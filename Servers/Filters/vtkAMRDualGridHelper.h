@@ -41,6 +41,13 @@ public:
   vtkTypeRevisionMacro(vtkAMRDualGridHelper,vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
   
+  // Description:
+  // An option to turn off copying ghost values across process boundaries.
+  // If the ghost values are already correct, then the extra communication is 
+  // not necessary.  If this assumption is wrong, this option will produce
+  // cracks / seams.
+  void SetSkipGhostCopy(int val) { this->SkipGhostCopy = val;}
+  
   // Set this before you call initialize.
   void SetEnableDegenerateCells(int v) { this->EnableDegenerateCells = v;}
 
@@ -138,6 +145,8 @@ private:
     vtkAMRDualGridHelperBlock* lowResBlock,
     vtkAMRDualGridHelperBlock* highResBlock,
     void* messagePtr);
+
+  int SkipGhostCopy;
 
 private:
   vtkAMRDualGridHelper(const vtkAMRDualGridHelper&);  // Not implemented.

@@ -24,7 +24,7 @@
 #include "vtkUnsignedCharArray.h"
 #include "vtkstd/vector"
 
-vtkCxxRevisionMacro(vtkAMRDualGridHelper, "1.5");
+vtkCxxRevisionMacro(vtkAMRDualGridHelper, "1.6");
 vtkStandardNewMacro(vtkAMRDualGridHelper);
 
 class vtkAMRDualGridHelperSeed;
@@ -613,6 +613,8 @@ vtkAMRDualGridHelper::vtkAMRDualGridHelper()
 {
   int ii;
   
+  this->SkipGhostCopy = 0;
+
   this->DataTypeSize = 8;
   this->ArrayName = 0;
   this->EnableDegenerateCells = 1;
@@ -1154,7 +1156,10 @@ int vtkAMRDualGridHelper::ClaimBlockSharedRegion(
       dreg.ReceivingRegion[1] = regionY;
       dreg.ReceivingRegion[2] = regionZ;
       dreg.SourceBlock = bestBlock;
-      this->DegenerateRegionQueue.push_back(dreg);
+      if ( ! this->SkipGhostCopy)
+        {
+        this->DegenerateRegionQueue.push_back(dreg);
+        }
       }
     else
       {
@@ -1167,7 +1172,11 @@ int vtkAMRDualGridHelper::ClaimBlockSharedRegion(
 
 
 
-
+// Just a hack to test an assumption.
+// This can be removed once we determine hor the ghost values behave across
+// level changes.
+static int vtkDualGridHelperCheckAssumption = 0;
+static int vtkDualGridHelperSkipGhostCopy = 0;
 
 
 // The following three methods are all similar and should be reworked so that
@@ -1181,6 +1190,7 @@ void vtkDualGridHelperCopyBlockToBlock(T* ptr, T* lowerPtr, int ext[6], int leve
                                        int highResBlockOriginIndex[3],
                                        int lowResBlockOriginIndex[3])
 {
+  T val;
   T *xPtr, *yPtr, *zPtr;
   zPtr = ptr + ext[0]+yInc*ext[2] + zInc*ext[4];
   int lx, ly, lz; // x,y,z converted to lower grid indexes.
@@ -1195,7 +1205,15 @@ void vtkDualGridHelperCopyBlockToBlock(T* ptr, T* lowerPtr, int ext[6], int leve
       for (int x = ext[0]; x <= ext[1]; ++x)
         {
         lx = ((x+highResBlockOriginIndex[0]) >> levelDiff) - lowResBlockOriginIndex[0];
-        *xPtr = lowerPtr[lx + ly*yInc + lz*zInc];
+        val = lowerPtr[lx + ly*yInc + lz*zInc];
+        // Lets see if our assumption about ghost values is correct.
+        if (vtkDualGridHelperCheckAssumption && vtkDualGridHelperSkipGhostCopy && *xPtr != val)
+          {
+          vtkGenericWarningMacro("Ghost assumption incorrect.  Seams may result.");
+          // Report issue once per execution.
+          vtkDualGridHelperCheckAssumption = 0;
+          }
+        *xPtr = val;
         xPtr++;
         }
       yPtr += yInc;
@@ -1294,6 +1312,7 @@ void vtkAMRDualGridHelper::CopyDegenerateRegionBlockToBlock(
       ext[4] =  ext[5];   break;
     }
 
+  vtkDualGridHelperSkipGhostCopy =  this->SkipGhostCopy;
   // Assume all blocks have the same extent.
   switch (daType)
     {
@@ -1553,7 +1572,7 @@ void* vtkAMRDualGridHelper::CopyDegenerateRegionMessageToBlock(
 // step of initialization.
 void vtkAMRDualGridHelper::ProcessDegenerateRegionQueue()
 {
-  if (this->Controller == 0)
+  if (this->Controller == 0 || this->SkipGhostCopy)
     {
     return;
     }
@@ -1745,6 +1764,7 @@ int vtkAMRDualGridHelper::Initialize(vtkHierarchicalBoxDataSet* input,
   int blockId, numBlocks;
   int numLevels = input->GetNumberOfLevels();
 
+  vtkDualGridHelperCheckAssumption = 1;
   this->SetArrayName(arrayName);
 
   // Create the level objects.
