@@ -48,7 +48,7 @@
 #include <ctime>
 
 
-vtkCxxRevisionMacro(vtkAMRDualClip, "1.1");
+vtkCxxRevisionMacro(vtkAMRDualClip, "1.2");
 vtkStandardNewMacro(vtkAMRDualClip);
 
 
@@ -64,24 +64,6 @@ vtkStandardNewMacro(vtkAMRDualClip);
 
 
 
-
-
-
-
-
-static int edgeTable[12][3] = {
-{1,0,0},
-{1,2,0},
-{1,0,2},
-{1,2,2},
-{0,1,0},
-{2,1,0},
-{0,1,2},
-{2,1,2},
-{0,0,1},
-{2,0,1},
-{0,2,1},
-{2,2,1}  };
 
 
 
@@ -1782,7 +1764,19 @@ static int mirror[2][20] = {
 {7,5,3,1,6,4,2,0,15,13,14,12,19,17,18,16,11,10,9,8},
 {0,2,1,3,4,6,5,7,12,13,14,15,8,9,10,11,16,18,17,19}};
 
-
+static int edgeTable[12][3] = {
+{1,0,0},
+{1,2,0},
+{1,0,2},
+{1,2,2},
+{0,1,0},
+{2,1,0},
+{0,1,2},
+{2,1,2},
+{0,0,1},
+{2,0,1},
+{0,2,1},
+{2,2,1}  };
 
 // This permutation changes from right handed to left handed,
 // so we need to flip the order of the tetras.
