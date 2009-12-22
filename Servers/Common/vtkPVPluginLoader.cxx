@@ -41,7 +41,7 @@
 
 
 vtkStandardNewMacro(vtkPVPluginLoader);
-vtkCxxRevisionMacro(vtkPVPluginLoader, "1.18");
+vtkCxxRevisionMacro(vtkPVPluginLoader, "1.19");
 //-----------------------------------------------------------------------------
 vtkPVPluginLoader::vtkPVPluginLoader()
 {
@@ -152,9 +152,9 @@ void vtkPVPluginLoader::SetFileName(const char* file)
       "from a older version of ParaView when this function was not required.");
     this->PluginInfo->SetError(
       "Not a ParaView Plugin since could not locate the plugin-verification function");
-    vtkErrorMacro(
-      "Not a ParaView Plugin since could not locate the plugin-verification "
-      "function");
+    //vtkErrorMacro(
+    //  "Not a ParaView Plugin since could not locate the plugin-verification "
+    //  "function");
     vtkDynamicLoader::CloseLibrary(lib);
     return;
     }
