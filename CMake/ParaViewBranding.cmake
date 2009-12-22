@@ -256,9 +256,11 @@ FUNCTION(build_paraview_client BPC_NAME)
       ${BPC_EXTRA_DEPENDENCIES}
       )
 
-  INSTALL(TARGETS pq${BPC_NAME}Initializer
-          DESTINATION ${PV_INSTALL_LIB_DIR}
-          COMPONENT BrandedRuntime)
+    IF (PV_INSTALL_LIB_DIR)
+      INSTALL(TARGETS pq${BPC_NAME}Initializer
+            DESTINATION ${PV_INSTALL_LIB_DIR}
+            COMPONENT BrandedRuntime)
+    ENDIF (PV_INSTALL_LIB_DIR)
   ENDIF (BPC_MAKE_INITIALIZER_LIBRARY)
 
   SET (PV_EXE_LIST ${BPC_NAME})
@@ -276,9 +278,11 @@ FUNCTION(build_paraview_client BPC_NAME)
     ${BPC_EXTRA_DEPENDENCIES}
     )
 
-  INSTALL(TARGETS ${pv_exe_name}
+  IF (PV_INSTALL_BIN_DIR)
+    INSTALL(TARGETS ${pv_exe_name}
           DESTINATION ${PV_INSTALL_BIN_DIR} 
           COMPONENT BrandedRuntime)
+  ENDIF (PV_INSTALL_BIN_DIR)
 
   IF (BPC_MAKE_INITIALIZER_LIBRARY)
     TARGET_LINK_LIBRARIES(${pv_exe_name}
@@ -300,8 +304,11 @@ FUNCTION(build_paraview_client BPC_NAME)
         @ONLY IMMEDIATE)
       ADD_EXECUTABLE(${pvexe} ${CMAKE_CURRENT_BINARY_DIR}/${pvexe}-forward.c)
       ADD_DEPENDENCIES(${pvexe} ${pvexe}${PV_EXE_SUFFIX})
-      INSTALL(TARGETS ${pvexe} DESTINATION ${PV_INSTALL_BIN_DIR} COMPONENT
-        BrandedRuntime)
+      IF (PV_INSTALL_BIN_DIR)
+        INSTALL(TARGETS ${pvexe}
+                DESTINATION ${PV_INSTALL_BIN_DIR} 
+                COMPONENT BrandedRuntime)
+      ENDIF (PV_INSTALL_BIN_DIR)
     ENDFOREACH(pvexe)
   ENDIF(PV_NEED_SHARED_FORWARD)
 
