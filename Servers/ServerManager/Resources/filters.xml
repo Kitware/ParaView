@@ -2039,42 +2039,42 @@ attributes of the fragments.
    <!-- End Grid Fragment -->
    </SourceProxy>
 
-  <!-- ==================================================================== -->
-   <SourceProxy name="AMRDualContour" class="vtkAMRDualContour"
-      label="AMR Contour">
-     <Documentation
-       short_help="Iso surface cell array."
-       long_help="Crack free iso surface using dual grid.">
-     </Documentation>
-     <InputProperty
-        name="Input"
-        command="SetInputConnection">
-           <ProxyGroupDomain name="groups">
-             <Group name="sources"/>
-             <Group name="filters"/>
-           </ProxyGroupDomain>
-           <DataTypeDomain name="input_type">
-             <DataType value="vtkCompositeDataSet"/>
-           </DataTypeDomain>
-           <InputArrayDomain name="input_array" attribute_type="cell"
-                             number_of_components="1"/>
+    <!-- ==================================================================== -->
+    <SourceProxy name="AMRDualClip" class="vtkAMRDualClip"
+       label="AMR Clip">
+      <Documentation
+        short_help="Clip with decimation."
+        long_help="Clip with scalars.  Tetrahedra.">
+      </Documentation>
+      <InputProperty
+         name="Input"
+         command="SetInputConnection">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkCompositeDataSet"/>
+        </DataTypeDomain>
+        <InputArrayDomain name="input_array" attribute_type="cell"
+                          number_of_components="1"/>
       </InputProperty>
 
-      <StringVectorProperty 
-        name="SelectInputScalars" 
+      <StringVectorProperty
+        name="SelectInputScalars"
         command="SetInputArrayToProcess"
         number_of_elements="5"
         element_types="0 0 0 0 2"
         animateable="0"
         label="Contour By">
-          <ArrayListDomain name="array_list" attribute_type="Scalars">
-            <RequiredProperties>
-               <Property name="Input" function="Input"/>
-            </RequiredProperties>
-          </ArrayListDomain>
-          <Documentation>
-            This property specifies the name of the cell scalar array from which the contour filter will compute isolines and/or isosurfaces.
-          </Documentation>
+        <ArrayListDomain name="array_list" attribute_type="Scalars">
+          <RequiredProperties>
+            <Property name="Input" function="Input"/>
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Documentation>
+          This property specifies the name of the cell scalar array from which the clip filter will compute clipped cells.
+        </Documentation>
       </StringVectorProperty>
 
       <DoubleVectorProperty
@@ -2082,84 +2082,189 @@ attributes of the fragments.
         command="SetIsoValue"
         label="Isosurface"
         number_of_elements="1"
-        default_values="1" > 
+        default_values="1" >
         animateable="1">
-          <ArrayRangeDomain name="scalar_range">
-            <RequiredProperties>
-               <Property name="Input" function="Input"/>
-               <Property name="SelectInputScalars" function="ArraySelection"/>
-            </RequiredProperties>
-          </ArrayRangeDomain>
-          <Documentation>
-            This property specifies the values at which to compute the isosurface.
-          </Documentation>
+        <ArrayRangeDomain name="scalar_range">
+          <RequiredProperties>
+            <Property name="Input" function="Input"/>
+            <Property name="SelectInputScalars" function="ArraySelection"/>
+          </RequiredProperties>
+        </ArrayRangeDomain>
+        <Documentation>
+          This property specifies the values at which to compute the isosurface.
+        </Documentation>
       </DoubleVectorProperty>
-      
-      <IntVectorProperty 
-        name="Capping" 
-        command="SetEnableCapping" 
+
+      <IntVectorProperty
+        name="DegenerateCells"
+        command="SetEnableDegenerateCells"
         number_of_elements="1"
         animateable="1"
-        default_values="1" > 
-       <BooleanDomain name="bool"/>
-       <Documentation>
-         If this property is on, the the boundary of the data set is capped.
-       </Documentation>
+        default_values="1" >
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          If this property is on, a transition mesh between levels is created.
+        </Documentation>
       </IntVectorProperty>
-      
-      <IntVectorProperty 
-        name="DegenerateCells" 
-        command="SetEnableDegenerateCells" 
+
+      <IntVectorProperty
+        name="MultiprocessCommunication"
+        command="SetEnableMultiProcessCommunication"
         number_of_elements="1"
         animateable="1"
-        default_values="1" > 
-       <BooleanDomain name="bool"/>
-       <Documentation>
-         If this property is on, a transition mesh between levels is created.
-       </Documentation>
+        default_values="1" >
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          If this property is off, each process executes independantly.
+        </Documentation>
       </IntVectorProperty>
 
-     <IntVectorProperty
-       name="MultiprocessCommunication"
-       command="SetEnableMultiProcessCommunication"
-       number_of_elements="1"
-       animateable="1"
-       default_values="1" >
-       <BooleanDomain name="bool"/>
-       <Documentation>
-         If this property is off, each process executes independantly.
-       </Documentation>
-     </IntVectorProperty>
-     
-     <IntVectorProperty
-       name="Triangulate"
-       command="SetTriangulateCap"
-       number_of_elements="1"
-       animateable="1"
-       default_values="1" >
-       <BooleanDomain name="bool"/>
-       <Documentation>
-         Use triangles instead of quads on capping surfaces.
-       </Documentation>
-     </IntVectorProperty>
+      <IntVectorProperty
+        name="MergePoints"
+        command="SetEnableMergePoints"
+        number_of_elements="1"
+        animateable="1"
+        default_values="1" >
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Use more memory to merge points on the boundaries of blocks.
+        </Documentation>
+      </IntVectorProperty>
+      <!-- End AMR Dual Clip -->
+    </SourceProxy>
 
-     <IntVectorProperty
-       name="MergePoints"
-       command="SetEnableMergePoints"
-       number_of_elements="1"
-       animateable="1"
-       default_values="1" >
-       <BooleanDomain name="bool"/>
-       <Documentation>
-         Use more memory to merge points on the boundaries of blocks.
-       </Documentation>
-     </IntVectorProperty>
+    <!-- ==================================================================== -->
+    <SourceProxy name="AMRDualContour" class="vtkAMRDualContour"
+       label="AMR Contour">
+      <Documentation
+        short_help="Iso surface cell array.">
+      </Documentation>
+      <InputProperty
+         name="Input"
+         command="SetInputConnection">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkCompositeDataSet"/>
+        </DataTypeDomain>
+        <InputArrayDomain name="input_array" attribute_type="cell"
+                          number_of_components="1"/>
+      </InputProperty>
+
+      <StringVectorProperty
+        name="SelectInputScalars"
+        command="SetInputArrayToProcess"
+        number_of_elements="5"
+        element_types="0 0 0 0 2"
+        animateable="0"
+        label="Contour By">
+        <ArrayListDomain name="array_list" attribute_type="Scalars">
+          <RequiredProperties>
+            <Property name="Input" function="Input"/>
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Documentation>
+          This property specifies the name of the cell scalar array from which the contour filter will compute isolines and/or isosurfaces.
+        </Documentation>
+      </StringVectorProperty>
+
+      <DoubleVectorProperty
+        name="ContourValue"
+        command="SetIsoValue"
+        label="Isosurface"
+        number_of_elements="1"
+        default_values="1" >
+        animateable="1">
+        <ArrayRangeDomain name="scalar_range">
+          <RequiredProperties>
+            <Property name="Input" function="Input"/>
+            <Property name="SelectInputScalars" function="ArraySelection"/>
+          </RequiredProperties>
+        </ArrayRangeDomain>
+        <Documentation>
+          This property specifies the values at which to compute the isosurface.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <IntVectorProperty
+        name="Capping"
+        command="SetEnableCapping"
+        number_of_elements="1"
+        animateable="1"
+        default_values="1" >
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          If this property is on, the the boundary of the data set is capped.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty
+        name="DegenerateCells"
+        command="SetEnableDegenerateCells"
+        number_of_elements="1"
+        animateable="1"
+        default_values="1" >
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          If this property is on, a transition mesh between levels is created.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty
+        name="MultiprocessCommunication"
+        command="SetEnableMultiProcessCommunication"
+        number_of_elements="1"
+        animateable="1"
+        default_values="1" >
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          If this property is off, each process executes independantly.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty
+        name="SkipGhostCopy"
+        command="SetSkipGhostCopy"
+        number_of_elements="1"
+        animateable="1"
+        default_values="1" >
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          A simple test to see if ghost values are already set properly.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty
+        name="Triangulate"
+        command="SetTriangulateCap"
+        number_of_elements="1"
+        animateable="1"
+        default_values="1" >
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Use triangles instead of quads on capping surfaces.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty
+        name="MergePoints"
+        command="SetEnableMergePoints"
+        number_of_elements="1"
+        animateable="1"
+        default_values="1" >
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Use more memory to merge points on the boundaries of blocks.
+        </Documentation>
+      </IntVectorProperty>
 
 
-     <!-- End AMR Dual Contour -->
-   </SourceProxy>
+      <!-- End AMR Dual Contour -->
+    </SourceProxy>
 
-  <!-- ==================================================================== -->
+    <!-- ==================================================================== -->
    <SourceProxy name="CTHSurface" class="vtkCTHSimpleSurface"
       label="CTH Surface">
      <Documentation
