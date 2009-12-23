@@ -68,6 +68,38 @@ ENDIF (BUILD_TESTING)
 
 
 #########################################################################
+# Add install rules for installing certain dependencies.
+
+#------------------------------------------------------------------------
+# Install Qt 
+SET (qtliblist QTCORE QTGUI QTNETWORK QTXML QTDBUS QTSQL QTHELP QTWEBKIT QTCLUCENE)
+IF (VTK_USE_QVTK_QTOPENGL)
+  SET (qtliblist ${qtliblist} QTOPENGL)
+ENDIF (VTK_USE_QVTK_QTOPENGL)
+
+install_qt_libs("${qtliblist}" Runtime)
+
+#------------------------------------------------------------------------
+# Install ffmpeg, if used.
+FOREACH(fmpglib avcodec avformat avutil)
+  IF (FFMPEG_${fmpglib}_LIBRARY)
+    INSTALL(FILES ${FFMPEG_${fmpglib}_LIBRARY}
+            DESTINATION ${PV_INSTALL_LIB_DIR}
+            COMPONENT Runtime)
+  ENDIF(FFMPEG_${fmpglib}_LIBRARY)
+ENDFOREACH(fmpglib)
+
+#------------------------------------------------------------------------
+# Import site specific installation rules file, if any.
+SET (PARAVIEW_EXTRA_INSTALL_RULES_FILE "" CACHE FILEPATH 
+  "Path to site-specific install rules for ParaView.")
+
+IF (EXISTS "${PARAVIEW_EXTRA_INSTALL_RULES_FILE}")
+  INCLUDE("${PARAVIEW_EXTRA_INSTALL_RULES_FILE}")
+ENDIF (EXISTS "${PARAVIEW_EXTRA_INSTALL_RULES_FILE}")
+
+#------------------------------------------------------------------------
+# Install ParaView client
 build_paraview_client_cpack_config_init(
     PACKAGE_NAME "ParaView"
     ORGANIZATION "Kitware Inc."
@@ -81,6 +113,4 @@ build_paraview_client_cpack_config_init(
 )
 
 build_paraview_client_cpack_config()
-# Setup CPack
-#INCLUDE(ParaView3CPack.cmake)
 #########################################################################

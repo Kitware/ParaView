@@ -63,6 +63,17 @@ MACRO(build_paraview_client_cpack_config_init)
       SET(CPACK_SYSTEM_NAME win32-${CMAKE_SYSTEM_PROCESSOR})
     ENDIF(CMAKE_CL_64)
   ENDIF(${CPACK_SYSTEM_NAME} MATCHES Windows)
+
+  SET (CPACK_INSTALL_CMAKE_PROJECTS
+    "${ParaView_BINARY_DIR}" "ParaView Runtime Libs" "Runtime" "/"
+    "${ParaView_BINARY_DIR}" "VTK Runtime Libs" "RuntimeLibraries" "/"
+    "${CMAKE_CURRENT_BINARY_DIR}" "${BCC_PACKAGE_NAME} Components" "BrandedRuntime" "/"
+  )
+  
+  # Override this variable to choose a different component for mac drag-n-drop
+  # generator.
+  SET (CPACK_INSTALL_CMAKE_PROJECTS_DRAGNDROP
+    ${CPACK_INSTALL_CMAKE_PROJECTS})
 ENDMACRO(build_paraview_client_cpack_config_init)
 
 MACRO(build_paraview_client_cpack_config)
@@ -73,3 +84,26 @@ MACRO(build_paraview_client_cpack_config)
   INCLUDE(CPack)
 ENDMACRO(build_paraview_client_cpack_config)
 
+
+# Function to install qt libraries. qtliblist is a list of libraries to install
+# of the form "QTCORE QTGUI QTNETWORK QTXML QTTEST QTSQL" etc.
+FUNCTION(install_qt_libs qtliblist componentname)
+  IF (NOT WIN32)
+    FOREACH(qtlib ${qtliblist})
+      GET_FILENAME_COMPONENT(QT_LIB_DIR_tmp ${QT_${qtlib}_LIBRARY_RELEASE} PATH)
+      GET_FILENAME_COMPONENT(QT_LIB_NAME_tmp ${QT_${qtlib}_LIBRARY_RELEASE} NAME)
+      FILE(GLOB QT_LIB_LIST RELATIVE ${QT_LIB_DIR_tmp} "${QT_${qtlib}_LIBRARY_RELEASE}*")
+      INSTALL(CODE "
+MESSAGE(STATUS \"Installing \${CMAKE_INSTALL_PREFIX}/${PV_INSTALL_LIB_DIR}/${QT_LIB_NAME_tmp}\")
+EXECUTE_PROCESS (WORKING_DIRECTORY ${QT_LIB_DIR_tmp}
+                 COMMAND tar c ${QT_LIB_LIST}
+                 COMMAND tar -xC \${CMAKE_INSTALL_PREFIX}/${PV_INSTALL_LIB_DIR})
+        " COMPONENT ${componentname})
+    ENDFOREACH(qtlib)
+  ELSE (NOT WIN32)
+    GET_FILENAME_COMPONENT(QT_DLL_PATH_tmp ${QT_QMAKE_EXECUTABLE} PATH)
+      INSTALL(FILES ${QT_DLL_PATH_tmp}/${qtlib}4.dll 
+              DESTINATION ${PV_INSTALL_LIB_DIR} 
+              COMPONENT ${componentname})
+  ENDIF (NOT WIN32)
+ENDFUNCTION(install_qt)
