@@ -226,12 +226,17 @@ IF (VTK_USE_QVTK)
     vtkSMChartOptionsProxy.cxx
     vtkSMChartRepresentationProxy.cxx
     vtkSMChartViewProxy.cxx
+#    vtkSMContextNamedOptionsModelProxy.cxx
+    vtkSMContextViewProxy.cxx
     vtkSMLineChartViewProxy.cxx
+    vtkSMXYChartRepresentationProxy.cxx
+    vtkSMXYChartViewProxy.cxx
     )
   FIND_PACKAGE(Qt4)
   INCLUDE(${QT_USE_FILE})
   INCLUDE_DIRECTORIES(
     ${QT_INCLUDE_DIR}
+    ${ParaView_SOURCE_DIR}/VTK/Charts
     ${ParaView_SOURCE_DIR}/VTK/GUISupport/Qt
     ${ParaView_BINARY_DIR}/VTK/GUISupport/Qt
     ${ParaView_SOURCE_DIR}/VTK/GUISupport/Qt/Chart
@@ -239,6 +244,7 @@ IF (VTK_USE_QVTK)
 
   SET_SOURCE_FILES_PROPERTIES(
     vtkSMChartViewProxy.cxx
+    vtkSMContextViewProxy.cxx
     ABSTRACT)
 ENDIF (VTK_USE_QVTK)
 
@@ -348,6 +354,7 @@ TARGET_LINK_LIBRARIES(vtk${KIT}
 
 IF (VTK_USE_QVTK)
   TARGET_LINK_LIBRARIES(vtk${KIT}
+    vtkCharts
     vtkQtChart
     QVTK)
 ENDIF (VTK_USE_QVTK)

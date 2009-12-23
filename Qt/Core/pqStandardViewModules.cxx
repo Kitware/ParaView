@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -45,10 +45,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqTextRepresentation.h"
 #include "pqTwoDRenderView.h"
 #include "pqScatterPlotView.h"
+#include "pqXYChartView.h"
 #include "vtkSMChartViewProxy.h"
+#include "vtkSMContextViewProxy.h"
+#include "vtkSMXYChartViewProxy.h"
 #include "vtkSMComparativeViewProxy.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMRenderViewProxy.h"
+
+#include <QDebug>
 
 pqStandardViewModules::pqStandardViewModules(QObject* o)
   : QObject(o)
@@ -61,22 +66,23 @@ pqStandardViewModules::~pqStandardViewModules()
 
 QStringList pqStandardViewModules::viewTypes() const
 {
-  return QStringList() << 
-    pqRenderView::renderViewType() << 
+  return QStringList() <<
+    pqRenderView::renderViewType() <<
     pqTwoDRenderView::twoDRenderViewType() <<
-    pqBarChartView::barChartViewType() << 
-    pqLineChartView::lineChartViewType() << 
+    pqBarChartView::barChartViewType() <<
+    pqLineChartView::lineChartViewType() <<
     pqTableView::tableType() <<
     pqComparativeRenderView::comparativeRenderViewType() <<
     pqComparativeBarChartView::comparativeBarChartViewType() <<
     pqComparativeLineChartView::comparativeLineChartViewType() <<
     pqSpreadSheetView::spreadsheetViewType() <<
-    pqScatterPlotView::scatterPlotViewType();
+    pqScatterPlotView::scatterPlotViewType() <<
+    pqXYChartView::XYChartViewType();
 }
 
 QStringList pqStandardViewModules::displayTypes() const
 {
-  return QStringList() 
+  return QStringList()
     << "BarChartRepresentation"
     << "XYPlotRepresentation"
     << "TextSourceRepresentation";
@@ -123,6 +129,10 @@ QString pqStandardViewModules::viewTypeName(const QString& type) const
   else if  (type == pqScatterPlotView::scatterPlotViewType())
     {
     return pqScatterPlotView::scatterPlotViewTypeName();
+    }
+  else if (type == pqXYChartView::XYChartViewType())
+    {
+    return pqXYChartView::XYChartViewTypeName();
     }
 
   return QString();
@@ -178,6 +188,10 @@ vtkSMProxy* pqStandardViewModules::createViewProxy(const QString& viewtype,
     {
     root_xmlname = "ScatterPlotRenderView";
     }
+  else if (viewtype == pqXYChartView::XYChartViewType())
+    {
+    root_xmlname = "XYChartView";
+    }
 
   if (root_xmlname)
     {
@@ -210,7 +224,7 @@ pqView* pqStandardViewModules::createView(const QString& viewtype,
   else if (viewtype == pqLineChartView::lineChartViewType() &&
     viewmodule->IsA("vtkSMChartViewProxy"))
     {
-    return new pqLineChartView(group, viewname, 
+    return new pqLineChartView(group, viewname,
       vtkSMChartViewProxy::SafeDownCast(viewmodule), server, p);
     }
   else if(viewtype == "TableView")
@@ -231,13 +245,15 @@ pqView* pqStandardViewModules::createView(const QString& viewtype,
     && viewmodule->IsA("vtkSMComparativeViewProxy"))
     {
     return new pqComparativeBarChartView(
-      group, viewname, vtkSMComparativeViewProxy::SafeDownCast(viewmodule), server, p);
+      group, viewname, vtkSMComparativeViewProxy::SafeDownCast(viewmodule),
+      server, p);
     }
   else if (viewtype == pqComparativeLineChartView::comparativeLineChartViewType()
     && viewmodule->IsA("vtkSMComparativeViewProxy"))
     {
     return new pqComparativeLineChartView(
-      group, viewname, vtkSMComparativeViewProxy::SafeDownCast(viewmodule), server, p);
+      group, viewname, vtkSMComparativeViewProxy::SafeDownCast(viewmodule),
+      server, p);
     }
   else if (viewmodule->IsA("vtkSMComparativeViewProxy"))
     {
@@ -248,19 +264,25 @@ pqView* pqStandardViewModules::createView(const QString& viewtype,
   else if (viewmodule->IsA("vtkSMTwoDRenderViewProxy"))
     {
     return new pqTwoDRenderView(
-      group, viewname, viewmodule, server, p); 
+      group, viewname, viewmodule, server, p);
     }
   else if (viewmodule->IsA("vtkSMScatterPlotViewProxy"))
     {
     return new pqScatterPlotView(
-      group, viewname, viewmodule, server, p); 
+      group, viewname, viewmodule, server, p);
     }
-  
-  
+  else if (viewmodule->IsA("vtkSMXYChartViewProxy"))
+    {
+    return new pqXYChartView(group, viewname,
+                            vtkSMXYChartViewProxy::SafeDownCast(viewmodule),
+                            server, p);
+    }
+
+  qDebug() << "Failed to create a proxy" << viewmodule->GetClassName();
   return NULL;
 }
 
-pqDataRepresentation* pqStandardViewModules::createDisplay(const QString& display_type, 
+pqDataRepresentation* pqStandardViewModules::createDisplay(const QString& display_type,
   const QString& group,
   const QString& n,
   vtkSMProxy* proxy,

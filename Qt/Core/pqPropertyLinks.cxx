@@ -583,6 +583,11 @@ void pqPropertyLinks::addPropertyLink(QObject* qObject, const char* qProperty,
   if(!Proxy || !Property || !qObject || !qProperty || !signal)
     {
     qWarning("Invalid parameters to add link\n");
+    qDebug() << "Proxy:" << Proxy << Proxy->GetClassName();
+    qDebug() << "Property:" << Property;
+    qDebug() << "qObject:" << qObject;
+    qDebug() << "qProperty:" << qProperty;
+    qDebug() << "signal:" << signal;
     return;
     }
   

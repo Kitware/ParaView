@@ -43,6 +43,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqBrandPluginsLoader.h
   pqChartRepresentation.h
   pqChartView.h
+  pqContextView.h
   pqColorButtonEventPlayer.h
   pqColorButtonEventTranslator.h
   pqCommandServerStartup.h
@@ -117,6 +118,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqWriterFactory.h
   pqXMLEventObserver.h
   pqXMLEventSource.h
+  pqXYChartView.h
   ${PYTHON_MOC_SRCS}
   )
 SET_DIRECTORY_PROPERTIES(PROPERTIES INCLUDE_DIRECTORIES "${include_dirs_tmp}")
@@ -183,6 +185,8 @@ ADD_LIBRARY(pqCore
   pqChartRepresentation.h
   pqChartView.cxx
   pqChartView.h
+  pqContextView.cxx
+  pqContextView.h
   pqColorButtonEventPlayer.cxx
   pqColorButtonEventPlayer.h
   pqColorButtonEventTranslator.cxx
@@ -367,6 +371,8 @@ ADD_LIBRARY(pqCore
   pqXMLEventSource.h
   pqXMLUtil.cxx
   pqXMLUtil.h
+  pqXYChartView.cxx
+  pqXYChartView.h
 
   ${MOC_BUILT_SOURCES}
   ${RCS_SOURCES}
@@ -385,6 +391,7 @@ TARGET_LINK_LIBRARIES(pqCore
   pqWidgets
   QVTK
   vtkQtChart
+  vtkCharts
   vtkPVServerManager
 )
 
