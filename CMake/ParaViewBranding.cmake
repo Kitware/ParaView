@@ -278,11 +278,12 @@ FUNCTION(build_paraview_client BPC_NAME)
     ${BPC_EXTRA_DEPENDENCIES}
     )
 
-  IF (PV_INSTALL_BIN_DIR)
+  IF (PV_EXE_INSTALL)
+    # PV_EXE_INSTALL is set to lib-dir when shared forwarding is enabled.
     INSTALL(TARGETS ${pv_exe_name}
-          DESTINATION ${PV_INSTALL_BIN_DIR} 
+          DESTINATION ${PV_EXE_INSTALL} 
           COMPONENT BrandedRuntime)
-  ENDIF (PV_INSTALL_BIN_DIR)
+  ENDIF (PV_EXE_INSTALL)
 
   IF (BPC_MAKE_INITIALIZER_LIBRARY)
     TARGET_LINK_LIBRARIES(${pv_exe_name}
