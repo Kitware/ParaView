@@ -77,7 +77,7 @@ IF (VTK_USE_QVTK_QTOPENGL)
   SET (qtliblist ${qtliblist} QTOPENGL)
 ENDIF (VTK_USE_QVTK_QTOPENGL)
 
-install_qt_libs("${qtliblist}" Runtime)
+install_qt_libs("${qtliblist}" BrandedRuntime)
 
 #------------------------------------------------------------------------
 # Install ffmpeg, if used.
@@ -85,7 +85,7 @@ FOREACH(fmpglib avcodec avformat avutil)
   IF (FFMPEG_${fmpglib}_LIBRARY)
     INSTALL(FILES ${FFMPEG_${fmpglib}_LIBRARY}
             DESTINATION ${PV_INSTALL_LIB_DIR}
-            COMPONENT Runtime)
+            COMPONENT BrandedRuntime)
   ENDIF(FFMPEG_${fmpglib}_LIBRARY)
 ENDFOREACH(fmpglib)
 
@@ -97,6 +97,12 @@ SET (PARAVIEW_EXTRA_INSTALL_RULES_FILE "" CACHE FILEPATH
 IF (EXISTS "${PARAVIEW_EXTRA_INSTALL_RULES_FILE}")
   INCLUDE("${PARAVIEW_EXTRA_INSTALL_RULES_FILE}")
 ENDIF (EXISTS "${PARAVIEW_EXTRA_INSTALL_RULES_FILE}")
+
+#------------------------------------------------------------------------
+# Install the .plugins configuration file.
+INSTALL(FILES "${EXECUTABLE_OUTPUT_PATH}/.plugins"
+        DESTINATION ${PV_INSTALL_LIB_DIR}
+        COMPONENT BrandedRuntime)
 
 #------------------------------------------------------------------------
 # Install ParaView client

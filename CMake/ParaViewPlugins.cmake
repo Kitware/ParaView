@@ -8,7 +8,7 @@ INCLUDE("${VTK_MAKE_INSTANTIATOR}/vtkMakeInstantiator.cmake")
 MACRO(internal_paraview_install_plugin name)
   IF (PV_INSTALL_LIB_DIR)
     INSTALL(TARGETS ${name}
-      DESTINATION "${PV_INSTALL_LIB_DIR}/plugins/"
+      DESTINATION "${PV_INSTALL_LIB_DIR}/plugins/${name}"
       COMPONENT Runtime)
   ENDIF (PV_INSTALL_LIB_DIR)
 ENDMACRO(internal_paraview_install_plugin)
