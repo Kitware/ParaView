@@ -45,7 +45,7 @@ public:
 };
 
 
-vtkCxxRevisionMacro(vtkSMContextViewProxy, "1.1");
+vtkCxxRevisionMacro(vtkSMContextViewProxy, "1.2");
 //----------------------------------------------------------------------------
 vtkSMContextViewProxy::vtkSMContextViewProxy()
 {
@@ -96,10 +96,11 @@ vtkContextView* vtkSMContextViewProxy::GetChartView()
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMContextViewProxy::WriteImage(const char* filename)
+bool vtkSMContextViewProxy::WriteImage(const char*)
 {
 //  this->PerformRender();
 //  return this->ChartView->SaveImage(filename);
+  return false;
 }
 
 //----------------------------------------------------------------------------
