@@ -24,7 +24,7 @@
 #include "vtkTable.h"
 
 vtkStandardNewMacro(vtkSMXYChartRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMXYChartRepresentationProxy, "1.1");
+vtkCxxRevisionMacro(vtkSMXYChartRepresentationProxy, "1.2");
 //----------------------------------------------------------------------------
 vtkSMXYChartRepresentationProxy::vtkSMXYChartRepresentationProxy()
 {
@@ -160,12 +160,14 @@ void vtkSMXYChartRepresentationProxy::Update(vtkSMViewProxy* view)
 int vtkSMXYChartRepresentationProxy::GetNumberOfSeries()
 {
 //  return this->VTKRepresentation->GetNumberOfSeries();
+  return 0;
 }
 
 //----------------------------------------------------------------------------
-const char* vtkSMXYChartRepresentationProxy::GetSeriesName(int series)
+const char* vtkSMXYChartRepresentationProxy::GetSeriesName(int)
 {
 //  return this->VTKRepresentation->GetSeriesName(series);
+  return NULL;
 }
 
 //----------------------------------------------------------------------------
