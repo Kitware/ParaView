@@ -78,7 +78,9 @@ ENDMACRO(build_paraview_client_cpack_config_init)
 
 MACRO(build_paraview_client_cpack_config)
   CONFIGURE_FILE("${ParaView_SOURCE_DIR}/CMake/ParaViewCPackOptions.cmake.in"
-    "${CMAKE_CURRENT_BINARY_DIR}/CPack${CPACK_PACKAGE_NAME}Options.cmake")
+    "${CMAKE_CURRENT_BINARY_DIR}/CPack${CPACK_PACKAGE_NAME}Options.cmake"
+    @ONLY
+    )
   SET (CPACK_PROJECT_CONFIG_FILE
     "${CMAKE_CURRENT_BINARY_DIR}/CPack${CPACK_PACKAGE_NAME}Options.cmake")
   INCLUDE(CPack)

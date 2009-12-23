@@ -55,14 +55,16 @@ mkdir -p "$SupportDir"
 #cp -p "${ParaViewBinaryDir}/pqClient.adp"  "$SupportDir/."
 
 # Copy the ".plugins" configuration file.
-echo "Copying .plugins"
-cp "${ParaViewBinaryDir}/bin/.plugins" "$SupportDir/"
+echo "Copying $ParaViewBinaryDir/bin/.plugins to $SupportDir"
+cp -p "$ParaViewBinaryDir/bin/.plugins" "$SupportDir/"
 
 # Copy the python scripts into the Python directory
 #
 echo "Copy python scripts"
 cp -Rp "${ParaViewBinaryDir}/Utilities/VTKPythonWrapping/paraview" "$PythonDir/"
 
+# Create an empty qt.conf so that we don't try to load Qt plugins.
+touch "$ParaView_App/Contents/Resources/qt.conf"
 
 # Assistant is no longer needed.
 ## Copy the Qt Assistant application into the Support directory

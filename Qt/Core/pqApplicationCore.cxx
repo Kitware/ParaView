@@ -733,8 +733,13 @@ void pqApplicationCore::loadDistributedPlugins(const char* filename)
     {
     config_file = QApplication::applicationDirPath() +  "/.plugins";
 #if defined(__APPLE__)
-    config_file =  QApplication::applicationDirPath() + "/../../../.plugins";
-    // FIXME: locating the .plugins in the installed .app bundle.
+
+    // for installed applications.
+    config_file = QApplication::applicationDirPath() + "/../Support/.plugins";
+    if (!QFile::exists(config_file))
+      {
+      config_file =  QApplication::applicationDirPath() + "/../../../.plugins";
+      }
 #endif
     }
 
