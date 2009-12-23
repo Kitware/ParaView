@@ -1,0 +1,95 @@
+#!/bin/sh
+
+# InstallPrefix environment variable may be set by caller...
+# If not, default to "$DESTDIR/Applications"
+#
+if [ "x$InstallPrefix" = "x" ]; then
+  InstallPrefix="$DESTDIR/Applications"
+  echo "info: Using default InstallPrefix value:"
+  echo "      $InstallPrefix"
+fi
+
+ParaViewBinaryDir="@ParaView_BINARY_DIR@"
+ParaViewExeName="@PV_EXE_NAME@"
+ParaView_App="@EXECUTABLE_OUTPUT_PATH@/$ParaViewExeName.app"
+
+
+# Remove the previous app package so we start with a clean bundle
+#
+echo "Remove previous bundle"
+rm -rf "$InstallPrefix/ParaView @PARAVIEW_VERSION_FULL@.app"
+
+
+# Copy paraview.app from the build tree to the install tree:
+#
+echo "Copy paraview.app from the build tree to $InstallPrefix/"
+mkdir -p "$InstallPrefix"
+cp -Rp "$ParaView_App" "$InstallPrefix/"
+mv "$InstallPrefix/paraview.app" "$InstallPrefix/ParaView @PARAVIEW_VERSION_FULL@.app"
+
+
+# Now operate on the bundle in the install tree:
+#
+ParaView_App="$InstallPrefix/ParaView @PARAVIEW_VERSION_FULL@.app"
+
+FrameworksDir="$ParaView_App/Contents/Frameworks"
+LibrariesDir="$ParaView_App/Contents/Libraries"
+PluginsDir="$ParaView_App/Contents/Plugins"
+PythonDir="$ParaView_App/Contents/Python"
+SupportDir="$ParaView_App/Contents/Support"
+
+
+# Create directories in the install tree bundle
+#
+mkdir -p "$FrameworksDir"
+mkdir -p "$LibrariesDir"
+mkdir -p "$PluginsDir"
+mkdir -p "$PythonDir"
+mkdir -p "$SupportDir"
+
+
+# Copy the documentation into the Support directory
+# Documentation is no longer distributed as such.
+#echo "Copy documentation"
+#cp -Rp "${ParaViewBinaryDir}/Documentation" "$SupportDir/"
+#cp -p "${ParaViewBinaryDir}/pqClient.adp"  "$SupportDir/."
+
+# Copy the ".plugins" configuration file.
+echo "Copying .plugins"
+cp "${ParaViewBinaryDir}/bin/.plugins" "$SupportDir/"
+
+# Copy the python scripts into the Python directory
+#
+echo "Copy python scripts"
+cp -Rp "${ParaViewBinaryDir}/Utilities/VTKPythonWrapping/paraview" "$PythonDir/"
+
+
+# Assistant is no longer needed.
+## Copy the Qt Assistant application into the Support directory
+##
+#echo "Embed copy of the QtAssistant in bundle"
+#cp -RpL "@QT_ASSISTANT_DOTAPP_BUNDLE@" "$SupportDir/"
+#
+## Create an empty qt.conf file in the Assistant_adp app package
+## to stop plugin loading by Assistant.
+##
+#touch "$SupportDir/@QT_ASSISTANT_DOTAPP_BUNDLE_NAME@/Contents/Resources/qt.conf"
+#
+## Create symlinks so that the Assistant.app bundle can use the same
+## copy of Qt Frameworks/Libraries as the paraview executable, yet still
+## refer to them via a string like "@executable_path/../Frameworks"...
+##
+#pushd "$SupportDir/@QT_ASSISTANT_DOTAPP_BUNDLE_NAME@/Contents"
+#ln -s "../../../Libraries" "Libraries"
+#ln -s "../../../Frameworks" "Frameworks"
+#popd
+
+
+# Remove unneeded build-byproduct files that were copied by the
+# above recursive directory copies:
+#
+rm -rf "$PythonDir/paraview/pv_compile_complete"
+#rm -rf "$SupportDir/Documentation/CMakeFiles"
+#rm -rf "$SupportDir/Documentation/cmake_install.cmake"
+#rm -rf "$SupportDir/Documentation/CTestTestfile.cmake"
+#rm -rf "$SupportDir/Documentation/Makefile"

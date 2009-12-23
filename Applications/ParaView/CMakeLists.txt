@@ -104,6 +104,23 @@ INSTALL(FILES "${EXECUTABLE_OUTPUT_PATH}/.plugins"
         DESTINATION ${PV_INSTALL_LIB_DIR}
         COMPONENT BrandedRuntime)
 
+# Call this last so the install script runs after the above targets are installed:
+#
+IF(APPLE)
+  SET(distributed_plugins ${PARAVIEW_PLUGINLIST})
+  SET(OSX_MAKE_STANDALONE_BUNDLE_CMAKE_SCRIPT
+    "${CMAKE_CURRENT_BINARY_DIR}/${PV_EXE_NAME}_OSX_MakeStandAloneBundle.cmake")
+  SET(OSX_MAKE_STANDALONE_BUNDLE_BASH_SCRIPT
+    "${CMAKE_CURRENT_BINARY_DIR}/${PV_EXE_NAME}_OSX_MakeStandAloneBundle.sh")
+
+  CONFIGURE_FILE("${CMAKE_CURRENT_SOURCE_DIR}/CompleteBundle.cmake.in"
+    "${OSX_MAKE_STANDALONE_BUNDLE_CMAKE_SCRIPT}" @ONLY IMMEDIATE)
+  CONFIGURE_FILE("${CMAKE_CURRENT_SOURCE_DIR}/CreateBundle.sh.in"
+    "${OSX_MAKE_STANDALONE_BUNDLE_BASH_SCRIPT}" @ONLY IMMEDIATE)
+
+  INSTALL(SCRIPT "${OSX_MAKE_STANDALONE_BUNDLE_CMAKE_SCRIPT}" COMPONENT Bundle)
+ENDIF(APPLE)
+
 #------------------------------------------------------------------------
 # Install ParaView client
 build_paraview_client_cpack_config_init(
@@ -117,6 +134,11 @@ build_paraview_client_cpack_config_init(
     DESCRIPTION_FILE "${ParaView_SOURCE_DIR}/License_v1.2.txt"
     PACKAGE_EXECUTABLES "paraview;ParaView"
 )
+
+# This ensure that the only component that is used by cpack when building the
+# drag-n-drop on Mac is the "Bundle" component.
+SET (CPACK_INSTALL_CMAKE_PROJECTS_DRAGNDROP
+  "${CMAKE_CURRENT_BINARY_DIR}" "ParaView Mac Bundle" "Bundle" "/")
 
 build_paraview_client_cpack_config()
 #########################################################################

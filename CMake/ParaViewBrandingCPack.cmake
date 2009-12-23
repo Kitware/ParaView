@@ -91,15 +91,17 @@ FUNCTION(install_qt_libs qtliblist componentname)
   IF (NOT APPLE)
     IF (NOT WIN32)
       FOREACH(qtlib ${qtliblist})
-        GET_FILENAME_COMPONENT(QT_LIB_DIR_tmp ${QT_${qtlib}_LIBRARY_RELEASE} PATH)
-        GET_FILENAME_COMPONENT(QT_LIB_NAME_tmp ${QT_${qtlib}_LIBRARY_RELEASE} NAME)
-        FILE(GLOB QT_LIB_LIST RELATIVE ${QT_LIB_DIR_tmp} "${QT_${qtlib}_LIBRARY_RELEASE}*")
-        INSTALL(CODE "
-  MESSAGE(STATUS \"Installing \${CMAKE_INSTALL_PREFIX}/${PV_INSTALL_LIB_DIR}/${QT_LIB_NAME_tmp}\")
-  EXECUTE_PROCESS (WORKING_DIRECTORY ${QT_LIB_DIR_tmp}
-                   COMMAND tar c ${QT_LIB_LIST}
-                   COMMAND tar -xC \${CMAKE_INSTALL_PREFIX}/${PV_INSTALL_LIB_DIR})
-          " COMPONENT ${componentname})
+        IF (${QT_${qtlib}_LIBRARY_RELEASE})
+          GET_FILENAME_COMPONENT(QT_LIB_DIR_tmp ${QT_${qtlib}_LIBRARY_RELEASE} PATH)
+          GET_FILENAME_COMPONENT(QT_LIB_NAME_tmp ${QT_${qtlib}_LIBRARY_RELEASE} NAME)
+          FILE(GLOB QT_LIB_LIST RELATIVE "${QT_LIB_DIR_tmp}" "${QT_${qtlib}_LIBRARY_RELEASE}*")
+          INSTALL(CODE "
+    MESSAGE(STATUS \"Installing \${CMAKE_INSTALL_PREFIX}/${PV_INSTALL_LIB_DIR}/${QT_LIB_NAME_tmp}\")
+    EXECUTE_PROCESS (WORKING_DIRECTORY ${QT_LIB_DIR_tmp}
+                     COMMAND tar c ${QT_LIB_LIST}
+                     COMMAND tar -xC \${CMAKE_INSTALL_PREFIX}/${PV_INSTALL_LIB_DIR})
+            " COMPONENT ${componentname})
+        ENDIF (${QT_${qtlib}_LIBRARY_RELEASE})
       ENDFOREACH(qtlib)
     ELSE (NOT WIN32)
       GET_FILENAME_COMPONENT(QT_DLL_PATH_tmp ${QT_QMAKE_EXECUTABLE} PATH)
