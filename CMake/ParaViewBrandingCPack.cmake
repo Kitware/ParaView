@@ -106,4 +106,4 @@ EXECUTE_PROCESS (WORKING_DIRECTORY ${QT_LIB_DIR_tmp}
               DESTINATION ${PV_INSTALL_LIB_DIR} 
               COMPONENT ${componentname})
   ENDIF (NOT WIN32)
-ENDFUNCTION(install_qt)
+ENDFUNCTION(install_qt_libs)
