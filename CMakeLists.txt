@@ -222,14 +222,15 @@ SET (dynamicHeaders)
 #########################################################################
 # Include the file that most of the environment setup (except GUI)
 # It also adds the VTK directories
-SET(PARAVIEW_MACROS_CMAKE_FILE  "${ParaView_SOURCE_DIR}/CMake/ParaViewMacros.cmake")
-SET(PARAVIEW_PLUGINS_CMAKE_FILE "${ParaView_SOURCE_DIR}/CMake/ParaViewPlugins.cmake")
-SET(PARAVIEW_BRANDING_CMAKE_FILE "${ParaView_SOURCE_DIR}/CMake/ParaViewBranding.cmake")
 SET(VTK_MAKE_INSTANTIATOR       "${ParaView_SOURCE_DIR}/VTK/CMake")
-SET(VTKCS_SOURCE_DIR            "${ParaView_SOURCE_DIR}/Utilities/VTKClientServer")
 SET(VTKCS_CONFIG_DIR            "${ParaView_SOURCE_DIR}/Utilities/VTKClientServer/CMake")
-INCLUDE(${ParaView_SOURCE_DIR}/CMake/ParaViewMacros.cmake)
-INCLUDE(${ParaView_SOURCE_DIR}/CMake/ParaViewCommon.cmake)
+
+SET (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${ParaView_SOURCE_DIR}/CMake)
+INCLUDE(ParaViewMacros)
+INCLUDE(ParaViewCommon)
+INCLUDE(ParaViewPlugins)
+INCLUDE(ParaViewBranding)
+INCLUDE(ParaViewBrandingCPack)
 
 #########################################################################
 IF(BUILD_DOCUMENTATION)
@@ -253,9 +254,7 @@ ENDIF (BUILD_EXAMPLES)
 SET(PARAVIEW_USE_FILE "${ParaView_SOURCE_DIR}/ParaViewUse.cmake")
 SET(PARAVIEW_VTK_DIR "${ParaView_BINARY_DIR}/VTK")
 
-SET(PARAVIEW_CMAKE_EXTENSIONS "${ParaView_SOURCE_DIR}/VTK/CMake")
-SET(PARAVIEW_CMAKE_CLIENT_SERVER_EXTENSION 
-  "${ParaView_SOURCE_DIR}/Utilities/VTKClientServer/CMake/vtkWrapClientServer.cmake")
+SET(PARAVIEW_CMAKE_EXTENSIONS "${ParaView_SOURCE_DIR}/CMake;${ParaView_SOURCE_DIR}/VTK/CMake")
 GET_TARGET_PROPERTY(VTK_WRAP_ClientServer_EXE_CONFIG vtkWrapClientServer LOCATION)
 
 SET(PARAVIEW_LIBRARY_DIRS 
@@ -384,8 +383,7 @@ IF (NOT PV_INSTALL_NO_DEVELOPMENT)
   SET(ParaView_SOURCE_DIR                         "${CMAKE_INSTALL_PREFIX}/${PV_INSTALL_INCLUDE_DIR}")
   SET(PARAVIEW_USE_FILE                           "${CMAKE_INSTALL_PREFIX}/${PV_INSTALL_LIB_DIR}/ParaViewUse.cmake")
   SET(PARAVIEW_VTK_DIR                            "${CMAKE_INSTALL_PREFIX}/${PV_INSTALL_LIB_DIR}")
-  SET(PARAVIEW_CMAKE_EXTENSIONS                   "${CMAKE_INSTALL_PREFIX}/${PV_INSTALL_LIB_DIR}")
-  SET(PARAVIEW_CMAKE_CLIENT_SERVER_EXTENSION      "${CMAKE_INSTALL_PREFIX}/${PV_INSTALL_LIB_DIR}/vtkWrapClientServer.cmake")
+  SET(PARAVIEW_CMAKE_EXTENSIONS                   "${CMAKE_INSTALL_PREFIX}/${PV_INSTALL_LIB_DIR}/CMake")
   SET(VTK_WRAP_ClientServer_EXE_CONFIG            "${CMAKE_INSTALL_PREFIX}/${PV_INSTALL_BIN_DIR}/vtkWrapClientServer")
   SET(PARAVIEW_INCLUDE_DIRS                       "${CMAKE_INSTALL_PREFIX}/${PV_INSTALL_INCLUDE_DIR}")
   SET(PARAVIEW_GUI_INCLUDE_DIRS                   "${CMAKE_INSTALL_PREFIX}/${PV_INSTALL_INCLUDE_DIR}")
@@ -397,7 +395,6 @@ IF (NOT PV_INSTALL_NO_DEVELOPMENT)
   SET(PARAVIEW_SERVER_MANAGER_RESOURCES_DIRECTORY "${CMAKE_INSTALL_PREFIX}/${PV_INSTALL_LIB_DIR}/Servers/ServerManager/Resources")
   SET(VTKCS_CONFIG_DIR                            "${CMAKE_INSTALL_PREFIX}/${PV_INSTALL_LIB_DIR}")
   SET(PARAVIEW_LIBRARY_DEPENDS_FILE               "${CMAKE_INSTALL_PREFIX}/${PV_INSTALL_LIB_DIR}/ParaViewLibraryDepends.cmake")
-  SET(PARAVIEW_PLUGINS_CMAKE_FILE                 "${CMAKE_INSTALL_PREFIX}/${PV_INSTALL_LIB_DIR}/ParaViewPlugins.cmake")
   SET(VTK_MAKE_INSTANTIATOR                       "${CMAKE_INSTALL_PREFIX}/${PV_INSTALL_LIB_DIR}/CMake/")
 
   CONFIGURE_FILE(

@@ -1,7 +1,3 @@
-INCLUDE(${PARAVIEW_BRANDING_CMAKE_FILE})
-INCLUDE(${PARAVIEW_PLUGINS_CMAKE_FILE})
-INCLUDE(${ParaView_SOURCE_DIR}/CMake/ParaViewBrandingCPack.cmake)
-
 #------------------------------------------------------------------------------
 # Add extra library containing custom code for the client.
 QT4_WRAP_CPP(MOC_BUILT_SOURCES
