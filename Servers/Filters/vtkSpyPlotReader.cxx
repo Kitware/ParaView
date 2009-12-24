@@ -62,7 +62,7 @@ PURPOSE.  See the above copyright notice for more information.
 #define coutVector6(x) (x)[0] << " " << (x)[1] << " " << (x)[2] << " " << (x)[3] << " " << (x)[4] << " " << (x)[5]
 #define coutVector3(x) (x)[0] << " " << (x)[1] << " " << (x)[2]
 
-vtkCxxRevisionMacro(vtkSpyPlotReader, "1.77");
+vtkCxxRevisionMacro(vtkSpyPlotReader, "1.78");
 vtkStandardNewMacro(vtkSpyPlotReader);
 vtkCxxSetObjectMacro(vtkSpyPlotReader,GlobalController,vtkMultiProcessController);
 
@@ -225,7 +225,7 @@ int vtkSpyPlotReader::UpdateFile (vtkInformation* request,
 int vtkSpyPlotReader::UpdateSpyDataFile(vtkInformation* request, 
                                         vtkInformationVector* outputVector)
 {
-cerr << "spydatafile\n";
+  // cerr << "spydatafile\n";
   // See if this is part of a series
   vtkstd::string extension = 
     vtksys::SystemTools::GetFilenameLastExtension(this->FileName);
@@ -289,10 +289,10 @@ cerr << "spydatafile\n";
   if(this->GetCurrentFileName()!=0 &&
      strcmp(this->FileName,this->GetCurrentFileName())==0)
     {
-cerr << "Not setting much else\n";
+    //cerr << "Not setting much else\n";
     return 1;
     }
-cerr << "setting Current file name " << this->FileName << endl;
+  // cerr << "setting Current file name " << this->FileName << endl;
   this->SetCurrentFileName(this->FileName);
   this->Map->Clean(0);
   vtkstd::string fileNoExt = 
@@ -311,7 +311,7 @@ cerr << "setting Current file name " << this->FileName << endl;
   while ( 1 )
     {
     sprintf(buffer, "%s/%s.%d",filePath.c_str(), fileNoExt.c_str(), idx);
-cerr << "buffer1 == " << buffer << endl;
+    // cerr << "buffer1 == " << buffer << endl;
     if ( !vtksys::SystemTools::FileExists(buffer) )
       {
       int next = idx;
@@ -339,7 +339,7 @@ cerr << "buffer1 == " << buffer << endl;
   while ( 1 )
     {
     sprintf(buffer, "%s/%s.%d", filePath.c_str(), fileNoExt.c_str(), idx);
-cerr << "buffer2 == " << buffer << endl;
+    // cerr << "buffer2 == " << buffer << endl;
     if ( !vtksys::SystemTools::FileExists(buffer) )
       {
       int next = idx;
@@ -364,14 +364,14 @@ cerr << "buffer2 == " << buffer << endl;
   for ( idx = minimum; idx <= maximum; ++ idx )
     {
     sprintf(buffer, "%s/%s.%d", filePath.c_str(), fileNoExt.c_str(), idx);
-cerr << "buffer3 == " << buffer << endl;
+    // cerr << "buffer3 == " << buffer << endl;
     this->Map->Files[buffer]=0;
     vtkDebugMacro( << __LINE__ << " Create new uni reader: " 
                    << this->Map->Files[buffer] );
     }
   // Okay now open just the first file to get meta data
   vtkDebugMacro("Reading Meta Data in UpdateCaseFile(ExecuteInformation) from file: " << this->Map->Files.begin()->first.c_str());
-cerr << "updating meta... " << endl;
+  // cerr << "updating meta... " << endl;
   return this->UpdateMetaData(request, outputVector);
 }
 
@@ -1406,20 +1406,20 @@ void vtkSpyPlotReader::PrintBlockList(vtkHierarchicalBoxDataSet *hbds, int myPro
   numberOfLevels=hbds->GetNumberOfLevels();
   for (level = 0; level<numberOfLevels; level++)
     {
-    cout<<myProcId<<" level="<<level<<"/"<<numberOfLevels<<endl;
+   // cout<<myProcId<<" level="<<level<<"/"<<numberOfLevels<<endl;
     int totalNumberOfDataSets=hbds->GetNumberOfDataSets(level);
     int i;
     for (i = 0; i<totalNumberOfDataSets; i++)
       {
-      cout<<myProcId<<" dataset="<<i<<"/"<<totalNumberOfDataSets;
+     // cout<<myProcId<<" dataset="<<i<<"/"<<totalNumberOfDataSets;
       vtkAMRBox box;
        if(hbds->GetDataSet(level,i,box)==0)
         {
-        cout<<" Void"<<endl;
+       // cout<<" Void"<<endl;
         }
       else
         {
-        cout<<" Exists"<<endl;
+       // cout<<" Exists"<<endl;
         }
       }
     }
