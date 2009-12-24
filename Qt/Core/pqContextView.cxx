@@ -94,7 +94,7 @@ vtkContextView* pqContextView::getVTKContextView() const
 
 //-----------------------------------------------------------------------------
 /// This view does not support saving to image.
-bool pqContextView::saveImage(int width, int height, const QString& filename)
+bool pqContextView::saveImage(int , int , const QString& )
 {
   return false;
 }
@@ -102,7 +102,7 @@ bool pqContextView::saveImage(int width, int height, const QString& filename)
 //-----------------------------------------------------------------------------
 /// Capture the view image into a new vtkImageData with the given magnification
 /// and returns it. The caller is responsible for freeing the returned image.
-vtkImageData* pqContextView::captureImage(int magnification)
+vtkImageData* pqContextView::captureImage(int )
 {
   return NULL;
 }
@@ -110,7 +110,7 @@ vtkImageData* pqContextView::captureImage(int magnification)
 //-----------------------------------------------------------------------------
 /// Capture the view image of the given size and returns it. The caller is
 /// responsible for freeing the returned image.
-vtkImageData* pqContextView::captureImage(const QSize& asize)
+vtkImageData* pqContextView::captureImage(const QSize& )
 {
   return NULL;
 }
