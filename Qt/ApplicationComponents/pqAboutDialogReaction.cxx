@@ -31,7 +31,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqAboutDialogReaction.h"
 
-#include "pqClientAboutDialog.h"
+#include "pqAboutDialog.h"
 #include "pqCoreUtilities.h"
 
 //-----------------------------------------------------------------------------
@@ -43,7 +43,7 @@ pqAboutDialogReaction::pqAboutDialogReaction(QAction* parentObject)
 //-----------------------------------------------------------------------------
 void pqAboutDialogReaction::showAboutDialog()
 {
-  pqClientAboutDialog about_dialog(pqCoreUtilities::mainWidget());
+  pqAboutDialog about_dialog(pqCoreUtilities::mainWidget());
   about_dialog.exec();
 }
 

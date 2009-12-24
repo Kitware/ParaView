@@ -30,8 +30,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#include "pqClientAboutDialog.h"
-#include "ui_pqClientAboutDialog.h"
+#include "pqAboutDialog.h"
+#include "ui_pqAboutDialog.h"
 
 #include "pqApplicationCore.h"
 #include "pqOptions.h"
@@ -52,12 +52,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtksys/ios/sstream>
 
 //-----------------------------------------------------------------------------
-pqClientAboutDialog::pqClientAboutDialog(QWidget* Parent) :
+pqAboutDialog::pqAboutDialog(QWidget* Parent) :
   QDialog(Parent),
-  Ui(new Ui::pqClientAboutDialog())
+  Ui(new Ui::pqAboutDialog())
 {
   this->Ui->setupUi(this);
-  this->setObjectName("pqClientAboutDialog");
+  this->setObjectName("pqAboutDialog");
 
   QString spashImage =
     QString(":/%1/SplashImage.img").arg(QApplication::applicationName());
@@ -96,7 +96,7 @@ pqClientAboutDialog::pqClientAboutDialog(QWidget* Parent) :
 }
 
 //-----------------------------------------------------------------------------
-pqClientAboutDialog::~pqClientAboutDialog()
+pqAboutDialog::~pqAboutDialog()
 {
   delete this->Ui;
 }
@@ -114,7 +114,7 @@ inline void addItem(QTreeWidget* tree, const QString& key, int value)
 }
 
 //-----------------------------------------------------------------------------
-void pqClientAboutDialog::AddClientInformation()
+void pqAboutDialog::AddClientInformation()
 {
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   pqOptions* opts = pqOptions::SafeDownCast(pm->GetOptions());
@@ -122,6 +122,7 @@ void pqClientAboutDialog::AddClientInformation()
   QTreeWidget* tree = this->Ui->ClientInformation;
 
   ::addItem(tree, "Version", PARAVIEW_VERSION_FULL);
+  ::addItem(tree, "Qt Version", QT_VERSION_STR);
 #if defined(PARAVIEW_ENABLE_PYTHON)
   ::addItem(tree, "Embedded Python", "On");
 #else
@@ -141,7 +142,7 @@ void pqClientAboutDialog::AddClientInformation()
 }
 
 //-----------------------------------------------------------------------------
-void pqClientAboutDialog::AddServerInformation()
+void pqAboutDialog::AddServerInformation()
 {
   QTreeWidget* tree = this->Ui->ServerInformation;
   pqServerManagerModel* smmodel = pqApplicationCore::instance()->getServerManagerModel();
@@ -154,7 +155,7 @@ void pqClientAboutDialog::AddServerInformation()
 }
 
 //-----------------------------------------------------------------------------
-void pqClientAboutDialog::AddServerInformation(pqServer* server, QTreeWidget* tree)
+void pqAboutDialog::AddServerInformation(pqServer* server, QTreeWidget* tree)
 {
   pqOptions* clientOptions = pqOptions::SafeDownCast(server->getOptions());
   vtkPVServerInformation* serverInfo = server->getServerInformation(); 

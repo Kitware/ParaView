@@ -1,6 +1,6 @@
 <ui version="4.0" >
- <class>pqClientAboutDialog</class>
- <widget class="QDialog" name="pqClientAboutDialog" >
+ <class>pqAboutDialog</class>
+ <widget class="QDialog" name="pqAboutDialog" >
   <property name="geometry" >
    <rect>
     <x>0</x>
@@ -231,7 +231,7 @@
   <connection>
    <sender>OK</sender>
    <signal>clicked()</signal>
-   <receiver>pqClientAboutDialog</receiver>
+   <receiver>pqAboutDialog</receiver>
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel" >

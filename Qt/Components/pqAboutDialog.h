@@ -29,40 +29,37 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-
-/// \file pqClientAboutDialog.h
-/// \date 7/15/2008
-
-#ifndef _pqClientAboutDialog_h
-#define _pqClientAboutDialog_h
+#ifndef _pqAboutDialog_h
+#define _pqAboutDialog_h
 
 #include <QDialog>
 #include "pqComponentsExport.h"
 
-namespace Ui { class pqClientAboutDialog; }
+namespace Ui { class pqAboutDialog; }
 
 class pqServer;
 class QTreeWidget;
-/// Provides an about dialog
-class PQCOMPONENTS_EXPORT pqClientAboutDialog :
+
+/// pqAboutDialog is the about dialog used by ParaView.
+/// It provides information about ParaView and current configuration.
+class PQCOMPONENTS_EXPORT pqAboutDialog :
   public QDialog
 {
   Q_OBJECT
 
 public:
-  pqClientAboutDialog(QWidget* Parent);
-  ~pqClientAboutDialog();
+  pqAboutDialog(QWidget* Parent);
+  ~pqAboutDialog();
 
-private:
-  pqClientAboutDialog(const pqClientAboutDialog&);
-  pqClientAboutDialog& operator=(const pqClientAboutDialog&);
-
+protected:
   void AddClientInformation();
   void AddServerInformation();
   void AddServerInformation(pqServer* server, QTreeWidget* tree);
   
-  Ui::pqClientAboutDialog* const Ui;
+private:
+  Q_DISABLE_COPY(pqAboutDialog)
+  Ui::pqAboutDialog* const Ui;
 };
 
-#endif // !_pqClientAboutDialog_h
+#endif // !_pqAboutDialog_h
 

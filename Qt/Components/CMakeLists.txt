@@ -49,6 +49,7 @@ SET_DIRECTORY_PROPERTIES(PROPERTIES INCLUDE_DIRECTORIES "${MOC_INCLUDE_DIRS}")
 
 QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pq3DWidget.h
+  pqAboutDialog.h
   pqActiveChartOptions.h
   pqActiveRenderViewOptions.h
   pqActiveObjects.h
@@ -76,7 +77,6 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqChartViewContextMenu.h
   pqChartViewContextMenuHandler.h
   pqChartSeriesEditorModel.h
-  pqClientAboutDialog.h
   pqClipPanel.h
   pqColorMapModel.h
   pqColorPresetManager.h
@@ -211,6 +211,7 @@ SET_DIRECTORY_PROPERTIES(PROPERTIES INCLUDE_DIRECTORIES "${include_dirs_tmp}")
 
 SET(UI_FORMS
   Resources/UI/pqAbortAnimation.ui
+  Resources/UI/pqAboutDialog.ui
   #Resources/UI/pqAddSourceDialog.ui
   Resources/UI/pqAnimationSettings.ui
   Resources/UI/pqApplicationOptions.ui
@@ -222,7 +223,6 @@ SET(UI_FORMS
   Resources/UI/pqCameraDialog.ui
   Resources/UI/pqCameraKeyFrameWidget.ui
   Resources/UI/pqChartOptionsWidget.ui
-  Resources/UI/pqClientAboutDialog.ui
   Resources/UI/pqColorPresetDialog.ui
   Resources/UI/pqColorScaleDialog.ui
   Resources/UI/pqComparativeVisPanel.ui
@@ -326,6 +326,8 @@ SOURCE_GROUP("Generated" FILES
 ADD_LIBRARY(pqComponents
   pq3DWidget.cxx
   pq3DWidget.h
+  pqAboutDialog.cxx
+  pqAboutDialog.h
   pqActiveChartOptions.cxx
   pqActiveChartOptions.h
   pqActiveRenderViewOptions.cxx
@@ -394,8 +396,6 @@ ADD_LIBRARY(pqComponents
   pqChartViewContextMenuHandler.h
   pqChartSeriesEditorModel.cxx
   pqChartSeriesEditorModel.h
-  pqClientAboutDialog.cxx
-  pqClientAboutDialog.h
   pqClipPanel.cxx
   pqClipPanel.h
   pqCloseViewUndoElement.cxx
