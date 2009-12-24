@@ -5,6 +5,10 @@
 # build_paraview_client(
 #   # The name for this client. This is the name used for the executable created.
 #   paraview
+#
+#   # Optional name for the application (If none is specified then the
+#   # client-name is used.
+#   APPLICATION_NAME "ParaView"
 # 
 #   # This is the title bar text. If none is provided the name will be used.
 #   TITLE "Kitware ParaView"
@@ -74,40 +78,9 @@
 #   )
 # 
 ###############################################################################
-MACRO(PV_PARSE_ARGUMENTS prefix arg_names option_names)
-  SET(DEFAULT_ARGS)
-  FOREACH(arg_name ${arg_names})    
-    SET(${prefix}_${arg_name})
-  ENDFOREACH(arg_name)
-  FOREACH(option ${option_names})
-    SET(${prefix}_${option} FALSE)
-  ENDFOREACH(option)
-
-  SET(current_arg_name DEFAULT_ARGS)
-  SET(current_arg_list)
-  FOREACH(arg ${ARGN})            
-    SET(larg_names ${arg_names})    
-    LIST(FIND larg_names "${arg}" is_arg_name)                   
-    IF (is_arg_name GREATER -1)
-      SET(${prefix}_${current_arg_name} ${current_arg_list})
-      SET(current_arg_name ${arg})
-      SET(current_arg_list)
-    ELSE (is_arg_name GREATER -1)
-      SET(loption_names ${option_names})    
-      LIST(FIND loption_names "${arg}" is_option)            
-      IF (is_option GREATER -1)
-       SET(${prefix}_${arg} TRUE)
-      ELSE (is_option GREATER -1)
-       SET(current_arg_list ${current_arg_list} ${arg})
-      ENDIF (is_option GREATER -1)
-    ENDIF (is_arg_name GREATER -1)
-  ENDFOREACH(arg)
-  SET(${prefix}_${current_arg_name} ${current_arg_list})
-ENDMACRO(PV_PARSE_ARGUMENTS)
-
 FUNCTION(build_paraview_client BPC_NAME)
   PV_PARSE_ARGUMENTS(BPC 
-    "TITLE;ORGANIZATION;SPLASH_IMAGE;VERSION_MAJOR;VERSION_MINOR;VERSION_PATCH;BUNDLE_ICON;APPLICATION_ICON;REQUIRED_PLUGINS;OPTIONAL_PLUGINS;PVMAIN_WINDOW;PVMAIN_WINDOW_INCLUDE;EXTRA_DEPENDENCIES;GUI_CONFIGURATION_XMLS;COMPRESSED_HELP_FILE;SOURCES"
+    "APPLICATION_NAME;TITLE;ORGANIZATION;SPLASH_IMAGE;VERSION_MAJOR;VERSION_MINOR;VERSION_PATCH;BUNDLE_ICON;APPLICATION_ICON;REQUIRED_PLUGINS;OPTIONAL_PLUGINS;PVMAIN_WINDOW;PVMAIN_WINDOW_INCLUDE;EXTRA_DEPENDENCIES;GUI_CONFIGURATION_XMLS;COMPRESSED_HELP_FILE;SOURCES"
     "MAKE_INITIALIZER_LIBRARY"
     ${ARGN}
     )
@@ -119,15 +92,9 @@ FUNCTION(build_paraview_client BPC_NAME)
   ENDIF (NOT DEFINED BPC_VERSION_MAJOR OR NOT DEFINED BPC_VERSION_MINOR OR NOT DEFINED BPC_VERSION_PATCH)
 
   # If no title is provided, make one up using the name.
-  IF (NOT BPC_TITLE)
-    SET (BPC_TITLE ${BPC_NAME})
-  ENDIF (NOT BPC_TITLE)
-  SET (BPC_NAME ${BPC_NAME})
-
-  IF (NOT BPC_ORGANIZATION)
-    SET (BPC_ORGANIZATION "Humanity")
-  ENDIF (NOT BPC_ORGANIZATION)
-
+  pv_set_if_not_set(BPC_TITLE "${BPC_NAME}")
+  pv_set_if_not_set(BPC_APPLICATION_NAME "${BPC_NAME}")
+  pv_set_if_not_set(BPC_ORGANIZATION "Humanity")
 
   SET (branding_source_dir "${ParaView_SOURCE_DIR}/CMake")
 
@@ -160,22 +127,15 @@ FUNCTION(build_paraview_client BPC_NAME)
   ENDIF(WIN32)
 
   # If splash image is not specified, use the standard ParaView splash image.
-  IF (NOT BPC_SPLASH_IMAGE)
-    SET (BPC_SPLASH_IMAGE "${branding_source_dir}/branded_splash.png")
-  ENDIF (NOT BPC_SPLASH_IMAGE)
+  pv_set_if_not_set(BPC_SPLASH_IMAGE "${branding_source_dir}/branded_splash.png")
   CONFIGURE_FILE("${BPC_SPLASH_IMAGE}"
                   ${CMAKE_CURRENT_BINARY_DIR}/SplashImage.img COPYONLY)
   SET (BPC_SPLASH_IMAGE ${CMAKE_CURRENT_BINARY_DIR}/SplashImage.img)
   GET_FILENAME_COMPONENT(BPC_SPLASH_RESOURCE ${BPC_SPLASH_IMAGE} NAME)
   SET (BPC_SPLASH_RESOURCE ":/${BPC_NAME}/${BPC_SPLASH_RESOURCE}")
 
-  IF (NOT BPC_PVMAIN_WINDOW)
-    SET (BPC_PVMAIN_WINDOW "QMainWindow")
-  ENDIF (NOT BPC_PVMAIN_WINDOW)
-
-  IF (NOT BPC_PVMAIN_WINDOW_INCLUDE)
-    SET (BPC_PVMAIN_WINDOW_INCLUDE "QMainWindow")
-  ENDIF (NOT BPC_PVMAIN_WINDOW_INCLUDE)
+  pv_set_if_not_set(BPC_PVMAIN_WINDOW "QMainWindow")
+  pv_set_if_not_set(BPC_PVMAIN_WINDOW_INCLUDE "QMainWindow")
 
   SET (BPC_HAS_GUI_CONFIGURATION_XMLS 0)
   IF (BPC_GUI_CONFIGURATION_XMLS)

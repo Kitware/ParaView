@@ -32,6 +32,9 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
+// ***************** DO NOT EDIT ***********************************
+// This is a generated file. 
+// It will be replaced next time you rebuild.
 
 #include <QApplication>
 #include "pq@BPC_NAME@Initializer.h"
@@ -49,8 +52,7 @@ int main(int argc, char* argv[])
   QApplication::setStyle(new QPlastiqueStyle);
 #endif
 
-  QApplication::setApplicationName("@BPC_NAME@");
-  // Only in Qt > 4.4
+  QApplication::setApplicationName("@BPC_APPLICATION_NAME@");
   QApplication::setApplicationVersion("@BPC_VERSION_MAJOR@.@BPC_VERSION_MINOR@.@BPC_VERSION_PATCH@");
   QApplication::setOrganizationName("@BPC_ORGANIZATION@");
 

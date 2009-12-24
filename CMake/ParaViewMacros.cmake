@@ -61,3 +61,12 @@ MACRO(PV_PARSE_ARGUMENTS prefix arg_names option_names)
   ENDFOREACH(arg)
   SET(${prefix}_${current_arg_name} ${current_arg_list})
 ENDMACRO(PV_PARSE_ARGUMENTS)
+
+#----------------------------------------------------------------------------
+# Macro for setting values if a user did not overwrite them
+#----------------------------------------------------------------------------
+MACRO(pv_set_if_not_set name value)
+  IF(NOT DEFINED "${name}")
+    SET(${name} "${value}")
+  ENDIF(NOT DEFINED "${name}")
+ENDMACRO(pv_set_if_not_set)

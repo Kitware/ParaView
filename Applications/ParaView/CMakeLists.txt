@@ -29,6 +29,7 @@ SET(ParaView_SOURCE_FILES
 #------------------------------------------------------------------------------
 # Build the client
 build_paraview_client(paraview
+    APPLICATION_NAME "ParaView"
     TITLE "ParaView ${PARAVIEW_VERSION_FULL}"
     ORGANIZATION  "Kitware"
     VERSION_MAJOR ${PARAVIEW_VERSION_MAJOR} 
