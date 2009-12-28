@@ -50,7 +50,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkPVDataInformation);
-vtkCxxRevisionMacro(vtkPVDataInformation, "1.63");
+vtkCxxRevisionMacro(vtkPVDataInformation, "1.64");
 
 //----------------------------------------------------------------------------
 vtkPVDataInformation::vtkPVDataInformation()
@@ -568,6 +568,9 @@ void vtkPVDataInformation::CopyFromObject(vtkObject* object)
       }
     else
       {
+      //Streaming ParaView puts this helper filter into the pipeline.
+      //The helper prevent the whole_extent from being requested and makes
+      //sure that the sub extent that is requested is worthwhile.
       vtkPriorityHelper *helper = vtkPriorityHelper::SafeDownCast(object);
       if (helper)
         {
