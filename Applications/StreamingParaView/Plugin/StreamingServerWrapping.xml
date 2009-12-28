@@ -353,6 +353,11 @@
        The Image reader reads raw regular rectilinear grid (image/volume) data from a file. Because no metadata is provided, the user must specify information about the size, spacing, dimensionality, etc. about the dataset. 
      </Documentation>
 
+     <Hints>
+      <ReaderFactory extensions="raw"
+          file_description="Raw float binary image data file" />
+     </Hints>
+
       <StringVectorProperty 
          name="FileName"
          command="SetFilename"

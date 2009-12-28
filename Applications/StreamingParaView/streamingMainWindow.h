@@ -1,14 +1,14 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqStreamingMainWindowCore.h
+   Module:    streamingMainWindow.h
 
-   Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
+   Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
    under the terms of the ParaView license version 1.2. 
-
+   
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
    Kitware Inc.
@@ -28,42 +28,28 @@ LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-=========================================================================*/
+========================================================================*/
+#ifndef __streamingMainWindow_h 
+#define __streamingMainWindow_h
 
-#ifndef _pqStreamingMainWindowCore_h
-#define _pqStreamingMainWindowCore_h
+#include <QMainWindow>
 
-#include <QObject>
-#include "pqMainWindowCore.h"
+class pqView;
 
-/** \brief Provides a standardized main window for ParaView applications -
-application authors can derive from pqMainWindowCore and call its member functions
-to use as-much or as-little of the standardized functionality as desired */
-
-class pqStreamingMainWindowCore :
-  public pqMainWindowCore
+/// MainWindow for the default ParaView application.
+class streamingMainWindow : public QMainWindow
 {
   Q_OBJECT
-  typedef pqMainWindowCore Superclass;
-
+  typedef QMainWindow Superclass;
 public:
-  pqStreamingMainWindowCore();
-  ~pqStreamingMainWindowCore();
-
-  /// Setup a proxy tab widget, attaching it to the given dock
-  virtual pqProxyTabWidget* setupProxyTabWidget(QDockWidget* parent);
-  
-signals:
-  void setMessage(const QString&);
+  streamingMainWindow();
+  ~streamingMainWindow();
 
 protected slots:
+  void showHelpForProxy(const QString& proxyname);
 
   /// Called when the active view in the pqActiveView singleton changes.
   virtual void onActiveViewChanged(pqView* view);
-
-  virtual void onRemovingSource(pqPipelineSource *source);
-
-  virtual void onPostAccept();
 
   // Every render has a chance to schedule additional renders if multipass is 
   // needed
@@ -74,7 +60,14 @@ protected:
 
   bool StopStreaming;
 
+private:
+  streamingMainWindow(const streamingMainWindow&); // Not implemented.
+  void operator=(const streamingMainWindow&); // Not implemented.
+
+  class pqInternals;
+  pqInternals* Internals;
 };
 
-#endif // !_pqStreamingMainWindowCore_h
+#endif
+
 

@@ -1,17 +1,7 @@
 <ParaViewWriters>
-  <Writer name="XMLPolyDataWriter"
-          extensions="vtp"
-          file_description="VTK PolyData Files"/>
-  <Writer name="XMLUnstructuredGridWriter"
-          extensions="vtu"
-          file_description="VTK UnstructuredGrid Files"/>
-  <Writer name="XMLStructuredGridWriter"
-          extensions="vts"
-          file_description="VTK StructuredGrid Files"/>
-  <Writer name="XMLRectilinearGridWriter"
-          extensions="vtr"
-          file_description="VTK RectilinearGrid Files"/>
-  <Writer name="XMLImageDataWriter"
-          extensions="vti"
-          file_description="VTK ImageData Files"/>
+  <Proxy group="writers" name="XMLPolyDataWriter"/>
+  <Proxy group="writers" name="XMLUnstructuredGridWriter"/>
+  <Proxy group="writers" name="XMLStructuredGridWriter"/>
+  <Proxy group="writers" name="XMLRectilinearGridWriter"/>
+  <Proxy group="writers" name="XMLImageDataWriter"/>
 </ParaViewWriters>

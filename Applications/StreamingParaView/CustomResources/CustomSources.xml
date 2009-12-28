@@ -1,18 +1,18 @@
 <ParaViewSources>
-  <Source name="GlyphSource2D" />
-  <Source name="VectorText" />
-  <Source name="ArrowSource" />
-  <Source name="Axes" />
-  <Source name="CubeSource" />
-  <Source name="ConeSource" />
-  <Source name="CylinderSource" />
-  <Source name="LineSource" />
-  <Source name="ImageMandelbrotSource" />
-  <Source name="OutlineSource" />
-  <Source name="PlaneSource" />
-  <Source name="PointSource" />
-  <Source name="SphereSource" />
-  <Source name="TextSource" />
-  <Source name="Ruler" />
-  <Source name="RTAnalyticSource" />
+  <Proxy group="sources" name="GlyphSource2D" />
+  <Proxy group="sources" name="VectorText" />
+  <Proxy group="sources" name="ArrowSource" />
+  <Proxy group="sources" name="Axes" />
+  <Proxy group="sources" name="CubeSource" />
+  <Proxy group="sources" name="ConeSource" />
+  <Proxy group="sources" name="CylinderSource" />
+  <Proxy group="sources" name="LineSource" />
+  <Proxy group="sources" name="ImageMandelbrotSource" />
+  <Proxy group="sources" name="OutlineSource" />
+  <Proxy group="sources" name="PlaneSource" />
+  <Proxy group="sources" name="PointSource" />
+  <Proxy group="sources" name="SphereSource" />
+  <Proxy group="sources" name="TextSource" />
+  <Proxy group="sources" name="Ruler" />
+  <Proxy group="sources" name="RTAnalyticSource" />
 </ParaViewSources>

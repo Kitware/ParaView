@@ -1,13 +1,6 @@
 <ParaViewReaders>
 
-  <Reader name="XMLImageDataReader"
-          extensions="vti"
-          file_description="VTK ImageData Files">
-  </Reader>
-
-  <Reader name="StridedReader"
-          extensions="raw"
-          file_description="Raw Files (Strided)" >
-  </Reader>
+  <Proxy group="sources" name="XMLImageDataReader"/>
+  <Proxy group="sources" name="StridedReader"/>
 
 </ParaViewReaders>
