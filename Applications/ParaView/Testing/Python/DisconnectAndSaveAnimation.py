@@ -21,7 +21,7 @@ object7 = 'pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwi
 QtTesting.playCommand(object7, 'set_boolean', 'true')
 object8 = 'pqClientMainWindow/menubar'
 QtTesting.playCommand(object8, 'activate', 'menu_View')
-object8 = 'pqClientMainWindow/menubar/menu_View/Panels'
+object8 = 'pqClientMainWindow/menubar/menu_View'
 QtTesting.playCommand(object8, 'activate', 'Animation View')
 object9 = 'pqClientMainWindow/animationViewDock/animationView/pqAnimationWidget/CreateDeleteWidget/PropertyCombo'
 QtTesting.playCommand(object9, 'set_string', 'Start Theta')
