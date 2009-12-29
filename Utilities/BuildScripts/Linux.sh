@@ -9,8 +9,8 @@ if [ "$#" != "2" ]; then
   exit 1
 fi
 
-set version=$1
-set cvstag=$2
+version=$1
+cvstag=$2
 
 #sudo apt-get install libglib-dev
 #sudo apt-get install cvs
@@ -370,6 +370,7 @@ then
   tar -zxvf mpich2-1.0.8.tar.gz
   cd mpich2-1.0.8/
   ./configure --prefix=${SUPPORT_DIR}/mpich2-1.0.8/
+  make -j${CORES}
   make install
   cd ..
 else
@@ -392,29 +393,41 @@ else
   echo "FFMPEG Complete"
 fi
 
-exit 0
-
 # ParaView (1st pass)
 # Visit needs a build of VTK so we do a first pass build of ParaView
 # the final pass will then just be an incremental build.
+
+if [ ! -f ${PV_BIN}/bin/paraview ];
+then
+
 if [ ! -d ${PV_BASE} ];
 then
   mkdir ${PV_BASE}
-  cd ${PV_BASE}
+fi
 
-  ## Checkout the version requested.
-  echo "Checking out version: ${cvstag}"
-  cvs -d :pserver:anoncvs@www.paraview.org:/cvsroot/ParaView3 co -r ${cvstag} ParaView3
+cd ${PV_BASE}
 
-  cd ParaView/Plugins
+## Checkout the version requested.
+echo "Checking out version: ${cvstag}"
+cvs -q -d :pserver:anoncvs@www.paraview.org:/cvsroot/ParaView3 co -r ${cvstag} ParaView3
+
+if [ ! -d ${PV_SRC}/Plugins/VisTrails ];
+then
+  cd ${PV_SRC}/Plugins
   hg clone http://blight.kitwarein.com/VisTrails
   cd ../..
-  
+fi
 
-  # Make the binary directory.
+# Make the binary directory.
+if [ ! -d ${PV_BIN} ];
+then
   mkdir ${PV_BIN}
-  cd ${PV_BIN}
-  echo "Reconfiguring and rebuilding in ${builddir}"
+fi
+
+cd ${PV_BIN}
+echo "Reconfiguring and rebuilding in ${builddir}"
+
+export LD_LIBRARY_PATH=${SUPPORT_DIR}/qt-4.3.5/bin/lib:${SUPPORT_DIR}/ffmpeg/lib:${SUPPORT_DIR}/python25/lib
 
 cat >> CMakeCache.txt << EOF
 CMAKE_BUILD_TYPE:STRING=Release
@@ -425,9 +438,9 @@ QT_QMAKE_EXECUTABLE:FILEPATH=${SUPPORT_DIR}/qt-4.3.5/bin/bin/qmake
 VTK_USE_QVTK_QTOPENGL:BOOL=ON
 VTK_USE_64BIT_IDS:BOOL=OFF
 PARAVIEW_USE_SYSTEM_HDF5:BOOL=ON
-HDF5_LIBRARY:PATH=/opt/hdf5-1.6.8_ser/lib/libhdf5.a;/opt/szip-2.1/lib/libsz.a
-HDF5_INCLUDE_DIR:PATH=/opt/hdf5-1.6.8_ser/include
-PARAVIEW_BUILD_PLUGIN_VisItReaderPlugin:BOOL=ON
+HDF5_LIBRARY:PATH=${SUPPORT_DIR}/hdf5-1.6.8_ser/lib/libhdf5.a;${SUPPORT_DIR}/szip-2.1/lib/libsz.a
+HDF5_INCLUDE_DIR:PATH=${SUPPORT_DIR}/hdf5-1.6.8_ser/include
+PARAVIEW_BUILD_PLUGIN_VisItReaderPlugin:BOOL=OFF
 VISIT_BASE:PATH=${SUPPORT_DIR}/VisIt-1.10.0.X-all/VisItDev1.10.0.X
 VTK_USE_FFMPEG_ENCODER:BOOL=ON
 FFMPEG_INCLUDE_DIR:PATH=${SUPPORT_DIR}/ffmpeg/include/
@@ -442,10 +455,12 @@ PYTHON_LIBRARY:PATH=${SUPPORT_DIR}/python25/lib/libpython2.5.so
 PARAVIEW_BUILD_PLUGIN_VisTrailsPlugin:BOOL=ON
 EOF
 
-  cmake ${PV_SRC}
-  make -j${CORES}
-fi
+cmake ${PV_SRC}
+make -j${CORES}
 
+else
+  echo "Found paraview"
+fi
 
 # Visit
 #=======
@@ -572,11 +587,13 @@ DEFAULT_GDAL_LIB=/${SUPPORT_DIR}/gdal-1.6.0/lib
 
 EOF
 
-if [ ! -f ${SUPPORT_DIR}/VisIt-1.10.0.X-all/VisItDev1.10.0.X/src/lib/libplugin.so ];
+if [ ! -f ${SUPPORT_DIR}/VisIt-1.10.0.X-all/VisItDev1.10.0.X/src/lib/libplugin123.so ];
 then
+  export QTDIR=${SUPPORT_DIR}/qt-x11-free-3.3.8/
+  export LD_LIBRARY_PATH=$QTDIR/lib
   cd ${SUPPORT_DIR}/VisIt-1.10.0.X-all/VisItDev1.10.0.X/src
-  make distclean
-  ./configure --prefix=/${SUPPORT_DIR}/VisIt-1.10.0 --with-config=/${SUPPORT_DIR}/vtkVisitDatabaseBridge.conf --with-hdf5=/${SUPPORT_DIR}/hdf5-1.6.8_ser/include,/${SUPPORT_DIR}/hdf5-1.6.8_ser/lib --enable-parallel --disable-scripting --disable-visitmodule --disable-viewer-mesa-stub --disable-icet --disable-bilib --disable-glew --disable-bzip2 --with-dbs=all --with-silo-include=/${SUPPORT_DIR}/silo-4.6.2/include --with-silo-library=/${SUPPORT_DIR}/silo-4.6.2/lib
+#  make distclean
+  ./configure --prefix=/${SUPPORT_DIR}/VisIt-1.10.0 --with-config=/${SUPPORT_DIR}/VisIt-1.10.0.X-all/vtkVisitDatabaseBridge.conf --with-hdf5=/${SUPPORT_DIR}/hdf5-1.6.8_ser/include,/${SUPPORT_DIR}/hdf5-1.6.8_ser/lib --enable-parallel --disable-scripting --disable-visitmodule --disable-viewer-mesa-stub --disable-icet --disable-bilib --disable-glew --disable-bzip2 --with-dbs=all --with-silo-include=/${SUPPORT_DIR}/silo-4.6.2/include --with-silo-library=/${SUPPORT_DIR}/silo-4.6.2/lib
   make -j${CORES}
 fi
 
