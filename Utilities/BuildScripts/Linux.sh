@@ -1,4 +1,4 @@
-
+set -x
 #!/bin/bash
 # Typical usage:
 #  ~/partyd/buildPackage.sh /tmp/partyd/ParaView3/ /tmp/partyd/ParaView3Bin
@@ -23,18 +23,17 @@ set cvstag=$2
 #sudo apt-get install tk8.4-dev
 #sudo apt-get install libglut3
 #sudo apt-get install libglut3-dev
+#sudo apt-get install libglib2.0-dev
 
 export FC=gfortran
 
-BASE_DIR=/home/kitware/Release/
+BASE_DIR=${PWD}
 SUPPORT_DIR=${BASE_DIR}/Support
 CORES=3
 
 PV_BASE=${BASE_DIR}/ParaView-${version}
 PV_SRC=${PV_BASE}/ParaView3
 PV_BIN=${PV_BASE}/ParaView3Bin
-
-cd ${BASE_DIR}
 
 if [ ! -d Support ];
 then
@@ -107,7 +106,7 @@ then
   wget http://www.riverbankcomputing.co.uk/static/Downloads/PyQt4/PyQt-x11-gpl-4.6.2.tar.gz
   tar -zxvf PyQt-x11-gpl-4.6.2.tar.gz
   cd PyQt-x11-gpl-4.6.2/
-  ${SUPPORT_DIR}/python25/bin/python configure.py -q ${SUPPORT_DIR}/qt-4.3.5/bin/bin/qmake
+  echo yes | ${SUPPORT_DIR}/python25/bin/python configure.py -q ${SUPPORT_DIR}/qt-4.3.5/bin/bin/qmake
   make -j${CORES}
   make install
   cd ..
@@ -119,8 +118,6 @@ fi
 # ./configure --qt-gui --qt-qmake=${SUPPORT_DIR}/qt-4.3.5/bin/bin/qmake
 # make -j${CORES}
 # sudo make install
-
-exit 0
 
 # VisIt
 
@@ -141,6 +138,8 @@ then
   make -j${CORES}
   make install
   cd ..
+else
+  echo "SZip Complete"
 fi
 
 # HDF4
@@ -152,6 +151,8 @@ then
   make -j 8
   make install
   cd ..
+else
+  echo "HDF4 Complete"
 fi
 
 # HDF5
@@ -170,6 +171,8 @@ then
   make install
   ln -s ${SUPPORT_DIR}/szip-2.1/lib/libsz.a ${SUPPORT_DIR}/hdf5-1.6.8_ser/lib/libsz.a
   cd ..
+else
+  echo "HDF5 Complete"
 fi
 
 # BoxLib
@@ -186,15 +189,53 @@ then
 
   mv std std.old
   chmod 644 *.H
-  CXXFLAGS=-fPIC CFLAGS=-fPIC FFLAGS=-fPIC USE_MPI=false COMP=g++ make -j${CORES}
+
+  (
+  cat <<EOF
+--- GNUmakefile 2001-07-23 00:32:20.000000000 -0400
++++ GNUmakefile.org     2009-12-29 12:06:07.000000000 -0500
+@@ -9,8 +9,8 @@
+ PRECISION = DOUBLE
+ DEBUG     = TRUE
+ DIM       = 3
+-COMP      = KCC
+-USE_MPI   = TRUE
++COMP      = g++
++USE_MPI   = FALSE
+ #NAMESPACE = TRUE
+ NAMESPACE = FALSE
+EOF
+) | patch -p0 -N
+
+  CXXFLAGS=-fPIC CFLAGS=-fPIC FFLAGS=-fPIC make -j${CORES}
   mkdir -p ${SUPPORT_DIR}/boxlib/{include/2D,include/3D,lib}
   cp libbox3d.Linux.g++.f77.DEBUG.a ${SUPPORT_DIR}/boxlib/lib/libbox3D.a
   cp *.H ${SUPPORT_DIR}/boxlib/include/3D/
+
   # edit GNUMakefile,set DIM=2
+  (
+  cat <<EOF
+--- GNUmakefile 2009-12-29 12:11:06.000000000 -0500
++++ GNUmakefile.org     2009-12-29 12:12:39.000000000 -0500
+@@ -8,7 +8,7 @@
+
+ PRECISION = DOUBLE
+ DEBUG     = TRUE
+-DIM       = 3
++DIM       = 2
+ COMP      = g++
+ USE_MPI   = FALSE
+ #NAMESPACE = TRUE
+EOF
+) | patch -p0 -N
+
+  
   CXXFLAGS=-fPIC CFLAGS=-fPIC FFLAGS=-fPIC make -j 8
   cp libbox2d.Linux.g++.f77.DEBUG.a ${SUPPORT_DIR}/boxlib/lib/libbox2D.a
   cp *.H ${SUPPORT_DIR}/boxlib/include/2D/
   cd ../..
+else
+  echo "BoxLib Complete"
 fi
 
 # NetCDF
@@ -226,6 +267,8 @@ then
   mkdir ${SUPPORT_DIR}/netcdf-3.6.0-p1
   make install 
   cd ..
+else
+  echo "NetCDF Complete"
 fi
 
 # Silo
@@ -239,6 +282,8 @@ then
   make install
   ln -s ${SUPPORT_DIR}/silo-4.6.2/lib/libsiloh5.a ${SUPPORT_DIR}/silo-4.6.2/lib/libsilo.a
   cd ..
+else
+  echo "Silo Complete"
 fi
 
 # CGNS
@@ -252,6 +297,8 @@ then
   mkdir -p ${SUPPORT_DIR}/cgns-2.4/{include,lib}
   make install
   cd ..
+else
+  echo "CGNS Complete"
 fi
 
 # CFITSIO
@@ -263,6 +310,8 @@ then
   make -j${CORES}
   make install
   cd ..
+else
+  echo "CFITSIO Complete"
 fi
 
 # H5Part
@@ -294,6 +343,8 @@ then
   make install
   cd ..
 fi
+
+exit 0
 
 # Qt 3
 #=======
