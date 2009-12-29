@@ -59,7 +59,7 @@ then
   mv src/ qt-4.3.5/src
 
   cd qt-4.3.5/src/
-  echo 'yes' | ./configure --prefix=${SUPPORT_DIR}/qt-4.3.5/bin/ -opengl -optimized-qmake
+  echo yes | ./configure --prefix=${SUPPORT_DIR}/qt-4.3.5/bin/ -opengl -optimized-qmake -opensource
   make -j${CORES}
   make install
 
@@ -240,8 +240,9 @@ fi
 
 # NetCDF
 # For gcc-4.3 add #include <cstring> to ./cxx/ncvalues.cpp
-
-tar -zxvf netcdf.tar.gz
+if [ ! -f ${SUPPORT_DIR}/netcdf-3.6.0-p1/lib/libnetcdf.a ];
+then
+  tar -zxvf netcdf.tar.gz
 
 (
 cat <<EOF
@@ -258,9 +259,7 @@ cat <<EOF
   #include "ncvalues.h"
 EOF
 ) | patch -p0 -N
-
-if [ ! -f ${SUPPORT_DIR}/netcdf-3.6.0-p1/lib/libnetcdf.a ];
-then 
+ 
   cd netcdf-3.6.0-p1/src/
   CXXFLAGS=-fPIC CFLAGS=-fPIC ./configure --prefix=${SUPPORT_DIR}/netcdf-3.6.0-p1
   make -j${CORES}
@@ -277,8 +276,8 @@ if [ ! -f ${SUPPORT_DIR}/silo-4.6.2/lib/libsilo.a ];
 then
   tar -zxvf silo-4.6.2.tar.gz
   cd silo-4.6.2/
-  ./configure --prefix=${SUPPORT_DIR}/silo-4.6.2 --without-readline --with-hdf5=${SUPPORT_DIR}/hdf5-1.6.8_ser/include/,${SUPPORT_DIR}/  hdf5-1.6.8_ser/lib/ --without-exodus --with-szlib=${SUPPORT_DIR}/szip-2.1 --disable-fortran --disable-browser --disable-shared --disable-silex
-  make -j 8
+  ./configure --prefix=${SUPPORT_DIR}/silo-4.6.2 --without-readline --with-hdf5=${SUPPORT_DIR}/hdf5-1.6.8_ser/include/,${SUPPORT_DIR}/hdf5-1.6.8_ser/lib/ --without-exodus --with-szlib=${SUPPORT_DIR}/szip-2.1 --disable-fortran --disable-browser --disable-shared --disable-silex
+  make -j${CORES}
   make install
   ln -s ${SUPPORT_DIR}/silo-4.6.2/lib/libsiloh5.a ${SUPPORT_DIR}/silo-4.6.2/lib/libsilo.a
   cd ..
@@ -302,7 +301,7 @@ else
 fi
 
 # CFITSIO
-if [ ! -f ${SUPPORT_DIR}/cfitsio/lib/libfitsio.a ];
+if [ ! -f ${SUPPORT_DIR}/cfitsio/lib/libcfitsio.a ];
 then
   tar -zxvf cfitsio3006.tar.gz
   cd cfitsio/
@@ -323,6 +322,8 @@ then
   make -j${CORES}
   make install
   cd ..
+else
+  echo "H5Part Complete"
 fi
 
 # CCMIO
@@ -342,9 +343,9 @@ then
   make -j${CORES}
   make install
   cd ..
+else
+  echo "GDAL Complete"
 fi
-
-exit 0
 
 # Qt 3
 #=======
@@ -355,10 +356,12 @@ then
   cd qt-x11-free-3.3.8/
   export QTDIR=`pwd`
   export LD_LIBRARY_PATH=$QTDIR/lib
-  ./configure --prefix=${SUPPORT_DIR}/qt-3.3.8
+  echo yes | ./configure --prefix=${SUPPORT_DIR}/qt-3.3.8 -opensource -optimized-qmake
   make -j${CORES}
   make install
   cd ..
+else
+  echo "Qt 3.3.8 Complete"
 fi
 
 # MPICH
@@ -369,6 +372,8 @@ then
   ./configure --prefix=${SUPPORT_DIR}/mpich2-1.0.8/
   make install
   cd ..
+else
+  echo "MPICH Complete"
 fi
 
 # FFMPEG
@@ -383,7 +388,11 @@ then
   make -j${CORES}
   make install
   cd ../..
+else
+  echo "FFMPEG Complete"
 fi
+
+exit 0
 
 # ParaView (1st pass)
 # Visit needs a build of VTK so we do a first pass build of ParaView
