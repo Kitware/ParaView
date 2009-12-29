@@ -74,11 +74,10 @@ void pqViewMenuManager::buildMenu()
     toolbars->addAction(toolbar->toggleViewAction());
     }
 
-  QMenu* panels = this->Menu->addMenu("Panels")
-    << pqSetName("Panels");
+  this->Menu->addSeparator();
   foreach (QDockWidget* dock_widget, this->Window->findChildren<QDockWidget*>())
     {
-    panels->addAction(dock_widget->toggleViewAction());
+    this->Menu->addAction(dock_widget->toggleViewAction());
     }
 
   this->Menu->addSeparator();
