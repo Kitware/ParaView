@@ -2894,4 +2894,6 @@ _createModules()
 loader = _ModuleLoader()
 sys.meta_path.append(loader)
 
-print vtkSMProxyManager.GetParaViewSourceVersion();
+if hasattr(sys, "ps1"):
+    # session is interactive.
+    print vtkSMProxyManager.GetParaViewSourceVersion();
