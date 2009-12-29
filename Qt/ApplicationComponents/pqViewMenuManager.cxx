@@ -81,37 +81,6 @@ void pqViewMenuManager::buildMenu()
     panels->addAction(dock_widget->toggleViewAction());
     }
 
-  QAction* action = this->Menu->addSeparator();
-  action->setText("Toolbars");
-  // Add menus for all toolbars and actions from them.
-  // This puts menu actions for all toolbars making it possible to access all
-  // toolbar actions even when the toolbar are not visible.
-  // I wonder if I should ignore the pqMainControlsToolbar since those actions
-  // are already placed at other places.
-  foreach (QToolBar* toolbar, all_toolbars)
-    {
-    QMenu* sub_menu = new QMenu(this->Menu)
-      << pqSetName(toolbar->windowTitle());
-    bool added = false;
-    foreach (QAction* action, toolbar->actions())
-      {
-      if (!action->text().isEmpty())
-        {
-        added = true;
-        sub_menu->addAction(action);
-        }
-      }
-    if (added)
-      {
-      QAction* menu_action = this->Menu->addMenu(sub_menu);
-      menu_action->setText(toolbar->windowTitle());
-      }
-    else
-      {
-      delete sub_menu;
-      }
-    }
-
   this->Menu->addSeparator();
 
   pqViewManager* viewManager = qobject_cast<pqViewManager*>(
