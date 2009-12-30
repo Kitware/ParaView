@@ -14,6 +14,7 @@ cvstag=$2
 
 #sudo apt-get install libglib-dev
 #sudo apt-get install cvs
+#sudo apt-get install hg
 #sudo apt-get install gfortran
 #sudo apt-get install libjpeg-dev
 #sudo apt-get install flex
@@ -415,6 +416,21 @@ if [ ! -d ${PV_SRC}/Plugins/VisTrails ];
 then
   cd ${PV_SRC}/Plugins
   hg clone http://blight.kitwarein.com/VisTrails
+# edit the CMaklists file to turn on VisTrails
+# edit the CMaklists file to turn on VisTrails
+(
+cat <<EOF
+--- CMakeLists.txt	2009-12-30 12:07:09.000000000 -0500
++++ CMakeLists.txt.org	2009-12-30 12:05:36.000000000 -0500
+@@ -49,5 +49,6 @@
+ paraview_build_optional_plugin(ThresholdTablePanel "ThresholdTablePanel" ThresholdTablePanel OFF) 
+ paraview_build_optional_plugin(ClientGraphViewFrame "ClientGraphViewFrame" ClientGraphViewFrame OFF)
+ paraview_build_optional_plugin(VisItReaderPlugin "VisItReaderPlugin" VisItDatabaseBridge OFF) 
++paraview_build_optional_plugin(VisTrailsPlugin "VisTrailsPlugin" VisTrails ON)
+ paraview_build_optional_plugin(H5PartReader "Reader for *.h5part files" H5PartReader ON)
+ 
+EOF
+) | patch -p0 -N
   cd ../..
 fi
 
@@ -467,6 +483,9 @@ fi
 # Visit
 #=======
 # write out config file
+
+if [ ! -f ${SUPPORT_DIR}/VisIt-1.10.0.X-all/VisItDev1.10.0.X/src/lib/libplugin.so ];
+then
 
 cd ${SUPPORT_DIR}/VisIt-1.10.0.X-all
 rm vtkVisitDatabaseBridge.conf
@@ -592,8 +611,6 @@ DEFAULT_GDAL_LIB=${SUPPORT_DIR}/gdal-1.6.0/lib
 
 EOF
 
-if [ ! -f ${SUPPORT_DIR}/VisIt-1.10.0.X-all/VisItDev1.10.0.X/src/lib/libplugin123.so ];
-then
   export QTDIR=${SUPPORT_DIR}/qt-x11-free-3.3.8
   export LD_LIBRARY_PATH=$QTDIR/lib
   cd ${SUPPORT_DIR}/VisIt-1.10.0.X-all/VisItDev1.10.0.X/src
@@ -603,5 +620,63 @@ then
 fi
 
 
+cd ${PV_BIN}
+echo "Reconfiguring and rebuilding in ${builddir}"
+
+export LD_LIBRARY_PATH=${SUPPORT_DIR}/qt-4.3.5/bin/lib:${SUPPORT_DIR}/ffmpeg/lib:${SUPPORT_DIR}/python25/lib
+
+rm CMakeCache.txt
+
+cat >> CMakeCache.txt << EOF
+CMAKE_BUILD_TYPE:STRING=Release
+BUILD_SHARED_LIBS:BOOL=ON
+VTK_USE_RPATH:BOOL=OFF
+PARAVIEW_BUILD_QT_GUI:BOOL=ON
+QT_QMAKE_EXECUTABLE:FILEPATH=${SUPPORT_DIR}/qt-4.3.5/bin/bin/qmake
+VTK_USE_QVTK_QTOPENGL:BOOL=ON
+VTK_USE_64BIT_IDS:BOOL=OFF
+PARAVIEW_USE_SYSTEM_HDF5:BOOL=ON
+HDF5_LIBRARY:PATH=${SUPPORT_DIR}/hdf5-1.6.8_ser/lib/libhdf5.a;${SUPPORT_DIR}/szip-2.1/lib/libsz.a
+HDF5_INCLUDE_DIR:PATH=${SUPPORT_DIR}/hdf5-1.6.8_ser/include
+PARAVIEW_BUILD_PLUGIN_VisItReaderPlugin:BOOL=ON
+VISIT_BASE:PATH=${SUPPORT_DIR}/VisIt-1.10.0.X-all/VisItDev1.10.0.X
+VTK_USE_FFMPEG_ENCODER:BOOL=ON
+FFMPEG_INCLUDE_DIR:PATH=${SUPPORT_DIR}/ffmpeg/include/
+FFMPEG_avcodec_LIBRARY:FILEPATH=${SUPPORT_DIR}/ffmpeg/lib/libavcodec.so
+FFMPEG_avformat_LIBRARY:FILEPATH=${SUPPORT_DIR}/ffmpeg/lib/libavformat.so
+FFMPEG_avutil_LIBRARY:FILEPATH=${SUPPORT_DIR}/ffmpeg/lib/libavutil.so
+PARAVIEW_ENABLE_PYTHON:BOOL=ON
+PARAVIEW_TESTING_WITH_PYTHON:BOOL=OFF
+PYTHON_EXECUTABLE:PATH=${SUPPORT_DIR}/python25/bin/python
+PYTHON_INCLUDE_PATH:PATH=${SUPPORT_DIR}/python25/include/python2.5/
+PYTHON_LIBRARY:PATH=${SUPPORT_DIR}/python25/lib/libpython2.5.so
+PARAVIEW_BUILD_PLUGIN_VisTrailsPlugin:BOOL=ON
+EOF
+
+cmake ${PV_SRC}
+make -j${CORES}
+
+echo "Building... Documentation "
+make HTMLDocumentation
+
+echo "Generating package using CPACK"
+cpack -G TGZ
+
+package_name=`ls -1 | grep tar | cut -f-3 -d.`
+echo "The package is ${package_name}"
+tar zxf ${package_name}.tar.gz
+
+lib_dir_name=`ls ${package_name}/lib | grep paraview`
+lib_dir=${package_name}/lib/${lib_dir_name}
+
+# Now add some standard libraries that don't get installed using cmake rules to the package.
+cp   /usr/lib/libstdc++.so.6 /lib/libgcc_s.so.1 ${SUPPORT_DIR}/python25/lib/libpython2.5.so.1.0 /usr/lib/libpng12.so.0 /usr/lib/libfontconfig.so.1 /usr/lib/libfreetype.so.6 /usr/lib/libz.so.1 ${lib_dir}
+rm -f ${lib_dir}/*.debug
+cd ${lib_dir}
+cp -r ${SUPPORT_DIR}/python25/lib/ .
+cd ${PV_BIN}
+tar zcf ${package_name}.tar.gz ${package_name}
+cp ${package_name}.tar.gz ../
+echo "Package build successfully: ${builddir}/../${package_name}.tar.gz"
 
 
