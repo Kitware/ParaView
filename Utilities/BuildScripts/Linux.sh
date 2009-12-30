@@ -676,7 +676,7 @@ cd ${lib_dir}
 cp -r ${SUPPORT_DIR}/python25/lib/ .
 cd ${PV_BIN}
 tar zcf ${package_name}.tar.gz ${package_name}
-cp ${package_name}.tar.gz ../
+cp ${package_name}.tar.gz ../../
 echo "Package build successfully: ${builddir}/../${package_name}.tar.gz"
 
 
