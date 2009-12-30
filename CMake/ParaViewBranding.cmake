@@ -117,7 +117,6 @@ FUNCTION(build_paraview_client BPC_NAME)
         PROPERTIES
         MACOSX_PACKAGE_LOCATION Resources
         )
-      SET(MACOSX_BUNDLE_ICON_FILE ${bundle_icon_file})
     ENDIF (BPC_BUNDLE_ICON)
     SET(MAKE_BUNDLE MACOSX_BUNDLE)
   ENDIF (APPLE)
@@ -250,10 +249,14 @@ FUNCTION(build_paraview_client BPC_NAME)
       pq${BPC_NAME}Initializer)
   ENDIF (BPC_MAKE_INITIALIZER_LIBRARY)
 
-  if (bundle_icon_file)
-  set_target_properties(${pv_exe_name} PROPERTIES
-    MACOSX_BUNDLE_ICON_FILE ${bundle_icon_file})
-  endif (bundle_icon_file)
+  IF (APPLE)
+    IF (BPC_BUNDLE_ICON)
+      SET_TARGET_PROPERTIES(${pv_exe_name} PROPERTIES
+        MACOSX_BUNDLE_ICON_FILE ${bundle_icon_file})
+    ENDIF (BPC_BUNDLE_ICON)
+    SET_TARGET_PROPERTIES(${pv_exe_name} PROPERTIES 
+      MACOSX_BUNDLE_BUNDLE_NAME "${BPC_APPLICATION_NAME}")
+  ENDIF (APPLE)
 
   # Add shared link forwarding executables if necessary.
   IF(PV_NEED_SHARED_FORWARD)
