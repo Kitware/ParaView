@@ -370,7 +370,7 @@ then
   tar -zxvf mpich2-1.0.8.tar.gz
   cd mpich2-1.0.8/
   ./configure --prefix=${SUPPORT_DIR}/mpich2-1.0.8/
-  make -j${CORES}
+  make
   make install
   cd ..
 else
@@ -429,6 +429,8 @@ echo "Reconfiguring and rebuilding in ${builddir}"
 
 export LD_LIBRARY_PATH=${SUPPORT_DIR}/qt-4.3.5/bin/lib:${SUPPORT_DIR}/ffmpeg/lib:${SUPPORT_DIR}/python25/lib
 
+rm CMakeCache.txt
+
 cat >> CMakeCache.txt << EOF
 CMAKE_BUILD_TYPE:STRING=Release
 BUILD_SHARED_LIBS:BOOL=ON
@@ -466,77 +468,80 @@ fi
 #=======
 # write out config file
 
+cd ${SUPPORT_DIR}/VisIt-1.10.0.X-all
+rm vtkVisitDatabaseBridge.conf
+
 cat >> vtkVisitDatabaseBridge.conf << EOF
 #==============================================================================(Configuration)
-VTK=$VTK_BUILD/VTK 
-VTK_SOURCE=${BASE_DIR}/ParaView3/VTK
-VTK_BUILD=/home/burlen/ext/PV3/
-VISIT_VTK_CPPFLAGS="\
-      -I$VTK_SOURCE/Parallel\
-      -I$VTK_SOURCE/GenericFiltering\
-      -I$VTK_SOURCE/Views\
-      -I$VTK_SOURCE/Imaging\
-      -I$VTK_SOURCE/GUISupport\
-      -I$VTK_SOURCE/Infovis\
-      -I$VTK_SOURCE/Hybrid\
-      -I$VTK_SOURCE/VolumeRendering\
-      -I$VTK_SOURCE/Examples\
-      -I$VTK_SOURCE/Wrapping\
-      -I$VTK_SOURCE/IO\
-      -I$VTK_SOURCE/Filtering\
-      -I$VTK_SOURCE/Common\
-      -I$VTK_SOURCE/Widgets\
-      -I$VTK_SOURCE/Rendering\
-      -I$VTK_SOURCE/Rendering/Testing/Cxx\
-      -I$VTK_SOURCE/Patented\
-      -I$VTK_SOURCE/Graphics\
-      -I$VTK_SOURCE/Utilities"
-VISIT_VTK_CPPFLAGS="$VISIT_VTK_CPPFLAGS -I$VTK_BUILD/VTK -I$VTK_BUILD/VTK/Utilities"
-VISIT_VTK_LDFLAGS="\
-     -rdynamic\
-     -L$VTK_BUILD/bin\
-     -L/${SUPPORT_DIR}/mpich2-1.0.8/lib\
-     -lvtkFiltering\
-     -lvtkHybrid\
-     -lvtkParallel\
-     -lvtkGraphics\
-     -lvtkImaging\
-     -lvtkRendering\
-     -lvtkGraphics\
-     -lvtkImaging\
-     -lvtkftgl\
-     -lvtkfreetype\
-     -lGL -lXt -lSM -lICE -lX11 -lXext\
-     -lvtkIO\
-     -lvtkDICOMParser\
-     -lvtkmetaio\
-     -lvtksqlite\
-     -lvtkpng\
-     -lvtktiff\
-     -lvtkzlib\
-     -lvtkjpeg\
-     -lvtkexpat\
-     -lvtkexoIIc\
-     -lvtkNetCDF\
-     -lvtkverdict\
-     -lvtkFiltering\
-     -lvtkCommon\
-     -lvtksys\
-     -ldl\
-     -lm\
-     -Wl,-rpath,$VTK_BUILD/bin:/${SUPPORT_DIR}/mpich2-1.0.8/lib\
+VTK=\$VTK_BUILD/VTK 
+VTK_SOURCE=${PV_SRC}/VTK
+VTK_BUILD=${PV_BIN}
+VISIT_VTK_CPPFLAGS="\\
+      -I\$VTK_SOURCE/Parallel\\
+      -I\$VTK_SOURCE/GenericFiltering\\
+      -I\$VTK_SOURCE/Views\\
+      -I\$VTK_SOURCE/Imaging\\
+      -I\$VTK_SOURCE/GUISupport\\
+      -I\$VTK_SOURCE/Infovis\\
+      -I\$VTK_SOURCE/Hybrid\\
+      -I\$VTK_SOURCE/VolumeRendering\\
+      -I\$VTK_SOURCE/Examples\\
+      -I\$VTK_SOURCE/Wrapping\\
+      -I\$VTK_SOURCE/IO\\
+      -I\$VTK_SOURCE/Filtering\\
+      -I\$VTK_SOURCE/Common\\
+      -I\$VTK_SOURCE/Widgets\\
+      -I\$VTK_SOURCE/Rendering\\
+      -I\$VTK_SOURCE/Rendering/Testing/Cxx\\
+      -I\$VTK_SOURCE/Patented\\
+      -I\$VTK_SOURCE/Graphics\\
+      -I\$VTK_SOURCE/Utilities"
+VISIT_VTK_CPPFLAGS="\$VISIT_VTK_CPPFLAGS -I\$VTK_BUILD/VTK -I\$VTK_BUILD/VTK/Utilities"
+VISIT_VTK_LDFLAGS="\\
+     -rdynamic\\
+     -L\$VTK_BUILD/bin\\
+     -L${SUPPORT_DIR}/mpich2-1.0.8/lib\\
+     -lvtkFiltering\\
+     -lvtkHybrid\\
+     -lvtkParallel\\
+     -lvtkGraphics\\
+     -lvtkImaging\\
+     -lvtkRendering\\
+     -lvtkGraphics\\
+     -lvtkImaging\\
+     -lvtkftgl\\
+     -lvtkfreetype\\
+     -lGL -lXt -lSM -lICE -lX11 -lXext\\
+     -lvtkIO\\
+     -lvtkDICOMParser\\
+     -lvtkmetaio\\
+     -lvtksqlite\\
+     -lvtkpng\\
+     -lvtktiff\\
+     -lvtkzlib\\
+     -lvtkjpeg\\
+     -lvtkexpat\\
+     -lvtkexoIIc\\
+     -lvtkNetCDF\\
+     -lvtkverdict\\
+     -lvtkFiltering\\
+     -lvtkCommon\\
+     -lvtksys\\
+     -ldl\\
+     -lm\\
+     -Wl,-rpath,\$VTK_BUILD/bin:${SUPPORT_DIR}/mpich2-1.0.8/lib\\
      -lmpichcxx -lmpich -lpthread -lrt"
 
-VTK_INCLUDE=$VISIT_VTK_CPPFLAGS
+VTK_INCLUDE=\$VISIT_VTK_CPPFLAGS
 
-# MESA=/${SUPPORT_DIR}/Mesa-7.2
-# MESA_INCLUDE=/${SUPPORT_DIR}/Mesa-7.2/include
-# MESA_LIBS=-L/${SUPPORT_DIR}/Mesa-7.2/lib
+# MESA=${SUPPORT_DIR}/Mesa-7.2
+# MESA_INCLUDE=${SUPPORT_DIR}/Mesa-7.2/include
+# MESA_LIBS=-L${SUPPORT_DIR}/Mesa-7.2/lib
 
 # QT, is required by the build system eg. xmlToMakefile
-QT_BIN=/${SUPPORT_DIR}/qt-3.3.8/bin
-QT_INCLUDE=/${SUPPORT_DIR}/qt-3.3.8/include
-QT_LIB=/${SUPPORT_DIR}/qt-3.3.8/lib
+QT_BIN=${SUPPORT_DIR}/qt-3.3.8/bin
+QT_INCLUDE=${SUPPORT_DIR}/qt-3.3.8/include
+QT_LIB=${SUPPORT_DIR}/qt-3.3.8/lib
 
 # # NOTE Also have to modify configure.in add version test for 4.4.3 
 # # other issues: include structure.
@@ -548,33 +553,33 @@ QT_LIB=/${SUPPORT_DIR}/qt-3.3.8/lib
 CC="gcc"
 CXX="g++"
 CFLAGS="-g -Wno-deprecated"
-CXXFLAGS="-fPIC -g -Wno-deprecated -DMPICH_IGNORE_CXX_SEEK -I/${SUPPORT_DIR}/mpich2-1.0.8/include $CXXFLAGS"
-CPPFLAGS="-fPIC $VISIT_VTK_CPPFLAGS -g -Wno-deprecated $CPPFLAGS"
-MPI_LIBS="-L/${SUPPORT_DIR}/mpich2-1.0.8/lib -Wl,-rpath -Wl,/${SUPPORT_DIR}/mpich2-1.0.8/lib -lmpichcxx -lmpich -lpthread -lrt "
+CXXFLAGS="-fPIC -g -Wno-deprecated -DMPICH_IGNORE_CXX_SEEK -I${SUPPORT_DIR}/mpich2-1.0.8/include \$CXXFLAGS"
+CPPFLAGS="-fPIC \$VISIT_VTK_CPPFLAGS -g -Wno-deprecated \$CPPFLAGS"
+MPI_LIBS="-L${SUPPORT_DIR}/mpich2-1.0.8/lib -Wl,-rpath -Wl,${SUPPORT_DIR}/mpich2-1.0.8/lib -lmpichcxx -lmpich -lpthread -lrt "
 
 # Database reader plugin support libraries
-DEFAULT_SZIP_INCLUDE=/${SUPPORT_DIR}/szip-2.1/include
-DEFAULT_SZIP_LIB=/${SUPPORT_DIR}/szip-2.1/lib
-DEFAULT_HDF4_INCLUDE=/${SUPPORT_DIR}/hdf4-4.2r4/include
-DEFAULT_HDF4_LIBS=/${SUPPORT_DIR}/hdf4-4.2r4/lib
-DEFAULT_HDF5_INCLUDE=/${SUPPORT_DIR}/hdf5-1.6.8_ser/include
-DEFAULT_HDF5_LIB=/${SUPPORT_DIR}/hdf5-1.6.8_ser/lib
-DEFAULT_NETCDF_INCLUDE=/${SUPPORT_DIR}/netcdf-3.6.0-p1/include
-DEFAULT_NETCDF_LIB=/${SUPPORT_DIR}/netcdf-3.6.0-p1/lib
-DEFAULT_SILO_INCLUDES=/${SUPPORT_DIR}/silo-4.6.2/include
-DEFAULT_SILO_LIBRARY=/${SUPPORT_DIR}/silo-4.6.2/lib
-DEFAULT_BOXLIB2D_INCLUDE=/${SUPPORT_DIR}/boxlib/include/2D
-DEFAULT_BOXLIB2D_LIBS=/${SUPPORT_DIR}/boxlib/lib
-DEFAULT_BOXLIB3D_INCLUDE=/${SUPPORT_DIR}/boxlib/include/3D
-DEFAULT_BOXLIB3D_LIBS=/${SUPPORT_DIR}/boxlib/lib
-DEFAULT_CFITSIO_INCLUDE=/${SUPPORT_DIR}/cfitsio/include
-DEFAULT_CFITSIO_LIB=/${SUPPORT_DIR}/cfitsio/lib
-DEFAULT_H5PART_INCLUDE=/${SUPPORT_DIR}/h5part-1.3.3/include
-DEFAULT_H5PART_LIB=/${SUPPORT_DIR}/h5part-1.3.3/lib
-DEFAULT_CGNS_INCLUDE=/${SUPPORT_DIR}/cgns-2.4/include
-DEFAULT_CGNS_LIB=/${SUPPORT_DIR}/cgns-2.4/lib
-DEFAULT_GDAL_INCLUDE=/${SUPPORT_DIR}/gdal-1.6.0/include
-DEFAULT_GDAL_LIB=/${SUPPORT_DIR}/gdal-1.6.0/lib
+DEFAULT_SZIP_INCLUDE=${SUPPORT_DIR}/szip-2.1/include
+DEFAULT_SZIP_LIB=${SUPPORT_DIR}/szip-2.1/lib
+DEFAULT_HDF4_INCLUDE=${SUPPORT_DIR}/hdf4-4.2r4/include
+DEFAULT_HDF4_LIBS=${SUPPORT_DIR}/hdf4-4.2r4/lib
+DEFAULT_HDF5_INCLUDE=${SUPPORT_DIR}/hdf5-1.6.8_ser/include
+DEFAULT_HDF5_LIB=${SUPPORT_DIR}/hdf5-1.6.8_ser/lib
+DEFAULT_NETCDF_INCLUDE=${SUPPORT_DIR}/netcdf-3.6.0-p1/include
+DEFAULT_NETCDF_LIB=${SUPPORT_DIR}/netcdf-3.6.0-p1/lib
+DEFAULT_SILO_INCLUDES=${SUPPORT_DIR}/silo-4.6.2/include
+DEFAULT_SILO_LIBRARY=${SUPPORT_DIR}/silo-4.6.2/lib
+DEFAULT_BOXLIB2D_INCLUDE=${SUPPORT_DIR}/boxlib/include/2D
+DEFAULT_BOXLIB2D_LIBS=${SUPPORT_DIR}/boxlib/lib
+DEFAULT_BOXLIB3D_INCLUDE=${SUPPORT_DIR}/boxlib/include/3D
+DEFAULT_BOXLIB3D_LIBS=${SUPPORT_DIR}/boxlib/lib
+DEFAULT_CFITSIO_INCLUDE=${SUPPORT_DIR}/cfitsio/include
+DEFAULT_CFITSIO_LIB=${SUPPORT_DIR}/cfitsio/lib
+DEFAULT_H5PART_INCLUDE=${SUPPORT_DIR}/h5part-1.3.3/include
+DEFAULT_H5PART_LIB=${SUPPORT_DIR}/h5part-1.3.3/lib
+DEFAULT_CGNS_INCLUDE=${SUPPORT_DIR}/cgns-2.4/include
+DEFAULT_CGNS_LIB=${SUPPORT_DIR}/cgns-2.4/lib
+DEFAULT_GDAL_INCLUDE=${SUPPORT_DIR}/gdal-1.6.0/include
+DEFAULT_GDAL_LIB=${SUPPORT_DIR}/gdal-1.6.0/lib
 # DEFAULT_CCMIO_INCLUDE=
 # DEFAULT_CCMIO_LIB=
 # BV_MILI_DIR=
@@ -589,11 +594,11 @@ EOF
 
 if [ ! -f ${SUPPORT_DIR}/VisIt-1.10.0.X-all/VisItDev1.10.0.X/src/lib/libplugin123.so ];
 then
-  export QTDIR=${SUPPORT_DIR}/qt-x11-free-3.3.8/
+  export QTDIR=${SUPPORT_DIR}/qt-x11-free-3.3.8
   export LD_LIBRARY_PATH=$QTDIR/lib
   cd ${SUPPORT_DIR}/VisIt-1.10.0.X-all/VisItDev1.10.0.X/src
 #  make distclean
-  ./configure --prefix=/${SUPPORT_DIR}/VisIt-1.10.0 --with-config=/${SUPPORT_DIR}/VisIt-1.10.0.X-all/vtkVisitDatabaseBridge.conf --with-hdf5=/${SUPPORT_DIR}/hdf5-1.6.8_ser/include,/${SUPPORT_DIR}/hdf5-1.6.8_ser/lib --enable-parallel --disable-scripting --disable-visitmodule --disable-viewer-mesa-stub --disable-icet --disable-bilib --disable-glew --disable-bzip2 --with-dbs=all --with-silo-include=/${SUPPORT_DIR}/silo-4.6.2/include --with-silo-library=/${SUPPORT_DIR}/silo-4.6.2/lib
+  ./configure --prefix=${SUPPORT_DIR}/VisIt-1.10.0 --with-config=${SUPPORT_DIR}/VisIt-1.10.0.X-all/vtkVisitDatabaseBridge.conf --with-hdf5=${SUPPORT_DIR}/hdf5-1.6.8_ser/include,${SUPPORT_DIR}/hdf5-1.6.8_ser/lib --enable-parallel --disable-scripting --disable-visitmodule --disable-viewer-mesa-stub --disable-icet --disable-bilib --disable-glew --disable-bzip2 --with-dbs=all --with-silo-include=${SUPPORT_DIR}/silo-4.6.2/include --with-silo-library=${SUPPORT_DIR}/silo-4.6.2/lib
   make -j${CORES}
 fi
 
