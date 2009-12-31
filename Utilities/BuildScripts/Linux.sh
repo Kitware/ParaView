@@ -60,7 +60,7 @@ then
   mv src/ qt-4.3.5/src
 
   cd qt-4.3.5/src/
-  echo yes | ./configure --prefix=${SUPPORT_DIR}/qt-4.3.5/bin/ -opengl -optimized-qmake -opensource
+  echo yes | ./configure --prefix=${SUPPORT_DIR}/qt-4.3.5/bin/ -opengl -optimized-qmake
   make -j${CORES}
   make install
 
@@ -357,7 +357,7 @@ then
   cd qt-x11-free-3.3.8/
   export QTDIR=`pwd`
   export LD_LIBRARY_PATH=$QTDIR/lib
-  echo yes | ./configure --prefix=${SUPPORT_DIR}/qt-3.3.8 -opensource -optimized-qmake
+  echo yes | ./configure --prefix=${SUPPORT_DIR}/qt-3.3.8
   make -j${CORES}
   make install
   cd ..
@@ -619,7 +619,6 @@ EOF
   make -j${CORES}
 fi
 
-
 cd ${PV_BIN}
 echo "Reconfiguring and rebuilding in ${builddir}"
 
@@ -670,9 +669,10 @@ lib_dir_name=`ls ${package_name}/lib | grep paraview`
 lib_dir=${package_name}/lib/${lib_dir_name}
 
 # Now add some standard libraries that don't get installed using cmake rules to the package.
-cp   /usr/lib/libstdc++.so.6 /lib/libgcc_s.so.1 ${SUPPORT_DIR}/python25/lib/libpython2.5.so.1.0 /usr/lib/libpng12.so.0 /usr/lib/libfontconfig.so.1 /usr/lib/libfreetype.so.6 /usr/lib/libz.so.1 ${lib_dir}
-rm -f ${lib_dir}/*.debug
 cd ${lib_dir}
+ls
+cp   /usr/lib/libstdc++.so.6 /lib/libgcc_s.so.1 ${SUPPORT_DIR}/python25/lib/libpython2.5.so.1.0 /usr/lib/libpng12.so.0 /usr/lib/libfontconfig.so.1 /usr/lib/libfreetype.so.6 /usr/lib/libz.so.1 /usr/lib/libexpat.so.1 ./
+rm -f *.debug
 cp -r ${SUPPORT_DIR}/python25/lib/ .
 cd ${PV_BIN}
 tar zcf ${package_name}.tar.gz ${package_name}
