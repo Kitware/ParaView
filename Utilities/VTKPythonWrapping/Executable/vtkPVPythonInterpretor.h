@@ -115,6 +115,8 @@ protected:
   // Initialize the interpretor.
   virtual void InitializeInternal();
 
+  void AddPythonPathInternal(const char* path);
+
   char* ExecutablePath;
   vtkSetStringMacro(ExecutablePath);
 
