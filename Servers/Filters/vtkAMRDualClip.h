@@ -23,7 +23,7 @@
 #ifndef __vtkAMRDualClip_h
 #define __vtkAMRDualClip_h
 
-#include "vtkMultiBlockDataSetAlgorithm.h"  // required because it is the superclass :)
+#include "vtkMultiBlockDataSetAlgorithm.h"
 
 class vtkDataSet;
 class vtkImageData;
