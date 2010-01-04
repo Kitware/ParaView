@@ -162,7 +162,7 @@ FUNCTION(build_paraview_client BPC_NAME)
     # appropriate help when the user asks for it. The 
     set (outfile "${CMAKE_CURRENT_BINARY_DIR}/${BPC_NAME}_help.qrc")
     GENERATE_QT_RESOURCE_FROM_FILES("${outfile}"
-      "/${BPC_NAME}/Documentation"
+      "/${BPC_APPLICATION_NAME}/Documentation"
       "${BPC_COMPRESSED_HELP_FILE};")
     SET (ui_resources ${ui_resources} "${outfile}")
   ENDIF (BPC_COMPRESSED_HELP_FILE)
