@@ -9,7 +9,7 @@
   <pqevent object="pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/0/Viewport" command="mouseMove" arguments="(0.526237,0.36,1,0,0)" />
   <pqevent object="pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/0/Viewport" command="mouseRelease" arguments="(0.526237,0.36,1,0,0)" />
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_View" />
-  <pqevent object="pqClientMainWindow/menubar/menu_View/Panels" command="activate" arguments="Animation View" />
+  <pqevent object="pqClientMainWindow/menubar/menu_View" command="activate" arguments="Animation View" />
   <pqevent object="pqClientMainWindow/animationViewDock/animationView/1pqAnimationWidget0/TrackHeader" command="mousePress" arguments="1,1,0,0,0,1" />
   <pqevent object="pqClientMainWindow/animationViewDock/animationView/1pqAnimationWidget0/TrackHeader" command="mouseRelease" arguments="1,0,0,0,0,1" />
   <pqevent object="pqClientMainWindow/animationViewDock/animationView/1pqAnimationWidget0/TrackHeader" command="mouseDblClick" arguments="1,1,0,0,0,1" />
