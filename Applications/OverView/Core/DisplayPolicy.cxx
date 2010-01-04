@@ -101,7 +101,7 @@ pqDataRepresentation* DisplayPolicy::createPreferredRepresentation(
 
 //-----------------------------------------------------------------------------
 pqDataRepresentation* DisplayPolicy::setRepresentationVisibility(
-  pqOutputPort* opPort, pqView* view, bool visible) 
+  pqOutputPort* opPort, pqView* view, bool visible) const
 {
   vtkPVDataInformation* selectedInformation = opPort->getDataInformation(false);
   vtkSMSourceProxy* selectionProxy = 

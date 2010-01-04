@@ -94,7 +94,7 @@ public:
   /// create new views, we provide this as part of display policy which can 
   /// be easily overridden by creating a new subclass.
   virtual pqDataRepresentation* setRepresentationVisibility(
-    pqOutputPort* opPort, pqView* view, bool visible);
+    pqOutputPort* opPort, pqView* view, bool visible) const;
 
   /// Returns the type for the view that is indicated as the preferred view
   /// for the given output port. May return a null string if the no view type

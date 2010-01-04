@@ -74,7 +74,7 @@ public:
   /// Adaptive ParaView overrides this so as not to reset the camera 
   // viewpoint as frequently.
   virtual pqDataRepresentation* setRepresentationVisibility(
-    pqOutputPort* opPort, pqView* view, bool visible);
+    pqOutputPort* opPort, pqView* view, bool visible) const;
 
 protected:
 };

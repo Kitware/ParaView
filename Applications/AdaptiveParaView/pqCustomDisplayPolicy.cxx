@@ -69,7 +69,7 @@ QString pqCustomDisplayPolicy::getPreferredViewType(pqOutputPort* opPort,
 
 //-----------------------------------------------------------------------------
 pqDataRepresentation* pqCustomDisplayPolicy::setRepresentationVisibility(
-  pqOutputPort* opPort, pqView* view, bool visible) 
+  pqOutputPort* opPort, pqView* view, bool visible)  const
 {
   if (!opPort)
     {

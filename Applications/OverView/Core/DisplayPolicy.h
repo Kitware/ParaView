@@ -95,7 +95,7 @@ public:
   /// create new views, we provide this as part of display policy which can 
   /// be easily overridden by creating a new subclass.
   virtual pqDataRepresentation* setRepresentationVisibility(
-    pqOutputPort* opPort, pqView* view, bool visible);
+    pqOutputPort* opPort, pqView* view, bool visible) const;
 
   // Description
   // Apps can choose whether new filter outputs are hidden upon creation by
