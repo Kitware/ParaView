@@ -210,16 +210,34 @@ vtkSMSourceProxy* pqSpreadSheetViewSelectionModel::getSelectionSource()
     return 0;
     }
 
+  // Convert field_type to selection field type if convert-able.
   int field_type = this->Internal->Model->getFieldType();
-  if (field_type != vtkDataObject::FIELD_ASSOCIATION_POINTS &&
-    field_type != vtkDataObject::FIELD_ASSOCIATION_CELLS)
+  int selection_field_type = -1;
+  switch (field_type)
     {
+  case vtkDataObject::FIELD_ASSOCIATION_POINTS:
+    selection_field_type = vtkSelectionNode::POINT;
+    break;
+
+  case vtkDataObject::FIELD_ASSOCIATION_CELLS:
+    selection_field_type = vtkSelectionNode::CELL;
+    break;
+
+  case vtkDataObject::FIELD_ASSOCIATION_VERTICES:
+    selection_field_type = vtkSelectionNode::VERTEX;
+    break;
+
+  case vtkDataObject::FIELD_ASSOCIATION_EDGES:
+    selection_field_type = vtkSelectionNode::EDGE;
+    break;
+
+  case vtkDataObject::FIELD_ASSOCIATION_ROWS:
+    selection_field_type = vtkSelectionNode::ROW;
+    break;
+
+  default:
     return 0;
     }
-
-  // Convert field_type to selection field type.
-  field_type = (field_type == vtkDataObject::FIELD_ASSOCIATION_POINTS)?
-    vtkSelectionNode::POINT : vtkSelectionNode::CELL;
 
   pqOutputPort* opport = repr->getOutputPortFromInput();
   vtkSMSourceProxy* selsource = opport->getSelectionInput(); 
@@ -229,7 +247,7 @@ vtkSMSourceProxy* pqSpreadSheetViewSelectionModel::getSelectionSource()
 
   // If field types differ, not updatable.
   if (updatable && pqSMAdaptor::getElementProperty(
-      selsource->GetProperty("FieldType")).toInt() != field_type)
+      selsource->GetProperty("FieldType")).toInt() != selection_field_type)
     {
     updatable = false;
     }
@@ -265,7 +283,7 @@ vtkSMSourceProxy* pqSpreadSheetViewSelectionModel::getSelectionSource()
     selsource->SetConnectionID(repr->getServer()->GetConnectionID());
     selsource->SetServers(vtkProcessModule::DATA_SERVER);
     pqSMAdaptor::setElementProperty(
-      selsource->GetProperty("FieldType"), field_type);
+      selsource->GetProperty("FieldType"), selection_field_type);
     selsource->UpdateVTKObjects();
     }
 

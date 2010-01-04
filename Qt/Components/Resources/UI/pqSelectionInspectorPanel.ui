@@ -189,6 +189,21 @@
             <string>POINT</string>
            </property>
           </item>
+          <item>
+           <property name="text" >
+            <string>VERTEX</string>
+           </property>
+          </item>
+          <item>
+           <property name="text" >
+            <string>EDGE</string>
+           </property>
+          </item>
+          <item>
+           <property name="text" >
+            <string>ROW</string>
+           </property>
+          </item>
          </widget>
         </item>
         <item row="3" column="0" colspan="2" >
