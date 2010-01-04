@@ -66,6 +66,7 @@ SET (MOC_HEADERS
   pqPVApplicationCore.h
   pqPVNewSourceBehavior.h
   pqPythonShellReaction.h
+  pqQtMessageHandlerBehavior.h
   pqReaction.h
   pqRepresentationToolbar.h
   pqResetScalarRangeReaction.h
@@ -135,10 +136,10 @@ SET (SOURCE_FILES
   pqCameraToolbar.h
   pqCameraUndoRedoReaction.cxx
   pqCameraUndoRedoReaction.h
+  pqCategoryToolbarsBehavior.cxx
+  pqCategoryToolbarsBehavior.h
   pqChangePipelineInputReaction.cxx
   pqChangePipelineInputReaction.h
-  pqPVApplicationCore.cxx
-  pqPVApplicationCore.h
   pqColorToolbar.cxx
   pqColorToolbar.h
   pqCommandLineOptionsBehavior.cxx
@@ -157,12 +158,16 @@ SET (SOURCE_FILES
   pqDeleteBehavior.h
   pqDeleteReaction.cxx
   pqDeleteReaction.h
+  pqEditCameraReaction.cxx
+  pqEditCameraReaction.h
   pqEditColorMapReaction.cxx
   pqEditColorMapReaction.h
   pqExportReaction.cxx
   pqExportReaction.h
   pqFiltersMenuReaction.cxx
   pqFiltersMenuReaction.h
+  pqHelpReaction.cxx
+  pqHelpReaction.h
   pqIgnoreSourceTimeReaction.cxx
   pqIgnoreSourceTimeReaction.h
   pqListNewProxyDefinitionsBehavior.cxx
@@ -193,8 +198,14 @@ SET (SOURCE_FILES
   pqProxyGroupMenuManager.h
   pqPVAnimationWidget.cxx
   pqPVAnimationWidget.h
+  pqPVApplicationCore.cxx
+  pqPVApplicationCore.h
   pqPVNewSourceBehavior.cxx
   pqPVNewSourceBehavior.h
+  pqPythonShellReaction.cxx
+  pqPythonShellReaction.h
+  pqQtMessageHandlerBehavior.cxx
+  pqQtMessageHandlerBehavior.h
   pqReaction.cxx
   pqReaction.h
   pqRepresentationToolbar.cxx
@@ -205,6 +216,8 @@ SET (SOURCE_FILES
   pqSaveAnimationGeometryReaction.h
   pqSaveAnimationReaction.cxx
   pqSaveAnimationReaction.h
+  pqSaveDataReaction.cxx
+  pqSaveDataReaction.h
   pqSaveScreenshotReaction.cxx
   pqSaveScreenshotReaction.h
   pqSaveStateReaction.cxx
@@ -223,38 +236,28 @@ SET (SOURCE_FILES
   pqSourcesMenuReaction.h
   pqSpreadSheetVisibilityBehavior.cxx
   pqSpreadSheetVisibilityBehavior.h
+  pqStandardViewFrameActionGroup.cxx
+  pqStandardViewFrameActionGroup.h
+  pqStatusBar.cxx
+  pqStatusBar.h
   pqTestingReaction.cxx
   pqTestingReaction.h
   pqTimerLogReaction.cxx
   pqTimerLogReaction.h
-  pqUndoRedoReaction.cxx
-  pqUndoRedoReaction.h
   pqUndoRedoBehavior.cxx
   pqUndoRedoBehavior.h
+  pqUndoRedoReaction.cxx
+  pqUndoRedoReaction.h
   pqVCRToolbar.cxx
   pqVCRToolbar.h
+  pqViewFrameActionsBehavior.cxx
+  pqViewFrameActionsBehavior.h
   pqViewMenuManager.cxx
   pqViewMenuManager.h
   pqViewSettingsManager.cxx
   pqViewSettingsManager.h
   pqViewSettingsReaction.cxx
   pqViewSettingsReaction.h
-  pqSaveDataReaction.cxx
-  pqSaveDataReaction.h
-  pqHelpReaction.cxx
-  pqHelpReaction.h
-  pqEditCameraReaction.cxx
-  pqEditCameraReaction.h
-  pqStandardViewFrameActionGroup.cxx
-  pqStandardViewFrameActionGroup.h
-  pqViewFrameActionsBehavior.cxx
-  pqViewFrameActionsBehavior.h
-  pqCategoryToolbarsBehavior.cxx
-  pqCategoryToolbarsBehavior.h
-  pqStatusBar.cxx
-  pqStatusBar.h
-  pqPythonShellReaction.cxx
-  pqPythonShellReaction.h
 )
 
 #---------------------------------------------

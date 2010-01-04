@@ -88,25 +88,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMReaderFactory.h"
 #include "vtkSMWriterFactory.h"
 
-static void QtMessageOutput(QtMsgType type, const char *msg)
-{
-  switch(type)
-    {
-  case QtDebugMsg:
-    vtkOutputWindow::GetInstance()->DisplayText(msg);
-    break;
-  case QtWarningMsg:
-    vtkOutputWindow::GetInstance()->DisplayErrorText(msg);
-    break;
-  case QtCriticalMsg:
-    vtkOutputWindow::GetInstance()->DisplayErrorText(msg);
-    break;
-  case QtFatalMsg:
-    vtkOutputWindow::GetInstance()->DisplayErrorText(msg);
-    break;
-    }
-}
-
 //-----------------------------------------------------------------------------
 class pqApplicationCore::pqInternals
 {
@@ -294,7 +275,6 @@ void pqApplicationCore::createOutputWindow()
 {
   // Set up error window.
   pqOutputWindowAdapter* owAdapter = pqOutputWindowAdapter::New();
-  qInstallMsgHandler(::QtMessageOutput);
   this->OutputWindow = new pqOutputWindow(0);
   this->OutputWindow->setAttribute(Qt::WA_QuitOnClose, false);
   this->OutputWindow->connect(owAdapter,
@@ -308,7 +288,6 @@ void pqApplicationCore::createOutputWindow()
     SLOT(onDisplayGenericWarningText(const QString&)));
   vtkOutputWindow::SetInstance(owAdapter);
   this->OutputWindowAdapter = owAdapter;
-
 }
 
 //-----------------------------------------------------------------------------
