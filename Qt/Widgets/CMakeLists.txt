@@ -191,6 +191,13 @@ TARGET_LINK_LIBRARIES(pqWidgets
   ${QT_LIBRARIES}
 )
 
+if(APPLE)
+  if(VTK_USE_CARBON)
+    TARGET_LINK_LIBRARIES(pqWidgets "-framework Carbon")
+  endif(VTK_USE_CARBON)
+endif(APPLE)
+
+
 SET(QTWIDGETS_BUILD_SHARED_LIBS "${BUILD_SHARED_LIBS}")
 CONFIGURE_FILE("${CMAKE_CURRENT_SOURCE_DIR}/QtWidgetsExport.h.in"
                "${CMAKE_CURRENT_BINARY_DIR}/QtWidgetsExport.h")
