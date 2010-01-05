@@ -23,7 +23,7 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMUnstructuredDataParallelStrategy);
-vtkCxxRevisionMacro(vtkSMUnstructuredDataParallelStrategy, "1.4");
+vtkCxxRevisionMacro(vtkSMUnstructuredDataParallelStrategy, "1.5");
 //----------------------------------------------------------------------------
 vtkSMUnstructuredDataParallelStrategy::vtkSMUnstructuredDataParallelStrategy()
 {
@@ -219,18 +219,20 @@ void vtkSMUnstructuredDataParallelStrategy::CreatePipelineInternal(
 //----------------------------------------------------------------------------
 void vtkSMUnstructuredDataParallelStrategy::SetKdTree(vtkSMProxy* proxy)
 {
-  vtkSetObjectBodyMacro(KdTree, vtkSMProxy, proxy);
-
-  if (this->Distributor)
+  if (this->KdTree != proxy)
     {
-    this->Connect(proxy, this->Distributor, "PKdTree");
-    }
+    vtkSetObjectBodyMacro(KdTree, vtkSMProxy, proxy);
 
-  if (this->DistributorLOD)
-    {
-    this->Connect(proxy, this->DistributorLOD, "PKdTree");
-    }
+    if (this->Distributor)
+      {
+      this->Connect(proxy, this->Distributor, "PKdTree");
+      }
 
+    if (this->DistributorLOD)
+      {
+      this->Connect(proxy, this->DistributorLOD, "PKdTree");
+      }
+    }
   //this->DistributedDataValid = false;
   //this->DistributedLODDataValid = false;
 }

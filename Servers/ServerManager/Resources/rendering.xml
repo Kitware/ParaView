@@ -3673,9 +3673,6 @@
         <Proxy name="Distributor" proxygroup="filters"
           proxyname="OrderedCompositeDistributor">
         </Proxy>
-        <ExposedProperties>
-          <Property name="PKdTree" />
-        </ExposedProperties>
       </SubProxy>
 
       <SubProxy>
@@ -3830,9 +3827,6 @@
         <Proxy name="Distributor" proxygroup="filters"
           proxyname="OrderedCompositeDistributor">
         </Proxy>
-        <ExposedProperties>
-          <Property name="PKdTree" />
-        </ExposedProperties>
       </SubProxy>
 
       <SubProxy>
