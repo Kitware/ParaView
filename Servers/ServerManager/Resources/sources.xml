@@ -1393,6 +1393,7 @@ OS is the output scalar; M represents the maximum value; G represents the Gaussi
           <Entry value="2" text="FIELD" />
           <Entry value="3" text="VERTEX" />
           <Entry value="4" text="EDGE" />
+          <Entry value="5" text="ROW" />
         </EnumerationDomain>
      </IntVectorProperty>
 
