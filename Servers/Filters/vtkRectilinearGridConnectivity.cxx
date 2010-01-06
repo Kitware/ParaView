@@ -38,7 +38,7 @@
 #include <vtkstd/string>
 
 
-vtkCxxRevisionMacro( vtkRectilinearGridConnectivity, "1.2" );
+vtkCxxRevisionMacro( vtkRectilinearGridConnectivity, "1.3" );
 vtkStandardNewMacro( vtkRectilinearGridConnectivity );
 
 // An extended marching cubes case table for generating cube faces (either
@@ -2396,7 +2396,6 @@ void vtkRectilinearGridConnectivity::AddPolygonsToFaceHash
   vtkCell        * thisFace = NULL; // a 2D polygon (instead of a 3D cell)
   vtkIdType        numFaces = 0; // number of 2D polygons in a vtkPolyData
   vtkIdType        volIndex = 0; // global volume Id attached to a 2D polygon
-  vtkIdType        numbPnts = 0;
   vtkIdType      * vIdxsPtr = NULL; // array of global volume Ids
   vtkDoubleArray * theArray = NULL;
   vtkRectilinearGridConnectivityFace * hashFace = NULL; // a face in the hash
@@ -2816,7 +2815,7 @@ void vtkRectilinearGridConnectivity::ExtractFragmentPolygons
   
   numFaces = 0;
   this->FaceHash->InitTraversal();
-  while ( thisFace = this->FaceHash->GetNextFace() )
+  while (  ( thisFace = this->FaceHash->GetNextFace() )  )
     {
     if ( thisFace->FragmentId > 0 )
       {
