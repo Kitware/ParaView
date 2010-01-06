@@ -38,7 +38,7 @@
 #include <vtkstd/string>
 
 
-vtkCxxRevisionMacro( vtkRectilinearGridConnectivity, "1.1" );
+vtkCxxRevisionMacro( vtkRectilinearGridConnectivity, "1.2" );
 vtkStandardNewMacro( vtkRectilinearGridConnectivity );
 
 // An extended marching cubes case table for generating cube faces (either
@@ -797,6 +797,18 @@ int vtkRectilinearGridConnectivity::FillInputPortInformation
 void vtkRectilinearGridConnectivity::PrintSelf( ostream & os, vtkIndent indent )
 {
   this->Superclass::PrintSelf( os, indent );
+  
+  os << indent << "Volume Fraction Surface Value: " 
+               << this->VolumeFractionSurfaceValue << "\n";
+  os << indent << "Dual Grids Ready: " << this->DualGridsReady    << "\n";
+  os << indent << "Number of Blocks: " << this->NumberOfBlocks    << "\n";
+  os << indent << "Data Blocks Time: " << this->DataBlocksTime    << "\n";
+  os << indent << "Dual Grid Bounds: " << this->DualGridBounds[0] << ", "
+                                       << this->DualGridBounds[1] << "; "
+                                       << this->DualGridBounds[2] << ", "
+                                       << this->DualGridBounds[3] << "; "
+                                       << this->DualGridBounds[4] << ", "
+                                       << this->DualGridBounds[5] << ".\n";
 }
 
 //-----------------------------------------------------------------------------
