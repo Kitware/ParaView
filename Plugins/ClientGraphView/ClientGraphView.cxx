@@ -180,7 +180,7 @@ ClientGraphView::~ClientGraphView()
 
 void ClientGraphView::selectionChanged()
 {
-  // Get the representaion's source
+  // Get the representation's source
   pqDataRepresentation* pqRepr =
     qobject_cast<pqDataRepresentation*>(this->visibleRepresentation());
   if (!pqRepr)
