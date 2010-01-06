@@ -2038,6 +2038,118 @@ attributes of the fragments.
       </InputProperty>
    <!-- End Grid Fragment -->
    </SourceProxy>
+      
+  <!-- ==================================================================== -->
+   <SourceProxy name="RectilinearGridConnectivity" class="vtkRectilinearGridConnectivity"
+     label="Rectilinear Grid Connectivity">
+     <Documentation
+       short_help="Parallel fragments extraction and attributes integration on rectilinear grids."
+       long_help="Parallel fragments extraction and attributes integration on rectilinear grids.">
+         Extracts material fragments from multi-block vtkRectilinearGrid datasets 
+         based on the selected volume fraction array(s) and a fraction isovalue and 
+         integrates the associated attributes.
+     </Documentation>
+       
+     <InputProperty
+       name="Input"
+       command="SetInputConnection">
+         <ProxyGroupDomain name="groups">
+           <Group name="sources"/>
+           <Group name="filters"/>
+         </ProxyGroupDomain>
+         
+         <DataTypeDomain name="input_type">
+           <DataType value="vtkRectilinearGrid"/>
+           <DataType value="vtkCompositeDataSet"/>
+         </DataTypeDomain>
+
+         <InputArrayDomain name="input_array" attribute_type="cell"
+                           number_of_components="1"/>
+     </InputProperty>
+     
+     <StringVectorProperty 
+       name="AddDoubleVolumeArrayName"
+       command="AddDoubleVolumeArrayName" 
+       clean_command="RemoveDoubleVolumeArrayNames"
+       repeat_command="1"
+       number_of_elements_per_command="1"
+       label="Double Volume Arrays">
+       <Documentation>
+         This property specifies the name(s) of the volume fraction array(s) for generating parts.
+       </Documentation>
+       <ArrayListDomain name="array_list" attribute_type="Scalars" data_type="VTK_DOUBLE" >
+         <RequiredProperties>
+           <Property name="Input" function="Input"/>
+         </RequiredProperties>
+       </ArrayListDomain>
+       <Hints>
+         <!-- This overrides the GUI's default mechanism to
+           not set the default value for this property
+           using the domain when the proxy is created -->
+         <NoDefault />
+       </Hints>
+     </StringVectorProperty> 
+
+     <StringVectorProperty 
+       name="AddFloatVolumeArrayName"
+       command="AddFloatVolumeArrayName" 
+       clean_command="RemoveFloatVolumeArrayNames"
+       repeat_command="1"
+       number_of_elements_per_command="1"
+       label="Float Volume Arrays">
+       <Documentation>
+         This property specifies the name(s) of the volume fraction array(s) for generating parts.
+       </Documentation>
+       <ArrayListDomain name="array_list" attribute_type="Scalars" data_type="VTK_FLOAT" >
+         <RequiredProperties>
+           <Property name="Input" function="Input"/>
+         </RequiredProperties>
+       </ArrayListDomain>
+       <Hints>
+         <!-- This overrides the GUI's default mechanism to
+           not set the default value for this property
+           using the domain when the proxy is created -->
+         <NoDefault />
+       </Hints>
+     </StringVectorProperty> 
+
+     <StringVectorProperty 
+       name="AddUnsignedCharVolumeArrayName"
+       command="AddUnsignedCharVolumeArrayName" 
+       clean_command="RemoveUnsignedCharVolumeArrayNames"
+       repeat_command="1"
+       number_of_elements_per_command="1"
+       label="Unsigned Character Volume Arrays">
+       <Documentation>
+         This property specifies the name(s) of the volume fraction array(s) for generating parts.
+       </Documentation>
+       <ArrayListDomain name="array_list" attribute_type="Scalars" data_type="VTK_UNSIGNED_CHAR" >
+         <RequiredProperties>
+           <Property name="Input" function="Input"/>
+         </RequiredProperties>
+       </ArrayListDomain>
+       <Hints>
+         <!-- This overrides the GUI's default mechanism to
+           not set the default value for this property
+           using the domain when the proxy is created -->
+         <NoDefault />
+       </Hints>
+     </StringVectorProperty> 
+
+     <DoubleVectorProperty
+       name="VolumeFractionSurfaceValue"
+       command="SetVolumeFractionSurfaceValue"
+       number_of_elements="1"
+       default_values="0.1"
+       label="Volume Fraction Value">
+       <DoubleRangeDomain name="range" min="0" max="1" />
+       <Documentation>
+         The value of this property is the volume fraction value for the surface.
+       </Documentation>
+     </DoubleVectorProperty>
+    
+   <!-- End Rectilinear Grid Connectivity -->
+   </SourceProxy>
 
     <!-- ==================================================================== -->
     <SourceProxy name="AMRDualClip" class="vtkAMRDualClip"

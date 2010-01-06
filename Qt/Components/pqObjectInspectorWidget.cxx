@@ -135,6 +135,11 @@ public:
         {
         return new pqExtractCTHPartsPanel(proxy, p);
         }
+      if(QString("RectilinearGridConnectivity") == proxy->getProxy()->GetXMLName())
+        {
+        // allow RectilinearGridConnectivity to reuse the panel of CTHPart
+        return new pqExtractCTHPartsPanel(proxy, p);
+        }
       }
     if(QString("sources") == proxy->getProxy()->GetXMLGroup())
       {
@@ -175,7 +180,8 @@ public:
          QString("ExtractSelection") == proxy->getProxy()->GetXMLName() ||
          QString("ExtractSelectionOverTime") == proxy->getProxy()->GetXMLName() ||
          QString("Contour") == proxy->getProxy()->GetXMLName() || 
-         QString("CTHPart") == proxy->getProxy()->GetXMLName()
+         QString("CTHPart") == proxy->getProxy()->GetXMLName() ||
+         QString("RectilinearGridConnectivity") == proxy->getProxy()->GetXMLName()
         )
         {
         return true;

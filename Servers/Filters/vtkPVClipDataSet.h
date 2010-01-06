@@ -15,17 +15,17 @@
 // .NAME vtkPVClipDataSet - Clip filter
 //
 // .SECTION Description
-// This is a subclass of vtkClipDataSet that allows selection of input scalars
+// This is a subclass of vtkVisItClipDataSet that allows selection of input scalars
 
 #ifndef __vtkPVClipDataSet_h
 #define __vtkPVClipDataSet_h
 
-#include "vtkClipDataSet.h"
+#include "vtkVisItClipDataSet.h"
 
-class VTK_EXPORT vtkPVClipDataSet : public vtkClipDataSet
+class VTK_EXPORT vtkPVClipDataSet : public vtkVisItClipDataSet
 {
 public:
-  vtkTypeRevisionMacro(vtkPVClipDataSet,vtkClipDataSet);
+  vtkTypeRevisionMacro(vtkPVClipDataSet,vtkVisItClipDataSet);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
