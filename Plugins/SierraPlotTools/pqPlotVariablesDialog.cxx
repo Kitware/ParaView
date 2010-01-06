@@ -712,7 +712,7 @@ pqPlotVariablesDialog::pqPlotVariablesDialog(QWidget *p,
 
   // set up some parameters for the scroll area
   // scroll area height should not be more than 60% of desktop main screen
-  this->ui->rangeScrollArea->setMaximumHeight(0.5 * QApplication::desktop()->availableGeometry().height());
+  this->ui->rangeScrollArea->setMaximumHeight(int(0.5 * QApplication::desktop()->availableGeometry().height()));
 
   // main dialog height should not be more than a certain percentage of desktop main screen
 
