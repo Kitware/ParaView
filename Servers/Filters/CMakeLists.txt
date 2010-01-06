@@ -131,6 +131,7 @@ SET(Filters_SRCS
   vtkPVUpdateSuppressor.cxx
   vtkPVHardwareSelector.cxx
   vtkRealtimeAnimationPlayer.cxx
+  vtkRectilinearGridConnectivity.cxx
   vtkReductionFilter.cxx
   vtkScatterPlotMapper.cxx
   vtkScatterPlotPainter.cxx
