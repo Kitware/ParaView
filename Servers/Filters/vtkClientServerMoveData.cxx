@@ -36,7 +36,7 @@
 #include <vtksys/ios/sstream>
 
 vtkStandardNewMacro(vtkClientServerMoveData);
-vtkCxxRevisionMacro(vtkClientServerMoveData, "1.16");
+vtkCxxRevisionMacro(vtkClientServerMoveData, "1.17");
 vtkCxxSetObjectMacro(vtkClientServerMoveData, ProcessModuleConnection, 
   vtkProcessModuleConnection);
 
@@ -51,6 +51,7 @@ vtkClientServerMoveData::vtkClientServerMoveData()
   this->WholeExtent[3] = -1;
   this->WholeExtent[4] =  0;
   this->WholeExtent[5] = -1;
+  this->ProcessType = AUTO;
 }
 
 //-----------------------------------------------------------------------------
@@ -142,12 +143,14 @@ int vtkClientServerMoveData::RequestData(vtkInformation*,
   if (rc)
     {
     vtkSocketController* controller = rc->GetSocketController();
-    if (rc->IsA("vtkClientConnection"))
+    bool is_server = this->ProcessType == SERVER;
+    bool is_client = this->ProcessType == CLIENT;
+    if (is_server || rc->IsA("vtkClientConnection"))
       {
       vtkDebugMacro("Server Root: Send input data to client.");
       return this->SendData(input, controller);
       }
-    else if (rc->IsA("vtkServerConnection"))
+    else if (is_client || rc->IsA("vtkServerConnection"))
       {
       vtkDebugMacro("Client: Get data from server and put it on the output.");
       // This is a client node.
@@ -249,4 +252,5 @@ void vtkClientServerMoveData::PrintSelf(ostream& os, vtkIndent indent)
     << this->WholeExtent[4] << ", "
     << this->WholeExtent[5] << endl;
   os << indent << "OutputDataType: " << this->OutputDataType << endl;
+  os << indent << "ProcessType: " << this->ProcessType << endl;
 }

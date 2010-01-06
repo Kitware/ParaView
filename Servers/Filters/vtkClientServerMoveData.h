@@ -59,7 +59,19 @@ public:
   // output type. Make sure to call this before any pipeline updates occur.
   vtkSetVector6Macro(WholeExtent, int);
   vtkGetVector6Macro(WholeExtent, int);
-  
+ 
+  // Description:
+  // Optionally, set the process type. If set to AUTO, then the process type is
+  // tried to be determined using the active connection.
+  vtkSetMacro(ProcessType, int);
+  vtkGetMacro(ProcessType, int);
+//BTX
+  enum ProcessTypes
+    {
+    AUTO=0,
+    SERVER=1,
+    CLIENT=2
+    };
 
 protected:
   vtkClientServerMoveData();
@@ -89,17 +101,16 @@ protected:
 
 
   vtkProcessModuleConnection* ProcessModuleConnection;
-  //BTX
   enum Tags {
     TRANSMIT_DATA_OBJECT = 23483
   };
-  //ETX
 
   int OutputDataType;
   int WholeExtent[6];
+  int ProcessType;
 
 private:
   vtkClientServerMoveData(const vtkClientServerMoveData&); // Not implemented.
   void operator=(const vtkClientServerMoveData&); // Not implemented.
-
+//ETX
 };
