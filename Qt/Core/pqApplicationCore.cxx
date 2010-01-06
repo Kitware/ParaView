@@ -601,7 +601,7 @@ pqSettings* pqApplicationCore::settings()
     if (options && options->GetDisableRegistry())
       {
       this->Settings = new pqSettings(
-        QApplication::applicationName(),
+        QApplication::organizationName(),
         QApplication::applicationName() + QApplication::applicationVersion() 
         + ".DisabledRegistry", this);
       this->Settings->clear();
@@ -609,7 +609,7 @@ pqSettings* pqApplicationCore::settings()
     else
       {
       this->Settings = new pqSettings(
-        QApplication::applicationName(),
+        QApplication::organizationName(),
         QApplication::applicationName() + QApplication::applicationVersion(),
         this);
       }
