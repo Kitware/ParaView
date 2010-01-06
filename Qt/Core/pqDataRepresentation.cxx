@@ -237,19 +237,23 @@ vtkPVDataInformation* pqDataRepresentation::getRepresentedDataInformation(
 //-----------------------------------------------------------------------------
 vtkPVDataInformation* pqDataRepresentation::getInputDataInformation() const
 {
-  if (!this->getInput())
+  if (!this->getOutputPortFromInput())
     {
     return 0;
     }
 
-  vtkSMSourceProxy* source = vtkSMSourceProxy::SafeDownCast(
-    this->getInput()->getProxy());
-  if (source)
+  return this->getOutputPortFromInput()->getDataInformation();
+}
+
+//-----------------------------------------------------------------------------
+vtkPVTemporalDataInformation* pqDataRepresentation::getInputTemporalDataInformation() const
+{
+  if (!this->getOutputPortFromInput())
     {
-    return source->GetDataInformation(
-      this->getOutputPortFromInput()->getPortNumber());
+    return 0;
     }
-  return 0;
+
+  return this->getOutputPortFromInput()->getTemporalDataInformation();
 }
 
 //-----------------------------------------------------------------------------

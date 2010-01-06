@@ -92,6 +92,7 @@ private slots:
   void setAutoRescale(bool on);
   void rescaleToNewRange();
   void rescaleToDataRange();
+  void rescaleToDataRangeOverTime();
 
   void setUseDiscreteColors(bool on);
   void setSizeFromText();

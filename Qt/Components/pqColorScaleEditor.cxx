@@ -41,8 +41,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqColorMapModel.h"
 #include "pqColorPresetManager.h"
 #include "pqColorPresetModel.h"
+#include "pqCoreUtilities.h"
 #include "pqDataRepresentation.h"
 #include "pqLookupTableManager.h"
+#include "pqOutputPort.h"
 #include "pqPipelineRepresentation.h"
 #include "pqPropertyLinks.h"
 #include "pqRenderViewBase.h"
@@ -52,32 +54,35 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqScalarsToColors.h"
 #include "pqScatterPlotRepresentation.h"
 #include "pqSignalAdaptors.h"
-#include "pqStandardColorLinkAdaptor.h"
 #include "pqSMAdaptor.h"
+#include "pqStandardColorLinkAdaptor.h"
+#include "vtkColorTransferFunction.h"
+#include "vtkEventQtSlotConnect.h"
+#include "vtkPiecewiseFunction.h"
+#include "vtkPVTemporalDataInformation.h"
+#include "vtkSMProperty.h"
+#include "vtkSMProxy.h"
+#include "vtkSMPVRepresentationProxy.h"
+#include "vtkTransferFunctionViewer.h"
+#include "vtkType.h"
 
 #include <QCloseEvent>
 #include <QColor>
 #include <QColorDialog>
+#include <QDoubleValidator>
 #include <QGridLayout>
+#include <QIntValidator>
 #include <QItemSelectionModel>
 #include <QList>
 #include <QMenu>
+#include <QMessageBox>
 #include <QPointer>
 #include <QSpacerItem>
 #include <QString>
 #include <QtDebug>
 #include <QVariant>
-#include <QIntValidator>
-#include <QDoubleValidator>
 
-#include "vtkColorTransferFunction.h"
-#include "vtkEventQtSlotConnect.h"
-#include "vtkPiecewiseFunction.h"
-#include "vtkSMPVRepresentationProxy.h"
-#include "vtkSMProperty.h"
-#include "vtkSMProxy.h"
-#include "vtkTransferFunctionViewer.h"
-#include "vtkType.h"
+
 
 
 class pqColorScaleEditorForm : public Ui::pqColorScaleDialog
@@ -217,6 +222,8 @@ pqColorScaleEditor::pqColorScaleEditor(QWidget *widgetParent)
       this, SLOT(rescaleToNewRange()));
   this->connect(this->Form->RescaleToDataButton, SIGNAL(clicked()),
       this, SLOT(rescaleToDataRange()));
+  this->connect(this->Form->RescaleToDataOverTimeButton, SIGNAL(clicked()),
+      this, SLOT(rescaleToDataRangeOverTime()));
 
   this->connect(this->Form->UseDiscreteColors, SIGNAL(toggled(bool)),
       this, SLOT(setUseDiscreteColors(bool)));
@@ -816,6 +823,29 @@ void pqColorScaleEditor::rescaleToNewRange()
     }
 }
 
+//-----------------------------------------------------------------------------
+void pqColorScaleEditor::rescaleToDataRangeOverTime()
+{
+  if (QMessageBox::warning(
+      pqCoreUtilities::mainWidget(),
+      "Potentially slow operation",
+      "This can potentially take a long time to complete. \n"
+      "Are you sure you want to continue?",
+      QMessageBox::Yes |QMessageBox::No, QMessageBox::No) ==
+    QMessageBox::Yes)
+    {
+    pqPipelineRepresentation *pipeline =
+      qobject_cast<pqPipelineRepresentation *>(this->Display);
+    if(pipeline)
+      {
+      pipeline->resetLookupTableScalarRangeOverTime();
+      pipeline->renderViewEventually();
+      }
+    }
+  // TODO: Handle all the other representation types!
+}
+
+//-----------------------------------------------------------------------------
 void pqColorScaleEditor::rescaleToDataRange()
 {
   pqPipelineRepresentation *pipeline =
@@ -841,6 +871,7 @@ void pqColorScaleEditor::rescaleToDataRange()
     }
 }
 
+//-----------------------------------------------------------------------------
 void pqColorScaleEditor::setUseDiscreteColors(bool on)
 {
   // Update the color scale widget and gui controls.

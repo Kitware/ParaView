@@ -40,6 +40,7 @@ class pqPipelineSource;
 class pqScalarOpacityFunction;
 class pqScalarsToColors;
 class vtkPVDataInformation;
+class vtkPVTemporalDataInformation;
 
 /// pqDataRepresentation is the superclass for a display for a pqPipelineSource
 /// i.e. the input for this display proxy is a pqPiplineSource.
@@ -65,6 +66,10 @@ public:
   /// Returns the data information for the data coming into the representation
   /// as input. 
   vtkPVDataInformation* getInputDataInformation() const;
+
+  /// Returns the temporal data information for the input. This can be a very
+  /// slow process. Use with extreme caution!!!
+  vtkPVTemporalDataInformation* getInputTemporalDataInformation() const;
 
   /// Returns the represented data information. Depending on the representation
   /// this may differ from the input data information eg. if the representation

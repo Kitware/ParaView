@@ -113,6 +113,12 @@ vtkPVDataInformation* pqOutputPort::getDataInformation() const
 }
 
 //-----------------------------------------------------------------------------
+vtkPVTemporalDataInformation* pqOutputPort::getTemporalDataInformation()
+{
+  return this->getOutputPortProxy()->GetTemporalDataInformation();
+}
+
+//-----------------------------------------------------------------------------
 const char* pqOutputPort::getDataClassName() const
 {
   vtkSMSourceProxy* source = vtkSMSourceProxy::SafeDownCast(

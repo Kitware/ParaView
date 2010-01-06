@@ -40,6 +40,7 @@ class pqPipelineSource;
 class pqServer;
 class pqView;
 class vtkPVDataInformation;
+class vtkPVTemporalDataInformation;
 class vtkSMOutputPort;
 class vtkSMSourceProxy;
 
@@ -106,6 +107,10 @@ public:
   /// This does not update the pipeline, it simply returns the data information
   /// for data currently present on the output port on the server.
   vtkPVDataInformation* getDataInformation() const;
+
+  /// Collects data information over time. This can potentially be a very slow
+  /// process, so use with caution.
+  vtkPVTemporalDataInformation* getTemporalDataInformation();
 
   /// Returns the class name of the output data.
   const char* getDataClassName() const;

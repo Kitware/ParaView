@@ -60,8 +60,8 @@ SET(Kit_SRCS
   vtkPVGenericAttributeInformation.cxx
   vtkPVInformation.cxx
   vtkPVOpenGLExtensionsInformation.cxx
-  vtkPVPluginInformation.cxx
   vtkPVPlugin.cxx
+  vtkPVPluginInformation.cxx
   vtkPVPluginLoader.cxx
   vtkPVProgressHandler.cxx
   vtkPVPythonModule.cxx
@@ -69,6 +69,7 @@ SET(Kit_SRCS
   vtkPVServerInformation.cxx
   vtkPVServerOptions.cxx
   vtkPVSILInformation.cxx
+  vtkPVTemporalDataInformation.cxx
   vtkPVTestUtilities.cxx
   vtkPVTimerInformation.cxx
   vtkRemoteConnection.cxx

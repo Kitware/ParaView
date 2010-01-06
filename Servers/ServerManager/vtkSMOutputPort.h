@@ -24,9 +24,10 @@
 
 #include "vtkSMProxy.h"
 #include "vtkClientServerStream.h" // needed for SetupUpdateExtent
+class vtkCollection;
 class vtkPVClassNameInformation;
 class vtkPVDataInformation;
-class vtkCollection;
+class vtkPVTemporalDataInformation;
 class vtkSMSourceProxy;
 
 class VTK_EXPORT vtkSMOutputPort : public vtkSMProxy
@@ -44,21 +45,18 @@ public:
   virtual vtkPVDataInformation* GetDataInformation();
 
   // Description:
+  // Returns data information collected over all timesteps provided by the
+  // pipeline. If the data information is not valid, this results iterating over
+  // the pipeline and hence can be slow. Use with caution.
+  virtual vtkPVTemporalDataInformation* GetTemporalDataInformation();
+
+  // Description:
   // Returns the classname of the data object on this output port.
   virtual const char* GetDataClassName();
 
   // Description:
   // Returns classname information.
   virtual vtkPVClassNameInformation* GetClassNameInformation();
-
-  // Description:
-  // Get the classname of the dataset from server.
-  virtual void GatherClassNameInformation();
-
-  // Description:
-  // Get information about dataset from server.
-  // Fires the vtkCommand::UpdateInformationEvent event.
-  virtual void GatherDataInformation(int doUpdate=1);
 
   // Description:
   // Mark data information as invalid.
@@ -119,6 +117,19 @@ protected:
   vtkSMOutputPort();
   ~vtkSMOutputPort();
 
+  // Description:
+  // Get the classname of the dataset from server.
+  virtual void GatherClassNameInformation();
+
+  // Description:
+  // Get information about dataset from server.
+  // Fires the vtkCommand::UpdateInformationEvent event.
+  virtual void GatherDataInformation();
+
+  // Description:
+  // Get temporal information from the server.
+  virtual void GatherTemporalDataInformation();
+
   void SetSourceProxy(vtkSMSourceProxy* src)
     { this->SourceProxy = src; }
 
@@ -140,6 +151,9 @@ protected:
   int ClassNameInformationValid;
   vtkPVDataInformation* DataInformation;
   bool DataInformationValid;
+
+  vtkPVTemporalDataInformation* TemporalDataInformation;
+  bool TemporalDataInformationValid;
 
 private:
   vtkSMOutputPort(const vtkSMOutputPort&); // Not implemented

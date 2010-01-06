@@ -22,11 +22,12 @@
 #include "vtkProcessModule.h"
 #include "vtkPVClassNameInformation.h"
 #include "vtkPVDataInformation.h"
+#include "vtkPVTemporalDataInformation.h"
 #include "vtkPVXMLElement.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMOutputPort);
-vtkCxxRevisionMacro(vtkSMOutputPort, "1.10");
+vtkCxxRevisionMacro(vtkSMOutputPort, "1.11");
 
 
 //----------------------------------------------------------------------------
@@ -36,8 +37,10 @@ vtkSMOutputPort::vtkSMOutputPort()
 
   this->ClassNameInformation = vtkPVClassNameInformation::New();
   this->DataInformation = vtkPVDataInformation::New();
+  this->TemporalDataInformation = vtkPVTemporalDataInformation::New();
   this->ClassNameInformationValid = 0;
   this->DataInformationValid = false;
+  this->TemporalDataInformationValid = false;
   this->PortIndex = 0;
   this->SourceProxy = 0;
   this->DataObjectProxy = 0;
@@ -49,6 +52,7 @@ vtkSMOutputPort::~vtkSMOutputPort()
   this->SetSourceProxy(0);
   this->ClassNameInformation->Delete();
   this->DataInformation->Delete();
+  this->TemporalDataInformation->Delete();
   if (this->DataObjectProxy)
     {
     this->DataObjectProxy->Delete();
@@ -195,6 +199,16 @@ vtkPVDataInformation* vtkSMOutputPort::GetDataInformation()
 }
 
 //----------------------------------------------------------------------------
+vtkPVTemporalDataInformation* vtkSMOutputPort::GetTemporalDataInformation()
+{
+  if (!this->TemporalDataInformationValid)
+    {
+    this->GatherTemporalDataInformation();
+    }
+  return this->TemporalDataInformation;
+}
+
+//----------------------------------------------------------------------------
 vtkPVClassNameInformation* vtkSMOutputPort::GetClassNameInformation()
 {
   if(this->ClassNameInformationValid == 0)
@@ -215,11 +229,11 @@ void vtkSMOutputPort::InvalidateDataInformation()
 {
   this->DataInformationValid = false;
   this->ClassNameInformationValid = false;
+  this->TemporalDataInformationValid = false;
 }
 
 //----------------------------------------------------------------------------
-// vtkPVPart used to update before gathering this information ...
-void vtkSMOutputPort::GatherDataInformation(int vtkNotUsed(doUpdate))
+void vtkSMOutputPort::GatherDataInformation()
 {
   if (this->GetID().IsNull())
     {
@@ -235,6 +249,25 @@ void vtkSMOutputPort::GatherDataInformation(int vtkNotUsed(doUpdate))
 
   this->DataInformationValid = true;
 
+  pm->SendCleanupPendingProgress(this->ConnectionID);
+}
+
+//----------------------------------------------------------------------------
+void vtkSMOutputPort::GatherTemporalDataInformation()
+{
+  if (this->GetID().IsNull())
+    {
+    vtkErrorMacro("Part has no associated object, can not gather info.");
+    return;
+    }
+
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  pm->SendPrepareProgress(this->ConnectionID);
+  this->TemporalDataInformation->Initialize();
+  pm->GatherInformation(this->ConnectionID, this->Servers, 
+                        this->TemporalDataInformation, this->GetID());
+
+  this->TemporalDataInformationValid = true;
   pm->SendCleanupPendingProgress(this->ConnectionID);
 }
 
@@ -306,7 +339,7 @@ void vtkSMOutputPort::InsertExtractPiecesIfNecessary()
            << this->GetProducerID() << "UpdateInformation"
            << vtkClientServerStream::End;
     pm->SendStream(this->ConnectionID, this->Servers, stream);
-    this->GatherDataInformation(0);
+    this->GatherDataInformation();
     if (this->DataInformation->GetCompositeDataClassName())
       {
       return;
@@ -369,7 +402,7 @@ void vtkSMOutputPort::InsertExtractPiecesIfNecessary()
     pm->SendStream(this->ConnectionID,
                    this->Servers, 
                    stream);
-    this->GatherDataInformation(0);
+    this->GatherDataInformation();
     if (this->DataInformation->GetCompositeDataClassName())
       {
       return;
@@ -437,7 +470,7 @@ void vtkSMOutputPort::InsertExtractPiecesIfNecessary()
     pm->SendStream(this->ConnectionID,
                    this->Servers, 
                    stream);
-    this->GatherDataInformation(0);
+    this->GatherDataInformation();
     stream << vtkClientServerStream::Invoke
            << this->GetExecutiveID() 
            << "GetMaximumNumberOfPieces"

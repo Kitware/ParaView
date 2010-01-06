@@ -163,6 +163,12 @@ public slots:
   // range of the selected array.
   void resetLookupTableScalarRange();
 
+  // If lookuptable is set up and is used for coloring,
+  // then calling this method resets the table ranges to match the 
+  // range of the selected array over time. This can potentially be a slow
+  // processes hence use with caution!!!
+  void resetLookupTableScalarRangeOverTime();
+
   /// If color lookuptable is set up and coloring is enabled, the this
   /// ensure that the lookuptable scalar range is greater than than the
   /// color array's scalar range. It also updates the scalar range on
@@ -186,15 +192,25 @@ protected slots:
   /// Called when the data is updated. We call updateLookupTableScalarRange() to
   /// ensure that the lookuptable has correct ranges.
   void onDataUpdated();
+
+  /// This slot gets called when the input to the representation is "accepted".
+  /// We mark this representation's LUT ranges dirty so that when the pipeline
+  /// finally updates, we can reset the LUT ranges.
+  void onInputAccepted();
 protected:
   /// Creates helper proxies such as as the proxy
   /// for volume opacity function.
   void createHelperProxies();
   
+  /// Overridden to capture the input's modified signal.
+  virtual void onInputChanged();
+
   /// Creates a default proxy for volume opacity function.
   vtkSMProxy* createOpacityFunctionProxy(
     vtkSMPropRepresentationProxy* repr);
-  
+ 
+  bool UpdateLUTRangesOnDataUpdate;
+
 private:
   class pqInternal;
   pqInternal* Internal; 

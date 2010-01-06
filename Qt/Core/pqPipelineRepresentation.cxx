@@ -45,9 +45,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVArrayInformation.h"
 #include "vtkPVDataSetAttributesInformation.h"
 #include "vtkPVGeometryInformation.h"
+#include "vtkPVTemporalDataInformation.h"
+#include "vtkScalarsToColors.h"
 #include "vtkSmartPointer.h" 
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMGlobalPropertiesManager.h"
+#include "vtkSMPropertyHelper.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMProxyProperty.h"
 #include "vtkSMPVRepresentationProxy.h"
@@ -176,6 +179,7 @@ pqPipelineRepresentation::pqPipelineRepresentation(
   this->Internal->VTKConnect->Connect(
     display, vtkCommand::UpdateDataEvent,
     this, SLOT(onDataUpdated()));
+  this->UpdateLUTRangesOnDataUpdate = true;
 }
 
 //-----------------------------------------------------------------------------
@@ -234,6 +238,30 @@ void pqPipelineRepresentation::createHelperProxies()
     pqSMAdaptor::setProxyProperty(
       proxy->GetProperty("ScalarOpacityFunction"), opacityFunction);
     proxy->UpdateVTKObjects();
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqPipelineRepresentation::onInputChanged()
+{
+  if (this->getInput())
+    {
+    QObject::disconnect(this->getInput(),
+      SIGNAL(modifiedStateChanged(pqServerManagerModelItem*)),
+      this, SLOT(onInputAccepted()));
+    }
+
+  this->Superclass::onInputChanged();
+
+  if (this->getInput())
+    {
+    /// We need to try to update the LUT ranges only when the user manually
+    /// changed the input source object (not necessarily ever pipeline update
+    /// which can happen when time changes -- for example). So we listen to this
+    /// signal. BUG #10062.
+    QObject::connect(this->getInput(),
+      SIGNAL(modifiedStateChanged(pqServerManagerModelItem*)),
+      this, SLOT(onInputAccepted()));
     }
 }
 
@@ -722,16 +750,74 @@ void pqPipelineRepresentation::resetLookupTableScalarRange()
 }
 
 //-----------------------------------------------------------------------------
+void pqPipelineRepresentation::resetLookupTableScalarRangeOverTime()
+{
+  vtkSMPropRepresentationProxy* repr = this->getRepresentationProxy();
+  pqScalarsToColors* lut = this->getLookupTable();
+  QString colorField = this->getColorField(true);
+
+  if (lut && colorField != "" && 
+    colorField != pqPipelineRepresentation::solidColor())
+    {
+    int attribute_type = vtkSMPropertyHelper(repr,
+      "ColorAttributeType").GetAsInt();
+    vtkPVTemporalDataInformation* dataInfo = 
+      this->getInputTemporalDataInformation();
+    vtkPVArrayInformation* arrayInfo = dataInfo->GetAttributeInformation(
+      attribute_type)->GetArrayInformation(colorField.toAscii().data());
+    if (arrayInfo)
+      {
+      int component = vtkSMPropertyHelper(lut->getProxy(),
+        "VectorComponent").GetAsInt();
+        if (vtkSMPropertyHelper(
+            lut->getProxy(), "VectorMode").GetAsInt() ==
+          vtkScalarsToColors::MAGNITUDE)
+          {
+          component = -1;
+          }
+      double range[2];
+      arrayInfo->GetComponentRange(component, range);
+      lut->setScalarRange(range[0], range[1]);
+
+      // scalar opacity is treated as slave to the lookup table.
+      pqScalarOpacityFunction* opacity = this->getScalarOpacityFunction();
+      if (opacity)
+        {
+        opacity->setScalarRange(range[0], range[1]);
+        }
+      }
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqPipelineRepresentation::onInputAccepted()
+{
+  // BUG #10062
+  // This slot gets called when the input to the representation is "accepted".
+  // We mark this representation's LUT ranges dirty so that when the pipeline
+  // finally updates, we can reset the LUT ranges.
+  if (this->getInput()->modifiedState() == pqProxy::MODIFIED)
+    {
+    this->UpdateLUTRangesOnDataUpdate = true;
+    }
+}
+
+//-----------------------------------------------------------------------------
 void pqPipelineRepresentation::onDataUpdated()
 {
-  // Since this part of the code happens every time the pipeline is updated, we
-  // don't need to record it on the undo stack. It will happen automatically
-  // each time.
-  BEGIN_UNDO_EXCLUDE();
-
-  this->updateLookupTableScalarRange();
-
-  END_UNDO_EXCLUDE();
+  // FIXME: I am letting the LUT be resized every timestep, until I add the GUI
+  // controls to change the behavior.
+  if (this->UpdateLUTRangesOnDataUpdate || true)
+    {
+    // BUG #10062
+    // Since this part of the code happens every time the pipeline is updated, we
+    // don't need to record it on the undo stack. It will happen automatically
+    // each time.
+    BEGIN_UNDO_EXCLUDE();
+    this->UpdateLUTRangesOnDataUpdate = false;
+    this->updateLookupTableScalarRange();
+    END_UNDO_EXCLUDE();
+    }
 }
 
 //-----------------------------------------------------------------------------
