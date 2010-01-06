@@ -379,7 +379,7 @@
   <customwidget>
    <class>pqResizingScrollArea</class>
    <extends>QScrollArea</extends>
-   <header>pqresizingscrollarea.h</header>
+   <header>pqResizingScrollArea.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
