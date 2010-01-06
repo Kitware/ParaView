@@ -486,8 +486,8 @@ void ClientGraphView::renderInternal()
     this->Implementation->View->SetVertexLabelVisibility(
       vtkSMPropertyHelper(proxy, "VertexLabels").GetAsInt());
 
-    //this->Implementation->View->SetHideVertexLabelsOnInteraction(
-    //  vtkSMPropertyHelper(proxy, "AutoHideVertexLabels").GetAsInt());
+    this->Implementation->View->SetHideVertexLabelsOnInteraction(
+      vtkSMPropertyHelper(proxy, "AutoHideVertexLabels").GetAsInt());
 
     this->Implementation->View->SetVertexLabelArrayName(
       vtkSMPropertyHelper(proxy, "VertexLabelArray").GetAsString());
@@ -564,8 +564,8 @@ void ClientGraphView::renderInternal()
     this->Implementation->View->SetEdgeLabelVisibility(
       vtkSMPropertyHelper(proxy, "EdgeLabels").GetAsInt());
 
-    //this->Implementation->View->SetHideEdgeLabelsOnInteraction(
-    //  vtkSMPropertyHelper(proxy, "AutoHideEdgeLabels").GetAsInt());
+    this->Implementation->View->SetHideEdgeLabelsOnInteraction(
+      vtkSMPropertyHelper(proxy, "AutoHideEdgeLabels").GetAsInt());
 
     this->Implementation->View->SetEdgeLabelArrayName(
       vtkSMPropertyHelper(proxy, "EdgeLabelArray").GetAsString());
