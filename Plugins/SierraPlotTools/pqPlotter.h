@@ -28,10 +28,12 @@
 #include <QObject>
 #include <QStringList>
 
+class QLabel;
 class pqOutputPort;
 class pqPipelineSource;
 class pqServer;
 class pqView;
+class QAction;
 class vtkPVArrayInformation;
 class vtkPVDataInformation;
 class vtkPVDataSetAttributesInformation;
@@ -98,6 +100,10 @@ public:
   void setDisplayOfVariables(pqPipelineSource * meshReader, const QMap<QString,QString> & vars);
 
   virtual void popUpHelp();
+
+  virtual QString getPlotterHeadingHoverText();
+
+  virtual QString getPlotterTextEditObjectName();
 
 signals:
   void activateAllVariables(pqPlotter *);

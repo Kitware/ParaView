@@ -2,7 +2,7 @@
 /*=========================================================================
 
   Program:   Visualization Toolkit
-  Module:    pqVariableVariablePlotter.cxx
+  Module:    pqResizingScrollArea.h
 
   Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
   All rights reserved.
@@ -19,34 +19,22 @@
   the U.S. Government retains certain rights in this software.
 -------------------------------------------------------------------------*/
 
-#include "warningState.h"
+#ifndef __pqResizingScrollArea_H
+#define __pqResizingScrollArea_H
 
-#include "pqVariableVariablePlotter.h"
+#include <QScrollArea>
 
-#include "pqApplicationCore.h"
-#include "pqObjectBuilder.h"
-#include "pqOutputPort.h"
-#include "pqPipelineSource.h"
+//
+// This class provides a scroll area that can resize (to a point) as widgets are
+// added to the contents 
+//
 
-#include "pqPlotVariablesDialog.h"
+class pqResizingScrollArea : public QScrollArea
+{
+public:
+  pqResizingScrollArea(QWidget *parent = 0);
 
-#include <QStringList>
+  QSize sizeHint() const;
+};
 
-#include <QStringList>
-#include <QtDebug>
-
-#include "vtkPVDataSetAttributesInformation.h"
-#include "vtkSelectionNode.h"
-#include "vtkSMIdTypeVectorProperty.h"
-#include "vtkSMIntVectorProperty.h"
-#include "vtkSMProxy.h"
-#include "vtkSMProperty.h"
-#include "vtkSMSourceProxy.h"
-#include "vtkSMProperty.h"
-#include "vtkSMVectorProperty.h"
-#include "vtkPVDataInformation.h"
-
-///
-/// pqVariableVariablePlotter
-///
-
+#endif //__pqResizingScrollArea_H

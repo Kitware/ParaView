@@ -32,6 +32,8 @@ class pqServer;
 class pqView;
 class pqPlotVariablesDialog;
 
+class QListWidgetItem;
+
 class vtkSMProxy;
 
 /// This singleton class manages the state associated with the packaged
@@ -53,6 +55,7 @@ public:
   QAction *actionPlotOverTime();
   QAction *actionToggleBackgroundBW();
   QAction *actionPlotDEBUG();
+  QAction *actionHoverGlobalVarVsTimeLabel();
 
   /// Convenience function for getting the current server.
   pqServer *getActiveServer();
@@ -95,7 +98,8 @@ public slots:
   void showWireframeAndBackMesh();
   void toggleBackgroundBW();
   void actOnPlotSelection();
-  void slotVariableSelected();
+  void slotVariableDeselectionByName(QString varStr);
+  void slotVariableSelectionByName(QString varStr);
   void slotPlotDialogAccepted();
   void slotUseParaViewGUIToSelectNodesCheck();
 
@@ -113,7 +117,7 @@ protected:
   virtual pqView *findView(pqPipelineSource *source, int port,
                            const QString &viewType);
 
-  virtual bool setupGUIForVars(pqPlotVariablesDialog * dialog);
+  virtual bool setupGUIForVars();
 
   virtual void setupPlotMenu();
   virtual void showPlotGUI(pqPlotVariablesDialog *);

@@ -19,6 +19,8 @@
   the U.S. Government retains certain rights in this software.
 -------------------------------------------------------------------------*/
 
+#include "warningState.h"
+
 #include "pqOutputPort.h"
 #include "pqNodePlotter.h"
 
@@ -57,9 +59,9 @@
 
 QStringList pqNodePlotter::getTheVars(vtkSMProxy * meshReaderProxy)
 {
-  QStringList theVars;
-  theVars.clear();
-  return theVars;
+  vtkSMProperty * prop = meshReaderProxy->GetProperty("PointVariablesInfo");
+
+  return getStringsFromProperty(prop);
 }
 
 //-----------------------------------------------------------------------------
@@ -135,7 +137,6 @@ QMap<QString, QList<pqOutputPort*> > pqNodePlotter::buildNamedInputs(pqPipelineS
   selectionSource = builder->createSource ("sources", "GlobalIDSelectionSource", this->getActiveServer());
 
   vtkSMProxy * sourceProxy = selectionSource ->getProxy(); 
-  vtkSMSourceProxy * selectionSourceProxy = dynamic_cast<vtkSMSourceProxy *>(sourceProxy);
 
   QList<pqOutputPort *> selectionInput;
   selectionInput.push_back(selectionSource->getOutputPort(0));
@@ -183,4 +184,10 @@ QMap<QString, QList<pqOutputPort*> > pqNodePlotter::buildNamedInputs(pqPipelineS
 QString pqNodePlotter::getNumberItemsLabel()
 {
   return QString("select node #");
+}
+
+///////////////////////////////////////////////////////////////////////////////
+QString pqNodePlotter::getPlotterTextEditObjectName()
+{
+  return QString("nodeVarsVsTimeTextEdit");
 }

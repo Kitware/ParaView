@@ -19,8 +19,12 @@
   the U.S. Government retains certain rights in this software.
 -------------------------------------------------------------------------*/
 
+#include "warningState.h"
+
 #include "pqGlobalPlotter.h"
 
+#include <QAction>
+#include <QLabel>
 #include <QStringList>
 #include <QtDebug>
 
@@ -29,15 +33,38 @@
 #include "vtkPVDataInformation.h"
 
 ///
+/// pqGlobalPlotter::pqInternal
+///
+
+class pqGlobalPlotter::pqInternal
+{
+public:
+
+  pqInternal();
+  ~pqInternal();
+
+  QAction * headingHoverAction;
+};
+
+///////////////////////////////////////////////////////////////////////////////
+pqGlobalPlotter::pqInternal::pqInternal() :
+  headingHoverAction(NULL)
+{
+}
+
+///
 /// pqGlobalPlotter
 ///
 
 //-----------------------------------------------------------------------------
+pqGlobalPlotter::pqGlobalPlotter()
+{
+  this->Internal = new pqGlobalPlotter::pqInternal();
+}
+
+//-----------------------------------------------------------------------------
 QStringList pqGlobalPlotter::getTheVars(vtkSMProxy * meshReaderProxy)
 {
-  QStringList theVars;
-  theVars.clear();
-
   vtkSMProperty * prop = meshReaderProxy->GetProperty("GlobalVariablesInfo");
 
   return getStringsFromProperty(prop);
@@ -91,3 +118,8 @@ QString pqGlobalPlotter::getFilterName()
   return QString("ExtractFieldDataOverTime");
 }
 
+///////////////////////////////////////////////////////////////////////////////
+QString pqGlobalPlotter::getPlotterTextEditObjectName()
+{
+  return QString("globalVarsVsTimeTextEdit");
+}

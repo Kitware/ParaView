@@ -25,6 +25,7 @@
 #include <QDialog>
 #include <QLabel>
 #include <QStringList>
+#include <QItemSelection>
 
 class QListWidgetItem;
 class QListWidget;
@@ -32,20 +33,6 @@ class QListWidget;
 class pqPlotter;
 class pqServer;
 class vtkSMStringVectorProperty;
-
-class HoverLabel : public QLabel
-{
-  Q_OBJECT;
-
-public:
-  HoverLabel(QWidget *parent = 0);
-
-  virtual void mouseMoveEvent ( QMouseEvent * theEvent );
-
-  void setPlotter(pqPlotter * thePlotter);
-
-  pqPlotter * plotter;
-};
 
 /// This dialog box provides an easy way to set up the readers in the pipeline
 /// and to ready them for the rest of the tools.
@@ -60,18 +47,18 @@ public:
 
   pqPlotVariablesDialog::pqUI * getUI() { return ui; }
 
+  virtual QSize sizeHint() const;
+
   static void setFloatingPointPrecision(int precision);
   static int getFloatingPointPrecision();
 
   virtual void setupVariablesList(QStringList varStrings);
-  virtual void refreshVariablesList(QStringList varStrings);
   virtual void setHeading(QString heading);
   virtual void setTimeRange(double min, double max);
   virtual void addVariable(QString varName);
   virtual void allocSetRange(QString varName, int numComp, int numElems, double ** ranges);
-  virtual void addVariableRange(QString varName, int compBegin, int compEnd);
-  virtual void initRangeUI();
-  virtual bool addRangesToUI(const QList<QListWidgetItem *> & selecteditems);
+  virtual bool addRangeToUI(QString itemText);
+  virtual bool removeRangeFromUI(QString itemText);
   virtual bool areVariablesSelected();
   virtual QList<QListWidgetItem *> getSelectedItems();
   virtual QStringList getSelectedItemsStringList();
@@ -92,7 +79,7 @@ public:
   virtual pqPlotter * getPlotter();
 
 public slots:
-  void listItemClicked(QListWidgetItem *);
+  void slotItemSelectionChanged();
 
   void slotOk(void);
   void slotCancel(void);
@@ -101,7 +88,9 @@ public slots:
   void slotTextChanged(const QString &);
 
 signals:
-  void variableSelected();
+  void variableSelected(QListWidgetItem * item);
+  void variableDeselectionByName(QString varName);
+  void variableSelectionByName(QString varName);
   void okDismissed();
   void cancelDismissed();
   void useParaViewGUIToSelectNodesCheck();

@@ -64,6 +64,8 @@ public:
     pqPipelineSource * meshReader, QList<int> itemList, bool & success);
 
   virtual QString getNumberItemsLabel();
+
+  virtual QString getPlotterTextEditObjectName();
 };
 
 //=============================================================================

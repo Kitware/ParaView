@@ -19,6 +19,8 @@
   the U.S. Government retains certain rights in this software.
 -------------------------------------------------------------------------*/
 
+#include "warningState.h"
+
 #include "pqSierraPlotToolsManager.h"
 
 #include "pqElementPlotter.h"
@@ -72,6 +74,7 @@
 #include "pqUndoStack.h"
 #include "pqView.h"
 
+
 #include <QDockWidget>
 #include <QGridLayout>
 #include <QListWidget>
@@ -107,19 +110,22 @@ public:
   class PlotterMetaData : QObject
   {
   public:
-    PlotterMetaData(plotVariableType theType, pqPlotter::plotDomain theDomain, QString theHeader, pqPlotter * thePlotter)
+    PlotterMetaData(plotVariableType theType, pqPlotter::plotDomain theDomain,
+      QString theHeader, pqPlotter * thePlotter, bool theEnabledFlag = true)
     {
       type = theType;
       domain = theDomain;
       header = theHeader;
       plotter = thePlotter;
       plotter->setDomain(theDomain);
+      enabledFlag = theEnabledFlag;
     }
 
     plotVariableType type;
     pqPlotter::plotDomain domain;
     QString header;
     pqPlotter * plotter;
+    bool enabledFlag;
   };
 
   pqSierraPlotToolsManager::pqInternal::pqInternal() :
@@ -153,12 +159,12 @@ public:
 
     heading = QString("Node var. along path...");
     plotMenuItemsList.push_back(heading);
-    plotMeta = new PlotterMetaData(eNode, pqPlotter::ePath, heading, new pqNodePlotter);
+    plotMeta = new PlotterMetaData(eNode, pqPlotter::ePath, heading, new pqNodePlotter, false);
     plotterMap[heading] = plotMeta;
 
     heading = QString("Element var. along path...");
     plotMenuItemsList.push_back(heading);
-    plotMeta = new PlotterMetaData(eElement, pqPlotter::ePath, heading, new pqElementPlotter);
+    plotMeta = new PlotterMetaData(eElement, pqPlotter::ePath, heading, new pqElementPlotter, false);
     plotterMap[heading] = plotMeta;
 
     // add a separator
@@ -166,7 +172,7 @@ public:
 
     heading = QString("Variable vs. variable...");
     plotMenuItemsList.push_back(heading);
-    plotMeta = new PlotterMetaData(eElement, pqPlotter::eVariable, heading, new pqVariableVariablePlotter);
+    plotMeta = new PlotterMetaData(eElement, pqPlotter::eVariable, heading, new pqVariableVariablePlotter, false);
     plotterMap[heading] = plotMeta;
     }
 
@@ -239,7 +245,7 @@ public:
 };
 
 //=============================================================================
-QVector<int> pqSierraPlotToolsManager::pqInternal::getGlobalIdsServerSide(vtkSMSourceProxy * sourceProxy)
+QVector<int> pqSierraPlotToolsManager::pqInternal::getGlobalIdsServerSide(vtkSMSourceProxy * /*sourceProxy*/)
 {
   QVector<int> idVector;
   idVector.clear();
@@ -257,8 +263,6 @@ QVector<int> pqSierraPlotToolsManager::pqInternal::getGlobalIdsFromDataSet(vtkDa
 
   vtkDataSetAttributes * dataSetAttrib = dataSet->GetAttributes(vtkDataObject::POINT);
   vtkIdTypeArray * globalIds = dynamic_cast<vtkIdTypeArray *>(dataSetAttrib->GetAttribute(vtkDataSetAttributes::GLOBALIDS));
-
-  int numComponents = globalIds->GetNumberOfComponents();
 
   int i;
   for (i = 0; i < globalIds->GetNumberOfTuples(); i++)
@@ -464,7 +468,6 @@ bool pqSierraPlotToolsManager::pqInternal::withinRange(QList<int> & nodeList, pq
       arrayInfo = pvDataSetAttributesInformation->GetArrayInformation("GlobalNodeId");
       if (arrayInfo != NULL)
         {
-        int numTuples = arrayInfo->GetNumberOfTuples();
         int numComponents = arrayInfo->GetNumberOfComponents ();
 
         if (numComponents > 1)
@@ -548,7 +551,6 @@ pqSierraPlotToolsManager::pqSierraPlotToolsManager(QObject *p) : QObject(p)
 
   // This widget serves no real purpose other than initializing the Actions
   // structure created with designer that holds the actions.
-
   this->Internal->ActionPlaceholder = new QWidget(NULL);
   this->Internal->Actions.setupUi(this->Internal->ActionPlaceholder);
 
@@ -595,16 +597,23 @@ void pqSierraPlotToolsManager::slotUseParaViewGUIToSelectNodesCheck()
 }
 
 //-----------------------------------------------------------------------------
-void pqSierraPlotToolsManager::slotVariableSelected()
+void pqSierraPlotToolsManager::slotVariableSelectionByName(QString varStr)
 {
-  QListWidget * listWidget = this->Internal->plotGUI->getVariableList();
+  if (! this->Internal->plotGUI->addRangeToUI(varStr))
+    {
+    // some sort of error...
+    return ;
+    }
+}
 
-  QList<QListWidgetItem *> selecteditems = listWidget->selectedItems();
-
-  this->Internal->plotGUI->initRangeUI();
-
-  // add all the ranges into the ui
-  this->Internal->plotGUI->addRangesToUI(selecteditems);
+//-----------------------------------------------------------------------------
+void pqSierraPlotToolsManager::slotVariableDeselectionByName(QString varStr)
+{
+  if (! this->Internal->plotGUI->removeRangeFromUI(varStr))
+    {
+    // some sort of error...
+    return ;
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -866,14 +875,22 @@ void pqSierraPlotToolsManager::setupPlotMenu()
       QAction * action = plottingMenu->addAction(heading);
       action->setObjectName(heading);
 
-      //
-      // Set up a signal/slot for when the user selects this plot choice
-      // from the pull-down menu that is shown off of the plot icon/button on
-      // the (SierraPlotTools) toolbar.
-      //
-      QObject::connect(action, SIGNAL(triggered(bool)), this, SLOT(actOnPlotSelection()));
+      pqInternal::PlotterMetaData * plot = this->Internal->plotterMap[heading];
+      if (plot != NULL)
+        {
+        action->setEnabled(plot->enabledFlag);
+        //
+        // Set up a signal/slot for when the user selects this plot choice
+        // from the pull-down menu that is shown off of the plot icon/button on
+        // the (SierraPlotTools) toolbar.
+        //
+        QObject::connect(action, SIGNAL(triggered(bool)), this, SLOT(actOnPlotSelection()));
+        }
+      else
+        {
+        qWarning() << "* ERROR * Invalid plot action" << heading;
+        }
       }
-
     }
 
   // This sets the menu for PLOT button on the toolbar
@@ -893,8 +910,6 @@ void pqSierraPlotToolsManager::setupPlotMenu()
 void pqSierraPlotToolsManager::actOnPlotSelection()
 {
   QObject * sender =  this->sender ();
-  int actionNameAsInt = -1;
-
   QAction * theAction = dynamic_cast<QAction *>(sender);
 
   if (theAction != NULL)
@@ -930,7 +945,7 @@ void pqSierraPlotToolsManager::actOnPlotSelection()
     return;
     }
 
-  bool setupResult = this->setupGUIForVars(this->Internal->plotGUI);
+  bool setupResult = this->setupGUIForVars();
   if ( ! setupResult )
     {
     qCritical() << "pqSierraPlotToolsManager::actOnPlotSelection: setup of GUI to show variables failed";
@@ -952,8 +967,11 @@ void pqSierraPlotToolsManager::showPlotGUI(pqPlotVariablesDialog * plotGUI)
   // connect accepted() signal to a slot here so that we can act on the dialog being accepted
   QObject::connect(this->Internal->plotGUI, SIGNAL(accepted()), this, SLOT(slotPlotDialogAccepted()));
 
-  // connect slot, for when variable(s) are selected
-  QObject::connect(this->Internal->plotGUI, SIGNAL(variableSelected()), this, SLOT(slotVariableSelected()));
+  // connect slot, for when variable(s) are deselected -- works for single click as well as swipe
+  QObject::connect(this->Internal->plotGUI, SIGNAL(variableDeselectionByName(QString)), this, SLOT(slotVariableDeselectionByName(QString)));
+
+  // connect slot, for when variable(s) are selected  -- works for single click as well as swipe
+  QObject::connect(this->Internal->plotGUI, SIGNAL(variableSelectionByName(QString)), this, SLOT(slotVariableSelectionByName(QString)));
 
   // connect slot, for when the "use ParaView GUI to Select Nodes" check box is checked
   QObject::connect(this->Internal->plotGUI, SIGNAL(useParaViewGUIToSelectNodesCheck()), this, SLOT(slotUseParaViewGUIToSelectNodesCheck()));
@@ -988,7 +1006,7 @@ void pqSierraPlotToolsManager::slotPlotDialogAccepted()
 //   Variable values, attributes, etc, so that the GUI can be filled
 //   in with appropriate information.
 //
-bool pqSierraPlotToolsManager::setupGUIForVars(pqPlotVariablesDialog * dialog)
+bool pqSierraPlotToolsManager::setupGUIForVars()
 {
   pqPipelineSource * meshReader = this->getMeshReader();
 
@@ -1044,8 +1062,6 @@ bool pqSierraPlotToolsManager::setupGUIForVars(pqPlotVariablesDialog * dialog)
 
         this->Internal->plotGUI->setTimeRange(timeMin, timeMax);
 
-        vtkTypeInt64 numPoints = pvDataInfo->GetNumberOfPoints();
-
         if (prop != NULL)
           {
           // get variable names and their component ranges
@@ -1076,8 +1092,6 @@ bool pqSierraPlotToolsManager::setupGUIForVars(pqPlotVariablesDialog * dialog)
 
                 if (arrayInfo != NULL)
                   {
-                  char * theName = arrayInfo->GetName();
-
                   int numComponents = arrayInfo->GetNumberOfComponents ();
                   if (numComponents > 0)
                     {
@@ -1093,11 +1107,11 @@ bool pqSierraPlotToolsManager::setupGUIForVars(pqPlotVariablesDialog * dialog)
                       ranges[j] = new double[numberElements];
                       }
 
-                    for (int i = 0; i < numComponents; i++)
+                    for (int k = 0; k < numComponents; k++)
                       {
-                      arrayInfo->GetComponentRange(i, range);
-                      ranges[i][0] = range[0];
-                      ranges[i][1] = range[1];
+                      arrayInfo->GetComponentRange(k, range);
+                      ranges[k][0] = range[0];
+                      ranges[k][1] = range[1];
                       }
 
                     // allocate and set the ranges for all the elements
@@ -1105,9 +1119,9 @@ bool pqSierraPlotToolsManager::setupGUIForVars(pqPlotVariablesDialog * dialog)
                     this->Internal->plotGUI->allocSetRange(arrayName, numComponents, 2, ranges);
 
                     // free up ranges memory
-                    for (int i=0; i < numComponents; i++)
+                    for (int k=0; k < numComponents; k++)
                       {
-                      delete [] ranges[i];
+                      delete [] ranges[k];
                       }
                     delete [] ranges;
 
@@ -1153,16 +1167,7 @@ bool pqSierraPlotToolsManager::setupGUIForVars(pqPlotVariablesDialog * dialog)
       }
     }
 
-  //
-  // This section of code checks the status of each variable to determine
-  //   whether to show it in the list box in the dialog
-  //   12/3/2009: This may no longer be necessary as by default all
-  //   variables are "activated" by the GUI (I think before this method
-  //   is called)
-  //
-
   QStringList theVars;
-  
   if (stringVecProp != NULL)
     {
     // get the list of variables names (with component info) to show in the
@@ -1197,6 +1202,7 @@ bool pqSierraPlotToolsManager::setupGUIForVars(pqPlotVariablesDialog * dialog)
   QString numberItemsLabel = this->Internal->currentMetaPlotter->plotter->getNumberItemsLabel();
   this->Internal->plotGUI->setNumberItemsLabel(numberItemsLabel);
 
+  // set the text heading for this gui
   this->Internal->plotGUI->setHeading(this->Internal->StripDotDotDot(this->Internal->currentMetaPlotter->header));
 
   // if we get here, assume success
@@ -1226,10 +1232,6 @@ void pqSierraPlotToolsManager::checkActionEnabled()
     //
     // in theory, the data has been read in by this point, and is valid
     //
-    pqOutputPort *outputPort = meshReader->getOutputPort(0);
-    vtkPVDataInformation *dataInfo = outputPort->getDataInformation();
-    vtkPVDataSetAttributesInformation *pointFields
-      = dataInfo->GetPointDataInformation();
 
     //
     // activate some GUI elements
@@ -1361,7 +1363,7 @@ bool pqSierraPlotToolsManager::createPlotOverTime()
 
   pqPipelineSource * plotFilter = NULL;
   QStringList::const_iterator constIter;
-  bool checkState = this->Internal->plotGUI->getUseParaViewGUIToSelectNodesCheckBoxState();
+  //bool checkState = this->Internal->plotGUI->getUseParaViewGUIToSelectNodesCheckBoxState();
 #pragma message (__FILE__ "[" STRING(__LINE__) "]: pqSierraPlotToolsManager::createPlotOverTime: NOTE: Not currently handing plotGUI->getUseParaViewGUIToSelectNodesCheckBoxState()")
 
   //

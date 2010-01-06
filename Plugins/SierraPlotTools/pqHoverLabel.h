@@ -1,9 +1,8 @@
-
 // -*- c++ -*-
 /*=========================================================================
 
   Program:   Visualization Toolkit
-  Module:    pqGlobalPlotter.h
+  Module:    pqHoverLabel.h
 
   Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
   All rights reserved.
@@ -20,46 +19,29 @@
   the U.S. Government retains certain rights in this software.
 -------------------------------------------------------------------------*/
 
-#ifndef __pqGlobalPlotter_h
-#define __pqGlobalPlotter_h
+#ifndef __pqHoverLabel_h
+#define __pqHoverLabel_h
 
-#include "pqPlotter.h"
+#include <QLabel>
 
-class pqGlobalPlotter : public pqPlotter
+class QMouseEvent;
+class pqPlotter;
+class QEvent;
+
+class pqHoverLabel : public QLabel
 {
   Q_OBJECT;
 
 public:
+  pqHoverLabel(QWidget *parent = 0);
 
-  pqGlobalPlotter();
+  virtual void mouseMoveEvent ( QMouseEvent * theEvent );
 
-  virtual ~pqGlobalPlotter()
-  {
-  }
+  void setPlotter(pqPlotter * thePlotter);
 
-  virtual QStringList getTheVars(vtkSMProxy * meshReaderProxy);
+  bool event(QEvent * event);
 
-  virtual vtkSMProperty * getSMVariableProperty(vtkSMProxy *meshReaderProxy);
-
-  virtual vtkPVDataSetAttributesInformation * getDataSetAttributesInformation(vtkPVDataInformation * pvDataInfo);
-
-  virtual bool amIAbleToSelectByNumber();
-
-  virtual pqPipelineSource * getPlotFilter();
-
-  virtual void setVarsStatus(vtkSMProxy * meshReaderProxy, bool flag);
-
-  virtual void setVarsActive(vtkSMProxy * meshReaderProxy, QString varName, bool activeFlag);
-
-  virtual QString getFilterName();
-
-  virtual QString getPlotterTextEditObjectName();
-
-protected:
-
-  class pqInternal;
-  pqInternal * Internal;
-
+  pqPlotter * plotter;
 };
 
-#endif // __pqGlobalPlotter_h
+#endif //__pqHoverLabel_h

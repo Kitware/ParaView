@@ -3,10 +3,35 @@
 # to make it easier to plot variables from Sierra-based finite
 # element simulations.
 # Author:  Jon Goldman
-# Created:  Aug 2009 -to- Jan 2009
+# Created:  Aug 2009 -to- Jan 2010
 
 SET(PLUGIN_NAME SierraPlotTools)
 SET(PLUGIN_VERSION "1.0")
+
+#
+# This macro changes the Visual Studio warning levels from 3 to 4,
+#  to catch things such as "unreferenced local variable"
+#
+MACRO(VS_SET_VS_WARNING_4)
+  IF(CMAKE_BUILD_TOOL MATCHES "(msdev|devenv|nmake)")
+    #MESSAGE(WARNING "CMAKE_BUILD_TOOL MATCHES msdev|devenv|nmake")
+
+    add_definitions(-DDISABLE_NOISY_COMPILE_WARNINGS)
+
+    # Use the highest warning level for visual studio.
+    SET(CMAKE_CXX_WARNING_LEVEL 4)
+    IF(CMAKE_CXX_FLAGS MATCHES "/W[0-4]")
+     STRING(REGEX REPLACE "/W[0-4]" "/W4"
+            CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+    ELSE(CMAKE_CXX_FLAGS MATCHES "/W[0-4]")
+     SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4")
+    ENDIF(CMAKE_CXX_FLAGS MATCHES "/W[0-4]")
+  ENDIF(CMAKE_BUILD_TOOL MATCHES "(msdev|devenv|nmake)")
+ENDMACRO(VS_SET_VS_WARNING_4)
+
+# Comment out VS_SET_VS_WARNING_4 to keep default Visual Studio Warning level 3
+# unComment VS_SET_VS_WARNING_4 to change Visual Studio Warning level to 4
+#VS_SET_VS_WARNING_4()
 
 INCLUDE_DIRECTORIES(
   ${CMAKE_CURRENT_BINARY_DIR}
@@ -15,41 +40,47 @@ INCLUDE_DIRECTORIES(
   )
 
 SET(UI_FILES
+  # pqSierraPlotToolsActionHolder.ui -- container for plot tools actions
   pqSierraPlotToolsActionHolder.ui
+  
   pqSierraPlotToolsDataLoadManager.ui
   pqVariablePlot.ui
-  )
-
-SET(HEADERS
-  pqPlotter.h
+  
+  # pqSierraToolsRichTextDocs.ui -- container for Rich Text documents
+  pqSierraToolsRichTextDocs.ui
   )
 
 SET(MOC_HEADERS
+  pqElementPlotter.h
+  pqHoverLabel.h
+  pqGlobalPlotter.h
+  pqNodePlotter.h
+  pqPlotVariablesDialog.h
+  pqPlotter.h
+  pqResizingScrollArea.h
   pqSierraPlotToolsActionGroup.h
   pqSierraPlotToolsDataLoadManager.h
   pqSierraPlotToolsManager.h
-  pqPlotVariablesDialog.h
-  pqPlotter.h
-  pqNodePlotter.h
-  pqGlobalPlotter.h
-  pqElementPlotter.h
   pqVariableVariablePlotter.h
   )
 
 SET(HEADERS
   ${MOC_HEADERS}
   pqSierraPlotToolsUtils.h
+  warningState.h
   )
 
 SET(CLIENT_SRCS
+  pqElementPlotter.cxx
+  pqGlobalPlotter.cxx
+  pqHoverLabel.cxx
+  pqNodePlotter.cxx
+  pqPlotVariablesDialog.cxx
+  pqPlotter.cxx
+  pqResizingScrollArea.cxx  
   pqSierraPlotToolsActionGroup.cxx
   pqSierraPlotToolsDataLoadManager.cxx
   pqSierraPlotToolsManager.cxx
-  pqPlotVariablesDialog.cxx
-  pqPlotter.cxx
-  pqNodePlotter.cxx
-  pqGlobalPlotter.cxx
-  pqElementPlotter.cxx
   pqSierraPlotToolsUtils.cxx
   pqVariableVariablePlotter.cxx
   )

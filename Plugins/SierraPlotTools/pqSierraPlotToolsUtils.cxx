@@ -19,6 +19,8 @@
   the U.S. Government retains certain rights in this software.
 -------------------------------------------------------------------------*/
 
+#include "warningState.h"
+
 #include "pqSierraPlotToolsUtils.h"
 
 // used to show line number in #pragma messages

@@ -97,46 +97,6 @@
     <string>Plot DEBUGGING button</string>
    </property>
   </action>
-  <action name="actionHoverGlobalVarVsTimeLabel">
-   <property name="text">
-    <string>hoverGlobalVarVsTimeLabel</string>
-   </property>
-   <property name="toolTip">
-    <string>This is hover over Global Var vs. Time label</string>
-   </property>
-  </action>
-  <action name="actionHoverNodeVarVsTimeLabel">
-   <property name="text">
-    <string>hoverNodeVarVsTimeLabel</string>
-   </property>
-   <property name="toolTip">
-    <string>This is hover over Node Var vs. Time label</string>
-   </property>
-  </action>
-  <action name="actionHoverelementVarVsTimeLabel">
-   <property name="text">
-    <string>hoverElementVarVsTimeLabel</string>
-   </property>
-   <property name="toolTip">
-    <string>This is hover over Element Var vs. Time label</string>
-   </property>
-  </action>
-  <action name="actionHoverNodeVarAlongPathLabel">
-   <property name="text">
-    <string>hoverNodeVarAlongPathLabel</string>
-   </property>
-   <property name="toolTip">
-    <string>This is hover over Node Var along Path label</string>
-   </property>
-  </action>
-  <action name="actionHoverElementVarAlongPathLabel">
-   <property name="text">
-    <string>hoverElementVarAlongPathLabel</string>
-   </property>
-   <property name="toolTip">
-    <string>This is hover over Element Var along Path label</string>
-   </property>
-  </action>
  </widget>
  <resources>
   <include location="SierraPlotTools.qrc"/>

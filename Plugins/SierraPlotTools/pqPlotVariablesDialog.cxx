@@ -19,6 +19,9 @@
   the U.S. Government retains certain rights in this software.
 -------------------------------------------------------------------------*/
 
+#include "warningState.h"
+
+#include "pqHoverLabel.h"
 #include "pqPlotVariablesDialog.h"
 #include "pqPlotter.h"
 #include "pqSierraPlotToolsManager.h"
@@ -36,14 +39,17 @@
 #include "pqSMAdaptor.h"
 #include "pqUndoStack.h"
 
-#include <QPushButton>
+#include <QApplication>
+#include <QDesktopWidget>
 #include <QGridLayout>
 #include <QLabel>
 #include <QList>
 #include <QListWidget>
 #include <QListWidgetItem>
 #include <QMouseEvent>
+#include <QPushButton>
 #include <QtDebug>
+#include <QToolTip>
 
 #include "ui_pqVariablePlot.h"
 
@@ -52,35 +58,12 @@
 #define STRING(x) STRING2(x)
 
 ///////////////////////////////////////////////////////////////////////////////
-HoverLabel::HoverLabel(QWidget *parent) :
-  QLabel(parent)
-{
-  bool hasTracking = this->hasMouseTracking();
-  this->setMouseTracking(true);
-}
-
-void HoverLabel::mouseMoveEvent ( QMouseEvent * theEvent  )
-{
-  QLabel::mouseMoveEvent(theEvent);
-
-  int globalX = theEvent->globalX();
-  int globalY = theEvent->globalY();
-  const QPoint pos = theEvent->pos();
-  QPointF posF = theEvent->posF();
-  int x = theEvent->x();
-  int y = theEvent->y();
-
-  plotter->popUpHelp();
-}
-
-void HoverLabel::setPlotter(pqPlotter * thePlotter)
-{
-  plotter = thePlotter;
-}
-
-///////////////////////////////////////////////////////////////////////////////
 class pqPlotVariablesDialog::pqUI : public Ui::pqVariablePlot {};
 
+//
+// This class stores the range values for a variable and its 
+// components.
+//
 class VarRange
 {
 public:
@@ -122,6 +105,13 @@ public:
   double *magnitudes;
 };
 
+//
+// This class encapsulates the concept/implementation of the GUI elements
+// that make up a "range".
+// The "range" consists of labels for the min & max, line edit boxes for the 
+// min and max values
+// 
+//
 class pqRangeWidget
 {
 public:
@@ -159,7 +149,8 @@ public:
     QHBoxLayout * maxHorizontalLayout;
   };
 
-  pqRangeWidget()
+  pqRangeWidget(QString variableAsString) :
+    varName(variableAsString)
   {
   }
 
@@ -177,10 +168,8 @@ public:
   }
 
   vtkstd::vector<RangeWidgetGroup *> rangeWidgetGroups;
-
-  static int rowCounter;
-
   QFrame * horizLine;
+  QString varName;
 
   static int precision;
 
@@ -255,10 +244,10 @@ public:
     return rangeWidgetGroup;
   }
 
-  void build(pqPlotVariablesDialog::pqUI *ui, const QString & varToDisplay,
-    VarRange * varRange, int componentIndex)
+  void build(pqPlotVariablesDialog::pqUI *ui, VarRange * varRange,
+    int componentIndex)
     {
-    rangeWidgetGroups.push_back(this->allocAndMakeMinMax(varRange, varToDisplay, componentIndex, ui->scrollWidgetLayout, ui->rangeScrollArea));
+    rangeWidgetGroups.push_back(this->allocAndMakeMinMax(varRange, this->varName, componentIndex, ui->scrollWidgetLayout, ui->rangeScrollArea));
 
     // Add a (QFrame) horizontal line for visual separation
     horizLine = new QFrame(ui->rangeScrollArea);
@@ -270,9 +259,11 @@ public:
 //
 // Storage for pqRangeWidget
 //
-int pqRangeWidget::rowCounter;
 int pqRangeWidget::precision = 0;
 
+//
+// Internal implementation for pqPlotVariablesDialog
+//
 class pqPlotVariablesDialog::pqInternal
 {
 public:
@@ -293,7 +284,6 @@ public:
     {
     varRanges.clear();
     rangeWidgets.clear();
-    pqRangeWidget::rowCounter = 1;
     pqPlotVariablesDialog::pqInternal::precision = pqPlotVariablesDialog::pqInternal::DEFAULT_FLOATING_POINT_PRECISION;
 
     // we set the pqRangeWidget::precision class variable here, because we want the DEFAULT_FLOATING_POINT_PRECISION
@@ -306,8 +296,10 @@ public:
     validComponentSuffixes.append("_z");
     validComponentSuffixes.append("_xx");
     validComponentSuffixes.append("_xy");
-    // symetric -- could be xz, or zx, but Exodus reader stores as zx
+
+    // symetric -- could be xz, or zx, but Exodus reader stores as 'zx'
     validComponentSuffixes.append("_zx");
+
     validComponentSuffixes.append("_yy");
     validComponentSuffixes.append("_yz");
     validComponentSuffixes.append("_zz");
@@ -343,10 +335,10 @@ public:
     }
 
   virtual void addVariable(QString varName);
-  virtual void initRangeUI(pqPlotVariablesDialog::pqUI *ui);
   virtual double computeMagnitude(VarRange * vr, int k);
-  virtual bool addRangesToUI(pqPlotVariablesDialog::pqUI *ui, const QList<QListWidgetItem *> & selecteditems);
   virtual bool addRangeToUI(pqPlotVariablesDialog::pqUI *ui, QString variableAsString);
+  virtual bool removeRangeFromUI(pqPlotVariablesDialog::pqUI *ui, QString variableAsString);
+  virtual bool inSelection(const QString & itemStr, QList<QListWidgetItem *> & selectedItems);
 
   virtual int getPlotType() { return plotType; }
 
@@ -602,6 +594,7 @@ public:
   QStringList validComponentSuffixes;
   QMap<QString,int> componentArrayIndicesMap;
   QMap<QString, VarRange *> varRanges;
+  QMap<QString, bool> variableSelectionStates;  // to keep track of selection state
   QVector<pqRangeWidget *> rangeWidgets;
   QListWidget * listWidget;
   QSpacerItem * verticalSpacer;
@@ -618,12 +611,47 @@ int pqPlotVariablesDialog::pqInternal::precision = pqPlotVariablesDialog::pqInte
 //-----------------------------------------------------------------------------
 void pqPlotVariablesDialog::pqInternal::addVariable(QString varName)
 {
-  VarRange * vr = varRanges[varName];
+  VarRange * vr = this->varRanges[varName];
   if (vr == NULL)
     {
     vr = new VarRange(varName);
-    varRanges[varName] = vr;
+    this->varRanges[varName] = vr;
     }
+}
+
+//-----------------------------------------------------------------------------
+bool pqPlotVariablesDialog::pqInternal::removeRangeFromUI(pqPlotVariablesDialog::pqUI *ui, QString variableAsString)
+{
+  pqRangeWidget * rangeWidget;
+
+  int i;
+  for (i = 0; i < this->rangeWidgets.size(); i++)
+    {
+    rangeWidget = this->rangeWidgets[i];
+    if (rangeWidget->varName == variableAsString)
+      {
+      delete rangeWidget;
+      this->rangeWidgets.remove(i);
+
+      // if no more range widgets left, remove the vertical spacer
+      if (this->rangeWidgets.size() == 0)
+        {
+        if (this->verticalSpacer)
+          {
+          ui->scrollWidgetLayout->removeItem(this->verticalSpacer);
+          this->verticalSpacer = NULL;
+          }
+        }
+
+      // update the scroll area geometry
+      // so that it resizes if need be
+      ui->rangeScrollArea->updateGeometry();
+
+      return true;
+      }
+    }
+
+  return false;
 }
 
 //-----------------------------------------------------------------------------
@@ -635,8 +663,8 @@ bool pqPlotVariablesDialog::pqInternal::addRangeToUI(pqPlotVariablesDialog::pqUI
 
   if (varRange != NULL)
     {
-    pqRangeWidget * rangeWidget = new pqRangeWidget();
-    rangeWidget->build(ui, variableAsString, varRange, arrayIndex);
+    pqRangeWidget * rangeWidget = new pqRangeWidget(variableAsString);
+    rangeWidget->build(ui, varRange, arrayIndex);
 
     this->rangeWidgets.append(rangeWidget);
     }
@@ -648,30 +676,6 @@ bool pqPlotVariablesDialog::pqInternal::addRangeToUI(pqPlotVariablesDialog::pqUI
 
   return true;
 }
-
-//-----------------------------------------------------------------------------
-bool pqPlotVariablesDialog::pqInternal::addRangesToUI(pqPlotVariablesDialog::pqUI *ui, const QList<QListWidgetItem *> & selecteditems)
-{
-  QList<QListWidgetItem *>::const_iterator iter = selecteditems.begin();
-
-  // add all the selected ranges
-  while (iter != selecteditems.end())
-    {
-    QString variableAsString = (*iter)->text();
-    //  add range to user interface
-    if (! this->addRangeToUI(ui, variableAsString))
-      {
-      return false;
-      }
-    iter++;
-    }
-
-  verticalSpacer = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
-  ui->scrollWidgetLayout->addItem(verticalSpacer);
-
-  return true;
-}
-
 
 //-----------------------------------------------------------------------------
 double pqPlotVariablesDialog::pqInternal::computeMagnitude(VarRange * vr, int k)
@@ -686,30 +690,59 @@ double pqPlotVariablesDialog::pqInternal::computeMagnitude(VarRange * vr, int k)
 
   return magnitude;
 }
+//=============================================================================
+pqPlotVariablesDialog::pqPlotVariablesDialog(QWidget *p,
+                                             Qt::WindowFlags f/*=0*/)
+  : QDialog(p, f)
+{
+  pqSierraPlotToolsManager *manager = pqSierraPlotToolsManager::instance();
+  this->Server = manager->getActiveServer();
+
+  this->Internal = new pqPlotVariablesDialog::pqInternal();
+
+  this->ui = new pqPlotVariablesDialog::pqUI;
+  this->ui->setupUi(this);
+
+  // connect signals and slots to the list widget
+  QObject::connect(this->ui->okCancelButtonBox, SIGNAL(accepted(void)), this, SLOT(slotOk(void)));
+  QObject::connect(this->ui->okCancelButtonBox, SIGNAL(rejected(void)), this, SLOT(slotCancel(void)));
+
+  QObject::connect(this->ui->useParaViewGUIToSelectNodesCheckBox, SIGNAL(toggled(bool)), this,
+    SLOT(slotUseParaViewGUIToSelectNodesCheckBox(bool)));
+
+  // set up some parameters for the scroll area
+  // scroll area height should not be more than 60% of desktop main screen
+  this->ui->rangeScrollArea->setMaximumHeight(0.5 * QApplication::desktop()->availableGeometry().height());
+
+  // main dialog height should not be more than a certain percentage of desktop main screen
+
+  //float deskTopHeight = QApplication::desktop()->availableGeometry().height();
+
+  pqPlotVariablesDialog * myDialog = this;
+  //  myDialog->setMaximumHeight(0.1 * deskTopHeight);
+
+  myDialog->setMaximumHeight(555);
+
+  QSizePolicy sizePolicy = this->sizePolicy();
+}
 
 //-----------------------------------------------------------------------------
-void pqPlotVariablesDialog::pqInternal::initRangeUI(pqPlotVariablesDialog::pqUI *ui)
+pqPlotVariablesDialog::~pqPlotVariablesDialog()
 {
-  int numRanges = rangeWidgets.size();
-  if (numRanges > 0)
-    {
-    QVector<pqRangeWidget *>::iterator iter = rangeWidgets.begin();
-    while (iter != rangeWidgets.end())
-      {
-      pqRangeWidget * ri = *iter;
-      delete ri;
-      iter++;
-      }
+  delete this->ui;
+  delete this->Internal;
+}
 
-    rangeWidgets.clear();
-    }
+//-----------------------------------------------------------------------------
+QSize pqPlotVariablesDialog::sizeHint() const
+{
+  QSize dialogSizeHint = this->QDialog::sizeHint();
 
-  if (this->verticalSpacer)
-   {
-    ui->scrollWidgetLayout->removeItem(this->verticalSpacer);
-   }
+  float deskTopHeight = QApplication::desktop()->availableGeometry().height();
 
-  pqRangeWidget::rowCounter = 1;// start at second row
+  dialogSizeHint.setHeight(0.1 * deskTopHeight);
+
+  return dialogSizeHint;
 }
 
 //-----------------------------------------------------------------------------
@@ -755,6 +788,8 @@ void pqPlotVariablesDialog::setPlotType(int type)
 void pqPlotVariablesDialog::setPlotter(pqPlotter * thePlotter)
 {
   this->Internal->setPlotter(thePlotter);
+
+  this->Internal->updateHoverWithPlotter(this->ui);
 }
 
 //-----------------------------------------------------------------------------
@@ -767,12 +802,6 @@ pqPlotter * pqPlotVariablesDialog::getPlotter()
 void pqPlotVariablesDialog::addVariable(QString varName)
 {
   this->Internal->addVariable(varName);
-}
-
-//-----------------------------------------------------------------------------
-void pqPlotVariablesDialog::initRangeUI()
-{
-  this->Internal->initRangeUI(this->ui);
 }
 
 //-----------------------------------------------------------------------------
@@ -818,35 +847,6 @@ void pqPlotVariablesDialog::allocSetRange(QString varName, int numComp, int numE
       vr->magnitudes[k] = this->Internal->computeMagnitude(vr,k);
       }
     }
-}
-
-//=============================================================================
-pqPlotVariablesDialog::pqPlotVariablesDialog(QWidget *p,
-                                             Qt::WindowFlags f/*=0*/)
-  : QDialog(p, f)
-{
-  pqSierraPlotToolsManager *manager = pqSierraPlotToolsManager::instance();
-  this->Server = manager->getActiveServer();
-
-  this->Internal = new pqPlotVariablesDialog::pqInternal();
-
-  this->ui = new pqPlotVariablesDialog::pqUI;
-  this->ui->setupUi(this);
-
-  // connect signals and slots to the list widget
-  QObject::connect(this->ui->okCancelButtonBox, SIGNAL(accepted(void)), this, SLOT(slotOk(void)));
-  QObject::connect(this->ui->okCancelButtonBox, SIGNAL(rejected(void)), this, SLOT(slotCancel(void)));
-
-  QObject::connect(this->ui->useParaViewGUIToSelectNodesCheckBox, SIGNAL(toggled(bool)), this, SLOT(slotUseParaViewGUIToSelectNodesCheckBox(bool)));
-
-  this->Internal->updateHoverWithPlotter(this->ui);
-}
-
-//-----------------------------------------------------------------------------
-pqPlotVariablesDialog::~pqPlotVariablesDialog()
-{
-  delete this->ui;
-  delete this->Internal;
 }
 
 //-----------------------------------------------------------------------------
@@ -958,7 +958,7 @@ QList<int> pqPlotVariablesDialog::determineSelectedItemsList(bool & errFlag)
 }
 
 //-----------------------------------------------------------------------------
-void pqPlotVariablesDialog::slotUseParaViewGUIToSelectNodesCheckBox(bool checked)
+void pqPlotVariablesDialog::slotUseParaViewGUIToSelectNodesCheckBox(bool /*checked*/)
 {
   emit this->useParaViewGUIToSelectNodesCheck();
 }
@@ -1000,7 +1000,7 @@ QStringList pqPlotVariablesDialog::getVarsWithComponentSuffixes(vtkSMStringVecto
   for (unsigned int i = 0; i < uNumElems; i += 2)
     {
     const char * elemPtr = stringVecProp->GetElement(i);
-    const char * elemPtr_status = stringVecProp->GetElement(i+1);
+    //const char * elemPtr_status = stringVecProp->GetElement(i+1);
 
     QString elemAsQString(elemPtr);
     VarRange * vr = this->Internal->varRanges[elemAsQString];
@@ -1065,20 +1065,6 @@ QListWidget * pqPlotVariablesDialog::getVariableList()
   return this->Internal->listWidget;
 }
 
-
-
-//-----------------------------------------------------------------------------
-void pqPlotVariablesDialog::refreshVariablesList(QStringList varStrings)
-{
-  this->Internal->listWidget->clear();
-  QStringList::const_iterator constIterator;
-  for (constIterator = varStrings.constBegin(); constIterator != varStrings.constEnd(); ++constIterator)
-    {
-    QString theVarNameStr = (*constIterator);
-    this->Internal->listWidget->addItem(theVarNameStr);
-    }
-}
-
 //-----------------------------------------------------------------------------
 void pqPlotVariablesDialog::setupVariablesList(QStringList varStrings)
 {
@@ -1093,22 +1079,109 @@ void pqPlotVariablesDialog::setupVariablesList(QStringList varStrings)
     {
     QString theVarNameStr = (*constIterator);
     this->Internal->listWidget->addItem(theVarNameStr);
+    this->Internal->variableSelectionStates[theVarNameStr] = false;
     }
 
   // connect signals and slots to the list widget
-  QObject::connect(this->Internal->listWidget, SIGNAL(itemClicked (QListWidgetItem *)), this, SLOT(listItemClicked(QListWidgetItem *)));
+  QObject::connect(this->Internal->listWidget, SIGNAL(itemSelectionChanged()), this, SLOT(slotItemSelectionChanged()));
 }
 
 //-----------------------------------------------------------------------------
-void pqPlotVariablesDialog::listItemClicked(QListWidgetItem * item)
+bool pqPlotVariablesDialog::pqInternal::inSelection(const QString & itemStr, QList<QListWidgetItem *> & selectedItems)
 {
-  emit this->variableSelected();
+  QList<QListWidgetItem *>::iterator iter;
+  for (iter=selectedItems.begin(); iter != selectedItems.end(); iter++)
+    {
+    if ((*iter)->text() == itemStr)
+      {
+      return true;
+      }
+    }
+
+  return false;
 }
 
 //-----------------------------------------------------------------------------
-bool pqPlotVariablesDialog::addRangesToUI(const QList<QListWidgetItem *> & selecteditems)
+void pqPlotVariablesDialog::slotItemSelectionChanged()
 {
-  return this->Internal->addRangesToUI(this->ui, selecteditems);
+  QList<QListWidgetItem *> selectedItems = this->Internal->listWidget->selectedItems();
+
+  // Find all deselected variables:
+  // first go through all the selection states. If a variable was selected,
+  // but is not in the current selection list, than that means it was 
+  // delselected
+  QMap<QString, bool>::iterator statesIter = this->Internal->variableSelectionStates.begin();
+  for ( ; statesIter != this->Internal->variableSelectionStates.end(); statesIter++)
+  {
+    if (*statesIter == true && ! this->Internal->inSelection(statesIter.key(), selectedItems))
+    {
+      // deselection
+      emit this->variableDeselectionByName(statesIter.key());
+
+      // and set the selection state accordingly
+      this->Internal->variableSelectionStates[statesIter.key()] = false;
+    }
+  }
+
+  // Now find all selected variables (that were not selected in the first pass):
+  // first go through all the selection states. If a variable was selected,
+  // but is not in the current selection list, than that means it was 
+  // delselected
+  statesIter = this->Internal->variableSelectionStates.begin();
+  for ( ; statesIter != this->Internal->variableSelectionStates.end(); statesIter++)
+  {
+    if (*statesIter == false && this->Internal->inSelection(statesIter.key(), selectedItems))
+    {
+      // new selection
+      emit this->variableSelectionByName(statesIter.key());
+
+      // and set the selection state accordingly
+      this->Internal->variableSelectionStates[statesIter.key()] = true;
+    }
+  }
+
+  pqPlotVariablesDialog * myDialog = this;
+
+  QSize dialogSize = myDialog->size();
+  QSize maxSize = myDialog->maximumSize();
+  QSizePolicy sizePolicy = myDialog->sizePolicy();
+  //QSizePolicy::Policy verticalPolicy = sizePolicy.verticalPolicy();
+}
+
+//-----------------------------------------------------------------------------
+bool pqPlotVariablesDialog::addRangeToUI(QString itemText)
+{
+
+  // Remove the verticalSpacer (if it exists)
+  // because we always want to add it after the last range
+  if (this->Internal->verticalSpacer)
+    {
+    ui->scrollWidgetLayout->removeItem(this->Internal->verticalSpacer);
+    this->Internal->verticalSpacer = NULL;
+    }
+
+  bool flag = this->Internal->addRangeToUI(this->ui, itemText);
+
+  if (! flag)
+  {
+    return false;
+  }
+
+  // add in a vertical spacer
+  this->Internal->verticalSpacer = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
+  this->ui->scrollWidgetLayout->addItem(this->Internal->verticalSpacer);
+
+  // update the scroll area geometry
+  // so that it resizes if need be
+  this->ui->rangeScrollArea->updateGeometry();
+
+  return true;
+}
+
+//-----------------------------------------------------------------------------
+bool pqPlotVariablesDialog::removeRangeFromUI(QString itemText)
+{
+  return this->Internal->removeRangeFromUI(this->ui, itemText);
 }
 
 //-----------------------------------------------------------------------------
@@ -1126,12 +1199,4 @@ void pqPlotVariablesDialog::setTimeRange(double min, double max)
   this->ui->timeMinLineEdit->setText(str);
   str = QString("%1").arg(max, 0, 'E');
   this->ui->timeMaxLineEdit->setText(str);
-}
-
-//-----------------------------------------------------------------------------
-void pqPlotVariablesDialog::addVariableRange(QString varName, int compBegin, int compEnd)
-{
-  //
-  // 9-10-2009:  This method HERE as an EXAMPLE
-  //
 }

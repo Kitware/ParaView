@@ -2,7 +2,7 @@
 /*=========================================================================
 
   Program:   Visualization Toolkit
-  Module:    pqVariableVariablePlotter.cxx
+  Module:    warningState.h
 
   Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
   All rights reserved.
@@ -19,34 +19,17 @@
   the U.S. Government retains certain rights in this software.
 -------------------------------------------------------------------------*/
 
-#include "warningState.h"
 
-#include "pqVariableVariablePlotter.h"
+#ifndef __warningState_h
+#define __warningState_h
 
-#include "pqApplicationCore.h"
-#include "pqObjectBuilder.h"
-#include "pqOutputPort.h"
-#include "pqPipelineSource.h"
+#if defined(DISABLE_NOISY_COMPILE_WARNINGS)
+// disables certain "noisy" compile warnings (e.g. Qt creates a plethora of 4127 and 4512)
+// if DISABLE_NOISY_COMPILE_WARNINGS is defined
+#if defined(_WIN32)
+#pragma warning ( disable : 4127 ) //warning C4127: conditional expression is constant
+#pragma warning ( disable : 4512 ) //warning C4512: assignment operator could not be generated
+#endif
+#endif
 
-#include "pqPlotVariablesDialog.h"
-
-#include <QStringList>
-
-#include <QStringList>
-#include <QtDebug>
-
-#include "vtkPVDataSetAttributesInformation.h"
-#include "vtkSelectionNode.h"
-#include "vtkSMIdTypeVectorProperty.h"
-#include "vtkSMIntVectorProperty.h"
-#include "vtkSMProxy.h"
-#include "vtkSMProperty.h"
-#include "vtkSMSourceProxy.h"
-#include "vtkSMProperty.h"
-#include "vtkSMVectorProperty.h"
-#include "vtkPVDataInformation.h"
-
-///
-/// pqVariableVariablePlotter
-///
-
+#endif //__warningState_h

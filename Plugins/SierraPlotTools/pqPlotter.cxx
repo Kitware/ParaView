@@ -19,6 +19,8 @@
   the U.S. Government retains certain rights in this software.
 -------------------------------------------------------------------------*/
 
+#include "warningState.h"
+
 #include "pqPlotter.h"
 #include "pqSierraPlotToolsManager.h"
 
@@ -37,10 +39,13 @@
 #include "pqSMAdaptor.h"
 #include "pqView.h"
 
+#include <QLabel>
 #include <QList>
 #include <QMap>
 #include <QStringList>
 #include <QtDebug>
+
+#include "ui_pqSierraToolsRichTextDocs.h"
 
 #include "vtkPVArrayInformation.h"
 #include "vtkPVDataInformation.h"
@@ -54,7 +59,6 @@
 // used to show line number in #pragma messages
 #define STRING2(x) #x
 #define STRING(x) STRING2(x)
-
 
 class pqPlotter::pqInternal
 {
@@ -80,45 +84,29 @@ public:
 
   QMap<int, QMap<QString,QString> > tensorLookup;
 
+  QWidget *richTextDocsPlaceholder;
+  Ui::pqSierraPlotToolsRichTextDocs richTextDocs;
 };
 
 ///////////////////////////////////////////////////////////////////////////////
 pqPlotter::pqInternal::pqInternal()
 {
-#if 0
-    validComponentSuffixes.append("_x");
-    validComponentSuffixes.append("_y");
-    validComponentSuffixes.append("_z");
-    validComponentSuffixes.append("_xx");
-    validComponentSuffixes.append("_xy");
-    // symetric -- could be xz, or zx, but Exodus reader stores as zx
-    validComponentSuffixes.append("_zx");
-    validComponentSuffixes.append("_yy");
-    validComponentSuffixes.append("_yz");
-    validComponentSuffixes.append("_zz");
-    validComponentSuffixes.append("_magnitude");
-
-    componentArrayIndicesMap["_magnitude"] = -1; // treat magnitude special!
-
-    componentArrayIndicesMap["_x"] = 0;
-    componentArrayIndicesMap["_y"] = 1;
-    componentArrayIndicesMap["_z"] = 2;
-
-    // The Symmetric Tensor – six components index order is defined
-    // by the VTK Exodus reader
-    //   see vtkExodusIIReaderPrivate.h
-    //   and vtkExodusIIReader.cxx in VTK library
-    componentArrayIndicesMap["_xx"] = 0;
-    componentArrayIndicesMap["_yy"] = 1;
-    componentArrayIndicesMap["_zz"] = 2;
-    componentArrayIndicesMap["_xy"] = 3;
-    componentArrayIndicesMap["_yz"] = 4;
-    componentArrayIndicesMap["_zx"] = 5;
-#endif
+  // This widget serves no real purpose other than initializing the QTextEdit
+  // structure created with designer that holds the Rich Text documents that
+  // we want to be able to display (as tooltip pop-ups or whatever) in this
+  // application at run-time
+  this->richTextDocsPlaceholder = new QWidget(NULL);
+  this->richTextDocs.setupUi(this->richTextDocsPlaceholder);
 
   validTensorComponentSuffixes.append("_x");
   validTensorComponentSuffixes.append("_y");
   validTensorComponentSuffixes.append("_z");
+
+  // The Symmetric Tensor – six components index order is defined
+  // by the VTK Exodus reader
+  //   see vtkExodusIIReaderPrivate.h
+  //   and vtkExodusIIReader.cxx in VTK library
+
   validTensorComponentSuffixes.append("_xx");
   validTensorComponentSuffixes.append("_xy");
   // symetric -- could be xz, or zx, but Exodus reader stores as zx
@@ -254,7 +242,7 @@ pqPlotter::~pqPlotter()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-QStringList pqPlotter::getTheVars(vtkSMProxy * meshReaderProxy)
+QStringList pqPlotter::getTheVars(vtkSMProxy * /*meshReaderProxy*/)
 {
   QStringList theVars;
   theVars.clear();
@@ -262,7 +250,7 @@ QStringList pqPlotter::getTheVars(vtkSMProxy * meshReaderProxy)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void pqPlotter::setDomain(plotDomain theDomain)
+void pqPlotter::setDomain(plotDomain /*theDomain*/)
 {
 }
 
@@ -286,7 +274,6 @@ QStringList pqPlotter::getStringsFromProperty(vtkSMProperty * prop)
     for (i = 0; i < uNumElems; i += 2)
       {
       const char * elemPtr = stringVecProp->GetElement(i);
-      const char * elemPtr_status = stringVecProp->GetElement(i+1);
       theVars.append(QString(elemPtr));
       }
     }
@@ -295,14 +282,14 @@ QStringList pqPlotter::getStringsFromProperty(vtkSMProperty * prop)
 }
 
 //-----------------------------------------------------------------------------
-vtkPVDataSetAttributesInformation * pqPlotter::getDataSetAttributesInformation(vtkPVDataInformation * pvDataInfo)
+vtkPVDataSetAttributesInformation * pqPlotter::getDataSetAttributesInformation(vtkPVDataInformation * /*pvDataInfo*/)
 {
   // should never get here, but the default behaviour is...
   return NULL;
 }
 
 //-----------------------------------------------------------------------------
-vtkSMProperty * pqPlotter::getSMVariableProperty(vtkSMProxy *meshReaderProxy)
+vtkSMProperty * pqPlotter::getSMVariableProperty(vtkSMProxy * /*meshReaderProxy*/)
 {
   // should never get here, but the default behaviour is...
   return NULL;
@@ -369,7 +356,7 @@ pqServer * pqPlotter::getActiveServer()
 }
 
 //-----------------------------------------------------------------------------
-void pqPlotter::setVarsStatus(vtkSMProxy * meshReaderProxy, bool flag)
+void pqPlotter::setVarsStatus(vtkSMProxy * /*meshReaderProxy*/, bool /*flag*/)
 {
   // should never get here, but the default behaviour is...
   return;
@@ -388,8 +375,10 @@ void pqPlotter::setVarElementsStatus(vtkSMProperty * prop, bool flag)
       unsigned int i;
       for (i = 0; i < uNumElems; i += 2)
         {
+#       if 0
         const char * elemPtr = stringVecProp->GetElement(i);
         const char * elemPtr_status = stringVecProp->GetElement(i+1);
+#       endif
 
         if (flag)
           {
@@ -416,7 +405,7 @@ void pqPlotter::setVarElementsStatus(vtkSMProperty * prop, bool flag)
 }
 
 //-----------------------------------------------------------------------------
-void pqPlotter::setVarsActive(vtkSMProxy * meshReaderProxy, QString varName, bool activeFlag)
+void pqPlotter::setVarsActive(vtkSMProxy * /*meshReaderProxy*/, QString /*varName*/, bool /*activeFlag*/)
 {
   // should never get here, but the default behaviour is...
   return;
@@ -438,8 +427,11 @@ void pqPlotter::setVarElementsActive(vtkSMProperty * prop, QString varName, bool
       unsigned int i;
       for (i = 0; i < uNumElems; i += 2)
         {
-        const char * elemPtr = stringVecProp->GetElement(i);
+#       if 0
         const char * elemPtr_status = stringVecProp->GetElement(i+1);
+#       endif
+
+        const char * elemPtr = stringVecProp->GetElement(i);
 
         QString elemStr(elemPtr);
 
@@ -454,11 +446,11 @@ void pqPlotter::setVarElementsActive(vtkSMProperty * prop, QString varName, bool
             stringVecProp->SetElement(i+1, "0");
             }
 
-          break;  // GET OUTTA THIS LOOPITYLOOP!
+          break;  // GET OUTTA THIS LOOP
           }
         else
             {
-            bool stillLooking=true;
+            //stillLooking
             }
         }
       }
@@ -520,7 +512,6 @@ bool pqPlotter::selectionWithinRange(QList<int> selectedItems, pqPipelineSource 
 
       if (arrayInfo != NULL)
         {
-        int numTuples = arrayInfo->GetNumberOfTuples();
         int numComponents = arrayInfo->GetNumberOfComponents ();
 
         if (numComponents > 1)
@@ -701,4 +692,28 @@ void pqPlotter::setDisplayOfVariables(pqPipelineSource * meshReader, const QMap<
 //-----------------------------------------------------------------------------
 void pqPlotter::popUpHelp()
 {
+}
+
+//-----------------------------------------------------------------------------
+QString pqPlotter::getPlotterTextEditObjectName()
+{
+  // should never get here, derived classes should handle this,
+  //    but the default behaviour is...
+  return QString("");
+}
+
+//-----------------------------------------------------------------------------
+QString pqPlotter::getPlotterHeadingHoverText()
+{
+  QString textEditObjName = this->getPlotterTextEditObjectName();
+  QString richText("");
+
+  QTextEdit * textEdit = this->Internal->richTextDocsPlaceholder->findChild<QTextEdit *>(textEditObjName);
+
+  if (textEdit != NULL)
+    {
+    richText = textEdit->toHtml();
+    }
+
+  return richText;
 }

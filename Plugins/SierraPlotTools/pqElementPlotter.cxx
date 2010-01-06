@@ -19,6 +19,8 @@
   the U.S. Government retains certain rights in this software.
 -------------------------------------------------------------------------*/
 
+#include "warningState.h"
+
 #include "pqElementPlotter.h"
 
 #include "pqApplicationCore.h"
@@ -48,11 +50,12 @@
 /// pqElementPlotter
 ///
 
+//-----------------------------------------------------------------------------
 QStringList pqElementPlotter::getTheVars(vtkSMProxy * meshReaderProxy)
 {
-  QStringList theVars;
-  theVars.clear();
-  return theVars;
+  vtkSMProperty * prop = meshReaderProxy->GetProperty("ElementVariablesInfo");
+
+  return getStringsFromProperty(prop);
 }
 
 //-----------------------------------------------------------------------------
@@ -128,7 +131,6 @@ QMap<QString, QList<pqOutputPort*> >
   pqObjectBuilder *builder = core->getObjectBuilder();
   selectionSource = builder->createSource ("sources", "GlobalIDSelectionSource", this->getActiveServer());
   vtkSMProxy * sourceProxy = selectionSource ->getProxy(); 
-  vtkSMSourceProxy * selectionSourceProxy = dynamic_cast<vtkSMSourceProxy *>(sourceProxy);
 
   //inputs.push_back(selectionSource->getOutputPort(0));
   QList<pqOutputPort *> selectionInput;
@@ -177,4 +179,10 @@ QMap<QString, QList<pqOutputPort*> >
 QString pqElementPlotter::getNumberItemsLabel()
 {
   return QString("select element #");
+}
+
+///////////////////////////////////////////////////////////////////////////////
+QString pqElementPlotter::getPlotterTextEditObjectName()
+{
+  return QString("elementVarsVsTimeTextEdit");
 }
