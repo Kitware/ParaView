@@ -95,6 +95,19 @@ public:
   /// lookup table. This only updates the component part of the title.
   void updateScalarBarTitles(const QString& component);
 
+  enum TemporalRangeScalingModes
+    {
+    LAST_TIMESTEP,
+    CURRENT_TIMESTEP,
+    EVERY_TIMESTEP
+    };
+
+  /// This merely update the application settings with correct values for the
+  /// temporal range scaling mode. Components that scale scalar range should
+  /// look at this setting to determine how the scaling should be done.
+  static void setTemporalRangeScalingMode(int);
+  static int temporalRangeScalingMode(int default_value=LAST_TIMESTEP);
+
 public slots:
   // This method checks if this LUT is used by any display,
   // if not, it hides all the scalars bar showing this LUT.

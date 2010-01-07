@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationCore.h"
 #include "pqObjectBuilder.h"
 #include "pqPipelineSource.h"
+#include "pqScalarsToColors.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
 #include "pqTimeKeeper.h"
@@ -54,7 +55,12 @@ pqDataTimeStepBehavior::pqDataTimeStepBehavior(QObject* parentObject)
 //-----------------------------------------------------------------------------
 void pqDataTimeStepBehavior::onReaderCreated(pqPipelineSource* reader)
 {
-  return; // disabled for now.
+  if (pqScalarsToColors::temporalRangeScalingMode() !=
+    pqScalarsToColors::LAST_TIMESTEP)
+    {
+    return;
+    }
+
   pqTimeKeeper* timeKeeper = reader->getServer()->getTimeKeeper();
   pqAnimationScene* scene =
     pqApplicationCore::instance()->getServerManagerModel()->findItems<pqAnimationScene*>(
@@ -62,10 +68,9 @@ void pqDataTimeStepBehavior::onReaderCreated(pqPipelineSource* reader)
   vtkSMProxy* readerProxy = reader->getProxy();
   if (readerProxy->GetProperty("TimestepValues"))
     {
-    const double *timesteps = vtkSMPropertyHelper(readerProxy,
-      "TimestepValues").GetAsDoublePtr();
-    unsigned int num_timesteps = vtkSMPropertyHelper(readerProxy,
-      "TimestepValues").GetNumberOfElements();
+    vtkSMPropertyHelper helper(readerProxy, "TimestepValues");
+    unsigned int num_timesteps = helper.GetNumberOfElements();
+    const double *timesteps = helper.GetAsDoublePtr();
     if (num_timesteps > 1)
       {
       if (timeKeeper->getTime() < timesteps[num_timesteps-1])

@@ -45,6 +45,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqRenderViewBase.h"
 #include "pqScalarBarRepresentation.h"
 #include "pqServerManagerModel.h"
+#include "pqSettings.h"
 #include "pqSMAdaptor.h"
 #include "vtkSMProperty.h"
 
@@ -348,3 +349,18 @@ void pqScalarsToColors::build()
   this->getProxy()->InvokeCommand("Build");
 }
 
+//-----------------------------------------------------------------------------
+void pqScalarsToColors::setTemporalRangeScalingMode(int mode)
+{
+  pqSettings* settings = pqApplicationCore::instance()->settings();
+  settings->setValue("pqScalarsToColors/TEMPORAL_RANGE_SCALING_MODE", mode);
+}
+
+//-----------------------------------------------------------------------------
+int pqScalarsToColors::temporalRangeScalingMode(
+  int default_value/*=LAST_TIMESTEP*/)
+{
+  pqSettings* settings = pqApplicationCore::instance()->settings();
+  return settings->value(
+    "pqScalarsToColors/TEMPORAL_RANGE_SCALING_MODE", default_value).toInt();
+}

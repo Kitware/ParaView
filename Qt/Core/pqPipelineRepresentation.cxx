@@ -805,9 +805,9 @@ void pqPipelineRepresentation::onInputAccepted()
 //-----------------------------------------------------------------------------
 void pqPipelineRepresentation::onDataUpdated()
 {
-  // FIXME: I am letting the LUT be resized every timestep, until I add the GUI
-  // controls to change the behavior.
-  if (this->UpdateLUTRangesOnDataUpdate || true)
+  if (this->UpdateLUTRangesOnDataUpdate ||
+    pqScalarsToColors::temporalRangeScalingMode() ==
+    pqScalarsToColors::EVERY_TIMESTEP)
     {
     // BUG #10062
     // Since this part of the code happens every time the pipeline is updated, we
