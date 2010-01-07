@@ -903,8 +903,13 @@ MACRO(ADD_PARAVIEW_PLUGIN NAME VERSION)
       IF(PARAVIEW_PLUGINLIST_TXT)
         FILE(APPEND ${PARAVIEW_PLUGINLIST_TXT} "${LIBRARY_OUTPUT_PATH}/lib${NAME}.dylib;")
       ENDIF(PARAVIEW_PLUGINLIST_TXT)
+      
+      if (MSVC)
+        # Do not generate manifests for the plugins - caused issues loading plugins
+        set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} /MANIFEST:NO")
+      endif(MSVC)
 
-      ADD_LIBRARY(${NAME} SHARED ${GUI_SRCS} ${SM_SRCS} ${ARG_SOURCES})
+      ADD_LIBRARY(${NAME} MODULE ${GUI_SRCS} ${SM_SRCS} ${ARG_SOURCES})
 
       IF(GUI_SRCS)
         TARGET_LINK_LIBRARIES(${NAME} pqComponents)
