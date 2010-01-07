@@ -740,7 +740,7 @@ QSize pqPlotVariablesDialog::sizeHint() const
 
   float deskTopHeight = QApplication::desktop()->availableGeometry().height();
 
-  dialogSizeHint.setHeight(0.1 * deskTopHeight);
+  dialogSizeHint.setHeight(int(0.1 * deskTopHeight));
 
   return dialogSizeHint;
 }
