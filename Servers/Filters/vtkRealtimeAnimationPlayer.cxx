@@ -18,7 +18,7 @@
 #include "vtkTimerLog.h"
 
 vtkStandardNewMacro(vtkRealtimeAnimationPlayer);
-vtkCxxRevisionMacro(vtkRealtimeAnimationPlayer, "1.4");
+vtkCxxRevisionMacro(vtkRealtimeAnimationPlayer, "1.5");
 //----------------------------------------------------------------------------
 vtkRealtimeAnimationPlayer::vtkRealtimeAnimationPlayer()
 {
@@ -68,7 +68,7 @@ double vtkRealtimeAnimationPlayer::GetNextTime(double curtime)
   // This line MUST !!NOT!! be removed, otherwise a crash problem would occur.
   if ( curtime == this->EndTime )
     {
-    return  this->EndTime + 0.01;
+    return  this->EndTime * 1.1;
     }
 
   this->Timer->StopTimer();
