@@ -7,6 +7,9 @@ object1 = 'pqClientMainWindow/menubar/menu_File'
 QtTesting.playCommand(object1, 'activate', 'actionFileOpen')
 object2 = 'pqClientMainWindow/FileOpenDialog'
 QtTesting.playCommand(object2, 'filesSelected', '$PARAVIEW_DATA_ROOT/Data/FileSeries/blow..vtk')
+object12 = 'pqClientMainWindow/currentTimeToolbar/CurrentTimeIndex'
+QtTesting.playCommand(object12, 'set_int', '0')
+QtTesting.playCommand(object12, 'key', '16777220')
 object3 = 'pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/objectInspector/Accept'
 QtTesting.playCommand(object3, 'activate', '')
 object4 = 'pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/0/Viewport'
