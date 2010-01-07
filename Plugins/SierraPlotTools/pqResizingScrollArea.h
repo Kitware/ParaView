@@ -31,6 +31,8 @@
 
 class pqResizingScrollArea : public QScrollArea
 {
+  Q_OBJECT;
+
 public:
   pqResizingScrollArea(QWidget *parent = 0);
 
