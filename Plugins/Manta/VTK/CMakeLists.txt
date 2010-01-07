@@ -183,7 +183,7 @@ TARGET_LINK_LIBRARIES ( ${PROJECT_NAME}
 
 # Wrapping for use from interpretted languages ##############################
 
-SET ( VTK_WRAP_HINTS "${PROJECT_SOURCE_DIR}/hints" )
+#SET ( VTK_WRAP_HINTS "${PROJECT_SOURCE_DIR}/hints" )
  
 # Create the instantiator for these classes.
 
