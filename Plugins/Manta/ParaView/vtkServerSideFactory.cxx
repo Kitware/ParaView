@@ -65,6 +65,13 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkServerSideFactory.h"
 #include "vtkMantaObjectFactory.h"
+#include "vtkProcessModule.h"
+
+#include "vtkProcessModule.h"
+#include "vtkClientServerInterpreter.h"
+
+//This sets the CS wrapped vtkManta classes up so ParaView can call them
+extern "C" void vtkMantaCS_Initialize(vtkClientServerInterpreter *arlu);
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkServerSideFactory);
@@ -92,6 +99,9 @@ void vtkServerSideFactory::EnableFactory()
     vtkObjectFactory::RegisterFactory(sf);
     vtkServerSideFactory::FactoryRegistered = 1;
     sf->Delete();
+
+    //register the wrapped classes in vtkManta so ParaView can call them too
+    vtkProcessModule::InitializeInterpreter(vtkMantaCS_Initialize);
     }
 }
 

@@ -83,7 +83,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <cstring>
 
-vtkCxxRevisionMacro(vtkMantaProperty, "1.2");
+vtkCxxRevisionMacro(vtkMantaProperty, "1.1");
 vtkStandardNewMacro(vtkMantaProperty);
 
 //----------------------------------------------------------------------------

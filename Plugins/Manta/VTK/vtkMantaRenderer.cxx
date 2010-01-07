@@ -108,7 +108,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <vtkstd/string>
 
-vtkCxxRevisionMacro(vtkMantaRenderer, "1.2");
+vtkCxxRevisionMacro(vtkMantaRenderer, "1.1");
 vtkStandardNewMacro(vtkMantaRenderer);
 
 //----------------------------------------------------------------------------
@@ -349,9 +349,9 @@ void vtkMantaRenderer::UpdateActorsForVisibility()
     if ( anyProp->IsA( "vtkMantaLODActor" ) )
       {
 #ifdef VTKMANTA_FOR_PARAVIEW
-       mantaActor = vtkMantaActor::SafeDownCast
-          ( vtkMantaLODActor::SafeDownCast( anyProp )->GetDevice() );
-#     endif
+      mantaActor = vtkMantaActor::SafeDownCast
+        ( vtkMantaLODActor::SafeDownCast( anyProp )->GetDevice() );
+#endif
       }
 
     if ( mantaActor )

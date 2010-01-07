@@ -102,7 +102,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <Model/Textures/Constant.h>
 #include <math.h>
 
-vtkCxxRevisionMacro(vtkMantaPolyDataMapper, "1.2");
+vtkCxxRevisionMacro(vtkMantaPolyDataMapper, "1.1");
 vtkStandardNewMacro(vtkMantaPolyDataMapper);
 
 //----------------------------------------------------------------------------
