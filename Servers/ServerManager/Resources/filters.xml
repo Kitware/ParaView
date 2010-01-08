@@ -127,6 +127,7 @@
        </ProxyGroupDomain>
        <DataTypeDomain name="input_type">
          <DataType value="vtkDataSet"/>
+         <DataType value="vtkTable"/>
          <DataType value="vtkCompositeDataSet"/>
        </DataTypeDomain>
        <Documentation>
@@ -8369,6 +8370,7 @@ This property controls how the filter works to generate tensor cell data. You ca
        </ProxyGroupDomain>
        <DataTypeDomain name="input_type">
          <DataType value="vtkDataSet"/>
+         <DataType value="vtkTable"/>
        </DataTypeDomain>
        <Documentation>
          This property specifies the input from which the selection is extracted.

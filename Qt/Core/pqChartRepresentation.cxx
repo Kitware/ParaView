@@ -166,6 +166,9 @@ QStringList pqChartRepresentation::defaultHiddenSeriesSetting()
   // Show only the vector magnitudes.  Hide the components.
   hiddenSeries << ".*\\(\\d+\\)";
 
+  // Hide vtkOriginalRowIds.
+  hiddenSeries << "vtkOriginalRowIds";
+
   return hiddenSeries;
 }
 
