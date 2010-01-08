@@ -82,6 +82,7 @@ protected slots:
 protected:
   bool PlayBackFinished;
   bool PlayBackStatus;
+  static bool DeferMenuTimeouts;
 
   pqEventSource* ActiveSource;
   pqEventPlayer* ActivePlayer;

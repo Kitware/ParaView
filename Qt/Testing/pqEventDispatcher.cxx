@@ -48,6 +48,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <iostream>
 using namespace std;
 
+bool pqEventDispatcher::DeferMenuTimeouts = false;
 //-----------------------------------------------------------------------------
 pqEventDispatcher::pqEventDispatcher(QObject* parentObject) :
   Superclass(parentObject)
@@ -176,6 +177,8 @@ void pqEventDispatcher::playEventStack(void* activeWidget)
 //-----------------------------------------------------------------------------
 void pqEventDispatcher::processEventsAndWait(int ms)
 {
+  bool prev = pqEventDispatcher::DeferMenuTimeouts;
+  pqEventDispatcher::DeferMenuTimeouts = true;
   if (ms > 0)
     {
     QApplication::processEvents(QEventLoop::ExcludeUserInputEvents);
@@ -184,11 +187,23 @@ void pqEventDispatcher::processEventsAndWait(int ms)
     loop.exec(QEventLoop::ExcludeUserInputEvents);
     }
   QApplication::processEvents(QEventLoop::ExcludeUserInputEvents);
+  pqEventDispatcher::DeferMenuTimeouts = prev;
 }
 
 //-----------------------------------------------------------------------------
 void pqEventDispatcher::onMenuTimerTimeout()
 {
+  // this is used to capture cases where are popup-menu (or any modal dialog in
+  // case of APPLE) is active in its event loop. However, we don't want the
+  // test to proceed if this timeout happened while we were in the
+  // processEventsAndWait() loop at any stage in executing an event. So we have
+  // this trap.
+  if (pqEventDispatcher::DeferMenuTimeouts)
+    {
+    this->AdhocMenuTimer.start();
+    return;
+    }
+
   QWidget* currentPopup = QApplication::activePopupWidget();
 #if defined(__APPLE__)
  if (!currentPopup)
