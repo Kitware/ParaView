@@ -57,6 +57,8 @@ pqPythonMacroSupervisor::pqPythonMacroSupervisor(QObject* p) : QObject(p)
 //----------------------------------------------------------------------------
 pqPythonMacroSupervisor::~pqPythonMacroSupervisor()
 {
+  delete this->Internal;
+  this->Internal = 0;
 }
 
 // Util methods

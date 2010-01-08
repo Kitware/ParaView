@@ -24,7 +24,7 @@
 #include <vtkstd/set>
 #include <vtksys/ios/sstream>
 
-vtkCxxRevisionMacro(vtkSciVizStatistics,"1.2");
+vtkCxxRevisionMacro(vtkSciVizStatistics,"1.3");
 vtkInformationKeyMacro(vtkSciVizStatistics, MULTIPLE_MODELS, Integer);
 
 vtkSciVizStatistics::vtkSciVizStatistics()
@@ -365,6 +365,7 @@ int vtkSciVizStatistics::RequestData(
         {
         ouModelCur = this->CreateModelDataType();
         ouModelIter->GetDataSet()->SetDataSet( ouModelIter, ouModelCur );
+        ouModelCur->Delete();
         }
       stat = this->RequestData(
         ouDataIter->GetCurrentDataObject(),
