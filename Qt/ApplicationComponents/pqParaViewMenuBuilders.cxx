@@ -191,8 +191,11 @@ void pqParaViewMenuBuilders::buildToolsMenu(QMenu& menu)
   new pqManageLinksReaction(menu.addAction("Manage Links") <<
     pqSetName("actionToolsManageLinks"));
   //<addaction name="actionToolsAddCameraLink" />
+#ifdef BUILD_SHARED_LIBS
+  // Add support for importing plugins only if ParaView was built shared.
   new pqManagePluginsReaction(menu.addAction("Manage Plugins") <<
     pqSetName("actionManage_Plugins"));
+#endif
   menu.addSeparator();
   //<addaction name="actionToolsDumpWidgetNames" />
   new pqTestingReaction(menu.addAction("Record Test")
