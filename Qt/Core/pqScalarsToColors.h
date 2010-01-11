@@ -95,18 +95,22 @@ public:
   /// lookup table. This only updates the component part of the title.
   void updateScalarBarTitles(const QString& component);
 
-  enum TemporalRangeScalingModes
+  enum RangeScalingModes
     {
-    LAST_TIMESTEP,
-    CURRENT_TIMESTEP,
-    EVERY_TIMESTEP
+    GROW_ON_MODIFIED, /* only when a pipeline object is explicitly modified */
+    GROW_ON_UPDATED   /* any time the pipeline updates */
     };
 
   /// This merely update the application settings with correct values for the
   /// temporal range scaling mode. Components that scale scalar range should
   /// look at this setting to determine how the scaling should be done.
-  static void setTemporalRangeScalingMode(int);
-  static int temporalRangeScalingMode(int default_value=LAST_TIMESTEP);
+
+  /// This provides access to the application settings that controls when color
+  /// table ranges are updated by the application. Components that scale scalar
+  /// range should look at this setting to determine how the scaling should be
+  /// done.
+  static void setColorRangeScalingMode(int);
+  static int colorRangeScalingMode(int default_value=GROW_ON_MODIFIED);
 
 public slots:
   // This method checks if this LUT is used by any display,

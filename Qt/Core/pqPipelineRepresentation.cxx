@@ -806,8 +806,8 @@ void pqPipelineRepresentation::onInputAccepted()
 void pqPipelineRepresentation::onDataUpdated()
 {
   if (this->UpdateLUTRangesOnDataUpdate ||
-    pqScalarsToColors::temporalRangeScalingMode() ==
-    pqScalarsToColors::EVERY_TIMESTEP)
+    pqScalarsToColors::colorRangeScalingMode() ==
+    pqScalarsToColors::GROW_ON_UPDATED)
     {
     // BUG #10062
     // Since this part of the code happens every time the pipeline is updated, we

@@ -350,17 +350,17 @@ void pqScalarsToColors::build()
 }
 
 //-----------------------------------------------------------------------------
-void pqScalarsToColors::setTemporalRangeScalingMode(int mode)
+void pqScalarsToColors::setColorRangeScalingMode(int mode)
 {
   pqSettings* settings = pqApplicationCore::instance()->settings();
-  settings->setValue("pqScalarsToColors/TEMPORAL_RANGE_SCALING_MODE", mode);
+  settings->setValue("pqScalarsToColors/COLOR_RANGE_SCALING_MODE", mode);
 }
 
 //-----------------------------------------------------------------------------
-int pqScalarsToColors::temporalRangeScalingMode(
-  int default_value/*=LAST_TIMESTEP*/)
+int pqScalarsToColors::colorRangeScalingMode(
+  int default_value/*=GROW_ON_MODIFIED*/)
 {
   pqSettings* settings = pqApplicationCore::instance()->settings();
   return settings->value(
-    "pqScalarsToColors/TEMPORAL_RANGE_SCALING_MODE", default_value).toInt();
+    "pqScalarsToColors/COLOR_RANGE_SCALING_MODE", default_value).toInt();
 }

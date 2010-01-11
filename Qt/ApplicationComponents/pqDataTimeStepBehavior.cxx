@@ -38,6 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqScalarsToColors.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
+#include "pqSettings.h"
 #include "pqTimeKeeper.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxy.h"
@@ -55,8 +56,10 @@ pqDataTimeStepBehavior::pqDataTimeStepBehavior(QObject* parentObject)
 //-----------------------------------------------------------------------------
 void pqDataTimeStepBehavior::onReaderCreated(pqPipelineSource* reader)
 {
-  if (pqScalarsToColors::temporalRangeScalingMode() !=
-    pqScalarsToColors::LAST_TIMESTEP)
+  pqSettings* settings = pqApplicationCore::instance()->settings();
+  // FIXME: Need some better organization for keep track for such global
+  // settings.
+  if (settings->value("DefaultTimeStepMode",0) == 0)
     {
     return;
     }

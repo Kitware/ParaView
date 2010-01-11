@@ -103,6 +103,9 @@ pqApplicationOptions::pqApplicationOptions(QWidget *widgetParent)
   QObject::connect(this->Internal->RescaleDataRangeMode,
                   SIGNAL(currentIndexChanged(int)),
                   this, SIGNAL(changesAvailable()));
+  QObject::connect(this->Internal->DefaultTimeStepMode,
+                  SIGNAL(currentIndexChanged(int)),
+                  this, SIGNAL(changesAvailable()));
   QObject::connect(this->Internal->HeartBeatTimeout,
                   SIGNAL(textChanged(const QString&)),
                   this, SIGNAL(changesAvailable()));
@@ -231,8 +234,11 @@ void pqApplicationOptions::applyChanges()
   pqServer::setHeartBeatTimeoutSetting(static_cast<int>(
       this->Internal->HeartBeatTimeout->text().toDouble()*60*1000));
 
-  pqScalarsToColors::setTemporalRangeScalingMode(
+  pqScalarsToColors::setColorRangeScalingMode(
     this->Internal->RescaleDataRangeMode->currentIndex());
+
+  settings->setValue("DefaultTimeStepMode", 
+    this->Internal->DefaultTimeStepMode->currentIndex());
 
   bool autoAccept = this->Internal->AutoAccept->isChecked();
   settings->setValue("autoAccept", autoAccept);
@@ -283,8 +289,11 @@ void pqApplicationOptions::resetChanges()
   index = (index==-1)? 0 : index;
   this->Internal->DefaultViewType->setCurrentIndex(index);
 
+  this->Internal->DefaultTimeStepMode->setCurrentIndex(
+    settings->value("DefaultTimeStepMode", 0).toInt());
+
   this->Internal->RescaleDataRangeMode->setCurrentIndex(
-    pqScalarsToColors::temporalRangeScalingMode());
+    pqScalarsToColors::colorRangeScalingMode());
 
   this->Internal->HeartBeatTimeout->setText(
     QString("%1").arg(pqServer::getHeartBeatTimeoutSetting()/(60.0*1000), 0, 'f', 2));
