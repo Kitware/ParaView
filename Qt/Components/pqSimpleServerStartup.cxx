@@ -423,8 +423,8 @@ bool pqSimpleServerStartup::promptRuntimeArguments()
       const QString option_label = xml_option->GetAttribute("label");
       const bool option_readonly = 
         (QString(xml_option->GetAttribute("readonly")) == "true");
-      const bool save_option =
-        QVariant(xml_option->GetAttribute("save")).toBool();
+      const bool save_option = xml_option->GetAttribute("save") ? 
+        QVariant(xml_option->GetAttribute("save")).toBool() : true;
 
       vtkPVXMLElement* xml_type = xml_option->GetNestedElement(0);
       if (!xml_type)
@@ -633,8 +633,8 @@ bool pqSimpleServerStartup::promptRuntimeArguments()
         val.toAscii().data());
       }
 
-    const bool save_option =
-      QVariant(xml_option->GetAttribute("save")).toBool();
+    const bool save_option = xml_option->GetAttribute("save")?
+      QVariant(xml_option->GetAttribute("save")).toBool() : true;
     if (save_option && !option_readonly)
       {
       settings->setValue(QString("SERVER_STARUP/%1").arg(option_name), val);
