@@ -446,7 +446,9 @@ bool pqSimpleServerStartup::promptRuntimeArguments()
             settings->value(QString("SERVER_STARUP/%1").arg(option_name)).toString();
           }
         }
-      if (widget_default.isEmpty())
+      if (widget_default.isEmpty() || (
+        xml_type->GetAttribute("default") &&
+        strcmp(xml_type->GetAttribute("default"), "random") == 0))
         {
         widget_default = xml_type->GetAttribute("default");
         }
