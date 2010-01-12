@@ -1,0 +1,611 @@
+/*=========================================================================
+
+  Program:   Visualization Toolkit
+  Module:    MantaBenchmark.cxx
+
+  Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
+  All rights reserved.
+  See Copyright.txt or http://www.kitware.com/Copyright.htm for details.
+
+     This software is distributed WITHOUT ANY WARRANTY; without even
+     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+     PURPOSE.  See the above copyright notice for more information.
+
+=========================================================================*/
+// This test covers the shadow map render pass.
+
+//TODO: Measure pipeline change and render setup time
+//TODO: Measure local render time
+//TODO: Measure composite time
+//TODO: Get rid of ComputeVisiblePropBounds messages
+//TODO: Swap in Manta rendering
+//TODO: pass threads setting to manta
+
+#include <mpi.h>
+
+#include "vtkActor.h"
+#include "vtkCamera.h"
+#include "vtkClipPolyData.h"
+#include "vtkCompositeRenderManager.h"
+#include "vtkElevationFilter.h"
+#include "vtkMantaTestSource.h"
+#include "vtkMPICommunicator.h"
+#include "vtkMPIController.h"
+#include "vtkParallelFactory.h"
+#include "vtkPlane.h"
+#include "vtkPolyDataMapper.h"
+#include "vtkProcess.h"
+#include "vtkProperty.h"
+#include "vtkRegressionTestImage.h"
+#include "vtkRenderer.h"
+#include "vtkRenderWindow.h"
+#include "vtkRenderWindowInteractor.h"
+#include "vtkSphereSource.h"
+#include "vtkTestUtilities.h"
+#include "vtkTimerLog.h"
+
+#include "vtkMantaRenderer.h"
+#include "vtkMantaRenderWindow.h"
+#include "vtkMantaActor.h"
+#include "vtkMantaPolyDataMapper.h"
+
+#include <assert.h>
+
+#include "vtkSmartPointer.h"
+
+#define VTK_CREATE(type, name) \
+  vtkSmartPointer<type> name = vtkSmartPointer<type>::New()
+
+vtkPlane* plane = NULL;
+vtkElevationFilter *elev = NULL;
+
+// call back to set the clip plane location value.
+void PlaceClipRMI(void *localArg, void* remoteArg, 
+                  int vtkNotUsed(remoteArgLen), int vtkNotUsed(id))
+{ 
+  double*origin = (double*)remoteArg;
+  if (plane)
+    {
+    plane->SetOrigin(origin[0], origin[1], origin[2]);
+    }
+}
+
+// call back to set the clip plane orientation
+void OrientClipRMI(void *localArg, void* remoteArg, 
+                   int vtkNotUsed(remoteArgLen), int vtkNotUsed(id))
+{ 
+
+  double*normal = (double*)remoteArg;
+  if (plane)
+    {
+    plane->SetNormal(normal[0], normal[1], normal[2]);
+    }
+}
+
+// call back to set the elevation filter orientation
+void OrientElevRMI(void *localArg, void* remoteArg, 
+                   int vtkNotUsed(remoteArgLen), int vtkNotUsed(id))
+{ 
+  double*segment = (double*)remoteArg;
+  if (segment)
+    {
+    elev->SetLowPoint(segment[0], segment[1], segment[2]);
+    elev->SetHighPoint(segment[3], segment[4], segment[5]);
+    }
+}
+
+class MyProcess : public vtkProcess
+{
+public:
+  static MyProcess *New();
+  ~MyProcess()
+  {
+    this->Timer->Delete();
+  }
+
+  vtkTypeRevisionMacro(MyProcess, vtkProcess);
+  
+  virtual void Execute();
+
+  void SetArgs(int anArgc,
+               char *anArgv[])
+    {
+      this->Argc=anArgc;
+      this->Argv=anArgv;  
+    }  
+  void NoteTime(vtkParallelRenderManager *prm)
+  {
+    this->Timer->StopTimer();
+    double allTime = this->Timer->GetElapsedTime();
+    double renTime = prm->GetRenderTime();
+    double compTime = prm->GetImageProcessingTime();
+    cerr << this->Frame << " "
+         << renTime << " "
+         << compTime << " "
+         << allTime << endl;
+    
+    this->Frame++;
+    this->RenderTime += renTime;
+    this->CompositeTime += compTime;
+    this->AllTime += allTime;
+    this->Timer->StartTimer();
+  }
+  void StartTime()
+  {
+    this->Timer->StartTimer();
+  }
+  void PrintStats()
+  {
+    cerr << "avg_render_time " << this->RenderTime/this->Frame << endl;
+    cerr << "avg_composite_time " << this->CompositeTime/this->Frame << endl;
+    cerr << "avg_framerate " << this->Frame/this->AllTime << endl;
+  }
+
+
+protected:
+  MyProcess();
+  
+  int Argc;
+  char **Argv;
+  int Frame;
+  double RenderTime;
+  double CompositeTime;
+  double AllTime;
+  vtkTimerLog *Timer;
+};
+
+vtkCxxRevisionMacro(MyProcess, "1.1");
+vtkStandardNewMacro(MyProcess);
+
+MyProcess::MyProcess()
+{
+  this->Argc=0;
+  this->Argv=0;
+  this->Timer = vtkTimerLog::New();
+  this->Frame = 0;
+  this->RenderTime = 0.0;
+  this->CompositeTime = 0.0;
+  this->AllTime = 0;
+}
+
+void MyProcess::Execute()
+{
+  //parse environment and arguments
+  int numProcs=this->Controller->GetNumberOfProcesses();
+  int me=this->Controller->GetLocalProcessId();
+  int screensize = 400;
+  int triangles = 100000; //TODO: Values under 10000 are making it break
+  int threads = 1;
+  int processes = numProcs;
+  bool useGL = false;
+  double framerate = 0.0;
+  double buildtime = 0.0;
+  double rendertime = 0.0;
+  double compositetime = 0.0;
+  for (int i = 0; i < this->Argc; i++)
+    {
+    if (!strcmp(this->Argv[i], "-screensize"))
+      {
+      screensize = atoi(this->Argv[i+1]);
+      }
+    if (!strcmp(this->Argv[i], "-triangles"))
+      {
+      triangles = atoi(this->Argv[i+1]);
+      }
+    if (!strcmp(this->Argv[i], "-threads"))
+      {
+      threads = atoi(this->Argv[i+1]);
+      }
+    if (!strcmp(this->Argv[i], "-useGL"))
+      {
+      useGL = true;
+      }
+    }
+
+  //Make a scene that has a configurable number of triangles
+  //and that we can change
+  double bds[6];
+  vtkMantaTestSource *source=vtkMantaTestSource::New();
+  source->SetResolution(triangles);
+  source->SetSlidingWindow(0.01);
+
+  //Compute local geometric bounds
+  vtkPolyData *pd = source->GetOutput();
+  pd->SetUpdateExtent(me, numProcs, 0);
+  source->Update();
+  source->GetOutput()->GetBounds(bds);
+  /*
+  cerr << "LBDS(" << me << ") "  
+       << bds[0] << ","<< bds[1] << ","
+       << bds[2] << ","<< bds[3] << ","
+       << bds[4] << ","<< bds[5] << endl;
+  */
+  vtkClipPolyData *clipper = vtkClipPolyData::New();
+  clipper->SetInputConnection(source->GetOutputPort());
+  plane = vtkPlane::New();
+  clipper->SetClipFunction(plane);
+  source->Delete();
+
+  elev = vtkElevationFilter::New();
+  elev->SetInputConnection(clipper->GetOutputPort());
+  clipper->Delete();
+
+  vtkPolyDataMapper *mapper=NULL;
+  if (useGL)
+    {
+    mapper = vtkPolyDataMapper::New();
+    }
+  else
+    {
+    mapper = vtkMantaPolyDataMapper::New();
+    }
+  mapper->SetInputConnection(elev->GetOutputPort());
+  mapper->SetPiece(me); //each processor makes a different part of the data
+  mapper->SetNumberOfPieces(numProcs);
+
+  //Now set up parallel display pipeline to show it
+  vtkCompositeRenderManager *prm = vtkCompositeRenderManager::New();   
+
+  vtkRenderWindowInteractor *iren=0;
+  vtkRenderWindow *renWin = NULL;
+  vtkMantaRenderWindow *mRenWin = NULL;
+  if (useGL)
+    {
+    renWin = vtkRenderWindow::New();
+    }
+  else
+    {
+    mRenWin = vtkMantaRenderWindow::New();
+    renWin = mRenWin;
+    }
+  renWin->SetMultiSamples(0);
+  if(me==0)
+    {
+    iren=vtkRenderWindowInteractor::New();
+    iren->SetRenderWindow(renWin);
+    }
+  renWin->SetSize(screensize, screensize);
+  renWin->SetPosition(0, (screensize+60)*me); // translate the window
+  
+  vtkRenderer *renderer = NULL;
+  vtkMantaRenderer *mRenderer = NULL;
+  if (useGL)
+    {
+    renderer = vtkRenderer::New();
+    }
+  else
+    {
+    mRenderer = vtkMantaRenderer::New();
+    mRenderer->ChangeNumberOfWorkers(threads);
+    renderer = mRenderer;
+    }
+
+  renWin->AddRenderer(renderer);
+  prm->SetRenderWindow(renWin);
+
+  vtkActor *actor = NULL;
+  if (useGL)
+    {
+    actor = vtkActor::New();
+
+    //quick way to be sure which one is actually rendering
+    //vtkProperty *prop = actor->GetProperty();
+    //prop->SetRepresentationToWireframe();
+    
+    }
+  else
+    {
+    actor = vtkMantaActor::New();
+    }
+
+  actor->SetMapper(mapper);
+  mapper->Delete();
+
+  renderer->AddViewProp(actor);
+  actor->Delete();
+  renderer->Delete();
+
+  prm->SetRenderWindow(renWin);
+  prm->SetController(this->Controller);    
+
+  int retVal;
+  const int MY_RETURN_VALUE_MESSAGE=0x518113;
+  const int ORIGIN_RMI=0x518114;
+  const int PLANE_RMI=0x518115;
+  const int ELEV_RMI=0x518116;
+  const int SETUP_BOUNDS=0x518117;
+  if(me>0)
+    {
+    //Figure out global bounds so we can use it for filters/viewpoints
+    this->Controller->Send(bds, 6, 0, SETUP_BOUNDS);
+
+    // Last, set up RMI call backs to change pipeline parameters
+    // camera changes are handled by the prm
+    this->Controller->AddRMI(PlaceClipRMI, NULL, ORIGIN_RMI);
+    this->Controller->AddRMI(OrientClipRMI, NULL, PLANE_RMI);
+    this->Controller->AddRMI(OrientElevRMI, NULL, ELEV_RMI);
+
+    // satellite nodes, start loop that receives and responds to window events
+    // from root
+    prm->StartServices(); 
+
+    // receive return value from root process.
+    this->Controller->Receive(&retVal, 1, 0, MY_RETURN_VALUE_MESSAGE);
+    }
+  else
+    {
+    //root node drives all the action, everyone else just does what it is told
+    double origin[3];
+    double normal[3];
+    double segment[6];
+
+    //Figure out global bounds so we can use it for filters/viewpoints
+    for (int p = 1; p < numProcs; ++p)
+      {
+      double rbds[6];
+      this->Controller->Receive(rbds, 6, p, SETUP_BOUNDS);
+      /*
+      cerr << "RBDS " 
+           << rbds[0] << ","<< rbds[1] << ","
+           << rbds[2] << ","<< rbds[3] << ","
+           << rbds[4] << ","<< rbds[5] << endl;
+      */
+      for (int i = 0; i < 3; i++)
+        {
+        if (rbds[i*2+0] < bds[i*2+0])
+          {
+          bds[i*2+0] = rbds[i*2+0];
+          }
+        if (rbds[i*2+1] > bds[i*2+1])
+          {
+          bds[i*2+1] = rbds[i*2+1];
+          }
+        }
+      }
+    /*
+    cerr << "GDS " 
+         << bds[0] << ","<< bds[1] << ","
+         << bds[2] << ","<< bds[3] << ","
+         << bds[4] << ","<< bds[5] << endl;
+    */
+
+    //set colors to show Z initially
+    segment[0] = 0;
+    segment[1] = 0;
+    segment[2] = bds[4];
+    segment[3] = 0;
+    segment[4] = 0;
+    segment[5] = bds[5];
+    elev->SetLowPoint(segment[0], segment[1], segment[2]);
+    elev->SetHighPoint(segment[3], segment[4], segment[5]);
+    for (int p = 1; p < numProcs; ++p)
+      {
+      this->Controller->TriggerRMI
+        (p,(void*)segment,6*sizeof(double),ELEV_RMI);
+      }        
+
+    //Playback some canned camera and data manipulations
+    vtkCamera *camera=renderer->GetActiveCamera();
+    renderer->ResetCamera(bds);
+
+    //move plane off data so entire thing is visible
+    origin[0] = bds[0];
+    origin[1] = bds[2];
+    origin[2] = bds[4];
+    plane->SetOrigin(origin[0], origin[1], origin[2]);
+    normal[0] = 1;
+    normal[1] = 0;
+    normal[2] = 0;
+    plane->SetNormal(normal[0],normal[1],normal[2]);
+    for (int p = 1; p < numProcs; ++p)
+      {
+      this->Controller->TriggerRMI
+        (p,(void*)origin,3*sizeof(double),ORIGIN_RMI);
+      this->Controller->TriggerRMI
+        (p,(void*)normal,3*sizeof(double),PLANE_RMI);
+      }        
+
+    this->StartTime(); //start benchmarking Rendering now
+
+    // initial render
+    renWin->Render();
+    this->NoteTime(prm);
+
+    //Change elevation filter's parameter to test color transfer function
+    for (int i=2; i>-1; i--)
+      {
+      cerr << "Color shows " 
+           << ((i==0)?"X":"") 
+           << ((i==1)?"Y":"") 
+           << ((i==2)?"Z":"") << endl;
+
+      segment[0] = 0;
+      segment[1] = 0;
+      segment[2] = 0;
+      segment[3] = 0;
+      segment[4] = 0;
+      segment[5] = 0;
+      segment[i] = bds[i*2+0];
+      segment[i+3] = bds[i*2+1];
+
+      elev->SetLowPoint(segment[0], segment[1], segment[2]);
+      elev->SetHighPoint(segment[3], segment[4], segment[5]);
+      for (int p = 1; p < numProcs; ++p)
+        {
+        this->Controller->TriggerRMI
+          (p,(void*)segment,6*sizeof(double),ELEV_RMI);
+        }        
+      // render
+      renWin->Render();
+      this->NoteTime(prm);
+
+      //Move the camera and render a bunch of frames to measure rerender time
+      //TODO: Make step size configurable
+      double direction = 10.0;
+      if (i==1)
+        {
+        direction = direction * -1.0;
+        }
+      for (int f = 0; f < 36; f++)
+        {        
+        camera->Azimuth(direction);
+        renderer->ResetCameraClippingRange(bds);
+        renWin->Render();
+        this->NoteTime(prm);
+        }
+      }
+
+    //put initial clip plane in the middle of the data...
+    origin[0] = (bds[0]+bds[1])*0.5;
+    origin[1] = (bds[2]+bds[3])*0.5;
+    origin[2] = (bds[4]+bds[5])*0.5;
+    plane->SetOrigin(origin[0], origin[1], origin[2]); //...locally
+    for (int p = 1; p < numProcs; ++p)
+      {
+      this->Controller->TriggerRMI
+        (p,(void*)origin,3*sizeof(double),ORIGIN_RMI); //...and on remotes
+      }
+
+    //Change a clip filter's parameter to measure render setup time
+    for (int i=2; i>-1; i--)
+      {
+      cerr << "Clip off " 
+           << ((i==0)?"X":"") 
+           << ((i==1)?"Y":"") 
+           << ((i==2)?"Z":"") << endl;
+
+      normal[0] = 0;
+      normal[1] = 0;
+      normal[2] = 0;
+      normal[i] = 1;
+      plane->SetNormal(normal[0],normal[1],normal[2]);
+      for (int p = 1; p < numProcs; ++p)
+        {
+        this->Controller->TriggerRMI
+          (p,(void*)normal,3*sizeof(double),PLANE_RMI);
+        }        
+      // render
+      renWin->Render();
+      this->NoteTime(prm);
+
+      //Move the camera and render a bunch of frames to measure rerender time
+      //TODO: Make step size configurable
+      double direction = 10.0;
+      if (i==1)
+        {
+        direction = direction * -1.0;
+        }
+      for (int f = 0; f < 36; f++)
+        {        
+        camera->Azimuth(direction);
+        renderer->ResetCameraClippingRange(bds);
+        renWin->Render();
+        this->NoteTime(prm);
+        }
+      }
+
+    //TODO: should also test with camera zoomed in
+
+    double thresh=10;
+    int i;
+    VTK_CREATE(vtkTesting, testing);
+    for (i = 0; i < this->Argc; ++i)
+      {
+      testing->AddArgument(this->Argv[i]);
+      }
+    
+    if (testing->IsInteractiveModeSpecified())
+      {
+      //Let user manipulate view manually
+      retVal=vtkTesting::DO_INTERACTOR;
+      iren->Start();
+      }
+    else
+      {    
+      //Do an image comparison of last image instead
+      if (testing->IsValidImageSpecified())
+        {
+        renWin->Render();        
+        //TODO: Compare final image against known correct result
+        /*
+        vtkImageData *testImage=renWin->Get>?;
+        retVal=testing->RegressionTest(testImage,thresh);
+        */
+        }
+      else
+        {
+        retVal=vtkTesting::NOT_RUN;
+        }
+      }
+
+    prm->StopServices(); // tells satellites to stop listening.
+    
+    // send the return value to the satellites
+    i=1;
+    while(i<numProcs)
+      {
+      this->Controller->Send(&retVal, 1, i, MY_RETURN_VALUE_MESSAGE);
+      ++i;
+      }
+    iren->Delete();
+
+    cerr << "processes " << processes << endl;
+    cerr << "threads " << threads << endl;
+    cerr << "screensize " << screensize << endl;
+    cerr << "triangles " << triangles << endl;
+    cerr << "render_with " << (useGL?"GL":"Manta") << endl;
+    this->PrintStats();
+    }
+  
+  renWin->Delete();
+  prm->Delete();
+  elev->Delete();
+  plane->Delete();
+  this->ReturnValue=retVal;
+}
+
+int main(int argc, char **argv)
+{
+  // This is here to avoid false leak messages from vtkDebugLeaks when
+  // using mpich. It appears that the root process which spawns all the
+  // main processes waits in MPI_Init() and calls exit() when
+  // the others are done, causing apparent memory leaks for any objects
+  // created before MPI_Init().
+  MPI_Init(&argc, &argv);
+
+  // Note that this will create a vtkMPIController if MPI
+  // is configured, vtkThreadedController otherwise.
+  vtkMPIController *contr = vtkMPIController::New();
+  contr->Initialize(&argc, &argv, 1);
+
+  int retVal = 1; //1==failed
+
+  vtkMultiProcessController::SetGlobalController(contr);
+
+  int numProcs = contr->GetNumberOfProcesses();
+  int me = contr->GetLocalProcessId();
+
+  if (!contr->IsA("vtkMPIController"))
+    {
+    if (me == 0)
+      {
+      cout << "DistributedData test requires MPI" << endl;
+      }
+    contr->Delete();
+    return retVal;
+    }
+
+  MyProcess *p=MyProcess::New();
+  p->SetArgs(argc,argv);
+  
+  contr->SetSingleProcessObject(p);
+  contr->SingleMethodExecute();
+  
+  retVal=p->GetReturnValue();
+  p->Delete();
+  contr->Finalize();
+  contr->Delete();
+
+  return !retVal;
+}
+

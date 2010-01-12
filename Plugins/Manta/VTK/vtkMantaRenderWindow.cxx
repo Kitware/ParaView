@@ -76,7 +76,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <Engine/Control/RTRT.h>
 #include <Engine/Display/SyncDisplay.h>
 
-vtkCxxRevisionMacro(vtkMantaRenderWindow, "1.1");
+vtkCxxRevisionMacro(vtkMantaRenderWindow, "1.2");
 vtkStandardNewMacro(vtkMantaRenderWindow);
 
 //----------------------------------------------------------------------------
@@ -134,11 +134,12 @@ vtkMantaRenderWindow::~vtkMantaRenderWindow()
 
 void vtkMantaRenderWindow::ChangeSize(int width, int height)
 {
+/*
   cerr << endl
        << "vtkMantaRenderWindow::SetSize(): number of renders: "
        << this->Renderers->GetNumberOfItems()  << ", "
        << "window size: (" << width << ", " << height << ")" << endl;
-
+*/
   // no matter if there is any renderer in this render window, we allocate the
   // software buffers
   delete [] this->ColorBuffer;
@@ -182,12 +183,13 @@ void vtkMantaRenderWindow::ChangeSize(int width, int height)
     renderSize[0] = int((renViewport[2] - renViewport[0]) * width  + 0.5f);
     renderSize[1] = int((renViewport[3] - renViewport[1]) * height + 0.5f);
 
+/*
     cerr << endl
          << "vtkMantaRenderWindow::SetSize(): "
          << "layer index #" << mantaRenderer->GetLayer()
          << "; renderer size = (" << renderSize[0] << ", " << renderSize[1]
          << ")" << endl;
-
+*/
     // all renderers need to be re-sized, regardless of the interactive mode
     if (mantaRenderer->GetSyncDisplay())
       {
@@ -233,11 +235,14 @@ void vtkMantaRenderWindow::SetSize( int width, int height )
   // frame with exactly the same size as the current size.
   if (this->Size[0] == width && this->Size[1] == height)
     {
-    //cerr << "Setting to the same size?\n";
+    cerr << "Setting to the same size?\n";
     return;
     }
 
   this->ChangeSize(width, height);
+
+  this->Superclass::SetSize(width, height);
+
 }
 
 #define USE_SSE 0

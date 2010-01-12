@@ -50,5 +50,10 @@ IF (VTK_USE_MPI)
             ${EXECUTABLE_OUTPUT_PATH}/TaskParallelism
             -T ${PROJECT_BINARY_DIR}/Testing/Temporary
             -V ${PROJECT_SOURCE_DIR}/examples/Baseline/ParallelImageCompositing.png )
+
+
+  ADD_EXECUTABLE( MantaBenchmark MantaBenchmark.cxx )
+  TARGET_LINK_LIBRARIES ( MantaBenchmark vtkManta vtkRendering vtkParallel )
+
 ENDIF(VTK_USE_MPI)
 
