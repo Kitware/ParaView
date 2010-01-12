@@ -107,6 +107,12 @@ pqPointSpriteDisplayPanelDecorator::pqPointSpriteDisplayPanelDecorator(
     return;
     }
 
+  if (!pqSMAdaptor::getEnumerationPropertyDomain(
+      reprProxy->GetProperty("Representation")).contains("Point Sprite"))
+    {
+    return;
+    }
+
   this->Internals = new pqInternals(this);
   QVBoxLayout* vlayout = dynamic_cast<QVBoxLayout*> (panel->layout());
   if (vlayout)

@@ -277,7 +277,8 @@ pqTransferFunctionEditor::pqTransferFunctionEditor()
 
 pqTransferFunctionEditor::~pqTransferFunctionEditor()
 {
-
+  delete this->Internals;
+  this->Internals = 0;
 }
 
 void pqTransferFunctionEditor::needReloadGUI()
