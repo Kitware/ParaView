@@ -100,12 +100,6 @@ IF(NOT PV_INSTALL_NO_DEVELOPMENT)
       FILES ${configFiles}
       DESTINATION ${PV_INSTALL_LIB_DIR}
       COMPONENT Development)
-  # This is already done in the CMakeLists file that builds vtkWrapClientServer...
-  # Wrapper exec
-  #INSTALL(
-  #    FILES "${ParaView_BINARY_DIR}/vtkWrapClientServer"
-  #    DESTINATION ${PV_INSTALL_BIN_DIR}
-  #    COMPONENT Development)
 ENDIF(NOT PV_INSTALL_NO_DEVELOPMENT)
 
 # Build vtkClientServer wrappers for VTK kits.
