@@ -979,9 +979,14 @@ FUNCTION(ADD_PARAVIEW_PLUGIN NAME VERSION)
       QT4_WRAP_CPP(tmp ${CMAKE_CURRENT_BINARY_DIR}/${PLUGIN_NAME}_Plugin.h)
       SET (plugin_sources ${plugin_sources} ${tmp})
     ENDIF (plugin_type_gui)
+    
+   if (MSVC)
+      # Do not generate manifests for the plugins - caused issues loading plugins
+      set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} /MANIFEST:NO")
+    endif(MSVC)
 
     IF (PARAVIEW_BUILD_SHARED_LIBS)
-      ADD_LIBRARY(${NAME} SHARED ${GUI_SRCS} ${SM_SRCS} ${ARG_SOURCES} ${plugin_sources})
+      ADD_LIBRARY(${NAME} MODULE ${GUI_SRCS} ${SM_SRCS} ${ARG_SOURCES} ${plugin_sources})
     ELSE (PARAVIEW_BUILD_SHARED_LIBS)
       ADD_LIBRARY(${NAME} ${GUI_SRCS} ${SM_SRCS} ${ARG_SOURCES} ${plugin_sources})
     ENDIF (PARAVIEW_BUILD_SHARED_LIBS)

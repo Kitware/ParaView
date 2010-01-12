@@ -69,9 +69,15 @@ ENDIF (BUILD_TESTING)
 
 #------------------------------------------------------------------------
 # Install Qt 
-SET (qtliblist QTCORE QTGUI QTNETWORK QTXML QTDBUS QTSQL QTHELP QTWEBKIT QTCLUCENE)
+SET (qtliblist QTCORE QTGUI QTNETWORK QTXML QTSQL QTHELP QTWEBKIT QTCLUCENE PHONON QTXMLPATTERNS)
+
+# QTDBUS is Unix only
+IF(NOT WIN32)
+  LIST_APPEND(qtliblist QTDBUS)
+ENDIF(NOT WIN32)  
+
 IF (VTK_USE_QVTK_QTOPENGL)
-  SET (qtliblist ${qtliblist} QTOPENGL)
+  LIST_APPEND(qtliblist QTOPENGL)
 ENDIF (VTK_USE_QVTK_QTOPENGL)
 
 install_qt_libs("${qtliblist}" BrandedRuntime)
