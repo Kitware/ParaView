@@ -21,13 +21,20 @@ ENDIF(VTK_WRAP_TCL)
 # Add main server executables.
 SET(PV_EXE_LIST pvserver pvrenderserver pvdataserver)
 FOREACH(pvexe ${PV_EXE_LIST})
-  ADD_EXECUTABLE(${pvexe}${PV_EXE_SUFFIX} ${pvexe}.cxx)
-  TARGET_LINK_LIBRARIES(${pvexe}${PV_EXE_SUFFIX} ${LIBS})
+  add_executable_with_forwarding(pv_exe_suffix
+    ${pvexe} ${pvexe}.cxx)
+  TARGET_LINK_LIBRARIES(${pvexe}${pv_exe_suffix} ${LIBS})
   # Install exe
   IF(NOT PV_INSTALL_NO_RUNTIME)
-      INSTALL(TARGETS ${pvexe}${PV_EXE_SUFFIX} 
-        DESTINATION ${PV_EXE_INSTALL}
-        COMPONENT Runtime)
+    INSTALL(TARGETS ${pvexe}
+            DESTINATION ${PV_INSTALL_BIN_DIR}
+            COMPONENT Runtime)
+    IF (pv_exe_suffix)
+      # Shared forwarding enabled.
+      INSTALL(TARGETS ${pvexe}${pv_exe_suffix}
+              DESTINATION ${PV_INSTALL_LIB_DIR}
+              COMPONENT Runtime)
+    ENDIF (pv_exe_suffix)
   ENDIF(NOT PV_INSTALL_NO_RUNTIME)
 
 ENDFOREACH(pvexe)
@@ -49,30 +56,18 @@ MARK_AS_ADVANCED(PV_TEST_CLIENT)
 CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/vtkSMTestDriverConfig.h.in
   ${CMAKE_CURRENT_BINARY_DIR}/vtkSMTestDriverConfig.h @ONLY ESCAPE_QUOTES)
 
-ADD_EXECUTABLE(smTestDriver${PV_EXE_SUFFIX} vtkSMTestDriver.cxx)
-TARGET_LINK_LIBRARIES(smTestDriver${PV_EXE_SUFFIX} vtksys)
-IF (NOT PV_INSTALL_NO_RUNTIME)
-  INSTALL(TARGETS smTestDriver${PV_EXE_SUFFIX} 
-    DESTINATION ${PV_EXE_INSTALL}
-    COMPONENT Runtime)
-ENDIF (NOT PV_INSTALL_NO_RUNTIME)
-SET (PV_EXE_LIST ${PV_EXE_LIST} smTestDriver)
+add_executable_with_forwarding(pv_exe_suffix smTestDriver vtkSMTestDriver.cxx)
+TARGET_LINK_LIBRARIES(smTestDriver${pv_exe_suffix} vtksys)
 
-# Add shared link forwarding executables if necessary.
-IF(PV_NEED_SHARED_FORWARD)
-  FOREACH(pvexe ${PV_EXE_LIST})
-    SET(PV_FORWARD_EXE ${pvexe}${PV_EXE_SUFFIX})
-    CONFIGURE_FILE(
-      ${ParaView_SOURCE_DIR}/Servers/Executables/pv-forward.c.in
-      ${CMAKE_CURRENT_BINARY_DIR}/${pvexe}-forward.c
-      @ONLY IMMEDIATE)
-    ADD_EXECUTABLE(${pvexe} ${CMAKE_CURRENT_BINARY_DIR}/${pvexe}-forward.c)
-    ADD_DEPENDENCIES(${pvexe} ${pvexe}${PV_EXE_SUFFIX})
-    IF(NOT PV_INSTALL_NO_RUNTIME)
-        # Install
-        INSTALL(TARGETS ${pvexe}
+IF (NOT PV_INSTALL_NO_RUNTIME)
+  INSTALL(TARGETS smTestDriver
           DESTINATION ${PV_INSTALL_BIN_DIR}
           COMPONENT Runtime)
-    ENDIF(NOT PV_INSTALL_NO_RUNTIME)
-  ENDFOREACH(pvexe)
-ENDIF(PV_NEED_SHARED_FORWARD)
+  IF (pv_exe_suffix)
+    # Shared forwarding enabled.
+    INSTALL(TARGETS smTestDriver${pv_exe_suffix} 
+            DESTINATION ${PV_INSTALL_LIB_DIR}
+            COMPONENT Runtime)
+  ENDIF (pv_exe_suffix)
+ENDIF (NOT PV_INSTALL_NO_RUNTIME)
+

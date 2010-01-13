@@ -70,3 +70,69 @@ MACRO(pv_set_if_not_set name value)
     SET(${name} "${value}")
   ENDIF(NOT DEFINED "${name}")
 ENDMACRO(pv_set_if_not_set)
+
+
+#----------------------------------------------------------------------------
+# Function for adding an executable with support for shared forwarding.
+# Typically, one just uses ADD_EXECUTABLE to add an executable target. However
+# on linuxes when rpath is off, and shared libararies are on, to over come the
+# need for setting the LD_LIBRARY_PATH, we use shared-forwarding. This macro
+# makes it easier to employ shared forwarding if needed. 
+# ARGUMENTS:
+# out_real_exe_suffix -- (out) suffix to be added to the exe-target to locate the
+#                     real executable target when shared forwarding is employed.
+#                     This is empty when shared forwarding is not needed.
+# exe_name        -- (in)  exe target name i.e. the first argument to
+#                    ADD_EXECUTABLE.
+# Any remaining arguments are simply passed on to the ADD_EXECUTABLE call.
+# While writing install rules for this executable. One typically does the
+# following.
+#   INSTALL(TARGETS exe_name
+#           DESTINATION "bin"
+#           COMPONENT Runtime)
+#   IF (pv_exe_suffix)
+#     # Shared forwarding enabled.
+#     INSTALL(TARGETS exe_name${out_real_exe_suffix}
+#             DESTINATION "lib"
+#             COMPONENT Runtime)
+#   ENDIF (pv_exe_suffix)
+#----------------------------------------------------------------------------
+FUNCTION (add_executable_with_forwarding
+            out_real_exe_suffix
+            exe_name)
+  if (NOT DEFINED PV_INSTALL_LIB_DIR)
+    MESSAGE(FATAL_ERROR
+      "PV_INSTALL_LIB_DIR variable must be set before calling add_executable_with_forwarding"
+    )
+  endif (NOT DEFINED PV_INSTALL_LIB_DIR)
+
+  if (NOT DEFINED PV_INSTALL_BIN_DIR)
+    MESSAGE(FATAL_ERROR
+      "PV_INSTALL_BIN_DIR variable must be set before calling add_executable_with_forwarding"
+    )
+  endif (NOT DEFINED PV_INSTALL_BIN_DIR)
+
+  SET(PV_EXE_SUFFIX)
+  IF (BUILD_SHARED_LIBS AND CMAKE_SKIP_RPATH)
+    IF(NOT WIN32)
+      SET(PV_EXE_SUFFIX -real)
+      SET(PV_FORWARD_DIR_BUILD "${EXECUTABLE_OUTPUT_PATH}")
+      SET(PV_FORWARD_DIR_INSTALL "../${PV_INSTALL_LIB_DIR}")
+      SET(PV_FORWARD_PATH_BUILD "\"${PV_FORWARD_DIR_BUILD}\"")
+      SET(PV_FORWARD_PATH_INSTALL "\"${PV_FORWARD_DIR_INSTALL}\"")
+      SET(PV_FORWARD_EXE ${exe_name}${PV_EXE_SUFFIX})
+      CONFIGURE_FILE(
+        ${ParaView_SOURCE_DIR}/Servers/Executables/pv-forward.c.in
+        ${CMAKE_CURRENT_BINARY_DIR}/${exe_name}-forward.c
+        @ONLY IMMEDIATE)
+      add_executable(${exe_name}
+        ${CMAKE_CURRENT_BINARY_DIR}/${exe_name}-forward.c)
+      ADD_DEPENDENCIES(${exe_name} ${exe_name}${PV_EXE_SUFFIX})
+    ENDIF(NOT WIN32)
+  ENDIF (BUILD_SHARED_LIBS AND CMAKE_SKIP_RPATH)
+
+  add_executable(${exe_name}${PV_EXE_SUFFIX} ${ARGN})
+
+  set (${out_real_exe_suffix} "${PV_EXE_SUFFIX}" PARENT_SCOPE)
+ENDFUNCTION (add_executable_with_forwarding)
+          

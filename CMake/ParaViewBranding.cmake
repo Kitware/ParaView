@@ -225,24 +225,29 @@ FUNCTION(build_paraview_client BPC_NAME)
   SET (PV_EXE_LIST ${BPC_NAME})
 
   # needed to set up shared forwarding correctly.
-  ADD_EXECUTABLE(${pv_exe_name} WIN32 ${MAKE_BUNDLE}
+  add_executable_with_forwarding(pv_exe_suffix
+                 ${BPC_NAME} WIN32 ${MAKE_BUNDLE}
                  ${BPC_NAME}_main.cxx
                  ${exe_icon}
                  ${apple_bundle_sources}
                  ${EXE_SRCS}
                  )
+  SET (pv_exe_name ${BPC_NAME}${pv_exe_suffix})
   TARGET_LINK_LIBRARIES(${pv_exe_name}
     pqApplicationComponents
     ${QT_QTMAIN_LIBRARY}
     ${BPC_EXTRA_DEPENDENCIES}
     )
 
-  IF (PV_EXE_INSTALL)
-    # PV_EXE_INSTALL is set to lib-dir when shared forwarding is enabled.
+  INSTALL(TARGETS ${BPC_NAME}
+    DESTINATION ${PV_INSTALL_BIN_DIR}
+    COMPONENT BrandedRuntime)
+  IF (pv_exe_suffix)
+    # Shared forwarding enabled.
     INSTALL(TARGETS ${pv_exe_name}
-          DESTINATION ${PV_EXE_INSTALL} 
+          DESTINATION ${PV_INSTALL_LIB_DIR}
           COMPONENT BrandedRuntime)
-  ENDIF (PV_EXE_INSTALL)
+  ENDIF (pv_exe_suffix)
 
   IF (BPC_MAKE_INITIALIZER_LIBRARY)
     TARGET_LINK_LIBRARIES(${pv_exe_name}
@@ -257,23 +262,4 @@ FUNCTION(build_paraview_client BPC_NAME)
     SET_TARGET_PROPERTIES(${pv_exe_name} PROPERTIES 
       MACOSX_BUNDLE_BUNDLE_NAME "${BPC_APPLICATION_NAME}")
   ENDIF (APPLE)
-
-  # Add shared link forwarding executables if necessary.
-  IF(PV_NEED_SHARED_FORWARD)
-    FOREACH(pvexe ${PV_EXE_LIST})
-      SET(PV_FORWARD_EXE ${pvexe}${PV_EXE_SUFFIX})
-      CONFIGURE_FILE(
-        ${ParaView_SOURCE_DIR}/Servers/Executables/pv-forward.c.in
-        ${CMAKE_CURRENT_BINARY_DIR}/${pvexe}-forward.c
-        @ONLY IMMEDIATE)
-      ADD_EXECUTABLE(${pvexe} ${CMAKE_CURRENT_BINARY_DIR}/${pvexe}-forward.c)
-      ADD_DEPENDENCIES(${pvexe} ${pvexe}${PV_EXE_SUFFIX})
-      IF (PV_INSTALL_BIN_DIR)
-        INSTALL(TARGETS ${pvexe}
-                DESTINATION ${PV_INSTALL_BIN_DIR} 
-                COMPONENT BrandedRuntime)
-      ENDIF (PV_INSTALL_BIN_DIR)
-    ENDFOREACH(pvexe)
-  ENDIF(PV_NEED_SHARED_FORWARD)
-
 ENDFUNCTION(build_paraview_client)

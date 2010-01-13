@@ -120,25 +120,6 @@ IF(NOT PV_INSTALL_DATA_DIR)
 ENDIF(NOT PV_INSTALL_DATA_DIR)
 
 #########################################################################
-# Enable shared link forwarding support if needed.
-SET(PV_EXE_SUFFIX)
-SET(PV_EXE_INSTALL ${PV_INSTALL_BIN_DIR})
-IF(BUILD_SHARED_LIBS AND CMAKE_SKIP_RPATH)
-  IF(NOT WIN32)
-    SET(PV_NEED_SHARED_FORWARD 1)
-    SET(PV_EXE_SUFFIX -real)
-    SET(PV_EXE_INSTALL ${PV_INSTALL_LIB_DIR})
-    SET(PV_FORWARD_DIR_BUILD "${EXECUTABLE_OUTPUT_PATH}")
-    SET(PV_FORWARD_DIR_INSTALL "../${PV_EXE_INSTALL}")
-    SET(PV_FORWARD_PATH_BUILD "\"${PV_FORWARD_DIR_BUILD}\"")
-    SET(PV_FORWARD_PATH_INSTALL "\"${PV_FORWARD_DIR_INSTALL}\"")
-    FOREACH(ldir ${PARAVIEW_EXTRA_LINK_DIRECTORIES})
-      SET(PV_FORWARD_PATH_BUILD "${PV_FORWARD_PATH_BUILD}, \"${ldir}\"")
-      SET(PV_FORWARD_PATH_INSTALL "${PV_FORWARD_PATH_INSTALL}, \"${ldir}\"")
-    ENDFOREACH(ldir)
-  ENDIF(NOT WIN32)
-ENDIF(BUILD_SHARED_LIBS AND CMAKE_SKIP_RPATH)
-
 # Install no development files by default, but allow the user to get
 # them installed by setting PV_INSTALL_DEVELOPMENT to true. 
 OPTION(PARAVIEW_INSTALL_DEVELOPMENT "Install ParaView plugin development files." OFF)
