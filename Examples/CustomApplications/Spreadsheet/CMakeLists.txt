@@ -1,5 +1,10 @@
-INCLUDE(${ParaView_SOURCE_DIR}/CMake/ParaViewBranding.cmake)
-INCLUDE(${ParaView_SOURCE_DIR}/CMake/ParaViewPlugins.cmake)
+cmake_minimum_required(VERSION 2.6)
+
+FIND_PACKAGE(ParaView REQUIRED)
+INCLUDE(${PARAVIEW_USE_FILE})
+
+# Variables that need to be set for installation code to work correctly.
+SET (BUILD_SHARED_LIBS ${PARAVIEW_BUILD_SHARED_LIBS}) # enable shared builds.
 
 SET (SOURCE_FILES
   SpreadSheetMainWindow.cxx
@@ -17,6 +22,7 @@ QT4_WRAP_UI(UI_BUILT_SOURCES
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}
   ${CMAKE_CURRENT_BINARY_DIR})
 
+
 #------------------------------------------------------------------------------
 # Build the client
 build_paraview_client(spreadsheet
@@ -32,4 +38,18 @@ build_paraview_client(spreadsheet
     SOURCES ${SOURCE_FILES} ${MOC_SRCS} ${UI_BUILT_SOURCES}
 )
 
+#------------------------------------------------------------------------
+# Install ParaView client
+build_paraview_client_cpack_config_init(
+    PACKAGE_NAME "SpreadSheet"
+    ORGANIZATION "Kitware Inc."
+    VERSION_MAJOR "1"
+    VERSION_MINOR "0"
+    VERSION_PATCH "0"
+    DESCRIPTION "ParaView is a scientific visualization tool"
+    PACKAGE_EXECUTABLES "spreadsheet;SpreadSheet"
+    LICENSE_FILE ${CMAKE_CURRENT_SOURCE_DIR}/README.txt
+    DESCRIPTION_FILE ${CMAKE_CURRENT_SOURCE_DIR}/README.txt
+)
 
+build_paraview_client_cpack_config()
