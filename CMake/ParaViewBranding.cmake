@@ -75,12 +75,20 @@
 #   # that the executable links against. Otherwise, for sake of simplicity no
 #   # extra library is created.
 #   MAKE_INITIALIZER_LIBRARY
+#   
+#   # Optional to specify the installation prefix for all the binaries.
+#   # "bin" is used if none is specified.
+#   INSTALL_BIN_DIR "bin"
+#
+#   # Optional to specify the installation prefix for all the libraries.
+#   # "lib/appname-major.minor" is used if none is specified (on windows "bin" is used").
+#   INSTALL_LIB_DIR "lib"
 #   )
 # 
 ###############################################################################
 FUNCTION(build_paraview_client BPC_NAME)
   PV_PARSE_ARGUMENTS(BPC 
-    "APPLICATION_NAME;TITLE;ORGANIZATION;SPLASH_IMAGE;VERSION_MAJOR;VERSION_MINOR;VERSION_PATCH;BUNDLE_ICON;APPLICATION_ICON;REQUIRED_PLUGINS;OPTIONAL_PLUGINS;PVMAIN_WINDOW;PVMAIN_WINDOW_INCLUDE;EXTRA_DEPENDENCIES;GUI_CONFIGURATION_XMLS;COMPRESSED_HELP_FILE;SOURCES"
+    "APPLICATION_NAME;TITLE;ORGANIZATION;SPLASH_IMAGE;VERSION_MAJOR;VERSION_MINOR;VERSION_PATCH;BUNDLE_ICON;APPLICATION_ICON;REQUIRED_PLUGINS;OPTIONAL_PLUGINS;PVMAIN_WINDOW;PVMAIN_WINDOW_INCLUDE;EXTRA_DEPENDENCIES;GUI_CONFIGURATION_XMLS;COMPRESSED_HELP_FILE;SOURCES;INSTALL_BIN_DIR;INSTALL_LIB_DIR"
     "MAKE_INITIALIZER_LIBRARY"
     ${ARGN}
     )
@@ -95,6 +103,13 @@ FUNCTION(build_paraview_client BPC_NAME)
   pv_set_if_not_set(BPC_TITLE "${BPC_NAME}")
   pv_set_if_not_set(BPC_APPLICATION_NAME "${BPC_NAME}")
   pv_set_if_not_set(BPC_ORGANIZATION "Humanity")
+  pv_set_if_not_set(BPC_INSTALL_BIN_DIR "bin")
+  IF (WIN32)
+    pv_set_if_not_set(BPC_INSTALL_LIB_DIR "bin")
+  ELSE (WIN32)
+    pv_set_if_not_set(BPC_INSTALL_LIB_DIR
+      "lib/${BPC_NAME}-${BPC_VERSION_MAJOR}.${BPC_VERSION_MINOR}")
+  ENDIF (WIN32)
 
   SET (branding_source_dir "${ParaView_SOURCE_DIR}/CMake")
 
@@ -225,7 +240,10 @@ FUNCTION(build_paraview_client BPC_NAME)
   SET (PV_EXE_LIST ${BPC_NAME})
 
   # needed to set up shared forwarding correctly.
-  add_executable_with_forwarding(pv_exe_suffix
+  add_executable_with_forwarding2(pv_exe_suffix
+                 "${PARAVIEW_LIBRARY_DIRS}"
+                 "../${PARAVIEW_INSTALL_LIB_DIR}"
+                 "${BPC_INSTALL_LIB_DIR}"
                  ${BPC_NAME} WIN32 ${MAKE_BUNDLE}
                  ${BPC_NAME}_main.cxx
                  ${exe_icon}
@@ -240,12 +258,12 @@ FUNCTION(build_paraview_client BPC_NAME)
     )
 
   INSTALL(TARGETS ${BPC_NAME}
-    DESTINATION ${PV_INSTALL_BIN_DIR}
+    DESTINATION ${BPC_INSTALL_BIN_DIR}
     COMPONENT BrandedRuntime)
   IF (pv_exe_suffix)
     # Shared forwarding enabled.
     INSTALL(TARGETS ${pv_exe_name}
-          DESTINATION ${PV_INSTALL_LIB_DIR}
+          DESTINATION ${BPC_INSTALL_LIB_DIR}
           COMPONENT BrandedRuntime)
   ENDIF (pv_exe_suffix)
 

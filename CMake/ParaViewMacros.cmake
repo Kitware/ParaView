@@ -99,27 +99,48 @@ ENDMACRO(pv_set_if_not_set)
 #----------------------------------------------------------------------------
 FUNCTION (add_executable_with_forwarding
             out_real_exe_suffix
-            exe_name)
+            exe_name
+            )
   if (NOT DEFINED PV_INSTALL_LIB_DIR)
     MESSAGE(FATAL_ERROR
       "PV_INSTALL_LIB_DIR variable must be set before calling add_executable_with_forwarding"
     )
   endif (NOT DEFINED PV_INSTALL_LIB_DIR)
 
-  if (NOT DEFINED PV_INSTALL_BIN_DIR)
-    MESSAGE(FATAL_ERROR
-      "PV_INSTALL_BIN_DIR variable must be set before calling add_executable_with_forwarding"
-    )
-  endif (NOT DEFINED PV_INSTALL_BIN_DIR)
+  add_executable_with_forwarding2(out_var "" "" 
+    ${PV_INSTALL_LIB_DIR}
+    ${exe_name} ${ARGN})
+  set (${out_real_exe_suffix} "${out_var}" PARENT_SCOPE)
+ENDFUNCTION(add_executable_with_forwarding)
+
+#----------------------------------------------------------------------------
+FUNCTION (add_executable_with_forwarding2
+            out_real_exe_suffix
+            extra_build_dirs
+            extra_install_dirs
+            install_lib_dir
+            exe_name
+            )
 
   SET(PV_EXE_SUFFIX)
   IF (BUILD_SHARED_LIBS AND CMAKE_SKIP_RPATH)
     IF(NOT WIN32)
+      SET(exe_output_path ${EXECUTABLE_OUTPUT_PATH})
+      IF (NOT EXECUTABLE_OUTPUT_PATH)
+        SET (exe_output_path ${CMAKE_BINARY_DIR})
+      ENDIF (NOT EXECUTABLE_OUTPUT_PATH)
       SET(PV_EXE_SUFFIX -real)
-      SET(PV_FORWARD_DIR_BUILD "${EXECUTABLE_OUTPUT_PATH}")
-      SET(PV_FORWARD_DIR_INSTALL "../${PV_INSTALL_LIB_DIR}")
+      SET(PV_FORWARD_DIR_BUILD "${exe_output_path}")
+      SET(PV_FORWARD_DIR_INSTALL "../${install_lib_dir}")
       SET(PV_FORWARD_PATH_BUILD "\"${PV_FORWARD_DIR_BUILD}\"")
       SET(PV_FORWARD_PATH_INSTALL "\"${PV_FORWARD_DIR_INSTALL}\"")
+      FOREACH(dir ${extra_build_dirs})
+        SET (PV_FORWARD_PATH_BUILD "${PV_FORWARD_PATH_BUILD},\"${dir}\"")
+      ENDFOREACH(dir)
+      FOREACH(dir ${extra_install_dirs})
+        SET (PV_FORWARD_PATH_INSTALL "${PV_FORWARD_PATH_INSTALL},\"${dir}\"")
+      ENDFOREACH(dir)
+
       SET(PV_FORWARD_EXE ${exe_name}${PV_EXE_SUFFIX})
       CONFIGURE_FILE(
         ${ParaView_SOURCE_DIR}/Servers/Executables/pv-forward.c.in
@@ -134,5 +155,5 @@ FUNCTION (add_executable_with_forwarding
   add_executable(${exe_name}${PV_EXE_SUFFIX} ${ARGN})
 
   set (${out_real_exe_suffix} "${PV_EXE_SUFFIX}" PARENT_SCOPE)
-ENDFUNCTION (add_executable_with_forwarding)
+ENDFUNCTION (add_executable_with_forwarding2)
           
