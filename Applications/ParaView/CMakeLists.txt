@@ -77,7 +77,7 @@ IF(NOT WIN32)
 ENDIF(NOT WIN32)  
 
 IF (VTK_USE_QVTK_QTOPENGL)
-  LIST_APPEND(qtliblist QTOPENGL)
+  LIST(APPEND qtliblist QTOPENGL)
 ENDIF (VTK_USE_QVTK_QTOPENGL)
 
 install_qt_libs("${qtliblist}" BrandedRuntime)
