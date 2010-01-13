@@ -54,22 +54,6 @@ MACRO(build_paraview_client_cpack_config_init)
   SET(CPACK_SOURCE_STRIP_FILES OFF)
   SET (CPACK_OUTPUT_CONFIG_FILE
     "${CMAKE_CURRENT_BINARY_DIR}/CPack${BCC_PACKAGE_NAME}Config.cmake")
-    
-  IF(WIN32 AND NOT UNIX)
-    # There is a bug in NSI that does not handle full unix paths properly. Make
-    # sure there is at least one set of four (4) backlasshes.
-    SET(CPACK_PACKAGE_ICON "${ParaView_SOURCE_DIR}/Applications/ParaView\\\\pvIcon.png")
-    SET(CPACK_NSIS_INSTALLED_ICON_NAME "bin\\\\paraview.exe")
-    SET(CPACK_NSIS_DISPLAY_NAME "${CPACK_PACKAGE_INSTALL_DIRECTORY} a cross-platform, open-source visualization system")
-    SET(CPACK_NSIS_PACKAGE_NAME "${CPACK_PACKAGE_INSTALL_DIRECTORY}")
-    SET(CPACK_NSIS_HELP_LINK "http://www.paraview.org")
-    SET(CPACK_NSIS_URL_INFO_ABOUT "http://www.kitware.com")
-    SET(CPACK_NSIS_CONTACT "webmaster@paraview.org")
-    SET(CPACK_NSIS_MODIFY_PATH OFF)
-    SET(CPACK_NSIS_MUI_ICON "${ParaView_SOURCE_DIR}/Applications/ParaView\\\\WinIcon.ico")
-    SET(CPACK_NSIS_MUI_UNIICON "${ParaView_SOURCE_DIR}/Applications/ParaView\\\\WinIcon.ico")
-  
-  ENDIF(WIN32 AND NOT UNIX)
 
   IF (CMAKE_SYSTEM_PROCESSOR MATCHES "unknown")
     SET (CMAKE_SYSTEM_PROCESSOR "x86")
