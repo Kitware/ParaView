@@ -32,6 +32,7 @@
 #include "vtkInformation.h"
 #include "vtkInformationIntegerKey.h"
 #include "vtkInstantiator.h"
+#include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
 #include "vtkPointData.h"
 #include "vtkProcessModuleConnectionManager.h"
@@ -92,7 +93,7 @@ inline bool SetIntVectorProperty(vtkSMProxy* proxy, const char* pname,
 }
 
 //-----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.87");
+vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.88");
 vtkStandardNewMacro(vtkSMRenderViewProxy);
 
 vtkInformationKeyMacro(vtkSMRenderViewProxy, LOD_RESOLUTION, Integer);
@@ -1154,29 +1155,40 @@ int vtkSMRenderViewProxy::WriteImage(const char* filename,
     return vtkErrorCode::UnknownError;
     }
 
-  vtkObject* object = vtkInstantiator::CreateInstance(writerName);
-  if (!object)
-    {
-    vtkErrorMacro("Failed to create Writer " << writerName);
-    return vtkErrorCode::UnknownError;
-    }
-  vtkImageWriter* writer = vtkImageWriter::SafeDownCast(object);
-  if (!writer)
-    {
-    vtkErrorMacro("Object is not a vtkImageWriter: " << object->GetClassName());
-    object->Delete();
-    return vtkErrorCode::UnknownError;
-    }
-
   vtkImageData* shot = this->CaptureWindow(magnification);
-  writer->SetInput(shot);
-  writer->SetFileName(filename);
-  writer->Write();
-  int error_code = writer->GetErrorCode();
 
-  writer->Delete();
+  // This is usually called on a serial client, but if it is called in
+  // a parallel job (for example, while coprocessing for a solver), then
+  // we really only want to write out an image on process 0.
+  int error_code;
+  vtkMultiProcessController *controller
+    = vtkMultiProcessController::GetGlobalController();
+  if (controller->GetLocalProcessId() == 0)
+    {
+    vtkObject* object = vtkInstantiator::CreateInstance(writerName);
+    if (!object)
+      {
+      vtkErrorMacro("Failed to create Writer " << writerName);
+      return vtkErrorCode::UnknownError;
+      }
+    vtkImageWriter* writer = vtkImageWriter::SafeDownCast(object);
+    if (!writer)
+      {
+      vtkErrorMacro("Object is not a vtkImageWriter: "<<object->GetClassName());
+      object->Delete();
+      return vtkErrorCode::UnknownError;
+      }
+
+    writer->SetInput(shot);
+    writer->SetFileName(filename);
+    writer->Write();
+    error_code = writer->GetErrorCode();
+
+    writer->Delete();
+    }
+
   shot->Delete();
-  
+  controller->Broadcast(&error_code, 1, 0);
   return error_code;
 }
 
