@@ -1574,7 +1574,7 @@ void pqPipelineModel::removeConnection(pqPipelineSource *source,
       dynamic_cast<pqPipelineModelFilter *>(this->getModelItemFor(sink));
   if(!sinkItem)
     {
-    qDebug() << "Connection sink not found in the pipeline model.";
+    //qDebug() << "Connection sink not found in the pipeline model.";
     return;
     }
 
