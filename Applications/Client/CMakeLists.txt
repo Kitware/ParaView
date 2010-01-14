@@ -307,6 +307,9 @@ IF(BUILD_TESTING)
           ToolBarPlugin
           ObjectPanelPlugin
           )
+      IF (PARAVIEW_BUILD_PLUGIN_pvblot)
+        SET(PLUGIN_TESTS ${PLUGIN_TESTS} PVBlotTest1)
+      ENDIF (PARAVIEW_BUILD_PLUGIN_pvblot)
 
       FOREACH(test ${PLUGIN_TESTS})
         ADD_TEST(pqClient${test}
