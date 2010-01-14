@@ -58,24 +58,21 @@ OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-// .NAME vtkMantaRenderer - 
-// .SECTION Description
-//
 
 #include "vtkManta.h"
 #include "vtkMantaRenderer.h"
 
+#include "vtkActor.h"
 #include "vtkCuller.h"
 #include "vtkLightCollection.h"
-#include "vtkObjectFactory.h"
-#include "vtkActor.h"
 #include "vtkMantaActor.h"
 #include "vtkMantaCamera.h"
 #include "vtkMantaLight.h"
 #include "vtkMantaProperty.h"
-#include "vtkRenderWindow.h"
 #include "vtkMantaRenderWindow.h"
+#include "vtkObjectFactory.h"
 #include "vtkRendererCollection.h"
+#include "vtkRenderWindow.h"
 #include "vtkTimerLog.h"
 
 #include <Interface/Light.h>
@@ -104,11 +101,9 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkMantaLODActor.h"
 #endif
 
-//#include "vtkPKdTree.h"
-
 #include <vtkstd/string>
 
-vtkCxxRevisionMacro(vtkMantaRenderer, "1.1");
+vtkCxxRevisionMacro(vtkMantaRenderer, "1.2");
 vtkStandardNewMacro(vtkMantaRenderer);
 
 //----------------------------------------------------------------------------
@@ -208,7 +203,6 @@ void vtkMantaRenderer::InitEngine()
     Manta::Color(  Manta::RGBColor( color[0], color[1], color[2] )  )  );
   color = NULL;
   this->MantaScene->setBackground( background );
-
 
   // create empty world group
   this->MantaWorldGroup = new Manta::Group();
