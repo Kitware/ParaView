@@ -225,18 +225,22 @@ void pqBlotShell::promptForInput()
   this->Interpretor->MakeCurrent();
   PyObject *modules = PySys_GetObject(const_cast<char*>("modules"));
   PyObject *pvblotmodule = PyDict_GetItemString(modules, "pvblot");
+  QString newPrompt = ">>> ";
   if (pvblotmodule)
     {
     PyObject *pvblotdict = PyModule_GetDict(pvblotmodule);
-    PyObject *pvblotinterp = PyDict_GetItemString(pvblotdict, "interpreter");
-    PyObject *promptObj = PyObject_GetAttrString(pvblotinterp,
-                                                 const_cast<char*>("prompt"));
-    char *prompt = PyString_AsString(PyObject_Str(promptObj));
-    this->Console->prompt(prompt);
+    if (pvblotdict)
+      {
+      PyObject *pvblotinterp = PyDict_GetItemString(pvblotdict, "interpreter");
+      if (pvblotinterp)
+        {
+        PyObject *promptObj = PyObject_GetAttrString(pvblotinterp,
+                                                   const_cast<char*>("prompt"));
+        newPrompt = PyString_AsString(PyObject_Str(promptObj));
+        }
+      }
     }
-  else
-    {
-    this->Console->prompt(">>> ");
-    }
+
+  this->Console->prompt(newPrompt);
   this->Interpretor->ReleaseControl();
 }
