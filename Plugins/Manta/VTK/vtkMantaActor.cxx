@@ -69,8 +69,9 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkMapper.h"
 #include "vtkMantaRenderWindow.h"
 
-#include "vtkRendererCollection.h"
+#include "vtkDataSet.h"
 #include "vtkObjectFactory.h"
+#include "vtkRendererCollection.h"
 
 #include <Interface/Scene.h>
 #include <Interface/Context.h>
@@ -79,7 +80,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <Model/Groups/Group.h>
 #include <Model/Groups/Mesh.h>
 
-vtkCxxRevisionMacro(vtkMantaActor, "1.1");
+vtkCxxRevisionMacro(vtkMantaActor, "1.2");
 vtkStandardNewMacro(vtkMantaActor);
 
 //----------------------------------------------------------------------------
@@ -334,63 +335,54 @@ void vtkMantaActor::UpdateObjects( vtkRenderer * ren )
 // vtkTexture::Renderer() are called
 void vtkMantaActor::Render( vtkRenderer * ren, vtkMapper * mapper )
 {
-
   if ( vtkMantaRenderer * mantaRenderer = vtkMantaRenderer::SafeDownCast( ren ) )
     {
     // TODO: be smarter on update or create rather than create every time
     // build transformation (with AffineTransfrom and Instance?)
-    if (!this->IsIdentity)
-      {
-      }
 
     // TODO: the way "real FLAT" shading is done right now (by not supplying vertex
     // normals), changing from FLAT to Gouraud shading needs to create a new mesh.
 
-    // If we are using Solid Color and only our property changed, replace the
-    // material in the mesh without generating a new mesh. For Scalar Colormap, we
-    // have to change each vertex's texture coordinates so a new mesh has to be created.
-    if (!(mapper->GetScalarVisibility()) &&
-         (this->GetProperty()->GetMTime() > this->MeshMTime) &&
-        !(mapper->GetMTime() > this->MeshMTime))
-      {
-      // FIXME: thread safety, make sure the engine is idle when we are doing this.
-      // Important: we only remove the pointer to the old material from
-      // the Mesh->materials but not deleting the old material. It was deleted
-      // in the vtkMantaProperty::Render() called before this function.
-      vtkMantaProperty * mantaProperty = vtkMantaProperty::SafeDownCast(this->GetProperty());
-      if (!mantaProperty)
-        return;
 
-      if (this->Mesh)
-        {
-        this->Mesh->materials.erase(this->Mesh->materials.begin());
-        this->Mesh->materials.push_back(mantaProperty->GetMantaMaterial());
-        // do preprocessing for the material since we only update the material and
-        // don't call preprocessing for the actor
-        Manta::PreprocessContext context(mantaRenderer->GetMantaEngine(), 0, 1,
-            mantaRenderer->GetMantaLightSet());
-        mantaProperty->GetMantaMaterial()->preprocess(context);
-        this->MeshMTime.Modified();
-        }
-      }
-    else
-    // NOTE: the use of 'this->IsModified' in the following if-statement is
-    // intended to support visibility toggling (including Center of Rotation
-    // Axes Widget and non-CRAW Manta actors). Specifically, visibility is
-    // toggled ON (from OFF) through an external call to vtkMantaActor::
-    // SetIsModified( true ) in vtkMantaRenderer::UpdateActorsForVisibility().
-    // For any changes related to or potentially affecting 'this->IsModified',
-    // please test visibility toggling.
-    if (mapper->GetMTime() > this->MeshMTime || this->IsModified)
+    //check if anything that affect appearence has changed, if so, rebuild manta
+    //object so we see it. Don't do it every frame, since it is costly.
+    if (mapper->GetInput()->GetMTime() > this->MeshMTime ||
+        mapper->GetMTime() > this->MeshMTime ||
+        this->GetProperty()->GetMTime() > this->MeshMTime ||
+        this->IsModified)
       {
-      // send a render to the mapper; update pipeline
-      mapper->Render(ren, this);
-      // remove old and add newly created geometries to the world of objects
-      if (this->IsModified)
+      if (!(mapper->GetScalarVisibility()))
         {
-        this->MeshMTime.Modified();
-        mantaRenderer->GetMantaEngine() ->addTransaction("update geometry",
+        vtkMantaProperty * mantaProperty =
+          vtkMantaProperty::SafeDownCast(this->GetProperty());
+        if (!mantaProperty)
+          return;
+
+        if (this->Mesh)
+          {
+          this->Mesh->materials.erase(this->Mesh->materials.begin());
+          this->Mesh->materials.push_back(mantaProperty->GetMantaMaterial());
+          // do preprocessing for the material since we only update the material
+          // and don't call preprocessing for the actor
+          Manta::PreprocessContext context
+            (mantaRenderer->GetMantaEngine(), 0, 1,
+             mantaRenderer->GetMantaLightSet());
+          mantaProperty->GetMantaMaterial()->preprocess(context);
+          this->MeshMTime.Modified();
+          }
+        }
+      else
+        {
+        // send a render to the mapper to update pipeline
+        mapper->Render(ren, this);
+
+        // remove old and add newly created geometries to the world of objects
+        if (this->IsModified)
+          {
+          this->MeshMTime.Modified();
+          mantaRenderer->GetMantaEngine() ->addTransaction("update geometry",
             Manta::Callback::create(this, &vtkMantaActor::UpdateObjects, ren));
+          }
         }
       }
     }
