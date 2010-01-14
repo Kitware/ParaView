@@ -4,6 +4,11 @@
 SET(PYMODULES
   blotish.py
   pvblot.py
+  blot_common.py
+  number_list_parser.py
+  tplot.py
+  async_io_helper.py
+  timestep_selection.py
   )
 
 SET(MOC_HEADERS
@@ -62,11 +67,17 @@ ENDIF (PARAVIEW_BUILD_QT_GUI)
 GET_TARGET_PROPERTY(PVBLOT_PVPYTHON_EXECUTABLE pvpython LOCATION)
 SET(PVBLOT_BLOTISH_PATH "${CMAKE_CURRENT_SOURCE_DIR}")
 
+SET(script_extension)
+IF(WIN32 AND NOT CYGWIN)
+  SET(script_ext ".bat")
+ENDIF(WIN32 AND NOT CYGWIN)
+
 CONFIGURE_FILE(
-  "${CMAKE_CURRENT_SOURCE_DIR}/pvblot.in"
-  "${EXECUTABLE_OUTPUT_PATH}/pvblot"
+  "${CMAKE_CURRENT_SOURCE_DIR}/pvblot${script_exe}.in"
+  "${EXECUTABLE_OUTPUT_PATH}/pvblot${script_exe}"
   @ONLY
   )
+
 
 #############################################################################
 # Set up pvblot script for when ParaView is installed.  This includes
@@ -79,14 +90,16 @@ INSTALL(
 SET(PVBLOT_PVPYTHON_EXECUTABLE "${CMAKE_INSTALL_PREFIX}/${PV_INSTALL_BIN_DIR}/pvpython${PV_EXE_SUFFIX}")
 SET(PVBLOT_BLOTISH_PATH "${CMAKE_INSTALL_PREFIX}/${PV_INSTALL_LIB_DIR}")
 
+
 CONFIGURE_FILE(
-  "${CMAKE_CURRENT_SOURCE_DIR}/pvblot.in"
-  "${ParaView_BINARY_DIR}/CMake/tmp/pvblot"
+  "${CMAKE_CURRENT_SOURCE_DIR}/pvblot${script_exe}.in"
+  "${ParaView_BINARY_DIR}/CMake/tmp/pvblot${script_exe}"
   @ONLY
   )
 
+
 INSTALL(
-  FILES "${ParaView_BINARY_DIR}/CMake/tmp/pvblot"
+  FILES "${ParaView_BINARY_DIR}/CMake/tmp/pvblot${script_exe}"
   DESTINATION ${PV_INSTALL_BIN_DIR}
   PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE
   )

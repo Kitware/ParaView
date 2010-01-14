@@ -62,6 +62,10 @@ public slots:
   virtual void executeBlotCommand(const QString &command);
   virtual void echoExecuteBlotCommand(const QString &command);
 
+  // Description:
+  // Takes a filename of a blot script and executes it.
+  virtual void executeBlotScript(const QString &filename);
+
   virtual void printStderr(const QString &text);
   virtual void printStdout(const QString &text);
   virtual void printMessage(const QString &text);

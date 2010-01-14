@@ -91,6 +91,30 @@ void pqBlotDialog::open(const QStringList &filenames)
   this->open(filenames[0]);
 }
 
+//-----------------------------------------------------------------------------
+void pqBlotDialog::runScript()
+{
+  QString filters = tr("BLOT Script (*.blot *.bl);;All files (*)");
+  pqFileDialog *const dialog = new pqFileDialog(NULL, this,
+                                                tr("Run BLOT Script"),
+                                                QString(), filters);
+
+  dialog->setObjectName("BLOTShellRunScriptDialog");
+  dialog->setFileMode(pqFileDialog::ExistingFiles);
+  QObject::connect(dialog, SIGNAL(filesSelected(const QStringList &)),
+                   this, SLOT(runScript(const QStringList &)));
+  dialog->show();
+}
+
+//-----------------------------------------------------------------------------
+void pqBlotDialog::runScript(const QStringList &files)
+{
+  foreach (QString filename, files)
+    {
+    this->ui->shellWidget->executeBlotScript(filename);
+    }
+}
+
 //=============================================================================
 pqBlotDialogExecuteAction::pqBlotDialogExecuteAction(QObject *p,
                                                      const QString &c)
