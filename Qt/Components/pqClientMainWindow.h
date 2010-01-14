@@ -50,6 +50,7 @@ class PQCOMPONENTS_EXPORT pqClientMainWindow :
   public QMainWindow
 {
   Q_OBJECT
+  Q_PROPERTY(QString TestDirectory READ getTestDirectory);
 
 public:
   pqClientMainWindow();
@@ -62,6 +63,9 @@ public:
 
   /// Applications can use this to get rid of selection menu
   void disableSelections();
+
+  /// Return the testing temporary directory, calls pqCoreTestUtility::TestDirectory().
+  QString getTestDirectory();
 
 public slots:
   QVariant findToolBarActionsNotInMenus();
