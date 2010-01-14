@@ -33,18 +33,30 @@ FUNCTION (add_pv_test prefix skip_test_flag_suffix)
         # pop test name from the top.
         list(GET ACT_TEST_SCRIPTS 0 test)
         list(REMOVE_AT ACT_TEST_SCRIPTS 0)
-        
         GET_FILENAME_COMPONENT(test_name ${test} NAME_WE)
-        if (NOT ${test_name}${skip_test_flag_suffix})
-          set (full_test_name "${full_test_name}.${test_name}")
-          set (extra_args ${extra_args} "--test-script=${test}")
-          process_args(extra_args)
-        endif (NOT ${test_name}${skip_test_flag_suffix})
+
+        # If this is "break" test, make sure that no other tests were already
+        # added.
+        if (${counter} GREATER 0)
+          if (${test_name}_BREAK)
+            set (counter 100000) # stop the group;
+            # push the test back into the list.
+            list(INSERT ACT_TEST_SCRIPTS 0 ${test})
+          endif (${test_name}_BREAK)
+        endif (${counter} GREATER 0)
+        
+        if (${counter} LESS 100000)
+          if (NOT ${test_name}${skip_test_flag_suffix})
+            set (full_test_name "${full_test_name}.${test_name}")
+            set (extra_args ${extra_args} "--test-script=${test}")
+            process_args(extra_args)
+          endif (NOT ${test_name}${skip_test_flag_suffix})
+        endif (${counter} LESS 100000)
       endif (num_tests)
       math(EXPR counter "${counter} + 1")
-      if (${test_name}_BREAK)
+      if (DEFINED ${test_name}_BREAK)
         set (counter 100000) # stop the group.
-      endif (${test_name}_BREAK)
+      endif (DEFINED ${test_name}_BREAK)
     endwhile (${counter} LESS ${TEST_GROUP_SIZE})
 
     if (extra_args)

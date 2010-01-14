@@ -12,6 +12,9 @@ SET (TESTS_WITH_BASELINES
 # Disable client test, only for remote connections.
 SET (DisconnectAndSaveAnimation_DISABLE_C TRUE)
 SET (DisconnectAndSaveAnimation_DISABLE_CRS TRUE)
+set (FileSeries_BREAK TRUE)
+set (DisconnectAndSaveAnimation_BREAK TRUE)
+set (LoadStateMultiView_BREAK TRUE)
 
 # Set image threshold overrides for the tests.
 SET(SaveLargeScreenshot_THRESHOLD 10000)

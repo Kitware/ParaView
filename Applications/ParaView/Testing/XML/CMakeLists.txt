@@ -95,6 +95,8 @@ set (ColorEditor1_BREAK TRUE)
 set (ColorEditor2_BREAK TRUE)
 set (ColorEditor3_BREAK TRUE)
 set (ColorEditor4_BREAK TRUE)
+set (ReadXMLPolyDataFileSeries_BREAK TRUE)
+
 
 # Add image threshold overrides for tests.
 # Generally all tests with wireframes need higher thresholds.
