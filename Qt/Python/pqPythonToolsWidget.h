@@ -70,6 +70,7 @@ protected slots:
   // Trace tab
   void onStartTraceClicked();
   void onStopTraceClicked();
+  void onTraceStateClicked();
   void onShowTraceClicked();
   void onSaveTraceClicked();
   void onEditTraceClicked();

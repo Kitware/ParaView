@@ -20,6 +20,7 @@ def reset_trace_globals():
   trace_globals.trace_output = ["try: paraview.simple\nexcept: from paraview.simple import *\n"]
   trace_globals.trace_output_endblock = "Render()"
   trace_globals.traced_proxy_groups = ["sources", "representations", "views", \
+                                       "implicit_functions", "piecewise_functions",
                                        "lookup_tables", "scalar_bars"]
   trace_globals.ignored_view_properties = ["ViewSize", "GUISize", "ViewPosition", \
                                            "ViewTime", "Representations"]
@@ -226,6 +227,15 @@ def get_property_value_from_list_domain(proxyInfo, propInfo):
             info = proxy_trace_info(proxyPropertyValue, "helpers", pythonProp.Available[i])
           info.PyVariable = "%s.%s" % (proxyInfo.PyVariable, propInfo.PyVariable)
           trace_globals.registered_proxies.append(info)
+
+          # If capture_all_properties, record all the properties of this proxy
+          if trace_globals.capture_all_properties:
+            itr = servermanager.PropertyIterator(proxyPropertyValue)
+            for prop in itr:
+              if prop.GetInformationOnly() or prop.GetIsInternal(): continue
+              trace_property_modified(info, prop)
+
+
           return "\"%s\"" % pythonProp.Available[i]
   return None
 
@@ -261,6 +271,7 @@ def trace_proxy_rename(proxy_info, new_name):
   if not proxy_info or proxy_info.Group != "sources": return
   old_pyvariable = proxy_info.PyVariable
   proxy_info.PyVariable = pyvariable_from_proxy_name(new_name)
+  if proxy_info.PyVariable == old_pyvariable: return
   proxy_info.ignore_next_unregister = True
   name_to_set = new_name.replace("\"", "")
   trace_globals.trace_output.append("RenameSource(\"%s\", %s)" % (name_to_set, old_pyvariable))
@@ -378,12 +389,21 @@ def append_trace():
         extraCtorCommands = "GetRenderView().Representations.append(%s)" % info.PyVariable
 
       if info.Group == "views":
-        ctorMethod = "CreateRenderView"
+        if info.Proxy.GetXMLLabel() == "XYPlotView":
+          ctorMethod = "CreateXYPlotView"
+        elif info.Proxy.GetXMLLabel() == "BarChartView":
+          ctorMethod = "CreateBarChartView"
+        else:
+          ctorMethod = "CreateRenderView"
+
         # Now track it as the last active view
         trace_globals.last_active_view = info.Proxy
         setPropertiesInCtor = False
       if info.Group == "lookup_tables":
         ctorMethod = "CreateLookupTable"
+
+      if info.Group == "piecewise_functions":
+        ctorMethod = "CreatePiecewiseFunction"
 
 
       if setPropertiesInCtor:
