@@ -1959,26 +1959,31 @@ def CreateRenderView(connection=None, **extraArgs):
     is not specified, then the active connection is used, if available.
 
     This method can also be used to initialize properties by passing
-    keyword arguments where the key is the name of the property.In addition
+    keyword arguments where the key is the name of the property. In addition
     registrationGroup and registrationName (optional) can be specified (as
     keyword arguments) to automatically register the proxy with the proxy
     manager."""
+    return _create_view("RenderView", connection, **extraArgs)
 
+def _create_view(view_xml_name, connection=None, **extraArgs):
+    """Creates a view on the particular connection. If connection
+    is not specified, then the active connection is used, if available.
+    This method can also be used to initialize properties by passing
+    keyword arguments where the key is the name of the property."""
     if not connection:
         connection = ActiveConnection
     if not connection:
-        raise RuntimeError, "Cannot create render window without connection."
+        raise RuntimeError, "Cannot create view without connection."
     pxm = ProxyManager()
-    prototype = pxm.GetPrototypeProxy("views", "RenderView")
-
+    prototype = pxm.GetPrototypeProxy("views", view_xml_name)
     proxy_xml_name = prototype.GetSuggestedViewType(connection.ID)
-    ren_module = None
+    view_module = None
     if proxy_xml_name:
-        ren_module = CreateProxy("views", proxy_xml_name, connection)
-    if not ren_module:
+        view_module = CreateProxy("views", proxy_xml_name, connection)
+    if not view_module:
         return None
-    extraArgs['proxy'] = ren_module
-    proxy = rendering.__dict__[ren_module.GetXMLName()](**extraArgs)
+    extraArgs['proxy'] = view_module
+    proxy = rendering.__dict__[view_module.GetXMLName()](**extraArgs)
     return proxy
 
 def GetRepresentation(aProxy, view):
@@ -2006,7 +2011,7 @@ def CreateRepresentation(aProxy, view, **extraArgs):
     if not aProxy:
         raise RuntimeError, "proxy argument cannot be None."
     if not view:
-        raise RuntimeError, "render module argument cannot be None."
+        raise RuntimeError, "view argument cannot be None."
     if "proxyName" in extraArgs:
       display = CreateProxy("representations", extraArgs['proxyName'], None)
       del extraArgs['proxyName']
@@ -2237,21 +2242,31 @@ def AnimateReader(reader, view, filename=None):
         scene.Play()
     return scene
 
-def ToggleProgressPrinting():
+def GetProgressPrintingIsEnabled():
+    return progressObserverTag is not None
+
+def SetProgressPrintingEnabled(value):
     """Turn on/off printing of progress (by default, it is on). You can
     always turn progress off and add your own observer to the process
     module to handle progress in a custom way. See _printProgress for
     an example event observer."""
     global progressObserverTag
 
-    if fromGUI:
-        raise RuntimeError, "Printing progress in the GUI is not supported."
-    if progressObserverTag:
+    # If value is true and progress printing is currently off...
+    if value and not GetProgressPrintingIsEnabled():
+        if fromGUI:
+            raise RuntimeError("Printing progress in the GUI is not supported.")
+        progressObserverTag = vtkProcessModule.GetProcessModule().AddObserver(\
+            "ProgressEvent", _printProgress)
+
+    # If value is false and progress printing is currently on...
+    elif GetProgressPrintingIsEnabled():
         vtkProcessModule.GetProcessModule().RemoveObserver(progressObserverTag)
         progressObserverTag = None
-    else:
-        progressObserverTag = vtkProcessModule.GetProcessModule().AddObserver(\
-             "ProgressEvent", _printProgress)
+
+def ToggleProgressPrinting():
+    """Turn on/off printing of progress.  See SetProgressPrintingEnabled."""
+    SetProgressPrintingEnabled(not GetProgressPrintingIsEnabled())
 
 def Finalize():
     """Although not required, this can be called at exit to cleanup."""
