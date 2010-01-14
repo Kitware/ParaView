@@ -113,7 +113,7 @@ class _PVBlotInterp(cmd.Cmd):
         try:
             command = self.get_unique_command(command_name)
             print command.__doc__
-        except blotish.BlotishError as err:
+        except blotish.BlotishError, err:
             blot_common.print_blot_error(err)
 
     def do_exit(self, args):
@@ -141,7 +141,7 @@ class _PVBlotInterp(cmd.Cmd):
         input is not used at all then return false."""
         ret = True
         try: ret = blotish._handle_input(s)
-        except Exception as err:
+        except Exception, err:
             self.handle_exception(err)
 
         # Update the prompt, some commands cause the prompt to change
@@ -165,7 +165,7 @@ class _PVBlotInterp(cmd.Cmd):
         try:
             command = self.get_unique_command(args[0])
             command(*args[1:])
-        except Exception as err:
+        except Exception, err:
             self.handle_exception(err)
 
         # Update the prompt, some commands cause the prompt to change
@@ -235,7 +235,7 @@ def execute_file(filename):
     This can only be called after calling initialize()"""
     try:
         f = open(filename, 'r')
-    except IOError as err:
+    except IOError, err:
         print "Could not open file", filename
         return
     blotish._set_interactive(False)
@@ -256,7 +256,7 @@ def start(data_file, script_file=None):
     # Try to start up the interpreter
     try:
         initialize(data_file)
-    except blotish.BlotishError as err:
+    except blotish.BlotishError, err:
         blot_common.print_blot_error(err)
         return
 

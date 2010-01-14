@@ -80,7 +80,7 @@ class _helper(object):
     def _next(self):
         try: self._output = self._generator.next()
         except StopIteration: self._clear()
-        except Exception as err:
+        except Exception, err:
 
             # Uncomment for debugging.
             #import sys
