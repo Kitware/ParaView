@@ -5319,29 +5319,56 @@
         </Documentation>
       </StringVectorProperty>
 
+      <StringVectorProperty name="DimensionInfo"
+                            command="GetAllDimensions"
+                            information_only="1">
+        <StringArrayHelper />
+      </StringVectorProperty>
+
+      <StringVectorProperty name="Dimensions"
+                            command="SetDimensions"
+                            number_of_elements="1"
+                            animatelable="0">
+        <StringListDomain name="array_list">
+          <RequiredProperties>
+            <Property name="DimensionInfo" function="ArrayList" />
+          </RequiredProperties>
+        </StringListDomain>
+        <Documentation>
+          Load the grid with the given dimensions.  Any arrays that conform
+          to these dimensions will be loaded.
+        </Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="VariableDimensionInfo"
+                            command="GetVariableDimensions"
+                            information_only="1">
+        <StringArrayHelper />
+      </StringVectorProperty>
+
       <StringVectorProperty name="VariableArrayInfo"
                             information_only="1">
         <ArraySelectionInformationHelper attribute_name="Variable"/>
       </StringVectorProperty>
 
-      <StringVectorProperty name="VariableArrayStatus"
-                            command="SetVariableArrayStatus"
-                            number_of_elements="0"
-                            repeat_command="1"
-                            number_of_elements_per_command="2"
-                            element_types="2 0"
-                            information_property="VariableArrayInfo"
-                            label="Variables">
-        <ArraySelectionDomain name="array_list">
-          <RequiredProperties>
-            <Property name="VariableArrayInfo" function="ArrayList" />
-          </RequiredProperties>
-        </ArraySelectionDomain>
-        <Documentation>
-          This property lists which netCDF variables to load.
-        </Documentation>
-      </StringVectorProperty>
-
+      <!-- <StringVectorProperty name="VariableArrayStatus" -->
+      <!--                       command="SetVariableArrayStatus" -->
+      <!--                       number_of_elements="0" -->
+      <!--                       repeat_command="1" -->
+      <!--                       number_of_elements_per_command="2" -->
+      <!--                       element_types="2 0" -->
+      <!--                       information_property="VariableArrayInfo" -->
+      <!--                       label="Variables"> -->
+      <!--   <ArraySelectionDomain name="array_list"> -->
+      <!--     <RequiredProperties> -->
+      <!--       <Property name="VariableArrayInfo" function="ArrayList" /> -->
+      <!--     </RequiredProperties> -->
+      <!--   </ArraySelectionDomain> -->
+      <!--   <Documentation> -->
+      <!--     This property lists which netCDF variables to load. -->
+      <!--   </Documentation> -->
+      <!-- </StringVectorProperty> -->
+ 
       <IntVectorProperty name="SphericalCoordinates"
                          command="SetSphericalCoordinates"
                          animateable="0"

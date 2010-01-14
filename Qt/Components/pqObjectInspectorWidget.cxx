@@ -60,6 +60,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqExtractCTHPartsPanel.h"
 #include "pqGlyphPanel.h"
 #include "pqLoadedFormObjectPanel.h"
+#include "pqNetCDFPanel.h"
 #include "pqObjectBuilder.h"
 #include "pqObjectPanelInterface.h"
 #include "pqParticleTracerPanel.h"
@@ -155,10 +156,14 @@ public:
         {
         return new pqXDMFPanel(proxy, p);
         }
+      if(QString("netCDFReader") == proxy->getProxy()->GetXMLName())
+        {
+        return new pqNetCDFPanel(proxy, p);
+        }
 #ifdef PARAVIEW_USE_SILO
       if(QString("SiloReader") == proxy->getProxy()->GetXMLName())
         {
-        return new pqSiloPanel(proxy, p);
+ 50
         }
 #endif
       }
@@ -191,6 +196,7 @@ public:
       {
       if (QString("ExodusIIReader") == proxy->getProxy()->GetXMLName() ||
          QString("ExodusRestartReader") == proxy->getProxy()->GetXMLName() ||
+         QString("netCDFReader") == proxy->getProxy()->GetXMLName() ||
 #ifdef PARAVIEW_USE_SILO
          QString("SiloReader") == proxy->getProxy()->GetXMLName() ||
 #endif
