@@ -64,7 +64,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <pqVCRController.h>
 #include <pqViewManager.h>
 #include <pqViewMenu.h>
-#include <pqHelpWindow.h>
+//#include <pqHelpWindow.h>
 #include <pqCoreTestUtility.h>
 
 // Include pqPythonManager when compiled with python support

@@ -22,8 +22,11 @@
 #include "pqBlotDialog.h"
 
 #include "pqApplicationCore.h"
+#include "pqFileDialog.h"
 #include "pqSettings.h"
 
+#include <QFile>
+#include <QtDebug>
 #include <QToolBar>
 
 #include "ui_pqBlotDialog.h"
@@ -43,6 +46,8 @@ pqBlotDialog::pqBlotDialog(QWidget *p) : QDialog(p)
   toolbar->addAction(this->ui->actionWireframe);
   toolbar->addAction(this->ui->actionSolid);
 
+  QObject::connect(this->ui->runScript, SIGNAL(clicked()),
+                   this, SLOT(runScript()));
   QObject::connect(this->ui->close, SIGNAL(clicked()),
                    this, SLOT(accept()));
 

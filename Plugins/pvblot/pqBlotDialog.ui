@@ -1,7 +1,8 @@
-<ui version="4.0" >
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
  <class>pqBlotDialog</class>
- <widget class="QDialog" name="pqBlotDialog" >
-  <property name="geometry" >
+ <widget class="QDialog" name="pqBlotDialog">
+  <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
@@ -9,22 +10,29 @@
     <height>395</height>
    </rect>
   </property>
-  <property name="windowTitle" >
+  <property name="windowTitle">
    <string>Dialog</string>
   </property>
-  <layout class="QVBoxLayout" >
+  <layout class="QVBoxLayout">
    <item>
-    <widget class="pqBlotShell" name="shellWidget" />
+    <widget class="pqBlotShell" name="shellWidget"/>
    </item>
    <item>
-    <widget class="QWidget" native="1" name="buttons" >
-     <layout class="QHBoxLayout" >
+    <widget class="QWidget" name="buttons" native="true">
+     <layout class="QHBoxLayout">
+      <item>
+       <widget class="QPushButton" name="runScript">
+        <property name="text">
+         <string>Run Script</string>
+        </property>
+       </widget>
+      </item>
       <item>
        <spacer>
-        <property name="orientation" >
+        <property name="orientation">
          <enum>Qt::Horizontal</enum>
         </property>
-        <property name="sizeHint" >
+        <property name="sizeHint" stdset="0">
          <size>
           <width>141</width>
           <height>20</height>
@@ -33,8 +41,8 @@
        </spacer>
       </item>
       <item>
-       <widget class="QPushButton" name="close" >
-        <property name="text" >
+       <widget class="QPushButton" name="close">
+        <property name="text">
          <string>Close</string>
         </property>
        </widget>
@@ -43,19 +51,21 @@
     </widget>
    </item>
   </layout>
-  <action name="actionWireframe" >
-   <property name="icon" >
-    <iconset resource="pvblot.qrc" >:/pvblot/Icons/Wireframe.png</iconset>
+  <action name="actionWireframe">
+   <property name="icon">
+    <iconset resource="pvblot.qrc">
+     <normaloff>:/pvblot/Icons/Wireframe.png</normaloff>:/pvblot/Icons/Wireframe.png</iconset>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>Wireframe</string>
    </property>
   </action>
-  <action name="actionSolid" >
-   <property name="icon" >
-    <iconset resource="pvblot.qrc" >:/pvblot/Icons/Solid.png</iconset>
+  <action name="actionSolid">
+   <property name="icon">
+    <iconset resource="pvblot.qrc">
+     <normaloff>:/pvblot/Icons/Solid.png</normaloff>:/pvblot/Icons/Solid.png</iconset>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>Solid</string>
    </property>
   </action>
@@ -68,7 +78,7 @@
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="pvblot.qrc" />
+  <include location="pvblot.qrc"/>
  </resources>
  <connections/>
 </ui>

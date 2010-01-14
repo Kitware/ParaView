@@ -44,6 +44,3 @@ def make_name_valid(name):
     if not name[0].isalpha():
         name = 'a' + name
     return name
-
->>>>>>> 412ce2c... ENH: Add new python module smstate.  This module uses the smtrace module to trace all the currently registered proxies, effectively saving state as a python script.  The new feature is found in the Trace tab in the python shell.  Click 'Trace State' to grab the state, then click 'Save Trace' to save it to disk.  ENH: smtrace and smstate now work with piecewise functions, this allows trace/state to correctly capture display properties for volume renderings.  ENH: smtrace knows about chart views and representations, still some bugs that must be hand corrected in the generated python.:Utilities/VTKPythonWrapping/paraview/__init__.py
-        

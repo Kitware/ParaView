@@ -66,7 +66,8 @@ void PVBlotPluginActions::startPVBlot()
   // Allow the user to pick a file, and then send that to create a new
   // blot window.
   QString filter =
-    "Exodus Files (*.g *.e *.ex2 *.ex2v2 *.exo *.gen *.exoII *.0 *.00 *.000 *.0000 *.exii);"
+    "Exodus Files (*.g *.e *.ex2 *.ex2v2 *.exo *.gen *.exoII *.0 *.00 *.000 *.0000 *.exii);;"
+    "SpyPlot CTH Files (*.spcth *.0);;"
     "All Files (*)";
     
   pqFileDialog *fdialog = new pqFileDialog(server, this->mainWindow(),
@@ -74,12 +75,6 @@ void PVBlotPluginActions::startPVBlot()
                                            filter);
   fdialog->setAttribute(Qt::WA_DeleteOnClose);
   fdialog->setFileMode(pqFileDialog::ExistingFile);
-  QObject::connect(fdialog, SIGNAL(fileAccepted(const QString &)),
-                   this, SLOT(startPVBlot(const QString &)));
-  // If you want to catch double-clicks on files as accepting, you also have to
-  // receive a filesSelected signal.  IMHO, this is stupid.  We just want the
-  // file the user chose.  We don't care whether they double-clicked on it or
-  // hit the accept button.
   QObject::connect(fdialog, SIGNAL(filesSelected(const QStringList &)),
                    this, SLOT(startPVBlot(const QStringList &)));
   fdialog->show();

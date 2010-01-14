@@ -48,6 +48,8 @@ public:
 public slots:
   virtual void open();
   virtual void open(const QString &filename);
+  virtual void runScript();
+  virtual void runScript(const QStringList &files);
 
 protected slots:
   virtual void open(const QStringList &filenames);

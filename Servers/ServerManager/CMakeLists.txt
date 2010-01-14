@@ -146,6 +146,7 @@ SET(Kit_SRCS
   vtkSMPVRepresentationProxy.cxx
   vtkSMPWriterProxy.cxx
   vtkSMRampKeyFrameProxy.cxx
+  vtkSMReaderFactory.cxx
   vtkSMRenderViewHelper.cxx
   vtkSMRenderViewProxy.cxx
   vtkSMRenderViewExporterProxy.cxx
