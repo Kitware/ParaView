@@ -88,7 +88,6 @@ public:
   //Description:
   //Overridden to synchronize viewport changes with Manta engine
   virtual void SetSize(int,int);
-  void ChangeSize(int width, int height);
 
   //Description:
   //Rest are overridden to support parallel depth compositing, while avoiding

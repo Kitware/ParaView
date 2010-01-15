@@ -73,7 +73,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <Engine/Control/RTRT.h>
 #include <Engine/Display/SyncDisplay.h>
 
-vtkCxxRevisionMacro(vtkMantaRenderWindow, "1.3");
+vtkCxxRevisionMacro(vtkMantaRenderWindow, "1.4");
 vtkStandardNewMacro(vtkMantaRenderWindow);
 
 //----------------------------------------------------------------------------
@@ -124,109 +124,12 @@ vtkMantaRenderWindow::~vtkMantaRenderWindow()
   ren = NULL;
 
   delete [] this->ColorBuffer;
-  this->ColorBuffer = 0;
+  this->ColorBuffer = NULL;
   delete [] this->DepthBuffer;
-  this->DepthBuffer = 0;
+  this->DepthBuffer = NULL;
 }
 
 //------------------------------------------------------------------------------
-void vtkMantaRenderWindow::ChangeSize(int width, int height)
-{
-/*
-  cerr << endl
-       << "vtkMantaRenderWindow::SetSize(): number of renders: "
-       << this->Renderers->GetNumberOfItems()  << ", "
-       << "window size: (" << width << ", " << height << ")" << endl;
-*/
-  // no matter if there is any renderer in this render window, we allocate the
-  // software buffers
-  delete [] this->ColorBuffer;
-  this->ColorBuffer = new uint32[width*height];
-  delete [] this->DepthBuffer;
-  this->DepthBuffer = new float[width*height];
-
-  if (this->Renderers->GetNumberOfItems() == 0)
-    {
-    // Chicken/Egg problem, SetSize() may be called before AddRenderer() is
-    // called thus there is no renderer.
-    return;
-    }
-
-  this->Renderers->InitTraversal();
-  for ( vtkRenderer *ren  = this->Renderers->GetNextItem();
-        ren != NULL;
-        ren  = this->Renderers->GetNextItem() )
-    {
-    vtkMantaRenderer * mantaRenderer = NULL;
-    if ( (mantaRenderer = vtkMantaRenderer::SafeDownCast(ren)) == 0 )
-        {
-        // in multi-renderer case, ren may not be a vtkMantaRenderer, skip
-        continue;
-        }
-
-    // compute an up-to-date size for the renderer and do NOT always trust
-    // vtkRenderer::GetSize() that may return an obsolete size upon
-    // window shrinking, at lease when the size of layer #1 is proportional
-    // to that of the render window through vtkRenderer::SetViewport() upon
-    // the initialization of the renderer (as in the "multiRen" example)
-    //
-    // TODO: for ParaView, the size of the annotation layer might not be
-    //       determined by vtkRenderer::Get/SetViewport(). Any way, make sure
-    //       we get a really correct size here for the renderer
-    //
-    // the following scheme works with the "multiRen" example, in support of
-    // both layer #0 and layer #1 for proper window re-sizing
-    double * renViewport = mantaRenderer->GetViewport();
-    int renderSize[2];
-    renderSize[0] = int((renViewport[2] - renViewport[0]) * width  + 0.5f);
-    renderSize[1] = int((renViewport[3] - renViewport[1]) * height + 0.5f);
-
-/*
-    cerr << endl
-         << "vtkMantaRenderWindow::SetSize(): "
-         << "layer index #" << mantaRenderer->GetLayer()
-         << "; renderer size = (" << renderSize[0] << ", " << renderSize[1]
-         << ")" << endl;
-*/
-    // all renderers need to be re-sized, regardless of the interactive mode
-    if (mantaRenderer->GetSyncDisplay())
-      {
-      // cerr << endl
-      //      << "vtkMantaRenderWindow: scheduling a Manta re-size transaction ..."
-      //     << endl;
-      mantaRenderer->GetMantaEngine()-> addTransaction("resize",
-          Manta::Callback::create(mantaRenderer->GetMantaEngine(),
-              &Manta::MantaInterface::changeResolution,
-              mantaRenderer->GetChannelId(), renderSize[0], renderSize[1],
-              true));
-
-      // Discard the image already baked in the pipeline (wrong size)
-      // This also serves as a sync barrier such that the changeResolution
-      // transaction will executed before CopyResultFrame is called.
-      mantaRenderer->GetSyncDisplay()->waitOnFrameReady();
-      mantaRenderer->GetSyncDisplay()->doneRendering();
-      }
-
-    mantaRenderer = NULL;
-    }
-
-  this->Superclass::SetSize(width, height);
-}
-
-//----------------------------------------------------------------------------
-// This function is effective in forcing the render window size to be ACTUALLY
-// changed while vtkMantaRenderWindowInteractor::ChangeMantaResolution( .... )
-// fails to do so when there are multiple layers of renderers as is the case
-// with the "multiRen" example (where the cube emulates the annotation layer).
-// However, this function currently causes intermediate artifacts WHEN the
-// render window is re-sized down.
-// TODO: this function is not sufficient, this->Size[] is change directly by
-// vtkXOpenGLRenderWindow::Render() without calling this function. It also
-// make it appear to be setting to the same old size.
-// we have to distinsh the cases
-// 1. Called by vtkMantaPVRenderWindowInteractor when using builtin server in ParaView
-// 2. Called by xxx when it is a VTK application
-// 3. Called by xxx when it is a ParaView server.
 void vtkMantaRenderWindow::SetSize( int width, int height )
 {
   // In ParaView with Client/Server mode, this function is called at each
@@ -237,10 +140,56 @@ void vtkMantaRenderWindow::SetSize( int width, int height )
     return;
     }
 
-  this->ChangeSize(width, height);
+  // reallocate pixel buffers
+  delete [] this->ColorBuffer;
+  this->ColorBuffer = new uint32[width*height];
+  delete [] this->DepthBuffer;
+  this->DepthBuffer = new float[width*height];
 
+  this->Renderers->InitTraversal();
+  for ( vtkRenderer *ren  = this->Renderers->GetNextItem();
+        ren != NULL;
+        ren  = this->Renderers->GetNextItem() )
+    {
+    vtkMantaRenderer * mantaRenderer = vtkMantaRenderer::SafeDownCast(ren);
+    if (!mantaRenderer)
+      {
+      //TODO: Handle GL layers
+      }
+    else
+      {
+      //TODO: The renderer should resize itself based on our size
+
+      // compute an up-to-date size for the renderer and do NOT always trust
+      // vtkRenderer::GetSize() that may return an obsolete size upon
+      // window shrinking. For example when the size of layer #1 is proportional
+      // to that of the render window through vtkRenderer::SetViewport() upon
+      // the initialization of the renderer (as in the "multiRen" example)
+      double * renViewport = mantaRenderer->GetViewport();
+      int renderSize[2];
+      renderSize[0] = int((renViewport[2] - renViewport[0]) * width  + 0.5f);
+      renderSize[1] = int((renViewport[3] - renViewport[1]) * height + 0.5f);      
+      if (mantaRenderer->GetSyncDisplay())
+        {
+        mantaRenderer->GetMantaEngine()-> addTransaction
+          ("resize",
+           Manta::Callback::create
+           (mantaRenderer->GetMantaEngine(),
+            &Manta::MantaInterface::changeResolution,
+            mantaRenderer->GetChannelId(), renderSize[0], renderSize[1],
+            true));
+        
+        // Discard the image already baked in the pipeline (wrong size)
+        // This also serves as a sync barrier such that the changeResolution
+        // transaction will executed before CopyResultFrame is called.
+        mantaRenderer->GetSyncDisplay()->waitOnFrameReady();
+        mantaRenderer->GetSyncDisplay()->doneRendering();
+        }
+      }
+    }
+
+  //TODO: Make this ignore manta renderers?
   this->Superclass::SetSize(width, height);
-
 }
 
 //------------------------------------------------------------------------------
