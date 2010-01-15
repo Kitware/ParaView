@@ -96,6 +96,7 @@ set (ColorEditor2_BREAK TRUE)
 set (ColorEditor3_BREAK TRUE)
 set (ColorEditor4_BREAK TRUE)
 set (ReadXMLPolyDataFileSeries_BREAK TRUE)
+set (ExodusXML_BREAK TRUE)
 
 
 # Add image threshold overrides for tests.
