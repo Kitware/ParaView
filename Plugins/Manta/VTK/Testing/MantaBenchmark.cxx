@@ -154,7 +154,7 @@ protected:
   vtkTimerLog *Timer;
 };
 
-vtkCxxRevisionMacro(MyProcess, "1.2");
+vtkCxxRevisionMacro(MyProcess, "1.3");
 vtkStandardNewMacro(MyProcess);
 
 MyProcess::MyProcess()
@@ -173,6 +173,7 @@ void MyProcess::Execute()
   //parse environment and arguments
   int numProcs=this->Controller->GetNumberOfProcesses();
   int me=this->Controller->GetLocalProcessId();
+  bool doBenchmark = true;
   int screensize = 400;
   int triangles = 100000; //TODO: Values under 10000 are making it break
   int threads = 1;
@@ -199,6 +200,10 @@ void MyProcess::Execute()
     if (!strcmp(this->Argv[i], "-useGL"))
       {
       useGL = true;
+      }
+    if (!strcmp(this->Argv[i], "-noBench"))
+      {
+      doBenchmark = false;
       }
     }
 
@@ -446,7 +451,7 @@ void MyProcess::Execute()
         {
         direction = direction * -1.0;
         }
-      for (int f = 0; f < 36; f++)
+      for (int f = 0; f < 36 && doBenchmark; f++)
         {        
         camera->Azimuth(direction);
         renderer->ResetCameraClippingRange(bds);
@@ -495,7 +500,7 @@ void MyProcess::Execute()
         {
         direction = direction * -1.0;
         }
-      for (int f = 0; f < 36; f++)
+      for (int f = 0; f < 36 && doBenchmark; f++)
         {        
         camera->Azimuth(direction);
         renderer->ResetCameraClippingRange(bds);
