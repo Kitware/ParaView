@@ -120,7 +120,7 @@ public:
         }
       pp->RemoveAllUncheckedProxies();
       pp->AddUncheckedInputConnection(source, port);
-      bool status = pp->IsInDomains();
+      bool status = pp->IsInDomains() != 0;
       pp->RemoveAllUncheckedProxies();
       return status;
       }
@@ -143,7 +143,7 @@ public:
 };
 
 vtkStandardNewMacro(vtkSMWriterFactory);
-vtkCxxRevisionMacro(vtkSMWriterFactory, "1.1");
+vtkCxxRevisionMacro(vtkSMWriterFactory, "1.2");
 //----------------------------------------------------------------------------
 vtkSMWriterFactory::vtkSMWriterFactory()
 {
