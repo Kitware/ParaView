@@ -75,7 +75,7 @@ static void vtkSMPluginManagerImportPlugin(vtkPVPlugin* plugin, void* calldata)
 
 //*****************************************************************************
 vtkStandardNewMacro(vtkSMPluginManager);
-vtkCxxRevisionMacro(vtkSMPluginManager, "1.10");
+vtkCxxRevisionMacro(vtkSMPluginManager, "1.11");
 //---------------------------------------------------------------------------
 vtkSMPluginManager::vtkSMPluginManager()
 {
@@ -330,7 +330,6 @@ void vtkSMPluginManager::RemovePlugin(
 
       if(found)
         {
-        (*infoIt)->Delete();
         it->second.erase(infoIt);
         }
       }
