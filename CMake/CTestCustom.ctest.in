@@ -98,7 +98,10 @@ SET(CTEST_CUSTOM_WARNING_EXCEPTION
   "mpi4py"
   "ClientServer.cxx"
   "vtkexodus2.*conversion from 'size_t' to 'int', possible loss of data"
-
+  
+  # Supress warning from Utilities, these are 3rd party code
+  # so many a times there's not much we can fix.
+  "Utilities/"
   # suppress warning from H5Part library.
   ".H5Part.src"
   )
