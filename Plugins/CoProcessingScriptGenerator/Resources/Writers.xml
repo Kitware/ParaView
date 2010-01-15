@@ -1,0 +1,3 @@
+<CoProcessingWriters>
+  <Writer proxyname="XMLPPolyDataWriter" proxygroup="filters" />
+</CoProcessingWriters>

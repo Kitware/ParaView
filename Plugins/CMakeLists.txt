@@ -49,4 +49,4 @@ paraview_build_optional_plugin(SLACTools "SLACTools" SLACTools ON)
 paraview_build_optional_plugin(VisItReaderPlugin "VisItReaderPlugin" VisItDatabaseBridge OFF) 
 paraview_build_optional_plugin(VisTrailsPlugin "VisTrailsPlugin" VisTrails OFF)
 paraview_build_optional_plugin(H5PartReader "Reader for *.h5part files" H5PartReader ON)
-
+paraview_build_optional_plugin(CoProcessingScriptGenerator "Plugin for creating python coprocessing scripts" CoProcessingScriptGenerator OFF)
