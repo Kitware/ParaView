@@ -1,0 +1,12 @@
+SET(CoProcessing_VERSION_MAJOR "@CoProcessing_VERSION_MAJOR@")
+SET(CoProcessing_VERSION_MINOR "@CoProcessing_VERSION_MINOR@")
+SET(CoProcessing_VERSION_PATCH "@CoProcessing_VERSION_PATCH@")
+
+SET(CoProcessing_SOURCE_DIR "@CoProcessing_SOURCE_DIR@")
+SET(CoProcessing_USE_FILE "@CoProcessing_USE_FILE@")
+
+SET(CoProcessing_INCLUDE_DIRS "@CoProcessing_INCLUDE_DIRS@")
+SET(CoProcessing_LIBRARY_DIRS "@CoProcessing_LIBRARY_DIRS@")
+
+# The CoProcessing library dependencies.
+INCLUDE("@CoProcessing_BINARY_DIR@/CPLibraryDepends.cmake")

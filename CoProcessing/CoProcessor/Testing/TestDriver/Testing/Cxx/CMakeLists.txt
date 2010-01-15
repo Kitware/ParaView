@@ -1,0 +1,8 @@
+ADD_EXECUTABLE(SimpleDriver SimpleDriver.cxx)
+TARGET_LINK_LIBRARIES(SimpleDriver vtkCPTestDriver)
+
+ADD_EXECUTABLE(SimpleDriver2 SimpleDriver2.cxx)
+TARGET_LINK_LIBRARIES(SimpleDriver2 vtkCPTestDriver)
+
+ADD_EXECUTABLE(AdaptorDriver AdaptorDriver.cxx vtkCustomUnstructuredGridBuilder.cxx)
+TARGET_LINK_LIBRARIES(AdaptorDriver vtkCPTestDriver)

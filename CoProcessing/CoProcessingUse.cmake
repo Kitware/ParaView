@@ -1,0 +1,6 @@
+IF(CoProcessing_FOUND)
+
+  INCLUDE_DIRECTORIES(${CoProcessing_INCLUDE_DIRS})
+  LINK_DIRECTORIES(${CoProcessing_LIBRARY_DIRS})
+
+ENDIF(CoProcessing_FOUND)
