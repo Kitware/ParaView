@@ -73,7 +73,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <Engine/Control/RTRT.h>
 #include <Engine/Display/SyncDisplay.h>
 
-vtkCxxRevisionMacro(vtkMantaRenderWindow, "1.4");
+vtkCxxRevisionMacro(vtkMantaRenderWindow, "1.5");
 vtkStandardNewMacro(vtkMantaRenderWindow);
 
 //----------------------------------------------------------------------------
@@ -130,13 +130,32 @@ vtkMantaRenderWindow::~vtkMantaRenderWindow()
 }
 
 //------------------------------------------------------------------------------
+int* vtkMantaRenderWindow::GetSize( )
+{
+  int tempSize[2];
+  tempSize[0] = this->Size[0];
+  tempSize[1] = this->Size[1];
+
+  int *ret = this->Superclass::GetSize();
+
+  if (this->Size[0] != tempSize[0] || this->Size[1] != tempSize[1])
+    {
+    //on a change, let Manta know
+    tempSize[0] = this->Size[0];
+    tempSize[1] = this->Size[1];
+    this->Size[0] = -1; //defeat no change return
+    this->Size[1] = -1;
+    this->SetSize(tempSize[0], tempSize[1]);
+    }
+
+  return ret;
+}
+
+//------------------------------------------------------------------------------
 void vtkMantaRenderWindow::SetSize( int width, int height )
 {
-  // In ParaView with Client/Server mode, this function is called at each
-  // frame with exactly the same size as the current size.
   if (this->Size[0] == width && this->Size[1] == height)
     {
-    cerr << "Setting to the same size?\n";
     return;
     }
 
@@ -231,10 +250,16 @@ void vtkMantaRenderWindow::CopyResultFrame(void)
     int      renderPos[2];
     renderPos[0] = int( renViewport[0] * renWinSize[0] + 0.5f );
     renderPos[1] = int( renViewport[1] * renWinSize[1] + 0.5f );
-
+    
     vtkMantaRenderer *mantaRenderer = vtkMantaRenderer::SafeDownCast(ren);
     if ( mantaRenderer  != 0 )
       {
+      bool mStereo;
+      int mXres;
+      int mYres;
+      //make sure we don't go off bounds since manta is asynch and lags
+      mantaRenderer->GetMantaEngine()->getResolution(0, mStereo, mXres, mYres);
+
       //cerr << "Manta layer: " << ren->GetLayer() << endl;
       const uint32 *srcRGB  = reinterpret_cast<uint32 *>(mantaRenderer->GetColorBuffer());
       const float  *srcZ    = mantaRenderer->GetDepthBuffer();
@@ -247,9 +272,9 @@ void vtkMantaRenderWindow::CopyResultFrame(void)
         {
 #if !USE_SSE
         // unconditionally overwrite old buffer data if it is layer 0
-        for (int j = 0; j < renderSize[1]; j++)
+        for (int j = 0; j < renderSize[1] && j < mYres; j++)
           {
-          for (int i = 0; i < renderSize[0]; i++)
+          for (int i = 0; i < renderSize[0] && i < mXres; i++)
             {
               *(dstRGB++) = *(srcRGB++);
               *(dstZ++)   = *(srcZ++);
@@ -423,14 +448,13 @@ int vtkMantaRenderWindow::GetRGBACharPixelData(int x1, int y1,
   return this->GetRGBACharPixelData(x1, y1, x2, y2, front, data->GetPointer(0));
 }
 
+//------------------------------------------------------------------------------
 // TODO: why doesn't virtual function works here?
 int vtkMantaRenderWindow::GetRGBACharPixelData(int x1, int y1,
-                                                int x2, int y2,
-                                                int front,
-                                                unsigned char* data)
+                                               int x2, int y2,
+                                               int front,
+                                               unsigned char* data)
 {
-//  cerr << "GetRGBACharPixelData\n";
-
   // TODO: this does not actually honor the parameters
   if (this->ColorBuffer == 0)
     {
@@ -455,8 +479,6 @@ int vtkMantaRenderWindow::GetRGBACharPixelData(int x1, int y1,
 int vtkMantaRenderWindow::GetZbufferData(int x1, int y1, int x2, int y2,
                                          float* z_data)
 {
-//  cerr << "GetZbufferData\n";
-
   // TODO: this does not actually honor the parameters
   if ( this->DepthBuffer == 0 )
     {
