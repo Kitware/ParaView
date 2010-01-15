@@ -58,7 +58,7 @@ OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-// .NAME vtkMantaRenderer - Manta renderer
+// .NAME vtkMantaRenderer - Renderer that uses Manta ray tracer instead of GL.
 // .SECTION Description
 // vtkMantaRenderer is a concrete implementation of the abstract class
 // vtkRenderer. vtkMantaRenderer interfaces to the Manta graphics library.
@@ -109,29 +109,70 @@ public:
   // Regular non-vtkSetGet functions are used here as Manta does NOT
   // adopt reference-counting to manage objects. Otherwise it would
   // complicate the memory management issue due to the inconsistency.
-  void   SetMantaEngine( Manta::MantaInterface * engine )
-         { this->MantaEngine = engine; }
-  void   SetMantaFactory( Manta::Factory * factory )
-         { this->MantaFactory = factory; }
-  void   SetMantaScene( Manta::Scene * scene )
-         { this->MantaScene = scene; }
-  void   SetMantaWorldGroup( Manta::Group * group )
-         { this->MantaWorldGroup = group; }
-  void   SetMantaLightSet( Manta::LightSet * lightSet )
-         { this->MantaLightSet = lightSet; }
-  void   SetMantaCamera( Manta::Camera * camera )
-         { this->MantaCamera = camera; }
-  void   SetSyncDisplay( Manta::SyncDisplay * syncDisplay )
-         { this->SyncDisplay = syncDisplay; }
-  Manta::MantaInterface * GetMantaEngine()    { return this->MantaEngine;    }
-  Manta::Factory        * GetMantaFactory()   { return this->MantaFactory;   }
-  Manta::Scene          * GetMantaScene()     { return this->MantaScene;     }
-  Manta::Group          * GetMantaWorldGroup(){ return this->MantaWorldGroup;}
-  Manta::LightSet       * GetMantaLightSet()  { return this->MantaLightSet;  }
-  Manta::Camera         * GetMantaCamera()    { return this->MantaCamera;    }
-  Manta::SyncDisplay    * GetSyncDisplay()    { return this->SyncDisplay;    }
-  float * GetColorBuffer() { return this->ColorBuffer; }
-  float * GetDepthBuffer() { return this->DepthBuffer; }
+  void SetMantaEngine( Manta::MantaInterface * engine )
+  { 
+    this->MantaEngine = engine;
+  }
+  void SetMantaFactory( Manta::Factory * factory )
+  {
+    this->MantaFactory = factory;
+  }
+  void SetMantaScene( Manta::Scene * scene )
+  { 
+    this->MantaScene = scene;
+  }
+  void SetMantaWorldGroup( Manta::Group * group )
+  { 
+    this->MantaWorldGroup = group;
+  }
+  void SetMantaLightSet( Manta::LightSet * lightSet )
+  {
+    this->MantaLightSet = lightSet;
+  }
+  void SetMantaCamera( Manta::Camera * camera )
+  {
+    this->MantaCamera = camera;
+  }
+  void SetSyncDisplay( Manta::SyncDisplay * syncDisplay )
+  { 
+    this->SyncDisplay = syncDisplay;
+  }
+  Manta::MantaInterface* GetMantaEngine()    
+  { 
+  return this->MantaEngine;
+  }
+  Manta::Factory* GetMantaFactory()
+  { 
+    return this->MantaFactory;
+  }
+  Manta::Scene* GetMantaScene() 
+  { 
+    return this->MantaScene;
+  }
+  Manta::Group* GetMantaWorldGroup() 
+  {
+    return this->MantaWorldGroup;
+  }
+  Manta::LightSet* GetMantaLightSet() 
+  {
+    return this->MantaLightSet;
+  }
+  Manta::Camera* GetMantaCamera()
+  { 
+    return this->MantaCamera;
+  }
+  Manta::SyncDisplay* GetSyncDisplay() 
+  {
+    return this->SyncDisplay;
+  }
+  float * GetColorBuffer() 
+  { 
+    return this->ColorBuffer; 
+  }
+  float * GetDepthBuffer() 
+  {
+    return this->DepthBuffer; 
+  }
   //ETX
 
 //  vtkGetMacro(LayerBuffer, float*);
@@ -144,7 +185,7 @@ protected:
   vtkMantaRenderer();
   ~vtkMantaRenderer();
 
-  // Picking functions to be implemented by sub-classes
+  // Manta renderer does not support picking.
   virtual void DevicePickRender() {};
   virtual void StartPick(unsigned int pickFromSize) {};
   virtual void UpdatePickId() {};
@@ -152,7 +193,9 @@ protected:
   virtual unsigned int GetPickedId() { return 0; };
   virtual unsigned int GetNumPickedIds() { return 0; };
   virtual int GetPickedIds( unsigned int atMost, unsigned int * callerBuffer )
-    { return 0; };
+  {
+    return 0; 
+  };
   virtual double GetPickedZ() { return 0.0f; };
 
 private:
@@ -165,12 +208,8 @@ private:
   // called right before UpdateGeometry()
   void UpdateActorsForVisibility();
 
-  // orverrides the counterpart of the parent class, i.e., vtkRenderer, that
-  // always creates a vtkOpenGLCamera object, as governed by a startdard
-  // object factory in vtkGraphicsFactory, despite the explicit specification
-  // of vtkMantaCamera as the expected concrete class type in the server XML
-  // file. Lack of this overriding function would disable vtkManta plug-ins to
-  // work in parallel mode.
+  //Description:
+  // Overriden to help ensure that a Manta compatible class is created.
   vtkCamera * MakeCamera();
 
   int  MaxDepth;
@@ -182,6 +221,7 @@ private:
   int ImageSize;
   float *ColorBuffer;
   float *DepthBuffer;
+
   //BTX
   Manta::MantaInterface * MantaEngine;
   Manta::Factory * MantaFactory;

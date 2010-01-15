@@ -58,7 +58,7 @@ OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-// .NAME vtkMantaActor - Manta Raytracer actor
+// .NAME vtkMantaActor - vtkActor for Manta Ray traced scenes
 // .SECTION Description
 // vtkMantaActor is a concrete implementation of the abstract class vtkActor.
 // vtkMantaActor interfaces to the Manta Raytracer library.
@@ -89,8 +89,12 @@ public:
   vtkTypeRevisionMacro(vtkMantaActor,vtkActor);
   virtual void PrintSelf(ostream& os, vtkIndent indent);
   
+  //Description:
+  // Overridden to ?
   virtual void SetVisibility(int);
   
+  //Description:
+  // Overriden to help ensure that a Manta compatible class is created.
   vtkProperty * MakeProperty();
   
   // Description:
@@ -111,33 +115,44 @@ public:
   // Regular non-vtkSetGet functions are used here as Manta does NOT
   // adopt reference-counting to manage objects. Otherwise it would
   // complicate the memory management issue due to the inconsistency.
-  void SetMesh( Manta::Mesh * mesh ) { this->Mesh = mesh; }
+  void SetMesh( Manta::Mesh * mesh ) 
+  { 
+    this->Mesh = mesh; 
+  }
   void SetMantaAS( Manta::AccelerationStructure * mantaAS )
-  { this->MantaAS = mantaAS; }
+  { 
+    this->MantaAS = mantaAS; 
+  }
   void SetMantaWorldGroup( Manta::Group * mantaWorldGroup )
-  { this->MantaWorldGroup = mantaWorldGroup; }
-  Manta::Mesh * GetMesh() { return this->Mesh; }
-  Manta::AccelerationStructure * GetMantaAS() { return this->MantaAS; }
-  Manta::Group * GetMantaWorldGroup() { return this->MantaWorldGroup; }
+  {
+    this->MantaWorldGroup = mantaWorldGroup; 
+  }
+  Manta::Mesh * GetMesh() 
+  {
+    return this->Mesh; 
+  }
+  Manta::AccelerationStructure * GetMantaAS() 
+  { 
+    return this->MantaAS; 
+  }
+  Manta::Group * GetMantaWorldGroup() 
+  { 
+    return this->MantaWorldGroup; 
+  }
   //ETX
   
+  // Description:
+  // Somehow helps enable visibility toggling
   vtkSetMacro(IsModified, bool);
   vtkGetMacro(IsModified, bool);
   
   // Description:
-  // Set / Get the visibility of the actor for the LAST frame / time.
-  // This PREVIOUS status is used in comparison with the visibility
-  // for the CURRENT frame / time to determine whether or not
-  // this->SetIsModified(true) and hence vtkMantaActor::UpdateObjects()
-  // are to be invoked in support of dynamically turning on/off vtkManta
-  // objects including the center of rotation axes widget.
-  //
-  // These two functions are called in vtkMantaRenderer::
-  // UpdateActorsForVisibility() to determine whether the geometry,
-  // specifically, the acceleration structure, of an actor needs to
-  // be added to or removed from the host renderer's world group.
+  // Somehow helps enable visibility toggling
   vtkSetMacro(LastVisibility, bool);
   vtkGetMacro(LastVisibility, bool);
+
+  // Description:
+  // Visibility
   void DetachFromMantaRenderEngine( vtkMantaRenderer * renderer );
   
   // Description:
@@ -149,8 +164,13 @@ public:
   // a vtkManta object is deleted, either explicitly through ParaView
   // pipeline browser or implicitly via closing ParaView.
   void SetRenderer( vtkMantaRenderer * renderer )
-  { this->Renderer = renderer; }
-  vtkMantaRenderer * GetRenderer() { return this->Renderer; }
+  {
+    this->Renderer = renderer; 
+  }
+  vtkMantaRenderer * GetRenderer() 
+  { 
+    return this->Renderer; 
+  }
   
  protected:
   vtkMantaActor();

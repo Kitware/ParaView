@@ -58,16 +58,13 @@ OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-// .NAME vtkMantaActor - 
-// .SECTION Description
-//
 
 #include "vtkManta.h"
 #include "vtkMantaActor.h"
-#include "vtkMantaRenderer.h"
 #include "vtkMantaProperty.h"
-#include "vtkMapper.h"
+#include "vtkMantaRenderer.h"
 #include "vtkMantaRenderWindow.h"
+#include "vtkMapper.h"
 
 #include "vtkDataSet.h"
 #include "vtkObjectFactory.h"
@@ -80,7 +77,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <Model/Groups/Group.h>
 #include <Model/Groups/Mesh.h>
 
-vtkCxxRevisionMacro(vtkMantaActor, "1.2");
+vtkCxxRevisionMacro(vtkMantaActor, "1.3");
 vtkStandardNewMacro(vtkMantaActor);
 
 //----------------------------------------------------------------------------
@@ -139,9 +136,21 @@ vtkMantaActor::~vtkMantaActor()
 }
 
 //----------------------------------------------------------------------------
+void vtkMantaActor::PrintSelf( ostream & os, vtkIndent indent )
+{
+  this->Superclass::PrintSelf( os, indent );
+}
+
+//----------------------------------------------------------------------------
 vtkProperty *vtkMantaActor::MakeProperty()
 {
   return vtkMantaProperty::New();
+}
+
+//----------------------------------------------------------------------------
+void vtkMantaActor::SetVisibility(int newval)
+{
+  this->Superclass::SetVisibility(newval);
 }
 
 //----------------------------------------------------------------------------
@@ -153,7 +162,7 @@ void vtkMantaActor::ReleaseGraphicsResources( vtkWindow * win )
     return;
     }
 
-  if (!MantaAS)
+  if (!this->MantaAS)
     {
     return;
     }
@@ -386,16 +395,4 @@ void vtkMantaActor::Render( vtkRenderer * ren, vtkMapper * mapper )
         }
       }
     }
-}
-
-//----------------------------------------------------------------------------
-void vtkMantaActor::PrintSelf( ostream & os, vtkIndent indent )
-{
-  this->Superclass::PrintSelf( os, indent );
-}
-
-//----------------------------------------------------------------------------
-void vtkMantaActor::SetVisibility(int newval)
-{
-  this->Superclass::SetVisibility(newval);
 }

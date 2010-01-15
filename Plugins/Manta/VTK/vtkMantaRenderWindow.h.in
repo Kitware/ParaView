@@ -58,9 +58,10 @@ OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-// .NAME vtkMantaRenderWindow - 
+// .NAME vtkMantaRenderWindow - RenderWindow that uses Manta ray tracing
+// instead of GL.
 // .SECTION Description
-//
+// vtkMantaRenderWindoe interfaces to the Manta graphics library.
 
 #ifndef __vtkMantaRenderWindow_h
 #define __vtkMantaRenderWindow_h
@@ -76,13 +77,22 @@ class vtkMantaRenderWindow : public @RenderWindowType@
 public:
   static vtkMantaRenderWindow *New();
   vtkTypeRevisionMacro(vtkMantaRenderWindow, @RenderWindowType@);
+  void PrintSelf(ostream& os, vtkIndent indent);
 
-  virtual void SetSize(int,int);
 
+  //Description:
+  //vtkManta updates the front buffer at this (late) stage of the 
+  //usual RenderWindow update cycle.
   virtual void CopyResultFrame(void);
 
+  //Description:
+  //Overridden to synchronize viewport changes with Manta engine
+  virtual void SetSize(int,int);
   void ChangeSize(int width, int height);
 
+  //Description:
+  //Rest are overridden to support parallel depth compositing, while avoiding
+  //GL at all in order to to improve framerate.
   virtual int GetRGBACharPixelData(int x1, int y1,
                            int x2, int y2,
                            int front,
@@ -105,7 +115,5 @@ private:
   vtkMantaRenderWindow(const vtkMantaRenderWindow&);  // Not implemented.
   void operator=(const vtkMantaRenderWindow&);  // Not implemented.
 };
-
-#undef ParentClass
 
 #endif

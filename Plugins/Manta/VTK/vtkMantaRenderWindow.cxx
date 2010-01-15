@@ -58,25 +58,22 @@ OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-// .NAME vtkMantaRenderWindow - 
-// .SECTION Description
-//
 
 #include "vtkManta.h"
-#include "vtkMantaRenderWindow.h"
 #include "vtkMantaRenderer.h"
+#include "vtkMantaRenderWindow.h"
 
+#include "vtkFloatArray.h"
 #include "vtkObjectFactory.h"
 #include "vtkRendererCollection.h"
-#include "vtkUnsignedCharArray.h"
-#include "vtkFloatArray.h"
 #include "vtkTimerLog.h"
+#include "vtkUnsignedCharArray.h"
 
 #include <Image/SimpleImage.h>
 #include <Engine/Control/RTRT.h>
 #include <Engine/Display/SyncDisplay.h>
 
-vtkCxxRevisionMacro(vtkMantaRenderWindow, "1.2");
+vtkCxxRevisionMacro(vtkMantaRenderWindow, "1.3");
 vtkStandardNewMacro(vtkMantaRenderWindow);
 
 //----------------------------------------------------------------------------
@@ -132,6 +129,7 @@ vtkMantaRenderWindow::~vtkMantaRenderWindow()
   this->DepthBuffer = 0;
 }
 
+//------------------------------------------------------------------------------
 void vtkMantaRenderWindow::ChangeSize(int width, int height)
 {
 /*
@@ -245,13 +243,13 @@ void vtkMantaRenderWindow::SetSize( int width, int height )
 
 }
 
+//------------------------------------------------------------------------------
 #define USE_SSE 0
 #if USE_SSE
 #include "ColorKey/ColorKeyCPYSSE.h"
 #include "ColorKey/ColorKeySSE.h"
 #include "ZKey/ZKeyRangeSSE.h"
 #endif
-
 void vtkMantaRenderWindow::CopyResultFrame(void)
 {
   // When this function is called, Render() has already been called on each of
@@ -431,6 +429,7 @@ void vtkMantaRenderWindow::CopyResultFrame(void)
     }
 }
 
+//------------------------------------------------------------------------------
 // TODO: why doesn't virtual function works here?
 int vtkMantaRenderWindow::GetRGBACharPixelData(int x1, int y1,
                                                int x2, int y2,
@@ -503,6 +502,7 @@ int vtkMantaRenderWindow::GetRGBACharPixelData(int x1, int y1,
     }
 }
 
+//------------------------------------------------------------------------------
 int vtkMantaRenderWindow::GetZbufferData(int x1, int y1, int x2, int y2,
                                          float* z_data)
 {
@@ -528,3 +528,8 @@ int vtkMantaRenderWindow::GetZbufferData(int x1, int y1, int x2, int y2,
     }
 }
 
+//----------------------------------------------------------------------------
+void vtkMantaRenderWindow::PrintSelf( ostream& os, vtkIndent indent )
+{
+  this->Superclass::PrintSelf( os, indent );
+}

@@ -60,16 +60,19 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
 #include "vtkManta.h"
+#include "vtkMantaActor.h"
+#include "vtkMantaCamera.h"
+#include "vtkMantaLight.h"
+#ifdef VTKMANTA_FOR_PARAVIEW
+#include "vtkMantaLODActor.h"
+#endif
+#include "vtkMantaProperty.h"
 #include "vtkMantaRenderer.h"
+#include "vtkMantaRenderWindow.h"
 
 #include "vtkActor.h"
 #include "vtkCuller.h"
 #include "vtkLightCollection.h"
-#include "vtkMantaActor.h"
-#include "vtkMantaCamera.h"
-#include "vtkMantaLight.h"
-#include "vtkMantaProperty.h"
-#include "vtkMantaRenderWindow.h"
 #include "vtkObjectFactory.h"
 #include "vtkRendererCollection.h"
 #include "vtkRenderWindow.h"
@@ -97,13 +100,9 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <Engine/Control/RTRT.h>
 #include <Engine/Display/SyncDisplay.h>
 
-#ifdef VTKMANTA_FOR_PARAVIEW
-#include "vtkMantaLODActor.h"
-#endif
-
 #include <vtkstd/string>
 
-vtkCxxRevisionMacro(vtkMantaRenderer, "1.2");
+vtkCxxRevisionMacro(vtkMantaRenderer, "1.3");
 vtkStandardNewMacro(vtkMantaRenderer);
 
 //----------------------------------------------------------------------------
@@ -155,9 +154,6 @@ vtkMantaRenderer::~vtkMantaRenderer()
   if ( this->EngineStarted )
     {
     // Stop the Manta Engine
-    // TODO: Why do we have to call doneRendering() twice?
-    // ANS: there is a semi-race in vtkMantaRenderWindow
-    //this->GetSyncDisplay()->doneRendering();
     this->GetMantaEngine()->finish();
     this->GetSyncDisplay()->doneRendering();
     this->GetMantaEngine()->blockUntilFinished();
@@ -227,6 +223,7 @@ void vtkMantaRenderer::InitEngine()
   // the image is combined with OpenGL framebuffer by vtkXMantaRenderWindow
   vtkstd::vector<vtkstd::string> vs;
   this->SyncDisplay = new Manta::SyncDisplay( vs );
+
   // TODO: memory leak, NullDisplay is not deleted
   this->SyncDisplay->setChild(  new Manta::NullDisplay( vs )  );
 
