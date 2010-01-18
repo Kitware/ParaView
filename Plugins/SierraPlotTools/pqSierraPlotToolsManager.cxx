@@ -1011,7 +1011,7 @@ bool pqSierraPlotToolsManager::setupGUIForVars()
   pqPipelineSource * meshReader = this->getMeshReader();
 
   QString smName = meshReader->getSMName();
-  qWarning() << "- INFO - variable processing, working on data named: " << qPrintable(smName);
+  //qWarning() << "- INFO - variable processing, working on data named: " << qPrintable(smName);
   vtkSMProxy * meshReaderProxy = meshReader->getProxy();
   vtkSMProperty * prop = NULL;
   prop = this->Internal->currentMetaPlotter->plotter->getSMVariableProperty(meshReaderProxy);
@@ -1347,9 +1347,9 @@ bool pqSierraPlotToolsManager::createPlotOverTime()
   pqPipelineSource * plotterSource = this->Internal->currentMetaPlotter->plotter->getPlotFilter();
 
   if (plotterSource == NULL)
-  {
-   qWarning() << "pqSierraPlotToolsManager::createPlotOverTime: INFO - NULL plot filter... maybe no view created yet";
-  }
+    {
+    //qWarning() << "pqSierraPlotToolsManager::createPlotOverTime: INFO - NULL plot filter... maybe no view created yet";
+    }
 
   this->destroyPipelineSourceAndConsumers(plotterSource);
 
