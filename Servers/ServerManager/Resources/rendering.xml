@@ -887,7 +887,7 @@
       </StringVectorProperty>
     </SourceProxy>
 
-    <SourceProxy name="FixedPointVolumeRayCastMapper" 
+    <SourceProxy name="FixedPointVolumeRayCastMapper"
       class="vtkFixedPointVolumeRayCastMapper">
       <InputProperty
         name="Input"
@@ -921,6 +921,23 @@
           <Entry value="4" text="CellFieldData"/>
         </EnumerationDomain>
       </IntVectorProperty>
+      <IntVectorProperty
+        name="BlendMode"
+        command="SetBlendMode"
+        default_values="0"
+        number_of_elements="1"
+        animateable="0">
+        <Documentation>
+          Set the current blend mode. Default is Composite. MaximumIntensity is
+          also known as MIP rendering.
+        </Documentation>
+        <EnumerationDomain name="enum">
+          <Entry value="0" text="Composite"/>
+          <Entry value="1" text="MaximumIntensity"/>
+          <Entry value="2" text="MinimumIntensity"/>
+        </EnumerationDomain>
+      </IntVectorProperty>
+
       <IntVectorProperty
         name="LockSampleDistanceToInputSpacing"
         command="SetLockSampleDistanceToInputSpacing"
@@ -7144,6 +7161,7 @@
         </Proxy>
         <ExposedProperties>
           <Property name="LockSampleDistanceToInputSpacing" />
+          <Property name="BlendMode"/>
         </ExposedProperties>
       </SubProxy>
 
@@ -7880,6 +7898,7 @@
           <Property name="LockSampleDistanceToInputSpacing" />
           <Property name="ScalarOpacityUnitDistance" />
           <Property name="ScalarOpacityFunction" />
+          <Property name="BlendMode"/>
         </ExposedProperties>
       </SubProxy>
 
