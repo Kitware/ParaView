@@ -209,6 +209,20 @@ void pqCreateServerStartupDialog::updateServerType()
       this->Implementation->UI.renderServerPort->setVisible(true);
       break;
     }
+
+  // hide host names for reverse connection.
+  switch (this->Implementation->UI.type->currentIndex())
+    {
+  case CLIENT_DATA_SERVER_RENDER_SERVER_REVERSE_CONNECT:
+  case CLIENT_SERVER_REVERSE_CONNECT:
+      this->Implementation->UI.hostLabel->setVisible(false);
+      this->Implementation->UI.host->setVisible(false);
+      this->Implementation->UI.dataServerHostLabel->setVisible(false);
+      this->Implementation->UI.dataServerHost->setVisible(false);
+      this->Implementation->UI.renderServerHostLabel->setVisible(false);
+      this->Implementation->UI.renderServerHost->setVisible(false);
+      break;
+    }
 }
 
 void pqCreateServerStartupDialog::updateConnectButton()
