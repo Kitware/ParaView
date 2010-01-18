@@ -58,9 +58,7 @@ OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-// .NAME vtkMantaLight - 
-// .SECTION Description
-//
+
 #include "vtkManta.h"
 #include "vtkMantaLight.h"
 #include "vtkMantaRenderer.h"
@@ -76,9 +74,11 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <math.h>
 
-vtkCxxRevisionMacro(vtkMantaLight, "1.1");
+vtkCxxRevisionMacro(vtkMantaLight, "1.2");
 vtkStandardNewMacro(vtkMantaLight);
 
+//------------------------------------------------------------------------------
+// called in Transaction context, it is safe to modify the engine state here
 void vtkMantaLight::UpdateMantaLight(vtkRenderer *ren)
 {
   double *color, *position, *focal, direction[3];
@@ -90,7 +90,8 @@ void vtkMantaLight::UpdateMantaLight(vtkRenderer *ren)
 
   if (this->GetPositional())
     {
-    Manta::PointLight * pointLight = dynamic_cast<Manta::PointLight *>(this->mantaLight);
+    Manta::PointLight * pointLight =
+      dynamic_cast<Manta::PointLight *>(this->mantaLight);
     if ( pointLight )
         {
         pointLight->setPosition(Manta::Vector(position[0], position[1], position[2]));
@@ -104,7 +105,8 @@ void vtkMantaLight::UpdateMantaLight(vtkRenderer *ren)
     }
   else
     {
-    Manta::DirectionalLight * dirLight = dynamic_cast<Manta::DirectionalLight *>(this->mantaLight);
+    Manta::DirectionalLight * dirLight =
+      dynamic_cast<Manta::DirectionalLight *>(this->mantaLight);
     if ( dirLight )
         {
         // "direction" in Manta means the direction toward light source rather than the
@@ -117,8 +119,8 @@ void vtkMantaLight::UpdateMantaLight(vtkRenderer *ren)
         }
     else
       {
-      vtkWarningMacro(
-              << "Changing from Positional to Directional light is not supported by vtkManta" );
+      vtkWarningMacro
+        (<< "Changing from Positional to Directional light is not supported by vtkManta" );
       }
     }
 }

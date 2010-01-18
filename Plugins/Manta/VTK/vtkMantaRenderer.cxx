@@ -102,7 +102,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <vtkstd/string>
 
-vtkCxxRevisionMacro(vtkMantaRenderer, "1.3");
+vtkCxxRevisionMacro(vtkMantaRenderer, "1.4");
 vtkStandardNewMacro(vtkMantaRenderer);
 
 //----------------------------------------------------------------------------
@@ -197,7 +197,6 @@ void vtkMantaRenderer::InitEngine()
   double *color = this->GetBackground();
   Manta::ConstantBackground * background = new Manta::ConstantBackground(
     Manta::Color(  Manta::RGBColor( color[0], color[1], color[2] )  )  );
-  color = NULL;
   this->MantaScene->setBackground( background );
 
   // create empty world group
@@ -210,7 +209,6 @@ void vtkMantaRenderer::InitEngine()
   this->MantaLightSet->setAmbientLight( new Manta::ConstantAmbient(
     Manta::Color(  Manta::RGBColor( ambient[0], ambient[1], ambient[2] )
                 ) ) );
-  ambient = NULL;
   this->MantaScene->setLights( this->MantaLightSet );
   this->MantaEngine->setScene( this->MantaScene );
 
@@ -223,14 +221,13 @@ void vtkMantaRenderer::InitEngine()
   // the image is combined with OpenGL framebuffer by vtkXMantaRenderWindow
   vtkstd::vector<vtkstd::string> vs;
   this->SyncDisplay = new Manta::SyncDisplay( vs );
-
   // TODO: memory leak, NullDisplay is not deleted
   this->SyncDisplay->setChild(  new Manta::NullDisplay( vs )  );
 
+  //Set screen size
   int *size = this->GetSize();
   this->ChannelId = this->MantaEngine->createChannel( this->SyncDisplay,
     this->MantaCamera, this->IsStereo, size[0], size[1] );
-  size = NULL;
 
   this->EngineInited = true;
 }
@@ -238,13 +235,19 @@ void vtkMantaRenderer::InitEngine()
 //----------------------------------------------------------------------------
 void vtkMantaRenderer::ChangeNumberOfWorkers(int numWorkers)
 {
+  if (this->NumberOfWorkers == numWorkers)
+    {
+    return;
+    }
   this->NumberOfWorkers = numWorkers;
   this->MantaEngine->changeNumWorkers( this->NumberOfWorkers );
+  this->Modified();
 }
 
 //----------------------------------------------------------------------------
 void vtkMantaRenderer::ClearLights(void)
 {
+  //TODO: This change needs to be scheduled
   delete this->MantaLightSet->getAmbientLight();
 
   for ( int i = 0; i < this->MantaLightSet->numLights(); i ++ )
@@ -300,28 +303,12 @@ int vtkMantaRenderer::UpdateLights()
 }
 
 //----------------------------------------------------------------------------
-// This function orverrides the counterpart of the parent class (vtkRenderer)
-// that always creates a vtkOpenGLCamera object, as governed by a startdard
-// object factory in vtkGraphicsFactory, despite the explicit specification
-// of vtkMantaCamera as the expected concrete class type in the server XML
-// file. Lack of this overriding function would disable vtkManta plug-ins to
-// work in parallel mode.
 vtkCamera* vtkMantaRenderer::MakeCamera()
 {
   return vtkMantaCamera::New();
 }
 
 //----------------------------------------------------------------------------
-// This function accesses the visibility status of the CURRENT frame/time, in
-// comparison with that of the LAST frame/time, for ANY of the actors assigned
-// to this renderer (and most likely other renderers BECAUSE it is ONLY the
-// FIRST renderer that is to be used to detach the geometry, and specifically
-// remove the acceleration structure, from the world group of the scene in
-// support of visibility toggling). Geometry addition (upon toggling on) or
-// detachment (upon toggling off) is performed for any vtkMantaActor.
-//
-// NOTE: In ParaView plugin mode, the target vtkMantaActor is accessed through
-// vtkMantaLODActor::GetDevice() that returns an internal variable.
 void vtkMantaRenderer::UpdateActorsForVisibility()
 {
   vtkProp * anyProp = NULL;
@@ -391,7 +378,7 @@ void vtkMantaRenderer::DeviceRender()
     }
 
   // Initialize the Manta engine so it can accept geometry
-  // but don''t start rendering just yet.
+  // but don't start rendering just yet.
   if ( !this->EngineInited )
     {
     this->InitEngine();
@@ -405,6 +392,7 @@ void vtkMantaRenderer::DeviceRender()
   // TODO: call ClearLights here?
 
   // reset background in the scene
+  // TODO: This should be scheduled via callback
   double *color = this->GetBackground();
   dynamic_cast<Manta::ConstantBackground *> (this->MantaScene->getBackground())->
     setValue(Manta::Color(  Manta::RGBColor( color[0], color[1], color[2] ) ) );

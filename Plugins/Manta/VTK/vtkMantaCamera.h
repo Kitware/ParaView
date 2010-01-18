@@ -84,7 +84,6 @@ public:
   vtkTypeRevisionMacro(vtkMantaCamera,vtkCamera);
   
   void Render(vtkRenderer *ren);
-  void UpdateViewport(vtkRenderer *ren);
   
 protected:
    vtkMantaCamera() : mantaCamera (0) {};
@@ -94,7 +93,7 @@ private:
   vtkMantaCamera(const vtkMantaCamera&);  // Not implemented.
   void operator=(const vtkMantaCamera&);  // Not implemented.
 
-  void CreateMantaCamera(vtkRenderer *);
+  void OrientMantaCamera(vtkRenderer *);
   
   vtkTimeStamp lastRenderTime;
   //BTX

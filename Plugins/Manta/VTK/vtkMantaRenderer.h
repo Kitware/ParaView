@@ -93,7 +93,7 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Concrete open gl render method.
+  // Concrete render method.
   void DeviceRender();
 
   // Description:
@@ -179,6 +179,9 @@ public:
 //  vtkGetMacro(DepthBuffer, float*);
   vtkSetMacro(ChannelId, int);
   vtkGetMacro(ChannelId, int);
+
+  //Description:
+  //Changes the number of manta rendering threads.
   void ChangeNumberOfWorkers(int numWorkers);
 
 protected:

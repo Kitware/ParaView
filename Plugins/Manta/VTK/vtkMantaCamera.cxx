@@ -65,7 +65,6 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkManta.h"
 #include "vtkMantaCamera.h"
 #include "vtkMantaRenderer.h"
-#include "vtkMantaRenderWindow.h"
 
 #include "vtkObjectFactory.h"
 
@@ -73,44 +72,51 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <Engine/Control/RTRT.h>
 #include <math.h>
 
-vtkCxxRevisionMacro(vtkMantaCamera, "1.1");
+vtkCxxRevisionMacro(vtkMantaCamera, "1.2");
 vtkStandardNewMacro(vtkMantaCamera);
 
 //----------------------------------------------------------------------------
-void vtkMantaCamera::CreateMantaCamera(vtkRenderer *ren)
+void vtkMantaCamera::OrientMantaCamera(vtkRenderer *ren)
 {
-  if (vtkMantaRenderer * mantaRenderer = vtkMantaRenderer::SafeDownCast(ren))
+  vtkMantaRenderer * mantaRenderer = vtkMantaRenderer::SafeDownCast(ren);
+  if (!mantaRenderer)
     {
-    // the mantaCamera is a singleton created by vtkMantaRenderer, all
-    // vtkCameras refer to the same mantaCamera created by vtkMantaRenderer
-    // (is it possible to have multiple vtkCameras associated with one
-    //  vtkRenderer?)
+    return;
+    }
+
+  if (!this->mantaCamera)
+    {
+    this->mantaCamera = mantaRenderer->GetMantaCamera();
     if (!this->mantaCamera)
       {
-      this->mantaCamera = mantaRenderer->GetMantaCamera();
+      return;
       }
-    
-    // for figuring out aspect ratio
-    int lowerLeft[2];
-    int usize, vsize;
-    ren->GetTiledSizeAndOrigin(&usize, &vsize, lowerLeft, lowerLeft + 1);
-
-    double *eye, *lookat, *up, vfov;
-    eye    = this->Position;
-    lookat = this->FocalPoint;
-    up     = this->ViewUp;
-    vfov   = this->ViewAngle;
-
-    const Manta::BasicCameraData bookmark(
-        Manta::Vector(eye[0], eye[1], eye[2]),
-        Manta::Vector(lookat[0], lookat[1], lookat[2]),
-        Manta::Vector(up[0], up[1], up[2]),
-        vfov * usize / vsize, vfov);
-
-    mantaRenderer->GetMantaEngine()->addTransaction("update camera",
-        Manta::Callback::create(this->mantaCamera,
-            &Manta::Camera::setBasicCameraData, bookmark));
     }
+
+  // for figuring out aspect ratio
+  int lowerLeft[2];
+  int usize, vsize;
+  ren->GetTiledSizeAndOrigin(&usize, &vsize, lowerLeft, lowerLeft + 1);
+
+  double *eye, *lookat, *up, vfov;
+  eye    = this->Position;
+  lookat = this->FocalPoint;
+  up     = this->ViewUp;
+  vfov   = this->ViewAngle;
+
+  const Manta::BasicCameraData bookmark
+    (
+     Manta::Vector(eye[0], eye[1], eye[2]),
+     Manta::Vector(lookat[0], lookat[1], lookat[2]),
+     Manta::Vector(up[0], up[1], up[2]),
+     vfov * usize / vsize, vfov
+     );
+
+  mantaRenderer->GetMantaEngine()->addTransaction
+    ("update camera",
+     Manta::Callback::create(this->mantaCamera,
+                             &Manta::Camera::setBasicCameraData, bookmark)
+     );
 }
 
 //----------------------------------------------------------------------------
@@ -119,18 +125,9 @@ void vtkMantaCamera::Render(vtkRenderer *ren)
 {
   if (this->GetMTime() > this->lastRenderTime)
     {
-    // vtkInteractorStyle changes the basic attributes of vtkCamera, all
-    // we need to do is update the mantaCamera accordingly via transaction
-    CreateMantaCamera(ren);
+    this->OrientMantaCamera(ren);
     }
 
   // update lastRenderTime
   this->lastRenderTime.Modified();
-}
-
-//----------------------------------------------------------------------------
-void vtkMantaCamera::UpdateViewport(vtkRenderer *ren)
-{
-  // Deal with change of window size
-  // Not actaully called by anyone
 }
