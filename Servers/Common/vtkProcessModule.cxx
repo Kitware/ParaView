@@ -137,7 +137,7 @@ protected:
 
 
 vtkStandardNewMacro(vtkProcessModule);
-vtkCxxRevisionMacro(vtkProcessModule, "1.97");
+vtkCxxRevisionMacro(vtkProcessModule, "1.98");
 vtkCxxSetObjectMacro(vtkProcessModule, ActiveRemoteConnection, vtkRemoteConnection);
 vtkCxxSetObjectMacro(vtkProcessModule, GUIHelper, vtkProcessModuleGUIHelper);
 
@@ -1364,8 +1364,8 @@ void vtkProcessModule::SetLocalProgress(const char* filter, int progress)
 {
   if (!this->GUIHelper)
     {
-    vtkErrorMacro("GUIHelper must be set for SetLocalProgress " << filter
-      << " " << progress);
+    //vtkErrorMacro("GUIHelper must be set for SetLocalProgress " << filter
+    //  << " " << progress);
     return;
     }
   this->LastProgress = progress;
