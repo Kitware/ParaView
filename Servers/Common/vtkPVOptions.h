@@ -53,6 +53,7 @@ public:
   vtkGetMacro(ConnectID, int);
   vtkGetMacro(UseOffscreenRendering, int);
   vtkGetMacro(UseStereoRendering, int);
+  vtkGetStringMacro(StereoType);
   vtkGetMacro(ClientMode, int);
   // Description:
   // Get Various ports.
@@ -216,6 +217,9 @@ private:
 
   char* LogFileName;
   int TellVersion;
+
+  vtkSetStringMacro(StereoType);
+  char* StereoType;
 //ETX
 private:
   vtkPVOptions(const vtkPVOptions&); // Not implemented

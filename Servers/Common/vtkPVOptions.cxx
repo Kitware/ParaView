@@ -24,7 +24,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVOptions);
-vtkCxxRevisionMacro(vtkPVOptions, "1.49");
+vtkCxxRevisionMacro(vtkPVOptions, "1.50");
 
 //----------------------------------------------------------------------------
 vtkPVOptions::vtkPVOptions()
@@ -77,6 +77,8 @@ vtkPVOptions::vtkPVOptions()
   this->DisableComposite = 0;
   this->ConnectID = 0;
   this->LogFileName = 0;
+  this->StereoType = 0;
+  this->SetStereoType("Red-Blue");
 
   this->Timeout = 0;
 
@@ -103,6 +105,7 @@ vtkPVOptions::~vtkPVOptions()
   this->SetMachinesFileName(0);
   this->SetStateFileName(0);
   this->SetLogFileName(0);
+  this->SetStereoType(0);
 }
 
 //----------------------------------------------------------------------------
@@ -151,6 +154,12 @@ void vtkPVOptions::Initialize()
   this->AddBooleanArgument("--stereo", 0, &this->UseStereoRendering,
                            "Tell the application to enable stereo rendering"
                            " (only when running on a single process).",
+                           vtkPVOptions::PVCLIENT | vtkPVOptions::PARAVIEW);
+  this->AddArgument("--stereo-type", 0, &this->StereoType,
+                           "Specify the stereo type. This valid only when "
+                           "--stereo is specified. Possible values are "
+                           "\"Crystal Eyes\", \"Red-Blue\", \"Interlaced\", "
+                           "\"Dresden\", \"Anaglyph\", \"Checkerboard\"",
                            vtkPVOptions::PVCLIENT | vtkPVOptions::PARAVIEW);
   /*
   this->AddArgument("--server-host", "-sh", &this->ServerHostName,

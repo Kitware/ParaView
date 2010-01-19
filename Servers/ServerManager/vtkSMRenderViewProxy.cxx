@@ -52,6 +52,7 @@
 #include "vtkSmartPointer.h"
 #include "vtkSMDataRepresentationProxy.h"
 #include "vtkSMDoubleVectorProperty.h"
+#include "vtkSMEnumerationDomain.h"
 #include "vtkSMHardwareSelector.h"
 #include "vtkSMInputProperty.h"
 #include "vtkSMIntVectorProperty.h"
@@ -93,7 +94,7 @@ inline bool SetIntVectorProperty(vtkSMProxy* proxy, const char* pname,
 }
 
 //-----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.88");
+vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.89");
 vtkStandardNewMacro(vtkSMRenderViewProxy);
 
 vtkInformationKeyMacro(vtkSMRenderViewProxy, LOD_RESOLUTION, Integer);
@@ -361,6 +362,13 @@ void vtkSMRenderViewProxy::EndCreateVTKObjects()
     {
     SetIntVectorProperty(this->RenderWindowProxy, "StereoCapableWindow", 1);
     SetIntVectorProperty(this->RenderWindowProxy, "StereoRender", 1);
+    vtkSMEnumerationDomain* domain = vtkSMEnumerationDomain::SafeDownCast(
+      this->RenderWindowProxy->GetProperty("StereoType")->GetDomain("enum"));
+    if (domain && domain->HasEntryText(pvoptions->GetStereoType()))
+      {
+      SetIntVectorProperty(this->RenderWindowProxy, "StereoType",
+        domain->GetEntryValueForText(pvoptions->GetStereoType()));
+      }
     }
 
   SetIntVectorProperty(this->Renderer2DProxy, "Erase", 0);
