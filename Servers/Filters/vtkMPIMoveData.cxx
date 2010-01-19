@@ -38,7 +38,7 @@
 #include "vtkTimerLog.h"
 #include "vtkToolkits.h"
 #include "vtkUnstructuredGrid.h"
-
+#include "vtk_zlib.h"
 #include <vtksys/ios/sstream>
 #define EXTENT_HEADER_SIZE 360
 
@@ -47,7 +47,7 @@
 #include "vtkAllToNRedistributePolyData.h"
 #endif
 
-vtkCxxRevisionMacro(vtkMPIMoveData, "1.22");
+vtkCxxRevisionMacro(vtkMPIMoveData, "1.23");
 vtkStandardNewMacro(vtkMPIMoveData);
 
 vtkCxxSetObjectMacro(vtkMPIMoveData,Controller, vtkMultiProcessController);
@@ -930,12 +930,29 @@ void vtkMPIMoveData::MarshalDataToBuffer(vtkDataSet* data)
   writer->WriteToOutputStringOn();
   writer->SetInput(d);
   writer->Write();
+
+  // Use z-lib compression.
+  uLongf out_size =compressBound(writer->GetOutputStringLength());
+  char* buffer = new char[out_size + EXTENT_HEADER_SIZE + 4]; 
+  compress2(reinterpret_cast<Bytef*>(buffer), 
+    &out_size,
+    reinterpret_cast<const Bytef*>(writer->GetOutputString()),
+    writer->GetOutputStringLength(), /* compression_level */ 9);
+  int in_size = static_cast<int>(writer->GetOutputStringLength());
+  for (int cc=0; cc < 4; cc++)
+    {
+    buffer[out_size+cc] = (in_size & 0x0ff);
+    in_size = in_size >> 8;
+    }
+  out_size += 4;
+
   // Get string.
   this->NumberOfBuffers = 1;
   this->BufferLengths = new vtkIdType[1];
-  this->BufferLengths[0] = writer->GetOutputStringLength();
+  this->BufferLengths[0] = out_size;
   this->BufferOffsets = new vtkIdType[1];
   this->BufferOffsets[0] = 0;
+  this->Buffers = buffer;
 
   if (imageData)
     {
@@ -955,22 +972,14 @@ void vtkMPIMoveData::MarshalDataToBuffer(vtkDataSet* data)
     if (stream.str().size() >= EXTENT_HEADER_SIZE)
       {
       vtkErrorMacro("Extent message too long!");
-      this->Buffers = writer->RegisterAndGetOutputString();
       }
     else
       {
       char extentHeader[EXTENT_HEADER_SIZE];
       strcpy(extentHeader, stream.str().c_str());
+      memcpy(&buffer[out_size], extentHeader, EXTENT_HEADER_SIZE);
       this->BufferLengths[0] += EXTENT_HEADER_SIZE;
-      this->Buffers = new char[this->BufferLengths[0]];
-      memcpy(this->Buffers, extentHeader, EXTENT_HEADER_SIZE);
-      memcpy(this->Buffers+EXTENT_HEADER_SIZE, writer->GetOutputString(),
-        writer->GetOutputStringLength());
       }
-    }
-  else
-    {
-    this->Buffers = writer->RegisterAndGetOutputString();
     }
   this->BufferTotalLength = this->BufferLengths[0];
 
@@ -1017,29 +1026,44 @@ void vtkMPIMoveData::ReconstructDataFromBuffer(vtkDataSet* data)
 
   for (int idx = 0; idx < this->NumberOfBuffers; ++idx)
     {
+    char* bufferArray = this->Buffers+this->BufferOffsets[idx];
+    vtkIdType bufferLength = this->BufferLengths[idx];
+
+    vtkIdType zlib_length = bufferLength - 4;
+    vtkIdType in_length = 0;
+    if (data->IsA("vtkImageData"))
+      {
+      zlib_length = bufferLength - EXTENT_HEADER_SIZE - 4;
+      }
+    for (int cc=0; cc < 4; cc++)
+      {
+      in_length = in_length | 
+        ((0xff & (bufferArray[zlib_length+cc])) <<8 *cc);
+      }
+
+    char* realBuffer = new char[in_length+100];
+    uLongf destLen = in_length+100;
+    uncompress(reinterpret_cast<Bytef*>(realBuffer), &destLen,
+      reinterpret_cast<const Bytef*>(bufferArray), zlib_length);
+
     // Setup a reader.
     vtkDataSetReader *reader = vtkDataSetReader::New();
     reader->ReadFromInputStringOn();
 
-    char* bufferArray = this->Buffers+this->BufferOffsets[idx];
-    vtkIdType bufferLength = this->BufferLengths[idx];
-
     int extent[6]= {0, 0, 0, 0, 0, 0};
     float origin[3] = {0, 0, 0};
     bool extentAvailable = false;
-    if (bufferLength >= EXTENT_HEADER_SIZE &&
-      strncmp(bufferArray, "EXTENT", 6)==0)
+    if (data->IsA("vtkImageData"))
       {
-      sscanf(bufferArray, "EXTENT %d %d %d %d %d %d ORIGIN %f %f %f", &extent[0], &extent[1],
+      sscanf(&bufferArray[zlib_length+4],
+        "EXTENT %d %d %d %d %d %d ORIGIN %f %f %f", &extent[0], &extent[1],
         &extent[2], &extent[3], &extent[4], &extent[5],
         &origin[0], &origin[1], &origin[2]);
-      bufferArray += EXTENT_HEADER_SIZE;
-      bufferLength -= EXTENT_HEADER_SIZE;
       extentAvailable = true;
       }
 
     vtkCharArray* mystring = vtkCharArray::New();
-    mystring->SetArray(bufferArray, bufferLength, 1);
+    mystring->SetArray(realBuffer, destLen, 1);
     reader->SetInputArray(mystring);
     reader->Modified(); // For append loop
     reader->Update();
@@ -1083,6 +1107,7 @@ void vtkMPIMoveData::ReconstructDataFromBuffer(vtkDataSet* data)
     mystring = 0;
     reader->Delete();
     reader = NULL;
+    delete [] realBuffer;
     }
 
   if (appendPd)
