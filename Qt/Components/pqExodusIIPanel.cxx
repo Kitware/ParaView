@@ -458,9 +458,18 @@ void pqExodusIIPanel::applyDisplacements(int state)
 
 void pqExodusIIPanel::displChanged(bool state)
 {
-  if(!state)
+  QCheckBox* ApplyDisp = this->UI->ApplyDisplacements;
+  if (state)
     {
-    QCheckBox* ApplyDisp = this->UI->ApplyDisplacements;
+    // BUG #9843. When displ array is enabled, set the value of
+    // ApplyDisplacements to the last accepted value.
+    ApplyDisp->setCheckState(
+      pqSMAdaptor::getElementProperty(
+        this->proxy()->GetProperty("ApplyDisplacements")).toBool()?
+      Qt::Checked : Qt::Unchecked);
+    }
+  else
+    {
     ApplyDisp->setCheckState(Qt::Unchecked);
     }
 }
