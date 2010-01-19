@@ -79,7 +79,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <cstring>
 
-vtkCxxRevisionMacro(vtkMantaProperty, "1.2");
+vtkCxxRevisionMacro(vtkMantaProperty, "1.3");
 vtkStandardNewMacro(vtkMantaProperty);
 
 //----------------------------------------------------------------------------
@@ -258,3 +258,11 @@ vtkMantaProperty::~vtkMantaProperty()
   if ( this->specularTexture ) delete   this->specularTexture;
   if ( this->MaterialType    ) delete[] this->MaterialType;
 }
+
+//------------------------------------------------------------------------------
+void vtkMantaProperty::ReleaseGraphicsResources(vtkWindow *win)
+{
+  cerr << "MANTA PROPERTY RELEASE " << this << endl;
+  this->Superclass::ReleaseGraphicsResources(win);
+}
+

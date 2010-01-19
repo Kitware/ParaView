@@ -77,7 +77,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <Model/Groups/Group.h>
 #include <Model/Groups/Mesh.h>
 
-vtkCxxRevisionMacro(vtkMantaActor, "1.4");
+vtkCxxRevisionMacro(vtkMantaActor, "1.5");
 vtkStandardNewMacro(vtkMantaActor);
 
 //----------------------------------------------------------------------------
@@ -131,6 +131,9 @@ void vtkMantaActor::SetVisibility(int newval)
 //----------------------------------------------------------------------------
 void vtkMantaActor::ReleaseGraphicsResources( vtkWindow * win )
 {
+  cerr << "MANTA ACTOR RELEASE " << this << endl;
+  this->Superclass::ReleaseGraphicsResources( win );
+
   if (!win)
     {
     // called by vtkRenderer::SetRenderWindow() with win==0 at initialization
@@ -170,8 +173,6 @@ void vtkMantaActor::ReleaseGraphicsResources( vtkWindow * win )
 #endif
       }
     }
-
-  //this->Superclass::ReleaseGraphicsResources( win );
 }
 
 //----------------------------------------------------------------------------

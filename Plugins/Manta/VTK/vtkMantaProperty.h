@@ -95,6 +95,12 @@ public:
   // Implement base class method.
   void BackfaceRender(vtkActor *a, vtkRenderer *ren);
 
+  // Description:
+  // Release any graphics resources that are being consumed by this
+  // property. The parameter window could be used to determine which graphic
+  // resources to release.
+  virtual void ReleaseGraphicsResources(vtkWindow *win);
+
   // functions that change parameters of various materials
   vtkSetStringMacro(MaterialType);
   vtkGetStringMacro(MaterialType);

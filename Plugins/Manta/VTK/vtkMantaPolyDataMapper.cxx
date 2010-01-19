@@ -85,7 +85,6 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkTubeFilter.h"
 #include "vtkUnsignedCharArray.h"
 
-
 #include <Engine/Control/RTRT.h>
 #include <Model/Groups/DynBVH.h>
 #include <Model/Groups/Group.h>
@@ -100,7 +99,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <math.h>
 
-vtkCxxRevisionMacro(vtkMantaPolyDataMapper, "1.2");
+vtkCxxRevisionMacro(vtkMantaPolyDataMapper, "1.3");
 vtkStandardNewMacro(vtkMantaPolyDataMapper);
 
 //----------------------------------------------------------------------------
@@ -123,7 +122,6 @@ vtkMantaPolyDataMapper::vtkMantaPolyDataMapper()
 vtkMantaPolyDataMapper::~vtkMantaPolyDataMapper()
 {
   cerr << "DESTROY MANTA POLY DATA MAPPER " << this << endl;
-
   if ( this->SphereConfig != NULL )
     {
     this->SphereConfig->Delete();
@@ -160,6 +158,7 @@ vtkMantaPolyDataMapper::~vtkMantaPolyDataMapper()
 // the display list if any.
 void vtkMantaPolyDataMapper::ReleaseGraphicsResources(vtkWindow *win)
 {
+  cerr << "MANTA MAPPER RELEASE " << this << endl;
 }
 
 //----------------------------------------------------------------------------
