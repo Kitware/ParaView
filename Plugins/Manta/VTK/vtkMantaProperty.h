@@ -114,14 +114,7 @@ public:
   //ETX
 
 protected:
- vtkMantaProperty() :
-  MantaMaterial(0), MaterialType(0), diffuseTexture(0), specularTexture(0),
-    Reflectance(0.0), Eta(1.52), Thickness(1.0)
-    {
-    // No, there is no duplication of setting MaterialType, it is the way
-    // vtkSetStringMacro works
-    this->SetMaterialType("default");
-    };
+  vtkMantaProperty();
   ~vtkMantaProperty();
 
 private:

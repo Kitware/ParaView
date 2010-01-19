@@ -58,9 +58,6 @@ OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-// .NAME vtkMantaTexture - 
-// .SECTION Description
-//
 
 #include "vtkManta.h"
 #include "vtkMantaRenderer.h"
@@ -79,19 +76,22 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <math.h>
 
-vtkCxxRevisionMacro(vtkMantaTexture, "1.1");
+vtkCxxRevisionMacro(vtkMantaTexture, "1.2");
 vtkStandardNewMacro(vtkMantaTexture);
 
 //----------------------------------------------------------------------------
 // Initializes an instance, generates a unique index.
 vtkMantaTexture::vtkMantaTexture()
 {
+  cerr << "CREATE MANTA TEXTURE " << this << endl;
   this->RenderWindow = 0;
 }
 
 //----------------------------------------------------------------------------
 vtkMantaTexture::~vtkMantaTexture()
 {
+  cerr << "DESTROY MANTA TEXTURE " << this << endl;
+
   if (this->RenderWindow)
     {
     this->ReleaseGraphicsResources(this->RenderWindow);

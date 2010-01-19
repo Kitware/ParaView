@@ -90,7 +90,7 @@ public:
   void Render(vtkRenderer *ren, int light_index);
 
 protected:
- vtkMantaLight() : mantaLight(0) {};
+  vtkMantaLight();
   ~vtkMantaLight();
 
 private:
@@ -100,7 +100,7 @@ private:
   void CreateMantaLight(vtkRenderer *);
   void UpdateMantaLight(vtkRenderer *ren);
   //BTX
-  Manta::Light *mantaLight;
+  Manta::Light *MantaLight;
   //ETX
 };
 

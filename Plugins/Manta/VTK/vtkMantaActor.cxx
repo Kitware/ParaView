@@ -77,13 +77,14 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <Model/Groups/Group.h>
 #include <Model/Groups/Mesh.h>
 
-vtkCxxRevisionMacro(vtkMantaActor, "1.3");
+vtkCxxRevisionMacro(vtkMantaActor, "1.4");
 vtkStandardNewMacro(vtkMantaActor);
 
 //----------------------------------------------------------------------------
 vtkMantaActor::vtkMantaActor() : Mesh(0), MantaAS(0), MantaWorldGroup(0),
   IsModified(false), LastVisibility(false), Renderer(0)
 {
+  cerr << "CREATE MANTA ACTOR " << this << endl;
 }
 
 //----------------------------------------------------------------------------
@@ -91,39 +92,13 @@ vtkMantaActor::vtkMantaActor() : Mesh(0), MantaAS(0), MantaWorldGroup(0),
 //
 vtkMantaActor::~vtkMantaActor()
 {
-  // The following code allows the user EITHER to repeatedly create and delete
-  // (explicit mode) vtkManta objects through ParaView GUI OR to simply leave
-  // them there to close ParaView (implicit deletion), without segfaults.
+  cerr << "DESTROY MANTA ACTOR " << this << endl;
   if ( this->Mesh    && this->Renderer &&
        this->MantaAS && this->MantaWorldGroup
      )
     {
-    // Now that this->Renderer is NOT NULL, we can check if the render window
-    // is available too. Debug results indicate that a render window might be
-    // NULL while Mesh, MantaAS, Renderer, and MantaWorldGroup still exist. In
-    // this case, it is Neither this current renderer Nor this current actor
-    // responsible for memory de-allocation. One fact is that there are usually
-    // multiple actors corresponding to a single VISIBLE Manta geometry, of
-    // which some are always INVISIBLE regardless of the visibility of the
-    // geometry in the scene. This partly adds to the complexity of memory
-    // de-allocation.
     if ( this->Renderer->GetRenderWindow() )
       {
-      // NOTE: ONLY when the render window is still available, can Manta
-      // objects be deleted. In fact only renderers on layer #0 are able to
-      // reach this line.
-      //
-      // However, an attempt to use the Manta callback scheme for this goal
-      // just does NOT work and incurs segfault problems (just upon explicit
-      // deletion) even when we guarantee that all required resources, i.e.,
-      // renderer, render window, renderer collection, first renderer, safe
-      // downcast, Manta engine, and Manta world group, are NOT NULL upon
-      // invoking the Manta callback function. This problem is probably due
-      // to the thread-safety issue that occurs just when those so many
-      // if-statements are checked. In other words, a TRUE if-statement might
-      // be immediately made FALSE due to the interference of other co-existent
-      // threads' behaviors.
-      //
       this->RemoveObjects( this->Renderer, true );
       }
     }
@@ -200,15 +175,6 @@ void vtkMantaActor::ReleaseGraphicsResources( vtkWindow * win )
 }
 
 //----------------------------------------------------------------------------
-// This function invokes vtkMantaActor::RemoveObjects( . ) through the Manta::
-// Callback::create( ... ) scheme for THREAD SAFETY. **PLEASE NOTE**: A DIRECT
-// call to vtkMantaActor::RemoveObjects( . ) would cause segfault problems. It
-// could be only the first renderer of a render window that is to be used to
-// detach the geometry, specifically remove the acceleration structure, from
-// the world group of the scene to turn off the visibility of the actor.
-
-//
-// called by vtkMantaRenderer::UpdateActorsForVisibility()
 void vtkMantaActor::DetachFromMantaRenderEngine( vtkMantaRenderer * renderer )
 {
   vtkRendererCollection * renders = renderer->GetRenderWindow()->GetRenderers();
@@ -228,26 +194,6 @@ void vtkMantaActor::DetachFromMantaRenderEngine( vtkMantaRenderer * renderer )
 }
 
 //----------------------------------------------------------------------------
-// DETACH the 'old' mesh from the acceleration structure (this->MantaAS) and
-// DETACH and DEEP-delete the acceleration structure (this->MantaAS) from the
-// host renderer's Manta world group (i.e., this->MantaWorldGroup)'s
-// vector<Manta::Object *>.
-//
-// NOTE: this function supports BOTH visibility toggling' of vtkManta objects
-//       (including the center of rotation axes widget) AND deleting vtkManta
-//       objects. For the former, it does NOT delete the 'old' mesh because
-//       the 'old' mesh might be assigned to a new acceleration structure upon
-//       visitility on later. The mesh, as the underlying geometry, will NOT
-//       be deleted until the corresponding vtkManta object is totally deleted
-//       , i.e., in the latter case, either explicitly via ParaView's pipeline
-//       browser or implicitly by closing ParaView.
-//
-//       The argument, 'renderer', is usually the FIRST renderer of a window.
-//
-//       Simply DETACHING (without deep-deleting) this->MantaAS would affect
-//       the switch between various color map modes.
-//
-// RELATED: vtkMantaRenderer::UpdateActorsForVisibility()
 void vtkMantaActor::RemoveObjects( vtkRenderer * renderer, bool deleteMesh )
 {
   // this->MantaAS is an acceleration structure attached to a vtkMantaActor
@@ -291,12 +237,6 @@ void vtkMantaActor::RemoveObjects( vtkRenderer * renderer, bool deleteMesh )
 }
 
 //----------------------------------------------------------------------------
-// Update the acceleration structure and the host renderer's world group with
-// a 'new' mesh (this->Mesh), which might be the OLD one when switching
-// between various color map modes. It is NEW only when a vtkManta (geometric)
-// object is created from scratch.
-//
-// RELATED: vtkMantaRenderer::UpdateActorsForVisibility()
 void vtkMantaActor::UpdateObjects( vtkRenderer * ren )
 {
   // This line is used for switching between various color map modes and hence
@@ -339,9 +279,6 @@ void vtkMantaActor::UpdateObjects( vtkRenderer * ren )
 }
 
 //----------------------------------------------------------------------------
-// Actual actor render method. called by vtkActor::RenderOpaqueGeometry and
-// vtkActor::RenderTranslucentGeometry after vtkProperty::Render() and
-// vtkTexture::Renderer() are called
 void vtkMantaActor::Render( vtkRenderer * ren, vtkMapper * mapper )
 {
   if ( vtkMantaRenderer * mantaRenderer = vtkMantaRenderer::SafeDownCast( ren ) )
@@ -351,7 +288,6 @@ void vtkMantaActor::Render( vtkRenderer * ren, vtkMapper * mapper )
 
     // TODO: the way "real FLAT" shading is done right now (by not supplying vertex
     // normals), changing from FLAT to Gouraud shading needs to create a new mesh.
-
 
     //check if anything that affect appearence has changed, if so, rebuild manta
     //object so we see it. Don't do it every frame, since it is costly.

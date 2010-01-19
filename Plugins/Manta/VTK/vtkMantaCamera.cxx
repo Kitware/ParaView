@@ -58,9 +58,6 @@ OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-// .NAME vtkMantaCamera - 
-// .SECTION Description
-//
 
 #include "vtkManta.h"
 #include "vtkMantaCamera.h"
@@ -72,8 +69,21 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <Engine/Control/RTRT.h>
 #include <math.h>
 
-vtkCxxRevisionMacro(vtkMantaCamera, "1.2");
+vtkCxxRevisionMacro(vtkMantaCamera, "1.3");
 vtkStandardNewMacro(vtkMantaCamera);
+
+//----------------------------------------------------------------------------
+vtkMantaCamera::vtkMantaCamera() : MantaCamera (0) 
+{
+  //TODO: Observe my own modified event, and call OrientCamera then
+  cerr << "CREATE MANTA CAMERA " << this << endl;
+}
+
+//----------------------------------------------------------------------------
+vtkMantaCamera::~vtkMantaCamera()
+{
+  cerr << "DESTROY MANTA CAMERA " << this << endl;
+}
 
 //----------------------------------------------------------------------------
 void vtkMantaCamera::OrientMantaCamera(vtkRenderer *ren)
@@ -84,10 +94,10 @@ void vtkMantaCamera::OrientMantaCamera(vtkRenderer *ren)
     return;
     }
 
-  if (!this->mantaCamera)
+  if (!this->MantaCamera)
     {
-    this->mantaCamera = mantaRenderer->GetMantaCamera();
-    if (!this->mantaCamera)
+    this->MantaCamera = mantaRenderer->GetMantaCamera();
+    if (!this->MantaCamera)
       {
       return;
       }
@@ -114,7 +124,7 @@ void vtkMantaCamera::OrientMantaCamera(vtkRenderer *ren)
 
   mantaRenderer->GetMantaEngine()->addTransaction
     ("update camera",
-     Manta::Callback::create(this->mantaCamera,
+     Manta::Callback::create(this->MantaCamera,
                              &Manta::Camera::setBasicCameraData, bookmark)
      );
 }
@@ -123,11 +133,10 @@ void vtkMantaCamera::OrientMantaCamera(vtkRenderer *ren)
 // called by Renderer::UpdateCamera()
 void vtkMantaCamera::Render(vtkRenderer *ren)
 {
-  if (this->GetMTime() > this->lastRenderTime)
+  if (this->GetMTime() > this->LastRenderTime)
     {
     this->OrientMantaCamera(ren);
-    }
 
-  // update lastRenderTime
-  this->lastRenderTime.Modified();
+    this->LastRenderTime.Modified();
+    }
 }

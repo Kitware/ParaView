@@ -72,13 +72,14 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 typedef vtkTypeUInt32 uint32;
 
+class vtkRenderer;
+
 class vtkMantaRenderWindow : public @RenderWindowType@
 {
 public:
   static vtkMantaRenderWindow *New();
   vtkTypeRevisionMacro(vtkMantaRenderWindow, @RenderWindowType@);
   void PrintSelf(ostream& os, vtkIndent indent);
-
 
   //Description:
   //vtkManta updates the front buffer at this (late) stage of the 
@@ -106,6 +107,10 @@ public:
                                    unsigned char* data);
   virtual int GetZbufferData(int x1, int y1, int x2, int y2,
                              float* z_data);
+
+  //Description:
+  //Overridden to manage manta specific resources
+  virtual void AddRenderer(vtkRenderer *ren);
 
 protected:
   vtkMantaRenderWindow();

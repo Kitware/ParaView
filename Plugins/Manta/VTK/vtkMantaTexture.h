@@ -103,6 +103,7 @@ public:
   vtkSetMacro(MantaTexture, Manta::Texture<Manta::Color>*);
   vtkGetMacro(MantaTexture, Manta::Texture<Manta::Color>*);
   //ETX
+
   //BTX
 protected:
   vtkMantaTexture();
@@ -117,7 +118,6 @@ private:
   void operator=(const vtkMantaTexture&);  // Not implemented.
 
   Manta::Texture<Manta::Color> *MantaTexture;
-
   //ETX
 };
 

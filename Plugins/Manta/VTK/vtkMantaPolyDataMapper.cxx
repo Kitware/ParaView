@@ -58,14 +58,12 @@ OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-// .NAME vtkMantaPolyDataMapper - 
-// .SECTION Description
-//
+
 #include "vtkManta.h"
+#include "vtkMantaActor.h"
 #include "vtkMantaPolyDataMapper.h"
 #include "vtkMantaProperty.h"
 #include "vtkMantaRenderer.h"
-#include "vtkMantaActor.h"
 #include "vtkMantaTexture.h"
 
 #include "vtkAppendPolyData.h"
@@ -74,19 +72,19 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkCommand.h"
 #include "vtkDataArray.h"
 #include "vtkFloatArray.h"
+#include "vtkGenericCell.h"
 #include "vtkGlyph3D.h"
+#include "vtkImageData.h"
 #include "vtkMatrix4x4.h"
 #include "vtkObjectFactory.h"
 #include "vtkPointData.h"
+#include "vtkPoints.h"
 #include "vtkPolyData.h"
 #include "vtkSphereSource.h"
 #include "vtkTransform.h"
 #include "vtkTubeFilter.h"
 #include "vtkUnsignedCharArray.h"
-#include "vtkImageData.h"
 
-#include "vtkPoints.h"
-#include "vtkGenericCell.h"
 
 #include <Engine/Control/RTRT.h>
 #include <Model/Groups/DynBVH.h>
@@ -97,32 +95,35 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <Model/Materials/Lambertian.h>
 #include <Model/Materials/Transparent.h>
 #include <Model/Materials/Phong.h>
-
 #include <Model/Textures/TexCoordTexture.h>
 #include <Model/Textures/Constant.h>
+
 #include <math.h>
 
-vtkCxxRevisionMacro(vtkMantaPolyDataMapper, "1.1");
+vtkCxxRevisionMacro(vtkMantaPolyDataMapper, "1.2");
 vtkStandardNewMacro(vtkMantaPolyDataMapper);
 
 //----------------------------------------------------------------------------
 // Construct empty object.
 vtkMantaPolyDataMapper::vtkMantaPolyDataMapper()
 {
-   this->IsCenterAxes = false;
-   this->SphereConfig = NULL;
-   this->SphereCenter = NULL;
-   this->SphereFilter = NULL;
-   this->TubeFilter   = NULL;
-   this->PolyStrips   = NULL;
-   this->VTKtoManta   = NULL;
-   this->InternalColorTexture = NULL;
+  cerr << "CREATE MANTA POLY DATA MAPPER " << this << endl;
+  this->IsCenterAxes = false;
+  this->SphereConfig = NULL;
+  this->SphereCenter = NULL;
+  this->SphereFilter = NULL;
+  this->TubeFilter   = NULL;
+  this->PolyStrips   = NULL;
+  this->VTKtoManta   = NULL;
+  this->InternalColorTexture = NULL;
 }
 
 //----------------------------------------------------------------------------
 // Destructor (don't call ReleaseGraphicsResources() since it is virtual
 vtkMantaPolyDataMapper::~vtkMantaPolyDataMapper()
 {
+  cerr << "DESTROY MANTA POLY DATA MAPPER " << this << endl;
+
   if ( this->SphereConfig != NULL )
     {
     this->SphereConfig->Delete();

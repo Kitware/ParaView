@@ -102,7 +102,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <vtkstd/string>
 
-vtkCxxRevisionMacro(vtkMantaRenderer, "1.4");
+vtkCxxRevisionMacro(vtkMantaRenderer, "1.5");
 vtkStandardNewMacro(vtkMantaRenderer);
 
 //----------------------------------------------------------------------------
@@ -111,6 +111,7 @@ vtkMantaRenderer::vtkMantaRenderer() :
   IsStereo( false ), MaxDepth( 5 ), MantaScene( 0 ), MantaWorldGroup( 0 ),
   MantaLightSet( 0 ), MantaCamera( 0 ), SyncDisplay( 0 )
 {
+  cerr << "CREATE MANTA RENDERER " << this << endl;
   // the default global ambient light created by vtkRenderer is too bright.
   this->SetAmbient( 0.1, 0.1, 0.1 );
 
@@ -142,6 +143,8 @@ vtkMantaRenderer::vtkMantaRenderer() :
 //----------------------------------------------------------------------------
 vtkMantaRenderer::~vtkMantaRenderer()
 {
+  cerr << "DESTROY MANTA RENDERER " << this << endl;
+
   // don't do anything if the engine is not even initialized
   // it is the case for the 2nd renderer in PV.
   if ( !this->EngineInited )
@@ -289,13 +292,13 @@ int vtkMantaRenderer::UpdateLights()
     // TODO: schedule ClearLight here?
     // TODO: the LightKit in ParaView with MantaView creates vtkOpenGLight rather
     // than vtkMantaLight because there is no Client/Server communication involved
-    vtkLight *vtk_light = NULL;
+    vtkLight *vLight = NULL;
     for ( this->Lights->InitTraversal( sit );
-          ( vtk_light = this->Lights->GetNextLight( sit ) ) ; )
+          ( vLight = this->Lights->GetNextLight( sit ) ) ; )
       {
-      if ( vtk_light->GetSwitch() )
+      if ( vLight->GetSwitch() )
         {
-        vtk_light->Render( this, 0 /* not used */ );
+        vLight->Render( this, 0 /* not used */ );
         }
       }
     }

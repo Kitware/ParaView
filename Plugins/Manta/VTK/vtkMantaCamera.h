@@ -86,8 +86,8 @@ public:
   void Render(vtkRenderer *ren);
   
 protected:
-   vtkMantaCamera() : mantaCamera (0) {};
-  ~vtkMantaCamera() {};
+   vtkMantaCamera();
+  ~vtkMantaCamera();
   
 private:
   vtkMantaCamera(const vtkMantaCamera&);  // Not implemented.
@@ -95,10 +95,10 @@ private:
 
   void OrientMantaCamera(vtkRenderer *);
   
-  vtkTimeStamp lastRenderTime;
+  vtkTimeStamp LastRenderTime;
   //BTX
   // a singleton, created and deleted by vtkMantaRenderer
-  Manta::Camera *mantaCamera;
+  Manta::Camera *MantaCamera;
   //ETX
 };
 

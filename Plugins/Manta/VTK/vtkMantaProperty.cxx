@@ -58,32 +58,28 @@ OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-// .NAME vtkMantaProperty - 
-// .SECTION Description
-//
 
 #include "vtkManta.h"
-#include "vtkMantaRenderer.h"
 #include "vtkMantaProperty.h"
+#include "vtkMantaRenderer.h"
 
 #include "vtkObjectFactory.h"
 
+#include <Core/Color/RGBColor.h>
+#include <Model/Materials/AmbientOcclusion.h>
+#include <Model/Materials/Dielectric.h>
 #include <Model/Materials/Flat.h>
 #include <Model/Materials/Lambertian.h>
-#include <Model/Materials/Transparent.h>
-#include <Model/Materials/Phong.h>
-#include <Model/Materials/ThinDielectric.h>
-#include <Model/Materials/AmbientOcclusion.h>
 #include <Model/Materials/MetalMaterial.h>
 #include <Model/Materials/OrenNayar.h>
-#include <Model/Materials/Dielectric.h>
-#include <Core/Color/RGBColor.h>
-
+#include <Model/Materials/Phong.h>
+#include <Model/Materials/ThinDielectric.h>
+#include <Model/Materials/Transparent.h>
 #include <Model/Textures/Constant.h>
 
 #include <cstring>
 
-vtkCxxRevisionMacro(vtkMantaProperty, "1.1");
+vtkCxxRevisionMacro(vtkMantaProperty, "1.2");
 vtkStandardNewMacro(vtkMantaProperty);
 
 //----------------------------------------------------------------------------
@@ -122,24 +118,24 @@ void vtkMantaProperty::CreateMantaProperty()
       this->MantaMaterial = new Manta::Flat( this->diffuseTexture );
       }
     else
-    if ( this->GetOpacity() < 1.0 )
-      {
-      this->MantaMaterial =
-        new Manta::Transparent( this->diffuseTexture, this->GetOpacity() );
-      }
-    else
-    if ( this->GetSpecular() == 0 )
-      {
-      this->MantaMaterial = new Manta::Lambertian( this->diffuseTexture );
-      }
-    else
-      {
-      this->MantaMaterial =
-        new Manta::Phong( this->diffuseTexture,
-                          this->specularTexture,
-                          static_cast<int> ( this->GetSpecularPower() ),
-                          NULL );
-      }
+      if ( this->GetOpacity() < 1.0 )
+        {
+        this->MantaMaterial =
+          new Manta::Transparent( this->diffuseTexture, this->GetOpacity() );
+        }
+      else
+        if ( this->GetSpecular() == 0 )
+          {
+          this->MantaMaterial = new Manta::Lambertian( this->diffuseTexture );
+          }
+        else
+          {
+          this->MantaMaterial =
+            new Manta::Phong( this->diffuseTexture,
+                              this->specularTexture,
+                              static_cast<int> ( this->GetSpecularPower() ),
+                              NULL );
+          }
     }
   else
     {
@@ -149,90 +145,75 @@ void vtkMantaProperty::CreateMantaProperty()
       this->MantaMaterial = new Manta::Lambertian( this->diffuseTexture );
       }
     else
-    if ( strcmp( this->MaterialType, "phong" ) == 0 )
-      {
-      this->MantaMaterial =
-        new Manta::Phong( this->diffuseTexture,
-                          this->specularTexture,
-                          static_cast<int> ( this->GetSpecularPower() ),
-                          new Manta::Constant<Manta::ColorComponent>
-                          ( this->Reflectance ) );
-      }
-    else
-    if ( strcmp( this->MaterialType, "transparent" ) == 0 )
-      {
-      this->MantaMaterial
-        = new Manta::Transparent( diffuseTexture, this->GetOpacity() );
-      }
-    else
-    if ( strcmp( this->MaterialType, "thindielectric" ) == 0 )
-      {
-      this->MantaMaterial = new Manta::ThinDielectric(
-        new Manta::Constant<Manta::Real>( this->Eta ),
-        diffuseTexture, this->Thickness, 1 );
-      }
-    else
-    if ( strcmp( this->MaterialType, "dielectric" ) == 0 )
-      {
-      this->MantaMaterial
-        = new Manta::Dielectric( new Manta::Constant<Manta::Real>( this->N  ),
-                                 new Manta::Constant<Manta::Real>( this->Nt ),
-                                 diffuseTexture );
-      }
-    else
-    if ( strcmp( this->MaterialType, "ambientocclusion" ) == 0 )
-      {
-      this->MantaMaterial =
-        new Manta::AmbientOcclusion( diffuseTexture, 20, 20 );
-      }
-    else
-    if (strcmp( this->MaterialType, "metal" ) == 0 )
-      {
-      this->MantaMaterial = new Manta::MetalMaterial( diffuseTexture );
-      }
-    else
-    if ( strcmp( this->MaterialType, "orennayer" ) == 0 )
-      {
-      this->MantaMaterial = new Manta::OrenNayar( diffuseTexture );
-      }
-    else
-      {
-      // just default to phong
-      this->MantaMaterial
-        = new Manta::Phong( this->diffuseTexture,
+      if ( strcmp( this->MaterialType, "phong" ) == 0 )
+        {
+        this->MantaMaterial =
+          new Manta::Phong( this->diffuseTexture,
                             this->specularTexture,
                             static_cast<int> ( this->GetSpecularPower() ),
-                            new Manta::Constant<Manta::ColorComponent>(
-                            this->Reflectance) );
-      }
+                            new Manta::Constant<Manta::ColorComponent>
+                            ( this->Reflectance ) );
+        }
+      else
+        if ( strcmp( this->MaterialType, "transparent" ) == 0 )
+          {
+          this->MantaMaterial
+            = new Manta::Transparent( diffuseTexture, this->GetOpacity() );
+          }
+        else
+          if ( strcmp( this->MaterialType, "thindielectric" ) == 0 )
+            {
+            this->MantaMaterial = new Manta::ThinDielectric
+              (
+               new Manta::Constant<Manta::Real>( this->Eta ),
+               diffuseTexture, this->Thickness, 1 );
+            }
+          else
+            if ( strcmp( this->MaterialType, "dielectric" ) == 0 )
+              {
+              this->MantaMaterial
+                = new Manta::Dielectric( new Manta::Constant<Manta::Real>( this->N  ),
+                                         new Manta::Constant<Manta::Real>( this->Nt ),
+                                         diffuseTexture );
+              }
+            else
+              if ( strcmp( this->MaterialType, "ambientocclusion" ) == 0 )
+                {
+                this->MantaMaterial =
+                  new Manta::AmbientOcclusion( diffuseTexture, 20, 20 );
+                }
+              else
+                if (strcmp( this->MaterialType, "metal" ) == 0 )
+                  {
+                  this->MantaMaterial = new Manta::MetalMaterial( diffuseTexture );
+                  }
+                else
+                  if ( strcmp( this->MaterialType, "orennayer" ) == 0 )
+                    {
+                    this->MantaMaterial = new Manta::OrenNayar( diffuseTexture );
+                    }
+                  else
+                    {
+                    // just default to phong
+                    this->MantaMaterial
+                      = new Manta::Phong( this->diffuseTexture,
+                                          this->specularTexture,
+                                          static_cast<int> ( this->GetSpecularPower() ),
+                                          new Manta::Constant<Manta::ColorComponent>
+                                          (
+                                           this->Reflectance) );
+                    }
     }
-
-  // update MantaMaterialMTime
-  this->MantaMaterialMTime.Modified();
 }
 
 //----------------------------------------------------------------------------
-// called by vtkActor::RenderOpaqueGeometry() and
-// vtkActor::RenderTranslucentPolygonalGeometry()
-// In PV, this function will called twice per vtkRenderer::Render(), once
-// in vtkPVLODActor::RenderOpaqueGeometry() and once in vtkPVLODActor::Render()
 void vtkMantaProperty::Render( vtkActor * anActor, vtkRenderer * ren)
 {
-  // this test works for both a newly created vtkMantaProperty and
-  // an updated one
   if ( this->GetMTime() > this->MantaMaterialMTime )
     {
-    // if there is some change to the vtkProperty since last time
-    // MantaMaterial is created, recreate mantaProperty accordingly.
-    // the actor referencing this property will check if vtkProperty
-    // is changed and update it's Manta primitive's material accordingly.
-
-    // FIXME: thread safety, these deletes may be called with the engine
-    // still running
-//    delete this->MantaMaterial;    this->MantaMaterial   = NULL;
-//    delete this->diffuseTexture;   this->diffuseTexture  = NULL;
-//    delete this->specularTexture;  this->specularTexture = NULL;
     this->CreateMantaProperty();
+
+    this->MantaMaterialMTime.Modified();
     }
 }
 
@@ -255,8 +236,21 @@ void vtkMantaProperty::PrintSelf( ostream & os, vtkIndent indent )
 }
 
 //----------------------------------------------------------------------------
+vtkMantaProperty::vtkMantaProperty()
+  : MantaMaterial(0), MaterialType(0), diffuseTexture(0), specularTexture(0),
+    Reflectance(0.0), Eta(1.52), Thickness(1.0)
+{
+  cerr << "CREATE MANTA PROPERTY " << this << endl;
+
+  this->MaterialType = NULL;
+  this->SetMaterialType("default");
+}
+
+//----------------------------------------------------------------------------
 vtkMantaProperty::~vtkMantaProperty()
 {
+  cerr << "DESTROY MANTA PROPERTY " << this << endl;
+
   // TODO: We don't have to test if these pointers are NULL if
   // we get other parts correct, this only hides memory problems
   if ( this->MantaMaterial   ) delete   this->MantaMaterial;

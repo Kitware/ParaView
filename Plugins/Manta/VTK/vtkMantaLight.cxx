@@ -74,13 +74,42 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <math.h>
 
-vtkCxxRevisionMacro(vtkMantaLight, "1.2");
+vtkCxxRevisionMacro(vtkMantaLight, "1.3");
 vtkStandardNewMacro(vtkMantaLight);
+
+//----------------------------------------------------------------------------
+vtkMantaLight::vtkMantaLight() : MantaLight(0)
+{
+  cerr << "CREATE MANTA LIGHT " << this << endl;
+  this->MantaLight = NULL;
+
+}
+
+//----------------------------------------------------------------------------
+vtkMantaLight::~vtkMantaLight()
+{
+  cerr << "DESTROY MANTA LIGHT " << this << endl;
+
+  // TODO: do we have to remove MantaLight from MantaLightSet?
+  // Ans: We should, but Manta Materials are holding pointers to
+  // the MantaLight in their local lightset cache.
+  delete this->MantaLight;
+}
+
+//----------------------------------------------------------------------------
+void vtkMantaLight::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os,indent);
+}
 
 //------------------------------------------------------------------------------
 // called in Transaction context, it is safe to modify the engine state here
 void vtkMantaLight::UpdateMantaLight(vtkRenderer *ren)
 {
+  if (!this->MantaLight)
+    {
+    return;
+    }
   double *color, *position, *focal, direction[3];
 
   // Manta Lights only have one "color"
@@ -91,7 +120,7 @@ void vtkMantaLight::UpdateMantaLight(vtkRenderer *ren)
   if (this->GetPositional())
     {
     Manta::PointLight * pointLight =
-      dynamic_cast<Manta::PointLight *>(this->mantaLight);
+      dynamic_cast<Manta::PointLight *>(this->MantaLight);
     if ( pointLight )
         {
         pointLight->setPosition(Manta::Vector(position[0], position[1], position[2]));
@@ -106,7 +135,7 @@ void vtkMantaLight::UpdateMantaLight(vtkRenderer *ren)
   else
     {
     Manta::DirectionalLight * dirLight =
-      dynamic_cast<Manta::DirectionalLight *>(this->mantaLight);
+      dynamic_cast<Manta::DirectionalLight *>(this->MantaLight);
     if ( dirLight )
         {
         // "direction" in Manta means the direction toward light source rather than the
@@ -130,6 +159,10 @@ void vtkMantaLight::UpdateMantaLight(vtkRenderer *ren)
 void vtkMantaLight::CreateMantaLight(vtkRenderer *ren)
 {
   vtkMantaRenderer *mantaRenderer = vtkMantaRenderer::SafeDownCast(ren);
+  if (!mantaRenderer)
+    {
+    return;
+    }
 
   double *color, *position, *focal, direction[3];
 
@@ -140,7 +173,7 @@ void vtkMantaLight::CreateMantaLight(vtkRenderer *ren)
 
   if (this->GetPositional())
     {
-    this->mantaLight = new Manta::PointLight(
+    this->MantaLight = new Manta::PointLight(
       Manta::Vector(position[0], position[1], position[2]),
       Manta::Color(Manta::RGBColor(color[0],color[1],color[2])));
     }
@@ -151,19 +184,23 @@ void vtkMantaLight::CreateMantaLight(vtkRenderer *ren)
     direction[0] = position[0] - focal[0];
     direction[1] = position[1] - focal[1];
     direction[2] = position[2] - focal[2];
-    this->mantaLight = new Manta::DirectionalLight(
+    this->MantaLight = new Manta::DirectionalLight(
       Manta::Vector(direction[0], direction[1], direction[2]),
       Manta::Color(Manta::RGBColor(color[0],color[1],color[2])));
     }
-  mantaRenderer->GetMantaLightSet()->add(mantaLight);
+  mantaRenderer->GetMantaLightSet()->add(this->MantaLight);
 }
 
 //----------------------------------------------------------------------------
 void vtkMantaLight::Render(vtkRenderer *ren, int /* not used */)
 {
   vtkMantaRenderer *mantaRenderer = vtkMantaRenderer::SafeDownCast(ren);
+  if (!mantaRenderer)
+    {
+    return;
+    }
 
-  if (this->mantaLight)
+  if (this->MantaLight)
     {
     mantaRenderer->GetMantaEngine()->addTransaction(
         "update light",
@@ -179,19 +216,4 @@ void vtkMantaLight::Render(vtkRenderer *ren, int /* not used */)
             &vtkMantaLight::CreateMantaLight,
             ren));
     }
-}
-
-//----------------------------------------------------------------------------
-vtkMantaLight::~vtkMantaLight()
-{
-  // TODO: do we have to remove mantaLight from MantaLightSet?
-  // Ans: We should, but Manta Materials are holding pointers to
-  // the mantaLight in their local lightset cache.
-  delete this->mantaLight;
-}
-
-//----------------------------------------------------------------------------
-void vtkMantaLight::PrintSelf(ostream& os, vtkIndent indent)
-{
-  this->Superclass::PrintSelf(os,indent);
 }
