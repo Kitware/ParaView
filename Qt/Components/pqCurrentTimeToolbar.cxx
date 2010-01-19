@@ -75,6 +75,7 @@ void pqCurrentTimeToolbar::constructor()
 
   QSpinBox* sbtimeedit = new pqSpinBox(this);
   sbtimeedit->setObjectName("CurrentTimeIndex");
+  sbtimeedit->setMaximum(10000); // ensure that the widget is atleast 10000 wide.
   this->TimeSpinBox = sbtimeedit;
 
   //QObject::connect(
