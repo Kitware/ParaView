@@ -1,18 +1,68 @@
-#include "vtkConeSource.h"
-#include "vtkSphereSource.h"
-#include "vtkCylinderSource.h"
-#include "vtkPolyDataMapper.h"
 #include "vtkActor.h"
+#include "vtkConeSource.h"
+#include "vtkCylinderSource.h"
+#include "vtkMantaActor.h"
+#include "vtkMantaPolyDataMapper.h"
+#include "vtkMantaRenderer.h"
+#include "vtkMantaRenderWindow.h"
+#include "vtkPolyDataMapper.h"
+#include "vtkRegressionTestImage.h"
 #include "vtkRenderer.h"
 #include "vtkRenderWindow.h"
 #include "vtkRenderWindowInteractor.h"
-#include "vtkRegressionTestImage.h"
+#include "vtkSphereSource.h"
 
 // this program tests toggling visibility of objects
 
-#ifndef usleep
-#define usleep(time)
-#endif
+bool useGL = false;
+
+vtkPolyDataMapper *makeMapper()
+{
+  if (useGL)
+    {
+    return vtkPolyDataMapper::New();
+    }
+  else
+    {
+    return vtkMantaPolyDataMapper::New();
+    }
+}
+
+vtkActor *makeActor()
+{
+  if (useGL)
+    {
+    return vtkActor::New();
+    }
+  else
+    {
+    return vtkMantaActor::New();
+    }
+}
+
+vtkRenderer *makeRenderer()
+{
+  if (useGL)
+    {
+    return vtkRenderer::New();
+    }
+  else
+    {
+    return vtkMantaRenderer::New();
+    }
+}
+
+vtkRenderWindow *makeRenderWindow()
+{
+  if (useGL)
+    {
+    return vtkRenderWindow::New();
+    }
+  else
+    {
+    return vtkMantaRenderWindow::New();
+    }
+}
 
 //----------------------------------------------------------------------------
 int main( int argc, char* argv[] )
@@ -28,86 +78,81 @@ int main( int argc, char* argv[] )
     { 1, 1, 1 }, { 0, 0, 1 }, { 1, 1, 1 }, { 0, 0, 0 }, { 1, 1, 1 }
   };
 
-  // cone
+  for (int i = 0; i < argc; i++)
+    {
+    if (!strcmp(argv[i], "-useGL"))
+      {
+      useGL = true;
+      }
+    }
+
+  vtkRenderer * renderer = makeRenderer();
+  renderer->SetBackground( 0.0, 0.0, 1.0 );
+
+  vtkRenderWindow * renWin = makeRenderWindow();
+  renWin->AddRenderer( renderer );
+  renWin->SetSize( 400, 400 );
+
+  // create cone
   vtkConeSource * cone= vtkConeSource::New();
   cone->SetRadius( objRad );
   cone->SetHeight( objRad * 2 );
   cone->SetResolution( objRes );
 
-  vtkPolyDataMapper * coneMapper = vtkPolyDataMapper::New();
+  vtkPolyDataMapper * coneMapper = makeMapper();
   coneMapper->SetInputConnection( cone->GetOutputPort() );
   
-  vtkActor * coneActor = vtkActor::New();
+  vtkActor * coneActor = makeActor();
   coneActor->SetMapper( coneMapper );
   coneActor->AddPosition( 0.0, objRad * 2.0, 0.0 );
   coneActor->RotateZ( 90.0 );
-    
-  // sphere
+
+  renderer->AddActor( coneActor );
+
+  // create sphere
   vtkSphereSource * sphere = vtkSphereSource::New();
   sphere->SetCenter( 0.0, 0.0, 0.0 );
   sphere->SetRadius( objRad );
   sphere->SetThetaResolution( objRes );
   sphere->SetPhiResolution  ( objRes );
 
-  vtkPolyDataMapper * sphereMapper = vtkPolyDataMapper::New();
+  vtkPolyDataMapper * sphereMapper = makeMapper();
   sphereMapper->SetInputConnection( sphere->GetOutputPort() );
-  
-  vtkActor * sphereActor = vtkActor::New();
+
+  vtkActor * sphereActor = makeActor();
   sphereActor->SetMapper( sphereMapper );
-  
-  // cylinder
+
+  renderer->AddActor( sphereActor );
+
+  // create cylinder
   vtkCylinderSource * cylinder = vtkCylinderSource::New();
   cylinder->SetCenter( 0.0, -objRad * 2, 0.0 );
   cylinder->SetRadius( objRad );
   cylinder->SetHeight( objRad * 2 );
   cylinder->SetResolution( objRes );
 
-  vtkPolyDataMapper * cylinderMapper = vtkPolyDataMapper::New();
+  vtkPolyDataMapper * cylinderMapper = makeMapper();
   cylinderMapper->SetInputConnection( cylinder->GetOutputPort() );
-  
-  vtkActor * cylinderActor = vtkActor::New();
+
+  vtkActor * cylinderActor = makeActor();
   cylinderActor->SetMapper( cylinderMapper );
-  
-  vtkRenderer * renderer = vtkRenderer::New();
-  renderer->SetBackground( 0.0, 0.0, 1.0 );
-  renderer->AddActor( coneActor );
-  renderer->AddActor( sphereActor );
+
   renderer->AddActor( cylinderActor );
-
-  vtkRenderWindow * renWin = vtkRenderWindow::New();
-  renWin->AddRenderer( renderer );
-  renWin->SetSize( 400, 400 );
-
-  vtkRenderWindowInteractor * interactor = vtkRenderWindowInteractor::New();
-  interactor->SetRenderWindow( renWin );
 
   renWin->Render();
 
-  int retVal = vtkRegressionTestImage( renWin );
-  if ( retVal == vtkRegressionTester::DO_INTERACTOR )
+  for ( int i = 0; i < 15; i ++ )
     {
-    interactor->Start();
-    }
-  else
-    {
-    for ( int i = 0; i < 15; i ++ )
-      {
-      coneActor->SetVisibility( objVis[i][0] );
-      sphereActor->SetVisibility( objVis[i][1] );
-      cylinderActor->SetVisibility( objVis[i][2] );
-      renWin->Render();
-      if ( i == 3 )
-        {
-        retVal = vtkRegressionTestImage( renWin );
-        }
-      usleep( second * 1000000 );
-      }
+    coneActor->SetVisibility( objVis[i][0] );
+    sphereActor->SetVisibility( objVis[i][1] );
+    cylinderActor->SetVisibility( objVis[i][2] );
+    renWin->Render();
     }
 
   cone->Delete();
   coneMapper->Delete();
   coneActor->Delete();
-  
+
   sphere->Delete();
   sphereMapper->Delete();
   sphereActor->Delete();
@@ -118,7 +163,6 @@ int main( int argc, char* argv[] )
 
   renderer->Delete();
   renWin->Delete();
-  interactor->Delete();
 
-  return !retVal;
+  return 0;
 }

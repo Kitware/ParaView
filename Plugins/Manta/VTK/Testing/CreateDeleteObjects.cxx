@@ -1,18 +1,67 @@
-#include "vtkConeSource.h"
-#include "vtkSphereSource.h"
-#include "vtkCylinderSource.h"
-#include "vtkPolyDataMapper.h"
 #include "vtkActor.h"
+#include "vtkConeSource.h"
+#include "vtkCylinderSource.h"
+#include "vtkMantaActor.h"
+#include "vtkMantaPolyDataMapper.h"
+#include "vtkMantaRenderer.h"
+#include "vtkMantaRenderWindow.h"
+#include "vtkPolyDataMapper.h"
 #include "vtkRenderer.h"
 #include "vtkRenderWindow.h"
 #include "vtkRenderWindowInteractor.h"
-#include "vtkRegressionTestImage.h"
+#include "vtkSphereSource.h"
 
 // this program tests creating and deleting objects
 
-#ifndef usleep
-#define usleep(time)
-#endif
+bool useGL = false;
+
+vtkPolyDataMapper *makeMapper()
+{
+  if (useGL)
+    {
+    return vtkPolyDataMapper::New();
+    }
+  else
+    {
+    return vtkMantaPolyDataMapper::New();
+    }
+}
+
+vtkActor *makeActor()
+{
+  if (useGL)
+    {
+    return vtkActor::New();
+    }
+  else
+    {
+    return vtkMantaActor::New();
+    }
+}
+
+vtkRenderer *makeRenderer()
+{
+  if (useGL)
+    {
+    return vtkRenderer::New();
+    }
+  else
+    {
+    return vtkMantaRenderer::New();
+    }
+}
+
+vtkRenderWindow *makeRenderWindow()
+{
+  if (useGL)
+    {
+    return vtkRenderWindow::New();
+    }
+  else
+    {
+    return vtkMantaRenderWindow::New();
+    }
+}
 
 //----------------------------------------------------------------------------
 int main( int argc, char* argv[] )
@@ -20,114 +69,118 @@ int main( int argc, char* argv[] )
   int     second = 1;
   int     objRes = 12;
   double  objRad = 0.075;
-  
-  vtkRenderer * renderer = vtkRenderer::New();
+
+  for (int i = 0; i < argc; i++)
+    {
+    if (!strcmp(argv[i], "-useGL"))
+      {
+      useGL = true;
+      }
+    }
+
+  vtkRenderer * renderer = makeRenderer();
   renderer->SetBackground( 0.0, 0.0, 1.0 );
 
-  vtkRenderWindow * renWin = vtkRenderWindow::New();
+  vtkRenderWindow * renWin = makeRenderWindow();
   renWin->AddRenderer( renderer );
   renWin->SetSize( 400, 400 );
 
-  vtkRenderWindowInteractor * interactor = vtkRenderWindowInteractor::New();
-  interactor->SetRenderWindow( renWin );
-  
+  // create cone
+  vtkConeSource * cone= vtkConeSource::New();
+  cone->SetRadius( objRad );
+  cone->SetHeight( objRad * 2 );
+  cone->SetResolution( objRes );
+
+  vtkPolyDataMapper * coneMapper = makeMapper();
+  coneMapper->SetInputConnection( cone->GetOutputPort() );
+
+  vtkActor * coneActor = makeActor();
+  coneActor->SetMapper( coneMapper );
+  coneActor->AddPosition( 0.0, objRad * 2.0, 0.0 );
+  coneActor->RotateZ( 90.0 );
+
+  renderer->AddActor( coneActor );
+
+  // create sphere
+  vtkSphereSource * sphere = vtkSphereSource::New();
+  sphere->SetCenter( 0.0, 0.0, 0.0 );
+  sphere->SetRadius( objRad );
+  sphere->SetThetaResolution( objRes );
+  sphere->SetPhiResolution  ( objRes );
+
+  vtkPolyDataMapper * sphereMapper = makeMapper();
+  sphereMapper->SetInputConnection( sphere->GetOutputPort() );
+
+  vtkActor * sphereActor = makeActor();
+  sphereActor->SetMapper( sphereMapper );
+
+  renderer->AddActor( sphereActor );
+
+  // create cylinder
+  vtkCylinderSource * cylinder = vtkCylinderSource::New();
+  cylinder->SetCenter( 0.0, -objRad * 2, 0.0 );
+  cylinder->SetRadius( objRad );
+  cylinder->SetHeight( objRad * 2 );
+  cylinder->SetResolution( objRes );
+
+  vtkPolyDataMapper * cylinderMapper = makeMapper();
+  cylinderMapper->SetInputConnection( cylinder->GetOutputPort() );
+
+  vtkActor * cylinderActor = makeActor();
+  cylinderActor->SetMapper( cylinderMapper );
+
+  renderer->AddActor( cylinderActor );
+
   renWin->Render();
 
-  int retVal = vtkRegressionTestImage( renWin );
-  if ( retVal == vtkRegressionTester::DO_INTERACTOR )
-    {
-    interactor->Start();
-    }
-  else
-    {
-    renWin->Render();
-    usleep( second * 1000000 );
+  // delete cone
+  renderer->RemoveActor( coneActor );
+  cone->Delete();
+  coneMapper->Delete();
+  coneActor->Delete();
 
-    // create cone
-    vtkConeSource * cone= vtkConeSource::New();
-    cone->SetRadius( objRad );
-    cone->SetHeight( objRad * 2 );
-    cone->SetResolution( objRes );
+  renWin->Render();
 
-    vtkPolyDataMapper * coneMapper = vtkPolyDataMapper::New();
-    coneMapper->SetInputConnection( cone->GetOutputPort() );
-  
-    vtkActor * coneActor = vtkActor::New();
-    coneActor->SetMapper( coneMapper );
-    coneActor->AddPosition( 0.0, objRad * 2.0, 0.0 );
-    coneActor->RotateZ( 90.0 );
+  // delete sphere
+  renderer->RemoveActor( sphereActor );
+  sphere->Delete();
+  sphereMapper->Delete();
+  sphereActor->Delete();
 
-    renderer->AddActor( coneActor );
-    renWin->Render();
-    usleep( second * 1000000 );
-  
-    // create sphere
-    vtkSphereSource * sphere = vtkSphereSource::New();
-    sphere->SetCenter( 0.0, 0.0, 0.0 );
-    sphere->SetRadius( objRad );
-    sphere->SetThetaResolution( objRes );
-    sphere->SetPhiResolution  ( objRes );
+  renWin->Render();
 
-    vtkPolyDataMapper * sphereMapper = vtkPolyDataMapper::New();
-    sphereMapper->SetInputConnection( sphere->GetOutputPort() );
-  
-    vtkActor * sphereActor = vtkActor::New();
-    sphereActor->SetMapper( sphereMapper );
+  // delete cylinder
+  renderer->RemoveActor( cylinderActor );
+  cylinder->Delete();
+  cylinderMapper->Delete();
+  cylinderActor->Delete();
 
-    renderer->AddActor( sphereActor );
-    renWin->Render();
-    usleep( second * 1000000 );
+  renWin->Render();
 
-    // create cylinder
-    vtkCylinderSource * cylinder = vtkCylinderSource::New();
-    cylinder->SetCenter( 0.0, -objRad * 2, 0.0 );
-    cylinder->SetRadius( objRad );
-    cylinder->SetHeight( objRad * 2 );
-    cylinder->SetResolution( objRes );
+  // re create sphere
+  sphere = vtkSphereSource::New();
+  sphere->SetCenter( 0.0, 0.0, 0.0 );
+  sphere->SetRadius( objRad );
+  sphere->SetThetaResolution( objRes );
+  sphere->SetPhiResolution  ( objRes );
 
-    vtkPolyDataMapper * cylinderMapper = vtkPolyDataMapper::New();
-    cylinderMapper->SetInputConnection( cylinder->GetOutputPort() );
-  
-    vtkActor * cylinderActor = vtkActor::New();
-    cylinderActor->SetMapper( cylinderMapper );
+  sphereMapper = makeMapper();
+  sphereMapper->SetInputConnection( sphere->GetOutputPort() );
 
-    renderer->AddActor( cylinderActor );
-    renWin->Render();
-    usleep( second * 1000000 );
+  sphereActor = makeActor();
+  sphereActor->SetMapper( sphereMapper );
 
-    retVal = vtkRegressionTestImage( renWin );
+  renderer->AddActor( sphereActor );
 
-    // delete cone
-    renderer->RemoveActor( coneActor );
-    cone->Delete();
-    coneMapper->Delete();
-    coneActor->Delete();
-  
-    renWin->Render();
-    usleep( second * 1000000 );
+  renWin->Render();
 
-    // delete sphere
-    renderer->RemoveActor( sphereActor );
-    sphere->Delete();
-    sphereMapper->Delete();
-    sphereActor->Delete();
-
-    renWin->Render();
-    usleep( second * 1000000 );
-
-    // delete cylinder
-    renderer->RemoveActor( cylinderActor );
-    cylinder->Delete();
-    cylinderMapper->Delete();
-    cylinderActor->Delete();
-
-    renWin->Render();
-    usleep( second * 1000000 );
-    }
+  //re-delete sphere
+  sphere->Delete();
+  sphereMapper->Delete();
+  sphereActor->Delete();
 
   renderer->Delete();
   renWin->Delete();
-  interactor->Delete();
 
-  return !retVal;
+  return 0;
 }
