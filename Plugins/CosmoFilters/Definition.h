@@ -53,21 +53,33 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif
 
 #ifdef USE_VTK_COSMO
+#include "vtkType.h"
 #include "vtkMPI.h"
 #else
+#include <stdint.h>
 #include <mpi.h>
 #endif
 
-#include <stdint.h>
 
 ///////////////////////////////////////////////////////////////////////////
 //
+
+#ifdef USE_VTK_COSMO
+#ifdef ID_64
+   typedef      vtkTypeInt64 ID_T;           // Particle and halo ids
+   #define IBYTES 8
+#else
+   typedef      vtkTypeInt32 ID_T;           // Particle and halo ids
+   #define IBYTES 4
+#endif
+#else
 #ifdef ID_64
    typedef      int64_t ID_T;           // Particle and halo ids
    #define IBYTES 8
 #else
    typedef      int32_t ID_T;           // Particle and halo ids
    #define IBYTES 4
+#endif
 #endif
 
 #ifdef POSVEL_64
@@ -86,8 +98,13 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    typedef      float   GRID_T;         // Grid types
 #endif
 
+#ifdef USE_VTK_COSMO
+typedef vtkTypeInt32    STATUS_T; // Dead (which neighbor) or alive particles
+typedef vtkTypeUInt16   MASK_T;   // Other particle information
+#else
 typedef int32_t         STATUS_T; // Dead (which neighbor) or alive particles
 typedef uint16_t        MASK_T;   // Other particle information
+#endif
 
 ///////////////////////////////////////////////////////////////////////////
 
