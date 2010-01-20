@@ -37,6 +37,15 @@ ADD_CUSTOM_TARGET(ParaViewOnlineHelp
   COMMENT "Compiling Qt help project paraview.qhp"
 )
 
+#
+# Development
+IF (NOT PV_INSTALL_NO_DEVELOPMENT)
+  INSTALL(
+      FILES ${CMAKE_CURRENT_BINARY_DIR}/paraview.qch
+      DESTINATION ${PV_INSTALL_DOC_DIR} 
+      COMPONENT Development)
+ENDIF (NOT PV_INSTALL_NO_DEVELOPMENT)
+
 #ADD_DEPENDENCIES(ParaViewOnlineHelp
 #  HTMLDocumentation
 #  )
