@@ -293,6 +293,7 @@ void pqPipelineRepresentation::setDefaultPropertyValues()
   pqSMAdaptor::setEnumerationProperty(repr->GetProperty("SelectionRepresentation"),
     "Wireframe");
   pqSMAdaptor::setElementProperty(repr->GetProperty("SelectionLineWidth"), 2);
+  pqSMAdaptor::setElementProperty(repr->GetProperty("SelectionPointSize"), 5);
 
   // Set up some global property links by default.
   vtkSMGlobalPropertiesManager* globalPropertiesManager =
