@@ -39,6 +39,9 @@ class vtkEventQtSlotConnect;
 class pqStandardColorButton;
 class vtkSMProxy;
 
+/// pqStandardColorLinkAdaptor is an adaptor used to connect the
+/// pqStandardColorButton with the property ensuring links with global
+/// properties are made and broken as and when needed.
 class PQCOMPONENTS_EXPORT pqStandardColorLinkAdaptor : public QObject
 {
   Q_OBJECT

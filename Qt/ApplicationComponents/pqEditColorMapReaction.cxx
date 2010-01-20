@@ -36,8 +36,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCoreUtilities.h"
 #include "pqPipelineRepresentation.h"
 #include "pqSMAdaptor.h"
+#include "pqStandardColorLinkAdaptor.h"
 #include "pqUndoStack.h"
 #include "vtkSMProxy.h"
+#include "vtkSMPVRepresentationProxy.h"
 
 #include <QDebug>
 #include <QColorDialog>
@@ -76,7 +78,12 @@ void pqEditColorMapReaction::editColorMap()
     // Get the color property.
     vtkSMProxy *proxy = repr->getProxy();
     vtkSMProperty *diffuse = proxy->GetProperty("DiffuseColor");
-    if (diffuse)
+    vtkSMProperty* ambient = proxy->GetProperty("AmbientColor");
+    int reprType = repr->getRepresentationType();
+    bool use_ambient = (reprType == vtkSMPVRepresentationProxy::WIREFRAME ||
+      reprType == vtkSMPVRepresentationProxy::POINTS ||
+      reprType == vtkSMPVRepresentationProxy::OUTLINE);
+    if (diffuse && ambient)
       {
       // Get the current color from the property.
       QList<QVariant> rgb =
@@ -98,10 +105,13 @@ void pqEditColorMapReaction::editColorMap()
         rgb.append(color.greenF());
         rgb.append(color.blueF());
         BEGIN_UNDO_SET("Changed Solid Color");
-        pqSMAdaptor::setMultipleElementProperty(diffuse, rgb);
         pqSMAdaptor::setMultipleElementProperty(
-          proxy->GetProperty("AmbientColor"), rgb);
+          use_ambient? ambient : diffuse, rgb);
         proxy->UpdateVTKObjects();
+        // need to break any global-property link that might have existed
+        // with this property.
+        pqStandardColorLinkAdaptor::breakLink(proxy, 
+          use_ambient? "AmbientColor" : "DiffuseColor");
         END_UNDO_SET();
         }
       }
