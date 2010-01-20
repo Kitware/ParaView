@@ -26,6 +26,7 @@
 struct vtkSMApplicationInternals;
 //ETX
 class vtkSMPluginManager;
+class vtkQtInitialization;
 
 class VTK_EXPORT vtkSMApplication : public vtkSMObject
 {
@@ -79,6 +80,7 @@ protected:
   ~vtkSMApplication();
 
   vtkSMApplicationInternals* Internals;
+  vtkQtInitialization* QtInitializer;
 private:
   vtkSMApplication(const vtkSMApplication&); // Not implemented
   void operator=(const vtkSMApplication&); // Not implemented

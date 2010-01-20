@@ -38,6 +38,10 @@
 
 #include "vtkStdString.h"
 
+#ifdef VTK_USE_QVTK
+# include "vtkQtInitialization.h"
+#endif
+
 struct vtkSMApplicationInternals
 {
   struct ConfFile
@@ -52,19 +56,30 @@ struct vtkSMApplicationInternals
 };
 
 vtkStandardNewMacro(vtkSMApplication);
-vtkCxxRevisionMacro(vtkSMApplication, "1.21");
+vtkCxxRevisionMacro(vtkSMApplication, "1.22");
 
 //---------------------------------------------------------------------------
 vtkSMApplication::vtkSMApplication()
 {
   this->Internals = new vtkSMApplicationInternals;
   this->Internals->EnvInfo = vtkSmartPointer<vtkPVEnvironmentInformation>::New();
+#ifdef VTK_USE_QVTK
+  this->QtInitializer = NULL;
+#endif
 }
 
 //---------------------------------------------------------------------------
 vtkSMApplication::~vtkSMApplication()
 {
   delete this->Internals;
+
+#ifdef VTK_USE_QVTK
+  if (this->QtInitializer)
+    {
+    this->QtInitializer->Delete();
+    this->QtInitializer = 0;
+    }
+#endif
 }
 
 extern "C" { void vtkPVServerManager_Initialize(vtkClientServerInterpreter*); }
@@ -106,6 +121,10 @@ void vtkSMApplication::ParseConfigurationFiles()
 //---------------------------------------------------------------------------
 void vtkSMApplication::Initialize()
 {
+#ifdef VTK_USE_QVTK
+  this->QtInitializer  = vtkQtInitialization::New();
+#endif
+
   vtkPVServerManager_Initialize(
     vtkProcessModule::GetProcessModule()->GetInterpreter());
 
@@ -203,6 +222,13 @@ void vtkSMApplication::Finalize()
   //this->GetProcessModule()->FinalizeInterpreter();
   this->SetProxyManager(0);
 
+#ifdef VTK_USE_QVTK
+  if (this->QtInitializer)
+    {
+    this->QtInitializer->Delete();
+    this->QtInitializer = 0;
+    }
+#endif
 }
 
 //---------------------------------------------------------------------------

@@ -21,25 +21,13 @@
 #include "vtkQtChartView.h"
 #include "vtkSMChartOptionsProxy.h"
 
-#include "vtkQtInitialization.h"
 #include <QWidget>
-#include <QApplication>
 
-static vtkQtInitialization* Initializer = NULL;
-
-vtkCxxRevisionMacro(vtkSMChartViewProxy, "1.6");
+vtkCxxRevisionMacro(vtkSMChartViewProxy, "1.7");
 //----------------------------------------------------------------------------
 vtkSMChartViewProxy::vtkSMChartViewProxy()
 {
   this->ChartView = 0;
-
-  if (!QApplication::instance())
-    {
-    // We're letting this leak since we don't know when is a good time to clean
-    // this application up since there could be qt components in use after the
-    // view has been destroyed.
-    Initializer = vtkQtInitialization::New();
-    }
 }
 
 //----------------------------------------------------------------------------
