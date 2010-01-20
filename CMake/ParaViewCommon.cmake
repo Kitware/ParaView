@@ -110,14 +110,13 @@ IF(NOT PV_INSTALL_INCLUDE_DIR)
 ENDIF(NOT PV_INSTALL_INCLUDE_DIR)
 IF(NOT PV_INSTALL_LIB_DIR)
   SET(PV_INSTALL_LIB_DIR lib/paraview-${PARAVIEW_VERSION})
-  IF (WIN32)
-    # For windows, no need to create a separate lib dir.
-    SET (PV_INSTALL_LIB_DIR bin)
-  ENDIF (WIN32)
 ENDIF(NOT PV_INSTALL_LIB_DIR)
 IF(NOT PV_INSTALL_DATA_DIR)
   SET(PV_INSTALL_DATA_DIR share/paraview-${PARAVIEW_VERSION})
 ENDIF(NOT PV_INSTALL_DATA_DIR)
+IF(NOT PV_INSTALL_DOC_DIR)
+  SET(PV_INSTALL_DOC_DIR doc)
+ENDIF(NOT PV_INSTALL_DOC_DIR)
 
 #########################################################################
 # Install no development files by default, but allow the user to get
