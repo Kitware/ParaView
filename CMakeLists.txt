@@ -225,7 +225,9 @@ SET (dynamicHeaders)
 SET(VTK_MAKE_INSTANTIATOR       "${ParaView_SOURCE_DIR}/VTK/CMake")
 SET(VTKCS_CONFIG_DIR            "${ParaView_SOURCE_DIR}/Utilities/VTKClientServer/CMake")
 
-SET (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${ParaView_SOURCE_DIR}/CMake)
+SET(PV_CMAKE_DIR "${ParaView_SOURCE_DIR}/CMake")
+SET (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PV_CMAKE_DIR})
+
 INCLUDE(ParaViewMacros)
 INCLUDE(ParaViewCommon)
 INCLUDE(ParaViewPlugins)
