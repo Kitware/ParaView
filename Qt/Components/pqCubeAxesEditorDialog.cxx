@@ -44,6 +44,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPropertyManager.h"
 #include "pqSignalAdaptors.h"
 #include "pqUndoStack.h"
+#include "pqStandardColorLinkAdaptor.h"
 
 class pqCubeAxesEditorDialog::pqInternal : public Ui::CubeAxesEditorDialog
 {
@@ -74,7 +75,6 @@ pqCubeAxesEditorDialog::pqCubeAxesEditorDialog(
   this->Internal->ColorAdaptor = new pqSignalAdaptorColor(
     this->Internal->Color, "chosenColor",
     SIGNAL(chosenColorChanged(const QColor&)), false);
-
   pqUndoStack* ustack = pqApplicationCore::instance()->getUndoStack();
   if (ustack)
     {
@@ -115,6 +115,8 @@ void pqCubeAxesEditorDialog::setRepresentationProxy(vtkSMProxy* repr)
       this->Internal->ColorAdaptor, "color", 
       SIGNAL(colorChanged(const QVariant&)),
       repr, repr->GetProperty("CubeAxesColor"));
+    new pqStandardColorLinkAdaptor(this->Internal->Color,
+      repr, "CubeAxesColor");
     }
 }
 
