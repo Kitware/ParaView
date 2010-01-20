@@ -65,6 +65,10 @@ public:
   const char* GetEntryText(unsigned int idx);
 
   // Description:
+  // Returns the text for an enumeration value.
+  const char* GetEntryTextForValue(int value);
+
+  // Description:
   // Return 1 is the text is present in the enumeration, otherwise 0.
   int HasEntryText(const char* text);
 

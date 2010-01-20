@@ -38,14 +38,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QTimer>
 
 // ParaView includes
-#include "vtkSMProperty.h"
-#include "vtkSMStringVectorProperty.h"
-#include "vtkSMDomain.h"
-#include "vtkEventQtSlotConnect.h"
 #include "pqSMAdaptor.h"
-#include "vtkCommand.h"
 #include "vtkCallbackCommand.h"
-
+#include "vtkCommand.h"
+#include "vtkDataObject.h"
+#include "vtkEventQtSlotConnect.h"
+#include "vtkSMArrayListDomain.h"
+#include "vtkSMDomain.h"
+#include "vtkSMEnumerationDomain.h"
+#include "vtkSMStringVectorProperty.h"
 
 pqFieldSelectionAdaptor::pqFieldSelectionAdaptor(QComboBox* p,
                                  vtkSMProperty* prop)
@@ -206,69 +207,59 @@ void pqFieldSelectionAdaptor::internalDomainChanged()
     originalData = combo->itemData(combo->currentIndex());
     }
 
-  this->IsGettingAllDomains = true;
-  QList<QString> possibleModes;
-  QList<QList<QString> > allArrays;
-  possibleModes = pqSMAdaptor::getFieldSelectionModeDomain(this->Property);
-  QString oldUncheckedVal = vtkSMStringVectorProperty::SafeDownCast(
-                            this->Property)->GetUncheckedElement(3);
-  
-  for (int kk=possibleModes.size()-1; kk >=0; kk--)
-    {
-    QString mode = possibleModes[kk];
-    QList<QPair<QString, bool> > arrays;
-    pqSMAdaptor::setUncheckedFieldSelectionMode(this->Property, mode);
-    arrays = pqSMAdaptor::getFieldSelectionScalarDomainWithPartialArrays(this->Property);
-    for(int i=0; i<arrays.size(); i++)
-      {
-      QList<QString> thisArray;
-      thisArray.append(mode);
-      thisArray.append(arrays[i].first);
-      thisArray.append(arrays[i].second? "1" : "0");
-      allArrays.append(thisArray);
-      }
-    }
-  
-  // put it back
-  vtkSMStringVectorProperty::SafeDownCast(
-    this->Property)->SetUncheckedElement(3, oldUncheckedVal.toAscii().data());
+  vtkSMArrayListDomain* ald = vtkSMArrayListDomain::SafeDownCast(
+    this->Property->GetDomain("array_list"));
+  vtkSMEnumerationDomain* fld = vtkSMEnumerationDomain::SafeDownCast(
+    this->Property->GetDomain("field_list"));
 
+  this->IsGettingAllDomains = true;
+  QList<QPair<QString, bool> > arrays = 
+    pqSMAdaptor::getFieldSelectionScalarDomainWithPartialArrays(this->Property);
   this->IsGettingAllDomains = false;
 
   combo->blockSignals(true);
   combo->clear();
   int newIndex = -1;
-  int i = 0;
-  foreach(QList<QString> array, allArrays)
+  int array_idx = 0;
+  QPair<QString, bool> array;
+  foreach (array, arrays)
     {
     QPixmap* pix = 0;
-    if(array[0] == "Point Data")
+    int field_association = ald->GetFieldAssociation(array_idx);
+    switch (field_association)
       {
-      pix = &pointPixmap;
-      }
-    else if(array[0] == "Cell Data")
-      {
+    case vtkDataObject::FIELD_ASSOCIATION_CELLS:
       pix = &cellPixmap;
+      break;
+
+    case vtkDataObject::FIELD_ASSOCIATION_POINTS:
+      pix = &pointPixmap;
+      break;
       }
 
-    QString arrayName = array[1];
-    if (array[2] == "1")
+    QString arrayName = array.first;
+    QStringList data;
+    data << fld->GetEntryTextForValue(field_association)
+         << arrayName
+         << (array.second? "1" : "0");
+    if (array.second)
       {
       arrayName += " (partial)";
       }
+
     if (pix)
       {
-      combo->addItem(QIcon(*pix), arrayName, QVariant(array));
+      combo->addItem(QIcon(*pix), arrayName, QVariant(data));
       }
     else
       {
-      combo->addItem(arrayName, QVariant(array));
+      combo->addItem(arrayName, QVariant(data));
       }
-    if (QVariant(array) == originalData)
+    if (QVariant(data) == originalData)
       {
-      newIndex = i;
+      newIndex = array_idx;
       }
-    i++;
+    array_idx++;
     }
   combo->setCurrentIndex(-1);
   combo->blockSignals(false);

@@ -90,6 +90,10 @@ public:
   int IsArrayPartial(unsigned int idx);
 
   // Description:
+  // Get field association for the array.
+  int GetFieldAssociation(unsigned int idx);
+
+  // Description:
   // Return the attribute type. The values are listed in
   // vtkDataSetAttributes.h.
   vtkGetMacro(AttributeType, int);
@@ -104,6 +108,18 @@ public:
   // property.
   // Returns 1 if the domain updated the property.
   virtual int SetDefaultValues(vtkSMProperty*);
+
+  // Description:
+  // Adds a new string to the domain.
+  unsigned int AddString(const char* string);
+
+  // Description:
+  // Removes a string from the domain.
+  virtual int RemoveString(const char* string);
+
+  // Description:
+  // Removes all strings from the domain.
+  virtual void RemoveAllStrings();
 
 protected:
   vtkSMArrayListDomain();

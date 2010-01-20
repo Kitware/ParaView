@@ -35,12 +35,13 @@
 #include "vtkStdString.h"
 
 vtkStandardNewMacro(vtkSMArrayListDomain);
-vtkCxxRevisionMacro(vtkSMArrayListDomain, "1.24");
+vtkCxxRevisionMacro(vtkSMArrayListDomain, "1.25");
 
 struct vtkSMArrayListDomainInternals
 {
   vtkstd::map<vtkStdString, int> PartialMap;
   vtkstd::vector<int> DataTypes;
+  vtkstd::vector<int> FieldAssociation;
 };
 
 //---------------------------------------------------------------------------
@@ -70,6 +71,56 @@ int vtkSMArrayListDomain::IsArrayPartial(unsigned int idx)
 }
 
 //---------------------------------------------------------------------------
+int vtkSMArrayListDomain::GetFieldAssociation(unsigned int idx)
+{
+  if (this->ALDInternals->FieldAssociation.size() > idx)
+    {
+    return this->ALDInternals->FieldAssociation[idx];
+    }
+
+  return -1;
+}
+//---------------------------------------------------------------------------
+unsigned int vtkSMArrayListDomain::AddString(const char* string)
+{
+  // by default we don't assume any association.
+  this->ALDInternals->FieldAssociation.push_back(
+    vtkDataObject::NUMBER_OF_ASSOCIATIONS);
+
+  return this->Superclass::AddString(string);
+}
+
+//---------------------------------------------------------------------------
+void vtkSMArrayListDomain::RemoveAllStrings()
+{
+  this->ALDInternals->FieldAssociation.clear();
+  this->ALDInternals->PartialMap.clear();
+  this->Superclass::RemoveAllStrings();
+}
+
+//---------------------------------------------------------------------------
+int vtkSMArrayListDomain::RemoveString(const char* string)
+{
+  int index = this->Superclass::RemoveString(string);
+  if (index != -1)
+    {
+    int cc=0;
+    vtkstd::vector<int>::iterator iter;
+    for (iter=this->ALDInternals->FieldAssociation.begin();
+      iter != this->ALDInternals->FieldAssociation.end();
+      iter++, cc++)
+      {
+      if (cc==index)
+        {
+        this->ALDInternals->FieldAssociation.erase(iter);
+        break;
+        }
+      }
+    }
+  return index;
+}
+
+//---------------------------------------------------------------------------
 void vtkSMArrayListDomain::AddArrays(vtkSMSourceProxy* sp,
                                      int outputport,
                                      vtkPVDataSetAttributesInformation* info, 
@@ -92,6 +143,7 @@ void vtkSMArrayListDomain::AddArrays(vtkSMSourceProxy* sp,
       if ( nAcceptedTypes==0 )
         {
         unsigned int newidx = this->AddString(arrayInfo->GetName());
+        this->ALDInternals->FieldAssociation[newidx] = association;
         if (arrayInfo == attrInfo)
           {
           attrIdx = newidx;
@@ -103,6 +155,7 @@ void vtkSMArrayListDomain::AddArrays(vtkSMSourceProxy* sp,
         if (!thisDataType || (arrayInfo->GetDataType() == thisDataType))
           {
           unsigned int newidx = this->AddString(arrayInfo->GetName());
+          this->ALDInternals->FieldAssociation[newidx] = association;
           if (arrayInfo == attrInfo)
             {
             attrIdx = newidx;
@@ -272,6 +325,8 @@ void vtkSMArrayListDomain::Update(vtkSMProperty*)
   if (this->NoneString)
     {
     this->AddString(this->NoneString);
+    this->ALDInternals->FieldAssociation[0] = 
+      vtkDataObject::NUMBER_OF_ASSOCIATIONS;
     }
 
   vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(

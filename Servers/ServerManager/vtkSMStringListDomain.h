@@ -65,11 +65,13 @@ public:
 
   // Description:
   // Removes a string from the domain.
-  void RemoveString(const char* string);
+  // Returns the index of the removed string. Will return -1, if the string was
+  // not found.
+  virtual int RemoveString(const char* string);
 
   // Description:
   // Removes all strings from the domain.
-  void RemoveAllStrings();
+  virtual void RemoveAllStrings();
 
   // Description:
   // Update self checking the "unchecked" values of all required
