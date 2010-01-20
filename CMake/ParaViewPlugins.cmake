@@ -991,6 +991,11 @@ FUNCTION(ADD_PARAVIEW_PLUGIN NAME VERSION)
       ADD_LIBRARY(${NAME} ${GUI_SRCS} ${SM_SRCS} ${ARG_SOURCES} ${plugin_sources})
     ENDIF (PARAVIEW_BUILD_SHARED_LIBS)
 
+    IF(MSVC)
+      # Do not generate manifests for the plugins - caused issues loading plugins
+      set_target_properties(${NAME} PROPERTIES LINK_FLAGS "/MANIFEST:NO")
+    ENDIF(MSVC)
+
     IF(plugin_type_gui OR GUI_SRCS)
       TARGET_LINK_LIBRARIES(${NAME} pqComponents)
     ENDIF(plugin_type_gui OR GUI_SRCS)
