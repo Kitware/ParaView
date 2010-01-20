@@ -48,7 +48,6 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <iomanip>
 
 #include <sys/types.h>
-#include <dirent.h>
 
 #include "Partition.h"
 #include "ParticleExchange.h"

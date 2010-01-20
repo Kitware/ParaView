@@ -6,14 +6,7 @@ IF(NOT VTK_USE_MPI)
   MESSAGE("Error: MPI must be enabled for the Cosmo plugin to be built.")
 ENDIF(NOT VTK_USE_MPI)
 
-INCLUDE(CheckIncludeFiles)
-CHECK_INCLUDE_FILES("dirent.h" HAVE_DIRENT_H)
-
-IF(NOT HAVE_DIRENT_H)
-  MESSAGE("Error: Cosmo plugin can't find dirent.h.")
-ENDIF(NOT HAVE_DIRENT_H)
-
-IF(VTK_USE_MPI AND HAVE_DIRENT_H)
+IF(VTK_USE_MPI)
 
 INCLUDE(FindMPI)
 
@@ -73,4 +66,4 @@ ADD_PARAVIEW_PLUGIN(CosmoFiltersPlugin "1.0"
                     ${SERVER_ARGS}
                     ${CLIENT_ARGS}) 
 
-ENDIF(VTK_USE_MPI AND HAVE_DIRENT_H)
+ENDIF(VTK_USE_MPI)

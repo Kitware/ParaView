@@ -48,7 +48,12 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <iomanip>
 
 #include <sys/types.h>
+
+#ifdef _WIN32
+#include "winDirent.h"
+#else
 #include <dirent.h>
+#endif
 
 #include "Partition.h"
 #include "ParticleDistribute.h"
