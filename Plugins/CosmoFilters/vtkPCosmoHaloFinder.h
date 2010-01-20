@@ -74,21 +74,64 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __vtkPCosmoHaloFinder_h
 #define __vtkPCosmoHaloFinder_h
 
-#include "vtkCosmoHaloFinder.h"
+#include "vtkUnstructuredGridAlgorithm.h"
 
 class vtkMultiProcessController;
+class vtkMPIController;
 
-class VTK_PARALLEL_EXPORT vtkPCosmoHaloFinder : public vtkCosmoHaloFinder
+class VTK_PARALLEL_EXPORT vtkPCosmoHaloFinder : public vtkUnstructuredGridAlgorithm
 {
  public:
-  // Description:
   static vtkPCosmoHaloFinder *New();
 
-  vtkTypeRevisionMacro(vtkPCosmoHaloFinder,vtkCosmoHaloFinder);
+  vtkTypeRevisionMacro(vtkPCosmoHaloFinder,vtkUnstructuredGridAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  vtkGetObjectMacro(Controller, vtkMultiProcessController);
+  // Description:
+  // Set the communicator object for interprocess communication
+  virtual vtkMultiProcessController* GetController();
   virtual void SetController(vtkMultiProcessController*);
+
+  // Description:
+  // Specify the number of seeded particles in one dimension (total = np^3)
+  vtkSetMacro(NP, int);
+  vtkGetMacro(NP, int);
+
+  // Description:
+  // Specify the physical box dimensions size (rL) (default 91)
+  vtkSetMacro(RL, float);
+  vtkGetMacro(RL, float);
+
+  // Description:
+  // Specify the ghost cell spacing (edge boundary of box) (default .06)
+  vtkSetMacro(Overlap, float);
+  vtkGetMacro(Overlap, float);
+
+  // Description:
+  // Specify the minimum number of particles for a halo (pmin)
+  vtkSetMacro(PMin, int);
+  vtkGetMacro(PMin, int);
+
+  // Description:
+  // Specify the linking length (bb)
+  vtkSetMacro(BB, float);
+  vtkGetMacro(BB, float);
+
+  // Description:
+  // Specify the particle mass
+  vtkSetMacro(ParticleMass, float);
+  vtkGetMacro(ParticleMass, float);
+
+  // Description:
+  // Use the average position for catalog output, otherwise use
+  // the particle closest to the center.  (Default off = use closest)
+  vtkSetMacro(CatalogAveragePosition, int);
+  vtkGetMacro(CatalogAveragePosition, int);
+
+  // Description:
+  // Copy the halo information to the original particles (Default on)
+  vtkSetMacro(CopyHaloDataToParticles, int);
+  vtkGetMacro(CopyHaloDataToParticles, int);
 
  protected:
   vtkPCosmoHaloFinder();
@@ -99,9 +142,19 @@ class VTK_PARALLEL_EXPORT vtkPCosmoHaloFinder : public vtkCosmoHaloFinder
                                  vtkInformationVector*);
 
   virtual int RequestData(vtkInformation*, 
-                          vtkInformationVector**, vtkInformationVector*);
+                          vtkInformationVector**, 
+                          vtkInformationVector*);
 
-  vtkMultiProcessController* Controller;
+  vtkMPIController* Controller;
+
+  int NP; // number of particles in the original simulation
+  float RL; // The physical box dimensions (rL)
+  float Overlap; // The ghost cell boundary space
+  int PMin; // The minimum particles for a halo
+  float BB; // The linking length
+  float ParticleMass;
+  int CatalogAveragePosition;
+  int CopyHaloDataToParticles;
 
  private:
   vtkPCosmoHaloFinder(const vtkPCosmoHaloFinder&);  // Not implemented.

@@ -1,20 +1,35 @@
+IF(NOT VTK_USE_MPI)
+  MESSAGE("MPI must be enabled for the Cosmo plugin to be built.")
+ENDIF(NOT VTK_USE_MPI)
+
+IF(VTK_USE_MPI)
+
+INCLUDE(FindMPI)
 INCLUDE_DIRECTORIES(${PARAVIEW_INCLUDE_DIRS}
-                    ${VTK_INCLUDE_DIR})
+                    ${VTK_INCLUDE_DIR}
+                    ${MPI_INCLUDE_PATH})
+
+ADD_DEFINITIONS("-DUSE_VTK_COSMO -DMPICH_IGNORE_CXX_SEEK")
 
 SET(COSMO_FILTERS_SOURCES
-#    vtkCosmoHaloCountFilter.cxx
-#    vtkCosmoHaloClassFilter.cxx
-    vtkCosmoHaloFinder.cxx 
-#    vtkPCosmoHaloFinder.cxx
-#    vtkCosmoDistillerSTD.cxx
-#    vtkCosmoHaloSorter.cxx
-#    vtkCosmoCorrelater.cxx
-#    vtkCosmoDistillerVTU.cxx
+    vtkPCosmoReader.cxx
+    vtkPCosmoHaloFinder.cxx
+)
+
+SET(RRU_SOURCES
+    Partition.cxx
+    ParticleDistribute.cxx
+    ParticleExchange.cxx
+    Message.cxx
+    CosmoHaloFinder.cxx
+    CosmoHaloFinderP.cxx
+    FOFHaloProperties.cxx
 )
 
 SET(SERVER_ARGS
     SERVER_MANAGER_XML CosmoFilters.xml
-    SERVER_MANAGER_SOURCES ${COSMO_FILTERS_SOURCES})    
+    SERVER_MANAGER_SOURCES ${COSMO_FILTERS_SOURCES}
+)    
     
 IF(PARAVIEW_BUILD_QT_GUI)
    FIND_PACKAGE(Qt4)
@@ -28,25 +43,26 @@ IF(PARAVIEW_BUILD_QT_GUI)
                           ${pqComponents_BINARY_DIR}
                           ${pqComponents_SOURCE_DIR})
 
-#      QT4_WRAP_CPP(MOC_SRCS HaloClassPanel.h)
-
-#      ADD_PARAVIEW_OBJECT_PANEL(IFACES IFACE_SRCS
-#                                CLASS_NAME HaloClassPanel
-#                                XML_NAME HaloClass
-#                                XML_GROUP filters)
-
       SET(CLIENT_ARGS
           GUI_INTERFACES ${IFACES}
-          GUI_RESOURCE_FILES CosmoFiltersResources.xml
-          SOURCES ${IFACE_SRCS}
+          GUI_RESOURCE_FILES CosmoFiltersResources.xml CosmoReaderResources.xml
+          SOURCES ${RRU_SOURCES}
+                  ${IFACE_SRCS}
                   ${MOC_SRCS}
-#                  HaloClassPanel.h
-#                  HaloClassPanel.cxx
       )
-
-    ENDIF(QT4_FOUND)
-ENDIF(PARAVIEW_BUILD_QT_GUI)
+   ELSE()
+      SET(CLIENT_ARGS
+          SOURCES ${RRU_SOURCES}
+      )
+   ENDIF()
+ELSE()
+   SET(CLIENT_ARGS
+       SOURCES ${RRU_SOURCES}
+   )
+ENDIF()
 
 ADD_PARAVIEW_PLUGIN(CosmoFiltersPlugin "1.0"
                     ${SERVER_ARGS}
                     ${CLIENT_ARGS}) 
+
+ENDIF(VTK_USE_MPI)

@@ -1,22 +1,5 @@
 /*=========================================================================
-
-  Program:   Visualization Toolkit
-  Module:    HaloClassPanel.h
-
-  Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
-  All rights reserved.
-  See Copyright.txt or http://www.kitware.com/Copyright.htm for details.
-
-     This software is distributed WITHOUT ANY WARRANTY; without even
-     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-     PURPOSE.  See the above copyright notice for more information.
-
-=========================================================================*/
-/*=========================================================================
-
-  Program:   VTK/ParaView Los Alamos National Laboratory Modules (PVLANL)
-  Module:    HaloClassPanel.h
-
+                                                                                
 Copyright (c) 2007, Los Alamos National Security, LLC
 
 All rights reserved.
@@ -56,35 +39,70 @@ OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
 WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR 
 OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF 
 ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
+                                                                                
 =========================================================================*/
 
-#ifndef __HaloClassPanel_h
-#define __HaloClassPanel_h
+// .NAME Partition - Partition MPI processors into cartesian grid
+//
+// .SECTION Description
+// Partition allows MPI to divide the number of processors it is given and
+// to set the position of this processor within the Cartesian grid.  Using
+// that information with wraparound, all neighbors of a processor are
+// also computed.  This class is static and will be shared by all classes
+// within the infrastructure.
 
-#include "pqSampleScalarWidget.h"
-#include "pqObjectPanel.h"
-#include <QLabel>
-#include <QLayout>
+#ifndef Partition_h
+#define Partition_h
 
-// this class defines the interface for vtkCosmoHaloClassFilter
-class HaloClassPanel : public pqObjectPanel
-{
-  Q_OBJECT
-  public:
-  HaloClassPanel(pqProxy* pxy, QWidget* p);
-  
-  ~HaloClassPanel();
+#include "Definition.h"
 
-private slots:
-  /// Called if the user accepts pending modifications
-  void onAccepted();
-  /// Called if the user rejects pending modifications
-  void onRejected();
-  
+#ifdef USE_VTK_COSMO
+#include "vtkMPI.h"
+#include "vtkstd/string"
+#include "vtkstd/vector"
+
+using namespace vtkstd;
+#else
+#include <mpi.h>
+#include <string>
+#include <vector>
+
+using namespace std;
+#endif
+
+class Partition {
+public:
+  Partition();
+  ~Partition();
+
+  // Control MPI and the Cartesian topology
+  //static void initialize(int& argc, char** argv);
+  static void initialize();
+  static void finalize();
+
+  // Set the processor numbers of neighbors in all directions
+  static void setNeighbors();
+
+  static MPI::Cartcomm& getComm()       { return cartComm; }
+
+  static int  getMyProc()               { return myProc; }
+  static int  getNumProc()              { return numProc; }
+
+  static void getDecompSize(int size[]);
+  static void getMyPosition(int pos[]);
+  static void getNeighbors(int neigh[]);
+
+  static int  getNeighbor(int xpos, int ypos, int zpos);
+
 private:
+  static int myProc;                    // My processor number
+  static int numProc;                   // Total number of processors
 
-  pqSampleScalarWidget SampleScalarWidget;
+  static MPI::Cartcomm cartComm;        // Cartesian communicator
+  static int decompSize[DIMENSION];     // Number of processors in each dim
+  static int myPosition[DIMENSION];     // My index in cartesian communicator
+
+  static int neighbor[NUM_OF_NEIGHBORS];// Neighbor processor ids
 };
 
 #endif

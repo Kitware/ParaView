@@ -1,14 +1,6 @@
 <ParaViewFilters>
 <!--  <Category name="Cosmology" menu_label="Cosmology"> -->
-    <Proxy group="filters" name="HaloFinder"/>
-<!--
-    <Filter name="HaloClass"/>
-    <Filter name="HaloCount"/>
-    <Filter name="CosmoDistiller"/>
-    <Filter name="CosmoHaloSorter"/>
-    <Filter name="CosmoNDF"/>
-    <Filter name="CosmoWrapAround"/>
--->
+    <Proxy group="filters" name="HaloFinder" />
 <!--  </Category> -->
 </ParaViewFilters>
 

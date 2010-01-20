@@ -1,0 +1,5 @@
+<ParaViewReaders>
+  <Reader name="CosmoReader" extensions="cosmo" 
+   file_description="Cosmology files" />
+</ParaViewReaders>
+
