@@ -80,8 +80,9 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CosmoHaloFinderP.h"
 #include "Definition.h"
 #include "FOFHaloProperties.h"
+#include "Partition.h"
 
-vtkCxxRevisionMacro(vtkPCosmoHaloFinder, "1.3");
+vtkCxxRevisionMacro(vtkPCosmoHaloFinder, "1.4");
 vtkStandardNewMacro(vtkPCosmoHaloFinder);
 
 /****************************************************************************/
@@ -267,6 +268,9 @@ int vtkPCosmoHaloFinder::RequestData(
 
   // shallow total point input to output
   output->ShallowCopy(input);
+
+  // initialize the communicator
+  Partition::initialize();
 
   // create the halo finder
   float deadSize = this->RL * this->Overlap;

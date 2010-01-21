@@ -499,10 +499,10 @@ void ParticleExchange::exchangeParticles()
   long totalDeadParticles = 0;
   MPI_Allreduce((void*) &this->numberOfAliveParticles, 
                 (void*) &totalAliveParticles, 
-                1, MPI_LONG, MPI_SUM, MPI_COMM_WORLD);
+                1, MPI_LONG, MPI_SUM, Partition::getComm());
   MPI_Allreduce((void*) &this->numberOfDeadParticles,
                 (void*) &totalDeadParticles, 
-                1, MPI_LONG, MPI_SUM, MPI_COMM_WORLD);
+                1, MPI_LONG, MPI_SUM, Partition::getComm());
 
 #ifndef USE_VTK_COSMO
 #ifdef DEBUG
@@ -580,7 +580,7 @@ void ParticleExchange::exchangeNeighborParticles()
   int maxShareSize;
   MPI_Allreduce((void*) &myShareSize,
                 (void*) &maxShareSize,
-                1, MPI_INT, MPI_MAX, MPI_COMM_WORLD);
+                1, MPI_INT, MPI_MAX, Partition::getComm());
 
   // Allocate messages to send and receive MPI buffers
   int bufferSize = (1 * sizeof(int)) +          // number of particles
@@ -600,7 +600,7 @@ void ParticleExchange::exchangeNeighborParticles()
   }
 #endif
 
-  MPI_Barrier(MPI_COMM_WORLD);
+  MPI_Barrier(Partition::getComm());
 
   // Exchange with each neighbor, with everyone sending in one direction and
   // receiving from the other.  Data corresponding to the particle index

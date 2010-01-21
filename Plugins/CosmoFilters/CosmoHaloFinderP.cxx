@@ -262,10 +262,10 @@ void CosmoHaloFinderP::executeHaloFinder()
        << particleCount << " particles" << endl;
 #endif
 
-  MPI_Barrier(MPI_COMM_WORLD);
+  MPI_Barrier(Partition::getComm());
   if (this->particleCount > 0)
     this->haloFinder.Finding();
-  MPI_Barrier(MPI_COMM_WORLD);
+  MPI_Barrier(Partition::getComm());
 }
 
 /////////////////////////////////////////////////////////////////////////
@@ -567,7 +567,7 @@ void CosmoHaloFinderP::mergeHalos()
   int maxNumberOfMixed;
   int numberOfMixed = this->myMixedHalos.size();
   MPI_Allreduce((void*) &numberOfMixed, (void*) &maxNumberOfMixed,
-                1, MPI_INT, MPI_MAX, MPI_COMM_WORLD);
+                1, MPI_INT, MPI_MAX, Partition::getComm());
 
   // If there are no halos to merge, return
   if (maxNumberOfMixed == 0)
@@ -581,25 +581,25 @@ void CosmoHaloFinderP::mergeHalos()
   // MASTER moves its own mixed halos to mixed halo vector (change index to tag)
   // then gets messages from others and creates those mixed halos
   collectMixedHalos(haloBuffer, haloBufSize);
-  MPI_Barrier(MPI_COMM_WORLD);
+  MPI_Barrier(Partition::getComm());
 
   // MASTER has all data and runs algorithm to make decisions
   assignMixedHalos();
-  MPI_Barrier(MPI_COMM_WORLD);
+  MPI_Barrier(Partition::getComm());
 
   // MASTER sends merge results to all processors
   sendMixedHaloResults(haloBuffer, haloBufSize);
-  MPI_Barrier(MPI_COMM_WORLD);
+  MPI_Barrier(Partition::getComm());
 
   // Collect totals for result checking
   int totalAliveHalos;
   MPI_Allreduce((void*) &this->numberOfAliveHalos, (void*) &totalAliveHalos,
-                1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
+                1, MPI_INT, MPI_SUM, Partition::getComm());
 
   int totalAliveHaloParticles;
   MPI_Allreduce((void*) &this->numberOfHaloParticles,
                 (void*) &totalAliveHaloParticles,
-                1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
+                1, MPI_INT, MPI_SUM, Partition::getComm());
 
 #ifndef USE_VTK_COSMO
   if (this->myProc == MASTER) {
@@ -627,7 +627,7 @@ void CosmoHaloFinderP::collectMixedHalos(ID_T* haloBuffer, int haloBufSize)
   int haveMixedHalo = (this->numberOfMixedHalos > 0 ? 1 : 0);
   int processorsWithMixedHalos;
   MPI_Allreduce((void*) &haveMixedHalo, (void*) &processorsWithMixedHalos,
-                1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
+                1, MPI_INT, MPI_SUM, Partition::getComm());
 
   // MASTER moves its own mixed halos to mixed halo vector (change index to tag)
   // then gets messages from others and creates those mixed halos
@@ -664,17 +664,17 @@ void CosmoHaloFinderP::collectMixedHalos(ID_T* haloBuffer, int haloBufSize)
       // FIXME: what the heck is this for? --Jon Woodring
 if (notReceived == processorsWithMixedHalos)
       MPI_Recv(haloBuffer, haloBufSize, MPI_INT, 5,
-               0, MPI_COMM_WORLD, &mpistatus);
+               0, Partition::getComm(), &mpistatus);
 else
 #endif
 
       // Get message containing mixed halo information
 #ifdef ID_64
       MPI_Recv(haloBuffer, haloBufSize, MPI_LONG, MPI_ANY_SOURCE,
-               0, MPI_COMM_WORLD, &mpistatus);
+               0, Partition::getComm(), &mpistatus);
 #else
       MPI_Recv(haloBuffer, haloBufSize, MPI_INT, MPI_ANY_SOURCE,
-               0, MPI_COMM_WORLD, &mpistatus);
+               0, Partition::getComm(), &mpistatus);
 #endif
 
       // Gather halo information from the message
@@ -727,10 +727,10 @@ else
       MPI_Request request;
 #ifdef ID_64
       MPI_Isend(haloBuffer, haloBufSize, MPI_LONG, MASTER,
-                0, MPI_COMM_WORLD, &request);
+                0, Partition::getComm(), &request);
 #else
       MPI_Isend(haloBuffer, haloBufSize, MPI_INT, MASTER,
-                0, MPI_COMM_WORLD, &request);
+                0, Partition::getComm(), &request);
 #endif
     }
   }
@@ -882,10 +882,10 @@ void CosmoHaloFinderP::sendMixedHaloResults(ID_T* haloBuffer, int haloBufSize)
     for (int proc = 1; proc < this->numProc; proc++) {
 #ifdef ID_64
       MPI_Isend(haloBuffer, haloBufSize, MPI_LONG, proc,
-                0, MPI_COMM_WORLD, &request); 
+                0, Partition::getComm(), &request); 
 #else
       MPI_Isend(haloBuffer, haloBufSize, MPI_INT, proc,
-                0, MPI_COMM_WORLD, &request); 
+                0, Partition::getComm(), &request); 
 #endif
     }
 
@@ -927,10 +927,10 @@ void CosmoHaloFinderP::sendMixedHaloResults(ID_T* haloBuffer, int haloBufSize)
     MPI_Status mpistatus;
 #ifdef ID_64
     MPI_Recv(haloBuffer, haloBufSize, MPI_LONG, MASTER,
-             0, MPI_COMM_WORLD, &mpistatus);
+             0, Partition::getComm(), &mpistatus);
 #else
     MPI_Recv(haloBuffer, haloBufSize, MPI_INT, MASTER,
-             0, MPI_COMM_WORLD, &mpistatus);
+             0, Partition::getComm(), &mpistatus);
 #endif
 
     // Unpack information to see which of mixed halos are still valid

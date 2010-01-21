@@ -47,6 +47,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 using namespace std;
 
 #include "Message.h"
+#include "Partition.h"
 
 ////////////////////////////////////////////////////////////////////////////
 //
@@ -114,7 +115,7 @@ void Message::putValue(int* data, int count)
   manualPack((char*)data, count, sizeof(int));
 #else
   MPI_Pack(data, count, MPI_INTEGER, 
-           this->buffer, this->bufSize, &this->bufPos, MPI_COMM_WORLD);
+           this->buffer, this->bufSize, &this->bufPos, Partition::getComm());
 #endif
 }
 void Message::putValue(unsigned short* data, int count)
@@ -123,7 +124,7 @@ void Message::putValue(unsigned short* data, int count)
   manualPack((char*)data, count, sizeof(unsigned short));
 #else
   MPI_Pack(data, count, MPI_UNSIGNED_SHORT, 
-           this->buffer, this->bufSize, &this->bufPos, MPI_COMM_WORLD);
+           this->buffer, this->bufSize, &this->bufPos, Partition::getComm());
 #endif
 }
 void Message::putValue(long int* data, int count)
@@ -132,7 +133,7 @@ void Message::putValue(long int* data, int count)
   manualPack((char*)data, count, sizeof(long int));
 #else
   MPI_Pack(data, count, MPI_LONG_INT, 
-           this->buffer, this->bufSize, &this->bufPos, MPI_COMM_WORLD);
+           this->buffer, this->bufSize, &this->bufPos, Partition::getComm());
 #endif
 }
 void Message::putValue(long long* data, int count)
@@ -141,7 +142,7 @@ void Message::putValue(long long* data, int count)
   manualPack((char*)data, count, sizeof(long long));
 #else
   MPI_Pack(data, count, MPI_LONG_LONG, 
-           this->buffer, this->bufSize, &this->bufPos, MPI_COMM_WORLD);
+           this->buffer, this->bufSize, &this->bufPos, Partition::getComm());
 #endif
 }
 void Message::putValue(float* data, int count)
@@ -150,7 +151,7 @@ void Message::putValue(float* data, int count)
   manualPack((char*)data, count, sizeof(float));
 #else
   MPI_Pack(data, count, MPI_FLOAT, 
-           this->buffer, this->bufSize, &this->bufPos, MPI_COMM_WORLD);
+           this->buffer, this->bufSize, &this->bufPos, Partition::getComm());
 #endif
 }
 void Message::putValue(double* data, int count)
@@ -159,7 +160,7 @@ void Message::putValue(double* data, int count)
   manualPack((char*)data, count, sizeof(double));
 #else
   MPI_Pack(data, count, MPI_DOUBLE, 
-           this->buffer, this->bufSize, &this->bufPos, MPI_COMM_WORLD);
+           this->buffer, this->bufSize, &this->bufPos, Partition::getComm());
 #endif
 }
 void Message::putValue(char* data, int count)
@@ -168,7 +169,7 @@ void Message::putValue(char* data, int count)
   manualPack((char*)data, count, sizeof(char));
 #else
   MPI_Pack(data, count, MPI_CHAR, 
-           this->buffer, this->bufSize, &this->bufPos, MPI_COMM_WORLD);
+           this->buffer, this->bufSize, &this->bufPos, Partition::getComm());
 #endif
 }
 
@@ -183,7 +184,7 @@ void Message::getValue(int* data, int count)
   manualUnpack((char*)data, count, sizeof(int));
 #else
   MPI_Unpack(this->buffer, this->bufSize, &this->bufPos, 
-             data, count, MPI_INTEGER, MPI_COMM_WORLD);
+             data, count, MPI_INTEGER, Partition::getComm());
 #endif
 }
 void Message::getValue(unsigned short* data, int count)
@@ -192,7 +193,7 @@ void Message::getValue(unsigned short* data, int count)
   manualUnpack((char*)data, count, sizeof(unsigned short));
 #else
   MPI_Unpack(this->buffer, this->bufSize, &this->bufPos, 
-             data, count, MPI_UNSIGNED_SHORT, MPI_COMM_WORLD);
+             data, count, MPI_UNSIGNED_SHORT, Partition::getComm());
 #endif
 }
 void Message::getValue(long int* data, int count)
@@ -201,7 +202,7 @@ void Message::getValue(long int* data, int count)
   manualUnpack((char*)data, count, sizeof(long int));
 #else
   MPI_Unpack(this->buffer, this->bufSize, &this->bufPos, 
-             data, count, MPI_LONG_INT, MPI_COMM_WORLD);
+             data, count, MPI_LONG_INT, Partition::getComm());
 #endif
 }
 void Message::getValue(long long* data, int count)
@@ -210,7 +211,7 @@ void Message::getValue(long long* data, int count)
   manualUnpack((char*)data, count, sizeof(long long));
 #else
   MPI_Unpack(this->buffer, this->bufSize, &this->bufPos, 
-             data, count, MPI_LONG_LONG, MPI_COMM_WORLD);
+             data, count, MPI_LONG_LONG, Partition::getComm());
 #endif
 }
 void Message::getValue(float* data, int count)
@@ -219,7 +220,7 @@ void Message::getValue(float* data, int count)
   manualUnpack((char*)data, count, sizeof(float));
 #else
   MPI_Unpack(this->buffer, this->bufSize, &this->bufPos, 
-             data, count, MPI_FLOAT, MPI_COMM_WORLD);
+             data, count, MPI_FLOAT, Partition::getComm());
 #endif
 }
 void Message::getValue(double* data, int count)
@@ -228,7 +229,7 @@ void Message::getValue(double* data, int count)
   manualUnpack((char*)data, count, sizeof(double));
 #else
   MPI_Unpack(this->buffer, this->bufSize, &this->bufPos, 
-             data, count, MPI_DOUBLE, MPI_COMM_WORLD);
+             data, count, MPI_DOUBLE, Partition::getComm());
 #endif
 }
 void Message::getValue(char* data, int count)
@@ -237,7 +238,7 @@ void Message::getValue(char* data, int count)
   manualUnpack((char*)data, count, sizeof(char));
 #else
   MPI_Unpack(this->buffer, this->bufSize, &this->bufPos, 
-             data, count, MPI_CHAR, MPI_COMM_WORLD);
+             data, count, MPI_CHAR, Partition::getComm());
 #endif
 }
 
@@ -250,7 +251,7 @@ void Message::send(int mach, int tag)
 {
   MPI_Request request;
   MPI_Isend(this->buffer, this->bufPos, MPI_PACKED, 
-            mach, tag, MPI_COMM_WORLD, &request);
+            mach, tag, Partition::getComm(), &request);
 }
 
 
@@ -263,5 +264,5 @@ void Message::receive(int mach, int tag)
 {
   MPI_Status status;
   MPI_Recv(this->buffer, this->bufSize, MPI_PACKED, mach, tag,
-           MPI_COMM_WORLD, &status);
+           Partition::getComm(), &status);
 }

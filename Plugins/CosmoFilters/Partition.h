@@ -97,6 +97,7 @@ public:
 private:
   static int myProc;                    // My processor number
   static int numProc;                   // Total number of processors
+  static int initialized;
 
   static MPI_Comm cartComm;             // Cartesian communicator
   static int decompSize[DIMENSION];     // Number of processors in each dim

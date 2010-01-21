@@ -59,6 +59,7 @@ int Partition::myProc = -1;
 int Partition::decompSize[DIMENSION];
 int Partition::myPosition[DIMENSION];
 int Partition::neighbor[NUM_OF_NEIGHBORS];
+int Partition::initialized = 0;
 
 Partition::Partition()
 {
@@ -78,37 +79,42 @@ Partition::~Partition()
 //void Partition::initialize(int& argc, char** argv)
 void Partition::initialize()
 {
-  // Start up MPI
-  //MPI_Init(&argc, &argv);
-  MPI_Comm_rank(MPI_COMM_WORLD, &myProc);
-  MPI_Comm_size(MPI_COMM_WORLD, &numProc);
-
-  for (int dim = 0; dim < DIMENSION; dim++)
-     decompSize[dim] = 0;
-  int periodic[] = {1, 1, 1};
-  int reorder = 1;
-
-  // Compute the number of processors in each dimension
-  MPI_Dims_create(numProc, DIMENSION, decompSize);
-
-  // Create the Cartesion communicator
-  MPI_Cart_create(MPI_COMM_WORLD,
-                  DIMENSION, decompSize, periodic, reorder, &cartComm);
-
-  // Reset my rank if it changed
-  MPI_Comm_rank(cartComm, &myProc);
-
-  // Get this processor's position in the Cartesian topology
-  MPI_Cart_coords(cartComm, myProc, DIMENSION, myPosition);
-
-  // Set all my neighbor processor ids for communication
-  setNeighbors();
-
+  if(!initialized)
+    {
+    // Start up MPI
+    //MPI_Init(&argc, &argv);
+    MPI_Comm_rank(MPI_COMM_WORLD, &myProc);
+    MPI_Comm_size(MPI_COMM_WORLD, &numProc);
+    
+    for (int dim = 0; dim < DIMENSION; dim++)
+      decompSize[dim] = 0;
+    int periodic[] = {1, 1, 1};
+    int reorder = 1;
+    
+    // Compute the number of processors in each dimension
+    MPI_Dims_create(numProc, DIMENSION, decompSize);
+    
+    // Create the Cartesion communicator
+    MPI_Cart_create(MPI_COMM_WORLD,
+                    DIMENSION, decompSize, periodic, reorder, &cartComm);
+    
+    // Reset my rank if it changed
+    MPI_Comm_rank(cartComm, &myProc);
+    
+    // Get this processor's position in the Cartesian topology
+    MPI_Cart_coords(cartComm, myProc, DIMENSION, myPosition);
+    
+    // Set all my neighbor processor ids for communication
+    setNeighbors();
+    
 #ifndef USE_VTK_COSMO
-  if (myProc == 0)
-  cout << "Decomposition: [" << decompSize[0] << ":"
-       << decompSize[1] << ":" << decompSize[2] << "]" << endl; 
+    if (myProc == 0)
+      cout << "Decomposition: [" << decompSize[0] << ":"
+           << decompSize[1] << ":" << decompSize[2] << "]" << endl; 
 #endif
+
+    initialized = 1;
+    }
 }
 
 /////////////////////////////////////////////////////////////////////////

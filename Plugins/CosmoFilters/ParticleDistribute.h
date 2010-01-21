@@ -126,8 +126,6 @@ public:
 
   // Collect local alive particles from the input buffers
   void distributeParticles(
-        POSVEL_T* fBlock,       // Data read from file into this block
-        ID_T* iBlock,           // Data read from file into this block
         Message* message1,      // Double buffering for reads
         Message* message2);     // Double buffering for reads
   void collectLocalParticles(Message* message);

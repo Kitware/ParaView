@@ -337,7 +337,7 @@ void ParticleDistribute::readParticlesRoundRobin(int reserveQ)
       }
 
       // Particles belonging to this processor are put in vectors
-      distributeParticles(fBlock, iBlock, message1, message2);
+      distributeParticles(message1, message2);
     }
 
     // Can delete the read buffers as soon as last file is read because
@@ -366,7 +366,7 @@ void ParticleDistribute::readParticlesRoundRobin(int reserveQ)
   long totalAliveParticles = 0;
   MPI_Allreduce((void*) &this->numberOfAliveParticles, 
                 (void*) &totalAliveParticles, 
-                1, MPI_LONG, MPI_SUM, MPI_COMM_WORLD);
+                1, MPI_LONG, MPI_SUM, Partition::getComm());
 
 #ifndef USE_VTK_COSMO
 #ifdef DEBUG
@@ -430,7 +430,7 @@ void ParticleDistribute::partitionInputFiles()
   vector<string> files;
 
   if (directory != NULL) {
-    while (directoryEntry = readdir(directory)) 
+  while ((directoryEntry = readdir(directory))) 
       {
       // get the name
       string fileName = directoryEntry->d_name;
@@ -640,17 +640,17 @@ void ParticleDistribute::findFileParticleCount()
   // Share the information about total particles
   MPI_Allreduce((void*) &numberOfParticles,
                 (void*) &this->totalParticles,
-                1, MPI_LONG, MPI_SUM, MPI_COMM_WORLD);
+                1, MPI_LONG, MPI_SUM, Partition::getComm());
 
   // Share the information about max particles in a file for setting buffer size
   MPI_Allreduce((void*) &maxNumberOfParticles,
                 (void*) &this->maxParticles,
-                1, MPI_LONG, MPI_MAX, MPI_COMM_WORLD);
+                1, MPI_LONG, MPI_MAX, Partition::getComm());
 
   // Share the maximum number of files on a processor for setting the loop
   MPI_Allreduce((void*) &numberOfMyFiles,
                 (void*) &this->maxFiles,
-                1, MPI_INT, MPI_MAX, MPI_COMM_WORLD);
+                1, MPI_INT, MPI_MAX, Partition::getComm());
 
 #ifndef USE_VTK_COSMO
 #ifdef DEBUG
@@ -678,8 +678,6 @@ void ParticleDistribute::findFileParticleCount()
 /////////////////////////////////////////////////////////////////////////
 
 void ParticleDistribute::distributeParticles(
-                POSVEL_T* fBlock,       // Read data from file into block
-                ID_T* iBlock,           // Read data from file into block
                 Message* message1,      // Send/receive buffers
                 Message* message2)      // Send/receive buffers
 {
@@ -704,7 +702,7 @@ void ParticleDistribute::distributeParticles(
       recvMessage->receive(this->prevProc);
       }
 
-    MPI_Barrier(MPI_COMM_WORLD);
+    MPI_Barrier(Partition::getComm());
 
     // Process the send buffer for alive and dead before sending on
     if (step < this->numberOfFileSends)
