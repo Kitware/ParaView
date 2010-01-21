@@ -48,7 +48,7 @@
 #include <ctime>
 
 
-vtkCxxRevisionMacro(vtkAMRDualClip, "1.3");
+vtkCxxRevisionMacro(vtkAMRDualClip, "1.4");
 vtkStandardNewMacro(vtkAMRDualClip);
 
 
@@ -479,7 +479,6 @@ void vtkDualGridClipInitializeLevelMask(
   unsigned char* levelMask, int dims[3]) 
 {
   unsigned char flag = 1;
-  unsigned char *tmp = levelMask;
   
   // We only set the inside because the ghost regions can already be set.
   scalarPtr += 1+ dims[0] + dims[0]*dims[1];
@@ -518,6 +517,7 @@ void vtkDualGridClipInitializeLevelMask(
 
   // simplify for debugging.
   // Only allow one (the one completely inside) to be decimated.
+  //unsigned char *tmp = levelMask;
   //if (flag)
   //  {
   //  levelMask = tmp + 1+ dims[0] + dims[0]*dims[1];
@@ -1484,8 +1484,6 @@ void vtkAMRDualClip::ShareBlockLocatorWithNeighbors(
   int numLevels = this->Helper->GetNumberOfLevels();
   int xMid, yMid, zMid;
   int xMin, xMax, yMin, yMax, zMin, zMax;
-  
-  vtkDataArray *scalars = this->GetInputArrayToProcess(0, block->Image);
   
   for (int level = block->Level; level < numLevels; ++level)
     {
