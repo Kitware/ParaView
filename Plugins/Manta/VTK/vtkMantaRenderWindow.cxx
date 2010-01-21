@@ -73,7 +73,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <Engine/Control/RTRT.h>
 #include <Engine/Display/SyncDisplay.h>
 
-vtkCxxRevisionMacro(vtkMantaRenderWindow, "1.6");
+vtkCxxRevisionMacro(vtkMantaRenderWindow, "1.7");
 vtkStandardNewMacro(vtkMantaRenderWindow);
 
 //----------------------------------------------------------------------------
@@ -145,11 +145,7 @@ int* vtkMantaRenderWindow::GetSize( )
   if (this->Size[0] != tempSize[0] || this->Size[1] != tempSize[1])
     {
     //on a change, let Manta know
-    tempSize[0] = this->Size[0];
-    tempSize[1] = this->Size[1];
-    this->Size[0] = -1; //defeat no change return
-    this->Size[1] = -1;
-    this->SetSize(tempSize[0], tempSize[1]);
+    this->InternalSetSize(this->Size[0], this->Size[1]);
     }
 
   return ret;
@@ -162,7 +158,12 @@ void vtkMantaRenderWindow::SetSize( int width, int height )
     {
     return;
     }
+  this->InternalSetSize(width, height);
+}
 
+//------------------------------------------------------------------------------
+void vtkMantaRenderWindow::InternalSetSize( int width, int height )
+{
   // reallocate pixel buffers
   delete [] this->ColorBuffer;
   this->ColorBuffer = new uint32[width*height];
@@ -194,6 +195,15 @@ void vtkMantaRenderWindow::SetSize( int width, int height )
       renderSize[1] = int((renViewport[3] - renViewport[1]) * height + 0.5f);      
       if (mantaRenderer->GetSyncDisplay())
         {
+#if 0
+        //just for debugging
+        cerr << "VSIZE NOW " << renderSize[0] << "x" << renderSize[1] << endl;
+        bool dummy;
+        int mantaSize[2];
+        mantaRenderer->GetSyncDisplay()->getCurrentImage()->
+          getResolution( dummy, mantaSize[0], mantaSize[1] );
+        cerr << "0 MSIZE NOW " << mantaSize[0] << "x" << mantaSize[1] << endl;
+#endif
         mantaRenderer->GetMantaEngine()-> addTransaction
           ("resize",
            Manta::Callback::create
@@ -202,16 +212,18 @@ void vtkMantaRenderWindow::SetSize( int width, int height )
             mantaRenderer->GetChannelId(), renderSize[0], renderSize[1],
             true));
         
-        // Discard the image already baked in the pipeline (wrong size)
-        // This also serves as a sync barrier such that the changeResolution
-        // transaction will executed before CopyResultFrame is called.
+        //Wait for manta to: receive the above transaction (after end of current frame),
+        //render with that, and for the old sized images to drain from the pipeline
         mantaRenderer->GetSyncDisplay()->waitOnFrameReady();
         mantaRenderer->GetSyncDisplay()->doneRendering();
+        mantaRenderer->GetSyncDisplay()->waitOnFrameReady();
+        mantaRenderer->GetSyncDisplay()->doneRendering();
+        //next wait (inside vtkMantaRenderer) is guaranteed to get the right size,
+        //but not before then (first wait above might happen before transaction handled)
         }
       }
     }
 
-  //TODO: Make this ignore manta renderers?
   this->Superclass::SetSize(width, height);
 }
 

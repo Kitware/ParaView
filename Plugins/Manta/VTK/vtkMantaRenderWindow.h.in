@@ -116,6 +116,8 @@ protected:
   vtkMantaRenderWindow();
   ~vtkMantaRenderWindow();
 
+  void InternalSetSize(int,int);
+
 private:
   uint32 *ColorBuffer;
   float  *DepthBuffer;
