@@ -461,7 +461,7 @@ void ParticleExchange::setParticles(
                         vector<MASK_T>* maskData,
                         vector<STATUS_T>* type)
 {
-  this->particleCount = xLoc->size();
+  this->particleCount = (long)xLoc->size();
   this->numberOfAliveParticles = this->particleCount;
   this->xx = xLoc;
   this->yy = yLoc;
@@ -644,7 +644,7 @@ void ParticleExchange::exchange(
   recvMessage->reset();
 
   // Number of particles to share with neighbor
-  int sendParticleCount = this->neighborParticles[sendTo].size();
+  int sendParticleCount = (int)this->neighborParticles[sendTo].size();
 
   // Overload factor alters the x,y,z dimension for wraparound depending on
   // the neighbor receiving the data and the position this processor

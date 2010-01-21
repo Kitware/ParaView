@@ -230,8 +230,10 @@ void ParticleDistribute::readParticlesRoundRobin(int reserveQ)
   Message* message2 = new Message(bufferSize);
 
   // Allocate space for the data read from the file
-  POSVEL_T *fBlock, *lBlock, *vBlock;
-  ID_T* iBlock;
+  POSVEL_T *fBlock = 0;
+  POSVEL_T *lBlock = 0;
+  POSVEL_T *vBlock = 0;
+  ID_T* iBlock = 0;
 
   // RECORD format reads one particle at a time
   if (this->inputType == RECORD) {
@@ -277,7 +279,7 @@ void ParticleDistribute::readParticlesRoundRobin(int reserveQ)
   for (int file = 0; file < this->maxFiles; file++) {
 
     // Open file to read the data if any for this processor
-    ifstream *inStream;
+    ifstream* inStream = 0;
     int firstParticle = 0;
     int numberOfParticles = 0;
     int remainingParticles = 0;
@@ -459,7 +461,7 @@ void ParticleDistribute::partitionInputFiles()
         }
       }
   }
-  this->numberOfFiles = files.size();
+  this->numberOfFiles = (int)files.size();
 
   if (this->numberOfFiles == 0) {
 #ifdef USE_VTK_COSMO
@@ -567,7 +569,7 @@ void ParticleDistribute::findFileParticleCount()
   // Compute the maximum number of particles in any one file to set buffer size
   long numberOfParticles = 0;
   long maxNumberOfParticles = 0;
-  int numberOfMyFiles = this->inFiles.size();
+  int numberOfMyFiles = (int)this->inFiles.size();
 
   // Each processor counts the particles in its own files
   for (int i = 0; i < numberOfMyFiles; i++) {

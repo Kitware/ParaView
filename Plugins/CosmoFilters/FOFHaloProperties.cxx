@@ -138,7 +138,7 @@ void FOFHaloProperties::setParticles(
                         vector<MASK_T>* maskData,
                         vector<STATUS_T>* state)
 {
-  this->particleCount = xLoc->size();
+  this->particleCount = (long)xLoc->size();
 
   // Extract the contiguous data block from a vector pointer
   this->xx = &(*xLoc)[0];

@@ -128,7 +128,7 @@ public:
         vector<STATUS_T>* state);
 
   // Return information needed by halo center finder
-  int getNumberOfHalos()        { return this->halos.size(); }
+  int getNumberOfHalos()        { return (int)this->halos.size(); }
   int* getHalos()               { return &this->halos[0]; }
   int* getHaloCount()           { return &this->haloCount[0]; }
   int* getHaloList()            { return this->haloList; }

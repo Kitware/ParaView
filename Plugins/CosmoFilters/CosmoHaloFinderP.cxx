@@ -214,7 +214,7 @@ void CosmoHaloFinderP::setParticles(
                         vector<MASK_T>* maskData,
                         vector<STATUS_T>* state)
 {
-  this->particleCount = xLoc->size();
+  this->particleCount = (long)xLoc->size();
 
   // Extract the contiguous data block from a vector pointer
   this->xx = &(*xLoc)[0];
@@ -565,7 +565,7 @@ void CosmoHaloFinderP::mergeHalos()
 {
   // What size integer buffer is needed to hold the largest halo data
   int maxNumberOfMixed;
-  int numberOfMixed = this->myMixedHalos.size();
+  int numberOfMixed = (int)this->myMixedHalos.size();
   MPI_Allreduce((void*) &numberOfMixed, (void*) &maxNumberOfMixed,
                 1, MPI_INT, MPI_MAX, Partition::getComm());
 
@@ -871,7 +871,7 @@ void CosmoHaloFinderP::sendMixedHaloResults(ID_T* haloBuffer, int haloBufSize)
     // Send to each processor the rank, id, and valid status
     // Use the same haloBuffer
     int index = 0;
-    haloBuffer[index++] = this->allMixedHalos.size();
+    haloBuffer[index++] = (ID_T)this->allMixedHalos.size();
     for (unsigned int m = 0; m < this->allMixedHalos.size(); m++) {
       haloBuffer[index++] = this->allMixedHalos[m]->getRankID();
       haloBuffer[index++] = this->allMixedHalos[m]->getHaloID();
