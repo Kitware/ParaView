@@ -31,6 +31,17 @@
 #include <vtkstd/vector>
 #include <vtksys/ios/sstream>
 #include <vtksys/SystemTools.hxx>
+#include <vtksys/RegularExpression.hxx>
+
+static void string_replace(vtkstd::string& string, char c, vtkstd::string str)
+{
+  size_t cc= string.find(c);
+  while (cc < vtkstd::string::npos)
+    {
+    string = string.replace(cc, 1, str);
+    cc = string.find(c, cc);
+    }
+}
 
 class vtkSMReaderFactory::vtkInternals
 {
@@ -40,6 +51,8 @@ public:
     vtkstd::string Group;
     vtkstd::string Name;
     vtkstd::vector<vtkstd::string> Extensions;
+    vtkstd::vector<vtksys::RegularExpression> FilenameRegExs;
+    vtkstd::vector<vtkstd::string> FilenamePatterns;
     vtkstd::string Description;
 
     void FillInformation()
@@ -64,6 +77,22 @@ public:
         {
         vtksys::SystemTools::Split(exts, this->Extensions,' ');
         }
+      const char* filename_patterns = rfHint->GetAttribute("filename_patterns");
+      if (filename_patterns)
+        {
+        vtksys::SystemTools::Split(filename_patterns, this->FilenamePatterns,' ');
+        vtkstd::vector<vtkstd::string>::iterator iter;
+        // convert the wild-card based patterns to regular expressions.
+        for (iter = this->FilenamePatterns.begin(); iter !=
+          this->FilenamePatterns.end(); iter++)
+          {
+          vtkstd::string regex = *iter;
+          ::string_replace(regex, '.', "\\.");
+          ::string_replace(regex, '?', ".");
+          ::string_replace(regex, '*', ".?");
+          this->FilenameRegExs.push_back(vtksys::RegularExpression(regex.c_str()));
+          }
+        }
       this->Description = rfHint->GetAttribute("file_description");
       }
 
@@ -79,11 +108,15 @@ public:
     // Returns true if the reader can read the file. More correctly, it returns
     // false is the reader reports that it cannot read the file.
     bool CanReadFile(const char* filename,
-      const vtkstd::vector<vtkstd::string>& extensions, vtkIdType cid);
+      const vtkstd::vector<vtkstd::string>& extensions, vtkIdType cid,
+      bool skip_filename_test=false);
 
     // Tests if 'any' of the strings in extensions is contained in
     // this->Extensions.
     bool ExtensionTest(const vtkstd::vector<vtkstd::string>& extensions);
+
+    // Tests if the FilenameRegEx matches the filename.
+    bool FilenameRegExTest(const char* filename);
     };
 
   void BuildExtensions(
@@ -137,9 +170,9 @@ public:
 bool vtkSMReaderFactory::vtkInternals::vtkValue::ExtensionTest(
   const vtkstd::vector<vtkstd::string>& extensions)
 {
-  if (this->Extensions.size() == 0 || extensions.size() == 0)
+  if (this->Extensions.size() == 0)
     {
-    return true;
+    return false;
     }
 
   vtkstd::vector<vtkstd::string>::const_iterator iter1;
@@ -159,9 +192,32 @@ bool vtkSMReaderFactory::vtkInternals::vtkValue::ExtensionTest(
 }
 
 //----------------------------------------------------------------------------
+bool vtkSMReaderFactory::vtkInternals::vtkValue::FilenameRegExTest(
+  const char* filename)
+{
+  if (this->FilenameRegExs.size() == 0)
+    {
+    return false;
+    }
+
+  vtkstd::vector<vtksys::RegularExpression>::iterator iter;
+  for (iter = this->FilenameRegExs.begin();
+    iter != this->FilenameRegExs.end(); ++iter)
+    {
+    if (iter->find(filename))
+      {
+      return true;
+      }
+    }
+  return false;
+}
+
+//----------------------------------------------------------------------------
 bool vtkSMReaderFactory::vtkInternals::vtkValue::CanReadFile(
   const char* filename, 
-  const vtkstd::vector<vtkstd::string>& extensions, vtkIdType cid)
+  const vtkstd::vector<vtkstd::string>& extensions,
+  vtkIdType cid,
+  bool skip_filename_test/*=false*/)
 {
   vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
   vtkSMProxy* prototype = pxm->GetPrototypeProxy(
@@ -171,9 +227,13 @@ bool vtkSMReaderFactory::vtkInternals::vtkValue::CanReadFile(
     return false;
     }
 
-  if (!this->ExtensionTest(extensions))
+  if (!skip_filename_test)
     {
-    return false;
+    if (!this->ExtensionTest(extensions) &&
+      !this->FilenameRegExTest(filename))
+      {
+      return false;
+      }
     }
 
   if (strcmp(prototype->GetXMLName(), "ImageReader") == 0)
@@ -192,7 +252,7 @@ bool vtkSMReaderFactory::vtkInternals::vtkValue::CanReadFile(
 }
 
 vtkStandardNewMacro(vtkSMReaderFactory);
-vtkCxxRevisionMacro(vtkSMReaderFactory, "1.2");
+vtkCxxRevisionMacro(vtkSMReaderFactory, "1.3");
 //----------------------------------------------------------------------------
 vtkSMReaderFactory::vtkSMReaderFactory()
 {
@@ -366,14 +426,13 @@ vtkStringList* vtkSMReaderFactory::GetPossibleReaders(const char* filename,
   vtkstd::vector<vtkstd::string> extensions;
   // purposefully set the extensions to empty, since we don't want the extension
   // test to be used for this case.
-  // this->Internals->BuildExtensions(filename, extensions);
 
   vtkInternals::PrototypesType::iterator iter;
   for (iter = this->Internals->Prototypes.begin();
     iter != this->Internals->Prototypes.end(); ++iter)
     {
     if (iter->CanCreatePrototype(cid) &&
-      (!filename || iter->CanReadFile(filename, extensions, cid)))
+      (!filename || iter->CanReadFile(filename, extensions, cid, true)))
       {
       this->Readers->AddString(iter->Group.c_str());
       this->Readers->AddString(iter->Name.c_str());
@@ -440,13 +499,33 @@ const char* vtkSMReaderFactory::GetSupportedFileTypes(vtkIdType cid)
     {
     if (iter->CanCreatePrototype(cid))
       {
+      vtkstd::string ext_list;
       if (iter->Extensions.size() > 0)
         {
-        vtkstd::string ext_join = ::vtkJoin(iter->Extensions, "*.", " ");
+        ext_list = ::vtkJoin(iter->Extensions, "*.", " ");
+        }
+
+      if (iter->FilenameRegExs.size() > 0)
+        {
+        vtkstd::string ext_join = ::vtkJoin(
+          iter->FilenamePatterns, "", " ");
+        if (ext_list.size() > 0)
+          {
+          ext_list += " ";
+          ext_list += ext_join;
+          }
+        else
+          {
+          ext_list = ext_join;
+          }
+        }
+
+      if (ext_list.size() > 0)
+        {
         vtksys_ios::ostringstream stream;
-        stream << iter->Description << "(" << ext_join << ")";
+        stream << iter->Description << "(" << ext_list << ")";
         sorted_types.insert(stream.str());
-        all_types << ext_join << " ";
+        all_types << ext_list << " ";
         }
       }
     }

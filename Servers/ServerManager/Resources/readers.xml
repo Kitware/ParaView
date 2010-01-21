@@ -5130,7 +5130,9 @@
      </IntVectorProperty>
 
      <Hints>
-      <ReaderFactory extensions="d3plot k lsdyna" file_description="LSDyna" />
+      <ReaderFactory extensions="k lsdyna d3plot"
+        filename_patterns="d3plot"
+        file_description="LSDyna" />
      </Hints>
 
    </SourceProxy>
