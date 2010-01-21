@@ -48,7 +48,7 @@
 #include <ctime>
 
 
-vtkCxxRevisionMacro(vtkAMRDualClip, "1.2");
+vtkCxxRevisionMacro(vtkAMRDualClip, "1.3");
 vtkStandardNewMacro(vtkAMRDualClip);
 
 
@@ -337,12 +337,27 @@ static int vtkAMRDualIsoEdgeToPointsTable[12][2] =
 
 
 
+
 //============================================================================
 // Used separately for each block.  
 // Has two locators  one for dual points (AMR cells), and one
 // for dual edges (AMR faces) This is the typical 3 edge per voxel 
 // lookup.  We do need to worry about degeneracy because corners can merge
 // and edges can merge when the degenerate cell is a wedge.
+
+// Shared points are copied to neighbors before a locator is deleted. 
+// Locators are created on demand and deleted right after a block is complete.
+
+// Setup of the level mask.
+// Centers are computed independantly.
+// Centers must be computed before anypoints are added.
+// Centers must be computed before they are used to set ghost values in neighbors.
+// Ghost values must be copied from neighbor before points are added.
+// Centers are filled in when the locator is created.
+// Ghost values are copied whena block is deleted and before a locator is used.
+// I will have to keep flags to indicate which ghost regions have been set.
+
+
 class vtkAMRDualClipLocator
 {
 public:
@@ -380,15 +395,22 @@ public:
 
  void ShareBlockLocatorWithNeighbor(
     vtkAMRDualGridHelperBlock* block,
-    vtkAMRDualGridHelperBlock* neighbor,
-    vtkDataArray* scalars,
-    double isoValue);
+    vtkAMRDualGridHelperBlock* neighbor);
    
   // The level mask could be a separate object, but it is used
   // by the locator to position points.
   // This computes just the center region.
   // Other regions need to be copied.
-  void InitializeLevelMask(vtkDataArray* scalars, double isoValue);
+  // If the center has already been computed, then this returns immediately
+  // (so it is ok to call this multiple times).
+  void ComputeLevelMask(vtkDataArray* scalars, double isoValue);
+
+  void CopyNeighborLevelMask(
+    vtkAMRDualGridHelperBlock* myBlock,
+    vtkAMRDualGridHelperBlock* neighborBlock);
+
+  // Used to set the level mask of capped faces.
+  void CapLevelMaskFace(int axis, int face);
 
   // Access to the level mask for any cell.
   unsigned char GetLevelMaskValue(int x, int y, int z);
@@ -415,87 +437,213 @@ private:
   unsigned char* LevelMask;
   void RecursiveComputeLevelMask(int depth);
   
-  // I think this is not needed anymore.
-  //int RegionLevelDifference[3][3][3];
+  // Flag to indicate that center region has been initialized.
+  unsigned char CenterLevelMaskComputed;
 };
+
+
+//----------------------------------------------------------------------------
+vtkAMRDualClipLocator* vtkAMRDualClipGetBlockLocator(
+  vtkAMRDualGridHelperBlock* block)
+{
+  if (block->UserData == 0)
+    {
+    vtkImageData* image = block->Image;
+    if (image == 0)
+      { // Remote blocks are only to setup local block bit flags.
+      // They do not need locators.
+      return 0;
+      }
+    int     extent[6];
+    // This is the same as the cell extent of the original grid (with ghosts).
+    image->GetExtent(extent);
+    --extent[1];
+    --extent[3];
+    --extent[5];
+
+    vtkAMRDualClipLocator* locator = new vtkAMRDualClipLocator;
+    block->UserData = (void*)(locator); // Block owns it now (and will delete it).
+    locator->Initialize(extent[1]-extent[0], extent[3]-extent[2], extent[5]-extent[4]);
+
+    return locator;
+    }
+  return (vtkAMRDualClipLocator*)(block->UserData);
+}
+
 
 //----------------------------------------------------------------------------
 // The only data specific stuff we need to do for the contour.
 template <class T>
 void vtkDualGridClipInitializeLevelMask(
-  T* scalarPtr, int length, double isoValue,
-  unsigned char* levelMask) 
+  T* scalarPtr, double isoValue, 
+  unsigned char* levelMask, int dims[3]) 
 {
-  for (int ii = 0; ii < length; ++ii)
+  unsigned char flag = 1;
+  unsigned char *tmp = levelMask;
+  
+  // We only set the inside because the ghost regions can already be set.
+  scalarPtr += 1+ dims[0] + dims[0]*dims[1];
+  levelMask += 1+ dims[0] + dims[0]*dims[1];
+  // Start with two because skiping from and back ghost.
+  // The exact value of zz does not matter.  
+  // This is easier than comparing < dim-1.
+  for (int zz = 2; zz < dims[2]; ++zz)
     {
-    // Lets do relative levels (to block) / level diff.
-    // Then we do not need the block level.  The only trouble is that
-    // we need to offset by 1 so that 0 can be special value (outside).
-    if (*scalarPtr++ > isoValue)
+    for (int yy = 2; yy < dims[1]; ++yy)
       {
-      *levelMask++ = 1;
+      for (int xx = 2; xx < dims[0]; ++xx)
+        {
+        // Lets do relative levels (to block) / level diff.
+        // Then we do not need the block level.  The only trouble is that
+        // we need to offset by 1 so that 0 can be special value (outside).
+        if (*scalarPtr++ > isoValue)
+          {
+          *levelMask++ = 1;
+          }
+        else
+          { // Special value  indicating point is outside clipped volume.
+          *levelMask++ = 0;
+          flag = 0;
+          }
+        }
+      // Skip last ghost of this row and first ghost of next.
+      levelMask += 2;
+      scalarPtr += 2;
       }
-    else
-      { // Special value  indicating point is outside clipped volume.
-      *levelMask++ = 0;
-      }
+    // Skip last ghost row of this plane and first ghost row of next.
+    levelMask += 2*dims[0];
+    scalarPtr += 2*dims[0];
     }
+
+
+  // simplify for debugging.
+  // Only allow one (the one completely inside) to be decimated.
+  //if (flag)
+  //  {
+  //  levelMask = tmp + 1+ dims[0] + dims[0]*dims[1];
+  //  for (int zz = 2; zz < dims[2]; ++zz)
+  //    {
+  //    for (int yy = 2; yy < dims[1]; ++yy)
+  //      {
+  //      for (int xx = 2; xx < dims[0]; ++xx)
+  //        {
+  //        *levelMask++ = 4;
+  //        }
+  //      levelMask += 2;
+  //      }
+  //    levelMask += 2*dims[0];
+  //    }
+  //  }
 }
 
 
 //----------------------------------------------------------------------------
-void vtkAMRDualClipLocator::InitializeLevelMask(
+// Initializes the center region of the level mask.
+// The other regions are set to default values, but have to be copied
+// from neighbors if they are not on the boundary of the dataset.
+void vtkAMRDualClipLocator::ComputeLevelMask(
   vtkDataArray* scalars, 
   double isoValue)
 {
+  if (this->CenterLevelMaskComputed)
+    {
+    return;
+    }
+  this->CenterLevelMaskComputed = 1;
+  int dims[3];
+  dims[0] = this->DualCellDimensions[0]+1;
+  dims[1] = this->DualCellDimensions[1]+1;
+  dims[2] = this->DualCellDimensions[2]+1;
+
   switch (scalars->GetDataType())
     {
     vtkTemplateMacro(vtkDualGridClipInitializeLevelMask(
                      (VTK_TT *)(scalars->GetVoidPointer(0)),
-                     this->ArrayLength, isoValue,
-                     this->LevelMask));
+                     isoValue, this->LevelMask, dims));
     default:
       vtkGenericWarningMacro("Execute: Unknown ScalarType");
     }
     
-  // Now try to reduce poinlevels based on Neighborhoods.
-  // If all the high level cells in a low level cell have the sam value
-  // the reduce the level of all.
+  // Reduce point levels based on cell neighbors.
+  // If all the high level cells in a low level cell have the same value
+  // then reduce the level of all.
   // Do this only for center region because ghost values need to be obtainied
-  // from neighbors.  
+  // from neighbors.
+  // We might add a restriction that level cannot change more than 1 brterrnneighboirs
+  // but this would make computation less local and maybe require all locators to be compted
+  // at once (or revised?).  
   
   // Recursive : Going in compute tree,  going out fill it mask. 
-  this->RecursiveComputeLevelMask(0);
   
-  // Copy to ghost regions because of capping surfaces.
-  unsigned char *tmp;
-  unsigned char *ptr = this->LevelMask;
-  int xMax = this->DualCellDimensions[0];
-  int yMax = this->DualCellDimensions[1];
-  int zMax = this->DualCellDimensions[2];
-  for (int zz = 0; zz <= zMax; ++zz)
-    {
-    for (int yy = 0; yy <= yMax; ++yy)
-      {
-      for (int xx = 0; xx <= zMax; ++xx)
-        {
-        tmp = ptr;
-        if (xx == 0) { ++tmp; }
-        if (yy == 0) { tmp += this->YIncrement; }
-        if (zz == 0) { tmp += this->ZIncrement; }
-        if (xx == xMax) { --tmp; }
-        if (yy == yMax) { tmp -= this->YIncrement; }
-        if (zz == zMax) { tmp -= this->ZIncrement; }
-        if (tmp != ptr)
-          {
-          *ptr = *tmp;
-          }
-        ++ptr;
-        }
-      }
-    }  
+  this->RecursiveComputeLevelMask(0);
 }
 
+
+
+
+
+//----------------------------------------------------------------------------
+// face = 0 => min, face = 1 => max
+void vtkAMRDualClipLocator::CapLevelMaskFace(int axis, int face)
+{
+  unsigned char *startPtr;
+  int normalInc;
+  int iiInc, jjInc;
+  int iiMax, jjMax;
+  
+  startPtr = this->LevelMask;
+  switch (axis)
+    {
+    case 0:
+      normalInc = 1;
+      iiInc = this->ZIncrement;
+      jjInc = this->YIncrement;    
+      iiMax = this->DualCellDimensions[2];
+      jjMax = this->DualCellDimensions[1];
+      break;
+    case 1:
+      normalInc = this->YIncrement;
+      iiInc = this->ZIncrement;
+      jjInc = 1;    
+      iiMax = this->DualCellDimensions[2];
+      jjMax = this->DualCellDimensions[0];
+      break;
+    case 2:
+      normalInc = this->ZIncrement;
+      iiInc = this->YIncrement;
+      jjInc = 1;    
+      iiMax = this->DualCellDimensions[1];
+      jjMax = this->DualCellDimensions[0];
+      break;
+    default:
+      vtkGenericWarningMacro("Bad axis.");      
+    }
+  // Handle the max face cases.
+  if (face == 1)
+    {
+    startPtr = startPtr + this->ArrayLength-1;
+    normalInc = -normalInc;
+    iiInc = -iiInc;
+    jjInc = -jjInc;    
+    }
+
+  // Copy to ghost regions because of capping surfaces.
+  // Ghost values that do not overlap neighbor blocks
+  // (on dataset boundary) need values.
+  // Just copy nearest internal block value.
+  unsigned char *iiPtr, *jjPtr;
+  iiPtr = startPtr;
+  for (int ii = 0; ii <= iiMax; ++ii)
+    {
+    jjPtr = iiPtr;
+    for (int jj = 0; jj <= jjMax; ++jj)
+      {
+      *jjPtr = jjPtr[normalInc];
+      jjPtr += jjInc;
+      }
+    iiPtr += iiInc;
+    }
+}
 
 //----------------------------------------------------------------------------
 void vtkAMRDualClipLocator::RecursiveComputeLevelMask(int depth)
@@ -592,6 +740,93 @@ void vtkAMRDualClipLocator::RecursiveComputeLevelMask(int depth)
     }
 }
 
+
+//----------------------------------------------------------------------------
+// Caller need to make sure the source has computed the level mask.
+void vtkAMRDualClipLocator::CopyNeighborLevelMask(
+  vtkAMRDualGridHelperBlock* myBlock,
+  vtkAMRDualGridHelperBlock* neighborBlock)
+{
+  // We never have to copy from a higher level to a lower level.
+  // the higher level block always handles the shared region.
+  // Neighbor is the source,  this is the destination.
+  // I will put a check in the caller so that only the block that owns
+  // this region calls this method.
+  if (neighborBlock->Level > myBlock->Level)
+    {
+    return;
+    }
+  vtkAMRDualClipLocator* neighborLocator = vtkAMRDualClipGetBlockLocator(neighborBlock);
+  
+  // We copy from the center region to ghost region.
+  
+  // Compute the intersection in the high level destination block
+  int sourceExt[6]; // Center region
+  sourceExt[0] = neighborBlock->OriginIndex[0] + 1;
+  sourceExt[2] = neighborBlock->OriginIndex[1] + 1;
+  sourceExt[4] = neighborBlock->OriginIndex[2] + 1;
+  sourceExt[1] = sourceExt[0] + neighborLocator->DualCellDimensions[0]-2;
+  sourceExt[3] = sourceExt[2] + neighborLocator->DualCellDimensions[1]-2;
+  sourceExt[5] = sourceExt[4] + neighborLocator->DualCellDimensions[2]-2;
+  int destExt[6]; // all regions (including ghosts)
+  destExt[0] = myBlock->OriginIndex[0];
+  destExt[2] = myBlock->OriginIndex[1];
+  destExt[4] = myBlock->OriginIndex[2];
+  destExt[1] = destExt[0] + this->DualCellDimensions[0];
+  destExt[3] = destExt[2] + this->DualCellDimensions[1];
+  destExt[5] = destExt[4] + this->DualCellDimensions[2];
+ 
+  // Convert the source extent to the destination coordinates.
+  // All extents have already been shifted to be positive.
+  int levelDiff = myBlock->Level - neighborBlock->Level;
+  sourceExt[0] = (sourceExt[0] << levelDiff);
+  sourceExt[1] = ((sourceExt[1]+1) << levelDiff) - 1;
+  sourceExt[2] = (sourceExt[2] << levelDiff);
+  sourceExt[3] = ((sourceExt[3]+1) << levelDiff) - 1;
+  sourceExt[4] = (sourceExt[4] << levelDiff);
+  sourceExt[5] = ((sourceExt[5]+1) << levelDiff) - 1;
+  
+  // Take the intersection to find the destination extent.
+  if (destExt[0] < sourceExt[0]) {destExt[0] = sourceExt[0]; }
+  if (destExt[1] > sourceExt[1]) {destExt[1] = sourceExt[1]; }
+  if (destExt[2] < sourceExt[2]) {destExt[2] = sourceExt[2]; }
+  if (destExt[3] > sourceExt[3]) {destExt[3] = sourceExt[3]; }
+  if (destExt[4] < sourceExt[4]) {destExt[4] = sourceExt[4]; }
+  if (destExt[5] > sourceExt[5]) {destExt[5] = sourceExt[5]; }
+  
+  // Loop over the extent.
+  unsigned char *sourcePtr = neighborLocator->LevelMask;
+  unsigned char *destPtr = this->LevelMask;
+  // +1 is for ghost offset.
+  destPtr += (destExt[0]-myBlock->OriginIndex[0]);
+  destPtr += (destExt[2]-myBlock->OriginIndex[1])*this->YIncrement;
+  destPtr += (destExt[4]-myBlock->OriginIndex[2])*this->ZIncrement;
+  unsigned char *xPtr, *yPtr, *zPtr;
+  zPtr = destPtr;
+  int sx, sy, sz;
+  for (int zz = destExt[4]; zz <= destExt[5]; ++zz)
+    {
+    sz = (zz >> levelDiff)-neighborBlock->OriginIndex[2];
+    yPtr = zPtr;
+    for (int yy = destExt[2]; yy <= destExt[3]; ++yy)
+      {
+      sy = (yy >> levelDiff)-neighborBlock->OriginIndex[1];
+      xPtr = yPtr;
+      for (int xx = destExt[0]; xx <= destExt[1]; ++xx)
+        {
+        // Compute the source for this pixel.
+        sx = (xx >> levelDiff)-neighborBlock->OriginIndex[0];
+        *xPtr = sourcePtr[sx + sy*this->YIncrement + sz*this->ZIncrement] + levelDiff;
+        ++xPtr;
+        }
+      yPtr += this->YIncrement;
+      }
+    zPtr += this->ZIncrement;
+    }
+}
+
+
+
 //----------------------------------------------------------------------------
 unsigned char vtkAMRDualClipLocator::GetLevelMaskValue(int x, int y, int z)
 {
@@ -600,31 +835,19 @@ unsigned char vtkAMRDualClipLocator::GetLevelMaskValue(int x, int y, int z)
 
 
 //----------------------------------------------------------------------------
-//void vtkAMRDualClipLocator::CopyRegionLevelDifferences(
-//  vtkAMRDualGridHelperBlock* block)
-//{
-//  int x,y,z;
-//  for (z = 0; z < 3; ++z)
-//    {
-//    for (y = 0; y < 3; ++y)
-//      {
-//      for (x = 0; x < 3; ++x)
-//        {
-//        this->RegionLevelDifference[x][y][z] = block->RegionBits[x][y][z] & vtkAMRRegionBitsDegenerateMask;
-//        }
-//      }
-//    }
-//}
-//----------------------------------------------------------------------------
 vtkAMRDualClipLocator::vtkAMRDualClipLocator()
 {
-  this->DualCellDimensions[0] = 0;
-  this->DualCellDimensions[1] = 0;
-  this->DualCellDimensions[2] = 0;
   this->YIncrement = this->ZIncrement = 0;
   this->ArrayLength = 0;
   this->XEdges = this->YEdges = this->ZEdges = 0;
   this->Corners = 0;
+  for (int ii = 0; ii < 3; ++ii)
+    {
+    this->DualCellDimensions[ii] = 0;
+    }
+  this->LevelMask = 0;
+  this->CenterLevelMaskComputed = 0;
+
 }
 //----------------------------------------------------------------------------
 vtkAMRDualClipLocator::~vtkAMRDualClipLocator()
@@ -663,6 +886,7 @@ void vtkAMRDualClipLocator::Initialize(
       this->ZEdges = new vtkIdType[this->ArrayLength];
       this->Corners = new vtkIdType[this->ArrayLength];
       this->LevelMask = new unsigned char[this->ArrayLength];
+      memset(this->LevelMask,255,this->ArrayLength); // Uninitialized
       }
     else
       {
@@ -843,7 +1067,8 @@ vtkIdType* vtkAMRDualClipLocator::GetCornerPointer(
   diff = this->LevelMask[xCell+(yCell*this->YIncrement)+(zCell*this->ZIncrement)];
   --diff;
   // Short circuit for debugging.
-  diff = 0;
+  // This will not merge any point based on the level mask.
+  //diff = 0;
   
   if (diff > 0 )
     {
@@ -939,47 +1164,15 @@ void vtkAMRDualClipLocator::SharePointIdsWithNeighbor(
 
 
 //----------------------------------------------------------------------------
-vtkAMRDualClipLocator* vtkAMRDualClipGetBlockLocator(
-  vtkAMRDualGridHelperBlock* block,
-  vtkDataArray* scalars,
-  double isoValue)
-{
-  if (block->UserData == 0)
-    {
-    vtkImageData* image = block->Image;
-    if (image == 0)
-      { // Remote blocks are only to setup local block bit flags.
-      return 0;
-      }
-    int     extent[6];
-    // This is the same as the cell extent of the original grid (with ghosts).
-    image->GetExtent(extent);
-    --extent[1];
-    --extent[3];
-    --extent[5];
-
-    vtkAMRDualClipLocator* locator = new vtkAMRDualClipLocator;
-    block->UserData = (void*)(locator); // Block owns it now.
-    locator->Initialize(extent[1]-extent[0], extent[3]-extent[2], extent[5]-extent[4]);
-    //locator->CopyRegionLevelDifferences(block);
-          
-    locator->InitializeLevelMask(scalars, isoValue);
-
-    return locator;
-    }
-  return (vtkAMRDualClipLocator*)(block->UserData);
-}
-
-//----------------------------------------------------------------------------
 // This version works with higher level neighbor blocks.
+// Move the points on boundaries to neighbor locator so there will
+// not be duplicate coincident points between blocks.
 void vtkAMRDualClipLocator::ShareBlockLocatorWithNeighbor(
   vtkAMRDualGridHelperBlock* block,
-  vtkAMRDualGridHelperBlock* neighbor,
-  vtkDataArray* scalars,
-  double isoValue)
+  vtkAMRDualGridHelperBlock* neighbor)
 {
-  vtkAMRDualClipLocator* blockLocator = vtkAMRDualClipGetBlockLocator(block, scalars, isoValue);
-  vtkAMRDualClipLocator* neighborLocator = vtkAMRDualClipGetBlockLocator(neighbor, scalars, isoValue);
+  vtkAMRDualClipLocator* blockLocator = vtkAMRDualClipGetBlockLocator(block);
+  vtkAMRDualClipLocator* neighborLocator = vtkAMRDualClipGetBlockLocator(neighbor);
 
   // Compute the extent of the locator to copy.
   // Moving too many will not hurt, so do not worry about which block owns the region.
@@ -1323,8 +1516,8 @@ void vtkAMRDualClip::ShareBlockLocatorWithNeighbors(
             // The unused center flag is used as a flag to indicate
             if (neighbor && neighbor->Image && neighbor->RegionBits[1][1][1])
               {
-              vtkAMRDualClipLocator* blockLocator = vtkAMRDualClipGetBlockLocator(block, scalars, this->IsoValue);
-              blockLocator->ShareBlockLocatorWithNeighbor(block, neighbor, scalars, this->IsoValue);
+              vtkAMRDualClipLocator* blockLocator = vtkAMRDualClipGetBlockLocator(block);
+              blockLocator->ShareBlockLocatorWithNeighbor(block, neighbor);
               }
             }
           }
@@ -1334,11 +1527,165 @@ void vtkAMRDualClip::ShareBlockLocatorWithNeighbors(
 }
 
 
+//----------------------------------------------------------------------------
+// This is called before we start processing a block to make sure
+// the locator is initialized in center and ghost regions.
+void vtkAMRDualClip::InitializeLevelMask(vtkAMRDualGridHelperBlock* block)
+{
+  vtkImageData* image = block->Image;
+  if (image == 0)
+    { // Remote blocks are only to setup local block bit flags.
+    return;
+    }
+  vtkDataArray *volumeFractionArray = this->GetInputArrayToProcess(0, image);
+  vtkAMRDualClipLocator* locator = vtkAMRDualClipGetBlockLocator(block);
+  locator->ComputeLevelMask(volumeFractionArray, this->IsoValue);
+
+  vtkAMRDualGridHelperBlock* neighbor;
+  vtkAMRDualClipLocator* neighborLocator;
+
+  // We need to check for neighbors in lower or equal
+  // to our level.  When blocks from different levels share a border
+  // the high level block always owns the shared region.
+  // This can be vastly simpler.  Since neighbor is always a lower (or equal)
+  // level, each face/edge/corner has at most one neighbor.
+  int xMid, yMid, zMid;
+  int xMin, xMax, yMin, yMax, zMin, zMax;
+  
+  for (int level = 0; level <= block->Level; ++level)
+    {
+    // Neighborhood.
+    int levelDiff = block->Level - level;
+    xMid = block->GridIndex[0];
+    xMin = (xMid >> levelDiff) - 1;
+    xMax = (xMid+1) >> levelDiff;
+    yMid = block->GridIndex[1];
+    yMin = (yMid >> levelDiff) - 1;
+    yMax = (yMid+1) >> levelDiff;
+    zMid = block->GridIndex[2];
+    zMin = (zMid >> levelDiff) - 1;
+    zMax = (zMid+1) >> levelDiff;
+    
+    for (int iz = zMin; iz <=zMax; ++iz)
+      {
+      for (int iy = yMin; iy <=yMax; ++iy)
+        {
+        for (int ix = xMin; ix <=xMax; ++ix)
+          {
+          if ((ix << levelDiff) != xMid || 
+              (iy << levelDiff) != yMid || 
+              (iz << levelDiff) != zMid)
+            {
+            // I could further prune and only copy to regions I own.
+            neighbor = this->Helper->GetBlock(level, ix, iy, iz);
+            // If the neighbor was already processed, then its level mask 
+            // was copied to this block already.
+            if (neighbor && neighbor->RegionBits[1][1][1] != 0)
+              {
+              neighborLocator = vtkAMRDualClipGetBlockLocator(neighbor);
+              image = neighbor->Image;
+              if (image)
+                {
+                volumeFractionArray = this->GetInputArrayToProcess(0, image);
+                neighborLocator->ComputeLevelMask(volumeFractionArray, this->IsoValue);
+                locator->CopyNeighborLevelMask(block, neighbor);
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    
+  // Take care of boundary faces which have not been set.
+  // Just reflect values over face normal  
+  if (block->BoundaryBits & 1)
+    {
+    locator->CapLevelMaskFace(0,0);
+    }
+  if (block->BoundaryBits & 2)
+    {
+    locator->CapLevelMaskFace(0,1);
+    }
+  if (block->BoundaryBits & 4)
+    {
+    locator->CapLevelMaskFace(1,0);
+    }
+  if (block->BoundaryBits & 8)
+    {
+    locator->CapLevelMaskFace(1,1);
+    }
+  if (block->BoundaryBits & 16)
+    {
+    locator->CapLevelMaskFace(2,0);
+    }
+  if (block->BoundaryBits & 32)
+    {
+    locator->CapLevelMaskFace(2,1);
+    }  
+}
+
+
+//----------------------------------------------------------------------------
+// This is called after we finished processing a block to share the locator
+// level mask with neighbors before we delete the locator.
+void vtkAMRDualClip::ShareLevelMask(vtkAMRDualGridHelperBlock* block)
+{
+  vtkAMRDualClipLocator* locator = vtkAMRDualClipGetBlockLocator(block);
+  vtkAMRDualGridHelperBlock* neighbor;
+  vtkAMRDualClipLocator* neighborLocator;
+  int numLevels = this->Helper->GetNumberOfLevels();
+
+  // We need to check for neighbors in higher or equal
+  // to our level.  When blocks from different levels share a border
+  // the high level block always owns the shared region.
+  int xMid, yMid, zMid;
+  int xMin, xMax, yMin, yMax, zMin, zMax;
+  
+  for (int level = block->Level; level < numLevels; ++level)
+    {
+    // Neighborhood.
+    int levelDiff = level - block->Level;
+    xMid = block->GridIndex[0];
+    xMin = (xMid << levelDiff) - 1;
+    xMax = (xMid+1) << levelDiff;
+    yMid = block->GridIndex[1];
+    yMin = (yMid << levelDiff) - 1;
+    yMax = (yMid+1) << levelDiff;
+    zMid = block->GridIndex[2];
+    zMin = (zMid << levelDiff) - 1;
+    zMax = (zMid+1) << levelDiff;
+    
+    for (int iz = zMin; iz <=zMax; ++iz)
+      {
+      for (int iy = yMin; iy <=yMax; ++iy)
+        {
+        for (int ix = xMin; ix <=xMax; ++ix)
+          {
+          if ((ix >> levelDiff) != xMid || 
+              (iy >> levelDiff) != yMid || 
+              (iz >> levelDiff) != zMid)
+            {
+            // I could further prune and only copy to regions owned by neighbor.
+            neighbor = this->Helper->GetBlock(level, ix, iy, iz);
+            // If the neighbor was already processed, then its level mask 
+            // was copied to this block already.
+            if (neighbor && neighbor->RegionBits[1][1][1] != 0)
+              {
+              neighborLocator = vtkAMRDualClipGetBlockLocator(neighbor);
+              neighborLocator->CopyNeighborLevelMask(neighbor, block);
+              }
+            }
+          }
+        }
+      }
+    }
+}
 
 
 //----------------------------------------------------------------------------
 void vtkAMRDualClip::ProcessBlock(vtkAMRDualGridHelperBlock* block,
-                                     int blockId)
+                                  int blockId)
 {
   vtkImageData* image = block->Image;
   if (image == 0)
@@ -1362,7 +1709,8 @@ void vtkAMRDualClip::ProcessBlock(vtkAMRDualGridHelperBlock* block,
   // Input the dimensions of the dual cells with ghosts.
   if (this->EnableMergePoints)
     {
-    this->BlockLocator = vtkAMRDualClipGetBlockLocator(block, volumeFractionArray, this->IsoValue);
+    this->InitializeLevelMask(block);
+    this->BlockLocator = vtkAMRDualClipGetBlockLocator(block);
     }
   else
     { // Shared locator.
@@ -1490,8 +1838,9 @@ void vtkAMRDualClip::ProcessBlock(vtkAMRDualGridHelperBlock* block,
             
   if (this->EnableMergePoints)
     { 
+    this->ShareLevelMask(block);
     // Copy point ids into neighbor locators.
-    //this->ShareBlockLocatorWithNeighbors(block);
+    this->ShareBlockLocatorWithNeighbors(block);
     // We are done.  We no longer need the locator for this block.
     delete this->BlockLocator;
     this->BlockLocator = 0;
@@ -1527,7 +1876,7 @@ void vtkAMRDualClip::ProcessDualCell(
     }
 
   // Which boundaries does this cube/cell touch?
-  unsigned char cubeBoundaryBits = 0;
+  unsigned char cubeBoundaryBits[8] = {0,0,0,0,0,0,0,0};
   // If this cell is degenerate, then remove triangles with 2 points.
   int degenerateFlag = 0;  
   
@@ -1544,7 +1893,7 @@ void vtkAMRDualClip::ProcessDualCell(
     spacing[ii] = tmp[ii] / (double)(1 << block->Level);
     lowerSpacing[ii] = 2.0 * spacing[ii];
     }
-  tmp = this->Helper->GetGlobalOrigin();
+  const double *origin = this->Helper->GetGlobalOrigin();
   
   // Use this range to  determine which dual point index is ghost.
   int ghostDualPointIndexRange[6];
@@ -1580,7 +1929,7 @@ void vtkAMRDualClip::ProcessDualCell(
       if ( (block->BoundaryBits & 1) ) 
         {
         dx = 1.0;
-        cubeBoundaryBits = cubeBoundaryBits | 1;
+        cubeBoundaryBits[c] = cubeBoundaryBits[c] | 1;
         }
       }
     else if (px == ghostDualPointIndexRange[1]) 
@@ -1589,7 +1938,7 @@ void vtkAMRDualClip::ProcessDualCell(
       if ( (block->BoundaryBits & 2) )
         {
         dx = 0.0;
-        cubeBoundaryBits = cubeBoundaryBits | 2;
+        cubeBoundaryBits[c] = cubeBoundaryBits[c] | 2;
         }
       }
     else {nx = 1;}
@@ -1600,7 +1949,7 @@ void vtkAMRDualClip::ProcessDualCell(
       if ( (block->BoundaryBits & 4) ) 
         {
         dy = 1.0;
-        cubeBoundaryBits = cubeBoundaryBits | 4;
+        cubeBoundaryBits[c] = cubeBoundaryBits[c] | 4;
         }
       }
     else if (py == ghostDualPointIndexRange[3]) 
@@ -1609,7 +1958,7 @@ void vtkAMRDualClip::ProcessDualCell(
       if ( (block->BoundaryBits & 8) ) 
         {
         dy = 0.0;
-        cubeBoundaryBits = cubeBoundaryBits | 8;
+        cubeBoundaryBits[c] = cubeBoundaryBits[c] | 8;
         }
       }
     else {ny = 1;}
@@ -1620,7 +1969,7 @@ void vtkAMRDualClip::ProcessDualCell(
       if ( (block->BoundaryBits & 16) )
         {
         dz = 1.0;
-        cubeBoundaryBits = cubeBoundaryBits | 16;
+        cubeBoundaryBits[c] = cubeBoundaryBits[c] | 16;
         }
       }
     else if (pz == ghostDualPointIndexRange[5]) 
@@ -1629,7 +1978,7 @@ void vtkAMRDualClip::ProcessDualCell(
       if ( (block->BoundaryBits & 32) )
         {
         dz = 0.0;
-        cubeBoundaryBits = cubeBoundaryBits | 32;
+        cubeBoundaryBits[c] = cubeBoundaryBits[c] | 32;
         }
       }
     else {nz = 1;}
@@ -1647,9 +1996,9 @@ void vtkAMRDualClip::ProcessDualCell(
     px = px >> levelDiff;
     py = py >> levelDiff;
     pz = pz >> levelDiff;
-    cornerPoints[c<<2]     = tmp[0] + spacing[0] * (double)(1 << levelDiff) * ((double)(px)+dx);
-    cornerPoints[(c<<2)|1] = tmp[1] + spacing[1] * (double)(1 << levelDiff) * ((double)(py)+dy);
-    cornerPoints[(c<<2)|2] = tmp[2] + spacing[2] * (double)(1 << levelDiff) * ((double)(pz)+dz);
+    cornerPoints[c<<2]     = origin[0] + spacing[0] * (double)(1 << levelDiff) * ((double)(px)+dx);
+    cornerPoints[(c<<2)|1] = origin[1] + spacing[1] * (double)(1 << levelDiff) * ((double)(py)+dy);
+    cornerPoints[(c<<2)|2] = origin[2] + spacing[2] * (double)(1 << levelDiff) * ((double)(pz)+dz);
     */
     // /*
     if (block->RegionBits[nx][ny][nz] & vtkAMRRegionBitsDegenerateMask)
@@ -1662,24 +2011,24 @@ void vtkAMRDualClip::ProcessDualCell(
       // Shift half a pixel to get center of cell (dual point).
       if (levelDiff == 1)
         { // This is the most common case; avoid extra multiplications.
-        cornerPoints[c<<2]     = tmp[0] + lowerSpacing[0] * ((double)(px)+dx);
-        cornerPoints[(c<<2)|1] = tmp[1] + lowerSpacing[1] * ((double)(py)+dy);
-        cornerPoints[(c<<2)|2] = tmp[2] + lowerSpacing[2] * ((double)(pz)+dz);
+        cornerPoints[c<<2]     = origin[0] + lowerSpacing[0] * ((double)(px)+dx);
+        cornerPoints[(c<<2)|1] = origin[1] + lowerSpacing[1] * ((double)(py)+dy);
+        cornerPoints[(c<<2)|2] = origin[2] + lowerSpacing[2] * ((double)(pz)+dz);
         }
       else
         { // This could be the only degenerate path with a little extra cost.
-        cornerPoints[c<<2]     = tmp[0] + spacing[0] * (double)(1 << levelDiff) * ((double)(px)+dx);
-        cornerPoints[(c<<2)|1] = tmp[1] + spacing[1] * (double)(1 << levelDiff) * ((double)(py)+dy);
-        cornerPoints[(c<<2)|2] = tmp[2] + spacing[2] * (double)(1 << levelDiff) * ((double)(pz)+dz);
+        cornerPoints[c<<2]     = origin[0] + spacing[0] * (double)(1 << levelDiff) * ((double)(px)+dx);
+        cornerPoints[(c<<2)|1] = origin[1] + spacing[1] * (double)(1 << levelDiff) * ((double)(py)+dy);
+        cornerPoints[(c<<2)|2] = origin[2] + spacing[2] * (double)(1 << levelDiff) * ((double)(pz)+dz);
         }
       }
     else
       {
-      // How do I chop the cells in half on the bondaries?
-      // Move the tmp origin and change spacing.
-      cornerPoints[c<<2]     = tmp[0] + spacing[0] * ((double)(px)+dx); 
-      cornerPoints[(c<<2)|1] = tmp[1] + spacing[1] * ((double)(py)+dy); 
-      cornerPoints[(c<<2)|2] = tmp[2] + spacing[2] * ((double)(pz)+dz); 
+      // How do I chop the cells in half on the boundaries?
+      // Move the origin and change spacing.
+      cornerPoints[c<<2]     = origin[0] + spacing[0] * ((double)(px)+dx); 
+      cornerPoints[(c<<2)|1] = origin[1] + spacing[1] * ((double)(py)+dy); 
+      cornerPoints[(c<<2)|2] = origin[2] + spacing[2] * ((double)(pz)+dz); 
       }
     // */
     }  
@@ -1699,26 +2048,47 @@ void vtkAMRDualClip::ProcessDualCell(
       unsigned char levelMaskValue = 0;
       int casePtId = *tetra;
       if (casePtId < 8)
-        {
+        { // Corner (internal point)
         ptIdPtr = this->BlockLocator->GetCornerPointer(x,y,z,casePtId);
-        levelMaskValue = this->BlockLocator->GetLevelMaskValue(x+(casePtId&1?0:1),
-                                                               y+(casePtId&2?0:1),
-                                                               z+(casePtId&4?0:1));
+        levelMaskValue = this->BlockLocator->GetLevelMaskValue(x+((casePtId&1)?1:0),
+                                                               y+((casePtId&2)?1:0),
+                                                               z+((casePtId&4)?1:0));
+        if (*ptIdPtr == -1)
+          {
+          // I am not going to tamper with the computation of points on the surface
+          // because it is working well.
+          // Compute points for interior dual cells based on the
+          // level mask degeneracy in the locator.
+          // We could skip computing the "cornerpoints" for case 255 (all internal).
+          // It is a pain to handle boundaries here with duplicat code but oh well.   
+          // Hey! The results of the last pass were saved in cube boundary bits.
+          dx = dy = dz = 0.5;
+          if (cubeBoundaryBits[casePtId] & 1) { dx = 1.0; } 
+          if (cubeBoundaryBits[casePtId] & 2) { dx = 0.0; }
+          if (cubeBoundaryBits[casePtId] & 4) { dy = 1.0; } 
+          if (cubeBoundaryBits[casePtId] & 8) { dy = 0.0; }
+          if (cubeBoundaryBits[casePtId] & 16){ dz = 1.0; } 
+          if (cubeBoundaryBits[casePtId] & 32){ dz = 0.0; }
+                    
+          int levelDiff = levelMaskValue - 1; // Had to shift mask so 0 would be a special value.
+          int px =(casePtId & 1)?gx+1:gx;
+          int py =(casePtId & 2)?gy+1:gy;
+          int pz =(casePtId & 4)?gz+1:gz;
+          px = px >> levelDiff;
+          py = py >> levelDiff;
+          pz = pz >> levelDiff;
+          // Shifting half an index to get to the middle of the cell for the dual point.
+          pt[0] = origin[0] + spacing[0] * (double)(1 << levelDiff) * ((double)(px)+dx);
+          pt[1] = origin[1] + spacing[1] * (double)(1 << levelDiff) * ((double)(py)+dy);
+          pt[2] = origin[2] + spacing[2] * (double)(1 << levelDiff) * ((double)(pz)+dz);
+          *ptIdPtr = this->Points->InsertNextPoint(pt);
+          this->LevelMaskPointArray->InsertNextValue(levelMaskValue);
+          }
         }
       else
-        {
+        { // Edge (clipped cell, point on iso surface)
         ptIdPtr = this->BlockLocator->GetEdgePointer(x,y,z,casePtId-8);
-        }
-      if (*ptIdPtr == -1)
-        {
-        if (casePtId < 8)
-          {
-          double* cornerPoint = cornerPoints + (casePtId << 2); // 4 values per corner
-          pt[0] = *cornerPoint++;
-          pt[1] = *cornerPoint++;
-          pt[2] = *cornerPoint++;
-          }
-        else
+        if (*ptIdPtr == -1)
           {
           int edge = casePtId - 8;
           // Compute the interpolation factor.
@@ -1732,13 +2102,14 @@ void vtkAMRDualClip::ProcessDualCell(
           pt[0] = cornerPoints[pt1Idx] + k*(cornerPoints[pt2Idx]-cornerPoints[pt1Idx]);
           pt[1] = cornerPoints[pt1Idx|1] + k*(cornerPoints[pt2Idx|1]-cornerPoints[pt1Idx|1]);
           pt[2] = cornerPoints[pt1Idx|2] + k*(cornerPoints[pt2Idx|2]-cornerPoints[pt1Idx|2]);
+          *ptIdPtr = this->Points->InsertNextPoint(pt);
+          this->LevelMaskPointArray->InsertNextValue(levelMaskValue);
           }
-        *ptIdPtr = this->Points->InsertNextPoint(pt);
-        this->LevelMaskPointArray->InsertNextValue(levelMaskValue);
         }
       pointIds[ii] = *ptIdPtr; 
       }
-    //if (pointIds[0]!=pointIds[1] && pointIds[0]!=pointIds[2] && pointIds[1]!=pointIds[2])
+    if (pointIds[0]!=pointIds[1] && pointIds[0]!=pointIds[2] && pointIds[0]!=pointIds[4] &&
+        pointIds[1]!=pointIds[2] && pointIds[1]!=pointIds[3] && pointIds[2]!=pointIds[3] )
       {
       this->Cells->InsertNextCell(4, pointIds);
       this->BlockIdCellArray->InsertNextValue(blockId);

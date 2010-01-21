@@ -24,7 +24,7 @@
 #include "vtkUnsignedCharArray.h"
 #include "vtkstd/vector"
 
-vtkCxxRevisionMacro(vtkAMRDualGridHelper, "1.6");
+vtkCxxRevisionMacro(vtkAMRDualGridHelper, "1.7");
 vtkStandardNewMacro(vtkAMRDualGridHelper);
 
 class vtkAMRDualGridHelperSeed;
@@ -1096,26 +1096,35 @@ int vtkAMRDualGridHelper::ClaimBlockSharedRegion(
                 if (ix == -1 && iy == 0 && iz == 0)
                   { // Turn off the -x boundary bit.
                   block->BoundaryBits = block->BoundaryBits & 62;
+                  // Turn off neighbor boundary bit.  It is not necessary because the
+                  // neighbor does not own the region and will not process it.
+                  // However, it is confusing when debugging not to have the correct bits set.
+                  neighborBlock->BoundaryBits = neighborBlock->BoundaryBits & 61;
                   }
                 if (ix == 1 && iy == 0 && iz == 0)
                   { // Turn off the x boundary bit.
                   block->BoundaryBits = block->BoundaryBits & 61;
+                  neighborBlock->BoundaryBits = neighborBlock->BoundaryBits & 62;
                   }
                 if (ix == 0 && iy == -1 && iz == 0)
                   { // Turn off the -y boundary bit.
                   block->BoundaryBits = block->BoundaryBits & 59;
+                  neighborBlock->BoundaryBits = neighborBlock->BoundaryBits & 55;
                   }
                 if (ix == 0 && iy == 1 && iz == 0)
                   { // Turn off the y boundary bit.
                   block->BoundaryBits = block->BoundaryBits & 55;
+                  neighborBlock->BoundaryBits = neighborBlock->BoundaryBits & 59;
                   }
                 if (ix == 0 && iy == 0 && iz == -1)
                   { // Turn off the -z boundary bit.
                   block->BoundaryBits = block->BoundaryBits & 47;
+                  neighborBlock->BoundaryBits = neighborBlock->BoundaryBits & 31;
                   }
                 if (ix == 0 && iy == 0 && iz == 1)
                   { // Turn off the z boundary bit.
                   block->BoundaryBits = block->BoundaryBits & 31;
+                  neighborBlock->BoundaryBits = neighborBlock->BoundaryBits & 47;
                   }
 
                 // Vote for degeneracy level.

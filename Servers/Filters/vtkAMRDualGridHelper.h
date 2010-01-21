@@ -185,6 +185,7 @@ public:
   
   // This is the global index of the origin of the image.
   // This is important since not all blocks have ghost layers on minimum side.
+  // It appears that this is the origin of the ghost pixel if the image has a ghost pixel.
   int OriginIndex[3];
   
   // The process that has the actual data (image).

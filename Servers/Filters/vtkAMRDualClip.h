@@ -102,6 +102,10 @@ protected:
     int x, int y, int z,
     double values[8]);
 
+  void InitializeLevelMask(vtkAMRDualGridHelperBlock* block);
+  void ShareLevelMask(vtkAMRDualGridHelperBlock* block);
+
+
   //void DebugCases();
   //void PermuteCases();
   //void MirrorCases();
