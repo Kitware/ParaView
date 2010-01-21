@@ -53,7 +53,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 /////////////////////////////////////////////////////////////////////////
 
-MPI::Cartcomm Partition::cartComm;
+MPI_Comm Partition::cartComm;
 int Partition::numProc = 0;
 int Partition::myProc = -1;
 int Partition::decompSize[DIMENSION];
@@ -85,21 +85,21 @@ void Partition::initialize()
 
   for (int dim = 0; dim < DIMENSION; dim++)
      decompSize[dim] = 0;
-  bool periodic[] = {true, true, true};
-  bool reorder = true;
+  int periodic[] = {1, 1, 1};
+  int reorder = 1;
 
   // Compute the number of processors in each dimension
-  MPI::Compute_dims(numProc, DIMENSION, decompSize);
+  MPI_Dims_create(numProc, DIMENSION, decompSize);
 
   // Create the Cartesion communicator
-  cartComm = MPI::COMM_WORLD.Create_cart(
-                     DIMENSION, decompSize, periodic, reorder);
-
-  // Get this processor's position in the Cartesian topology
-  cartComm.Get_topo(DIMENSION, decompSize, periodic, myPosition);
+  MPI_Cart_create(MPI_COMM_WORLD,
+                  DIMENSION, decompSize, periodic, reorder, &cartComm);
 
   // Reset my rank if it changed
-  myProc = cartComm.Get_cart_rank(myPosition);
+  MPI_Comm_rank(cartComm, &myProc);
+
+  // Get this processor's position in the Cartesian topology
+  MPI_Cart_coords(cartComm, myProc, DIMENSION, myPosition);
 
   // Set all my neighbor processor ids for communication
   setNeighbors();
@@ -161,7 +161,8 @@ int Partition::getNeighbor(int xpos, int ypos, int zpos)
   pos[1] = ypos;
   pos[2] = zpos;
 
-  int neighborProc = cartComm.Get_cart_rank(pos);
+  int neighborProc;
+  MPI_Cart_rank(cartComm, pos, &neighborProc);
   return neighborProc;
 }
 

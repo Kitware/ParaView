@@ -83,7 +83,7 @@ public:
   // Set the processor numbers of neighbors in all directions
   static void setNeighbors();
 
-  static MPI::Cartcomm& getComm()       { return cartComm; }
+  static MPI_Comm getComm()       { return cartComm; }
 
   static int  getMyProc()               { return myProc; }
   static int  getNumProc()              { return numProc; }
@@ -98,7 +98,7 @@ private:
   static int myProc;                    // My processor number
   static int numProc;                   // Total number of processors
 
-  static MPI::Cartcomm cartComm;        // Cartesian communicator
+  static MPI_Comm cartComm;             // Cartesian communicator
   static int decompSize[DIMENSION];     // Number of processors in each dim
   static int myPosition[DIMENSION];     // My index in cartesian communicator
 

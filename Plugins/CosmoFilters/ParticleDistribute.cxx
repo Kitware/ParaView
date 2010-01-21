@@ -395,20 +395,34 @@ void ParticleDistribute::partitionInputFiles()
   string::size_type dirPos = this->baseFile.rfind("/");
   string subdirectory;
   string baseName;
-  string baseNameNoDot;
 
   // If the directory is not given use the current directory
-  // Get the base name of input files of the form filename."number" 
   if (dirPos == string::npos) {
     subdirectory = "./";
-    baseName = this->baseFile + '.';
-    baseNameNoDot = this->baseFile;
+    baseName = this->baseFile;
   } else {
-    subdirectory = this->baseFile.substr(0, dirPos);
-    baseName = this->baseFile.substr(dirPos+1);
-    baseNameNoDot = baseName;
-    baseName = baseName + '.';
+    subdirectory = this->baseFile.substr(0, dirPos + 1);
+    baseName = this->baseFile.substr(dirPos + 1);
   }
+
+  // strip everything back to the first non-number
+  string::size_type counter = baseFile.size() - 1;
+  int numbersOK = 1;
+
+  while(numbersOK && counter > 0)
+    {
+    if(baseName[counter] >= '0' && baseName[counter] <= '9')
+      {
+      counter = counter - 1;
+      }
+    else
+      {
+      numbersOK = 0;
+      }
+    }
+  
+  // base name is everything up to the numbers
+  baseName = baseName.substr(0, counter);
 
   // Open the subdirectory and make a list of input files
   DIR* directory = opendir(subdirectory.c_str());
@@ -416,33 +430,45 @@ void ParticleDistribute::partitionInputFiles()
   vector<string> files;
 
   if (directory != NULL) {
-    while (directoryEntry = readdir(directory)) {
-
+    while (directoryEntry = readdir(directory)) 
+      {
+      // get the name
       string fileName = directoryEntry->d_name;
       string::size_type pos = fileName.find(baseName.c_str());
-      string::size_type pos1 = pos + baseName.size();
 
-      // Files containing the base name with a '.##' are recognized
-      if (pos != string::npos &&
-          (fileName[pos1] >= '0' && fileName[pos1] <= '9')) {
-        string inputFile = subdirectory + '/' + fileName;
-        files.push_back(inputFile);
+      // if it starts with the base name
+      if(pos == 0)
+        {
+        // check to see if it is all numbers on the end
+        pos = baseName.size();
+        numbersOK = 1;
+        while(pos < fileName.size())
+          {
+          if(fileName[pos] < '0' || fileName[pos] > '9')
+            {
+            numbersOK = 0;
+            break;
+            }
+          }
+
+        if(numbersOK)
+          {
+          fileName = subdirectory + fileName;
+          files.push_back(fileName);
+          }
+        }
       }
-      // also look for files of the base name only
-      else if(fileName.find(baseNameNoDot.c_str()) != string::npos) {
-        string inputFile = subdirectory + '/' + fileName;
-        files.push_back(inputFile);     
-      }
-    }
   }
   this->numberOfFiles = files.size();
 
   if (this->numberOfFiles == 0) {
 #ifdef USE_VTK_COSMO
-    vtkStdString temp = "Rank ";
+    vtkStdString temp = "Processor ";
     temp += this->myProc; 
     temp += " found no input files.\n";
     vtkOutputWindowDisplayErrorText(temp.c_str());
+
+    return;
 #else
     cout << "Rank " << this->myProc << " found no input files" << endl;
     exit(1);
@@ -550,7 +576,16 @@ void ParticleDistribute::findFileParticleCount()
     ifstream *inStream = new ifstream(this->inFiles[i].c_str(), ios::in);
     if (inStream->fail()) {
       delete inStream;
-#ifndef USE_VTK_COSMO
+#ifdef USE_VTK_COSMO
+      vtkStdString message = "File ";
+      message += this->inFiles[i];
+      message += " cannot be opened.\n";
+      vtkOutputWindowDisplayErrorText(message.c_str());
+
+      this->totalParticles = 0;
+      this->maxParticles = 0;
+      return;
+#else
       cout << "File: " << this->inFiles[i] << " cannot be opened" << endl;
       exit (-1);
 #endif
@@ -720,6 +755,7 @@ void ParticleDistribute::readFromRecordFile(
     if (inStream->gcount() != COSMO_FLOAT * sizeof(POSVEL_T)) {
 #ifdef USE_VTK_COSMO
       vtkOutputWindowDisplayErrorText("Premature end-of-file.\n");
+      return;
 #else
       cout << "Premature end-of-file" << endl;
       exit (-1);
@@ -732,6 +768,7 @@ void ParticleDistribute::readFromRecordFile(
     if (inStream->gcount() != COSMO_INT * sizeof(ID_T)) {
 #ifdef USE_VTK_COSMO
       vtkOutputWindowDisplayErrorText("Premature end-of-file.\n");
+      return;
 #else
       cout << "Premature end-of-file" << endl;
       exit (-1);
@@ -1024,6 +1061,11 @@ void ParticleDistribute::readFromRecordFile()
     if (inStream.gcount() != COSMO_FLOAT * sizeof(POSVEL_T)) {
 #ifdef USE_VTK_COSMO
       vtkOutputWindowDisplayErrorText("Premature end-of-file.\n");
+      inStream.close();
+      delete [] fBlock;
+      delete [] iBlock;
+
+      return;
 #else
       cout << "Premature end-of-file" << endl;
       exit (-1);
@@ -1036,6 +1078,11 @@ void ParticleDistribute::readFromRecordFile()
     if (inStream.gcount() != COSMO_INT * sizeof(ID_T)) {
 #ifdef USE_VTK_COSMO
       vtkOutputWindowDisplayErrorText("Premature end-of-file.\n");
+      inStream.close();
+      delete [] fBlock;
+      delete [] iBlock;
+
+      return;
 #else
       cout << "Premature end-of-file" << endl;
       exit (-1);
