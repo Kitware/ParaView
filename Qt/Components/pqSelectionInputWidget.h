@@ -57,6 +57,11 @@ public:
 public slots:
   virtual void setSelection(pqSMProxy selection);
 
+  /// This must be connected to the panel-accept signal to ensure that the new
+  /// selection source object gets registered for undo-redo/state to work. This
+  /// method also gets rid of any obsolete selection_sources.
+  virtual void accept();
+
 signals:
   /// Signal that the selection proxy changed.
   void selectionChanged(pqSMProxy);
@@ -64,6 +69,13 @@ signals:
 protected slots:
   // Copy active selection.
   void copyActiveSelection();
+
+  // Called by the constructor on idle.
+  // Here, if a selection hasn't already been set, we call
+  // copyActiveSelection(). This ensures that the active selection is copied
+  // only when the panel is created for a clean source (not the one loaded from
+  // state or undo-redo).
+  void initializeWidget();
 
   void onActiveSelectionChanged();
 

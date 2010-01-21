@@ -273,6 +273,8 @@ void pqNamedWidgets::linkObject(QObject* object, pqSMProxy proxy,
         {
         pqNamedWidgets::linkObject(object, userProperty, userSignal,
                                    proxy, SMProperty, -1, property_manager);
+        QObject::connect(property_manager, SIGNAL(accepted()),
+          selectWidget, SLOT(accept()));
         }
       }
     }

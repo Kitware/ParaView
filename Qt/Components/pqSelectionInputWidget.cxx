@@ -33,9 +33,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkEventQtSlotConnect.h"
 #include "vtkSelection.h"
-#include "vtkSMSourceProxy.h"
+#include "vtkSMProxyIterator.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMProxyProperty.h"
+#include "vtkSMSourceProxy.h"
 
 #include <QtDebug>
 #include <QTextStream>
@@ -47,6 +48,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqProxy.h"
 #include "pqSelectionManager.h"
 #include "pqSMAdaptor.h"
+
+#include <vtkstd/string>
 
 #include "ui_pqSelectionInputWidget.h"
 class pqSelectionInputWidget::UI : public Ui::pqSelectionInputWidget { };
@@ -70,7 +73,7 @@ pqSelectionInputWidget::pqSelectionInputWidget(QWidget* _parent)
                      this, SLOT(onActiveSelectionChanged()));
     }
 
-  QTimer::singleShot(10, this, SLOT(copyActiveSelection()));
+  QTimer::singleShot(10, this, SLOT(initializeWidget()));
 }
 
 //-----------------------------------------------------------------------------
@@ -85,6 +88,7 @@ void pqSelectionInputWidget::updateLabels()
   if (!this->SelectionSource)
     {
     this->ui->label->setText("No selection");
+    this->ui->textBrowser->setText("");
     return;
     }
 
@@ -230,6 +234,15 @@ void pqSelectionInputWidget::updateLabels()
 }
 
 //-----------------------------------------------------------------------------
+void pqSelectionInputWidget::initializeWidget()
+{
+  if (!this->SelectionSource)
+    {
+    this->copyActiveSelection();
+    }
+}
+
+//-----------------------------------------------------------------------------
 // This will update the UnacceptedSelectionSource proxy with a clone of the
 // active selection proxy. The filter proxy is not modified yet.
 void pqSelectionInputWidget::copyActiveSelection()
@@ -284,4 +297,40 @@ void pqSelectionInputWidget::onActiveSelectionChanged()
   // The selection has changed, either a new selection was created
   // or an old one cleared.
   this->ui->label->setText("Copied Selection (Active Selection Changed)");
+}
+
+//-----------------------------------------------------------------------------
+void pqSelectionInputWidget::accept()
+{
+  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+
+  // Unregister any de-referenced proxy sources.
+  vtkSMProxyIterator* iter = vtkSMProxyIterator::New();
+  iter->SetModeToOneGroup();
+  for (iter->Begin("selection_sources"); !iter->IsAtEnd();)
+    {
+    vtkSMProxy* proxy = iter->GetProxy();
+    if (proxy->GetNumberOfConsumers() == 0)
+      {
+      vtkstd::string key = iter->GetKey();
+      iter->Next();
+      pxm->UnRegisterProxy("selection_sources", key.c_str(), proxy);
+      }
+    else
+      {
+      iter->Next();
+      }
+    }
+  iter->Delete();
+
+  // Register the new selection proxy.
+  vtkSMProxy* sel_source = this->selection();
+  if (sel_source && pxm)
+    {
+    if (!pxm->GetProxyName("selection_sources", sel_source))
+      {
+      pxm->RegisterProxy("selection_sources",
+        sel_source->GetSelfIDAsString(), sel_source);
+      }
+    }
 }
