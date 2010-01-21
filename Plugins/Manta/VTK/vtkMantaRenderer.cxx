@@ -102,7 +102,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <vtkstd/string>
 
-vtkCxxRevisionMacro(vtkMantaRenderer, "1.5");
+vtkCxxRevisionMacro(vtkMantaRenderer, "1.6");
 vtkStandardNewMacro(vtkMantaRenderer);
 
 //----------------------------------------------------------------------------
@@ -362,9 +362,6 @@ void vtkMantaRenderer::UpdateActorsForVisibility()
           }
         }
       }
-
-    anyProp    = NULL;
-    mantaActor = NULL;
     }
 }
 
@@ -539,13 +536,6 @@ void vtkMantaRenderer::LayerRender()
   this->GetSyncDisplay()->doneRendering();
   vtkTimerLog::MarkEndEvent("Image Conversion");
 
-  // memory deallocation
-  mantaBuffer = NULL;
-  renViewport = NULL;
-  renWinSize  = NULL;
-  clipValues  = NULL;
-  renderSize  = NULL;
-  mantaBase   = NULL;
 }
 
 //----------------------------------------------------------------------------
