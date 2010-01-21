@@ -122,8 +122,17 @@ FUNCTION (add_executable_with_forwarding2
             exe_name
             )
 
+  SET(mac_bundle)
+  IF (APPLE)
+    set (largs ${ARGN})
+    LIST (FIND largs "MACOSX_BUNDLE" mac_bundle_index)
+    IF (mac_bundle_index GREATER -1)
+      SET (mac_bundle TRUE)
+    ENDIF (mac_bundle_index GREATER -1)
+  ENDIF (APPLE)
+
   SET(PV_EXE_SUFFIX)
-  IF (BUILD_SHARED_LIBS AND CMAKE_SKIP_RPATH)
+  IF (BUILD_SHARED_LIBS AND CMAKE_SKIP_RPATH AND NOT mac_bundle)
     IF(NOT WIN32)
       SET(exe_output_path ${EXECUTABLE_OUTPUT_PATH})
       IF (NOT EXECUTABLE_OUTPUT_PATH)
@@ -150,7 +159,7 @@ FUNCTION (add_executable_with_forwarding2
         ${CMAKE_CURRENT_BINARY_DIR}/${exe_name}-forward.c)
       ADD_DEPENDENCIES(${exe_name} ${exe_name}${PV_EXE_SUFFIX})
     ENDIF(NOT WIN32)
-  ENDIF (BUILD_SHARED_LIBS AND CMAKE_SKIP_RPATH)
+  ENDIF (BUILD_SHARED_LIBS AND CMAKE_SKIP_RPATH AND NOT mac_bundle)
 
   add_executable(${exe_name}${PV_EXE_SUFFIX} ${ARGN})
 
