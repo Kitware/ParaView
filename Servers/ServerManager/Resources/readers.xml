@@ -5137,18 +5137,19 @@
    <!-- End of LSDyna Reader -->
 
     <SourceProxy name="netCDFReader"
-                 class="vtkNetCDFCOARDSReader"
+                 class="vtkNetCDFCFReader"
                  label="NetCDF Reader">
       <Documentation short_help="Read regular arrays from netCDF files."
-                     long_help="Read regular arrays from netCDF files.  Will also read any topological information specified byt he COARDS convention.">
+                     long_help="Read regular arrays from netCDF files.  Will also read any topological information specified by the COARDS and CF conventions.">
         Reads arrays from netCDF files into structured VTK data sets.  In
         the absence of any other information, the files will be read as
         image data.  This reader will also look for meta information
-        specified by the COARDS convention that specify things like
-        topology and time.  This information can cause the output to be a
-        nonuniform rectilinear grid or curvilinear (structured) grid.
-        Details on the COARDS convention can be found at
-        http://ferret.wrc.noaa.gov/noaa_coop/coop_cdf_profile.html.
+        specified by the CF convention that specify things like topology
+        and time.  This information can cause the output to be a nonuniform
+        rectilinear grid or curvilinear (structured) grid.  Details on the
+        CF convention can be found at http://cf-pcmdi.llnl.gov/.  It should
+        be noted that the CF convention is a superset of the COARDS
+        convention, so COARDS conventions will also be recognized.
       </Documentation>
 
       <StringVectorProperty name="FileName"
@@ -5218,10 +5219,61 @@
                          default_values="1">
         <BooleanDomain name="bool" />
         <Documentation>
-          If on, then 3D data with latitude/longitude dimensions will be
+          If on, then data with latitude/longitude dimensions will be
           read in as curvilinear data shaped like spherical coordinates.
           If false, then the data will always be read in Cartesian
           coordinates.
+        </Documentation>
+      </IntVectorProperty>
+
+      <DoubleVectorProperty name="VerticalScale"
+                            command="SetVerticalScale"
+                            number_of_elements="1"
+                            default_values="1">
+        <Documentation>
+          The scale of the vertical component of spherical coordinates.  It
+          is common to write the vertical component with respect to
+          something other than the center of the sphere (for example, the
+          surface).  In this case, it might be necessary to scale and/or
+          bias the vertical height.  The height will become height*scale +
+          bias.  Keep in mind that if the positive attribute of the
+          vertical dimension is down, then the height is negated.  The
+          scaling will be adjusted if it results in invalid (negative)
+          vertical values.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="VerticalBias"
+                            command="SetVerticalBias"
+                            number_of_elements="1"
+                            default_values="0">
+        <Documentation>
+          The bias of the vertical component of spherical coordinates.  It
+          is common to write the vertical component with respect to
+          something other than the center of the sphere (for example, the
+          surface).  In this case, it might be necessary to scale and/or
+          bias the vertical height.  The height will become height*scale +
+          bias.  Keep in mind that if the positive attribute of the
+          vertical dimension is down, then the height is negated.  The
+          scaling will be adjusted if it results in invalid (negative)
+          vertical values.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <IntVectorProperty name="RepalceFillValueWithNan"
+                         command="SetReplaceFillValueWithNan"
+                         number_of_elements="1"
+                         default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          If on, any float or double variable read that has a _FillValue
+          attribute will have that fill value replaced with a not-a-number
+          (NaN) value.  The advantage of setting these to NaN values is
+          that, if implemented properly by the system and careful math
+          operations are used, they can implicitly be ignored by
+          calculations like finding the range of the values.  That said,
+          this option should be used with caution as VTK does not fully
+          support NaN values and therefore odd calculations may occur.
         </Documentation>
       </IntVectorProperty>
 

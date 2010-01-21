@@ -123,6 +123,20 @@ pqNetCDFPanel::pqNetCDFPanel(pqProxy *object_proxy, QWidget *_parent)
     // Make sure the variables list is populated.
     this->updateVariableStatusEntries();
     }
+
+  // Some parameters only take effect when loading spherical coordinates.
+  // Disable them if the spherical coordinates option is off.
+  QWidget *SphericalCoordinates
+    = this->findChild<QWidget*>("SphericalCoordinates");
+  QStringList dependentWidgets;
+  dependentWidgets << "VerticalScale" << "_labelForVerticalScale"
+                   << "VerticalBias" << "_labelForVerticalBias";
+  foreach (QString dWidgetName, dependentWidgets)
+    {
+    QWidget *dWidget = this->findChild<QWidget*>(dWidgetName);
+    QObject::connect(SphericalCoordinates, SIGNAL(toggled(bool)),
+                     dWidget, SLOT(setEnabled(bool)));
+    }
 }
 
 //-----------------------------------------------------------------------------
