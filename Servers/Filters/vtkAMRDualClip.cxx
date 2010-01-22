@@ -48,7 +48,7 @@
 #include <ctime>
 
 
-vtkCxxRevisionMacro(vtkAMRDualClip, "1.4");
+vtkCxxRevisionMacro(vtkAMRDualClip, "1.5");
 vtkStandardNewMacro(vtkAMRDualClip);
 
 
@@ -591,6 +591,7 @@ void vtkAMRDualClipLocator::CapLevelMaskFace(int axis, int face)
   int iiInc, jjInc;
   int iiMax, jjMax;
   
+  iiMax = jjMax = iiInc = iiInc = normalInc = 0;
   startPtr = this->LevelMask;
   switch (axis)
     {
@@ -1629,7 +1630,6 @@ void vtkAMRDualClip::InitializeLevelMask(vtkAMRDualGridHelperBlock* block)
 // level mask with neighbors before we delete the locator.
 void vtkAMRDualClip::ShareLevelMask(vtkAMRDualGridHelperBlock* block)
 {
-  vtkAMRDualClipLocator* locator = vtkAMRDualClipGetBlockLocator(block);
   vtkAMRDualGridHelperBlock* neighbor;
   vtkAMRDualClipLocator* neighborLocator;
   int numLevels = this->Helper->GetNumberOfLevels();
