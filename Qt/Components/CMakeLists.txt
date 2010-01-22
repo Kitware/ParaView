@@ -127,6 +127,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqLinksEditor.h
   pqLinksManager.h
   pqLoadedFormObjectPanel.h
+  pqLockViewSizeCustomDialog.h
   pqMultiView.h
   pqMultiViewFrame.h
   pqNamedObjectPanel.h
@@ -251,6 +252,7 @@ SET(UI_FORMS
   Resources/UI/pqLineSourceControls.ui
   Resources/UI/pqLinksEditor.ui
   Resources/UI/pqLinksManager.ui
+  Resources/UI/pqLockViewSizeCustomDialog.ui
   Resources/UI/pqMultiViewFrameMenu.ui
   Resources/UI/pqOptionsDialog.ui
   Resources/UI/pqOrbitCreatorDialog.ui
@@ -510,6 +512,8 @@ ADD_LIBRARY(pqComponents
   pqLinksManager.h
   pqLoadedFormObjectPanel.cxx
   pqLoadedFormObjectPanel.h
+  pqLockViewSizeCustomDialog.cxx
+  pqLockViewSizeCustomDialog.h
   pqMultiView.cxx
   pqMultiView.h
   pqMultiViewFrame.cxx

@@ -830,6 +830,8 @@ void pqViewManager::setMaxViewWindowSize(const QSize& win_size)
     {
     frame->mainWidget()->setMaximumSize(this->Internal->MaxWindowSize);
     }
+
+  emit maxViewWindowSizeSet(!win_size.isEmpty());
 }
 
 //-----------------------------------------------------------------------------

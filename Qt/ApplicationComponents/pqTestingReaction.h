@@ -45,17 +45,11 @@ public:
     {
     RECORD,
     PLAYBACK,
-    LOCK_VIEW_SIZE
+    LOCK_VIEW_SIZE,
+    LOCK_VIEW_SIZE_CUSTOM
     };
 
-  pqTestingReaction(QAction* parentObject, Mode mode): Superclass(parentObject) 
-  {
-  this->ReactionMode = mode;
-  if (mode == LOCK_VIEW_SIZE)
-    {
-    parentObject->setCheckable(true);
-    }
-  }
+  pqTestingReaction(QAction* parentObject, Mode mode);
 
   /// Records test.
   static void recordTest(const QString& filename);
@@ -67,6 +61,9 @@ public:
 
   /// Locks the view size for testing.
   static void lockViewSize(bool);
+
+  /// Locks the view size with a custom resolution.
+  static void lockViewSizeCustom();
 
 protected:
   virtual void onTriggered()
@@ -81,6 +78,9 @@ protected:
       break;
     case LOCK_VIEW_SIZE:
       pqTestingReaction::lockViewSize(this->parentAction()->isChecked());
+      break;
+    case LOCK_VIEW_SIZE_CUSTOM:
+      pqTestingReaction::lockViewSizeCustom();
       break;
       }
     }

@@ -34,9 +34,24 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPVApplicationCore.h"
 #include "pqCoreUtilities.h"
 #include "pqFileDialog.h"
+#include "pqLockViewSizeCustomDialog.h"
 #include "pqTestUtility.h"
 #include "pqViewManager.h"
 
+//-----------------------------------------------------------------------------
+pqTestingReaction::pqTestingReaction(QAction* parentObject, Mode mode)
+  : Superclass(parentObject)
+{
+  this->ReactionMode = mode;
+  if (mode == LOCK_VIEW_SIZE)
+    {
+    parentObject->setCheckable(true);
+    pqViewManager* viewManager = qobject_cast<pqViewManager*>(
+                   pqApplicationCore::instance()->manager("MULTIVIEW_MANAGER"));
+    QObject::connect(viewManager, SIGNAL(maxViewWindowSizeSet(bool)),
+                     parentObject, SLOT(setChecked(bool)));
+    }
+}
 
 //-----------------------------------------------------------------------------
 void pqTestingReaction::recordTest()
@@ -111,7 +126,12 @@ void pqTestingReaction::lockViewSize(bool lock)
     }
 }
  
-
-
-
-
+//-----------------------------------------------------------------------------
+void pqTestingReaction::lockViewSizeCustom()
+{
+  // Launch the dialog box.  The box will take care of everything else.
+  pqLockViewSizeCustomDialog *sizeDialog
+    = new pqLockViewSizeCustomDialog(pqCoreUtilities::mainWidget());
+  sizeDialog->setAttribute(Qt::WA_DeleteOnClose, true);
+  sizeDialog->show();
+}

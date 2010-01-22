@@ -112,6 +112,10 @@ signals:
   /// Fired when the active view module changes.
   void activeViewChanged(pqView*);
 
+  /// Fired when setMaxViewWindowSize.  Argument set to true when given a
+  /// nonempty size, false otherwise.
+  void maxViewWindowSizeSet(bool);
+
 private slots:
   /// This will create a view module to fill the frame.
   /// the render window is created on the active server

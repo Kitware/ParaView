@@ -207,6 +207,9 @@ void pqParaViewMenuBuilders::buildToolsMenu(QMenu& menu)
   new pqTestingReaction(menu.addAction("Lock View Size")
     << pqSetName("actionTesting_Window_Size"),
     pqTestingReaction::LOCK_VIEW_SIZE);
+  new pqTestingReaction(menu.addAction("Lock View Size Custom...")
+    << pqSetName("actionTesting_Window_Size_Custom"),
+    pqTestingReaction::LOCK_VIEW_SIZE_CUSTOM);
   menu.addSeparator();
   new pqTimerLogReaction(menu.addAction("Timer Log")
     << pqSetName("actionToolsTimerLog"));
