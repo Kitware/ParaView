@@ -293,7 +293,11 @@ void pqChartSeriesEditorModel::setSeriesColor(int row, const QColor &color)
   if (row >= 0 && row < this->rowCount(QModelIndex()))
     {
     double double_color[3];
-    color.getRgbF(double_color, double_color+1, double_color+2);
+    qreal qreal_color[3];
+    color.getRgbF(qreal_color, qreal_color+1, qreal_color+2);
+    double_color[0] = static_cast<double>(qreal_color[0]);
+    double_color[1] = static_cast<double>(qreal_color[1]);
+    double_color[2] = static_cast<double>(qreal_color[2]);
     vtkSMPropertyHelper(this->RepresentationProxy,
       "SeriesColor").SetStatus(
       this->getSeriesName(row), double_color, 3);
