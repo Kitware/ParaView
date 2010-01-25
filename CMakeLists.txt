@@ -225,8 +225,8 @@ SET (dynamicHeaders)
 SET(VTK_MAKE_INSTANTIATOR       "${ParaView_SOURCE_DIR}/VTK/CMake")
 SET(VTKCS_CONFIG_DIR            "${ParaView_SOURCE_DIR}/Utilities/VTKClientServer/CMake")
 
-SET(PV_CMAKE_DIR "${ParaView_SOURCE_DIR}/CMake")
-SET (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PV_CMAKE_DIR})
+SET(ParaView_CMAKE_DIR "${ParaView_SOURCE_DIR}/CMake")
+SET (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${ParaView_CMAKE_DIR})
 
 INCLUDE(ParaViewMacros)
 INCLUDE(ParaViewCommon)
@@ -256,11 +256,14 @@ ENDIF (BUILD_EXAMPLES)
 SET(PARAVIEW_USE_FILE "${ParaView_SOURCE_DIR}/ParaViewUse.cmake")
 SET(PARAVIEW_VTK_DIR "${ParaView_BINARY_DIR}/VTK")
 
-SET(PARAVIEW_CMAKE_EXTENSIONS "${ParaView_SOURCE_DIR}/CMake;${ParaView_SOURCE_DIR}/VTK/CMake")
+#SET(PARAVIEW_CMAKE_EXTENSIONS "${ParaView_SOURCE_DIR}/CMake;${ParaView_SOURCE_DIR}/VTK/CMake")
 GET_TARGET_PROPERTY(VTK_WRAP_ClientServer_EXE_CONFIG vtkWrapClientServer LOCATION)
 
 SET(PARAVIEW_LIBRARY_DIRS 
   ${LIBRARY_OUTPUT_PATH} ${PARAVIEW_EXTRA_LINK_DIRECTORIES})
+
+# used in ParaViewPlugins.cmake
+SET(ParaView_QT_DIR ${ParaView_SOURCE_DIR}/Qt)
 
 SET(PARAVIEW_GUI_INCLUDE_DIRS ${ParaView_SOURCE_DIR}/VTK/GUISupport/Qt
                               ${ParaView_BINARY_DIR}/VTK/GUISupport/Qt
@@ -326,6 +329,9 @@ CONFIGURE_FILE(
     ${ParaView_SOURCE_DIR}/ParaViewConfig.cmake.in
     ${ParaView_BINARY_DIR}/ParaViewConfig.cmake 
     @ONLY IMMEDIATE)
+    
+# used by the ParaViewConfig file to determine where the parts of the tree are located relative to the ParaViewConfig file.
+set(REL_REF "")
 
 #######################################################################
 # INSTALL
@@ -334,6 +340,13 @@ IF (NOT PV_INSTALL_NO_DEVELOPMENT)
 
   INSTALL(
       FILES ${dynamicHeaders} 
+      DESTINATION ${PV_INSTALL_INCLUDE_DIR}
+      COMPONENT Development)
+      
+  SET(pluginQtApplicationComponents
+    ${ParaView_BINARY_DIR}/Qt/ApplicationComponents/pqApplicationComponentsExport.h)
+  INSTALL(
+      FILES ${pluginQtApplicationComponents}
       DESTINATION ${PV_INSTALL_INCLUDE_DIR}
       COMPONENT Development)
   SET(pluginQtComponentConfig
@@ -372,42 +385,70 @@ IF (NOT PV_INSTALL_NO_DEVELOPMENT)
       DESTINATION ${PV_INSTALL_INCLUDE_DIR}/Servers/Common/vtkPVPluginInit.cxx.in
       COMPONENT Development)
   SET(cmakeDevFiles
+      ${ParaView_CMAKE_DIR}/branded_splash.png
       ${ParaView_SOURCE_DIR}/ParaViewUse.cmake
       ${ParaView_BINARY_DIR}/ParaViewLibraryDepends.cmake
-      ${ParaView_SOURCE_DIR}/CMake/ParaViewPlugins.cmake)
+      ${ParaView_CMAKE_DIR}/ParaViewMacros.cmake
+      ${ParaView_CMAKE_DIR}/ParaViewPlugins.cmake
+      ${ParaView_CMAKE_DIR}/ParaViewBranding.cmake
+      ${ParaView_CMAKE_DIR}/ParaViewBrandingCPack.cmake
+      ${ParaView_CMAKE_DIR}/pqParaViewPlugin.cxx.in
+      ${ParaView_CMAKE_DIR}/pqParaViewPlugin.h.in
+      ${ParaView_CMAKE_DIR}/branded_paraview_initializer.cxx.in
+      ${ParaView_CMAKE_DIR}/branded_paraview_main.cxx.in
+      ${ParaView_CMAKE_DIR}/branded_paraview_initializer.h.in
+      ${ParaView_CMAKE_DIR}/ParaViewCPackOptions.cmake.in)
   INSTALL(
       FILES ${cmakeDevFiles} 
-      DESTINATION ${PV_INSTALL_LIB_DIR}
+      DESTINATION ${PV_INSTALL_CMAKE_DIR}
       COMPONENT Development)
-
+      
   # Re-configure for the install.
   SET(SOURCE_TREE                                  ${ParaView_SOURCE_DIR})
-  SET(ParaView_SOURCE_DIR                         "${CMAKE_INSTALL_PREFIX}/${PV_INSTALL_INCLUDE_DIR}")
-  SET(PARAVIEW_USE_FILE                           "${CMAKE_INSTALL_PREFIX}/${PV_INSTALL_LIB_DIR}/ParaViewUse.cmake")
-  SET(PARAVIEW_VTK_DIR                            "${CMAKE_INSTALL_PREFIX}/${PV_INSTALL_LIB_DIR}")
-  SET(PARAVIEW_CMAKE_EXTENSIONS                   "${CMAKE_INSTALL_PREFIX}/${PV_INSTALL_LIB_DIR}/CMake")
-  SET(VTK_WRAP_ClientServer_EXE_CONFIG            "${CMAKE_INSTALL_PREFIX}/${PV_INSTALL_BIN_DIR}/vtkWrapClientServer")
-  SET(PARAVIEW_INCLUDE_DIRS                       "${CMAKE_INSTALL_PREFIX}/${PV_INSTALL_INCLUDE_DIR}")
-  SET(PARAVIEW_GUI_INCLUDE_DIRS                   "${CMAKE_INSTALL_PREFIX}/${PV_INSTALL_INCLUDE_DIR}")
-  SET(PARAVIEW_KWSYS_INCLUDE_DIRS                 "${CMAKE_INSTALL_PREFIX}/${PV_INSTALL_INCLUDE_DIR}")
-  SET(PARAVIEW_LIBRARY_DIRS                       "${CMAKE_INSTALL_PREFIX}/${PV_INSTALL_LIB_DIR}")
-  SET(PARAVIEW_GUI_CLIENT_EXECUTABLE              "${CMAKE_INSTALL_PREFIX}/${PV_INSTALL_BIN_DIR}/paraview${PV_EXE_SUFFIX}")
-  SET(PARAVIEW_BATCH_EXECUTABLE                   "${CMAKE_INSTALL_PREFIX}/${PV_INSTALL_BIN_DIR}/pvbatch${PV_EXE_SUFFIX}")
-  SET(PARAVIEW_PROCESS_XML_EXECUTABLE             "${CMAKE_INSTALL_PREFIX}/${PV_INSTALL_BIN_DIR}/kwProcessXML${PV_EXE_SUFFIX}")
-  SET(PARAVIEW_SERVER_MANAGER_RESOURCES_DIRECTORY "${CMAKE_INSTALL_PREFIX}/${PV_INSTALL_LIB_DIR}/Servers/ServerManager/Resources")
-  SET(VTKCS_CONFIG_DIR                            "${CMAKE_INSTALL_PREFIX}/${PV_INSTALL_LIB_DIR}")
-  SET(PARAVIEW_LIBRARY_DEPENDS_FILE               "${CMAKE_INSTALL_PREFIX}/${PV_INSTALL_LIB_DIR}/ParaViewLibraryDepends.cmake")
-  SET(VTK_MAKE_INSTANTIATOR                       "${CMAKE_INSTALL_PREFIX}/${PV_INSTALL_LIB_DIR}/CMake/")
+  SET(BUILD_TREE                                   ${ParaView_BINARY_DIR}) 
+  #SET(ParaView_SOURCE_DIR                         "\${ParaView_INSTALL_PREFIX}/${PV_INSTALL_INCLUDE_DIR}")
+  SET(ParaView_CMAKE_DIR                          "\${ParaView_INSTALL_PREFIX}/${PV_INSTALL_CMAKE_DIR}")
+  SET(ParaView_BINARY_DIR                         "\${ParaView_INSTALL_PREFIX}/${PV_INSTALL_BIN_DIR}")
+  SET(PARAVIEW_USE_FILE                           "\${ParaView_INSTALL_PREFIX}/${PV_INSTALL_CMAKE_DIR}/ParaViewUse.cmake")
+  SET(PARAVIEW_VTK_DIR                            "\${ParaView_INSTALL_PREFIX}/${PV_INSTALL_LIB_DIR}")
+#  SET(PARAVIEW_CMAKE_EXTENSIONS                   "${CMAKE_INSTALL_PREFIX}/${PV_INSTALL_CMAKE_DIR}")
+  SET(VTK_WRAP_ClientServer_EXE_CONFIG            "\${ParaView_INSTALL_PREFIX}/${PV_INSTALL_BIN_DIR}/vtkWrapClientServer")
+  SET(PARAVIEW_INCLUDE_DIRS                       "\${ParaView_INSTALL_PREFIX}/${PV_INSTALL_INCLUDE_DIR}")
+  SET(ParaView_QT_DIR                             "\${ParaView_INSTALL_PREFIX}/${PV_INSTALL_INCLUDE_DIR}/Qt")
+  SET(PARAVIEW_GUI_INCLUDE_DIRS                   "\${ParaView_INSTALL_PREFIX}/${PV_INSTALL_INCLUDE_DIR}")
+  SET(PARAVIEW_KWSYS_INCLUDE_DIRS                 "\${ParaView_INSTALL_PREFIX}/${PV_INSTALL_INCLUDE_DIR}")
+  SET(PARAVIEW_LIBRARY_DIRS                       "\${ParaView_INSTALL_PREFIX}/${PV_INSTALL_LIB_DIR}")
+  SET(PARAVIEW_GUI_CLIENT_EXECUTABLE              "\${ParaView_INSTALL_PREFIX}/${PV_INSTALL_BIN_DIR}/paraview${PV_EXE_SUFFIX}")
+  SET(PARAVIEW_BATCH_EXECUTABLE                   "\${ParaView_INSTALL_PREFIX}/${PV_INSTALL_BIN_DIR}/pvbatch${PV_EXE_SUFFIX}")
+  SET(PARAVIEW_PROCESS_XML_EXECUTABLE             "\${ParaView_INSTALL_PREFIX}/${PV_INSTALL_BIN_DIR}/kwProcessXML${PV_EXE_SUFFIX}")
+  SET(PARAVIEW_PYTHON_EXECUTABLE                  "\${ParaView_INSTALL_PREFIX}/${PV_INSTALL_BIN_DIR}/pvpython${PV_EXE_SUFFIX}")
+  SET(PARAVIEW_SERVER_EXECUTABLE                  "\${ParaView_INSTALL_PREFIX}/${PV_INSTALL_BIN_DIR}/pvserver${PV_EXE_SUFFIX}")
+  SET(PARAVIEW_DATA_SERVER_EXECUTABLE             "\${ParaView_INSTALL_PREFIX}/${PV_INSTALL_BIN_DIR}/pvdataserver${PV_EXE_SUFFIX}")
+  SET(PARAVIEW_RENDER_SERVER_EXECUTABLE           "\${ParaView_INSTALL_PREFIX}/${PV_INSTALL_BIN_DIR}/pvrenderserver${PV_EXE_SUFFIX}")
+  SET(PARAVIEW_SMTESTDRIVER_EXECUTABLE            "\${ParaView_INSTALL_PREFIX}/${PV_INSTALL_BIN_DIR}/smTestDriver${PV_EXE_SUFFIX}")
+  SET(PARAVIEW_SERVER_MANAGER_RESOURCES_DIRECTORY "\${ParaView_INSTALL_PREFIX}/${PV_INSTALL_LIB_DIR}/Servers/ServerManager/Resources")
+  SET(VTKCS_CONFIG_DIR                            "\${ParaView_INSTALL_PREFIX}/${PV_INSTALL_CMAKE_DIR}")
+  SET(PARAVIEW_LIBRARY_DEPENDS_FILE               "\${ParaView_INSTALL_PREFIX}/${PV_INSTALL_CMAKE_DIR}/ParaViewLibraryDepends.cmake")
+  SET(VTK_MAKE_INSTANTIATOR                       "\${ParaView_INSTALL_PREFIX}/${PV_INSTALL_CMAKE_DIR}")
 
   CONFIGURE_FILE(
       "${SOURCE_TREE}/ParaViewConfig.cmake.in"
-      "${ParaView_BINARY_DIR}/CMake/tmp/ParaViewConfig.cmake"
+      "${BUILD_TREE}/CMake/tmp/ParaViewConfig.cmake"
       @ONLY IMMEDIATE)
 
-  INSTALL(
-      FILES "${ParaView_BINARY_DIR}/CMake/tmp/ParaViewConfig.cmake"
-      DESTINATION ${PV_INSTALL_LIB_DIR}
-      COMPONENT Development)
+      
+  IF(WIN32)
+    INSTALL(
+        FILES "${BUILD_TREE}/CMake/tmp/ParaViewConfig.cmake"
+        DESTINATION ${CMAKE_INSTALL_PREFIX}
+        COMPONENT Development)
+  ELSE(WIN32)
+    set(REL_REF "/../..")
+    INSTALL(
+        FILES "${BUILD_TREE}/CMake/tmp/ParaViewConfig.cmake"
+        DESTINATION ${PV_INSTALL_INCLUDE_DIR}
+        COMPONENT Development)
+  ENDIF(WIN32)
 
 ENDIF (NOT PV_INSTALL_NO_DEVELOPMENT)
 
