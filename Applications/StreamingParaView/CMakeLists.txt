@@ -1,7 +1,7 @@
 PROJECT(StreamingParaView)
 
-INCLUDE(${ParaView_SOURCE_DIR}/CMake/ParaViewBranding.cmake)
-INCLUDE(${ParaView_SOURCE_DIR}/CMake/ParaViewPlugins.cmake)
+INCLUDE(${ParaView_CMAKE_DIR}/ParaViewBranding.cmake)
+INCLUDE(${ParaView_CMAKE_DIR}/ParaViewPlugins.cmake)
 
 add_subdirectory(Plugin)
 

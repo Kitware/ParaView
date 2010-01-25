@@ -1,4 +1,4 @@
-INCLUDE(${ParaView_SOURCE_DIR}/CMake/ParaViewPlugins.cmake)
+INCLUDE(${ParaView_CMAKE_DIR}/ParaViewPlugins.cmake)
 
 # PARAVIEW_PLUGINLIST is used to generate the config file distributed with
 # ParaView that lists the plugins distributed with ParaView.
