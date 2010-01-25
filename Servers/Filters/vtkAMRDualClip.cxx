@@ -48,7 +48,7 @@
 #include <ctime>
 
 
-vtkCxxRevisionMacro(vtkAMRDualClip, "1.5");
+vtkCxxRevisionMacro(vtkAMRDualClip, "1.6");
 vtkStandardNewMacro(vtkAMRDualClip);
 
 
@@ -61,6 +61,16 @@ vtkStandardNewMacro(vtkAMRDualClip);
 // Center region of mask does not depend on neighbors.
 // Ghost regions of mask must come from neighbors.
 // Decimation mask takes care of transitions between levels.
+
+
+
+// Remaining issues.
+// Degenerate internal points can be outside iso surface.
+// Degenerate mask not shared between processes.
+// Locator not merging points between blocks when (degenerate) levels are different.
+
+
+
 
 
 
@@ -379,7 +389,8 @@ public:
   // Description:
   // Same but for corners not edges.  This uses my binary indexing of corners.
   // 0:(000) 1:(100) 2:(010) 3:(110) 4:(001) 5:(101)....
-  vtkIdType* GetCornerPointer(int xCell, int yCell, int zCell, int cornerIdx);
+  vtkIdType* GetCornerPointer(int xCell, int yCell, int zCell, int cornerIdx,
+                              int blockOrigin[3]);
 
   // Description:
   // To handle degenerate cells, indicate the level difference between the block
@@ -405,6 +416,7 @@ public:
   // (so it is ok to call this multiple times).
   void ComputeLevelMask(vtkDataArray* scalars, double isoValue);
 
+  // This is used to syncronize the ghost level mask with neighbors.
   void CopyNeighborLevelMask(
     vtkAMRDualGridHelperBlock* myBlock,
     vtkAMRDualGridHelperBlock* neighborBlock);
@@ -591,7 +603,7 @@ void vtkAMRDualClipLocator::CapLevelMaskFace(int axis, int face)
   int iiInc, jjInc;
   int iiMax, jjMax;
   
-  iiMax = jjMax = iiInc = iiInc = normalInc = 0;
+  iiMax = jjMax = iiInc = jjInc = normalInc = 0;
   startPtr = this->LevelMask;
   switch (axis)
     {
@@ -1045,46 +1057,48 @@ vtkIdType* vtkAMRDualClipLocator::GetEdgePointer(
 
 //----------------------------------------------------------------------------
 // No bounds checking.
+// We need to know the origin of the block
+// because we have to know where degenerate boundaries are.
+// This is only important in the rare cases when degenerate delta level is
+// larger than 3 (degenerate block is in ghost region and is larger the
+// whole block).  We could keep recursing past block boundaries when computing
+// the level mask, but I do not think it would buy us much.
 vtkIdType* vtkAMRDualClipLocator::GetCornerPointer(
   int xCell, int yCell, int zCell, 
-  int cornerIdx)
+  int cornerIdx, int blockOrigin[3])
 {
   int diff;
+
+  // Compute the dual corner index from the dual cell index and corner id.
   xCell += cornerIdx & 1;
   yCell += (cornerIdx & 2) >> 1;
   zCell += (cornerIdx & 4) >> 2;
   
-  // For degenerate regions we do not need to worry about corners.
-  // Too many cases (18)  generalize it.
-  int rx, ry, rz;
-  rx = ry = rz = 1;
-  if (xCell == 0) {rx=0;}
-  if (xCell == this->DualCellDimensions[0]) {rx=2;}
-  if (yCell == 0) {ry=0;}
-  if (yCell == this->DualCellDimensions[1]) {ry=2;}
-  if (zCell == 0) {rz=0;}
-  if (zCell == this->DualCellDimensions[2]) {rz=2;}
-  
+  // Find out the delta level degeneracy for this region.
   diff = this->LevelMask[xCell+(yCell*this->YIncrement)+(zCell*this->ZIncrement)];
   --diff;
   // Short circuit for debugging.
   // This will not merge any point based on the level mask.
   //diff = 0;
-  
+
   if (diff > 0 )
     {
-    if (xCell > 0)
-      {
-      xCell = (((xCell - 1) >> diff) << diff) + 1;
-      }
-    if (yCell > 0)
-      {
-      yCell = (((yCell - 1) >> diff) << diff) + 1;
-      }
-    if (zCell > 0)
-      {
-     zCell = (((zCell - 1) >> diff) << diff) + 1;
-      }
+    // We have to modify the dual point index to reflect degeneracy.
+    // The problem is that the range may become larger than our locator array.
+    // The minimum extent can get smaller when we mask bits off.
+    // Also, we have to convert back to relative index to remove the global offset.
+    // Different point in the locator may be in different degnerate levels,
+    // so we do need to convert index back to the original level.
+    // It looks like we need to know the origin of the block. 
+    xCell += blockOrigin[0];
+    xCell = ((xCell >> diff) << diff) - blockOrigin[0];
+    if (xCell < 0) { xCell = 0;}
+    yCell += blockOrigin[1];
+    yCell = ((yCell >> diff) << diff) - blockOrigin[1];
+    if (yCell < 0) { yCell = 0;}
+    zCell += blockOrigin[2];
+    zCell = ((zCell >> diff) << diff) - blockOrigin[2];
+    if (zCell < 0) { zCell = 0;}
     }
    
   return this->Corners + (xCell+(yCell*this->YIncrement)+(zCell*this->ZIncrement));
@@ -2047,7 +2061,7 @@ void vtkAMRDualClip::ProcessDualCell(
       int casePtId = *tetra;
       if (casePtId < 8)
         { // Corner (internal point)
-        ptIdPtr = this->BlockLocator->GetCornerPointer(x,y,z,casePtId);
+        ptIdPtr = this->BlockLocator->GetCornerPointer(x,y,z,casePtId, block->OriginIndex);
         levelMaskValue = this->BlockLocator->GetLevelMaskValue(x+((casePtId&1)?1:0),
                                                                y+((casePtId&2)?1:0),
                                                                z+((casePtId&4)?1:0));
@@ -2106,7 +2120,7 @@ void vtkAMRDualClip::ProcessDualCell(
         }
       pointIds[ii] = *ptIdPtr; 
       }
-    if (pointIds[0]!=pointIds[1] && pointIds[0]!=pointIds[2] && pointIds[0]!=pointIds[4] &&
+    if (pointIds[0]!=pointIds[1] && pointIds[0]!=pointIds[2] && pointIds[0]!=pointIds[3] &&
         pointIds[1]!=pointIds[2] && pointIds[1]!=pointIds[3] && pointIds[2]!=pointIds[3] )
       {
       this->Cells->InsertNextCell(4, pointIds);
