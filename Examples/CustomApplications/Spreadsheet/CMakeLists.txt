@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 2.6)
 
+project(SpreadSheet)
+
 FIND_PACKAGE(ParaView REQUIRED)
 INCLUDE(${PARAVIEW_USE_FILE})
 

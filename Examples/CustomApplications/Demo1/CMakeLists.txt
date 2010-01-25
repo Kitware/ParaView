@@ -1,5 +1,13 @@
-INCLUDE(${ParaView_SOURCE_DIR}/CMake/ParaViewBranding.cmake)
-INCLUDE(${ParaView_SOURCE_DIR}/CMake/ParaViewPlugins.cmake)
+
+cmake_minimum_required(VERSION 2.6)
+
+project(Demo1)
+
+FIND_PACKAGE(ParaView REQUIRED)
+INCLUDE(${PARAVIEW_USE_FILE})
+
+INCLUDE(${ParaView_CMAKE_DIR}/ParaViewBranding.cmake)
+INCLUDE(${ParaView_CMAKE_DIR}/ParaViewPlugins.cmake)
 
 SET (SOURCE_FILES 
   DemoApp1.cxx

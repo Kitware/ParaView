@@ -1,3 +1,11 @@
+
+cmake_minimum_required(VERSION 2.6)
+
+project(Demo0)
+
+FIND_PACKAGE(ParaView REQUIRED)
+INCLUDE(${PARAVIEW_USE_FILE})
+
 SET (SOURCE_FILES 
   DemoApp0.cxx
 )
