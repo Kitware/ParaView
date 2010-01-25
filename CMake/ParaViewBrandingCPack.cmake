@@ -82,7 +82,7 @@ MACRO(build_paraview_client_cpack_config_init)
 ENDMACRO(build_paraview_client_cpack_config_init)
 
 MACRO(build_paraview_client_cpack_config)
-  CONFIGURE_FILE("${ParaView_SOURCE_DIR}/CMake/ParaViewCPackOptions.cmake.in"
+  CONFIGURE_FILE("${ParaView_CMAKE_DIR}/ParaViewCPackOptions.cmake.in"
     "${CMAKE_CURRENT_BINARY_DIR}/CPack${CPACK_PACKAGE_NAME}Options.cmake"
     @ONLY
     )

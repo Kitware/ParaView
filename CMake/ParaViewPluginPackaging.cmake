@@ -2,7 +2,7 @@
 # other applications). This doesn't include the macros for creating the plugins,
 # those are in ParaViewPlugins.cmake.
 
-INCLUDE(${ParaView_SOURCE_DIR}/CMake/ParaViewPlugins.cmake)
+INCLUDE(${ParaView_CMAKE_DIR}/ParaViewPlugins.cmake)
 
 # Add an optional plugin. 
 # Arguments:

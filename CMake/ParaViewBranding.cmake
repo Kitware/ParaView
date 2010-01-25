@@ -111,7 +111,7 @@ FUNCTION(build_paraview_client BPC_NAME)
       "lib/${BPC_NAME}-${BPC_VERSION_MAJOR}.${BPC_VERSION_MINOR}")
   ENDIF (WIN32)
 
-  SET (branding_source_dir "${ParaView_SOURCE_DIR}/CMake")
+  SET (branding_source_dir "${ParaView_CMAKE_DIR}")
 
   # If APPLICATION_ICON is specified, use that for the windows executable.
   IF (WIN32 AND BPC_APPLICATION_ICON)
