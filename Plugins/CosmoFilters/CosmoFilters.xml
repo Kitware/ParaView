@@ -24,7 +24,7 @@
         default_values="1" >
      <BooleanDomain name="bool" />
        <Documentation>
-       If checked, the data will be read as the LANL Cosmo format.  If unchecked, the data will be read as Gadget format.
+       If checked, the data will be read as the LANL Cosmo format.  If unchecked, the data will be read as Gadget-2 format.
        </Documentation>
      </IntVectorProperty>
 
@@ -33,7 +33,7 @@
         command="SetRL"
         label="rL (physical box side length)"
         number_of_elements="1"
-        default_values="91" >
+        default_values="90.140846" >
      <DoubleRangeDomain name="range" min="0" />
        <Documentation>
        The box side length used to wrap particles around if they exceed rL (or less than 0) in any dimension.
@@ -110,9 +110,11 @@
        </Documentation>
      </DoubleVectorProperty>
 
+<!--
      <Hints>
-       <ReaderFactory extensions="cosmo" file_description="Cosmology files" />
+       <ReaderFactory extensions="cosmo gadget2" file_description="Cosmology files" />
      </Hints>
+-->
    </FileSeriesReaderProxy> 
 
   </ProxyGroup>
@@ -173,7 +175,7 @@
         command="SetRL"
         label="rL (physical box side length)"
         number_of_elements="1"
-        default_values="91" >
+        default_values="90.140846" >
      <DoubleRangeDomain name="range" min="0" />
        <Documentation>
        The box side length used to wrap particles around if they exceed rL (or less than 0) in any dimension.

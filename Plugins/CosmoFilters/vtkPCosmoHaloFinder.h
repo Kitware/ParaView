@@ -63,13 +63,6 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // vtkPCosmoHaloFinder is a filter object that operates on the unstructured 
 // grid of all particles and assigns each particle a halo id.
 //
-// .SECTION Note
-// This finder implements a recursive algorithm.
-// Linked lists are used for halos.
-// Merge is done recursively.
-// Each interval has its bounding box calculated in Reorder().
-// Non-power-of-two case can be handled.
-
 
 #ifndef __vtkPCosmoHaloFinder_h
 #define __vtkPCosmoHaloFinder_h
@@ -77,7 +70,6 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkUnstructuredGridAlgorithm.h"
 
 class vtkMultiProcessController;
-class vtkMPIController;
 
 class VTK_EXPORT vtkPCosmoHaloFinder : public vtkUnstructuredGridAlgorithm
 {
@@ -145,7 +137,7 @@ class VTK_EXPORT vtkPCosmoHaloFinder : public vtkUnstructuredGridAlgorithm
                           vtkInformationVector**, 
                           vtkInformationVector*);
 
-  vtkMPIController* Controller;
+  vtkMultiProcessController* Controller;
 
   int NP; // number of particles in the original simulation
   float RL; // The physical box dimensions (rL)

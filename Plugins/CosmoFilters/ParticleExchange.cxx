@@ -497,12 +497,18 @@ void ParticleExchange::exchangeParticles()
   // Count the particles across processors
   long totalAliveParticles = 0;
   long totalDeadParticles = 0;
+
+#ifdef USE_SERIAL_COSMO
+  totalAliveParticles = this->numberOfAliveParticles;
+  totalDeadParticles = this->numberOfDeadParticles;
+#else
   MPI_Allreduce((void*) &this->numberOfAliveParticles, 
                 (void*) &totalAliveParticles, 
                 1, MPI_LONG, MPI_SUM, Partition::getComm());
   MPI_Allreduce((void*) &this->numberOfDeadParticles,
                 (void*) &totalDeadParticles, 
                 1, MPI_LONG, MPI_SUM, Partition::getComm());
+#endif
 
 #ifndef USE_VTK_COSMO
 #ifdef DEBUG
@@ -578,9 +584,13 @@ void ParticleExchange::exchangeNeighborParticles()
       myShareSize = (int)this->neighborParticles[n].size();
 
   int maxShareSize;
+#ifdef USE_SERIAL_COSMO
+  maxShareSize = myShareSize;
+#else
   MPI_Allreduce((void*) &myShareSize,
                 (void*) &maxShareSize,
                 1, MPI_INT, MPI_MAX, Partition::getComm());
+#endif
 
   // Allocate messages to send and receive MPI buffers
   int bufferSize = (1 * sizeof(int)) +          // number of particles
@@ -600,7 +610,9 @@ void ParticleExchange::exchangeNeighborParticles()
   }
 #endif
 
+#ifndef USE_SERIAL_COSMO
   MPI_Barrier(Partition::getComm());
+#endif
 
   // Exchange with each neighbor, with everyone sending in one direction and
   // receiving from the other.  Data corresponding to the particle index
@@ -704,7 +716,9 @@ void ParticleExchange::exchange(
   // Receive the buffer from neighbor on other side
   recvMessage->receive(this->neighbor[recvFrom]);
 
+#ifndef USE_SERIAL_COSMO
   MPI_Barrier(Partition::getComm());
+#endif
 
   // Process the received buffer
   int recvParticleCount;

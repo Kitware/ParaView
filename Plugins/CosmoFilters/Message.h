@@ -50,10 +50,25 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef MESSAGE_H
 #define MESSAGE_H
 
+#ifdef USE_SERIAL_COSMO
+
+#ifdef USE_VTK_COSMO
+#include "vtkstd/queue"
+
+using namespace vtkstd;
+#else
+#include <queue>
+
+using namespace std;
+#endif
+
+#else
 #ifdef USE_VTK_COSMO
 #include "vtkMPI.h"
 #else
 #include <mpi.h>
+#endif
+
 #endif
 
 #include "Definition.h"
@@ -95,9 +110,17 @@ public:
 
   // Receive blocking
   void receive(
+#ifdef USE_SERIAL_COSMO
+        int mach = 0,
+#else
         int mach = MPI_ANY_SOURCE,      // From where to receive
+#endif
         int tag = 0                     // Identifying tag
   );
+
+#ifdef USE_SERIAL_COSMO // message queue hack for serial
+  queue<char*> q;
+#endif
 
   // Reset the buffer for another set of data
   void reset();

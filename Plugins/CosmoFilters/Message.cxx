@@ -42,6 +42,10 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
                                                                                 
 =========================================================================*/
 
+#ifdef USE_SERIAL_COSMO
+#include <string.h>
+#endif
+
 #include <iostream>
 
 using namespace std;
@@ -249,9 +253,15 @@ void Message::getValue(char* data, int count)
 ////////////////////////////////////////////////////////////////////////////
 void Message::send(int mach, int tag)
 {
+#ifdef USE_SERIAL_COSMO
+  char* in = new char[this->bufPos];
+  memcpy(in, this->buffer, this->bufPos);
+  q.push(in);
+#else
   MPI_Request request;
   MPI_Isend(this->buffer, this->bufPos, MPI_PACKED, 
             mach, tag, Partition::getComm(), &request);
+#endif
 }
 
 
@@ -262,7 +272,13 @@ void Message::send(int mach, int tag)
 ////////////////////////////////////////////////////////////////////////////
 void Message::receive(int mach, int tag)
 {
+#ifdef USE_SERIAL_COSMO
+  char* out = q.front(); q.pop();
+  memcpy(this->buffer, out, this->bufSize);
+  delete [] out;
+#else
   MPI_Status status;
   MPI_Recv(this->buffer, this->bufSize, MPI_PACKED, mach, tag,
            Partition::getComm(), &status);
+#endif
 }

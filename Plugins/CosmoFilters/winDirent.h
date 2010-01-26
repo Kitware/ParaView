@@ -55,13 +55,12 @@
  * May 28 1998, Toni Ronkko
  * First version.
  *****************************************************************************/
-#ifndef _WINDOWS_DIRENT_H
-#define _WINDOWS_DIRENT_H
+#ifndef __WINDOWS_DIRENT_H
+#define __WINDOWS_DIRENT_H
 
 #include <windows.h>
 #include <string.h>
 #include <assert.h>
-
 
 typedef struct dirent
 {
@@ -227,4 +226,4 @@ static void rewinddir(DIR* dirp)
 }
 
 
-#endif /*WINDOWS_DIRENT_H*/
+#endif /*__WINDOWS_DIRENT_H*/

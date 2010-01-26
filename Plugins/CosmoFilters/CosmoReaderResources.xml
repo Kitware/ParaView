@@ -1,5 +1,5 @@
 <ParaViewReaders>
-  <Reader name="CosmoReader" extensions="cosmo" 
+  <Reader name="CosmoReader" extensions="cosmo gadget2" 
    file_description="Cosmology files" />
 </ParaViewReaders>
 

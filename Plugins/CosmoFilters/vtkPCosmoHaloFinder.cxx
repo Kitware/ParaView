@@ -82,7 +82,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "FOFHaloProperties.h"
 #include "Partition.h"
 
-vtkCxxRevisionMacro(vtkPCosmoHaloFinder, "1.5");
+vtkCxxRevisionMacro(vtkPCosmoHaloFinder, "1.6");
 vtkStandardNewMacro(vtkPCosmoHaloFinder);
 
 /****************************************************************************/
@@ -97,7 +97,7 @@ vtkPCosmoHaloFinder::vtkPCosmoHaloFinder()
       this->SetController(vtkSmartPointer<vtkDummyController>::New());
     }
 
-  this->RL = 91;
+  this->RL = 90.140846;
   this->Overlap = .06;
   this->BB = .2;
   this->PMin = 10;
@@ -128,12 +128,12 @@ void vtkPCosmoHaloFinder::PrintSelf(ostream& os, vtkIndent indent)
     }
 
   os << indent << "rL: " << this->RL << endl;
-  os << indent << "overlap: " << this->Overlap << endl;
+  os << indent << "Overlap: " << this->Overlap << endl;
   os << indent << "bb: " << this->BB << endl;
   os << indent << "pmin: " << this->PMin << endl;
-  os << indent << "particle mass: " << this->ParticleMass << endl;
-  os << indent << "use catalog average position: " << this->CatalogAveragePosition << endl;
-  os << indent << "copy halo information to particles: " << this->CopyHaloDataToParticles << endl;
+  os << indent << "ParticleMass: " << this->ParticleMass << endl;
+  os << indent << "CatalogAveragePosition: " << this->CatalogAveragePosition << endl;
+  os << indent << "CopyHaloDataToParticles: " << this->CopyHaloDataToParticles << endl;
 }
 
 //----------------------------------------------------------------------------
@@ -157,13 +157,7 @@ void vtkPCosmoHaloFinder::SetController(vtkMultiProcessController *c)
     return;
     }
 
-  if(!c->IsA("vtkMPIController"))
-    {
-    vtkErrorMacro(<< "Controller is not a vtkMPIController: " << c->GetClassName());
-    return;
-    }
-
-  this->Controller = (vtkMPIController*)c;
+  this->Controller = c;
   c->Register(this);
 }
 
@@ -178,12 +172,14 @@ int vtkPCosmoHaloFinder::RequestInformation
  vtkInformationVector** inputVector,
  vtkInformationVector* outputVector)
 {
+#ifndef USE_SERIAL_COSMO
   // check for controller
   if(!this->Controller) 
     {
     vtkErrorMacro(<< "Unable to work without a Controller.");
     return 0;
     }
+#endif
 
   // set the other outputs to have the same number of pieces
   if((*inputVector)->GetInformationObject(0)->Has(vtkStreamingDemandDrivenPipeline::MAXIMUM_NUMBER_OF_PIECES()))

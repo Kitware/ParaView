@@ -54,10 +54,18 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #ifdef USE_VTK_COSMO
 #include "vtkType.h"
+
+#ifndef USE_SERIAL_COSMO
 #include "vtkMPI.h"
+#endif
+
 #else
 #include <stdint.h>
+
+#ifndef USE_SERIAL_COSMO
 #include <mpi.h>
+#endif
+
 #endif
 
 
@@ -67,29 +75,23 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifdef USE_VTK_COSMO
 #ifdef ID_64
    typedef      vtkTypeInt64 ID_T;           // Particle and halo ids
-   #define IBYTES 8
 #else
    typedef      vtkTypeInt32 ID_T;           // Particle and halo ids
-   #define IBYTES 4
 #endif
 #else
 #ifdef ID_64
    typedef      int64_t ID_T;           // Particle and halo ids
-   #define IBYTES 8
 #else
    typedef      int32_t ID_T;           // Particle and halo ids
-   #define IBYTES 4
 #endif
 #endif
 
 #ifdef POSVEL_64
    typedef      double  POSVEL_T;       // Position,velocity
    typedef      double  POTENTIAL_T;    // Potential
-   #define FBYTES 8
 #else
    typedef      float   POSVEL_T;       // Position,velocity
    typedef      float   POTENTIAL_T;    // Potential
-   #define FBYTES 4
 #endif
 
 #ifdef GRID_64
@@ -129,7 +131,7 @@ const int       NUM_SOD_BINS = 20;              // Log bins for SOD halo
 // Cosmology record data in .cosmo format
 const int   COSMO_FLOAT = 7;    // x,y,z location and velocity plus mass
 const int   COSMO_INT   = 1;    // Particle id
-const int   RECORD_SIZE = COSMO_FLOAT*FBYTES + COSMO_INT*IBYTES;
+const int   RECORD_SIZE = sizeof(POSVEL_T) * COSMO_FLOAT + sizeof(ID_T) * COSMO_INT;
 
 const bool  ENFORCE_MAX_READ = false;
 const int   MAX_READ    = 8000000;

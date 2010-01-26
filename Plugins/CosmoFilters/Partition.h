@@ -57,13 +57,19 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Definition.h"
 
 #ifdef USE_VTK_COSMO
+#ifndef USE_SERIAL_COSMO
 #include "vtkMPI.h"
+#endif
+
 #include "vtkstd/string"
 #include "vtkstd/vector"
 
 using namespace vtkstd;
 #else
+#ifndef USE_SERIAL_COSMO
 #include <mpi.h>
+#endif
+
 #include <string>
 #include <vector>
 
@@ -83,7 +89,9 @@ public:
   // Set the processor numbers of neighbors in all directions
   static void setNeighbors();
 
+#ifndef USE_SERIAL_COSMO
   static MPI_Comm getComm()       { return cartComm; }
+#endif
 
   static int  getMyProc()               { return myProc; }
   static int  getNumProc()              { return numProc; }
@@ -99,7 +107,10 @@ private:
   static int numProc;                   // Total number of processors
   static int initialized;
 
+#ifndef USE_SERIAL_COSMO
   static MPI_Comm cartComm;             // Cartesian communicator
+#endif
+
   static int decompSize[DIMENSION];     // Number of processors in each dim
   static int myPosition[DIMENSION];     // My index in cartesian communicator
 

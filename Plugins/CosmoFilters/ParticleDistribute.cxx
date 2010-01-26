@@ -366,9 +366,13 @@ void ParticleDistribute::readParticlesRoundRobin(int reserveQ)
 
   // Count the particles across processors
   long totalAliveParticles = 0;
+#ifdef USE_SERIAL_COSMO
+  totalAliveParticles = this->numberOfAliveParticles;
+#else
   MPI_Allreduce((void*) &this->numberOfAliveParticles, 
                 (void*) &totalAliveParticles, 
                 1, MPI_LONG, MPI_SUM, Partition::getComm());
+#endif
 
 #ifndef USE_VTK_COSMO
 #ifdef DEBUG
@@ -433,33 +437,33 @@ void ParticleDistribute::partitionInputFiles()
 
   if (directory != NULL) {
   while ((directoryEntry = readdir(directory))) 
+    {
+    // get the name
+    string fileName = directoryEntry->d_name;
+    string::size_type pos = fileName.find(baseName.c_str());
+    
+    // if it starts with the base name
+    if(pos == 0)
       {
-      // get the name
-      string fileName = directoryEntry->d_name;
-      string::size_type pos = fileName.find(baseName.c_str());
-
-      // if it starts with the base name
-      if(pos == 0)
+      // check to see if it is all numbers on the end
+      pos = baseName.size();
+      numbersOK = 1;
+      while(pos < fileName.size())
         {
-        // check to see if it is all numbers on the end
-        pos = baseName.size();
-        numbersOK = 1;
-        while(pos < fileName.size())
+        if(fileName[pos] < '0' || fileName[pos] > '9')
           {
-          if(fileName[pos] < '0' || fileName[pos] > '9')
-            {
-            numbersOK = 0;
-            break;
-            }
-          }
-
-        if(numbersOK)
-          {
-          fileName = subdirectory + fileName;
-          files.push_back(fileName);
+          numbersOK = 0;
+          break;
           }
         }
+      
+      if(numbersOK)
+        {
+        fileName = subdirectory + fileName;
+        files.push_back(fileName);
+        }
       }
+    }
   }
   this->numberOfFiles = (int)files.size();
 
@@ -640,19 +644,31 @@ void ParticleDistribute::findFileParticleCount()
   }
 
   // Share the information about total particles
+#ifdef USE_SERIAL_COSMO
+  this->totalParticles = numberOfParticles;
+#else
   MPI_Allreduce((void*) &numberOfParticles,
                 (void*) &this->totalParticles,
                 1, MPI_LONG, MPI_SUM, Partition::getComm());
+#endif
 
   // Share the information about max particles in a file for setting buffer size
+#ifdef USE_SERIAL_COSMO
+  this->maxParticles = maxNumberOfParticles;
+#else
   MPI_Allreduce((void*) &maxNumberOfParticles,
                 (void*) &this->maxParticles,
                 1, MPI_LONG, MPI_MAX, Partition::getComm());
+#endif
 
   // Share the maximum number of files on a processor for setting the loop
+#ifdef USE_SERIAL_COSMO
+  this->maxFiles = numberOfMyFiles;
+#else
   MPI_Allreduce((void*) &numberOfMyFiles,
                 (void*) &this->maxFiles,
                 1, MPI_INT, MPI_MAX, Partition::getComm());
+#endif
 
 #ifndef USE_VTK_COSMO
 #ifdef DEBUG
@@ -704,7 +720,9 @@ void ParticleDistribute::distributeParticles(
       recvMessage->receive(this->prevProc);
       }
 
+#ifndef USE_SERIAL_COSMO
     MPI_Barrier(Partition::getComm());
+#endif
 
     // Process the send buffer for alive and dead before sending on
     if (step < this->numberOfFileSends)

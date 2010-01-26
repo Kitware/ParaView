@@ -129,7 +129,7 @@ protected:
   virtual int RequestData
     (vtkInformation *, vtkInformationVector **, vtkInformationVector *);
 
-  vtkMPIController* Controller; // Interprocess communication
+  vtkMultiProcessController* Controller;
 
   char* FileName; // Name of binary particle file
   float RL; // The physical box dimensions (rL)

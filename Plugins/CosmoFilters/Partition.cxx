@@ -53,7 +53,10 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 /////////////////////////////////////////////////////////////////////////
 
+#ifndef USE_SERIAL_COSMO
 MPI_Comm Partition::cartComm;
+#endif
+
 int Partition::numProc = 0;
 int Partition::myProc = -1;
 int Partition::decompSize[DIMENSION];
@@ -81,16 +84,41 @@ void Partition::initialize()
 {
   if(!initialized)
     {
+#ifndef USE_SERIAL_COSMO
+
+#ifdef USE_VTK_COSMO
+    // this is for when it is compiled against MPI but single processor
+    // on ParaView (client only, it won't MPI_Init itself)
+    int temp;
+    MPI_Initialized(&temp);
+    if(!temp) 
+      {
+      temp = 0;
+      MPI_Init(&temp, 0);
+      }
+#endif
+
     // Start up MPI
     //MPI_Init(&argc, &argv);
     MPI_Comm_rank(MPI_COMM_WORLD, &myProc);
     MPI_Comm_size(MPI_COMM_WORLD, &numProc);
-    
+#endif    
+
     for (int dim = 0; dim < DIMENSION; dim++)
       decompSize[dim] = 0;
     int periodic[] = {1, 1, 1};
     int reorder = 1;
     
+#ifdef USE_SERIAL_COSMO
+    myProc = 0;
+    numProc = 1;
+
+    for(int dim = 0; dim < DIMENSION; dim = dim + 1)
+      {
+      decompSize[dim] = 1;
+      myPosition[dim] = 0;
+      }
+#else
     // Compute the number of processors in each dimension
     MPI_Dims_create(numProc, DIMENSION, decompSize);
     
@@ -103,7 +131,8 @@ void Partition::initialize()
     
     // Get this processor's position in the Cartesian topology
     MPI_Cart_coords(cartComm, myProc, DIMENSION, myPosition);
-    
+#endif    
+
     // Set all my neighbor processor ids for communication
     setNeighbors();
     
@@ -162,6 +191,9 @@ void Partition::getNeighbors(int neigh[])
 
 int Partition::getNeighbor(int xpos, int ypos, int zpos)
 {
+#ifdef USE_SERIAL_COSMO
+  return 0;
+#else
   static int pos[DIMENSION];
   pos[0] = xpos;
   pos[1] = ypos;
@@ -170,6 +202,7 @@ int Partition::getNeighbor(int xpos, int ypos, int zpos)
   int neighborProc;
   MPI_Cart_rank(cartComm, pos, &neighborProc);
   return neighborProc;
+#endif
 }
 
 /////////////////////////////////////////////////////////////////////////

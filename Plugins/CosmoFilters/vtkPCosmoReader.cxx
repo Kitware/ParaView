@@ -87,7 +87,7 @@ using namespace vtkstd;
 #include "ParticleExchange.h"
 #include "ParticleDistribute.h"
 
-vtkCxxRevisionMacro(vtkPCosmoReader, "1.1");
+vtkCxxRevisionMacro(vtkPCosmoReader, "1.2");
 vtkStandardNewMacro(vtkPCosmoReader);
 
 //----------------------------------------------------------------------------
@@ -103,7 +103,7 @@ vtkPCosmoReader::vtkPCosmoReader()
     }
 
   this->FileName = 0;
-  this->RL = 91;
+  this->RL = 90.140846;
   this->Overlap = .06;
   this->ReadMode = 1;
   this->CosmoFormat = 1;
@@ -120,41 +120,6 @@ vtkPCosmoReader::~vtkPCosmoReader()
   this->SetController(0);
 }
 
-//----------------------------------------------------------------------------
-void vtkPCosmoReader::SetController(vtkMultiProcessController *c)
-{
-  if(this->Controller == c)
-    {
-    return;
-    }
-
-  this->Modified();
-
-  if(this->Controller != 0)
-    {
-    this->Controller->UnRegister(this);
-    this->Controller = 0;
-    }
-
-  if(c == 0)
-    {
-    return;
-    }
-
-  if(!c->IsA("vtkMPIController"))
-    {
-    vtkErrorMacro(<< "Controller is not a vtkMPIController: " << c->GetClassName());
-    return;
-    }
-
-  this->Controller = (vtkMPIController*)c;
-  c->Register(this);
-}
-
-vtkMultiProcessController* vtkPCosmoReader::GetController()
-{
-  return (vtkMultiProcessController*)this->Controller;
-}
 
 //----------------------------------------------------------------------------
 void vtkPCosmoReader::PrintSelf(ostream& os, vtkIndent indent)
@@ -178,18 +143,41 @@ void vtkPCosmoReader::PrintSelf(ostream& os, vtkIndent indent)
 }
 
 //----------------------------------------------------------------------------
+void vtkPCosmoReader::SetController(vtkMultiProcessController *c)
+{
+  if(this->Controller == c)
+    {
+    return;
+    }
+
+  this->Modified();
+
+  if(this->Controller != 0)
+    {
+    this->Controller->UnRegister(this);
+    this->Controller = 0;
+    }
+
+  if(c == 0)
+    {
+    return;
+    }
+
+  this->Controller = c;
+  c->Register(this);
+}
+
+vtkMultiProcessController* vtkPCosmoReader::GetController()
+{
+  return (vtkMultiProcessController*)this->Controller;
+}
+
+//----------------------------------------------------------------------------
 int vtkPCosmoReader::RequestInformation(
   vtkInformation *vtkNotUsed(request),
   vtkInformationVector **vtkNotUsed(inputVector),
   vtkInformationVector *outputVector)
 {
-  // check for controller
-  if(!this->Controller) 
-    {
-    vtkErrorMacro(<< "Unable to work without a vtkMPIController.");
-    return 0;
-    }
-
   // set the pieces as the number of processes
   outputVector->GetInformationObject(0)->Set
     (vtkStreamingDemandDrivenPipeline::MAXIMUM_NUMBER_OF_PIECES(),
