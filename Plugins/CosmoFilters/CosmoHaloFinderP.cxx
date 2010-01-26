@@ -183,7 +183,7 @@ void CosmoHaloFinderP::setParameters(
   // Serial halo finder wants normalized locations on a grid superimposed
   // on the physical rL grid.  Grid size is np and number of particles in
   // the problem is np^3
-  this->normalizeFactor = (1.0 * _np) / _rL;
+  this->normalizeFactor = (POSVEL_T)((1.0 * _np) / _rL);
 
 #ifndef USE_VTK_COSMO
   if (this->myProc == MASTER) {

@@ -139,7 +139,7 @@ const int   MAX_READ    = 8000000;
                                 // Multipled by COSMO_FLOAT floats
                                 // makes the largest MPI allowed buffer
 
-const float DEAD_FACTOR = 1.20; // Number of dead allocated is % more than max
+const float DEAD_FACTOR = 1.20f; // Number of dead allocated is % more than max
 
 const int   ALIVE       = -1;   // Particle belongs to this processor
 const int   MIXED       = ALIVE - 1;

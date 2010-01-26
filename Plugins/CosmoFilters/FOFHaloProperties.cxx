@@ -348,7 +348,7 @@ void FOFHaloProperties::FOFVelocityDispersion(
                                   (*yAvgVel)[halo], (*zAvgVel)[halo]);
 
     // Velocity dispersion
-    POSVEL_T vDispersion = sqrt((particleDot - haloDot) / 3.0);
+    POSVEL_T vDispersion = (POSVEL_T)sqrt((particleDot - haloDot) / 3.0);
 
     // Save onto supplied vector
     velDisp->push_back(vDispersion);
@@ -476,8 +476,8 @@ int FOFHaloProperties::minimumPotentialN2_2(int halo, POTENTIAL_T* minPotential)
 
       POSVEL_T r = sqrt((xdist * xdist) + (ydist * ydist) + (zdist * zdist));
       if (r != 0.0) {
-        lpot[indx1] = lpot[indx1] - (1.0 / r);
-        lpot[indx2] = lpot[indx2] - (1.0 / r);
+        lpot[indx1] = (POTENTIAL_T)(lpot[indx1] - (1.0 / r));
+        lpot[indx2] = (POTENTIAL_T)(lpot[indx2] - (1.0 / r));
       }
 
       // Next particle
