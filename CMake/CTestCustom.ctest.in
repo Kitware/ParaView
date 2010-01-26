@@ -71,7 +71,6 @@ SET(CTEST_CUSTOM_WARNING_EXCEPTION
   "tk8.4.5/[^/]+/[^/]+.c[:\"]"
   "VTK/Utilities/vtktiff/"      
   "VTK/Utilities/vtkmpeg2encode/"      
-  "Utilities/hdf5/"
   "xtree.[0-9]+. : warning C4702: unreachable code"
   "warning LNK4221"
   "variable .var_args[2]*. is used before its value is set"
@@ -101,7 +100,10 @@ SET(CTEST_CUSTOM_WARNING_EXCEPTION
   
   # Supress warning from Utilities, these are 3rd party code
   # so many a times there's not much we can fix.
-  "Utilities/"
+  "Utilities/mpi4py/"
+  "Utilities/Xdmf2/"
+  "Utilities/IceT/"
+  "Utilities/hdf5/"
   # suppress warning from H5Part library.
   ".H5Part.src"
   )
