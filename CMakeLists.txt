@@ -264,6 +264,7 @@ SET(PARAVIEW_LIBRARY_DIRS
 
 # used in ParaViewPlugins.cmake
 SET(ParaView_QT_DIR ${ParaView_SOURCE_DIR}/Qt)
+SET(PARAVIEW_QT_QMAKE_EXECUTABLE ${QT_QMAKE_EXECUTABLE})
 
 SET(PARAVIEW_GUI_INCLUDE_DIRS ${ParaView_SOURCE_DIR}/VTK/GUISupport/Qt
                               ${ParaView_BINARY_DIR}/VTK/GUISupport/Qt
@@ -415,6 +416,7 @@ IF (NOT PV_INSTALL_NO_DEVELOPMENT)
   SET(VTK_WRAP_ClientServer_EXE_CONFIG            "\${ParaView_INSTALL_PREFIX}/${PV_INSTALL_BIN_DIR}/vtkWrapClientServer")
   SET(PARAVIEW_INCLUDE_DIRS                       "\${ParaView_INSTALL_PREFIX}/${PV_INSTALL_INCLUDE_DIR}")
   SET(ParaView_QT_DIR                             "\${ParaView_INSTALL_PREFIX}/${PV_INSTALL_INCLUDE_DIR}/Qt")
+  SET(PARAVIEW_QT_QMAKE_EXECUTABLE                "")
   SET(PARAVIEW_GUI_INCLUDE_DIRS                   "\${ParaView_INSTALL_PREFIX}/${PV_INSTALL_INCLUDE_DIR}")
   SET(PARAVIEW_KWSYS_INCLUDE_DIRS                 "\${ParaView_INSTALL_PREFIX}/${PV_INSTALL_INCLUDE_DIR}")
   SET(PARAVIEW_LIBRARY_DIRS                       "\${ParaView_INSTALL_PREFIX}/${PV_INSTALL_LIB_DIR}")
