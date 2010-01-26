@@ -22,7 +22,7 @@
 #include "vtkPVOptions.h"
 #include "vtkPVPlugin.h"
 #include "vtkPVPluginInformation.h"
-#include "vtkPVPythonPluginInterace.h"
+#include "vtkPVPythonPluginInterface.h"
 #include "vtkPVServerManagerPluginInterface.h"
 #include "vtkSmartPointer.h"
 #include "vtkStringArray.h"
@@ -41,7 +41,7 @@
 
 
 vtkStandardNewMacro(vtkPVPluginLoader);
-vtkCxxRevisionMacro(vtkPVPluginLoader, "1.19");
+vtkCxxRevisionMacro(vtkPVPluginLoader, "1.20");
 //-----------------------------------------------------------------------------
 vtkPVPluginLoader::vtkPVPluginLoader()
 {
@@ -326,8 +326,8 @@ void vtkPVPluginLoader::Load(vtkPVPlugin* plugin)
     }
 
   // Now, if this is a python-module plugin, get the python source list.
-  vtkPVPythonPluginInterace *pyplugin =
-    dynamic_cast<vtkPVPythonPluginInterace*>(plugin);
+  vtkPVPythonPluginInterface *pyplugin =
+    dynamic_cast<vtkPVPythonPluginInterface*>(plugin);
   if (pyplugin)
     {
     vtkstd::vector<vtkstd::string> names;

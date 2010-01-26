@@ -44,3 +44,8 @@ void vtkPVPlugin::ImportPlugin(vtkPVPlugin* plugin)
       PVPluginInternals.CallDatas[cc]);
     }
 }
+
+vtkPVPlugin::~vtkPVPlugin()
+{
+
+}

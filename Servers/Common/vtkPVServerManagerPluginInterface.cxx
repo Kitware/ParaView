@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkPVGUIPluginInterface.h
+  Module:    vtkPVServerManagerPluginInterface.cxx
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -12,21 +12,9 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
+#include "vtkPVServerManagerPluginInterface.h"
 
-#ifndef __vtkPVGUIPluginInterface_h
-#define __vtkPVGUIPluginInterface_h
-
-#include <QObjectList>
-
-/// vtkPVGUIPluginInterface defines the interface required by GUI plugins. This
-/// simply provides access to the GUI-component interfaces defined in this
-/// plugin.
-class vtkPVGUIPluginInterface 
+vtkPVServerManagerPluginInterface::~vtkPVServerManagerPluginInterface()
 {
-public:
-  virtual ~vtkPVGUIPluginInterface();
-  virtual QObjectList interfaces() = 0;
-};
 
-#endif
-
+}

@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkPVPythonPluginInterace.h
+  Module:    vtkPVPythonPluginInterface.h
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -12,20 +12,22 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVPythonPluginInterace
+// .NAME vtkPVPythonPluginInterface
 // .SECTION Description
-// vtkPVPythonPluginInterace defines the interface required by ParaView plugins
+// vtkPVPythonPluginInterface defines the interface required by ParaView plugins
 // that add python modules to ParaView.
 
-#ifndef __vtkPVPythonPluginInterace_h
-#define __vtkPVPythonPluginInterace_h
+#ifndef __vtkPVPythonPluginInterface_h
+#define __vtkPVPythonPluginInterface_h
 
 #include "vtkObject.h"
+#include <vtkstd/vector>
+#include <vtkstd/string>
 
-class VTK_EXPORT vtkPVPythonPluginInterace
+class VTK_EXPORT vtkPVPythonPluginInterface
 {
 public:
-  virtual ~vtkPVPythonPluginInterace() { }
+  virtual ~vtkPVPythonPluginInterface();
 
   virtual void GetPythonSourceList(vtkstd::vector<vtkstd::string>& modules,
     vtkstd::vector<vtkstd::string>& sources,

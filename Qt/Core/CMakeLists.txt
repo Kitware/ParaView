@@ -384,6 +384,8 @@ ADD_LIBRARY(pqCore
   vtkPVAxesWidget.h
   vtkPVAxesActor.cxx
   vtkPVAxesActor.h
+  vtkPVGUIPluginInterface.cxx
+  vtkPVGUIPluginInterface.h
 )
 
 TARGET_LINK_LIBRARIES(pqCore

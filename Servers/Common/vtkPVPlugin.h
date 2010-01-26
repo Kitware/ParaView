@@ -42,7 +42,7 @@
 class VTK_EXPORT vtkPVPlugin
 {
 public:
-  virtual ~vtkPVPlugin() {}
+  virtual ~vtkPVPlugin();
 
   // Description:
   // Returns the name for this plugin.

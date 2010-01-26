@@ -52,7 +52,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif
 
 #ifdef plugin_type_python
-# include "vtkPVPythonPluginInterace.h"
+# include "vtkPVPythonPluginInterface.h"
 #endif
 
 class @PLUGIN_NAME@_Plugin :
@@ -67,7 +67,7 @@ class @PLUGIN_NAME@_Plugin :
   , public vtkPVServerManagerPluginInterface
 #endif
 #ifdef plugin_type_python
-  , public vtkPVPythonPluginInterace
+  , public vtkPVPythonPluginInterface
 #endif
 
 {
