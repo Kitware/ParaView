@@ -22,8 +22,8 @@
 #define __vtkPVServerManagerPluginInterface_h
 
 #include "vtkProcessModule.h"
-#include <vtkstd/vector>
-#include <vtkstd/string>
+#include <vtkstd/vector> // STL Header
+#include <vtkstd/string> // STL Header
 
 class VTK_EXPORT vtkPVServerManagerPluginInterface
 {
