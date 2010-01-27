@@ -37,7 +37,7 @@ public:
   GridDescriptionMapType GridDescriptionMap;
 };
 
-vtkCxxRevisionMacro(vtkCPDataDescription, "1.1");
+vtkCxxRevisionMacro(vtkCPDataDescription, "1.2");
 vtkStandardNewMacro(vtkCPDataDescription);
 //----------------------------------------------------------------------------
 vtkCPDataDescription::vtkCPDataDescription()
@@ -66,18 +66,18 @@ void vtkCPDataDescription::SetTimeData(double time, vtkIdType timeStep)
 }
 
 //----------------------------------------------------------------------------
-void vtkCPDataDescription::AddInput(const char* gridname)
+void vtkCPDataDescription::AddInput(const char* gridName)
 {
-  if (this->Internals->GridDescriptionMap.find(gridname) ==
+  if (this->Internals->GridDescriptionMap.find(gridName) ==
     this->Internals->GridDescriptionMap.end())
     {
-    this->Internals->GridDescriptionMap[gridname] =
+    this->Internals->GridDescriptionMap[gridName] =
       vtkSmartPointer<vtkCPInputDataDescription>::New();
     }
 }
 
 //----------------------------------------------------------------------------
-unsigned int vtkCPDataDescription::GetNumberOfGrids()
+unsigned int vtkCPDataDescription::GetNumberOfInputDescriptions()
 {
   return static_cast<unsigned int>(this->Internals->GridDescriptionMap.size());
 }
@@ -111,7 +111,7 @@ vtkCPInputDataDescription *vtkCPDataDescription::GetInputDescription(
 }
 
 //----------------------------------------------------------------------------
-vtkCPInputDataDescription* vtkCPDataDescription::GetInputDescription(
+vtkCPInputDataDescription* vtkCPDataDescription::GetInputDescriptionByName(
   const char* name)
 {
   vtkInternals::GridDescriptionMapType::iterator iter =

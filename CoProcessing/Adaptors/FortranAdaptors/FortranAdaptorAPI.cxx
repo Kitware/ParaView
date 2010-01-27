@@ -151,13 +151,13 @@ void needtocreategrid_(int* needGrid)
 
   // assume that the grid is not changing so that we only build it 
   // the first time, otherwise we clear out the field data
-  if(coProcessorData->GetInputDescription("input")->GetGrid())
+  if(coProcessorData->GetInputDescriptionByName("input")->GetGrid())
     {
     *needGrid = 0;
     // The grid is either stored as a class derived from vtkDataSet
     // or from a class derived from vtkMultiBlockDataSet
     vtkDataSet* grid = vtkDataSet::SafeDownCast(
-      coProcessorData->GetInputDescription("input")->GetGrid());
+      coProcessorData->GetInputDescriptionByName("input")->GetGrid());
     if(grid)
       {
       ClearFieldDataFromGrid(grid);
@@ -165,7 +165,7 @@ void needtocreategrid_(int* needGrid)
     else
       {
       vtkMultiBlockDataSet* multiBlock = vtkMultiBlockDataSet::SafeDownCast(
-        coProcessorData->GetInputDescription("input")->GetGrid());
+        coProcessorData->GetInputDescriptionByName("input")->GetGrid());
       if(multiBlock)
         {
         vtkCompositeDataIterator* iter = multiBlock->NewIterator();

@@ -37,7 +37,7 @@ public:
 
   // Description:
   // Set the time step and current simulation time.
-  void SetTimeData(double Time, vtkIdType TimeStep);
+  void SetTimeData(double time, vtkIdType timeStep);
 
   // Description:
   // Macros for getting the time step and simulation time.
@@ -48,11 +48,11 @@ public:
   // Add names for grids produced by the simulation. This allocates a new
   // vtkCPInputDataDescription for that grid, if a grid by that name does not
   // already exist.
-  void AddInput(const char* name);
+  void AddInput(const char* gridName);
 
   // Description:
-  // Returns the number of grids.
-  unsigned int GetNumberOfGrids();
+  // Returns the number of input descriptions.
+  unsigned int GetNumberOfInputDescriptions();
 
   // Description:
   // Reset the names of the fields that are needed, the required meshes etc.
@@ -64,7 +64,7 @@ public:
 
   // Description:
   // Provides access to a grid description using the grid name.
-  vtkCPInputDataDescription *GetInputDescription(const char*);
+  vtkCPInputDataDescription *GetInputDescriptionByName(const char*);
 
   // Description:
   // Returns true if the grid is necessary, given the grid's name.
