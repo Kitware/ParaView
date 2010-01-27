@@ -110,11 +110,9 @@
        </Documentation>
      </DoubleVectorProperty>
 
-<!--
      <Hints>
        <ReaderFactory extensions="cosmo gadget2" file_description="Cosmology files" />
      </Hints>
--->
    </FileSeriesReaderProxy> 
 
   </ProxyGroup>

@@ -412,14 +412,14 @@ void ParticleDistribute::partitionInputFiles()
   }
 
   // strip everything back to the first non-number
-  string::size_type counter = baseFile.size() - 1;
+  string::size_type pos = baseName.size() - 1;
   int numbersOK = 1;
 
-  while(numbersOK && counter > 0)
+  while(numbersOK && pos >= 0)
     {
-    if(baseName[counter] >= '0' && baseName[counter] <= '9')
+    if(baseName[pos] >= '0' && baseName[pos] <= '9')
       {
-      counter = counter - 1;
+      pos = pos - 1;
       }
     else
       {
@@ -428,7 +428,7 @@ void ParticleDistribute::partitionInputFiles()
     }
   
   // base name is everything up to the numbers
-  baseName = baseName.substr(0, counter);
+  baseName = baseName.substr(0, pos + 1);
 
   // Open the subdirectory and make a list of input files
   DIR* directory = opendir(subdirectory.c_str());
@@ -440,14 +440,15 @@ void ParticleDistribute::partitionInputFiles()
     {
     // get the name
     string fileName = directoryEntry->d_name;
-    string::size_type pos = fileName.find(baseName.c_str());
+    pos = fileName.find(baseName.c_str());
     
     // if it starts with the base name
     if(pos == 0)
       {
       // check to see if it is all numbers on the end
-      pos = baseName.size();
+      pos = baseName.size() + 1;
       numbersOK = 1;
+
       while(pos < fileName.size())
         {
         if(fileName[pos] < '0' || fileName[pos] > '9')
@@ -455,6 +456,8 @@ void ParticleDistribute::partitionInputFiles()
           numbersOK = 0;
           break;
           }
+
+        pos = pos + 1;
         }
       
       if(numbersOK)
