@@ -446,7 +446,7 @@ void ParticleDistribute::partitionInputFiles()
     if(pos == 0)
       {
       // check to see if it is all numbers on the end
-      pos = baseName.size() + 1;
+      pos = (int)baseName.size() + 1;
       numbersOK = 1;
 
       while(pos < (int)fileName.size())
