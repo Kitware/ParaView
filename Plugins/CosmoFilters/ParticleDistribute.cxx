@@ -412,7 +412,7 @@ void ParticleDistribute::partitionInputFiles()
   }
 
   // strip everything back to the first non-number
-  string::size_type pos = baseName.size() - 1;
+  int pos = (int)baseName.size() - 1;
   int numbersOK = 1;
 
   while(numbersOK && pos >= 0)
@@ -440,7 +440,7 @@ void ParticleDistribute::partitionInputFiles()
     {
     // get the name
     string fileName = directoryEntry->d_name;
-    pos = fileName.find(baseName.c_str());
+    pos = (int)fileName.find(baseName.c_str());
     
     // if it starts with the base name
     if(pos == 0)
@@ -449,7 +449,7 @@ void ParticleDistribute::partitionInputFiles()
       pos = baseName.size() + 1;
       numbersOK = 1;
 
-      while(pos < fileName.size())
+      while(pos < (int)fileName.size())
         {
         if(fileName[pos] < '0' || fileName[pos] > '9')
           {
