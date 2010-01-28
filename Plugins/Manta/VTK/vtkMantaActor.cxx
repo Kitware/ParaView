@@ -75,14 +75,12 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <Engine/Control/RTRT.h>
 #include <Model/Groups/DynBVH.h>
 #include <Model/Groups/Group.h>
-#include <Model/Groups/Mesh.h>
 
-vtkCxxRevisionMacro(vtkMantaActor, "1.5");
+vtkCxxRevisionMacro(vtkMantaActor, "1.6");
 vtkStandardNewMacro(vtkMantaActor);
 
 //----------------------------------------------------------------------------
-vtkMantaActor::vtkMantaActor() : Mesh(0), MantaAS(0), MantaWorldGroup(0),
-  IsModified(false), LastVisibility(false), Renderer(0)
+vtkMantaActor::vtkMantaActor() : Group(0), MantaAS(0), Renderer(0),
 {
   cerr << "CREATE MANTA ACTOR " << this << endl;
 }
@@ -93,8 +91,9 @@ vtkMantaActor::vtkMantaActor() : Mesh(0), MantaAS(0), MantaWorldGroup(0),
 vtkMantaActor::~vtkMantaActor()
 {
   cerr << "DESTROY MANTA ACTOR " << this << endl;
-  if ( this->Mesh    && this->Renderer &&
-       this->MantaAS && this->MantaWorldGroup
+  if ( this->Group && 
+       this->Renderer &&
+       this->MantaAS
      )
     {
     if ( this->Renderer->GetRenderWindow() )
@@ -103,11 +102,7 @@ vtkMantaActor::~vtkMantaActor()
       }
     }
 
-  // now safe to assign them to NULL
-  this->Mesh     = NULL;
-  this->MantaAS  = NULL;
   this->Renderer = NULL;
-  this->MantaWorldGroup = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -120,12 +115,6 @@ void vtkMantaActor::PrintSelf( ostream & os, vtkIndent indent )
 vtkProperty *vtkMantaActor::MakeProperty()
 {
   return vtkMantaProperty::New();
-}
-
-//----------------------------------------------------------------------------
-void vtkMantaActor::SetVisibility(int newval)
-{
-  this->Superclass::SetVisibility(newval);
 }
 
 //----------------------------------------------------------------------------
@@ -147,8 +136,6 @@ void vtkMantaActor::ReleaseGraphicsResources( vtkWindow * win )
 
   if (vtkRenderWindow * renWin = vtkRenderWindow::SafeDownCast(win))
     {
-    this->MantaWorldGroup = 0;
-
     vtkRendererCollection * renders = renWin->GetRenderers();
     if (vtkMantaRenderer * mantaRenderer = vtkMantaRenderer::SafeDownCast(
         renders->GetFirstRenderer()))
@@ -176,114 +163,15 @@ void vtkMantaActor::ReleaseGraphicsResources( vtkWindow * win )
 }
 
 //----------------------------------------------------------------------------
-void vtkMantaActor::DetachFromMantaRenderEngine( vtkMantaRenderer * renderer )
-{
-  vtkRendererCollection * renders = renderer->GetRenderWindow()->GetRenderers();
-
-  if ( vtkMantaRenderer *render0 =
-       vtkMantaRenderer::SafeDownCast( renders->GetFirstRenderer() ) )
-    {
-    render0->GetMantaEngine()->addTransaction
-      ( "detach geometry",
-        Manta::Callback::create( this,
-                                 &vtkMantaActor::RemoveObjects,
-                                 renders->GetFirstRenderer(),
-                                 false
-                               )
-      );
-    }
-}
-
-//----------------------------------------------------------------------------
-void vtkMantaActor::RemoveObjects( vtkRenderer * renderer, bool deleteMesh )
-{
-  // this->MantaAS is an acceleration structure attached to a vtkMantaActor
-  // object (the 'current' acceleration structure)
-  if ( this->MantaAS )
-    {
-    // Detach the 'old' mesh, i.e, the group (Manta::DynBVH::currGroup)
-    // assigned to the current acceleration structure, from the latter. It is
-    // this->UpdataObjects( ... ) that sets the 'old' mesh as the 'currGroup'
-    // of this->MantaAS.
-    //
-    // NOTE: we might NOT delete the 'old' mesh here as it might be exactly
-    //       the same as the one (this->Mesh) to be assigned LATER to a new
-    //       acceleration structure, as is the case with visibility toggling.
-    this->MantaAS->setGroup( NULL );
-
-    // ONLY when the corresponding vtkManta object is totally deleted, either
-    // explicitly through ParaView's pipeline browser or implicitly by closing
-    // ParaView, is the mesh actually deleted as follows
-    if ( deleteMesh == true && this->Mesh != NULL )
-      {
-      delete this->Mesh;
-      this->Mesh = NULL;
-      }
-
-    // Remove the pointer to the current acceleration structure (this->MantaAS)
-    // from the host renderer's world group (i.e., this->MantaWorldGroup)'s
-    // vector<Manta::Object *> and actually delete this acceleration structure
-    // (true means DEEP delete) that is of type Manta::Object.
-    if ( vtkMantaRenderer * mantaRenderer =
-         vtkMantaRenderer::SafeDownCast( renderer ) )
-      {
-      mantaRenderer->GetMantaWorldGroup()->remove( this->MantaAS, true );
-      }
-
-    // this->MantaAS was DEEP-deleted while this->Mesh may or may not exist
-    this->MantaAS = NULL;
-    }
-
-  // TODO: we should invalidate the already rendered image in the pipeline
-}
-
-//----------------------------------------------------------------------------
-void vtkMantaActor::UpdateObjects( vtkRenderer * ren )
-{
-  // This line is used for switching between various color map modes and hence
-  // the 'old' mesh is actually NOT deleted at all. In fact, the 'old' mesh is
-  // detached from this->MantaAS. Then this->MantaAS is detached from the Manta
-  // world group and DEEP-deleted.
-  //
-  // This line is skipped for any vtkManta (geometric) object that is created
-  // from scratch. For this case, this->Mesh is indeed a NEW mesh and should be
-  // readily available upon the call to this function.
-  this->RemoveObjects( ren, false );
-
-  if (vtkMantaRenderer * mantaRenderer = vtkMantaRenderer::SafeDownCast(ren))
-    {
-    // create a new acceleration structure
-    this->MantaAS = new Manta::DynBVH();
-
-    // Set the mesh, this->Mesh, as the 'currGroup' of the acceleration
-    // structure, this->MantaAS, and rebuild/update will be done by preprocess()
-    // TODO: can we just "update" the mesh instead of setting a new one?
-    this->MantaAS->setGroup(this->Mesh);
-    this->IsModified = false;
-
-    // add this new acceleration structure to the host renderer's world group
-    // (this->MantaWorldGroup)'s vector<Manta::Object *>
-    mantaRenderer->GetMantaWorldGroup()->add(
-        static_cast<Manta::Object *> (this->MantaAS));
-
-    this->MantaWorldGroup = mantaRenderer->GetMantaWorldGroup();
-
-    // apply preprocessing to the world group of the host renderer
-    Manta::PreprocessContext context(mantaRenderer->GetMantaEngine(), 0, 1,
-        mantaRenderer->GetMantaLightSet());
-    mantaRenderer->GetMantaWorldGroup()->preprocess(context);
-
-    // number of objects in the world group
-    cerr << "world group size " << mantaRenderer->GetMantaWorldGroup()->size()
-        << endl;
-    }
-}
-
-//----------------------------------------------------------------------------
 void vtkMantaActor::Render( vtkRenderer * ren, vtkMapper * mapper )
 {
   if ( vtkMantaRenderer * mantaRenderer = vtkMantaRenderer::SafeDownCast( ren ) )
     {
+    if (!this->Renderer)
+      {
+      this->Renderer = mantaRenderer;
+      }
+
     // TODO: be smarter on update or create rather than create every time
     // build transformation (with AffineTransfrom and Instance?)
 
@@ -295,41 +183,125 @@ void vtkMantaActor::Render( vtkRenderer * ren, vtkMapper * mapper )
     if (mapper->GetInput()->GetMTime() > this->MeshMTime ||
         mapper->GetMTime() > this->MeshMTime ||
         this->GetProperty()->GetMTime() > this->MeshMTime ||
-        this->IsModified)
+        this->GetMTime() > this->MeshMTime)
       {
-      if (!(mapper->GetScalarVisibility()))
-        {
-        vtkMantaProperty * mantaProperty =
-          vtkMantaProperty::SafeDownCast(this->GetProperty());
-        if (!mantaProperty)
-          return;
+      // update pipeline to get up to date data to show
+      mapper->Render(ren, this);
 
-        if (this->Mesh)
-          {
-          this->Mesh->materials.erase(this->Mesh->materials.begin());
-          this->Mesh->materials.push_back(mantaProperty->GetMantaMaterial());
-          // do preprocessing for the material since we only update the material
-          // and don't call preprocessing for the actor
-          Manta::PreprocessContext context
-            (mantaRenderer->GetMantaEngine(), 0, 1,
-             mantaRenderer->GetMantaLightSet());
-          mantaProperty->GetMantaMaterial()->preprocess(context);
-          this->MeshMTime.Modified();
-          }
+      this->MeshMTime.Modified();
+
+      mantaRenderer->GetMantaEngine()->addTransaction
+        ("update geometry",
+         Manta::Callback::create(this, &vtkMantaActor::UpdateObjects, ren));
+      }
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkMantaActor::SetVisibility(int newval)
+{
+  if (newval == this->GetVisibility())
+    {
+    return;
+    }
+  if (this->Renderer && !newval)
+    {
+    //this is necessary since Render (and thus UpdateObjects) is not 
+    //called when visibility is off.
+    this->Renderer->GetMantaEngine()->addTransaction
+      ( "detach geometry",
+        Manta::Callback::create( this,
+                                 &vtkMantaActor::RemoveObjects,
+                                 (vtkRenderer*)this->Renderer,
+                                 false
+                               )
+      );
+    }
+  this->Superclass::SetVisibility(newval);
+}
+
+//----------------------------------------------------------------------------
+void vtkMantaActor::RemoveObjects( vtkRenderer * ren, bool deleteMesh )
+{
+  vtkMantaRenderer * mantaRenderer =
+    vtkMantaRenderer::SafeDownCast( ren );
+  if (!mantaRenderer)
+    {
+    return;
+    }
+  
+  if (this->MantaAS)
+    {
+    //TODO: I think the old group can and should be deleted too
+    this->MantaAS->setGroup( NULL ); 
+
+    mantaRenderer->GetMantaWorldGroup()->remove( this->MantaAS, true );
+    //delete this->MantaAS; //TODO: does remove above to this? This is double delete F.S.R.
+    this->MantaAS = NULL;
+    }
+
+  if (deleteMesh)
+    {    
+    if (this->Group)
+      {
+      //delete all geometry
+      this->Group->shrinkTo(0, true);
+      delete this->Group;
+      this->Group = NULL;
+      }
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkMantaActor::UpdateObjects( vtkRenderer * ren )
+{
+  vtkMantaRenderer * mantaRenderer =
+    vtkMantaRenderer::SafeDownCast( ren );
+  if (!mantaRenderer)
+    {
+    return;
+    }
+
+  //TODO:
+  //We are using Manta's DynBVH, but we never use it Dyn-amically.
+  //Instead we delete the old and rebuild a new AS every time something changes,
+  //We should either ask the DynBVH to update itself,
+  //or try different acceleration structures. Those might be faster - either 
+  //during sort or during search.
+
+  //Remove whatever we used to show in the scene
+  this->RemoveObjects(ren, false);
+
+  if (this->Group)
+    {
+    //Add what we are now supposed to show
+    //Create an acceleration structure for the data and add it to the scene
+
+    //We have to nest to make an AS for each inner group
+    //Is there a Manta call we can make to simply recurse while making the AS?
+    this->MantaAS = new Manta::DynBVH();
+    Manta::Group *group = new Manta::Group();
+    for (unsigned int i = 0; i < this->Group->size(); i++)
+      {
+      Manta::DynBVH *innerBVH = new Manta::DynBVH();
+      Manta::Group * innerGroup = static_cast<Manta::Group *>(this->Group->get(i));
+      if (innerGroup)
+        {
+        innerBVH->setGroup(innerGroup);
+        group->add(innerBVH);
         }
       else
         {
-        // send a render to the mapper to update pipeline
-        mapper->Render(ren, this);
-
-        // remove old and add newly created geometries to the world of objects
-        if (this->IsModified)
-          {
-          this->MeshMTime.Modified();
-          mantaRenderer->GetMantaEngine() ->addTransaction("update geometry",
-            Manta::Callback::create(this, &vtkMantaActor::UpdateObjects, ren));
-          }
+        delete innerBVH;
+        group->add(this->Group->get(i));
         }
       }
+    this->MantaAS->setGroup(group);
+    Manta::Group* mantaWorldGroup = mantaRenderer->GetMantaWorldGroup();
+    mantaWorldGroup->add(static_cast<Manta::Object *> (this->MantaAS));
+
+    Manta::PreprocessContext context(mantaRenderer->GetMantaEngine(), 0, 1,
+                                     mantaRenderer->GetMantaLightSet());
+    mantaWorldGroup->preprocess(context);
     }
 }

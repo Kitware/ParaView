@@ -108,10 +108,6 @@ public:
   void ReleaseGraphicsResources(vtkWindow *);
 
   // Description:
-  // Check if this actor refers to the center of rotation axes widget
-  vtkGetMacro(IsCenterAxes, bool);
-
-  // Description:
   // Draw method for Manta.
   virtual void Draw(vtkRenderer *ren, vtkActor *a);
 
@@ -122,23 +118,10 @@ protected:
   //BTX
   void DrawPolygons(vtkPolyData *, Manta::Mesh *);
   void DrawTStrips(vtkPolyData *, Manta::Mesh *);
-  void ExtractVertices(vtkPolyData* srcPoly,  vtkPolyData* outPoly);
   //ETX
 
 private:
-  bool                IsCenterAxes;
-  vtkSphereSource*    SphereConfig;
-  vtkPolyData*        SphereCenter;
-  vtkGlyph3D*         SphereFilter;
-  vtkTubeFilter*      TubeFilter;
-  vtkPolyData*        PolyStrips;
-  vtkAppendPolyData*  VTKtoManta;
-
   vtkMantaTexture*    InternalColorTexture;
-
-  vtkSetMacro(IsCenterAxes, bool);
-  void EnableTCoordsForCenterAxes(vtkPolyData * centerAxes);
-  void FillInTCoordsForCenterAxes(vtkPolyData * centerAxes);
 
   vtkMantaPolyDataMapper(const vtkMantaPolyDataMapper&); // Not implemented.
   void operator=(const vtkMantaPolyDataMapper&); // Not implemented.

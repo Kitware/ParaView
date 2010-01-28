@@ -72,7 +72,6 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //BTX
 namespace Manta {
 class Group;
-class Mesh;
 class AccelerationStructure;
 class Object;
 };
@@ -88,11 +87,7 @@ public:
   static vtkMantaActor *New();
   vtkTypeRevisionMacro(vtkMantaActor,vtkActor);
   virtual void PrintSelf(ostream& os, vtkIndent indent);
-  
-  //Description:
-  // Overridden to ?
-  virtual void SetVisibility(int);
-  
+    
   //Description:
   // Overriden to help ensure that a Manta compatible class is created.
   vtkProperty * MakeProperty();
@@ -109,69 +104,36 @@ public:
   // The parameter window could be used to determine which graphic
   // resources to release.
   void ReleaseGraphicsResources(vtkWindow *);
-  void RemoveObjects(vtkRenderer * renderer, bool deleteMesh );
   
+  //Description:
+  // Overridden to schedule a transaction to hide the object
+  virtual void SetVisibility(int);
+  
+  //Description:
+  // Transaction callback that hides the object
+  void RemoveObjects(vtkRenderer * ren, bool deleteMesh );
+
   //BTX
-  // Regular non-vtkSetGet functions are used here as Manta does NOT
-  // adopt reference-counting to manage objects. Otherwise it would
-  // complicate the memory management issue due to the inconsistency.
-  void SetMesh( Manta::Mesh * mesh ) 
+  //TODO: This leaks whatever was there, but must schedule its deletion because of threading
+  void SetGroup( Manta::Group * group ) 
   { 
-    this->Mesh = mesh; 
+    this->Group = group; 
   }
+  //TODO: This leaks whatever was there, but must schedule its deletion because of threading
   void SetMantaAS( Manta::AccelerationStructure * mantaAS )
   { 
     this->MantaAS = mantaAS; 
   }
-  void SetMantaWorldGroup( Manta::Group * mantaWorldGroup )
+  Manta::Group * GetGroup() 
   {
-    this->MantaWorldGroup = mantaWorldGroup; 
-  }
-  Manta::Mesh * GetMesh() 
-  {
-    return this->Mesh; 
+    return this->Group; 
   }
   Manta::AccelerationStructure * GetMantaAS() 
   { 
     return this->MantaAS; 
   }
-  Manta::Group * GetMantaWorldGroup() 
-  { 
-    return this->MantaWorldGroup; 
-  }
   //ETX
-  
-  // Description:
-  // Somehow helps enable visibility toggling
-  vtkSetMacro(IsModified, bool);
-  vtkGetMacro(IsModified, bool);
-  
-  // Description:
-  // Somehow helps enable visibility toggling
-  vtkSetMacro(LastVisibility, bool);
-  vtkGetMacro(LastVisibility, bool);
-
-  // Description:
-  // Visibility
-  void DetachFromMantaRenderEngine( vtkMantaRenderer * renderer );
-  
-  // Description:
-  // Set/Get the renderer that this vtkMantaActor is added to.
-  //
-  // 'Set' is called in vtkMantaRenderer::UpdateActorsForVisibility()
-  // such that this vtkMantaActor obtains a handle to the associated
-  // vtkMantaRenderer for memory de-allocation upon destruction when
-  // a vtkManta object is deleted, either explicitly through ParaView
-  // pipeline browser or implicitly via closing ParaView.
-  void SetRenderer( vtkMantaRenderer * renderer )
-  {
-    this->Renderer = renderer; 
-  }
-  vtkMantaRenderer * GetRenderer() 
-  { 
-    return this->Renderer; 
-  }
-  
+    
  protected:
   vtkMantaActor();
   ~vtkMantaActor();
@@ -181,18 +143,12 @@ public:
   void operator=(const vtkMantaActor&);  // Not implemented.
   
   vtkMantaRenderer * Renderer;
-  bool IsModified;
-  bool LastVisibility; // visibility for the LAST frame / time
   void UpdateObjects(vtkRenderer *);
   vtkTimeStamp MeshMTime;
     
-  // for the moment, each Actor is assumed to be "single piece" and is
-  // represented by one Manta::Mesh, one Manta::AccelerationStructure
-  // is used to accelerate the raytracing process.
   //BTX
-  Manta::Mesh * Mesh;
-  Manta::AccelerationStructure * MantaAS;
-  Manta::Group * MantaWorldGroup;
+  Manta::Group * Group; //geometry
+  Manta::AccelerationStructure * MantaAS; //acceleration structure for that geometry
   //ETX
 };
 

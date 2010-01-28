@@ -102,7 +102,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <vtkstd/string>
 
-vtkCxxRevisionMacro(vtkMantaRenderer, "1.6");
+vtkCxxRevisionMacro(vtkMantaRenderer, "1.7");
 vtkStandardNewMacro(vtkMantaRenderer);
 
 //----------------------------------------------------------------------------
@@ -312,60 +312,6 @@ vtkCamera* vtkMantaRenderer::MakeCamera()
 }
 
 //----------------------------------------------------------------------------
-void vtkMantaRenderer::UpdateActorsForVisibility()
-{
-  vtkProp * anyProp = NULL;
-  vtkCollectionSimpleIterator propIter;
-
-  for ( this->Props->InitTraversal( propIter );
-        ( anyProp = this->Props->GetNextProp( propIter ) );
-      )
-    {
-    vtkMantaActor * mantaActor = NULL;
-    if ( anyProp->IsA( "vtkMantaActor" ) )
-      {
-      mantaActor = vtkMantaActor::SafeDownCast( anyProp );
-      }
-    else
-    if ( anyProp->IsA( "vtkMantaLODActor" ) )
-      {
-#ifdef VTKMANTA_FOR_PARAVIEW
-      mantaActor = vtkMantaActor::SafeDownCast
-        ( vtkMantaLODActor::SafeDownCast( anyProp )->GetDevice() );
-#endif
-      }
-
-    if ( mantaActor )
-      {
-      // this provides vtkMantaActor with a handle for memory de-allocation
-      // upon destruction when a vtkManta object is deleted, either explicitly
-      // through ParaView pipeline browser or implicitly via closing ParaView
-      mantaActor->SetRenderer( this );
-
-//TODO: I don't understand the need for last visibility.
-//Why can't we just have the mantaactor itself make a callback 
-//to do the AccellStruct detach at the next safe opportunity?
-      if ( anyProp->GetVisibility() )
-        {
-        if ( mantaActor->GetLastVisibility() == false )
-          {
-          mantaActor->SetIsModified( true );
-          mantaActor->SetLastVisibility( true );
-          }
-        }
-      else
-        {
-        if ( mantaActor->GetLastVisibility() == true )
-          {
-          mantaActor->DetachFromMantaRenderEngine( this );
-          mantaActor->SetLastVisibility( false );
-          }
-        }
-      }
-    }
-}
-
-//----------------------------------------------------------------------------
 void vtkMantaRenderer::DeviceRender()
 {
   // In ParaView, we are wasting time in rendering the "sync layer" with
@@ -401,10 +347,6 @@ void vtkMantaRenderer::DeviceRender()
   // call Light::Render()
   this->UpdateLightGeometry();
   this->UpdateLights();
-
-  // detach or attach the mesh to an acceleration structure, which is then
-  // added to the Manta world group, in support of visibility toggling
-  this->UpdateActorsForVisibility();
 
   this->UpdateGeometry();
 

@@ -90,6 +90,8 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <Model/Groups/Group.h>
 #include <Model/Groups/Mesh.h>
 #include <Model/Primitives/WaldTriangle.h>
+#include <Model/Primitives/Sphere.h>
+#include <Model/Primitives/Cylinder.h>
 #include <Model/Materials/Flat.h>
 #include <Model/Materials/Lambertian.h>
 #include <Model/Materials/Transparent.h>
@@ -99,7 +101,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <math.h>
 
-vtkCxxRevisionMacro(vtkMantaPolyDataMapper, "1.3");
+vtkCxxRevisionMacro(vtkMantaPolyDataMapper, "1.4");
 vtkStandardNewMacro(vtkMantaPolyDataMapper);
 
 //----------------------------------------------------------------------------
@@ -107,13 +109,6 @@ vtkStandardNewMacro(vtkMantaPolyDataMapper);
 vtkMantaPolyDataMapper::vtkMantaPolyDataMapper()
 {
   cerr << "CREATE MANTA POLY DATA MAPPER " << this << endl;
-  this->IsCenterAxes = false;
-  this->SphereConfig = NULL;
-  this->SphereCenter = NULL;
-  this->SphereFilter = NULL;
-  this->TubeFilter   = NULL;
-  this->PolyStrips   = NULL;
-  this->VTKtoManta   = NULL;
   this->InternalColorTexture = NULL;
 }
 
@@ -122,35 +117,6 @@ vtkMantaPolyDataMapper::vtkMantaPolyDataMapper()
 vtkMantaPolyDataMapper::~vtkMantaPolyDataMapper()
 {
   cerr << "DESTROY MANTA POLY DATA MAPPER " << this << endl;
-  if ( this->SphereConfig != NULL )
-    {
-    this->SphereConfig->Delete();
-    }
-  
-  if ( this->SphereCenter != NULL )
-    {
-    this->SphereCenter->Delete();
-    }
-  
-  if ( this->SphereFilter != NULL )
-    {
-    this->SphereFilter->Delete();
-    }
-  
-  if ( this->TubeFilter != NULL )
-    {
-    this->TubeFilter->Delete();
-    }
-  
-  if ( this->PolyStrips != NULL )
-    {
-    this->PolyStrips->Delete();
-    }
-  
-  if ( this->VTKtoManta != NULL )
-    {
-    this->VTKtoManta->Delete();
-    }
 }
 
 //----------------------------------------------------------------------------
@@ -200,18 +166,7 @@ void vtkMantaPolyDataMapper::RenderPiece(vtkRenderer *ren, vtkActor *act)
     this->CreateDefaultLookupTable();
     }
   
-  // TODO: vtkOpenGLPolyDataMapper uses OpenGL clip planes for some reason
-  
-  // A strict check is performed here in case of any non-center-axes
-  // vtkPolyData that happens to contain a point-based data array called
-  // "Axes", too. More info is available in vtkAxes that is used to create
-  // this special representation for the center of rotation axes widget.
-  this->SetIsCenterAxes( this->GetInput()->GetLines()
-                         ->GetNumberOfCells(  ) == 3  &&
-                         this->GetInput()->GetPoints()
-                         ->GetNumberOfPoints( ) == 6  &&
-                         this->GetInput()->GetPointData()
-                         ->GetScalars( "Axes" ) != NULL );
+  // TODO: vtkOpenGLPolyDataMapper uses OpenGL clip planes here
   
   // For vertex coloring, this sets this->Colors as side effect.
   // For texture map coloring, this sets ColorCoordinates
@@ -238,6 +193,7 @@ void vtkMantaPolyDataMapper::RenderPiece(vtkRenderer *ren, vtkActor *act)
        )
     {
     //this->ReleaseGraphicsResources( ren->GetRenderWindow() );
+
     // If we are coloring by texture, then load the texture map.
     // Use Map as indicator, because texture hangs around.
     if (this->ColorTextureMap)
@@ -260,7 +216,7 @@ void vtkMantaPolyDataMapper::DrawPolygons(vtkPolyData *polys, Manta::Mesh *mesh)
   vtkCellArray *cells = polys->GetPolys();
   vtkIdType npts = 0, *index = 0, cellNum = 0;
   bool cellScalar = false;
-  
+
   // implement color by point field data
   if (this->Colors || this->ColorCoordinates)
     {
@@ -501,136 +457,6 @@ void vtkMantaPolyDataMapper::DrawTStrips(vtkPolyData *polys, Manta::Mesh *mesh)
 }
 
 //----------------------------------------------------------------------------
-void vtkMantaPolyDataMapper::ExtractVertices(vtkPolyData* srcPoly,  vtkPolyData* outPoly)
-{
-  if ( srcPoly == NULL || outPoly == NULL )
-    {
-    vtkErrorMacro(<< "either srcPoly or outPoly is NULL!");
-    return;
-    }
-  
-  double          pntCoord[3];
-  vtkIdType       srcCellId, outCellId, srcPntId, outPntId;
-  
-  vtkIdType       numCells  = srcPoly->GetNumberOfVerts();
-  vtkPoints*      srcPoints = srcPoly->GetPoints();
-  vtkPoints*      outPoints = vtkPoints::New();
-  outPoints->Allocate(numCells);
-  
-  vtkCellData*    srcCD = srcPoly->GetCellData();
-  vtkCellData*    outCD = outPoly->GetCellData();
-  outCD->CopyAllocate(srcCD, numCells);
-  
-  vtkPointData*   srcPD = srcPoly->GetPointData();
-  vtkPointData*   outPD = outPoly->GetPointData();
-  outPD->CopyAllocate(srcPD, numCells);
-  
-  vtkCellArray*   vt_cells = vtkCellArray::New();
-  vtkGenericCell* vertCell = vtkGenericCell::New();
-  
-  for ( srcCellId = 0;  srcCellId < numCells;  srcCellId ++ )
-    {
-    srcPoly->GetCell(srcCellId, vertCell);
-    srcPntId  = vertCell->GetPointId(0);
-    srcPoints->GetPoint(srcPntId, pntCoord);
-    outPntId  = outPoints->InsertNextPoint(pntCoord);
-    outCellId = vt_cells->InsertNextCell(1);
-    vt_cells->InsertCellPoint(outPntId);
-    outPD->CopyData(srcPD, srcPntId,  outPntId );
-    outCD->CopyData(srcCD, srcCellId, outCellId);
-    }
-  
-  outPoly->SetPoints(outPoints);
-  outPoly->SetVerts(vt_cells);
-  outPoly->Squeeze();
-  
-  vertCell->Delete();
-  vt_cells->Delete();
-  outPoints->Delete();
-  srcPoints = NULL;
-  srcCD = NULL;
-  outCD = NULL;
-  srcPD = NULL;
-  outPD = NULL;
-}
-
-//----------------------------------------------------------------------------
-// This function specifies the radius and number of sides for the resulting
-// cylinders if the source vtkPolyData is the Center Of Rotation axes widget.
-// The COR, with the geometry and attributes generated through source vtkAxes,
-// contains a scalar data array called 'Axes', which is then employed in the
-// line-to-cylinder convertor, i.e., vtkTubeFilter, to create texture
-// coordinates for the vertices of the resulting cylinders. The texture
-// coordinates, after correction by FillInTCoordsForCenterAxes(.), are used to
-// index into a color texture map to obtain the actual axes colors.
-//
-// NOTE: This function needs to be called prior to this->TubeFilter->Update(),
-// in vtkMantaPolyDataMapper::Draw(vtkRenderer *renderer, vtkActor *actor),
-// and after which, needs to be paired with vtkMantaPolyDataMapper::
-// FillInTCoordsForCenterAxes(.).
-void vtkMantaPolyDataMapper::EnableTCoordsForCenterAxes(
-                                                        vtkPolyData * centerAxes )
-{
-  if ( this->GetIsCenterAxes() &&
-       this->ColorCoordinates  &&
-       this->InterpolateScalarsBeforeMapping )
-    {
-    int  arrayIndex = -1;
-    centerAxes->GetPointData()->GetArray( "Axes", arrayIndex );
-    this->TubeFilter->SetRadius( 3 * 0.005 );
-    this->TubeFilter->SetNumberOfSides( 6 );
-    this->TubeFilter->SetGenerateTCoordsToUseScalars();
-    this->SetInputArrayToProcess( arrayIndex, 0, 0,
-                                  vtkDataObject::FIELD_ASSOCIATION_POINTS,
-                                  vtkDataSetAttributes::SCALARS );
-    }
-}
-
-//----------------------------------------------------------------------------
-// This function fixes the texture coordinates, created through vtkTubeFilter,
-// for the Center Of Rotation axes widget since vtkTubeFilters fails to
-// interpolate along a CONSTANT line to produce FIXED texture coordinates that
-// are then actually used to index into a color texture map for FLAT-colored
-// axes. Given the texture coordinates array allocated via vtkTubeFilter, this
-// function updates this array with proper texture (color) coordinates that
-// are accessed from this->ColorCoordinates.
-//
-// NOTE: This function needs to be called after this->TubeFilter->Update(),
-// in vtkMantaPolyDataMapper::Draw(vtkRenderer *renderer, vtkActor *actor),
-// as a paired function of vtkMantaPolyDataMapper::
-// EnableTCoordsForCenterAxes(.).
-void vtkMantaPolyDataMapper::FillInTCoordsForCenterAxes(
-                                                        vtkPolyData * centerAxes )
-{
-  if ( this->GetIsCenterAxes() &&
-       this->ColorCoordinates  &&
-       this->InterpolateScalarsBeforeMapping )
-    {
-    vtkDataArray * pClrCoords = this->ColorCoordinates;
-    vtkDataArray * pTexCoords = this->TubeFilter->GetOutput()
-      ->GetPointData()->GetTCoords();
-    int      numCCoords = pClrCoords->GetNumberOfTuples();
-    int      numTCoords = pTexCoords->GetNumberOfTuples();
-    int      numAxisLns = centerAxes->GetLines()->GetNumberOfCells();
-    int      ptsPerLine = numTCoords / numAxisLns;
-    int      tCordIndex = 0;
-    double * colorCoord = NULL;
-    if ( numCCoords == numAxisLns * 2 )
-      {
-      for ( int j = 0; j < numAxisLns; j ++ )
-        for ( int i = 0; i < ptsPerLine; i ++, tCordIndex ++ )
-          {
-          colorCoord = pClrCoords->GetTuple( j << 1 );
-          pTexCoords->SetTuple2( tCordIndex, colorCoord[0], 0 );
-          }
-      }
-    pClrCoords = NULL;
-    pTexCoords = NULL;
-    colorCoord = NULL;
-    }
-}
-
-//----------------------------------------------------------------------------
 // Draw method for Manta.
 void vtkMantaPolyDataMapper::Draw(vtkRenderer *renderer, vtkActor *actor)
 {
@@ -638,8 +464,7 @@ void vtkMantaPolyDataMapper::Draw(vtkRenderer *renderer, vtkActor *actor)
   vtkMantaProperty *mantaProperty = vtkMantaProperty::SafeDownCast( mantaActor->GetProperty() );
   
   vtkPolyData *input = this->GetInput();
-  
-#if 1
+
   // obtain the OpenGL-based point size and line width
   // that are specified through vtkProperty
   double    pointSize = mantaProperty->GetPointSize();
@@ -649,96 +474,71 @@ void vtkMantaPolyDataMapper::Draw(vtkRenderer *renderer, vtkActor *actor)
   pointSize = sqrt(pointSize);
   lineWidth = sqrt(lineWidth);
   
-  // convert points to spheres
+  //convert VTK_VERTEX cells to manta spheres
+  Manta::Group *sphereGroup = NULL;
+  Manta::Group *tubeGroup = NULL;
+
+  //TODO: Does not respect view transform
   if ( input->GetNumberOfVerts() > 0 )
-    {
-    if ( this->SphereConfig == NULL)
+    {   
+    sphereGroup = new Manta::Group();
+    //TODO: color each point correctly
+    Manta::Flat *sphereMat = new Manta::Flat(Manta::Color(Manta::RGBColor(0.0,0.5,0.0)));
+    double sphereRadius = pointSize * 0.010;
+
+    vtkCellArray *ca = input->GetVerts();
+    ca->InitTraversal();
+    vtkIdType npts;
+    vtkIdType *pts;
+    vtkPoints *ptarray = input->GetPoints();
+    double coord[3];
+    while (ca->GetNextCell(npts, pts))
       {
-      this->SphereConfig = vtkSphereSource::New();
+      ptarray->GetPoint(pts[0], coord);
+      Manta::Sphere *sphere = new Manta::Sphere
+        (sphereMat, 
+         Manta::Vector(coord[0], coord[1], coord[2]), 
+         sphereRadius);
+      sphereGroup->add(sphere);
       }
-    
-    if ( this->SphereCenter != NULL )
-      {
-      this->SphereCenter->Delete();
-      }
-    this->SphereCenter = vtkPolyData::New();
-    
-    if ( this->SphereFilter == NULL)
-      {
-      this->SphereFilter = vtkGlyph3D::New();
-      }
-    
-    // sphere configuration
-    int   sphereRes = int(pointSize * 5);
-    this->SphereConfig->SetRadius( pointSize * 0.010 );
-    this->SphereConfig->SetPhiResolution(sphereRes);
-    this->SphereConfig->SetThetaResolution(sphereRes);
-    
-    // NOTE: here 'input' can NOT be directly used as the input to 'SphereFilter'
-    // because input->GetPoints() might include those points introduced by line-type
-    // primitives, as is the case with a hybrid vertices+lines vtkPolyData input.
-    // Thus only those points introduced by vertex-type primitives may be taken as
-    // the input to 'SphereFilter'.
-    this->ExtractVertices( input, this->SphereCenter );
-    this->SphereFilter->SetInput( this->SphereCenter );
-    this->SphereFilter->SetSource( SphereConfig->GetOutput() );
-    this->SphereFilter->Update();
     }
   
-  // convert lines to tubes
+  //TODO: Does not respect view transform
+  //convert VTK_LINE type cells to manta cylinders
   if ( input->GetNumberOfLines() > 0 )
     {
-    if ( this->TubeFilter == NULL)
+    tubeGroup = new Manta::Group();
+    //TODO: color each segment correctly
+    Manta::Flat *tubeMat = new Manta::Flat(Manta::Color(Manta::RGBColor(0.0,0.0,0.5)));
+    double tubeDiameter = lineWidth * 0.005;
+
+    vtkCellArray *ca = input->GetLines();
+    ca->InitTraversal();
+    vtkIdType npts;
+    vtkIdType *pts;
+    vtkPoints *ptarray = input->GetPoints();
+    double coord0[3];
+    double coord1[3];
+    while (ca->GetNextCell(npts, pts))
       {
-      this->TubeFilter = vtkTubeFilter::New();
-      }
-    
-    int   tubeNumSides = int(lineWidth * 4);
-    this->TubeFilter->SetRadius( lineWidth * 0.005 );
-    this->TubeFilter->SetNumberOfSides(tubeNumSides);
-    this->TubeFilter->UseDefaultNormalOn();
-    this->TubeFilter->SetDefaultNormal(0.577, 0.577, 0.577);
-    this->EnableTCoordsForCenterAxes(input);
-    this->TubeFilter->SetInput(input);
-    this->TubeFilter->Update();
-    this->FillInTCoordsForCenterAxes(input);
+      ptarray->GetPoint(pts[0], coord0);
+      for (vtkIdType i = 1; i < npts; i++)
+        {
+        ptarray->GetPoint(pts[i], coord1);
+        Manta::Cylinder *segment = new Manta::Cylinder
+          (tubeMat,
+           Manta::Vector(coord0[0], coord0[1], coord0[2]), 
+           Manta::Vector(coord1[0], coord1[1], coord1[2]), 
+           tubeDiameter);
+        tubeGroup->add(segment);
+        coord0[0] = coord1[0];
+        coord0[1] = coord1[2];
+        coord0[2] = coord1[3];
+        }
+      }    
     }
-  
-  // merge the original polygons and triangle strips with
-  // the constructed spheres and tubes
-  if ( this->VTKtoManta != NULL )
-    {
-    this->VTKtoManta->Delete();
-    }
-  this->VTKtoManta = vtkAppendPolyData::New();
-  
-  if ( input->GetNumberOfVerts() > 0 )
-    {
-    this->VTKtoManta->AddInput( this->SphereFilter->GetOutput() );
-    }
-  
-  if ( input->GetNumberOfLines() > 0 )
-    {
-    this->VTKtoManta->AddInput( this->TubeFilter->GetOutput() );
-    }
-  
-  // use the original polygons and triangle strips while
-  // deactivating the original vertices and lines
-  if ( this->PolyStrips != NULL )
-    {
-    this->PolyStrips->Delete();
-    }
-  this->PolyStrips = vtkPolyData::New();
-  this->PolyStrips->ShallowCopy(input);
-  this->PolyStrips->SetVerts(NULL);
-  this->PolyStrips->SetLines(NULL);
-  this->VTKtoManta->AddInput( this->PolyStrips );
-  
-  // take the Manta-compliant polydata as the input to Manta::Mesh
-  this->VTKtoManta->Update();
-  input = this->VTKtoManta->GetOutput();
-#endif
-  
+
+  //TODO: Use manta instancing to transform instead of doing it brute force here
   // transform point coordinates and normal vectors
   vtkTransform *transform = vtkTransform::New();
   transform->SetMatrix( actor->GetMatrix() );
@@ -753,7 +553,6 @@ void vtkMantaPolyDataMapper::Draw(vtkRenderer *renderer, vtkActor *actor)
     {
     double *pos = points->GetPoint(i);
     mesh->vertices.push_back( Manta::Vector(pos[0], pos[1], pos[2]) );
-    pos = NULL;
     }
   points->Delete();
   
@@ -773,11 +572,9 @@ void vtkMantaPolyDataMapper::Draw(vtkRenderer *renderer, vtkActor *actor)
         {
         double *normal = normals->GetTuple(i);
         mesh->vertexNormals.push_back( Manta::Vector(normal[0], normal[1], normal[2]) );
-        normal = NULL;
         }
       normals->Delete();
       }
-    pointData = NULL;
     }
   
   transform->Delete();
@@ -785,7 +582,7 @@ void vtkMantaPolyDataMapper::Draw(vtkRenderer *renderer, vtkActor *actor)
   // make sure the Center Of Rotation axes widget is INsensitive to the
   // change of the color map scheme used by disabling the first switch
   // below IF AND ONLY IF the target actor corresponds to the COR widget
-  if ( this->Colors && this->GetIsCenterAxes() == false )
+  if ( this->Colors )
     {
     // vertex color, easily supported by Manta with TexCoordTexture
     // TODO: color by Cell v.s. Point data
@@ -827,7 +624,6 @@ void vtkMantaPolyDataMapper::Draw(vtkRenderer *renderer, vtkActor *actor)
     if ( material == NULL )
       {
       delete  texture;
-      texture = NULL;
       }
     else
       {
@@ -838,43 +634,16 @@ void vtkMantaPolyDataMapper::Draw(vtkRenderer *renderer, vtkActor *actor)
       {
       unsigned char *color = this->Colors->GetPointer(4 * i);
       mesh->texCoords.push_back( Manta::Vector(color[0]/255.0, color[1]/255.0, color[2]/255.0) );
-      color = NULL;
       }
     }
   else
-    // this switch should be always chosen AS LONG AS the target actor
-    // is the center of rotation axes widget
     if (this->InterpolateScalarsBeforeMapping && this->ColorCoordinates)
       {
-      // TODO: drawing of lines creates triangle strip with possibly undefined tex coordinates
-      // scalar color with texture
+      // TODO: drawing of lines creates triangle strip with possibly undefined
+      // tex coordinates scalar color with texture
       vtkDataArray * tcoords = this->ColorCoordinates;
       if ( tcoords )
         {
-        // A special treatment is needed here for the center of rotation axes
-        // widget due to the fact that the color texture coordinates, stored
-        // in 'this->ColorCoordinates', are generated prior to the line-to-
-        // cylinder conversion and therefore the number of the tuples is
-        // less than that of the actual vertices constituting the cylinders,
-        // i.e., the thick axes of the widget.
-        //
-        // To address this issue, the proper color coordinates are created in
-        // the line-to-cylinder process, by turning on a flag through the call
-        // to EnableTCoordsForCenterAxes(.), an then corrected (vtkTubeFilter
-        // fails to interpolate along a CONSTANT line to produce FIXED texture
-        // coordinates that are then used for FLAT coloring) by a call to
-        // FillInTCoordsForCenterAxes(.).
-        //
-        // NOTE: any changes to the color map code, e.g., something related to
-        // to this->InterpolateScalarsBeforeMapping, this->Colors,
-        // this->ColorCoordinates, and this->InternalColorTexture, might
-        // cause new problems with the center of rotation axes wwidget.
-        if ( this->GetIsCenterAxes() )
-          {
-          tcoords = this->TubeFilter->GetOutput()
-            ->GetPointData()->GetTCoords();
-          }
-        
         for (int i = 0; i < tcoords->GetNumberOfTuples(); i++)
           {
           double *tcoord = tcoords->GetTuple(i);
@@ -928,24 +697,47 @@ void vtkMantaPolyDataMapper::Draw(vtkRenderer *renderer, vtkActor *actor)
         mesh->materials.push_back( mantaProperty->GetMantaMaterial() );
         }
   
-  mantaProperty = NULL;
-  
-  
+  //TODO: Respect wireframe and point mode
   // write polygons
+  bool hadsome = false;
   if ( input->GetNumberOfPolys() > 0 )
     {
+    hadsome = true;
     this->DrawPolygons(input, mesh);
     }
   
+  //TODO: Respect wireframe and point mode
   // write triangle strips
   if ( input->GetNumberOfStrips() > 0 )
     {
+    hadsome = true;
     this->DrawTStrips(input, mesh);
     }
-  
-  // we delay the deletion of old mesh at transaction time
-  mantaActor->SetMesh(mesh);
-  mantaActor->SetIsModified(true);
-  mantaActor = NULL;
-  input      = NULL;
+
+  //TODO: Need a transaction to safely delete the old array
+  mantaActor->SetGroup(NULL);
+
+  Manta::Group *group = new Manta::Group();
+  if(sphereGroup)
+    {
+    group->add(sphereGroup);
+    }
+  if(tubeGroup)
+    {
+    group->add(tubeGroup);
+    }
+  if (hadsome)
+    {
+    group->add(mesh);
+    }
+  if (group->size())
+    {
+    mantaActor->SetGroup(group);
+    }
+  else
+    {
+    delete group;
+    cerr << "NOTHING TO SEE" << endl;
+    }
+  mantaActor->Modified();
 }

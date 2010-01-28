@@ -73,7 +73,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <Engine/Control/RTRT.h>
 #include <Engine/Display/SyncDisplay.h>
 
-vtkCxxRevisionMacro(vtkMantaRenderWindow, "1.8");
+vtkCxxRevisionMacro(vtkMantaRenderWindow, "1.9");
 vtkStandardNewMacro(vtkMantaRenderWindow);
 
 //----------------------------------------------------------------------------
@@ -239,8 +239,6 @@ void vtkMantaRenderWindow::CopyResultFrame(void)
   // When this function is called, Render() has already been called on each of
   // the renderers in this->Renderers. The RGBA and Z buffer data should also
   // be ready by now.
-  int numPixels = this->Size[0]*this->Size[1];
-
   vtkTimerLog::MarkStartEvent("Color-key");
 
   // TODO: move this function back to LayerRender() for vtkMantaRenderer layers

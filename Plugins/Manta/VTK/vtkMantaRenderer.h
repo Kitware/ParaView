@@ -208,9 +208,6 @@ private:
   void InitEngine();
   void LayerRender();
 
-  // called right before UpdateGeometry()
-  void UpdateActorsForVisibility();
-
   //Description:
   // Overriden to help ensure that a Manta compatible class is created.
   vtkCamera * MakeCamera();
