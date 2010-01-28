@@ -76,6 +76,7 @@ class Camera;
 //ETX
 
 class vtkTimeStamp;
+class vtkMantaManager;
  
 class VTK_vtkManta_EXPORT vtkMantaCamera : public vtkCamera
 {
@@ -100,6 +101,8 @@ private:
   // a singleton, created and deleted by vtkMantaRenderer
   Manta::Camera *MantaCamera;
   //ETX
+
+  vtkMantaManager *MantaManager;
 };
 
 #endif

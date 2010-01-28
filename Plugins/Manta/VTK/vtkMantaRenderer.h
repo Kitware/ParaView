@@ -82,8 +82,7 @@ class SyncDisplay;
 }
 //ETX
 
-class vtkPKdTree;
-typedef vtkTypeUInt32 uint32;
+class vtkMantaManager;
 
 class VTK_vtkManta_EXPORT vtkMantaRenderer : public vtkRenderer
 {
@@ -237,6 +236,8 @@ private:
   Manta::SyncDisplay * SyncDisplay;
   //ETX
   int ChannelId;
+
+  vtkMantaManager *MantaManager;
 };
 
 #endif

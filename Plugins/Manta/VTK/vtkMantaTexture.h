@@ -79,8 +79,8 @@ namespace Manta {
 }
 //ETX
 
-class vtkMantaLRenderer;
 class vtkRenderWindow;
+class vtkMantaManager;
 
 class vtkMantaTexture : public vtkTexture
 {
@@ -119,6 +119,8 @@ private:
 
   Manta::Texture<Manta::Color> *MantaTexture;
   //ETX
+
+  vtkMantaManager *MantaManager;
 };
 
 #endif

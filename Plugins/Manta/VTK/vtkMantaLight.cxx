@@ -61,6 +61,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkManta.h"
 #include "vtkMantaLight.h"
+#include "vtkMantaManager.h"
 #include "vtkMantaRenderer.h"
 
 #include "vtkObjectFactory.h"
@@ -74,7 +75,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <math.h>
 
-vtkCxxRevisionMacro(vtkMantaLight, "1.3");
+vtkCxxRevisionMacro(vtkMantaLight, "1.4");
 vtkStandardNewMacro(vtkMantaLight);
 
 //----------------------------------------------------------------------------
@@ -82,7 +83,7 @@ vtkMantaLight::vtkMantaLight() : MantaLight(0)
 {
   cerr << "CREATE MANTA LIGHT " << this << endl;
   this->MantaLight = NULL;
-
+  this->MantaManager = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -94,6 +95,10 @@ vtkMantaLight::~vtkMantaLight()
   // Ans: We should, but Manta Materials are holding pointers to
   // the MantaLight in their local lightset cache.
   delete this->MantaLight;
+  if (this->MantaManager)
+    {
+    this->MantaManager->Delete();
+    }
 }
 
 //----------------------------------------------------------------------------

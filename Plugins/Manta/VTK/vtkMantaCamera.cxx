@@ -61,6 +61,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkManta.h"
 #include "vtkMantaCamera.h"
+#include "vtkMantaManager.h"
 #include "vtkMantaRenderer.h"
 
 #include "vtkObjectFactory.h"
@@ -69,7 +70,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <Engine/Control/RTRT.h>
 #include <math.h>
 
-vtkCxxRevisionMacro(vtkMantaCamera, "1.3");
+vtkCxxRevisionMacro(vtkMantaCamera, "1.4");
 vtkStandardNewMacro(vtkMantaCamera);
 
 //----------------------------------------------------------------------------
@@ -77,12 +78,17 @@ vtkMantaCamera::vtkMantaCamera() : MantaCamera (0)
 {
   //TODO: Observe my own modified event, and call OrientCamera then
   cerr << "CREATE MANTA CAMERA " << this << endl;
+  this->MantaManager = NULL;
 }
 
 //----------------------------------------------------------------------------
 vtkMantaCamera::~vtkMantaCamera()
 {
   cerr << "DESTROY MANTA CAMERA " << this << endl;
+  if (this->MantaManager)
+    {
+    this->MantaManager->Delete();
+    }
 }
 
 //----------------------------------------------------------------------------

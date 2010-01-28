@@ -60,6 +60,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
 #include "vtkManta.h"
+#include "vtkMantaManager.h"
 #include "vtkMantaRenderer.h"
 #include "vtkMantaTexture.h"
 #include "vtkMantaRenderWindow.h"
@@ -76,7 +77,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <math.h>
 
-vtkCxxRevisionMacro(vtkMantaTexture, "1.2");
+vtkCxxRevisionMacro(vtkMantaTexture, "1.3");
 vtkStandardNewMacro(vtkMantaTexture);
 
 //----------------------------------------------------------------------------
@@ -85,6 +86,7 @@ vtkMantaTexture::vtkMantaTexture()
 {
   cerr << "CREATE MANTA TEXTURE " << this << endl;
   this->RenderWindow = 0;
+  this->MantaManager = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -97,6 +99,10 @@ vtkMantaTexture::~vtkMantaTexture()
     this->ReleaseGraphicsResources(this->RenderWindow);
     }
   this->RenderWindow = NULL;
+  if (this->MantaManager)
+    {
+    this->MantaManager->Delete();
+    }
 }
 
 //-----------------------------------------------------------------------------

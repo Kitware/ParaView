@@ -89,6 +89,7 @@ class vtkPoints;
 class vtkProperty;
 class vtkRenderWindow;
 class vtkMantaRenderer;
+class vtkMantaManager;
 
 class VTK_vtkManta_EXPORT vtkMantaPolyDataMapper : public vtkPolyDataMapper
 {
@@ -125,6 +126,8 @@ private:
 
   vtkMantaPolyDataMapper(const vtkMantaPolyDataMapper&); // Not implemented.
   void operator=(const vtkMantaPolyDataMapper&); // Not implemented.
+
+  vtkMantaManager *MantaManager;
 };
 
 #endif

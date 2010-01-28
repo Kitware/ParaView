@@ -159,7 +159,7 @@ SET ( MANTA_CLASSES
   vtkMantaActor.cxx
   vtkMantaCamera.cxx
   vtkMantaLight.cxx
-#  vtkMantaManager.cxx
+  vtkMantaManager.cxx
   vtkMantaPolyDataMapper.cxx
   vtkMantaProperty.cxx
   vtkMantaRenderer.cxx

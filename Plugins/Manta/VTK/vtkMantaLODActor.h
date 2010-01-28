@@ -83,8 +83,8 @@ protected:
   ~vtkMantaLODActor() {};
 
 private:
-    vtkMantaLODActor(const vtkMantaLODActor&);  // Not implemented.
-    void operator=(const vtkMantaLODActor&);  // Not implemented.
+  vtkMantaLODActor(const vtkMantaLODActor&);  // Not implemented.
+  void operator=(const vtkMantaLODActor&);  // Not implemented.
 };
 
 #endif

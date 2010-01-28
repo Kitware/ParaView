@@ -74,6 +74,8 @@ typedef vtkTypeUInt32 uint32;
 
 class vtkRenderer;
 
+class vtkMantaManager;
+
 class vtkMantaRenderWindow : public @RenderWindowType@
 {
 public:
@@ -124,6 +126,8 @@ private:
 
   vtkMantaRenderWindow(const vtkMantaRenderWindow&);  // Not implemented.
   void operator=(const vtkMantaRenderWindow&);  // Not implemented.
+
+  vtkMantaManager *MantaManager;
 };
 
 #endif

@@ -79,6 +79,7 @@ namespace Manta {
 //ETX
 
 class vtkMantaRenderer;
+class vtkMantaManager;
 
 class VTK_vtkManta_EXPORT vtkMantaProperty : public vtkProperty
 {
@@ -158,6 +159,8 @@ private:
   // index of refraction for inside material (transmissive). used in
   // dielectric material
   float Nt;
+
+  vtkMantaManager *MantaManager;
 };
 
 #endif

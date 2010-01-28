@@ -80,6 +80,7 @@ class Object;
 class vtkTimeStamp;
 class vtkMantaProperty;
 class vtkMantaRenderer;
+class vtkMantaManager;
 
 class VTK_vtkManta_EXPORT vtkMantaActor : public vtkActor
 {
@@ -150,6 +151,8 @@ public:
   Manta::Group * Group; //geometry
   Manta::AccelerationStructure * MantaAS; //acceleration structure for that geometry
   //ETX
+
+  vtkMantaManager *MantaManager;
 };
 
 #endif

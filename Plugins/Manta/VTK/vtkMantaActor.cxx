@@ -61,6 +61,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkManta.h"
 #include "vtkMantaActor.h"
+#include "vtkMantaManager.h"
 #include "vtkMantaProperty.h"
 #include "vtkMantaRenderer.h"
 #include "vtkMantaRenderWindow.h"
@@ -76,13 +77,14 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <Model/Groups/DynBVH.h>
 #include <Model/Groups/Group.h>
 
-vtkCxxRevisionMacro(vtkMantaActor, "1.7");
+vtkCxxRevisionMacro(vtkMantaActor, "1.8");
 vtkStandardNewMacro(vtkMantaActor);
 
 //----------------------------------------------------------------------------
 vtkMantaActor::vtkMantaActor() : Group(0), MantaAS(0), Renderer(0)
 {
   cerr << "CREATE MANTA ACTOR " << this << endl;
+  this->MantaManager = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -103,6 +105,10 @@ vtkMantaActor::~vtkMantaActor()
     }
 
   this->Renderer = NULL;
+  if (this->MantaManager)
+    {
+    this->MantaManager->Delete();
+    }
 }
 
 //----------------------------------------------------------------------------

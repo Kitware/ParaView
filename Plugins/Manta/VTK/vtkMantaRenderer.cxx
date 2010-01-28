@@ -60,8 +60,9 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
 #include "vtkManta.h"
-#include "vtkMantaRenderer.h"
 #include "vtkMantaCamera.h"
+#include "vtkMantaManager.h"
+#include "vtkMantaRenderer.h"
 
 #include "vtkActor.h"
 #include "vtkCuller.h"
@@ -72,6 +73,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkRenderWindow.h"
 #include "vtkTimerLog.h"
 
+#include <Image/SimpleImage.h>
 #include <Interface/Light.h>
 #include <Interface/LightSet.h>
 #include <Interface/Scene.h>
@@ -90,13 +92,10 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <Core/Color/ColorDB.h>
 #include <Core/Color/RGBColor.h>
 
-#include <Image/SimpleImage.h>
-#include <Engine/Control/RTRT.h>
-#include <Engine/Display/SyncDisplay.h>
 
 #include <vtkstd/string>
 
-vtkCxxRevisionMacro(vtkMantaRenderer, "1.8");
+vtkCxxRevisionMacro(vtkMantaRenderer, "1.9");
 vtkStandardNewMacro(vtkMantaRenderer);
 
 //----------------------------------------------------------------------------
@@ -109,11 +108,14 @@ vtkMantaRenderer::vtkMantaRenderer() :
   // the default global ambient light created by vtkRenderer is too bright.
   this->SetAmbient( 0.1, 0.1, 0.1 );
 
-  this->MantaEngine = Manta::createManta();
+  this->MantaManager = vtkMantaManager::New();
+
+  this->MantaEngine = this->MantaManager->GetMantaEngine();
   this->MantaEngine->changeNumWorkers( this->NumberOfWorkers );
 
   // Default options
-  this->MantaFactory = new Manta::Factory( this->MantaEngine );
+  this->MantaFactory = this->MantaManager->GetMantaFactory();
+
   //this->MantaFactory->selectImageType( "rgbafloat" );
   //this->MantaFactory->selectImageType( "rgbzfloat" );
   this->MantaFactory->selectImageType( "rgba8zfloat" );
@@ -141,19 +143,12 @@ vtkMantaRenderer::~vtkMantaRenderer()
 
   // don't do anything if the engine is not even initialized
   // it is the case for the 2nd renderer in PV.
-  if ( !this->EngineInited )
-    {
-    delete this->MantaFactory;
-    delete this->MantaEngine;
-    return;
-    }
-
   if ( this->EngineStarted )
     {
     // Stop the Manta Engine
-    this->GetMantaEngine()->finish();
+    this->MantaEngine->finish();
     this->GetSyncDisplay()->doneRendering();
-    this->GetMantaEngine()->blockUntilFinished();
+    this->MantaEngine->blockUntilFinished();
     }
 
   // we don't have to delete each Manta::Light in the Manta::LightSet, they
@@ -169,8 +164,6 @@ vtkMantaRenderer::~vtkMantaRenderer()
   delete this->MantaScene;
 
   delete this->MantaWorldGroup;
-  delete this->MantaFactory;
-  delete this->MantaEngine;
 #if 0
   delete this->SyncDisplay;
 #endif
@@ -183,6 +176,8 @@ vtkMantaRenderer::~vtkMantaRenderer()
     {
     delete[] this->DepthBuffer;
     }
+
+  this->MantaManager->Delete();
 }
 
 //----------------------------------------------------------------------------

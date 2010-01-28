@@ -60,6 +60,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
 #include "vtkManta.h"
+#include "vtkMantaManager.h"
 #include "vtkMantaRenderer.h"
 #include "vtkMantaRenderWindow.h"
 
@@ -73,7 +74,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <Engine/Control/RTRT.h>
 #include <Engine/Display/SyncDisplay.h>
 
-vtkCxxRevisionMacro(vtkMantaRenderWindow, "1.9");
+vtkCxxRevisionMacro(vtkMantaRenderWindow, "1.10");
 vtkStandardNewMacro(vtkMantaRenderWindow);
 
 //----------------------------------------------------------------------------
@@ -89,6 +90,7 @@ vtkMantaRenderWindow::vtkMantaRenderWindow() : ColorBuffer(0), DepthBuffer(0)
 
   this->WindowName = new char[ strlen("Visualization Toolkit - Manta") + 1 ];
   strcpy( this->WindowName, "Visualization Toolkit - Manta" );
+  this->MantaManager = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -131,6 +133,10 @@ vtkMantaRenderWindow::~vtkMantaRenderWindow()
   this->ColorBuffer = NULL;
   delete [] this->DepthBuffer;
   this->DepthBuffer = NULL;
+  if (this->MantaManager)
+    {
+    this->MantaManager->Delete();
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -204,7 +210,7 @@ void vtkMantaRenderWindow::InternalSetSize( int width, int height )
           getResolution( dummy, mantaSize[0], mantaSize[1] );
         cerr << "0 MSIZE NOW " << mantaSize[0] << "x" << mantaSize[1] << endl;
 #endif
-        mantaRenderer->GetMantaEngine()-> addTransaction
+        mantaRenderer->GetMantaEngine()->addTransaction
           ("resize",
            Manta::Callback::create
            (mantaRenderer->GetMantaEngine(),

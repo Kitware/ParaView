@@ -61,6 +61,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkManta.h"
 #include "vtkMantaActor.h"
+#include "vtkMantaManager.h"
 #include "vtkMantaPolyDataMapper.h"
 #include "vtkMantaProperty.h"
 #include "vtkMantaRenderer.h"
@@ -101,7 +102,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <math.h>
 
-vtkCxxRevisionMacro(vtkMantaPolyDataMapper, "1.4");
+vtkCxxRevisionMacro(vtkMantaPolyDataMapper, "1.5");
 vtkStandardNewMacro(vtkMantaPolyDataMapper);
 
 //----------------------------------------------------------------------------
@@ -110,6 +111,7 @@ vtkMantaPolyDataMapper::vtkMantaPolyDataMapper()
 {
   cerr << "CREATE MANTA POLY DATA MAPPER " << this << endl;
   this->InternalColorTexture = NULL;
+  this->MantaManager = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -117,6 +119,10 @@ vtkMantaPolyDataMapper::vtkMantaPolyDataMapper()
 vtkMantaPolyDataMapper::~vtkMantaPolyDataMapper()
 {
   cerr << "DESTROY MANTA POLY DATA MAPPER " << this << endl;
+  if (this->MantaManager)
+    {
+    this->MantaManager->Delete();
+    }
 }
 
 //----------------------------------------------------------------------------

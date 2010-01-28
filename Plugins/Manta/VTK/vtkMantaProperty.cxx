@@ -60,6 +60,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
 #include "vtkManta.h"
+#include "vtkMantaManager.h"
 #include "vtkMantaProperty.h"
 #include "vtkMantaRenderer.h"
 
@@ -79,8 +80,62 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <cstring>
 
-vtkCxxRevisionMacro(vtkMantaProperty, "1.3");
+vtkCxxRevisionMacro(vtkMantaProperty, "1.4");
 vtkStandardNewMacro(vtkMantaProperty);
+
+//----------------------------------------------------------------------------
+vtkMantaProperty::vtkMantaProperty()
+  : MantaMaterial(0), MaterialType(0), diffuseTexture(0), specularTexture(0),
+    Reflectance(0.0), Eta(1.52), Thickness(1.0)
+{
+  cerr << "CREATE MANTA PROPERTY " << this << endl;
+
+  this->MaterialType = NULL;
+  this->SetMaterialType("default");
+  this->MantaManager = NULL;
+}
+
+//----------------------------------------------------------------------------
+vtkMantaProperty::~vtkMantaProperty()
+{
+  cerr << "DESTROY MANTA PROPERTY " << this << endl;
+
+  // TODO: We don't have to test if these pointers are NULL if
+  // we get other parts correct, this only hides memory problems
+  if (this->MantaMaterial) 
+    {
+    delete this->MantaMaterial;
+    }
+  if (this->diffuseTexture) 
+    {
+    delete this->diffuseTexture;
+    }
+  if (this->specularTexture)
+    {
+    delete this->specularTexture;
+    }
+  if (this->MaterialType) 
+    {
+    delete[] this->MaterialType;
+    }
+  if (this->MantaManager)
+    {
+    this->MantaManager->Delete();
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkMantaProperty::PrintSelf( ostream & os, vtkIndent indent )
+{
+  this->Superclass::PrintSelf( os, indent );
+}
+
+//------------------------------------------------------------------------------
+void vtkMantaProperty::ReleaseGraphicsResources(vtkWindow *win)
+{
+  cerr << "MANTA PROPERTY RELEASE " << this << endl;
+  this->Superclass::ReleaseGraphicsResources(win);
+}
 
 //----------------------------------------------------------------------------
 void vtkMantaProperty::CreateMantaProperty()
@@ -212,7 +267,6 @@ void vtkMantaProperty::Render( vtkActor * anActor, vtkRenderer * ren)
   if ( this->GetMTime() > this->MantaMaterialMTime )
     {
     this->CreateMantaProperty();
-
     this->MantaMaterialMTime.Modified();
     }
 }
@@ -227,42 +281,5 @@ void vtkMantaProperty::BackfaceRender( vtkActor * vtkNotUsed( anActor ),
     << "vtkMantaProperty::BackfaceRender(), backface rendering "
     << "is not supported by Manta"
     << endl;
-}
-
-//----------------------------------------------------------------------------
-void vtkMantaProperty::PrintSelf( ostream & os, vtkIndent indent )
-{
-  this->Superclass::PrintSelf( os, indent );
-}
-
-//----------------------------------------------------------------------------
-vtkMantaProperty::vtkMantaProperty()
-  : MantaMaterial(0), MaterialType(0), diffuseTexture(0), specularTexture(0),
-    Reflectance(0.0), Eta(1.52), Thickness(1.0)
-{
-  cerr << "CREATE MANTA PROPERTY " << this << endl;
-
-  this->MaterialType = NULL;
-  this->SetMaterialType("default");
-}
-
-//----------------------------------------------------------------------------
-vtkMantaProperty::~vtkMantaProperty()
-{
-  cerr << "DESTROY MANTA PROPERTY " << this << endl;
-
-  // TODO: We don't have to test if these pointers are NULL if
-  // we get other parts correct, this only hides memory problems
-  if ( this->MantaMaterial   ) delete   this->MantaMaterial;
-  if ( this->diffuseTexture  ) delete   this->diffuseTexture;
-  if ( this->specularTexture ) delete   this->specularTexture;
-  if ( this->MaterialType    ) delete[] this->MaterialType;
-}
-
-//------------------------------------------------------------------------------
-void vtkMantaProperty::ReleaseGraphicsResources(vtkWindow *win)
-{
-  cerr << "MANTA PROPERTY RELEASE " << this << endl;
-  this->Superclass::ReleaseGraphicsResources(win);
 }
 

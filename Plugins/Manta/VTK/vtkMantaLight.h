@@ -77,6 +77,7 @@ class Light;
 
 class vtkMantaRenderer;
 class vtkTimeStamp;
+class vtkMantaManager;
 
 class VTK_vtkManta_EXPORT vtkMantaLight : public vtkLight
 {
@@ -102,6 +103,9 @@ private:
   //BTX
   Manta::Light *MantaLight;
   //ETX
+
+  vtkMantaManager *MantaManager;
+
 };
 
 #endif
