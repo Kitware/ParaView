@@ -176,7 +176,6 @@ static struct dirent *readdir(DIR *dirp)
    return &dirp->current;
 }
 
-
 /*****************************************************************************
  * Close directory stream opened by opendir() function.  Close of the
  * directory stream invalidates the DIR structure as well as any previously
@@ -197,6 +196,7 @@ static int closedir(DIR *dirp)
    return 0;
 }
 
+#ifdef USE_VTK_COSMO
 
 /*****************************************************************************
  * Resets the position of the directory stream to which dirp refers to the
@@ -225,5 +225,6 @@ static void rewinddir(DIR* dirp)
    dirp->cached = 1;
 }
 
+#endif
 
 #endif /*__WINDOWS_DIRENT_H*/

@@ -467,7 +467,10 @@ void ParticleDistribute::partitionInputFiles()
         }
       }
     }
+
+  closedir(directory);
   }
+
   this->numberOfFiles = (int)files.size();
 
   if (this->numberOfFiles == 0) {
