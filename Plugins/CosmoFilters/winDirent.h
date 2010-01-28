@@ -82,8 +82,10 @@ typedef struct DIR
 static DIR *opendir (const char *dirname);
 static struct dirent *readdir (DIR *dirp);
 static int closedir (DIR *dirp);
-static void rewinddir(DIR* dirp);
 
+#ifndef USE_VTK_COSMO
+static void rewinddir(DIR* dirp);
+#endif
 
 /* Use the new safe string functions introduced in Visual Studio 2005 */
 #if defined(_MSC_VER) && _MSC_VER >= 1400
@@ -196,7 +198,7 @@ static int closedir(DIR *dirp)
    return 0;
 }
 
-#ifdef USE_VTK_COSMO
+#ifndef USE_VTK_COSMO
 
 /*****************************************************************************
  * Resets the position of the directory stream to which dirp refers to the
