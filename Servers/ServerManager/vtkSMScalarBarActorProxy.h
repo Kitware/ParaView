@@ -15,7 +15,7 @@
 // .NAME vtkSMScalarBarActorProxy - proxy for vtkScalarBarActor.
 // .SECTION Description
 // This is the proxy for the vtkScalarBarActor. The only reason that this 
-// proxy is not a generic proxy is to support simpler interace to
+// proxy is not a generic proxy is to support simpler interface to
 // set the positions of the actor, and to provide set up the text properties.
 
 

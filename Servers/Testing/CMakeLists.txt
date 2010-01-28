@@ -21,7 +21,7 @@ IF(PYTHON_EXECUTABLE AND VTK_HEADER_TESTING_PY)
       vtkPriorityHelper.h
       vtkProcessModuleConnectionManagerInternals.h
       vtkPVPlugin.h
-      vtkPVPythonPluginInterace.h
+      vtkPVPythonPluginInterface.h
       vtkPVServerManagerPluginInterface.h
       vtkPVServerOptionsInternals.h
       vtkPVTestUtities.h
