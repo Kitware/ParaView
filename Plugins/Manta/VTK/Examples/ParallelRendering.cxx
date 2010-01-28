@@ -88,7 +88,7 @@ int main(int argc, char** argv)
 
 static void Run(vtkMultiProcessController* contr, void* arg)
 {
-  int i, go;
+  int go;
   DDArgs_tmp* args = reinterpret_cast<DDArgs_tmp*> (arg);
   vtkCompositeRenderManager* prm = vtkCompositeRenderManager::New();
   prm->SetCompositer(vtkTreeCompositer::New());
@@ -97,7 +97,7 @@ static void Run(vtkMultiProcessController* contr, void* arg)
   vtkUnstructuredGrid* ug = vtkUnstructuredGrid::New();
   vtkDataSet* ds = NULL;
   vtkPolyData* data;
-  vtkPolyDataReader* reader;
+  vtkPolyDataReader* reader = NULL;
   double boundingbox[6];
 
   if (myId == 0)

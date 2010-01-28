@@ -66,7 +66,6 @@ vtkRenderWindow *makeRenderWindow()
 //----------------------------------------------------------------------------
 int main( int argc, char* argv[] )
 {
-  int     second = 1;
   int     objRes = 12;
   double  objRad = 0.075;
 

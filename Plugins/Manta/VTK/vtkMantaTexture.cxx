@@ -77,7 +77,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <math.h>
 
-vtkCxxRevisionMacro(vtkMantaTexture, "1.3");
+vtkCxxRevisionMacro(vtkMantaTexture, "1.4");
 vtkStandardNewMacro(vtkMantaTexture);
 
 //----------------------------------------------------------------------------
@@ -204,9 +204,9 @@ void vtkMantaTexture::Load(vtkRenderer *ren)
     Manta::Image *image = new Manta::SimpleImage<Manta::RGB8Pixel> (false, xsize, ysize);
     Manta::RGB8Pixel *pixels = dynamic_cast<Manta::SimpleImage<Manta::RGB8Pixel> const*>(image)->getRawPixels(0);
     Manta::RGB8Pixel pixel;
-    for (unsigned v = 0; v < ysize; v++)
+    for (int v = 0; v < ysize; v++)
       {
-      for (unsigned u = 0; u < xsize; u++)
+      for (int u = 0; u < xsize; u++)
         {
         unsigned char *color = &dataPtr[(v*xsize+u)*bytesPerPixel];
         pixel.r = color[0];

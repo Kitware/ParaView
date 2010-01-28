@@ -76,8 +76,6 @@ int main(int argc, char** argv)
         return -1;
     }
 
-    int i;
-
     // create renderer
     vtkRenderer *renderer = vtkRenderer::New();
     renderer->SetBackground(slate_grey);

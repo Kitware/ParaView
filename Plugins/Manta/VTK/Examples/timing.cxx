@@ -178,8 +178,6 @@ public:
 
 static void Run(vtkMultiProcessController* contr, void* arg)
 {
-  int go;
-
   vtkTimerLog* mainTimer = vtkTimerLog::New();
   mainTimer->StartTimer();
 
@@ -278,8 +276,6 @@ static void Run(vtkMultiProcessController* contr, void* arg)
   meshMapper->SetNumberOfPieces(NumProcs);
   meshMapper->Update();
 
-  vtkPolyData* temp = meshMapper->GetInput();
-
   // setup camera
   if (myId == 0)
     {
@@ -364,9 +360,6 @@ vtkPolyDataMapper* addFile(vtkRenderer* renderer, char* filename,
     {
     data = vtkPolyData::New();
     }
-
-  vtkMPICommunicator* comm = vtkMPICommunicator::SafeDownCast(
-      contr->GetCommunicator());
 
   vtkTransmitPolyDataPiece* pass = vtkTransmitPolyDataPiece::New();
   pass->SetController(contr);
