@@ -76,11 +76,11 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <Model/Groups/DynBVH.h>
 #include <Model/Groups/Group.h>
 
-vtkCxxRevisionMacro(vtkMantaActor, "1.6");
+vtkCxxRevisionMacro(vtkMantaActor, "1.7");
 vtkStandardNewMacro(vtkMantaActor);
 
 //----------------------------------------------------------------------------
-vtkMantaActor::vtkMantaActor() : Group(0), MantaAS(0), Renderer(0),
+vtkMantaActor::vtkMantaActor() : Group(0), MantaAS(0), Renderer(0)
 {
   cerr << "CREATE MANTA ACTOR " << this << endl;
 }
