@@ -156,14 +156,15 @@ CONFIGURE_FILE ( ${PROJECT_SOURCE_DIR}/vtkMantaConfigure.h.in
 
 # Set vtkManta source files.
 SET ( MANTA_CLASSES
-  vtkMantaTestSource.cxx
   vtkMantaActor.cxx
   vtkMantaCamera.cxx
   vtkMantaLight.cxx
+#  vtkMantaManager.cxx
   vtkMantaPolyDataMapper.cxx
   vtkMantaProperty.cxx
   vtkMantaRenderer.cxx
   vtkMantaRenderWindow.cxx
+  vtkMantaTestSource.cxx
   vtkMantaTexture.cxx
   )
 

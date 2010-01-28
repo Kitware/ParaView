@@ -60,18 +60,12 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
 #include "vtkManta.h"
-#include "vtkMantaActor.h"
-#include "vtkMantaCamera.h"
-#include "vtkMantaLight.h"
-#ifdef VTKMANTA_FOR_PARAVIEW
-#include "vtkMantaLODActor.h"
-#endif
-#include "vtkMantaProperty.h"
 #include "vtkMantaRenderer.h"
-#include "vtkMantaRenderWindow.h"
+#include "vtkMantaCamera.h"
 
 #include "vtkActor.h"
 #include "vtkCuller.h"
+#include "vtkLight.h"
 #include "vtkLightCollection.h"
 #include "vtkObjectFactory.h"
 #include "vtkRendererCollection.h"
@@ -102,7 +96,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <vtkstd/string>
 
-vtkCxxRevisionMacro(vtkMantaRenderer, "1.7");
+vtkCxxRevisionMacro(vtkMantaRenderer, "1.8");
 vtkStandardNewMacro(vtkMantaRenderer);
 
 //----------------------------------------------------------------------------
@@ -236,6 +230,30 @@ void vtkMantaRenderer::InitEngine()
 }
 
 //----------------------------------------------------------------------------
+void vtkMantaRenderer::SetBackground(double r, double g, double b)
+{
+  if ((this->Background[0] != r)||
+      (this->Background[1] != g)||
+      (this->Background[2] != b))
+  {
+  this->Superclass::SetBackground(r,g,b);
+  this->MantaEngine->addTransaction
+    ( "set background",
+      Manta::Callback::create( this, &vtkMantaRenderer::SetMantaBackground) );
+  }; 
+}
+
+//----------------------------------------------------------------------------
+void vtkMantaRenderer::SetMantaBackground()
+{
+  cerr << "CALLBACK" << endl;
+  double *color = this->GetBackground();
+  Manta::ConstantBackground * background = new Manta::ConstantBackground(
+    Manta::Color(  Manta::RGBColor( color[0], color[1], color[2] )  )  );
+  this->MantaScene->setBackground( background );
+}
+
+//----------------------------------------------------------------------------
 void vtkMantaRenderer::ChangeNumberOfWorkers(int numWorkers)
 {
   if (this->NumberOfWorkers == numWorkers)
@@ -253,7 +271,7 @@ void vtkMantaRenderer::ClearLights(void)
   //TODO: This change needs to be scheduled
   delete this->MantaLightSet->getAmbientLight();
 
-  for ( int i = 0; i < this->MantaLightSet->numLights(); i ++ )
+  for ( unsigned int i = 0; i < this->MantaLightSet->numLights(); i ++ )
     {
     Manta::Light *currentLight = this->MantaLightSet->getLight( i );
     this->MantaLightSet->remove( currentLight );
@@ -337,13 +355,6 @@ void vtkMantaRenderer::DeviceRender()
 
   // TODO: call ClearLights here?
 
-  // reset background in the scene
-  // TODO: This should be scheduled via callback
-  double *color = this->GetBackground();
-  dynamic_cast<Manta::ConstantBackground *> (this->MantaScene->getBackground())->
-    setValue(Manta::Color(  Manta::RGBColor( color[0], color[1], color[2] ) ) );
-  color = NULL;
-
   // call Light::Render()
   this->UpdateLightGeometry();
   this->UpdateLights();
@@ -382,7 +393,6 @@ void vtkMantaRenderer::LayerRender()
   bool    stereoDumy;
   float*  mantaBuffer = NULL;
   double* renViewport = NULL;
-  double* background  = NULL;
   const   Manta::SimpleImageBase* mantaBase = NULL;
 
 

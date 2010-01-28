@@ -184,6 +184,11 @@ public:
   //Changes the number of manta rendering threads.
   void ChangeNumberOfWorkers(int numWorkers);
 
+  //Description:
+  //Callback to set manta engine's background
+  void SetMantaBackground();
+
+  virtual void SetBackground(double r, double g, double b);
 protected:
   vtkMantaRenderer();
   ~vtkMantaRenderer();
