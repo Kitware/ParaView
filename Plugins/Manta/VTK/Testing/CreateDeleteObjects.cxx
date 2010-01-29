@@ -133,6 +133,7 @@ int main( int argc, char* argv[] )
   renWin->Render();
 
   // delete cone
+  cerr << "DELETE CONE" << endl;
   renderer->RemoveActor( coneActor );
   cone->Delete();
   coneMapper->Delete();
@@ -141,6 +142,7 @@ int main( int argc, char* argv[] )
   renWin->Render();
 
   // delete sphere
+  cerr << "DELETE SPHERE" << endl;
   renderer->RemoveActor( sphereActor );
   sphere->Delete();
   sphereMapper->Delete();
@@ -149,6 +151,7 @@ int main( int argc, char* argv[] )
   renWin->Render();
 
   // delete cylinder
+  cerr << "DELETE CYLINDER" << endl;
   renderer->RemoveActor( cylinderActor );
   cylinder->Delete();
   cylinderMapper->Delete();
@@ -157,6 +160,7 @@ int main( int argc, char* argv[] )
   renWin->Render();
 
   // re create sphere
+  cerr << "DELETE SECOND SPHERE" << endl;
   sphere = vtkSphereSource::New();
   sphere->SetCenter( 0.0, 0.0, 0.0 );
   sphere->SetRadius( objRad );

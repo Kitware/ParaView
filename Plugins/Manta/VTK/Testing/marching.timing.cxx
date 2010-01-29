@@ -294,7 +294,7 @@ int main(int argc, char** argv)
         timer->StartTimer();
         renderWindow->Render();
         timer->StopTimer();
-        double time2 = renderer->GetLastRenderTimeInSeconds();
+        renderer->GetLastRenderTimeInSeconds();
         sum += timer->GetElapsedTime();
         }
       printf("average render time: %f\n", sum / numFrames);

@@ -15,11 +15,8 @@
 // This test covers the shadow map render pass.
 
 //TODO: Measure pipeline change and render setup time
-//TODO: Measure local render time
-//TODO: Measure composite time
-//TODO: Get rid of ComputeVisiblePropBounds messages
-//TODO: Swap in Manta rendering
-//TODO: pass threads setting to manta
+//TODO: Add option to prevent data changes and just do camera
+//TODO: Make it run and compile without MPI
 
 #include <mpi.h>
 
@@ -154,7 +151,7 @@ protected:
   vtkTimerLog *Timer;
 };
 
-vtkCxxRevisionMacro(MyProcess, "1.3");
+vtkCxxRevisionMacro(MyProcess, "1.4");
 vtkStandardNewMacro(MyProcess);
 
 MyProcess::MyProcess()
@@ -173,16 +170,13 @@ void MyProcess::Execute()
   //parse environment and arguments
   int numProcs=this->Controller->GetNumberOfProcesses();
   int me=this->Controller->GetLocalProcessId();
-  bool doBenchmark = true;
+  bool changeData = true;
+  bool changeCamera = true;
   int screensize = 400;
   int triangles = 100000; //TODO: Values under 10000 are making it break
   int threads = 1;
   int processes = numProcs;
   bool useGL = false;
-  double framerate = 0.0;
-  double buildtime = 0.0;
-  double rendertime = 0.0;
-  double compositetime = 0.0;
   for (int i = 0; i < this->Argc; i++)
     {
     if (!strcmp(this->Argv[i], "-screensize"))
@@ -201,9 +195,13 @@ void MyProcess::Execute()
       {
       useGL = true;
       }
-    if (!strcmp(this->Argv[i], "-noBench"))
+    if (!strcmp(this->Argv[i], "-noCamera"))
       {
-      doBenchmark = false;
+      changeCamera = false;
+      }
+    if (!strcmp(this->Argv[i], "-noData"))
+      {
+      changeData = false;
       }
     }
 
@@ -251,7 +249,7 @@ void MyProcess::Execute()
   //Now set up parallel display pipeline to show it
   vtkCompositeRenderManager *prm = vtkCompositeRenderManager::New();   
 
-  vtkRenderWindowInteractor *iren=0;
+  vtkRenderWindowInteractor *iren=NULL;
   vtkRenderWindow *renWin = NULL;
   vtkMantaRenderWindow *mRenWin = NULL;
   if (useGL)
@@ -419,27 +417,30 @@ void MyProcess::Execute()
     //Change elevation filter's parameter to test color transfer function
     for (int i=2; i>-1; i--)
       {
-      cerr << "Color shows " 
-           << ((i==0)?"X":"") 
-           << ((i==1)?"Y":"") 
-           << ((i==2)?"Z":"") << endl;
-
-      segment[0] = 0;
-      segment[1] = 0;
-      segment[2] = 0;
-      segment[3] = 0;
-      segment[4] = 0;
-      segment[5] = 0;
-      segment[i] = bds[i*2+0];
-      segment[i+3] = bds[i*2+1];
-
-      elev->SetLowPoint(segment[0], segment[1], segment[2]);
-      elev->SetHighPoint(segment[3], segment[4], segment[5]);
-      for (int p = 1; p < numProcs; ++p)
+      if (changeData)
         {
-        this->Controller->TriggerRMI
-          (p,(void*)segment,6*sizeof(double),ELEV_RMI);
-        }        
+        cerr << "Color shows " 
+             << ((i==0)?"X":"") 
+             << ((i==1)?"Y":"") 
+             << ((i==2)?"Z":"") << endl;
+        
+        segment[0] = 0;
+        segment[1] = 0;
+        segment[2] = 0;
+        segment[3] = 0;
+        segment[4] = 0;
+        segment[5] = 0;
+        segment[i] = bds[i*2+0];
+        segment[i+3] = bds[i*2+1];
+        
+        elev->SetLowPoint(segment[0], segment[1], segment[2]);
+        elev->SetHighPoint(segment[3], segment[4], segment[5]);
+        for (int p = 1; p < numProcs; ++p)
+          {
+          this->Controller->TriggerRMI
+            (p,(void*)segment,6*sizeof(double),ELEV_RMI);
+          }      
+        }  
       // render
       renWin->Render();
       this->NoteTime(prm);
@@ -451,7 +452,7 @@ void MyProcess::Execute()
         {
         direction = direction * -1.0;
         }
-      for (int f = 0; f < 36 && doBenchmark; f++)
+      for (int f = 0; f < 36 && changeCamera; f++)
         {        
         camera->Azimuth(direction);
         renderer->ResetCameraClippingRange(bds);
@@ -461,34 +462,40 @@ void MyProcess::Execute()
       }
 
     //put initial clip plane in the middle of the data...
-    origin[0] = (bds[0]+bds[1])*0.5;
-    origin[1] = (bds[2]+bds[3])*0.5;
-    origin[2] = (bds[4]+bds[5])*0.5;
-    plane->SetOrigin(origin[0], origin[1], origin[2]); //...locally
-    for (int p = 1; p < numProcs; ++p)
-      {
-      this->Controller->TriggerRMI
-        (p,(void*)origin,3*sizeof(double),ORIGIN_RMI); //...and on remotes
+    if (changeData)
+      {     
+      origin[0] = (bds[0]+bds[1])*0.5;
+      origin[1] = (bds[2]+bds[3])*0.5;
+      origin[2] = (bds[4]+bds[5])*0.5;
+      plane->SetOrigin(origin[0], origin[1], origin[2]); //...locally
+      for (int p = 1; p < numProcs; ++p)
+        {
+        this->Controller->TriggerRMI
+          (p,(void*)origin,3*sizeof(double),ORIGIN_RMI); //...and on remotes
+        }
       }
 
     //Change a clip filter's parameter to measure render setup time
     for (int i=2; i>-1; i--)
       {
-      cerr << "Clip off " 
-           << ((i==0)?"X":"") 
-           << ((i==1)?"Y":"") 
-           << ((i==2)?"Z":"") << endl;
-
-      normal[0] = 0;
-      normal[1] = 0;
-      normal[2] = 0;
-      normal[i] = 1;
-      plane->SetNormal(normal[0],normal[1],normal[2]);
-      for (int p = 1; p < numProcs; ++p)
+      if (changeData)
         {
-        this->Controller->TriggerRMI
-          (p,(void*)normal,3*sizeof(double),PLANE_RMI);
-        }        
+        cerr << "Clip off " 
+             << ((i==0)?"X":"") 
+             << ((i==1)?"Y":"") 
+             << ((i==2)?"Z":"") << endl;
+        
+        normal[0] = 0;
+        normal[1] = 0;
+        normal[2] = 0;
+        normal[i] = 1;
+        plane->SetNormal(normal[0],normal[1],normal[2]);
+        for (int p = 1; p < numProcs; ++p)
+          {
+          this->Controller->TriggerRMI
+            (p,(void*)normal,3*sizeof(double),PLANE_RMI);
+          }      
+        }  
       // render
       renWin->Render();
       this->NoteTime(prm);
@@ -500,7 +507,7 @@ void MyProcess::Execute()
         {
         direction = direction * -1.0;
         }
-      for (int f = 0; f < 36 && doBenchmark; f++)
+      for (int f = 0; f < 36 && changeCamera; f++)
         {        
         camera->Azimuth(direction);
         renderer->ResetCameraClippingRange(bds);
@@ -511,7 +518,7 @@ void MyProcess::Execute()
 
     //TODO: should also test with camera zoomed in
 
-    double thresh=10;
+    //double thresh=10;
     int i;
     VTK_CREATE(vtkTesting, testing);
     for (i = 0; i < this->Argc; ++i)
@@ -587,9 +594,7 @@ int main(int argc, char **argv)
 
   vtkMultiProcessController::SetGlobalController(contr);
 
-  int numProcs = contr->GetNumberOfProcesses();
   int me = contr->GetLocalProcessId();
-
   if (!contr->IsA("vtkMPIController"))
     {
     if (me == 0)
