@@ -224,7 +224,8 @@
           <Property name="Background" />
           <!-- RenderWindow -->
           <Property name="ImageReductionFactor" />
-          <Property name="SquirtLevel" />
+
+<!--          <Property name="SquirtLevel" />  -->
           <Property name="DisableOrderedCompositing" />
           <Property name="RemoteRenderThreshold" />
         </ExposedProperties>
@@ -297,7 +298,7 @@
           <Property name="Background" />
           <!-- RenderWindow -->
           <Property name="ImageReductionFactor" />
-          <Property name="SquirtLevel" />
+<!--          <Property name="SquirtLevel" />  -->
           <Property name="DisableOrderedCompositing" />
           <Property name="RemoteRenderThreshold" />
         </ExposedProperties>
@@ -858,6 +859,7 @@
        </Documentation>
      </IntVectorProperty>
 
+<!--
      <IntVectorProperty 
         name="BlockReadSize"
         command="SetBlockReadSize"
@@ -867,6 +869,7 @@
          This property specifies the skip dimension.
        </Documentation>
      </IntVectorProperty>
+-->
 
      <IntVectorProperty 
         name="SwapEndian"
@@ -1120,7 +1123,7 @@
         name="Degree"
         command="SetDegree"
         number_of_elements="1"
-        default_values="2">
+        default_values="8">
         <IntRangeDomain name="range" min="2"/>
         <Documentation>
           This controls the number of children each piece will be split into when it is refined.
@@ -1131,7 +1134,7 @@
         name="Rate"
         command="SetRate"
         number_of_elements="1"
-        default_values="8">
+        default_values="2">
          <IntRangeDomain name="range" min="1"/>
          <Documentation>
           This controls the sampling rate in a dimension of the multi-resolution levels.

@@ -26,7 +26,6 @@
 
 #include "vtkImageAlgorithm.h"
 
-class vtkRSRFileSkimmer2;
 class vtkMetaInfoDatabase;
 class vtkGridSampler2;
 
@@ -52,23 +51,15 @@ public:
   vtkSetVector3Macro(Spacing, double);
   vtkGetVector3Macro(Spacing, double);
 
-  vtkSetVector3Macro(Stride, int);
-  vtkGetVector3Macro(Stride, int);
-
-  vtkSetMacro(BlockReadSize, int);
-  vtkGetMacro(BlockReadSize, int);
-
   // Description:
   // Checks for presence of preprocessed files.
   int CanReadFile(const char *filename);
 
-#ifndef _WIN32
-  float* SetupMap(size_t);  
-#endif
-
 protected:
   vtkRawStridedReader2();
   ~vtkRawStridedReader2();
+
+  int Read(float* data, int* uExtents);
 
   // Description:
   // Overridden to provide meta info when available and to catch whole extent requests
@@ -90,37 +81,16 @@ protected:
     vtkInformationVector** inputVector,
     vtkInformationVector* outputVector);
 
-  // Description:
-  // Overridden for debugging.
-  virtual int RequestUpdateExtent(
-    vtkInformation* request,
-    vtkInformationVector** inputVector,
-    vtkInformationVector* outputVector);
-
   char *Filename;
   int WholeExtent[6];
   int sWholeExtent[6];
   int Dimensions[3];
   double Origin[3];
   double Spacing[3];
-
-  //user requested stride
-  int Stride[3];
-  int UpdateExtent[6];
+  int SwapBytes;
 
   //actual produced resolution
   double Resolution;
-
-  //computed stride
-  int SI;
-  int SJ;
-  int SK;
-
-  //buffer size to read off of disk into
-  int BlockReadSize;
-
-  //Does file I/O
-  vtkRSRFileSkimmer2 *Skimmer;
 
   //Stores meta information as it is obtained.
   vtkMetaInfoDatabase *RangeKeeper;
@@ -135,10 +105,11 @@ protected:
   vtkIdType lastresolution;
 
 #ifndef _WIN32
-  size_t chunk;
+  int chunk;
   float* map;
   size_t mapsize;
   void TearDownMap();
+  void SetupMap(int);  
 #endif
 
   void SetupFile();

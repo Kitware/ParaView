@@ -1,14 +1,14 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqAdaptiveMainWindowCore.h
+   Module:    adaptiveMainWindow.h
 
-   Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
+   Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
    under the terms of the ParaView license version 1.2. 
-
+   
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
    Kitware Inc.
@@ -28,54 +28,50 @@ LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-=========================================================================*/
+========================================================================*/
+#ifndef __adaptiveMainWindow_h 
+#define __adaptiveMainWindow_h
 
-#ifndef _pqAdaptiveMainWindowCore_h
-#define _pqAdaptiveMainWindowCore_h
+#include <QMainWindow>
 
-#include <QObject>
-#include "pqMainWindowCore.h"
+class pqView;
 
-/** \brief Provides a standardized main window for ParaView applications -
-application authors can derive from pqMainWindowCore and call its member functions
-to use as-much or as-little of the standardized functionality as desired */
-
-class pqAdaptiveMainWindowCore :
-  public pqMainWindowCore
+/// MainWindow for the default ParaView application.
+class adaptiveMainWindow : public QMainWindow
 {
   Q_OBJECT
-  typedef pqMainWindowCore Superclass;
-
+  typedef QMainWindow Superclass;
 public:
-  pqAdaptiveMainWindowCore();
-  ~pqAdaptiveMainWindowCore();
+  adaptiveMainWindow();
+  ~adaptiveMainWindow();
 
-  /// Setup a proxy tab widget, attaching it to the given dock
-  virtual pqProxyTabWidget* setupProxyTabWidget(QDockWidget* parent);
-  
 signals:
-  //called to put information messages on the UI. The main app wathces this
   void setMessage(const QString&);
 
 protected slots:
+  void showHelpForProxy(const QString& proxyname);
 
   /// Called when the active view in the pqActiveView singleton changes.
-  // this turns on automatic rerendering to drive streaming
   virtual void onActiveViewChanged(pqView* view);
 
-  // this is called after every render to schedule the next, if needed
+  // Every render has a chance to schedule additional renders if multipass is 
+  // needed
   void scheduleNextPass();
-
-  // can accept signal tells streaming it stop what it is doing
   void stopAdaptive();
-  virtual void onPostAccept();
-  
-  //disable auto show
-  virtual void onRemovingSource(pqPipelineSource *source);
+
 protected:
 
+  bool StopAdaptive;
   int Pass;
+
+private:
+  adaptiveMainWindow(const adaptiveMainWindow&); // Not implemented.
+  void operator=(const adaptiveMainWindow&); // Not implemented.
+
+  class pqInternals;
+  pqInternals* Internals;
 };
 
-#endif // !_pqAdaptiveMainWindowCore_h
+#endif
+
 

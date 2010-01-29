@@ -27,7 +27,7 @@
   }
 #endif
 
-vtkCxxRevisionMacro(vtkGridSampler2, "1.4");
+vtkCxxRevisionMacro(vtkGridSampler2, "1.5");
 vtkStandardNewMacro(vtkGridSampler2);
 
 //define to 1 to adapt for thin k dimension
@@ -115,12 +115,12 @@ void vtkGridSampler2::ComputeSplits(int *pathLen, int **splitPath)
       axis = 2;
       dims[2] = dims[2] / rate + (dims[2] % rate > 0 ? 1 : 0);
       }
-    else if (dims[1] >= dims[0] && dims[1]/rate >= 1)
+    else if (dims[1] >= dims[0] && dims[1] / rate >= 1)
       {
       axis = 1;
       dims[1] = dims[1] / rate + (dims[1] % rate > 0 ? 1 : 0);
       }
-    else if (dims[0]/rate >= 1)
+    else if (dims[0] / rate >= 1)
       {
       axis = 0;
       dims[0] = dims[0] / rate + (dims[0] % rate > 0 ? 1 : 0);
