@@ -29,6 +29,7 @@ The U.S. Government has rights to use, reproduce, and distribute this software.
 NEITHER THE GOVERNMENT NOR LOS ALAMOS NATIONAL SECURITY, LLC MAKES ANY WARRANTY,
 EXPRESS OR IMPLIED, OR ASSUMES ANY LIABILITY FOR THE USE OF THIS SOFTWARE.  
 If software is modified to produce derivative works, such modified software 
+
 should be clearly marked, so as not to confuse it with the version available 
 from LANL.
  
@@ -77,13 +78,13 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <Model/Groups/DynBVH.h>
 #include <Model/Groups/Group.h>
 
-vtkCxxRevisionMacro(vtkMantaActor, "1.8");
+vtkCxxRevisionMacro(vtkMantaActor, "1.9");
 vtkStandardNewMacro(vtkMantaActor);
 
 //----------------------------------------------------------------------------
-vtkMantaActor::vtkMantaActor() : Group(0), MantaAS(0), Renderer(0)
+vtkMantaActor::vtkMantaActor() : Group(0), MantaAS(0)
 {
-  cerr << "CREATE MANTA ACTOR " << this << endl;
+  cerr << "MA(" << this << ") CREATE" << endl;
   this->MantaManager = NULL;
 }
 
@@ -92,19 +93,7 @@ vtkMantaActor::vtkMantaActor() : Group(0), MantaAS(0), Renderer(0)
 //
 vtkMantaActor::~vtkMantaActor()
 {
-  cerr << "DESTROY MANTA ACTOR " << this << endl;
-  if ( this->Group && 
-       this->Renderer &&
-       this->MantaAS
-     )
-    {
-    if ( this->Renderer->GetRenderWindow() )
-      {
-      this->RemoveObjects( this->Renderer, true );
-      }
-    }
-
-  this->Renderer = NULL;
+  cerr << "MA(" << this << ") DESTROY" << endl;
   if (this->MantaManager)
     {
     this->MantaManager->Delete();
@@ -126,46 +115,21 @@ vtkProperty *vtkMantaActor::MakeProperty()
 //----------------------------------------------------------------------------
 void vtkMantaActor::ReleaseGraphicsResources( vtkWindow * win )
 {
-  cerr << "MANTA ACTOR RELEASE " << this << endl;
+  cerr << "MA(" << this << ") RELEASE GRAPHICS RESOURCES" << endl;
   this->Superclass::ReleaseGraphicsResources( win );
 
-  if (!win)
-    {
-    // called by vtkRenderer::SetRenderWindow() with win==0 at initialization
-    return;
-    }
-
-  if (!this->MantaAS)
+  if (!this->MantaManager)
     {
     return;
     }
-
-  if (vtkRenderWindow * renWin = vtkRenderWindow::SafeDownCast(win))
-    {
-    vtkRendererCollection * renders = renWin->GetRenderers();
-    if (vtkMantaRenderer * mantaRenderer = vtkMantaRenderer::SafeDownCast(
-        renders->GetFirstRenderer()))
-      {
-#if 0
-      // TODO: We can't remove the object this way, when PV is shutting down,
-      // mantaRenderer->MantaEngine is already invalid at this point.
-      mantaRenderer->GetMantaEngine()->
-      addTransaction(
-          "delete geometry",
-          Manta::Callback::create( this,
-              &vtkMantaActor::RemoveObjects,
-              renders->GetFirstRenderer(),
-              true
-          )
-      );
-#else
-      // TODO: We can't remove the object this way either, when PV is still running and
-      // the user deletes the actor, the Manta Engine may be still running and cause
-      // thread safety issue.
-      //this->RemoveObjects( renders->GetFirstRenderer(), true );
-#endif
-      }
-    }
+  this->MantaManager->GetMantaEngine()->
+    addTransaction(
+                   "delete geometry",
+                   Manta::Callback::create( this,
+                                            &vtkMantaActor::RemoveObjects,
+                                            true
+                                            )
+                   );
 }
 
 //----------------------------------------------------------------------------
@@ -173,9 +137,10 @@ void vtkMantaActor::Render( vtkRenderer * ren, vtkMapper * mapper )
 {
   if ( vtkMantaRenderer * mantaRenderer = vtkMantaRenderer::SafeDownCast( ren ) )
     {
-    if (!this->Renderer)
+    if (!this->MantaManager)
       {
-      this->Renderer = mantaRenderer;
+      this->MantaManager = mantaRenderer->GetMantaManager();
+      this->MantaManager->Register(this);
       }
 
     // TODO: be smarter on update or create rather than create every time
@@ -196,7 +161,7 @@ void vtkMantaActor::Render( vtkRenderer * ren, vtkMapper * mapper )
 
       this->MeshMTime.Modified();
 
-      mantaRenderer->GetMantaEngine()->addTransaction
+      this->MantaManager->GetMantaEngine()->addTransaction
         ("update geometry",
          Manta::Callback::create(this, &vtkMantaActor::UpdateObjects, ren));
       }
@@ -210,15 +175,14 @@ void vtkMantaActor::SetVisibility(int newval)
     {
     return;
     }
-  if (this->Renderer && !newval)
+  if (this->MantaManager && !newval)
     {
     //this is necessary since Render (and thus UpdateObjects) is not 
     //called when visibility is off.
-    this->Renderer->GetMantaEngine()->addTransaction
+    this->MantaManager->GetMantaEngine()->addTransaction
       ( "detach geometry",
         Manta::Callback::create( this,
                                  &vtkMantaActor::RemoveObjects,
-                                 (vtkRenderer*)this->Renderer,
                                  false
                                )
       );
@@ -227,21 +191,20 @@ void vtkMantaActor::SetVisibility(int newval)
 }
 
 //----------------------------------------------------------------------------
-void vtkMantaActor::RemoveObjects( vtkRenderer * ren, bool deleteMesh )
-{
-  vtkMantaRenderer * mantaRenderer =
-    vtkMantaRenderer::SafeDownCast( ren );
-  if (!mantaRenderer)
+void vtkMantaActor::RemoveObjects(bool deleteMesh )
+{  
+  cerr << "MA(" << this << ") REMOVE OBJECTS" << endl;
+  if (!this->MantaManager)
     {
     return;
     }
-  
+
   if (this->MantaAS)
     {
     //TODO: I think the old group can and should be deleted too
     this->MantaAS->setGroup( NULL ); 
 
-    mantaRenderer->GetMantaWorldGroup()->remove( this->MantaAS, true );
+    this->MantaManager->GetMantaWorldGroup()->remove( this->MantaAS, true );
     //delete this->MantaAS; //TODO: does remove above to this? This is double delete F.S.R.
     this->MantaAS = NULL;
     }
@@ -261,6 +224,8 @@ void vtkMantaActor::RemoveObjects( vtkRenderer * ren, bool deleteMesh )
 //----------------------------------------------------------------------------
 void vtkMantaActor::UpdateObjects( vtkRenderer * ren )
 {
+  cerr << "MA(" << this << ") UPDATE" << endl;
+
   vtkMantaRenderer * mantaRenderer =
     vtkMantaRenderer::SafeDownCast( ren );
   if (!mantaRenderer)
@@ -276,7 +241,7 @@ void vtkMantaActor::UpdateObjects( vtkRenderer * ren )
   //during sort or during search.
 
   //Remove whatever we used to show in the scene
-  this->RemoveObjects(ren, false);
+  this->RemoveObjects(false);
 
   if (this->Group)
     {
@@ -290,7 +255,8 @@ void vtkMantaActor::UpdateObjects( vtkRenderer * ren )
     for (unsigned int i = 0; i < this->Group->size(); i++)
       {
       Manta::DynBVH *innerBVH = new Manta::DynBVH();
-      Manta::Group * innerGroup = static_cast<Manta::Group *>(this->Group->get(i));
+      Manta::Group * innerGroup = static_cast<Manta::Group *>
+        (this->Group->get(i));
       if (innerGroup)
         {
         innerBVH->setGroup(innerGroup);
@@ -303,11 +269,11 @@ void vtkMantaActor::UpdateObjects( vtkRenderer * ren )
         }
       }
     this->MantaAS->setGroup(group);
-    Manta::Group* mantaWorldGroup = mantaRenderer->GetMantaWorldGroup();
+    Manta::Group* mantaWorldGroup = this->MantaManager->GetMantaWorldGroup();
     mantaWorldGroup->add(static_cast<Manta::Object *> (this->MantaAS));
 
-    Manta::PreprocessContext context(mantaRenderer->GetMantaEngine(), 0, 1,
-                                     mantaRenderer->GetMantaLightSet());
+    Manta::PreprocessContext context(this->MantaManager->GetMantaEngine(), 0, 1,
+                                     this->MantaManager->GetMantaLightSet());
     mantaWorldGroup->preprocess(context);
     }
 }

@@ -104,6 +104,10 @@ public:
   vtkGetMacro(MantaTexture, Manta::Texture<Manta::Color>*);
   //ETX
 
+  //Description:
+  //Internal callbacks for manta thread use.
+  //Do not call them directly.
+  void FreeMantaResources();
   //BTX
 protected:
   vtkMantaTexture();

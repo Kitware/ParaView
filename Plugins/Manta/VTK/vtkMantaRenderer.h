@@ -73,7 +73,6 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace Manta {
 class MantaInterface;
 class Scene;
-class Object;
 class Group;
 class LightSet;
 class Factory;
@@ -96,46 +95,10 @@ public:
   void DeviceRender();
 
   // Description:
-  // Internal method temporarily removes lights before reloading them
-  // into graphics pipeline.
-  void ClearLights(void);
-
-  // Description:
   // Ask lights to load themselves into graphics pipeline.
   int UpdateLights(void);
 
   //BTX
-  // Regular non-vtkSetGet functions are used here as Manta does NOT
-  // adopt reference-counting to manage objects. Otherwise it would
-  // complicate the memory management issue due to the inconsistency.
-  void SetMantaEngine( Manta::MantaInterface * engine )
-  { 
-    this->MantaEngine = engine;
-  }
-  void SetMantaFactory( Manta::Factory * factory )
-  {
-    this->MantaFactory = factory;
-  }
-  void SetMantaScene( Manta::Scene * scene )
-  { 
-    this->MantaScene = scene;
-  }
-  void SetMantaWorldGroup( Manta::Group * group )
-  { 
-    this->MantaWorldGroup = group;
-  }
-  void SetMantaLightSet( Manta::LightSet * lightSet )
-  {
-    this->MantaLightSet = lightSet;
-  }
-  void SetMantaCamera( Manta::Camera * camera )
-  {
-    this->MantaCamera = camera;
-  }
-  void SetSyncDisplay( Manta::SyncDisplay * syncDisplay )
-  { 
-    this->SyncDisplay = syncDisplay;
-  }
   Manta::MantaInterface* GetMantaEngine()    
   { 
   return this->MantaEngine;
@@ -174,20 +137,31 @@ public:
   }
   //ETX
 
-//  vtkGetMacro(LayerBuffer, float*);
-//  vtkGetMacro(DepthBuffer, float*);
+  vtkMantaManager* GetMantaManager()
+  {
+    return this->MantaManager;
+  }
+
   vtkSetMacro(ChannelId, int);
-  vtkGetMacro(ChannelId, int);
 
   //Description:
   //Changes the number of manta rendering threads.
   void ChangeNumberOfWorkers(int numWorkers);
 
   //Description:
-  //Callback to set manta engine's background
-  void SetMantaBackground();
-
+  // Overridded to use manta callbacks to do the work.
   virtual void SetBackground(double r, double g, double b);
+
+  // Description:
+  // Turns off all lighting
+  void ClearLights(void);
+
+  //Description:
+  //Internal callbacks for manta thread use.
+  //Do not call them directly.
+  void InternalSetBackground();
+  void InternalClearLights();
+
 protected:
   vtkMantaRenderer();
   ~vtkMantaRenderer();

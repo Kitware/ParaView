@@ -73,29 +73,29 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkRenderWindow.h"
 #include "vtkTimerLog.h"
 
+#include <Core/Color/Color.h>
+#include <Core/Color/ColorDB.h>
+#include <Core/Color/RGBColor.h>
+#include <Engine/Control/RTRT.h>
+#include <Engine/Display/NullDisplay.h>
+#include <Engine/Display/SyncDisplay.h>
+#include <Engine/Factory/Create.h>
+#include <Engine/Factory/Factory.h>
 #include <Image/SimpleImage.h>
+#include <Interface/Context.h>
 #include <Interface/Light.h>
 #include <Interface/LightSet.h>
 #include <Interface/Scene.h>
 #include <Interface/Object.h>
-#include <Interface/Context.h>
-#include <Engine/Control/RTRT.h>
-#include <Engine/Factory/Create.h>
-#include <Engine/Factory/Factory.h>
-#include <Engine/Display/NullDisplay.h>
-#include <Engine/Display/SyncDisplay.h>
 #include <Model/AmbientLights/ConstantAmbient.h>
-#include <Model/Lights/HeadLight.h>
-#include <Model/Groups/Group.h>
 #include <Model/Backgrounds/ConstantBackground.h>
-#include <Core/Color/Color.h>
-#include <Core/Color/ColorDB.h>
-#include <Core/Color/RGBColor.h>
+#include <Model/Groups/Group.h>
+#include <Model/Lights/HeadLight.h>
 
 
 #include <vtkstd/string>
 
-vtkCxxRevisionMacro(vtkMantaRenderer, "1.9");
+vtkCxxRevisionMacro(vtkMantaRenderer, "1.10");
 vtkStandardNewMacro(vtkMantaRenderer);
 
 //----------------------------------------------------------------------------
@@ -104,7 +104,7 @@ vtkMantaRenderer::vtkMantaRenderer() :
   IsStereo( false ), MaxDepth( 5 ), MantaScene( 0 ), MantaWorldGroup( 0 ),
   MantaLightSet( 0 ), MantaCamera( 0 ), SyncDisplay( 0 )
 {
-  cerr << "CREATE MANTA RENDERER " << this << endl;
+  cerr << "MR(" << this << ") CREATE" << endl;
   // the default global ambient light created by vtkRenderer is too bright.
   this->SetAmbient( 0.1, 0.1, 0.1 );
 
@@ -139,34 +139,8 @@ vtkMantaRenderer::vtkMantaRenderer() :
 //----------------------------------------------------------------------------
 vtkMantaRenderer::~vtkMantaRenderer()
 {
-  cerr << "DESTROY MANTA RENDERER " << this << endl;
-
-  // don't do anything if the engine is not even initialized
-  // it is the case for the 2nd renderer in PV.
-  if ( this->EngineStarted )
-    {
-    // Stop the Manta Engine
-    this->MantaEngine->finish();
-    this->GetSyncDisplay()->doneRendering();
-    this->MantaEngine->blockUntilFinished();
-    }
-
-  // we don't have to delete each Manta::Light in the Manta::LightSet, they
-  // are deleted by ~vtkMantaLight()
-  delete this->MantaLightSet->getAmbientLight();
-  delete this->MantaLightSet;
-  delete this->MantaCamera;
-
-  // Manta::Scene is not responsible for de-allocating the referenced
-  // (shallow-copied) Manta::ConstantBackground object created in Initialize()
-  delete this->MantaScene->getBackground();
-  this->MantaScene->setBackground( NULL );
-  delete this->MantaScene;
-
-  delete this->MantaWorldGroup;
-#if 0
-  delete this->SyncDisplay;
-#endif
+  cerr << "MR(" << this << ") DESTROY" << endl;
+  this->MantaManager->Delete();
 
   if (this->ColorBuffer)
     {
@@ -176,50 +150,24 @@ vtkMantaRenderer::~vtkMantaRenderer()
     {
     delete[] this->DepthBuffer;
     }
-
-  this->MantaManager->Delete();
 }
 
 //----------------------------------------------------------------------------
 void vtkMantaRenderer::InitEngine()
 {
-  // create an empty Manta scene with background
-  this->MantaScene = new Manta::Scene();
-  this->MantaScene->getRenderParameters().setMaxDepth( this->MaxDepth );
-  double *color = this->GetBackground();
-  Manta::ConstantBackground * background = new Manta::ConstantBackground(
-    Manta::Color(  Manta::RGBColor( color[0], color[1], color[2] )  )  );
-  this->MantaScene->setBackground( background );
+  cerr << "MR(" << this << ") INIT" << endl;
+  this->MantaManager->StartEngine(this->MaxDepth,
+                                  this->GetBackground(),
+                                  this->Ambient,
+                                  this->IsStereo,
+                                  this->GetSize());
 
-  // create empty world group
-  this->MantaWorldGroup = new Manta::Group();
-  this->MantaScene->setObject( this->MantaWorldGroup );
-
-  // create empty LightSet with ambient light
-  double *ambient = this->Ambient;
-  this->MantaLightSet = new Manta::LightSet();
-  this->MantaLightSet->setAmbientLight( new Manta::ConstantAmbient(
-    Manta::Color(  Manta::RGBColor( ambient[0], ambient[1], ambient[2] )
-                ) ) );
-  this->MantaScene->setLights( this->MantaLightSet );
-  this->MantaEngine->setScene( this->MantaScene );
-
-  // create the mantaCamera singleton,
-  // it is the only camera we create per renderer
-  this->MantaCamera = this->MantaFactory->
-    createCamera( "pinhole(-normalizeRays -createCornerRays)" );
-
-  // Use SyncDisplay with Null Display to stop Manta engine at each frame,
-  // the image is combined with OpenGL framebuffer by vtkXMantaRenderWindow
-  vtkstd::vector<vtkstd::string> vs;
-  this->SyncDisplay = new Manta::SyncDisplay( vs );
-  // TODO: memory leak, NullDisplay is not deleted
-  this->SyncDisplay->setChild(  new Manta::NullDisplay( vs )  );
-
-  //Set screen size
-  int *size = this->GetSize();
-  this->ChannelId = this->MantaEngine->createChannel( this->SyncDisplay,
-    this->MantaCamera, this->IsStereo, size[0], size[1] );
+  this->MantaScene = this->MantaManager->GetMantaScene();
+  this->MantaWorldGroup = this->MantaManager->GetMantaWorldGroup();
+  this->MantaLightSet = this->MantaManager->GetMantaLightSet();
+  this->MantaCamera = this->MantaManager->GetMantaCamera();
+  this->SyncDisplay = this->MantaManager->GetSyncDisplay();
+  this->ChannelId = this->MantaManager->GetChannelId();
 
   this->EngineInited = true;
 }
@@ -234,17 +182,18 @@ void vtkMantaRenderer::SetBackground(double r, double g, double b)
   this->Superclass::SetBackground(r,g,b);
   this->MantaEngine->addTransaction
     ( "set background",
-      Manta::Callback::create( this, &vtkMantaRenderer::SetMantaBackground) );
+      Manta::Callback::create(this, &vtkMantaRenderer::InternalSetBackground));
   }; 
 }
 
 //----------------------------------------------------------------------------
-void vtkMantaRenderer::SetMantaBackground()
+void vtkMantaRenderer::InternalSetBackground()
 {
-  cerr << "CALLBACK" << endl;
   double *color = this->GetBackground();
   Manta::ConstantBackground * background = new Manta::ConstantBackground(
     Manta::Color(  Manta::RGBColor( color[0], color[1], color[2] )  )  );
+
+  delete this->MantaScene->getBackground();
   this->MantaScene->setBackground( background );
 }
 
@@ -263,14 +212,23 @@ void vtkMantaRenderer::ChangeNumberOfWorkers(int numWorkers)
 //----------------------------------------------------------------------------
 void vtkMantaRenderer::ClearLights(void)
 {
-  //TODO: This change needs to be scheduled
-  delete this->MantaLightSet->getAmbientLight();
+  this->MantaEngine->addTransaction
+    ( "clear lights",
+      Manta::Callback::create( this, &vtkMantaRenderer::InternalClearLights));
+}
 
-  for ( unsigned int i = 0; i < this->MantaLightSet->numLights(); i ++ )
+//----------------------------------------------------------------------------
+void vtkMantaRenderer::InternalClearLights(void)
+{
+  if (this->MantaLightSet)
     {
-    Manta::Light *currentLight = this->MantaLightSet->getLight( i );
-    this->MantaLightSet->remove( currentLight );
-    delete currentLight;
+    delete this->MantaLightSet->getAmbientLight();
+    for ( unsigned int i = 0; i < this->MantaLightSet->numLights(); i ++ )
+      {
+      Manta::Light *light = this->MantaLightSet->getLight( i );
+      this->MantaLightSet->remove( light );
+      delete light;
+      }
     }
 }
 

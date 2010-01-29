@@ -112,7 +112,7 @@ public:
   
   //Description:
   // Transaction callback that hides the object
-  void RemoveObjects(vtkRenderer * ren, bool deleteMesh );
+  void RemoveObjects(bool deleteMesh );
 
   //BTX
   //TODO: This leaks whatever was there, but must schedule its deletion because of threading
@@ -142,8 +142,7 @@ public:
  private:
   vtkMantaActor(const vtkMantaActor&);  // Not implemented.
   void operator=(const vtkMantaActor&);  // Not implemented.
-  
-  vtkMantaRenderer * Renderer;
+
   void UpdateObjects(vtkRenderer *);
   vtkTimeStamp MeshMTime;
     

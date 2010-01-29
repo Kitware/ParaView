@@ -75,13 +75,13 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <math.h>
 
-vtkCxxRevisionMacro(vtkMantaLight, "1.4");
+vtkCxxRevisionMacro(vtkMantaLight, "1.5");
 vtkStandardNewMacro(vtkMantaLight);
 
 //----------------------------------------------------------------------------
 vtkMantaLight::vtkMantaLight() : MantaLight(0)
 {
-  cerr << "CREATE MANTA LIGHT " << this << endl;
+  cerr << "ML(" << this << ") CREATE" << endl;
   this->MantaLight = NULL;
   this->MantaManager = NULL;
 }
@@ -89,11 +89,7 @@ vtkMantaLight::vtkMantaLight() : MantaLight(0)
 //----------------------------------------------------------------------------
 vtkMantaLight::~vtkMantaLight()
 {
-  cerr << "DESTROY MANTA LIGHT " << this << endl;
-
-  // TODO: do we have to remove MantaLight from MantaLightSet?
-  // Ans: We should, but Manta Materials are holding pointers to
-  // the MantaLight in their local lightset cache.
+  cerr << "ML(" << this << ") DESTROY" << endl;
   delete this->MantaLight;
   if (this->MantaManager)
     {
@@ -105,6 +101,72 @@ vtkMantaLight::~vtkMantaLight()
 void vtkMantaLight::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
+}
+
+//----------------------------------------------------------------------------
+void vtkMantaLight::Render(vtkRenderer *ren, int /* not used */)
+{
+  vtkMantaRenderer *mantaRenderer = vtkMantaRenderer::SafeDownCast(ren);
+  if (!mantaRenderer)
+    {
+    return;
+    }
+
+  if (!this->MantaLight)
+    {
+    mantaRenderer->GetMantaEngine()->addTransaction(
+        "create light",
+        Manta::Callback::create(this,
+            &vtkMantaLight::CreateMantaLight,
+            ren));
+    }
+  else
+    {
+    mantaRenderer->GetMantaEngine()->addTransaction(
+        "update light",
+        Manta::Callback::create(this,
+            &vtkMantaLight::UpdateMantaLight,
+            ren));
+    }
+}
+
+//----------------------------------------------------------------------------
+// called in Transaction context, it is safe to modify the engine state here
+void vtkMantaLight::CreateMantaLight(vtkRenderer *ren)
+{
+  vtkMantaRenderer *mantaRenderer = vtkMantaRenderer::SafeDownCast(ren);
+  if (!mantaRenderer)
+    {
+    return;
+    }
+
+  double *color, *position, *focal, direction[3];
+
+  // Manta Lights only have one "color"
+  color    = this->GetColor();
+  position = this->GetTransformedPosition();
+  focal    = this->GetTransformedFocalPoint();
+
+  if (this->GetPositional())
+    {
+    this->MantaLight = new Manta::PointLight(
+      Manta::Vector(position[0], position[1], position[2]),
+      Manta::Color(Manta::RGBColor(color[0],color[1],color[2])));
+    }
+  else
+    {
+    // "direction" in Manta means the direction toward light source rather than the
+    // direction of rays originate from light source
+    direction[0] = position[0] - focal[0];
+    direction[1] = position[1] - focal[1];
+    direction[2] = position[2] - focal[2];
+    this->MantaLight = new Manta::DirectionalLight(
+      Manta::Vector(direction[0], direction[1], direction[2]),
+      Manta::Color(Manta::RGBColor(color[0],color[1],color[2])));
+    }
+  mantaRenderer->GetMantaLightSet()->add(this->MantaLight);
+  this->MantaManager = mantaRenderer->GetMantaManager();
+  this->MantaManager->Register(this);
 }
 
 //------------------------------------------------------------------------------
@@ -156,69 +218,5 @@ void vtkMantaLight::UpdateMantaLight(vtkRenderer *ren)
       vtkWarningMacro
         (<< "Changing from Positional to Directional light is not supported by vtkManta" );
       }
-    }
-}
-
-//----------------------------------------------------------------------------
-// called in Transaction context, it is safe to modify the engine state here
-void vtkMantaLight::CreateMantaLight(vtkRenderer *ren)
-{
-  vtkMantaRenderer *mantaRenderer = vtkMantaRenderer::SafeDownCast(ren);
-  if (!mantaRenderer)
-    {
-    return;
-    }
-
-  double *color, *position, *focal, direction[3];
-
-  // Manta Lights only have one "color"
-  color    = this->GetColor();
-  position = this->GetTransformedPosition();
-  focal    = this->GetTransformedFocalPoint();
-
-  if (this->GetPositional())
-    {
-    this->MantaLight = new Manta::PointLight(
-      Manta::Vector(position[0], position[1], position[2]),
-      Manta::Color(Manta::RGBColor(color[0],color[1],color[2])));
-    }
-  else
-    {
-    // "direction" in Manta means the direction toward light source rather than the
-    // direction of rays originate from light source
-    direction[0] = position[0] - focal[0];
-    direction[1] = position[1] - focal[1];
-    direction[2] = position[2] - focal[2];
-    this->MantaLight = new Manta::DirectionalLight(
-      Manta::Vector(direction[0], direction[1], direction[2]),
-      Manta::Color(Manta::RGBColor(color[0],color[1],color[2])));
-    }
-  mantaRenderer->GetMantaLightSet()->add(this->MantaLight);
-}
-
-//----------------------------------------------------------------------------
-void vtkMantaLight::Render(vtkRenderer *ren, int /* not used */)
-{
-  vtkMantaRenderer *mantaRenderer = vtkMantaRenderer::SafeDownCast(ren);
-  if (!mantaRenderer)
-    {
-    return;
-    }
-
-  if (this->MantaLight)
-    {
-    mantaRenderer->GetMantaEngine()->addTransaction(
-        "update light",
-        Manta::Callback::create(this,
-            &vtkMantaLight::UpdateMantaLight,
-            ren));
-    }
-  else
-    {
-    mantaRenderer->GetMantaEngine()->addTransaction(
-        "create light",
-        Manta::Callback::create(this,
-            &vtkMantaLight::CreateMantaLight,
-            ren));
     }
 }

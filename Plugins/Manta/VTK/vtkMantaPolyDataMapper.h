@@ -112,6 +112,11 @@ public:
   // Draw method for Manta.
   virtual void Draw(vtkRenderer *ren, vtkActor *a);
 
+  //Description:
+  //Internal callbacks for manta thread use.
+  //Do not call them directly.
+  void FreeMantaResources();
+
 protected:
   vtkMantaPolyDataMapper();
   ~vtkMantaPolyDataMapper();

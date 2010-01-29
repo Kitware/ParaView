@@ -28,8 +28,13 @@
 
 //BTX
 namespace Manta {
-class MantaInterface;
+class Camera;
 class Factory;
+class Group;
+class LightSet;
+class MantaInterface;
+class Scene;
+class SyncDisplay;
 };
 //ETX
 
@@ -40,6 +45,14 @@ public:
   vtkTypeRevisionMacro(vtkMantaManager,vtkObject);
   virtual void PrintSelf(ostream& os, vtkIndent indent);
 
+  //Description:
+  //Called to setup and start the manta ray tracing engine
+  void StartEngine(int MaxRayDepth,
+                   double *BackGroundColor,
+                   double *AmbientRGB,
+                   bool IsStereo,
+                   int *ViewPortsize);
+
 //BTX
   Manta::MantaInterface* GetMantaEngine()    
   { 
@@ -48,6 +61,30 @@ public:
   Manta::Factory* GetMantaFactory()
   { 
     return this->MantaFactory;
+  }
+  Manta::Scene* GetMantaScene() 
+  { 
+    return this->MantaScene;
+  }
+  Manta::Group* GetMantaWorldGroup() 
+  {
+    return this->MantaWorldGroup;
+  }
+  Manta::LightSet* GetMantaLightSet() 
+  {
+    return this->MantaLightSet;
+  }
+  Manta::Camera* GetMantaCamera()
+  { 
+    return this->MantaCamera;
+  }
+  Manta::SyncDisplay* GetSyncDisplay() 
+  {
+    return this->SyncDisplay;
+  }
+  int GetChannelId()
+  {
+    return this->ChannelId;
   }
 //ETX    
 
@@ -58,11 +95,18 @@ public:
  private:
   vtkMantaManager(const vtkMantaManager&);  // Not implemented.
   void operator=(const vtkMantaManager&);  // Not implemented.
-    
-  //BTX
+
+//BTX    
   Manta::MantaInterface * MantaEngine;
   Manta::Factory * MantaFactory;
-  //ETX
+  Manta::Scene * MantaScene;
+  Manta::Group * MantaWorldGroup;
+  Manta::LightSet * MantaLightSet;
+  Manta::Camera * MantaCamera;
+  Manta::SyncDisplay * SyncDisplay;
+//ETX
+  int ChannelId;
+  bool Started;
 };
 
 #endif

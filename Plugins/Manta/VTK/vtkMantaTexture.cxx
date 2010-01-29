@@ -72,33 +72,27 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPointData.h"
 #include "vtkTransform.h"
 
+#include <Engine/Control/RTRT.h>
 #include <Image/SimpleImage.h>
 #include <Model/Textures/ImageTexture.h>
 
 #include <math.h>
 
-vtkCxxRevisionMacro(vtkMantaTexture, "1.4");
+vtkCxxRevisionMacro(vtkMantaTexture, "1.5");
 vtkStandardNewMacro(vtkMantaTexture);
 
 //----------------------------------------------------------------------------
 // Initializes an instance, generates a unique index.
 vtkMantaTexture::vtkMantaTexture()
 {
-  cerr << "CREATE MANTA TEXTURE " << this << endl;
-  this->RenderWindow = 0;
+  cerr << "MT( " << this << ") CREATE " << endl;
   this->MantaManager = NULL;
 }
 
 //----------------------------------------------------------------------------
 vtkMantaTexture::~vtkMantaTexture()
 {
-  cerr << "DESTROY MANTA TEXTURE " << this << endl;
-
-  if (this->RenderWindow)
-    {
-    this->ReleaseGraphicsResources(this->RenderWindow);
-    }
-  this->RenderWindow = NULL;
+  cerr << "MT( " << this << ") DESTROY " << endl;
   if (this->MantaManager)
     {
     this->MantaManager->Delete();
@@ -107,22 +101,49 @@ vtkMantaTexture::~vtkMantaTexture()
 
 //-----------------------------------------------------------------------------
 // Release the graphics resources used by this texture.
-void vtkMantaTexture::ReleaseGraphicsResources(vtkWindow *renWin)
+void vtkMantaTexture::ReleaseGraphicsResources(vtkWindow *win)
 {
-  //this->RenderWindow = NULL;
-  //this->Modified();
+  cerr << "MT( " << this << ") RELEASE GRAPHICS RESOURCES " << endl;
+  this->Superclass::ReleaseGraphicsResources( win );
+  if (!this->MantaManager)
+    {
+    return;
+    }
+
+  this->MantaManager->GetMantaEngine()->
+    addTransaction(
+                   "delete texture",
+                   Manta::Callback::create(this,
+                                           &vtkMantaTexture::FreeMantaResources
+                                           )
+                   );
+  
+}
+
+//----------------------------------------------------------------------------
+void vtkMantaTexture::FreeMantaResources()
+{
+  cerr << "MT(" << this << ") FREE MANTA RESOURCES " << endl;
+  delete this->MantaTexture;
+  this->MantaTexture = NULL;
 }
 
 //----------------------------------------------------------------------------
 void vtkMantaTexture::Load(vtkRenderer *ren)
 {
+  cerr << "MT(" << this << ") LOAD " << endl;
   vtkImageData *input = this->GetInput();
 
-  vtkMantaRenderWindow* renWin =
-      vtkMantaRenderWindow::SafeDownCast(ren->GetRenderWindow());
-  if (!renWin)
+  vtkMantaRenderer* mantaRenderer =
+      vtkMantaRenderer::SafeDownCast(ren);
+  if (!mantaRenderer)
     {
     return;
+    }
+  if (!this->MantaManager)
+    {
+    this->MantaManager = mantaRenderer->GetMantaManager();
+    this->MantaManager->Register(this);
     }
 
   if (this->GetMTime() > this->LoadTime.GetMTime() ||
@@ -201,8 +222,11 @@ void vtkMantaTexture::Load(vtkRenderer *ren)
       }
 
     // Create Manta Image from input
-    Manta::Image *image = new Manta::SimpleImage<Manta::RGB8Pixel> (false, xsize, ysize);
-    Manta::RGB8Pixel *pixels = dynamic_cast<Manta::SimpleImage<Manta::RGB8Pixel> const*>(image)->getRawPixels(0);
+    Manta::Image *image = 
+      new Manta::SimpleImage<Manta::RGB8Pixel> (false, xsize, ysize);
+    Manta::RGB8Pixel *pixels = 
+      dynamic_cast<Manta::SimpleImage<Manta::RGB8Pixel> const*>(image)->
+      getRawPixels(0);
     Manta::RGB8Pixel pixel;
     for (int v = 0; v < ysize; v++)
       {
@@ -217,9 +241,14 @@ void vtkMantaTexture::Load(vtkRenderer *ren)
       }
 
     // create Manta texture from the image
-    Manta::ImageTexture<Manta::Color> *imgtexture = new Manta::ImageTexture<Manta::Color>(image, false);
+    Manta::ImageTexture<Manta::Color> *imgtexture = 
+      new Manta::ImageTexture<Manta::Color>(image, false);
+
+    //TODO: MEMORY LEAK OF WHAT USED TO BE HERE NEED TRANSACTION
     this->MantaTexture = imgtexture;
+
     imgtexture->setInterpolationMethod(1);
+
     // Manta image is copied and converted to internal buffer in the texture,
     // delete the image
     delete image;

@@ -74,14 +74,13 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <Engine/Control/RTRT.h>
 #include <Engine/Display/SyncDisplay.h>
 
-vtkCxxRevisionMacro(vtkMantaRenderWindow, "1.10");
+vtkCxxRevisionMacro(vtkMantaRenderWindow, "1.11");
 vtkStandardNewMacro(vtkMantaRenderWindow);
 
 //----------------------------------------------------------------------------
 vtkMantaRenderWindow::vtkMantaRenderWindow() : ColorBuffer(0), DepthBuffer(0)
 {
-  cerr << "CREATE MANTA RENDER WINDOW " << this << endl;
-
+  cerr << "MW(" << this << ") CREATE" << endl;
   if ( this->WindowName )
     {
     delete [] this->WindowName;
@@ -96,7 +95,7 @@ vtkMantaRenderWindow::vtkMantaRenderWindow() : ColorBuffer(0), DepthBuffer(0)
 //----------------------------------------------------------------------------
 vtkMantaRenderWindow::~vtkMantaRenderWindow()
 {
-  cerr << "DESTROY MANTA RENDER WINDOW " << this << endl;
+  cerr << "MW(" << this << ") DESTROY" << endl;
 
   vtkRenderer * ren = NULL;
   this->Renderers->InitTraversal();
@@ -215,7 +214,7 @@ void vtkMantaRenderWindow::InternalSetSize( int width, int height )
            Manta::Callback::create
            (mantaRenderer->GetMantaEngine(),
             &Manta::MantaInterface::changeResolution,
-            mantaRenderer->GetChannelId(), renderSize[0], renderSize[1],
+            0 /*mantaRenderer->GetChannelId()*/, renderSize[0], renderSize[1],
             true));
         
         //Wait for manta to: receive the above transaction (after end of current frame),

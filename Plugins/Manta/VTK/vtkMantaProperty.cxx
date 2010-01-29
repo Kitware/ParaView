@@ -67,6 +67,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 
 #include <Core/Color/RGBColor.h>
+#include <Engine/Control/RTRT.h>
 #include <Model/Materials/AmbientOcclusion.h>
 #include <Model/Materials/Dielectric.h>
 #include <Model/Materials/Flat.h>
@@ -80,7 +81,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <cstring>
 
-vtkCxxRevisionMacro(vtkMantaProperty, "1.4");
+vtkCxxRevisionMacro(vtkMantaProperty, "1.5");
 vtkStandardNewMacro(vtkMantaProperty);
 
 //----------------------------------------------------------------------------
@@ -88,8 +89,7 @@ vtkMantaProperty::vtkMantaProperty()
   : MantaMaterial(0), MaterialType(0), diffuseTexture(0), specularTexture(0),
     Reflectance(0.0), Eta(1.52), Thickness(1.0)
 {
-  cerr << "CREATE MANTA PROPERTY " << this << endl;
-
+  cerr << "MP(" << this << ") CREATE" << endl;
   this->MaterialType = NULL;
   this->SetMaterialType("default");
   this->MantaManager = NULL;
@@ -98,30 +98,12 @@ vtkMantaProperty::vtkMantaProperty()
 //----------------------------------------------------------------------------
 vtkMantaProperty::~vtkMantaProperty()
 {
-  cerr << "DESTROY MANTA PROPERTY " << this << endl;
-
-  // TODO: We don't have to test if these pointers are NULL if
-  // we get other parts correct, this only hides memory problems
-  if (this->MantaMaterial) 
-    {
-    delete this->MantaMaterial;
-    }
-  if (this->diffuseTexture) 
-    {
-    delete this->diffuseTexture;
-    }
-  if (this->specularTexture)
-    {
-    delete this->specularTexture;
-    }
-  if (this->MaterialType) 
-    {
-    delete[] this->MaterialType;
-    }
+  cerr << "MP(" << this << ") DESTROY" << endl;
   if (this->MantaManager)
     {
     this->MantaManager->Delete();
     }
+  delete[] this->MaterialType;
 }
 
 //----------------------------------------------------------------------------
@@ -133,24 +115,80 @@ void vtkMantaProperty::PrintSelf( ostream & os, vtkIndent indent )
 //------------------------------------------------------------------------------
 void vtkMantaProperty::ReleaseGraphicsResources(vtkWindow *win)
 {
-  cerr << "MANTA PROPERTY RELEASE " << this << endl;
+  cerr << "MP(" << this << ") RELEASE GRAPHICS RESOURCES" << endl;
   this->Superclass::ReleaseGraphicsResources(win);
+  if (!this->MantaManager)
+    {
+    return;
+    }
+
+  this->MantaManager->GetMantaEngine()->addTransaction
+    ( "cleanup property",
+      Manta::Callback::create(this, &vtkMantaProperty::FreeMantaResources));
+}
+
+//----------------------------------------------------------------------------
+void vtkMantaProperty::Render( vtkActor *vtkNotUsed(anActor),
+                               vtkRenderer * ren)
+{
+  vtkMantaRenderer * mantaRenderer = vtkMantaRenderer::SafeDownCast( ren );
+  if (!mantaRenderer)
+    {
+    return;
+    }
+  if (!this->MantaManager)
+    {
+    this->MantaManager = mantaRenderer->GetMantaManager();
+    this->MantaManager->Register(this);
+    }
+
+  if ( this->GetMTime() > this->MantaMaterialMTime )
+    {    
+    this->MantaManager->GetMantaEngine()->addTransaction
+      ( "set property",
+      Manta::Callback::create(this, &vtkMantaProperty::CreateMantaProperty));
+    this->MantaMaterialMTime.Modified();
+    }
+}
+
+//----------------------------------------------------------------------------
+// Implement base class method.
+void vtkMantaProperty::BackfaceRender( vtkActor * vtkNotUsed( anActor ),
+                                       vtkRenderer * vtkNotUsed( ren ) )
+{
+  // NOT supported by Manta
+  cerr
+    << "vtkMantaProperty::BackfaceRender(), backface rendering "
+    << "is not supported by Manta"
+    << endl;
+}
+
+//----------------------------------------------------------------------------
+void vtkMantaProperty::FreeMantaResources()
+{
+  cerr << "MP(" << this << ") FREE MANTA RESOURCES" << endl;
+  delete this->MantaMaterial;
+  this->MantaMaterial = NULL;
+  delete this->diffuseTexture;
+  this->diffuseTexture = NULL;
+  delete this->specularTexture;
+  this->specularTexture = NULL;
 }
 
 //----------------------------------------------------------------------------
 void vtkMantaProperty::CreateMantaProperty()
 {
+  cerr << "MP(" << this << ") CREATE MANTA PROPERTY" << endl;
   double * diffuse  = this->GetDiffuseColor();
   double * specular = this->GetSpecularColor();
+
+  this->FreeMantaResources();
 
   this->diffuseTexture  = new Manta::Constant<Manta::Color>
     (  Manta::Color( Manta::RGBColor( diffuse[0],  diffuse[1],  diffuse[2]  ) )  );
 
   this->specularTexture = new Manta::Constant<Manta::Color>
     (  Manta::Color( Manta::RGBColor( specular[0], specular[1], specular[2] ) )  );
-
-  diffuse  = NULL;
-  specular = NULL;
 
   // A note on Manta Materials and shading model:
   // 1. Surface normal is computed at each hit point, if the primitive
@@ -194,7 +232,6 @@ void vtkMantaProperty::CreateMantaProperty()
     }
   else
     {
-    // TODO: memory leak, textures created but never deleted
     if ( strcmp( this->MaterialType,  "lambertian" ) == 0 )
       {
       this->MantaMaterial = new Manta::Lambertian( this->diffuseTexture );
@@ -260,26 +297,3 @@ void vtkMantaProperty::CreateMantaProperty()
                     }
     }
 }
-
-//----------------------------------------------------------------------------
-void vtkMantaProperty::Render( vtkActor * anActor, vtkRenderer * ren)
-{
-  if ( this->GetMTime() > this->MantaMaterialMTime )
-    {
-    this->CreateMantaProperty();
-    this->MantaMaterialMTime.Modified();
-    }
-}
-
-//----------------------------------------------------------------------------
-// Implement base class method.
-void vtkMantaProperty::BackfaceRender( vtkActor * vtkNotUsed( anActor ),
-                                       vtkRenderer * vtkNotUsed( ren ) )
-{
-  // NOT supported by Manta
-  cerr
-    << "vtkMantaProperty::BackfaceRender(), backface rendering "
-    << "is not supported by Manta"
-    << endl;
-}
-

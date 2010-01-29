@@ -120,6 +120,12 @@ public:
   vtkGetMacro(MantaMaterial, Manta::Material*);
   //ETX
 
+  //Description:
+  //Internal callbacks for manta thread use.
+  //Do not call them directly.
+  void FreeMantaResources();
+  void CreateMantaProperty();
+
 protected:
   vtkMantaProperty();
   ~vtkMantaProperty();
@@ -128,10 +134,9 @@ private:
   vtkMantaProperty(const vtkMantaProperty&);  // Not implemented.
   void operator=(const vtkMantaProperty&);  // Not implemented.
 
-  void CreateMantaProperty();
-
   // the last time MantaMaterial is modified
   vtkTimeStamp MantaMaterialMTime;
+
   //BTX
   Manta::Material *MantaMaterial;
   Manta::Texture<Manta::Color> *diffuseTexture;

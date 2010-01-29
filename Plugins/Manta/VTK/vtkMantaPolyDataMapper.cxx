@@ -102,14 +102,14 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <math.h>
 
-vtkCxxRevisionMacro(vtkMantaPolyDataMapper, "1.5");
+vtkCxxRevisionMacro(vtkMantaPolyDataMapper, "1.6");
 vtkStandardNewMacro(vtkMantaPolyDataMapper);
 
 //----------------------------------------------------------------------------
 // Construct empty object.
 vtkMantaPolyDataMapper::vtkMantaPolyDataMapper()
 {
-  cerr << "CREATE MANTA POLY DATA MAPPER " << this << endl;
+  cerr << "MM(" << this << ") CREATE" << endl;
   this->InternalColorTexture = NULL;
   this->MantaManager = NULL;
 }
@@ -118,7 +118,7 @@ vtkMantaPolyDataMapper::vtkMantaPolyDataMapper()
 // Destructor (don't call ReleaseGraphicsResources() since it is virtual
 vtkMantaPolyDataMapper::~vtkMantaPolyDataMapper()
 {
-  cerr << "DESTROY MANTA POLY DATA MAPPER " << this << endl;
+  cerr << "MM(" << this << ") DESTROY" << endl;
   if (this->MantaManager)
     {
     this->MantaManager->Delete();
@@ -130,7 +130,30 @@ vtkMantaPolyDataMapper::~vtkMantaPolyDataMapper()
 // the display list if any.
 void vtkMantaPolyDataMapper::ReleaseGraphicsResources(vtkWindow *win)
 {
-  cerr << "MANTA MAPPER RELEASE " << this << endl;
+  cerr << "MM(" << this << ") RELEASE GRAPHICS RESOURCES" << endl;
+  this->Superclass::ReleaseGraphicsResources( win );
+    
+  if (!this->MantaManager)
+    {
+    return;
+    }
+  this->MantaManager->GetMantaEngine()->addTransaction
+    ("delete polyresources",
+     Manta::Callback::create( this,
+                              &vtkMantaPolyDataMapper::FreeMantaResources
+                              )
+     );
+}
+
+//----------------------------------------------------------------------------
+void vtkMantaPolyDataMapper::FreeMantaResources()
+{
+  cerr << "MM(" << this << ") FREE MANTA RESOURCES" << endl;
+  if (this->InternalColorTexture)
+    {
+    this->InternalColorTexture->Delete();
+    }
+  this->InternalColorTexture = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -138,6 +161,18 @@ void vtkMantaPolyDataMapper::ReleaseGraphicsResources(vtkWindow *win)
 // called by Mapper->Render() (which is called by Actor->Render())
 void vtkMantaPolyDataMapper::RenderPiece(vtkRenderer *ren, vtkActor *act)
 {
+  vtkMantaRenderer* mantaRenderer =
+    vtkMantaRenderer::SafeDownCast(ren);
+  if (!mantaRenderer)
+    {
+    return;
+    }
+  if (!this->MantaManager)
+    {
+    this->MantaManager = mantaRenderer->GetMantaManager();
+    this->MantaManager->Register(this);
+    }
+
   // write geometry, first ask the pipeline to update data
   vtkPolyData *input = this->GetInput();
   if (input == NULL)
@@ -181,10 +216,11 @@ void vtkMantaPolyDataMapper::RenderPiece(vtkRenderer *ren, vtkActor *act)
   
   if ( this->ColorTextureMap )
     {
-    if (this->InternalColorTexture == 0)
+    if (!this->InternalColorTexture)
       {
       this->InternalColorTexture = vtkMantaTexture::New();
       this->InternalColorTexture->RepeatOff();
+      this->InternalColorTexture->Register(this);
       }
     this->InternalColorTexture->SetInput(this->ColorTextureMap);
     }
@@ -660,7 +696,8 @@ void vtkMantaPolyDataMapper::Draw(vtkRenderer *renderer, vtkActor *actor)
       // TODO: memory leak, delete material at some point
       if (this->InternalColorTexture)
         {
-        Manta::Texture<Manta::Color> *texture = this->InternalColorTexture->GetMantaTexture();
+        Manta::Texture<Manta::Color> *texture = 
+          this->InternalColorTexture->GetMantaTexture();
         Manta::Material *material = new Manta::Lambertian(texture);
         mesh->materials.push_back( material );
         cerr << "scalar color map with texture\n";
