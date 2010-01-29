@@ -46,3 +46,5 @@ build_paraview_client(adaptive_paraview
     ${CMAKE_CURRENT_SOURCE_DIR}/CustomResources/CustomSources.xml
   SOURCES ${Application_SOURCE_FILES}
 )
+
+ADD_EXECUTABLE(adaptivePreprocessRSR2 downsample.cxx)

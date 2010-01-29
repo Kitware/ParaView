@@ -2,6 +2,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <math.h>
+#include <sys/stat.h>
 
 #ifdef __APPLE__
 #include <mach/mach_time.h>
@@ -79,7 +80,7 @@ int main(int argc, char* argv[]) {
     exit(0);
     }
   
-  unsigned int height = atol(argv[2])+1;
+  unsigned int height = atol(argv[2]) + 1;
   unsigned int degree = atol(argv[3]);
   unsigned int rate = atol(argv[4]);
   
@@ -108,12 +109,14 @@ int main(int argc, char* argv[]) {
   
   FILE** output = new FILE*[height];
   char *fn = new char[strlen(argv[1]) + 256];
+  sprintf(fn, "%s-%d-%d-%ds", argv[1], height - 1, degree, rate);
+  mkdir(fn, 0755);
   for(unsigned int h = 1; h < height; h = h + 1) 
     {
-    sprintf(fn, "%s-%d", argv[1], h);
+    sprintf(fn, "%s-%d-%d-%ds/%d", argv[1], height - 1, degree, rate, h);
     output[h] = fopen(fn, "w");
     
-    printf("%d %d %d = 1 / %d = %d\n", 
+    printf("%lu %lu %lu = 1 / %lu = %lu\n", 
            u[h], v[h], w[h],
            r[h] * s[h] * t[h], 
            u[h] * v[h] * w[h] * sizeof(float));
