@@ -19,15 +19,17 @@
 #include "vtkQtChartMouseSelection.h"
 #include "vtkQtChartWidget.h"
 #include "vtkQtChartView.h"
+#include "vtkSMApplication.h"
 #include "vtkSMChartOptionsProxy.h"
 
 #include <QWidget>
 
-vtkCxxRevisionMacro(vtkSMChartViewProxy, "1.7");
+vtkCxxRevisionMacro(vtkSMChartViewProxy, "1.8");
 //----------------------------------------------------------------------------
 vtkSMChartViewProxy::vtkSMChartViewProxy()
 {
   this->ChartView = 0;
+  this->GetApplication()->EnsureQApplicationIsInitialized();
 }
 
 //----------------------------------------------------------------------------
