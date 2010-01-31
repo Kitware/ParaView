@@ -3,6 +3,10 @@ IF (PARAVIEW_DATA_ROOT)
   include_directories(
     ${TestDriver_SOURCE_DIR}
     )
+
+IF (COPROCESSOR_USE_MPI)
+  INCLUDE_DIRECTORIES(${MPI_INCLUDE_PATH})
+ENDIF (COPROCESSOR_USE_MPI)
   
   ADD_EXECUTABLE(CoProcessingPythonScriptExample PythonScriptCoProcessingExample.cxx vtkPVCustomTestDriver.cxx)
   TARGET_LINK_LIBRARIES(CoProcessingPythonScriptExample vtkCoProcessor vtkCPTestDriver)
