@@ -128,7 +128,7 @@ public:
     bool enabledFlag;
   };
 
-  pqSierraPlotToolsManager::pqInternal::pqInternal() :
+  pqInternal() :
     ActionPlaceholder(NULL),
     plotGUI(NULL),
     currentMetaPlotter(NULL)

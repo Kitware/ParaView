@@ -277,7 +277,7 @@ public:
     e_dashSep,
     };
 
-  pqPlotVariablesDialog::pqInternal::pqInternal() :
+  pqInternal() :
     listWidget(NULL),
     verticalSpacer(NULL),
     plotType(-1)
