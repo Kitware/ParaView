@@ -55,7 +55,7 @@
 #include <vtkstd/string>
 #include <vtkstd/vector>
 
-vtkCxxRevisionMacro( vtkFlashReader, "1.1" );
+vtkCxxRevisionMacro( vtkFlashReader, "1.2" );
 vtkStandardNewMacro( vtkFlashReader );
 
 // ============================================================================
@@ -363,7 +363,7 @@ void vtkFlashReaderInternal::ReadProcessorIds()
     ssize_t objsize = H5Gget_objname_by_idx( rootIndx, objIndex, NULL, 0 );
     if ( objsize == 16 )
       {
-      ssize_t objsize = H5Gget_objname_by_idx
+      /*ssize_t objsize = */H5Gget_objname_by_idx // sss
                         ( rootIndx, objIndex, namefromfile, 17 );
       vtkstd::string tempstr = namefromfile;
       if ( tempstr == sObjName ) // if this file contains processor numbers
@@ -389,7 +389,8 @@ void vtkFlashReaderInternal::ReadProcessorIds()
     hsize_t procnum_ndims = H5Sget_simple_extent_dims
                             ( procnumSpaceId, procnum_dims, NULL );
 
-    if ( procnum_ndims != 1 || procnum_dims[0] != this->NumberOfBlocks )
+    if (  static_cast<int> ( procnum_ndims   ) != 1 || // sss
+          static_cast<int> ( procnum_dims[0] ) != this->NumberOfBlocks  )
       {
       vtkGenericWarningMacro( "Error with getting the number of " <<
                               "processor Ids." << endl );
@@ -462,7 +463,7 @@ void vtkFlashReaderInternal::ReadDoubleScalars( hid_t fileIndx )
     }
 
   hsize_t scalarDims[10];
-  hsize_t ndims = H5Sget_simple_extent_dims( spaceId, scalarDims, NULL );
+  /*hsize_t ndims = */H5Sget_simple_extent_dims( spaceId, scalarDims, NULL ); // sss
 
   int nScalars = scalarDims[0];
 
@@ -525,7 +526,7 @@ void vtkFlashReaderInternal::ReadIntegerScalars( hid_t fileIndx )
     }
 
   hsize_t  scalarDims[1];
-  hsize_t  ndims = H5Sget_simple_extent_dims( spaceId, scalarDims, NULL );
+  /*hsize_t  ndims = */H5Sget_simple_extent_dims( spaceId, scalarDims, NULL ); // sss
   int   nScalars = scalarDims[0];
 
   hid_t datatype = H5Tcreate
@@ -847,7 +848,8 @@ void vtkFlashReaderInternal::ReadBlockTypes()
   hsize_t nodetype_ndims = H5Sget_simple_extent_dims
                            ( nodetypeSpaceId, nodetype_dims, NULL );
 
-  if ( nodetype_ndims != 1 || nodetype_dims[0] != this->NumberOfBlocks )
+  if (  static_cast<int> ( nodetype_ndims   ) != 1 || // sss
+        static_cast<int> ( nodetype_dims[0] ) != this->NumberOfBlocks  )
     {
     vtkGenericWarningMacro( "Inconsistency in the number of blocks." << endl );
     return;
@@ -900,10 +902,10 @@ void vtkFlashReaderInternal::ReadBlockBounds()
 
   if ( this->FileFormatVersion <= FLASH_READER_FLASH3_FFV8 )
     {
-    if ( bbox_ndims   != 3 ||
-         bbox_dims[0] != this->NumberOfBlocks ||
-         bbox_dims[1] != this->NumberOfDimensions ||
-         bbox_dims[2] != 2 )
+    if (  static_cast<int> ( bbox_ndims   ) != 3 || // sss
+          static_cast<int> ( bbox_dims[0] ) != this->NumberOfBlocks ||
+          static_cast<int> ( bbox_dims[1] ) != this->NumberOfDimensions ||
+          static_cast<int> ( bbox_dims[2] ) != 2  )
       {
       vtkGenericWarningMacro( "Error with number of blocks " <<
                               "or number of dimensions." << endl );
@@ -978,10 +980,10 @@ void vtkFlashReaderInternal::ReadBlockBounds()
   else 
   if ( this->FileFormatVersion == FLASH_READER_FLASH3_FFV9 )
     {
-    if ( bbox_ndims   != 3 ||
-         bbox_dims[0] != this->NumberOfBlocks  ||
-         bbox_dims[1] != FLASH_READER_MAX_DIMS ||
-         bbox_dims[2] != 2 )
+    if (  static_cast<int> ( bbox_ndims   ) != 3 || // sss
+          static_cast<int> ( bbox_dims[0] ) != this->NumberOfBlocks  ||
+          static_cast<int> ( bbox_dims[1] ) != FLASH_READER_MAX_DIMS ||
+          static_cast<int> ( bbox_dims[2] ) != 2  )
       {
       vtkGenericWarningMacro( "Error with number of blocks." << endl );
       return;
@@ -1069,9 +1071,9 @@ void vtkFlashReaderInternal::ReadBlockCenters()
 
   if ( this->FileFormatVersion <= FLASH_READER_FLASH3_FFV8 )
     {
-    if ( coordinates_ndims   != 2 ||
-         coordinates_dims[0] != this->NumberOfBlocks ||
-         coordinates_dims[1] != this->NumberOfDimensions )
+    if (  static_cast<int> ( coordinates_ndims   ) != 2 || // sss
+          static_cast<int> ( coordinates_dims[0] ) != this->NumberOfBlocks ||
+          static_cast<int> ( coordinates_dims[1] ) != this->NumberOfDimensions  )
       {
       vtkGenericWarningMacro( "Error with number of blocks or " << 
                               "number of dimensions." << endl );
@@ -1117,9 +1119,9 @@ void vtkFlashReaderInternal::ReadBlockCenters()
   else 
   if ( this->FileFormatVersion == FLASH_READER_FLASH3_FFV9 )
     {
-    if ( coordinates_ndims   != 2 ||
-         coordinates_dims[0] != this->NumberOfBlocks ||
-         coordinates_dims[1] != FLASH_READER_MAX_DIMS )
+    if (  static_cast<int> ( coordinates_ndims   ) != 2 || // sss
+          static_cast<int> ( coordinates_dims[0] ) != this->NumberOfBlocks ||
+          static_cast<int> ( coordinates_dims[1] ) != FLASH_READER_MAX_DIMS  )
       {
       vtkGenericWarningMacro( "Error with number of blocks." << endl );
       return;
@@ -1273,7 +1275,8 @@ void vtkFlashReaderInternal::ReadRefinementLevels()
   hsize_t refinement_ndims = H5Sget_simple_extent_dims
                              ( refinementSpaceId, refinement_dims, NULL );
 
-  if ( refinement_ndims != 1 || refinement_dims[0] != this->NumberOfBlocks )
+  if (  static_cast<int> ( refinement_ndims   ) != 1 || // sss
+        static_cast<int> ( refinement_dims[0] ) != this->NumberOfBlocks  )
     {
     vtkGenericWarningMacro( "Error with number of blocks" << endl );
     return;
