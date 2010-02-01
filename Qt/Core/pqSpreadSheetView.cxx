@@ -378,6 +378,7 @@ void pqSpreadSheetView::onEndRender()
   // cout << "Render" << endl;
   //this->Internal->Model.forceUpdate();
   this->Internal->Model.update();
+  this->Internal->Table->viewport()->update();
 }
 
 //-----------------------------------------------------------------------------
