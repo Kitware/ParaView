@@ -141,9 +141,9 @@ def DoCoProcessing(datadescription):
 
 def CreateProducer(datadescription, gridname):
   "Creates a producer proxy for the grid"
-  if not datadescription.GetInputDescription(gridname):
+  if not datadescription.GetInputDescriptionByName(gridname):
     raise RuntimeError, "Simulation input name '%%s' does not exist" %% gridname
-  grid = datadescription.GetInputDescription(gridname).GetGrid()
+  grid = datadescription.GetInputDescriptionByName(gridname).GetGrid()
   producer = TrivialProducer()
   producer.GetClientSideObject().SetOutput(grid)
   producer.UpdatePipeline()
@@ -162,8 +162,8 @@ def CreateWriter(proxy_ctor, filename, freq):
 
 timestep_expression = """
     if %s :
-        datadescription.GetInputDescription('%s').AllFieldsOn()
-        datadescription.GetInputDescription('%s').GenerateMeshOn()
+        datadescription.GetInputDescriptionByName('%s').AllFieldsOn()
+        datadescription.GetInputDescriptionByName('%s').GenerateMeshOn()
 """
 
 do_coprocessing = ""
