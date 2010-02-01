@@ -32,7 +32,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMAdaptiveOutputPort);
-vtkCxxRevisionMacro(vtkSMAdaptiveOutputPort, "1.1");
+vtkCxxRevisionMacro(vtkSMAdaptiveOutputPort, "1.2");
 
 //----------------------------------------------------------------------------
 vtkSMAdaptiveOutputPort::vtkSMAdaptiveOutputPort()
@@ -74,6 +74,7 @@ void vtkSMAdaptiveOutputPort::InvalidateDataInformation()
 // vtkPVPart used to update before gathering this information ...
 void vtkSMAdaptiveOutputPort::GatherDataInformation(int vtkNotUsed(doUpdate))
 {
+  // I mucked around with this, so that information updates only happens here
 
   if (this->GetID().IsNull())
     {
@@ -118,11 +119,14 @@ void vtkSMAdaptiveOutputPort::GatherDataInformation(int vtkNotUsed(doUpdate))
     << this->GetExecutiveID() << "ComputePriority"
     << vtkClientServerStream::End;
 
+  // commented out
+  /*
   stream 
     << vtkClientServerStream::Invoke 
     << this->GetExecutiveID() << "Update"
     << vtkClientServerStream::End;
-  
+  */
+
   pm->SendStream(this->ConnectionID, this->Servers, stream);
   
   pm->GatherInformation(this->ConnectionID, this->Servers, 
@@ -138,9 +142,13 @@ void vtkSMAdaptiveOutputPort::GatherDataInformation(int vtkNotUsed(doUpdate))
 //----------------------------------------------------------------------------
 void vtkSMAdaptiveOutputPort::UpdatePipelineInternal(double time, bool doTime)
 {
+  // I mucked around with this so only update happens here
+
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   vtkClientServerStream stream;
 
+  // commented out
+  /*
   stream << vtkClientServerStream::Invoke 
          << this->GetProducerID() << "UpdateInformation"
          << vtkClientServerStream::End;
@@ -165,6 +173,7 @@ void vtkSMAdaptiveOutputPort::UpdatePipelineInternal(double time, bool doTime)
     << pm->GetNumberOfPartitions(this->ConnectionID)
     << 0 //ghosts
     << vtkClientServerStream::End; 
+  */
 
   if (doTime)
     {
@@ -175,10 +184,13 @@ void vtkSMAdaptiveOutputPort::UpdatePipelineInternal(double time, bool doTime)
       << vtkClientServerStream::End; 
     }
 
+  // commented out
+  /*
   stream 
     << vtkClientServerStream::Invoke 
     << this->GetExecutiveID() << "ComputePriority"
     << vtkClientServerStream::End;
+  */
 
   stream 
     << vtkClientServerStream::Invoke 

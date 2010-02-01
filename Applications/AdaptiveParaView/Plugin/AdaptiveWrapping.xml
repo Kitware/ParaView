@@ -894,6 +894,61 @@
    <!-- End StridedReader2 -->
    </SourceProxy>
 
+
+   <SourceProxy name="ACosmoReader" 
+                class="vtkACosmoReader"
+                label="Cosmo (adaptive) reader">
+     <Documentation
+       short_help="" 
+       long_help="" >
+     </Documentation>
+
+      <StringVectorProperty 
+         name="FileName"
+         command="SetFileName"
+         animateable="0"
+         number_of_elements="1">
+        <FileListDomain name="files"/>
+        <Documentation>
+          This property specifies the file name to read.
+        </Documentation>
+      </StringVectorProperty>
+
+      <DoubleVectorProperty
+         name="BoxSize"
+         command="SetBoxSize"
+         number_of_elements="1"
+         default_values="90.140846" >
+        <DoubleRangeDomain name="range"/>
+        <Documentation>
+        </Documentation>
+      </DoubleVectorProperty>
+
+     <IntVectorProperty 
+        name="ByteOrder"
+        command="SetByteOrder"
+        label="Little Endian"
+        number_of_elements="1" 
+        default_values="1">
+       <BooleanDomain name="bool"/>
+       <Documentation>
+       </Documentation>
+     </IntVectorProperty>
+
+     <IntVectorProperty 
+        name="TagSize"
+        command="SetTagSize"
+        label="64-bit tags"
+        number_of_elements="1" 
+        default_values="0">
+       <BooleanDomain name="bool"/>
+       <Documentation>
+       </Documentation>
+     </IntVectorProperty>
+
+   <!-- End ACosmoReader -->
+   </SourceProxy>
+
     <!-- End of sources -->
   </ProxyGroup>
 

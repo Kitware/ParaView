@@ -12,6 +12,7 @@ SET(ADAPTIVE_SS_SOURCES
   vtkRawStridedReader1.cxx
   vtkGridSampler1.cxx
   vtkGridSampler2.cxx
+  vtkACosmoReader.cxx
   vtkMetaInfoDatabase.cxx
 #  vtkSMSImageDataParallelStrategy.cxx
   vtkSMAdaptiveOutlineRepresentation.cxx 

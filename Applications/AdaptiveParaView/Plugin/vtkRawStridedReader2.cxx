@@ -39,7 +39,7 @@
 
 #include "vtkAdaptiveOptions.h"
 
-vtkCxxRevisionMacro(vtkRawStridedReader2, "1.5");
+vtkCxxRevisionMacro(vtkRawStridedReader2, "1.6");
 vtkStandardNewMacro(vtkRawStridedReader2);
 
 #define MAPSIZE (1024 * 1024 * 1024) 
@@ -115,7 +115,6 @@ int vtkRawStridedReader2::Read(float* data, int* uExtents)
 }
 
 void vtkRawStridedReader2::SetupFile() {
-  // this is a static hack, this should be available in the pipeline
   int height = vtkAdaptiveOptions::GetHeight();
   int degree = vtkAdaptiveOptions::GetDegree();
   int rate = vtkAdaptiveOptions::GetRate();
@@ -254,15 +253,11 @@ vtkRawStridedReader2::vtkRawStridedReader2()
   this->Filename = NULL;
   this->WholeExtent[0] = this->WholeExtent[2] = this->WholeExtent[4] = 0;
   this->WholeExtent[1] = this->WholeExtent[3] = this->WholeExtent[5] = 99;
-  this->Dimensions[0] = this->WholeExtent[1] - this->WholeExtent[0] + 1;
-  this->Dimensions[1] = this->WholeExtent[3] - this->WholeExtent[2] + 1;
-  this->Dimensions[2] = this->WholeExtent[5] - this->WholeExtent[4] + 1;
   this->sWholeExtent[0] = this->sWholeExtent[2] = 
     this->sWholeExtent[4] = this->WholeExtent[0];
   this->sWholeExtent[1] = this->sWholeExtent[3] = 
     this->sWholeExtent[5] = this->WholeExtent[1];
   this->Origin[0] = this->Origin[1] = this->Origin[2] = 0.0;
-  this->Spacing[0] = this->Spacing[1] = this->Spacing[2] = 1.0;
 
   this->RangeKeeper = vtkMetaInfoDatabase::New();
 
@@ -345,70 +340,68 @@ int vtkRawStridedReader2::RequestInformation
  vtkInformationVector* outputVector)
 { 
   vtkInformation* outInfo = outputVector->GetInformationObject(0);
-  outInfo->Set(vtkDataObject::ORIGIN(),this->Origin,3);
+  outInfo->Set(vtkDataObject::ORIGIN(), this->Origin, 3);
 
   outInfo->Set(vtkStreamingDemandDrivenPipeline::WHOLE_EXTENT(), 
                this->WholeExtent, 6);
-  sWholeExtent[0] = this->WholeExtent[0];
-  sWholeExtent[1] = this->WholeExtent[1];
-  sWholeExtent[2] = this->WholeExtent[2];
-  sWholeExtent[3] = this->WholeExtent[3];
-  sWholeExtent[4] = this->WholeExtent[4];
-  sWholeExtent[5] = this->WholeExtent[5];
-
-  this->Dimensions[0] = this->WholeExtent[1] - this->WholeExtent[0]+1;
-  this->Dimensions[1] = this->WholeExtent[3] - this->WholeExtent[2]+1;
-  this->Dimensions[2] = this->WholeExtent[5] - this->WholeExtent[4]+1;
 
   outInfo->Set(vtkDataObject::SPACING(), this->Spacing, 3);
-  double sSpacing[3];
-  sSpacing[0] = this->Spacing[0];
-  sSpacing[1] = this->Spacing[1];
-  sSpacing[2] = this->Spacing[2];
+  
+  vtkImageData *outData = vtkImageData::SafeDownCast
+    (outInfo->Get(vtkDataObject::DATA_OBJECT()));
+
+  this->sWholeExtent[0] = this->WholeExtent[0];
+  this->sWholeExtent[1] = this->WholeExtent[1];
+  this->sWholeExtent[2] = this->WholeExtent[2];
+  this->sWholeExtent[3] = this->WholeExtent[3];
+  this->sWholeExtent[4] = this->WholeExtent[4];
+  this->sWholeExtent[5] = this->WholeExtent[5];
+
   this->Resolution = 1.0;
+
+  this->sSpacing[0] = this->Spacing[0];
+  this->sSpacing[1] = this->Spacing[1];
+  this->sSpacing[2] = this->Spacing[2];
 
   if (outInfo->Has(vtkStreamingDemandDrivenPipeline::UPDATE_RESOLUTION()))
     {
     double rRes =
       outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_RESOLUTION());
-    int strides[3];
-    double aRes;
+
     int pathLen;
     int *splitPath;
 
+    // get the dimension splits
     this->GridSampler->SetWholeExtent(sWholeExtent);
     vtkIntArray *ia = this->GridSampler->GetSplitPath();
     pathLen = ia->GetNumberOfTuples();
     splitPath = ia->GetPointer(0);
 
     //save split path in translator
-    vtkImageData *outData = vtkImageData::SafeDownCast(
-      outInfo->Get(vtkDataObject::DATA_OBJECT()));
     vtkExtentTranslator *et = outData->GetExtentTranslator();
     et->SetSplitPath(pathLen, splitPath);
 
+    // set the parameters
     this->GridSampler->SetSpacing(sSpacing);
     this->GridSampler->ComputeAtResolution(rRes);
 
-    this->GridSampler->GetStridedExtent(sWholeExtent);
-    this->GridSampler->GetStridedSpacing(sSpacing);
-    this->GridSampler->GetStrides(strides);
-    aRes = this->GridSampler->GetStridedResolution();
+    // get the strides
+    this->GridSampler->GetStridedExtent(this->sWholeExtent);
+    this->GridSampler->GetStridedSpacing(this->sSpacing);
+    this->Resolution = this->GridSampler->GetStridedResolution();
 
     outInfo->Set(vtkStreamingDemandDrivenPipeline::WHOLE_EXTENT(), 
-                 sWholeExtent, 6);
-    outInfo->Set(vtkDataObject::SPACING(), sSpacing, 3);
-    
-    this->Resolution = aRes;
+                 this->sWholeExtent, 6);
+    outInfo->Set(vtkDataObject::SPACING(), this->sSpacing, 3);
   }
 
   double bounds[6];
-  bounds[0] = this->Origin[0] + sSpacing[0] * sWholeExtent[0];
-  bounds[1] = this->Origin[0] + sSpacing[0] * sWholeExtent[1];
-  bounds[2] = this->Origin[1] + sSpacing[1] * sWholeExtent[2];
-  bounds[3] = this->Origin[1] + sSpacing[1] * sWholeExtent[3];
-  bounds[4] = this->Origin[2] + sSpacing[2] * sWholeExtent[4];
-  bounds[5] = this->Origin[2] + sSpacing[2] * sWholeExtent[5];
+  bounds[0] = this->Origin[0] + this->sSpacing[0] * this->sWholeExtent[0];
+  bounds[1] = this->Origin[0] + this->sSpacing[0] * this->sWholeExtent[1];
+  bounds[2] = this->Origin[1] + this->sSpacing[1] * this->sWholeExtent[2];
+  bounds[3] = this->Origin[1] + this->sSpacing[1] * this->sWholeExtent[3];
+  bounds[4] = this->Origin[2] + this->sSpacing[2] * this->sWholeExtent[4];
+  bounds[5] = this->Origin[2] + this->sSpacing[2] * this->sWholeExtent[5];
 
   outInfo->Set(vtkStreamingDemandDrivenPipeline::WHOLE_BOUNDING_BOX(),
                bounds, 6);

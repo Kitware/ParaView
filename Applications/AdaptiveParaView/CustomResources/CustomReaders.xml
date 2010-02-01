@@ -15,4 +15,9 @@
           file_description="Raw Files (Strided rev 2)" >
   </Reader>
 
+  <Reader name="ACosmoReader"
+          extensions="cosmo"
+          file_description="Cosmo (adaptive) Files" >
+  </Reader>
+
 </ParaViewReaders>

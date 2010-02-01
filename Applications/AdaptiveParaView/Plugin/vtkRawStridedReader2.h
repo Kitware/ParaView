@@ -83,14 +83,14 @@ protected:
 
   char *Filename;
   int WholeExtent[6];
-  int sWholeExtent[6];
-  int Dimensions[3];
   double Origin[3];
   double Spacing[3];
   int SwapBytes;
 
   //actual produced resolution
   double Resolution;
+  int sWholeExtent[6];
+  double sSpacing[3];
 
   //Stores meta information as it is obtained.
   vtkMetaInfoDatabase *RangeKeeper;
