@@ -44,6 +44,7 @@
   <Proxy group="sources" name="PNGReader" />
   <Proxy group="sources" name="TIFFReader" />
   <Proxy group="sources" name="PhastaReader" />
+  <Proxy group="sources" name="FlashReader" />
   <Proxy group="sources" name="SESAMEReader" />
   <Proxy group="sources" name="CSVReader" />
   <Proxy group="sources" name="MFIXReader" />

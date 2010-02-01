@@ -3300,6 +3300,31 @@
           file_description="Phasta Files" />
      </Hints>
    </SourceProxy>
+      
+   <SourceProxy name="FlashReader" 
+                class="vtkFlashReader"
+                label="Flash Reader">
+     <Documentation
+       short_help="Read multi-block dataset from a Flash file."
+       long_help="Read multi-block dataset from a Flash file.">
+         This Flash reader loads data stored in Flash format. The output of this reader is a multi-block dataset.
+     </Documentation>
+     <StringVectorProperty
+        name="FileName"
+        command="SetFileName"
+        animateable="0"
+        number_of_elements="1">
+        <FileListDomain name="files"/>
+        <Documentation>
+            This property specifies the file name for the Flash reader.
+        </Documentation>
+     </StringVectorProperty>
+
+     <Hints>
+      <ReaderFactory extensions="Flash flash"
+          file_description="Flash Files" />
+     </Hints>
+   </SourceProxy>
 
    <FileSeriesReaderProxy name="stlreader"
                           class="vtkFileSeriesReader"
