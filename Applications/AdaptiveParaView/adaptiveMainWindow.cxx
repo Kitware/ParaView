@@ -48,7 +48,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCustomDisplayPolicy.h"
 #include "vtksys/ios/sstream"
 
-#include <QShortCut>
+#include <QShortcut>
 #include <QStatusBar>
 
 #include <iostream>
