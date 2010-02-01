@@ -60,7 +60,7 @@ protected:
 //-----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkSMServerSideAnimationPlayer);
-vtkCxxRevisionMacro(vtkSMServerSideAnimationPlayer, "1.9");
+vtkCxxRevisionMacro(vtkSMServerSideAnimationPlayer, "1.10");
 vtkCxxSetObjectMacro(vtkSMServerSideAnimationPlayer, Writer, 
   vtkSMAnimationSceneImageWriter);
 //-----------------------------------------------------------------------------
@@ -122,7 +122,8 @@ void vtkSMServerSideAnimationPlayer::PerformActions()
 
   vtkSMProxyIterator* iter = vtkSMProxyIterator::New();
 
-  // Render any views.
+  // Mark all views so that they render offscreen.
+  // BUG #10159.
   for (iter->Begin(); !iter->IsAtEnd(); iter->Next())
     {
     vtkSMRenderViewProxy* ren = 
@@ -131,7 +132,10 @@ void vtkSMServerSideAnimationPlayer::PerformActions()
     if (ren && ren->GetConnectionID() 
       != vtkProcessModuleConnectionManager::GetNullConnectionID())
       {
-      ren->StillRender();
+      if (ren->GetUseOffscreenRenderingForScreenshots())
+        {
+        ren->SetUseOffscreen(1);
+        }
       }
     }
 
