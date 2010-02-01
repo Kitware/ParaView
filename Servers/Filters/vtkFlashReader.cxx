@@ -55,7 +55,7 @@
 #include <vtkstd/string>
 #include <vtkstd/vector>
 
-vtkCxxRevisionMacro( vtkFlashReader, "1.2" );
+vtkCxxRevisionMacro( vtkFlashReader, "1.3" );
 vtkStandardNewMacro( vtkFlashReader );
 
 // ============================================================================
@@ -363,8 +363,7 @@ void vtkFlashReaderInternal::ReadProcessorIds()
     ssize_t objsize = H5Gget_objname_by_idx( rootIndx, objIndex, NULL, 0 );
     if ( objsize == 16 )
       {
-      /*ssize_t objsize = */H5Gget_objname_by_idx // sss
-                        ( rootIndx, objIndex, namefromfile, 17 );
+      H5Gget_objname_by_idx( rootIndx, objIndex, namefromfile, 17 );
       vtkstd::string tempstr = namefromfile;
       if ( tempstr == sObjName ) // if this file contains processor numbers
         {
@@ -389,7 +388,7 @@ void vtkFlashReaderInternal::ReadProcessorIds()
     hsize_t procnum_ndims = H5Sget_simple_extent_dims
                             ( procnumSpaceId, procnum_dims, NULL );
 
-    if (  static_cast<int> ( procnum_ndims   ) != 1 || // sss
+    if (  static_cast<int> ( procnum_ndims   ) != 1 ||
           static_cast<int> ( procnum_dims[0] ) != this->NumberOfBlocks  )
       {
       vtkGenericWarningMacro( "Error with getting the number of " <<
@@ -463,7 +462,7 @@ void vtkFlashReaderInternal::ReadDoubleScalars( hid_t fileIndx )
     }
 
   hsize_t scalarDims[10];
-  /*hsize_t ndims = */H5Sget_simple_extent_dims( spaceId, scalarDims, NULL ); // sss
+  H5Sget_simple_extent_dims( spaceId, scalarDims, NULL );
 
   int nScalars = scalarDims[0];
 
@@ -526,7 +525,7 @@ void vtkFlashReaderInternal::ReadIntegerScalars( hid_t fileIndx )
     }
 
   hsize_t  scalarDims[1];
-  /*hsize_t  ndims = */H5Sget_simple_extent_dims( spaceId, scalarDims, NULL ); // sss
+  H5Sget_simple_extent_dims( spaceId, scalarDims, NULL );
   int   nScalars = scalarDims[0];
 
   hid_t datatype = H5Tcreate
@@ -848,7 +847,7 @@ void vtkFlashReaderInternal::ReadBlockTypes()
   hsize_t nodetype_ndims = H5Sget_simple_extent_dims
                            ( nodetypeSpaceId, nodetype_dims, NULL );
 
-  if (  static_cast<int> ( nodetype_ndims   ) != 1 || // sss
+  if (  static_cast<int> ( nodetype_ndims   ) != 1 ||
         static_cast<int> ( nodetype_dims[0] ) != this->NumberOfBlocks  )
     {
     vtkGenericWarningMacro( "Inconsistency in the number of blocks." << endl );
@@ -902,7 +901,7 @@ void vtkFlashReaderInternal::ReadBlockBounds()
 
   if ( this->FileFormatVersion <= FLASH_READER_FLASH3_FFV8 )
     {
-    if (  static_cast<int> ( bbox_ndims   ) != 3 || // sss
+    if (  static_cast<int> ( bbox_ndims   ) != 3 ||
           static_cast<int> ( bbox_dims[0] ) != this->NumberOfBlocks ||
           static_cast<int> ( bbox_dims[1] ) != this->NumberOfDimensions ||
           static_cast<int> ( bbox_dims[2] ) != 2  )
@@ -980,7 +979,7 @@ void vtkFlashReaderInternal::ReadBlockBounds()
   else 
   if ( this->FileFormatVersion == FLASH_READER_FLASH3_FFV9 )
     {
-    if (  static_cast<int> ( bbox_ndims   ) != 3 || // sss
+    if (  static_cast<int> ( bbox_ndims   ) != 3 ||
           static_cast<int> ( bbox_dims[0] ) != this->NumberOfBlocks  ||
           static_cast<int> ( bbox_dims[1] ) != FLASH_READER_MAX_DIMS ||
           static_cast<int> ( bbox_dims[2] ) != 2  )
@@ -1071,7 +1070,7 @@ void vtkFlashReaderInternal::ReadBlockCenters()
 
   if ( this->FileFormatVersion <= FLASH_READER_FLASH3_FFV8 )
     {
-    if (  static_cast<int> ( coordinates_ndims   ) != 2 || // sss
+    if (  static_cast<int> ( coordinates_ndims   ) != 2 ||
           static_cast<int> ( coordinates_dims[0] ) != this->NumberOfBlocks ||
           static_cast<int> ( coordinates_dims[1] ) != this->NumberOfDimensions  )
       {
@@ -1119,7 +1118,7 @@ void vtkFlashReaderInternal::ReadBlockCenters()
   else 
   if ( this->FileFormatVersion == FLASH_READER_FLASH3_FFV9 )
     {
-    if (  static_cast<int> ( coordinates_ndims   ) != 2 || // sss
+    if (  static_cast<int> ( coordinates_ndims   ) != 2 ||
           static_cast<int> ( coordinates_dims[0] ) != this->NumberOfBlocks ||
           static_cast<int> ( coordinates_dims[1] ) != FLASH_READER_MAX_DIMS  )
       {
@@ -1275,7 +1274,7 @@ void vtkFlashReaderInternal::ReadRefinementLevels()
   hsize_t refinement_ndims = H5Sget_simple_extent_dims
                              ( refinementSpaceId, refinement_dims, NULL );
 
-  if (  static_cast<int> ( refinement_ndims   ) != 1 || // sss
+  if (  static_cast<int> ( refinement_ndims   ) != 1 ||
         static_cast<int> ( refinement_dims[0] ) != this->NumberOfBlocks  )
     {
     vtkGenericWarningMacro( "Error with number of blocks" << endl );
@@ -2827,8 +2826,6 @@ int vtkFlashReader::GetMortonSegment( int blockIdx, vtkPolyData * polyData )
 void vtkFlashReader::GetCurve( const char * curvName, int & blockIdx, 
                                vtkMultiBlockDataSet * multiBlk )
 {
-  // for token "curves/xxx" where 'xxx' refers to a scalar data attribute
-  
   if (  curvName == NULL || strlen( curvName ) <= 7 || 
         strncmp( curvName, "curves/", 7 )  )
     {
@@ -2846,8 +2843,8 @@ void vtkFlashReader::GetCurve( const char * curvName, int & blockIdx,
   // obtain the scalar value at each sample from the file
   int            numSamps = this->Internal->BlockCellDimensions[0] * 
                             this->Internal->NumberOfBlocks;
-  //float        * sampVals = new float [ numSamps ]; // yyy
-  double        * sampVals = new double [ numSamps ]; // zzz
+  //float        * sampVals = new float [ numSamps ];
+  double        * sampVals = new double [ numSamps ];
   vtkstd::string dataName = vtkstd::string( curvName ).substr( 7 ); 
   hid_t          dataIndx = H5Dopen
                             ( this->Internal->FileIndex, dataName.c_str() );
@@ -2858,8 +2855,8 @@ void vtkFlashReader::GetCurve( const char * curvName, int & blockIdx,
     sampVals = NULL;
     return;
     }
-  //H5Dread ( dataIndx, H5T_NATIVE_FLOAT, H5S_ALL, // yyy
-  H5Dread ( dataIndx, H5T_NATIVE_DOUBLE, H5S_ALL,  // zzz
+  //H5Dread ( dataIndx, H5T_NATIVE_FLOAT, H5S_ALL,
+  H5Dread ( dataIndx, H5T_NATIVE_DOUBLE, H5S_ALL,
             H5S_ALL,  H5P_DEFAULT,      sampVals );
   H5Dclose( dataIndx );
 
