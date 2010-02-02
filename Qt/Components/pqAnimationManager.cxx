@@ -43,6 +43,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProxyManager.h"
 #include "vtkSMServerProxyManagerReviver.h"
 
+#include <QIntValidator>
 #include <QFileInfo>
 #include <QMap>
 #include <QMessageBox>
@@ -79,10 +80,12 @@ public:
   QPointer<pqServer> ActiveServer;
   typedef QMap<pqServer*, QPointer<pqAnimationScene> > SceneMap;
   SceneMap Scenes;
-  Ui::Dialog* AnimationSettingsDialog;
+  Ui::pqAnimationSettingsDialog* AnimationSettingsDialog;
 
   QSize OldMaxSize;
   QSize OldSize;
+
+  double AspectRatio;
 };
 
 //-----------------------------------------------------------------------------
@@ -279,6 +282,47 @@ void pqAnimationManager::updateGUI()
     }
 }
 
+//-----------------------------------------------------------------------------
+void pqAnimationManager::onWidthEdited()
+{
+  Ui::pqAnimationSettingsDialog *dialog
+    = this->Internals->AnimationSettingsDialog;
+  if (dialog->lockAspect->isChecked())
+    {
+    int width = dialog->width->text().toInt();
+    int height = static_cast<int>(width/this->Internals->AspectRatio);
+    dialog->height->setText(QString::number(height));
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqAnimationManager::onHeightEdited()
+{
+  Ui::pqAnimationSettingsDialog *dialog
+    = this->Internals->AnimationSettingsDialog;
+  if (dialog->lockAspect->isChecked())
+    {
+    int height = dialog->height->text().toInt();
+    int width = static_cast<int>(height*this->Internals->AspectRatio);
+    dialog->width->setText(QString::number(width));
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqAnimationManager::onLockAspectRatio(bool lock)
+{
+  if (lock)
+    {
+    Ui::pqAnimationSettingsDialog *dialog
+      = this->Internals->AnimationSettingsDialog;
+    int width = dialog->width->text().toInt();
+    int height = dialog->height->text().toInt();
+    this->Internals->AspectRatio
+      = static_cast<double>(width)/static_cast<double>(height);
+    }
+}
+
+//-----------------------------------------------------------------------------
 #define PADDING_COMPENSATION QSize(16, 16);
 inline void enforceMultiple4(QSize& newSize)
 {
@@ -317,9 +361,16 @@ bool pqAnimationManager::saveAnimation()
   vtkSMAnimationSceneProxy* sceneProxy = scene->getAnimationSceneProxy();
 
   QDialog dialog;
-  Ui::Dialog dialogUI;
+  Ui::pqAnimationSettingsDialog dialogUI;
   this->Internals->AnimationSettingsDialog = &dialogUI;
   dialogUI.setupUi(&dialog);
+
+  QIntValidator *intValidator = new QIntValidator(this);
+  intValidator->setBottom(50);
+  dialogUI.width->setValidator(intValidator);
+  intValidator = new QIntValidator(this);
+  intValidator->setBottom(50);
+  dialogUI.height->setValidator(intValidator);
 
   // Cannot disconnect and save animation unless connected to a remote server.
   dialogUI.checkBoxDisconnect->setEnabled(
@@ -343,8 +394,8 @@ bool pqAnimationManager::saveAnimation()
     padding.setHeight((padding.height()*viewSize.height())/viewSize.width());
     }
   viewSize -= padding;
-  dialogUI.spinBoxHeight->setValue(viewSize.height());
-  dialogUI.spinBoxWidth->setValue(viewSize.width());
+  dialogUI.height->setText(QString::number(viewSize.height()));
+  dialogUI.width->setText(QString::number(viewSize.width()));
 
   // Frames per timestep is only shown
   // when saving in SNAP_TO_TIMESTEPS mode.
@@ -404,6 +455,13 @@ bool pqAnimationManager::saveAnimation()
   QObject::connect(
     dialogUI.spinBoxFramesPerTimestep, SIGNAL(valueChanged(int)),
     this, SLOT(updateGUI()));
+
+  QObject::connect(dialogUI.width, SIGNAL(editingFinished()),
+                   this, SLOT(onWidthEdited()));
+  QObject::connect(dialogUI.height, SIGNAL(editingFinished()),
+                   this, SLOT(onHeightEdited()));
+  QObject::connect(dialogUI.lockAspect, SIGNAL(toggled(bool)),
+                   this, SLOT(onLockAspectRatio(bool)));
 
   if (!dialog.exec())
     {
@@ -541,8 +599,8 @@ bool pqAnimationManager::saveAnimation()
 
   sceneProxy->UpdateVTKObjects();
 
-  QSize newSize(dialogUI.spinBoxWidth->value(),
-    dialogUI.spinBoxHeight->value());
+  QSize newSize(dialogUI.width->text().toInt(),
+                dialogUI.height->text().toInt());
 
   // Enforce any view size conditions (such a multiple of 4). 
   ::enforceMultiple4(newSize); 

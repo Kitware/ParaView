@@ -124,6 +124,11 @@ protected slots:
 
   /// Called on every tick while saving animation.
   void onTick(int);
+
+  /// Manages locking the aspect ratio.
+  void onWidthEdited();
+  void onHeightEdited();
+  void onLockAspectRatio(bool lock);
 private:
   pqAnimationManager(const pqAnimationManager&); // Not implemented.
   void operator=(const pqAnimationManager&); // Not implemented.

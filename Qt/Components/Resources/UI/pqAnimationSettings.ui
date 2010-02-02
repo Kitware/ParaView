@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>Dialog</class>
- <widget class="QDialog" name="Dialog">
+ <class>pqAnimationSettingsDialog</class>
+ <widget class="QDialog" name="pqAnimationSettingsDialog">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>334</width>
-    <height>300</height>
+    <width>404</width>
+    <height>312</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -16,12 +16,6 @@
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
     <layout class="QGridLayout">
-     <property name="margin">
-      <number>0</number>
-     </property>
-     <property name="spacing">
-      <number>6</number>
-     </property>
      <item row="4" column="0">
       <widget class="QLabel" name="label_3">
        <property name="text">
@@ -29,29 +23,7 @@
        </property>
       </widget>
      </item>
-     <item row="4" column="1">
-      <widget class="QSpinBox" name="spinBoxWidth">
-       <property name="toolTip">
-        <string>View Width (in pixels) </string>
-       </property>
-       <property name="statusTip">
-        <string>Sets the width (in pixles) to use while generating animation.</string>
-       </property>
-       <property name="whatsThis">
-        <string>Sets the width (in pixles) to use while generating animation.</string>
-       </property>
-       <property name="minimum">
-        <number>2</number>
-       </property>
-       <property name="maximum">
-        <number>8000</number>
-       </property>
-       <property name="singleStep">
-        <number>10</number>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="1" colspan="2">
+     <item row="1" column="1" colspan="3">
       <widget class="QDoubleSpinBox" name="frameRate">
        <property name="minimum">
         <double>1.000000000000000</double>
@@ -61,14 +33,14 @@
        </property>
       </widget>
      </item>
-     <item row="3" column="1" colspan="2">
+     <item row="3" column="1" colspan="3">
       <widget class="QSpinBox" name="spinBoxNumberOfFrames">
        <property name="maximum">
         <number>2147483647</number>
        </property>
       </widget>
      </item>
-     <item row="0" column="1" colspan="2">
+     <item row="0" column="1" colspan="3">
       <widget class="QDoubleSpinBox" name="animationDuration">
        <property name="maximum">
         <double>999999999999999967336168804116691273849533185806555472917961779471295845921727862608739868455469056.000000000000000</double>
@@ -82,7 +54,7 @@
        </property>
       </widget>
      </item>
-     <item row="2" column="1" colspan="2">
+     <item row="2" column="1" colspan="3">
       <widget class="QSpinBox" name="spinBoxFramesPerTimestep">
        <property name="minimum">
         <number>1</number>
@@ -96,28 +68,6 @@
       <widget class="QLabel" name="labelFramesPerTimestep">
        <property name="text">
         <string>No. of Frames / timestep</string>
-       </property>
-      </widget>
-     </item>
-     <item row="4" column="2">
-      <widget class="QSpinBox" name="spinBoxHeight">
-       <property name="toolTip">
-        <string>View Height (in pixels)</string>
-       </property>
-       <property name="statusTip">
-        <string>Sets the height (in pixles) to use while generating animation.</string>
-       </property>
-       <property name="whatsThis">
-        <string>Sets the height (in pixles) to use while generating animation.</string>
-       </property>
-       <property name="minimum">
-        <number>2</number>
-       </property>
-       <property name="maximum">
-        <number>8000</number>
-       </property>
-       <property name="singleStep">
-        <number>10</number>
        </property>
       </widget>
      </item>
@@ -146,7 +96,7 @@ p, li { white-space: pre-wrap; }
        </property>
       </widget>
      </item>
-     <item row="5" column="1" colspan="2">
+     <item row="5" column="1" colspan="3">
       <widget class="QComboBox" name="stereoMode">
        <item>
         <property name="text">
@@ -180,6 +130,41 @@ p, li { white-space: pre-wrap; }
        </item>
       </widget>
      </item>
+     <item row="4" column="1">
+      <widget class="QLineEdit" name="width"/>
+     </item>
+     <item row="4" column="2">
+      <widget class="QLineEdit" name="height"/>
+     </item>
+     <item row="4" column="3">
+      <widget class="QToolButton" name="lockAspect">
+       <property name="toolTip">
+        <string>Lock aspect</string>
+       </property>
+       <property name="statusTip">
+        <string>Lock aspect</string>
+       </property>
+       <property name="whatsThis">
+        <string>Lock aspect</string>
+       </property>
+       <property name="text">
+        <string>L</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../pqComponents.qrc">
+         <normaloff>:/pqWidgets/Icons/pqOctreeData16.png</normaloff>:/pqWidgets/Icons/pqOctreeData16.png</iconset>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>12</width>
+         <height>12</height>
+        </size>
+       </property>
+       <property name="checkable">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
     </layout>
    </item>
    <item>
@@ -203,12 +188,6 @@ p, li { white-space: pre-wrap; }
    </item>
    <item>
     <layout class="QHBoxLayout">
-     <property name="spacing">
-      <number>6</number>
-     </property>
-     <property name="margin">
-      <number>0</number>
-     </property>
      <item>
       <spacer>
        <property name="orientation">
@@ -263,16 +242,20 @@ p, li { white-space: pre-wrap; }
   <tabstop>frameRate</tabstop>
   <tabstop>spinBoxFramesPerTimestep</tabstop>
   <tabstop>spinBoxNumberOfFrames</tabstop>
-  <tabstop>spinBoxWidth</tabstop>
-  <tabstop>spinBoxHeight</tabstop>
+  <tabstop>width</tabstop>
+  <tabstop>height</tabstop>
+  <tabstop>lockAspect</tabstop>
+  <tabstop>stereoMode</tabstop>
   <tabstop>checkBoxDisconnect</tabstop>
  </tabstops>
- <resources/>
+ <resources>
+  <include location="../pqComponents.qrc"/>
+ </resources>
  <connections>
   <connection>
    <sender>okButton</sender>
    <signal>clicked()</signal>
-   <receiver>Dialog</receiver>
+   <receiver>pqAnimationSettingsDialog</receiver>
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -288,7 +271,7 @@ p, li { white-space: pre-wrap; }
   <connection>
    <sender>cancelButton</sender>
    <signal>clicked()</signal>
-   <receiver>Dialog</receiver>
+   <receiver>pqAnimationSettingsDialog</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
