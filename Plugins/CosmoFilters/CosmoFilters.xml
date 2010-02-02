@@ -183,7 +183,7 @@
      <DoubleVectorProperty
         name="Overlap"
         command="SetOverlap"
-        label="overlap percent (shared point/ghost cell gap distance)"
+        label="overlap (shared point/ghost cell gap distance)"
         number_of_elements="1"
         default_values="5" >
      <DoubleRangeDomain name="range" min="0" />
