@@ -87,7 +87,7 @@ using namespace vtkstd;
 #include "ParticleExchange.h"
 #include "ParticleDistribute.h"
 
-vtkCxxRevisionMacro(vtkPCosmoReader, "1.2");
+vtkCxxRevisionMacro(vtkPCosmoReader, "1.3");
 vtkStandardNewMacro(vtkPCosmoReader);
 
 //----------------------------------------------------------------------------
@@ -181,6 +181,10 @@ int vtkPCosmoReader::RequestInformation(
   // set the pieces as the number of processes
   outputVector->GetInformationObject(0)->Set
     (vtkStreamingDemandDrivenPipeline::MAXIMUM_NUMBER_OF_PIECES(),
+     this->Controller->GetNumberOfProcesses());
+
+  outputVector->GetInformationObject(0)->Set
+    (vtkDataObject::DATA_NUMBER_OF_PIECES(),
      this->Controller->GetNumberOfProcesses());
 
   // set the ghost levels
