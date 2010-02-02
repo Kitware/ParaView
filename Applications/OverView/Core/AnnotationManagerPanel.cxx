@@ -1,20 +1,20 @@
 /*=========================================================================
 
-   Program: ParaView
-   Module:    AnnotationManagerPanel.cxx
+Program: ParaView
+Module:    AnnotationManagerPanel.cxx
 
-   Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
-   All rights reserved.
+Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
+All rights reserved.
 
-   ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+ParaView is a free software; you can redistribute it and/or modify it
+under the terms of the ParaView license version 1.2. 
 
-   See License_v1.2.txt for the full ParaView license.
-   A copy of this license can be obtained by contacting
-   Kitware Inc.
-   28 Corporate Drive
-   Clifton Park, NY 12065
-   USA
+See License_v1.2.txt for the full ParaView license.
+A copy of this license can be obtained by contacting
+Kitware Inc.
+28 Corporate Drive
+Clifton Park, NY 12065
+USA
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -69,13 +69,12 @@ class AnnotationManagerPanelCommand : public vtkCommand
 {
 public:
   static AnnotationManagerPanelCommand* New()
-    { return new AnnotationManagerPanelCommand(); }
+  { return new AnnotationManagerPanelCommand(); }
   void Execute(vtkObject* caller, unsigned long id, void* callData);
   AnnotationManagerPanel* Target;
 };
 
-void AnnotationManagerPanelCommand::Execute(
-  vtkObject* caller, unsigned long, void*)
+void AnnotationManagerPanelCommand::Execute(vtkObject* caller, unsigned long, void*)
 {
   this->Target->annotationsChanged();
 }
@@ -87,20 +86,20 @@ struct AnnotationManagerPanel::pqImplementation : public Ui::AnnotationManagerPa
 {
 public:
   pqImplementation() 
-    {
+  {
     this->Model = 0;
     this->AnnotationLink = 0;
-    }
+  }
 
   ~pqImplementation()
-    {
+  {
     delete this->Model;
     this->Model = 0;
     if (this->AnnotationLink)
       {
-      this->AnnotationLink->Delete();
+  this->AnnotationLink->Delete();
       }
-    }
+  }
 
   pqAnnotationLayersModel *Model;
   vtkSMSourceProxy* AnnotationLink;
@@ -108,7 +107,7 @@ public:
 };
 
 /////////////////////////////////////////////////////////////////////////////////
-// AnnotationManagerPanel
+              // AnnotationManagerPanel
 
 AnnotationManagerPanel::AnnotationManagerPanel(QWidget *p) :
   QWidget(p),
@@ -123,24 +122,24 @@ AnnotationManagerPanel::AnnotationManagerPanel(QWidget *p) :
   this->Implementation->treeView->setModel(this->Implementation->Model);
 
   QObject::connect(this->Implementation->Model,
-    SIGNAL(dataChanged(const QModelIndex &, const QModelIndex &)),
-    this, SLOT(modelChanged()));
+       SIGNAL(dataChanged(const QModelIndex &, const QModelIndex &)),
+       this, SLOT(modelChanged()));
 
   QObject::connect(
-    this->Implementation->treeView, SIGNAL(activated(const QModelIndex &)),
-    this, SLOT(activateItem(const QModelIndex &)));
+       this->Implementation->treeView, SIGNAL(activated(const QModelIndex &)),
+       this, SLOT(activateItem(const QModelIndex &)));
 
   QObject::connect(this->Implementation->upButton, 
-    SIGNAL(pressed()), this, SLOT(onUpButtonPressed()));
+       SIGNAL(pressed()), this, SLOT(onUpButtonPressed()));
 
   QObject::connect(this->Implementation->downButton, 
-    SIGNAL(pressed()), this, SLOT(onDownButtonPressed()));
+       SIGNAL(pressed()), this, SLOT(onDownButtonPressed()));
 
   QObject::connect(this->Implementation->selectButton, 
-    SIGNAL(pressed()), this, SLOT(onSelectButtonPressed()));
+       SIGNAL(pressed()), this, SLOT(onSelectButtonPressed()));
 
   QObject::connect(this->Implementation->deleteButton, 
-    SIGNAL(pressed()), this, SLOT(onDeleteButtonPressed()));
+       SIGNAL(pressed()), this, SLOT(onDeleteButtonPressed()));
 }
 
 //-----------------------------------------------------------------------------
@@ -155,21 +154,21 @@ void AnnotationManagerPanel::setAnnotationLink(vtkSMSourceProxy* link)
 {
   if (this->Implementation->AnnotationLink != link)
     {
-    vtkSMSourceProxy* tempSGMacroVar = this->Implementation->AnnotationLink;
-    this->Implementation->AnnotationLink = link;
-    if (this->Implementation->AnnotationLink != NULL) 
-      { 
-      this->Implementation->AnnotationLink->Register(0); 
-      vtkAnnotationLink* clientLink = static_cast<vtkAnnotationLink*>(link->GetClientSideObject());
-      this->Implementation->Model->setAnnotationLink(clientLink);
-      }
-    if (tempSGMacroVar != NULL)
-      {
-      tempSGMacroVar->UnRegister(0);
-      }
-    this->Implementation->AnnotationLink->AddObserver(vtkCommand::ModifiedEvent, this->Command);
-    this->Implementation->AnnotationLink->AddObserver(vtkCommand::UpdateDataEvent, this->Command);
-    this->annotationsChanged();
+      vtkSMSourceProxy* tempSGMacroVar = this->Implementation->AnnotationLink;
+      this->Implementation->AnnotationLink = link;
+      if (this->Implementation->AnnotationLink != NULL) 
+  { 
+    this->Implementation->AnnotationLink->Register(0); 
+    vtkAnnotationLink* clientLink = static_cast<vtkAnnotationLink*>(link->GetClientSideObject());
+    this->Implementation->Model->setAnnotationLink(clientLink);
+  }
+      if (tempSGMacroVar != NULL)
+  {
+    tempSGMacroVar->UnRegister(0);
+  }
+      this->Implementation->AnnotationLink->AddObserver(vtkCommand::ModifiedEvent, this->Command);
+      this->Implementation->AnnotationLink->AddObserver(vtkCommand::UpdateDataEvent, this->Command);
+      this->annotationsChanged();
     }
 }
 
@@ -179,12 +178,32 @@ vtkSMSourceProxy* AnnotationManagerPanel::getAnnotationLink()
   return this->Implementation->AnnotationLink;
 }
 
+int AnnotationManagerPanel::getNumberOfAnnotations()
+{
+  return this->Implementation->Model->rowCount();
+}
+int AnnotationManagerPanel::getRowFromName(QString myName)
+{
+  int ii;
+  for(ii = 0; ii<this->Implementation->Model->rowCount(); ii++)
+    {
+      if(this->Implementation->Model->getAnnotationName(ii) ==
+   myName.trimmed())
+  return ii;
+    }
+  return -1;
+}
+void AnnotationManagerPanel::activateAnnotation(int row, bool onOrOff)
+{
+  if(row > -1 && row < this->Implementation->Model->rowCount())
+    this->Implementation->Model->setAnnotationEnabled(row, onOrOff);
+}
 void AnnotationManagerPanel::modelChanged()
 {
   vtkSMSourceProxy* link = this->getAnnotationLink();
   if (!link)
     {
-    return;
+      return;
     }
 
   link->RemoveObserver(this->Command);
@@ -200,22 +219,22 @@ void AnnotationManagerPanel::annotationsChanged()
   vtkAnnotationLink* link = static_cast<vtkAnnotationLink*>(this->Implementation->AnnotationLink->GetClientSideObject());
 
   QObject::disconnect(this->Implementation->Model,
-    SIGNAL(dataChanged(const QModelIndex &, const QModelIndex &)),
-    this, SLOT(modelChanged()));
+          SIGNAL(dataChanged(const QModelIndex &, const QModelIndex &)),
+          this, SLOT(modelChanged()));
 
   //this->Implementation->Model->setAnnotationLayers(link->GetAnnotationLayers());
   this->Implementation->Model->setAnnotationLink(link);
 
   QObject::connect(this->Implementation->Model,
-    SIGNAL(dataChanged(const QModelIndex &, const QModelIndex &)),
-    this, SLOT(modelChanged()));
+       SIGNAL(dataChanged(const QModelIndex &, const QModelIndex &)),
+       this, SLOT(modelChanged()));
 }
 
 void AnnotationManagerPanel::onUpButtonPressed()
 {
   if (!this->getAnnotationLink())
     {
-    return;
+      return;
     }
 
   vtkAnnotationLink* link = static_cast<vtkAnnotationLink*>(this->Implementation->AnnotationLink->GetClientSideObject());
@@ -235,12 +254,12 @@ void AnnotationManagerPanel::onUpButtonPressed()
   annotations->RemoveAnnotation(annotations->GetAnnotation(removedRow));
   for(int i=0; i<removedRow-1; ++i)
     {
-    newAnnotations->AddAnnotation(annotations->GetAnnotation(i)); 
+      newAnnotations->AddAnnotation(annotations->GetAnnotation(i)); 
     }
   newAnnotations->AddAnnotation(a);
   for(int i=removedRow-1; i<annotations->GetNumberOfAnnotations(); ++i)
     {
-    newAnnotations->AddAnnotation(annotations->GetAnnotation(i)); 
+      newAnnotations->AddAnnotation(annotations->GetAnnotation(i)); 
     }
   link->SetAnnotationLayers(newAnnotations);
   this->getAnnotationLink()->MarkModified(0);
@@ -250,7 +269,7 @@ void AnnotationManagerPanel::onDownButtonPressed()
 {
   if (!this->getAnnotationLink())
     {
-    return;
+      return;
     }
 
   vtkAnnotationLink* link = static_cast<vtkAnnotationLink*>(this->Implementation->AnnotationLink->GetClientSideObject());
@@ -270,12 +289,12 @@ void AnnotationManagerPanel::onDownButtonPressed()
   annotations->RemoveAnnotation(annotations->GetAnnotation(removedRow));
   for(int i=0; i<removedRow+1; ++i)
     {
-    newAnnotations->AddAnnotation(annotations->GetAnnotation(i));
+      newAnnotations->AddAnnotation(annotations->GetAnnotation(i));
     }
   newAnnotations->AddAnnotation(a);
   for(int i=removedRow+1; i<annotations->GetNumberOfAnnotations(); ++i)
     {
-    newAnnotations->AddAnnotation(annotations->GetAnnotation(i));
+      newAnnotations->AddAnnotation(annotations->GetAnnotation(i));
     }
   link->SetAnnotationLayers(newAnnotations);
   this->getAnnotationLink()->MarkModified(0);
@@ -285,7 +304,7 @@ void AnnotationManagerPanel::onSelectButtonPressed()
 {
   if (!this->getAnnotationLink())
     {
-    return;
+      return;
     }
 
   vtkAnnotationLink* link = static_cast<vtkAnnotationLink*>(this->Implementation->AnnotationLink->GetClientSideObject());
@@ -295,10 +314,10 @@ void AnnotationManagerPanel::onSelectButtonPressed()
   QModelIndexList indexes = model->selectedIndexes();
   foreach (QModelIndex index, indexes)
     {
-    vtkSmartPointer<vtkSelection> temp = vtkSmartPointer<vtkSelection>::New(); 
-    vtkAnnotation* a = annotations->GetAnnotation(index.row()); 
-    temp->DeepCopy(a->GetSelection());
-    s->Union(temp);
+      vtkSmartPointer<vtkSelection> temp = vtkSmartPointer<vtkSelection>::New(); 
+      vtkAnnotation* a = annotations->GetAnnotation(index.row()); 
+      temp->DeepCopy(a->GetSelection());
+      s->Union(temp);
     }
   
   link->SetCurrentSelection(s);
@@ -309,7 +328,7 @@ void AnnotationManagerPanel::onDeleteButtonPressed()
 {
   if (!this->getAnnotationLink())
     {
-    return;
+      return;
     }
 
   vtkAnnotationLink* link = static_cast<vtkAnnotationLink*>(this->Implementation->AnnotationLink->GetClientSideObject());
@@ -329,8 +348,8 @@ void AnnotationManagerPanel::activateItem(const QModelIndex &index)
 {
   if (!index.isValid() || index.column() != 1)
     {
-    // We are interested in clicks on the color swab alone.
-    return;
+      // We are interested in clicks on the color swab alone.
+      return;
     }
 
   // Get current color
@@ -340,7 +359,7 @@ void AnnotationManagerPanel::activateItem(const QModelIndex &index)
   color = QColorDialog::getColor(color, this);
   if (color.isValid())
     {
-    // Set the new color
-    this->Implementation->Model->setAnnotationColor(index.row(), color);
+      // Set the new color
+      this->Implementation->Model->setAnnotationColor(index.row(), color);
     }
 }

@@ -54,6 +54,11 @@ public:
   void setAnnotationLink(vtkSMSourceProxy*);
   vtkSMSourceProxy* getAnnotationLink();
 
+  int getNumberOfAnnotations();
+  int getRowFromName(QString myName);
+  //turn on (or off) the annotation referred to by the given row
+  void activateAnnotation(int row, bool onOrOff);
+
 public slots:
   void activateItem(const QModelIndex &index);
   void annotationsChanged();
