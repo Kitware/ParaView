@@ -37,7 +37,7 @@ class vtkPVExtractSelection::vtkSelectionNodeVector :
 };
 
 
-vtkCxxRevisionMacro(vtkPVExtractSelection, "1.12");
+vtkCxxRevisionMacro(vtkPVExtractSelection, "1.13");
 vtkStandardNewMacro(vtkPVExtractSelection);
 
 //----------------------------------------------------------------------------
@@ -152,6 +152,22 @@ int vtkPVExtractSelection::RequestData(
   vtkSelectionNodeVector oVector;
   if (cdOutput)
     {
+    // this is the collection of vtkSelectionNodes that don't have any
+    // COMPOSITE_INDEX or HIERARCHICAL_INDEX qualification i.e. they are
+    // applicable to all nodes in the composite dataset.
+    vtkSelectionNodeVector non_composite_nodes;
+
+    for (unsigned int cc=0; cc < sel->GetNumberOfNodes(); cc++)
+      {
+      vtkInformation* properties = sel->GetNode(cc)->GetProperties();
+      if (!properties->Has(vtkSelectionNode::COMPOSITE_INDEX()) &&
+        !properties->Has(vtkSelectionNode::HIERARCHICAL_LEVEL()) &&
+        !properties->Has(vtkSelectionNode::HIERARCHICAL_INDEX()))
+        {
+        non_composite_nodes.push_back(sel->GetNode(cc));
+        }
+      }
+
     // For composite datasets, the output of this filter is
     // vtkSelectionNode::SELECTIONS instance with vtkSelection instances for some
     // nodes in the composite dataset. COMPOSITE_INDEX() or
@@ -168,26 +184,32 @@ int vtkPVExtractSelection::RequestData(
         sel);
       if (!curSel && hbIter)
         {
-        curSel = this->LocateSelection(hbIter->GetCurrentLevel(), hbIter->GetCurrentIndex(),
-          sel);
+        curSel = this->LocateSelection(hbIter->GetCurrentLevel(),
+          hbIter->GetCurrentIndex(), sel);
         }
 
       geomOutput = vtkDataSet::SafeDownCast(cdOutput->GetDataSet(iter));
+
+      vtkSelectionNodeVector curOVector;
       if (curSel && geomOutput)
         {
-        vtkSelectionNodeVector curOVector;
-        vtkSelectionNodeVector::iterator viter;
-
         this->RequestDataInternal(curOVector, geomOutput, curSel);
+        }
 
-        for (viter = curOVector.begin(); viter != curOVector.end(); ++viter)
-          {
-          // RequestDataInternal() will not set COMPOSITE_INDEX() for
-          // hierarchical datasets.
-          viter->GetPointer()->GetProperties()->Set(vtkSelectionNode::COMPOSITE_INDEX(),
-            iter->GetCurrentFlatIndex());
-          oVector.push_back(viter->GetPointer());
-          }
+      for (vtkSelectionNodeVector::iterator giter = non_composite_nodes.begin();
+        giter != non_composite_nodes.end(); ++giter)
+        {
+        this->RequestDataInternal(curOVector, geomOutput, giter->GetPointer());
+        }
+
+      for (vtkSelectionNodeVector::iterator viter = curOVector.begin();
+        viter != curOVector.end(); ++viter)
+        {
+        // RequestDataInternal() will not set COMPOSITE_INDEX() for
+        // hierarchical datasets.
+        viter->GetPointer()->GetProperties()->Set(vtkSelectionNode::COMPOSITE_INDEX(),
+          iter->GetCurrentFlatIndex());
+        oVector.push_back(viter->GetPointer());
         }
       }
     iter->Delete();
@@ -222,10 +244,10 @@ vtkSelectionNode* vtkPVExtractSelection::LocateSelection(unsigned int level,
       {
       if (node->GetProperties()->Has(vtkSelectionNode::HIERARCHICAL_LEVEL()) &&
           node->GetProperties()->Has(vtkSelectionNode::HIERARCHICAL_INDEX()) &&
-          static_cast<unsigned int>(node->GetProperties()->Get(vtkSelectionNode::HIERARCHICAL_LEVEL())) == 
-          level &&
-          static_cast<unsigned int>(node->GetProperties()->Get(vtkSelectionNode::HIERARCHICAL_INDEX())) == 
-          index)
+          static_cast<unsigned int>(node->GetProperties()->Get(
+              vtkSelectionNode::HIERARCHICAL_LEVEL())) == level &&
+          static_cast<unsigned int>(node->GetProperties()->Get(
+              vtkSelectionNode::HIERARCHICAL_INDEX())) == index)
         {
         return node;
         }
