@@ -81,7 +81,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkLongLongArray.h"
 #endif
 
-vtkCxxRevisionMacro(vtkACosmoReader, "1.1");
+vtkCxxRevisionMacro(vtkACosmoReader, "1.2");
 vtkStandardNewMacro(vtkACosmoReader);
 
 #define FILE_BIG_ENDIAN 0
@@ -194,7 +194,7 @@ int vtkACosmoReader::RequestData(
   vtkUnstructuredGrid *output = vtkUnstructuredGrid::SafeDownCast(
     outInfo->Get(vtkDataObject::DATA_OBJECT()));
 
-  output->Initialize();
+  //output->Initialize();
                  
   if(outInfo->Has(vtkStreamingDemandDrivenPipeline::UPDATE_RESOLUTION()))
     {

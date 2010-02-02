@@ -45,7 +45,7 @@
 #include <vtksys/ios/sstream>
 
 //-----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkSMAdaptiveViewProxy, "1.1");
+vtkCxxRevisionMacro(vtkSMAdaptiveViewProxy, "1.2");
 vtkStandardNewMacro(vtkSMAdaptiveViewProxy);
 
 #define DEBUGPRINT_VIEW(arg)\
@@ -598,10 +598,14 @@ void vtkSMAdaptiveViewProxy::CopyBackBufferToFrontBuffer()
   if (!this->PixelArray)
     {
     this->PixelArray = vtkUnsignedCharArray::New();
+    this->PixelArray->SetNumberOfComponents(4);
     }
-  this->PixelArray->Initialize();
-  this->PixelArray->SetNumberOfComponents(4);
-  this->PixelArray->SetNumberOfTuples(size[0]*size[1]);  
+
+  //this->PixelArray->Initialize();
+  if(size[0] * size[1] != this->PixelArray->GetNumberOfTuples())
+    {
+    this->PixelArray->SetNumberOfTuples(size[0]*size[1]);  
+    }
 
   //capture back buffer
   renWin->GetRGBACharPixelData(0, 0, size[0]-1, size[1]-1, 0, this->PixelArray);
@@ -609,8 +613,10 @@ void vtkSMAdaptiveViewProxy::CopyBackBufferToFrontBuffer()
   //copy into the front buffer
   renWin->SetRGBACharPixelData(0, 0, size[0]-1, size[1]-1, this->PixelArray, 1);
 
+  /*
   //hack, this call is just here to reset glDrawBuffer(BACK)
   renWin->SetRGBACharPixelData(0, 0, size[0]-1, size[1]-1, this->PixelArray, 0);
+  */
 }
 
 //----------------------------------------------------------------------------
@@ -849,10 +855,13 @@ void vtkSMAdaptiveViewProxy::FinalizeRenderPass()
     {
     DEBUGPRINT_VIEW(cerr << "SV(" << this << ") Update Front Buffer" << endl;);
 
+    renWin->Frame();
     this->CopyBackBufferToFrontBuffer();
+    /*
     renWin->SwapBuffersOn();
     renWin->Frame();
     renWin->SwapBuffersOff();
+    */
     }
 
 
