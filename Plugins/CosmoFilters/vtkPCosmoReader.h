@@ -101,7 +101,7 @@ public:
   vtkGetMacro(RL, float);
 
   // Description:
-  // Specify the ghost cell spacing (edge boundary of box) (default .06)
+  // Specify the ghost cell spacing (edge boundary of box) (default 5)
   vtkSetMacro(Overlap, float);
   vtkGetMacro(Overlap, float);
 

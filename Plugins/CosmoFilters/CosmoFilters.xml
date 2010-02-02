@@ -43,12 +43,12 @@
      <DoubleVectorProperty
         name="Overlap"
         command="SetOverlap"
-        label="overlap percent (shared point/ghost cell gap distance)"
+        label="overlap (shared point/ghost cell gap distance)"
         number_of_elements="1"
-        default_values=".06" >
-     <DoubleRangeDomain name="range" min="0" max="1" />
+        default_values="5" >
+     <DoubleRangeDomain name="range" min="0" />
        <Documentation>
-       The percentage of rL to extend processor particle ownership for ghost particles/cells.  Needed for correct halo calculation when halos cross processor boundaries in parallel computation.
+       The space in rL units to extend processor particle ownership for ghost particles/cells.  Needed for correct halo calculation when halos cross processor boundaries in parallel computation.
        </Documentation>
      </DoubleVectorProperty>
 
@@ -185,10 +185,10 @@
         command="SetOverlap"
         label="overlap percent (shared point/ghost cell gap distance)"
         number_of_elements="1"
-        default_values=".06" >
-     <DoubleRangeDomain name="range" min="0" max="1" />
+        default_values="5" >
+     <DoubleRangeDomain name="range" min="0" />
        <Documentation>
-       The percentage of rL to extend processor particle ownership for ghost particles/cells.  Needed for correct halo calculation when halos cross processor boundaries in parallel computation.
+       The space in rL units to extend processor particle ownership for ghost particles/cells.  Needed for correct halo calculation when halos cross processor boundaries in parallel computation.
        </Documentation>
      </DoubleVectorProperty>
 

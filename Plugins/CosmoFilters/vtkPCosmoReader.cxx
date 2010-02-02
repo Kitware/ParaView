@@ -87,7 +87,7 @@ using namespace vtkstd;
 #include "ParticleExchange.h"
 #include "ParticleDistribute.h"
 
-vtkCxxRevisionMacro(vtkPCosmoReader, "1.3");
+vtkCxxRevisionMacro(vtkPCosmoReader, "1.4");
 vtkStandardNewMacro(vtkPCosmoReader);
 
 //----------------------------------------------------------------------------
@@ -104,7 +104,7 @@ vtkPCosmoReader::vtkPCosmoReader()
 
   this->FileName = 0;
   this->RL = 90.140846;
-  this->Overlap = .06;
+  this->Overlap = 5;
   this->ReadMode = 1;
   this->CosmoFormat = 1;
 }
@@ -230,7 +230,6 @@ int vtkPCosmoReader::RequestData(
 
   // RRU code
   // Initialize the partitioner which uses MPI Cartesian Topology
-  float deadSize = this->RL * this->Overlap;
   Partition::initialize();
 
   // Construct the particle distributor, exchanger and halo finder
@@ -246,7 +245,7 @@ int vtkPCosmoReader::RequestData(
     {
     distribute.setParameters(this->FileName, this->RL, "BLOCK");
     }
-  exchange.setParameters(this->RL, deadSize);
+  exchange.setParameters(this->RL, this->Overlap);
 
   distribute.initialize();
   exchange.initialize();

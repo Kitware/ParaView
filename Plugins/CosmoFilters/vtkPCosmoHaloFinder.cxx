@@ -82,7 +82,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "FOFHaloProperties.h"
 #include "Partition.h"
 
-vtkCxxRevisionMacro(vtkPCosmoHaloFinder, "1.6");
+vtkCxxRevisionMacro(vtkPCosmoHaloFinder, "1.7");
 vtkStandardNewMacro(vtkPCosmoHaloFinder);
 
 /****************************************************************************/
@@ -98,7 +98,7 @@ vtkPCosmoHaloFinder::vtkPCosmoHaloFinder()
     }
 
   this->RL = 90.140846;
-  this->Overlap = .06;
+  this->Overlap = 5;
   this->BB = .2;
   this->PMin = 10;
   this->ParticleMass = 1;
@@ -267,14 +267,13 @@ int vtkPCosmoHaloFinder::RequestData(
 
   // RRU code
   // Initialize the partitioner which uses MPI Cartesian Topology
-  float deadSize = this->RL * this->Overlap;
   Partition::initialize();
 
   // create the halo finder
   CosmoHaloFinderP haloFinder;
 
   haloFinder.setParameters
-    ("", this->RL, deadSize, this->NP, this->PMin, this->BB);
+    ("", this->RL, this->Overlap, this->NP, this->PMin, this->BB);
 
   // halo finder needs vectors so take the time to turn them into vectors
   // FIXME: ought to go into the halo finder and put some #ifdefs
@@ -386,7 +385,7 @@ int vtkPCosmoHaloFinder::RequestData(
 
   FOFHaloProperties fof;
   fof.setHalos(numberOfFOFHalos, fofHalos, fofHaloCount, fofHaloList);
-  fof.setParameters("", this->RL, deadSize, this->ParticleMass);
+  fof.setParameters("", this->RL, this->Overlap, this->ParticleMass);
   fof.setParticles(xx, yy, zz, vx, vy, vz, potential, tag, mask, status);
 
   // Find the index of the particle at the center of every FOF halo
