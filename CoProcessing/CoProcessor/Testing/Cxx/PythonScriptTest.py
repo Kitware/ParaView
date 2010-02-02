@@ -1,7 +1,7 @@
 def DoCoProcessing(datadescription):
   timestep = datadescription.GetTimeStep()
     
-  grid = datadescription.GetInputDescription("input").GetGrid()
+  grid = datadescription.GetInputDescriptionByName("input").GetGrid()
   pressure = grid.GetPointData().GetArray('Pressure')
 
   grid.GetPointData().SetScalars(pressure)
@@ -58,8 +58,8 @@ def RequestDataDescription(datadescription):
   if timestep % 20 == 0:
     # add in some fields
     #print 'added Pressure and wanting to do coprocessing'
-    datadescription.GetInputDescription("input").AddPointField("Pressure")
-    datadescription.GetInputDescription('input').GenerateMeshOn()
+    datadescription.GetInputDescriptionByName("input").AddPointField("Pressure")
+    datadescription.GetInputDescriptionByName('input').GenerateMeshOn()
   return
 
 # the code below is needed to import objects from paraview.simple
