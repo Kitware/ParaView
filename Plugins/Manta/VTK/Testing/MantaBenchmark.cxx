@@ -151,7 +151,7 @@ protected:
   vtkTimerLog *Timer;
 };
 
-vtkCxxRevisionMacro(MyProcess, "1.4");
+vtkCxxRevisionMacro(MyProcess, "1.5");
 vtkStandardNewMacro(MyProcess);
 
 MyProcess::MyProcess()
@@ -199,7 +199,7 @@ void MyProcess::Execute()
       {
       changeCamera = false;
       }
-    if (!strcmp(this->Argv[i], "-noData"))
+    if (!strcmp(this->Argv[i], "-noChanges"))
       {
       changeData = false;
       }
