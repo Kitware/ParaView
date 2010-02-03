@@ -390,8 +390,6 @@ vtkParametricFunctionSource* getRandomHill(double umin, double umax,
 {
     // given the max and min values to sample over, return a random hill
     // sampled over those ranges.
-    int i;
-
     vtkParametricRandomHills* hills = vtkParametricRandomHills::New();
     hills->SetRandomSeed(randomHillSeed);
     hills->GenerateTheHills();
