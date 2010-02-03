@@ -94,13 +94,13 @@ public:
     : MantaMaterial(m), DiffuseTexture(dT), SpecularTexture(sT)
   {
     this->DebugCntr = MPR::GlobalCntr++;
-    cerr << "MPPR( " << this << ") " << this->DebugCntr << endl;
+    //cerr << "MPPR( " << this << ") " << this->DebugCntr << endl;
   }
   
   void FreeMantaResources()
   {
-    cerr << "MPPR(" << this << ") FREE MANTA RESOURCES " 
-         << this->DebugCntr << endl;
+    //cerr << "MPPR(" << this << ") FREE MANTA RESOURCES " 
+    //<< this->DebugCntr << endl;
     delete this->MantaMaterial;
     delete this->DiffuseTexture;
     delete this->SpecularTexture;
@@ -125,7 +125,7 @@ int MPR::GlobalCntr = 0;
 
 //===========================================================================
 
-vtkCxxRevisionMacro(vtkMantaProperty, "1.6");
+vtkCxxRevisionMacro(vtkMantaProperty, "1.7");
 vtkStandardNewMacro(vtkMantaProperty);
 
 //----------------------------------------------------------------------------
@@ -133,7 +133,7 @@ vtkMantaProperty::vtkMantaProperty()
   : MantaMaterial(0), MaterialType(0), DiffuseTexture(0), SpecularTexture(0),
     Reflectance(0.0), Eta(1.52), Thickness(1.0)
 {
-  cerr << "MP(" << this << ") CREATE" << endl;
+  //cerr << "MP(" << this << ") CREATE" << endl;
   this->MaterialType = NULL;
   this->SetMaterialType("default");
   this->MantaManager = NULL;
@@ -142,7 +142,7 @@ vtkMantaProperty::vtkMantaProperty()
 //----------------------------------------------------------------------------
 vtkMantaProperty::~vtkMantaProperty()
 {
-  cerr << "MP(" << this << ") DESTROY" << endl;
+  //cerr << "MP(" << this << ") DESTROY" << endl;
   if (this->MantaManager)
     {
     this->MantaManager->Delete();
@@ -159,7 +159,7 @@ void vtkMantaProperty::PrintSelf( ostream & os, vtkIndent indent )
 //------------------------------------------------------------------------------
 void vtkMantaProperty::ReleaseGraphicsResources(vtkWindow *win)
 {
-  cerr << "MP(" << this << ") RELEASE GRAPHICS RESOURCES" << endl;
+  //cerr << "MP(" << this << ") RELEASE GRAPHICS RESOURCES" << endl;
   this->Superclass::ReleaseGraphicsResources(win);
   if (!this->MantaManager)
     {
@@ -216,6 +216,7 @@ void vtkMantaProperty::BackfaceRender( vtkActor * vtkNotUsed( anActor ),
                                        vtkRenderer * vtkNotUsed( ren ) )
 {
   // NOT supported by Manta
+  //TODO: Do something about it.
   cerr
     << "vtkMantaProperty::BackfaceRender(), backface rendering "
     << "is not supported by Manta"
@@ -226,7 +227,7 @@ void vtkMantaProperty::BackfaceRender( vtkActor * vtkNotUsed( anActor ),
 //----------------------------------------------------------------------------
 void vtkMantaProperty::CreateMantaProperty()
 {
-  cerr << "MP(" << this << ") CREATE MANTA PROPERTY" << endl;
+  //cerr << "MP(" << this << ") CREATE MANTA PROPERTY" << endl;
   double * diffuse  = this->GetDiffuseColor();
   double * specular = this->GetSpecularColor();
 

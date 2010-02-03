@@ -78,21 +78,21 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <math.h>
 
-vtkCxxRevisionMacro(vtkMantaTexture, "1.5");
+vtkCxxRevisionMacro(vtkMantaTexture, "1.6");
 vtkStandardNewMacro(vtkMantaTexture);
 
 //----------------------------------------------------------------------------
 // Initializes an instance, generates a unique index.
 vtkMantaTexture::vtkMantaTexture()
 {
-  cerr << "MT( " << this << ") CREATE " << endl;
+  //cerr << "MT( " << this << ") CREATE " << endl;
   this->MantaManager = NULL;
 }
 
 //----------------------------------------------------------------------------
 vtkMantaTexture::~vtkMantaTexture()
 {
-  cerr << "MT( " << this << ") DESTROY " << endl;
+  //cerr << "MT( " << this << ") DESTROY " << endl;
   if (this->MantaManager)
     {
     this->MantaManager->Delete();
@@ -103,7 +103,7 @@ vtkMantaTexture::~vtkMantaTexture()
 // Release the graphics resources used by this texture.
 void vtkMantaTexture::ReleaseGraphicsResources(vtkWindow *win)
 {
-  cerr << "MT( " << this << ") RELEASE GRAPHICS RESOURCES " << endl;
+  //cerr << "MT( " << this << ") RELEASE GRAPHICS RESOURCES " << endl;
   this->Superclass::ReleaseGraphicsResources( win );
   if (!this->MantaManager)
     {
@@ -123,7 +123,7 @@ void vtkMantaTexture::ReleaseGraphicsResources(vtkWindow *win)
 //----------------------------------------------------------------------------
 void vtkMantaTexture::FreeMantaResources()
 {
-  cerr << "MT(" << this << ") FREE MANTA RESOURCES " << endl;
+  //cerr << "MT(" << this << ") FREE MANTA RESOURCES " << endl;
   delete this->MantaTexture;
   this->MantaTexture = NULL;
 }
@@ -131,7 +131,7 @@ void vtkMantaTexture::FreeMantaResources()
 //----------------------------------------------------------------------------
 void vtkMantaTexture::Load(vtkRenderer *ren)
 {
-  cerr << "MT(" << this << ") LOAD " << endl;
+  //cerr << "MT(" << this << ") LOAD " << endl;
   vtkImageData *input = this->GetInput();
 
   vtkMantaRenderer* mantaRenderer =

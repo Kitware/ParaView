@@ -134,7 +134,7 @@ int main( int argc, char* argv[] )
 
   renWin->Render();
 
-  usleep(1000000);
+  usleep(100000);
 
   // delete cone
   cerr << "DELETE CONE" << endl;
@@ -145,7 +145,7 @@ int main( int argc, char* argv[] )
 
   renWin->Render();
 
-  usleep(1000000);
+  usleep(100000);
 
   // delete sphere
   cerr << "DELETE SPHERE" << endl;
@@ -155,7 +155,7 @@ int main( int argc, char* argv[] )
   sphereActor->Delete();
 
   renWin->Render();
-  usleep(1000000);
+  usleep(100000);
 
   // delete cylinder
   cerr << "DELETE CYLINDER" << endl;
@@ -165,7 +165,7 @@ int main( int argc, char* argv[] )
   cylinderActor->Delete();
 
   renWin->Render();
-  usleep(1000000);
+  usleep(100000);
 
   // re create sphere
   cerr << "CREATE NEW SPHERE" << endl;
@@ -184,20 +184,20 @@ int main( int argc, char* argv[] )
   renderer->AddActor( sphereActor );
 
   renWin->Render();
-  usleep(1000000);
+  usleep(100000);
 
   cerr << "DELETE NEW SPHERE" << endl;
 
   renderer->RemoveActor( sphereActor );
 
   renWin->Render();
-  usleep(1000000);
+  usleep(100000);
 
   renWin->Render();
-  usleep(1000000);
+  usleep(100000);
 
   renWin->Render();
-  usleep(1000000);
+  usleep(100000);
 
   //re-delete sphere
   sphere->Delete();

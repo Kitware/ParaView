@@ -95,7 +95,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <vtkstd/string>
 
-vtkCxxRevisionMacro(vtkMantaRenderer, "1.10");
+vtkCxxRevisionMacro(vtkMantaRenderer, "1.11");
 vtkStandardNewMacro(vtkMantaRenderer);
 
 //----------------------------------------------------------------------------
@@ -104,7 +104,7 @@ vtkMantaRenderer::vtkMantaRenderer() :
   IsStereo( false ), MaxDepth( 5 ), MantaScene( 0 ), MantaWorldGroup( 0 ),
   MantaLightSet( 0 ), MantaCamera( 0 ), SyncDisplay( 0 )
 {
-  cerr << "MR(" << this << ") CREATE" << endl;
+  //cerr << "MR(" << this << ") CREATE" << endl;
   // the default global ambient light created by vtkRenderer is too bright.
   this->SetAmbient( 0.1, 0.1, 0.1 );
 
@@ -139,7 +139,7 @@ vtkMantaRenderer::vtkMantaRenderer() :
 //----------------------------------------------------------------------------
 vtkMantaRenderer::~vtkMantaRenderer()
 {
-  cerr << "MR(" << this << ") DESTROY" << endl;
+  //cerr << "MR(" << this << ") DESTROY" << endl;
   this->MantaManager->Delete();
 
   if (this->ColorBuffer)
@@ -155,7 +155,7 @@ vtkMantaRenderer::~vtkMantaRenderer()
 //----------------------------------------------------------------------------
 void vtkMantaRenderer::InitEngine()
 {
-  cerr << "MR(" << this << ") INIT" << endl;
+  //cerr << "MR(" << this << ") INIT" << endl;
   this->MantaManager->StartEngine(this->MaxDepth,
                                   this->GetBackground(),
                                   this->Ambient,
@@ -350,7 +350,8 @@ void vtkMantaRenderer::LayerRender()
 
 
   vtkTimerLog::MarkStartEvent("ThreadSync");
-  // syncrhonize with render threads to be sure manta has a full set of pixels
+  // synchronize with render threads to be sure manta has a full set of pixels
+  //cerr << "MR(" << this << ") wait" << endl;
   this->GetSyncDisplay()->waitOnFrameReady();
   vtkTimerLog::MarkEndEvent("ThreadSync");
 
@@ -439,6 +440,7 @@ void vtkMantaRenderer::LayerRender()
 
   // decouple to let render threads work right away
   this->GetSyncDisplay()->doneRendering();
+  //cerr << "MR(" << this << ") release" << endl;
   vtkTimerLog::MarkEndEvent("Image Conversion");
 
 }

@@ -36,13 +36,13 @@
 #include <Model/Groups/Group.h>
 #include <Model/Lights/HeadLight.h>
 
-vtkCxxRevisionMacro(vtkMantaManager, "1.2");
+vtkCxxRevisionMacro(vtkMantaManager, "1.3");
 vtkStandardNewMacro(vtkMantaManager);
 
 //----------------------------------------------------------------------------
 vtkMantaManager::vtkMantaManager()
 {
-  cerr << "MX(" << this << ") CREATE" << endl;
+  //cerr << "MX(" << this << ") CREATE" << endl;
   this->MantaEngine = Manta::createManta();
   this->MantaFactory = new Manta::Factory( this->MantaEngine );
   this->Started = false;
@@ -58,12 +58,21 @@ vtkMantaManager::vtkMantaManager()
 //----------------------------------------------------------------------------
 vtkMantaManager::~vtkMantaManager()
 {
-  cerr << "MX(" << this << ") DESTROY" << endl;
-  this->MantaEngine->finish();
-  if (this->SyncDisplay)
+  //cerr << "MX(" << this << ") DESTROY" << endl;
+
+  int v =-1;
+  //TODO: This is screwey but the only way I've found to get it to consistently
+  //shutdown without hanging.
+  while (v != 0)
     {
+    v = this->MantaEngine->numWorkers();
+    //cerr << "MX(" << this << ") SYNC " << i++ << " " << v << endl;
+    this->SyncDisplay->waitOnFrameReady();
     this->SyncDisplay->doneRendering();
+    this->MantaEngine->changeNumWorkers(0);
     }
+
+  //cerr << "MX(" << this << ") wait" << endl;
   this->MantaEngine->blockUntilFinished();
 
   if (this->MantaLightSet)
@@ -91,10 +100,13 @@ vtkMantaManager::~vtkMantaManager()
 
   delete this->MantaWorldGroup;
 
-  delete this->SyncDisplay;
-
   delete this->MantaFactory;
+
+  //delete this->SyncDisplay; //engine does this
+
   delete this->MantaEngine;
+  //cerr << "MX(" << this << ") good night Gracie" << endl;
+
 }
 
 //----------------------------------------------------------------------------
@@ -111,7 +123,7 @@ void vtkMantaManager::StartEngine(int maxDepth,
                                   int *size
                                   )
 {
-  cerr << "MX(" << this << ") START" << endl;
+  //cerr << "MX(" << this << ") START" << endl;
   if (this->Started)
     {
     cerr << "WARNING: Manta is already initted, ignoring reinitialize." << endl;

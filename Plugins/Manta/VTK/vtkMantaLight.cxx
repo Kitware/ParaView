@@ -75,13 +75,13 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <math.h>
 
-vtkCxxRevisionMacro(vtkMantaLight, "1.5");
+vtkCxxRevisionMacro(vtkMantaLight, "1.6");
 vtkStandardNewMacro(vtkMantaLight);
 
 //----------------------------------------------------------------------------
 vtkMantaLight::vtkMantaLight() : MantaLight(0)
 {
-  cerr << "ML(" << this << ") CREATE" << endl;
+  //cerr << "ML(" << this << ") CREATE" << endl;
   this->MantaLight = NULL;
   this->MantaManager = NULL;
 }
@@ -89,7 +89,7 @@ vtkMantaLight::vtkMantaLight() : MantaLight(0)
 //----------------------------------------------------------------------------
 vtkMantaLight::~vtkMantaLight()
 {
-  cerr << "ML(" << this << ") DESTROY" << endl;
+  //cerr << "ML(" << this << ") DESTROY" << endl;
   delete this->MantaLight;
   if (this->MantaManager)
     {

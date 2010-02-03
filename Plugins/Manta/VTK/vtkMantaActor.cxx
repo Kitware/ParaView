@@ -92,28 +92,28 @@ public:
     : MantaWorldGroup(w), MantaAS(a), MantaGeom(g)
   {
     this->DebugCntr = MPR2::GlobalCntr++;
-    cerr << "MAPR( " << this << ") " << this->DebugCntr << endl;
-    cerr << " AS: " << this->MantaAS << endl;
-    cerr << " WG: " << this->MantaWorldGroup << endl;
-    cerr << " MG: " << this->MantaGeom << endl;
+    //cerr << "MAPR( " << this << ") " << this->DebugCntr << endl;
+    //cerr << " AS: " << this->MantaAS << endl;
+    //cerr << " WG: " << this->MantaWorldGroup << endl;
+    //cerr << " MG: " << this->MantaGeom << endl;
   }
   
   void FreeMantaResources()
   {
-    cerr << "MAPR(" << this << ") FREE MANTA RESOURCES " 
-         << this->DebugCntr << endl;
-    cerr << " AS: " << this->MantaAS << endl;
+    //cerr << "MAPR(" << this << ") FREE MANTA RESOURCES " 
+    //     << this->DebugCntr << endl;
+    //cerr << " AS: " << this->MantaAS << endl;
     if (this->MantaAS)
       {
       this->MantaAS->setGroup( NULL ); 
       }
-    cerr << " WG: " << this->MantaWorldGroup << endl;
+    //cerr << " WG: " << this->MantaWorldGroup << endl;
     if (this->MantaWorldGroup)
       {
       this->MantaWorldGroup->remove(this->MantaAS, false);
       }
     delete this->MantaAS; 
-    cerr << " MG: " << this->MantaGeom << endl;
+    //cerr << " MG: " << this->MantaGeom << endl;
     if (this->MantaGeom)
       {
       this->MantaGeom->shrinkTo(0, true);
@@ -139,13 +139,13 @@ int MPR2::GlobalCntr = 0;
 
 //===========================================================================
 
-vtkCxxRevisionMacro(vtkMantaActor, "1.10");
+vtkCxxRevisionMacro(vtkMantaActor, "1.11");
 vtkStandardNewMacro(vtkMantaActor);
 
 //----------------------------------------------------------------------------
 vtkMantaActor::vtkMantaActor() : Group(0), MantaAS(0)
 {
-  cerr << "MA(" << this << ") CREATE" << endl;
+  //cerr << "MA(" << this << ") CREATE" << endl;
   this->MantaManager = NULL;
 }
 
@@ -154,7 +154,7 @@ vtkMantaActor::vtkMantaActor() : Group(0), MantaAS(0)
 //
 vtkMantaActor::~vtkMantaActor()
 {
-  cerr << "MA(" << this << ") DESTROY" << endl;
+  //cerr << "MA(" << this << ") DESTROY" << endl;
   if (this->MantaManager)
     {
     this->MantaManager->Delete();
@@ -176,11 +176,11 @@ vtkProperty *vtkMantaActor::MakeProperty()
 //----------------------------------------------------------------------------
 void vtkMantaActor::ReleaseGraphicsResources( vtkWindow * win )
 {
-  cerr << "MA(" << this << ") RELEASE GRAPHICS RESOURCES" << endl;
+  //cerr << "MA(" << this << ") RELEASE GRAPHICS RESOURCES" << endl;
   this->Superclass::ReleaseGraphicsResources( win );
   if (!this->MantaManager)
     {
-    cerr << "NO MGR" << endl;
+    //cerr << "NO MGR" << endl;
     return;
     }
 
@@ -202,7 +202,7 @@ void vtkMantaActor::ReleaseGraphicsResources( vtkWindow * win )
 //----------------------------------------------------------------------------
 void vtkMantaActor::Render( vtkRenderer * ren, vtkMapper * mapper )
 {
-  cerr << "MA(" << this << ") RENDER" << endl;
+  //cerr << "MA(" << this << ") RENDER" << endl;
 
   if ( vtkMantaRenderer * mantaRenderer = vtkMantaRenderer::SafeDownCast( ren ) )
     {
@@ -258,7 +258,7 @@ void vtkMantaActor::SetVisibility(int newval)
 //----------------------------------------------------------------------------
 void vtkMantaActor::RemoveObjects()
 {  
-  cerr << "MA(" << this << ") REMOVE OBJECTS" << endl;
+  //cerr << "MA(" << this << ") REMOVE OBJECTS" << endl;
   if (!this->MantaManager)
     {
     return;
@@ -266,9 +266,8 @@ void vtkMantaActor::RemoveObjects()
 
   if (this->MantaAS)
     {
-    cerr << " AS: " << this->MantaAS << endl;
-    cerr << " WG: " << this->MantaManager->GetMantaWorldGroup() << endl;
-
+    //cerr << " AS: " << this->MantaAS << endl;
+    //cerr << " WG: " << this->MantaManager->GetMantaWorldGroup() << endl;
     this->MantaAS->setGroup( NULL ); 
     this->MantaManager->GetMantaWorldGroup()->remove( this->MantaAS, false );
     delete this->MantaAS; 
@@ -279,8 +278,7 @@ void vtkMantaActor::RemoveObjects()
 //----------------------------------------------------------------------------
 void vtkMantaActor::UpdateObjects( vtkRenderer * ren )
 {
-  cerr << "MA(" << this << ") UPDATE" << endl;
-
+  //cerr << "MA(" << this << ") UPDATE" << endl;
   vtkMantaRenderer * mantaRenderer =
     vtkMantaRenderer::SafeDownCast( ren );
   if (!mantaRenderer)
@@ -312,7 +310,7 @@ void vtkMantaActor::UpdateObjects( vtkRenderer * ren )
     //We have to nest to make an AS for each inner group
     //Is there a Manta call we can make to simply recurse while making the AS?
     this->MantaAS = new Manta::DynBVH();
-    cerr << "MA(" << this << ") CREATE AS " << this->MantaAS << endl;
+    //cerr << "MA(" << this << ") CREATE AS " << this->MantaAS << endl;
     Manta::Group *group = new Manta::Group();
     for (unsigned int i = 0; i < this->Group->size(); i++)
       {
@@ -321,38 +319,37 @@ void vtkMantaActor::UpdateObjects( vtkRenderer * ren )
         (this->Group->get(i));
       if (innerGroup)
         {
-        cerr << "MA(" << this << ") BVH FOR " << i << " " << innerGroup << endl;
+        //cerr << "MA(" << this << ") BVH FOR " << i << " " << innerGroup << endl;
         innerBVH->setGroup(innerGroup);
         group->add(innerBVH);
         }
       else
         {
-        cerr << "MA(" << this << ") SIMPLE " << i << " " << innerGroup << endl;
+        //cerr << "MA(" << this << ") SIMPLE " << i << " " << innerGroup << endl;
         delete innerBVH;
         group->add(this->Group->get(i));
         }
       }
 
-    cerr << "MA(" << this << ") PREPROCESS" << endl;
+    //cerr << "MA(" << this << ") PREPROCESS" << endl;
     this->MantaAS->setGroup(group);
     Manta::Group* mantaWorldGroup = this->MantaManager->GetMantaWorldGroup();
     mantaWorldGroup->add(static_cast<Manta::Object *> (this->MantaAS));
-    cerr << "ME = " << this->MantaManager->GetMantaEngine() << endl;
-    cerr << "LS = " << this->MantaManager->GetMantaLightSet() << endl;
+    //cerr << "ME = " << this->MantaManager->GetMantaEngine() << endl;
+    //cerr << "LS = " << this->MantaManager->GetMantaLightSet() << endl;
     Manta::PreprocessContext context(this->MantaManager->GetMantaEngine(), 0, 1,
                                      this->MantaManager->GetMantaLightSet());
     mantaWorldGroup->preprocess(context);
-    cerr << "PREP DONE" << endl;
+    //cerr << "PREP DONE" << endl;
     }
 }
 
 //----------------------------------------------------------------------------
 void vtkMantaActor::SetGroup( Manta::Group * group ) 
 { 
-  cerr << "MA(" << this << ") SET GROUP" 
-       << " WAS " << this->Group 
-       << " NOW " << group << endl;
-
+  //cerr << "MA(" << this << ") SET GROUP" 
+  //     << " WAS " << this->Group 
+  //     << " NOW " << group << endl;
   if (!this->Group)
     {
     this->Group = group; 

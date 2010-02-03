@@ -74,13 +74,13 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <Engine/Control/RTRT.h>
 #include <Engine/Display/SyncDisplay.h>
 
-vtkCxxRevisionMacro(vtkMantaRenderWindow, "1.11");
+vtkCxxRevisionMacro(vtkMantaRenderWindow, "1.12");
 vtkStandardNewMacro(vtkMantaRenderWindow);
 
 //----------------------------------------------------------------------------
 vtkMantaRenderWindow::vtkMantaRenderWindow() : ColorBuffer(0), DepthBuffer(0)
 {
-  cerr << "MW(" << this << ") CREATE" << endl;
+  //cerr << "MW(" << this << ") CREATE" << endl;
   if ( this->WindowName )
     {
     delete [] this->WindowName;
@@ -95,7 +95,7 @@ vtkMantaRenderWindow::vtkMantaRenderWindow() : ColorBuffer(0), DepthBuffer(0)
 //----------------------------------------------------------------------------
 vtkMantaRenderWindow::~vtkMantaRenderWindow()
 {
-  cerr << "MW(" << this << ") DESTROY" << endl;
+  //cerr << "MW(" << this << ") DESTROY" << endl;
 
   vtkRenderer * ren = NULL;
   this->Renderers->InitTraversal();
@@ -530,11 +530,12 @@ void vtkMantaRenderWindow::AddRenderer( vtkRenderer *ren )
   vtkMantaRenderer *mren = vtkMantaRenderer::SafeDownCast(ren);
   if (mren)
     {
-    cerr << "Adding a manta renderer " << mren << endl;
+    //cerr << "Adding a manta renderer " << mren << endl;
     }
   else
     {
-    cerr << "Adding a non manta renderer " << ren << " " << ren->GetClassName() << endl;
+    //cerr << "Adding a non manta renderer " << ren << " " 
+    //     << ren->GetClassName() << endl;
     }
   this->Superclass::AddRenderer( ren );
 }
