@@ -78,7 +78,68 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <Model/Groups/DynBVH.h>
 #include <Model/Groups/Group.h>
 
-vtkCxxRevisionMacro(vtkMantaActor, "1.9");
+//============================================================================
+
+//MPR is a helper that exists just to hold on to manta side resources
+//long enough for the manta thread to destroy them, whenever that
+//threads gets around to it (in a callback)
+class MPR2
+{
+public:
+  MPR2(Manta::Group *w,
+      Manta::AccelerationStructure *a,
+      Manta::Group *g)
+    : MantaWorldGroup(w), MantaAS(a), MantaGeom(g)
+  {
+    this->DebugCntr = MPR2::GlobalCntr++;
+    cerr << "MAPR( " << this << ") " << this->DebugCntr << endl;
+    cerr << " AS: " << this->MantaAS << endl;
+    cerr << " WG: " << this->MantaWorldGroup << endl;
+    cerr << " MG: " << this->MantaGeom << endl;
+  }
+  
+  void FreeMantaResources()
+  {
+    cerr << "MAPR(" << this << ") FREE MANTA RESOURCES " 
+         << this->DebugCntr << endl;
+    cerr << " AS: " << this->MantaAS << endl;
+    if (this->MantaAS)
+      {
+      this->MantaAS->setGroup( NULL ); 
+      }
+    cerr << " WG: " << this->MantaWorldGroup << endl;
+    if (this->MantaWorldGroup)
+      {
+      this->MantaWorldGroup->remove(this->MantaAS, false);
+      }
+    delete this->MantaAS; 
+    cerr << " MG: " << this->MantaGeom << endl;
+    if (this->MantaGeom)
+      {
+      this->MantaGeom->shrinkTo(0, true);
+      }
+    delete this->MantaGeom;
+
+    //WARNING: this class must never be instantiated on the stack.
+    //Therefore, it has private unimplemented copy/contructors.
+    delete this; 
+  }
+    
+  Manta::Group * MantaWorldGroup;
+  Manta::AccelerationStructure * MantaAS;
+  Manta::Group * MantaGeom;
+  int DebugCntr;
+  static int GlobalCntr;
+private:
+  MPR2(const MPR2&);  // Not implemented.
+  void operator=(const MPR2&);  // Not implemented.
+};
+
+int MPR2::GlobalCntr = 0;
+
+//===========================================================================
+
+vtkCxxRevisionMacro(vtkMantaActor, "1.10");
 vtkStandardNewMacro(vtkMantaActor);
 
 //----------------------------------------------------------------------------
@@ -117,24 +178,32 @@ void vtkMantaActor::ReleaseGraphicsResources( vtkWindow * win )
 {
   cerr << "MA(" << this << ") RELEASE GRAPHICS RESOURCES" << endl;
   this->Superclass::ReleaseGraphicsResources( win );
-
   if (!this->MantaManager)
     {
+    cerr << "NO MGR" << endl;
     return;
     }
+
+  //save off the pointers for the manta thread
+  MPR2 *R = new MPR2(this->MantaManager->GetMantaWorldGroup(),
+                     this->MantaAS,
+                     this->Group);
+
+  //make no further references to them in this thread
+  this->MantaAS = NULL;
+  this->Group = NULL;
+
+  //ask the manta thread to free them when it can
   this->MantaManager->GetMantaEngine()->
-    addTransaction(
-                   "delete geometry",
-                   Manta::Callback::create( this,
-                                            &vtkMantaActor::RemoveObjects,
-                                            true
-                                            )
-                   );
+    addTransaction("cleanup actor",
+                   Manta::Callback::create(R, &MPR2::FreeMantaResources));
 }
 
 //----------------------------------------------------------------------------
 void vtkMantaActor::Render( vtkRenderer * ren, vtkMapper * mapper )
 {
+  cerr << "MA(" << this << ") RENDER" << endl;
+
   if ( vtkMantaRenderer * mantaRenderer = vtkMantaRenderer::SafeDownCast( ren ) )
     {
     if (!this->MantaManager)
@@ -181,17 +250,13 @@ void vtkMantaActor::SetVisibility(int newval)
     //called when visibility is off.
     this->MantaManager->GetMantaEngine()->addTransaction
       ( "detach geometry",
-        Manta::Callback::create( this,
-                                 &vtkMantaActor::RemoveObjects,
-                                 false
-                               )
-      );
+        Manta::Callback::create(this, &vtkMantaActor::RemoveObjects) );
     }
   this->Superclass::SetVisibility(newval);
 }
 
 //----------------------------------------------------------------------------
-void vtkMantaActor::RemoveObjects(bool deleteMesh )
+void vtkMantaActor::RemoveObjects()
 {  
   cerr << "MA(" << this << ") REMOVE OBJECTS" << endl;
   if (!this->MantaManager)
@@ -201,23 +266,13 @@ void vtkMantaActor::RemoveObjects(bool deleteMesh )
 
   if (this->MantaAS)
     {
-    //TODO: I think the old group can and should be deleted too
+    cerr << " AS: " << this->MantaAS << endl;
+    cerr << " WG: " << this->MantaManager->GetMantaWorldGroup() << endl;
+
     this->MantaAS->setGroup( NULL ); 
-
-    this->MantaManager->GetMantaWorldGroup()->remove( this->MantaAS, true );
-    //delete this->MantaAS; //TODO: does remove above to this? This is double delete F.S.R.
+    this->MantaManager->GetMantaWorldGroup()->remove( this->MantaAS, false );
+    delete this->MantaAS; 
     this->MantaAS = NULL;
-    }
-
-  if (deleteMesh)
-    {    
-    if (this->Group)
-      {
-      //delete all geometry
-      this->Group->shrinkTo(0, true);
-      delete this->Group;
-      this->Group = NULL;
-      }
     }
 }
 
@@ -233,6 +288,12 @@ void vtkMantaActor::UpdateObjects( vtkRenderer * ren )
     return;
     }
 
+  //Remove whatever we used to show in the scene
+  if (!this->MantaManager)
+    {
+    return;
+    }
+
   //TODO:
   //We are using Manta's DynBVH, but we never use it Dyn-amically.
   //Instead we delete the old and rebuild a new AS every time something changes,
@@ -240,40 +301,72 @@ void vtkMantaActor::UpdateObjects( vtkRenderer * ren )
   //or try different acceleration structures. Those might be faster - either 
   //during sort or during search.
 
-  //Remove whatever we used to show in the scene
-  this->RemoveObjects(false);
+  //Remove what was shown.
+  this->RemoveObjects();
 
+  //Add what we are now supposed to show.
   if (this->Group)
     {
-    //Add what we are now supposed to show
     //Create an acceleration structure for the data and add it to the scene
 
     //We have to nest to make an AS for each inner group
     //Is there a Manta call we can make to simply recurse while making the AS?
     this->MantaAS = new Manta::DynBVH();
+    cerr << "MA(" << this << ") CREATE AS " << this->MantaAS << endl;
     Manta::Group *group = new Manta::Group();
     for (unsigned int i = 0; i < this->Group->size(); i++)
       {
       Manta::DynBVH *innerBVH = new Manta::DynBVH();
-      Manta::Group * innerGroup = static_cast<Manta::Group *>
+      Manta::Group * innerGroup = dynamic_cast<Manta::Group *>
         (this->Group->get(i));
       if (innerGroup)
         {
+        cerr << "MA(" << this << ") BVH FOR " << i << " " << innerGroup << endl;
         innerBVH->setGroup(innerGroup);
         group->add(innerBVH);
         }
       else
         {
+        cerr << "MA(" << this << ") SIMPLE " << i << " " << innerGroup << endl;
         delete innerBVH;
         group->add(this->Group->get(i));
         }
       }
+
+    cerr << "MA(" << this << ") PREPROCESS" << endl;
     this->MantaAS->setGroup(group);
     Manta::Group* mantaWorldGroup = this->MantaManager->GetMantaWorldGroup();
     mantaWorldGroup->add(static_cast<Manta::Object *> (this->MantaAS));
-
+    cerr << "ME = " << this->MantaManager->GetMantaEngine() << endl;
+    cerr << "LS = " << this->MantaManager->GetMantaLightSet() << endl;
     Manta::PreprocessContext context(this->MantaManager->GetMantaEngine(), 0, 1,
                                      this->MantaManager->GetMantaLightSet());
     mantaWorldGroup->preprocess(context);
+    cerr << "PREP DONE" << endl;
     }
+}
+
+//----------------------------------------------------------------------------
+void vtkMantaActor::SetGroup( Manta::Group * group ) 
+{ 
+  cerr << "MA(" << this << ") SET GROUP" 
+       << " WAS " << this->Group 
+       << " NOW " << group << endl;
+
+  if (!this->Group)
+    {
+    this->Group = group; 
+    return;
+    }
+
+  //save off the pointers for the manta thread
+  MPR2 *R = new MPR2(NULL,
+                     NULL,
+                     this->Group);
+
+  this->Group = group; 
+  //ask the manta thread to free them when it can
+  this->MantaManager->GetMantaEngine()->
+    addTransaction("change geometry",
+                   Manta::Callback::create(R, &MPR2::FreeMantaResources));
 }

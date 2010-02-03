@@ -112,19 +112,12 @@ public:
   
   //Description:
   // Transaction callback that hides the object
-  void RemoveObjects(bool deleteMesh );
+  void RemoveObjects();
 
   //BTX
-  //TODO: This leaks whatever was there, but must schedule its deletion because of threading
-  void SetGroup( Manta::Group * group ) 
-  { 
-    this->Group = group; 
-  }
-  //TODO: This leaks whatever was there, but must schedule its deletion because of threading
-  void SetMantaAS( Manta::AccelerationStructure * mantaAS )
-  { 
-    this->MantaAS = mantaAS; 
-  }
+  //TODO: This leaks whatever was there, but must schedule its 
+  //deletion because of threading
+  void SetGroup( Manta::Group * group );
   Manta::Group * GetGroup() 
   {
     return this->Group; 

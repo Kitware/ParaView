@@ -123,7 +123,6 @@ public:
   //Description:
   //Internal callbacks for manta thread use.
   //Do not call them directly.
-  void FreeMantaResources();
   void CreateMantaProperty();
 
 protected:
@@ -139,8 +138,8 @@ private:
 
   //BTX
   Manta::Material *MantaMaterial;
-  Manta::Texture<Manta::Color> *diffuseTexture;
-  Manta::Texture<Manta::Color> *specularTexture;
+  Manta::Texture<Manta::Color> *DiffuseTexture;
+  Manta::Texture<Manta::Color> *SpecularTexture;
   //ETX
 
   // type of material to use. possible values are: "lambertian", "phong",
