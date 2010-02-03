@@ -34,13 +34,13 @@ QtTesting.playCommand(object11, 'activate', '')
 object12 = 'pqClientMainWindow/menubar/menu_File'
 QtTesting.playCommand(object12, 'activate', '')
 QtTesting.playCommand(object12, 'activate', 'actionFileSaveAnimation')
-object13 = 'Dialog/checkBoxDisconnect'
+object13 = 'pqAnimationSettingsDialog/checkBoxDisconnect'
 QtTesting.playCommand(object13, 'set_boolean', 'true')
-object14 = 'Dialog/spinBoxWidth'
-QtTesting.playCommand(object14, 'set_int', '300')
-object14 = 'Dialog/spinBoxHeight'
-QtTesting.playCommand(object14, 'set_int', '300')
-object15 = 'Dialog/okButton'
+object14 = 'pqAnimationSettingsDialog/width'
+QtTesting.playCommand(object14, 'set_string', '300')
+object14 = 'pqAnimationSettingsDialog/height'
+QtTesting.playCommand(object14, 'set_string', '300')
+object15 = 'pqAnimationSettingsDialog/okButton'
 QtTesting.playCommand(object15, 'activate', '')
 object16 = 'pqClientMainWindow/FileSaveAnimationDialog'
 
