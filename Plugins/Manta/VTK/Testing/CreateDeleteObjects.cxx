@@ -11,6 +11,8 @@
 #include "vtkRenderWindowInteractor.h"
 #include "vtkSphereSource.h"
 
+#include <unistd.h>
+
 // this program tests creating and deleting objects
 
 bool useGL = false;
@@ -132,6 +134,8 @@ int main( int argc, char* argv[] )
 
   renWin->Render();
 
+  usleep(1000000);
+
   // delete cone
   cerr << "DELETE CONE" << endl;
   renderer->RemoveActor( coneActor );
@@ -141,6 +145,8 @@ int main( int argc, char* argv[] )
 
   renWin->Render();
 
+  usleep(1000000);
+
   // delete sphere
   cerr << "DELETE SPHERE" << endl;
   renderer->RemoveActor( sphereActor );
@@ -149,6 +155,7 @@ int main( int argc, char* argv[] )
   sphereActor->Delete();
 
   renWin->Render();
+  usleep(1000000);
 
   // delete cylinder
   cerr << "DELETE CYLINDER" << endl;
@@ -158,9 +165,10 @@ int main( int argc, char* argv[] )
   cylinderActor->Delete();
 
   renWin->Render();
+  usleep(1000000);
 
   // re create sphere
-  cerr << "DELETE SECOND SPHERE" << endl;
+  cerr << "CREATE NEW SPHERE" << endl;
   sphere = vtkSphereSource::New();
   sphere->SetCenter( 0.0, 0.0, 0.0 );
   sphere->SetRadius( objRad );
@@ -176,6 +184,20 @@ int main( int argc, char* argv[] )
   renderer->AddActor( sphereActor );
 
   renWin->Render();
+  usleep(1000000);
+
+  cerr << "DELETE NEW SPHERE" << endl;
+
+  renderer->RemoveActor( sphereActor );
+
+  renWin->Render();
+  usleep(1000000);
+
+  renWin->Render();
+  usleep(1000000);
+
+  renWin->Render();
+  usleep(1000000);
 
   //re-delete sphere
   sphere->Delete();
