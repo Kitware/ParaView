@@ -15,6 +15,7 @@
 #include "vtkBlockDeliveryPreprocessor.h"
 
 #include "vtkAttributeDataToTableFilter.h"
+#include "vtkSplitColumnComponents.h"
 #include "vtkCompositeDataPipeline.h"
 #include "vtkExtractBlock.h"
 #include "vtkHierarchicalBoxDataIterator.h"
@@ -28,12 +29,13 @@
 #include "vtkTable.h"
 
 vtkStandardNewMacro(vtkBlockDeliveryPreprocessor);
-vtkCxxRevisionMacro(vtkBlockDeliveryPreprocessor, "1.3");
+vtkCxxRevisionMacro(vtkBlockDeliveryPreprocessor, "1.4");
 //----------------------------------------------------------------------------
 vtkBlockDeliveryPreprocessor::vtkBlockDeliveryPreprocessor()
 {
   this->CompositeDataSetIndex = 0;
   this->FieldAssociation = vtkDataObject::FIELD_ASSOCIATION_POINTS;
+  this->FlattenTable = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -90,7 +92,7 @@ int vtkBlockDeliveryPreprocessor::RequestData(vtkInformation*,
   vtkInformationVector** inputVector,
   vtkInformationVector* outputVector)
 {
-  //cout << "vtkBlockDeliveryPreprocessor::CompositeDataSetIndex: " 
+  //cout << "vtkBlockDeliveryPreprocessor::CompositeDataSetIndex: "
   // << this->CompositeDataSetIndex << endl;
   vtkDataObject* inputDO = vtkDataObject::GetData(inputVector[0], 0);
   vtkDataObject* outputDO = vtkDataObject::GetData(outputVector, 0);
@@ -106,18 +108,34 @@ int vtkBlockDeliveryPreprocessor::RequestData(vtkInformation*,
   adtf->SetFieldAssociation(this->FieldAssociation);
   adtf->Update();
 
+  // Create a pointer of the base class type, so that later stages need not be
+  // concerned with whether the data was flattened or not.
+  vtkAlgorithm* filter = adtf;
+
+  vtkSmartPointer<vtkSplitColumnComponents> split;
+  if (this->FlattenTable)
+    {
+    split = vtkSmartPointer<vtkSplitColumnComponents>::New();
+    vtkCompositeDataPipeline *pipeline = vtkCompositeDataPipeline::New();
+    split->SetExecutive(pipeline);
+    pipeline->Delete();
+    filter = split;
+    split->SetInputConnection(adtf->GetOutputPort());
+    split->Update();
+    }
+
   vtkMultiBlockDataSet* output = vtkMultiBlockDataSet::SafeDownCast(
     outputDO);
   if (!output)
     {
-    outputDO->ShallowCopy(adtf->GetOutputDataObject(0));
+    outputDO->ShallowCopy(filter->GetOutputDataObject(0));
     return 1;
     }
 
   if (this->CompositeDataSetIndex != 0)
     {
     vtkSmartPointer<vtkExtractBlock> eb = vtkSmartPointer<vtkExtractBlock>::New();
-    eb->SetInputConnection(adtf->GetOutputPort());
+    eb->SetInputConnection(filter->GetOutputPort());
     eb->AddIndex(this->CompositeDataSetIndex);
     eb->PruneOutputOff();
     eb->Update();
@@ -125,7 +143,7 @@ int vtkBlockDeliveryPreprocessor::RequestData(vtkInformation*,
     }
   else
     {
-    output->ShallowCopy(adtf->GetOutputDataObject(0));
+    output->ShallowCopy(filter->GetOutputDataObject(0));
     }
 
   vtkCompositeDataSet* input = vtkCompositeDataSet::SafeDownCast(inputDO);

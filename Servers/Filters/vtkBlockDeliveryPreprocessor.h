@@ -39,7 +39,7 @@ public:
   void SetCompositeDataSetIndex() { this->SetCompositeDataSetIndex(0); }
 
   // Description:
-  // Select the attribute type. Accepted values are 
+  // Select the attribute type. Accepted values are
   // \li vtkDataObject::FIELD_ASSOCIATION_POINTS,
   // \li vtkDataObject::FIELD_ASSOCIATION_CELLS,
   // \li vtkDataObject::FIELD_ASSOCIATION_NONE,
@@ -50,6 +50,12 @@ public:
   // associated with the input dataobject is extracted.
   vtkSetMacro(FieldAssociation, int);
   vtkGetMacro(FieldAssociation, int);
+
+  // Description:
+  // Flatten the table, i.e. split any multicomponent columns into separate
+  // components, internally the vtkSplitColumnComponents filter is used.
+  vtkSetMacro(FlattenTable, int);
+  vtkGetMacro(FlattenTable, int);
 
 //BTX
 protected:
@@ -71,6 +77,7 @@ protected:
 
   int FieldAssociation;
   unsigned int CompositeDataSetIndex;
+  int FlattenTable;
 private:
   vtkBlockDeliveryPreprocessor(const vtkBlockDeliveryPreprocessor&); // Not implemented
   void operator=(const vtkBlockDeliveryPreprocessor&); // Not implemented
