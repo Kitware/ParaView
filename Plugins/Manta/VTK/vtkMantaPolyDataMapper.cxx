@@ -102,7 +102,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <math.h>
 
-vtkCxxRevisionMacro(vtkMantaPolyDataMapper, "1.6");
+vtkCxxRevisionMacro(vtkMantaPolyDataMapper, "1.7");
 vtkStandardNewMacro(vtkMantaPolyDataMapper);
 
 //----------------------------------------------------------------------------
@@ -522,7 +522,7 @@ void vtkMantaPolyDataMapper::Draw(vtkRenderer *renderer, vtkActor *actor)
 
   //TODO: Does not respect view transform
   if ( input->GetNumberOfVerts() > 0 )
-    {   
+    {
     sphereGroup = new Manta::Group();
     //TODO: color each point correctly
     Manta::Flat *sphereMat = new Manta::Flat(Manta::Color(Manta::RGBColor(0.0,0.5,0.0)));
@@ -603,13 +603,13 @@ void vtkMantaPolyDataMapper::Draw(vtkRenderer *renderer, vtkActor *actor)
   // normals), changing from FLAT to Gouraud shading needs to create a new mesh.
   if ( mantaProperty->GetInterpolation() != VTK_FLAT )
     {
+    cerr << "GETTING NORMALS" << endl;
     vtkPointData *pointData = input->GetPointData();
     if ( pointData->GetNormals() )
       {
       vtkDataArray *normals = vtkFloatArray::New();
       normals->SetNumberOfComponents(3);
-      transform->TransformNormals( pointData->GetNormals(), normals );
-      
+      transform->TransformNormals( pointData->GetNormals(), normals );      
       for ( int i = 0; i < normals->GetNumberOfTuples(); i ++ )
         {
         double *normal = normals->GetTuple(i);
@@ -621,51 +621,57 @@ void vtkMantaPolyDataMapper::Draw(vtkRenderer *renderer, vtkActor *actor)
   
   transform->Delete();
   
-  // make sure the Center Of Rotation axes widget is INsensitive to the
-  // change of the color map scheme used by disabling the first switch
-  // below IF AND ONLY IF the target actor corresponds to the COR widget
   if ( this->Colors )
     {
+    cerr << "HAS COLORS" << endl;
     // vertex color, easily supported by Manta with TexCoordTexture
     // TODO: color by Cell v.s. Point data
     // TODO: memory leak, delete material and texture at some point
     // TODO: how should we deal with interpolated alpha?
     // TODO: make this a factory method
     cerr << "scalar colormap with mapper Colors array\n";
-    Manta::Material *material = 0;
+    Manta::Material *material = NULL;
     Manta::Texture<Manta::Color> *texture = new Manta::TexCoordTexture();
     
     if ( actor->GetProperty()->GetInterpolation() == VTK_FLAT )
       {
+      cerr << "FLAT" << endl;
       material = new Manta::Flat(texture);
       }
     else
       if ( actor->GetProperty()->GetOpacity() < 1.0 )
         {
-        material = new Manta::Transparent( texture, actor->GetProperty()->GetOpacity() );
+        cerr << "TRANSLUCENT" << endl;
+        material = new Manta::Transparent(texture, 
+                                          actor->GetProperty()->GetOpacity());
         }
       else
         if ( actor->GetProperty()->GetSpecular() == 0 )
           {
+          cerr << "LAMBERTIAN" << endl;
           material = new Manta::Lambertian(texture);
           }
         else
           {
+          cerr << "PHONG" << endl;
           //TODO: Phong shading on colormap??
           double *specular = actor->GetProperty()->GetSpecularColor();
           Manta::Texture<Manta::Color> *specularTexture =
-            new Manta::Constant<Manta::Color>(Manta::Color(Manta::RGBColor(specular[0],
-                                                                           specular[1],
-                                                                           specular[2])));
+            new Manta::Constant<Manta::Color>
+            (Manta::Color(Manta::RGBColor(specular[0],
+                                          specular[1],
+                                          specular[2])));
           material =
-            new Manta::Phong(texture,
-                             specularTexture,
-                             static_cast<int> (actor->GetProperty()->GetSpecularPower()), NULL);
+            new Manta::Phong
+            (texture,
+             specularTexture,
+             static_cast<int> (actor->GetProperty()->GetSpecularPower()),
+             NULL);
           }
     
     if ( material == NULL )
       {
-      delete  texture;
+      delete texture;
       }
     else
       {
@@ -675,17 +681,20 @@ void vtkMantaPolyDataMapper::Draw(vtkRenderer *renderer, vtkActor *actor)
     for ( int i = 0; i < this->Colors->GetNumberOfTuples(); i ++ )
       {
       unsigned char *color = this->Colors->GetPointer(4 * i);
-      mesh->texCoords.push_back( Manta::Vector(color[0]/255.0, color[1]/255.0, color[2]/255.0) );
+      mesh->texCoords.push_back
+        (Manta::Vector(color[0]/255.0, color[1]/255.0, color[2]/255.0) );
       }
     }
   else
     if (this->InterpolateScalarsBeforeMapping && this->ColorCoordinates)
       {
+      cerr << "INTERP AND COLORCOORDS" << endl;
       // TODO: drawing of lines creates triangle strip with possibly undefined
       // tex coordinates scalar color with texture
       vtkDataArray * tcoords = this->ColorCoordinates;
       if ( tcoords )
         {
+        cerr << "HAS TCCORDS" << endl;
         for (int i = 0; i < tcoords->GetNumberOfTuples(); i++)
           {
           double *tcoord = tcoords->GetTuple(i);
@@ -696,6 +705,7 @@ void vtkMantaPolyDataMapper::Draw(vtkRenderer *renderer, vtkActor *actor)
       // TODO: memory leak, delete material at some point
       if (this->InternalColorTexture)
         {
+        cerr << "INTERNAL COLOR TEXTURE" << endl;
         Manta::Texture<Manta::Color> *texture = 
           this->InternalColorTexture->GetMantaTexture();
         Manta::Material *material = new Manta::Lambertian(texture);
@@ -710,24 +720,28 @@ void vtkMantaPolyDataMapper::Draw(vtkRenderer *renderer, vtkActor *actor)
     else
       if (input->GetPointData()->GetTCoords() && actor->GetTexture() )
         {
+        cerr << "USE VTKTEXTURE" << endl;
         // use vtkTexture
         // write texture coordinates
         vtkDataArray *tcoords = input->GetPointData()->GetTCoords();
         for (int i = 0; i < tcoords->GetNumberOfTuples(); i++)
           {
           double *tcoord = tcoords->GetTuple(i);
-          mesh->texCoords.push_back( Manta::Vector(tcoord[0], tcoord[1], tcoord[2]) );
+          mesh->texCoords.push_back
+            ( Manta::Vector(tcoord[0], tcoord[1], tcoord[2]) );
           }
         
         // TODO: memory leak, delete material at some point
         // get Manta texture from Actor->Texture
-        vtkMantaTexture *mantaTexture = vtkMantaTexture::SafeDownCast(actor->GetTexture());
+        vtkMantaTexture *mantaTexture = 
+          vtkMantaTexture::SafeDownCast(actor->GetTexture());
         if (mantaTexture)
           {
-          Manta::Texture<Manta::Color> *texture = mantaTexture->GetMantaTexture();
+          cerr << "MANTA TEXTURE" << endl;
+          Manta::Texture<Manta::Color> *texture = 
+            mantaTexture->GetMantaTexture();
           Manta::Material *material = new Manta::Lambertian(texture);
           mesh->materials.push_back( material );
-          cerr << "color with texture\n";
           }
         else
           {
@@ -736,8 +750,15 @@ void vtkMantaPolyDataMapper::Draw(vtkRenderer *renderer, vtkActor *actor)
         }
       else
         {
+        cerr << "using actor's property" << endl;
         // no colormap or texture, use the Actor's property
-        mesh->materials.push_back( mantaProperty->GetMantaMaterial() );
+        Manta::Material *mmat = mantaProperty->GetMantaMaterial();
+        if(!mmat)
+          {
+          mantaProperty->CreateMantaProperty();
+          mmat = mantaProperty->GetMantaMaterial();
+          }
+        mesh->materials.push_back( mmat );
         }
   
   //TODO: Respect wireframe and point mode
@@ -757,21 +778,26 @@ void vtkMantaPolyDataMapper::Draw(vtkRenderer *renderer, vtkActor *actor)
     this->DrawTStrips(input, mesh);
     }
 
-  //TODO: Need a transaction to safely delete the old array
-  mantaActor->SetGroup(NULL);
-
   Manta::Group *group = new Manta::Group();
+  cerr << "MM(" << this << ") Create Group " << group << endl;
   if(sphereGroup)
     {
+    cerr << "MM(" << this << ")   points " << sphereGroup << endl;
     group->add(sphereGroup);
     }
   if(tubeGroup)
     {
+    cerr << "MM(" << this << ")   lines " << tubeGroup << endl;
     group->add(tubeGroup);
     }
   if (hadsome)
     {
+    cerr << "MM(" << this << ")   polygons " << mesh << endl;
     group->add(mesh);
+    }
+  else
+    {
+    delete mesh;
     }
   if (group->size())
     {
@@ -779,6 +805,7 @@ void vtkMantaPolyDataMapper::Draw(vtkRenderer *renderer, vtkActor *actor)
     }
   else
     {
+    mantaActor->SetGroup(NULL);
     delete group;
     cerr << "NOTHING TO SEE" << endl;
     }
