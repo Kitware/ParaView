@@ -8181,7 +8181,7 @@
         default_values="">
         <Documentation>
           Set the array to use on X axis. This is used only when
-          UseIndexForXAxis is set to 0. 
+          UseIndexForXAxis is set to 0.
         </Documentation>
         <StringListDomain name="array_list" >
           <RequiredProperties>
@@ -8393,7 +8393,7 @@
       <SubProxy>
         <Proxy name="PreProcessor"
           proxygroup="extended_filters"
-          proxyname="ChartRepresentationPreprocessor">
+          proxyname="XYChartRepresentationPreprocessor">
         </Proxy>
         <!-- TODO: Change Domain of CompositeDataSetIndex so that one can select
         a single leaf in the composite dataset alone -->
@@ -8402,6 +8402,33 @@
           <Property name="CompositeDataSetIndex" />
         </ExposedProperties>
       </SubProxy>
+
+      <StringVectorProperty name="SeriesNamesInfo"
+        number_of_elements_per_command="1"
+        element_types="2"
+        update_self="1"
+        information_only="1">
+        <Documentation>
+          Property providing list of available series that can be plotted.
+        </Documentation>
+        <ContextArraysInformationHelper />
+      </StringVectorProperty>
+
+      <StringVectorProperty name="XArrayName"
+        command="SetXAxisSeriesName"
+        update_self="1"
+        number_of_elements="1"
+        default_values="">
+        <Documentation>
+          Set the array to use on X axis. This is used only when
+          UseIndexForXAxis is set to 0.
+        </Documentation>
+        <StringListDomain name="array_list" >
+          <RequiredProperties>
+             <Property name="SeriesNamesInfo" function="ArrayList"/>
+          </RequiredProperties>
+        </StringListDomain>
+      </StringVectorProperty>
 
       <!-- End of XYPlotRepresentation -->
     </XYChartRepresentationProxy>
