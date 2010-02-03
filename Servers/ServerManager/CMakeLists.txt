@@ -227,6 +227,7 @@ IF (VTK_USE_QVTK)
     vtkSMChartRepresentationProxy.cxx
     vtkSMChartViewProxy.cxx
 #    vtkSMContextNamedOptionsModelProxy.cxx
+    vtkSMContextArraysInformationHelper.cxx
     vtkSMContextViewProxy.cxx
     vtkSMLineChartViewProxy.cxx
     vtkSMXYChartRepresentationProxy.cxx
