@@ -23,7 +23,7 @@
 #include "vtkUnstructuredGrid.h"
 
 vtkStandardNewMacro(vtkCompositeDataToUnstructuredGridFilter);
-vtkCxxRevisionMacro(vtkCompositeDataToUnstructuredGridFilter, "1.6");
+vtkCxxRevisionMacro(vtkCompositeDataToUnstructuredGridFilter, "1.7");
 //----------------------------------------------------------------------------
 vtkCompositeDataToUnstructuredGridFilter::vtkCompositeDataToUnstructuredGridFilter()
 {
@@ -130,7 +130,7 @@ void vtkCompositeDataToUnstructuredGridFilter::AddDataSet(
   vtkDataSet* ds, vtkAppendFilter* appender)
 {
   vtkDataSet* clone = ds->NewInstance();
-  clone->ShallowCopy(clone);
+  clone->ShallowCopy(ds);
   appender->AddInput(clone);
   clone->Delete();
 }
