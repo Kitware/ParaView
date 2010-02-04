@@ -448,7 +448,7 @@ IF (NOT PV_INSTALL_NO_DEVELOPMENT)
     set(REL_REF "/../..")
     INSTALL(
         FILES "${BUILD_TREE}/CMake/tmp/ParaViewConfig.cmake"
-        DESTINATION ${PV_INSTALL_INCLUDE_DIR}
+        DESTINATION ${PV_INSTALL_LIB_DIR}
         COMPONENT Development)
   ENDIF(WIN32)
 
