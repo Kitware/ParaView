@@ -102,7 +102,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <math.h>
 
-vtkCxxRevisionMacro(vtkMantaPolyDataMapper, "1.9");
+vtkCxxRevisionMacro(vtkMantaPolyDataMapper, "1.10");
 vtkStandardNewMacro(vtkMantaPolyDataMapper);
 
 //----------------------------------------------------------------------------
@@ -119,8 +119,16 @@ vtkMantaPolyDataMapper::vtkMantaPolyDataMapper()
 vtkMantaPolyDataMapper::~vtkMantaPolyDataMapper()
 {
   //cerr << "MM(" << this << ") DESTROY" << endl;
+  if (this->InternalColorTexture)
+    {
+    this->InternalColorTexture->Delete();
+    }
+
   if (this->MantaManager)
     {
+    //cerr << "MM(" << this << ") DESTROY " 
+    //     << this->MantaManager << " " 
+    //     << this->MantaManager->GetReferenceCount() << endl;
     this->MantaManager->Delete();
     }
 }
@@ -149,11 +157,14 @@ void vtkMantaPolyDataMapper::ReleaseGraphicsResources(vtkWindow *win)
 void vtkMantaPolyDataMapper::FreeMantaResources()
 {
   //cerr << "MM(" << this << ") FREE MANTA RESOURCES" << endl;
+/*
+  TODO: Is this necessary? If so how to make it work?
   if (this->InternalColorTexture)
     {
     this->InternalColorTexture->Delete();
     }
   this->InternalColorTexture = NULL;
+*/
 }
 
 //----------------------------------------------------------------------------
@@ -170,6 +181,8 @@ void vtkMantaPolyDataMapper::RenderPiece(vtkRenderer *ren, vtkActor *act)
   if (!this->MantaManager)
     {
     this->MantaManager = mantaRenderer->GetMantaManager();
+    //cerr << "MM(" << this << ") REGISTER " << this->MantaManager << " " 
+    //     << this->MantaManager->GetReferenceCount() << endl;
     this->MantaManager->Register(this);
     }
 
@@ -220,7 +233,6 @@ void vtkMantaPolyDataMapper::RenderPiece(vtkRenderer *ren, vtkActor *act)
       {
       this->InternalColorTexture = vtkMantaTexture::New();
       this->InternalColorTexture->RepeatOff();
-      this->InternalColorTexture->Register(this);
       }
     this->InternalColorTexture->SetInput(this->ColorTextureMap);
     }

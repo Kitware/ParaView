@@ -78,7 +78,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <math.h>
 
-vtkCxxRevisionMacro(vtkMantaTexture, "1.6");
+vtkCxxRevisionMacro(vtkMantaTexture, "1.7");
 vtkStandardNewMacro(vtkMantaTexture);
 
 //----------------------------------------------------------------------------
@@ -95,6 +95,8 @@ vtkMantaTexture::~vtkMantaTexture()
   //cerr << "MT( " << this << ") DESTROY " << endl;
   if (this->MantaManager)
     {
+    //cerr << "MT(" << this << ") DESTROY " << this->MantaManager << " " 
+    //     << this->MantaManager->GetReferenceCount() << endl;
     this->MantaManager->Delete();
     }
 }
@@ -143,6 +145,8 @@ void vtkMantaTexture::Load(vtkRenderer *ren)
   if (!this->MantaManager)
     {
     this->MantaManager = mantaRenderer->GetMantaManager();
+    //cerr << "MT(" << this << ") REGISTER " << this->MantaManager << " " 
+    //     << this->MantaManager->GetReferenceCount() << endl;
     this->MantaManager->Register(this);
     }
 

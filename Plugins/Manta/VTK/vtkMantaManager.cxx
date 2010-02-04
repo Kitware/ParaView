@@ -36,7 +36,7 @@
 #include <Model/Groups/Group.h>
 #include <Model/Lights/HeadLight.h>
 
-vtkCxxRevisionMacro(vtkMantaManager, "1.4");
+vtkCxxRevisionMacro(vtkMantaManager, "1.5");
 vtkStandardNewMacro(vtkMantaManager);
 
 //----------------------------------------------------------------------------
@@ -59,22 +59,27 @@ vtkMantaManager::vtkMantaManager()
 vtkMantaManager::~vtkMantaManager()
 {
   //cerr << "MX(" << this << ") DESTROY" << endl;
-
   int v =-1;
-  //TODO: This is screwey but the only way I've found to get it to consistently
+  //TODO: This is screwy but the only way I've found to get it to consistently
   //shutdown without hanging.
+  //int i = 0;
+  if (this->SyncDisplay)
+    {
+    this->SyncDisplay->doneRendering();
+    }
+  v = this->MantaEngine->numWorkers();
+  this->MantaEngine->changeNumWorkers(0);
   while (v != 0)
     {
-    v = this->MantaEngine->numWorkers();
     //cerr << "MX(" << this << ") SYNC " << i++ << " " << v << endl;
     if (this->SyncDisplay)
       {
       this->SyncDisplay->waitOnFrameReady();
       this->SyncDisplay->doneRendering();
       }
-    this->MantaEngine->changeNumWorkers(0);
+    v = this->MantaEngine->numWorkers();
     }
-
+  //cerr << "MX(" << this << ") SYNC DONE " << i << " " << v << endl;
   //cerr << "MX(" << this << ") wait" << endl;
   this->MantaEngine->blockUntilFinished();
 
@@ -108,6 +113,7 @@ vtkMantaManager::~vtkMantaManager()
   //delete this->SyncDisplay; //engine does this
 
   delete this->MantaEngine;
+
   //cerr << "MX(" << this << ") good night Gracie" << endl;
 
 }

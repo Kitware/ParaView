@@ -95,7 +95,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <vtkstd/string>
 
-vtkCxxRevisionMacro(vtkMantaRenderer, "1.12");
+vtkCxxRevisionMacro(vtkMantaRenderer, "1.13");
 vtkStandardNewMacro(vtkMantaRenderer);
 
 //----------------------------------------------------------------------------
@@ -139,7 +139,8 @@ vtkMantaRenderer::vtkMantaRenderer() :
 //----------------------------------------------------------------------------
 vtkMantaRenderer::~vtkMantaRenderer()
 {
-  //cerr << "MR(" << this << ") DESTROY" << endl;
+  //cerr << "MR(" << this << ") DESTROY " << this->MantaManager << " " 
+  //     << this->MantaManager->GetReferenceCount() << endl;
   this->MantaManager->Delete();
 
   if (this->ColorBuffer)
@@ -155,7 +156,8 @@ vtkMantaRenderer::~vtkMantaRenderer()
 //----------------------------------------------------------------------------
 void vtkMantaRenderer::InitEngine()
 {
-  //cerr << "MR(" << this << ") INIT" << endl;
+  //cerr << "MR(" << this << ")#" << this->GetLayer() << " INIT " 
+  //     << this->MantaManager << endl;
   this->MantaManager->StartEngine(this->MaxDepth,
                                   this->GetBackground(),
                                   this->Ambient,
@@ -294,9 +296,7 @@ void vtkMantaRenderer::DeviceRender()
     return;
     }
 
-  // Initialize the Manta engine so it can accept geometry
-  // but don't start rendering just yet.
-  if ( !this->EngineInited )
+  if (!this->EngineInited )
     {
     this->InitEngine();
     }
@@ -312,17 +312,16 @@ void vtkMantaRenderer::DeviceRender()
   this->UpdateLightGeometry();
   this->UpdateLights();
 
-  this->UpdateGeometry();
-
-  vtkTimerLog::MarkEndEvent("Geometry");
-
-  // Start the Manta Engine so the geometry added
-  // by transactions can be rendered
   if (!this->EngineStarted)
     {
     this->MantaEngine->beginRendering( false );
     this->EngineStarted = true;
+    this->GetSyncDisplay()->waitOnFrameReady();
     }
+
+  this->UpdateGeometry();
+
+  vtkTimerLog::MarkEndEvent("Geometry");
 
   vtkTimerLog::MarkStartEvent("Total LayerRender");
   if ( this->EngineStarted )
@@ -348,21 +347,13 @@ void vtkMantaRenderer::LayerRender()
   double* renViewport = NULL;
   const   Manta::SimpleImageBase* mantaBase = NULL;
 
-
   vtkTimerLog::MarkStartEvent("ThreadSync");
-  // synchronize with render threads to be sure manta has a full set of pixels
-  //cerr << "MR(" << this << ") wait" << endl;
+  // let the render threads draw what we've asked them to
+  this->GetSyncDisplay()->doneRendering();
+  this->GetSyncDisplay()->waitOnFrameReady();
+  this->GetSyncDisplay()->doneRendering();
   this->GetSyncDisplay()->waitOnFrameReady();
   vtkTimerLog::MarkEndEvent("ThreadSync");
-
-  if (this->GetLayer() != 0 && this->NumberOfPropsRendered == 0)
-    {
-    // skip image composition if we are not Layer 0 and nothing is rendered
-    // in this layer.
-    //cerr << "empty layer: " << this->GetLayer() << endl;
-    this->GetSyncDisplay()->doneRendering();
-    return;
-    }
 
   // collect some useful info
   renderSize = this->GetSize();
@@ -437,8 +428,6 @@ void vtkMantaRenderer::LayerRender()
       }
     }
 
-  // decouple to let render threads work right away
-  this->GetSyncDisplay()->doneRendering();
   //cerr << "MR(" << this << ") release" << endl;
   vtkTimerLog::MarkEndEvent("Image Conversion");
 

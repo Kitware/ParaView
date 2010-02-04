@@ -139,7 +139,7 @@ int MPR2::GlobalCntr = 0;
 
 //===========================================================================
 
-vtkCxxRevisionMacro(vtkMantaActor, "1.11");
+vtkCxxRevisionMacro(vtkMantaActor, "1.12");
 vtkStandardNewMacro(vtkMantaActor);
 
 //----------------------------------------------------------------------------
@@ -157,6 +157,8 @@ vtkMantaActor::~vtkMantaActor()
   //cerr << "MA(" << this << ") DESTROY" << endl;
   if (this->MantaManager)
     {
+    //cerr << "MA(" << this << " DESTROY " << this->MantaManager << " "
+    //     << this->MantaManager->GetReferenceCount() << endl;
     this->MantaManager->Delete();
     }
 }
@@ -209,6 +211,8 @@ void vtkMantaActor::Render( vtkRenderer * ren, vtkMapper * mapper )
     if (!this->MantaManager)
       {
       this->MantaManager = mantaRenderer->GetMantaManager();
+      //cerr << "MA(" << this << " REGISTER " << this->MantaManager << " " 
+      //     << this->MantaManager->GetReferenceCount() << endl;
       this->MantaManager->Register(this);
       }
 

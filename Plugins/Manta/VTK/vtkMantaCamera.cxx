@@ -70,7 +70,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <Engine/Control/RTRT.h>
 #include <math.h>
 
-vtkCxxRevisionMacro(vtkMantaCamera, "1.6");
+vtkCxxRevisionMacro(vtkMantaCamera, "1.7");
 vtkStandardNewMacro(vtkMantaCamera);
 
 //----------------------------------------------------------------------------
@@ -87,6 +87,8 @@ vtkMantaCamera::~vtkMantaCamera()
   //cerr << "MC(" << this << ") DESTROY" << endl;
   if (this->MantaManager)
     {
+    //cerr << "MC(" << this << ") DESTROY " << this->MantaManager << " "
+    //     << this->MantaManager->GetReferenceCount() << endl;
     this->MantaManager->Delete();
     }
 }
