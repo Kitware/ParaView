@@ -21,7 +21,6 @@
 #define __vtkPVGeometryFilter_h
 
 #include "vtkPolyDataAlgorithm.h"
-
 class vtkAppendPolyData;
 class vtkCallbackCommand;
 class vtkDataObject;
@@ -115,6 +114,8 @@ protected:
   vtkPVGeometryFilter();
   ~vtkPVGeometryFilter();
 
+  class vtkPolyDataVector;
+
   virtual int RequestInformation(vtkInformation* request,
                                  vtkInformationVector** inputVector,
                                  vtkInformationVector* outputVector);
@@ -147,10 +148,9 @@ protected:
     vtkPolyData* input, vtkPolyData* output, int doCommunicate);
   void OctreeExecute(
     vtkHyperOctree* input, vtkPolyData* output, int doCommunicate);
-  void DataSetSurfaceExecute(vtkDataSet* input, vtkPolyData* output);
   void ExecuteCellNormals(vtkPolyData* output, int doCommunicate);
   int ExecuteCompositeDataSet(vtkCompositeDataSet* mgInput, 
-                              vtkAppendPolyData* append, 
+                              vtkPolyDataVector &outputs,
                               int& numInputs);
 
   void ChangeUseStripsInternal(int val, int force);
@@ -167,7 +167,7 @@ protected:
   
   int CheckAttributes(vtkDataObject* input);
 
-  vtkCompositeDataSet* FillPartialArrays(vtkCompositeDataSet* input);
+  void FillPartialArrays(vtkPolyDataVector& inputs);
 
   // Callback registered with the InternalProgressObserver.
   static void InternalProgressCallbackFunction(vtkObject*, unsigned long,
