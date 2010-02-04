@@ -432,6 +432,11 @@ IF (NOT PV_INSTALL_NO_DEVELOPMENT)
   SET(VTKCS_CONFIG_DIR                            "\${ParaView_INSTALL_PREFIX}/${PV_INSTALL_CMAKE_DIR}")
   SET(PARAVIEW_LIBRARY_DEPENDS_FILE               "\${ParaView_INSTALL_PREFIX}/${PV_INSTALL_CMAKE_DIR}/ParaViewLibraryDepends.cmake")
   SET(VTK_MAKE_INSTANTIATOR                       "\${ParaView_INSTALL_PREFIX}/${PV_INSTALL_CMAKE_DIR}")
+  
+  set(REL_REF)
+  IF(NOT WIN32)
+    set(REL_REF "/../..")
+  ENDIF(NOT WIN32)
 
   CONFIGURE_FILE(
       "${SOURCE_TREE}/ParaViewConfig.cmake.in"
@@ -445,7 +450,6 @@ IF (NOT PV_INSTALL_NO_DEVELOPMENT)
         DESTINATION ${CMAKE_INSTALL_PREFIX}
         COMPONENT Development)
   ELSE(WIN32)
-    set(REL_REF "/../..")
     INSTALL(
         FILES "${BUILD_TREE}/CMake/tmp/ParaViewConfig.cmake"
         DESTINATION ${PV_INSTALL_LIB_DIR}
