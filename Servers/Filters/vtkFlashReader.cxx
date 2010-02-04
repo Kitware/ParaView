@@ -50,12 +50,14 @@
 #include "vtkMultiProcessController.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 
+#include <hdf5.h>    // for the HDF data loading engine
+
 #include <algorithm> // for 'find()'
 #include <vtkstd/map>
 #include <vtkstd/string>
 #include <vtkstd/vector>
 
-vtkCxxRevisionMacro( vtkFlashReader, "1.3" );
+vtkCxxRevisionMacro( vtkFlashReader, "1.4" );
 vtkStandardNewMacro( vtkFlashReader );
 
 // ============================================================================

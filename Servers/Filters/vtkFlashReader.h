@@ -44,7 +44,6 @@
 #ifndef __vtkFlashReader_h
 #define __vtkFlashReader_h
 
-#include <hdf5.h>
 #include "vtkMultiBlockDataSetAlgorithm.h"
 
 class    vtkPolyData;
