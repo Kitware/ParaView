@@ -71,6 +71,24 @@ MACRO(pv_set_if_not_set name value)
   ENDIF(NOT DEFINED "${name}")
 ENDMACRO(pv_set_if_not_set)
 
+#----------------------------------------------------------------------------
+# When installing system libraries, on non-windows machines, the CMake variable
+# pointing to the library may be a sym-link, in which case we don't simply want
+# to install the symlink, but the actual library. This macro takes care of that.
+# Use it for installing system libraries. Call this only on unix boxes.
+FUNCTION (pv_install_library libpath dest component)
+  IF (NOT WIN32)
+    GET_FILENAME_COMPONENT(dir_tmp ${libpath} PATH)
+    GET_FILENAME_COMPONENT(name_tmp ${libpath} NAME)
+    FILE(GLOB lib_list RELATIVE "${QT_LIB_DIR_tmp}" "${libpath}*")
+    INSTALL(CODE "
+          MESSAGE(STATUS \"Installing ${name_tmp}\")
+          EXECUTE_PROCESS (WORKING_DIRECTORY ${dir_tmp}
+               COMMAND tar c ${lib_list}
+               COMMAND tar -xC \${CMAKE_INSTALL_PREFIX}/${dest})
+               " COMPONENT ${component})
+  ENDIF (NOT WIN32)
+ENDFUNCTION (pv_install_library)
 
 #----------------------------------------------------------------------------
 # Function for adding an executable with support for shared forwarding.
