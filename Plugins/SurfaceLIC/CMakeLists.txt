@@ -16,7 +16,7 @@ if ( SURFACE_LIC_PLUGINS )
 
   QT4_WRAP_CPP( MOC_SRCS 
     pqSurfaceLICDisplayPanelDecorator.h
-    pqSurfaceLICDisplayPanelDecoratorImplementation.h
+ #   pqSurfaceLICDisplayPanelDecoratorImplementation.h
     )
 
   QT4_WRAP_UI( UI_SRCS 
