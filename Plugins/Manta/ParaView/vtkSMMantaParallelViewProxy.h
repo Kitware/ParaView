@@ -83,6 +83,21 @@ public:
   // quietly return an empty selection.
   virtual bool IsSelectionAvailable() { return false;}
 
+
+  // Description:
+  // Overridden to prevent client side rendering, which isn't ray traced yet, and
+  // because switching back and forth has issues.
+  virtual void SetRemoteRenderThreshold(double ) 
+  {
+    this->RemoteRenderThreshold = 0.0;
+  }
+
+  // Description:
+  // Overridden to prevent LOD, since that causes rebuilds of the accel structure on every frame.
+  virtual void SetLODThreshold(double)
+  {
+    this->LODThreshold = 100000.0;
+  }
 //BTX
 protected:
   vtkSMMantaParallelViewProxy();
@@ -92,6 +107,10 @@ protected:
   // Called at the start of CreateVTKObjects().
   virtual bool BeginCreateVTKObjects();
   virtual void EndCreateVTKObjects();
+
+  // Description:
+  // Overridden to prevent screen space downsampling until it works with manta.
+  virtual void SetImageReductionFactorInternal(int factor) { return; }
 
 private:
 

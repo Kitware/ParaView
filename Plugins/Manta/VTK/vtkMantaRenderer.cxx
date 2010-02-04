@@ -95,7 +95,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <vtkstd/string>
 
-vtkCxxRevisionMacro(vtkMantaRenderer, "1.11");
+vtkCxxRevisionMacro(vtkMantaRenderer, "1.12");
 vtkStandardNewMacro(vtkMantaRenderer);
 
 //----------------------------------------------------------------------------
@@ -376,25 +376,24 @@ void vtkMantaRenderer::LayerRender()
               ( this->GetSyncDisplay()->getCurrentImage() );
   rowLength = mantaBase->getRowLength();
 
-//  cerr << endl << "vtkMantaRenderer, ImangeSize: "
-//       << mantaSize[0] << ", " << mantaSize[1] << ", "
-//       << "renWinSize: " << renWinSize[0] << ", " << renWinSize[1] << ", "
-//       << "renderSize: " << renderSize[0] << ", " << renderSize[1] << ", " << endl
-//       << "Layer: " << this->GetLayer() << ", Props Rendered: " << this->NumberOfPropsRendered << endl;
-
-
   // for window re-sizing
   minWidth    = ( mantaSize[0] < renderSize[0] )
                 ? mantaSize[0] : renderSize[0];
   minHeight   = ( mantaSize[1] < renderSize[1] )
                 ? mantaSize[1] : renderSize[1];
   hMantaDiff  = mantaSize[1] - minHeight;
-  hRenderDiff = renderSize[1]- minHeight;
+  hRenderDiff = renderSize[1] - minHeight;
   if (hMantaDiff != 0 || hRenderDiff != 0)
-     {
-     cerr << "mantaDiff: " << hMantaDiff << endl;
-     cerr << "RenderDiff: " << hRenderDiff << endl;
-     }
+    {
+/*
+    cerr << "MR(" << this << ") " 
+         << "Layer: " << this->GetLayer() << ", "
+         << "Props: " << this->NumberOfPropsRendered << endl
+         << "  MantaSize: " << mantaSize[0] << ", " << mantaSize[1] << ", "
+         << "  renWinSize: " << renWinSize[0] << ", " << renWinSize[1] << ", "
+         << "  renderSize: " << renderSize[0] << ", " << renderSize[1] << endl;
+*/
+    }
 
   // memory allocation and acess to the Manta image
   int size = renderSize[0]*renderSize[1];

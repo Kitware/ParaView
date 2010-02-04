@@ -36,7 +36,7 @@
 #include <Model/Groups/Group.h>
 #include <Model/Lights/HeadLight.h>
 
-vtkCxxRevisionMacro(vtkMantaManager, "1.3");
+vtkCxxRevisionMacro(vtkMantaManager, "1.4");
 vtkStandardNewMacro(vtkMantaManager);
 
 //----------------------------------------------------------------------------
@@ -67,8 +67,11 @@ vtkMantaManager::~vtkMantaManager()
     {
     v = this->MantaEngine->numWorkers();
     //cerr << "MX(" << this << ") SYNC " << i++ << " " << v << endl;
-    this->SyncDisplay->waitOnFrameReady();
-    this->SyncDisplay->doneRendering();
+    if (this->SyncDisplay)
+      {
+      this->SyncDisplay->waitOnFrameReady();
+      this->SyncDisplay->doneRendering();
+      }
     this->MantaEngine->changeNumWorkers(0);
     }
 

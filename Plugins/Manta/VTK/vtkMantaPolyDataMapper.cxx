@@ -102,7 +102,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <math.h>
 
-vtkCxxRevisionMacro(vtkMantaPolyDataMapper, "1.8");
+vtkCxxRevisionMacro(vtkMantaPolyDataMapper, "1.9");
 vtkStandardNewMacro(vtkMantaPolyDataMapper);
 
 //----------------------------------------------------------------------------
@@ -809,5 +809,4 @@ void vtkMantaPolyDataMapper::Draw(vtkRenderer *renderer, vtkActor *actor)
     delete group;
     //cerr << "NOTHING TO SEE" << endl;
     }
-  mantaActor->Modified();
 }
