@@ -61,7 +61,7 @@
 #include <vtkstd/string>
 #include <assert.h>
 
-vtkCxxRevisionMacro(vtkPVGeometryFilter, "1.100");
+vtkCxxRevisionMacro(vtkPVGeometryFilter, "1.101");
 vtkStandardNewMacro(vtkPVGeometryFilter);
 
 vtkCxxSetObjectMacro(vtkPVGeometryFilter, Controller, vtkMultiProcessController);
@@ -651,6 +651,7 @@ int vtkPVGeometryFilter::ExecuteCompositeDataSet(
     
     vtkPolyData* tmpOut = vtkPolyData::New();
     this->ExecuteBlock(block, tmpOut, 0);
+    //// assert(tmpOut->GetReferenceCount() == 1);
 
     if (hdIter)
       {
@@ -904,8 +905,11 @@ void vtkPVGeometryFilter::ImageDataExecute(vtkImageData *input,
 //      !this->UseOutline)
   if (!this->UseOutline)
     {
-    this->DataSetSurfaceFilter->StructuredExecute(input,
-      output, input->GetExtent(), ext);
+    if (input->GetNumberOfCells() > 0)
+      {
+      this->DataSetSurfaceFilter->StructuredExecute(input,
+        output, input->GetExtent(), ext);
+      }
     this->OutlineFlag = 0;
     return;
     }  
@@ -958,8 +962,11 @@ void vtkPVGeometryFilter::StructuredGridExecute(vtkStructuredGrid* input,
 //      !this->UseOutline)
   if (!this->UseOutline)
     {
-    this->DataSetSurfaceFilter->StructuredExecute(input, output, input->GetExtent(),
-      input->GetWholeExtent());
+    if (input->GetNumberOfCells() > 0)
+      {
+      this->DataSetSurfaceFilter->StructuredExecute(input, output, input->GetExtent(),
+        input->GetWholeExtent());
+      }
     this->OutlineFlag = 0;
     return;
     }  
@@ -995,8 +1002,11 @@ void vtkPVGeometryFilter::RectilinearGridExecute(vtkRectilinearGrid* input,
 //      !this->UseOutline)
   if (!this->UseOutline)
     {
-    this->DataSetSurfaceFilter->StructuredExecute(input, output,
-      input->GetExtent(), input->GetWholeExtent());
+    if (input->GetNumberOfCells() > 0)
+      {
+      this->DataSetSurfaceFilter->StructuredExecute(input, output,
+        input->GetExtent(), input->GetWholeExtent());
+      }
     this->OutlineFlag = 0;
     return;
     }  
@@ -1025,7 +1035,10 @@ void vtkPVGeometryFilter::UnstructuredGridExecute(
   if (!this->UseOutline)
     {
     this->OutlineFlag = 0;
-    this->DataSetSurfaceFilter->UnstructuredGridExecute(input, output);
+    if (input->GetNumberOfCells() > 0)
+      {
+      this->DataSetSurfaceFilter->UnstructuredGridExecute(input, output);
+      }
     return;
     }
   
