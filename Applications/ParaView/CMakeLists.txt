@@ -84,13 +84,15 @@ install_qt_libs("${qtliblist}" BrandedRuntime)
 
 #------------------------------------------------------------------------
 # Install ffmpeg, if used.
-FOREACH(fmpglib avcodec avformat avutil)
-  IF (FFMPEG_${fmpglib}_LIBRARY)
-    INSTALL(FILES ${FFMPEG_${fmpglib}_LIBRARY}
-            DESTINATION ${PV_INSTALL_LIB_DIR}
-            COMPONENT BrandedRuntime)
-  ENDIF(FFMPEG_${fmpglib}_LIBRARY)
-ENDFOREACH(fmpglib)
+IF (VTK_USE_FFMPEG_ENCODER)
+  FOREACH(fmpglib avcodec avformat avutil)
+    IF (FFMPEG_${fmpglib}_LIBRARY)
+      INSTALL(FILES ${FFMPEG_${fmpglib}_LIBRARY}
+              DESTINATION ${PV_INSTALL_LIB_DIR}
+              COMPONENT BrandedRuntime)
+    ENDIF(FFMPEG_${fmpglib}_LIBRARY)
+  ENDFOREACH(fmpglib)
+ENDIF (VTK_USE_FFMPEG_ENCODER)
 
 #------------------------------------------------------------------------
 # Import site specific installation rules file, if any.
