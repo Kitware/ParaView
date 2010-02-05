@@ -527,19 +527,12 @@ void pqObjectInspectorWidget::accept()
     this->CurrentPanel->accept();
     }
 
-  pqView* activeView = this->view();
   foreach (pqProxy* proxy_to_show, proxies_to_show)
     {
-    if (!activeView)
-      {
-      // if the current frame is empty, try to use the most recently created
-      // frame when accepting multiple sources at the same time.
-      activeView = this->view();
-      }
     pqPipelineSource* source = qobject_cast<pqPipelineSource*>(proxy_to_show);
     if (source)
       {
-      this->show(source, activeView);
+      this->show(source);
       pqProxyModifiedStateUndoElement* elem =
         pqProxyModifiedStateUndoElement::New();
       elem->MadeUnmodified(source);
@@ -707,7 +700,7 @@ void pqObjectInspectorWidget::showHelp()
 }
 
 //-----------------------------------------------------------------------------
-void pqObjectInspectorWidget::show(pqPipelineSource* source, pqView* activeview)
+void pqObjectInspectorWidget::show(pqPipelineSource* source)
 {
   pqDisplayPolicy* displayPolicy = 
     pqApplicationCore::instance()->getDisplayPolicy();
@@ -721,7 +714,7 @@ void pqObjectInspectorWidget::show(pqPipelineSource* source, pqView* activeview)
   for (int cc=0; cc < source->getNumberOfOutputPorts(); cc++)
     {
     pqDataRepresentation* repr = displayPolicy->createPreferredRepresentation(
-      source->getOutputPort(cc), activeview, false);
+      source->getOutputPort(cc), this->view(), false);
     if (!repr || !repr->getView())
       {
       continue;

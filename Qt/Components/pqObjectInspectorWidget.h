@@ -142,7 +142,7 @@ protected slots:
 
 protected:
   /// shows the source.
-  void show(pqPipelineSource*, pqView*);
+  void show(pqPipelineSource*);
   
 private:
 
