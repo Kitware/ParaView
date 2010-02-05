@@ -26,7 +26,7 @@
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMSILInformationHelper);
-vtkCxxRevisionMacro(vtkSMSILInformationHelper, "1.2");
+vtkCxxRevisionMacro(vtkSMSILInformationHelper, "1.3");
 vtkCxxSetObjectMacro(vtkSMSILInformationHelper, SIL, vtkGraph);
 //----------------------------------------------------------------------------
 vtkSMSILInformationHelper::vtkSMSILInformationHelper()
@@ -142,7 +142,7 @@ void vtkSMSILInformationHelper::UpdateArrayList(vtkSMStringVectorProperty* svp)
   model->Initialize(this->SIL);
 
   vtkIdType subTreeVertexId = this->Subtree?
-    model->FindVertex(this->Subtree, 0) : 0;
+    model->FindVertex(this->Subtree) : 0;
 
   if (subTreeVertexId == -1)
     {

@@ -292,6 +292,17 @@ QModelIndex pqSILModel::parent(const QModelIndex& idx) const
 }
 
 //-----------------------------------------------------------------------------
+vtkIdType pqSILModel::findVertex(const char* name) const
+{
+  if (!name)
+    {
+    return -1;
+    }
+
+  return this->SILModel->FindVertex(name);
+}
+
+//-----------------------------------------------------------------------------
 QModelIndex pqSILModel::makeIndex(vtkIdType vertexid) const
 {
   if (vertexid == 0)

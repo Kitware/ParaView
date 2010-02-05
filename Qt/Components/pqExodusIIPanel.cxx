@@ -36,13 +36,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QAction>
 #include <QCheckBox>
 #include <QDoubleSpinBox>
+#include <QHeaderView>
 #include <QLabel>
+#include <QMap>
+#include <QtDebug>
 #include <QTimer>
 #include <QTreeWidget>
 #include <QVariant>
 #include <QVector>
-#include <QMap>
-#include <QHeaderView>
 
 // VTK includes
 
@@ -51,28 +52,37 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkGraph.h"
 #include "vtkProcessModule.h"
 #include "vtkPVArrayInformation.h"
+#include "vtkPVCompositeDataInformation.h"
+#include "vtkPVCompositeDataInformationIterator.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVDataSetAttributesInformation.h"
 #include "vtkPVSILInformation.h"
 #include "vtkSmartPointer.h"
+#include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMProperty.h"
-#include "vtkSMProxyManager.h"
-#include "vtkSMSourceProxy.h"
 #include "vtkSMPropertyHelper.h"
+#include "vtkSMSourceProxy.h"
 
 // ParaView includes
+#include "pqApplicationCore.h"
+#include "pqOutputPort.h"
+#include "pqPipelineSource.h"
 #include "pqPropertyManager.h"
 #include "pqProxy.h"
-#include "pqServer.h"
-#include "pqTimeKeeper.h"
-#include "pqSMAdaptor.h"
-#include "pqTreeWidgetSelectionHelper.h"
-#include "pqTreeWidgetItemObject.h"
-#include "vtkSMDoubleVectorProperty.h"
-#include "pqSILModel.h"
 #include "pqProxySILModel.h"
+#include "pqSelectionManager.h"
+#include "pqServer.h"
+#include "pqSILModel.h"
+#include "pqSMAdaptor.h"
+#include "pqTimeKeeper.h"
 #include "pqTreeViewSelectionHelper.h"
+#include "pqTreeWidgetItemObject.h"
+#include "pqTreeWidgetSelectionHelper.h"
 
+#include <vtkstd/vector>
+#include <vtkstd/algorithm>
+
+//-----------------------------------------------------------------------------
 class pqExodusIIPanel::pqUI : public QObject, public Ui::ExodusIIPanel 
 {
 public:
@@ -112,6 +122,7 @@ public:
   int SILUpdateStamp;
 };
 
+//-----------------------------------------------------------------------------
 pqExodusIIPanel::pqExodusIIPanel(pqProxy* object_proxy, QWidget* p) :
   Superclass(object_proxy, p)
 {
@@ -168,12 +179,26 @@ pqExodusIIPanel::pqExodusIIPanel(pqProxy* object_proxy, QWidget* p) :
     {
     new pqTreeViewSelectionHelper(tree);
     }
+
+  pqSelectionManager* selMan = qobject_cast<pqSelectionManager*>(
+    pqApplicationCore::instance()->manager("SelectionManager"));
+  if (selMan)
+    {
+    QObject::connect(selMan, SIGNAL(selectionChanged(pqOutputPort*)),
+      this, SLOT(onSelectionChanged(pqOutputPort*)));
+    }
+  QObject::connect(this->UI->checkSelected, SIGNAL(pressed()),
+    this, SLOT(setSelectedBlocksCheckState()), Qt::QueuedConnection);
+  QObject::connect(this->UI->uncheckSelected, SIGNAL(pressed()),
+    this, SLOT(uncheckSelectedBlocks()), Qt::QueuedConnection);
 }
 
+//-----------------------------------------------------------------------------
 pqExodusIIPanel::~pqExodusIIPanel()
 {
 }
 
+//-----------------------------------------------------------------------------
 void pqExodusIIPanel::updateSIL()
 {
   vtkSMProxy* reader = this->referenceProxy()->getProxy();
@@ -197,6 +222,7 @@ void pqExodusIIPanel::updateSIL()
     }
 }
 
+//-----------------------------------------------------------------------------
 void pqExodusIIPanel::addSelectionsToTreeWidget(const QString& prop, 
                                       QTreeWidget* tree,
                                       PixmapType pix)
@@ -212,6 +238,7 @@ void pqExodusIIPanel::addSelectionsToTreeWidget(const QString& prop,
     }
 }
 
+//-----------------------------------------------------------------------------
 void pqExodusIIPanel::addSelectionToTreeWidget(const QString& name,
                                                const QString& realName,
                                                QTreeWidget* tree,
@@ -263,6 +290,7 @@ void pqExodusIIPanel::addSelectionToTreeWidget(const QString& name,
   this->UI->TreeItemToPropMap[item] = prop;
 }
 
+//-----------------------------------------------------------------------------
 void pqExodusIIPanel::linkServerManagerProperties()
 {
 
@@ -446,6 +474,7 @@ void pqExodusIIPanel::linkServerManagerProperties()
 
 }
   
+//-----------------------------------------------------------------------------
 void pqExodusIIPanel::applyDisplacements(int state)
 {
   if(state == Qt::Checked && this->DisplItem)
@@ -456,6 +485,7 @@ void pqExodusIIPanel::applyDisplacements(int state)
                                                   true : false);
 }
 
+//-----------------------------------------------------------------------------
 void pqExodusIIPanel::displChanged(bool state)
 {
   QCheckBox* ApplyDisp = this->UI->ApplyDisplacements;
@@ -474,6 +504,7 @@ void pqExodusIIPanel::displChanged(bool state)
     }
 }
 
+//-----------------------------------------------------------------------------
 QString pqExodusIIPanel::formatDataFor(vtkPVArrayInformation* ai)
 {
   QString info;
@@ -515,6 +546,7 @@ QString pqExodusIIPanel::formatDataFor(vtkPVArrayInformation* ai)
   return info;
 }
 
+//-----------------------------------------------------------------------------
 void pqExodusIIPanel::modeChanged(int value)
 {
   if ((value > 0) && (value <= this->UI->TimestepValues.size()))
@@ -524,6 +556,7 @@ void pqExodusIIPanel::modeChanged(int value)
     }
 }
 
+//-----------------------------------------------------------------------------
 void pqExodusIIPanel::onRefresh()
 {
   vtkSMSourceProxy* sp = vtkSMSourceProxy::SafeDownCast(this->proxy());
@@ -536,4 +569,97 @@ void pqExodusIIPanel::onRefresh()
   // "Pull" the values
   sp->UpdatePropertyInformation(sp->GetProperty("TimeRange"));
   sp->UpdatePropertyInformation(sp->GetProperty("TimestepValues")); 
+}
+
+//-----------------------------------------------------------------------------
+void pqExodusIIPanel::onSelectionChanged(pqOutputPort* port)
+{
+  this->UI->checkSelected->setEnabled(false);
+  this->UI->uncheckSelected->setEnabled(false);
+
+  if (!port || port->getSource()->getProxy() != this->proxy())
+    {
+    return;
+    }
+
+  vtkSMProxy* activeSelection = port->getSelectionInput();
+  if (!activeSelection ||
+    strcmp(activeSelection->GetXMLName(), "BlockSelectionSource") != 0)
+    {
+    return;
+    }
+
+  this->UI->checkSelected->setEnabled(true);
+  this->UI->uncheckSelected->setEnabled(true);
+}
+
+//-----------------------------------------------------------------------------
+void pqExodusIIPanel::setSelectedBlocksCheckState(bool check/*=true*/)
+{
+  pqSelectionManager* selMan = qobject_cast<pqSelectionManager*>(
+    pqApplicationCore::instance()->manager("SelectionManager"));
+  if (!selMan || !selMan->getSelectedPort())
+    {
+    return;
+    }
+  
+  pqOutputPort* port = selMan->getSelectedPort();
+  vtkSMProxy* activeSelection = port->getSelectionInput();
+  vtkPVDataInformation* dataInfo = port->getDataInformation();
+
+  vtkSMPropertyHelper blocksProp(activeSelection, "Blocks");
+  vtkstd::vector<vtkIdType> block_ids;
+  block_ids.resize(blocksProp.GetNumberOfElements());
+  blocksProp.Get(&block_ids[0], blocksProp.GetNumberOfElements());
+  vtkstd::sort(block_ids.begin(), block_ids.end());
+
+  // if check is true then we are checking only the selected blocks,
+  // if check is false, then we are un-checking the selected blocks, leaving
+  // the selections for the other blocks as they are.
+  if (check)
+    {
+    this->UI->SILModel.setData(
+      this->UI->SILModel.makeIndex(0), Qt::Unchecked,
+      Qt::CheckStateRole);
+    }
+
+  // block selection only has the block ids, now we need to convert the block
+  // ids to names for the blocks (and sets) using the data information.
+  vtkPVCompositeDataInformationIterator* iter =
+    vtkPVCompositeDataInformationIterator::New();
+  iter->SetDataInformation(dataInfo);
+  unsigned int cur_index = 0;
+  for (iter->InitTraversal();
+    !iter->IsDoneWithTraversal() && cur_index < static_cast<unsigned int>(
+      block_ids.size()); iter->GoToNextItem())
+    {
+    if (iter->GetCurrentFlatIndex() < block_ids[cur_index])
+      {
+      continue;
+      }
+    if (iter->GetCurrentFlatIndex() > block_ids[cur_index])
+      {
+      qDebug() << "Failed to locate block's name for block id: " <<
+        block_ids[cur_index];
+      cur_index++;
+      continue;
+      }
+
+    vtkIdType vertexid =
+      this->UI->SILModel.findVertex(iter->GetCurrentName());
+    if (vertexid != -1)
+      {
+      this->UI->SILModel.setData(this->UI->SILModel.makeIndex(vertexid),
+        check? Qt::Checked : Qt::Unchecked, Qt::CheckStateRole);
+      }
+    else
+      {
+      // if vertexid==-1 from the SIL, then it's possible that this is a name of
+      // one of the sets, since currently, sets are not part of the SIL. Until
+      // the users ask for it, we will leave enabling/disabling the sets out.
+      }
+    cur_index++;
+    }
+
+  iter->Delete();
 }

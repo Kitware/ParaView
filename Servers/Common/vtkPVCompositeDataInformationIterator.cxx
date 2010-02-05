@@ -27,10 +27,12 @@ public:
     {
     vtkPVDataInformation* Node;
     unsigned int NextChildIndex;
-    vtkItem(vtkPVDataInformation* node)
+    const char* Name;
+    vtkItem(vtkPVDataInformation* node, const char* name)
       {
       this->Node = node;
       this->NextChildIndex = 0;
+      this->Name = name;
       }
     };
 
@@ -38,7 +40,7 @@ public:
 };
 
 vtkStandardNewMacro(vtkPVCompositeDataInformationIterator);
-vtkCxxRevisionMacro(vtkPVCompositeDataInformationIterator, "1.2");
+vtkCxxRevisionMacro(vtkPVCompositeDataInformationIterator, "1.3");
 vtkCxxSetObjectMacro(vtkPVCompositeDataInformationIterator, DataInformation, vtkPVDataInformation);
 //----------------------------------------------------------------------------
 vtkPVCompositeDataInformationIterator::vtkPVCompositeDataInformationIterator()
@@ -62,7 +64,8 @@ void vtkPVCompositeDataInformationIterator::InitTraversal()
   this->Internal->Stack.clear();
   if (this->DataInformation)
     {
-    this->Internal->Stack.push_back(vtkInternal::vtkItem(this->DataInformation));
+    this->Internal->Stack.push_back(vtkInternal::vtkItem(this->DataInformation,
+        NULL));
     }
   this->CurrentFlatIndex = 0;
 }
@@ -77,6 +80,17 @@ vtkPVDataInformation* vtkPVCompositeDataInformationIterator::GetCurrentDataInfor
 
   vtkInternal::vtkItem& item = this->Internal->Stack.back();
   return item.Node;
+}
+
+//----------------------------------------------------------------------------
+const char* vtkPVCompositeDataInformationIterator::GetCurrentName()
+{
+  if (this->IsDoneWithTraversal())
+    {
+    return NULL;
+    }
+  vtkInternal::vtkItem& item = this->Internal->Stack.back();
+  return item.Name;
 }
 
 //----------------------------------------------------------------------------
@@ -100,11 +114,12 @@ void vtkPVCompositeDataInformationIterator::GoToNextItem()
     if (cdInfo && cdInfo->GetDataIsComposite() && item.NextChildIndex < cdInfo->GetNumberOfChildren())
       {
       vtkPVDataInformation* current = cdInfo->GetDataInformation(item.NextChildIndex);
+      const char* name = cdInfo->GetName(item.NextChildIndex);
       // current may be NULL for multi piece datasets.
       item.NextChildIndex++;
       this->CurrentFlatIndex++;
       this->Internal->Stack.push_back(
-        vtkInternal::vtkItem(current));
+        vtkInternal::vtkItem(current, name));
       return;
       }
     }

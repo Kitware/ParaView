@@ -118,7 +118,7 @@ public:
   bool SetCheckState(vtkIdType vertex, int status);
   bool SetCheckState(const char* name, int status)
     {
-    vtkIdType vertex = this->FindVertex(name, 0);
+    vtkIdType vertex = this->FindVertex(name);
     if (vertex != -1)
       {
       return this->SetCheckState(vertex, status);
@@ -142,9 +142,8 @@ public:
   void UpdateStateFromProperty(vtkSMStringVectorProperty*);
 
   // Description:
-  // Locate a vertex with the given name under the subtree identified by the
-  // parent (use 0 for root). Returns -1 if the vertex is not found.
-  vtkIdType FindVertex(const char* name, vtkIdType parent);
+  // Locate a vertex with the given name. Returns -1 if the vertex is not found.
+  vtkIdType FindVertex(const char* name);
 
 //BTX 
   void GetLeaves(vtkstd::set<vtkIdType>& leaves,

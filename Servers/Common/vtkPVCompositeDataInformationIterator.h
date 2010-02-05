@@ -56,6 +56,11 @@ public:
   vtkPVDataInformation* GetCurrentDataInformation();
 
   // Description:
+  // Returns the name for the current node. Name may be valid only for a child
+  // node. The root node has no name. Returns NULL when no name is provided.
+  const char* GetCurrentName();
+
+  // Description:
   // Returns the current flat index/composite index.
   // This is only valid is IsDoneWithTraversal() returns false.
   vtkGetMacro(CurrentFlatIndex, unsigned int);

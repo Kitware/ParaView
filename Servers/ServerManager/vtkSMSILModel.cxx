@@ -30,6 +30,8 @@
 #include "vtkStdString.h"
 #include "vtkStringArray.h"
 
+#include <vtkstd/map>
+#include <vtkstd/string>
 #include <vtkstd/vector>
 
 class vtkSMSILModel::vtkInternals
@@ -37,6 +39,9 @@ class vtkSMSILModel::vtkInternals
 public:
   typedef vtkstd::vector<vtkSMSILModel::CheckState> CheckStatesType;
   CheckStatesType CheckStates;
+
+  typedef vtkstd::map<vtkstd::string, vtkIdType> VertexNameMapType;
+  VertexNameMapType VertexNameMap;
 
   // Returns the vertex ids for all leaf nodes in the subtree identified by
   // vertexid.
@@ -69,7 +74,7 @@ public:
 };
 
 vtkStandardNewMacro(vtkSMSILModel);
-vtkCxxRevisionMacro(vtkSMSILModel, "1.2");
+vtkCxxRevisionMacro(vtkSMSILModel, "1.3");
 //-----------------------------------------------------------------------------
 vtkSMSILModel::vtkSMSILModel()
 {
@@ -110,11 +115,20 @@ void vtkSMSILModel::SetSIL(vtkGraph* sil)
     }
 
   vtkIdType numVertices = sil->GetNumberOfVertices();
-  int cursize = this->Internals->CheckStates.size();
+  int cursize = static_cast<int>(this->Internals->CheckStates.size());
   this->Internals->CheckStates.resize(numVertices);
   for (int cc=cursize; cc < numVertices; cc++)
     {
     this->Internals->CheckStates[cc] = vtkSMSILModel::UNCHECKED;
+    }
+
+  // Update the name map.
+  vtkStringArray* names = vtkStringArray::SafeDownCast(
+    this->SIL->GetVertexData()->GetAbstractArray("Names"));
+  this->Internals->VertexNameMap.clear();
+  for (vtkIdType kk=0; kk < numVertices; kk++)
+    {
+    this->Internals->VertexNameMap[names->GetValue(kk)] = kk;
     }
 
   if (numVertices > 0)
@@ -456,7 +470,7 @@ void vtkSMSILModel::UpdateStateFromProperty(vtkSMStringVectorProperty* svp)
     {
     const char* vertexname = svp->GetElement(cc);
     int check_state = atoi(svp->GetElement(cc+1));
-    vtkIdType vertexid = this->FindVertex(vertexname, 0);
+    vtkIdType vertexid = this->FindVertex(vertexname);
     if (vertexid == -1)
       {
       continue;
@@ -490,42 +504,13 @@ void vtkSMSILModel::UncheckAll()
 }
 
 //-----------------------------------------------------------------------------
-vtkIdType vtkSMSILModel::FindVertex(const char* name, vtkIdType parent)
+vtkIdType vtkSMSILModel::FindVertex(const char* name)
 {
-  vtkStringArray* names = vtkStringArray::SafeDownCast(
-    this->SIL->GetVertexData()->GetAbstractArray("Names"));
-
-  if (parent >=0 && parent < names->GetNumberOfTuples())
+  vtkInternals::VertexNameMapType::iterator iter =
+    this->Internals->VertexNameMap.find(name);
+  if (iter != this->Internals->VertexNameMap.end())
     {
-    if (names->GetValue(parent) == name)
-      {
-      return parent;
-      }
-    }
-  else
-    {
-    vtkErrorMacro("Invalid node: " << parent);
-    return -1;
-    }
-
-
-  vtkDataArray* crossEdgesArray = vtkDataArray::SafeDownCast(
-    this->SIL->GetEdgeData()->GetAbstractArray("CrossEdges"));
-
-  vtkSmartPointer<vtkOutEdgeIterator> iter =
-    vtkSmartPointer<vtkOutEdgeIterator>::New();
-  this->SIL->GetOutEdges(parent, iter);
-  while (iter->HasNext())
-    {
-    vtkOutEdgeType edge = iter->Next();
-    if (crossEdgesArray->GetTuple1(edge.Id) == 0)
-      {
-      vtkIdType index = this->FindVertex(name, edge.Target);
-      if (index != -1)
-        {
-        return index;
-        }
-      }
+    return iter->second;
     }
   return -1;
 }

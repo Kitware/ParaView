@@ -36,12 +36,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqNamedObjectPanel.h"
 #include "pqComponentsExport.h"
 
+class pqOutputPort;
 class pqTreeWidgetItemObject;
-class vtkPVArrayInformation;
-class vtkSMProperty;
 class QPixmap;
 class QTreeWidget;
 class QTreeWidgetItem;
+class vtkPVArrayInformation;
+class vtkSMProperty;
 
 class PQCOMPONENTS_EXPORT pqExodusIIPanel :
   public pqNamedObjectPanel
@@ -68,6 +69,20 @@ protected slots:
 
   /// Gets the SIL from the reader and updates the GUI.
   void updateSIL();
+
+  /// Called when the global selection changes. We check if the newly created
+  /// selection is a block-based selection on the data produced by the reader.
+  /// If so, we enable the "Check Selected", "Uncheck Selected" buttons which
+  /// make it possible for the user to quickly select blocks to read/not read.
+  /// BUG #8281.
+  /// For this to work, it requires that the pqSelectionManager is registered
+  /// with the pqApplicationCore as "SelectionManager".
+  void onSelectionChanged(pqOutputPort*);
+
+  /// Slots called when the corresponding buttons are pressed.
+  void setSelectedBlocksCheckState(bool check=true);
+  void uncheckSelectedBlocks()
+    { this->setSelectedBlocksCheckState(false); }
 protected:
   
   /// populate widgets with properties from the server manager

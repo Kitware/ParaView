@@ -139,6 +139,10 @@ public:
   /// Returns the model index for a vertex.
   QModelIndex makeIndex(vtkIdType vertexid) const;
 
+  /// Returns the vertex id for a vertex with the given name in the SIL. Returns
+  /// -1 if no such vertex could be found.
+  vtkIdType findVertex(const char* name) const;
+
 signals:
   void checkStatusChanged();
 
