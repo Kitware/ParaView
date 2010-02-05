@@ -42,7 +42,6 @@
 #include "vtkPointData.h"
 #include "vtkPolyData.h"
 #include "vtkPolygon.h"
-#include "vtkPVTrivialProducer.h"
 #include "vtkRectilinearGrid.h"
 #include "vtkRectilinearGridOutlineFilter.h"
 #include "vtkSmartPointer.h"
@@ -61,7 +60,7 @@
 #include <vtkstd/string>
 #include <assert.h>
 
-vtkCxxRevisionMacro(vtkPVGeometryFilter, "1.101");
+vtkCxxRevisionMacro(vtkPVGeometryFilter, "1.102");
 vtkStandardNewMacro(vtkPVGeometryFilter);
 
 vtkCxxSetObjectMacro(vtkPVGeometryFilter, Controller, vtkMultiProcessController);
