@@ -1,21 +1,20 @@
-IF (PARAVIEW_DATA_ROOT)
-
-  include_directories(
-    ${TestDriver_SOURCE_DIR}
-    )
+include_directories(
+  ${TestDriver_SOURCE_DIR}
+  )
 
 IF (COPROCESSOR_USE_MPI)
   INCLUDE_DIRECTORIES(${MPI_INCLUDE_PATH})
 ENDIF (COPROCESSOR_USE_MPI)
-  
-  ADD_EXECUTABLE(CoProcessingPythonScriptExample PythonScriptCoProcessingExample.cxx vtkPVCustomTestDriver.cxx)
-  TARGET_LINK_LIBRARIES(CoProcessingPythonScriptExample vtkCoProcessor vtkCPTestDriver)
-  
-  ADD_TEST(CoProcessingTestPythonScript ${EXECUTABLE_OUTPUT_PATH}/CoProcessingPythonScriptExample ${CoProcessing_SOURCE_DIR}/CoProcessor/Testing/Cxx/PythonScriptTest.py)
+
+ADD_EXECUTABLE(CoProcessingPythonScriptExample PythonScriptCoProcessingExample.cxx vtkPVCustomTestDriver.cxx)
+TARGET_LINK_LIBRARIES(CoProcessingPythonScriptExample vtkCoProcessor vtkCPTestDriver)
+
+ADD_TEST(CoProcessingTestPythonScript ${EXECUTABLE_OUTPUT_PATH}/CoProcessingPythonScriptExample ${CoProcessing_SOURCE_DIR}/CoProcessor/Testing/Cxx/PythonScriptTest.py)
   
   # below is for doing image comparisons
   # they are not done directly in the above python script due to the fact 
   # that they would make the python script rather ugly
+IF (PARAVIEW_DATA_ROOT)
   ADD_EXECUTABLE(CoProcessingCompareImagesTester CompareImages.cxx)
   TARGET_LINK_LIBRARIES(CoProcessingCompareImagesTester vtkCommon vtkIO vtkRendering)
   
