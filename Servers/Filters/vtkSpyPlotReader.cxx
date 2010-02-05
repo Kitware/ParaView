@@ -62,7 +62,7 @@ PURPOSE.  See the above copyright notice for more information.
 #define coutVector6(x) (x)[0] << " " << (x)[1] << " " << (x)[2] << " " << (x)[3] << " " << (x)[4] << " " << (x)[5]
 #define coutVector3(x) (x)[0] << " " << (x)[1] << " " << (x)[2]
 
-vtkCxxRevisionMacro(vtkSpyPlotReader, "1.78");
+vtkCxxRevisionMacro(vtkSpyPlotReader, "1.79");
 vtkStandardNewMacro(vtkSpyPlotReader);
 vtkCxxSetObjectMacro(vtkSpyPlotReader,GlobalController,vtkMultiProcessController);
 
@@ -1398,7 +1398,8 @@ void vtkSpyPlotReader::SetMergeXYZComponents(int merge)
   this->Modified();
 }
 //-----------------------------------------------------------------------------
-void vtkSpyPlotReader::PrintBlockList(vtkHierarchicalBoxDataSet *hbds, int myProcId)
+void vtkSpyPlotReader::PrintBlockList(vtkHierarchicalBoxDataSet *hbds, int
+  vtkNotUsed(myProcId))
 {
   unsigned int numberOfLevels=hbds->GetNumberOfLevels();
   unsigned int level;
