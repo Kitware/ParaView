@@ -62,7 +62,7 @@ PURPOSE.  See the above copyright notice for more information.
 #define coutVector6(x) (x)[0] << " " << (x)[1] << " " << (x)[2] << " " << (x)[3] << " " << (x)[4] << " " << (x)[5]
 #define coutVector3(x) (x)[0] << " " << (x)[1] << " " << (x)[2]
 
-vtkCxxRevisionMacro(vtkSpyPlotReader, "1.79");
+vtkCxxRevisionMacro(vtkSpyPlotReader, "1.80");
 vtkStandardNewMacro(vtkSpyPlotReader);
 vtkCxxSetObjectMacro(vtkSpyPlotReader,GlobalController,vtkMultiProcessController);
 
@@ -229,7 +229,7 @@ int vtkSpyPlotReader::UpdateSpyDataFile(vtkInformation* request,
   // See if this is part of a series
   vtkstd::string extension = 
     vtksys::SystemTools::GetFilenameLastExtension(this->FileName);
-  int currentNum, isASeries=0;
+  int currentNum=0, isASeries=0;
   size_t esize;
   esize = extension.size();
   if (esize > 0 )
