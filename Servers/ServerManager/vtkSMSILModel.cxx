@@ -74,7 +74,7 @@ public:
 };
 
 vtkStandardNewMacro(vtkSMSILModel);
-vtkCxxRevisionMacro(vtkSMSILModel, "1.3");
+vtkCxxRevisionMacro(vtkSMSILModel, "1.4");
 //-----------------------------------------------------------------------------
 vtkSMSILModel::vtkSMSILModel()
 {
@@ -450,7 +450,8 @@ void vtkSMSILModel::UpdatePropertyValue(vtkSMStringVectorProperty* svp)
     values[2*cc] = this->GetName(*iter);
     values[2*cc+1] = check_states[this->GetCheckStatus(*iter)];
     }
-  svp->SetElements(leaf_ids.size()*2, values);
+  svp->SetElements(
+    static_cast<unsigned int>(leaf_ids.size())*2, values);
   delete[] values;
   this->BlockUpdate = false;
 }
