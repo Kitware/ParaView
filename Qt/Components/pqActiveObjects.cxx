@@ -58,8 +58,8 @@ pqActiveObjects::pqActiveObjects()
   this->CachedPort = 0;
   this->CachedServer = 0;
 
-  pqActiveView* activeView = &pqActiveView::instance();
-  QObject::connect(activeView, SIGNAL(changed(pqView*)),
+  pqActiveView* actView = &pqActiveView::instance();
+  QObject::connect(actView, SIGNAL(changed(pqView*)),
     this, SLOT(activeViewChanged(pqView*)));
 
   pqServerManagerSelectionModel *selection =
