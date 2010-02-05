@@ -1,6 +1,7 @@
 
 import simple
 import servermanager
+import re
 
 
 class trace_globals: pass
@@ -23,7 +24,8 @@ def reset_trace_globals():
   trace_globals.trace_output_endblock = "Render()"
   trace_globals.traced_proxy_groups = ["sources", "representations", "views", \
                                        "implicit_functions", "piecewise_functions",
-                                       "lookup_tables", "scalar_bars"]
+                                       "lookup_tables", "scalar_bars",
+                                       "selection_sources"]
   trace_globals.ignored_view_properties = ["ViewSize", "GUISize", "ViewPosition", \
                                            "ViewTime", "Representations"]
   trace_globals.ignored_representation_properties = ["Input"]
@@ -115,6 +117,18 @@ def track_existing_representation_proxy(proxy, proxy_name):
       return proxy_info
   return None
 
+def track_existing_lookuptable_proxy(proxy, proxy_name):
+    """When recording the state, we ran into a use of an existing lookuptable.
+    Now this is tricky. When replaying the state, we need to ensure that it
+    works in most general cases. Since LUT creation is totally hidden from the
+    user for most part, we cannot expect the user to 'deal with it' when a lut
+    that was expected to be already created is missing. So we handle more
+    gracefully, creating the LUT is none already exists.
+    All this is nicely encapsulate in GetLookupTableForArray() function. So
+    really, the work here is no different than that when a LUT is registered by
+    the GUI. So we simply pretend as if the LUT was registered."""
+    return trace_proxy_registered(proxy, "lookup_tables", proxy_name)
+
 def track_existing_proxy(proxy):
   proxy_name = get_source_proxy_registration_name(proxy)
   if proxy_name:
@@ -125,6 +139,9 @@ def track_existing_proxy(proxy):
   proxy_name = get_view_proxy_registration_name(proxy)
   if proxy_name:
     return track_existing_view_proxy(proxy, proxy_name)
+  proxy_name = get_lookuptable_proxy_registration_name(proxy)
+  if proxy_name:
+    return track_existing_lookuptable_proxy(proxy, proxy_name)
   return None
 
 def get_proxy_info(p, search_existing=True):
@@ -193,6 +210,11 @@ def get_representation_proxy_registration_name(proxy):
     """Assuming the given proxy is registered in the group 'representations',
     lookup the proxy's registration name with the servermanager"""
     return servermanager.ProxyManager().GetProxyName("representations", proxy)
+
+def get_lookuptable_proxy_registration_name(proxy):
+    """Assuming the give proxy is registered in the group "lookup_tables",
+    lookup the proxy's registration name with the servermanager"""
+    return servermanager.ProxyManager().GetProxyName("lookup_tables", proxy)
 
 def make_comma_separated_string(values):
   ret = str()
@@ -403,7 +425,15 @@ def append_trace():
         trace_globals.last_active_view = info.Proxy
         setPropertiesInCtor = False
       if info.Group == "lookup_tables":
-        ctorMethod = "CreateLookupTable"
+        match = re.match("(\d)\.([^.]+)\.PVLookupTable", info.ProxyName)
+        if match:
+          ctorMethod = "GetLookupTableForArray"
+          ctorArgs.append("\"%s\"" % match.group(2))
+          ctorArgs.append(match.group(1))
+        else:
+          # This is not a standard LUT created by the GUI--how in the world?
+          # We'll just handle it as if it's a stray LUT.
+          ctorMethod = "CreateLookupTable"
 
       if info.Group == "piecewise_functions":
         ctorMethod = "CreatePiecewiseFunction"

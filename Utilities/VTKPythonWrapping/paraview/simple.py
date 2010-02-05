@@ -313,6 +313,24 @@ def CreatePiecewiseFunction(**params):
     SetProperties(pfunc, **params)
     return pfunc
 
+def GetLookupTableForArray(arrayname, num_components, **params):
+    """Used to get an existing lookuptable for a array or to create one if none
+    exists. Keyword arguments can be passed in to initialize the LUT if a new
+    one is created."""
+    proxyName = "%d.%s.PVLookupTable" % (int(num_components), arrayname)
+    lut = servermanager.ProxyManager().GetProxy("lookup_tables", proxyName)
+    if lut:
+        return lut
+    # No LUT exists for this array, create a new one.
+    # TODO: Change this to go a LookupTableManager that is shared with the GUI,
+    # so that the GUI and python end up create same type of LUTs. For now,
+    # python will create a Blue-Red LUT, unless overridden by params.
+    lut = servermanager.rendering.PVLookupTable(
+            ColorSpace="HSV", RGBPoints=[0, 0, 0, 1, 1, 1, 0, 0])
+    SetProperties(lut, **params)
+    servermanager.Register(lut, registrationName=proxyName)
+    return lut
+
 def CreateScalarBar(**params):
     """Create and return a scalar bar widget.  The returned widget may
     be added to a render view by appending it to the view's representations
