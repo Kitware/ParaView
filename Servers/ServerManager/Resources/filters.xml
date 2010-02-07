@@ -754,7 +754,7 @@ The Clean filter takes polygonal data as input and generates polygonal data as o
       <Documentation
          long_help="This filter merges points and converts the data set to unstructured grid."
          short_help="Merge points.">
-The Clean to Grid filter merges points that are within a tolerance of 1/100,000 of the length of the diagonal of the bounding box of the data set. It also converts the data set to an unstructured grid. You may wish to do this if you want to apply a filter to your data set that is available for unstructured grids but not for the initial type of your data set (e.g., applying warp vector to volumetric data). The Clean to Grid filter operates on any type of data set.
+The Clean to Grid filter merges points that are exactly coincident. It also converts the data set to an unstructured grid. You may wish to do this if you want to apply a filter to your data set that is available for unstructured grids but not for the initial type of your data set (e.g., applying warp vector to volumetric data). The Clean to Grid filter operates on any type of data set.
       </Documentation>
       <InputProperty
          name="Input"

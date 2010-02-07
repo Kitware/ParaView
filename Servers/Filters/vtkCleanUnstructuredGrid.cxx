@@ -26,7 +26,7 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 
-vtkCxxRevisionMacro(vtkCleanUnstructuredGrid, "1.9");
+vtkCxxRevisionMacro(vtkCleanUnstructuredGrid, "1.10");
 vtkStandardNewMacro(vtkCleanUnstructuredGrid);
 
 //----------------------------------------------------------------------------
@@ -110,7 +110,7 @@ int vtkCleanUnstructuredGrid::RequestData(
   output->SetPoints(newPts);
   newPts->Delete();
 
-  // New copy the cells.
+  // Now copy the cells.
   vtkIdList *cellPoints = vtkIdList::New();
   num = input->GetNumberOfCells();
   output->Allocate(num);
