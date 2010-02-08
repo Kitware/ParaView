@@ -1376,9 +1376,7 @@ void pqViewManager::showFrameOverlays()
       label = new QLabel("Overlay Text", iter.key(), Qt::ToolTip);
       this->Internal->FrameOverlays[iter.key()] = label;
       }
-    vtkSMPropertyHelper viewSize(iter.value()->getProxy(),
-      "ViewSize");
-    QSize frameSize(viewSize.GetAsInt(0), viewSize.GetAsInt(1));
+    QSize frameSize(iter.value()->getWidget()->size());
     label->move(iter.value()->getWidget()->mapToGlobal(
         QPoint(frameSize.width()/2-30, frameSize.height()/2-10)));
     label->setText(QString(" (%1, %2) ").arg(frameSize.width()).arg(
