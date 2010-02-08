@@ -300,7 +300,7 @@ void pqSelectionInputWidget::onActiveSelectionChanged()
 }
 
 //-----------------------------------------------------------------------------
-void pqSelectionInputWidget::accept()
+void pqSelectionInputWidget::postAccept()
 {
   vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
 
@@ -322,6 +322,12 @@ void pqSelectionInputWidget::accept()
       }
     }
   iter->Delete();
+}
+
+//-----------------------------------------------------------------------------
+void pqSelectionInputWidget::preAccept()
+{
+  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
 
   // Register the new selection proxy.
   vtkSMProxy* sel_source = this->selection();
@@ -329,8 +335,9 @@ void pqSelectionInputWidget::accept()
     {
     if (!pxm->GetProxyName("selection_sources", sel_source))
       {
-      pxm->RegisterProxy("selection_sources",
-        sel_source->GetSelfIDAsString(), sel_source);
+      vtkstd::string key = vtkstd::string("selection_source.") +
+        sel_source->GetSelfIDAsString();
+      pxm->RegisterProxy("selection_sources", key.c_str(), sel_source);
       }
     }
 }

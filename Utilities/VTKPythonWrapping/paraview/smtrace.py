@@ -312,7 +312,7 @@ def trace_proxy_registered(proxy, proxyGroup, proxyName):
     return None
   info = proxy_trace_info(proxy, proxyGroup, proxyName)
   trace_globals.last_registered_proxies.append(info)
-  if trace_globals.capture_all_properties:
+  if trace_globals.capture_all_properties or proxyGroup == "selection_sources":
     itr = servermanager.PropertyIterator(proxy)
     for prop in itr:
       if prop.GetInformationOnly() or prop.GetIsInternal(): continue

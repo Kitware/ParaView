@@ -79,6 +79,7 @@ signals:
   void modified();
 
   /// Signal emitted when the user has accepted changes
+  void aboutToAccept();
   void accepted();
   /// Signal emitted when the user has rejected changes
   void rejected();

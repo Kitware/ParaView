@@ -60,7 +60,8 @@ public slots:
   /// This must be connected to the panel-accept signal to ensure that the new
   /// selection source object gets registered for undo-redo/state to work. This
   /// method also gets rid of any obsolete selection_sources.
-  virtual void accept();
+  virtual void preAccept();
+  virtual void postAccept();
 
 signals:
   /// Signal that the selection proxy changed.

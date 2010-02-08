@@ -2549,6 +2549,16 @@ def __determineGroup(proxy):
     xmlgroup = proxy.GetXMLGroup()
     xmlname = proxy.GetXMLName()
     if xmlgroup == "sources":
+        if xmlname in ["BlockSelectionSource",
+                       "FrustumSelectionSource",
+                       "GlobalIDSelectionSource",
+                       "PedigreeIDSelectionSource",
+                       "IDSelectionSource",
+                       "CompositeDataIDSelectionSource",
+                       "HierarchicalDataIDSelectionSource",
+                       "ThresholdSelectionSource",
+                       "LocationSelectionSource"]:
+            return "selection_sources"
         return "sources"
     elif xmlgroup == "filters":
         return "sources"

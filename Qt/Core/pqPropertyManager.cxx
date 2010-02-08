@@ -287,6 +287,7 @@ void pqPropertyManager::removeAllLinks()
 //-----------------------------------------------------------------------------
 void pqPropertyManager::accept()
 {
+  emit this->aboutToAccept();
   this->Internal->Links.accept();
   emit this->accepted();
   this->Internal->Modified = false;
