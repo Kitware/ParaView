@@ -3320,6 +3320,17 @@
         </Documentation>
      </StringVectorProperty>
 
+     <IntVectorProperty 
+        name="MaxLevel" 
+        command="SetMaxLevel" 
+        number_of_elements="1"
+        default_values="100" > 
+       <IntRangeDomain name="range"/>
+       <Documentation>
+         Do not blocks above this level.
+       </Documentation>
+     </IntVectorProperty>
+
      <Hints>
       <ReaderFactory extensions="Flash flash"
           file_description="Flash Files" />

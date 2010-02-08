@@ -45,6 +45,7 @@
 #define __vtkFlashReader_h
 
 #include "vtkMultiBlockDataSetAlgorithm.h"
+#include "vtkstd/vector"
 
 class    vtkPolyData;
 class    vtkRectilinearGrid;
@@ -61,6 +62,11 @@ public:
   // Description:
   // Set the Flash data file name.
   void           SetFileName( const char * fileName );
+  
+  // Description:
+  // Only load upto this level.
+  vtkSetMacro(MaxLevel,int);
+  
   
   // --------------------------------------------------------------------------
   // --------------------------- General Information --------------------------
@@ -319,7 +325,12 @@ protected:
   char *         FileName;
   static int     NumberOfInstances;
   vtkFlashReaderInternal * Internal;
-                          
+  int MaxLevel;
+//BTX
+  vtkstd::vector<int> BlockMap;
+//ETX
+  void GenerateBlockMap();
+                            
 private:
 
   vtkFlashReader( const vtkFlashReader & );    // Not implemented.
