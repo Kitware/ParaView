@@ -74,6 +74,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqImageUtil.h"
 #include "pqMultiViewFrame.h"
 #include "pqObjectBuilder.h"
+#include "pqOptions.h"
 #include "pqPluginManager.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
@@ -124,6 +125,10 @@ public:
   // Used by prepareForCapture and finishedCapture.
   QSize SavedMaxSize;
   QSize SavedSize;
+
+  typedef QMap<pqMultiViewFrame*, QPointer<QLabel> > FrameOverlaysType;
+  FrameOverlaysType FrameOverlays;
+  QTimer OverlayCleanupTimer;
 };
 
 //-----------------------------------------------------------------------------
@@ -133,6 +138,10 @@ pqViewManager::pqViewManager(QWidget* _parent/*=null*/)
   this->Internal = new pqInternals();
   this->Internal->DontCreateDeleteViewsModules = false;
   this->Internal->MaxWindowSize = QSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX);
+  this->Internal->OverlayCleanupTimer.setInterval(2000);
+  QObject::connect(&this->Internal->OverlayCleanupTimer,
+    SIGNAL(timeout()),
+    this, SLOT(destroyFrameOverlays()));
 
   pqServerManagerModel* smModel =
     pqApplicationCore::instance()->getServerManagerModel();
@@ -811,8 +820,8 @@ bool pqViewManager::eventFilter(QObject* caller, QEvent* e)
         }
       }
     }
-  else if(QApplication::instance() != caller &&
-          e->type() == QEvent::Resize)
+  else if(qobject_cast<pqMultiViewFrame*>(caller) &&
+    e->type() == QEvent::Resize)
     {
     // Update ViewPosition and GUISize properties on all view modules.
     this->updateViewPositions();
@@ -884,6 +893,9 @@ void pqViewManager::updateViewPositions()
 
   END_UNDO_EXCLUDE();
   this->updateCompactViewPositions();
+
+  // Show the overlays displaying the view sizes.
+  this->showFrameOverlays();
 }
 
 
@@ -1337,4 +1349,50 @@ void pqViewManager::onServerDisconnect()
     {
     delete widget;
     }
+}
+
+//-----------------------------------------------------------------------------
+void pqViewManager::showFrameOverlays()
+{
+  // when running tests, don't show the overlay labels as they may interfere
+  // with the screen captures.
+  if (pqApplicationCore::instance()->getOptions()->GetDisableRegistry())
+    {
+    return;
+    }
+  this->Internal->OverlayCleanupTimer.start();
+
+  pqInternals::FrameMapType::iterator iter;
+  for (iter = this->Internal->Frames.begin();
+    iter != this->Internal->Frames.end(); ++iter)
+    {
+    if (iter.value() == NULL)
+      {
+      continue;
+      }
+    QLabel* label = this->Internal->FrameOverlays[iter.key()];
+    if (label == NULL)
+      {
+      label = new QLabel("Overlay Text", iter.key(), Qt::ToolTip);
+      this->Internal->FrameOverlays[iter.key()] = label;
+      }
+    vtkSMPropertyHelper viewSize(iter.value()->getProxy(),
+      "ViewSize");
+    QSize frameSize(viewSize.GetAsInt(0), viewSize.GetAsInt(1));
+    label->move(iter.value()->getWidget()->mapToGlobal(
+        QPoint(frameSize.width()/2-30, frameSize.height()/2-10)));
+    label->setText(QString(" (%1, %2) ").arg(frameSize.width()).arg(
+        frameSize.height()));
+    label->show();
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqViewManager::destroyFrameOverlays()
+{
+  foreach (QLabel* label, this->Internal->FrameOverlays)
+    {
+    delete label;
+    }
+  this->Internal->FrameOverlays.clear();
 }

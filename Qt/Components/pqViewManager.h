@@ -161,6 +161,9 @@ private slots:
   /// We add an undo element to the stack to undo/redo the split.
   void onSplittingView(const Index&, Qt::Orientation, float, const Index&);
 
+  /// Destroys any frame overlays.
+  void destroyFrameOverlays();
+
 public slots:
   /// Called to change the active view. If view==null and then if the view
   /// manager is currently focused on an empty frame, then it does not change
@@ -209,6 +212,8 @@ protected:
   /// We add an undo element to the stack to undo/redo the close.
   void onFrameRemovedInternal(pqMultiViewFrame*);
 
+  /// Shows the overlay widgets showing all the view sizes.
+  void showFrameOverlays();
 
   QAction* getAction(pqMultiViewFrame* frame,QString name);
 
