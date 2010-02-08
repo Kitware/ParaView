@@ -75,6 +75,9 @@ protected:
 
   // When true, "Field Data" option is added to the domain.
   bool EnableFieldDataSelection;
+
+  // When true, we don't update the available list of attributes based on what's
+  // actually available in the input (false by default).
   bool DisableUpdateDomainEntries;
 private:
 
