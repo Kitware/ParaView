@@ -137,7 +137,7 @@ def DoCoProcessing(datadescription):
     for writer in cp_writers:
         if timestep %% writer.cpFrequency == 0:
             writer.FileName = writer.cpFileName.replace("%%t", str(timestep))
-        writer.UpdatePipeline()
+            writer.UpdatePipeline()
 
 def CreateProducer(datadescription, gridname):
   "Creates a producer proxy for the grid"
