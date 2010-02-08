@@ -453,9 +453,9 @@ void pqViewManager::reset()
 {
   QList<QWidget*> removed;
   this->reset(removed);
-  foreach (QWidget* widget, removed)
+  foreach (QWidget* _widget, removed)
     {
-    delete widget;
+    delete _widget;
     }
 }
 
@@ -1345,9 +1345,9 @@ void pqViewManager::onServerDisconnect()
 {
   QList<QWidget*> removed;
   this->reset(removed);
-  foreach (QWidget* widget, removed)
+  foreach (QWidget* _widget, removed)
     {
-    delete widget;
+    delete _widget;
     }
 }
 
@@ -1376,11 +1376,11 @@ void pqViewManager::showFrameOverlays()
       label = new QLabel("Overlay Text", iter.key(), Qt::ToolTip);
       this->Internal->FrameOverlays[iter.key()] = label;
       }
-    QSize frameSize(iter.value()->getWidget()->size());
+    QSize curFrameSize(iter.value()->getWidget()->size());
     label->move(iter.value()->getWidget()->mapToGlobal(
-        QPoint(frameSize.width()/2-30, frameSize.height()/2-10)));
-    label->setText(QString(" (%1, %2) ").arg(frameSize.width()).arg(
-        frameSize.height()));
+        QPoint(curFrameSize.width()/2-30, curFrameSize.height()/2-10)));
+    label->setText(QString(" (%1, %2) ").arg(curFrameSize.width()).arg(
+        curFrameSize.height()));
     label->show();
     }
 }
