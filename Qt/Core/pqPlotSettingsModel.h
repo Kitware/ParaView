@@ -121,6 +121,9 @@ public slots:
   int getSeriesAxisCorner(int row) const;
   int getSeriesMarkerStyle(int row) const;
 
+signals:
+  void redrawChart();
+
 private:
   class pqImplementation;
   pqImplementation* Implementation;

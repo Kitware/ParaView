@@ -117,6 +117,8 @@ pqXYChartDisplayPanel::pqXYChartDisplayPanel(
     this, SLOT(updateOptionsWidgets()));
   QObject::connect(this->Internal->SettingsModel, SIGNAL(modelReset()),
     this, SLOT(updateOptionsWidgets()));
+  QObject::connect(this->Internal->SettingsModel, SIGNAL(redrawChart()),
+    this, SLOT(updateAllViews()));
 
   QObject::connect(this->Internal->UseArrayIndex, SIGNAL(toggled(bool)),
     this, SLOT(useArrayIndexToggled(bool)));
@@ -296,7 +298,6 @@ void pqXYChartDisplayPanel::setCurrentSeriesColor(const QColor &color)
       this->Internal->SettingsModel->setSeriesColor(iter->row(), color);
       }
     this->Internal->InChange = false;
-    this->updateAllViews();
     }
 }
 
@@ -314,7 +315,6 @@ void pqXYChartDisplayPanel::setCurrentSeriesThickness(int thickness)
       this->Internal->SettingsModel->setSeriesThickness(iter->row(), thickness);
       }
     this->Internal->InChange = false;
-    this->updateAllViews();
     }
 }
 

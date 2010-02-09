@@ -222,6 +222,7 @@ void pqPlotSettingsModel::setSeriesEnabled(int row, bool enabled)
 
     QModelIndex idx = this->createIndex(row, 0);
     emit this->dataChanged(idx, idx);
+    emit this->redrawChart();
     this->updateCheckState(0, Qt::Horizontal);
     }
 }
@@ -243,6 +244,7 @@ void pqPlotSettingsModel::setSeriesLabel(int row, const QString& label)
       "SeriesLabel").SetStatus(
       this->getSeriesName(row), label.toAscii().data());
     this->Implementation->RepresentationProxy->UpdateVTKObjects();
+    emit this->redrawChart();
     }
 }
 
@@ -272,6 +274,7 @@ void pqPlotSettingsModel::setSeriesColor(int row, const QColor &color)
 
     QModelIndex idx = this->createIndex(row, 1);
     emit this->dataChanged(idx, idx);
+    emit this->redrawChart();
     }
 }
 
@@ -293,6 +296,7 @@ void pqPlotSettingsModel::setSeriesThickness(int row, int value)
       "SeriesLineThickness").SetStatus(
       this->getSeriesName(row), value);
     this->Implementation->RepresentationProxy->UpdateVTKObjects();
+    emit this->redrawChart();
     }
 }
 
