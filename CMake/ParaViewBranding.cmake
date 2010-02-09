@@ -131,7 +131,25 @@ FUNCTION(build_paraview_client BPC_NAME)
         ${BPC_BUNDLE_ICON}
         PROPERTIES
         MACOSX_PACKAGE_LOCATION Resources
+      )
+      IF(QT_MAC_USE_COCOA)
+        GET_FILENAME_COMPONENT(qt_menu_nib
+          "@QT_QTGUI_LIBRARY_RELEASE@/Resources/qt_menu.nib"
+          REALPATH)
+
+        set(qt_menu_nib_sources
+          "${qt_menu_nib}/classes.nib"
+          "${qt_menu_nib}/info.nib"
+          "${qt_menu_nib}/keyedobjects.nib"
+          )
+        SET_SOURCE_FILES_PROPERTIES(
+          ${qt_menu_nib_sources}
+          PROPERTIES
+          MACOSX_PACKAGE_LOCATION Resources/qt_menu.nib
         )
+      ELSE(QT_MAC_USE_COCOA)
+        set(qt_menu_nib_sources)
+      ENDIF(QT_MAC_USE_COCOA)
     ENDIF (BPC_BUNDLE_ICON)
     SET(MAKE_BUNDLE MACOSX_BUNDLE)
   ENDIF (APPLE)
@@ -248,6 +266,7 @@ FUNCTION(build_paraview_client BPC_NAME)
                  ${BPC_NAME}_main.cxx
                  ${exe_icon}
                  ${apple_bundle_sources}
+                 ${qt_menu_nib_sources}
                  ${EXE_SRCS}
                  )
   SET (pv_exe_name ${BPC_NAME}${pv_exe_suffix})
