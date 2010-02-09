@@ -319,19 +319,19 @@ void pqXYChartDisplayPanel::setCurrentSeriesThickness(int thickness)
 }
 
 //-----------------------------------------------------------------------------
-void pqXYChartDisplayPanel::setCurrentSeriesStyle(int listIndex)
+void pqXYChartDisplayPanel::setCurrentSeriesStyle(int)
 {
 
 }
 
 //-----------------------------------------------------------------------------
-void pqXYChartDisplayPanel::setCurrentSeriesMarkerStyle(int listIndex)
+void pqXYChartDisplayPanel::setCurrentSeriesMarkerStyle(int)
 {
 
 }
 
 //-----------------------------------------------------------------------------
-void pqXYChartDisplayPanel::setCurrentSeriesAxes(int listIndex)
+void pqXYChartDisplayPanel::setCurrentSeriesAxes(int)
 {
 
 }

@@ -49,8 +49,8 @@ public:
   QPointer<pqDataRepresentation> Representation;
 };
 
-pqPlotSettingsModel::pqPlotSettingsModel(QObject* parent) :
-  Superclass(parent), Implementation(new pqImplementation())
+pqPlotSettingsModel::pqPlotSettingsModel(QObject* parentObject) :
+  Superclass(parentObject), Implementation(new pqImplementation())
 {
   // Set up the column headers.
   this->insertHeaderSections(Qt::Horizontal, 0, 1);
@@ -307,38 +307,38 @@ int pqPlotSettingsModel::getSeriesThickness(int row) const
 }
 
 //-----------------------------------------------------------------------------
-void pqPlotSettingsModel::setSeriesStyle(int row, int style)
+void pqPlotSettingsModel::setSeriesStyle(int, int)
 {
 
 }
 
 //-----------------------------------------------------------------------------
-int pqPlotSettingsModel::getSeriesStyle(int row) const
+int pqPlotSettingsModel::getSeriesStyle(int) const
+{
+  return 0;
+}
+
+//-----------------------------------------------------------------------------
+void pqPlotSettingsModel::setSeriesAxisCorner(int, int)
 {
 
 }
 
 //-----------------------------------------------------------------------------
-void pqPlotSettingsModel::setSeriesAxisCorner(int row, int axiscorner)
+int pqPlotSettingsModel::getSeriesAxisCorner(int) const
+{
+  return 0;
+}
+
+//-----------------------------------------------------------------------------
+void pqPlotSettingsModel::setSeriesMarkerStyle(int, int)
 {
 
 }
 
 //-----------------------------------------------------------------------------
-int pqPlotSettingsModel::getSeriesAxisCorner(int row) const
+int pqPlotSettingsModel::getSeriesMarkerStyle(int) const
 {
-
-}
-
-//-----------------------------------------------------------------------------
-void pqPlotSettingsModel::setSeriesMarkerStyle(int row, int style)
-{
-
-}
-
-//-----------------------------------------------------------------------------
-int pqPlotSettingsModel::getSeriesMarkerStyle(int row) const
-{
-
+  return 0;
 }
 

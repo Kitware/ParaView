@@ -46,7 +46,7 @@ public:
 };
 
 vtkStandardNewMacro(vtkSMContextNamedOptionsProxy);
-vtkCxxRevisionMacro(vtkSMContextNamedOptionsProxy, "1.2");
+vtkCxxRevisionMacro(vtkSMContextNamedOptionsProxy, "1.3");
 //----------------------------------------------------------------------------
 vtkSMContextNamedOptionsProxy::vtkSMContextNamedOptionsProxy()
 {
@@ -267,7 +267,7 @@ void vtkSMContextNamedOptionsProxy::SetLineThickness(const char* name,
 }
 
 //----------------------------------------------------------------------------
-void vtkSMContextNamedOptionsProxy::SetLineStyle(const char* name, int value)
+void vtkSMContextNamedOptionsProxy::SetLineStyle(const char*, int)
 {
 
 }
@@ -283,13 +283,13 @@ void vtkSMContextNamedOptionsProxy::SetColor(const char* name,
 }
 
 //----------------------------------------------------------------------------
-void vtkSMContextNamedOptionsProxy::SetAxisCorner(const char* name, int value)
+void vtkSMContextNamedOptionsProxy::SetAxisCorner(const char*, int)
 {
 
 }
 
 //----------------------------------------------------------------------------
-void vtkSMContextNamedOptionsProxy::SetMarkerStyle(const char* name, int value)
+void vtkSMContextNamedOptionsProxy::SetMarkerStyle(const char*, int)
 {
 
 }
