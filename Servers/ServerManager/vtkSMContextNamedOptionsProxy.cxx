@@ -46,7 +46,7 @@ public:
 };
 
 vtkStandardNewMacro(vtkSMContextNamedOptionsProxy);
-vtkCxxRevisionMacro(vtkSMContextNamedOptionsProxy, "1.3");
+vtkCxxRevisionMacro(vtkSMContextNamedOptionsProxy, "1.4");
 //----------------------------------------------------------------------------
 vtkSMContextNamedOptionsProxy::vtkSMContextNamedOptionsProxy()
 {
@@ -131,13 +131,12 @@ void vtkSMContextNamedOptionsProxy::UpdatePropertyInformationInternal(
 {
   vtkSMStringVectorProperty* svp =
       vtkSMStringVectorProperty::SafeDownCast(prop);
-  if (svp && this->Internals->Table) //&& svp->GetInformationOnly())
+  if (svp && this->Internals->Table && svp->GetInformationOnly())
     {
     vtkStringList* new_values = vtkStringList::New();
     int numOptions = this->Internals->Table->GetNumberOfColumns();
     const char* propname = this->GetPropertyName(prop);
     bool skip = false;
-    //cout << "Property name: " << vtkstd::string(propname) << endl;
     for (int i = 0; i < numOptions; ++i)
       {
       QString name = this->Internals->Table->GetColumnName(i);
@@ -194,9 +193,9 @@ void vtkSMContextNamedOptionsProxy::UpdatePropertyInformationInternal(
           }
         else
           {
-          new_values->AddString("0");
-          new_values->AddString("0");
-          new_values->AddString("0");
+          new_values->AddString("0.0");
+          new_values->AddString("0.0");
+          new_values->AddString("0.0");
           }
         }
       else
@@ -205,9 +204,10 @@ void vtkSMContextNamedOptionsProxy::UpdatePropertyInformationInternal(
         break;
         }
       }
-    //cout << "Property name: " << vtkstd::string(propname) << endl;
-    //new_values->Print(cout);
-    svp->SetElements(new_values);
+    if (!skip)
+      {
+      svp->SetElements(new_values);
+      }
     new_values->Delete();
     }
 }
