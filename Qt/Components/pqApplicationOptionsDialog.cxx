@@ -41,6 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 pqApplicationOptionsDialog::pqApplicationOptionsDialog(QWidget* p)
   : pqOptionsDialog(p)
 {
+  this->setWindowTitle("Settings");
   this->setApplyNeeded(true);
 
   pqApplicationOptions* appOptions = new pqApplicationOptions;
