@@ -205,6 +205,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqWidgetRangeDomain.h
   pqWriterDialog.h
   pqXDMFPanel.h
+  pqXYChartDisplayPanel.h
   pqComponentsTestUtility.h
   ${EXTRA_PQ_COMPONENT_MOC_SOURCES}
 )
@@ -285,6 +286,7 @@ SET(UI_FORMS
   Resources/UI/pqTwoDRenderViewOptions.ui
   Resources/UI/pqWriterDialog.ui
   Resources/UI/pqXDMFPanel.ui
+  Resources/UI/pqXYChartDisplayPanel.ui
 )
 
 QT4_WRAP_UI(UI_BUILT_SOURCES
@@ -677,6 +679,8 @@ ADD_LIBRARY(pqComponents
   pqWriterDialog.h
   pqXDMFPanel.cxx
   pqXDMFPanel.h
+  pqXYChartDisplayPanel.cxx
+  pqXYChartDisplayPanel.h
   ${EXTRA_PQ_COMPONENT_SOURCES}
   ${MOC_BUILT_SOURCES}
   ${RCS_SOURCES}

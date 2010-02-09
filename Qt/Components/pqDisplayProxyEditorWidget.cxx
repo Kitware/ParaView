@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -37,6 +37,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QPointer>
 #include <QVBoxLayout>
 
+#include <QDebug>
+
 #include "pqApplicationCore.h"
 #include "pqBarChartDisplayPanel.h"
 #include "pqDisplayPanelDecoratorInterface.h"
@@ -53,6 +55,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSpreadSheetDisplayEditor.h"
 #include "pqTextDisplayPropertiesWidget.h"
 #include "pqTextRepresentation.h"
+#include "pqXYChartDisplayPanel.h"
 #include "pqUndoStack.h"
 #include "pqView.h"
 
@@ -77,6 +80,7 @@ public:
     QString type = proxy->getProxy()->GetXMLName();
 
     if (type == "XYPlotRepresentation" ||
+       type == "XYChartRepresentation" ||
        type == "BarChartRepresentation" ||
        type == "SpreadSheetRepresentation" ||
        qobject_cast<pqTextRepresentation*>(proxy)||
@@ -92,13 +96,19 @@ public:
     {
     if(!proxy || !proxy->getProxy())
       {
+      qDebug() << "Proxy is null" << proxy;
       return NULL;
       }
 
     QString type = proxy->getProxy()->GetXMLName();
+
     if (type == QString("XYPlotRepresentation"))
       {
       return new pqLineChartDisplayPanel(proxy, p);
+      }
+    if (type == QString("XYChartRepresentation"))
+      {
+      return new pqXYChartDisplayPanel(proxy, p);
       }
     if (type == QString("BarChartRepresentation"))
       {
@@ -109,7 +119,7 @@ public:
       {
       return new pqSpreadSheetDisplayEditor(proxy, p);
       }
-    
+
     if (qobject_cast<pqTextRepresentation*>(proxy))
       {
       return new pqTextDisplayPropertiesWidget(proxy, p);
@@ -123,7 +133,7 @@ public:
 };
 
 
-class pqDefaultDisplayPanel::pqInternal 
+class pqDefaultDisplayPanel::pqInternal
  : public Ui::DisplayProxyEditorWidget
 {
 public:
@@ -145,7 +155,7 @@ pqDefaultDisplayPanel::pqDefaultDisplayPanel(pqRepresentation* repr, QWidget* p)
     {
     this->Internal->ViewData->setCheckState(Qt::Unchecked);
     }
-  QObject::connect(this->Internal->ViewData, SIGNAL(stateChanged(int)), 
+  QObject::connect(this->Internal->ViewData, SIGNAL(stateChanged(int)),
                    this, SLOT(onStateChanged(int)));
 }
 
@@ -234,7 +244,7 @@ void pqDisplayProxyEditorWidget::onVisibilityChanged(bool state)
   pqRepresentation* disp = policy->setRepresentationVisibility(
     this->Internal->OutputPort, this->Internal->View, state);
   emit this->endUndo();
-  
+
   if (disp)
     {
     disp->renderViewEventually();
@@ -265,7 +275,7 @@ void pqDisplayProxyEditorWidget::updatePanel()
     }
 
   pqRepresentation* repr = this->Internal->Representation;
-  
+
   // search for a custom panels
   pqPluginManager* pm = pqApplicationCore::instance()->getPluginManager();
   QObjectList ifaces = pm->interfaces();
@@ -295,7 +305,7 @@ void pqDisplayProxyEditorWidget::updatePanel()
   else if(!this->Internal->DisplayPanel)
     {
     this->Internal->DisplayPanel = new pqDefaultDisplayPanel(repr, this);
-    
+
     if((this->Internal->Representation || !this->Internal->View ||
        this->Internal->View->canDisplay(this->Internal->OutputPort)) &&
       (this->Internal->OutputPort &&
@@ -305,7 +315,7 @@ void pqDisplayProxyEditorWidget::updatePanel()
       // connect to visibility so we can create a view for it
       QObject::connect(this->Internal->DisplayPanel,
                        SIGNAL(visibilityChanged(bool)),
-                       this, 
+                       this,
                        SLOT(onVisibilityChanged(bool)), Qt::QueuedConnection);
       }
     else
