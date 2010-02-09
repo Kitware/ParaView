@@ -52,12 +52,12 @@
 
 #include <hdf5.h>    // for the HDF data loading engine
 
-#include <algorithm> // for 'find()'
+#include <vtkstd/algorithm> // for 'find()'
 #include <vtkstd/map>
 #include <vtkstd/string>
 #include <vtkstd/vector>
 
-vtkCxxRevisionMacro( vtkFlashReader, "1.5" );
+vtkCxxRevisionMacro( vtkFlashReader, "1.6" );
 vtkStandardNewMacro( vtkFlashReader );
 
 // ============================================================================
