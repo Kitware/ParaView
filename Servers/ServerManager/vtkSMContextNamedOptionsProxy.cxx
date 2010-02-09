@@ -15,10 +15,6 @@
 #include "vtkSMContextNamedOptionsProxy.h"
 
 #include "vtkObjectFactory.h"
-#include "vtkQtChartNamedSeriesOptionsModel.h"
-#include "vtkQtChartSeriesOptions.h"
-#include "vtkQtChartRepresentation.h"
-#include "vtkQtChartTableSeriesModel.h"
 #include "vtkStringList.h"
 #include "vtkSMStringVectorProperty.h"
 #include "vtkChart.h"
@@ -28,7 +24,7 @@
 
 #include "vtkstd/map"
 
-#include <QPen>
+#include <QString>
 
 class vtkSMContextNamedOptionsProxy::vtkInternals
 {
@@ -50,7 +46,7 @@ public:
 };
 
 vtkStandardNewMacro(vtkSMContextNamedOptionsProxy);
-vtkCxxRevisionMacro(vtkSMContextNamedOptionsProxy, "1.1");
+vtkCxxRevisionMacro(vtkSMContextNamedOptionsProxy, "1.2");
 //----------------------------------------------------------------------------
 vtkSMContextNamedOptionsProxy::vtkSMContextNamedOptionsProxy()
 {
@@ -91,6 +87,7 @@ void vtkSMContextNamedOptionsProxy::SetTable(vtkTable* table)
 //----------------------------------------------------------------------------
 void vtkSMContextNamedOptionsProxy::SetXSeriesName(const char* name)
 {
+  //cout << "Setting the X series name: " << vtkstd::string(name) << endl;
   if (!name)
     {
     this->Internals->XSeriesName = "";
