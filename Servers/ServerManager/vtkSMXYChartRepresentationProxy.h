@@ -23,9 +23,11 @@
 #include "vtkWeakPointer.h" // needed for vtkWeakPointer.
 
 class vtkSMXYChartViewProxy;
-class vtkSMChartNamedOptionsModelProxy;
+class vtkSMContextNamedOptionsProxy;
+class vtkChartXY;
 
-class VTK_EXPORT vtkSMXYChartRepresentationProxy : public vtkSMClientDeliveryRepresentationProxy
+class VTK_EXPORT vtkSMXYChartRepresentationProxy :
+    public vtkSMClientDeliveryRepresentationProxy
 {
 public:
   static vtkSMXYChartRepresentationProxy* New();
@@ -36,6 +38,7 @@ public:
   // Description:
   // Provides access to the underlying VTK representation.
 //BTX
+  vtkChartXY* GetChart();
   //vtkGetObjectMacro(VTKRepresentation, vtkQtChartRepresentation);
 //ETX
 
@@ -79,11 +82,6 @@ public:
   // Set the series to use as the X-axis.
   void SetXAxisSeriesName(const char* name);
 
-  // Description:
-  // When set, the array index will be used for X axis, otherwise the array
-  // identified by XArrayName will be used.
-  void SetUseIndexForXAxis(bool use_index);
-
 //BTX
 protected:
   vtkSMXYChartRepresentationProxy();
@@ -91,18 +89,9 @@ protected:
 
   virtual bool EndCreateVTKObjects();
 
-  // Description:
-  // Called by SetXAxisSeriesName and SetUseIndexForXAxis to update the
-  // KeyColumn for the internal chart.
-  void UpdateXSeriesName();
-
   vtkWeakPointer<vtkSMXYChartViewProxy> ChartViewProxy;
-//  vtkQtChartRepresentation* VTKRepresentation;
-  vtkSMChartNamedOptionsModelProxy* OptionsProxy;
+  vtkSMContextNamedOptionsProxy* OptionsProxy;
   int Visibility;
-  bool UseIndexForXAxis;
-  char* XSeriesName;
-  vtkSetStringMacro(XSeriesName);
 
 private:
   vtkSMXYChartRepresentationProxy(const vtkSMXYChartRepresentationProxy&); // Not implemented

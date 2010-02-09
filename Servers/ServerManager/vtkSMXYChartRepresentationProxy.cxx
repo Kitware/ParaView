@@ -16,7 +16,7 @@
 
 #include "vtkDataObject.h"
 #include "vtkObjectFactory.h"
-#include "vtkSMChartNamedOptionsModelProxy.h"
+#include "vtkSMContextNamedOptionsProxy.h"
 #include "vtkSMXYChartViewProxy.h"
 #include "vtkContextView.h"
 #include "vtkChartXY.h"
@@ -24,20 +24,16 @@
 #include "vtkTable.h"
 
 vtkStandardNewMacro(vtkSMXYChartRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMXYChartRepresentationProxy, "1.3");
+vtkCxxRevisionMacro(vtkSMXYChartRepresentationProxy, "1.4");
 //----------------------------------------------------------------------------
 vtkSMXYChartRepresentationProxy::vtkSMXYChartRepresentationProxy()
 {
   this->Visibility = 1;
-
-  this->UseIndexForXAxis = true;
-  this->XSeriesName = 0;
 }
 
 //----------------------------------------------------------------------------
 vtkSMXYChartRepresentationProxy::~vtkSMXYChartRepresentationProxy()
 {
-  this->SetXSeriesName(0);
 }
 
 //----------------------------------------------------------------------------
@@ -57,13 +53,29 @@ bool vtkSMXYChartRepresentationProxy::EndCreateVTKObjects()
   // The reduction type for all chart representation is TABLE_MERGE since charts
   // always deliver tables.
   this->SetReductionType(vtkSMClientDeliveryRepresentationProxy::TABLE_MERGE);
-/*
-  this->OptionsProxy = vtkSMChartNamedOptionsModelProxy::SafeDownCast(
-    this->GetSubProxy("SeriesOptions"));
-  this->OptionsProxy->CreateObjects(this->VTKRepresentation);
-  this->VTKRepresentation->SetOptionsModel(
-    this->OptionsProxy->GetOptionsModel()); */
+
+  this->OptionsProxy = vtkSMContextNamedOptionsProxy::SafeDownCast(
+    this->GetSubProxy("PlotOptions"));
+  if (this->OptionsProxy)
+    {
+    this->OptionsProxy->SetChart(this->GetChart());
+    this->OptionsProxy->SetTable(vtkTable::SafeDownCast(this->GetOutput()));
+    }
+
   return true;
+}
+
+//----------------------------------------------------------------------------
+vtkChartXY* vtkSMXYChartRepresentationProxy::GetChart()
+{
+  if (this->ChartViewProxy)
+    {
+    return this->ChartViewProxy->GetChartXY();
+    }
+  else
+    {
+    return 0;
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -73,15 +85,14 @@ bool vtkSMXYChartRepresentationProxy::AddToView(vtkSMViewProxy* view)
     {
     return false;
     }
-
   vtkSMXYChartViewProxy* chartView = vtkSMXYChartViewProxy::SafeDownCast(view);
   if (!chartView)
     {
     return false;
     }
-  vtkChartXY* chart = chartView->GetChartXY();
-
   this->ChartViewProxy = chartView;
+  vtkChartXY* chart = this->ChartViewProxy->GetChartXY();
+
   if (this->Visibility && chart)
     {
 //    this->ChartViewProxy->GetChartView()->AddRepresentation(
@@ -134,23 +145,10 @@ void vtkSMXYChartRepresentationProxy::SetVisibility(int visible)
 void vtkSMXYChartRepresentationProxy::Update(vtkSMViewProxy* view)
 {
   this->Superclass::Update(view);
-  vtkSMXYChartViewProxy* chartView = vtkSMXYChartViewProxy::SafeDownCast(view);
-  if (!chartView)
-    {
-    return;
-    }
-  vtkChartXY* chart = chartView->GetChartXY();
-  if (!chart)
-    {
-    return;
-    }
-  // Add a plot and set up the series
-  vtkPlot *plot = chart->AddPlot(vtkChart::LINE);
-  plot->SetInput(vtkTable::SafeDownCast(this->GetOutput()), 2, 0);
 
-//  this->VTKRepresentation->SetInputConnection(
-//    this->GetOutput()->GetProducerPort());
-//  this->VTKRepresentation->Update();
+  this->OptionsProxy->SetChart(this->GetChart());
+  this->OptionsProxy->SetTable(vtkTable::SafeDownCast(this->GetOutput()));
+
   this->UpdatePropertyInformation();
 }
 
@@ -183,30 +181,8 @@ const char* vtkSMXYChartRepresentationProxy::GetSeriesName(int col)
 }
 
 //----------------------------------------------------------------------------
-void vtkSMXYChartRepresentationProxy::SetUseIndexForXAxis(bool use_index)
-{
-  this->UseIndexForXAxis = use_index;
-  this->UpdateXSeriesName();
-  this->Modified();
-}
-
-//----------------------------------------------------------------------------
 void vtkSMXYChartRepresentationProxy::SetXAxisSeriesName(const char* name)
 {
-  this->SetXSeriesName(name);
-  this->UpdateXSeriesName();
+  this->OptionsProxy->SetXSeriesName(name);
   this->Modified();
-}
-
-//----------------------------------------------------------------------------
-void vtkSMXYChartRepresentationProxy::UpdateXSeriesName()
-{
-  if (!this->UseIndexForXAxis && this->XSeriesName && this->XSeriesName[0])
-    {
-//    this->VTKRepresentation->SetKeyColumn(this->XSeriesName);
-    }
-  else
-    {
-//    this->VTKRepresentation->SetKeyColumn(0);
-    }
 }
