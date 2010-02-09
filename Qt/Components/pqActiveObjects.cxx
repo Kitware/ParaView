@@ -150,13 +150,26 @@ void pqActiveObjects::onSelectionChanged()
 
   bool port_changed =  (this->CachedPort != opPort);
   bool source_changed = (this->CachedSource != source);
+
+  if (port_changed && this->CachedPort)
+    {
+    QObject::disconnect(this->CachedPort, 0, this, 0);
+    }
+
   this->CachedPort = opPort;
   this->CachedSource = source;
 
   if (port_changed)
     {
+    if (opPort)
+      {
+      QObject::connect(opPort,
+        SIGNAL(representationAdded(pqOutputPort*, pqDataRepresentation*)),
+        this, SLOT(updateRepresentation()));
+      }
     emit this->portChanged(opPort);
     }
+
   if (source_changed)
     {
     emit this->sourceChanged(source);
