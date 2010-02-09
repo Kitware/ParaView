@@ -267,8 +267,7 @@ void pqPlotSettingsModel::setSeriesColor(int row, const QColor &color)
     double_color[1] = static_cast<double>(qreal_color[1]);
     double_color[2] = static_cast<double>(qreal_color[2]);
     vtkSMPropertyHelper(this->Implementation->RepresentationProxy,
-      "SeriesColor").SetStatus(
-      this->getSeriesName(row), double_color, 3);
+      "SeriesColor").SetStatus(this->getSeriesName(row), double_color, 3);
     this->Implementation->RepresentationProxy->UpdateVTKObjects();
 
     QModelIndex idx = this->createIndex(row, 1);
@@ -281,9 +280,7 @@ QColor pqPlotSettingsModel::getSeriesColor(int row) const
 {
   double tmp[3] = {0.0, 1.0, 0.0};
   vtkSMPropertyHelper(this->Implementation->RepresentationProxy,
-    "SeriesColor").GetStatus(
-    this->getSeriesName(row), tmp, 3);
-  cout << "GetSeriesColor: " << tmp[0] << ", " << tmp[1] << ", " << tmp[2] << endl;
+    "SeriesColor").GetStatus(this->getSeriesName(row), tmp, 3);
   return QColor::fromRgbF(tmp[0], tmp[1], tmp[2]);
 }
 
