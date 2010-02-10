@@ -140,6 +140,7 @@ void pqAnimatablePropertiesComboBox::buildPropertyList()
 void pqAnimatablePropertiesComboBox::buildPropertyListInternal(vtkSMProxy* proxy, 
   const QString& labelPrefix)
 {
+  this->Internal->VTKConnect->Disconnect();
   vtkSmartPointer<vtkSMPropertyIterator> iter;
   iter.TakeReference(proxy->NewPropertyIterator());
   for (iter->Begin(); !iter->IsAtEnd(); iter->Next())
