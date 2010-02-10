@@ -3331,6 +3331,26 @@
        </Documentation>
      </IntVectorProperty>
 
+     <IntVectorProperty name="LoadParticles"
+       command="SetLoadParticles"
+       number_of_elements="1"
+       default_values="1">
+       <BooleanDomain name="bool" />
+       <Documentation>
+         Load particles when on.
+       </Documentation>
+     </IntVectorProperty>
+
+     <IntVectorProperty name="LoadMortonCurve"
+       command="SetLoadMortonCurve"
+       number_of_elements="1"
+       default_values="0">
+       <BooleanDomain name="bool" />
+       <Documentation>
+         Generate morton curve when on.
+       </Documentation>
+     </IntVectorProperty>
+
      <Hints>
       <ReaderFactory extensions="Flash flash"
           file_description="Flash Files" />
