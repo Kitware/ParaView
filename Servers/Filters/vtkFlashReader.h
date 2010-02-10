@@ -67,6 +67,17 @@ public:
   // Only load upto this level.
   vtkSetMacro(MaxLevel,int);
   
+  // Description:
+  // Load the morton curve.
+  vtkSetMacro(LoadMortonCurve,int);
+  vtkGetMacro(LoadMortonCurve,int);
+  vtkBooleanMacro(LoadMortonCurve,int);
+  
+  // Description:
+  // Load the particles.
+  vtkSetMacro(LoadParticles,int);
+  vtkGetMacro(LoadParticles,int);
+  vtkBooleanMacro(LoadParticles,int);
   
   // --------------------------------------------------------------------------
   // --------------------------- General Information --------------------------
@@ -325,11 +336,14 @@ protected:
   char *         FileName;
   static int     NumberOfInstances;
   vtkFlashReaderInternal * Internal;
+  int LoadMortonCurve;
+  int LoadParticles;
+
   int MaxLevel;
 //BTX
   vtkstd::vector<int> BlockMap;
 //ETX
-  void GenerateBlockMap();
+  virtual void GenerateBlockMap();
                             
 private:
 

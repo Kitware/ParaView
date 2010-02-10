@@ -57,7 +57,7 @@
 #include <vtkstd/string>
 #include <vtkstd/vector>
 
-vtkCxxRevisionMacro( vtkFlashReader, "1.6" );
+vtkCxxRevisionMacro( vtkFlashReader, "1.7" );
 vtkStandardNewMacro( vtkFlashReader );
 
 // ============================================================================
@@ -1658,6 +1658,9 @@ vtkFlashReader::vtkFlashReader()
   this->FileName = NULL;
   this->Internal = new vtkFlashReaderInternal;
   this->MaxLevel = 1000;
+  this->LoadMortonCurve = 0;
+  this->LoadParticles = 1;
+
   
   this->SetNumberOfInputPorts( 0 );
 
@@ -2198,10 +2201,15 @@ int vtkFlashReader::RequestData( vtkInformation * vtkNotUsed( request ),
     this->GetBlock( j, output );
     }
    
-  int   blockIdx = this->Internal->NumberOfBlocks;
-  this->GetParticles( blockIdx, output );
-  this->GetMortonCurve( blockIdx, output );
-  
+  int   blockIdx = this->BlockMap.size();
+  if (this->LoadParticles)
+    {
+    this->GetParticles( blockIdx, output );
+    }
+  if (this->LoadMortonCurve)
+    {
+    this->GetMortonCurve( blockIdx, output );
+    }
   outInf = NULL;
   output = NULL;
   
