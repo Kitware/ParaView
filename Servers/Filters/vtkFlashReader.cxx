@@ -57,7 +57,7 @@
 #include <vtkstd/string>
 #include <vtkstd/vector>
 
-vtkCxxRevisionMacro( vtkFlashReader, "1.7" );
+vtkCxxRevisionMacro( vtkFlashReader, "1.8" );
 vtkStandardNewMacro( vtkFlashReader );
 
 // ============================================================================
@@ -1331,7 +1331,7 @@ void vtkFlashReaderInternal::ReadDataAttributeNames()
     }
 
   hid_t unk_raw_data_type = H5Dget_type( unknownsId );
-  int length = H5Tget_size( unk_raw_data_type );
+  int length = (int)(H5Tget_size( unk_raw_data_type ));
 
   int nvars = unk_dims[0];
   char * unk_array = new char [ nvars * length ];
@@ -1437,7 +1437,7 @@ void vtkFlashReaderInternal::ReadParticleAttributes()
     vtkstd::string nice_name = GetSeparatedParticleName( member_name );
     hid_t  member_raw_type = H5Tget_member_type( point_raw_type, i );
     hid_t  member_type = H5Tget_native_type( member_raw_type, H5T_DIR_ASCEND );
-    int    index = this->ParticleAttributeTypes.size();
+    int    index = (int)(this->ParticleAttributeTypes.size());
     
     if (  strcmp( member_name, "particle_x" )  &&
           strcmp( member_name, "particle_y" )  &&
@@ -1561,7 +1561,7 @@ void vtkFlashReaderInternal::ReadParticleAttributesFLASH3()
     { 
     vtkstd::string name = snames.substr( i * 24, 24 );
     
-    int sp = name.find_first_of(' ');
+    int sp = (int)(name.find_first_of(' '));
     if ( sp < 24 )
       {
       name = name.substr( 0, sp );
@@ -2195,13 +2195,13 @@ int vtkFlashReader::RequestData( vtkInformation * vtkNotUsed( request ),
   
   this->Internal->ReadMetaData();
   this->GenerateBlockMap();
-  int numBlocks = this->BlockMap.size();
+  int numBlocks = (int)(this->BlockMap.size());
   for ( int j = 0; j < numBlocks; j ++ )
     {
     this->GetBlock( j, output );
     }
    
-  int   blockIdx = this->BlockMap.size();
+  int   blockIdx = (int)(this->BlockMap.size());
   if (this->LoadParticles)
     {
     this->GetParticles( blockIdx, output );
