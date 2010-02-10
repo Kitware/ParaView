@@ -38,7 +38,7 @@
 #include <vtksys/ios/sstream>
 
 vtkStandardNewMacro(vtkSMProxy);
-vtkCxxRevisionMacro(vtkSMProxy, "1.116");
+vtkCxxRevisionMacro(vtkSMProxy, "1.117");
 
 vtkCxxSetObjectMacro(vtkSMProxy, XMLElement, vtkPVXMLElement);
 vtkCxxSetObjectMacro(vtkSMProxy, Hints, vtkPVXMLElement);
@@ -2299,6 +2299,12 @@ vtkPVXMLElement* vtkSMProxy::SaveState(vtkPVXMLElement* root)
 
   while (!iter->IsAtEnd())
     {
+    if (!iter->GetProperty())
+      {
+      vtkWarningMacro("Missing property with name: " << iter->GetKey()
+        << " on " << this->GetXMLName());
+      continue;
+      }
     if (!iter->GetProperty()->GetIsInternal())
       {
       vtksys_ios::ostringstream propID;
