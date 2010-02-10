@@ -80,10 +80,16 @@ IF (VTK_USE_QVTK_QTOPENGL)
   LIST(APPEND qtliblist QTOPENGL)
 ENDIF (VTK_USE_QVTK_QTOPENGL)
 
-
-IF (DEVELOPMENT_INSTALL_QT_LIBS)
+# Don't install Qt runtime libs if we are doing a development install and 
+# DEVELOPMENT_INSTALL_QT_LIBS is off
+IF (PARAVIEW_INSTALL_DEVELOPMENT)
+  IF (DEVELOPMENT_INSTALL_QT_LIBS)
+    install_qt_libs("${qtliblist}" BrandedRuntime)
+  ENDIF(DEVELOPMENT_INSTALL_QT_LIBS)
+ELSE(PARAVIEW_INSTALL_DEVELOPMENT)
+  # if not doing a development install always install Qt libs.
   install_qt_libs("${qtliblist}" BrandedRuntime)
-ENDIF(DEVELOPMENT_INSTALL_QT_LIBS)
+ENDIF(PARAVIEW_INSTALL_DEVELOPMENT)
 
 #------------------------------------------------------------------------
 # Install ffmpeg, if used.
