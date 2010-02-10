@@ -78,11 +78,25 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
+  //Controls number of render threads.
+  virtual void SetThreads(int val);
+  vtkGetMacro(Threads, int);
+
+  // Description:
+  // Parameters that controls ray tracing quality
+  // Defaults are for minimal quality and maximal speed.
+  virtual void SetEnableShadows(int val);
+  vtkGetMacro(EnableShadows, int);
+  virtual void SetSamples(int val);
+  vtkGetMacro(Samples, int);
+  virtual void SetMaxDepth(int val);
+  vtkGetMacro(MaxDepth, int);
+
+  // Description:
   // Checks if color depth is sufficient to support selection.
   // If not, will return 0 and any calls to SelectVisibleCells will 
   // quietly return an empty selection.
   virtual bool IsSelectionAvailable() { return false;}
-
 
   // Description:
   // Overridden to prevent client side rendering, which isn't ray traced yet, and
@@ -111,6 +125,11 @@ protected:
   // Description:
   // Overridden to prevent screen space downsampling until it works with manta.
   virtual void SetImageReductionFactorInternal(int factor) { return; }
+
+  int EnableShadows;
+  int Threads;
+  int Samples;
+  int MaxDepth;
 
 private:
 

@@ -90,15 +90,76 @@ public:
   vtkTypeRevisionMacro(vtkMantaRenderer,vtkRenderer);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Concrete render method.
-  void DeviceRender();
+  //Description:
+  // Overridden to use manta callbacks to do the work.
+  virtual void SetBackground(double r, double g, double b);
+
+  //Description:
+  //Changes the number of manta rendering threads.
+  //More is faster.
+  //Default is 1.
+  void SetNumberOfWorkers(int);
+  vtkGetMacro(NumberOfWorkers, int);
+
+  //Description:
+  //Turns on or off shadow rendering.
+  //Default is off.
+  void SetEnableShadows(int);
+  vtkGetMacro(EnableShadows, int);
+
+  //Description:
+  //Controls multisample (anitaliased) rendering. 
+  //More looks better, but is slower.
+  //Default is 1.
+  void SetSamples(int);
+  vtkGetMacro(Samples, int);
+
+  //Description:
+  //Controls maximum ray bounce depth.
+  //More looks better, but is slower.
+  //Default is 1 meaning no bounces.
+  void SetMaxDepth(int);
+  vtkGetMacro(MaxDepth, int);
 
   // Description:
   // Ask lights to load themselves into graphics pipeline.
+  // TODO: is this necessary?
   int UpdateLights(void);
 
+  // Description:
+  // Turns off all lighting
+  // TODO: is this necessary?
+  void ClearLights(void);
+
+  //Description:
+  //Access to the manta rendered image
+  float * GetColorBuffer() 
+  { 
+    return this->ColorBuffer; 
+  }
+  float * GetDepthBuffer() 
+  {
+    return this->DepthBuffer; 
+  }
+
+  // Description:
+  // Concrete render method. Do not call this directly. The pipeline calls
+  // it during Renderwindow::Render()
+  void DeviceRender();
+
+  //Description:
+  //All classes that make manta calls should get hold of this and
+  //Register it so that the Manager, and thus the manta engine
+  //outlive themselves, and thus guarantee that they can safely make
+  //manta API calls whenever they need to.
+  vtkMantaManager* GetMantaManager()
+  {
+    return this->MantaManager;
+  }
+
   //BTX
+  //Description:
+  //Convenience read accessors to Manta structures
   Manta::MantaInterface* GetMantaEngine()    
   { 
   return this->MantaEngine;
@@ -127,40 +188,17 @@ public:
   {
     return this->SyncDisplay;
   }
-  float * GetColorBuffer() 
-  { 
-    return this->ColorBuffer; 
-  }
-  float * GetDepthBuffer() 
-  {
-    return this->DepthBuffer; 
-  }
   //ETX
-
-  vtkMantaManager* GetMantaManager()
-  {
-    return this->MantaManager;
-  }
-
-  vtkSetMacro(ChannelId, int);
-
-  //Description:
-  //Changes the number of manta rendering threads.
-  void ChangeNumberOfWorkers(int numWorkers);
-
-  //Description:
-  // Overridded to use manta callbacks to do the work.
-  virtual void SetBackground(double r, double g, double b);
-
-  // Description:
-  // Turns off all lighting
-  void ClearLights(void);
 
   //Description:
   //Internal callbacks for manta thread use.
   //Do not call them directly.
   void InternalSetBackground();
   void InternalClearLights();
+  void InternalSetNumberOfWorkers();
+  void InternalSetShadows();
+  void InternalSetSamples();
+  void InternalSetMaxDepth();
 
 protected:
   vtkMantaRenderer();
@@ -190,8 +228,6 @@ private:
   // Overriden to help ensure that a Manta compatible class is created.
   vtkCamera * MakeCamera();
 
-  int  MaxDepth;
-  int  NumberOfWorkers;
   bool IsStereo;
   bool EngineInited;
   bool EngineStarted;
@@ -209,9 +245,15 @@ private:
   Manta::Camera * MantaCamera;
   Manta::SyncDisplay * SyncDisplay;
   //ETX
+
   int ChannelId;
 
   vtkMantaManager *MantaManager;
+
+  int NumberOfWorkers;
+  int EnableShadows;
+  int Samples;
+  int MaxDepth;
 };
 
 #endif

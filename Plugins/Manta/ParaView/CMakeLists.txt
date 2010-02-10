@@ -46,22 +46,46 @@ IF(PARAVIEW_BUILD_QT_GUI)
   
   SET(MANTA_PLUGIN_CS_SOURCES
     pqMantaView.cxx
+    MantaViewOptions.cxx
+    MantaDisplay.cxx
     )
       
-  QT4_WRAP_CPP(MOC_SRCS pqMantaView.h)
+  QT4_WRAP_CPP(MOC_SRCS 
+    pqMantaView.h 
+    MantaViewOptions.h 
+    MantaDisplay.h
+    )
+  
+  QT4_WRAP_UI(UI_SRCS
+    MantaViewOptions.ui
+    MantaDisplay.ui
+    )
       
   ADD_PARAVIEW_VIEW_MODULE(
-    IFACES 
-    IFACE_SRCS 
+    VIEW_IFACE VIEW_IFACE_SRCS 
     VIEW_TYPE pqMantaView
     VIEW_NAME Manta          
     VIEW_XML_GROUP views
     VIEW_XML_NAME Manta
     )
   
+  ADD_PARAVIEW_VIEW_OPTIONS(
+    OPTIONS_IFACE OPTIONS_IFACE_SRCS
+    VIEW_TYPE pqMantaView 
+    GLOBAL_VIEW_OPTIONS MantaViewOptions
+    )
+
+  ADD_PARAVIEW_DISPLAY_PANEL_DECORATOR(
+    DISPLAY_IFACE DISPLAY_IFACE_SRCS 
+    CLASS_NAME MantaDisplay
+    PANEL_TYPES pqDisplayProxyEditor)
+
   SET(CLIENT_ARGS
-    GUI_INTERFACES ${IFACES}
-    GUI_SOURCES ${MANTA_PLUGIN_CS_SOURCES} ${MOC_SRCS} ${IFACE_SRCS} )
+    GUI_INTERFACES 
+    ${VIEW_IFACE} ${OPTIONS_IFACE} ${DISPLAY_IFACE}
+    GUI_SOURCES 
+    ${MANTA_PLUGIN_CS_SOURCES} ${MOC_SRCS} ${UI_SRCS}
+    ${VIEW_IFACE_SRCS} ${OPTIONS_IFACE_SRCS} ${DISPLAY_IFACE_SRCS})
   
 ENDIF(PARAVIEW_BUILD_QT_GUI)
 

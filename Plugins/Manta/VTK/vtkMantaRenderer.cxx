@@ -95,16 +95,23 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <vtkstd/string>
 
-vtkCxxRevisionMacro(vtkMantaRenderer, "1.13");
+vtkCxxRevisionMacro(vtkMantaRenderer, "1.14");
 vtkStandardNewMacro(vtkMantaRenderer);
 
 //----------------------------------------------------------------------------
 vtkMantaRenderer::vtkMantaRenderer() :
-  EngineInited( false ), EngineStarted( false ), NumberOfWorkers( 8 ),
-  IsStereo( false ), MaxDepth( 5 ), MantaScene( 0 ), MantaWorldGroup( 0 ),
+  EngineInited( false ), EngineStarted( false ),
+  IsStereo( false ), MantaScene( 0 ), MantaWorldGroup( 0 ),
   MantaLightSet( 0 ), MantaCamera( 0 ), SyncDisplay( 0 )
 {
   //cerr << "MR(" << this << ") CREATE" << endl;
+
+  // Default options
+  this->NumberOfWorkers = 1;
+  this->EnableShadows = 0;
+  this->Samples = 1;
+  this->MaxDepth = 1;
+
   // the default global ambient light created by vtkRenderer is too bright.
   this->SetAmbient( 0.1, 0.1, 0.1 );
 
@@ -113,27 +120,42 @@ vtkMantaRenderer::vtkMantaRenderer() :
   this->MantaEngine = this->MantaManager->GetMantaEngine();
   this->MantaEngine->changeNumWorkers( this->NumberOfWorkers );
 
-  // Default options
   this->MantaFactory = this->MantaManager->GetMantaFactory();
-
-  //this->MantaFactory->selectImageType( "rgbafloat" );
-  //this->MantaFactory->selectImageType( "rgbzfloat" );
-  this->MantaFactory->selectImageType( "rgba8zfloat" );
-  this->MantaFactory->selectImageTraverser( "tiled(-square)" );
-  //this->MantaFactory->selectImageTraverser( "deadline()" );
-  this->MantaFactory->selectLoadBalancer( "workqueue" );
-  //this->MantaFactory->selectShadowAlgorithm( "hard(-attenuateShadows)" );
-  this->MantaFactory->selectShadowAlgorithm( "noshadows" );
-  this->MantaFactory->selectPixelSampler( "singlesample" );
-  //this->MantaFactory->selectPixelSampler("regularsample(-numberOfSamples 4)");
-  //this->MantaFactory->selectPixelSampler(
-  //"jittersample(-numberOfSamples 16)");
-  this->MantaFactory->selectRenderer( "raytracer" );
-  //this->MantaFactory->selectRenderer( "depthvalue" );
 
   this->ColorBuffer = NULL;
   this->DepthBuffer = NULL;
   this->ImageSize = -1;
+
+  this->MantaFactory->selectImageType( "rgba8zfloat" );
+
+  this->MantaFactory->selectImageTraverser( "tiled(-square)" );
+  //this->MantaFactory->selectImageTraverser( "deadline()" );
+
+  this->MantaFactory->selectLoadBalancer( "workqueue" );
+
+  if (this->EnableShadows)
+    {
+    this->MantaFactory->selectShadowAlgorithm( "hard(-attenuateShadows)" );
+    }
+  else
+    {
+    this->MantaFactory->selectShadowAlgorithm( "noshadows" );
+    }
+
+  if (this->Samples <= 1)
+    {
+    this->MantaFactory->selectPixelSampler( "singlesample" );
+    }
+  else
+    {
+    char buff[80];
+    sprintf(buff, "regularsample(-numberOfSamples %d)", this->Samples);
+    this->MantaFactory->selectPixelSampler(buff);
+    //this->MantaFactory->selectPixelSampler(
+    //"jittersample(-numberOfSamples 16)");
+    }
+
+  this->MantaFactory->selectRenderer( "raytracer" );
 }
 
 //----------------------------------------------------------------------------
@@ -197,18 +219,6 @@ void vtkMantaRenderer::InternalSetBackground()
 
   delete this->MantaScene->getBackground();
   this->MantaScene->setBackground( background );
-}
-
-//----------------------------------------------------------------------------
-void vtkMantaRenderer::ChangeNumberOfWorkers(int numWorkers)
-{
-  if (this->NumberOfWorkers == numWorkers)
-    {
-    return;
-    }
-  this->NumberOfWorkers = numWorkers;
-  this->MantaEngine->changeNumWorkers( this->NumberOfWorkers );
-  this->Modified();
 }
 
 //----------------------------------------------------------------------------
@@ -349,8 +359,8 @@ void vtkMantaRenderer::LayerRender()
 
   vtkTimerLog::MarkStartEvent("ThreadSync");
   // let the render threads draw what we've asked them to
-  this->GetSyncDisplay()->doneRendering();
-  this->GetSyncDisplay()->waitOnFrameReady();
+  //this->GetSyncDisplay()->doneRendering();
+  //this->GetSyncDisplay()->waitOnFrameReady();
   this->GetSyncDisplay()->doneRendering();
   this->GetSyncDisplay()->waitOnFrameReady();
   vtkTimerLog::MarkEndEvent("ThreadSync");
@@ -438,3 +448,105 @@ void vtkMantaRenderer::PrintSelf( ostream& os, vtkIndent indent )
 {
   this->Superclass::PrintSelf( os, indent );
 }
+
+//----------------------------------------------------------------------------
+void vtkMantaRenderer::SetNumberOfWorkers( int newval )
+{
+  if (this->NumberOfWorkers == newval)
+    {
+    return;
+    }
+  this->NumberOfWorkers = newval;
+  this->MantaEngine->addTransaction
+    ( "set max depth",
+      Manta::Callback::create(this, &vtkMantaRenderer::InternalSetNumberOfWorkers));
+  this->Modified();
+}
+
+//----------------------------------------------------------------------------
+void vtkMantaRenderer::InternalSetNumberOfWorkers()
+{
+  this->MantaEngine->changeNumWorkers( this->NumberOfWorkers );
+}
+
+//----------------------------------------------------------------------------
+void vtkMantaRenderer::SetEnableShadows( int newval )
+{
+  if (this->EnableShadows == newval)
+    {
+    return;
+    }
+
+  this->EnableShadows = newval;
+  this->MantaEngine->addTransaction
+    ( "set shadows",
+      Manta::Callback::create(this, &vtkMantaRenderer::InternalSetShadows));
+  this->Modified();
+}
+
+//----------------------------------------------------------------------------
+void vtkMantaRenderer::InternalSetShadows()
+{
+  if (this->EnableShadows)
+    {
+    this->MantaFactory->selectShadowAlgorithm( "hard(-attenuateShadows)" );
+    }
+  else
+    {
+    this->MantaFactory->selectShadowAlgorithm( "noshadows" );
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkMantaRenderer::SetSamples( int newval )
+{
+  if (this->Samples == newval)
+    {
+    return;
+    }
+
+  this->Samples = newval;
+  this->MantaEngine->addTransaction
+    ( "set samples",
+      Manta::Callback::create(this, &vtkMantaRenderer::InternalSetSamples));
+  this->Modified();
+}
+
+//----------------------------------------------------------------------------
+void vtkMantaRenderer::InternalSetSamples()
+{
+  if (this->Samples <= 1)
+    {
+    this->MantaFactory->selectPixelSampler( "singlesample" );
+    }
+  else
+    {
+    char buff[80];
+    sprintf(buff, "regularsample(-numberOfSamples %d)", this->Samples);
+    this->MantaFactory->selectPixelSampler(buff);
+    //this->MantaFactory->selectPixelSampler(
+    //"jittersample(-numberOfSamples 16)");
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkMantaRenderer::SetMaxDepth( int newval )
+{
+  if (this->MaxDepth == newval)
+    {
+    return;
+    }
+
+  this->MaxDepth = newval;
+  this->MantaEngine->addTransaction
+    ( "set max depth",
+      Manta::Callback::create(this, &vtkMantaRenderer::InternalSetMaxDepth));
+  this->Modified();
+}
+
+//----------------------------------------------------------------------------
+void vtkMantaRenderer::InternalSetMaxDepth()
+{
+  this->MantaScene->getRenderParameters().setMaxDepth( this->MaxDepth );
+}
+

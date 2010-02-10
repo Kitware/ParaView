@@ -151,7 +151,7 @@ protected:
   vtkTimerLog *Timer;
 };
 
-vtkCxxRevisionMacro(MyProcess, "1.5");
+vtkCxxRevisionMacro(MyProcess, "1.6");
 vtkStandardNewMacro(MyProcess);
 
 MyProcess::MyProcess()
@@ -279,7 +279,7 @@ void MyProcess::Execute()
   else
     {
     mRenderer = vtkMantaRenderer::New();
-    mRenderer->ChangeNumberOfWorkers(threads);
+    mRenderer->SetNumberOfWorkers(threads);
     renderer = mRenderer;
     }
 

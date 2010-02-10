@@ -225,7 +225,7 @@ int main(int argc, char** argv)
     vtkCamera *camera = vtkCamera::New();
     if ( mantarenderer )
       {
-      mantarenderer->ChangeNumberOfWorkers(numThreads);
+      mantarenderer->SetNumberOfWorkers(numThreads);
       }
     renderer->SetActiveCamera(camera);
 

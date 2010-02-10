@@ -67,15 +67,21 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkClientServerStream.h"
 #include "vtkProcessModule.h"
 
+#include "vtkSMIntVectorProperty.h"
+
 #define DEBUGPRINT_VIEW(arg) arg;
 
 //-----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkSMMantaClientServerViewProxy, "1.1");
+vtkCxxRevisionMacro(vtkSMMantaClientServerViewProxy, "1.2");
 vtkStandardNewMacro(vtkSMMantaClientServerViewProxy);
 
 //-----------------------------------------------------------------------------
 vtkSMMantaClientServerViewProxy::vtkSMMantaClientServerViewProxy()
 {
+  this->EnableShadows = 0;
+  this->Threads = 1;
+  this->Samples = 1 ;
+  this->MaxDepth = 1;
 }
 
 //-----------------------------------------------------------------------------
@@ -112,5 +118,105 @@ bool vtkSMMantaClientServerViewProxy::BeginCreateVTKObjects()
 void vtkSMMantaClientServerViewProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMMantaClientServerViewProxy::SetThreads(int newval)
+{
+  if (newval == this->Threads)
+    {
+    return;
+    }
+  this->Threads = newval;
+  this->Modified();
+
+  //use streams instead of properties because the client
+  //doesn't have a vtkMantaRenderer
+  vtkProcessModule *pm = vtkProcessModule::GetProcessModule();
+  vtkSMProxy *proxy = this->GetRendererProxy();
+  vtkClientServerStream stream;
+  vtkClientServerID id = proxy->GetID();
+  stream << vtkClientServerStream::Invoke
+         << id << "SetNumberOfWorkers"
+         << newval
+         << vtkClientServerStream::End;
+  pm->SendStream(this->GetConnectionID(),
+                 vtkProcessModule::RENDER_SERVER,
+                 stream);
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMMantaClientServerViewProxy::SetEnableShadows(int newval)
+{
+  if (newval == this->EnableShadows)
+    {
+    return;
+    }
+  this->EnableShadows = newval;
+  this->Modified();
+
+  //use streams instead of properties because the client
+  //doesn't have a vtkMantaRenderer
+  vtkProcessModule *pm = vtkProcessModule::GetProcessModule();
+  vtkSMProxy *proxy = this->GetRendererProxy();
+  vtkClientServerStream stream;
+  vtkClientServerID id = proxy->GetID();
+  stream << vtkClientServerStream::Invoke
+         << id << "SetEnableShadows"
+         << newval
+         << vtkClientServerStream::End;
+  pm->SendStream(this->GetConnectionID(),
+                 vtkProcessModule::RENDER_SERVER,
+                 stream);
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMMantaClientServerViewProxy::SetSamples(int newval)
+{
+  if (newval == this->Samples)
+    {
+    return;
+    }
+  this->Samples = newval;
+  this->Modified();
+
+  //use streams instead of properties because the client
+  //doesn't have a vtkMantaRenderer
+  vtkProcessModule *pm = vtkProcessModule::GetProcessModule();
+  vtkSMProxy *proxy = this->GetRendererProxy();
+  vtkClientServerStream stream;
+  vtkClientServerID id = proxy->GetID();
+  stream << vtkClientServerStream::Invoke
+         << id << "SetSamples"
+         << newval
+         << vtkClientServerStream::End;
+  pm->SendStream(this->GetConnectionID(),
+                 vtkProcessModule::RENDER_SERVER,
+                 stream);
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMMantaClientServerViewProxy::SetMaxDepth(int newval)
+{
+  if (newval == this->EnableShadows)
+    {
+    return;
+    }
+  this->MaxDepth = newval;
+  this->Modified();
+
+  //use streams instead of properties because the client
+  //doesn't have a vtkMantaRenderer
+  vtkProcessModule *pm = vtkProcessModule::GetProcessModule();
+  vtkSMProxy *proxy = this->GetRendererProxy();
+  vtkClientServerStream stream;
+  vtkClientServerID id = proxy->GetID();
+  stream << vtkClientServerStream::Invoke
+         << id << "SetMaxDepth"
+         << newval
+         << vtkClientServerStream::End;
+  pm->SendStream(this->GetConnectionID(),
+                 vtkProcessModule::RENDER_SERVER,
+                 stream);
 }
 

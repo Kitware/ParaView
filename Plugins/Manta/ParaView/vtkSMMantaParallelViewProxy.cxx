@@ -79,7 +79,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define DEBUGPRINT_VIEW(arg) arg;
 
 //-----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkSMMantaParallelViewProxy, "1.1");
+vtkCxxRevisionMacro(vtkSMMantaParallelViewProxy, "1.2");
 vtkStandardNewMacro(vtkSMMantaParallelViewProxy);
 
 
@@ -87,6 +87,10 @@ vtkStandardNewMacro(vtkSMMantaParallelViewProxy);
 vtkSMMantaParallelViewProxy::vtkSMMantaParallelViewProxy()
 {
   this->UsingIceTRenderers = false;
+  this->EnableShadows = 0;
+  this->Threads = 1;
+  this->Samples = 1 ;
+  this->MaxDepth = 1;
 }
 
 //-----------------------------------------------------------------------------
@@ -136,5 +140,105 @@ void vtkSMMantaParallelViewProxy::EndCreateVTKObjects()
 void vtkSMMantaParallelViewProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMMantaParallelViewProxy::SetThreads(int newval)
+{
+  if (newval == this->Threads)
+    {
+    return;
+    }
+  this->Threads = newval;
+  this->Modified();
+
+  //use streams instead of properties because the client
+  //doesn't have a vtkMantaRenderer
+  vtkProcessModule *pm = vtkProcessModule::GetProcessModule();
+  vtkSMProxy *proxy = this->GetRendererProxy();
+  vtkClientServerStream stream;
+  vtkClientServerID id = proxy->GetID();
+  stream << vtkClientServerStream::Invoke
+         << id << "SetNumberOfWorkers"
+         << newval
+         << vtkClientServerStream::End;
+  pm->SendStream(this->GetConnectionID(),
+                 vtkProcessModule::RENDER_SERVER,
+                 stream);
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMMantaParallelViewProxy::SetEnableShadows(int newval)
+{
+  if (newval == this->EnableShadows)
+    {
+    return;
+    }
+  this->EnableShadows = newval;
+  this->Modified();
+
+  //use streams instead of properties because the client
+  //doesn't have a vtkMantaRenderer
+  vtkProcessModule *pm = vtkProcessModule::GetProcessModule();
+  vtkSMProxy *proxy = this->GetRendererProxy();
+  vtkClientServerStream stream;
+  vtkClientServerID id = proxy->GetID();
+  stream << vtkClientServerStream::Invoke
+         << id << "SetEnableShadows"
+         << newval
+         << vtkClientServerStream::End;
+  pm->SendStream(this->GetConnectionID(),
+                 vtkProcessModule::RENDER_SERVER,
+                 stream);
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMMantaParallelViewProxy::SetSamples(int newval)
+{
+  if (newval == this->Samples)
+    {
+    return;
+    }
+  this->Samples = newval;
+  this->Modified();
+
+  //use streams instead of properties because the client
+  //doesn't have a vtkMantaRenderer
+  vtkProcessModule *pm = vtkProcessModule::GetProcessModule();
+  vtkSMProxy *proxy = this->GetRendererProxy();
+  vtkClientServerStream stream;
+  vtkClientServerID id = proxy->GetID();
+  stream << vtkClientServerStream::Invoke
+         << id << "SetSamples"
+         << newval
+         << vtkClientServerStream::End;
+  pm->SendStream(this->GetConnectionID(),
+                 vtkProcessModule::RENDER_SERVER,
+                 stream);
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMMantaParallelViewProxy::SetMaxDepth(int newval)
+{
+  if (newval == this->EnableShadows)
+    {
+    return;
+    }
+  this->MaxDepth = newval;
+  this->Modified();
+
+  //use streams instead of properties because the client
+  //doesn't have a vtkMantaRenderer
+  vtkProcessModule *pm = vtkProcessModule::GetProcessModule();
+  vtkSMProxy *proxy = this->GetRendererProxy();
+  vtkClientServerStream stream;
+  vtkClientServerID id = proxy->GetID();
+  stream << vtkClientServerStream::Invoke
+         << id << "SetMaxDepth"
+         << newval
+         << vtkClientServerStream::End;
+  pm->SendStream(this->GetConnectionID(),
+                 vtkProcessModule::RENDER_SERVER,
+                 stream);
 }
 
