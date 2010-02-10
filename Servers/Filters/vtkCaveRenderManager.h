@@ -22,8 +22,6 @@
 
 #include "vtkParallelRenderManager.h"
 
-#include "vtkIceTConstants.h"   // For constant definitions
-
 class vtkIceTRenderer;
 class vtkIntArray;
 class vtkPerspectiveTransform;

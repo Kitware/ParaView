@@ -54,7 +54,7 @@
 // vtkCaveRenderManager implementation.
 //******************************************************************
 
-vtkCxxRevisionMacro(vtkCaveRenderManager, "1.5");
+vtkCxxRevisionMacro(vtkCaveRenderManager, "1.6");
 vtkStandardNewMacro(vtkCaveRenderManager);
 
 vtkCaveRenderManager::vtkCaveRenderManager()
@@ -499,4 +499,31 @@ void vtkCaveRenderManager::PostRenderProcessing()
 void vtkCaveRenderManager::PrintSelf(ostream &os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+  os << indent << "NumberOfDisplays: " 
+    << this->NumberOfDisplays << endl;
+  vtkIndent rankIndent = indent.GetNextIndent();
+  for (int i = 0; i < this->NumberOfDisplays; ++i)
+    {
+    os << rankIndent;
+    for (int j = 0; j < 12; ++j)
+      {
+      os << this->Displays[i][j] << " ";
+      }
+    os << endl;
+    }
+  os << indent << "Origin: " 
+     << this->DisplayOrigin[0] << " "
+     << this->DisplayOrigin[1] << " "
+     << this->DisplayOrigin[2] << " "
+     << this->DisplayOrigin[3] << endl;
+  os << indent << "X: " 
+     << this->DisplayX[0] << " "
+     << this->DisplayX[1] << " "
+     << this->DisplayX[2] << " "
+     << this->DisplayX[3] << endl;
+  os << indent << "Y: " 
+     << this->DisplayY[0] << " "
+     << this->DisplayY[1] << " "
+     << this->DisplayY[2] << " "
+     << this->DisplayY[3] << endl;
 }
