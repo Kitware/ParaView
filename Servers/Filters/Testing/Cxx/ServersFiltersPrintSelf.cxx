@@ -17,7 +17,6 @@
 #include "vtkAppendRectilinearGrid.h"
 #include "vtkAttributeDataReductionFilter.h"
 #include "vtkCameraManipulator.h"
-#include "vtkCaveRenderManager.h"
 #include "vtkCleanUnstructuredGrid.h"
 #include "vtkClientServerMoveData.h"
 #include "vtkCompleteArrays.h"
@@ -107,6 +106,7 @@
 # include "vtkBalancedRedistributePolyData.h"
 # include "vtkRedistributePolyData.h"
 # ifdef PARAVIEW_USE_ICE_T
+#  include "vtkCaveRenderManager.h"
 #  include "vtkDesktopDeliveryClient.h"
 #  include "vtkDesktopDeliveryServer.h"
 //#include "vtkExtractCTHPart2.h"
