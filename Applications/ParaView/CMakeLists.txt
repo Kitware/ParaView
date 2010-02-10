@@ -80,7 +80,10 @@ IF (VTK_USE_QVTK_QTOPENGL)
   LIST(APPEND qtliblist QTOPENGL)
 ENDIF (VTK_USE_QVTK_QTOPENGL)
 
-install_qt_libs("${qtliblist}" BrandedRuntime)
+
+IF (DEVELOPMENT_INSTALL_QT_LIBS)
+  install_qt_libs("${qtliblist}" BrandedRuntime)
+ENDIF(DEVELOPMENT_INSTALL_QT_LIBS)
 
 #------------------------------------------------------------------------
 # Install ffmpeg, if used.
