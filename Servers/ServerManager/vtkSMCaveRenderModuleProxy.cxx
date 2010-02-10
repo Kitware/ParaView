@@ -28,7 +28,7 @@
 #include "vtkPVServerInformation.h"
 
 vtkStandardNewMacro(vtkSMCaveRenderModuleProxy);
-vtkCxxRevisionMacro(vtkSMCaveRenderModuleProxy, "1.11");
+vtkCxxRevisionMacro(vtkSMCaveRenderModuleProxy, "1.12");
 //-----------------------------------------------------------------------------
 vtkSMCaveRenderModuleProxy::vtkSMCaveRenderModuleProxy()
 {
@@ -239,6 +239,7 @@ void vtkSMCaveRenderModuleProxy::ConfigureFromServerInformation()
                        serverInfo->GetLowerRight(idx),
                        serverInfo->GetUpperLeft(idx));
     }
+    
 }
 
 //-----------------------------------------------------------------------------

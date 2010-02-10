@@ -46,6 +46,8 @@ SET(Kit_SRCS
   vtkSMCameraLink.cxx
   vtkSMCameraManipulatorProxy.cxx
   vtkSMCameraProxy.cxx
+  #vtkSMCaveRenderModuleProxy.cxx
+  vtkSMCaveRenderViewProxy.cxx
   vtkSMClientDeliveryRepresentationProxy.cxx
   vtkSMClientDeliveryStrategyProxy.cxx
   vtkSMClientServerRenderSyncManagerHelper.cxx

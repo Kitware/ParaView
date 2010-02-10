@@ -12,251 +12,105 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-
+/*----------------------------------------------------------------------------
+ Copyright (c) Sandia Corporation
+ See Copyright.txt or http://www.paraview.org/HTML/Copyright.html for details.
+----------------------------------------------------------------------------*/
 #include "vtkCaveRenderManager.h"
-#include "vtkMath.h"
+
 #include "vtkCallbackCommand.h"
 #include "vtkCamera.h"
-#include "vtkTimerLog.h"
-#include "vtkLight.h"
-#include "vtkLightCollection.h"
-#include "vtkMultiProcessController.h"
-#include "vtkSocketController.h"
-#include "vtkObjectFactory.h"
-#include "vtkRenderWindow.h"
-#include "vtkRenderer.h"
-#include "vtkRendererCollection.h"
-#include "vtkToolkits.h"
-#include "vtkUnsignedCharArray.h"
+#include "vtkDoubleArray.h"
 #include "vtkFloatArray.h"
+#include "vtkIceTContext.h"
+#include "vtkIceTRenderer.h"
+#include "vtkIntArray.h"
+#include "vtkMath.h"
+#include "vtkMPIController.h"
+#include "vtkMPI.h"
+#include "vtkMultiProcessStream.h"
+#include "vtkObjectFactory.h"
+#include "vtkPerspectiveTransform.h"
+#include "vtkPKdTree.h"
+#include "vtkProcessModule.h"
+#include "vtkRendererCollection.h"
+#include "vtkRenderWindow.h"
+#include "vtkTimerLog.h"
+#include "vtkUnsignedCharArray.h"
+
+#include <GL/ice-t.h>
+
+#include "vtkgl.h"
+#include "assert.h"
+#include <vtkstd/algorithm>
+
 #include "vtkTransform.h"
 
-#ifdef _WIN32
-#include "vtkWin32OpenGLRenderWindow.h"
-#endif
+// ******************************************************************
+// Callback commands.
+// ******************************************************************
 
-#ifdef VTK_USE_MPI
- #include <mpi.h>
-#endif
+//******************************************************************
+// vtkCaveRenderManager implementation.
+//******************************************************************
 
-vtkCxxRevisionMacro(vtkCaveRenderManager, "1.3");
+vtkCxxRevisionMacro(vtkCaveRenderManager, "1.4");
 vtkStandardNewMacro(vtkCaveRenderManager);
 
-// Structures to communicate render info.
-// Marshaling is easier if we use all floats. (24)
-class vtkPVCaveClientInfo 
-{
-public:
-  vtkPVCaveClientInfo();
-  double ClientCameraPosition[3];
-  double ClientCameraFocalPoint[3];
-  double ClientCameraViewUp[3];
-  double LightPosition[3];
-  double LightFocalPoint[3];
-  double Background[3];
-  // Room coordinates.
-  double UserPosition[4];
-};
-vtkPVCaveClientInfo::vtkPVCaveClientInfo()
-{
-  this->ClientCameraPosition[0] = 0.0;               
-  this->ClientCameraPosition[1] = 0.0;               
-  this->ClientCameraPosition[2] = 0.0;               
-  this->ClientCameraFocalPoint[0] = 0.0;    
-  this->ClientCameraFocalPoint[1] = 0.0;    
-  this->ClientCameraFocalPoint[2] = 0.0;    
-  this->ClientCameraViewUp[0] = 0.0;  
-  this->ClientCameraViewUp[1] = 0.0;  
-  this->ClientCameraViewUp[2] = 0.0;  
-  this->LightPosition[0] = 0.0;
-  this->LightPosition[1] = 0.0;
-  this->LightPosition[2] = 0.0;
-  this->LightFocalPoint[0] = 0.0;
-  this->LightFocalPoint[1] = 0.0;
-  this->LightFocalPoint[2] = 0.0;
-  this->Background[0] = 0.0;
-  this->Background[1] = 0.0;
-  this->Background[2] = 0.0;
-  this->UserPosition[0] = 0.0;               
-  this->UserPosition[1] = 0.0;               
-  this->UserPosition[2] = 0.0; 
-  this->UserPosition[3] = 1.0; 
-}
-// Structures to communicate render info.
-// Marshaling is easier if we use all floats. (24)
-class vtkPVCaveDisplayInfo 
-{
-public:
-  vtkPVCaveDisplayInfo();
-  double DisplayIndex;
-  // Room coordinates.
-  double DisplayOrigin[3];
-  double DisplayX[3];
-  double DisplayY[3];
-};
-
-vtkPVCaveDisplayInfo::vtkPVCaveDisplayInfo()
-{
-  this->DisplayOrigin[0] = 0.0;               
-  this->DisplayOrigin[1] = 0.0;               
-  this->DisplayOrigin[2] = 0.0;
-  this->DisplayX[0] = 0.0;
-  this->DisplayX[1] = 0.0;
-  this->DisplayX[2] = 0.0;     
-  this->DisplayY[0] = 0.0;
-  this->DisplayY[1] = 0.0;
-  this->DisplayY[2] = 0.0;
-}
-
-
-
-//-------------------------------------------------------------------------
 vtkCaveRenderManager::vtkCaveRenderManager()
 {
-  this->ClientFlag = 0;
-  this->SocketController = NULL;
+  this->NumberOfDisplays = 0;
+  this->Displays= 0;
+  this->SetNumberOfDisplays(1);
 
-  this->StartTag = this->EndTag = 0;
-
-  this->DisplayOrigin[0] = 0;
-  this->DisplayOrigin[1] = 0;
-  this->DisplayOrigin[2] = 0;
+  this->DisplayOrigin[0] = 0.0;
+  this->DisplayOrigin[1] = 0.0;
+  this->DisplayOrigin[2] = 0.0;
   this->DisplayOrigin[3] = 1.0;
-  this->DisplayX[0] = 1.0;
+  this->DisplayX[0] = 0.0;
   this->DisplayX[1] = 0.0;
   this->DisplayX[2] = 0.0;
   this->DisplayX[3] = 1.0;
   this->DisplayY[0] = 0.0;
-  this->DisplayY[1] = 1.0;
+  this->DisplayY[1] = 0.0;
   this->DisplayY[2] = 0.0;
   this->DisplayY[3] = 1.0;
+  // Reload the controller so that we make an ICE-T context.
+  this->Superclass::SetController(NULL);
+  this->SetController(vtkMultiProcessController::GetGlobalController());
 }
 
-  
 //-------------------------------------------------------------------------
+
 vtkCaveRenderManager::~vtkCaveRenderManager()
 {
-  this->SetSocketController(0);
+  this->SetController(NULL);
+  this->SetNumberOfDisplays(0);
 }
-
-
-
-
-//-------------------------------------------------------------------------
-// Called by the render window start event. 
-float vtkCaveRenderManager::GetZBufferValue(int x, int y)
-{
-  float z;
-  float *pz;
-
-  if (this->RenderWindow == NULL)
-    {
-    vtkErrorMacro("Missing render window.");
-    return 0.5;
-    }
-  
-  pz = this->RenderWindow->GetZbufferData(x, y, x, y);
-  z = *pz;
-  delete [] pz;
-  return z;  
-}
-
-
-
-//==================== CallbackCommand and RMI functions ====================
-
-
-//-------------------------------------------------------------------------
-// Called by the render window start event. 
-void vtkCaveRenderManagerDefineDisplayRMI(void *localArg, 
-                                          void *, int, int)
-{
-  vtkCaveRenderManager *self = (vtkCaveRenderManager *)localArg;
-
-  self->DefineDisplayRMI();
-}
-
-//-------------------------------------------------------------------------
-// Called by the render window start event. 
-void vtkCaveRenderManagerClientStartRender(vtkObject *caller,
-                                 unsigned long vtkNotUsed(event), 
-                                 void *clientData, void *)
-{
-  vtkCaveRenderManager *self = (vtkCaveRenderManager *)clientData;
-
-  if (caller != self->GetRenderWindow())
-    { // Sanity check.
-    vtkGenericWarningMacro("Caller mismatch.");
-    return;
-    }
-
-  self->ClientStartRender();
-}
-
-//-------------------------------------------------------------------------
-// Called by the render window start event. 
-void vtkCaveRenderManagerClientEndRender(vtkObject *caller,
-                                 unsigned long vtkNotUsed(event), 
-                                 void *clientData, void *)
-{
-  (void)caller;
-  vtkCaveRenderManager *self = (vtkCaveRenderManager *)clientData;
-
-  if (caller != self->GetRenderWindow())
-    { // Sanity check.
-    vtkGenericWarningMacro("Caller mismatch.");
-    return;
-    }
-
-  self->ClientEndRender();
-}
-
-
-typedef void (*vtkRMIFunctionType)(void *localArg, 
-                                   void *remoteArg, int remoteArgLength, 
-                                   int remoteProcessId);
-
-//-------------------------------------------------------------------------
-void vtkCaveRenderManagerRootStartRenderRMI(void *localArg, 
-                                           void *, int, int)
-{
-  vtkCaveRenderManager *self = (vtkCaveRenderManager *)localArg;
-  vtkMultiProcessController *controller = self->GetSocketController();
-  vtkPVCaveClientInfo info;  
-
-  controller->Receive((double*)(&info), 
-                     sizeof(vtkPVCaveClientInfo)/sizeof(double), 1, 
-                     vtkCaveRenderManager::INFO_TAG);
-  self->RootStartRenderRMI(&info);
-}
-
-//-------------------------------------------------------------------------
-void vtkCaveRenderManagerSatelliteStartRenderRMI(void *localArg, 
-                                                 void *, int, int)
-{
-  vtkCaveRenderManager *self = (vtkCaveRenderManager *)localArg;
-  self->SatelliteStartRenderRMI();
-}
-
-
-
-//==================== end of callback and RMI functions ====================
-
-
 //-------------------------------------------------------------------------
 // Room camera is a camera in room coordinates that points at the display.
 // Client camera is the camera on the client.  The out camera is the 
 // combination of the two used for the final cave display.
 // It is the room camera transformed by the world camera.
-void vtkCaveRenderManager::ComputeCamera(vtkPVCaveClientInfo *info,
-                                         vtkCamera* cam)
+void vtkCaveRenderManager::ComputeCamera(vtkCamera* cam)
 {
   int idx;
+  int display = this->Controller->GetLocalProcessId();
+  double* displayOrigin = this->Displays[display];
+  double* displayX = &(this->Displays[display][4]);
+  double* displayY = &(this->Displays[display][8]);
+  // pos is the user position
+  double pos[4];
+  //cam->GetPosition(pos);
+  pos[0] = 0.;
+  pos[1] = 0.; 
+  pos[2] = 0.;
+  pos[3] = 1.;
 
   // Use the camera here  tempoarily to get the client view transform.
-  cam->SetFocalPoint(info->ClientCameraFocalPoint);
-  cam->SetPosition(info->ClientCameraPosition);
-  cam->SetViewUp(info->ClientCameraViewUp);
+  //cam->SetFocalPoint(originalCam->GetFocalPoint());
+  //cam->SetPosition(info->ClientCameraPosition);
+  //cam->SetViewUp(info->ClientCameraViewUp);
   // Create a transform from the client camera.
   vtkTransform* trans = cam->GetViewTransformObject();
   // The displays are defined in camera coordinates.
@@ -268,7 +122,12 @@ void vtkCaveRenderManager::ComputeCamera(vtkPVCaveClientInfo *info,
   double o[4];
   double x[4];
   double y[4];
-  trans->MultiplyPoint(info->UserPosition, p);
+  trans->MultiplyPoint(pos, p);
+  /*
+  trans->MultiplyPoint(displayOrigin, o);
+  trans->MultiplyPoint(displayX, x);
+  trans->MultiplyPoint(displayY, y);
+  */
   trans->MultiplyPoint(this->DisplayOrigin, o);
   trans->MultiplyPoint(this->DisplayX, x);
   trans->MultiplyPoint(this->DisplayY, y);
@@ -336,185 +195,259 @@ void vtkCaveRenderManager::ComputeCamera(vtkPVCaveClientInfo *info,
 }
 
 //-------------------------------------------------------------------------
+
+vtkRenderer *vtkCaveRenderManager::MakeRenderer()
+{
+  return vtkIceTRenderer::New();
+}
+
+//-------------------------------------------------------------------------
+
+void vtkCaveRenderManager::SetController(vtkMultiProcessController *controller)
+{
+  vtkDebugMacro("SetController to " << controller);
+
+  if (controller == this->Controller)
+    {
+    return;
+    }
+
+  if (controller != NULL)
+    {
+    vtkCommunicator *communicator = controller->GetCommunicator();
+    if (!communicator || (!communicator->IsA("vtkMPICommunicator")))
+      {
+      vtkErrorMacro("vtkCaveRenderManager parallel compositor currently works only with an MPI communicator.");
+      return;
+      }
+    }
+
+  this->Superclass::SetController(controller);
+}
+
+//-----------------------------------------------------------------------------
+
+void vtkCaveRenderManager::SetRenderWindow(vtkRenderWindow *renwin)
+{
+  if (this->RenderWindow == renwin)
+    {
+    return;
+    }
+
+  this->Superclass::SetRenderWindow(renwin);
+
+  this->ContextDirty = 1;
+}
+
+//-----------------------------------------------------------------------------
+void vtkCaveRenderManager::SetNumberOfDisplays(int numberOfDisplays)
+{
+  if (numberOfDisplays == this->NumberOfDisplays)
+    {
+    return;
+    }
+  double** newDisplays = 0;
+  if (numberOfDisplays > 0)
+    {
+    newDisplays = new double*[numberOfDisplays];
+    for (int i = 0; i < numberOfDisplays; ++i)
+      {
+      newDisplays[i] = new double[12];
+      if (i < this->NumberOfDisplays)
+        {
+        memcpy(newDisplays[i], this->Displays[i], 12 * sizeof(double));
+        }
+      else
+        {
+        newDisplays[i][0] = -1.;
+        newDisplays[i][1] = -1.;
+        newDisplays[i][2] = -1.;
+        newDisplays[i][3] = 1.0;
+
+        newDisplays[i][4] = 1.0;
+        newDisplays[i][5] = -1.0;
+        newDisplays[i][6] = -1.0;
+        newDisplays[i][7] = 1.0;
+        
+        newDisplays[i][8] = -1.0;
+        newDisplays[i][9] = 1.0;
+        newDisplays[i][10] = -1.0;
+        newDisplays[i][11] = 1.0;
+        }
+      }
+    }
+  for (int i = 0; i < this->NumberOfDisplays; ++i)
+    {
+    delete [] this->Displays[i];
+    }
+  delete [] this->Displays;
+  this->Displays = newDisplays;
+
+  this->NumberOfDisplays = numberOfDisplays;
+  //this->Modified();
+}
+
+//-----------------------------------------------------------------------------
+void vtkCaveRenderManager::SetDisplay(double idx, double origin0, double origin1, double origin2, 
+                              double x0, double x1, double x2,
+                              double y0, double y1, double y2)
+{
+  double origin[3];
+  double x[3];
+  double y[3];
+  origin[0] = origin0;
+  origin[1] = origin1;
+  origin[2] = origin2;
+  x[0] = x0;
+  x[1] = x1;
+  x[2] = x2;
+  y[0] = y0;
+  y[1] = y1;
+  y[2] = y2;
+  this->DefineDisplay(static_cast<int>(idx), origin, x, y);
+}
+
+//-------------------------------------------------------------------------
 void vtkCaveRenderManager::DefineDisplay(int idx, double origin[3],
                                          double x[3], double y[3])
 {
-  vtkPVCaveDisplayInfo info;
+  if (idx >= this->NumberOfDisplays)
+    {
+    vtkErrorMacro("idx is too high !");
+    return;
+    }
+  memcpy(&this->Displays[idx][0], origin, 3 * sizeof(double));
+  memcpy(&this->Displays[idx][4], x, 3 * sizeof(double));
+  memcpy(&this->Displays[idx][8], y, 3 * sizeof(double));
+  if (idx == this->Controller->GetLocalProcessId())
+    {
+    memcpy(this->DisplayOrigin, origin, 3 * sizeof(double));
+    memcpy(this->DisplayX, x, 3 * sizeof(double));
+    memcpy(this->DisplayY, y, 3 * sizeof(double));
+    }
+  // this->Displays will be synchronized with the others processes in processWindow
+  this->Modified();
+}
+//-----------------------------------------------------------------------------
+void vtkCaveRenderManager::CollectWindowInformation(vtkMultiProcessStream& stream)
+{
+  vtkDebugMacro("Sending Window Information");
 
-  info.DisplayIndex = (double)idx;
-  info.DisplayOrigin[0] = origin[0];
-  info.DisplayOrigin[1] = origin[1];
-  info.DisplayOrigin[2] = origin[2];
-  info.DisplayX[0] = x[0];
-  info.DisplayX[1] = x[1];
-  info.DisplayX[2] = x[2];
-  info.DisplayY[0] = y[0];
-  info.DisplayY[1] = y[1];
-  info.DisplayY[2] = y[2];
+  this->Superclass::CollectWindowInformation(stream);
 
-  this->SocketController->TriggerRMI(1, NULL, 0, 
-                   vtkCaveRenderManager::DEFINE_DISPLAY_RMI_TAG);
-  this->SocketController->Send((double*)(&info), 
-                     sizeof(vtkPVCaveDisplayInfo)/sizeof(double), 
-                     1, vtkCaveRenderManager::DEFINE_DISPLAY_INFO_TAG);
+  // insert the tag to ensure we reading back the correct information.
+  stream << vtkProcessModule::IceTWinInfo;
+
+  stream << this->NumberOfDisplays;
+  for (int x = 0; x < this->NumberOfDisplays; x++)
+    {
+    for (int i = 0; i < 12 ; ++i)
+      {
+      stream << this->Displays[x][i];
+      }
+    }  
+  stream << vtkProcessModule::IceTWinInfo;
 }
 
-//-------------------------------------------------------------------------
-// Only called on "client".
-void vtkCaveRenderManager::ClientStartRender()
+//-----------------------------------------------------------------------------
+
+bool vtkCaveRenderManager::ProcessWindowInformation(vtkMultiProcessStream& stream)
 {
-  vtkPVCaveClientInfo info;
-  int numProcs;
-  vtkRendererCollection *rens;
-  vtkRenderer* ren;
-  vtkCamera *cam;
-  vtkLightCollection *lc;
-  vtkLight *light;
-  
-  vtkDebugMacro("StartRender");
-  // Make sure they all swp buffers at the same time.
-  this->RenderWindow->SwapBuffersOff();
+  vtkDebugMacro("Receiving Window Information");
 
-  rens = this->RenderWindow->GetRenderers();
-  numProcs = this->Controller->GetNumberOfProcesses();
-
-  // Synchronize cameras
-  rens->InitTraversal();
-  // Assume only one renderer.
-  ren = rens->GetNextItem();
-  cam = ren->GetActiveCamera();
-  lc = ren->GetLights();
-  lc->InitTraversal();
-  light = lc->GetNextItem();
-  cam->GetPosition(info.ClientCameraPosition);
-  cam->GetFocalPoint(info.ClientCameraFocalPoint);
-  cam->GetViewUp(info.ClientCameraViewUp);
-  if (light)
+  if (!this->Superclass::ProcessWindowInformation(stream))
     {
-    light->GetPosition(info.LightPosition);
-    light->GetFocalPoint(info.LightFocalPoint);
+    return false;
     }
-  ren->GetBackground(info.Background);
 
-  // Trigger the satellite processes to start their render routine.  
-  if (this->SocketController)
-    { // client... Send to root
-    this->SocketController->TriggerRMI(1, NULL, 0, 
-                     vtkCaveRenderManager::ROOT_RENDER_RMI_TAG);
-    this->SocketController->Send((double*)(&info), 
-                     sizeof(vtkPVCaveClientInfo)/sizeof(double), 1, 
-                     vtkCaveRenderManager::INFO_TAG);
-    }
-  else
+  int tag;
+  stream >> tag;
+  if (tag != vtkProcessModule::IceTWinInfo)
     {
-    // Client is also root.  Call directly.
-    this->RootStartRenderRMI(&info);   
+    vtkErrorMacro("Incorrect tag received. Aborting for debugging purposes.");
+    return false;
     }
-}
 
+  int numDisplays;
+  stream >> numDisplays;
+  this->SetNumberOfDisplays(numDisplays);
 
-//-------------------------------------------------------------------------
-// I am using the same RMI for both root and satellites.
-void vtkCaveRenderManager::DefineDisplayRMI()
-{
-  int myId = this->Controller->GetLocalProcessId();
-  vtkPVCaveDisplayInfo info; 
-  int idx; 
-
-  if (myId == 0)
+  for (int x = 0; x < numDisplays; x++)
     {
-    this->SocketController->Receive((double*)(&info), 
-                           sizeof(vtkPVCaveDisplayInfo)/sizeof(double), 1, 
-                           vtkCaveRenderManager::DEFINE_DISPLAY_INFO_TAG);
-    if (info.DisplayIndex != 0)
-      { // Pass display info to appropriate satellite.
-      this->Controller->TriggerRMI(
-        static_cast<int>(info.DisplayIndex), NULL, 0, 
-        vtkCaveRenderManager::DEFINE_DISPLAY_RMI_TAG);
-      this->Controller->Send((double*)(&info), 
-                             sizeof(vtkPVCaveDisplayInfo)/sizeof(double), 
-                             static_cast<int>(info.DisplayIndex), 
-                             vtkCaveRenderManager::DEFINE_DISPLAY_INFO_TAG);
-      return;
+    for (int i = 0; i < 12 ; ++i)
+      {
+      stream >> this->Displays[x][i];
+      }
+    if (x == this->Controller->GetLocalProcessId())
+      {
+      memcpy(this->DisplayOrigin, &this->Displays[x][0], 4*sizeof(double));
+      memcpy(this->DisplayX, &this->Displays[x][4], 4*sizeof(double));
+      memcpy(this->DisplayY, &this->Displays[x][8], 4*sizeof(double));
       }
     }
-  else
+  stream >> tag;
+  if (tag != vtkProcessModule::IceTWinInfo)
     {
-    // We are on a satellite. Receive info from root.
-    this->Controller->Receive((double*)(&info), 
-                      sizeof(vtkPVCaveDisplayInfo)/sizeof(double), 0, 
-                      vtkCaveRenderManager::DEFINE_DISPLAY_INFO_TAG);
-    if (info.DisplayIndex != myId)
-      { 
-      vtkErrorMacro("Wrong display.");
-      return;
-      }
+    vtkErrorMacro("Incorrect tag received. Aborting for debugging purposes.");
+    return false;
     }
-
-  for (idx = 0; idx < 3; ++idx)
-    {
-    this->DisplayOrigin[idx] = info.DisplayOrigin[idx];
-    this->DisplayX[idx] = info.DisplayX[idx];
-    this->DisplayY[idx] = info.DisplayY[idx];
-    }
-  this->DisplayOrigin[3] = 1.0;
-  this->DisplayX[3] = 1.0;
-  this->DisplayY[3] = 1.0;
+  return true;
 }
 
-//-------------------------------------------------------------------------
-// Only called on "root".
-void vtkCaveRenderManager::RootStartRenderRMI(vtkPVCaveClientInfo *info)
+//-----------------------------------------------------------------------------
+void vtkCaveRenderManager::CollectRendererInformation(vtkRenderer *_ren,
+  vtkMultiProcessStream& stream)
 {
-  int id, numProcs;
+  vtkDebugMacro("Sending renderer information for " << _ren);
 
-  if (this->Controller)
+  this->Superclass::CollectRendererInformation(_ren, stream);
+
+  vtkIceTRenderer *ren = vtkIceTRenderer::SafeDownCast(_ren);
+  if (!ren)
     {
-    numProcs = this->Controller->GetNumberOfProcesses();
-    }
-  else
-    {
-    numProcs = 1;
+    return;
     }
 
-  // Every process (except "client") gets to participate.  
-  for (id = 1; id < numProcs; ++id)
-    {
-    this->Controller->TriggerRMI(id, NULL, 0, 
-                     vtkCaveRenderManager::SATELLITE_RENDER_RMI_TAG);
-    this->Controller->Send((double*)(info), 
-                     sizeof(vtkPVCaveClientInfo)/sizeof(double), id,
-                     vtkCaveRenderManager::INFO_TAG);
-    }
-  if ( this->SocketController)
-    { // Root is not client, it participates also.
-    this->InternalSatelliteStartRender(info);
-    }
+  stream << ren->GetStrategy()
+         << ren->GetComposeOperation();
 }
 
-//-------------------------------------------------------------------------
-void vtkCaveRenderManager::SatelliteStartRenderRMI()
+//-----------------------------------------------------------------------------
+bool vtkCaveRenderManager::ProcessRendererInformation(vtkRenderer *_ren,
+  vtkMultiProcessStream& stream)
 {
-  vtkPVCaveClientInfo info;
+  vtkDebugMacro("Receiving renderer information for " << _ren);
 
-  this->Controller->Receive((double*)(&info), 
-                            sizeof(vtkPVCaveClientInfo)/sizeof(double), 0, 
-                            vtkCaveRenderManager::INFO_TAG);
-  this->InternalSatelliteStartRender(&info);
+  if (!this->Superclass::ProcessRendererInformation(_ren, stream))
+    {
+    return false;
+    }
+
+  vtkIceTRenderer *ren = vtkIceTRenderer::SafeDownCast(_ren);
+  if (ren) 
+    {
+    int strategy;
+    int compose_operation;
+    stream >> strategy >> compose_operation;
+    ren->SetStrategy(strategy);
+    ren->SetComposeOperation(compose_operation);
+    }
+  return true;
 }
 
-//-------------------------------------------------------------------------
-void vtkCaveRenderManager::InternalSatelliteStartRender(vtkPVCaveClientInfo *info)
+//-----------------------------------------------------------------------------
+void vtkCaveRenderManager::PreRenderProcessing()
 {
   vtkRendererCollection *rens;
   vtkRenderer* ren;
   vtkCamera *cam = 0;
-  vtkLightCollection *lc;
-  vtkLight *light;
+  //vtkLightCollection *lc;
+  //vtkLight *light;
   vtkRenderWindow* renWin = this->RenderWindow;
 
   // Delay swapping buffers until all processes are finished.
-  if (this->Controller)
+  //if (this->Controller)
+  if (this->UseBackBuffer)
     {
     renWin->SwapBuffersOff();  
     }
@@ -535,209 +468,47 @@ void vtkCaveRenderManager::InternalSatelliteStartRender(vtkPVCaveClientInfo *inf
     }
   else
     {
-    lc = ren->GetLights();
-    lc->InitTraversal();
-    light = lc->GetNextItem();
+    //lc = ren->GetLights();
+    //lc->InitTraversal();
+    //light = lc->GetNextItem();
     // Setup tile independent stuff
     cam = ren->GetActiveCamera();
-    this->ComputeCamera(info, cam);
+    this->ComputeCamera(cam);
+    /*
     if (light)
       {
       light->SetPosition(info->LightPosition);
       light->SetFocalPoint(info->LightFocalPoint);
       }
-    ren->SetBackground(info->Background);
+      */
+    //ren->SetBackground(info->Background);
     ren->ResetCameraClippingRange();
     }
 
-    this->RenderWindow->Render();
-
-  // Synchronize here to have all procs swap buffers at the same time.
-  if (this->Controller)
+  if (this->UseBackBuffer)
     {
-    this->Controller->Barrier();
+    this->RenderWindow->SwapBuffersOff();
     }
-  if (this->SocketController)
-    {
-    this->SocketController->Barrier();
-    // Socket barrier is not implemented.
-    // Just send a message to synchronize.
-    int dummyMessage = 10;
-    this->SocketController->Send(&dummyMessage,1, 1, 12323);
-    }
-
-  // Force swap buffers here.
-  renWin->SwapBuffersOn();  
-  renWin->Frame();
 }
 
+//-----------------------------------------------------------------------------
 
-//-------------------------------------------------------------------------
-// Only client needs start and end render callbacks.
-void vtkCaveRenderManager::SetRenderWindow(vtkRenderWindow *renWin)
+void vtkCaveRenderManager::PostRenderProcessing()
 {
-  int clientFlag = 0;
+  vtkDebugMacro("PostRenderProcessing");
 
-  if (this->RenderWindow == renWin)
-    {
-    return;
-    }
-  this->Modified();
+  this->Controller->Barrier();
 
-  if (this->ClientFlag)
+  // Swap buffers here.
+  if (this->UseBackBuffer)
     {
-    clientFlag = 1;
+    this->RenderWindow->SwapBuffersOn();
     }
-
-  if (this->RenderWindow)
-    {
-    // Remove all of the observers.
-    if (clientFlag)
-      {
-      this->RenderWindow->RemoveObserver(this->StartTag);
-      this->RenderWindow->RemoveObserver(this->EndTag);
-      }
-    // Delete the reference.
-    this->RenderWindow->UnRegister(this);
-    this->RenderWindow =  NULL;
-    }
-  if (renWin)
-    {
-    renWin->Register(this);
-    this->RenderWindow = renWin;
-    if (clientFlag)
-      {
-      vtkCallbackCommand *cbc;
-      
-      cbc= vtkCallbackCommand::New();
-      cbc->SetCallback(vtkCaveRenderManagerClientStartRender);
-      cbc->SetClientData((void*)this);
-      // renWin will delete the cbc when the observer is removed.
-      this->StartTag = renWin->AddObserver(vtkCommand::StartEvent,cbc);
-      cbc->Delete();
-        
-      cbc = vtkCallbackCommand::New();
-      cbc->SetCallback(vtkCaveRenderManagerClientEndRender);
-      cbc->SetClientData((void*)this);
-      // renWin will delete the cbc when the observer is removed.
-      this->EndTag = renWin->AddObserver(vtkCommand::EndEvent,cbc);
-      cbc->Delete();
-      }
-    else
-      {
-      if (!getenv("PV_ICET_WINDOW_BORDERS"))
-        {
-        renWin->FullScreenOn();
-        }
-      }
-    }
+  this->RenderWindow->Frame();
 }
+//-----------------------------------------------------------------------------
 
-
-//-------------------------------------------------------------------------
-void vtkCaveRenderManager::SetController(vtkMultiProcessController *mpc)
-{
-  if (this->Controller == mpc)
-    {
-    return;
-    }
-  if (mpc)
-    {
-    mpc->Register(this);
-    }
-  if (this->Controller)
-    {
-    this->Controller->UnRegister(this);
-    }
-  this->Controller = mpc;
-}
-
-
-
-//-------------------------------------------------------------------------
-void vtkCaveRenderManager::SetSocketController(vtkSocketController *mpc)
-{
-  if (this->SocketController == mpc)
-    {
-    return;
-    }
-  if (mpc)
-    {
-    mpc->Register(this);
-    }
-  if (this->SocketController)
-    {
-    this->SocketController->UnRegister(this);
-    }
-  this->SocketController = mpc;
-}
-
-
-
-//-------------------------------------------------------------------------
-// This is only called in the satellite processes (not 0).
-void vtkCaveRenderManager::InitializeRMIs()
-{
-  // Adding RMIs to processes that do not need them is harmless ...
-  if (this->SocketController)
-    {
-    this->SocketController->AddRMI(vtkCaveRenderManagerRootStartRenderRMI, (void*)this, 
-                                   vtkCaveRenderManager::ROOT_RENDER_RMI_TAG); 
-    this->SocketController->AddRMI(vtkCaveRenderManagerDefineDisplayRMI, (void*)this, 
-                                   vtkCaveRenderManager::DEFINE_DISPLAY_RMI_TAG); 
-    }
-
-  if (this->Controller)
-    {
-    this->Controller->AddRMI(vtkCaveRenderManagerSatelliteStartRenderRMI, (void*)this, 
-                             vtkCaveRenderManager::SATELLITE_RENDER_RMI_TAG); 
-    this->Controller->AddRMI(vtkCaveRenderManagerDefineDisplayRMI, (void*)this, 
-                             vtkCaveRenderManager::DEFINE_DISPLAY_RMI_TAG); 
-    }
-}
-
-
-//-------------------------------------------------------------------------
-void vtkCaveRenderManager::ClientEndRender()
-{
-  vtkRenderWindow* renWin = this->RenderWindow;
-  
-  if (this->SocketController)
-    {
-    this->SocketController->Barrier();
-    // Since socket barrier is not implemented,
-    // just receive a message to synchronize.
-    int dummyMessage;
-    this->SocketController->Receive(&dummyMessage,1, 1, 12323);
-    }
-
-  if (renWin)
-    {
-    renWin->SwapBuffersOn();  
-    renWin->Frame();
-    }
-}
-
-
-//----------------------------------------------------------------------------
-void vtkCaveRenderManager::PrintSelf(ostream& os, vtkIndent indent)
+void vtkCaveRenderManager::PrintSelf(ostream &os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  
-  os << indent << "ClientFlag: " << this->ClientFlag << endl;
-
-  if ( this->RenderWindow )
-    {
-    os << indent << "RenderWindow: " << this->RenderWindow << "\n";
-    }
-  else
-    {
-    os << indent << "RenderWindow: (none)\n";
-    }
-
-  os << indent << "Controller: (" << this->Controller << ")\n"; 
-  os << indent << "SocketController: (" << this->SocketController << ")\n"; 
 }
-
-
-

@@ -3522,32 +3522,27 @@
         </ProxyGroupDomain>
       </ProxyProperty>
     </Proxy>
+    
+    <!-- =================================================================== -->
     <Proxy name="CaveRenderManager" class="vtkCaveRenderManager">
-      <ProxyProperty
-        name="RenderWindow"
-        command="SetRenderWindow">
+      <ProxyProperty name="RenderWindow"
+                     command="SetRenderWindow">
         <ProxyGroupDomain name="groups">
           <Group name="renderwindow" />
         </ProxyGroupDomain>
       </ProxyProperty>
-      <IntVectorProperty
-        name="ImageReductionFactor"
-        command="SetImageReductionFactor"
-        number_of_elements="1"
-        default_values="1">
-        <IntRangeDomain name="range" min="0" />
+
+      <IntVectorProperty name="NumberOfDisplays"
+          command="SetNumberOfDisplays"
+          number_of_elements="1"
+          default_values="1">
       </IntVectorProperty>
-      <IntVectorProperty
-        name="UseCompositing"
-        command="SetUseCompositing"
-        number_of_elements="1"
-        default_values="0">
-        <BooleanDomain name="bool" />
-      </IntVectorProperty>
-      <Property
-        name="InitializeRMIs"
-        command="InitializeRMIs">
-      </Property>
+      <DoubleVectorProperty name="Displays"
+                        command="SetDisplay"
+                        repeat_command="1"
+                        number_of_elements_per_command="10">
+      </DoubleVectorProperty>
+
     </Proxy>
   </ProxyGroup>
   
@@ -6425,7 +6420,22 @@
 
       <!-- End of ScatterPlotClientServerRenderView -->
     </ScatterPlotViewProxy>
-
+    <CaveRenderViewProxy name="CaveRenderView"
+          base_proxygroup="views" base_proxyname="IceTMultiDisplayRenderView">
+      <Documentation>
+        Cave Render View for tile displays.
+      </Documentation>
+      <!-- change the ParallelRenderManager from IceTRenderManager to CaveRenderManager -->
+      <SubProxy>
+        <Proxy  name="ParallelRenderManager"
+                proxygroup="composite_managers"
+                proxyname="CaveRenderManager"
+                override="1">
+        </Proxy>
+      </SubProxy>
+       
+      <!-- End of CaveRenderView -->
+    </CaveRenderViewProxy>
     <!-- End of group "views" -->
   </ProxyGroup>
 

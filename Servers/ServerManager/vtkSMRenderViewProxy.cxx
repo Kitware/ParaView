@@ -94,7 +94,7 @@ inline bool SetIntVectorProperty(vtkSMProxy* proxy, const char* pname,
 }
 
 //-----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.89");
+vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.90");
 vtkStandardNewMacro(vtkSMRenderViewProxy);
 
 vtkInformationKeyMacro(vtkSMRenderViewProxy, LOD_RESOLUTION, Integer);
@@ -1873,6 +1873,10 @@ const char* vtkSMRenderViewProxy::GetSuggestedViewType(vtkIdType connectionID)
         {
         // tiled-display
         renderViewName = "IceTMultiDisplayRenderView";
+        }
+      else if (server_info->GetNumberOfMachines())
+        {
+        renderViewName = "CaveRenderView";
         }
       else
         {
