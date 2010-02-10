@@ -124,6 +124,34 @@
     </WriterProxy>
 
     <!-- ================================================================= -->
+    <WriterProxy name="XMLHyperOctreeWriter"
+                   class="vtkFileSeriesWriter"
+                   file_name_method="SetFileName"
+                   base_proxygroup="writers"
+                   base_proxyname="XMLDataSetWriterBase" >
+      <Documentation
+        short_help="Write unstructured grid in a xml-based vtk data file.">
+        Writer to write unstructured grid in a xml-based vtk data file. Cannot be used
+        for parallel writing.
+      </Documentation>
+      <InputProperty name="Input" command="SetInputConnection">
+        <DataTypeDomain name="input_type" composite_data_supported="0">
+          <DataType value="vtkHyperOctree" />
+        </DataTypeDomain>
+        <Documentation>
+          The input filter/source whose output dataset is to written to the
+          file.
+        </Documentation>
+      </InputProperty>
+      <Hints>
+        <Property name="Input" show="0"/>
+        <Property name="FileName" show="0"/>
+        <WriterFactory extensions="vto" file_description="VTK Octree Files"/>
+      </Hints>
+      <!-- End of XMLUnstructuredGridWriter -->
+    </WriterProxy>
+
+    <!-- ================================================================= -->
     <WriterProxy name="XMLUnstructuredGridWriter"
                    class="vtkFileSeriesWriter"
                    file_name_method="SetFileName"
