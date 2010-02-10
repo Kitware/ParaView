@@ -54,7 +54,7 @@
 // vtkCaveRenderManager implementation.
 //******************************************************************
 
-vtkCxxRevisionMacro(vtkCaveRenderManager, "1.4");
+vtkCxxRevisionMacro(vtkCaveRenderManager, "1.5");
 vtkStandardNewMacro(vtkCaveRenderManager);
 
 vtkCaveRenderManager::vtkCaveRenderManager()
@@ -95,10 +95,6 @@ vtkCaveRenderManager::~vtkCaveRenderManager()
 void vtkCaveRenderManager::ComputeCamera(vtkCamera* cam)
 {
   int idx;
-  int display = this->Controller->GetLocalProcessId();
-  double* displayOrigin = this->Displays[display];
-  double* displayX = &(this->Displays[display][4]);
-  double* displayY = &(this->Displays[display][8]);
   // pos is the user position
   double pos[4];
   //cam->GetPosition(pos);
@@ -108,10 +104,7 @@ void vtkCaveRenderManager::ComputeCamera(vtkCamera* cam)
   pos[3] = 1.;
 
   // Use the camera here  tempoarily to get the client view transform.
-  //cam->SetFocalPoint(originalCam->GetFocalPoint());
-  //cam->SetPosition(info->ClientCameraPosition);
-  //cam->SetViewUp(info->ClientCameraViewUp);
-  // Create a transform from the client camera.
+ // Create a transform from the client camera.
   vtkTransform* trans = cam->GetViewTransformObject();
   // The displays are defined in camera coordinates.
   // We want to convert them to world coordinates.
@@ -123,11 +116,6 @@ void vtkCaveRenderManager::ComputeCamera(vtkCamera* cam)
   double x[4];
   double y[4];
   trans->MultiplyPoint(pos, p);
-  /*
-  trans->MultiplyPoint(displayOrigin, o);
-  trans->MultiplyPoint(displayX, x);
-  trans->MultiplyPoint(displayY, y);
-  */
   trans->MultiplyPoint(this->DisplayOrigin, o);
   trans->MultiplyPoint(this->DisplayX, x);
   trans->MultiplyPoint(this->DisplayY, y);
