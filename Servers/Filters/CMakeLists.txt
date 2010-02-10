@@ -30,7 +30,6 @@ SET(Filters_SRCS
   vtkCameraInterpolator2.cxx
   vtkCameraManipulator.cxx
   vtkCameraManipulatorGUIHelper.cxx
-  vtkCaveRenderManager.cxx
   vtkCleanArrays.cxx
   vtkCleanUnstructuredGrid.cxx
   vtkClientServerMoveData.cxx
@@ -227,6 +226,7 @@ IF (PARAVIEW_USE_ICE_T)
   IF(VTK_USE_MPI)
     SET(Filters_SRCS 
       ${Filters_SRCS}
+      vtkCaveRenderManager.cxx
       vtkIceTContext.cxx
       vtkIceTRenderManager.cxx
       vtkIceTRenderer.cxx
