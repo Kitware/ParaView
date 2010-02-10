@@ -92,6 +92,12 @@ public:
   virtual void SetMaxDepth(int val);
   vtkGetMacro(MaxDepth, int);
 
+  // Description:
+  // Create a default representation for the given output port of source proxy.
+  // Returns a new proxy.
+  virtual vtkSMRepresentationProxy* CreateDefaultRepresentation(
+    vtkSMProxy*, int opport);
+
 
   // Description:
   // Checks if color depth is sufficient to support selection.

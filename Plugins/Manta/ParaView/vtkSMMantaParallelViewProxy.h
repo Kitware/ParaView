@@ -93,6 +93,12 @@ public:
   vtkGetMacro(MaxDepth, int);
 
   // Description:
+  // Create a default representation for the given output port of source proxy.
+  // Returns a new proxy.
+  virtual vtkSMRepresentationProxy* CreateDefaultRepresentation(
+    vtkSMProxy*, int opport);
+
+  // Description:
   // Checks if color depth is sufficient to support selection.
   // If not, will return 0 and any calls to SelectVisibleCells will 
   // quietly return an empty selection.

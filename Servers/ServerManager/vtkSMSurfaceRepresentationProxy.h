@@ -110,6 +110,11 @@ public:
   vtkGetObjectMacro(Prop3D, vtkSMProxy);
 
   // Description:
+  // Returns the proxy for the vtkProperty.
+  virtual vtkSMProxy *GetPropertyProxy() 
+    { return this->Property; }
+
+  // Description:
   // HACK: vtkSMAnimationSceneGeometryWriter needs acces to the processed data
   // so save out. This method should return the proxy that goes in as the input
   // to strategies (eg. in case of SurfaceRepresentation, it is the geometry

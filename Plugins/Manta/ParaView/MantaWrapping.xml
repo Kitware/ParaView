@@ -53,6 +53,65 @@
   </ProxyGroup>
 
   <!-- ================================================================= -->
+  <ProxyGroup name="representations">
+                           
+    <MantaRepresentation name="MantaGeometryRepresentation"
+      base_proxygroup="representations" 
+      base_proxyname="GeometryRepresentation">
+
+      <StringVectorProperty name="MaterialType"
+        command="SetMaterialType"
+        immediate_update="1"
+        update_self="1"
+        number_of_elements="1"
+        default_values="default" >
+      </StringVectorProperty>
+
+      <DoubleVectorProperty name="Reflectance"
+        command="SetReflectance"
+        update_self="1"
+        immediate_update="1"
+        number_of_elements="1"
+        default_values="0.0">
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="Thickness"
+        command="SetThickness"
+        update_self="1"
+        immediate_update="1"
+        number_of_elements="1"
+        default_values="1.0">
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="Eta"
+        command="SetEta"
+        update_self="1"
+        immediate_update="1"
+        number_of_elements="1"
+        default_values="1.52">
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="N"
+        command="SetN"
+        update_self="1"
+        immediate_update="1"
+        number_of_elements="1"
+        default_values="0.0">
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="Nt"
+        command="SetNt"
+        update_self="1"
+        immediate_update="1"
+        number_of_elements="1"
+        default_values="0.0">
+      </DoubleVectorProperty>
+
+      <!-- End of MantaGeometryRepresentation -->
+    </MantaRepresentation>
+  </ProxyGroup>
+
+  <!-- ================================================================= -->
 
   <ProxyGroup name="views">
 
@@ -64,54 +123,6 @@
         A render view that uses the Manta ray tracing engine to render 
         instead of OpenGL.
       </Documentation>
-
-      <IntVectorProperty name="Threads"
-        command="SetThreads"
-        update_self="1"
-        immediate_update="1"
-        number_of_elements="1"
-        default_values="1">
-        <IntRangeDomain name="range" min="1" />
-        <Documentation>
-          Controls number of render threads.
-        </Documentation>
-      </IntVectorProperty>
-
-      <IntVectorProperty name="EnableShadows"
-        command="SetEnableShadows"
-        update_self="1"
-        immediate_update="1"
-        number_of_elements="1"
-        default_values="0">
-        <BooleanDomain name="bool" />
-        <Documentation>
-          Turns on shadow.
-        </Documentation>
-      </IntVectorProperty>
-
-      <IntVectorProperty name="Samples"
-        command="SetSamples"
-        update_self="1"
-        immediate_update="1"
-        number_of_elements="1"
-        default_values="1">
-        <IntRangeDomain name="range" min="1" />
-        <Documentation>
-          Controls multisampling.
-        </Documentation>
-      </IntVectorProperty>
-
-      <IntVectorProperty name="MaxDepth"
-        command="SetMaxDepth"
-        update_self="1"
-        immediate_update="1"
-        number_of_elements="1"
-        default_values="1">
-        <IntRangeDomain name="range" min="1" />
-        <Documentation>
-          Controls maximum number of ray bounces.
-        </Documentation>
-      </IntVectorProperty>
 
       <!-- End of MantaRenderView -->
     </MantaViewProxy>

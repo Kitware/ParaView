@@ -29,10 +29,11 @@ INCLUDE ( ${PARAVIEW_USE_FILE} )
 
 #Configure the plugin ######################################################
 SET(MANTA_PLUGIN_SS_SOURCES
-  vtkSMMantaViewProxy.cxx
+  vtkServerSideFactory.cxx
   vtkSMMantaClientServerViewProxy.cxx
   vtkSMMantaParallelViewProxy.cxx
-  vtkServerSideFactory.cxx
+  vtkSMMantaRepresentation.cxx
+  vtkSMMantaViewProxy.cxx
   )      
 
 SET(SERVER_ARGS 
@@ -45,20 +46,20 @@ IF(PARAVIEW_BUILD_QT_GUI)
   INCLUDE(${QT_USE_FILE})
   
   SET(MANTA_PLUGIN_CS_SOURCES
-    pqMantaView.cxx
-    MantaViewOptions.cxx
     MantaDisplay.cxx
+    MantaViewOptions.cxx
+    pqMantaView.cxx
     )
       
   QT4_WRAP_CPP(MOC_SRCS 
-    pqMantaView.h 
-    MantaViewOptions.h 
     MantaDisplay.h
+    MantaViewOptions.h 
+    pqMantaView.h 
     )
   
   QT4_WRAP_UI(UI_SRCS
-    MantaViewOptions.ui
     MantaDisplay.ui
+    MantaViewOptions.ui
     )
       
   ADD_PARAVIEW_VIEW_MODULE(

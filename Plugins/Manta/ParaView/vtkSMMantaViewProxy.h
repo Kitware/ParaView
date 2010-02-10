@@ -83,6 +83,12 @@ public:
   // quietly return an empty selection.
   virtual bool IsSelectionAvailable() { return false;}
 
+  // Description:
+  // Create a default representation for the given output port of source proxy.
+  // Returns a new proxy.
+  virtual vtkSMRepresentationProxy* CreateDefaultRepresentation(
+    vtkSMProxy*, int opport);
+
 //BTX
 protected:
   vtkSMMantaViewProxy();

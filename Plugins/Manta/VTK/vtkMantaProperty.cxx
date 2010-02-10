@@ -125,7 +125,7 @@ int MPR::GlobalCntr = 0;
 
 //===========================================================================
 
-vtkCxxRevisionMacro(vtkMantaProperty, "1.8");
+vtkCxxRevisionMacro(vtkMantaProperty, "1.9");
 vtkStandardNewMacro(vtkMantaProperty);
 
 //----------------------------------------------------------------------------
@@ -300,6 +300,7 @@ void vtkMantaProperty::CreateMantaProperty()
                             static_cast<int> ( this->GetSpecularPower() ),
                             new Manta::Constant<Manta::ColorComponent>
                             ( this->Reflectance ) );
+        cerr << "PHONG WITH R=" << this->Reflectance << endl;
         }
       else
         if ( strcmp( this->MaterialType, "transparent" ) == 0 )

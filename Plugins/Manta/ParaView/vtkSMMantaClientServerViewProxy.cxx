@@ -69,10 +69,15 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkSMIntVectorProperty.h"
 
+#include "vtkSMProxyManager.h"
+#include "vtkSMSourceProxy.h"
+#include "vtkSMInputProperty.h"
+#include "vtkSMRepresentationProxy.h"
+
 #define DEBUGPRINT_VIEW(arg) arg;
 
 //-----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkSMMantaClientServerViewProxy, "1.2");
+vtkCxxRevisionMacro(vtkSMMantaClientServerViewProxy, "1.3");
 vtkStandardNewMacro(vtkSMMantaClientServerViewProxy);
 
 //-----------------------------------------------------------------------------
@@ -220,3 +225,47 @@ void vtkSMMantaClientServerViewProxy::SetMaxDepth(int newval)
                  stream);
 }
 
+//-----------------------------------------------------------------------------
+vtkSMRepresentationProxy* 
+  vtkSMMantaClientServerViewProxy::CreateDefaultRepresentation
+    (vtkSMProxy* source, int opport)
+{
+  if (!source)
+    {
+    return 0;
+    }
+
+  DEBUGPRINT_VIEW(
+    cerr << "SV(" << this << ") CreateDefaultRepresentation" << endl;
+    );
+
+  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+
+  // Update with time to avoid domains updating without time later.
+  vtkSMSourceProxy* sproxy = vtkSMSourceProxy::SafeDownCast(source);
+  if (sproxy)
+    {
+    sproxy->UpdatePipeline(this->GetViewUpdateTime());
+    }
+
+  // Choose which type of representation proxy to create.
+  vtkSMProxy* prototype;
+  prototype = pxm->GetPrototypeProxy("representations",
+    "MantaGeometryRepresentation");
+  vtkSMInputProperty *pp = vtkSMInputProperty::SafeDownCast(
+    prototype->GetProperty("Input"));
+  pp->RemoveAllUncheckedProxies();
+  pp->AddUncheckedInputConnection(source, opport);
+  bool g = (pp->IsInDomains()>0);
+  pp->RemoveAllUncheckedProxies();
+  if (g)
+    {
+    DEBUGPRINT_VIEW(
+      cerr << "SV(" << this << ") Created MantaGeometryRepresentation" << endl;
+      );
+    return vtkSMRepresentationProxy::SafeDownCast(
+      pxm->NewProxy("representations", "MantaGeometryRepresentation"));
+    }
+
+  return 0;
+}
