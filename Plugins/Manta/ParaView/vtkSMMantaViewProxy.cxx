@@ -80,7 +80,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define DEBUGPRINT_VIEW(arg) arg;
 
 //-----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkSMMantaViewProxy, "1.1");
+vtkCxxRevisionMacro(vtkSMMantaViewProxy, "1.2");
 vtkStandardNewMacro(vtkSMMantaViewProxy);
 
 
@@ -97,6 +97,11 @@ vtkSMMantaViewProxy::~vtkSMMantaViewProxy()
 //------------------------------------------------------------------------------
 bool vtkSMMantaViewProxy::BeginCreateVTKObjects()
 {
+#if 1
+
+  vtkWarningMacro("Manta view is not yet working in builtin mode.\nReverting to 3D view.");
+
+#else
   DEBUGPRINT_VIEW(
     cerr 
     << "MV(" << this << ") Creating serial view " 
@@ -115,7 +120,7 @@ bool vtkSMMantaViewProxy::BeginCreateVTKObjects()
                  vtkProcessModule::CLIENT,
                  stream);
   cerr << "DONE" << endl;
-
+#endif
   return this->Superclass::BeginCreateVTKObjects();
 }
 
