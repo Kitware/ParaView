@@ -112,7 +112,7 @@ FUNCTION(install_qt_libs qtliblist componentname)
       ELSE (NOT WIN32)
         GET_FILENAME_COMPONENT(QT_DLL_PATH_tmp ${QT_QMAKE_EXECUTABLE} PATH)
           INSTALL(FILES ${QT_DLL_PATH_tmp}/${qtlib}4.dll 
-                  DESTINATION ${PV_INSTALL_LIB_DIR} 
+                  DESTINATION ${PV_INSTALL_BIN_DIR} 
                   COMPONENT ${componentname})
       ENDIF (NOT WIN32)
     ENDFOREACH(qtlib)
