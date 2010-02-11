@@ -129,7 +129,6 @@ int main(int , char *[])
   c = vtkAppendRectilinearGrid::New(); c->Print(cout); c->Delete();
   c = vtkAttributeDataReductionFilter::New(); c->Print(cout); c->Delete();
   c = vtkCameraManipulator::New(); c->Print(cout); c->Delete();
-  c = vtkCaveRenderManager::New(); c->Print(cout); c->Delete();
   c = vtkCleanUnstructuredGrid::New(); c->Print(cout); c->Delete();
   c = vtkClientServerMoveData::New(); c->Print(cout); c->Delete();
   c = vtkCompleteArrays::New(); c->Print(cout); c->Delete();
@@ -218,6 +217,7 @@ int main(int , char *[])
   c = vtkBalancedRedistributePolyData::New(); c->Print(cout); c->Delete();
   c = vtkRedistributePolyData::New(); c->Print(cout); c->Delete();
 # ifdef PARAVIEW_USE_ICE_T
+  c = vtkCaveRenderManager::New(); c->Print(cout); c->Delete();
   c = vtkDesktopDeliveryClient::New(); c->Print(cout); c->Delete();
   c = vtkDesktopDeliveryServer::New(); c->Print(cout); c->Delete();
 //  c = vtkExtractCTHPart2::New(); c->Print(cout); c->Delete();
