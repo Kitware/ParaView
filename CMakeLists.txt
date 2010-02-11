@@ -140,6 +140,11 @@ SET(VTK_USE_INFOVIS ON CACHE BOOL "Build VTK with Infovis Support" FORCE)
 MARK_AS_ADVANCED(VTK_USE_INFOVIS)
 
 #########################################################################
+# Force Charts support on
+SET(VTK_USE_CHARTS ON CACHE BOOL "Build VTK with Charts Support" FORCE)
+MARK_AS_ADVANCED(VTK_USE_CHARTS)
+
+#########################################################################
 #
 MARK_AS_ADVANCED(VTK_USE_N_WAY_ARRAYS)
 MARK_AS_ADVANCED(VTK_USE_TEXT_ANALYSIS)
