@@ -340,14 +340,22 @@ int pqPlotSettingsModel::getSeriesAxisCorner(int) const
 }
 
 //-----------------------------------------------------------------------------
-void pqPlotSettingsModel::setSeriesMarkerStyle(int, int)
+void pqPlotSettingsModel::setSeriesMarkerStyle(int row, int value)
 {
-
+  if (row >= 0 && row < this->rowCount(QModelIndex()))
+    {
+    vtkSMPropertyHelper(this->Implementation->RepresentationProxy,
+      "SeriesMarkerStyle").SetStatus(
+      this->getSeriesName(row), value);
+    this->Implementation->RepresentationProxy->UpdateVTKObjects();
+    emit this->redrawChart();
+    }
 }
 
 //-----------------------------------------------------------------------------
-int pqPlotSettingsModel::getSeriesMarkerStyle(int) const
+int pqPlotSettingsModel::getSeriesMarkerStyle(int row) const
 {
-  return 0;
+  return vtkSMPropertyHelper(this->Implementation->RepresentationProxy,
+    "SeriesMarkerStyle").GetStatus(this->getSeriesName(row), 1);
 }
 

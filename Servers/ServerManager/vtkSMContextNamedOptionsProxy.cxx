@@ -47,7 +47,7 @@ public:
 };
 
 vtkStandardNewMacro(vtkSMContextNamedOptionsProxy);
-vtkCxxRevisionMacro(vtkSMContextNamedOptionsProxy, "1.5");
+vtkCxxRevisionMacro(vtkSMContextNamedOptionsProxy, "1.6");
 //----------------------------------------------------------------------------
 vtkSMContextNamedOptionsProxy::vtkSMContextNamedOptionsProxy()
 {
@@ -222,7 +222,7 @@ void vtkSMContextNamedOptionsProxy::UpdatePropertyInformationInternal(
           }
         else
           {
-          new_values->AddString("1");
+          new_values->AddString("0");
           }
         }
       else

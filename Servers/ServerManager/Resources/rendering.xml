@@ -8451,12 +8451,14 @@
           <Property name="LineThickness" exposed_name="SeriesLineThickness" />
           <Property name="LineStyle" exposed_name="SeriesLineStyle" />
           <Property name="Label" exposed_name="SeriesLabel" />
+          <Property name="MarkerStyle" exposed_name="SeriesMarkerStyle" />
 
           <Property name="VisibilityInfo" exposed_name="SeriesVisibilityInfo" />
           <Property name="ColorInfo" exposed_name="SeriesColorInfo" />
           <Property name="LineThicknessInfo" exposed_name="SeriesLineThicknessInfo" />
           <Property name="LineStyleInfo" exposed_name="SeriesLineStyleInfo" />
           <Property name="LabelInfo" exposed_name="SeriesLabelInfo" />
+          <Property name="MarkerStyleInfo" exposed_name="SeriesMarkerStyleInfo" />
         </ExposedProperties>
       </SubProxy>
 
@@ -9909,6 +9911,27 @@
         </Documentation>
       </StringVectorProperty>
 
+      <StringVectorProperty name="MarkerStyleInfo"
+        number_of_elements_per_command="2"
+        repeat_command="1"
+        information_only="1">
+        <Documentation>
+          Property which has the current state of marker style for the series
+          available currently.
+        </Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="MarkerStyle"
+        command="SetMarkerStyle"
+        update_self="1"
+        number_of_elements_per_command="2"
+        element_types="2 0"
+        repeat_command="1"
+        information_property="MarkerStyleInfo">
+        <Documentation>
+          Set the series marker style.
+        </Documentation>
+      </StringVectorProperty>
       <!-- End of PlotOptionsBase -->
     </ContextNamedOptionsProxy>
 
