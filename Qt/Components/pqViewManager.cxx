@@ -33,6 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ui_pqEmptyView.h"
 
 // VTK includes.
+#include "QVTKWidget.h"
 #include "vtkErrorCode.h"
 #include "vtkImageData.h"
 #include "vtkImageIterator.h"
@@ -41,10 +42,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMAnimationSceneImageWriter.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMIntVectorProperty.h"
+#include "vtkSMPropertyHelper.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyLocator.h"
 #include "vtkSMUtilities.h"
-#include "vtkSMPropertyHelper.h"
 
 // Qt includes.
 #include <QAction>
@@ -820,8 +821,9 @@ bool pqViewManager::eventFilter(QObject* caller, QEvent* e)
         }
       }
     }
-  else if(qobject_cast<pqMultiViewFrame*>(caller) &&
-    e->type() == QEvent::Resize)
+  else if(
+    (qobject_cast<pqMultiViewFrame*>(caller) ||
+     qobject_cast<QVTKWidget*>(caller)) && e->type() == QEvent::Resize)
     {
     // Update ViewPosition and GUISize properties on all view modules.
     this->updateViewPositions();
@@ -895,7 +897,11 @@ void pqViewManager::updateViewPositions()
   this->updateCompactViewPositions();
 
   // Show the overlays displaying the view sizes.
-  this->showFrameOverlays();
+  // Disabling frame overlays for now.
+  //if (this->isVisible())
+  //  {
+  //  this->showFrameOverlays();
+  //  }
 }
 
 
