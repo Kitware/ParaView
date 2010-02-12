@@ -10,6 +10,13 @@ SET (dynamicHeaders)
 
 INCLUDE_REGULAR_EXPRESSION("^vtk.*$")
 
+SET(KIT PVFilters)
+SET(KIT_UPCASE "PVFILTERS")
+IF(NOT WIN32)
+  SET(CMAKE_C_FLAGS "${CMAKE_ANSI_CFLAGS} ${CMAKE_C_FLAGS}")
+  ADD_DEFINITIONS(-D_HPUX_SOURCE)
+ENDIF(NOT WIN32)
+
 IF(PARAVIEW_ENABLE_PYTHON)
   INCLUDE_DIRECTORIES(
     ${PYTHON_INCLUDE_PATH}
@@ -359,6 +366,33 @@ INCLUDE_DIRECTORIES(${VTKCLIENTSERVER_INCLUDE_DIR})
 SET(KIT_WRAP_DEPS Parallel Hybrid Rendering VolumeRendering Widgets)
 SET(VTK_KITS_DIR "${ParaView_BINARY_DIR}/Servers/Filters/Utilities")
 PV_WRAP_VTK_CS(PVFilters PVFILTERS "${KIT_WRAP_DEPS}")
+
+# Wrap for python
+IF (PARAVIEW_ENABLE_PYTHON)
+  SET(Kit_SRCS ${Filters_SRCS})
+  SET(Kit_PYTHON_EXTRA_SRCS)
+  SET(KIT_PYTHON_LIBS
+    vtkPVFilters vtkPVServerCommonPythonD vtkPVFiltersPythonD vtkPVFiltersCS vtkRenderingPythonD vtkWidgetsPythonD vtkParallelPythonD
+    )
+  # Tell vtkWrapPython.cmake to set VTK_PYTHON_LIBRARIES for us.
+  SET(VTK_WRAP_PYTHON_FIND_LIBS 1)
+  INCLUDE("${VTK_CMAKE_DIR}/vtkWrapPython.cmake")
+  INCLUDE_DIRECTORIES(${PYTHON_INCLUDE_PATH})
+  SET(KIT_PYTHON_DEPS)
+  SET(VTK_INSTALL_NO_LIBRARIES 1)
+  IF(VTKPythonWrapping_INSTALL_BIN_DIR)
+    SET(VTK_INSTALL_NO_LIBRARIES)
+  ENDIF(VTKPythonWrapping_INSTALL_BIN_DIR)
+
+  SET(VTK_INSTALL_LIB_DIR "${VTKPythonWrapping_INSTALL_LIB_DIR}")
+  SET(VTK_INSTALL_BIN_DIR "${VTKPythonWrapping_INSTALL_BIN_DIR}")
+  SET(VTK_INSTALL_LIB_DIR_CM24 "${VTKPythonWrapping_INSTALL_LIB_DIR}")
+  SET(VTK_INSTALL_BIN_DIR_CM24 "${VTKPythonWrapping_INSTALL_BIN_DIR}")
+
+  # include python wrapping from VTK
+  INCLUDE(KitCommonPythonWrapBlock)
+ENDIF (PARAVIEW_ENABLE_PYTHON)
+
 
 #Install
 #-------------------------------------------------------------------------------------------------

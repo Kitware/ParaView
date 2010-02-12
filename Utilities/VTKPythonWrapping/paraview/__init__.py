@@ -16,6 +16,7 @@ r"""
 This module is not meant to be used directly. Please look at one of the modules
 it provides:
   servermanager
+  pvfilters
   vtk
   numeric
   util
