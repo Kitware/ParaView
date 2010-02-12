@@ -87,6 +87,13 @@ public:
   vtkSetMacro(DeliverOutlineToClient, int);
   vtkGetMacro(DeliverOutlineToClient, int);
 
+  // Description:
+  // When set to true, zlib compression is used. False by default.
+  // This value has any effect only on the data-sender processes. The receiver
+  // always checks the received data to see if zlib decompression is required.
+  static void SetUseZLibCompression(bool b);
+  static bool GetUseZLibCompression();
+
 //BTX
   enum MoveModes {
     PASS_THROUGH=0,
@@ -161,6 +168,8 @@ private:
 
   vtkMPIMoveData(const vtkMPIMoveData&); // Not implemented
   void operator=(const vtkMPIMoveData&); // Not implemented
+
+  static bool UseZLibCompression;
 };
 
 #endif

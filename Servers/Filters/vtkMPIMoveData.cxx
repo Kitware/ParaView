@@ -46,7 +46,11 @@
 #include "vtkAllToNRedistributePolyData.h"
 #endif
 
-vtkCxxRevisionMacro(vtkMPIMoveData, "1.24");
+
+bool vtkMPIMoveData::UseZLibCompression = false;
+
+
+vtkCxxRevisionMacro(vtkMPIMoveData, "1.25");
 vtkStandardNewMacro(vtkMPIMoveData);
 
 vtkCxxSetObjectMacro(vtkMPIMoveData,Controller, vtkMultiProcessController);
@@ -89,6 +93,18 @@ vtkMPIMoveData::~vtkMPIMoveData()
   this->ClientDataServerSocketController = 0;
   this->SetMPIMToNSocketConnection(0);
   this->ClearBuffer();
+}
+
+//----------------------------------------------------------------------------
+void vtkMPIMoveData::SetUseZLibCompression(bool b)
+{
+  vtkMPIMoveData::UseZLibCompression = b;
+}
+
+//----------------------------------------------------------------------------
+bool vtkMPIMoveData::GetUseZLibCompression()
+{
+  return vtkMPIMoveData::UseZLibCompression;
 }
 
 //----------------------------------------------------------------------------
@@ -946,28 +962,44 @@ void vtkMPIMoveData::MarshalDataToBuffer(vtkDataSet* data)
     }
   writer->Write();
 
-  vtkTimerLog::MarkStartEvent("Zlib compress");
-  // Use z-lib compression.
-  uLongf out_size =compressBound(writer->GetOutputStringLength());
-  char* buffer = new char[out_size + 4]; 
-  // cout << "insize: " << writer->GetOutputStringLength() << endl;
-  compress2(reinterpret_cast<Bytef*>(buffer), 
-    &out_size,
-    reinterpret_cast<const Bytef*>(writer->GetOutputString()),
-    writer->GetOutputStringLength(), /* compression_level */ 3);
-  vtkTimerLog::MarkEndEvent("Zlib compress");
-  int in_size = static_cast<int>(writer->GetOutputStringLength());
-  for (int cc=0; cc < 4; cc++)
+  char* buffer =NULL;
+  vtkIdType buffer_length = 0;
+
+  if (vtkMPIMoveData::UseZLibCompression)
     {
-    buffer[out_size+cc] = (in_size & 0x0ff);
-    in_size = in_size >> 8;
+    vtkTimerLog::MarkStartEvent("Zlib compress");
+    // Use z-lib compression.
+    uLongf out_size =compressBound(writer->GetOutputStringLength());
+    buffer = new char[out_size + 8]; 
+    memcpy(buffer, "zlib0000", 8);
+
+    compress2(reinterpret_cast<Bytef*>(buffer + 8), 
+      &out_size,
+      reinterpret_cast<const Bytef*>(writer->GetOutputString()),
+      writer->GetOutputStringLength(), /* compression_level */ Z_DEFAULT_COMPRESSION);
+    vtkTimerLog::MarkEndEvent("Zlib compress");
+    int in_size = static_cast<int>(writer->GetOutputStringLength());
+    for (int cc=0; cc < 4; cc++)
+      {
+      // the first 4 bytes in the header are "zlib" which helps the receiver
+      // identify that zlib compression has been used.
+      // the next 4 bytes are the original length since zlib doesn't provide
+      // that to the receiver.
+      buffer[4+cc] = (in_size & 0x0ff);
+      in_size = in_size >> 8;
+      }
+    buffer_length = out_size + 8;
     }
-  out_size += 4;
+  else
+    {
+    buffer_length = writer->GetOutputStringLength();
+    buffer = writer->RegisterAndGetOutputString();
+    }
 
   // Get string.
   this->NumberOfBuffers = 1;
   this->BufferLengths = new vtkIdType[1];
-  this->BufferLengths[0] = out_size;
+  this->BufferLengths[0] = buffer_length;
   this->BufferOffsets = new vtkIdType[1];
   this->BufferOffsets[0] = 0;
   this->Buffers = buffer;
@@ -1019,24 +1051,29 @@ void vtkMPIMoveData::ReconstructDataFromBuffer(vtkDataSet* data)
     char* bufferArray = this->Buffers+this->BufferOffsets[idx];
     vtkIdType bufferLength = this->BufferLengths[idx];
 
-    vtkIdType zlib_length = bufferLength - 4;
-    vtkIdType in_length = 0;
-    if (data->IsA("vtkImageData"))
+    char* realBuffer = 0;
+    if (bufferLength > 4 && strncmp(bufferArray, "zlib", 4) == 0)
       {
-      zlib_length = bufferLength - 4;
-      }
-    for (int cc=0; cc < 4; cc++)
-      {
-      in_length = in_length | 
-        ((0xff & (bufferArray[zlib_length+cc])) <<8 *cc);
-      }
+      // sender used zlib compression. Decompress it.
+      vtkIdType compressed_length = bufferLength - 8; // remove the zlib header.
+      vtkIdType uncompressed_length = 0;
+      for (int cc=0; cc < 4; cc++)
+        {
+        uncompressed_length = uncompressed_length | 
+          ((0xff & (bufferArray[4+cc])) <<8 *cc);
+        }
 
-    char* realBuffer = new char[in_length+100];
-    uLongf destLen = in_length+100;
-    vtkTimerLog::MarkStartEvent("Zlib uncompress");
-    uncompress(reinterpret_cast<Bytef*>(realBuffer), &destLen,
-      reinterpret_cast<const Bytef*>(bufferArray), zlib_length);
-    vtkTimerLog::MarkEndEvent("Zlib uncompress");
+      // using zlib compression.
+      realBuffer = new char[uncompressed_length];
+      uLongf destLen = uncompressed_length;
+      vtkTimerLog::MarkStartEvent("Zlib uncompress");
+      uncompress(reinterpret_cast<Bytef*>(realBuffer), &destLen,
+        reinterpret_cast<const Bytef*>(bufferArray+8), compressed_length);
+      vtkTimerLog::MarkEndEvent("Zlib uncompress");
+
+      bufferArray = realBuffer;
+      bufferLength = uncompressed_length;
+      }
 
     // Setup a reader.
     vtkDataSetReader *reader = vtkDataSetReader::New();
@@ -1046,7 +1083,7 @@ void vtkMPIMoveData::ReconstructDataFromBuffer(vtkDataSet* data)
     float origin[3] = {0, 0, 0};
     bool extentAvailable = false;
     vtkCharArray* mystring = vtkCharArray::New();
-    mystring->SetArray(realBuffer, destLen, 1);
+    mystring->SetArray(bufferArray, bufferLength, 1);
     reader->SetInputArray(mystring);
     reader->Modified(); // For append loop
     reader->Update();
@@ -1101,6 +1138,7 @@ void vtkMPIMoveData::ReconstructDataFromBuffer(vtkDataSet* data)
     reader->Delete();
     reader = NULL;
     delete [] realBuffer;
+    realBuffer = 0;
     }
 
   if (appendPd)
