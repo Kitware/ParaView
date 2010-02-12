@@ -19,6 +19,7 @@
 #include "vtkSMStringVectorProperty.h"
 #include "vtkChart.h"
 #include "vtkPlot.h"
+#include "vtkPen.h"
 #include "vtkTable.h"
 #include "vtkWeakPointer.h"
 
@@ -46,7 +47,7 @@ public:
 };
 
 vtkStandardNewMacro(vtkSMContextNamedOptionsProxy);
-vtkCxxRevisionMacro(vtkSMContextNamedOptionsProxy, "1.4");
+vtkCxxRevisionMacro(vtkSMContextNamedOptionsProxy, "1.5");
 //----------------------------------------------------------------------------
 vtkSMContextNamedOptionsProxy::vtkSMContextNamedOptionsProxy()
 {
@@ -198,6 +199,32 @@ void vtkSMContextNamedOptionsProxy::UpdatePropertyInformationInternal(
           new_values->AddString("0.0");
           }
         }
+      else if (strcmp(propname, "LineStyleInfo") == 0)
+        {
+        new_values->AddString(name.toAscii().data());
+        if (plot)
+          {
+          new_values->AddString(
+              QString::number(plot->GetPen()->GetLineType()).toAscii().data());
+          }
+        else
+          {
+          new_values->AddString("1");
+          }
+        }
+      else if (strcmp(propname, "MarkerStyleInfo") == 0)
+        {
+        new_values->AddString(name.toAscii().data());
+        if (plot && false)
+          {
+          new_values->AddString(
+              QString::number(plot->GetPen()->GetWidth()).toAscii().data());
+          }
+        else
+          {
+          new_values->AddString("1");
+          }
+        }
       else
         {
         skip = true;
@@ -267,9 +294,12 @@ void vtkSMContextNamedOptionsProxy::SetLineThickness(const char* name,
 }
 
 //----------------------------------------------------------------------------
-void vtkSMContextNamedOptionsProxy::SetLineStyle(const char*, int)
+void vtkSMContextNamedOptionsProxy::SetLineStyle(const char* name, int style)
 {
-
+  if (this->Internals->PlotMap[name])
+    {
+    this->Internals->PlotMap[name]->GetPen()->SetLineType(style);
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -291,7 +321,6 @@ void vtkSMContextNamedOptionsProxy::SetAxisCorner(const char*, int)
 //----------------------------------------------------------------------------
 void vtkSMContextNamedOptionsProxy::SetMarkerStyle(const char*, int)
 {
-
 }
 
 //----------------------------------------------------------------------------

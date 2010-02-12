@@ -308,15 +308,23 @@ int pqPlotSettingsModel::getSeriesThickness(int row) const
 }
 
 //-----------------------------------------------------------------------------
-void pqPlotSettingsModel::setSeriesStyle(int, int)
+void pqPlotSettingsModel::setSeriesStyle(int row, int value)
 {
-
+  if (row >= 0 && row < this->rowCount(QModelIndex()))
+    {
+    vtkSMPropertyHelper(this->Implementation->RepresentationProxy,
+      "SeriesLineStyle").SetStatus(
+      this->getSeriesName(row), value);
+    this->Implementation->RepresentationProxy->UpdateVTKObjects();
+    emit this->redrawChart();
+    }
 }
 
 //-----------------------------------------------------------------------------
-int pqPlotSettingsModel::getSeriesStyle(int) const
+int pqPlotSettingsModel::getSeriesStyle(int row) const
 {
-  return 0;
+  return vtkSMPropertyHelper(this->Implementation->RepresentationProxy,
+    "SeriesLineStyle").GetStatus(this->getSeriesName(row), 1);
 }
 
 //-----------------------------------------------------------------------------
