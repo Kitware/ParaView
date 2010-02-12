@@ -40,14 +40,13 @@
 #include "vtkUnstructuredGrid.h"
 #include "vtk_zlib.h"
 #include <vtksys/ios/sstream>
-#define EXTENT_HEADER_SIZE 360
 
 #ifdef VTK_USE_MPI
 #include "vtkMPICommunicator.h"
 #include "vtkAllToNRedistributePolyData.h"
 #endif
 
-vtkCxxRevisionMacro(vtkMPIMoveData, "1.23");
+vtkCxxRevisionMacro(vtkMPIMoveData, "1.24");
 vtkStandardNewMacro(vtkMPIMoveData);
 
 vtkCxxSetObjectMacro(vtkMPIMoveData,Controller, vtkMultiProcessController);
@@ -929,15 +928,34 @@ void vtkMPIMoveData::MarshalDataToBuffer(vtkDataSet* data)
   writer->SetFileTypeToBinary();
   writer->WriteToOutputStringOn();
   writer->SetInput(d);
+  if (imageData)
+    {
+    // We add the image extents to the header, since the writer doesn't preserve
+    // the extents.
+    int *extent = imageData->GetExtent();
+    double* origin = imageData->GetOrigin();
+    vtksys_ios::ostringstream stream;
+    stream << "EXTENT " << extent[0] << " " <<
+      extent[1] << " " <<
+      extent[2] << " " <<
+      extent[3] << " " <<
+      extent[4] << " " <<
+      extent[5];
+    stream << " ORIGIN: " << origin[0] << " " << origin[1] << " " << origin[2];
+    writer->SetHeader(stream.str().c_str());
+    }
   writer->Write();
 
+  vtkTimerLog::MarkStartEvent("Zlib compress");
   // Use z-lib compression.
   uLongf out_size =compressBound(writer->GetOutputStringLength());
-  char* buffer = new char[out_size + EXTENT_HEADER_SIZE + 4]; 
+  char* buffer = new char[out_size + 4]; 
+  // cout << "insize: " << writer->GetOutputStringLength() << endl;
   compress2(reinterpret_cast<Bytef*>(buffer), 
     &out_size,
     reinterpret_cast<const Bytef*>(writer->GetOutputString()),
-    writer->GetOutputStringLength(), /* compression_level */ 9);
+    writer->GetOutputStringLength(), /* compression_level */ 3);
+  vtkTimerLog::MarkEndEvent("Zlib compress");
   int in_size = static_cast<int>(writer->GetOutputStringLength());
   for (int cc=0; cc < 4; cc++)
     {
@@ -953,34 +971,6 @@ void vtkMPIMoveData::MarshalDataToBuffer(vtkDataSet* data)
   this->BufferOffsets = new vtkIdType[1];
   this->BufferOffsets[0] = 0;
   this->Buffers = buffer;
-
-  if (imageData)
-    {
-    // we need to add marshall extents separately, since the writer doesn't
-    // preserve extents.
-    int *extent = imageData->GetExtent();
-    double* origin = imageData->GetOrigin();
-    vtksys_ios::ostringstream stream;
-    stream << "EXTENT " << extent[0] << " " <<
-      extent[1] << " " <<
-      extent[2] << " " <<
-      extent[3] << " " <<
-      extent[4] << " " <<
-      extent[5];
-    stream << " ORIGIN: " << origin[0] << " " << origin[1] << " " << origin[2];
-
-    if (stream.str().size() >= EXTENT_HEADER_SIZE)
-      {
-      vtkErrorMacro("Extent message too long!");
-      }
-    else
-      {
-      char extentHeader[EXTENT_HEADER_SIZE];
-      strcpy(extentHeader, stream.str().c_str());
-      memcpy(&buffer[out_size], extentHeader, EXTENT_HEADER_SIZE);
-      this->BufferLengths[0] += EXTENT_HEADER_SIZE;
-      }
-    }
   this->BufferTotalLength = this->BufferLengths[0];
 
   d->Delete();
@@ -1033,7 +1023,7 @@ void vtkMPIMoveData::ReconstructDataFromBuffer(vtkDataSet* data)
     vtkIdType in_length = 0;
     if (data->IsA("vtkImageData"))
       {
-      zlib_length = bufferLength - EXTENT_HEADER_SIZE - 4;
+      zlib_length = bufferLength - 4;
       }
     for (int cc=0; cc < 4; cc++)
       {
@@ -1043,8 +1033,10 @@ void vtkMPIMoveData::ReconstructDataFromBuffer(vtkDataSet* data)
 
     char* realBuffer = new char[in_length+100];
     uLongf destLen = in_length+100;
+    vtkTimerLog::MarkStartEvent("Zlib uncompress");
     uncompress(reinterpret_cast<Bytef*>(realBuffer), &destLen,
       reinterpret_cast<const Bytef*>(bufferArray), zlib_length);
+    vtkTimerLog::MarkEndEvent("Zlib uncompress");
 
     // Setup a reader.
     vtkDataSetReader *reader = vtkDataSetReader::New();
@@ -1053,20 +1045,21 @@ void vtkMPIMoveData::ReconstructDataFromBuffer(vtkDataSet* data)
     int extent[6]= {0, 0, 0, 0, 0, 0};
     float origin[3] = {0, 0, 0};
     bool extentAvailable = false;
+    vtkCharArray* mystring = vtkCharArray::New();
+    mystring->SetArray(realBuffer, destLen, 1);
+    reader->SetInputArray(mystring);
+    reader->Modified(); // For append loop
+    reader->Update();
+
     if (data->IsA("vtkImageData"))
       {
-      sscanf(&bufferArray[zlib_length+4],
+      sscanf(reader->GetHeader(),
         "EXTENT %d %d %d %d %d %d ORIGIN %f %f %f", &extent[0], &extent[1],
         &extent[2], &extent[3], &extent[4], &extent[5],
         &origin[0], &origin[1], &origin[2]);
       extentAvailable = true;
       }
 
-    vtkCharArray* mystring = vtkCharArray::New();
-    mystring->SetArray(realBuffer, destLen, 1);
-    reader->SetInputArray(mystring);
-    reader->Modified(); // For append loop
-    reader->Update();
     if (appendPd)
       {
       appendPd->AddInput(reader->GetPolyDataOutput());
