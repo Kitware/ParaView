@@ -7745,7 +7745,6 @@
           <Property name="SelectionOpacity" />
           <Property name="SelectionPointSize" />
           <Property name="SelectionRepresentation" />
-          <Property name="SelectionInterpolation" />
 
           <!-- Inherit Cube-Axes properties -->
           <Property name="CubeAxesColor"/>
@@ -7849,7 +7848,6 @@
           <Property name="SelectionOpacity" />
           <Property name="SelectionPointSize" />
           <Property name="SelectionRepresentation" />
-          <Property name="SelectionInterpolation" />
 
           <!-- Inherit Cube-Axes properties -->
           <Property name="CubeAxesColor"/>
@@ -7968,7 +7966,6 @@
           <Property name="SelectionOpacity" />
           <Property name="SelectionPointSize" />
           <Property name="SelectionRepresentation" />
-          <Property name="SelectionInterpolation" />
 
           <!-- Inherit Cube-Axes properties -->
           <Property name="CubeAxesColor"/>
