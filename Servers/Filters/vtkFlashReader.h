@@ -45,7 +45,7 @@
 #define __vtkFlashReader_h
 
 #include "vtkMultiBlockDataSetAlgorithm.h"
-#include "vtkstd/vector"
+#include <vtkstd/vector> // STL Header
 
 class    vtkPolyData;
 class    vtkRectilinearGrid;
