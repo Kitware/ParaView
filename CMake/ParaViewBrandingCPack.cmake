@@ -72,7 +72,7 @@ MACRO(build_paraview_client_cpack_config_init)
   SET (CPACK_INSTALL_CMAKE_PROJECTS
     "${ParaView_BINARY_DIR}" "ParaView Runtime Libs" "Runtime" "/"
     "${ParaView_BINARY_DIR}" "VTK Runtime Libs" "RuntimeLibraries" "/"
-    "${CMAKE_CURRENT_BINARY_DIR}" "${BCC_PACKAGE_NAME} Components" "BrandedRuntime" "/"
+    "${CMAKE_CURRENT_BINARY_DIR}" "${BCC_PACKAGE_NAME} Components" "BrandedRuntime" "Development" "/"
   )
   
   # Override this variable to choose a different component for mac drag-n-drop
