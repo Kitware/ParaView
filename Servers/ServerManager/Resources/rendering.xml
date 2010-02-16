@@ -8330,28 +8330,7 @@
           Visibility of the representation.
         </Documentation>
       </IntVectorProperty>
-      
-      <IntVectorProperty name="Testing"
-        command="SetVisibility"
-        update_self="1"
-        number_of_elements="1"
-        default_values="1" >
-        <BooleanDomain name="bool" />
-        <Documentation>
-          Visibility of the representation.
-        </Documentation>
-      </IntVectorProperty>
-      <!--
-      <StringVectorProperty name="MarkerStyleInfo"
-        number_of_elements_per_command="2"
-        repeat_command="1"
-        information_only="1">
-        <Documentation>
-          Property which has the current state of marker style for the series
-          available currently.
-        </Documentation>
-      </StringVectorProperty>
-      -->
+
       <StringVectorProperty name="MarkerStyle"
         command="SetMarkerStyle"
         update_self="1"
@@ -8363,40 +8342,7 @@
           Set the series marker style.
         </Documentation>
       </StringVectorProperty>
-      <!--
-      <StringVectorProperty name="AxisCorner"
-        command="SetAxisCorner"
-        update_self="1"
-        number_of_elements_per_command="2"
-        element_types="2 0"
-        repeat_command="1">
-        <Documentation>
-          Set the series line style.
-        </Documentation>
-      </StringVectorProperty>
 
-      <StringVectorProperty name="PenColorInfo"
-        number_of_elements_per_command="4"
-        repeat_command="1"
-        information_only="1">
-        <Documentation>
-          Property which has the current state of line color for the series
-          available currently.
-        </Documentation>
-      </StringVectorProperty>
-
-      <StringVectorProperty name="Color"
-        command="SetPenColor"
-        update_self="1"
-        number_of_elements_per_command="4"
-        element_types="2 1 1 1"
-        repeat_command="1"
-        information_property="PenColorInfo" >
-        <Documentation>
-          Set the series line color.
-        </Documentation>
-      </StringVectorProperty>
-      -->
       <SubProxy>
         <Proxy name="PreProcessor"
           proxygroup="extended_filters"
@@ -8436,6 +8382,18 @@
           </RequiredProperties>
         </StringListDomain>
       </StringVectorProperty>
+
+      <IntVectorProperty name="UseIndexForXAxis"
+        command="SetUseIndexForXAxis"
+        update_self="1"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          When set, the array index will be used for X axis, otherwise the array
+          identified by XArrayName will be used.
+        </Documentation>
+      </IntVectorProperty>
 
       <SubProxy>
         <Proxy name="PlotOptions"

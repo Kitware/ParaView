@@ -32,6 +32,7 @@ class vtkSMContextNamedOptionsProxy::vtkInternals
 public:
   vtkstd::map<vtkstd::string, vtkWeakPointer<vtkPlot> > PlotMap;
   vtkstd::string XSeriesName;
+  bool UseIndexForXAxis;
 
   vtkWeakPointer<vtkChart> Chart;
   vtkWeakPointer<vtkTable> Table;
@@ -47,11 +48,12 @@ public:
 };
 
 vtkStandardNewMacro(vtkSMContextNamedOptionsProxy);
-vtkCxxRevisionMacro(vtkSMContextNamedOptionsProxy, "1.6");
+vtkCxxRevisionMacro(vtkSMContextNamedOptionsProxy, "1.7");
 //----------------------------------------------------------------------------
 vtkSMContextNamedOptionsProxy::vtkSMContextNamedOptionsProxy()
 {
   this->Internals = new vtkInternals();
+  this->Internals->UseIndexForXAxis = true;
 }
 
 //----------------------------------------------------------------------------
@@ -88,7 +90,6 @@ void vtkSMContextNamedOptionsProxy::SetTable(vtkTable* table)
 //----------------------------------------------------------------------------
 void vtkSMContextNamedOptionsProxy::SetXSeriesName(const char* name)
 {
-  //cout << "Setting the X series name: " << vtkstd::string(name) << endl;
   if (!name)
     {
     this->Internals->XSeriesName = "";
@@ -97,6 +98,36 @@ void vtkSMContextNamedOptionsProxy::SetXSeriesName(const char* name)
     {
     this->Internals->XSeriesName = name;
     }
+  // Now update the plots to use the X series specified
+  vtkstd::map<vtkstd::string, vtkWeakPointer<vtkPlot> >::iterator it;
+  for (it = this->Internals->PlotMap.begin();
+       it != this->Internals->PlotMap.end(); ++it)
+    {
+    if (it->second)
+      {
+      it->second->SetInputArray(0, name);
+      it->second->SetUseIndexForXSeries(this->Internals->UseIndexForXAxis);
+      }
+    }
+  this->Modified();
+}
+
+
+//----------------------------------------------------------------------------
+void vtkSMContextNamedOptionsProxy::SetUseIndexForXAxis(bool useIndex)
+{
+  this->Internals->UseIndexForXAxis = useIndex;
+  // Now update the plots to use the X series specified
+  vtkstd::map<vtkstd::string, vtkWeakPointer<vtkPlot> >::iterator it;
+  for (it = this->Internals->PlotMap.begin();
+       it != this->Internals->PlotMap.end(); ++it)
+    {
+    if (it->second)
+      {
+      it->second->SetUseIndexForXSeries(this->Internals->UseIndexForXAxis);
+      }
+    }
+  this->Modified();
 }
 
 //----------------------------------------------------------------------------
@@ -118,7 +149,7 @@ void vtkSMContextNamedOptionsProxy::InitializePlotMap()
         this->Internals->Chart)
       {
       vtkPlot *plot = this->Internals->Chart->AddPlot(vtkChart::LINE);
-      plot->SetUseIndexForXSeries(true);
+      plot->SetUseIndexForXSeries(this->Internals->UseIndexForXAxis);
       plot->SetInput(this->Internals->Table, vtkIdType(0), vtkIdType(0));
       this->Internals->PlotMap[this->Internals->Table->GetColumnName(0)] =
           plot;
@@ -247,16 +278,12 @@ void vtkSMContextNamedOptionsProxy::SetVisibility(const char* name, int visible)
     vtkPlot *plot = this->Internals->PlotMap[name];
     plot->SetVisible(static_cast<bool>(visible));
     // If the X series has changed update this in the plot plot
-    if (plot->GetUseIndexForXSeries() !=
-        (this->Internals->XSeriesName.length() == 0))
+    plot->SetUseIndexForXSeries(this->Internals->UseIndexForXAxis);
+    if (this->Internals->XSeriesName.length() > 0)
       {
-      plot->SetUseIndexForXSeries(this->Internals->XSeriesName.length() == 0);
-      if (this->Internals->XSeriesName.length() > 0)
-        {
-        plot->SetInput(this->Internals->Table,
-                       this->Internals->XSeriesName.c_str(),
-                       name);
-        }
+      plot->SetInput(this->Internals->Table,
+                     this->Internals->XSeriesName.c_str(),
+                     name);
       }
     }
   else
@@ -267,12 +294,12 @@ void vtkSMContextNamedOptionsProxy::SetVisibility(const char* name, int visible)
       vtkPlot *plot = this->Internals->Chart->AddPlot(vtkChart::LINE);
       if (this->Internals->XSeriesName.length() == 0)
         {
-        plot->SetUseIndexForXSeries(true);
+        plot->SetUseIndexForXSeries(this->Internals->UseIndexForXAxis);
         plot->SetInput(this->Internals->Table, name, name);
         }
       else
         {
-        plot->SetUseIndexForXSeries(false);
+        plot->SetUseIndexForXSeries(this->Internals->UseIndexForXAxis);
         plot->SetInput(this->Internals->Table,
                        this->Internals->XSeriesName.c_str(),
                        name);

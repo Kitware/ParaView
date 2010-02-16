@@ -119,6 +119,8 @@ pqXYChartDisplayPanel::pqXYChartDisplayPanel(
     this, SLOT(updateOptionsWidgets()));
   QObject::connect(this->Internal->SettingsModel, SIGNAL(redrawChart()),
     this, SLOT(updateAllViews()));
+  QObject::connect(this->Internal->XAxisArray, SIGNAL(currentIndexChanged(int)),
+    this, SLOT(updateAllViews()));
 
   QObject::connect(this->Internal->UseArrayIndex, SIGNAL(toggled(bool)),
     this, SLOT(useArrayIndexToggled(bool)));
@@ -193,6 +195,12 @@ void pqXYChartDisplayPanel::setDisplay(pqRepresentation* disp)
   this->Internal->Links.addPropertyLink(this->Internal->XAxisArrayAdaptor,
       "currentText", SIGNAL(currentTextChanged(const QString&)),
       proxy, proxy->GetProperty("XArrayName"));
+
+  // Link to set whether the index is used for the x axis
+  this->Internal->Links.addPropertyLink(
+    this->Internal->UseArrayIndex, "checked",
+    SIGNAL(toggled(bool)),
+    proxy, proxy->GetProperty("UseIndexForXAxis"));
 
   this->setEnabled(true);
 
@@ -365,4 +373,5 @@ void pqXYChartDisplayPanel::useArrayIndexToggled(bool toggle)
 void pqXYChartDisplayPanel::useDataArrayToggled(bool toggle)
 {
   this->Internal->UseArrayIndex->setChecked(!toggle);
+  this->updateAllViews();
 }

@@ -82,6 +82,10 @@ public:
   // Set the series to use as the X-axis.
   void SetXAxisSeriesName(const char* name);
 
+  // Description:
+  // Set whether the index should be used for the x axis.
+  void SetUseIndexForXAxis(bool useIndex);
+
 //BTX
 protected:
   vtkSMXYChartRepresentationProxy();

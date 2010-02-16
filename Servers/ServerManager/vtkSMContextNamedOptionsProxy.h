@@ -46,6 +46,10 @@ public:
   // y series should be used.
   void SetXSeriesName(const char* name);
 
+  // Description:
+  // Set whether the index should be used for the x axis.
+  void SetUseIndexForXAxis(bool useIndex);
+
 //BTX
   // Description:
   // Sets the internal chart object whose options will be manipulated.
