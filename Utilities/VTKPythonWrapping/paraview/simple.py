@@ -177,6 +177,40 @@ def SetProperties(proxy=None, **params):
             raise AttributeError("object has no property %s" % param)
         setattr(proxy, param, params[param])
 
+def GetProperty(*arguments, **keywords):
+    """Get one property of the given pipeline object. If keywords are used,
+       you can set the proxy and the name of the property that you want to get
+       like in the following example :
+            GetProperty({proxy=sphere, name="Radius"})
+       If it's arguments that are used, then you have two case:
+         - if only one argument is used that argument will be
+           the property name.
+         - if two arguments are used then the first one will be
+           the proxy and the second one the property name.
+       Several example are given below:
+           GetProperty({name="Radius"})
+           GetProperty({proxy=sphereProxy, name="Radius"})
+           GetProperty( sphereProxy, "Radius" )
+           GetProperty( "Radius" )
+    """
+    name = None
+    proxy = None
+    for key in keywords:
+        if key == "name":
+            name = keywords[key]
+        if key == "proxy":
+            proxy = keywords[key]
+    if len(arguments) == 1 :
+        name = arguments[0]
+    if len(arguments) == 2 :
+        proxy = arguments[0]
+        name  = arguments[1]
+    if not name:
+        raise RuntimeError, "Expecting at least a property name as input. Otherwise keyword could be used to set 'proxy' and property 'name'"
+    if not proxy:
+        proxy = active_objects.source
+    return proxy.GetProperty(name)
+
 def SetDisplayProperties(proxy=None, view=None, **params):
     """Sets one or more display properties of the given pipeline object. If an argument
     is not provided, the active source is used. Pass a list of property_name=value
