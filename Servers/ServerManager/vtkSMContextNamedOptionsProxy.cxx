@@ -18,11 +18,14 @@
 #include "vtkStringList.h"
 #include "vtkSMStringVectorProperty.h"
 #include "vtkChart.h"
+#include "vtkColorSeries.h"
+#include "vtkVector.h"
 #include "vtkPlot.h"
 #include "vtkAxis.h"
 #include "vtkPen.h"
 #include "vtkTable.h"
 #include "vtkWeakPointer.h"
+#include "vtkSmartPointer.h"
 
 #include "vtkstd/map"
 
@@ -37,9 +40,11 @@ public:
 
   vtkWeakPointer<vtkChart> Chart;
   vtkWeakPointer<vtkTable> Table;
+  vtkSmartPointer<vtkColorSeries> Colors;
 
   vtkInternals()
     {
+    this->Colors = vtkSmartPointer<vtkColorSeries>::New();
     }
 
   ~vtkInternals()
@@ -49,7 +54,7 @@ public:
 };
 
 vtkStandardNewMacro(vtkSMContextNamedOptionsProxy);
-vtkCxxRevisionMacro(vtkSMContextNamedOptionsProxy, "1.9");
+vtkCxxRevisionMacro(vtkSMContextNamedOptionsProxy, "1.10");
 //----------------------------------------------------------------------------
 vtkSMContextNamedOptionsProxy::vtkSMContextNamedOptionsProxy()
 {
@@ -255,9 +260,10 @@ void vtkSMContextNamedOptionsProxy::UpdatePropertyInformationInternal(
           }
         else
           {
-          new_values->AddString("0.0");
-          new_values->AddString("0.0");
-          new_values->AddString("0.0");
+          vtkColor3ub color = this->Internals->Colors->GetColorRepeating(i);
+          new_values->AddString(QString::number(color.Red() / 255.0).toAscii().data());
+          new_values->AddString(QString::number(color.Green() / 255.0).toAscii().data());
+          new_values->AddString(QString::number(color.Blue() / 255.0).toAscii().data());
           }
         }
       else if (strcmp(propname, "LineStyleInfo") == 0)

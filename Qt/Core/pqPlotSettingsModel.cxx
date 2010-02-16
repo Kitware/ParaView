@@ -220,6 +220,7 @@ void pqPlotSettingsModel::setSeriesEnabled(int row, bool enabled)
       this->getSeriesName(row), enabled ? 1 : 0);
     this->Implementation->RepresentationProxy->UpdateVTKObjects();
 
+    this->setSeriesColor(row, this->getSeriesColor(row));
     QModelIndex idx = this->createIndex(row, 0);
     emit this->dataChanged(idx, idx);
     emit this->redrawChart();
