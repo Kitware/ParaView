@@ -19,6 +19,7 @@
 #include "vtkSMStringVectorProperty.h"
 #include "vtkChart.h"
 #include "vtkPlot.h"
+#include "vtkAxis.h"
 #include "vtkPen.h"
 #include "vtkTable.h"
 #include "vtkWeakPointer.h"
@@ -48,7 +49,7 @@ public:
 };
 
 vtkStandardNewMacro(vtkSMContextNamedOptionsProxy);
-vtkCxxRevisionMacro(vtkSMContextNamedOptionsProxy, "1.8");
+vtkCxxRevisionMacro(vtkSMContextNamedOptionsProxy, "1.9");
 //----------------------------------------------------------------------------
 vtkSMContextNamedOptionsProxy::vtkSMContextNamedOptionsProxy()
 {
@@ -98,6 +99,7 @@ void vtkSMContextNamedOptionsProxy::SetXSeriesName(const char* name)
     {
     this->Internals->XSeriesName = name;
     }
+
   // Now update the plots to use the X series specified
   vtkstd::map<vtkstd::string, vtkWeakPointer<vtkPlot> >::iterator it;
   for (it = this->Internals->PlotMap.begin();
@@ -105,12 +107,21 @@ void vtkSMContextNamedOptionsProxy::SetXSeriesName(const char* name)
     {
     if (it->second)
       {
-      it->second->SetInputArray(0, name);
+      it->second->SetInputArray(0, this->Internals->XSeriesName.c_str());
       it->second->SetUseIndexForXSeries(this->Internals->UseIndexForXAxis);
       }
     }
   if (this->Internals->Chart)
     {
+    if (this->Internals->UseIndexForXAxis)
+      {
+      this->Internals->Chart->GetAxis(0)->SetTitle("Index of Array");
+      }
+    else
+      {
+      this->Internals->Chart->GetAxis(0)
+          ->SetTitle(this->Internals->XSeriesName.c_str());
+      }
     this->Internals->Chart->RecalculateBounds();
     }
   this->Modified();
@@ -133,6 +144,15 @@ void vtkSMContextNamedOptionsProxy::SetUseIndexForXAxis(bool useIndex)
     }
   if (this->Internals->Chart)
     {
+    if (this->Internals->UseIndexForXAxis)
+      {
+      this->Internals->Chart->GetAxis(0)->SetTitle("Index of Array");
+      }
+    else
+      {
+      this->Internals->Chart->GetAxis(0)
+          ->SetTitle(this->Internals->XSeriesName.c_str());
+      }
     this->Internals->Chart->RecalculateBounds();
     }
   this->Modified();
@@ -161,6 +181,8 @@ void vtkSMContextNamedOptionsProxy::InitializePlotMap()
       plot->SetInput(this->Internals->Table, vtkIdType(0), vtkIdType(0));
       this->Internals->PlotMap[this->Internals->Table->GetColumnName(0)] =
           plot;
+      this->Internals->Chart->GetAxis(0)->SetTitle("Index");
+      this->SetXSeriesName(this->Internals->Table->GetColumnName(0));
       }
     }
 }
