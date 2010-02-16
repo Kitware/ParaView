@@ -48,7 +48,7 @@ public:
 };
 
 vtkStandardNewMacro(vtkSMContextNamedOptionsProxy);
-vtkCxxRevisionMacro(vtkSMContextNamedOptionsProxy, "1.7");
+vtkCxxRevisionMacro(vtkSMContextNamedOptionsProxy, "1.8");
 //----------------------------------------------------------------------------
 vtkSMContextNamedOptionsProxy::vtkSMContextNamedOptionsProxy()
 {
@@ -109,6 +109,10 @@ void vtkSMContextNamedOptionsProxy::SetXSeriesName(const char* name)
       it->second->SetUseIndexForXSeries(this->Internals->UseIndexForXAxis);
       }
     }
+  if (this->Internals->Chart)
+    {
+    this->Internals->Chart->RecalculateBounds();
+    }
   this->Modified();
 }
 
@@ -126,6 +130,10 @@ void vtkSMContextNamedOptionsProxy::SetUseIndexForXAxis(bool useIndex)
       {
       it->second->SetUseIndexForXSeries(this->Internals->UseIndexForXAxis);
       }
+    }
+  if (this->Internals->Chart)
+    {
+    this->Internals->Chart->RecalculateBounds();
     }
   this->Modified();
 }
@@ -284,6 +292,10 @@ void vtkSMContextNamedOptionsProxy::SetVisibility(const char* name, int visible)
       plot->SetInput(this->Internals->Table,
                      this->Internals->XSeriesName.c_str(),
                      name);
+      }
+    if (this->Internals->Chart)
+      {
+      this->Internals->Chart->RecalculateBounds();
       }
     }
   else
