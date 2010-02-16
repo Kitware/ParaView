@@ -52,22 +52,19 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #undef SEEK_END
 #endif
 
+#ifndef USE_SERIAL_COSMO
 #ifdef USE_VTK_COSMO
-#include "vtkType.h"
-
-#ifndef USE_SERIAL_COSMO
 #include "vtkMPI.h"
-#endif
-
 #else
-#include <stdint.h>
-
-#ifndef USE_SERIAL_COSMO
 #include <mpi.h>
 #endif
-
 #endif
 
+#ifdef USE_VTK_COSMO
+#include "vtkType.h"
+#else
+#include <stdint.h>
+#endif
 
 ///////////////////////////////////////////////////////////////////////////
 //

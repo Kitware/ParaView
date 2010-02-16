@@ -137,7 +137,7 @@
         command="SetCatalogAveragePosition"
         label="Use average position for halo positions"
         number_of_elements="1"
-        default_values="0" >
+        default_values="1" >
      <BooleanDomain name="bool" />
        <Documentation>
        If checked, the halo catalog will use the average position for the halo position.  If unchecked, the halo position will be the particle closest to the center.

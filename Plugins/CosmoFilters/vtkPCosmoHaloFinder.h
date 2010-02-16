@@ -116,7 +116,7 @@ class VTK_EXPORT vtkPCosmoHaloFinder : public vtkUnstructuredGridAlgorithm
 
   // Description:
   // Use the average position for catalog output, otherwise use
-  // the particle closest to the center.  (Default off = use closest)
+  // the particle closest to the center.  (Default on = use closest)
   vtkSetMacro(CatalogAveragePosition, int);
   vtkGetMacro(CatalogAveragePosition, int);
 
