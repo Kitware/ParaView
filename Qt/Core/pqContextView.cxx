@@ -36,21 +36,19 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqOutputPort.h"
 #include "pqPipelineSource.h"
 #include "pqServer.h"
+#include "pqImageUtil.h"
+#include "vtkErrorCode.h"
 #include "vtkImageData.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVXMLElement.h"
 
 #include "vtkContextView.h"
-
-// #include "vtkQtChartArea.h"
-// #include "vtkQtChartContentsSpace.h"
-// #include "vtkQtChartView.h"
-// #include "vtkQtChartWidget.h"
-
 #include "vtkSMContextViewProxy.h"
 #include "vtkSMSourceProxy.h"
 
 #include "QVTKWidget.h"
+
+#include <QDebug>
 
 //-----------------------------------------------------------------------------
 pqContextView::pqContextView(
@@ -85,7 +83,7 @@ QWidget* pqContextView::getWidget()
 }
 
 //-----------------------------------------------------------------------------
-/// Returns the internal vtkQtChartView which provide the implementation for
+/// Returns the internal vtkChartView that provides the implementation for
 /// the chart rendering.
 vtkContextView* pqContextView::getVTKContextView() const
 {
@@ -93,27 +91,78 @@ vtkContextView* pqContextView::getVTKContextView() const
 }
 
 //-----------------------------------------------------------------------------
-/// This view does not support saving to image.
-bool pqContextView::saveImage(int , int , const QString& )
+vtkSMContextViewProxy* pqContextView::getContextViewProxy() const
 {
-  return false;
+  return vtkSMContextViewProxy::SafeDownCast(this->getProxy());
+}
+
+//-----------------------------------------------------------------------------
+/// This view does not support saving to image.
+bool pqContextView::saveImage(int width, int height, const QString& filename)
+{
+  QWidget* vtkwidget = this->getWidget();
+  QSize cursize = vtkwidget->size();
+  QSize fullsize = QSize(width, height);
+  QSize newsize = cursize;
+  int magnification = 1;
+  if (width>0 && height>0)
+    {
+    magnification = pqView::computeMagnification(fullsize, newsize);
+    vtkwidget->resize(newsize);
+    }
+  this->render();
+
+  int error_code = vtkErrorCode::UnknownError;
+  vtkImageData* vtkimage = this->captureImage(magnification);
+  if (vtkimage)
+    {
+    error_code = pqImageUtil::saveImage(vtkimage, filename);
+    vtkimage->Delete();
+    }
+
+  switch (error_code)
+    {
+    case vtkErrorCode::UnrecognizedFileTypeError:
+      qCritical() << "Failed to determine file type for file:"
+        << filename.toAscii().data();
+      break;
+    case vtkErrorCode::NoError:
+      // success.
+      break;
+    default:
+      qCritical() << "Failed to save image.";
+    }
+
+  if (width>0 && height>0)
+    {
+    vtkwidget->resize(newsize);
+    vtkwidget->resize(cursize);
+    this->render();
+    }
+  return (error_code == vtkErrorCode::NoError);
 }
 
 //-----------------------------------------------------------------------------
 /// Capture the view image into a new vtkImageData with the given magnification
 /// and returns it. The caller is responsible for freeing the returned image.
-vtkImageData* pqContextView::captureImage(int )
+vtkImageData* pqContextView::captureImage(int magnification)
 {
+  if (this->getWidget()->isVisible())
+    {
+    return this->getContextViewProxy()->CaptureWindow(magnification);
+    }
+
+  // Don't return any image when the view is not visible.
   return NULL;
 }
 
 //-----------------------------------------------------------------------------
 /// Capture the view image of the given size and returns it. The caller is
 /// responsible for freeing the returned image.
-vtkImageData* pqContextView::captureImage(const QSize& )
-{
-  return NULL;
-}
+//vtkImageData* pqContextView::captureImage(const QSize& )
+//{
+//  return NULL;
+//}
 
 //-----------------------------------------------------------------------------
 /// Called to undo interaction.

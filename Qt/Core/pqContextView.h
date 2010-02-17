@@ -53,6 +53,9 @@ public:
   /// the chart rendering.
   virtual vtkContextView* getVTKContextView() const;
 
+  /// Returns the context view proxy associated with this object.
+  virtual vtkSMContextViewProxy* getContextViewProxy() const;
+
   /// This view does not support saving to image.
   virtual bool saveImage(int width, int height, const QString& filename);
 
@@ -62,7 +65,7 @@ public:
 
   /// Capture the view image of the given size and return it. The caller is
   /// responsible for freeing the returned image.
-  virtual vtkImageData* captureImage(const QSize& asize);
+  //virtual vtkImageData* captureImage(const QSize& asize);
 
   /// This view supports undo so this method always returns true.
   virtual bool supportsUndo() const {return true;}

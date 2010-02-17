@@ -15,6 +15,9 @@
 #include "vtkSMContextViewProxy.h"
 
 #include "vtkContextView.h"
+#include "vtkRenderWindow.h"
+#include "vtkWindowToImageFilter.h"
+#include "vtkProcessModule.h"
 
 #include "vtkObjectFactory.h"
 #include "vtkQtChartInteractorSetup.h"
@@ -45,7 +48,7 @@ public:
 };
 
 
-vtkCxxRevisionMacro(vtkSMContextViewProxy, "1.2");
+vtkCxxRevisionMacro(vtkSMContextViewProxy, "1.3");
 //----------------------------------------------------------------------------
 vtkSMContextViewProxy::vtkSMContextViewProxy()
 {
@@ -93,6 +96,40 @@ QVTKWidget* vtkSMContextViewProxy::GetChartWidget()
 vtkContextView* vtkSMContextViewProxy::GetChartView()
 {
   return this->ChartView;
+}
+
+//-----------------------------------------------------------------------------
+vtkImageData* vtkSMContextViewProxy::CaptureWindow(int magnification)
+{
+  this->GetChartView()->GetRenderWindow()->SwapBuffersOff();
+  this->GetChartView()->Render();
+
+  vtkWindowToImageFilter* w2i = vtkWindowToImageFilter::New();
+  w2i->SetInput(this->GetChartView()->GetRenderWindow());
+  w2i->SetMagnification(magnification);
+  w2i->Update();
+  w2i->ReadFrontBufferOff();
+  w2i->ShouldRerenderOff();
+
+  vtkImageData* capture = vtkImageData::New();
+  capture->ShallowCopy(w2i->GetOutput());
+  w2i->Delete();
+
+  this->GetChartView()->GetRenderWindow()->SwapBuffersOn();
+
+  // Update image extents based on ViewPosition
+  int extents[6];
+  capture->GetExtent(extents);
+  for (int cc=0; cc < 4; cc++)
+    {
+    extents[cc] += this->ViewPosition[cc/2]*magnification;
+    }
+  capture->SetExtent(extents);
+
+  cout << "Capture image called: " << extents[0] << " " << extents[1] << endl;
+  capture->Print(cout);
+
+  return capture;
 }
 
 //----------------------------------------------------------------------------

@@ -23,6 +23,7 @@
 #include "vtkSMViewProxy.h"
 
 class vtkContextView;
+class vtkImageData;
 //BTX
 class QVTKWidget;
 //ETX
@@ -47,6 +48,10 @@ public:
   // Provides access to the vtk chart view.
   vtkContextView* GetChartView();
 //ETX
+
+  // Description:
+  // Capture the contents of the window at the specified magnification level.
+  vtkImageData* CaptureWindow(int magnification);
 
 //BTX
 protected:
