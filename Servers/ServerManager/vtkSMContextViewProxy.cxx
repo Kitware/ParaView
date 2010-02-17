@@ -48,7 +48,7 @@ public:
 };
 
 
-vtkCxxRevisionMacro(vtkSMContextViewProxy, "1.3");
+vtkCxxRevisionMacro(vtkSMContextViewProxy, "1.4");
 //----------------------------------------------------------------------------
 vtkSMContextViewProxy::vtkSMContextViewProxy()
 {
@@ -101,7 +101,6 @@ vtkContextView* vtkSMContextViewProxy::GetChartView()
 //-----------------------------------------------------------------------------
 vtkImageData* vtkSMContextViewProxy::CaptureWindow(int magnification)
 {
-  this->GetChartView()->GetRenderWindow()->SwapBuffersOff();
   this->GetChartView()->Render();
 
   vtkWindowToImageFilter* w2i = vtkWindowToImageFilter::New();
@@ -114,8 +113,6 @@ vtkImageData* vtkSMContextViewProxy::CaptureWindow(int magnification)
   vtkImageData* capture = vtkImageData::New();
   capture->ShallowCopy(w2i->GetOutput());
   w2i->Delete();
-
-  this->GetChartView()->GetRenderWindow()->SwapBuffersOn();
 
   // Update image extents based on ViewPosition
   int extents[6];
