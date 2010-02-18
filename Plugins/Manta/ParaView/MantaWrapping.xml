@@ -61,16 +61,25 @@
 
       <StringVectorProperty name="MaterialType"
         command="SetMaterialType"
-        immediate_update="1"
         update_self="1"
         number_of_elements="1"
         default_values="default" >
+        <StringListDomain name="material">
+          <String value="default"/>
+          <String value="lambertian"/>
+          <String value="phong"/>
+          <String value="transparent"/>
+          <String value="thindielectric"/>
+          <String value="dielectric"/>
+          <String value="ambientocclusion"/>
+          <String value="metal"/>
+          <String value="orennayer"/>
+        </StringListDomain>
       </StringVectorProperty>
 
       <DoubleVectorProperty name="Reflectance"
         command="SetReflectance"
         update_self="1"
-        immediate_update="1"
         number_of_elements="1"
         default_values="0.0">
       </DoubleVectorProperty>
@@ -78,7 +87,6 @@
       <DoubleVectorProperty name="Thickness"
         command="SetThickness"
         update_self="1"
-        immediate_update="1"
         number_of_elements="1"
         default_values="1.0">
       </DoubleVectorProperty>
@@ -86,7 +94,6 @@
       <DoubleVectorProperty name="Eta"
         command="SetEta"
         update_self="1"
-        immediate_update="1"
         number_of_elements="1"
         default_values="1.52">
       </DoubleVectorProperty>
@@ -94,17 +101,15 @@
       <DoubleVectorProperty name="N"
         command="SetN"
         update_self="1"
-        immediate_update="1"
         number_of_elements="1"
-        default_values="0.0">
+        default_values="1.0">
       </DoubleVectorProperty>
 
       <DoubleVectorProperty name="Nt"
         command="SetNt"
         update_self="1"
-        immediate_update="1"
         number_of_elements="1"
-        default_values="0.0">
+        default_values="1.0">
       </DoubleVectorProperty>
 
       <!-- End of MantaGeometryRepresentation -->
@@ -177,7 +182,7 @@
         update_self="1"
         immediate_update="1"
         number_of_elements="1"
-        default_values="1">
+        default_values="5">
         <IntRangeDomain name="range" min="1" />
         <Documentation>
           Controls maximum number of ray bounces.
@@ -266,7 +271,7 @@
         update_self="1"
         immediate_update="1"
         number_of_elements="1"
-        default_values="1">
+        default_values="5">
         <IntRangeDomain name="range" min="1" />
         <Documentation>
           Controls maximum number of ray bounces.

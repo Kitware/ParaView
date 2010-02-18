@@ -118,7 +118,7 @@ public:
   //Description:
   //Controls maximum ray bounce depth.
   //More looks better, but is slower.
-  //Default is 1 meaning no bounces.
+  //Default is 5 meaning a couple of bounces.
   void SetMaxDepth(int);
   vtkGetMacro(MaxDepth, int);
 

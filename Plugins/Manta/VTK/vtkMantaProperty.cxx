@@ -125,13 +125,13 @@ int MPR::GlobalCntr = 0;
 
 //===========================================================================
 
-vtkCxxRevisionMacro(vtkMantaProperty, "1.9");
+vtkCxxRevisionMacro(vtkMantaProperty, "1.10");
 vtkStandardNewMacro(vtkMantaProperty);
 
 //----------------------------------------------------------------------------
 vtkMantaProperty::vtkMantaProperty()
-  : MantaMaterial(0), MaterialType(0), DiffuseTexture(0), SpecularTexture(0),
-    Reflectance(0.0), Eta(1.52), Thickness(1.0)
+  : MantaMaterial(0), DiffuseTexture(0), SpecularTexture(0),
+    Reflectance(0.0), Eta(1.52), Thickness(1.0), N(1.0), Nt(1.0)
 {
   //cerr << "MP(" << this << ") CREATE" << endl;
   this->MaterialType = NULL;
@@ -231,6 +231,7 @@ void vtkMantaProperty::BackfaceRender( vtkActor * vtkNotUsed( anActor ),
 void vtkMantaProperty::CreateMantaProperty()
 {
   //cerr << "MP(" << this << ") CREATE MANTA PROPERTY" << endl;
+
   double * diffuse  = this->GetDiffuseColor();
   double * specular = this->GetSpecularColor();
 
@@ -300,7 +301,6 @@ void vtkMantaProperty::CreateMantaProperty()
                             static_cast<int> ( this->GetSpecularPower() ),
                             new Manta::Constant<Manta::ColorComponent>
                             ( this->Reflectance ) );
-        cerr << "PHONG WITH R=" << this->Reflectance << endl;
         }
       else
         if ( strcmp( this->MaterialType, "transparent" ) == 0 )

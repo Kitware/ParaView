@@ -36,25 +36,23 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QVBoxLayout>
 
 // ParaView Includes.
-#include "pqActiveView.h"
-#include "pqApplicationCore.h"
 #include "pqDisplayPanel.h"
-#include "pqOutputPort.h"
-#include "pqPipelineSource.h"
-#include "pqServerManagerSelectionModel.h"
-#include "vtkSMMantaRepresentation.h"
-#include "pqDataRepresentation.h"
+#include "pqPropertyLinks.h"
 
+#include "vtkSMMantaRepresentation.h"
 #include "pqMantaView.h"
+#include "pqSignalAdaptors.h"
 
 #include <iostream>
 
 using namespace std;
 
 class MantaDisplay::pqInternal
-{
+{  
 public:
   Ui::MantaDisplay ui;
+  pqPropertyLinks links;
+  pqSignalAdaptorComboBox *strAdapt;
 };
 
 //-----------------------------------------------------------------------------
@@ -68,74 +66,70 @@ MantaDisplay::MantaDisplay(pqDisplayPanel* panel)
   QVBoxLayout* l = qobject_cast<QVBoxLayout*>(panel->layout());
   l->addWidget(frame);
 
-  QObject::connect(this->Internal->ui.material,
-                   SIGNAL(currentIndexChanged(int)),
-                   this, SLOT(applyChanges()));
-  QObject::connect(this->Internal->ui.reflectance,
-                   SIGNAL(valueChanged(double)),
-                   this, SLOT(applyChanges()));
-  QObject::connect(this->Internal->ui.thickness,
-                   SIGNAL(valueChanged(double)),
-                   this, SLOT(applyChanges()));
-  QObject::connect(this->Internal->ui.eta,
-                   SIGNAL(valueChanged(double)),
-                   this, SLOT(applyChanges()));
-  QObject::connect(this->Internal->ui.n,
-                   SIGNAL(valueChanged(double)),
-                   this, SLOT(applyChanges()));
-  QObject::connect(this->Internal->ui.nt,
-                   SIGNAL(valueChanged(double)),
-                   this, SLOT(applyChanges()));
+  pqRepresentation *rep = panel->getRepresentation();
+  vtkSMMantaRepresentation *mrep = vtkSMMantaRepresentation::SafeDownCast
+    (rep->getProxy());
+  if (!mrep)
+    {
+    return;
+    }
+  vtkSMProperty *prop = mrep->GetProperty("MaterialType");
+  //have to use a helper class because pqPropertyLinks won't map directly
+  this->Internal->strAdapt = 
+    new pqSignalAdaptorComboBox(this->Internal->ui.material);
+  this->Internal->links.addPropertyLink(
+    this->Internal->strAdapt, 
+    "currentText",
+    SIGNAL(currentTextChanged(const QString&)),
+    mrep, 
+    prop);
+
+  prop = mrep->GetProperty("Reflectance");
+  this->Internal->links.addPropertyLink(
+    this->Internal->ui.reflectance, 
+    "value",
+    SIGNAL(valueChanged(double)),
+    mrep, 
+    prop);
+
+  prop = mrep->GetProperty("Thickness");
+  this->Internal->links.addPropertyLink(
+    this->Internal->ui.thickness, 
+    "value",
+    SIGNAL(valueChanged(double)),
+    mrep, 
+    prop);
+
+  prop = mrep->GetProperty("Eta");
+  this->Internal->links.addPropertyLink(
+    this->Internal->ui.eta, 
+    "value",
+    SIGNAL(valueChanged(double)),
+    mrep, 
+    prop);
+
+  prop = mrep->GetProperty("N");
+  this->Internal->links.addPropertyLink(
+    this->Internal->ui.n, 
+    "value",
+    SIGNAL(valueChanged(double)),
+    mrep, 
+    prop);
+
+  prop = mrep->GetProperty("Nt");
+  this->Internal->links.addPropertyLink(
+    this->Internal->ui.nt, 
+    "value",
+    SIGNAL(valueChanged(double)),
+    mrep, 
+    prop);
 }
 
 //-----------------------------------------------------------------------------
 MantaDisplay::~MantaDisplay()
 {
+  delete this->Internal->strAdapt;
+  delete this->Internal;
 }
 
 
-//-----------------------------------------------------------------------------
-void MantaDisplay::applyChanges()
-{
-  //find out what view and representation with that view we are modifying
-  pqMantaView* view = qobject_cast<pqMantaView*>
-    (pqActiveView::instance().current());
-  if(!view)
-    {
-    return;
-    }
-
-  pqServerManagerModelItem *item =
-    pqApplicationCore::instance()->getSelectionModel()->currentItem();
-  if (!item)
-    {
-    return;
-    }
-  pqOutputPort* opPort = qobject_cast<pqOutputPort*>(item);
-  pqPipelineSource *source = opPort? opPort->getSource() : 
-    qobject_cast<pqPipelineSource*>(item);
-  if (!source)
-    {
-    return;
-    }
-  pqDataRepresentation* representation = 
-    source->getRepresentation(0, view);
-  if (!representation)
-    {
-    return;
-    }
-  vtkSMMantaRepresentation *mrep = vtkSMMantaRepresentation::SafeDownCast
-    (representation->getProxy());
-  if (!mrep)
-    {
-    return;
-    }
-
-  QString s = this->Internal->ui.material->currentText();
-  mrep->SetMaterialType((char*)s.toStdString().c_str());
-  mrep->SetReflectance(this->Internal->ui.reflectance->value());
-  mrep->SetThickness(this->Internal->ui.thickness->value());
-  mrep->SetEta(this->Internal->ui.eta->value());
-  mrep->SetN(this->Internal->ui.n->value());
-  mrep->SetNt(this->Internal->ui.nt->value());
-}

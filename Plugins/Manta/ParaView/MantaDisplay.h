@@ -45,9 +45,6 @@ public:
   MantaDisplay(pqDisplayPanel* parent);
   ~MantaDisplay();
 
-public slots:
-  void applyChanges();
-
 private:
   MantaDisplay(const MantaDisplay&); // Not implemented.
   void operator=(const MantaDisplay&); // Not implemented.
