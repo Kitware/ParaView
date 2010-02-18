@@ -47,7 +47,9 @@
 #include "vtkMultiBlockDataSetAlgorithm.h"
 #include <vtkstd/vector> // STL Header
 
+class    vtkDataSet;
 class    vtkPolyData;
+class    vtkImageData;
 class    vtkRectilinearGrid;
 class    vtkMultiBlockDataSet;
 class    vtkFlashReaderInternal;
@@ -64,20 +66,41 @@ public:
   void           SetFileName( const char * fileName );
   
   // Description:
+  // Set the output type of each block to vtkImageData (note that this type
+  // is imposed on the constituent MAIN blocks, excluding the one constrcted
+  // for the particles, if any).
+  void           SetBlockOutputTypeToImageData()
+                 { this->SetBlockOutputType( 0 ); }
+                 
+  // Description:
+  // Set the output type of each block to vtkRectilinearGrid (note that this 
+  // type is imposed on the constituent MAIN blocks, excluding the one built
+  // for the particles, if any).
+  void           SetBlockOutputTypeToRectilinearGrid()
+                 { this->SetBlockOutputType( 1 ); }
+  
+  // Description:
+  // Set/Get the output type of each block (vtkImageData or vtkRectilinearGrid),
+  // with vtkImageData as the default. (note that this type is imposed on the 
+  // constituent MAIN blocks, excluding the one built for the particles, if any).
+  vtkSetClampMacro( BlockOutputType, int, 0, 1 );
+  vtkGetMacro( BlockOutputType, int );
+  
+  // Description:
   // Only load upto this level.
-  vtkSetMacro(MaxLevel,int);
+  vtkSetMacro( MaxLevel,int);
   
   // Description:
   // Load the morton curve.
-  vtkSetMacro(LoadMortonCurve,int);
-  vtkGetMacro(LoadMortonCurve,int);
-  vtkBooleanMacro(LoadMortonCurve,int);
+  vtkSetMacro( LoadMortonCurve, int );
+  vtkGetMacro( LoadMortonCurve, int );
+  vtkBooleanMacro( LoadMortonCurve, int );
   
   // Description:
   // Load the particles.
-  vtkSetMacro(LoadParticles,int);
-  vtkGetMacro(LoadParticles,int);
-  vtkBooleanMacro(LoadParticles,int);
+  vtkSetMacro( LoadParticles, int );
+  vtkGetMacro( LoadParticles, int );
+  vtkBooleanMacro( LoadParticles, int );
   
   // --------------------------------------------------------------------------
   // --------------------------- General Information --------------------------
@@ -263,7 +286,13 @@ public:
   // Description:
   // Check whether a given name attrName is a data attribute associated with
   // particles (return a non-negative value as the attribute index)or not (-1).
-  int            IsParticleAttribute( const char * attrName );         
+  int            IsParticleAttribute( const char * attrName );    
+  
+  // Description:
+  // This function fills an allocated vtkImageData with a block specified by
+  // 0-based blockIdx and loads the associated cell data attributes from the
+  // file. The returned value indicates failure (0) or success (1).
+  int            GetBlock( int blockIdx, vtkImageData * imagData );     
   
   // Description:
   // This function fills an allocated vtkRectilinearGrid with a block specified
@@ -297,10 +326,10 @@ protected:
   // Description:
   // This function, called by GetBlock( ... ), loads from the file a cell data
   // attribute (with name atribute) associated with a vtkRectilinerGrid block
-  // specified by 0-based blockIdx and inserts it to an allocated 
-  // vtkRectilinearGrid rectGrid.
+  // specified by 0-based blockIdx and inserts it to an allocated vtkDataSet
+  // pDataSet (which is either vtkImageData or vtkRectilinearGrid).
   void           GetBlockAttribute( const char * atribute, int blockIdx, 
-                                    vtkRectilinearGrid * rectGrid );
+                                    vtkDataSet * pDataSet );
                                   
   // Description:
   // This function loads particles (and the associated data attributes) from the 
@@ -336,10 +365,11 @@ protected:
   char *         FileName;
   static int     NumberOfInstances;
   vtkFlashReaderInternal * Internal;
-  int LoadMortonCurve;
-  int LoadParticles;
-
-  int MaxLevel;
+  int            BlockOutputType;
+  int            LoadMortonCurve;
+  int            LoadParticles;
+  int            MaxLevel;
+  
 //BTX
   vtkstd::vector<int> BlockMap;
 //ETX

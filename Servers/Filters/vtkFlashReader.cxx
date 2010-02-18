@@ -30,11 +30,13 @@
 #include "vtkFlashReader.h"
 
 #include "vtkPoints.h"
+#include "vtkDataSet.h"
 #include "vtkPolyData.h"
 #include "vtkCellData.h"
 #include "vtkCellArray.h"
 #include "vtkDataArray.h"
 #include "vtkPointData.h"
+#include "vtkImageData.h"
 #include "vtkRectilinearGrid.h"
 
 #include "vtkIntArray.h"
@@ -57,7 +59,7 @@
 #include <vtkstd/string>
 #include <vtkstd/vector>
 
-vtkCxxRevisionMacro( vtkFlashReader, "1.8" );
+vtkCxxRevisionMacro( vtkFlashReader, "1.9" );
 vtkStandardNewMacro( vtkFlashReader );
 
 // ============================================================================
@@ -1658,8 +1660,9 @@ vtkFlashReader::vtkFlashReader()
   this->FileName = NULL;
   this->Internal = new vtkFlashReaderInternal;
   this->MaxLevel = 1000;
+  this->LoadParticles   = 1;
   this->LoadMortonCurve = 0;
-  this->LoadParticles = 1;
+  this->BlockOutputType = 0;
 
   
   this->SetNumberOfInputPorts( 0 );
@@ -2159,7 +2162,8 @@ void vtkFlashReader::PrintSelf( ostream & os, vtkIndent indent )
 {
   this->Superclass::PrintSelf( os, indent );
   
-  os << indent << "FileName: " << this->FileName << "\n";
+  os << indent << "FileName: "        << this->FileName        << "\n";
+  os << indent << "BlockOutputType: " << this->BlockOutputType << "\n";
 }
 
 // ----------------------------------------------------------------------------
@@ -2229,21 +2233,92 @@ void vtkFlashReader::GetBlock( int blockMapIdx, vtkMultiBlockDataSet * multiBlk 
     return;
     }
   
-  vtkRectilinearGrid * rectGrid = vtkRectilinearGrid::New();
-  if (  this->GetBlock( blockIdx, rectGrid ) == 1  )
+  int                  bSuccess = 0;
+  vtkDataSet         * pDataSet = NULL;
+  vtkImageData       * imagData = NULL;
+  vtkRectilinearGrid * rectGrid = NULL;
+  
+  if ( this->BlockOutputType == 0 ) // take each block as a vtkImageData
+    {
+    imagData = vtkImageData::New();
+    pDataSet = imagData;
+    bSuccess = this->GetBlock( blockIdx, imagData );
+    }
+  else                              // take each clock as a vtkRectilinearGrid
+    {
+    rectGrid = vtkRectilinearGrid::New();
+    pDataSet = rectGrid;
+    bSuccess = this->GetBlock( blockIdx, rectGrid );
+    }
+  
+  if (  bSuccess == 1  )
     {
     char     blckName[100];
     sprintf( blckName, "Block%03d_Level%d_Type%d", 
              this->Internal->Blocks[blockIdx].Index, 
              this->Internal->Blocks[blockIdx].Level, 
              this->Internal->Blocks[blockIdx].Type );
-    multiBlk->SetBlock( blockMapIdx, rectGrid );
+    multiBlk->SetBlock( blockMapIdx, pDataSet );
     multiBlk->GetMetaData( blockMapIdx )
             ->Set( vtkCompositeDataSet::NAME(), blckName );
     }
+    
+  pDataSet = NULL;
   
-  rectGrid->Delete();
-  rectGrid = NULL;
+  if ( imagData )
+    {
+    imagData->Delete();
+    imagData = NULL;
+    }
+  
+  if ( rectGrid )
+    {
+    rectGrid->Delete();
+    rectGrid = NULL;
+    }
+}
+
+// ----------------------------------------------------------------------------
+int  vtkFlashReader::GetBlock( int blockIdx, vtkImageData * imagData )
+{
+  this->Internal->ReadMetaData();
+  
+  if ( imagData == NULL || blockIdx < 0 || 
+       blockIdx >= this->Internal->NumberOfBlocks )
+    {
+    vtkDebugMacro( "Invalid block index or vtkImageData NULL" << endl );
+    return 0;
+    }
+  
+  int     i;
+  double  blockMin[3];
+  double  blockMax[3];
+  double  spacings[3];
+  
+  for ( i = 0; i < 3; i ++ )
+    {
+    blockMin[i] =   this->Internal->Blocks[ blockIdx ].MinBounds[i];
+    blockMax[i] =   this->Internal->Blocks[ blockIdx ].MaxBounds[i]; 
+    spacings[i] = ( this->Internal->BlockGridDimensions[i] > 1   )
+                ? ( blockMax[i] - blockMin[i] ) / 
+                  ( this->Internal->BlockGridDimensions[i] - 1.0 )
+                :   1.0;
+    }
+  
+  imagData->SetDimensions( this->Internal->BlockGridDimensions );
+  imagData->SetOrigin ( blockMin[0], blockMin[1], blockMin[2] );
+  imagData->SetSpacing( spacings[0], spacings[1], spacings[2] );
+  
+  // attach the data attributes to the grid
+  int   numAttrs = static_cast < int > 
+                   ( this->Internal->AttributeNames.size() );
+  for ( i = 0; i < numAttrs; i ++ )
+    {
+    this->GetBlockAttribute( this->Internal->AttributeNames[i].c_str(), 
+                             blockIdx, imagData );
+    }
+    
+  return 1;
 }
 
 // ----------------------------------------------------------------------------
@@ -2311,15 +2386,15 @@ int vtkFlashReader::GetBlock( int blockIdx, vtkRectilinearGrid * rectGrid )
 
 // ----------------------------------------------------------------------------
 void vtkFlashReader::GetBlockAttribute( const char * atribute, int blockIdx, 
-                                        vtkRectilinearGrid * rectGrid )
+                                        vtkDataSet * pDataSet )
 {
   // this function must be called by GetBlock( ... )
   this->Internal->ReadMetaData();
   
   if ( atribute == NULL || blockIdx < 0  ||
-       rectGrid == NULL || blockIdx >= this->Internal->NumberOfBlocks )
+       pDataSet == NULL || blockIdx >= this->Internal->NumberOfBlocks )
     {
-    vtkDebugMacro( "Data attribute name or vtkRectilinearGrid NULL, or " <<
+    vtkDebugMacro( "Data attribute name or vtkDataSet NULL, or " <<
                    "invalid block index." << endl );
     return;
     }
@@ -2457,7 +2532,7 @@ void vtkFlashReader::GetBlockAttribute( const char * atribute, int blockIdx,
   H5Tclose( hRawType );
   H5Dclose( dataIndx );
 
-  rectGrid->GetCellData()->AddArray ( dataAray );
+  pDataSet->GetCellData()->AddArray ( dataAray );
   
   dataAray->Delete();
   dataAray = NULL;
