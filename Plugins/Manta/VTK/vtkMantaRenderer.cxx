@@ -95,7 +95,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <vtkstd/string>
 
-vtkCxxRevisionMacro(vtkMantaRenderer, "1.16");
+vtkCxxRevisionMacro(vtkMantaRenderer, "1.17");
 vtkStandardNewMacro(vtkMantaRenderer);
 
 //----------------------------------------------------------------------------
@@ -110,7 +110,7 @@ vtkMantaRenderer::vtkMantaRenderer() :
   this->NumberOfWorkers = 1;
   this->EnableShadows = 0;
   this->Samples = 1;
-  this->MaxDepth = 1;
+  this->MaxDepth = 5;
 
   // the default global ambient light created by vtkRenderer is too bright.
   this->SetAmbient( 0.1, 0.1, 0.1 );
@@ -282,7 +282,7 @@ int vtkMantaRenderer::UpdateLights()
       // there is no VTK light nor MantaLight defined, create a Manta headlight
       cerr << "No light defined, creating a headlight at camera position" << endl;      
       this->DefaultLight =
-        new Manta::HeadLight(    0, Manta::Color(  Manta::RGBColor( 1, 1, 1 )  )   );      
+        new Manta::HeadLight( 0, Manta::Color( Manta::RGBColor( 1, 1, 1 ) ) );
       this->MantaEngine->addTransaction
         ("add headlight",
          Manta::Callback::create( this->MantaLightSet, &Manta::LightSet::add,
@@ -373,8 +373,8 @@ void vtkMantaRenderer::LayerRender()
 
   vtkTimerLog::MarkStartEvent("ThreadSync");
   // let the render threads draw what we've asked them to
-  //this->GetSyncDisplay()->doneRendering();
-  //this->GetSyncDisplay()->waitOnFrameReady();
+  this->GetSyncDisplay()->doneRendering();
+  this->GetSyncDisplay()->waitOnFrameReady();
   this->GetSyncDisplay()->doneRendering();
   this->GetSyncDisplay()->waitOnFrameReady();
   vtkTimerLog::MarkEndEvent("ThreadSync");
@@ -439,7 +439,7 @@ void vtkMantaRenderer::LayerRender()
 
     for ( i = 0; i < minWidth; i ++ )
       {
-      this->ColorBuffer[ tupleIndex + i     ]
+      this->ColorBuffer[ tupleIndex + i ]
                          = mantaBuffer[ mantaIndex + i*2     ];
       float depthValue   = mantaBuffer[ mantaIndex + i*2 + 1 ];
       // normalize the depth values to [ 0.0f, 1.0f ], since we are using a
