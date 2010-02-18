@@ -95,7 +95,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <vtkstd/string>
 
-vtkCxxRevisionMacro(vtkMantaRenderer, "1.14");
+vtkCxxRevisionMacro(vtkMantaRenderer, "1.15");
 vtkStandardNewMacro(vtkMantaRenderer);
 
 //----------------------------------------------------------------------------
@@ -252,39 +252,36 @@ int vtkMantaRenderer::UpdateLights()
   vtkCollectionSimpleIterator sit;
   this->Lights->InitTraversal( sit );
 
-//    Manta::Light *headlight =
-//      new Manta::HeadLight(    0, Manta::Color(  Manta::RGB( .5, .5, .5 )  )   );
-//    this->MantaLightSet->add(headlight);
-
-  if ( this->Lights->GetNextLight( sit ) == 0 &&
-       this->MantaLightSet->numLights()  == 0 )
+  // TODO: schedule ClearLight here?
+  vtkLight *vLight = NULL;
+  bool noneOn = true;
+  for ( this->Lights->InitTraversal( sit );
+        ( vLight = this->Lights->GetNextLight( sit ) ) ; )
     {
-    // there is no VTK light nor MantaLight defined, create a Manta headlight
-    // TODO: memory leak, headlight is not deleted
-    vtkWarningMacro(
-      << "No light defined, creating a headlight at camera position" );
-    Manta::Light *headlight =
-      new Manta::HeadLight(    0, Manta::Color(  Manta::RGBColor( 1, 1, 1 )  )   );
-
-    this->MantaEngine->addTransaction( "add headlight",
-      Manta::Callback::create( this->MantaLightSet, &Manta::LightSet::add,
-      headlight ) );
-    }
-  else
-    {
-    // TODO: schedule ClearLight here?
-    // TODO: the LightKit in ParaView with MantaView creates vtkOpenGLight rather
-    // than vtkMantaLight because there is no Client/Server communication involved
-    vtkLight *vLight = NULL;
-    for ( this->Lights->InitTraversal( sit );
-          ( vLight = this->Lights->GetNextLight( sit ) ) ; )
+    if ( vLight->GetSwitch() )
       {
-      if ( vLight->GetSwitch() )
-        {
-        vLight->Render( this, 0 /* not used */ );
-        }
+      noneOn = false;
+      vLight->Render( this, 0 /* not used */ );
+      }
+    i++;
+    }
+    
+  if (noneOn)
+    {
+    if (this->MantaLightSet->numLights()==0 )
+      {
+      // there is no VTK light nor MantaLight defined, create a Manta headlight
+
+      // TODO: headlight is not deleted, and probably never removed from the scene
+      cerr << "No light defined, creating a headlight at camera position" << endl;      
+      Manta::Light *headlight =
+        new Manta::HeadLight(    0, Manta::Color(  Manta::RGBColor( 1, 1, 1 )  )   );      
+      this->MantaEngine->addTransaction( "add headlight",
+                                         Manta::Callback::create( this->MantaLightSet, &Manta::LightSet::add,
+                                                                  headlight ) );
       }
     }
+
   return 0;
 }
 
