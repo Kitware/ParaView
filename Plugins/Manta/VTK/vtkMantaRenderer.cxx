@@ -95,7 +95,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <vtkstd/string>
 
-vtkCxxRevisionMacro(vtkMantaRenderer, "1.15");
+vtkCxxRevisionMacro(vtkMantaRenderer, "1.16");
 vtkStandardNewMacro(vtkMantaRenderer);
 
 //----------------------------------------------------------------------------
@@ -156,6 +156,8 @@ vtkMantaRenderer::vtkMantaRenderer() :
     }
 
   this->MantaFactory->selectRenderer( "raytracer" );
+
+  this->DefaultLight = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -163,6 +165,14 @@ vtkMantaRenderer::~vtkMantaRenderer()
 {
   //cerr << "MR(" << this << ") DESTROY " << this->MantaManager << " " 
   //     << this->MantaManager->GetReferenceCount() << endl;
+
+  if (this->DefaultLight && this->MantaLightSet)
+    {
+    Manta::Callback::create( this->MantaLightSet, &Manta::LightSet::remove,
+                             this->DefaultLight );
+    this->DefaultLight = NULL;
+    }
+
   this->MantaManager->Delete();
 
   if (this->ColorBuffer)
@@ -263,7 +273,6 @@ int vtkMantaRenderer::UpdateLights()
       noneOn = false;
       vLight->Render( this, 0 /* not used */ );
       }
-    i++;
     }
     
   if (noneOn)
@@ -271,14 +280,22 @@ int vtkMantaRenderer::UpdateLights()
     if (this->MantaLightSet->numLights()==0 )
       {
       // there is no VTK light nor MantaLight defined, create a Manta headlight
-
-      // TODO: headlight is not deleted, and probably never removed from the scene
       cerr << "No light defined, creating a headlight at camera position" << endl;      
-      Manta::Light *headlight =
+      this->DefaultLight =
         new Manta::HeadLight(    0, Manta::Color(  Manta::RGBColor( 1, 1, 1 )  )   );      
-      this->MantaEngine->addTransaction( "add headlight",
-                                         Manta::Callback::create( this->MantaLightSet, &Manta::LightSet::add,
-                                                                  headlight ) );
+      this->MantaEngine->addTransaction
+        ("add headlight",
+         Manta::Callback::create( this->MantaLightSet, &Manta::LightSet::add,
+                                  this->DefaultLight ) );
+      }
+    }
+  else
+    {
+    if (this->DefaultLight)
+      {
+      Manta::Callback::create( this->MantaLightSet, &Manta::LightSet::remove,
+                               this->DefaultLight );
+      this->DefaultLight = NULL;
       }
     }
 

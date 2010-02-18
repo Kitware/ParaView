@@ -78,6 +78,7 @@ class LightSet;
 class Factory;
 class Camera;
 class SyncDisplay;
+class Light;
 }
 //ETX
 
@@ -244,6 +245,7 @@ private:
   Manta::LightSet * MantaLightSet;
   Manta::Camera * MantaCamera;
   Manta::SyncDisplay * SyncDisplay;
+  Manta::Light * DefaultLight;
   //ETX
 
   int ChannelId;
