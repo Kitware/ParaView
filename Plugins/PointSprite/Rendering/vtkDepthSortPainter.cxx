@@ -61,7 +61,7 @@
 #include "vtkPolyData.h"
 
 //-----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkDepthSortPainter, "1.1")
+vtkCxxRevisionMacro(vtkDepthSortPainter, "1.2")
 vtkStandardNewMacro(vtkDepthSortPainter)
 //-----------------------------------------------------------------------------
 vtkCxxSetObjectMacro(vtkDepthSortPainter,DepthSortPolyData,vtkDepthSortPolyData)
@@ -284,8 +284,10 @@ int vtkDepthSortPainter::IsTextureSemiTranslucent(vtkTexture* tex)
       return 1;
       }
     }
+/*
   this->CachedIsTextureSemiTranslucent = -1;
   return -1;
+*/
 }
 
 int vtkDepthSortPainter::IsColorSemiTranslucent(vtkUnsignedCharArray* color)

@@ -50,8 +50,8 @@ class pqCPExportStateWizardPage2 : public QWizardPage
 {
   pqCPExportStateWizard::pqInternals* Internals;
 public:
-  pqCPExportStateWizardPage2(QWidget* parent=0)
-    : QWizardPage(parent)
+  pqCPExportStateWizardPage2(QWidget* _parent=0)
+    : QWizardPage(_parent)
     {
     this->Internals = ::ActiveWizard->Internals;
     }
@@ -68,8 +68,8 @@ class pqCPExportStateWizardPage3: public QWizardPage
 {
   pqCPExportStateWizard::pqInternals* Internals;
 public:
-  pqCPExportStateWizardPage3(QWidget* parent=0)
-    : QWizardPage(parent)
+  pqCPExportStateWizardPage3(QWidget* _parent=0)
+    : QWizardPage(_parent)
     {
     this->Internals = ::ActiveWizard->Internals;
     }

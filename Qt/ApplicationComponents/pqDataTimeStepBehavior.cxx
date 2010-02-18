@@ -84,7 +84,7 @@ void pqDataTimeStepBehavior::onReaderCreated(pqPipelineSource* reader)
     }
   else if (readerProxy->GetProperty("TimeRange"))
     {
-    int max_time = vtkSMPropertyHelper(readerProxy, "TimeRange").GetAsDouble(1);
+    double max_time = vtkSMPropertyHelper(readerProxy, "TimeRange").GetAsDouble(1);
     if (timeKeeper->getTime() < max_time)
       {
       scene->setAnimationTime(max_time);

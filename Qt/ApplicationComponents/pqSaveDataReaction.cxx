@@ -140,7 +140,7 @@ bool pqSaveDataReaction::saveActiveData(const QString& filename)
 
   if (writer->IsA("vtkSMPSWriterProxy") && port->getServer()->getNumberOfPartitions() > 1)
     {
-    pqOptions* options = pqApplicationCore::instance()->getOptions();
+    //pqOptions* options = pqApplicationCore::instance()->getOptions();
     // To avoid showing the dialog when running tests.
     if (!pqApplicationCore::instance()->testUtility()->playingTest())
       {

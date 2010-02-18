@@ -29,8 +29,8 @@
 #include <QToolTip>
 
 ///////////////////////////////////////////////////////////////////////////////
-pqHoverLabel::pqHoverLabel(QWidget *parent) :
-  QLabel(parent)
+pqHoverLabel::pqHoverLabel(QWidget *_parent) :
+  QLabel(_parent)
 {
   this->setMouseTracking(true);
 }

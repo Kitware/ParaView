@@ -909,12 +909,12 @@ void pqSierraPlotToolsManager::setupPlotMenu()
 //
 void pqSierraPlotToolsManager::actOnPlotSelection()
 {
-  QObject * sender =  this->sender ();
-  QAction * theAction = dynamic_cast<QAction *>(sender);
+  QObject * aSender =  this->sender ();
+  QAction * theAction = dynamic_cast<QAction *>(aSender);
 
   if (theAction != NULL)
     {
-    QString heading = dynamic_cast<QAction *>(sender)->objectName();
+    QString heading = dynamic_cast<QAction *>(aSender)->objectName();
     pqInternal::PlotterMetaData * metaData = this->Internal->plotterMap[heading];
 
     if (this->Internal->plotGUI)

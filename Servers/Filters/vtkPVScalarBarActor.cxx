@@ -52,7 +52,7 @@
 #define MY_ABS(x)       ((x) < 0 ? -(x) : (x))
 
 //=============================================================================
-vtkCxxRevisionMacro(vtkPVScalarBarActor, "1.12");
+vtkCxxRevisionMacro(vtkPVScalarBarActor, "1.13");
 vtkStandardNewMacro(vtkPVScalarBarActor);
 
 //=============================================================================
@@ -741,7 +741,7 @@ void vtkPVScalarBarActor::AllocateAndPositionLabels(int *propSize,
       const int minorRatios[] = {10, 5, 2, 1};
       const int numMinorRatios
         = static_cast<int>(sizeof(minorRatios)/sizeof(int));
-      int minorRatio;
+      int minorRatio = 0;
       for (int r = 0; r < numMinorRatios; r++)
         {
         minorRatio = minorRatios[r];

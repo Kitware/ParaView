@@ -466,7 +466,7 @@ QString pqPlotter::getFilterName()
 
 //-----------------------------------------------------------------------------
 QMap<QString, QList<pqOutputPort*> > pqPlotter::buildNamedInputs(
-  pqPipelineSource * meshReader, QList<int> itemList, bool & success)
+  pqPipelineSource * meshReader, QList<int> /*itemList*/, bool & success)
 {
   success = true;
 

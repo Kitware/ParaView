@@ -13,7 +13,7 @@
 //=============================================================================
 //-----------------------------------------------------------------------------
 
-vtkCxxRevisionMacro(vtkSpyPlotUniReader, "1.12");
+vtkCxxRevisionMacro(vtkSpyPlotUniReader, "1.13");
 vtkStandardNewMacro(vtkSpyPlotUniReader);
 vtkCxxSetObjectMacro(vtkSpyPlotUniReader, CellArraySelection, vtkDataArraySelection);
 
@@ -1588,6 +1588,7 @@ int vtkSpyPlotUniReader::ReadGroupHeaderInformation(vtkSpyPlotIStream *spis)
     nch.NumberOfDataDumps = this->NumberOfDataDumps + gh.NumberOfDataDumps;
     nch.DumpCycle  = new int[nch.NumberOfDataDumps];
     nch.DumpTime   = new double[nch.NumberOfDataDumps];
+    nch.DumpDT = NULL;
     if ( this->FileVersion >= 102 )
       {
       nch.DumpDT = new double[nch.NumberOfDataDumps];

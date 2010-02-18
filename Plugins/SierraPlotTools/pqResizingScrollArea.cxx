@@ -26,8 +26,8 @@
 #include <QApplication>
 #include <QDesktopWidget>
 
-pqResizingScrollArea::pqResizingScrollArea(QWidget *parent)
-:QScrollArea(parent)
+pqResizingScrollArea::pqResizingScrollArea(QWidget *_parent)
+:QScrollArea(_parent)
 {
   setWidgetResizable(true);
   setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);

@@ -55,7 +55,7 @@ struct vtkPPhastaReaderInternal
 };
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkPPhastaReader, "1.6");
+vtkCxxRevisionMacro(vtkPPhastaReader, "1.7");
 vtkStandardNewMacro(vtkPPhastaReader);
 
 //----------------------------------------------------------------------------
@@ -162,9 +162,11 @@ int vtkPPhastaReader::RequestData(vtkInformation*,
   MultiPieceDataSet->Delete();
 
   const char* geometryPattern = 0;
-  int geomHasPiece, geomHasTime;
+  int geomHasPiece = 0;
+  int geomHasTime = 0;
   const char* fieldPattern = 0;
-  int fieldHasPiece, fieldHasTime;
+  int fieldHasPiece = 0;
+  int fieldHasTime = 0;
 
   unsigned int numElements = rootElement->GetNumberOfNestedElements();
   for (unsigned int i=0; i<numElements; i++)

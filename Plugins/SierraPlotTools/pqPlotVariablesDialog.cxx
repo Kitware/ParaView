@@ -503,6 +503,10 @@ public:
             rangeEnd = -1;
             }
           break;
+
+        case e_unknownSep:
+          //Do something here?
+          break;
         }
       }
 
@@ -723,7 +727,7 @@ pqPlotVariablesDialog::pqPlotVariablesDialog(QWidget *p,
 
   myDialog->setMaximumHeight(555);
 
-  QSizePolicy sizePolicy = this->sizePolicy();
+  //QSizePolicy tmpSizePolicy = this->sizePolicy(); //If this doesn't do anything, why is it here?
 }
 
 //-----------------------------------------------------------------------------
@@ -1140,11 +1144,11 @@ void pqPlotVariablesDialog::slotItemSelectionChanged()
     }
   }
 
-  pqPlotVariablesDialog * myDialog = this;
+  //pqPlotVariablesDialog * myDialog = this;
 
-  QSize dialogSize = myDialog->size();
-  QSize maxSize = myDialog->maximumSize();
-  QSizePolicy sizePolicy = myDialog->sizePolicy();
+  //QSize dialogSize = myDialog->size();
+  //QSize maxSize = myDialog->maximumSize();
+  //QSizePolicy tmpSizePolicy = myDialog->sizePolicy(); 
   //QSizePolicy::Policy verticalPolicy = sizePolicy.verticalPolicy();
 }
 

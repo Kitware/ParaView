@@ -35,10 +35,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqUndoStack.h"
 
 //-----------------------------------------------------------------------------
-pqUndoRedoReaction::pqUndoRedoReaction(QAction* parentObject, bool undo)
+pqUndoRedoReaction::pqUndoRedoReaction(QAction* parentObject, bool _undo)
   : Superclass(parentObject)
 {
-  this->Undo = undo;
+  this->Undo = _undo;
   this->enable(false);
 
   pqUndoStack* stack = pqApplicationCore::instance()->getUndoStack();

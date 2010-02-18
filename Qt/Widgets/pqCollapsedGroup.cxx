@@ -78,10 +78,12 @@ QRect pqCollapsedGroup::collapseRect()
   option.subControls |= QStyle::SC_GroupBoxCheckBox;
   return this->style()->subControlRect(QStyle::CC_GroupBox, &option,
                                        QStyle::SC_GroupBoxCheckBox, this);
+/*
   QRect r = this->style()->subControlRect(QStyle::CC_GroupBox, &option,
-                                             QStyle::SC_GroupBoxCheckBox, this);
+                                          QStyle::SC_GroupBoxCheckBox, this);
   r.moveRight(this->width() - r.left());
   return r;
+*/
 }
 
 void pqCollapsedGroup::paintEvent(QPaintEvent*)

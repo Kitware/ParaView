@@ -243,8 +243,8 @@ void pqProxyGroupMenuManager::loadRecentlyUsedItems()
       QStringList pieces = part.split(";", QString::SkipEmptyParts);
       if (pieces.size() == 2)
         {
-        QPair<QString, QString> key(pieces[0], pieces[1]);
-        this->Internal->RecentlyUsed.push_back(key);
+        QPair<QString, QString> aKey(pieces[0], pieces[1]);
+        this->Internal->RecentlyUsed.push_back(aKey);
         }
       }
     }
@@ -317,20 +317,20 @@ void pqProxyGroupMenuManager::populateMenu()
   pqInternal::ProxyInfoMap::iterator proxyIter = 
     this->Internal->Proxies.begin();
 
-  QList<QAction*> actions;
+  QList<QAction*> someActions;
   for (; proxyIter != this->Internal->Proxies.end(); ++proxyIter)
     {
     QAction* action = this->getAction(proxyIter.key().first,
       proxyIter.key().second);
     if (action)
       {
-      actions.push_back(action);
+      someActions.push_back(action);
       }
     }
 
   // Now sort all actions added in temp based on their texts.
-  qSort(actions.begin(), actions.end(), ::actionTextSort);
-  foreach (QAction* action, actions)
+  qSort(someActions.begin(), someActions.end(), ::actionTextSort);
+  foreach (QAction* action, someActions)
     {
     alphabeticalMenu->addAction(action);
     }
