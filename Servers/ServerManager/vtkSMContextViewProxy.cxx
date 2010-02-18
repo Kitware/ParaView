@@ -48,7 +48,7 @@ public:
 };
 
 
-vtkCxxRevisionMacro(vtkSMContextViewProxy, "1.4");
+vtkCxxRevisionMacro(vtkSMContextViewProxy, "1.5");
 //----------------------------------------------------------------------------
 vtkSMContextViewProxy::vtkSMContextViewProxy()
 {
@@ -122,9 +122,6 @@ vtkImageData* vtkSMContextViewProxy::CaptureWindow(int magnification)
     extents[cc] += this->ViewPosition[cc/2]*magnification;
     }
   capture->SetExtent(extents);
-
-  cout << "Capture image called: " << extents[0] << " " << extents[1] << endl;
-  capture->Print(cout);
 
   return capture;
 }
