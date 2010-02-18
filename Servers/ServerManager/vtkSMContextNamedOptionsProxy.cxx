@@ -54,7 +54,7 @@ public:
 };
 
 vtkStandardNewMacro(vtkSMContextNamedOptionsProxy);
-vtkCxxRevisionMacro(vtkSMContextNamedOptionsProxy, "1.10");
+vtkCxxRevisionMacro(vtkSMContextNamedOptionsProxy, "1.11");
 //----------------------------------------------------------------------------
 vtkSMContextNamedOptionsProxy::vtkSMContextNamedOptionsProxy()
 {
@@ -347,6 +347,35 @@ void vtkSMContextNamedOptionsProxy::SetVisibility(const char* name, int visible)
       // Update the map with the pointer
       this->Internals->PlotMap[name] = plot;
       }
+    }
+  // Figure out how many active plot items there are - set the y axis title
+  // or display legend to true.
+  int active = 0;
+  vtkPlot* lastPlot = 0;
+  vtkstd::map<vtkstd::string, vtkWeakPointer<vtkPlot> >::iterator it;
+  for (it = this->Internals->PlotMap.begin();
+       it != this->Internals->PlotMap.end(); ++it)
+    {
+    if (it->second && it->second->GetVisible())
+      {
+      ++active;
+      lastPlot = it->second;
+      }
+    }
+  if (active == 0 && this->Internals->Chart)
+    {
+    this->Internals->Chart->GetAxis(1)->SetTitle(" ");
+    this->Internals->Chart->SetShowLegend(false);
+    }
+  else if (active == 1 && this->Internals->Chart)
+    {
+    this->Internals->Chart->GetAxis(1)->SetTitle(lastPlot->GetLabel());
+    this->Internals->Chart->SetShowLegend(false);
+    }
+  else if (this->Internals->Chart)
+    {
+    this->Internals->Chart->GetAxis(1)->SetTitle(" ");
+    this->Internals->Chart->SetShowLegend(true);
     }
 }
 
