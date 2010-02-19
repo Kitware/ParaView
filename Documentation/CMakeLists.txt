@@ -37,7 +37,10 @@ ADD_CUSTOM_TARGET(ParaViewOnlineHelp
   COMMENT "Compiling Qt help project paraview.qhp"
 )
 
-#
+ADD_DEPENDENCIES(ParaViewOnlineHelp
+  HTMLDocumentation
+  )
+
 # Development
 IF (NOT PV_INSTALL_NO_DEVELOPMENT)
   INSTALL(
