@@ -256,7 +256,12 @@ void pqParaViewMenuBuilders::buildPipelineBrowserContextMenu(QWidget& widget)
 }
 
 //-----------------------------------------------------------------------------
-void pqParaViewMenuBuilders::buildMacrosMenu(QMenu& menu)
+void pqParaViewMenuBuilders::buildMacrosMenu
+#ifdef PARAVIEW_ENABLE_PYTHON
+(QMenu& menu)
+#else
+(QMenu& )
+#endif
 {
 #ifdef PARAVIEW_ENABLE_PYTHON
   // Give the macros menu to the pqPythonMacroSupervisor

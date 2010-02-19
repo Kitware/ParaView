@@ -251,7 +251,12 @@ void Message::getValue(char* data, int count)
 // Nonblocking send
 //
 ////////////////////////////////////////////////////////////////////////////
-void Message::send(int mach, int tag)
+void Message::send
+#ifdef USE_SERIAL_COSMO
+  (int , int )
+#else
+  (int mach, int tag)
+#endif
 {
 #ifdef USE_SERIAL_COSMO
   char* in = new char[this->bufPos];

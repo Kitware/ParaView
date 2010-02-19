@@ -646,7 +646,12 @@ void CosmoHaloFinderP::mergeHalos()
 //
 /////////////////////////////////////////////////////////////////////////
 
-void CosmoHaloFinderP::collectMixedHalos(ID_T* haloBuffer, int haloBufSize)
+void CosmoHaloFinderP::collectMixedHalos
+#ifdef USE_SERIAL_COSMO
+  (ID_T* , int )
+#else
+  (ID_T* haloBuffer, int haloBufSize)
+#endif
 {
   // How many processors have mixed halos
   int haveMixedHalo = (this->numberOfMixedHalos > 0 ? 1 : 0);

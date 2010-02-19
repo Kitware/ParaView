@@ -202,19 +202,19 @@ void pqProgressManager::onEndProgress()
 //-----------------------------------------------------------------------------
 void pqProgressManager::onProgress()
 {
-  int progress = vtkProcessModule::GetProcessModule()->GetLastProgress();
+  int oldProgress = vtkProcessModule::GetProcessModule()->GetLastProgress();
   QString text = vtkProcessModule::GetProcessModule()->GetLastProgressName();
 
   // forgive those who don't call SendPrepareProgress beforehand
   if (this->EnableProgress == false &&
-    this->ReadyEnableProgress == false && progress == 0)
+    this->ReadyEnableProgress == false && oldProgress == 0)
     {
     this->onStartProgress();
     return;
     }
 
   // forgive those who don't cleanup or want to go the extra mile
-  if (progress >= 100)
+  if (oldProgress >= 100)
     {
     this->onEndProgress();
     return;
@@ -246,5 +246,5 @@ void pqProgressManager::onProgress()
     {
     text = text.mid(3);
     }
-  this->setProgress(text, progress);
+  this->setProgress(text, oldProgress);
 }

@@ -67,7 +67,12 @@ vtkProcessModule::InterpreterInitializationCallback
 }
 
 //-----------------------------------------------------------------------------
-void @PLUGIN_NAME@_Plugin::GetXMLs(vtkstd::vector<vtkstd::string> &xmls)
+void @PLUGIN_NAME@_Plugin::GetXMLs
+# ifdef PUSH_BACK_XML_INTERFACES
+  (vtkstd::vector<vtkstd::string> &xmls)
+#else
+  (vtkstd::vector<vtkstd::string> &)
+# endif
 {
 # ifdef PUSH_BACK_XML_INTERFACES
   PUSH_BACK_XML_INTERFACES(xmls);
@@ -79,11 +84,11 @@ void @PLUGIN_NAME@_Plugin::GetXMLs(vtkstd::vector<vtkstd::string> &xmls)
 #ifdef plugin_type_gui
 QObjectList @PLUGIN_NAME@_Plugin::interfaces()
 {
-  QObjectList interfaces;
+  QObjectList ifaces;
 #ifdef PUSH_BACK_PV_INTERFACES
-  PUSH_BACK_PV_INTERFACES(interfaces);
+  PUSH_BACK_PV_INTERFACES(ifaces);
 #endif
-  return interfaces;
+  return ifaces;
 }
 #endif
 
