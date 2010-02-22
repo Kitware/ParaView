@@ -21,7 +21,7 @@
 #ifndef __vtkMPIMoveData_h
 #define __vtkMPIMoveData_h
 
-#include "vtkDataSetAlgorithm.h"
+#include "vtkPassInputTypeAlgorithm.h"
 
 class vtkMultiProcessController;
 class vtkSocketController;
@@ -29,11 +29,11 @@ class vtkMPIMToNSocketConnection;
 class vtkDataSet;
 class vtkIndent;
 
-class VTK_EXPORT vtkMPIMoveData : public vtkDataSetAlgorithm
+class VTK_EXPORT vtkMPIMoveData : public vtkPassInputTypeAlgorithm
 {
 public:
   static vtkMPIMoveData *New();
-  vtkTypeRevisionMacro(vtkMPIMoveData, vtkDataSetAlgorithm);
+  vtkTypeRevisionMacro(vtkMPIMoveData, vtkPassInputTypeAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
@@ -127,16 +127,16 @@ protected:
   vtkSocketController* ClientDataServerSocketController;
   vtkMPIMToNSocketConnection* MPIMToNSocketConnection;
 
-  void DataServerAllToN(vtkDataSet* inData, vtkDataSet* outData, int n);
-  void DataServerGatherAll(vtkDataSet* input, vtkDataSet* output);
-  void DataServerGatherToZero(vtkDataSet* input, vtkDataSet* output);
-  void DataServerSendToRenderServer(vtkDataSet* output);
-  void RenderServerReceiveFromDataServer(vtkDataSet* output);
-  void DataServerZeroSendToRenderServerZero(vtkDataSet* data);
-  void RenderServerZeroReceiveFromDataServerZero(vtkDataSet* data);
-  void RenderServerZeroBroadcast(vtkDataSet* data);
-  void DataServerSendToClient(vtkDataSet* output);
-  void ClientReceiveFromDataServer(vtkDataSet* output);
+  void DataServerAllToN(vtkDataObject* inData, vtkDataObject* outData, int n);
+  void DataServerGatherAll(vtkDataObject* input, vtkDataObject* output);
+  void DataServerGatherToZero(vtkDataObject* input, vtkDataObject* output);
+  void DataServerSendToRenderServer(vtkDataObject* output);
+  void RenderServerReceiveFromDataServer(vtkDataObject* output);
+  void DataServerZeroSendToRenderServerZero(vtkDataObject* data);
+  void RenderServerZeroReceiveFromDataServerZero(vtkDataObject* data);
+  void RenderServerZeroBroadcast(vtkDataObject* data);
+  void DataServerSendToClient(vtkDataObject* output);
+  void ClientReceiveFromDataServer(vtkDataObject* output);
 
   int        NumberOfBuffers;
   vtkIdType* BufferLengths;
@@ -145,8 +145,8 @@ protected:
   vtkIdType  BufferTotalLength;
 
   void ClearBuffer();
-  void MarshalDataToBuffer(vtkDataSet* data);
-  void ReconstructDataFromBuffer(vtkDataSet* data);
+  void MarshalDataToBuffer(vtkDataObject* data);
+  void ReconstructDataFromBuffer(vtkDataObject* data);
 
   int MoveMode;
   int Server;
