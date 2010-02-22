@@ -26,6 +26,7 @@
 * http://www.llnl.gov/visit/copyright.html.
 *
 *****************************************************************************/
+#define H5_USE_16_API
 
 #include "vtkFlashReader.h"
 
@@ -59,7 +60,7 @@
 #include <vtkstd/string>
 #include <vtkstd/vector>
 
-vtkCxxRevisionMacro( vtkFlashReader, "1.9" );
+vtkCxxRevisionMacro( vtkFlashReader, "1.10" );
 vtkStandardNewMacro( vtkFlashReader );
 
 // ============================================================================
