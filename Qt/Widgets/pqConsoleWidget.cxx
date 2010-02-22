@@ -440,8 +440,9 @@ void pqConsoleWidget::insertCompletion(const QString& completion)
 //-----------------------------------------------------------------------------
 void pqConsoleWidget::printString(const QString& Text)
 {
-  this->Implementation->textCursor().movePosition(QTextCursor::End);
-  this->Implementation->textCursor().insertText(Text);
+  QTextCursor c(this->Implementation->document());
+  c.movePosition(QTextCursor::End);
+  c.insertText(Text);
   this->Implementation->InteractivePosition = this->Implementation->documentEnd();
   this->Implementation->ensureCursorVisible();
 }
