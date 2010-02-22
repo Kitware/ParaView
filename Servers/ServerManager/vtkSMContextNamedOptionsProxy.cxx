@@ -55,7 +55,7 @@ public:
 };
 
 vtkStandardNewMacro(vtkSMContextNamedOptionsProxy);
-vtkCxxRevisionMacro(vtkSMContextNamedOptionsProxy, "1.13");
+vtkCxxRevisionMacro(vtkSMContextNamedOptionsProxy, "1.14");
 //----------------------------------------------------------------------------
 vtkSMContextNamedOptionsProxy::vtkSMContextNamedOptionsProxy()
 {
@@ -76,6 +76,12 @@ void vtkSMContextNamedOptionsProxy::SetChartType(int type)
 {
   this->Internals->ChartType = type;
   this->Modified();
+}
+
+//----------------------------------------------------------------------------
+int vtkSMContextNamedOptionsProxy::GetChartType()
+{
+  return this->Internals->ChartType;
 }
 
 //----------------------------------------------------------------------------

@@ -24,7 +24,7 @@
 #include "vtkTable.h"
 
 vtkStandardNewMacro(vtkSMXYChartRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMXYChartRepresentationProxy, "1.6");
+vtkCxxRevisionMacro(vtkSMXYChartRepresentationProxy, "1.7");
 //----------------------------------------------------------------------------
 vtkSMXYChartRepresentationProxy::vtkSMXYChartRepresentationProxy()
 {
@@ -199,4 +199,10 @@ void vtkSMXYChartRepresentationProxy::SetChartType(const char *type)
     {
     this->OptionsProxy->SetChartType(vtkChart::BAR);
     }
+}
+
+//----------------------------------------------------------------------------
+int vtkSMXYChartRepresentationProxy::GetChartType()
+{
+  return this->OptionsProxy->GetChartType();
 }

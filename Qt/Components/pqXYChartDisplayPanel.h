@@ -79,6 +79,9 @@ private:
   /// an XYChartRepresentation proxy.
   void setDisplay(pqRepresentation* display);
 
+  /// Disable/enable elements of the dialog based on the chart type.
+  void changeDialog(pqRepresentation* display);
+
   Qt::CheckState getEnabledState() const;
 
   class pqInternal;

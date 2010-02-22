@@ -40,6 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProxy.h"
 #include "vtkSmartPointer.h"
 #include "vtkTable.h"
+#include "vtkChart.h"
 
 #include <QColorDialog>
 #include <QHeaderView>
@@ -211,9 +212,31 @@ void pqXYChartDisplayPanel::setDisplay(pqRepresentation* disp)
     SIGNAL(toggled(bool)),
     proxy, proxy->GetProperty("UseIndexForXAxis"));
 
+  this->changeDialog(disp);
+
   this->setEnabled(true);
 
   this->reloadSeries();
+}
+
+//-----------------------------------------------------------------------------
+void pqXYChartDisplayPanel::changeDialog(pqRepresentation* disp)
+{
+  vtkSMXYChartRepresentationProxy* proxy =
+    vtkSMXYChartRepresentationProxy::SafeDownCast(disp->getProxy());
+  bool visible = true;
+  if (proxy->GetChartType() == vtkChart::BAR)
+    {
+    visible = false;
+    }
+  this->Internal->Thickness->setVisible(visible);
+  this->Internal->ThicknessLabel->setVisible(visible);
+  this->Internal->StyleList->setVisible(visible);
+  this->Internal->StyleListLabel->setVisible(visible);
+  this->Internal->MarkerStyleList->setVisible(visible);
+  this->Internal->MarkerStyleListLabel->setVisible(visible);
+  this->Internal->AxisList->setVisible(visible);
+  this->Internal->AxisListLabel->setVisible(visible);
 }
 
 //-----------------------------------------------------------------------------

@@ -90,6 +90,11 @@ public:
   // Set the chart type, defaults to line chart
   void SetChartType(const char *type);
 
+  // Description:
+  // Get the chart type, defaults to line chart, the return value is from the
+  // vtkChart enum (anonymous for wrapping).
+  int GetChartType();
+
 //BTX
 protected:
   vtkSMXYChartRepresentationProxy();
