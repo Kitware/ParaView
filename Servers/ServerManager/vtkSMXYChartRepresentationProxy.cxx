@@ -24,7 +24,7 @@
 #include "vtkTable.h"
 
 vtkStandardNewMacro(vtkSMXYChartRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMXYChartRepresentationProxy, "1.5");
+vtkCxxRevisionMacro(vtkSMXYChartRepresentationProxy, "1.6");
 //----------------------------------------------------------------------------
 vtkSMXYChartRepresentationProxy::vtkSMXYChartRepresentationProxy()
 {
@@ -91,13 +91,7 @@ bool vtkSMXYChartRepresentationProxy::AddToView(vtkSMViewProxy* view)
     return false;
     }
   this->ChartViewProxy = chartView;
-  vtkChartXY* chart = this->ChartViewProxy->GetChartXY();
 
-  if (this->Visibility && chart)
-    {
-//    this->ChartViewProxy->GetChartView()->AddRepresentation(
-//      this->VTKRepresentation);
-    }
   return true;
 }
 
@@ -110,10 +104,9 @@ bool vtkSMXYChartRepresentationProxy::RemoveFromView(vtkSMViewProxy* view)
     return false;
     }
 
-  if (this->Visibility && this->ChartViewProxy)
+  if (this->Visibility && this->GetChart())
     {
-//    this->ChartViewProxy->GetChartView()->RemoveRepresentation(
-//      this->VTKRepresentation);
+      this->GetChart()->ClearPlots();
     }
   this->ChartViewProxy = 0;
   return this->Superclass::RemoveFromView(view);
@@ -192,4 +185,18 @@ void vtkSMXYChartRepresentationProxy::SetUseIndexForXAxis(bool useIndex)
 {
   this->OptionsProxy->SetUseIndexForXAxis(useIndex);
   this->Modified();
+}
+
+//----------------------------------------------------------------------------
+void vtkSMXYChartRepresentationProxy::SetChartType(const char *type)
+{
+  // Match the string to the vtkChart enum, if no match then stick with default.
+  if (strcmp(type, "Line") == 0)
+    {
+    this->OptionsProxy->SetChartType(vtkChart::LINE);
+    }
+  else if (strcmp(type, "Bar") == 0)
+    {
+    this->OptionsProxy->SetChartType(vtkChart::BAR);
+    }
 }

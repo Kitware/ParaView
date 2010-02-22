@@ -18,10 +18,11 @@
 #include "vtkContextView.h"
 #include "vtkContextScene.h"
 #include "vtkChartXY.h"
-#include "QVTKWidget.h"
+
+#include "vtkstd/string"
 
 vtkStandardNewMacro(vtkSMXYChartViewProxy);
-vtkCxxRevisionMacro(vtkSMXYChartViewProxy, "1.1");
+vtkCxxRevisionMacro(vtkSMXYChartViewProxy, "1.2");
 //----------------------------------------------------------------------------
 vtkSMXYChartViewProxy::vtkSMXYChartViewProxy()
 {
@@ -46,6 +47,12 @@ vtkContextView* vtkSMXYChartViewProxy::NewChartView()
   this->ChartView->GetScene()->AddItem(this->Chart);
 
   return this->ChartView;
+}
+
+//----------------------------------------------------------------------------
+void vtkSMXYChartViewProxy::SetChartType(const char *)
+{
+  // Does this proxy need to remember what type it is?
 }
 
 //----------------------------------------------------------------------------

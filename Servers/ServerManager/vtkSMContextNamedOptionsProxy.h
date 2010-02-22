@@ -50,6 +50,11 @@ public:
   // Set whether the index should be used for the x axis.
   void SetUseIndexForXAxis(bool useIndex);
 
+  // Description:
+  // Set the type of plots that should be added to charts by this proxy.
+  // Uses the enum from vtkChart.
+  void SetChartType(int type);
+
 //BTX
   // Description:
   // Sets the internal chart object whose options will be manipulated.

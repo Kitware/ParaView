@@ -86,6 +86,10 @@ public:
   // Set whether the index should be used for the x axis.
   void SetUseIndexForXAxis(bool useIndex);
 
+  // Description:
+  // Set the chart type, defaults to line chart
+  void SetChartType(const char *type);
+
 //BTX
 protected:
   vtkSMXYChartRepresentationProxy();

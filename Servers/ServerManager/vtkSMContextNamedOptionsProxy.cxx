@@ -37,6 +37,7 @@ public:
   vtkstd::map<vtkstd::string, vtkWeakPointer<vtkPlot> > PlotMap;
   vtkstd::string XSeriesName;
   bool UseIndexForXAxis;
+  int ChartType;
 
   vtkWeakPointer<vtkChart> Chart;
   vtkWeakPointer<vtkTable> Table;
@@ -54,12 +55,13 @@ public:
 };
 
 vtkStandardNewMacro(vtkSMContextNamedOptionsProxy);
-vtkCxxRevisionMacro(vtkSMContextNamedOptionsProxy, "1.12");
+vtkCxxRevisionMacro(vtkSMContextNamedOptionsProxy, "1.13");
 //----------------------------------------------------------------------------
 vtkSMContextNamedOptionsProxy::vtkSMContextNamedOptionsProxy()
 {
   this->Internals = new vtkInternals();
   this->Internals->UseIndexForXAxis = true;
+  this->Internals->ChartType = vtkChart::LINE;
 }
 
 //----------------------------------------------------------------------------
@@ -67,6 +69,13 @@ vtkSMContextNamedOptionsProxy::~vtkSMContextNamedOptionsProxy()
 {
   delete this->Internals;
   this->Internals = 0;
+}
+
+//----------------------------------------------------------------------------
+void vtkSMContextNamedOptionsProxy::SetChartType(int type)
+{
+  this->Internals->ChartType = type;
+  this->Modified();
 }
 
 //----------------------------------------------------------------------------
@@ -326,13 +335,8 @@ void vtkSMContextNamedOptionsProxy::SetVisibility(const char* name, int visible)
     // Only create a new plot if the request is to make the plot visible
     if (visible && this->Internals->Chart)
       {
-      vtkPlot *plot = this->Internals->Chart->AddPlot(vtkChart::LINE);
-      if (this->Internals->XSeriesName.length() == 0)
-        {
-        plot->SetUseIndexForXSeries(this->Internals->UseIndexForXAxis);
-        plot->SetInput(this->Internals->Table, name, name);
-        }
-      else
+      vtkPlot *plot = this->Internals->Chart->AddPlot(this->Internals->ChartType);
+      if (plot)
         {
         plot->SetUseIndexForXSeries(this->Internals->UseIndexForXAxis);
         plot->SetInput(this->Internals->Table,

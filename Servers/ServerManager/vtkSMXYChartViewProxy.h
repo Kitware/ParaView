@@ -33,6 +33,10 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
+  // Set the chart type, defaults to line chart
+  void SetChartType(const char *type);
+
+  // Description:
   // Provides access to the bar chart view.
 //BTX
   vtkChartXY* GetChartXY();
