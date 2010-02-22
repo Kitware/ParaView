@@ -119,6 +119,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqWriterFactory.h
   pqXMLEventObserver.h
   pqXMLEventSource.h
+  pqXYBarChartView.h
   pqXYChartView.h
   ${PYTHON_MOC_SRCS}
   )
@@ -374,6 +375,8 @@ ADD_LIBRARY(pqCore
   pqXMLEventSource.h
   pqXMLUtil.cxx
   pqXMLUtil.h
+  pqXYBarChartView.cxx
+  pqXYBarChartView.h
   pqXYChartView.cxx
   pqXYChartView.h
 

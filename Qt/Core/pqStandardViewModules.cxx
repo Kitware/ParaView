@@ -46,6 +46,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqTwoDRenderView.h"
 #include "pqScatterPlotView.h"
 #include "pqXYChartView.h"
+#include "pqXYBarChartView.h"
 #include "vtkSMChartViewProxy.h"
 #include "vtkSMContextViewProxy.h"
 #include "vtkSMXYChartViewProxy.h"
@@ -77,7 +78,8 @@ QStringList pqStandardViewModules::viewTypes() const
     pqComparativeLineChartView::comparativeLineChartViewType() <<
     pqSpreadSheetView::spreadsheetViewType() <<
     pqScatterPlotView::scatterPlotViewType() <<
-    pqXYChartView::XYChartViewType();
+    pqXYChartView::XYChartViewType() <<
+    pqXYBarChartView::XYBarChartViewType();
 }
 
 QStringList pqStandardViewModules::displayTypes() const
@@ -133,6 +135,10 @@ QString pqStandardViewModules::viewTypeName(const QString& type) const
   else if (type == pqXYChartView::XYChartViewType())
     {
     return pqXYChartView::XYChartViewTypeName();
+    }
+  else if (type == pqXYBarChartView::XYBarChartViewType())
+    {
+    return pqXYBarChartView::XYBarChartViewTypeName();
     }
 
   return QString();
@@ -192,6 +198,10 @@ vtkSMProxy* pqStandardViewModules::createViewProxy(const QString& viewtype,
     {
     root_xmlname = "XYChartView";
     }
+  else if (viewtype == pqXYBarChartView::XYBarChartViewType())
+    {
+    root_xmlname = "XYBarChartView";
+    }
 
   if (root_xmlname)
     {
@@ -209,11 +219,11 @@ vtkSMProxy* pqStandardViewModules::createViewProxy(const QString& viewtype,
 
 
 pqView* pqStandardViewModules::createView(const QString& viewtype,
-                                                const QString& group,
-                                                const QString& viewname,
-                                                vtkSMViewProxy* viewmodule,
-                                                pqServer* server,
-                                                QObject* p)
+                                          const QString& group,
+                                          const QString& viewname,
+                                          vtkSMViewProxy* viewmodule,
+                                          pqServer* server,
+                                          QObject* p)
 {
   if(viewtype == pqBarChartView::barChartViewType() &&
     viewmodule->IsA("vtkSMChartViewProxy"))
@@ -277,6 +287,12 @@ pqView* pqStandardViewModules::createView(const QString& viewtype,
                             vtkSMXYChartViewProxy::SafeDownCast(viewmodule),
                             server, p);
     }
+  else if (viewmodule->IsA("vtkSMXYBarChartViewProxy"))
+    {
+    return new pqXYBarChartView(group, viewname,
+                                vtkSMXYChartViewProxy::SafeDownCast(viewmodule),
+                                server, p);
+    }
 
   qDebug() << "Failed to create a proxy" << viewmodule->GetClassName();
   return NULL;
@@ -302,5 +318,3 @@ pqDataRepresentation* pqStandardViewModules::createDisplay(const QString& displa
 
   return NULL;
 }
-
-

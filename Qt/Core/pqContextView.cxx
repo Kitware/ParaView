@@ -157,14 +157,6 @@ vtkImageData* pqContextView::captureImage(int magnification)
 }
 
 //-----------------------------------------------------------------------------
-/// Capture the view image of the given size and returns it. The caller is
-/// responsible for freeing the returned image.
-//vtkImageData* pqContextView::captureImage(const QSize& )
-//{
-//  return NULL;
-//}
-
-//-----------------------------------------------------------------------------
 /// Called to undo interaction.
 void pqContextView::undo()
 {
@@ -194,6 +186,7 @@ bool pqContextView::canRedo() const
 /// Resets the zoom level to 100%.
 void pqContextView::resetDisplay()
 {
+
 }
 
 //-----------------------------------------------------------------------------

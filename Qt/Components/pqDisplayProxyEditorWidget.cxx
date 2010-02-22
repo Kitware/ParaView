@@ -81,6 +81,7 @@ public:
 
     if (type == "XYPlotRepresentation" ||
        type == "XYChartRepresentation" ||
+       type == "XYBarChartRepresentation" ||
        type == "BarChartRepresentation" ||
        type == "SpreadSheetRepresentation" ||
        qobject_cast<pqTextRepresentation*>(proxy)||
@@ -107,6 +108,10 @@ public:
       return new pqLineChartDisplayPanel(proxy, p);
       }
     if (type == QString("XYChartRepresentation"))
+      {
+      return new pqXYChartDisplayPanel(proxy, p);
+      }
+    if (type == QString("XYBarChartRepresentation"))
       {
       return new pqXYChartDisplayPanel(proxy, p);
       }
