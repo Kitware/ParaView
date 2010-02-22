@@ -45,6 +45,8 @@ class pqAnimationKeyFrame;
 class QTWIDGETS_EXPORT pqAnimationTrack : public QObject, public QGraphicsItem
 {
   Q_OBJECT
+  /// Declare the interfaces implemented
+  Q_INTERFACES(QGraphicsItem)
   /// the property animated in this track
   Q_PROPERTY(QVariant property READ property WRITE setProperty)
 public:
