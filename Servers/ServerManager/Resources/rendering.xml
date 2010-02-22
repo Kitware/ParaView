@@ -4528,8 +4528,35 @@
       <Documentation>
         This is the proxy for XY plot view.
       </Documentation>
+
+      <StringVectorProperty
+        name="ChartType"
+        command="SetChartType"
+        update_self="1"
+        number_of_elements="1"
+        default_values="Line" >
+      </StringVectorProperty>
+
     </XYChartViewProxy>
-    
+
+    <XYChartViewProxy name="XYBarChartView"
+      base_proxygroup="views"
+      base_proxyname="ViewBase"
+      representation_name="XYBarChartRepresentation">
+      <Documentation>
+        This is the proxy for bar chart view.
+      </Documentation>
+
+      <StringVectorProperty
+        name="ChartType"
+        command="SetChartType"
+        update_self="1"
+        number_of_elements="1"
+        default_values="Bar" >
+      </StringVectorProperty>
+
+    </XYChartViewProxy>
+
     <LineChartViewProxy name="XYPlotView" 
       base_proxygroup="views" 
       base_proxyname="ViewBase"
@@ -8303,9 +8330,8 @@
     </ChartRepresentationProxy>
 
     <!-- New representation for ContextView based charts. -->
-    <XYChartRepresentationProxy name="XYChartRepresentation"
+    <XYChartRepresentationProxy name="XYChartRepresentationBase"
       base_proxygroup="representations" >
-      <!-- base_proxyname="ChartRepresentationBase" -->
       <Documentation>
         Representation used by XYChartView.
       </Documentation>
@@ -8319,7 +8345,7 @@
           <DataType value="vtkDataObject"/>
         </DataTypeDomain>
       </InputProperty>
-      
+
       <IntVectorProperty name="Visibility"
         command="SetVisibility"
         update_self="1"
@@ -8418,6 +8444,40 @@
       </SubProxy>
 
       <!-- End of XYPlotRepresentation -->
+    </XYChartRepresentationProxy>
+
+    !-- New representation for ContextView based charts. -->
+    <XYChartRepresentationProxy name="XYChartRepresentation"
+      base_proxygroup="representations"
+      base_proxyname="XYChartRepresentationBase" >
+      <Documentation>
+        Representation used by XYChartView.
+      </Documentation>
+
+      <StringVectorProperty
+        name="ChartType"
+        command="SetChartType"
+        update_self="1"
+        number_of_elements="1"
+        default_values="Line" >
+      </StringVectorProperty>
+    </XYChartRepresentationProxy>
+
+    <!-- New representation for ContextView based charts. -->
+    <XYChartRepresentationProxy name="XYBarChartRepresentation"
+      base_proxygroup="representations"
+      base_proxyname="XYChartRepresentationBase" >
+      <Documentation>
+        Representation used by XYBarChartView.
+      </Documentation>
+
+      <StringVectorProperty
+        name="ChartType"
+        command="SetChartType"
+        update_self="1"
+        number_of_elements="1"
+        default_values="Bar" >
+      </StringVectorProperty>
     </XYChartRepresentationProxy>
 
 #endif
