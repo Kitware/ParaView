@@ -21,6 +21,7 @@
 #include "vtkColorSeries.h"
 #include "vtkVector.h"
 #include "vtkPlot.h"
+#include "vtkPlotLine.h"
 #include "vtkAxis.h"
 #include "vtkPen.h"
 #include "vtkTable.h"
@@ -55,7 +56,7 @@ public:
 };
 
 vtkStandardNewMacro(vtkSMContextNamedOptionsProxy);
-vtkCxxRevisionMacro(vtkSMContextNamedOptionsProxy, "1.14");
+vtkCxxRevisionMacro(vtkSMContextNamedOptionsProxy, "1.15");
 //----------------------------------------------------------------------------
 vtkSMContextNamedOptionsProxy::vtkSMContextNamedOptionsProxy()
 {
@@ -420,8 +421,17 @@ void vtkSMContextNamedOptionsProxy::SetAxisCorner(const char*, int)
 }
 
 //----------------------------------------------------------------------------
-void vtkSMContextNamedOptionsProxy::SetMarkerStyle(const char*, int)
+void vtkSMContextNamedOptionsProxy::SetMarkerStyle(const char* name, int style)
 {
+  // Must downcast to set the marker style...
+  if (this->Internals->PlotMap[name])
+    {
+    vtkPlotLine *line = vtkPlotLine::SafeDownCast(this->Internals->PlotMap[name]);
+    if (line)
+      {
+      line->SetMarkerStyle(style);
+      }
+    }
 }
 
 //----------------------------------------------------------------------------

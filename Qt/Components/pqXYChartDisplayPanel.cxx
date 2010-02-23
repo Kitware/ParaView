@@ -376,9 +376,20 @@ void pqXYChartDisplayPanel::setCurrentSeriesStyle(int style)
 }
 
 //-----------------------------------------------------------------------------
-void pqXYChartDisplayPanel::setCurrentSeriesMarkerStyle(int)
+void pqXYChartDisplayPanel::setCurrentSeriesMarkerStyle(int style)
 {
-
+  QItemSelectionModel *model = this->Internal->SeriesList->selectionModel();
+  if (model)
+    {
+    this->Internal->InChange = true;
+    QModelIndexList indexes = model->selectedIndexes();
+    QModelIndexList::Iterator iter = indexes.begin();
+    for( ; iter != indexes.end(); ++iter)
+      {
+      this->Internal->SettingsModel->setSeriesMarkerStyle(iter->row(), style);
+      }
+    this->Internal->InChange = false;
+    }
 }
 
 //-----------------------------------------------------------------------------

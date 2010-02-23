@@ -8357,18 +8357,6 @@
         </Documentation>
       </IntVectorProperty>
 
-      <StringVectorProperty name="MarkerStyle"
-        command="SetMarkerStyle"
-        update_self="1"
-        number_of_elements_per_command="2"
-        element_types="2 0"
-        repeat_command="1"
-        information_property="MarkerStyleInfo">
-        <Documentation>
-          Set the series marker style.
-        </Documentation>
-      </StringVectorProperty>
-
       <SubProxy>
         <Proxy name="PreProcessor"
           proxygroup="extended_filters"
