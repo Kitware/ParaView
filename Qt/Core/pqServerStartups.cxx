@@ -391,7 +391,7 @@ void pqServerStartups::load(const QString& path, bool userPrefs)
       {
       QString warn("Failed to parse ");
       warn += path;
-      qWarning(warn.toAscii().data());
+      qWarning() << warn;
       }
     }
 }

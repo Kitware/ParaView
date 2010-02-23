@@ -12,7 +12,6 @@
 
 #include "pqApplicationCore.h"
 #include "pqCoreTestUtility.h"
-#include "pqMain.h"
 #include "pqObjectBuilder.h"
 #include "pqOptions.h"
 #include "pqPipelineSource.h"
@@ -65,10 +64,11 @@ void MainWindow::processTest()
   if (pqOptions* const options = pqApplicationCore::instance()->getOptions())
     {
     bool comparison_succeeded = true;
-    if (options->GetBaselineImage())
+    if ( (options->GetNumberOfTestScripts() > 0) &&
+      (options->GetTestBaseline(0) != NULL))
       {
-      comparison_succeeded = this->compareView(options->GetBaselineImage(),
-        options->GetImageThreshold(), cout, options->GetTestDirectory());
+      comparison_succeeded = this->compareView(options->GetTestBaseline(0),
+        options->GetTestImageThreshold(0), cout, options->GetTestDirectory());
       }
     if (options->GetExitAppWhenTestsDone())
       {

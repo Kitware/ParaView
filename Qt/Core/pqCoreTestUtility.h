@@ -54,13 +54,6 @@ public:
   pqCoreTestUtility(QObject* parent = 0);
   ~pqCoreTestUtility();
 
-  virtual bool playTests(const QStringList& filenames)
-    {
-    bool ret = this->Superclass::playTests(filenames);
-    this->testFinished(ret);
-    return ret;
-    }
-
 public:
   /// Returns the absolute path to the PARAVIEW_DATA_ROOT in canonical form
   /// (slashes forward), or empty string
@@ -89,9 +82,6 @@ public:
                            double Threshold, 
                            ostream& Output, 
                            const QString& TempDirectory);
-
-private:
-  void testFinished(bool success);
 
 private:
   QStringList TestFilenames;

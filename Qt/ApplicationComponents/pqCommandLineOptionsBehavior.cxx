@@ -139,7 +139,7 @@ void pqCommandLineOptionsBehavior::playTests()
 
     // Play the test script if specified.
     pqTestUtility* testUtility = pqApplicationCore::instance()->testUtility();
-    options->SetImageThreshold(options->GetTestImageThreshold(cc));
+    options->SetCurrentImageThreshold(options->GetTestImageThreshold(cc));
     cout << "Playing: " << options->GetTestScript(cc).toAscii().data() << endl;
     success = testUtility->playTests(options->GetTestScript(cc));
 

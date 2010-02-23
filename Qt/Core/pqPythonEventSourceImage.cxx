@@ -191,7 +191,7 @@ void pqPythonEventSourceImage::doComparison()
 
   pqOptions* const options = pqOptions::SafeDownCast(
     vtkProcessModule::GetProcessModule()->GetOptions());
-  int threshold = options->GetImageThreshold();
+  int threshold = options->GetCurrentImageThreshold();
   QString testdir = options->GetTestDirectory();
   if(testdir == QString::null)
     {

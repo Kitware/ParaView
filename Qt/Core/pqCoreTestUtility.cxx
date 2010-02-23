@@ -61,7 +61,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqFlatTreeViewEventPlayer.h"
 #include "pqFlatTreeViewEventTranslator.h"
 #include "pqOptions.h"
-#include "pqProcessModuleGUIHelper.h"
 #include "pqQVTKWidgetEventPlayer.h"
 #include "pqQVTKWidgetEventTranslator.h"
 
@@ -226,37 +225,4 @@ QString pqCoreTestUtility::TestDirectory()
   return QString();
 }
 
-
-void pqCoreTestUtility::testFinished(bool success)
-{
-
-  // OBSOLETE: This is obsolete code only here till old paraview and application
-  // are fixed.
-  if(pqOptions* const options = pqOptions::SafeDownCast(
-    vtkProcessModule::GetProcessModule()->GetOptions()))
-    {
-    // TODO: image comparisons probably ought to be done the same
-    //       way widget validation is done (when that gets implemented)
-    //       That is, check that the text of a QLineEdit is a certain value
-    //       Referencing a QVTKWidget can then be done the same way as referencing
-    //       any other widget, instead of relying on the "active" view.
-    pqProcessModuleGUIHelper * helper = pqProcessModuleGUIHelper::SafeDownCast(
-      vtkProcessModule::GetProcessModule()->GetGUIHelper());
-    if (helper)
-      {
-      if (success)
-        {
-        if(options->GetBaselineImage())
-          {
-          success = helper->compareView(options->GetBaselineImage(),
-            options->GetImageThreshold(), cout, options->GetTestDirectory());
-          }
-        }
-      if(options->GetExitAppWhenTestsDone())
-        {
-        QApplication::instance()->exit(success? 0 : 1);
-        }
-      }
-    }
-}
 

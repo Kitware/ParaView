@@ -110,7 +110,6 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqExtractCTHPartsPanel.h
   pqFileChooserWidget.h
   pqFilterInputDialog.h
-  pqFiltersMenuManager.h
   pqFieldSelectionAdaptor.h
   pqGlobalRenderViewOptions.h
   pqGlyphPanel.h
@@ -149,7 +148,6 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqPluginDialog.h
   pqPointSourceWidget.h
   pqProxyInformationWidget.h
-  pqProxyMenuManager.h
   pqProxyPanel.h
   pqProxySelectionWidget.h
   pqProxyTabWidget.h
@@ -184,7 +182,6 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqSelectionInputWidget.h
   pqSimpleServerStartup.h
   pqSourceComboBox.h
-  pqSourcesMenuManager.h
   pqSphereWidget.h
   pqSplineWidget.h
   pqSpreadSheetDisplayEditor.h
@@ -481,8 +478,6 @@ ADD_LIBRARY(pqComponents
   pqFileChooserWidget.h
   pqFilterInputDialog.cxx
   pqFilterInputDialog.h
-  pqFiltersMenuManager.cxx
-  pqFiltersMenuManager.h
   pqFieldSelectionAdaptor.cxx
   pqFieldSelectionAdaptor.h
   pqGlobalRenderViewOptions.cxx
@@ -565,8 +560,6 @@ ADD_LIBRARY(pqComponents
   pqPointSourceWidget.h
   pqProxyInformationWidget.cxx
   pqProxyInformationWidget.h
-  pqProxyMenuManager.cxx
-  pqProxyMenuManager.h
   pqProxyPanel.cxx
   pqProxyPanel.h
   pqProxySelectionWidget.cxx
@@ -635,8 +628,6 @@ ADD_LIBRARY(pqComponents
   pqSimpleServerStartup.h
   pqSourceComboBox.cxx
   pqSourceComboBox.h
-  pqSourcesMenuManager.cxx
-  pqSourcesMenuManager.h
   pqSphereWidget.cxx
   pqSphereWidget.h
   pqSplineWidget.cxx

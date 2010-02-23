@@ -17,7 +17,6 @@
 #include "vtkObjectFactory.h"
 #include "vtkSmartPointer.h"
 
-#include "pqMain.h"
 #include "pqServer.h"
 #include "pqFileDialog.h"
 #include "pqApplicationCore.h"
@@ -230,7 +229,7 @@ int main(int argc, char** argv)
 
   QMetaObject::invokeMethod(mainWidget.Tester(), "playTheTests",
     Qt::QueuedConnection,
-    Q_ARG(QStringList, options->GetTestFiles()));
+    Q_ARG(QStringList, options->GetTestScripts()));
   return app.exec();
 }
 

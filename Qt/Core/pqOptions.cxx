@@ -37,7 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkstd/string>
 
 vtkStandardNewMacro(pqOptions);
-vtkCxxRevisionMacro(pqOptions, "1.9");
+vtkCxxRevisionMacro(pqOptions, "1.10");
 
 static int AddTestScript(const char*, const char* value, void* call_data)
 {
@@ -72,26 +72,20 @@ static int AddTestImageThreshold(const char*, const char* value, void* call_data
 //-----------------------------------------------------------------------------
 pqOptions::pqOptions()
 {
-  this->BaselineImage = 0;
   this->TestDirectory = 0;
   this->DataDirectory = 0;
-  this->ImageThreshold = 12;
   this->ExitAppWhenTestsDone = 0;
   this->DisableRegistry = 0;
-  this->TestFileName = 0;
-  this->TestInitFileName = 0;
   this->ServerResourceName = 0;
   this->DisableLightKit = 0;
+  this->CurrentImageThreshold = 12;
 }
 
 //-----------------------------------------------------------------------------
 pqOptions::~pqOptions()
 {
-  this->SetBaselineImage(0);
   this->SetTestDirectory(0);
   this->SetDataDirectory(0);
-  this->SetTestFileName(0);
-  this->SetTestInitFileName(0);
   this->SetServerResourceName(0);
 }
 
@@ -99,10 +93,6 @@ pqOptions::~pqOptions()
 void pqOptions::Initialize()
 {
   this->Superclass::Initialize();
-  
-  this->AddArgument("--compare-view", NULL, 
-    &this->BaselineImage,
-    "Compare the viewport to a reference image, and exit.");
   
   this->AddArgument("--test-directory", NULL,
     &this->TestDirectory,
@@ -112,15 +102,6 @@ void pqOptions::Initialize()
     &this->DataDirectory,
     "Set the data directory where test-case data are.");
  
-  this->AddArgument("--run-test", NULL,
-    &this->TestFileName,  "Run a recorded test case.");
-
-  this->AddArgument("--run-test-init", NULL,
-    &this->TestInitFileName,  "Run a recorded test initialization case.");
-  
-  this->AddArgument("--image-threshold", NULL, &this->ImageThreshold,
-    "Set the threshold beyond which viewport-image comparisons fail.");
-
   this->AddBooleanArgument("--exit", NULL, &this->ExitAppWhenTestsDone,
     "Exit application when testing is done. Use for testing.");
 
@@ -150,35 +131,25 @@ void pqOptions::Initialize()
 }
 
 //-----------------------------------------------------------------------------
+QStringList pqOptions::GetTestScripts()
+{
+  QStringList list;
+  for (int cc=0; cc < this->GetNumberOfTestScripts(); cc++)
+    {
+    list << this->GetTestScript(cc);
+    }
+  return list;
+}
+
+//-----------------------------------------------------------------------------
 int pqOptions::PostProcess(int argc, const char * const *argv)
 {
-  this->TestFiles.clear();
-  if (this->TestInitFileName)
-    {
-    this->TestFiles << QString(this->TestInitFileName);
-    }
-  if (this->TestFileName)
-    {
-    this->TestFiles << QString(this->TestFileName);
-    }
   return this->Superclass::PostProcess(argc, argv);
 }
 
 //-----------------------------------------------------------------------------
 int pqOptions::WrongArgument(const char* arg)
 {
-  vtkstd::string argument = arg;
-  int index = argument.find('=');
-  if ( index != -1)
-    {
-    vtkstd::string key = argument.substr(0, index);
-    vtkstd::string value = argument.substr(index+1);
-    if (key == "--run-test")
-      {
-      this->TestFiles.push_back(value.c_str());
-      return 1;
-      }
-    }
   return this->Superclass::WrongArgument(arg);
 }
 
@@ -217,10 +188,6 @@ void pqOptions::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 
-  os << indent << "ImageThreshold: " << this->ImageThreshold
-    << endl;
-  os << indent << "BaselineImage: " << (this->BaselineImage?
-    this->BaselineImage : "(none)") << endl;
   os << indent << "TestDirectory: " << (this->TestDirectory?
     this->TestDirectory : "(none)") << endl;
   os << indent << "DataDirectory: " << (this->DataDirectory?

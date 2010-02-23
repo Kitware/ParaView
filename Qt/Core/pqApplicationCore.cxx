@@ -106,25 +106,6 @@ pqApplicationCore* pqApplicationCore::instance()
 }
 
 //-----------------------------------------------------------------------------
-// deprecated constructor.
-pqApplicationCore::pqApplicationCore(QObject* parentObject)
-  : QObject(parentObject)
-{
-  this->createOutputWindow();
-  this->constructor();
-  this->FinalizeOnExit = false;
-
-  // Register ParaView interfaces.
-  pqPluginManager* pgm = this->getPluginManager();
-
-  // * adds support for standard paraview views.
-  pgm->addInterface(new pqStandardViewModules(pgm));
-  
-  this->Options = pqOptions::SafeDownCast(
-    vtkProcessModule::GetProcessModule()->GetOptions());
-}
-
-//-----------------------------------------------------------------------------
 pqApplicationCore::pqApplicationCore(int& argc, char** argv, pqOptions* options,
   QObject* parentObject)
   : QObject(parentObject)

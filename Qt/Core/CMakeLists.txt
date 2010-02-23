@@ -73,7 +73,6 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqOutputWindow.h
   pqOutputWindowAdapter.h
   pqOutputPort.h
-  pqPendingDisplayManager.h
   pqPickHelper.h
   pqPipelineSource.h
   pqPipelineFilter.h
@@ -251,8 +250,6 @@ ADD_LIBRARY(pqCore
   pqLinkViewWidget.h
   pqLookupTableManager.cxx
   pqLookupTableManager.h
-  pqMain.cxx
-  pqMain.h
   pqManualServerStartup.cxx
   pqManualServerStartup.h
   pqNameCount.cxx
@@ -267,10 +264,6 @@ ADD_LIBRARY(pqCore
   pqOutputWindowAdapter.h
   pqOutputPort.cxx
   pqOutputPort.h
-  pqPendingDisplayManager.cxx
-  pqPendingDisplayManager.h
-  pqPendingDisplayUndoElement.cxx
-  pqPendingDisplayUndoElement.h
   pqPickHelper.cxx
   pqPickHelper.h
   pqPipelineFilter.cxx
@@ -283,8 +276,6 @@ ADD_LIBRARY(pqCore
   pqPlotSettingsModel.h
   pqPluginManager.cxx
   pqPluginManager.h
-  pqProcessModuleGUIHelper.cxx
-  pqProcessModuleGUIHelper.h
   pqProgressManager.cxx
   pqProgressManager.h
   pqPropertyLinks.cxx

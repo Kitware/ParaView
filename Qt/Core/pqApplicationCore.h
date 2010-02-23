@@ -33,7 +33,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __pqApplicationCore_h
 
 #include "pqCoreExport.h"
-#include "vtkSetGet.h" // for VTK_LEGACY macro
 #include <QObject>
 #include <QPointer>
 
@@ -78,13 +77,6 @@ class PQCORE_EXPORT pqApplicationCore : public QObject
 public:
   // Get the global instace for the pqApplicationCore.
   static pqApplicationCore* instance();
-
-  /// DEPRECATED CONSTRUCTOR. This expects the old-style
-  /// pqProcessModuleGUIHelper shebang. Only here till all application switch to
-  /// new style.
-  /// @deprecated Use pqApplicationCore(int, char**, pqOptions*, QObject*)
-  /// instead which uses the new style application initialization process.
-  VTK_LEGACY(pqApplicationCore(QObject* parentObject=NULL));
 
   /// Preferred constructor. Initializes the server-manager engine and sets up
   /// the core functionality. If application supports special command line

@@ -52,23 +52,11 @@ public:
   vtkGetStringMacro(TestDirectory);
   vtkGetStringMacro(DataDirectory);
 
-  /// DEPRECATED.
-  /// @deprecated Use GetTestScript(int)/GetTestBaseline(int)/
-  /// GetTestImageThreshold(int) instead which allows for providing
-  /// multiples tests/baselines/thresholds on  the command line.
-  VTK_LEGACY(vtkGetStringMacro(BaselineImage));
-  VTK_LEGACY(vtkGetMacro(ImageThreshold, int));
-  VTK_LEGACY(vtkSetMacro(ImageThreshold, int));
-
   vtkGetMacro(ExitAppWhenTestsDone, int);
   vtkGetMacro(DisableRegistry, int);
  
-  /// DEPRECATED.
-  /// @deprecated Use GetTestScript(int)/GetTestBaseline(int)/
-  /// GetTestImageThreshold(int) instead which allows for providing
-  /// multiples tests/baselines/thresholds on  the command line.
-  const QStringList& GetTestFiles() 
-    { return this->TestFiles; }
+  // Returns the test scripts as a list.
+  QStringList GetTestScripts();
 
   /// Returns the server resource name specified
   /// to load.
@@ -76,9 +64,6 @@ public:
 
   vtkSetStringMacro(TestDirectory);
   vtkSetStringMacro(DataDirectory);
-  vtkSetStringMacro(BaselineImage);
-  vtkSetStringMacro(TestFileName);
-  vtkSetStringMacro(TestInitFileName);
   vtkSetStringMacro(ServerResourceName);
 
   int GetNumberOfTestScripts()
@@ -89,6 +74,12 @@ public:
     { return this->TestScripts[cc].TestBaseline; }
   int GetTestImageThreshold(int cc)
     { return this->TestScripts[cc].ImageThreshold; }
+
+  /// HACK: When playing back tests, this variable is set to make it easier to locate
+  /// the test image threshold for the current test. This is updated by the
+  /// test playback code.
+  vtkSetMacro(CurrentImageThreshold, int);
+  vtkGetMacro(CurrentImageThreshold, int);
 
   // Description
   // Get/Set whether lightkit is disabled by default. This is useful for
@@ -110,14 +101,11 @@ protected:
 
   char* TestDirectory;
   char* DataDirectory;
-  char* BaselineImage;
-  char* TestFileName;
-  char* TestInitFileName;
   char* ServerResourceName;
-  int ImageThreshold;
   int ExitAppWhenTestsDone;
   int DisableRegistry;
   int DisableLightKit;
+  int CurrentImageThreshold;
 
   struct TestInfo
     {
@@ -129,9 +117,6 @@ protected:
 
   QList<TestInfo> TestScripts;
 
-  QStringList TestFiles;
-    
- 
   // Description:
   // This method is called when wrong argument is found. If it returns 0, then
   // the parsing will fail.

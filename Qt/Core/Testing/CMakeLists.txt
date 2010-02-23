@@ -30,7 +30,7 @@ IF(QT_TESTING_WITH_PYTHON)
   TARGET_LINK_LIBRARIES(pqFileDialogTest pqCore QtTesting ${QT_LIBRARIES} )
   ADD_TEST(pqFileDialogTest "${EXECUTABLE_OUTPUT_PATH}/pqFileDialogTest" -dr
            "--test-directory=${PARAVIEW_TEST_DIR}"
-           "--run-test=${CMAKE_CURRENT_SOURCE_DIR}/pqFileDialogTest.py"
+           "--test-script=${CMAKE_CURRENT_SOURCE_DIR}/pqFileDialogTest.py"
            --exit)
 
 
