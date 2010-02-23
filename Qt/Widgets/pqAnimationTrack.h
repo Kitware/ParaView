@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -46,14 +46,16 @@ class QTWIDGETS_EXPORT pqAnimationTrack : public QObject, public QGraphicsItem
 {
   Q_OBJECT
   /// Declare the interfaces implemented - fails with Qt 4.5, warns on 4.6
-  ///Q_INTERFACES(QGraphicsItem)
+#if QT_VERSION >= 0x40600
+  Q_INTERFACES(QGraphicsItem)
+#endif
   /// the property animated in this track
   Q_PROPERTY(QVariant property READ property WRITE setProperty)
 public:
 
   pqAnimationTrack(QObject* p = 0);
   ~pqAnimationTrack();
-  
+
   /// number of keyframes
   int count();
   /// get a keyframe
@@ -69,9 +71,9 @@ public:
   void setDeletable(bool d) { this->Deletable = d; }
 
   QVariant property() const;
-  
+
   QRectF boundingRect() const;
-  
+
 public slots:
   void setProperty(const QVariant& p);
 
