@@ -36,7 +36,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqObjectBuilder.h"
 #include "pqOutputPort.h"
 #include "pqPipelineFilter.h"
-#include "pqProcessModuleGUIHelper.h"
 #include "pqServer.h"
 #include "pqServerManagerSelectionModel.h"
 #include "pqUndoStack.h"
