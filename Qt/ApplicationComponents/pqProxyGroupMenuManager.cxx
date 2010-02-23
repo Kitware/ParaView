@@ -119,6 +119,42 @@ void pqProxyGroupMenuManager::addProxy(
 }
 
 //-----------------------------------------------------------------------------
+namespace
+{
+  void pqProxyGroupMenuManagerConvertLegacyXML(vtkPVXMLElement* root)
+    {
+    if (!root | !root->GetName())
+      {
+      return;
+      }
+    if (strcmp(root->GetName(), "Source") == 0)
+      {
+      root->SetName("Proxy");
+      root->AddAttribute("group", "sources");
+      }
+    else if (strcmp(root->GetName(), "Filter") == 0)
+      {
+      root->SetName("Proxy");
+      root->AddAttribute("group", "filters");
+      }
+    else if (strcmp(root->GetName(), "Reader") == 0)
+      {
+      root->SetName("Proxy");
+      root->AddAttribute("group", "sources");
+      }
+    else if (strcmp(root->GetName(), "Writer") == 0)
+      {
+      root->SetName("Proxy");
+      root->AddAttribute("group", "writers");
+      }
+    for (unsigned int cc=0; cc < root->GetNumberOfNestedElements(); cc++)
+      {
+      pqProxyGroupMenuManagerConvertLegacyXML(root->GetNestedElement(cc));
+      }
+    }
+};
+
+//-----------------------------------------------------------------------------
 void pqProxyGroupMenuManager::loadConfiguration(vtkPVXMLElement* root)
 {
   if (!root || !root->GetName())
@@ -131,6 +167,9 @@ void pqProxyGroupMenuManager::loadConfiguration(vtkPVXMLElement* root)
         this->ResourceTagName.toAscii().data()));
     return;
     }
+
+  // Convert legacy xml to new style.
+  pqProxyGroupMenuManagerConvertLegacyXML(root);
 
   // Iterate over Category elements and find items with tag name "Proxy".
   // Iterate over elements with tag "Proxy" and add them to the

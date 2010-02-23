@@ -41,6 +41,7 @@ build_paraview_client(paraview
       ${CMAKE_CURRENT_SOURCE_DIR}/ParaViewFilters.xml
       ${CMAKE_CURRENT_SOURCE_DIR}/ParaViewReaders.xml
       ${CMAKE_CURRENT_SOURCE_DIR}/ParaViewWriters.xml
+      ${PARAVIEW_EXTRA_GUI_RESOURCES} # Add any compiled in GUI configuration xmls
     COMPRESSED_HELP_FILE "${ParaView_BINARY_DIR}/Documentation/paraview.qch"
     SOURCES ${ParaView_SOURCE_FILES}
 )
