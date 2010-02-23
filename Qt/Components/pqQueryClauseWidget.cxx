@@ -213,7 +213,7 @@ void pqQueryClauseWidget::populateSelectionCriteria(
           this->Internals->criteria->addItem(
             QString("%1 (%2)").arg(arrayInfo->GetName()).arg(kk),
             THRESHOLD);
-          int item_index = (this->Internals->criteria->count()-1);
+          item_index = (this->Internals->criteria->count()-1);
           this->Internals->Arrays.insert(item_index,
             pqInternals::ArrayInfo(arrayInfo->GetName(), kk));
           }

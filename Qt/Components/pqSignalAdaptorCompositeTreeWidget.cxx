@@ -363,7 +363,7 @@ pqSignalAdaptorCompositeTreeWidget::~pqSignalAdaptorCompositeTreeWidget()
 }
 
 //-----------------------------------------------------------------------------
-void pqSignalAdaptorCompositeTreeWidget::select(unsigned int flatIndex)
+void pqSignalAdaptorCompositeTreeWidget::select(unsigned int flat_index)
 {
   QList<QTreeWidgetItem*> selItems = this->Internal->TreeWidget->selectedItems();
   foreach (QTreeWidgetItem* item, selItems)
@@ -374,7 +374,7 @@ void pqSignalAdaptorCompositeTreeWidget::select(unsigned int flatIndex)
   foreach (pqTreeWidgetItem* item, treeitems)
     {
     QVariant metadata = item->data(0, FLAT_INDEX);
-    if (metadata.isValid() && metadata.toUInt() == flatIndex)
+    if (metadata.isValid() && metadata.toUInt() == flat_index)
       {
       item->setSelected(true);
       break;
@@ -429,8 +429,8 @@ unsigned int pqSignalAdaptorCompositeTreeWidget::hierarchicalBlockIndex(
 QString pqSignalAdaptorCompositeTreeWidget::blockName(
   const QTreeWidgetItem* item) const
 {
-  QString blockName = item->data(0, BLOCK_NAME).toString();
-  return blockName;
+  QString block_name = item->data(0, BLOCK_NAME).toString();
+  return block_name;
 }
 
 //-----------------------------------------------------------------------------
@@ -785,7 +785,7 @@ void pqSignalAdaptorCompositeTreeWidget::buildTree(pqTreeWidgetItem* item,
     {
     vtkPVDataInformation* childInfo = cinfo->GetDataInformation(cc);
     QString childLabel = QString("DataSet %1").arg(cc);
-    QString blockName;
+    QString block_name;
 
     bool is_leaf = true;
     if (childInfo && childInfo->GetCompositeDataInformation()->GetDataIsComposite())
@@ -799,7 +799,7 @@ void pqSignalAdaptorCompositeTreeWidget::buildTree(pqTreeWidgetItem* item,
       if (cname[0])
         {
         childLabel = cname;
-        blockName = cname;
+        block_name = cname;
         }
       }
 
@@ -814,7 +814,7 @@ void pqSignalAdaptorCompositeTreeWidget::buildTree(pqTreeWidgetItem* item,
         QStringList(childLabel));
       child->setCallbackHandler(this->CallbackAdaptor);
       child->setData(0, ORIGINAL_LABEL, childLabel);
-      child->setData(0, BLOCK_NAME, blockName);
+      child->setData(0, BLOCK_NAME, block_name);
       child->setToolTip(0, child->text(0));
       this->buildTree(child, cinfo->GetDataInformation(cc));
       child->setData(0, AMR_LEVEL_NUMBER, this->LevelNo);
