@@ -59,7 +59,7 @@
 // The lower left triangle contains the Cholesky decomposition of the
 // covariance matrix (which is triangular, so its upper triangle is zero).
 // Because the diagonal must be stored for both matrices, an additional
-// row is required — hence the N+1 rows and the final entry of the column
+// row is required - hence the N+1 rows and the final entry of the column
 // named "Column". 
 
 #ifndef __vtkPSciVizMultiCorrelativeStats_h
