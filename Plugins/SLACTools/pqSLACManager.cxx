@@ -40,7 +40,6 @@
 #include "pqLineChartView.h"
 #include "pqObjectBuilder.h"
 #include "pqOutputPort.h"
-#include "pqPendingDisplayManager.h"
 #include "pqPipelineRepresentation.h"
 #include "pqPipelineFilter.h"
 #include "pqPipelineSource.h"
@@ -781,16 +780,6 @@ void pqSLACManager::createPlotOverZ()
   meshReader->setModifiedState(pqProxy::UNMODIFIED);
   plotFilter->setModifiedState(pqProxy::UNMODIFIED);
 
-  // This is something of a hack to make the pending display manager to
-  // realize that I have already created all necessary displays.  This should
-  // go away soon.
-  pqPendingDisplayManager* pdmanager = qobject_cast<pqPendingDisplayManager*>(
-                                      core->manager("PENDING_DISPLAY_MANAGER"));
-  if (pdmanager)
-    {
-    pdmanager->removePendingDisplayForSource(plotFilter);
-    }
-
   if (stack) stack->endUndoSet();
 }
 
@@ -876,16 +865,6 @@ void pqSLACManager::resetRangeTemporal()
   // further modifications.
   meshReader->setModifiedState(pqProxy::UNMODIFIED);
   rangeFilter->setModifiedState(pqProxy::UNMODIFIED);
-
-  // This is something of a hack to make the pending display manager to realize
-  // that I have already created all necessary displays (actually, I might not
-  // have, but I don't care).  This should go away soon.
-  pqPendingDisplayManager* pdmanager = qobject_cast<pqPendingDisplayManager*>(
-                                      core->manager("PENDING_DISPLAY_MANAGER"));
-  if (pdmanager)
-    {
-    pdmanager->removePendingDisplayForSource(rangeFilter);
-    }
 
   if (stack) stack->endUndoSet();
 }
