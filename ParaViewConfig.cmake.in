@@ -10,7 +10,6 @@ SET(PARAVIEW_VERSION_PATCH "@PARAVIEW_VERSION_PATCH@")
 # Locations for the source and binary dirs.
 # I am not sure ParaView_SOURCE_DIR should be exported since it won't be
 # available for development-install
-#SET(ParaView_SOURCE_DIR "@ParaView_SOURCE_DIR@")
 SET(ParaView_CMAKE_DIR "@ParaView_CMAKE_DIR@")
 SET(ParaView_BINARY_DIR "@ParaView_BINARY_DIR@")
 
