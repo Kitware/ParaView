@@ -39,6 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class pqTreeWidgetItem;
 class QTreeWidget;
+class QTreeWidgetItem;
 class vtkPVDataInformation;
 class vtkSMIntVectorProperty;
 class vtkSMOutputPort;
@@ -115,8 +116,25 @@ public:
   /// Select the item with the given flat index.
   void select(unsigned int flatIndex);
 
+  /// API to get information about the currently selected item.
   /// Returns the flat index for the current item.
-  unsigned int getCurrentFlatIndex(bool* valid=NULL); 
+  unsigned int getCurrentFlatIndex(bool* valid=NULL);
+
+  /// API to get information about an item.
+  /// Returns the block name for the item.
+  QString blockName(const QTreeWidgetItem* item) const;
+
+  /// API to get information about an item.
+  /// Returns the AMR level for the item if valid.
+  unsigned int hierarchicalLevel(const QTreeWidgetItem* item) const;
+
+  /// API to get information about an item.
+  /// Returns the AMR block number for the item if valid.
+  unsigned int hierarchicalBlockIndex(const QTreeWidgetItem* item) const;
+
+  /// API to get information about an item.
+  /// Returns the flat index for the item.
+  unsigned int flatIndex(const QTreeWidgetItem* item) const;
 
 public slots:
   /// Set the values.
@@ -159,10 +177,11 @@ private:
   enum MetaData
     {
     FLAT_INDEX = Qt::UserRole,
-    LEVEL_NUMBER = Qt::UserRole+1,
-    DATASET_INDEX = Qt::UserRole+2,
+    AMR_LEVEL_NUMBER = Qt::UserRole+1,
+    AMR_BLOCK_INDEX = Qt::UserRole+2,
     NODE_TYPE = Qt::UserRole+3,
-    ORIGINAL_LABEL = Qt::UserRole+4
+    ORIGINAL_LABEL = Qt::UserRole+4,
+    BLOCK_NAME = Qt::UserRole+5
     };
 
   enum NodeTypes
@@ -189,7 +208,7 @@ private:
 
   bool AutoUpdateWidgetVisibility;
 
-  bool ShowIndex;
+  bool ShowFlatIndex;
 
   bool ShowSelectedElementCounts;
 

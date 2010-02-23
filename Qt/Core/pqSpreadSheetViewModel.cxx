@@ -283,14 +283,6 @@ void pqSpreadSheetViewModel::forceUpdate()
 
     this->Internal->NumberOfRows = this->Internal->getNumberOfRows();
     this->Internal->NumberOfColumns = this->Internal->getNumberOfColumns();
-    
-    // When SelectionOnly is true, the delivered data has an extra
-    // "vtkOriginalIndices" column that needs to be hidden since it does not
-    // make any sense to the user.
-    if (this->Internal->NumberOfColumns && repr->GetSelectionOnly())
-      {
-      this->Internal->NumberOfColumns--;
-      }
     }
 
   this->Internal->SelectionModel.clear();
@@ -887,6 +879,11 @@ bool pqSpreadSheetViewModel::isDataValid( const QModelIndex &idx) const
 //-----------------------------------------------------------------------------
 void pqSpreadSheetViewModel::resetCompositeDataSetIndex()
 {
+  if (!this->getRepresentation())
+    {
+    return;
+    }
+
   vtkSMProxy* reprProxy = this->getRepresentationProxy();
   int cur_index = pqSMAdaptor::getElementProperty(
     reprProxy->GetProperty("CompositeDataSetIndex")).toInt();

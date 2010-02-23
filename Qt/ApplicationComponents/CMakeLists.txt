@@ -40,6 +40,7 @@ SET (MOC_HEADERS
   pqCrashRecoveryBehavior.h
   pqCreateCustomFilterReaction.h
   pqDataTimeStepBehavior.h
+  pqDataQueryReaction.h
   pqDefaultMainWindow.h
   pqDefaultViewBehavior.h
   pqDeleteBehavior.h
@@ -150,6 +151,8 @@ SET (SOURCE_FILES
   pqCreateCustomFilterReaction.h
   pqDataTimeStepBehavior.cxx
   pqDataTimeStepBehavior.h
+  pqDataQueryReaction.h
+  pqDataQueryReaction.cxx
   pqDefaultMainWindow.cxx
   pqDefaultMainWindow.h
   pqDefaultViewBehavior.cxx

@@ -137,6 +137,7 @@ SET(Filters_SRCS
   vtkPVTrivialProducer.cxx
   vtkPVUpdateSuppressor.cxx
   vtkPVHardwareSelector.cxx
+  vtkQuerySelectionSource.cxx
   vtkRealtimeAnimationPlayer.cxx
   vtkRectilinearGridConnectivity.cxx
   vtkReductionFilter.cxx

@@ -98,12 +98,14 @@ public:
   QVariant headerData (int section, Qt::Orientation orientation, 
     int role=Qt::DisplayRole) const; 
  
-  /// Set/Get the data representation.
+  /// Set/Get the data representation. This internally calls
+  /// setRepresentationProxy().
   void setRepresentation(pqDataRepresentation*);
   pqDataRepresentation* getRepresentation() const;
 
   /// Set/Get the representation proxy which is currently displayed in this
   /// model.
+  void setRepresentationProxy(vtkSMSpreadSheetRepresentationProxy*);
   vtkSMSpreadSheetRepresentationProxy* getRepresentationProxy() const;
 
   /// resets the model.
@@ -158,8 +160,6 @@ protected:
   /// selection, since representation can never give us the complete state of
   /// selection. 
   void updateSelectionForBlock(vtkIdType blocknumber);
-
-  void setRepresentationProxy(vtkSMSpreadSheetRepresentationProxy*);
 
   /// Given an index into the model, check to see that its row number is
   /// less than the length of the data array associated with its column

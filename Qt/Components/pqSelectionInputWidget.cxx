@@ -33,6 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkEventQtSlotConnect.h"
 #include "vtkSelection.h"
+#include "vtkSMPropertyHelper.h"
 #include "vtkSMProxyIterator.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMProxyProperty.h"
@@ -223,6 +224,13 @@ void pqSelectionInputWidget::updateLabels()
         columnValues << "\t\t" ;
         }
       }
+    }
+  else if (strcmp(xmlname, "SelectionQuerySource") == 0)
+    {
+    columnValues << "Query" << endl;
+    this->SelectionSource->UpdatePropertyInformation();
+    columnValues << vtkSMPropertyHelper(
+      this->SelectionSource, "UserFriendlyText").GetAsString();
     }
   else
     {

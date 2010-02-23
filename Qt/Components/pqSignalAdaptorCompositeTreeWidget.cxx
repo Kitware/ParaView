@@ -248,7 +248,7 @@ void pqSignalAdaptorCompositeTreeWidget::constructor(
   this->CheckMode = SINGLE_ITEM;
   this->IndexMode = INDEX_MODE_FLAT;
 
-  this->ShowIndex = false;
+  this->ShowFlatIndex = false;
   this->ShowDatasetsInMultiPiece = false;
   this->ShowSelectedElementCounts = false;
 
@@ -341,7 +341,7 @@ pqSignalAdaptorCompositeTreeWidget::pqSignalAdaptorCompositeTreeWidget(
     return;
     }
 
-  this->ShowIndex = true;
+  this->ShowFlatIndex = true;
   this->ShowDatasetsInMultiPiece = true;
   this->ShowSelectedElementCounts = showSelectedElementCounts;
   this->CheckMode = selectMultiple? MULTIPLE_ITEMS : SINGLE_ITEM;
@@ -397,9 +397,40 @@ unsigned int pqSignalAdaptorCompositeTreeWidget::getCurrentFlatIndex(bool* valid
       {
       *valid = true;
       }
-    return selItems[0]->data(0, FLAT_INDEX).toUInt();
+    return this->flatIndex(selItems[0]);
     }
   return 0;
+}
+
+//-----------------------------------------------------------------------------
+unsigned int pqSignalAdaptorCompositeTreeWidget::flatIndex(
+  const QTreeWidgetItem* item) const
+{
+  return item->data(0, FLAT_INDEX).toUInt();
+}
+
+//-----------------------------------------------------------------------------
+unsigned int pqSignalAdaptorCompositeTreeWidget::hierarchicalLevel(
+  const QTreeWidgetItem* item) const
+{
+  QVariant val = item->data(0, AMR_LEVEL_NUMBER).toUInt();
+  return val.toUInt();
+}
+
+//-----------------------------------------------------------------------------
+unsigned int pqSignalAdaptorCompositeTreeWidget::hierarchicalBlockIndex(
+  const QTreeWidgetItem* item) const
+{
+  QVariant val = item->data(0, AMR_BLOCK_INDEX).toUInt();
+  return val.toUInt();
+}
+
+//-----------------------------------------------------------------------------
+QString pqSignalAdaptorCompositeTreeWidget::blockName(
+  const QTreeWidgetItem* item) const
+{
+  QString blockName = item->data(0, BLOCK_NAME).toString();
+  return blockName;
 }
 
 //-----------------------------------------------------------------------------
@@ -438,8 +469,8 @@ QList<QVariant> pqSignalAdaptorCompositeTreeWidget::values() const
       }
     else if (this->IndexMode == INDEX_MODE_LEVEL_INDEX)
       {
-      QVariant metadata0 = item->data(0, LEVEL_NUMBER);
-      QVariant metadata1 = item->data(0, DATASET_INDEX);
+      QVariant metadata0 = item->data(0, AMR_LEVEL_NUMBER);
+      QVariant metadata1 = item->data(0, AMR_BLOCK_INDEX);
       if (metadata0.isValid() && metadata1.isValid() && item->checkState(0) == Qt::Checked)
         {
         reply.push_back(metadata0);
@@ -449,7 +480,7 @@ QList<QVariant> pqSignalAdaptorCompositeTreeWidget::values() const
       }
     else if (this->IndexMode == INDEX_MODE_LEVEL)
       {
-      QVariant metadata0 = item->data(0, LEVEL_NUMBER);
+      QVariant metadata0 = item->data(0, AMR_LEVEL_NUMBER);
       if (metadata0.isValid() && item->checkState(0) == Qt::Checked)
         {
         reply.push_back(metadata0);
@@ -493,7 +524,7 @@ void pqSignalAdaptorCompositeTreeWidget::setValues(const QList<QVariant>& new_va
     {
     foreach (pqTreeWidgetItem* item, treeitems)
       {
-      QVariant metadata = item->data(0, LEVEL_NUMBER);
+      QVariant metadata = item->data(0, AMR_LEVEL_NUMBER);
       Qt::CheckState cstate = 
         (metadata.isValid() && new_values.contains(metadata))? 
         Qt::Checked : Qt::Unchecked;
@@ -516,8 +547,8 @@ void pqSignalAdaptorCompositeTreeWidget::setValues(const QList<QVariant>& new_va
 
     foreach (pqTreeWidgetItem* item, treeitems)
       {
-      QVariant metadata0 = item->data(0, LEVEL_NUMBER);
-      QVariant metadata1 = item->data(0, DATASET_INDEX);
+      QVariant metadata0 = item->data(0, AMR_LEVEL_NUMBER);
+      QVariant metadata1 = item->data(0, AMR_BLOCK_INDEX);
       Qt::CheckState cstate = (metadata0.isValid() && metadata1.isValid() &&
         pairs.contains(QPair<unsigned int, unsigned int>(metadata0.toUInt(), metadata1.toUInt())))?
         Qt::Checked : Qt::Unchecked;
@@ -553,6 +584,7 @@ void pqSignalAdaptorCompositeTreeWidget::domainChanged()
     this->Internal->TreeWidget, QStringList("Root"));
   root->setCallbackHandler(this->CallbackAdaptor);
   root->setData(0, ORIGINAL_LABEL, "Root");
+  root->setData(0, BLOCK_NAME, QString());
   root->setToolTip(0, root->text(0));
   this->buildTree(root, dInfo);
   this->updateItemFlags();
@@ -599,6 +631,7 @@ void pqSignalAdaptorCompositeTreeWidget::portInformationChanged()
     this->Internal->TreeWidget, QStringList("Root"));
   root->setCallbackHandler(this->CallbackAdaptor);
   root->setData(0, ORIGINAL_LABEL, "Root");
+  root->setData(0, BLOCK_NAME, QString());
   root->setToolTip(0, root->text(0));
   this->buildTree(root, dInfo);
   this->updateItemFlags();
@@ -716,7 +749,7 @@ void pqSignalAdaptorCompositeTreeWidget::buildTree(pqTreeWidgetItem* item,
         // We don't fetch the names for each piece in a vtkMultiPieceDataSet
         // hence we just make up a name,
         QString childLabel = QString("DataSet %1").arg(cc);
-        if (this->ShowIndex)
+        if (this->ShowFlatIndex)
           {
           childLabel = QString("DataSet (%1)").arg(this->FlatIndex);
           }
@@ -726,9 +759,10 @@ void pqSignalAdaptorCompositeTreeWidget::buildTree(pqTreeWidgetItem* item,
         child->setCallbackHandler(this->CallbackAdaptor);
         child->setToolTip(0, child->text(0));
         child->setData(0, ORIGINAL_LABEL, childLabel);
+        child->setData(0, BLOCK_NAME, QString());
         this->buildTree(child, NULL);
-        child->setData(0, DATASET_INDEX, cc);
-        child->setData(0, LEVEL_NUMBER, this->LevelNo);
+        child->setData(0, AMR_BLOCK_INDEX, cc);
+        child->setData(0, AMR_LEVEL_NUMBER, this->LevelNo);
         }
       }
     else
@@ -751,6 +785,7 @@ void pqSignalAdaptorCompositeTreeWidget::buildTree(pqTreeWidgetItem* item,
     {
     vtkPVDataInformation* childInfo = cinfo->GetDataInformation(cc);
     QString childLabel = QString("DataSet %1").arg(cc);
+    QString blockName;
 
     bool is_leaf = true;
     if (childInfo && childInfo->GetCompositeDataInformation()->GetDataIsComposite())
@@ -764,10 +799,11 @@ void pqSignalAdaptorCompositeTreeWidget::buildTree(pqTreeWidgetItem* item,
       if (cname[0])
         {
         childLabel = cname;
+        blockName = cname;
         }
       }
 
-    if (this->ShowIndex)
+    if (this->ShowFlatIndex)
       {
       childLabel = QString("%1 (%2)").arg(childLabel).arg(this->FlatIndex);
       }
@@ -778,9 +814,10 @@ void pqSignalAdaptorCompositeTreeWidget::buildTree(pqTreeWidgetItem* item,
         QStringList(childLabel));
       child->setCallbackHandler(this->CallbackAdaptor);
       child->setData(0, ORIGINAL_LABEL, childLabel);
+      child->setData(0, BLOCK_NAME, blockName);
       child->setToolTip(0, child->text(0));
       this->buildTree(child, cinfo->GetDataInformation(cc));
-      child->setData(0, LEVEL_NUMBER, this->LevelNo);
+      child->setData(0, AMR_LEVEL_NUMBER, this->LevelNo);
       this->LevelNo++;
       }
     else

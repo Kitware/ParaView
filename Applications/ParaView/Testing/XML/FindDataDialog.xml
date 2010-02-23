@@ -1,0 +1,50 @@
+<?xml version="1.0" ?>
+<pqevents>
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_File" />
+  <pqevent object="pqClientMainWindow/menubar/menu_File" command="activate" arguments="actionFileOpen" />
+  <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected"
+    arguments="$PARAVIEW_DATA_ROOT/Data/can.ex2" />
+  <pqevent object="pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/Variables" command="setCurrent" arguments="0.0" />
+  <pqevent object="pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/Variables/1QHeaderView0" command="mousePress" arguments="1,1,0,0,0,0" />
+  <pqevent object="pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/Variables/1QHeaderView0" command="mouseRelease" arguments="1,0,0,0,0,0" />
+  <pqevent object="pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/objectInspector/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/cameraToolbar/actionNegativeY" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_Edit" />
+  <pqevent object="pqClientMainWindow/menubar/menu_Edit" command="activate" arguments="actionQuery" />
+  <pqevent object="pqClientMainWindow/pqQueryDialog/queryClauseFrame/pqQueryClauseWidget/criteria" command="set_string" arguments="Block ID" />
+  <pqevent object="pqClientMainWindow/pqQueryDialog/queryClauseFrame/pqQueryClauseWidget/valueStackedWidget/multiBlock/value_block" command="set_string" arguments="2" />
+  <pqevent object="pqClientMainWindow/pqQueryDialog/runQuery" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqQueryDialog/extractSelection" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/objectInspector/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_Edit" />
+  <pqevent object="pqClientMainWindow/menubar/menu_Edit" command="activate" arguments="actionQuery" />
+  <pqevent object="pqClientMainWindow/pqQueryDialog/queryClauseFrame/pqQueryClauseWidget/criteria" command="set_string" arguments="Global ID" />
+  <pqevent object="pqClientMainWindow/pqQueryDialog/queryClauseFrame/pqQueryClauseWidget/condition" command="set_string" arguments="is between" />
+  <pqevent object="pqClientMainWindow/pqQueryDialog/queryClauseFrame/pqQueryClauseWidget/valueStackedWidget/range/value_min" command="set_string" arguments="1" />
+  <pqevent object="pqClientMainWindow/pqQueryDialog/queryClauseFrame/pqQueryClauseWidget/valueStackedWidget/range/value_min" command="set_string" arguments="10" />
+  <pqevent object="pqClientMainWindow/pqQueryDialog/queryClauseFrame/pqQueryClauseWidget/valueStackedWidget/range/value_min" command="set_string" arguments="100" />
+  <pqevent object="pqClientMainWindow/pqQueryDialog/queryClauseFrame/pqQueryClauseWidget/valueStackedWidget/range/value_max" command="key" arguments="16777217" />
+  <pqevent object="pqClientMainWindow/pqQueryDialog/queryClauseFrame/pqQueryClauseWidget/valueStackedWidget/range/value_max" command="set_string" arguments="2" />
+  <pqevent object="pqClientMainWindow/pqQueryDialog/queryClauseFrame/pqQueryClauseWidget/valueStackedWidget/range/value_max" command="set_string" arguments="20" />
+  <pqevent object="pqClientMainWindow/pqQueryDialog/queryClauseFrame/pqQueryClauseWidget/valueStackedWidget/range/value_max" command="set_string" arguments="200" />
+  <pqevent object="pqClientMainWindow/pqQueryDialog/runQuery" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqQueryDialog/buttonBox/1QPushButton0" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_Edit" />
+  <pqevent object="pqClientMainWindow/menubar/menu_Edit" command="activate" arguments="actionQuery" />
+  <pqevent object="pqClientMainWindow/pqQueryDialog/queryClauseFrame/pqQueryClauseWidget" command="mousePress" arguments="1,1,0,111,15" />
+  <pqevent object="pqClientMainWindow/pqQueryDialog/queryClauseFrame/pqQueryClauseWidget" command="mouseMove" arguments="1,0,0,110,14" />
+  <pqevent object="pqClientMainWindow/pqQueryDialog/queryClauseFrame/pqQueryClauseWidget" command="mouseRelease" arguments="1,0,0,110,14" />
+  <pqevent object="pqClientMainWindow/pqQueryDialog/queryClauseFrame" command="mouseMove" arguments="1,0,0,110,14" />
+  <pqevent object="pqClientMainWindow/pqQueryDialog/queryClauseFrame" command="mouseRelease" arguments="1,0,0,110,14" />
+  <pqevent object="pqClientMainWindow/pqQueryDialog" command="mouseMove" arguments="1,0,0,130,70" />
+  <pqevent object="pqClientMainWindow/pqQueryDialog" command="mouseRelease" arguments="1,0,0,130,70" />
+  <pqevent object="pqClientMainWindow/pqQueryDialog/queryClauseFrame/pqQueryClauseWidget/criteria" command="set_string" arguments="Global ID" />
+  <pqevent object="pqClientMainWindow/pqQueryDialog/queryClauseFrame/pqQueryClauseWidget/valueStackedWidget/singleValue/value" command="set_string" arguments="80" />
+  <pqevent object="pqClientMainWindow/pqQueryDialog/queryClauseFrame/pqQueryClauseWidget/valueStackedWidget/singleValue/value" command="set_string" arguments="80" />
+  <pqevent object="pqClientMainWindow/pqQueryDialog/queryClauseFrame/pqQueryClauseWidget/valueStackedWidget/singleValue/value" command="set_string" arguments="800" />
+  <pqevent object="pqClientMainWindow/pqQueryDialog/runQuery" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqQueryDialog/labels" command="set_string" arguments="GlobalNodeId" />
+  <pqevent object="pqClientMainWindow/pqQueryDialog/labels" command="set_string" arguments="GlobalElementId" />
+  <pqevent object="pqClientMainWindow/pqQueryDialog/buttonBox/1QPushButton0" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/cameraToolbar/actionResetCamera" command="activate" arguments="" />
+</pqevents>

@@ -39,7 +39,8 @@ class pqDataRepresentation;
 class pqSpreadSheetViewModel;
 
 /// View for spread-sheet view. It can show data from any source/filter on the
-/// client. 
+/// client. Uses pqSpreadSheetViewModel, pqSpreadSheetViewWidget and
+/// pqSpreadSheetViewSelectionModel.
 class PQCORE_EXPORT pqSpreadSheetView : public pqView
 {
   Q_OBJECT
@@ -80,11 +81,12 @@ signals:
   /// NULL.
   void showing(pqDataRepresentation* repr);
 
-protected slots:
+public slots:
   /// Called when a new repr is added.
   void onAddRepresentation(pqRepresentation*);
   void onRemoveRepresentation(pqRepresentation*);
 
+protected slots:
   /// Called to ensure that at most 1 repr is visible at a time.
   void updateRepresentationVisibility(pqRepresentation* repr, bool visible);
 
@@ -99,9 +101,6 @@ protected slots:
   /// When user creates a "surface" selection on the view.
   void onCreateSelection(vtkSMSourceProxy* selSource);
 
-  /// Called when user double clicks on a column header.
-  void onSectionDoubleClicked(int logicalindex);
-  
   /// Called when checkbox "Show Only Selected Elements" is updated
   void onSelectionOnly(int selOnly);
   
@@ -111,9 +110,6 @@ private:
 
   class pqInternal;
   pqInternal* Internal;
-
-  class pqDelegate;
-  class pqTableView;
 };
 
 #endif

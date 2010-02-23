@@ -153,6 +153,8 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqProxyPanel.h
   pqProxySelectionWidget.h
   pqProxyTabWidget.h
+  pqQueryClauseWidget.h
+  pqQueryDialog.h
   pqRecentFilesMenu.h
   pqRenderViewOptions.h
   pqRescaleRange.h
@@ -262,6 +264,9 @@ SET(UI_FORMS
   Resources/UI/pqPluginDialog.ui
   Resources/UI/pqPointSourceControls.ui
   Resources/UI/pqProxyInformationWidget.ui
+  Resources/UI/pqQueryClauseWidget.ui
+  Resources/UI/pqQueryCompositeTreeDialog.ui
+  Resources/UI/pqQueryDialog.ui
   Resources/UI/pqRescaleRangeDialog.ui
   Resources/UI/pqRenderViewOptions.ui
   Resources/UI/pqSampleScalarAddRangeDialog.ui
@@ -568,6 +573,10 @@ ADD_LIBRARY(pqComponents
   pqProxySelectionWidget.h
   pqProxyTabWidget.cxx
   pqProxyTabWidget.h
+  pqQueryClauseWidget.cxx
+  pqQueryClauseWidget.h
+  pqQueryDialog.cxx
+  pqQueryDialog.h
   pqRecentFilesMenu.cxx
   pqRecentFilesMenu.h
   pqRescaleRange.cxx

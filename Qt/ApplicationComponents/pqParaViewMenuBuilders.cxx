@@ -48,6 +48,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqChangePipelineInputReaction.h"
 #include "pqColorToolbar.h"
 #include "pqCreateCustomFilterReaction.h"
+#include "pqDataQueryReaction.h"
 #include "pqDeleteReaction.h"
 #include "pqExportReaction.h"
 #include "pqFiltersMenuReaction.h"
@@ -141,6 +142,7 @@ void pqParaViewMenuBuilders::buildEditMenu(QMenu& menu)
   new pqDeleteReaction(ui.actionDelete_All, true);
   new pqApplicationSettingsReaction(ui.actionEditSettings);
   new pqViewSettingsReaction(ui.actionEditViewSettings);
+  new pqDataQueryReaction(ui.actionQuery);
 }
 
 //-----------------------------------------------------------------------------

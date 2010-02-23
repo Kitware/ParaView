@@ -1,45 +1,43 @@
-<ui version="4.0" >
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
  <class>SelectionInspectorPanel</class>
- <widget class="QWidget" name="SelectionInspectorPanel" >
-  <property name="geometry" >
+ <widget class="QWidget" name="SelectionInspectorPanel">
+  <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>333</width>
-    <height>754</height>
+    <width>460</width>
+    <height>934</height>
    </rect>
   </property>
-  <property name="sizePolicy" >
-   <sizepolicy vsizetype="Minimum" hsizetype="Minimum" >
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
     <horstretch>0</horstretch>
     <verstretch>0</verstretch>
    </sizepolicy>
   </property>
-  <property name="windowTitle" >
+  <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QVBoxLayout" >
+  <layout class="QVBoxLayout">
    <item>
-    <layout class="QGridLayout" >
-     <property name="horizontalSpacing" >
+    <layout class="QGridLayout">
+     <property name="spacing">
       <number>3</number>
      </property>
-     <property name="verticalSpacing" >
-      <number>3</number>
-     </property>
-     <item row="0" column="0" >
-      <widget class="QLabel" name="label_6" >
-       <property name="text" >
+     <item row="0" column="0">
+      <widget class="QLabel" name="label_6">
+       <property name="text">
         <string>Current Object:</string>
        </property>
       </widget>
      </item>
-     <item row="0" column="1" >
-      <widget class="pqOutputPortComboBox" name="currentObject" />
+     <item row="0" column="1">
+      <widget class="pqOutputPortComboBox" name="currentObject"/>
      </item>
-     <item row="1" column="0" colspan="2" >
-      <widget class="QPushButton" name="createSelection" >
-       <property name="text" >
+     <item row="1" column="0" colspan="2">
+      <widget class="QPushButton" name="createSelection">
+       <property name="text">
         <string>Create Selection</string>
        </property>
       </widget>
@@ -47,181 +45,165 @@
     </layout>
    </item>
    <item>
-    <widget class="pqCollapsedGroup" name="groupActiveSelection" >
-     <property name="title" >
+    <widget class="pqCollapsedGroup" name="groupActiveSelection">
+     <property name="title">
       <string>Active Selection</string>
      </property>
-     <layout class="QVBoxLayout" >
-      <property name="spacing" >
+     <layout class="QVBoxLayout">
+      <property name="spacing">
        <number>3</number>
       </property>
-      <property name="leftMargin" >
-       <number>3</number>
-      </property>
-      <property name="topMargin" >
-       <number>3</number>
-      </property>
-      <property name="rightMargin" >
-       <number>3</number>
-      </property>
-      <property name="bottomMargin" >
+      <property name="margin">
        <number>3</number>
       </property>
       <item>
-       <layout class="QGridLayout" >
-        <property name="leftMargin" >
+       <layout class="QGridLayout">
+        <property name="margin">
          <number>3</number>
         </property>
-        <property name="topMargin" >
+        <property name="spacing">
          <number>3</number>
         </property>
-        <property name="rightMargin" >
-         <number>3</number>
-        </property>
-        <property name="bottomMargin" >
-         <number>3</number>
-        </property>
-        <property name="horizontalSpacing" >
-         <number>3</number>
-        </property>
-        <property name="verticalSpacing" >
-         <number>3</number>
-        </property>
-        <item row="0" column="0" >
-         <widget class="QLabel" name="label" >
-          <property name="text" >
+        <item row="0" column="0">
+         <widget class="QLabel" name="label">
+          <property name="text">
            <string>Selected Object:</string>
           </property>
          </widget>
         </item>
-        <item row="0" column="1" >
-         <widget class="QLabel" name="selectedObject" >
-          <property name="text" >
-           <string>&lt;b>[selected object name]&lt;/b></string>
+        <item row="0" column="1">
+         <widget class="QLabel" name="selectedObject">
+          <property name="text">
+           <string>&lt;b&gt;[selected object name]&lt;/b&gt;</string>
           </property>
          </widget>
         </item>
-        <item row="1" column="0" >
-         <widget class="QLabel" name="label_size_6" >
-          <property name="sizePolicy" >
-           <sizepolicy vsizetype="Fixed" hsizetype="Minimum" >
+        <item row="1" column="0">
+         <widget class="QLabel" name="label_size_6">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
           </property>
-          <property name="text" >
+          <property name="text">
            <string>Selection Type:</string>
           </property>
          </widget>
         </item>
-        <item row="1" column="1" >
-         <widget class="QComboBox" name="comboSelectionType" >
-          <property name="sizePolicy" >
-           <sizepolicy vsizetype="Fixed" hsizetype="Minimum" >
+        <item row="1" column="1">
+         <widget class="QComboBox" name="comboSelectionType">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
           </property>
-          <property name="whatsThis" >
+          <property name="whatsThis">
            <string>Used to set the label font.</string>
           </property>
           <item>
-           <property name="text" >
+           <property name="text">
             <string>IDs</string>
            </property>
           </item>
           <item>
-           <property name="text" >
+           <property name="text">
             <string>Frustum</string>
            </property>
           </item>
           <item>
-           <property name="text" >
+           <property name="text">
             <string>Locations</string>
            </property>
           </item>
           <item>
-           <property name="text" >
+           <property name="text">
             <string>Thresholds</string>
            </property>
           </item>
           <item>
-           <property name="text" >
+           <property name="text">
             <string>Blocks</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Query</string>
            </property>
           </item>
          </widget>
         </item>
-        <item row="2" column="0" >
-         <widget class="QLabel" name="label_size_5" >
-          <property name="sizePolicy" >
-           <sizepolicy vsizetype="Fixed" hsizetype="Minimum" >
+        <item row="2" column="0">
+         <widget class="QLabel" name="label_size_5">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
           </property>
-          <property name="text" >
+          <property name="text">
            <string>Field Type:</string>
           </property>
          </widget>
         </item>
-        <item row="2" column="1" >
-         <widget class="QComboBox" name="comboFieldType" >
-          <property name="enabled" >
+        <item row="2" column="1">
+         <widget class="QComboBox" name="comboFieldType">
+          <property name="enabled">
            <bool>true</bool>
           </property>
-          <property name="sizePolicy" >
-           <sizepolicy vsizetype="Fixed" hsizetype="Minimum" >
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
           </property>
-          <property name="whatsThis" >
+          <property name="whatsThis">
            <string>Used to set the label font.</string>
           </property>
           <item>
-           <property name="text" >
+           <property name="text">
             <string>CELL</string>
            </property>
           </item>
           <item>
-           <property name="text" >
+           <property name="text">
             <string>POINT</string>
            </property>
           </item>
           <item>
-           <property name="text" >
+           <property name="text">
             <string>VERTEX</string>
            </property>
           </item>
           <item>
-           <property name="text" >
+           <property name="text">
             <string>EDGE</string>
            </property>
           </item>
           <item>
-           <property name="text" >
+           <property name="text">
             <string>ROW</string>
            </property>
           </item>
          </widget>
         </item>
-        <item row="3" column="0" colspan="2" >
-         <widget class="QCheckBox" name="checkboxContainCell" >
-          <property name="enabled" >
+        <item row="3" column="0" colspan="2">
+         <widget class="QCheckBox" name="checkboxContainCell">
+          <property name="enabled">
            <bool>false</bool>
           </property>
-          <property name="text" >
+          <property name="text">
            <string>Select cells that include the selected points</string>
           </property>
-          <property name="tristate" >
+          <property name="tristate">
            <bool>false</bool>
           </property>
          </widget>
         </item>
-        <item row="4" column="0" colspan="2" >
-         <widget class="QCheckBox" name="checkboxInsideOut" >
-          <property name="text" >
+        <item row="4" column="0" colspan="2">
+         <widget class="QCheckBox" name="checkboxInsideOut">
+          <property name="text">
            <string>Invert selection</string>
           </property>
          </widget>
@@ -229,167 +211,143 @@
        </layout>
       </item>
       <item>
-       <layout class="QHBoxLayout" >
-        <property name="spacing" >
+       <layout class="QHBoxLayout">
+        <property name="spacing">
          <number>0</number>
         </property>
         <item>
-         <widget class="pqTreeWidget" name="compositeTree" >
-          <property name="sizePolicy" >
-           <sizepolicy vsizetype="Expanding" hsizetype="Fixed" >
+         <widget class="pqTreeWidget" name="compositeTree">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Fixed" vsizetype="Expanding">
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
           </property>
-          <property name="maximumSize" >
+          <property name="maximumSize">
            <size>
             <width>150</width>
             <height>16777215</height>
            </size>
           </property>
           <column>
-           <property name="text" >
+           <property name="text">
             <string>Data Hierarchy</string>
            </property>
           </column>
          </widget>
         </item>
         <item>
-         <widget class="QStackedWidget" name="itemsStackedWidget" >
-          <property name="autoFillBackground" >
+         <widget class="QStackedWidget" name="itemsStackedWidget">
+          <property name="autoFillBackground">
            <bool>false</bool>
           </property>
-          <property name="frameShape" >
+          <property name="frameShape">
            <enum>QFrame::StyledPanel</enum>
           </property>
-          <property name="currentIndex" >
+          <property name="currentIndex">
            <number>0</number>
           </property>
-          <widget class="QWidget" name="page_IDs" >
-           <layout class="QVBoxLayout" >
-            <property name="spacing" >
+          <widget class="QWidget" name="page_IDs">
+           <layout class="QVBoxLayout">
+            <property name="spacing">
              <number>3</number>
             </property>
-            <property name="leftMargin" >
-             <number>3</number>
-            </property>
-            <property name="topMargin" >
-             <number>3</number>
-            </property>
-            <property name="rightMargin" >
-             <number>3</number>
-            </property>
-            <property name="bottomMargin" >
+            <property name="margin">
              <number>3</number>
             </property>
             <item>
-             <widget class="QLabel" name="ProcessIDRange" >
-              <property name="text" >
+             <widget class="QLabel" name="ProcessIDRange">
+              <property name="text">
                <string>Process ID Range: 0 - 0</string>
               </property>
              </widget>
             </item>
             <item>
-             <widget class="pqTreeWidget" name="Indices" >
-              <property name="sizePolicy" >
-               <sizepolicy vsizetype="Expanding" hsizetype="Preferred" >
+             <widget class="pqTreeWidget" name="Indices">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
                 <horstretch>0</horstretch>
                 <verstretch>0</verstretch>
                </sizepolicy>
               </property>
-              <property name="editTriggers" >
-               <set>QAbstractItemView::DoubleClicked|QAbstractItemView::EditKeyPressed|QAbstractItemView::NoEditTriggers</set>
+              <property name="editTriggers">
+               <set>QAbstractItemView::DoubleClicked|QAbstractItemView::EditKeyPressed</set>
               </property>
-              <property name="alternatingRowColors" >
+              <property name="alternatingRowColors">
                <bool>true</bool>
               </property>
-              <property name="selectionMode" >
+              <property name="selectionMode">
                <enum>QAbstractItemView::ExtendedSelection</enum>
               </property>
-              <property name="rootIsDecorated" >
+              <property name="rootIsDecorated">
                <bool>false</bool>
               </property>
-              <property name="sortingEnabled" >
+              <property name="sortingEnabled">
                <bool>true</bool>
               </property>
               <column>
-               <property name="text" >
+               <property name="text">
                 <string>Indices</string>
                </property>
               </column>
              </widget>
             </item>
             <item>
-             <layout class="QGridLayout" >
-              <property name="leftMargin" >
-               <number>0</number>
-              </property>
-              <property name="topMargin" >
-               <number>0</number>
-              </property>
-              <property name="rightMargin" >
-               <number>0</number>
-              </property>
-              <property name="bottomMargin" >
-               <number>0</number>
-              </property>
-              <property name="horizontalSpacing" >
+             <layout class="QGridLayout">
+              <property name="spacing">
                <number>2</number>
               </property>
-              <property name="verticalSpacing" >
-               <number>2</number>
-              </property>
-              <item row="0" column="0" >
-               <widget class="QPushButton" name="NewValue" >
-                <property name="toolTip" >
+              <item row="0" column="0">
+               <widget class="QPushButton" name="NewValue">
+                <property name="toolTip">
                  <string>Add a single value to the current set</string>
                 </property>
-                <property name="statusTip" >
+                <property name="statusTip">
                  <string>Add a single value to the current set.</string>
                 </property>
-                <property name="text" >
+                <property name="text">
                  <string>New Value</string>
                 </property>
                </widget>
               </item>
-              <item row="1" column="1" >
-               <widget class="QPushButton" name="DeleteAll" >
-                <property name="enabled" >
+              <item row="1" column="1">
+               <widget class="QPushButton" name="DeleteAll">
+                <property name="enabled">
                  <bool>true</bool>
                 </property>
-                <property name="toolTip" >
+                <property name="toolTip">
                  <string>Delete all values</string>
                 </property>
-                <property name="text" >
+                <property name="text">
                  <string>Delete All</string>
                 </property>
                </widget>
               </item>
-              <item row="0" column="1" >
-               <widget class="QPushButton" name="NewRange" >
-                <property name="enabled" >
+              <item row="0" column="1">
+               <widget class="QPushButton" name="NewRange">
+                <property name="enabled">
                  <bool>false</bool>
                 </property>
-                <property name="toolTip" >
+                <property name="toolTip">
                  <string>Add a single value to the current set</string>
                 </property>
-                <property name="statusTip" >
+                <property name="statusTip">
                  <string>Add a single value to the current set.</string>
                 </property>
-                <property name="text" >
+                <property name="text">
                  <string>New Range</string>
                 </property>
                </widget>
               </item>
-              <item row="1" column="0" >
-               <widget class="QPushButton" name="Delete" >
-                <property name="enabled" >
+              <item row="1" column="0">
+               <widget class="QPushButton" name="Delete">
+                <property name="enabled">
                  <bool>true</bool>
                 </property>
-                <property name="toolTip" >
+                <property name="toolTip">
                  <string>Delete selected values from the current set</string>
                 </property>
-                <property name="text" >
+                <property name="text">
                  <string>Delete</string>
                 </property>
                </widget>
@@ -398,36 +356,24 @@
             </item>
            </layout>
           </widget>
-          <widget class="QWidget" name="page_Frustum" >
-           <layout class="QVBoxLayout" >
-            <property name="spacing" >
-             <number>6</number>
-            </property>
-            <property name="leftMargin" >
-             <number>3</number>
-            </property>
-            <property name="topMargin" >
-             <number>3</number>
-            </property>
-            <property name="rightMargin" >
-             <number>3</number>
-            </property>
-            <property name="bottomMargin" >
+          <widget class="QWidget" name="page_Frustum">
+           <layout class="QVBoxLayout">
+            <property name="margin">
              <number>3</number>
             </property>
             <item>
-             <widget class="QCheckBox" name="checkboxShowFrustum" >
-              <property name="text" >
+             <widget class="QCheckBox" name="checkboxShowFrustum">
+              <property name="text">
                <string>Show Frustum</string>
               </property>
              </widget>
             </item>
             <item>
              <spacer>
-              <property name="orientation" >
+              <property name="orientation">
                <enum>Qt::Vertical</enum>
               </property>
-              <property name="sizeHint" >
+              <property name="sizeHint" stdset="0">
                <size>
                 <width>20</width>
                 <height>341</height>
@@ -437,132 +383,108 @@
             </item>
            </layout>
           </widget>
-          <widget class="QWidget" name="page_Locations" >
-           <layout class="QVBoxLayout" >
-            <property name="spacing" >
+          <widget class="QWidget" name="page_Locations">
+           <layout class="QVBoxLayout">
+            <property name="spacing">
              <number>3</number>
             </property>
-            <property name="leftMargin" >
-             <number>3</number>
-            </property>
-            <property name="topMargin" >
-             <number>3</number>
-            </property>
-            <property name="rightMargin" >
-             <number>3</number>
-            </property>
-            <property name="bottomMargin" >
+            <property name="margin">
              <number>3</number>
             </property>
             <item>
-             <widget class="QLabel" name="label_3" >
-              <property name="text" >
+             <widget class="QLabel" name="label_3">
+              <property name="text">
                <string>Locations</string>
               </property>
              </widget>
             </item>
             <item>
-             <widget class="pqTreeWidget" name="Locations" >
-              <property name="selectionMode" >
+             <widget class="pqTreeWidget" name="Locations">
+              <property name="selectionMode">
                <enum>QAbstractItemView::MultiSelection</enum>
               </property>
-              <property name="rootIsDecorated" >
+              <property name="rootIsDecorated">
                <bool>false</bool>
               </property>
-              <property name="sortingEnabled" >
+              <property name="sortingEnabled">
                <bool>true</bool>
               </property>
-              <property name="columnCount" >
+              <property name="columnCount">
                <number>3</number>
               </property>
               <column>
-               <property name="text" >
+               <property name="text">
                 <string>X</string>
                </property>
               </column>
               <column>
-               <property name="text" >
+               <property name="text">
                 <string>Y</string>
                </property>
               </column>
               <column>
-               <property name="text" >
+               <property name="text">
                 <string>Z</string>
                </property>
               </column>
              </widget>
             </item>
             <item>
-             <layout class="QGridLayout" >
-              <property name="leftMargin" >
-               <number>0</number>
-              </property>
-              <property name="topMargin" >
-               <number>0</number>
-              </property>
-              <property name="rightMargin" >
-               <number>0</number>
-              </property>
-              <property name="bottomMargin" >
-               <number>0</number>
-              </property>
-              <property name="horizontalSpacing" >
+             <layout class="QGridLayout">
+              <property name="spacing">
                <number>2</number>
               </property>
-              <property name="verticalSpacing" >
-               <number>2</number>
-              </property>
-              <item row="0" column="0" >
-               <widget class="QPushButton" name="NewValue_Locations" >
-                <property name="toolTip" >
+              <item row="0" column="0">
+               <widget class="QPushButton" name="NewValue_Locations">
+                <property name="toolTip">
                  <string>Add a single value to the current set</string>
                 </property>
-                <property name="statusTip" >
+                <property name="statusTip">
                  <string>Add a single value to the current set.</string>
                 </property>
-                <property name="text" >
+                <property name="text">
                  <string>New Value</string>
                 </property>
                </widget>
               </item>
-              <item row="1" column="1" >
-               <widget class="QPushButton" name="DeleteAll_Locations" >
-                <property name="enabled" >
+              <item row="1" column="1">
+               <widget class="QPushButton" name="DeleteAll_Locations">
+                <property name="enabled">
                  <bool>true</bool>
                 </property>
-                <property name="toolTip" >
+                <property name="toolTip">
                  <string>Delete all values</string>
                 </property>
-                <property name="text" >
+                <property name="text">
                  <string>Delete All</string>
                 </property>
                </widget>
               </item>
-              <item row="0" column="1" >
-               <widget class="QPushButton" name="NewRange_Locations" >
-                <property name="enabled" >
+              <item row="0" column="1">
+               <widget class="QPushButton" name="NewRange_Locations">
+                <property name="enabled">
                  <bool>false</bool>
                 </property>
-                <property name="toolTip" >
+                <property name="toolTip">
                  <string>Add a single value to the current set</string>
                 </property>
-                <property name="statusTip" >
+                <property name="statusTip">
                  <string>Add a single value to the current set.</string>
                 </property>
-                <property name="text" >
+                <property name="text">
                  <string>New Range</string>
                 </property>
                </widget>
               </item>
-              <item row="1" column="0" >
-               <widget class="QPushButton" name="Delete_Locations" >
-                <property name="enabled" >
+              <item row="1" column="0">
+               <widget class="QPushButton" name="Delete_Locations">
+                <property name="enabled">
                  <bool>true</bool>
                 </property>
-                <property name="toolTip" >
+                <property name="toolTip">
                  <string>Delete selected values from the current set</string>
                 </property>
-                <property name="text" >
+                <property name="text">
                  <string>Delete</string>
                 </property>
                </widget>
@@ -570,134 +492,119 @@
              </layout>
             </item>
             <item>
-             <widget class="QCheckBox" name="showLocationWidgets" >
-              <property name="text" >
+             <widget class="QCheckBox" name="showLocationWidgets">
+              <property name="text">
                <string>Show location widgets</string>
               </property>
              </widget>
             </item>
            </layout>
           </widget>
-          <widget class="QWidget" name="page_Thresholds" >
-           <layout class="QGridLayout" >
-            <property name="leftMargin" >
+          <widget class="QWidget" name="page_Thresholds">
+           <layout class="QGridLayout">
+            <property name="margin">
              <number>3</number>
             </property>
-            <property name="topMargin" >
+            <property name="spacing">
              <number>3</number>
             </property>
-            <property name="rightMargin" >
-             <number>3</number>
-            </property>
-            <property name="bottomMargin" >
-             <number>3</number>
-            </property>
-            <property name="horizontalSpacing" >
-             <number>3</number>
-            </property>
-            <property name="verticalSpacing" >
-             <number>3</number>
-            </property>
-            <item row="0" column="0" colspan="3" >
-             <layout class="QGridLayout" >
-              <property name="horizontalSpacing" >
+            <item row="0" column="0" colspan="3">
+             <layout class="QGridLayout">
+              <property name="spacing">
                <number>3</number>
               </property>
-              <property name="verticalSpacing" >
-               <number>3</number>
-              </property>
-              <item row="0" column="0" >
-               <widget class="QLabel" name="label_2" >
-                <property name="text" >
+              <item row="0" column="0">
+               <widget class="QLabel" name="label_2">
+                <property name="text">
                  <string>Scalars</string>
                 </property>
                </widget>
               </item>
-              <item row="0" column="1" >
-               <widget class="QComboBox" name="ThresholdScalarArray" />
+              <item row="0" column="1">
+               <widget class="QComboBox" name="ThresholdScalarArray"/>
               </item>
              </layout>
             </item>
-            <item row="1" column="0" colspan="3" >
-             <widget class="QPushButton" name="buttonAddThresholds" >
-              <property name="text" >
+            <item row="1" column="0" colspan="3">
+             <widget class="QPushButton" name="buttonAddThresholds">
+              <property name="text">
                <string>Add Thresholds</string>
               </property>
              </widget>
             </item>
-            <item row="2" column="0" colspan="3" >
-             <widget class="pqTreeWidget" name="thresholdRanges" >
-              <property name="sizePolicy" >
-               <sizepolicy vsizetype="Expanding" hsizetype="Preferred" >
+            <item row="2" column="0" colspan="3">
+             <widget class="pqTreeWidget" name="thresholdRanges">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
                 <horstretch>0</horstretch>
                 <verstretch>0</verstretch>
                </sizepolicy>
               </property>
-              <property name="editTriggers" >
-               <set>QAbstractItemView::DoubleClicked|QAbstractItemView::EditKeyPressed|QAbstractItemView::NoEditTriggers</set>
+              <property name="editTriggers">
+               <set>QAbstractItemView::DoubleClicked|QAbstractItemView::EditKeyPressed</set>
               </property>
-              <property name="tabKeyNavigation" >
+              <property name="tabKeyNavigation">
                <bool>true</bool>
               </property>
-              <property name="alternatingRowColors" >
+              <property name="alternatingRowColors">
                <bool>true</bool>
               </property>
-              <property name="selectionMode" >
+              <property name="selectionMode">
                <enum>QAbstractItemView::ExtendedSelection</enum>
               </property>
-              <property name="rootIsDecorated" >
+              <property name="rootIsDecorated">
                <bool>false</bool>
               </property>
-              <property name="sortingEnabled" >
+              <property name="sortingEnabled">
                <bool>true</bool>
               </property>
-              <property name="allColumnsShowFocus" >
+              <property name="allColumnsShowFocus">
                <bool>false</bool>
               </property>
               <column>
-               <property name="text" >
+               <property name="text">
                 <string>Lower</string>
                </property>
               </column>
               <column>
-               <property name="text" >
+               <property name="text">
                 <string>Upper</string>
                </property>
               </column>
              </widget>
             </item>
-            <item row="3" column="0" >
-             <widget class="QPushButton" name="Delete_Threshold" >
-              <property name="enabled" >
+            <item row="3" column="0">
+             <widget class="QPushButton" name="Delete_Threshold">
+              <property name="enabled">
                <bool>true</bool>
               </property>
-              <property name="toolTip" >
+              <property name="toolTip">
                <string>Delete selected values from the current set</string>
               </property>
-              <property name="text" >
+              <property name="text">
                <string>Delete</string>
               </property>
              </widget>
             </item>
-            <item row="3" column="1" >
-             <widget class="QPushButton" name="DeleteAll_Threshold" >
-              <property name="enabled" >
+            <item row="3" column="1">
+             <widget class="QPushButton" name="DeleteAll_Threshold">
+              <property name="enabled">
                <bool>true</bool>
               </property>
-              <property name="toolTip" >
+              <property name="toolTip">
                <string>Delete all values</string>
               </property>
-              <property name="text" >
+              <property name="text">
                <string>Delete All</string>
               </property>
              </widget>
             </item>
-            <item row="3" column="2" >
+            <item row="3" column="2">
              <spacer>
-              <property name="orientation" >
+              <property name="orientation">
                <enum>Qt::Horizontal</enum>
               </property>
-              <property name="sizeHint" >
+              <property name="sizeHint" stdset="0">
                <size>
                 <width>40</width>
                 <height>20</height>
@@ -707,33 +614,21 @@
             </item>
            </layout>
           </widget>
-          <widget class="QWidget" name="page_Blocks" >
-           <layout class="QGridLayout" >
-            <property name="leftMargin" >
+          <widget class="QWidget" name="page_Blocks">
+           <layout class="QGridLayout">
+            <property name="margin">
              <number>3</number>
             </property>
-            <property name="topMargin" >
+            <property name="spacing">
              <number>3</number>
             </property>
-            <property name="rightMargin" >
-             <number>3</number>
-            </property>
-            <property name="bottomMargin" >
-             <number>3</number>
-            </property>
-            <property name="horizontalSpacing" >
-             <number>3</number>
-            </property>
-            <property name="verticalSpacing" >
-             <number>3</number>
-            </property>
-            <item row="0" column="0" >
-             <widget class="pqTreeWidget" name="Blocks" >
-              <property name="rootIsDecorated" >
+            <item row="0" column="0">
+             <widget class="pqTreeWidget" name="Blocks">
+              <property name="rootIsDecorated">
                <bool>false</bool>
               </property>
               <column>
-               <property name="text" >
+               <property name="text">
                 <string>Blocks</string>
                </property>
               </column>
@@ -741,115 +636,101 @@
             </item>
            </layout>
           </widget>
-          <widget class="QWidget" name="page_Global_IDs" >
-           <layout class="QVBoxLayout" >
-            <property name="spacing" >
+          <widget class="QWidget" name="page_Query">
+           <layout class="QGridLayout" name="gridLayout">
+            <property name="margin">
              <number>3</number>
             </property>
-            <property name="leftMargin" >
+            <item row="0" column="0">
+             <widget class="QTextBrowser" name="queryText"/>
+            </item>
+           </layout>
+          </widget>
+          <widget class="QWidget" name="page_Global_IDs">
+           <layout class="QVBoxLayout">
+            <property name="spacing">
              <number>3</number>
             </property>
-            <property name="topMargin" >
-             <number>3</number>
-            </property>
-            <property name="rightMargin" >
-             <number>3</number>
-            </property>
-            <property name="bottomMargin" >
+            <property name="margin">
              <number>3</number>
             </property>
             <item>
-             <widget class="pqTreeWidget" name="GlobalIDs" >
-              <property name="alternatingRowColors" >
+             <widget class="pqTreeWidget" name="GlobalIDs">
+              <property name="alternatingRowColors">
                <bool>true</bool>
               </property>
-              <property name="selectionMode" >
+              <property name="selectionMode">
                <enum>QAbstractItemView::ExtendedSelection</enum>
               </property>
-              <property name="rootIsDecorated" >
+              <property name="rootIsDecorated">
                <bool>false</bool>
               </property>
-              <property name="sortingEnabled" >
+              <property name="sortingEnabled">
                <bool>true</bool>
               </property>
               <column>
-               <property name="text" >
+               <property name="text">
                 <string>Global IDs</string>
                </property>
               </column>
              </widget>
             </item>
             <item>
-             <layout class="QGridLayout" >
-              <property name="leftMargin" >
-               <number>0</number>
-              </property>
-              <property name="topMargin" >
-               <number>0</number>
-              </property>
-              <property name="rightMargin" >
-               <number>0</number>
-              </property>
-              <property name="bottomMargin" >
-               <number>0</number>
-              </property>
-              <property name="horizontalSpacing" >
+             <layout class="QGridLayout">
+              <property name="spacing">
                <number>2</number>
               </property>
-              <property name="verticalSpacing" >
-               <number>2</number>
-              </property>
-              <item row="0" column="0" >
-               <widget class="QPushButton" name="NewValue_GlobalIDs" >
-                <property name="toolTip" >
+              <item row="0" column="0">
+               <widget class="QPushButton" name="NewValue_GlobalIDs">
+                <property name="toolTip">
                  <string>Add a single value to the current set</string>
                 </property>
-                <property name="statusTip" >
+                <property name="statusTip">
                  <string>Add a single value to the current set.</string>
                 </property>
-                <property name="text" >
+                <property name="text">
                  <string>New Value</string>
                 </property>
                </widget>
               </item>
-              <item row="1" column="1" >
-               <widget class="QPushButton" name="DeleteAll_GlobalIDs" >
-                <property name="enabled" >
+              <item row="1" column="1">
+               <widget class="QPushButton" name="DeleteAll_GlobalIDs">
+                <property name="enabled">
                  <bool>true</bool>
                 </property>
-                <property name="toolTip" >
+                <property name="toolTip">
                  <string>Delete all values</string>
                 </property>
-                <property name="text" >
+                <property name="text">
                  <string>Delete All</string>
                 </property>
                </widget>
               </item>
-              <item row="0" column="1" >
-               <widget class="QPushButton" name="NewRange_GlobalIDs" >
-                <property name="enabled" >
+              <item row="0" column="1">
+               <widget class="QPushButton" name="NewRange_GlobalIDs">
+                <property name="enabled">
                  <bool>false</bool>
                 </property>
-                <property name="toolTip" >
+                <property name="toolTip">
                  <string>Add a single value to the current set</string>
                 </property>
-                <property name="statusTip" >
+                <property name="statusTip">
                  <string>Add a single value to the current set.</string>
                 </property>
-                <property name="text" >
+                <property name="text">
                  <string>New Range</string>
                 </property>
                </widget>
               </item>
-              <item row="1" column="0" >
-               <widget class="QPushButton" name="Delete_GlobalIDs" >
-                <property name="enabled" >
+              <item row="1" column="0">
+               <widget class="QPushButton" name="Delete_GlobalIDs">
+                <property name="enabled">
                  <bool>true</bool>
                 </property>
-                <property name="toolTip" >
+                <property name="toolTip">
                  <string>Delete selected values from the current set</string>
                 </property>
-                <property name="text" >
+                <property name="text">
                  <string>Delete</string>
                 </property>
                </widget>
@@ -866,79 +747,52 @@
     </widget>
    </item>
    <item>
-    <widget class="pqCollapsedGroup" name="groupSelectionLabel" >
-     <property name="title" >
+    <widget class="pqCollapsedGroup" name="groupSelectionLabel">
+     <property name="title">
       <string>Display Style</string>
      </property>
-     <layout class="QGridLayout" >
-      <property name="leftMargin" >
+     <layout class="QGridLayout">
+      <property name="margin">
        <number>2</number>
       </property>
-      <property name="topMargin" >
-       <number>2</number>
-      </property>
-      <property name="rightMargin" >
-       <number>2</number>
-      </property>
-      <property name="bottomMargin" >
-       <number>2</number>
-      </property>
-      <property name="horizontalSpacing" >
-       <number>6</number>
-      </property>
-      <property name="verticalSpacing" >
-       <number>6</number>
-      </property>
-      <item row="0" column="0" >
-       <widget class="QTabWidget" name="tabWidget_SelectionLabelStyle" >
-        <property name="sizePolicy" >
-         <sizepolicy vsizetype="Preferred" hsizetype="Preferred" >
+      <item row="0" column="0">
+       <widget class="QTabWidget" name="tabWidget_SelectionLabelStyle">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
-        <property name="autoFillBackground" >
+        <property name="autoFillBackground">
          <bool>false</bool>
         </property>
-        <property name="currentIndex" >
+        <property name="currentIndex">
          <number>0</number>
         </property>
-        <widget class="QWidget" name="tab_SelectionStyle" >
-         <attribute name="title" >
+        <widget class="QWidget" name="tab_SelectionStyle">
+         <attribute name="title">
           <string>Selection</string>
          </attribute>
-         <layout class="QGridLayout" >
-          <property name="leftMargin" >
+         <layout class="QGridLayout">
+          <property name="margin">
            <number>3</number>
           </property>
-          <property name="topMargin" >
+          <property name="spacing">
            <number>3</number>
           </property>
-          <property name="rightMargin" >
-           <number>3</number>
-          </property>
-          <property name="bottomMargin" >
-           <number>3</number>
-          </property>
-          <property name="horizontalSpacing" >
-           <number>3</number>
-          </property>
-          <property name="verticalSpacing" >
-           <number>3</number>
-          </property>
-          <item row="1" column="0" >
-           <widget class="QLabel" name="label_22" >
-            <property name="text" >
+          <item row="1" column="0">
+           <widget class="QLabel" name="label_22">
+            <property name="text">
              <string>  Opacity</string>
             </property>
            </widget>
           </item>
-          <item row="3" column="0" >
+          <item row="3" column="0">
            <spacer>
-            <property name="orientation" >
+            <property name="orientation">
              <enum>Qt::Vertical</enum>
             </property>
-            <property name="sizeHint" >
+            <property name="sizeHint" stdset="0">
              <size>
               <width>20</width>
               <height>40</height>
@@ -946,136 +800,100 @@
             </property>
            </spacer>
           </item>
-          <item row="1" column="1" >
-           <widget class="QDoubleSpinBox" name="Sel_StyleOpacity" >
-            <property name="toolTip" >
-             <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">If your dataset contains points/verticies, this scale adjusts the diameter of the rendered points.&lt;/p>&lt;/body>&lt;/html></string>
+          <item row="1" column="1">
+           <widget class="QDoubleSpinBox" name="Sel_StyleOpacity">
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;/head&gt;&lt;body style=&quot; white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;&quot;&gt;&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;If your dataset contains points/verticies, this scale adjusts the diameter of the rendered points.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
             </property>
-            <property name="minimum" >
+            <property name="minimum">
              <double>0.000000000000000</double>
             </property>
-            <property name="maximum" >
+            <property name="maximum">
              <double>1.000000000000000</double>
             </property>
-            <property name="singleStep" >
+            <property name="singleStep">
              <double>0.100000000000000</double>
             </property>
            </widget>
           </item>
-          <item row="0" column="0" colspan="2" >
-           <widget class="pqColorChooserButton" name="Sel_buttonColor" >
-            <property name="sizePolicy" >
-             <sizepolicy vsizetype="Fixed" hsizetype="Minimum" >
+          <item row="0" column="0" colspan="2">
+           <widget class="pqColorChooserButton" name="Sel_buttonColor">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
             </property>
-            <property name="whatsThis" >
+            <property name="whatsThis">
              <string>Click this button to set the title color.</string>
             </property>
-            <property name="layoutDirection" >
+            <property name="layoutDirection">
              <enum>Qt::LeftToRight</enum>
             </property>
-            <property name="text" >
+            <property name="text">
              <string>Color</string>
             </property>
            </widget>
           </item>
-          <item row="2" column="0" colspan="2" >
-           <widget class="QStackedWidget" name="stackedWidget_2" >
-            <property name="sizePolicy" >
-             <sizepolicy vsizetype="Fixed" hsizetype="Preferred" >
+          <item row="2" column="0" colspan="2">
+           <widget class="QStackedWidget" name="stackedWidget_2">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
             </property>
-            <property name="currentIndex" >
+            <property name="currentIndex">
              <number>0</number>
             </property>
-            <widget class="QWidget" name="page" >
-             <layout class="QGridLayout" >
-              <property name="leftMargin" >
-               <number>9</number>
-              </property>
-              <property name="topMargin" >
-               <number>9</number>
-              </property>
-              <property name="rightMargin" >
-               <number>9</number>
-              </property>
-              <property name="bottomMargin" >
-               <number>9</number>
-              </property>
-              <property name="horizontalSpacing" >
-               <number>6</number>
-              </property>
-              <property name="verticalSpacing" >
-               <number>6</number>
-              </property>
-              <item row="0" column="0" >
-               <widget class="QLabel" name="label_21" >
-                <property name="text" >
+            <widget class="QWidget" name="page">
+             <layout class="QGridLayout">
+              <item row="0" column="0">
+               <widget class="QLabel" name="label_21">
+                <property name="text">
                  <string>Line width</string>
                 </property>
                </widget>
               </item>
-              <item row="0" column="1" >
-               <widget class="QDoubleSpinBox" name="Sel_StyleLineWidth" >
-                <property name="toolTip" >
-                 <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">If your dataset contains points/verticies, this scale adjusts the diameter of the rendered points.&lt;/p>&lt;/body>&lt;/html></string>
+              <item row="0" column="1">
+               <widget class="QDoubleSpinBox" name="Sel_StyleLineWidth">
+                <property name="toolTip">
+                 <string>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;/head&gt;&lt;body style=&quot; white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;&quot;&gt;&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;If your dataset contains points/verticies, this scale adjusts the diameter of the rendered points.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                 </property>
-                <property name="minimum" >
+                <property name="minimum">
                  <double>1.000000000000000</double>
                 </property>
-                <property name="maximum" >
+                <property name="maximum">
                  <double>100.000000000000000</double>
                 </property>
-                <property name="value" >
+                <property name="value">
                  <double>2.000000000000000</double>
                 </property>
                </widget>
               </item>
              </layout>
             </widget>
-            <widget class="QWidget" name="page_2" >
-             <layout class="QGridLayout" >
-              <property name="leftMargin" >
-               <number>9</number>
-              </property>
-              <property name="topMargin" >
-               <number>9</number>
-              </property>
-              <property name="rightMargin" >
-               <number>9</number>
-              </property>
-              <property name="bottomMargin" >
-               <number>9</number>
-              </property>
-              <property name="horizontalSpacing" >
-               <number>6</number>
-              </property>
-              <property name="verticalSpacing" >
-               <number>6</number>
-              </property>
-              <item row="0" column="1" >
-               <widget class="QDoubleSpinBox" name="Sel_StylePointSize" >
-                <property name="toolTip" >
-                 <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">If your dataset contains points/verticies, this scale adjusts the diameter of the rendered points.&lt;/p>&lt;/body>&lt;/html></string>
+            <widget class="QWidget" name="page_2">
+             <layout class="QGridLayout">
+              <item row="0" column="1">
+               <widget class="QDoubleSpinBox" name="Sel_StylePointSize">
+                <property name="toolTip">
+                 <string>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;/head&gt;&lt;body style=&quot; white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;&quot;&gt;&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;If your dataset contains points/verticies, this scale adjusts the diameter of the rendered points.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                 </property>
-                <property name="minimum" >
+                <property name="minimum">
                  <double>1.000000000000000</double>
                 </property>
-                <property name="maximum" >
+                <property name="maximum">
                  <double>100.000000000000000</double>
                 </property>
-                <property name="value" >
+                <property name="value">
                  <double>2.000000000000000</double>
                 </property>
                </widget>
               </item>
-              <item row="0" column="0" >
-               <widget class="QLabel" name="label_23" >
-                <property name="text" >
+              <item row="0" column="0">
+               <widget class="QLabel" name="label_23">
+                <property name="text">
                  <string>Point Size</string>
                 </property>
                </widget>
@@ -1086,351 +904,309 @@
           </item>
          </layout>
         </widget>
-        <widget class="QWidget" name="tab_CellLabel" >
-         <attribute name="title" >
+        <widget class="QWidget" name="tab_CellLabel">
+         <attribute name="title">
           <string>Cell Label</string>
          </attribute>
-         <layout class="QGridLayout" >
-          <property name="leftMargin" >
+         <layout class="QGridLayout">
+          <property name="margin">
            <number>3</number>
           </property>
-          <property name="topMargin" >
+          <property name="spacing">
            <number>3</number>
           </property>
-          <property name="rightMargin" >
-           <number>3</number>
-          </property>
-          <property name="bottomMargin" >
-           <number>3</number>
-          </property>
-          <property name="horizontalSpacing" >
-           <number>3</number>
-          </property>
-          <property name="verticalSpacing" >
-           <number>3</number>
-          </property>
-          <item row="0" column="0" >
-           <widget class="QCheckBox" name="checkBoxLabelCells" >
-            <property name="text" >
+          <item row="0" column="0">
+           <widget class="QCheckBox" name="checkBoxLabelCells">
+            <property name="text">
              <string>Visible</string>
             </property>
            </widget>
           </item>
-          <item row="1" column="0" >
-           <widget class="QGroupBox" name="groupBox_CellLabelStyle" >
-            <property name="enabled" >
+          <item row="1" column="0">
+           <widget class="QGroupBox" name="groupBox_CellLabelStyle">
+            <property name="enabled">
              <bool>false</bool>
             </property>
-            <property name="title" >
+            <property name="title">
              <string>Style</string>
             </property>
-            <layout class="QGridLayout" >
-             <property name="leftMargin" >
-              <number>9</number>
-             </property>
-             <property name="topMargin" >
-              <number>9</number>
-             </property>
-             <property name="rightMargin" >
-              <number>9</number>
-             </property>
-             <property name="bottomMargin" >
-              <number>9</number>
-             </property>
-             <property name="horizontalSpacing" >
-              <number>6</number>
-             </property>
-             <property name="verticalSpacing" >
-              <number>6</number>
-             </property>
-             <item row="1" column="2" colspan="2" >
-              <widget class="QSpinBox" name="spinBoxSize_Cell" >
-               <property name="sizePolicy" >
-                <sizepolicy vsizetype="Fixed" hsizetype="Minimum" >
+            <layout class="QGridLayout">
+             <item row="1" column="2" colspan="2">
+              <widget class="QSpinBox" name="spinBoxSize_Cell">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
                  <horstretch>0</horstretch>
                  <verstretch>0</verstretch>
                 </sizepolicy>
                </property>
-               <property name="minimum" >
+               <property name="minimum">
                 <number>1</number>
                </property>
-               <property name="maximum" >
+               <property name="maximum">
                 <number>1024</number>
                </property>
-               <property name="value" >
+               <property name="value">
                 <number>24</number>
                </property>
               </widget>
              </item>
-             <item row="0" column="0" colspan="2" >
-              <widget class="QLabel" name="label_size_3" >
-               <property name="sizePolicy" >
-                <sizepolicy vsizetype="Fixed" hsizetype="Minimum" >
+             <item row="0" column="0" colspan="2">
+              <widget class="QLabel" name="label_size_3">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
                  <horstretch>0</horstretch>
                  <verstretch>0</verstretch>
                 </sizepolicy>
                </property>
-               <property name="text" >
+               <property name="text">
                 <string>Label Mode</string>
                </property>
               </widget>
              </item>
-             <item row="2" column="3" >
-              <layout class="QHBoxLayout" >
-               <property name="spacing" >
-                <number>0</number>
-               </property>
-               <property name="leftMargin" >
-                <number>0</number>
-               </property>
-               <property name="topMargin" >
-                <number>0</number>
-               </property>
-               <property name="rightMargin" >
-                <number>0</number>
-               </property>
-               <property name="bottomMargin" >
+             <item row="2" column="3">
+              <layout class="QHBoxLayout">
+               <property name="spacing">
                 <number>0</number>
                </property>
                <item>
-                <widget class="QToolButton" name="toolButtonBold_Cell" >
-                 <property name="toolTip" >
+                <widget class="QToolButton" name="toolButtonBold_Cell">
+                 <property name="toolTip">
                   <string>Bold</string>
                  </property>
-                 <property name="whatsThis" >
+                 <property name="whatsThis">
                   <string>Turn this option on to get bold labels.</string>
                  </property>
-                 <property name="text" >
+                 <property name="text">
                   <string>B</string>
                  </property>
-                 <property name="checkable" >
+                 <property name="checkable">
                   <bool>true</bool>
                  </property>
                 </widget>
                </item>
                <item>
-                <widget class="QToolButton" name="toolButtonItalic_Cell" >
-                 <property name="toolTip" >
+                <widget class="QToolButton" name="toolButtonItalic_Cell">
+                 <property name="toolTip">
                   <string>Italic</string>
                  </property>
-                 <property name="whatsThis" >
+                 <property name="whatsThis">
                   <string>Turn this option on to get italic labels.</string>
                  </property>
-                 <property name="text" >
+                 <property name="text">
                   <string>I</string>
                  </property>
-                 <property name="checkable" >
+                 <property name="checkable">
                   <bool>true</bool>
                  </property>
                 </widget>
                </item>
                <item>
-                <widget class="QToolButton" name="toolButtonShadow_Cell" >
-                 <property name="enabled" >
+                <widget class="QToolButton" name="toolButtonShadow_Cell">
+                 <property name="enabled">
                   <bool>false</bool>
                  </property>
-                 <property name="toolTip" >
+                 <property name="toolTip">
                   <string>Shadow</string>
                  </property>
-                 <property name="whatsThis" >
+                 <property name="whatsThis">
                   <string>Turn this option on to get a shadow under the labels.</string>
                  </property>
-                 <property name="text" >
+                 <property name="text">
                   <string>S</string>
                  </property>
-                 <property name="checkable" >
+                 <property name="checkable">
                   <bool>true</bool>
                  </property>
                 </widget>
                </item>
               </layout>
              </item>
-             <item row="0" column="2" colspan="2" >
-              <widget class="QComboBox" name="comboLabelMode_Cell" >
-               <property name="sizePolicy" >
-                <sizepolicy vsizetype="Fixed" hsizetype="Minimum" >
+             <item row="0" column="2" colspan="2">
+              <widget class="QComboBox" name="comboLabelMode_Cell">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
                  <horstretch>0</horstretch>
                  <verstretch>0</verstretch>
                 </sizepolicy>
                </property>
-               <property name="whatsThis" >
+               <property name="whatsThis">
                 <string>Used to set the label font.</string>
                </property>
                <item>
-                <property name="text" >
+                <property name="text">
                  <string>IDs</string>
                 </property>
                </item>
                <item>
-                <property name="text" >
+                <property name="text">
                  <string>Scalars</string>
                 </property>
                </item>
                <item>
-                <property name="text" >
+                <property name="text">
                  <string>Vectors</string>
                 </property>
                </item>
                <item>
-                <property name="text" >
+                <property name="text">
                  <string>Normals</string>
                 </property>
                </item>
                <item>
-                <property name="text" >
+                <property name="text">
                  <string>TCoords</string>
                 </property>
                </item>
                <item>
-                <property name="text" >
+                <property name="text">
                  <string>Tensors</string>
                 </property>
                </item>
                <item>
-                <property name="text" >
+                <property name="text">
                  <string>FieldData</string>
                 </property>
                </item>
               </widget>
              </item>
-             <item row="2" column="0" >
-              <widget class="QLabel" name="label_cell_font" >
-               <property name="sizePolicy" >
-                <sizepolicy vsizetype="Fixed" hsizetype="Minimum" >
+             <item row="2" column="0">
+              <widget class="QLabel" name="label_cell_font">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
                  <horstretch>0</horstretch>
                  <verstretch>0</verstretch>
                 </sizepolicy>
                </property>
-               <property name="text" >
+               <property name="text">
                 <string>Font</string>
                </property>
               </widget>
              </item>
-             <item row="1" column="0" colspan="2" >
-              <widget class="QLabel" name="label_size_2" >
-               <property name="sizePolicy" >
-                <sizepolicy vsizetype="Fixed" hsizetype="Minimum" >
+             <item row="1" column="0" colspan="2">
+              <widget class="QLabel" name="label_size_2">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
                  <horstretch>0</horstretch>
                  <verstretch>0</verstretch>
                 </sizepolicy>
                </property>
-               <property name="text" >
+               <property name="text">
                 <string>Font Size</string>
                </property>
               </widget>
              </item>
-             <item row="4" column="0" >
-              <widget class="QLabel" name="label_15" >
-               <property name="sizePolicy" >
-                <sizepolicy vsizetype="Fixed" hsizetype="Minimum" >
+             <item row="4" column="0">
+              <widget class="QLabel" name="label_15">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
                  <horstretch>0</horstretch>
                  <verstretch>0</verstretch>
                 </sizepolicy>
                </property>
-               <property name="text" >
+               <property name="text">
                 <string>Opacity</string>
                </property>
               </widget>
              </item>
-             <item row="4" column="3" >
-              <widget class="pqColorChooserButton" name="buttonColor_Cell" >
-               <property name="sizePolicy" >
-                <sizepolicy vsizetype="Fixed" hsizetype="Minimum" >
+             <item row="4" column="3">
+              <widget class="pqColorChooserButton" name="buttonColor_Cell">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
                  <horstretch>0</horstretch>
                  <verstretch>0</verstretch>
                 </sizepolicy>
                </property>
-               <property name="whatsThis" >
+               <property name="whatsThis">
                 <string>Click this button to set the title color.</string>
                </property>
-               <property name="text" >
+               <property name="text">
                 <string>Color</string>
                </property>
               </widget>
              </item>
-             <item row="4" column="1" colspan="2" >
-              <widget class="QDoubleSpinBox" name="spinBoxOpacity_Cell" >
-               <property name="whatsThis" >
+             <item row="4" column="1" colspan="2">
+              <widget class="QDoubleSpinBox" name="spinBoxOpacity_Cell">
+               <property name="whatsThis">
                 <string>Used to set the label opacity.</string>
                </property>
-               <property name="maximum" >
+               <property name="maximum">
                 <double>1.000000000000000</double>
                </property>
-               <property name="singleStep" >
+               <property name="singleStep">
                 <double>0.100000000000000</double>
                </property>
-               <property name="value" >
+               <property name="value">
                 <double>1.000000000000000</double>
                </property>
               </widget>
              </item>
-             <item row="2" column="1" colspan="2" >
-              <widget class="QComboBox" name="comboFontFamily_Cell" >
-               <property name="sizePolicy" >
-                <sizepolicy vsizetype="Fixed" hsizetype="Minimum" >
+             <item row="2" column="1" colspan="2">
+              <widget class="QComboBox" name="comboFontFamily_Cell">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
                  <horstretch>0</horstretch>
                  <verstretch>0</verstretch>
                 </sizepolicy>
                </property>
-               <property name="whatsThis" >
+               <property name="whatsThis">
                 <string>Used to set the label font.</string>
                </property>
                <item>
-                <property name="text" >
+                <property name="text">
                  <string>Arial</string>
                 </property>
                </item>
                <item>
-                <property name="text" >
+                <property name="text">
                  <string>Courier</string>
                 </property>
                </item>
                <item>
-                <property name="text" >
+                <property name="text">
                  <string>Times</string>
                 </property>
                </item>
               </widget>
              </item>
-             <item row="3" column="0" >
-              <widget class="QLabel" name="label_16" >
-               <property name="sizePolicy" >
-                <sizepolicy vsizetype="Fixed" hsizetype="Minimum" >
+             <item row="3" column="0">
+              <widget class="QLabel" name="label_16">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
                  <horstretch>0</horstretch>
                  <verstretch>0</verstretch>
                 </sizepolicy>
                </property>
-               <property name="text" >
+               <property name="text">
                 <string>Align</string>
                </property>
               </widget>
              </item>
-             <item row="3" column="1" colspan="2" >
-              <widget class="QComboBox" name="comboTextAlign_Cell" >
-               <property name="sizePolicy" >
-                <sizepolicy vsizetype="Fixed" hsizetype="Minimum" >
+             <item row="3" column="1" colspan="2">
+              <widget class="QComboBox" name="comboTextAlign_Cell">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
                  <horstretch>0</horstretch>
                  <verstretch>0</verstretch>
                 </sizepolicy>
                </property>
-               <property name="whatsThis" >
+               <property name="whatsThis">
                 <string>Used to set the label font.</string>
                </property>
-               <property name="currentIndex" >
+               <property name="currentIndex">
                 <number>1</number>
                </property>
                <item>
-                <property name="text" >
+                <property name="text">
                  <string>Left</string>
                 </property>
                </item>
                <item>
-                <property name="text" >
+                <property name="text">
                  <string>Center</string>
                 </property>
                </item>
                <item>
-                <property name="text" >
+                <property name="text">
                  <string>Right</string>
                 </property>
                </item>
@@ -1441,345 +1217,303 @@
           </item>
          </layout>
         </widget>
-        <widget class="QWidget" name="tab_PointLabel" >
-         <attribute name="title" >
+        <widget class="QWidget" name="tab_PointLabel">
+         <attribute name="title">
           <string>Point Label</string>
          </attribute>
-         <layout class="QGridLayout" >
-          <property name="leftMargin" >
+         <layout class="QGridLayout">
+          <property name="margin">
            <number>3</number>
           </property>
-          <property name="topMargin" >
+          <property name="spacing">
            <number>3</number>
           </property>
-          <property name="rightMargin" >
-           <number>3</number>
-          </property>
-          <property name="bottomMargin" >
-           <number>3</number>
-          </property>
-          <property name="horizontalSpacing" >
-           <number>3</number>
-          </property>
-          <property name="verticalSpacing" >
-           <number>3</number>
-          </property>
-          <item row="1" column="0" >
-           <widget class="QGroupBox" name="groupBox_PointLabelStyle" >
-            <property name="enabled" >
+          <item row="1" column="0">
+           <widget class="QGroupBox" name="groupBox_PointLabelStyle">
+            <property name="enabled">
              <bool>false</bool>
             </property>
-            <property name="title" >
+            <property name="title">
              <string>Style</string>
             </property>
-            <layout class="QGridLayout" >
-             <property name="leftMargin" >
-              <number>9</number>
-             </property>
-             <property name="topMargin" >
-              <number>9</number>
-             </property>
-             <property name="rightMargin" >
-              <number>9</number>
-             </property>
-             <property name="bottomMargin" >
-              <number>9</number>
-             </property>
-             <property name="horizontalSpacing" >
-              <number>6</number>
-             </property>
-             <property name="verticalSpacing" >
-              <number>6</number>
-             </property>
-             <item row="3" column="1" colspan="2" >
-              <widget class="QComboBox" name="comboTextAlign_Point" >
-               <property name="sizePolicy" >
-                <sizepolicy vsizetype="Fixed" hsizetype="Minimum" >
+            <layout class="QGridLayout">
+             <item row="3" column="1" colspan="2">
+              <widget class="QComboBox" name="comboTextAlign_Point">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
                  <horstretch>0</horstretch>
                  <verstretch>0</verstretch>
                 </sizepolicy>
                </property>
-               <property name="whatsThis" >
+               <property name="whatsThis">
                 <string>Used to set the label font.</string>
                </property>
-               <property name="currentIndex" >
+               <property name="currentIndex">
                 <number>1</number>
                </property>
                <item>
-                <property name="text" >
+                <property name="text">
                  <string>Left</string>
                 </property>
                </item>
                <item>
-                <property name="text" >
+                <property name="text">
                  <string>Center</string>
                 </property>
                </item>
                <item>
-                <property name="text" >
+                <property name="text">
                  <string>Right</string>
                 </property>
                </item>
               </widget>
              </item>
-             <item row="3" column="0" >
-              <widget class="QLabel" name="label_17" >
-               <property name="sizePolicy" >
-                <sizepolicy vsizetype="Fixed" hsizetype="Minimum" >
+             <item row="3" column="0">
+              <widget class="QLabel" name="label_17">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
                  <horstretch>0</horstretch>
                  <verstretch>0</verstretch>
                 </sizepolicy>
                </property>
-               <property name="text" >
+               <property name="text">
                 <string>Align</string>
                </property>
               </widget>
              </item>
-             <item row="4" column="3" >
-              <widget class="pqColorChooserButton" name="buttonColor_Point" >
-               <property name="sizePolicy" >
-                <sizepolicy vsizetype="Fixed" hsizetype="Minimum" >
+             <item row="4" column="3">
+              <widget class="pqColorChooserButton" name="buttonColor_Point">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
                  <horstretch>0</horstretch>
                  <verstretch>0</verstretch>
                 </sizepolicy>
                </property>
-               <property name="whatsThis" >
+               <property name="whatsThis">
                 <string>Click this button to set the title color.</string>
                </property>
-               <property name="text" >
+               <property name="text">
                 <string>Color</string>
                </property>
               </widget>
              </item>
-             <item row="4" column="1" colspan="2" >
-              <widget class="QDoubleSpinBox" name="spinBoxOpacity_Point" >
-               <property name="whatsThis" >
+             <item row="4" column="1" colspan="2">
+              <widget class="QDoubleSpinBox" name="spinBoxOpacity_Point">
+               <property name="whatsThis">
                 <string>Used to set the label opacity.</string>
                </property>
-               <property name="maximum" >
+               <property name="maximum">
                 <double>1.000000000000000</double>
                </property>
-               <property name="singleStep" >
+               <property name="singleStep">
                 <double>0.100000000000000</double>
                </property>
-               <property name="value" >
+               <property name="value">
                 <double>1.000000000000000</double>
                </property>
               </widget>
              </item>
-             <item row="4" column="0" >
-              <widget class="QLabel" name="label_14" >
-               <property name="sizePolicy" >
-                <sizepolicy vsizetype="Fixed" hsizetype="Minimum" >
+             <item row="4" column="0">
+              <widget class="QLabel" name="label_14">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
                  <horstretch>0</horstretch>
                  <verstretch>0</verstretch>
                 </sizepolicy>
                </property>
-               <property name="text" >
+               <property name="text">
                 <string>Opacity</string>
                </property>
               </widget>
              </item>
-             <item row="2" column="3" >
-              <layout class="QHBoxLayout" >
-               <property name="spacing" >
-                <number>0</number>
-               </property>
-               <property name="leftMargin" >
-                <number>0</number>
-               </property>
-               <property name="topMargin" >
-                <number>0</number>
-               </property>
-               <property name="rightMargin" >
-                <number>0</number>
-               </property>
-               <property name="bottomMargin" >
+             <item row="2" column="3">
+              <layout class="QHBoxLayout">
+               <property name="spacing">
                 <number>0</number>
                </property>
                <item>
-                <widget class="QToolButton" name="toolButtonBold_Point" >
-                 <property name="toolTip" >
+                <widget class="QToolButton" name="toolButtonBold_Point">
+                 <property name="toolTip">
                   <string>Bold</string>
                  </property>
-                 <property name="whatsThis" >
+                 <property name="whatsThis">
                   <string>Turn this option on to get bold labels.</string>
                  </property>
-                 <property name="text" >
+                 <property name="text">
                   <string>B</string>
                  </property>
-                 <property name="checkable" >
+                 <property name="checkable">
                   <bool>true</bool>
                  </property>
                 </widget>
                </item>
                <item>
-                <widget class="QToolButton" name="toolButtonItalic_Point" >
-                 <property name="toolTip" >
+                <widget class="QToolButton" name="toolButtonItalic_Point">
+                 <property name="toolTip">
                   <string>Italic</string>
                  </property>
-                 <property name="whatsThis" >
+                 <property name="whatsThis">
                   <string>Turn this option on to get italic labels.</string>
                  </property>
-                 <property name="text" >
+                 <property name="text">
                   <string>I</string>
                  </property>
-                 <property name="checkable" >
+                 <property name="checkable">
                   <bool>true</bool>
                  </property>
                 </widget>
                </item>
                <item>
-                <widget class="QToolButton" name="toolButtonShadow_Point" >
-                 <property name="enabled" >
+                <widget class="QToolButton" name="toolButtonShadow_Point">
+                 <property name="enabled">
                   <bool>false</bool>
                  </property>
-                 <property name="toolTip" >
+                 <property name="toolTip">
                   <string>Shadow</string>
                  </property>
-                 <property name="whatsThis" >
+                 <property name="whatsThis">
                   <string>Turn this option on to get a shadow under the labels.</string>
                  </property>
-                 <property name="text" >
+                 <property name="text">
                   <string>S</string>
                  </property>
-                 <property name="checkable" >
+                 <property name="checkable">
                   <bool>true</bool>
                  </property>
                 </widget>
                </item>
               </layout>
              </item>
-             <item row="2" column="1" colspan="2" >
-              <widget class="QComboBox" name="comboFontFamily_Point" >
-               <property name="sizePolicy" >
-                <sizepolicy vsizetype="Fixed" hsizetype="Minimum" >
+             <item row="2" column="1" colspan="2">
+              <widget class="QComboBox" name="comboFontFamily_Point">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
                  <horstretch>0</horstretch>
                  <verstretch>0</verstretch>
                 </sizepolicy>
                </property>
-               <property name="whatsThis" >
+               <property name="whatsThis">
                 <string>Used to set the label font.</string>
                </property>
                <item>
-                <property name="text" >
+                <property name="text">
                  <string>Arial</string>
                 </property>
                </item>
                <item>
-                <property name="text" >
+                <property name="text">
                  <string>Courier</string>
                 </property>
                </item>
                <item>
-                <property name="text" >
+                <property name="text">
                  <string>Times</string>
                 </property>
                </item>
               </widget>
              </item>
-             <item row="0" column="0" colspan="2" >
-              <widget class="QLabel" name="label_size_4" >
-               <property name="sizePolicy" >
-                <sizepolicy vsizetype="Fixed" hsizetype="Minimum" >
+             <item row="0" column="0" colspan="2">
+              <widget class="QLabel" name="label_size_4">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
                  <horstretch>0</horstretch>
                  <verstretch>0</verstretch>
                 </sizepolicy>
                </property>
-               <property name="text" >
+               <property name="text">
                 <string>Label Mode</string>
                </property>
               </widget>
              </item>
-             <item row="1" column="0" colspan="2" >
-              <widget class="QLabel" name="label_size" >
-               <property name="sizePolicy" >
-                <sizepolicy vsizetype="Fixed" hsizetype="Minimum" >
+             <item row="1" column="0" colspan="2">
+              <widget class="QLabel" name="label_size">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
                  <horstretch>0</horstretch>
                  <verstretch>0</verstretch>
                 </sizepolicy>
                </property>
-               <property name="text" >
+               <property name="text">
                 <string>Font Size</string>
                </property>
               </widget>
              </item>
-             <item row="0" column="2" colspan="2" >
-              <widget class="QComboBox" name="comboLabelMode_Point" >
-               <property name="sizePolicy" >
-                <sizepolicy vsizetype="Fixed" hsizetype="Minimum" >
+             <item row="0" column="2" colspan="2">
+              <widget class="QComboBox" name="comboLabelMode_Point">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
                  <horstretch>0</horstretch>
                  <verstretch>0</verstretch>
                 </sizepolicy>
                </property>
-               <property name="whatsThis" >
+               <property name="whatsThis">
                 <string>Used to set the label font.</string>
                </property>
                <item>
-                <property name="text" >
+                <property name="text">
                  <string>IDs</string>
                 </property>
                </item>
                <item>
-                <property name="text" >
+                <property name="text">
                  <string>Scalars</string>
                 </property>
                </item>
                <item>
-                <property name="text" >
+                <property name="text">
                  <string>Vectors</string>
                 </property>
                </item>
                <item>
-                <property name="text" >
+                <property name="text">
                  <string>Normals</string>
                 </property>
                </item>
                <item>
-                <property name="text" >
+                <property name="text">
                  <string>TCoords</string>
                 </property>
                </item>
                <item>
-                <property name="text" >
+                <property name="text">
                  <string>Tensors</string>
                 </property>
                </item>
                <item>
-                <property name="text" >
+                <property name="text">
                  <string>FieldData</string>
                 </property>
                </item>
               </widget>
              </item>
-             <item row="2" column="0" >
-              <widget class="QLabel" name="label_point_font" >
-               <property name="sizePolicy" >
-                <sizepolicy vsizetype="Fixed" hsizetype="Minimum" >
+             <item row="2" column="0">
+              <widget class="QLabel" name="label_point_font">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
                  <horstretch>0</horstretch>
                  <verstretch>0</verstretch>
                 </sizepolicy>
                </property>
-               <property name="text" >
+               <property name="text">
                 <string>Font</string>
                </property>
               </widget>
              </item>
-             <item row="1" column="2" colspan="2" >
-              <widget class="QSpinBox" name="spinBoxSize_Point" >
-               <property name="sizePolicy" >
-                <sizepolicy vsizetype="Fixed" hsizetype="Minimum" >
+             <item row="1" column="2" colspan="2">
+              <widget class="QSpinBox" name="spinBoxSize_Point">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
                  <horstretch>0</horstretch>
                  <verstretch>0</verstretch>
                 </sizepolicy>
                </property>
-               <property name="minimum" >
+               <property name="minimum">
                 <number>1</number>
                </property>
-               <property name="maximum" >
+               <property name="maximum">
                 <number>1024</number>
                </property>
-               <property name="value" >
+               <property name="value">
                 <number>18</number>
                </property>
               </widget>
@@ -1787,9 +1521,9 @@
             </layout>
            </widget>
           </item>
-          <item row="0" column="0" >
-           <widget class="QCheckBox" name="checkBoxLabelPoints" >
-            <property name="text" >
+          <item row="0" column="0">
+           <widget class="QCheckBox" name="checkBoxLabelPoints">
+            <property name="text">
              <string>Visible</string>
             </property>
            </widget>
@@ -1803,10 +1537,10 @@
    </item>
    <item>
     <spacer>
-     <property name="orientation" >
+     <property name="orientation">
       <enum>Qt::Vertical</enum>
      </property>
-     <property name="sizeHint" >
+     <property name="sizeHint" stdset="0">
       <size>
        <width>20</width>
        <height>40</height>
@@ -1884,11 +1618,11 @@
    <receiver>stackedWidget_2</receiver>
    <slot>setCurrentIndex(int)</slot>
    <hints>
-    <hint type="sourcelabel" >
+    <hint type="sourcelabel">
      <x>269</x>
      <y>58</y>
     </hint>
-    <hint type="destinationlabel" >
+    <hint type="destinationlabel">
      <x>256</x>
      <y>524</y>
     </hint>
@@ -1900,11 +1634,11 @@
    <receiver>groupBox_CellLabelStyle</receiver>
    <slot>setEnabled(bool)</slot>
    <hints>
-    <hint type="sourcelabel" >
+    <hint type="sourcelabel">
      <x>107</x>
      <y>444</y>
     </hint>
-    <hint type="destinationlabel" >
+    <hint type="destinationlabel">
      <x>107</x>
      <y>444</y>
     </hint>
@@ -1916,11 +1650,11 @@
    <receiver>groupBox_PointLabelStyle</receiver>
    <slot>setEnabled(bool)</slot>
    <hints>
-    <hint type="sourcelabel" >
+    <hint type="sourcelabel">
      <x>84</x>
      <y>444</y>
     </hint>
-    <hint type="destinationlabel" >
+    <hint type="destinationlabel">
      <x>92</x>
      <y>444</y>
     </hint>
@@ -1932,11 +1666,11 @@
    <receiver>itemsStackedWidget</receiver>
    <slot>setCurrentIndex(int)</slot>
    <hints>
-    <hint type="sourcelabel" >
+    <hint type="sourcelabel">
      <x>234</x>
      <y>131</y>
     </hint>
-    <hint type="destinationlabel" >
+    <hint type="destinationlabel">
      <x>241</x>
      <y>339</y>
     </hint>

@@ -127,12 +127,24 @@
     <string>Settings</string>
    </property>
   </action>
+  <action name="actionQuery">
+   <property name="text">
+    <string>Find Data</string>
+   </property>
+   <property name="iconText">
+    <string>Find Data</string>
+   </property>
+   <property name="toolTip">
+    <string>Find data matching certain criteria from the current source.</string>
+   </property>
+  </action>
   <addaction name="actionEditUndo"/>
   <addaction name="actionEditRedo"/>
   <addaction name="separator"/>
   <addaction name="actionEditCameraUndo"/>
   <addaction name="actionEditCameraRedo"/>
   <addaction name="separator"/>
+  <addaction name="actionQuery" />
   <addaction name="actionChangeInput"/>
   <addaction name="actionIgnoreTime"/>
   <addaction name="actionDelete"/>

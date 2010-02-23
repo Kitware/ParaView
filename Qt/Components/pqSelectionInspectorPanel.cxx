@@ -253,7 +253,8 @@ public:
     LOCATIONS = 2,
     THRESHOLDS = 3,
     BLOCKS = 4,
-    GLOBALIDS = 5 // GLOBALIDS has to be last 
+    QUERY = 5,
+    GLOBALIDS = 6 // GLOBALIDS has to be last 
     };
 
   static const char* getText(int val, int type)
@@ -285,6 +286,9 @@ public:
 
     case BLOCKS:
       return "Blocks";
+
+    case QUERY:
+      return "Query";
       }
     return "Unknown";
     }
@@ -429,7 +433,6 @@ void pqSelectionInspectorPanel::setSelectionManager(pqSelectionManager* mgr)
     {
     QObject::connect(
       mgr, SIGNAL(selectionChanged(pqOutputPort*)),
-      //this, SLOT(select(pqOutputPort* /*, bool*/)));
       this, SLOT(onSelectionManagerChanged(pqOutputPort*)));
     }
 }
@@ -515,7 +518,10 @@ void pqSelectionInspectorPanel::select(pqOutputPort* opport, bool createNew)
 
   this->Implementation->UpdatingGUI = false;
 
-  this->Implementation->SelectionManager->select(opport);
+  if (createNew)
+    {
+    this->Implementation->SelectionManager->select(opport);
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -637,6 +643,11 @@ void pqSelectionInspectorPanel::updateSelectionGUI()
         /*selectMultiple=*/true,
         /*autoUpdateVisibility=*/false);
     }
+  else if (proxyname == QString("SelectionQuerySource"))
+    {
+    this->Implementation->comboSelectionType->setCurrentIndex(
+      pqImplementation::QUERY); // Query.
+    }
   else
     {
     qDebug() << proxyname << "is not handled by the pqSelectionInspectorPanel yet.";
@@ -689,6 +700,15 @@ void pqSelectionInspectorPanel::updateSelectionGUI()
     this->Implementation->SelectionLinks->addPropertyLink(
       this->Implementation->ThresholdsAdaptor, "values", SIGNAL(valuesChanged()),
       selSource, selSource->GetProperty("Thresholds"));
+    }
+
+  if (selSource->GetProperty("UserFriendlyText"))
+    {
+    selSource->UpdatePropertyInformation();
+    this->Implementation->SelectionLinks->addPropertyLink(
+      this->Implementation->queryText, "plainText", 
+      SIGNAL(textChanged()),
+      selSource, selSource->GetProperty("UserFriendlyText"));
     }
 }
 
@@ -1768,6 +1788,7 @@ void pqSelectionInspectorPanel::updateSelectionTypesAvailable()
   this->updateSelectionTypesAvailable(this->Implementation->InputPort);
 }
 
+//-----------------------------------------------------------------------------
 void pqSelectionInspectorPanel::updateSelectionTypesAvailable(pqOutputPort* port)
 {
   int cur_index = this->Implementation->comboSelectionType->currentIndex();
@@ -1790,8 +1811,8 @@ void pqSelectionInspectorPanel::updateSelectionTypesAvailable(pqOutputPort* port
         this->Implementation->comboFieldType->currentText() == 
           QString("POINT")? 1 : 0));
     }
-  this->Implementation->comboSelectionType->blockSignals(prev);
   this->Implementation->comboSelectionType->setCurrentIndex(cur_index);
+  this->Implementation->comboSelectionType->blockSignals(prev);
 }
 
 bool pqSelectionInspectorPanel::hasGlobalIDs(pqOutputPort* port)

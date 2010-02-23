@@ -98,11 +98,6 @@ public:
   /// has representations added (the representations may not be visible).
   QList<pqView*> getViews() const;
 
-  /// This method updates all render modules to which all  
-  /// representations for this source belong, if force is true, it for an 
-  /// immediate render otherwise render on idle.
-  void renderAllViews(bool force=false);
-
   /// Returns the current data information at this output port.
   /// This does not update the pipeline, it simply returns the data information
   /// for data currently present on the output port on the server.
@@ -125,6 +120,12 @@ public:
 
   /// Set the selection input.
   void setSelectionInput(vtkSMSourceProxy* src, int port);
+
+public slots:
+  /// This method updates all render modules to which all  
+  /// representations for this source belong, if force is true, it for an 
+  /// immediate render otherwise render on idle.
+  void renderAllViews(bool force=false);
 
 signals:
   /// Fired when a connection is added between this output port and a consumer.
