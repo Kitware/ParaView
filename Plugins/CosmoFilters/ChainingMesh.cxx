@@ -115,8 +115,8 @@ ChainingMesh::ChainingMesh(
     this->maxMine[dim] = maxAlive[dim] + this->deadSize;
 
     // How many chain mesh grids will fit
-    this->meshSize[dim] = ((this->maxMine[dim] - this->minMine[dim]) / 
-                            this->chainSize) + 1;
+    this->meshSize[dim] = (int)(((this->maxMine[dim] - this->minMine[dim]) / 
+                                 this->chainSize) + 1);
   }
 
   // Create the chaining mesh of all particles
@@ -154,8 +154,8 @@ ChainingMesh::ChainingMesh(
     this->minMine[dim] = minLoc[dim];
     this->maxMine[dim] = maxLoc[dim];
 
-    this->meshSize[dim] = ((this->maxMine[dim] - this->minMine[dim]) / 
-                            this->chainSize) + 1;
+    this->meshSize[dim] = (int)(((this->maxMine[dim] - this->minMine[dim]) / 
+                                 this->chainSize) + 1);
   }
 
   // Create the chaining mesh of halo particles
@@ -233,9 +233,9 @@ void ChainingMesh::createChainingMesh()
     loc[1] = this->yy[p];
     loc[2] = this->zz[p];
 
-    int i = (loc[0] - this->minMine[0]) / this->chainSize;
-    int j = (loc[1] - this->minMine[1]) / this->chainSize;
-    int k = (loc[2] - this->minMine[2]) / this->chainSize;
+    int i = (int)((loc[0] - this->minMine[0]) / this->chainSize);
+    int j = (int)((loc[1] - this->minMine[1]) / this->chainSize);
+    int k = (int)((loc[2] - this->minMine[2]) / this->chainSize);
 
     // First particle in bucket
     if (this->buckets[i][j][k] == -1) {
