@@ -206,7 +206,7 @@ p, li { white-space: pre-wrap; }
         <bool>false</bool>
        </property>
        <property name="text">
-        <string>Extract Selection Over Time</string>
+        <string>Plot Selection Over Time</string>
        </property>
       </widget>
      </item>
