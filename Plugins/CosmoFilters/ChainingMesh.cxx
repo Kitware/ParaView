@@ -79,7 +79,7 @@ ChainingMesh::ChainingMesh(
   this->chainSize = chainSz;
 
   // Extract the contiguous data block from a vector pointer
-  this->particleCount = xLoc->size();
+  this->particleCount = (long)xLoc->size();
   this->xx = &(*xLoc)[0];
   this->yy = &(*yLoc)[0];
   this->zz = &(*zLoc)[0];
