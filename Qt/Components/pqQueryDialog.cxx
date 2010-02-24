@@ -170,6 +170,13 @@ pqQueryDialog::pqQueryDialog(
   QObject::connect(
     &this->Internals->LabelColorLinks, SIGNAL(qtWidgetChanged()),
     _producer, SLOT(renderAllViews()));
+
+  vtkPVDataInformation* dataInfo = this->producer()->getDataInformation();
+  if (dataInfo->GetTimeSpan()[0] >= dataInfo->GetTimeSpan()[1])
+    {
+    // don't show the extract selection over time option is there's not time!
+    this->Internals->extractSelectionOverTime->hide();
+    }
 }
 
 //-----------------------------------------------------------------------------
