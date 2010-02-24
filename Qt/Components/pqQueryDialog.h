@@ -95,12 +95,12 @@ protected slots:
   void onExtractSelection()
     { 
     this->ExtractSelection = true;
-    this->close();
+    this->accept();
     }
   void onExtractSelectionOverTime()
     {
     this->ExtractSelectionOverTime=true;
-    this->close();
+    this->accept();
     }
 
 protected:
