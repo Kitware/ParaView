@@ -330,6 +330,16 @@ SET(PARAVIEW_LIBRARY_DEPENDS_FILE
   "${ParaView_BINARY_DIR}/ParaViewLibraryDepends.cmake")
 EXPORT_LIBRARY_DEPENDENCIES(${PARAVIEW_LIBRARY_DEPENDS_FILE})
 
+#########################################################################
+# Configure the CoProcessing library
+IF (PARAVIEW_ENABLE_PYTHON)
+  OPTION(PARAVIEW_ENABLE_COPROCESSING "Enable/Disable the CoProcessing library." OFF)
+  MARK_AS_ADVANCED(PARAVIEW_ENABLE_COPROCESSING)
+  IF (PARAVIEW_ENABLE_COPROCESSING)
+    ADD_SUBDIRECTORY (CoProcessing)
+  ENDIF (PARAVIEW_ENABLE_COPROCESSING)
+ENDIF (PARAVIEW_ENABLE_PYTHON) 
+
 # Perform build tree configuration. Install configuration is
 # handled below.
 CONFIGURE_FILE(
@@ -464,13 +474,4 @@ IF (NOT PV_INSTALL_NO_DEVELOPMENT)
 
 ENDIF (NOT PV_INSTALL_NO_DEVELOPMENT)
 
-#########################################################################
-# Configure the CoProcessing library
-IF (PARAVIEW_ENABLE_PYTHON)
-  OPTION(PARAVIEW_ENABLE_COPROCESSING "Enable/Disable the CoProcessing library." OFF)
-  MARK_AS_ADVANCED(PARAVIEW_ENABLE_COPROCESSING)
-  IF (PARAVIEW_ENABLE_COPROCESSING)
-    ADD_SUBDIRECTORY (CoProcessing)
-  ENDIF (PARAVIEW_ENABLE_COPROCESSING)
-ENDIF (PARAVIEW_ENABLE_PYTHON) 
 
