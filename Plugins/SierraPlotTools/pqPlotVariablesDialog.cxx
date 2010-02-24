@@ -33,7 +33,6 @@
 #include "pqDataRepresentation.h"
 #include "pqDisplayPolicy.h"
 #include "pqObjectBuilder.h"
-#include "pqPendingDisplayManager.h"
 #include "pqPipelineSource.h"
 #include "pqSierraPlotToolsUtils.h"
 #include "pqSMAdaptor.h"

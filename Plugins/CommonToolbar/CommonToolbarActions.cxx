@@ -6,7 +6,6 @@
 #include <pqDisplayPolicy.h>
 #include <pqObjectBuilder.h>
 #include <pqOutputPort.h>
-#include <pqPendingDisplayManager.h>
 #include <pqPluginManager.h>
 #include <pqPipelineSource.h>
 #include <pqRepresentation.h>

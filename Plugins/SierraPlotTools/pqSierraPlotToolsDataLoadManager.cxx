@@ -30,7 +30,6 @@
 #include "pqDataRepresentation.h"
 #include "pqDisplayPolicy.h"
 #include "pqObjectBuilder.h"
-#include "pqPendingDisplayManager.h"
 #include "pqPipelineSource.h"
 #include "pqSMAdaptor.h"
 #include "pqUndoStack.h"
@@ -138,16 +137,6 @@ void pqSierraPlotToolsDataLoadManager::setupPipeline()
     // We have already made the representations and pushed everything to the
     // server manager.  Thus, there is no state left to be modified.
     meshReader->setModifiedState(pqProxy::UNMODIFIED);
-
-    // This is something of a hack to make the pending display manager to
-    // realize that I have already created all necessary displays.  This should
-    // go away soon.
-    pqPendingDisplayManager* pdmanager = qobject_cast<pqPendingDisplayManager*>(
-                                      core->manager("PENDING_DISPLAY_MANAGER"));
-    if (pdmanager)
-      {
-      pdmanager->removePendingDisplayForSource(meshReader);
-      }
     }
 
   if (stack) stack->endUndoSet();
