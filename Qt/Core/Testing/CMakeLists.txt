@@ -11,7 +11,7 @@ IF(PARAVIEW_DATA_ROOT)
   ADD_EXECUTABLE(pqCoreBasicApp BasicApp.cxx BasicApp.h ${MOC_SRCS})
   TARGET_LINK_LIBRARIES(pqCoreBasicApp pqCore QtTesting ${QT_LIBRARIES} )
   ADD_TEST(pqCoreBasicApp "${EXECUTABLE_OUTPUT_PATH}/pqCoreBasicApp" -dr "--test-directory=${PARAVIEW_TEST_DIR}"
-           "--compare-view=${BASELINE_DIR}/pqCoreBasicApp.png" --exit)
+           "--test-baseline=${BASELINE_DIR}/pqCoreBasicApp.png" --exit)
 ENDIF(PARAVIEW_DATA_ROOT)
 
 
