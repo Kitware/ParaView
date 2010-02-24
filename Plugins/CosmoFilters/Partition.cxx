@@ -106,6 +106,8 @@ void Partition::initialize()
 
     for (int dim = 0; dim < DIMENSION; dim++)
       decompSize[dim] = 0;
+    int periodic[] = {1, 1, 1};
+    int reorder = 1;
     
 #ifdef USE_SERIAL_COSMO
     myProc = 0;
@@ -117,9 +119,6 @@ void Partition::initialize()
       myPosition[dim] = 0;
       }
 #else
-    int periodic[] = {1, 1, 1};
-    int reorder = 1;
-
     // Compute the number of processors in each dimension
     MPI_Dims_create(numProc, DIMENSION, decompSize);
     

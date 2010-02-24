@@ -67,7 +67,8 @@ public:
         const string& outName,  // Base name of output halo files
         POSVEL_T rL,            // Box size of the physical problem
         POSVEL_T deadSize,      // Dead size used to normalize for non periodic
-        POSVEL_T particleMass); // Mass of a single particle in system
+        POSVEL_T particleMass,  // Mass of a single particle in system
+        POSVEL_T bb);           // Inter particle distance for halos
 
   // Set alive particle vectors which were created elsewhere
   void setParticles(
@@ -96,11 +97,17 @@ public:
   /////////////////////////////////////////////////////////////////////
 
   // Find the halo centers (minimum potential) finding minimum of array
-  void FOFHaloCenter(vector<int>* haloCenter);
+  void FOFHaloCenterMinimumPotential(vector<int>* haloCenter);
 
-  // Find the halo centers (minimum potential) using N^2 algorithm
-  void FOFHaloCenterN2_2(vector<int>* haloCenter);
-  int  minimumPotentialN2_2(int h, POTENTIAL_T* minPotential);
+  // Find the halo centers using most bound particle (N^2/2)
+  void FOFHaloCenterMBP(vector<int>* haloCenter);
+  int  mostBoundParticleN2(int h, POTENTIAL_T* minPotential);
+  int  mostBoundParticleAStar(int h);
+
+  // Find the halo centers using most connected particle (N^2/2)
+  void FOFHaloCenterMCP(vector<int>* haloCenter);
+  int  mostConnectedParticleN2(int h);
+  int  mostConnectedParticleChainMesh(int h);
 
   // Find the mass of each halo
   void FOFHaloMass(
@@ -136,6 +143,12 @@ public:
 
 #ifndef USE_VTK_COSMO
   // Print information about halos for debugging and selection
+  void FOFHaloCatalog(
+        vector<int>* haloCenter,
+        vector<POSVEL_T>* xVel,
+        vector<POSVEL_T>* yVel,
+        vector<POSVEL_T>* zVel);
+
   void printHaloSizes(int minSize);
   void printLocations(int haloIndex);
   void printBoundingBox(int haloIndex);
@@ -150,6 +163,7 @@ private:
   POSVEL_T boxSize;             // Physical box size of the data set
   POSVEL_T deadSize;            // Border size for dead particles
   POSVEL_T particleMass;        // Mass of a single particle
+  POSVEL_T bb;                  // Interparticle distance for halos
 
   long   particleCount;         // Total particles on this processor
 

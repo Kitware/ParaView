@@ -66,7 +66,7 @@ using namespace std;
 #ifdef USE_VTK_COSMO
 #include "vtkMPI.h"
 #else
-#include <mpi.h>
+#include <rru_mpi.h>
 #endif
 
 #endif

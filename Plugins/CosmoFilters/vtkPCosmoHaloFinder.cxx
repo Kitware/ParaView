@@ -82,7 +82,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "FOFHaloProperties.h"
 #include "Partition.h"
 
-vtkCxxRevisionMacro(vtkPCosmoHaloFinder, "1.9");
+vtkCxxRevisionMacro(vtkPCosmoHaloFinder, "1.10");
 vtkStandardNewMacro(vtkPCosmoHaloFinder);
 
 /****************************************************************************/
@@ -102,7 +102,6 @@ vtkPCosmoHaloFinder::vtkPCosmoHaloFinder()
   this->BB = .2;
   this->PMin = 10;
   this->ParticleMass = 1;
-  this->CatalogAveragePosition = 1;
   this->CopyHaloDataToParticles = 1;
 }
 
@@ -132,7 +131,6 @@ void vtkPCosmoHaloFinder::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "bb: " << this->BB << endl;
   os << indent << "pmin: " << this->PMin << endl;
   os << indent << "ParticleMass: " << this->ParticleMass << endl;
-  os << indent << "CatalogAveragePosition: " << this->CatalogAveragePosition << endl;
   os << indent << "CopyHaloDataToParticles: " << this->CopyHaloDataToParticles << endl;
 }
 
@@ -385,12 +383,8 @@ int vtkPCosmoHaloFinder::RequestData(
 
   FOFHaloProperties fof;
   fof.setHalos(numberOfFOFHalos, fofHalos, fofHaloCount, fofHaloList);
-  fof.setParameters("", this->RL, this->Overlap, this->ParticleMass);
+  fof.setParameters("", this->RL, this->Overlap, this->ParticleMass, this->BB);
   fof.setParticles(xx, yy, zz, vx, vy, vz, potential, tag, mask, status);
-
-  // Find the index of the particle at the center of every FOF halo
-  vector<int>* fofCenter = new vector<int>;
-  fof.FOFHaloCenter(fofCenter);
 
   // Find the average position of every FOF halo
   vector<POSVEL_T>* fofXPos = new vector<POSVEL_T>;
@@ -501,18 +495,9 @@ int vtkPCosmoHaloFinder::RequestData(
       {
       // set the catalog and average point
       vtkIdType pid;
-      if(this->CatalogAveragePosition)
-        {
-        pid = catpoints->InsertNextPoint
-          ((*fofXPos)[i], (*fofYPos)[i], (*fofZPos)[i]);
-        catalog->InsertNextCell(1, 1, &pid);
-        }
-      else
-        {
-        pid = catpoints->InsertNextPoint
-          (points->GetPoint((*fofCenter)[i]));
-        catalog->InsertNextCell(1, 1, &pid);
-        }
+      pid = catpoints->InsertNextPoint
+        ((*fofXPos)[i], (*fofYPos)[i], (*fofZPos)[i]);
+      catalog->InsertNextCell(1, 1, &pid);
 
       // set the halo data
       haloTag->SetValue(i, fofHaloTags[i]);
@@ -584,7 +569,6 @@ int vtkPCosmoHaloFinder::RequestData(
   delete mask;
 
   delete [] fofHaloTags;
-  delete fofCenter;
   delete fofXPos;
   delete fofYPos;
   delete fofZPos;

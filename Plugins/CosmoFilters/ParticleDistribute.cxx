@@ -972,13 +972,6 @@ void ParticleDistribute::collectLocalParticles(Message* message)
   // If it is DEAD assign it to the neighbor zone that it is in
   // Check all combinations of wraparound
 
-#ifndef USE_VTK_COSMO
-#ifdef DEBUG
-  cout << "Rank " << this->myProc << " local collect " << numParticles <<
-    " particles" << endl;
-#endif
-#endif
-
   for (int i = 0; i < numParticles; i++) {
     for (int dim = 0; dim < DIMENSION; dim++)
       message->getValue(&loc[dim]);

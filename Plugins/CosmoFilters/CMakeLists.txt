@@ -43,6 +43,7 @@ SET(RRU_SOURCES
     CosmoHaloFinder.cxx
     CosmoHaloFinderP.cxx
     FOFHaloProperties.cxx
+    ChainingMesh.cxx
 )
 
 SET(SERVER_ARGS

@@ -115,12 +115,6 @@ class VTK_EXPORT vtkPCosmoHaloFinder : public vtkUnstructuredGridAlgorithm
   vtkGetMacro(ParticleMass, float);
 
   // Description:
-  // Use the average position for catalog output, otherwise use
-  // the particle closest to the center.  (Default on = use closest)
-  vtkSetMacro(CatalogAveragePosition, int);
-  vtkGetMacro(CatalogAveragePosition, int);
-
-  // Description:
   // Copy the halo information to the original particles (Default on)
   vtkSetMacro(CopyHaloDataToParticles, int);
   vtkGetMacro(CopyHaloDataToParticles, int);
@@ -145,7 +139,6 @@ class VTK_EXPORT vtkPCosmoHaloFinder : public vtkUnstructuredGridAlgorithm
   int PMin; // The minimum particles for a halo
   float BB; // The linking length
   float ParticleMass;
-  int CatalogAveragePosition;
   int CopyHaloDataToParticles;
 
  private:

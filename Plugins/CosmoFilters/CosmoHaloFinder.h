@@ -49,11 +49,59 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // It operates by finding clusters of neighbors.
 //
 // .SECTION Note
-// this finder implements a recursive algorithm.
-// linked lists are used for halos.
-// merge is done recursively.
-// each interval has its bounding box calculated in Reorder()
-// JimRecOptList
+// This halo finder implements a recursive algorithm using a k-d tree.
+// Linked lists are used to connect halos found during the recursive merge. 
+// Bounding boxes are calculated for each particle for pruning the merge tree.
+//
+// The halo finder doesn't actually build a tree that can be walked but
+// rather reorganizes the particles into the k-d tree using recursion, such that
+// when myFOF is walked in the same way, the data will match. This is stored
+// in the seq[] array.
+//
+// First step is Reorder().  When it is called the first time it divides all
+// the particles on the X axis such that the particle at the halfway mark in
+// the array is correctly positioned, and all particles in the array below it 
+// have an X value less than it and all particles in the array above it have
+// an X value higher.  Reorder() calls nth_element() which is a partial sort but
+// faster.  So the division does not physically divide the space in half
+// but rather divides the number of particles in half on a dimension.
+// 
+// Next step is the first level of recursion.  Each of the halves from above
+// are divided on the Y axis, again such that the number of particles is the
+// same in each half although the physical space is not divided.  Partial
+// ordering is done again by resequencing the seq array.  Each of these now
+// four pieces is divided on the Z axis next, and this continues until there
+// is one particle at the bottom of the tree.
+// 
+// Next step in the halo finder is to call ComputeLU() which computes a 
+// lower and upper bound for each particle based on the k-d tree of the next
+// axis positioning.  This is used in pruning the merge tree during myFOF().
+// This means that if there is a branch of the k-d tree with some
+// halos in it, but that the next jump to a particle is too far away, then
+// that entire branch is ignored.
+// 
+// Finally myFOF() is called and its recursion mimics that done by Reorder()
+// so that it is looking at the k-d tree resequence correctly.  myFOF()
+// recurses down to the bottom of the tree going to the left first.  When it
+// gets to the bottom it calls Merge() to see if those particles at the
+// bottom are close enough to each other.  Remembering that at each stage
+// of the k-d tree the two halves are divided on the next axis by count and
+// not by physical space, you can see that the Merge() must be done on those
+// four parts as follows.
+// 
+// Merge(A,C) Merge(A,D) Merge(B,C) Merge(B,D).  
+//
+// This is because it is unknown if A shares a boundary with C and D or 
+// B shares that boundary.  As particles are found to be close to each other, 
+// if they are already a part of a halo, the two halos must unite.  
+// While all this is going on, we also prune which means we stop the recursion.
+// As Merge() and myFOF() walk through the recursion chains of halos are
+// created and joined where they have a particle withing the required distance.
+// When myFOF() ends it has a chain of first particle in a halo and nextp 
+// pointing on down until -1 is reached.  Also the halo tag field for each
+// particle is constantly altered so that each particle knows what halo it
+// is part of, and that halo tag is the id of the lowest particle in the halo.
+//
 
 #ifndef CosmoHaloFinder_h
 #define CosmoHaloFinder_h
@@ -158,6 +206,8 @@ private:
 
   int *halo, *nextp, *hsize;
 
+  // Creates a sequence array containing ids of particle rearranged into
+  // a k-d tree.  Recursive method.
   ValueIdPair *v;
   int *seq;
   void Reorder
@@ -165,9 +215,12 @@ private:
      int last, 
      int flag);
 
+  // Calculates a lower and upper bound for each particle so that the 
+  // mergeing step can prune parts of the k-d tree
   POSVEL_T **lb, **ub;
   void ComputeLU(int, int);
 
+  // Recurses through the k-d tree merging particles to create halos
   void myFOF(int, int, int);
   void Merge(int, int, int, int, int);
 };

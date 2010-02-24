@@ -67,7 +67,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 using namespace vtkstd;
 #else
 #ifndef USE_SERIAL_COSMO
-#include <mpi.h>
+#include <rru_mpi.h>
 #endif
 
 #include <string>

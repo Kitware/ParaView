@@ -697,16 +697,6 @@ void CosmoHaloFinderP::collectMixedHalos
     MPI_Status mpistatus;
     while (notReceived > 0) {
 
-      /*
-#ifndef USE_VTK_COSMO
-      // FIXME: what the heck is this for? --Jon Woodring
-if (notReceived == processorsWithMixedHalos)
-      MPI_Recv(haloBuffer, haloBufSize, MPI_INT, 5,
-               0, Partition::getComm(), &mpistatus);
-else
-#endif
-      */
-
       // Get message containing mixed halo information
 #ifdef ID_64
       MPI_Recv(haloBuffer, haloBufSize, MPI_LONG, MPI_ANY_SOURCE,
@@ -812,7 +802,7 @@ void CosmoHaloFinderP::assignMixedHalos()
 
         // Current mixed halo has the most alive particles so far
         int numberAlive = this->allMixedHalos[m]->getAliveCount();
-        int haloWithMostAlive = m;
+        int haloWithLeastAlive = m;
 
         // Iterate on the rest of the mixed halos
         unsigned int n = m + 1;
@@ -824,9 +814,9 @@ void CosmoHaloFinderP::assignMixedHalos()
 
           // Keep track of the mixed halo with the most alive particles
           if (match > 0) {
-            if (numberAlive < this->allMixedHalos[n]->getAliveCount()) {
+            if (numberAlive > this->allMixedHalos[n]->getAliveCount()) {
               numberAlive = this->allMixedHalos[n]->getAliveCount();
-              haloWithMostAlive = n;
+              haloWithLeastAlive = n;
             }
             this->allMixedHalos[m]->addPartner(n);
             this->allMixedHalos[n]->addPartner(m);
@@ -835,8 +825,8 @@ void CosmoHaloFinderP::assignMixedHalos()
           }
           n++;
         }
-        // Mixed halo with the most alive particles gets it as VALID
-        this->allMixedHalos[haloWithMostAlive]->setValid(VALID);
+        // Mixed halo with the least alive particles gets it as VALID
+        this->allMixedHalos[haloWithLeastAlive]->setValid(VALID);
       }
     }
 
@@ -1048,7 +1038,7 @@ void CosmoHaloFinderP::sendMixedHaloResults(ID_T* haloBuffer, int haloBufSize)
 //
 /////////////////////////////////////////////////////////////////////////
 
-void CosmoHaloFinderP::writeHalos()
+void CosmoHaloFinderP::writeTaggedParticles()
 {
   // Map the index of the particle on this process to the index of the
   // particle with the lowest tag value so that the written output refers
@@ -1064,11 +1054,8 @@ void CosmoHaloFinderP::writeHalos()
       mapIndex[this->haloTag[p]] = p;
   }
 
-  // Write the halo catalog
+  // Write the tagged particle file
   ofstream* outStream = new ofstream(this->outFile.c_str(), ios::out);
-
-  // Write halo information of halo tag followed by size for histgram
-  ofstream* haloStream = new ofstream(this->outHaloFile.c_str(), ios::out);
 
   string textMode = "ascii";
   char str[1024];
@@ -1094,13 +1081,6 @@ void CosmoHaloFinderP::writeHalos()
                       ? -1: this->tag[mapIndex[this->haloTag[p]]];
         sprintf(str, "%12d %12d\n", result, this->tag[p]);
         *outStream << str;
-
-        // Only ALIVE particles which are the first particle in a halo
-        // get written to the halo file with the halo size
-        if (this->haloSize[p] >= this->pmin) {
-          *haloStream << this->tag[mapIndex[p]] << "\t"
-                      << this->haloSize[p] << endl;
-        }
       }
     }
   }
@@ -1126,10 +1106,8 @@ void CosmoHaloFinderP::writeHalos()
     }
   }
   outStream->close();
-  haloStream->close();
 
   delete outStream;
-  delete haloStream;
   delete [] mapIndex;
 }
 #endif // USE_VTK_COSMO

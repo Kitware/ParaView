@@ -110,8 +110,8 @@ public:
   int compareHalos(CosmoHalo* halo1, CosmoHalo* halo2);
 
 #ifndef USE_VTK_COSMO
-  // Write the halo results
-  void writeHalos();
+  // Write the particles with mass field containing halo tags
+  void writeTaggedParticles();
 #endif
 
   // Set alive particle vectors which were created elsewhere
