@@ -18,12 +18,6 @@ ELSE (ParaView_SOURCE_DIR)
   INCLUDE(${PARAVIEW_USE_FILE})
 ENDIF (ParaView_SOURCE_DIR)
 
-# Configure a header file for the paths that are needed.
-if(WIN32)
-  set(COPROCESSOR_WIN32_BUILD 1)
-  set(COPROCESSOR_WIN32_BUILD_TYPE ${CMAKE_CONFIGURATION_TYPES})
-endif(WIN32)
-
 if(VTK_USE_MPI)
   set(COPROCESSOR_USE_MPI 1)
 endif(VTK_USE_MPI)

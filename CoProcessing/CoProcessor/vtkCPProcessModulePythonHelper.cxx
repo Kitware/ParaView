@@ -28,7 +28,7 @@
 #include <vtkstd/string>
 using namespace vtkstd;
 
-vtkCxxRevisionMacro(vtkCPProcessModulePythonHelper, "1.2");
+vtkCxxRevisionMacro(vtkCPProcessModulePythonHelper, "1.3");
 vtkStandardNewMacro(vtkCPProcessModulePythonHelper);
 
 //----------------------------------------------------------------------------
@@ -84,13 +84,8 @@ int vtkCPProcessModulePythonHelper::RunGUIStart(
   this->Interpretor=vtkPVPythonInterpretor::New();
   int interpOk = this->Interpretor->InitializeSubInterpretor(1, argv);
 
-  // The stuff below may need to be changed for windows.
 #ifdef PARAVIEW_INSTALL_DIR
-#ifndef COPROCESSOR_WIN32_BUILD
-  this->Interpretor->AddPythonPath(PARAVIEW_INSTALL_DIR "/bin");
-#else
-  this->Interpretor->AddPythonPath(PARAVIEW_INSTALL_DIR "/bin/" COPROCESSOR_WIN32_BUILD_TYPE);
-#endif
+  this->Interpretor->AddPythonPath(PARAVIEW_INSTALL_DIR "/bin/" COPROCESSOR_BUILD_DIR);
   this->Interpretor->AddPythonPath(PARAVIEW_INSTALL_DIR "/Utilities/VTKPythonWrapping");
 #else
   vtkErrorMacro("ParaView install directory is undefined.");
