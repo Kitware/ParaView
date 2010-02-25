@@ -100,10 +100,15 @@ SET(CTEST_CUSTOM_WARNING_EXCEPTION
   
   # Supress warning from Utilities, these are 3rd party code
   # so many a times there's not much we can fix.
-  "Utilities/mpi4py/"
-  "Utilities/Xdmf2/"
-  "Utilities/IceT/"
-  "Utilities/hdf5/"
+  "Utilities.mpi4py"
+  "Utilities.Xdmf2.libsrc"
+  "Utilities.Xdmf2.Ice"
+  "Utilities.IceT"
+  "Utilities.hdf5"
+  "vtkParse.tab.c"
+  "Utilities.vtksqlite"
+  "Utilities.vtkexodus2"
+
   # suppress warning from H5Part library.
   ".H5Part.src"
   )
