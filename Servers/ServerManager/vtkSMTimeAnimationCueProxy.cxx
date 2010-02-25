@@ -14,12 +14,13 @@
 =========================================================================*/
 #include "vtkSMTimeAnimationCueProxy.h"
 
+#include "vtkCommand.h"
 #include "vtkObjectFactory.h"
 #include "vtkSMDomain.h"
 #include "vtkSMProperty.h"
 
 vtkStandardNewMacro(vtkSMTimeAnimationCueProxy);
-vtkCxxRevisionMacro(vtkSMTimeAnimationCueProxy, "1.2");
+vtkCxxRevisionMacro(vtkSMTimeAnimationCueProxy, "1.3");
 //----------------------------------------------------------------------------
 vtkSMTimeAnimationCueProxy::vtkSMTimeAnimationCueProxy()
 {
