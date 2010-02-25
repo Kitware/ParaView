@@ -19,7 +19,7 @@
 #include "vtkSMProperty.h"
 
 vtkStandardNewMacro(vtkSMTimeAnimationCueProxy);
-vtkCxxRevisionMacro(vtkSMTimeAnimationCueProxy, "1.1");
+vtkCxxRevisionMacro(vtkSMTimeAnimationCueProxy, "1.2");
 //----------------------------------------------------------------------------
 vtkSMTimeAnimationCueProxy::vtkSMTimeAnimationCueProxy()
 {
@@ -51,6 +51,7 @@ void vtkSMTimeAnimationCueProxy::TickInternal(void* info)
       {
       proxy->UpdateVTKObjects();
       }
+    this->InvokeEvent(vtkCommand::AnimationCueTickEvent, info);
     }
   else
     {
