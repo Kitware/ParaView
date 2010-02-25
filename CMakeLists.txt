@@ -395,12 +395,6 @@ IF (NOT PV_INSTALL_NO_DEVELOPMENT)
   INSTALL(
       FILES ${pluginQtCoreConfig}
       DESTINATION ${PV_INSTALL_INCLUDE_DIR}/Qt/Core)
-  SET(pluginServerManagerConfig
-      ${ParaView_SOURCE_DIR}/Servers/Common/vtkPVPluginInit.cxx.in)
-  INSTALL(
-      FILES ${pluginServerManagerConfig}
-      DESTINATION ${PV_INSTALL_INCLUDE_DIR}/Servers/Common/vtkPVPluginInit.cxx.in
-      COMPONENT Development)
   SET(cmakeDevFiles
       ${ParaView_CMAKE_DIR}/branded_splash.png
       ${ParaView_SOURCE_DIR}/ParaViewUse.cmake
