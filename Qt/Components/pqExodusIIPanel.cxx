@@ -633,11 +633,13 @@ void pqExodusIIPanel::setSelectedBlocksCheckState(bool check/*=true*/)
     !iter->IsDoneWithTraversal() && cur_index < static_cast<unsigned int>(
       block_ids.size()); iter->GoToNextItem())
     {
-    if (iter->GetCurrentFlatIndex() < block_ids[cur_index])
+    if (static_cast<vtkIdType>(
+        iter->GetCurrentFlatIndex()) < block_ids[cur_index])
       {
       continue;
       }
-    if (iter->GetCurrentFlatIndex() > block_ids[cur_index])
+    if (static_cast<vtkIdType>(
+        iter->GetCurrentFlatIndex()) > block_ids[cur_index])
       {
       qDebug() << "Failed to locate block's name for block id: " <<
         block_ids[cur_index];
