@@ -52,7 +52,7 @@ public:
 };
 
 vtkStandardNewMacro(vtkSMContextNamedOptionsProxy);
-vtkCxxRevisionMacro(vtkSMContextNamedOptionsProxy, "1.17");
+vtkCxxRevisionMacro(vtkSMContextNamedOptionsProxy, "1.18");
 //----------------------------------------------------------------------------
 vtkSMContextNamedOptionsProxy::vtkSMContextNamedOptionsProxy()
 {
@@ -150,7 +150,6 @@ void vtkSMContextNamedOptionsProxy::SetXSeriesName(const char* name)
     }
   this->Modified();
 }
-
 
 //----------------------------------------------------------------------------
 void vtkSMContextNamedOptionsProxy::SetUseIndexForXAxis(bool useIndex)

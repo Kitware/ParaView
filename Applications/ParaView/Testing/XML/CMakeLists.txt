@@ -78,6 +78,7 @@ SET (TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/XdmfReadStructuredGridCollection.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/XdmfGridAttributes.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/XYChart.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/XYBarChart.xml
 )
 
 # Mark tests that change change state considerably requires a restart of the
