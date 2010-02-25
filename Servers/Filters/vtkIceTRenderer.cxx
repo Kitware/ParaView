@@ -47,7 +47,7 @@ static vtkIceTRenderer *currentRenderer;
 // vtkIceTRenderer implementation.
 //******************************************************************
 
-vtkCxxRevisionMacro(vtkIceTRenderer, "1.28");
+vtkCxxRevisionMacro(vtkIceTRenderer, "1.29");
 vtkStandardNewMacro(vtkIceTRenderer);
 
 vtkCxxSetObjectMacro(vtkIceTRenderer, SortingKdTree, vtkPKdTree);
@@ -283,6 +283,11 @@ void vtkIceTRenderer::DeviceRender()
     {
     icetDisable(ICET_ORDERED_COMPOSITE);
     }
+
+  // \NOTE: This suppose to fix the issue with volume rendering
+  // on the tile display mode where every tile has to render and composite
+  // but for some reason it didnot work.
+//  icetDisable(ICET_FLOATING_VIEWPORT);
 
   //Make sure we tell ICE-T what the background color is.  If the background
   //is black, also make it transparent so that we can skip fixing it.
@@ -559,7 +564,7 @@ int vtkIceTRenderer::UpdateGeometry()
 int vtkIceTRenderer::UpdateTranslucentPolygonalGeometry()
 {
   int result=0;
-  // loop through props and give them a chance to 
+  // loop through props and give them a chance to
   // render themselves as translucent geometry
   for (int i = 0; i < this->PropArrayCount; i++ )
     {

@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -44,9 +44,9 @@ class pqPipelineRepresentation;
 class PQCOMPONENTS_EXPORT pqDisplayProxyEditor : public pqDisplayPanel
 {
   Q_OBJECT
-  
+
   // property adaptor for specular lighting
-  Q_PROPERTY(QVariant specularColor READ specularColor 
+  Q_PROPERTY(QVariant specularColor READ specularColor
                                     WRITE setSpecularColor)
 public:
   /// constructor
@@ -80,6 +80,8 @@ protected slots:
   void volumeBlockSelected();
   void setSolidColor(const QColor& color);
   void setBackfaceSolidColor(const QColor& color);
+  void setAutoAdjustSampleDistances(bool flag);
+
 protected:
 
   /// Set the display whose properties we want to edit.
@@ -88,7 +90,7 @@ protected:
 
   pqDisplayProxyEditorInternal* Internal;
   void setupGUIConnections();
-  
+
   QVariant specularColor() const;
   void setSpecularColor(QVariant);
 

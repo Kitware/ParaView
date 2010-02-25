@@ -16,7 +16,7 @@
 // show a uniform grid volume in a render view.
 // .SECTION Description
 // vtkSMUniformGridVolumeRepresentationProxy is a concrete representation that can be used
-// to render the uniform grid volume in a vtkSMRenderViewProxy. 
+// to render the uniform grid volume in a vtkSMRenderViewProxy.
 // It supports rendering the uniform grid volume data.
 
 #ifndef __vtkSMUniformGridVolumeRepresentationProxy_h
@@ -24,12 +24,12 @@
 
 #include "vtkSMPropRepresentationProxy.h"
 
-class VTK_EXPORT vtkSMUniformGridVolumeRepresentationProxy : 
+class VTK_EXPORT vtkSMUniformGridVolumeRepresentationProxy :
   public vtkSMPropRepresentationProxy
 {
 public:
   static vtkSMUniformGridVolumeRepresentationProxy* New();
-  vtkTypeRevisionMacro(vtkSMUniformGridVolumeRepresentationProxy, 
+  vtkTypeRevisionMacro(vtkSMUniformGridVolumeRepresentationProxy,
     vtkSMPropRepresentationProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
@@ -55,15 +55,40 @@ public:
   // Views typically support a mechanism to create a selection in the view
   // itself, e.g. by click-and-dragging over a region in the view. The view
   // passes this selection to each of the representations and asks them to
-  // convert it to a proxy for a selection which can be set on the view. 
+  // convert it to a proxy for a selection which can be set on the view.
   // Its representation does not support selection creation, it should simply
-  // return NULL. This method returns a new vtkSMProxy instance which the 
+  // return NULL. This method returns a new vtkSMProxy instance which the
   // caller must free after use.
   // This implementation converts a prop selection to a selection source.
   virtual vtkSMProxy* ConvertSelection(vtkSelection* input);
 
+  // Description:
+  // Set the active volume mapper by enum index.
+  void SetSelectedMapperIndex(int);
+  vtkGetMacro(SelectedMapperIndex, int);
+
+  // Description:
+  // Convenience methods for switching between volume
+  // mappers.
+  void SetVolumeMapperToFixedPoint();
+  void SetVolumeMapperToXYZ();
+
+  // Note: Do we need to have the name like this?
+  // GetVolumeMapperTypeCM()? What is CM stands for.
+  virtual int GetVolumeMapperType();
+
 //BTX
 protected:
+
+  // Volume mapper types.
+  enum
+    {
+    FIXED_POINT_MAPPER,
+    GPU_MAPPER,
+    UNKNOWN_VOLUME_MAPPER
+    };
+
+
   vtkSMUniformGridVolumeRepresentationProxy();
   ~vtkSMUniformGridVolumeRepresentationProxy();
 
@@ -80,18 +105,24 @@ protected:
   virtual bool BeginCreateVTKObjects();
 
   // Description:
-  // This method is called after CreateVTKObjects(). 
+  // This method is called after CreateVTKObjects().
   // This gives subclasses an opportunity to do some post-creation
   // initialization.
   virtual bool EndCreateVTKObjects();
 
   // Structured grid volume rendering classes
   vtkSMProxy* VolumeFixedPointRayCastMapper;
+  vtkSMProxy* VolumeGPURayCastMapper;
 
   // Common volume rendering classes
   vtkSMProxy* VolumeActor;
   vtkSMProxy* VolumeProperty;
   vtkSMProxy* ClientMapper;
+
+  // @Note: Should we have check if one or more
+  // Mapper type is supported?.
+  int SelectedMapperIndex;
+
 
 private:
   vtkSMUniformGridVolumeRepresentationProxy(const vtkSMUniformGridVolumeRepresentationProxy&); // Not implemented

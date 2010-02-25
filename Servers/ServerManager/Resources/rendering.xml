@@ -91,7 +91,7 @@
         number_of_elements="1"
         default_values="110.0" >
         <DoubleRangeDomain name="range" min="60" max="170" resolution="1"/>
-      </DoubleVectorProperty>    
+      </DoubleVectorProperty>
       <!-- Head Light -->
       <DoubleVectorProperty
         name="HeadLightWarmth"
@@ -117,15 +117,15 @@
      </IntVectorProperty>
     </Proxy>
   </ProxyGroup>
-   
+
   <ProxyGroup name="renderers">
 
     <Proxy name="Renderer" class="vtkRenderer">
       <!-- Renderer purposefully doesn't have an active camera property.
       Since the renderer is managed by RenderModule, it sets the camera
       in peculiar ways, and can't use a property for it -->
-      <ProxyProperty 
-        name="ViewProps" 
+      <ProxyProperty
+        name="ViewProps"
         command="AddViewProp"
         clean_command="RemoveAllViewProps"
         repeatable="1">
@@ -142,7 +142,7 @@
         default_values="1">
         <BooleanDomain name="bool"/>
       </IntVectorProperty>
-      
+
       <IntVectorProperty
         name="AutomaticLightCreation"
         command="SetAutomaticLightCreation"
@@ -150,7 +150,7 @@
         default_values="0">
         <BooleanDomain name="bool"/>
       </IntVectorProperty>
-      
+
       <IntVectorProperty
         name="Layer"
         command="SetLayer"
@@ -197,7 +197,7 @@
          <DoubleRangeDomain name="range" min="0 0 0 0" max="1 1 1 1" />
        </DoubleVectorProperty>
 
-      <ProxyProperty name="Lights" 
+      <ProxyProperty name="Lights"
                      command="AddLight"
                      clean_command="RemoveAllLights"
                      repeatable="1">
@@ -206,7 +206,7 @@
         </ProxyGroupDomain>
       </ProxyProperty>
 
-      <ProxyProperty name="RenderPass" 
+      <ProxyProperty name="RenderPass"
                      command="SetPass">
         <ProxyGroupDomain name="groups">
           <Group name="renderpasses"/>
@@ -216,7 +216,7 @@
     <!-- End Renderer -->
     </Proxy>
 
-    <Proxy name="IceTRenderer" 
+    <Proxy name="IceTRenderer"
            base_proxygroup="renderers"
            base_proxyname="Renderer"
            class="vtkIceTRenderer">
@@ -285,7 +285,7 @@
         default_values="0 0 1">
         <SimpleDoubleInformationHelper/>
       </DoubleVectorProperty>
-      
+
       <DoubleVectorProperty
         name="CameraPosition"
         command="SetPosition"
@@ -294,7 +294,7 @@
         immediate_update="1"
         default_values="0 0 1">
       </DoubleVectorProperty>
-      
+
       <DoubleVectorProperty
         name="CameraFocalPointInfo"
         command="GetFocalPoint"
@@ -355,7 +355,7 @@
         default_values="0.01 1000.01">
         <SimpleDoubleInformationHelper/>
       </DoubleVectorProperty>
-        
+
       <DoubleVectorProperty
         name="CameraClippingRange"
         command="SetClippingRange"
@@ -399,7 +399,7 @@
       </DoubleVectorProperty>
     </CameraProxy> <!-- end of Camera Proxy -->
   </ProxyGroup>
-    
+
   <ProxyGroup name="renderwindow">
     <!-- Proxy for renderwindow -->
     <Proxy name="RenderWindow" class="vtkRenderWindow">
@@ -507,7 +507,7 @@
           <Group name="sources"/>
           <Group name="filters"/>
         </ProxyGroupDomain>
-        <InputArrayDomain name="input_array" 
+        <InputArrayDomain name="input_array"
           attribute_type="point">
         </InputArrayDomain>
       </InputProperty>
@@ -548,7 +548,7 @@
       <StringVectorProperty name="FieldDataArrayName"
         command="SetFieldDataName"
         number_of_elements="1">
-        <ArrayListDomain name="array_list" 
+        <ArrayListDomain name="array_list"
           attribute_type="Scalars"
           input_domain_name="input_array">
           <RequiredProperties>
@@ -571,7 +571,7 @@
         </ProxyGroupDomain>
       </ProxyProperty>
 
-      <IntVectorProperty name="ScalarVisibility" 
+      <IntVectorProperty name="ScalarVisibility"
         command="SetScalarVisibility"
         number_of_elements="1"
         default_values="1"
@@ -579,7 +579,7 @@
         <BooleanDomain name="bool" />
       </IntVectorProperty>
 
-      <IntVectorProperty name="MapScalars" 
+      <IntVectorProperty name="MapScalars"
         command="SetColorMode"
         number_of_elements="1"
         default_values="1"
@@ -598,7 +598,7 @@
         default_values="0 1"
         animateable="0"/>
 
-      <IntVectorProperty name="ImmediateModeRendering" 
+      <IntVectorProperty name="ImmediateModeRendering"
         command="SetImmediateModeRendering"
         number_of_elements="1"
         is_internal="1"
@@ -637,10 +637,10 @@
         </EnumerationDomain>
       </IntVectorProperty>
 
-      <StringVectorProperty name="ColorArray" 
-        command="SelectColorArray" 
+      <StringVectorProperty name="ColorArray"
+        command="SelectColorArray"
         number_of_elements="1"
-        animateable="0"> 
+        animateable="0">
         <ArrayListDomain name="array_list" attribute_type="Scalars">
           <RequiredProperties>
             <Property name="Input" function="Input"/>
@@ -648,7 +648,7 @@
         </ArrayListDomain>
       </StringVectorProperty>
 
-      <ProxyProperty name="ClippingPlanes" 
+      <ProxyProperty name="ClippingPlanes"
                      command="AddClippingPlane"
                      repeat_command="1"
                      repeatable="1">
@@ -685,12 +685,12 @@
       </IntVectorProperty>
     </SourceProxy>
 
-    <SourceProxy name="ProjectedTetrahedraMapper" 
+    <SourceProxy name="ProjectedTetrahedraMapper"
       class="vtkProjectedTetrahedraMapper">
       <InputProperty
         name="Input"
         command="SetInputConnection">
-        <!-- 
+        <!--
         <ProxyGroupDomain name="groups">
           <Group name="sources"/>
           <Group name="filters"/>
@@ -727,12 +727,12 @@
       </StringVectorProperty>
     </SourceProxy>
 
-    <SourceProxy name="HAVSVolumeMapper" 
+    <SourceProxy name="HAVSVolumeMapper"
       class="vtkHAVSVolumeMapper">
       <InputProperty
         name="Input"
         command="SetInputConnection">
-        <!-- 
+        <!--
         <ProxyGroupDomain name="groups">
           <Group name="sources"/>
           <Group name="filters"/>
@@ -802,12 +802,12 @@
       </ProxyProperty>
     </Proxy>
 
-    <SourceProxy name="UnstructuredGridVolumeRayCastMapper" 
+    <SourceProxy name="UnstructuredGridVolumeRayCastMapper"
       class="vtkUnstructuredGridVolumeRayCastMapper">
       <InputProperty
         name="Input"
         command="SetInputConnection">
-        <!-- 
+        <!--
         <ProxyGroupDomain name="groups">
           <Group name="sources"/>
           <Group name="filters"/>
@@ -852,12 +852,12 @@
       </ProxyProperty>
     </SourceProxy>
 
-    <SourceProxy name="UnstructuredGridVolumeZSweepMapper" 
+    <SourceProxy name="UnstructuredGridVolumeZSweepMapper"
       class="vtkUnstructuredGridVolumeZSweepMapper">
       <InputProperty
         name="Input"
         command="SetInputConnection">
-        <!-- 
+        <!--
         <ProxyGroupDomain name="groups">
           <Group name="sources"/>
           <Group name="filters"/>
@@ -892,6 +892,89 @@
           </RequiredProperties>
         </ArrayListDomain>
       </StringVectorProperty>
+    </SourceProxy>
+
+    <SourceProxy name="GPUVolumeRayCastMapper"
+      class="vtkGPUVolumeRayCastMapper">
+      <Documentation>
+        This is the proxy for GPU based volume rendering.
+      </Documentation>
+      <InputProperty
+        name="Input"
+        command="SetInputConnection">
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkImageData"/>
+        </DataTypeDomain>
+      </InputProperty>
+      <StringVectorProperty
+        name="SelectScalarArray"
+        command="SelectScalarArray"
+        number_of_elements="1"
+        animateable="0">
+        <ArrayListDomain name="array_list" attribute_type="Scalars">
+          <RequiredProperties>
+            <Property name="Input" function="Input"/>
+          </RequiredProperties>
+        </ArrayListDomain>
+      </StringVectorProperty>
+      <IntVectorProperty
+        name="ScalarMode"
+        command="SetScalarMode"
+        default_values="3"
+        number_of_elements="1"
+        animateable="0">
+        <EnumerationDomain name="enum">
+          <Entry value="0" text="Default"/>
+          <Entry value="1" text="PointData"/>
+          <Entry value="2" text="CellData"/>
+          <Entry value="3" text="PointFieldData"/>
+          <Entry value="4" text="CellFieldData"/>
+        </EnumerationDomain>
+      </IntVectorProperty>
+      <IntVectorProperty
+        name="BlendMode"
+        command="SetBlendMode"
+        default_values="0"
+        number_of_elements="1"
+        animateable="0">
+        <Documentation>
+          Set the current blend mode. Default is Composite. MaximumIntensity is
+          also known as MIP rendering.
+        </Documentation>
+        <EnumerationDomain name="enum">
+          <Entry value="0" text="Composite"/>
+          <Entry value="1" text="MaximumIntensity"/>
+          <Entry value="2" text="MinimumIntensity"/>
+        </EnumerationDomain>
+      </IntVectorProperty>
+
+      <IntVectorProperty
+        name="AutoAdjustSampleDistances"
+        command="SetAutoAdjustSampleDistances"
+        default_values="1"
+        number_of_elements="1"
+        animateable="0">
+        <Documentation>
+        If AutoAdjustSampleDistances is on, the the ImageSampleDistance
+        will be varied to achieve the allocated render time of this
+        prop (controlled by the desired update rate and any culling in
+        use).
+        </Documentation>
+      </IntVectorProperty>
+
+      <DoubleVectorProperty
+        name="SampleDistance"
+        command="SetSampleDistance"
+        default_values="1.0"
+        number_of_elements="1"
+        animateable="0">
+        <Documentation>
+        Set/Get the distance between samples used for rendering
+        when AutoAdjustSampleDistances is off, or when this mapper
+        has more than 1 second allocated to it for rendering.
+        </Documentation>
+      </DoubleVectorProperty>
+      <!-- End of GPUVolumeRayCastMapper -->
     </SourceProxy>
 
     <SourceProxy name="FixedPointVolumeRayCastMapper"
@@ -1033,11 +1116,11 @@
         </EnumerationDomain>
       </IntVectorProperty>
 
-      <StringVectorProperty 
-        name="ColorArray" 
-        command="SelectColorArray" 
+      <StringVectorProperty
+        name="ColorArray"
+        command="SelectColorArray"
         number_of_elements="1"
-        animateable="0"> 
+        animateable="0">
         <Documentation>
           Choose the name for the scalar array.
         </Documentation>
@@ -1058,8 +1141,8 @@
         </ProxyGroupDomain>
       </ProxyProperty>
 
-     <IntVectorProperty 
-        name="MapScalars" 
+     <IntVectorProperty
+        name="MapScalars"
         command="SetColorMode"
         number_of_elements="1"
         default_values="1"
@@ -1231,7 +1314,7 @@
         number_of_elements="1"
         animateable="0">
         <IntRangeDomain name="range" min="0" max="15" />
-<!--        
+<!--
         <EnumerationDomain name="enum">
           <Entry value="0" text="NoGlyph"/>
           <Entry value="1" text="UseGlyph"/>
@@ -1241,7 +1324,7 @@
         </EnumerationDomain>
 -->
       </IntVectorProperty>
- 
+
      <IntVectorProperty
         name="ScalingArrayMode"
         command="SetScalingArrayMode"
@@ -1266,8 +1349,8 @@
           <Entry value="1" text="SCALE_BY_COMPONENTS"/>
         </EnumerationDomain>
       </IntVectorProperty>
- 
-     <DoubleVectorProperty 
+
+     <DoubleVectorProperty
         name="ScaleFactor"
         command="SetScaleFactor"
         number_of_elements="1"
@@ -1301,10 +1384,10 @@
         animateable="0">
         <BooleanDomain name="bool" />
       </IntVectorProperty>
-      
+
     </SourceProxy>
 
-  <!-- End of "mappers" -->  
+  <!-- End of "mappers" -->
   </ProxyGroup>
 
   <ProxyGroup name="ugrid_raycast_functions">
@@ -1334,7 +1417,7 @@
         used for texturing.
       </Documentation>
       <SubProxy>
-        <Proxy name="Source" 
+        <Proxy name="Source"
           proxygroup="sources" proxyname="NetworkImageSource" />
         <ExposedProperties>
           <Property name="FileName" />
@@ -1393,11 +1476,11 @@
         Proxy for a text actor. Not to be used directly.
       </Documentation>
 
-      <StringVectorProperty 
-        name="Text" 
-        command="SetInput" 
+      <StringVectorProperty
+        name="Text"
+        command="SetInput"
         number_of_elements="1"
-        animateable="0"> 
+        animateable="0">
       </StringVectorProperty>
 
       <IntVectorProperty
@@ -1417,7 +1500,7 @@
         animateable="0">
         <DoubleRangeDomain name="range" />
       </DoubleVectorProperty>
-      
+
       <IntVectorProperty name="TextScaleMode"
         command="SetTextScaleMode"
         number_of_elements="1"
@@ -1439,10 +1522,10 @@
 
       <!-- End of TextActor -->
     </Proxy>
-    
+
     <Proxy name="ActorBase" class="not-used">
       <Documentation>
-        Defines interface for an actor. Don't instantiate this 
+        Defines interface for an actor. Don't instantiate this
         proxy itself.
       </Documentation>
       <ProxyProperty
@@ -1574,7 +1657,7 @@
         <BooleanDomain name="bool" />
       </IntVectorProperty>
 
-     <DoubleVectorProperty 
+     <DoubleVectorProperty
         name="Value"
         command="SetValue"
         number_of_elements="1"
@@ -1583,7 +1666,7 @@
         <DoubleRangeDomain name="range"/>
      </DoubleVectorProperty>
 
-     <DoubleVectorProperty 
+     <DoubleVectorProperty
         name="ValueInfo"
         command="GetValue"
         information_only="1">
@@ -1606,7 +1689,7 @@
         <DoubleRangeDomain name="range"/>
       </DoubleVectorProperty>
 
-     <DoubleVectorProperty 
+     <DoubleVectorProperty
         name="MinimumValue"
         command="SetMinimumValue"
         number_of_elements="1"
@@ -1614,7 +1697,7 @@
         <DoubleRangeDomain name="range"/>
      </DoubleVectorProperty>
 
-     <DoubleVectorProperty 
+     <DoubleVectorProperty
         name="MaximumValue"
         command="SetMaximumValue"
         number_of_elements="1"
@@ -1635,7 +1718,7 @@
         <BooleanDomain name="bool" />
      </IntVectorProperty>
 
-     <DoubleVectorProperty 
+     <DoubleVectorProperty
         name="WorldPosition"
         command="SetWorldPosition"
         number_of_elements="3"
@@ -1645,7 +1728,7 @@
         <DoubleRangeDomain name="range"/>
      </DoubleVectorProperty>
 
-     <DoubleVectorProperty 
+     <DoubleVectorProperty
         name="WorldPositionInfo"
         command="GetWorldPosition"
         information_only="1">
@@ -1672,7 +1755,7 @@
        </ProxyGroupDomain>
      </ProxyProperty>
     </Proxy>
-        
+
     <Proxy name="LineRepresentation"
            class="vtkLineRepresentation">
 
@@ -1685,7 +1768,7 @@
         <BooleanDomain name="bool" />
      </IntVectorProperty>
 
-     <DoubleVectorProperty 
+     <DoubleVectorProperty
         name="Point1WorldPosition"
         command="SetPoint1WorldPosition"
         number_of_elements="3"
@@ -1695,14 +1778,14 @@
         <DoubleRangeDomain name="range"/>
      </DoubleVectorProperty>
 
-     <DoubleVectorProperty 
+     <DoubleVectorProperty
         name="Point1WorldPositionInfo"
         command="GetPoint1WorldPosition"
         information_only="1">
         <SimpleDoubleInformationHelper/>
      </DoubleVectorProperty>
 
-     <DoubleVectorProperty 
+     <DoubleVectorProperty
         name="Point2WorldPosition"
         command="SetPoint2WorldPosition"
         number_of_elements="3"
@@ -1712,14 +1795,14 @@
         <DoubleRangeDomain name="range"/>
      </DoubleVectorProperty>
 
-     <DoubleVectorProperty 
+     <DoubleVectorProperty
         name="Point2WorldPositionInfo"
         command="GetPoint2WorldPosition"
         information_only="1">
         <SimpleDoubleInformationHelper/>
      </DoubleVectorProperty>
 
-     <DoubleVectorProperty 
+     <DoubleVectorProperty
         name="Point1DisplayPosition"
         command="SetPoint1DisplayPosition"
         number_of_elements="3"
@@ -1729,14 +1812,14 @@
         <DoubleRangeDomain name="range"/>
      </DoubleVectorProperty>
 
-     <DoubleVectorProperty 
+     <DoubleVectorProperty
         name="Point1DisplayPositionInfo"
         command="GetPoint1DisplayPosition"
         information_only="1">
         <SimpleDoubleInformationHelper/>
      </DoubleVectorProperty>
 
-     <DoubleVectorProperty 
+     <DoubleVectorProperty
         name="Point2DisplayPosition"
         command="SetPoint2DisplayPosition"
         number_of_elements="3"
@@ -1746,14 +1829,14 @@
         <DoubleRangeDomain name="range"/>
      </DoubleVectorProperty>
 
-     <DoubleVectorProperty 
+     <DoubleVectorProperty
         name="Point2DisplayPositionInfo"
         command="GetPoint2DisplayPosition"
         information_only="1">
         <SimpleDoubleInformationHelper/>
      </DoubleVectorProperty>
 
-     <DoubleVectorProperty 
+     <DoubleVectorProperty
         name="PlaceWidget"
         is_internal="1"
         command="PlaceWidget"
@@ -1762,7 +1845,7 @@
         default_values="0 1 0 1 0 1">
         <DoubleRangeDomain name="range"/>
      </DoubleVectorProperty>
-      
+
      <DoubleVectorProperty name="LineColor"
         command="SetLineColor"
         number_of_elements="3"
@@ -1816,8 +1899,8 @@
         information_only="1">
         <SimpleDoubleInformationHelper/>
      </DoubleVectorProperty>
-     
-     <DoubleVectorProperty 
+
+     <DoubleVectorProperty
         name="PlaceWidget"
         is_internal="1"
         command="PlaceWidget"
@@ -1835,8 +1918,8 @@
      <!-- End of DistanceRepresentation2D -->
     </DistanceRepresentation2DProxy>
 
-    <ImplicitPlaneRepresentationProxy 
-           name="ImplicitPlaneRepresentation" 
+    <ImplicitPlaneRepresentationProxy
+           name="ImplicitPlaneRepresentation"
            class="vtkImplicitPlaneRepresentation">
      <IntVectorProperty
         name="Visibility"
@@ -1856,7 +1939,7 @@
         <BooleanDomain name="bool" />
      </IntVectorProperty>
 
-     <DoubleVectorProperty 
+     <DoubleVectorProperty
         name="Origin"
         command="SetOrigin"
         number_of_elements="3"
@@ -1865,14 +1948,14 @@
         <DoubleRangeDomain name="range"/>
      </DoubleVectorProperty>
 
-     <DoubleVectorProperty 
+     <DoubleVectorProperty
         name="OriginInfo"
         command="GetOrigin"
         information_only="1">
         <SimpleDoubleInformationHelper/>
      </DoubleVectorProperty>
 
-     <DoubleVectorProperty 
+     <DoubleVectorProperty
         name="Normal"
         command="SetNormal"
         number_of_elements="3"
@@ -1881,14 +1964,14 @@
         <DoubleRangeDomain name="range"/>
      </DoubleVectorProperty>
 
-     <DoubleVectorProperty 
+     <DoubleVectorProperty
         name="NormalInfo"
         command="GetNormal"
         information_only="1">
         <SimpleDoubleInformationHelper/>
      </DoubleVectorProperty>
 
-     <DoubleVectorProperty 
+     <DoubleVectorProperty
         name="PlaceWidget"
         is_internal="1"
         command="PlaceWidget"
@@ -1898,7 +1981,7 @@
         <DoubleRangeDomain name="range"/>
      </DoubleVectorProperty>
 
-     <DoubleVectorProperty 
+     <DoubleVectorProperty
         name="PlaceFactor"
         command="SetPlaceFactor"
         number_of_elements="1"
@@ -1941,7 +2024,7 @@
         <BooleanDomain name="bool" />
       </IntVectorProperty>
 
-      <DoubleVectorProperty 
+      <DoubleVectorProperty
         name="PlaceWidget"
         command="PlaceWidget"
         number_of_elements="6"
@@ -1950,7 +2033,7 @@
         <DoubleRangeDomain name="range"/>
       </DoubleVectorProperty>
 
-      <DoubleVectorProperty 
+      <DoubleVectorProperty
         name="PlaceFactor"
         command="SetPlaceFactor"
         number_of_elements="1"
@@ -1969,12 +2052,12 @@
           proxygroup="transforms" proxyname="Transform2">
         </Proxy>
         <ExposedProperties>
-          <Property name="Position" /> 
-          <Property name="PositionInfo" /> 
-          <Property name="Rotation" /> 
-          <Property name="RotationInfo" /> 
-          <Property name="Scale" /> 
-          <Property name="ScaleInfo" /> 
+          <Property name="Position" />
+          <Property name="PositionInfo" />
+          <Property name="Rotation" />
+          <Property name="RotationInfo" />
+          <Property name="Scale" />
+          <Property name="ScaleInfo" />
         </ExposedProperties>
       </SubProxy>
 
@@ -1997,7 +2080,7 @@
         <BooleanDomain name="bool" />
       </IntVectorProperty>
 
-      <DoubleVectorProperty 
+      <DoubleVectorProperty
         name="PlaceWidget"
         command="PlaceWidget"
         number_of_elements="6"
@@ -2006,7 +2089,7 @@
         <DoubleRangeDomain name="range"/>
       </DoubleVectorProperty>
 
-      <DoubleVectorProperty 
+      <DoubleVectorProperty
         name="PlaceFactor"
         command="SetPlaceFactor"
         number_of_elements="1"
@@ -2026,7 +2109,7 @@
         default_values="1">
         <Documentation>
            Set the representation (i.e., appearance) of the sphere. Different
-            representations are useful depending on the application. 
+            representations are useful depending on the application.
         </Documentation>
         <EnumerationDomain name="enum">
           <Entry text="Off" value="0" />
@@ -2051,7 +2134,7 @@
       <DoubleVectorProperty name="CenterInfo"
         command="GetCenter"
         information_only="1" >
-        <SimpleDoubleInformationHelper /> 
+        <SimpleDoubleInformationHelper />
       </DoubleVectorProperty>
 
       <DoubleVectorProperty name="Radius"
@@ -2069,7 +2152,7 @@
       <DoubleVectorProperty name="RadiusInfo"
         command="GetRadius"
         information_only="1" >
-        <SimpleDoubleInformationHelper /> 
+        <SimpleDoubleInformationHelper />
       </DoubleVectorProperty>
 
       <IntVectorProperty name="HandleVisibility"
@@ -2080,7 +2163,7 @@
         <Documentation>
           The handle sits on the surface of the sphere and may be moved around
           the surface by picking (left mouse) and then moving. The position
-          of the handle can be retrieved, this is useful for positioning 
+          of the handle can be retrieved, this is useful for positioning
           cameras and lights. By default, the handle is turned off.
         </Documentation>
       </IntVectorProperty>
@@ -2094,7 +2177,7 @@
           Enable/disable a label that displays the location of the handle in
           spherical coordinates (radius,theta,phi). The two angles, theta and
           phi, are displayed in degrees. Note that phi is measured from the
-          north pole down towards the equator; and theta is the angle around 
+          north pole down towards the equator; and theta is the angle around
           the north/south axis.
         </Documentation>
       </IntVectorProperty>
@@ -2123,7 +2206,7 @@
       <!-- End of SphereRepresentation -->
     </Proxy>
 
-    <Proxy name="ScalarBarRepresentation" 
+    <Proxy name="ScalarBarRepresentation"
            class="vtkScalarBarRepresentation">
 
       <IntVectorProperty
@@ -2135,7 +2218,7 @@
          <BooleanDomain name="bool" />
       </IntVectorProperty>
 
-      <DoubleVectorProperty 
+      <DoubleVectorProperty
          name="Position"
          command="SetPosition"
          number_of_elements="2"
@@ -2144,14 +2227,14 @@
          <DoubleRangeDomain name="range" min="0 0" max="1 1"/>
       </DoubleVectorProperty>
 
-      <DoubleVectorProperty 
+      <DoubleVectorProperty
          name="PositionInfo"
          command="GetPosition"
          information_only="1">
          <SimpleDoubleInformationHelper/>
       </DoubleVectorProperty>
 
-      <DoubleVectorProperty 
+      <DoubleVectorProperty
          name="Position2"
          command="SetPosition2"
          number_of_elements="2"
@@ -2160,7 +2243,7 @@
          <DoubleRangeDomain name="range" min="0 0" max="1 1"/>
       </DoubleVectorProperty>
 
-      <DoubleVectorProperty 
+      <DoubleVectorProperty
          name="Position2Info"
          command="GetPosition2"
          information_only="1">
@@ -2200,7 +2283,7 @@
       <!-- End of ScalarBarRepresentation -->
     </Proxy>
 
-    <Proxy name="TextRepresentation" 
+    <Proxy name="TextRepresentation"
            class="vtkTextRepresentation">
 
       <IntVectorProperty
@@ -2212,7 +2295,7 @@
          <BooleanDomain name="bool" />
       </IntVectorProperty>
 
-      <DoubleVectorProperty 
+      <DoubleVectorProperty
          name="Position"
          command="SetPosition"
          number_of_elements="2"
@@ -2221,14 +2304,14 @@
          <DoubleRangeDomain name="range" min="0 0" max="1 1"/>
       </DoubleVectorProperty>
 
-      <DoubleVectorProperty 
+      <DoubleVectorProperty
          name="PositionInfo"
          command="GetPosition"
          information_only="1">
          <SimpleDoubleInformationHelper/>
       </DoubleVectorProperty>
 
-      <DoubleVectorProperty 
+      <DoubleVectorProperty
          name="Position2"
          command="SetPosition2"
          number_of_elements="2"
@@ -2237,7 +2320,7 @@
          <DoubleRangeDomain name="range" min="0 0" max="1 1"/>
       </DoubleVectorProperty>
 
-      <DoubleVectorProperty 
+      <DoubleVectorProperty
          name="Position2Info"
          command="GetPosition2"
          information_only="1">
@@ -2250,7 +2333,7 @@
          immediate_update="1"
          default_values="Some Default">
       </StringVectorProperty>
-      
+
       <IntVectorProperty
         name="WindowLocation"
         command="SetWindowLocation"
@@ -2306,7 +2389,7 @@
          default_values="5.0">
         <DoubleRangeDomain name="range" min="0.001" max="1000"/>
       </DoubleVectorProperty>
-      
+
       <DoubleVectorProperty
          name="PlaceFactor"
          command="SetPlaceFactor"
@@ -2381,7 +2464,7 @@
 
       <!-- End of SplineRepresentation -->
     </Proxy>
-    
+
     <Proxy name="ContourRepresentationBase" class="not-used">
       <Documentation>
         Defines interface defined by vtkContourRepresentation. Don't instantiate directly.
@@ -2416,7 +2499,7 @@
         default_values="0">
         <BooleanDomain name="bool" />
       </IntVectorProperty>
-      
+
       <IntVectorProperty
          name="ClosedLoopInfo"
          command="GetClosedLoop"
@@ -2433,7 +2516,7 @@
           <Group name="point_placers" />
         </ProxyGroupDomain>
       </ProxyProperty>
-      
+
       <ProxyProperty
         name="LineInterpolator"
         command="SetLineInterpolator">
@@ -2448,7 +2531,7 @@
         repeat_command="1"
         number_of_elements_per_command="3">
       </DoubleVectorProperty>
-      
+
       <IntVectorProperty
         name="SelectNodes"
         command="SetNthNodeSelected"
@@ -2467,7 +2550,7 @@
 
       <!-- End of ContourRepresentationBase -->
     </Proxy>
-    
+
     <Proxy name="OrientedGlyphContourRepresentation" class="vtkOrientedGlyphContourRepresentation"
            base_proxygroup="props" base_proxyname="ContourRepresentationBase">
       <Documentation>
@@ -2483,13 +2566,13 @@
         default_values="1.0 1.0 1.0">
         <DoubleRangeDomain name="range" min="0 0 0" max="1 1 1" />
       </DoubleVectorProperty>
-      
+
       <IntVectorProperty name="AlwaysOnTop"
         command="SetAlwaysOnTop"
         number_of_elements="1"
         default_values="0">
         <BooleanDomain name="bool" />
-      </IntVectorProperty>      
+      </IntVectorProperty>
       <!-- End of OrientedGlyphContourRepresentation -->
     </Proxy>
 
@@ -2547,8 +2630,8 @@
           <Entry text="Static Edges" value="4" />
         </EnumerationDomain>
         <Documentation>
-          Specify a mode to control how the axes are drawn: either static, 
-          closest triad, furthest triad or outer edges in relation to the 
+          Specify a mode to control how the axes are drawn: either static,
+          closest triad, furthest triad or outer edges in relation to the
           camera position.
         </Documentation>
       </IntVectorProperty>
@@ -2560,7 +2643,7 @@
         <IntRangeDomain name="range" min="1" />
         <Documentation>
           Set the inertial factor that controls how often (i.e, how
-          many renders) the axes can switch position (jump from one axes 
+          many renders) the axes can switch position (jump from one axes
           to another).
         </Documentation>
       </IntVectorProperty>
@@ -2572,7 +2655,7 @@
         <DoubleRangeDomain name="range" />
         <Documentation>
           Specify an offset value to "pull back" the axes from the corner at
-          which they are joined to avoid overlap of axes labels. The 
+          which they are joined to avoid overlap of axes labels. The
           "CornerOffset" is the fraction of the axis length to pull back.
         </Documentation>
       </DoubleVectorProperty>
@@ -2777,7 +2860,7 @@
         default_values="1.0">
         <DoubleRangeDomain name="range" min="1.0" max="5.0" />
       </DoubleVectorProperty>
-      
+
       <IntVectorProperty name="RightAxisVisibility"
         command="SetRightAxisVisibility"
         number_of_elements="1"
@@ -2853,7 +2936,7 @@
         animateable="0">
         <BooleanDomain name="bool"/>
       </IntVectorProperty>
-      
+
       <IntVectorProperty
         name="Italic"
         command="SetItalic"
@@ -2880,7 +2963,7 @@
         animateable="0">
         <IntRangeDomain name="range" min="0" />
       </IntVectorProperty>
-      
+
       <DoubleVectorProperty name="Orientation"
         command="SetOrientation"
         number_of_elements="1"
@@ -2921,7 +3004,7 @@
 
       <!-- End of TextProperty -->
     </Proxy>
-  
+
     <Proxy name="VolumeProperty" class="vtkVolumeProperty">
       <IntVectorProperty
         name="InterpolationType"
@@ -3152,7 +3235,7 @@
       </DoubleVectorProperty>
       <!-- End of Property2 -->
     </Proxy>
-    
+
     <Proxy name="Property2D" class="vtkProperty2D">
       <DoubleVectorProperty
         name="Color"
@@ -3206,8 +3289,8 @@
           <Group  name="renderers" />
         </ProxyGroupDomain>
       </ProxyProperty>
-      <ProxyProperty 
-        name="InteractorStyle" 
+      <ProxyProperty
+        name="InteractorStyle"
         command="SetInteractorStyle">
         <ProxyGroupDomain name="groups">
           <Group  name="interactorstyles" />
@@ -3231,7 +3314,7 @@
         is_internal="1"
         repeatable="1">
         <!-- For now, we are marking this property is_internal so that it won't
-        get saved in state files. 
+        get saved in state files.
         Eventually, we need to take out all the interaction related code from
         the server manager -->
         <ProxyGroupDomain name="groups">
@@ -3327,8 +3410,8 @@
     </Proxy>
   </ProxyGroup>
 
-  
-  
+
+
   <ProxyGroup name="composite_managers">
     <!-- =================================================================== -->
     <Proxy name="DesktopDeliveryClient" class="vtkPVDesktopDeliveryClient">
@@ -3385,9 +3468,9 @@
         default_values="1">
         <BooleanDomain name="bool"/>
         <Documentation>
-          When set the render manager will synchronize the TileViewport and 
-          TileScale properties. This may not be desirable in cases where 
-          there's some other mechanism to set the tile dimensions 
+          When set the render manager will synchronize the TileViewport and
+          TileScale properties. This may not be desirable in cases where
+          there's some other mechanism to set the tile dimensions
           eg. Tile displays.
         </Documentation>
       </IntVectorProperty>
@@ -3418,10 +3501,10 @@
 
     <!-- =================================================================== -->
     <Proxy name="DesktopDeliveryServer" class="vtkPVDesktopDeliveryServer"
-           base_proxygroup="composite_managers" 
+           base_proxygroup="composite_managers"
            base_proxyname="DesktopDeliveryClient">
     </Proxy>
-    
+
     <!-- =================================================================== -->
     <Proxy name="IceTRenderManager" class="vtkIceTRenderManager">
       <ProxyProperty name="RenderWindow"
@@ -3452,7 +3535,7 @@
           To use tile displays, it is essential to set this property to 1.
         </Documentation>
       </IntVectorProperty>
-        
+
       <ProxyProperty name="SortingKdTree" command="SetSortingKdTree">
         <ProxyGroupDomain name="groups">
           <Group name="locators"/>
@@ -3522,7 +3605,7 @@
         </ProxyGroupDomain>
       </ProxyProperty>
     </Proxy>
-    
+
     <!-- =================================================================== -->
     <Proxy name="CaveRenderManager" class="vtkCaveRenderManager">
       <ProxyProperty name="RenderWindow"
@@ -3545,13 +3628,13 @@
 
     </Proxy>
   </ProxyGroup>
-  
+
   <ProxyGroup name="PropPickers">
     <Proxy name="AreaPicker"
            class="vtkRenderedAreaPicker">
 
-      <ProxyProperty 
-        name="SetRenderer" 
+      <ProxyProperty
+        name="SetRenderer"
         command="SetRenderer">
         <ProxyGroupDomain name="groups">
           <Group name="renderers"/>
@@ -3565,7 +3648,7 @@
         default_values="0.0 0.0 0.0 0.0">
         <DoubleRangeDomain name="range" min="0.0 0.0 0.0 0.0"/>
       </DoubleVectorProperty>
-       
+
       <Property
         name="Pick"
         command="Pick"
@@ -3575,7 +3658,7 @@
 
     <HardwareSelector name="HardwareSelector" class="vtkPVHardwareSelector">
 
-      <ProxyProperty name="Renderer" 
+      <ProxyProperty name="Renderer"
         command="SetRenderer">
       </ProxyProperty>
 
@@ -3606,10 +3689,10 @@
         number_of_elements="1"
         default_values="1">
       </IntVectorProperty>
-        
-      
+
+
     </HardwareSelector>
-    <!-- End of PropPickers --> 
+    <!-- End of PropPickers -->
   </ProxyGroup>
 
   <ProxyGroup name="strategies">
@@ -3633,7 +3716,7 @@
       </SubProxy>
 
       <SubProxy>
-        <Proxy name="LODDecimator" 
+        <Proxy name="LODDecimator"
           proxygroup="filters" proxyname="QuadricClustering" />
       </SubProxy>
 
@@ -3660,7 +3743,7 @@
     </SimpleStrategy>
 
     <UnstructuredDataParallelStrategy name="PolyDataParallelStrategy"
-      base_proxygroup="strategies" 
+      base_proxygroup="strategies"
       base_proxyname="PolyDataStrategy">
 
       <SubProxy>
@@ -3727,7 +3810,7 @@
           <Exception name="Input" />
         </ShareProperties>
       </SubProxy>
-      
+
       <!-- End of PolyDataParallelStrategy -->
     </UnstructuredDataParallelStrategy>
 
@@ -3787,7 +3870,7 @@
       </SubProxy>
 
       <SubProxy>
-        <Proxy name="LODDecimator" 
+        <Proxy name="LODDecimator"
           proxygroup="filters" proxyname="GeometryFilter" />
       </SubProxy>
 
@@ -3814,7 +3897,7 @@
     </SimpleStrategy>
 
     <UnstructuredGridParallelStrategy name="UnstructuredGridParallelStrategy"
-      base_proxygroup="strategies" 
+      base_proxygroup="strategies"
       base_proxyname="UnstructuredGridStrategy">
 
       <SubProxy>
@@ -3878,10 +3961,10 @@
           proxyname="OrderedCompositeDistributor">
         </Proxy>
         <ShareProperties subproxy="Distributor">
-          <Exception name="Input" /> 
+          <Exception name="Input" />
         </ShareProperties>
       </SubProxy>
-      
+
       <!-- End of UnstructuredGridParallelStrategy -->
     </UnstructuredGridParallelStrategy>
 
@@ -3913,7 +3996,7 @@
       </SubProxy>
 
       <SubProxy>
-        <Proxy name="LODDecimator"  
+        <Proxy name="LODDecimator"
           proxygroup="filters" proxyname="OutlineFilter">
         </Proxy>
       </SubProxy>
@@ -4009,7 +4092,7 @@
       </SubProxy>
 
       <SubProxy>
-        <Proxy name="LODDecimator"  
+        <Proxy name="LODDecimator"
           proxygroup="filters" proxyname="OutlineFilter">
         </Proxy>
       </SubProxy>
@@ -4114,14 +4197,14 @@
       <!-- End of ViewBase -->
     </Proxy>
 
-    <ViewProxy name="SpreadSheetView" 
-      base_proxygroup="views" 
+    <ViewProxy name="SpreadSheetView"
+      base_proxygroup="views"
       base_proxyname="ViewBase"
       representation_name="SpreadSheetRepresentation">
 
       <!-- End of SpreadSheetView -->
     </ViewProxy>
-   
+
 #ifdef VTK_USE_QVTK
     <ChartOptionsProxy name="ChartOptionsBase">
       <Documentation>
@@ -4274,7 +4357,7 @@
         repeat_command="1"
         use_index="1"
         number_of_elements_per_command="4"
-        element_types="2 0 0 0" 
+        element_types="2 0 0 0"
         number_of_elements="16"
         default_values_delimiter=";"
         default_values="Helvetica;9;0;0;Helvetica;9;0;0;Helvetica;9;0;0;Helvetica;9;0;0" >
@@ -4399,7 +4482,7 @@
         repeat_command="1"
         use_index="1"
         number_of_elements_per_command="4"
-        element_types="2 0 0 0" 
+        element_types="2 0 0 0"
         number_of_elements="16"
         default_values_delimiter=";"
         default_values="Helvetica;9;0;0;Helvetica;9;0;0;Helvetica;9;0;0;Helvetica;9;0;0">
@@ -4437,8 +4520,8 @@
 #endif
 
 #ifdef VTK_USE_QVTK
-    <BarChartViewProxy name="BarChartView" 
-      base_proxygroup="views" 
+    <BarChartViewProxy name="BarChartView"
+      base_proxygroup="views"
       base_proxyname="ViewBase"
       representation_name="BarChartRepresentation">
       <Documentation>
@@ -4557,8 +4640,8 @@
 
     </XYChartViewProxy>
 
-    <LineChartViewProxy name="XYPlotView" 
-      base_proxygroup="views" 
+    <LineChartViewProxy name="XYPlotView"
+      base_proxygroup="views"
       base_proxyname="ViewBase"
       representation_name="XYPlotRepresentation">
       <Documentation>
@@ -4614,7 +4697,7 @@
 #endif
 
     <Proxy name="RenderViewBase"
-      base_proxygroup="views" 
+      base_proxygroup="views"
       base_proxyname="ViewBase">
       <Documentation>
         This defines the properties/subproxies common to all render view
@@ -4710,7 +4793,7 @@
         </Documentation>
       </IntVectorProperty>
 
-      <!-- 
+      <!--
         Some common subproxies that are not affected by the type of render
         view. Note the absence of such essential subproxies as RenderWindow,
         Renderer.
@@ -4777,7 +4860,7 @@
       </SubProxy>
 
       <SubProxy>
-        <Proxy name="Interactor" proxyname="GenericRenderWindowInteractor" 
+        <Proxy name="Interactor" proxyname="GenericRenderWindowInteractor"
           proxygroup="interactors">
         </Proxy>
         <ExposedProperties>
@@ -4786,7 +4869,7 @@
       </SubProxy>
 
       <SubProxy>
-        <Proxy name="InteractorStyle" proxyname="InteractorStyle" 
+        <Proxy name="InteractorStyle" proxyname="InteractorStyle"
           proxygroup="interactorstyles">
         </Proxy>
         <ExposedProperties>
@@ -4797,7 +4880,7 @@
       <!-- End of RenderViewBase -->
     </Proxy>
 
-    <RenderViewProxy name="RenderView" 
+    <RenderViewProxy name="RenderView"
       base_proxygroup="views" base_proxyname="RenderViewBase">
       <Documentation>
         Simplest render view without compositing/client-server support.
@@ -4843,10 +4926,10 @@
         <DoubleRangeDomain name="range" min="0" />
         <Documentation>
            The threshold used to determine if the compositing should be used
-           for rendering. 
+           for rendering.
         </Documentation>
       </DoubleVectorProperty>
-     
+
       <IntVectorProperty
         name="ImageReductionFactor"
         command="SetImageReductionFactor"
@@ -4908,7 +4991,7 @@
 
       <SubProxy>
         <Proxy name="MultiViewManager" class="vtkMultiViewManager">
-          <ProxyProperty  
+          <ProxyProperty
             name="RenderWindow"
             command="SetRenderWindow">
           </ProxyProperty>
@@ -4916,7 +4999,7 @@
       </SubProxy>
 
       <SubProxy>
-        <Proxy  name="ParallelRenderManager" 
+        <Proxy  name="ParallelRenderManager"
                 proxygroup="composite_managers"
                 proxyname="IceTRenderManager">
         </Proxy>
@@ -4966,7 +5049,7 @@
            server.
         </Documentation>
       </DoubleVectorProperty>
-     
+
       <IntVectorProperty
         name="ImageReductionFactor"
         command="SetImageReductionFactor"
@@ -5014,8 +5097,8 @@
         </ExposedProperties>
       </SubProxy>
       <SubProxy>
-        <Proxy 
-          name="RenderSyncManager" 
+        <Proxy
+          name="RenderSyncManager"
           proxygroup="composite_managers"
           proxyname="DesktopDeliveryClient">
         </Proxy>
@@ -5026,7 +5109,7 @@
       </SubProxy>
 
       <SubProxy>
-        <Proxy  name="ParallelRenderManager" 
+        <Proxy  name="ParallelRenderManager"
                 proxygroup="composite_managers"
                 proxyname="IceTRenderManager">
         </Proxy>
@@ -5085,7 +5168,7 @@
         <DoubleRangeDomain name="range" min="0" />
         <Documentation>
            The threshold used to determine if the compositing should be used
-           for rendering on the tile display. 
+           for rendering on the tile display.
         </Documentation>
       </DoubleVectorProperty>
 
@@ -5176,8 +5259,8 @@
       </SubProxy>
 
      <SubProxy>
-        <Proxy 
-          name="RenderSyncManager" 
+        <Proxy
+          name="RenderSyncManager"
           proxygroup="composite_managers"
           proxyname="DesktopDeliveryClient">
         </Proxy>
@@ -5265,7 +5348,7 @@
         <Documentation>
           This property determines how individual frames of the comparative view will
           update when a source or filter displayed by the view is modified.  When none is
-          selected, no frames will update until the comparative view is explicity updated. 
+          selected, no frames will update until the comparative view is explicity updated.
           When root is selected, the root frame will update but the other frames will not
           update until the comparative view is explicity updated.  When all is selected, all
           frames will update.
@@ -5379,13 +5462,13 @@
     <ComparativeViewProxy name="ComparativeIceTDesktopRenderView"
       base_proxygroup="views" base_proxyname="ComparativeViewBase">
       <Documentation>
-        The is comparative view comprising of individual 
+        The is comparative view comprising of individual
         "IceTDesktopRenderView" proxies
         for each panel in the comparative view grid.
       </Documentation>
 
       <SubProxy>
-        <Proxy name="RootView" 
+        <Proxy name="RootView"
           proxygroup="views" proxyname="IceTDesktopRenderView">
         </Proxy>
         <ExposedProperties>
@@ -5456,13 +5539,13 @@
     <ComparativeViewProxy name="ComparativeIceTMultiDisplayRenderView"
       base_proxygroup="views" base_proxyname="ComparativeViewBase">
       <Documentation>
-        The is comparative view comprising of individual 
+        The is comparative view comprising of individual
         "IceTMultiDisplayRenderView" proxies
         for each panel in the comparative view grid.
       </Documentation>
 
       <SubProxy>
-        <Proxy name="RootView" 
+        <Proxy name="RootView"
           proxygroup="views" proxyname="IceTMultiDisplayRenderView">
         </Proxy>
         <ExposedProperties>
@@ -5537,13 +5620,13 @@
     <ComparativeViewProxy name="ComparativeClientServerRenderView"
       base_proxygroup="views" base_proxyname="ComparativeViewBase">
       <Documentation>
-        The is comparative view comprising of individual 
+        The is comparative view comprising of individual
         "ClientServerRenderView" proxies
         for each panel in the comparative view grid.
       </Documentation>
 
       <SubProxy>
-        <Proxy name="RootView" 
+        <Proxy name="RootView"
           proxygroup="views" proxyname="ClientServerRenderView">
         </Proxy>
         <ExposedProperties>
@@ -5779,7 +5862,7 @@
           <Property name="CameraParallelScale" />
           <Property name="CameraParallelScaleInfo" />
           <!-- Hide CameraParallelProjection, since CameraParallelProjection is
-            always true in this view. 
+            always true in this view.
           <Property name="CameraParallelProjection" />
           -->
           <Property name="EyeAngle" />
@@ -5797,12 +5880,12 @@
     <TwoDRenderViewProxy name="2DIceTCompositeView"
       base_proxygroup="views" base_proxyname="2DRenderViewBase">
       <Documentation>
-        IceT based 2D render view. 
+        IceT based 2D render view.
         Currently this view can only show image slices.
       </Documentation>
 
       <SubProxy>
-        <Proxy name="RenderView" 
+        <Proxy name="RenderView"
           proxygroup="views" proxyname="IceTCompositeView">
         </Proxy>
         <ExposedProperties>
@@ -5868,12 +5951,12 @@
     <TwoDRenderViewProxy name="2DIceTDesktopRenderView"
       base_proxygroup="views" base_proxyname="2DRenderViewBase">
       <Documentation>
-        IceT based 2D render view. 
+        IceT based 2D render view.
         Currently this view can only show image slices.
       </Documentation>
 
       <SubProxy>
-        <Proxy name="RenderView" 
+        <Proxy name="RenderView"
           proxygroup="views" proxyname="IceTDesktopRenderView">
         </Proxy>
         <ExposedProperties>
@@ -5947,7 +6030,7 @@
       </Documentation>
 
       <SubProxy>
-        <Proxy name="RenderView" 
+        <Proxy name="RenderView"
           proxygroup="views" proxyname="IceTMultiDisplayRenderView">
         </Proxy>
         <ExposedProperties>
@@ -6023,7 +6106,7 @@
       </Documentation>
 
       <SubProxy>
-        <Proxy name="RenderView" 
+        <Proxy name="RenderView"
           proxygroup="views" proxyname="ClientServerRenderView">
         </Proxy>
         <ExposedProperties>
@@ -6161,12 +6244,12 @@
     <ScatterPlotViewProxy name="ScatterPlotIceTCompositeView"
       base_proxygroup="views" base_proxyname="ScatterPlotRenderViewBase">
       <Documentation>
-        IceT based ScatterPlot render view. 
+        IceT based ScatterPlot render view.
         Currently this view can only show image slices.
       </Documentation>
 
       <SubProxy>
-        <Proxy name="RenderView" 
+        <Proxy name="RenderView"
           proxygroup="views" proxyname="IceTCompositeView">
         </Proxy>
         <ExposedProperties>
@@ -6232,12 +6315,12 @@
     <ScatterPlotViewProxy name="ScatterPlotIceTDesktopRenderView"
       base_proxygroup="views" base_proxyname="ScatterPlotRenderViewBase">
       <Documentation>
-        IceT based ScatterPlot render view. 
+        IceT based ScatterPlot render view.
         Currently this view can only show image slices.
       </Documentation>
 
       <SubProxy>
-        <Proxy name="RenderView" 
+        <Proxy name="RenderView"
           proxygroup="views" proxyname="IceTDesktopRenderView">
         </Proxy>
         <ExposedProperties>
@@ -6311,7 +6394,7 @@
       </Documentation>
 
       <SubProxy>
-        <Proxy name="RenderView" 
+        <Proxy name="RenderView"
           proxygroup="views" proxyname="IceTMultiDisplayRenderView">
         </Proxy>
         <ExposedProperties>
@@ -6387,7 +6470,7 @@
       </Documentation>
 
       <SubProxy>
-        <Proxy name="RenderView" 
+        <Proxy name="RenderView"
           proxygroup="views" proxyname="ClientServerRenderView">
         </Proxy>
         <ExposedProperties>
@@ -6460,7 +6543,7 @@
                 override="1">
         </Proxy>
       </SubProxy>
-       
+
       <!-- End of CaveRenderView -->
     </CaveRenderViewProxy>
     <!-- End of group "views" -->
@@ -6472,13 +6555,13 @@
         Proxy to show a selection as geometry.
       </Documentation>
 
-      <InputProperty name="Input" 
+      <InputProperty name="Input"
         command="NotUsed">
         <InputArrayDomain name="input_array_any"
           attribute_type="any">
         </InputArrayDomain>
       </InputProperty>
-      
+
       <IntVectorProperty
         name="Visibility"
         command="SetVisibility"
@@ -6499,7 +6582,7 @@
         update_self="1">
         <BooleanDomain name="bool" />
         <Documentation>
-          Set the visibility of the cell labels for this representation. 
+          Set the visibility of the cell labels for this representation.
           This is ignored if Visibility is 0.
         </Documentation>
       </IntVectorProperty>
@@ -6541,19 +6624,19 @@
       </SubProxy>
 
       <SubProxy>
-        <!-- 
-          Mapper for selection 
+        <!--
+          Mapper for selection
         -->
-        <Proxy name="Mapper" 
+        <Proxy name="Mapper"
           proxygroup="mappers" proxyname="PolyDataMapper" />
       </SubProxy>
 
       <SubProxy>
-        <!-- 
+        <!--
           Mapper for low-res selection. It shares all its properties with the
           high-res mapper (except input ofcourse).
         -->
-        <Proxy name="LODMapper" 
+        <Proxy name="LODMapper"
           proxygroup="mappers" proxyname="PolyDataMapper" />
         <ShareProperties subproxy="Mapper" >
           <Exception name="Input" />
@@ -6562,7 +6645,7 @@
 
       <SubProxy>
         <!--
-          SelectionProp3D that gets added to the 3D renderer 
+          SelectionProp3D that gets added to the 3D renderer
         -->
         <Proxy name="Prop3D" proxygroup="props" proxyname="LODActor" />
       </SubProxy>
@@ -6573,16 +6656,16 @@
         -->
         <Proxy name="Property" proxygroup="properties" proxyname="Property2" />
         <ExposedProperties>
-          <Property name="Color"/> 
-          <Property name="LineWidth"/> 
-          <Property name="Opacity"/> 
-          <Property name="PointSize"/> 
-          <Property name="Representation"/> 
+          <Property name="Color"/>
+          <Property name="LineWidth"/>
+          <Property name="Opacity"/>
+          <Property name="PointSize"/>
+          <Property name="Representation"/>
         </ExposedProperties>
       </SubProxy>
-      
+
       <SubProxy>
-        <Proxy name="LabelRepresentation" 
+        <Proxy name="LabelRepresentation"
           proxygroup="representations"
           proxyname="DataLabelRepresentation" />
         <ExposedProperties>
@@ -6596,7 +6679,7 @@
           <Property name="PointLabelFontSize" />
           <Property name="PointFieldDataArrayIndex" />
           <Property name="PointFieldDataArrayName" />
-          
+
           <Property name="CellLabelColor" />
           <Property name="CellLabelOpacity" />
           <Property name="CellLabelFontFamily" />
@@ -6723,7 +6806,7 @@
       </IntVectorProperty>
 
       <SubProxy>
-        <!-- 
+        <!--
           Geometry filter is used to conver non-polydata input to polydata.
           It is also used to convert poly data to triangle strips when
           requested.
@@ -6735,9 +6818,9 @@
           <Property name="ForceStrips" />
         </ExposedProperties>
       </SubProxy>
-  
+
       <SubProxy>
-        <!-- 
+        <!--
           Mapper for high-res geometry.
         -->
         <Proxy name="Mapper" proxygroup="mappers" proxyname="PolyDataMapper" />
@@ -6754,11 +6837,11 @@
       </SubProxy>
 
       <SubProxy>
-        <!-- 
+        <!--
           Mapper for low-res geometry. It shares all its properties with the
           high-res mapper (except input ofcourse).
         -->
-        <Proxy name="LODMapper" 
+        <Proxy name="LODMapper"
           proxygroup="mappers" proxyname="PolyDataMapper" />
         <ShareProperties subproxy="Mapper" >
           <Exception name="Input" />
@@ -6767,7 +6850,7 @@
 
       <SubProxy>
         <!--
-          Prop3D that gets added to the 3D renderer 
+          Prop3D that gets added to the 3D renderer
         -->
         <Proxy name="Prop3D" proxygroup="props" proxyname="LODActor" />
         <ExposedProperties>
@@ -6803,7 +6886,7 @@
 
       <SubProxy>
         <!-- This is the helper that assures that the material xml is provided
-          to the servers from the client, when needed. Note that this is 
+          to the servers from the client, when needed. Note that this is
           a client only proxy -->
         <MaterialLoaderProxy name="MaterialLoader" >
           <StringVectorProperty name="Material"
@@ -6819,14 +6902,14 @@
       <!-- End of SurfaceRepresentationBase -->
     </Proxy>
 
-    <SurfaceRepresentationProxy name="SurfaceRepresentation" 
+    <SurfaceRepresentationProxy name="SurfaceRepresentation"
       base_proxygroup="representations"
       base_proxyname="SurfaceRepresentationBase">
       <Documentation>
         Representation to show surface.
       </Documentation>
-      
-      <InputProperty name="Input" 
+
+      <InputProperty name="Input"
         command="NotUsed">
         <InputArrayDomain name="input_array_any"
           attribute_type="any">
@@ -6842,7 +6925,7 @@
         then this representation shows a single Z slice.
       </Documentation>
 
-      <InputProperty name="Input" 
+      <InputProperty name="Input"
         command="not-used">
         <Documentation>
           Set the input to the representation. Must be a vtkImageData producer.
@@ -6963,7 +7046,7 @@
 
       <SubProxy>
         <!-- Mapper for high-res image -->
-        <Proxy name="Mapper" 
+        <Proxy name="Mapper"
           proxygroup="mappers" proxyname="ImageSliceMapper" />
         <ExposedProperties>
           <Property name="LookupTable" />
@@ -6976,7 +7059,7 @@
 
       <SubProxy>
         <!-- Mapper for low-res image -->
-        <Proxy name="LODMapper" 
+        <Proxy name="LODMapper"
           proxygroup="mappers" proxyname="ImageSliceMapper" />
         <ShareProperties subproxy="Mapper" >
           <Exception name="Input" />
@@ -7020,8 +7103,8 @@
     </ImageSliceRepresentationProxy>
 
     <OutlineRepresentationProxy name="OutlineRepresentation">
-      
-      <InputProperty name="Input" 
+
+      <InputProperty name="Input"
         command="NotUsed">
         <InputArrayDomain name="input_array_any"
           attribute_type="any">
@@ -7083,7 +7166,7 @@
       </StringVectorProperty>
 
       <SubProxy>
-        <!-- 
+        <!--
           vtkOutlineFilter is used to conver non-polydata input to polydata.
         -->
         <Proxy name="OutlineFilter"
@@ -7092,9 +7175,9 @@
           <Property name="MakeOutlineOfInput" />
         </ExposedProperties>
       </SubProxy>
-  
+
       <SubProxy>
-        <!-- 
+        <!--
           Mapper for high-res geometry.
         -->
         <Proxy name="Mapper" proxygroup="mappers" proxyname="PolyDataMapper" />
@@ -7112,7 +7195,7 @@
 
       <SubProxy>
         <!--
-          Prop3D that gets added to the 3D renderer 
+          Prop3D that gets added to the 3D renderer
         -->
         <Proxy name="Prop3D" proxygroup="props" proxyname="LODActor" />
         <ExposedProperties>
@@ -7139,8 +7222,8 @@
     <!-- End of OutlineRepresentation -->
     </OutlineRepresentationProxy>
 
-    <UniformGridVolumeRepresentationProxy name="UniformGridVolumeRepresentation">     
-      <InputProperty name="Input" 
+    <UniformGridVolumeRepresentationProxy name="UniformGridVolumeRepresentation">
+      <InputProperty name="Input"
         command="NotUsed"
         />
 
@@ -7198,14 +7281,39 @@
         </ArrayListDomain>
       </StringVectorProperty>
 
+      <IntVectorProperty name="SelectedMapperIndex"
+        command="SetSelectedMapperIndex"
+        number_of_elements="1"
+        default_values="0"
+        update_self="1">
+        <EnumerationDomain name="enum">
+          <Entry value="0" text="Fixed point" />
+          <Entry value="1" text="GPU" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+
       <SubProxy>
-        <Proxy name="VolumeFixedPointRayCastMapper" 
-          proxygroup="mappers" 
+        <Proxy name="VolumeFixedPointRayCastMapper"
+          proxygroup="mappers"
           proxyname="FixedPointVolumeRayCastMapper">
         </Proxy>
         <ExposedProperties>
           <Property name="LockSampleDistanceToInputSpacing" />
           <Property name="BlendMode"/>
+        </ExposedProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="VolumeGPURayCastMapper"
+          proxygroup="mappers"
+          proxyname="GPUVolumeRayCastMapper">
+        </Proxy>
+        <ShareProperties subproxy="VolumeFixedPointRayCastMapper">
+        <Exception name="LockSampleDistanceToInputSpacing" />
+        </ShareProperties>
+        <ExposedProperties>
+          <Property name="AutoAdjustSampleDistances" exposed_name="AutoAdjustSampleDistances" />
+          <Property name="SampleDistance" exposed_name="SampleDistance" />
         </ExposedProperties>
       </SubProxy>
 
@@ -7221,7 +7329,7 @@
       </SubProxy>
 
       <SubProxy>
-        <Proxy name="VolumeProperty" 
+        <Proxy name="VolumeProperty"
           proxygroup="properties" proxyname="VolumeProperty" >
         </Proxy>
         <ExposedProperties>
@@ -7232,7 +7340,7 @@
       </SubProxy>
 
       <SubProxy>
-        <!-- 
+        <!--
           Mapper for client-side rendering.
         -->
         <Proxy name="LODMapper" proxygroup="mappers" proxyname="PolyDataMapper" />
@@ -7348,7 +7456,7 @@
             number_of_elements="1"
             default_values="0">
             <Documentation>
-              In case of multiblock datasets, choose the flat index of the dataset to 
+              In case of multiblock datasets, choose the flat index of the dataset to
               volume render. The flat index must point to an unstructured grid dataset.
               If the input is not a multiblock dataset then this index is ignored.
             </Documentation>
@@ -7443,11 +7551,11 @@
       </SubProxy>
 
       <SubProxy>
-        <!-- 
+        <!--
           Mapper for low-res geometry. It shares all its properties with the
           high-res mapper (except input ofcourse).
         -->
-        <Proxy name="VolumeLODMapper" 
+        <Proxy name="VolumeLODMapper"
           proxygroup="mappers" proxyname="PolyDataMapper" />
         <ShareProperties subproxy="VolumeDummyMapper" >
           <Exception name="Input" />
@@ -7510,7 +7618,7 @@
         </Documentation>
       </IntVectorProperty>
 
-      <RepresentationType 
+      <RepresentationType
         subproxy="OutlineRepresentation" text="Outline"/>
       <RepresentationType
         subproxy="SurfaceRepresentation" text="Points" subtype="0" />
@@ -7532,7 +7640,7 @@
         </Documentation>
         <EnumerationDomain name="enum">
           <!-- this domain is automatically populated using RepresentationType
-               elements in the definition for this proxy. 
+               elements in the definition for this proxy.
           <Entry value="3" text="Outline" />
           <Entry value="0" text="Points" />
           <Entry value="1" text="Wireframe" />
@@ -7644,7 +7752,7 @@
       </SubProxy>
 
       <SubProxy>
-        <Proxy name="SelectionRepresentation" 
+        <Proxy name="SelectionRepresentation"
           proxygroup="representations"
           proxyname="SelectionRepresentation" />
         <ExposedProperties>
@@ -7654,8 +7762,8 @@
           <Property name="PointSize" exposed_name="SelectionPointSize" />
           <Property name="Representation"
                     exposed_name="SelectionRepresentation" />
-          
-          <Property name="PointLabelVisibility" 
+
+          <Property name="PointLabelVisibility"
                     exposed_name="SelectionPointLabelVisibility" />
           <Property name="PointLabelColor" exposed_name="SelectionPointLabelColor" />
           <Property name="PointLabelOpacity" exposed_name="SelectionPointLabelOpacity" />
@@ -7668,7 +7776,7 @@
           <Property name="PointFieldDataArrayIndex" exposed_name="SelectionPointFieldDataArrayIndex"/>
           <Property name="PointFieldDataArrayName" exposed_name="SelectionPointFieldDataArrayName"/>
 
-          <Property name="CellLabelVisibility" 
+          <Property name="CellLabelVisibility"
                     exposed_name="SelectionCellLabelVisibility" />
           <Property name="CellLabelColor" exposed_name="SelectionCellLabelColor" />
           <Property name="CellLabelOpacity" exposed_name="SelectionCellLabelOpacity" />
@@ -7719,14 +7827,14 @@
     </PVRepresentationProxy>
 
     <PVRepresentationProxy name="GeometryRepresentation"
-      base_proxygroup="representations" 
+      base_proxygroup="representations"
       base_proxyname="PVRepresentationBase">
       <Documentation>
         This representation is used to show geometry as
         Surface/Outline/Points/Wireframe.
       </Documentation>
-      
-      <InputProperty 
+
+      <InputProperty
         name="Input"
         command="NotUsed">
        <DataTypeDomain name="input_type">
@@ -7794,7 +7902,7 @@
           <Property name="CubeAxesZAxisVisibility"/>
           <Property name="CubeAxesZGridLines"/>
           <Property name="CubeAxesZTitle"/>
-          
+
         </InheritRepresentationProperties>
       </Hints>
 
@@ -7802,17 +7910,17 @@
     </PVRepresentationProxy>
 
     <PVRepresentationProxy name="UnstructuredGridRepresentation"
-      base_proxygroup="representations" 
+      base_proxygroup="representations"
       base_proxyname="PVRepresentationBase">
       <Documentation>
         This representation is used to show unstructured grid as
         Surface/Outline/Points/Wireframe/Volume
       </Documentation>
-     
+
       <!-- this adds to what is already defined in PVRepresentationBase -->
       <RepresentationType subproxy="VolumeRepresentation" text="Volume"/>
 
-      <InputProperty 
+      <InputProperty
         name="Input"
         command="NotUsed">
        <DataTypeDomain name="input_type"
@@ -7868,7 +7976,7 @@
           <Property name="BackfaceColor" />
           <Property name="BackfaceDiffuseColor" />
           <Property name="BackfaceOpacity" />
-        
+
           <!-- Inherit selection properties -->
           <Property name="SelectionColor" />
           <Property name="SelectionLineWidth" />
@@ -7897,7 +8005,7 @@
           <Property name="CubeAxesZAxisVisibility"/>
           <Property name="CubeAxesZGridLines"/>
           <Property name="CubeAxesZTitle"/>
-          
+
         </InheritRepresentationProperties>
       </Hints>
 
@@ -7905,7 +8013,7 @@
     </PVRepresentationProxy>
 
     <PVRepresentationProxy name="UniformGridRepresentation"
-      base_proxygroup="representations" 
+      base_proxygroup="representations"
       base_proxyname="PVRepresentationBase">
       <Documentation>
         This representation is used to show image data as
@@ -7916,7 +8024,7 @@
       <RepresentationType subproxy="VolumeRepresentation" text="Volume"/>
       <RepresentationType subproxy="SliceRepresentation" text="Slice"/>
 
-      <InputProperty 
+      <InputProperty
         name="Input"
         command="NotUsed">
        <DataTypeDomain name="input_type"
@@ -7940,7 +8048,10 @@
           <Property name="LockSampleDistanceToInputSpacing" />
           <Property name="ScalarOpacityUnitDistance" />
           <Property name="ScalarOpacityFunction" />
+          <Property name="SelectedMapperIndex" />
           <Property name="BlendMode"/>
+          <Property name="AutoAdjustSampleDistances"/>
+          <Property name="SampleDistance"/>
         </ExposedProperties>
       </SubProxy>
 
@@ -7986,7 +8097,7 @@
           <Property name="BackfaceColor" />
           <Property name="BackfaceDiffuseColor" />
           <Property name="BackfaceOpacity" />
-        
+
           <!-- Inherit selection properties -->
           <Property name="SelectionColor" />
           <Property name="SelectionLineWidth" />
@@ -8015,18 +8126,18 @@
           <Property name="CubeAxesZAxisVisibility"/>
           <Property name="CubeAxesZGridLines"/>
           <Property name="CubeAxesZTitle"/>
-          
+
         </InheritRepresentationProperties>
       </Hints>
 
       <!-- End of UniformGridRepresentation -->
     </PVRepresentationProxy>
 
-    <ClientDeliveryRepresentationProxy 
+    <ClientDeliveryRepresentationProxy
       name="ClientDeliveryRepresentationBase">
       <Documentation>
         This defines the common API used by all
-        ClientDeliveryRepresentation proxies. 
+        ClientDeliveryRepresentation proxies.
       </Documentation>
 
       <IntVectorProperty
@@ -8073,15 +8184,15 @@
         </Documentation>
       </ProxyProperty>
 
-      <IntVectorProperty 
-         name="PassThrough" 
-         command="SetPassThrough" 
+      <IntVectorProperty
+         name="PassThrough"
+         command="SetPassThrough"
          update_self="1"
          number_of_elements="1"
-         default_values="-1"> 
+         default_values="-1">
         <IntRangeDomain name="range" min="-1"/>
         <Documentation>
-          If set to a non-negative value, then produce results using only 
+          If set to a non-negative value, then produce results using only
           the node Id specified.
         </Documentation>
       </IntVectorProperty>
@@ -8098,7 +8209,7 @@
           indicating the process id on which the cell/point was generated.
         </Documentation>
       </IntVectorProperty>
-        
+
       <DoubleVectorProperty name="UpdateTime"
         command="SetUpdateTime"
         update_self="1"
@@ -8260,7 +8371,7 @@
       </InputProperty>
 
       <SubProxy>
-        <Proxy name="SeriesOptions" 
+        <Proxy name="SeriesOptions"
           proxygroup="options"
           proxyname="BarChartSeriesOptions">
         </Proxy>
@@ -8304,7 +8415,7 @@
       </InputProperty>
 
       <SubProxy>
-        <Proxy name="SeriesOptions" 
+        <Proxy name="SeriesOptions"
           proxygroup="options"
           proxyname="LineChartSeriesOptions">
         </Proxy>
@@ -8533,7 +8644,7 @@
 
       <SubProxy>
         <!-- Streaming sub-proxy -->
-        <Proxy name="Streamer" 
+        <Proxy name="Streamer"
           proxygroup="extended_filters" proxyname="TableStreamer">
         </Proxy>
         <ExposedProperties>
@@ -8549,7 +8660,7 @@
 
     <BlockDeliveryRepresentationProxy name="SelectionBlockDeliveryRepresentation">
       <Documentation>
-        Representation used to deliver blocks of data to the client. 
+        Representation used to deliver blocks of data to the client.
         This representation delivers a subset of selection pertinent to the
         block that would have been delivered if we were using a
         BlockDeliveryRepresentation.
@@ -8708,7 +8819,7 @@
     </AxesRepresentationProxy>
 
     <AxesRepresentationProxy name="AxesRepresentation" class="vtkAxes" >
-      
+
       <IntVectorProperty name="Symmetric"
         command="SetSymmetric"
         number_of_elements="1"
@@ -8740,7 +8851,7 @@
         </ExposedProperties>
       </SubProxy>
     </AxesRepresentationProxy>
-    
+
     <NewWidgetRepresentationProxy name="HandleWidgetRepresentation">
       <SubProxy>
         <Proxy name="Prop"
@@ -8765,10 +8876,10 @@
 
     <NewWidgetRepresentationProxy name="PointSourceWidgetRepresentation"
       base_proxygroup="representations" base_proxyname="HandleWidgetRepresentation">
-      <!-- 
+      <!--
         This is same as handle widget except that it provides
-        dummy properties for the radius/number of points in a point 
-        source. 
+        dummy properties for the radius/number of points in a point
+        source.
       -->
       <DoubleVectorProperty
         name="Radius"
@@ -8814,9 +8925,9 @@
 
     <NewWidgetRepresentationProxy name="LineSourceWidgetRepresentation"
       base_proxygroup="representations" base_proxyname="LineWidgetRepresentation">
-      <!-- 
+      <!--
         This is same as LineWidgetRepresentation except that it provides
-        dummy property for the resolution for the line source. 
+        dummy property for the resolution for the line source.
       -->
       <IntVectorProperty
         name="Resolution"
@@ -8854,7 +8965,7 @@
 
     <NewWidgetRepresentationProxy name="DistanceWidgetRepresentation">
       <SubProxy>
-        <Proxy name="Prop2D" 
+        <Proxy name="Prop2D"
           proxygroup="props" proxyname="DistanceRepresentation2D">
         </Proxy>
         <ExposedProperties>
@@ -9012,7 +9123,7 @@
 
       <!-- End of SplineWidgetRepresentation -->
     </NewWidgetRepresentationProxy>
-    
+
     <NewWidgetRepresentationProxy name="ContourWidgetRepresentation">
       <Documentation>
         Representation proxy for the the Contour widget. This includes the
@@ -9053,7 +9164,7 @@
 
       <!-- End of ContourWidgetRepresentation -->
     </NewWidgetRepresentationProxy>
-    
+
     <ScalarBarWidgetRepresentationProxy name="ScalarBarWidgetRepresentation" class="vtkScalarBarWidget">
       <IntVectorProperty name="Enabled"
                          command="SetEnabled"
@@ -9193,7 +9304,7 @@
         Representation proxy used to show text.
       </Documentation>
 
-      <InputProperty name="Input" 
+      <InputProperty name="Input"
         command="NotUsed" />
 
       <DoubleVectorProperty name="UpdateTime"
@@ -9259,7 +9370,7 @@
 
       <!-- End of TextSourceRepresentation -->
     </TextSourceRepresentationProxy>
-    
+
     <DataLabelRepresentationProxy name="DataLabelRepresentation">
       <Documentation>
         Representation used to add labels to points/cells of any dataset.
@@ -9363,7 +9474,7 @@
         simply shows an axes along the bounding box of the dataobject.
       </Documentation>
 
-      <InputProperty name="Input" 
+      <InputProperty name="Input"
         command="NotUsed">
         <Documentation>
           Input around which the bound box is to be shown.
@@ -9427,7 +9538,7 @@
 
       <SubProxy>
         <SourceProxy name="OutlineFilter" class="vtkPVGeometryFilter">
-          <!-- 
+          <!--
             Outline filter generates a partial outline on all processes.
           -->
           <InputProperty name="Input"
@@ -9445,7 +9556,7 @@
       </SubProxy>
 
       <SubProxy>
-        <Proxy name="Prop2D" 
+        <Proxy name="Prop2D"
           proxygroup="props" proxyname="CubeAxesActor" />
         <ExposedProperties>
           <Property name="CornerOffset" />
@@ -9478,7 +9589,7 @@
           <Property name="Color" />
         </ExposedProperties>
       </SubProxy>
-      
+
       <!-- End of CubeAxesRepresentation -->
     </CubeAxesRepresentationProxy>
 
@@ -9487,7 +9598,7 @@
         Representation to scatter plots. The plot can be in 2D or 3D.
       </Documentation>
 
-      <InputProperty name="Input" 
+      <InputProperty name="Input"
         command="not-used"
         port_index="0">
         <Documentation>
@@ -9499,7 +9610,7 @@
         </DataTypeDomain>
       </InputProperty>
 
-      <InputProperty name="GlyphInput" 
+      <InputProperty name="GlyphInput"
         command="not-used"
         port_index="1">
         <Documentation>
@@ -9525,7 +9636,7 @@
       </DoubleVectorProperty>
 
       <SubProxy>
-        <!-- 
+        <!--
           Geometry filter is used to conver non-polydata input to polydata.
           -->
         <Proxy name="FlattenFilter"
@@ -9696,7 +9807,7 @@
 
       <SubProxy>
         <!-- Mapper for high-res image -->
-        <Proxy name="Mapper" 
+        <Proxy name="Mapper"
           proxygroup="mappers" proxyname="ScatterPlotMapper" />
 
         <ExposedProperties>
@@ -9721,8 +9832,8 @@
 
       <!-- Mapper for low-res image
       <SubProxy>
-        
-        <Proxy name="LODMapper" 
+
+        <Proxy name="LODMapper"
           proxygroup="mappers" proxyname="PolyDataMapper" />
         <ShareProperties subproxy="Mapper" >
           <Exception name="Input" />
@@ -10086,7 +10197,7 @@
           Set the series line color.
         </Documentation>
       </StringVectorProperty>
-    
+
       <!-- End of LineChartSeriesOptions -->
     </ChartNamedOptionsModelProxy>
 

@@ -1,7 +1,8 @@
-<ui version="4.0" >
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
  <class>pqDisplayProxyEditor</class>
- <widget class="QWidget" name="pqDisplayProxyEditor" >
-  <property name="geometry" >
+ <widget class="QWidget" name="pqDisplayProxyEditor">
+  <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
@@ -9,75 +10,63 @@
     <height>1368</height>
    </rect>
   </property>
-  <property name="windowTitle" >
+  <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QVBoxLayout" >
+  <layout class="QVBoxLayout">
    <item>
-    <widget class="QGroupBox" name="ViewGroup" >
-     <property name="title" >
+    <widget class="QGroupBox" name="ViewGroup">
+     <property name="title">
       <string>View</string>
      </property>
-     <layout class="QGridLayout" >
-      <property name="leftMargin" >
+     <layout class="QGridLayout">
+      <property name="margin">
        <number>6</number>
       </property>
-      <property name="topMargin" >
+      <property name="spacing">
        <number>6</number>
       </property>
-      <property name="rightMargin" >
-       <number>6</number>
-      </property>
-      <property name="bottomMargin" >
-       <number>6</number>
-      </property>
-      <property name="horizontalSpacing" >
-       <number>6</number>
-      </property>
-      <property name="verticalSpacing" >
-       <number>6</number>
-      </property>
-      <item row="0" column="0" >
-       <widget class="QCheckBox" name="ViewData" >
-        <property name="sizePolicy" >
-         <sizepolicy vsizetype="Fixed" hsizetype="Fixed" >
+      <item row="0" column="0">
+       <widget class="QCheckBox" name="ViewData">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
-        <property name="toolTip" >
-         <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Toggle visibility of this dataset's geometry.&lt;/p>&lt;/body>&lt;/html></string>
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;/head&gt;&lt;body style=&quot; white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;&quot;&gt;&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Toggle visibility of this dataset's geometry.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
-        <property name="text" >
+        <property name="text">
          <string>Visible</string>
         </property>
        </widget>
       </item>
-      <item row="0" column="1" >
-       <widget class="QPushButton" name="ViewZoomToData" >
-        <property name="enabled" >
+      <item row="0" column="1">
+       <widget class="QPushButton" name="ViewZoomToData">
+        <property name="enabled">
          <bool>true</bool>
         </property>
-        <property name="toolTip" >
-         <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Change the camera location to best fit the dataset in the view window.&lt;/p>&lt;/body>&lt;/html></string>
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;/head&gt;&lt;body style=&quot; white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;&quot;&gt;&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Change the camera location to best fit the dataset in the view window.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
-        <property name="text" >
+        <property name="text">
          <string>&amp;Zoom To Data</string>
         </property>
        </widget>
       </item>
-      <item row="1" column="0" >
-       <widget class="QCheckBox" name="Selectable" >
-        <property name="sizePolicy" >
-         <sizepolicy vsizetype="Fixed" hsizetype="Fixed" >
+      <item row="1" column="0">
+       <widget class="QCheckBox" name="Selectable">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
-        <property name="toolTip" >
-         <string>&lt;html>Toggle the selectablity of the object. Only selectable objects can be selected using the selection mechanisms&lt;/html></string>
+        <property name="toolTip">
+         <string>&lt;html&gt;Toggle the selectablity of the object. Only selectable objects can be selected using the selection mechanisms&lt;/html&gt;</string>
         </property>
-        <property name="text" >
+        <property name="text">
          <string>Selectable</string>
         </property>
        </widget>
@@ -86,69 +75,48 @@
     </widget>
    </item>
    <item>
-    <widget class="QGroupBox" name="ColorGroup" >
-     <property name="title" >
+    <widget class="QGroupBox" name="ColorGroup">
+     <property name="title">
       <string>Color</string>
      </property>
-     <layout class="QGridLayout" >
-      <property name="leftMargin" >
+     <layout class="QGridLayout">
+      <property name="margin">
        <number>6</number>
       </property>
-      <property name="topMargin" >
+      <property name="spacing">
        <number>6</number>
       </property>
-      <property name="rightMargin" >
-       <number>6</number>
-      </property>
-      <property name="bottomMargin" >
-       <number>6</number>
-      </property>
-      <property name="horizontalSpacing" >
-       <number>6</number>
-      </property>
-      <property name="verticalSpacing" >
-       <number>6</number>
-      </property>
-      <item row="4" column="0" colspan="2" >
-       <widget class="QStackedWidget" name="ColorButtonStack" >
-        <property name="sizePolicy" >
-         <sizepolicy vsizetype="Fixed" hsizetype="MinimumExpanding" >
+      <item row="4" column="0" colspan="2">
+       <widget class="QStackedWidget" name="ColorButtonStack">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
-        <property name="currentIndex" >
+        <property name="currentIndex">
          <number>1</number>
         </property>
-        <widget class="QWidget" name="ColorMapPage" >
-         <property name="sizePolicy" >
-          <sizepolicy vsizetype="Fixed" hsizetype="MinimumExpanding" >
+        <widget class="QWidget" name="ColorMapPage">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
          </property>
-         <layout class="QHBoxLayout" >
-          <property name="spacing" >
+         <layout class="QHBoxLayout">
+          <property name="spacing">
            <number>6</number>
           </property>
-          <property name="leftMargin" >
-           <number>0</number>
-          </property>
-          <property name="topMargin" >
-           <number>0</number>
-          </property>
-          <property name="rightMargin" >
-           <number>0</number>
-          </property>
-          <property name="bottomMargin" >
+          <property name="margin">
            <number>0</number>
           </property>
           <item>
            <spacer>
-            <property name="orientation" >
+            <property name="orientation">
              <enum>Qt::Horizontal</enum>
             </property>
-            <property name="sizeHint" >
+            <property name="sizeHint" stdset="0">
              <size>
               <width>0</width>
               <height>20</height>
@@ -157,66 +125,54 @@
            </spacer>
           </item>
           <item>
-           <widget class="QPushButton" name="EditColorMapButton" >
-            <property name="text" >
+           <widget class="QPushButton" name="EditColorMapButton">
+            <property name="text">
              <string>Edit Color Map...</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="RescaleButton" >
-            <property name="text" >
+           <widget class="QPushButton" name="RescaleButton">
+            <property name="text">
              <string>Rescale to Data Range</string>
             </property>
            </widget>
           </item>
          </layout>
         </widget>
-        <widget class="QWidget" name="SolidColorPage" >
-         <property name="sizePolicy" >
-          <sizepolicy vsizetype="Fixed" hsizetype="MinimumExpanding" >
+        <widget class="QWidget" name="SolidColorPage">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
          </property>
-         <layout class="QGridLayout" >
-          <property name="leftMargin" >
+         <layout class="QGridLayout">
+          <property name="margin">
            <number>0</number>
           </property>
-          <property name="topMargin" >
-           <number>0</number>
-          </property>
-          <property name="rightMargin" >
-           <number>0</number>
-          </property>
-          <property name="bottomMargin" >
-           <number>0</number>
-          </property>
-          <property name="horizontalSpacing" >
+          <property name="spacing">
            <number>6</number>
           </property>
-          <property name="verticalSpacing" >
-           <number>6</number>
-          </property>
-          <item row="0" column="0" >
-           <widget class="pqStandardColorButton" name="ColorActorColor" >
-            <property name="enabled" >
+          <item row="0" column="0">
+           <widget class="pqStandardColorButton" name="ColorActorColor">
+            <property name="enabled">
              <bool>true</bool>
             </property>
-            <property name="toolTip" >
-             <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Edit the constant color for the geometry.&lt;/p>&lt;/body>&lt;/html></string>
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;/head&gt;&lt;body style=&quot; white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;&quot;&gt;&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Edit the constant color for the geometry.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
             </property>
-            <property name="text" >
+            <property name="text">
              <string>Set Solid Color...</string>
             </property>
            </widget>
           </item>
-          <item row="0" column="1" >
+          <item row="0" column="1">
            <spacer>
-            <property name="orientation" >
+            <property name="orientation">
              <enum>Qt::Horizontal</enum>
             </property>
-            <property name="sizeHint" >
+            <property name="sizeHint" stdset="0">
              <size>
               <width>40</width>
               <height>20</height>
@@ -227,50 +183,38 @@
          </layout>
         </widget>
         <widget class="QWidget" name="AmbientColorPage">
-         <property name="sizePolicy" >
-          <sizepolicy vsizetype="Fixed" hsizetype="MinimumExpanding" >
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
          </property>
-         <layout class="QGridLayout" >
-          <property name="leftMargin" >
+         <layout class="QGridLayout">
+          <property name="margin">
            <number>0</number>
           </property>
-          <property name="topMargin" >
-           <number>0</number>
-          </property>
-          <property name="rightMargin" >
-           <number>0</number>
-          </property>
-          <property name="bottomMargin" >
-           <number>0</number>
-          </property>
-          <property name="horizontalSpacing" >
+          <property name="spacing">
            <number>6</number>
           </property>
-          <property name="verticalSpacing" >
-           <number>6</number>
-          </property>
-          <item row="0" column="0" >
-           <widget class="pqStandardColorButton" name="AmbientColor" >
-            <property name="enabled" >
+          <item row="0" column="0">
+           <widget class="pqStandardColorButton" name="AmbientColor">
+            <property name="enabled">
              <bool>true</bool>
             </property>
-            <property name="toolTip" >
-             <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Edit the constant color for the geometry.&lt;/p>&lt;/body>&lt;/html></string>
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;/head&gt;&lt;body style=&quot; white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;&quot;&gt;&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Edit the constant color for the geometry.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
             </property>
-            <property name="text" >
+            <property name="text">
              <string>Set Ambient Color...</string>
             </property>
            </widget>
           </item>
-          <item row="0" column="1" >
+          <item row="0" column="1">
            <spacer>
-            <property name="orientation" >
+            <property name="orientation">
              <enum>Qt::Horizontal</enum>
             </property>
-            <property name="sizeHint" >
+            <property name="sizeHint" stdset="0">
              <size>
               <width>40</width>
               <height>20</height>
@@ -282,194 +226,173 @@
         </widget>
        </widget>
       </item>
-      <item row="1" column="0" colspan="2" >
-       <widget class="QCheckBox" name="ColorMapScalars" >
-        <property name="enabled" >
+      <item row="1" column="0" colspan="2">
+       <widget class="QCheckBox" name="ColorMapScalars">
+        <property name="enabled">
          <bool>true</bool>
         </property>
-        <property name="toolTip" >
-         <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Map scalars through lookup table before applying color.&lt;/p>&lt;/body>&lt;/html></string>
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;/head&gt;&lt;body style=&quot; white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;&quot;&gt;&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Map scalars through lookup table before applying color.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
-        <property name="text" >
+        <property name="text">
          <string>Map Scalars</string>
         </property>
        </widget>
       </item>
-      <item row="0" column="0" colspan="2" >
-       <widget class="QCheckBox" name="ColorInterpolateScalars" >
-        <property name="enabled" >
+      <item row="0" column="0" colspan="2">
+       <widget class="QCheckBox" name="ColorInterpolateScalars">
+        <property name="enabled">
          <bool>true</bool>
         </property>
-        <property name="toolTip" >
-         <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">If on, scalars will be interpolated within polygons and color mapping will happen on a per-pixel basis.  If off, color mapping occurs at polygon points and colors are interpolated, which is generally less accurate.&lt;/p>&lt;/body>&lt;/html></string>
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;/head&gt;&lt;body style=&quot; white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;&quot;&gt;&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;If on, scalars will be interpolated within polygons and color mapping will happen on a per-pixel basis.  If off, color mapping occurs at polygon points and colors are interpolated, which is generally less accurate.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
-        <property name="text" >
+        <property name="text">
          <string>Interpolate Scalars</string>
         </property>
        </widget>
       </item>
-      <item row="3" column="1" >
-       <widget class="pqDisplayColorWidget" native="1" name="ColorBy" >
-        <property name="enabled" >
+      <item row="3" column="1">
+       <widget class="pqDisplayColorWidget" name="ColorBy" native="true">
+        <property name="enabled">
          <bool>true</bool>
         </property>
-        <property name="sizePolicy" >
-         <sizepolicy vsizetype="Fixed" hsizetype="Minimum" >
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
-        <property name="toolTip" >
-         <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Select method for coloring dataset geometry.&lt;/p>&lt;/body>&lt;/html></string>
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;/head&gt;&lt;body style=&quot; white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;&quot;&gt;&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Select method for coloring dataset geometry.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
        </widget>
       </item>
-      <item row="3" column="0" >
-       <widget class="QLabel" name="label" >
-        <property name="sizePolicy" >
-         <sizepolicy vsizetype="Preferred" hsizetype="Fixed" >
+      <item row="3" column="0">
+       <widget class="QLabel" name="label">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
-        <property name="text" >
+        <property name="text">
          <string>Color by</string>
         </property>
        </widget>
       </item>
-      <item row="2" column="0" >
-       <widget class="QLabel" name="TextureLabel" >
-        <property name="sizePolicy" >
-         <sizepolicy vsizetype="Preferred" hsizetype="Fixed" >
+      <item row="2" column="0">
+       <widget class="QLabel" name="TextureLabel">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
-        <property name="text" >
+        <property name="text">
          <string>Apply Texture</string>
         </property>
        </widget>
       </item>
-      <item row="2" column="1" >
-       <widget class="pqTextureComboBox" name="Texture" />
+      <item row="2" column="1">
+       <widget class="pqTextureComboBox" name="Texture"/>
       </item>
      </layout>
     </widget>
    </item>
    <item>
-    <widget class="QGroupBox" name="SliceGroup" >
-     <property name="title" >
+    <widget class="QGroupBox" name="SliceGroup">
+     <property name="title">
       <string>Slice</string>
      </property>
-     <layout class="QGridLayout" >
-      <property name="leftMargin" >
+     <layout class="QGridLayout">
+      <property name="margin">
        <number>6</number>
       </property>
-      <property name="topMargin" >
+      <property name="spacing">
        <number>6</number>
       </property>
-      <property name="rightMargin" >
-       <number>6</number>
-      </property>
-      <property name="bottomMargin" >
-       <number>6</number>
-      </property>
-      <property name="horizontalSpacing" >
-       <number>6</number>
-      </property>
-      <property name="verticalSpacing" >
-       <number>6</number>
-      </property>
-      <item row="0" column="0" >
-       <widget class="QLabel" name="label_14" >
-        <property name="sizePolicy" >
-         <sizepolicy vsizetype="Preferred" hsizetype="Fixed" >
+      <item row="0" column="0">
+       <widget class="QLabel" name="label_14">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
-        <property name="text" >
+        <property name="text">
          <string>Slice Direction</string>
         </property>
        </widget>
       </item>
-      <item row="0" column="1" >
-       <widget class="QComboBox" name="SliceDirection" />
+      <item row="0" column="1">
+       <widget class="QComboBox" name="SliceDirection"/>
       </item>
-      <item row="1" column="0" >
-       <widget class="QLabel" name="label_15" >
-        <property name="sizePolicy" >
-         <sizepolicy vsizetype="Preferred" hsizetype="Fixed" >
+      <item row="1" column="0">
+       <widget class="QLabel" name="label_15">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
-        <property name="text" >
+        <property name="text">
          <string>Slice</string>
         </property>
        </widget>
       </item>
-      <item row="1" column="1" >
-       <widget class="pqIntRangeWidget" native="1" name="Slice" />
+      <item row="1" column="1">
+       <widget class="pqIntRangeWidget" name="Slice" native="true"/>
       </item>
      </layout>
     </widget>
    </item>
    <item>
-    <widget class="QGroupBox" name="AnnotationGroup" >
-     <property name="title" >
+    <widget class="QGroupBox" name="AnnotationGroup">
+     <property name="title">
       <string>Annotation</string>
      </property>
-     <layout class="QGridLayout" >
-      <property name="leftMargin" >
+     <layout class="QGridLayout">
+      <property name="margin">
        <number>6</number>
       </property>
-      <property name="topMargin" >
-       <number>6</number>
-      </property>
-      <property name="rightMargin" >
-       <number>6</number>
-      </property>
-      <property name="bottomMargin" >
-       <number>6</number>
-      </property>
-      <item row="0" column="1" >
-       <widget class="QPushButton" name="EditCubeAxes" >
-        <property name="enabled" >
+      <item row="0" column="1">
+       <widget class="QPushButton" name="EditCubeAxes">
+        <property name="enabled">
          <bool>false</bool>
         </property>
-        <property name="toolTip" >
-         <string>&lt;html>Edit properties of the cube axes &lt;/html></string>
+        <property name="toolTip">
+         <string>&lt;html&gt;Edit properties of the cube axes &lt;/html&gt;</string>
         </property>
-        <property name="statusTip" >
-         <string>&lt;html>Edit properties of the cube axes &lt;/html></string>
+        <property name="statusTip">
+         <string>&lt;html&gt;Edit properties of the cube axes &lt;/html&gt;</string>
         </property>
-        <property name="whatsThis" >
-         <string>&lt;html>Edit properties of the cube axes &lt;/html></string>
+        <property name="whatsThis">
+         <string>&lt;html&gt;Edit properties of the cube axes &lt;/html&gt;</string>
         </property>
-        <property name="text" >
+        <property name="text">
          <string>Edit</string>
         </property>
        </widget>
       </item>
-      <item row="0" column="0" >
-       <widget class="QCheckBox" name="ShowCubeAxes" >
-        <property name="sizePolicy" >
-         <sizepolicy vsizetype="Fixed" hsizetype="Fixed" >
+      <item row="0" column="0">
+       <widget class="QCheckBox" name="ShowCubeAxes">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
-        <property name="toolTip" >
-         <string>&lt;html>Toggle visibility of the cube axes&lt;/html></string>
+        <property name="toolTip">
+         <string>&lt;html&gt;Toggle visibility of the cube axes&lt;/html&gt;</string>
         </property>
-        <property name="statusTip" >
-         <string>&lt;html>Toggle visibility of the cube axes&lt;/html></string>
+        <property name="statusTip">
+         <string>&lt;html&gt;Toggle visibility of the cube axes&lt;/html&gt;</string>
         </property>
-        <property name="whatsThis" >
-         <string>&lt;html>Toggle visibility of the cube axes&lt;/html></string>
+        <property name="whatsThis">
+         <string>&lt;html&gt;Toggle visibility of the cube axes&lt;/html&gt;</string>
         </property>
-        <property name="text" >
+        <property name="text">
          <string>Show cube axes</string>
         </property>
        </widget>
@@ -478,122 +401,110 @@
     </widget>
    </item>
    <item>
-    <widget class="QGroupBox" name="StyleGroup" >
-     <property name="title" >
+    <widget class="QGroupBox" name="StyleGroup">
+     <property name="title">
       <string>Style</string>
      </property>
-     <layout class="QGridLayout" >
-      <property name="leftMargin" >
+     <layout class="QGridLayout">
+      <property name="margin">
        <number>6</number>
       </property>
-      <property name="topMargin" >
+      <property name="spacing">
        <number>6</number>
       </property>
-      <property name="rightMargin" >
-       <number>6</number>
-      </property>
-      <property name="bottomMargin" >
-       <number>6</number>
-      </property>
-      <property name="horizontalSpacing" >
-       <number>6</number>
-      </property>
-      <property name="verticalSpacing" >
-       <number>6</number>
-      </property>
-      <item row="0" column="0" >
-       <widget class="QLabel" name="label_2" >
-        <property name="text" >
+      <item row="0" column="0">
+       <widget class="QLabel" name="label_2">
+        <property name="text">
          <string>Representation</string>
         </property>
-        <property name="alignment" >
+        <property name="alignment">
          <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
         </property>
        </widget>
       </item>
-      <item row="0" column="1" colspan="2" >
-       <widget class="pqDisplayRepresentationWidget" native="1" name="StyleRepresentation" >
-        <property name="sizePolicy" >
-         <sizepolicy vsizetype="Fixed" hsizetype="Minimum" >
+      <item row="0" column="1" colspan="2">
+       <widget class="pqDisplayRepresentationWidget" name="StyleRepresentation" native="true">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
-        <property name="toolTip" >
-         <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Choose what geometry should be used to represent the dataset.&lt;/p>&lt;/body>&lt;/html></string>
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;/head&gt;&lt;body style=&quot; white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;&quot;&gt;&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Choose what geometry should be used to represent the dataset.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
        </widget>
       </item>
-      <item row="1" column="0" colspan="3" >
-       <widget class="QTreeWidget" name="compositeTree" >
+      <item row="1" column="0" colspan="3">
+       <widget class="QTreeWidget" name="compositeTree">
         <column>
-         <property name="text" >
+         <property name="text">
           <string>Block selection:</string>
          </property>
         </column>
        </widget>
       </item>
-      <item row="2" column="0" >
-       <widget class="QLabel" name="label_3" >
-        <property name="text" >
+      <item row="2" column="0">
+       <widget class="QLabel" name="label_3">
+        <property name="text">
          <string>Interpolation</string>
         </property>
        </widget>
       </item>
-      <item row="2" column="1" colspan="2" >
-       <widget class="QComboBox" name="StyleInterpolation" >
-        <property name="toolTip" >
-         <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Choose the method used to shade the geometry and interpolate point attributes.&lt;/p>&lt;/body>&lt;/html></string>
+      <item row="2" column="1" colspan="2">
+       <widget class="QComboBox" name="StyleInterpolation">
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;/head&gt;&lt;body style=&quot; white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;&quot;&gt;&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Choose the method used to shade the geometry and interpolate point attributes.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
        </widget>
       </item>
-      <item row="3" column="0" >
-       <widget class="QLabel" name="label_13" >
-        <property name="text" >
+      <item row="3" column="0">
+       <widget class="QLabel" name="label_13">
+        <property name="text">
          <string>Material</string>
         </property>
        </widget>
       </item>
-      <item row="3" column="1" colspan="2" >
-       <widget class="QComboBox" name="StyleMaterial" >
+      <item row="3" column="1" colspan="2">
+       <widget class="QComboBox" name="StyleMaterial">
         <item>
-         <property name="text" >
+         <property name="text">
           <string>None</string>
          </property>
         </item>
         <item>
-         <property name="text" >
+         <property name="text">
           <string>Browse...</string>
          </property>
         </item>
        </widget>
       </item>
-      <item row="4" column="0" >
-       <widget class="QLabel" name="label_4" >
-        <property name="text" >
+      <item row="4" column="0">
+       <widget class="QLabel" name="label_4">
+        <property name="text">
          <string>Point size</string>
         </property>
        </widget>
       </item>
-      <item row="4" column="1" >
-       <widget class="QDoubleSpinBox" name="StylePointSize" >
-        <property name="toolTip" >
-         <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">If your dataset contains points/verticies, this scale adjusts the diameter of the rendered points.&lt;/p>&lt;/body>&lt;/html></string>
+      <item row="4" column="1">
+       <widget class="QDoubleSpinBox" name="StylePointSize">
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;/head&gt;&lt;body style=&quot; white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;&quot;&gt;&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;If your dataset contains points/verticies, this scale adjusts the diameter of the rendered points.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
-        <property name="minimum" >
+        <property name="minimum">
          <double>1.000000000000000</double>
         </property>
-        <property name="maximum" >
+        <property name="maximum">
          <double>100.000000000000000</double>
         </property>
        </widget>
       </item>
-      <item row="4" column="2" >
+      <item row="4" column="2">
        <spacer>
-        <property name="orientation" >
+        <property name="orientation">
          <enum>Qt::Horizontal</enum>
         </property>
-        <property name="sizeHint" >
+        <property name="sizeHint" stdset="0">
          <size>
           <width>40</width>
           <height>20</height>
@@ -601,32 +512,32 @@
         </property>
        </spacer>
       </item>
-      <item row="5" column="0" >
-       <widget class="QLabel" name="label_5" >
-        <property name="text" >
+      <item row="5" column="0">
+       <widget class="QLabel" name="label_5">
+        <property name="text">
          <string>Line width</string>
         </property>
        </widget>
       </item>
-      <item row="5" column="1" >
-       <widget class="QDoubleSpinBox" name="StyleLineWidth" >
-        <property name="toolTip" >
-         <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">If your dataset containes lines/edges, this scale adjusts the width of the rendered lines.&lt;/p>&lt;/body>&lt;/html></string>
+      <item row="5" column="1">
+       <widget class="QDoubleSpinBox" name="StyleLineWidth">
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;/head&gt;&lt;body style=&quot; white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;&quot;&gt;&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;If your dataset containes lines/edges, this scale adjusts the width of the rendered lines.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
-        <property name="minimum" >
+        <property name="minimum">
          <double>1.000000000000000</double>
         </property>
-        <property name="maximum" >
+        <property name="maximum">
          <double>100.000000000000000</double>
         </property>
        </widget>
       </item>
-      <item row="5" column="2" >
+      <item row="5" column="2">
        <spacer>
-        <property name="orientation" >
+        <property name="orientation">
          <enum>Qt::Horizontal</enum>
         </property>
-        <property name="sizeHint" >
+        <property name="sizeHint" stdset="0">
          <size>
           <width>40</width>
           <height>20</height>
@@ -634,34 +545,34 @@
         </property>
        </spacer>
       </item>
-      <item row="6" column="0" >
-       <widget class="QLabel" name="label_6" >
-        <property name="text" >
+      <item row="6" column="0">
+       <widget class="QLabel" name="label_6">
+        <property name="text">
          <string>Opacity</string>
         </property>
        </widget>
       </item>
-      <item row="6" column="1" >
-       <widget class="QDoubleSpinBox" name="Opacity" >
-        <property name="toolTip" >
-         <string>&lt;html>Set the opacity of the dataset's geometry.  Artifacts
+      <item row="6" column="1">
+       <widget class="QDoubleSpinBox" name="Opacity">
+        <property name="toolTip">
+         <string>&lt;html&gt;Set the opacity of the dataset's geometry.  Artifacts
          may appear in translucent geometry because primatives are not
-         sorted.&lt;/html></string>
+         sorted.&lt;/html&gt;</string>
         </property>
-        <property name="maximum" >
+        <property name="maximum">
          <double>1.000000000000000</double>
         </property>
-        <property name="singleStep" >
+        <property name="singleStep">
          <double>0.100000000000000</double>
         </property>
        </widget>
       </item>
-      <item row="6" column="2" >
+      <item row="6" column="2">
        <spacer>
-        <property name="orientation" >
+        <property name="orientation">
          <enum>Qt::Horizontal</enum>
         </property>
-        <property name="sizeHint" >
+        <property name="sizeHint" stdset="0">
          <size>
           <width>40</width>
           <height>20</height>
@@ -669,17 +580,17 @@
         </property>
        </spacer>
       </item>
-      <item row="7" column="0" >
-       <widget class="QLabel" name="label_19" >
-        <property name="text" >
+      <item row="7" column="0">
+       <widget class="QLabel" name="label_19">
+        <property name="text">
          <string>Volume mapper</string>
         </property>
        </widget>
       </item>
-      <item row="7" column="1" colspan="2" >
-       <widget class="QComboBox" name="SelectedMapperIndex" >
-        <property name="toolTip" >
-         <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Choose the mapper to use for volume rendering.&lt;/p>&lt;/body>&lt;/html></string>
+      <item row="7" column="1" colspan="2">
+       <widget class="QComboBox" name="SelectedMapperIndex">
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;/head&gt;&lt;body style=&quot; white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;&quot;&gt;&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Choose the mapper to use for volume rendering.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
        </widget>
       </item>
@@ -687,48 +598,39 @@
     </widget>
    </item>
    <item>
-    <widget class="QGroupBox" name="EdgeStyleGroup" >
-     <property name="title" >
+    <widget class="QGroupBox" name="EdgeStyleGroup">
+     <property name="title">
       <string>Edge Style</string>
      </property>
-     <layout class="QHBoxLayout" >
-      <property name="leftMargin" >
-       <number>6</number>
-      </property>
-      <property name="topMargin" >
-       <number>6</number>
-      </property>
-      <property name="rightMargin" >
-       <number>6</number>
-      </property>
-      <property name="bottomMargin" >
+     <layout class="QHBoxLayout">
+      <property name="margin">
        <number>6</number>
       </property>
       <item>
-       <widget class="pqStandardColorButton" name="EdgeColor" >
-        <property name="enabled" >
+       <widget class="pqStandardColorButton" name="EdgeColor">
+        <property name="enabled">
          <bool>true</bool>
         </property>
-        <property name="sizePolicy" >
-         <sizepolicy vsizetype="Fixed" hsizetype="Minimum" >
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
-        <property name="toolTip" >
-         <string>&lt;html>Set the color to use for edges shown on the surface&lt;/html></string>
+        <property name="toolTip">
+         <string>&lt;html&gt;Set the color to use for edges shown on the surface&lt;/html&gt;</string>
         </property>
-        <property name="text" >
+        <property name="text">
          <string>Set Edge Color...</string>
         </property>
        </widget>
       </item>
       <item>
        <spacer>
-        <property name="orientation" >
+        <property name="orientation">
          <enum>Qt::Horizontal</enum>
         </property>
-        <property name="sizeHint" >
+        <property name="sizeHint" stdset="0">
          <size>
           <width>40</width>
           <height>20</height>
@@ -740,52 +642,83 @@
     </widget>
    </item>
    <item>
-    <widget class="QGroupBox" name="LightingGroup" >
-     <property name="title" >
+    <widget class="QGroupBox" name="VolumeGroup">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
+     <property name="title">
+      <string>Volume</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout">
+      <item>
+       <widget class="QCheckBox" name="AutoAdjustSampleDistances">
+        <property name="text">
+         <string>AutoAdjustSampleDistances</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout">
+        <item>
+         <widget class="QLabel" name="SampleDistance">
+          <property name="text">
+           <string>Sample Distance</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLineEdit" name="SampleDistanceValue">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="LightingGroup">
+     <property name="title">
       <string>Lighting</string>
      </property>
-     <layout class="QGridLayout" >
-      <property name="leftMargin" >
+     <layout class="QGridLayout">
+      <property name="margin">
        <number>6</number>
       </property>
-      <property name="topMargin" >
+      <property name="spacing">
        <number>6</number>
       </property>
-      <property name="rightMargin" >
-       <number>6</number>
-      </property>
-      <property name="bottomMargin" >
-       <number>6</number>
-      </property>
-      <property name="horizontalSpacing" >
-       <number>6</number>
-      </property>
-      <property name="verticalSpacing" >
-       <number>6</number>
-      </property>
-      <item row="0" column="0" >
-       <widget class="QLabel" name="label_12" >
-        <property name="text" >
+      <item row="0" column="0">
+       <widget class="QLabel" name="label_12">
+        <property name="text">
          <string>Specular Intensity</string>
         </property>
        </widget>
       </item>
-      <item row="0" column="1" >
-       <widget class="QDoubleSpinBox" name="SpecularIntensity" >
-        <property name="maximum" >
+      <item row="0" column="1">
+       <widget class="QDoubleSpinBox" name="SpecularIntensity">
+        <property name="maximum">
          <double>1.000000000000000</double>
         </property>
-        <property name="singleStep" >
+        <property name="singleStep">
          <double>0.100000000000000</double>
         </property>
        </widget>
       </item>
-      <item row="0" column="2" >
+      <item row="0" column="2">
        <spacer>
-        <property name="orientation" >
+        <property name="orientation">
          <enum>Qt::Horizontal</enum>
         </property>
-        <property name="sizeHint" >
+        <property name="sizeHint" stdset="0">
          <size>
           <width>40</width>
           <height>20</height>
@@ -793,26 +726,26 @@
         </property>
        </spacer>
       </item>
-      <item row="1" column="0" >
-       <widget class="QLabel" name="label_11" >
-        <property name="text" >
+      <item row="1" column="0">
+       <widget class="QLabel" name="label_11">
+        <property name="text">
          <string>Specular Focus</string>
         </property>
        </widget>
       </item>
-      <item row="1" column="1" >
-       <widget class="QSpinBox" name="SpecularPower" >
-        <property name="maximum" >
+      <item row="1" column="1">
+       <widget class="QSpinBox" name="SpecularPower">
+        <property name="maximum">
          <number>128</number>
         </property>
        </widget>
       </item>
-      <item row="1" column="2" >
+      <item row="1" column="2">
        <spacer>
-        <property name="orientation" >
+        <property name="orientation">
          <enum>Qt::Horizontal</enum>
         </property>
-        <property name="sizeHint" >
+        <property name="sizeHint" stdset="0">
          <size>
           <width>40</width>
           <height>20</height>
@@ -820,12 +753,12 @@
         </property>
        </spacer>
       </item>
-      <item row="2" column="0" colspan="3" >
-       <widget class="QCheckBox" name="SpecularWhite" >
-        <property name="text" >
+      <item row="2" column="0" colspan="3">
+       <widget class="QCheckBox" name="SpecularWhite">
+        <property name="text">
          <string>Specular White</string>
         </property>
-        <property name="checked" >
+        <property name="checked">
          <bool>true</bool>
         </property>
        </widget>
@@ -834,85 +767,70 @@
     </widget>
    </item>
    <item>
-    <widget class="QGroupBox" name="BackfaceStyleGroup" >
-     <property name="title" >
+    <widget class="QGroupBox" name="BackfaceStyleGroup">
+     <property name="title">
       <string>Backface Style</string>
      </property>
-     <layout class="QGridLayout" >
-      <property name="leftMargin" >
+     <layout class="QGridLayout">
+      <property name="margin">
        <number>6</number>
       </property>
-      <property name="topMargin" >
+      <property name="spacing">
        <number>6</number>
       </property>
-      <property name="rightMargin" >
-       <number>6</number>
-      </property>
-      <property name="bottomMargin" >
-       <number>6</number>
-      </property>
-      <property name="horizontalSpacing" >
-       <number>6</number>
-      </property>
-      <property name="verticalSpacing" >
-       <number>6</number>
-      </property>
-      <item row="0" column="0" >
-       <widget class="QLabel" name="label_16" >
-        <property name="sizePolicy" >
-         <sizepolicy vsizetype="Preferred" hsizetype="Fixed" >
+      <item row="0" column="0">
+       <widget class="QLabel" name="label_16">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
-        <property name="text" >
+        <property name="text">
          <string>Representation</string>
         </property>
        </widget>
       </item>
-      <item row="0" column="1" >
-       <widget class="QComboBox" name="BackfaceStyleRepresentation" />
+      <item row="0" column="1">
+       <widget class="QComboBox" name="BackfaceStyleRepresentation"/>
       </item>
-      <item row="1" column="0" colspan="2" >
-       <widget class="QWidget" native="1" name="BackfaceStyleGroupOptions" >
-        <layout class="QGridLayout" >
-         <property name="leftMargin" >
+      <item row="1" column="0" colspan="2">
+       <widget class="QWidget" name="BackfaceStyleGroupOptions" native="true">
+        <layout class="QGridLayout">
+         <property name="leftMargin">
           <number>0</number>
          </property>
-         <property name="topMargin" >
+         <property name="topMargin">
           <number>6</number>
          </property>
-         <property name="rightMargin" >
+         <property name="rightMargin">
           <number>0</number>
          </property>
-         <property name="bottomMargin" >
+         <property name="bottomMargin">
           <number>0</number>
          </property>
-         <property name="horizontalSpacing" >
+         <property name="spacing">
           <number>6</number>
          </property>
-         <property name="verticalSpacing" >
-          <number>6</number>
-         </property>
-         <item row="0" column="0" colspan="2" >
-          <widget class="pqStandardColorButton" name="BackfaceActorColor" >
-           <property name="sizePolicy" >
-            <sizepolicy vsizetype="Fixed" hsizetype="Minimum" >
+         <item row="0" column="0" colspan="2">
+          <widget class="pqStandardColorButton" name="BackfaceActorColor">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
            </property>
-           <property name="text" >
+           <property name="text">
             <string>Set Backface Color...</string>
            </property>
           </widget>
          </item>
-         <item row="0" column="2" >
+         <item row="0" column="2">
           <spacer>
-           <property name="orientation" >
+           <property name="orientation">
             <enum>Qt::Horizontal</enum>
            </property>
-           <property name="sizeHint" >
+           <property name="sizeHint" stdset="0">
             <size>
              <width>40</width>
              <height>20</height>
@@ -920,29 +838,29 @@
            </property>
           </spacer>
          </item>
-         <item row="1" column="0" >
-          <widget class="QLabel" name="label_20" >
-           <property name="text" >
+         <item row="1" column="0">
+          <widget class="QLabel" name="label_20">
+           <property name="text">
             <string>Opacity</string>
            </property>
           </widget>
          </item>
-         <item row="1" column="1" >
-          <widget class="QDoubleSpinBox" name="BackfaceOpacity" >
-           <property name="maximum" >
+         <item row="1" column="1">
+          <widget class="QDoubleSpinBox" name="BackfaceOpacity">
+           <property name="maximum">
             <double>1.000000000000000</double>
            </property>
-           <property name="singleStep" >
+           <property name="singleStep">
             <double>0.100000000000000</double>
            </property>
           </widget>
          </item>
-         <item row="1" column="2" >
+         <item row="1" column="2">
           <spacer>
-           <property name="orientation" >
+           <property name="orientation">
             <enum>Qt::Horizontal</enum>
            </property>
-           <property name="sizeHint" >
+           <property name="sizeHint" stdset="0">
             <size>
              <width>40</width>
              <height>20</height>
@@ -957,210 +875,198 @@
     </widget>
    </item>
    <item>
-    <widget class="QGroupBox" name="TransformationGroup" >
-     <property name="title" >
+    <widget class="QGroupBox" name="TransformationGroup">
+     <property name="title">
       <string>Transformation</string>
      </property>
-     <layout class="QGridLayout" >
-      <property name="leftMargin" >
+     <layout class="QGridLayout">
+      <property name="margin">
        <number>6</number>
       </property>
-      <property name="topMargin" >
+      <property name="spacing">
        <number>6</number>
       </property>
-      <property name="rightMargin" >
-       <number>6</number>
-      </property>
-      <property name="bottomMargin" >
-       <number>6</number>
-      </property>
-      <property name="horizontalSpacing" >
-       <number>6</number>
-      </property>
-      <property name="verticalSpacing" >
-       <number>6</number>
-      </property>
-      <item row="0" column="0" >
-       <widget class="QLabel" name="label_7" >
-        <property name="text" >
+      <item row="0" column="0">
+       <widget class="QLabel" name="label_7">
+        <property name="text">
          <string>Translate</string>
         </property>
        </widget>
       </item>
-      <item row="0" column="1" >
-       <widget class="QLineEdit" name="TranslateX" >
-        <property name="sizePolicy" >
-         <sizepolicy vsizetype="Fixed" hsizetype="Preferred" >
+      <item row="0" column="1">
+       <widget class="QLineEdit" name="TranslateX">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
-        <property name="toolTip" >
-         <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Translate the geometry relative to the dataset location.&lt;/p>&lt;/body>&lt;/html></string>
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;/head&gt;&lt;body style=&quot; white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;&quot;&gt;&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Translate the geometry relative to the dataset location.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
        </widget>
       </item>
-      <item row="0" column="2" >
-       <widget class="QLineEdit" name="TranslateY" >
-        <property name="sizePolicy" >
-         <sizepolicy vsizetype="Fixed" hsizetype="Preferred" >
+      <item row="0" column="2">
+       <widget class="QLineEdit" name="TranslateY">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
-        <property name="toolTip" >
-         <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Translate the geometry relative to the dataset location.&lt;/p>&lt;/body>&lt;/html></string>
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;/head&gt;&lt;body style=&quot; white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;&quot;&gt;&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Translate the geometry relative to the dataset location.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
        </widget>
       </item>
-      <item row="0" column="3" >
-       <widget class="QLineEdit" name="TranslateZ" >
-        <property name="sizePolicy" >
-         <sizepolicy vsizetype="Fixed" hsizetype="Preferred" >
+      <item row="0" column="3">
+       <widget class="QLineEdit" name="TranslateZ">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
-        <property name="toolTip" >
-         <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Translate the geometry relative to the dataset location.&lt;/p>&lt;/body>&lt;/html></string>
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;/head&gt;&lt;body style=&quot; white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;&quot;&gt;&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Translate the geometry relative to the dataset location.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
        </widget>
       </item>
-      <item row="1" column="0" >
-       <widget class="QLabel" name="label_8" >
-        <property name="text" >
+      <item row="1" column="0">
+       <widget class="QLabel" name="label_8">
+        <property name="text">
          <string>Scale</string>
         </property>
        </widget>
       </item>
-      <item row="1" column="1" >
-       <widget class="QLineEdit" name="ScaleX" >
-        <property name="sizePolicy" >
-         <sizepolicy vsizetype="Fixed" hsizetype="Preferred" >
+      <item row="1" column="1">
+       <widget class="QLineEdit" name="ScaleX">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
-        <property name="toolTip" >
-         <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Scale the geometry relative to the size of the dataset.&lt;/p>&lt;/body>&lt;/html></string>
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;/head&gt;&lt;body style=&quot; white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;&quot;&gt;&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Scale the geometry relative to the size of the dataset.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
        </widget>
       </item>
-      <item row="1" column="2" >
-       <widget class="QLineEdit" name="ScaleY" >
-        <property name="sizePolicy" >
-         <sizepolicy vsizetype="Fixed" hsizetype="Preferred" >
+      <item row="1" column="2">
+       <widget class="QLineEdit" name="ScaleY">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
-        <property name="toolTip" >
-         <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Scale the geometry relative to the size of the dataset.&lt;/p>&lt;/body>&lt;/html></string>
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;/head&gt;&lt;body style=&quot; white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;&quot;&gt;&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Scale the geometry relative to the size of the dataset.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
        </widget>
       </item>
-      <item row="1" column="3" >
-       <widget class="QLineEdit" name="ScaleZ" >
-        <property name="sizePolicy" >
-         <sizepolicy vsizetype="Fixed" hsizetype="Preferred" >
+      <item row="1" column="3">
+       <widget class="QLineEdit" name="ScaleZ">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
-        <property name="toolTip" >
-         <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Scale the geometry relative to the size of the dataset.&lt;/p>&lt;/body>&lt;/html></string>
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;/head&gt;&lt;body style=&quot; white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;&quot;&gt;&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Scale the geometry relative to the size of the dataset.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
        </widget>
       </item>
-      <item row="2" column="0" >
-       <widget class="QLabel" name="label_9" >
-        <property name="text" >
+      <item row="2" column="0">
+       <widget class="QLabel" name="label_9">
+        <property name="text">
          <string>Orientation</string>
         </property>
        </widget>
       </item>
-      <item row="2" column="1" >
-       <widget class="QLineEdit" name="OrientationX" >
-        <property name="sizePolicy" >
-         <sizepolicy vsizetype="Fixed" hsizetype="Preferred" >
+      <item row="2" column="1">
+       <widget class="QLineEdit" name="OrientationX">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
-        <property name="toolTip" >
-         <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Orient the geometry relative to the dataset origin.&lt;/p>&lt;/body>&lt;/html></string>
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;/head&gt;&lt;body style=&quot; white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;&quot;&gt;&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Orient the geometry relative to the dataset origin.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
        </widget>
       </item>
-      <item row="2" column="2" >
-       <widget class="QLineEdit" name="OrientationY" >
-        <property name="sizePolicy" >
-         <sizepolicy vsizetype="Fixed" hsizetype="Preferred" >
+      <item row="2" column="2">
+       <widget class="QLineEdit" name="OrientationY">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
-        <property name="toolTip" >
-         <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Orient the geometry relative to the dataset origin.&lt;/p>&lt;/body>&lt;/html></string>
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;/head&gt;&lt;body style=&quot; white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;&quot;&gt;&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Orient the geometry relative to the dataset origin.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
        </widget>
       </item>
-      <item row="2" column="3" >
-       <widget class="QLineEdit" name="OrientationZ" >
-        <property name="sizePolicy" >
-         <sizepolicy vsizetype="Fixed" hsizetype="Preferred" >
+      <item row="2" column="3">
+       <widget class="QLineEdit" name="OrientationZ">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
-        <property name="toolTip" >
-         <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Orient the geometry relative to the dataset origin.&lt;/p>&lt;/body>&lt;/html></string>
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;/head&gt;&lt;body style=&quot; white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;&quot;&gt;&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Orient the geometry relative to the dataset origin.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
        </widget>
       </item>
-      <item row="3" column="0" >
-       <widget class="QLabel" name="label_10" >
-        <property name="text" >
+      <item row="3" column="0">
+       <widget class="QLabel" name="label_10">
+        <property name="text">
          <string>Origin</string>
         </property>
        </widget>
       </item>
-      <item row="3" column="1" >
-       <widget class="QLineEdit" name="OriginX" >
-        <property name="sizePolicy" >
-         <sizepolicy vsizetype="Fixed" hsizetype="Preferred" >
+      <item row="3" column="1">
+       <widget class="QLineEdit" name="OriginX">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
-        <property name="toolTip" >
-         <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Set the origin point about which rotations take place.&lt;/p>&lt;/body>&lt;/html></string>
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;/head&gt;&lt;body style=&quot; white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;&quot;&gt;&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Set the origin point about which rotations take place.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
        </widget>
       </item>
-      <item row="3" column="2" >
-       <widget class="QLineEdit" name="OriginY" >
-        <property name="sizePolicy" >
-         <sizepolicy vsizetype="Fixed" hsizetype="Preferred" >
+      <item row="3" column="2">
+       <widget class="QLineEdit" name="OriginY">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
-        <property name="toolTip" >
-         <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Set the origin point about which rotations take place.&lt;/p>&lt;/body>&lt;/html></string>
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;/head&gt;&lt;body style=&quot; white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;&quot;&gt;&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Set the origin point about which rotations take place.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
        </widget>
       </item>
-      <item row="3" column="3" >
-       <widget class="QLineEdit" name="OriginZ" >
-        <property name="sizePolicy" >
-         <sizepolicy vsizetype="Fixed" hsizetype="Preferred" >
+      <item row="3" column="3">
+       <widget class="QLineEdit" name="OriginZ">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
-        <property name="toolTip" >
-         <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Set the origin point about which rotations take place.&lt;/p>&lt;/body>&lt;/html></string>
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;/head&gt;&lt;body style=&quot; white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;&quot;&gt;&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Set the origin point about which rotations take place.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
        </widget>
       </item>
@@ -1246,11 +1152,11 @@
    <receiver>EditCubeAxes</receiver>
    <slot>setEnabled(bool)</slot>
    <hints>
-    <hint type="sourcelabel" >
+    <hint type="sourcelabel">
      <x>82</x>
      <y>490</y>
     </hint>
-    <hint type="destinationlabel" >
+    <hint type="destinationlabel">
      <x>213</x>
      <y>490</y>
     </hint>
@@ -1262,11 +1168,11 @@
    <receiver>EditColorMapButton</receiver>
    <slot>setEnabled(bool)</slot>
    <hints>
-    <hint type="sourcelabel" >
+    <hint type="sourcelabel">
      <x>139</x>
      <y>122</y>
     </hint>
-    <hint type="destinationlabel" >
+    <hint type="destinationlabel">
      <x>92</x>
      <y>194</y>
     </hint>
@@ -1278,11 +1184,11 @@
    <receiver>RescaleButton</receiver>
    <slot>setEnabled(bool)</slot>
    <hints>
-    <hint type="sourcelabel" >
+    <hint type="sourcelabel">
      <x>139</x>
      <y>122</y>
     </hint>
-    <hint type="destinationlabel" >
+    <hint type="destinationlabel">
      <x>201</x>
      <y>194</y>
     </hint>

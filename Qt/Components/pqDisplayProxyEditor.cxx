@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -162,7 +162,7 @@ pqDisplayProxyEditor::~pqDisplayProxyEditor()
 
 //-----------------------------------------------------------------------------
 /// set the proxy to repr display properties for
-void pqDisplayProxyEditor::setRepresentation(pqPipelineRepresentation* repr) 
+void pqDisplayProxyEditor::setRepresentation(pqPipelineRepresentation* repr)
 {
   if(this->Internal->Representation == repr)
     {
@@ -189,7 +189,7 @@ void pqDisplayProxyEditor::setRepresentation(pqPipelineRepresentation* repr)
     }
 
   this->setEnabled(true);
-  
+
   // The slots are already connected but we do not want them to execute
   // while we are initializing the GUI
   this->DisableSlots = 1;
@@ -256,7 +256,7 @@ void pqDisplayProxyEditor::setRepresentation(pqPipelineRepresentation* repr)
     QObject::connect(this->Internal->SpecularPower, SIGNAL(editingFinished()),
       this, SLOT(updateAllViews()));
     }
-  
+
   // setup for interpolation
   this->Internal->StyleInterpolation->clear();
   if ((prop = reprProxy->GetProperty("Interpolation")) != 0)
@@ -315,7 +315,7 @@ void pqDisplayProxyEditor::setRepresentation(pqPipelineRepresentation* repr)
     reprProxy, reprProxy->GetProperty("Position"), 1);
   validator = new QDoubleValidator(this);
   this->Internal->TranslateY->setValidator(validator);
-  
+
   this->Internal->Links->addPropertyLink(this->Internal->TranslateZ,
     "text", SIGNAL(editingFinished()),
     reprProxy, reprProxy->GetProperty("Position"), 2);
@@ -438,7 +438,7 @@ void pqDisplayProxyEditor::setRepresentation(pqPipelineRepresentation* repr)
       "value", SIGNAL(valueChanged(int)),
       reprProxy, reprProxy->GetProperty("Slice"));
 
-    QList<QVariant> sliceModes = 
+    QList<QVariant> sliceModes =
       pqSMAdaptor::getEnumerationPropertyDomain(
         reprProxy->GetProperty("SliceMode"));
     foreach(QVariant item, sliceModes)
@@ -453,7 +453,7 @@ void pqDisplayProxyEditor::setRepresentation(pqPipelineRepresentation* repr)
 
   if (reprProxy->GetProperty("ExtractedBlockIndex"))
     {
-    this->Internal->CompositeTreeAdaptor = 
+    this->Internal->CompositeTreeAdaptor =
       new pqSignalAdaptorCompositeTreeWidget(
         this->Internal->compositeTree,
         this->Internal->Representation->getOutputPortFromInput()->getOutputPortProxy(),
@@ -463,7 +463,7 @@ void pqDisplayProxyEditor::setRepresentation(pqPipelineRepresentation* repr)
 
   if (reprProxy->GetProperty("SelectedMapperIndex"))
     {
-    QList<QVariant> mapperNames = 
+    QList<QVariant> mapperNames =
       pqSMAdaptor::getEnumerationPropertyDomain(
         reprProxy->GetProperty("SelectedMapperIndex"));
     foreach(QVariant item, mapperNames)
@@ -526,7 +526,7 @@ void pqDisplayProxyEditor::setRepresentation(pqPipelineRepresentation* repr)
                                          reprProxy->GetProperty("BackfaceOpacity"));
     }
 
-#if 0                                       //FIXME 
+#if 0                                       //FIXME
   // material
   this->Internal->StyleMaterial->blockSignals(true);
   this->Internal->StyleMaterial->clear();
@@ -577,13 +577,31 @@ void pqDisplayProxyEditor::setRepresentation(pqPipelineRepresentation* repr)
 
   this->DisableSlots = 0;
   QTimer::singleShot(0, this, SLOT(updateEnableState()));
+
+
+  //
+  if(reprProxy->GetProperty("SampleDistance"))
+    {
+    this->Internal->Links->addPropertyLink(this->Internal->SampleDistanceValue,
+      "text", SIGNAL(editingFinished()),
+      reprProxy, reprProxy->GetProperty("SampleDistance"));
+    validator = new QDoubleValidator(this);
+    this->Internal->SampleDistanceValue->setValidator(validator);
+    }
+
+  if(reprProxy->GetProperty("AutoAdjustSampleDistances"))
+    {
+    this->Internal->Links->addPropertyLink(this->Internal->AutoAdjustSampleDistances,
+      "checked", SIGNAL(toggled(bool)),
+      reprProxy, reprProxy->GetProperty("AutoAdjustSampleDistances"));
+    }
 }
 
 //-----------------------------------------------------------------------------
 void pqDisplayProxyEditor::setupGUIConnections()
 {
   QObject::connect(
-    this->Internal->ViewZoomToData, SIGNAL(clicked(bool)), 
+    this->Internal->ViewZoomToData, SIGNAL(clicked(bool)),
     this, SLOT(zoomToData()));
   QObject::connect(
     this->Internal->EditColorMapButton, SIGNAL(clicked()),
@@ -683,6 +701,12 @@ void pqDisplayProxyEditor::setupGUIConnections()
     QObject::connect(this->Internal->BackfaceActorColor,
                      SIGNAL(endUndo()), stack, SLOT(endUndoSet()));
     }
+
+
+  QObject::connect(this->Internal->AutoAdjustSampleDistances,
+                   SIGNAL(toggled(bool)),
+                   this,
+                   SLOT(setAutoAdjustSampleDistances(bool)));
 }
 
 //-----------------------------------------------------------------------------
@@ -721,7 +745,7 @@ void pqDisplayProxyEditor::updateEnableState()
     this->Internal->BackfaceActorColor->setEnabled(false);
     }
 
-  
+
   this->Internal->EdgeStyleGroup->setEnabled(
     reprType == vtkSMPVRepresentationProxy::SURFACE_WITH_EDGES);
 
@@ -767,13 +791,13 @@ void pqDisplayProxyEditor::updateEnableState()
     this->Internal->BackfaceStyleGroupOptions->setEnabled(!backFollowsFront);
     }
 
-  vtkSMDataRepresentationProxy* display = 
+  vtkSMDataRepresentationProxy* display =
     this->Internal->Representation->getRepresentationProxy();
   if (display)
     {
     QVariant scalarMode = pqSMAdaptor::getEnumerationProperty(
       display->GetProperty("ColorAttributeType"));
-    vtkPVDataInformation* geomInfo = 
+    vtkPVDataInformation* geomInfo =
       display->GetRepresentedDataInformation(/*update=*/false);
     if (!geomInfo)
       {
@@ -872,7 +896,7 @@ QVariant pqDisplayProxyEditor::specularColor() const
     ret.append(1.0);
     return ret;
     }
-  
+
   vtkSMProxy* proxy = this->Internal->Representation->getProxy();
   return pqSMAdaptor::getMultipleElementProperty(
        proxy->GetProperty("DiffuseColor"));
@@ -902,7 +926,7 @@ void pqDisplayProxyEditor::setSpecularColor(QVariant specColor)
 void pqDisplayProxyEditor::updateMaterial(int vtkNotUsed(idx))
 {
   // FIXME: when we enable materials.
-#if 0   
+#if 0
   if(idx == 0)
     {
     this->Internal->Representation->getDisplayProxy()->SetMaterialCM(0);
@@ -910,7 +934,7 @@ void pqDisplayProxyEditor::updateMaterial(int vtkNotUsed(idx))
     }
   else if(idx == 1)
     {
-    pqFileDialog diag(NULL, this, "Open Material File", QString(), 
+    pqFileDialog diag(NULL, this, "Open Material File", QString(),
                       "Material Files (*.xml)");
     diag.setFileMode(pqFileDialog::ExistingFile);
     if(diag.exec() == QDialog::Accepted)
@@ -993,9 +1017,9 @@ void pqDisplayProxyEditor::volumeBlockSelected()
       && this->Internal->Representation)
     {
     bool valid = false;
-    unsigned int selectedIndex = 
+    unsigned int selectedIndex =
       this->Internal->CompositeTreeAdaptor->getCurrentFlatIndex(&valid);
-    if (valid && selectedIndex > 0) 
+    if (valid && selectedIndex > 0)
       {
       vtkSMDataRepresentationProxy* repr =
         this->Internal->Representation->getRepresentationProxy();
@@ -1044,7 +1068,31 @@ void pqDisplayProxyEditor::setBackfaceSolidColor(const QColor& color)
 }
 
 //-----------------------------------------------------------------------------
+void pqDisplayProxyEditor::setAutoAdjustSampleDistances(bool flag)
+{
+  this->Internal->SampleDistanceValue->setEnabled(!flag);
+}
+
+//-----------------------------------------------------------------------------
 void pqDisplayProxyEditor::selectedMapperChanged()
 {
-
+  if(!this->Internal->SelectedMapperIndex->currentText().compare(
+      QString("Fixed Point"), Qt::CaseInsensitive))
+    {
+    // Fixed point does not uses sample distance.
+    this->Internal->SampleDistance->setEnabled(0);
+    this->Internal->SampleDistanceValue->setEnabled(0);
+    this->Internal->AutoAdjustSampleDistances->setEnabled(0);
+    }
+  else if(!this->Internal->SelectedMapperIndex->currentText().compare(
+      QString("GPU"), Qt::CaseInsensitive))
+    {
+    this->Internal->SampleDistance->setEnabled(1);
+    this->Internal->SampleDistanceValue->setEnabled(0);
+    this->Internal->AutoAdjustSampleDistances->setEnabled(1);
+    }
+  else
+    {
+      // Do nothing.
+    }
 }

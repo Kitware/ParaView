@@ -34,11 +34,12 @@
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMUniformGridVolumeRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMUniformGridVolumeRepresentationProxy, "1.13");
+vtkCxxRevisionMacro(vtkSMUniformGridVolumeRepresentationProxy, "1.14");
 //----------------------------------------------------------------------------
 vtkSMUniformGridVolumeRepresentationProxy::vtkSMUniformGridVolumeRepresentationProxy()
 {
   this->VolumeFixedPointRayCastMapper = 0;
+  this->VolumeGPURayCastMapper = 0;
   this->VolumeActor = 0;
   this->VolumeProperty = 0;
   this->ClientMapper = 0;
@@ -48,6 +49,7 @@ vtkSMUniformGridVolumeRepresentationProxy::vtkSMUniformGridVolumeRepresentationP
 vtkSMUniformGridVolumeRepresentationProxy::~vtkSMUniformGridVolumeRepresentationProxy()
 {
   this->VolumeFixedPointRayCastMapper = 0;
+  this->VolumeGPURayCastMapper = 0;
   this->VolumeActor = 0;
   this->VolumeProperty = 0;
 }
@@ -72,7 +74,7 @@ bool vtkSMUniformGridVolumeRepresentationProxy::InitializeStrategy(vtkSMViewProx
   // (Look at vtkSMDataRepresentationProxy::AddToView()).
 
   // This representation interprets LOD to mean client-side data. Hence, LOD
-  // pipeline is enabled only when client-server are separate processes. 
+  // pipeline is enabled only when client-server are separate processes.
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   if (!pm->IsRemote(this->ConnectionID))
     {
@@ -81,6 +83,7 @@ bool vtkSMUniformGridVolumeRepresentationProxy::InitializeStrategy(vtkSMViewProx
 
   this->Connect(this->GetInputProxy(), strategy, "Input", this->OutputPort);
   this->Connect(strategy->GetOutput(), this->VolumeFixedPointRayCastMapper);
+  this->Connect(strategy->GetOutput(), this->VolumeGPURayCastMapper);
   this->Connect(strategy->GetLODOutput(), this->ClientMapper);
 
   // Creates the strategy objects.
@@ -101,12 +104,18 @@ bool vtkSMUniformGridVolumeRepresentationProxy::BeginCreateVTKObjects()
   // Set server flags correctly on all subproxies.
   this->VolumeFixedPointRayCastMapper = this->GetSubProxy(
     "VolumeFixedPointRayCastMapper");
+  this->VolumeGPURayCastMapper =
+      this->GetSubProxy("VolumeGPURayCastMapper");
+
   this->VolumeActor = this->GetSubProxy("Prop3D");
   this->VolumeProperty = this->GetSubProxy("VolumeProperty");
   this->ClientMapper = this->GetSubProxy("LODMapper");
 
   this->VolumeFixedPointRayCastMapper->SetServers(
     vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
+  this->VolumeGPURayCastMapper->SetServers(
+    vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
+
   this->VolumeActor->SetServers(
     vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
   this->VolumeProperty->SetServers(
@@ -121,10 +130,11 @@ bool vtkSMUniformGridVolumeRepresentationProxy::BeginCreateVTKObjects()
 bool vtkSMUniformGridVolumeRepresentationProxy::EndCreateVTKObjects()
 {
   this->Connect(this->VolumeFixedPointRayCastMapper, this->VolumeActor, "Mapper");
+  this->Connect(this->VolumeGPURayCastMapper, this->VolumeActor, "Mapper");
   this->Connect(this->VolumeProperty, this->VolumeActor, "Property");
 
   // This representation interprets LOD to mean client-side data. Hence, LOD
-  // pipeline is enabled only when client-server are separate processes. 
+  // pipeline is enabled only when client-server are separate processes.
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   if (pm->IsRemote(this->ConnectionID))
     {
@@ -141,7 +151,7 @@ bool vtkSMUniformGridVolumeRepresentationProxy::EndCreateVTKObjects()
             << this->ClientMapper->GetID()
             << vtkClientServerStream::End;
     vtkProcessModule::GetProcessModule()->SendStream(
-      this->ConnectionID, vtkProcessModule::CLIENT, stream);   
+      this->ConnectionID, vtkProcessModule::CLIENT, stream);
     }
 
   return this->Superclass::EndCreateVTKObjects();
@@ -154,16 +164,22 @@ void vtkSMUniformGridVolumeRepresentationProxy::SetColorArrayName(
   vtkSMStringVectorProperty* svp = vtkSMStringVectorProperty::SafeDownCast(
     this->VolumeFixedPointRayCastMapper->GetProperty("SelectScalarArray"));
 
+  vtkSMStringVectorProperty* gpu_svp = vtkSMStringVectorProperty::SafeDownCast(
+    this->VolumeGPURayCastMapper->GetProperty("SelectScalarArray"));
+
   if (name && name[0])
     {
     svp->SetElement(0, name);
+    gpu_svp->SetElement(0, name);
     }
   else
     {
     svp->SetElement(0, "");
+    gpu_svp->SetElement(0, "");
     }
 
-  this->VolumeFixedPointRayCastMapper->UpdateVTKObjects();;
+  this->VolumeFixedPointRayCastMapper->UpdateVTKObjects();
+  this->VolumeGPURayCastMapper->UpdateVTKObjects();
 }
 
 //----------------------------------------------------------------------------
@@ -172,25 +188,34 @@ void vtkSMUniformGridVolumeRepresentationProxy::SetColorAttributeType(
 {
   vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
     this->VolumeFixedPointRayCastMapper->GetProperty("ScalarMode"));
+
+  vtkSMIntVectorProperty* gpu_ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->VolumeGPURayCastMapper->GetProperty("ScalarMode"));
+
   switch (type)
     {
   case POINT_DATA:
-    ivp->SetElement(0, VTK_SCALAR_MODE_USE_POINT_FIELD_DATA); 
+    ivp->SetElement(0, VTK_SCALAR_MODE_USE_POINT_FIELD_DATA);
+    gpu_ivp->SetElement(0, VTK_SCALAR_MODE_USE_POINT_FIELD_DATA);
     break;
 
   case CELL_DATA:
     ivp->SetElement(0, VTK_SCALAR_MODE_USE_CELL_FIELD_DATA);
+    gpu_ivp->SetElement(0, VTK_SCALAR_MODE_USE_CELL_FIELD_DATA);
     break;
 
   case FIELD_DATA:
     ivp->SetElement(0, VTK_SCALAR_MODE_USE_FIELD_DATA);
+    gpu_ivp->SetElement(0, VTK_SCALAR_MODE_USE_FIELD_DATA);
     break;
 
   default:
     ivp->SetElement(0,  VTK_SCALAR_MODE_DEFAULT);
+    gpu_ivp->SetElement(0,  VTK_SCALAR_MODE_DEFAULT);
     }
 
   this->VolumeFixedPointRayCastMapper->UpdateVTKObjects();
+  this->VolumeGPURayCastMapper->UpdateVTKObjects();
 }
 
 //----------------------------------------------------------------------------
@@ -207,7 +232,7 @@ bool vtkSMUniformGridVolumeRepresentationProxy::HasVisibleProp3D(vtkProp3D* prop
   }
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
 
-  if (this->GetVisibility() && 
+  if (this->GetVisibility() &&
     pm->GetIDFromObject(prop) == this->VolumeActor->GetID())
   {
     return true;
@@ -225,7 +250,7 @@ vtkSMProxy* vtkSMUniformGridVolumeRepresentationProxy::ConvertSelection(
     return 0;
     }
 
-  vtkSmartPointer<vtkSelection> mySelection = 
+  vtkSmartPointer<vtkSelection> mySelection =
     vtkSmartPointer<vtkSelection>::New();
 
   unsigned int numNodes = userSel->GetNumberOfNodes();
@@ -252,7 +277,7 @@ vtkSMProxy* vtkSMUniformGridVolumeRepresentationProxy::ConvertSelection(
       {
       hasProp = false;
       vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-      if (properties->Get(vtkSelectionNode::PROP()) == 
+      if (properties->Get(vtkSelectionNode::PROP()) ==
         pm->GetObjectFromID(this->VolumeActor->GetID()))
         {
         hasProp = true;
@@ -273,11 +298,102 @@ vtkSMProxy* vtkSMUniformGridVolumeRepresentationProxy::ConvertSelection(
     }
 
   // Create a selection source for the selection.
-  vtkSMProxy* selectionSource = 
+  vtkSMProxy* selectionSource =
     vtkSMSelectionHelper::NewSelectionSourceFromSelection(
       this->ConnectionID, mySelection);
-  
+
   return selectionSource;
+}
+
+//----------------------------------------------------------------------------
+void vtkSMUniformGridVolumeRepresentationProxy::SetSelectedMapperIndex(int index)
+{
+  this->SelectedMapperIndex = index;
+  switch (index)
+    {
+    case vtkSMUniformGridVolumeRepresentationProxy::FIXED_POINT_MAPPER:
+      this->SetVolumeMapperToFixedPoint();
+      break;
+    case vtkSMUniformGridVolumeRepresentationProxy::GPU_MAPPER:
+      this->SetVolumeMapperToXYZ();
+      break;
+    default:
+      vtkDebugMacro("Unknown volume mapper index " << index);
+      break;
+    }
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMUniformGridVolumeRepresentationProxy::SetVolumeMapperToFixedPoint()
+{
+  vtkSMProxyProperty* pp;
+  pp = vtkSMProxyProperty::SafeDownCast(
+    this->VolumeActor->GetProperty("Mapper"));
+  if (!pp)
+    {
+    vtkErrorMacro("Failed to find property Mapper on VolumeActor.");
+    return;
+    }
+  if (pp->GetNumberOfProxies() != 1)
+    {
+    vtkErrorMacro("Expected one proxy in Mapper's VolumeActor.");
+    }
+  pp->SetProxy(0, this->VolumeFixedPointRayCastMapper);
+  this->UpdateVTKObjects();
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMUniformGridVolumeRepresentationProxy::SetVolumeMapperToXYZ()
+{
+  vtkSMProxyProperty* pp;
+  pp = vtkSMProxyProperty::SafeDownCast(
+    this->VolumeActor->GetProperty("Mapper"));
+  if (!pp)
+    {
+    vtkErrorMacro("Failed to find property Mapper on VolumeActor.");
+    return;
+    }
+  if (pp->GetNumberOfProxies() != 1)
+    {
+    vtkErrorMacro("Expected one proxy in Mapper's VolumeActor.");
+    }
+  pp->SetProxy(0, this->VolumeGPURayCastMapper);
+  this->UpdateVTKObjects();
+}
+
+
+//-----------------------------------------------------------------------------
+int vtkSMUniformGridVolumeRepresentationProxy::GetVolumeMapperType()
+{
+  vtkSMProxyProperty* pp;
+  pp = vtkSMProxyProperty::SafeDownCast(
+    this->VolumeActor->GetProperty("Mapper"));
+  if (!pp)
+    {
+    vtkErrorMacro("Failed to find property Mapper on VolumeActor.");
+    return vtkSMUniformGridVolumeRepresentationProxy::UNKNOWN_VOLUME_MAPPER;
+    }
+
+  vtkSMProxy *p = pp->GetProxy(0);
+
+  if ( !p )
+    {
+    vtkErrorMacro("Failed to find proxy in Mapper proxy property!");
+    return vtkSMUniformGridVolumeRepresentationProxy::UNKNOWN_VOLUME_MAPPER;
+    }
+
+  if ( !strcmp(p->GetVTKClassName(), "vtkFixedPointVolumeRayCastMapper" ) )
+    {
+    return vtkSMUniformGridVolumeRepresentationProxy::FIXED_POINT_MAPPER;
+    }
+
+  // @Note: For time being keeping the same name.
+  if ( !strcmp(p->GetVTKClassName(), "vtkFixedPointVolumeRayCastMapper" ) )
+    {
+    return vtkSMUniformGridVolumeRepresentationProxy::GPU_MAPPER;
+    }
+
+  return vtkSMUniformGridVolumeRepresentationProxy::UNKNOWN_VOLUME_MAPPER;
 }
 
 //----------------------------------------------------------------------------
@@ -285,5 +401,4 @@ void vtkSMUniformGridVolumeRepresentationProxy::PrintSelf(ostream& os, vtkIndent
 {
   this->Superclass::PrintSelf(os, indent);
 }
-
 
