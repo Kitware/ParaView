@@ -122,11 +122,6 @@ pqXYChartDisplayPanel::pqXYChartDisplayPanel(
     this, SLOT(updateAllViews()));
   QObject::connect(this->Internal->XAxisArray, SIGNAL(currentIndexChanged(int)),
     this, SLOT(updateAllViews()));
-  // Trigger an update if the composite data set index changes
-  //QObject::connect(this->Internal->CompositeIndex, SIGNAL(itemSelectionChanged()),
-  //  this, SLOT(updateAllViews()));
-  QObject::connect(this->Internal->CompositeIndex, SIGNAL(itemSelectionChanged()),
-    this, SLOT(reloadSeries()));
 
   QObject::connect(this->Internal->UseArrayIndex, SIGNAL(toggled(bool)),
     this, SLOT(useArrayIndexToggled(bool)));
@@ -146,6 +141,9 @@ pqXYChartDisplayPanel::pqXYChartDisplayPanel(
     this, SLOT(setCurrentSeriesMarkerStyle(int)));
 
   this->setDisplay(display);
+
+  QObject::connect(&this->Internal->Links, SIGNAL(qtWidgetChanged()),
+                   this, SLOT(reloadSeries()), Qt::QueuedConnection);
 }
 
 //-----------------------------------------------------------------------------
@@ -158,8 +156,6 @@ pqXYChartDisplayPanel::~pqXYChartDisplayPanel()
 void pqXYChartDisplayPanel::reloadSeries()
 {
   this->updateAllViews();
-  this->Internal->ChartRepresentation->Update();
-  this->Internal->SettingsModel->reload();
   this->updateOptionsWidgets();
 }
 
