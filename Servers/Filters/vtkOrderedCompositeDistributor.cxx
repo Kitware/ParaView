@@ -55,7 +55,7 @@ static void D3UpdateProgress(vtkObject *_D3, unsigned long,
 
 //-----------------------------------------------------------------------------
 
-vtkCxxRevisionMacro(vtkOrderedCompositeDistributor, "1.10");
+vtkCxxRevisionMacro(vtkOrderedCompositeDistributor, "1.11");
 vtkStandardNewMacro(vtkOrderedCompositeDistributor);
 
 vtkCxxSetObjectMacro(vtkOrderedCompositeDistributor, PKdTree, vtkPKdTree);
@@ -210,7 +210,13 @@ int vtkOrderedCompositeDistributor::RequestData(
     return 1;
     }
 
-  vtkBSPCuts *cuts = this->PKdTree->GetCuts();
+  if (!this->PKdTree)
+    {
+    vtkWarningMacro("No PKdTree set. vtkOrderedCompositeDistributor requires that"
+      " at least an empty PKdTree be set.");
+    }
+
+  vtkBSPCuts *cuts = this->PKdTree? this->PKdTree->GetCuts() : NULL;
   if (cuts == NULL)
     {
     // No partitioning has been defined.  Just pass the data through.

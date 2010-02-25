@@ -27,7 +27,7 @@
 #include "vtkSMSourceProxy.h"
 #include "vtkSMPropertyHelper.h"
 
-vtkCxxRevisionMacro(vtkSMRepresentationStrategy, "1.21");
+vtkCxxRevisionMacro(vtkSMRepresentationStrategy, "1.22");
 vtkCxxSetObjectMacro(vtkSMRepresentationStrategy, 
   RepresentedDataInformation, vtkPVDataInformation);
 //----------------------------------------------------------------------------
@@ -91,8 +91,15 @@ void vtkSMRepresentationStrategy::SetViewInformation(vtkInformation* info)
     {
     this->ViewInformation->AddObserver(vtkCommand::ModifiedEvent,
       this->Observer);
-    // Get the current values from the view helper.
-    this->ProcessViewInformation();
+
+    if (this->ObjectsCreated)
+      {
+      // Don't call ProcessViewInformation() unless we know that the objects
+      // have been created. ProcessViewInformation() is called in
+      // CreateVTKObjects() as well.
+      // Get the current values from the view helper.
+      this->ProcessViewInformation();
+      }
     }
 }
 
@@ -262,6 +269,13 @@ void vtkSMRepresentationStrategy::CreateVTKObjects()
     this->BeginCreateVTKObjects();
     this->Superclass::CreateVTKObjects();
     this->EndCreateVTKObjects();
+    if (this->ViewInformation)
+      {
+      // If ViewInformation is set, we now process it (after all objects have
+      // been created to ensure that the subproxies etc. are setup which may be
+      // affected by the values in the view information).
+      this->ProcessViewInformation();
+      }
     }
 }
 

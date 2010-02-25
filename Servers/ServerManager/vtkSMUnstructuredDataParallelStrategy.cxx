@@ -21,9 +21,10 @@
 #include "vtkSMIceTCompositeViewProxy.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMSourceProxy.h"
+#include "vtkSmartPointer.h"
 
 vtkStandardNewMacro(vtkSMUnstructuredDataParallelStrategy);
-vtkCxxRevisionMacro(vtkSMUnstructuredDataParallelStrategy, "1.5");
+vtkCxxRevisionMacro(vtkSMUnstructuredDataParallelStrategy, "1.6");
 //----------------------------------------------------------------------------
 vtkSMUnstructuredDataParallelStrategy::vtkSMUnstructuredDataParallelStrategy()
 {
@@ -120,7 +121,6 @@ void vtkSMUnstructuredDataParallelStrategy::BeginCreateVTKObjects()
 void vtkSMUnstructuredDataParallelStrategy::EndCreateVTKObjects()
 {
   this->Superclass::EndCreateVTKObjects();
-  this->SetKdTree(this->KdTree);
 }
 
 //----------------------------------------------------------------------------
