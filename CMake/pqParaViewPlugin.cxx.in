@@ -68,15 +68,12 @@ vtkProcessModule::InterpreterInitializationCallback
 
 //-----------------------------------------------------------------------------
 void @PLUGIN_NAME@_Plugin::GetXMLs
-# ifdef PUSH_BACK_XML_INTERFACES
   (vtkstd::vector<vtkstd::string> &xmls)
-#else
-  (vtkstd::vector<vtkstd::string> &)
-# endif
 {
 # ifdef PUSH_BACK_XML_INTERFACES
   PUSH_BACK_XML_INTERFACES(xmls);
 # endif
+  (void)xmls;
 }
 #endif
 
