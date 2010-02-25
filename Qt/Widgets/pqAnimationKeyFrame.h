@@ -58,7 +58,7 @@ class QTWIDGETS_EXPORT pqAnimationKeyFrame : public QObject, public QGraphicsIte
   Q_PROPERTY(QVariant endValue READ endValue WRITE setEndValue)
   /// an icon to help describe the keyframe
   Q_PROPERTY(QIcon icon READ icon WRITE setIcon)
-
+  Q_INTERFACES(QGraphicsItem)
 public:
 
   pqAnimationKeyFrame(pqAnimationTrack* p, QGraphicsScene* s);
