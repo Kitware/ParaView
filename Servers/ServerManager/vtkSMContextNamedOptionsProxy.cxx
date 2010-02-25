@@ -18,8 +18,6 @@
 #include "vtkStringList.h"
 #include "vtkSMStringVectorProperty.h"
 #include "vtkChart.h"
-#include "vtkColorSeries.h"
-#include "vtkVector.h"
 #include "vtkPlot.h"
 #include "vtkPlotLine.h"
 #include "vtkAxis.h"
@@ -42,11 +40,9 @@ public:
 
   vtkWeakPointer<vtkChart> Chart;
   vtkWeakPointer<vtkTable> Table;
-  vtkSmartPointer<vtkColorSeries> Colors;
 
   vtkInternals()
     {
-    this->Colors = vtkSmartPointer<vtkColorSeries>::New();
     }
 
   ~vtkInternals()
@@ -56,7 +52,7 @@ public:
 };
 
 vtkStandardNewMacro(vtkSMContextNamedOptionsProxy);
-vtkCxxRevisionMacro(vtkSMContextNamedOptionsProxy, "1.16");
+vtkCxxRevisionMacro(vtkSMContextNamedOptionsProxy, "1.17");
 //----------------------------------------------------------------------------
 vtkSMContextNamedOptionsProxy::vtkSMContextNamedOptionsProxy()
 {
@@ -93,6 +89,10 @@ void vtkSMContextNamedOptionsProxy::SetChart(vtkChart* chart)
     return;
     }
   this->Internals->Chart = chart;
+  if (this->Internals->Table)
+    {
+    this->InitializePlotMap();
+    }
   this->Modified();
 }
 
@@ -105,7 +105,10 @@ void vtkSMContextNamedOptionsProxy::SetTable(vtkTable* table)
     }
   this->Internals->Table = table;
   // If the table changed then update the plot map
-  this->InitializePlotMap();
+  if (this->Internals->Chart)
+    {
+    this->InitializePlotMap();
+    }
   this->Modified();
 }
 
@@ -282,10 +285,9 @@ void vtkSMContextNamedOptionsProxy::UpdatePropertyInformationInternal(
           }
         else
           {
-          vtkColor3ub color = this->Internals->Colors->GetColorRepeating(i);
-          new_values->AddString(QString::number(color.Red() / 255.0).toAscii().data());
-          new_values->AddString(QString::number(color.Green() / 255.0).toAscii().data());
-          new_values->AddString(QString::number(color.Blue() / 255.0).toAscii().data());
+          new_values->AddString("0");
+          new_values->AddString("0");
+          new_values->AddString("0");
           }
         }
       else if (strcmp(propname, "LineStyleInfo") == 0)
