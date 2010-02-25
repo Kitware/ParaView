@@ -39,9 +39,35 @@
   vtkerror << x;\
   vtkOutputWindowDisplayText(vtkerror.str().c_str());} }
 
+namespace
+{
+  // Cleans successfully opened libs when the application quits.
+  // BUG # 10293
+  class vtkPVPluginLoaderCleaner
+    {
+    vtkstd::vector<vtkLibHandle> Handles;
+
+  public:
+    void Register(vtkLibHandle &handle)
+      {
+      this->Handles.push_back(handle);
+      }
+
+    ~vtkPVPluginLoaderCleaner()
+      {
+      for (vtkstd::vector<vtkLibHandle>::iterator iter = this->Handles.begin();
+        iter != this->Handles.end(); ++iter)
+        {
+        vtkDynamicLoader::CloseLibrary(*iter);
+        }
+      }
+    };
+  static vtkPVPluginLoaderCleaner LibCleaner;
+};
+
 
 vtkStandardNewMacro(vtkPVPluginLoader);
-vtkCxxRevisionMacro(vtkPVPluginLoader, "1.20");
+vtkCxxRevisionMacro(vtkPVPluginLoader, "1.21");
 //-----------------------------------------------------------------------------
 vtkPVPluginLoader::vtkPVPluginLoader()
 {
@@ -132,6 +158,10 @@ void vtkPVPluginLoader::SetFileName(const char* file)
     vtkPVPluginLoaderDebugMacro(this->PluginInfo->GetError());
     return;
     }
+
+  // So that the lib is closed when the application quits.
+  // BUG #10293.
+  ::LibCleaner.Register(lib);
 
   vtkPVPluginLoaderDebugMacro("Loaded shared library successfully. "
     "Now trying to validate that it's a ParaView plugin.");
