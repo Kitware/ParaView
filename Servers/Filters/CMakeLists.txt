@@ -48,6 +48,11 @@ SET(Filters_SRCS
   vtkDataSetToRectilinearGrid.cxx
   vtkDesktopDeliveryClient.cxx
   vtkDesktopDeliveryServer.cxx
+  vtkEnSight6BinaryReader2.cxx
+  vtkEnSight6Reader2.cxx
+  vtkEnSightGoldReader2.cxx
+  vtkEnSightGoldBinaryReader2.cxx
+  vtkEnSightReader2.cxx
   vtkEquivalenceSet.cxx
   vtkExodusFileSeriesReader.cxx
   vtkExtractHistogram.cxx
@@ -56,6 +61,7 @@ SET(Filters_SRCS
   vtkFileSeriesWriter.cxx
   vtkFlashReader.cxx
   vtkHierarchicalFractal.cxx
+  vtkGenericEnSightReader2.cxx
   vtkGridConnectivity.cxx
   vtkImageCompressor.cxx
   vtkImageSliceMapper.cxx
@@ -75,6 +81,9 @@ SET(Filters_SRCS
   vtkPConvertSelection.cxx
   vtkPExtractHistogram.cxx
   vtkParallelSerialWriter.cxx
+  vtkPEnSightGoldBinaryReader2.cxx
+  vtkPEnSightGoldReader2.cxx
+  vtkPEnSightReader2.cxx
   vtkPhastaReader.cxx
   vtkPlotEdges.cxx
   vtkPointHandleRepresentationSphere.cxx
@@ -96,6 +105,7 @@ SET(Filters_SRCS
   vtkPVDesktopDeliveryServer.cxx
   vtkPVDReader.cxx
   vtkPVEnSightMasterServerReader.cxx
+  vtkPVEnSightMasterServerReader2.cxx
   vtkPVEnSightMasterServerTranslator.cxx
   vtkPVExtentTranslator.cxx
   vtkPVExtractSelection.cxx
@@ -196,7 +206,9 @@ SET_SOURCE_FILES_PROPERTIES(
 SET_SOURCE_FILES_PROPERTIES(
   vtkAnimationPlayer.cxx
   vtkCameraManipulatorGUIHelper.cxx
+  vtkEnSightReader2.cxx
   vtkImageCompressor.cxx
+  vtkPEnSightReader2.cxx
   vtkPVClientServerRenderManager.cxx
   vtkPVJoystickFly.cxx
   vtkPVRenderViewProxy.cxx
