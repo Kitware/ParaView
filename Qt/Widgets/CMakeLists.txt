@@ -87,8 +87,6 @@ SET(QtWidgets_SRCS
   pqTreeWidgetSelectionHelper.h
   pqTreeViewSelectionHelper.cxx
   pqTreeViewSelectionHelper.h
-  pqViewMenu.cxx
-  pqViewMenu.h
   pqWaitCursor.cxx
   pqWaitCursor.h
   pqHelpWindow.cxx
@@ -142,7 +140,6 @@ QT4_WRAP_CPP(QtWidgets_MOC_SOURCES
   pqTreeWidgetItemObject.h
   pqTreeWidgetSelectionHelper.h
   pqTreeViewSelectionHelper.h
-  pqViewMenu.h
   pqHelpWindow.h
 )
 
