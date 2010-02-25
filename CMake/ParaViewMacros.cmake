@@ -80,7 +80,7 @@ FUNCTION (pv_install_library libpath dest component)
   IF (NOT WIN32)
     GET_FILENAME_COMPONENT(dir_tmp ${libpath} PATH)
     GET_FILENAME_COMPONENT(name_tmp ${libpath} NAME)
-    FILE(GLOB lib_list RELATIVE "${QT_LIB_DIR_tmp}" "${libpath}*")
+    FILE(GLOB lib_list RELATIVE "${dir_tmp}" "${libpath}*")
     INSTALL(CODE "
           MESSAGE(STATUS \"Installing ${name_tmp}\")
           EXECUTE_PROCESS (WORKING_DIRECTORY ${dir_tmp}
