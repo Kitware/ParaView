@@ -87,7 +87,8 @@ pqDataRepresentation* pqPlotSettingsModel::representation() const
 
 int pqPlotSettingsModel::rowCount(const QModelIndex& /*parent*/) const
 {
-  return this->Implementation->RepresentationProxy->GetNumberOfSeries();
+  return this->Implementation->RepresentationProxy ?
+      this->Implementation->RepresentationProxy->GetNumberOfSeries() : 0;
 }
 
 int pqPlotSettingsModel::columnCount(const QModelIndex& /*parent*/) const
