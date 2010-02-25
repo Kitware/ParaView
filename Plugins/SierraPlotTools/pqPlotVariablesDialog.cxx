@@ -482,26 +482,28 @@ public:
           break;
 
         case e_dashSep:
-          rangeBeg = this->util.getNumber(parseIndex, separatorIndex-1, lineEditText);
-          int rangeEndIndex = this->getNumberPostSeparator(separatorIndex+1, lineEditText);
-          if (rangeEndIndex != -1)
             {
-            rangeEnd = this->util.getNumber(separatorIndex+1, rangeEndIndex, lineEditText);
-            parseIndex = rangeEndIndex + 1;
-
-            // if the next char is a separator, then advance the index to parse at
-            if (isSeparator(lineEditText[parseIndex]))
+            rangeBeg = this->util.getNumber(parseIndex, separatorIndex-1, lineEditText);
+            int rangeEndIndex = this->getNumberPostSeparator(separatorIndex+1, lineEditText);
+            if (rangeEndIndex != -1)
               {
-              parseIndex++;
+              rangeEnd = this->util.getNumber(separatorIndex+1, rangeEndIndex, lineEditText);
+              parseIndex = rangeEndIndex + 1;
+
+              // if the next char is a separator, then advance the index to parse at
+              if (isSeparator(lineEditText[parseIndex]))
+                {
+                parseIndex++;
+                }
               }
+            else
+              {
+              // error with range specification
+              rangeBeg = -1;
+              rangeEnd = -1;
+              }
+            break;
             }
-          else
-            {
-            // error with range specification
-            rangeBeg = -1;
-            rangeEnd = -1;
-            }
-          break;
 
         case e_unknownSep:
           //Do something here?

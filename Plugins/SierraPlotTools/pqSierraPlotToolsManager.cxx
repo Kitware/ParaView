@@ -25,10 +25,8 @@
 
 #include "pqElementPlotter.h"
 #include "pqGlobalPlotter.h"
-#include "pqMain.h" 
 #include "pqNodePlotter.h"
 #include "pqPlotVariablesDialog.h"
-#include "pqProcessModuleGUIHelper.h"
 #include "pqSierraPlotToolsDataLoadManager.h"
 #include "pqVariableVariablePlotter.h"
 
