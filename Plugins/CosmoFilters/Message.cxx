@@ -275,7 +275,12 @@ void Message::send
 // Blocking receive
 //
 ////////////////////////////////////////////////////////////////////////////
-void Message::receive(int mach, int tag)
+void Message::receive
+#ifdef USE_SERIAL_COSMO
+(int, int)
+#else
+(int mach, int tag)
+#endif
 {
 #ifdef USE_SERIAL_COSMO
   char* out = q.front(); q.pop();

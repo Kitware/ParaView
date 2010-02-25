@@ -893,7 +893,12 @@ int CosmoHaloFinderP::compareHalos(CosmoHalo* halo1, CosmoHalo* halo2)
 //
 /////////////////////////////////////////////////////////////////////////
 
-void CosmoHaloFinderP::sendMixedHaloResults(ID_T* haloBuffer, int haloBufSize)
+void CosmoHaloFinderP::sendMixedHaloResults
+#ifdef USE_SERIAL_COSMO
+(ID_T* haloBuffer, int)
+#else
+(ID_T* haloBuffer, int haloBufSize)
+#endif
 {
 #ifndef USE_SERIAL_COSMO
   // MASTER sends merge results to all processors
