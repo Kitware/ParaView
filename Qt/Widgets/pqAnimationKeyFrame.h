@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -58,7 +58,9 @@ class QTWIDGETS_EXPORT pqAnimationKeyFrame : public QObject, public QGraphicsIte
   Q_PROPERTY(QVariant endValue READ endValue WRITE setEndValue)
   /// an icon to help describe the keyframe
   Q_PROPERTY(QIcon icon READ icon WRITE setIcon)
+#if QT_VERSION >= 0x40600
   Q_INTERFACES(QGraphicsItem)
+#endif
 public:
 
   pqAnimationKeyFrame(pqAnimationTrack* p, QGraphicsScene* s);
@@ -69,7 +71,7 @@ public:
   QVariant startValue() const;
   QVariant endValue() const;
   QIcon icon() const;
-  
+
   QRectF boundingRect() const;
 
 public slots:
@@ -93,7 +95,7 @@ protected:
   virtual void paint(QPainter* p,
                      const QStyleOptionGraphicsItem * option,
                      QWidget * widget);
-  
+
 
 private:
   double NormalizedStartTime;
