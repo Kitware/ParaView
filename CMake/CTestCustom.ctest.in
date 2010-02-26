@@ -150,5 +150,6 @@ SET(CTEST_CUSTOM_COVERAGE_EXCLUDE
   "moc_[^\\.]+.cxx"
   "ui_[^\\.]+.h"
   "qrc_[^\\.]+.cxx"
+  "Utilities.Xdmf2.libsrc.*"
   )
 
