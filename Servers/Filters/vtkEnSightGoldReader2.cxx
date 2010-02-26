@@ -32,7 +32,7 @@
 #include <vtkstd/string>
 #include <vtkstd/vector>
 
-vtkCxxRevisionMacro(vtkEnSightGoldReader2, "1.1");
+vtkCxxRevisionMacro(vtkEnSightGoldReader2, "1.2");
 vtkStandardNewMacro(vtkEnSightGoldReader2);
 
 //BTX
@@ -465,7 +465,7 @@ int vtkEnSightGoldReader2::ReadScalarsPerNode(const char* fileName, const char* 
     {
     int realTimeStep = timeStep - 1;
     // Try to find the nearest time step for which we know the offset
-    int j = 0;
+    j = 0;
     for (i = realTimeStep; i >= 0; i--)
       {
       if (this->FileOffsets.find(fileName) != this->FileOffsets.end()
@@ -678,7 +678,7 @@ int vtkEnSightGoldReader2::ReadVectorsPerNode(const char* fileName, const char* 
     {
     int realTimeStep = timeStep - 1;
     // Try to find the nearest time step for which we know the offset
-    int j = 0;
+    j = 0;
     for (i = realTimeStep; i >= 0; i--)
       {
       if (this->FileOffsets.find(fileName) != this->FileOffsets.end()
@@ -845,7 +845,7 @@ int vtkEnSightGoldReader2::ReadTensorsPerNode(const char* fileName, const char* 
     {
     int realTimeStep = timeStep - 1;
     // Try to find the nearest time step for which we know the offset
-    int j = 0;
+    j = 0;
     for (i = realTimeStep; i >= 0; i--)
       {
       if (this->FileOffsets.find(fileName) != this->FileOffsets.end()
@@ -1172,7 +1172,7 @@ int vtkEnSightGoldReader2::ReadVectorsPerElement(const char* fileName,
     {
     int realTimeStep = timeStep - 1;
     // Try to find the nearest time step for which we know the offset
-    int j = 0;
+    j = 0;
     for (i = realTimeStep; i >= 0; i--)
       {
       if (this->FileOffsets.find(fileName) != this->FileOffsets.end()
@@ -1339,7 +1339,7 @@ int vtkEnSightGoldReader2::ReadTensorsPerElement(const char* fileName,
     {
     int realTimeStep = timeStep - 1;
     // Try to find the nearest time step for which we know the offset
-    int j = 0;
+    j = 0;
     for (i = realTimeStep; i >= 0; i--)
       {
       if (this->FileOffsets.find(fileName) != this->FileOffsets.end()

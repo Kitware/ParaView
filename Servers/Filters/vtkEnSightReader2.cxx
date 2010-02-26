@@ -33,7 +33,7 @@
 #include <vtkstd/string>
 #include <vtkstd/vector>
 
-vtkCxxRevisionMacro(vtkEnSightReader2, "1.1");
+vtkCxxRevisionMacro(vtkEnSightReader2, "1.2");
 
 //----------------------------------------------------------------------------
 typedef vtkstd::vector< vtkSmartPointer<vtkIdList> > vtkEnSightReader2CellIdsTypeBase;
@@ -464,11 +464,8 @@ int vtkEnSightReader2::RequestInformation(
 //----------------------------------------------------------------------------
 int vtkEnSightReader2::ReadCaseFileGeometry(char* line)
 {
-  char formatLine[256];
-  char subLine[256], subLine2[256];
-  int stringRead;
-  int timeSet, fileSet, numTimeSteps, i, filenameNum, increment, lineRead;
-  float timeStep;
+  char subLine[256];
+  int timeSet, fileSet, lineRead;
 
   // There will definitely be a "model" line.  There may also be "measured"
   // and "match" lines.
@@ -538,9 +535,7 @@ int vtkEnSightReader2::ReadCaseFileVariable(char* line)
 {
   char formatLine[256];
   char subLine[256], subLine2[256];
-  int stringRead;
-  int timeSet, fileSet, numTimeSteps, i, filenameNum, increment, lineRead;
-  float timeStep;
+  int timeSet, fileSet, i, filenameNum, increment, lineRead;
 
   this->NumberOfScalarsPerNode = 0;
   this->NumberOfVectorsPerNode = 0;
