@@ -1,7 +1,259 @@
 <ServerManagerConfiguration>
   <ProxyGroup name="filters">
-    <SourceProxy name="XMLPPolyDataWriter" class="vtkPVNullSource"
+    <SourceProxy name="XMLImageDataWriter" class="vtkPVNullSource"
+      label="Image Data Writer">
+      <InputProperty name="Input">
+          <ProxyGroupDomain name="groups">
+            <Group name="sources" />
+            <Group name="filters" />
+          </ProxyGroupDomain>
+          <DataTypeDomain name="input_type">
+            <DataType value="vtkImageData" />
+          </DataTypeDomain>
+          <Documentation>
+            The input.
+          </Documentation>
+      </InputProperty>
+
+      <StringVectorProperty name="FileName"
+        number_of_elements="1"
+        default_values="filename_%t.vti">
+     </StringVectorProperty>
+
+      <IntVectorProperty name="WriteFrequency"
+        number_of_elements="1"
+        default_values="1">
+        <IntRangeDomain min="1" />
+      </IntVectorProperty>
+
+     <Hints>
+      <!-- TODO: this doesn't work yet -->
+      <PipelineIcon name=":pqComponents/pqSave32.png" />
+
+      <!-- This will help us when exporting the CoProcessing state -->
+      <CoProcessing group="writers" name="XMLImageDataWriter" />
+     </Hints>
+     <!-- End of XMLImageDataWriter -->
+    </SourceProxy>
+
+    <SourceProxy name="XMLPImageDataWriter" class="vtkPVNullSource"
+      label="Parallel Image Data Writer">
+      <InputProperty name="Input">
+          <ProxyGroupDomain name="groups">
+            <Group name="sources" />
+            <Group name="filters" />
+          </ProxyGroupDomain>
+          <DataTypeDomain name="input_type">
+            <DataType value="vtkImageData" />
+          </DataTypeDomain>
+          <Documentation>
+            The input.
+          </Documentation>
+      </InputProperty>
+
+      <StringVectorProperty name="FileName"
+        number_of_elements="1"
+        default_values="filename_%t.pvti">
+     </StringVectorProperty>
+
+      <IntVectorProperty name="WriteFrequency"
+        number_of_elements="1"
+        default_values="1">
+        <IntRangeDomain min="1" />
+      </IntVectorProperty>
+
+     <Hints>
+      <!-- TODO: this doesn't work yet -->
+      <PipelineIcon name=":pqComponents/pqSave32.png" />
+
+      <!-- This will help us when exporting the CoProcessing state -->
+      <CoProcessing group="writers" name="XMLPImageDataWriter" />
+     </Hints>
+     <!-- End of XMLPImageDataWriter -->
+    </SourceProxy>
+
+    <SourceProxy name="XMLRectilinearGridWriter" class="vtkPVNullSource"
+      label="Rectilinear Grid Writer">
+      <InputProperty name="Input">
+          <ProxyGroupDomain name="groups">
+            <Group name="sources" />
+            <Group name="filters" />
+          </ProxyGroupDomain>
+          <DataTypeDomain name="input_type">
+            <DataType value="vtkRectilinearGrid" />
+          </DataTypeDomain>
+          <Documentation>
+            The input.
+          </Documentation>
+      </InputProperty>
+
+      <StringVectorProperty name="FileName"
+        number_of_elements="1"
+        default_values="filename_%t.vtr">
+     </StringVectorProperty>
+
+      <IntVectorProperty name="WriteFrequency"
+        number_of_elements="1"
+        default_values="1">
+        <IntRangeDomain min="1" />
+      </IntVectorProperty>
+
+     <Hints>
+      <!-- TODO: this doesn't work yet -->
+      <PipelineIcon name=":pqComponents/pqSave32.png" />
+
+      <!-- This will help us when exporting the CoProcessing state -->
+      <CoProcessing group="writers" name="XMLRectlinearGridWriter" />
+     </Hints>
+     <!-- End of XMLRectilinearGridWriter -->
+    </SourceProxy>
+
+    <SourceProxy name="XMLPRectilinearGridWriter" class="vtkPVNullSource"
+      label="Parallel Rectilinear Grid Writer">
+      <InputProperty name="Input">
+          <ProxyGroupDomain name="groups">
+            <Group name="sources" />
+            <Group name="filters" />
+          </ProxyGroupDomain>
+          <DataTypeDomain name="input_type">
+            <DataType value="vtkRectilinearGrid" />
+          </DataTypeDomain>
+          <Documentation>
+            The input.
+          </Documentation>
+      </InputProperty>
+
+      <StringVectorProperty name="FileName"
+        number_of_elements="1"
+        default_values="filename_%t.pvtr">
+     </StringVectorProperty>
+
+      <IntVectorProperty name="WriteFrequency"
+        number_of_elements="1"
+        default_values="1">
+        <IntRangeDomain min="1" />
+      </IntVectorProperty>
+
+     <Hints>
+      <!-- TODO: this doesn't work yet -->
+      <PipelineIcon name=":pqComponents/pqSave32.png" />
+
+      <!-- This will help us when exporting the CoProcessing state -->
+      <CoProcessing group="writers" name="XMLPRectlinearGridWriter" />
+     </Hints>
+     <!-- End of XMLRectilinearGridWriter -->
+    </SourceProxy>
+
+    <SourceProxy name="XMLStructuredGridWriter" class="vtkPVNullSource"
+      label="Structured Grid Writer">
+      <InputProperty name="Input">
+          <ProxyGroupDomain name="groups">
+            <Group name="sources" />
+            <Group name="filters" />
+          </ProxyGroupDomain>
+          <DataTypeDomain name="input_type">
+            <DataType value="vtkStructuredGrid" />
+          </DataTypeDomain>
+          <Documentation>
+            The input.
+          </Documentation>
+      </InputProperty>
+
+      <StringVectorProperty name="FileName"
+        number_of_elements="1"
+        default_values="filename_%t.vts">
+     </StringVectorProperty>
+
+      <IntVectorProperty name="WriteFrequency"
+        number_of_elements="1"
+        default_values="1">
+        <IntRangeDomain min="1" />
+      </IntVectorProperty>
+
+     <Hints>
+      <!-- TODO: this doesn't work yet -->
+      <PipelineIcon name=":pqComponents/pqSave32.png" />
+
+      <!-- This will help us when exporting the CoProcessing state -->
+      <CoProcessing group="writers" name="XMLStructuredGridWriter" />
+     </Hints>
+     <!-- End of XMLStructuredGridWriter -->
+    </SourceProxy>
+
+    <SourceProxy name="XMLPStructuredGridWriter" class="vtkPVNullSource"
+      label="Parallel Structured Grid Writer">
+      <InputProperty name="Input">
+          <ProxyGroupDomain name="groups">
+            <Group name="sources" />
+            <Group name="filters" />
+          </ProxyGroupDomain>
+          <DataTypeDomain name="input_type">
+            <DataType value="vtkStructuredGrid" />
+          </DataTypeDomain>
+          <Documentation>
+            The input.
+          </Documentation>
+      </InputProperty>
+
+      <StringVectorProperty name="FileName"
+        number_of_elements="1"
+        default_values="filename_%t.pvts">
+     </StringVectorProperty>
+
+      <IntVectorProperty name="WriteFrequency"
+        number_of_elements="1"
+        default_values="1">
+        <IntRangeDomain min="1" />
+      </IntVectorProperty>
+
+     <Hints>
+      <!-- TODO: this doesn't work yet -->
+      <PipelineIcon name=":pqComponents/pqSave32.png" />
+
+      <!-- This will help us when exporting the CoProcessing state -->
+      <CoProcessing group="writers" name="XMLPStructuredGridWriter" />
+     </Hints>
+     <!-- End of XMLPStructuredGridWriter -->
+    </SourceProxy>
+
+    <SourceProxy name="XMLPolyDataWriter" class="vtkPVNullSource"
       label="PolyData Writer">
+      <InputProperty name="Input">
+          <ProxyGroupDomain name="groups">
+            <Group name="sources" />
+            <Group name="filters" />
+          </ProxyGroupDomain>
+          <DataTypeDomain name="input_type">
+            <DataType value="vtkPolyData" />
+          </DataTypeDomain>
+          <Documentation>
+            The input.
+          </Documentation>
+      </InputProperty>
+
+      <StringVectorProperty name="FileName"
+        number_of_elements="1"
+        default_values="filename_%t.vtp">
+     </StringVectorProperty>
+
+      <IntVectorProperty name="WriteFrequency"
+        number_of_elements="1"
+        default_values="1">
+        <IntRangeDomain min="1" />
+      </IntVectorProperty>
+
+     <Hints>
+      <!-- TODO: this doesn't work yet -->
+      <PipelineIcon name=":pqComponents/pqSave32.png" />
+
+      <!-- This will help us when exporting the CoProcessing state -->
+      <CoProcessing group="writers" name="XMLPolyDataWriter" />
+     </Hints>
+     <!-- End of XMLPolyDataWriter -->
+    </SourceProxy>
+
+    <SourceProxy name="XMLPPolyDataWriter" class="vtkPVNullSource"
+      label="Parallel PolyData Writer">
       <InputProperty name="Input">
           <ProxyGroupDomain name="groups">
             <Group name="sources" />
@@ -33,10 +285,224 @@
       <!-- This will help us when exporting the CoProcessing state -->
       <CoProcessing group="writers" name="XMLPPolyDataWriter" />
      </Hints>
-
      <!-- End of XMLPPolyDataWriter -->
     </SourceProxy>
 
+    <SourceProxy name="XMLUnstructuredGridWriter" class="vtkPVNullSource"
+      label="UnstructuredGrid Writer">
+      <InputProperty name="Input">
+          <ProxyGroupDomain name="groups">
+            <Group name="sources" />
+            <Group name="filters" />
+          </ProxyGroupDomain>
+          <DataTypeDomain name="input_type">
+            <DataType value="vtkUnstructuredGrid" />
+          </DataTypeDomain>
+          <Documentation>
+            The input.
+          </Documentation>
+      </InputProperty>
+
+      <StringVectorProperty name="FileName"
+        number_of_elements="1"
+        default_values="filename_%t.vtu">
+     </StringVectorProperty>
+
+      <IntVectorProperty name="WriteFrequency"
+        number_of_elements="1"
+        default_values="1">
+        <IntRangeDomain min="1" />
+      </IntVectorProperty>
+
+     <Hints>
+      <!-- TODO: this doesn't work yet -->
+      <PipelineIcon name=":pqComponents/pqSave32.png" />
+
+      <!-- This will help us when exporting the CoProcessing state -->
+      <CoProcessing group="writers" name="XMLUnstructuredGridWriter" />
+     </Hints>
+     <!-- End of XMLUnstructuredGridWriter -->
+    </SourceProxy>
+
+    <SourceProxy name="XMLPUnstructuredGridWriter" class="vtkPVNullSource"
+      label="Parallel UnstructuredGrid Writer">
+      <InputProperty name="Input">
+          <ProxyGroupDomain name="groups">
+            <Group name="sources" />
+            <Group name="filters" />
+          </ProxyGroupDomain>
+          <DataTypeDomain name="input_type">
+            <DataType value="vtkUnstructuredGrid" />
+          </DataTypeDomain>
+          <Documentation>
+            The input.
+          </Documentation>
+      </InputProperty>
+
+      <StringVectorProperty name="FileName"
+        number_of_elements="1"
+        default_values="filename_%t.pvtu">
+     </StringVectorProperty>
+
+      <IntVectorProperty name="WriteFrequency"
+        number_of_elements="1"
+        default_values="1">
+        <IntRangeDomain min="1" />
+      </IntVectorProperty>
+
+     <Hints>
+      <!-- TODO: this doesn't work yet -->
+      <PipelineIcon name=":pqComponents/pqSave32.png" />
+
+      <!-- This will help us when exporting the CoProcessing state -->
+      <CoProcessing group="writers" name="XMLPUnstructuredGridWriter" />
+     </Hints>
+     <!-- End of XMLPUnstructuredGridWriter -->
+    </SourceProxy>
+
+    <SourceProxy name="XMLMultiBlockDataWriter" class="vtkPVNullSource"
+      label="MultiBlockDataSet Writer">
+      <InputProperty name="Input">
+          <ProxyGroupDomain name="groups">
+            <Group name="sources" />
+            <Group name="filters" />
+          </ProxyGroupDomain>
+          <DataTypeDomain name="input_type">
+            <DataType value="vtkMultiBlockDataSet" />
+          </DataTypeDomain>
+          <Documentation>
+            The input.
+          </Documentation>
+      </InputProperty>
+
+      <StringVectorProperty name="FileName"
+        number_of_elements="1"
+        default_values="filename_%t.vtm">
+     </StringVectorProperty>
+
+      <IntVectorProperty name="WriteFrequency"
+        number_of_elements="1"
+        default_values="1">
+        <IntRangeDomain min="1" />
+      </IntVectorProperty>
+
+     <Hints>
+      <!-- TODO: this doesn't work yet -->
+      <PipelineIcon name=":pqComponents/pqSave32.png" />
+
+      <!-- This will help us when exporting the CoProcessing state -->
+      <CoProcessing group="writers" name="XMLMultiBlockDataWriter" />
+     </Hints>
+     <!-- End of XMLMultiBlockDataWriter -->
+    </SourceProxy>
+
+    <SourceProxy name="XMLPMultiBlockDataWriter" class="vtkPVNullSource"
+      label="Parallel MultiBlockDataSet Writer">
+      <InputProperty name="Input">
+          <ProxyGroupDomain name="groups">
+            <Group name="sources" />
+            <Group name="filters" />
+          </ProxyGroupDomain>
+          <DataTypeDomain name="input_type">
+            <DataType value="vtkMultiBlockDataSet" />
+          </DataTypeDomain>
+          <Documentation>
+            The input.
+          </Documentation>
+      </InputProperty>
+
+      <StringVectorProperty name="FileName"
+        number_of_elements="1"
+        default_values="filename_%t.pvtm">
+     </StringVectorProperty>
+
+      <IntVectorProperty name="WriteFrequency"
+        number_of_elements="1"
+        default_values="1">
+        <IntRangeDomain min="1" />
+      </IntVectorProperty>
+
+     <Hints>
+      <!-- TODO: this doesn't work yet -->
+      <PipelineIcon name=":pqComponents/pqSave32.png" />
+
+      <!-- This will help us when exporting the CoProcessing state -->
+      <CoProcessing group="writers" name="XMLPMultiBlockDataWriter" />
+     </Hints>
+     <!-- End of XMLPMultiBlockDataWriter -->
+    </SourceProxy>
+
+    <SourceProxy name="XMLHierarchicalBoxDataWriter" class="vtkPVNullSource"
+      label="Hierarchical Box Data Writer">
+      <InputProperty name="Input">
+          <ProxyGroupDomain name="groups">
+            <Group name="sources" />
+            <Group name="filters" />
+          </ProxyGroupDomain>
+          <DataTypeDomain name="input_type">
+            <DataType value="vtkHierarchicalBoxDataSet" />
+          </DataTypeDomain>
+          <Documentation>
+            The input.
+          </Documentation>
+      </InputProperty>
+
+      <StringVectorProperty name="FileName"
+        number_of_elements="1"
+        default_values="filename_%t.vth">
+     </StringVectorProperty>
+
+      <IntVectorProperty name="WriteFrequency"
+        number_of_elements="1"
+        default_values="1">
+        <IntRangeDomain min="1" />
+      </IntVectorProperty>
+
+     <Hints>
+      <!-- TODO: this doesn't work yet -->
+      <PipelineIcon name=":pqComponents/pqSave32.png" />
+
+      <!-- This will help us when exporting the CoProcessing state -->
+      <CoProcessing group="writers" name="XMLHierarchicalBoxDataWriter" />
+     </Hints>
+     <!-- End of XMLHierarchicalBoxDataWriter -->
+    </SourceProxy>
+
+    <SourceProxy name="XMLPHierarchicalBoxDataWriter" class="vtkPVNullSource"
+      label="Parallel Hierarchical Box Data Writer">
+      <InputProperty name="Input">
+          <ProxyGroupDomain name="groups">
+            <Group name="sources" />
+            <Group name="filters" />
+          </ProxyGroupDomain>
+          <DataTypeDomain name="input_type">
+            <DataType value="vtkHierarchicalBoxDataSet" />
+          </DataTypeDomain>
+          <Documentation>
+            The input.
+          </Documentation>
+      </InputProperty>
+
+      <StringVectorProperty name="FileName"
+        number_of_elements="1"
+        default_values="filename_%t.pvth">
+     </StringVectorProperty>
+
+      <IntVectorProperty name="WriteFrequency"
+        number_of_elements="1"
+        default_values="1">
+        <IntRangeDomain min="1" />
+      </IntVectorProperty>
+
+     <Hints>
+      <!-- TODO: this doesn't work yet -->
+      <PipelineIcon name=":pqComponents/pqSave32.png" />
+
+      <!-- This will help us when exporting the CoProcessing state -->
+      <CoProcessing group="writers" name="XMLPHierarchicalBoxDataWriter" />
+     </Hints>
+     <!-- End of XMLPHierarchicalBoxDataWriter -->
+    </SourceProxy>
 
   </ProxyGroup>
 </ServerManagerConfiguration>

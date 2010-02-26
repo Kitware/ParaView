@@ -96,7 +96,7 @@ void pqCPWritersMenuManager::createMenu()
   QFile xmlFile(":/CoProcessingPlugin/ParaViewResources/Writers.xml");
   if (!xmlFile.open(QIODevice::ReadOnly))
     {
-    qCritical() << "Failed to load the Writes.xml resource file."
+    qCritical() << "Failed to load the Writers.xml resource file."
       << " Plugin has not been built correctly.";
     return;
     }
