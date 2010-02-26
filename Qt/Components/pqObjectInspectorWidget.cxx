@@ -77,7 +77,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqThresholdPanel.h"
 #include "pqUndoStack.h"
 #include "pqView.h"
-#include "pqXDMFPanel.h"
 #include "vtkPVConfig.h" // To get PARAVIEW_USE_*
 #ifdef PARAVIEW_USE_SILO
 #include "pqSiloPanel.h"
@@ -152,10 +151,6 @@ public:
         {
         return new pqExodusIIPanel(proxy, p);
         }
-      if(QString("XdmfReader") == proxy->getProxy()->GetXMLName())
-        {
-        return new pqXDMFPanel(proxy, p);
-        }
       if(QString("netCDFReader") == proxy->getProxy()->GetXMLName())
         {
         return new pqNetCDFPanel(proxy, p);
@@ -195,12 +190,12 @@ public:
     if(QString("sources") == proxy->getProxy()->GetXMLGroup())
       {
       if (QString("ExodusIIReader") == proxy->getProxy()->GetXMLName() ||
-         QString("ExodusRestartReader") == proxy->getProxy()->GetXMLName() ||
-         QString("netCDFReader") == proxy->getProxy()->GetXMLName() ||
+        QString("ExodusRestartReader") == proxy->getProxy()->GetXMLName() ||
 #ifdef PARAVIEW_USE_SILO
-         QString("SiloReader") == proxy->getProxy()->GetXMLName() ||
+        QString("SiloReader") == proxy->getProxy()->GetXMLName() ||
 #endif
-         QString("XdmfReader") == proxy->getProxy()->GetXMLName())
+        QString("netCDFReader") == proxy->getProxy()->GetXMLName()
+         )
         {
         return true;
         }

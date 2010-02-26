@@ -213,8 +213,6 @@ SET(Kit_SRCS
   vtkSMWidgetRepresentationProxy.cxx
   vtkSMWriterFactory.cxx
   vtkSMWriterProxy.cxx
-  vtkSMXDMFInformationHelper.cxx
-  vtkSMXDMFPropertyDomain.cxx
   vtkSMXMLPVAnimationWriterProxy.cxx
   vtkSMDataSourceProxy.cxx
   )

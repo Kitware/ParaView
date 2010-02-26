@@ -24,7 +24,7 @@
   <Proxy group="sources" name="ensightMS" />
   <Proxy group="sources" name="netCDFReader" />
   <Proxy group="sources" name="byureader" />
-  <Proxy group="sources" name="XdmfReader2" />
+  <Proxy group="sources" name="XdmfReader" />
   <Proxy group="sources" name="pdbreader" />
   <Proxy group="sources" name="xyzreader" />
   <Proxy group="sources" name="P3DReader" />

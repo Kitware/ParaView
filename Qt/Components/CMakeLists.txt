@@ -203,7 +203,6 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqViewManager.h
   pqWidgetRangeDomain.h
   pqWriterDialog.h
-  pqXDMFPanel.h
   pqXYChartDisplayPanel.h
   pqComponentsTestUtility.h
   ${EXTRA_PQ_COMPONENT_MOC_SOURCES}
@@ -287,7 +286,6 @@ SET(UI_FORMS
   Resources/UI/pqTimerLogDisplay.ui
   Resources/UI/pqTwoDRenderViewOptions.ui
   Resources/UI/pqWriterDialog.ui
-  Resources/UI/pqXDMFPanel.ui
   Resources/UI/pqXYChartDisplayPanel.ui
 )
 
@@ -677,8 +675,6 @@ ADD_LIBRARY(pqComponents
   pqWidgetRangeDomain.h
   pqWriterDialog.cxx
   pqWriterDialog.h
-  pqXDMFPanel.cxx
-  pqXDMFPanel.h
   pqXYChartDisplayPanel.cxx
   pqXYChartDisplayPanel.h
   ${EXTRA_PQ_COMPONENT_SOURCES}
