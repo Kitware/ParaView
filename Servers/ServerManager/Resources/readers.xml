@@ -2740,7 +2740,7 @@
    </SourceProxy>
 
    <SourceProxy name="ensight" 
-                class="vtkGenericEnSightReader"
+                class="vtkGenericEnSightReader2"
                 label="EnSight Reader">
      <Documentation
        short_help="Read EnSight files."
@@ -3557,7 +3557,7 @@
    </SourceProxy>
 
    <SourceProxy name="ensightMS" 
-                class="vtkPVEnSightMasterServerReader"
+                class="vtkPVEnSightMasterServerReader2"
                 label="EnSight Master Server Reader">
      <Documentation
        short_help="Read parallel EnSight files."
