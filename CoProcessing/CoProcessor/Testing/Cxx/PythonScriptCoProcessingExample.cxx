@@ -26,7 +26,6 @@
 
 int main(int argc, char* argv[])
 {
-  int size = 0;
   if(argc < 2)
     {
     cerr << "Wrong number of arguments.  Command is: <exe> <python script>\n";
@@ -35,7 +34,6 @@ int main(int argc, char* argv[])
 #ifdef COPROCESSOR_USE_MPI
   cout << "Initializing MPI.\n";
   MPI_Init(&argc,&argv);
-  MPI_Comm_size(MPI_COMM_WORLD, &size);
 #endif
   int errors = 0;
   vtkPVCustomTestDriver* testDriver = vtkPVCustomTestDriver::New();
