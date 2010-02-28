@@ -24,12 +24,12 @@
 #define vtkCPPipeline_h
 
 #include "vtkObject.h"
+#include "CPWin32Header.h" // For windows import/export of shared libraries
 
 class vtkCPDataDescription;
 
-class VTK_EXPORT vtkCPPipeline : public vtkObject
+class COPROCESSING_EXPORT vtkCPPipeline : public vtkObject
 {
-
 public:
   vtkTypeRevisionMacro(vtkCPPipeline,vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);

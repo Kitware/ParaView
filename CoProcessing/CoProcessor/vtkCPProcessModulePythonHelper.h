@@ -21,12 +21,13 @@
 #define __vtkCPProcessModulePythonHelper_h
 
 #include "vtkPVProcessModulePythonHelper.h"
+#include "CPWin32Header.h" // For windows import/export of shared libraries
 
 class vtkPVProcessModule;
 class vtkPVPythonInterpretor;
 class vtkSMApplication;
 
-class VTK_EXPORT vtkCPProcessModulePythonHelper : public vtkPVProcessModulePythonHelper
+class COPROCESSING_EXPORT vtkCPProcessModulePythonHelper : public vtkPVProcessModulePythonHelper
 {
 public: 
   static vtkCPProcessModulePythonHelper* New();

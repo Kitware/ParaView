@@ -26,11 +26,12 @@
 
 #include "vtkCPPipeline.h"
 #include "vtkStdString.h"  // for the string
+#include "CPWin32Header.h" // For windows import/export of shared libraries
 
 class vtkCPDataDescription;
 class vtkCPPythonHelper;
 
-class VTK_EXPORT vtkCPPythonScriptPipeline : public vtkCPPipeline
+class COPROCESSING_EXPORT vtkCPPythonScriptPipeline : public vtkCPPipeline
 {
 public:
   static vtkCPPythonScriptPipeline* New();

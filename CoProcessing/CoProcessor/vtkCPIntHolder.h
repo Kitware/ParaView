@@ -16,8 +16,9 @@
 #define vtkCPIntHolder_h
 
 #include "vtkObject.h"
+#include "CPWin32Header.h" // For windows import/export of shared libraries
 
-class VTK_EXPORT vtkCPIntHolder : public vtkObject
+class COPROCESSING_EXPORT vtkCPIntHolder : public vtkObject
 {
 public:
   static vtkCPIntHolder* New();

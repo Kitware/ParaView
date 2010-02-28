@@ -21,6 +21,7 @@
 #define vtkCPDataDescription_h
 
 #include "vtkObject.h"
+#include "CPWin32Header.h" // For windows import/export of shared libraries
 
 class vtkDataObject;
 class vtkDataSet;
@@ -28,7 +29,7 @@ class vtkFieldData;
 class vtkStringArray;
 class vtkCPInputDataDescription;
 
-class VTK_EXPORT vtkCPDataDescription : public vtkObject
+class COPROCESSING_EXPORT vtkCPDataDescription : public vtkObject
 {
 public:
   static vtkCPDataDescription* New();

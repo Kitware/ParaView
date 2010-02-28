@@ -47,6 +47,7 @@
 #define vtkCPProcessor_h
 
 #include "vtkObject.h"
+#include "CPWin32Header.h" // For windows import/export of shared libraries
 
 struct vtkCPProcessorInternals;
 class vtkCPDataDescription;
@@ -54,7 +55,7 @@ class vtkDataObject;
 class vtkFieldData;
 class vtkCPPipeline;
 
-class VTK_EXPORT vtkCPProcessor : public vtkObject
+class COPROCESSING_EXPORT vtkCPProcessor : public vtkObject
 {
 
 public:

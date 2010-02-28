@@ -20,13 +20,14 @@
 #define vtkCPPythonHelper_h
 
 #include "vtkCPPipeline.h"
+#include "CPWin32Header.h" // For windows import/export of shared libraries
 
 class vtkCPProcessModulePythonHelper;
 class vtkPVMain;
 class vtkPVPythonOptions;
 class vtkPVPythonInterpretor;
 
-class VTK_EXPORT vtkCPPythonHelper : public vtkObject
+class COPROCESSING_EXPORT vtkCPPythonHelper : public vtkObject
 {
 public:
   static vtkCPPythonHelper* New();
