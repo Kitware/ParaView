@@ -22,11 +22,19 @@
 
 #include "vtkProcessModuleGUIHelper.h"
 
+#if defined(_WIN32) && defined(VTK_BUILD_SHARED_LIBS)
+#if defined(PythonAdaptor_EXPORTS)
+#define PYTHONADAPTOR_EXPORT VTK_ABI_EXPORT
+#else
+#define PYTHONADAPTOR_EXPORT VTK_ABI_IMPORT
+#endif
+#endif
+
 class vtkPVProcessModule;
 class vtkPVPythonInterpretor;
 class vtkSMApplication;
 
-class VTK_EXPORT vtkPVPythonAdapterHelper : public vtkProcessModuleGUIHelper
+class PYTHONADAPTOR_EXPORT vtkPVPythonAdapterHelper : public vtkProcessModuleGUIHelper
 {
 public: 
   static vtkPVPythonAdapterHelper* New();
