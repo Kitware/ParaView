@@ -12,6 +12,7 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
+#include "vtkPython.h" // include Python.h before other headers
 #include "vtkCPProcessModulePythonHelper.h"
 
 #include "CPSystemInformation.h"
@@ -28,7 +29,7 @@
 #include <vtkstd/string>
 using namespace vtkstd;
 
-vtkCxxRevisionMacro(vtkCPProcessModulePythonHelper, "1.3");
+vtkCxxRevisionMacro(vtkCPProcessModulePythonHelper, "1.4");
 vtkStandardNewMacro(vtkCPProcessModulePythonHelper);
 
 //----------------------------------------------------------------------------
