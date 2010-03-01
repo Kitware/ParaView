@@ -23,7 +23,7 @@
 #include "vtkstd/string"
 
 vtkStandardNewMacro(vtkSMXYChartViewProxy);
-vtkCxxRevisionMacro(vtkSMXYChartViewProxy, "1.3");
+vtkCxxRevisionMacro(vtkSMXYChartViewProxy, "1.4");
 //----------------------------------------------------------------------------
 vtkSMXYChartViewProxy::vtkSMXYChartViewProxy()
 {
@@ -107,7 +107,7 @@ void vtkSMXYChartViewProxy::SetGridVisibility(int index, bool visible)
 {
   if (this->Chart)
     {
-    //this->ChartView->SetGridVisibility(index, visible);
+    this->Chart->GetAxis(index)->SetGridVisible(visible);
     }
 }
 

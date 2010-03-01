@@ -58,6 +58,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqActiveView.h
   pqActiveViewOptions.h
   pqActiveViewOptionsManager.h
+  pqActiveXYChartOptions.h
   #pqAddSourceDialog.h
   pqAnimatablePropertiesComboBox.h
   pqAnimatableProxyComboBox.h
@@ -204,6 +205,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqWidgetRangeDomain.h
   pqWriterDialog.h
   pqXYChartDisplayPanel.h
+  pqXYChartOptionsEditor.h
   pqComponentsTestUtility.h
   ${EXTRA_PQ_COMPONENT_MOC_SOURCES}
 )
@@ -349,6 +351,8 @@ ADD_LIBRARY(pqComponents
   pqActiveViewOptions.h
   pqActiveViewOptionsManager.cxx
   pqActiveViewOptionsManager.h
+  pqActiveXYChartOptions.cxx
+  pqActiveXYChartOptions.h
   #pqAddSourceDialog.cxx
   #pqAddSourceDialog.h
   pqAnimatablePropertiesComboBox.cxx
@@ -677,6 +681,8 @@ ADD_LIBRARY(pqComponents
   pqWriterDialog.h
   pqXYChartDisplayPanel.cxx
   pqXYChartDisplayPanel.h
+  pqXYChartOptionsEditor.cxx
+  pqXYChartOptionsEditor.h
   ${EXTRA_PQ_COMPONENT_SOURCES}
   ${MOC_BUILT_SOURCES}
   ${RCS_SOURCES}

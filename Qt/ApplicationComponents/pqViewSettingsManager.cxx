@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -32,24 +32,28 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqViewSettingsManager.h"
 
 #include "pqActiveChartOptions.h"
+#include "pqActiveXYChartOptions.h"
 #include "pqActiveObjects.h"
 #include "pqActiveRenderViewOptions.h"
 #include "pqActiveTwoDRenderViewOptions.h"
 #include "pqApplicationCore.h"
 #include "pqBarChartView.h"
 #include "pqLineChartView.h"
+#include "pqXYChartView.h"
 #include "pqPluginManager.h"
 #include "pqTwoDRenderView.h"
 #include "pqViewOptionsInterface.h"
-  
+
 //-----------------------------------------------------------------------------
 pqViewSettingsManager::pqViewSettingsManager(QObject* parentObject)
   : Superclass(parentObject)
 {
   this->setRenderViewOptions(new pqActiveRenderViewOptions(this));
   pqActiveChartOptions *chartOptions = new pqActiveChartOptions(this);
+  pqActiveXYChartOptions *xyChartOptions = new pqActiveXYChartOptions(this);
   this->registerOptions(pqBarChartView::barChartViewType(), chartOptions);
   this->registerOptions(pqLineChartView::lineChartViewType(), chartOptions);
+  this->registerOptions(pqXYChartView::XYChartViewType(), xyChartOptions);
   pqActiveTwoDRenderViewOptions* twoDOptions =
     new pqActiveTwoDRenderViewOptions(this);
   this->registerOptions(pqTwoDRenderView::twoDRenderViewType(), twoDOptions);
