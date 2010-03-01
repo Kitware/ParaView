@@ -92,6 +92,7 @@ protected slots:
   void setAxisVisibility(bool visible);
   void setGridVisibility(bool visible);
   void setUsingLogScale(bool usingLogScale);
+  void pickTitleFont();
 
 private:
   void updateOptions();
@@ -99,6 +100,7 @@ private:
   void loadAxisPage();
   void loadAxisLayoutPage();
   void loadAxisTitlePage();
+  bool pickFont(QLabel *label, QFont &font);
   void updateDescription(QLabel *label, const QFont &newFont);
   vtkSMProxy* getProxy();
   class pqInternal;

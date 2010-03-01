@@ -214,6 +214,11 @@ pqXYChartOptionsEditor::pqXYChartOptionsEditor(QWidget *widgetParent)
   this->Internal->Form->setupUi(this);
 
   // Connect up some of the form elements
+  QObject::connect(this->Internal->Form->ChartTitleFontButton,
+                   SIGNAL(clicked()), this, SLOT(pickTitleFont()));
+  QObject::connect(this->Internal->Form->ChartTitleColor,
+                   SIGNAL(chosenColorChanged(QColor)),
+                   this, SIGNAL(changesAvailable()));
   QObject::connect(this->Internal->Form->UseChartSelect, SIGNAL(toggled(bool)),
                    this, SLOT(changeLayoutPage(bool)));
   QObject::connect(this->Internal->Form->UseBestFit, SIGNAL(toggled(bool)),
@@ -430,10 +435,11 @@ void pqXYChartOptionsEditor::updateOptions()
       proxy->GetProperty("ChartTitleFont"));
   if(values.size() == 4)
     {
+    this->Internal->Form->TitleFont = QFont(values[0].toString(), values[1].toInt(),
+                                            values[2].toInt() != 0 ? QFont::Bold : -1,
+                                            values[3].toInt() != 0);
     this->updateDescription(this->Internal->Form->ChartTitleFont,
-                            QFont(values[0].toString(), values[1].toInt(),
-                                  values[2].toInt() != 0 ? QFont::Bold : -1,
-                                  values[3].toInt() != 0));
+                            this->Internal->Form->TitleFont);
     }
   values = pqSMAdaptor::getMultipleElementProperty(
       proxy->GetProperty("ChartTitleColor"));
@@ -471,6 +477,24 @@ void pqXYChartOptionsEditor::applyAxisOptions()
   // Apply updated axis options to the server properties
   QList<QVariant> values;
   vtkSMProxy *proxy = this->getProxy();
+
+  // Apply the font type info
+  values.clear();
+  values.append(QVariant(this->Internal->Form->TitleFont.family()));
+  values.append(QVariant(this->Internal->Form->TitleFont.pointSize()));
+  values.append(QVariant(this->Internal->Form->TitleFont.bold() ? 1 : 0));
+  values.append(QVariant(this->Internal->Form->TitleFont.italic() ? 1 : 0));
+  pqSMAdaptor::setMultipleElementProperty(
+      proxy->GetProperty("ChartTitleFont"), values);
+
+  // The chart title color
+  QColor color = this->Internal->Form->ChartTitleColor->chosenColor();
+  values.clear();
+  values.append(QVariant(static_cast<double>(color.redF())));
+  values.append(QVariant(static_cast<double>(color.greenF())));
+  values.append(QVariant(static_cast<double>(color.blueF())));
+  pqSMAdaptor::setMultipleElementProperty(
+      proxy->GetProperty("ChartTitleColor"), values);
 
   // Axis visibility
   values.clear();
@@ -601,6 +625,28 @@ void pqXYChartOptionsEditor::updateRemoveButton()
     {
     QItemSelectionModel *model = this->Internal->Form->LabelList->selectionModel();
     this->Internal->Form->RemoveButton->setEnabled(model->hasSelection());
+    }
+}
+
+void pqXYChartOptionsEditor::pickTitleFont()
+{
+  this->pickFont(this->Internal->Form->ChartTitleFont,
+                 this->Internal->Form->TitleFont);
+}
+
+bool pqXYChartOptionsEditor::pickFont(QLabel *label, QFont &font)
+{
+  bool ok = false;
+  font = QFontDialog::getFont(&ok, font, this);
+  if(ok)
+    {
+    this->updateDescription(label, font);
+    this->changesAvailable();
+    return true;
+    }
+  else
+    {
+    return false;
     }
 }
 

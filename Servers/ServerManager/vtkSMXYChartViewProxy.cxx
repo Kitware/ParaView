@@ -19,11 +19,12 @@
 #include "vtkContextScene.h"
 #include "vtkChartXY.h"
 #include "vtkAxis.h"
+#include "vtkTextProperty.h"
 
 #include "vtkstd/string"
 
 vtkStandardNewMacro(vtkSMXYChartViewProxy);
-vtkCxxRevisionMacro(vtkSMXYChartViewProxy, "1.4");
+vtkCxxRevisionMacro(vtkSMXYChartViewProxy, "1.5");
 //----------------------------------------------------------------------------
 vtkSMXYChartViewProxy::vtkSMXYChartViewProxy()
 {
@@ -69,19 +70,31 @@ void vtkSMXYChartViewProxy::SetTitle(const char* title)
 void vtkSMXYChartViewProxy::SetTitleFont(const char* family, int pointSize,
                                          bool bold, bool italic)
 {
-
+  if (this->Chart)
+    {
+    this->Chart->GetTitleProperties()->SetFontFamilyAsString(family);
+    this->Chart->GetTitleProperties()->SetFontSize(pointSize);
+    this->Chart->GetTitleProperties()->SetBold(static_cast<int>(bold));
+    this->Chart->GetTitleProperties()->SetItalic(static_cast<int>(italic));
+    }
 }
 
 //----------------------------------------------------------------------------
 void vtkSMXYChartViewProxy::SetTitleColor(double red, double green, double blue)
 {
-
+  if (this->Chart)
+    {
+    this->Chart->GetTitleProperties()->SetColor(red, green, blue);
+    }
 }
 
 //----------------------------------------------------------------------------
 void vtkSMXYChartViewProxy::SetTitleAlignment(int alignment)
 {
-
+  if (this->Chart)
+    {
+    this->Chart->GetTitleProperties()->SetJustification(alignment);
+    }
 }
 
 //----------------------------------------------------------------------------
