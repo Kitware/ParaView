@@ -135,13 +135,9 @@ pqPythonToolsWidget::pqPythonToolsWidget(QWidget* p) : Superclass(p)
     }
 
 
-  // Macros buttons
-  bool showMenu = settings->value("PythonMacros/ShowMenu", false).toBool();
-  this->Internal->showMenuCheck->setChecked(showMenu);
+  // Macro tab signals
   QObject::connect(this->Internal->RemoveMacroButton, SIGNAL(clicked()),
     this, SLOT(onRemoveMacroClicked()));
-  QObject::connect(this->Internal->showMenuCheck, SIGNAL(stateChanged(int)),
-    this, SLOT(onShowMenuChecked()));
   QObject::connect(this->Internal->MacroListBox, SIGNAL(itemSelectionChanged()),
     this, SLOT(onMacroListSelectionChanged()));
   QObject::connect(this->Internal->MacroListBox, SIGNAL(itemChanged(QListWidgetItem*)),
@@ -215,15 +211,6 @@ void pqPythonToolsWidget::onMacroListSelectionChanged()
 {
   bool enabled = (this->Internal->MacroListBox->selectedItems().size() > 0);
   this->Internal->RemoveMacroButton->setEnabled(enabled);
-}
-
-//----------------------------------------------------------------------------
-void pqPythonToolsWidget::onShowMenuChecked()
-{
-  bool showMacroMenu = this->Internal->showMenuCheck->isChecked();
-  pqSettings* settings = pqApplicationCore::instance()->settings();
-  settings->setValue("PythonMacros/ShowMenu", showMacroMenu);
-  settings->alertSettingsModified();
 }
 
 //----------------------------------------------------------------------------

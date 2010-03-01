@@ -244,16 +244,6 @@
               </widget>
              </item>
              <item>
-              <widget class="QCheckBox" name="showMenuCheck" >
-               <property name="toolTip" >
-                <string>Hide or show the macros menu in the main menu bar</string>
-               </property>
-               <property name="text" >
-                <string>Show menu</string>
-               </property>
-              </widget>
-             </item>
-             <item>
               <spacer name="verticalSpacer_2" >
                <property name="orientation" >
                 <enum>Qt::Vertical</enum>

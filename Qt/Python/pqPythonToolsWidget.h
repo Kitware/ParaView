@@ -79,7 +79,6 @@ protected slots:
   // Macros tab
   void addMacroToListBox(const QString& macroName, const QString& filename);
   void onRemoveMacroClicked();
-  void onShowMenuChecked();
   void onMacroListSelectionChanged();
   void onMacroNameChanged(QListWidgetItem* item);
 
