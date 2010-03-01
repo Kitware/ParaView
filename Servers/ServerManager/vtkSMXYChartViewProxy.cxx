@@ -18,11 +18,12 @@
 #include "vtkContextView.h"
 #include "vtkContextScene.h"
 #include "vtkChartXY.h"
+#include "vtkAxis.h"
 
 #include "vtkstd/string"
 
 vtkStandardNewMacro(vtkSMXYChartViewProxy);
-vtkCxxRevisionMacro(vtkSMXYChartViewProxy, "1.2");
+vtkCxxRevisionMacro(vtkSMXYChartViewProxy, "1.3");
 //----------------------------------------------------------------------------
 vtkSMXYChartViewProxy::vtkSMXYChartViewProxy()
 {
@@ -53,6 +54,72 @@ vtkContextView* vtkSMXYChartViewProxy::NewChartView()
 void vtkSMXYChartViewProxy::SetChartType(const char *)
 {
   // Does this proxy need to remember what type it is?
+}
+
+//----------------------------------------------------------------------------
+void vtkSMXYChartViewProxy::SetTitle(const char* title)
+{
+  if (this->Chart)
+    {
+    this->Chart->SetTitle(title);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkSMXYChartViewProxy::SetTitleFont(const char* family, int pointSize,
+                                         bool bold, bool italic)
+{
+
+}
+
+//----------------------------------------------------------------------------
+void vtkSMXYChartViewProxy::SetTitleColor(double red, double green, double blue)
+{
+
+}
+
+//----------------------------------------------------------------------------
+void vtkSMXYChartViewProxy::SetTitleAlignment(int alignment)
+{
+
+}
+
+//----------------------------------------------------------------------------
+void vtkSMXYChartViewProxy::SetLegendVisibility(int visible)
+{
+  if (this->Chart)
+    {
+    this->Chart->SetShowLegend(static_cast<bool>(visible));
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkSMXYChartViewProxy::SetAxisVisibility(int index, bool visible)
+{
+  if (this->Chart)
+    {
+    this->Chart->GetAxis(index)->SetVisible(visible);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkSMXYChartViewProxy::SetGridVisibility(int index, bool visible)
+{
+  if (this->Chart)
+    {
+    //this->ChartView->SetGridVisibility(index, visible);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkSMXYChartViewProxy::SetAxisLogScale(int index, bool logScale)
+{
+  if (this->Chart)
+    {
+    this->Chart->GetAxis(index)->SetLogScale(logScale);
+    this->Chart->Update();
+    this->Chart->RecalculateBounds();
+    }
 }
 
 //----------------------------------------------------------------------------

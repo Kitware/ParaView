@@ -52,7 +52,7 @@ public:
 };
 
 vtkStandardNewMacro(vtkSMContextNamedOptionsProxy);
-vtkCxxRevisionMacro(vtkSMContextNamedOptionsProxy, "1.18");
+vtkCxxRevisionMacro(vtkSMContextNamedOptionsProxy, "1.19");
 //----------------------------------------------------------------------------
 vtkSMContextNamedOptionsProxy::vtkSMContextNamedOptionsProxy()
 {
@@ -139,11 +139,11 @@ void vtkSMContextNamedOptionsProxy::SetXSeriesName(const char* name)
     {
     if (this->Internals->UseIndexForXAxis)
       {
-      this->Internals->Chart->GetAxis(0)->SetTitle("Index of Array");
+      this->Internals->Chart->GetAxis(vtkAxis::BOTTOM)->SetTitle("Index of Array");
       }
     else
       {
-      this->Internals->Chart->GetAxis(0)
+      this->Internals->Chart->GetAxis(vtkAxis::BOTTOM)
           ->SetTitle(this->Internals->XSeriesName.c_str());
       }
     this->Internals->Chart->RecalculateBounds();
@@ -169,11 +169,11 @@ void vtkSMContextNamedOptionsProxy::SetUseIndexForXAxis(bool useIndex)
     {
     if (this->Internals->UseIndexForXAxis)
       {
-      this->Internals->Chart->GetAxis(0)->SetTitle("Index of Array");
+      this->Internals->Chart->GetAxis(vtkAxis::BOTTOM)->SetTitle("Index of Array");
       }
     else
       {
-      this->Internals->Chart->GetAxis(0)
+      this->Internals->Chart->GetAxis(vtkAxis::BOTTOM)
           ->SetTitle(this->Internals->XSeriesName.c_str());
       }
     this->Internals->Chart->RecalculateBounds();
@@ -196,6 +196,7 @@ void vtkSMContextNamedOptionsProxy::InitializePlotMap()
     // Choose a default plot series if one has not already been chosen
     if (this->Internals->Table->GetNumberOfColumns() > 1)
       {
+      this->SetXSeriesName(this->Internals->Table->GetColumnName(0));
       this->Internals->PlotMap[this->Internals->Table->GetColumnName(0)] = 0;
       this->SetVisibility(this->Internals->Table->GetColumnName(0), 1);
       for(vtkIdType i = 1; i < this->Internals->Table->GetNumberOfColumns(); ++i)
@@ -383,17 +384,17 @@ void vtkSMContextNamedOptionsProxy::SetVisibility(const char* name, int visible)
     }
   if (active == 0 && this->Internals->Chart)
     {
-    this->Internals->Chart->GetAxis(1)->SetTitle(" ");
+    this->Internals->Chart->GetAxis(vtkAxis::LEFT)->SetTitle(" ");
     this->Internals->Chart->SetShowLegend(false);
     }
   else if (active == 1 && this->Internals->Chart)
     {
-    this->Internals->Chart->GetAxis(1)->SetTitle(lastPlot->GetLabel());
+    this->Internals->Chart->GetAxis(vtkAxis::LEFT)->SetTitle(lastPlot->GetLabel());
     this->Internals->Chart->SetShowLegend(false);
     }
   else if (this->Internals->Chart)
     {
-    this->Internals->Chart->GetAxis(1)->SetTitle(" ");
+    this->Internals->Chart->GetAxis(vtkAxis::LEFT)->SetTitle(" ");
     this->Internals->Chart->SetShowLegend(true);
     }
 }

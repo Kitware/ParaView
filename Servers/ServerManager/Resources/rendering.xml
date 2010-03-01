@@ -4620,6 +4620,89 @@
         default_values="Line" >
       </StringVectorProperty>
 
+      <StringVectorProperty
+        name="ChartTitle"
+        command="SetTitle"
+        update_self="1"
+        number_of_elements="1">
+      </StringVectorProperty>
+
+      <StringVectorProperty
+        name="ChartTitleFont"
+        command="SetTitleFont"
+        update_self="1"
+        number_of_elements="4"
+        element_types="2 0 0 0"
+        default_values_delimiter=";"
+        default_values="Helvetica;9;0;0" >
+        <Documentation>
+          Set the chart title font (familyname, size, bold, italics).
+        </Documentation>
+      </StringVectorProperty>
+
+      <DoubleVectorProperty
+        name="ChartTitleColor"
+        command="SetTitleColor"
+        update_self="1"
+        number_of_elements="3"
+        default_values="0 0 0">
+        <DoubleRangeDomain name="range" min="0" max="1" />
+      </DoubleVectorProperty>
+
+      <IntVectorProperty
+        name="ChartTitleAlignment"
+        command="SetTitleAlignment"
+        update_self="1"
+        number_of_elements="1"
+        default_values="1">
+        <IntRangeDomain name="range" min="0" max="2" />
+      </IntVectorProperty>
+
+      <IntVectorProperty
+        name="ShowLegend"
+        command="SetLegendVisibility"
+        update_self="1"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      <IntVectorProperty
+        name="ShowAxis"
+        command="SetAxisVisibility"
+        update_self="1"
+        repeat_command="1"
+        use_index="1"
+        number_of_elements_per_command="1"
+        number_of_elements="4"
+        default_values="1 1 0 0">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      <IntVectorProperty
+        name="AxisLogScale"
+        command="SetAxisLogScale"
+        update_self="1"
+        repeat_command="1"
+        use_index="1"
+        number_of_elements_per_command="1"
+        number_of_elements="4"
+        default_values="0 0 0 0">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      <IntVectorProperty
+        name="ShowAxisGrid"
+        command="SetGridVisibility"
+        update_self="1"
+        repeat_command="1"
+        use_index="1"
+        number_of_elements_per_command="1"
+        number_of_elements="4"
+        default_values="1 1 0 0">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
     </XYChartViewProxy>
 
     <XYChartViewProxy name="XYBarChartView"

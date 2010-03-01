@@ -37,6 +37,62 @@ public:
   void SetChartType(const char *type);
 
   // Description:
+  // Set the title of the chart.
+  // These methods should not be called directly. They are made public only so
+  // that the client-server-stream-interpreter can invoke them. Use the
+  // corresponding properties to change these values.
+  void SetTitle(const char* title);
+
+  // Description:
+  // Set the chart title's font.
+  // These methods should not be called directly. They are made public only so
+  // that the client-server-stream-interpreter can invoke them. Use the
+  // corresponding properties to change these values.
+  void SetTitleFont(const char* family, int pointSize, bool bold, bool italic);
+
+  // Description:
+  // Set the chart title's color.
+  // These methods should not be called directly. They are made public only so
+  // that the client-server-stream-interpreter can invoke them. Use the
+  // corresponding properties to change these values.
+  void SetTitleColor(double red, double green, double blue);
+
+  // Description:
+  // Set the chart title's alignment.
+  // These methods should not be called directly. They are made public only so
+  // that the client-server-stream-interpreter can invoke them. Use the
+  // corresponding properties to change these values.
+  void SetTitleAlignment(int alignment);
+
+  // Description:
+  // Set the legend visibility.
+  // These methods should not be called directly. They are made public only so
+  // that the client-server-stream-interpreter can invoke them. Use the
+  // corresponding properties to change these values.
+  void SetLegendVisibility(int visible);
+
+  // Description:
+  // Sets whether or not the given axis is visible.
+  // These methods should not be called directly. They are made public only so
+  // that the client-server-stream-interpreter can invoke them. Use the
+  // corresponding properties to change these values.
+  void SetAxisVisibility(int index, bool visible);
+
+  // Description:
+  // Sets whether or not the grid for the given axis is visible.
+  // These methods should not be called directly. They are made public only so
+  // that the client-server-stream-interpreter can invoke them. Use the
+  // corresponding properties to change these values.
+  void SetGridVisibility(int index, bool visible);
+
+  // Description:
+  // Sets whether or not the given axis uses a log10 scale.
+  // These methods should not be called directly. They are made public only so
+  // that the client-server-stream-interpreter can invoke them. Use the
+  // corresponding properties to change these values.
+  void SetAxisLogScale(int index, bool logScale);
+
+  // Description:
   // Provides access to the bar chart view.
 //BTX
   vtkChartXY* GetChartXY();
