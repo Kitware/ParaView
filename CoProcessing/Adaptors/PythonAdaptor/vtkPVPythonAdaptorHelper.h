@@ -22,7 +22,7 @@
 
 #include "vtkProcessModuleGUIHelper.h"
 
-#if defined(_WIN32) && defined(VTK_BUILD_SHARED_LIBS)
+#if defined(VTK_BUILD_SHARED_LIBS)
 #if defined(PythonAdaptor_EXPORTS)
 #define PYTHONADAPTOR_EXPORT VTK_ABI_EXPORT
 #else
