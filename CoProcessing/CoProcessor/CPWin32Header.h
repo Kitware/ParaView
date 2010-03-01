@@ -4,4 +4,6 @@
 #else
 #define COPROCESSING_EXPORT VTK_ABI_IMPORT
 #endif
+#else
+#define COPROCESSING_EXPORT
 #endif

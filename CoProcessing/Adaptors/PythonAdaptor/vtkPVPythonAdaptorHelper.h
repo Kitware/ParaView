@@ -28,6 +28,8 @@
 #else
 #define PYTHONADAPTOR_EXPORT VTK_ABI_IMPORT
 #endif
+#else
+#define PYTHONADAPTOR_EXPORT
 #endif
 
 class vtkPVProcessModule;
