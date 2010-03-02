@@ -3448,6 +3448,31 @@
    <!-- End byureader -->
    </SourceProxy>
 
+   <SourceProxy name="objreader" class="vtkOBJReader" label="Wavefront OBJ Reader">
+     <Documentation
+       short_help="Read Wavefront .OBJ files."
+       long_help="Read Wavefront .OBJ files to produce polygonal and line data.">
+       The OBJ reader reads data stored in Wavefront .OBJ format.
+       The expected file extension is .obj, the datasets resulting
+       from reading these files are polygons and lines.
+     </Documentation>
+     <StringVectorProperty
+        name="FileName"
+        animateable="0"
+        command="SetFileName"
+        number_of_elements="1">
+        <FileListDomain name="files"/>
+        <Documentation>
+          This property specifies the file name for the OBJ reader.
+        </Documentation>
+     </StringVectorProperty>
+     <Hints>
+      <ReaderFactory extensions="obj"
+          file_description="Wavefront OBJ Files"/>
+     </Hints>
+   <!-- End vtkOBJReader -->
+   </SourceProxy>
+
    <SourceProxy name="gaussiancubereader" class="vtkGaussianCubeReader"
                 label="Gaussian Cube Reader">
      <Documentation
