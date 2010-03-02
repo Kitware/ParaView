@@ -695,12 +695,18 @@ void pqApplicationCore::loadDistributedPlugins(const char* filename)
     {
     config_file = QApplication::applicationDirPath() +  "/.plugins";
 #if defined(__APPLE__)
-
     // for installed applications.
     config_file = QApplication::applicationDirPath() + "/../Support/.plugins";
     if (!QFile::exists(config_file))
       {
       config_file =  QApplication::applicationDirPath() + "/../../../.plugins";
+      }
+#endif
+#if defined(WIN32)
+    if (!QFile::exists(config_file))
+      {
+      // maybe running from the build tree.
+      config_file = QApplication::applicationDirPath() + "/../.plugins";
       }
 #endif
     }
