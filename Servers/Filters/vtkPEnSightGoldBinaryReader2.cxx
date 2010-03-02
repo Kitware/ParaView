@@ -18,7 +18,7 @@
 #include <ctype.h>
 #include <vtkstd/string>
 
-vtkCxxRevisionMacro(vtkPEnSightGoldBinaryReader2, "1.1");
+vtkCxxRevisionMacro(vtkPEnSightGoldBinaryReader2, "1.2");
 vtkStandardNewMacro(vtkPEnSightGoldBinaryReader2);
 
 // This is half the precision of an int.
@@ -1335,7 +1335,7 @@ int vtkPEnSightGoldBinaryReader2::ReadScalarsPerNode(
 
       if (measured)
         {
-        int partId = this->UnstructuredPartIds->IsId(this->NumberOfGeometryParts);
+        partId = this->UnstructuredPartIds->IsId(this->NumberOfGeometryParts);
         output = static_cast<vtkDataSet*>(
                                           this->GetDataSetFromBlock(compositeOutput, partId));
         numPts = this->GetPointIds(partId)->GetNumberOfIds();
@@ -1382,7 +1382,7 @@ int vtkPEnSightGoldBinaryReader2::ReadScalarsPerNode(
 
   if (measured)
     {
-    int partId = this->UnstructuredPartIds->IsId(this->NumberOfGeometryParts);
+    partId = this->UnstructuredPartIds->IsId(this->NumberOfGeometryParts);
     output = static_cast<vtkDataSet*>(
                                       this->GetDataSetFromBlock(compositeOutput, partId));
     numPts = this->GetPointIds(partId)->GetNumberOfIds();
@@ -1561,7 +1561,7 @@ int vtkPEnSightGoldBinaryReader2::ReadVectorsPerNode(
 
       if (measured)
         {
-        int partId = this->UnstructuredPartIds->IsId(this->NumberOfGeometryParts);
+        partId = this->UnstructuredPartIds->IsId(this->NumberOfGeometryParts);
         output = static_cast<vtkDataSet*>(
                                           this->GetDataSetFromBlock(compositeOutput, partId));
         numPts = this->GetPointIds(partId)->GetNumberOfIds();
@@ -1608,7 +1608,7 @@ int vtkPEnSightGoldBinaryReader2::ReadVectorsPerNode(
 
   if (measured)
     {
-    int partId = this->UnstructuredPartIds->IsId(this->NumberOfGeometryParts);
+    partId = this->UnstructuredPartIds->IsId(this->NumberOfGeometryParts);
     output = static_cast<vtkDataSet*>(
                                       this->GetDataSetFromBlock(compositeOutput, partId));
     numPts = this->GetPointIds(partId)->GetNumberOfIds();
@@ -4226,8 +4226,6 @@ int vtkPEnSightGoldBinaryReader2::ReadInt(int *result)
   if ( this->IFile->read((char*)result, sizeof(int)) == 0)
     {
     vtkErrorMacro("Read failed");
-    int *nimp = NULL;
-    int i= *nimp;
     return 0;
     }
 

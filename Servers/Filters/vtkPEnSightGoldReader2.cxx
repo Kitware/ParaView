@@ -19,7 +19,7 @@
 #include <vtkstd/vector>
 #include <vtkIOStream.h>
 
-vtkCxxRevisionMacro(vtkPEnSightGoldReader2, "1.2");
+vtkCxxRevisionMacro(vtkPEnSightGoldReader2, "1.3");
 vtkStandardNewMacro(vtkPEnSightGoldReader2);
 
 //BTX
@@ -414,9 +414,9 @@ int vtkPEnSightGoldReader2::ReadMeasuredGeometryFile(
     int realId = this->GetPointIds(partId)->GetId(id);
     if( realId != -1 )
       {
-      vtkIdType tempId = realId;
+      vtkIdType tmp = realId;
       newPoints->InsertNextPoint(coords);
-      geom->InsertNextCell(VTK_VERTEX, 1, &tempId);
+      geom->InsertNextCell(VTK_VERTEX, 1, &tmp);
       }
     }
 
@@ -475,7 +475,7 @@ int vtkPEnSightGoldReader2::ReadScalarsPerNode(const char* fileName, const char*
     {
     int realTimeStep = timeStep - 1;
     // Try to find the nearest time step for which we know the offset
-    int j = 0;
+    j = 0;
     for (i = realTimeStep; i >= 0; i--)
       {
       if (this->FileOffsets.find(fileName) != this->FileOffsets.end()
@@ -515,7 +515,7 @@ int vtkPEnSightGoldReader2::ReadScalarsPerNode(const char* fileName, const char*
 
   if (measured)
     {
-    int partId = this->UnstructuredPartIds->IsId(this->NumberOfGeometryParts);
+    partId = this->UnstructuredPartIds->IsId(this->NumberOfGeometryParts);
     output = this->GetDataSetFromBlock(
                                        compositeOutput, partId);
     numPts = this->GetPointIds(partId)->GetNumberOfIds();
@@ -699,7 +699,7 @@ int vtkPEnSightGoldReader2::ReadVectorsPerNode(const char* fileName, const char*
     {
     int realTimeStep = timeStep - 1;
     // Try to find the nearest time step for which we know the offset
-    int j = 0;
+    j = 0;
     for (i = realTimeStep; i >= 0; i--)
       {
       if (this->FileOffsets.find(fileName) != this->FileOffsets.end()
@@ -739,7 +739,7 @@ int vtkPEnSightGoldReader2::ReadVectorsPerNode(const char* fileName, const char*
 
   if (measured)
     {
-    int partId = this->UnstructuredPartIds->IsId(this->NumberOfGeometryParts);
+    partId = this->UnstructuredPartIds->IsId(this->NumberOfGeometryParts);
     output = this->GetDataSetFromBlock(
                                        compositeOutput, partId);
     numPts = this->GetPointIds(partId)->GetNumberOfIds();
@@ -880,7 +880,7 @@ int vtkPEnSightGoldReader2::ReadTensorsPerNode(const char* fileName, const char*
     {
     int realTimeStep = timeStep - 1;
     // Try to find the nearest time step for which we know the offset
-    int j = 0;
+    j = 0;
     for (i = realTimeStep; i >= 0; i--)
       {
       if (this->FileOffsets.find(fileName) != this->FileOffsets.end()
@@ -1219,7 +1219,7 @@ int vtkPEnSightGoldReader2::ReadVectorsPerElement(const char* fileName,
     {
     int realTimeStep = timeStep - 1;
     // Try to find the nearest time step for which we know the offset
-    int j = 0;
+    j = 0;
     for (i = realTimeStep; i >= 0; i--)
       {
       if (this->FileOffsets.find(fileName) != this->FileOffsets.end()
@@ -1390,7 +1390,7 @@ int vtkPEnSightGoldReader2::ReadTensorsPerElement(const char* fileName,
     {
     int realTimeStep = timeStep - 1;
     // Try to find the nearest time step for which we know the offset
-    int j = 0;
+    j = 0;
     for (i = realTimeStep; i >= 0; i--)
       {
       if (this->FileOffsets.find(fileName) != this->FileOffsets.end()

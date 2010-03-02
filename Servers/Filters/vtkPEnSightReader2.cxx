@@ -41,7 +41,7 @@
 #include "vtkMultiProcessController.h"
 #include "vtkObject.h"
 
-vtkCxxRevisionMacro(vtkPEnSightReader2, "1.1");
+vtkCxxRevisionMacro(vtkPEnSightReader2, "1.2");
 
 typedef vtkstd::vector< vtkPEnSightReader2::vtkPEnSightReader2CellIds* > vtkPEnSightReader2CellIdsTypeBase;
 class vtkPEnSightReader2CellIdsType: public vtkPEnSightReader2CellIdsTypeBase {};
@@ -2325,7 +2325,6 @@ vtkIdType vtkPEnSightReader2::GetLocalTotalNumberOfCellIds(int index)
 {
   int i;
   vtkIdType numCellIds = 0;
-  vtkIdType j = 0;
 
   if(index < 0 || ( (this->UnstructuredPartIds->IsId(index) == -1) && (this->StructuredPartIds->IsId(index) == -1) ))
     {

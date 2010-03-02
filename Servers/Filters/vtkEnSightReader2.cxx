@@ -33,7 +33,7 @@
 #include <vtkstd/string>
 #include <vtkstd/vector>
 
-vtkCxxRevisionMacro(vtkEnSightReader2, "1.2");
+vtkCxxRevisionMacro(vtkEnSightReader2, "1.3");
 
 //----------------------------------------------------------------------------
 typedef vtkstd::vector< vtkSmartPointer<vtkIdList> > vtkEnSightReader2CellIdsTypeBase;
@@ -533,9 +533,8 @@ int vtkEnSightReader2::ReadCaseFileGeometry(char* line)
 //----------------------------------------------------------------------------
 int vtkEnSightReader2::ReadCaseFileVariable(char* line)
 {
-  char formatLine[256];
   char subLine[256], subLine2[256];
-  int timeSet, fileSet, i, filenameNum, increment, lineRead;
+  int timeSet, fileSet, lineRead;
 
   this->NumberOfScalarsPerNode = 0;
   this->NumberOfVectorsPerNode = 0;
@@ -983,9 +982,8 @@ int vtkEnSightReader2::ReadCaseFileVariable(char* line)
 int vtkEnSightReader2::ReadCaseFileTime(char* line)
 {
   char formatLine[256];
-  char subLine[256], subLine2[256];
-  int stringRead;
-  int timeSet, fileSet, numTimeSteps, i, filenameNum, increment, lineRead;
+  char subLine[256];
+  int timeSet, numTimeSteps, i, filenameNum, increment, lineRead;
   float timeStep;
 
   // found TIME section
@@ -1268,11 +1266,7 @@ int vtkEnSightReader2::ReadCaseFileTime(char* line)
 //----------------------------------------------------------------------------
 int vtkEnSightReader2::ReadCaseFileFile(char* line)
 {
-  char formatLine[256];
-  char subLine[256], subLine2[256];
-  int stringRead;
-  int timeSet, fileSet, numTimeSteps, i, filenameNum, increment, lineRead;
-  float timeStep;
+  int fileSet, numTimeSteps, filenameNum, lineRead;
 
   this->UseFileSetsOn();
   lineRead = this->ReadNextDataLine(line);
@@ -1322,11 +1316,10 @@ int vtkEnSightReader2::ReadCaseFileFile(char* line)
 //----------------------------------------------------------------------------
 int vtkEnSightReader2::ReadCaseFile()
 {
-  char line[256], formatLine[256];
-  char subLine[256], subLine2[256];
+  char line[256];
+  char subLine[256];
   int stringRead;
-  int timeSet, fileSet, numTimeSteps, i, filenameNum, increment, lineRead;
-  float timeStep;
+  int i, filenameNum;
   int ret;
   vtkDebugMacro("In vtkEnSightReader2::ReadCaseFile");
 

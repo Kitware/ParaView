@@ -44,7 +44,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVEnSightMasterServerReader2);
-vtkCxxRevisionMacro(vtkPVEnSightMasterServerReader2, "1.1");
+vtkCxxRevisionMacro(vtkPVEnSightMasterServerReader2, "1.2");
 
 vtkCxxSetObjectMacro(vtkPVEnSightMasterServerReader2, Controller,
                      vtkMultiProcessController);
@@ -184,8 +184,8 @@ int vtkPVEnSightMasterServerReader2SyncValues(T*,
 
 //----------------------------------------------------------------------------
 int vtkPVEnSightMasterServerReader2::RequestInformation(
-  vtkInformation *request,
-  vtkInformationVector **inputVector,
+  vtkInformation * vtkNotUsed(request),
+  vtkInformationVector ** vtkNotUsed(inputVector),
   vtkInformationVector *outputVector)
 {
   int i;
@@ -327,18 +327,15 @@ int vtkPVEnSightMasterServerReader2::RequestInformation(
 
   // Compare time set values.
   // Across pieces.
-  vtkDataArray* array;
-  vtkDataArray* pArray;
-  int numValues;
   for(i=0; i < this->Internal->NumberOfTimeSets; ++i)
     {
-    array = timeSets->GetItem(i);
-    numValues = array->GetNumberOfTuples();
+    vtkDataArray* array = timeSets->GetItem(i);
+    vtkIdType numValues = array->GetNumberOfTuples();
     for (unsigned int rIdx = 1 ; rIdx < this->Internal->RealReaders.size() ; rIdx++)
       {
       pTimeSets = this->Internal->RealReaders[rIdx]->GetTimeSets();
-      pArray = pTimeSets->GetItem(i);
-      for(int j=0; j < numValues; ++j)
+      vtkDataArray* pArray = pTimeSets->GetItem(i);
+      for(vtkIdType j=0; j < numValues; ++j)
         {
         if (array->GetTuple1(j) != pArray->GetTuple1(j))
           {
@@ -355,8 +352,8 @@ int vtkPVEnSightMasterServerReader2::RequestInformation(
   for(i=0; i < this->Internal->NumberOfTimeSets; ++i)
     {
     vtkDataArray* array = timeSets->GetItem(i);
-    int numValues = array->GetNumberOfTuples();
-    for(int j=0; j < numValues; ++j)
+    vtkIdType numValues = array->GetNumberOfTuples();
+    for(vtkIdType j=0; j < numValues; ++j)
       {
       this->Internal->TimeSetValues.push_back(array->GetTuple1(j));
       }
@@ -392,8 +389,8 @@ int vtkPVEnSightMasterServerReader2::RequestInformation(
 
 //----------------------------------------------------------------------------
 int vtkPVEnSightMasterServerReader2::RequestData(
-  vtkInformation *request,
-  vtkInformationVector **inputVector,
+  vtkInformation * vtkNotUsed(request),
+  vtkInformationVector ** vtkNotUsed(inputVector),
   vtkInformationVector *outputVector)
 {
   // Do not execute if ExecuteInformation failed.
@@ -729,13 +726,13 @@ const char* vtkPVEnSightMasterServerReader2::GetCellArrayName(int index)
 //----------------------------------------------------------------------------
 int vtkPVEnSightMasterServerReader2::GetPointArrayStatus(const char* name)
 {
-  return this->Internal->RealReaders.size() == 0 ? NULL : this->Internal->RealReaders[0]->GetPointArrayStatus(name);
+  return this->Internal->RealReaders.size() == 0 ? 0 : this->Internal->RealReaders[0]->GetPointArrayStatus(name);
 }
 
 //----------------------------------------------------------------------------
 int vtkPVEnSightMasterServerReader2::GetCellArrayStatus(const char* name)
 {
-  return this->Internal->RealReaders.size() == 0 ? NULL : this->Internal->RealReaders[0]->GetCellArrayStatus(name);
+  return this->Internal->RealReaders.size() == 0 ? 0 : this->Internal->RealReaders[0]->GetCellArrayStatus(name);
 }
 
 //----------------------------------------------------------------------------

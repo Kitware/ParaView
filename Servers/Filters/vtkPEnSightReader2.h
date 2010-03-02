@@ -63,11 +63,11 @@ class VTK_EXPORT vtkPEnSightReader2 : public vtkGenericEnSightReader2
 
   //BTX
 
-//----------------------------------------------------------------------------
-// PointIds and CellIds must be stored in a different way:
-// vtkstd::vector in non distributed mode
-// vtkstd::map in distributed mode
-// note: Ensight Ids are INTEGERS, not longs
+  //----------------------------------------------------------------------------
+  // PointIds and CellIds must be stored in a different way:
+  // vtkstd::vector in non distributed mode
+  // vtkstd::map in distributed mode
+  // note: Ensight Ids are INTEGERS, not longs
   class vtkPEnSightReader2CellIds
   {
 
@@ -82,9 +82,9 @@ class VTK_EXPORT vtkPEnSightReader2 : public vtkGenericEnSightReader2
       this->cellVector = NULL;
       }
 
-    vtkPEnSightReader2CellIds(EnsightReaderCellIdMode mode)
+    vtkPEnSightReader2CellIds(EnsightReaderCellIdMode amode)
       {
-      this->mode = mode;
+      this->mode = amode;
       if( this->mode == SPARSE_MODE )
         {
         this->cellMap = new IntIntMap;
@@ -117,9 +117,9 @@ class VTK_EXPORT vtkPEnSightReader2 : public vtkGenericEnSightReader2
         delete this->cellVector;
       }
 
-    void SetMode(EnsightReaderCellIdMode mode)
+    void SetMode(EnsightReaderCellIdMode amode)
     {
-      this->mode = mode;
+      this->mode = amode;
       if( this->mode == SPARSE_MODE )
         {
         this->cellMap = new IntIntMap;
