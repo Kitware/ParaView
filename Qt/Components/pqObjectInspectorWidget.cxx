@@ -158,7 +158,7 @@ public:
 #ifdef PARAVIEW_USE_SILO
       if(QString("SiloReader") == proxy->getProxy()->GetXMLName())
         {
- 50
+        return new pqSiloPanel(proxy, p);
         }
 #endif
       }
