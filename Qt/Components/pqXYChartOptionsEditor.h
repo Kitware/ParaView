@@ -91,7 +91,20 @@ protected slots:
   // Setters for the axis elements of the form
   void setAxisVisibility(bool visible);
   void setGridVisibility(bool visible);
+  void setAxisColor(const QColor& color);
+  void setGridColor(const QColor& color);
+  void setLabelVisibility(bool visible);
+  void pickLabelFont();
+  void setAxisLabelColor(const QColor& color);
+  void setLabelNotation(int notation);
+  void setLabelPrecision(int precision);
   void setUsingLogScale(bool usingLogScale);
+  void setAxisMinimum();
+  void setAxisMaximum();
+  void pickAxisTitleFont();
+  void setAxisTitleColor(const QColor& color);
+  void setAxisTitle(const QString& title);
+
   void pickTitleFont();
 
 private:

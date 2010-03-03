@@ -4634,7 +4634,7 @@
         number_of_elements="4"
         element_types="2 0 0 0"
         default_values_delimiter=";"
-        default_values="Helvetica;9;0;0" >
+        default_values="Helvetica;12;0;0" >
         <Documentation>
           Set the chart title font (familyname, size, bold, italics).
         </Documentation>
@@ -4702,6 +4702,157 @@
         default_values="1 1 0 0">
         <BooleanDomain name="bool" />
       </IntVectorProperty>
+      
+      <DoubleVectorProperty
+        name="AxisColor"
+        command="SetAxisColor"
+        update_self="1"
+        repeat_command="1"
+        number_of_elements_per_command="3"
+        use_index="1"
+        number_of_elements="12"
+        default_values=
+          "0.0 0.0 0.0   0.0 0.0 0.0   0.0 0.0 0.0   0.0 0.0 0.0">
+        <DoubleRangeDomain name="range" min="0" max="1" />
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+        name="AxisGridColor"
+        command="SetGridColor"
+        update_self="1"
+        use_index="1"
+        repeat_command="1"
+        number_of_elements_per_command="3"
+        number_of_elements="12"
+        default_values=
+          "0.95 0.95 0.95   0.95 0.95 0.95   0.95 0.95 0.95   0.95 0.95 0.95">
+        <DoubleRangeDomain name="range" min="0" max="1" />
+      </DoubleVectorProperty>
+
+      <IntVectorProperty
+        name="ShowAxisLabels"
+        command="SetAxisLabelVisibility"
+        update_self="1"
+        repeat_command="1"
+        use_index="1"
+        number_of_elements_per_command="1"
+        number_of_elements="4"
+        default_values="1 1 1 1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      <StringVectorProperty
+        name="AxisLabelFont"
+        command="SetAxisLabelFont"
+        update_self="1"
+        repeat_command="1"
+        use_index="1"
+        number_of_elements_per_command="4"
+        element_types="2 0 0 0"
+        number_of_elements="16"
+        default_values_delimiter=";"
+        default_values="Helvetica;9;0;0;Helvetica;9;0;0;Helvetica;9;0;0;Helvetica;9;0;0" >
+        <Documentation>
+          Set the axis title font (familyname, size, bold, italics).
+        </Documentation>
+      </StringVectorProperty>
+
+      <DoubleVectorProperty
+        name="AxisLabelColor"
+        command="SetAxisLabelColor"
+        update_self="1"
+        repeat_command="1"
+        use_index="1"
+        number_of_elements_per_command="3"
+        number_of_elements="12"
+        default_values="0 0 0   0 0 0   0 0 0.5   0 0 0.5" >
+        <DoubleRangeDomain name="range" min="0" max="1" />
+      </DoubleVectorProperty>
+
+      <IntVectorProperty
+        name="AxisLabelNotation"
+        command="SetAxisLabelNotation"
+        update_self="1"
+        repeat_command="1"
+        use_index="1"
+        number_of_elements_per_command="1"
+        number_of_elements="4"
+        default_values="0 0 0 0">
+        <IntRangeDomain name="range" min="0" max="2" />
+      </IntVectorProperty>
+
+      <IntVectorProperty
+        name="AxisLabelPrecision"
+        command="SetAxisLabelPrecision"
+        update_self="1"
+        repeat_command="1"
+        use_index="1"
+        number_of_elements_per_command="1"
+        number_of_elements="4"
+        default_values="2 2 2 2">
+        <IntRangeDomain name="range" min="0" max="6" />
+      </IntVectorProperty>
+      
+      <IntVectorProperty
+        name="AxisBehavior"
+        command="SetAxisBehavior"
+        update_self="1"
+        repeat_command="1"
+        use_index="1"
+        number_of_elements_per_command="1"
+        number_of_elements="4"
+        default_values="0 0 0 0">
+        <IntRangeDomain name="range" min="0" max="2" />
+      </IntVectorProperty>
+
+      <DoubleVectorProperty
+        name="AxisRange"
+        command="SetAxisRange"
+        update_self="1"
+        repeat_command="1"
+        use_index="1"
+        number_of_elements_per_command="2"
+        number_of_elements="8"
+        default_values="0 1 0 1 0 1 0 1">
+      </DoubleVectorProperty>
+      
+      <StringVectorProperty
+        name="AxisTitle"
+        command="SetAxisTitle"
+        update_self="1"
+        repeat_command="1"
+        use_index="1"
+        number_of_elements_per_command="1"
+        number_of_elements="4">
+      </StringVectorProperty>
+
+      <StringVectorProperty
+        name="AxisTitleFont"
+        command="SetAxisTitleFont"
+        update_self="1"
+        repeat_command="1"
+        use_index="1"
+        number_of_elements_per_command="4"
+        element_types="2 0 0 0"
+        number_of_elements="16"
+        default_values_delimiter=";"
+        default_values="Helvetica;10;1;0;Helvetica;10;1;0;Helvetica;10;1;0;Helvetica;10;1;0">
+        <Documentation>
+          Set the axis title font (familyname, size, bold, italics).
+        </Documentation>
+      </StringVectorProperty>
+
+      <DoubleVectorProperty
+        name="AxisTitleColor"
+        command="SetAxisTitleColor"
+        update_self="1"
+        repeat_command="1"
+        use_index="1"
+        number_of_elements_per_command="3"
+        number_of_elements="12"
+        default_values="0 0 0   0 0 0   0 0 0.5   0 0 0.5" >
+        <DoubleRangeDomain name="range" min="0" max="1" />
+      </DoubleVectorProperty>
 
     </XYChartViewProxy>
 

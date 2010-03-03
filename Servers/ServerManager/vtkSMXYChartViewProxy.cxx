@@ -19,12 +19,13 @@
 #include "vtkContextScene.h"
 #include "vtkChartXY.h"
 #include "vtkAxis.h"
+#include "vtkPen.h"
 #include "vtkTextProperty.h"
 
 #include "vtkstd/string"
 
 vtkStandardNewMacro(vtkSMXYChartViewProxy);
-vtkCxxRevisionMacro(vtkSMXYChartViewProxy, "1.5");
+vtkCxxRevisionMacro(vtkSMXYChartViewProxy, "1.6");
 //----------------------------------------------------------------------------
 vtkSMXYChartViewProxy::vtkSMXYChartViewProxy()
 {
@@ -125,6 +126,100 @@ void vtkSMXYChartViewProxy::SetGridVisibility(int index, bool visible)
 }
 
 //----------------------------------------------------------------------------
+void vtkSMXYChartViewProxy::SetAxisColor(int index, double red, double green,
+                                         double blue)
+{
+  if (this->Chart)
+    {
+    this->Chart->GetAxis(index)->GetPen()->SetColorF(red, green, blue);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkSMXYChartViewProxy::SetGridColor(int index, double red, double green,
+                                         double blue)
+{
+  if (this->Chart)
+    {
+    this->Chart->GetAxis(index)->GetGridPen()->SetColorF(red, green, blue);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkSMXYChartViewProxy::SetAxisLabelVisibility(int index, bool visible)
+{
+  if (this->Chart)
+    {
+    this->Chart->GetAxis(index)->SetLabelsVisible(visible);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkSMXYChartViewProxy::SetAxisLabelFont(int index, const char* family,
+                                             int pointSize, bool bold,
+                                             bool italic)
+{
+  if (this->Chart)
+    {
+    vtkTextProperty *prop = this->Chart->GetAxis(index)->GetLabelProperties();
+    prop->SetFontFamilyAsString(family);
+    prop->SetFontSize(pointSize);
+    prop->SetBold(static_cast<int>(bold));
+    prop->SetItalic(static_cast<int>(italic));
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkSMXYChartViewProxy::SetAxisLabelColor(int index, double red,
+                                              double green, double blue)
+{
+  if (this->Chart)
+    {
+    this->Chart->GetAxis(index)->GetLabelProperties()->SetColor(red, green,
+                                                                blue);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkSMXYChartViewProxy::SetAxisLabelNotation(int index, int notation)
+{
+  if (this->Chart)
+    {
+    this->Chart->GetAxis(index)->SetNotation(notation);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkSMXYChartViewProxy::SetAxisLabelPrecision(int index, int precision)
+{
+  if (this->Chart)
+    {
+    this->Chart->GetAxis(index)->SetPrecision(precision);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkSMXYChartViewProxy::SetAxisBehavior(int index, int behavior)
+{
+  if (this->Chart)
+    {
+    this->Chart->GetAxis(index)->SetBehavior(behavior);
+    this->Chart->RecalculateBounds();
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkSMXYChartViewProxy::SetAxisRange(int index, double min, double max)
+{
+  if (this->Chart && this->Chart->GetAxis(index)->GetBehavior() > 0)
+    {
+    this->Chart->GetAxis(index)->SetMinimum(min);
+    this->Chart->GetAxis(index)->SetMaximum(max);
+    this->Chart->RecalculateBounds();
+    }
+}
+
+//----------------------------------------------------------------------------
 void vtkSMXYChartViewProxy::SetAxisLogScale(int index, bool logScale)
 {
   if (this->Chart)
@@ -132,6 +227,41 @@ void vtkSMXYChartViewProxy::SetAxisLogScale(int index, bool logScale)
     this->Chart->GetAxis(index)->SetLogScale(logScale);
     this->Chart->Update();
     this->Chart->RecalculateBounds();
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkSMXYChartViewProxy::SetAxisTitle(int index, const char* title)
+{
+  if (this->Chart)
+    {
+    this->Chart->GetAxis(index)->SetTitle(title);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkSMXYChartViewProxy::SetAxisTitleFont(int index, const char* family,
+                                             int pointSize, bool bold,
+                                             bool italic)
+{
+  if (this->Chart)
+    {
+    vtkTextProperty *prop = this->Chart->GetAxis(index)->GetTitleProperties();
+    prop->SetFontFamilyAsString(family);
+    prop->SetFontSize(pointSize);
+    prop->SetBold(static_cast<int>(bold));
+    prop->SetItalic(static_cast<int>(italic));
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkSMXYChartViewProxy::SetAxisTitleColor(int index, double red,
+                                              double green, double blue)
+{
+  if (this->Chart)
+    {
+    this->Chart->GetAxis(index)->GetTitleProperties()->SetColor(red, green,
+                                                                blue);
     }
 }
 

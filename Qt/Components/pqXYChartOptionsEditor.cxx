@@ -44,6 +44,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QString>
 #include <QStringList>
 #include <QStringListModel>
+#include <QDebug>
 
 // Use the property links/manager etc
 #include "pqNamedWidgets.h"
@@ -213,6 +214,17 @@ pqXYChartOptionsEditor::pqXYChartOptionsEditor(QWidget *widgetParent)
   this->Internal->Form = new pqXYChartOptionsEditorForm();
   this->Internal->Form->setupUi(this);
 
+  // Adjust a few of the form elements
+  this->Internal->Form->GridType->setHidden(true);
+  this->Internal->Form->label_18->setHidden(true);
+  this->Internal->Form->label_25->setHidden(true);
+  this->Internal->Form->LabelNotation->clear();
+  this->Internal->Form->LabelNotation->addItem("Mixed");
+  this->Internal->Form->LabelNotation->addItem("Scientific");
+  this->Internal->Form->LabelNotation->addItem("Fixed");
+  this->Internal->Form->label_12->setHidden(true);
+  this->Internal->Form->AxisTitleAlignment->setHidden(true);
+
   // Connect up some of the form elements
   QObject::connect(this->Internal->Form->ChartTitleFontButton,
                    SIGNAL(clicked()), this, SLOT(pickTitleFont()));
@@ -229,8 +241,43 @@ pqXYChartOptionsEditor::pqXYChartOptionsEditor(QWidget *widgetParent)
                    this, SLOT(setAxisVisibility(bool)));
   QObject::connect(this->Internal->Form->ShowAxisGrid, SIGNAL(toggled(bool)),
                    this, SLOT(setGridVisibility(bool)));
+  QObject::connect(this->Internal->Form->AxisColor,
+                   SIGNAL(chosenColorChanged(QColor)),
+                   this, SLOT(setAxisColor(QColor)));
+  QObject::connect(this->Internal->Form->GridColor,
+                   SIGNAL(chosenColorChanged(QColor)),
+                   this, SLOT(setGridColor(QColor)));
+  QObject::connect(this->Internal->Form->ShowAxisLabels, SIGNAL(toggled(bool)),
+                   this, SLOT(setLabelVisibility(bool)));
+  QObject::connect(this->Internal->Form->AxisLabelFontButton,
+                   SIGNAL(clicked()), this, SLOT(pickLabelFont()));
+  QObject::connect(this->Internal->Form->LabelColor,
+                   SIGNAL(chosenColorChanged(QColor)),
+                   this, SLOT(setAxisLabelColor(QColor)));
+  QObject::connect(this->Internal->Form->LabelNotation,
+                   SIGNAL(currentIndexChanged(int)),
+                   this, SLOT(setLabelNotation(int)));
+  QObject::connect(this->Internal->Form->LabelPrecision,
+                   SIGNAL(valueChanged(int)),
+                   this, SLOT(setLabelPrecision(int)));
+
+  QObject::connect(this->Internal->Form->AxisMinimum, SIGNAL(textEdited(QString)),
+                   this, SLOT(setAxisMinimum()));
+  QObject::connect(this->Internal->Form->AxisMaximum, SIGNAL(textEdited(QString)),
+                   this, SLOT(setAxisMaximum()));
+
   QObject::connect(this->Internal->Form->UseLogScale, SIGNAL(toggled(bool)),
                    this, SLOT(setUsingLogScale(bool)));
+
+  // Axis title
+  QObject::connect(this->Internal->Form->AxisTitleText,
+                   SIGNAL(textChanged(QString)),
+                   this, SLOT(setAxisTitle(QString)));
+  QObject::connect(this->Internal->Form->AxisTitleFontButton,
+                   SIGNAL(clicked()), this, SLOT(pickAxisTitleFont()));
+  QObject::connect(this->Internal->Form->AxisTitleColor,
+                   SIGNAL(chosenColorChanged(QColor)),
+                   this, SLOT(setAxisTitleColor(QColor)));
 
   // Connect up some signals and slots for the property links
   QObject::connect(&this->Internal->Links, SIGNAL(modified()),
@@ -410,12 +457,138 @@ void pqXYChartOptionsEditor::setGridVisibility(bool visible)
     }
 }
 
+void pqXYChartOptionsEditor::setAxisColor(const QColor& color)
+{
+  if(this->Internal->Form->AxisIndex != -1)
+    {
+    this->Internal->Form->AxisData[this->Internal->Form->AxisIndex]->AxisColor
+        = color;
+    this->changesAvailable();
+    }
+}
+
+void pqXYChartOptionsEditor::setGridColor(const QColor& color)
+{
+  if(this->Internal->Form->AxisIndex != -1)
+    {
+    this->Internal->Form->AxisData[this->Internal->Form->AxisIndex]->GridColor
+        = color;
+    this->changesAvailable();
+    }
+}
+
+void pqXYChartOptionsEditor::setLabelVisibility(bool visible)
+{
+  if(this->Internal->Form->AxisIndex != -1)
+    {
+    this->Internal->Form->AxisData[this->Internal->Form->AxisIndex]->ShowLabels
+        = visible;
+    this->changesAvailable();
+    }
+}
+
+void pqXYChartOptionsEditor::pickLabelFont()
+{
+  if(this->Internal->Form->AxisIndex != -1)
+    {
+    this->pickFont(this->Internal->Form->AxisLabelFont,
+        this->Internal->Form->AxisData[this->Internal->Form->AxisIndex]->LabelFont);
+    this->changesAvailable();
+    }
+}
+
+void pqXYChartOptionsEditor::setAxisLabelColor(const QColor& color)
+{
+  if(this->Internal->Form->AxisIndex != -1)
+    {
+    this->Internal->Form->AxisData[this->Internal->Form->AxisIndex]->LabelColor
+        = color;
+    this->changesAvailable();
+    }
+}
+
+void pqXYChartOptionsEditor::setLabelNotation(int notation)
+{
+  if(this->Internal->Form->AxisIndex != -1)
+    {
+    this->Internal->Form->AxisData[this->Internal->Form->AxisIndex]->Notation
+        = notation;
+    this->changesAvailable();
+    }
+}
+
+void pqXYChartOptionsEditor::setLabelPrecision(int precision)
+{
+  if(this->Internal->Form->AxisIndex != -1)
+    {
+    this->Internal->Form->AxisData[this->Internal->Form->AxisIndex]->Precision
+        = precision;
+    this->changesAvailable();
+    }
+}
+
 void pqXYChartOptionsEditor::setUsingLogScale(bool usingLogScale)
 {
   if(this->Internal->Form->AxisIndex != -1)
     {
     this->Internal->Form->AxisData[this->Internal->Form->AxisIndex]->UseLogScale
         = usingLogScale;
+    this->changesAvailable();
+    }
+}
+
+void pqXYChartOptionsEditor::setAxisMinimum()
+{
+  if(this->Internal->Form->AxisIndex != -1)
+    {
+    this->Internal->Form->AxisData[this->Internal->Form->AxisIndex]->Minimum
+        = this->Internal->Form->AxisMinimum->text();
+    this->changesAvailable();
+    }
+}
+
+void pqXYChartOptionsEditor::setAxisMaximum()
+{
+  if(this->Internal->Form->AxisIndex != -1)
+    {
+    this->Internal->Form->AxisData[this->Internal->Form->AxisIndex]->Maximum
+        = this->Internal->Form->AxisMaximum->text();
+    this->changesAvailable();
+    }
+}
+
+void pqXYChartOptionsEditor::pickTitleFont()
+{
+  this->pickFont(this->Internal->Form->ChartTitleFont,
+                 this->Internal->Form->TitleFont);
+}
+
+void pqXYChartOptionsEditor::pickAxisTitleFont()
+{
+  if(this->Internal->Form->AxisIndex != -1)
+    {
+    this->pickFont(this->Internal->Form->AxisTitleFont,
+      this->Internal->Form->AxisData[this->Internal->Form->AxisIndex]->TitleFont);
+    this->changesAvailable();
+    }
+}
+
+void pqXYChartOptionsEditor::setAxisTitleColor(const QColor& color)
+{
+  if(this->Internal->Form->AxisIndex != -1)
+    {
+    this->Internal->Form->AxisData[this->Internal->Form->AxisIndex]->TitleColor
+        = color;
+    this->changesAvailable();
+    }
+}
+
+void pqXYChartOptionsEditor::setAxisTitle(const QString& text)
+{
+  if(this->Internal->Form->AxisIndex != -1)
+    {
+    this->Internal->Form->AxisData[this->Internal->Form->AxisIndex]->Title
+        = text;
     this->changesAvailable();
     }
 }
@@ -467,6 +640,125 @@ void pqXYChartOptionsEditor::updateOptions()
     {
     this->Internal->Form->AxisData[i]->ShowGrid = values[i].toInt() != 0;
     }
+  values = pqSMAdaptor::getMultipleElementProperty(
+      proxy->GetProperty("AxisColor"));
+  if(values.size() == 12)
+    {
+    for(int i = 0; i < 4; ++i)
+      {
+      this->Internal->Form->AxisData[i]->AxisColor = QColor::fromRgbF(
+          values[3*i].toDouble(), values[3*i + 1].toDouble(),
+          values[3*i + 2].toDouble());
+      }
+    }
+  values = pqSMAdaptor::getMultipleElementProperty(
+      proxy->GetProperty("AxisGridColor"));
+  if(values.size() == 12)
+    {
+    for(int i = 0; i < 4; ++i)
+      {
+      this->Internal->Form->AxisData[i]->GridColor = QColor::fromRgbF(
+          values[3*i].toDouble(), values[3*i + 1].toDouble(),
+          values[3*i + 2].toDouble());
+      }
+    }
+
+  // Axis label parameters
+  values = pqSMAdaptor::getMultipleElementProperty(
+      proxy->GetProperty("ShowAxisLabels"));
+  for(int i = 0; i < 4 && i < values.size(); ++i)
+    {
+    this->Internal->Form->AxisData[i]->ShowLabels = values[i].toInt() != 0;
+    }
+
+  values = pqSMAdaptor::getMultipleElementProperty(
+      proxy->GetProperty("AxisLabelFont"));
+  if (values.size() == 16)
+    {
+    for(int i = 0; i < 4; ++i)
+      {
+      int j = 4*i;
+      this->Internal->Form->AxisData[i]->LabelFont =
+          QFont(values[j].toString(), values[j + 1].toInt(),
+                values[j + 2].toInt() != 0 ? QFont::Bold : -1,
+                values[j + 3].toInt() != 0);
+      }
+    }
+
+  values = pqSMAdaptor::getMultipleElementProperty(
+      proxy->GetProperty("AxisLabelColor"));
+  if (values.size() == 12)
+    {
+    for(int i = 0; i < 4; ++i)
+      {
+      this->Internal->Form->AxisData[i]->LabelColor = QColor::fromRgbF(
+          values[3*i].toDouble(), values[3*i + 1].toDouble(),
+          values[3*i + 2].toDouble());
+      }
+    }
+
+  values = pqSMAdaptor::getMultipleElementProperty(
+      proxy->GetProperty("AxisLabelNotation"));
+  for(int i = 0; i < 4 && i < values.size(); ++i)
+    {
+    this->Internal->Form->AxisData[i]->Notation = values[i].toInt();
+    }
+
+  values = pqSMAdaptor::getMultipleElementProperty(
+      proxy->GetProperty("AxisLabelPrecision"));
+  for(int i = 0; i < 4 && i < values.size(); ++i)
+    {
+    this->Internal->Form->AxisData[i]->Precision = values[i].toInt();
+    }
+
+  values = pqSMAdaptor::getMultipleElementProperty(
+      proxy->GetProperty("AxisBehavior"));
+  for(int i = 0; i < 4 && i < values.size(); ++i)
+    {
+    this->Internal->Form->AxisData[i]->AxisLayout = values[i].toInt();
+    }
+
+  values = pqSMAdaptor::getMultipleElementProperty(
+      proxy->GetProperty("AxisRange"));
+  for(int i = 0; i < 4 && values.size() == 8; ++i)
+    {
+    this->Internal->Form->AxisData[i]->Minimum = values[2*i].toString();
+    this->Internal->Form->AxisData[i]->Maximum = values[2*i+1].toString();
+    }
+
+  values = pqSMAdaptor::getMultipleElementProperty(
+      proxy->GetProperty("AxisTitle"));
+
+  for(int i = 0; i < 4; ++i)
+    {
+    this->Internal->Form->AxisData[i]->Title = values[i].toString();
+    }
+
+  values = pqSMAdaptor::getMultipleElementProperty(
+      proxy->GetProperty("AxisTitleFont"));
+  if (values.size() == 16)
+    {
+    for(int i = 0; i < 4; ++i)
+      {
+      int j = 4*i;
+      this->Internal->Form->AxisData[i]->TitleFont =
+          QFont(values[j].toString(), values[j + 1].toInt(),
+                values[j + 2].toInt() != 0 ? QFont::Bold : -1,
+                values[j + 3].toInt() != 0);
+      }
+    }
+
+  values = pqSMAdaptor::getMultipleElementProperty(
+      proxy->GetProperty("AxisTitleColor"));
+  if (values.size() == 12)
+    {
+    for(int i = 0; i < 4; ++i)
+      {
+      this->Internal->Form->AxisData[i]->TitleColor = QColor::fromRgbF(
+          values[3*i].toDouble(), values[3*i + 1].toDouble(),
+          values[3*i + 2].toDouble());
+      }
+    }
 
   this->blockSignals(false);
 
@@ -514,6 +806,101 @@ void pqXYChartOptionsEditor::applyAxisOptions()
   pqSMAdaptor::setMultipleElementProperty(
       proxy->GetProperty("ShowAxisGrid"), values);
 
+  // Axis color
+  values.clear();
+  for(int i = 0; i < 4; ++i)
+    {
+    QColor color = this->Internal->Form->AxisData[i]->AxisColor;
+    values.append(QVariant(static_cast<double>(color.redF())));
+    values.append(QVariant(static_cast<double>(color.greenF())));
+    values.append(QVariant(static_cast<double>(color.blueF())));
+    }
+  pqSMAdaptor::setMultipleElementProperty(
+      proxy->GetProperty("AxisColor"), values);
+
+  // Axis color
+  values.clear();
+  for(int i = 0; i < 4; ++i)
+    {
+    QColor color = this->Internal->Form->AxisData[i]->GridColor;
+    values.append(QVariant(static_cast<double>(color.redF())));
+    values.append(QVariant(static_cast<double>(color.greenF())));
+    values.append(QVariant(static_cast<double>(color.blueF())));
+    }
+  pqSMAdaptor::setMultipleElementProperty(
+      proxy->GetProperty("AxisGridColor"), values);
+
+  // Axis label visibility
+  values.clear();
+  for(int i = 0; i < 4; ++i)
+    {
+    values.append(this->Internal->Form->AxisData[i]->ShowLabels);
+    }
+  pqSMAdaptor::setMultipleElementProperty(
+      proxy->GetProperty("ShowAxisLabels"), values);
+
+  // Label color
+  values.clear();
+  for(int i = 0; i < 4; ++i)
+    {
+    QColor color = this->Internal->Form->AxisData[i]->LabelColor;
+    values.append(QVariant(static_cast<double>(color.redF())));
+    values.append(QVariant(static_cast<double>(color.greenF())));
+    values.append(QVariant(static_cast<double>(color.blueF())));
+    }
+  pqSMAdaptor::setMultipleElementProperty(
+      proxy->GetProperty("AxisLabelColor"), values);
+
+  // Axis label font
+  values.clear();
+  for (int i = 0; i < 4; ++i)
+    {
+    QFont font = this->Internal->Form->AxisData[i]->LabelFont;
+    values.append(QVariant(font.family()));
+    values.append(QVariant(font.pointSize()));
+    values.append(QVariant(font.bold() ? 1 : 0));
+    values.append(QVariant(font.italic() ? 1 : 0));
+    }
+  pqSMAdaptor::setMultipleElementProperty(
+      proxy->GetProperty("AxisLabelFont"), values);
+
+  // Axis label notation
+  values.clear();
+  for(int i = 0; i < 4; ++i)
+    {
+    values.append(this->Internal->Form->AxisData[i]->Notation);
+    }
+  pqSMAdaptor::setMultipleElementProperty(
+      proxy->GetProperty("AxisLabelNotation"), values);
+
+  // Axis label precision
+  values.clear();
+  for(int i = 0; i < 4; ++i)
+    {
+    values.append(this->Internal->Form->AxisData[i]->Precision);
+    }
+  pqSMAdaptor::setMultipleElementProperty(
+      proxy->GetProperty("AxisLabelPrecision"), values);
+
+  // Axis behavior
+  values.clear();
+  for(int i = 0; i < 4; ++i)
+    {
+    values.append(this->Internal->Form->AxisData[i]->AxisLayout);
+    }
+  pqSMAdaptor::setMultipleElementProperty(
+      proxy->GetProperty("AxisBehavior"), values);
+
+  // Axis range
+  values.clear();
+  for(int i = 0; i < 4; ++i)
+    {
+    values.append(this->Internal->Form->AxisData[i]->Minimum);
+    values.append(this->Internal->Form->AxisData[i]->Maximum);
+    }
+  pqSMAdaptor::setMultipleElementProperty(
+      proxy->GetProperty("AxisRange"), values);
+
   // Axis use log scale
   values.clear();
   for(int i = 0; i < 4; ++i)
@@ -522,6 +909,40 @@ void pqXYChartOptionsEditor::applyAxisOptions()
     }
   pqSMAdaptor::setMultipleElementProperty(
       proxy->GetProperty("AxisLogScale"), values);
+
+  // Axis title
+  values.clear();
+  for(int i = 0; i < 4; ++i)
+    {
+    values.append(QVariant(this->Internal->Form->AxisData[i]->Title));
+    }
+  pqSMAdaptor::setMultipleElementProperty(
+      proxy->GetProperty("AxisTitle"), values);
+
+  // Axis title color
+  values.clear();
+  for(int i = 0; i < 4; ++i)
+    {
+    QColor color = this->Internal->Form->AxisData[i]->TitleColor;
+    values.append(QVariant(static_cast<double>(color.redF())));
+    values.append(QVariant(static_cast<double>(color.greenF())));
+    values.append(QVariant(static_cast<double>(color.blueF())));
+    }
+  pqSMAdaptor::setMultipleElementProperty(
+      proxy->GetProperty("AxisTitleColor"), values);
+
+  // Axis title font
+  values.clear();
+  for (int i = 0; i < 4; ++i)
+    {
+    QFont font = this->Internal->Form->AxisData[i]->TitleFont;
+    values.append(QVariant(font.family()));
+    values.append(QVariant(font.pointSize()));
+    values.append(QVariant(font.bold() ? 1 : 0));
+    values.append(QVariant(font.italic() ? 1 : 0));
+    }
+  pqSMAdaptor::setMultipleElementProperty(
+      proxy->GetProperty("AxisTitleFont"), values);
 }
 
 void pqXYChartOptionsEditor::loadAxisPage()
@@ -531,8 +952,6 @@ void pqXYChartOptionsEditor::loadAxisPage()
           this->Internal->Form->AxisData[this->Internal->Form->AxisIndex];
   this->Internal->Form->ShowAxis->setChecked(axis->ShowAxis);
   this->Internal->Form->ShowAxisGrid->setChecked(axis->ShowGrid);
-  this->Internal->Form->GridType->setHidden(true);
-  this->Internal->Form->label_18->setHidden(true);
   this->Internal->Form->AxisColor->setChosenColor(axis->AxisColor);
   this->Internal->Form->GridColor->setChosenColor(axis->GridColor);
   this->Internal->Form->ShowAxisLabels->setChecked(axis->ShowLabels);
@@ -616,6 +1035,7 @@ void pqXYChartOptionsEditor::changeLayoutPage(bool checked)
               this->Internal->Form->BlankPage);
       axis->AxisLayout = 0;
       }
+    this->changesAvailable();
     }
 }
 
@@ -626,12 +1046,6 @@ void pqXYChartOptionsEditor::updateRemoveButton()
     QItemSelectionModel *model = this->Internal->Form->LabelList->selectionModel();
     this->Internal->Form->RemoveButton->setEnabled(model->hasSelection());
     }
-}
-
-void pqXYChartOptionsEditor::pickTitleFont()
-{
-  this->pickFont(this->Internal->Form->ChartTitleFont,
-                 this->Internal->Form->TitleFont);
 }
 
 bool pqXYChartOptionsEditor::pickFont(QLabel *label, QFont &font)
