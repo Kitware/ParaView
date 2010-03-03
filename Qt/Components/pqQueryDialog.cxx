@@ -177,13 +177,39 @@ pqQueryDialog::pqQueryDialog(
     // don't show the extract selection over time option is there's not time!
     this->Internals->extractSelectionOverTime->hide();
     }
+
+  QApplication::instance()->installEventFilter(this);
 }
 
 //-----------------------------------------------------------------------------
 pqQueryDialog::~pqQueryDialog()
 {
+  QApplication::instance()->removeEventFilter(this);
   delete this->Internals;
   this->Internals = 0;
+}
+
+#include <QInputEvent>
+#include <pqCoreUtilities.h>
+#include "QVTKWidget.h"
+//-----------------------------------------------------------------------------
+bool pqQueryDialog::eventFilter(QObject* obj, QEvent* evt)
+{
+  QWidget* wdg = qobject_cast<QWidget*>(obj);
+  bool is_input_event = (dynamic_cast<QInputEvent*>(evt) != NULL);
+  bool is_meant_for_dialog =
+    (wdg == NULL || this->isAncestorOf(wdg) || this == wdg);
+  bool is_render_window = (qobject_cast<QVTKWidget*>(obj));
+  bool is_magical_event =
+    (is_meant_for_dialog || !pqCoreUtilities::mainWidget()->isAncestorOf(wdg));
+  
+  if (is_input_event && !is_meant_for_dialog && !is_magical_event &&
+    !is_render_window)
+    {
+    return true;
+    }
+      
+  return this->Superclass::eventFilter(obj, evt);
 }
 
 //-----------------------------------------------------------------------------

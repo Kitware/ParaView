@@ -110,6 +110,10 @@ protected:
   /// link the label-color widget with the active label-color property.
   void linkLabelColorWidet(vtkSMProxy*, const QString& propname);
 
+  /// helps in simulating modal behavior but allowing interaction with render
+  /// windows.
+  virtual bool eventFilter(QObject*, QEvent*);
+
   bool ExtractSelectionOverTime;
   bool ExtractSelection;
 private:

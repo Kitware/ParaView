@@ -38,6 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqQueryDialog.h"
 #include "pqSelectionManager.h"
 
+#include <QEventLoop>
 //-----------------------------------------------------------------------------
 pqDataQueryReaction::pqDataQueryReaction(QAction* parentObject)
   : Superclass(parentObject)
@@ -79,8 +80,11 @@ void pqDataQueryReaction::showQueryDialog()
     QObject::connect(&dialog, SIGNAL(selected(pqOutputPort*)),
       selManager, SLOT(select(pqOutputPort*)));
     }
-  dialog.exec();
-
+  dialog.show();
+  QEventLoop loop;
+  QObject::connect(&dialog, SIGNAL(finished(int)),
+    &loop, SLOT(quit()));
+  loop.exec();
   if (dialog.extractSelection())
     {
     pqFiltersMenuReaction::createFilter("filters", "ExtractSelection");
