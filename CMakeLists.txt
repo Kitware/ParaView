@@ -112,6 +112,8 @@ ENDIF (PARAVIEW_BUILD_QT_GUI)
 # Mark these Qt variables as advanced. Users don't really have to set them.
 MARK_AS_ADVANCED(VTK_USE_QT VTK_USE_GUISUPPORT)
 MARK_AS_ADVANCED(QT_MKSPECS_DIR QT_PLUGINS_DIR QT_X11_X11_LIBRARY QT_X11_Xext_LIBRARY QT_X11_m_LIBRARY)
+# these should be all marked as advanced automatically but FindQt4 in cmake ...
+MARK_AS_ADVANCED(QT_QTMOTIF_INCLUDE_DIR QT_QTMOTIF_LIBRARY_DEBUG QT_QTMOTIF_LIBRARY_RELEASE QT_HELP_GENERATOR)
 
 # Mark certain VTK variables as advanced. Users do not really have to set these.
 IF (APPLE)
