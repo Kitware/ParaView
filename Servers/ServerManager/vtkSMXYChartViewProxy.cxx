@@ -24,12 +24,16 @@
 
 #include "vtkstd/string"
 
+#include <QString>
+#include <QRegExp>
+
 vtkStandardNewMacro(vtkSMXYChartViewProxy);
-vtkCxxRevisionMacro(vtkSMXYChartViewProxy, "1.6");
+vtkCxxRevisionMacro(vtkSMXYChartViewProxy, "1.7");
 //----------------------------------------------------------------------------
 vtkSMXYChartViewProxy::vtkSMXYChartViewProxy()
 {
   this->Chart = NULL;
+  this->InternalTitle = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -40,6 +44,7 @@ vtkSMXYChartViewProxy::~vtkSMXYChartViewProxy()
     this->Chart->Delete();
     this->Chart = NULL;
     }
+  this->SetInternalTitle(NULL);
 }
 
 //----------------------------------------------------------------------------
@@ -63,7 +68,16 @@ void vtkSMXYChartViewProxy::SetTitle(const char* title)
 {
   if (this->Chart)
     {
-    this->Chart->SetTitle(title);
+    QString tmp(title);
+    if (tmp.contains("${TIME}",  Qt::CaseInsensitive))
+      {
+      this->SetInternalTitle(title);
+      }
+    else
+      {
+      this->Chart->SetTitle(title);
+      this->SetInternalTitle(NULL);
+      }
     }
 }
 
@@ -277,6 +291,14 @@ void vtkSMXYChartViewProxy::PerformRender()
   if (!this->Chart)
     {
     return;
+    }
+  if (this->InternalTitle)
+    {
+    QString time = QString::number(this->GetViewUpdateTime());
+    QRegExp regExp("\\$\\{TIME\\}", Qt::CaseInsensitive);
+    QString title = this->InternalTitle;
+    title = title.replace(regExp, time);
+    this->Chart->SetTitle(title.toAscii().data());
     }
 
   this->ChartView->Render();

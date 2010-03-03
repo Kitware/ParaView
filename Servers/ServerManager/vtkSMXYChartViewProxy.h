@@ -200,6 +200,14 @@ protected:
   virtual void PerformRender();
 
   // Description:
+  // Set the internal title, for managing time replacement in the chart title.
+  vtkSetStringMacro(InternalTitle);
+
+  // Description:
+  // Store the unreplaced chart title in the case where ${TIME} is used...
+  char* InternalTitle;
+
+  // Description:
   // Pointer to the proxy's chart instance.
   vtkChartXY* Chart;
 
