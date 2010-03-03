@@ -1,5 +1,6 @@
 PROJECT(pqCore)
 
+
 # Any build configured headers should be added to this 
 # variable so that they also get installed.
 SET (dynamicHeaders)

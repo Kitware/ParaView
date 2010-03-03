@@ -26,9 +26,10 @@
 #include <vtkstd/algorithm>
 #include <vtkstd/set>
 #include <vtkstd/string>
+#include <vtkstd/iterator>
 
 vtkStandardNewMacro(vtkCleanArrays);
-vtkCxxRevisionMacro(vtkCleanArrays, "1.2");
+vtkCxxRevisionMacro(vtkCleanArrays, "1.3");
 vtkCxxSetObjectMacro(vtkCleanArrays, Controller, vtkMultiProcessController);
 //----------------------------------------------------------------------------
 vtkCleanArrays::vtkCleanArrays()

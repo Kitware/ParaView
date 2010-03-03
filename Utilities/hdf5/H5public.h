@@ -38,11 +38,11 @@
 #ifdef H5_STDC_HEADERS
 #   include <limits.h>    /*for H5T_NATIVE_CHAR defn in H5Tpublic.h    */
 #endif
-#ifndef __cplusplus
+//#ifndef __cplusplus
 #ifdef H5_HAVE_STDINT_H
 #   include <stdint.h>    /*for C9x types             */
 #endif
-#endif
+//#endif
 #ifdef H5_HAVE_INTTYPES_H
 #   include <inttypes.h>        /* For uint64_t on some platforms            */
 #endif

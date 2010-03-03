@@ -27,6 +27,7 @@
 #include <vtksys/SystemTools.hxx>
 #include <vtkstd/set>
 #include <vtkstd/algorithm>
+#include <vtkstd/iterator>
 
 //-----------------------------------------------------------------------------
 class vtkPVOpenGLExtensionsInformationInternal
@@ -39,7 +40,7 @@ public:
 //-----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkPVOpenGLExtensionsInformation);
-vtkCxxRevisionMacro(vtkPVOpenGLExtensionsInformation, "1.2");
+vtkCxxRevisionMacro(vtkPVOpenGLExtensionsInformation, "1.3");
 //-----------------------------------------------------------------------------
 vtkPVOpenGLExtensionsInformation::vtkPVOpenGLExtensionsInformation()
 {

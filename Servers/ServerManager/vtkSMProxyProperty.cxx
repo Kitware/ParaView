@@ -28,11 +28,12 @@
 #include <vtkstd/map>
 #include <vtkstd/set>
 #include <vtkstd/vector>
+#include <vtkstd/iterator>
 
 #include "vtkStdString.h"
 
 vtkStandardNewMacro(vtkSMProxyProperty);
-vtkCxxRevisionMacro(vtkSMProxyProperty, "1.58");
+vtkCxxRevisionMacro(vtkSMProxyProperty, "1.59");
 
 struct vtkSMProxyPropertyInternals
 {
