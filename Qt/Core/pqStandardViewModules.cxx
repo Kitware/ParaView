@@ -281,13 +281,15 @@ pqView* pqStandardViewModules::createView(const QString& viewtype,
     return new pqScatterPlotView(
       group, viewname, viewmodule, server, p);
     }
-  else if (viewmodule->IsA("vtkSMXYChartViewProxy"))
+  else if (viewmodule->IsA("vtkSMXYChartViewProxy") &&
+           viewtype == "XYChartView")
     {
     return new pqXYChartView(group, viewname,
                             vtkSMXYChartViewProxy::SafeDownCast(viewmodule),
                             server, p);
     }
-  else if (viewmodule->IsA("vtkSMXYBarChartViewProxy"))
+  else if (viewmodule->IsA("vtkSMXYChartViewProxy") &&
+           viewtype == "XYBarChartView")
     {
     return new pqXYBarChartView(group, viewname,
                                 vtkSMXYChartViewProxy::SafeDownCast(viewmodule),

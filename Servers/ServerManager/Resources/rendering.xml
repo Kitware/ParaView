@@ -4604,21 +4604,12 @@
 #endif
 
 #ifdef VTK_USE_QVTK
-    <XYChartViewProxy name="XYChartView"
+    <XYChartViewProxy name="XYChartViewBase"
       base_proxygroup="views"
-      base_proxyname="ViewBase"
-      representation_name="XYChartRepresentation">
+      base_proxyname="ViewBase">
       <Documentation>
-        This is the proxy for XY plot view.
+        This is the base proxy for XY chart views.
       </Documentation>
-
-      <StringVectorProperty
-        name="ChartType"
-        command="SetChartType"
-        update_self="1"
-        number_of_elements="1"
-        default_values="Line" >
-      </StringVectorProperty>
 
       <StringVectorProperty
         name="ChartTitle"
@@ -4856,9 +4847,27 @@
 
     </XYChartViewProxy>
 
+    <XYChartViewProxy name="XYChartView"
+      base_proxygroup="views"
+      base_proxyname="XYChartViewBase"
+      representation_name="XYChartRepresentation">
+      <Documentation>
+        This is the proxy for the XY line chart view.
+      </Documentation>
+
+      <StringVectorProperty
+        name="ChartType"
+        command="SetChartType"
+        update_self="1"
+        number_of_elements="1"
+        default_values="Line" >
+      </StringVectorProperty>
+
+    </XYChartViewProxy>
+
     <XYChartViewProxy name="XYBarChartView"
       base_proxygroup="views"
-      base_proxyname="ViewBase"
+      base_proxyname="XYChartViewBase"
       representation_name="XYBarChartRepresentation">
       <Documentation>
         This is the proxy for bar chart view.

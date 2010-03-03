@@ -63,6 +63,7 @@ void pqActiveXYChartOptions::showOptions(pqView *view, const QString &page,
     this->Dialog = new pqOptionsDialog(widgetParent);
     this->Dialog->setObjectName("ActiveChartOptions");
     this->Editor = new pqXYChartOptionsEditor();
+    this->changeView(view);
     this->Dialog->addOptions(this->Editor);
 
     this->connect(this->Dialog, SIGNAL(finished(int)),

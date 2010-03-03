@@ -118,7 +118,7 @@ pqXYChartOptionsEditorAxis::pqXYChartOptionsEditorAxis()
     Maximum(), Labels()
 {
   this->GridType = 0;
-  this->Notation = 3;
+  this->Notation = 0;
   this->Precision = 2;
   this->AxisLayout = 0;
   this->TitleAlignment = 1;
@@ -378,12 +378,15 @@ QStringList pqXYChartOptionsEditor::getPageList()
   pages.append("Bottom Axis");
   pages.append("Bottom Axis.Layout");
   pages.append("Bottom Axis.Title");
-  pages.append("Right Axis");
-  pages.append("Right Axis.Layout");
-  pages.append("Right Axis.Title");
-  pages.append("Top Axis");
-  pages.append("Top Axis.Layout");
-  pages.append("Top Axis.Title");
+  if (this->Internal->XYChartView)
+    {
+    pages.append("Right Axis");
+    pages.append("Right Axis.Layout");
+    pages.append("Right Axis.Title");
+    pages.append("Top Axis");
+    pages.append("Top Axis.Layout");
+    pages.append("Top Axis.Title");
+    }
   return pages;
 }
 
@@ -729,8 +732,7 @@ void pqXYChartOptionsEditor::updateOptions()
 
   values = pqSMAdaptor::getMultipleElementProperty(
       proxy->GetProperty("AxisTitle"));
-
-  for(int i = 0; i < 4; ++i)
+  for(int i = 0; i < 4 && i < values.size(); ++i)
     {
     this->Internal->Form->AxisData[i]->Title = values[i].toString();
     }
