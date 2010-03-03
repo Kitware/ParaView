@@ -64,7 +64,6 @@ void pqActiveXYChartOptions::showOptions(pqView *view, const QString &page,
     this->Dialog->setObjectName("ActiveChartOptions");
     this->Editor = new pqXYChartOptionsEditor();
     this->Dialog->addOptions(this->Editor);
-    this->Editor->setView(view);
 
     this->connect(this->Dialog, SIGNAL(finished(int)),
         this, SLOT(finishDialog(int)));
@@ -94,6 +93,7 @@ void pqActiveXYChartOptions::changeView(pqView *view)
 {
   if(this->Dialog)
     {
+    this->Editor->setView(view);
     this->Dialog->setWindowTitle("View Settings");
     }
 }
