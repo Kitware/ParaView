@@ -222,6 +222,7 @@ pqXYChartOptionsEditor::pqXYChartOptionsEditor(QWidget *widgetParent)
   this->Internal->Form->LabelNotation->addItem("Mixed");
   this->Internal->Form->LabelNotation->addItem("Scientific");
   this->Internal->Form->LabelNotation->addItem("Fixed");
+  this->Internal->Form->UseFixedInterval->setHidden(true);
   this->Internal->Form->label_12->setHidden(true);
   this->Internal->Form->AxisTitleAlignment->setHidden(true);
 
