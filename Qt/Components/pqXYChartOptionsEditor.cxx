@@ -813,7 +813,7 @@ void pqXYChartOptionsEditor::applyAxisOptions()
   values.clear();
   for(int i = 0; i < 4; ++i)
     {
-    QColor color = this->Internal->Form->AxisData[i]->AxisColor;
+    color = this->Internal->Form->AxisData[i]->AxisColor;
     values.append(QVariant(static_cast<double>(color.redF())));
     values.append(QVariant(static_cast<double>(color.greenF())));
     values.append(QVariant(static_cast<double>(color.blueF())));
@@ -825,7 +825,7 @@ void pqXYChartOptionsEditor::applyAxisOptions()
   values.clear();
   for(int i = 0; i < 4; ++i)
     {
-    QColor color = this->Internal->Form->AxisData[i]->GridColor;
+    color = this->Internal->Form->AxisData[i]->GridColor;
     values.append(QVariant(static_cast<double>(color.redF())));
     values.append(QVariant(static_cast<double>(color.greenF())));
     values.append(QVariant(static_cast<double>(color.blueF())));
@@ -846,7 +846,7 @@ void pqXYChartOptionsEditor::applyAxisOptions()
   values.clear();
   for(int i = 0; i < 4; ++i)
     {
-    QColor color = this->Internal->Form->AxisData[i]->LabelColor;
+    color = this->Internal->Form->AxisData[i]->LabelColor;
     values.append(QVariant(static_cast<double>(color.redF())));
     values.append(QVariant(static_cast<double>(color.greenF())));
     values.append(QVariant(static_cast<double>(color.blueF())));
@@ -926,7 +926,7 @@ void pqXYChartOptionsEditor::applyAxisOptions()
   values.clear();
   for(int i = 0; i < 4; ++i)
     {
-    QColor color = this->Internal->Form->AxisData[i]->TitleColor;
+    color = this->Internal->Form->AxisData[i]->TitleColor;
     values.append(QVariant(static_cast<double>(color.redF())));
     values.append(QVariant(static_cast<double>(color.greenF())));
     values.append(QVariant(static_cast<double>(color.blueF())));
