@@ -205,7 +205,7 @@ void pqEventDispatcher::onMenuTimerTimeout()
     }
 
   QWidget* currentPopup = QApplication::activePopupWidget();
-#if defined(__APPLE__)
+#if defined(__APPLE__) || defined(WIN32)
  if (!currentPopup)
     {
     currentPopup = QApplication::activeModalWidget();
@@ -222,7 +222,7 @@ void pqEventDispatcher::onMenuTimerTimeout()
 bool pqEventDispatcher::eventFilter(QObject *obj, QEvent *ev)
 {
   QWidget* currentPopup = QApplication::activePopupWidget();
-#if defined(__APPLE__)
+#if defined(__APPLE__) || defined(WIN32)
   if (!currentPopup)
     {
     currentPopup = QApplication::activeModalWidget();
@@ -241,7 +241,7 @@ bool pqEventDispatcher::eventFilter(QObject *obj, QEvent *ev)
     this->AdhocMenuTimer.stop();
     }
 
-#if defined(__APPLE__)
+#if defined(__APPLE__) || defined(WIN32)
   return this->Superclass::eventFilter(obj, ev);
 #endif
 
