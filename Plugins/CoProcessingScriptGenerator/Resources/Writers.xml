@@ -1,16 +1,9 @@
 <CoProcessingWriters>
-  <Writer proxyname="XMLImageDataWriter" proxygroup="filters" />
   <Writer proxyname="XMLPImageDataWriter" proxygroup="filters" />
-  <Writer proxyname="XMLRectilinearGridWriter" proxygroup="filters" />
   <Writer proxyname="XMLPRectilinearGridWriter" proxygroup="filters" />
-  <Writer proxyname="XMLStructuredGridWriter" proxygroup="filters" />
   <Writer proxyname="XMLPStructuredGridWriter" proxygroup="filters" />
-  <Writer proxyname="XMLPolyDataWriter" proxygroup="filters" />
   <Writer proxyname="XMLPPolyDataWriter" proxygroup="filters" />
-  <Writer proxyname="XMLUnstructuredGridWriter" proxygroup="filters" />
   <Writer proxyname="XMLPUnstructuredGridWriter" proxygroup="filters" />
   <Writer proxyname="XMLMultiBlockDataWriter" proxygroup="filters" />
-  <Writer proxyname="XMLPMultiBlockDataWriter" proxygroup="filters" />
   <Writer proxyname="XMLHierarchicalBoxDataWriter" proxygroup="filters" />
-  <Writer proxyname="XMLPHierarchicalBoxDataWriter" proxygroup="filters" />
 </CoProcessingWriters>
