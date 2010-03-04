@@ -29,7 +29,7 @@ MACRO(GLOB_INSTALL_DEVELOPMENT from to exts)
     INSTALL(
         FILES ${filesToInstall}
         DESTINATION ${to}
-        COMPONENT Develeopment)
+        COMPONENT Development)
   ENDIF(filesToInstall)
 ENDMACRO(GLOB_INSTALL_DEVELOPMENT)
 
