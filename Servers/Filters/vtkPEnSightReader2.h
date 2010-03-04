@@ -425,6 +425,7 @@ class VTK_EXPORT vtkPEnSightReader2 : public vtkGenericEnSightReader2
           break;
           }
         }
+      return 0;
     }
 
     vtkIdTypeArray* GenerateGlobalIdsArray(const char* name)
