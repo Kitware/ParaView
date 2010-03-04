@@ -36,7 +36,7 @@
 #include <assert.h>
 #include <ctype.h> /* isspace */
 
-vtkCxxRevisionMacro(vtkGenericEnSightReader2, "1.1");
+vtkCxxRevisionMacro(vtkGenericEnSightReader2, "1.2");
 vtkStandardNewMacro(vtkGenericEnSightReader2);
 
 vtkCxxSetObjectMacro(vtkGenericEnSightReader2,TimeSets,
@@ -695,7 +695,7 @@ int vtkGenericEnSightReader2::ReadLine(char result[256])
 // to 80 characters.  Returns zero if there was an error.
 int vtkGenericEnSightReader2::ReadBinaryLine(char result[80])
 {
-  int n = fread(result, sizeof(char), 80, this->IFile);
+  int n = static_cast<int>(fread(result, sizeof(char), 80, this->IFile));
 
   if ((n<80) || feof(this->IFile) || ferror(this->IFile))
     {

@@ -254,7 +254,7 @@ class VTK_EXPORT vtkPEnSightReader2 : public vtkGenericEnSightReader2
           if( this->cellVector->size() < (unsigned int)(id + 1) )
             {
             int k;
-            int currentSize = this->cellVector->size();
+            int currentSize = static_cast<int>(this->cellVector->size());
             this->cellVector->resize(id + 1);
             for(k = currentSize ; k < id ; k++)
               {
@@ -297,11 +297,11 @@ class VTK_EXPORT vtkPEnSightReader2 : public vtkGenericEnSightReader2
         default:
           {
           this->cellVector->push_back(id);
-          return this->cellVector->size() - 1;
+          return static_cast<int>(this->cellVector->size() - 1);
           break;
           }
         }
-      return this->cellVector->size() - 1;
+      return static_cast<int>(this->cellVector->size() - 1);
     }
 
     int GetNumberOfIds()
@@ -333,7 +333,7 @@ class VTK_EXPORT vtkPEnSightReader2 : public vtkGenericEnSightReader2
           if( this->cellNumberOfIds >= 0 )
             return this->cellNumberOfIds;
           else
-            return this->cellVector->size();
+            return static_cast<int>(this->cellVector->size());
           break;
           }
         }
@@ -402,7 +402,7 @@ class VTK_EXPORT vtkPEnSightReader2 : public vtkGenericEnSightReader2
           }
         case SPARSE_MODE:
           {
-          return this->cellMap->size();
+          return static_cast<int>(this->cellMap->size());
           break;
           }
         default:
