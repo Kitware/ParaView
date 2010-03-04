@@ -23,7 +23,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkInformationVector.h"
 
-vtkCxxRevisionMacro( vtkPVArrayCalculator, "1.1" );
+vtkCxxRevisionMacro( vtkPVArrayCalculator, "1.2" );
 vtkStandardNewMacro( vtkPVArrayCalculator );
 
 // ----------------------------------------------------------------------------
@@ -86,7 +86,7 @@ void vtkPVArrayCalculator::UpdateArrayAndVariableNames
     
     // Let's extract the main part of the scalar variable name, without suffix.
     // It is safe to assume that the components of any vector end with _X/Y/Z.
-    aray1Length = strlen( theAryName1 );
+    aray1Length = static_cast< int > (  strlen( theAryName1 )  );
     if (   aray1Length > 2 &&
            (  strcmp( theAryName1 + aray1Length - 2, "_X" ) == 0 ||
               strcmp( theAryName1 + aray1Length - 2, "_Y" ) == 0 ||
