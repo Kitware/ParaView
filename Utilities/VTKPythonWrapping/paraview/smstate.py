@@ -1,7 +1,7 @@
 import smtrace
 import servermanager
 
-_proxy_groups = ["sources", "representations", "views", "scalar_bars",
+_proxy_groups = ["sources", "representations", "views", "scalar_bars", "selection_sources",
                  "piecewise_functions", "implicit_functions", "lookup_tables"]
 
 class proxy_lookup(object):
@@ -36,12 +36,13 @@ def get_all_inputs_registered(proxy):
     have been registered with smtrace.  Returns True if all inputs
     are registered or proxy does not have an Input property, else
     returns False."""
-    input_property = proxy.GetProperty("Input")
-    if input_property:
-        for i in xrange(input_property.GetNumberOfProxies()):
-            input_proxy = input_property.GetProxy(i)
-            info = smtrace.get_proxy_info(input_proxy, search_existing=False)
-            if not info: return False
+    itr = servermanager.PropertyIterator(proxy.SMProxy)
+    for prop in itr:
+        if prop.IsA("vtkSMInputProperty"):
+            for i in xrange(prop.GetNumberOfProxies()):
+                input_proxy = prop.GetProxy(i)
+                info = smtrace.get_proxy_info(input_proxy, search_existing=False)
+                if not info: return False
     return True
 
 
@@ -95,7 +96,7 @@ def _trace_state():
     # views refer to representations and scalar_bars
 
     proxy_groups = ["implicit_functions", "piecewise_functions",
-                    "lookup_tables", "scalar_bars", "sources",
+                    "lookup_tables", "scalar_bars", "selection_sources", "sources",
                     "representations", "views"]
 
     # Collect the proxies using a list comprehension
