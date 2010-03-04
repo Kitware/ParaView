@@ -69,8 +69,18 @@ MACRO(build_paraview_client_cpack_config_init)
     ENDIF(CMAKE_CL_64)
   ENDIF(${CPACK_SYSTEM_NAME} MATCHES Windows)
 
-  SET (CPACK_INSTALL_CMAKE_PROJECTS
+  SET (CPACK_INSTALL_CMAKE_PROJECTS 
     "${ParaView_BINARY_DIR}" "ParaView Runtime Libs" "Runtime" "/"
+  )
+
+  # Append in CPACK rule for the Development Component
+  IF(NOT PV_INSTALL_NO_DEVELOPMENT)
+    LIST(APPEND CPACK_INSTALL_CMAKE_PROJECTS
+      "${ParaView_BINARY_DIR}" "ParaView Development Headers, Libs and Tools" "Development" "/"
+    )
+  ENDIF(NOT PV_INSTALL_NO_DEVELOPMENT)
+
+  LIST(APPEND CPACK_INSTALL_CMAKE_PROJECTS
     "${ParaView_BINARY_DIR}" "VTK Runtime Libs" "RuntimeLibraries" "/"
     "${CMAKE_CURRENT_BINARY_DIR}" "${BCC_PACKAGE_NAME} Components" "BrandedRuntime" "/"
   )
