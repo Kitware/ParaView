@@ -95,6 +95,7 @@ SET(Filters_SRCS
   vtkPSciVizPCAStats.cxx
   vtkPSciVizKMeans.cxx
   vtkPVAnimationScene.cxx
+  vtkPVArrayCalculator.cxx
   vtkPVArrowSource.cxx
   vtkPVCacheKeeper.cxx
   vtkPVCacheKeeperPipeline.cxx
