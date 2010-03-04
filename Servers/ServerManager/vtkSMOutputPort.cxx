@@ -14,20 +14,23 @@
 =========================================================================*/
 #include "vtkSMOutputPort.h"
 
+#include "vtkAlgorithm.h"
 #include "vtkClientServerStream.h"
 #include "vtkCollection.h"
 #include "vtkCollectionIterator.h"
 #include "vtkCommand.h"
+#include "vtkDataObject.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
 #include "vtkPVClassNameInformation.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVTemporalDataInformation.h"
 #include "vtkPVXMLElement.h"
+#include "vtkSMSourceProxy.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMOutputPort);
-vtkCxxRevisionMacro(vtkSMOutputPort, "1.11");
+vtkCxxRevisionMacro(vtkSMOutputPort, "1.12");
 
 
 //----------------------------------------------------------------------------
@@ -281,32 +284,42 @@ void vtkSMOutputPort::GatherClassNameInformation()
     }
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
 
-  // Temporarily assign an id to the output object so that we
-  // can obtain it's name.
-  vtkClientServerStream stream;
-  stream << vtkClientServerStream::Invoke
-         << this->GetProducerID()
-         << "GetOutputDataObject"
-         << this->PortIndex
-         << vtkClientServerStream::End;
-  vtkClientServerID uid = pm->GetUniqueID();
-  stream << vtkClientServerStream::Assign 
-         << uid << vtkClientServerStream::LastResult
-         << vtkClientServerStream::End;
+  vtkObjectBase* cso = this->GetSourceProxy()->GetClientSideObject();
+  if (cso)
+    {
+    this->ClassNameInformation->CopyFromObject(
+      vtkAlgorithm::SafeDownCast(cso)->GetOutputDataObject(
+        this->PortIndex));
+    }
+  else
+    {
+    // Temporarily assign an id to the output object so that we
+    // can obtain it's name.
+    vtkClientServerStream stream;
+    stream << vtkClientServerStream::Invoke
+           << this->GetProducerID()
+           << "GetOutputDataObject"
+           << this->PortIndex
+           << vtkClientServerStream::End;
+    vtkClientServerID uid = pm->GetUniqueID();
+    stream << vtkClientServerStream::Assign 
+           << uid << vtkClientServerStream::LastResult
+           << vtkClientServerStream::End;
 
-  pm->SendStream(this->ConnectionID, this->Servers, stream);
+    pm->SendStream(this->ConnectionID, this->Servers, stream);
 
-  pm->GatherInformation(this->ConnectionID, 
-                        this->Servers,
-                        this->ClassNameInformation, 
-                        uid);
+    pm->GatherInformation(this->ConnectionID, 
+                          this->Servers,
+                          this->ClassNameInformation, 
+                          uid);
+
+    // Unassign the id.
+    stream << vtkClientServerStream::Delete 
+           << uid 
+           << vtkClientServerStream::End;
+    pm->SendStream(this->ConnectionID, this->Servers, stream);
+    }
   this->ClassNameInformationValid = 1;
-
-  // Unassign the id.
-  stream << vtkClientServerStream::Delete 
-         << uid 
-         << vtkClientServerStream::End;
-  pm->SendStream(this->ConnectionID, this->Servers, stream);
 }
 
 //----------------------------------------------------------------------------
