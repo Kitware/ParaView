@@ -91,7 +91,7 @@ public:
   virtual pqPipelineSource* createFilter(
     const QString& group, const QString& name,
     QMap<QString, QList<pqOutputPort*> > namedInputs, pqServer* server,
-    QMap<QString, QVariant>& properties=QMap<QString, QVariant>());
+    const QMap<QString, QVariant>& properties=QMap<QString, QVariant>());
 
   /// Convenience method that takes a single input source.
   virtual pqPipelineSource* createFilter(
@@ -267,7 +267,7 @@ protected:
   virtual vtkSMProxy* createProxyInternal(const QString& sm_group, 
     const QString& sm_name, pqServer* server, 
     const QString& reg_group, const QString& reg_name=QString(),
-          QMap<QString, QVariant>& properties=QMap<QString, QVariant>());
+    const QMap<QString, QVariant>& properties=QMap<QString, QVariant>());
 
   /// Unregisters a proxy.
   virtual void destroyProxyInternal(pqProxy* proxy);

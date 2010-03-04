@@ -123,7 +123,7 @@ pqPipelineSource* pqObjectBuilder::createFilter(
   const QString& group, const QString& name,
   QMap<QString, QList<pqOutputPort*> > namedInputs,
   pqServer* server,
-  QMap<QString, QVariant>& properties/*=QMap<QString, QVariant>()*/)
+  const QMap<QString, QVariant>& properties/*=QMap<QString, QVariant>()*/)
 {
   vtkSMProxy* proxy = 
     this->createProxyInternal(group, name, server, "sources",QString(),properties);
@@ -705,7 +705,7 @@ void pqObjectBuilder::destroyAllProxies(pqServer* server)
 vtkSMProxy* pqObjectBuilder::createProxyInternal(const QString& sm_group, 
   const QString& sm_name, pqServer* server, 
   const QString& reg_group, const QString& reg_name/*=QString()*/,
-  QMap<QString, QVariant>& properties/*=QMap<QString, QVariant>()*/)
+  const QMap<QString, QVariant>& properties/*=QMap<QString, QVariant>()*/)
 {
   if (!server)
     {
@@ -740,7 +740,7 @@ vtkSMProxy* pqObjectBuilder::createProxyInternal(const QString& sm_group,
     actual_regname.toAscii().data(), proxy);
 
 
-  QMap<QString, QVariant>::iterator mapIter;
+  QMap<QString, QVariant>::const_iterator mapIter;
   for (mapIter = properties.begin(); mapIter != properties.end(); ++mapIter)
     {
     QString propertyName = mapIter.key();
