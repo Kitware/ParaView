@@ -373,9 +373,10 @@ class SourceProxy(Proxy):
             self.SMProxy.UpdatePipeline(time)
         else:
             self.SMProxy.UpdatePipeline()
-        # Fetch the new information. This is also here to cause a receive
+        # This is here to cause a receive
         # on the client side so that progress works properly.
-        self.SMProxy.GetDataInformation()
+        if ActiveConnection and ActiveConnection.IsRemote():
+            self.SMProxy.GetDataInformation()
 
     def FileNameChanged(self):
         "Called when the filename of a source proxy is changed."
