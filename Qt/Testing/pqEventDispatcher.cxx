@@ -62,7 +62,7 @@ pqEventDispatcher::pqEventDispatcher(QObject* parentObject) :
   QObject::connect(QAbstractEventDispatcher::instance(), SIGNAL(awake()),
                    this, SLOT(awake()));
 
-  this->BlockTimer.setInterval(100);
+  this->BlockTimer.setInterval(500);
   this->BlockTimer.setSingleShot(true);
   QObject::connect(&this->BlockTimer, SIGNAL(timeout()),
                    this, SLOT(playEventOnBlocking()));
@@ -80,7 +80,7 @@ void pqEventDispatcher::aboutToBlock()
     {
     if (!this->BlockTimer.isActive())
       {
-      cout << "aboutToBlock" << endl;
+      // cout << "aboutToBlock" << endl;
       // Request a delayed playback for an event.
       this->BlockTimer.start();
       }
