@@ -128,8 +128,9 @@ pqPythonManager* pqPVApplicationCore::pythonManager() const
 {
 #ifdef PARAVIEW_ENABLE_PYTHON
   return this->PythonManager;
-#endif
+#else
   return 0;
+#endif
 }
 
 //-----------------------------------------------------------------------------
