@@ -1606,17 +1606,6 @@ The filter operates on any type of data set, but the input data set must have at
           </Documentation>
      </InputProperty>
 
-     <Property
-        name="RemoveAllVariables"
-        command="RemoveAllVariables"
-        immediate_update="1"
-        is_internal="0"
-        label="Clear">
-        <Documentation>
-          This property erases the current function from the calculator. (See the Function property.)
-        </Documentation>
-     </Property>
-
      <StringVectorProperty 
         name="ResultArrayName" 
         command="SetResultArrayName" 
@@ -1633,62 +1622,6 @@ The filter operates on any type of data set, but the input data set must have at
         number_of_elements="1">
         <Documentation>
           This property contains the equation for computing the new array.
-        </Documentation>
-     </StringVectorProperty>
-   
-     <StringVectorProperty 
-        name="AddScalarVariable" 
-        command="AddScalarVariable" 
-        clean_command="RemoveScalarVariables"
-        number_of_elements="0" 
-        repeat_command="1"
-        number_of_elements_per_command="3"
-        element_types="2 2 0"
-        label="Scalar Variable">
-        <Documentation>
-          This property adds a new scalar variable (single-component array or a single component of a multi-component array) to the current function for computing a new array.
-        </Documentation>
-     </StringVectorProperty>
-
-     <StringVectorProperty 
-        name="AddVectorVariable" 
-        command="AddVectorVariable" 
-        clean_command="RemoveVectorVariables"
-        number_of_elements="0" 
-        repeat_command="1"
-        number_of_elements_per_command="5"
-        element_types="2 2 0 0 0"
-        label="Vector Variable">
-        <Documentation>
-          This property adds a new vector variable (multi-component array) to the current function for computing a new array.
-        </Documentation>
-     </StringVectorProperty>
-     
-     <StringVectorProperty 
-        name="AddCoordinateScalarVariable" 
-        command="AddCoordinateScalarVariable" 
-        clean_command="RemoveCoordinateScalarVariables"
-        number_of_elements="0" 
-        repeat_command="1"
-        number_of_elements_per_command="2"
-        element_types="2 0"
-        label="Coordinate Scalar Variable">
-        <Documentation>
-          This property adds a new scalar variable (single-component array or a single component of a multi-component array) to the current function for computing new point coordinates.
-        </Documentation>
-     </StringVectorProperty>
-
-     <StringVectorProperty 
-        name="AddCoordinateVectorVariable" 
-        command="AddCoordinateVectorVariable" 
-        clean_command="RemoveCoordinateVectorVariables"
-        number_of_elements="0" 
-        repeat_command="1"
-        number_of_elements_per_command="4"
-        element_types="2 0 0 0"
-        label="Coordinate Vector Variable">
-        <Documentation>
-          This property adds a new vector variable (multi-component array) to the current function for computing new point coordinates.
         </Documentation>
      </StringVectorProperty>
 
