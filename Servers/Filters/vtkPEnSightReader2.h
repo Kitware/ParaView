@@ -226,6 +226,7 @@ class VTK_EXPORT vtkPEnSightReader2 : public vtkGenericEnSightReader2
           break;
           }
         }
+      return -1;
     }
 
     void SetId(int id, int value)
@@ -336,6 +337,7 @@ class VTK_EXPORT vtkPEnSightReader2 : public vtkGenericEnSightReader2
           break;
           }
         }
+      return 0;
     }
 
     // Just inject the real total number of Ids

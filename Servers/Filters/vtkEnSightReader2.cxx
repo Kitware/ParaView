@@ -33,7 +33,7 @@
 #include <vtkstd/string>
 #include <vtkstd/vector>
 
-vtkCxxRevisionMacro(vtkEnSightReader2, "1.3");
+vtkCxxRevisionMacro(vtkEnSightReader2, "1.4");
 
 //----------------------------------------------------------------------------
 typedef vtkstd::vector< vtkSmartPointer<vtkIdList> > vtkEnSightReader2CellIdsTypeBase;
@@ -1319,7 +1319,7 @@ int vtkEnSightReader2::ReadCaseFile()
   char line[256];
   char subLine[256];
   int stringRead;
-  int i, filenameNum;
+  int i;
   int ret;
   vtkDebugMacro("In vtkEnSightReader2::ReadCaseFile");
 

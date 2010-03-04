@@ -19,7 +19,7 @@
 #include <vtkstd/vector>
 #include <vtkIOStream.h>
 
-vtkCxxRevisionMacro(vtkPEnSightGoldReader2, "1.3");
+vtkCxxRevisionMacro(vtkPEnSightGoldReader2, "1.4");
 vtkStandardNewMacro(vtkPEnSightGoldReader2);
 
 //BTX
@@ -2723,8 +2723,8 @@ int vtkPEnSightGoldReader2::CreateStructuredGridOutput(int partId,
   int newDimensions[3];
   int splitDimension;
   int splitDimensionBeginIndex;
-  vtkUnsignedCharArray *pointGhostArray;
-  vtkUnsignedCharArray *cellGhostArray;
+  vtkUnsignedCharArray *pointGhostArray = NULL;
+  vtkUnsignedCharArray *cellGhostArray = NULL;
   if( this->GhostLevels == 0 )
     {
     this->PrepareStructuredDimensionsForDistribution(partId, dimensions, newDimensions, &splitDimension, &splitDimensionBeginIndex, 0, NULL, NULL);
@@ -2850,8 +2850,8 @@ int vtkPEnSightGoldReader2::CreateRectilinearGridOutput(int partId,
   int newDimensions[3];
   int splitDimension;
   int splitDimensionBeginIndex;
-  vtkUnsignedCharArray *pointGhostArray;
-  vtkUnsignedCharArray *cellGhostArray;
+  vtkUnsignedCharArray *pointGhostArray = NULL;
+  vtkUnsignedCharArray *cellGhostArray = NULL;
   if( this->GhostLevels == 0 )
     {
     this->PrepareStructuredDimensionsForDistribution(partId, dimensions, newDimensions, &splitDimension, &splitDimensionBeginIndex, 0, NULL, NULL);
@@ -2987,8 +2987,8 @@ int vtkPEnSightGoldReader2::CreateImageDataOutput(int partId,
   int newDimensions[3];
   int splitDimension;
   int splitDimensionBeginIndex;
-  vtkUnsignedCharArray *pointGhostArray;
-  vtkUnsignedCharArray *cellGhostArray;
+  vtkUnsignedCharArray *pointGhostArray = NULL;
+  vtkUnsignedCharArray *cellGhostArray = NULL;
   if( this->GhostLevels == 0 )
     {
     this->PrepareStructuredDimensionsForDistribution(partId, dimensions, newDimensions, &splitDimension, &splitDimensionBeginIndex, 0, NULL, NULL);
