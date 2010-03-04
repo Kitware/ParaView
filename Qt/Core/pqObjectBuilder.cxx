@@ -122,10 +122,11 @@ pqPipelineSource* pqObjectBuilder::createSource(const QString& sm_group,
 pqPipelineSource* pqObjectBuilder::createFilter(
   const QString& group, const QString& name,
   QMap<QString, QList<pqOutputPort*> > namedInputs,
-  pqServer* server)
+  pqServer* server,
+  QMap<QString, QVariant>& properties/*=QMap<QString, QVariant>()*/)
 {
   vtkSMProxy* proxy = 
-    this->createProxyInternal(group, name, server, "sources");
+    this->createProxyInternal(group, name, server, "sources",QString(),properties);
   if (!proxy)
     {
     return 0;
@@ -703,7 +704,8 @@ void pqObjectBuilder::destroyAllProxies(pqServer* server)
 //-----------------------------------------------------------------------------
 vtkSMProxy* pqObjectBuilder::createProxyInternal(const QString& sm_group, 
   const QString& sm_name, pqServer* server, 
-  const QString& reg_group, const QString& reg_name/*=QString()*/)
+  const QString& reg_group, const QString& reg_name/*=QString()*/,
+  QMap<QString, QVariant>& properties/*=QMap<QString, QVariant>()*/)
 {
   if (!server)
     {
@@ -736,6 +738,33 @@ vtkSMProxy* pqObjectBuilder::createProxyInternal(const QString& sm_group,
 
   pxm->RegisterProxy(reg_group.toAscii().data(), 
     actual_regname.toAscii().data(), proxy);
+
+
+  QMap<QString, QVariant>::iterator mapIter;
+  for (mapIter = properties.begin(); mapIter != properties.end(); ++mapIter)
+    {
+    QString propertyName = mapIter.key();
+    QVariant propertyValue = mapIter.value();
+
+    vtkSMProperty *prop=proxy->GetProperty(propertyName.toAscii().data());
+
+    if(prop)
+      {
+        switch (pqSMAdaptor::getPropertyType(prop))
+        {
+        case pqSMAdaptor::FILE_LIST:
+          {
+            pqSMAdaptor::setFileListProperty(prop, propertyValue.toStringList());
+          }
+          break;
+        default:
+          break;
+        }
+      }
+    }
+
+
+
   return proxy;
 }
 
