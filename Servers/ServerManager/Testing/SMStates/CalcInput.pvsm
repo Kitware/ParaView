@@ -1237,13 +1237,13 @@
   </Proxy>
   <Proxy group="filters" type="Calculator" id="627">
     <Property name="AddScalarVariable" id="627.AddScalarVariable" number_of_elements="9">
-      <Element index="0" value="Normals_0"/>
+      <Element index="0" value="Normals_X"/>
       <Element index="1" value="Normals"/>
       <Element index="2" value="0"/>
-      <Element index="3" value="Normals_1"/>
+      <Element index="3" value="Normals_Y"/>
       <Element index="4" value="Normals"/>
       <Element index="5" value="1"/>
-      <Element index="6" value="Normals_2"/>
+      <Element index="6" value="Normals_Z"/>
       <Element index="7" value="Normals"/>
       <Element index="8" value="2"/>
     </Property>
@@ -1262,7 +1262,7 @@
       </Domain>
     </Property>
     <Property name="Function" id="627.Function" number_of_elements="1">
-      <Element index="0" value="Normals_0+Normals_1+Normals_2"/>
+      <Element index="0" value="Normals_X+Normals_Y+Normals_Z"/>
     </Property>
     <Property name="Input" id="627.Input" number_of_elements="1">
       <Proxy value="981"/>
