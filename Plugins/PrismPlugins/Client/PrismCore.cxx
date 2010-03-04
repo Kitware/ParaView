@@ -212,8 +212,8 @@ void PrismCore::onSESAMEFileOpen(const QStringList& files)
     //filter->setDefaultPropertyValues();
     //filter->setDefaultPropertyValues();
 
-
-    if(stack)
+/*
+    if(stack)*/
 
 
     if(stack)
@@ -305,13 +305,16 @@ void PrismCore::onCreatePrismView(const QStringList& files)
         stack->beginUndoSet("Create Prism Filter");
         }
 
-    filter = builder->createFilter("PrismFilters", "PrismFilter", namedInputs, server);
+    QMap<QString,QVariant> defaultProperties;
+    defaultProperties["FileName"]=files;
 
-    vtkSMProperty *fileNameProperty=filter->getProxy()->GetProperty("FileName");
+    filter = builder->createFilter("PrismFilters", "PrismFilter", namedInputs, server,defaultProperties);
 
-    pqSMAdaptor::setElementProperty(fileNameProperty, files[0]);
+ //   vtkSMProperty *fileNameProperty=filter->getProxy()->GetProperty("FileName");
 
-    filter->getProxy()->UpdateVTKObjects();
+ //   pqSMAdaptor::setElementProperty(fileNameProperty, files[0]);
+
+//    filter->getProxy()->UpdateVTKObjects();
     //I believe that this is needs to be called twice because there are properties that depend on other properties.
     //Calling it once doesn't set all the properties right.
     filter->setDefaultPropertyValues();
