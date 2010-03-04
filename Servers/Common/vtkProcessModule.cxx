@@ -137,7 +137,7 @@ protected:
 
 
 vtkStandardNewMacro(vtkProcessModule);
-vtkCxxRevisionMacro(vtkProcessModule, "1.98");
+vtkCxxRevisionMacro(vtkProcessModule, "1.99");
 vtkCxxSetObjectMacro(vtkProcessModule, ActiveRemoteConnection, vtkRemoteConnection);
 vtkCxxSetObjectMacro(vtkProcessModule, GUIHelper, vtkProcessModuleGUIHelper);
 
@@ -832,9 +832,10 @@ vtkClientServerID vtkProcessModule::NewStreamObject(
 }
 
 //-----------------------------------------------------------------------------
-vtkObjectBase* vtkProcessModule::GetObjectFromID(vtkClientServerID id)
+vtkObjectBase* vtkProcessModule::GetObjectFromID(vtkClientServerID id,
+  bool silent)
 {
-  return this->Interpreter->GetObjectFromID(id);
+  return this->Interpreter->GetObjectFromID(id, silent);
 }
 //-----------------------------------------------------------------------------
 vtkClientServerID vtkProcessModule::GetIDFromObject(vtkObjectBase *obj)

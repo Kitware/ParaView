@@ -438,6 +438,7 @@ public:
 
   // Description:
   // Returns the client side object associated with the VTKObjectID (if any).
+  // Returns 0 otherwise.
   vtkObjectBase* GetClientSideObject();
 
 //BTX

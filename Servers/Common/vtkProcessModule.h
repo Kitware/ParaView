@@ -158,10 +158,11 @@ public:
   // Description:
   // Return the vtk object associated with the given id for the
   // client.  If the id is for an object on another node then 0 is
-  // returned.
-  virtual vtkObjectBase* GetObjectFromID(int id)
+  // returned. If the second argument is set to true, no error
+  // is reported when the ID is invalid / does not exist.
+  virtual vtkObjectBase* GetObjectFromID(int id, bool silent=false)
   {
-    return this->GetObjectFromID(vtkClientServerID(id));
+    return this->GetObjectFromID(vtkClientServerID(id), silent);
   }
 
 //BTX
@@ -191,7 +192,13 @@ public:
   // Return the vtk object associated with the given id for the
   // client.  If the id is for an object on another node then 0 is
   // returned.
-  virtual vtkObjectBase* GetObjectFromID(vtkClientServerID);
+  // If the second argument is set to true, no error
+  // is reported when the ID is invalid / does not exist.
+  virtual vtkObjectBase* GetObjectFromID(vtkClientServerID, bool silent=true);
+  
+  // Description:
+  // Given a vtk object, returns its client-server ID if that object
+  // is registered. Returns a NULL ID otherwise.
   virtual vtkClientServerID GetIDFromObject(vtkObjectBase*);
 
   // Description:
