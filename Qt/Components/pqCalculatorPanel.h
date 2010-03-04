@@ -60,7 +60,7 @@ protected slots:
   void updateVariables(const QString& mode);
   void variableChosen(QAction* a);
   void disableResults(bool);
-
+  void updateVariableNames();
 protected:
   class pqInternal;
   pqInternal* Internal;

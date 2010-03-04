@@ -41,12 +41,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // ParaView Server Manager includes
 #include "vtkSMProperty.h"
+
 #include "vtkPVDataSetAttributesInformation.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVArrayInformation.h"
 #include "vtkSMStringVectorProperty.h"
 
 // ParaView includes
+#include "pqPropertyLinks.h"
+#include "pqSignalAdaptors.h"
+#include "pqPropertyManager.h"
 #include "pqPipelineFilter.h"
 #include "pqOutputPort.h"
 #include "pqSMAdaptor.h"
@@ -57,9 +61,26 @@ class pqCalculatorPanel::pqInternal
  : public QObject, public Ui::CalculatorPanel
 {
 public:
-  pqInternal(QObject* p) : QObject(p) {}
-  QMenu ScalarsMenu;
-  QMenu VectorsMenu;
+  pqInternal( QObject * p ) : QObject( p ) 
+    { 
+      this->AttributeModeAdaptor = NULL;
+      this->AttributeModeLink.removeAllPropertyLinks();
+    }
+    
+  ~pqInternal() 
+    { 
+      this->AttributeModeLink.removeAllPropertyLinks();
+      if ( this->AttributeModeAdaptor )
+        {
+        delete this->AttributeModeAdaptor;
+        this->AttributeModeAdaptor = NULL;
+        }
+    }
+    
+  QMenu                     ScalarsMenu;
+  QMenu                     VectorsMenu;
+  pqPropertyLinks           AttributeModeLink;
+  pqSignalAdaptorComboBox * AttributeModeAdaptor;
 };
 
 //-----------------------------------------------------------------------------
@@ -69,7 +90,6 @@ pqCalculatorPanel::pqCalculatorPanel(pqProxy* pxy, QWidget* p) :
 {
   this->Internal = new pqInternal(this);
   this->Internal->setupUi(this);
-
 
   QObject::connect(this->Internal->AttributeMode,
                    SIGNAL(currentIndexChanged(const QString&)),
@@ -92,18 +112,91 @@ pqCalculatorPanel::pqCalculatorPanel(pqProxy* pxy, QWidget* p) :
                    SIGNAL(triggered(QAction*)),
                    this,
                    SLOT(variableChosen(QAction*)));
+  
+  
+  // the following three connections make sure the arrays and associated
+  // variables are timely updated 
+  QObject::connect(  &this->Internal->ScalarsMenu,
+                     SIGNAL( aboutToShow() ),
+                     this,
+                     SLOT( updateVariableNames() )  );
+                   
+  QObject::connect(  &this->Internal->VectorsMenu,
+                     SIGNAL( aboutToShow() ),
+                     this,
+                     SLOT( updateVariableNames() )  );
+                     
+  QObject::connect(  this->Internal->Function,
+                     SIGNAL( editingFinished() ),
+                     this,
+                     SLOT( updateVariableNames() )  );
+  
+  // the connection between the Qt widget and the ParaView proxy 
+  //                   
+  // As an example, signal editingFinished() released by QLineEdit invokes 
+  // vtkPVArrayCalculator::SetFunction() to update the class IVAR while 
+  // vtkPVArrayCalculator::SetFunction() invokes QLineEdit::text() to update 
+  // the panel.
+  this->propertyManager()->registerLink
+        (   this->Internal->Function, "text", 
+            SIGNAL( editingFinished() ),
+            this->proxy(), 
+            this->proxy()->GetProperty( "Function" )   );
+           
+  this->propertyManager()->registerLink
+        (   this->Internal->ResultArrayName, "text", 
+            SIGNAL( editingFinished() ),
+            this->proxy(), 
+            this->proxy()->GetProperty( "ResultArrayName" )   );
+           
+  this->propertyManager()->registerLink
+        (   this->Internal->ReplacementValue, "text", 
+            SIGNAL( editingFinished() ),
+            this->proxy(), 
+            this->proxy()->GetProperty( "ReplacementValue" )   );
+           
+  this->propertyManager()->registerLink
+        (   this->Internal->ReplaceInvalidResult, "checked",
+            SIGNAL(  stateChanged( int )  ),
+            this->proxy(), 
+            this->proxy()->GetProperty( "ReplaceInvalidValues" )   );
+            
+  this->propertyManager()->registerLink
+        (   this->Internal->CoordinateResults, "checked",
+            SIGNAL(  stateChanged( int )  ),
+            this->proxy(), 
+            this->proxy()->GetProperty( "CoordinateResults" )   );
+            
+  // a special case: pqSignalAdaptorComboBox is needed to connect the 
+  // AttributeMode (a QComboBox widge) and the class IVAR
+  this->Internal->AttributeModeAdaptor = new
+                  pqSignalAdaptorComboBox( this->Internal->AttributeMode );
+  this->Internal->AttributeModeAdaptor->setObjectName( "AttributeModeAdaptor" );
+  this->Internal->AttributeModeLink.addPropertyLink
+                  (   this->Internal->AttributeModeAdaptor, 
+                      "currentText",
+                      SIGNAL(  currentTextChanged( const QString & )  ), 
+                      this->proxy(),
+                      this->proxy()->GetProperty( "AttributeMode" )   );
+  QObject::connect(  &this->Internal->AttributeModeLink,  
+                      SIGNAL( smPropertyChanged() ),
+                      this, 
+                      SLOT( reset() )  
+                  );
+
 
   // clicking on any button or any part of the panel where another button
   // doesn't take focus will cause the line edit to have focus 
   this->setFocusProxy(this->Internal->Function);
   
   // connect all buttons for which the text of the button 
-  // is the same as what goes into the function
-  QRegExp regexp("^([ijk]Hat|n[0-9]|ln|log10|sin|cos|"
+  // is the same as what goes into the function 
+  QRegExp regexp("^([ijk]Hat|ln|log10|sin|cos|"
                  "tan|asin|acos|atan|sinh|cosh|tanh|"
                  "sqrt|exp|ceil|floor|abs|norm|mag|"
                  "LeftParentheses|RightParentheses|"
-                 "Divide|Multiply|Minus|Plus|Dot)$");
+                 "Divide|Multiply|Minus|Plus)$");
+                 
   QList<QToolButton*> buttons;
   buttons = this->findChildren<QToolButton*>(regexp);
   foreach(QToolButton* tb, buttons)
@@ -374,6 +467,11 @@ void pqCalculatorPanel::reset()
 void pqCalculatorPanel::buttonPressed(const QString& buttonText)
 {
   this->Internal->Function->insert(buttonText);
+}
+
+void pqCalculatorPanel::updateVariableNames()
+{
+  this->updateVariables( this->Internal->AttributeMode->currentText() );
 }
 
 void pqCalculatorPanel::updateVariables(const QString& mode)
