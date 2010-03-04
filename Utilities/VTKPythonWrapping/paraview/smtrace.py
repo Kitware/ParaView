@@ -343,13 +343,15 @@ def sort_proxy_info_by_group(infoList):
   views = []
   sources = []
   representations = []
+  selections = []
   other = []
   for i in infoList:
     if i.Group == "views": views.append(i)
     elif i.Group == "sources": sources.append(i)
+    elif i.Group == "selection_sources": selections.append(i)
     elif i.Group == "representations": representations.append(i)
     else: other.append(i)
-  return views + sources + other + representations
+  return views + selections + sources + other + representations
 
 def append_trace():
 
