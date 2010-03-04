@@ -80,26 +80,8 @@ smtrace.start_trace(CaptureAllProperties=True, UseGuiName=True)
 smtrace.trace_globals.proxy_ctor_hook = staticmethod(cp_hook)
 smtrace.trace_globals.trace_output = []
 
-# Get proxy lists by group.  Order is very important here.  The idea is that
-# we want to register groups of proxies such that when a proxy is registered
-# none of its properties refer to proxies that have not yet been registered.
-#
-# rules:
-#
-# scalar_bars refer to lookup_tables.
-# representations refer to sources and piecewise_functions
-# views refer to representations and scalar_bars
-
-if export_rendering:
-    proxy_groups = ["implicit_functions", "piecewise_functions",
-                    "lookup_tables", "scalar_bars", "sources",
-                    "representations", "views"]
-else:
-    proxy_groups = ["implicit_functions",  "sources"]
-
-# Collect the proxies using a list comprehension
-get_func = servermanager.ProxyManager().GetProxiesInGroup
-proxy_lists = [get_func(proxy_group).values() for proxy_group in proxy_groups]
+# Get list of proxy lists
+proxy_lists = smstate.get_proxy_lists_ordered_by_group(WithRendering=export_rendering)
 
 # Now register the proxies with the smtrace module
 for proxy_list in proxy_lists:

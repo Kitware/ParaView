@@ -77,13 +77,14 @@ def register_proxies_by_dependency(proxy_list):
         print "WARNING: Missing dependencies, could not register proxies:", proxies_to_register
 
 
-def _trace_state():
-    """This method using the smtrace module to trace each registered proxy and
-    generate a python trace script.  The proxies must be traced in the correct
-    order so that no traced proxy refers to a proxy that is yet to be traced."""
-
-    # Start trace
-    smtrace.start_trace(CaptureAllProperties=True, UseGuiName=True)
+def get_proxy_lists_ordered_by_group(WithRendering=True):
+    """Returns a list of lists.  Each sub list contains all proxies that are
+    currently registered under a given group name.  The order of the sub lists
+    is important.  The idea is that no proxy in a group list should have
+    properties that refer to proxies that appear in later group lists.  For
+    example, sources are listed before representations, representations are
+    listed before views.  If WithRendering is false, groups that are related
+    to rendering are skipped."""
 
     # Get proxy lists by group.  Order is very important here.  The idea is that
     # we want to register groups of proxies such that when a proxy is registered
@@ -92,16 +93,33 @@ def _trace_state():
     # rules:
     #
     # scalar_bars refer to lookup_tables.
+    # sources refer to selection_sources
     # representations refer to sources and piecewise_functions
     # views refer to representations and scalar_bars
 
-    proxy_groups = ["implicit_functions", "piecewise_functions",
-                    "lookup_tables", "scalar_bars", "selection_sources", "sources",
-                    "representations", "views"]
+    if WithRendering:
+        proxy_groups = ["implicit_functions", "piecewise_functions", "lookup_tables",
+                        "scalar_bars", "selection_sources", "sources",
+                        "representations", "views"]
+    else:
+        proxy_groups = ["implicit_functions", "selection_sources",  "sources"]
 
     # Collect the proxies using a list comprehension
     get_func = servermanager.ProxyManager().GetProxiesInGroup
     proxy_lists = [get_func(proxy_group).values() for proxy_group in proxy_groups]
+    return proxy_lists
+
+
+def _trace_state():
+    """This method using the smtrace module to trace each registered proxy and
+    generate a python trace script.  The proxies must be traced in the correct
+    order so that no traced proxy refers to a proxy that is yet to be traced."""
+
+    # Start trace
+    smtrace.start_trace(CaptureAllProperties=True, UseGuiName=True)
+
+    # Get proxy lists ordered by group
+    proxy_lists = get_ordered_proxy_lists()
 
     # Now register the proxies with the smtrace module
     for proxy_list in proxy_lists:
