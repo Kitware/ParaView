@@ -46,6 +46,11 @@ public:
     vtkClientServerID id);
 //ETX
 
+  // Description:
+  // Initializes the connection. This sets the progress handler's connection
+  // to 0 to turn of progress reporting and calls superclass.
+  virtual int Initialize(int argc, char** argv, int *partitionId);
+
 //BTX
 protected:
   vtkSynchronousMPISelfConnection();
