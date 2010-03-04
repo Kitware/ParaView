@@ -118,7 +118,7 @@ ENDIF (EXISTS "${PARAVIEW_EXTRA_INSTALL_RULES_FILE}")
 #------------------------------------------------------------------------
 # Install the .plugins configuration file.
 INSTALL(FILES "${EXECUTABLE_OUTPUT_PATH}/.plugins"
-        DESTINATION ${PV_INSTALL_LIB_DIR}
+        DESTINATION ${PV_INSTALL_PLUGIN_DIR}
         COMPONENT BrandedRuntime)
 
 # Call this last so the install script runs after the above targets are installed:
