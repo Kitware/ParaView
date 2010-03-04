@@ -1549,7 +1549,7 @@ The Extract Surface filter extracts the polygons forming the outer surface of th
    </SourceProxy>
 
    <!-- ==================================================================== -->
-   <SourceProxy name="Calculator" class="vtkArrayCalculator">
+   <SourceProxy name="Calculator" class="vtkPVArrayCalculator">
     <Documentation
        long_help="Compute new attribute arrays as function of existing arrays."
        short_help="Compute new attribute arrays.">
