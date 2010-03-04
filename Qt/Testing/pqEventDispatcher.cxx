@@ -57,17 +57,44 @@ pqEventDispatcher::pqEventDispatcher(QObject* parentObject) :
   this->ActivePlayer = NULL;
   this->PlayBackStatus = false;
   this->PlayBackFinished = false;
-  this->AdhocMenuTimer.setInterval(1000);
-  this->AdhocMenuTimer.setSingleShot(true);
-  QObject::connect(&this->AdhocMenuTimer, SIGNAL(timeout()),
-    this, SLOT(onMenuTimerTimeout()));
-  QObject::connect(this, SIGNAL(triggerPlayEventStack(void*)),
-    this, SLOT(playEventStack(void*)), Qt::QueuedConnection);
+  QObject::connect(QAbstractEventDispatcher::instance(), SIGNAL(aboutToBlock()),
+                   this, SLOT(aboutToBlock()));
+  QObject::connect(QAbstractEventDispatcher::instance(), SIGNAL(awake()),
+                   this, SLOT(awake()));
+
+  this->BlockTimer.setInterval(100);
+  this->BlockTimer.setSingleShot(true);
+  QObject::connect(&this->BlockTimer, SIGNAL(timeout()),
+                   this, SLOT(playEventOnBlocking()));
 }
 
 //-----------------------------------------------------------------------------
 pqEventDispatcher::~pqEventDispatcher()
 {
+}
+
+//-----------------------------------------------------------------------------
+void pqEventDispatcher::aboutToBlock()
+{
+  if (!pqEventDispatcher::DeferMenuTimeouts)
+    {
+    if (!this->BlockTimer.isActive())
+      {
+      cout << "aboutToBlock" << endl;
+      // Request a delayed playback for an event.
+      this->BlockTimer.start();
+      }
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqEventDispatcher::awake()
+{
+  if (!pqEventDispatcher::DeferMenuTimeouts)
+    {
+    // cout << "awake" << endl;
+    // this->BlockTimer.stop();
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -84,29 +111,40 @@ bool pqEventDispatcher::playEvents(pqEventSource& source, pqEventPlayer& player)
 
   QApplication::setEffectEnabled(Qt::UI_General, false);
 
-  QApplication::instance()->installEventFilter(this);
-
+  // This is how the playback logic works:
+  // * In here, we continuously keep on playing one event after another until
+  //   we are done processing all the events.
+  // * If a modal dialog pops up, then this->aboutToBlock() gets called. To me
+  //   accurate, aboutToBlock() is called everytime the sub-event loop is entered
+  //   and more modal dialogs that loop is entered after processing of each event
+  //   (not merely when the dialog pops up).
+  // * In this->aboutToBlock() we start a timer which on timeout processes just 1 event.
+  // * After executing that event, if the dialog still is up, them aboutToBlock() will
+  //   be called again and the cycle continues. If not, the control returns to this main
+  //   playback loop, and it continues.
   this->PlayBackStatus = true; // success.
   this->PlayBackFinished = false;
-  this->playEventStack(NULL);
+  while (!this->PlayBackFinished)
+    {
+    this->playEvent();
+    }
   this->ActiveSource = NULL;
   this->ActivePlayer = NULL;
-  
-  QApplication::instance()->removeEventFilter(this);
   return this->PlayBackStatus;
 }
 
 //-----------------------------------------------------------------------------
-void pqEventDispatcher::playEventStack(void* activeWidget)
+void pqEventDispatcher::playEventOnBlocking()
 {
-  QWidget* activePopup = QApplication::activePopupWidget();
-  QWidget* activeModal = QApplication::activeModalWidget();
+  //cout << "---blocked event: " << endl;
+  // if needed for debugging, I can print blocking annotation here.
+  this->playEvent();
+}
 
-  if (activeWidget != activePopup && activeWidget != activeModal)
-    {
-    return;
-    }
-
+//-----------------------------------------------------------------------------
+void pqEventDispatcher::playEvent()
+{
+  this->BlockTimer.stop();
   if (this->PlayBackFinished)
     {
     return;
@@ -114,7 +152,9 @@ void pqEventDispatcher::playEventStack(void* activeWidget)
 
   if (!this->ActiveSource)
     {
-    qCritical("Internal error: playEventStack Ecalled without valid source.");
+    this->PlayBackFinished = true;
+    this->PlayBackStatus = false; // failure.
+    qCritical("Internal error: playEvent called without a valid event source.");
     return;
     }
 
@@ -138,7 +178,7 @@ void pqEventDispatcher::playEventStack(void* activeWidget)
   QApplication::syncX();
   static unsigned long counter=0;
   unsigned long local_counter = counter++;
-  int indent = this->ActiveModalWidgetStack.size();
+  int indent = 1; // this->ActiveModalWidgetStack.size();
   QString pretty_name = object.mid(object.lastIndexOf('/'));
   bool print_debug = getenv("PV_DEBUG_TEST") != NULL;
   if (print_debug)
@@ -153,6 +193,7 @@ void pqEventDispatcher::playEventStack(void* activeWidget)
   bool error = false;
   this->ActivePlayer->playEvent(object, command, arguments, error);
   this->processEventsAndWait(100); // let what's going to happen after the
+                                   // playback, happen.
   if (print_debug)
     {
     cout << QString().fill(' ', 4*indent).toStdString().c_str()
@@ -164,14 +205,6 @@ void pqEventDispatcher::playEventStack(void* activeWidget)
     this->PlayBackFinished = true;
     return;
     }
-
-  if (QApplication::activeModalWidget() != activeWidget)
-    {
-    // done.
-    return;
-    }
-
-  this->playEventStack(activeWidget);
 }
 
 //-----------------------------------------------------------------------------
@@ -188,90 +221,4 @@ void pqEventDispatcher::processEventsAndWait(int ms)
     }
   QApplication::processEvents(QEventLoop::ExcludeUserInputEvents);
   pqEventDispatcher::DeferMenuTimeouts = prev;
-}
-
-//-----------------------------------------------------------------------------
-void pqEventDispatcher::onMenuTimerTimeout()
-{
-  // this is used to capture cases where are popup-menu (or any modal dialog in
-  // case of APPLE) is active in its event loop. However, we don't want the
-  // test to proceed if this timeout happened while we were in the
-  // processEventsAndWait() loop at any stage in executing an event. So we have
-  // this trap.
-  if (pqEventDispatcher::DeferMenuTimeouts)
-    {
-    this->AdhocMenuTimer.start();
-    return;
-    }
-
-  QWidget* currentPopup = QApplication::activePopupWidget();
-#if defined(__APPLE__) || defined(WIN32)
- if (!currentPopup)
-    {
-    currentPopup = QApplication::activeModalWidget();
-    }
-#endif
- 
-  if (currentPopup)
-    {
-    this->playEventStack(currentPopup);
-    }
-}
-
-//-----------------------------------------------------------------------------
-bool pqEventDispatcher::eventFilter(QObject *obj, QEvent *ev)
-{
-  QWidget* currentPopup = QApplication::activePopupWidget();
-#if defined(__APPLE__) || defined(WIN32)
-  if (!currentPopup)
-    {
-    currentPopup = QApplication::activeModalWidget();
-    }
-#endif
-  if (currentPopup && !this->AdhocMenuTimer.isActive())
-    {
-    // it's possible that this is temporary popup (eg. standard menus), so we do
-    // a deferred handling for this event (I hate these menus in tests, btw).
-    // cout << "Start Menu Timer" << endl;
-    this->AdhocMenuTimer.start();
-    }
-  if (!currentPopup && this->AdhocMenuTimer.isActive())
-    {
-    // cout << "Stop Menu Timer" << endl;
-    this->AdhocMenuTimer.stop();
-    }
-
-#if defined(__APPLE__) || defined(WIN32)
-  return this->Superclass::eventFilter(obj, ev);
-#endif
-
-  QWidget* currentWidget = QApplication::activeModalWidget();
-
-  if (
-    (this->ActiveModalWidgetStack.size() == 0 && currentWidget == 0) ||
-    (this->ActiveModalWidgetStack.size() > 0 && this->ActiveModalWidgetStack.back() ==
-     currentWidget))
-    {
-    return this->Superclass::eventFilter(obj, ev);
-    }
-
-  if (currentWidget && this->ActiveModalWidgetStack.contains(currentWidget))
-    {
-    // a modal dialog was closed.
-    this->ActiveModalWidgetStack = this->ActiveModalWidgetStack.mid(0,
-      this->ActiveModalWidgetStack.indexOf(currentWidget)+1);
-    }
-  else if ((currentWidget && this->ActiveModalWidgetStack.size() == 0) ||
-    (currentWidget && !this->ActiveModalWidgetStack.contains(currentWidget)) )
-    {
-    // new modal dialog,
-    this->ActiveModalWidgetStack.push_back(currentWidget);
-    emit this->triggerPlayEventStack(this->ActiveModalWidgetStack.back());
-    }
-  else if (!currentWidget)
-    {
-    // all modal dialogs were closed.
-    this->ActiveModalWidgetStack.clear();
-    }
-  return this->Superclass::eventFilter(obj, ev);
 }

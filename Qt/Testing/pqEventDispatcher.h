@@ -64,21 +64,18 @@ public:
       to perform a certain action */
   static void processEventsAndWait(int ms);
 
-protected:
-  /// filter application level events. This is not really a "filter", but more
-  /// like an observer of the application level events.
-  bool eventFilter(QObject *obj, QEvent *ev); 
-
-signals:
-  void triggerPlayEventStack(void*);
-
 protected slots:
-  /// Plays event set, until 
-  /// 2> All events have been processed
-  /// 3> There's an error.
-  void playEventStack(void* activeWidget);
+  /// Plays a single event. this->PlayBackFinished and this->PlayBackStatus are
+  /// updated by this method.
+  void playEvent();
+  void playEventOnBlocking();
 
-  void onMenuTimerTimeout();
+  /// Called when the mainThread is about to block.
+  void aboutToBlock();
+
+  /// Called when the mainThread wakes up.
+  void awake();
+
 protected:
   bool PlayBackFinished;
   bool PlayBackStatus;
@@ -86,8 +83,7 @@ protected:
 
   pqEventSource* ActiveSource;
   pqEventPlayer* ActivePlayer;
-  QTimer AdhocMenuTimer;
-  QList<QWidget*> ActiveModalWidgetStack;
+  QTimer BlockTimer;
 };
 
 #endif // !_pqEventDispatcher_h
