@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QObject>
 #include "pqCoreExport.h"
 #include <QMap>
+#include <QVariant>
 
 class pqAnimationScene;
 class pqDataRepresentation;
