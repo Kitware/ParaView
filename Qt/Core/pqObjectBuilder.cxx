@@ -122,7 +122,7 @@ pqPipelineSource* pqObjectBuilder::createFilter(
   const QString& group, const QString& name,
   QMap<QString, QList<pqOutputPort*> > namedInputs, pqServer* server)
 {
-  this->createFilter(group, name, namedInputs, server, QMap<QString, QVariant>());
+  return this->createFilter(group, name, namedInputs, server, QMap<QString, QVariant>());
 }
 
 
