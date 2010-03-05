@@ -37,8 +37,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QAbstractEventDispatcher>
 #include <QtDebug>
-#include <QTime>
-#include <QTimer>
 #include <QApplication>
 #include <QEventLoop>
 #include <QThread>
@@ -124,6 +122,7 @@ bool pqEventDispatcher::playEvents(pqEventSource& source, pqEventPlayer& player)
   //   playback loop, and it continues.
   this->PlayBackStatus = true; // success.
   this->PlayBackFinished = false;
+  this->PlaybackStartTime = QTime::currentTime();
   while (!this->PlayBackFinished)
     {
     this->playEvent();
@@ -136,13 +135,19 @@ bool pqEventDispatcher::playEvents(pqEventSource& source, pqEventPlayer& player)
 //-----------------------------------------------------------------------------
 void pqEventDispatcher::playEventOnBlocking()
 {
+  if (pqEventDispatcher::DeferMenuTimeouts)
+    {
+    this->BlockTimer.start();
+    return;
+    }
+
   //cout << "---blocked event: " << endl;
   // if needed for debugging, I can print blocking annotation here.
-  this->playEvent();
+  this->playEvent(1);
 }
 
 //-----------------------------------------------------------------------------
-void pqEventDispatcher::playEvent()
+void pqEventDispatcher::playEvent(int indent)
 {
   this->BlockTimer.stop();
   if (this->PlayBackFinished)
@@ -178,26 +183,31 @@ void pqEventDispatcher::playEvent()
   QApplication::syncX();
   static unsigned long counter=0;
   unsigned long local_counter = counter++;
-  int indent = 1; // this->ActiveModalWidgetStack.size();
   QString pretty_name = object.mid(object.lastIndexOf('/'));
   bool print_debug = getenv("PV_DEBUG_TEST") != NULL;
+#if defined(WIN32)
+  print_debug = true;
+#endif
   if (print_debug)
     {
-    cout  << QString().fill(' ', 4*indent).toStdString().c_str()
-          << local_counter << ": Test (" << indent << "): "
-          << pretty_name.toStdString().c_str() << ": "
-          << command.toStdString().c_str() << " : "
-          << arguments.toStdString().c_str() << endl;
+    cout << QTime::currentTime().secsTo(this->PlaybackStartTime) << " : "
+         << QString().fill(' ', 4*indent).toStdString().c_str()
+         << local_counter << ": Test (" << indent << "): "
+         << pretty_name.toStdString().c_str() << ": "
+         << command.toStdString().c_str() << " : "
+         << arguments.toStdString().c_str() << endl;
     }
 
   bool error = false;
   this->ActivePlayer->playEvent(object, command, arguments, error);
+  this->BlockTimer.stop();
   this->processEventsAndWait(100); // let what's going to happen after the
                                    // playback, happen.
   if (print_debug)
     {
-    cout << QString().fill(' ', 4*indent).toStdString().c_str()
-      << local_counter << ": Done" << endl;
+    cout << QTime::currentTime().secsTo(this->PlaybackStartTime) << " : "
+         << QString().fill(' ', 4*indent).toStdString().c_str()
+         << local_counter << ": Done" << endl;
     }
   if (error)
     {

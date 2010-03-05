@@ -37,7 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QObject>
 #include <QTimer>
-#include <QEvent>
+#include <QTime>
 
 class pqEventPlayer;
 class pqEventSource;
@@ -67,7 +67,7 @@ public:
 protected slots:
   /// Plays a single event. this->PlayBackFinished and this->PlayBackStatus are
   /// updated by this method.
-  void playEvent();
+  void playEvent(int indent=0);
   void playEventOnBlocking();
 
   /// Called when the mainThread is about to block.
@@ -84,6 +84,7 @@ protected:
   pqEventSource* ActiveSource;
   pqEventPlayer* ActivePlayer;
   QTimer BlockTimer;
+  QTime PlaybackStartTime;
 };
 
 #endif // !_pqEventDispatcher_h
