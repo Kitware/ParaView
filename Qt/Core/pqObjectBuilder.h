@@ -91,8 +91,18 @@ public:
   /// is set as the input. All inputs must be on the same server.
   virtual pqPipelineSource* createFilter(
     const QString& group, const QString& name,
+    QMap<QString, QList<pqOutputPort*> > namedInputs, pqServer* server);
+  /// Creates a filter with the given Server Manager group (\c sm_group) and
+  /// name (\c sm_name). If the filter accepts multiple inputs, all the inputs
+  /// provided in the list are set as input, instead only the first one
+  /// is set as the input. All inputs must be on the same server.
+  /// This also takes properties to initialize the filter with.
+  /// Note: a separate function was added as opposed to making the last
+  /// parameter with a default value due to bug in gcc < 4.4
+  virtual pqPipelineSource* createFilter(
+    const QString& group, const QString& name,
     QMap<QString, QList<pqOutputPort*> > namedInputs, pqServer* server,
-    const QMap<QString, QVariant>& properties=QMap<QString, QVariant>());
+    const QMap<QString, QVariant>& properties);
 
   /// Convenience method that takes a single input source.
   virtual pqPipelineSource* createFilter(
@@ -267,8 +277,8 @@ protected:
   /// a new name will be assigned to it.
   virtual vtkSMProxy* createProxyInternal(const QString& sm_group, 
     const QString& sm_name, pqServer* server, 
-    const QString& reg_group, const QString& reg_name=QString(),
-    const QMap<QString, QVariant>& properties=QMap<QString, QVariant>());
+    const QString& reg_group, const QString& reg_name,
+    const QMap<QString, QVariant>& properties);
 
   /// Unregisters a proxy.
   virtual void destroyProxyInternal(pqProxy* proxy);

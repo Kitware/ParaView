@@ -95,7 +95,7 @@ pqPipelineSource* pqObjectBuilder::createSource(const QString& sm_group,
     const QString& sm_name, pqServer* server)
 {
   vtkSMProxy* proxy = 
-    this->createProxyInternal(sm_group, sm_name, server, "sources");
+    this->createProxyInternal(sm_group, sm_name, server, "sources", QString(), QMap<QString,QVariant>());
   if (proxy)
     {
     pqPipelineSource* source = pqApplicationCore::instance()->
@@ -117,6 +117,14 @@ pqPipelineSource* pqObjectBuilder::createSource(const QString& sm_group,
     }
   return 0;
 }
+
+pqPipelineSource* pqObjectBuilder::createFilter(
+  const QString& group, const QString& name,
+  QMap<QString, QList<pqOutputPort*> > namedInputs, pqServer* server)
+{
+  this->createFilter(group, name, namedInputs, server, QMap<QString, QVariant>());
+}
+
 
 //-----------------------------------------------------------------------------
 pqPipelineSource* pqObjectBuilder::createFilter(
@@ -228,7 +236,7 @@ pqPipelineSource* pqObjectBuilder::createReader(const QString& sm_group,
     }
 
   vtkSMProxy* proxy = 
-    this->createProxyInternal(sm_group, sm_name, server, "sources", reg_name);
+    this->createProxyInternal(sm_group, sm_name, server, "sources", reg_name, QMap<QString,QVariant>());
   if (!proxy)
     {
     return 0;
@@ -569,7 +577,8 @@ pqScalarBarRepresentation* pqObjectBuilder::createScalarBarDisplay(
 
   pqServer* server = view->getServer();
   vtkSMProxy* scalarBarProxy = this->createProxyInternal(
-    "representations", "ScalarBarWidgetRepresentation", server, "scalar_bars");
+    "representations", "ScalarBarWidgetRepresentation", server, "scalar_bars",
+    QString(), QMap<QString,QVariant>());
 
   if (!scalarBarProxy)
     {
@@ -596,7 +605,8 @@ pqScalarBarRepresentation* pqObjectBuilder::createScalarBarDisplay(
 pqAnimationScene* pqObjectBuilder::createAnimationScene(pqServer* server)
 {
   vtkSMProxy* proxy = 
-    this->createProxyInternal("animation", "AnimationScene", server, "animation");
+    this->createProxyInternal("animation", "AnimationScene", server,
+      "animation", QString(), QMap<QString,QVariant>());
   if (proxy)
     {
     proxy->SetServers(vtkProcessModule::CLIENT);
@@ -620,7 +630,7 @@ vtkSMProxy* pqObjectBuilder::createProxy(const QString& sm_group,
     const QString& reg_group, const QString& reg_name/*=QString()*/)
 {
   vtkSMProxy* proxy = this->createProxyInternal(
-    sm_group, sm_name, server, reg_group, reg_name);
+    sm_group, sm_name, server, reg_group, reg_name, QMap<QString,QVariant>());
   if (proxy)
     {
     emit this->proxyCreated(proxy);
