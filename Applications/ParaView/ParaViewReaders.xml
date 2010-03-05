@@ -41,6 +41,7 @@
   <Proxy group="sources" name="popreader"/>
   <Proxy group="sources" name="AVSucdSeriesReader" />
   <Proxy group="sources" name="MetaImageReader" />
+  <Proxy group="sources" name="NrrdReader" />
   <Proxy group="sources" name="Facet Proxy" />
   <Proxy group="sources" name="PNGReader" />
   <Proxy group="sources" name="TIFFReader" />

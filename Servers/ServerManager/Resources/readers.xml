@@ -3684,7 +3684,7 @@
    </SourceProxy>
 
    <SourceProxy name="ImageReader" 
-                class="vtkImageReader"
+                class="vtkMPIImageReader"
                 label="Image Reader">
      <Documentation
        short_help="Read raw regular rectilinear grid data from a file." 
@@ -3836,6 +3836,41 @@
      </IntVectorProperty>
    <!-- End ImageReader -->
    </SourceProxy>
+
+   <SourceProxy name="NrrdReader"
+                class="vtkPNrrdReader"
+                label="Nrrd Reader">
+     <Documentation short_help="Read raw image files with Nrrd meta data."
+                    long_help="Read raw image files with Nrrd meta data.">
+       The Nrrd reader reads raw image data much like the Raw Image Reader
+       except that it will also read metadata information in the Nrrd format.
+       This means that the reader will automatically set information like file
+       dimensions.
+
+       There are several limitations on what type of nrrd files we can
+       read.  This reader only supports nrrd files in raw format.  Other
+       encodings like ascii and hex will result in errors.  When reading in
+       detached headers, this only supports reading one file that is
+       detached.
+     </Documentation>
+
+     <StringVectorProperty name="FileName"
+                           command="SetFileName"
+                           animateable="0"
+                           number_of_elements="1">
+       <FileListDomain name="files" />
+       <Documentation>
+         The name of the file to read (or the meta data file that will
+         point to the actual file).
+       </Documentation>
+     </StringVectorProperty>
+
+     <Hints>
+       <ReaderFactory extensions="nrrd nhdr"
+                      file_description="Nrrd Raw Image Files" />
+     </Hints>
+
+   </SourceProxy> <!-- NrrdReader -->
 
    <SourceProxy name="XdmfReader" 
                 class="vtkXdmfReader"
