@@ -60,7 +60,7 @@ pqEventDispatcher::pqEventDispatcher(QObject* parentObject) :
   QObject::connect(QAbstractEventDispatcher::instance(), SIGNAL(awake()),
                    this, SLOT(awake()));
 
-  this->BlockTimer.setInterval(500);
+  this->BlockTimer.setInterval(1000);
   this->BlockTimer.setSingleShot(true);
   QObject::connect(&this->BlockTimer, SIGNAL(timeout()),
                    this, SLOT(playEventOnBlocking()));
@@ -74,7 +74,7 @@ pqEventDispatcher::~pqEventDispatcher()
 //-----------------------------------------------------------------------------
 void pqEventDispatcher::aboutToBlock()
 {
-  if (!pqEventDispatcher::DeferMenuTimeouts)
+  // if (!pqEventDispatcher::DeferMenuTimeouts)
     {
     if (!this->BlockTimer.isActive())
       {
@@ -144,6 +144,11 @@ void pqEventDispatcher::playEventOnBlocking()
   //cout << "---blocked event: " << endl;
   // if needed for debugging, I can print blocking annotation here.
   this->playEvent(1);
+
+  if (!this->BlockTimer.isActive())
+    {
+    this->BlockTimer.start();
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -185,7 +190,7 @@ void pqEventDispatcher::playEvent(int indent)
   unsigned long local_counter = counter++;
   QString pretty_name = object.mid(object.lastIndexOf('/'));
   bool print_debug = getenv("PV_DEBUG_TEST") != NULL;
-#if defined(WIN32)
+#if defined(WIN32) || defined(__APPLE__) // temporary debugging on both platforms.
   print_debug = true;
 #endif
   if (print_debug)
@@ -203,6 +208,7 @@ void pqEventDispatcher::playEvent(int indent)
   this->BlockTimer.stop();
   this->processEventsAndWait(100); // let what's going to happen after the
                                    // playback, happen.
+  this->BlockTimer.stop();
   if (print_debug)
     {
     cout << QTime::currentTime().secsTo(this->PlaybackStartTime) << " : "
@@ -224,11 +230,11 @@ void pqEventDispatcher::processEventsAndWait(int ms)
   pqEventDispatcher::DeferMenuTimeouts = true;
   if (ms > 0)
     {
-    QApplication::processEvents(QEventLoop::ExcludeUserInputEvents);
+    QApplication::processEvents();
     QEventLoop loop;
     QTimer::singleShot(ms, &loop, SLOT(quit()));
-    loop.exec(QEventLoop::ExcludeUserInputEvents);
+    loop.exec();
     }
-  QApplication::processEvents(QEventLoop::ExcludeUserInputEvents);
+  QApplication::processEvents();
   pqEventDispatcher::DeferMenuTimeouts = prev;
 }
