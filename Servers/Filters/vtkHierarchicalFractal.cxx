@@ -36,7 +36,7 @@
 
 #include <assert.h>
 
-vtkCxxRevisionMacro(vtkHierarchicalFractal, "1.14");
+vtkCxxRevisionMacro(vtkHierarchicalFractal, "1.15");
 vtkStandardNewMacro(vtkHierarchicalFractal);
 
 //----------------------------------------------------------------------------
@@ -452,7 +452,7 @@ int vtkHierarchicalFractal::RequestData(
   // return the specific process number
   int piece=info->Get(vtkStreamingDemandDrivenPipeline::UPDATE_PIECE_NUMBER());
   int numPieces =info->Get(vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_PIECES());
-  
+
   float ox = -1.75;
   float oy = -1.25;
   float oz = 0.0;
@@ -771,6 +771,10 @@ void vtkHierarchicalFractal::Traverse(int &blockId,
         this->Levels->InsertValue(blockId, level);
         ++blockId;
         }
+      else if (this->EndBlock != -1)
+        {
+        this->AppedDataSetToLevel(output, level, ext, NULL);
+        }
       ++this->BlockCount;
       }
     }
@@ -1063,13 +1067,16 @@ void vtkHierarchicalFractal::AddBlockIdArray(vtkCompositeDataSet *output)
   int blockId = 0;
   vtkSmartPointer<vtkCompositeDataIterator> iter;
   iter.TakeReference(output->NewIterator());
+  iter->SkipEmptyNodesOff();
   for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); 
     iter->GoToNextItem(), blockId++)
     {
     vtkUniformGrid *grid;
     grid=vtkUniformGrid::SafeDownCast(iter->GetCurrentDataObject());
-    assert("check: grid_exists" && grid!=0);
-
+    if (!grid)
+      {
+      continue;
+      }
 
     vtkIntArray* array = vtkIntArray::New();
     int numCells=grid->GetNumberOfCells();
@@ -1101,21 +1108,21 @@ void vtkHierarchicalFractal::AddDepthArray(vtkHierarchicalBoxDataSet* output)
       vtkAMRBox temp;
       vtkUniformGrid *grid;
       grid=vtkUniformGrid::SafeDownCast(output->GetDataSet(level,block, temp));
-      assert("check: grid_exists" && grid!=0);
-      
-      
-      vtkIntArray* array = vtkIntArray::New();
-      int numCells=grid->GetNumberOfCells();
-      array->Allocate(numCells);
-      int cell=0;
-      while(cell<numCells)
+      if (grid)
         {
-        array->InsertNextValue(level);
-        ++cell;
+        vtkIntArray* array = vtkIntArray::New();
+        int numCells=grid->GetNumberOfCells();
+        array->Allocate(numCells);
+        int cell=0;
+        while(cell<numCells)
+          {
+          array->InsertNextValue(level);
+          ++cell;
+          }
+        array->SetName("Depth");
+        grid->GetCellData()->AddArray(array);
+        array->Delete();
         }
-      array->SetName("Depth");
-      grid->GetCellData()->AddArray(array);
-      array->Delete();
       ++block;
       }
     ++level;
