@@ -41,7 +41,8 @@
           </RequiredProperties>
         </ArrayListDomain>
 
-        <FieldDataDomain name="field_list">
+        <FieldDataDomain name="field_list"
+                         disable_update_domain_entries="1">
           <RequiredProperties>
             <Property name="Input" function="Input"/>
           </RequiredProperties>
