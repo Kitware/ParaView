@@ -206,8 +206,14 @@ void pqEventDispatcher::playEvent(int indent)
   bool error = false;
   this->ActivePlayer->playEvent(object, command, arguments, error);
   this->BlockTimer.stop();
+  //QCoreApplication::sendPostedEvents();
+  //QCoreApplication::flush();
+  if (print_debug) { cout << "       -- pre-processEventsAndWait: " <<
+    local_counter <<endl;}
   this->processEventsAndWait(100); // let what's going to happen after the
                                    // playback, happen.
+  if (print_debug) { cout << "       -- post-processEventsAndWait: " <<
+    local_counter <<endl;}
   this->BlockTimer.stop();
   if (print_debug)
     {
