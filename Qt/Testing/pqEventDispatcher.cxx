@@ -88,11 +88,11 @@ void pqEventDispatcher::aboutToBlock()
 //-----------------------------------------------------------------------------
 void pqEventDispatcher::awake()
 {
-  if (!pqEventDispatcher::DeferMenuTimeouts)
-    {
-    // cout << "awake" << endl;
-    // this->BlockTimer.stop();
-    }
+  //if (!pqEventDispatcher::DeferMenuTimeouts)
+  //  {
+  //  // cout << "awake" << endl;
+  //  // this->BlockTimer.stop();
+  //  }
 }
 
 //-----------------------------------------------------------------------------
@@ -145,10 +145,10 @@ void pqEventDispatcher::playEventOnBlocking()
   // if needed for debugging, I can print blocking annotation here.
   this->playEvent(1);
 
-  if (!this->BlockTimer.isActive())
-    {
-    this->BlockTimer.start();
-    }
+  //if (!this->BlockTimer.isActive())
+  //  {
+  //  this->BlockTimer.start();
+  //  }
 }
 
 //-----------------------------------------------------------------------------

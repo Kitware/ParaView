@@ -153,7 +153,6 @@ bool pqAbstractItemViewEventPlayer::playEvent(QObject* Object, const QString& Co
       type = Command == "mouseDblClick" ? QEvent::MouseButtonDblClick : type;
       QMouseEvent e(type, pt, button, buttons, keym);
       QCoreApplication::sendEvent(object->viewport(), &e);
-      pqEventDispatcher::processEventsAndWait(1);
       return true;
       }
     }

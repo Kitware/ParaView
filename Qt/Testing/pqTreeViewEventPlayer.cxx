@@ -112,7 +112,6 @@ bool pqTreeViewEventPlayer::playEvent(
         }
       }
     cur_item->setCheckState(column, static_cast<Qt::CheckState>(check_state));
-    pqEventDispatcher::processEventsAndWait(10);
     return true;
     }
 
@@ -133,7 +132,6 @@ bool pqTreeViewEventPlayer::playEvent(
       treeView->model()->setData(index,
         static_cast<Qt::CheckState>(check_state),
         Qt::CheckStateRole);
-      pqEventDispatcher::processEventsAndWait(10);
       }
     return true;
     }
@@ -146,7 +144,6 @@ bool pqTreeViewEventPlayer::playEvent(
       return true;
       }
     treeView->setExpanded(index, (command=="expand"));
-    pqEventDispatcher::processEventsAndWait(10);
     return true;
     }
   else if (command == "setCurrent")
@@ -158,7 +155,6 @@ bool pqTreeViewEventPlayer::playEvent(
       return true;
       }
     treeView->setCurrentIndex(index);
-    pqEventDispatcher::processEventsAndWait(10);
     return true;
     }
   return false;
