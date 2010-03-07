@@ -10,10 +10,12 @@ SET (SMSTATE_FILES
   ${PYTHON_SMSTATE_FILES}
   )
 
+SET(actual_exe_path ${EXECUTABLE_OUTPUT_PATH}/${CMAKE_CFG_INTDIR})
+
 IF (PVServerManagerTestData)
   FOREACH (tfile ${SMSTATE_FILES})
     ADD_TEST("${tfile}-ServerManagerPython"
-      ${EXECUTABLE_OUTPUT_PATH}/pvpython
+      ${actual_exe_path}/pvpython
       ${CMAKE_CURRENT_SOURCE_DIR}/SMPythonTesting.py
       -D ${PVServerManagerTestData}
       -T ${ParaView_BINARY_DIR}/Testing/Temporary
@@ -24,7 +26,7 @@ IF (PVServerManagerTestData)
   # This is a test that saves a temporary SM state and uses that saved
   # state for regression testing.
   ADD_TEST("LoadSave-ServerManagerPython"
-      ${EXECUTABLE_OUTPUT_PATH}/pvpython
+      ${actual_exe_path}/pvpython
       ${CMAKE_CURRENT_SOURCE_DIR}/SMPythonTesting.py
       -D ${PVServerManagerTestData}
       -T ${ParaView_BINARY_DIR}/Testing/Temporary
@@ -52,7 +54,7 @@ SET (PY_TESTS
 IF (PVServerManagerTestData)
   FOREACH (tfile ${PY_TESTS})
     ADD_TEST("${tfile}-ServerManagerPython"
-      ${EXECUTABLE_OUTPUT_PATH}/pvpython
+      ${actual_exe_path}/pvpython
       ${CMAKE_CURRENT_SOURCE_DIR}/${tfile}.py
       -D ${PVServerManagerTestData}
       -T ${ParaView_BINARY_DIR}/Testing/Temporary
@@ -76,7 +78,7 @@ SET(PY_TESTS_NO_BASELINE
 IF (PVServerManagerTestData)
   FOREACH (tfile ${PY_TESTS_NO_BASELINE})
     ADD_TEST("${tfile}-ServerManagerPython"
-      ${EXECUTABLE_OUTPUT_PATH}/pvpython
+      ${actual_exe_path}/pvpython
       ${CMAKE_CURRENT_SOURCE_DIR}/${tfile}.py
       -D ${PVServerManagerTestData}
       -T ${ParaView_BINARY_DIR}/Testing/Temporary
@@ -96,7 +98,7 @@ IF (PVServerManagerTestData)
     IF (VTK_MPIRUN_EXE AND VTK_MPI_MAX_NUMPROCS GREATER 1)
       ADD_TEST(${tfile}-Batch
         ${VTK_MPIRUN_EXE} ${VTK_MPI_PRENUMPROC_FLAGS} ${VTK_MPI_NUMPROC_FLAG} 2 ${VTK_MPI_PREFLAGS}
-        ${EXECUTABLE_OUTPUT_PATH}/pvbatch
+        ${actual_exe_path}/pvbatch
         ${CMAKE_CURRENT_SOURCE_DIR}/${tfile}.py
         -D ${PVServerManagerTestData}
         -T ${ParaView_BINARY_DIR}/Testing/Temporary
@@ -105,7 +107,7 @@ IF (PVServerManagerTestData)
   
       ADD_TEST(${tfile}-SymmetricBatch
         ${VTK_MPIRUN_EXE} ${VTK_MPI_PRENUMPROC_FLAGS} ${VTK_MPI_NUMPROC_FLAG} 2 ${VTK_MPI_PREFLAGS}
-        ${EXECUTABLE_OUTPUT_PATH}/pvbatch
+        ${actual_exe_path}/pvbatch
         --symmetric
         ${CMAKE_CURRENT_SOURCE_DIR}/${tfile}.py
         -D ${PVServerManagerTestData}
@@ -114,7 +116,7 @@ IF (PVServerManagerTestData)
         -S ${SMSTATE_FILE_DIR})
     ELSE (VTK_MPIRUN_EXE AND VTK_MPI_MAX_NUMPROCS GREATER 1)
       ADD_TEST(${tfile}-Batch
-        ${EXECUTABLE_OUTPUT_PATH}/pvbatch
+        ${actual_exe_path}/pvbatch
         ${CMAKE_CURRENT_SOURCE_DIR}/${tfile}.py
         -D ${PVServerManagerTestData}
         -T ${ParaView_BINARY_DIR}/Testing/Temporary
@@ -122,7 +124,7 @@ IF (PVServerManagerTestData)
         -S ${SMSTATE_FILE_DIR})
   
       ADD_TEST(${tfile}-SymmetricBatch
-        ${EXECUTABLE_OUTPUT_PATH}/pvbatch
+        ${actual_exe_path}/pvbatch
         --symmetric
         ${CMAKE_CURRENT_SOURCE_DIR}/${tfile}.py
         -D ${PVServerManagerTestData}
