@@ -1983,7 +1983,7 @@ is refined.
 
    <!-- ==================================================================== -->
    <SourceProxy name="TrivialProducer" 
-                class="vtkPVTrivialProducer">
+                class="vtkTrivialProducer">
    </SourceProxy>
 
   </ProxyGroup>

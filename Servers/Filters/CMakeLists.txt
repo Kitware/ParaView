@@ -143,8 +143,6 @@ SET(Filters_SRCS
   vtkPVTrackballRoll.cxx
   vtkPVTrackballRotate.cxx
   vtkPVTrackballZoom.cxx
-  vtkPVTrivialExtentTranslator.cxx
-  vtkPVTrivialProducer.cxx
   vtkPVUpdateSuppressor.cxx
   vtkPVHardwareSelector.cxx
   vtkQuerySelectionSource.cxx
