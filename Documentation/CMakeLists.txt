@@ -37,9 +37,14 @@ ADD_CUSTOM_TARGET(ParaViewOnlineHelp
   COMMENT "Compiling Qt help project paraview.qhp"
 )
 
-#ADD_DEPENDENCIES(ParaViewOnlineHelp
-#  HTMLDocumentation
-#)
+OPTION(GENERATE_FILTERS_DOCUMENTATION
+  "Turn on to ensure that the documentation for filters/sources/readers and writers is built."
+  OFF)
+IF (GENERATE_FILTERS_DOCUMENTATION)
+  ADD_DEPENDENCIES(ParaViewOnlineHelp
+    HTMLDocumentation)
+ENDIF(GENERATE_FILTERS_DOCUMENTATION)
+MARK_AS_ADVANCED(GENERATE_FILTERS_DOCUMENTATION)
 
 # Development
 IF (NOT PV_INSTALL_NO_DEVELOPMENT)
