@@ -95,6 +95,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqCustomFilterDefinitionWizard.h
   pqCustomFilterManager.h
   pqCustomFilterManagerModel.h
+  pqCustomViewButtonDialog.h
   pqCutPanel.h
   pqDataInformationModel.h
   pqDataInformationModelSelectionAdaptor.h
@@ -234,6 +235,7 @@ SET(UI_FORMS
   Resources/UI/pqCreateServerStartupDialog.ui
   Resources/UI/pqCustomFilterDefinitionWizard.ui
   Resources/UI/pqCustomFilterManager.ui
+  Resources/UI/pqCustomViewButtonDialog.ui
   Resources/UI/pqCubeAxesEditorDialog.ui
   Resources/UI/pqDisplayProxyEditor.ui
   Resources/UI/pqDisplayProxyEditorWidget.ui
@@ -448,6 +450,8 @@ ADD_LIBRARY(pqComponents
   pqCustomFilterManager.h
   pqCustomFilterManagerModel.cxx
   pqCustomFilterManagerModel.h
+  pqCustomViewButtonDialog.h
+  pqCustomViewButtonDialog.cxx
   pqCutPanel.cxx
   pqCutPanel.h
   pqDataInformationModel.cxx

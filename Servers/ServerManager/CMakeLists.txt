@@ -42,6 +42,8 @@ SET(Kit_SRCS
   vtkSMBoundsDomain.cxx
   vtkSMBoxProxy.cxx
   vtkSMBoxRepresentationProxy.cxx
+  vtkSMCameraConfigurationReader.cxx
+  vtkSMCameraConfigurationWriter.cxx
   vtkSMCameraKeyFrameProxy.cxx
   vtkSMCameraLink.cxx
   vtkSMCameraManipulatorProxy.cxx
@@ -126,10 +128,13 @@ SET(Kit_SRCS
   vtkSMProperty.cxx
   vtkSMPropertyHelper.cxx
   vtkSMPropertyIterator.cxx
+  vtkSMNamedPropertyIterator.cxx
   vtkSMPropertyLink.cxx
   vtkSMPropertyModificationUndoElement.cxx
   vtkSMPropRepresentationProxy.cxx
   vtkSMProxy.cxx
+  vtkSMProxyConfigurationReader.cxx
+  vtkSMProxyConfigurationWriter.cxx
   vtkSMProxyDefinitionIterator.cxx
   vtkSMProxyGroupDomain.cxx
   vtkSMProxyIterator.cxx

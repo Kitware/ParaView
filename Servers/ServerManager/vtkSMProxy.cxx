@@ -38,7 +38,7 @@
 #include <vtksys/ios/sstream>
 
 vtkStandardNewMacro(vtkSMProxy);
-vtkCxxRevisionMacro(vtkSMProxy, "1.118");
+vtkCxxRevisionMacro(vtkSMProxy, "1.119");
 
 vtkCxxSetObjectMacro(vtkSMProxy, XMLElement, vtkPVXMLElement);
 vtkCxxSetObjectMacro(vtkSMProxy, Hints, vtkPVXMLElement);
@@ -2287,8 +2287,21 @@ int vtkSMProxy::LoadRevivalState(vtkPVXMLElement* revivalElem)
   return 1;
 }
 
+
 //---------------------------------------------------------------------------
 vtkPVXMLElement* vtkSMProxy::SaveState(vtkPVXMLElement* root)
+{
+  vtkSMPropertyIterator *iter=this->NewPropertyIterator();
+  vtkPVXMLElement *proxyXml=this->SaveState(root,iter,1);
+  iter->Delete();
+  return proxyXml;
+}
+
+//---------------------------------------------------------------------------
+vtkPVXMLElement* vtkSMProxy::SaveState(
+    vtkPVXMLElement* root,
+    vtkSMPropertyIterator *iter,
+    int saveSubProxies)
 {
   vtkPVXMLElement* proxyElement = vtkPVXMLElement::New();
   proxyElement->SetName("Proxy");
@@ -2297,9 +2310,8 @@ vtkPVXMLElement* vtkSMProxy::SaveState(vtkPVXMLElement* root)
   proxyElement->AddAttribute("id", this->GetSelfIDAsString());
   proxyElement->AddAttribute("servers", 
     static_cast<unsigned int>(this->Servers));
-  vtkSMPropertyIterator* iter = this->NewPropertyIterator();
 
-  while (!iter->IsAtEnd())
+  for (iter->Begin(); !iter->IsAtEnd(); iter->Next())
     {
     if (!iter->GetProperty())
       {
@@ -2314,10 +2326,7 @@ vtkPVXMLElement* vtkSMProxy::SaveState(vtkPVXMLElement* root)
       iter->GetProperty()->SaveState(proxyElement, iter->GetKey(),
         propID.str().c_str());
       }
-    iter->Next();
     }
-
-  iter->Delete();
 
   if (root)
     {
@@ -2325,7 +2334,11 @@ vtkPVXMLElement* vtkSMProxy::SaveState(vtkPVXMLElement* root)
     proxyElement->Delete();
     }
 
-  this->SaveSubProxyState(proxyElement);
+  if (saveSubProxies)
+    {
+    this->SaveSubProxyState(proxyElement);
+    }
+
   return proxyElement;
 }
 

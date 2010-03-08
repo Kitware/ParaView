@@ -421,7 +421,22 @@ public:
   // Description:
   // Saves the state of the proxy. This state can be reloaded
   // to create a new proxy that is identical the present state of this proxy.
+  // The resulting proxy's XML hieratchy is returned, in addition if the root
+  // argument is not NULL then it's also inserted as a nested element.
+  // This call saves all a proxy's properties, including exposed properties
+  // and sub-proxies. More control is provided by the following overload.
   virtual vtkPVXMLElement* SaveState(vtkPVXMLElement* root);
+  // Description:
+  // Saves the state of the proxy. This state can be reloaded
+  // to create a new proxy that is identical the present state of this proxy.
+  // The resulting proxy's XML hieratchy is returned, in addition if the root
+  // argument is not NULL then it's also inserted as a nested element.
+  // The iterator argument is provided as a means for subsetting properties.
+  // The saveSubProxies argument turns on and off the saving of sub-proxies.
+  virtual vtkPVXMLElement* SaveState(
+        vtkPVXMLElement* root,
+        vtkSMPropertyIterator *iter,
+        int saveSubProxies);
 
   // Description:
   // Loads the proxy state from the XML element. Returns 0 on failure.
@@ -486,6 +501,7 @@ protected:
   friend class vtkSMPart;
   friend class vtkSMProperty;
   friend class vtkSMPropertyIterator;
+  friend class vtkSMNamedPropertyIterator;
   friend class vtkSMProxyManager;
   friend class vtkSMProxyObserver;
   friend class vtkSMProxyProperty;

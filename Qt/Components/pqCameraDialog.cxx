@@ -33,20 +33,42 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ui_pqCameraDialog.h"
 
 // ParaView Server Manager includes.
+#include "vtkSmartPointer.h"
 #include "vtkCamera.h"
 #include "vtkProcessModule.h"
 #include "vtkSMProxy.h"
 #include "vtkSMRenderViewProxy.h"
+#include "vtkSMProperty.h"
+#include "vtkSMCameraConfigurationReader.h"
+#include "vtkSMCameraConfigurationWriter.h"
+
+#include "vtkPVXMLElement.h"
+#include "vtkPVXMLParser.h"
 
 // Qt includes.
 #include <QPointer>
+#include <QString>
+#include <QDebug>
 
 // ParaView Client includes.
 #include "pqApplicationCore.h"
 #include "pqRenderView.h"
 #include "pqPropertyLinks.h"
+#include "pqSettings.h"
+#include "pqFileDialog.h"
+#include "pqCustomViewButtonDialog.h"
 
-//-----------------------------------------------------------------------------
+// STL
+#include <vtkstd/string>
+#include <vtksys/ios/sstream>
+
+#define pqErrorMacro(estr)\
+  qDebug()\
+      << "Error in:" << endl\
+      << __FILE__ << ", line " << __LINE__ << endl\
+      << "" estr << endl;
+
+//=============================================================================
 class pqCameraDialogInternal : public Ui::pqCameraDialog
 {
 public:
@@ -103,6 +125,47 @@ pqCameraDialog::pqCameraDialog(QWidget* _p/*=null*/,
   QObject::connect(
     this->Internal->azimuthButton, SIGNAL(clicked()),
     this, SLOT(applyCameraAzimuth()));
+
+  QObject::connect(
+    this->Internal->saveCameraConfiguration, SIGNAL(clicked()),
+    this, SLOT(saveCameraConfiguration()));
+
+  QObject::connect(
+    this->Internal->loadCameraConfiguration, SIGNAL(clicked()),
+    this, SLOT(loadCameraConfiguration()));
+
+  QObject::connect(
+    this->Internal->customView0, SIGNAL(clicked()),
+    this, SLOT(applyCustomView0()));
+
+  QObject::connect(
+    this->Internal->customView1, SIGNAL(clicked()),
+    this, SLOT(applyCustomView1()));
+
+  QObject::connect(
+    this->Internal->customView2, SIGNAL(clicked()),
+    this, SLOT(applyCustomView2()));
+
+  QObject::connect(
+    this->Internal->customView3, SIGNAL(clicked()),
+    this, SLOT(applyCustomView3()));
+
+  QObject::connect(
+    this->Internal->configureCustomViews, SIGNAL(clicked()),
+    this, SLOT(configureCustomViews()));
+
+  // load custom view buttons with any tool tips set by the user in a previous
+  // session.
+  pqCameraDialogInternal *w=this->Internal;
+  pqSettings *settings=pqApplicationCore::instance()->settings();
+  settings->beginGroup("CustomViewButtons");
+  settings->beginGroup("ToolTips");
+  w->customView0->setToolTip(settings->value("0","not configured.").toString());
+  w->customView1->setToolTip(settings->value("1","not configured.").toString());
+  w->customView2->setToolTip(settings->value("2","not configured.").toString());
+  w->customView3->setToolTip(settings->value("3","not configured.").toString());
+  settings->endGroup();
+  settings->endGroup();
 }
 
 //-----------------------------------------------------------------------------
@@ -326,3 +389,173 @@ void pqCameraDialog::resetRotationCenterWithCamera()
     }
 }
 
+//-----------------------------------------------------------------------------
+void pqCameraDialog::configureCustomViews()
+{
+  pqCameraDialogInternal *ui=this->Internal;
+
+  // load the existing button configurations from the app wide settings.
+  QStringList toolTips;
+  QStringList configs;
+
+  pqSettings *settings;
+  settings=pqApplicationCore::instance()->settings();
+  settings->beginGroup("CustomViewButtons");
+
+  settings->beginGroup("Configurations");
+  configs << settings->value("0","").toString();
+  configs << settings->value("1","").toString();
+  configs << settings->value("2","").toString();
+  configs << settings->value("3","").toString();
+  settings->endGroup();
+
+  settings->beginGroup("ToolTips");
+  toolTips << settings->value("0",ui->customView0->toolTip()).toString();
+  toolTips << settings->value("1",ui->customView1->toolTip()).toString();
+  toolTips << settings->value("2",ui->customView2->toolTip()).toString();
+  toolTips << settings->value("3",ui->customView3->toolTip()).toString();
+  settings->endGroup();
+  settings->endGroup();
+
+  // grab the current camera configuration.
+  vtksys_ios::ostringstream os;
+
+  vtkSMCameraConfigurationWriter *writer=vtkSMCameraConfigurationWriter::New();
+  writer->SetRenderViewProxy(ui->RenderModule->getRenderViewProxy());
+  writer->WriteConfiguration(os);
+
+  QString currentConfig(os.str().c_str());
+
+  // user modifies the configuration
+  pqCustomViewButtonDialog dialog(this,0,toolTips,configs,currentConfig);
+  if (dialog.exec()==QDialog::Accepted)
+    {
+    // save the new configuration into the app wide settings.
+    configs=dialog.getConfigurations();
+    settings->beginGroup("CustomViewButtons");
+    settings->beginGroup("Configurations");
+    settings->setValue("0",configs[0]);
+    settings->setValue("1",configs[1]);
+    settings->setValue("2",configs[2]);
+    settings->setValue("3",configs[3]);
+    settings->endGroup();
+
+    toolTips=dialog.getToolTips();
+    settings->beginGroup("ToolTips");
+    settings->setValue("0",toolTips[0]);
+    settings->setValue("1",toolTips[1]);
+    settings->setValue("2",toolTips[2]);
+    settings->setValue("3",toolTips[3]);
+    settings->endGroup();
+    settings->endGroup();
+
+    ui->customView0->setToolTip(toolTips[0]);
+    ui->customView1->setToolTip(toolTips[1]);
+    ui->customView2->setToolTip(toolTips[2]);
+    ui->customView3->setToolTip(toolTips[3]);
+    }
+
+  writer->Delete();
+}
+
+//-----------------------------------------------------------------------------
+void pqCameraDialog::applyCustomView(int buttonId)
+{
+  pqCameraDialogInternal *ui=this->Internal;
+
+  pqSettings *settings=pqApplicationCore::instance()->settings();
+  settings->beginGroup("CustomViewButtons");
+  settings->beginGroup("Configurations");
+  QString config=settings->value(QString::number(buttonId),"").toString();
+  settings->endGroup();
+  settings->endGroup();
+
+  if (!config.isEmpty())
+    {
+    vtkSmartPointer<vtkPVXMLParser> parser=vtkSmartPointer<vtkPVXMLParser>::New();
+    parser->InitializeParser();
+    parser->ParseChunk(config.toAscii().data(),static_cast<unsigned int>(config.size()));
+    parser->CleanupParser();
+
+    vtkPVXMLElement *xmlStream=parser->GetRootElement();
+    if (!xmlStream)
+      {
+      pqErrorMacro("Invalid XML in custom view button configuration.");
+      return;
+      }
+
+    vtkSmartPointer<vtkSMCameraConfigurationReader> reader
+      = vtkSmartPointer<vtkSMCameraConfigurationReader>::New();
+
+    reader->SetRenderViewProxy(ui->RenderModule->getRenderViewProxy());
+    int ok=reader->ReadConfiguration(xmlStream);
+    if (!ok)
+      {
+      pqErrorMacro(
+          << "Invalid XML in custom view button " 
+          << buttonId << " configuration.");
+      return;
+      }
+
+    // camera configuration has been modified update the scene.
+    ui->RenderModule->render();
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqCameraDialog::saveCameraConfiguration()
+{
+  vtkSMCameraConfigurationWriter *writer=vtkSMCameraConfigurationWriter::New();
+  writer->SetRenderViewProxy(this->Internal->RenderModule->getRenderViewProxy());
+
+  QString filters
+    = QString("%1 (*%2);;All Files (*.*)")
+        .arg(writer->GetFileDescription()).arg(writer->GetFileExtension());
+
+  pqFileDialog dialog(0,this,"Save Camera Configuration","",filters);
+  dialog.setFileMode(pqFileDialog::AnyFile);
+
+  if (dialog.exec()==QDialog::Accepted)
+    {
+    QString filename(dialog.getSelectedFiles()[0]);
+
+    int ok=writer->WriteConfiguration(filename.toStdString().c_str());
+    if (!ok)
+      {
+      pqErrorMacro("Failed to save the camera configuration.");
+      }
+    }
+
+  writer->Delete();
+}
+
+//-----------------------------------------------------------------------------
+void pqCameraDialog::loadCameraConfiguration()
+{
+  vtkSMCameraConfigurationReader *reader=vtkSMCameraConfigurationReader::New();
+  reader->SetRenderViewProxy(this->Internal->RenderModule->getRenderViewProxy());
+
+  QString filters
+    = QString("%1 (*%2);;All Files (*.*)")
+        .arg(reader->GetFileDescription()).arg(reader->GetFileExtension());
+
+  pqFileDialog dialog(0,this,"Load Camera Configuration","",filters);
+  dialog.setFileMode(pqFileDialog::ExistingFile);
+
+  if (dialog.exec()==QDialog::Accepted)
+    {
+    QString filename;
+    filename=dialog.getSelectedFiles()[0];
+
+    int ok=reader->ReadConfiguration(filename.toStdString().c_str());
+    if (!ok)
+      {
+      pqErrorMacro("Failed to load the camera configuration.");
+      }
+
+    // Update the scene with the new camera settings.
+    this->Internal->RenderModule->render();
+    }
+
+  reader->Delete();
+}

@@ -45,11 +45,26 @@ public:
   virtual ~pqCameraDialog();
 
   void SetCameraGroupsEnabled(bool enabled);
-  
+
 public slots:
   void setRenderModule(pqRenderView*);
 
 private slots:
+  // Description:
+  // Choose a file and load/save camera properties.
+  void saveCameraConfiguration();
+  void loadCameraConfiguration();
+
+  // Description:
+  // Assign/restore the current camera properties to 
+  // a custom view button.
+  void configureCustomViews();
+  void applyCustomView(int buttonId);
+  void applyCustomView0(){ this->applyCustomView(0); }
+  void applyCustomView1(){ this->applyCustomView(1); }
+  void applyCustomView2(){ this->applyCustomView(2); }
+  void applyCustomView3(){ this->applyCustomView(3); }
+
   void resetViewDirectionPosX();
   void resetViewDirectionNegX();
   void resetViewDirectionPosY();
@@ -72,15 +87,14 @@ protected:
 
 private:
   pqCameraDialogInternal* Internal;
-  
+
   enum CameraAdjustmentType
     {
     Roll=0,
     Elevation,
     Azimuth
     };
-  void adjustCamera(CameraAdjustmentType enType, 
-    double angle);
+  void adjustCamera(CameraAdjustmentType enType, double angle);
 };
 
 #endif
