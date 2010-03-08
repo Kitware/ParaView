@@ -9,33 +9,42 @@
 SET (SMSTATE_FILES
   ${PYTHON_SMSTATE_FILES}
   )
+  
+# In CMake version 2.8 we can used a much nicer $<CONFIGURATION> arguments for specifying 
+# the configuration type of the build For now I have added this new functionality to these 
+# batch tests but it will only work on dashboards using 2.8. This check can be removed when
+# ParaView officially requires CMake 2.8."
+SET(GENERATOR_EXPRESSIONS_SUPPORTED)
+IF("${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}" LESS 2.8)
+  SET(GENERATOR_EXPRESSIONS_SUPPORTED OFF)
+ELSE("${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}" LESS 2.8)
+  SET(GENERATOR_EXPRESSIONS_SUPPORTED ON)
+ENDIF("${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}" LESS 2.8)
 
-#SET(actual_exe_path ${EXECUTABLE_OUTPUT_PATH}/${CMAKE_CFG_INTDIR})
-SET(actual_exe_path ${EXECUTABLE_OUTPUT_PATH})
 
-IF (PVServerManagerTestData)
+IF (PVServerManagerTestData AND GENERATOR_EXPRESSIONS_SUPPORTED)
   FOREACH (tfile ${SMSTATE_FILES})
-    ADD_TEST("${tfile}-ServerManagerPython"
-      ${actual_exe_path}/pvpython
-      ${CMAKE_CURRENT_SOURCE_DIR}/SMPythonTesting.py
-      -D ${PVServerManagerTestData}
-      -T ${ParaView_BINARY_DIR}/Testing/Temporary
-      -V ${PVServerManagerTestData}/Baseline/${tfile}.png
-      --state ${SMSTATE_FILE_DIR}/${tfile}.pvsm)
+    ADD_TEST(NAME "${tfile}-ServerManagerPython"
+      COMMAND ${EXECUTABLE_OUTPUT_PATH}/\$<CONFIGURATION>/pvpython
+        ${CMAKE_CURRENT_SOURCE_DIR}/SMPythonTesting.py
+        -D ${PVServerManagerTestData}
+        -T ${ParaView_BINARY_DIR}/Testing/Temporary
+        -V ${PVServerManagerTestData}/Baseline/${tfile}.png
+        --state ${SMSTATE_FILE_DIR}/${tfile}.pvsm)
   ENDFOREACH (tfile)
 
   # This is a test that saves a temporary SM state and uses that saved
   # state for regression testing.
-  ADD_TEST("LoadSave-ServerManagerPython"
-      ${actual_exe_path}/pvpython
-      ${CMAKE_CURRENT_SOURCE_DIR}/SMPythonTesting.py
-      -D ${PVServerManagerTestData}
-      -T ${ParaView_BINARY_DIR}/Testing/Temporary
-      -V ${PVServerManagerTestData}/Baseline/Arrow.png
-      --state ${SMSTATE_FILE_DIR}/Arrow.pvsm
-      --use_saved_state)
-ENDIF (PVServerManagerTestData)
-  
+  ADD_TEST(NAME "LoadSave-ServerManagerPython"
+      COMMAND ${EXECUTABLE_OUTPUT_PATH}/\$<CONFIGURATION>/pvpython
+        ${CMAKE_CURRENT_SOURCE_DIR}/SMPythonTesting.py
+        -D ${PVServerManagerTestData}
+        -T ${ParaView_BINARY_DIR}/Testing/Temporary
+        -V ${PVServerManagerTestData}/Baseline/Arrow.png
+        --state ${SMSTATE_FILE_DIR}/Arrow.pvsm
+        --use_saved_state)
+ENDIF (PVServerManagerTestData AND GENERATOR_EXPRESSIONS_SUPPORTED)
+
 ###############################################################################
 # For python scripts for testing.
 #
@@ -52,17 +61,17 @@ SET (PY_TESTS
   )
 
 
-IF (PVServerManagerTestData)
+IF (PVServerManagerTestData  AND GENERATOR_EXPRESSIONS_SUPPORTED)
   FOREACH (tfile ${PY_TESTS})
-    ADD_TEST("${tfile}-ServerManagerPython"
-      ${actual_exe_path}/pvpython
-      ${CMAKE_CURRENT_SOURCE_DIR}/${tfile}.py
-      -D ${PVServerManagerTestData}
-      -T ${ParaView_BINARY_DIR}/Testing/Temporary
-      -V ${PVServerManagerTestData}/Baseline/${tfile}.png
-      -S ${SMSTATE_FILE_DIR})
+    ADD_TEST(NAME "${tfile}-ServerManagerPython"
+      COMMAND ${EXECUTABLE_OUTPUT_PATH}/\$<CONFIGURATION>/pvpython
+        ${CMAKE_CURRENT_SOURCE_DIR}/${tfile}.py
+        -D ${PVServerManagerTestData}
+        -T ${ParaView_BINARY_DIR}/Testing/Temporary
+        -V ${PVServerManagerTestData}/Baseline/${tfile}.png
+        -S ${SMSTATE_FILE_DIR})
   ENDFOREACH(tfile)
-ENDIF (PVServerManagerTestData)
+ENDIF (PVServerManagerTestData AND GENERATOR_EXPRESSIONS_SUPPORTED)
 
 
 SET(PY_TESTS_NO_BASELINE
@@ -76,16 +85,16 @@ SET(PY_TESTS_NO_BASELINE
   PythonFilters
 )
 
-IF (PVServerManagerTestData)
+IF (PVServerManagerTestData AND GENERATOR_EXPRESSIONS_SUPPORTED)
   FOREACH (tfile ${PY_TESTS_NO_BASELINE})
-    ADD_TEST("${tfile}-ServerManagerPython"
-      ${actual_exe_path}/pvpython
-      ${CMAKE_CURRENT_SOURCE_DIR}/${tfile}.py
-      -D ${PVServerManagerTestData}
-      -T ${ParaView_BINARY_DIR}/Testing/Temporary
-      -S ${SMSTATE_FILE_DIR})
+    ADD_TEST(NAME "${tfile}-ServerManagerPython"
+      COMMAND ${EXECUTABLE_OUTPUT_PATH}/\$<CONFIGURATION>/pvpython
+        ${CMAKE_CURRENT_SOURCE_DIR}/${tfile}.py
+        -D ${PVServerManagerTestData}
+        -T ${ParaView_BINARY_DIR}/Testing/Temporary
+        -S ${SMSTATE_FILE_DIR})
   ENDFOREACH(tfile)
-ENDIF (PVServerManagerTestData)
+ENDIF (PVServerManagerTestData AND GENERATOR_EXPRESSIONS_SUPPORTED)
 ###############################################################################
 # Add tests for pvbatch.
 
@@ -94,45 +103,46 @@ SET (PVBATCH_TESTS
   ParallelSerialWriter
 )
 
-IF (PVServerManagerTestData)
+IF (PVServerManagerTestData AND GENERATOR_EXPRESSIONS_SUPPORTED)
   FOREACH (tfile ${PVBATCH_TESTS})
     IF (VTK_MPIRUN_EXE AND VTK_MPI_MAX_NUMPROCS GREATER 1)
-      ADD_TEST(${tfile}-Batch
-        ${VTK_MPIRUN_EXE} ${VTK_MPI_PRENUMPROC_FLAGS} ${VTK_MPI_NUMPROC_FLAG} 2 ${VTK_MPI_PREFLAGS}
-        ${actual_exe_path}/pvbatch
-        ${CMAKE_CURRENT_SOURCE_DIR}/${tfile}.py
-        -D ${PVServerManagerTestData}
-        -T ${ParaView_BINARY_DIR}/Testing/Temporary
-        -V ${PVServerManagerTestData}/Baseline/${tfile}.png
-        -S ${SMSTATE_FILE_DIR})
-  
-      ADD_TEST(${tfile}-SymmetricBatch
-        ${VTK_MPIRUN_EXE} ${VTK_MPI_PRENUMPROC_FLAGS} ${VTK_MPI_NUMPROC_FLAG} 2 ${VTK_MPI_PREFLAGS}
-        ${actual_exe_path}/pvbatch
-        --symmetric
-        ${CMAKE_CURRENT_SOURCE_DIR}/${tfile}.py
-        -D ${PVServerManagerTestData}
-        -T ${ParaView_BINARY_DIR}/Testing/Temporary
-        -V ${PVServerManagerTestData}/Baseline/${tfile}.png
-        -S ${SMSTATE_FILE_DIR})
+
+      ADD_TEST(NAME ${tfile}-Batch
+        COMMAND ${VTK_MPIRUN_EXE} ${VTK_MPI_PRENUMPROC_FLAGS} ${VTK_MPI_NUMPROC_FLAG} 2 ${VTK_MPI_PREFLAGS}
+          ${EXECUTABLE_OUTPUT_PATH}/\$<CONFIGURATION>/pvbatch
+          ${CMAKE_CURRENT_SOURCE_DIR}/${tfile}.py
+          -D ${PVServerManagerTestData}
+          -T ${ParaView_BINARY_DIR}/Testing/Temporary
+          -V ${PVServerManagerTestData}/Baseline/${tfile}.png
+          -S ${SMSTATE_FILE_DIR})
+
+      ADD_TEST(NAME ${tfile}-SymmetricBatch
+        COMMAND ${VTK_MPIRUN_EXE} ${VTK_MPI_PRENUMPROC_FLAGS} ${VTK_MPI_NUMPROC_FLAG} 2 ${VTK_MPI_PREFLAGS}
+          ${EXECUTABLE_OUTPUT_PATH}/\$<CONFIGURATION>/pvbatch
+          --symmetric
+          ${CMAKE_CURRENT_SOURCE_DIR}/${tfile}.py
+          -D ${PVServerManagerTestData}
+          -T ${ParaView_BINARY_DIR}/Testing/Temporary
+          -V ${PVServerManagerTestData}/Baseline/${tfile}.png
+          -S ${SMSTATE_FILE_DIR})
     ELSE (VTK_MPIRUN_EXE AND VTK_MPI_MAX_NUMPROCS GREATER 1)
-      ADD_TEST(${tfile}-Batch
-        ${actual_exe_path}/pvbatch
-        ${CMAKE_CURRENT_SOURCE_DIR}/${tfile}.py
-        -D ${PVServerManagerTestData}
-        -T ${ParaView_BINARY_DIR}/Testing/Temporary
-        -V ${PVServerManagerTestData}/Baseline/${tfile}.png
-        -S ${SMSTATE_FILE_DIR})
-  
-      ADD_TEST(${tfile}-SymmetricBatch
-        ${actual_exe_path}/pvbatch
-        --symmetric
-        ${CMAKE_CURRENT_SOURCE_DIR}/${tfile}.py
-        -D ${PVServerManagerTestData}
-        -T ${ParaView_BINARY_DIR}/Testing/Temporary
-        -V ${PVServerManagerTestData}/Baseline/${tfile}.png
-        -S ${SMSTATE_FILE_DIR})
+      ADD_TEST(NAME ${tfile}-Batch
+        COMMAND ${EXECUTABLE_OUTPUT_PATH}/\$<CONFIGURATION>/pvbatch
+          ${CMAKE_CURRENT_SOURCE_DIR}/${tfile}.py
+          -D ${PVServerManagerTestData}
+          -T ${ParaView_BINARY_DIR}/Testing/Temporary
+          -V ${PVServerManagerTestData}/Baseline/${tfile}.png
+          -S ${SMSTATE_FILE_DIR})
+
+      ADD_TEST(NAME ${tfile}-SymmetricBatch
+        COMMAND ${EXECUTABLE_OUTPUT_PATH}/\$<CONFIGURATION>/pvbatch
+          --symmetric
+          ${CMAKE_CURRENT_SOURCE_DIR}/${tfile}.py
+          -D ${PVServerManagerTestData}
+          -T ${ParaView_BINARY_DIR}/Testing/Temporary
+          -V ${PVServerManagerTestData}/Baseline/${tfile}.png
+          -S ${SMSTATE_FILE_DIR})
     ENDIF (VTK_MPIRUN_EXE AND VTK_MPI_MAX_NUMPROCS GREATER 1)
   ENDFOREACH (tfile)
-ENDIF (PVServerManagerTestData)
+ENDIF (PVServerManagerTestData AND GENERATOR_EXPRESSIONS_SUPPORTED)
 
