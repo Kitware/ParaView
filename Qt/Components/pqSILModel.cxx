@@ -420,7 +420,7 @@ Qt::ItemFlags pqSILModel::flags(const QModelIndex &idx) const
   Qt::ItemFlags item_flags = 
     (Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsUserCheckable);
 
-  if (this->isLeaf(vertexId))
+  if (this->isLeaf(vertexId) == false)
     {
     item_flags |= Qt::ItemIsTristate;
     }
