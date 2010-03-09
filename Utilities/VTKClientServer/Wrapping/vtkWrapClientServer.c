@@ -826,10 +826,12 @@ void printFunction_BEGIN(FILE *fp, char * funName, char * className)
   // Print the header of the function
   fprintf(fp,
           "//------------------------------------------------------------------------auto\n"
-          "int %s_%s(const vtkClientServerStream& msg, %s *op, vtkClientServerStream& resultStream)\n"
-          "{\n  (void)resultStream;\n",
+          "int %s_%s(const vtkClientServerStream& msg, vtkObjectBase *opb, vtkClientServerStream& resultStream)\n"
+          "{\n  (void)resultStream;\n"
+          "  %s *op = static_cast<%s*>(opb);\n",
           className,
           funName,
+          className,
           className);
 }
 
@@ -1296,7 +1298,7 @@ void outputMethodMapFunction(FILE *fp, ClassInfo *data)
           "\n"
           "#ifndef VTK_METHOD_MAP\n"
           "#include <vtkstd/map>\n"
-          "typedef int (*funPtr)(const vtkClientServerStream& msg, %s *op, vtkClientServerStream& resultStream);\n"
+          "typedef int (*funPtr)(const vtkClientServerStream& msg, vtkObjectBase *op, vtkClientServerStream& resultStream);\n"
           "typedef vtkstd::map <vtkstd::string , funPtr> vtkMethodMap;\n"
           "#endif\n"
           "\n"
@@ -1314,7 +1316,6 @@ void outputMethodMapFunction(FILE *fp, ClassInfo *data)
           "  if(once)\n"
           "    {\n"
           "    once = 0;\n",
-          data->ClassName,
           data->ClassName,
           data->ClassName
           );
