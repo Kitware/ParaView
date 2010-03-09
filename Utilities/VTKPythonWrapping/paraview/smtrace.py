@@ -22,12 +22,11 @@ def reset_trace_globals():
   trace_globals.registered_proxies = []
   trace_globals.trace_output = ["try: paraview.simple\nexcept: from paraview.simple import *\n"]
   trace_globals.trace_output_endblock = "Render()"
-  trace_globals.traced_proxy_groups = ["sources", "representations", "views", \
+  trace_globals.traced_proxy_groups = ["sources", "representations", "views",
                                        "implicit_functions", "piecewise_functions",
-                                       "lookup_tables", "scalar_bars",
-                                       "selection_sources"]
-  trace_globals.ignored_view_properties = ["ViewSize", "GUISize", "ViewPosition", \
-                                           "ViewTime", "Representations"]
+                                       "lookup_tables", "scalar_bars", "selection_sources"]
+  trace_globals.ignored_view_properties = ["ViewSize", "GUISize",
+                                           "ViewPosition", "Representations"]
   trace_globals.ignored_representation_properties = ["Input"]
   trace_globals.proxy_ctor_hook = None
   reset_trace_observer()
@@ -525,12 +524,6 @@ def on_property_modified(o, e):
   if propName and proxy:
     prop = proxy.GetProperty(propName)
     if prop.GetInformationOnly() or prop.GetIsInternal(): return
-
-    # small hack here: some view properties are modified before the view
-    # is registered.  We don't want to call get_proxy_info until after
-    # the view is registered, so for now lets ignore these properties:
-    if propName in ignoredViewProperties(): return
-
     info = get_proxy_info(proxy)
     if info and prop:
       trace_property_modified(info, prop)
