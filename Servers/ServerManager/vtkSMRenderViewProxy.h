@@ -146,6 +146,16 @@ public:
   // Called when saving server manager state.
   // Overridden to SynchronizeCameraProperties before saving the properties.
   virtual vtkPVXMLElement* SaveState(vtkPVXMLElement* root);
+  
+  // Description:
+  // Un-hide the method. See vtkSMProxy for description.
+    virtual vtkPVXMLElement* SaveState(
+        vtkPVXMLElement* root,
+        vtkSMPropertyIterator *iter,
+        int saveSubProxies)
+      {
+      return this->Superclass::SaveState(root,iter,saveSubProxies);
+      }
 
   // Description:
   // Returns an image data that contains a "screenshot" of the window.

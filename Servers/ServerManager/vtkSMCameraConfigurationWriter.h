@@ -34,7 +34,7 @@ class vtkSMProxy;
 class VTK_EXPORT vtkSMCameraConfigurationWriter : public vtkSMProxyConfigurationWriter
 {
 public:
-  vtkTypeRevisionMacro(vtkSMCameraConfigurationWriter,vtkObject);
+  vtkTypeRevisionMacro(vtkSMCameraConfigurationWriter,vtkSMProxyConfigurationWriter);
   void PrintSelf(ostream& os, vtkIndent indent);
   static vtkSMCameraConfigurationWriter *New();
 
@@ -48,7 +48,7 @@ protected:
 
   // Protect the superclass's SetProxy, clients are forced to use
   // SetRenderViewProxy
-  void SetProxy(vtkSMProxy *proxy){ vtkErrorMacro("Use SetRenderViewProxy."); }
+  void SetProxy(vtkSMProxy *){ vtkErrorMacro("Use SetRenderViewProxy."); }
 
 private:
   vtkSMCameraConfigurationWriter(const vtkSMCameraConfigurationWriter&);  // Not implemented.

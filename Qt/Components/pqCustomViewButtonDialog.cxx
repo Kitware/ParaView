@@ -48,13 +48,13 @@ public:
 
 //------------------------------------------------------------------------------
 pqCustomViewButtonDialog::pqCustomViewButtonDialog(
-    QWidget *parent,
+    QWidget *Parent,
     Qt::WindowFlags flags,
     QStringList &toolTips,
     QStringList &configs,
     QString &curConfig)
             :
-    QDialog(parent,flags),
+    QDialog(Parent,flags),
     NButtons(0),
     ui(0)
 {
@@ -237,21 +237,21 @@ void pqCustomViewButtonDialog::importConfigurations()
         }
 
       // tool tip
-      vtkPVXMLElement *toolTip=button->FindNestedElementByName("ToolTip");
-      if (toolTip==0)
+      vtkPVXMLElement *tip=button->FindNestedElementByName("ToolTip");
+      if (tip==0)
         {
         pqErrorMacro(<< buttonTagId << " is missing ToolTip.");
         return;
         }
-      const char *toolTipValue=toolTip->GetAttribute("value");
-      if (toolTipValue==0)
+      const char *tipValue=tip->GetAttribute("value");
+      if (tipValue==0)
         {
         pqErrorMacro("In " << buttonTagId
             << " ToolTip is missing value attribute.");
         return;
         }
 
-      toolTips << toolTipValue;
+      toolTips << tipValue;
 
       // Here are the optionally nested Camera Configurations.
       vtkPVXMLElement *config=button->FindNestedElementByName("Configuration");
@@ -329,9 +329,9 @@ void pqCustomViewButtonDialog::exportConfigurations()
     for (int i=0; i<this->NButtons; ++i)
       {
       // tool tip
-      vtkPVXMLElement *toolTip=vtkPVXMLElement::New();
-      toolTip->SetName("ToolTip");
-      toolTip->SetAttribute("value",this->ToolTips[i]->text().toStdString().c_str());
+      vtkPVXMLElement *tip=vtkPVXMLElement::New();
+      tip->SetName("ToolTip");
+      tip->SetAttribute("value",this->ToolTips[i]->text().toStdString().c_str());
 
       // camera configuration
       vtksys_ios::ostringstream os;
@@ -358,12 +358,12 @@ void pqCustomViewButtonDialog::exportConfigurations()
 
       vtkPVXMLElement *button=vtkPVXMLElement::New();
       button->SetName(QString("CustomViewButton%1").arg(i).toStdString().c_str());
-      button->AddNestedElement(toolTip);
+      button->AddNestedElement(tip);
       button->AddNestedElement(config);
 
       xmlStream->AddNestedElement(button);
 
-      toolTip->Delete();
+      tip->Delete();
       config->Delete();
       button->Delete();
       }

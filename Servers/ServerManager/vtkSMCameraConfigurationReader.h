@@ -62,7 +62,7 @@ protected:
 
   // Protect the superclass's SetProxy, clients are forced to use
   // SetRenderViewProxy
-  void SetProxy(vtkSMProxy *proxy){ vtkErrorMacro("Use SetRenderViewProxy."); }
+  void SetProxy(vtkSMProxy *){ vtkErrorMacro("Use SetRenderViewProxy."); }
 
 private:
   vtkSMCameraConfigurationReader(const vtkSMCameraConfigurationReader&);  // Not implemented.

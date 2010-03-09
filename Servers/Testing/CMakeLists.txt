@@ -26,9 +26,11 @@ IF(PYTHON_EXECUTABLE AND VTK_HEADER_TESTING_PY)
       vtkPVServerOptionsInternals.h
       vtkPVTestUtities.h
       vtkSciVizStatisticsPrivate.h
+      vtkSMCameraConfigurationFileInfo.h
       vtkSMPropertyHelper.h
       vtkSMPropertyInternals.h
       vtkSMPropertyInternals.h
+      vtkSMProxyConfigurationFileInfo.h
       vtkSMProxyInternals.h
       vtkSMProxyManagerInternals.h
       vtkSMRepresentationStrategyVector.h

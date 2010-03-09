@@ -40,7 +40,7 @@ class vtkSMPropertyIterator;
 class vtkSMProxy;
 class vtkStringList;
 
-class vtkSMProxyConfigurationWriter : public vtkSMObject
+class VTK_EXPORT vtkSMProxyConfigurationWriter : public vtkSMObject
 {
 public:
   static vtkSMProxyConfigurationWriter* New();
@@ -90,8 +90,10 @@ public:
 protected:
   vtkSMProxyConfigurationWriter();
   virtual ~vtkSMProxyConfigurationWriter();
-  vtkSMProxyConfigurationWriter(const vtkSMProxyConfigurationWriter &); // not implemented
-  vtkSMProxyConfigurationWriter &operator=(const vtkSMProxyConfigurationWriter &); // not implemented
+
+private:
+  vtkSMProxyConfigurationWriter(const vtkSMProxyConfigurationWriter&); // Not implemented
+  void operator=(const vtkSMProxyConfigurationWriter&); // Not implemented
 
 private:
   char *FileName;
