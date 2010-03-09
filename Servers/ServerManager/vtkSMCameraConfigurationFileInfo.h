@@ -38,7 +38,7 @@ public:
     FileExtension(".pvcc")
       { }
 
-  virtual void PrintSelf(ostream &os, vtkIndent indent)
+  void PrintSelf(ostream &os, vtkIndent indent)
     {
     os
       << indent << "FileIdentifier: " << this->FileIdentifier << endl
