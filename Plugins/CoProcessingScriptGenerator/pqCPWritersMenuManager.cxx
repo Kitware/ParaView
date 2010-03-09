@@ -89,6 +89,24 @@ pqCPWritersMenuManager::~pqCPWritersMenuManager()
 {
 }
 
+namespace
+{
+  QAction* findHelpMenuAction(QMenuBar* menubar)
+    {
+    QList<QAction *> menuBarActions = menubar->actions();
+    foreach(QAction *existingMenuAction, menuBarActions)
+      {
+      QString menuName = existingMenuAction->text().toLower();
+      menuName.remove('&');
+      if (menuName == "help")
+        {
+        return existingMenuAction;
+        }
+      }
+    return NULL;
+    }
+}
+
 //-----------------------------------------------------------------------------
 void pqCPWritersMenuManager::createMenu()
 {
@@ -117,7 +135,8 @@ void pqCPWritersMenuManager::createMenu()
 
   this->Menu = new QMenu("&Writers", mainWindow);
   this->Menu->setObjectName("CoProcessingWritersMenu");
-  mainWindow->menuBar()->addMenu(this->Menu);
+  mainWindow->menuBar()->insertMenu(
+    ::findHelpMenuAction(mainWindow->menuBar()), this->Menu);
 
   QObject::connect(this->Menu, SIGNAL(triggered(QAction*)),
     this, SLOT(onActionTriggered(QAction*)), Qt::QueuedConnection);

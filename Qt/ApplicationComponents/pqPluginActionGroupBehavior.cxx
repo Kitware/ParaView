@@ -40,6 +40,38 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QMenuBar>
 #include <QToolBar>
 
+namespace
+{
+  QAction* findExitAction(QMenu* menu)
+    {
+    foreach (QAction* action, menu->actions())
+      {
+      QString name = action->text().toLower();
+      name.remove('&');
+      if (name == "exit" || name == "quit")
+        {
+        return action;
+        }
+      }
+    return NULL;
+    }
+
+  QAction* findHelpMenuAction(QMenuBar* menubar)
+    {
+    QList<QAction *> menuBarActions = menubar->actions();
+    foreach(QAction *existingMenuAction, menuBarActions)
+      {
+      QString menuName = existingMenuAction->text().toLower();
+      menuName.remove('&');
+      if (menuName == "help")
+        {
+        return existingMenuAction;
+        }
+      }
+    return NULL;
+    }
+}
+
 //-----------------------------------------------------------------------------
 pqPluginActionGroupBehavior::pqPluginActionGroupBehavior(QMainWindow* parentObject)
   : Superclass(parentObject)
@@ -95,12 +127,21 @@ void pqPluginActionGroupBehavior::addPluginInterface(QObject* iface)
       }
     if (menu)
       {
-      // Add to existing menu.
+      QAction* exitAction = ::findExitAction(menu);
+
+      // Add to existing menu (before exit action, if exists).
       QAction *a;
-      a = menu->addSeparator();
+      if (exitAction == NULL)
+        {
+        menu->addSeparator();
+        }
       foreach(a, agi->actionGroup()->actions())
         {
-        menu->addAction(a);
+        menu->insertAction(exitAction, a);
+        }
+      if (exitAction != NULL)
+        {
+        menu->insertSeparator(exitAction);
         }
       }
     else
@@ -109,7 +150,9 @@ void pqPluginActionGroupBehavior::addPluginInterface(QObject* iface)
       menu = new QMenu(splitName[1], mainWindow);
       menu->setObjectName(splitName[1]);
       menu->addActions(agi->actionGroup()->actions());
-      mainWindow->menuBar()->addMenu(menu);
+      // insert new menus before the Help menu is possible.
+      mainWindow->menuBar()->insertMenu(
+        ::findHelpMenuAction(mainWindow->menuBar()), menu);
       }
     }
   else if (splitName.size())
