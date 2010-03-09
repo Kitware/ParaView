@@ -102,7 +102,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <math.h>
 
-vtkCxxRevisionMacro(vtkMantaPolyDataMapper, "1.10");
+vtkCxxRevisionMacro(vtkMantaPolyDataMapper, "1.11");
 vtkStandardNewMacro(vtkMantaPolyDataMapper);
 
 //----------------------------------------------------------------------------
@@ -141,30 +141,11 @@ void vtkMantaPolyDataMapper::ReleaseGraphicsResources(vtkWindow *win)
   //cerr << "MM(" << this << ") RELEASE GRAPHICS RESOURCES" << endl;
   this->Superclass::ReleaseGraphicsResources( win );
     
-  if (!this->MantaManager)
-    {
-    return;
-    }
-  this->MantaManager->GetMantaEngine()->addTransaction
-    ("delete polyresources",
-     Manta::Callback::create( this,
-                              &vtkMantaPolyDataMapper::FreeMantaResources
-                              )
-     );
-}
-
-//----------------------------------------------------------------------------
-void vtkMantaPolyDataMapper::FreeMantaResources()
-{
-  //cerr << "MM(" << this << ") FREE MANTA RESOURCES" << endl;
-/*
-  TODO: Is this necessary? If so how to make it work?
   if (this->InternalColorTexture)
     {
     this->InternalColorTexture->Delete();
     }
   this->InternalColorTexture = NULL;
-*/
 }
 
 //----------------------------------------------------------------------------
@@ -240,8 +221,6 @@ void vtkMantaPolyDataMapper::RenderPiece(vtkRenderer *ren, vtkActor *act)
   // if something has changed, regenerate Manta primitives if required
   if ( this->GetMTime()  > this->BuildTime ||
        input->GetMTime() > this->BuildTime ||
-       // TODO: Actor is always modified in ParaView by vtkPVLODActor,
-       // it calls vtkActor::SetProperty every time its Render() is called.
        //act->GetMTime()   > this->BuildTime ||
        act->GetProperty()->GetMTime() > this->BuildTime
        )
@@ -360,12 +339,6 @@ void vtkMantaPolyDataMapper::DrawPolygons(vtkPolyData *polys, Manta::Mesh *mesh)
       numtriangles ++;
       }
     }
-  
-  // It is always good to assign unused pointers to NULL
-  // to avoid wild ones that may cause problems on some occasions.
-  // 'index' must NOT be 'delete'-d here.
-  index = NULL;
-  cells = NULL;
   
   //cerr << "polygons: # of triangles = " << numtriangles << endl;
   
@@ -687,6 +660,7 @@ void vtkMantaPolyDataMapper::Draw(vtkRenderer *renderer, vtkActor *actor)
       }
     else
       {
+      //cerr << "PUSH MATERIAL 1 " << material << endl;
       mesh->materials.push_back(material);
       }
     
@@ -721,6 +695,7 @@ void vtkMantaPolyDataMapper::Draw(vtkRenderer *renderer, vtkActor *actor)
         Manta::Texture<Manta::Color> *texture = 
           this->InternalColorTexture->GetMantaTexture();
         Manta::Material *material = new Manta::Lambertian(texture);
+        //cerr << "PUSH MATERIAL 2 " << material << endl;
         mesh->materials.push_back( material );
         //cerr << "scalar color map with texture\n";
         }
@@ -753,6 +728,7 @@ void vtkMantaPolyDataMapper::Draw(vtkRenderer *renderer, vtkActor *actor)
           Manta::Texture<Manta::Color> *texture = 
             mantaTexture->GetMantaTexture();
           Manta::Material *material = new Manta::Lambertian(texture);
+          //cerr << "PUSH MATERIAL 3 " << material << endl;
           mesh->materials.push_back( material );
           }
         else
@@ -764,13 +740,18 @@ void vtkMantaPolyDataMapper::Draw(vtkRenderer *renderer, vtkActor *actor)
         {
         //cerr << "using actor's property" << endl;
         // no colormap or texture, use the Actor's property
-        Manta::Material *mmat = mantaProperty->GetMantaMaterial();
-        if(!mmat)
+        Manta::Material *material = mantaProperty->GetMantaMaterial();
+        if(material)
           {
+          //TODO: This crashes, the material is created alright,
+          //but the next call the property->Render(), deletes it and which leaves dead references and
+          //causes a creash
           mantaProperty->CreateMantaProperty();
-          mmat = mantaProperty->GetMantaMaterial();
+          material = mantaProperty->GetMantaMaterial();
+          //cerr << "OBTAINED " << material << endl;
           }
-        mesh->materials.push_back( mmat );
+        //cerr << "PUSH MATERIAL 4 " << material << endl;
+        mesh->materials.push_back( material );
         }
   
   //TODO: Respect wireframe and point mode

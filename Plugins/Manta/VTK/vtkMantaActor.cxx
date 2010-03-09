@@ -80,18 +80,18 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //============================================================================
 
-//MPR is a helper that exists just to hold on to manta side resources
+//This is a helper that exists just to hold on to manta side resources
 //long enough for the manta thread to destroy them, whenever that
 //threads gets around to it (in a callback)
-class MPR2
+class vtkMantaActorThreadCache
 {
 public:
-  MPR2(Manta::Group *w,
+  vtkMantaActorThreadCache(Manta::Group *w,
       Manta::AccelerationStructure *a,
       Manta::Group *g)
     : MantaWorldGroup(w), MantaAS(a), MantaGeom(g)
   {
-    this->DebugCntr = MPR2::GlobalCntr++;
+    this->DebugCntr = vtkMantaActorThreadCache::GlobalCntr++;
     //cerr << "MAPR( " << this << ") " << this->DebugCntr << endl;
     //cerr << " AS: " << this->MantaAS << endl;
     //cerr << " WG: " << this->MantaWorldGroup << endl;
@@ -131,15 +131,15 @@ public:
   int DebugCntr;
   static int GlobalCntr;
 private:
-  MPR2(const MPR2&);  // Not implemented.
-  void operator=(const MPR2&);  // Not implemented.
+  vtkMantaActorThreadCache(const vtkMantaActorThreadCache&);  // Not implemented.
+  void operator=(const vtkMantaActorThreadCache&);  // Not implemented.
 };
 
-int MPR2::GlobalCntr = 0;
+int vtkMantaActorThreadCache::GlobalCntr = 0;
 
 //===========================================================================
 
-vtkCxxRevisionMacro(vtkMantaActor, "1.12");
+vtkCxxRevisionMacro(vtkMantaActor, "1.13");
 vtkStandardNewMacro(vtkMantaActor);
 
 //----------------------------------------------------------------------------
@@ -187,9 +187,10 @@ void vtkMantaActor::ReleaseGraphicsResources( vtkWindow * win )
     }
 
   //save off the pointers for the manta thread
-  MPR2 *R = new MPR2(this->MantaManager->GetMantaWorldGroup(),
-                     this->MantaAS,
-                     this->Group);
+  vtkMantaActorThreadCache *R =
+    new vtkMantaActorThreadCache(this->MantaManager->GetMantaWorldGroup(),
+                                 this->MantaAS,
+                                 this->Group);
 
   //make no further references to them in this thread
   this->MantaAS = NULL;
@@ -198,7 +199,8 @@ void vtkMantaActor::ReleaseGraphicsResources( vtkWindow * win )
   //ask the manta thread to free them when it can
   this->MantaManager->GetMantaEngine()->
     addTransaction("cleanup actor",
-                   Manta::Callback::create(R, &MPR2::FreeMantaResources));
+                   Manta::Callback::create
+                   (R, &vtkMantaActorThreadCache::FreeMantaResources));
 }
 
 //----------------------------------------------------------------------------
@@ -361,7 +363,7 @@ void vtkMantaActor::SetGroup( Manta::Group * group )
     }
 
   //save off the pointers for the manta thread
-  MPR2 *R = new MPR2(NULL,
+  vtkMantaActorThreadCache *R = new vtkMantaActorThreadCache(NULL,
                      NULL,
                      this->Group);
 
@@ -369,5 +371,6 @@ void vtkMantaActor::SetGroup( Manta::Group * group )
   //ask the manta thread to free them when it can
   this->MantaManager->GetMantaEngine()->
     addTransaction("change geometry",
-                   Manta::Callback::create(R, &MPR2::FreeMantaResources));
+                   Manta::Callback::create
+                   (R, &vtkMantaActorThreadCache::FreeMantaResources));
 }

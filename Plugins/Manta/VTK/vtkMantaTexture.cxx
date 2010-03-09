@@ -78,7 +78,38 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <math.h>
 
-vtkCxxRevisionMacro(vtkMantaTexture, "1.7");
+//==============================================================================
+//This is a helper that exists just to hold on to manta side resources
+//long enough for the manta thread to destroy them, whenever that
+//threads gets around to it (in a callback)
+class vtkMantaTextureThreadCache
+{
+public:
+  vtkMantaTextureThreadCache(Manta::Texture<Manta::Color> *mt)
+    : MantaTexture(mt)
+  {
+  }
+
+  void FreeMantaResources()
+  {
+    delete MantaTexture;
+    //WARNING: this class must never be instantiated on the stack.
+    //Therefore, it has private unimplemented copy/contructors.
+    delete this;
+  }
+
+private:
+  vtkMantaTextureThreadCache(const vtkMantaTextureThreadCache&);
+  // Not implemented.
+  void operator=(const vtkMantaTextureThreadCache&);
+  // Not implemented.
+
+  Manta::Texture<Manta::Color> *MantaTexture;
+};
+
+//============================================================================== 
+
+vtkCxxRevisionMacro(vtkMantaTexture, "1.8");
 vtkStandardNewMacro(vtkMantaTexture);
 
 //----------------------------------------------------------------------------
@@ -87,6 +118,7 @@ vtkMantaTexture::vtkMantaTexture()
 {
   //cerr << "MT( " << this << ") CREATE " << endl;
   this->MantaManager = NULL;
+  this->MantaTexture = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -95,10 +127,34 @@ vtkMantaTexture::~vtkMantaTexture()
   //cerr << "MT( " << this << ") DESTROY " << endl;
   if (this->MantaManager)
     {
+    this->DeleteMantaTexture();
+
     //cerr << "MT(" << this << ") DESTROY " << this->MantaManager << " " 
     //     << this->MantaManager->GetReferenceCount() << endl;
     this->MantaManager->Delete();
     }
+}
+
+//-----------------------------------------------------------------------------
+void vtkMantaTexture::DeleteMantaTexture()
+{
+  if (!this->MantaTexture)
+    {
+    return;
+    }
+
+  //save off the pointers for the manta thread
+  vtkMantaTextureThreadCache *R =
+    new vtkMantaTextureThreadCache(this->MantaTexture);
+
+  //make no further references to them in this thread
+  this->MantaTexture = NULL;
+
+  //ask the manta thread to free them when it can
+  this->MantaManager->GetMantaEngine()->
+    addTransaction("cleanup texture",
+                   Manta::Callback::create
+                   (R, &vtkMantaTextureThreadCache::FreeMantaResources));
 }
 
 //-----------------------------------------------------------------------------
@@ -112,22 +168,7 @@ void vtkMantaTexture::ReleaseGraphicsResources(vtkWindow *win)
     return;
     }
 
-  this->MantaManager->GetMantaEngine()->
-    addTransaction(
-                   "delete texture",
-                   Manta::Callback::create(this,
-                                           &vtkMantaTexture::FreeMantaResources
-                                           )
-                   );
-  
-}
-
-//----------------------------------------------------------------------------
-void vtkMantaTexture::FreeMantaResources()
-{
-  //cerr << "MT(" << this << ") FREE MANTA RESOURCES " << endl;
-  delete this->MantaTexture;
-  this->MantaTexture = NULL;
+  this->DeleteMantaTexture();
 }
 
 //----------------------------------------------------------------------------
@@ -188,8 +229,8 @@ void vtkMantaTexture::Load(vtkRenderer *ren)
     bytesPerPixel = scalars->GetNumberOfComponents();
 
     // make sure using unsigned char data of color scalars type
-    if (this->MapColorScalarsThroughLookupTable || scalars->GetDataType()
-        != VTK_UNSIGNED_CHAR)
+    if (this->MapColorScalarsThroughLookupTable ||
+        scalars->GetDataType() != VTK_UNSIGNED_CHAR)
       {
       dataPtr = this->MapScalarsToColors(scalars);
       bytesPerPixel = 4;
@@ -247,11 +288,10 @@ void vtkMantaTexture::Load(vtkRenderer *ren)
     // create Manta texture from the image
     Manta::ImageTexture<Manta::Color> *imgtexture = 
       new Manta::ImageTexture<Manta::Color>(image, false);
-
-    //TODO: MEMORY LEAK OF WHAT USED TO BE HERE NEED TRANSACTION
-    this->MantaTexture = imgtexture;
-
     imgtexture->setInterpolationMethod(1);
+
+    this->DeleteMantaTexture();
+    this->MantaTexture = imgtexture;
 
     // Manta image is copied and converted to internal buffer in the texture,
     // delete the image
@@ -259,7 +299,6 @@ void vtkMantaTexture::Load(vtkRenderer *ren)
 
     this->LoadTime.Modified();
     }
-
 }
 
 //----------------------------------------------------------------------------

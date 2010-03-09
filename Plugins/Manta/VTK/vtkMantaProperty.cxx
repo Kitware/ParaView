@@ -82,18 +82,18 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cstring>
 
 //============================================================================
-//MPR is a helper that exists just to hold on to manta side resources
+//This is a helper that exists just to hold on to manta side resources
 //long enough for the manta thread to destroy them, whenever that
 //threads gets around to it (in a callback)
-class MPR
+class vtkMantaPropertyThreadCache
 {
 public:
-  MPR(Manta::Material *m,
+  vtkMantaPropertyThreadCache(Manta::Material *m,
       Manta::Texture<Manta::Color> *dT,
       Manta::Texture<Manta::Color> *sT )
     : MantaMaterial(m), DiffuseTexture(dT), SpecularTexture(sT)
   {
-    this->DebugCntr = MPR::GlobalCntr++;
+    this->DebugCntr = vtkMantaPropertyThreadCache::GlobalCntr++;
     //cerr << "MPPR( " << this << ") " << this->DebugCntr << endl;
   }
   
@@ -117,15 +117,15 @@ public:
   static int GlobalCntr;
 
 private:
-  MPR(const MPR&);  // Not implemented.
-  void operator=(const MPR&);  // Not implemented.
+  vtkMantaPropertyThreadCache(const vtkMantaPropertyThreadCache&);  // Not implemented.
+  void operator=(const vtkMantaPropertyThreadCache&);  // Not implemented.
 };
 
-int MPR::GlobalCntr = 0;
+int vtkMantaPropertyThreadCache::GlobalCntr = 0;
 
 //===========================================================================
 
-vtkCxxRevisionMacro(vtkMantaProperty, "1.10");
+vtkCxxRevisionMacro(vtkMantaProperty, "1.11");
 vtkStandardNewMacro(vtkMantaProperty);
 
 //----------------------------------------------------------------------------
@@ -168,9 +168,10 @@ void vtkMantaProperty::ReleaseGraphicsResources(vtkWindow *win)
     }
 
   //save off the pointers for the manta thread
-  MPR *R = new MPR(this->MantaMaterial, 
-                   this->DiffuseTexture, 
-                   this->SpecularTexture);
+  vtkMantaPropertyThreadCache *R =
+    new vtkMantaPropertyThreadCache(this->MantaMaterial,
+                                    this->DiffuseTexture,
+                                    this->SpecularTexture);
   //make no further references to them in this thread
   this->MantaMaterial = NULL;
   this->DiffuseTexture = NULL;
@@ -179,7 +180,8 @@ void vtkMantaProperty::ReleaseGraphicsResources(vtkWindow *win)
   //ask the manta thread to free them when it can
   this->MantaManager->GetMantaEngine()->addTransaction
     ( "cleanup property",
-      Manta::Callback::create(R, &MPR::FreeMantaResources));
+      Manta::Callback::create
+      (R, &vtkMantaPropertyThreadCache::FreeMantaResources));
 }
 
 //----------------------------------------------------------------------------
@@ -236,6 +238,11 @@ void vtkMantaProperty::CreateMantaProperty()
   double * specular = this->GetSpecularColor();
 
   //this only happens in a manta thread callback, so this is safe to do
+
+  if (this->MantaMaterial)
+    {
+    cerr << "DELETING " << this->MantaMaterial << endl;
+    }
   delete this->MantaMaterial;
   delete this->DiffuseTexture;
   delete this->SpecularTexture;
@@ -352,4 +359,6 @@ void vtkMantaProperty::CreateMantaProperty()
                                            this->Reflectance) );
                     }
     }
+
+  cerr << "CREATED " << this->MantaMaterial << endl;
 }
