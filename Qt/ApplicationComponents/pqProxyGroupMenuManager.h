@@ -104,6 +104,7 @@ signals:
 
 protected slots:
   void triggered();
+  void quickLaunch();
 
 protected:
   QString ResourceTagName;

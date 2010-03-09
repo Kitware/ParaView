@@ -31,7 +31,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqProxyGroupMenuManager.h"
 
-#include "pqApplicationCore.h"
+#include "pqPVApplicationCore.h"
 #include "pqSetData.h"
 #include "pqSetName.h"
 #include "pqSettings.h"
@@ -317,12 +317,21 @@ void pqProxyGroupMenuManager::populateMenu()
     }
   menuActions.clear();
 
+
   QList<QMenu*> submenus = _menu->findChildren<QMenu*>();
   foreach (QMenu* submenu, submenus)
     {
     delete submenu;
     }
   _menu->clear();
+
+#ifdef Q_WS_MAC
+  _menu->addAction("Search...", this, SLOT(quickLaunch()),
+    QKeySequence(Qt::Key_Space | Qt::ALT));
+#else
+  _menu->addAction("Search...", this, SLOT(quickLaunch()),
+    QKeySequence(Qt::Key_Space | Qt::CTRL));
+#endif
 
   if (this->RecentlyUsedMenuSize > 0)
     {
@@ -459,6 +468,15 @@ void pqProxyGroupMenuManager::triggered()
       }
     this->populateRecentlyUsedMenu(0);
     this->saveRecentlyUsedItems();
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqProxyGroupMenuManager::quickLaunch()
+{
+  if (pqPVApplicationCore::instance())
+    {
+    pqPVApplicationCore::instance()->quickLaunch();
     }
 }
 

@@ -88,6 +88,21 @@
     <string>&amp;Redo</string>
    </property>
   </action>
+  <action name="actionAutoApply">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../../../Components/Resources/pqComponents.qrc">
+     <normaloff>:/pqWidgets/Icons/pqAutoApply32.png</normaloff>:/pqWidgets/Icons/pqAutoApply32.png</iconset>
+   </property>
+   <property name="text">
+    <string>Auto Apply</string>
+   </property>
+   <property name="toolTip">
+    <string>Apply changes to parameters automatically</string>
+   </property>
+  </action>
   <addaction name="actionOpenData"/>
   <addaction name="actionSaveData"/>
   <addaction name="separator"/>
@@ -96,6 +111,8 @@
   <addaction name="separator"/>
   <addaction name="actionUndo"/>
   <addaction name="actionRedo"/>
+  <addaction name="separator"/>
+  <addaction name="actionAutoApply"/>
   <addaction name="separator"/>
   <addaction name="actionHelp"/>
  </widget>

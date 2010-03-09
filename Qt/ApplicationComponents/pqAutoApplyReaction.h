@@ -1,14 +1,14 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqMainControlsToolbar.cxx
+   Module:    pqAutoApplyReaction.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
    under the terms of the ParaView license version 1.2. 
-
+   
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
    Kitware Inc.
@@ -29,30 +29,34 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#include "pqMainControlsToolbar.h"
-#include "ui_pqMainControlsToolbar.h"
+#ifndef __pqAutoApplyReaction_h 
+#define __pqAutoApplyReaction_h
 
-#include "pqHelpReaction.h"
-#include "pqLoadDataReaction.h"
-#include "pqSaveDataReaction.h"
-#include "pqServerConnectReaction.h"
-#include "pqServerDisconnectReaction.h"
-#include "pqUndoRedoReaction.h"
-#include "pqAutoApplyReaction.h"
-//-----------------------------------------------------------------------------
-void pqMainControlsToolbar::constructor()
+#include "pqReaction.h"
+
+/// @ingroup Reactions
+/// Reaction for enabling/disabling auto-apply.
+class PQAPPLICATIONCOMPONENTS_EXPORT pqAutoApplyReaction : public pqReaction
 {
-  Ui::pqMainControlsToolbar ui;
-  ui.setupUi(this);
-  new pqLoadDataReaction(ui.actionOpenData);
-  new pqSaveDataReaction(ui.actionSaveData);
-  new pqServerConnectReaction(ui.actionServerConnect);
-  new pqServerDisconnectReaction(ui.actionServerDisconnect);
-  new pqUndoRedoReaction(ui.actionUndo, true);
-  new pqUndoRedoReaction(ui.actionRedo, false);
-  new pqHelpReaction(ui.actionHelp);
-  new pqAutoApplyReaction(ui.actionAutoApply);
-}
+  Q_OBJECT
+  typedef pqReaction Superclass;
+public:
+  pqAutoApplyReaction(QAction* parent=0);
 
+  /// Set the status of auto-apply.
+  static void setAutoApply(bool);
+
+  /// Get the status of auto-apply.
+  static bool autoApply();
+
+protected slots:
+  void updateState();
+  void checkStateChanged(bool);
+
+private:
+  Q_DISABLE_COPY(pqAutoApplyReaction)
+};
+
+#endif
 
 

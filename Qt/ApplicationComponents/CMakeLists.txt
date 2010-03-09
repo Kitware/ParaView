@@ -27,6 +27,7 @@ SET (MOC_HEADERS
   pqAlwaysConnectedBehavior.h
   pqAnimationTimeToolbar.h
   pqApplicationSettingsReaction.h
+  pqAutoApplyReaction.h
   pqAutoLoadPluginXMLBehavior.h
   pqAxesToolbar.h
   pqCameraLinkReaction.h
@@ -125,6 +126,8 @@ SET (SOURCE_FILES
   pqAnimationTimeToolbar.h
   pqApplicationSettingsReaction.cxx
   pqApplicationSettingsReaction.h
+  pqAutoApplyReaction.cxx
+  pqAutoApplyReaction.h
   pqAutoLoadPluginXMLBehavior.cxx
   pqAutoLoadPluginXMLBehavior.h
   pqAxesToolbar.cxx

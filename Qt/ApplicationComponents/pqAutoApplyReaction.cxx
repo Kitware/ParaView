@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqMainControlsToolbar.cxx
+   Module:    pqAutoApplyReaction.cxx
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,30 +29,37 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#include "pqMainControlsToolbar.h"
-#include "ui_pqMainControlsToolbar.h"
-
-#include "pqHelpReaction.h"
-#include "pqLoadDataReaction.h"
-#include "pqSaveDataReaction.h"
-#include "pqServerConnectReaction.h"
-#include "pqServerDisconnectReaction.h"
-#include "pqUndoRedoReaction.h"
 #include "pqAutoApplyReaction.h"
+
+#include "pqApplicationCore.h"
+#include "pqSettings.h"
+#include "pqObjectInspectorWidget.h"
+
 //-----------------------------------------------------------------------------
-void pqMainControlsToolbar::constructor()
+pqAutoApplyReaction::pqAutoApplyReaction(QAction* parentObject)
+  : Superclass(parentObject)
 {
-  Ui::pqMainControlsToolbar ui;
-  ui.setupUi(this);
-  new pqLoadDataReaction(ui.actionOpenData);
-  new pqSaveDataReaction(ui.actionSaveData);
-  new pqServerConnectReaction(ui.actionServerConnect);
-  new pqServerDisconnectReaction(ui.actionServerDisconnect);
-  new pqUndoRedoReaction(ui.actionUndo, true);
-  new pqUndoRedoReaction(ui.actionRedo, false);
-  new pqHelpReaction(ui.actionHelp);
-  new pqAutoApplyReaction(ui.actionAutoApply);
+  parentObject->setChecked(this->autoApply());
+  QObject::connect(parentObject, SIGNAL(triggered(bool)),
+    this, SLOT(checkStateChanged(bool)));
 }
 
+//-----------------------------------------------------------------------------
+void pqAutoApplyReaction::checkStateChanged(bool autoAccept)
+{
+  pqSettings* settings = pqApplicationCore::instance()->settings();
+  settings->setValue("autoAccept", autoAccept);
+  pqObjectInspectorWidget::setAutoAccept(autoAccept);
+}
 
+//-----------------------------------------------------------------------------
+bool pqAutoApplyReaction::autoApply()
+{
+  return pqObjectInspectorWidget::autoAccept();
+}
 
+//-----------------------------------------------------------------------------
+void pqAutoApplyReaction::updateState()
+{
+  // Doh! I have no way of knowing when the auto-accept state changes :(.
+}
