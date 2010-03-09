@@ -56,7 +56,7 @@ struct vtkSMApplicationInternals
 };
 
 vtkStandardNewMacro(vtkSMApplication);
-vtkCxxRevisionMacro(vtkSMApplication, "1.23");
+vtkCxxRevisionMacro(vtkSMApplication, "1.24");
 
 //---------------------------------------------------------------------------
 vtkSMApplication::vtkSMApplication()
@@ -133,8 +133,10 @@ void vtkSMApplication::EnsureQApplicationIsInitialized()
 void vtkSMApplication::Initialize()
 {
 
+#ifndef PARAVIEW_MINIMAL_BUILD
   vtkPVServerManager_Initialize(
     vtkProcessModule::GetProcessModule()->GetInterpreter());
+#endif
 
   vtkSMProxyManager* proxyM = vtkSMProxyManager::New();
   this->SetProxyManager(proxyM);
