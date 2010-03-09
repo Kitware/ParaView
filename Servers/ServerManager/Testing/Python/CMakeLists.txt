@@ -21,11 +21,20 @@ ELSE("${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}" LESS 2.8)
   SET(GENERATOR_EXPRESSIONS_SUPPORTED ON)
 ENDIF("${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}" LESS 2.8)
 
+SET(PVPYTHON_COMMAND ${EXECUTABLE_OUTPUT_PATH}/pvpython)
+SET(PVBATCH_COMMAND ${EXECUTABLE_OUTPUT_PATH}/pvbatch)
+
+# We don't want the <CONFIGURATION> as part of the path on non windows systems.
+IF(WIN32 AND GENERATOR_EXPRESSIONS_SUPPORTED)
+  SET(PVPYTHON_COMMAND ${EXECUTABLE_OUTPUT_PATH}/\$<CONFIGURATION>/pvpython)
+  SET(PVBATCH_COMMAND ${EXECUTABLE_OUTPUT_PATH}/\$<CONFIGURATION>/pvbatch)
+ENDIF(WIN32 AND GENERATOR_EXPRESSIONS_SUPPORTED)
+
 
 IF (PVServerManagerTestData AND GENERATOR_EXPRESSIONS_SUPPORTED)
   FOREACH (tfile ${SMSTATE_FILES})
     ADD_TEST(NAME "${tfile}-ServerManagerPython"
-      COMMAND ${EXECUTABLE_OUTPUT_PATH}/\$<CONFIGURATION>/pvpython
+      COMMAND ${PVPYTHON_COMMAND}
         ${CMAKE_CURRENT_SOURCE_DIR}/SMPythonTesting.py
         -D ${PVServerManagerTestData}
         -T ${ParaView_BINARY_DIR}/Testing/Temporary
@@ -36,7 +45,7 @@ IF (PVServerManagerTestData AND GENERATOR_EXPRESSIONS_SUPPORTED)
   # This is a test that saves a temporary SM state and uses that saved
   # state for regression testing.
   ADD_TEST(NAME "LoadSave-ServerManagerPython"
-      COMMAND ${EXECUTABLE_OUTPUT_PATH}/\$<CONFIGURATION>/pvpython
+      COMMAND ${PVPYTHON_COMMAND}
         ${CMAKE_CURRENT_SOURCE_DIR}/SMPythonTesting.py
         -D ${PVServerManagerTestData}
         -T ${ParaView_BINARY_DIR}/Testing/Temporary
@@ -61,10 +70,10 @@ SET (PY_TESTS
   )
 
 
-IF (PVServerManagerTestData  AND GENERATOR_EXPRESSIONS_SUPPORTED)
+IF (PVServerManagerTestData AND GENERATOR_EXPRESSIONS_SUPPORTED)
   FOREACH (tfile ${PY_TESTS})
     ADD_TEST(NAME "${tfile}-ServerManagerPython"
-      COMMAND ${EXECUTABLE_OUTPUT_PATH}/\$<CONFIGURATION>/pvpython
+      COMMAND ${PVPYTHON_COMMAND}
         ${CMAKE_CURRENT_SOURCE_DIR}/${tfile}.py
         -D ${PVServerManagerTestData}
         -T ${ParaView_BINARY_DIR}/Testing/Temporary
@@ -88,7 +97,7 @@ SET(PY_TESTS_NO_BASELINE
 IF (PVServerManagerTestData AND GENERATOR_EXPRESSIONS_SUPPORTED)
   FOREACH (tfile ${PY_TESTS_NO_BASELINE})
     ADD_TEST(NAME "${tfile}-ServerManagerPython"
-      COMMAND ${EXECUTABLE_OUTPUT_PATH}/\$<CONFIGURATION>/pvpython
+      COMMAND ${PVPYTHON_COMMAND}
         ${CMAKE_CURRENT_SOURCE_DIR}/${tfile}.py
         -D ${PVServerManagerTestData}
         -T ${ParaView_BINARY_DIR}/Testing/Temporary
@@ -109,7 +118,7 @@ IF (PVServerManagerTestData AND GENERATOR_EXPRESSIONS_SUPPORTED)
 
       ADD_TEST(NAME ${tfile}-Batch
         COMMAND ${VTK_MPIRUN_EXE} ${VTK_MPI_PRENUMPROC_FLAGS} ${VTK_MPI_NUMPROC_FLAG} 2 ${VTK_MPI_PREFLAGS}
-          ${EXECUTABLE_OUTPUT_PATH}/\$<CONFIGURATION>/pvbatch
+          ${PVBATCH_COMMAND}
           ${CMAKE_CURRENT_SOURCE_DIR}/${tfile}.py
           -D ${PVServerManagerTestData}
           -T ${ParaView_BINARY_DIR}/Testing/Temporary
@@ -118,7 +127,7 @@ IF (PVServerManagerTestData AND GENERATOR_EXPRESSIONS_SUPPORTED)
 
       ADD_TEST(NAME ${tfile}-SymmetricBatch
         COMMAND ${VTK_MPIRUN_EXE} ${VTK_MPI_PRENUMPROC_FLAGS} ${VTK_MPI_NUMPROC_FLAG} 2 ${VTK_MPI_PREFLAGS}
-          ${EXECUTABLE_OUTPUT_PATH}/\$<CONFIGURATION>/pvbatch
+          ${PVBATCH_COMMAND}
           --symmetric
           ${CMAKE_CURRENT_SOURCE_DIR}/${tfile}.py
           -D ${PVServerManagerTestData}
@@ -127,7 +136,7 @@ IF (PVServerManagerTestData AND GENERATOR_EXPRESSIONS_SUPPORTED)
           -S ${SMSTATE_FILE_DIR})
     ELSE (VTK_MPIRUN_EXE AND VTK_MPI_MAX_NUMPROCS GREATER 1)
       ADD_TEST(NAME ${tfile}-Batch
-        COMMAND ${EXECUTABLE_OUTPUT_PATH}/\$<CONFIGURATION>/pvbatch
+        COMMAND ${PVBATCH_COMMAND}
           ${CMAKE_CURRENT_SOURCE_DIR}/${tfile}.py
           -D ${PVServerManagerTestData}
           -T ${ParaView_BINARY_DIR}/Testing/Temporary
@@ -135,7 +144,7 @@ IF (PVServerManagerTestData AND GENERATOR_EXPRESSIONS_SUPPORTED)
           -S ${SMSTATE_FILE_DIR})
 
       ADD_TEST(NAME ${tfile}-SymmetricBatch
-        COMMAND ${EXECUTABLE_OUTPUT_PATH}/\$<CONFIGURATION>/pvbatch
+        COMMAND ${PVBATCH_COMMAND}
           --symmetric
           ${CMAKE_CURRENT_SOURCE_DIR}/${tfile}.py
           -D ${PVServerManagerTestData}
