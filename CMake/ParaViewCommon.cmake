@@ -713,6 +713,10 @@ ENDIF(PARAVIEW_ENABLE_PYTHON)
 # Configure Paraview Minimum Settings
 OPTION(PARAVIEW_MINIMAL_BUILD "Compile paraview for minimum image" OFF)
 MARK_AS_ADVANCED(PARAVIEW_MINIMAL_BUILD)
+IF(PARAVIEW_MINIMAL_BUILD)
+  SET(PARAVIEW_MINIMAL_BUILD_CLASS_FILE "NOTFOUND" CACHE FILEPATH
+    "A text file listing the vtk classes to include in the minimal initializer list.")
+ENDIF(PARAVIEW_MINIMAL_BUILD)
 
 #########################################################################
 # Configure Servers executables

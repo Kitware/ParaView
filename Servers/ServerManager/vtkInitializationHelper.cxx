@@ -47,13 +47,13 @@ PURPOSE.  See the above copyright notice for more information.
 
 #include <vtkstd/string>
 
-vtkCxxRevisionMacro(vtkInitializationHelper, "1.8");
+vtkCxxRevisionMacro(vtkInitializationHelper, "1.9");
 
 static void vtkInitializationHelperInit(vtkProcessModule* pm);
 
 //----------------------------------------------------------------------------
 // ClientServer wrapper initialization functions.
-extern "C" void vtkParaviewMINI_Initialize(vtkClientServerInterpreter*);
+extern "C" void vtkParaviewMinInit_Initialize(vtkClientServerInterpreter*);
 extern "C" void vtkCommonCS_Initialize(vtkClientServerInterpreter*);
 extern "C" void vtkFilteringCS_Initialize(vtkClientServerInterpreter*);
 extern "C" void vtkGenericFilteringCS_Initialize(vtkClientServerInterpreter*);
@@ -173,7 +173,7 @@ void vtkInitializationHelperInit(vtkProcessModule* pm)
 {
 
 #ifdef PARAVIEW_MINIMAL_BUILD
-  vtkParaviewMINI_Initialize(pm->GetInterpreter());
+  vtkParaviewMinInit_Initialize(pm->GetInterpreter());
 #else
   // Initialize built-in wrapper modules.
   vtkCommonCS_Initialize(pm->GetInterpreter());

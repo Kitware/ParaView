@@ -338,16 +338,16 @@ SET(KIT_WRAP_DEPS "")
 SET(VTK_KITS_DIR "${CMAKE_CURRENT_BINARY_DIR}/Utilities")
 PV_PRE_WRAP_VTK_CS("vtk${KIT}" "${KIT}" "${KIT_UPCASE}" "${KIT_WRAP_DEPS}")
 
-# tryint to include the MINI init somewhere -nix
-SET(MINI_INIT)
+# The client server minimal initializer
+SET(MIN_INIT_SRC)
 IF(PARAVIEW_MINIMAL_BUILD)
-  SET(MINI_INIT vtkParaviewMINIInit.cxx)
+  SET(MIN_INIT_SRC "${CMAKE_CURRENT_BINARY_DIR}/vtkParaviewMinInit.cxx")
 ENDIF(PARAVIEW_MINIMAL_BUILD)
 
 # Create the library.
 ADD_LIBRARY(vtk${KIT}
   ${ServerManager_SRCS}
-  ${MINI_INIT}
+  ${MIN_INIT_SRC}
   ${CMInstantiator_SRCS} 
   ${vtkPVServerManagerCS_SRCS} 
   ${KitInstantiator_SRCS}
@@ -429,17 +429,17 @@ ADD_CUSTOM_COMMAND(
   ${resourceFiles}
   COMMENT "generating modules")
 
-# Adding new command to create vtkParaviewMINIInit.cxx -nix
+# Custom command for generating the minimal initializer, requires python interpreter
 IF(PARAVIEW_MINIMAL_BUILD)
+SET(min_init_writer
+    "${ParaView_SOURCE_DIR}/Utilities/VTKClientServer/MinimalBuildTools/WriteMinInit.py")
 ADD_CUSTOM_COMMAND(
-  OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${MINI_INIT}
-  DEPENDS ${resourceFiles}
-  ${CMAKE_CURRENT_SOURCE_DIR}/Resources/ClassExtract.py
-  COMMAND python
-  ARGS ${CMAKE_CURRENT_SOURCE_DIR}/Resources/ClassExtract.py ${CMAKE_CURRENT_BINARY_DIR}/${MINI_INIT}
-   # /home/nikhil/pv/Servers/ServerManager/Resources/filters.xml
-   ${resourceFiles}
-  COMMENT "generating vtkParaviewMINIInit.cxx")
+  OUTPUT ${MIN_INIT_SRC}
+  DEPENDS ${PARAVIEW_MINIMAL_BUILD_CLASS_FILE}
+  ${min_init_writer}
+  COMMAND ${PYTHON_EXECUTABLE}
+  ARGS ${min_init_writer} ${PARAVIEW_MINIMAL_BUILD_CLASS_FILE} ${MIN_INIT_SRC}
+  COMMENT "generating ${MIN_INIT_SRC}")
 ENDIF(PARAVIEW_MINIMAL_BUILD)
 
 SET(GUI_CONFIG_FILES
