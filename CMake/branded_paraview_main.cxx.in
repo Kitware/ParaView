@@ -61,7 +61,7 @@ int main(int argc, char* argv[])
     QApplication::setEffectEnabled(Qt::UI_FadeMenu, false);
     QApplication::setEffectEnabled(Qt::UI_AnimateCombo, false);
     QApplication::setEffectEnabled(Qt::UI_AnimateTooltip, false);
-    QApplication::setEffectEnabled(Qt::Qt::UI_FadeTooltip, false);
+    QApplication::setEffectEnabled(Qt::UI_FadeTooltip, false);
     }
 
   QApplication::setApplicationName("@BPC_APPLICATION_NAME@");
