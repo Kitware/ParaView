@@ -98,6 +98,9 @@ void pqSpreadSheetDisplayEditor::setRepresentationInternal(pqRepresentation* rep
 {
   vtkSMProxy* reprProxy = repr->getProxy();
 
+  this->Internal->AttributeModeDomain = new pqComboBoxDomain(
+    this->Internal->AttributeMode,
+    reprProxy->GetProperty("FieldAssociation"), "enum");
   this->Internal->Links.addPropertyLink(this->Internal->ViewData,
     "checked", SIGNAL(stateChanged(int)),
     reprProxy, reprProxy->GetProperty("Visibility"));
@@ -113,9 +116,6 @@ void pqSpreadSheetDisplayEditor::setRepresentationInternal(pqRepresentation* rep
   this->Internal->Links.addPropertyLink(this->Internal->CompositeTreeAdaptor,
     "values", SIGNAL(valuesChanged()),
     reprProxy, reprProxy->GetProperty("CompositeDataSetIndex"));
-  this->Internal->AttributeModeDomain = new pqComboBoxDomain(
-    this->Internal->AttributeMode,
-    reprProxy->GetProperty("FieldAssociation"), "enum");
 
   QObject::connect(&this->Internal->Links, SIGNAL(qtWidgetChanged()),
     this, SLOT(updateAllViews()));
