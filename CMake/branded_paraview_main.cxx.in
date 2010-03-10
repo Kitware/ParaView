@@ -52,6 +52,18 @@ int main(int argc, char* argv[])
   QApplication::setStyle(new QPlastiqueStyle);
 #endif
 
+  // When playing tests, disable all effects.
+  if (getenv("DART_TEST_FROM_DART") ||
+    getenv("DASHBOARD_TEST_FROM_CTEST"))
+    {
+    QApplication::setDesktopSettingsAware(false);
+    QApplication::setEffectEnabled(Qt::UI_AnimateMenu, false);
+    QApplication::setEffectEnabled(Qt::UI_FadeMenu, false);
+    QApplication::setEffectEnabled(Qt::UI_AnimateCombo, false);
+    QApplication::setEffectEnabled(Qt::UI_AnimateTooltip, false);
+    QApplication::setEffectEnabled(Qt::Qt::UI_FadeTooltip, false);
+    }
+
   QApplication::setApplicationName("@BPC_APPLICATION_NAME@");
   QApplication::setApplicationVersion("@BPC_VERSION_MAJOR@.@BPC_VERSION_MINOR@.@BPC_VERSION_PATCH@");
   QApplication::setOrganizationName("@BPC_ORGANIZATION@");
