@@ -90,9 +90,15 @@ bool pq@BPC_NAME@Initializer::Initialize(int argc, char* argv[])
 
   // Create and show the splash screen as the main window is being created.
   QPixmap pixmap("@BPC_SPLASH_RESOURCE@");
-  this->Splash = new QSplashScreen(pixmap);
+  this->Splash = new QSplashScreen(pixmap, Qt::WindowStaysOnTopHint);
   this->Splash->setMask(pixmap.createMaskFromColor(QColor(Qt::transparent)));
-  this->Splash->show();
+  // splash screen slows down tests. So don't show it unless we are not running
+  // tests.
+  bool show_splash = (!getenv("DASHBOARD_TEST_FROM_CTEST"));
+  if (show_splash)
+    {
+    this->Splash->show();
+    }
 
   // Not sure why this is needed. Andy added this ages ago with comment saying
   // needed for Mac apps. Need to check that it's indeed still required.
@@ -138,7 +144,10 @@ bool pq@BPC_NAME@Initializer::Initialize(int argc, char* argv[])
   this->MainWindow->show();
 
   QApplication::instance()->processEvents();
-  this->Splash->finish(this->MainWindow);
+  if (show_splash)
+    {
+    this->Splash->finish(this->MainWindow);
+    }
   return true;
 }
 // ***************** DO NOT EDIT ***********************************

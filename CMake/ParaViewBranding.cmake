@@ -197,6 +197,8 @@ FUNCTION(build_paraview_client BPC_NAME)
     GENERATE_QT_RESOURCE_FROM_FILES("${outfile}"
       "/${BPC_APPLICATION_NAME}/Documentation"
       "${BPC_COMPRESSED_HELP_FILE};")
+    SET_SOURCE_FILES_PROPERTIES(${outfile}
+      PROPERTIES OBJECT_DEPENDS "${BPC_COMPRESSED_HELP_FILE}")
     SET (ui_resources ${ui_resources} "${outfile}")
   ENDIF (BPC_COMPRESSED_HELP_FILE)
   
