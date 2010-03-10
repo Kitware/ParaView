@@ -303,6 +303,7 @@ void pqXYChartOptionsEditor::setView(pqView* view)
   if (this->Internal->XYChartView || this->Internal->XYBarChartView)
     {
     this->connectGUI();
+    this->setPage(this->Internal->Form->CurrentPage);
     }
 }
 
@@ -320,7 +321,7 @@ pqView* pqXYChartOptionsEditor::getView()
 
 void pqXYChartOptionsEditor::setPage(const QString &page)
 {
-  if(this->Internal->Form->CurrentPage == page)
+  if (page.isEmpty())
     {
     return;
     }
@@ -638,6 +639,13 @@ void pqXYChartOptionsEditor::updateOptions()
     {
     this->Internal->Form->AxisData[i]->ShowAxis = values[i].toInt() != 0;
     }
+  values = pqSMAdaptor::getMultipleElementProperty(
+      proxy->GetProperty("AxisLogScale"));
+  for(int i = 0; i < 4 && i < values.size(); ++i)
+    {
+    this->Internal->Form->AxisData[i]->UseLogScale = values[i].toInt() != 0;
+    }
+
   values = pqSMAdaptor::getMultipleElementProperty(
       proxy->GetProperty("ShowAxisGrid"));
   for(int i = 0; i < 4 && i < values.size(); ++i)
