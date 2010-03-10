@@ -529,6 +529,7 @@ int vtkSMTestDriver::OutputStringHasError(const char* pname, vtkstd::string& out
 //----------------------------------------------------------------------------
 int vtkSMTestDriver::Main(int argc, char* argv[])
 {
+  vtksys::SystemTools::PutEnv("DASHBOARD_TEST_FROM_CTEST=1");
 
 #ifdef PV_TEST_INIT_COMMAND
   // run user-specified commands before initialization.
