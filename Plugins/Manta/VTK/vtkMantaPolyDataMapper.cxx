@@ -102,7 +102,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <math.h>
 
-vtkCxxRevisionMacro(vtkMantaPolyDataMapper, "1.11");
+vtkCxxRevisionMacro(vtkMantaPolyDataMapper, "1.12");
 vtkStandardNewMacro(vtkMantaPolyDataMapper);
 
 //----------------------------------------------------------------------------
@@ -741,7 +741,7 @@ void vtkMantaPolyDataMapper::Draw(vtkRenderer *renderer, vtkActor *actor)
         //cerr << "using actor's property" << endl;
         // no colormap or texture, use the Actor's property
         Manta::Material *material = mantaProperty->GetMantaMaterial();
-        if(material)
+        if(!material)
           {
           //TODO: This crashes, the material is created alright,
           //but the next call the property->Render(), deletes it and which leaves dead references and
