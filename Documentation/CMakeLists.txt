@@ -29,7 +29,8 @@ FIND_PROGRAM(QT_HELP_GENERATOR
   PATHS "${QT_BINARY_DIR}"
   DOC "qhelpgenerator used to compile Qt help project files")
 
-ADD_CUSTOM_TARGET(ParaViewOnlineHelp
+ADD_CUSTOM_COMMAND(
+  OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/paraview.qch
   DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/paraview.qhp
   COMMAND ${QT_HELP_GENERATOR}
   ARGS ${CMAKE_CURRENT_BINARY_DIR}/paraview.qhp
@@ -37,12 +38,15 @@ ADD_CUSTOM_TARGET(ParaViewOnlineHelp
   COMMENT "Compiling Qt help project paraview.qhp"
 )
 
+ADD_CUSTOM_TARGET(ParaViewOnlineHelp
+  DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/paraview.qch)
+
 OPTION(GENERATE_FILTERS_DOCUMENTATION
   "Turn on to ensure that the documentation for filters/sources/readers and writers is built."
   OFF)
 IF (GENERATE_FILTERS_DOCUMENTATION)
   ADD_DEPENDENCIES(ParaViewOnlineHelp
-    HTMLDocumentation)
+     HTMLDocumentation)
 ENDIF(GENERATE_FILTERS_DOCUMENTATION)
 MARK_AS_ADVANCED(GENERATE_FILTERS_DOCUMENTATION)
 
