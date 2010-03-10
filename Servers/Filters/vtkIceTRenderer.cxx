@@ -47,7 +47,7 @@ static vtkIceTRenderer *currentRenderer;
 // vtkIceTRenderer implementation.
 //******************************************************************
 
-vtkCxxRevisionMacro(vtkIceTRenderer, "1.29");
+vtkCxxRevisionMacro(vtkIceTRenderer, "1.30");
 vtkStandardNewMacro(vtkIceTRenderer);
 
 vtkCxxSetObjectMacro(vtkIceTRenderer, SortingKdTree, vtkPKdTree);
@@ -289,26 +289,6 @@ void vtkIceTRenderer::DeviceRender()
   // but for some reason it didnot work.
 //  icetDisable(ICET_FLOATING_VIEWPORT);
 
-  //Make sure we tell ICE-T what the background color is.  If the background
-  //is black, also make it transparent so that we can skip fixing it.
-  GLint in_buffers;
-  icetGetIntegerv(ICET_INPUT_BUFFERS, &in_buffers);
-  if (   (in_buffers == ICET_COLOR_BUFFER_BIT)
-      && (this->Background[0] == 0.0)
-      && (this->Background[1] == 0.0)
-      && (this->Background[2] == 0.0) )
-    {
-    glClearColor((GLclampf)(0.0), (GLclampf)(0.0),
-                 (GLclampf)(0.0), (GLclampf)(0.0));
-    }
-  else
-    {
-    glClearColor((GLclampf)(this->Background[0]),
-                 (GLclampf)(this->Background[1]),
-                 (GLclampf)(this->Background[2]),
-                 (GLclampf)(1.0));
-    }
-
   //ICE-T works much better if it knows the bounds of the geometry.
   double allBounds[6];
   this->ComputeVisiblePropBounds(allBounds);
@@ -351,32 +331,6 @@ void vtkIceTRenderer::DeviceRender()
 }
 
 //-----------------------------------------------------------------------------
-
-void vtkIceTRenderer::Clear()
-{
-  if (!this->InIceTRender)
-    {
-    this->Superclass::Clear();
-    return;
-    }
-
-  // Set clear color so that it is transparent if color blending.
-  float bgcolor[4];
-  icetGetFloatv(ICET_BACKGROUND_COLOR, bgcolor);
-  vtkDebugMacro("Clear Color: " << bgcolor[0] << ", " << bgcolor[1]
-                << ", " << bgcolor[2] << ", " << bgcolor[3]);
-  glClearColor(bgcolor[0], bgcolor[1], bgcolor[2], bgcolor[3]);
-  GLbitfield  clear_mask = GL_COLOR_BUFFER_BIT;
-  if (!this->GetPreserveDepthBuffer())
-    {
-    glClearDepth(static_cast<GLclampf>(1.0));
-    clear_mask |= GL_DEPTH_BUFFER_BIT;
-    }
-  glClear(clear_mask);
-}
-
-//-----------------------------------------------------------------------------
-
 void vtkIceTRenderer::RenderWithoutCamera()
 {
   vtkDebugMacro("In vtkIceTRenderer::RenderWithoutCamera()");

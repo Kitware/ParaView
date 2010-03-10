@@ -50,11 +50,6 @@ public:
   vtkSetMacro(ComposeNextFrame, int);
 
   // Description:
-  // Ensures that the background has an ambient color of 0 when color blend
-  // compositing is on.
-  virtual void Clear();
-
-  // Description:
   // Reset ComposeNextFrame between rendering each eye for stereo viewing
   void StereoMidpoint();
 
