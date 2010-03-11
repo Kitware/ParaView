@@ -125,7 +125,7 @@ int vtkMantaPropertyThreadCache::GlobalCntr = 0;
 
 //===========================================================================
 
-vtkCxxRevisionMacro(vtkMantaProperty, "1.11");
+vtkCxxRevisionMacro(vtkMantaProperty, "1.12");
 vtkStandardNewMacro(vtkMantaProperty);
 
 //----------------------------------------------------------------------------
@@ -201,6 +201,8 @@ void vtkMantaProperty::Render( vtkActor *vtkNotUsed(anActor),
     this->MantaManager->Register(this);
     }
 
+  return;
+/*
   if ( this->GetMTime() > this->MantaMaterialMTime )
     {
     //TODO: this doesn't actually have to be a transaction, other than 
@@ -213,6 +215,7 @@ void vtkMantaProperty::Render( vtkActor *vtkNotUsed(anActor),
 
     this->MantaMaterialMTime.Modified();
     }
+*/
 }
 
 //----------------------------------------------------------------------------
@@ -237,12 +240,14 @@ void vtkMantaProperty::CreateMantaProperty()
   double * diffuse  = this->GetDiffuseColor();
   double * specular = this->GetSpecularColor();
 
-  //this only happens in a manta thread callback, so this is safe to do
+  //this only happens in a manta thread callback, so this is safe to do - not true
 
+  /*
   if (this->MantaMaterial)
     {
     cerr << "DELETING " << this->MantaMaterial << endl;
     }
+  */
   delete this->MantaMaterial;
   delete this->DiffuseTexture;
   delete this->SpecularTexture;
@@ -360,5 +365,5 @@ void vtkMantaProperty::CreateMantaProperty()
                     }
     }
 
-  cerr << "CREATED " << this->MantaMaterial << endl;
+  //cerr << "CREATED " << this->MantaMaterial << endl;
 }
