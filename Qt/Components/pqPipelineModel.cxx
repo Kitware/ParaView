@@ -254,6 +254,8 @@ public:
     default:
       break;
       }
+
+    bool ret_val = false;
     if (this->VisibilityIcon != newIcon)
       {
       this->VisibilityIcon = newIcon;
@@ -261,7 +263,7 @@ public:
         {
         this->Model->itemDataChanged(this);
         }
-      return true;
+      ret_val = true;
       }
     if (traverse_subtree)
       {
@@ -270,7 +272,7 @@ public:
         child->updateVisibilityIcon(view, traverse_subtree);
         }
       }
-    return false;
+    return ret_val;
     }
 
   bool isModified() const
