@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -29,7 +29,7 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqTextureComboBox_h 
+#ifndef __pqTextureComboBox_h
 #define __pqTextureComboBox_h
 
 #include <QComboBox>
@@ -83,7 +83,7 @@ protected slots:
   void updateTextures();
 
   void proxyRegistered(const QString& groupname);
-  void proxyUnRegistered(const QString& group, 
+  void proxyUnRegistered(const QString& group,
     const QString&, vtkSMProxy* proxy);
 protected:
   /// Get the texture proxy associated with the given data.

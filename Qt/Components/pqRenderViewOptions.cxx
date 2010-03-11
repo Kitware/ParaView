@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -38,11 +38,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QPointer>
 
+#include "vtkSMProperty.h"
+#include "vtkSMPropertyHelper.h"
 #include "vtkSMProxy.h"
 
 #include "pqNamedWidgets.h"
 #include "pqPropertyManager.h"
 #include "pqRenderView.h"
+#include "pqServer.h"
 #include "pqSignalAdaptors.h"
 #include "pqStandardColorLinkAdaptor.h"
 
@@ -53,6 +56,8 @@ public:
   pqPropertyManager Links;
   pqPropertyManager LightsLinks;
   pqSignalAdaptorColor *ColorAdaptor;
+  pqSignalAdaptorColor *GradColorAdaptor1;
+  pqSignalAdaptorColor *GradColorAdaptor2;
 };
 
 
@@ -63,7 +68,17 @@ pqRenderViewOptions::pqRenderViewOptions(QWidget *widgetParent)
   this->Internal = new pqInternal;
   this->Internal->setupUi(this);
 
-  this->Internal->ColorAdaptor = new pqSignalAdaptorColor(this->Internal->backgroundColor, 
+
+  this->Internal->ColorAdaptor = new pqSignalAdaptorColor(
+    this->Internal->backgroundColor,
+    "chosenColor", SIGNAL(chosenColorChanged(const QColor&)), false);
+
+  this->Internal->GradColorAdaptor1 =
+    new pqSignalAdaptorColor(this->Internal->gradientColor1,
+    "chosenColor", SIGNAL(chosenColorChanged(const QColor&)), false);
+
+  this->Internal->GradColorAdaptor2 =
+    new pqSignalAdaptorColor(this->Internal->gradientColor2,
     "chosenColor", SIGNAL(chosenColorChanged(const QColor&)), false);
 
 
@@ -72,13 +87,19 @@ pqRenderViewOptions::pqRenderViewOptions(QWidget *widgetParent)
           this, SIGNAL(changesAvailable()));
   QObject::connect(&this->Internal->LightsLinks, SIGNAL(modified()),
           this, SIGNAL(changesAvailable()));
-  
+
   QObject::connect(this->Internal->restoreDefault,
     SIGNAL(clicked(bool)), this, SLOT(restoreDefaultBackground()));
-  
+
+  QObject::connect(this->Internal->restoreDefaultGradColor1,
+    SIGNAL(clicked(bool)), this, SLOT(restoreDefaultGradientColor1()));
+
+  QObject::connect(this->Internal->restoreDefaultGradColor2,
+    SIGNAL(clicked(bool)), this, SLOT(restoreDefaultGradientColor2()));
+
   QObject::connect(this->Internal->ResetLight,
     SIGNAL(clicked(bool)), this, SLOT(resetLights()));
-  
+
   QObject::connect(this->Internal->OrientationAxes,
           SIGNAL(toggled(bool)),
           this, SIGNAL(changesAvailable()));
@@ -94,6 +115,18 @@ pqRenderViewOptions::pqRenderViewOptions(QWidget *widgetParent)
   QObject::connect(this->Internal->CenterAxesVisibility,
           SIGNAL(toggled(bool)),
           this, SIGNAL(changesAvailable()));
+
+  QObject::connect(this->Internal->solidColor,
+                   SIGNAL(toggled(bool)),
+                   this, SLOT(selectSolidColor(bool)));
+
+  QObject::connect(this->Internal->gradientColor,
+                   SIGNAL(toggled(bool)),
+                   this, SLOT(selectGradientColor(bool)));
+
+//  QObject::connect(this->Internal->image,
+//                   SIGNAL(toggled(bool)),
+//                   this, SLOT(selectBackgroundImage(bool)));
 }
 
 pqRenderViewOptions::~pqRenderViewOptions()
@@ -124,7 +157,7 @@ QStringList pqRenderViewOptions::getPageList()
     }
   return pages;
 }
-  
+
 void pqRenderViewOptions::setView(pqView* view)
 {
   // disconnect widgets from current render view
@@ -146,8 +179,9 @@ void pqRenderViewOptions::applyChanges()
 
   this->Internal->Links.accept();
   this->Internal->LightsLinks.accept();
-  
-  this->Internal->RenderView->setOrientationAxesVisibility(this->Internal->OrientationAxes->isChecked());
+
+  this->Internal->RenderView->setOrientationAxesVisibility(
+      this->Internal->OrientationAxes->isChecked());
 
   this->Internal->RenderView->setOrientationAxesInteractivity(
     this->Internal->OrientationAxesInteraction->checkState() == Qt::Checked);
@@ -158,7 +192,18 @@ void pqRenderViewOptions::applyChanges()
 
   this->Internal->RenderView->setCenterAxesVisibility(
     this->Internal->CenterAxesVisibility->checkState() == Qt::Checked);
-  
+
+  vtkSMProxy* proxy = this->Internal->RenderView->getProxy();
+  if(this->Internal->stackedWidget2->currentIndex() == 1)
+    {
+    vtkSMPropertyHelper(proxy, "UseGradientBackground").Set(1);
+    }
+  else
+    {
+    vtkSMPropertyHelper(proxy, "UseGradientBackground").Set(0);
+    }
+  proxy->UpdateVTKObjects();
+
   this->Internal->RenderView->saveSettings();
 
   // update the view after changes
@@ -183,16 +228,30 @@ void pqRenderViewOptions::connectGUI()
     SIGNAL(colorChanged(const QVariant&)),
     proxy, proxy->GetProperty("Background"));
 
+  this->Internal->Links.registerLink(this->Internal->GradColorAdaptor1, "color",
+    SIGNAL(colorChanged(const QVariant&)),
+    proxy, proxy->GetProperty("Background"));
+
+  this->Internal->Links.registerLink(this->Internal->GradColorAdaptor2, "color",
+    SIGNAL(colorChanged(const QVariant&)),
+    proxy, proxy->GetProperty("Background2"));
+
   new pqStandardColorLinkAdaptor(this->Internal->backgroundColor,
     proxy, "Background");
-  
+
+  new pqStandardColorLinkAdaptor(this->Internal->gradientColor1,
+    proxy, "Background");
+
+  new pqStandardColorLinkAdaptor(this->Internal->gradientColor2,
+    proxy, "Background2");
+
   this->Internal->Links.registerLink(this->Internal->parallelProjection, "checked",
     SIGNAL(stateChanged(int)),
     proxy, proxy->GetProperty("CameraParallelProjection"));
-  
-  
+
+
   // link default light params
-  this->Internal->LightsLinks.registerLink(this->Internal->DefaultLightSwitch, "checked", 
+  this->Internal->LightsLinks.registerLink(this->Internal->DefaultLightSwitch, "checked",
     SIGNAL(toggled(bool)),
     proxy, proxy->GetProperty("LightSwitch"));
   pqSignalAdaptorSliderRange* sliderAdaptor;
@@ -227,8 +286,35 @@ void pqRenderViewOptions::connectGUI()
   this->Internal->LightsLinks.registerLink(this->Internal->UseLight, "checked", SIGNAL(toggled(bool)),
     proxy, proxy->GetProperty("UseLight"));
 
+  // Check the default here.
+  if(vtkSMPropertyHelper(proxy, "UseGradientBackground").GetAsInt() == 1)
+    {
+    this->Internal->gradientColor->setChecked(true);
+    this->selectGradientColor(true);
+    }
+  else
+    {
+    this->Internal->solidColor->setChecked(true);
+    this->selectSolidColor(true);
+    }
+
+  this->restoreDefaultGradientColor1();
+  this->restoreDefaultGradientColor2();
+
   this->resetAnnotation();
-  
+
+  // Check if this is a remote renderer.
+  if(this->Internal->RenderView->getServer()->isRemote())
+    {
+    this->Internal->gradientColor->setDisabled(true);
+    this->Internal->gradColorPage->setDisabled(true);
+    }
+  else
+    {
+    this->Internal->gradientColor->setEnabled(true);
+    this->Internal->gradColorPage->setEnabled(true);
+    }
+
   this->blockSignals(false);
 
 }
@@ -278,3 +364,41 @@ void pqRenderViewOptions::resetLights()
     }
 }
 
+//-----------------------------------------------------------------------------
+void pqRenderViewOptions::selectSolidColor(bool flag)
+{
+  if(flag)
+    {
+    this->Internal->stackedWidget2->setCurrentIndex(0);
+    emit this->changesAvailable();
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqRenderViewOptions::selectGradientColor(bool flag)
+{
+  if(flag)
+    {
+    this->Internal->stackedWidget2->setCurrentIndex(1);
+    emit this->changesAvailable();
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqRenderViewOptions::restoreDefaultGradientColor1()
+{
+  this->restoreDefaultBackground();
+}
+
+
+//-----------------------------------------------------------------------------
+void pqRenderViewOptions::restoreDefaultGradientColor2()
+{
+//  vtkSMProxy* proxy = this->Internal->RenderView->getProxy();
+//  proxy->GetProperty("Background2")->ResetToDefault();
+  if (this->Internal->RenderView)
+    {
+    this->Internal->gradientColor2->setChosenColor(QColor(0, 0, 44));
+    }
+  emit this->changesAvailable();
+}

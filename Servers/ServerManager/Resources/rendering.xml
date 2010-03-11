@@ -189,6 +189,22 @@
       </DoubleVectorProperty>
 
       <DoubleVectorProperty
+        name="Background2"
+        command="SetBackground2"
+        number_of_elements="3"
+        default_values="1 1 1" >
+        <DoubleRangeDomain name="range" min="0 0 0" max="1 1 1"/>
+      </DoubleVectorProperty>
+
+      <IntVectorProperty
+        name="UseGradientBackground"
+        command="SetGradientBackground"
+        number_of_elements="1"
+        default_values="0" >
+        <BooleanDomain name="bool"/>
+      </IntVectorProperty>
+
+      <DoubleVectorProperty
          name="Viewport"
          command="SetViewport"
          number_of_elements="4"
@@ -4693,7 +4709,7 @@
         default_values="1 1 0 0">
         <BooleanDomain name="bool" />
       </IntVectorProperty>
-      
+
       <DoubleVectorProperty
         name="AxisColor"
         command="SetAxisColor"
@@ -4783,7 +4799,7 @@
         default_values="2 2 2 2">
         <IntRangeDomain name="range" min="0" max="6" />
       </IntVectorProperty>
-      
+
       <IntVectorProperty
         name="AxisBehavior"
         command="SetAxisBehavior"
@@ -4806,7 +4822,7 @@
         number_of_elements="8"
         default_values="0 1 0 1 0 1 0 1">
       </DoubleVectorProperty>
-      
+
       <StringVectorProperty
         name="AxisTitle"
         command="SetAxisTitle"
@@ -5134,6 +5150,8 @@
         </Proxy>
         <ExposedProperties>
           <Property name="Background" />
+          <Property name="Background2" />
+          <Property name="UseGradientBackground" />
           <Property name="DepthPeeling" />
           <Property name="MaximumNumberOfPeels" />
         </ExposedProperties>
@@ -5217,6 +5235,8 @@
         </Proxy>
         <ExposedProperties>
           <Property name="Background" />
+          <Property name="Background2" />
+          <Property name="UseGradientBackground" />
           <Property name="DepthPeeling" />
           <Property name="MaximumNumberOfPeels" />
         </ExposedProperties>
@@ -5325,6 +5345,8 @@
         </Proxy>
         <ExposedProperties>
           <Property name="Background" />
+          <Property name="Background2" />
+          <Property name="UseGradientBackground" />
           <Property name="DepthPeeling" />
           <Property name="MaximumNumberOfPeels" />
         </ExposedProperties>
@@ -5485,6 +5507,8 @@
         </Proxy>
         <ExposedProperties>
           <Property name="Background" />
+          <Property name="Background2" />
+          <Property name="UseGradientBackground" />
           <Property name="DepthPeeling" />
           <Property name="MaximumNumberOfPeels" />
         </ExposedProperties>
@@ -5692,6 +5716,8 @@
           <Property name="CenterOfRotation" />
           <!-- Renderer -->
           <Property name="Background" />
+          <Property name="Background2" />
+          <Property name="UseGradientBackground" />
           <Property name="StereoRender" />
           <Property name="StereoType" />
           <!-- RenderWindow -->
@@ -5763,6 +5789,8 @@
           <Property name="CenterOfRotation" />
           <!-- Renderer -->
           <Property name="Background" />
+          <Property name="Background2" />
+          <Property name="UseGradientBackground" />
           <Property name="StereoRender" />
           <Property name="StereoType" />
           <!-- RenderWindow -->
@@ -5840,6 +5868,8 @@
           <Property name="CenterOfRotation" />
           <!-- Renderer -->
           <Property name="Background" />
+          <Property name="Background2" />
+          <Property name="UseGradientBackground" />
           <!-- RenderWindow-->
           <Property name="StereoRender" />
           <Property name="StereoType" />
@@ -5921,6 +5951,8 @@
           <Property name="CenterOfRotation" />
           <!-- Renderer -->
           <Property name="Background" />
+          <Property name="Background2" />
+          <Property name="UseGradientBackground" />
           <!-- RenderWindow -->
           <Property name="RemoteRenderThreshold" />
           <Property name="StereoRender" />
@@ -6114,6 +6146,8 @@
           <Property name="CenterOfRotation" />
           <!-- Renderer -->
           <Property name="Background" />
+          <Property name="Background2" />
+          <Property name="UseGradientBackground" />
           <!-- RenderWindow -->
         </ExposedProperties>
       </SubProxy>
@@ -6180,6 +6214,8 @@
           <Property name="CenterOfRotation" />
           <!-- Renderer -->
           <Property name="Background" />
+          <Property name="Background2" />
+          <Property name="UseGradientBackground" />
           <!-- RenderWindow -->
           <Property name="ImageReductionFactor" />
           <Property name="DisableOrderedCompositing" />
@@ -6251,6 +6287,8 @@
           <Property name="CenterOfRotation" />
           <!-- Renderer -->
           <Property name="Background" />
+          <Property name="Background2" />
+          <Property name="UseGradientBackground" />
           <!-- RenderWindow -->
           <Property name="ImageReductionFactor" />
           <Property name="DisableOrderedCompositing" />
@@ -6325,6 +6363,8 @@
           <Property name="CenterOfRotation" />
           <!-- Renderer -->
           <Property name="Background" />
+          <Property name="Background2" />
+          <Property name="UseGradientBackground" />
           <!-- Tiles -->
           <Property name="CollectGeometryThreshold" />
           <Property name="StillRenderImageReductionFactor" />
@@ -6401,6 +6441,8 @@
           <Property name="CenterOfRotation" />
           <!-- Renderer -->
           <Property name="Background" />
+          <Property name="Background2" />
+          <Property name="UseGradientBackground" />
           <!-- RenderWindow -->
           <Property name="RemoteRenderThreshold" />
         </ExposedProperties>
@@ -6478,6 +6520,8 @@
           <Property name="CenterOfRotation" />
           <!-- Renderer -->
           <Property name="Background" />
+          <Property name="Background2" />
+          <Property name="UseGradientBackground" />
           <!-- RenderWindow -->
         </ExposedProperties>
       </SubProxy>
@@ -6544,6 +6588,8 @@
           <Property name="CenterOfRotation" />
           <!-- Renderer -->
           <Property name="Background" />
+          <Property name="Background2" />
+          <Property name="UseGradientBackground" />
           <!-- RenderWindow -->
           <Property name="ImageReductionFactor" />
           <Property name="DisableOrderedCompositing" />
@@ -6615,6 +6661,8 @@
           <Property name="CenterOfRotation" />
           <!-- Renderer -->
           <Property name="Background" />
+          <Property name="Background2" />
+          <Property name="UseGradientBackground" />
           <!-- RenderWindow -->
           <Property name="ImageReductionFactor" />
           <Property name="DisableOrderedCompositing" />
@@ -6689,6 +6737,8 @@
           <Property name="CenterOfRotation" />
           <!-- Renderer -->
           <Property name="Background" />
+          <Property name="Background2" />
+          <Property name="UseGradientBackground" />
           <!-- Tiles -->
           <Property name="CollectGeometryThreshold" />
           <Property name="StillRenderImageReductionFactor" />
@@ -6765,6 +6815,8 @@
           <Property name="CenterOfRotation" />
           <!-- Renderer -->
           <Property name="Background" />
+          <Property name="Background2" />
+          <Property name="UseGradientBackground" />
           <!-- RenderWindow -->
           <Property name="RemoteRenderThreshold" />
         </ExposedProperties>
