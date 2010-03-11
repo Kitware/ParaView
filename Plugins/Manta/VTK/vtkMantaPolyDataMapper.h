@@ -118,9 +118,9 @@ protected:
   ~vtkMantaPolyDataMapper();
 
   //BTX
-  void DrawPolygons(vtkPolyData *, 
+  void DrawPolygons(vtkPolyData *, vtkPoints *,
                     Manta::Mesh *, Manta::Group *, Manta::Group *);
-  void DrawTStrips(vtkPolyData *,
+  void DrawTStrips(vtkPolyData *, vtkPoints *,
                     Manta::Mesh *, Manta::Group *, Manta::Group *);
   //ETX
 
@@ -135,6 +135,11 @@ private:
   double PointSize;
   double LineWidth;
   bool CellScalarColor;
+
+//BTX
+  class Helper;
+  Helper *MyHelper;
+//ETX
 };
 
 #endif

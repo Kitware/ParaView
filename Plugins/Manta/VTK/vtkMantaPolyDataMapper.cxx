@@ -82,6 +82,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPointData.h"
 #include "vtkPoints.h"
 #include "vtkPolyData.h"
+#include "vtkProperty.h"
 #include "vtkSphereSource.h"
 #include "vtkTransform.h"
 #include "vtkTubeFilter.h"
@@ -107,7 +108,16 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <math.h>
 
-vtkCxxRevisionMacro(vtkMantaPolyDataMapper, "1.13");
+class vtkMantaPolyDataMapper::Helper {
+public:
+  Helper() {}
+  ~Helper() {}
+
+  Manta::Material *material;
+  vtkstd::vector<Manta::Vector> texCoords;
+};
+
+vtkCxxRevisionMacro(vtkMantaPolyDataMapper, "1.14");
 vtkStandardNewMacro(vtkMantaPolyDataMapper);
 
 //----------------------------------------------------------------------------
@@ -120,6 +130,7 @@ vtkMantaPolyDataMapper::vtkMantaPolyDataMapper()
   this->PointSize = 1.0;
   this->LineWidth = 1.0;
   this->Representation = VTK_SURFACE;
+  this->MyHelper = new Helper();
 }
 
 //----------------------------------------------------------------------------
@@ -139,6 +150,8 @@ vtkMantaPolyDataMapper::~vtkMantaPolyDataMapper()
     //     << this->MantaManager->GetReferenceCount() << endl;
     this->MantaManager->Delete();
     }
+
+  delete this->MyHelper;
 }
 
 //----------------------------------------------------------------------------
@@ -253,59 +266,103 @@ void vtkMantaPolyDataMapper::RenderPiece(vtkRenderer *ren, vtkActor *act)
 
 //----------------------------------------------------------------------------
 void vtkMantaPolyDataMapper::DrawPolygons(vtkPolyData *polys, 
+                                          vtkPoints *ptarray,
                                           Manta::Mesh *mesh,
                                           Manta::Group *points,
                                           Manta::Group *lines)
 {
+
+  Manta::Material *material = this->MyHelper->material;
+  vtkstd::vector<Manta::Vector> &texCoords = this->MyHelper->texCoords;
+
   int total_triangles = 0;
   vtkCellArray *cells = polys->GetPolys();
   vtkIdType npts = 0, *index = 0, cellNum = 0;
 
-  // write polygons with on the fly triangulation, assuming polygons are simple and
-  // can be triangulated into "fans"
-  for ( cells->InitTraversal(); cells->GetNextCell(npts, index); cellNum++ )
+  switch (this->Representation) {  
+  case VTK_POINTS:
     {
-    int triangle[3];
-    
-    // the first triangle
-    triangle[0] = index[0];
-    triangle[1] = index[1];
-    triangle[2] = index[2];
-    mesh->vertex_indices.push_back(triangle[0]);
-    mesh->vertex_indices.push_back(triangle[1]);
-    mesh->vertex_indices.push_back(triangle[2]);
-    mesh->face_material.push_back(0);
-    
-    if ( !mesh->vertexNormals.empty() )
+    for ( cells->InitTraversal(); cells->GetNextCell(npts, index); cellNum++ )
       {
-      mesh->normal_indices.push_back(triangle[0]);
-      mesh->normal_indices.push_back(triangle[1]);
-      mesh->normal_indices.push_back(triangle[2]);
-      }
-    
-    if ( !mesh->texCoords.empty() )
-      {
-      if (this->CellScalarColor)
+      double coord[3];
+      Manta::Vector noTC(0.0,0.0,0.0);      
+      for (int i = 0; i < npts; i++)
         {
-        mesh->texture_indices.push_back(cellNum);
-        mesh->texture_indices.push_back(cellNum);
-        mesh->texture_indices.push_back(cellNum);
+        //TODO: Make option to scale pointsize by scalar   
+        ptarray->GetPoint(index[i], coord);
+        Manta::TextureCoordinateSphere *sphere =
+          new Manta::TextureCoordinateSphere
+          (material, 
+           Manta::Vector(coord[0], coord[1], coord[2]), 
+           this->PointSize,
+           (texCoords.size()?
+            texCoords[(this->CellScalarColor?cellNum:index[i])] : noTC)
+           );
+        points->add(sphere);
         }
-      else
-        {
-        mesh->texture_indices.push_back(triangle[0]);
-        mesh->texture_indices.push_back(triangle[1]);
-        mesh->texture_indices.push_back(triangle[2]);
-        }
+      total_triangles ++;
       }
-    total_triangles ++;
-    
-    // the remaining triangles, of which
-    // each introduces a triangle after extraction
-    for ( int i = 3; i < npts; i ++ )
+    //cerr << "polygons: # of triangles = " << total_triangles << endl;    
+    } //VTK_POINTS;
+    break;
+  case VTK_WIREFRAME:
+    {
+    double coord0[3];
+    double coord1[3];
+    Manta::Vector noTC(0.0,0.0,0.0);      
+    Manta::TextureCoordinateCylinder *segment;
+    for ( cells->InitTraversal(); cells->GetNextCell(npts, index); cellNum++ )
       {
-      triangle[1] = triangle[2];
-      triangle[2] = index[i];
+      ptarray->GetPoint(index[0], coord0);
+      for (vtkIdType i = 1; i < npts; i++)
+        {
+        //TODO: Make option to scale linewidth by scalar
+        ptarray->GetPoint(index[i], coord1);
+        segment =
+          new Manta::TextureCoordinateCylinder
+          (material,
+           Manta::Vector(coord0[0], coord0[1], coord0[2]), 
+           Manta::Vector(coord1[0], coord1[1], coord1[2]), 
+           this->LineWidth,
+           (texCoords.size()?
+            texCoords[(this->CellScalarColor?cellNum:index[i-1])] : noTC),
+           (texCoords.size()?
+            texCoords[(this->CellScalarColor?cellNum:index[i])] : noTC)
+           );
+        lines->add(segment);
+        coord0[0] = coord1[0];
+        coord0[1] = coord1[1];
+        coord0[2] = coord1[2];
+        }
+      ptarray->GetPoint(index[0], coord1);
+      segment =
+        new Manta::TextureCoordinateCylinder
+        (material,
+         Manta::Vector(coord0[0], coord0[1], coord0[2]), 
+         Manta::Vector(coord1[0], coord1[1], coord1[2]), 
+         this->LineWidth,
+         (texCoords.size()?
+          texCoords[(this->CellScalarColor?cellNum:index[npts-1])] : noTC),
+         (texCoords.size()?
+          texCoords[(this->CellScalarColor?cellNum:index[0])] : noTC)
+         );
+      lines->add(segment);
+      }
+    } //VTK_WIREFRAME:
+    break;
+  case VTK_SURFACE:
+  default:
+    {
+    // write polygons with on the fly triangulation, assuming polygons are simple and
+    // can be triangulated into "fans"
+    for ( cells->InitTraversal(); cells->GetNextCell(npts, index); cellNum++ )
+      {
+      int triangle[3];
+      
+      // the first triangle
+      triangle[0] = index[0];
+      triangle[1] = index[1];
+      triangle[2] = index[2];
       mesh->vertex_indices.push_back(triangle[0]);
       mesh->vertex_indices.push_back(triangle[1]);
       mesh->vertex_indices.push_back(triangle[2]);
@@ -334,99 +391,173 @@ void vtkMantaPolyDataMapper::DrawPolygons(vtkPolyData *polys,
           }
         }
       total_triangles ++;
+      
+      // the remaining triangles, of which
+      // each introduces a triangle after extraction
+      for ( int i = 3; i < npts; i ++ )
+        {
+        triangle[1] = triangle[2];
+        triangle[2] = index[i];
+        mesh->vertex_indices.push_back(triangle[0]);
+        mesh->vertex_indices.push_back(triangle[1]);
+        mesh->vertex_indices.push_back(triangle[2]);
+        mesh->face_material.push_back(0);
+        
+        if ( !mesh->vertexNormals.empty() )
+          {
+          mesh->normal_indices.push_back(triangle[0]);
+          mesh->normal_indices.push_back(triangle[1]);
+          mesh->normal_indices.push_back(triangle[2]);
+          }
+        
+        if ( !mesh->texCoords.empty() )
+          {
+          if (this->CellScalarColor)
+            {
+            mesh->texture_indices.push_back(cellNum);
+            mesh->texture_indices.push_back(cellNum);
+            mesh->texture_indices.push_back(cellNum);
+            }
+          else
+            {
+            mesh->texture_indices.push_back(triangle[0]);
+            mesh->texture_indices.push_back(triangle[1]);
+            mesh->texture_indices.push_back(triangle[2]);
+            }
+          }
+        total_triangles ++;
+        }
       }
-    }
-  
-  //cerr << "polygons: # of triangles = " << total_triangles << endl;
-  
-  // TODO: memory leak, wald_triangle is not deleted
-  Manta::WaldTriangle *wald_triangle = new Manta::WaldTriangle[total_triangles];
-  for ( int i = 0; i < total_triangles; i ++ )
-    {
-    mesh->addTriangle( &wald_triangle[i] );
-    }
+    //cerr << "polygons: # of triangles = " << total_triangles << endl;
+    
+    // TODO: memory leak, wald_triangle is not deleted
+    Manta::WaldTriangle *wald_triangle = new Manta::WaldTriangle[total_triangles];
+    for ( int i = 0; i < total_triangles; i ++ )
+      {
+      mesh->addTriangle( &wald_triangle[i] );
+      }
+    }//VTK_SURFACE
+    break;
+  }
+
 }
 
 //----------------------------------------------------------------------------
 void vtkMantaPolyDataMapper::DrawTStrips(vtkPolyData *polys, 
+                                         vtkPoints *ptarray,
                                          Manta::Mesh *mesh, 
                                          Manta::Group *points, 
                                          Manta::Group *lines)
 {
+  Manta::Material *material = this->MyHelper->material;
+  vtkstd::vector<Manta::Vector> &texCoords = this->MyHelper->texCoords;
+
   // total number of triangles
   int total_triangles = 0;
   
   vtkCellArray *cells = polys->GetStrips();
   vtkIdType npts = 0, *index = 0, cellNum = 0;;
-  
-  for ( cells->InitTraversal(); cells->GetNextCell(npts, index); cellNum++ )
+
+  switch (this->Representation) {  
+  case VTK_POINTS:
     {
-    // count of the i-th triangle in a strip
-    int numtriangles2 = 0;
-    
-    int triangle[3];
-    // the first triangle
-    triangle[0] = index[0];
-    triangle[1] = index[1];
-    triangle[2] = index[2];
-    mesh->vertex_indices.push_back( triangle[0] );
-    mesh->vertex_indices.push_back( triangle[1] );
-    mesh->vertex_indices.push_back( triangle[2] );
-    mesh->face_material.push_back(0);
-    
-    if ( !mesh->vertexNormals.empty() )
+    for ( cells->InitTraversal(); cells->GetNextCell(npts, index); cellNum++ )
       {
-      mesh->normal_indices.push_back( triangle[0] );
-      mesh->normal_indices.push_back( triangle[1] );
-      mesh->normal_indices.push_back( triangle[2] );
+      double coord[3];
+      Manta::Vector noTC(0.0,0.0,0.0);      
+      for (int i = 0; i < npts; i++)
+        {
+        //TODO: Make option to scale pointsize by scalar   
+        ptarray->GetPoint(index[i], coord);
+        Manta::TextureCoordinateSphere *sphere =
+          new Manta::TextureCoordinateSphere
+          (material, 
+           Manta::Vector(coord[0], coord[1], coord[2]), 
+           this->PointSize,
+           (texCoords.size()?
+            texCoords[(this->CellScalarColor?cellNum:index[i])] : noTC)
+           );
+        points->add(sphere);
+        }
+      total_triangles ++;
       }
-    
-    if ( !mesh->texCoords.empty() )
+    //cerr << "polygons: # of triangles = " << total_triangles << endl;    
+    } //VTK_POINTS;
+    break;
+  case VTK_WIREFRAME:
+    {
+    double coord0[3];
+    double coord1[3];
+    double coord2[3];
+    Manta::Vector noTC(0.0,0.0,0.0);      
+    Manta::TextureCoordinateCylinder *segment;
+    for ( cells->InitTraversal(); cells->GetNextCell(npts, index); cellNum++ )
       {
-      if ( this->CellScalarColor )
+      //TODO: Make option to scale linewidth by scalar
+      ptarray->GetPoint(index[0], coord0);
+      ptarray->GetPoint(index[1], coord1);
+      segment =
+        new Manta::TextureCoordinateCylinder
+        (material,
+         Manta::Vector(coord0[0], coord0[1], coord0[2]), 
+         Manta::Vector(coord1[0], coord1[1], coord1[2]), 
+         this->LineWidth,
+         (texCoords.size()?
+          texCoords[(this->CellScalarColor?cellNum:index[0])] : noTC),
+         (texCoords.size()?
+          texCoords[(this->CellScalarColor?cellNum:index[1])] : noTC)
+         );
+      lines->add(segment);
+      for (vtkIdType i = 2; i < npts; i++)
         {
-        mesh->texture_indices.push_back(cellNum);
-        mesh->texture_indices.push_back(cellNum);
-        mesh->texture_indices.push_back(cellNum);
-        }
-      else
-        {
-        mesh->texture_indices.push_back( triangle[0] );
-        mesh->texture_indices.push_back( triangle[1] );
-        mesh->texture_indices.push_back( triangle[2] );
+        ptarray->GetPoint(index[i], coord2);
+        segment =
+          new Manta::TextureCoordinateCylinder
+          (material,
+           Manta::Vector(coord1[0], coord1[1], coord1[2]), 
+           Manta::Vector(coord2[0], coord2[1], coord2[2]), 
+           this->LineWidth,
+           (texCoords.size()?
+            texCoords[(this->CellScalarColor?cellNum:index[i-1])] : noTC),
+           (texCoords.size()?
+            texCoords[(this->CellScalarColor?cellNum:index[i])] : noTC)
+           );
+        lines->add(segment);
+        segment =
+          new Manta::TextureCoordinateCylinder
+          (material,
+           Manta::Vector(coord2[0], coord2[1], coord2[2]), 
+           Manta::Vector(coord0[0], coord0[1], coord0[2]), 
+           this->LineWidth,
+           (texCoords.size()?
+            texCoords[(this->CellScalarColor?cellNum:index[i])] : noTC),
+           (texCoords.size()?
+            texCoords[(this->CellScalarColor?cellNum:index[i-2])] : noTC)
+           );
+        lines->add(segment);
+        coord0[0] = coord1[0];
+        coord0[1] = coord1[1];
+        coord0[2] = coord1[2];
+        coord1[0] = coord2[0];
+        coord1[1] = coord2[1];
+        coord1[2] = coord2[2];
         }
       }
-    
-    total_triangles ++;
-    numtriangles2 ++;
-    
-    // the rest of triangles
-    for ( int i = 3; i < npts; i ++ )
+    } //VTK_WIREFRAME:
+    break;
+  case VTK_SURFACE:
+  default:
+    {
+    for ( cells->InitTraversal(); cells->GetNextCell(npts, index); cellNum++ )
       {
-      int tmp[3];
-      if ( numtriangles2 % 2 == 1 )
-        {
-        // an odd triangle
-        tmp[0] = triangle[1];
-        tmp[1] = triangle[2];
-        tmp[2] = index[i];
-        
-        triangle[0] = tmp[0];
-        triangle[1] = tmp[2];
-        triangle[2] = tmp[1];
-        }
-      else
-        {
-        // an even triangle
-        tmp[0] = triangle[1];
-        tmp[1] = triangle[2];
-        tmp[2] = index[i];
-        
-        triangle[0] = tmp[1];
-        triangle[1] = tmp[0];
-        triangle[2] = tmp[2];
-        }
+      // count of the i-th triangle in a strip
+      int numtriangles2 = 0;
       
+      int triangle[3];
+      // the first triangle
+      triangle[0] = index[0];
+      triangle[1] = index[1];
+      triangle[2] = index[2];
       mesh->vertex_indices.push_back( triangle[0] );
       mesh->vertex_indices.push_back( triangle[1] );
       mesh->vertex_indices.push_back( triangle[2] );
@@ -457,17 +588,77 @@ void vtkMantaPolyDataMapper::DrawTStrips(vtkPolyData *polys,
       
       total_triangles ++;
       numtriangles2 ++;
+      
+      // the rest of triangles
+      for ( int i = 3; i < npts; i ++ )
+        {
+        int tmp[3];
+        if ( numtriangles2 % 2 == 1 )
+          {
+          // an odd triangle
+          tmp[0] = triangle[1];
+          tmp[1] = triangle[2];
+          tmp[2] = index[i];
+          
+          triangle[0] = tmp[0];
+          triangle[1] = tmp[2];
+          triangle[2] = tmp[1];
+          }
+        else
+          {
+          // an even triangle
+          tmp[0] = triangle[1];
+          tmp[1] = triangle[2];
+          tmp[2] = index[i];
+          
+          triangle[0] = tmp[1];
+          triangle[1] = tmp[0];
+          triangle[2] = tmp[2];
+          }
+        
+        mesh->vertex_indices.push_back( triangle[0] );
+        mesh->vertex_indices.push_back( triangle[1] );
+        mesh->vertex_indices.push_back( triangle[2] );
+        mesh->face_material.push_back(0);
+        
+        if ( !mesh->vertexNormals.empty() )
+          {
+          mesh->normal_indices.push_back( triangle[0] );
+          mesh->normal_indices.push_back( triangle[1] );
+          mesh->normal_indices.push_back( triangle[2] );
+          }
+        
+        if ( !mesh->texCoords.empty() )
+          {
+          if ( this->CellScalarColor )
+            {
+            mesh->texture_indices.push_back(cellNum);
+            mesh->texture_indices.push_back(cellNum);
+            mesh->texture_indices.push_back(cellNum);
+            }
+          else
+            {
+            mesh->texture_indices.push_back( triangle[0] );
+            mesh->texture_indices.push_back( triangle[1] );
+            mesh->texture_indices.push_back( triangle[2] );
+            }
+          }
+        
+        total_triangles ++;
+        numtriangles2 ++;
+        }
+      }
+    
+    //cerr << "strips: # of triangles = " << total_triangles << endl;
+    
+    // TODO: memory leak, wald_triangle is not deleted
+    Manta::WaldTriangle *wald_triangle = new Manta::WaldTriangle[total_triangles];
+    for ( int i = 0; i < total_triangles; i++ )
+      {
+      mesh->addTriangle( &wald_triangle[i] );
       }
     }
-  
-  //cerr << "strips: # of triangles = " << total_triangles << endl;
-  
-  // TODO: memory leak, wald_triangle is not deleted
-  Manta::WaldTriangle *wald_triangle = new Manta::WaldTriangle[total_triangles];
-  for ( int i = 0; i < total_triangles; i++ )
-    {
-    mesh->addTriangle( &wald_triangle[i] );
-    }
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -489,6 +680,8 @@ void vtkMantaPolyDataMapper::Draw(vtkRenderer *renderer, vtkActor *actor)
   vtkPolyData *input = this->GetInput();
 
   // Compute we need to for color
+  this->Representation = mantaProperty->GetRepresentation();
+
   this->CellScalarColor = false;
   if (( this->ScalarMode == VTK_SCALAR_MODE_USE_CELL_DATA ||
         this->ScalarMode == VTK_SCALAR_MODE_USE_CELL_FIELD_DATA ||
@@ -501,8 +694,11 @@ void vtkMantaPolyDataMapper::Draw(vtkRenderer *renderer, vtkActor *actor)
     this->CellScalarColor = true;
     }
   
-  Manta::Material *material = NULL;
-  vtkstd::vector<Manta::Vector> texCoords;
+  this->MyHelper->material = NULL;
+  this->MyHelper->texCoords.clear();
+  Manta::Material *&material = this->MyHelper->material;
+  vtkstd::vector<Manta::Vector> &texCoords = this->MyHelper->texCoords;
+
   if ( !this->ScalarVisibility || (!this->Colors && !this->ColorCoordinates))
     {
     //cerr << "Solid color from actor's property" << endl;
@@ -521,7 +717,7 @@ void vtkMantaPolyDataMapper::Draw(vtkRenderer *renderer, vtkActor *actor)
   else if (this->Colors)
     {
     //cerr << "Color scalar values directly (interpolation in color space)" << endl;
-    Manta::Texture<Manta::Color> *texture = new Manta::TexCoordTexture();
+    Manta::Texture<Manta::Color> *texture = new Manta::TexCoordTexture();   
     if ( mantaProperty->GetInterpolation() == VTK_FLAT )
       {
       //cerr << "Flat" << endl;
@@ -532,7 +728,7 @@ void vtkMantaPolyDataMapper::Draw(vtkRenderer *renderer, vtkActor *actor)
       if ( mantaProperty->GetOpacity() < 1.0 )
         {
         //cerr << "Translucent" << endl;
-        material = new Manta::Transparent(texture,
+        material = new Manta::Transparent(texture, 
                                           mantaProperty->GetOpacity());
         }
       else
@@ -588,11 +784,11 @@ void vtkMantaPolyDataMapper::Draw(vtkRenderer *renderer, vtkActor *actor)
   else if (input->GetPointData()->GetTCoords() && actor->GetTexture() )
     {
     //cerr << "color using actor's texture" << endl;
-    vtkMantaTexture *mantaTexture =
+    vtkMantaTexture *mantaTexture = 
       vtkMantaTexture::SafeDownCast(actor->GetTexture());
     if (mantaTexture)
       {
-      Manta::Texture<Manta::Color> *texture =
+      Manta::Texture<Manta::Color> *texture = 
         mantaTexture->GetMantaTexture();
       material = new Manta::Lambertian(texture);
       }
@@ -654,7 +850,7 @@ void vtkMantaPolyDataMapper::Draw(vtkRenderer *renderer, vtkActor *actor)
       Manta::TextureCoordinateSphere *sphere =
         new Manta::TextureCoordinateSphere
         (material, 
-         Manta::Vector(coord[0], coord[1], coord[2]),
+         Manta::Vector(coord[0], coord[1], coord[2]), 
          this->PointSize,
          (texCoords.size()?
           texCoords[(this->CellScalarColor?cell:pts[0])] : noTC)
@@ -685,8 +881,8 @@ void vtkMantaPolyDataMapper::Draw(vtkRenderer *renderer, vtkActor *actor)
         Manta::TextureCoordinateCylinder *segment =
           new Manta::TextureCoordinateCylinder
           (material,
-           Manta::Vector(coord0[0], coord0[1], coord0[2]),
-           Manta::Vector(coord1[0], coord1[1], coord1[2]),
+           Manta::Vector(coord0[0], coord0[1], coord0[2]), 
+           Manta::Vector(coord1[0], coord1[1], coord1[2]), 
            this->LineWidth,
            (texCoords.size()?
             texCoords[(this->CellScalarColor?cell:pts[0])] : noTC),
@@ -695,7 +891,7 @@ void vtkMantaPolyDataMapper::Draw(vtkRenderer *renderer, vtkActor *actor)
            );
         tubeGroup->add(segment);
         coord0[0] = coord1[0];
-        coord0[1] = coord1[2];
+        coord0[1] = coord1[1];
         coord0[2] = coord1[3];
         }
       }    
@@ -717,7 +913,7 @@ void vtkMantaPolyDataMapper::Draw(vtkRenderer *renderer, vtkActor *actor)
       {
       vtkDataArray *normals = vtkFloatArray::New();
       normals->SetNumberOfComponents(3);
-      transform->TransformNormals( pointData->GetNormals(), normals );
+      transform->TransformNormals( pointData->GetNormals(), normals );      
       for ( int i = 0; i < normals->GetNumberOfTuples(); i ++ )
         {
         double *normal = normals->GetTuple(i);
@@ -734,13 +930,13 @@ void vtkMantaPolyDataMapper::Draw(vtkRenderer *renderer, vtkActor *actor)
   // convert polygons to manta format
   if ( input->GetNumberOfPolys() > 0 )
     {
-    this->DrawPolygons(input, mesh, sphereGroup, tubeGroup);
+    this->DrawPolygons(input, points, mesh, sphereGroup, tubeGroup);
     }
   
   // convert triangle strips to manta format
   if ( input->GetNumberOfStrips() > 0 )
     {
-    this->DrawTStrips(input, mesh, sphereGroup, tubeGroup);
+    this->DrawTStrips(input, points, mesh, sphereGroup, tubeGroup);
     }
 
   //delete transformed point coordinates
@@ -751,7 +947,7 @@ void vtkMantaPolyDataMapper::Draw(vtkRenderer *renderer, vtkActor *actor)
   Manta::Group *group = new Manta::Group();
   if(sphereGroup->size())
     {
-    cerr << "MM(" << this << ")   points " << sphereGroup->size() << endl;
+    //cerr << "MM(" << this << ")   points " << sphereGroup->size() << endl;
     group->add(sphereGroup);
     }
   else
@@ -760,7 +956,7 @@ void vtkMantaPolyDataMapper::Draw(vtkRenderer *renderer, vtkActor *actor)
     }
   if(tubeGroup->size())
     {
-    cerr << "MM(" << this << ")   lines " << tubeGroup->size() << endl;
+    //cerr << "MM(" << this << ")   lines " << tubeGroup->size() << endl;
     group->add(tubeGroup);
     }
   else
@@ -769,7 +965,7 @@ void vtkMantaPolyDataMapper::Draw(vtkRenderer *renderer, vtkActor *actor)
     }
   if (mesh->size())
     {
-    cerr << "MM(" << this << ")   polygons " << mesh->size() << endl;
+    //cerr << "MM(" << this << ")   polygons " << mesh->size() << endl;
     group->add(mesh);
     }
   else
