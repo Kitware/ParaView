@@ -29,3 +29,8 @@ if(BUILD_PHASTA_ADAPTOR)
   add_subdirectory(PhastaAdaptor)
 endif(BUILD_PHASTA_ADAPTOR)
 
+option(BUILD_NPIC_ADAPTOR "Build NPIC Adaptor" OFF)
+if(BUILD_NPIC_ADAPTOR)
+  add_subdirectory(NPICAdaptor)
+endif(BUILD_NPIC_ADAPTOR)
+
