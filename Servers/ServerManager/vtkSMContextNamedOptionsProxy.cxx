@@ -52,7 +52,7 @@ public:
 };
 
 vtkStandardNewMacro(vtkSMContextNamedOptionsProxy);
-vtkCxxRevisionMacro(vtkSMContextNamedOptionsProxy, "1.20");
+vtkCxxRevisionMacro(vtkSMContextNamedOptionsProxy, "1.21");
 //----------------------------------------------------------------------------
 vtkSMContextNamedOptionsProxy::vtkSMContextNamedOptionsProxy()
 {
@@ -193,14 +193,13 @@ void vtkSMContextNamedOptionsProxy::InitializePlotMap()
     {
     this->Internals->Chart->ClearPlots();
     // Choose a default plot series if one has not already been chosen
-    if (this->Internals->Table->GetNumberOfColumns() > 1)
+    if (this->Internals->Table->GetNumberOfColumns() > 0)
       {
       for(vtkIdType i = 0; i < this->Internals->Table->GetNumberOfColumns(); ++i)
         {
         vtkPlot *plot = this->Internals->Chart->AddPlot(this->Internals->ChartType);
         if (plot)
           {
-          plot->SetVisible(false);
           plot->SetUseIndexForXSeries(this->Internals->UseIndexForXAxis);
           plot->SetInput(this->Internals->Table,
                          this->Internals->XSeriesName.c_str(),
@@ -209,6 +208,7 @@ void vtkSMContextNamedOptionsProxy::InitializePlotMap()
         // Update the map with the pointer
         this->Internals->PlotMap[this->Internals->Table->GetColumnName(i)] = plot;
         }
+      // Set the plot to visible (already visible, but other things are done)
       this->SetVisibility(this->Internals->Table->GetColumnName(0), 1);
       }
     }
@@ -330,6 +330,10 @@ void vtkSMContextNamedOptionsProxy::UpdatePropertyInformationInternal(
 //----------------------------------------------------------------------------
 void vtkSMContextNamedOptionsProxy::SetVisibility(const char* name, int visible)
 {
+  if (strlen(name) == 0)
+    {
+    return;
+    }
   if (this->Internals->PlotMap[name])
     {
     vtkPlot *plot = this->Internals->PlotMap[name];

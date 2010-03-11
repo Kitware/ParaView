@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -68,7 +68,7 @@ void pqChartRepresentation::setDefaultPropertyValues()
   // Set default arrays and lookup table.
   vtkSMRepresentationProxy* proxy = vtkSMRepresentationProxy::SafeDownCast(
     this->getProxy());
- 
+
   // This update is needed since when resetting default property values, the
   // superclass may have changed some property such as the "composite_index"
   // which requires the representation to be re-updated to get correct data
@@ -127,9 +127,12 @@ void pqChartRepresentation::setDefaultPropertyValues()
         helper.SetStatus(array.toAscii().data(), 0);
         }
       }
-    helper.SetStatus(y_array.toAscii().data(), 1);
+    if (!y_array.isEmpty())
+      {
+      helper.SetStatus(y_array.toAscii().data(), 1);
+      }
     }
-  
+
   proxy->UpdateVTKObjects();
 }
 
