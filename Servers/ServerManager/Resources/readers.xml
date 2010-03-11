@@ -5622,5 +5622,126 @@
    <!-- End TecplotReader -->
    </FileSeriesReaderProxy>
 
+   <!-- Start vtkVPICReader -->
+   <SourceProxy name="VPICReader" 
+                class="vtkVPICReader"
+                label="VPIC Reader">
+
+     <StringVectorProperty
+        name="FileName"
+        command="SetFileName"
+        animateable="0"
+        number_of_elements="1">
+        <FileListDomain name="files"/>
+     </StringVectorProperty>
+
+     <StringVectorProperty
+        name="PointArrayInfo"
+        information_only="1">
+        <ArraySelectionInformationHelper attribute_name="Point"/>
+     </StringVectorProperty>
+
+     <StringVectorProperty
+        name="PointArrayStatus"
+        command="SetPointArrayStatus"
+        number_of_elements="2"
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0"
+        information_property="PointArrayInfo" >
+        <ArraySelectionDomain name="array_list" >
+          <RequiredProperties>
+             <Property name="PointArrayInfo" function="ArrayList"/>
+          </RequiredProperties>
+        </ArraySelectionDomain>
+     </StringVectorProperty>
+
+     <DoubleVectorProperty
+         name="TimestepValues"
+         repeatable="1"
+         information_only="1">
+       <TimeStepsInformationHelper/>
+     </DoubleVectorProperty>
+
+     <IntVectorProperty
+         name="SetStride"
+         label="Stride"
+         command="SetStride"
+         number_of_elements="3"
+         default_values="1 1 1">
+         <IntRangeDomain name="range" min="1"/>
+     </IntVectorProperty>
+
+     <IntVectorProperty
+        name="DefaultXExtent"
+        command="GetXLayout"
+        information_only="1">
+        <SimpleIntInformationHelper/>
+     </IntVectorProperty>
+
+     <IntVectorProperty
+        name="DefaultYExtent"
+        command="GetYLayout"
+        information_only="1">
+        <SimpleIntInformationHelper/>
+     </IntVectorProperty>
+
+     <IntVectorProperty
+        name="DefaultZExtent"
+        command="GetZLayout"
+        information_only="1">
+        <SimpleIntInformationHelper/>
+     </IntVectorProperty>
+
+     <IntVectorProperty
+        name="XExtent"
+        label="X Extent"
+        command="SetXExtent"
+        number_of_elements="2"
+        animateable="1"
+        default_values="-1 -1">
+        <IntRangeDomain name="XRange">
+             <RequiredProperties>
+                 <Property name="DefaultXExtent" function="Range"/>
+             </RequiredProperties>
+        </IntRangeDomain>
+     </IntVectorProperty>
+
+     <IntVectorProperty
+        name="YExtent"
+        label="Y Extent"
+        command="SetYExtent"
+        number_of_elements="2"
+        animateable="1"
+        default_values="-1 -1">
+        <IntRangeDomain name="YRange">
+             <RequiredProperties>
+                 <Property name="DefaultYExtent" function="Range"/>
+             </RequiredProperties>
+        </IntRangeDomain>
+     </IntVectorProperty>
+
+     <IntVectorProperty
+        name="ZExtent"
+        label="Z Extent"
+        command="SetZExtent"
+        number_of_elements="2"
+        animateable="1"
+        default_values="-1 -1">
+        <IntRangeDomain name="ZRange">
+             <RequiredProperties>
+                 <Property name="DefaultZExtent" function="Range"/>
+             </RequiredProperties>
+        </IntRangeDomain>
+     </IntVectorProperty>
+     
+     <Hints>
+        <ReaderFactory extensions="vpc"
+          file_description="VPIC Files" />
+     </Hints>
+
+   </SourceProxy>
+   <!-- End vtkVPICReader -->
+
   </ProxyGroup>
 </ServerManagerConfiguration>
