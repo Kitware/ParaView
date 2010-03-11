@@ -118,6 +118,10 @@ public:
   //BTX
   vtkSetMacro(MantaMaterial, Manta::Material*);
   vtkGetMacro(MantaMaterial, Manta::Material*);
+  vtkSetMacro(DiffuseTexture, Manta::Texture<Manta::Color>*);
+  vtkGetMacro(DiffuseTexture, Manta::Texture<Manta::Color>*);
+  vtkSetMacro(SpecularTexture, Manta::Texture<Manta::Color>*);
+  vtkGetMacro(SpecularTexture, Manta::Texture<Manta::Color>*);
   //ETX
 
   //Description:

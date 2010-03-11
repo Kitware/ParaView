@@ -82,6 +82,7 @@ class vtkAppendPolyData;
 //BTX
 namespace Manta {
 class Mesh;
+class Group;
 }
 //ETX
 class vtkCellArray;
@@ -117,17 +118,23 @@ protected:
   ~vtkMantaPolyDataMapper();
 
   //BTX
-  void DrawPolygons(vtkPolyData *, Manta::Mesh *);
-  void DrawTStrips(vtkPolyData *, Manta::Mesh *);
+  void DrawPolygons(vtkPolyData *, 
+                    Manta::Mesh *, Manta::Group *, Manta::Group *);
+  void DrawTStrips(vtkPolyData *,
+                    Manta::Mesh *, Manta::Group *, Manta::Group *);
   //ETX
 
 private:
-  vtkMantaTexture*    InternalColorTexture;
-
   vtkMantaPolyDataMapper(const vtkMantaPolyDataMapper&); // Not implemented.
   void operator=(const vtkMantaPolyDataMapper&); // Not implemented.
 
   vtkMantaManager *MantaManager;
+
+  vtkMantaTexture* InternalColorTexture;
+  int Representation;
+  double PointSize;
+  double LineWidth;
+  bool CellScalarColor;
 };
 
 #endif
