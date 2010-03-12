@@ -101,7 +101,7 @@ public:
   void FreeMantaResources()
   {
     //cerr << "MAPR(" << this << ") FREE MANTA RESOURCES " 
-    //     << this->DebugCntr << endl;
+    //    << this->DebugCntr << endl;
     //cerr << " AS: " << this->MantaAS << endl;
     if (this->MantaAS)
       {
@@ -139,7 +139,7 @@ int vtkMantaActorThreadCache::GlobalCntr = 0;
 
 //===========================================================================
 
-vtkCxxRevisionMacro(vtkMantaActor, "1.13");
+vtkCxxRevisionMacro(vtkMantaActor, "1.14");
 vtkStandardNewMacro(vtkMantaActor);
 
 //----------------------------------------------------------------------------
@@ -157,6 +157,7 @@ vtkMantaActor::~vtkMantaActor()
   //cerr << "MA(" << this << ") DESTROY" << endl;
   if (this->MantaManager)
     {
+    this->ReleaseGraphicsResources(NULL);
     //cerr << "MA(" << this << " DESTROY " << this->MantaManager << " "
     //     << this->MantaManager->GetReferenceCount() << endl;
     this->MantaManager->Delete();
@@ -179,10 +180,13 @@ vtkProperty *vtkMantaActor::MakeProperty()
 void vtkMantaActor::ReleaseGraphicsResources( vtkWindow * win )
 {
   //cerr << "MA(" << this << ") RELEASE GRAPHICS RESOURCES" << endl;
-  this->Superclass::ReleaseGraphicsResources( win );
+  if (win)
+    {
+    this->Superclass::ReleaseGraphicsResources( win );
+    }
   if (!this->MantaManager)
     {
-    //cerr << "NO MGR" << endl;
+    //cerr << "MA(" << this << ") NO MGR" << endl;
     return;
     }
 
@@ -191,7 +195,7 @@ void vtkMantaActor::ReleaseGraphicsResources( vtkWindow * win )
     new vtkMantaActorThreadCache(this->MantaManager->GetMantaWorldGroup(),
                                  this->MantaAS,
                                  this->Group);
-
+  //cerr << "MA(" << this << ") handed off to MAPR(" << R << ")" << endl;
   //make no further references to them in this thread
   this->MantaAS = NULL;
   this->Group = NULL;
@@ -207,7 +211,6 @@ void vtkMantaActor::ReleaseGraphicsResources( vtkWindow * win )
 void vtkMantaActor::Render( vtkRenderer * ren, vtkMapper * mapper )
 {
   //cerr << "MA(" << this << ") RENDER" << endl;
-
   if ( vtkMantaRenderer * mantaRenderer = vtkMantaRenderer::SafeDownCast( ren ) )
     {
     if (!this->MantaManager)
@@ -246,6 +249,7 @@ void vtkMantaActor::Render( vtkRenderer * ren, vtkMapper * mapper )
 //----------------------------------------------------------------------------
 void vtkMantaActor::SetVisibility(int newval)
 {
+  //cerr << "MA(" << this << ") SET VISIBILITY " << newval << endl;
   if (newval == this->GetVisibility())
     {
     return;
