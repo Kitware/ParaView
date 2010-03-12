@@ -24,7 +24,7 @@
 #include "vtkIdTypeArray.h"
 #include "vtkCellArray.h"
 
-vtkCxxRevisionMacro(vtkMantaTestSource, "1.1");
+vtkCxxRevisionMacro(vtkMantaTestSource, "1.2");
 vtkStandardNewMacro(vtkMantaTestSource);
 
 //----------------------------------------------------------------------------
@@ -201,7 +201,7 @@ int vtkMantaTestSource::RequestData(vtkInformation *vtkNotUsed(info),
   double X = vtkMath::Random();
   double Y = vtkMath::Random();
   double Z = vtkMath::Random();
-  for (vtkIdType i = 0; i < this->Resolution; i++)
+  for (i = 0; i < this->Resolution; i++)
     {
     X = X+vtkMath::Random() * this->DriftFactor - this->DriftFactor*0.5;
     Y = Y+vtkMath::Random() * this->DriftFactor - this->DriftFactor*0.5;
