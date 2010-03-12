@@ -75,7 +75,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <math.h>
 
-vtkCxxRevisionMacro(vtkMantaLight, "1.7");
+vtkCxxRevisionMacro(vtkMantaLight, "1.8");
 vtkStandardNewMacro(vtkMantaLight);
 
 //----------------------------------------------------------------------------
@@ -185,11 +185,18 @@ void vtkMantaLight::UpdateMantaLight(vtkRenderer *ren)
     return;
     }
   double *color, *position, *focal, direction[3];
+  double intens = this->GetIntensity();
+  double on = (this->GetSwitch()?1.0:0.0);
 
   // Manta Lights only have one "color"
   color    = this->GetColor();
   position = this->GetTransformedPosition();
   focal    = this->GetTransformedFocalPoint();
+
+  double lcolor[3]; //factor in intensity and on/off state for manta API
+  lcolor[0] = color[0] * intens * on;
+  lcolor[1] = color[1] * intens * on;
+  lcolor[2] = color[2] * intens * on;
 
   if (this->GetPositional())
     {
@@ -198,7 +205,7 @@ void vtkMantaLight::UpdateMantaLight(vtkRenderer *ren)
     if ( pointLight )
         {
         pointLight->setPosition(Manta::Vector(position[0], position[1], position[2]));
-        pointLight->setColor(Manta::Color(Manta::RGBColor(color[0],color[1],color[2])));
+        pointLight->setColor(Manta::Color(Manta::RGBColor(lcolor[0],lcolor[1],lcolor[2])));
         }
     else
       {
@@ -218,7 +225,7 @@ void vtkMantaLight::UpdateMantaLight(vtkRenderer *ren)
         direction[1] = position[1] - focal[1];
         direction[2] = position[2] - focal[2];
         dirLight->setDirection(Manta::Vector(direction[0], direction[1], direction[2]));
-        dirLight->setColor(Manta::Color(Manta::RGBColor(color[0],color[1],color[2])));
+        dirLight->setColor(Manta::Color(Manta::RGBColor(lcolor[0],lcolor[1],lcolor[2])));
         }
     else
       {

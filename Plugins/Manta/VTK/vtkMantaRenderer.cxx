@@ -95,7 +95,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <vtkstd/string>
 
-vtkCxxRevisionMacro(vtkMantaRenderer, "1.17");
+vtkCxxRevisionMacro(vtkMantaRenderer, "1.18");
 vtkStandardNewMacro(vtkMantaRenderer);
 
 //----------------------------------------------------------------------------
@@ -271,8 +271,9 @@ int vtkMantaRenderer::UpdateLights()
     if ( vLight->GetSwitch() )
       {
       noneOn = false;
-      vLight->Render( this, 0 /* not used */ );
       }
+    //manta lights set intensity to 0.0 if switched off, so render regardless
+    vLight->Render( this, 0 /* not used */ ); 
     }
     
   if (noneOn)
