@@ -157,7 +157,7 @@
      
      <Hints>
         <!-- View can be used to specify the preferred view for the proxy -->
-        <View type="XYPlotView" />
+        <View type="XYChartView" />
 
         <!-- Temporary hint to allow the output of this filter to be plotted -->
         <Plotable />
@@ -194,7 +194,7 @@ TimeData (if Time exists in the input)).
 
      <Hints>
         <!-- View can be used to specify the preferred view for the proxy -->
-        <View type="XYPlotView" />
+        <View type="XYChartView" />
         <Plotable />
      </Hints>
 
@@ -247,7 +247,7 @@ TimeData (if Time exists in the input)).
      </IntVectorProperty>
      <Hints>
         <!-- View can be used to specify the preferred view for the proxy -->
-        <View type="XYPlotView" />
+        <View type="XYChartView" />
         <Plotable />
      </Hints>
    <!-- End ImageShrink -->
@@ -3745,7 +3745,7 @@ The Triangle Strips filter converts triangles into triangle strips and lines int
      </InputProperty>
     <Hints>
       <!-- View can be used to specify the preferred view for the proxy -->
-      <View type="XYPlotView" />
+      <View type="XYChartView" />
       
       <!-- Temporary hint to allow the output of this filter to be plotted -->
       <Plotable />
@@ -3863,7 +3863,7 @@ The Triangle Strips filter converts triangles into triangle strips and lines int
      <OutputPort name="Output" proxy="PlotEdges1" port_index="0"/>
      <Hints>
        <!-- View can be used to specify the preferred view for the proxy -->
-       <View type="XYPlotView" />
+       <View type="XYChartView" />
        <Plotable />
      </Hints>
    </CompoundSourceProxy>
@@ -5396,7 +5396,7 @@ The Probe filter samples the data set attributes of the current data set at the 
      <Hints>
        <Visibility replace_input="0" />
        <!-- View can be used to specify the preferred view for the proxy -->
-      <View type="XYPlotView" />
+      <View type="XYChartView" />
       <Plotable />
      </Hints>
     <!-- End ProbeLine -->
@@ -7832,7 +7832,7 @@ This filter extracts a list of datasets from hierarchical datasets.
 
      <Hints>
        <!-- View can be used to specify the preferred view for the proxy -->
-       <View type="BarChartView" />
+       <View type="XYBarChartView" />
        <Plotable />
      </Hints>
 
@@ -7868,7 +7868,7 @@ This filter extracts a list of datasets from hierarchical datasets.
      <Hints>
         <Visibility replace_input="0" />
        <!-- View can be used to specify the preferred view for the proxy -->
-       <View type="XYPlotView" />
+       <View type="XYChartView" />
        <Plotable />
      </Hints>
    <!-- End ScatterPlot -->
@@ -8933,7 +8933,7 @@ This property controls how the filter works to generate tensor cell data. You ca
       <OutputPort name="Output" proxy="TableFFT1" port_index="0"/>
       <Hints>
         <!-- View can be used to specify the preferred view for the proxy -->
-        <View type="XYPlotView" />
+        <View type="XYChartView" />
         <Plotable />
       </Hints>
     </CompoundSourceProxy> <!-- FFTSelectionOverTime -->
@@ -9017,7 +9017,7 @@ This property controls how the filter works to generate tensor cell data. You ca
         </Documentation>
       </InputProperty>
       <Hints>
-        <View type="XYPlotView" />
+        <View type="XYChartView" />
         <Plotable/>
       </Hints>
       <!-- End of PlotAttributes -->

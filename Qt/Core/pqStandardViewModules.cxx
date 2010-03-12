@@ -32,12 +32,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqStandardViewModules.h"
 
-#include "pqBarChartView.h"
 #include "pqChartRepresentation.h"
 #include "pqComparativeBarChartView.h"
 #include "pqComparativeLineChartView.h"
 #include "pqComparativeRenderView.h"
-#include "pqLineChartView.h"
 #include "pqRenderView.h"
 #include "pqServer.h"
 #include "pqSpreadSheetView.h"
@@ -70,8 +68,6 @@ QStringList pqStandardViewModules::viewTypes() const
   return QStringList() <<
     pqRenderView::renderViewType() <<
     pqTwoDRenderView::twoDRenderViewType() <<
-    pqBarChartView::barChartViewType() <<
-    pqLineChartView::lineChartViewType() <<
     pqTableView::tableType() <<
     pqComparativeRenderView::comparativeRenderViewType() <<
     pqComparativeBarChartView::comparativeBarChartViewType() <<
@@ -85,8 +81,6 @@ QStringList pqStandardViewModules::viewTypes() const
 QStringList pqStandardViewModules::displayTypes() const
 {
   return QStringList()
-    << "BarChartRepresentation"
-    << "XYPlotRepresentation"
     << "XYChartRepresentation"
     << "XYBarChartRepresentation"
     << "TextSourceRepresentation";
@@ -97,14 +91,6 @@ QString pqStandardViewModules::viewTypeName(const QString& type) const
   if (type == pqRenderView::renderViewType())
     {
     return pqRenderView::renderViewTypeName();
-    }
-  else if(type == pqBarChartView::barChartViewType())
-    {
-    return pqBarChartView::barChartViewTypeName();
-    }
-  else if(type == pqLineChartView::lineChartViewType())
-    {
-    return pqLineChartView::lineChartViewTypeName();
     }
   else if(type == pqTableView::tableType())
     {
@@ -176,14 +162,6 @@ vtkSMProxy* pqStandardViewModules::createViewProxy(const QString& viewtype,
     {
     root_xmlname = "2DRenderView";
     }
-  else if(viewtype == pqBarChartView::barChartViewType())
-    {
-    root_xmlname = "BarChartView";
-    }
-  else if(viewtype == pqLineChartView::lineChartViewType())
-    {
-    root_xmlname = "XYPlotView";
-    }
   else if(viewtype == pqTableView::tableType())
     {
     root_xmlname = "TableView";
@@ -227,23 +205,10 @@ pqView* pqStandardViewModules::createView(const QString& viewtype,
                                           pqServer* server,
                                           QObject* p)
 {
-  if(viewtype == pqBarChartView::barChartViewType() &&
-    viewmodule->IsA("vtkSMChartViewProxy"))
-    {
-    return new pqBarChartView(group, viewname,
-      vtkSMChartViewProxy::SafeDownCast(viewmodule), server, p);
-    }
-  else if (viewtype == pqLineChartView::lineChartViewType() &&
-    viewmodule->IsA("vtkSMChartViewProxy"))
-    {
-    return new pqLineChartView(group, viewname,
-      vtkSMChartViewProxy::SafeDownCast(viewmodule), server, p);
-    }
-  else if(viewtype == "TableView")
+  if(viewtype == "TableView")
     {
     // return new pqTableView(group, viewname, viewmodule, server, p);
     }
-
   else if (viewtype == pqSpreadSheetView::spreadsheetViewType())
     {
     return new pqSpreadSheetView(
@@ -309,10 +274,8 @@ pqDataRepresentation* pqStandardViewModules::createDisplay(const QString& displa
   pqServer* server,
   QObject* p)
 {
-  if (display_type == "XYPlotRepresentation" ||
-    display_type == "BarChartRepresentation" ||
-    display_type == "XYChartRepresentation" ||
-    display_type == "XYBarChartRepresentation")
+  if (display_type == "XYChartRepresentation" ||
+      display_type == "XYBarChartRepresentation")
     {
     // new chart representations.
     return new pqChartRepresentation(group, n, proxy, server, p);
