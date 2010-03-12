@@ -60,7 +60,7 @@ pqEventDispatcher::pqEventDispatcher(QObject* parentObject) :
   QObject::connect(QAbstractEventDispatcher::instance(), SIGNAL(awake()),
                    this, SLOT(awake()));
 
-  this->BlockTimer.setInterval(500);
+  this->BlockTimer.setInterval(100);
   this->BlockTimer.setSingleShot(true);
   QObject::connect(&this->BlockTimer, SIGNAL(timeout()),
                    this, SLOT(playEventOnBlocking()));

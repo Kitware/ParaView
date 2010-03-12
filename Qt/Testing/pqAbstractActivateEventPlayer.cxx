@@ -160,21 +160,21 @@ bool pqAbstractActivateEventPlayer::playEvent(QObject* Object,
     QApplication::sendEvent(object, &keyDown);
     QApplication::sendEvent(object, &keyUp);
 
-    QApplication::processEvents();
+    //QApplication::processEvents();
     return true;
     }
 
   if(QAbstractButton* const object = qobject_cast<QAbstractButton*>(Object))
     {
     object->click();
-    QApplication::processEvents();
+    //QApplication::processEvents();
     return true;
     }
 
   if (QAction* const action = qobject_cast<QAction*>(Object))
     {
     action->activate(QAction::Trigger);
-    QApplication::processEvents();
+    //QApplication::processEvents();
     return true;
     }
   
