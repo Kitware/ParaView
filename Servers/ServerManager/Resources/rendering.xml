@@ -196,9 +196,25 @@
         <DoubleRangeDomain name="range" min="0 0 0" max="1 1 1"/>
       </DoubleVectorProperty>
 
+      <ProxyProperty name="BackgroundTexture"
+                     command="SetBackgroundTexture"
+                     repeatable="0">
+        <ProxyGroupDomain name="groups">
+          <Group name="textures"/>
+        </ProxyGroupDomain>
+      </ProxyProperty>
+
       <IntVectorProperty
         name="UseGradientBackground"
         command="SetGradientBackground"
+        number_of_elements="1"
+        default_values="0" >
+        <BooleanDomain name="bool"/>
+      </IntVectorProperty>
+
+      <IntVectorProperty
+        name="UseTexturedBackground"
+        command="SetTexturedBackground"
         number_of_elements="1"
         default_values="0" >
         <BooleanDomain name="bool"/>
@@ -5151,7 +5167,9 @@
         <ExposedProperties>
           <Property name="Background" />
           <Property name="Background2" />
+          <Property name="BackgroundTexture" />
           <Property name="UseGradientBackground" />
+          <Property name="UseTexturedBackground" />
           <Property name="DepthPeeling" />
           <Property name="MaximumNumberOfPeels" />
         </ExposedProperties>
@@ -5236,7 +5254,9 @@
         <ExposedProperties>
           <Property name="Background" />
           <Property name="Background2" />
+          <Property name="BackgroundTexture" />
           <Property name="UseGradientBackground" />
+          <Property name="UseTexturedBackground" />
           <Property name="DepthPeeling" />
           <Property name="MaximumNumberOfPeels" />
         </ExposedProperties>
@@ -5346,7 +5366,9 @@
         <ExposedProperties>
           <Property name="Background" />
           <Property name="Background2" />
+          <Property name="BackgroundTexture" />
           <Property name="UseGradientBackground" />
+          <Property name="UseTexturedBackground" />
           <Property name="DepthPeeling" />
           <Property name="MaximumNumberOfPeels" />
         </ExposedProperties>
@@ -5508,7 +5530,9 @@
         <ExposedProperties>
           <Property name="Background" />
           <Property name="Background2" />
+          <Property name="BackgroundTexture" />
           <Property name="UseGradientBackground" />
+          <Property name="UseTexturedBackground" />
           <Property name="DepthPeeling" />
           <Property name="MaximumNumberOfPeels" />
         </ExposedProperties>
@@ -5717,7 +5741,9 @@
           <!-- Renderer -->
           <Property name="Background" />
           <Property name="Background2" />
+          <Property name="BackgroundTexture" />
           <Property name="UseGradientBackground" />
+          <Property name="UseTexturedBackground" />
           <Property name="StereoRender" />
           <Property name="StereoType" />
           <!-- RenderWindow -->
@@ -5790,7 +5816,9 @@
           <!-- Renderer -->
           <Property name="Background" />
           <Property name="Background2" />
+          <Property name="BackgroundTexture" />
           <Property name="UseGradientBackground" />
+          <Property name="UseTexturedBackground" />
           <Property name="StereoRender" />
           <Property name="StereoType" />
           <!-- RenderWindow -->
@@ -5869,7 +5897,9 @@
           <!-- Renderer -->
           <Property name="Background" />
           <Property name="Background2" />
+          <Property name="BackgroundTexture" />
           <Property name="UseGradientBackground" />
+          <Property name="UseTexturedBackground" />
           <!-- RenderWindow-->
           <Property name="StereoRender" />
           <Property name="StereoType" />
@@ -5952,7 +5982,9 @@
           <!-- Renderer -->
           <Property name="Background" />
           <Property name="Background2" />
+          <Property name="BackgroundTexture" />
           <Property name="UseGradientBackground" />
+          <Property name="UseTexturedBackground" />
           <!-- RenderWindow -->
           <Property name="RemoteRenderThreshold" />
           <Property name="StereoRender" />
@@ -6147,7 +6179,9 @@
           <!-- Renderer -->
           <Property name="Background" />
           <Property name="Background2" />
+          <Property name="BackgroundTexture" />
           <Property name="UseGradientBackground" />
+          <Property name="UseTexturedBackground" />
           <!-- RenderWindow -->
         </ExposedProperties>
       </SubProxy>
@@ -6215,7 +6249,9 @@
           <!-- Renderer -->
           <Property name="Background" />
           <Property name="Background2" />
+          <Property name="BackgroundTexture" />
           <Property name="UseGradientBackground" />
+          <Property name="UseTexturedBackground" />
           <!-- RenderWindow -->
           <Property name="ImageReductionFactor" />
           <Property name="DisableOrderedCompositing" />
@@ -6288,7 +6324,9 @@
           <!-- Renderer -->
           <Property name="Background" />
           <Property name="Background2" />
+          <Property name="BackgroundTexture" />
           <Property name="UseGradientBackground" />
+          <Property name="UseTexturedBackground" />
           <!-- RenderWindow -->
           <Property name="ImageReductionFactor" />
           <Property name="DisableOrderedCompositing" />
@@ -6364,7 +6402,9 @@
           <!-- Renderer -->
           <Property name="Background" />
           <Property name="Background2" />
+          <Property name="BackgroundTexture" />
           <Property name="UseGradientBackground" />
+          <Property name="UseTexturedBackground" />
           <!-- Tiles -->
           <Property name="CollectGeometryThreshold" />
           <Property name="StillRenderImageReductionFactor" />
@@ -6442,7 +6482,9 @@
           <!-- Renderer -->
           <Property name="Background" />
           <Property name="Background2" />
+          <Property name="BackgroundTexture" />
           <Property name="UseGradientBackground" />
+          <Property name="UseTexturedBackground" />
           <!-- RenderWindow -->
           <Property name="RemoteRenderThreshold" />
         </ExposedProperties>
@@ -6521,7 +6563,9 @@
           <!-- Renderer -->
           <Property name="Background" />
           <Property name="Background2" />
+          <Property name="BackgroundTexture" />
           <Property name="UseGradientBackground" />
+          <Property name="UseTexturedBackground" />
           <!-- RenderWindow -->
         </ExposedProperties>
       </SubProxy>
@@ -6589,7 +6633,9 @@
           <!-- Renderer -->
           <Property name="Background" />
           <Property name="Background2" />
+          <Property name="BackgroundTexture" />
           <Property name="UseGradientBackground" />
+          <Property name="UseTexturedBackground" />
           <!-- RenderWindow -->
           <Property name="ImageReductionFactor" />
           <Property name="DisableOrderedCompositing" />
@@ -6662,7 +6708,9 @@
           <!-- Renderer -->
           <Property name="Background" />
           <Property name="Background2" />
+          <Property name="BackgroundTexture" />
           <Property name="UseGradientBackground" />
+          <Property name="UseTexturedBackground" />
           <!-- RenderWindow -->
           <Property name="ImageReductionFactor" />
           <Property name="DisableOrderedCompositing" />
@@ -6738,7 +6786,9 @@
           <!-- Renderer -->
           <Property name="Background" />
           <Property name="Background2" />
+          <Property name="BackgroundTexture" />
           <Property name="UseGradientBackground" />
+          <Property name="UseTexturedBackground" />
           <!-- Tiles -->
           <Property name="CollectGeometryThreshold" />
           <Property name="StillRenderImageReductionFactor" />
@@ -6816,7 +6866,9 @@
           <!-- Renderer -->
           <Property name="Background" />
           <Property name="Background2" />
+          <Property name="BackgroundTexture" />
           <Property name="UseGradientBackground" />
+          <Property name="UseTexturedBackground" />
           <!-- RenderWindow -->
           <Property name="RemoteRenderThreshold" />
         </ExposedProperties>

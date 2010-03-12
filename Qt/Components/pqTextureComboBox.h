@@ -36,6 +36,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqComponentsExport.h"
 
 class pqDataRepresentation;
+class pqRenderView;
+
 class vtkSMProxy;
 
 /// This is a ComboBox that is used on the display tab to select available
@@ -66,6 +68,8 @@ public slots:
   /// update the enable state of the widget depending on whether texture
   /// coordinates are available.
   void setRepresentation(pqDataRepresentation* repr);
+
+  void setRenderView(pqRenderView* view);
 
   /// Forces a reload of the widget. Generally one does not need to call this
   /// method explicity.

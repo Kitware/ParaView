@@ -124,9 +124,9 @@ pqRenderViewOptions::pqRenderViewOptions(QWidget *widgetParent)
                    SIGNAL(toggled(bool)),
                    this, SLOT(selectGradientColor(bool)));
 
-//  QObject::connect(this->Internal->image,
-//                   SIGNAL(toggled(bool)),
-//                   this, SLOT(selectBackgroundImage(bool)));
+  QObject::connect(this->Internal->image,
+                   SIGNAL(toggled(bool)),
+                   this, SLOT(selectBackgroundImage(bool)));
 }
 
 pqRenderViewOptions::~pqRenderViewOptions()
@@ -167,6 +167,8 @@ void pqRenderViewOptions::setView(pqView* view)
     {
     // connect widgets to current render view
     this->connectGUI();
+
+    this->Internal->Texture->setRenderView(this->Internal->RenderView);
     }
 }
 
@@ -197,11 +199,19 @@ void pqRenderViewOptions::applyChanges()
   if(this->Internal->stackedWidget2->currentIndex() == 1)
     {
     vtkSMPropertyHelper(proxy, "UseGradientBackground").Set(1);
+    vtkSMPropertyHelper(proxy, "UseTexturedBackground").Set(0);
+    }
+
+  else if(this->Internal->stackedWidget2->currentIndex() == 0)
+    {
+    vtkSMPropertyHelper(proxy, "UseGradientBackground").Set(0);
+    vtkSMPropertyHelper(proxy, "UseTexturedBackground").Set(0);
     }
   else
     {
-    vtkSMPropertyHelper(proxy, "UseGradientBackground").Set(0);
+    vtkSMPropertyHelper(proxy, "UseTexturedBackground").Set(1);
     }
+
   proxy->UpdateVTKObjects();
 
   this->Internal->RenderView->saveSettings();
@@ -287,7 +297,12 @@ void pqRenderViewOptions::connectGUI()
     proxy, proxy->GetProperty("UseLight"));
 
   // Check the default here.
-  if(vtkSMPropertyHelper(proxy, "UseGradientBackground").GetAsInt() == 1)
+  if(vtkSMPropertyHelper(proxy, "UseTexturedBackground").GetAsInt() == 1)
+    {
+    this->Internal->image->setChecked(true);
+    this->selectBackgroundImage(true);
+    }
+  else if(vtkSMPropertyHelper(proxy, "UseGradientBackground").GetAsInt() == 1)
     {
     this->Internal->gradientColor->setChecked(true);
     this->selectGradientColor(true);
@@ -308,11 +323,17 @@ void pqRenderViewOptions::connectGUI()
     {
     this->Internal->gradientColor->setDisabled(true);
     this->Internal->gradColorPage->setDisabled(true);
+
+    this->Internal->image->setDisabled(true);
+    this->Internal->imagePage->setDisabled(true);
     }
   else
     {
     this->Internal->gradientColor->setEnabled(true);
     this->Internal->gradColorPage->setEnabled(true);
+
+    this->Internal->image->setEnabled(true);
+    this->Internal->imagePage->setEnabled(true);
     }
 
   this->blockSignals(false);
@@ -385,6 +406,16 @@ void pqRenderViewOptions::selectGradientColor(bool flag)
 }
 
 //-----------------------------------------------------------------------------
+void pqRenderViewOptions::selectBackgroundImage(bool flag)
+{
+  if(flag)
+    {
+    this->Internal->stackedWidget2->setCurrentIndex(2);
+    emit this->changesAvailable();
+    }
+}
+
+//-----------------------------------------------------------------------------
 void pqRenderViewOptions::restoreDefaultGradientColor1()
 {
   this->restoreDefaultBackground();
@@ -394,8 +425,6 @@ void pqRenderViewOptions::restoreDefaultGradientColor1()
 //-----------------------------------------------------------------------------
 void pqRenderViewOptions::restoreDefaultGradientColor2()
 {
-//  vtkSMProxy* proxy = this->Internal->RenderView->getProxy();
-//  proxy->GetProperty("Background2")->ResetToDefault();
   if (this->Internal->RenderView)
     {
     this->Internal->gradientColor2->setChosenColor(QColor(0, 0, 44));

@@ -72,6 +72,7 @@ protected slots:
 
   void selectSolidColor(bool flag);
   void selectGradientColor(bool flag);
+  void selectBackgroundImage(bool flag);
 
   void restoreDefaultGradientColor1();
   void restoreDefaultGradientColor2();

@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -56,6 +56,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationCore.h"
 #include "pqDataRepresentation.h"
 #include "pqFileDialog.h"
+#include "pqRenderView.h"
 #include "pqServerManagerObserver.h"
 #include "pqSMAdaptor.h"
 #include "pqUndoStack.h"
@@ -70,6 +71,7 @@ public:
     QString FileName;
     };
   QPointer<pqDataRepresentation> Representation;
+  QPointer<pqRenderView> RenderView;
   QMap<vtkSMProxy*, Info> TextureIcons;
   vtkSmartPointer<vtkEventQtSlotConnect> VTKConnect;
 
@@ -85,15 +87,15 @@ public:
 pqTextureComboBox::pqTextureComboBox(QWidget* _parent):Superclass(_parent)
 {
   this->Internal = new pqInternal();
-  
+
   QObject::connect(this, SIGNAL(activated(int)), this, SLOT(onActivated(int)),
     Qt::QueuedConnection);
 
-  pqServerManagerObserver* observer = 
+  pqServerManagerObserver* observer =
     pqApplicationCore::instance()->getServerManagerObserver();
-  QObject::connect(observer, 
+  QObject::connect(observer,
     SIGNAL(proxyRegistered(const QString&, const QString&, vtkSMProxy*)),
-    this, 
+    this,
     SLOT(proxyRegistered(const QString&)));
   QObject::connect(observer,
     SIGNAL(proxyUnRegistered(const QString&, const QString&, vtkSMProxy*)),
@@ -210,8 +212,17 @@ void pqTextureComboBox::setRepresentation(pqDataRepresentation* repr)
 //-----------------------------------------------------------------------------
 void pqTextureComboBox::updateFromProperty()
 {
-  vtkSMProxy* texture = pqSMAdaptor::getProxyProperty(
-    this->Internal->Representation->getProxy()->GetProperty("Texture"));
+  vtkSMProxy* texture (0x0);
+  if(this->Internal->Representation)
+    {
+    texture = pqSMAdaptor::getProxyProperty(
+      this->Internal->Representation->getProxy()->GetProperty("Texture"));
+    }
+  else
+    {
+    texture = pqSMAdaptor::getProxyProperty(
+      this->Internal->RenderView->getProxy()->GetProperty("BackgroundTexture"));
+    }
 
   this->setCurrentIndex(0);
   if (texture)
@@ -269,8 +280,20 @@ void pqTextureComboBox::onActivated(int index)
 {
   QVariant _data = this->itemData(index);
 
-  vtkSMProxy* proxy = this->Internal->Representation->getProxy();
-  vtkSMProperty* textureProperty = proxy->GetProperty("Texture");
+  vtkSMProxy* proxy (0);
+  vtkSMProperty* textureProperty(0);
+
+  if(this->Internal->Representation)
+    {
+    proxy = this->Internal->Representation->getProxy();
+    textureProperty = proxy->GetProperty("Texture");
+    }
+  else
+    {
+    proxy = this->Internal->RenderView->getProxy();
+    textureProperty = proxy->GetProperty("BackgroundTexture");
+    }
+
   if (!textureProperty)
     {
     qDebug() << "Failed to locate Texture property.";
@@ -282,7 +305,14 @@ void pqTextureComboBox::onActivated(int index)
     emit this->begin("Texture Change");
     vtkSMProxyProperty::SafeDownCast(textureProperty)->RemoveAllProxies();
     proxy->UpdateVTKObjects();
-    this->Internal->Representation->renderView(false);
+    if(this->Internal->Representation)
+      {
+      this->Internal->Representation->renderView(false);
+      }
+    else
+      {
+      this->Internal->RenderView->render();
+      }
     emit this->end();
     }
   else if (_data.toString() == "LOAD")
@@ -298,7 +328,7 @@ void pqTextureComboBox::onActivated(int index)
     vtkSMProxy* textureProxy = this->getTextureProxy(_data);
     if (!textureProxy)
       {
-      qDebug() << "Failed to locate the loaded texture by the name " 
+      qDebug() << "Failed to locate the loaded texture by the name "
         << this->itemText(index);
       return;
       }
@@ -306,7 +336,15 @@ void pqTextureComboBox::onActivated(int index)
     pqSMAdaptor::setProxyProperty(textureProperty, textureProxy);
     proxy->UpdateVTKObjects();
     emit this->end();
-    this->Internal->Representation->renderView(false);
+
+    if(this->Internal->Representation)
+      {
+      this->Internal->Representation->renderView(false);
+      }
+    else
+      {
+      this->Internal->RenderView->render();
+      }
     }
 }
 
@@ -350,14 +388,24 @@ bool pqTextureComboBox::loadTexture(const QString& filename)
 
   vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
   vtkSMProxy* texture = pxm->NewProxy("textures", "ImageTexture");
-  texture->SetConnectionID(
-    this->Internal->Representation->getProxy()->GetConnectionID());
+
+  if(this->Internal->Representation)
+    {
+    texture->SetConnectionID(
+      this->Internal->Representation->getProxy()->GetConnectionID());
+    }
+  else
+    {
+    texture->SetConnectionID(
+      this->Internal->RenderView->getProxy()->GetConnectionID());
+    }
+
   texture->SetServers(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
   pqSMAdaptor::setElementProperty(texture->GetProperty("FileName"), filename);
   pqSMAdaptor::setEnumerationProperty(texture->GetProperty("SourceProcess"),
     "Client");
   texture->UpdateVTKObjects();
-  pxm->RegisterProxy(TEXTURESGROUP, 
+  pxm->RegisterProxy(TEXTURESGROUP,
     vtksys::SystemTools::GetFilenameName(filename.toAscii().data()).c_str(),
     texture);
   texture->Delete();
@@ -408,3 +456,41 @@ void pqTextureComboBox::updateEnableState()
     this->setToolTip("Select/Load texture to apply.");
     }
 }
+
+
+void pqTextureComboBox::setRenderView(pqRenderView* view)
+{
+  this->setEnabled(view != 0);
+  if (this->Internal->RenderView == view)
+    {
+    return;
+    }
+
+  if (this->Internal->RenderView)
+    {
+    QObject::disconnect(this->Internal->RenderView, 0, this, 0);
+    this->Internal->VTKConnect->Disconnect(
+      this->Internal->RenderView->getProxy()->GetProperty("BackgroundTexture"));
+    }
+  this->Internal->RenderView = view;
+  if (!this->Internal->RenderView)
+    {
+    return;
+    }
+
+//  // When the repr is updated, its likely that the available arrays have
+//  // changed, and texture coords may have become available. Hence, we update the
+//  // enabled state.
+//  QObject::connect(this->Internal->Representation, SIGNAL(dataUpdated()),
+//    this, SLOT(updateEnableState()), Qt::QueuedConnection);
+
+  // When the texture attached to the representation changes, we want to update
+  // the combo box.
+  this->Internal->VTKConnect->Connect(
+    this->Internal->RenderView->getProxy()->GetProperty("BackgroundTexture"),
+    vtkCommand::ModifiedEvent, this, SLOT(updateFromProperty()));
+  this->updateFromProperty();
+
+//  QTimer::singleShot(0, this, SLOT(updateEnableState()));
+}
+
