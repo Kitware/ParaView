@@ -227,6 +227,8 @@
           <Property name="Background" />
           <Property name="DepthPeeling" />
           <Property name="MaximumNumberOfPeels" />
+          <Property name="Background2" />
+          <Property name="UseGradientBackground" />
         </ExposedProperties>
       </SubProxy>
 
