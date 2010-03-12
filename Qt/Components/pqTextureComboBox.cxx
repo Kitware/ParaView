@@ -457,11 +457,11 @@ void pqTextureComboBox::updateEnableState()
     }
 }
 
-
-void pqTextureComboBox::setRenderView(pqRenderView* view)
+//-----------------------------------------------------------------------------
+void pqTextureComboBox::setRenderView(pqRenderView* rview)
 {
-  this->setEnabled(view != 0);
-  if (this->Internal->RenderView == view)
+  this->setEnabled(rview != 0);
+  if (this->Internal->RenderView == rview)
     {
     return;
     }
@@ -472,17 +472,11 @@ void pqTextureComboBox::setRenderView(pqRenderView* view)
     this->Internal->VTKConnect->Disconnect(
       this->Internal->RenderView->getProxy()->GetProperty("BackgroundTexture"));
     }
-  this->Internal->RenderView = view;
+  this->Internal->RenderView = rview;
   if (!this->Internal->RenderView)
     {
     return;
     }
-
-//  // When the repr is updated, its likely that the available arrays have
-//  // changed, and texture coords may have become available. Hence, we update the
-//  // enabled state.
-//  QObject::connect(this->Internal->Representation, SIGNAL(dataUpdated()),
-//    this, SLOT(updateEnableState()), Qt::QueuedConnection);
 
   // When the texture attached to the representation changes, we want to update
   // the combo box.
@@ -490,7 +484,5 @@ void pqTextureComboBox::setRenderView(pqRenderView* view)
     this->Internal->RenderView->getProxy()->GetProperty("BackgroundTexture"),
     vtkCommand::ModifiedEvent, this, SLOT(updateFromProperty()));
   this->updateFromProperty();
-
-//  QTimer::singleShot(0, this, SLOT(updateEnableState()));
 }
 

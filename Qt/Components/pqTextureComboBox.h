@@ -69,7 +69,7 @@ public slots:
   /// coordinates are available.
   void setRepresentation(pqDataRepresentation* repr);
 
-  void setRenderView(pqRenderView* view);
+  void setRenderView(pqRenderView* rview);
 
   /// Forces a reload of the widget. Generally one does not need to call this
   /// method explicity.
