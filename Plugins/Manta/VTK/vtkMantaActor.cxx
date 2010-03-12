@@ -139,7 +139,7 @@ int vtkMantaActorThreadCache::GlobalCntr = 0;
 
 //===========================================================================
 
-vtkCxxRevisionMacro(vtkMantaActor, "1.14");
+vtkCxxRevisionMacro(vtkMantaActor, "1.15");
 vtkStandardNewMacro(vtkMantaActor);
 
 //----------------------------------------------------------------------------
@@ -278,7 +278,19 @@ void vtkMantaActor::RemoveObjects()
     {
     //cerr << " AS: " << this->MantaAS << endl;
     //cerr << " WG: " << this->MantaManager->GetMantaWorldGroup() << endl;
-    this->MantaAS->setGroup( NULL ); 
+    Manta::Group *grp = this->MantaAS->getGroup();
+    for (int i = 0; i < grp->size(); i++)
+      {
+      Manta::Group *ig = dynamic_cast<Manta::Group *>(grp->get(i));
+      if (ig)
+        {
+        ig->shrinkTo(0, true);
+        //delete ig;
+        }     
+      }
+    grp->shrinkTo(0, true);
+    //delete grp;
+    this->MantaAS->setGroup( NULL );
     this->MantaManager->GetMantaWorldGroup()->remove( this->MantaAS, false );
     delete this->MantaAS; 
     this->MantaAS = NULL;
