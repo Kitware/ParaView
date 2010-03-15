@@ -464,6 +464,44 @@ void outputFunction(FILE *fp, FileInfo *data)
 }
 
 //--------------------------------------------------------------------------nix
+/*
+ * This structure is used internally to sort+collect individual functions.
+ * Polymorphed functions will be combined and can be handeled together.
+ *
+ */
+typedef struct _UniqueFunctionInfo
+{
+  char *Name;
+  int TotalPolymorphTypes;
+  FunctionInfo Function[20];
+} UniqueFunctionInfo;
+
+
+//--------------------------------------------------------------------------nix
+/*
+ * This structure is used to collect and hold class information. It is a
+ * modified version of FileInfo
+ *
+ */
+typedef struct _ClassInfo
+{
+  int   HasDelete;
+  int   IsAbstract;
+  int   IsConcrete;
+  char *ClassName;
+  char *FileName;
+  char *OutputFileName;
+  char *SuperClasses[10];
+  int   NumberOfSuperClasses;
+  int   NumberOfFunctions;
+  UniqueFunctionInfo Functions[1000];
+  char *NameComment;
+  char *Description;
+  char *Caveats;
+  char *SeeAlso;
+} ClassInfo;
+
+//--------------------------------------------------------------------------nix
 /* 
  * This function makes writes a function which makes its own meta-infomation
  * available to the caller.
