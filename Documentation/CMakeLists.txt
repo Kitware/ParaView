@@ -29,9 +29,24 @@ FIND_PROGRAM(QT_HELP_GENERATOR
   PATHS "${QT_BINARY_DIR}"
   DOC "qhelpgenerator used to compile Qt help project files")
 
+SET (qhp_dependencies)
+  
+OPTION(GENERATE_FILTERS_DOCUMENTATION
+  "Turn on to ensure that the documentation for filters/sources/readers and writers is built."
+  OFF)
+IF (GENERATE_FILTERS_DOCUMENTATION)
+  # This dependency ensures that whenever the html files are regenerated, the
+  # qch file is regenerated as well.
+  SET (qhp_dependencies ${qhp_dependencies}
+        ${HTMLDocumentation_FILES})
+ENDIF(GENERATE_FILTERS_DOCUMENTATION)
+
+MARK_AS_ADVANCED(GENERATE_FILTERS_DOCUMENTATION)
+
 ADD_CUSTOM_COMMAND(
   OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/paraview.qch
   DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/paraview.qhp
+          ${qhp_dependencies}
   COMMAND ${QT_HELP_GENERATOR}
   ARGS ${CMAKE_CURRENT_BINARY_DIR}/paraview.qhp
       -o ${CMAKE_CURRENT_BINARY_DIR}/paraview.qch
@@ -40,16 +55,13 @@ ADD_CUSTOM_COMMAND(
 
 ADD_CUSTOM_TARGET(ParaViewOnlineHelp
   DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/paraview.qch)
-
-OPTION(GENERATE_FILTERS_DOCUMENTATION
-  "Turn on to ensure that the documentation for filters/sources/readers and writers is built."
-  OFF)
 IF (GENERATE_FILTERS_DOCUMENTATION)
-  set_source_files_properties(
-    ${CMAKE_CURRENT_BINARY_DIR}/paraview.qhp
-    PROPERTIES OBJECT_DEPENDS HTMLDocumentation)
-ENDIF(GENERATE_FILTERS_DOCUMENTATION)
-MARK_AS_ADVANCED(GENERATE_FILTERS_DOCUMENTATION)
+  # This dependency ensures that the ParaViewFiles.html and other files are
+  # generated before the qch file is attempted to be generated.
+  ADD_DEPENDENCIES(ParaViewOnlineHelp
+    HTMLDocumentation)
+ENDIF (GENERATE_FILTERS_DOCUMENTATION)
+
 
 # Development
 IF (NOT PV_INSTALL_NO_DEVELOPMENT)

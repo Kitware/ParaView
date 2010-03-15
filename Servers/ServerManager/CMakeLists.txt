@@ -480,6 +480,8 @@ ENDFOREACH(gcf)
 ADD_CUSTOM_TARGET(HTMLDocumentation
   DEPENDS ${HTML_RESULTS}
 )
+SET (HTMLDocumentation_FILES ${HTML_RESULTS} CACHE INTERNAL
+  "HTMLDocumentation files generated from ServerManager")
 
 SET(PARAVIEW_INCLUDE_MODULES_TO_SMAPPLICATION "")
 FOREACH(rf ${resourceFiles})
