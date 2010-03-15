@@ -48,7 +48,7 @@ public:
 };
 
 
-vtkCxxRevisionMacro(vtkSMContextViewProxy, "1.5");
+vtkCxxRevisionMacro(vtkSMContextViewProxy, "1.6");
 //----------------------------------------------------------------------------
 vtkSMContextViewProxy::vtkSMContextViewProxy()
 {
@@ -139,7 +139,6 @@ void vtkSMContextViewProxy::PerformRender()
 {
   int size[2];
   this->GetGUISize(size);
-  cout << "Perform render called in ContextViewProxy." << endl;
 }
 
 //----------------------------------------------------------------------------
