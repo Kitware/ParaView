@@ -338,6 +338,29 @@ def trace_property_modified(info, prop):
   return propInfo
 
 
+def trace_save_screenshot(filename, size, allViews):
+  """This method is called from the paraview c++ implementation.
+  Do not change the arguments without updating the c++ code."""
+  if not trace_globals.observer_active: return
+
+  # make sure the trace is up to date
+  if len(trace_globals.last_registered_proxies):
+    append_trace()
+
+  if not allViews:
+    trace_globals.trace_output.append("WriteImage('%s')" % filename)
+  else:
+    import os
+    filename, extension = os.path.splitext(filename)
+    filename = filename + "_%02d" + extension
+    viewsToSave = \
+      [info.PyVariable for info in trace_globals.registered_proxies if info.Group == "views"]
+    for i, view in enumerate(viewsToSave):
+      saveStr = "WriteImage('%s', view=%s)" % (filename%i, view)
+      trace_globals.trace_output.append(saveStr)
+  trace_globals.trace_output.append("\n")
+
+
 def sort_proxy_info_by_group(infoList):
   views = []
   sources = []

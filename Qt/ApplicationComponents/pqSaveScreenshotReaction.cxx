@@ -44,6 +44,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVXMLElement.h"
 #include "vtkSmartPointer.h"
 
+#include "vtkPVConfig.h"
+#ifdef PARAVIEW_ENABLE_PYTHON
+#include "pqPythonManager.h"
+#include "pqPythonDialog.h"
+#include "pqPythonShell.h"
+#endif
+
 #include <QDebug>
 #include <QFileInfo>
 
@@ -183,4 +190,21 @@ void pqSaveScreenshotReaction::saveScreenshot(
     {
     pqImageUtil::saveImage(img, filename, quality);
     }
+
+#ifdef PARAVIEW_ENABLE_PYTHON
+  pqPythonManager* manager = pqPVApplicationCore::instance()->pythonManager();
+  if (manager && manager->interpreterIsInitialized())
+    {
+    QString allViewsStr = all_views ? "True" : "False";
+    QString script =
+    "try:\n"
+    "  paraview.smtrace\n"
+    "  paraview.smtrace.trace_save_screenshot('%1', (%2, %3), %4)\n"
+    "except AttributeError: pass\n";
+    script = script.arg(filename).arg(size.width()).arg(size.height()).arg(allViewsStr);
+    pqPythonShell* shell = manager->pythonShellDialog()->shell();
+    shell->executeScript(script);
+    return;
+    }
+#endif
 }
