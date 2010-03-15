@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMPropertyHelper.h"
 
 #include <QPointer>
+#include <QPixmap>
 
 class pqPlotSettingsModel::pqImplementation
 {
@@ -56,6 +57,10 @@ pqPlotSettingsModel::pqPlotSettingsModel(QObject* parentObject) :
   this->insertHeaderSections(Qt::Horizontal, 0, 1);
   this->setCheckable(0, Qt::Horizontal, true);
   this->setCheckState(0, Qt::Horizontal, Qt::Unchecked);
+
+  // Change the index check state when the header checkbox is clicked.
+  this->connect(this, SIGNAL(headerDataChanged(Qt::Orientation, int, int)),
+      this, SLOT(setIndexCheckState(Qt::Orientation, int, int)));
 }
 
 pqPlotSettingsModel::~pqPlotSettingsModel()
@@ -98,14 +103,15 @@ int pqPlotSettingsModel::columnCount(const QModelIndex& /*parent*/) const
 
 QVariant pqPlotSettingsModel::data(const QModelIndex& idx, int role) const
 {
-  if(role == Qt::DisplayRole)
+  if(role == Qt::DisplayRole || role == Qt::EditRole || role == Qt::ToolTipRole)
     {
-    switch(idx.column())
+    if (idx.column() == 0)
       {
-      case 0:
-        return QString(this->getSeriesName(idx.row()));
-      case 1:
-        return this->getSeriesLabel(idx.row());
+      return QString(this->getSeriesName(idx.row()));
+      }
+    else if (idx.column() == 1)
+      {
+      return this->getSeriesLabel(idx.row());
       }
     }
   else if (role == Qt::CheckStateRole)
@@ -116,11 +122,22 @@ QVariant pqPlotSettingsModel::data(const QModelIndex& idx, int role) const
                       Qt::Checked : Qt::Unchecked);
       }
     }
+  else if (role == Qt::DecorationRole)
+    {
+    if (idx.column() == 1)
+      {
+      QPixmap pixmap(16, 16);
+      pixmap.fill(this->getSeriesColor(idx.row()));
+      return QVariant(pixmap);
+      }
+    }
 
   return QVariant();
 }
 
-QVariant pqPlotSettingsModel::headerData(int section, Qt::Orientation orientation, int role) const
+QVariant pqPlotSettingsModel::headerData(int section,
+                                         Qt::Orientation orientation,
+                                         int role) const
 {
   if(role == Qt::DisplayRole && orientation == Qt::Horizontal)
     {
@@ -131,6 +148,10 @@ QVariant pqPlotSettingsModel::headerData(int section, Qt::Orientation orientatio
       case 1:
         return QString(tr("Legend Name"));
       }
+    }
+  else
+    {
+    return this->Superclass::headerData(section, orientation, role);
     }
 
   return QVariant();
