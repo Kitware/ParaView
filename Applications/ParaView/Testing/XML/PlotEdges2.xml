@@ -31,8 +31,8 @@
   command="activate" arguments="PlotOnSortedLines" />
   <pqevent object="pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/objectInspector/Accept" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_tabbar" command="set_tab" arguments="1" />
-  <pqevent object="pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/1QScrollArea0/qt_scrollarea_viewport/1pqDisplayProxyEditorWidget0/pqLineChartDisplayPanel/SeriesGroup/SeriesList/1pqCheckableHeaderView0" command="mousePress" arguments="1,1,0,0,0,0" />
-  <pqevent object="pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/1QScrollArea0/qt_scrollarea_viewport/1pqDisplayProxyEditorWidget0/pqLineChartDisplayPanel/SeriesGroup/SeriesList/1pqCheckableHeaderView0" command="mouseRelease" arguments="1,0,0,0,0,0" />
+  <pqevent object="pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/1QScrollArea0/qt_scrollarea_viewport/1pqDisplayProxyEditorWidget0/pqXYChartDisplayPanel/SeriesGroup/SeriesList/1pqCheckableHeaderView0" command="mousePress" arguments="1,1,0,0,0,0" />
+  <pqevent object="pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/1QScrollArea0/qt_scrollarea_viewport/1pqDisplayProxyEditorWidget0/pqXYChartDisplayPanel/SeriesGroup/SeriesList/1pqCheckableHeaderView0" command="mouseRelease" arguments="1,0,0,0,0,0" />
   <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser/qt_scrollarea_vcontainer/1QScrollBar0" command="mousePress" arguments="1,1,0,10,64" />
   <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser/qt_scrollarea_vcontainer/1QScrollBar0" command="mouseMove" arguments="1,0,0,10,93" />
   <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser/qt_scrollarea_vcontainer/1QScrollBar0" command="mouseRelease" arguments="1,0,0,10,93" />
