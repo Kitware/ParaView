@@ -7,29 +7,29 @@
   All rights reserved.
   See Copyright.txt or http://www.paraview.org/HTML/Copyright.html for details.
 
-  This software is distributed WITHOUT ANY WARRANTY; without even
-  the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-  PURPOSE.  See the above copyright notice for more information.
+     This software is distributed WITHOUT ANY WARRANTY; without even
+     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+     PURPOSE.  See the above copyright notice for more information.
 
-  =========================================================================*/
+=========================================================================*/
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-
 #include "vtkParse.h"
 
-//int numberOfWrappedFunctions = 0;
-//FunctionInfo *wrappedFunctions[1000];
-//extern FunctionInfo *currentFunction;
+int numberOfWrappedFunctions = 0;
+FunctionInfo *wrappedFunctions[1000];
+extern FunctionInfo *currentFunction;
 
 int arg_is_pointer_to_data(int aType, int count)
 {
-  return(count == 0 &&
-         (aType % 0x1000)/0x100 == 3 && /* T*   */
-         (aType % 0x100) != 0x02 && /* void*    */
-         (aType % 0x100) != 0x03 && /* char*    */
-         (aType % 0x100) != 0x08 && /* Foo*  */
-         (aType % 0x100) != 0x09 /* vtkFoo*  */);
+  return
+    (count == 0 &&
+     (aType % 0x1000)/0x100 == 3 && /* T*   */
+     (aType % 0x100) != 0x02 && /* void*    */
+     (aType % 0x100) != 0x03 && /* char*    */
+     (aType % 0x100) != 0x08 && /* Foo*  */
+     (aType % 0x100) != 0x09 /* vtkFoo*  */);
 }
 
 void output_temp(FILE *fp, int i, int aType, char *Id, int count)
@@ -120,8 +120,6 @@ void output_temp(FILE *fp, int i, int aType, char *Id, int count)
   fprintf(fp,";\n");
 }
 
-#ifdef LEGACY_REIMPLEMENTED
-
 /* when the cpp file doesn't have enough info use the hint file */
 void use_hints(FILE *fp)
 {
@@ -172,8 +170,8 @@ void return_result(FILE *fp)
         }
       break;
 
-      /* handle functions returning vectors */
-      /* this is done by looking them up in a hint file */
+    /* handle functions returning vectors */
+    /* this is done by looking them up in a hint file */
     case 0x301: case 0x307:
     case 0x304: case 0x305: case 0x306: case 0x30A: case 0x30B: case 0x30C: case 0x30D:
     case 0x313: case 0x314: case 0x315: case 0x316: case 0x31A: case 0x31B:
@@ -207,7 +205,7 @@ void get_args(FILE *fp, int i)
 {
   int j;
   int start_arg = 2;
-  
+
   /* what arg do we start with */
   for (j = 0; j < i; j++)
     {
@@ -465,621 +463,6 @@ void outputFunction(FILE *fp, FileInfo *data)
 #endif
 }
 
-#endif //LEGACY_REIMPLEMENTED
-
-//--------------------------------------------------------------------------nix
-/*
- * notWrappable returns true if the current-function is not wrappable.
- * 
- * @param currentFunction function-info being worked on
- * 
- * @return true if the function is not wrappable
- */
-int notWrappable(FunctionInfo *currentFunction)
-{
-  return (currentFunction->IsOperator ||
-          currentFunction->ArrayFailure ||
-          !currentFunction->IsPublic ||
-          !currentFunction->Name);
-}
-
-//--------------------------------------------------------------------------nix
-/*
- * managableArguments check if the functions arguments are in a form
- * which can easily be used for automatic wrapper generation.
- * 
- * @param currentFunction the function beign worked on
- * 
- * @return true if the arguments are okay for code generation
- */
-int managableArguments(FunctionInfo *currentFunction)
-{
-  int args_ok = 1;
-  int i;
-  
-  /* check to see if we can handle the args */
-  for (i = 0; i < currentFunction->NumberOfArguments; i++)
-    {
-    int isPointerToData = arg_is_pointer_to_data(currentFunction->ArgTypes[i],
-                                                 currentFunction->ArgCounts[i]);
-    if ((currentFunction->ArgTypes[i] % 0x10) == 0x8)
-      args_ok = 0;
-
-    /* if its a pointer arg make sure we have the ArgCount */
-    if ((currentFunction->ArgTypes[i] % 0x1000 >= 0x100) &&
-        !isPointerToData &&
-        (currentFunction->ArgTypes[i] % 0x1000 != 0x303)&&
-        (currentFunction->ArgTypes[i] % 0x1000 != 0x309)&&
-        (currentFunction->ArgTypes[i] % 0x1000 != 0x109))
-      {
-      if (currentFunction->NumberOfArguments > 1 ||
-          !currentFunction->ArgCounts[i])
-        {
-        args_ok = 0;
-        }
-      }
-    if ((currentFunction->ArgTypes[i] % 0x100 >= 0x10)&&
-        (currentFunction->ArgTypes[i] != 0x13)&&
-        (currentFunction->ArgTypes[i] != 0x14)&&
-        (currentFunction->ArgTypes[i] != 0x15)&&
-        (currentFunction->ArgTypes[i] != 0x16)&&
-        (currentFunction->ArgTypes[i] != 0x1A)&&
-        !isPointerToData)
-      {
-      args_ok = 0;
-      }
-    }
-  
-  /* if it returns an unknown class we cannot wrap it */
-  if ((currentFunction->ReturnType % 0x10) == 0x8)
-    {
-    args_ok = 0;
-    }
-  
-  if (((currentFunction->ReturnType % 0x1000)/0x100 != 0x3)&&
-      ((currentFunction->ReturnType % 0x1000)/0x100 != 0x1)&&
-      ((currentFunction->ReturnType % 0x1000)/0x100))
-    {
-    args_ok = 0;
-    }
-  if (currentFunction->NumberOfArguments &&
-      (currentFunction->ArgTypes[0] == 0x5000))
-    {
-    args_ok = 0;
-    }
-
-  /* we can't handle void * return types */
-  if ((currentFunction->ReturnType % 0x1000) == 0x302)
-    {
-    args_ok = 0;
-    }
-
-  /* watch out for functions that dont have enough info */
-  switch (currentFunction->ReturnType % 0x1000)
-    {
-    case 0x301: case 0x307:
-    case 0x304: case 0x305: case 0x306: case 0x30A: case 0x30B:
-    case 0x30C: case 0x30D:
-    case 0x313: case 0x314: case 0x315: case 0x316: case 0x31A:
-    case 0x31B: case 0x31C:
-      args_ok = currentFunction->HaveHint;
-      break;
-    }
-  return args_ok;
-}
-
-//--------------------------------------------------------------------------nix
-/** 
- * Reimplementation of use_hints to eliminate global CurrentFunction
- * 
- * @param fp file to write into
- * @param currentFunction data which is used to write
- */
-void useHints(FILE *fp,FunctionInfo *currentFunction)
-{
-  /* use the hint */
-  switch (currentFunction->ReturnType % 0x1000)
-    {
-    case 0x301: case 0x307:
-    case 0x304: case 0x305: case 0x306: case 0x30A: case 0x30B: case 0x30C:
-    case 0x313: case 0x314: case 0x315: case 0x316: case 0x31A: case 0x31B:
-    case 0x31C: case 0x30D:
-      fprintf(fp,
-              "      resultStream.Reset();\n"
-              "      resultStream << vtkClientServerStream::Reply << vtkClientServerStream::InsertArray(temp%i,%i) << vtkClientServerStream::End;\n", MAX_ARGS, currentFunction->HintSize);
-      break;
-    }
-}
-
-//--------------------------------------------------------------------------nix
-/*
- * A modified implementation of return_result to take currenFunction parameter 
- * 
- * @param fp the file to write into
- * @param currentFunction the data used to write the file
- */
-void returnResult(FILE *fp,FunctionInfo *currentFunction)
-{
-  switch (currentFunction->ReturnType % 0x1000)
-    {
-    case 0x2:
-      break;
-    case 0x1: case 0x3: case 0x4: case 0x5: case 0x6: case 0x7: case 0xA:
-    case 0xB: case 0xC: case 0xD: case 0xE: case 0x13: case 0x14: case 0x15: case 0x16:
-    case 0x1A: case 0x1B: case 0x1C:
-    case 0x303:
-      fprintf(fp,
-              "      resultStream.Reset();\n"
-              "      resultStream << vtkClientServerStream::Reply << temp%i << vtkClientServerStream::End;\n",
-              MAX_ARGS);
-      break;
-    case 0x109:
-    case 0x309:
-      /* Handle some objects of known type.  */
-      if(strcmp(currentFunction->ReturnClass, "vtkClientServerStream") == 0)
-        {
-        fprintf(fp,
-                "      resultStream.Reset();\n"
-                "      resultStream << vtkClientServerStream::Reply << *temp%i << vtkClientServerStream::End;\n",
-                MAX_ARGS);
-        }
-      else
-        {
-        fprintf(fp,
-                "      resultStream.Reset();\n"
-                "      resultStream << vtkClientServerStream::Reply << (vtkObjectBase *)temp%i << vtkClientServerStream::End;\n",MAX_ARGS);
-        }
-      break;
-
-      /* handle functions returning vectors */
-      /* this is done by looking them up in a hint file */
-    case 0x301: case 0x307:
-    case 0x304: case 0x305: case 0x306: case 0x30A: case 0x30B: case 0x30C: case 0x30D:
-    case 0x313: case 0x314: case 0x315: case 0x316: case 0x31A: case 0x31B:
-    case 0x31C:
-      useHints(fp,currentFunction);
-      break;
-    case 0x9:
-      {
-      /* Handle some objects of known type.  */
-      if(strcmp(currentFunction->ReturnClass, "vtkClientServerStream") == 0)
-        {
-        fprintf(fp,
-                "      resultStream.Reset();\n"
-                "      resultStream << vtkClientServerStream::Reply << temp%i << vtkClientServerStream::End;\n",
-                MAX_ARGS);
-        break;
-        }
-      }
-    default:
-      fprintf(fp,
-              "      resultStream.Reset();\n"
-              "      resultStream << vtkClientServerStream::Reply\n"
-              "                   << \"unable to return result of type(%d %% 0x1000 = %d).\"\n"
-              "                   << vtkClientServerStream::End;\n",
-              currentFunction->ReturnType, currentFunction->ReturnType % 0x1000);
-      break;
-    }
-}
-
-
-//--------------------------------------------------------------------------nix
-/** 
- * getArgs is a modified version of get_args
- * 
- * @param fp file to write into
- * @param currentFunction holds information required to make the function
- * @param i total number of args
- */
-void getArgs(FILE *fp, FunctionInfo* currentFunction,int i)
-{
-  int j;
-  int start_arg = 2;
-  
-  /* what arg do we start with */
-  for (j = 0; j < i; j++)
-    {
-    start_arg = start_arg +
-      (currentFunction->ArgCounts[j] ? currentFunction->ArgCounts[j] : 1);
-    }
-
-  /* ignore void */
-  if (((currentFunction->ArgTypes[i] % 0x10) == 0x2)&&
-      (!((currentFunction->ArgTypes[i] % 0x1000)/0x100)))
-    {
-    return;
-    }
-
-  switch (currentFunction->ArgTypes[i] % 0x1000)
-    {
-    case 0x1:
-    case 0x7:
-    case 0x4:
-    case 0x5:
-    case 0x6:
-    case 0xA:
-    case 0xB:
-    case 0xC:
-    case 0xD:
-    case 0xE:
-    case 0x3:
-    case 0x13:
-    case 0x14:
-    case 0x15:
-    case 0x16:
-    case 0x1A:
-    case 0x303:
-      fprintf(fp, "msg.GetArgument(0, %i, &temp%i)", i+2, i);
-      break;
-    case 0x109:
-    case 0x309:
-      /* Handle some objects of known type.  */
-      if(strcmp(currentFunction->ArgClasses[i], "vtkClientServerStream") == 0)
-        {
-        fprintf(fp,
-                "msg.GetArgument(0, %i, temp%i)", i+2, i);
-        }
-      else
-        {
-        fprintf(fp,
-                "vtkClientServerStreamGetArgumentObject(msg, 0, %i, &temp%i, \"%s\")",
-                i+2, i, currentFunction->ArgClasses[i]);
-        }
-      break;
-    case 0x2:
-    case 0x9:
-      break;
-    default:
-      if (currentFunction->ArgCounts[i] > 1)
-        {
-        switch (currentFunction->ArgTypes[i] % 0x100)
-          {
-          case 0x1: case 0x7:
-          case 0x4: case 0x5: case 0x6: case 0xA: case 0xB: case 0xC: case 0xD: case 0xE:
-          case 0x13: case 0x14: case 0x15: case 0x16:
-          case 0x1A: case 0x1B: case 0x1C:
-            fprintf(fp, "msg.GetArgument(0, %i, temp%i, %i)",
-                    i+2, i, currentFunction->ArgCounts[i]);
-            break;
-          }
-        }
-      else if(arg_is_pointer_to_data(currentFunction->ArgTypes[i],
-                                     currentFunction->ArgCounts[i]))
-        {
-        /* Pointer-to-data arguments are handled by an object
-           convertible to bool.  */
-        fprintf(fp, "temp%i", i);
-        }
-
-    }
-}
-
-//--------------------------------------------------------------------------nix
-/*
- * puts the VTK_LEGACY_REMOVE macro if the code is legacy 
- * 
- * @param fp file to write into
- * @param isLegacy is 1 if the function is legacy else 0
- */
-void printIfLegacy_BEGIN(FILE *fp, int isLegacy)
-{
-  if(isLegacy)
-    fprintf(fp,
-            "\n \n"
-            "#if !defined(VTK_LEGACY_REMOVE)\n"
-            );
-}
-
-//--------------------------------------------------------------------------nix
-/* 
- * puts end to the VTK_LEGACY_REMOVE macro 
- * 
- * @param fp file to write into
- * @param isLegacy is 1 is the code is legacy else 0
- */
-void printIfLegacy_END(FILE *fp, int isLegacy)
-{
-  if(isLegacy)
-    fprintf(fp,
-            "#endif\n\n"
-            );
-}
-
-//--------------------------------------------------------------------------nix
-/* 
- * prints the first "if" check to check for the right count of params
- * 
- * @param fp file to write into
- * @param currentFunction hold info about the function
- */
-void printCheckArgs_BEGIN(FILE *fp, FunctionInfo *currentFunction)
-{
-  fprintf(fp,
-          "  if(msg.GetNumberOfArguments(0) == %d)\n"
-          "    {\n",
-          currentFunction->NumberOfArguments+2); 
-}
-
-//--------------------------------------------------------------------------nix
-/*
- * prints the ending braces with the relevant spaces
- * 
- * @param fp file to write into
- */
-void printCheckArgs_END(FILE *fp)
-{    
-  fprintf(fp,
-          "    }\n"
-          );
-}
-
-//--------------------------------------------------------------------------nix
-/*
- * printFunction_BEGIN printf the header of the function
- * 
- * @param fp file to write into
- * @param funName holds the name of the function
- * @param className holds the name of the class
- */
-void printFunction_BEGIN(FILE *fp, char * funName, char * className)
-{
-  // Print the header of the function
-  fprintf(fp,
-          "//------------------------------------------------------------------------auto\n"
-          "int %s_%s(const vtkClientServerStream& msg, vtkObjectBase *opb, vtkClientServerStream& resultStream)\n"
-          "{\n  (void)resultStream;\n"
-          "  %s *op = static_cast<%s*>(opb);\n",
-          className,
-          funName,
-          className,
-          className);
-}
-
-//--------------------------------------------------------------------------nix
-/* 
- * printFunction_END writes the end braces
- * 
- * @param fp file to write into
- */
-void printFunction_END(FILE *fp)
-{
-  fprintf(fp,
-          "  return 0;\n"
-          "}\n");
-}
-
-
-//--------------------------------------------------------------------------nix
-/* 
- * outputMappableFunction will output individual functions appended with
- * the number of parameters.
- *
- * @param fp output cxx file to write code into
- * @param data the data used to write the output functions
- */
-void outputMappableFunction(FILE *fp, UniqueFunctionInfo *data,char* ClassName)
-{
-  int i,j;
-  FunctionInfo *currentFunction;
-  printFunction_BEGIN(fp,data->Name,ClassName);
-  for (j=0; j<data->TotalPolymorphTypes; ++j)
-    {
-    currentFunction = &(data->Function[j]);      
-    printIfLegacy_BEGIN(fp,currentFunction->IsLegacy);
-    printCheckArgs_BEGIN(fp,currentFunction);
-    /* process the args */
-    for (i = 0; i < currentFunction->NumberOfArguments; i++)
-      {
-      output_temp(fp, i, currentFunction->ArgTypes[i],
-                  currentFunction->ArgClasses[i],
-                  currentFunction->ArgCounts[i]);
-      }
-    output_temp(fp, MAX_ARGS,currentFunction->ReturnType,
-                currentFunction->ReturnClass, 0);
-    if(currentFunction->NumberOfArguments > 0)
-      {
-      const char* amps = "    if(";
-      /* now get the required args from the stack */
-      for (i = 0; i < currentFunction->NumberOfArguments; i++)
-        {
-        fprintf(fp, "%s", amps);
-        amps = " &&\n      ";
-        getArgs(fp,currentFunction,i);
-        }
-      fprintf(fp, ")\n");
-      }
-    fprintf(fp, "      {\n");
-    switch (currentFunction->ReturnType % 0x1000)
-      {
-      case 0x2:
-        fprintf(fp,"      op->%s(",currentFunction->Name);
-        break;
-      case 0x109:
-        fprintf(fp,"      temp%i = &(op)->%s(",MAX_ARGS,currentFunction->Name);
-        break;
-      default:
-        fprintf(fp,"      temp%i = (op)->%s(",MAX_ARGS,currentFunction->Name);
-      }
-    for (i = 0; i < currentFunction->NumberOfArguments; i++)
-      {
-      if (i)        fprintf(fp,",");
-      if ((currentFunction->ArgTypes[i] % 0x1000)
-          == 0x109) fprintf(fp,"*(temp%i)",i); 
-      else          fprintf(fp,"temp%i",i);
-      }
-    fprintf(fp,");\n");
-    returnResult(fp,currentFunction);
-    fprintf(fp,"      return 1;\n");
-    fprintf(fp,"      }\n");
-    
-    printCheckArgs_END(fp);
-    printIfLegacy_END(fp,currentFunction->IsLegacy);
-    //wrappedFunctions[numberOfWrappedFunctions] = currentFunction;
-    //numberOfWrappedFunctions++;
-    }
-  printFunction_END(fp);
-}
-
-
-
-//--------------------------------------------------------------------------nix
-/*
- * funCmp is used to compare the function names of two FunInfo data.
- * This is used as a utility to the sort function.
- * 
- * @param fun1 first function data which is compared
- * @param fun2 second function data which is compared
- * 
- * @return values returned by strcmp
- */
-
-static int funCmp(const void  *fun1, const void *fun2)
-{
-  FunctionInfo *a = (FunctionInfo*)fun1;
-  FunctionInfo *b = (FunctionInfo*)fun2;
-  return strcmp(a->Name,b->Name);
-}
-
-//--------------------------------------------------------------------------nix
-/* 
- * copy copies data from the source array to the destination
- * 
- * @param from the source array from which we want to copy data
- * @param fromSize the size of the source array
- * @param to the destination to which we wanto to copy the data
- * 
- * @return the size of the destination array
- */
-int copy(FunctionInfo* from, int fromSize, FunctionInfo* to)
-{
-  int i;
-  for (i=0 ; i<fromSize;i++)
-    {
-    to[i] =  from[i];
-    }
-  return i;
-}
-
-//--------------------------------------------------------------------------nix
-/* 
- * extractWrappable copies data from the source array to the destination
- * array and removes unwrappable functions whenever encountered.
- * It returns the count of the destination array.
- * 
- * @param from the source array from which we want to extract data
- * @param fromSize the size of the source array
- * @param to the destination to which we wanto to copy extracted data
- * 
- * @return the size of the destination array (this may not be the size of the source)
- */
-int extractWrappable(FunctionInfo* from,
-                     int fromSize,
-                     FunctionInfo* to,
-                     char* ClassName)
-{
-  int i,j;
-  for (i=0,j=0 ; i<fromSize ;i++)
-    {
-    /* if the function is wrappable and
-       args are OK and
-       it is not a constructor or destructor */
-    if(!notWrappable(&(from[i])) &&
-       managableArguments(&(from[i])) &&
-       strcmp(ClassName,from[i].Name) && strcmp(ClassName,from[i].Name + 1))
-      {
-      to[j] =  from[i];
-      ++j;
-      }
-    }
-  return j;
-}
-
-//--------------------------------------------------------------------------nix
-/*
- * collectUniqueFunctionInfo collects unique function. Polymorphed functions
- * are grouped in the UniqueFunctionInfo structure.
- * 
- * @param src source data array with all applicable function info
- * @param srcSize the size of the array holding this info
- * @param dest the destnation array to store the extracted info
- * 
- * @return the total number of elements in the dest array
- */
-int collectUniqueFunctionInfo(FunctionInfo *src, int srcSize, UniqueFunctionInfo *dest)
-{
-  int i,j,k;
-  i=0;
-  j=0;
-  for (i=0; i < srcSize; ++i)
-    {
-    dest[i].Name = src[i].Name;
-    dest[i].TotalPolymorphTypes = 1;
-    dest[i].Function[0]= src[i];
-    for(j=i+1; j<srcSize;j++)
-      {
-      if(funCmp(&dest[i],&src[j])==0)
-        {
-        //printf("%d [%d]> dest = %s :: src = %s\n",i,srcSize, dest[i].Name,src[j].Name);
-        //printf("    > [SAME]\n");
-        dest[i].Function[dest[i].TotalPolymorphTypes]=src[j];
-        ++dest[i].TotalPolymorphTypes;
-        for(k=j; k<srcSize-1;k++)
-          {
-          //printf("remaining = %s\n",src[k].Name);
-          src[k]=src[k+1];
-          }
-        j--;
-        srcSize--;
-        }
-      
-      }
-    }
-  return srcSize;
-}
-
-#if 0
-int collectUniqueFunctionInfo(FunctionInfo *src, int srcSize, UniqueFunctionInfo *dest)
-{
-  int i,j;
-  i=0;
-  j=0;
-  for (i=0,j=0; i < srcSize; ++i,++j)
-    {
-    dest[j].Name = src[i].Name;
-    dest[j].TotalPolymorphTypes = 1;
-    dest[j].Function[0]= src[i];
-    if(i+1 < srcSize)
-      {
-      while(funCmp(&dest[j],&src[i+1])==0)
-        {
-        dest[j].Function[dest[j].TotalPolymorphTypes]=src[i+1];
-        i++;
-        ++dest[j].TotalPolymorphTypes;
-        if(i+1 < srcSize) continue;
-        else              break;
-        }
-      }
-    }
-  return j;
-}
-#endif
-
-//--------------------------------------------------------------------------nix
-/* 
- * outputMappableFunctions will output all functions
- *
- * @param fp output cxx file to write code into
- * @param data the data used to write the output functions
- */
-void outputMappableFunctions(FILE *fp, ClassInfo *data)
-{
-  int i;
-
-  /* insert function making code here */
-  for (i = 0; i < data->NumberOfFunctions; i++)
-    outputMappableFunction(fp, &(data->Functions[i]),data->ClassName);
-}
-
 //--------------------------------------------------------------------------nix
 /* 
  * This function makes writes a function which makes its own meta-infomation
@@ -1223,6 +606,224 @@ void outputMetaInfoExtractFunction(FILE *fp, ClassInfo *data)
 
 //--------------------------------------------------------------------------nix
 /*
+ * notWrappable returns true if the current-function is not wrappable.
+ * 
+ * @param currentFunction function-info being worked on
+ * 
+ * @return true if the function is not wrappable
+ */
+int notWrappable(FunctionInfo *currentFunction)
+{
+  return (currentFunction->IsOperator ||
+          currentFunction->ArrayFailure ||
+          !currentFunction->IsPublic ||
+          !currentFunction->Name);
+}
+
+//--------------------------------------------------------------------------nix
+/*
+ * managableArguments check if the functions arguments are in a form
+ * which can easily be used for automatic wrapper generation.
+ * 
+ * @param currentFunction the function beign worked on
+ * 
+ * @return true if the arguments are okay for code generation
+ */
+int managableArguments(FunctionInfo *currentFunction)
+{
+  int args_ok = 1;
+  int i;
+  
+  /* check to see if we can handle the args */
+  for (i = 0; i < currentFunction->NumberOfArguments; i++)
+    {
+    int isPointerToData = arg_is_pointer_to_data(currentFunction->ArgTypes[i],
+                                                 currentFunction->ArgCounts[i]);
+    if ((currentFunction->ArgTypes[i] % 0x10) == 0x8)
+      args_ok = 0;
+
+    /* if its a pointer arg make sure we have the ArgCount */
+    if ((currentFunction->ArgTypes[i] % 0x1000 >= 0x100) &&
+        !isPointerToData &&
+        (currentFunction->ArgTypes[i] % 0x1000 != 0x303)&&
+        (currentFunction->ArgTypes[i] % 0x1000 != 0x309)&&
+        (currentFunction->ArgTypes[i] % 0x1000 != 0x109))
+      {
+      if (currentFunction->NumberOfArguments > 1 ||
+          !currentFunction->ArgCounts[i])
+        {
+        args_ok = 0;
+        }
+      }
+    if ((currentFunction->ArgTypes[i] % 0x100 >= 0x10)&&
+        (currentFunction->ArgTypes[i] != 0x13)&&
+        (currentFunction->ArgTypes[i] != 0x14)&&
+        (currentFunction->ArgTypes[i] != 0x15)&&
+        (currentFunction->ArgTypes[i] != 0x16)&&
+        (currentFunction->ArgTypes[i] != 0x1A)&&
+        !isPointerToData)
+      {
+      args_ok = 0;
+      }
+    }
+  
+  /* if it returns an unknown class we cannot wrap it */
+  if ((currentFunction->ReturnType % 0x10) == 0x8)
+    {
+    args_ok = 0;
+    }
+  
+  if (((currentFunction->ReturnType % 0x1000)/0x100 != 0x3)&&
+      ((currentFunction->ReturnType % 0x1000)/0x100 != 0x1)&&
+      ((currentFunction->ReturnType % 0x1000)/0x100))
+    {
+    args_ok = 0;
+    }
+  if (currentFunction->NumberOfArguments &&
+      (currentFunction->ArgTypes[0] == 0x5000))
+    {
+    args_ok = 0;
+    }
+
+  /* we can't handle void * return types */
+  if ((currentFunction->ReturnType % 0x1000) == 0x302)
+    {
+    args_ok = 0;
+    }
+
+  /* watch out for functions that dont have enough info */
+  switch (currentFunction->ReturnType % 0x1000)
+    {
+    case 0x301: case 0x307:
+    case 0x304: case 0x305: case 0x306: case 0x30A: case 0x30B:
+    case 0x30C: case 0x30D:
+    case 0x313: case 0x314: case 0x315: case 0x316: case 0x31A:
+    case 0x31B: case 0x31C:
+      args_ok = currentFunction->HaveHint;
+      break;
+    }
+  return args_ok;
+}
+
+//--------------------------------------------------------------------------nix
+/*
+ * funCmp is used to compare the function names of two FunInfo data.
+ * This is used as a utility to the sort function.
+ * 
+ * @param fun1 first function data which is compared
+ * @param fun2 second function data which is compared
+ * 
+ * @return values returned by strcmp
+ */
+
+static int funCmp(const void  *fun1, const void *fun2)
+{
+  FunctionInfo *a = (FunctionInfo*)fun1;
+  FunctionInfo *b = (FunctionInfo*)fun2;
+  return strcmp(a->Name,b->Name);
+}
+
+//--------------------------------------------------------------------------nix
+/* 
+ * copy copies data from the source array to the destination
+ * 
+ * @param from the source array from which we want to copy data
+ * @param fromSize the size of the source array
+ * @param to the destination to which we wanto to copy the data
+ * 
+ * @return the size of the destination array
+ */
+/*
+int copy(FunctionInfo* from, int fromSize, FunctionInfo* to)
+{
+  int i;
+  for (i=0 ; i<fromSize;i++)
+    {
+    to[i] =  from[i];
+    }
+  return i;
+}
+*/
+
+//--------------------------------------------------------------------------nix
+/* 
+ * extractWrappable copies data from the source array to the destination
+ * array and removes unwrappable functions whenever encountered.
+ * It returns the count of the destination array.
+ * 
+ * @param from the source array from which we want to extract data
+ * @param fromSize the size of the source array
+ * @param to the destination to which we wanto to copy extracted data
+ * 
+ * @return the size of the destination array (this may not be the size of the source)
+ */
+int extractWrappable(FunctionInfo* from,
+                     int fromSize,
+                     FunctionInfo* to,
+                     char* ClassName)
+{
+  int i,j;
+  for (i=0,j=0 ; i<fromSize ;i++)
+    {
+    /* if the function is wrappable and
+       args are OK and
+       it is not a constructor or destructor */
+    if(!notWrappable(&(from[i])) &&
+       managableArguments(&(from[i])) &&
+       strcmp(ClassName,from[i].Name) && strcmp(ClassName,from[i].Name + 1))
+      {
+      to[j] =  from[i];
+      ++j;
+      }
+    }
+  return j;
+}
+
+//--------------------------------------------------------------------------nix
+/*
+ * collectUniqueFunctionInfo collects unique function. Polymorphed functions
+ * are grouped in the UniqueFunctionInfo structure.
+ * 
+ * @param src source data array with all applicable function info
+ * @param srcSize the size of the array holding this info
+ * @param dest the destnation array to store the extracted info
+ * 
+ * @return the total number of elements in the dest array
+ */
+int collectUniqueFunctionInfo(FunctionInfo *src, int srcSize, UniqueFunctionInfo *dest)
+{
+  int i,j,k;
+  i=0;
+  j=0;
+  for (i=0; i < srcSize; ++i)
+    {
+    dest[i].Name = src[i].Name;
+    dest[i].TotalPolymorphTypes = 1;
+    dest[i].Function[0]= src[i];
+    for(j=i+1; j<srcSize;j++)
+      {
+      if(funCmp(&dest[i],&src[j])==0)
+        {
+        //printf("%d [%d]> dest = %s :: src = %s\n",i,srcSize, dest[i].Name,src[j].Name);
+        //printf("    > [SAME]\n");
+        dest[i].Function[dest[i].TotalPolymorphTypes]=src[j];
+        ++dest[i].TotalPolymorphTypes;
+        for(k=j; k<srcSize-1;k++)
+          {
+          //printf("remaining = %s\n",src[k].Name);
+          src[k]=src[k+1];
+          }
+        j--;
+        srcSize--;
+        }
+      
+      }
+    }
+  return srcSize;
+}
+
+//--------------------------------------------------------------------------nix
+/*
  * This is a format converter function which converts from traditional
  * FileInfo format to ClassInfo format. The classInfo format combines
  * polymorphed functions into UniqueFunctionInfo internal format.
@@ -1285,57 +886,6 @@ void getClassInfo(FileInfo *data, ClassInfo* classData)
 }
 
 //--------------------------------------------------------------------------nix
-/*
- * This function outputs the *MethodMap function.
- * 
- * @param fp file to write into
- * @param data data which will be used to write into file
- */
-void outputMethodMapFunction(FILE *fp, ClassInfo *data)
-{
-  int i;
-  fprintf(fp,
-          "\n"
-          "#ifndef VTK_METHOD_MAP\n"
-          "#include <vtkstd/map>\n"
-          "typedef int (*funPtr)(const vtkClientServerStream& msg, vtkObjectBase *op, vtkClientServerStream& resultStream);\n"
-          "typedef vtkstd::map <vtkstd::string , funPtr> vtkMethodMap;\n"
-          "#endif\n"
-          "\n"
-          "//-------------------------------------------------------------------------auto\n"
-          "/*\n"
-          " * %sMethodMap function creates a map with key as the name of the function\n"
-          " * and value as the funptr which can be directly called.\n"
-          " *\n"
-          " * @return the map which returns the funptr given the name\n"
-          " */\n"
-          "vtkMethodMap& %sMethodMap()\n"
-          "{\n"
-          "  static bool once = 1;\n"
-          "  static vtkMethodMap map;\n"
-          "  if(once)\n"
-          "    {\n"
-          "    once = 0;\n",
-          data->ClassName,
-          data->ClassName
-          );
-  for(i=0; i < data->NumberOfFunctions;i++)
-    {
-    fprintf(fp,
-            "    map[\"%s\"]=%s_%s;\n",
-            data->Functions[i].Name,
-            data->ClassName,
-            data->Functions[i].Name
-            );
-    }
-  fprintf(fp,
-          "    }\n"
-          "  return map;\n"
-          "}\n\n"
-          );
-}
-
-//--------------------------------------------------------------------------nix
 /* 
  * Checks if the given string in unique in a list of strings 
  * 
@@ -1375,10 +925,10 @@ int uniqueClasses(char *classes[],int total,char *classSelfName)
   {
     current_class_name = classes[i];
     if (strcmp(current_class_name,classSelfName)!=0  &&
-         // hack
+       // hack
        strcmp(current_class_name,"vtkClientServerStream")!=0 &&
-       isUniqueString(current_class_name,&temp[0],j) //&&
-       //strcmp(classes[i],"vtkObjectBase")!=0 )
+       isUniqueString(current_class_name,&temp[0],j)
+       // && strcmp(classes[i],"vtkObjectBase")!=0)
        )
       {
       temp[j]= current_class_name;
@@ -1391,30 +941,6 @@ int uniqueClasses(char *classes[],int total,char *classSelfName)
     }
   return j;
 }
-
-#if 0
-int uniqueClasses(char *classes[],int total,char *classSelfName)
-{
-
-  int i,j=0;
-  char *temp[1000];
-  for (i = total-1; i>0; --i)
-    if(isUniqueString(classes[i],&classes[0],i) &&
-       //strcmp(classes[i],classSelfName)!=0 &&
-       // hack
-       strcmp(classes[i],"vtkClientServerStream")!=0)// &&
-       //strcmp(classes[i],"vtkObjectBase")!=0 )
-      {
-      temp[j]=classes[i];
-      ++j;
-      }
-  temp[j]=classes[0];
-  ++j;  
-  for(i=0;i<j;++i)
-    classes[i]=temp[i];
-  return j;
-}
-#endif
 
 //--------------------------------------------------------------------------nix
 /*
@@ -1439,6 +965,7 @@ int extractOtherClassesUsed(ClassInfo *data, char * classes[])
   
   // Collect all the functions params and return types
   for ( i = 0; i < data->NumberOfFunctions; ++i)
+    {
     for (j = 0; j < data->Functions[i].TotalPolymorphTypes; ++j)
       {
       for (k=0; k < data->Functions[i].Function[j].NumberOfArguments; ++k)
@@ -1461,6 +988,7 @@ int extractOtherClassesUsed(ClassInfo *data, char * classes[])
           }
         }
       }
+    }
   return uniqueClasses(classes,count,data->ClassName);
 }
 
@@ -1479,6 +1007,7 @@ void output_InitFunction(FILE *fp, ClassInfo *data)
   char* classes[1000];
   int totalClasses,i;
   totalClasses=  extractOtherClassesUsed(data,classes);
+  fprintf(fp,"\n");
   for (i=0; i < totalClasses; ++i)
     {
     fprintf(fp,"void %s_Init(vtkClientServerInterpreter* csi);\n",classes[i]);
@@ -1499,176 +1028,155 @@ void output_InitFunction(FILE *fp, ClassInfo *data)
             data->ClassName,data->ClassName);
   fprintf(fp,"    csi->AddCommandFunction(\"%s\", %sCommand);\n",
           data->ClassName,data->ClassName);
-  //fprintf(fp,"    csi->AddMetaObjectInfoFunction(\"%s\", %sMetaInfo);\n",
-  //        data->ClassName,data->ClassName);
   fprintf(fp, "    }\n}\n");
 }
 
 /* print the parsed structures */
 void vtkParseOutput(FILE *fp, FileInfo *data)
 {
+  ClassInfo *classData;
   int i;
-  ClassInfo *classData = (ClassInfo*)malloc(sizeof(ClassInfo));
-  
-  fprintf(fp,"// ************ AUTO GENERATED ****************\n");
+
   fprintf(fp,"// ClientServer wrapper for %s object\n//\n",data->ClassName);
-    fprintf(fp,"#define VTK_WRAPPING_CXX\n");
-    if(strcmp("vtkObjectBase", data->ClassName) != 0)
-      {
-      /* Block inclusion of full streams. */
-      fprintf(fp,"#define VTK_STREAMS_FWD_ONLY\n");
-      }
-    fprintf(fp,"#include \"vtkSystemIncludes.h\"\n");
-    fprintf(fp,"#include \"%s.h\"\n",data->ClassName);
-    fprintf(fp,"#include \"vtkClientServerInterpreter.h\"\n");
-    fprintf(fp,"#include \"vtkClientServerStream.h\"\n\n");
-    fprintf(fp,"#include \"vtkParse.h\"\n\n");
-
-    getClassInfo(data,classData);
-    outputMappableFunctions(fp,classData);
-    outputMethodMapFunction(fp,classData);
-    //outputMetaInfoExtractFunction(fp,classData);
-//    output_InitFunction(fp,classData);
-    
-
+  fprintf(fp,"#define VTK_WRAPPING_CXX\n");
+  if(strcmp("vtkObjectBase", data->ClassName) != 0)
+    {
+    /* Block inclusion of full streams. */
+    fprintf(fp,"#define VTK_STREAMS_FWD_ONLY\n");
+    }
+  fprintf(fp,"#include \"vtkSystemIncludes.h\"\n");
+  fprintf(fp,"#include \"%s.h\"\n",data->ClassName);
+  fprintf(fp,"#include \"vtkClientServerInterpreter.h\"\n");
+  fprintf(fp,"#include \"vtkClientServerStream.h\"\n\n");
 #if 0
-    if (!strcmp("vtkObject",data->ClassName))
-      {
-      fprintf(fp,"#include \"vtkClientServerProgressObserver.h\"\n\n");
-      }
+  if (!strcmp("vtkObject",data->ClassName))
+    {
+    fprintf(fp,"#include \"vtkClientServerProgressObserver.h\"\n\n");
+    }
 #endif
-    if (!strcmp("vtkObjectBase",data->ClassName))
-      {
-      fprintf(fp,"#include <vtksys/ios/sstream>\n");
-      }
-    if (data->IsConcrete)
-      {
-      fprintf(fp,"\nvtkObjectBase *%sClientServerNewCommand()\n{\n",data->ClassName);
-      fprintf(fp,"  return %s::New();\n}\n\n",data->ClassName);
-      }
+  if (!strcmp("vtkObjectBase",data->ClassName))
+    {
+    fprintf(fp,"#include <vtksys/ios/sstream>\n");
+    }
+  if (data->IsConcrete)
+    {
+    fprintf(fp,"\nvtkObjectBase *%sClientServerNewCommand()\n{\n",data->ClassName);
+    fprintf(fp,"  return %s::New();\n}\n\n",data->ClassName);
+    }
 
-    for (i = 0; i < data->NumberOfSuperClasses; i++)
+  for (i = 0; i < data->NumberOfSuperClasses; i++)
+    {
       {
-        {
-        fprintf(fp,
-                "int %sCommand(vtkClientServerInterpreter*, vtkObjectBase*,"
-                " const char*, const vtkClientServerStream&,"
-                " vtkClientServerStream& resultStream);\n",
-                data->SuperClasses[i]);
-        }
-      }
-
-    fprintf(fp,
-            "\n"
-            "int VTK_EXPORT"
-            " %sCommand(vtkClientServerInterpreter *arlu, vtkObjectBase *ob,"
-            " const char *method, const vtkClientServerStream& msg,"
-            " vtkClientServerStream& resultStream)\n"
-            "{\n",
-            data->ClassName);
-
-    if(strcmp(data->ClassName, "vtkObjectBase") == 0)
-      {
-      fprintf(fp,"  %s *op = ob;\n",
-              data->ClassName);
-      }
-    else
-      {
-      fprintf(fp,"  %s *op = %s::SafeDownCast(ob);\n",
-              data->ClassName, data->ClassName);
       fprintf(fp,
-              "  if(!op)\n"
-              "    {\n"
-              "    vtkOStrStreamWrapper vtkmsg;\n"
-              "    vtkmsg << \"Cannot cast \" << ob->GetClassName() << \" object to %s.  \"\n"
-              "           << \"This probably means the class specifies the incorrect superclass in vtkTypeRevisionMacro.\";\n"
-              "    resultStream.Reset();\n"
-              "    resultStream << vtkClientServerStream::Error\n"
-              "                 << vtkmsg.str() << 0 << vtkClientServerStream::End;\n"
-              "    return 0;\n"
-              "    }\n", data->ClassName);
-      }
-
-    fprintf(fp, "  (void)arlu;\n");
-
-
-    /*fprintf(fp,"  vtkClientServerStream resultStream;\n");*/
-#if 1 //nix
-    //-------------------------------------------------------------nix
-    fprintf(fp,
-            "\n"
-            "  if(funPtr f = %sMethodMap()[method])\n"
-            "  if(f(msg,op,resultStream))\n"
-            "    return 1;\n\n",
-            classData->ClassName
-            );
-
-#else
-    /* insert function handling code here */
-    for (i = 0; i < data->NumberOfFunctions; i++)
-      {
-      currentFunction = data->Functions + i;
-      outputFunction(fp, data);
-      }
-#endif
-
-    /* try superclasses */
-    for (i = 0; i < data->NumberOfSuperClasses; i++)
-      {
-      fprintf(fp,"\n  if (%sCommand(arlu, op,method,msg,resultStream))\n",
+              "int %sCommand(vtkClientServerInterpreter*, vtkObjectBase*,"
+              " const char*, const vtkClientServerStream&,"
+              " vtkClientServerStream& resultStream);\n",
               data->SuperClasses[i]);
-      fprintf(fp,"    {\n    return 1;\n    }\n");
       }
-    /* Add the Print method to vtkObjectBase. */
-    if (!strcmp("vtkObjectBase",data->ClassName))
-      {
-      fprintf(fp,
-              "  if (!strcmp(\"Print\",method) && msg.GetNumberOfArguments(0) == 2)\n"
-              "    {\n"
-              "    vtksys_ios::ostringstream buf_with_warning_C4701;\n"
-              "    op->Print(buf_with_warning_C4701);\n"
-              "    resultStream.Reset();\n"
-              "    resultStream << vtkClientServerStream::Reply\n"
-              "                 << buf_with_warning_C4701.str().c_str()\n"
-              "                 << vtkClientServerStream::End;\n"
-              "    return 1;\n"
-              "    }\n");
-      }
-    /* Add the special form of AddObserver to vtkObject. */
-    if (!strcmp("vtkObject",data->ClassName))
-      {
-      fprintf(fp,
-              "  if (!strcmp(\"AddObserver\",method) && msg.GetNumberOfArguments(0) == 4)\n"
-              "    {\n"
-              "    const char* event;\n"
-              "    vtkClientServerStream css;\n"
-              "    if(msg.GetArgument(0, 2, &event) && msg.GetArgument(0, 3, &css))\n"
-              "      {\n"
-              "      return arlu->NewObserver(op, event, css);\n"
-              "      }\n"
-              "    }\n");
-      }
-    fprintf(fp,
-            "  if(resultStream.GetNumberOfMessages() > 0 &&\n"
-            "     resultStream.GetCommand(0) == vtkClientServerStream::Error &&\n"
-            "     resultStream.GetNumberOfArguments(0) > 1)\n"
-            "    {\n"
-            "    /* A superclass wrapper prepared a special message. */\n"
-            "    return 0;\n"
-            "    }\n"
-            "  vtkOStrStreamWrapper vtkmsg;\n"
-            "  vtkmsg << \"Object type: %s, could not find requested method: \\\"\"\n"
-            "         << method << \"\\\"\\nor the method was called with incorrect arguments.\\n\";\n"
-            "  resultStream.Reset();\n"
-            "  resultStream << vtkClientServerStream::Error\n"
-            "               << vtkmsg.str() << vtkClientServerStream::End;\n"
-            "  vtkmsg.rdbuf()->freeze(0);\n",
+    }
+
+  fprintf(fp,
+          "\n"
+          "int VTK_EXPORT"
+          " %sCommand(vtkClientServerInterpreter *arlu, vtkObjectBase *ob,"
+          " const char *method, const vtkClientServerStream& msg,"
+          " vtkClientServerStream& resultStream)\n"
+          "{\n",
+          data->ClassName);
+
+  if(strcmp(data->ClassName, "vtkObjectBase") == 0)
+    {
+    fprintf(fp,"  %s *op = ob;\n",
             data->ClassName);
+    }
+  else
+    {
+    fprintf(fp,"  %s *op = %s::SafeDownCast(ob);\n",
+            data->ClassName, data->ClassName);
     fprintf(fp,
-            "  return 0;\n"
-            "}\n\n");
-    
-    output_InitFunction(fp,classData);
-    free(classData);
+            "  if(!op)\n"
+            "    {\n"
+            "    vtkOStrStreamWrapper vtkmsg;\n"
+            "    vtkmsg << \"Cannot cast \" << ob->GetClassName() << \" object to %s.  \"\n"
+            "           << \"This probably means the class specifies the incorrect superclass in vtkTypeRevisionMacro.\";\n"
+            "    resultStream.Reset();\n"
+            "    resultStream << vtkClientServerStream::Error\n"
+            "                 << vtkmsg.str() << 0 << vtkClientServerStream::End;\n"
+            "    return 0;\n"
+            "    }\n", data->ClassName);
+    }
+
+  fprintf(fp, "  (void)arlu;\n");
+
+
+  /*fprintf(fp,"  vtkClientServerStream resultStream;\n");*/
+
+  /* insert function handling code here */
+  for (i = 0; i < data->NumberOfFunctions; i++)
+    {
+    currentFunction = data->Functions + i;
+    outputFunction(fp, data);
+    }
+
+  /* try superclasses */
+  for (i = 0; i < data->NumberOfSuperClasses; i++)
+    {
+    fprintf(fp,"\n  if (%sCommand(arlu, op,method,msg,resultStream))\n",
+              data->SuperClasses[i]);
+    fprintf(fp,"    {\n    return 1;\n    }\n");
+    }
+  /* Add the Print method to vtkObjectBase. */
+  if (!strcmp("vtkObjectBase",data->ClassName))
+    {
+    fprintf(fp,
+            "  if (!strcmp(\"Print\",method) && msg.GetNumberOfArguments(0) == 2)\n"
+            "    {\n"
+            "    vtksys_ios::ostringstream buf_with_warning_C4701;\n"
+            "    op->Print(buf_with_warning_C4701);\n"
+            "    resultStream.Reset();\n"
+            "    resultStream << vtkClientServerStream::Reply\n"
+            "                 << buf_with_warning_C4701.str().c_str()\n"
+            "                 << vtkClientServerStream::End;\n"
+            "    return 1;\n"
+            "    }\n");
+    }
+  /* Add the special form of AddObserver to vtkObject. */
+  if (!strcmp("vtkObject",data->ClassName))
+    {
+    fprintf(fp,
+            "  if (!strcmp(\"AddObserver\",method) && msg.GetNumberOfArguments(0) == 4)\n"
+            "    {\n"
+            "    const char* event;\n"
+            "    vtkClientServerStream css;\n"
+            "    if(msg.GetArgument(0, 2, &event) && msg.GetArgument(0, 3, &css))\n"
+            "      {\n"
+            "      return arlu->NewObserver(op, event, css);\n"
+            "      }\n"
+            "    }\n");
+    }
+  fprintf(fp,
+          "  if(resultStream.GetNumberOfMessages() > 0 &&\n"
+          "     resultStream.GetCommand(0) == vtkClientServerStream::Error &&\n"
+          "     resultStream.GetNumberOfArguments(0) > 1)\n"
+          "    {\n"
+          "    /* A superclass wrapper prepared a special message. */\n"
+          "    return 0;\n"
+          "    }\n"
+          "  vtkOStrStreamWrapper vtkmsg;\n"
+          "  vtkmsg << \"Object type: %s, could not find requested method: \\\"\"\n"
+          "         << method << \"\\\"\\nor the method was called with incorrect arguments.\\n\";\n"
+          "  resultStream.Reset();\n"
+          "  resultStream << vtkClientServerStream::Error\n"
+          "               << vtkmsg.str() << vtkClientServerStream::End;\n"
+          "  vtkmsg.rdbuf()->freeze(0);\n",
+          data->ClassName);
+  fprintf(fp,
+          "  return 0;\n"
+          "}\n");
+  
+  classData = (ClassInfo*)malloc(sizeof(ClassInfo));
+  getClassInfo(data,classData);
+  output_InitFunction(fp,classData);
+  free(classData);
 }
 
