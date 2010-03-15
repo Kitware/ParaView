@@ -229,6 +229,7 @@
           <Property name="MaximumNumberOfPeels" />
           <Property name="Background2" />
           <Property name="UseGradientBackground" />
+          <Property name="UseTexturedBackground" />
         </ExposedProperties>
       </SubProxy>
 
