@@ -410,7 +410,8 @@ IF (NOT PV_INSTALL_NO_DEVELOPMENT)
       ${ParaView_CMAKE_DIR}/branded_paraview_initializer.cxx.in
       ${ParaView_CMAKE_DIR}/branded_paraview_main.cxx.in
       ${ParaView_CMAKE_DIR}/branded_paraview_initializer.h.in
-      ${ParaView_CMAKE_DIR}/ParaViewCPackOptions.cmake.in)
+      ${ParaView_CMAKE_DIR}/ParaViewCPackOptions.cmake.in
+      ${ParaView_CMAKE_DIR}/pv-forward.c.in)
   INSTALL(
       FILES ${cmakeDevFiles} 
       DESTINATION ${PV_INSTALL_CMAKE_DIR}
