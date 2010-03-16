@@ -361,14 +361,7 @@ IF (NOT PV_INSTALL_NO_DEVELOPMENT)
       FILES ${dynamicHeaders} 
       DESTINATION ${PV_INSTALL_INCLUDE_DIR}
       COMPONENT Development)
-      
-  SET(pluginQtApplicationComponents
-    ${ParaView_BINARY_DIR}/Qt/ApplicationComponents/pqApplicationComponentsExport.h)
-  INSTALL(
-      FILES ${pluginQtApplicationComponents}
-      DESTINATION ${PV_INSTALL_INCLUDE_DIR}
-      COMPONENT Development)
-      
+
   SET(cmakeDevFiles
       ${ParaView_CMAKE_DIR}/branded_splash.png
       ${ParaView_SOURCE_DIR}/ParaViewUse.cmake

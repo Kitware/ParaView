@@ -270,6 +270,8 @@ SET (SOURCE_FILES
 CONFIGURE_FILE("${CMAKE_CURRENT_SOURCE_DIR}/pqApplicationComponentsExport.h.in"
                "${CMAKE_CURRENT_BINARY_DIR}/pqApplicationComponentsExport.h")
 
+SET(dynamicHeaders 
+    "${dynamicHeaders};${CMAKE_CURRENT_BINARY_DIR}/pqApplicationComponentsExport.h")
 
 QT4_WRAP_CPP(MOC_BUILT_SOURCES
   ${MOC_HEADERS}
