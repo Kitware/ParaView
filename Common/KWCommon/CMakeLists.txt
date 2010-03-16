@@ -222,6 +222,7 @@ SUBDIRS(CMake/ExportConfiguration)
 
 SET(KWCommon_EXE_SUFFIX)
 SET(KWCommon_EXE_INSTALL ${KWCommon_INSTALL_BIN_DIR})
+SET(Temp_Using_Shared_Forwarding OFF)
 IF(KWCOMMON_BUILD_PROCESSXML)
   # For shared libraries on non-windows systems use the KWSys shared-forward
   # implementation to make sure shared libraries are found.
@@ -237,13 +238,14 @@ IF(KWCOMMON_BUILD_PROCESSXML)
                      @ONLY IMMEDIATE)
       ADD_EXECUTABLE(kwProcessXML
                      ${CMAKE_CURRENT_BINARY_DIR}/ProcessXML-forward.c)
+      SET(Temp_Using_Shared_Forwarding ON)
       EXPORT(TARGETS kwProcessXML FILE ${EXPORT_EXECUTABLES_FILE} NAMESPACE "${EXPORT_EXECUTABLES_NAMESPACE}" APPEND)
       IF(KWCOMMON_HOST_TOOLS_TARGET)
         ADD_DEPENDENCIES(${KWCOMMON_HOST_TOOLS_TARGET} kwProcessXML)
       ENDIF(KWCOMMON_HOST_TOOLS_TARGET)
       IF(NOT KWCommon_INSTALL_NO_DEVELOPMENT)
         INSTALL(TARGETS kwProcessXML 
-          DESTINATION ${PV_INSTALL_LIB_DIR}
+          DESTINATION ${PV_INSTALL_BIN_DIR}
           COMPONENT Development)
       ENDIF(NOT KWCommon_INSTALL_NO_DEVELOPMENT)
     ENDIF(NOT WIN32)
@@ -256,8 +258,12 @@ IF(KWCOMMON_BUILD_PROCESSXML)
     ADD_DEPENDENCIES(${KWCOMMON_HOST_TOOLS_TARGET} kwProcessXML${KWCommon_EXE_SUFFIX})
   ENDIF(KWCOMMON_HOST_TOOLS_TARGET)
   IF(NOT KWCommon_INSTALL_NO_DEVELOPMENT)
+    SET(kwProcessXML_real_INSTALL_DIR ${PV_INSTALL_BIN_DIR})
+    IF(Temp_Using_Shared_Forwarding)
+      SET(kwProcessXML_real_INSTALL_DIR ${PV_INSTALL_LIB_DIR})
+    ENDIF(Temp_Using_Shared_Forwarding)
     INSTALL(TARGETS kwProcessXML${KWCommon_EXE_SUFFIX} 
-      DESTINATION ${PV_INSTALL_BIN_DIR}
+      DESTINATION ${kwProcessXML_real_INSTALL_DIR}
       COMPONENT Development)
   ENDIF(NOT KWCommon_INSTALL_NO_DEVELOPMENT)
   IF(KWCommon_EXE_SUFFIX)
