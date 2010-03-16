@@ -119,6 +119,10 @@ protected:
   ifstream *FileStream; // Data stream
   double Resolution;
   int PieceNumber;
+  float* pieceBounds;
+  int maxlevel;
+  int splits;
+  vtkIdType currentLevel;
 
 private:
   vtkACosmoReader(const vtkACosmoReader&);  // Not implemented.

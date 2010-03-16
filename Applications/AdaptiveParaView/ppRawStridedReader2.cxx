@@ -11,7 +11,7 @@
 #ifdef WIN32
   double log2(double value)
   {
-    return log(value)/log(2.0);
+    return log(value) / log(2.0);
   }
 #endif
 

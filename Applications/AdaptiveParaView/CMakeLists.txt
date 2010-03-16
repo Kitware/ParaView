@@ -47,4 +47,5 @@ build_paraview_client(adaptive_paraview
   SOURCES ${Application_SOURCE_FILES}
 )
 
-ADD_EXECUTABLE(adaptivePreprocessRSR2 downsample.cxx)
+ADD_EXECUTABLE(ppRawStridedReader2 ppRawStridedReader2.cxx)
+# ADD_EXECUTABLE(ppACosmoReader ppACosmoReader.cxx)

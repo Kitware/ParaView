@@ -81,7 +81,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkLongLongArray.h"
 #endif
 
-vtkCxxRevisionMacro(vtkACosmoReader, "1.2");
+vtkCxxRevisionMacro(vtkACosmoReader, "1.3");
 vtkStandardNewMacro(vtkACosmoReader);
 
 #define FILE_BIG_ENDIAN 0
@@ -110,6 +110,7 @@ vtkACosmoReader::vtkACosmoReader()
   this->TagSize = 0;
 
   this->FileStream             = 0;
+  this->pieceBounds = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -118,6 +119,11 @@ vtkACosmoReader::~vtkACosmoReader()
   if (this->FileName)
     {
     delete [] this->FileName;
+    }
+
+  if(this->pieceBounds)
+    {
+      delete [] this->pieceBounds;
     }
 }
 
@@ -148,24 +154,69 @@ int vtkACosmoReader::RequestInformation(
     return 0;
     }
 
+  // get parameters
+  this->maxlevel = vtkAdaptiveOptions::GetHeight();
+  this->splits = vtkAdaptiveOptions::GetDegree();
+
+  // read meta data
+  if(!this->pieceBounds)
+    {
+    this->SetErrorCode(vtkErrorCode::NoError);
+
+    char* fn = new char[255 + strlen(this->FileName)];
+    sprintf(fn, "%s.meta", this->FileName);
+    ifstream* meta = new ifstream(fn, ios::in);
+
+    if(meta->fail())
+      {
+      this->SetErrorCode(vtkErrorCode::FileNotFoundError);
+      vtkErrorMacro(<< "Unable to open meta file " << fn << ".");
+      delete meta;
+      return 0;
+      }
+
+    int totalpieces = (int)
+    ((pow(this->splits, this->maxlevel + 1) - 1) / (this->splits - 1));
+    this->pieceBounds = new float[6 * totalpieces];
+    
+    // actually read the meta data
+    for(int i = 0; i < totalpieces; i = i + 1)
+      {
+      int piecelevel;
+      int piecenumber;
+      float bounds[6];
+
+      *meta >> piecelevel;
+      *meta >> piecenumber;
+      *meta >> bounds[0];
+      *meta >> bounds[1];
+      *meta >> bounds[2];
+      *meta >> bounds[3];
+      *meta >> bounds[4];
+      *meta >> bounds[5];
+
+      piecelevel = (int)
+        ((pow(this->splits, piecelevel) - 1) / (this->splits - 1));
+      piecenumber = (piecelevel + piecenumber) * 6;
+
+      this->pieceBounds[piecenumber + 0] = bounds[0];
+      this->pieceBounds[piecenumber + 1] = bounds[1];
+      this->pieceBounds[piecenumber + 2] = bounds[2];
+      this->pieceBounds[piecenumber + 3] = bounds[3];
+      this->pieceBounds[piecenumber + 4] = bounds[4];
+      this->pieceBounds[piecenumber + 5] = bounds[5];
+      }
+      
+      delete meta;
+    }
+
   // get the info object
   vtkInformation *outInfo = outputVector->GetInformationObject(0);
 
   /*
-  vtkUnstructuredGrid *output = vtkUnstructuredGrid::SafeDownCast(
-    outInfo->Get(vtkDataObject::DATA_OBJECT()));
-  */
-
-  this->Resolution = 1.0;
-  if(outInfo->Has(vtkStreamingDemandDrivenPipeline::UPDATE_RESOLUTION()))
-    {
-    this->Resolution = 
-      outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_RESOLUTION());
-    }
-
-  /*
-  outInfo->Set(vtkDataObject::DATA_NUMBER_OF_GHOST_LEVELS(),
-               0);
+  // get the data object
+  vtkUnstructuredGrid *outData = vtkUnstructuredGrid::SafeDownCast
+    (outInfo->Get(vtkDataObject::DATA_OBJECT()));
   */
 
   double bounds[6];
@@ -177,6 +228,42 @@ int vtkACosmoReader::RequestInformation(
   bounds[5] = this->BoxSize;
   outInfo->Set(vtkStreamingDemandDrivenPipeline::WHOLE_BOUNDING_BOX(),
                bounds, 6);
+
+  this->Resolution = 1.0;
+  if(outInfo->Has(vtkStreamingDemandDrivenPipeline::UPDATE_RESOLUTION()))
+    {
+    this->Resolution = 
+      outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_RESOLUTION());
+    }
+  this->currentLevel = (vtkIdType)(this->maxlevel * this->Resolution + .5);
+
+  this->PieceNumber = 0;
+  if(outInfo->Has(vtkStreamingDemandDrivenPipeline::UPDATE_PIECE_NUMBER()))
+    {
+    this->PieceNumber =
+      outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_PIECE_NUMBER());
+    }
+
+  int index = (int)
+    ((pow(this->splits, this->currentLevel) - 1) / (this->splits - 1));
+  index = (index + this->PieceNumber) * 6;
+
+  bounds[0] = this->pieceBounds[index + 0];
+  bounds[1] = this->pieceBounds[index + 1];
+  bounds[2] = this->pieceBounds[index + 2];
+  bounds[3] = this->pieceBounds[index + 3];
+  bounds[4] = this->pieceBounds[index + 4];
+  bounds[5] = this->pieceBounds[index + 5];
+
+  outInfo->Set(vtkStreamingDemandDrivenPipeline::PIECE_BOUNDING_BOX(),
+               bounds, 6);
+
+  outInfo->Set(vtkStreamingDemandDrivenPipeline::MAXIMUM_NUMBER_OF_PIECES(),
+               -1);
+
+  /*
+  outInfo->Set(vtkDataObject::DATA_NUMBER_OF_PIECES(), -1);
+  */
 
   return 1;
 }
@@ -196,11 +283,13 @@ int vtkACosmoReader::RequestData(
 
   //output->Initialize();
                  
+  this->Resolution = 1.0;
   if(outInfo->Has(vtkStreamingDemandDrivenPipeline::UPDATE_RESOLUTION()))
     {
     this->Resolution = 
       outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_RESOLUTION());
     }
+  this->currentLevel = (vtkIdType)(this->maxlevel * this->Resolution + .5);
 
   this->PieceNumber = 0;
   if(outInfo->Has(vtkStreamingDemandDrivenPipeline::UPDATE_PIECE_NUMBER()))
@@ -211,7 +300,6 @@ int vtkACosmoReader::RequestData(
                              
   // Read the file into the output unstructured grid
   return this->ReadFile(output);
-
 }
 
 //----------------------------------------------------------------------------
@@ -219,10 +307,16 @@ int vtkACosmoReader::ReadFile(vtkUnstructuredGrid *output)
 {
   this->SetErrorCode(vtkErrorCode::NoError);
 
+  char* fn = new char[255 + strlen(this->FileName)];
+  sprintf(fn, "%s-%lu-%d", 
+          this->FileName, 
+          (long unsigned)this->currentLevel,
+          this->PieceNumber);
+
 #if defined(_WIN32) && !defined(__CYGWIN__)
-  this->FileStream = new ifstream(this->FileName, ios::in | ios::binary);
+  this->FileStream = new ifstream(fn, ios::in | ios::binary);
 #else
-  this->FileStream = new ifstream(this->FileName, ios::in);
+  this->FileStream = new ifstream(fn, ios::in);
 #endif
 
   // File exists and can be opened
@@ -231,9 +325,11 @@ int vtkACosmoReader::ReadFile(vtkUnstructuredGrid *output)
     this->SetErrorCode(vtkErrorCode::FileNotFoundError);
     delete this->FileStream;
     this->FileStream = NULL;
-    vtkErrorMacro("Specified filename not found");
+    vtkErrorMacro(<< "Specified filename " << fn << " not found");
+    delete [] fn;
     return 0;
     }
+  delete [] fn;
 
   this->FileStream->seekg(0L, ios::end);
   size_t fileLength = this->FileStream->tellg();
@@ -251,36 +347,6 @@ int vtkACosmoReader::ReadFile(vtkUnstructuredGrid *output)
   // Divide by number of components per record
   vtkIdType numberOfParticles = 
     fileLength / (BYTES_PER_DATA_MINUS_TAG + tagBytes);
-
-  vtkIdType currentLevel = (vtkIdType)
-    (vtkAdaptiveOptions::GetHeight() * this->Resolution + .5);
-  vtkIdType strideLevel = (vtkIdType)
-    (vtkAdaptiveOptions::GetHeight() * (1.0 - this->Resolution) + .5);
-  vtkIdType numberOfPieces = 
-    (vtkIdType)pow(vtkAdaptiveOptions::GetDegree(), currentLevel); 
-  vtkIdType stride = vtkAdaptiveOptions::GetRate() * 
-    vtkAdaptiveOptions::GetDegree() * strideLevel;
-  stride = stride > 0 ? stride : 1;
-
-  vtkIdType start = this->PieceNumber * numberOfParticles /
-    numberOfPieces;
-  vtkIdType end = (this->PieceNumber + 1) * numberOfParticles /
-    numberOfPieces;
-  numberOfParticles = (end - start) / stride + 
-    ((end - start) % stride > 0 ? 1 : 0);
-
-  /*
-  cout << endl;
-  cout << start << endl;
-  cout << end << endl;
-  cout << this->PieceNumber << endl;
-  cout << this->Resolution << endl; 
-  cout << numberOfParticles << endl; 
-  cout << stride << endl; 
-  cout << numberOfPieces << endl;
-  cout << currentLevel << endl;
-  cout.flush();
-  */
 
   // Create the arrays to hold location and field data
   vtkPoints *points       = vtkPoints::New();
@@ -366,7 +432,7 @@ int vtkACosmoReader::ReadFile(vtkUnstructuredGrid *output)
   this->FileStream->seekg(0, ios::beg);
   //vtkIdType chunksize = numberOfParticles / 100;
 
-  for (vtkIdType i = start; i < end; i = i + stride)
+  for (vtkIdType i = 0; i < numberOfParticles; i = i + 1)
     {
     
     /*
@@ -380,8 +446,10 @@ int vtkACosmoReader::ReadFile(vtkUnstructuredGrid *output)
     */
 
     // seek and read
+      /*
     size_t position = i * (BYTES_PER_DATA_MINUS_TAG + tagBytes);
     this->FileStream->seekg(position, ios::beg);
+      */
 
     // Read the floating point part of the data
     this->FileStream->read((char*)fBlock, 
@@ -476,13 +544,45 @@ int vtkACosmoReader::ProcessRequest(vtkInformation *request,
 {
   vtkInformation *outInfo = outputVector->GetInformationObject(0);
 
+  this->Resolution = 1.0;
+  if(outInfo->Has(vtkStreamingDemandDrivenPipeline::UPDATE_RESOLUTION()))
+    {
+    this->Resolution = 
+      outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_RESOLUTION());
+    }
+  this->currentLevel = (vtkIdType)(this->maxlevel * this->Resolution + .5);
+
+  this->PieceNumber = 0;
+  if(outInfo->Has(vtkStreamingDemandDrivenPipeline::UPDATE_PIECE_NUMBER()))
+    {
+    this->PieceNumber =
+      outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_PIECE_NUMBER());
+    }
+
+  int index = (int)
+    ((pow(this->splits, this->currentLevel) - 1) / (this->splits - 1));
+  index = (index + this->PieceNumber) * 6;
+
   double bounds[6];
-  bounds[0] = 0.0;
-  bounds[1] = this->BoxSize;
-  bounds[2] = 0.0;
-  bounds[3] = this->BoxSize;
-  bounds[4] = 0.0;
-  bounds[5] = this->BoxSize;
+  if(this->pieceBounds)
+    {
+    bounds[0] = this->pieceBounds[index + 0];
+    bounds[1] = this->pieceBounds[index + 1];
+    bounds[2] = this->pieceBounds[index + 2];
+    bounds[3] = this->pieceBounds[index + 3];
+    bounds[4] = this->pieceBounds[index + 4];
+    bounds[5] = this->pieceBounds[index + 5];
+    }
+  else
+    {
+    bounds[0] = 0.0;
+    bounds[1] = this->BoxSize;
+    bounds[2] = 0.0;
+    bounds[3] = this->BoxSize;
+    bounds[4] = 0.0;
+    bounds[5] = this->BoxSize;
+    }
+
   outInfo->Set(vtkStreamingDemandDrivenPipeline::PIECE_BOUNDING_BOX(),
                bounds, 6);
 

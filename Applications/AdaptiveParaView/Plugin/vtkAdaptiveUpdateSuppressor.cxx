@@ -34,7 +34,7 @@
 #include "vtkMPIMoveData.h"
 #include "vtkTimerLog.h"
 
-vtkCxxRevisionMacro(vtkAdaptiveUpdateSuppressor, "1.1");
+vtkCxxRevisionMacro(vtkAdaptiveUpdateSuppressor, "1.2");
 vtkStandardNewMacro(vtkAdaptiveUpdateSuppressor);
 
 #if 0
@@ -256,10 +256,12 @@ void vtkAdaptiveUpdateSuppressor::PrepareFirstPass()
     int gPieces = this->UpdateNumberOfPieces*np;
 
     double priority = this->ComputePriority(gPiece, gPieces, res);
+
     this->ToDo->GetPiece(i)->SetPriority(priority);
     }
   //sort them
   this->ToDo->SortPriorities();
+  
   //combine empties
   this->Reap();
 
@@ -440,9 +442,9 @@ void vtkAdaptiveUpdateSuppressor::FinishPass()
       {
       mdr = (double)this->MaxDepth/(double)this->Height;
       }
-    if (priority>0.0 &&
-        res<0.99 &&
-        res<mdr)
+    if (priority > 0.0 &&
+        res < 1 &&
+        res < mdr)
       {
       return;
       }
@@ -479,9 +481,9 @@ void vtkAdaptiveUpdateSuppressor::Refine()
       {
       mdr = (double)this->MaxDepth/(double)this->Height;
       }
-    if (priority>0.0 &&
-        res<0.99 &&
-        res<mdr)
+    if (priority > 0.0 &&
+        res < 1.0 &&
+        res < mdr)
       {
       numSplittable++;
       this->ToSplit->AddPiece(piece);
@@ -522,12 +524,12 @@ void vtkAdaptiveUpdateSuppressor::Refine()
     
     //split it N times
     int nrNP = np*this->Degree;
-    int gPieces = this->UpdateNumberOfPieces*nrNP;      
+    int gPieces = this->UpdateNumberOfPieces*nrNP;
     for (int child=0; child < this->Degree; child++)
       {
-      int nrA = p*this->Degree+child;
-      int gPieceA = this->UpdatePiece*nrNP + nrA;
-      
+      int nrA = p * this->Degree + child;
+      int gPieceA = this->UpdatePiece * nrNP + nrA;
+
       DEBUGPRINT_EXECUTION(cerr << "SUS(" << this << ") created " << nrA << "/" << nrNP << "@" << resolution << endl;);
       
       vtkPiece *pA = vtkPiece::New();

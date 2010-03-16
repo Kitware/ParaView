@@ -26,7 +26,7 @@
 #include "vtkBoundingBox.h"
 #include "vtkExtractSelectedFrustum.h"
 
-vtkCxxRevisionMacro(vtkVisibilityPrioritizer, "1.1");
+vtkCxxRevisionMacro(vtkVisibilityPrioritizer, "1.2");
 vtkStandardNewMacro(vtkVisibilityPrioritizer);
 
 #define DEBUGPRINT_PRIORITY(arg)\
@@ -144,6 +144,7 @@ int vtkVisibilityPrioritizer::RequestUpdateExtentInformation(
     cerr << "VS(" << this << ") Asking for bounds " << endl;
                         );
     sddp->GetPieceBoundingBox(port, pbbox);
+
     if (pbbox[0] <= pbbox[1] &&
         pbbox[2] <= pbbox[3] &&
         pbbox[4] <= pbbox[5])        
@@ -171,11 +172,45 @@ int vtkVisibilityPrioritizer::RequestUpdateExtentInformation(
         //Must do this using only information about current piece.
         vtkBoundingBox box(pbbox);
         double center[3];
-        box.GetCenter(center);
+        //box.GetCenter(center);
+                                                       
+        // use the closest corner, not the center for uneven sized pieces
+        if(fabs(this->CameraState[0] - pbbox[0]) <
+           fabs(this->CameraState[0] - pbbox[1]))
+          {
+          center[0] = pbbox[0];
+          }
+        else
+          {
+          center[0] = pbbox[1];
+          }
 
-        double dbox=sqrt(vtkMath::Distance2BetweenPoints(&this->CameraState[0], center));
+        if(fabs(this->CameraState[1] - pbbox[2]) <
+           fabs(this->CameraState[1] - pbbox[3]))
+          {
+          center[1] = pbbox[2];
+          }
+        else
+          {
+          center[1] = pbbox[3];
+          }
+
+        if(fabs(this->CameraState[2] - pbbox[4]) <
+           fabs(this->CameraState[2] - pbbox[5]))
+          {
+          center[2] = pbbox[4];
+          }
+        else
+          {
+          center[2] = pbbox[5];
+          }
+
+        double dbox=sqrt
+          (vtkMath::Distance2BetweenPoints(&this->CameraState[0], center));
         const double *farlowerleftcorner = &this->Frustum[1*4];
-        double dfar=sqrt(vtkMath::Distance2BetweenPoints(&this->CameraState[0], farlowerleftcorner));
+        double dfar=sqrt
+          (vtkMath::Distance2BetweenPoints
+           (&this->CameraState[0], farlowerleftcorner));
 
         double dist = 1.0-dbox/dfar;
         if (dist < 0.0)

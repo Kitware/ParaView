@@ -32,7 +32,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMAdaptiveOutputPort);
-vtkCxxRevisionMacro(vtkSMAdaptiveOutputPort, "1.2");
+vtkCxxRevisionMacro(vtkSMAdaptiveOutputPort, "1.3");
 
 //----------------------------------------------------------------------------
 vtkSMAdaptiveOutputPort::vtkSMAdaptiveOutputPort()
@@ -74,8 +74,6 @@ void vtkSMAdaptiveOutputPort::InvalidateDataInformation()
 // vtkPVPart used to update before gathering this information ...
 void vtkSMAdaptiveOutputPort::GatherDataInformation(int vtkNotUsed(doUpdate))
 {
-  // I mucked around with this, so that information updates only happens here
-
   if (this->GetID().IsNull())
     {
     vtkErrorMacro("Part has no associated object, can not gather info.");
@@ -86,13 +84,12 @@ void vtkSMAdaptiveOutputPort::GatherDataInformation(int vtkNotUsed(doUpdate))
   pm->SendPrepareProgress(this->ConnectionID);
   this->DataInformation->Initialize();
 
-  int doPrints =  vtkAdaptiveOptions::GetEnableStreamMessages();
-  if (doPrints)
-    {
-    cerr << "SMOP::" << this << " Conditionally GatherDataInformation " << endl;
-    }
-
   vtkClientServerStream stream;
+
+  stream << vtkClientServerStream::Invoke 
+         << this->GetProducerID() << "UpdateInformation"
+         << vtkClientServerStream::End;
+
   stream 
     << vtkClientServerStream::Invoke
     << this->GetExecutiveID() << "SetUpdateResolution" 
@@ -119,14 +116,6 @@ void vtkSMAdaptiveOutputPort::GatherDataInformation(int vtkNotUsed(doUpdate))
     << this->GetExecutiveID() << "ComputePriority"
     << vtkClientServerStream::End;
 
-  // commented out
-  /*
-  stream 
-    << vtkClientServerStream::Invoke 
-    << this->GetExecutiveID() << "Update"
-    << vtkClientServerStream::End;
-  */
-
   pm->SendStream(this->ConnectionID, this->Servers, stream);
   
   pm->GatherInformation(this->ConnectionID, this->Servers, 
@@ -142,38 +131,8 @@ void vtkSMAdaptiveOutputPort::GatherDataInformation(int vtkNotUsed(doUpdate))
 //----------------------------------------------------------------------------
 void vtkSMAdaptiveOutputPort::UpdatePipelineInternal(double time, bool doTime)
 {
-  // I mucked around with this so only update happens here
-
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   vtkClientServerStream stream;
-
-  // commented out
-  /*
-  stream << vtkClientServerStream::Invoke 
-         << this->GetProducerID() << "UpdateInformation"
-         << vtkClientServerStream::End;
-
-  stream 
-    << vtkClientServerStream::Invoke
-    << this->GetExecutiveID() << "SetUpdateResolution" 
-    << this->PortIndex << 0.0
-    << vtkClientServerStream::End; 
-
-  stream 
-    << vtkClientServerStream::Invoke
-    << pm->GetProcessModuleID() << "GetPartitionId"
-    << vtkClientServerStream::End;
-  
-  stream 
-    << vtkClientServerStream::Invoke
-    << this->GetExecutiveID() << "SetSplitUpdateExtent" 
-    << this->PortIndex
-    << vtkClientServerStream::LastResult 
-    << 0 //pass
-    << pm->GetNumberOfPartitions(this->ConnectionID)
-    << 0 //ghosts
-    << vtkClientServerStream::End; 
-  */
 
   if (doTime)
     {
@@ -183,14 +142,6 @@ void vtkSMAdaptiveOutputPort::UpdatePipelineInternal(double time, bool doTime)
       << this->PortIndex << time
       << vtkClientServerStream::End; 
     }
-
-  // commented out
-  /*
-  stream 
-    << vtkClientServerStream::Invoke 
-    << this->GetExecutiveID() << "ComputePriority"
-    << vtkClientServerStream::End;
-  */
 
   stream 
     << vtkClientServerStream::Invoke 
