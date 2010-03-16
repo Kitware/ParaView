@@ -170,7 +170,7 @@ FUNCTION (add_executable_with_forwarding2
 
       SET(PV_FORWARD_EXE ${exe_name}${PV_EXE_SUFFIX})
       CONFIGURE_FILE(
-        ${ParaView_SOURCE_DIR}/Servers/Executables/pv-forward.c.in
+        ${ParaView_CMAKE_DIR}/pv-forward.c.in
         ${CMAKE_CURRENT_BINARY_DIR}/${exe_name}-forward.c
         @ONLY IMMEDIATE)
       add_executable(${exe_name}
