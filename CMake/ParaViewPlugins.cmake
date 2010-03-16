@@ -278,9 +278,9 @@ MACRO(ADD_PARAVIEW_OBJECT_PANEL OUTIFACES OUTSRCS)
   SET(PANEL_XML_GROUP ${ARG_XML_GROUP})
   SET(${OUTIFACES} ${PANEL_NAME})
 
-  CONFIGURE_FILE(${ParaView_QT_DIR}/Components/pqObjectPanelImplementation.h.in
+  CONFIGURE_FILE(${ParaView_CMAKE_DIR}/pqObjectPanelImplementation.h.in
                  ${CMAKE_CURRENT_BINARY_DIR}/${PANEL_NAME}Implementation.h @ONLY)
-  CONFIGURE_FILE(${ParaView_QT_DIR}/Components/pqObjectPanelImplementation.cxx.in
+  CONFIGURE_FILE(${ParaView_CMAKE_DIR}/pqObjectPanelImplementation.cxx.in
                  ${CMAKE_CURRENT_BINARY_DIR}/${PANEL_NAME}Implementation.cxx @ONLY)
 
   GET_DIRECTORY_PROPERTY(include_dirs_tmp INCLUDE_DIRECTORIES)
@@ -313,9 +313,9 @@ MACRO(ADD_PARAVIEW_DISPLAY_PANEL OUTIFACES OUTSRCS)
   SET(PANEL_XML_NAME ${ARG_XML_NAME})
   SET(${OUTIFACES} ${PANEL_NAME})
 
-  CONFIGURE_FILE(${ParaView_QT_DIR}/Components/pqDisplayPanelImplementation.h.in
+  CONFIGURE_FILE(${ParaView_CMAKE_DIR}/pqDisplayPanelImplementation.h.in
                  ${CMAKE_CURRENT_BINARY_DIR}/${PANEL_NAME}Implementation.h @ONLY)
-  CONFIGURE_FILE(${ParaView_QT_DIR}/Components/pqDisplayPanelImplementation.cxx.in
+  CONFIGURE_FILE(${ParaView_CMAKE_DIR}/pqDisplayPanelImplementation.cxx.in
                  ${CMAKE_CURRENT_BINARY_DIR}/${PANEL_NAME}Implementation.cxx @ONLY)
 
   GET_DIRECTORY_PROPERTY(include_dirs_tmp INCLUDE_DIRECTORIES)
@@ -406,9 +406,9 @@ MACRO(ADD_PARAVIEW_VIEW_MODULE OUTIFACES OUTSRCS)
     SET(ARG_DISPLAY_TYPE "pqDataRepresentation")
   ENDIF(NOT ARG_DISPLAY_TYPE)
 
-  CONFIGURE_FILE(${ParaView_QT_DIR}/Core/pqViewModuleImplementation.h.in
+  CONFIGURE_FILE(${ParaView_CMAKE_DIR}/pqViewModuleImplementation.h.in
                  ${CMAKE_CURRENT_BINARY_DIR}/${ARG_VIEW_TYPE}Implementation.h @ONLY)
-  CONFIGURE_FILE(${ParaView_QT_DIR}/Core/pqViewModuleImplementation.cxx.in
+  CONFIGURE_FILE(${ParaView_CMAKE_DIR}/pqViewModuleImplementation.cxx.in
                  ${CMAKE_CURRENT_BINARY_DIR}/${ARG_VIEW_TYPE}Implementation.cxx @ONLY)
 
   GET_DIRECTORY_PROPERTY(include_dirs_tmp INCLUDE_DIRECTORIES)
@@ -471,9 +471,9 @@ MACRO(ADD_PARAVIEW_VIEW_OPTIONS OUTIFACES OUTSRCS)
 
   SET(${OUTIFACES} ${ARG_VIEW_TYPE}Options)
 
-  CONFIGURE_FILE(${ParaView_QT_DIR}/Components/pqViewOptionsImplementation.h.in
+  CONFIGURE_FILE(${ParaView_CMAKE_DIR}/pqViewOptionsImplementation.h.in
                  ${CMAKE_CURRENT_BINARY_DIR}/${ARG_VIEW_TYPE}OptionsImplementation.h @ONLY)
-  CONFIGURE_FILE(${ParaView_QT_DIR}/Components/pqViewOptionsImplementation.cxx.in
+  CONFIGURE_FILE(${ParaView_CMAKE_DIR}/pqViewOptionsImplementation.cxx.in
                  ${CMAKE_CURRENT_BINARY_DIR}/${ARG_VIEW_TYPE}OptionsImplementation.cxx @ONLY)
 
   GET_DIRECTORY_PROPERTY(include_dirs_tmp INCLUDE_DIRECTORIES)
@@ -505,9 +505,9 @@ MACRO(ADD_PARAVIEW_ACTION_GROUP OUTIFACES OUTSRCS)
  
   SET(${OUTIFACES} ${ARG_CLASS_NAME})
 
-  CONFIGURE_FILE(${ParaView_QT_DIR}/Components/pqActionGroupImplementation.h.in
+  CONFIGURE_FILE(${ParaView_CMAKE_DIR}/pqActionGroupImplementation.h.in
                  ${CMAKE_CURRENT_BINARY_DIR}/${ARG_CLASS_NAME}Implementation.h @ONLY)
-  CONFIGURE_FILE(${ParaView_QT_DIR}/Components/pqActionGroupImplementation.cxx.in
+  CONFIGURE_FILE(${ParaView_CMAKE_DIR}/pqActionGroupImplementation.cxx.in
                  ${CMAKE_CURRENT_BINARY_DIR}/${ARG_CLASS_NAME}Implementation.cxx @ONLY)
 
   GET_DIRECTORY_PROPERTY(include_dirs_tmp INCLUDE_DIRECTORIES)
@@ -536,9 +536,9 @@ MACRO(ADD_PARAVIEW_VIEW_FRAME_ACTION_GROUP OUTIFACES OUTSRCS)
  
   SET(${OUTIFACES} ${ARG_CLASS_NAME})
 
-  CONFIGURE_FILE(${ParaView_QT_DIR}/Components/pqViewFrameActionGroupImplementation.h.in
+  CONFIGURE_FILE(${ParaView_CMAKE_DIR}/pqViewFrameActionGroupImplementation.h.in
                  ${CMAKE_CURRENT_BINARY_DIR}/${ARG_CLASS_NAME}Implementation.h @ONLY)
-  CONFIGURE_FILE(${ParaView_QT_DIR}/Components/pqViewFrameActionGroupImplementation.cxx.in
+  CONFIGURE_FILE(${ParaView_CMAKE_DIR}/pqViewFrameActionGroupImplementation.cxx.in
                  ${CMAKE_CURRENT_BINARY_DIR}/${ARG_CLASS_NAME}Implementation.cxx @ONLY)
 
   GET_DIRECTORY_PROPERTY(include_dirs_tmp INCLUDE_DIRECTORIES)
@@ -575,9 +575,9 @@ MACRO(ADD_PARAVIEW_DOCK_WINDOW OUTIFACES OUTSRCS)
   ENDIF(NOT ARG_DOCK_AREA)
   SET(${OUTIFACES} ${ARG_CLASS_NAME})
 
-  CONFIGURE_FILE(${ParaView_QT_DIR}/Components/pqDockWindowImplementation.h.in
+  CONFIGURE_FILE(${ParaView_CMAKE_DIR}/pqDockWindowImplementation.h.in
                  ${CMAKE_CURRENT_BINARY_DIR}/${ARG_CLASS_NAME}Implementation.h @ONLY)
-  CONFIGURE_FILE(${ParaView_QT_DIR}/Components/pqDockWindowImplementation.cxx.in
+  CONFIGURE_FILE(${ParaView_CMAKE_DIR}/pqDockWindowImplementation.cxx.in
                  ${CMAKE_CURRENT_BINARY_DIR}/${ARG_CLASS_NAME}Implementation.cxx @ONLY)
 
   GET_DIRECTORY_PROPERTY(include_dirs_tmp INCLUDE_DIRECTORIES)
@@ -623,9 +623,9 @@ MACRO(ADD_PARAVIEW_AUTO_START OUTIFACES OUTSRCS)
   ENDIF (NOT ARG_SHUTDOWN)
   
   SET(${OUTIFACES} ${ARG_CLASS_NAME})
-  CONFIGURE_FILE(${ParaView_QT_DIR}/Core/pqAutoStartImplementation.h.in
+  CONFIGURE_FILE(${ParaView_CMAKE_DIR}/pqAutoStartImplementation.h.in
                  ${CMAKE_CURRENT_BINARY_DIR}/${ARG_CLASS_NAME}Implementation.h @ONLY)
-  CONFIGURE_FILE(${ParaView_QT_DIR}/Core/pqAutoStartImplementation.cxx.in
+  CONFIGURE_FILE(${ParaView_CMAKE_DIR}/pqAutoStartImplementation.cxx.in
                  ${CMAKE_CURRENT_BINARY_DIR}/${ARG_CLASS_NAME}Implementation.cxx @ONLY)
 
   GET_DIRECTORY_PROPERTY(include_dirs_tmp INCLUDE_DIRECTORIES)
@@ -657,9 +657,9 @@ MACRO(ADD_PARAVIEW_DISPLAY_PANEL_DECORATOR OUTIFACES OUTSRCS)
   PV_PLUGIN_PARSE_ARGUMENTS(ARG "CLASS_NAME;PANEL_TYPES" "" ${ARGN})
 
   SET(${OUTIFACES} ${ARG_CLASS_NAME})
-  CONFIGURE_FILE(${ParaView_QT_DIR}/Components/pqDisplayPanelDecoratorImplementation.h.in
+  CONFIGURE_FILE(${ParaView_CMAKE_DIR}/pqDisplayPanelDecoratorImplementation.h.in
                  ${CMAKE_CURRENT_BINARY_DIR}/${ARG_CLASS_NAME}Implementation.h @ONLY)
-  CONFIGURE_FILE(${ParaView_QT_DIR}/Components/pqDisplayPanelDecoratorImplementation.cxx.in
+  CONFIGURE_FILE(${ParaView_CMAKE_DIR}/pqDisplayPanelDecoratorImplementation.cxx.in
                  ${CMAKE_CURRENT_BINARY_DIR}/${ARG_CLASS_NAME}Implementation.cxx @ONLY)
 
   GET_DIRECTORY_PROPERTY(include_dirs_tmp INCLUDE_DIRECTORIES)
@@ -687,9 +687,9 @@ MACRO(ADD_3DWIDGET OUTIFACES OUTSRCS)
   PV_PLUGIN_PARSE_ARGUMENTS(ARG "CLASS_NAME;WIDGET_TYPE" "" ${ARGN})
 
   SET(${OUTIFACES} ${ARG_CLASS_NAME})
-  CONFIGURE_FILE(${ParaView_QT_DIR}/Components/pq3DWidgetImplementation.h.in
+  CONFIGURE_FILE(${ParaView_CMAKE_DIR}/pq3DWidgetImplementation.h.in
                  ${CMAKE_CURRENT_BINARY_DIR}/${ARG_CLASS_NAME}Implementation.h @ONLY)
-  CONFIGURE_FILE(${ParaView_QT_DIR}/Components/pq3DWidgetImplementation.cxx.in
+  CONFIGURE_FILE(${ParaView_CMAKE_DIR}/pq3DWidgetImplementation.cxx.in
                  ${CMAKE_CURRENT_BINARY_DIR}/${ARG_CLASS_NAME}Implementation.cxx @ONLY)
 
   GET_DIRECTORY_PROPERTY(include_dirs_tmp INCLUDE_DIRECTORIES)
@@ -722,9 +722,9 @@ MACRO(ADD_PARAVIEW_GRAPH_LAYOUT_STRATEGY OUTIFACES OUTSRCS)
 
   SET(${OUTIFACES} ${ARG_STRATEGY_TYPE})
 
-  CONFIGURE_FILE(${ParaView_QT_DIR}/Core/pqGraphLayoutStrategyImplementation.h.in
+  CONFIGURE_FILE(${ParaView_CMAKE_DIR}/pqGraphLayoutStrategyImplementation.h.in
                  ${CMAKE_CURRENT_BINARY_DIR}/${ARG_STRATEGY_TYPE}Implementation.h @ONLY)
-  CONFIGURE_FILE(${ParaView_QT_DIR}/Core/pqGraphLayoutStrategyImplementation.cxx.in
+  CONFIGURE_FILE(${ParaView_CMAKE_DIR}/pqGraphLayoutStrategyImplementation.cxx.in
                  ${CMAKE_CURRENT_BINARY_DIR}/${ARG_STRATEGY_TYPE}Implementation.cxx @ONLY)
 
   GET_DIRECTORY_PROPERTY(include_dirs_tmp INCLUDE_DIRECTORIES)
@@ -757,9 +757,9 @@ MACRO(ADD_PARAVIEW_TREE_LAYOUT_STRATEGY OUTIFACES OUTSRCS)
 
   SET(${OUTIFACES} ${ARG_STRATEGY_TYPE})
 
-  CONFIGURE_FILE(${ParaView_QT_DIR}/Core/pqTreeLayoutStrategyImplementation.h.in
+  CONFIGURE_FILE(${ParaView_CMAKE_DIR}/pqTreeLayoutStrategyImplementation.h.in
                  ${CMAKE_CURRENT_BINARY_DIR}/${ARG_STRATEGY_TYPE}Implementation.h @ONLY)
-  CONFIGURE_FILE(${ParaView_QT_DIR}/Core/pqTreeLayoutStrategyImplementation.cxx.in
+  CONFIGURE_FILE(${ParaView_CMAKE_DIR}/pqTreeLayoutStrategyImplementation.cxx.in
                  ${CMAKE_CURRENT_BINARY_DIR}/${ARG_STRATEGY_TYPE}Implementation.cxx @ONLY)
 
   GET_DIRECTORY_PROPERTY(include_dirs_tmp INCLUDE_DIRECTORIES)

@@ -368,35 +368,7 @@ IF (NOT PV_INSTALL_NO_DEVELOPMENT)
       FILES ${pluginQtApplicationComponents}
       DESTINATION ${PV_INSTALL_INCLUDE_DIR}
       COMPONENT Development)
-  SET(pluginQtComponentConfig
-      ${ParaView_SOURCE_DIR}/Qt/Components/pqObjectPanelImplementation.h.in
-      ${ParaView_SOURCE_DIR}/Qt/Components/pqObjectPanelImplementation.cxx.in
-      ${ParaView_SOURCE_DIR}/Qt/Components/pqDisplayPanelImplementation.h.in
-      ${ParaView_SOURCE_DIR}/Qt/Components/pqDisplayPanelImplementation.cxx.in
-      ${ParaView_SOURCE_DIR}/Qt/Components/pqViewOptionsImplementation.h.in
-      ${ParaView_SOURCE_DIR}/Qt/Components/pqViewOptionsImplementation.cxx.in
-      ${ParaView_SOURCE_DIR}/Qt/Components/pqActionGroupImplementation.h.in
-      ${ParaView_SOURCE_DIR}/Qt/Components/pqActionGroupImplementation.cxx.in
-      ${ParaView_SOURCE_DIR}/Qt/Components/pqViewFrameActionGroupImplementation.h.in
-      ${ParaView_SOURCE_DIR}/Qt/Components/pqViewFrameActionGroupImplementation.cxx.in
-      ${ParaView_SOURCE_DIR}/Qt/Components/pqDockWindowImplementation.h.in
-      ${ParaView_SOURCE_DIR}/Qt/Components/pqDockWindowImplementation.cxx.in
-      ${ParaView_SOURCE_DIR}/Qt/Components/pqDisplayPanelDecoratorImplementation.h.in
-      ${ParaView_SOURCE_DIR}/Qt/Components/pqDisplayPanelDecoratorImplementation.cxx.in)
-  INSTALL(
-      FILES ${pluginQtComponentConfig}
-      DESTINATION ${PV_INSTALL_INCLUDE_DIR}/Qt/Components
-      COMPONENT Development)
-  SET(pluginQtCoreConfig
-      ${ParaView_SOURCE_DIR}/Qt/Core/pqViewModuleImplementation.h.in
-      ${ParaView_SOURCE_DIR}/Qt/Core/pqViewModuleImplementation.cxx.in
-      ${ParaView_SOURCE_DIR}/Qt/Core/pqAutoStartImplementation.h.in
-      ${ParaView_SOURCE_DIR}/Qt/Core/pqAutoStartImplementation.cxx.in
-      ${ParaView_SOURCE_DIR}/Qt/Core/pqPluginImplementation.h.in
-      ${ParaView_SOURCE_DIR}/Qt/Core/pqPluginImplementation.cxx.in)
-  INSTALL(
-      FILES ${pluginQtCoreConfig}
-      DESTINATION ${PV_INSTALL_INCLUDE_DIR}/Qt/Core)
+      
   SET(cmakeDevFiles
       ${ParaView_CMAKE_DIR}/branded_splash.png
       ${ParaView_SOURCE_DIR}/ParaViewUse.cmake
@@ -411,7 +383,31 @@ IF (NOT PV_INSTALL_NO_DEVELOPMENT)
       ${ParaView_CMAKE_DIR}/branded_paraview_main.cxx.in
       ${ParaView_CMAKE_DIR}/branded_paraview_initializer.h.in
       ${ParaView_CMAKE_DIR}/ParaViewCPackOptions.cmake.in
-      ${ParaView_CMAKE_DIR}/pv-forward.c.in)
+      ${ParaView_CMAKE_DIR}/pv-forward.c.in
+      # originaly from Qt/Components
+      ${ParaView_CMAKE_DIR}/pqObjectPanelImplementation.h.in
+      ${ParaView_CMAKE_DIR}/pqObjectPanelImplementation.cxx.in
+      ${ParaView_CMAKE_DIR}/pqDisplayPanelImplementation.h.in
+      ${ParaView_CMAKE_DIR}/pqDisplayPanelImplementation.cxx.in
+      ${ParaView_CMAKE_DIR}/pqViewOptionsImplementation.h.in
+      ${ParaView_CMAKE_DIR}/pqViewOptionsImplementation.cxx.in
+      ${ParaView_CMAKE_DIR}/pqActionGroupImplementation.h.in
+      ${ParaView_CMAKE_DIR}/pqActionGroupImplementation.cxx.in
+      ${ParaView_CMAKE_DIR}/pqViewFrameActionGroupImplementation.h.in
+      ${ParaView_CMAKE_DIR}/pqViewFrameActionGroupImplementation.cxx.in
+      ${ParaView_CMAKE_DIR}/pqDockWindowImplementation.h.in
+      ${ParaView_CMAKE_DIR}/pqDockWindowImplementation.cxx.in
+      ${ParaView_CMAKE_DIR}/pqDisplayPanelDecoratorImplementation.h.in
+      ${ParaView_CMAKE_DIR}/pqDisplayPanelDecoratorImplementation.cxx.in
+      # originaly from Qt/Core
+      ${ParaView_CMAKE_DIR}/pqViewModuleImplementation.h.in
+      ${ParaView_CMAKE_DIR}/pqViewModuleImplementation.cxx.in
+      ${ParaView_CMAKE_DIR}/pqAutoStartImplementation.h.in
+      ${ParaView_CMAKE_DIR}/pqAutoStartImplementation.cxx.in
+      ${ParaView_CMAKE_DIR}/pqGraphLayoutStrategyImplementation.h.in
+      ${ParaView_CMAKE_DIR}/pqGraphLayoutStrategyImplementation.cxx.in
+      ${ParaView_CMAKE_DIR}/pqTreeLayoutStrategyImplementation.h.in
+      ${ParaView_CMAKE_DIR}/pqTreeLayoutStrategyImplementation.cxx.in)
   INSTALL(
       FILES ${cmakeDevFiles} 
       DESTINATION ${PV_INSTALL_CMAKE_DIR}
