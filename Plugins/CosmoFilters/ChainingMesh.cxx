@@ -117,8 +117,8 @@ ChainingMesh::ChainingMesh(
     this->maxRange[dim] = maxAlive[dim] + this->deadSize;
 
     // How many chain mesh grids will fit
-    this->meshSize[dim] = ((this->maxRange[dim] - this->minRange[dim]) / 
-                            this->chainSize) + 1;
+    this->meshSize[dim] = (int)((this->maxRange[dim] - this->minRange[dim]) / 
+                                this->chainSize) + 1;
   }
 
   // Create the chaining mesh
@@ -158,8 +158,8 @@ ChainingMesh::ChainingMesh(
   for (int dim = 0; dim < DIMENSION; dim++) {
     this->minRange[dim] = minLoc[dim];
     this->maxRange[dim] = maxLoc[dim];
-    this->meshSize[dim] = ((this->maxRange[dim] - this->minRange[dim]) / 
-                            this->chainSize) + 1;
+    this->meshSize[dim] = (int)((this->maxRange[dim] - this->minRange[dim]) / 
+                                this->chainSize) + 1;
   }
 
   // Create the chaining mesh
@@ -239,9 +239,9 @@ void ChainingMesh::createChainingMesh()
     loc[1] = this->yy[p];
     loc[2] = this->zz[p];
 
-    int i = (loc[0] - this->minRange[0]) / this->chainSize;
-    int j = (loc[1] - this->minRange[1]) / this->chainSize;
-    int k = (loc[2] - this->minRange[2]) / this->chainSize;
+    int i = (int)((loc[0] - this->minRange[0]) / this->chainSize);
+    int j = (int)((loc[1] - this->minRange[1]) / this->chainSize);
+    int k = (int)((loc[2] - this->minRange[2]) / this->chainSize);
 
     // First particle in bucket
     if (this->buckets[i][j][k] == -1) {

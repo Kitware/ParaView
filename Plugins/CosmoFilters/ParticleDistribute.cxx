@@ -418,11 +418,18 @@ void ParticleDistribute::partitionInputFiles()
   string::size_type pos = baseName.size() - 1;
   int numbersOK = 1;
 
-  while(numbersOK && pos >= 0)
+  while(numbersOK)
     {
     if(baseName[pos] >= '0' && baseName[pos] <= '9')
       {
-      pos = pos - 1;
+      if(pos > 0) 
+        {
+        pos = pos - 1;
+        }
+      else
+        {
+        break;
+        }
       }
     else
       {
