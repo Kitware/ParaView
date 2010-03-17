@@ -83,10 +83,10 @@ def CreateRenderView():
     return _create_view("RenderView")
 
 def CreateXYPlotView():
-    return _create_view("XYPlotView")
+    return _create_view("XYChartView")
 
 def CreateBarChartView():
-    return _create_view("BarChart")
+    return _create_view("XYBarChartView")
 
 def GetRenderView():
     "Returns the active view if there is one. Else creates and returns a new view."
