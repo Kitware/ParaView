@@ -87,7 +87,7 @@ using namespace vtkstd;
 #include "ParticleExchange.h"
 #include "ParticleDistribute.h"
 
-vtkCxxRevisionMacro(vtkPCosmoReader, "1.5");
+vtkCxxRevisionMacro(vtkPCosmoReader, "1.6");
 vtkStandardNewMacro(vtkPCosmoReader);
 
 //----------------------------------------------------------------------------
@@ -261,10 +261,11 @@ int vtkPCosmoReader::RequestData(
   vector<POSVEL_T>* vx = new vector<POSVEL_T>;
   vector<POSVEL_T>* vy = new vector<POSVEL_T>;
   vector<POSVEL_T>* vz = new vector<POSVEL_T>;
+  vector<POSVEL_T>* mass = new vector<POSVEL_T>;
   vector<ID_T>* tag = new vector<ID_T>;
   vector<STATUS_T>* status = new vector<STATUS_T>;
 
-  distribute.setParticles(xx,yy,zz,vx,vy,vz,tag);
+  distribute.setParticles(xx, yy, zz, vx, vy, vz, mass, tag);
   if(this->ReadMode)
     {
     distribute.readParticlesRoundRobin();
@@ -280,7 +281,8 @@ int vtkPCosmoReader::RequestData(
   vector<MASK_T>* mask = new vector<MASK_T>(numberOfParticles);
 
   // Exchange particles adds dead particles to all the vectors
-  exchange.setParticles(xx, yy, zz, vx, vy, vz, potential, tag, mask, status);
+  exchange.setParticles(xx, yy, zz, vx, vy, vz, mass, potential, tag, 
+                        mask, status);
   exchange.exchangeParticles();
 
   // create VTK structures
@@ -293,6 +295,8 @@ int vtkPCosmoReader::RequestData(
   vtkFloatArray* vel = vtkFloatArray::New();
   vel->SetName("velocity");
   vel->SetNumberOfComponents(DIMENSION);
+  vtkFloatArray* m = vtkFloatArray::New();
+  m->SetName("mass");
   vtkIntArray* uid = vtkIntArray::New();
   uid->SetName("tag");
   vtkIntArray* owner = vtkIntArray::New();
@@ -303,6 +307,7 @@ int vtkPCosmoReader::RequestData(
   output->Allocate(numberOfParticles);
   output->SetPoints(points);
   output->GetPointData()->AddArray(vel);
+  output->GetPointData()->AddArray(m);
   output->GetPointData()->AddArray(uid);
   output->GetPointData()->AddArray(owner);
   output->GetPointData()->AddArray(ghost);
@@ -333,6 +338,12 @@ int vtkPCosmoReader::RequestData(
 
     vel->InsertNextTuple(pt);
 
+    // insert mass
+    pt[0] = mass->back();
+    mass->pop_back();
+
+    m->InsertNextValue(pt[0]);
+
     // insert tag
     int particle = tag->back();
     tag->pop_back();
@@ -351,6 +362,7 @@ int vtkPCosmoReader::RequestData(
   // cleanup
   points->Delete();
   vel->Delete();
+  m->Delete();
   uid->Delete();
   owner->Delete();
   ghost->Delete();
@@ -361,6 +373,7 @@ int vtkPCosmoReader::RequestData(
   delete vx;
   delete vy;
   delete vz;
+  delete mass;
   delete tag;
   delete status;
   delete potential;

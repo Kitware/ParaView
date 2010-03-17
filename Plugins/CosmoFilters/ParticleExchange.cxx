@@ -456,6 +456,7 @@ void ParticleExchange::setParticles(
                         vector<POSVEL_T>* xVel,
                         vector<POSVEL_T>* yVel,
                         vector<POSVEL_T>* zVel,
+                        vector<POSVEL_T>* mass,
                         vector<POTENTIAL_T>* potential,
                         vector<ID_T>* id,
                         vector<MASK_T>* maskData,
@@ -469,6 +470,7 @@ void ParticleExchange::setParticles(
   this->vx = xVel;
   this->vy = yVel;
   this->vz = zVel;
+  this->ms = mass;
   this->pot = potential;
   this->tag = id;
   this->mask = maskData;
@@ -594,10 +596,11 @@ void ParticleExchange::exchangeNeighborParticles()
 
   // Allocate messages to send and receive MPI buffers
   int bufferSize = (1 * sizeof(int)) +          // number of particles
-                   (maxShareSize * 
-                     ((7 * sizeof(POSVEL_T)) +  // location, velocity, potential
-                      (1 * sizeof(ID_T)) +      // id tag
-                      (1 * sizeof(MASK_T))));   // mask
+        (maxShareSize * 
+          ((COSMO_FLOAT * sizeof(POSVEL_T)) +   // location, velocity, mass
+           (1 * sizeof(POSVEL_T)) +             // potential
+           (COSMO_INT * sizeof(ID_T)) +        // id tag
+           (1 * sizeof(MASK_T))));             // mask
 
   Message* sendMessage = new Message(bufferSize);
   Message* recvMessage = new Message(bufferSize);
@@ -676,6 +679,7 @@ void ParticleExchange::exchange(
       this->vx->push_back((*this->vx)[deadIndex]);
       this->vy->push_back((*this->vy)[deadIndex]);
       this->vz->push_back((*this->vz)[deadIndex]);
+      this->ms->push_back((*this->ms)[deadIndex]);
       this->pot->push_back((*this->pot)[deadIndex]);
       this->tag->push_back((*this->tag)[deadIndex]);
       this->mask->push_back((*this->mask)[deadIndex]);
@@ -705,6 +709,7 @@ void ParticleExchange::exchange(
     sendMessage->putValue(&(*this->vx)[deadIndex]);
     sendMessage->putValue(&(*this->vy)[deadIndex]);
     sendMessage->putValue(&(*this->vz)[deadIndex]);
+    sendMessage->putValue(&(*this->ms)[deadIndex]);
     sendMessage->putValue(&(*this->pot)[deadIndex]);
     sendMessage->putValue(&(*this->tag)[deadIndex]);
     sendMessage->putValue(&(*this->mask)[deadIndex]);
@@ -737,6 +742,8 @@ void ParticleExchange::exchange(
     this->vy->push_back(posValue);
     recvMessage->getValue(&posValue);
     this->vz->push_back(posValue);
+    recvMessage->getValue(&posValue);
+    this->ms->push_back(posValue);
     recvMessage->getValue(&potValue);
     this->pot->push_back(potValue);
     recvMessage->getValue(&idValue);

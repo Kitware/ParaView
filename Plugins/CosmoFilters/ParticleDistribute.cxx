@@ -172,6 +172,7 @@ void ParticleDistribute::setParticles(vector<POSVEL_T>* xLoc,
                                       vector<POSVEL_T>* xVel,
                                       vector<POSVEL_T>* yVel,
                                       vector<POSVEL_T>* zVel,
+                                      vector<POSVEL_T>* mass,
                                       vector<ID_T>* id)
 {
   this->xx = xLoc;
@@ -180,6 +181,7 @@ void ParticleDistribute::setParticles(vector<POSVEL_T>* xLoc,
   this->vx = xVel;
   this->vy = yVel;
   this->vz = zVel;
+  this->ms = mass;
   this->tag = id;
 }
 
@@ -223,8 +225,8 @@ void ParticleDistribute::readParticlesRoundRobin(int reserveQ)
   // Number of particles is the first integer in the buffer
   int bufferSize = (1 * sizeof(int)) +          // number of particles
                    (this->maxRead *
-                     ((6 * sizeof(POSVEL_T)) +  // location, velocity vectors
-                      (1 * sizeof(ID_T))));     // id tag
+                     ((COSMO_FLOAT * sizeof(POSVEL_T)) +
+                      (COSMO_INT * sizeof(ID_T))));
 
   Message* message1 = new Message(bufferSize);
   Message* message2 = new Message(bufferSize);
@@ -264,6 +266,7 @@ void ParticleDistribute::readParticlesRoundRobin(int reserveQ)
     this->vx->reserve(reserveSize);
     this->vy->reserve(reserveSize);
     this->vz->reserve(reserveSize);
+    this->ms->reserve(reserveSize);
     this->tag->reserve(reserveSize);
   }
 
@@ -412,7 +415,7 @@ void ParticleDistribute::partitionInputFiles()
   }
 
   // strip everything back to the first non-number
-  int pos = (int)baseName.size() - 1;
+  string::size_type pos = baseName.size() - 1;
   int numbersOK = 1;
 
   while(numbersOK && pos >= 0)
@@ -440,16 +443,16 @@ void ParticleDistribute::partitionInputFiles()
     {
     // get the name
     string fileName = directoryEntry->d_name;
-    pos = (int)fileName.find(baseName.c_str());
+    pos = fileName.find(baseName.c_str());
     
     // if it starts with the base name
     if(pos == 0)
       {
       // check to see if it is all numbers on the end
-      pos = (int)baseName.size() + 1;
+      pos = baseName.size() + 1;
       numbersOK = 1;
 
-      while(pos < (int)fileName.size())
+      while(pos < fileName.size())
         {
         if(fileName[pos] < '0' || fileName[pos] > '9')
           {
@@ -767,8 +770,7 @@ void ParticleDistribute::readFromRecordFile(
   int skip = (floatSkip + intSkip) * firstParticle;
   inStream->seekg(skip, ios::beg);
 
-  // Store each particle location, velocity in buffer and replace
-  // constant mass by float tag id
+  // Store each particle location, velocity, mass and tag (as float) in buffer
   int changeCount = 0;
   for (int p = 0; p < numberOfParticles; p++) {
 
@@ -812,7 +814,7 @@ void ParticleDistribute::readFromRecordFile(
       }
     }
 
-    // Store location and velocity in message buffer but not the constant mass
+    // Store location and velocity and mass in message buffer
     // Reorder so that location vector is followed by velocity vector
     message->putValue(&fBlock[0]);
     message->putValue(&fBlock[2]);
@@ -820,8 +822,9 @@ void ParticleDistribute::readFromRecordFile(
     message->putValue(&fBlock[1]);
     message->putValue(&fBlock[3]);
     message->putValue(&fBlock[5]);
+    message->putValue(&fBlock[6]);
 
-    // Store the integer tag in the float mass position reinterpreted
+    // Store the integer tag
     message->putValue(&iBlock[0]);
   }
 
@@ -931,6 +934,7 @@ void ParticleDistribute::readFromBlockFile(
   // Store the locations in the message buffer in record order
   // so that the same distribution method for RECORD will work
   int indx = 0;
+  POSVEL_T mass = 1.0;
   for (int p = 0; p < numberOfParticles; p++) {
 
     // Locations
@@ -942,6 +946,9 @@ void ParticleDistribute::readFromBlockFile(
     message->putValue(&vBlock[indx]);           // X velocity
     message->putValue(&vBlock[indx+1]);         // Y velocity
     message->putValue(&vBlock[indx+2]);         // Z velocity
+
+    // No mass in gadget files so put a constant
+    message->putValue(&mass);
 
     // Id tag
     message->putValue(&iBlock[p]);
@@ -965,7 +972,7 @@ void ParticleDistribute::collectLocalParticles(Message* message)
 
   int numParticles;
   message->getValue(&numParticles);
-  POSVEL_T loc[DIMENSION], vel[DIMENSION];
+  POSVEL_T loc[DIMENSION], vel[DIMENSION], mass;
   ID_T id;
 
   // Test each particle in the buffer to see if it is ALIVE or DEAD
@@ -977,6 +984,7 @@ void ParticleDistribute::collectLocalParticles(Message* message)
       message->getValue(&loc[dim]);
     for (int dim = 0; dim < DIMENSION; dim++)
       message->getValue(&vel[dim]);
+    message->getValue(&mass);
     message->getValue(&id);
 
     // Is the particle ALIVE on this processor
@@ -990,6 +998,7 @@ void ParticleDistribute::collectLocalParticles(Message* message)
           this->vx->push_back(vel[0]);
           this->vy->push_back(vel[1]);
           this->vz->push_back(vel[2]);
+          this->ms->push_back(mass);
           this->tag->push_back(id);
 
           this->numberOfAliveParticles++;
@@ -1033,6 +1042,7 @@ void ParticleDistribute::readParticlesOneToOne(int reserveQ)
     this->vx->reserve(reserveSize);
     this->vy->reserve(reserveSize);
     this->vz->reserve(reserveSize);
+    this->ms->reserve(reserveSize);
     this->tag->reserve(reserveSize);
   }
 
@@ -1113,6 +1123,7 @@ void ParticleDistribute::readFromRecordFile()
     this->vy->push_back(fBlock[3]);
     this->zz->push_back(fBlock[4]);
     this->vz->push_back(fBlock[5]);
+    this->ms->push_back(fBlock[6]);
     this->tag->push_back(iBlock[0]);
 
     this->numberOfAliveParticles++;
@@ -1187,6 +1198,12 @@ void ParticleDistribute::readFromBlockFile()
     this->vx->push_back(fBlock[0]);
     this->vy->push_back(fBlock[1]);
     this->vz->push_back(fBlock[2]);
+  }
+
+  // Store the constant mass
+  POSVEL_T mass = 1.0;
+  for (int p = 0; p < numberOfParticles; p++) {
+    this->ms->push_back(mass);
   }
 
   // Seek to first particle tags and read

@@ -79,7 +79,7 @@ ChainingMesh::ChainingMesh(
   this->chainSize = chainSz;
 
   // Extract the contiguous data block from a vector pointer
-  this->particleCount = (long)xLoc->size();
+  this->particleCount = xLoc->size();
   this->xx = &(*xLoc)[0];
   this->yy = &(*yLoc)[0];
   this->zz = &(*zLoc)[0];
@@ -99,6 +99,8 @@ ChainingMesh::ChainingMesh(
   POSVEL_T minAlive[DIMENSION];
   POSVEL_T maxAlive[DIMENSION];
   this->meshSize = new int[DIMENSION];
+  this->minRange = new POSVEL_T[DIMENSION];
+  this->maxRange = new POSVEL_T[DIMENSION];
 
   for (int dim = 0; dim < DIMENSION; dim++) {
     boxStep[dim] = this->boxSize / this->layoutSize[dim];
@@ -111,22 +113,22 @@ ChainingMesh::ChainingMesh(
       
     // Allow for the boundary of dead particles, normalized to 0
     // Overall boundary will be [0:(rL+2*deadSize)]
-    this->minMine[dim] = minAlive[dim] - this->deadSize;
-    this->maxMine[dim] = maxAlive[dim] + this->deadSize;
+    this->minRange[dim] = minAlive[dim] - this->deadSize;
+    this->maxRange[dim] = maxAlive[dim] + this->deadSize;
 
     // How many chain mesh grids will fit
-    this->meshSize[dim] = (int)(((this->maxMine[dim] - this->minMine[dim]) / 
-                                 this->chainSize) + 1);
+    this->meshSize[dim] = ((this->maxRange[dim] - this->minRange[dim]) / 
+                            this->chainSize) + 1;
   }
 
-  // Create the chaining mesh of all particles
+  // Create the chaining mesh
   createChainingMesh();
 }
 
 /////////////////////////////////////////////////////////////////////////
 //
-// ChainingMesh assigns all particles in halo to a 3D mesh of buckets
-// Box size and dead size don't pertain, just bounding box of halo
+// ChainingMesh assigns all particles in a halo to a 3D mesh
+// of buckets for more efficient iteration on particles in an area
 //
 /////////////////////////////////////////////////////////////////////////
 
@@ -134,31 +136,33 @@ ChainingMesh::ChainingMesh(
                         POSVEL_T* minLoc,
                         POSVEL_T* maxLoc,
                         POSVEL_T chainSz,
-                        int haloPartCount,
+                        int haloCount,
                         POSVEL_T* xLoc,
                         POSVEL_T* yLoc,
                         POSVEL_T* zLoc)
 {
-  // Imposed bucket size on this processor
+  this->meshSize = new int[DIMENSION];
+  this->minRange = new POSVEL_T[DIMENSION];
+  this->maxRange = new POSVEL_T[DIMENSION];
+
+  // Bucket size
   this->chainSize = chainSz;
 
   // Extract the contiguous data block from a vector pointer
-  this->particleCount = haloPartCount;
+  this->particleCount = haloCount;
   this->xx = xLoc;
   this->yy = yLoc;
   this->zz = zLoc;
-  this->meshSize = new int[DIMENSION];
 
-  // Halo extents
+  // Find the grid size of this chaining mesh
   for (int dim = 0; dim < DIMENSION; dim++) {
-    this->minMine[dim] = minLoc[dim];
-    this->maxMine[dim] = maxLoc[dim];
-
-    this->meshSize[dim] = (int)(((this->maxMine[dim] - this->minMine[dim]) / 
-                                 this->chainSize) + 1);
+    this->minRange[dim] = minLoc[dim];
+    this->maxRange[dim] = maxLoc[dim];
+    this->meshSize[dim] = ((this->maxRange[dim] - this->minRange[dim]) / 
+                            this->chainSize) + 1;
   }
 
-  // Create the chaining mesh of halo particles
+  // Create the chaining mesh
   createChainingMesh();
 }
 
@@ -182,6 +186,8 @@ ChainingMesh::~ChainingMesh()
   delete [] this->bucketCount;
   delete [] this->bucketList;
   delete [] this->meshSize;
+  delete [] this->minRange;
+  delete [] this->maxRange;
 }
 
 /////////////////////////////////////////////////////////////////////////
@@ -233,9 +239,9 @@ void ChainingMesh::createChainingMesh()
     loc[1] = this->yy[p];
     loc[2] = this->zz[p];
 
-    int i = (int)((loc[0] - this->minMine[0]) / this->chainSize);
-    int j = (int)((loc[1] - this->minMine[1]) / this->chainSize);
-    int k = (int)((loc[2] - this->minMine[2]) / this->chainSize);
+    int i = (loc[0] - this->minRange[0]) / this->chainSize;
+    int j = (loc[1] - this->minRange[1]) / this->chainSize;
+    int k = (loc[2] - this->minRange[2]) / this->chainSize;
 
     // First particle in bucket
     if (this->buckets[i][j][k] == -1) {

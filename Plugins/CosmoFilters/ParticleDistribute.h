@@ -139,6 +139,7 @@ public:
                     vector<POSVEL_T>* vx,
                     vector<POSVEL_T>* vy,
                     vector<POSVEL_T>* vz,
+                    vector<POSVEL_T>* mass,
                     vector<ID_T>* tag);
 
   vector<POSVEL_T>* getXLocation()      { return this->xx; }
@@ -147,6 +148,7 @@ public:
   vector<POSVEL_T>* getXVelocity()      { return this->vx; }
   vector<POSVEL_T>* getYVelocity()      { return this->vy; }
   vector<POSVEL_T>* getZVelocity()      { return this->vz; }
+  vector<POSVEL_T>* getMass()           { return this->ms; }
   vector<ID_T>* getTag()                { return this->tag; }
 
 private:

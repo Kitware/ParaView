@@ -64,6 +64,7 @@ using namespace std;
 
 class ChainingMesh {
 public:
+  // Chaining mesh for all particles on a processor
   ChainingMesh(
         POSVEL_T rL,            // Box size of entire physical problem
         POSVEL_T deadSize,      // Dead size of overflow particles
@@ -72,12 +73,13 @@ public:
         vector<POSVEL_T>* yLoc,
         vector<POSVEL_T>* zLoc);
 
+  // Chaining mesh for a single halo
   ChainingMesh(
-        POSVEL_T* minLoc,       // Extent for one halo's particles
-        POSVEL_T* maxLoc,       // Extent for one halo's particles
+        POSVEL_T* minLoc,       // Bounding box of halo
+        POSVEL_T* maxLoc,       // Bounding box of halo
         POSVEL_T chainSize,     // Mesh size imposed on this physical space
-        int haloPartCount,      // Number of locations
-        POSVEL_T* xLoc,         // Locations of every particle on processor
+        int haloCount,          // Number of particles in halo
+        POSVEL_T* xLoc,         // Locations of every particle
         POSVEL_T* yLoc,
         POSVEL_T* zLoc);
 
@@ -90,11 +92,15 @@ public:
   void printChainingMeshCentroids();
 
   POSVEL_T getChainSize()       { return this->chainSize; }
-  POSVEL_T getMinMine(int dim)  { return this->minMine[dim]; }
-  POSVEL_T getMaxMine(int dim)  { return this->maxMine[dim]; }
+
+  POSVEL_T getMinMine(int dim)  { return this->minRange[dim]; }
+  POSVEL_T getMaxMine(int dim)  { return this->maxRange[dim]; }
   int getMeshSize(int dim)      { return this->meshSize[dim]; }
 
+  POSVEL_T* getMinRange()       { return this->minRange; }
+  POSVEL_T* getMaxRange()       { return this->maxRange; }
   int* getMeshSize()            { return this->meshSize; }
+
   int*** getBucketCount()       { return this->bucketCount; }
   int*** getBuckets()           { return this->buckets; }
   int* getBucketList()          { return this->bucketList; }
@@ -116,10 +122,10 @@ private:
                                 // processor index where it is ALIVE
 
   POSVEL_T chainSize;           // Grid size in chaining mesh
-  POSVEL_T minMine[DIMENSION];  // Physical range on processor, including dead
-  POSVEL_T maxMine[DIMENSION];  // Physical range on processor, including dead
-
+  POSVEL_T* minRange;           // Physical range on processor, including dead
+  POSVEL_T* maxRange;           // Physical range on processor, including dead
   int* meshSize;                // Chaining mesh grid dimension
+
   int*** buckets;               // First particle index into bucketList
   int*** bucketCount;           // Size of each bucket 
   int* bucketList;              // Indices of next particle in halo

@@ -108,6 +108,7 @@ public:
         vector<POSVEL_T>* vx,
         vector<POSVEL_T>* vy,
         vector<POSVEL_T>* vz,
+        vector<POSVEL_T>* mass,
         vector<POTENTIAL_T>* potential,
         vector<ID_T>* tag,
         vector<MASK_T>* mask,
@@ -166,12 +167,12 @@ private:
   vector<POSVEL_T>* vx;         // X velocity for particles on this processor
   vector<POSVEL_T>* vy;         // Y velocity for particles on this processor
   vector<POSVEL_T>* vz;         // Z velocity for particles on this processor
+  vector<POSVEL_T>* ms;         // Mass for particles on this processor
   vector<ID_T>* tag;            // Id tag for particles on this processor
   vector<STATUS_T>* status;     // Particle is ALIVE or labeled with neighbor
                                 // processor index where it is ALIVE
   vector<POTENTIAL_T>* pot;     // Id tag for particles on this processor
   vector<MASK_T>* mask;         // Id tag for particles on this processor
-
 };
 
 #endif

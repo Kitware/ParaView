@@ -52,6 +52,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define FOFHaloProperties_h
 
 #include "Definition.h"
+#include "ChainingMesh.h"
 #include <string>
 #include <vector>
 
@@ -92,7 +93,7 @@ public:
 
   /////////////////////////////////////////////////////////////////////
   //
-  // FOF (Friend of friends) halo analysis
+  // FOF (Friend of friends) center finding
   //
   /////////////////////////////////////////////////////////////////////
 
@@ -102,12 +103,99 @@ public:
   // Find the halo centers using most bound particle (N^2/2)
   void FOFHaloCenterMBP(vector<int>* haloCenter);
   int  mostBoundParticleN2(int h, POTENTIAL_T* minPotential);
+
+  // Initial guess of A* contains an actual part and an estimated part
   int  mostBoundParticleAStar(int h);
+
+  // Calculate actual values between particles within a bucket
+  void aStarThisBucketPart(
+        ChainingMesh* haloChain,        // Buckets of particles
+        POSVEL_T* xLocHalo,             // Locations within buckets
+        POSVEL_T* yLocHalo,
+        POSVEL_T* zLocHalo,
+        int* bucketID,                  // Map from particle to bucket
+        POSVEL_T* estimate);            // Running minimum potential
+
+  // Calculate actual values for 26 neighbors in the center of halo
+  // Level 1 refinement done for initial guess
+  void aStarActualNeighborPart(
+        ChainingMesh* haloChain,        // Buckets of particles
+        int* minActual,                 // Range for doing actual vs estimated
+        int* maxActual,
+        POSVEL_T* xLocHalo,             // Locations within buckets
+        POSVEL_T* yLocHalo,
+        POSVEL_T* zLocHalo,
+        int* refineLevel,               // Refinement level of each particle
+        POSVEL_T* estimate);            // Running minimum potential
+
+  // Calculate estimated values for 26 neighbors around the edges of halo
+  // Level 0 refinement done for initial guess
+  void aStarEstimatedNeighborPart(
+        ChainingMesh* haloChain,        // Buckets of particles
+        int* minActual,                 // Range for doing actual vs estimated
+        int* maxActual,
+        POSVEL_T* xLocHalo,             // Locations within buckets
+        POSVEL_T* yLocHalo,
+        POSVEL_T* zLocHalo,
+        int* refineLevel,               // Refinement level of each particle
+        POSVEL_T* estimate,             // Running minimum potential
+        POSVEL_T boundarySize);         // Boundary around bucket for estimation
+
+  // Calculate estimates for all buckets beyond the 27 closest
+  void aStarEstimatedPart(
+        ChainingMesh* haloChain,        // Buckets of particles
+        POSVEL_T* xLocHalo,             // Locations within buckets
+        POSVEL_T* yLocHalo,
+        POSVEL_T* zLocHalo,
+        POSVEL_T* estimate);            // Running minimum potential
+
+  // Refinement of 0 to 1
+  void refineAStarLevel_1(
+        ChainingMesh* haloChain,        // Buckets of particles
+        int bi,                         // Bucket containing particle to refine
+        int bj,
+        int bk,
+        int* minActual,                 // Range for doing actual vs estimated
+        int* maxActual,
+        POSVEL_T* xLocHalo,             // Locations within buckets
+        POSVEL_T* yLocHalo,
+        POSVEL_T* zLocHalo,
+        int minParticle,                // Particle to refine
+        POSVEL_T* estimate,             // Running minimum potential
+        POSVEL_T boundarySize);         // Boundary around bucket for estimation
+
+  // Refinement of 1 to N
+  void refineAStarLevel_N(
+        ChainingMesh* haloChain,        // Buckets of particles
+        int bi,                         // Bucket containing particle to refine
+        int bj,
+        int bk,
+        POSVEL_T* xLocHalo,             // Locations within buckets
+        POSVEL_T* yLocHalo,
+        POSVEL_T* zLocHalo,
+        int minParticle,                // Particle to refine
+        POSVEL_T* estimate,             // Running minimum potential
+        int winDelta);                  // Number of buckets to refine out to
 
   // Find the halo centers using most connected particle (N^2/2)
   void FOFHaloCenterMCP(vector<int>* haloCenter);
   int  mostConnectedParticleN2(int h);
   int  mostConnectedParticleChainMesh(int h);
+
+  // Build a chaining mesh of halo particles
+  ChainingMesh* buildChainingMesh(
+        int halo,
+        POSVEL_T chainSize,
+        POSVEL_T* xLocHalo,
+        POSVEL_T* yLocHalo,
+        POSVEL_T* zLocHalo,
+        int* actualIndx);
+
+  /////////////////////////////////////////////////////////////////////
+  //
+  // FOF (Friend of friends) halo analysis
+  //
+  /////////////////////////////////////////////////////////////////////
 
   // Find the mass of each halo
   void FOFHaloMass(
