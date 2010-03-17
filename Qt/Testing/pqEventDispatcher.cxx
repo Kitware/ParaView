@@ -55,10 +55,6 @@ pqEventDispatcher::pqEventDispatcher(QObject* parentObject) :
   this->ActivePlayer = NULL;
   this->PlayBackStatus = false;
   this->PlayBackFinished = false;
-  QObject::connect(QAbstractEventDispatcher::instance(), SIGNAL(aboutToBlock()),
-                   this, SLOT(aboutToBlock()));
-  QObject::connect(QAbstractEventDispatcher::instance(), SIGNAL(awake()),
-                   this, SLOT(awake()));
 
 #ifdef __APPLE__
   this->BlockTimer.setInterval(1000);
@@ -113,6 +109,12 @@ bool pqEventDispatcher::playEvents(pqEventSource& source, pqEventPlayer& player)
 
   QApplication::setEffectEnabled(Qt::UI_General, false);
 
+  QObject::connect(QAbstractEventDispatcher::instance(), SIGNAL(aboutToBlock()),
+                   this, SLOT(aboutToBlock()));
+  QObject::connect(QAbstractEventDispatcher::instance(), SIGNAL(awake()),
+                   this, SLOT(awake()));
+
+
   // This is how the playback logic works:
   // * In here, we continuously keep on playing one event after another until
   //   we are done processing all the events.
@@ -133,6 +135,12 @@ bool pqEventDispatcher::playEvents(pqEventSource& source, pqEventPlayer& player)
     }
   this->ActiveSource = NULL;
   this->ActivePlayer = NULL;
+
+  QObject::disconnect(QAbstractEventDispatcher::instance(), SIGNAL(aboutToBlock()),
+                   this, SLOT(aboutToBlock()));
+  QObject::disconnect(QAbstractEventDispatcher::instance(), SIGNAL(awake()),
+                   this, SLOT(awake()));
+
   return this->PlayBackStatus;
 }
 
