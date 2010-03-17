@@ -808,11 +808,11 @@ int FOFHaloProperties::mostBoundParticleAStar(int halo)
                               xLocHalo, yLocHalo, zLocHalo, actualIndx);
 
   // Get chaining mesh information
-  int*** bucketCount = haloChain->getBucketCount();
-  int*** buckets = haloChain->getBuckets();
-  int* bucketList = haloChain->getBucketList();
+  //int*** bucketCount = haloChain->getBucketCount();
+  //int*** buckets = haloChain->getBuckets();
+  //int* bucketList = haloChain->getBucketList();
   int* meshSize = haloChain->getMeshSize();
-  POSVEL_T* minRange = haloChain->getMinRange();
+  //POSVEL_T* minRange = haloChain->getMinRange();
 
   // Bucket ID allows finding the bucket every particle is in
   int* bucketID = new int[this->haloCount[halo]];
@@ -1020,7 +1020,7 @@ void FOFHaloProperties::aStarThisBucketPart(
                         POSVEL_T* estimate)
 {
   POSVEL_T xdist, ydist, zdist, dist;
-  int bp, bp2, bi, bj, bk;
+  int /*bp, bp2,*/ bi, bj, bk;
 
   // Get chaining mesh information
   int*** buckets = haloChain->getBuckets();
@@ -1272,7 +1272,7 @@ void FOFHaloProperties::aStarEstimatedNeighborPart(
 {   
   // Walking window extents and size
   int bp, bi, bj, bk;
-  int wp, wi, wj, wk;
+  int /*wp,*/ wi, wj, wk;
   int first[DIMENSION], last[DIMENSION];
   POSVEL_T minBound[DIMENSION], maxBound[DIMENSION];
   POSVEL_T xNear, yNear, zNear;
