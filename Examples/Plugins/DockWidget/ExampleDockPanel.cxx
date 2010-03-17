@@ -4,8 +4,8 @@
 void ExampleDockPanel::constructor()
 {
   this->setWindowTitle("Example Dock Panel");
-  QWidget* widget = new QWidget(this);
+  QWidget* t_widget = new QWidget(this);
   Ui::ExampleDockPanel ui;
-  ui.setupUi(widget);
-  this->setWidget(widget);
+  ui.setupUi(t_widget);
+  this->setWidget(t_widget);
 }

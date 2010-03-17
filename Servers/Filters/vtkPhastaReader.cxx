@@ -29,7 +29,7 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkSmartPointer.h"
 #include "vtkUnstructuredGrid.h"
 
-vtkCxxRevisionMacro(vtkPhastaReader, "1.11");
+vtkCxxRevisionMacro(vtkPhastaReader, "1.12");
 vtkStandardNewMacro(vtkPhastaReader);
 
 vtkCxxSetObjectMacro(vtkPhastaReader, CachedGrid, vtkUnstructuredGrid);
@@ -77,7 +77,7 @@ int binary_format = 0;
 // the caller has the responsibility to delete the returned string 
 char* vtkPhastaReader::StringStripper( const char  istring[] ) 
 {
-  int length = strlen( istring );
+  size_t length = strlen( istring );
   char* dest = new char [ length + 1 ];
   strcpy( dest, istring );
   dest[ length ] = '\0';

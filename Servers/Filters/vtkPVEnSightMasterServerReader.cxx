@@ -43,7 +43,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVEnSightMasterServerReader);
-vtkCxxRevisionMacro(vtkPVEnSightMasterServerReader, "1.28");
+vtkCxxRevisionMacro(vtkPVEnSightMasterServerReader, "1.29");
 
 vtkCxxSetObjectMacro(vtkPVEnSightMasterServerReader, Controller,
                      vtkMultiProcessController);
@@ -293,7 +293,8 @@ int vtkPVEnSightMasterServerReader::RequestInformation(
     }
   if(vtkPVEnSightMasterServerReaderSyncValues(
        &*this->Internal->TimeSetValues.begin(),
-       this->Internal->TimeSetValues.size(), this->NumberOfPieces,
+       static_cast<int>(this->Internal->TimeSetValues.size()),
+       this->NumberOfPieces,
        this->Controller) != VTK_OK)
     {
     vtkErrorMacro("Time set values do not match on all nodes.");
