@@ -134,7 +134,9 @@ void pqChangePipelineInputReaction::changeInput()
     vtkSMInputProperty* ip =vtkSMInputProperty::SafeDownCast(
       filter->getProxy()->GetProperty(
         inputPortName.toAscii().data()));
-    ip->SetProxies(inputPtrs.size(), &inputPtrs[0], &inputPorts[0]);
+    ip->SetProxies(
+      static_cast<unsigned int>(inputPtrs.size()),
+      &inputPtrs[0], &inputPorts[0]);
     }
   filter->getProxy()->UpdateVTKObjects();
   END_UNDO_SET();
