@@ -724,9 +724,9 @@ int FOFHaloProperties::mostBoundParticleN2(int halo, POTENTIAL_T* minPotential)
 
     while (q != -1) {
 
-      POSVEL_T xdist = fabs(this->xx[p] - this->xx[q]);
-      POSVEL_T ydist = fabs(this->yy[p] - this->yy[q]);
-      POSVEL_T zdist = fabs(this->zz[p] - this->zz[q]);
+      POSVEL_T xdist = (POSVEL_T)fabs(this->xx[p] - this->xx[q]);
+      POSVEL_T ydist = (POSVEL_T)fabs(this->yy[p] - this->yy[q]);
+      POSVEL_T zdist = (POSVEL_T)fabs(this->zz[p] - this->zz[q]);
 
       POSVEL_T r = sqrt((xdist * xdist) + (ydist * ydist) + (zdist * zdist));
       POSVEL_T value = 1.0 / r;
@@ -796,7 +796,7 @@ int FOFHaloProperties::mostBoundParticleAStar(int halo)
   POSVEL_T chainSize = this->bb * chainFactor;
 
   // Boundary around edges of a bucket for calculating estimate
-  POSVEL_T boundaryFactor = 10.0 * chainFactor;
+  POSVEL_T boundaryFactor = 10.0f * chainFactor;
   POSVEL_T boundarySize = chainSize / boundaryFactor;
 
   // Actual values calculated for 26 neighbors in the center of a halo
@@ -1042,9 +1042,9 @@ void FOFHaloProperties::aStarThisBucketPart(
 
           int bp2 = bucketList[bp];
           while (bp2 != -1) {
-            xdist = fabs(xLocHalo[bp] - xLocHalo[bp2]);
-            ydist = fabs(yLocHalo[bp] - yLocHalo[bp2]);
-            zdist = fabs(zLocHalo[bp] - zLocHalo[bp2]);
+            xdist = (POSVEL_T)fabs(xLocHalo[bp] - xLocHalo[bp2]);
+            ydist = (POSVEL_T)fabs(yLocHalo[bp] - yLocHalo[bp2]);
+            zdist = (POSVEL_T)fabs(zLocHalo[bp] - zLocHalo[bp2]);
             dist = sqrt((xdist*xdist) + (ydist*ydist) + (zdist*zdist));
             if (dist != 0.0) {
               POSVEL_T value = 1.0 / dist;
@@ -1132,9 +1132,9 @@ void FOFHaloProperties::aStarActualNeighborPart(
 
                     wp = buckets[wi][wj][wk];
                     while (wp != -1) {
-                      xdist = fabs(xLocHalo[bp] - xLocHalo[wp]);
-                      ydist = fabs(yLocHalo[bp] - yLocHalo[wp]);
-                      zdist = fabs(zLocHalo[bp] - zLocHalo[wp]);
+                      xdist = (POSVEL_T)fabs(xLocHalo[bp] - xLocHalo[wp]);
+                      ydist = (POSVEL_T)fabs(yLocHalo[bp] - yLocHalo[wp]);
+                      zdist = (POSVEL_T)fabs(zLocHalo[bp] - zLocHalo[wp]);
                       dist = sqrt((xdist*xdist)+(ydist*ydist)+(zdist*zdist));
                       if (dist != 0.0) {
                         POSVEL_T value = 1.0 / dist;
@@ -1211,9 +1211,9 @@ void FOFHaloProperties::aStarActualNeighborPart(
             for (wk = first[2]; wk <= last[2]; wk++) {
               wp = buckets[wi][wj][wk];
               while (wp != -1) {
-                xdist = fabs(xLocHalo[bp] - xLocHalo[wp]);
-                ydist = fabs(yLocHalo[bp] - yLocHalo[wp]);
-                zdist = fabs(zLocHalo[bp] - zLocHalo[wp]);
+                xdist = (POSVEL_T)fabs(xLocHalo[bp] - xLocHalo[wp]);
+                ydist = (POSVEL_T)fabs(yLocHalo[bp] - yLocHalo[wp]);
+                zdist = (POSVEL_T)fabs(zLocHalo[bp] - zLocHalo[wp]);
                 dist = sqrt((xdist*xdist) + (ydist*ydist) + (zdist*zdist));
                 if (dist != 0) {
                   POSVEL_T value = 1.0 / dist;
@@ -1231,9 +1231,9 @@ void FOFHaloProperties::aStarActualNeighborPart(
           for (wk = bk + 1; wk <= last[2]; wk++) {
             wp = buckets[wi][wj][wk];
             while (wp != -1) {
-              xdist = fabs(xLocHalo[bp] - xLocHalo[wp]);
-              ydist = fabs(yLocHalo[bp] - yLocHalo[wp]);
-              zdist = fabs(zLocHalo[bp] - zLocHalo[wp]);
+              xdist = (POSVEL_T)fabs(xLocHalo[bp] - xLocHalo[wp]);
+              ydist = (POSVEL_T)fabs(yLocHalo[bp] - yLocHalo[wp]);
+              zdist = (POSVEL_T)fabs(zLocHalo[bp] - zLocHalo[wp]);
               dist = sqrt((xdist*xdist) + (ydist*ydist) + (zdist*zdist));
               if (dist != 0.0) {
                 POSVEL_T value = 1.0 / dist;
@@ -1344,13 +1344,13 @@ void FOFHaloProperties::aStarEstimatedNeighborPart(
 
                     // What is the nearest point between buckets
                     if (wi < bi)  xNear = minBound[0];
-                    if (wi == bi) xNear = (minBound[0] + maxBound[0]) / 2.0;
+                    if (wi == bi) xNear = (minBound[0] + maxBound[0]) / 2.0f;
                     if (wi > bi)  xNear = maxBound[0];
                     if (wj < bj)  yNear = minBound[1];
-                    if (wj == bj) yNear = (minBound[1] + maxBound[1]) / 2.0;
+                    if (wj == bj) yNear = (minBound[1] + maxBound[1]) / 2.0f;
                     if (wj > bj)  yNear = maxBound[1];
                     if (wk < bk)  zNear = minBound[2];
-                    if (wk == bk) zNear = (minBound[2] + maxBound[2]) / 2.0;
+                    if (wk == bk) zNear = (minBound[2] + maxBound[2]) / 2.0f;
                     if (wk > bk)  zNear = maxBound[2];
 
                     int wp = buckets[wi][wj][wk];
@@ -1365,9 +1365,9 @@ void FOFHaloProperties::aStarEstimatedNeighborPart(
 
                         // Is the window particle within the boundary condition
                         // Calculate actual potential
-                        xdist = fabs(xLocHalo[bp] - xLocHalo[wp]);
-                        ydist = fabs(yLocHalo[bp] - yLocHalo[wp]);
-                        zdist = fabs(zLocHalo[bp] - zLocHalo[wp]);
+                        xdist = (POSVEL_T)fabs(xLocHalo[bp] - xLocHalo[wp]);
+                        ydist = (POSVEL_T)fabs(yLocHalo[bp] - yLocHalo[wp]);
+                        zdist = (POSVEL_T)fabs(zLocHalo[bp] - zLocHalo[wp]);
                         dist = sqrt(xdist*xdist + ydist*ydist + zdist*zdist);
                         if (dist != 0.0) {
                           POSVEL_T value = 1.0 / dist;
@@ -1382,9 +1382,9 @@ void FOFHaloProperties::aStarEstimatedNeighborPart(
 
                     // Find nearest corner or location to this bucket
                     // Calculate estimated value for the part of the bucket
-                    xdist = fabs(xLocHalo[bp] - xNear);
-                    ydist = fabs(yLocHalo[bp] - yNear);
-                    zdist = fabs(zLocHalo[bp] - zNear);
+                    xdist = (POSVEL_T)fabs(xLocHalo[bp] - xNear);
+                    ydist = (POSVEL_T)fabs(yLocHalo[bp] - yNear);
+                    zdist = (POSVEL_T)fabs(zLocHalo[bp] - zNear);
                     dist = sqrt((xdist*xdist) + (ydist*ydist) + (zdist*zdist));
                     if (dist != 0) {
                       POSVEL_T value = (1.0 / dist) * estimatedParticleCount;
@@ -1595,9 +1595,9 @@ void FOFHaloProperties::refineAStarLevel_1(
               estimatedParticleCount++;
 
               // Calculate actual potential
-              xdist = fabs(xLocHalo[bp] - xLocHalo[wp]);
-              ydist = fabs(yLocHalo[bp] - yLocHalo[wp]);
-              zdist = fabs(zLocHalo[bp] - zLocHalo[wp]);
+              xdist = (POSVEL_T)fabs(xLocHalo[bp] - xLocHalo[wp]);
+              ydist = (POSVEL_T)fabs(yLocHalo[bp] - yLocHalo[wp]);
+              zdist = (POSVEL_T)fabs(zLocHalo[bp] - zLocHalo[wp]);
               dist = sqrt(xdist*xdist + ydist*ydist + zdist*zdist);
               if (dist != 0.0) {
                 POSVEL_T value = 1.0 / dist;
@@ -1609,9 +1609,9 @@ void FOFHaloProperties::refineAStarLevel_1(
 
           // Find nearest corner or location to this bucket
           // Calculate estimated value for the part of the bucket
-          xdist = fabs(xLocHalo[bp] - xNear);
-          ydist = fabs(yLocHalo[bp] - yNear);
-          zdist = fabs(zLocHalo[bp] - zNear);
+          xdist = (POSVEL_T)fabs(xLocHalo[bp] - xNear);
+          ydist = (POSVEL_T)fabs(yLocHalo[bp] - yNear);
+          zdist = (POSVEL_T)fabs(zLocHalo[bp] - zNear);
           dist = sqrt((xdist*xdist) + (ydist*ydist) + (zdist*zdist));
           if (dist != 0) {
             POSVEL_T value = (1.0 / dist) * estimatedParticleCount;
@@ -1693,9 +1693,9 @@ void FOFHaloProperties::refineAStarLevel_N(
                   
             // Distance of this particle to the corner gives estimate
             // which was subtracted in initialPhase and now is added back
-            xdist = fabs(xLocHalo[bp] - xNear);
-            ydist = fabs(yLocHalo[bp] - yNear);
-            zdist = fabs(zLocHalo[bp] - zNear);
+            xdist = (POSVEL_T)fabs(xLocHalo[bp] - xNear);
+            ydist = (POSVEL_T)fabs(yLocHalo[bp] - yNear);
+            zdist = (POSVEL_T)fabs(zLocHalo[bp] - zNear);
             dist = sqrt((xdist*xdist) + (ydist*ydist) + (zdist*zdist));
             if (dist != 0) {
               POSVEL_T value = (1.0 / dist) * bucketCount[wi][wj][wk];
