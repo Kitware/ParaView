@@ -438,9 +438,9 @@ def append_trace():
         extraCtorCommands = "GetRenderView().Representations.append(%s)" % info.PyVariable
 
       if info.Group == "views":
-        if info.Proxy.GetXMLLabel() == "XYPlotView":
+        if info.Proxy.GetXMLLabel() == "XYChartView":
           ctorMethod = "CreateXYPlotView"
-        elif info.Proxy.GetXMLLabel() == "BarChartView":
+        elif info.Proxy.GetXMLLabel() == "XYBarChartView":
           ctorMethod = "CreateBarChartView"
         else:
           ctorMethod = "CreateRenderView"
