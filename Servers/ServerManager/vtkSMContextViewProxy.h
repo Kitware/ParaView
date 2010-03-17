@@ -35,9 +35,9 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Saves the chart view as an image file.  See vtkQtChartView::SaveImage().
-  // Returns true on success.
-  bool WriteImage(const char* filename);
+  // Saves a screenshot of the view to disk.  The writerName argument specifies
+  // the vtkImageWriter subclass to use.
+  int WriteImage(const char* filename, const char* writerName, int magnification);
 
 //BTX
   // Description:

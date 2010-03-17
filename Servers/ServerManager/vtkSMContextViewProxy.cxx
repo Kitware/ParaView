@@ -18,6 +18,7 @@
 #include "vtkRenderWindow.h"
 #include "vtkWindowToImageFilter.h"
 #include "vtkProcessModule.h"
+#include "vtkErrorCode.h"
 
 #include "vtkObjectFactory.h"
 #include "vtkQtChartInteractorSetup.h"
@@ -25,6 +26,7 @@
 #include "vtkQtChartWidget.h"
 #include "vtkQtChartView.h"
 #include "vtkSMChartOptionsProxy.h"
+#include "vtkSMUtilities.h"
 
 #include "QVTKWidget.h"
 #include <QPointer>
@@ -48,7 +50,7 @@ public:
 };
 
 
-vtkCxxRevisionMacro(vtkSMContextViewProxy, "1.6");
+vtkCxxRevisionMacro(vtkSMContextViewProxy, "1.7");
 //----------------------------------------------------------------------------
 vtkSMContextViewProxy::vtkSMContextViewProxy()
 {
@@ -126,12 +128,18 @@ vtkImageData* vtkSMContextViewProxy::CaptureWindow(int magnification)
   return capture;
 }
 
-//----------------------------------------------------------------------------
-bool vtkSMContextViewProxy::WriteImage(const char*)
+//-----------------------------------------------------------------------------
+int vtkSMContextViewProxy::WriteImage(const char* filename,
+  const char* writerName, int magnification)
 {
-//  this->PerformRender();
-//  return this->ChartView->SaveImage(filename);
-  return false;
+  if (!filename || !writerName)
+    {
+    return vtkErrorCode::UnknownError;
+    }
+
+  vtkSmartPointer<vtkImageData> shot;
+  shot.TakeReference(this->CaptureWindow(magnification));
+  return vtkSMUtilities::SaveImageOnProcessZero(shot, filename, writerName);
 }
 
 //----------------------------------------------------------------------------
