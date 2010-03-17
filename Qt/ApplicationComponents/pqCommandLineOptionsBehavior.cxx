@@ -105,7 +105,11 @@ void pqCommandLineOptionsBehavior::processCommandLineOptions()
       QString());
     dialog.setFileMode(pqFileDialog::ExistingFiles);
     dialog.selectFile(options->GetParaViewDataName());
-    pqLoadDataReaction::loadData(dialog.getSelectedFiles());
+    if (pqLoadDataReaction::loadData(dialog.getSelectedFiles()) == NULL)
+      {
+      qCritical() << "Failed to load data file: " <<
+        options->GetParaViewDataName();
+      }
     }
   else if (options->GetStateFileName())
     {
