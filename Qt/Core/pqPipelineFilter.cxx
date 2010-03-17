@@ -42,7 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMDomain.h"
 #include "vtkSMDomainIterator.h"
 #include "vtkSMInputProperty.h"
-#include "vtkSMPropertyIterator.h"
+#include "vtkSMOrderedPropertyIterator.h"
 #include "vtkSMPVRepresentationProxy.h"
 
 //Qt includes.
@@ -103,8 +103,8 @@ static void pqPipelineFilterGetInputProperties(QList<const char*> &list,
   vtkSMProxy* proxy, 
   bool skip_optional)
 {
-  vtkSmartPointer<vtkSMPropertyIterator> propIter;
-  propIter.TakeReference(proxy->NewPropertyIterator());
+  vtkSMOrderedPropertyIterator* propIter = vtkSMOrderedPropertyIterator::New();
+  propIter->SetProxy(proxy);
   for (propIter->Begin(); !propIter->IsAtEnd(); propIter->Next())
     {
     vtkSMInputProperty* inputProp = vtkSMInputProperty::SafeDownCast(
@@ -154,6 +154,7 @@ static void pqPipelineFilterGetInputProperties(QList<const char*> &list,
         }
       }
     }
+  propIter->Delete();
 }
 
 //-----------------------------------------------------------------------------

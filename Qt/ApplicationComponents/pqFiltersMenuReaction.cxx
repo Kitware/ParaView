@@ -33,18 +33,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqActiveObjects.h"
 #include "pqApplicationCore.h"
+#include "pqChangeInputDialog.h"
 #include "pqCoreUtilities.h"
-#include "pqFilterInputDialog.h"
 #include "pqObjectBuilder.h"
 #include "pqOutputPort.h"
 #include "pqPipelineFilter.h"
-#include "pqPipelineModel.h"
 #include "pqProxyGroupMenuManager.h"
 #include "pqServer.h"
 #include "pqServerManagerSelectionModel.h"
 #include "pqUndoStack.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMInputProperty.h"
+#include "vtkSMPropertyHelper.h"
 #include "vtkSMPropertyIterator.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMSourceProxy.h"
@@ -250,42 +250,29 @@ pqPipelineSource* pqFiltersMenuReaction::createFilter(
   // If the filter has more than 1 input ports, we are simply going to ask the 
   // user to make selection for the inputs for each port. We may change that in 
   // future to be smarter.
-  int numInputPorts = inputPortNames.size();
   if (pqPipelineFilter::getRequiredInputPorts(prototype).size() > 1)
     {
-    vtkSmartPointer<vtkSMProxy> filterProxy;
-    filterProxy.TakeReference(pxm->NewProxy("filters", xmlname.toAscii().data()));
-    filterProxy->SetConnectionID(server->GetConnectionID());
+    vtkSMProxy* filterProxy = pxm->GetPrototypeProxy("filters",
+      xmlname.toAscii().data());
+    vtkSMPropertyHelper helper(filterProxy, inputPortNames[0]);
+    helper.RemoveAllValues();
 
-    // Create a dummy pqPipelineFilter which we can use to
-    // pass on to the pqFilterInputDialog.
-    pqPipelineFilter filter (xmlname, filterProxy, server, NULL);
-    
-    pqFilterInputDialog dialog(pqCoreUtilities::mainWidget());
-    dialog.setObjectName("SelectInputDialog");
-
-    pqServerManagerModel *smModel =
-        pqApplicationCore::instance()->getServerManagerModel();
-    pqPipelineModel model(*smModel);
-    model.addSource(&filter);
     foreach (pqOutputPort *outputPort, selectedOutputPorts)
       {
-      model.addConnection(outputPort->getSource(), &filter,
-          outputPort->getPortNumber());
+      helper.Add(outputPort->getSource()->getProxy(),
+        outputPort->getPortNumber());
       }
 
-    dialog.setModelAndFilter(&model, &filter, namedInputs);
+    pqChangeInputDialog dialog(filterProxy, pqCoreUtilities::mainWidget());
+    dialog.setObjectName("SelectInputDialog");
     if (QDialog::Accepted != dialog.exec())
       {
+      helper.RemoveAllValues();
       // User aborted creation.
       return 0; 
       }
-
-    for (int cc=0; cc < numInputPorts; cc++)
-      {
-      QString portName = filter.getInputPortName(cc);
-      namedInputs[portName] = dialog.getFilterInputs(portName);
-      }
+    helper.RemoveAllValues();
+    namedInputs = dialog.selectedInputs();
     }
 
   BEGIN_UNDO_SET(QString("Create '%1'").arg(xmlname));

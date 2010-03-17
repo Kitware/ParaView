@@ -32,8 +32,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqChangePipelineInputReaction.h"
 
 #include "pqApplicationCore.h"
+#include "pqChangeInputDialog.h"
 #include "pqCoreUtilities.h"
-#include "pqFilterInputDialog.h"
 #include "pqOutputPort.h"
 #include "pqPipelineFilter.h"
 #include "pqPipelineModel.h"
@@ -102,40 +102,44 @@ void pqChangePipelineInputReaction::changeInput()
     return;
     }
 
-  pqFilterInputDialog dialog(pqCoreUtilities::mainWidget());
+  pqChangeInputDialog dialog(filter->getProxy(),
+    pqCoreUtilities::mainWidget());
   dialog.setObjectName("ChangeInputDialog");
-  pqServerManagerModel *smModel =
-    pqApplicationCore::instance()->getServerManagerModel();
-  pqPipelineModel model(*smModel);
-  dialog.setModelAndFilter(&model, filter, filter->getNamedInputs());
-  if (QDialog::Accepted == dialog.exec())
+  if (dialog.exec() != QDialog::Accepted)
     {
-    BEGIN_UNDO_SET(QString("Change Input for %1").arg(
-        filter->getSMName()));
-    for (int cc=0; cc < filter->getNumberOfInputPorts(); cc++)
-      {
-      QString inputPortName = filter->getInputPortName(cc);
-      QList<pqOutputPort*> inputs = dialog.getFilterInputs(inputPortName);
-
-      vtkstd::vector<vtkSMProxy*> inputPtrs;
-      vtkstd::vector<unsigned int> inputPorts;
-
-      foreach (pqOutputPort* opport, inputs)
-        {
-        inputPtrs.push_back(opport->getSource()->getProxy());
-        inputPorts.push_back(opport->getPortNumber());
-        }
-
-      vtkSMInputProperty* ip =vtkSMInputProperty::SafeDownCast(
-        filter->getProxy()->GetProperty(
-          inputPortName.toAscii().data()));
-      ip->SetProxies(inputPtrs.size(), &inputPtrs[0], &inputPorts[0]);
-      }
-    filter->getProxy()->UpdateVTKObjects();
-    END_UNDO_SET();
-
-    // render all views
-    pqApplicationCore::instance()->render();
+    return;
     }
+
+  BEGIN_UNDO_SET(QString("Change Input for %1").arg(
+      filter->getSMName()));
+
+  const QMap<QString, QList<pqOutputPort*> > input_map =
+    dialog.selectedInputs();
+  QMap<QString, QList<pqOutputPort*> >::const_iterator iter; 
+
+  for (iter = input_map.begin(); iter != input_map.end(); iter++)
+    {
+    QString inputPortName = iter.key();
+    const QList<pqOutputPort*> &inputs = iter.value();
+
+    vtkstd::vector<vtkSMProxy*> inputPtrs;
+    vtkstd::vector<unsigned int> inputPorts;
+
+    foreach (pqOutputPort* opport, inputs)
+      {
+      inputPtrs.push_back(opport->getSource()->getProxy());
+      inputPorts.push_back(opport->getPortNumber());
+      }
+
+    vtkSMInputProperty* ip =vtkSMInputProperty::SafeDownCast(
+      filter->getProxy()->GetProperty(
+        inputPortName.toAscii().data()));
+    ip->SetProxies(inputPtrs.size(), &inputPtrs[0], &inputPorts[0]);
+    }
+  filter->getProxy()->UpdateVTKObjects();
+  END_UNDO_SET();
+
+  // render all views
+  pqApplicationCore::instance()->render();
 }
 

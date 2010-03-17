@@ -36,9 +36,9 @@
   <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mouseRelease" arguments="1,0,0,79,4,/0:0/0:0/0:0" />
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_Edit" />
   <pqevent object="pqClientMainWindow/menubar/menu_Edit" command="activate" arguments="actionChangeInput" />
-  <pqevent object="pqClientMainWindow/ChangeInputDialog/Sources" command="mousePress" arguments="1,1,0,60,15,/0:0/1:0" />
-  <pqevent object="pqClientMainWindow/ChangeInputDialog/Sources" command="mouseRelease" arguments="1,0,0,60,15,/0:0/1:0" />
-  <pqevent object="pqClientMainWindow/ChangeInputDialog/OkButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/ChangeInputDialog/pipelineView" command="mousePress" arguments="1,1,0,43,13,/0:0/1:0" />
+  <pqevent object="pqClientMainWindow/ChangeInputDialog/pipelineView" command="mouseRelease" arguments="1,0,0,43,13,/0:0/1:0" />
+  <pqevent object="pqClientMainWindow/ChangeInputDialog/buttonBox/1QPushButton0" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/MainControlsToolbar/actionUndo" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/MainControlsToolbar/actionUndo" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/MainControlsToolbar/actionUndo" command="activate" arguments="" />

@@ -74,6 +74,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqCalculatorPanel.h
   pqCameraDialog.h
   pqCameraKeyFrameWidget.h
+  pqChangeInputDialog.h
   pqChartOptionsEditor.h
   pqChartViewContextMenu.h
   pqChartViewContextMenuHandler.h
@@ -111,7 +112,6 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqExodusIIPanel.h
   pqExtractCTHPartsPanel.h
   pqFileChooserWidget.h
-  pqFilterInputDialog.h
   pqFieldSelectionAdaptor.h
   pqGlobalRenderViewOptions.h
   pqGlyphPanel.h
@@ -227,6 +227,7 @@ SET(UI_FORMS
   Resources/UI/pqCameraDialog.ui
   Resources/UI/pqCameraKeyFrameWidget.ui
   Resources/UI/pqChartOptionsWidget.ui
+  Resources/UI/pqChangeInputDialog.ui
   Resources/UI/pqColorPresetDialog.ui
   Resources/UI/pqColorScaleDialog.ui
   Resources/UI/pqComparativeVisPanel.ui
@@ -393,6 +394,8 @@ ADD_LIBRARY(pqComponents
   pqCameraDialog.h
   pqCameraKeyFrameWidget.cxx
   pqCameraKeyFrameWidget.h
+  pqChangeInputDialog.cxx
+  pqChangeInputDialog.h
   pqChartOptionsEditor.cxx
   pqChartOptionsEditor.h
   pqChartOptionsHandler.cxx
@@ -482,8 +485,6 @@ ADD_LIBRARY(pqComponents
   pqExtractCTHPartsPanel.h
   pqFileChooserWidget.cxx
   pqFileChooserWidget.h
-  pqFilterInputDialog.cxx
-  pqFilterInputDialog.h
   pqFieldSelectionAdaptor.cxx
   pqFieldSelectionAdaptor.h
   pqGlobalRenderViewOptions.cxx
