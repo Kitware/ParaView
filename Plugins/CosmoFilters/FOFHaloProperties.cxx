@@ -1275,7 +1275,9 @@ void FOFHaloProperties::aStarEstimatedNeighborPart(
   int /*wp,*/ wi, wj, wk;
   int first[DIMENSION], last[DIMENSION];
   POSVEL_T minBound[DIMENSION], maxBound[DIMENSION];
-  POSVEL_T xNear, yNear, zNear;
+  POSVEL_T xNear = 0.0;
+  POSVEL_T yNear = 0.0;
+  POSVEL_T zNear = 0.0;
   POSVEL_T xdist, ydist, zdist, dist;
 
   // Get chaining mesh information
@@ -1415,7 +1417,7 @@ void FOFHaloProperties::aStarEstimatedPart(
 {
   // Walking window extents and size
   int bp, bi, bj, bk;
-  int wi, wj, wk;
+  /*int wi, wj, wk;*/
   int first[DIMENSION], last[DIMENSION];
   POSVEL_T xdist, ydist, zdist, dist;
   POSVEL_T xNear, yNear, zNear;
@@ -1513,7 +1515,9 @@ void FOFHaloProperties::refineAStarLevel_1(
   int wp, wi, wj, wk;
   int first[DIMENSION], last[DIMENSION];
   POSVEL_T xdist, ydist, zdist, dist;
-  POSVEL_T xNear, yNear, zNear;
+  POSVEL_T xNear = 0.0;
+  POSVEL_T yNear = 0.0;
+  POSVEL_T zNear = 0.0;
   POSVEL_T minBound[DIMENSION], maxBound[DIMENSION];
 
   // Get chaining mesh information
