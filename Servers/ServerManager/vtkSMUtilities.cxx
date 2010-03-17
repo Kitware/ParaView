@@ -19,19 +19,20 @@
 #include "vtkImageData.h"
 #include "vtkInstantiator.h"
 #include "vtkJPEGWriter.h"
+#include "vtkMath.h"
+#include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
 #include "vtkPNGWriter.h"
 #include "vtkPNMWriter.h"
 #include "vtkPoints.h"
 #include "vtkTIFFWriter.h"
 #include "vtkTransform.h"
-#include "vtkMath.h"
 
 #include <vtksys/SystemTools.hxx>
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkSMUtilities);
-vtkCxxRevisionMacro(vtkSMUtilities, "1.3");
+vtkCxxRevisionMacro(vtkSMUtilities, "1.4");
 
 //----------------------------------------------------------------------------
 int vtkSMUtilities::SaveImage(vtkImageData* image, const char* filename,
@@ -85,6 +86,56 @@ int vtkSMUtilities::SaveImage(vtkImageData* image, const char* filename,
   return error_code;
 }
 
+//----------------------------------------------------------------------------
+int vtkSMUtilities::
+SaveImage(vtkImageData* image, const char* filename, const char* writerName)
+{
+  if (!filename || !writerName)
+    {
+    return vtkErrorCode::UnknownError;
+    }
+
+  vtkObject* object = vtkInstantiator::CreateInstance(writerName);
+  if (!object)
+    {
+    vtkGenericWarningMacro("Failed to create Writer " << writerName);
+    return vtkErrorCode::UnknownError;
+    }
+  vtkImageWriter* writer = vtkImageWriter::SafeDownCast(object);
+  if (!writer)
+    {
+    vtkGenericWarningMacro("Object is not a vtkImageWriter: "
+                                     << object->GetClassName());
+    object->Delete();
+    return vtkErrorCode::UnknownError;
+    }
+
+  writer->SetInput(image);
+  writer->SetFileName(filename);
+  writer->Write();
+  int error_code = writer->GetErrorCode();
+  writer->Delete();
+  return error_code;
+}
+
+//----------------------------------------------------------------------------
+  // This is usually called on a serial client, but if it is called in
+  // a parallel job (for example, while coprocessing for a solver), then
+  // we really only want to write out an image on process 0.
+int vtkSMUtilities::SaveImageOnProcessZero(vtkImageData* image,
+                   const char* filename, const char* writerName)
+{
+  int error_code;
+  vtkMultiProcessController *controller =
+    vtkMultiProcessController::GetGlobalController();
+  if (controller->GetLocalProcessId() == 0)
+    {
+    error_code = SaveImage(image, filename, writerName);
+    }
+
+  controller->Broadcast(&error_code, 1, 0);
+  return error_code;
+}
 
 //----------------------------------------------------------------------------
 vtkPoints* vtkSMUtilities::CreateOrbit(const double center[3],

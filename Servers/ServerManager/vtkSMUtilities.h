@@ -42,6 +42,18 @@ public:
     { return vtkSMUtilities::SaveImage(image, filename, -1); }
 
   // Description:
+  // Save the image to a file using a vtkImageWriter subclass given by writerName.
+  // The file is created on the process on which this method is called.
+  static int SaveImage(vtkImageData* image, const char* filename,
+                                          const char* writerName);
+
+  // Description:
+  // Calls SaveImage(image, filename, writerName) only on process 0.
+  // Other processes will recieve the return code through a broadcast.
+  static int SaveImageOnProcessZero(vtkImageData* image,
+                const char* filename, const char* writerName);
+
+  // Description:
   // Returns the points an orbit to revolve around the \c center at a distance
   // of \c radius in the plane defined by the \c center and the \c normal. The
   // number of points returned is equal to \c resolution.
