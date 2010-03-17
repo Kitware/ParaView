@@ -221,11 +221,11 @@ void pqChangeInputDialog::inputPortToggled(bool checked)
     pqApplicationCore::instance()->getServerManagerModel();
   this->Internals->PipelineModel->setSubtreeSelectable(
     pqActiveObjects::instance().activeServer(), true);
-  pqPipelineSource* source = smModel->findItem<pqPipelineSource*>(
+  pqPipelineSource* pqproxy = smModel->findItem<pqPipelineSource*>(
     this->Internals->Proxy);
-  if (source)
+  if (pqproxy)
     {
-    this->Internals->PipelineModel->setSubtreeSelectable(source, false);
+    this->Internals->PipelineModel->setSubtreeSelectable(pqproxy, false);
     }
 
   vtkSMInputProperty* inputProp = vtkSMInputProperty::SafeDownCast(
