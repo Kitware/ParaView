@@ -22,6 +22,8 @@ STANDARD_CHART_COLORS = [
     [ 0.804, 0.522, 0.000 ],    # Orange
     ]
 
+_global_view = None
+
 class TPlot(object):
 
     def __init__(self):
@@ -34,8 +36,10 @@ class TPlot(object):
         self.node_plot = smp.PlotSelectionOverTime(Selection=self.node_selection)
         self.element_plot = smp.PlotSelectionOverTime(Selection=self.element_selection)
         """
-
-        self.view = smp.CreateXYPlotView()
+        global _global_view
+        if not _global_view:
+            _global_view = smp.CreateXYPlotView()
+        self.view = _global_view
         self._curve_reps = dict()
         self._filters = []
         self.reset()

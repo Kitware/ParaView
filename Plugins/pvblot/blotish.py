@@ -566,6 +566,7 @@ def tplot():
     print
     state.subProgram = "tplot"
     state.tplot = tplot_mod.TPlot()
+    paraview.simple.SetActiveView(state.tplot.view)
 
 @_subprogram("tplot")
 def overlay(*args):
@@ -800,7 +801,9 @@ def _tplot_plot(io_helper=None):
         state.tplot.plot()
 
         if state.diskwrite:
-            state.tplot.write_image(state.get_next_screenshot_filename("tplot_overlay"))
+            fname = state.get_next_screenshot_filename("tplot_overlay")
+            paraview.simple.WriteImage(fname, state.tplot.view)
+
         return
 
     interactive = state.interactive
@@ -809,7 +812,8 @@ def _tplot_plot(io_helper=None):
         state.tplot.plot(i)
 
         if state.diskwrite:
-            state.tplot.write_image(state.get_next_screenshot_filename("tplot_curve%02d"%i))
+            fname = state.get_next_screenshot_filename("tplot_curve%02d"%i)
+            paraview.simple.WriteImage(fname, state.tplot.view)
 
         if interactive and i < nCurves-1:
             yield "Enter 'Q' to quit, '' to continue. "
