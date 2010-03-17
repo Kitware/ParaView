@@ -5742,6 +5742,57 @@
 
    </SourceProxy>
    <!-- End vtkVPICReader -->
+   
+   <!-- Start WindBladeReader -->
+
+   <SourceProxy name="WindBladeReader"
+                class="vtkWindBladeReader"
+                label="WindBlade reader">
+
+     <OutputPort name="Field" index="0" />
+     <OutputPort name="Blade" index="1" />
+
+      <StringVectorProperty name="Filename"
+        command="SetFilename"
+        animateable="0" >
+        <FileListDomain name="files"/>
+      </StringVectorProperty>
+
+     <DoubleVectorProperty
+         name="TimestepValues"
+         repeatable="1"
+         information_only="1">
+       <TimeStepsInformationHelper/>
+     </DoubleVectorProperty>
+
+      <StringVectorProperty
+        name="PointArrayInfo"
+        information_only="1">
+        <ArraySelectionInformationHelper attribute_name="Point"/>
+      </StringVectorProperty>
+
+      <StringVectorProperty
+        name="PointArrayStatus"
+        command="SetPointArrayStatus"
+        number_of_elements="2"
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0"
+        information_property="PointArrayInfo" >
+        <ArraySelectionDomain name="array_list" >
+          <RequiredProperties>
+             <Property name="PointArrayInfo" function="ArrayList"/>
+          </RequiredProperties>
+        </ArraySelectionDomain>
+      </StringVectorProperty>
+
+      <Hints>
+        <ReaderFactory extensions="wind"
+          file_description="WindBlade Data" />
+      </Hints>
+
+   </SourceProxy>
+   <!-- End WindBladeReader -->
 
   </ProxyGroup>
 </ServerManagerConfiguration>

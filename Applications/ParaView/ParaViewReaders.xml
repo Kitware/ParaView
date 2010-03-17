@@ -60,4 +60,5 @@
   <Proxy group="sources" name="SLACParticleReader" />
   <Proxy group="sources" name="ParticleReader" />
   <Proxy group="sources" name="VPICReader" />
+  <Proxy group="sources" name="WindBladeReader" />
 </ParaViewReaders>
