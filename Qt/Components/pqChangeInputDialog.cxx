@@ -206,12 +206,6 @@ void pqChangeInputDialog::inputPortToggled(bool checked)
     {
     selected_indexes.push_back(
       this->Internals->PipelineModel->getIndexFor(port));
-    //pqPipelineSource* source = port->getSource();
-    //QString label = source->getSMName();
-    //if (source->getNumberOfOutputPorts() > 1)
-    //  {
-    //  label =QString("%1 (%2)").arg(label).arg(port->getPortName());
-    //  }
     }
 
 
