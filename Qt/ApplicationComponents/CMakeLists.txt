@@ -3,8 +3,10 @@ PROJECT(pqApplicationComponents)
 INCLUDE_DIRECTORIES(
   ${pqApplicationComponents_SOURCE_DIR}
   ${pqApplicationComponents_BINARY_DIR}
+  ${pqApplicationComponents_BINARY_DIR}/Resources/UI
   ${pqComponents_BINARY_DIR}
   ${pqComponents_SOURCE_DIR}
+  ${pqComponents_BINARY_DIR}/Resources/UI
   ${pqCore_BINARY_DIR}
   ${pqCore_SOURCE_DIR}
   ${VTK_INCLUDE_DIR}

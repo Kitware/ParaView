@@ -14,6 +14,7 @@ INCLUDE_DIRECTORIES(
   ${QtTesting_BINARY_DIR}
   ${pqCore_BINARY_DIR}
   ${pqCore_SOURCE_DIR}
+  ${pqCore_BINARY_DIR}/Resources/UI
 )
 
 IF(QT_TESTING_WITH_PYTHON)

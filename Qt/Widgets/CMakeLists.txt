@@ -7,6 +7,7 @@ SET (dynamicHeaders)
 INCLUDE_DIRECTORIES(
   ${QtWidgets_SOURCE_DIR}
   ${QtWidgets_BINARY_DIR}
+  ${QtWidgets_BINARY_DIR}/Resources/UI
   ${QT_QTDESIGNER_INCLUDE_DIR}
 )
 
