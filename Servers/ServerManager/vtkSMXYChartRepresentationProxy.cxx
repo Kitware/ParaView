@@ -26,7 +26,7 @@
 #include "vtkSelection.h"
 
 vtkStandardNewMacro(vtkSMXYChartRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMXYChartRepresentationProxy, "1.8");
+vtkCxxRevisionMacro(vtkSMXYChartRepresentationProxy, "1.9");
 //----------------------------------------------------------------------------
 vtkSMXYChartRepresentationProxy::vtkSMXYChartRepresentationProxy()
 {
@@ -71,10 +71,12 @@ void vtkSMXYChartRepresentationProxy::CreatePipeline(vtkSMSourceProxy* input,
 
   // Connect the selection output from the input to the SelectionRepresentation.
 
-  // Ensure that the source proxy has created extract selection filters.
-  input->CreateSelectionProxies();
+  vtkSMSourceProxy* realInput = this->GetInputProxy();
 
-  vtkSMSourceProxy* esProxy = input->GetSelectionOutput(outputport);
+  // Ensure that the source proxy has created extract selection filters.
+  realInput->CreateSelectionProxies();
+
+  vtkSMSourceProxy* esProxy = realInput->GetSelectionOutput(outputport);
   if (!esProxy)
     {
     vtkErrorMacro("Input proxy does not support selection extraction.");
