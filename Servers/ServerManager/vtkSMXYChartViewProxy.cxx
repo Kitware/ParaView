@@ -28,7 +28,7 @@
 #include <QRegExp>
 
 vtkStandardNewMacro(vtkSMXYChartViewProxy);
-vtkCxxRevisionMacro(vtkSMXYChartViewProxy, "1.8");
+vtkCxxRevisionMacro(vtkSMXYChartViewProxy, "1.9");
 //----------------------------------------------------------------------------
 vtkSMXYChartViewProxy::vtkSMXYChartViewProxy()
 {
@@ -282,7 +282,7 @@ void vtkSMXYChartViewProxy::SetAxisTitleColor(int index, double red,
 }
 
 //----------------------------------------------------------------------------
-vtkChartXY* vtkSMXYChartViewProxy::GetChartXY()
+vtkChart* vtkSMXYChartViewProxy::GetChart()
 {
   return this->Chart;
 }

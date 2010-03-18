@@ -192,7 +192,7 @@ void pqContextView::resetDisplay()
       vtkSMXYChartViewProxy::SafeDownCast(this->getContextViewProxy());
   if (proxy)
     {
-    proxy->GetChartXY()->RecalculateBounds();
+    proxy->GetChart()->RecalculateBounds();
     this->getWidget()->update();
     }
 }

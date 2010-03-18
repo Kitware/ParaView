@@ -27,7 +27,7 @@
 #include "vtkSelection.h"
 
 vtkStandardNewMacro(vtkSMXYChartRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMXYChartRepresentationProxy, "1.10");
+vtkCxxRevisionMacro(vtkSMXYChartRepresentationProxy, "1.11");
 //----------------------------------------------------------------------------
 vtkSMXYChartRepresentationProxy::vtkSMXYChartRepresentationProxy()
 {
@@ -118,7 +118,7 @@ vtkChartXY* vtkSMXYChartRepresentationProxy::GetChart()
 {
   if (this->ChartViewProxy)
     {
-    return this->ChartViewProxy->GetChartXY();
+    return vtkChartXY::SafeDownCast(this->ChartViewProxy->GetChart());
     }
   else
     {

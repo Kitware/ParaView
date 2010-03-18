@@ -23,7 +23,7 @@
 #include "vtkSMContextViewProxy.h"
 
 class vtkChartView;
-class vtkChartXY;
+class vtkChart;
 
 class VTK_EXPORT vtkSMXYChartViewProxy : public vtkSMContextViewProxy
 {
@@ -179,9 +179,9 @@ public:
   void SetAxisTitleColor(int index, double red, double green, double blue);
 
   // Description:
-  // Provides access to the bar chart view.
+  // Provides access to the chart view.
 //BTX
-  vtkChartXY* GetChartXY();
+  vtkChart* GetChart();
 //ETX
 
 //BTX
@@ -209,7 +209,7 @@ protected:
 
   // Description:
   // Pointer to the proxy's chart instance.
-  vtkChartXY* Chart;
+  vtkChart* Chart;
 
 private:
   vtkSMXYChartViewProxy(const vtkSMXYChartViewProxy&); // Not implemented
