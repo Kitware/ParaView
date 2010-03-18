@@ -139,6 +139,9 @@ void pqProxyInformationWidget::updateInformation()
   this->Ui->filename->setText(tr("NA"));
   this->Ui->filename->setToolTip(tr("NA"));
   this->Ui->filename->setStatusTip(tr("NA"));
+  this->Ui->path->setText(tr("NA"));
+  this->Ui->path->setToolTip(tr("NA"));
+  this->Ui->path->setStatusTip(tr("NA"));
 
   vtkPVDataInformation* dataInformation = NULL;
   pqPipelineSource* source = NULL;
@@ -194,11 +197,17 @@ void pqProxyInformationWidget::updateInformation()
             }
           QString filename = 
             pqSMAdaptor::getElementProperty(smprop).toString();
+          QString path = vtksys::SystemTools::GetFilenamePath(
+            filename.toAscii().data()).c_str();
+
           this->Ui->properties->show();
           this->Ui->filename->setText(vtksys::SystemTools::GetFilenameName(
               filename.toAscii().data()).c_str());
           this->Ui->filename->setToolTip(filename);
           this->Ui->filename->setStatusTip(filename);
+          this->Ui->path->setText(path);
+          this->Ui->path->setToolTip(path);
+          this->Ui->path->setStatusTip(path);
           break;
           }
         }

@@ -1,83 +1,77 @@
-<ui version="4.0" >
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
  <class>pqProxyInformationWidget</class>
- <widget class="QWidget" name="pqProxyInformationWidget" >
-  <property name="geometry" >
+ <widget class="QWidget" name="pqProxyInformationWidget">
+  <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
     <width>276</width>
-    <height>956</height>
+    <height>966</height>
    </rect>
   </property>
-  <property name="sizePolicy" >
-   <sizepolicy vsizetype="Expanding" hsizetype="Expanding" >
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
     <horstretch>0</horstretch>
     <verstretch>0</verstretch>
    </sizepolicy>
   </property>
-  <property name="windowTitle" >
+  <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QVBoxLayout" >
-   <property name="spacing" >
+  <layout class="QVBoxLayout">
+   <property name="spacing">
     <number>6</number>
    </property>
-   <property name="leftMargin" >
-    <number>9</number>
-   </property>
-   <property name="topMargin" >
-    <number>9</number>
-   </property>
-   <property name="rightMargin" >
-    <number>9</number>
-   </property>
-   <property name="bottomMargin" >
+   <property name="margin">
     <number>9</number>
    </property>
    <item>
-    <widget class="pqTreeWidget" name="compositeTree" >
+    <widget class="pqTreeWidget" name="compositeTree">
      <column>
-      <property name="text" >
+      <property name="text">
        <string>Data Hierarchy</string>
       </property>
      </column>
     </widget>
    </item>
    <item>
-    <widget class="QGroupBox" name="properties" >
-     <property name="title" >
+    <widget class="QGroupBox" name="properties">
+     <property name="title">
       <string>Properties</string>
      </property>
-     <layout class="QGridLayout" >
-      <property name="leftMargin" >
+     <layout class="QGridLayout">
+      <property name="margin">
        <number>4</number>
       </property>
-      <property name="topMargin" >
+      <property name="spacing">
        <number>4</number>
       </property>
-      <property name="rightMargin" >
-       <number>4</number>
-      </property>
-      <property name="bottomMargin" >
-       <number>4</number>
-      </property>
-      <property name="horizontalSpacing" >
-       <number>4</number>
-      </property>
-      <property name="verticalSpacing" >
-       <number>4</number>
-      </property>
-      <item row="0" column="0" >
-       <widget class="QLabel" name="filenameLabel" >
-        <property name="text" >
+      <item row="0" column="0">
+       <widget class="QLabel" name="filenameLabel">
+        <property name="text">
          <string>Filename:</string>
         </property>
        </widget>
       </item>
-      <item row="0" column="1" >
-       <widget class="QLabel" name="filename" >
-        <property name="text" >
+      <item row="0" column="1">
+       <widget class="QLabel" name="filename">
+        <property name="text">
          <string>Filename:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="label_13">
+        <property name="text">
+         <string>Path:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QLabel" name="path">
+        <property name="text">
+         <string>Path</string>
         </property>
        </widget>
       </item>
@@ -85,112 +79,94 @@
     </widget>
    </item>
    <item>
-    <widget class="QGroupBox" name="groupBox" >
-     <property name="title" >
+    <widget class="QGroupBox" name="groupBox">
+     <property name="title">
       <string>Statistics</string>
      </property>
-     <layout class="QGridLayout" >
-      <item row="0" column="0" >
-       <widget class="QLabel" name="label" >
-        <property name="text" >
+     <layout class="QGridLayout">
+      <item row="0" column="0">
+       <widget class="QLabel" name="label">
+        <property name="text">
          <string>Type:</string>
         </property>
        </widget>
       </item>
-      <item row="0" column="1" >
-       <widget class="QLabel" name="type" >
-        <property name="text" >
+      <item row="0" column="1">
+       <widget class="QLabel" name="type">
+        <property name="text">
          <string>Type:</string>
         </property>
        </widget>
       </item>
-      <item row="1" column="0" colspan="2" >
-       <widget class="QStackedWidget" name="dataTypeProperties" >
-        <property name="currentIndex" >
+      <item row="1" column="0" colspan="2">
+       <widget class="QStackedWidget" name="dataTypeProperties">
+        <property name="currentIndex">
          <number>0</number>
         </property>
-        <widget class="QWidget" name="DataSet" >
-         <layout class="QGridLayout" >
-          <property name="leftMargin" >
+        <widget class="QWidget" name="DataSet">
+         <layout class="QGridLayout">
+          <property name="margin">
            <number>0</number>
           </property>
-          <property name="topMargin" >
-           <number>0</number>
-          </property>
-          <property name="rightMargin" >
-           <number>0</number>
-          </property>
-          <property name="bottomMargin" >
-           <number>0</number>
-          </property>
-          <item row="0" column="0" >
-           <widget class="QLabel" name="label_2" >
-            <property name="text" >
+          <item row="0" column="0">
+           <widget class="QLabel" name="label_2">
+            <property name="text">
              <string>Number of Cells:</string>
             </property>
            </widget>
           </item>
-          <item row="0" column="1" >
-           <widget class="QLabel" name="numberOfCells" >
-            <property name="text" >
+          <item row="0" column="1">
+           <widget class="QLabel" name="numberOfCells">
+            <property name="text">
              <string>Number of Cells:</string>
             </property>
            </widget>
           </item>
-          <item row="1" column="0" >
-           <widget class="QLabel" name="label_3" >
-            <property name="text" >
+          <item row="1" column="0">
+           <widget class="QLabel" name="label_3">
+            <property name="text">
              <string>Number of Points:</string>
             </property>
            </widget>
           </item>
-          <item row="1" column="1" >
-           <widget class="QLabel" name="numberOfPoints" >
-            <property name="text" >
+          <item row="1" column="1">
+           <widget class="QLabel" name="numberOfPoints">
+            <property name="text">
              <string>Number of Points:</string>
             </property>
            </widget>
           </item>
          </layout>
         </widget>
-        <widget class="QWidget" name="Table" >
-         <layout class="QGridLayout" >
-          <property name="leftMargin" >
+        <widget class="QWidget" name="Table">
+         <layout class="QGridLayout">
+          <property name="margin">
            <number>0</number>
           </property>
-          <property name="topMargin" >
-           <number>0</number>
-          </property>
-          <property name="rightMargin" >
-           <number>0</number>
-          </property>
-          <property name="bottomMargin" >
-           <number>0</number>
-          </property>
-          <item row="0" column="0" >
-           <widget class="QLabel" name="label_11" >
-            <property name="text" >
+          <item row="0" column="0">
+           <widget class="QLabel" name="label_11">
+            <property name="text">
              <string>Number of Rows:</string>
             </property>
            </widget>
           </item>
-          <item row="0" column="1" >
-           <widget class="QLabel" name="numberOfRows" >
-            <property name="text" >
+          <item row="0" column="1">
+           <widget class="QLabel" name="numberOfRows">
+            <property name="text">
              <string>Number Of Rows:</string>
             </property>
            </widget>
           </item>
-          <item row="1" column="0" >
-           <widget class="QLabel" name="label_12" >
-            <property name="text" >
+          <item row="1" column="0">
+           <widget class="QLabel" name="label_12">
+            <property name="text">
              <string>Number of Columns</string>
             </property>
            </widget>
           </item>
-          <item row="1" column="1" >
-           <widget class="QLabel" name="numberOfColumns" >
-            <property name="text" >
+          <item row="1" column="1">
+           <widget class="QLabel" name="numberOfColumns">
+            <property name="text">
              <string>Number of Columns</string>
             </property>
            </widget>
@@ -199,16 +175,16 @@
         </widget>
        </widget>
       </item>
-      <item row="2" column="0" >
-       <widget class="QLabel" name="label_4" >
-        <property name="text" >
+      <item row="2" column="0">
+       <widget class="QLabel" name="label_4">
+        <property name="text">
          <string>Memory:</string>
         </property>
        </widget>
       </item>
-      <item row="2" column="1" >
-       <widget class="QLabel" name="memory" >
-        <property name="text" >
+      <item row="2" column="1">
+       <widget class="QLabel" name="memory">
+        <property name="text">
          <string>Memory:</string>
         </property>
        </widget>
@@ -217,67 +193,55 @@
     </widget>
    </item>
    <item>
-    <widget class="QGroupBox" name="groupBox_2" >
-     <property name="sizePolicy" >
-      <sizepolicy vsizetype="Expanding" hsizetype="Expanding" >
+    <widget class="QGroupBox" name="groupBox_2">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
-     <property name="title" >
+     <property name="title">
       <string>Data Arrays</string>
      </property>
-     <layout class="QGridLayout" >
-      <property name="leftMargin" >
+     <layout class="QGridLayout">
+      <property name="margin">
        <number>4</number>
       </property>
-      <property name="topMargin" >
+      <property name="spacing">
        <number>4</number>
       </property>
-      <property name="rightMargin" >
-       <number>4</number>
-      </property>
-      <property name="bottomMargin" >
-       <number>4</number>
-      </property>
-      <property name="horizontalSpacing" >
-       <number>4</number>
-      </property>
-      <property name="verticalSpacing" >
-       <number>4</number>
-      </property>
-      <item row="1" column="0" >
-       <widget class="pqTreeWidget" name="dataArrays" >
-        <property name="sizePolicy" >
-         <sizepolicy vsizetype="MinimumExpanding" hsizetype="Ignored" >
+      <item row="1" column="0">
+       <widget class="pqTreeWidget" name="dataArrays">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Ignored" vsizetype="MinimumExpanding">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
-        <property name="rootIsDecorated" >
+        <property name="rootIsDecorated">
          <bool>false</bool>
         </property>
         <column>
-         <property name="text" >
+         <property name="text">
           <string>Name</string>
          </property>
         </column>
         <column>
-         <property name="text" >
+         <property name="text">
           <string>Data Type</string>
          </property>
         </column>
         <column>
-         <property name="text" >
+         <property name="text">
           <string>Data Ranges</string>
          </property>
         </column>
        </widget>
       </item>
-      <item row="0" column="0" >
-       <widget class="QLabel" name="dataTimeLabel" >
-        <property name="text" >
-         <string>Current data time step: &lt;b>$TIME$&lt;/b></string>
+      <item row="0" column="0">
+       <widget class="QLabel" name="dataTimeLabel">
+        <property name="text">
+         <string>Current data time step: &lt;b&gt;$TIME$&lt;/b&gt;</string>
         </property>
        </widget>
       </item>
@@ -285,35 +249,23 @@
     </widget>
    </item>
    <item>
-    <widget class="QGroupBox" name="groupExtent" >
-     <property name="title" >
+    <widget class="QGroupBox" name="groupExtent">
+     <property name="title">
       <string>Extents</string>
      </property>
-     <layout class="QGridLayout" >
-      <property name="leftMargin" >
+     <layout class="QGridLayout">
+      <property name="margin">
        <number>9</number>
       </property>
-      <property name="topMargin" >
-       <number>9</number>
-      </property>
-      <property name="rightMargin" >
-       <number>9</number>
-      </property>
-      <property name="bottomMargin" >
-       <number>9</number>
-      </property>
-      <property name="horizontalSpacing" >
+      <property name="spacing">
        <number>6</number>
       </property>
-      <property name="verticalSpacing" >
-       <number>6</number>
-      </property>
-      <item row="1" column="2" >
+      <item row="1" column="2">
        <spacer>
-        <property name="orientation" >
+        <property name="orientation">
          <enum>Qt::Horizontal</enum>
         </property>
-        <property name="sizeHint" >
+        <property name="sizeHint" stdset="0">
          <size>
           <width>40</width>
           <height>20</height>
@@ -321,44 +273,44 @@
         </property>
        </spacer>
       </item>
-      <item row="2" column="1" >
-       <widget class="QLabel" name="zExtent" >
-        <property name="text" >
+      <item row="2" column="1">
+       <widget class="QLabel" name="zExtent">
+        <property name="text">
          <string>TextLabel</string>
         </property>
        </widget>
       </item>
-      <item row="1" column="1" >
-       <widget class="QLabel" name="yExtent" >
-        <property name="text" >
+      <item row="1" column="1">
+       <widget class="QLabel" name="yExtent">
+        <property name="text">
          <string>TextLabel</string>
         </property>
        </widget>
       </item>
-      <item row="0" column="1" >
-       <widget class="QLabel" name="xExtent" >
-        <property name="text" >
+      <item row="0" column="1">
+       <widget class="QLabel" name="xExtent">
+        <property name="text">
          <string>TextLabel</string>
         </property>
        </widget>
       </item>
-      <item row="2" column="0" >
-       <widget class="QLabel" name="label_5" >
-        <property name="text" >
+      <item row="2" column="0">
+       <widget class="QLabel" name="label_5">
+        <property name="text">
          <string>Z Extent</string>
         </property>
        </widget>
       </item>
-      <item row="1" column="0" >
-       <widget class="QLabel" name="label_9" >
-        <property name="text" >
+      <item row="1" column="0">
+       <widget class="QLabel" name="label_9">
+        <property name="text">
          <string>Y Extent:</string>
         </property>
        </widget>
       </item>
-      <item row="0" column="0" >
-       <widget class="QLabel" name="label_10" >
-        <property name="text" >
+      <item row="0" column="0">
+       <widget class="QLabel" name="label_10">
+        <property name="text">
          <string>X Extent:</string>
         </property>
        </widget>
@@ -367,55 +319,43 @@
     </widget>
    </item>
    <item>
-    <widget class="QGroupBox" name="groupBox_3" >
-     <property name="sizePolicy" >
-      <sizepolicy vsizetype="Preferred" hsizetype="Preferred" >
+    <widget class="QGroupBox" name="groupBox_3">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
-     <property name="title" >
+     <property name="title">
       <string>Bounds</string>
      </property>
-     <layout class="QGridLayout" >
-      <property name="leftMargin" >
+     <layout class="QGridLayout">
+      <property name="margin">
        <number>4</number>
       </property>
-      <property name="topMargin" >
+      <property name="spacing">
        <number>4</number>
       </property>
-      <property name="rightMargin" >
-       <number>4</number>
-      </property>
-      <property name="bottomMargin" >
-       <number>4</number>
-      </property>
-      <property name="horizontalSpacing" >
-       <number>4</number>
-      </property>
-      <property name="verticalSpacing" >
-       <number>4</number>
-      </property>
-      <item row="2" column="0" >
-       <widget class="QLabel" name="label_8" >
-        <property name="text" >
+      <item row="2" column="0">
+       <widget class="QLabel" name="label_8">
+        <property name="text">
          <string>Z range:</string>
         </property>
        </widget>
       </item>
-      <item row="2" column="1" >
-       <widget class="QLabel" name="zRange" >
-        <property name="text" >
+      <item row="2" column="1">
+       <widget class="QLabel" name="zRange">
+        <property name="text">
          <string>Z range:</string>
         </property>
        </widget>
       </item>
-      <item row="1" column="2" >
+      <item row="1" column="2">
        <spacer>
-        <property name="orientation" >
+        <property name="orientation">
          <enum>Qt::Horizontal</enum>
         </property>
-        <property name="sizeHint" >
+        <property name="sizeHint" stdset="0">
          <size>
           <width>40</width>
           <height>20</height>
@@ -423,30 +363,30 @@
         </property>
        </spacer>
       </item>
-      <item row="1" column="1" >
-       <widget class="QLabel" name="yRange" >
-        <property name="text" >
+      <item row="1" column="1">
+       <widget class="QLabel" name="yRange">
+        <property name="text">
          <string>Y range:</string>
         </property>
        </widget>
       </item>
-      <item row="0" column="0" >
-       <widget class="QLabel" name="label_6" >
-        <property name="text" >
+      <item row="0" column="0">
+       <widget class="QLabel" name="label_6">
+        <property name="text">
          <string>X range:</string>
         </property>
        </widget>
       </item>
-      <item row="0" column="1" >
-       <widget class="QLabel" name="xRange" >
-        <property name="text" >
+      <item row="0" column="1">
+       <widget class="QLabel" name="xRange">
+        <property name="text">
          <string>X range:</string>
         </property>
        </widget>
       </item>
-      <item row="1" column="0" >
-       <widget class="QLabel" name="label_7" >
-        <property name="text" >
+      <item row="1" column="0">
+       <widget class="QLabel" name="label_7">
+        <property name="text">
          <string>Y range:</string>
         </property>
        </widget>
@@ -455,53 +395,41 @@
     </widget>
    </item>
    <item>
-    <widget class="QGroupBox" name="groupBox_4" >
-     <property name="sizePolicy" >
-      <sizepolicy vsizetype="Expanding" hsizetype="Expanding" >
+    <widget class="QGroupBox" name="groupBox_4">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
-     <property name="title" >
+     <property name="title">
       <string>Time</string>
      </property>
-     <layout class="QGridLayout" >
-      <property name="leftMargin" >
+     <layout class="QGridLayout">
+      <property name="margin">
        <number>4</number>
       </property>
-      <property name="topMargin" >
+      <property name="spacing">
        <number>4</number>
       </property>
-      <property name="rightMargin" >
-       <number>4</number>
-      </property>
-      <property name="bottomMargin" >
-       <number>4</number>
-      </property>
-      <property name="horizontalSpacing" >
-       <number>4</number>
-      </property>
-      <property name="verticalSpacing" >
-       <number>4</number>
-      </property>
-      <item row="0" column="0" >
-       <widget class="pqTreeWidget" name="timeValues" >
-        <property name="sizePolicy" >
-         <sizepolicy vsizetype="MinimumExpanding" hsizetype="Ignored" >
+      <item row="0" column="0">
+       <widget class="pqTreeWidget" name="timeValues">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Ignored" vsizetype="MinimumExpanding">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
-        <property name="columnCount" >
+        <property name="columnCount">
          <number>2</number>
         </property>
         <column>
-         <property name="text" >
+         <property name="text">
           <string>Index</string>
          </property>
         </column>
         <column>
-         <property name="text" >
+         <property name="text">
           <string>Value</string>
          </property>
         </column>
@@ -512,10 +440,10 @@
    </item>
    <item>
     <spacer>
-     <property name="orientation" >
+     <property name="orientation">
       <enum>Qt::Vertical</enum>
      </property>
-     <property name="sizeHint" >
+     <property name="sizeHint" stdset="0">
       <size>
        <width>20</width>
        <height>40</height>
