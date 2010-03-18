@@ -23,19 +23,22 @@
 #include "vtkChartXY.h"
 #include "vtkPlot.h"
 #include "vtkTable.h"
+#include "vtkAnnotationLink.h"
 #include "vtkSelection.h"
 
 vtkStandardNewMacro(vtkSMXYChartRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMXYChartRepresentationProxy, "1.9");
+vtkCxxRevisionMacro(vtkSMXYChartRepresentationProxy, "1.10");
 //----------------------------------------------------------------------------
 vtkSMXYChartRepresentationProxy::vtkSMXYChartRepresentationProxy()
 {
   this->Visibility = 1;
+  this->AnnLink = vtkAnnotationLink::New();
 }
 
 //----------------------------------------------------------------------------
 vtkSMXYChartRepresentationProxy::~vtkSMXYChartRepresentationProxy()
 {
+  this->AnnLink->Delete();
 }
 
 //----------------------------------------------------------------------------
@@ -186,6 +189,14 @@ void vtkSMXYChartRepresentationProxy::Update(vtkSMViewProxy* view)
 
   // Update our selection
   this->SelectionRepresentation->Update(view);
+
+  if (this->GetChart())
+    {
+    vtkSelection *sel =
+        vtkSelection::SafeDownCast(this->SelectionRepresentation->GetOutput());
+    this->AnnLink->SetCurrentSelection(sel);
+    this->GetChart()->SetAnnotationLink(AnnLink);
+    }
 
   this->OptionsProxy->SetChart(this->GetChart());
   this->OptionsProxy->SetTable(vtkTable::SafeDownCast(this->GetOutput()));

@@ -25,6 +25,7 @@
 class vtkSMXYChartViewProxy;
 class vtkSMContextNamedOptionsProxy;
 class vtkChartXY;
+class vtkAnnotationLink;
 
 class VTK_EXPORT vtkSMXYChartRepresentationProxy :
     public vtkSMClientDeliveryRepresentationProxy
@@ -109,6 +110,7 @@ protected:
   vtkWeakPointer<vtkSMXYChartViewProxy> ChartViewProxy;
   vtkSMContextNamedOptionsProxy* OptionsProxy;
   int Visibility;
+  vtkAnnotationLink *AnnLink;
 
 private:
   vtkSMXYChartRepresentationProxy(const vtkSMXYChartRepresentationProxy&); // Not implemented
