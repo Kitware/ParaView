@@ -8889,6 +8889,13 @@
         </ExposedProperties>
       </SubProxy>
 
+      <SubProxy>
+        <Proxy name="SelectionRepresentation"
+          proxygroup="representations"
+          proxyname="ClientDeliveryRepresentation">
+        </Proxy>
+      </SubProxy>
+
       <!-- End of XYPlotRepresentation -->
     </XYChartRepresentationProxy>
 

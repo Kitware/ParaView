@@ -32,7 +32,7 @@ class VTK_EXPORT vtkSMXYChartRepresentationProxy :
 public:
   static vtkSMXYChartRepresentationProxy* New();
   vtkTypeRevisionMacro(vtkSMXYChartRepresentationProxy,
-    vtkSMClientDeliveryRepresentationProxy);
+                       vtkSMClientDeliveryRepresentationProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
@@ -100,7 +100,11 @@ protected:
   vtkSMXYChartRepresentationProxy();
   ~vtkSMXYChartRepresentationProxy();
 
+  virtual bool BeginCreateVTKObjects();
   virtual bool EndCreateVTKObjects();
+  virtual void CreatePipeline(vtkSMSourceProxy* input, int outputport);
+
+  vtkSMClientDeliveryRepresentationProxy* SelectionRepresentation;
 
   vtkWeakPointer<vtkSMXYChartViewProxy> ChartViewProxy;
   vtkSMContextNamedOptionsProxy* OptionsProxy;

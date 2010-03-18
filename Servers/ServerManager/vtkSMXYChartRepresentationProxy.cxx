@@ -16,15 +16,17 @@
 
 #include "vtkDataObject.h"
 #include "vtkObjectFactory.h"
+#include "vtkSMSourceProxy.h"
 #include "vtkSMContextNamedOptionsProxy.h"
 #include "vtkSMXYChartViewProxy.h"
 #include "vtkContextView.h"
 #include "vtkChartXY.h"
 #include "vtkPlot.h"
 #include "vtkTable.h"
+#include "vtkSelection.h"
 
 vtkStandardNewMacro(vtkSMXYChartRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMXYChartRepresentationProxy, "1.7");
+vtkCxxRevisionMacro(vtkSMXYChartRepresentationProxy, "1.8");
 //----------------------------------------------------------------------------
 vtkSMXYChartRepresentationProxy::vtkSMXYChartRepresentationProxy()
 {
@@ -40,6 +42,47 @@ vtkSMXYChartRepresentationProxy::~vtkSMXYChartRepresentationProxy()
 void vtkSMXYChartRepresentationProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+}
+
+//-----------------------------------------------------------------------------
+bool vtkSMXYChartRepresentationProxy::BeginCreateVTKObjects()
+{
+  if (!this->Superclass::BeginCreateVTKObjects())
+    {
+    return false;
+    }
+
+  this->SelectionRepresentation =
+    vtkSMClientDeliveryRepresentationProxy::SafeDownCast(
+      this->GetSubProxy("SelectionRepresentation"));
+  if (!this->SelectionRepresentation)
+    {
+    vtkErrorMacro("SelectionRepresentation must be defined in the xml configuration.");
+    return false;
+    }
+  return true;
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMXYChartRepresentationProxy::CreatePipeline(vtkSMSourceProxy* input,
+                                                     int outputport)
+{
+  this->Superclass::CreatePipeline(input, outputport);
+
+  // Connect the selection output from the input to the SelectionRepresentation.
+
+  // Ensure that the source proxy has created extract selection filters.
+  input->CreateSelectionProxies();
+
+  vtkSMSourceProxy* esProxy = input->GetSelectionOutput(outputport);
+  if (!esProxy)
+    {
+    vtkErrorMacro("Input proxy does not support selection extraction.");
+    return;
+    }
+  // esProxy port 1 is the input vtkSelection. That's the one we are
+  // interested in.
+  this->Connect(esProxy, this->SelectionRepresentation, "Input", 1);
 }
 
 //----------------------------------------------------------------------------
@@ -139,9 +182,11 @@ void vtkSMXYChartRepresentationProxy::Update(vtkSMViewProxy* view)
 {
   this->Superclass::Update(view);
 
+  // Update our selection
+  this->SelectionRepresentation->Update(view);
+
   this->OptionsProxy->SetChart(this->GetChart());
   this->OptionsProxy->SetTable(vtkTable::SafeDownCast(this->GetOutput()));
-
   this->UpdatePropertyInformation();
 }
 
