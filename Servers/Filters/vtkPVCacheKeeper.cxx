@@ -42,7 +42,7 @@ public:
 };
 
 vtkStandardNewMacro(vtkPVCacheKeeper);
-vtkCxxRevisionMacro(vtkPVCacheKeeper, "1.2");
+vtkCxxRevisionMacro(vtkPVCacheKeeper, "1.3");
 vtkCxxSetObjectMacro(vtkPVCacheKeeper, CacheSizeKeeper, vtkCacheSizeKeeper);
 //----------------------------------------------------------------------------
 vtkPVCacheKeeper::vtkPVCacheKeeper()
@@ -76,13 +76,19 @@ vtkPVCacheKeeper::~vtkPVCacheKeeper()
 //----------------------------------------------------------------------------
 void vtkPVCacheKeeper::RemoveAllCaches()
 {
-  //cout << "RemoveAllCaches" << endl;
+  bool something_removed = this->Cache->size() > 0;
+
+  // cout << this << " RemoveAllCaches" << endl;
   unsigned long freed_size = this->Cache->GetActualMemorySize();
   this->Cache->clear();
   if (freed_size > 0 && this->CacheSizeKeeper)
     {
     // Tell the cache size keeper about the newly freed memory size.
     this->CacheSizeKeeper->FreeCacheSize(freed_size);
+    }
+  if (something_removed)
+    {
+    this->Modified();
     }
 }
 
@@ -169,19 +175,19 @@ int vtkPVCacheKeeper::RequestData(vtkInformation* vtkNotUsed(reqInfo),
     if (this->IsCached(this->CacheTime))
       {
       output->ShallowCopy((*this->Cache)[this->CacheTime]);
-      //cout << "using Cache: " << this->CacheTime << endl;
+      // cout << this << " using Cache: " << this->CacheTime << endl;
       }
     else
       {
       output->ShallowCopy(input);
       this->SaveData(output);
-      //cout << "Saving cache: " << this->CacheTime << endl;
+      // cout << this << " Saving cache: " << this->CacheTime << endl;
       }
     }
   else
     {
     output->ShallowCopy(input);
-    //cout << "Not using cache" << endl;
+    // cout << this << " Not using cache" << endl;
     }
   return 1;
 }
