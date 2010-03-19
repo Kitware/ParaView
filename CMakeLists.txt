@@ -272,10 +272,13 @@ SET(PARAVIEW_GUI_INCLUDE_DIRS ${ParaView_SOURCE_DIR}/VTK/GUISupport/Qt
                               ${ParaView_BINARY_DIR}/Qt/Chart
                               ${ParaView_SOURCE_DIR}/Qt/Core
                               ${ParaView_BINARY_DIR}/Qt/Core
+                              ${ParaView_BINARY_DIR}/Qt/Core/Resources/UI
                               ${ParaView_SOURCE_DIR}/Qt/Components
                               ${ParaView_BINARY_DIR}/Qt/Components
+                              ${ParaView_BINARY_DIR}/Qt/Components/Resources/UI
                               ${ParaView_SOURCE_DIR}/Qt/ApplicationComponents
                               ${ParaView_BINARY_DIR}/Qt/ApplicationComponents
+                              ${ParaView_BINARY_DIR}/Qt/ApplicationComponents/Resources/UI
                               ${ParaView_SOURCE_DIR}/Qt/Testing
                               ${ParaView_BINARY_DIR}/Qt/Testing )
 IF (PARAVIEW_ENABLE_PYTHON)

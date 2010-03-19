@@ -12,6 +12,8 @@ ELSE (ParaView_SOURCE_DIR)
   FIND_PACKAGE(ParaView REQUIRED)
   INCLUDE(${PARAVIEW_USE_FILE})
 ENDIF (ParaView_SOURCE_DIR)
+  
+INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR}/Resources)
 
 # Plugins for ParaView that add support to export state for CoProcessing etc.
 #------------------------------------------------------------------------------

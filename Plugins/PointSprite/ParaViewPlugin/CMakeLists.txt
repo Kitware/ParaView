@@ -10,6 +10,13 @@ ELSE (ParaView_SOURCE_DIR)
   FIND_PACKAGE(ParaView REQUIRED)
   INCLUDE(${PARAVIEW_USE_FILE})
 ENDIF (ParaView_SOURCE_DIR)
+    
+include_directories(
+  ${PARAVIEW_GUI_INCLUDE_DIRS}
+  ${PARAVIEW_INCLUDE_DIRS}
+  ${CMAKE_CURRENT_BINARY_DIR}
+  ${CMAKE_CURRENT_BINARY_DIR}/Resources
+)
 
 set(SM_SOURCES
   vtkSMPointSpriteRepresentationProxy.cxx
@@ -38,12 +45,6 @@ include(${PointSpritePlugin_BINARY_DIR}/Graphics/vtkCSCS_PointSprite_GraphicsKit
 foreach(class ${VTK_POINTSPRITE_GRAPHICS_CLASSES})
   set(CS_WRAP_Graphics ${CS_WRAP_Graphics} ${VTK_POINTSPRITE_GRAPHICS_HEADER_DIR}/${class}.h)
 endforeach(class)
-
-include_directories(
-  ${PARAVIEW_GUI_INCLUDE_DIRS}
-  ${PARAVIEW_INCLUDE_DIRS}
-  ${CMAKE_CURRENT_BINARY_DIR}
-)
 
 
 IF(PARAVIEW_BUILD_QT_GUI)
