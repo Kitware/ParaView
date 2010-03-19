@@ -425,6 +425,8 @@ bool pqSimpleServerStartup::promptRuntimeArguments()
         (QString(xml_option->GetAttribute("readonly")) == "true");
       const bool save_option = xml_option->GetAttribute("save") ? 
         QVariant(xml_option->GetAttribute("save")).toBool() : true;
+      QString settings_key = QString("SERVER_STARUP/%1.%2").arg(
+        this->Implementation->Server.toURI()).arg(option_name);
 
       vtkPVXMLElement* xml_type = xml_option->GetNestedElement(0);
       if (!xml_type)
@@ -440,10 +442,10 @@ bool pqSimpleServerStartup::promptRuntimeArguments()
         {
         // if save="true" is set on the Option, then try to get the value from
         // the settings if available.
-        if (settings->contains(QString("SERVER_STARUP/%1").arg(option_name)))
+
+        if (settings->contains(settings_key))
           {
-          widget_default =
-            settings->value(QString("SERVER_STARUP/%1").arg(option_name)).toString();
+          widget_default = settings->value(settings_key).toString();
           }
         }
       if (widget_default.isEmpty() || (
@@ -639,7 +641,9 @@ bool pqSimpleServerStartup::promptRuntimeArguments()
       QVariant(xml_option->GetAttribute("save")).toBool() : true;
     if (save_option && !option_readonly)
       {
-      settings->setValue(QString("SERVER_STARUP/%1").arg(option_name), val);
+      QString settings_key = QString("SERVER_STARUP/%1.%2").arg(
+        this->Implementation->Server.toURI()).arg(option_name);
+      settings->setValue(settings_key, val);
       }
     }
 
