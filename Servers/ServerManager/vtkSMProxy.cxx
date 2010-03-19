@@ -38,7 +38,7 @@
 #include <vtksys/ios/sstream>
 
 vtkStandardNewMacro(vtkSMProxy);
-vtkCxxRevisionMacro(vtkSMProxy, "1.121");
+vtkCxxRevisionMacro(vtkSMProxy, "1.122");
 
 vtkCxxSetObjectMacro(vtkSMProxy, XMLElement, vtkPVXMLElement);
 vtkCxxSetObjectMacro(vtkSMProxy, Hints, vtkPVXMLElement);
@@ -1370,7 +1370,7 @@ void vtkSMProxy::ReviveVTKObjects()
 //---------------------------------------------------------------------------
 unsigned int vtkSMProxy::GetNumberOfSubProxies()
 {
-  return this->Internals->SubProxies.size();
+  return static_cast<unsigned int>(this->Internals->SubProxies.size());
 }
 
 //---------------------------------------------------------------------------
@@ -1638,7 +1638,7 @@ void vtkSMProxy::RemoveAllConsumers()
 //---------------------------------------------------------------------------
 unsigned int vtkSMProxy::GetNumberOfConsumers()
 {
-  return this->Internals->Consumers.size();
+  return static_cast<unsigned int>(this->Internals->Consumers.size());
 }
 
 //---------------------------------------------------------------------------
@@ -1694,7 +1694,7 @@ void vtkSMProxy::RemoveProducer(vtkSMProperty* property, vtkSMProxy* proxy)
 //---------------------------------------------------------------------------
 unsigned int vtkSMProxy::GetNumberOfProducers()
 {
-  return this->Internals->Producers.size();
+  return static_cast<unsigned int>(this->Internals->Producers.size());
 }
 
 //---------------------------------------------------------------------------

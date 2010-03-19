@@ -82,7 +82,7 @@ public:
 //----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkSMComparativeViewProxy);
-vtkCxxRevisionMacro(vtkSMComparativeViewProxy, "1.31");
+vtkCxxRevisionMacro(vtkSMComparativeViewProxy, "1.32");
 
 //----------------------------------------------------------------------------
 vtkSMComparativeViewProxy::vtkSMComparativeViewProxy()
@@ -184,14 +184,14 @@ void vtkSMComparativeViewProxy::Build(int dx, int dy)
   // Ensure objects are created before building.
   this->CreateVTKObjects();
 
-  if (dx == 0 || dy == 0)
+  if (dx <= 0 || dy <= 0)
     {
     vtkErrorMacro("Dimensions cannot be 0.");
     return;
     }
 
-  int numViews = dx * dy;
-  int cc;
+  size_t numViews = dx * dy;
+  size_t cc;
 
   // Remove extra view modules.
   for (cc=this->Internal->Views.size()-1; cc >= numViews; cc--)
