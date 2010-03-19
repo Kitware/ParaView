@@ -1,6 +1,7 @@
 ################################################################################
 SET(ServersServerManager_SRCS
   ServersServerManagerPrintSelf
+  TestComparativeAnimationCueProxy 
   )
 
 FOREACH(name ${ServersServerManager_SRCS})
