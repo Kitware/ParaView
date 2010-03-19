@@ -33,21 +33,24 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ui_pqComparativeVisPanel.h"
 
 // Server Manager Includes.
+#include "vtkEventQtSlotConnect.h"
 #include "vtkProcessModule.h"
 #include "vtkSMAnimationCueProxy.h"
 #include "vtkSmartPointer.h"
+#include "vtkSMComparativeAnimationCueProxy.h"
 #include "vtkSMComparativeViewProxy.h"
+#include "vtkSMPropertyHelper.h"
 #include "vtkSMProxyManager.h"
-#include "vtkSMProxyProperty.h"
-#include "vtkSMDoubleVectorProperty.h"
+#include "vtkSMVectorProperty.h"
 
 // Qt Includes.
 #include <QHeaderView>
 #include <QPointer>
 #include <QScrollArea>
+#include <QtDebug>
 
 // ParaView Includes.
-#include "pqActiveView.h"
+#include "pqActiveObjects.h"
 #include "pqAnimationCue.h"
 #include "pqAnimationKeyFrame.h"
 #include "pqAnimationModel.h"
@@ -57,246 +60,416 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqComparativeRenderView.h"
 #include "pqPipelineSource.h"
 #include "pqPropertyLinks.h"
+#include "pqServer.h"
 #include "pqServerManagerModel.h"
 #include "pqSignalAdaptors.h"
 #include "pqSMAdaptor.h"
+#include "pqSMProxy.h"
+#include "pqTimeKeeper.h"
+#include "pqUndoStack.h"
 
-class pqComparativeVisPanel::pqInternal : public Ui::ComparativeView
+class pqComparativeVisPanel::pqInternal : public Ui::pqComparativeVisPanel
 {
 public:
   QPointer<pqView> View;
   pqPropertyLinks Links;
-  pqSignalAdaptorComboBox* ModeAdaptor;
-  pqSignalAdaptorComboBox* ViewUpdateModeAdaptor;
+};
+
+namespace pqComparativeVisPanelNS
+{
+  enum
+    {
+    PROXY = Qt::UserRole,
+    PROPERTY_NAME = PROXY+1,
+    PROPERTY_INDEX = PROPERTY_NAME + 1,
+    CUE_PROXY = PROPERTY_INDEX + 1
+    };
+
+  QString getName(vtkSMProxy* proxy)
+    {
+    pqServerManagerModel* smmmodel =
+      pqApplicationCore::instance()->getServerManagerModel();
+    pqProxy* pq_proxy = smmmodel->findItem<pqProxy*>(proxy);
+    if (pq_proxy)
+      {
+      return pq_proxy->getSMName();
+      }
+    return "<unrecognized-proxy>";
+    }
+
+  QString getName(vtkSMProxy* proxy, const char* pname, int index)
+    {
+    vtkSMVectorProperty* smproperty = 
+      vtkSMVectorProperty::SafeDownCast(proxy->GetProperty(pname));
+    if (!smproperty)
+      {
+      return "<unrecognized-property>";
+      }
+
+    unsigned int num_elems = smproperty->GetNumberOfElements();
+    if (smproperty->GetRepeatCommand())
+      {
+      num_elems = 1;
+      }
+
+    if (num_elems == 1 || index == -1)
+      {
+      return smproperty->GetXMLLabel();
+      }
+    return QString("%1 (%2)").arg(smproperty->GetXMLLabel()).arg(index);
+    }
+
+  QTableWidgetItem* newItem(vtkSMProxy* proxy, const char* pname, int index)
+    {
+    QTableWidgetItem* item = new QTableWidgetItem();
+    item->setData(PROXY, QVariant::fromValue<pqSMProxy>(pqSMProxy(proxy)));
+    item->setData(PROPERTY_NAME, pname);
+    item->setData(PROPERTY_INDEX, index);
+    if (proxy)
+      {
+      item->setText(QString("%1:%2").arg(
+          getName(proxy), getName(proxy, pname, index)));
+      }
+    else
+      {
+      item->setText("Time");
+      }
+    return item;
+    }
+
+  vtkSMProxy* newCue(vtkSMProxy* proxy, const char* pname, int index)
+    {
+    vtkSMProxyManager *pxm = vtkSMProxyManager::GetProxyManager();
+    pqServer* activeServer = pqActiveObjects::instance().activeServer();
+
+    // Create a new cueProxy.
+    vtkSMProxy* cueProxy = pxm->NewProxy("animation", "ComparativeAnimationCue");
+    cueProxy->SetConnectionID(activeServer->GetConnectionID());
+
+    vtkSMPropertyHelper(cueProxy, "AnimatedPropertyName").Set(pname);
+    vtkSMPropertyHelper(cueProxy, "AnimatedElement").Set(index);
+    vtkSMPropertyHelper(cueProxy, "AnimatedProxy").Set(proxy);
+
+    // Setup default value.
+    if (proxy)
+      {
+      QList<QVariant> domain =
+        pqSMAdaptor::getMultipleElementPropertyDomain(proxy->GetProperty(pname),
+          index >= 0? index : 0);
+      double curValue = 0.0;
+      if (index != -1)
+        {
+        curValue = vtkSMPropertyHelper(proxy, pname).GetAsDouble(index);
+        }
+      else if (vtkSMPropertyHelper(proxy, pname).GetNumberOfElements() > 0)
+        {
+        curValue = vtkSMPropertyHelper(proxy, pname).GetAsDouble(0);
+        }
+      double minValue = curValue;
+      double maxValue = curValue;
+      if (domain.size() >=1 && domain[0].isValid())
+        {
+        minValue = domain[0].toDouble();
+        }
+      if (domain.size() >= 2 && domain[1].isValid())
+        {
+        maxValue = domain[1].toDouble();
+        }
+      vtkSMComparativeAnimationCueProxy::SafeDownCast(
+        cueProxy)->UpdateWholeRange(minValue, maxValue);
+      }
+    if (!proxy)
+      {
+      pqTimeKeeper* timekeeper = activeServer->getTimeKeeper();
+      QPair<double, double> range = timekeeper->getTimeRange();
+      // this is a "Time" animation cue. Use the range provided by the time
+      // keeper.
+      vtkSMComparativeAnimationCueProxy::SafeDownCast(
+        cueProxy)->UpdateWholeRange(range.first, range.second);
+      }
+    cueProxy->UpdateVTKObjects();
+    pxm->RegisterProxy("comparative_cues", cueProxy->GetSelfIDAsString(), cueProxy);
+    return cueProxy;
+    }
 };
 
 //-----------------------------------------------------------------------------
 pqComparativeVisPanel::pqComparativeVisPanel(QWidget* p):Superclass(p)
 {
+  this->VTKConnect = vtkEventQtSlotConnect::New();
+
   this->Internal = new pqInternal();
-
-  /* TODO: Why does this never work for me :( ?
-  QVBoxLayout* vboxlayout = new QVBoxLayout(this);
-  vboxlayout->setSpacing(0);
-  vboxlayout->setMargin(0);
-  vboxlayout->setObjectName("vboxLayout");
-
-  QWidget* container = new QWidget(this);
-  container->setObjectName("scrollWidget");
-  container->setSizePolicy(QSizePolicy::MinimumExpanding,
-    QSizePolicy::MinimumExpanding);
-
-  QScrollArea* s = new QScrollArea(this);
-  s->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
-  s->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
-  s->setWidgetResizable(true);
-  s->setObjectName("scrollArea");
-  s->setFrameShape(QFrame::NoFrame);
-  s->setWidget(container);
-  vboxlayout->addWidget(s);
-  this->Internal->setupUi(container);
-  */
-
   this->Internal->setupUi(this);
-  this->Internal->ModeAdaptor = 
-    new pqSignalAdaptorComboBox(this->Internal->Mode);
-  this->Internal->ViewUpdateModeAdaptor = 
-    new pqSignalAdaptorComboBox(this->Internal->ViewUpdateMode);
-  this->Internal->Links.setUseUncheckedProperties(false);
+  this->Internal->activeParameters->horizontalHeader()->setResizeMode(
+    QHeaderView::ResizeToContents);
 
-  // When mode changes we want to hide the non-related GUI components.
   QObject::connect(
-    this->Internal->ModeAdaptor, SIGNAL(currentTextChanged(const QString&)),
-    this, SLOT(modeChanged(const QString&)), Qt::QueuedConnection);
-  this->Internal->YAxisGroup->setVisible(false);
-
-  // Call updateView when "Update" pushbutton is clicked.
-  QObject::connect(this->Internal->Update, SIGNAL(clicked()),
-    this, SLOT(updateView()), Qt::QueuedConnection);
-
-  // FIXME: move connection to pqMainWindowCore.
-  QObject::connect(&pqActiveView::instance(), SIGNAL(changed(pqView*)),
+    &pqActiveObjects::instance(), SIGNAL(viewChanged(pqView*)),
     this, SLOT(setView(pqView*)));
+  this->setView(pqActiveObjects::instance().activeView());
 
-  //this->Internal->XObject->setUpdateCurrentWithSelection(true);
-  //this->Internal->YObject->setUpdateCurrentWithSelection(true);
-  pqServerManagerModel* smmodel = 
-    pqApplicationCore::instance()->getServerManagerModel();
+  QObject::connect(this->Internal->addParameter, SIGNAL(clicked()),
+    this, SLOT(addParameter()));
 
-  // Add source to pqSourceComboBox when source is added to pipeline
-  QObject::connect(smmodel, SIGNAL(sourceAdded(pqPipelineSource*)),
-    this->Internal->XObject, SLOT(addSource(pqPipelineSource*)));
-  QObject::connect(smmodel, SIGNAL(sourceAdded(pqPipelineSource*)),
-    this->Internal->YObject, SLOT(addSource(pqPipelineSource*)));
+  QObject::connect(this->Internal->proxyCombo,
+    SIGNAL(currentProxyChanged(vtkSMProxy*)),
+    this->Internal->propertyCombo,
+    SLOT(setSource(vtkSMProxy*)));
+  this->Internal->propertyCombo->setSource(
+    this->Internal->proxyCombo->getCurrentProxy());
 
-  // Remove source from pqSourceComboBox when source is remove from pipeline
-  QObject::connect(smmodel, SIGNAL(preSourceRemoved(pqPipelineSource*)),
-    this->Internal->XObject, SLOT(removeSource(pqPipelineSource*)));
-  QObject::connect(smmodel, SIGNAL(preSourceRemoved(pqPipelineSource*)),
-    this->Internal->YObject, SLOT(removeSource(pqPipelineSource*)));
+  this->Internal->proxyCombo->addProxy(0, "Time", NULL);
 
-  // Set pqAnimatablePropertiesComboBox when pqSourceComboBox changes
-  QObject::connect(
-    this->Internal->XObject, SIGNAL(currentIndexChanged(vtkSMProxy*)),
-    this->Internal->XProperty, SLOT(setSource(vtkSMProxy*)));
-  QObject::connect(
-    this->Internal->YObject, SIGNAL(currentIndexChanged(vtkSMProxy*)),
-    this->Internal->YProperty, SLOT(setSource(vtkSMProxy*)));
+  QObject::connect(this->Internal->activeParameters,
+    SIGNAL(currentItemChanged(QTableWidgetItem*, QTableWidgetItem*)),
+    this, SLOT(parameterSelectionChanged()));
 
-  // Call propertyChanged() when pqAnimatablePropertiesComboBox changes
-  QObject::connect(
-    this->Internal->XProperty, SIGNAL(currentIndexChanged(const QString&)),
-    this, SLOT(xpropertyChanged()));
-  QObject::connect(
-    this->Internal->YProperty, SIGNAL(currentIndexChanged(const QString&)),
-    this, SLOT(ypropertyChanged()));
+  QObject::connect(&this->Internal->Links, SIGNAL(qtWidgetChanged()),
+    this, SLOT(sizeUpdated()));
+  QObject::connect(&this->Internal->Links, SIGNAL(smPropertyChanged()),
+    this, SLOT(sizeUpdated()));
+  QObject::connect(this->Internal->activeParameters->verticalHeader(),
+    SIGNAL(sectionClicked(int)),
+    this, SLOT(removeParameter(int)));
 
-  this->Internal->XProperty->setUseBlankEntry(true);
-  this->Internal->YProperty->setUseBlankEntry(true);
-  this->setEnabled(false);
+  // for now, no automatic labelling.
+  this->Internal->showParameterLabels->hide();
 }
 
 //-----------------------------------------------------------------------------
 pqComparativeVisPanel::~pqComparativeVisPanel()
 {
-  delete this->Internal->ModeAdaptor;
-  delete this->Internal->ViewUpdateModeAdaptor;
+  this->VTKConnect->Disconnect();
+  this->VTKConnect->Delete();
+  this->VTKConnect = 0;
   delete this->Internal;
+  this->Internal = 0;
 }
 
 //-----------------------------------------------------------------------------
-void pqComparativeVisPanel::setView(pqView* view)
+void pqComparativeVisPanel::setView(pqView* _view)
 {
-
-  if (this->Internal->View == view)
+  if (this->Internal->View == _view)
     {
     return;
     }
 
+  if (this->Internal->View)
+    {
+    QObject::disconnect(this->Internal->cueWidget,
+      SIGNAL(valuesChanged()),
+      this->Internal->View, SLOT(render()));
+    }
+
   this->Internal->Links.removeAllPropertyLinks();
-  this->Internal->View = view;
-  this->Internal->AnimationWidget->setComparativeView(
-    view? view->getProxy() : 0);
+  this->VTKConnect->Disconnect();
+  this->Internal->View = _view;
+  this->Internal->activeParameters->clearContents();
 
   // View must be a comparative render/plot view
-  if (   !qobject_cast<pqComparativeRenderView*>(view)
-      && !qobject_cast<pqComparativeChartView*>(view))
+  if (!qobject_cast<pqComparativeRenderView*>(_view)
+      && !qobject_cast<pqComparativeChartView*>(_view))
     {
     this->Internal->View = 0;
     this->setEnabled(false);
     return;
     }
 
-  vtkSMComparativeViewProxy* viewProxy =
-    vtkSMComparativeViewProxy::SafeDownCast(view->getProxy());
+  QObject::connect(this->Internal->cueWidget,
+    SIGNAL(valuesChanged()),
+    this->Internal->View, SLOT(render()));
 
+  vtkSMComparativeViewProxy* viewProxy =
+    vtkSMComparativeViewProxy::SafeDownCast(_view->getProxy());
   this->setEnabled(true);
 
-  // Connect XFrames spinbox value to vtkSMComparativeViewProxy's "Dimensions" property
+  // Connect layoutX spinbox value to vtkSMComparativeViewProxy's "Dimensions" property
   this->Internal->Links.addPropertyLink(
-    this->Internal->XFrames, "value", SIGNAL(valueChanged(int)),
+    this->Internal->layoutX, "value", SIGNAL(editingFinished()),
     viewProxy, viewProxy->GetProperty("Dimensions"), 0);
 
-  // Connect YFrames spinbox value to vtkSMComparativeViewProxy's "Dimensions" property
+  // Connect layoutY spinbox value to vtkSMComparativeViewProxy's "Dimensions" property
   this->Internal->Links.addPropertyLink(
-    this->Internal->YFrames, "value", SIGNAL(valueChanged(int)),
+    this->Internal->layoutY, "value", SIGNAL(editingFinished()),
     viewProxy, viewProxy->GetProperty("Dimensions"), 1);
 
-  // Connect show timesteps check button
-  this->Internal->Links.addPropertyLink(
-    this->Internal->ShowTimeStepsCheck, "checked", SIGNAL(stateChanged(int)),
-    viewProxy, viewProxy->GetProperty("ShowTimeSteps"), 1);
+  this->VTKConnect->Connect(viewProxy->GetProperty("Cues"),
+    vtkCommand::ModifiedEvent,
+    this, SLOT(updateParametersList()));
 
-  // Connect mode combobox to vtkSMComparativeViewProxy's "Mode" property
-  this->Internal->Links.addPropertyLink(
-    this->Internal->ModeAdaptor, "currentText", 
-    SIGNAL(currentTextChanged(const QString&)),
-    viewProxy, viewProxy->GetProperty("Mode"));
-
-  // Connect combobox to vtkSMComparativeViewProxy's "ViewUpdateMode" property
-  this->Internal->Links.addPropertyLink(
-    this->Internal->ViewUpdateModeAdaptor, "currentText", 
-    SIGNAL(currentTextChanged(const QString&)),
-    viewProxy, viewProxy->GetProperty("ViewUpdateMode"));
+  this->updateParametersList();
 }
 
 //-----------------------------------------------------------------------------
-void pqComparativeVisPanel::updateView()
+pqView* pqComparativeVisPanel::view() const
 {
+  return this->Internal->View;
+}
 
-  if (this->Internal->View)
+//-----------------------------------------------------------------------------
+void pqComparativeVisPanel::updateParametersList()
+{
+  this->Internal->activeParameters->clearContents();
+
+  vtkSMPropertyHelper cues(this->view()->getProxy(), "Cues");
+  this->Internal->activeParameters->setRowCount(
+    static_cast<int>(cues.GetNumberOfElements()));
+
+  for (unsigned int cc=0; cc < cues.GetNumberOfElements(); cc++)
     {
-    this->Internal->Links.accept();
+    vtkSMPropertyHelper animatedProxyHelper(cues.GetAsProxy(cc),
+      "AnimatedProxy");
+    vtkSMProxy* curProxy = animatedProxyHelper.GetNumberOfElements() > 0 ?
+      animatedProxyHelper.GetAsProxy() : NULL;
+    const char* pname = vtkSMPropertyHelper(cues.GetAsProxy(cc),
+      "AnimatedPropertyName").GetAsString();
+    int pindex = vtkSMPropertyHelper(cues.GetAsProxy(cc),
+      "AnimatedElement").GetAsInt();
 
-    // This could be handled differently, but for now lets
-    // set the timerange to the currently selected source object's
-    // TimestepValues (if it has them)
-    if (this->Internal->XObject->currentSource())
-      {
-      this->setTimeRangeFromSource(this->Internal->XObject->currentSource()->getProxy());
-      }
+    QTableWidgetItem* item = pqComparativeVisPanelNS::newItem(
+      curProxy, pname, pindex);
+    item->setData(pqComparativeVisPanelNS::CUE_PROXY,
+      QVariant::fromValue<pqSMProxy>(pqSMProxy(cues.GetAsProxy(cc))));
+    this->Internal->activeParameters->setItem(static_cast<int>(cc), 0, item);
 
-    vtkSMComparativeViewProxy* viewProxy =
-      vtkSMComparativeViewProxy::SafeDownCast(this->Internal->View->getProxy());
-
-    // Call UpdateVisualization with 1 to force the update
-    viewProxy->UpdateVisualization(1);
+    QTableWidgetItem* headerItem = new QTableWidgetItem(
+      QIcon(":/QtWidgets/Icons/pqDelete16.png"), "");
+    this->Internal->activeParameters->setVerticalHeaderItem(
+      static_cast<int>(cc), headerItem);
     }
+  
+  this->Internal->activeParameters->setCurrentItem(
+    this->Internal->activeParameters->item(cues.GetNumberOfElements()-1, 0),
+    QItemSelectionModel::ClearAndSelect);
 }
 
-
 //-----------------------------------------------------------------------------
-void pqComparativeVisPanel::modeChanged(const QString& mode)
+void pqComparativeVisPanel::addParameter()
 {
-  if (mode == "Film Strip")
+  // Need to create new cue for this property.
+  vtkSMProxy* curProxy = this->Internal->proxyCombo->getCurrentProxy();
+  QString pname = this->Internal->propertyCombo->getCurrentPropertyName();
+  int pindex = this->Internal->propertyCombo->getCurrentIndex();
+
+  int row = this->findRow(curProxy, pname, pindex);
+  if (row != -1)
     {
-    this->Internal->YAxisGroup->setVisible(false);
+    // already exists, select it.
+    this->Internal->activeParameters->setCurrentItem(
+      this->Internal->activeParameters->item(row, 0),
+      QItemSelectionModel::ClearAndSelect);
+    return;
+    }
+
+  if (curProxy)
+    {
+    BEGIN_UNDO_SET(QString("Add parameter %1 : %2").arg(
+        pqComparativeVisPanelNS::getName(curProxy)).arg(
+        pqComparativeVisPanelNS::getName(curProxy, pname.toAscii().data(), pindex)));
     }
   else
     {
-    this->Internal->YAxisGroup->setVisible(true);
+    BEGIN_UNDO_SET("Add parameter Time");
     }
+
+  // Add new cue.
+  vtkSMProxy* cueProxy = pqComparativeVisPanelNS::newCue(curProxy,
+    pname.toAscii().data(), pindex);
+  vtkSMPropertyHelper(this->view()->getProxy(), "Cues").Add(cueProxy);
+  cueProxy->Delete();
+  this->view()->getProxy()->UpdateVTKObjects();
+  END_UNDO_SET();
+
+  this->Internal->View->render();
 }
 
 //-----------------------------------------------------------------------------
-void pqComparativeVisPanel::xpropertyChanged()
+int pqComparativeVisPanel::findRow(
+  vtkSMProxy* animatedProxy, const QString& animatedPName, int animatedIndex)
 {
-  if (this->Internal->View)
+  for (int cc=0; cc < this->Internal->activeParameters->rowCount(); cc++)
     {
-    // Locate the X animation cue for this property (if none exists, a new one will
-    // be created) and make it the only enabled cue in the XCues property.
-    vtkSMProxy* proxy = this->Internal->XProperty->getCurrentProxy();
-    QString pname = this->Internal->XProperty->getCurrentPropertyName();
-    int index = this->Internal->XProperty->getCurrentIndex();
-
-    // Locate cue for the selected property.
-    this->activateCue(
-      this->Internal->View->getProxy()->GetProperty("XCues"),
-      proxy, pname, index);
-    this->Internal->View->getProxy()->UpdateVTKObjects();
+    QTableWidgetItem* item =  this->Internal->activeParameters->item(cc, 0);
+    if (item->data(
+        pqComparativeVisPanelNS::PROXY).value<pqSMProxy>().GetPointer() ==
+      animatedProxy &&
+      item->data(
+        pqComparativeVisPanelNS::PROPERTY_NAME) == animatedPName &&
+      item->data(
+        pqComparativeVisPanelNS::PROPERTY_INDEX) == animatedIndex)
+      {
+      return cc;
+      }
     }
+  return -1;
 }
 
 //-----------------------------------------------------------------------------
-void pqComparativeVisPanel::ypropertyChanged()
+void pqComparativeVisPanel::parameterSelectionChanged()
 {
-  if (this->Internal->View)
+  QTableWidgetItem* activeItem =
+    this->Internal->activeParameters->currentItem();
+  if (activeItem)
     {
-    // Locate the Y animation cue for this property (if none exists, a new one will
-    // be created) and make it the only enabled cue in the YCues property.
-    vtkSMProxy* proxy = this->Internal->YProperty->getCurrentProxy();
-    QString pname = this->Internal->YProperty->getCurrentPropertyName();
-    int index = this->Internal->YProperty->getCurrentIndex();
-
-    // Locate cue for the selected property.
-    this->activateCue(
-      this->Internal->View->getProxy()->GetProperty("YCues"),
-      proxy, pname, index);
-    this->Internal->View->getProxy()->UpdateVTKObjects();
+    vtkSMProxy* cue = activeItem->data(
+      pqComparativeVisPanelNS::CUE_PROXY).value<pqSMProxy>().GetPointer();
+    this->Internal->cueGroup->setTitle(activeItem->text());
+    this->Internal->cueWidget->setCue(cue);
+    this->Internal->multivalueHint->setVisible(
+      this->Internal->cueWidget->acceptsMultipleValues());
+    }
+  else
+    {
+    this->Internal->cueGroup->setTitle("[Select Parameter]");
+    this->Internal->cueWidget->setCue(NULL);
+    this->Internal->multivalueHint->hide();
     }
 }
 
 //-----------------------------------------------------------------------------
+void pqComparativeVisPanel::sizeUpdated()
+{
+  this->Internal->cueWidget->setSize(
+    this->Internal->layoutX->value(),
+    this->Internal->layoutY->value());
+
+  this->Internal->View->render();
+}
+
+//-----------------------------------------------------------------------------
+void pqComparativeVisPanel::removeParameter(int index)
+{
+  if (index < 0 || index >= this->Internal->activeParameters->rowCount())
+    {
+    qWarning() << "Invalid index: "<< index;
+    return;
+    }
+
+  QTableWidgetItem* item = this->Internal->activeParameters->item(index, 0);
+  Q_ASSERT(item);
+
+  BEGIN_UNDO_SET("Remove Parameter");
+
+  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+  vtkSmartPointer<vtkSMProxy> cue = item->data(
+    pqComparativeVisPanelNS::CUE_PROXY).value<pqSMProxy>().GetPointer();
+  item = NULL;
+
+  vtkSMPropertyHelper(this->view()->getProxy(), "Cues").Remove(cue);
+  this->view()->getProxy()->UpdateVTKObjects();
+
+  const char* proxy_name = pxm->GetProxyName("comparative_cues", cue);
+  if (proxy_name)
+    {
+    pxm->UnRegisterProxy("comparative_cues", proxy_name, cue);
+    }
+  END_UNDO_SET();
+
+  this->Internal->View->render();
+}
+
+//-----------------------------------------------------------------------------
+/*
 void pqComparativeVisPanel::setTimeRangeFromSource(vtkSMProxy* source)
 {
   if (!source || !this->Internal->View)
@@ -322,8 +495,10 @@ void pqComparativeVisPanel::setTimeRangeFromSource(vtkSMProxy* source)
     this->Internal->View->getProxy()->UpdateProperty("TimeRange");
     }
 }
+*/
 
 //-----------------------------------------------------------------------------
+/*
 void pqComparativeVisPanel::activateCue(
   vtkSMProperty* cuesProperty, 
   vtkSMProxy* animatedProxy, const QString& animatedPName, int animatedIndex)
@@ -385,6 +560,6 @@ void pqComparativeVisPanel::activateCue(
   pqSMAdaptor::addProxyProperty(cuesProperty, cueProxy);
   pqSMAdaptor::setElementProperty(cueProxy->GetProperty("Enabled"), 1);
   cueProxy->UpdateVTKObjects();
-
 }
+*/
 

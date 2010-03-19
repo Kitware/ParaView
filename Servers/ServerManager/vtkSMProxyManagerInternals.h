@@ -87,6 +87,7 @@ class vtkSMProxyManagerProxyInfo : public vtkObjectBase
 public:
   vtkSmartPointer<vtkSMProxy> Proxy;
   unsigned long ModifiedObserverTag;
+  unsigned long StateChangedObserverTag;
   unsigned long UpdateObserverTag;
   unsigned long UpdateInformationObserverTag;
 
@@ -117,6 +118,7 @@ private:
   vtkSMProxyManagerProxyInfo()
     {
     this->ModifiedObserverTag = 0;
+    this->StateChangedObserverTag = 0;
     this->UpdateObserverTag = 0;
     this->UpdateInformationObserverTag = 0;
     }
@@ -127,6 +129,11 @@ private:
       {
       this->Proxy.GetPointer()->RemoveObserver(this->ModifiedObserverTag);
       this->ModifiedObserverTag = 0;
+      }
+    if (this->StateChangedObserverTag && this->Proxy.GetPointer())
+      {
+      this->Proxy.GetPointer()->RemoveObserver(this->StateChangedObserverTag);
+      this->StateChangedObserverTag = 0;
       }
     if (this->UpdateObserverTag && this->Proxy.GetPointer())
       {

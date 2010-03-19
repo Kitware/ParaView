@@ -121,10 +121,7 @@ void pqAnimatableProxyComboBox::onNameChanged(pqServerManagerModelItem* item)
 void pqAnimatableProxyComboBox::onCurrentSourceChanged(int idx)
 {
   pqSMProxy pxy = this->itemData(idx).value<pqSMProxy>();
-  if(pxy)
-    {
-    emit this->currentProxyChanged(pxy);
-    }
+  emit this->currentProxyChanged(pxy);
 }
 
 void pqAnimatableProxyComboBox::addProxy(int index, const QString& label, vtkSMProxy* pxy)

@@ -26,6 +26,7 @@
 #include "vtkSMProxy.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMProxyRegisterUndoElement.h"
+#include "vtkSMProxyStateChangedUndoElement.h"
 #include "vtkSMProxyUnRegisterUndoElement.h"
 #include "vtkSMUndoStack.h"
 #include "vtkSMUpdateInformationUndoElement.h"
@@ -66,7 +67,7 @@ private:
 };
 
 vtkStandardNewMacro(vtkSMUndoStackBuilder);
-vtkCxxRevisionMacro(vtkSMUndoStackBuilder, "1.3");
+vtkCxxRevisionMacro(vtkSMUndoStackBuilder, "1.4");
 vtkCxxSetObjectMacro(vtkSMUndoStackBuilder, UndoStack, vtkSMUndoStack);
 //-----------------------------------------------------------------------------
 vtkSMUndoStackBuilder::vtkSMUndoStackBuilder()
@@ -94,6 +95,7 @@ vtkSMUndoStackBuilder::vtkSMUndoStackBuilder()
     pxm->AddObserver(vtkCommand::RegisterEvent, this->Observer, 100);
     pxm->AddObserver(vtkCommand::UnRegisterEvent, this->Observer, 100);
     pxm->AddObserver(vtkCommand::PropertyModifiedEvent, this->Observer, 100);
+    pxm->AddObserver(vtkCommand::StateChangedEvent, this->Observer, 100);
     pxm->AddObserver(vtkCommand::UpdateInformationEvent, this->Observer, 100);
 
     // Add existing global properties managers.
@@ -274,6 +276,14 @@ void vtkSMUndoStackBuilder::ExecuteEvent(vtkObject* caller,
       }
     break;
 
+  case vtkCommand::StateChangedEvent:
+      {
+      vtkSMProxyManager::StateChangedInformation &info = *(reinterpret_cast<
+        vtkSMProxyManager::StateChangedInformation*>(data));
+      this->OnProxyStateChanged(info.Proxy, info.StateChangeElement);
+      }
+    break;
+
   case vtkCommand::UpdateInformationEvent:
       {
       this->OnUpdateInformation(reinterpret_cast<vtkSMProxy*>(data));
@@ -364,6 +374,20 @@ void vtkSMUndoStackBuilder::OnPropertyModified(vtkSMProxy* proxy,
     vtkSMPropertyModificationUndoElement* elem = 
       vtkSMPropertyModificationUndoElement::New();
     elem->ModifiedProperty(proxy, pname);
+    this->UndoSet->AddElement(elem);
+    elem->Delete();
+    }
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMUndoStackBuilder::OnProxyStateChanged(vtkSMProxy* proxy,
+  vtkPVXMLElement* stateChange)
+{
+  if (proxy && stateChange)
+    {
+    vtkSMProxyStateChangedUndoElement* elem =
+      vtkSMProxyStateChangedUndoElement::New();
+    elem->StateChanged(proxy, stateChange);
     this->UndoSet->AddElement(elem);
     elem->Delete();
     }

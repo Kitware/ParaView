@@ -153,6 +153,7 @@ public:
   void Set(unsigned int index, vtkSMProxy* value, unsigned int outputport=0);
   void Set(vtkSMProxy** value, unsigned int count, unsigned int *outputports=NULL);
   void Add(vtkSMProxy* value, unsigned int outputport=0);
+  void Remove(vtkSMProxy* value);
   vtkSMProxy* GetAsProxy(unsigned int index=0);
   unsigned int GetOutputPort(unsigned int index=0);
  

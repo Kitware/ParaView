@@ -890,6 +890,17 @@
       <!-- End of AnimationCueBase -->
     </Proxy>
 
+    <ComparativeAnimationCueProxy name="ComparativeAnimationCue" 
+      class="vtkAnimationCue"
+      base_proxygroup="animation" base_proxyname="AnimationCueBase">
+      <Documentation>
+        Animation cue used by comparative views.
+      </Documentation>
+
+      <!-- No server side objects created. All properties are updateself -->
+      <!-- End of ComparativeAnimationCue -->
+    </ComparativeAnimationCueProxy>
+
     <AnimationCueProxy name="AnimationCue" class="vtkAnimationCue"
       base_proxygroup="animation" base_proxyname="AnimationCueBase">
       <Documentation>

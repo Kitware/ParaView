@@ -38,7 +38,7 @@
 #include <vtksys/ios/sstream>
 
 vtkStandardNewMacro(vtkSMProxy);
-vtkCxxRevisionMacro(vtkSMProxy, "1.119");
+vtkCxxRevisionMacro(vtkSMProxy, "1.120");
 
 vtkCxxSetObjectMacro(vtkSMProxy, XMLElement, vtkPVXMLElement);
 vtkCxxSetObjectMacro(vtkSMProxy, Hints, vtkPVXMLElement);
@@ -2287,6 +2287,12 @@ int vtkSMProxy::LoadRevivalState(vtkPVXMLElement* revivalElem)
   return 1;
 }
 
+//---------------------------------------------------------------------------
+int vtkSMProxy::RevertState(vtkPVXMLElement* element, vtkSMProxyLocator* locator)
+{
+  //vtkWarningMacro("RevertState not supported by this proxy");
+  return 0;
+}
 
 //---------------------------------------------------------------------------
 vtkPVXMLElement* vtkSMProxy::SaveState(vtkPVXMLElement* root)

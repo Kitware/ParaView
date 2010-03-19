@@ -54,6 +54,7 @@ SET(Kit_SRCS
   vtkSMClientDeliveryStrategyProxy.cxx
   vtkSMClientServerRenderSyncManagerHelper.cxx
   vtkSMClientServerRenderViewProxy.cxx
+  vtkSMComparativeAnimationCueProxy.cxx
   vtkSMComparativeViewProxy.cxx
   vtkSMCompositeKeyFrameProxy.cxx
   vtkSMCompositeTreeDomain.cxx
@@ -146,6 +147,7 @@ SET(Kit_SRCS
   vtkSMProxyProperty.cxx
   vtkSMProxyRegisterUndoElement.cxx
   vtkSMProxySelectionModel.cxx
+  vtkSMProxyStateChangedUndoElement.cxx
   vtkSMProxyUnRegisterUndoElement.cxx
   vtkSMPythonTraceObserver.cxx
   vtkSMPVLookupTableProxy.cxx

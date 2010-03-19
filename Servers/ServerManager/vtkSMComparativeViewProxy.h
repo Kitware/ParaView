@@ -23,7 +23,7 @@
 
 #include "vtkSMViewProxy.h"
 
-class vtkSMAnimationSceneProxy;
+class vtkSMComparativeAnimationCueProxy;
 class vtkCollection;
 
 class VTK_EXPORT vtkSMComparativeViewProxy : public vtkSMViewProxy
@@ -32,47 +32,6 @@ public:
   static vtkSMComparativeViewProxy* New();
   vtkTypeRevisionMacro(vtkSMComparativeViewProxy, vtkSMViewProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
-
-  //BTX
-  enum Types
-    {
-    FILM_STRIP,
-    COMPARATIVE
-    };
-  //ETX
-
-  //BTX
-  enum ViewUpdateModeTypes
-    {
-    UPDATE_MODE_NONE,
-    UPDATE_MODE_ROOT,
-    UPDATE_MODE_ALL
-    };
-  //ETX
-  
-  // Description:
-  // Set the mode. In FILM_STRIP mode, AnimationSceneX is used while in
-  // COMPARATIVE mode AnimationSceneX as well as AnimationSceneY are used.
-  vtkSetMacro(Mode, int);
-  vtkGetMacro(Mode, int);
-
-  // Description:
-  // This property determines how individual frames of the comparative view will
-  // update when a source or filter displayed by the view is modified.  When UPDATE_MODE_NONE is
-  // selected, no frames will update until the comparative view is explicity updated. 
-  // When UPDATE_MODE_ROOT is selected, the root frame will update but the other frames will not
-  // update until the comparative view is explicity updated.  When UPDATE_MODE_ALL is selected, all
-  // frames will update.
-  vtkSetMacro(ViewUpdateMode, int);
-  vtkGetMacro(ViewUpdateMode, int);
-
-  // Description:
-  // This property controls how the comparative view displays time.  When show timesteps
-  // is off, the global time is displayed in each frame.  When show timesteps is on, the
-  // comparative view displays different timesteps in each frame.  When show timesteps is
-  // on, the global time is ignored.
-  vtkSetMacro(ShowTimeSteps, int);
-  vtkGetMacro(ShowTimeSteps, int);
 
   // Description:
   // Builds the MxN views. This method simply creates the MxN internal view modules.
@@ -102,13 +61,8 @@ public:
   virtual void RemoveAllRepresentations();
 
   // Description:
-  // Forwards the call to all internal views.
-  virtual void StillRender();
-
-  // Description:
-  // Renders the view using lower resolution is possible.
-  // Forwards the call to all internal views.
-  virtual void InteractiveRender();
+  // Updates the data pipelines for all visible representations.
+  virtual void UpdateAllRepresentations();
 
   // Description:
   // Create a default representation for the given source proxy.
@@ -133,12 +87,6 @@ public:
   // Description:
   // Returns the root view proxy.
   vtkSMViewProxy* GetRootView();
-
-  // Description:
-  // Called on every still render. This checks if the comparative visualization
-  // needs to be regenerated (following changes to proxies involved in
-  // generating the comparative visualization)/tim
-  void UpdateVisualization(int force=0);
 
   // Description:
   // ViewSize, ViewPosition need to split up among all the component
@@ -174,25 +122,6 @@ public:
   vtkGetVector2Macro(Spacing, int);
 
   // Description:
-  // Set the time range and mark the scene outdated.
-  void SetTimeRange (double min, double max)
-    {
-    if ( (this->TimeRange[0] != min) || (this->TimeRange[1] != max))
-      {
-      this->TimeRange[0] = min;
-      this->TimeRange[1] = max;
-      this->Modified();
-      this->MarkSceneOutdated();
-      }
-    }
-
-  void SetTimeRange(double x[2])
-    {
-    this->SetTimeRange(x[0], x[1]);
-    }
-  vtkGetVector2Macro(TimeRange, double);
-
-  // Description:
   // Gets the X property and element number currently being compared, if any.
   virtual bool GetXPropertyAndElement(vtkSMProperty *&, int &);
 
@@ -211,9 +140,19 @@ public:
   // method on a prototype instantaiated for the requested class and the
   // determine the actual xmlname for the view to create.
   // Overridden to choose the correct type of render view.
- virtual const char* GetSuggestedViewType(vtkIdType connectionID);
+  virtual const char* GetSuggestedViewType(vtkIdType connectionID);
 
-//BTX
+  // Description:
+  // Add/Remove parameter cues.
+  void AddCue(vtkSMComparativeAnimationCueProxy*);
+  void RemoveCue(vtkSMComparativeAnimationCueProxy*);
+
+  // Description:
+  // Dirty means this algorithm will execute during next update.
+  // This all marks all consumers as dirty.
+  virtual void MarkDirty(vtkSMProxy* modifiedProxy); 
+
+  //BTX
 protected:
   vtkSMComparativeViewProxy();
   ~vtkSMComparativeViewProxy();
@@ -232,16 +171,9 @@ protected:
   // Removes an internal view and all the representations in that view.
   void RemoveView(vtkSMViewProxy* remove);
 
-  void UpdateRootView();
-
   // Description:
-  // Update comparative scene.
-  void UpdateComparativeVisualization(vtkSMAnimationSceneProxy* sceneX,
-    vtkSMAnimationSceneProxy* sceneY);
-
-  // Description:
-  // Update timestrip scene.
-  void UpdateFilmStripVisualization(vtkSMAnimationSceneProxy* scene);
+  virtual void EndStillRender();
+  virtual void EndInteractiveRender();
 
   // Description:
   // Update layout for internal views.
@@ -250,21 +182,16 @@ protected:
   // Description:
   // Marks the view dirty i.e. on next StillRender it needs to regenerate the
   // comparative vis by replaying the animation(s).
-  void MarkSceneOutdated()
-    { this->SceneOutdated=true; }
+  void MarkOutdated()
+    { this->Outdated=true; }
 
-  int Mode;
-  int ViewUpdateMode;
-  int ShowTimeSteps;
+  void ClearDataCaches();
+
   int Dimensions[2];
   int ViewSize[2];
   int Spacing[2];
-  double TimeRange[2];
 
-  vtkSMAnimationSceneProxy* AnimationSceneX;
-  vtkSMAnimationSceneProxy* AnimationSceneY;
-
-  bool SceneOutdated;
+  bool Outdated;
 
 private:
   vtkSMComparativeViewProxy(const vtkSMComparativeViewProxy&); // Not implemented
@@ -272,9 +199,9 @@ private:
 
   class vtkInternal;
   vtkInternal* Internal;
-  vtkCommand* SceneObserver;
+  vtkCommand* MarkOutdatedObserver;
 
-//ETX
+  //ETX
 };
 
 #endif

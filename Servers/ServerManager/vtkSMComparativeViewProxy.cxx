@@ -17,17 +17,15 @@
 #include "vtkCollection.h"
 #include "vtkMemberFunctionCommand.h"
 #include "vtkObjectFactory.h"
-#include "vtkSMAnimationSceneProxy.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMCameraLink.h"
-#include "vtkSMDoubleVectorProperty.h"
-#include "vtkSMIntVectorProperty.h"
+#include "vtkSMComparativeAnimationCueProxy.h"
+#include "vtkSMPropertyHelper.h"
 #include "vtkSMPropertyIterator.h"
 #include "vtkSMProxyLink.h"
 #include "vtkSMProxyManager.h"
-#include "vtkSMPropertyHelper.h"
-#include "vtkSMRepresentationProxy.h"
 #include "vtkSMProxyProperty.h"
+#include "vtkSMRepresentationProxy.h"
 
 #include <vtkstd/vector>
 #include <vtkstd/map>
@@ -45,15 +43,26 @@ public:
                             // being the view in which that representation clone
                             // exists.
     vtkSmartPointer<vtkSMProxyLink> Link;
+
+    void MarkRepresentationsModified()
+      {
+      MapOfViewToRepr::iterator iter;
+      for (iter = this->Clones.begin(); iter != this->Clones.end(); ++iter)
+        {
+        iter->second.GetPointer()->MarkDirty(NULL);
+        }
+      }
     };
 
   typedef vtkstd::vector<vtkSmartPointer<vtkSMViewProxy> > VectorOfViews;
   VectorOfViews Views;
 
-
   typedef vtkstd::map<vtkSMRepresentationProxy*, RepresentationData> MapOfReprClones;
-
   MapOfReprClones RepresentationClones;
+
+  typedef vtkstd::vector<vtkSmartPointer<vtkSMComparativeAnimationCueProxy> >
+    VectorOfCues;
+  VectorOfCues Cues;
 
   vtkSmartPointer<vtkSMProxyLink> ViewLink;
   vtkSmartPointer<vtkSMCameraLink> ViewCameraLink;
@@ -73,48 +82,56 @@ public:
 //----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkSMComparativeViewProxy);
-vtkCxxRevisionMacro(vtkSMComparativeViewProxy, "1.29");
+vtkCxxRevisionMacro(vtkSMComparativeViewProxy, "1.30");
 
 //----------------------------------------------------------------------------
 vtkSMComparativeViewProxy::vtkSMComparativeViewProxy()
 {
   this->Internal = new vtkInternal();
-  this->Mode = FILM_STRIP;
   this->Dimensions[0] = 0;
   this->Dimensions[1] = 0;
   this->ViewSize[0] = 400;
   this->ViewSize[1] = 400;
-  this->TimeRange[0] = 0.0;
-  this->TimeRange[1] = 1.0;
   this->Spacing[0] = this->Spacing[1] = 1;
-  this->AnimationSceneX = 0;
-  this->AnimationSceneY = 0;
-  this->ShowTimeSteps = 1;
-  this->ViewUpdateMode = UPDATE_MODE_ROOT;
 
-  this->SceneOutdated = true;
+  this->Outdated = true;
 
   vtkMemberFunctionCommand<vtkSMComparativeViewProxy>* fsO = 
     vtkMemberFunctionCommand<vtkSMComparativeViewProxy>::New();
-  fsO->SetCallback(*this, &vtkSMComparativeViewProxy::MarkSceneOutdated);
-  this->SceneObserver = fsO;
+  fsO->SetCallback(*this, &vtkSMComparativeViewProxy::MarkOutdated);
+  this->MarkOutdatedObserver = fsO;
 }
 
 //----------------------------------------------------------------------------
 vtkSMComparativeViewProxy::~vtkSMComparativeViewProxy()
 {
-  if (this->AnimationSceneX)
-    {
-    this->AnimationSceneX->RemoveObserver(this->SceneObserver);
-    }
-  if (this->AnimationSceneY)
-    {
-    this->AnimationSceneY->RemoveObserver(this->SceneObserver);
-    }
-
   delete this->Internal;
+  this->MarkOutdatedObserver->Delete();
+}
 
-  this->SceneObserver->Delete();
+//----------------------------------------------------------------------------
+void vtkSMComparativeViewProxy::AddCue(vtkSMComparativeAnimationCueProxy* cue)
+{
+  this->Internal->Cues.push_back(cue);
+  cue->AddObserver(vtkCommand::ModifiedEvent, this->MarkOutdatedObserver);
+  this->MarkOutdated();
+}
+
+//----------------------------------------------------------------------------
+void vtkSMComparativeViewProxy::RemoveCue(vtkSMComparativeAnimationCueProxy* cue)
+{
+  vtkInternal::VectorOfCues::iterator iter;
+  for (iter = this->Internal->Cues.begin();
+    iter != this->Internal->Cues.end(); ++iter)
+    {
+    if (iter->GetPointer() == cue)
+      {
+      cue->RemoveObserver(this->MarkOutdatedObserver);
+      this->Internal->Cues.erase(iter);
+      this->MarkOutdated();
+      break;
+      }
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -158,16 +175,6 @@ bool vtkSMComparativeViewProxy::BeginCreateVTKObjects()
   this->Internal->ViewLink->AddException("CameraViewAngleInfo");
   this->Internal->ViewLink->AddException("CameraViewAngle");
 
-  this->AnimationSceneX  = vtkSMAnimationSceneProxy::SafeDownCast(
-    this->GetSubProxy("AnimationSceneX"));
-  this->AnimationSceneY = vtkSMAnimationSceneProxy::SafeDownCast(
-    this->GetSubProxy("AnimationSceneY"));
-
-  this->AnimationSceneX->AddObserver(vtkCommand::ModifiedEvent, 
-    this->SceneObserver);
-  this->AnimationSceneY->AddObserver(vtkCommand::ModifiedEvent, 
-    this->SceneObserver);
-
   return this->Superclass::BeginCreateVTKObjects();
 }
 
@@ -190,14 +197,14 @@ void vtkSMComparativeViewProxy::Build(int dx, int dy)
   for (cc=this->Internal->Views.size()-1; cc >= numViews; cc--)
     {
     this->RemoveView(this->Internal->Views[cc]);
-    this->SceneOutdated = true;
+    this->Outdated = true;
     }
 
   // Add view modules, if not enough.
   for (cc=this->Internal->Views.size(); cc < numViews; cc++)
     {
     this->AddNewView();
-    this->SceneOutdated = true;
+    this->Outdated = true;
     }
 
   this->Dimensions[0] = dx;
@@ -227,28 +234,18 @@ void vtkSMComparativeViewProxy::UpdateViewLayout()
       int view_pos[2];
       view_pos[0] = this->ViewPosition[0] + width * x;
       view_pos[1] = this->ViewPosition[1] + height * y;
+      vtkSMPropertyHelper(view, "ViewPosition").Set(view_pos, 2);
 
-      vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
-        view->GetProperty("ViewPosition"));
-      ivp->SetElements(view_pos);
+      // Not all view classes have a ViewSize property
+      vtkSMPropertyHelper(view, "ViewSize", true).Set(0, width);
+      vtkSMPropertyHelper(view, "ViewSize", true).Set(1, height);
 
-      ivp = vtkSMIntVectorProperty::SafeDownCast(
-        view->GetProperty("ViewSize"));
-      if (ivp) // Not all view classes have a ViewSize property
-        {
-        ivp->SetElement(0, width);
-        ivp->SetElement(1, height);
-        }
+      vtkSMPropertyHelper(view, "GUISize").Set(this->GUISize, 2);
 
-      ivp = vtkSMIntVectorProperty::SafeDownCast(
-        view->GetProperty("GUISize"));
-      ivp->SetElements(this->GUISize);
       view->UpdateVTKObjects();
       }
     }
-
 }
-
 
 //----------------------------------------------------------------------------
 vtkSMViewProxy* vtkSMComparativeViewProxy::GetRootView()
@@ -396,11 +393,12 @@ void vtkSMComparativeViewProxy::RemoveView(vtkSMViewProxy* view)
 //----------------------------------------------------------------------------
 void vtkSMComparativeViewProxy::AddRepresentation(vtkSMRepresentationProxy* repr)
 {
-
   if (!repr)
     {
     return;
     }
+
+  this->MarkOutdated();
 
   // Add representation to the root view
   vtkSMViewProxy* rootView = this->GetRootView();
@@ -472,6 +470,8 @@ void vtkSMComparativeViewProxy::RemoveRepresentation(vtkSMRepresentationProxy* r
     return;
     }
 
+  this->MarkOutdated();
+
   vtkInternal::RepresentationData& data = reprDataIter->second;
 
   // Remove all clones of this representation.
@@ -513,33 +513,43 @@ void vtkSMComparativeViewProxy::RemoveAllRepresentations()
     this->RemoveRepresentation(repr);
     iter = this->Internal->RepresentationClones.begin();
     }
+
+  this->MarkOutdated();
 }
 
 //----------------------------------------------------------------------------
-void vtkSMComparativeViewProxy::StillRender()
+void vtkSMComparativeViewProxy::MarkDirty(vtkSMProxy* modifiedProxy) 
 {
-  static bool in_still_render = false;
-  if (in_still_render)
-    {
-    return;
-    }
-  in_still_render = true;
+  // The representation that gets added to this view is a consumer of it's
+  // input. While this view is a consumer of the representation. So, when the
+  // input source is modified, that call eventually leads to
+  // vtkSMComparativeViewProxy::MarkDirty(). When that happens, we need to
+  // ensure that we regenerate the comparison, so we call this->MarkOutdated().
 
-  // Generate the CV if required.
-  // For starters, we wont update the vis automatically, let the user call
-  // UpdateComparativeVisualization explicitly.
-  this->UpdateVisualization();
+  // TODO: We can be even smarter. We may want to try to consider only those
+  // representations that are actually involved in the parameter comparison to
+  // mark this view outdated. This will save on the regeneration of cache when
+  // not needed.
 
-  this->GetRootView()->StillRender();
+  // TODO: Another optimization: we can enable caching only for those
+  // representations that are invovled in parameter comparison, others we don't
+  // even need to cache.
+
+  // TODO: Need to update data ranges by collecting ranges from all views.
+  this->Superclass::MarkDirty(modifiedProxy);
+  this->MarkOutdated();
+}
+
+//----------------------------------------------------------------------------
+void vtkSMComparativeViewProxy::EndStillRender()
+{
   // The StillRender will propagate through the ViewCameraLink to all the other
   // views.
-
-  in_still_render = false;
-  //this->Internal->ViewCameraLink->SetEnabled(true);
+  this->GetRootView()->StillRender();
 }
 
 //----------------------------------------------------------------------------
-void vtkSMComparativeViewProxy::InteractiveRender()
+void vtkSMComparativeViewProxy::EndInteractiveRender()
 {
   // The InteractiveRender will propagate through the ViewCameraLink to all the 
   // other views.
@@ -554,172 +564,103 @@ vtkSMRepresentationProxy* vtkSMComparativeViewProxy::CreateDefaultRepresentation
 }
 
 //----------------------------------------------------------------------------
-void vtkSMComparativeViewProxy::UpdateVisualization(int force)
+void vtkSMComparativeViewProxy::UpdateAllRepresentations()
 {
-  if (!this->AnimationSceneX && !this->AnimationSceneY)
+  if (!this->Outdated)
     {
-    // no comparative vis.
+    // cout << "Not Outdated" << endl;
     return;
     }
 
-  if (!this->SceneOutdated && !force && this->ViewUpdateMode != UPDATE_MODE_ALL)
+  // ensure that all representation caches are cleared.
+  this->ClearDataCaches();
+  // cout << "-------------" << endl;
+
+  vtkSMComparativeAnimationCueProxy* timeCue = NULL;
+  // locate time cue.
+  vtkInternal::VectorOfCues::iterator iter;
+  for (iter = this->Internal->Cues.begin();
+    iter != this->Internal->Cues.end(); ++iter)
     {
-    if (this->ViewUpdateMode == UPDATE_MODE_ROOT)
+    // for now, we are saying that the first cue that has no animatable  proxy
+    // is for animating time.
+    if (iter->GetPointer()->GetAnimatedProxy() == NULL)
       {
-      this->UpdateRootView();
+      timeCue = iter->GetPointer();
+      break;
       }
-    // no need to rebuild.
-    return;
     }
-
-  vtkInternal::VectorOfViews::iterator iter;
-  for (iter = this->Internal->Views.begin(); 
-       iter != this->Internal->Views.end(); ++iter)
-    {
-    iter->GetPointer()->SetUseCache(false);
-    iter->GetPointer()->UpdateAllRepresentations();
-    iter->GetPointer()->SetUseCache(true);
-    }
-
-  // Are we in generating a film-strip or a comparative vis?
-  if (this->AnimationSceneX && this->AnimationSceneY &&
-    this->Mode == COMPARATIVE)
-    {
-    this->UpdateComparativeVisualization(
-      this->AnimationSceneX, this->AnimationSceneY);
-    }
-  else if (this->Mode == FILM_STRIP && this->AnimationSceneX)
-    {
-    this->UpdateFilmStripVisualization(this->AnimationSceneX);
-    }
-
-    /*
-    // I'm not sure why this block of code was needed?
-    // It called SetUseCache(false) which caused bad behavior.
-    for (iter = this->Internal->Views.begin(); 
-       iter != this->Internal->Views.end(); ++iter)
-    {
-    // Mark all representations as updated; this won't cause any real updation
-    // since use cache is on.
-    iter->GetPointer()->UpdateAllRepresentations();
-    iter->GetPointer()->SetUseCache(false);
-    }
-    */
-  this->SceneOutdated = false;
-}
-
-//----------------------------------------------------------------------------
-void vtkSMComparativeViewProxy::UpdateRootView()
-{
-  this->AnimationSceneX->SetAnimationTime(0);
-  vtkSMViewProxy* view = this->Internal->Views[0];
-  if (this->GetShowTimeSteps())
-    {
-    view->SetViewUpdateTime(this->TimeRange[0]);
-    }
-  else
-    {
-    view->SetViewUpdateTime(this->GetViewUpdateTime());
-    }
-  view->SetCacheTime(view->GetCacheTime()+1.0);
-  view->StillRender();
-}
-
-//----------------------------------------------------------------------------
-void vtkSMComparativeViewProxy::UpdateFilmStripVisualization(
-  vtkSMAnimationSceneProxy* scene)
-{
-
-  // Set EndTime to the number of views in comparative view.
-  // Think of this as the number of key frames in the animation.
-  // Next, for each frame in the CV, set that frame's time to an
-  // intermediate value between this->TimeRange[0] and this->TimeRange[1].
-
-  vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
-    scene->GetProperty("EndTime"));
-  dvp->SetElement(0, this->Dimensions[0]*this->Dimensions[1]-1);
-  scene->UpdateVTKObjects();
-
-  this->Internal->ActiveIndexX = 0;
-  this->Internal->ActiveIndexY = 0;
-
-  double increment =  (this->TimeRange[1] - this->TimeRange[0])/
-    (this->Dimensions[0]*this->Dimensions[1]-1);
-
-  for (int view_index=0; 
-    view_index < this->Dimensions[0]*this->Dimensions[1]; ++view_index)
-    {
-    scene->SetAnimationTime(view_index);
-
-    vtkSMViewProxy* view = this->Internal->Views[view_index];
-
-    if (this->GetShowTimeSteps())
-      {
-      double time = this->TimeRange[0] + view_index*increment;
-      view->SetViewUpdateTime(time);
-      }
-    else
-      {
-      view->SetViewUpdateTime(this->GetViewUpdateTime());
-      }
-
-    // HACK: This ensure that obsolete cache is never used when the CV is being
-    // generated.
-    view->SetCacheTime(view->GetCacheTime()+1.0);
-
-    // Make the view cache the current setup. 
-    // We do interactive render so that both the full-res as well as low-res cache
-    // is updated.
-    view->InteractiveRender();
-    }
-}
-
-//----------------------------------------------------------------------------
-void vtkSMComparativeViewProxy::UpdateComparativeVisualization(
-  vtkSMAnimationSceneProxy* sceneX, vtkSMAnimationSceneProxy* sceneY)
-{
-  vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
-    sceneX->GetProperty("EndTime"));
-  dvp->SetElement(0, this->Dimensions[0]-1);
-  sceneX->UpdateVTKObjects();
-
-  dvp = vtkSMDoubleVectorProperty::SafeDownCast(
-    sceneY->GetProperty("EndTime"));
-  dvp->SetElement(0, this->Dimensions[1]-1);
-  sceneY->UpdateVTKObjects();
-
-  double increment =  (this->TimeRange[1] - this->TimeRange[0])/
-    (this->Dimensions[0]*this->Dimensions[1]-1);
 
   int view_index=0;
   for (int y=0; y < this->Dimensions[1]; y++)
     {
-    sceneY->SetAnimationTime(y);
     for (int x=0; x < this->Dimensions[0]; x++)
       {
-      sceneX->SetAnimationTime(x);
       vtkSMViewProxy* view = this->Internal->Views[view_index];
+      view_index++;
 
-      if (this->GetShowTimeSteps())
+      if (timeCue)
         {
-        double time = this->TimeRange[0] + view_index*increment;
-        view->SetViewUpdateTime(time);
+        double value = iter->GetPointer()->GetValue(
+          x, y, this->Dimensions[0], this->Dimensions[1]);
+        view->SetViewUpdateTime(value);
         }
       else
         {
         view->SetViewUpdateTime(this->GetViewUpdateTime());
         }
 
-      // HACK: This ensure that obsolete cache is never used when the CV is being
-      // generated.
-      view->SetCacheTime(view->GetCacheTime()+1.0);
+      vtkInternal::VectorOfCues::iterator iter;
+      for (iter = this->Internal->Cues.begin();
+        iter != this->Internal->Cues.end(); ++iter)
+        {
+        if (iter->GetPointer() == timeCue)
+          {
+          continue;
+          }
+        iter->GetPointer()->UpdateAnimatedValue(
+          x, y, this->Dimensions[0], this->Dimensions[1]);
+        }
+
+      view->SetCacheTime(0);
 
       // Make the view cache the current setup. 
       // We do interactive render so that both the full-res as well as low-res cache
       // is updated.
-      view->InteractiveRender();
-      view_index++;
+      view->UpdateAllRepresentations();
       }
+    }
+
+  this->Outdated = false;
+}
+
+//----------------------------------------------------------------------------
+void vtkSMComparativeViewProxy::ClearDataCaches()
+{
+  vtkInternal::VectorOfViews::iterator viter;
+  for (viter = this->Internal->Views.begin(); 
+    viter != this->Internal->Views.end(); ++viter)
+    {
+    viter->GetPointer()->SetUseCache(false);
+    }
+
+  // Mark all representations modified. This clears their caches. It's essential
+  // that SetUseCache(false) is called before we do this, otherwise the caches
+  // are not cleared.
+
+  vtkInternal::MapOfReprClones::iterator repcloneiter;
+  for (repcloneiter = this->Internal->RepresentationClones.begin();
+    repcloneiter != this->Internal->RepresentationClones.end();
+    ++repcloneiter)
+    {
+    repcloneiter->first->MarkDirty(NULL);
+    repcloneiter->second.MarkRepresentationsModified();
+    }
+
+  for (viter = this->Internal->Views.begin(); 
+    viter != this->Internal->Views.end(); ++viter)
+    {
+    viter->GetPointer()->SetUseCache(true);
     }
 }
 
@@ -836,9 +777,6 @@ void vtkSMComparativeViewProxy::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os, indent);
   os << indent << "Dimensions: " << this->Dimensions[0] 
     << ", " << this->Dimensions[1] << endl;
-  os << indent << "Mode: " << this->Mode << endl;
-  os << indent << "TimeRange: " 
-    << this->TimeRange[0] <<", " << this->TimeRange[1] << endl;
   os << indent << "Spacing: " << this->Spacing[0] << ", "
     << this->Spacing[1] << endl;
 }

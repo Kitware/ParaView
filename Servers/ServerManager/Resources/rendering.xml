@@ -5602,82 +5602,15 @@
         </Documentation>
       </IntVectorProperty>
 
-      <DoubleVectorProperty
-        name="TimeRange"
-        command="SetTimeRange"
-        update_self="1"
-        number_of_elements="2"
-        default_values="0.0 1.0">
-        <Documentation>
-          Set the time range for FilmStrip visualizations.
-        </Documentation>
-      </DoubleVectorProperty>
-
-      <IntVectorProperty
-        name="Mode"
-        command="SetMode"
-        update_self="1"
-        number_of_elements="1"
-        default_values="0">
-        <EnumerationDomain name="enum">
-          <Entry value="0" text="Film Strip" />
-          <Entry value="1" text="Comparative" />
-        </EnumerationDomain>
-      </IntVectorProperty>
-
-      <IntVectorProperty
-        name="ViewUpdateMode"
-        command="SetViewUpdateMode"
-        update_self="1"
-        number_of_elements="1"
-        default_values="1">
-        <EnumerationDomain name="enum">
-          <Entry value="0" text="None" />
-          <Entry value="1" text="Root" />
-          <Entry value="2" text="All" />
-        </EnumerationDomain>
-        <Documentation>
-          This property determines how individual frames of the comparative view will
-          update when a source or filter displayed by the view is modified.  When none is
-          selected, no frames will update until the comparative view is explicity updated.
-          When root is selected, the root frame will update but the other frames will not
-          update until the comparative view is explicity updated.  When all is selected, all
-          frames will update.
-        </Documentation>
-      </IntVectorProperty>
-
-      <IntVectorProperty
-        name="ShowTimeSteps"
-        command="SetShowTimeSteps"
-        number_of_elements="1"
-        default_values="1"
+      <ProxyProperty name="Cues"
+        command="AddCue"
+        remove_command="RemoveCue"
         update_self="1">
-        <BooleanDomain name="bool" />
         <Documentation>
-          This property controls how the comparative view displays time.  When show timesteps
-          is off, the global time is displayed in each frame.  When show timesteps is on, the
-          comparative view displays different timesteps in each frame.  When show timesteps is
-          on, the global time is ignored.
+          Animation cues for changing parameters.
         </Documentation>
-      </IntVectorProperty>
+      </ProxyProperty>
 
-      <SubProxy>
-        <Proxy name="AnimationSceneX" proxygroup="animation"
-          proxyname="AnimationScene">
-        </Proxy>
-        <ExposedProperties>
-          <Property name="Cues" exposed_name="XCues" />
-        </ExposedProperties>
-      </SubProxy>
-
-      <SubProxy>
-        <Proxy name="AnimationSceneY" proxygroup="animation"
-          proxyname="AnimationScene">
-        </Proxy>
-        <ExposedProperties>
-          <Property name="Cues" exposed_name="YCues" />
-        </ExposedProperties>
-      </SubProxy>
       <!-- End of ComparativeViewBase -->
     </Proxy>
 

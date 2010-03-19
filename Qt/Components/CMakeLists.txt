@@ -87,7 +87,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqColorScaleEditor.h
   pqColorScaleToolbar.h
   pqComboBoxDomain.h
-  pqComparativeTracksWidget.h
+  pqComparativeCueWidget.h
   pqComparativeVisPanel.h
   pqContourPanel.h
   pqContourWidget.h
@@ -231,6 +231,7 @@ SET(UI_FORMS
   Resources/UI/pqChangeInputDialog.ui
   Resources/UI/pqColorPresetDialog.ui
   Resources/UI/pqColorScaleDialog.ui
+  Resources/UI/pqComparativeParameterRangeDialog.ui
   Resources/UI/pqComparativeVisPanel.ui
   Resources/UI/pqContourControls.ui
   Resources/UI/pqContourWidget.ui
@@ -427,8 +428,8 @@ ADD_LIBRARY(pqComponents
   pqColorScaleToolbar.h
   pqComboBoxDomain.cxx
   pqComboBoxDomain.h
-  pqComparativeTracksWidget.cxx
-  pqComparativeTracksWidget.h
+  pqComparativeCueWidget.cxx
+  pqComparativeCueWidget.h
   pqComparativeVisPanel.cxx
   pqComparativeVisPanel.h
   pqComponentsExport.h

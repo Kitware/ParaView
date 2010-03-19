@@ -426,6 +426,7 @@ public:
   // This call saves all a proxy's properties, including exposed properties
   // and sub-proxies. More control is provided by the following overload.
   virtual vtkPVXMLElement* SaveState(vtkPVXMLElement* root);
+
   // Description:
   // Saves the state of the proxy. This state can be reloaded
   // to create a new proxy that is identical the present state of this proxy.
@@ -445,6 +446,14 @@ public:
   // or subclasses). If locator is NULL, then such properties are left
   // unchanged.
   virtual int LoadState(vtkPVXMLElement* element, vtkSMProxyLocator* locator);
+
+  // Description:
+  // Same as LoadState except that the proxy will try to undo the changes
+  // recorded in the state. Default implementation simply throws an warning.
+  // Subclasses that don't have traditional properties but fire
+  // vtkCommand::StateChangedEvent to capture state changes, need to override
+  // this method to support undo/redo.
+  virtual int RevertState(vtkPVXMLElement* element, vtkSMProxyLocator* locator);
 
   // Description:
   // Dirty means this algorithm will execute during next update.

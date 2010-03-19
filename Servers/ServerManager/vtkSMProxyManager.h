@@ -389,6 +389,12 @@ public:
     vtkPVXMLElement* RootElement;
     vtkSMProxyLocator* ProxyLocator;
     };
+
+  struct StateChangedInformation
+    {
+    vtkSMProxy* Proxy;
+    vtkPVXMLElement* StateChangeElement;
+    };
 //ETX
 
   // Description:

@@ -188,11 +188,11 @@ private:
 };
 
 vtkStandardNewMacro(vtkSMUndoStackUndoSet);
-vtkCxxRevisionMacro(vtkSMUndoStackUndoSet, "1.17");
+vtkCxxRevisionMacro(vtkSMUndoStackUndoSet, "1.18");
 //*****************************************************************************
 
 vtkStandardNewMacro(vtkSMUndoStack);
-vtkCxxRevisionMacro(vtkSMUndoStack, "1.17");
+vtkCxxRevisionMacro(vtkSMUndoStack, "1.18");
 vtkCxxSetObjectMacro(vtkSMUndoStack, StateLoader, vtkSMUndoRedoStateLoader);
 //-----------------------------------------------------------------------------
 vtkSMUndoStack::vtkSMUndoStack()
@@ -241,8 +241,8 @@ void vtkSMUndoStack::Push(vtkIdType cid, const char* label, vtkUndoSet* set)
     }
   
   vtkPVXMLElement* state = set->SaveState(NULL);
-//    if (!this->ClientOnly)
-//      state->PrintXML();
+  //if (!this->ClientOnly)
+  //  state->PrintXML();
 
   /*
    * FIXME: Until we start supporting multiple client, it really unnecessary to push

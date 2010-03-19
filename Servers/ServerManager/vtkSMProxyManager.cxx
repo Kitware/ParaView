@@ -102,7 +102,7 @@ protected:
 
 //*****************************************************************************
 vtkStandardNewMacro(vtkSMProxyManager);
-vtkCxxRevisionMacro(vtkSMProxyManager, "1.86");
+vtkCxxRevisionMacro(vtkSMProxyManager, "1.87");
 //---------------------------------------------------------------------------
 vtkSMProxyManager::vtkSMProxyManager()
 {
@@ -891,6 +891,8 @@ void vtkSMProxyManager::RegisterProxy(const char* groupname,
   // Add observers to note proxy modification.
   proxyInfo->ModifiedObserverTag = proxy->AddObserver(
     vtkCommand::PropertyModifiedEvent, this->Observer);
+  proxyInfo->StateChangedObserverTag = proxy->AddObserver(
+    vtkCommand::StateChangedEvent, this->Observer);
   proxyInfo->UpdateObserverTag = proxy->AddObserver(vtkCommand::UpdateEvent,
     this->Observer);
   proxyInfo->UpdateInformationObserverTag = proxy->AddObserver(
@@ -1091,6 +1093,23 @@ void vtkSMProxyManager::ExecuteEvent(vtkObject* obj, unsigned long event,
         {
         this->InvokeEvent(vtkCommand::PropertyModifiedEvent,
           &info);
+        }
+      }
+    break;
+
+  case vtkCommand::StateChangedEvent:
+      {
+      // I wonder if I need to mark the proxy modified. Cause when state
+      // changes, the properties are pushed as well so ideally we should call
+      // MarkProxyAsModified() and then UnMarkProxyAsModified() :).
+      // this->MarkProxyAsModified(proxy);
+
+      StateChangedInformation info;
+      info.Proxy = proxy;
+      info.StateChangeElement = reinterpret_cast<vtkPVXMLElement*>(data);
+      if (info.StateChangeElement)
+        {
+        this->InvokeEvent(vtkCommand::StateChangedEvent, &info);
         }
       }
     break;

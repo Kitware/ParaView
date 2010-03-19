@@ -32,6 +32,7 @@
 
 #include "vtkSMObject.h"
 
+class vtkPVXMLElement;
 class vtkSMGlobalPropertiesManager;
 class vtkSMProxy;
 class vtkSMUndoStack;
@@ -130,6 +131,8 @@ protected:
   virtual void OnUnRegisterProxy(const char* group, const char* name,
     vtkSMProxy*);
   virtual void OnPropertyModified(vtkSMProxy* proxy, const char* propname);
+  virtual void OnProxyStateChanged(vtkSMProxy* proxy, vtkPVXMLElement*
+    stateChange);
   virtual void OnUpdateInformation(vtkSMProxy* proxy);
   virtual void OnRegisterLink(const char* name);
   virtual void OnUnRegisterLink(const char* name);

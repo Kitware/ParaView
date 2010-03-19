@@ -38,7 +38,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqView;
 class vtkSMProxy;
 class vtkSMProperty;
+class vtkEventQtSlotConnect;
 
+/// pqComparativeVisPanel is a properties page for the comparative view. It
+/// allows the user to change the layout of the grid as well as add/remove
+/// parameters to compare in the view.
 class PQCOMPONENTS_EXPORT pqComparativeVisPanel : public QWidget
 {
   Q_OBJECT
@@ -47,34 +51,46 @@ public:
   pqComparativeVisPanel(QWidget* parent=0);
   ~pqComparativeVisPanel();
 
+  /// Access the current view being shown by this panel.
+  pqView* view() const;
+
 public slots:
   /// Set the view to shown in this panel. If the view is not a comparative view
   /// then the panel will be disabled, otherwise, it shows the properties of the
   /// view.
   void setView(pqView*);
 
-  /// Update the view using the current panel values.
-  void updateView(); 
-
-  void modeChanged(const QString&);
 protected slots:
-  /// When the selection of the property to animate on X axis changes.
-  void xpropertyChanged();
-  
-  /// When the selection of the property to animate on Y axis changes.
-  void ypropertyChanged();
+  ///// If vtkSMProxy has a TimestepValues property then this method will set the
+  ///// TimeRange property of vtkSMComparativeViewProxy to reflect the values.
+  //void setTimeRangeFromSource(vtkSMProxy*);
 
-  /// If vtkSMProxy has a TimestepValues property then this method will set the
-  /// TimeRange property of vtkSMComparativeViewProxy to reflect the values.
-  void setTimeRangeFromSource(vtkSMProxy*);
+  /// Called when the "+" button is clicked to add a new parameter.
+  void addParameter();
+
+  /// Updates the list of animated parameters from the proxy.
+  void updateParametersList();
+
+  /// Called when the selection in the active parameters widget changes.
+  void parameterSelectionChanged();
+
+  void sizeUpdated();
+
+  /// Triggered when user clicks the delete button to remove a parameter.
+  void removeParameter(int index);
 
 protected:
-  void activateCue(vtkSMProperty* cuesProperty, 
-  vtkSMProxy* animatedProxy, const QString& animatedPName, int animatedIndex);
+  //void activateCue(vtkSMProperty* cuesProperty, 
+  //vtkSMProxy* animatedProxy, const QString& animatedPName, int animatedIndex);
+
+  /// Finds the row (-1 if none found) for the given (proxy,property).
+  int findRow(
+    vtkSMProxy* animatedProxy, const QString& animatedPName, int animatedIndex);
 private:
   pqComparativeVisPanel(const pqComparativeVisPanel&); // Not implemented.
   void operator=(const pqComparativeVisPanel&); // Not implemented.
 
+  vtkEventQtSlotConnect* VTKConnect;
   class pqInternal;
   pqInternal* Internal;
 };

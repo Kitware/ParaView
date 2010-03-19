@@ -512,6 +512,21 @@ void vtkSMPropertyHelper::Add(vtkSMProxy* value, unsigned int outputport/*=0*/)
 }
 
 //----------------------------------------------------------------------------
+void vtkSMPropertyHelper::Remove(vtkSMProxy* value)
+{
+  if (this->Type == vtkSMPropertyHelper::PROXY ||
+    this->Type == vtkSMPropertyHelper::INPUT)
+    {
+    vtkSMProxyProperty* pp = static_cast<vtkSMProxyProperty*>(this->Property);
+    pp->RemoveProxy(value);
+    }
+  else
+    {
+    vtkSMPropertyHelperWarningMacro("Call not supported for the current property type.");
+    }
+}
+
+//----------------------------------------------------------------------------
 vtkSMProxy* vtkSMPropertyHelper::GetAsProxy(unsigned int index/*=0*/)
 {
   switch (this->Type)
