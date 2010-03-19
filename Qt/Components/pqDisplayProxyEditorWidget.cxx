@@ -254,6 +254,7 @@ void pqDisplayProxyEditorWidget::onVisibilityChanged(bool state)
     {
     disp->renderViewEventually();
     }
+  this->setRepresentation(disp);
 }
 
 //-----------------------------------------------------------------------------
@@ -320,7 +321,7 @@ void pqDisplayProxyEditorWidget::updatePanel()
       QObject::connect(this->Internal->DisplayPanel,
                        SIGNAL(visibilityChanged(bool)),
                        this,
-                       SLOT(onVisibilityChanged(bool)));
+                       SLOT(onVisibilityChanged(bool)), Qt::QueuedConnection);
       }
     else
       {
