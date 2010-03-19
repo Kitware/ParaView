@@ -99,14 +99,14 @@ pqComparativeCueWidget::~pqComparativeCueWidget()
 }
 
 //-----------------------------------------------------------------------------
-void pqComparativeCueWidget::setCue(vtkSMProxy* cue)
+void pqComparativeCueWidget::setCue(vtkSMProxy* _cue)
 {
-  if (this->Cue.GetPointer() == cue)
+  if (this->Cue.GetPointer() == _cue)
     {
     return;
     }
   this->VTKConnect->Disconnect();
-  this->Cue = vtkSMComparativeAnimationCueProxy::SafeDownCast(cue);
+  this->Cue = vtkSMComparativeAnimationCueProxy::SafeDownCast(_cue);
   if (this->Cue)
     {
     this->VTKConnect->Connect(this->Cue, vtkCommand::ModifiedEvent,
@@ -164,14 +164,14 @@ void pqComparativeCueWidget::updateGUI()
     return;
     }
 
-  for (int col=0; col < cols; col++)
+  for (int colno=0; colno < cols; colno++)
     {
-    for (int row=0; row < rows; row++)
+    for (int rowno=0; rowno < rows; rowno++)
       {
-      QTableWidgetItem* item = new QTableWidgetItem();
+      QTableWidgetItem* tableitem = new QTableWidgetItem();
 
       unsigned int numvalues = 0;
-      double* values = acue->GetValues(col, row, cols, rows, numvalues);
+      double* values = acue->GetValues(colno, rowno, cols, rows, numvalues);
       if (numvalues >= 1)
         {
         QStringList val_list;
@@ -179,26 +179,26 @@ void pqComparativeCueWidget::updateGUI()
           {
           val_list.push_back(QString("%1").arg(values[cc]));
           }
-        item->setText(val_list.join(","));
+        tableitem->setText(val_list.join(","));
         }
       else
         {
-        item->setText("");
+        tableitem->setText("");
         }
-      this->setItem(row, col, item);
+      this->setItem(rowno, colno, tableitem);
       }
     }
 }
 
 //-----------------------------------------------------------------------------
-void pqComparativeCueWidget::onCellChanged(int row, int col)
+void pqComparativeCueWidget::onCellChanged(int rowno, int colno)
 {
   if (this->InUpdateGUI)
     {
     return;
     }
   BEGIN_UNDO_SET("Parameter Changed");
-  QString text = this->item(row, col)->text();
+  QString text = this->item(rowno, colno)->text();
   if (this->acceptsMultipleValues())
     {
     QStringList parts = text.split(',', QString::SkipEmptyParts);
@@ -211,14 +211,14 @@ void pqComparativeCueWidget::onCellChanged(int row, int col)
         *ptr = QVariant(part).toDouble();
         ptr++;
         }
-      this->cue()->UpdateValue(col, row, newvalues,
+      this->cue()->UpdateValue(colno, rowno, newvalues,
         static_cast<unsigned int>(parts.size()));
       }
     }
   else
     {
-    double data = QVariant(text).toDouble();
-    this->cue()->UpdateValue(col, row, data);
+    double item_data = QVariant(text).toDouble();
+    this->cue()->UpdateValue(colno, rowno, item_data);
     }
   END_UNDO_SET();
 
@@ -305,16 +305,16 @@ void pqComparativeCueWidget::editRange()
     // cannot formulate user chose as a range. Set individual values.
     int count = range.rowCount() * range.columnCount() -1;
 
-    for (int x=range.leftColumn(); x <= range.rightColumn(); x++)
+    for (int xx=range.leftColumn(); xx <= range.rightColumn(); xx++)
       {
-      for (int y=range.topRow(); y <= range.bottomRow(); y++)
+      for (int yy=range.topRow(); yy <= range.bottomRow(); yy++)
         {
         for (unsigned int cc=0; cc < numvalues; cc++)
           {
-          minvalues[cc] = minvalues[cc] + (y * range.columnCount() + x) * 
+          minvalues[cc] = minvalues[cc] + (yy * range.columnCount() + xx) * 
             (maxvalues[cc] - minvalues[cc]) / count;
           }
-        this->cue()->UpdateValue(x, y, &minvalues[0], numvalues);
+        this->cue()->UpdateValue(xx, yy, &minvalues[0], numvalues);
         }
       }
     }
