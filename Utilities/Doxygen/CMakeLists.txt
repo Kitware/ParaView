@@ -4,6 +4,11 @@
 INCLUDE (Documentation)
 
 IF (BUILD_DOCUMENTATION)
+  OPTION (INCLUDE_PARAVIEW_DOXYGEN_IN_ALL 
+    "When set to true, ParaViewDoxygenDoc target will be included in ALL"
+    OFF)
+  MARK_AS_ADVANCED(INCLUDE_PARAVIEW_DOXYGEN_IN_ALL)
+
   # Since Qt 4.6, Nokia distributes the qt.tag file. So we directly use it.
   SET (QT_TAG_FILE "${QT_DOC_DIR}/html/qt.tags")
 
@@ -72,7 +77,14 @@ IF (BUILD_DOCUMENTATION)
     ${CMAKE_CURRENT_SOURCE_DIR}/doc_makeall.sh.in
     ${CMAKE_CURRENT_BINARY_DIR}/doc_makeall.sh @ONLY IMMEDIATE)
 
-  ADD_CUSTOM_TARGET(${DOXYGEN_PROJECT_NAME}DoxygenDoc
-    ${BASH}
-    ${CMAKE_CURRENT_BINARY_DIR}/doc_makeall.sh)
+  IF (INCLUDE_PARAVIEW_DOXYGEN_IN_ALL)
+    ADD_CUSTOM_TARGET(${DOXYGEN_PROJECT_NAME}DoxygenDoc ALL
+      ${BASH}
+      ${CMAKE_CURRENT_BINARY_DIR}/doc_makeall.sh)
+  ELSE (INCLUDE_PARAVIEW_DOXYGEN_IN_ALL)
+    ADD_CUSTOM_TARGET(${DOXYGEN_PROJECT_NAME}DoxygenDoc
+      ${BASH}
+      ${CMAKE_CURRENT_BINARY_DIR}/doc_makeall.sh)
+  ENDIF (INCLUDE_PARAVIEW_DOXYGEN_IN_ALL)
+  
 ENDIF (BUILD_DOCUMENTATION)
