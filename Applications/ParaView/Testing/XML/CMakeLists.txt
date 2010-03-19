@@ -4,8 +4,8 @@ SET (TESTS_WITHOUT_BASELINES
 )
 
 SET (TESTS_WITH_BASELINES
-  ${CMAKE_CURRENT_SOURCE_DIR}/3DWidgetInCustomFilter.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/AnimatePipelineTime.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/3DWidgetInCustomFilter.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/CalcParens.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/Calculator.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/CameraLink.xml
@@ -14,6 +14,7 @@ SET (TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/ColorEditor2.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/ColorEditor3.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/ColorEditor4.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/ComparativeVisPanel.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/Contour.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/ContourRange.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/CustomFilter.xml
@@ -100,6 +101,7 @@ set (ColorEditor3_BREAK TRUE)
 set (ColorEditor4_BREAK TRUE)
 set (ReadXMLPolyDataFileSeries_BREAK TRUE)
 set (ExodusXML_BREAK TRUE)
+SET (ComparativeVisPanel_BREAK TRUE)
 
 
 # Add image threshold overrides for tests.
