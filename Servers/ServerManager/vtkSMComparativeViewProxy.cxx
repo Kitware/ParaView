@@ -82,7 +82,7 @@ public:
 //----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkSMComparativeViewProxy);
-vtkCxxRevisionMacro(vtkSMComparativeViewProxy, "1.30");
+vtkCxxRevisionMacro(vtkSMComparativeViewProxy, "1.31");
 
 //----------------------------------------------------------------------------
 vtkSMComparativeViewProxy::vtkSMComparativeViewProxy()
@@ -578,8 +578,7 @@ void vtkSMComparativeViewProxy::UpdateAllRepresentations()
 
   vtkSMComparativeAnimationCueProxy* timeCue = NULL;
   // locate time cue.
-  vtkInternal::VectorOfCues::iterator iter;
-  for (iter = this->Internal->Cues.begin();
+  for (vtkInternal::VectorOfCues::iterator iter = this->Internal->Cues.begin();
     iter != this->Internal->Cues.end(); ++iter)
     {
     // for now, we are saying that the first cue that has no animatable  proxy
@@ -601,7 +600,7 @@ void vtkSMComparativeViewProxy::UpdateAllRepresentations()
 
       if (timeCue)
         {
-        double value = iter->GetPointer()->GetValue(
+        double value = timeCue->GetValue(
           x, y, this->Dimensions[0], this->Dimensions[1]);
         view->SetViewUpdateTime(value);
         }
@@ -610,8 +609,8 @@ void vtkSMComparativeViewProxy::UpdateAllRepresentations()
         view->SetViewUpdateTime(this->GetViewUpdateTime());
         }
 
-      vtkInternal::VectorOfCues::iterator iter;
-      for (iter = this->Internal->Cues.begin();
+      for (vtkInternal::VectorOfCues::iterator iter =
+        this->Internal->Cues.begin();
         iter != this->Internal->Cues.end(); ++iter)
         {
         if (iter->GetPointer() == timeCue)
