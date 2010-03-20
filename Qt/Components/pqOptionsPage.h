@@ -77,7 +77,7 @@ public:
   pqOptionsPage(QWidget *parent=0);
   virtual ~pqOptionsPage() {}
 
-  /// \breif
+  /// \brief
   ///   Gets whether or not the apply button is used by the options.
   /// \return
   ///   True if the apply button is used by the options.
