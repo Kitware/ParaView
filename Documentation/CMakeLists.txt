@@ -10,11 +10,24 @@ foreach (file ${PV_DOCUMENTATION_FILES})
     COPYONLY)
 endforeach (file)
 
+OPTION(PARAVIEW_GENERATE_PROXY_DOCUMENTATION
+  "Turn on to ensure that the documentation for filters/sources/readers and writers is built."
+  OFF)
+
+SET (qhp_dependencies)
+
+IF (PARAVIEW_GENERATE_PROXY_DOCUMENTATION)
+  # This dependency ensures that whenever the html files are regenerated, the
+  # qch file is regenerated as well.
+  SET (qhp_dependencies ${qhp_dependencies}
+        ${HTMLDocumentation_FILES})
+ENDIF(PARAVIEW_GENERATE_PROXY_DOCUMENTATION)
 
 ADD_CUSTOM_COMMAND(
   OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/paraview.qhp
   DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/paraview.qhp.in
           ${CMAKE_CURRENT_SOURCE_DIR}/GenerateQHP.cmake
+          ${qhp_dependencies}
   COMMAND ${CMAKE_COMMAND}
     ARGS
       -D DOCUMENTATION_DIR:PATH=${CMAKE_CURRENT_BINARY_DIR}
@@ -24,29 +37,26 @@ ADD_CUSTOM_COMMAND(
   COMMENT "Generating paraview.qhp"
 )
 
+ADD_CUSTOM_TARGET(GenerateParaViewQHP
+  DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/paraview.qhp)
+
+IF (PARAVIEW_GENERATE_PROXY_DOCUMENTATION)
+  # This dependency ensures that the ParaViewFiles.html and other files are
+  # generated before the qch file is attempted to be generated.
+  ADD_DEPENDENCIES(GenerateParaViewQHP
+    HTMLDocumentation)
+ENDIF (PARAVIEW_GENERATE_PROXY_DOCUMENTATION)
+
 FIND_PROGRAM(QT_HELP_GENERATOR
   qhelpgenerator
   PATHS "${QT_BINARY_DIR}"
   DOC "qhelpgenerator used to compile Qt help project files")
-
-SET (qhp_dependencies)
-  
-OPTION(PARAVIEW_GENERATE_PROXY_DOCUMENTATION
-  "Turn on to ensure that the documentation for filters/sources/readers and writers is built."
-  OFF)
-IF (PARAVIEW_GENERATE_PROXY_DOCUMENTATION)
-  # This dependency ensures that whenever the html files are regenerated, the
-  # qch file is regenerated as well.
-  SET (qhp_dependencies ${qhp_dependencies}
-        ${HTMLDocumentation_FILES})
-ENDIF(PARAVIEW_GENERATE_PROXY_DOCUMENTATION)
 
 MARK_AS_ADVANCED(PARAVIEW_GENERATE_PROXY_DOCUMENTATION)
 
 ADD_CUSTOM_COMMAND(
   OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/paraview.qch
   DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/paraview.qhp
-          ${qhp_dependencies}
   COMMAND ${QT_HELP_GENERATOR}
   ARGS ${CMAKE_CURRENT_BINARY_DIR}/paraview.qhp
       -o ${CMAKE_CURRENT_BINARY_DIR}/paraview.qch
@@ -55,13 +65,8 @@ ADD_CUSTOM_COMMAND(
 
 ADD_CUSTOM_TARGET(ParaViewOnlineHelp
   DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/paraview.qch)
-IF (PARAVIEW_GENERATE_PROXY_DOCUMENTATION)
-  # This dependency ensures that the ParaViewFiles.html and other files are
-  # generated before the qch file is attempted to be generated.
-  ADD_DEPENDENCIES(ParaViewOnlineHelp
-    HTMLDocumentation)
-ENDIF (PARAVIEW_GENERATE_PROXY_DOCUMENTATION)
-
+ADD_DEPENDENCIES(ParaViewOnlineHelp
+  GenerateParaViewQHP)
 
 # Development
 IF (NOT PV_INSTALL_NO_DEVELOPMENT)
