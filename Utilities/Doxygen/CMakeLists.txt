@@ -30,7 +30,8 @@ IF (BUILD_DOCUMENTATION)
         \"${ParaView_SOURCE_DIR}/Common/KWCommon\" \\
         \"${ParaView_SOURCE_DIR}/Servers/Common\" \\
         \"${ParaView_SOURCE_DIR}/Servers/Filters\" \\
-        \"${ParaView_SOURCE_DIR}/Servers/ServerManager\"")
+        \"${ParaView_SOURCE_DIR}/Servers/ServerManager\" \\
+        \"${ParaView_SOURCE_DIR}/CoProcessing/CoProcessor\"")
   SET(DOXYGEN_BINARY_LOCATIONS_DIR "${ParaView_BINARY_DIR}")
   SET(DOXYGEN_BINARY_LOCATIONS
        "")
@@ -50,8 +51,8 @@ IF (BUILD_DOCUMENTATION)
         \"${CMAKE_CURRENT_BINARY_DIR}/dox/Common/KWCommon\" \\
         \"${CMAKE_CURRENT_BINARY_DIR}/dox/Servers/Common\" \\
         \"${CMAKE_CURRENT_BINARY_DIR}/dox/Servers/Filters\" \\
-        \"${CMAKE_CURRENT_BINARY_DIR}/dox/Servers/ServerManager\"")
-         
+        \"${CMAKE_CURRENT_BINARY_DIR}/dox/Servers/ServerManager\" \\
+        \"${CMAKE_CURRENT_BINARY_DIR}/dox/CoProcessing/CoProcessor\"")
 
   SET(DOXYGEN_IGNORE_PREFIX "vtkPV vtkSM vtk pq")
 
