@@ -56,6 +56,11 @@ pqChangePipelineInputReaction::pqChangePipelineInputReaction(
       selectionChanged(const pqServerManagerSelection&,
         const pqServerManagerSelection&)),
     this, SLOT(updateEnableState()));
+
+  // nameChanged() is fired even when modified state is changed ;).
+  QObject::connect(core->getServerManagerModel(),
+    SIGNAL(nameChanged(pqServerManagerModelItem*)),
+    this, SLOT(updateEnableState()));
   this->updateEnableState();
 }
 
