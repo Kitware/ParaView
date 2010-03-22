@@ -102,7 +102,7 @@ protected:
     double  cornerPoints[32], 
     double* cornerPtrs[8],
     double* passPtrs[8]);
-  void vtkFlashContour::ProcessCellFinal(
+  void ProcessCellFinal(
     const double cornerPoints[32], 
     const double cornerValues[8],
     int          cubeCase,
