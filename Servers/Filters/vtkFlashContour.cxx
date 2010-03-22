@@ -29,7 +29,7 @@
 #include "vtkUnsignedCharArray.h"
 #include "vtkMarchingCubesCases.h"
 
-vtkCxxRevisionMacro(vtkFlashContour, "1.1");
+vtkCxxRevisionMacro(vtkFlashContour, "1.2");
 vtkStandardNewMacro(vtkFlashContour);
 
 
@@ -643,7 +643,6 @@ void vtkFlashContour::RecurseTree(
 void vtkFlashContour::ProcessBlock(vtkImageData* image)
 {
   vtkDataArray *volumeFractionArray = this->GetInputArrayToProcess(0, image);
-  void* volumeFractionPtr = volumeFractionArray->GetVoidPointer(0);
   const double* spacing = image->GetSpacing();
   double blockOrigin[3];
   image->GetOrigin(blockOrigin);
@@ -687,7 +686,6 @@ void vtkFlashContour::ProcessBlock(vtkImageData* image)
   dims[1] -= 1;
   dims[2] -= 1;
   // Compute offset to 8 neighbor cells (corners of dual cell).
-  int xInc = 1;
   int yInc = dims[0];
   int zInc = yInc*dims[1];
   double cornerValues[8];

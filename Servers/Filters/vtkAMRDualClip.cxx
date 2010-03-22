@@ -49,7 +49,7 @@
 #include <ctime>
 
 
-vtkCxxRevisionMacro(vtkAMRDualClip, "1.7");
+vtkCxxRevisionMacro(vtkAMRDualClip, "1.8");
 vtkStandardNewMacro(vtkAMRDualClip);
 
 
@@ -2183,7 +2183,6 @@ void vtkAMRDualClip::DistributeLevelMasks()
 
   // Make a map of interprocess commnication.
   // Each region has a process, level, grid index, and extent.
-  int numProcs = this->Controller->GetNumberOfProcesses();
   int myProcessId = this->Controller->GetLocalProcessId();
   
   // Loop through blocks
@@ -2239,7 +2238,6 @@ void vtkAMRDualClip::DistributeLevelMasks()
                       neighborLocator->ComputeLevelMask(scalars, this->IsoValue);
                       neighborLevelMaskArray = neighborLocator->GetLevelMaskArray();
                       }
-                    vtkAMRDualClipLocator* neighborLocator = vtkAMRDualClipGetBlockLocator(neighborBlock);
                     
                     this->Helper->QueueRegionRemoteCopy(
                                     rx, ry, rz, 
