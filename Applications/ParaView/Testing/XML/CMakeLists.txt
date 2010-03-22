@@ -91,6 +91,10 @@ SET (XdmfReadImageData_BREAK TRUE)
 SET (UndoRedo3_BREAK TRUE)
 SET (UndoRedo6_BREAK TRUE)
   # <-- since this changes view settings.
+SET (UndoRedo1_BREAK TRUE)
+SET (UndoRedo2_BREAK TRUE)
+  # <-- since these are just long tests, they result in timeouts.
+
 SET (ViewSettingsDialog_BREAK TRUE)
 SET (UnstructuredOutline_BREAK TRUE)
   # <-- since this changes view settings.
