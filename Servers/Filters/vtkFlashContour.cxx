@@ -29,7 +29,7 @@
 #include "vtkUnsignedCharArray.h"
 #include "vtkMarchingCubesCases.h"
 
-vtkCxxRevisionMacro(vtkFlashContour, "1.2");
+vtkCxxRevisionMacro(vtkFlashContour, "1.3");
 vtkStandardNewMacro(vtkFlashContour);
 
 
@@ -324,7 +324,7 @@ int vtkFlashContour::RequestData(
     vtkImageData* block = vtkImageData::SafeDownCast(mbdsInput->GetBlock(0));
     if (block)
       {
-      vtkDataArray* da = block->GetCellData()->GetArray(this->PassAttribute);
+      da = block->GetCellData()->GetArray(this->PassAttribute);
       if ( da == 0 || da->GetDataType() != VTK_DOUBLE)
         {
         vtkErrorMacro("We can only pass double arrays.");
@@ -642,7 +642,6 @@ void vtkFlashContour::RecurseTree(
 //----------------------------------------------------------------------------
 void vtkFlashContour::ProcessBlock(vtkImageData* image)
 {
-  vtkDataArray *volumeFractionArray = this->GetInputArrayToProcess(0, image);
   const double* spacing = image->GetSpacing();
   double blockOrigin[3];
   image->GetOrigin(blockOrigin);
