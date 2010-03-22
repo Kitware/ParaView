@@ -31,7 +31,7 @@
 //
 // .SECTION Description
 //  vtkFlashReader reads a Flash dataset and generates a vtkMultiBlockDataSet.
-//  A Flash file may contain a hierarchy of multi-resolution vtkRectilinearGrid
+//  A Flash file may contain a hierarchy of multi-resolution vtkImageData
 //  (2D / 3D) blocks, with the same dimension settings (in terms of the number
 //  of grid points along each axis) across the sub-division tree, and/or a set
 //  of particles (as a vtkPolyData block in the output), and the associated
@@ -39,7 +39,7 @@
 //  the underlying data loading engine.
 // 
 // .SECTION See Also
-//  vtkPolyData vtkRectilinearGrid vtkMultiBlockDataSet
+//  vtkPolyData vtkImageData vtkMultiBlockDataSet
 
 #ifndef __vtkFlashReader_h
 #define __vtkFlashReader_h
@@ -53,6 +53,9 @@ class    vtkImageData;
 class    vtkRectilinearGrid;
 class    vtkMultiBlockDataSet;
 class    vtkFlashReaderInternal;
+class    vtkDataArraySelection;
+class    vtkCallbackCommand;
+class    vtkDataSetAttributes;
 
 class VTK_EXPORT vtkFlashReader : public vtkMultiBlockDataSetAlgorithm
 {
@@ -60,6 +63,17 @@ public:
   static vtkFlashReader * New();
   vtkTypeRevisionMacro( vtkFlashReader, vtkMultiBlockDataSetAlgorithm );
   void PrintSelf( ostream & os, vtkIndent indent );
+
+  // Description:
+  // If true, the reader will merge scalar arrays named, for example, "X velocity"
+  // "Y velocity" and "Z velocity" into a vector array named "velocity" with
+  // scalar components X, Y and Z. It will also merge X and Y scalar arrays
+  // (with no Z component) into a vector with scalar components X, Y and 0.
+  // True by default.
+  void SetMergeXYZComponents(int merge);
+  vtkGetMacro(MergeXYZComponents,int);
+  vtkBooleanMacro(MergeXYZComponents,int);
+
   
   // Description:
   // Set the Flash data file name.
@@ -85,10 +99,26 @@ public:
   // constituent MAIN blocks, excluding the one built for the particles, if any).
   vtkSetClampMacro( BlockOutputType, int, 0, 1 );
   vtkGetMacro( BlockOutputType, int );
+
+  // Description:
+  // Do not load mor than this number of blocks.
+  // Right now parent blocks are loaded, but they do not need to be.
+  vtkSetMacro( MaximumNumberOfBlocks,int);
   
   // Description:
-  // Only load upto this level.
-  vtkSetMacro( MaxLevel,int);
+  // Description:
+  // An interface to select blocks to load based on a camera.
+  // Blocks containing the point will be refined as much as possible.
+  // We could have multiple points.  Blocks near the point
+  // are preferentially refined. (See also MaximumNumberOfBlocks).
+  // Set position of first place to refine.
+  vtkSetVector3Macro(Point1,double);
+  vtkGetVectorMacro(Point1,double,3);
+
+  // Description:
+  // Set position of the second point to refine.
+  vtkSetVector3Macro(Point2,double);
+  vtkGetVectorMacro(Point2,double,3);  
   
   // Description:
   // Load the morton curve.
@@ -255,22 +285,6 @@ public:
   int            IsIntermediateBlock( int blockIdx );
   
   // Description:
-  // Get the number of (cell) data attributes associated with each rectilinear
-  // block.
-  int            GetNumberOfBlockAttributes();
-  
-  // Description:
-  // Get the name of the attrIndx-th (0-based) scalar (cell) data attribute
-  // associated with each block. NULL is returned for invalid attrIndx.
-  const char   * GetBlockAttributeName( int attrIndx );
-  
-  // Description:
-  // Check whether a given name attrName is a (cell) data attribute associated
-  // with each block (return a non-negative value as the attribute index)or not
-  // (-1).
-  int            IsBlockAttribute( const char * attrName );
-  
-  // Description:
   // Get the name of particles.
   const char   * GetParticleName();
   
@@ -295,7 +309,7 @@ public:
   int            GetBlock( int blockIdx, vtkImageData * imagData );     
   
   // Description:
-  // This function fills an allocated vtkRectilinearGrid with a block specified
+  // This function fills an allocated vtkImageData with a block specified
   // by 0-based blockIdx and loads the associated cell data attributes from the
   // file. The returned value indicates failure (0) or success (1).
   int            GetBlock( int blockIdx, vtkRectilinearGrid * rectGrid );
@@ -313,12 +327,91 @@ public:
   // or success (1).
   int            GetMortonCurve( vtkPolyData * polyData );
   
+
+
+
+
+
+
+  // Description:
+  // Get the number of (cell) data attributes associated with each rectilinear
+  // block.
+  int            GetNumberOfBlockAttributes();
+  
+  // Description:
+  // Check whether a given name attrName is a (cell) data attribute associated
+  // with each block (return a non-negative value as the attribute index)or not
+  // (-1).
+  int            IsBlockAttribute( const char * attrName );
+  
+  // Description:
+  // Get the name of the attrIndx-th (0-based) scalar (cell) data attribute
+  // associated with each block. NULL is returned for invalid attrIndx.
+  const char   * GetBlockAttributeName( int attrIndx );
+  
+  // Description:
+  // Get the data array selection tables used to configure which data
+  // arrays are loaded by the reader.
+  vtkGetObjectMacro(CellDataArraySelection, vtkDataArraySelection);
+
+  // Description:
+  // Cell array selection
+  int GetNumberOfCellArrays() {return this->GetNumberOfBlockAttributes();}
+  const char* GetCellArrayName(int idx) {return this->GetBlockAttributeName(idx);}
+  int GetCellArrayStatus(const char *name);
+  void SetCellArrayStatus(const char *name, int status);  
+
 protected:
   vtkFlashReader();
   ~vtkFlashReader();
   
+  // The file format stores a vector field as separated scalar component
+  // fields. This method rebuilds the vector field from those scalar
+  // component fields.
+  void MergeVectors(vtkDataSetAttributes *da);
+  int MergeVectors(vtkDataSetAttributes *da, 
+                   vtkDataArray *a1,
+                   vtkDataArray *a2);
+  int MergeVectors(vtkDataSetAttributes *da, 
+                   vtkDataArray *a1,
+                   vtkDataArray *a2,
+                   vtkDataArray *a3);
+  
+  int MergeXYZComponents;
+
+
+
+  // The array selections.
+  vtkDataArraySelection *CellDataArraySelection;
+  vtkCallbackCommand *SelectionObserver;
+
   // Description:
-  // This function creates a vtkRectilinearGrid block (and loads the associated 
+  // This does the updating of meta data of the dataset from the
+  // first binary file registered in the map:
+  // - number of time steps
+  // - number of fields
+  // - name of fields
+  int UpdateMetaData(vtkInformation* request,
+                     vtkInformationVector* outputVector);
+
+  // Callback registered with the SelectionObserver.
+  static void SelectionModifiedCallback(vtkObject *caller, unsigned long eid,
+                                        void *clientdata, void *calldata);
+
+
+
+
+
+
+
+
+
+
+  double Point1[3];
+  double Point2[3];
+  
+  // Description:
+  // This function creates a vtkImageData block (and loads the associated 
   // cell data attributes from the file) specified by 0-based blockIdx and 
   // inserted it to an allocated vtkMultiBlockDataSet multiBlk.
   void           GetBlock( int blockIdx, vtkMultiBlockDataSet * multiBlk );
@@ -368,12 +461,15 @@ protected:
   int            BlockOutputType;
   int            LoadMortonCurve;
   int            LoadParticles;
-  int            MaxLevel;
+  int            MaximumNumberOfBlocks;
   
 //BTX
-  vtkstd::vector<int> BlockMap;
+  vtkstd::vector<int>    ToGlobalBlockMap;
+  vtkstd::vector<double> BlockRank;
 //ETX
   virtual void GenerateBlockMap();
+  void AddBlockToMap(int globalId);
+
                             
 private:
 

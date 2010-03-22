@@ -39,12 +39,14 @@
 #include "vtkPointData.h"
 #include "vtkImageData.h"
 #include "vtkRectilinearGrid.h"
+#include "vtkDataSetAttributes.h"
 
 #include "vtkIntArray.h"
 #include "vtkCharArray.h"
 #include "vtkShortArray.h"
 #include "vtkFloatArray.h"
 #include "vtkDoubleArray.h"
+#include "vtkDataArraySelection.h"
 
 #include "vtkInformation.h"
 #include "vtkObjectFactory.h"
@@ -52,15 +54,17 @@
 #include "vtkMultiBlockDataSet.h"
 #include "vtkMultiProcessController.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
+#include "vtkCallbackCommand.h"
 
 #include <hdf5.h>    // for the HDF data loading engine
 
 #include <vtkstd/algorithm> // for 'find()'
 #include <vtkstd/map>
+#include <vtkstd/set>
 #include <vtkstd/string>
 #include <vtkstd/vector>
 
-vtkCxxRevisionMacro( vtkFlashReader, "1.10" );
+vtkCxxRevisionMacro( vtkFlashReader, "1.11" );
 vtkStandardNewMacro( vtkFlashReader );
 
 // ============================================================================
@@ -1654,13 +1658,119 @@ void vtkFlashReaderInternal::ReadParticleAttributesFLASH3()
 //                     Class  vtkFlashReaderInternal ( end )                         
 // ----------------------------------------------------------------------------
 
+//-----------------------------------------------------------------------------
+int vtkFlashReader::UpdateMetaData(vtkInformation* request,
+                                   vtkInformationVector* outputVector)
+{
+  //int* timeStepRange = uniReader->GetTimeStepRange();
+  //num_time_steps=timeStepRange[1] + 1;
+  //this->TimeStepRange[1]=timeStepRange[1];
+  
+  if(request->Has(vtkDemandDrivenPipeline::REQUEST_INFORMATION()))
+    {
+    vtkInformation* outInfo = outputVector->GetInformationObject(0);
+    //double* timeArray = uniReader->GetTimeArray();
+    //outInfo->Set(vtkStreamingDemandDrivenPipeline::TIME_STEPS(), 
+    //             timeArray,
+    //             num_time_steps);
+    //double timeRange[2];
+    //timeRange[0] = timeArray[0];
+    //timeRange[1] = timeArray[num_time_steps-1];
+    //outInfo->Set(vtkStreamingDemandDrivenPipeline::TIME_RANGE(), 
+    //             timeRange, 2);
+    }
+
+  //if (!this->TimeRequestedFromPipeline)
+  //  {
+  //  this->CurrentTimeStep=this->TimeStep;
+  //  }
+  //if(this->CurrentTimeStep<0||this->CurrentTimeStep>=num_time_steps)
+  //  {
+  //  vtkErrorMacro("TimeStep set to " << this->CurrentTimeStep << " outside of the range 0 - " << (num_time_steps-1) << ". Use 0.");
+  //  this->CurrentTimeStep=0;
+  //  }
+
+  // Set the reader to read the first time step.
+  //uniReader->SetCurrentTimeStep(this->CurrentTimeStep);
+
+  // Fields
+  int fieldsCount = this->GetNumberOfCellArrays();
+  vtkDebugMacro("Number of fields: " << fieldsCount);
+  
+  vtkstd::set<vtkstd::string> fileFields;
+  
+  int field;
+  for(field=0; field<fieldsCount; ++field)
+    {
+    const char*fieldName=this->CellDataArraySelection->GetArrayName(field);
+    vtkDebugMacro("Field #" << field << ": " << fieldName);
+    fileFields.insert(fieldName);
+    }
+  // Now remove the existing array that were not found in the file.
+  field=0;
+  // the trick is that GetNumberOfArrays() may change at each step.
+  while(field<this->CellDataArraySelection->GetNumberOfArrays())
+    {
+    if(fileFields.find(this->CellDataArraySelection->GetArrayName(field))==fileFields.end())
+      {
+      this->CellDataArraySelection->RemoveArrayByIndex(field);
+      }
+    else
+      {
+      ++field;
+      }
+    }
+  return 1;
+}
+
+//-----------------------------------------------------------------------------
+int vtkFlashReader::GetCellArrayStatus(const char* name)
+{
+  return this->CellDataArraySelection->ArrayIsEnabled(name);
+}
+
+//-----------------------------------------------------------------------------
+void vtkFlashReader::SetCellArrayStatus(const char* name, int status)
+{
+  vtkDebugMacro("Set cell array \"" << name << "\" status to: " << status);
+  if(status)
+    {
+    this->CellDataArraySelection->EnableArray(name);
+    }
+  else
+    {
+    this->CellDataArraySelection->DisableArray(name);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkFlashReader::SelectionModifiedCallback(vtkObject*, unsigned long,
+                                                 void* clientdata, void*)
+{
+  static_cast<vtkFlashReader*>(clientdata)->Modified();
+}
+
 
 //-----------------------------------------------------------------------------
 vtkFlashReader::vtkFlashReader()
 {
+  this->MergeXYZComponents = 1;
+
+  this->CellDataArraySelection = vtkDataArraySelection::New();
+  // Setup the selection callback to modify this object when an array
+  // selection is changed.
+  // Setup the selection callback to modify this object when an array
+  // selection is changed.
+  this->SelectionObserver = vtkCallbackCommand::New();
+  this->SelectionObserver->SetCallback(
+    &vtkFlashReader::SelectionModifiedCallback);
+  this->SelectionObserver->SetClientData(this);
+  this->CellDataArraySelection->AddObserver(vtkCommand::ModifiedEvent,
+                                            this->SelectionObserver);
+
   this->FileName = NULL;
   this->Internal = new vtkFlashReaderInternal;
-  this->MaxLevel = 1000;
+  this->MaximumNumberOfBlocks = 100;
   this->LoadParticles   = 1;
   this->LoadMortonCurve = 0;
   this->BlockOutputType = 0;
@@ -1676,12 +1786,20 @@ vtkFlashReader::vtkFlashReader()
     H5Eset_auto( NULL, NULL );
     }
   vtkFlashReader::NumberOfInstances ++;
+  
+  this->Point1[0] = 0.0;
+  this->Point1[1] = 0.0;
+  this->Point1[2] = 0.0;
 }
 
 //-----------------------------------------------------------------------------
 
 vtkFlashReader::~vtkFlashReader()
 {
+  this->CellDataArraySelection->RemoveObserver(this->SelectionObserver);
+  this->SelectionObserver->Delete();
+  this->CellDataArraySelection->Delete();
+
   if ( this->FileName )
     {
     delete [] this->FileName;
@@ -2165,6 +2283,21 @@ void vtkFlashReader::PrintSelf( ostream & os, vtkIndent indent )
   
   os << indent << "FileName: "        << this->FileName        << "\n";
   os << indent << "BlockOutputType: " << this->BlockOutputType << "\n";
+  if ( this->CellDataArraySelection )
+    {
+    os << "CellDataArraySelection:" << endl;
+    this->CellDataArraySelection->PrintSelf(os, indent.GetNextIndent());
+    }
+
+  os << "MergeXYZComponents: ";
+  if(this->MergeXYZComponents)
+    {
+    os << "true"<<endl;
+    }
+  else
+    {
+    os << "false"<<endl;
+    }
 }
 
 // ----------------------------------------------------------------------------
@@ -2176,18 +2309,110 @@ int vtkFlashReader::FillOutputPortInformation
 }
 
 //-----------------------------------------------------------------------------
+// Start with the root node.
+// If we are under the limit, then split the leaf with the highest rank.
+// The map contains zero based global indexes. Chilren from methods return 1 based.
 void vtkFlashReader::GenerateBlockMap()
 {
-  this->BlockMap.clear();
+  int blockCount = 0;
   this->Internal->ReadMetaData();
-  for ( int j = 0; j < this->Internal->NumberOfBlocks; j ++ )
+
+  this->ToGlobalBlockMap.clear();
+  this->BlockRank.clear();
+  // Add all of the roots.
+  int numGlobalBlocks = this->Internal->NumberOfBlocks;
+  for (int i = 0; i < numGlobalBlocks; ++i)
     {
-    if (this->GetBlockLevel(j) <= this->MaxLevel)
+    if (this->GetBlockLevel(i) == 1)
       {
-      this->BlockMap.push_back(j);
-      }    
-    }  
+      this->AddBlockToMap(i);
+      }
+    }
+  
+  while (((int)(this->ToGlobalBlockMap.size())+7) <= this->MaximumNumberOfBlocks)
+    { // Find the block with the highest rank.
+    int bestIdx = 0;
+    double bestRank = -1.0;
+    int numBlocks = (int)(this->BlockRank.size());
+    for (int j = 0; j < numBlocks; ++j)
+      {
+      double rank = this->BlockRank[j];
+      if (rank > bestRank)
+        {
+        bestRank = rank;
+        bestIdx = j;
+        }
+      }
+    if (bestRank < 0.0)
+      {
+      return;
+      }
+    // Now we have the highest ranked block.  Refine it.
+    int blockId = this->ToGlobalBlockMap[bestIdx];
+    // Remove the parent from the list so it will not be loaded.
+    this->ToGlobalBlockMap.erase(this->ToGlobalBlockMap.begin()+bestIdx);
+    this->BlockRank.erase(this->BlockRank.begin()+bestIdx);
+    // Add the children of the best block.
+    int* children = this->Internal->Blocks[blockId].ChildrenIds;
+    for (int j = 0; j < 8; ++j)
+      {
+      this->AddBlockToMap(children[j]-1);
+      }
+    }
+}      
+
+void vtkFlashReader::AddBlockToMap(int globalId)
+{
+  int* children = this->Internal->Blocks[globalId].ChildrenIds;
+  double rank = -1.0; // Cannot split leaves.
+  if (children[0] >= 0)
+    {
+    double bounds[6];
+    this->GetBlockBounds(globalId, bounds);
+    // If the block contains the rank then use a large rank.
+    // Only one leaf block should contain a point.
+    if ((this->Point1[0] > bounds[0] && this->Point1[0] < bounds[1] &&
+         this->Point1[1] > bounds[2] && this->Point1[1] < bounds[3] &&
+         this->Point1[2] > bounds[4] && this->Point1[2] < bounds[5]) ||
+        (this->Point2[0] > bounds[0] && this->Point2[0] < bounds[1] &&
+         this->Point2[1] > bounds[2] && this->Point2[1] < bounds[3] &&
+         this->Point2[2] > bounds[4] && this->Point2[2] < bounds[5]))
+      {
+      rank = VTK_LARGE_FLOAT;
+      }
+    else
+      { // Compute inverse of minimum distance.
+      double x = 0.0;
+      if (this->Point1[0] < bounds[0]) {x = bounds[0]-this->Point1[0];}
+      else if (this->Point1[0] > bounds[1]) {x = this->Point1[0]-bounds[1];}
+      double y = 0.0;
+      if (this->Point1[1] < bounds[2]) {y = bounds[2]-this->Point1[1];}
+      else if (this->Point1[1] > bounds[3]) {y = this->Point1[1]-bounds[3];}
+      double z = 0.0;
+      if (this->Point1[2] < bounds[4]) {z = bounds[4]-this->Point1[2];}
+      else if (this->Point1[2] > bounds[5]) {z = this->Point1[2]-bounds[5];}
+      double dist = sqrt(x*x + y*y + z*z);
+      rank = (dist == 0) ? VTK_LARGE_FLOAT:(1.0/dist);
+
+      x = 0.0;  y = 0.0; z = 0.0;
+      if (this->Point2[0] < bounds[0]) {x = bounds[0]-this->Point2[0];}
+      else if (this->Point2[0] > bounds[1]) {x = this->Point2[0]-bounds[1];}
+      if (this->Point2[1] < bounds[2]) {y = bounds[2]-this->Point2[1];}
+      else if (this->Point2[1] > bounds[3]) {y = this->Point2[1]-bounds[3];}
+      if (this->Point2[2] < bounds[4]) {z = bounds[4]-this->Point2[2];}
+      else if (this->Point2[2] > bounds[5]) {z = this->Point2[2]-bounds[5];}
+      dist = sqrt(x*x + y*y + z*z);
+      double rank2 = (dist == 0) ? VTK_LARGE_FLOAT:(1.0/dist);
+      if (rank2 > rank) 
+        {
+        rank = rank2;
+        }
+      }
+    }
+  this->BlockRank.push_back(rank);
+  this->ToGlobalBlockMap.push_back(globalId);
 }
+
 
 //-----------------------------------------------------------------------------
 int vtkFlashReader::RequestData( vtkInformation * vtkNotUsed( request ),
@@ -2200,13 +2425,80 @@ int vtkFlashReader::RequestData( vtkInformation * vtkNotUsed( request ),
   
   this->Internal->ReadMetaData();
   this->GenerateBlockMap();
-  int numBlocks = (int)(this->BlockMap.size());
+
+  // Save meta data from all blocks and a map from global to loaded ids.  
+  // I am saving global ids because I do not want to require that all ancestors
+  // of leaves have to be loaded.  However, I need ancestor meta data to traverse
+  // the tree.  We could change this so that pruned whole branches are not
+  // in the metadata. 
+  int numBlocks = this->Internal->NumberOfBlocks;
+  vtkIntArray* levelArray = vtkIntArray::New();
+  levelArray->SetName("BlockLevel");
+  levelArray->SetNumberOfTuples(numBlocks);
+  output->GetFieldData()->AddArray(levelArray);
+  vtkIntArray* parentArray = vtkIntArray::New();
+  parentArray->SetName("BlockParent");
+  parentArray->SetNumberOfTuples(numBlocks);
+  output->GetFieldData()->AddArray(parentArray);
+  vtkIntArray* childrenArray = vtkIntArray::New();
+  childrenArray->SetName("BlockChildren");
+  childrenArray->SetNumberOfComponents(8);
+  childrenArray->SetNumberOfTuples(numBlocks);
+  output->GetFieldData()->AddArray(childrenArray);
+  vtkIntArray* neighborArray = vtkIntArray::New();
+  neighborArray->SetName("BlockNeighbors");
+  neighborArray->SetNumberOfComponents(6);
+  neighborArray->SetNumberOfTuples(numBlocks);
+  output->GetFieldData()->AddArray(neighborArray);  
+  vtkIntArray* globalToLocalMapArray = vtkIntArray::New();
+  globalToLocalMapArray->SetName("GlobalToLocalMap");
+  globalToLocalMapArray->SetNumberOfTuples(numBlocks);
+  output->GetFieldData()->AddArray(globalToLocalMapArray);
+  vtkIntArray* localToGlobalMapArray = vtkIntArray::New();
+  localToGlobalMapArray->SetName("LocalToGlobalMap");
+  output->GetFieldData()->AddArray(localToGlobalMapArray);
+  for ( int j = 0; j < numBlocks; j++ )
+    {
+    globalToLocalMapArray->SetValue(j,-32);
+    levelArray->SetValue(j,this->GetBlockLevel(j));
+    parentArray->SetValue(j,this->GetBlockParentId(j));
+    int childrenIds[8];
+    this->GetBlockChildrenIds(j, childrenIds);
+    for (int i = 0; i < 8; ++i) 
+      {
+      if (childrenIds[i] > 0) {--childrenIds[i];}
+      } 
+    childrenArray->SetTupleValue(j,childrenIds);
+    int neighborIds[6];
+    this->GetBlockNeighborIds(j, neighborIds);
+    for (int i = 0; i < 6; ++i) 
+      {
+      if (neighborIds[i] > 0) {--neighborIds[i];}
+      }
+    neighborArray->SetTupleValue(j, neighborIds);
+    }
+
+  numBlocks = (int)(this->ToGlobalBlockMap.size());  
   for ( int j = 0; j < numBlocks; j ++ )
     {
+    // Change GlobalToLocalMapArray to reflect this block was loaded.
+    int globalId = this->ToGlobalBlockMap[j];
+    globalToLocalMapArray->SetValue(globalId,j);
+    localToGlobalMapArray->InsertNextValue(globalId);
+    // parent blocks not loaded will be marked with -1
+    while (globalId != 0) // root
+      {
+      globalId = parentArray->GetValue(globalId) - 1;
+      if (globalToLocalMapArray->GetValue(globalId) != -32)
+        {
+        break;
+        }
+      globalToLocalMapArray->SetValue(globalId, -1);
+      }
     this->GetBlock( j, output );
     }
    
-  int   blockIdx = (int)(this->BlockMap.size());
+  int   blockIdx = (int)(this->ToGlobalBlockMap.size());
   if (this->LoadParticles)
     {
     this->GetParticles( blockIdx, output );
@@ -2217,6 +2509,8 @@ int vtkFlashReader::RequestData( vtkInformation * vtkNotUsed( request ),
     }
   outInf = NULL;
   output = NULL;
+  levelArray->Delete();
+  levelArray = 0;
   
   return 1;
 }
@@ -2225,7 +2519,7 @@ int vtkFlashReader::RequestData( vtkInformation * vtkNotUsed( request ),
 void vtkFlashReader::GetBlock( int blockMapIdx, vtkMultiBlockDataSet * multiBlk )
 {
   this->Internal->ReadMetaData();
-  int blockIdx = this->BlockMap[blockMapIdx];
+  int blockIdx = this->ToGlobalBlockMap[blockMapIdx];
   
   if ( multiBlk == NULL || blockIdx < 0 || 
        blockIdx >= this->Internal->NumberOfBlocks )
@@ -2315,8 +2609,17 @@ int  vtkFlashReader::GetBlock( int blockIdx, vtkImageData * imagData )
                    ( this->Internal->AttributeNames.size() );
   for ( i = 0; i < numAttrs; i ++ )
     {
-    this->GetBlockAttribute( this->Internal->AttributeNames[i].c_str(), 
-                             blockIdx, imagData );
+    const char* name = this->Internal->AttributeNames[i].c_str();
+    if (this->GetCellArrayStatus(name))
+      {
+      this->GetBlockAttribute(name, blockIdx, imagData );
+      }
+    }
+
+  // vectorize
+  if (this->MergeXYZComponents)
+    {
+    this->MergeVectors(imagData->GetCellData()); 
     }
     
   return 1;
@@ -3032,7 +3335,7 @@ void vtkFlashReader::GetCurve( const char * curvName, int & blockIdx,
 
   // create a 1D rectilinear grid (line) to connect all sample points and
   // attach a scalar value as the point data attribute to each sample
-  vtkRectilinearGrid * sampLine = vtkRectilinearGrid::New();
+  vtkImageData * sampLine = vtkImageData::New();
   this->Create1DRectilinearGrid( sampLine, numSteps, VTK_DOUBLE );
   vtkDataArray       * smpCords = sampLine->GetXCoordinates();
   vtkDoubleArray     * dataAray = vtkDoubleArray::New();
@@ -3070,15 +3373,15 @@ void vtkFlashReader::GetCurve( const char * curvName, int & blockIdx,
 }
 
 // ----------------------------------------------------------------------------
-// This function initilizes a vtkRectilinearGrid rectGrid with an allocated
+// This function initilizes a vtkImageData rectGrid with an allocated
 // one-dimensional array of x-coordinates (of size nXCoords and of type 
 // dataType: VTK_DOUBLE, VTK_INT, et al) to be filled.
-void vtkFlashReader::Create1DRectilinearGrid( vtkRectilinearGrid * rectGrid,
+void vtkFlashReader::Create1DRectilinearGrid( vtkImageData * rectGrid,
                                               int nXCoords, int dataType )
 {
   if ( !rectGrid || nXCoords <= 0 )
     {
-    vtkDebugMacro( "Invalid dimension or vtkRectilinearGrid NULL." << endl );
+    vtkDebugMacro( "Invalid dimension or vtkImageData NULL." << endl );
     return;
     }
     
@@ -3137,3 +3440,288 @@ void vtkFlashReader::Create1DRectilinearGrid( vtkRectilinearGrid * rectGrid,
   xCordAry = NULL;
   yzCoords = NULL;
 }//*/
+
+
+
+//-----------------------------------------------------------------------------
+void vtkFlashReader::MergeVectors(vtkDataSetAttributes* da)
+{
+  int numArrays = da->GetNumberOfArrays();
+  int idx;
+  vtkDataArray *a1, *a2, *a3;
+  int flag = 1;
+
+  // Loop merging arrays.
+  // Since we are modifying the list of arrays that we are traversing,
+  // merge one set of arrays at a time.
+  while (flag)
+    {
+    flag = 0;  
+    for (idx = 0; idx < numArrays-1 && !flag; ++idx)
+      {
+      a1 = da->GetArray(idx);
+      a2 = da->GetArray(idx+1);
+      if (idx+2 < numArrays)
+        {
+        a3 = da->GetArray(idx+2);
+        if (this->MergeVectors(da, a1, a2, a3))
+          {
+          flag = 1;
+          continue;
+          }    
+        if (this->MergeVectors(da, a3, a2, a1))
+          {
+          flag = 1;
+          continue;
+          }
+        }
+      if (this->MergeVectors(da, a1, a2))
+        {
+        flag = 1;
+        continue;
+        }
+      if (this->MergeVectors(da, a2, a1))
+        {
+        flag = 1;
+        continue;
+        }
+      }
+    }
+}
+
+//-----------------------------------------------------------------------------
+// The templated execute function handles all the data types.
+template <class T>
+void vtkMergeVectorComponents(vtkIdType length,
+                              T *p1, T *p2, T *p3, T *po)
+{
+  vtkIdType idx;
+  if (p3)
+    {
+    for (idx = 0; idx < length; ++idx)
+      {
+      *po++ = *p1++;
+      *po++ = *p2++;
+      *po++ = *p3++;
+      }
+    }
+  else
+    {
+    for (idx = 0; idx < length; ++idx)
+      {
+      *po++ = *p1++;
+      *po++ = *p2++;
+      *po++ = (T)0;
+      }
+    }
+}
+
+//-----------------------------------------------------------------------------
+int vtkFlashReader::MergeVectors(vtkDataSetAttributes* da, 
+                                   vtkDataArray * a1, vtkDataArray * a2, vtkDataArray * a3)
+{
+  int prefixFlag = 0;
+
+  if (a1 == 0 || a2 == 0 || a3 == 0)
+    {
+    return 0;
+    }
+  if(a1->GetNumberOfTuples() != a2->GetNumberOfTuples() ||
+     a1->GetNumberOfTuples() != a3->GetNumberOfTuples())
+    { // Sanity check.  Should never happen.
+    return 0;
+    }
+  if(a1->GetDataType()!=a2->GetDataType()||a1->GetDataType()!=a3->GetDataType())
+    {
+    return 0;
+    }
+  if(a1->GetNumberOfComponents()!=1 || a2->GetNumberOfComponents()!=1 ||
+     a3->GetNumberOfComponents()!=1)
+    {
+    return 0;
+    }
+  const char *n1, *n2, *n3;
+  size_t e1, e2, e3;
+  n1 = a1->GetName();
+  n2 = a2->GetName();
+  n3 = a3->GetName();
+  if (n1 == 0 || n2 == 0 || n3 == 0)
+    {
+    return 0;
+    }  
+  e1 = strlen(n1)-1;
+  e2 = strlen(n2)-1;
+  e3 = strlen(n3)-1;
+  if(e1!=e2 || e1 != e3)
+    {
+    return 0;
+    }
+  if (strncmp(n1+1,n2+1,e1)==0 && strncmp(n1+1,n3+1,e1)==0)
+    { // Trailing characters are the same. Check for prefix XYZ.
+    if ((n1[0]!='X' || n2[0]!='Y' || n3[0]!='Z') &&
+        (n1[0]!='x' || n2[0]!='y' || n3[0]!='z'))
+      { // Since last characters are the same, there is no way
+      // the names can have postfix XYZ.
+      return 0;
+      }
+    prefixFlag = 1;
+    }
+  else
+    { // Check for postfix case.
+    if (strncmp(n1,n2,e1)!=0 || strncmp(n1,n3,e1)!=0)
+      { // Not pre or postfix.
+      return 0;
+      }
+    if ((n1[e1]!='X' || n2[e2]!='Y' || n3[e3]!='Z') &&
+        (n1[e1]!='x' || n2[e2]!='y' || n3[e3]!='z'))
+      { // Tails are the same, but postfix not XYZ.
+      return 0;
+      }
+    }
+  // Merge the arrays.
+  vtkDataArray* newArray = a1->NewInstance();
+  newArray->SetNumberOfComponents(3);
+  vtkIdType length = a1->GetNumberOfTuples();
+  newArray->SetNumberOfTuples(length);
+  void *p1 = a1->GetVoidPointer(0);
+  void *p2 = a2->GetVoidPointer(0);
+  void *p3 = a3->GetVoidPointer(0);
+  void *pn = newArray->GetVoidPointer(0);
+  switch (a1->GetDataType())
+    {
+    vtkTemplateMacro(
+      vtkMergeVectorComponents( length, 
+                                (VTK_TT*)p1,
+                                (VTK_TT*)p2,
+                                (VTK_TT*)p3,
+                                (VTK_TT*)pn));
+    default:
+      vtkErrorMacro(<< "Execute: Unknown ScalarType");
+      return 0;
+    }
+  if (prefixFlag)
+    {
+    newArray->SetName(n1+1);
+    }
+  else
+    {
+    char* name = new char[e1+2];
+    strncpy(name,n1,e1);
+    name[e1] = '\0';
+    newArray->SetName(name);
+    delete [] name;
+    }
+  da->RemoveArray(n1);    
+  da->RemoveArray(n2);    
+  da->RemoveArray(n3);
+  da->AddArray(newArray);
+  newArray->Delete();    
+  return 1;
+}
+
+//-----------------------------------------------------------------------------
+int vtkFlashReader::MergeVectors(vtkDataSetAttributes* da, 
+                                   vtkDataArray * a1, vtkDataArray * a2)
+{
+  int prefixFlag = 0;
+
+  if (a1 == 0 || a2 == 0)
+    {
+    return 0;
+    }
+  if (a1->GetNumberOfTuples() != a2->GetNumberOfTuples())
+    { // Sanity check.  Should never happen.
+    return 0;
+    }
+  if (a1->GetDataType() != a2->GetDataType())
+    {
+    return 0;
+    }
+  if (a1->GetNumberOfComponents() != 1 || a2->GetNumberOfComponents() != 1)
+    {
+    return 0;
+    }
+  const char *n1, *n2;
+  size_t e1, e2;
+  n1 = a1->GetName();
+  n2 = a2->GetName();
+  if (n1 == 0 || n2 == 0)
+    {
+    return 0;
+    }  
+  e1 = strlen(n1)-1;
+  e2 = strlen(n2)-1;
+  if (e1 != e2 )
+    {
+    return 0;
+    }
+  if ( strncmp(n1+1,n2+1,e1) == 0)
+    { // Trailing characters are the same. Check for prefix XYZ.
+    if ((n1[0]!='X' || n2[0]!='Y') && (n1[0]!='x' || n2[0]!='y'))
+      { // Since last characters are the same, there is no way
+      // the names can have postfix XYZ.
+      return 0;
+      }
+    prefixFlag = 1;
+    }
+  else
+    { // Check for postfix case.
+    if (strncmp(n1,n2,e1) != 0)
+      { // Not pre or postfix.
+      return 0;
+      }
+    if ((n1[e1]!='X' || n2[e2]!='Y') && (n1[e1]!='x' || n2[e2]!='y'))
+      { // Tails are the same, but postfix not XYZ.
+      return 0;
+      }
+    }
+  // Merge the arrays.
+  vtkDataArray* newArray = a1->NewInstance();
+  // Creae the third componnt and set to 0.
+  newArray->SetNumberOfComponents(3);
+  vtkIdType length = a1->GetNumberOfTuples();
+  newArray->SetNumberOfTuples(length);
+  void *p1 = a1->GetVoidPointer(0);
+  void *p2 = a2->GetVoidPointer(0);
+  void *pn = newArray->GetVoidPointer(0);
+  switch (a1->GetDataType())
+    {
+    vtkTemplateMacro(
+      vtkMergeVectorComponents( length, 
+                                (VTK_TT*)p1,
+                                (VTK_TT*)p2,
+                                (VTK_TT*)0,
+                                (VTK_TT*)pn));
+    default:
+      vtkErrorMacro(<< "Execute: Unknown ScalarType");
+      return 0;
+    }
+  if (prefixFlag)
+    {
+    newArray->SetName(n1+1);
+    }
+  else
+    {
+    char* name = new char[e1+2];
+    strncpy(name,n1,e1);
+    name[e1] = '\0';
+    newArray->SetName(name);
+    delete [] name;
+    }
+  da->RemoveArray(n1);    
+  da->RemoveArray(n2);    
+  da->AddArray(newArray);
+  newArray->Delete();    
+  return 1;
+}
+
+//-----------------------------------------------------------------------------
+void vtkFlashReader::SetMergeXYZComponents(int merge)
+{
+  if ( merge == this->MergeXYZComponents )
+    {
+    return;
+    }
+  this->MergeXYZComponents = merge;
+  this->Modified();
+}
