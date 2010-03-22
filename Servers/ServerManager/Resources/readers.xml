@@ -3335,17 +3335,6 @@
        </Documentation>
      </IntVectorProperty>
 
-     <IntVectorProperty 
-       name="MaxLevel" 
-       command="SetMaxLevel" 
-       number_of_elements="1"
-       default_values="100" > 
-       <IntRangeDomain name="range"/>
-       <Documentation>
-         Do not blocks above this level.
-       </Documentation>
-     </IntVectorProperty>
-
      <IntVectorProperty name="LoadParticles"
        command="SetLoadParticles"
        number_of_elements="1"
