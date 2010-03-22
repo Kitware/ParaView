@@ -40,6 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPipelineFilter.h"
 #include "pqProxyGroupMenuManager.h"
 #include "pqServer.h"
+#include "pqServerManagerModel.h"
 #include "pqServerManagerSelectionModel.h"
 #include "pqUndoStack.h"
 #include "vtkSmartPointer.h"
@@ -76,7 +77,7 @@ pqFiltersMenuReaction::pqFiltersMenuReaction(
 {
   QObject::connect(&this->Timer, SIGNAL(timeout()),
     this, SLOT(updateEnableState()));
-  this->Timer.setInterval(100);
+  this->Timer.setInterval(10);
   this->Timer.setSingleShot(true);
 
   QObject::connect(
@@ -87,6 +88,9 @@ pqFiltersMenuReaction::pqFiltersMenuReaction(
   QObject::connect(activeObjects, SIGNAL(serverChanged(pqServer*)),
     &this->Timer, SLOT(start()));
   QObject::connect(activeObjects, SIGNAL(portChanged(pqOutputPort*)),
+    &this->Timer, SLOT(start()));
+  QObject::connect(pqApplicationCore::instance()->getServerManagerModel(),
+    SIGNAL(nameChanged(pqServerManagerModelItem*)),
     &this->Timer, SLOT(start()));
   this->updateEnableState();
 }
