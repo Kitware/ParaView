@@ -59,6 +59,7 @@ SET(Filters_SRCS
   vtkExtractScatterPlot.cxx
   vtkFileSeriesReader.cxx
   vtkFileSeriesWriter.cxx
+  vtkFlashContour.cxx
   vtkFlashReader.cxx
   vtkHierarchicalFractal.cxx
   vtkGenericEnSightReader2.cxx

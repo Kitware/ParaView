@@ -33,6 +33,11 @@ class vtkRectilinearGrid;
 class vtkDataSet;
 class vtkHierarchicalBoxDataSet;
 
+
+
+
+
+
 class VTK_EXPORT vtkHierarchicalFractal : public vtkCompositeDataSetAlgorithm
 {
 public:
@@ -90,6 +95,12 @@ public:
   // Adds 2 to the x extent of the far x blocks (level 1).
   vtkSetMacro(Asymetric,int);
   vtkGetMacro(Asymetric,int);
+
+  // Description:
+  // Test with lower levels overlapping higher levels.
+  // This is what I assume flash is like.
+  vtkSetMacro(Overlap,int);
+  vtkGetMacro(Overlap,int);
 
 protected:
   vtkHierarchicalFractal();
@@ -175,6 +186,7 @@ protected:
   
   void InternalImageDataCopy(vtkHierarchicalFractal *src);
 
+  int Overlap;
   int Asymetric;
   int MaximumLevel;
   int Dimensions;

@@ -24,7 +24,7 @@
 #include "vtkUnsignedCharArray.h"
 #include "vtkstd/vector"
 
-vtkCxxRevisionMacro(vtkAMRDualGridHelper, "1.7");
+vtkCxxRevisionMacro(vtkAMRDualGridHelper, "1.8");
 vtkStandardNewMacro(vtkAMRDualGridHelper);
 
 class vtkAMRDualGridHelperSeed;
@@ -88,16 +88,19 @@ class vtkAMRDualGridHelperDegenerateRegion
 {
 public:
   vtkAMRDualGridHelperDegenerateRegion();
-  vtkAMRDualGridHelperBlock* ReceivingBlock;
   int ReceivingRegion[3];
   vtkAMRDualGridHelperBlock* SourceBlock;
+  vtkDataArray* SourceArray;
+  vtkAMRDualGridHelperBlock* ReceivingBlock;
+  vtkDataArray* ReceivingArray;
 };
 vtkAMRDualGridHelperDegenerateRegion::vtkAMRDualGridHelperDegenerateRegion()
 {
-  this->ReceivingBlock = this->SourceBlock = 0;
   this->ReceivingRegion[0] = 0;
   this->ReceivingRegion[1] = 0;
   this->ReceivingRegion[2] = 0;
+  this->ReceivingBlock = this->SourceBlock = 0;
+  this->ReceivingArray = this->SourceArray = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -1159,27 +1162,62 @@ int vtkAMRDualGridHelper::ClaimBlockSharedRegion(
     if (block->Image == 0 || bestBlock->Image == 0)
       { // Deal with remote blocks later.
       // Add the pair of blocks to a queue to copy when we get the data.
-      vtkAMRDualGridHelperDegenerateRegion dreg;
-      dreg.ReceivingBlock = block;
-      dreg.ReceivingRegion[0] = regionX;
-      dreg.ReceivingRegion[1] = regionY;
-      dreg.ReceivingRegion[2] = regionZ;
-      dreg.SourceBlock = bestBlock;
-      if ( ! this->SkipGhostCopy)
+      vtkDataArray* bestBlockArray = 0;
+      vtkDataArray* blockArray = 0;      
+      if (block->Image)
         {
-        this->DegenerateRegionQueue.push_back(dreg);
+        blockArray = block->Image->GetCellData()->GetArray(this->ArrayName);
         }
+      if (bestBlock->Image)
+        {
+        bestBlockArray = bestBlock->Image->GetCellData()->GetArray(this->ArrayName);
+        }
+      this->QueueRegionRemoteCopy(regionX, regionY, regionZ,
+                                  bestBlock, bestBlockArray,
+                                  block, blockArray);
       }
     else
       {
-      this->CopyDegenerateRegionBlockToBlock(regionX,regionY,regionZ, bestBlock, block);
+      if (block->CopyFlag == 0)
+        { // We cannot modify our input.
+        vtkImageData* copy = vtkImageData::New();
+        // We only really need to deep copy the one volume fraction array.
+        // All others can be shallow copied.
+        copy->DeepCopy(block->Image);
+        block->Image = copy;
+        block->CopyFlag = 1;
+        }
+      vtkDataArray *blockDataArray = block->Image->GetCellData()->GetArray(this->ArrayName);  
+      vtkDataArray *bestBlockDataArray = bestBlock->Image->GetCellData()->GetArray(this->ArrayName);  
+      if (blockDataArray && bestBlockDataArray)
+        {
+        this->CopyDegenerateRegionBlockToBlock(regionX,regionY,regionZ, 
+                bestBlock,bestBlockDataArray,
+                block,blockDataArray);
+        }
       }
     }
 
   return bestLevel;
 }
-
-
+void vtkAMRDualGridHelper::QueueRegionRemoteCopy(
+  int regionX, int regionY, int regionZ,
+  vtkAMRDualGridHelperBlock* lowResBlock, vtkDataArray* lowResArray,
+  vtkAMRDualGridHelperBlock* highResBlock, vtkDataArray* highResArray)
+{
+  vtkAMRDualGridHelperDegenerateRegion dreg;
+  dreg.ReceivingRegion[0] = regionX;
+  dreg.ReceivingRegion[1] = regionY;
+  dreg.ReceivingRegion[2] = regionZ;
+  dreg.ReceivingBlock = highResBlock;
+  dreg.ReceivingArray = highResArray;
+  dreg.SourceBlock = lowResBlock;
+  dreg.SourceArray = lowResArray;
+  if ( ! this->SkipGhostCopy)
+    {
+    this->DegenerateRegionQueue.push_back(dreg);
+    }
+}
 
 // Just a hack to test an assumption.
 // This can be removed once we determine hor the ghost values behave across
@@ -1236,8 +1274,8 @@ void vtkDualGridHelperCopyBlockToBlock(T* ptr, T* lowerPtr, int ext[6], int leve
 // This method copies low-res values to high-res ghost blocks.
 void vtkAMRDualGridHelper::CopyDegenerateRegionBlockToBlock(
   int regionX, int regionY, int regionZ,
-  vtkAMRDualGridHelperBlock* lowResBlock,
-  vtkAMRDualGridHelperBlock* highResBlock)
+  vtkAMRDualGridHelperBlock* lowResBlock, vtkDataArray* lowResArray,
+  vtkAMRDualGridHelperBlock* highResBlock, vtkDataArray* highResArray)
 {
   int levelDiff = highResBlock->Level - lowResBlock->Level;
   if (levelDiff == 0)
@@ -1249,32 +1287,19 @@ void vtkAMRDualGridHelper::CopyDegenerateRegionBlockToBlock(
     vtkGenericWarningMacro("Reverse level change.");
     return;
     }
-  if (highResBlock->CopyFlag == 0)
-    { // We cannot modify our input.
-    vtkImageData* copy = vtkImageData::New();
-    // We only really need to deep copy the one volume fraction array.
-    // All others can be shallow copied.
-    copy->DeepCopy(highResBlock->Image);
-    highResBlock->Image = copy;
-    highResBlock->CopyFlag = 1;
-    }
 
   // Now copy low resolution into highresolution ghost layer.
   // For simplicity loop over all three axes (one will be degenerate).
-  vtkDataArray *da = highResBlock->Image->GetCellData()->GetArray(this->ArrayName);
-  if (da == 0) {return;}
-  void *ptr = da->GetVoidPointer(0);
-  int   daType = da->GetDataType();
+  void *ptr = highResArray->GetVoidPointer(0);
+  int   daType = highResArray->GetDataType();
 
   // Lower block pointer
-  da = lowResBlock->Image->GetCellData()->GetArray(this->ArrayName);
-  if (da == 0) {return;}
-  if (da->GetDataType() != daType)
+  if (lowResArray->GetDataType() != daType)
     {
     vtkGenericWarningMacro("Type mismatch.");
     return;
     }
-  void *lowerPtr = da->GetVoidPointer(0);
+  void *lowerPtr = lowResArray->GetVoidPointer(0);
 
   // Get the extent of the high-res region we are replacing with values from the neighbor.
   int ext[6];
@@ -1359,11 +1384,15 @@ void* vtkDualGridHelperCopyBlockToMessage(T* messagePtr, T* lowerPtr,
   return messagePtr;
 }
 void* vtkAMRDualGridHelper::CopyDegenerateRegionBlockToMessage(
-  int regionX, int regionY, int regionZ,
-  vtkAMRDualGridHelperBlock* lowResBlock,
-  vtkAMRDualGridHelperBlock* highResBlock,
+  vtkAMRDualGridHelperDegenerateRegion* region,
   void* messagePtr)
 {    
+  int regionX = region->ReceivingRegion[0];
+  int regionY = region->ReceivingRegion[1];
+  int regionZ = region->ReceivingRegion[2];
+  vtkAMRDualGridHelperBlock* lowResBlock = region->SourceBlock;
+  vtkAMRDualGridHelperBlock* highResBlock = region->ReceivingBlock;
+
   int levelDiff = highResBlock->Level - lowResBlock->Level;
   if (levelDiff == 0)
     { // double check.
@@ -1375,11 +1404,9 @@ void* vtkAMRDualGridHelper::CopyDegenerateRegionBlockToMessage(
     return messagePtr;
     }
   // Lower block pointer
-  vtkDataArray* da;
-  da = lowResBlock->Image->GetCellData()->GetArray(this->ArrayName);
-  if (da == 0) {return messagePtr;}
-  int daType = da->GetDataType();
-  void *lowerPtr = da->GetVoidPointer(0);
+  if (region->SourceArray == 0) {return messagePtr;}
+  int daType = region->SourceArray->GetDataType();
+  void *lowerPtr = region->SourceArray->GetVoidPointer(0);
 
   // Get the extent of the high-res region we are replacing with values from the neighbor.
   int ext[6];
@@ -1440,13 +1467,15 @@ void* vtkAMRDualGridHelper::CopyDegenerateRegionBlockToMessage(
 
   return messagePtr;
 }
+
 // Take the low res message and copy to the high res block.
 template <class T>
 void* vtkDualGridHelperCopyMessageToBlock(T* ptr, T* messagePtr, 
                                        int ext[6],int messageExt[6],int levelDiff,
                                        int yInc, int zInc, 
                                        int highResBlockOriginIndex[3],
-                                       int lowResBlockOriginIndex[3])
+                                       int lowResBlockOriginIndex[3],
+                                       bool hackLevelFlag)
 {
   int messageIncY = messageExt[1]-messageExt[0]+1;
   int messageIncZ = messageIncY * (messageExt[3]-messageExt[2]+1);
@@ -1465,7 +1494,16 @@ void* vtkDualGridHelperCopyMessageToBlock(T* ptr, T* messagePtr,
       for (int x = ext[0]; x <= ext[1]; ++x)
         {
         lx = ((x+highResBlockOriginIndex[0]) >> levelDiff) - lowResBlockOriginIndex[0] - messageExt[0];
-        *xPtr = messagePtr[lx + ly*messageIncY + lz*messageIncZ];
+        if (hackLevelFlag)
+          { // When generalizing I forgot that levels get an extra increment here.
+          // Mybe it woudl be better if the level diff was relative to the block level!!!!  Oh well.
+          // It is too late to make that change. Just pass in a special case.
+          *xPtr = messagePtr[lx + ly*messageIncY + lz*messageIncZ] + levelDiff;
+          }
+        else
+          {
+          *xPtr = messagePtr[lx + ly*messageIncY + lz*messageIncZ];
+          }
         xPtr++;
         }
       yPtr += yInc;
@@ -1474,14 +1512,21 @@ void* vtkDualGridHelperCopyMessageToBlock(T* ptr, T* messagePtr,
     }
   return messagePtr + (messageIncZ*(messageExt[5]-messageExt[4]+1));
 }
+
+
 void* vtkAMRDualGridHelper::CopyDegenerateRegionMessageToBlock(
-  int regionX, int regionY, int regionZ,
-  vtkAMRDualGridHelperBlock* lowResBlock,
-  vtkAMRDualGridHelperBlock* highResBlock,
-  void* messagePtr)
+  vtkAMRDualGridHelperDegenerateRegion* region,
+  void* messagePtr,
+  bool hackLevelFlag) // Make levels absolute so we can get rid of this flag.
 {
+  int regionX = region->ReceivingRegion[0];
+  int regionY = region->ReceivingRegion[1];
+  int regionZ = region->ReceivingRegion[2];
+  vtkAMRDualGridHelperBlock* lowResBlock = region->SourceBlock;
+  vtkAMRDualGridHelperBlock* highResBlock = region->ReceivingBlock;
+
   int levelDiff = highResBlock->Level - lowResBlock->Level;
-  if (levelDiff == 0)
+  if (levelDiff == 0)  // I am not sure this is right!  Can't levels be the same when copying?
     { // double check.
     return messagePtr;
     }
@@ -1490,20 +1535,12 @@ void* vtkAMRDualGridHelper::CopyDegenerateRegionMessageToBlock(
     vtkGenericWarningMacro("Reverse level change.");
     return messagePtr;
     }
-  if (highResBlock->CopyFlag == 0)
-    { // We cannot modify our input.
-    vtkImageData* copy = vtkImageData::New();
-    copy->DeepCopy(highResBlock->Image);
-    highResBlock->Image = copy;
-    highResBlock->CopyFlag = 1;
-    }
 
   // Now copy low resolution into highresolution ghost layer.
   // For simplicity loop over all three axes (one will be degenerate).
-  vtkDataArray *da = highResBlock->Image->GetCellData()->GetArray(this->ArrayName);
-  if (da == 0) {return messagePtr;}
-  int daType = da->GetDataType();
-  void *ptr = da->GetVoidPointer(0);
+  if (region->ReceivingArray == 0) {return messagePtr;}
+  int daType = region->ReceivingArray->GetDataType();
+  void *ptr = region->ReceivingArray->GetVoidPointer(0);
 
   // Get the extent of the high-res region we are replacing with values from the neighbor.
   int ext[6];
@@ -1565,7 +1602,8 @@ void* vtkAMRDualGridHelper::CopyDegenerateRegionMessageToBlock(
                   static_cast<VTK_TT *>(messagePtr),
                   ext, messageExt, levelDiff, yInc, zInc,
                   highResBlock->OriginIndex,
-                  lowResBlock->OriginIndex));
+                  lowResBlock->OriginIndex,
+                  hackLevelFlag));
     default:
       vtkGenericWarningMacro("Execute: Unknown ScalarType");
       return messagePtr;
@@ -1579,7 +1617,7 @@ void* vtkAMRDualGridHelper::CopyDegenerateRegionMessageToBlock(
 // I am assuming that each block has the same extent.  If boundary ghost
 // cells are removed by the reader, then I will add them back as the first
 // step of initialization.
-void vtkAMRDualGridHelper::ProcessDegenerateRegionQueue()
+void vtkAMRDualGridHelper::ProcessRegionRemoteCopyQueue(bool hackLevelFlag)
 {
   if (this->Controller == 0 || this->SkipGhostCopy)
     {
@@ -1597,11 +1635,11 @@ void vtkAMRDualGridHelper::ProcessDegenerateRegionQueue()
     if (procIdx < myProc)
       {
       this->SendDegenerateRegionsFromQueue(procIdx, myProc);
-      this->ReceiveDegenerateRegionsFromQueue(procIdx, myProc);
+      this->ReceiveDegenerateRegionsFromQueue(procIdx, myProc, hackLevelFlag);
       }
     else if (procIdx > myProc)
       {
-      this->ReceiveDegenerateRegionsFromQueue(procIdx, myProc);
+      this->ReceiveDegenerateRegionsFromQueue(procIdx, myProc, hackLevelFlag);
       this->SendDegenerateRegionsFromQueue(procIdx, myProc);
       }
     }
@@ -1652,6 +1690,10 @@ void vtkAMRDualGridHelper::SendDegenerateRegionsFromQueue(int remoteProc, int lo
       messageLength += regionSize * this->DataTypeSize;
       }
     }
+  if (messageLength == 0)
+    { // Nothing to send.
+    return;
+    }
   this->AllocateMessageBuffer(messageLength * sizeof(unsigned char));
   // Now copy the layers into the message buffer.
   void* messagePtr = (void*)(this->MessageBuffer);
@@ -1662,11 +1704,7 @@ void vtkAMRDualGridHelper::SendDegenerateRegionsFromQueue(int remoteProc, int lo
          region->SourceBlock->ProcessId == localProc)
       {
       messagePtr = this->CopyDegenerateRegionBlockToMessage(
-                        region->ReceivingRegion[0],
-                        region->ReceivingRegion[1],
-                        region->ReceivingRegion[2],
-                        region->SourceBlock,
-                        region->ReceivingBlock,
+                        region,
                         messagePtr);
       }
     }
@@ -1677,7 +1715,8 @@ void vtkAMRDualGridHelper::SendDegenerateRegionsFromQueue(int remoteProc, int lo
 }
 
 //----------------------------------------------------------------------------
-void vtkAMRDualGridHelper::ReceiveDegenerateRegionsFromQueue(int remoteProc, int localProc)
+void vtkAMRDualGridHelper::ReceiveDegenerateRegionsFromQueue(int remoteProc, int localProc,
+                                                             bool hackLevelFlag)
 {
   // Find the length of the message.
   vtkAMRDualGridHelperDegenerateRegion* region;
@@ -1719,6 +1758,10 @@ void vtkAMRDualGridHelper::ReceiveDegenerateRegionsFromQueue(int remoteProc, int
       messageLength += regionSize * this->DataTypeSize;
       }
     }
+  if (messageLength == 0)
+    { // Nothing to receive
+    return;
+    }
 
   // Receive the message.
   this->AllocateMessageBuffer(messageLength * sizeof(unsigned char));
@@ -1733,13 +1776,17 @@ void vtkAMRDualGridHelper::ReceiveDegenerateRegionsFromQueue(int remoteProc, int
     if ( region->ReceivingBlock->ProcessId == localProc &&
          region->SourceBlock->ProcessId == remoteProc)
       {
+      if (region->ReceivingBlock->CopyFlag == 0)
+        { // We cannot modify our input.
+        vtkImageData* copy = vtkImageData::New();
+        copy->DeepCopy(region->ReceivingBlock->Image);
+        region->ReceivingBlock->Image = copy;
+        region->ReceivingBlock->CopyFlag = 1;
+        }
       messagePtr = this->CopyDegenerateRegionMessageToBlock(
-                        region->ReceivingRegion[0],
-                        region->ReceivingRegion[1],
-                        region->ReceivingRegion[2],
-                        region->SourceBlock,
-                        region->ReceivingBlock,
-                        messagePtr);
+                        region,
+                        messagePtr,
+                        hackLevelFlag);
       }
     }
 }
@@ -1808,12 +1855,16 @@ int vtkAMRDualGridHelper::Initialize(vtkHierarchicalBoxDataSet* input,
   this->AssignSharedRegions();
   
   // Copy regions on level boundaries between processes.
-  this->ProcessDegenerateRegionQueue();
+  this->ProcessRegionRemoteCopyQueue(false);
   
   // Setup faces for seeding connectivity between blocks.
   //this->CreateFaces();
   
   return VTK_OK;
+}
+void vtkAMRDualGridHelper::ClearRegionRemoteCopyQueue() 
+{
+  this->DegenerateRegionQueue.clear();
 }
 void vtkAMRDualGridHelper::ShareBlocks()
 {

@@ -25,6 +25,7 @@
 #include "vtkObject.h"
 #include <vtkstd/vector>
 
+class vtkDataArray;
 class vtkHierarchicalBoxDataSet;
 class vtkAMRDualGridHelperBlock;
 class vtkAMRDualGridHelperLevel;
@@ -63,6 +64,38 @@ public:
   vtkAMRDualGridHelperBlock* GetBlock(int level, int blockIdx);
   vtkAMRDualGridHelperBlock* GetBlock(int level, int xGrid, int yGrid, int zGrid);
 
+
+  // Description:
+  // I am generalizing the code that copies lowres blocks to highres ghost regions.
+  // I need to do this for the clip filter (level mask).
+  //
+  // For transitions between levels, degeneracy works well to create
+  // and contour wedges and pyramids, but the volume fraction values
+  // in the high-level blocks ghost cells need to be the same
+  // as the closest cell in the low resolution block.  These methods
+  // copy low values to high.
+  void CopyDegenerateRegionBlockToBlock(
+    int regionX, int regionY, int regionZ,
+    vtkAMRDualGridHelperBlock* lowResBlock, vtkDataArray* lowResArray,
+    vtkAMRDualGridHelperBlock* highResBlock, vtkDataArray* highResArray);
+  // Description:
+  // This queues up either a copy from a remote process to this process
+  // or a copy from this process to a remote process.
+  // Only the local block needs an array.  LowRes block is the source.
+  void QueueRegionRemoteCopy(
+    int regionX, int regionY, int regionZ,
+    vtkAMRDualGridHelperBlock* lowResBlock, vtkDataArray* lowResArray,
+    vtkAMRDualGridHelperBlock* highResBlock, vtkDataArray* highResArray);
+  // Description:
+  // This should be called on every process.  It processes the queue of region copies.
+  // It sends and copies the regions into blocks.
+  void ProcessRegionRemoteCopyQueue(bool hackLevelFlag);
+  // Description:
+  // Call this before adding regions to the queue.  It clears the queue.
+  void ClearRegionRemoteCopyQueue();
+  // Description:
+  // It is convenient to get this here.
+  vtkGetStringMacro(ArrayName);
 
 private:
   vtkAMRDualGridHelper();
@@ -123,28 +156,15 @@ private:
   // Degenerate regions that span processes.  We keep them in a queue
   // to communicate and process all at once.
   vtkstd::vector<vtkAMRDualGridHelperDegenerateRegion> DegenerateRegionQueue;
-  void ProcessDegenerateRegionQueue();
   void SendDegenerateRegionsFromQueue(int remoteProc, int localProc);
-  void ReceiveDegenerateRegionsFromQueue(int remoteProc, int localProc);
-  
-  // For transitions between levels, degeneracy works well to create
-  // and contour wedges and pyramids, but the volume fraction values
-  // in the high-level blocks ghost cells need to be the same
-  // as the closest cell in the low resolution block.  These methods
-  // copy low values to high.
-  void CopyDegenerateRegionBlockToBlock(int regionX, int regionY, int regionZ,
-                                        vtkAMRDualGridHelperBlock* lowResBlock,
-                                        vtkAMRDualGridHelperBlock* highResBlock);
+  void ReceiveDegenerateRegionsFromQueue(int remoteProc, int localProc, bool hackLevelFlag);  
   void* CopyDegenerateRegionBlockToMessage(
-    int regionX, int regionY, int regionZ,
-    vtkAMRDualGridHelperBlock* lowResBlock,
-    vtkAMRDualGridHelperBlock* highResBlock,
+    vtkAMRDualGridHelperDegenerateRegion* region,
     void* messagePtr);
   void* CopyDegenerateRegionMessageToBlock(
-    int regionX, int regionY, int regionZ,
-    vtkAMRDualGridHelperBlock* lowResBlock,
-    vtkAMRDualGridHelperBlock* highResBlock,
-    void* messagePtr);
+    vtkAMRDualGridHelperDegenerateRegion* region,
+    void* messagePtr,
+    bool hackLevelFlag);
 
   int SkipGhostCopy;
 

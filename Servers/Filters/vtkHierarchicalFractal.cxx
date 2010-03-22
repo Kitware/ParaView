@@ -36,7 +36,7 @@
 
 #include <assert.h>
 
-vtkCxxRevisionMacro(vtkHierarchicalFractal, "1.15");
+vtkCxxRevisionMacro(vtkHierarchicalFractal, "1.16");
 vtkStandardNewMacro(vtkHierarchicalFractal);
 
 //----------------------------------------------------------------------------
@@ -52,6 +52,7 @@ vtkHierarchicalFractal::vtkHierarchicalFractal()
   this->Levels = vtkIntArray::New();
   this->TwoDimensional = 1;
   this->Asymetric = 1;
+  this->Overlap = 1;
   
   this->TopLevelSpacing[0] = 1.0;
   this->TopLevelSpacing[1] = 1.0;
@@ -719,11 +720,15 @@ void vtkHierarchicalFractal::Traverse(int &blockId,
     }
     
   int subOnFace[6];
-  
+  int generateBlock  = 1;
   if (this->TwoDimensional)
     {
     if (this->TwoDTest(bds, level, this->MaximumLevel))
       {
+      if ( ! this->Overlap)
+        {
+        generateBlock = 0;
+        }
       ++level;
       // Traverse the 4 new blocks.
       subOnFace[0]=onFace[0];
@@ -749,7 +754,7 @@ void vtkHierarchicalFractal::Traverse(int &blockId,
 //      subOnFace[3]=onFace[3];
       this->Traverse(blockId, level, output, x2,x3,y2,y3,z0,z0,subOnFace);
       }
-    else
+    if (generateBlock)
       {
       if (this->BlockCount >= this->StartBlock
           && this->BlockCount <= this->EndBlock)
@@ -785,6 +790,10 @@ void vtkHierarchicalFractal::Traverse(int &blockId,
         this->LineTest(-1.05088,0.85595,0.87104, -0.61430,1.00347,0.59553, bds,
                        level, this->MaximumLevel) )
       { // break block into eight.
+      if ( ! this->Overlap)
+        {
+        generateBlock = 0;
+        }
       ++level;
       // Traverse the 8 new blocks.
       subOnFace[0]=onFace[0];
@@ -834,7 +843,7 @@ void vtkHierarchicalFractal::Traverse(int &blockId,
 //      subOnFace[3]=onFace[3];
       this->Traverse(blockId, level, output, x2,x3,y2,y3,z2,z3,subOnFace);
       }
-    else
+    if (generateBlock)
       {
       if (this->BlockCount >= this->StartBlock
           && this->BlockCount <= this->EndBlock)

@@ -44,11 +44,12 @@
 #include "vtkCellArray.h"
 #include "vtkIntArray.h"
 #include "vtkUnsignedCharArray.h"
+#include "vtkUnsignedCharArray.h"
 #include <math.h>
 #include <ctime>
 
 
-vtkCxxRevisionMacro(vtkAMRDualClip, "1.6");
+vtkCxxRevisionMacro(vtkAMRDualClip, "1.7");
 vtkStandardNewMacro(vtkAMRDualClip);
 
 
@@ -427,6 +428,8 @@ public:
   // Access to the level mask for any cell.
   unsigned char GetLevelMaskValue(int x, int y, int z);
 
+  vtkUnsignedCharArray* GetLevelMaskArray() { return this->LevelMaskArray;}
+
 private:
 
   int DualCellDimensions[3];
@@ -446,12 +449,24 @@ private:
   // which level grid the point will be on.  If all 8 cells (children of a 
   // cell in the next lower level) are interior, then all eight merge to the
   // same point.
-  unsigned char* LevelMask;
+  //unsigned char* LevelMask;
+  vtkUnsignedCharArray* LevelMaskArray;
+  unsigned char* GetLevelMaskPointer();
   void RecursiveComputeLevelMask(int depth);
   
   // Flag to indicate that center region has been initialized.
   unsigned char CenterLevelMaskComputed;
 };
+
+//----------------------------------------------------------------------------
+unsigned char* vtkAMRDualClipLocator::GetLevelMaskPointer() 
+{ 
+  if (this->LevelMaskArray == 0)
+    {
+    return 0;
+    }
+  return this->LevelMaskArray->GetPointer(0);
+}
 
 
 //----------------------------------------------------------------------------
@@ -571,7 +586,7 @@ void vtkAMRDualClipLocator::ComputeLevelMask(
     {
     vtkTemplateMacro(vtkDualGridClipInitializeLevelMask(
                      (VTK_TT *)(scalars->GetVoidPointer(0)),
-                     isoValue, this->LevelMask, dims));
+                     isoValue, this->GetLevelMaskPointer(), dims));
     default:
       vtkGenericWarningMacro("Execute: Unknown ScalarType");
     }
@@ -604,7 +619,7 @@ void vtkAMRDualClipLocator::CapLevelMaskFace(int axis, int face)
   int iiMax, jjMax;
   
   iiMax = jjMax = iiInc = jjInc = normalInc = 0;
-  startPtr = this->LevelMask;
+  startPtr = this->GetLevelMaskPointer();
   switch (axis)
     {
     case 0:
@@ -684,7 +699,7 @@ void vtkAMRDualClipLocator::RecursiveComputeLevelMask(int depth)
   // Compute the next level of the tree
   unsigned char *xPtr, *yPtr, *zPtr;
   // Skip the ghost regions.
-  zPtr = this->LevelMask + 1 + this->YIncrement + this->ZIncrement;
+  zPtr = this->GetLevelMaskPointer() + 1 + this->YIncrement + this->ZIncrement;
   for (int zz = 0; zz < zMax; ++zz)
     {
     yPtr = zPtr;
@@ -716,7 +731,7 @@ void vtkAMRDualClipLocator::RecursiveComputeLevelMask(int depth)
   int xMax2 = 1<<depth;
   int yMax2 = 1<<depth;
   int zMax2 = 1<<depth;
-  zPtr = this->LevelMask + 1 + this->YIncrement + this->ZIncrement;
+  zPtr = this->GetLevelMaskPointer() + 1 + this->YIncrement + this->ZIncrement;
   ++depth;
   for (int zz = 0; zz < zMax; ++zz)
     {
@@ -755,7 +770,8 @@ void vtkAMRDualClipLocator::RecursiveComputeLevelMask(int depth)
 
 
 //----------------------------------------------------------------------------
-// Caller need to make sure the source has computed the level mask.
+// Caller needs to make sure the source has computed the level mask.
+// I am not sure of the difference between CopyNeighborLevelMask and .....
 void vtkAMRDualClipLocator::CopyNeighborLevelMask(
   vtkAMRDualGridHelperBlock* myBlock,
   vtkAMRDualGridHelperBlock* neighborBlock)
@@ -770,6 +786,10 @@ void vtkAMRDualClipLocator::CopyNeighborLevelMask(
     return;
     }
   vtkAMRDualClipLocator* neighborLocator = vtkAMRDualClipGetBlockLocator(neighborBlock);
+  if (neighborLocator == 0)
+    { // Figuring out logic for parallel case.
+    return;
+    }
   
   // We copy from the center region to ghost region.
   
@@ -808,8 +828,8 @@ void vtkAMRDualClipLocator::CopyNeighborLevelMask(
   if (destExt[5] > sourceExt[5]) {destExt[5] = sourceExt[5]; }
   
   // Loop over the extent.
-  unsigned char *sourcePtr = neighborLocator->LevelMask;
-  unsigned char *destPtr = this->LevelMask;
+  unsigned char *sourcePtr = neighborLocator->GetLevelMaskPointer();
+  unsigned char *destPtr = this->GetLevelMaskPointer();
   // +1 is for ghost offset.
   destPtr += (destExt[0]-myBlock->OriginIndex[0]);
   destPtr += (destExt[2]-myBlock->OriginIndex[1])*this->YIncrement;
@@ -843,7 +863,8 @@ void vtkAMRDualClipLocator::CopyNeighborLevelMask(
 //----------------------------------------------------------------------------
 unsigned char vtkAMRDualClipLocator::GetLevelMaskValue(int x, int y, int z)
 {
-  return this->LevelMask[x+(y*this->YIncrement)+(z*this->ZIncrement)];
+  unsigned char* ptr = this->GetLevelMaskPointer();
+  return ptr[x+(y*this->YIncrement)+(z*this->ZIncrement)];
 }
 
 
@@ -858,7 +879,7 @@ vtkAMRDualClipLocator::vtkAMRDualClipLocator()
     {
     this->DualCellDimensions[ii] = 0;
     }
-  this->LevelMask = 0;
+  this->LevelMaskArray = 0;
   this->CenterLevelMaskComputed = 0;
 
 }
@@ -883,7 +904,8 @@ void vtkAMRDualClipLocator::Initialize(
       delete [] this->YEdges;
       delete [] this->ZEdges;
       delete [] this->Corners;
-      delete [] this->LevelMask;
+      this->LevelMaskArray->Delete();
+      this->LevelMaskArray = 0;
       }
     if (xDualCellDim > 0 && yDualCellDim > 0 && zDualCellDim > 0)
       {
@@ -898,8 +920,10 @@ void vtkAMRDualClipLocator::Initialize(
       this->YEdges = new vtkIdType[this->ArrayLength];
       this->ZEdges = new vtkIdType[this->ArrayLength];
       this->Corners = new vtkIdType[this->ArrayLength];
-      this->LevelMask = new unsigned char[this->ArrayLength];
-      memset(this->LevelMask,255,this->ArrayLength); // Uninitialized
+      this->LevelMaskArray = vtkUnsignedCharArray::New();
+      this->LevelMaskArray->SetNumberOfTuples(this->ArrayLength);
+      // 255 is a special value that means the pixel is uninitialized.
+      memset(this->GetLevelMaskPointer(),255,this->ArrayLength);
       }
     else
       {
@@ -1075,7 +1099,7 @@ vtkIdType* vtkAMRDualClipLocator::GetCornerPointer(
   zCell += (cornerIdx & 4) >> 2;
   
   // Find out the delta level degeneracy for this region.
-  diff = this->LevelMask[xCell+(yCell*this->YIncrement)+(zCell*this->ZIncrement)];
+  diff = this->GetLevelMaskPointer()[xCell+(yCell*this->YIncrement)+(zCell*this->ZIncrement)];
   --diff;
   // Short circuit for debugging.
   // This will not merge any point based on the level mask.
@@ -1188,6 +1212,12 @@ void vtkAMRDualClipLocator::ShareBlockLocatorWithNeighbor(
 {
   vtkAMRDualClipLocator* blockLocator = vtkAMRDualClipGetBlockLocator(block);
   vtkAMRDualClipLocator* neighborLocator = vtkAMRDualClipGetBlockLocator(neighbor);
+
+  // Working on the logic to parallize level mask.
+  if (blockLocator == 0 || neighborLocator == 0)
+    { // This occurs if the block is owned by a different process.
+    return;
+    }
 
   // Compute the extent of the locator to copy.
   // Moving too many will not hurt, so do not worry about which block owns the region.
@@ -1417,6 +1447,12 @@ int vtkAMRDualClip::RequestData(
   this->Helper->SetEnableDegenerateCells(this->EnableDegenerateCells);
   this->Helper->SetEnableMultiProcessCommunication(this->EnableMultiProcessCommunication);
   this->Helper->Initialize(hbdsInput, arrayNameToProcess);
+
+  if (this->Controller && this->Controller->GetNumberOfProcesses() > 1 &&
+      this->EnableDegenerateCells)
+    {
+    this->DistributeLevelMasks();
+    }
 
   vtkUnstructuredGrid* mesh = vtkUnstructuredGrid::New();
   this->Points = vtkPoints::New();
@@ -1682,7 +1718,7 @@ void vtkAMRDualClip::ShareLevelMask(vtkAMRDualGridHelperBlock* block)
             neighbor = this->Helper->GetBlock(level, ix, iy, iz);
             // If the neighbor was already processed, then its level mask 
             // was copied to this block already.
-            if (neighbor && neighbor->RegionBits[1][1][1] != 0)
+            if (neighbor && neighbor->Image && neighbor->RegionBits[1][1][1] != 0)
               {
               neighborLocator = vtkAMRDualClipGetBlockLocator(neighbor);
               neighborLocator->CopyNeighborLevelMask(neighbor, block);
@@ -2128,6 +2164,100 @@ void vtkAMRDualClip::ProcessDualCell(
       }
     }
 }
+
+//----------------------------------------------------------------------------
+// In order to synchronize level mask between processes we need to precompute
+// them.  It is a shame that we cannot generate the masks on demand.
+// This method is meant to be called right after initialization.
+// Level masks only move regions from lower levels to higher levels. 
+void vtkAMRDualClip::DistributeLevelMasks()
+{
+  vtkAMRDualGridHelperBlock* block;
+  vtkAMRDualGridHelperBlock* neighborBlock;
+
+  if (this->Controller == 0)
+    {
+    return;
+    }
+  this->Helper->ClearRegionRemoteCopyQueue();
+
+  // Make a map of interprocess commnication.
+  // Each region has a process, level, grid index, and extent.
+  int numProcs = this->Controller->GetNumberOfProcesses();
+  int myProcessId = this->Controller->GetLocalProcessId();
+  
+  // Loop through blocks
+  int numLevels = this->Helper->GetNumberOfLevels();
+  int numBlocks;
+  int blockId;
+
+  // Process each block.
+  for (int level = 0; level < numLevels; ++level)
+    {
+    numBlocks = this->Helper->GetNumberOfBlocksInLevel(level);
+    for (blockId = 0; blockId < numBlocks; ++blockId)
+      {
+      block = this->Helper->GetBlock(level, blockId);
+      // Any blocks sending to this block from lower levels?
+      // Lets look by region.
+      for (int rz = -1; rz < 2; ++rz)
+        {
+        for (int ry = -1; ry < 2; ++ry)
+          {
+          for (int rx = -1; rx < 2; ++rx)
+            {
+            if (block->RegionBits[rx+1][ry+1][rz+1] & vtkAMRRegionBitOwner)
+              {
+              for (int lowerLevel = 0; lowerLevel <= level; ++lowerLevel)
+                {
+                // Convert the grid index into the lower level coordinate system.
+                int xGrid = (block->GridIndex[0] + rx) >> (block->Level - lowerLevel); 
+                int yGrid = (block->GridIndex[1] + ry) >> (block->Level - lowerLevel); 
+                int zGrid = (block->GridIndex[2] + rz) >> (block->Level - lowerLevel); 
+                neighborBlock = this->Helper->GetBlock(lowerLevel,xGrid,yGrid,zGrid);
+                // We can ignore pairs in the same process.
+                if (neighborBlock && neighborBlock->ProcessId != block->ProcessId)
+                  {
+                  // We can ingnore pairs if both are in other processses.
+                  if (block->ProcessId == myProcessId || neighborBlock->ProcessId == myProcessId)
+                    {
+                    const char* arrayName = this->Helper->GetArrayName();
+                    vtkDataArray* scalars;
+                    vtkDataArray* neighborLevelMaskArray = 0;
+                    vtkDataArray* blockLevelMaskArray = 0;
+                    if (block->Image)
+                      {
+                      scalars = block->Image->GetCellData()->GetArray(arrayName);
+                      vtkAMRDualClipLocator* blockLocator = vtkAMRDualClipGetBlockLocator(block);                  
+                      blockLocator->ComputeLevelMask(scalars, this->IsoValue);
+                      blockLevelMaskArray = blockLocator->GetLevelMaskArray();
+                      }
+                    if (neighborBlock->Image)
+                      {
+                      scalars = neighborBlock->Image->GetCellData()->GetArray(arrayName);
+                      vtkAMRDualClipLocator* neighborLocator = vtkAMRDualClipGetBlockLocator(neighborBlock);                  
+                      neighborLocator->ComputeLevelMask(scalars, this->IsoValue);
+                      neighborLevelMaskArray = neighborLocator->GetLevelMaskArray();
+                      }
+                    vtkAMRDualClipLocator* neighborLocator = vtkAMRDualClipGetBlockLocator(neighborBlock);
+                    
+                    this->Helper->QueueRegionRemoteCopy(
+                                    rx, ry, rz, 
+                                    neighborBlock, neighborLevelMaskArray,
+                                    block, blockLevelMaskArray);
+                    } // if pair in queue
+                  } // if one block is in our processes
+                } // Loop over source levels. 
+              } // if the receiving block owns the region.
+            } // loop over region x index
+          } // loop over region y index
+        } // loop over region z index
+      } // loop over receiving blocks in level
+    } // loop over all levels
+
+  this->Helper->ProcessRegionRemoteCopyQueue(true);
+}
+
 
 
 

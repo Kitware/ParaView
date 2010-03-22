@@ -104,6 +104,7 @@ protected:
 
   void InitializeLevelMask(vtkAMRDualGridHelperBlock* block);
   void ShareLevelMask(vtkAMRDualGridHelperBlock* block);
+  void DistributeLevelMasks();
 
 
   //void DebugCases();
