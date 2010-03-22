@@ -54,7 +54,7 @@ int vtkSpyPlotBlockDistributionBlockIterator::GetNumberOfBlocksToProcess()
   fileIterator = this->FileMap->Files.begin();
   size_t numFiles = this->FileMap->Files.size();
   int cur_file = 1;
-  int progressInterval = numFiles/20 + 1;
+  int progressInterval = (int)(numFiles/20 + 1);
   for ( ;
         fileIterator != this->FileMap->Files.end(); 
         fileIterator++, cur_file++)
