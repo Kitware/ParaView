@@ -114,7 +114,8 @@ pqAdaptiveControls::pqAdaptiveControls(QWidget* p)
   this->refinementModeButton = new QComboBox(canvas);
   hl->addWidget(this->refinementModeButton);
   this->refinementModeButton->addItem("MANUAL");
-  this->refinementModeButton->addItem("AUTOMATIC");
+  this->refinementModeButton->addItem("AUTOMATICALLY REFINE");
+  this->refinementModeButton->addItem("AUTOMATICALLY COARSEN");
   this->refinementModeButton->setToolTip("Controls whether refinement progresses to full resolution automatically or whether user drives it.");
   QObject::connect(this->refinementModeButton, SIGNAL(activated(int)), 
                    this, SLOT(onRefinementMode(int)));
@@ -287,7 +288,7 @@ void pqAdaptiveControls::onRefinementMode(int index)
     return;
     }
   this->currentView->getAdaptiveViewProxy()->SetRefinementMode(index);
-  if (index==1)
+  if (index!=0)
     {
     this->coarsenButton->setEnabled(false);
     this->refineButton->setEnabled(false);

@@ -45,7 +45,7 @@
 #include <vtksys/ios/sstream>
 
 //-----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkSMAdaptiveViewProxy, "1.2");
+vtkCxxRevisionMacro(vtkSMAdaptiveViewProxy, "1.3");
 vtkStandardNewMacro(vtkSMAdaptiveViewProxy);
 
 #define DEBUGPRINT_VIEW(arg)\
@@ -500,7 +500,8 @@ void vtkSMAdaptiveViewProxy::SetRefinementMode(int i)
 //-----------------------------------------------------------------------------
 void vtkSMAdaptiveViewProxy::Refine()
 {
-  if ((this->RefinementMode == AUTOMATIC) || (this->AdvanceCommand == REFINE))
+  if (this->RefinementMode != MANUAL ||
+      this->AdvanceCommand == REFINE)
     {
     return;
     }
@@ -512,7 +513,8 @@ void vtkSMAdaptiveViewProxy::Refine()
 //-----------------------------------------------------------------------------
 void vtkSMAdaptiveViewProxy::Coarsen()
 {
-  if ((this->RefinementMode == AUTOMATIC) || (this->AdvanceCommand == COARSEN))
+  if (this->RefinementMode != MANUAL ||
+      this->AdvanceCommand == COARSEN)
     {
     return;
     }
@@ -678,12 +680,13 @@ void vtkSMAdaptiveViewProxy::PrepareRenderPass()
           {
           srep->SetViewState(this->Internals->CamState, this->Internals->Frustum);
           }
-        if ((this->WendDone && this->RefinementMode == AUTOMATIC)||
+        if ((this->WendDone && this->RefinementMode == AUTOMATIC_REFINE)||
             this->AdvanceCommand == REFINE)
           {
           srep->Refine();
           }
-        if (this->AdvanceCommand == COARSEN)
+        if ((this->WendDone && this->RefinementMode == AUTOMATIC_COARSEN)||
+            this->AdvanceCommand == COARSEN)
           {
           srep->Coarsen();
           }
@@ -829,7 +832,7 @@ void vtkSMAdaptiveViewProxy::FinalizeRenderPass()
     if (srep && srep->GetVisibility())
       {
       //TODO: think about moving this to before prepare render pass
-      if (this->RefinementMode == AUTOMATIC)
+      if (this->RefinementMode != MANUAL)
         {        
         DEBUGPRINT_VIEW(cerr << "SV(" << this << ") " << srep << " FinishPass " << endl;);
         srep->FinishPass();

@@ -104,7 +104,7 @@ public:
 
   // Description:
 //BTX
-  enum {MANUAL, AUTOMATIC};
+  enum {MANUAL, AUTOMATIC_REFINE, AUTOMATIC_COARSEN};
   enum {COARSEN, STAY, REFINE};
 //ETX
   virtual void SetRefinementMode(int i);
