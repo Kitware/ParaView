@@ -31,17 +31,17 @@ FIND_PROGRAM(QT_HELP_GENERATOR
 
 SET (qhp_dependencies)
   
-OPTION(GENERATE_FILTERS_DOCUMENTATION
+OPTION(PARAVIEW_GENERATE_PROXY_DOCUMENTATION
   "Turn on to ensure that the documentation for filters/sources/readers and writers is built."
   OFF)
-IF (GENERATE_FILTERS_DOCUMENTATION)
+IF (PARAVIEW_GENERATE_PROXY_DOCUMENTATION)
   # This dependency ensures that whenever the html files are regenerated, the
   # qch file is regenerated as well.
   SET (qhp_dependencies ${qhp_dependencies}
         ${HTMLDocumentation_FILES})
-ENDIF(GENERATE_FILTERS_DOCUMENTATION)
+ENDIF(PARAVIEW_GENERATE_PROXY_DOCUMENTATION)
 
-MARK_AS_ADVANCED(GENERATE_FILTERS_DOCUMENTATION)
+MARK_AS_ADVANCED(PARAVIEW_GENERATE_PROXY_DOCUMENTATION)
 
 ADD_CUSTOM_COMMAND(
   OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/paraview.qch
@@ -55,12 +55,12 @@ ADD_CUSTOM_COMMAND(
 
 ADD_CUSTOM_TARGET(ParaViewOnlineHelp
   DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/paraview.qch)
-IF (GENERATE_FILTERS_DOCUMENTATION)
+IF (PARAVIEW_GENERATE_PROXY_DOCUMENTATION)
   # This dependency ensures that the ParaViewFiles.html and other files are
   # generated before the qch file is attempted to be generated.
   ADD_DEPENDENCIES(ParaViewOnlineHelp
     HTMLDocumentation)
-ENDIF (GENERATE_FILTERS_DOCUMENTATION)
+ENDIF (PARAVIEW_GENERATE_PROXY_DOCUMENTATION)
 
 
 # Development
