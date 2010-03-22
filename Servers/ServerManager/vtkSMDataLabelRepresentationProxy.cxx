@@ -341,61 +341,6 @@ void vtkSMDataLabelRepresentationProxy::SetupDefaults()
     }
   ivp->SetElement(0, 2); // Clone mode.
   this->CollectProxy->UpdateVTKObjects();
-
-  ivp = vtkSMIntVectorProperty::SafeDownCast(
-    this->TextPropertyProxy->GetProperty("FontSize"));
-  if (!ivp)
-    {
-    vtkErrorMacro("Failed to find property FontSize on TextPropertyProxy.");
-    return;
-    }
-  ivp->SetElement(0, 18);
-
-  ivp = vtkSMIntVectorProperty::SafeDownCast(
-    this->TextPropertyProxy->GetProperty("Justification"));
-  if (!ivp)
-  {
-    vtkErrorMacro("Failed to find property Justification on CellTextPropertyProxy.");
-    return;
-  }
-  ivp->SetElement(0, 1); //Center justified
-  this->TextPropertyProxy->UpdateVTKObjects();
-
-  ivp = vtkSMIntVectorProperty::SafeDownCast(
-    this->GetProperty("CellLabelVisibility"));
-  ivp->SetElement(0, 0);    
-  this->UpdateProperty("CellLabelVisibility");
-
-  // Set default Cell Text property
-  ivp = vtkSMIntVectorProperty::SafeDownCast(
-    this->CellTextPropertyProxy->GetProperty("FontSize"));
-  if (!ivp)
-    {
-    vtkErrorMacro("Failed to find property FontSize on CellTextPropertyProxy.");
-    return;
-    }
-  ivp->SetElement(0, 24);
-
-  ivp = vtkSMIntVectorProperty::SafeDownCast(
-    this->CellTextPropertyProxy->GetProperty("Justification"));
-  if (!ivp)
-  {
-    vtkErrorMacro("Failed to find property Justification on CellTextPropertyProxy.");
-    return;
-  }
-  ivp->SetElement(0, 1); //Center justified
-
-  vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
-    this->CellTextPropertyProxy->GetProperty("Color"));
-  if (!dvp)
-    {
-    vtkErrorMacro("Failed to find property Color on CellTextPropertyProxy.");
-    return;
-    }
-  dvp->SetElements3(0.0, 1.0, 0.0);
-
-  this->CellTextPropertyProxy->UpdateVTKObjects();
-
 }
 
 //-----------------------------------------------------------------------------

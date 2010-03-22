@@ -38,7 +38,7 @@
 #include <vtksys/ios/sstream>
 
 vtkStandardNewMacro(vtkSMProxy);
-vtkCxxRevisionMacro(vtkSMProxy, "1.122");
+vtkCxxRevisionMacro(vtkSMProxy, "1.123");
 
 vtkCxxSetObjectMacro(vtkSMProxy, XMLElement, vtkPVXMLElement);
 vtkCxxSetObjectMacro(vtkSMProxy, Hints, vtkPVXMLElement);
@@ -1959,6 +1959,7 @@ int vtkSMProxy::ReadXMLAttributes(
     {
     return 0;
     }
+
   this->SetXMLElement(0);
   return 1;
 }
@@ -2100,6 +2101,22 @@ void vtkSMProxy::SetupExposedProperties(const char* subproxy_name,
        if (!propertyElement->GetScalarAttribute("override", &override))
          {
          override = 0;
+         }
+
+       if (propertyElement->GetAttribute("default_values"))
+         {
+         vtkSMProxy* subproxy = this->GetSubProxy(subproxy_name);
+         vtkSMProperty* prop = subproxy->GetProperty(name);
+         if (!prop)
+           {
+           vtkWarningMacro("Failed to locate property '" << name
+             << "' on subproxy '" << subproxy_name << "'");
+           return;
+           }
+         if (!prop->ReadXMLAttributes(subproxy, propertyElement))
+           {
+           return;
+           }
          }
        this->ExposeSubProxyProperty(subproxy_name, name, exposed_name, override);
        }
@@ -2521,7 +2538,7 @@ void vtkSMProxy::ExposeSubProxyProperty(const char* subproxy_name,
         << "\" already exists. It will be replaced.");
       }
     }
-  
+
   vtkSMProxyInternals::ExposedPropertyInfo info;
   info.SubProxyName = subproxy_name;
   info.PropertyName = property_name;

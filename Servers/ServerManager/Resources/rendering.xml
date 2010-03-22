@@ -6936,11 +6936,11 @@
         -->
         <Proxy name="Property" proxygroup="properties" proxyname="Property2" />
         <ExposedProperties>
-          <Property name="Color"/>
-          <Property name="LineWidth"/>
+          <Property name="Color" default_values="1.0 0.0 1.0" />
+          <Property name="LineWidth" default_values="2.0" />
           <Property name="Opacity"/>
-          <Property name="PointSize"/>
-          <Property name="Representation"/>
+          <Property name="PointSize" default_values="5.0" />
+          <Property name="Representation" default_values="1" />
         </ExposedProperties>
       </SubProxy>
 
@@ -9693,7 +9693,8 @@
           <Property name="Bold" exposed_name="PointLabelBold" />
           <Property name="Italic" exposed_name="PointLabelItalic" />
           <Property name="Shadow" exposed_name="PointLabelShadow" />
-          <Property name="Justification" exposed_name="PointLabelJustification" />
+          <Property name="Justification" exposed_name="PointLabelJustification" 
+                    default_values="1" />
           <Property name="FontSize" exposed_name="PointLabelFontSize" />
         </ExposedProperties>
       </SubProxy>
@@ -9725,14 +9726,17 @@
           proxygroup="properties" proxyname="TextProperty">
         </Proxy>
         <ExposedProperties>
-          <Property name="Color" exposed_name="CellLabelColor" />
+          <Property name="Color" exposed_name="CellLabelColor" 
+                    default_values="0.0 1.0 0.0" />
           <Property name="Opacity" exposed_name="CellLabelOpacity" />
           <Property name="FontFamily" exposed_name="CellLabelFontFamily" />
           <Property name="Bold" exposed_name="CellLabelBold" />
           <Property name="Italic" exposed_name="CellLabelItalic" />
           <Property name="Shadow" exposed_name="CellLabelShadow" />
-          <Property name="Justification" exposed_name="CellLabelJustification" />
-          <Property name="FontSize" exposed_name="CellLabelFontSize" />
+          <Property name="Justification" exposed_name="CellLabelJustification"
+                    default_values="1" />
+          <Property name="FontSize" exposed_name="CellLabelFontSize"
+                    default_values="24" />
         </ExposedProperties>
       </SubProxy>
       <SubProxy>
@@ -9749,7 +9753,8 @@
         <Proxy name="CellLabelProp2D" proxygroup="props" proxyname="Actor2D">
         </Proxy>
         <ExposedProperties>
-          <Property name="Visibility" exposed_name="CellLabelVisibility" />
+          <Property name="Visibility" exposed_name="CellLabelVisibility"
+                    default_values="0" />
         </ExposedProperties>
       </SubProxy>
     <!-- End of DataLabelRepresentation -->

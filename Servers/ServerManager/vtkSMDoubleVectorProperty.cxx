@@ -22,7 +22,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMDoubleVectorProperty);
-vtkCxxRevisionMacro(vtkSMDoubleVectorProperty, "1.47");
+vtkCxxRevisionMacro(vtkSMDoubleVectorProperty, "1.48");
 
 struct vtkSMDoubleVectorPropertyInternals
 {
@@ -422,7 +422,7 @@ int vtkSMDoubleVectorProperty::ReadXMLAttributes(vtkSMProxy* proxy,
         this->Internals->UpdateLastPushedValues();
         this->Internals->UpdateDefaultValues();
         }
-      else
+      else if (!this->Initialized)
         {
         vtkErrorMacro("No default value is specified for property: "
                       << this->GetXMLName()
