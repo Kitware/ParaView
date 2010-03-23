@@ -21,10 +21,6 @@
 #include "vtkErrorCode.h"
 
 #include "vtkObjectFactory.h"
-#include "vtkQtChartInteractorSetup.h"
-#include "vtkQtChartMouseSelection.h"
-#include "vtkQtChartWidget.h"
-#include "vtkQtChartView.h"
 #include "vtkSMChartOptionsProxy.h"
 #include "vtkSMUtilities.h"
 
@@ -36,21 +32,17 @@
 class vtkSMContextViewProxy::Private
 {
 public:
-  Private() { this->Widget = new QVTKWidget; }
+  Private() { }
   ~Private()
   {
-    if (this->Widget)
-      {
-      delete this->Widget;
-      this->Widget = NULL;
-      }
+  delete this->Widget;
   }
 
   QPointer<QVTKWidget> Widget;
 };
 
 
-vtkCxxRevisionMacro(vtkSMContextViewProxy, "1.7");
+vtkCxxRevisionMacro(vtkSMContextViewProxy, "1.8");
 //----------------------------------------------------------------------------
 vtkSMContextViewProxy::vtkSMContextViewProxy()
 {
@@ -80,9 +72,6 @@ void vtkSMContextViewProxy::CreateVTKObjects()
 
   this->Storage = new Private;
   this->ChartView = vtkContextView::New();
-  this->ChartView->SetInteractor(this->Storage->Widget->GetInteractor());
-  this->Storage->Widget->SetRenderWindow(this->ChartView->GetRenderWindow());
-
   this->NewChartView();
 
   this->Superclass::CreateVTKObjects();
@@ -91,6 +80,13 @@ void vtkSMContextViewProxy::CreateVTKObjects()
 //----------------------------------------------------------------------------
 QVTKWidget* vtkSMContextViewProxy::GetChartWidget()
 {
+  if (!this->Storage->Widget)
+    {
+    this->Storage->Widget = new QVTKWidget;
+    this->ChartView->SetInteractor(this->Storage->Widget->GetInteractor());
+    this->Storage->Widget->SetRenderWindow(this->ChartView->GetRenderWindow());
+    }
+
   return this->Storage->Widget;
 }
 

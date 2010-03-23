@@ -51,6 +51,11 @@ public:
   void SetUseIndexForXAxis(bool useIndex);
 
   // Description:
+  // Hides or plots that belong to this table.  When showing,
+  // only plots that are actually marked visible will be shown.
+  void SetTableVisibility(bool visible);
+
+  // Description:
   // Set the type of plots that will be added to charts by this proxy.
   // Uses the enum from vtkChart.
   void SetChartType(int type);
@@ -60,14 +65,29 @@ public:
   // Uses the enum from vtkChart.
   int GetChartType();
 
+// This BTX is here because currently vtkCharts is not client-server wrapped.
 //BTX
   // Description:
   // Sets the internal chart object whose options will be manipulated.
   void SetChart(vtkChart* chart);
+//ETX
+
 
   // Description:
   // Sets the internal table object that can be plotted.
   void SetTable(vtkTable* table);
+
+
+  void RemovePlotsFromChart();
+
+  // Description:
+  // Initializes the plots map, and adds a default series to plot
+  void RefreshPlots();
+
+//BTX
+  // Description:
+  // POD class for storing individual series properties
+  class PlotInfo;
 //ETX
 
 //BTX
@@ -76,8 +96,14 @@ protected:
   ~vtkSMContextNamedOptionsProxy();
 
   // Description:
-  // Initializes the plots map, and adds a default series to plot
-  void InitializePlotMap();
+  // Set the title of the bottom axis based on the value of the
+  // UseIndexForXAxis property.
+  void RefreshBottomAxisTitle();
+
+  // Description:
+  // Hide/show the chart legend and set the left axis name depending on
+  // the number of currently visible plots
+  void RefreshLegendStatus();
 
   // Description:
   // Called to update the property information on the property. It is assured
@@ -85,6 +111,12 @@ protected:
   // overloads of UpdatePropertyInformation() call this method, so subclass can
   // override this method to perform special tasks.
   virtual void UpdatePropertyInformationInternal(vtkSMProperty*);
+
+  // Description:
+  // If the plot exists this will set its visibility.  If the plot does not yet
+  // exist and visible is true then the plot will be created.  The series name
+  // is passed to this method so it can be used to initialize the vtkPlot if needed.
+  void SetPlotVisibilityInternal(PlotInfo& info, bool visible, const char* seriesName);
 
 private:
   vtkSMContextNamedOptionsProxy(const vtkSMContextNamedOptionsProxy&); // Not implemented

@@ -27,7 +27,7 @@
 #include "vtkSelection.h"
 
 vtkStandardNewMacro(vtkSMXYChartRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMXYChartRepresentationProxy, "1.11");
+vtkCxxRevisionMacro(vtkSMXYChartRepresentationProxy, "1.12");
 //----------------------------------------------------------------------------
 vtkSMXYChartRepresentationProxy::vtkSMXYChartRepresentationProxy()
 {
@@ -106,7 +106,6 @@ bool vtkSMXYChartRepresentationProxy::EndCreateVTKObjects()
     this->GetSubProxy("PlotOptions"));
   if (this->OptionsProxy)
     {
-    this->OptionsProxy->SetChart(this->GetChart());
     this->OptionsProxy->SetTable(vtkTable::SafeDownCast(this->GetOutput()));
     }
 
@@ -133,14 +132,17 @@ bool vtkSMXYChartRepresentationProxy::AddToView(vtkSMViewProxy* view)
     {
     return false;
     }
+
   vtkSMXYChartViewProxy* chartView = vtkSMXYChartViewProxy::SafeDownCast(view);
-  if (!chartView)
+  if (!chartView || chartView == this->ChartViewProxy)
     {
     return false;
     }
-  this->ChartViewProxy = chartView;
 
-  return true;
+  this->ChartViewProxy = chartView;
+  this->OptionsProxy->SetChart(chartView->GetChart());
+  this->OptionsProxy->SetTableVisibility(this->Visibility);
+  return this->Superclass::AddToView(view);
 }
 
 //----------------------------------------------------------------------------
@@ -152,10 +154,8 @@ bool vtkSMXYChartRepresentationProxy::RemoveFromView(vtkSMViewProxy* view)
     return false;
     }
 
-  if (this->Visibility && this->GetChart())
-    {
-      this->GetChart()->ClearPlots();
-    }
+  this->OptionsProxy->RemovePlotsFromChart();
+  this->OptionsProxy->SetChart(0);
   this->ChartViewProxy = 0;
   return this->Superclass::RemoveFromView(view);
 }
@@ -166,19 +166,7 @@ void vtkSMXYChartRepresentationProxy::SetVisibility(int visible)
   if (this->Visibility != visible)
     {
     this->Visibility = visible;
-    if (this->ChartViewProxy)
-      {
-      if (this->Visibility)
-        {
-//        this->ChartViewProxy->GetChartView()->AddRepresentation(
-//          this->VTKRepresentation);
-        }
-      else
-        {
-//        this->ChartViewProxy->GetChartView()->RemoveRepresentation(
-//          this->VTKRepresentation);
-        }
-      }
+    this->OptionsProxy->SetTableVisibility(visible != 0);
     }
 }
 
@@ -198,8 +186,14 @@ void vtkSMXYChartRepresentationProxy::Update(vtkSMViewProxy* view)
     this->GetChart()->SetAnnotationLink(AnnLink);
     }
 
-  this->OptionsProxy->SetChart(this->GetChart());
+  // Set the table, in case it has changed.
   this->OptionsProxy->SetTable(vtkTable::SafeDownCast(this->GetOutput()));
+
+  // Calling RefreshPlots will make sure that the vtkChart is
+  // in sync with the vtkTable.
+  this->OptionsProxy->RefreshPlots();
+
+  this->OptionsProxy->SetTableVisibility(this->Visibility);
   this->UpdatePropertyInformation();
 }
 

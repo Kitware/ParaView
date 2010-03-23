@@ -23,6 +23,8 @@
 #include "vtkAxis.h"
 #include "vtkPen.h"
 #include "vtkTable.h"
+#include "vtkColorSeries.h"
+#include "vtkStdString.h"
 #include "vtkWeakPointer.h"
 #include "vtkSmartPointer.h"
 
@@ -30,33 +32,57 @@
 
 #include <QString>
 
+//----------------------------------------------------------------------------
+// POD class to store information about each plot.
+// A PlotInfo is created for each column in the vtkTable
+class vtkSMContextNamedOptionsProxy::PlotInfo
+{
+public:
+  vtkWeakPointer<vtkPlot> Plot;
+  vtkStdString Label;
+  int LineThickness;
+  int LineStyle;
+  int MarkerStyle;
+  int Visible;
+  double Color[3];
+
+  PlotInfo()
+    {
+    LineThickness = 2;
+    LineStyle = 1;
+    MarkerStyle = 0;
+    Visible = 1;
+    Color[0] = Color[1] = Color[2] = 0;
+    Color[0] = 1;
+    }
+};
+
+typedef vtkstd::map<vtkstd::string, vtkSMContextNamedOptionsProxy::PlotInfo > PlotMapType;
+typedef PlotMapType::iterator PlotMapIterator;
+
+//----------------------------------------------------------------------------
 class vtkSMContextNamedOptionsProxy::vtkInternals
 {
 public:
-  vtkstd::map<vtkstd::string, vtkWeakPointer<vtkPlot> > PlotMap;
+  PlotMapType PlotMap;
   vtkstd::string XSeriesName;
   bool UseIndexForXAxis;
   int ChartType;
 
   vtkWeakPointer<vtkChart> Chart;
   vtkWeakPointer<vtkTable> Table;
-
-  vtkInternals()
-    {
-    }
-
-  ~vtkInternals()
-    {
-    }
-
+  vtkSmartPointer<vtkColorSeries> Colors;
 };
 
+//----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMContextNamedOptionsProxy);
-vtkCxxRevisionMacro(vtkSMContextNamedOptionsProxy, "1.21");
+vtkCxxRevisionMacro(vtkSMContextNamedOptionsProxy, "1.22");
+
 //----------------------------------------------------------------------------
 vtkSMContextNamedOptionsProxy::vtkSMContextNamedOptionsProxy()
 {
   this->Internals = new vtkInternals();
+  this->Internals->Colors = vtkSmartPointer<vtkColorSeries>::New();
   this->Internals->UseIndexForXAxis = true;
   this->Internals->ChartType = vtkChart::LINE;
 }
@@ -89,10 +115,6 @@ void vtkSMContextNamedOptionsProxy::SetChart(vtkChart* chart)
     return;
     }
   this->Internals->Chart = chart;
-  if (this->Internals->Table)
-    {
-    this->InitializePlotMap();
-    }
   this->Modified();
 }
 
@@ -104,37 +126,13 @@ void vtkSMContextNamedOptionsProxy::SetTable(vtkTable* table)
     return;
     }
   this->Internals->Table = table;
-  // If the table changed then update the plot map
-  if (this->Internals->Chart)
-    {
-    this->InitializePlotMap();
-    }
+  this->RefreshPlots();
   this->Modified();
 }
 
 //----------------------------------------------------------------------------
-void vtkSMContextNamedOptionsProxy::SetXSeriesName(const char* name)
+void vtkSMContextNamedOptionsProxy::RefreshBottomAxisTitle()
 {
-  if (!name)
-    {
-    this->Internals->XSeriesName = "";
-    }
-  else
-    {
-    this->Internals->XSeriesName = name;
-    }
-
-  // Now update the plots to use the X series specified
-  vtkstd::map<vtkstd::string, vtkWeakPointer<vtkPlot> >::iterator it;
-  for (it = this->Internals->PlotMap.begin();
-       it != this->Internals->PlotMap.end(); ++it)
-    {
-    if (it->second)
-      {
-      it->second->SetInputArray(0, this->Internals->XSeriesName.c_str());
-      it->second->SetUseIndexForXSeries(this->Internals->UseIndexForXAxis);
-      }
-    }
   if (this->Internals->Chart)
     {
     if (this->Internals->UseIndexForXAxis)
@@ -148,239 +146,23 @@ void vtkSMContextNamedOptionsProxy::SetXSeriesName(const char* name)
       }
     this->Internals->Chart->RecalculateBounds();
     }
-  this->Modified();
 }
 
 //----------------------------------------------------------------------------
-void vtkSMContextNamedOptionsProxy::SetUseIndexForXAxis(bool useIndex)
+void vtkSMContextNamedOptionsProxy::RefreshLegendStatus()
 {
-  this->Internals->UseIndexForXAxis = useIndex;
-  // Now update the plots to use the X series specified
-  vtkstd::map<vtkstd::string, vtkWeakPointer<vtkPlot> >::iterator it;
-  for (it = this->Internals->PlotMap.begin();
-       it != this->Internals->PlotMap.end(); ++it)
-    {
-    if (it->second)
-      {
-      it->second->SetUseIndexForXSeries(this->Internals->UseIndexForXAxis);
-      }
-    }
-  if (this->Internals->Chart)
-    {
-    if (this->Internals->UseIndexForXAxis)
-      {
-      this->Internals->Chart->GetAxis(vtkAxis::BOTTOM)->SetTitle("Index of Array");
-      }
-    else
-      {
-      this->Internals->Chart->GetAxis(vtkAxis::BOTTOM)
-          ->SetTitle(this->Internals->XSeriesName.c_str());
-      }
-    this->Internals->Chart->RecalculateBounds();
-    }
-  this->Modified();
-}
-
-//----------------------------------------------------------------------------
-void vtkSMContextNamedOptionsProxy::InitializePlotMap()
-{
-  this->Internals->PlotMap.clear();
-  if (!this->Internals->Table || !this->Internals->Chart)
-    {
-    return;
-    }
-  else
-    {
-    this->Internals->Chart->ClearPlots();
-    // Choose a default plot series if one has not already been chosen
-    if (this->Internals->Table->GetNumberOfColumns() > 0)
-      {
-      for(vtkIdType i = 0; i < this->Internals->Table->GetNumberOfColumns(); ++i)
-        {
-        vtkPlot *plot = this->Internals->Chart->AddPlot(this->Internals->ChartType);
-        if (plot)
-          {
-          plot->SetUseIndexForXSeries(this->Internals->UseIndexForXAxis);
-          plot->SetInput(this->Internals->Table,
-                         this->Internals->XSeriesName.c_str(),
-                         this->Internals->Table->GetColumnName(i));
-          }
-        // Update the map with the pointer
-        this->Internals->PlotMap[this->Internals->Table->GetColumnName(i)] = plot;
-        }
-      // Set the plot to visible (already visible, but other things are done)
-      this->SetVisibility(this->Internals->Table->GetColumnName(0), 1);
-      }
-    }
-}
-
-//----------------------------------------------------------------------------
-void vtkSMContextNamedOptionsProxy::UpdatePropertyInformationInternal(
-  vtkSMProperty* prop)
-{
-  vtkSMStringVectorProperty* svp =
-      vtkSMStringVectorProperty::SafeDownCast(prop);
-  if (svp && this->Internals->Table && svp->GetInformationOnly())
-    {
-    vtkStringList* new_values = vtkStringList::New();
-    int numOptions = this->Internals->Table->GetNumberOfColumns();
-    const char* propname = this->GetPropertyName(prop);
-    bool skip = false;
-    for (int i = 0; i < numOptions; ++i)
-      {
-      QString name = this->Internals->Table->GetColumnName(i);
-      vtkPlot *plot = this->Internals->PlotMap[name.toStdString()];
-      if (strcmp(propname, "VisibilityInfo") == 0)
-        {
-        new_values->AddString(name.toAscii().data());
-        if (this->Internals->PlotMap[name.toStdString()] &&
-            this->Internals->PlotMap[name.toStdString()]->GetVisible())
-          {
-          new_values->AddString("1");
-          }
-        else
-          {
-          new_values->AddString("0");
-          }
-        }
-      else if (strcmp(propname, "LabelInfo") == 0)
-        {
-        new_values->AddString(name.toAscii().data());
-        if (plot)
-          {
-          new_values->AddString(plot->GetLabel() ? plot->GetLabel() :
-                                name.toAscii().data());
-          }
-        else
-          {
-          new_values->AddString(name.toAscii().data());
-          }
-        }
-      else if (strcmp(propname, "LineThicknessInfo") == 0)
-        {
-        new_values->AddString(name.toAscii().data());
-        if (plot)
-          {
-          new_values->AddString(
-              QString::number(plot->GetWidth()).toAscii().data());
-          }
-        else
-          {
-          new_values->AddString("2"); // The default value
-          }
-        }
-      else if (strcmp(propname, "ColorInfo") == 0)
-        {
-        new_values->AddString(name.toAscii().data());
-        if (plot)
-          {
-          double rgb[3];
-          plot->GetColor(rgb);
-          new_values->AddString(QString::number(rgb[0]).toAscii().data());
-          new_values->AddString(QString::number(rgb[1]).toAscii().data());
-          new_values->AddString(QString::number(rgb[2]).toAscii().data());
-          }
-        else
-          {
-          new_values->AddString("0");
-          new_values->AddString("0");
-          new_values->AddString("0");
-          }
-        }
-      else if (strcmp(propname, "LineStyleInfo") == 0)
-        {
-        new_values->AddString(name.toAscii().data());
-        if (plot)
-          {
-          new_values->AddString(
-              QString::number(plot->GetPen()->GetLineType()).toAscii().data());
-          }
-        else
-          {
-          new_values->AddString("1");
-          }
-        }
-      else if (strcmp(propname, "MarkerStyleInfo") == 0)
-        {
-        new_values->AddString(name.toAscii().data());
-        if (plot && false)
-          {
-          new_values->AddString(
-              QString::number(plot->GetPen()->GetWidth()).toAscii().data());
-          }
-        else
-          {
-          new_values->AddString("0");
-          }
-        }
-      else
-        {
-        skip = true;
-        break;
-        }
-      }
-    if (!skip)
-      {
-      svp->SetElements(new_values);
-      }
-    new_values->Delete();
-    }
-}
-
-//----------------------------------------------------------------------------
-void vtkSMContextNamedOptionsProxy::SetVisibility(const char* name, int visible)
-{
-  if (strlen(name) == 0)
-    {
-    return;
-    }
-  if (this->Internals->PlotMap[name])
-    {
-    vtkPlot *plot = this->Internals->PlotMap[name];
-    plot->SetVisible(static_cast<bool>(visible));
-    // If the X series has changed update this in the plot
-    plot->SetUseIndexForXSeries(this->Internals->UseIndexForXAxis);
-    if (this->Internals->XSeriesName.length() > 0)
-      {
-      plot->SetInput(this->Internals->Table,
-                     this->Internals->XSeriesName.c_str(),
-                     name);
-      }
-    if (this->Internals->Chart)
-      {
-      this->Internals->Chart->RecalculateBounds();
-      }
-    }
-  else
-    {
-    // Only create a new plot if the request is to make the plot visible
-    if (this->Internals->Chart && name && strlen(name))
-      {
-      vtkPlot *plot = this->Internals->Chart->AddPlot(this->Internals->ChartType);
-      if (plot)
-        {
-        plot->SetVisible(static_cast<bool>(visible));
-        plot->SetUseIndexForXSeries(this->Internals->UseIndexForXAxis);
-        plot->SetInput(this->Internals->Table,
-                       this->Internals->XSeriesName.c_str(),
-                       name);
-        }
-      // Update the map with the pointer
-      this->Internals->PlotMap[name] = plot;
-      }
-    }
   // Figure out how many active plot items there are - set the y axis title
   // or display legend to true.
   int active = 0;
   vtkPlot* lastPlot = 0;
-  vtkstd::map<vtkstd::string, vtkWeakPointer<vtkPlot> >::iterator it;
+  vtkstd::map<vtkstd::string, PlotInfo >::iterator it;
   for (it = this->Internals->PlotMap.begin();
        it != this->Internals->PlotMap.end(); ++it)
     {
-    if (it->second && it->second->GetVisible())
+    if (it->second.Plot && it->second.Visible)
       {
       ++active;
-      lastPlot = it->second;
+      lastPlot = it->second.Plot;
       }
     }
   if (active == 0 && this->Internals->Chart)
@@ -401,21 +183,285 @@ void vtkSMContextNamedOptionsProxy::SetVisibility(const char* name, int visible)
 }
 
 //----------------------------------------------------------------------------
+void vtkSMContextNamedOptionsProxy::SetXSeriesName(const char* name)
+{
+  if (!name)
+    {
+    this->Internals->XSeriesName = "";
+    }
+  else
+    {
+    this->Internals->XSeriesName = name;
+    }
+
+  // Now update any existing plots to use the X series specified
+  vtkstd::map<vtkstd::string, PlotInfo>::iterator it;
+  for (it = this->Internals->PlotMap.begin();
+       it != this->Internals->PlotMap.end(); ++it)
+    {
+    if (it->second.Plot)
+      {
+      it->second.Plot->SetInputArray(0, this->Internals->XSeriesName.c_str());
+      it->second.Plot->SetUseIndexForXSeries(this->Internals->UseIndexForXAxis);
+      }
+    }
+
+  this->RefreshBottomAxisTitle();
+  this->Modified();
+}
+
+//----------------------------------------------------------------------------
+void vtkSMContextNamedOptionsProxy::SetUseIndexForXAxis(bool useIndex)
+{
+  this->Internals->UseIndexForXAxis = useIndex;
+  // Now update the plots to use the X series specified
+  vtkstd::map<vtkstd::string, PlotInfo>::iterator it;
+  for (it = this->Internals->PlotMap.begin();
+       it != this->Internals->PlotMap.end(); ++it)
+    {
+    if (it->second.Plot)
+      {
+      it->second.Plot->SetUseIndexForXSeries(this->Internals->UseIndexForXAxis);
+      }
+    }
+
+  this->RefreshBottomAxisTitle();
+  this->Modified();
+}
+
+//----------------------------------------------------------------------------
+void vtkSMContextNamedOptionsProxy::RefreshPlots()
+{
+  if (!this->Internals->Table)
+    {
+    return;
+    }
+
+  PlotMapType newMap;
+
+  // For each series (column in the table)
+  const vtkIdType numberOfColumns = this->Internals->Table->GetNumberOfColumns();
+  for (vtkIdType i = 0; i < numberOfColumns; ++i)
+    {
+    // Get the series name
+    const char* seriesName = this->Internals->Table->GetColumnName(i);
+    if (!seriesName || !seriesName[0])
+      {
+      continue;
+      }
+
+    // Find an existing PlotInfo object or initialize a new one,
+    // then add it to newMap.
+    PlotMapIterator it = this->Internals->PlotMap.find(seriesName);
+    if (it != this->Internals->PlotMap.end())
+      {
+      newMap[seriesName] = it->second;
+      }
+    else
+      {
+      PlotInfo& plotInfo = newMap[seriesName];
+      plotInfo.Label = seriesName;
+      vtkColor3ub color = this->Internals->Colors->GetColorRepeating(i);
+      plotInfo.Color[0] = color.GetData()[0]/255.0;
+      plotInfo.Color[1] = color.GetData()[1]/255.0;
+      plotInfo.Color[2] = color.GetData()[2]/255.0;
+      }
+    }
+
+  // Now we need to prune old series (table columns that were removed)
+  if (this->Internals->Chart)
+    {
+    PlotMapIterator it = this->Internals->PlotMap.begin();
+    for ( ; it != this->Internals->PlotMap.end(); ++it)
+      {
+      // If the series is currently in the chart but has been removed from
+      // the vtkTable then lets remove it from the chart
+      if (it->second.Plot && newMap.find(it->first) == newMap.end())
+        {
+        this->Internals->Chart->RemovePlotInstance(it->second.Plot);
+        }
+      }
+    }
+
+  this->Internals->PlotMap = newMap;
+}
+
+//----------------------------------------------------------------------------
+void vtkSMContextNamedOptionsProxy::UpdatePropertyInformationInternal(
+  vtkSMProperty* prop)
+{
+  vtkSMStringVectorProperty* svp = vtkSMStringVectorProperty::SafeDownCast(prop);
+  if (!svp || !svp->GetInformationOnly() || !this->Internals->Table)
+    {
+    return;
+    }
+
+  this->RefreshPlots();
+
+  bool skip = false;
+  const char* propertyName = this->GetPropertyName(prop);
+  vtkSmartPointer<vtkStringList> newValues = vtkSmartPointer<vtkStringList>::New();
+
+  // Note: we could iterate over this->Internals->PlotMap, but just for
+  // kicks we'll iterate over the table columns in order to respect the
+  // column ordering, probably not needed... since we called RefreshPlots()
+  // we know that PlotMap matches the table columns.
+  int numberOfColumns = this->Internals->Table->GetNumberOfColumns();
+  for (int i = 0; i < numberOfColumns; ++i)
+    {
+    const char* seriesName = this->Internals->Table->GetColumnName(i);
+    if (!seriesName)
+      {
+      continue;
+      }
+
+    PlotInfo& plotInfo = this->Internals->PlotMap[seriesName];
+    newValues->AddString(seriesName);
+
+    if (strcmp(propertyName, "VisibilityInfo") == 0)
+      {
+      newValues->AddString(QString::number(plotInfo.Visible).toAscii().data());
+      }
+    else if (strcmp(propertyName, "LabelInfo") == 0)
+      {
+      newValues->AddString(plotInfo.Label);
+      }
+    else if (strcmp(propertyName, "LineThicknessInfo") == 0)
+      {
+      newValues->AddString(
+        QString::number(plotInfo.LineThickness).toAscii().data());
+      }
+    else if (strcmp(propertyName, "ColorInfo") == 0)
+      {
+      newValues->AddString(QString::number(plotInfo.Color[0]).toAscii().data());
+      newValues->AddString(QString::number(plotInfo.Color[1]).toAscii().data());
+      newValues->AddString(QString::number(plotInfo.Color[2]).toAscii().data());
+      }
+    else if (strcmp(propertyName, "LineStyleInfo") == 0)
+      {
+      newValues->AddString(
+        QString::number(plotInfo.LineStyle).toAscii().data());
+      }
+    else if (strcmp(propertyName, "MarkerStyleInfo") == 0)
+      {
+      newValues->AddString(
+        QString::number(plotInfo.MarkerStyle).toAscii().data());
+      }
+    else
+      {
+      skip = true;
+      break;
+      }
+    }
+  if (!skip)
+    {
+    svp->SetElements(newValues);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkSMContextNamedOptionsProxy::RemovePlotsFromChart()
+{
+  if (!this->Internals->Chart)
+    {
+    return;
+    }
+
+  for (PlotMapIterator it = this->Internals->PlotMap.begin();
+       it != this->Internals->PlotMap.end(); ++it)
+    {
+    PlotInfo& plotInfo = it->second;
+    if (plotInfo.Plot)
+      {
+      vtkPlot* plot = plotInfo.Plot;
+      plotInfo.Plot = 0; // clear the weak pointer before destroying the plot
+      this->Internals->Chart->RemovePlotInstance(plot);
+      }
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkSMContextNamedOptionsProxy::SetPlotVisibilityInternal(PlotInfo& plotInfo,
+                                          bool visible, const char* seriesName)
+{
+  if (plotInfo.Plot)
+    {
+    plotInfo.Plot->SetVisible(static_cast<bool>(visible));
+    }
+  else if (this->Internals->Chart && this->Internals->Table && visible)
+    {
+    // Create a new vtkPlot and initialize it
+    vtkPlot *plot = this->Internals->Chart->AddPlot(this->Internals->ChartType);
+    if (plot)
+      {
+      plotInfo.Plot = plot;
+      plot->SetVisible(static_cast<bool>(visible));
+      plot->SetLabel(plotInfo.Label);
+      plot->SetWidth(plotInfo.LineThickness);
+      plot->GetPen()->SetLineType(plotInfo.LineStyle);
+      plot->SetColor(plotInfo.Color[0], plotInfo.Color[1], plotInfo.Color[2]);
+      // Must downcast to set the marker style...
+      vtkPlotLine *line = vtkPlotLine::SafeDownCast(plot);
+      if (line)
+        {
+        line->SetMarkerStyle(plotInfo.MarkerStyle);
+        }
+      plot->SetUseIndexForXSeries(this->Internals->UseIndexForXAxis);
+      plot->SetInput(this->Internals->Table,
+                      this->Internals->XSeriesName.c_str(),
+                      seriesName);
+      }
+    }
+
+  // Recalculate the bounds if a plot was made visible
+  if (this->Internals->Chart && visible)
+    {
+    this->Internals->Chart->RecalculateBounds();
+    }
+
+  this->RefreshLegendStatus();
+}
+
+//----------------------------------------------------------------------------
+void vtkSMContextNamedOptionsProxy::SetTableVisibility(bool visible)
+{
+  for (PlotMapIterator it = this->Internals->PlotMap.begin();
+       it != this->Internals->PlotMap.end(); ++it)
+    {
+    PlotInfo& plotInfo = it->second;
+    this->SetPlotVisibilityInternal(plotInfo, visible && plotInfo.Visible,
+                                                         it->first.c_str());
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkSMContextNamedOptionsProxy::SetVisibility(const char* name, int visible)
+{
+  PlotInfo& plotInfo = this->Internals->PlotMap[name];
+  plotInfo.Visible = visible;
+  this->SetPlotVisibilityInternal(plotInfo, visible, name);
+}
+
+//----------------------------------------------------------------------------
 void vtkSMContextNamedOptionsProxy::SetLineThickness(const char* name,
                                                      int value)
 {
-  if (this->Internals->PlotMap[name])
+  PlotInfo& plotInfo = this->Internals->PlotMap[name];
+  plotInfo.LineThickness = value;
+  if (plotInfo.Plot)
     {
-    this->Internals->PlotMap[name]->SetWidth(value);
+    plotInfo.Plot->SetWidth(value);
     }
 }
 
 //----------------------------------------------------------------------------
 void vtkSMContextNamedOptionsProxy::SetLineStyle(const char* name, int style)
 {
-  if (this->Internals->PlotMap[name])
+  PlotInfo& plotInfo = this->Internals->PlotMap[name];
+  plotInfo.LineStyle = style;
+  if (plotInfo.Plot)
     {
-    this->Internals->PlotMap[name]->GetPen()->SetLineType(style);
+    plotInfo.Plot->GetPen()->SetLineType(style);
     }
 }
 
@@ -423,9 +469,13 @@ void vtkSMContextNamedOptionsProxy::SetLineStyle(const char* name, int style)
 void vtkSMContextNamedOptionsProxy::SetColor(const char* name,
                                              double r, double g, double b)
 {
-  if (this->Internals->PlotMap[name])
+  PlotInfo& plotInfo = this->Internals->PlotMap[name];
+  plotInfo.Color[0] = r;
+  plotInfo.Color[1] = g;
+  plotInfo.Color[2] = b;
+  if (plotInfo.Plot)
     {
-    this->Internals->PlotMap[name]->SetColor(r, g, b);
+    plotInfo.Plot->SetColor(r, g, b);
     }
 }
 
@@ -438,14 +488,14 @@ void vtkSMContextNamedOptionsProxy::SetAxisCorner(const char*, int)
 //----------------------------------------------------------------------------
 void vtkSMContextNamedOptionsProxy::SetMarkerStyle(const char* name, int style)
 {
+  PlotInfo& plotInfo = this->Internals->PlotMap[name];
+  plotInfo.MarkerStyle = style;
+
   // Must downcast to set the marker style...
-  if (this->Internals->PlotMap[name])
+  vtkPlotLine *line = vtkPlotLine::SafeDownCast(plotInfo.Plot);
+  if (line)
     {
-    vtkPlotLine *line = vtkPlotLine::SafeDownCast(this->Internals->PlotMap[name]);
-    if (line)
-      {
-      line->SetMarkerStyle(style);
-      }
+    line->SetMarkerStyle(style);
     }
 }
 
@@ -453,9 +503,12 @@ void vtkSMContextNamedOptionsProxy::SetMarkerStyle(const char* name, int style)
 void vtkSMContextNamedOptionsProxy::SetLabel(const char* name,
                                              const char* label)
 {
-  if (this->Internals->PlotMap[name])
+  PlotInfo& plotInfo = this->Internals->PlotMap[name];
+  plotInfo.Label = label;
+
+  if (plotInfo.Plot)
     {
-    this->Internals->PlotMap[name]->SetLabel(label);
+    plotInfo.Plot->SetLabel(label);
     }
 }
 
