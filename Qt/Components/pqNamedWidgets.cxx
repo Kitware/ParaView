@@ -1364,7 +1364,7 @@ void pqNamedWidgets::createWidgets(QGridLayout* panelLayout, vtkSMProxy* pxy)
     else if(pt == pqSMAdaptor::FIELD_SELECTION)
       {
       QLabel* label = createPanelLabel(panelLayout->parentWidget(),
-                                       "Scalars",
+                                       propertyLabel,
                                        propertyName);
       QComboBox* combo = new QComboBox(panelLayout->parentWidget());
       if(informationOnly)
