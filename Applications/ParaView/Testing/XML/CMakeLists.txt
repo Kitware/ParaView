@@ -113,6 +113,9 @@ SET (Flow2_THRESHOLD 15)
 SET (UndoRedo1_THRESHOLD 15)
 SET (UndoRedo4_THRESHOLD 15)
 
+# Since often there are issues with fonts etc.
+SET (XYChart_THRESHOLD 150)
+
 # These Xdmf tests have wireframes, hence the increased thresholds.
 SET (XdmfReadImageData_THRESHOLD 20)
 SET (XdmfReadRectilinearGrid_THRESHOLD 20)
