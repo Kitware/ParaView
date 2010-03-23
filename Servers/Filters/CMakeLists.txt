@@ -53,6 +53,7 @@ SET(Filters_SRCS
   vtkEnSightGoldReader2.cxx
   vtkEnSightGoldBinaryReader2.cxx
   vtkEnSightReader2.cxx
+  vtkEnzoReader.cxx
   vtkEquivalenceSet.cxx
   vtkExodusFileSeriesReader.cxx
   vtkExtractHistogram.cxx
