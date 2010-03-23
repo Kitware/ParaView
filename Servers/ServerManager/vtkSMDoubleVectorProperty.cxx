@@ -22,7 +22,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMDoubleVectorProperty);
-vtkCxxRevisionMacro(vtkSMDoubleVectorProperty, "1.48");
+vtkCxxRevisionMacro(vtkSMDoubleVectorProperty, "1.49");
 
 struct vtkSMDoubleVectorPropertyInternals
 {
@@ -182,13 +182,13 @@ void vtkSMDoubleVectorProperty::SetNumberOfElements(unsigned int num)
 //---------------------------------------------------------------------------
 unsigned int vtkSMDoubleVectorProperty::GetNumberOfUncheckedElements()
 {
-  return this->Internals->UncheckedValues.size();
+  return static_cast<unsigned int>(this->Internals->UncheckedValues.size());
 }
 
 //---------------------------------------------------------------------------
 unsigned int vtkSMDoubleVectorProperty::GetNumberOfElements()
 {
-  return this->Internals->Values.size();
+  return static_cast<unsigned int>(this->Internals->Values.size());
 }
 
 //---------------------------------------------------------------------------
@@ -522,7 +522,7 @@ void vtkSMDoubleVectorProperty::ChildSaveState(
 
   if (saveLastPushedValues)
     {
-    size = this->Internals->LastPushedValues.size();
+    size = static_cast<unsigned int>(this->Internals->LastPushedValues.size());
     
     vtkPVXMLElement* element = vtkPVXMLElement::New();
     element->SetName("LastPushedValues");

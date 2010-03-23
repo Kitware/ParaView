@@ -21,7 +21,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMIdTypeVectorProperty);
-vtkCxxRevisionMacro(vtkSMIdTypeVectorProperty, "1.24");
+vtkCxxRevisionMacro(vtkSMIdTypeVectorProperty, "1.25");
 
 struct vtkSMIdTypeVectorPropertyInternals
 {
@@ -172,13 +172,13 @@ void vtkSMIdTypeVectorProperty::SetNumberOfElements(unsigned int num)
 //---------------------------------------------------------------------------
 unsigned int vtkSMIdTypeVectorProperty::GetNumberOfUncheckedElements()
 {
-  return this->Internals->UncheckedValues.size();
+  return static_cast<unsigned int>(this->Internals->UncheckedValues.size());
 }
 
 //---------------------------------------------------------------------------
 unsigned int vtkSMIdTypeVectorProperty::GetNumberOfElements()
 {
-  return this->Internals->Values.size();
+  return static_cast<unsigned int>(this->Internals->Values.size());
 }
 
 //---------------------------------------------------------------------------
@@ -451,7 +451,7 @@ void vtkSMIdTypeVectorProperty::ChildSaveState(vtkPVXMLElement* propertyElement,
 
   if (saveLastPushedValues)
     {
-    size = this->Internals->LastPushedValues.size();
+    size = static_cast<unsigned int>(this->Internals->LastPushedValues.size());
     
     vtkPVXMLElement* element = vtkPVXMLElement::New();
     element->SetName("LastPushedValues");
