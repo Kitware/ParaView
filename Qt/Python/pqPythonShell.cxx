@@ -41,6 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVOptions.h"
 #include "vtkEventQtSlotConnect.h"
 #include "vtkPVPythonInteractiveInterpretor.h"
+#include "vtkStdString.h"
 
 #include <QCoreApplication>
 #include <QResizeEvent>
@@ -272,6 +273,10 @@ void pqPythonShell::initializeInterpretor(int argc, char* argv[])
   this->Implementation->VTKConnect->Connect(
     this->Implementation->Interpreter, vtkCommand::WarningEvent, 
     this, SLOT(printStdout(vtkObject*, unsigned long, void*, void*))); 
+
+  this->Implementation->VTKConnect->Connect(
+    this->Implementation->Interpreter, vtkCommand::UpdateEvent, 
+    this, SLOT(readInputLine(vtkObject*, unsigned long, void*, void*))); 
 }
 
 void pqPythonShell::clear()
@@ -365,6 +370,32 @@ void pqPythonShell::printStdout(vtkObject*, unsigned long, void*, void* calldata
   const char* text = reinterpret_cast<const char*>(calldata);
   this->printStdout(text);
   this->Implementation->Interpreter->ClearMessages();
+}
+
+#include <QDialog>
+#include <QLineEdit>
+#include <QVBoxLayout>
+class LineInput : public QDialog {
+public:
+  LineInput(QWidget* parent=NULL) : QDialog(parent, Qt::FramelessWindowHint)
+  {
+    QVBoxLayout* layout = new QVBoxLayout(this);
+    layout->setMargin(0);
+    this->Edit = new QLineEdit;
+    layout->addWidget(this->Edit);
+    this->connect(this->Edit, SIGNAL(returnPressed()), SLOT(accept()));
+  }
+  QLineEdit* Edit;
+};
+
+void pqPythonShell::readInputLine(vtkObject*, unsigned long, void*, void* calldata)
+{
+  vtkStdString* ret = reinterpret_cast<vtkStdString*>(calldata);
+  QPoint pos = this->Implementation->Console.getCursorPosition();
+  LineInput input(this);
+  input.move(this->mapToGlobal(pos));
+  input.exec();
+  *ret = input.Edit->text().toAscii().data();
 }
 
 void pqPythonShell::printStderr(vtkObject*, unsigned long, void*, void* calldata)

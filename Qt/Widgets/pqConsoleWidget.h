@@ -64,6 +64,8 @@ public:
 
   /// Set a completer for this console widget
   void setCompleter(pqConsoleWidgetCompleter* completer);
+
+  QPoint getCursorPosition();
   
 signals:
   /// Signal emitted whenever the user enters a command

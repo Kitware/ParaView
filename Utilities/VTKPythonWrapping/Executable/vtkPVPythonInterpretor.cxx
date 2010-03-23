@@ -243,7 +243,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPythonInterpretor);
-vtkCxxRevisionMacro(vtkPVPythonInterpretor, "1.29");
+vtkCxxRevisionMacro(vtkPVPythonInterpretor, "1.30");
 
 //-----------------------------------------------------------------------------
 vtkPVPythonInterpretor::vtkPVPythonInterpretor()
@@ -258,6 +258,14 @@ vtkPVPythonInterpretor::~vtkPVPythonInterpretor()
 {
   delete this->Internal;
   this->SetExecutablePath(0);
+}
+
+//-----------------------------------------------------------------------------
+vtkStdString vtkPVPythonInterpretor::GetInputLine()
+{
+  vtkStdString ret;
+  this->InvokeEvent(vtkCommand::UpdateEvent, &ret);
+  return ret;
 }
 
 //-----------------------------------------------------------------------------
@@ -369,11 +377,14 @@ void vtkPVPythonInterpretor::InitializeInternal()
     vtkPVPythonInterpretorWrapper* wrapperErr = vtkWrapInterpretor(this);
     wrapperErr->DumpToError = true;
 
-    // Redirect Python's stdout and stderr
+    // Redirect Python's stdout and stderr and stdin
     PySys_SetObject(const_cast<char*>("stdout"),
       reinterpret_cast<PyObject*>(wrapperOut));
 
     PySys_SetObject(const_cast<char*>("stderr"),
+      reinterpret_cast<PyObject*>(wrapperErr));
+
+    PySys_SetObject(const_cast<char*>("stdin"),
       reinterpret_cast<PyObject*>(wrapperErr));
 
     Py_DECREF(wrapperOut);

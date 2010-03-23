@@ -126,6 +126,7 @@ protected:
 
   void DumpError(const char* string);
   void DumpOutput(const char* string);
+  vtkStdString GetInputLine();
   
 private:
   vtkPVPythonInterpretor(const vtkPVPythonInterpretor&); // Not implemented.

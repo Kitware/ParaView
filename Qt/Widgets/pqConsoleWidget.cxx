@@ -412,6 +412,14 @@ void pqConsoleWidget::setFormat(const QTextCharFormat& Format)
 }
 
 //-----------------------------------------------------------------------------
+QPoint pqConsoleWidget::getCursorPosition()
+{
+  QTextCursor tc = this->Implementation->textCursor();
+
+  return this->Implementation->cursorRect(tc).topLeft();
+}
+
+//-----------------------------------------------------------------------------
 void pqConsoleWidget::setCompleter(pqConsoleWidgetCompleter* completer)
 {
   this->Implementation->setCompleter(completer);

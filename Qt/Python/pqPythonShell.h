@@ -74,6 +74,7 @@ public:
 
 signals:
   void executing(bool);
+  void getInputLine(QString& input);
 
 public slots:
   void clear();
@@ -82,6 +83,8 @@ public slots:
 private slots:
   void printStderr(vtkObject*, unsigned long, void*, void*);
   void printStdout(vtkObject*, unsigned long, void*, void*);
+
+  void readInputLine(vtkObject*, unsigned long, void*, void*);
 
   void onExecuteCommand(const QString&);
 
@@ -97,6 +100,7 @@ private:
 
   void printStderr(const QString&);
   void printStdout(const QString&);
+
 };
 
 #endif // !_pqPythonShell_h
