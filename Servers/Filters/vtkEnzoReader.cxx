@@ -47,7 +47,7 @@
 #include "vtkLongLongArray.h"
 #include "vtkUnsignedIntArray.h"
 #include "vtkUnsignedCharArray.h"
-#include "vtkunsignedShortArray.h"
+#include "vtkUnsignedShortArray.h"
 
 #include "vtkInformation.h"
 #include "vtkObjectFactory.h"
@@ -59,7 +59,7 @@
 
 #include <vtkstd/string>
 
-vtkCxxRevisionMacro( vtkEnzoReader, "1.1" );
+vtkCxxRevisionMacro( vtkEnzoReader, "1.2" );
 vtkStandardNewMacro( vtkEnzoReader );
 
 // ============================================================================
@@ -729,7 +729,7 @@ void vtkEnzoReaderInternal::ReadBlockStructures()
       tmpBlk.Level    = levlId;
       tmpBlk.ParentId = parent;
 
-      if ( this->Blocks.size() != tmpBlk.Index )
+      if (  static_cast < int > ( this->Blocks.size() )  !=  tmpBlk.Index  )
         {
         vtkGenericWarningMacro( "The blocks in the hierarchy file " << 
                                 this->HierarchyFileName.c_str()     << 
