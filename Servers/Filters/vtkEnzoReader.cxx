@@ -59,7 +59,7 @@
 
 #include <vtkstd/string>
 
-vtkCxxRevisionMacro( vtkEnzoReader, "1.3" );
+vtkCxxRevisionMacro( vtkEnzoReader, "1.4" );
 vtkStandardNewMacro( vtkEnzoReader );
 
 // ============================================================================
@@ -906,7 +906,8 @@ void vtkEnzoReaderInternal::GetAttributeNames()
   hid_t   rootIndx = H5Gopen( fileIndx, "/" );
   H5Gget_num_objs( rootIndx, &numbObjs );
   
-  for ( objIndex = 0; objIndex < numbObjs; objIndex ++ )
+  for (  objIndex = 0;  objIndex < static_cast < int > ( numbObjs ); 
+         objIndex ++  )
     {
     if (  H5Gget_objtype_by_idx( rootIndx, objIndex )  ==  H5G_GROUP  )
       {
@@ -930,7 +931,8 @@ void vtkEnzoReaderInternal::GetAttributeNames()
   // of target block)
   H5Gget_num_objs( rootIndx, &numbObjs );
 
-  for ( objIndex = 0; objIndex < numbObjs; objIndex ++ )
+  for (  objIndex = 0;  objIndex < static_cast < int > ( numbObjs ); 
+         objIndex ++  )
     {
     if (  H5Gget_objtype_by_idx( rootIndx, objIndex ) == H5G_DATASET  )
       {
@@ -1971,7 +1973,8 @@ int  vtkEnzoReader::GetParticles( int blockIdx, vtkPolyData * polyData,
   hsize_t numbObjs;
   hid_t   rootIndx = H5Gopen( fileIndx, "/" );
   H5Gget_num_objs( rootIndx, &numbObjs );
-  for ( objIndex = 0; objIndex < numbObjs; objIndex ++ )
+  for (  objIndex = 0;  objIndex < static_cast < int > ( numbObjs );  
+         objIndex ++  )
     {
     if (  H5Gget_objtype_by_idx( rootIndx, objIndex ) == H5G_GROUP  )
       {
@@ -2106,7 +2109,7 @@ int  vtkEnzoReader::GetParticles( int blockIdx, vtkPolyData * polyData,
   // GetParticlesAttribute()
   int  numAttrs = static_cast < int > 
                   ( this->Internal->ParticleAttributeNames.size() );
-  for ( int i = 0; i < numAttrs; i ++ )
+  for ( i = 0; i < numAttrs; i ++ )
     {
     this->GetParticlesAttribute
           ( this->Internal->ParticleAttributeNames[i].c_str(), 
@@ -2189,7 +2192,8 @@ int  vtkEnzoReader::LoadAttribute( const char * atribute, int blockIdx )
   hsize_t numbObjs;
   hid_t   rootIndx = H5Gopen( fileIndx, "/" );
   H5Gget_num_objs( rootIndx, &numbObjs );
-  for ( objIndex = 0; objIndex < numbObjs; objIndex ++ )
+  for (  objIndex = 0;  objIndex < static_cast < int > ( numbObjs ); 
+         objIndex ++  )
     {
     if (  H5Gget_objtype_by_idx( rootIndx, objIndex )  ==  H5G_GROUP  )
       {
