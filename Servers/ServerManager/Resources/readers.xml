@@ -5637,7 +5637,8 @@
         repeat_command="1"
         number_of_elements_per_command="2"
         element_types="2 0"
-        information_property="PointArrayInfo" >
+        information_property="PointArrayInfo" 
+        label="Point Arrays">
         <ArraySelectionDomain name="array_list" >
           <RequiredProperties>
              <Property name="PointArrayInfo" function="ArrayList"/>
@@ -5767,7 +5768,8 @@
         repeat_command="1"
         number_of_elements_per_command="2"
         element_types="2 0"
-        information_property="PointArrayInfo" >
+        information_property="PointArrayInfo" 
+        label="Point Arrays">
         <ArraySelectionDomain name="array_list" >
           <RequiredProperties>
              <Property name="PointArrayInfo" function="ArrayList"/>
