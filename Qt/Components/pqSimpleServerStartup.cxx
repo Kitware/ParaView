@@ -425,7 +425,7 @@ bool pqSimpleServerStartup::promptRuntimeArguments()
         (QString(xml_option->GetAttribute("readonly")) == "true");
       const bool save_option = xml_option->GetAttribute("save") ? 
         QVariant(xml_option->GetAttribute("save")).toBool() : true;
-      QString settings_key = QString("SERVER_STARUP/%1.%2").arg(
+      QString settings_key = QString("SERVER_STARTUP/%1.%2").arg(
         this->Implementation->Server.toURI()).arg(option_name);
 
       vtkPVXMLElement* xml_type = xml_option->GetNestedElement(0);
@@ -641,7 +641,7 @@ bool pqSimpleServerStartup::promptRuntimeArguments()
       QVariant(xml_option->GetAttribute("save")).toBool() : true;
     if (save_option && !option_readonly)
       {
-      QString settings_key = QString("SERVER_STARUP/%1.%2").arg(
+      QString settings_key = QString("SERVER_STARTUP/%1.%2").arg(
         this->Implementation->Server.toURI()).arg(option_name);
       settings->setValue(settings_key, val);
       }
