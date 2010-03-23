@@ -426,7 +426,7 @@ bool pqSimpleServerStartup::promptRuntimeArguments()
       const bool save_option = xml_option->GetAttribute("save") ? 
         QVariant(xml_option->GetAttribute("save")).toBool() : true;
       QString settings_key = QString("SERVER_STARTUP/%1.%2").arg(
-        this->Implementation->Server.toURI()).arg(option_name);
+        this->Implementation->Startup->getName()).arg(option_name);
 
       vtkPVXMLElement* xml_type = xml_option->GetNestedElement(0);
       if (!xml_type)
@@ -642,7 +642,7 @@ bool pqSimpleServerStartup::promptRuntimeArguments()
     if (save_option && !option_readonly)
       {
       QString settings_key = QString("SERVER_STARTUP/%1.%2").arg(
-        this->Implementation->Server.toURI()).arg(option_name);
+        this->Implementation->Startup->getName()).arg(option_name);
       settings->setValue(settings_key, val);
       }
     }
