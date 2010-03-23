@@ -1,0 +1,5 @@
+<ParaViewWriters>
+  <Writer name="AnalyzeWriter"
+          extensions="img"
+          file_description="Analyze File Format"/>
+</ParaViewWriters>

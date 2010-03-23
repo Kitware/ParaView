@@ -1,0 +1,6 @@
+<ParaViewReaders>
+  <Reader name="NIfTIReader"
+          extensions="nii"
+          file_description="NIfTI Files">
+  </Reader>
+</ParaViewReaders>

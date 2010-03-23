@@ -1,0 +1,49 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="sources">
+  
+  <SourceProxy name="AnalyzeReader"
+                   class="vtkAnalyzeReader"
+                   label="Analyze reader">
+      <Documentation
+       short_help="Read Analyze data files."
+       long_help="Read Analyze image data files">
+       The Analyze reader reads Analyze data and header files containing image data file. The expected file extensions are .img and .hdr.
+     </Documentation>
+     <StringVectorProperty
+         name="FileName"
+         animateable="0"
+         command="SetFileName"
+         number_of_elements="1">
+        <FileListDomain name="files"/>
+        <Documentation>
+          This property specifies the file name for the Analyze reader.
+        </Documentation>
+      </StringVectorProperty>
+      <!-- End AnalyzeReader -->  
+   </SourceProxy>
+  
+  <SourceProxy name="NIfTIReader"
+                   class="vtkNIfTIReader"
+                   label="NIfTI Volume reader">
+      <Documentation
+       short_help="Read NIfTI Volume data files."
+       long_help="Read NIfTI Volume NII image data files">
+       The NIfTI Volume reader reads NIfTI files containing image data. The expected file extensions are .nii.
+     </Documentation>
+     <StringVectorProperty
+         name="FileName"
+         animateable="0"
+         command="SetFileName"
+         number_of_elements="1">
+        <FileListDomain name="files"/>
+        <Documentation>
+          This property specifies the file name for the NIfTI Volume reader.
+        </Documentation>
+      </StringVectorProperty>
+      <!-- End NIfTIReader -->
+   </SourceProxy>
+
+  </ProxyGroup>
+  
+</ServerManagerConfiguration>
+

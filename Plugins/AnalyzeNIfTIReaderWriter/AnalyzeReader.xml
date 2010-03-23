@@ -1,0 +1,6 @@
+<ParaViewReaders>
+  <Reader name="AnalyzeReader"
+          extensions="img hdr"
+          file_description="Analyze Files">
+  </Reader>
+</ParaViewReaders>

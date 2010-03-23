@@ -1,0 +1,72 @@
+<ServerManagerConfiguration>
+
+  <ProxyGroup name="writers">
+
+   <WriterProxy name="AnalyzeWriter" class="vtkAnalyzeWriter"
+      base_proxygroup="internal_writers" base_proxyname="DataWriterBase">
+      <Documentation
+        short_help="Write Analyze files">
+        Writer to write Analyze files.
+      </Documentation>
+      <InputProperty name="Input" command="SetInputConnection">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type" composite_data_supported="0">
+          <DataType value="vtkImageData"/>
+        </DataTypeDomain>
+      </InputProperty>
+      <StringVectorProperty
+        name="FileName"
+        command="SetFileName"
+        number_of_elements="1">
+        <Documentation>
+          The name of the file to be written.
+        </Documentation>
+      </StringVectorProperty>
+      <Hints>
+        <Property name="Input" show="0"/>
+        <Property name="FileName" show="0"/>
+        <WriterFactory
+         extensions="img"
+         file_description="Analyze File Format"/>
+      </Hints>
+    </WriterProxy>
+
+   <WriterProxy name="NIfTIWriter" class="vtkNIfTIWriter"
+      base_proxygroup="internal_writers" base_proxyname="DataWriterBase">
+      <Documentation
+        short_help="Write NIfTI files">
+        Writer to write NIfTI files.
+      </Documentation>
+      <InputProperty name="Input" command="SetInputConnection">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type" composite_data_supported="0">
+          <DataType value="vtkImageData"/>
+        </DataTypeDomain>
+      </InputProperty>
+       <StringVectorProperty
+        name="FileName"
+        command="SetFileName"
+        number_of_elements="1">
+        <Documentation>
+          The name of the file to be written.
+        </Documentation>
+      </StringVectorProperty>
+     <Hints>
+        <Property name="Input" show="0"/>
+        <Property name="FileName" show="0"/>
+         <WriterFactory
+         extensions="nii"
+         file_description="NIfTI File Format"/>
+     </Hints>
+    </WriterProxy>
+
+  </ProxyGroup>
+ 
+</ServerManagerConfiguration>
+
