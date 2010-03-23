@@ -7669,6 +7669,19 @@ This filter extracts a range of groups from a multiblock dataset
         </Documentation>
      </IntVectorProperty>
 
+     <IntVectorProperty name="MaintainStructure"
+        command="SetMaintainStructure"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          This is used only when PruneOutput is ON. By default, when pruning the
+          output i.e. remove empty blocks, if node has only 1 non-null child
+          block, then that node is removed. To preserve these parent nodes, set
+          this flag to true.
+        </Documentation>
+     </IntVectorProperty>
+
     <!-- End ExtractBlock -->
    </SourceProxy>
 
