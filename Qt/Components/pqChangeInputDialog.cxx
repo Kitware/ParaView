@@ -34,15 +34,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqActiveObjects.h"
 #include "pqApplicationCore.h"
+#include "pqOutputPort.h"
 #include "pqPipelineFilter.h"
 #include "pqPipelineModel.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
 #include "vtkSmartPointer.h"
+#include "vtkSMDocumentation.h"
 #include "vtkSMInputProperty.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxy.h"
-#include "pqOutputPort.h"
 
 #include <QRadioButton>
 #include <QLineEdit>
@@ -157,10 +158,16 @@ void pqChangeInputDialog::buildPortWidgets()
   for (int cc=0; cc < input_property_names.size(); cc++)
     {
     const char* input_prop_name = input_property_names[cc];
+    vtkSMProperty* smproperty =
+      this->Internals->Proxy->GetProperty(input_prop_name);
     QRadioButton* rb = new QRadioButton(this->Internals->buttonFrame);
     rb->setObjectName(input_prop_name);
-    rb->setText(
-      this->Internals->Proxy->GetProperty(input_prop_name)->GetXMLLabel());
+    rb->setText(smproperty->GetXMLLabel());
+    if (smproperty->GetDocumentation())
+      {
+      rb->setToolTip(QString(
+          smproperty->GetDocumentation()->GetDescription()).trimmed());
+      }
     vbox->addWidget(rb);
 
     QObject::connect(rb, SIGNAL(toggled(bool)),
