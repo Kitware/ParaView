@@ -59,7 +59,7 @@
 
 #include <vtkstd/string>
 
-vtkCxxRevisionMacro( vtkEnzoReader, "1.2" );
+vtkCxxRevisionMacro( vtkEnzoReader, "1.3" );
 vtkStandardNewMacro( vtkEnzoReader );
 
 // ============================================================================
@@ -740,7 +740,7 @@ void vtkEnzoReaderInternal::ReadBlockStructures()
 
       this->Blocks.push_back( tmpBlk );
       this->Blocks[parent].ChildrenIds.push_back( tmpBlk.Index );
-      this->NumberOfBlocks = this->Blocks.size() - 1;
+      this->NumberOfBlocks = static_cast < int > ( this->Blocks.size() ) - 1;
       }
     else 
     if ( theStr == "Pointer:" )
