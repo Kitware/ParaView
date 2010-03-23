@@ -45,7 +45,7 @@ public:
   ~pqComparativeLineChartView();
 
   static QString comparativeLineChartViewType() { return "ComparativeXYPlotView"; }
-  static QString comparativeLineChartViewTypeName() { return "XY Plot View (Comparative)"; }
+  static QString comparativeLineChartViewTypeName() { return "Line Chart View (Comparative)"; }
 
 private:
   pqComparativeLineChartView(const pqComparativeLineChartView&); // Not implemented.

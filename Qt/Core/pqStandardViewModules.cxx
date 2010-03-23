@@ -69,13 +69,13 @@ QStringList pqStandardViewModules::viewTypes() const
     pqRenderView::renderViewType() <<
     pqTwoDRenderView::twoDRenderViewType() <<
     pqTableView::tableType() <<
-    pqComparativeRenderView::comparativeRenderViewType() <<
-    pqComparativeBarChartView::comparativeBarChartViewType() <<
-    pqComparativeLineChartView::comparativeLineChartViewType() <<
     pqSpreadSheetView::spreadsheetViewType() <<
     pqScatterPlotView::scatterPlotViewType() <<
     pqXYChartView::XYChartViewType() <<
-    pqXYBarChartView::XYBarChartViewType();
+    pqXYBarChartView::XYBarChartViewType() <<
+    pqComparativeRenderView::comparativeRenderViewType() <<
+    pqComparativeBarChartView::comparativeBarChartViewType() <<
+    pqComparativeLineChartView::comparativeLineChartViewType();
 }
 
 QStringList pqStandardViewModules::displayTypes() const
