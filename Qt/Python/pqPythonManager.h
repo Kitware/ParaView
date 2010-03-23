@@ -79,6 +79,12 @@ signals:
 
   void paraviewPythonModulesImported();
 
+public slots:
+  // Description:
+  // Executes the given script.  If the python interpreter hasn't been initialized
+  // yet it will be initialized.
+  void executeScript(const QString& filename);
+
 protected slots:
 
   // Description:
@@ -95,11 +101,6 @@ protected slots:
   // Description:
   // Resets the python interpreter.
   void onRemovingServer(pqServer* server);
-
-  // Description:
-  // Executes the given script.  If the python interpreter hasn't been initialized
-  // yet it will be initialized.
-  void executeScript(const QString& filename);
 
 protected:
 

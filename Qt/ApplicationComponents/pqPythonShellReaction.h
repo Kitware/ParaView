@@ -48,6 +48,9 @@ public:
   /// flag on.
   static void showPythonShell();
 
+  /// Executes a python script.
+  static void executeScript(const char* filename);
+
 protected:
   /// Called when the action is triggered.
   virtual void onTriggered()

@@ -87,6 +87,12 @@ public:
   vtkGetMacro(DisableLightKit, int);
   vtkSetMacro(DisableLightKit, int);
 
+  // Description:
+  // Using --script option, user can specify a python script to be run on
+  // startup. This have any effect only when ParaView is built with Python
+  // support.
+  vtkGetStringMacro(PythonScript);
+
   // DO NOT CALL. Public for internal callbacks.
   int AddTestScript(const char*);
   int SetLastTestBaseline(const char*);
@@ -106,6 +112,9 @@ protected:
   int DisableRegistry;
   int DisableLightKit;
   int CurrentImageThreshold;
+  char* PythonScript;
+
+  vtkSetStringMacro(PythonScript);
 
   struct TestInfo
     {

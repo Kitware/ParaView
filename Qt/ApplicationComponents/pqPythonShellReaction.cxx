@@ -67,4 +67,19 @@ void pqPythonShellReaction::showPythonShell()
   qCritical("Python support not enabled.");
 }
 
+//-----------------------------------------------------------------------------
+void pqPythonShellReaction::executeScript(const char* filename)
+{
+#ifdef PARAVIEW_ENABLE_PYTHON
+  pqPythonManager* manager = pqPVApplicationCore::instance()->pythonManager();
+  if (manager)
+    {
+    manager->executeScript(filename);
+    return;
+    }
+#endif
+
+  (void)filename;
+  qCritical("Python support not enabled.");
+}
 

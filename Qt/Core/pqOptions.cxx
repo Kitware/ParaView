@@ -37,7 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkstd/string>
 
 vtkStandardNewMacro(pqOptions);
-vtkCxxRevisionMacro(pqOptions, "1.11");
+vtkCxxRevisionMacro(pqOptions, "1.12");
 
 static int AddTestScript(const char*, const char* value, void* call_data)
 {
@@ -79,6 +79,7 @@ pqOptions::pqOptions()
   this->ServerResourceName = 0;
   this->DisableLightKit = 0;
   this->CurrentImageThreshold = 12;
+  this->PythonScript = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -87,6 +88,7 @@ pqOptions::~pqOptions()
   this->SetTestDirectory(0);
   this->SetDataDirectory(0);
   this->SetServerResourceName(0);
+  this->SetPythonScript(0);
 }
 
 //-----------------------------------------------------------------------------
@@ -128,6 +130,10 @@ void pqOptions::Initialize()
     "Add test image threshold. "
     "Can be used multiple times to specify multiple image thresholds for "
     "multiple tests in order.");
+
+  this->AddArgument("--script", NULL,
+    &this->PythonScript,
+    "Set a python script to be evaluated on startup.");
 }
 
 //-----------------------------------------------------------------------------
@@ -195,4 +201,7 @@ void pqOptions::PrintSelf(ostream& os, vtkIndent indent)
 
   os << indent << "ServerResourceName: " 
     << (this->ServerResourceName? this->ServerResourceName : "(none)") << endl;
+
+  os << indent << "PythonScript: " << 
+    (this->PythonScript? this->PythonScript : "(none)") << endl;
 }

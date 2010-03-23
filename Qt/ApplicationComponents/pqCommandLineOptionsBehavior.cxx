@@ -43,15 +43,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqOptions.h"
 #include "pqPersistentMainWindowStateBehavior.h"
 #include "pqPVApplicationCore.h"
+#include "pqPythonShellReaction.h"
+#include "pqRenderView.h"
 #include "pqScalarsToColors.h"
 #include "pqServerConnectReaction.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
 #include "pqTimeKeeper.h"
 #include "pqUndoStack.h"
-#include "pqRenderView.h"
 #include "pqViewManager.h"
 #include "vtkProcessModule.h"
+#include "vtkPVConfig.h"
 
 #include <QApplication>
 #include <QDebug>
@@ -116,6 +118,15 @@ void pqCommandLineOptionsBehavior::processCommandLineOptions()
     // check for --state option. (Bug #5711)
     // NOTE: --data and --state cannnot be specifed at the same time.
     pqLoadStateReaction::loadState(options->GetStateFileName());
+    }
+
+  if (options->GetPythonScript())
+    {
+#ifdef PARAVIEW_ENABLE_PYTHON
+    pqPythonShellReaction::executeScript(options->GetPythonScript());
+#else
+    qCritical() << "Python support not enabled. Cannot run python scripts.";
+#endif
     }
 
   if (options->GetNumberOfTestScripts() > 0)
