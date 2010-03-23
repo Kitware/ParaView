@@ -64,7 +64,7 @@
 #include <vtkstd/string>
 #include <vtkstd/vector>
 
-vtkCxxRevisionMacro( vtkFlashReader, "1.11" );
+vtkCxxRevisionMacro( vtkFlashReader, "1.12" );
 vtkStandardNewMacro( vtkFlashReader );
 
 // ============================================================================
@@ -1666,9 +1666,9 @@ int vtkFlashReader::UpdateMetaData(vtkInformation* request,
   //num_time_steps=timeStepRange[1] + 1;
   //this->TimeStepRange[1]=timeStepRange[1];
   
-  if(request->Has(vtkDemandDrivenPipeline::REQUEST_INFORMATION()))
-    {
-    vtkInformation* outInfo = outputVector->GetInformationObject(0);
+  //if(request->Has(vtkDemandDrivenPipeline::REQUEST_INFORMATION()))
+  //  {
+    //vtkInformation* outInfo = outputVector->GetInformationObject(0);
     //double* timeArray = uniReader->GetTimeArray();
     //outInfo->Set(vtkStreamingDemandDrivenPipeline::TIME_STEPS(), 
     //             timeArray,
@@ -1678,7 +1678,7 @@ int vtkFlashReader::UpdateMetaData(vtkInformation* request,
     //timeRange[1] = timeArray[num_time_steps-1];
     //outInfo->Set(vtkStreamingDemandDrivenPipeline::TIME_RANGE(), 
     //             timeRange, 2);
-    }
+  //  }
 
   //if (!this->TimeRequestedFromPipeline)
   //  {
@@ -2314,7 +2314,6 @@ int vtkFlashReader::FillOutputPortInformation
 // The map contains zero based global indexes. Chilren from methods return 1 based.
 void vtkFlashReader::GenerateBlockMap()
 {
-  int blockCount = 0;
   this->Internal->ReadMetaData();
 
   this->ToGlobalBlockMap.clear();
