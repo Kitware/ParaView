@@ -58,6 +58,11 @@ public:
   void UnRegisterPrototype(const char* xmlgroup, const char* xmlname);
 
   // Description:
+  // Registers all prototypes from a particular group that have the
+  // "ReaderFactory" hint.
+  void RegisterPrototypes(const char* xmlgroup);
+
+  // Description:
   // Load configuration XML. This adds the prototypes specified in the
   // configuration XML to those already present in the factory. Use Initialize()
   // is start with an empty factory before calling this method if needed. If two
@@ -124,6 +129,10 @@ public:
   static bool CanReadFile(const char* filename, vtkSMProxy* reader);
   static bool CanReadFile(const char* filename, const char* readerxmlgroup,
     const char* readerxmlname, vtkIdType cid);
+
+  // Description:
+  // Returns the number of registered prototypes.
+  unsigned int GetNumberOfRegisteredPrototypes();
 
 //BTX
 protected:

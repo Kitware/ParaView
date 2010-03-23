@@ -21,6 +21,7 @@
 #include "vtkPVXMLParser.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMPropertyHelper.h"
+#include "vtkSMProxyDefinitionIterator.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyManager.h"
 #include "vtkStringList.h"
@@ -252,7 +253,7 @@ bool vtkSMReaderFactory::vtkInternals::vtkValue::CanReadFile(
 }
 
 vtkStandardNewMacro(vtkSMReaderFactory);
-vtkCxxRevisionMacro(vtkSMReaderFactory, "1.3");
+vtkCxxRevisionMacro(vtkSMReaderFactory, "1.4");
 //----------------------------------------------------------------------------
 vtkSMReaderFactory::vtkSMReaderFactory()
 {
@@ -276,6 +277,31 @@ vtkSMReaderFactory::~vtkSMReaderFactory()
 void vtkSMReaderFactory::Initialize()
 {
   this->Internals->Prototypes.clear();
+}
+
+//----------------------------------------------------------------------------
+void vtkSMReaderFactory::RegisterPrototypes(const char* xmlgroup)
+{
+  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+  vtkSMProxyDefinitionIterator* iter = vtkSMProxyDefinitionIterator::New();
+  iter->SetModeToOneGroup();
+  for (iter->Begin(xmlgroup); !iter->IsAtEnd(); iter->Next())
+    {
+    vtkPVXMLElement* hints = pxm->GetProxyHints(iter->GetGroup(),
+      iter->GetKey());
+    if (hints &&
+        hints->FindNestedElementByName("ReaderFactory"))
+      {
+      this->RegisterPrototype(iter->GetGroup(), iter->GetKey());
+      }
+    }
+  iter->Delete();
+}
+
+//----------------------------------------------------------------------------
+unsigned int vtkSMReaderFactory::GetNumberOfRegisteredPrototypes()
+{
+  return static_cast<unsigned int>(this->Internals->Prototypes.size());
 }
 
 //----------------------------------------------------------------------------

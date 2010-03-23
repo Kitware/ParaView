@@ -97,6 +97,24 @@ def CreateComparativeXYPlotView():
 def CreateComparativeBarChartView():
     return _create_view("ComparativeBarChartView")
 
+def OpenDataFile(filename, **extraArgs):
+    """Creates a reader to read the give file, if possible.
+       This uses extension matching to determine the best reader possible.
+       If a reader cannot be identified, then this returns None."""
+    reader_factor = servermanager.ProxyManager().GetReaderFactory()
+    if  reader_factor.GetNumberOfRegisteredPrototypes() == 0:
+      reader_factor.RegisterPrototypes("sources")
+    cid = servermanager.ActiveConnection.ID
+    if not reader_factor.TestFileReadability(filename, cid):
+        raise RuntimeError, "File not readable: %s " % filename
+    if not reader_factor.CanReadFile(filename, cid):
+        raise RuntimeError, "File not readable. No reader found for '%s' " % filename
+    prototype = servermanager.ProxyManager().GetPrototypeProxy(
+      reader_factor.GetReaderGroup(), reader_factor.GetReaderName())
+    xml_name = paraview.make_name_valid(prototype.GetXMLLabel())
+    reader = globals()[xml_name](FileName=filename, **extraArgs)
+    return reader
+
 def GetRenderView():
     "Returns the active view if there is one. Else creates and returns a new view."
     view = active_objects.view
