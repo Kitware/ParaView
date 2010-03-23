@@ -1994,8 +1994,8 @@
        short_help="Read a VTK data file containing a hierarchical box dataset."
        long_help="Read a VTK XML-based data file containing a hierarchical dataset containing vtkUniformGrids.">
        The XML Hierarchical Box Data reader reads VTK's XML-based file format
-       containing a vtkHierarchicalBoxDataSet. The expected file extensions are
-       .vtm and .vthd.
+       containing a vtkHierarchicalBoxDataSet. The expected file extensions is
+       .vthb.
      </Documentation>
 
      <SubProxy>
@@ -2038,7 +2038,7 @@
      </DoubleVectorProperty>
 
      <Hints>
-      <ReaderFactory extensions="vtm vthb"
+      <ReaderFactory extensions="vthb"
           file_description="VTK Hierarchical Box Data Files" />
      </Hints>
 
