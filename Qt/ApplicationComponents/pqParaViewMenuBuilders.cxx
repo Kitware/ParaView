@@ -197,7 +197,15 @@ void pqParaViewMenuBuilders::buildToolsMenu(QMenu& menu)
   // Add support for importing plugins only if ParaView was built shared.
   new pqManagePluginsReaction(menu.addAction("Manage Plugins") <<
     pqSetName("actionManage_Plugins"));
+#else
+  QAction* action2 = menu.addAction("Manage Plugins");
+  action2->setEnabled(false);
+  action2->setToolTip(
+    "Use BUILD_SHARED:ON while compiling to enable plugin support.");
+  action2->setStatusTip(action2->toolTip());
 #endif
+
+   
   menu.addSeparator();
   //<addaction name="actionToolsDumpWidgetNames" />
   new pqTestingReaction(menu.addAction("Record Test")
