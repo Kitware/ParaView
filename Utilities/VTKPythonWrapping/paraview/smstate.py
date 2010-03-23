@@ -119,7 +119,7 @@ def _trace_state():
     smtrace.start_trace(CaptureAllProperties=True, UseGuiName=True)
 
     # Get proxy lists ordered by group
-    proxy_lists = get_ordered_proxy_lists()
+    proxy_lists = get_proxy_lists_ordered_by_group()
 
     # Now register the proxies with the smtrace module
     for proxy_list in proxy_lists:
