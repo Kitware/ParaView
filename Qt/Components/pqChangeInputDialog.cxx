@@ -261,6 +261,16 @@ void pqChangeInputDialog::inputPortToggled(bool checked)
     index = this->Internals->PipelineModel->getNextIndex(index, root);
     }
 
+  // update selection mode.
+  if (this->Internals->AcceptsMultipleConnections[input_prop_name])
+    {
+    this->Internals->pipelineView->setSelectionMode(pqFlatTreeView::ExtendedSelection);
+    }
+  else
+    {
+    this->Internals->pipelineView->setSelectionMode(pqFlatTreeView::SingleSelection);
+    }
+
   // update current selection.
   this->Internals->BlockSelectionChanged = true;
   QItemSelectionModel* selModel =
@@ -271,16 +281,6 @@ void pqChangeInputDialog::inputPortToggled(bool checked)
     selModel->select(idx, QItemSelectionModel::Select);
     }
   this->Internals->BlockSelectionChanged = false;
-
-  // update selection mode.
-  if (this->Internals->AcceptsMultipleConnections[input_prop_name])
-    {
-    this->Internals->pipelineView->setSelectionMode(pqFlatTreeView::ExtendedSelection);
-    }
-  else
-    {
-    this->Internals->pipelineView->setSelectionMode(pqFlatTreeView::SingleSelection);
-    }
   this->selectionChanged();
 }
 
