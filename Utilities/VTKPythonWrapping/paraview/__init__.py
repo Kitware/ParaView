@@ -35,9 +35,8 @@ class compatibility:
     GetVersion = classmethod(GetVersion)
 
 def make_name_valid(name):
-    """"Make a string into a valid Python variable name.  Return None if
-    the name contains parentheses."""
-    if not name or '(' in name or ')' in name:
+    """"Make a string into a valid Python variable name."""
+    if not name:
         return None
     import string
     valid_chars = "_%s%s" % (string.ascii_letters, string.digits)
