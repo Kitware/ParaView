@@ -88,6 +88,15 @@ def CreateXYPlotView():
 def CreateBarChartView():
     return _create_view("XYBarChartView")
 
+def CreateComparativeRenderView():
+    return _create_view("ComparativeRenderView")
+
+def CreateComparativeXYPlotView():
+    return _create_view("ComparativeXYPlotView")
+ 
+def CreateComparativeBarChartView():
+    return _create_view("ComparativeBarChartView")
+
 def GetRenderView():
     "Returns the active view if there is one. Else creates and returns a new view."
     view = active_objects.view
