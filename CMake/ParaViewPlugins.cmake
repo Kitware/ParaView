@@ -6,11 +6,11 @@ INCLUDE("${VTK_MAKE_INSTANTIATOR}/vtkMakeInstantiator.cmake")
 # This is a macro internal to ParaView and should not be directly used by
 # external applications. This may change in future without notice.
 MACRO(internal_paraview_install_plugin name)
-  IF (PV_INSTALL_LIB_DIR)
+  IF (PV_INSTALL_PLUGIN_DIR)
     INSTALL(TARGETS ${name}
       DESTINATION "${PV_INSTALL_PLUGIN_DIR}"
       COMPONENT Runtime)
-  ENDIF (PV_INSTALL_LIB_DIR)
+  ENDIF (PV_INSTALL_PLUGIN_DIR)
 ENDMACRO(internal_paraview_install_plugin)
 
 # helper PV_PLUGIN_LIST_CONTAINS macro
