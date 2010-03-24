@@ -139,6 +139,11 @@ SET (FFTOverTime_DISABLE_CRS TRUE)
 SET (ColorEditor3_DISABLE_CS TRUE)
 SET (ColorEditor3_DISABLE_CRS TRUE)
 
+# ViewSettingsDialog uses texture background which is currently supported only
+# in local render mode.
+SET (ViewSettingsDialog_DISABLE_CS TRUE)
+SET (ViewSettingsDialog_DISABLE_CRS TRUE)
+
 # Make these tests use reverse connection.
 SET (CutMulti_REVERSE_CONNECT TRUE)
 

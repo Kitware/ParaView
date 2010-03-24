@@ -88,8 +88,8 @@ pqTextureComboBox::pqTextureComboBox(QWidget* _parent):Superclass(_parent)
 {
   this->Internal = new pqInternal();
 
-  QObject::connect(this, SIGNAL(activated(int)), this, SLOT(onActivated(int)),
-    Qt::QueuedConnection);
+  QObject::connect(this, SIGNAL(currentIndexChanged(int)),
+    this, SLOT(onActivated(int)));
 
   pqServerManagerObserver* observer =
     pqApplicationCore::instance()->getServerManagerObserver();
