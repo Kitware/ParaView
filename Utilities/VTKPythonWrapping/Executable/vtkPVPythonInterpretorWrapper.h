@@ -156,6 +156,7 @@ static PyObject* vtkWrite(PyObject* self, PyObject* args)
 
 static PyObject* vtkRead(PyObject* self, PyObject* args)
 {
+  (void)args;
   if(!self || !PyObject_TypeCheck(self, &vtkPVPythonInterpretorWrapperType))
     {
     return 0;

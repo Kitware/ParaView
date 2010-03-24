@@ -27,7 +27,7 @@
 #include "vtkSelection.h"
 
 vtkStandardNewMacro(vtkSMXYChartRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMXYChartRepresentationProxy, "1.12");
+vtkCxxRevisionMacro(vtkSMXYChartRepresentationProxy, "1.13");
 //----------------------------------------------------------------------------
 vtkSMXYChartRepresentationProxy::vtkSMXYChartRepresentationProxy()
 {
@@ -141,7 +141,7 @@ bool vtkSMXYChartRepresentationProxy::AddToView(vtkSMViewProxy* view)
 
   this->ChartViewProxy = chartView;
   this->OptionsProxy->SetChart(chartView->GetChart());
-  this->OptionsProxy->SetTableVisibility(this->Visibility);
+  this->OptionsProxy->SetTableVisibility(this->Visibility != 0);
   return this->Superclass::AddToView(view);
 }
 
@@ -193,7 +193,7 @@ void vtkSMXYChartRepresentationProxy::Update(vtkSMViewProxy* view)
   // in sync with the vtkTable.
   this->OptionsProxy->RefreshPlots();
 
-  this->OptionsProxy->SetTableVisibility(this->Visibility);
+  this->OptionsProxy->SetTableVisibility(this->Visibility != 0);
   this->UpdatePropertyInformation();
 }
 

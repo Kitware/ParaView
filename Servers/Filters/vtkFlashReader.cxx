@@ -64,7 +64,7 @@
 #include <vtkstd/string>
 #include <vtkstd/vector>
 
-vtkCxxRevisionMacro( vtkFlashReader, "1.12" );
+vtkCxxRevisionMacro( vtkFlashReader, "1.13" );
 vtkStandardNewMacro( vtkFlashReader );
 
 // ============================================================================
@@ -1659,8 +1659,8 @@ void vtkFlashReaderInternal::ReadParticleAttributesFLASH3()
 // ----------------------------------------------------------------------------
 
 //-----------------------------------------------------------------------------
-int vtkFlashReader::UpdateMetaData(vtkInformation* request,
-                                   vtkInformationVector* outputVector)
+int vtkFlashReader::UpdateMetaData(vtkInformation* vtkNotUsed(request),
+  vtkInformationVector* vtkNotUsed(outputVector))
 {
   //int* timeStepRange = uniReader->GetTimeStepRange();
   //num_time_steps=timeStepRange[1] + 1;
