@@ -24,7 +24,7 @@
 
 #define NIFTI_HEADER_ARRAY "vtkNIfTIReaderHeaderArray"
 
-vtkCxxRevisionMacro(vtkAnalyzeWriter, "1.1");
+vtkCxxRevisionMacro(vtkAnalyzeWriter, "1.2");
 vtkStandardNewMacro(vtkAnalyzeWriter);
 
 vtkAnalyzeWriter::vtkAnalyzeWriter()
@@ -87,7 +87,7 @@ static int nifti_write_extensions(znzFile fp, nifti_image *nim)
       }
       if( ok ){
          size = vtknifti1_io::nifti_write_buffer(fp, list->edata, list->esize - 8);
-         ok = (size == list->esize - 8);
+         ok = (((int)size) == list->esize - 8);
       }
 
       if( !ok ){
@@ -249,8 +249,8 @@ void vtkAnalyzeWriter::WriteFileHeader(ofstream * vtkNotUsed(file), vtkImageData
     headerUnsignedCharArray = vtkUnsignedCharArray::SafeDownCast(validNiftiDataArray);
   }
 
-  nifti_1_header niftiHeader;
-  unsigned char * headerUnsignedCharArrayPtr = (unsigned char *) &niftiHeader;
+  nifti_1_header tempNiftiHeader;
+  unsigned char * headerUnsignedCharArrayPtr = (unsigned char *) &tempNiftiHeader;
   int count;
 
   //this->headerUnsignedCharArrayPtr = new unsigned char[this->headerSize];
@@ -261,12 +261,12 @@ void vtkAnalyzeWriter::WriteFileHeader(ofstream * vtkNotUsed(file), vtkImageData
     for(count=0;count<headerSize;count++){
      headerUnsignedCharArrayPtr[count] = headerUnsignedCharArray->GetValue(count);
     }
-      m_NiftiImage = vtknifti1_io::nifti_convert_nhdr2nim(niftiHeader, HeaderFileName.c_str());
+      m_NiftiImage = vtknifti1_io::nifti_convert_nhdr2nim(tempNiftiHeader, HeaderFileName.c_str());
   } else if(foundNiftiHeader){
     for(count=0;count<headerSize;count++){
      headerUnsignedCharArrayPtr[count] = headerUnsignedCharArray->GetValue(count);
     }
-      m_NiftiImage = vtknifti1_io::nifti_convert_nhdr2nim(niftiHeader, HeaderFileName.c_str());
+      m_NiftiImage = vtknifti1_io::nifti_convert_nhdr2nim(tempNiftiHeader, HeaderFileName.c_str());
 
       int qform_code = m_NiftiImage->qform_code;
       int sform_code = m_NiftiImage->sform_code;
@@ -277,7 +277,7 @@ void vtkAnalyzeWriter::WriteFileHeader(ofstream * vtkNotUsed(file), vtkImageData
 
     q = new double*[4];
     s = new double*[4];
-    int count;
+
     for(count=0;count<4;count++){
     q[count] = new double[4];
     s[count] = new double[4];
@@ -458,7 +458,7 @@ void vtkAnalyzeWriter::WriteFileHeader(ofstream * vtkNotUsed(file), vtkImageData
     for(count=orientPosition;count<headerSize;count++){
      headerUnsignedCharArrayPtr[count] = 0;
     }
-      m_NiftiImage = vtknifti1_io::nifti_convert_nhdr2nim(niftiHeader, HeaderFileName.c_str());
+      m_NiftiImage = vtknifti1_io::nifti_convert_nhdr2nim(tempNiftiHeader, HeaderFileName.c_str());
 
   } else {
     for(count=0;count<headerSize;count++){
@@ -696,7 +696,7 @@ void vtkAnalyzeWriter::WriteFile(ofstream * vtkNotUsed(file), vtkImageData *data
 
 // reorient data
   unsigned char * outUnsignedCharPtr = (unsigned char *) p;
-  int scalarSize = dataTypeSize;
+  int scalarSize = (int) dataTypeSize;
   int inIndex[3];
   int inDim[3];
   int outDim[3];
@@ -945,7 +945,6 @@ void vtkAnalyzeWriter::WriteFile(ofstream * vtkNotUsed(file), vtkImageData *data
     int outOffsetByte;
     unsigned char tempByteValue = 0;
     unsigned char tempBitValue = 0;
-    int outSliceOffset;
     int outBitNumber = 0;
     int outTotalBitNumber = 0;
 

@@ -49,7 +49,7 @@ vtkznzlib.cxx (zipped or non-zipped library)
    use_compression==0 is no compression
    use_compression!=0 uses zlib (gzip) compression
 */
-vtkCxxRevisionMacro(vtkznzlib, "1.1");
+vtkCxxRevisionMacro(vtkznzlib, "1.2");
 vtkStandardNewMacro(vtkznzlib);
 
 vtkznzlib::vtkznzlib()
@@ -68,7 +68,7 @@ void vtkznzlib::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os,indent);
 }
 
-znzFile vtkznzlib::znzopen(const char *path, const char *mode, int use_compression)
+znzFile vtkznzlib::znzopen(const char *path, const char *mode, int vtkNotUsed(use_compression))
 {
   znzFile file;
   file = (znzFile) calloc(1,sizeof(struct znzptr));
@@ -105,7 +105,7 @@ znzFile vtkznzlib::znzopen(const char *path, const char *mode, int use_compressi
 }
 
 
-znzFile vtkznzlib::znzdopen(int fd, const char *mode, int use_compression)
+znzFile vtkznzlib::znzdopen(int vtkNotUsed(fd), const char * vtkNotUsed(mode), int vtkNotUsed(use_compression))
 {
   znzFile file;
   file = (znzFile) calloc(1,sizeof(struct znzptr));

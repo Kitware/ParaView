@@ -24,7 +24,7 @@
 
 #define ANALYZE_HEADER_ARRAY "vtkAnalyzeReaderHeaderArray"
 
-vtkCxxRevisionMacro(vtkNIfTIWriter, "1.1");
+vtkCxxRevisionMacro(vtkNIfTIWriter, "1.2");
 vtkStandardNewMacro(vtkNIfTIWriter);
 
 vtkNIfTIWriter::vtkNIfTIWriter()
@@ -100,7 +100,7 @@ static int nifti_write_extensions(znzFile fp, nifti_image *nim)
       }
       if( ok ){
          size = vtknifti1_io::nifti_write_buffer(fp, list->edata, list->esize - 8);
-         ok = (size == list->esize - 8);
+         ok = (((int) size) == list->esize - 8);
       }
 
       if( !ok ){
@@ -534,7 +534,7 @@ void vtkNIfTIWriter::WriteFile(ofstream * vtkNotUsed(file), vtkImageData *data,
 
    // reorient data
   unsigned char * outUnsignedCharPtr = (unsigned char *) p;
-  int scalarSize = dataTypeSize;
+  int scalarSize = (int) dataTypeSize;
   int inIndex[3];
   int inDim[3];
   int outDim[3];

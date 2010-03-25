@@ -29,7 +29,7 @@
 #include "vtkBitArray.h"
 #include "vtkDataArray.h"
 
-vtkCxxRevisionMacro(vtkAnalyzeReader, "1.1");
+vtkCxxRevisionMacro(vtkAnalyzeReader, "1.2");
 vtkStandardNewMacro(vtkAnalyzeReader);
 
 
@@ -354,7 +354,7 @@ Note: Index0 is fastest-varying (innermost-nested) index, Index2 the outermost.
   //this->DataOrigin[2] = -128.5;
 
   imageSizeInBytes = (int) (numElts * dataTypeSize);
-  if (type = DT_BINARY){
+  if (type == DT_BINARY){
      double tempSize = numElts / m_NiftiImage->nz;
    double tempSliceSize = tempSize * dataTypeSize;
      int tempSliceSizeInt = (int) tempSliceSize;
@@ -523,8 +523,8 @@ void vtkAnalyzeReader::vtkAnalyzeReaderUpdateVTKBit(vtkImageData * vtkNotUsed(da
 
   // read image in
   //::gzread( file_p, p, self->getImageSizeInBytes());
-  int analyzeHeaderSize = 0;
-  ::gzseek( file_p, analyzeHeaderSize, SEEK_SET );
+  int tempAnalyzeHeaderSize = 0;
+  ::gzseek( file_p, tempAnalyzeHeaderSize, SEEK_SET );
   ::gzread( file_p, p, onDiskImageSizeInBytes);
   
   gzclose( file_p );
@@ -725,7 +725,7 @@ hist.orient    Mayo name          Voxel[Index0, Index1, Index2]    NIfTI (2004-4
 Note: Index0 is fastest-varying (innermost-nested) index, Index2 the outermost.
 2004-04-15: NIfTI's interpretation of "sagittal flipped" looks off to me. See further notes below.
   */
-  int scalarSize = dataTypeSize;
+  int scalarSize = (int) dataTypeSize;
   int inIndex[3];
   int inDim[3];
   int outDim[3];

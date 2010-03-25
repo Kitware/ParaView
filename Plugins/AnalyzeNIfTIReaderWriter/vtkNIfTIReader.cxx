@@ -27,7 +27,7 @@
 #include "vtkznzlib.h"
 #include "vtk_zlib.h"
 
-vtkCxxRevisionMacro(vtkNIfTIReader, "1.1");
+vtkCxxRevisionMacro(vtkNIfTIReader, "1.2");
 vtkStandardNewMacro(vtkNIfTIReader);
 
 
@@ -200,8 +200,8 @@ void vtkNIfTIReader::ExecuteInformation()
   dataTypeSize = 1.0;
   unsigned int numComponents = 1;
   int m_ComponentType;
-  nifti_1_header niftiHeader;
-  unsigned char * niftiHeaderUnsignedCharArrayPtr = (unsigned char *) &niftiHeader;
+  nifti_1_header tempNiftiHeader;
+  unsigned char * niftiHeaderUnsignedCharArrayPtr = (unsigned char *) &tempNiftiHeader;
 
   this->niftiHeaderUnsignedCharArray = new unsigned char[this->niftiHeaderSize];
   
@@ -212,7 +212,7 @@ void vtkNIfTIReader::ExecuteInformation()
   return;
     }
 
-   niftiHeader = vtknifti1_io::nifti_convert_nim2nhdr(m_NiftiImage);
+   tempNiftiHeader = vtknifti1_io::nifti_convert_nim2nhdr(m_NiftiImage);
 
    int count;
 
@@ -644,7 +644,7 @@ void vtkNIfTIReader::ExecuteData(vtkDataObject *output)
   // Call the correct templated function for the input
   outPtr = data->GetScalarPointer();
   nifti_1_header * niftiPointer = (nifti_1_header *) niftiHeaderUnsignedCharArray;
-  offset = niftiPointer->vox_offset;
+  offset = (long) (niftiPointer->vox_offset);
   switch (data->GetScalarType())
     {
     vtkTemplateMacro(
@@ -673,7 +673,7 @@ void vtkNIfTIReader::ExecuteData(vtkDataObject *output)
   double outOrigin[3];
   double inExtent[6];
   double outExtent[6];
-  int scalarSize = dataTypeSize;
+  int scalarSize = (int) dataTypeSize;
   
   int InPlaceFilteredAxes[3];
   long inOffset;
@@ -867,10 +867,10 @@ void vtkNIfTIReader::ExecuteData(vtkDataObject *output)
 
   for (count=0;count<3;count++){
     this->DataIncrements[count]   = outIncrements[count];
-  this->DataSpacing[count]      = outSpacing[count];
-  this->DataExtent[count*2]     = outExtent[count*2];
-  this->DataExtent[(count*2)+1] = outExtent[(count*2)+1];
-  this->DataOrigin[count]       = outOrigin[count];
+    this->DataSpacing[count]      = outSpacing[count];
+    this->DataExtent[count*2]     = (int) (outExtent[count*2]);
+    this->DataExtent[(count*2)+1] = (int) (outExtent[(count*2)+1]);
+    this->DataOrigin[count]       = outOrigin[count];
  }
 
   unsigned char* tempUnsignedCharData = NULL;

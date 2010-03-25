@@ -396,7 +396,7 @@ static const nifti_type_ele nifti_type_list[] = {
 
 
 
-vtkCxxRevisionMacro(vtknifti1_io, "1.1");
+vtkCxxRevisionMacro(vtknifti1_io, "1.2");
 vtkStandardNewMacro(vtknifti1_io);
 
 vtknifti1_io::vtknifti1_io()
@@ -2533,7 +2533,9 @@ const char * vtknifti1_io::nifti_find_file_extension( const char * name )
    char   exthdr[8] = ".hdr";   /* (leave space for .gz) */
    char   extimg[8] = ".img";
    char   extnia[8] = ".nia";
+#ifdef HAVE_ZLIB
    char   extgz[4]  = ".gz";
+#endif
    char * elist[4]  = { NULL, NULL, NULL, NULL};
 
    /* stupid compiler... */
@@ -2866,7 +2868,7 @@ char * vtknifti1_io::nifti_findimgname(const char* fname , int nifti_type)
    \sa nifti_set_filenames
 *//*-------------------------------------------------------------------*/
 char * vtknifti1_io::nifti_makehdrname(const char * prefix, int nifti_type, int check,
-                         int comp)
+                         int vtkNotUsed(comp))
 {
    char * iname;
    const char * ext;
@@ -2936,7 +2938,7 @@ char * vtknifti1_io::nifti_makehdrname(const char * prefix, int nifti_type, int 
    \sa nifti_set_filenames
 *//*-------------------------------------------------------------------*/
 char * vtknifti1_io::nifti_makeimgname(const char * prefix, int nifti_type, int check,
-                         int comp)
+                         int vtkNotUsed(comp))
 {
    char * iname;
    const char * ext;
@@ -4888,7 +4890,7 @@ size_t vtknifti1_io::nifti_read_buffer(znzFile fp, void* dataptr, size_t ntot,
   if( dataptr == NULL ){
      if( g_opts.debug > 0 )
         fprintf(stderr,"** ERROR: nifti_read_buffer: NULL dataptr\n");
-     return -1;
+     return ((size_t)-1);
   }
 
   ii = vtkznzlib::znzread( dataptr , 1 , ntot , fp ) ;             /* data input */
@@ -4903,7 +4905,7 @@ size_t vtknifti1_io::nifti_read_buffer(znzFile fp, void* dataptr, size_t ntot,
                nim->iname , (unsigned int)ntot ,
                (unsigned int)ii , (unsigned int)(ntot-ii) ) ;
     /* memset( (char *)(dataptr)+ii , 0 , ntot-ii ) ;  now failure [rickr] */
-    return -1 ;
+    return ((size_t)-1) ;
   }
 
   if( g_opts.debug > 2 )
