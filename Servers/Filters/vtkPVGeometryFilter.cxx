@@ -60,7 +60,7 @@
 #include <vtkstd/string>
 #include <assert.h>
 
-vtkCxxRevisionMacro(vtkPVGeometryFilter, "1.103");
+vtkCxxRevisionMacro(vtkPVGeometryFilter, "1.104");
 vtkStandardNewMacro(vtkPVGeometryFilter);
 
 vtkCxxSetObjectMacro(vtkPVGeometryFilter, Controller, vtkMultiProcessController);
@@ -382,6 +382,36 @@ int vtkPVGeometryFilter::RequestInformation(
   outInfo->Set(vtkStreamingDemandDrivenPipeline::MAXIMUM_NUMBER_OF_PIECES(), -1);
 
   return 1;
+}
+
+//----------------------------------------------------------------------------
+int vtkPVGeometryFilter::RequestUpdateExtent(vtkInformation* request,
+  vtkInformationVector** inputVector,
+  vtkInformationVector* outputVector)
+{
+  vtkUnstructuredGrid* ug_input =
+    vtkUnstructuredGrid::GetData(inputVector[0], 0);
+  vtkCompositeDataSet* cd_input =
+    vtkCompositeDataSet::GetData(inputVector[0], 0);
+  if (ug_input || cd_input)
+    {
+    vtkInformation *inInfo = inputVector[0]->GetInformationObject(0);
+    vtkInformation *outInfo = outputVector->GetInformationObject(0);
+    int numPieces, ghostLevels;
+    numPieces =
+      outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_PIECES());
+    ghostLevels =
+      outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_GHOST_LEVELS());
+    if (numPieces > 1)
+      {
+      ++ghostLevels;
+      }
+    inInfo->Set(vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_GHOST_LEVELS(),
+      ghostLevels);
+    }
+
+  return this->Superclass::RequestUpdateExtent(request, inputVector,
+    outputVector);
 }
 
 //----------------------------------------------------------------------------

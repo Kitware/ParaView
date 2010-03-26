@@ -180,6 +180,14 @@ protected:
 
   virtual void ReportReferences(vtkGarbageCollector*);
 
+  // Description:
+  // Overridden to request ghost-cells for vtkUnstructuredGrid inputs so that we
+  // don't generate internal surfaces.
+  virtual int RequestUpdateExtent(vtkInformation*,
+                                  vtkInformationVector**,
+                                  vtkInformationVector*);
+
+
   // Convenience method to purge ghost cells.
   void RemoveGhostCells(vtkPolyData*);
 
