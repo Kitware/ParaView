@@ -29,7 +29,7 @@
 #include "vtkUnsignedCharArray.h"
 #include "vtkMarchingCubesCases.h"
 
-vtkCxxRevisionMacro(vtkFlashContour, "1.3");
+vtkCxxRevisionMacro(vtkFlashContour, "1.4");
 vtkStandardNewMacro(vtkFlashContour);
 
 
@@ -321,7 +321,15 @@ int vtkFlashContour::RequestData(
   if (this->PassAttribute && mbdsInput->GetNumberOfBlocks() > 0)
     {
     // Find the array we are supposed to pass.
-    vtkImageData* block = vtkImageData::SafeDownCast(mbdsInput->GetBlock(0));
+    // pain empty blocks.
+    int blockId = 0;
+    int numBlocks = mbdsInput->GetNumberOfBlocks();
+    vtkImageData* block = 0;
+    while (block == 0 && blockId < numBlocks)
+      {
+      block = vtkImageData::SafeDownCast(mbdsInput->GetBlock(blockId));
+      ++blockId;
+      }
     if (block)
       {
       da = block->GetCellData()->GetArray(this->PassAttribute);

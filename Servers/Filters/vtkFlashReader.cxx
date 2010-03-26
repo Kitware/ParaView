@@ -64,7 +64,7 @@
 #include <vtkstd/string>
 #include <vtkstd/vector>
 
-vtkCxxRevisionMacro( vtkFlashReader, "1.13" );
+vtkCxxRevisionMacro( vtkFlashReader, "1.14" );
 vtkStandardNewMacro( vtkFlashReader );
 
 // ============================================================================
@@ -1754,6 +1754,7 @@ void vtkFlashReader::SelectionModifiedCallback(vtkObject*, unsigned long,
 //-----------------------------------------------------------------------------
 vtkFlashReader::vtkFlashReader()
 {
+  this->NumberOfRoots = 1;
   this->MergeXYZComponents = 1;
 
   this->CellDataArraySelection = vtkDataArraySelection::New();
@@ -2316,15 +2317,30 @@ void vtkFlashReader::GenerateBlockMap()
 {
   this->Internal->ReadMetaData();
 
+  // Choose which roots will be loaded on this process.
+  int numProcs = 1;
+  this->MyProcessId = 0;
+  vtkMultiProcessController* controller = vtkMultiProcessController::GetGlobalController();
+  if (controller)
+    {
+    numProcs = controller->GetNumberOfProcesses();
+    this->MyProcessId = controller->GetLocalProcessId();
+    }
+ 
   this->ToGlobalBlockMap.clear();
   this->BlockRank.clear();
-  // Add all of the roots.
+  this->BlockProcess.clear();
+  // Add the selected roots.
   int numGlobalBlocks = this->Internal->NumberOfBlocks;
+  int root = 0;
   for (int i = 0; i < numGlobalBlocks; ++i)
     {
     if (this->GetBlockLevel(i) == 1)
       {
       this->AddBlockToMap(i);
+      // Set the process for this root.
+      this->BlockProcess.push_back(root * numProcs / this->NumberOfRoots);
+      ++root;
       }
     }
   
@@ -2348,14 +2364,17 @@ void vtkFlashReader::GenerateBlockMap()
       }
     // Now we have the highest ranked block.  Refine it.
     int blockId = this->ToGlobalBlockMap[bestIdx];
+    int process = this->BlockProcess[bestIdx]; // Child inherits process.
     // Remove the parent from the list so it will not be loaded.
     this->ToGlobalBlockMap.erase(this->ToGlobalBlockMap.begin()+bestIdx);
     this->BlockRank.erase(this->BlockRank.begin()+bestIdx);
+    this->BlockProcess.erase(this->BlockProcess.begin()+bestIdx);
     // Add the children of the best block.
     int* children = this->Internal->Blocks[blockId].ChildrenIds;
     for (int j = 0; j < 8; ++j)
       {
       this->AddBlockToMap(children[j]-1);
+      this->BlockProcess.push_back(process);
       }
     }
 }      
@@ -2424,7 +2443,7 @@ int vtkFlashReader::RequestData( vtkInformation * vtkNotUsed( request ),
   
   this->Internal->ReadMetaData();
   this->GenerateBlockMap();
-
+  
   // Save meta data from all blocks and a map from global to loaded ids.  
   // I am saving global ids because I do not want to require that all ancestors
   // of leaves have to be loaded.  However, I need ancestor meta data to traverse
@@ -2484,7 +2503,7 @@ int vtkFlashReader::RequestData( vtkInformation * vtkNotUsed( request ),
     int globalId = this->ToGlobalBlockMap[j];
     globalToLocalMapArray->SetValue(globalId,j);
     localToGlobalMapArray->InsertNextValue(globalId);
-    // parent blocks not loaded will be marked with -1
+    // blocks not loaded because they are ancestors will be marked with -1
     while (globalId != 0) // root
       {
       globalId = parentArray->GetValue(globalId) - 1;
@@ -2519,6 +2538,7 @@ void vtkFlashReader::GetBlock( int blockMapIdx, vtkMultiBlockDataSet * multiBlk 
 {
   this->Internal->ReadMetaData();
   int blockIdx = this->ToGlobalBlockMap[blockMapIdx];
+  bool processOwns = (this->MyProcessId == this->BlockProcess[blockMapIdx]);
   
   if ( multiBlk == NULL || blockIdx < 0 || 
        blockIdx >= this->Internal->NumberOfBlocks )
@@ -2532,17 +2552,20 @@ void vtkFlashReader::GetBlock( int blockMapIdx, vtkMultiBlockDataSet * multiBlk 
   vtkImageData       * imagData = NULL;
   vtkRectilinearGrid * rectGrid = NULL;
   
-  if ( this->BlockOutputType == 0 ) // take each block as a vtkImageData
+  if (processOwns)
     {
-    imagData = vtkImageData::New();
-    pDataSet = imagData;
-    bSuccess = this->GetBlock( blockIdx, imagData );
-    }
-  else                              // take each clock as a vtkRectilinearGrid
-    {
-    rectGrid = vtkRectilinearGrid::New();
-    pDataSet = rectGrid;
-    bSuccess = this->GetBlock( blockIdx, rectGrid );
+    if ( this->BlockOutputType == 0 ) // take each block as a vtkImageData
+      {
+      imagData = vtkImageData::New();
+      pDataSet = imagData;
+      bSuccess = this->GetBlock( blockIdx, imagData );
+      }
+    else                              // take each clock as a vtkRectilinearGrid
+      {
+      rectGrid = vtkRectilinearGrid::New();
+      pDataSet = rectGrid;
+      bSuccess = this->GetBlock( blockIdx, rectGrid );
+      }
     }
   
   if (  bSuccess == 1  )
@@ -3723,4 +3746,45 @@ void vtkFlashReader::SetMergeXYZComponents(int merge)
     }
   this->MergeXYZComponents = merge;
   this->Modified();
+}
+
+
+//-----------------------------------------------------------------------------
+// Count the number of roots for parallelism.
+// Add the available atrributes to information.
+int vtkFlashReader::RequestInformation(vtkInformation *request,
+                                         vtkInformationVector **inputVector,
+                                         vtkInformationVector *outputVector)
+{
+  if(!this->Superclass::RequestInformation(request,inputVector,outputVector))
+    {
+    return 0;
+    }
+  // I copied this from the SpyPlot reader. It should not be necessary.
+  //struct stat fs;
+  //if(stat(this->FileName,&fs)!=0)
+  //  {
+  //  vtkErrorMacro("Cannot find file " << this->FileName);
+  //  return 0;
+  //  }
+
+  // Count the roots.
+  this->NumberOfRoots = 0;
+  this->Internal->ReadMetaData();
+  int numGlobalBlocks = this->Internal->NumberOfBlocks;
+  for (int i = 0; i < numGlobalBlocks; ++i)
+    {
+    if (this->GetBlockLevel(i) == 1)
+      {
+      ++this->NumberOfRoots;
+      }
+    }
+  vtkInformation *info=outputVector->GetInformationObject(0);
+  info->Set(vtkStreamingDemandDrivenPipeline::MAXIMUM_NUMBER_OF_PIECES(),this->NumberOfRoots);
+
+  // Superclass must call this  I do not know how the CellDataArraySelection gets filled out.
+  // It works for selecitng arrays from the Paraview Gui so ....
+  // I cannot call it here because CellDataArraySelection is empty and crashes.
+  //return this->UpdateMetaData(request, outputVector);
+  return -1;
 }

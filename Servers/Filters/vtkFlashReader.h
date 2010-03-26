@@ -454,6 +454,10 @@ protected:
   virtual int    FillOutputPortInformation( int port, vtkInformation * info );
   int            RequestData( vtkInformation *,
                               vtkInformationVector **, vtkInformationVector * );
+  int            RequestInformation(vtkInformation *request,
+                                    vtkInformationVector **inputVector,
+                                    vtkInformationVector *outputVector);
+  
   
   char *         FileName;
   static int     NumberOfInstances;
@@ -466,10 +470,18 @@ protected:
 //BTX
   vtkstd::vector<int>    ToGlobalBlockMap;
   vtkstd::vector<double> BlockRank;
+  // Every process to have the same blocks.  They may be empty but they have to be the same.
+  // Keep track of whichprocess will actually load the block.
+  vtkstd::vector<int>    BlockProcess;
 //ETX
   virtual void GenerateBlockMap();
   void AddBlockToMap(int globalId);
-
+  
+  // Files are split up between processes as whole trees.
+  // Keep track of the number of roots so we know how to 
+  // assigne the trees.  This is set in the RequestInformation method.
+  int NumberOfRoots;
+  int MyProcessId;
                             
 private:
 
