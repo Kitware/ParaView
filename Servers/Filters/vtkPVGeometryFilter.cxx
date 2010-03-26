@@ -60,7 +60,7 @@
 #include <vtkstd/string>
 #include <assert.h>
 
-vtkCxxRevisionMacro(vtkPVGeometryFilter, "1.104");
+vtkCxxRevisionMacro(vtkPVGeometryFilter, "1.105");
 vtkStandardNewMacro(vtkPVGeometryFilter);
 
 vtkCxxSetObjectMacro(vtkPVGeometryFilter, Controller, vtkMultiProcessController);
@@ -389,6 +389,7 @@ int vtkPVGeometryFilter::RequestUpdateExtent(vtkInformation* request,
   vtkInformationVector** inputVector,
   vtkInformationVector* outputVector)
 {
+  /* 
   vtkUnstructuredGrid* ug_input =
     vtkUnstructuredGrid::GetData(inputVector[0], 0);
   vtkCompositeDataSet* cd_input =
@@ -410,6 +411,7 @@ int vtkPVGeometryFilter::RequestUpdateExtent(vtkInformation* request,
       ghostLevels);
     }
 
+  */
   return this->Superclass::RequestUpdateExtent(request, inputVector,
     outputVector);
 }
