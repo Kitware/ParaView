@@ -1362,7 +1362,7 @@ bool pqSierraPlotToolsManager::createPlotOverTime()
   pqPipelineSource * plotFilter = NULL;
   QStringList::const_iterator constIter;
   //bool checkState = this->Internal->plotGUI->getUseParaViewGUIToSelectNodesCheckBoxState();
-#pragma message (__FILE__ "[" STRING(__LINE__) "]: pqSierraPlotToolsManager::createPlotOverTime: NOTE: Not currently handing plotGUI->getUseParaViewGUIToSelectNodesCheckBoxState()")
+  //#pragma message (__FILE__ "[" STRING(__LINE__) "]: pqSierraPlotToolsManager::createPlotOverTime: NOTE: Not currently handing plotGUI->getUseParaViewGUIToSelectNodesCheckBoxState()")
 
   //
   // This section of code first toggles all the variables off for this plotter, then...
