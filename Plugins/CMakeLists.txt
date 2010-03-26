@@ -53,4 +53,4 @@ paraview_build_optional_plugin(H5PartReader "Reader for *.h5part files" H5PartRe
 IF(PARAVIEW_BUILD_QT_GUI)
   paraview_build_optional_plugin(CoProcessingScriptGenerator "Plugin for creating python coprocessing scripts" CoProcessingScriptGenerator OFF)
 ENDIF(PARAVIEW_BUILD_QT_GUI)
-paraview_build_optional_plugin(AnalyzeNIfTIReaderWriter "Reader/Writer for Analyyze and NIfTI." AnalyzeNIfTIReaderWriter ON)
+paraview_build_optional_plugin(AnalyzeNIfTIReaderWriter "Reader/Writer for Analyze and NIfTI." AnalyzeNIfTIReaderWriter ON)
