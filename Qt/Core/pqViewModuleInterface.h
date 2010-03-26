@@ -62,16 +62,19 @@ public:
 
   /// Returns true if this can create a view of a given name
   /// The name corresponds to the Server Manager XML Hint such as
+  /// @verbatim
   /// <SourceProxy name="MyCustomFilter" class="vtkMyCustomFilter">
   ///  ...
   ///  <Hints>
   ///   <View type="MyCustom" />
   ///  </Hints>
   /// </SourceProxy>
+  /// @endverbatim
   virtual bool canCreateView(const QString& viewtype) const = 0;
   
   /// Creates the Server Manager view module
   /// For example:
+  /// @verbatim
   /// <ProxyGroup name="plotmodules">
   ///  <ViewModuleProxy name="MyCustomViewModule">
   ///    base_proxygroup="rendermodules"
@@ -79,6 +82,7 @@ public:
   ///    display_name="MyCustomViewDisplay"
   ///  </ViewModuleProxy>
   /// </ProxyGroup>
+  /// @endverbatim
   ///
   /// implement this to call 
   /// vtkSMProxyManager::NewProxy("plotmodules", "MyCustomViewModule")
