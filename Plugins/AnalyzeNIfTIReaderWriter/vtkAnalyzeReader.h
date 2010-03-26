@@ -76,7 +76,7 @@ private:
   unsigned int imageSizeInBytes;
   unsigned int orientation;
   double dataTypeSize;
-  unsigned int type;
+  unsigned int Type;
   int width;
   int height;
   int depth;

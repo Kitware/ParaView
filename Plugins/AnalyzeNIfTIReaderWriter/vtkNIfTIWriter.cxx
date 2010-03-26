@@ -24,7 +24,7 @@
 
 #define ANALYZE_HEADER_ARRAY "vtkAnalyzeReaderHeaderArray"
 
-vtkCxxRevisionMacro(vtkNIfTIWriter, "1.2");
+vtkCxxRevisionMacro(vtkNIfTIWriter, "1.3");
 vtkStandardNewMacro(vtkNIfTIWriter);
 
 vtkNIfTIWriter::vtkNIfTIWriter()
@@ -224,7 +224,7 @@ void vtkNIfTIWriter::WriteFileHeader(ofstream * vtkNotUsed(file), vtkImageData *
   }
 
   vtkDataArray * validNiftiDataArray = fa->GetArray(NIFTI_HEADER_ARRAY);
-  vtkUnsignedCharArray *headerUnsignedCharArray;
+  vtkUnsignedCharArray *headerUnsignedCharArray = NULL;
   foundNiftiHeader = true;
   foundAnalayzeHeader = false;
   if (!validNiftiDataArray)

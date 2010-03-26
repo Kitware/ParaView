@@ -29,7 +29,7 @@
 #include "vtkBitArray.h"
 #include "vtkDataArray.h"
 
-vtkCxxRevisionMacro(vtkAnalyzeReader, "1.2");
+vtkCxxRevisionMacro(vtkAnalyzeReader, "1.3");
 vtkStandardNewMacro(vtkAnalyzeReader);
 
 
@@ -175,9 +175,9 @@ void vtkAnalyzeReader::ExecuteInformation()
   return;
     }
 
-  type = m_NiftiImage->datatype;
+  Type = m_NiftiImage->datatype;
 
-  if(type==DT_BINARY){
+  if(Type==DT_BINARY){
 
      int alignmentSize  = 8;
 
@@ -285,7 +285,7 @@ Note: Index0 is fastest-varying (innermost-nested) index, Index2 the outermost.
     }
 
 
-    switch( type )
+    switch( Type )
     {
     case DT_BINARY:
       m_ComponentType = VTK_BIT;
@@ -354,7 +354,7 @@ Note: Index0 is fastest-varying (innermost-nested) index, Index2 the outermost.
   //this->DataOrigin[2] = -128.5;
 
   imageSizeInBytes = (int) (numElts * dataTypeSize);
-  if (type == DT_BINARY){
+  if (Type == DT_BINARY){
      double tempSize = numElts / m_NiftiImage->nz;
    double tempSliceSize = tempSize * dataTypeSize;
      int tempSliceSizeInt = (int) tempSliceSize;
@@ -816,7 +816,7 @@ Note: Index0 is fastest-varying (innermost-nested) index, Index2 the outermost.
 
   tempUnsignedCharData = new unsigned char[outDim[0]*outDim[1]*outDim[2]*scalarSize];
   double tempSizeDouble;
-  int tempSizeInt;
+  int tempSizeInt = 0;
   if(tempScalarTypeValue==1){
   tempSizeDouble = outDim[0]*outDim[1]*outDim[2]*dataTypeSize;
   tempSizeInt = (int) tempSizeDouble;

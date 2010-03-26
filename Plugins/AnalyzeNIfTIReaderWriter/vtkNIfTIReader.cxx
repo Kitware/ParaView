@@ -27,7 +27,7 @@
 #include "vtkznzlib.h"
 #include "vtk_zlib.h"
 
-vtkCxxRevisionMacro(vtkNIfTIReader, "1.2");
+vtkCxxRevisionMacro(vtkNIfTIReader, "1.3");
 vtkStandardNewMacro(vtkNIfTIReader);
 
 
@@ -244,9 +244,9 @@ void vtkNIfTIReader::ExecuteInformation()
       numElts = 0;
     }
 
-    type = m_NiftiImage->datatype;
+    Type = m_NiftiImage->datatype;
 
-    switch(type)
+    switch(Type)
     {
     case DT_BINARY:
       m_ComponentType = VTK_BIT;

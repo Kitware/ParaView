@@ -72,7 +72,7 @@ private:
 
   unsigned int numberOfDimensions;
   unsigned int imageSizeInBytes;
-  unsigned int type;
+  unsigned int Type;
   int width;
   int height;
   int depth;
