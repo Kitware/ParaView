@@ -51,15 +51,14 @@
 // @endverbatim
 // The GeometryFileNamePattern and FieldFileNamePattern elements have
 // three attributes:
-// @verbatim
-// 1. pattern: This is the pattern used to get the Phasta filenames.
+// \li pattern: This is the pattern used to get the Phasta filenames.
 //   The %d placeholders will be replaced by appropriate 
 //   indices. The first index is time (if specified), the
 //   second one is piece.
-// 2. has_piece_entry (0 or 1): Specifies whether the pattern has a
+// \li has_piece_entry (0 or 1): Specifies whether the pattern has a
 //   piece placeholder. The piece placeholder is replaced by the 
 //   update piece number.
-// 3. has_time_entry (0 or 1): Specified whether the pattern has a
+// \li has_time_entry (0 or 1): Specified whether the pattern has a
 //   time placeholder. The time placeholder is replaced by an index
 //   specified in the TimeSteps element
 //
