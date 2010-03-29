@@ -1,4 +1,8 @@
 <ParaViewFilters>
+  <Category name="Cosmology" menu_label="Cosmology">
+    <Proxy group="filters" name="HaloFinder" />
+  </Category>
+    
   <Category name="Common" menu_label="&amp;Common" preserve_order="1"
     show_in_toolbar="1">
     <Proxy group="filters" name="Calculator" icon=":/pqWidgets/Icons/pqCalculator24.png"/>

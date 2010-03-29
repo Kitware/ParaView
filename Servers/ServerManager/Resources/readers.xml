@@ -1857,6 +1857,59 @@
      </StringVectorProperty>
      <!-- End TecplotReaderCore-->
    </SourceProxy>
+   
+   <SourceProxy name="CosmoReaderCore" 
+                class="vtkPCosmoReader"
+                label="COSMO Reader">
+
+     <StringVectorProperty
+        name="FileName"
+        command="SetFileName"
+        animateable="0"
+        number_of_elements="1">
+        <FileListDomain name="files"/>
+        <Documentation>
+          This property specifies the file name for the COSMO reader.
+        </Documentation>
+     </StringVectorProperty>
+
+     <IntVectorProperty
+        name="CosmoFormat"
+        command="SetCosmoFormat"
+        label="Cosmo Format"
+        number_of_elements="1"
+        default_values="1" >
+     <BooleanDomain name="bool" />
+       <Documentation>
+       If checked, the data will be read as the LANL Cosmo format.  If unchecked, the data will be read as Gadget-2 format.
+       </Documentation>
+     </IntVectorProperty>
+
+     <DoubleVectorProperty
+        name="RL"
+        command="SetRL"
+        label="rL (physical box side length)"
+        number_of_elements="1"
+        default_values="90.140846" >
+     <DoubleRangeDomain name="range" min="0" />
+       <Documentation>
+       The box side length used to wrap particles around if they exceed rL (or less than 0) in any dimension.
+       </Documentation>
+     </DoubleVectorProperty>
+
+     <DoubleVectorProperty
+        name="Overlap"
+        command="SetOverlap"
+        label="overlap (shared point/ghost cell gap distance)"
+        number_of_elements="1"
+        default_values="5" >
+     <DoubleRangeDomain name="range" min="0" />
+       <Documentation>
+       The space in rL units to extend processor particle ownership for ghost particles/cells.  Needed for correct halo calculation when halos cross processor boundaries in parallel computation.
+       </Documentation>
+     </DoubleVectorProperty>
+
+   </SourceProxy>
 
     <!-- End of "internal_sources" -->
   </ProxyGroup>
@@ -5892,6 +5945,63 @@
       
    </SourceProxy>
    <!-- End NetCDFPOPReader -->
+   
+   <FileSeriesReaderProxy name="CosmoReader"
+                          class="vtkFileSeriesReader"
+                          label="COSMO Reader"
+                          file_name_method="SetFileName">
+     <Documentation
+       short_help="Read a cosmology file."
+       long_help="Read a cosmology file into a vtkUnstructuredGrid.">
+       The Cosmology reader reads a binary file of particle location, 
+       velocity, and id creating a vtkUnstructuredGrid. The default 
+       file extension is .cosmo.  Reads LANL Cosmo format or Gadget format.
+     </Documentation>
+
+     <SubProxy>
+       <Proxy name="Reader"
+              proxygroup="internal_sources"
+              proxyname="CosmoReaderCore">
+       </Proxy>
+       <ExposedProperties>
+         <Property name="CosmoFormat" />
+         <Property name="RL" />
+         <Property name="Overlap" />
+       </ExposedProperties>
+     </SubProxy>
+
+     <StringVectorProperty name="FileNameInfo"
+        command="GetCurrentFileName"
+        information_only="1" >
+        <SimpleStringInformationHelper />
+     </StringVectorProperty>
+
+     <StringVectorProperty name="FileName"
+                           clean_command="RemoveAllFileNames"
+                           command="AddFileName"
+                           animateable="0"
+                           number_of_elements="0" 
+                           repeat_command="1"
+                           information_property="FileNameInfo" >
+       <FileListDomain name="files"/>
+       <Documentation>
+         The list of files to be read by the reader.
+       </Documentation>
+     </StringVectorProperty>
+
+     <DoubleVectorProperty name="TimestepValues"
+                           repeatable="1"
+                           information_only="1">
+       <TimeStepsInformationHelper/>
+       <Documentation>
+         Available timestep values.
+       </Documentation>
+     </DoubleVectorProperty>
+
+     <Hints>
+       <ReaderFactory extensions="cosmo gadget2" file_description="Cosmology files" />
+     </Hints>
+   </FileSeriesReaderProxy>
 
   </ProxyGroup>
 </ServerManagerConfiguration>

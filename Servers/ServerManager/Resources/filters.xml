@@ -9815,6 +9815,105 @@ This property controls how the filter works to generate tensor cell data. You ca
     </Hints>
 
    </SourceProxy> <!-- PCAStatistics -->
+   
+   <SourceProxy name="HaloFinder" class="vtkPCosmoHaloFinder" label="Cosmology Halo Finder">
+     <InputProperty
+        name="Input"
+        command="SetInputConnection">
+          <ProxyGroupDomain name="groups">
+            <Group name="sources"/>
+            <Group name="filters"/>
+          </ProxyGroupDomain>
+          <DataTypeDomain name="input_type">
+            <DataType value="vtkUnstructuredGrid"/>
+          </DataTypeDomain>
+     </InputProperty>
+     
+     <IntVectorProperty
+        name="CopyHaloDataToParticles"
+        command="SetCopyHaloDataToParticles"
+        label="Copy halo information to original particles"
+        number_of_elements="1"
+        default_values="1" >
+     <BooleanDomain name="bool" />
+       <Documentation>
+       If checked, halo data will be copied to the original particles.  If unchecked, the particles will not be annotated with halo data.
+       </Documentation>
+     </IntVectorProperty>
+
+     <IntVectorProperty 
+        name="NP" 
+        command="SetNP"
+        label="np (number of seeded particles in one dimension)"
+        number_of_elements="1"
+        default_values="256" > 
+     <IntRangeDomain name="range" min="0" />
+       <Documentation> 
+        Number of seeded particles in one dimension.  Therefore, total simulation particles is np^3 (cubed).
+       </Documentation>
+     </IntVectorProperty>
+
+     <DoubleVectorProperty
+        name="RL"
+        command="SetRL"
+        label="rL (physical box side length)"
+        number_of_elements="1"
+        default_values="90.140846" >
+     <DoubleRangeDomain name="range" min="0" />
+       <Documentation>
+       The box side length used to wrap particles around if they exceed rL (or less than 0) in any dimension.
+       </Documentation>
+     </DoubleVectorProperty>
+
+     <DoubleVectorProperty
+        name="Overlap"
+        command="SetOverlap"
+        label="overlap (shared point/ghost cell gap distance)"
+        number_of_elements="1"
+        default_values="5" >
+     <DoubleRangeDomain name="range" min="0" />
+       <Documentation>
+       The space in rL units to extend processor particle ownership for ghost particles/cells.  Needed for correct halo calculation when halos cross processor boundaries in parallel computation.
+       </Documentation>
+     </DoubleVectorProperty>
+
+     <IntVectorProperty 
+        name="PMin" 
+        command="SetPMin"
+        label="pmin (minimum particles for a halo)"
+        number_of_elements="1"
+        default_values="10" > 
+     <IntRangeDomain name="range" min="1" />
+       <Documentation>
+         Minimal number of particles needed before a group is called a halo.
+       </Documentation>
+     </IntVectorProperty>
+
+     <DoubleVectorProperty 
+        name="BB" 
+        command="SetBB"
+        label="bb (linking distance)"
+        number_of_elements="1"
+        default_values="0.20" > 
+     <DoubleRangeDomain name="range" min="0" />
+       <Documentation>
+         Linking length measured in units of interparticle spacing and is dimensionless.  Used to link particles into halos for the friend-of-a-friend algorithm.
+       </Documentation>
+     </DoubleVectorProperty>
+
+     <DoubleVectorProperty 
+        name="ParticleMass" 
+        command="SetParticleMass"
+        label="particle mass"
+        number_of_elements="1"
+        default_values="1.0" > 
+     <DoubleRangeDomain name="range" min="0" />
+       <Documentation>
+         The mass of a particle.
+       </Documentation>
+     </DoubleVectorProperty>
+
+   </SourceProxy>
 
   </ProxyGroup>
 
