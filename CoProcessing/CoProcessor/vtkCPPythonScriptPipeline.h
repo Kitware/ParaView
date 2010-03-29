@@ -41,7 +41,7 @@ public:
   // Description:
   // Initialize this pipeline from given the file name of a 
   // python script. Returns 1 for success and 0 for failure.
-  int Initialize(const char* FileName);
+  int Initialize(const char* fileName);
   
   // Description:
   // Configuration Step:
@@ -51,19 +51,19 @@ public:
   // it fills in the FieldNames array that the coprocessor requires
   // in order to fulfill all the coprocessing requests for this
   // TimeStep/Time combination.
-  virtual int RequestDataDescription(vtkCPDataDescription* DataDescription);
+  virtual int RequestDataDescription(vtkCPDataDescription* dataDescription);
 
   // Description:
   // Execute the pipeline. Returns 1 for success and 0 for failure.
-  virtual int CoProcess(vtkCPDataDescription* DataDescription);
+  virtual int CoProcess(vtkCPDataDescription* dataDescription);
 
 protected:
   vtkCPPythonScriptPipeline();
   virtual ~vtkCPPythonScriptPipeline();
 
   // Description:
-  // Return the address of Pointer for the python script.
-  vtkStdString GetPythonAddress(void* Pointer);
+  // Return the address of pointer for the python script.
+  vtkStdString GetPythonAddress(void* pointer);
 
   // Description:
   // Set/get macro functinos for setting PythonScriptName.

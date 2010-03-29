@@ -29,14 +29,13 @@
 #include "vtkSMXMLParser.h"
 
 #include <vtkstd/string>
-using vtkstd::string;
 #include <vtksys/SystemTools.hxx>
 #include <vtksys/ios/sstream>
 using vtksys_ios::ostringstream;
 
 vtkCPPythonHelper* vtkCPPythonScriptPipeline::PythonHelper = 0;
 
-vtkCxxRevisionMacro(vtkCPPythonScriptPipeline, "1.1");
+vtkCxxRevisionMacro(vtkCPPythonScriptPipeline, "1.2");
 vtkStandardNewMacro(vtkCPPythonScriptPipeline);
 
 //----------------------------------------------------------------------------
@@ -63,118 +62,109 @@ vtkCPPythonScriptPipeline::~vtkCPPythonScriptPipeline()
 }
 
 //----------------------------------------------------------------------------
-int vtkCPPythonScriptPipeline::Initialize(const char* FileName)
+int vtkCPPythonScriptPipeline::Initialize(const char* fileName)
 {
-  if(vtksys::SystemTools::FileExists(FileName) == 0)
+  if(vtksys::SystemTools::FileExists(fileName) == 0)
     {
-    vtkErrorMacro("Could not find file " << FileName);
+    vtkErrorMacro("Could not find file " << fileName);
     return 0;
     }
 
   // for now do not check on filename extension:
   //vtksys::SystemTools::GetFilenameLastExtension(FileName) == ".py" == 0)
 
-  string FilenamePath = vtksys::SystemTools::GetFilenamePath(FileName);
-  string FilenameName = vtksys::SystemTools::GetFilenameWithoutExtension(
-    vtksys::SystemTools::GetFilenameName(FileName));
+  vtkstd::string fileNamePath = vtksys::SystemTools::GetFilenamePath(fileName);
+  vtkstd::string fileNameName = vtksys::SystemTools::GetFilenameWithoutExtension(
+    vtksys::SystemTools::GetFilenameName(fileName));
   // need to save the script name as it is used as the name of the module
-  this->SetPythonScriptName(FilenameName.c_str());
+  this->SetPythonScriptName(fileNameName.c_str());
 
-  ostringstream LoadPythonModules;
-  LoadPythonModules
-    << "sys.path.append('" << FilenamePath << "')\n"
-    << "import " << FilenameName << "\n";
+  ostringstream loadPythonModules;
+  loadPythonModules
+    << "sys.path.append('" << fileNamePath << "')\n"
+    << "import " << fileNameName << "\n";
 
   this->PythonHelper->GetPythonInterpretor()->RunSimpleString(
-    LoadPythonModules.str().c_str());
+    loadPythonModules.str().c_str());
   this->PythonHelper->GetPythonInterpretor()->FlushMessages();
   return 1;
 }
 
 //----------------------------------------------------------------------------
 int vtkCPPythonScriptPipeline::RequestDataDescription(
-  vtkCPDataDescription* DataDescription)
+  vtkCPDataDescription* dataDescription)
 {
-  if(!DataDescription)
+  if(!dataDescription)
     {
-    vtkWarningMacro("DataDescription is NULL.");
+    vtkWarningMacro("dataDescription is NULL.");
     return 0;
     }
   // check the script to see if it should be run...
-  vtkStdString DataDescriptionString = this->GetPythonAddress(DataDescription);
+  vtkStdString dataDescriptionString = this->GetPythonAddress(dataDescription);
 
-  ostringstream PythonInput;
+  ostringstream pythonInput;
 #ifndef COPROCESSOR_WIN32_BUILD
   // Not on Windows.
-  PythonInput << "DataDescription = libvtkCoProcessorPython.vtkCPDataDescription('"
-              << DataDescriptionString << "')\n"
-              << this->PythonScriptName << ".RequestDataDescription(DataDescription)\n";
+  pythonInput << "dataDescription = libvtkCoProcessorPython.vtkCPDataDescription('"
+              << dataDescriptionString << "')\n"
+              << this->PythonScriptName << ".RequestDataDescription(dataDescription)\n";
 #else
-  PythonInput << "DataDescription = vtkCoProcessorPython.vtkCPDataDescription('"
-              << DataDescriptionString << "')\n"
-              << this->PythonScriptName << ".RequestDataDescription(DataDescription)\n";
+  pythonInput << "dataDescription = vtkCoProcessorPython.vtkCPDataDescription('"
+              << dataDescriptionString << "')\n"
+              << this->PythonScriptName << ".RequestdataDescription(dataDescription)\n";
 #endif
 
-  this->PythonHelper->GetPythonInterpretor()->RunSimpleString(PythonInput.str().c_str());
+  this->PythonHelper->GetPythonInterpretor()->RunSimpleString(pythonInput.str().c_str());
   this->PythonHelper->GetPythonInterpretor()->FlushMessages();
-  return DataDescription->GetIfAnyGridNecessary()? 1: 0;
+  return dataDescription->GetIfAnyGridNecessary()? 1: 0;
 }
 
 //----------------------------------------------------------------------------
 int vtkCPPythonScriptPipeline::CoProcess(
-  vtkCPDataDescription* DataDescription)
+  vtkCPDataDescription* dataDescription)
 {
-  if(!DataDescription)
+  if(!dataDescription)
     {
     vtkWarningMacro("DataDescription is NULL.");
     return 0;
     }
-  vtkStdString DataDescriptionString = this->GetPythonAddress(DataDescription);
+  vtkStdString dataDescriptionString = this->GetPythonAddress(dataDescription);
 
-  ostringstream PythonInput;
-  PythonInput 
+  ostringstream pythonInput;
+  pythonInput 
 #ifndef COPROCESSOR_WIN32_BUILD
     // Not on Windows
-    << "DataDescription = libvtkCoProcessorPython.vtkCPDataDescription('"
+    << "dataDescription = libvtkCoProcessorPython.vtkCPDataDescription('"
 #else
-    << "DataDescription = vtkCoProcessorPython.vtkCPDataDescription('"
+    << "dataDescription = vtkCoProcessorPython.vtkCPDataDescription('"
 #endif
-    << DataDescriptionString << "')\n"
-    << this->PythonScriptName << ".DoCoProcessing(DataDescription)\n";
+    << dataDescriptionString << "')\n"
+    << this->PythonScriptName << ".DoCoProcessing(dataDescription)\n";
 
   this->PythonHelper->GetPythonInterpretor()->RunSimpleString(
-    PythonInput.str().c_str());
+    pythonInput.str().c_str());
   this->PythonHelper->GetPythonInterpretor()->FlushMessages();
   return 1;  
 }
 
 //----------------------------------------------------------------------------
-vtkStdString vtkCPPythonScriptPipeline::GetPythonAddress(void* Pointer)
+vtkStdString vtkCPPythonScriptPipeline::GetPythonAddress(void* pointer)
 {
-  /*
-  ostringstream ss;
-  ss.setf(ios::hex,ios::basefield);
-  ss.unsetf(ios::showbase);
-  // below may be 32/64 bit dependent
-  ss << reinterpret_cast<unsigned long long>(Pointer);
-  return ss.str();
-  */
-
-  char AddressOfPointer[1024];
+  char addressOfPointer[1024];
 #ifdef COPROCESSOR_WIN32_BUILD
-  sprintf_s(AddressOfPointer, "%p", Pointer);
+  sprintf_s(addressOfPointer, "%p", pointer);
 #else
-  sprintf(AddressOfPointer, "%p", Pointer);
+  sprintf(addressOfPointer, "%p", pointer);
 #endif
-  char *aplus = AddressOfPointer;
-  if ((AddressOfPointer[0] == '0') && 
-      ((AddressOfPointer[1] == 'x') || AddressOfPointer[1] == 'X'))
+  char *aplus = addressOfPointer;
+  if ((addressOfPointer[0] == '0') && 
+      ((addressOfPointer[1] == 'x') || addressOfPointer[1] == 'X'))
     {
     aplus += 2; //skip over "0x"
     }
 
-  vtkstd::string Value = aplus;
-  return Value;
+  vtkstd::string value = aplus;
+  return value;
 }
 
 //----------------------------------------------------------------------------
