@@ -7,7 +7,7 @@ foreach (file ${PV_DOCUMENTATION_FILES})
   configure_file(
     "${CMAKE_CURRENT_SOURCE_DIR}/${file}"
     "${CMAKE_CURRENT_BINARY_DIR}/${file}"
-    COPYONLY)
+    @ONLY)
 endforeach (file)
 
 OPTION(PARAVIEW_GENERATE_PROXY_DOCUMENTATION
