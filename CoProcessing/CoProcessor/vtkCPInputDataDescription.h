@@ -12,9 +12,7 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkCPInputDataDescription - Class for describing data for coprocessing for
-// each grid.
-// .SECTION Description
+/// @ingroup CoProcessing
 // This class provides the data description for each input for the coprocessor
 // pipelines.
 

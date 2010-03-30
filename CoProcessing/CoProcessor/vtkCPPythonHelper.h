@@ -12,9 +12,8 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkCPPythonHelper - Singleton class for python interpretor.
-// .SECTION Description
-// Singleton class for python interpretor.
+/// @ingroup CoProcessing
+/// Singleton class for python interpretor.
 
 #ifndef vtkCPPythonHelper_h
 #define vtkCPPythonHelper_h
@@ -34,8 +33,7 @@ public:
   vtkTypeRevisionMacro(vtkCPPythonHelper,vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Get the interpretor that has been setup.
+  /// Get the interpretor that has been setup.
   vtkPVPythonInterpretor* GetPythonInterpretor();
 
 protected:
@@ -50,8 +48,7 @@ private:
   vtkPVMain* PVMain;
   vtkPVPythonOptions* PythonOptions;
 
-  // Description:
-  // The singleton instance of the class.
+  /// The singleton instance of the class.
   static vtkCPPythonHelper* Instance;
 };
 

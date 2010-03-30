@@ -15,6 +15,10 @@
 #ifndef vtkCPIntHolder_h
 #define vtkCPIntHolder_h
 
+/// @ingroup CoProcessing
+/// A simple class to enable returning an integer from the python 
+/// script to the adaptor.
+
 #include "vtkObject.h"
 #include "CPWin32Header.h" // For windows import/export of shared libraries
 

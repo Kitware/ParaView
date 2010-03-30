@@ -12,10 +12,9 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkCPProcessModulePythonHelper
-// .SECTION Description
-// A class that can be used to provide GUI elements to the vtkProcessModule
-// without forcing the process modules to link to a GUI.
+/// @ingroup CoProcessing
+/// A class that can be used to provide GUI elements to the vtkProcessModule
+/// without forcing the process modules to link to a GUI.
 
 #ifndef __vtkCPProcessModulePythonHelper_h
 #define __vtkCPProcessModulePythonHelper_h
@@ -34,8 +33,7 @@ public:
   vtkTypeRevisionMacro(vtkCPProcessModulePythonHelper,vtkPVProcessModulePythonHelper);
   void PrintSelf(ostream& os, vtkIndent indent);
   
-  // Description: 
-  // run main gui loop from process module
+  /// Run main gui loop from process module.
   virtual int RunGUIStart(int argc, char **argv, int numServerProcs, int myId); 
 
   vtkGetMacro(Interpretor, vtkPVPythonInterpretor*);
