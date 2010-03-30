@@ -11,6 +11,7 @@
 #include <vtkSMPropertyHelper.h>
 #include <vtkSMProxyManager.h>
 
+#include <pqGlobalAdaptiveViewOptions.h>
 #include <pqOutputPort.h>
 #include <pqPipelineSource.h>
 #include <pqRepresentation.h>
@@ -58,4 +59,13 @@ QWidget* pqAdaptiveRenderView::createWidget()
     vtkwidget->setAutomaticImageCacheEnabled(false);
     }
   return vtkwidget;
+}
+
+//-----------------------------------------------------------------------------
+void pqAdaptiveRenderView::setDefaultPropertyValues()
+{
+  pqGlobalAdaptiveViewOptions *vOpt = new pqGlobalAdaptiveViewOptions(NULL);
+  delete vOpt;
+  this->Superclass::setDefaultPropertyValues();
+  this->clearUndoStack();
 }
