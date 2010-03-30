@@ -38,6 +38,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QMouseEvent>
 #include <QKeyEvent>
 #include <QtDebug>
+#include <QList>
+#include <QListWidget>
 
 #include "pqEventDispatcher.h"
 
@@ -60,6 +62,26 @@ static QModelIndex OldGetIndex(QAbstractItemView& View, const QString& Name)
       }
       
     return index;
+}
+
+static QModelIndex GetIndexByItemName(QAbstractItemView& View, const QString& Name)
+{
+  QListWidget* const listWidget = qobject_cast<QListWidget*>(&View);
+
+  QModelIndex index;
+  if(!listWidget)
+    {
+    return index;
+    }
+  QList<QListWidgetItem *> findResult = listWidget->findItems(Name,Qt::MatchExactly);
+  if(findResult.count() > 0)
+    {
+    // in theory more than one item could match? Only return the index for
+    // the first instance.
+    index = View.model()->index(listWidget->row(findResult.first()), 0, index);
+    }
+    
+  return index;
 }
 
 static QModelIndex GetIndex(QAbstractItemView* View, const QString& Name)
@@ -95,6 +117,15 @@ bool pqAbstractItemViewEventPlayer::playEvent(QObject* Object, const QString& Co
   if(Command == "currentChanged")  // left to support old recordings
     {
     const QModelIndex index = OldGetIndex(*object, Arguments);
+    if(!index.isValid())
+      return false;
+      
+    object->setCurrentIndex(index);
+    return true;
+    }
+  else if(Command == "currentChangedbyItemName")
+    {
+    const QModelIndex index = GetIndexByItemName(*object, Arguments);
     if(!index.isValid())
       return false;
       
