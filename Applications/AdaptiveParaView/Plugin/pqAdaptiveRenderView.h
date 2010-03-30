@@ -32,6 +32,9 @@ public:
   /// Returns proxy this one manages
   virtual vtkSMRenderViewProxy* getRenderViewProxy() const;
 
+  /// Load streaming settings.
+  virtual void setDefaultPropertyValues();
+
 protected:
 
   /// Overridden to disable Qt caching of front buffer. 
