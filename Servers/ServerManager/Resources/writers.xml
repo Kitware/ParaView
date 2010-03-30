@@ -940,6 +940,7 @@
       <Hints>
         <Property name="Input" show="0"/>
         <Property name="FileName" show="0"/>
+        <WriterFactory extensions="xmf" file_description="Xdmf Data File"/>
       </Hints>
       <!-- End of XdmfWriter -->
     </WriterProxy>
