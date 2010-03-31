@@ -28,7 +28,7 @@
 #include <QRegExp>
 
 vtkStandardNewMacro(vtkSMXYChartViewProxy);
-vtkCxxRevisionMacro(vtkSMXYChartViewProxy, "1.9");
+vtkCxxRevisionMacro(vtkSMXYChartViewProxy, "1.10");
 //----------------------------------------------------------------------------
 vtkSMXYChartViewProxy::vtkSMXYChartViewProxy()
 {
@@ -53,8 +53,8 @@ vtkContextView* vtkSMXYChartViewProxy::NewChartView()
   // Construct a new chart view and return the view of it
   this->Chart = vtkChartXY::New();
   this->ChartView->GetScene()->AddItem(this->Chart);
-  // Do not use the buffer id for now - performance issues.
-  this->ChartView->GetScene()->SetUseBufferId(false);
+  // Use the buffer id - performance issues are fixed.
+  this->ChartView->GetScene()->SetUseBufferId(true);
 
   return this->ChartView;
 }
