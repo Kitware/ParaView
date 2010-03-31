@@ -32,7 +32,6 @@ include_directories(
 set(CoProcessor_SRCS
   vtkCPDataDescription.cxx
   vtkCPInputDataDescription.cxx
-  vtkCPIntHolder.cxx
   vtkCPPipeline.cxx
   vtkCPProcessModulePythonHelper.cxx
   vtkCPProcessor.cxx
