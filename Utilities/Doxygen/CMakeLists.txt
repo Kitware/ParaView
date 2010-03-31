@@ -43,6 +43,7 @@ IF (BUILD_DOCUMENTATION)
         \"${ParaView_SOURCE_DIR}/Applications/StreamingParaView/\" \\
         \"${ParaView_SOURCE_DIR}/Applications/AdaptiveParaView//\" \\
         \"${ParaView_SOURCE_DIR}/Applications/ParaView\" \\
+        \"${ParaView_SOURCE_DIR}/CoProcessing/CoProcessor\" \\
         \"${CMAKE_CURRENT_BINARY_DIR}/dox/Common/KWCommon\" \\
         \"${CMAKE_CURRENT_BINARY_DIR}/dox/Servers/Common\" \\
         \"${CMAKE_CURRENT_BINARY_DIR}/dox/Servers/Filters\" \\
