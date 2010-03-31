@@ -268,7 +268,7 @@ SET(UI_FORMS
   Resources/UI/pqPluginDialog.ui
   Resources/UI/pqPointSourceControls.ui
   Resources/UI/pqProxyInformationWidget.ui
-  Resources/UI/pqPVThresholdPanel.ui
+#  Resources/UI/pqPVThresholdPanel.ui
   Resources/UI/pqQueryClauseWidget.ui
   Resources/UI/pqQueryCompositeTreeDialog.ui
   Resources/UI/pqQueryDialog.ui
