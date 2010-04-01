@@ -61,12 +61,15 @@ view = servermanager.rendering.AdaptiveRenderView()
 ## Set streaming parameters
 pxm = servermanager.ProxyManager()
 helper = pxm.GetProxy("helpers", "AdaptiveOptionsInstance")
-helper.GetProperty("StreamedPasses").SetElement(0, 16)
 helper.GetProperty("EnableStreamMessages").SetElement(0, 1)
-helper.GetProperty("PieceCacheLimit").SetElement(0, 16)
+helper.GetProperty("ShowOn").SetElement(0,1)
 helper.GetProperty("UsePrioritization").SetElement(0, 1)
 helper.GetProperty("UseViewOrdering").SetElement(0, 1)
-helper.GetProperty("PieceRenderCutoff").SetElement(0, -1)
+helper.GetProperty("PieceCacheLimit").SetElement(0, 16)
+helper.GetProperty("Height").SetElement(0,5)
+helper.GetProperty("Degree").SetElement(0,2)
+helper.GetProperty("Rate").SetElement(0,2)
+helper.GetProperty("MaxSplits").SetElement(0,4)
 
 ## Disable progress printing if requested
 if (printProgress == 0):

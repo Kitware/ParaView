@@ -2,4 +2,4 @@ GET_TARGET_PROPERTY(ADAPTIVE_PLUGIN_LOCATION AdaptivePlugin LOCATION)
 
 ADD_TEST("TestAdaptivePlugin-Python"
   ${EXECUTABLE_OUTPUT_PATH}/pvbatch
-  ${CMAKE_CURRENT_SOURCE_DIR}/TestAdaptiveStreaming.py --plugin ${ADAPTIVE_PLUGIN_LOCATION} -q -l)
+  ${CMAKE_CURRENT_SOURCE_DIR}/TestAdaptive.py --plugin ${ADAPTIVE_PLUGIN_LOCATION} -q -l)
