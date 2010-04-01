@@ -146,6 +146,9 @@ timestep_expression = """
     if %s :
         datadescription.GetInputDescriptionByName('%s').AllFieldsOn()
         datadescription.GetInputDescriptionByName('%s').GenerateMeshOn()
+    else:
+        datadescription.GetInputDescriptionByName('%s').AllFieldsOff()
+        datadescription.GetInputDescriptionByName('%s').GenerateMeshOff()
 """
 
 do_coprocessing = ""
