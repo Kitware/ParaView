@@ -55,7 +55,7 @@ class PQCOMPONENTS_EXPORT pqViewContextMenuManager : public QObject
   Q_OBJECT
 
 public:
-  /// \breif
+  /// \brief
   ///   Creates a view context menu manager.
   /// \param parent The parent object.
   pqViewContextMenuManager(QObject *parent=0);
