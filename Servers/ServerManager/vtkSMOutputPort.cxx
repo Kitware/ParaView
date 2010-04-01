@@ -30,7 +30,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMOutputPort);
-vtkCxxRevisionMacro(vtkSMOutputPort, "1.12");
+vtkCxxRevisionMacro(vtkSMOutputPort, "1.13");
 
 
 //----------------------------------------------------------------------------
@@ -352,11 +352,6 @@ void vtkSMOutputPort::InsertExtractPiecesIfNecessary()
            << this->GetProducerID() << "UpdateInformation"
            << vtkClientServerStream::End;
     pm->SendStream(this->ConnectionID, this->Servers, stream);
-    this->GatherDataInformation();
-    if (this->DataInformation->GetCompositeDataClassName())
-      {
-      return;
-      }
     stream << vtkClientServerStream::Invoke 
            << this->GetExecutiveID() 
            << "GetMaximumNumberOfPieces"
@@ -415,11 +410,6 @@ void vtkSMOutputPort::InsertExtractPiecesIfNecessary()
     pm->SendStream(this->ConnectionID,
                    this->Servers, 
                    stream);
-    this->GatherDataInformation();
-    if (this->DataInformation->GetCompositeDataClassName())
-      {
-      return;
-      }
     stream << vtkClientServerStream::Invoke 
            << this->GetExecutiveID() 
            << "GetMaximumNumberOfPieces"
@@ -483,7 +473,6 @@ void vtkSMOutputPort::InsertExtractPiecesIfNecessary()
     pm->SendStream(this->ConnectionID,
                    this->Servers, 
                    stream);
-    this->GatherDataInformation();
     stream << vtkClientServerStream::Invoke
            << this->GetExecutiveID() 
            << "GetMaximumNumberOfPieces"
