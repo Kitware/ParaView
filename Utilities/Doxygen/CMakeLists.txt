@@ -25,8 +25,7 @@ IF (BUILD_DOCUMENTATION)
         \"${ParaView_SOURCE_DIR}/Common/KWCommon\" \\
         \"${ParaView_SOURCE_DIR}/Servers/Common\" \\
         \"${ParaView_SOURCE_DIR}/Servers/Filters\" \\
-        \"${ParaView_SOURCE_DIR}/Servers/ServerManager\" \\
-        \"${ParaView_SOURCE_DIR}/CoProcessing/CoProcessor\"")
+        \"${ParaView_SOURCE_DIR}/Servers/ServerManager\"")
   SET(DOXYGEN_BINARY_LOCATIONS_DIR "${ParaView_BINARY_DIR}")
   SET(DOXYGEN_BINARY_LOCATIONS
        "")
@@ -40,17 +39,16 @@ IF (BUILD_DOCUMENTATION)
         \"${ParaView_SOURCE_DIR}/Qt/Python\" \\
         \"${ParaView_SOURCE_DIR}/Qt/Widgets\" \\
         \"${ParaView_SOURCE_DIR}/Qt/Testing\" \\
+        \"${ParaView_SOURCE_DIR}/CoProcessing/CoProcessor\" \\
         \"${ParaView_SOURCE_DIR}/Applications/StreamingParaView/\" \\
         \"${ParaView_SOURCE_DIR}/Applications/AdaptiveParaView//\" \\
         \"${ParaView_SOURCE_DIR}/Applications/ParaView\" \\
-        \"${ParaView_SOURCE_DIR}/CoProcessing/CoProcessor\" \\
         \"${CMAKE_CURRENT_BINARY_DIR}/dox/Common/KWCommon\" \\
         \"${CMAKE_CURRENT_BINARY_DIR}/dox/Servers/Common\" \\
         \"${CMAKE_CURRENT_BINARY_DIR}/dox/Servers/Filters\" \\
-        \"${CMAKE_CURRENT_BINARY_DIR}/dox/Servers/ServerManager\" \\
-        \"${CMAKE_CURRENT_BINARY_DIR}/dox/CoProcessing/CoProcessor\"")
+        \"${CMAKE_CURRENT_BINARY_DIR}/dox/Servers/ServerManager\"")
 
-  SET(DOXYGEN_IGNORE_PREFIX "vtkPV vtkSM vtk pq")
+  SET(DOXYGEN_IGNORE_PREFIX "vtkPV vtkSM vtk pq vtkCP")
 
   #
   # Configure the script and the doxyfile, then add target
