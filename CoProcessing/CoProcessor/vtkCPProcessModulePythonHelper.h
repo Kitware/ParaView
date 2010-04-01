@@ -12,10 +12,6 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-/// @ingroup CoProcessing
-/// A class that can be used to provide GUI elements to the vtkProcessModule
-/// without forcing the process modules to link to a GUI.
-
 #ifndef __vtkCPProcessModulePythonHelper_h
 #define __vtkCPProcessModulePythonHelper_h
 
@@ -26,6 +22,9 @@ class vtkPVProcessModule;
 class vtkPVPythonInterpretor;
 class vtkSMApplication;
 
+/// @ingroup CoProcessing
+/// A class that can be used to provide GUI elements to the vtkProcessModule
+/// without forcing the process modules to link to a GUI.
 class COPROCESSING_EXPORT vtkCPProcessModulePythonHelper : public vtkPVProcessModulePythonHelper
 {
 public: 

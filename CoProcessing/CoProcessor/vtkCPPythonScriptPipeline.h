@@ -12,14 +12,6 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-/// @ingroup CoProcessing
-/// Class that creates a coprocessing pipeline starting from a coprocessing
-/// script.  This class only does operations with respect to the script
-/// and uses the name of the script as the module to hide its definitions
-/// from other python modules.  Python is primarily set up in 
-/// vtkCPPythonHelper where it loads servermanager, the coprocessing library
-/// and the trivial producer used to get the grid into the script.
-
 #ifndef vtkCPPythonScriptPipeline_h
 #define vtkCPPythonScriptPipeline_h
 
@@ -30,6 +22,13 @@
 class vtkCPDataDescription;
 class vtkCPPythonHelper;
 
+/// @ingroup CoProcessing
+/// Class that creates a coprocessing pipeline starting from a coprocessing
+/// script.  This class only does operations with respect to the script
+/// and uses the name of the script as the module to hide its definitions
+/// from other python modules.  Python is primarily set up in 
+/// vtkCPPythonHelper where it loads servermanager, the coprocessing library
+/// and the trivial producer used to get the grid into the script.
 class COPROCESSING_EXPORT vtkCPPythonScriptPipeline : public vtkCPPipeline
 {
 public:

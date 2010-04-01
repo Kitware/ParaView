@@ -12,40 +12,6 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-/// @defgroup CoProcessing ParaView CoProcessing
-/// The CoProcessing library is designed to be called from parallel 
-/// simulation codes to reduce the size of the information that is saved
-/// while also keeping the important information available as results.
-
-/// @ingroup CoProcessing
-/// There are 3 distinct phases for the operation of a co-processor.
-///
-/// 1) Initialization -- set up for the run.
-/// 2) Processing -- the run.
-/// 3) Finalization -- clean up before exit.
-///
-/// The processing phase occurs repeatedly and is composed of two distinct steps,
-/// namely 1) Configuration (see vtkCPProcessor::ProcessDataDescription) and
-/// 2) Processing (see vtkCPProcessor::ProcessData).
-///
-/// Configuration step:
-/// In the first step the Co-Processor implemntation is called with a
-/// vtkDataDescription describing the data that the simulation can provide
-/// This gives the Co-Processor implemntation a chance to identify what
-/// (if any) of the available data it will process during this pass. By
-/// default all of the avaible data is selected, so that if the Co-Processor
-/// implementation does nothing it will receive all data during the Processing 
-/// step. The Co-Processor implementation should extract what ever meta-data
-/// it will need (or alternatively can save a reference to the DataDescription),
-/// during the Processing step.
-///
-/// Processing step:
-/// In the second step the Co-Processor implementation is called with the
-/// actual data that it has been asked to provide, if any. If no data was
-/// selected during the Configuration Step than the priovided vtkDataObject
-/// may be NULL.
-///
-
 #ifndef vtkCPProcessor_h
 #define vtkCPProcessor_h
 
@@ -58,6 +24,36 @@ class vtkDataObject;
 class vtkFieldData;
 class vtkCPPipeline;
 
+/// @defgroup CoProcessing ParaView CoProcessing
+/// The CoProcessing library is designed to be called from parallel 
+/// simulation codes to reduce the size of the information that is saved
+/// while also keeping the important information available as results.
+
+/// @ingroup CoProcessing
+/// There are 3 distinct phases for the operation of a co-processor.\n
+/// 1) Initialization -- set up for the run.\n
+/// 2) Processing -- the run.\n
+/// 3) Finalization -- clean up before exit.\n
+/// The processing phase occurs repeatedly and is composed of two distinct steps,
+/// namely 1) Configuration (see vtkCPProcessor::ProcessDataDescription) and
+/// 2) Processing (see vtkCPProcessor::ProcessData).
+///
+/// Configuration step:\n
+/// In the first step the Co-Processor implemntation is called with a
+/// vtkDataDescription describing the data that the simulation can provide
+/// This gives the Co-Processor implemntation a chance to identify what
+/// (if any) of the available data it will process during this pass. By
+/// default all of the avaible data is selected, so that if the Co-Processor
+/// implementation does nothing it will receive all data during the Processing 
+/// step. The Co-Processor implementation should extract what ever meta-data
+/// it will need (or alternatively can save a reference to the DataDescription),
+/// during the Processing step.
+///
+/// Processing step:\n
+/// In the second step the Co-Processor implementation is called with the
+/// actual data that it has been asked to provide, if any. If no data was
+/// selected during the Configuration Step than the priovided vtkDataObject
+/// may be NULL.
 class COPROCESSING_EXPORT vtkCPProcessor : public vtkObject
 {
 

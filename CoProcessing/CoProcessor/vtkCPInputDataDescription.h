@@ -12,10 +12,6 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-/// @ingroup CoProcessing
-// This class provides the data description for each input for the coprocessor
-// pipelines.
-
 #ifndef __vtkCPInputDataDescription_h
 #define __vtkCPInputDataDescription_h
 
@@ -26,6 +22,9 @@ class vtkFieldData;
 #include "vtkObject.h"
 #include "CPWin32Header.h" // For windows import/export of shared libraries
 
+/// @ingroup CoProcessing
+/// This class provides the data description for each input for the coprocessor
+/// pipelines.
 class COPROCESSING_EXPORT vtkCPInputDataDescription : public vtkObject
 {
 public:

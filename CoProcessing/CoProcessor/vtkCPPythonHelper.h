@@ -12,9 +12,6 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-/// @ingroup CoProcessing
-/// Singleton class for python interpretor.
-
 #ifndef vtkCPPythonHelper_h
 #define vtkCPPythonHelper_h
 
@@ -26,6 +23,8 @@ class vtkPVMain;
 class vtkPVPythonOptions;
 class vtkPVPythonInterpretor;
 
+/// @ingroup CoProcessing
+/// Singleton class for python interpretor.
 class COPROCESSING_EXPORT vtkCPPythonHelper : public vtkObject
 {
 public:

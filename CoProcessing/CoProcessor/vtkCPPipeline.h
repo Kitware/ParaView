@@ -12,13 +12,6 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-/// @ingroup CoProcessing
-/// Generic interface for operating on pipelines.  The user can use this
-/// if they only have a single pipeline that they want to operate on
-/// or they can use this to create a single pipeline and add it to
-/// vtkCPProcessor.  Each derived class should set itself up before
-/// adding itself to vtkCPProcessor.
-
 #ifndef vtkCPPipeline_h
 #define vtkCPPipeline_h
 
@@ -27,6 +20,12 @@
 
 class vtkCPDataDescription;
 
+/// @ingroup CoProcessing
+/// Generic interface for operating on pipelines.  The user can use this
+/// if they only have a single pipeline that they want to operate on
+/// or they can use this to create a single pipeline and add it to
+/// vtkCPProcessor.  Each derived class should set itself up before
+/// adding itself to vtkCPProcessor.
 class COPROCESSING_EXPORT vtkCPPipeline : public vtkObject
 {
 public:

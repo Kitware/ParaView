@@ -12,10 +12,6 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-/// @ingroup CoProcessing
-/// This class provides the description of the data for the coprocessor
-/// pipelines.
-
 #ifndef vtkCPDataDescription_h
 #define vtkCPDataDescription_h
 
@@ -28,6 +24,9 @@ class vtkFieldData;
 class vtkStringArray;
 class vtkCPInputDataDescription;
 
+/// @ingroup CoProcessing
+/// This class provides the description of the data for the coprocessor
+/// pipelines.
 class COPROCESSING_EXPORT vtkCPDataDescription : public vtkObject
 {
 public:
