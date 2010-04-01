@@ -106,6 +106,12 @@ extern "C" void insertblockofcells_(
         cout << pts[i] << " is not a valid node id\n";
         }
       }
+    if(type == VTK_TETRA)
+      { // change the canonical ordering of the tet to match VTK style
+      vtkIdType temp = pts[0];
+      pts[0] = pts[1];
+      pts[1] = temp;
+      }
     grid->InsertNextCell(type, *numPointsPerCell, pts);
     }
 }
