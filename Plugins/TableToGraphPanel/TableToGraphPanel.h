@@ -8,7 +8,7 @@ class TableToGraphPanel :
   Q_OBJECT
 
   typedef pqObjectPanel Superclass;
-  
+
 public:
   TableToGraphPanel(pqProxy* proxy, QWidget* p);
 
@@ -19,5 +19,7 @@ private slots:
 
 private:
   Ui::TableToGraphPanel Widgets;
+
+  bool UsingVertexTableArrays;
 };
 
