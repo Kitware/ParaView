@@ -181,7 +181,7 @@ public:
   // Description:
   // Provides access to the chart view.
 //BTX
-  vtkChart* GetChart();
+  virtual vtkChart* GetChart();
 //ETX
 
 //BTX

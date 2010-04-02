@@ -48,9 +48,30 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkChartXY.h"
 #include "vtkSMSourceProxy.h"
 
+#include "vtkCommand.h"
+
 #include "QVTKWidget.h"
 
 #include <QDebug>
+
+// Command implementation
+class pqContextView::command : public vtkCommand
+{
+public:
+  static command* New(pqContextView &view)
+  {
+    return new command(view);
+  }
+
+  command(pqContextView &view) : Target(view) { }
+
+  virtual void Execute(vtkObject*, unsigned long, void*)
+  {
+    Target.selectionChanged();
+  }
+
+  pqContextView& Target;
+};
 
 //-----------------------------------------------------------------------------
 pqContextView::pqContextView(
@@ -62,11 +83,14 @@ pqContextView::pqContextView(
 : Superclass(type, group, name, viewProxy, server, parentObject)
 {
   viewProxy->GetID(); // this results in calling CreateVTKObjects().
+  this->Command = command::New(*this);
+  viewProxy->AddObserver(vtkCommand::SelectionChangedEvent, this->Command);
 }
 
 //-----------------------------------------------------------------------------
 pqContextView::~pqContextView()
 {
+  this->Command->Delete();
 }
 
 //-----------------------------------------------------------------------------
@@ -222,3 +246,7 @@ bool pqContextView::canDisplay(pqOutputPort* opPort) const
   return (dataInfo && dataInfo->DataSetTypeIsA("vtkTable"));
 }
 
+void pqContextView::selectionChanged()
+{
+  qDebug() << "Selection changed!";
+}

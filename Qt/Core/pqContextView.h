@@ -104,6 +104,12 @@ protected:
 
   /// Overridden to set up some default signal-slot connections.
   virtual void initialize();
+
+  /// Listen for new selection events, and pass them back to ParaView
+  void selectionChanged();
+  class command;
+  command* Command;
+
 private:
   pqContextView(const pqContextView&); // Not implemented.
   void operator=(const pqContextView&); // Not implemented.

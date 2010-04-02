@@ -18,6 +18,7 @@
 #include "vtkContextView.h"
 #include "vtkContextScene.h"
 #include "vtkChartXY.h"
+#include "vtkChartParallelCoordinates.h"
 #include "vtkAxis.h"
 #include "vtkPen.h"
 #include "vtkTextProperty.h"
@@ -28,7 +29,7 @@
 #include <QRegExp>
 
 vtkStandardNewMacro(vtkSMXYChartViewProxy);
-vtkCxxRevisionMacro(vtkSMXYChartViewProxy, "1.10");
+vtkCxxRevisionMacro(vtkSMXYChartViewProxy, "1.11");
 //----------------------------------------------------------------------------
 vtkSMXYChartViewProxy::vtkSMXYChartViewProxy()
 {
@@ -51,8 +52,7 @@ vtkSMXYChartViewProxy::~vtkSMXYChartViewProxy()
 vtkContextView* vtkSMXYChartViewProxy::NewChartView()
 {
   // Construct a new chart view and return the view of it
-  this->Chart = vtkChartXY::New();
-  this->ChartView->GetScene()->AddItem(this->Chart);
+
   // Use the buffer id - performance issues are fixed.
   this->ChartView->GetScene()->SetUseBufferId(true);
 
@@ -60,9 +60,28 @@ vtkContextView* vtkSMXYChartViewProxy::NewChartView()
 }
 
 //----------------------------------------------------------------------------
-void vtkSMXYChartViewProxy::SetChartType(const char *)
+void vtkSMXYChartViewProxy::SetChartType(const char *type)
 {
-  // Does this proxy need to remember what type it is?
+  if (this->Chart)
+    {
+    this->Chart->Delete();
+    this->Chart = NULL;
+    }
+
+  // Construct the correct type of chart
+  if (strcmp(type, "Line") == 0 || strcmp(type, "Bar") == 0)
+    {
+    this->Chart = vtkChartXY::New();
+    }
+  else if (strcmp(type, "ParallelCoordinates") == 0)
+    {
+    this->Chart = vtkChartParallelCoordinates::New();
+    }
+
+  if (this->Chart)
+    {
+    this->ChartView->GetScene()->AddItem(this->Chart);
+    }
 }
 
 //----------------------------------------------------------------------------

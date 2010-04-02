@@ -237,6 +237,7 @@ IF (VTK_USE_QVTK)
     vtkSMContextArraysInformationHelper.cxx
     vtkSMContextViewProxy.cxx
     vtkSMLineChartViewProxy.cxx
+    vtkSMParallelCoordinatesRepresentationProxy.cxx
     vtkSMXYChartRepresentationProxy.cxx
     vtkSMXYChartViewProxy.cxx
     )

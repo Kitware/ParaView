@@ -42,7 +42,7 @@ public:
 };
 
 
-vtkCxxRevisionMacro(vtkSMContextViewProxy, "1.8");
+vtkCxxRevisionMacro(vtkSMContextViewProxy, "1.9");
 //----------------------------------------------------------------------------
 vtkSMContextViewProxy::vtkSMContextViewProxy()
 {
@@ -94,6 +94,12 @@ QVTKWidget* vtkSMContextViewProxy::GetChartWidget()
 vtkContextView* vtkSMContextViewProxy::GetChartView()
 {
   return this->ChartView;
+}
+
+//----------------------------------------------------------------------------
+vtkChart* vtkSMContextViewProxy::GetChart()
+{
+  return NULL;
 }
 
 //-----------------------------------------------------------------------------

@@ -45,6 +45,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqScatterPlotView.h"
 #include "pqXYChartView.h"
 #include "pqXYBarChartView.h"
+#include "pqParallelCoordinatesChartView.h"
 #include "vtkSMChartViewProxy.h"
 #include "vtkSMContextViewProxy.h"
 #include "vtkSMXYChartViewProxy.h"
@@ -73,6 +74,7 @@ QStringList pqStandardViewModules::viewTypes() const
     pqScatterPlotView::scatterPlotViewType() <<
     pqXYChartView::XYChartViewType() <<
     pqXYBarChartView::XYBarChartViewType() <<
+    pqParallelCoordinatesChartView::chartViewType() <<
     pqComparativeRenderView::comparativeRenderViewType() <<
     pqComparativeBarChartView::comparativeBarChartViewType() <<
     pqComparativeLineChartView::comparativeLineChartViewType();
@@ -128,6 +130,10 @@ QString pqStandardViewModules::viewTypeName(const QString& type) const
     {
     return pqXYBarChartView::XYBarChartViewTypeName();
     }
+  else if (type == pqParallelCoordinatesChartView::chartViewType())
+    {
+    return pqParallelCoordinatesChartView::chartViewTypeName();
+    }
 
   return QString();
 }
@@ -181,6 +187,10 @@ vtkSMProxy* pqStandardViewModules::createViewProxy(const QString& viewtype,
   else if (viewtype == pqXYBarChartView::XYBarChartViewType())
     {
     root_xmlname = "XYBarChartView";
+    }
+  else if (viewtype == pqParallelCoordinatesChartView::chartViewType())
+    {
+    root_xmlname = "ParallelCoordinatesChartView";
     }
 
   if (root_xmlname)
@@ -261,6 +271,13 @@ pqView* pqStandardViewModules::createView(const QString& viewtype,
     return new pqXYBarChartView(group, viewname,
                                 vtkSMXYChartViewProxy::SafeDownCast(viewmodule),
                                 server, p);
+    }
+  else if (viewmodule->IsA("vtkSMXYChartViewProxy") &&
+           viewtype == "ParallelCoordinatesChartView")
+    {
+    return new pqParallelCoordinatesChartView(group, viewname,
+                                        vtkSMXYChartViewProxy::SafeDownCast(viewmodule),
+                                        server, p);
     }
 
   qDebug() << "Failed to create a proxy" << viewmodule->GetClassName();
