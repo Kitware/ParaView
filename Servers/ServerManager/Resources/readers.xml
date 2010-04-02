@@ -873,6 +873,17 @@
           This property specifies the file name for the STL reader.
         </Documentation>
      </StringVectorProperty>
+
+      <IntVectorProperty name="ScalarTags"
+        command="SetScalarTags"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          When set to true, the reader will include cell data describing which solid a cell belongs to.
+        </Documentation>
+      </IntVectorProperty>
+
    <!-- End stlreader -->
    </SourceProxy>
 
