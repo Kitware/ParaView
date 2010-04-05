@@ -672,8 +672,7 @@ void pqPipelineRepresentation::colorByArray(const char* arrayname, int fieldtype
   
   if (current_scalar_bar_visibility && lut_mgr && this->getLookupTable())
     {
-    lut_mgr->setScalarBarVisibility(this->getView(),
-      this->getLookupTable(),
+    lut_mgr->setScalarBarVisibility(this,
       current_scalar_bar_visibility);
     }
 }

@@ -34,6 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QtDebug>
 
 #include "pqApplicationCore.h"
+#include "pqDataRepresentation.h"
 #include "pqObjectBuilder.h"
 #include "pqRenderViewBase.h"
 #include "pqScalarBarRepresentation.h"
@@ -86,9 +87,11 @@ void pqLookupTableManager::onRemoveProxy(pqProxy* proxy)
 
 //-----------------------------------------------------------------------------
 pqScalarBarRepresentation* pqLookupTableManager::setScalarBarVisibility(
-  pqView* view, pqScalarsToColors* stc, bool visible)
+  pqDataRepresentation* repr,  bool visible)
 {
 
+  pqView *view = repr->getView();  
+  pqScalarsToColors* stc = repr->getLookupTable();  
   if (!stc || !view)
     {
     qCritical() << "Arguments  to pqLookupTableManager::setScalarBarVisibility "
@@ -115,7 +118,17 @@ pqScalarBarRepresentation* pqLookupTableManager::setScalarBarVisibility(
     // No scalar bar exists currently, so we create a new one.
     pqObjectBuilder* builder = pqApplicationCore::instance()->getObjectBuilder();
     sb = builder->createScalarBarDisplay(stc, renderView);
-    //title will be set be what call this  
+    
+    //fill the proper component name into the label
+    QString arrayName;    
+    int numComponents;
+    int component;    
+    if ( this->getLookupTableProperties( stc, arrayName, numComponents, component ) )
+      {  
+      int field = repr->getProxyScalarMode( );
+      QString compName = repr->getComponentName( arrayName.toAscii(), field, component );
+      sb->setTitle( arrayName, compName );
+      }
     }
 
   if (sb)

@@ -128,21 +128,9 @@ void pqScalarBarVisibilityReaction::setScalarBarVisibility(bool visible)
 
   BEGIN_UNDO_SET( "Toggle Color Legend Visibility");
   pqScalarBarRepresentation* scalar_bar =
-    lut_mgr->setScalarBarVisibility(view, repr->getLookupTable(), visible);
-
-  //fill the proper component name into the label
-  QString arrayName;
-  QString compName;
-  int numComponents;
-  int component;
-  int field;
-  lut_mgr->getLookupTableProperties( repr->getLookupTable(), arrayName, numComponents, component );
-  
-  field = repr->getProxyScalarMode( );
-  compName = repr->getComponentName( arrayName.toAscii(), field, component );
-  scalar_bar->setTitle( arrayName, compName );
-
+    lut_mgr->setScalarBarVisibility(repr, visible);
   END_UNDO_SET();
+  
   if (scalar_bar)
     {
     scalar_bar->renderViewEventually();

@@ -154,14 +154,6 @@ void pqScalarBarRepresentation::onLookupTableModified()
 //-----------------------------------------------------------------------------
 QPair<QString, QString> pqScalarBarRepresentation::getTitle() const
 {
-  /*QString title = pqSMAdaptor::getElementProperty(
-    this->getProxy()->GetProperty("Title")).toString();
-  QRegExp reg("(.*)\\b(Magnitude|X|Y|Z|XX|XY|XZ|YX|YY|YZ|ZX|ZY|ZZ|[0-9]+)\\b");
-  if (!reg.exactMatch(title))
-    {
-    return QPair<QString, QString>(title.trimmed(), "");
-    }
-    */
   QString title = pqSMAdaptor::getElementProperty(
     this->getProxy()->GetProperty("Title")).toString();
 

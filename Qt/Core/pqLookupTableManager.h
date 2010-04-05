@@ -35,12 +35,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QObject>
 #include "pqCoreExport.h"
 
+class pqDataRepresentation;
 class pqProxy;
 class pqScalarBarRepresentation;
 class pqScalarsToColors;
 class pqScalarOpacityFunction;
 class pqServer;
-class pqView;
 
 /// pqLookupTableManager is the manager that manages color lookup objects.
 /// This is an abstract class that defines the API for any LUT manager.
@@ -77,7 +77,7 @@ public:
   /// default labels for the scalar bar if a new scalar bar is created).
   /// Returns the scalar bar, if any.
   virtual pqScalarBarRepresentation* setScalarBarVisibility(
-    pqView* view, pqScalarsToColors*, bool visible);
+     pqDataRepresentation* repr,  bool visible);
 
   /// Used to get the array the \c lut is associated with.
   /// Return false if no such association exists.
