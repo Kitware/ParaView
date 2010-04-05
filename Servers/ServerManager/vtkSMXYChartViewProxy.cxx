@@ -28,13 +28,37 @@
 #include <QString>
 #include <QRegExp>
 
+#include "vtkCommand.h"
+
+// Command implementation
+class vtkSMXYChartViewProxy::CommandImpl : public vtkCommand
+{
+public:
+  static CommandImpl* New(vtkSMXYChartViewProxy *proxy)
+  {
+    return new CommandImpl(proxy);
+  }
+
+  CommandImpl(vtkSMXYChartViewProxy* proxy)
+    : Target(proxy), Initialized(false)
+  { }
+
+  virtual void Execute(vtkObject*, unsigned long, void*)
+  {
+    Target->SelectionChanged();
+  }
+  vtkSMXYChartViewProxy* Target;
+  bool Initialized;
+};
+
 vtkStandardNewMacro(vtkSMXYChartViewProxy);
-vtkCxxRevisionMacro(vtkSMXYChartViewProxy, "1.11");
+vtkCxxRevisionMacro(vtkSMXYChartViewProxy, "1.12");
 //----------------------------------------------------------------------------
 vtkSMXYChartViewProxy::vtkSMXYChartViewProxy()
 {
   this->Chart = NULL;
   this->InternalTitle = NULL;
+  this->Command = CommandImpl::New(this);
 }
 
 //----------------------------------------------------------------------------
@@ -46,6 +70,7 @@ vtkSMXYChartViewProxy::~vtkSMXYChartViewProxy()
     this->Chart = NULL;
     }
   this->SetInternalTitle(NULL);
+  this->Command->Delete();
 }
 
 //----------------------------------------------------------------------------
@@ -80,6 +105,7 @@ void vtkSMXYChartViewProxy::SetChartType(const char *type)
 
   if (this->Chart)
     {
+    this->Chart->AddObserver(vtkCommand::SelectionChangedEvent, this->Command);
     this->ChartView->GetScene()->AddItem(this->Chart);
     }
 }
@@ -323,6 +349,11 @@ void vtkSMXYChartViewProxy::PerformRender()
     }
 
   this->ChartView->Render();
+}
+
+void vtkSMXYChartViewProxy::SelectionChanged()
+{
+  this->InvokeEvent(vtkCommand::SelectionChangedEvent);
 }
 
 //----------------------------------------------------------------------------
