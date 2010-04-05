@@ -86,17 +86,11 @@ protected:
   virtual bool EndCreateVTKObjects();
   virtual void CreatePipeline(vtkSMSourceProxy* input, int outputport);
 
-  void SelectionChanged();
-
   vtkSMClientDeliveryRepresentationProxy* SelectionRepresentation;
 
   vtkWeakPointer<vtkSMXYChartViewProxy> ChartViewProxy;
   int Visibility;
   vtkAnnotationLink *AnnLink;
-
-  // Command implementation and object pointer - listen to selection updates.
-  class CommandImpl;
-  CommandImpl* Command;
 
 private:
   vtkSMParallelCoordinatesRepresentationProxy(

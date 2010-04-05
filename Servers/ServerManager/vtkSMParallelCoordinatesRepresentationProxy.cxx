@@ -24,45 +24,20 @@
 #include "vtkTable.h"
 #include "vtkAnnotationLink.h"
 #include "vtkSelection.h"
-#include "vtkCommand.h"
-
-// Command implementation
-class vtkSMParallelCoordinatesRepresentationProxy::CommandImpl : public vtkCommand
-{
-public:
-  static CommandImpl* New(vtkSMParallelCoordinatesRepresentationProxy *proxy)
-  {
-    return new CommandImpl(proxy);
-  }
-
-  CommandImpl(vtkSMParallelCoordinatesRepresentationProxy* proxy)
-    : Target(proxy), Initialized(false)
-  { }
-
-  virtual void Execute(vtkObject*, unsigned long, void*)
-  {
-    Target->SelectionChanged();
-  }
-  vtkSMParallelCoordinatesRepresentationProxy* Target;
-  bool Initialized;
-};
-
 
 vtkStandardNewMacro(vtkSMParallelCoordinatesRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMParallelCoordinatesRepresentationProxy, "1.1");
+vtkCxxRevisionMacro(vtkSMParallelCoordinatesRepresentationProxy, "1.2");
 //----------------------------------------------------------------------------
 vtkSMParallelCoordinatesRepresentationProxy::vtkSMParallelCoordinatesRepresentationProxy()
 {
   this->Visibility = 1;
   this->AnnLink = vtkAnnotationLink::New();
-  this->Command = CommandImpl::New(this);
 }
 
 //----------------------------------------------------------------------------
 vtkSMParallelCoordinatesRepresentationProxy::~vtkSMParallelCoordinatesRepresentationProxy()
 {
   this->AnnLink->Delete();
-  this->Command->Delete();
 }
 
 //----------------------------------------------------------------------------
@@ -125,13 +100,6 @@ bool vtkSMParallelCoordinatesRepresentationProxy::EndCreateVTKObjects()
   // The reduction type for all chart representation is TABLE_MERGE since charts
   // always deliver tables.
   this->SetReductionType(vtkSMClientDeliveryRepresentationProxy::TABLE_MERGE);
-
-  if (this->GetChart())
-    {
-    this->GetChart()->AddObserver(vtkCommand::SelectionChangedEvent,
-                                  this->Command);
-    this->Command->Initialized = true;
-    }
 
   return true;
 }
@@ -205,13 +173,6 @@ void vtkSMParallelCoordinatesRepresentationProxy::Update(vtkSMViewProxy* view)
         vtkSelection::SafeDownCast(this->SelectionRepresentation->GetOutput());
     this->AnnLink->SetCurrentSelection(sel);
     this->GetChart()->SetAnnotationLink(AnnLink);
-
-    if (!this->Command->Initialized)
-      {
-      this->GetChart()->AddObserver(vtkCommand::SelectionChangedEvent,
-                                    this->Command);
-      this->Command->Initialized = true;
-      }
     }
 
   // Set the table, in case it has changed.
@@ -246,10 +207,4 @@ const char* vtkSMParallelCoordinatesRepresentationProxy::GetSeriesName(int col)
     {
     return NULL;
     }
-}
-
-void vtkSMParallelCoordinatesRepresentationProxy::SelectionChanged()
-{
-  this->InvokeEvent(vtkCommand::SelectionChangedEvent);
-  cout << "Selection changed in proxy..." << endl;
 }
