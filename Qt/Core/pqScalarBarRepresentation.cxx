@@ -154,14 +154,21 @@ void pqScalarBarRepresentation::onLookupTableModified()
 //-----------------------------------------------------------------------------
 QPair<QString, QString> pqScalarBarRepresentation::getTitle() const
 {
-  QString title = pqSMAdaptor::getElementProperty(
+  /*QString title = pqSMAdaptor::getElementProperty(
     this->getProxy()->GetProperty("Title")).toString();
   QRegExp reg("(.*)\\b(Magnitude|X|Y|Z|XX|XY|XZ|YX|YY|YZ|ZX|ZY|ZZ|[0-9]+)\\b");
   if (!reg.exactMatch(title))
     {
     return QPair<QString, QString>(title.trimmed(), "");
     }
-  return QPair<QString, QString>(reg.cap(1).trimmed(), reg.cap(2).trimmed());
+    */
+  QString title = pqSMAdaptor::getElementProperty(
+    this->getProxy()->GetProperty("Title")).toString();
+
+  QString compTitle = pqSMAdaptor::getElementProperty(
+    this->getProxy()->GetProperty("ComponentTitle")).toString();
+
+  return QPair<QString, QString>(title.trimmed(), compTitle.trimmed());
 }
 
 //-----------------------------------------------------------------------------
@@ -173,39 +180,10 @@ void pqScalarBarRepresentation::setTitle(const QString& name, const QString& com
     }
 
   pqSMAdaptor::setElementProperty(this->getProxy()->GetProperty("Title"),
-    (name + " " + comp).trimmed());
+    name.trimmed());
+  pqSMAdaptor::setElementProperty(this->getProxy()->GetProperty("ComponentTitle"),
+    comp.trimmed());    
   this->getProxy()->UpdateVTKObjects();
-}
-
-//-----------------------------------------------------------------------------
-QString pqScalarBarRepresentation::getDefaultComponentLabel(
-  int component_no, int num_components)
-{
-  QString component;
-  if (num_components <= 1)
-    {
-    component = "";
-    }
-  else if (component_no == -1)
-    {
-    component = "Magnitude";
-    }
-  else if (num_components <= 3 && component_no < 3)
-    {
-    const char* titles[] = { "X", "Y", "Z"};
-    component = titles[component_no];
-    }
-  else if (num_components == 6)
-    {
-    const char* titles[] ={"XX", "YY", "ZZ", "XY", "YZ", "XZ"};
-    // Assume this is a symmetric matrix.
-    component = titles[component_no];
-    }
-  else
-    {
-    component = QString::number(component_no);
-    }
-  return component;
 }
 
 //-----------------------------------------------------------------------------

@@ -48,13 +48,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMStringVectorProperty.h"
 
 // ParaView includes
+#include "pqDataRepresentation.h"
 #include "pqPropertyLinks.h"
 #include "pqSignalAdaptors.h"
 #include "pqPropertyManager.h"
 #include "pqPipelineFilter.h"
 #include "pqOutputPort.h"
 #include "pqSMAdaptor.h"
-#include "pqScalarBarRepresentation.h"
 #include "ui_pqCalculatorPanel.h"
 
 class pqCalculatorPanel::pqInternal 
@@ -529,9 +529,9 @@ void pqCalculatorPanel::updateVariables(const QString& mode)
         this->Internal->ScalarsMenu.addAction(name);
         }
       else
-        {
-        QString n = name + QString("_%1").arg(
-          pqScalarBarRepresentation::getDefaultComponentLabel(j, numComponents));
+        {        
+        QString compName(arrayInfo->GetComponentName( j ));        
+        QString n = name + QString( "_%1").arg( compName );
         QStringList d;
         d.append(name);
         d.append(QString("%1").arg(j));

@@ -39,8 +39,11 @@ class pqOutputPort;
 class pqPipelineSource;
 class pqScalarOpacityFunction;
 class pqScalarsToColors;
+class vtkPVArrayInformation;
 class vtkPVDataInformation;
 class vtkPVTemporalDataInformation;
+
+
 
 /// pqDataRepresentation is the superclass for a display for a pqPipelineSource
 /// i.e. the input for this display proxy is a pqPiplineSource.
@@ -118,6 +121,10 @@ public:
   /// This is only applicable, if this representation is connected to a
   /// data-filter which has a valid input.
   pqDataRepresentation* getRepresentationForUpstreamSource() const;
+  
+  virtual int getProxyScalarMode( );
+  virtual int getNumberOfComponents(const char* arrayname, int fieldType);
+  virtual QString getComponentName( const char* arrayname, int fieldtype, int component);
 
 signals:
   /// Fired when the representation proxy fires the vtkCommand::UpdateDataEvent.
@@ -137,6 +144,8 @@ protected:
     this->Superclass::initialize();
     this->onInputChanged();
     }
+
+  virtual vtkPVArrayInformation* getArrayInformation( const char* arrayname, const int &fieldType );
 
 private:
   pqDataRepresentation(const pqDataRepresentation&); // Not implemented.

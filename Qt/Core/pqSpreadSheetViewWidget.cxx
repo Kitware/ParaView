@@ -109,6 +109,7 @@ public:
     this->TextOption.setAlignment(
       QStyle::visualAlignment(option.direction, option.displayAlignment));
     // assume this is representative of the largest number we'll show
+    
     int len = option.fontMetrics.width("-8.88888e-8888 ");
     this->TextOption.setTabStop(len);
     this->TextLayout.setTextOption(this->TextOption);

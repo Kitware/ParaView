@@ -115,22 +115,7 @@ pqScalarBarRepresentation* pqLookupTableManager::setScalarBarVisibility(
     // No scalar bar exists currently, so we create a new one.
     pqObjectBuilder* builder = pqApplicationCore::instance()->getObjectBuilder();
     sb = builder->createScalarBarDisplay(stc, renderView);
-
-    QString arrayName;
-    int numComponents;
-    int component;
-
-    if (!this->getLookupTableProperties(stc, arrayName, numComponents, component))
-      {
-      qWarning() << "LookupTable is not managed by this pqLookupTableManager.";
-      }
-    else
-      {
-      // Now set the title for the scalar bar.
-      QString compName = pqScalarBarRepresentation::getDefaultComponentLabel(
-        component, numComponents);
-      sb->setTitle(arrayName, compName);
-      }
+    //title will be set be what call this  
     }
 
   if (sb)

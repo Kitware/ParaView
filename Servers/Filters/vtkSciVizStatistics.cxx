@@ -24,7 +24,7 @@
 #include <vtkstd/set>
 #include <vtksys/ios/sstream>
 
-vtkCxxRevisionMacro(vtkSciVizStatistics,"1.3");
+vtkCxxRevisionMacro(vtkSciVizStatistics,"1.4");
 vtkInformationKeyMacro(vtkSciVizStatistics, MULTIPLE_MODELS, Integer);
 
 vtkSciVizStatistics::vtkSciVizStatistics()
@@ -514,10 +514,14 @@ int vtkSciVizStatistics::PrepareFullDataTable( vtkTable* tableIn, vtkFieldData* 
         // FIXME: Should we add a "norm" column when arr is a vtkDataArray? It would make sense.
         vtkstd::vector<vtkAbstractArray*> comps;
         int i;
+        const char* compName;
         for ( i = 0; i < ncomp; ++ i )
           {
           vtksys_ios::ostringstream os;
-          os << arr->GetName() << "_" << i;
+          compName = arr->GetComponentName( i );
+          os << arr->GetName() << "_";
+          ( compName ) ? os << compName : os << i;
+
           vtkAbstractArray* arrCol = vtkAbstractArray::CreateArray( arr->GetDataType() );
           arrCol->SetName( os.str().c_str() );
           arrCol->SetNumberOfComponents( 1 );

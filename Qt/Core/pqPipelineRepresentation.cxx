@@ -529,7 +529,21 @@ int pqPipelineRepresentation::getNumberOfComponents(
     arrayname, fieldtype);
   return (info? info->GetNumberOfComponents() : 0);
 }
+//-----------------------------------------------------------------------------
+QString pqPipelineRepresentation::getComponentName(
+  const char* arrayname, int fieldtype, int component)
+{
+  vtkPVArrayInformation* info = this->Internal->getArrayInformation(
+    arrayname, fieldtype);
+     
+   if ( info )
+     {
+     return QString (info->GetComponentName( component ) );     
+     }  
 
+   //failed to find info, return empty string
+  return QString();
+}
 //-----------------------------------------------------------------------------
 void pqPipelineRepresentation::colorByArray(const char* arrayname, int fieldtype)
 {
@@ -994,6 +1008,30 @@ int pqPipelineRepresentation::getColorFieldNumberOfComponents(const QString& arr
 
   return this->getNumberOfComponents(field.toAscii().data(),
     fieldType);
+}
+
+//-----------------------------------------------------------------------------
+QString pqPipelineRepresentation::getColorFieldComponentName( const QString& array, const int &component )
+{
+  QString field = array;
+  int fieldType = vtkSMDataRepresentationProxy::POINT_DATA;
+
+  if(field == pqPipelineRepresentation::solidColor())
+    {
+    return 0;
+    }
+  if(field.right(strlen(" (cell)")) == " (cell)")
+    {
+    field.chop(strlen(" (cell)"));
+    fieldType = vtkSMDataRepresentationProxy::CELL_DATA;
+    }
+  else if(field.right(strlen(" (point)")) == " (point)")
+    {
+    field.chop(strlen(" (point)"));
+    fieldType = vtkSMDataRepresentationProxy::POINT_DATA;
+    }
+
+   return this->getComponentName(field.toAscii().data(), fieldType, component );
 }
 
 //-----------------------------------------------------------------------------

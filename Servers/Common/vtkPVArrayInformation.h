@@ -25,8 +25,9 @@
 #define __vtkPVArrayInformation_h
 
 #include "vtkPVInformation.h"
-
 class vtkClientServerStream;
+class vtkComponentNames;
+class vtkStdString;
 
 class VTK_EXPORT vtkPVArrayInformation : public vtkPVInformation
 {
@@ -50,6 +51,16 @@ public:
   // Changing the number of components clears the ranges back to the default.
   void SetNumberOfComponents(int numComps);
   vtkGetMacro(NumberOfComponents, int);
+
+  // Description:
+  // Set the name for a component. Must be >= 1. 
+  void SetComponentName( int component, const char *name );
+  
+  //Description:
+  // Get the component name for a given component.
+  // Note: the const char* that is returned is only valid
+  // intill the next call to this method!
+  const char* GetComponentName( int component );
 
   // Description:
   // Set/get the array's length
@@ -118,6 +129,17 @@ protected:
   int NumberOfTuples;
   char *Name;
   double *Ranges;
+  
+  //this is used by GetComponentName, so that it always return a valid component name
+  //BTX
+  vtkStdString *DefaultComponentName;
+  //ETX
+  
+  /// assigns to a string to DefaultComponentName for this component
+  void DetermineDefaultComponentName( const int &component_no, const int &numComps);
+  
+
+  vtkComponentNames* ComponentNames;
 
   vtkPVArrayInformation(const vtkPVArrayInformation&); // Not implemented
   void operator=(const vtkPVArrayInformation&); // Not implemented

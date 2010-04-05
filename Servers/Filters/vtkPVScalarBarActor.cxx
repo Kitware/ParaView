@@ -52,7 +52,7 @@
 #define MY_ABS(x)       ((x) < 0 ? -(x) : (x))
 
 //=============================================================================
-vtkCxxRevisionMacro(vtkPVScalarBarActor, "1.13");
+vtkCxxRevisionMacro(vtkPVScalarBarActor, "1.14");
 vtkStandardNewMacro(vtkPVScalarBarActor);
 
 //=============================================================================
@@ -82,12 +82,17 @@ vtkPVScalarBarActor::~vtkPVScalarBarActor()
 
   this->LabelMappers.clear();
   this->LabelActors.clear();
+
+  if (this->ComponentTitle)
+    {
+    delete [] this->ComponentTitle;
+    this->ComponentTitle = NULL;
+    }
 }
 
 void vtkPVScalarBarActor::PrintSelf(ostream &os, vtkIndent indent)
 {
-  this->Superclass::PrintSelf(os, indent);
-
+  this->Superclass::PrintSelf(os, indent); 
   os << indent << "AspectRatio: " << this->AspectRatio << endl;
   os << indent << "AutomaticLabelFormat: " << this->AutomaticLabelFormat <<endl;
 }
@@ -218,8 +223,21 @@ int vtkPVScalarBarActor::RenderOpaqueGeometry(vtkViewport *viewport)
     
     // Update all the composing objects
     this->TitleActor->GetProperty()->DeepCopy(this->GetProperty());
-    this->TitleMapper->SetInput(this->Title);
-    
+    if ( this->ComponentTitle && strlen(this->ComponentTitle) > 0 )
+      {
+      //need to account for a space between title & component and null term
+      int size = strlen(this->Title) + strlen(this->ComponentTitle) + 2;
+      char *combinedTitle = new char[ size ];
+      strcpy(combinedTitle, this->Title );
+      strcat( combinedTitle, " " );
+      strcat( combinedTitle, this->ComponentTitle );
+      this->TitleMapper->SetInput(combinedTitle);
+      delete [] combinedTitle;
+      }
+    else
+      {
+      this->TitleMapper->SetInput(this->Title);
+      }
     // find the best size for the title font
     this->PositionTitle(size, viewport);
     

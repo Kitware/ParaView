@@ -23,7 +23,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkInformationVector.h"
 
-vtkCxxRevisionMacro( vtkPVArrayCalculator, "1.2" );
+vtkCxxRevisionMacro( vtkPVArrayCalculator, "1.3" );
 vtkStandardNewMacro( vtkPVArrayCalculator );
 
 // ----------------------------------------------------------------------------
@@ -41,7 +41,7 @@ void vtkPVArrayCalculator::UpdateArrayAndVariableNames
   int     numberComps = 1;
   int     aray1Length = 0; // length of a scalar variable name
   int     numberArays = inDataAttrs->GetNumberOfArrays(); // the input
-  char    tempVarName[100];
+  char    tempVarName[128];
   char  * theAryName0 = NULL; // array name of the input
   char  * theAryName1 = NULL; // array name of the output
   static  char   stringSufix[3][3] = { "_X", "_Y", "_Z" };
@@ -149,9 +149,19 @@ void vtkPVArrayCalculator::UpdateArrayAndVariableNames
       }
     else
       {
+      const char* compName;
+      vtkAbstractArray* abstArray = inDataAttrs->GetAbstractArray( theAryName0 );
       for ( i = 0; i < numberComps; i ++ )
-        {
-        sprintf( tempVarName, "%s%s", theAryName0, stringSufix[i] );
+        {        
+        compName = abstArray->GetComponentName( i );
+        if ( compName )
+          {
+          sprintf( tempVarName, "%s_%s", theAryName0, compName );
+          }
+        else
+          {
+          sprintf( tempVarName, "%s%s", theAryName0, stringSufix[i] );
+          }
         this->AddScalarVariable( tempVarName, theAryName0, i );
         }
       

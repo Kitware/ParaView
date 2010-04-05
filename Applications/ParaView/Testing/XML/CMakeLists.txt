@@ -68,6 +68,7 @@ SET (TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/UndoRedo7.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/UnstructuredOutline.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/VariableSelector.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/VariableSelector1.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/ViewSettingsDialog.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/XdmfRead.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/XdmfReadImageData.xml

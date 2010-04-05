@@ -962,6 +962,19 @@ void pqColorScaleEditor::setLegendVisibility(bool visible)
         pqApplicationCore::instance()->getLookupTableManager();
       pqScalarBarRepresentation* legend = lutManager->setScalarBarVisibility(
         this->Display->getView(), this->ColorMap, visible);
+      
+      //fill the proper component name into the label
+      QString arrayName;
+      QString compName;
+      int numComponents;
+      int component;
+      int field;
+      lutManager->getLookupTableProperties( this->ColorMap, arrayName, numComponents, component );
+      
+      field = this->Display->getProxyScalarMode( );
+      compName = this->Display->getComponentName( arrayName.toAscii(), field, component );
+      legend->setTitle( arrayName, compName );
+      
       this->setLegend(legend);
       this->Form->MakingLegend = false;
       }

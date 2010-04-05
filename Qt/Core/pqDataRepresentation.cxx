@@ -32,7 +32,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqDataRepresentation.h"
 
 #include "vtkEventQtSlotConnect.h"
+#include "vtkPVArrayInformation.h"
 #include "vtkPVDataInformation.h"
+#include "vtkPVDataSetAttributesInformation.h"
 #include "vtkSMDataRepresentationProxy.h"
 #include "vtkSMInputProperty.h"
 #include "vtkSMSourceProxy.h"
@@ -274,4 +276,68 @@ pqDataRepresentation* pqDataRepresentation::getRepresentationForUpstreamSource()
    }
 
  return input->getRepresentation(view);
+}
+
+//-----------------------------------------------------------------------------
+int pqDataRepresentation::getProxyScalarMode( )
+{
+  vtkSMDataRepresentationProxy* repr = vtkSMDataRepresentationProxy::SafeDownCast( this->getProxy() );
+   if (!repr)
+    {
+    return NULL;
+    }
+
+  QVariant scalarMode = pqSMAdaptor::getEnumerationProperty(
+    repr->GetProperty("ColorAttributeType"));
+
+   if(scalarMode == "CELL_DATA")
+      {
+      return vtkSMDataRepresentationProxy::CELL_DATA;
+      }
+    else if(scalarMode == "POINT_DATA")
+      {
+      return vtkSMDataRepresentationProxy::POINT_DATA;
+      }
+
+   return vtkSMDataRepresentationProxy::FIELD_DATA;
+  }
+
+
+//-----------------------------------------------------------------------------
+vtkPVArrayInformation* pqDataRepresentation::getArrayInformation( const char* arrayname, const int &fieldType )
+{
+ 
+  vtkPVDataInformation* dataInfo = this->getRepresentedDataInformation(true);
+  vtkPVArrayInformation* info = NULL;
+  if(fieldType == vtkSMDataRepresentationProxy::CELL_DATA)
+    {
+    vtkPVDataSetAttributesInformation* cellinfo = 
+      dataInfo->GetCellDataInformation();
+    info = cellinfo->GetArrayInformation(arrayname);
+    }
+  else if ( fieldType == vtkSMDataRepresentationProxy::POINT_DATA )
+    {
+    vtkPVDataSetAttributesInformation* pointinfo = 
+      dataInfo->GetPointDataInformation();
+    info = pointinfo->GetArrayInformation(arrayname);
+    }  
+  return info;
+}
+
+//-----------------------------------------------------------------------------
+int pqDataRepresentation::getNumberOfComponents(const char* arrayname, int fieldType)
+{
+  vtkPVArrayInformation *info = this->getArrayInformation( arrayname, fieldType );
+  return ( info ) ? info->GetNumberOfComponents() : 0;
+}
+
+//-----------------------------------------------------------------------------
+QString pqDataRepresentation::getComponentName( const char* arrayname, int fieldType, int component)
+{ 
+  vtkPVArrayInformation *info = this->getArrayInformation( arrayname, fieldType );
+  if ( info )
+     {
+     return QString(info->GetComponentName( component ));     
+     }     
+  return QString();
 }

@@ -311,10 +311,9 @@ void pqDisplayColorWidget::updateComponents()
 
       this->Components->addItem("Magnitude");
       for(int i=0; i<numComponents; i++)
-        {
-        this->Components->addItem(
-          pqScalarBarRepresentation::getDefaultComponentLabel(
-            i, numComponents));
+        {        
+        this->Components->addItem(  
+          display->getColorFieldComponentName( display->getColorField(), i) );          
         }
       
       if(lut->getVectorMode() == pqScalarsToColors::MAGNITUDE)

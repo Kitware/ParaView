@@ -9549,6 +9549,7 @@
         <ExposedProperties>
           <Property name="LookupTable" />
           <Property name="Title" />
+          <Property name="ComponentTitle" />
           <Property name="AutomaticLabelFormat" />
           <Property name="LabelFormat" />
           <Property name="NumberOfLabels" />

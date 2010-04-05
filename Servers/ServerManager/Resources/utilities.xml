@@ -1761,6 +1761,14 @@
         default_values=""
         animateable="0">
       </StringVectorProperty>
+      
+      <StringVectorProperty
+        name="ComponentTitle"
+        command="SetComponentTitle"
+        number_of_elements="1"
+        default_values=""
+        animateable="0">
+      </StringVectorProperty>
 
       <IntVectorProperty name="AutomaticLabelFormat"
                          command="SetAutomaticLabelFormat"

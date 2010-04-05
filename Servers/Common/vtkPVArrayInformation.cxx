@@ -14,19 +14,29 @@ cxx     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 =========================================================================*/
 #include "vtkPVArrayInformation.h"
 
-#include "vtkClientServerStream.h"
+#include "vtkClientServerStream.h"  
 #include "vtkDataArray.h"
 #include "vtkObjectFactory.h"
 
+#include "vtkStdString.h"
+#include <vtkstd/vector>
+#include <vtksys/ios/sstream>
+
+typedef  vtkstd::vector< vtkStdString* > vtkComponentNameBase;
+class vtkComponentNames : public vtkComponentNameBase {};
+
 vtkStandardNewMacro(vtkPVArrayInformation);
-vtkCxxRevisionMacro(vtkPVArrayInformation, "1.9");
+vtkCxxRevisionMacro(vtkPVArrayInformation, "1.10");
 
 //----------------------------------------------------------------------------
 vtkPVArrayInformation::vtkPVArrayInformation()
 {
   this->Name = 0;
   this->Ranges = 0;
+  this->ComponentNames = 0;
+  this->DefaultComponentName = 0;
   this->Initialize();
+
 }
 
 //----------------------------------------------------------------------------
@@ -42,6 +52,20 @@ void vtkPVArrayInformation::Initialize()
   this->DataType = VTK_VOID;
   this->NumberOfComponents = 0;
   this->NumberOfTuples = 0;
+
+  if ( this->ComponentNames )
+    {
+    this->ComponentNames->clear();
+    delete this->ComponentNames;
+    this->ComponentNames = 0;
+    }  
+
+  if ( this->DefaultComponentName )
+    {
+    delete this->DefaultComponentName;
+    this->DefaultComponentName = 0;
+    }
+
   if(this->Ranges)
     {
     delete [] this->Ranges;
@@ -63,6 +87,14 @@ void vtkPVArrayInformation::PrintSelf(ostream& os, vtkIndent indent)
     }
   os << indent << "DataType: " << this->DataType << endl;
   os << indent << "NumberOfComponents: " << this->NumberOfComponents << endl;
+  if ( this->ComponentNames )
+    {
+    os << indent << "ComponentNames:" << endl;
+    for ( idx=0; idx < this->ComponentNames->size(); ++idx )
+      {
+      os << i2 << this->ComponentNames->at(idx) << endl;
+      }    
+    }
   os << indent << "NumberOfTuples: " << this->NumberOfTuples << endl;
   os << indent << "IsPartial: " << this->IsPartial << endl;
 
@@ -76,6 +108,7 @@ void vtkPVArrayInformation::PrintSelf(ostream& os, vtkIndent indent)
     {
     os << i2 << this->Ranges[2*idx] << ", " << this->Ranges[2*idx+1] << endl;
     }
+
 }
 
 
@@ -111,6 +144,62 @@ void vtkPVArrayInformation::SetNumberOfComponents(int numComps)
     }
 }
 
+
+//----------------------------------------------------------------------------
+void vtkPVArrayInformation::SetComponentName( int component, const char *name )
+  {
+  if ( component < 0 || name == NULL )
+    {
+    return;
+    }
+
+  if ( this->ComponentNames == NULL )
+    {
+    //delayed allocate
+    this->ComponentNames = new vtkComponentNames();
+    }
+
+  if ( component == this->ComponentNames->size() )
+    {
+    //the array isn't large enough, so we will resize
+    this->ComponentNames->push_back( new vtkStdString(name) );
+    return;
+    }
+  else if ( component > this->ComponentNames->size() )
+    {
+    this->ComponentNames->resize( component+1, NULL );
+    }  
+   
+  //replace an exisiting element
+  vtkStdString *compName = this->ComponentNames->at(component);
+  if ( !compName )
+    {
+    compName = new vtkStdString(name);
+    this->ComponentNames->at(component) = compName;    
+    } 
+  else
+    {
+    compName->assign( name );
+    }
+  }
+
+//----------------------------------------------------------------------------
+const char* vtkPVArrayInformation::GetComponentName( int component )
+{
+  if( this->ComponentNames && component >= 0 && 
+    component < this->ComponentNames->size() )
+    {
+    vtkStdString *compName = this->ComponentNames->at( component );
+    if ( compName )
+      {
+      return compName->c_str();
+      }
+    }
+  //we have failed to find a user set component name, use the default component name    
+  this->DetermineDefaultComponentName( component, this->GetNumberOfComponents() );
+  return this->DefaultComponentName->c_str();
+}
+  
 //----------------------------------------------------------------------------
 void vtkPVArrayInformation::SetComponentRange(int comp, double min, double max)
 {
@@ -286,6 +375,24 @@ void vtkPVArrayInformation::DeepCopy(vtkPVArrayInformation *info)
     {
     this->Ranges[idx] = info->Ranges[idx];
     }
+
+  if ( this->ComponentNames )
+    {
+    //clear the vector of the all data
+    this->ComponentNames->clear();
+    
+    //copy the passed in components    
+    this->ComponentNames->reserve( info->ComponentNames->size() );
+    const char *name;
+    for ( vtkIdType i = 0; i < info->ComponentNames->size(); ++i )
+      {
+      name = info->GetComponentName(i);
+      if ( name )
+        {
+        this->SetComponentName(i,name);
+        }
+      }
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -323,6 +430,21 @@ void vtkPVArrayInformation::CopyFromObject(vtkObject* obj)
   this->DataType = array->GetDataType();
   this->SetNumberOfComponents(array->GetNumberOfComponents());
   this->SetNumberOfTuples(array->GetNumberOfTuples());
+
+  if ( array->HasAComponentName() )
+    {
+    const char *name;
+    //copy the component names over
+    for ( int i=0; i < this->GetNumberOfComponents(); ++i )
+      {
+      name = array->GetComponentName(i);
+      if ( name )
+        {
+        //each component doesn't have to be named
+        this->SetComponentName(i,name);
+        }
+      }
+    }
   
   if(vtkDataArray* const data_array = vtkDataArray::SafeDownCast(obj))
     {
@@ -400,6 +522,21 @@ void vtkPVArrayInformation::CopyToStream(vtkClientServerStream* css)
     *css << vtkClientServerStream::InsertArray(this->Ranges + 2*i, 2);
     }
 
+  //add in the component names
+  num = this->ComponentNames ? this->ComponentNames->size() : 0;
+  *css << num;
+  vtkStdString *compName;
+  for ( int i=0; i < num; ++i )
+    {    
+    compName = this->ComponentNames->at(i);
+    if ( compName )
+      {
+      //we can't presume that every component has been named, so only stream valid component names
+      *css << i;
+      *css << compName->c_str();
+      }    
+    }    
+
   *css << vtkClientServerStream::End;
 }
 
@@ -444,7 +581,7 @@ void vtkPVArrayInformation::CopyFromStream(const vtkClientServerStream* css)
     num++;
     }
 
-  // Range of each component.
+  // Range of each component.  
   for(int i=0; i < num; ++i)
     {
     if(!css->GetArgument(0, 4+i, this->Ranges + 2*i, 2))
@@ -452,5 +589,78 @@ void vtkPVArrayInformation::CopyFromStream(const vtkClientServerStream* css)
       vtkErrorMacro("Error parsing range of component.");
       return;
       }
+    }  
+  int pos = 4 + num;
+  int numOfComponents;
+  if ( !css->GetArgument(0,pos++,&numOfComponents) )
+    {
+    vtkErrorMacro("Error parsing number of component names.");
+    return;
+    }  
+  if ( numOfComponents > 0 )
+    {   
+    if ( !this->ComponentNames )
+      {    
+      this->ComponentNames = new vtkComponentNames();
+      }
+    this->ComponentNames->clear();      
+    this->ComponentNames->reserve( numOfComponents );
+    
+    num = 0;
+    int i = 0;
+    //the component names don't have to be continous but they are in ascending order
+    while ( num < (numOfComponents-1) )
+      {
+      if (!css->GetArgument(0, pos + (i*2), &num ) )
+        {
+        vtkErrorMacro("Error parsing component name position from message.");
+        return;
+        }
+      if (!css->GetArgument(0, pos + (i*2+1), &name ) )
+        {
+        vtkErrorMacro("Error parsing component name from message.");
+        return;
+        }
+      this->SetComponentName(num,name);
+      ++i;
+      }   
     }
+      
+
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVArrayInformation::DetermineDefaultComponentName(
+  const int &component_no, const int &num_components)
+{  
+  if ( !this->DefaultComponentName )
+    {    
+    this->DefaultComponentName = new vtkStdString();
+    }
+  
+  if (num_components <= 1)
+    {
+    this->DefaultComponentName->assign("");
+    }
+  else if (component_no == -1)
+    {
+    this->DefaultComponentName->assign("Magnitude");
+    }
+  else if (num_components <= 3 && component_no < 3)
+    {
+    const char* titles[] = { "X", "Y", "Z"};
+    this->DefaultComponentName->assign(titles[component_no]);
+    }
+  else if (num_components == 6)
+    {
+    const char* titles[] ={"XX", "YY", "ZZ", "XY", "YZ", "XZ"};
+    // Assume this is a symmetric matrix.
+    this->DefaultComponentName->assign(titles[component_no]);
+    }
+  else
+    {
+    vtkstd::ostringstream buffer;
+    buffer << component_no;
+    this->DefaultComponentName->assign( buffer.str() );
+    }  
 }

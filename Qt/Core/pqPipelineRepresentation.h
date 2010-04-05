@@ -122,6 +122,10 @@ public:
   /// field is a string of format "<arrayname> (cell|point)".
   int getColorFieldNumberOfComponents(const QString& field);
 
+  /// Returns the name of a component for the given field.
+  /// field is a string of format "<arrayname> (cell|point)".  
+  QString getColorFieldComponentName( const QString& array, const int &component );
+
   /// Returns the proxy for the piecewise function used to
   /// map scalars to opacity.
   virtual vtkSMProxy* getScalarOpacityFunctionProxy();
@@ -197,6 +201,10 @@ protected slots:
   /// We mark this representation's LUT ranges dirty so that when the pipeline
   /// finally updates, we can reset the LUT ranges.
   void onInputAccepted();
+
+  virtual int getNumberOfComponents(const char* arrayname, int fieldType);
+  virtual QString getComponentName( const char* arrayname, int fieldtype, int component);
+
 protected:
   /// Creates helper proxies such as as the proxy
   /// for volume opacity function.
@@ -211,6 +219,8 @@ protected:
  
   bool UpdateLUTRangesOnDataUpdate;
 
+  
+
 private:
   class pqInternal;
   pqInternal* Internal; 
@@ -218,9 +228,7 @@ private:
     vtkPVDataSetAttributesInformation* attrInfo,
     vtkPVDataSetAttributesInformation* inAttrInfo,
     vtkPVArrayInformation*& arrayInfo);
-
-  int getNumberOfComponents(const char* arrayname, int fieldType);
-
+  
   /// Returns the settings key.
   static const char* UNSTRUCTURED_GRID_OUTLINE_THRESHOLD();
 };

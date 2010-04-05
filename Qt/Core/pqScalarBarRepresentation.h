@@ -76,9 +76,6 @@ public:
 
   virtual void setDefaultPropertyValues();
 
-  /// Returns the default string for showing the given component.
-  static QString getDefaultComponentLabel(int component_no, int numComps);
-
 signals:
   /// Fired just before the color is changed on the underlying proxy.
   /// This must be hooked to an undo stack to record the
