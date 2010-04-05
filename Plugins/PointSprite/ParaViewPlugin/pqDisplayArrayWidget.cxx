@@ -323,11 +323,12 @@ void pqDisplayArrayWidget::reloadComponents()
     if (numComponents > 1)
       {
       this->Internal->Components->addItem("Magnitude");
+      QString componentName;
       for (int i = 0; i < numComponents; i++)
-        {
-        this->Internal->Components->addItem(
-            pqScalarBarRepresentation::getDefaultComponentLabel(i,
-                numComponents));
+        {        
+        componentName =  display->getColorFieldComponentName(
+          this->getArrayName() + " (point)", i);        
+        this->Internal->Components->addItem( componentName );
         }
       }
     }
