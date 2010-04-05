@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationComponentsExport.h"
 
 /// @ingroup Behaviors
+///
 /// ParaView plugins can load gui configuration xmls eg. xmls for defining the
 /// filters menu, readers etc. This behavior ensures that as soon as such
 /// plugins are loaded if they provide any XMLs in the ":/.*/ParaViewResources/"
