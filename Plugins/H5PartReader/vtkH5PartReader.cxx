@@ -18,7 +18,7 @@
   Module                  : vtkH5PartReader.h
   Revision of last commit : $Rev: 793 $
   Author of last commit   : $Author: utkarsh $
-  Date of last commit     : $Date: 2009-10-01 19:21:15 $
+  Date of last commit     : $Date: 2010-04-05 14:20:00 $
 
   Copyright (C) CSCS - Swiss National Supercomputing Centre.
   You may use modify and and distribute this code freely providing
@@ -142,7 +142,7 @@ static hid_t H5PartGetDiskShape(H5PartFile *f, hid_t dataset)
 }
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkH5PartReader, "1.3");
+vtkCxxRevisionMacro(vtkH5PartReader, "1.4");
 vtkStandardNewMacro(vtkH5PartReader);
 //----------------------------------------------------------------------------
 vtkH5PartReader::vtkH5PartReader()
@@ -408,6 +408,59 @@ int vtkH5PartReader::RequestInformation(
   return 1;
 }
 
+int GetVTKDataType(int datatype)
+{
+  if (H5Tequal(datatype,H5T_NATIVE_FLOAT))
+    {
+    return VTK_FLOAT;
+    }
+  else if (H5Tequal(datatype,H5T_NATIVE_DOUBLE))
+    {
+    return VTK_DOUBLE;
+    }
+  else if (H5Tequal(datatype,H5T_NATIVE_SCHAR))
+    {
+    return VTK_CHAR;
+    }
+  else if (H5Tequal(datatype,H5T_NATIVE_UCHAR))
+    {
+    return VTK_UNSIGNED_CHAR;
+    }
+  else if (H5Tequal(datatype,H5T_NATIVE_SHORT))
+    {
+    return VTK_SHORT;
+    }
+  else if (H5Tequal(datatype,H5T_NATIVE_USHORT))
+    {
+    return VTK_UNSIGNED_SHORT;
+    }
+  else if (H5Tequal(datatype,H5T_NATIVE_INT))
+    {
+    return VTK_INT;
+    }
+  else if (H5Tequal(datatype,H5T_NATIVE_UINT))
+    {
+    return VTK_UNSIGNED_INT;
+    }
+  else if (H5Tequal(datatype,H5T_NATIVE_LONG))
+    {
+    return VTK_LONG;
+    }
+  else if (H5Tequal(datatype,H5T_NATIVE_ULONG))
+    {
+    return VTK_UNSIGNED_LONG;
+    }
+  else if (H5Tequal(datatype,H5T_NATIVE_LLONG))
+    {
+    return VTK_LONG_LONG;
+    }
+  else if (H5Tequal(datatype,H5T_NATIVE_ULLONG))
+    {
+    return VTK_UNSIGNED_LONG_LONG;
+    }
+  return VTK_VOID;
+}
+
 //----------------------------------------------------------------------------
 //A Convenience Macro which does what we want for any dataset type
 #define H5PartReadDataArray(null, T2)  \
@@ -434,6 +487,7 @@ int vtkH5PartReader::RequestInformation(
     if (diskshape!=H5S_ALL) H5Sclose(diskshape);              \
     H5Dclose(dataset);                                        \
   }
+
 //----------------------------------------------------------------------------
 /*
 template <class T1, class T2>
@@ -554,17 +608,17 @@ int vtkH5PartReader::RequestData(
       processarray = true;
       coordarrays[0] = name;
       }
-    else if (!vtksys::SystemTools::Strucmp(name,this->Yarray))
+    if (!vtksys::SystemTools::Strucmp(name,this->Yarray))
       {
       processarray = true;
       coordarrays[1] = name;
       }
-    else if (!vtksys::SystemTools::Strucmp(name,this->Zarray))
+    if (!vtksys::SystemTools::Strucmp(name,this->Zarray))
       {
       processarray = true;
       coordarrays[2] = name;
       }
-    else if (this->PointDataArraySelection->ArrayIsEnabled(name))
+    if (this->PointDataArraySelection->ArrayIsEnabled(name))
       {
       processarray = true;
       }
@@ -615,6 +669,7 @@ int vtkH5PartReader::RequestData(
       break;
       }
     }
+
   if (coordvector==scalarFields.end())
     {
     FieldMap::value_type element("Coords", coordarrays);
@@ -669,7 +724,6 @@ int vtkH5PartReader::RequestData(
   // Setup arrays for reading data
   vtkSmartPointer<vtkPoints>    points = vtkSmartPointer<vtkPoints>::New();
   vtkSmartPointer<vtkDataArray> coords = NULL;
-  int c;
   for (FieldMap::iterator it=scalarFields.begin(); it!=scalarFields.end(); it++)
     {
     // use the type of the first array for all if it is a vector field
@@ -680,66 +734,65 @@ int vtkH5PartReader::RequestData(
     //
     vtkSmartPointer<vtkDataArray> dataarray = NULL;
     hid_t datatype = H5PartGetNativeDatasetType(H5FileId,array_name);
-    // Put the float and double first as they are the most common
-    if (H5Tequal(datatype,H5T_NATIVE_FLOAT))
+    int vtk_datatype = GetVTKDataType(datatype);
+
+    if (vtk_datatype != VTK_VOID)
       {
-      dataarray = vtkSmartPointer<vtkFloatArray>::New();
-      H5PartReadDataArray(,H5T_NATIVE_FLOAT);
-      }
-    else if (H5Tequal(datatype,H5T_NATIVE_DOUBLE))
-      {
-      dataarray = vtkSmartPointer<vtkDoubleArray>::New();
-      H5PartReadDataArray(,H5T_NATIVE_DOUBLE);
-      }
-    else if (H5Tequal(datatype,H5T_NATIVE_SCHAR))
-      {
-      dataarray = vtkSmartPointer<vtkCharArray>::New();
-      H5PartReadDataArray(,H5T_NATIVE_SCHAR);
-      }
-    else if (H5Tequal(datatype,H5T_NATIVE_UCHAR))
-      {
-      dataarray = vtkSmartPointer<vtkUnsignedCharArray>::New();
-      H5PartReadDataArray(,H5T_NATIVE_UCHAR);
-      }
-    else if (H5Tequal(datatype,H5T_NATIVE_SHORT))
-      {
-      dataarray = vtkSmartPointer<vtkShortArray>::New();
-      H5PartReadDataArray(,H5T_NATIVE_SHORT);
-      }
-    else if (H5Tequal(datatype,H5T_NATIVE_USHORT))
-      {
-      dataarray = vtkSmartPointer<vtkUnsignedShortArray>::New();
-      H5PartReadDataArray(,H5T_NATIVE_USHORT);
-      }
-    else if (H5Tequal(datatype,H5T_NATIVE_INT) || H5Tequal(datatype,H5T_NATIVE_LONG))
-      {
-      dataarray = vtkSmartPointer<vtkIntArray>::New();
-      H5PartReadDataArray(,H5T_NATIVE_INT);
-      }
-    else if (H5Tequal(datatype,H5T_NATIVE_UINT) || H5Tequal(datatype,H5T_NATIVE_ULONG))
-      {
-      dataarray = vtkSmartPointer<vtkUnsignedIntArray>::New();
-      H5PartReadDataArray(,H5T_NATIVE_UINT);
-      }
-    else if (H5Tequal(datatype,H5T_NATIVE_LONG) || H5Tequal(datatype,H5T_NATIVE_ULONG))
-      {
-      dataarray = vtkSmartPointer<vtkLongArray>::New();
-      H5PartReadDataArray(,H5T_NATIVE_LONG);
-      }
-    else if (H5Tequal(datatype,H5T_NATIVE_ULONG) || H5Tequal(datatype,H5T_NATIVE_ULONG))
-      {
-      dataarray = vtkSmartPointer<vtkUnsignedLongArray>::New();
-      H5PartReadDataArray(,H5T_NATIVE_ULONG);
-      }
-    else if (H5Tequal(datatype,H5T_NATIVE_LLONG))
-      {
-      dataarray = vtkSmartPointer<vtkLongLongArray>::New();
-      H5PartReadDataArray(,H5T_NATIVE_LLONG);
-      }
-    else if (H5Tequal(datatype,H5T_NATIVE_ULLONG))
-      {
-      dataarray = vtkSmartPointer<vtkUnsignedLongLongArray>::New();
-      H5PartReadDataArray(,H5T_NATIVE_ULLONG);
+      dataarray.TakeReference(vtkDataArray::CreateDataArray(vtk_datatype));
+      dataarray->SetNumberOfComponents(Nc);
+      dataarray->SetNumberOfTuples(Nt);
+      dataarray->SetName(rootname.c_str());
+
+      // now read the data components.
+      herr_t r;
+      hsize_t count1_mem[] = { Nt*Nc };
+      hsize_t count2_mem[] = { Nt };
+      hsize_t offset_mem[] = { 0 };
+      hsize_t stride_mem[] = { Nc };
+      for (int c=0; c<Nc; c++)
+        {
+        const char *name = arraylist[c].c_str();
+        hid_t dataset   = H5Dopen(H5FileId->timegroup,name);
+        hid_t diskshape = H5PartGetDiskShape(H5FileId,dataset);
+        hid_t memspace = H5Screate_simple(1, count1_mem, NULL);
+        hid_t component_datatype = H5PartGetNativeDatasetType(H5FileId, name);
+        offset_mem[0] = c;
+        r = H5Sselect_hyperslab(
+          memspace, H5S_SELECT_SET,
+          offset_mem, stride_mem, count2_mem, NULL);
+        if (component_datatype == datatype)
+          {
+          H5Dread(dataset, datatype, memspace,
+            diskshape, H5P_DEFAULT, dataarray->GetVoidPointer(0));
+          }
+        else
+          {
+          // read data into a temporary array of the right type and then copy it
+          // over to the "dataarray".
+          // This can be optimized to create a single component array. But I
+          // don't understand the stride/offset stuff too well to fix that.
+          vtkDataArray* temparray =
+            vtkDataArray::CreateDataArray(GetVTKDataType(component_datatype));
+          temparray->SetNumberOfComponents(Nc);
+          temparray->SetNumberOfTuples(Nt);
+          r = H5Sselect_hyperslab(
+            memspace, H5S_SELECT_SET,
+            offset_mem, stride_mem, count2_mem, NULL);
+          H5Dread(dataset, component_datatype, memspace,
+            diskshape, H5P_DEFAULT, temparray->GetVoidPointer(0));
+          dataarray->CopyComponent(c, temparray, c);
+          temparray->Delete();
+          }
+        if (memspace!=H5S_ALL)
+          {
+          H5Sclose(memspace);
+          }
+        if (diskshape!=H5S_ALL)
+          {
+          H5Sclose(diskshape);
+          }
+        H5Dclose(dataset);
+        }
       }
     else
       {
@@ -762,6 +815,7 @@ int vtkH5PartReader::RequestData(
         }
       }
     }
+
   if (this->GenerateVertexCells)
     {
     vtkSmartPointer<vtkCellArray> vertices = vtkSmartPointer<vtkCellArray>::New();
