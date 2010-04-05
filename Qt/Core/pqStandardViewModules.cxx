@@ -74,10 +74,10 @@ QStringList pqStandardViewModules::viewTypes() const
     pqScatterPlotView::scatterPlotViewType() <<
     pqXYChartView::XYChartViewType() <<
     pqXYBarChartView::XYBarChartViewType() <<
-    pqParallelCoordinatesChartView::chartViewType() <<
     pqComparativeRenderView::comparativeRenderViewType() <<
     pqComparativeBarChartView::comparativeBarChartViewType() <<
-    pqComparativeLineChartView::comparativeLineChartViewType();
+    pqComparativeLineChartView::comparativeLineChartViewType() <<
+    pqParallelCoordinatesChartView::chartViewType();
 }
 
 QStringList pqStandardViewModules::displayTypes() const
