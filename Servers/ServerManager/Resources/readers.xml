@@ -4636,7 +4636,7 @@
      </Hints>
      <!-- End SESAMEReader -->
    </SourceProxy>
-
+    #ifdef VTK_USE_OPENFOAM
     <!-- Beginning of OpenFOAM Reader -->
     <SourceProxy name="OpenFOAMReader" class="vtkPOpenFOAMReader">
       <StringVectorProperty
@@ -4864,6 +4864,7 @@
 
     </SourceProxy>
     <!-- End of OpenFOAM Reader -->
+#endif
 
     <!-- Beginning of MFIX Reader -->
     <SourceProxy name="MFIXReader" class="vtkMFIXReader">
