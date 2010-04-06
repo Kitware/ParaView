@@ -30,7 +30,7 @@ namespace
 class vtkPVArrayInformation::vtkInternalComponentNames : public vtkInternalComponentNameBase {};
 
 vtkStandardNewMacro(vtkPVArrayInformation);
-vtkCxxRevisionMacro(vtkPVArrayInformation, "1.11");
+vtkCxxRevisionMacro(vtkPVArrayInformation, "1.12");
 
 //----------------------------------------------------------------------------
 vtkPVArrayInformation::vtkPVArrayInformation()
@@ -81,7 +81,7 @@ void vtkPVArrayInformation::Initialize()
 //----------------------------------------------------------------------------
 void vtkPVArrayInformation::PrintSelf(ostream& os, vtkIndent indent)
 {
-  int num, idx;
+  int num,idx;  
   vtkIndent i2 = indent.GetNextIndent();
 
   this->Superclass::PrintSelf(os,indent);
@@ -94,9 +94,9 @@ void vtkPVArrayInformation::PrintSelf(ostream& os, vtkIndent indent)
   if ( this->ComponentNames )
     {
     os << indent << "ComponentNames:" << endl;
-    for ( idx=0; idx < this->ComponentNames->size(); ++idx )
+    for (unsigned int i=0; i < this->ComponentNames->size(); ++i )
       {
-      os << i2 << this->ComponentNames->at(idx) << endl;
+      os << i2 << this->ComponentNames->at(i) << endl;
       }    
     }
   os << indent << "NumberOfTuples: " << this->NumberOfTuples << endl;
