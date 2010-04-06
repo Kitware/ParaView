@@ -26,7 +26,6 @@
 
 #include "vtkPVInformation.h"
 class vtkClientServerStream;
-class vtkComponentNames;
 class vtkStdString;
 
 class VTK_EXPORT vtkPVArrayInformation : public vtkPVInformation
@@ -54,13 +53,13 @@ public:
 
   // Description:
   // Set the name for a component. Must be >= 1. 
-  void SetComponentName( int component, const char *name );
+  void SetComponentName( vtkIdType component, const char *name );
   
   //Description:
   // Get the component name for a given component.
   // Note: the const char* that is returned is only valid
   // intill the next call to this method!
-  const char* GetComponentName( int component );
+  const char* GetComponentName( vtkIdType component );
 
   // Description:
   // Set/get the array's length
@@ -138,8 +137,10 @@ protected:
   /// assigns to a string to DefaultComponentName for this component
   void DetermineDefaultComponentName( const int &component_no, const int &numComps);
   
-
-  vtkComponentNames* ComponentNames;
+  //BTX
+  class vtkInternalComponentNames;
+  vtkInternalComponentNames* ComponentNames;
+  //ETX
 
   vtkPVArrayInformation(const vtkPVArrayInformation&); // Not implemented
   void operator=(const vtkPVArrayInformation&); // Not implemented

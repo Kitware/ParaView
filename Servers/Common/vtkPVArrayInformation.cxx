@@ -22,11 +22,15 @@ cxx     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 #include <vtkstd/vector>
 #include <vtksys/ios/sstream>
 
-typedef  vtkstd::vector< vtkStdString* > vtkComponentNameBase;
-class vtkComponentNames : public vtkComponentNameBase {};
+
+namespace
+{
+  typedef  vtkstd::vector< vtkStdString* > vtkInternalComponentNameBase;
+}
+class vtkPVArrayInformation::vtkInternalComponentNames : public vtkInternalComponentNameBase {};
 
 vtkStandardNewMacro(vtkPVArrayInformation);
-vtkCxxRevisionMacro(vtkPVArrayInformation, "1.10");
+vtkCxxRevisionMacro(vtkPVArrayInformation, "1.11");
 
 //----------------------------------------------------------------------------
 vtkPVArrayInformation::vtkPVArrayInformation()
@@ -146,36 +150,38 @@ void vtkPVArrayInformation::SetNumberOfComponents(int numComps)
 
 
 //----------------------------------------------------------------------------
-void vtkPVArrayInformation::SetComponentName( int component, const char *name )
+void vtkPVArrayInformation::SetComponentName( vtkIdType component, const char *name )
   {
   if ( component < 0 || name == NULL )
     {
     return;
     }
 
+  unsigned int index = static_cast<unsigned int>( component );
   if ( this->ComponentNames == NULL )
     {
     //delayed allocate
-    this->ComponentNames = new vtkComponentNames();
+    this->ComponentNames = 
+      new vtkPVArrayInformation::vtkInternalComponentNames();
     }
 
-  if ( component == this->ComponentNames->size() )
+  if ( index == this->ComponentNames->size() )
     {
     //the array isn't large enough, so we will resize
     this->ComponentNames->push_back( new vtkStdString(name) );
     return;
     }
-  else if ( component > this->ComponentNames->size() )
+  else if ( index > this->ComponentNames->size() )
     {
-    this->ComponentNames->resize( component+1, NULL );
+    this->ComponentNames->resize( index+1, NULL );
     }  
    
   //replace an exisiting element
-  vtkStdString *compName = this->ComponentNames->at(component);
+  vtkStdString *compName = this->ComponentNames->at(index);
   if ( !compName )
     {
     compName = new vtkStdString(name);
-    this->ComponentNames->at(component) = compName;    
+    this->ComponentNames->at(index) = compName;    
     } 
   else
     {
@@ -184,12 +190,14 @@ void vtkPVArrayInformation::SetComponentName( int component, const char *name )
   }
 
 //----------------------------------------------------------------------------
-const char* vtkPVArrayInformation::GetComponentName( int component )
+const char* vtkPVArrayInformation::GetComponentName( vtkIdType component )
 {
+  unsigned int index = static_cast<unsigned int>( component );
+  //check signed component for less than zero
   if( this->ComponentNames && component >= 0 && 
-    component < this->ComponentNames->size() )
-    {
-    vtkStdString *compName = this->ComponentNames->at( component );
+    index < this->ComponentNames->size() )
+    { 
+    vtkStdString *compName = this->ComponentNames->at( index );
     if ( compName )
       {
       return compName->c_str();
@@ -376,15 +384,21 @@ void vtkPVArrayInformation::DeepCopy(vtkPVArrayInformation *info)
     this->Ranges[idx] = info->Ranges[idx];
     }
 
-  if ( this->ComponentNames )
+  if ( !this->ComponentNames )
     {
-    //clear the vector of the all data
-    this->ComponentNames->clear();
-    
-    //copy the passed in components    
+    this->ComponentNames = 
+      new vtkPVArrayInformation::vtkInternalComponentNames();
+    }
+
+  //clear the vector of old data
+  this->ComponentNames->clear();
+  
+  if ( info->ComponentNames )
+    {
+    //copy the passed in components if they exist   
     this->ComponentNames->reserve( info->ComponentNames->size() );
     const char *name;
-    for ( vtkIdType i = 0; i < info->ComponentNames->size(); ++i )
+    for ( unsigned i = 0; i < info->ComponentNames->size(); ++i )
       {
       name = info->GetComponentName(i);
       if ( name )
@@ -393,6 +407,7 @@ void vtkPVArrayInformation::DeepCopy(vtkPVArrayInformation *info)
         }
       }
     }
+  
 }
 
 //----------------------------------------------------------------------------
@@ -428,13 +443,13 @@ void vtkPVArrayInformation::CopyFromObject(vtkObject* obj)
 
   this->SetName(array->GetName());
   this->DataType = array->GetDataType();
-  this->SetNumberOfComponents(array->GetNumberOfComponents());
+  this->SetNumberOfComponents(array->GetNumberOfComponents());  
   this->SetNumberOfTuples(array->GetNumberOfTuples());
 
   if ( array->HasAComponentName() )
     {
     const char *name;
-    //copy the component names over
+    //copy the component names over    
     for ( int i=0; i < this->GetNumberOfComponents(); ++i )
       {
       name = array->GetComponentName(i);
@@ -445,7 +460,8 @@ void vtkPVArrayInformation::CopyFromObject(vtkObject* obj)
         }
       }
     }
-  
+
+    
   if(vtkDataArray* const data_array = vtkDataArray::SafeDownCast(obj))
     {
     double range[2];
@@ -523,7 +539,7 @@ void vtkPVArrayInformation::CopyToStream(vtkClientServerStream* css)
     }
 
   //add in the component names
-  num = this->ComponentNames ? this->ComponentNames->size() : 0;
+  num = static_cast<int>( this->ComponentNames ? this->ComponentNames->size() : 0 );
   *css << num;
   vtkStdString *compName;
   for ( int i=0; i < num; ++i )
@@ -601,7 +617,8 @@ void vtkPVArrayInformation::CopyFromStream(const vtkClientServerStream* css)
     {   
     if ( !this->ComponentNames )
       {    
-      this->ComponentNames = new vtkComponentNames();
+      this->ComponentNames = 
+        new vtkPVArrayInformation::vtkInternalComponentNames();
       }
     this->ComponentNames->clear();      
     this->ComponentNames->reserve( numOfComponents );
