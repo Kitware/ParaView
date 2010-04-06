@@ -23,112 +23,32 @@
 #include "vtkObjectFactory.h"
 #include "vtkInformationVector.h"
 
-vtkCxxRevisionMacro( vtkPVArrayCalculator, "1.2" );
+#include <vtksys/ios/sstream>
+#include <assert.h>
+
+vtkCxxRevisionMacro( vtkPVArrayCalculator, "1.2.2.1" );
 vtkStandardNewMacro( vtkPVArrayCalculator );
+// ----------------------------------------------------------------------------
+vtkPVArrayCalculator::vtkPVArrayCalculator()
+{
+}
+
+// ----------------------------------------------------------------------------
+vtkPVArrayCalculator::~vtkPVArrayCalculator()
+{
+}
 
 // ----------------------------------------------------------------------------
 void vtkPVArrayCalculator::UpdateArrayAndVariableNames
    ( vtkDataObject * theInputObj, vtkDataSetAttributes * inDataAttrs )
 { 
-  if ( !inDataAttrs )
-    {
-    return;
-    }
-    
-  int     i, j;
-  int     funcInvalid = 0; // an invalid function?
-  int     varNotFound = 1; // a function variable not found from input?
-  int     numberComps = 1;
-  int     aray1Length = 0; // length of a scalar variable name
-  int     numberArays = inDataAttrs->GetNumberOfArrays(); // the input
-  char    tempVarName[100];
-  char  * theAryName0 = NULL; // array name of the input
-  char  * theAryName1 = NULL; // array name of the output
   static  char   stringSufix[3][3] = { "_X", "_Y", "_Z" };
-  
-  for ( j = 0; j < this->NumberOfVectorArrays && funcInvalid == 0; j ++ )
-    {
-    theAryName1 = this->VectorArrayNames[j];
-    
-    if (  strstr( this->Function, theAryName1 )  )
-      {
-      // the function references this vector, either whole or component(s)
-      
-      varNotFound = 1;
-      
-      // check if this vector can be found from the input
-      for ( i = 0; i < numberArays && varNotFound == 1; i ++ )
-        {
-        theAryName0 = inDataAttrs->GetArray( i )->GetName();
-        numberComps = inDataAttrs->GetArray( i )->GetNumberOfComponents();
-        varNotFound = (  numberComps > 1 && 
-                         strcmp( theAryName1, theAryName0 ) == 0  )
-                      ? 0 : varNotFound;
-        }
-        
-      funcInvalid = varNotFound;
-      }
-    
-    theAryName0 = NULL;
-    theAryName1 = NULL;
-    }
-  this->VectorsOutdated = funcInvalid; // to avoid a crash for whole vector
-  this->VectorsOutdated = ( this->FunctionType == 1 && 
-                            this->InputData &&
-                            this->InputData != theInputObj
-                          ) ? 1 : this->VectorsOutdated;
-  this->InputData = theInputObj;
-    
-    
-  for ( j = 0; j < this->NumberOfScalarArrays && funcInvalid == 0; j ++ )
-    {
-    theAryName1 = this->ScalarArrayNames[j];
-    
-    // Let's extract the main part of the scalar variable name, without suffix.
-    // It is safe to assume that the components of any vector end with _X/Y/Z.
-    aray1Length = static_cast< int > (  strlen( theAryName1 )  );
-    if (   aray1Length > 2 &&
-           (  strcmp( theAryName1 + aray1Length - 2, "_X" ) == 0 ||
-              strcmp( theAryName1 + aray1Length - 2, "_Y" ) == 0 ||
-              strcmp( theAryName1 + aray1Length - 2, "_Z" ) == 0
-           )
-       )
-      {
-      strcpy( tempVarName, theAryName1 );
-      tempVarName[ aray1Length - 2 ] = '\0';
-      theAryName1 = tempVarName;
-      }
-    
-    if (  strstr( this->Function, theAryName1 )  )
-      {
-      // the function references this scalar variable, which might be a
-      // component of a vector
-      
-      varNotFound = 1;
-      
-      // check if this scalable variable can be found from the input
-      for ( i = 0; i < numberArays && varNotFound == 1; i ++ )
-        {
-        theAryName0 = inDataAttrs->GetArray( i )->GetName();
-        varNotFound = (  strcmp( theAryName1, theAryName0 ) == 0  ) 
-                      ? 0 : varNotFound;
-        }
-        
-      funcInvalid = varNotFound;
-      }
-    
-    theAryName0 = NULL;
-    theAryName1 = NULL;
-    }
-  
-  
-  // As the function has been checked, the arrays and the associated variables
-  // need to be updated to ensure consistency between the input and the output
-  // regardless of any change made to either the name of an upstream calculator
-  // or the input of an downstream calculator. Note that the following segment
-  // simply employs AddScalarVariable() and AddVectorArrayName(), which may not
-  // be an optimized solution, though the small number of arrays and variables
-  // does not justify that effort.
+  unsigned long mtime = this->GetMTime();
+
+  // Look at the data-arrays available in the input and register them as
+  // variables with the superclass.
+  // It's safe to call these methods in RequestData() since they don't call
+  // this->Modified().
   this->RemoveAllVariables();
   
   // Add coordinate scalar and vector variables
@@ -138,41 +58,41 @@ void vtkPVArrayCalculator::UpdateArrayAndVariableNames
   this->AddCoordinateVectorVariable( "coords",  0, 1, 2 );
   
   // add non-coordinate scalar and vector variables
-  for ( j = 0; j < numberArays; j ++ )
+  int numberArays = inDataAttrs->GetNumberOfArrays(); // the input
+  for (int j = 0; j < numberArays; j ++ )
     {
-    theAryName0 = inDataAttrs->GetArray( j )->GetName();
-    numberComps = inDataAttrs->GetArray( j )->GetNumberOfComponents();
+    vtkAbstractArray* array = inDataAttrs->GetAbstractArray(j);
+    const char* array_name = array->GetName();
+    int numberComps = array->GetNumberOfComponents();
    
     if ( numberComps == 1 )
       {
-      this->AddScalarVariable( theAryName0, theAryName0, 0 );
+      this->AddScalarVariable( array_name, array_name, 0 );
       }
     else
       {
-      for ( i = 0; i < numberComps; i ++ )
+      for (int i = 0; i < numberComps; i ++ )
         {
-        sprintf( tempVarName, "%s%s", theAryName0, stringSufix[i] );
-        this->AddScalarVariable( tempVarName, theAryName0, i );
+        if (i < 3)
+          {
+          vtksys_ios::ostringstream var_name;
+          var_name << array_name << stringSufix[i];
+          this->AddScalarVariable(var_name.str().c_str(), array_name, i );
+          }
+        vtksys_ios::ostringstream var_name2;
+        var_name2 << array_name << "_" << i;
+        this->AddScalarVariable(var_name2.str().c_str(), array_name, i );
         }
       
       if ( numberComps == 3 )
         {
-        this->AddVectorArrayName( theAryName0, 0, 1, 2 );
+        this->AddVectorArrayName(array_name, 0, 1, 2 );
         }
       }
-    
-    theAryName0 = NULL;
     }
   
-  // release a warning to ask the user to update the function, if necessary
-  if ( funcInvalid || this->VectorsOutdated )
-    {
-    vtkGenericWarningMacro( << "Array " << this->ResultArrayName << " may be "
-                            << "either missing or assigned with incorrect "
-                            << "values since the function contains outdated "
-                            << "scalar and / or vector variables. Please " 
-                            << "update it with valid variables." << endl );
-    }
+  assert(this->GetMTime() == mtime &&
+    "post: mtime cannot be changed in RequestData()");
 }
 
 // ----------------------------------------------------------------------------
@@ -218,18 +138,15 @@ int vtkPVArrayCalculator::RequestData
       }
     }
   
-  if ( numTuples < 1 )
+  if ( numTuples > 0 )
     {
-    vtkDebugMacro( "Empty data." );
-    return 1;
+    // Let's update the (scalar and vector arrays / variables) names  to make
+    // them consistent with those of the upstream calculator(s). This addresses
+    // the scenarios where the user modifies the name of a calculator whose out-
+    // put is the input of a (some) subsequent calculator(s) or the user changes
+    // the input of a downstream calculator.
+    this->UpdateArrayAndVariableNames( input, dataAttrs );
     }
-   
-  // Let's update the (scalar and vector arrays / variables) names  to make
-  // them consistent with those of the upstream calculator(s). This addresses
-  // the scenarios where the user modifies the name of a calculator whose out-
-  // put is the input of a (some) subsequent calculator(s) or the user changes
-  // the input of a downstream calculator.
-  this->UpdateArrayAndVariableNames( input, dataAttrs );
   
   input      = NULL;
   dsInput    = NULL;
