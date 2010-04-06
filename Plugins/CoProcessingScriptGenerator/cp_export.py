@@ -143,12 +143,13 @@ def CreateWriter(proxy_ctor, filename, freq):
 """
 
 timestep_expression = """
+    input_name = '%s'
     if %s :
-        datadescription.GetInputDescriptionByName('%s').AllFieldsOn()
-        datadescription.GetInputDescriptionByName('%s').GenerateMeshOn()
+        datadescription.GetInputDescriptionByName(input_name).AllFieldsOn()
+        datadescription.GetInputDescriptionByName(input_name).GenerateMeshOn()
     else:
-        datadescription.GetInputDescriptionByName('%s').AllFieldsOff()
-        datadescription.GetInputDescriptionByName('%s').GenerateMeshOff()
+        datadescription.GetInputDescriptionByName(input_name).AllFieldsOff()
+        datadescription.GetInputDescriptionByName(input_name).GenerateMeshOff()
 """
 
 do_coprocessing = ""
@@ -163,7 +164,7 @@ for sim_input in write_frequencies:
         continue
     freqs.sort()
     condition_str = "(timestep % " + " == 0) or (timestep % ".join(map(str, freqs)) + " == 0)"
-    request_data_description += timestep_expression % (condition_str, sim_input, sim_input)
+    request_data_description += timestep_expression % (sim_input, condition_str)
 
 fileName = "%3"
 outFile = open(fileName, 'w')
