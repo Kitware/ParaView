@@ -44,8 +44,8 @@ public:
   static vtkPVArrayCalculator * New();
 
 protected:
-  vtkPVArrayCalculator()  { this->InputData = NULL; }
-  ~vtkPVArrayCalculator() {}
+  vtkPVArrayCalculator();
+  ~vtkPVArrayCalculator();
 
   virtual int RequestData( vtkInformation *, vtkInformationVector **, 
                            vtkInformationVector *);
@@ -60,8 +60,6 @@ protected:
   // RequestData() only.
   void    UpdateArrayAndVariableNames( vtkDataObject        * theInputObj, 
                                        vtkDataSetAttributes * inDataAttrs );
-  vtkDataObject * InputData;
-  
 private:
   vtkPVArrayCalculator( const vtkPVArrayCalculator & ); // Not implemented.
   void operator = ( const vtkPVArrayCalculator & );     // Not implemented.
