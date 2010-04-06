@@ -74,13 +74,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServerManagerObserver.h"
 #include "pqSettings.h"
 #include "pqStreamTracerPanel.h"
-#include "pqPVThresholdPanel.h"
+#include "pqThresholdPanel.h"
 #include "pqUndoStack.h"
 #include "pqView.h"
 #include "vtkPVConfig.h" // To get PARAVIEW_USE_*
 #ifdef PARAVIEW_USE_SILO
 #include "pqSiloPanel.h"
 #endif
+
 
 bool pqObjectInspectorWidget::AutoAccept = false;
 
@@ -124,12 +125,8 @@ public:
 //        }
       if(QString("Threshold") == proxy->getProxy()->GetXMLName())
         {
-        return new pqPVThresholdPanel(proxy, p);
+        return new pqThresholdPanel(proxy, p);
         }
-//      if(QString("PVThreshold") == proxy->getProxy()->GetXMLName())
-//        {
-//        return new pqPVThresholdPanel(proxy, p);
-//        }
       if(QString("Contour") == proxy->getProxy()->GetXMLName())
         {
         return new pqContourPanel(proxy, p);
@@ -182,7 +179,7 @@ public:
          QString("Threshold") == proxy->getProxy()->GetXMLName() ||
          QString("ExtractSelection") == proxy->getProxy()->GetXMLName() ||
          QString("ExtractSelectionOverTime") == proxy->getProxy()->GetXMLName() ||
-         QString("Contour") == proxy->getProxy()->GetXMLName() ||
+         QString("Contour") == proxy->getProxy()->GetXMLName() || 
          QString("CTHPart") == proxy->getProxy()->GetXMLName() ||
          QString("RectilinearGridConnectivity") == proxy->getProxy()->GetXMLName()
         )
@@ -218,7 +215,7 @@ pqObjectInspectorWidget::pqObjectInspectorWidget(QWidget *p)
 
   // get custom panels
   this->StandardCustomPanels = new pqStandardCustomPanels(this);
-
+  
   // main layout
   QVBoxLayout* mainLayout = new QVBoxLayout(this);
   mainLayout->setMargin(0);
@@ -310,13 +307,13 @@ pqObjectInspectorWidget::pqObjectInspectorWidget(QWidget *p)
   this->connect(pqApplicationCore::instance()->getServerManagerModel(),
                 SIGNAL(sourceRemoved(pqPipelineSource*)),
                 SLOT(removeProxy(pqPipelineSource*)));
-  this->connect(pqApplicationCore::instance()->getServerManagerModel(),
+  this->connect(pqApplicationCore::instance()->getServerManagerModel(), 
       SIGNAL(connectionRemoved(pqPipelineSource*, pqPipelineSource*, int)),
       SLOT(handleConnectionChanged(pqPipelineSource*, pqPipelineSource*)));
-  this->connect(pqApplicationCore::instance()->getServerManagerModel(),
+  this->connect(pqApplicationCore::instance()->getServerManagerModel(), 
       SIGNAL(connectionAdded(pqPipelineSource*, pqPipelineSource*, int)),
       SLOT(handleConnectionChanged(pqPipelineSource*, pqPipelineSource*)));
-
+  
   this->AutoAccept = pqApplicationCore::instance()->settings()->
     value("autoAccept", false).toBool();
 
@@ -392,7 +389,7 @@ void pqObjectInspectorWidget::setProxy(pqProxy *proxy)
     this->CurrentPanel->hide();
     this->CurrentPanel->setObjectName("");
     // We don't delete the panel, it's managed by this->PanelStore.
-    // Any deletion of any panel must ensure that call pointers
+    // Any deletion of any panel must ensure that call pointers 
     // to the panel ie. this->CurrentPanel and this->PanelStore
     // are updated so that we don't have any dangling pointers.
     }
@@ -420,7 +417,7 @@ void pqObjectInspectorWidget::setProxy(pqProxy *proxy)
   if(proxy && !this->CurrentPanel)
     {
     const QString xml_name = proxy->getProxy()->GetXMLName();
-
+      
     // search custom panels
     pqPluginManager* pm = pqApplicationCore::instance()->getPluginManager();
     QObjectList ifaces = pm->interfaces();
@@ -434,13 +431,13 @@ void pqObjectInspectorWidget::setProxy(pqProxy *proxy)
         break;
         }
       }
-
+    
     // search standard custom panels
     if(!this->CurrentPanel)
       {
       if (this->StandardCustomPanels->canCreatePanel(proxy))
         {
-        this->CurrentPanel =
+        this->CurrentPanel = 
           this->StandardCustomPanels->createPanel(proxy, NULL);
         }
       }
@@ -466,20 +463,20 @@ void pqObjectInspectorWidget::setProxy(pqProxy *proxy)
 
   // the current auto panel always has the name "Editor"
   this->CurrentPanel->setObjectName("Editor");
-
+  
   if(!reusedPanel)
     {
-    QObject::connect(this, SIGNAL(viewChanged(pqView*)),
+    QObject::connect(this, SIGNAL(viewChanged(pqView*)), 
                      this->CurrentPanel, SLOT(setView(pqView*)));
-
+    
     QObject::connect(this->CurrentPanel, SIGNAL(modified()),
       this, SLOT(updateAcceptState()));
-
+    
     QObject::connect(this->CurrentPanel->referenceProxy(),
       SIGNAL(modifiedStateChanged(pqServerManagerModelItem*)),
       this, SLOT(updateAcceptState()));
     }
-
+    
   this->PanelArea->layout()->addWidget(this->CurrentPanel);
   this->CurrentPanel->setView(this->View);
   this->CurrentPanel->select();
@@ -513,7 +510,7 @@ void pqObjectInspectorWidget::accept()
       panel->accept();
       }
     }
-
+  
   if (this->CurrentPanel)
     {
     pqProxy* refProxy = this->CurrentPanel->referenceProxy();
@@ -538,10 +535,10 @@ void pqObjectInspectorWidget::accept()
       elem->Delete();
       }
     }
-
+ 
   emit this->accepted();
   emit this->postaccept();
-
+ 
   END_UNDO_SET();
 
   // Essential to render all views.
@@ -561,7 +558,7 @@ void pqObjectInspectorWidget::reset()
       p->reset();
       }
     }
-
+  
   if(this->CurrentPanel)
     {
     this->CurrentPanel->reset();

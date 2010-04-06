@@ -4,7 +4,7 @@ PROJECT(PVFilters)
 SET(VTK_INSTALL_PACKAGE_DIR_CM24 ${PV_INSTALL_LIB_DIR})
 SET(VTK_INSTALL_PACKAGE_DIR ${PV_INSTALL_LIB_DIR})
 
-# Any build configured headers should be added to this
+# Any build configured headers should be added to this 
 # variable so that they also get installed.
 SET (dynamicHeaders)
 
@@ -139,7 +139,6 @@ SET(Filters_SRCS
   vtkPVServerTimeSteps.cxx
   vtkPVStringArrayHelper.cxx
   vtkPVTextSource.cxx
-  vtkPVThreshold.cxx
   vtkPVTrackballMoveActor.cxx
   vtkPVTrackballMultiRotate.cxx
   vtkPVTrackballPan.cxx
@@ -245,7 +244,7 @@ ENDIF(VTK_USE_MPI)
 
 IF (PARAVIEW_USE_ICE_T)
   IF(VTK_USE_MPI)
-    SET(Filters_SRCS
+    SET(Filters_SRCS 
       ${Filters_SRCS}
       vtkCaveRenderManager.cxx
       vtkIceTContext.cxx
@@ -299,7 +298,7 @@ IF(PARAVIEW_BUILD_WITH_ADAPTOR)
     )
   IF(PARAVIEW_ADAPTOR_LIBRARY)
     MESSAGE("adaptor lib found.")
-    GET_FILENAME_COMPONENT(PARAVIEW_ADAPTOR_LIBRARY_PATH
+    GET_FILENAME_COMPONENT(PARAVIEW_ADAPTOR_LIBRARY_PATH 
       "${PARAVIEW_ADAPTOR_LIBRARY}" PATH)
     SET(PARAVIEW_ADAPTOR_INCLUDE_DIR ${PARAVIEW_ADAPTOR_LIBRARY_PATH}/../../include/vtk)
   ENDIF(PARAVIEW_ADAPTOR_LIBRARY)
@@ -326,7 +325,7 @@ SET(VTK_WRAP_HINTS ${CMAKE_CURRENT_SOURCE_DIR}/hints)
 
 # Setup vtkInstantiator registration for this library's classes.
 INCLUDE(${ParaView_SOURCE_DIR}/VTK/CMake/vtkMakeInstantiator.cmake)
-VTK_MAKE_INSTANTIATOR3(vtkPVFiltersInstantiator FiltersInst_SRCS
+VTK_MAKE_INSTANTIATOR3(vtkPVFiltersInstantiator FiltersInst_SRCS 
   "${Filters_SRCS}"
   VTK_EXPORT
   "${PVFilters_BINARY_DIR}" "")
@@ -336,7 +335,7 @@ ADD_LIBRARY(vtkPVFilters ${Filters_SRCS} ${FiltersInst_SRCS}
   ${ExtraParaViewServer_SRCS} ${ExtraParaViewServerNonWrapped_SRCS})
 TARGET_LINK_LIBRARIES(vtkPVFilters
   vtkPVServerCommon
-  vtkPVServerCommonCS
+  vtkPVServerCommonCS 
   vtkXdmfCS
   vtkHybridCS
   vtkParallelCS
@@ -349,10 +348,10 @@ TARGET_LINK_LIBRARIES(vtkPVFilters
   )
 
 IF(PARAVIEW_ENABLE_PYTHON)
-  TARGET_LINK_LIBRARIES(vtkPVFilters
+  TARGET_LINK_LIBRARIES(vtkPVFilters 
     ${PYTHON_LIBRARIES}
     vtkPVPythonInterpretor
-  )
+  ) 
 ENDIF(PARAVIEW_ENABLE_PYTHON)
 
 TARGET_LINK_LIBRARIES(vtkPVFilters ${PARAVIEW_HDF5_LIBRARIES} ${SPCTH_LIBRARIES})
@@ -421,11 +420,11 @@ ENDIF(NOT PV_INSTALL_NO_LIBRARIES)
 IF (NOT PV_INSTALL_NO_DEVELOPMENT)
   GLOB_INSTALL_DEVELOPMENT(
       ${CMAKE_CURRENT_SOURCE_DIR}
-      ${PV_INSTALL_INCLUDE_DIR}
+      ${PV_INSTALL_INCLUDE_DIR} 
       "*.h;*.hxx;*.txx")
   INSTALL(
       FILES ${dynamicHeaders}
-      DESTINATION ${PV_INSTALL_INCLUDE_DIR}
+      DESTINATION ${PV_INSTALL_INCLUDE_DIR} 
       COMPONENT Development)
 ENDIF (NOT PV_INSTALL_NO_DEVELOPMENT)
 
