@@ -30,12 +30,13 @@ ADD_TEST( ToggleVisibility ${EXECUTABLE_OUTPUT_PATH}/ToggleVisibility
           -T ${PROJECT_BINARY_DIR}/Testing/Temporary
           -V ${PROJECT_SOURCE_DIR}/examples/Baseline/ToggleVisibility.png )
 
-ADD_EXECUTABLE( multiRens multiRens.cxx )
-TARGET_LINK_LIBRARIES( multiRens vtkManta vtkRendering vtkHybrid )
-ADD_TEST( MultiLayerRendering ${EXECUTABLE_OUTPUT_PATH}/multiRens
-          ${PROJECT_SOURCE_DIR}/examples/multiRensEvents.log
-          -T ${PROJECT_BINARY_DIR}/Testing/Temporary
-          -V ${PROJECT_SOURCE_DIR}/examples/Baseline/MultiLayerRendering.png )
+#Disable this test until we support intermixed renderers.
+#ADD_EXECUTABLE( multiRens multiRens.cxx )
+#TARGET_LINK_LIBRARIES( multiRens vtkManta vtkRendering vtkHybrid )
+#ADD_TEST( MultiLayerRendering ${EXECUTABLE_OUTPUT_PATH}/multiRens
+#          ${PROJECT_SOURCE_DIR}/examples/multiRensEvents.log
+#          -T ${PROJECT_BINARY_DIR}/Testing/Temporary
+#          -V ${PROJECT_SOURCE_DIR}/examples/Baseline/MultiLayerRendering.png )
 
 ADD_EXECUTABLE( marching.timing marching.timing.cxx )
 TARGET_LINK_LIBRARIES( marching.timing vtkManta vtkHybrid vtkRendering )
