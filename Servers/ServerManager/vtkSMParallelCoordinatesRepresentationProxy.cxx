@@ -26,7 +26,7 @@
 #include "vtkSelection.h"
 
 vtkStandardNewMacro(vtkSMParallelCoordinatesRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMParallelCoordinatesRepresentationProxy, "1.2");
+vtkCxxRevisionMacro(vtkSMParallelCoordinatesRepresentationProxy, "1.3");
 //----------------------------------------------------------------------------
 vtkSMParallelCoordinatesRepresentationProxy::vtkSMParallelCoordinatesRepresentationProxy()
 {
@@ -156,6 +156,10 @@ void vtkSMParallelCoordinatesRepresentationProxy::SetVisibility(int visible)
   if (this->Visibility != visible)
     {
     this->Visibility = visible;
+    if (this->GetChart())
+      {
+      this->GetChart()->SetVisible(visible != 0);
+      }
     }
 }
 
