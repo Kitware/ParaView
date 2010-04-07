@@ -88,10 +88,7 @@ build_paraview_client_cpack_config_init(
     LICENSE_FILE "${ParaView_SOURCE_DIR}/License_v1.2.txt"
     DESCRIPTION_FILE "${ParaView_SOURCE_DIR}/License_v1.2.txt"
 )
-SET (CPACK_INSTALL_CMAKE_PROJECTS
-  "${ParaView_BINARY_DIR}" "ParaView Runtime Libs" "Runtime" "/"
-  "${ParaView_BINARY_DIR}" "VTK Runtime Libs" "RuntimeLibraries" "/"
-)
+
 SET (CPACK_INSTALL_CMAKE_PROJECTS_DRAGNDROP
   ${CPACK_INSTALL_CMAKE_PROJECTS})
 build_paraview_client_cpack_config()
