@@ -32,6 +32,7 @@
 #include <vtksys/ios/sstream>
 
 vtkStandardNewMacro(vtkCSVWriter);
+
 //-----------------------------------------------------------------------------
 vtkCSVWriter::vtkCSVWriter()
 {
@@ -146,6 +147,37 @@ void vtkCSVWriterGetDataString(
       }
     }
 }
+
+//-----------------------------------------------------------------------------
+VTK_TEMPLATE_SPECIALIZE
+void vtkCSVWriterGetDataString(
+  vtkArrayIteratorTemplate<char>* iter, vtkIdType tupleIndex, 
+  ofstream* stream, vtkCSVWriter* writer, bool* first)
+{
+  int numComps = iter->GetNumberOfComponents();
+  vtkIdType index = tupleIndex* numComps;
+  for (int cc=0; cc < numComps; cc++)
+    {
+    if ((index+cc) < iter->GetNumberOfValues())
+      {
+      if (*first == false)
+        {
+        (*stream) << writer->GetFieldDelimiter();
+        }
+      *first = false;
+      (*stream) << static_cast<int>( iter->GetValue(index+cc) );
+      }
+    else
+      {
+      if (*first == false)
+        {
+        (*stream) << writer->GetFieldDelimiter();
+        }
+      *first = false;
+      }
+    }
+}
+
 
 //-----------------------------------------------------------------------------
 vtkStdString vtkCSVWriter::GetString(vtkStdString string)
