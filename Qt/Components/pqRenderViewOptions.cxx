@@ -318,23 +318,23 @@ void pqRenderViewOptions::connectGUI()
 
   this->resetAnnotation();
 
-  // Check if this is a remote renderer.
-  if(this->Internal->RenderView->getServer()->isRemote())
-    {
-    this->Internal->gradientColor->setDisabled(true);
-    this->Internal->gradColorPage->setDisabled(true);
-
-    this->Internal->image->setDisabled(true);
-    this->Internal->imagePage->setDisabled(true);
-    }
-  else
-    {
-    this->Internal->gradientColor->setEnabled(true);
-    this->Internal->gradColorPage->setEnabled(true);
-
-    this->Internal->image->setEnabled(true);
-    this->Internal->imagePage->setEnabled(true);
-    }
+//  // Check if this is a remote renderer.
+//  if(this->Internal->RenderView->getServer()->isRemote())
+//    {
+//    this->Internal->gradientColor->setDisabled(true);
+//    this->Internal->gradColorPage->setDisabled(true);
+//
+//    this->Internal->image->setDisabled(true);
+//    this->Internal->imagePage->setDisabled(true);
+//    }
+//  else
+//    {
+//    this->Internal->gradientColor->setEnabled(true);
+//    this->Internal->gradColorPage->setEnabled(true);
+//
+//    this->Internal->image->setEnabled(true);
+//    this->Internal->imagePage->setEnabled(true);
+//    }
 
   this->blockSignals(false);
 
