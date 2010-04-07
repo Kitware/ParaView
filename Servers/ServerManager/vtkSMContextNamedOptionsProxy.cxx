@@ -64,10 +64,19 @@ typedef PlotMapType::iterator PlotMapIterator;
 class vtkSMContextNamedOptionsProxy::vtkInternals
 {
 public:
+  vtkInternals()
+  {
+    this->Colors = vtkSmartPointer<vtkColorSeries>::New();
+    this->UseIndexForXAxis = true;
+    this->ChartType = vtkChart::LINE;
+    this->TableVisibility = false;
+  }
+
   PlotMapType PlotMap;
   vtkstd::string XSeriesName;
   bool UseIndexForXAxis;
   int ChartType;
+  bool TableVisibility;
 
   vtkWeakPointer<vtkChart> Chart;
   vtkWeakPointer<vtkTable> Table;
@@ -76,15 +85,12 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMContextNamedOptionsProxy);
-vtkCxxRevisionMacro(vtkSMContextNamedOptionsProxy, "1.22");
+vtkCxxRevisionMacro(vtkSMContextNamedOptionsProxy, "1.22.2.1");
 
 //----------------------------------------------------------------------------
 vtkSMContextNamedOptionsProxy::vtkSMContextNamedOptionsProxy()
 {
   this->Internals = new vtkInternals();
-  this->Internals->Colors = vtkSmartPointer<vtkColorSeries>::New();
-  this->Internals->UseIndexForXAxis = true;
-  this->Internals->ChartType = vtkChart::LINE;
 }
 
 //----------------------------------------------------------------------------
@@ -125,8 +131,10 @@ void vtkSMContextNamedOptionsProxy::SetTable(vtkTable* table)
     {
     return;
     }
+
   this->Internals->Table = table;
   this->RefreshPlots();
+  this->SetTableVisibility(this->Internals->TableVisibility);
   this->Modified();
 }
 
@@ -425,12 +433,14 @@ void vtkSMContextNamedOptionsProxy::SetPlotVisibilityInternal(PlotInfo& plotInfo
 //----------------------------------------------------------------------------
 void vtkSMContextNamedOptionsProxy::SetTableVisibility(bool visible)
 {
+  this->Internals->TableVisibility = visible;
+
   for (PlotMapIterator it = this->Internals->PlotMap.begin();
        it != this->Internals->PlotMap.end(); ++it)
     {
     PlotInfo& plotInfo = it->second;
     this->SetPlotVisibilityInternal(plotInfo, visible && plotInfo.Visible,
-                                                         it->first.c_str());
+                                    it->first.c_str());
     }
 }
 
