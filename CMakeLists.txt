@@ -447,7 +447,7 @@ IF (NOT PV_INSTALL_NO_DEVELOPMENT)
   IF(WIN32)
     INSTALL(
         FILES "${BUILD_TREE}/CMake/tmp/ParaViewConfig.cmake"
-        DESTINATION ${CMAKE_INSTALL_PREFIX}
+        DESTINATION .
         COMPONENT Development)
   ELSE(WIN32)
     INSTALL(
