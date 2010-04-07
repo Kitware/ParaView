@@ -240,8 +240,11 @@ INCLUDE(ParaViewBrandingCPack)
 IF(BUILD_DOCUMENTATION)
   ADD_SUBDIRECTORY(Utilities/Doxygen)
 ENDIF(BUILD_DOCUMENTATION)
-ADD_SUBDIRECTORY(Documentation)
 
+# Documentation exists as a qch file. -> Don't build it if no Gui.
+IF (PARAVIEW_BUILD_QT_GUI)
+  ADD_SUBDIRECTORY(Documentation)
+ENDIF (PARAVIEW_BUILD_QT_GUI)
 #########################################################################
 IF (PARAVIEW_BUILD_QT_GUI)
   ADD_SUBDIRECTORY(Qt)
