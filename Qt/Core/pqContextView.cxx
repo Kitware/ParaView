@@ -306,7 +306,6 @@ void pqContextView::selectionChanged()
   vtkSMVectorProperty* vp = vtkSMVectorProperty::SafeDownCast(
     selectionSource->GetProperty("IDs"));
   QList<QVariant> ids = pqSMAdaptor::getMultipleElementProperty(vp);
-  int numElemsPerCommand = vp->GetNumberOfElementsPerCommand();
 
   vtkSelectionNode* node = 0;
 

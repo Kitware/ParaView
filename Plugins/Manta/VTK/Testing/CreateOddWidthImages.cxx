@@ -18,7 +18,6 @@
 //----------------------------------------------------------------------------
 int main( int argc, char* argv[] )
 {
-  int     second = 1;
   int     objRes = 12;
   double  objRad = 0.075;
 
@@ -92,7 +91,7 @@ int main( int argc, char* argv[] )
         {
         retVal = vtkRegressionTestImage( renWin );
         }
-      usleep( second * 1000000 );
+      usleep( 1000000 );
       }
     }
 

@@ -37,7 +37,7 @@
 #include <string>
 #include <vtkstd/vector>
 
-vtkCxxRevisionMacro(vtkRawStridedReader1, "1.1");
+vtkCxxRevisionMacro(vtkRawStridedReader1, "1.2");
 vtkStandardNewMacro(vtkRawStridedReader1);
 
 #if 0
@@ -786,8 +786,6 @@ int vtkRawStridedReader1::RequestData(
   outData->AllocateScalars();
   outData->GetPointData()->GetScalars()->SetName("PointCenteredData");
   float *myfloats = (float*)outData->GetScalarPointer();
-  vtkIdType nc =
-    outData->GetPointData()->GetArray("PointCenteredData")->GetNumberOfTuples();
 //  double c_alloc = clock();
 
   char pfilename[256];
