@@ -5939,7 +5939,7 @@
     </StringVectorProperty>
     
     <Hints>
-      <ReaderFactory extensions="ncdf nc"
+      <ReaderFactory extensions="pop.ncdf pop.nc"
           file_description="Ocean Netcdf Files" />
     </Hints>
       
