@@ -24,12 +24,11 @@
 
 #include <QWidget>
 
-vtkCxxRevisionMacro(vtkSMChartViewProxy, "1.8");
+vtkCxxRevisionMacro(vtkSMChartViewProxy, "1.8.2.1");
 //----------------------------------------------------------------------------
 vtkSMChartViewProxy::vtkSMChartViewProxy()
 {
   this->ChartView = 0;
-  this->GetApplication()->EnsureQApplicationIsInitialized();
 }
 
 //----------------------------------------------------------------------------
@@ -49,6 +48,8 @@ void vtkSMChartViewProxy::CreateVTKObjects()
     {
     return;
     }
+
+  this->GetApplication()->EnsureQApplicationIsInitialized();
 
   this->ChartView = this->NewChartView();
 
