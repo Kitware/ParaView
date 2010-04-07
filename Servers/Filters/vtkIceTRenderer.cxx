@@ -47,7 +47,7 @@ static vtkIceTRenderer *currentRenderer;
 // vtkIceTRenderer implementation.
 //******************************************************************
 
-vtkCxxRevisionMacro(vtkIceTRenderer, "1.31");
+vtkCxxRevisionMacro(vtkIceTRenderer, "1.32");
 vtkStandardNewMacro(vtkIceTRenderer);
 
 vtkCxxSetObjectMacro(vtkIceTRenderer, SortingKdTree, vtkPKdTree);
@@ -74,6 +74,10 @@ vtkIceTRenderer::vtkIceTRenderer()
     {
     this->PhysicalViewport[i] = 0;
     }
+
+  // Disable the gradient and texuted background color for now.
+  this->Superclass::TexturedBackgroundOff();
+  this->Superclass::GradientBackgroundOff();
 }
 
 vtkIceTRenderer::~vtkIceTRenderer()
