@@ -5600,6 +5600,15 @@
       </IntVectorProperty>
 
       <IntVectorProperty
+        name="OverlayAllComparisons"
+        command="SetOverlayAllComparisons"
+        update_self="1"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      <IntVectorProperty
         name="Spacing"
         command="SetSpacing"
         update_self="1"

@@ -43,6 +43,10 @@ public:
   void Build(int dx, int dy);
 
   // Description:
+  void SetOverlayAllComparisons(bool);
+  vtkGetMacro(OverlayAllComparisons, bool);
+
+  // Description:
   // Returns the dimensions used by the most recent Build() request.
   vtkGetVector2Macro(Dimensions, int);
 
@@ -83,6 +87,7 @@ public:
   // clones.  It is not recommended to directly change the properties of the returned
   // representations.
   void GetRepresentationsForView(vtkSMViewProxy*, vtkCollection*);
+  void GetRepresentations(int x, int y, vtkCollection*);
 
   // Description:
   // Returns the root view proxy.
@@ -120,14 +125,6 @@ public:
   // Set spacing between views. 
   vtkSetVector2Macro(Spacing, int);
   vtkGetVector2Macro(Spacing, int);
-
-  // Description:
-  // Gets the X property and element number currently being compared, if any.
-  virtual bool GetXPropertyAndElement(vtkSMProperty *&, int &);
-
-  // Description:
-  // Gets the Y property and element currently being compared, if any.
-  virtual bool GetYPropertyAndElement(vtkSMProperty *&, int &);
 
   // Description:
   // Generally each view type is different class of view eg. bar char view, line
@@ -180,6 +177,10 @@ protected:
   void UpdateViewLayout();
 
   // Description:
+  // Update all representations belonging for the indicated position.
+  void UpdateAllRepresentations(int x, int y);
+
+  // Description:
   // Marks the view dirty i.e. on next StillRender it needs to regenerate the
   // comparative vis by replaying the animation(s).
   void MarkOutdated()
@@ -190,6 +191,8 @@ protected:
   int Dimensions[2];
   int ViewSize[2];
   int Spacing[2];
+
+  bool OverlayAllComparisons;
 
   bool Outdated;
 

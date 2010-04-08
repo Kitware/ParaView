@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>237</width>
-    <height>473</height>
+    <height>404</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -65,7 +65,7 @@
      </property>
     </widget>
    </item>
-   <item row="2" column="0" colspan="5">
+   <item row="3" column="0" colspan="5">
     <widget class="QTableWidget" name="activeParameters">
      <property name="editTriggers">
       <set>QAbstractItemView::NoEditTriggers</set>
@@ -122,7 +122,7 @@
      </column>
     </widget>
    </item>
-   <item row="3" column="0" colspan="5">
+   <item row="4" column="0" colspan="5">
     <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="0,0,1">
      <property name="spacing">
       <number>2</number>
@@ -154,7 +154,7 @@
      </item>
     </layout>
    </item>
-   <item row="4" column="0" colspan="5">
+   <item row="5" column="0" colspan="5">
     <widget class="pqCollapsedGroup" name="cueGroup">
      <property name="title">
       <string>[Select Parameter]</string>
@@ -187,6 +187,13 @@
        </widget>
       </item>
      </layout>
+    </widget>
+   </item>
+   <item row="2" column="0" colspan="5">
+    <widget class="QCheckBox" name="overlay">
+     <property name="text">
+      <string>Overlay all comparisons</string>
+     </property>
     </widget>
    </item>
   </layout>

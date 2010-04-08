@@ -188,6 +188,10 @@ void pqComparativeRenderView::onComparativeVisLayoutChanged()
   // Now layout the views.
   int dimensions[2];
   compView->GetDimensions(dimensions);
+  if (compView->GetOverlayAllComparisons())
+    {
+    dimensions[0] = dimensions[1] = 1;
+    }
 
   // destroy the old layout and create a new one. 
   QWidget* widget = this->getWidget();
@@ -248,6 +252,12 @@ vtkImageData* pqComparativeRenderView::captureImage(int magnification)
   vtkCollection* currentViews =  vtkCollection::New();
   this->getComparativeRenderViewProxy()->GetViews(currentViews);
   this->getComparativeRenderViewProxy()->GetDimensions(dimensions);
+
+  if (this->getComparativeRenderViewProxy()->GetOverlayAllComparisons())
+    {
+    dimensions[0] = dimensions[1] = 1;
+    }
+
 
   int imageSize[3];
   int finalImageSize[2] = {0, 0};

@@ -293,6 +293,11 @@ void pqComparativeVisPanel::setView(pqView* _view)
     this->Internal->layoutY, "value", SIGNAL(editingFinished()),
     viewProxy, viewProxy->GetProperty("Dimensions"), 1);
 
+  // Connect layoutY spinbox value to vtkSMComparativeViewProxy's "Dimensions" property
+  this->Internal->Links.addPropertyLink(
+    this->Internal->overlay, "checked", SIGNAL(toggled(bool)),
+    viewProxy, viewProxy->GetProperty("OverlayAllComparisons"), 1);
+
   this->VTKConnect->Connect(viewProxy->GetProperty("Cues"),
     vtkCommand::ModifiedEvent,
     this, SLOT(updateParametersList()));
