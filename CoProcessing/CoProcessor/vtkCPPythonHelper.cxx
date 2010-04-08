@@ -44,7 +44,7 @@ vtkInstantiatorNewMacro(vtkCPPythonHelper);
 
 vtkCPPythonHelper* vtkCPPythonHelper::Instance = 0;
 
-vtkCxxRevisionMacro(vtkCPPythonHelper, "1.1");
+vtkCxxRevisionMacro(vtkCPPythonHelper, "1.2");
 
 //----------------------------------------------------------------------------
 vtkCPPythonHelper::vtkCPPythonHelper()
@@ -64,9 +64,9 @@ vtkCPPythonHelper::~vtkCPPythonHelper()
     }
   if(this->PVMain)
     {
-    vtkPVMain::Finalize();
     this->PVMain->Delete();
     this->PVMain = 0;
+    vtkPVMain::Finalize();
     }
   if(this->PythonOptions)
     {
