@@ -45,7 +45,7 @@
 #include <vtksys/ios/sstream>
 
 //-----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkSMAdaptiveViewProxy, "1.3");
+vtkCxxRevisionMacro(vtkSMAdaptiveViewProxy, "1.4");
 vtkStandardNewMacro(vtkSMAdaptiveViewProxy);
 
 #define DEBUGPRINT_VIEW(arg)\
@@ -858,13 +858,10 @@ void vtkSMAdaptiveViewProxy::FinalizeRenderPass()
     {
     DEBUGPRINT_VIEW(cerr << "SV(" << this << ") Update Front Buffer" << endl;);
 
-    renWin->Frame();
     this->CopyBackBufferToFrontBuffer();
-    /*
     renWin->SwapBuffersOn();
     renWin->Frame();
     renWin->SwapBuffersOff();
-    */
     }
 
 
