@@ -81,16 +81,25 @@ IF (VTK_USE_QVTK_QTOPENGL)
   LIST(APPEND qtliblist QTOPENGL)
 ENDIF (VTK_USE_QVTK_QTOPENGL)
 
+SET(_install_qt_libs ON)
+
 # Don't install Qt runtime libs if we are doing a development install and 
 # DEVELOPMENT_INSTALL_QT_LIBS is off
-IF (PARAVIEW_INSTALL_DEVELOPMENT)
-  IF (DEVELOPMENT_INSTALL_QT_LIBS)
-    install_qt_libs("${qtliblist}" BrandedRuntime)
-  ENDIF(DEVELOPMENT_INSTALL_QT_LIBS)
-ELSE(PARAVIEW_INSTALL_DEVELOPMENT)
-  # if not doing a development install always install Qt libs.
-  install_qt_libs("${qtliblist}" BrandedRuntime)
-ENDIF(PARAVIEW_INSTALL_DEVELOPMENT)
+IF (PARAVIEW_INSTALL_DEVELOPMENT AND NOT DEVELOPMENT_INSTALL_QT_LIBS)
+  SET(_install_qt_libs OFF)
+ENDIF(PARAVIEW_INSTALL_DEVELOPMENT AND NOT DEVELOPMENT_INSTALL_QT_LIBS)
+
+IF(_install_qt_libs)
+   install_qt_libs("${qtliblist}" BrandedRuntime)
+    
+  # Now install the plugins for sqldrivers. For use by the help system
+  INSTALL(DIRECTORY ${QT_PLUGINS_DIR}/sqldrivers 
+          DESTINATION ${PV_INSTALL_LIB_DIR}
+          COMPONENT Runtime
+          FILES_MATCHING
+            PATTERN "*.so"
+            PATTERN "*.dll")
+ENDIF(_install_qt_libs)
 
 #------------------------------------------------------------------------
 # Install ffmpeg, if used.
@@ -130,6 +139,8 @@ IF(APPLE)
     "${CMAKE_CURRENT_BINARY_DIR}/ParaView_OSX_MakeStandAloneBundle.cmake")
   SET(OSX_MAKE_STANDALONE_BUNDLE_BASH_SCRIPT
     "${CMAKE_CURRENT_BINARY_DIR}/ParaView_OSX_MakeStandAloneBundle.sh")
+    
+  SET (QT_SQLLITE_PLUGINS_DIR ${QT_PLUGINS_DIR}/sqldrivers)
 
   CONFIGURE_FILE("${CMAKE_CURRENT_SOURCE_DIR}/CompleteBundle.cmake.in"
     "${OSX_MAKE_STANDALONE_BUNDLE_CMAKE_SCRIPT}" @ONLY IMMEDIATE)
