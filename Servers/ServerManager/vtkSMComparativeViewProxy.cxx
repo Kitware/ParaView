@@ -184,7 +184,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMComparativeViewProxy);
-vtkCxxRevisionMacro(vtkSMComparativeViewProxy, "1.33");
+vtkCxxRevisionMacro(vtkSMComparativeViewProxy, "1.34");
 
 //----------------------------------------------------------------------------
 vtkSMComparativeViewProxy::vtkSMComparativeViewProxy()
@@ -560,7 +560,6 @@ void vtkSMComparativeViewProxy::AddRepresentation(vtkSMRepresentationProxy* repr
 
   if (this->OverlayAllComparisons)
     {
-    vtkSMViewProxy* rootView = this->GetRootView();
     size_t numReprs = this->Dimensions[0] * this->Dimensions[1];
     for (size_t cc=1; cc < numReprs; cc++)
       {
