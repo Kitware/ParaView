@@ -4,13 +4,13 @@ set -x
 #  ~/partyd/buildPackage.sh /tmp/partyd/ParaView3/ /tmp/partyd/ParaView3Bin
 #  ~/partyd/buildParaViewPackage.sh <version> <cvstag>
 
-if [ "$#" != "2" ]; then
-  echo "Usage: $0 <version> <cvstag>"
+if [ "$#" != "3" ]; then
+  echo "Usage: $0 <base direcotry> <version> <cvstag>"
   exit 1
 fi
 
-version=$1
-cvstag=$2
+version=$2
+cvstag=$3
 
 #sudo apt-get install libglib-dev
 #sudo apt-get install cvs
@@ -28,7 +28,7 @@ cvstag=$2
 
 export FC=gfortran
 
-BASE_DIR=${PWD}/../../..
+BASE_DIR=$1
 SUPPORT_DIR=${BASE_DIR}/Support
 CORES=5
 
@@ -452,6 +452,7 @@ export LD_LIBRARY_PATH=${SUPPORT_DIR}/qt-4.6.2/bin/lib:${SUPPORT_DIR}/ffmpeg/lib
 rm CMakeCache.txt
 
 cat >> CMakeCache.txt << EOF
+BUILD_TESTING:BOOL=OFF
 CMAKE_BUILD_TYPE:STRING=Release
 BUILD_SHARED_LIBS:BOOL=ON
 VTK_USE_RPATH:BOOL=OFF
@@ -621,6 +622,9 @@ EOF
 #  make distclean
   ./configure --prefix=${SUPPORT_DIR}/VisIt-1.10.0 --with-config=${SUPPORT_DIR}/VisIt-1.10.0.X-all/vtkVisitDatabaseBridge.conf --with-hdf5=${SUPPORT_DIR}/hdf5-1.6.8_ser/include,${SUPPORT_DIR}/hdf5-1.6.8_ser/lib --enable-parallel --disable-scripting --disable-visitmodule --disable-viewer-mesa-stub --disable-icet --disable-bilib --disable-glew --disable-bzip2 --with-dbs=all --with-silo-include=${SUPPORT_DIR}/silo-4.6.2/include --with-silo-library=${SUPPORT_DIR}/silo-4.6.2/lib
   make -j${CORES}
+  
+else
+  echo "Found VisIt"
 fi
 
 cd ${PV_BIN}
@@ -631,6 +635,7 @@ export LD_LIBRARY_PATH=${SUPPORT_DIR}/qt-4.6.2/bin/lib:${SUPPORT_DIR}/ffmpeg/lib
 rm CMakeCache.txt
 
 cat >> CMakeCache.txt << EOF
+BUILD_TESTING:BOOL=OFF
 CMAKE_BUILD_TYPE:STRING=Release
 BUILD_SHARED_LIBS:BOOL=ON
 VTK_USE_RPATH:BOOL=OFF
@@ -654,19 +659,24 @@ PYTHON_EXECUTABLE:PATH=${SUPPORT_DIR}/python25/bin/python
 PYTHON_INCLUDE_PATH:PATH=${SUPPORT_DIR}/python25/include/python2.5/
 PYTHON_LIBRARY:PATH=${SUPPORT_DIR}/python25/lib/libpython2.5.so
 PARAVIEW_BUILD_PLUGIN_VisTrailsPlugin:BOOL=ON
+BUILD_DOCUMENTATION:BOOL=ON
+PARAVIEW_GENERATE_PROXY_DOCUMENTATION:BOOL=ON
 EOF
 
 cmake ${PV_SRC}
 make -j${CORES}
 
-echo "Building... Documentation "
-make HTMLDocumentation
-
 echo "Generating package using CPACK"
-cpack -G TGZ
+cpack --config ${PV_BIN}/Applications/ParaView/CPackParaViewConfig.cmake -G TGZ
 
 package_name=`ls -1 | grep tar | cut -f-3 -d.`
 echo "The package is ${package_name}"
+
+if [ -d ${PV_BIN} ];
+then
+  rm -rf ${package_name}
+fi
+
 tar zxf ${package_name}.tar.gz
 
 lib_dir_name=`ls ${package_name}/lib | grep paraview`
@@ -675,7 +685,7 @@ lib_dir=${package_name}/lib/${lib_dir_name}
 # Now add some standard libraries that don't get installed using cmake rules to the package.
 cd ${lib_dir}
 ls
-cp   /usr/lib/libstdc++.so.6 /lib/libgcc_s.so.1 ${SUPPORT_DIR}/python25/lib/libpython2.5.so.1.0 /usr/lib/libpng12.so.0 /usr/lib/libfontconfig.so.1 /usr/lib/libfreetype.so.6 /usr/lib/libz.so.1 /usr/lib/libexpat.so.1 ./
+cp /usr/lib/libstdc++.so.6 /lib/libgcc_s.so.1 ${SUPPORT_DIR}/python25/lib/libpython2.5.so.1.0 /usr/lib/libpng12.so.0 /usr/lib/libfreetype.so.6 /usr/lib/libz.so.1 /usr/lib/libexpat.so.1 ./
 rm -f *.debug
 cp -r ${SUPPORT_DIR}/python25/lib/ .
 cd ${PV_BIN}
