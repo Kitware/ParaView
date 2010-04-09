@@ -52,7 +52,7 @@
 #define MY_ABS(x)       ((x) < 0 ? -(x) : (x))
 
 //=============================================================================
-vtkCxxRevisionMacro(vtkPVScalarBarActor, "1.14");
+vtkCxxRevisionMacro(vtkPVScalarBarActor, "1.15");
 vtkStandardNewMacro(vtkPVScalarBarActor);
 
 //=============================================================================
@@ -226,8 +226,8 @@ int vtkPVScalarBarActor::RenderOpaqueGeometry(vtkViewport *viewport)
     if ( this->ComponentTitle && strlen(this->ComponentTitle) > 0 )
       {
       //need to account for a space between title & component and null term
-      int size = strlen(this->Title) + strlen(this->ComponentTitle) + 2;
-      char *combinedTitle = new char[ size ];
+      int str_len = strlen(this->Title) + strlen(this->ComponentTitle) + 2;
+      char *combinedTitle = new char[ str_len ];
       strcpy(combinedTitle, this->Title );
       strcat( combinedTitle, " " );
       strcat( combinedTitle, this->ComponentTitle );
