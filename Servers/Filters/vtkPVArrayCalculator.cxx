@@ -26,7 +26,7 @@
 #include <vtksys/ios/sstream>
 #include <assert.h>
 
-vtkCxxRevisionMacro( vtkPVArrayCalculator, "1.4" );
+vtkCxxRevisionMacro( vtkPVArrayCalculator, "1.5" );
 vtkStandardNewMacro( vtkPVArrayCalculator );
 // ----------------------------------------------------------------------------
 vtkPVArrayCalculator::vtkPVArrayCalculator()
@@ -40,7 +40,7 @@ vtkPVArrayCalculator::~vtkPVArrayCalculator()
 
 // ----------------------------------------------------------------------------
 void vtkPVArrayCalculator::UpdateArrayAndVariableNames
-   ( vtkDataObject * theInputObj, vtkDataSetAttributes * inDataAttrs )
+   ( vtkDataObject * vtkNotUsed(theInputObj), vtkDataSetAttributes * inDataAttrs )
 { 
   static  char   stringSufix[3][3] = { "_X", "_Y", "_Z" };
   unsigned long mtime = this->GetMTime();
