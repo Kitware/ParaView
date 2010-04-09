@@ -8905,6 +8905,133 @@
           proxyname="ClientDeliveryRepresentation">
         </Proxy>
       </SubProxy>
+
+      <StringVectorProperty name="SeriesVisibilityInfo"
+        number_of_elements_per_command="2"
+        repeat_command="1"
+        information_only="1">
+        <Documentation>
+          Property which has the current state of visibility for the series
+          available currently.
+        </Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="SeriesVisibility"
+        command="SetSeriesVisibility"
+        update_self="1"
+        number_of_elements_per_command="2"
+        element_types="2 0"
+        repeat_command="1"
+        information_property="SeriesVisibilityInfo" >
+        <Documentation>
+          Set the series visibility.
+        </Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="LineThicknessInfo"
+        number_of_elements_per_command="1"
+        information_only="1">
+        <Documentation>
+          Property which has the current state of line thickness for the series
+          available currently.
+        </Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="LineThickness"
+        command="SetLineThickness"
+        update_self="1"
+        number_of_elements_per_command="1"
+        element_types="0"
+        repeat_command="1"
+        information_property="LineThicknessInfo" >
+        <Documentation>
+          Set the series line thickness.
+        </Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="LineStyleInfo"
+        number_of_elements_per_command="1"
+        information_only="1">
+        <Documentation>
+          Property which has the current state of line style for the series
+          available currently.
+        </Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="LineStyle"
+        command="SetLineStyle"
+        update_self="1"
+        number_of_elements_per_command="1"
+        element_types="0"
+        repeat_command="1"
+        information_property="LineStyleInfo">
+        <Documentation>
+          Set the series line style.
+        </Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="SeriesLabelInfo"
+        number_of_elements_per_command="2"
+        repeat_command="1"
+        information_only="1">
+        <Documentation>
+          Property which has the current state of labels for the series
+          available currently.
+        </Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="SeriesLabel"
+        command="SetLabel"
+        update_self="1"
+        number_of_elements_per_command="2"
+        element_types="2 2"
+        repeat_command="1"
+        information_property="LabelInfo">
+        <Documentation>
+          Set the series labels.
+        </Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="ColorInfo"
+        number_of_elements_per_command="3"
+        information_only="1">
+        <Documentation>
+          Property which has the current state of line color for the series.
+        </Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="Color"
+        command="SetColor"
+        update_self="1"
+        number_of_elements_per_command="3"
+        element_types="1 1 1"
+        repeat_command="1"
+        information_property="ColorInfo" >
+        <Documentation>
+          Set the series line color.
+        </Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="OpacityInfo"
+        number_of_elements_per_command="1"
+        information_only="1">
+        <Documentation>
+          Property which has the current state of line color for the series.
+        </Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="Opacity"
+        command="SetOpacity"
+        update_self="1"
+        number_of_elements_per_command="1"
+        element_types="1"
+        repeat_command="1"
+        information_property="OpacityInfo" >
+        <Documentation>
+          Set the opacity of the lines.
+        </Documentation>
+      </StringVectorProperty>
+
     </ParallelCoordinatesRepresentationProxy>
 
     !-- New representation for ContextView based charts. -->

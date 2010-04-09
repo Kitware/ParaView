@@ -77,6 +77,20 @@ public:
   // to GetSeriesName.
   const char* GetSeriesName(int series);
 
+  // Description:
+  // Set series visibility for the series with the given name.
+  void SetSeriesVisibility(const char* name, int visible);
+
+  // Description:
+  // Set series label for the series with the given name.
+  void SetLabel(const char* name, const char* label);
+
+
+  void SetLineThickness(int value);
+  void SetLineStyle(int value);
+  void SetColor(double r, double g, double b);
+  void SetOpacity(double opacity);
+
 //BTX
 protected:
   vtkSMParallelCoordinatesRepresentationProxy();
@@ -85,6 +99,13 @@ protected:
   virtual bool BeginCreateVTKObjects();
   virtual bool EndCreateVTKObjects();
   virtual void CreatePipeline(vtkSMSourceProxy* input, int outputport);
+
+  // Description:
+  // Called to update the property information on the property. It is assured
+  // that the property passed in as an argument is a self property. Both the
+  // overloads of UpdatePropertyInformation() call this method, so subclass can
+  // override this method to perform special tasks.
+  virtual void UpdatePropertyInformationInternal(vtkSMProperty*);
 
   vtkSMClientDeliveryRepresentationProxy* SelectionRepresentation;
 

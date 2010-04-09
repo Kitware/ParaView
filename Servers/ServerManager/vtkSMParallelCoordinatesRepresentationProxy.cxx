@@ -21,12 +21,18 @@
 #include "vtkContextView.h"
 #include "vtkChartParallelCoordinates.h"
 #include "vtkPlot.h"
+#include "vtkPen.h"
 #include "vtkTable.h"
 #include "vtkAnnotationLink.h"
 #include "vtkSelection.h"
+#include "vtkStringArray.h"
+#include "vtkStringList.h"
+#include "vtkSMStringVectorProperty.h"
+
+#include <QString>
 
 vtkStandardNewMacro(vtkSMParallelCoordinatesRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMParallelCoordinatesRepresentationProxy, "1.3");
+vtkCxxRevisionMacro(vtkSMParallelCoordinatesRepresentationProxy, "1.4");
 //----------------------------------------------------------------------------
 vtkSMParallelCoordinatesRepresentationProxy::vtkSMParallelCoordinatesRepresentationProxy()
 {
@@ -177,12 +183,86 @@ void vtkSMParallelCoordinatesRepresentationProxy::Update(vtkSMViewProxy* view)
         vtkSelection::SafeDownCast(this->SelectionRepresentation->GetOutput());
     this->AnnLink->SetCurrentSelection(sel);
     this->GetChart()->SetAnnotationLink(AnnLink);
+
+    // Set the table, in case it has changed.
+    this->GetChart()->GetPlot(0)
+        ->SetInput(vtkTable::SafeDownCast(this->GetOutput()));
     }
 
-  // Set the table, in case it has changed.
-  this->GetChart()->GetPlot(0)->SetInput(vtkTable::SafeDownCast(this->GetOutput()));
-
   this->UpdatePropertyInformation();
+}
+
+//----------------------------------------------------------------------------
+void vtkSMParallelCoordinatesRepresentationProxy::UpdatePropertyInformationInternal(
+  vtkSMProperty* prop)
+{
+  vtkSMStringVectorProperty* svp = vtkSMStringVectorProperty::SafeDownCast(prop);
+  if (!svp || !svp->GetInformationOnly() ||
+      !vtkTable::SafeDownCast(this->GetOutput()))
+    {
+    return;
+    }
+
+  vtkTable* table = vtkTable::SafeDownCast(this->GetOutput());
+
+  bool skip = false;
+  const char* propertyName = this->GetPropertyName(prop);
+  vtkSmartPointer<vtkStringList> newValues = vtkSmartPointer<vtkStringList>::New();
+
+  int numberOfColumns = table->GetNumberOfColumns();
+  for (int i = 0; i < numberOfColumns; ++i)
+    {
+    const char* seriesName = table->GetColumnName(i);
+    if (!seriesName)
+      {
+      continue;
+      }
+
+    newValues->AddString(seriesName);
+
+    if (strcmp(propertyName, "SeriesVisibilityInfo") == 0)
+      {
+      if (i < 10)
+        {
+        newValues->AddString("1");
+        }
+      else
+        {
+        newValues->AddString("0");
+        }
+      }
+    else if (strcmp(propertyName, "LabelInfo") == 0)
+      {
+      newValues->AddString(seriesName);
+      }
+    else if (strcmp(propertyName, "LineThicknessInfo") == 0)
+      {
+      newValues->AddString("2");
+      }
+    else if (strcmp(propertyName, "ColorInfo") == 0)
+      {
+      newValues->AddString("0");
+      newValues->AddString("0");
+      newValues->AddString("0");
+      }
+    else if (strcmp(propertyName, "OpacityInfo") == 0)
+      {
+      newValues->AddString("0.10");
+      }
+    else if (strcmp(propertyName, "LineStyleInfo") == 0)
+      {
+      newValues->AddString("1");
+      }
+    else
+      {
+      skip = true;
+      break;
+      }
+    }
+  if (!skip)
+    {
+    svp->SetElements(newValues);
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -210,5 +290,59 @@ const char* vtkSMParallelCoordinatesRepresentationProxy::GetSeriesName(int col)
   else
     {
     return NULL;
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkSMParallelCoordinatesRepresentationProxy::SetSeriesVisibility(
+    const char* name, int visible)
+{
+  if (this->GetChart())
+    {
+    this->GetChart()->SetColumnVisibility(name, visible != 0);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkSMParallelCoordinatesRepresentationProxy::SetLabel(const char* name,
+                                                           const char* label)
+{
+
+}
+
+//----------------------------------------------------------------------------
+void vtkSMParallelCoordinatesRepresentationProxy::SetLineThickness(int value)
+{
+  if (this->GetChart())
+    {
+    this->GetChart()->GetPlot(0)->GetPen()->SetWidth(value);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkSMParallelCoordinatesRepresentationProxy::SetLineStyle(int value)
+{
+  if (this->GetChart())
+    {
+    this->GetChart()->GetPlot(0)->GetPen()->SetLineType(value);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkSMParallelCoordinatesRepresentationProxy::SetColor(double r, double g,
+                                                           double b)
+{
+  if (this->GetChart())
+    {
+    this->GetChart()->GetPlot(0)->GetPen()->SetColorF(r, g, b);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkSMParallelCoordinatesRepresentationProxy::SetOpacity(double opacity)
+{
+  if (this->GetChart())
+    {
+    this->GetChart()->GetPlot(0)->GetPen()->SetOpacityF(opacity);
     }
 }
