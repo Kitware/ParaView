@@ -115,6 +115,9 @@ SET(CTEST_CUSTOM_WARNING_EXCEPTION
 
   # suppress warning from H5Part library.
   ".H5Part.src"
+
+  # ignore all size_t to int conversion warnings.
+  "conversion from 'size_t' to"
   )
 
 SET(CTEST_CUSTOM_WARNING_EXCEPTION
