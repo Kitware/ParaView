@@ -193,6 +193,9 @@ if(APPLE)
   if(VTK_USE_CARBON)
     TARGET_LINK_LIBRARIES(pqWidgets "-framework Carbon")
   endif(VTK_USE_CARBON)
+  if(VTK_USE_COCOA)
+   TARGET_LINK_LIBRARIES(pqWidgets "-framework Cocoa")
+  endif(VTK_USE_COCOA)
 endif(APPLE)
 
 
