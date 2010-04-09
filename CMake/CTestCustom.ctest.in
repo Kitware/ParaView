@@ -111,6 +111,7 @@ SET(CTEST_CUSTOM_WARNING_EXCEPTION
   "Utilities.vtksqlite"
   "Utilities.vtkexodus2"
   "Utilities.VPIC"
+  "Utilities.vtkpng"
 
   # suppress warning from H5Part library.
   ".H5Part.src"
@@ -128,6 +129,9 @@ SET(CTEST_CUSTOM_WARNING_EXCEPTION
 
   # disable any warning coming from Qt headers.
   "[Qq]t.*/include/qt.*"
+
+  # disable warnings from UI files.
+  "ui_[^\\.]+.h"
   )
 
 IF(APPLE)
