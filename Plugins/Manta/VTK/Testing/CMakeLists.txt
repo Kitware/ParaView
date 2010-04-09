@@ -30,9 +30,9 @@ ADD_TEST( ToggleVisibility ${EXECUTABLE_OUTPUT_PATH}/ToggleVisibility
           -T ${PROJECT_BINARY_DIR}/Testing/Temporary
           -V ${PROJECT_SOURCE_DIR}/examples/Baseline/ToggleVisibility.png )
 
+ADD_EXECUTABLE( multiRens multiRens.cxx )
+TARGET_LINK_LIBRARIES( multiRens vtkManta vtkRendering vtkHybrid )
 #Disable this test until we support intermixed renderers.
-#ADD_EXECUTABLE( multiRens multiRens.cxx )
-#TARGET_LINK_LIBRARIES( multiRens vtkManta vtkRendering vtkHybrid )
 #ADD_TEST( MultiLayerRendering ${EXECUTABLE_OUTPUT_PATH}/multiRens
 #          ${PROJECT_SOURCE_DIR}/examples/multiRensEvents.log
 #          -T ${PROJECT_BINARY_DIR}/Testing/Temporary
@@ -47,10 +47,11 @@ ADD_TEST( MarchingCubeTiming ${EXECUTABLE_OUTPUT_PATH}/marching.timing 2
 IF (VTK_USE_MPI)
   ADD_EXECUTABLE( TaskParallelism TaskParallelism )
   TARGET_LINK_LIBRARIES ( TaskParallelism vtkManta vtkRendering vtkParallel )
-  ADD_TEST( ParallelImageCompositing mpirun -np 2 
-            ${EXECUTABLE_OUTPUT_PATH}/TaskParallelism
-            -T ${PROJECT_BINARY_DIR}/Testing/Temporary
-            -V ${PROJECT_SOURCE_DIR}/examples/Baseline/ParallelImageCompositing.png )
+#Disable this test because it isn't finishing on the dashboard.
+#  ADD_TEST( ParallelImageCompositing mpirun -np 2 
+#            ${EXECUTABLE_OUTPUT_PATH}/TaskParallelism
+#            -T ${PROJECT_BINARY_DIR}/Testing/Temporary
+#            -V ${PROJECT_SOURCE_DIR}/examples/Baseline/ParallelImageCompositing.png )
 
 
   ADD_EXECUTABLE( MantaBenchmark MantaBenchmark.cxx )
