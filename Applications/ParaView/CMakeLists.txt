@@ -181,6 +181,9 @@ IF(WIN32 AND NOT UNIX)
   
   ENDIF(WIN32 AND NOT UNIX)
 
+#override CPACK_SOURCE_PACKAGE_FILE_NAME  
+SET(CPACK_SOURCE_PACKAGE_FILE_NAME "$ParaView-${PARAVIEW_VERSION_FULL}")
+
 # This ensure that the only component that is used by cpack when building the
 # drag-n-drop on Mac is the "Bundle" component.
 SET (CPACK_INSTALL_CMAKE_PROJECTS_DRAGNDROP
