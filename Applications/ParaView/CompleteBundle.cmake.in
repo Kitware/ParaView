@@ -27,7 +27,8 @@ endif(COMMAND CMAKE_POLICY)
 # gp_item_default_embedded_path
 #
 function(gp_item_default_embedded_path_override item default_embedded_path_var)
- 
+  message("item: ${item}")
+  
   # By default, embed items as set by gp_item_default_embedded_path:
   #
   set(path "${${default_embedded_path_var}}")
@@ -42,10 +43,14 @@ function(gp_item_default_embedded_path_override item default_embedded_path_var)
  
   # ...embed *Plugin.dylib in the Plugins folder:
   #
-  if(item MATCHES "Plugin\\.dylib$")
+  #if(item MATCHES "Plugin\\.dylib$")
+  #  set(path "@executable_path/../Plugins")
+  #endif(item MATCHES "Plugin\\.dylib$")
+  
+  if(item MATCHES )
     set(path "@executable_path/../Plugins")
-  endif(item MATCHES "Plugin\\.dylib$")
- 
+  endif(item MATCHES )
+
   # ...embed libqsqlite.dylib in the Plugins/sqldrivers folder:
   #
   if(item MATCHES "libqsqlite\\.dylib$")
