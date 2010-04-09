@@ -150,6 +150,11 @@ IF(APPLE)
   INSTALL(SCRIPT "${OSX_MAKE_STANDALONE_BUNDLE_CMAKE_SCRIPT}" COMPONENT Bundle)
 ENDIF(APPLE)
 
+SET(_VERSION_PATCH "${PARAVIEW_VERSION_PATCH}")
+IF(PARAVIEW_VERSION_RC)
+  SET(_VERSION_PATCH "${PARAVIEW_VERSION_PATCH}-RC${PARAVIEW_VERSION_RC}")
+ENDIF(PARAVIEW_VERSION_RC)
+
 #------------------------------------------------------------------------
 # Install ParaView client
 build_paraview_client_cpack_config_init(
@@ -157,12 +162,17 @@ build_paraview_client_cpack_config_init(
     ORGANIZATION "Kitware Inc."
     VERSION_MAJOR "${PARAVIEW_VERSION_MAJOR}"
     VERSION_MINOR "${PARAVIEW_VERSION_MINOR}"
-    VERSION_PATCH "${PARAVIEW_VERSION_PATCH}"
+    VERSION_PATCH ${_VERSION_PATCH}
     DESCRIPTION "ParaView is a scientific visualization tool"
     LICENSE_FILE "${ParaView_SOURCE_DIR}/License_v1.2.txt"
     DESCRIPTION_FILE "${ParaView_SOURCE_DIR}/License_v1.2.txt"
     PACKAGE_EXECUTABLES "paraview;ParaView"
 )
+
+#override CPACK_SOURCE_PACKAGE_FILE_NAME  
+#SET(CPACK_PACKAGE_NAME "ParaView-${PARAVIEW_VERSION_FULL}")
+#SET(CPACK_SOURCE_PACKAGE_FILE_NAME "ParaView-${PARAVIEW_VERSION_FULL}")
+#SET(CPACK_PACKAGE_FILE_NAME "ParaView-${PARAVIEW_VERSION_FULL}${CPACK_SYSTEM_NAME}")
 
 # Set NSIS specific CPACK vars for install icons, strings etc..
 IF(WIN32 AND NOT UNIX)
@@ -170,8 +180,8 @@ IF(WIN32 AND NOT UNIX)
     # sure there is at least one set of four (4) backlasshes.
     SET(CPACK_PACKAGE_ICON "${ParaView_SOURCE_DIR}/Applications/ParaView\\\\pvIcon.png")
     SET(CPACK_NSIS_INSTALLED_ICON_NAME "bin\\\\paraview.exe")
-    SET(CPACK_NSIS_DISPLAY_NAME "${CPACK_PACKAGE_INSTALL_DIRECTORY} a cross-platform, open-source visualization system")
-    SET(CPACK_NSIS_PACKAGE_NAME "${CPACK_PACKAGE_INSTALL_DIRECTORY}")
+    SET(CPACK_NSIS_DISPLAY_NAME "ParaView-${PARAVIEW_VERSION_FULL} a cross-platform, open-source visualization system")
+    SET(CPACK_NSIS_PACKAGE_NAME "ParaView-${PARAVIEW_VERSION_FULL}")
     SET(CPACK_NSIS_HELP_LINK "http://www.paraview.org")
     SET(CPACK_NSIS_URL_INFO_ABOUT "http://www.kitware.com")
     SET(CPACK_NSIS_CONTACT "webmaster@paraview.org")
@@ -179,10 +189,9 @@ IF(WIN32 AND NOT UNIX)
     SET(CPACK_NSIS_MUI_ICON "${ParaView_SOURCE_DIR}/Applications/ParaView\\\\WinIcon.ico")
     SET(CPACK_NSIS_MUI_UNIICON "${ParaView_SOURCE_DIR}/Applications/ParaView\\\\WinIcon.ico")
   
-  ENDIF(WIN32 AND NOT UNIX)
+ENDIF(WIN32 AND NOT UNIX)
 
-#override CPACK_SOURCE_PACKAGE_FILE_NAME  
-SET(CPACK_SOURCE_PACKAGE_FILE_NAME "$ParaView-${PARAVIEW_VERSION_FULL}")
+
 
 # This ensure that the only component that is used by cpack when building the
 # drag-n-drop on Mac is the "Bundle" component.
