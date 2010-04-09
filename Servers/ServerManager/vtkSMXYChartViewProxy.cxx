@@ -52,7 +52,7 @@ public:
 };
 
 vtkStandardNewMacro(vtkSMXYChartViewProxy);
-vtkCxxRevisionMacro(vtkSMXYChartViewProxy, "1.12");
+vtkCxxRevisionMacro(vtkSMXYChartViewProxy, "1.13");
 //----------------------------------------------------------------------------
 vtkSMXYChartViewProxy::vtkSMXYChartViewProxy()
 {
@@ -105,6 +105,10 @@ void vtkSMXYChartViewProxy::SetChartType(const char *type)
 
   if (this->Chart)
     {
+    // Default to empty axis titles
+    this->SetAxisTitle(0, "");
+    this->SetAxisTitle(1, "");
+
     this->Chart->AddObserver(vtkCommand::SelectionChangedEvent, this->Command);
     this->ChartView->GetScene()->AddItem(this->Chart);
     }

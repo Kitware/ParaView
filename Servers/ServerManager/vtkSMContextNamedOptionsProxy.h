@@ -86,7 +86,7 @@ public:
 
 //BTX
   // Description:
-  // POD class for storing individual series properties
+  // Class for storing individual series properties like color, label, line thickness...
   class PlotInfo;
 //ETX
 
@@ -94,16 +94,6 @@ public:
 protected:
   vtkSMContextNamedOptionsProxy();
   ~vtkSMContextNamedOptionsProxy();
-
-  // Description:
-  // Set the title of the bottom axis based on the value of the
-  // UseIndexForXAxis property.
-  void RefreshBottomAxisTitle();
-
-  // Description:
-  // Hide/show the chart legend and set the left axis name depending on
-  // the number of currently visible plots
-  void RefreshLegendStatus();
 
   // Description:
   // Called to update the property information on the property. It is assured
@@ -117,6 +107,8 @@ protected:
   // exist and visible is true then the plot will be created.  The series name
   // is passed to this method so it can be used to initialize the vtkPlot if needed.
   void SetPlotVisibilityInternal(PlotInfo& info, bool visible, const char* seriesName);
+
+  PlotInfo& GetPlotInfo(const char* seriesName);
 
 private:
   vtkSMContextNamedOptionsProxy(const vtkSMContextNamedOptionsProxy&); // Not implemented
