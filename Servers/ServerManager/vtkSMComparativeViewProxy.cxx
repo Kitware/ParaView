@@ -184,7 +184,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMComparativeViewProxy);
-vtkCxxRevisionMacro(vtkSMComparativeViewProxy, "1.34");
+vtkCxxRevisionMacro(vtkSMComparativeViewProxy, "1.35");
 
 //----------------------------------------------------------------------------
 vtkSMComparativeViewProxy::vtkSMComparativeViewProxy()
@@ -555,6 +555,7 @@ void vtkSMComparativeViewProxy::AddRepresentation(vtkSMRepresentationProxy* repr
     vtkSMRepresentationProxy* newRepr = 
       this->Internal->AddRepresentationClone(
         repr, iter->GetPointer());
+    (void)newRepr;
     assert(newRepr != NULL);
     }
 
@@ -566,6 +567,7 @@ void vtkSMComparativeViewProxy::AddRepresentation(vtkSMRepresentationProxy* repr
       // Create a new representation
       vtkSMRepresentationProxy* newRepr =
         this->Internal->AddRepresentationClone(repr, rootView);
+      (void)newRepr;
       assert(newRepr);
       }
     }
