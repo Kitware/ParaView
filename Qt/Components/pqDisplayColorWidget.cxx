@@ -298,7 +298,19 @@ void pqDisplayColorWidget::updateComponents()
     pqScalarsToColors* lut = display->getLookupTable();
     int numComponents = display->getColorFieldNumberOfComponents(
         display->getColorField());
-    if(lut && numComponents > 1)
+    if ( lut && numComponents == 1 )
+      {
+      //we need to show a single name
+      QString compName = display->getColorFieldComponentName( 
+        display->getColorField(), 0);
+      if ( compName.length() > 0 )
+        {
+        //only add an item if a component name exists, that way
+        //we don't get a drop down box with a single empty item
+        this->Components->addItem( compName );          
+        }
+      }
+    else if(lut && numComponents > 1)
       {
       // delayed connection for when lut finally exists
       // remove previous connection, if any

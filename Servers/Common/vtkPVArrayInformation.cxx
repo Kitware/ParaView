@@ -30,7 +30,7 @@ namespace
 class vtkPVArrayInformation::vtkInternalComponentNames : public vtkInternalComponentNameBase {};
 
 vtkStandardNewMacro(vtkPVArrayInformation);
-vtkCxxRevisionMacro(vtkPVArrayInformation, "1.12");
+vtkCxxRevisionMacro(vtkPVArrayInformation, "1.13");
 
 //----------------------------------------------------------------------------
 vtkPVArrayInformation::vtkPVArrayInformation()
@@ -198,6 +198,16 @@ const char* vtkPVArrayInformation::GetComponentName( vtkIdType component )
     index < this->ComponentNames->size() )
     { 
     vtkStdString *compName = this->ComponentNames->at( index );
+    if ( compName )
+      {
+      return compName->c_str();
+      }
+    }
+  else if ( this->ComponentNames && component == -1 && 
+    this->ComponentNames->size() >= 1)
+    {
+    //we have a scalar array, and we need the component name
+    vtkStdString *compName = this->ComponentNames->at(0);
     if ( compName )
       {
       return compName->c_str();
