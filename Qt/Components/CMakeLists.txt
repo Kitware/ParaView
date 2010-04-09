@@ -143,6 +143,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqOrbitWidget.h
   pqOutputPortComboBox.h
 #  pqParticleTracerPanel.h
+  pqParallelCoordinatesChartDisplayPanel.h
   pqPQLookupTableManager.h
   pqPipelineBrowserWidget.h
   pqPipelineModel.h
@@ -262,6 +263,7 @@ SET(UI_FORMS
   Resources/UI/pqMultiViewFrameMenu.ui
   Resources/UI/pqOptionsDialog.ui
   Resources/UI/pqOrbitCreatorDialog.ui
+  Resources/UI/pqParallelCoordinatesChartDisplayPanel.ui
 #  Resources/UI/pqParticleTracerPanel.ui
   Resources/UI/pqPipelineTimeKeyFrameEditor.ui
   Resources/UI/pqPluginDialog.ui
@@ -554,6 +556,8 @@ ADD_LIBRARY(pqComponents
   pqOutputPortComboBox.h
   pqPQLookupTableManager.cxx
   pqPQLookupTableManager.h
+  pqParallelCoordinatesChartDisplayPanel.cxx
+  pqParallelCoordinatesChartDisplayPanel.h
 #  pqParticleTracerPanel.cxx
 #  pqParticleTracerPanel.h
   pqPipelineBrowserWidget.cxx

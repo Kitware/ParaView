@@ -34,6 +34,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProperty.h"
 #include "vtkSMContextViewProxy.h"
 #include "pqSMAdaptor.h"
+#include "pqRepresentation.h"
+#include "pqDataRepresentation.h"
 
 //-----------------------------------------------------------------------------
 pqParallelCoordinatesChartView::pqParallelCoordinatesChartView(const QString& group,
@@ -43,6 +45,13 @@ pqParallelCoordinatesChartView::pqParallelCoordinatesChartView(const QString& gr
                              QObject* parent/*=NULL*/):
   Superclass(chartViewType(), group, name, viewModule, server, parent)
 {
+  QObject::connect(this, SIGNAL(representationAdded(pqRepresentation*)),
+    this, SLOT(onAddRepresentation(pqRepresentation*)));
+  QObject::connect(this, SIGNAL(representationRemoved(pqRepresentation*)),
+    this, SLOT(onRemoveRepresentation(pqRepresentation*)));
+  QObject::connect(
+    this, SIGNAL(representationVisibilityChanged(pqRepresentation*, bool)),
+    this, SLOT(updateRepresentationVisibility(pqRepresentation*, bool)));
 }
 
 //-----------------------------------------------------------------------------
@@ -56,4 +65,42 @@ void pqParallelCoordinatesChartView::setDefaultPropertyValues()
   this->Superclass::setDefaultPropertyValues();
 }
 
+//-----------------------------------------------------------------------------
+void pqParallelCoordinatesChartView::onAddRepresentation(pqRepresentation* repr)
+{
+  this->updateRepresentationVisibility(repr, repr->isVisible());
+}
 
+
+//-----------------------------------------------------------------------------
+void pqParallelCoordinatesChartView::onRemoveRepresentation(pqRepresentation*)
+{
+}
+
+//-----------------------------------------------------------------------------
+void pqParallelCoordinatesChartView::updateRepresentationVisibility(
+    pqRepresentation* repr, bool visible)
+{
+  if (!visible && repr)
+    {
+    emit this->showing(0);
+    }
+
+  if (!visible || !repr)
+    {
+    return;
+    }
+
+  // If visible, turn-off visibility of all other representations.
+  QList<pqRepresentation*> reprs = this->getRepresentations();
+  foreach (pqRepresentation* cur_repr, reprs)
+    {
+    if (cur_repr != repr)
+      {
+      cur_repr->setVisible(false);
+      }
+    }
+
+  pqDataRepresentation* dataRepr = qobject_cast<pqDataRepresentation*>(repr);
+  emit this->showing(dataRepr);
+}

@@ -56,6 +56,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqTextDisplayPropertiesWidget.h"
 #include "pqTextRepresentation.h"
 #include "pqXYChartDisplayPanel.h"
+#include "pqParallelCoordinatesChartDisplayPanel.h"
 #include "pqUndoStack.h"
 #include "pqView.h"
 
@@ -85,7 +86,8 @@ public:
        type == "BarChartRepresentation" ||
        type == "SpreadSheetRepresentation" ||
        qobject_cast<pqTextRepresentation*>(proxy)||
-        type == "ScatterPlotRepresentation")
+       type == "ScatterPlotRepresentation" ||
+       type == "ParallelCoordinatesRepresentation")
       {
       return true;
       }
@@ -132,6 +134,10 @@ public:
     if (type == "ScatterPlotRepresentation")
       {
       return new pqScatterPlotDisplayPanel(proxy, p);
+      }
+    if (type == QString("ParallelCoordinatesRepresentation"))
+      {
+      return new pqParallelCoordinatesChartDisplayPanel(proxy, p);
       }
     return NULL;
     }
