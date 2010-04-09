@@ -646,16 +646,16 @@ void outputMetaInfoExtractFunction(FILE *fp, ClassInfo *data)
 /*
  * notWrappable returns true if the current-function is not wrappable.
  * 
- * @param currentFunction function-info being worked on
+ * @param curFunction function-info being worked on
  * 
  * @return true if the function is not wrappable
  */
-int notWrappable(FunctionInfo *currentFunction)
+int notWrappable(FunctionInfo *curFunction)
 {
-  return (currentFunction->IsOperator ||
-          currentFunction->ArrayFailure ||
-          !currentFunction->IsPublic ||
-          !currentFunction->Name);
+  return (curFunction->IsOperator ||
+          curFunction->ArrayFailure ||
+          !curFunction->IsPublic ||
+          !curFunction->Name);
 }
 
 //--------------------------------------------------------------------------nix
@@ -663,42 +663,42 @@ int notWrappable(FunctionInfo *currentFunction)
  * managableArguments check if the functions arguments are in a form
  * which can easily be used for automatic wrapper generation.
  * 
- * @param currentFunction the function beign worked on
+ * @param curFunction the function beign worked on
  * 
  * @return true if the arguments are okay for code generation
  */
-int managableArguments(FunctionInfo *currentFunction)
+int managableArguments(FunctionInfo *curFunction)
 {
   int args_ok = 1;
   int i;
   
   /* check to see if we can handle the args */
-  for (i = 0; i < currentFunction->NumberOfArguments; i++)
+  for (i = 0; i < curFunction->NumberOfArguments; i++)
     {
-    int isPointerToData = arg_is_pointer_to_data(currentFunction->ArgTypes[i],
-                                                 currentFunction->ArgCounts[i]);
-    if ((currentFunction->ArgTypes[i] % 0x10) == 0x8)
+    int isPointerToData = arg_is_pointer_to_data(curFunction->ArgTypes[i],
+                                                 curFunction->ArgCounts[i]);
+    if ((curFunction->ArgTypes[i] % 0x10) == 0x8)
       args_ok = 0;
 
     /* if its a pointer arg make sure we have the ArgCount */
-    if ((currentFunction->ArgTypes[i] % 0x1000 >= 0x100) &&
+    if ((curFunction->ArgTypes[i] % 0x1000 >= 0x100) &&
         !isPointerToData &&
-        (currentFunction->ArgTypes[i] % 0x1000 != 0x303)&&
-        (currentFunction->ArgTypes[i] % 0x1000 != 0x309)&&
-        (currentFunction->ArgTypes[i] % 0x1000 != 0x109))
+        (curFunction->ArgTypes[i] % 0x1000 != 0x303)&&
+        (curFunction->ArgTypes[i] % 0x1000 != 0x309)&&
+        (curFunction->ArgTypes[i] % 0x1000 != 0x109))
       {
-      if (currentFunction->NumberOfArguments > 1 ||
-          !currentFunction->ArgCounts[i])
+      if (curFunction->NumberOfArguments > 1 ||
+          !curFunction->ArgCounts[i])
         {
         args_ok = 0;
         }
       }
-    if ((currentFunction->ArgTypes[i] % 0x100 >= 0x10)&&
-        (currentFunction->ArgTypes[i] != 0x13)&&
-        (currentFunction->ArgTypes[i] != 0x14)&&
-        (currentFunction->ArgTypes[i] != 0x15)&&
-        (currentFunction->ArgTypes[i] != 0x16)&&
-        (currentFunction->ArgTypes[i] != 0x1A)&&
+    if ((curFunction->ArgTypes[i] % 0x100 >= 0x10)&&
+        (curFunction->ArgTypes[i] != 0x13)&&
+        (curFunction->ArgTypes[i] != 0x14)&&
+        (curFunction->ArgTypes[i] != 0x15)&&
+        (curFunction->ArgTypes[i] != 0x16)&&
+        (curFunction->ArgTypes[i] != 0x1A)&&
         !isPointerToData)
       {
       args_ok = 0;
@@ -706,38 +706,38 @@ int managableArguments(FunctionInfo *currentFunction)
     }
   
   /* if it returns an unknown class we cannot wrap it */
-  if ((currentFunction->ReturnType % 0x10) == 0x8)
+  if ((curFunction->ReturnType % 0x10) == 0x8)
     {
     args_ok = 0;
     }
   
-  if (((currentFunction->ReturnType % 0x1000)/0x100 != 0x3)&&
-      ((currentFunction->ReturnType % 0x1000)/0x100 != 0x1)&&
-      ((currentFunction->ReturnType % 0x1000)/0x100))
+  if (((curFunction->ReturnType % 0x1000)/0x100 != 0x3)&&
+      ((curFunction->ReturnType % 0x1000)/0x100 != 0x1)&&
+      ((curFunction->ReturnType % 0x1000)/0x100))
     {
     args_ok = 0;
     }
-  if (currentFunction->NumberOfArguments &&
-      (currentFunction->ArgTypes[0] == 0x5000))
+  if (curFunction->NumberOfArguments &&
+      (curFunction->ArgTypes[0] == 0x5000))
     {
     args_ok = 0;
     }
 
   /* we can't handle void * return types */
-  if ((currentFunction->ReturnType % 0x1000) == 0x302)
+  if ((curFunction->ReturnType % 0x1000) == 0x302)
     {
     args_ok = 0;
     }
 
   /* watch out for functions that dont have enough info */
-  switch (currentFunction->ReturnType % 0x1000)
+  switch (curFunction->ReturnType % 0x1000)
     {
     case 0x301: case 0x307:
     case 0x304: case 0x305: case 0x306: case 0x30A: case 0x30B:
     case 0x30C: case 0x30D:
     case 0x313: case 0x314: case 0x315: case 0x316: case 0x31A:
     case 0x31B: case 0x31C:
-      args_ok = currentFunction->HaveHint;
+      args_ok = curFunction->HaveHint;
       break;
     }
   return args_ok;
