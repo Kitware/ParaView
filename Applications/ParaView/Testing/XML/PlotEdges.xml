@@ -2,6 +2,9 @@
 <pqevents>
   <pqevent object="pqClientMainWindow/MainControlsToolbar/actionOpenData" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Data/can.ex2" />
+  <pqevent object="pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/Variables" command="setCurrent" arguments="0.0" />
+  <pqevent object="pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/Variables/1QHeaderView0" command="mousePress" arguments="1,1,0,0,0,0" />
+  <pqevent object="pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/Variables/1QHeaderView0" command="mouseRelease" arguments="1,0,0,0,0,0" />
   <pqevent object="pqClientMainWindow/VCRToolbar/actionVCRFirstFrame" command="activate" arguments="" />  
   <pqevent object="pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/objectInspector/Accept" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/cameraToolbar/actionPositiveY" command="activate" arguments="" />
