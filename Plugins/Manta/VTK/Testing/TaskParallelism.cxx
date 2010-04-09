@@ -129,8 +129,6 @@ void process(vtkMultiProcessController* controller, void* vtkNotUsed(arg))
   sprintf(windowName, "I am process %d", myId);
   renWin->SetWindowName(windowName);
   // Generate the pipeline see task1.cxx and task2.cxx)
-  vtkPolyDataMapper* mapper = (*task)(renWin, EXTENT, cam);
-
   vtkRenderWindowInteractor* iren = vtkRenderWindowInteractor::New();
   iren->SetRenderWindow(renWin);
 
