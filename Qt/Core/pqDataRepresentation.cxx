@@ -284,7 +284,7 @@ int pqDataRepresentation::getProxyScalarMode( )
   vtkSMDataRepresentationProxy* repr = vtkSMDataRepresentationProxy::SafeDownCast( this->getProxy() );
    if (!repr)
     {
-    return NULL;
+    return 0;
     }
 
   QVariant scalarMode = pqSMAdaptor::getEnumerationProperty(
