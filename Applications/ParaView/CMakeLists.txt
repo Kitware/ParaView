@@ -169,8 +169,6 @@ build_paraview_client_cpack_config_init(
     PACKAGE_EXECUTABLES "paraview;ParaView"
 )
 
-
-
 # Set NSIS specific CPACK vars for install icons, strings etc..
 IF(WIN32 AND NOT UNIX)
     # There is a bug in NSI that does not handle full unix paths properly. Make
