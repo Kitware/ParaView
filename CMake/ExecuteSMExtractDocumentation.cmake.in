@@ -1,0 +1,14 @@
+
+if(WIN32)
+  get_filename_component(@QT_QMAKE_EXECUTABLE@ QT_BIN_DIR PATH)
+  set(ENV{PATH} ${QT_BIN_DIR})
+elseif(APPLE)
+  set(ENV{DYLD_LIBRARY_PATH} @QT_LIBRARY_DIR@)
+else(WIN32)
+  set(ENV{LD_LIBRARY_PATH} @QT_LIBRARY_DIR@)
+endif(WIN32)
+
+execute_process(
+  COMMAND @DOCUMENTATION_EXE@
+  ARGS @ParaView_BINARY_DIR@/Documentation ${fullXMLFile}
+  )
