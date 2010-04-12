@@ -16,7 +16,15 @@ endif(COMMAND CMAKE_POLICY)
 if(COMMAND CMAKE_POLICY)
   cmake_policy(SET CMP0011 NEW)
 endif(COMMAND CMAKE_POLICY)
- 
+
+
+# Read the list of ParaView plugins from the file configured by ParaView:
+#
+set (packaged_plugin_names "@distributed_plugins@")
+set (PluginList)
+foreach (pluginname ${packaged_plugin_names})
+  list (APPEND PluginList "@EXECUTABLE_OUTPUT_PATH@/lib${pluginname}.dylib")
+endforeach()
  
 # gp_item_default_embedded_path_override item default_embedded_path_var
 #
@@ -27,8 +35,6 @@ endif(COMMAND CMAKE_POLICY)
 # gp_item_default_embedded_path
 #
 function(gp_item_default_embedded_path_override item default_embedded_path_var)
-  message("item: ${item}")
-  
   # By default, embed items as set by gp_item_default_embedded_path:
   #
   set(path "${${default_embedded_path_var}}")
@@ -41,15 +47,12 @@ function(gp_item_default_embedded_path_override item default_embedded_path_var)
     set(path "@executable_path/../Libraries")
   endif(item MATCHES "\\.dylib$")
  
-  # ...embed *Plugin.dylib in the Plugins folder:
+  # ...embed Plugins from ${PluginList} in the Plugins folder:
   #
-  #if(item MATCHES "Plugin\\.dylib$")
-  #  set(path "@executable_path/../Plugins")
-  #endif(item MATCHES "Plugin\\.dylib$")
-  
-  if(item MATCHES )
+  list(FIND PluginList ${item} pluginFound)
+  if(pluginFound GREATER -1)
     set(path "@executable_path/../Plugins")
-  endif(item MATCHES )
+  endif(pluginFound GREATER -1)
 
   # ...embed libqsqlite.dylib in the Plugins/sqldrivers folder:
   #
@@ -95,14 +98,7 @@ endif()
 # Fixup the .app bundle in the install tree:
 #
 include(BundleUtilities)
- 
-# Read the list of ParaView plugins from the file configured by ParaView:
-#
-set (packaged_plugin_names "@distributed_plugins@")
-set (PluginList)
-foreach (pluginname ${packaged_plugin_names})
-  list (APPEND PluginList "@EXECUTABLE_OUTPUT_PATH@/lib${pluginname}.dylib")
-endforeach()
+
 list(APPEND PluginList "@QT_PLUGINS_DIR@/sqldrivers/libqsqlite.dylib")
  
 # GLOB the list of Python.so files (treat them like plugins, too, for
