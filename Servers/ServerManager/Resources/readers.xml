@@ -3989,6 +3989,20 @@
        </Documentation>
      </StringVectorProperty>
 
+     <IntVectorProperty name="DataVOI"
+                        command="SetDataVOI"
+                        label="Data VOI"
+                        number_of_elements="6"
+                        default_values="0 0 0 0 0 0">
+       <Documentation>
+         The data volume of interest (VOI).  The VOI is a sub-extent of the
+         data that you want loaded.  Setting a VOI is useful when reading
+         from a large data set and you are only interested in a small
+         portion of the data.  If left containing all 0's, then the reader
+         will load in the entire data set.
+       </Documentation>
+     </IntVectorProperty>
+
      <Hints>
        <ReaderFactory extensions="nrrd nhdr"
                       file_description="Nrrd Raw Image Files" />
