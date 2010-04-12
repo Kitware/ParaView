@@ -52,7 +52,7 @@ public:
 };
 
 vtkStandardNewMacro(vtkSMXYChartViewProxy);
-vtkCxxRevisionMacro(vtkSMXYChartViewProxy, "1.13");
+vtkCxxRevisionMacro(vtkSMXYChartViewProxy, "1.14");
 //----------------------------------------------------------------------------
 vtkSMXYChartViewProxy::vtkSMXYChartViewProxy()
 {
@@ -298,7 +298,7 @@ void vtkSMXYChartViewProxy::SetAxisLogScale(int index, bool logScale)
 //----------------------------------------------------------------------------
 void vtkSMXYChartViewProxy::SetAxisTitle(int index, const char* title)
 {
-  if (this->Chart)
+  if (this->Chart && this->Chart->GetAxis(index))
     {
     this->Chart->GetAxis(index)->SetTitle(title);
     }
