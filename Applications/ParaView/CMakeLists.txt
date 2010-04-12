@@ -169,10 +169,7 @@ build_paraview_client_cpack_config_init(
     PACKAGE_EXECUTABLES "paraview;ParaView"
 )
 
-#override CPACK_SOURCE_PACKAGE_FILE_NAME  
-#SET(CPACK_PACKAGE_NAME "ParaView-${PARAVIEW_VERSION_FULL}")
-#SET(CPACK_SOURCE_PACKAGE_FILE_NAME "ParaView-${PARAVIEW_VERSION_FULL}")
-#SET(CPACK_PACKAGE_FILE_NAME "ParaView-${PARAVIEW_VERSION_FULL}${CPACK_SYSTEM_NAME}")
+
 
 # Set NSIS specific CPACK vars for install icons, strings etc..
 IF(WIN32 AND NOT UNIX)
