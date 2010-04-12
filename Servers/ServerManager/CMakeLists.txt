@@ -465,14 +465,22 @@ ELSE(CMAKE_CROSSCOMPILING)
 ENDIF(CMAKE_CROSSCOMPILING)
 
 # FIXME: DUDE! Dependency on Qt code in ServerManager!!!!
+
+CONFIGURE_FILE(${ParaView_CMAKE_DIR}/ExecuteSMExtractDocumentation.cmake.in
+  ${ParaView_BINARY_DIR}/CMake/ExecuteSMExtractDocumentation.cmake
+  @ONLY)
+
 FOREACH(gcf ${GUI_CONFIG_FILES})
   SET(fullXMLFile ${ParaView_SOURCE_DIR}/Applications/ParaView/${gcf}.xml)
   SET(fullHTMLFile ${ParaView_BINARY_DIR}/Documentation/${gcf}.html)
+  
+  # run the following cmake script so that we can set the runtime path for Qt when executing 
+  # SMExtractDocumentation during the build.  
   ADD_CUSTOM_COMMAND(
     OUTPUT ${fullHTMLFile}
     DEPENDS ${fullXMLFile} ${resourceFiles} vtkSMExtractDocumentation
-    COMMAND ${DOCUMENTATION_EXE}
-    ARGS ${ParaView_BINARY_DIR}/Documentation ${fullXMLFile}
+    COMMAND ${CMAKE_COMMAND}
+    ARGS -DfullXMLFile=${fullXMLFile} -P ${ParaView_BINARY_DIR}/CMake/ExecuteSMExtractDocumentation.cmake
     COMMENT "Creating Documentation for ${gcf}"
     )
 
