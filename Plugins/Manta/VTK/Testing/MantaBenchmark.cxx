@@ -15,7 +15,6 @@
 // This test covers the shadow map render pass.
 
 //TODO: Measure pipeline change and render setup time
-//TODO: Add option to prevent data changes and just do camera
 //TODO: Make it run and compile without MPI
 
 #include <mpi.h>
@@ -40,6 +39,7 @@
 #include "vtkSphereSource.h"
 #include "vtkTestUtilities.h"
 #include "vtkTimerLog.h"
+#include "vtkPLYWriter.h"
 
 #include "vtkMantaRenderer.h"
 #include "vtkMantaRenderWindow.h"
@@ -109,22 +109,44 @@ public:
     {
       this->Argc=anArgc;
       this->Argv=anArgv;  
+
+      this->Frame = 0;
+      this->PrepFrames = 0;
+      this->PrepTime = 0.0;
+      this->RenderTime = 0.0;
+      this->CompositeTime = 0.0;
+      this->AllTime = 0.0;
     }  
-  void NoteTime(vtkParallelRenderManager *prm)
+  void NoteTime(vtkParallelRenderManager *prm, bool SetupFrame)
   {
     this->Timer->StopTimer();
     double allTime = this->Timer->GetElapsedTime();
+
     double renTime = prm->GetRenderTime();
+    double prepTime = 0.0;
+    if (SetupFrame)
+      {
+      prepTime = renTime;
+      renTime = 0.0;
+      }
     double compTime = prm->GetImageProcessingTime();
     cerr << this->Frame << " "
          << renTime << " "
          << compTime << " "
          << allTime << endl;
     
-    this->Frame++;
+    if (SetupFrame)
+      {
+      this->PrepFrames++;
+      }
+    else
+      {
+      this->Frame++;
+      }
     this->RenderTime += renTime;
     this->CompositeTime += compTime;
     this->AllTime += allTime;
+    this->PrepTime += prepTime;
     this->Timer->StartTimer();
   }
   void StartTime()
@@ -133,9 +155,19 @@ public:
   }
   void PrintStats()
   {
-    cerr << "avg_render_time " << this->RenderTime/this->Frame << endl;
-    cerr << "avg_composite_time " << this->CompositeTime/this->Frame << endl;
-    cerr << "avg_framerate " << this->Frame/this->AllTime << endl;
+    if (this->PrepFrames != 0)
+      {
+      cerr << "avg_prep_time " << this->PrepTime/this->PrepFrames << endl;
+      }
+    if (this->Frame != 0)
+      {
+      cerr << "avg_render_time " << this->RenderTime/this->Frame << endl;
+      }
+    if (this->AllTime != 0.0)
+      {
+      cerr << "avg_composite_time " << this->CompositeTime/(this->Frame+this->PrepFrames) << endl;
+      cerr << "avg_framerate " << (this->Frame+this->PrepFrames)/this->AllTime << endl;
+      }
   }
 
 
@@ -145,13 +177,15 @@ protected:
   int Argc;
   char **Argv;
   int Frame;
+  int PrepFrames;
+  double PrepTime; //an approximation, assumes whole first frame is prep and not rendering
   double RenderTime;
   double CompositeTime;
   double AllTime;
   vtkTimerLog *Timer;
 };
 
-vtkCxxRevisionMacro(MyProcess, "1.6");
+vtkCxxRevisionMacro(MyProcess, "1.7");
 vtkStandardNewMacro(MyProcess);
 
 MyProcess::MyProcess()
@@ -211,6 +245,18 @@ void MyProcess::Execute()
   vtkMantaTestSource *source=vtkMantaTestSource::New();
   source->SetResolution(triangles);
   source->SetSlidingWindow(0.01);
+#if 0
+  //for comparison with Manta standalone
+  vtkPLYWriter *writer = vtkPLYWriter::New();
+  writer->SetInputConnection(source->GetOutputPort(0));
+  char buff[120];
+  sprintf(buff, "mesh_%d.ply", triangles);
+  cerr << buff << endl;
+  writer->SetFileName(buff);
+  writer->Write();
+  writer->Delete();
+  exit(0);
+#endif
 
   //Compute local geometric bounds
   vtkPolyData *pd = source->GetOutput();
@@ -412,7 +458,7 @@ void MyProcess::Execute()
 
     // initial render
     renWin->Render();
-    this->NoteTime(prm);
+    this->NoteTime(prm, true);
 
     //Change elevation filter's parameter to test color transfer function
     for (int i=2; i>-1; i--)
@@ -443,21 +489,20 @@ void MyProcess::Execute()
         }  
       // render
       renWin->Render();
-      this->NoteTime(prm);
-
+      this->NoteTime(prm, changeData);
       //Move the camera and render a bunch of frames to measure rerender time
       //TODO: Make step size configurable
-      double direction = 10.0;
+      double direction = 20.0;
       if (i==1)
         {
         direction = direction * -1.0;
         }
-      for (int f = 0; f < 36 && changeCamera; f++)
+      for (int f = 0; f < 18 && changeCamera; f++)
         {        
         camera->Azimuth(direction);
         renderer->ResetCameraClippingRange(bds);
         renWin->Render();
-        this->NoteTime(prm);
+        this->NoteTime(prm, false);
         }
       }
 
@@ -498,21 +543,21 @@ void MyProcess::Execute()
         }  
       // render
       renWin->Render();
-      this->NoteTime(prm);
+      this->NoteTime(prm, changeData);
 
       //Move the camera and render a bunch of frames to measure rerender time
       //TODO: Make step size configurable
-      double direction = 10.0;
+      double direction = 20.0;
       if (i==1)
         {
         direction = direction * -1.0;
         }
-      for (int f = 0; f < 36 && changeCamera; f++)
+      for (int f = 0; f < 18 && changeCamera; f++)
         {        
         camera->Azimuth(direction);
         renderer->ResetCameraClippingRange(bds);
         renWin->Render();
-        this->NoteTime(prm);
+        this->NoteTime(prm, false);
         }
       }
 
