@@ -18,6 +18,7 @@
 #include "vtkContextView.h"
 #include "vtkContextScene.h"
 #include "vtkChartXY.h"
+#include "vtkChartParallelCoordinates.h"
 #include "vtkAxis.h"
 #include "vtkPen.h"
 #include "vtkTextProperty.h"
@@ -27,13 +28,37 @@
 #include <QString>
 #include <QRegExp>
 
+#include "vtkCommand.h"
+
+// Command implementation
+class vtkSMXYChartViewProxy::CommandImpl : public vtkCommand
+{
+public:
+  static CommandImpl* New(vtkSMXYChartViewProxy *proxy)
+  {
+    return new CommandImpl(proxy);
+  }
+
+  CommandImpl(vtkSMXYChartViewProxy* proxy)
+    : Target(proxy), Initialized(false)
+  { }
+
+  virtual void Execute(vtkObject*, unsigned long, void*)
+  {
+    Target->SelectionChanged();
+  }
+  vtkSMXYChartViewProxy* Target;
+  bool Initialized;
+};
+
 vtkStandardNewMacro(vtkSMXYChartViewProxy);
-vtkCxxRevisionMacro(vtkSMXYChartViewProxy, "1.9");
+vtkCxxRevisionMacro(vtkSMXYChartViewProxy, "1.9.2.1");
 //----------------------------------------------------------------------------
 vtkSMXYChartViewProxy::vtkSMXYChartViewProxy()
 {
   this->Chart = NULL;
   this->InternalTitle = NULL;
+  this->Command = CommandImpl::New(this);
 }
 
 //----------------------------------------------------------------------------
@@ -45,24 +70,48 @@ vtkSMXYChartViewProxy::~vtkSMXYChartViewProxy()
     this->Chart = NULL;
     }
   this->SetInternalTitle(NULL);
+  this->Command->Delete();
 }
 
 //----------------------------------------------------------------------------
 vtkContextView* vtkSMXYChartViewProxy::NewChartView()
 {
   // Construct a new chart view and return the view of it
-  this->Chart = vtkChartXY::New();
-  this->ChartView->GetScene()->AddItem(this->Chart);
-  // Do not use the buffer id for now - performance issues.
-  this->ChartView->GetScene()->SetUseBufferId(false);
+
+  // Use the buffer id - performance issues are fixed.
+  this->ChartView->GetScene()->SetUseBufferId(true);
 
   return this->ChartView;
 }
 
 //----------------------------------------------------------------------------
-void vtkSMXYChartViewProxy::SetChartType(const char *)
+void vtkSMXYChartViewProxy::SetChartType(const char *type)
 {
-  // Does this proxy need to remember what type it is?
+  if (this->Chart)
+    {
+    this->Chart->Delete();
+    this->Chart = NULL;
+    }
+
+  // Construct the correct type of chart
+  if (strcmp(type, "Line") == 0 || strcmp(type, "Bar") == 0)
+    {
+    this->Chart = vtkChartXY::New();
+    }
+  else if (strcmp(type, "ParallelCoordinates") == 0)
+    {
+    this->Chart = vtkChartParallelCoordinates::New();
+    }
+
+  if (this->Chart)
+    {
+    // Default to empty axis titles
+    this->SetAxisTitle(0, "");
+    this->SetAxisTitle(1, "");
+
+    this->Chart->AddObserver(vtkCommand::SelectionChangedEvent, this->Command);
+    this->ChartView->GetScene()->AddItem(this->Chart);
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -249,7 +298,7 @@ void vtkSMXYChartViewProxy::SetAxisLogScale(int index, bool logScale)
 //----------------------------------------------------------------------------
 void vtkSMXYChartViewProxy::SetAxisTitle(int index, const char* title)
 {
-  if (this->Chart)
+  if (this->Chart && this->Chart->GetAxis(index))
     {
     this->Chart->GetAxis(index)->SetTitle(title);
     }
@@ -304,6 +353,11 @@ void vtkSMXYChartViewProxy::PerformRender()
     }
 
   this->ChartView->Render();
+}
+
+void vtkSMXYChartViewProxy::SelectionChanged()
+{
+  this->InvokeEvent(vtkCommand::SelectionChangedEvent);
 }
 
 //----------------------------------------------------------------------------

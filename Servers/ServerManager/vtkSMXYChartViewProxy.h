@@ -181,7 +181,7 @@ public:
   // Description:
   // Provides access to the chart view.
 //BTX
-  vtkChart* GetChart();
+  virtual vtkChart* GetChart();
 //ETX
 
 //BTX
@@ -210,6 +210,12 @@ protected:
   // Description:
   // Pointer to the proxy's chart instance.
   vtkChart* Chart;
+
+  void SelectionChanged();
+
+  // Command implementation and object pointer - listen to selection updates.
+  class CommandImpl;
+  CommandImpl* Command;
 
 private:
   vtkSMXYChartViewProxy(const vtkSMXYChartViewProxy&); // Not implemented

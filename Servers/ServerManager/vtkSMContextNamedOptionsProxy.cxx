@@ -33,13 +33,14 @@
 #include <QString>
 
 //----------------------------------------------------------------------------
-// POD class to store information about each plot.
+// Class to store information about each plot.
 // A PlotInfo is created for each column in the vtkTable
 class vtkSMContextNamedOptionsProxy::PlotInfo
 {
 public:
   vtkWeakPointer<vtkPlot> Plot;
   vtkStdString Label;
+  bool ColorInitialized;
   int LineThickness;
   int LineStyle;
   int MarkerStyle;
@@ -48,13 +49,28 @@ public:
 
   PlotInfo()
     {
+    ColorInitialized = false;
     LineThickness = 2;
     LineStyle = 1;
     MarkerStyle = 0;
     Visible = 1;
     Color[0] = Color[1] = Color[2] = 0;
-    Color[0] = 1;
     }
+
+  PlotInfo(const PlotInfo &p)
+    {
+    ColorInitialized = p.ColorInitialized;
+    LineThickness = p.LineThickness;
+    LineStyle = p.LineStyle;
+    MarkerStyle = p.MarkerStyle;
+    Visible = p.Visible;
+    Label = p.Label;
+    Color[0] = p.Color[0];
+    Color[1] = p.Color[1];
+    Color[2] = p.Color[2];
+    Plot = p.Plot;
+    }
+
 };
 
 typedef vtkstd::map<vtkstd::string, vtkSMContextNamedOptionsProxy::PlotInfo > PlotMapType;
@@ -85,7 +101,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMContextNamedOptionsProxy);
-vtkCxxRevisionMacro(vtkSMContextNamedOptionsProxy, "1.22.2.1");
+vtkCxxRevisionMacro(vtkSMContextNamedOptionsProxy, "1.22.2.2");
 
 //----------------------------------------------------------------------------
 vtkSMContextNamedOptionsProxy::vtkSMContextNamedOptionsProxy()
@@ -139,58 +155,6 @@ void vtkSMContextNamedOptionsProxy::SetTable(vtkTable* table)
 }
 
 //----------------------------------------------------------------------------
-void vtkSMContextNamedOptionsProxy::RefreshBottomAxisTitle()
-{
-  if (this->Internals->Chart)
-    {
-    if (this->Internals->UseIndexForXAxis)
-      {
-      this->Internals->Chart->GetAxis(vtkAxis::BOTTOM)->SetTitle("Index of Array");
-      }
-    else
-      {
-      this->Internals->Chart->GetAxis(vtkAxis::BOTTOM)
-          ->SetTitle(this->Internals->XSeriesName.c_str());
-      }
-    this->Internals->Chart->RecalculateBounds();
-    }
-}
-
-//----------------------------------------------------------------------------
-void vtkSMContextNamedOptionsProxy::RefreshLegendStatus()
-{
-  // Figure out how many active plot items there are - set the y axis title
-  // or display legend to true.
-  int active = 0;
-  vtkPlot* lastPlot = 0;
-  vtkstd::map<vtkstd::string, PlotInfo >::iterator it;
-  for (it = this->Internals->PlotMap.begin();
-       it != this->Internals->PlotMap.end(); ++it)
-    {
-    if (it->second.Plot && it->second.Visible)
-      {
-      ++active;
-      lastPlot = it->second.Plot;
-      }
-    }
-  if (active == 0 && this->Internals->Chart)
-    {
-    this->Internals->Chart->GetAxis(vtkAxis::LEFT)->SetTitle(" ");
-    this->Internals->Chart->SetShowLegend(false);
-    }
-  else if (active == 1 && this->Internals->Chart)
-    {
-    this->Internals->Chart->GetAxis(vtkAxis::LEFT)->SetTitle(lastPlot->GetLabel());
-    this->Internals->Chart->SetShowLegend(false);
-    }
-  else if (this->Internals->Chart)
-    {
-    this->Internals->Chart->GetAxis(vtkAxis::LEFT)->SetTitle(" ");
-    this->Internals->Chart->SetShowLegend(true);
-    }
-}
-
-//----------------------------------------------------------------------------
 void vtkSMContextNamedOptionsProxy::SetXSeriesName(const char* name)
 {
   if (!name)
@@ -213,9 +177,6 @@ void vtkSMContextNamedOptionsProxy::SetXSeriesName(const char* name)
       it->second.Plot->SetUseIndexForXSeries(this->Internals->UseIndexForXAxis);
       }
     }
-
-  this->RefreshBottomAxisTitle();
-  this->Modified();
 }
 
 //----------------------------------------------------------------------------
@@ -232,10 +193,21 @@ void vtkSMContextNamedOptionsProxy::SetUseIndexForXAxis(bool useIndex)
       it->second.Plot->SetUseIndexForXSeries(this->Internals->UseIndexForXAxis);
       }
     }
-
-  this->RefreshBottomAxisTitle();
-  this->Modified();
 }
+
+//----------------------------------------------------------------------------
+
+namespace {
+// Helper method to set color on PlotInfo
+void SetPlotInfoColor(vtkSMContextNamedOptionsProxy::PlotInfo& plotInfo, vtkColor3ub color)
+{
+  plotInfo.Color[0] = color.GetData()[0]/255.0;
+  plotInfo.Color[1] = color.GetData()[1]/255.0;
+  plotInfo.Color[2] = color.GetData()[2]/255.0;
+  plotInfo.ColorInitialized = true;
+}
+}
+
 
 //----------------------------------------------------------------------------
 void vtkSMContextNamedOptionsProxy::RefreshPlots()
@@ -258,22 +230,15 @@ void vtkSMContextNamedOptionsProxy::RefreshPlots()
       continue;
       }
 
-    // Find an existing PlotInfo object or initialize a new one,
-    // then add it to newMap.
-    PlotMapIterator it = this->Internals->PlotMap.find(seriesName);
-    if (it != this->Internals->PlotMap.end())
+    // Get the existing PlotInfo or initialize a new one
+    PlotInfo& plotInfo = this->GetPlotInfo(seriesName);
+    if (!plotInfo.ColorInitialized)
       {
-      newMap[seriesName] = it->second;
+      SetPlotInfoColor(plotInfo, this->Internals->Colors->GetColorRepeating(i));
       }
-    else
-      {
-      PlotInfo& plotInfo = newMap[seriesName];
-      plotInfo.Label = seriesName;
-      vtkColor3ub color = this->Internals->Colors->GetColorRepeating(i);
-      plotInfo.Color[0] = color.GetData()[0]/255.0;
-      plotInfo.Color[1] = color.GetData()[1]/255.0;
-      plotInfo.Color[2] = color.GetData()[2]/255.0;
-      }
+
+    // Add the PlotInfo to the new collection
+    newMap[seriesName] = plotInfo;
     }
 
   // Now we need to prune old series (table columns that were removed)
@@ -304,16 +269,13 @@ void vtkSMContextNamedOptionsProxy::UpdatePropertyInformationInternal(
     return;
     }
 
-  this->RefreshPlots();
-
   bool skip = false;
   const char* propertyName = this->GetPropertyName(prop);
   vtkSmartPointer<vtkStringList> newValues = vtkSmartPointer<vtkStringList>::New();
 
   // Note: we could iterate over this->Internals->PlotMap, but just for
   // kicks we'll iterate over the table columns in order to respect the
-  // column ordering, probably not needed... since we called RefreshPlots()
-  // we know that PlotMap matches the table columns.
+  // column ordering, probably not needed...
   int numberOfColumns = this->Internals->Table->GetNumberOfColumns();
   for (int i = 0; i < numberOfColumns; ++i)
     {
@@ -323,7 +285,7 @@ void vtkSMContextNamedOptionsProxy::UpdatePropertyInformationInternal(
       continue;
       }
 
-    PlotInfo& plotInfo = this->Internals->PlotMap[seriesName];
+    PlotInfo& plotInfo = this->GetPlotInfo(seriesName);
     newValues->AddString(seriesName);
 
     if (strcmp(propertyName, "VisibilityInfo") == 0)
@@ -426,8 +388,23 @@ void vtkSMContextNamedOptionsProxy::SetPlotVisibilityInternal(PlotInfo& plotInfo
     {
     this->Internals->Chart->RecalculateBounds();
     }
+}
 
-  this->RefreshLegendStatus();
+//----------------------------------------------------------------------------
+vtkSMContextNamedOptionsProxy::PlotInfo&
+vtkSMContextNamedOptionsProxy::GetPlotInfo(const char* seriesName)
+{
+  PlotMapIterator it = this->Internals->PlotMap.find(seriesName);
+  if (it != this->Internals->PlotMap.end())
+    {
+    return it->second;
+    }
+  else
+    {
+    PlotInfo& plotInfo = this->Internals->PlotMap[seriesName];
+    plotInfo.Label = seriesName;
+    return plotInfo;
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -447,7 +424,7 @@ void vtkSMContextNamedOptionsProxy::SetTableVisibility(bool visible)
 //----------------------------------------------------------------------------
 void vtkSMContextNamedOptionsProxy::SetVisibility(const char* name, int visible)
 {
-  PlotInfo& plotInfo = this->Internals->PlotMap[name];
+  PlotInfo& plotInfo = this->GetPlotInfo(name);
   plotInfo.Visible = visible;
   this->SetPlotVisibilityInternal(plotInfo, visible, name);
 }
@@ -456,7 +433,7 @@ void vtkSMContextNamedOptionsProxy::SetVisibility(const char* name, int visible)
 void vtkSMContextNamedOptionsProxy::SetLineThickness(const char* name,
                                                      int value)
 {
-  PlotInfo& plotInfo = this->Internals->PlotMap[name];
+  PlotInfo& plotInfo = this->GetPlotInfo(name);
   plotInfo.LineThickness = value;
   if (plotInfo.Plot)
     {
@@ -467,7 +444,7 @@ void vtkSMContextNamedOptionsProxy::SetLineThickness(const char* name,
 //----------------------------------------------------------------------------
 void vtkSMContextNamedOptionsProxy::SetLineStyle(const char* name, int style)
 {
-  PlotInfo& plotInfo = this->Internals->PlotMap[name];
+  PlotInfo& plotInfo = this->GetPlotInfo(name);
   plotInfo.LineStyle = style;
   if (plotInfo.Plot)
     {
@@ -479,10 +456,11 @@ void vtkSMContextNamedOptionsProxy::SetLineStyle(const char* name, int style)
 void vtkSMContextNamedOptionsProxy::SetColor(const char* name,
                                              double r, double g, double b)
 {
-  PlotInfo& plotInfo = this->Internals->PlotMap[name];
+  PlotInfo& plotInfo = this->GetPlotInfo(name);
   plotInfo.Color[0] = r;
   plotInfo.Color[1] = g;
   plotInfo.Color[2] = b;
+  plotInfo.ColorInitialized = true;
   if (plotInfo.Plot)
     {
     plotInfo.Plot->SetColor(r, g, b);
@@ -498,7 +476,7 @@ void vtkSMContextNamedOptionsProxy::SetAxisCorner(const char*, int)
 //----------------------------------------------------------------------------
 void vtkSMContextNamedOptionsProxy::SetMarkerStyle(const char* name, int style)
 {
-  PlotInfo& plotInfo = this->Internals->PlotMap[name];
+  PlotInfo& plotInfo = this->GetPlotInfo(name);
   plotInfo.MarkerStyle = style;
 
   // Must downcast to set the marker style...
@@ -513,9 +491,8 @@ void vtkSMContextNamedOptionsProxy::SetMarkerStyle(const char* name, int style)
 void vtkSMContextNamedOptionsProxy::SetLabel(const char* name,
                                              const char* label)
 {
-  PlotInfo& plotInfo = this->Internals->PlotMap[name];
+  PlotInfo& plotInfo = this->GetPlotInfo(name);
   plotInfo.Label = label;
-
   if (plotInfo.Plot)
     {
     plotInfo.Plot->SetLabel(label);
