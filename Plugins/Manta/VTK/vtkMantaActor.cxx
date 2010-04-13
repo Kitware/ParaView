@@ -139,7 +139,7 @@ int vtkMantaActorThreadCache::GlobalCntr = 0;
 
 //===========================================================================
 
-vtkCxxRevisionMacro(vtkMantaActor, "1.16");
+vtkCxxRevisionMacro(vtkMantaActor, "1.17");
 vtkStandardNewMacro(vtkMantaActor);
 
 //----------------------------------------------------------------------------
@@ -331,12 +331,12 @@ void vtkMantaActor::UpdateObjects( vtkRenderer * ren )
 
     //We have to nest to make an AS for each inner group
     //Is there a Manta call we can make to simply recurse while making the AS?
-    this->MantaAS = new Manta::DynBVH();
+    this->MantaAS = new Manta::DynBVH(false);
     //cerr << "MA(" << this << ") CREATE AS " << this->MantaAS << endl;
     Manta::Group *group = new Manta::Group();
     for (unsigned int i = 0; i < this->Group->size(); i++)
       {
-      Manta::DynBVH *innerBVH = new Manta::DynBVH();
+      Manta::DynBVH *innerBVH = new Manta::DynBVH(false);
       Manta::Group * innerGroup = dynamic_cast<Manta::Group *>
         (this->Group->get(i));
       if (innerGroup)
