@@ -23,6 +23,10 @@ SET(ParaView_SOURCE_FILES
   ${UI_BUILT_SOURCES})
 
 #------------------------------------------------------------------------------
+# Add install rules for required system runtimes such as MSVCRxx.dll
+INCLUDE(InstallRequiredSystemLibraries)
+
+#------------------------------------------------------------------------------
 # Build the client
 build_paraview_client(paraview
     APPLICATION_NAME "ParaView"

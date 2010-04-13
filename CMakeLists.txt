@@ -348,6 +348,11 @@ CONFIGURE_FILE(
     ${ParaView_SOURCE_DIR}/ParaViewConfig.cmake.in
     ${ParaView_BINARY_DIR}/ParaViewConfig.cmake 
     @ONLY IMMEDIATE)
+
+CONFIGURE_FILE(
+    ${ParaView_SOURCE_DIR}/ParaViewConfigVersion.cmake.in
+    ${ParaView_BINARY_DIR}/ParaViewConfigVersion.cmake
+    @ONLY IMMEDIATE)
     
 # used by the ParaViewConfig file to determine where the parts of the tree are located relative to the ParaViewConfig file.
 set(REL_REF "")
@@ -451,15 +456,16 @@ IF (NOT PV_INSTALL_NO_DEVELOPMENT)
   IF(WIN32)
     INSTALL(
         FILES "${BUILD_TREE}/CMake/tmp/ParaViewConfig.cmake"
+          "${BUILD_TREE}/ParaViewConfigVersion.cmake"
         DESTINATION .
         COMPONENT Development)
   ELSE(WIN32)
     INSTALL(
         FILES "${BUILD_TREE}/CMake/tmp/ParaViewConfig.cmake"
+          "${BUILD_TREE}/ParaViewConfigVersion.cmake"
         DESTINATION ${PV_INSTALL_LIB_DIR}
         COMPONENT Development)
   ENDIF(WIN32)
 
 ENDIF (NOT PV_INSTALL_NO_DEVELOPMENT)
-
 
