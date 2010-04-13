@@ -155,10 +155,15 @@ IF(PARAVIEW_VERSION_RC)
   SET(_VERSION_PATCH "${PARAVIEW_VERSION_PATCH}-RC${PARAVIEW_VERSION_RC}")
 ENDIF(PARAVIEW_VERSION_RC)
 
+SET(_package_name "ParaView")
+IF(PARAVIEW_INSTALL_DEVELOPMENT)
+  SET(_package_name "ParaView-Development")
+ENDIF(PARAVIEW_INSTALL_DEVELOPMENT)
+
 #------------------------------------------------------------------------
 # Install ParaView client
 build_paraview_client_cpack_config_init(
-    PACKAGE_NAME "ParaView"
+    PACKAGE_NAME ${_package_name}
     ORGANIZATION "Kitware Inc."
     VERSION_MAJOR "${PARAVIEW_VERSION_MAJOR}"
     VERSION_MINOR "${PARAVIEW_VERSION_MINOR}"
@@ -175,8 +180,8 @@ IF(WIN32 AND NOT UNIX)
     # sure there is at least one set of four (4) backlasshes.
     SET(CPACK_PACKAGE_ICON "${ParaView_SOURCE_DIR}/Applications/ParaView\\\\pvIcon.png")
     SET(CPACK_NSIS_INSTALLED_ICON_NAME "bin\\\\paraview.exe")
-    SET(CPACK_NSIS_DISPLAY_NAME "ParaView-${PARAVIEW_VERSION_FULL} a cross-platform, open-source visualization system")
-    SET(CPACK_NSIS_PACKAGE_NAME "ParaView-${PARAVIEW_VERSION_FULL}")
+    SET(CPACK_NSIS_DISPLAY_NAME "${_package_name}-${PARAVIEW_VERSION_FULL} a cross-platform, open-source visualization system")
+    SET(CPACK_NSIS_PACKAGE_NAME "${_package_name}-${PARAVIEW_VERSION_FULL}")
     SET(CPACK_NSIS_HELP_LINK "http://www.paraview.org")
     SET(CPACK_NSIS_URL_INFO_ABOUT "http://www.kitware.com")
     SET(CPACK_NSIS_CONTACT "webmaster@paraview.org")
