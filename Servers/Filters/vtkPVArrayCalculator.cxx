@@ -14,19 +14,20 @@
 =========================================================================*/
 #include "vtkPVArrayCalculator.h"
 
-#include "vtkGraph.h"
-#include "vtkDataSet.h"
 #include "vtkCellData.h"
-#include "vtkPointData.h"
 #include "vtkDataObject.h"
+#include "vtkDataSet.h"
+#include "vtkFunctionParser.h"
+#include "vtkGraph.h"
 #include "vtkInformation.h"
-#include "vtkObjectFactory.h"
 #include "vtkInformationVector.h"
+#include "vtkObjectFactory.h"
+#include "vtkPointData.h"
 
 #include <vtksys/ios/sstream>
 #include <assert.h>
 
-vtkCxxRevisionMacro( vtkPVArrayCalculator, "1.2.2.1" );
+vtkCxxRevisionMacro( vtkPVArrayCalculator, "1.2.2.2" );
 vtkStandardNewMacro( vtkPVArrayCalculator );
 // ----------------------------------------------------------------------------
 vtkPVArrayCalculator::vtkPVArrayCalculator()
@@ -50,6 +51,10 @@ void vtkPVArrayCalculator::UpdateArrayAndVariableNames
   // It's safe to call these methods in RequestData() since they don't call
   // this->Modified().
   this->RemoveAllVariables();
+
+  // This ensures that the vtkFunctionParser re-evalutes the expression.
+  this->FunctionParser->SetFunction(0);
+  this->FunctionParser->SetFunction(this->Function);
   
   // Add coordinate scalar and vector variables
   this->AddCoordinateScalarVariable( "coordsX", 0 );
