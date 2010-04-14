@@ -24,7 +24,22 @@ SET(ParaView_SOURCE_FILES
 
 #------------------------------------------------------------------------------
 # Add install rules for required system runtimes such as MSVCRxx.dll
+SET (CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS_SKIP 1)
 INCLUDE(InstallRequiredSystemLibraries)
+IF (CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS)
+  INSTALL(FILES ${CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS}
+    DESTINATION ${PV_INSTALL_BIN_DIR}
+    PERMISSIONS OWNER_WRITE OWNER_READ OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ
+    COMPONENT Runtime)
+
+  # Install the runtimes to the lib dir as well since python modules are
+  # installed in that directory and the manifest files need to present there as
+  # well.
+  INSTALL(FILES ${CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS}
+    DESTINATION ${PV_INSTALL_LIB_DIR}
+    PERMISSIONS OWNER_WRITE OWNER_READ OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ
+    COMPONENT Runtime)
+ENDIF (CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS)
 
 #------------------------------------------------------------------------------
 # Build the client
