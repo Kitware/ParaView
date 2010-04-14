@@ -96,6 +96,7 @@ SET(Filters_SRCS
   vtkPSciVizMultiCorrelativeStats.cxx
   vtkPSciVizPCAStats.cxx
   vtkPSciVizKMeans.cxx
+  vtkPVAMRDualClip.cxx
   vtkPVAnimationScene.cxx
   vtkPVArrayCalculator.cxx
   vtkPVArrowSource.cxx

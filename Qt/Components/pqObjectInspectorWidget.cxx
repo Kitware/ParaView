@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -181,8 +181,7 @@ public:
          QString("ExtractSelectionOverTime") == proxy->getProxy()->GetXMLName() ||
          QString("Contour") == proxy->getProxy()->GetXMLName() || 
          QString("CTHPart") == proxy->getProxy()->GetXMLName() ||
-         QString("RectilinearGridConnectivity") == proxy->getProxy()->GetXMLName()
-        )
+         QString("RectilinearGridConnectivity") == proxy->getProxy()->GetXMLName())
         {
         return true;
         }
@@ -254,19 +253,19 @@ pqObjectInspectorWidget::pqObjectInspectorWidget(QWidget *p)
   this->DeleteButton->setObjectName("Delete");
   this->DeleteButton->setText(tr("Delete"));
   this->DeleteButton->setIcon(QIcon(QPixmap(":/QtWidgets/Icons/pqDelete16.png")));
-  
+
   this->HelpButton = new QPushButton(this);
   this->HelpButton->setObjectName("Help");
   this->HelpButton->setIcon(QIcon(":/pqWidgets/Icons/pqHelp16.png"));
   this->HelpButton->setEnabled(false);
-  
+
   buttonlayout->addStretch();
   buttonlayout->addWidget(this->AcceptButton);
   buttonlayout->addWidget(this->ResetButton);
   buttonlayout->addWidget(this->DeleteButton);
   buttonlayout->addWidget(this->HelpButton);
   buttonlayout->addStretch();
-  
+
   mainLayout->addLayout(buttonlayout);
   mainLayout->addWidget(s);
 
@@ -697,7 +696,7 @@ void pqObjectInspectorWidget::showHelp()
 //-----------------------------------------------------------------------------
 void pqObjectInspectorWidget::show(pqPipelineSource* source)
 {
-  pqDisplayPolicy* displayPolicy = 
+  pqDisplayPolicy* displayPolicy =
     pqApplicationCore::instance()->getDisplayPolicy();
   if (!displayPolicy)
     {
@@ -715,7 +714,7 @@ void pqObjectInspectorWidget::show(pqPipelineSource* source)
       continue;
       }
 
-    pqView* cur_view = repr->getView(); 
+    pqView* cur_view = repr->getView();
     pqPipelineFilter* filter = qobject_cast<pqPipelineFilter*>(source);
     if (filter)
       {

@@ -59,6 +59,7 @@
   </Category>
 
   <Proxy group="filters" name="AMRDualClip" />
+  <Proxy group="filters" name="PVAMRDualClip" />
   <Proxy group="filters" name="AMRDualContour" />
   <Proxy group="filters" name="AMRFlashContour" />
   <Proxy group="filters" name="Append" />

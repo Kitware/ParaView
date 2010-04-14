@@ -2180,6 +2180,102 @@ attributes of the fragments.
     </SourceProxy>
 
     <!-- ==================================================================== -->
+    <SourceProxy name="PVAMRDualClip" class="vtkPVAMRDualClip"
+       label="PV AMRDualClip">
+      <Documentation
+        short_help="Clip with decimation."
+        long_help="Clip with scalars.  Tetrahedra.">
+      </Documentation>
+      <InputProperty
+         name="Input"
+         command="SetInputConnection">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkCompositeDataSet"/>
+        </DataTypeDomain>
+        <InputArrayDomain name="input_array" attribute_type="cell"
+                          number_of_components="1"/>
+      </InputProperty>
+
+      <StringVectorProperty
+        name="SelectMaterialArrays"
+        command="AddInputCellArrayToProcess"
+        clean_command="ClearInputCellArrayToProcess"
+        number_of_elements="1"
+        repeat_command="1">
+        <ArrayListDomain name="array_list" attribute_type="Scalars" data_type="VTK_UNSIGNED_CHAR">
+          <RequiredProperties>
+            <Property name="Input" function="Input"/>
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Hints>
+          <NoDefault />
+        </Hints>
+        <Documentation>
+          This property specifies the cell arrays from which the clip filter will
+          compute clipped cells.
+        </Documentation>
+      </StringVectorProperty>
+
+      <DoubleVectorProperty
+        name="VolumeFractionSurfaceValue"
+        command="SetVolumeFractionSurfaceValue"
+        label="Volume Fraction Value"
+        number_of_elements="1"
+        default_values="0.1" >
+        <DoubleRangeDomain name="scalar_range" min="0.0" max="1.0" />
+          <!--<RequiredProperties>
+            <Property name="Input" function="Input"/>
+            <Property name="AddInputCellArrayToProcess" function="ArraySelection"/>
+          </RequiredProperties>
+        </ArrayRangeDomain>-->
+        <Documentation>
+          This property specifies the values at which to compute the isosurface.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <IntVectorProperty
+        name="DegenerateCells"
+        command="SetEnableDegenerateCells"
+        number_of_elements="1"
+        animateable="1"
+        default_values="1" >
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          If this property is on, a transition mesh between levels is created.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty
+        name="MultiprocessCommunication"
+        command="SetEnableMultiProcessCommunication"
+        number_of_elements="1"
+        animateable="1"
+        default_values="1" >
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          If this property is off, each process executes independantly.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty
+        name="MergePoints"
+        command="SetEnableMergePoints"
+        number_of_elements="1"
+        animateable="1"
+        default_values="1" >
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Use more memory to merge points on the boundaries of blocks.
+        </Documentation>
+      </IntVectorProperty>
+      <!-- End PV AMR Dual Clip -->
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
     <SourceProxy name="AMRDualContour" class="vtkAMRDualContour"
        label="AMR Contour">
       <Documentation
@@ -9815,7 +9911,7 @@ This property controls how the filter works to generate tensor cell data. You ca
     </Hints>
 
    </SourceProxy> <!-- PCAStatistics -->
-   
+
    <SourceProxy name="HaloFinder" class="vtkPCosmoHaloFinder" label="Cosmology Halo Finder">
      <InputProperty
         name="Input"
@@ -9828,7 +9924,7 @@ This property controls how the filter works to generate tensor cell data. You ca
             <DataType value="vtkUnstructuredGrid"/>
           </DataTypeDomain>
      </InputProperty>
-     
+
      <IntVectorProperty
         name="CopyHaloDataToParticles"
         command="SetCopyHaloDataToParticles"
@@ -9841,14 +9937,14 @@ This property controls how the filter works to generate tensor cell data. You ca
        </Documentation>
      </IntVectorProperty>
 
-     <IntVectorProperty 
-        name="NP" 
+     <IntVectorProperty
+        name="NP"
         command="SetNP"
         label="np (number of seeded particles in one dimension)"
         number_of_elements="1"
-        default_values="256" > 
+        default_values="256" >
      <IntRangeDomain name="range" min="0" />
-       <Documentation> 
+       <Documentation>
         Number of seeded particles in one dimension.  Therefore, total simulation particles is np^3 (cubed).
        </Documentation>
      </IntVectorProperty>
@@ -9877,36 +9973,36 @@ This property controls how the filter works to generate tensor cell data. You ca
        </Documentation>
      </DoubleVectorProperty>
 
-     <IntVectorProperty 
-        name="PMin" 
+     <IntVectorProperty
+        name="PMin"
         command="SetPMin"
         label="pmin (minimum particles for a halo)"
         number_of_elements="1"
-        default_values="10" > 
+        default_values="10" >
      <IntRangeDomain name="range" min="1" />
        <Documentation>
          Minimal number of particles needed before a group is called a halo.
        </Documentation>
      </IntVectorProperty>
 
-     <DoubleVectorProperty 
-        name="BB" 
+     <DoubleVectorProperty
+        name="BB"
         command="SetBB"
         label="bb (linking distance)"
         number_of_elements="1"
-        default_values="0.20" > 
+        default_values="0.20" >
      <DoubleRangeDomain name="range" min="0" />
        <Documentation>
          Linking length measured in units of interparticle spacing and is dimensionless.  Used to link particles into halos for the friend-of-a-friend algorithm.
        </Documentation>
      </DoubleVectorProperty>
 
-     <DoubleVectorProperty 
-        name="ParticleMass" 
+     <DoubleVectorProperty
+        name="ParticleMass"
         command="SetParticleMass"
         label="particle mass"
         number_of_elements="1"
-        default_values="1.0" > 
+        default_values="1.0" >
      <DoubleRangeDomain name="range" min="0" />
        <Documentation>
          The mass of a particle.

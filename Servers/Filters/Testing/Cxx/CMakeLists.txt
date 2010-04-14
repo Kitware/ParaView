@@ -35,11 +35,12 @@ IF (VTK_USE_DISPLAY AND VTK_DATA_ROOT AND PARAVIEW_DATA_ROOT)
 # Enable these after the transfer function can take the vtkTable histograms.
 #TestTransferFunctionEditor
 #TestTransferFunctionEditor2
+TestPVAMRDualClip
     )
   FOREACH(name ${ServersFiltersImage_SRCS})
     ADD_EXECUTABLE(${name} ${name}.cxx)
     ADD_TEST(${name} ${CXX_TEST_PATH}/${name} ${name}
-      -D ${VTK_DATA_ROOT}
+      -D ${PARAVIEW_DATA_ROOT}
       -T ${ParaView_BINARY_DIR}/Testing/Temporary
       -V ${PARAVIEW_DATA_ROOT}/Baseline/${name}.png
       )

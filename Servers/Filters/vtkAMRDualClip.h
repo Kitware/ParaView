@@ -88,14 +88,22 @@ protected:
 
   //BTX
   virtual int RequestData(vtkInformation *, vtkInformationVector **, vtkInformationVector *);
+
+  // Description:
+  // Not a pipeline function. This is a helper function that
+  // allows creating a new data set given a input and a cell array name.
+  vtkMultiBlockDataSet* DoRequestData(vtkHierarchicalBoxDataSet* input,
+                                          const char* arrayNameToProcess);
+
   virtual int FillInputPortInformation(int port, vtkInformation *info);
   virtual int FillOutputPortInformation(int port, vtkInformation *info);
 
   void ShareBlockLocatorWithNeighbors(
     vtkAMRDualGridHelperBlock* block);
 
-  void ProcessBlock(vtkAMRDualGridHelperBlock* block, int blockId);
-  
+  void ProcessBlock(vtkAMRDualGridHelperBlock* block, int blockId,
+                    const char* arrayName);
+
   void ProcessDualCell(
     vtkAMRDualGridHelperBlock* block, int blockId,
     int marchingCase,
@@ -111,7 +119,7 @@ protected:
   //void PermuteCases();
   //void MirrorCases();
   //void AddGlyph(double x, double y, double z);
-  
+
   // Stuff exclusively for debugging.
   vtkIntArray* BlockIdCellArray;
   vtkUnsignedCharArray* LevelMaskPointArray;
