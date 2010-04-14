@@ -76,6 +76,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <Interface/Context.h>
 #include <Engine/Control/RTRT.h>
 #include <Model/Groups/DynBVH.h>
+#include <Model/Groups/RecursiveGrid.h>
 #include <Model/Groups/Group.h>
 
 //============================================================================
@@ -139,7 +140,7 @@ int vtkMantaActorThreadCache::GlobalCntr = 0;
 
 //===========================================================================
 
-vtkCxxRevisionMacro(vtkMantaActor, "1.17");
+vtkCxxRevisionMacro(vtkMantaActor, "1.18");
 vtkStandardNewMacro(vtkMantaActor);
 
 //----------------------------------------------------------------------------
@@ -147,6 +148,7 @@ vtkMantaActor::vtkMantaActor() : Group(0), MantaAS(0)
 {
   //cerr << "MA(" << this << ") CREATE" << endl;
   this->MantaManager = NULL;
+  this->SortType = DYNBVH;
 }
 
 //----------------------------------------------------------------------------
@@ -336,19 +338,30 @@ void vtkMantaActor::UpdateObjects( vtkRenderer * ren )
     Manta::Group *group = new Manta::Group();
     for (unsigned int i = 0; i < this->Group->size(); i++)
       {
-      Manta::DynBVH *innerBVH = new Manta::DynBVH(false);
+      Manta::AccelerationStructure *innerAS = NULL;
+      switch (this->SortType) {
+      case DYNBVH:
+      default:
+        innerAS = new Manta::DynBVH(false);
+        break;
+      case RECURSIVEGRID3:
+        innerAS = new Manta::RecursiveGrid(3);
+        break;
+      }      
+
       Manta::Group * innerGroup = dynamic_cast<Manta::Group *>
         (this->Group->get(i));
       if (innerGroup)
         {
         //cerr << "MA(" << this << ") BVH FOR " << i << " " << innerGroup << endl;
-        innerBVH->setGroup(innerGroup);
-        group->add(innerBVH);
+        innerAS->setGroup(innerGroup);
+        group->add(innerAS);
+        innerAS->rebuild();
         }
       else
         {
         //cerr << "MA(" << this << ") SIMPLE " << i << " " << innerGroup << endl;
-        delete innerBVH;
+        delete innerAS;
         group->add(this->Group->get(i));
         }
       }
