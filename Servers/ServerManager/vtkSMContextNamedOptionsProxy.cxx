@@ -101,7 +101,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMContextNamedOptionsProxy);
-vtkCxxRevisionMacro(vtkSMContextNamedOptionsProxy, "1.24");
+vtkCxxRevisionMacro(vtkSMContextNamedOptionsProxy, "1.25");
 
 //----------------------------------------------------------------------------
 vtkSMContextNamedOptionsProxy::vtkSMContextNamedOptionsProxy()
@@ -177,6 +177,12 @@ void vtkSMContextNamedOptionsProxy::SetXSeriesName(const char* name)
       it->second.Plot->SetUseIndexForXSeries(this->Internals->UseIndexForXAxis);
       }
     }
+
+  // If the X series column is changed, the range will have changed
+  if (this->Internals->Chart)
+    {
+    this->Internals->Chart->RecalculateBounds();
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -192,6 +198,12 @@ void vtkSMContextNamedOptionsProxy::SetUseIndexForXAxis(bool useIndex)
       {
       it->second.Plot->SetUseIndexForXSeries(this->Internals->UseIndexForXAxis);
       }
+    }
+
+  // If the X series column is changed, the range will have changed
+  if (this->Internals->Chart)
+    {
+    this->Internals->Chart->RecalculateBounds();
     }
 }
 
