@@ -188,7 +188,7 @@ void pqParallelCoordinatesChartDisplayPanel::setDisplay(pqRepresentation* disp)
 }
 
 //-----------------------------------------------------------------------------
-void pqParallelCoordinatesChartDisplayPanel::activateItem(const QModelIndex &index)
+void pqParallelCoordinatesChartDisplayPanel::activateItem(const QModelIndex&)
 {
   if(!this->Internal->ChartRepresentation)
     {
@@ -265,10 +265,10 @@ void pqParallelCoordinatesChartDisplayPanel::setSeriesThickness(int thickness)
 }
 
 //-----------------------------------------------------------------------------
-void pqParallelCoordinatesChartDisplayPanel::setSeriesStyle(int style)
+void pqParallelCoordinatesChartDisplayPanel::setSeriesStyle(int lineStyle)
 {
   pqSMAdaptor::setElementProperty(
-      this->Internal->ChartRepresentation->GetProperty("LineStyle"), style);
+      this->Internal->ChartRepresentation->GetProperty("LineStyle"), lineStyle);
   this->Internal->ChartRepresentation->UpdateVTKObjects();
   this->updateAllViews();
 }
