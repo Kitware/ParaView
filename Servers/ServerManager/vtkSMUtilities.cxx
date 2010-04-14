@@ -32,7 +32,7 @@
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkSMUtilities);
-vtkCxxRevisionMacro(vtkSMUtilities, "1.4");
+vtkCxxRevisionMacro(vtkSMUtilities, "1.5");
 
 //----------------------------------------------------------------------------
 int vtkSMUtilities::SaveImage(vtkImageData* image, const char* filename,
