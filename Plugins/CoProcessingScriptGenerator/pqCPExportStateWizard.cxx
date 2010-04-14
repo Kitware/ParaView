@@ -30,16 +30,22 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
 #include "pqCPExportStateWizard.h"
+#include <QMessageBox>
 #include <QWizardPage>
 #include <QPointer>
 #include <QtDebug>
 
 #include "pqPipelineFilter.h"
+#include "pqPipelineSource.h"
 #include "pqApplicationCore.h"
 #include "pqServerManagerModel.h"
 #include "pqPythonDialog.h"
 #include "pqPythonManager.h"
 #include "pqFileDialog.h"
+
+#include <vtkPVXMLElement.h>
+#include <vtkSMProxyManager.h>
+#include <vtkSMSourceProxy.h>
 
 extern const char* cp_export_py;
 
@@ -76,7 +82,6 @@ public:
 
   virtual void initializePage();
 };
-
 
 #include "ui_ExportStateWizard.h"
 
@@ -207,6 +212,60 @@ bool pqCPExportStateWizard::validateCurrentPage()
     return true;
     }
 
+  QString export_rendering = "True";
+  if (this->Internals->ignoreRendering->isChecked())
+    {
+    export_rendering = "False";
+    // check to make sure that there is a writer hooked up since we aren't
+    // exporting an image
+    vtkSMProxyManager* proxyManager = vtkSMProxyManager::GetProxyManager();
+    pqServerManagerModel* smModel = pqApplicationCore::instance()->getServerManagerModel();
+    bool haveSomeWriters = false;
+    QStringList filtersWithoutConsumers;
+    for(unsigned int i=0;i<proxyManager->GetNumberOfProxies("sources");i++)
+      {
+      if(vtkSMSourceProxy* proxy = vtkSMSourceProxy::SafeDownCast(
+           proxyManager->GetProxy("sources", proxyManager->GetProxyName("sources", i))))
+        {
+        vtkPVXMLElement* coProcessingHint = proxy->GetHints();
+        if(coProcessingHint && coProcessingHint->FindNestedElementByName("CoProcessing"))
+          {
+          haveSomeWriters = true;
+          }
+        else
+          {
+          pqPipelineSource* input = smModel->findItem<pqPipelineSource*>(proxy);
+          if(input && input->getNumberOfConsumers() == 0)
+            {
+            filtersWithoutConsumers << proxyManager->GetProxyName("sources", i);
+            }
+          }
+        }
+      }
+    if(!haveSomeWriters)
+      {
+      QMessageBox messageBox;
+      QString message(tr("No output writers specified. Either add writers in the pipeline or uncheck <b>Ignore rendering components</b>."));
+      messageBox.setText(message);
+      messageBox.exec();
+      return false;
+      }
+    if(filtersWithoutConsumers.size() != 0)
+      {
+      QMessageBox messageBox;
+      QString message(tr("The following filters have no consumers and will not be saved:\n"));
+      for(QStringList::const_iterator iter=filtersWithoutConsumers.constBegin();
+          iter!=filtersWithoutConsumers.constEnd();iter++)
+        {
+        message.append("  ");
+        message.append(iter->toLocal8Bit().constData());
+        message.append("\n");
+        }
+      messageBox.setText(message);
+      messageBox.exec();
+      }
+    }
+
   QString filters ="ParaView Python State Files (*.py);;All files (*)";
 
   pqFileDialog file_dialog (NULL, this,
@@ -245,13 +304,11 @@ bool pqCPExportStateWizard::validateCurrentPage()
   // remove last ","
   sim_inputs_map.chop(1);
   
-  QString export_rendering = "True";
-  if (this->Internals->ignoreRendering->isChecked())
-    {
-    export_rendering = "False";
-    }
   QString command =
     QString(cp_export_py).arg(export_rendering).arg(sim_inputs_map).arg(filename);
+
+  //cout << command.toStdString() << endl;
+  
   dialog->runString(command);
   return true;
 }
