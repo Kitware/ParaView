@@ -474,15 +474,25 @@ FOREACH(gcf ${GUI_CONFIG_FILES})
   SET(fullXMLFile ${ParaView_SOURCE_DIR}/Applications/ParaView/${gcf}.xml)
   SET(fullHTMLFile ${ParaView_BINARY_DIR}/Documentation/${gcf}.html)
   
-  # run the following cmake script so that we can set the runtime path for Qt when executing 
-  # SMExtractDocumentation during the build.  
-  ADD_CUSTOM_COMMAND(
-    OUTPUT ${fullHTMLFile}
-    DEPENDS ${fullXMLFile} ${resourceFiles} vtkSMExtractDocumentation
-    COMMAND ${CMAKE_COMMAND}
-    ARGS -DfullXMLFile=${fullXMLFile} -P ${ParaView_BINARY_DIR}/CMake/ExecuteSMExtractDocumentation.cmake
-    COMMENT "Creating Documentation for ${gcf}"
+  if(WIN32)
+    # run the following cmake script so that we can set the runtime path for Qt when executing 
+    # SMExtractDocumentation during the build.  
+    ADD_CUSTOM_COMMAND(
+      OUTPUT ${fullHTMLFile}
+      DEPENDS ${fullXMLFile} ${resourceFiles} vtkSMExtractDocumentation
+      COMMAND ${CMAKE_COMMAND}
+      ARGS -DfullXMLFile=${fullXMLFile} -P ${ParaView_BINARY_DIR}/CMake/ExecuteSMExtractDocumentation.cmake
+      COMMENT "Creating Documentation for ${gcf}"
+      )
+  else(WIN32)
+    ADD_CUSTOM_COMMAND(
+      OUTPUT ${fullHTMLFile}
+      DEPENDS ${fullXMLFile} ${resourceFiles} vtkSMExtractDocumentation
+      COMMAND ${DOCUMENTATION_EXE}
+      ARGS ${ParaView_BINARY_DIR}/Documentation ${fullXMLFile}
+      COMMENT "Creating Documentation for ${gcf}"
     )
+  endif(WIN32)
 
   SET(HTML_RESULTS ${HTML_RESULTS} ${fullHTMLFile})
 ENDFOREACH(gcf)
