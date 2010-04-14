@@ -110,14 +110,24 @@ ENDIF(PARAVIEW_INSTALL_DEVELOPMENT AND NOT DEVELOPMENT_INSTALL_QT_LIBS)
 
 IF(_install_qt_libs)
    install_qt_libs("${qtliblist}" BrandedRuntime)
-    
-  # Now install the plugins for sqldrivers. For use by the help system
-  INSTALL(DIRECTORY ${QT_PLUGINS_DIR}/sqldrivers 
-          DESTINATION ${PV_INSTALL_LIB_DIR}
-          COMPONENT Runtime
-          FILES_MATCHING
-            PATTERN "*.so"
-            PATTERN "*.dll")
+  
+  if(WIN32)
+    # Now install the plugins for sqldrivers. For use by the help system
+    INSTALL(DIRECTORY ${QT_PLUGINS_DIR}/sqldrivers 
+            DESTINATION ${PV_INSTALL_BIN_DIR}
+            COMPONENT Runtime
+            FILES_MATCHING
+              PATTERN "*.so"
+              PATTERN "*.dll")
+  else(WIN32)
+    # Now install the plugins for sqldrivers. For use by the help system
+    INSTALL(DIRECTORY ${QT_PLUGINS_DIR}/sqldrivers 
+            DESTINATION ${PV_INSTALL_LIB_DIR}
+            COMPONENT Runtime
+            FILES_MATCHING
+              PATTERN "*.so"
+              PATTERN "*.dll")
+  endif(WIN32)
 ENDIF(_install_qt_libs)
 
 #------------------------------------------------------------------------
