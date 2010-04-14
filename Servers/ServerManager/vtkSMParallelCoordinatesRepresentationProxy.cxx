@@ -32,7 +32,7 @@
 #include <QString>
 
 vtkStandardNewMacro(vtkSMParallelCoordinatesRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMParallelCoordinatesRepresentationProxy, "1.5");
+vtkCxxRevisionMacro(vtkSMParallelCoordinatesRepresentationProxy, "1.6");
 //----------------------------------------------------------------------------
 vtkSMParallelCoordinatesRepresentationProxy::vtkSMParallelCoordinatesRepresentationProxy()
 {
@@ -309,8 +309,8 @@ void vtkSMParallelCoordinatesRepresentationProxy::SetSeriesVisibility(
 }
 
 //----------------------------------------------------------------------------
-void vtkSMParallelCoordinatesRepresentationProxy::SetLabel(const char* name,
-                                                           const char* label)
+void vtkSMParallelCoordinatesRepresentationProxy::SetLabel(const char*,
+                                                           const char*)
 {
 
 }
