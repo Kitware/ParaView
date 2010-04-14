@@ -71,6 +71,11 @@ IF (NOT PV_INSTALL_NO_RUNTIME)
   ENDIF (pv_exe_suffix)
 ENDIF (NOT PV_INSTALL_NO_RUNTIME)
 
+SET(_VERSION_PATCH "${PARAVIEW_VERSION_PATCH}")
+IF(PARAVIEW_VERSION_RC)
+  SET(_VERSION_PATCH "${PARAVIEW_VERSION_PATCH}-RC${PARAVIEW_VERSION_RC}")
+ENDIF(PARAVIEW_VERSION_RC)
+
 #------------------------------------------------------------------------
 # We setup the CPack scripts for packaging the server.
 # This comes in handy when the Qt client is not built, or we want to package
@@ -83,7 +88,7 @@ build_paraview_client_cpack_config_init(
     ORGANIZATION "Kitware Inc."
     VERSION_MAJOR "${PARAVIEW_VERSION_MAJOR}"
     VERSION_MINOR "${PARAVIEW_VERSION_MINOR}"
-    VERSION_PATCH "${PARAVIEW_VERSION_PATCH}"
+    VERSION_PATCH "${_VERSION_PATCH}"
     DESCRIPTION "ParaView is a scientific visualization tool"
     LICENSE_FILE "${ParaView_SOURCE_DIR}/License_v1.2.txt"
     DESCRIPTION_FILE "${ParaView_SOURCE_DIR}/License_v1.2.txt"
