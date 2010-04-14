@@ -32,7 +32,7 @@
 #include <QString>
 
 vtkStandardNewMacro(vtkSMParallelCoordinatesRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMParallelCoordinatesRepresentationProxy, "1.4");
+vtkCxxRevisionMacro(vtkSMParallelCoordinatesRepresentationProxy, "1.5");
 //----------------------------------------------------------------------------
 vtkSMParallelCoordinatesRepresentationProxy::vtkSMParallelCoordinatesRepresentationProxy()
 {
@@ -152,6 +152,11 @@ bool vtkSMParallelCoordinatesRepresentationProxy::RemoveFromView(vtkSMViewProxy*
     return false;
     }
 
+  if (this->GetChart())
+    {
+    this->GetChart()->GetPlot(0)->SetInput(0);
+    this->GetChart()->SetVisible(false);
+    }
   this->ChartViewProxy = 0;
   return this->Superclass::RemoveFromView(view);
 }
