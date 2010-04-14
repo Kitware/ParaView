@@ -91,7 +91,7 @@ export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${SUPPORT_DIR}/python25/lib
 if [ ! -f ${SUPPORT_DIR}/python25/bin/sip ];
 then   
   wget http://www.riverbankcomputing.co.uk/static/Downloads/sip4/sip-4.10.1.tar.gz
-  tar -zxvf sip-4.10.1.tar.bz2
+  tar -zxvf sip-4.10.1.tar.gz
   cd sip-4.10.1/
   ${SUPPORT_DIR}/python25/bin/python configure.py
   make -j${CORES}
@@ -105,7 +105,7 @@ fi
 if [ ! -f ${SUPPORT_DIR}/python25/lib/python2.5/site-packages/PyQt4/QtCore.so ];
 then
   wget http://www.riverbankcomputing.co.uk/static/Downloads/PyQt4/PyQt-x11-gpl-4.7.2.tar.gz
-  tar -zxvf PyQt-x11-gpl-4.7.2.tar.bz2
+  tar -zxvf PyQt-x11-gpl-4.7.2.tar.gz
   cd PyQt-x11-gpl-4.7.2/
   echo yes | ${SUPPORT_DIR}/python25/bin/python configure.py -q ${SUPPORT_DIR}/qt-4.6.2/bin/bin/qmake
   make -j${CORES}
@@ -124,7 +124,7 @@ fi
 
 if [ ! -f ${SUPPORT_DIR}/VisIt-1.10.0.X-all.tar.bz2 ];
 then
-  wget videonas2/paraview/tools/VisIt-1.10.0.X-all.tar.bz2
+  wget http://www.cmake.org/files/VisIt-1.10.0.X-all.tar.bz2
 fi
 
 if [ ! -d ${SUPPORT_DIR}/VisIt-1.10.0.X-all ];
@@ -382,6 +382,9 @@ else
   echo "MPICH Complete"
 fi
 
+# end VisIt
+cd ..
+
 # FFMPEG
 if [ ! -f ${SUPPORT_DIR}/ffmpeg/lib/libavcodec.so ];
 then
@@ -390,7 +393,7 @@ then
   cd ffmpeg_source
   tar -zxvf ffmpeg.tar.gz
   cd ffmpeg
-  ./configure --disable-vhook --disable-static --disable-network --disable-zlib --disable-ffserver --disable-ffplay --disable-decoders --enable-shared --prefix=/${SUPPORT_DIR}/ffmpeg/
+  ./configure --disable-vhook --disable-static --disable-network --disable-zlib --disable-ffserver --disable-ffplay --disable-decoders --enable-shared --prefix=${SUPPORT_DIR}/ffmpeg/
   make -j${CORES}
   make install
   cd ../..
@@ -402,7 +405,7 @@ fi
 # Visit needs a build of VTK so we do a first pass build of ParaView
 # the final pass will then just be an incremental build.
 
-if [ ! -f ${PV_BIN}/bin/paraview ];
+if [ ! -f ${PV_BIN}/bin/paraview123 ];
 then
 
 if [ ! -d ${PV_BASE} ];
@@ -420,22 +423,6 @@ if [ ! -d ${PV_SRC}/Plugins/VisTrails ];
 then
   cd ${PV_SRC}/Plugins
   hg clone http://blight.kitwarein.com/VisTrails
-# edit the CMaklists file to turn on VisTrails
-# edit the CMaklists file to turn on VisTrails
-(
-cat <<EOF
---- CMakeLists.txt	2009-12-30 12:07:09.000000000 -0500
-+++ CMakeLists.txt.org	2009-12-30 12:05:36.000000000 -0500
-@@ -49,5 +49,6 @@
- paraview_build_optional_plugin(ThresholdTablePanel "ThresholdTablePanel" ThresholdTablePanel OFF) 
- paraview_build_optional_plugin(ClientGraphViewFrame "ClientGraphViewFrame" ClientGraphViewFrame OFF)
- paraview_build_optional_plugin(VisItReaderPlugin "VisItReaderPlugin" VisItDatabaseBridge OFF) 
-+paraview_build_optional_plugin(VisTrailsPlugin "VisTrailsPlugin" VisTrails ON)
- paraview_build_optional_plugin(H5PartReader "Reader for *.h5part files" H5PartReader ON)
- 
-EOF
-) | patch -p0 -N
-  cd ../..
 fi
 
 # Make the binary directory.
@@ -489,7 +476,7 @@ fi
 #=======
 # write out config file
 
-if [ ! -f ${SUPPORT_DIR}/VisIt-1.10.0.X-all/VisItDev1.10.0.X/src/lib/libplugin.so ];
+if [ ! -f ${SUPPORT_DIR}/VisIt-1.10.0.X-all/VisItDev1.10.0.X/src/lib/libplugin123.so ];
 then
 
 cd ${SUPPORT_DIR}/VisIt-1.10.0.X-all
