@@ -127,7 +127,13 @@ public:
     return this->MantaAS; 
   }
   //ETX
-    
+
+  //Description:
+  //Lets you choose the manta space sorting (acceleration) structure
+  //type used internally. Default is 0=DYNBVH
+  vtkSetMacro(SortType, int);
+  vtkGetMacro(SortType, int);
+
  protected:
   vtkMantaActor();
   ~vtkMantaActor();
@@ -138,8 +144,11 @@ public:
 
   void UpdateObjects(vtkRenderer *);
   vtkTimeStamp MeshMTime;
+
+  int SortType;
     
   //BTX
+  enum {DYNBVH, RECURSIVEGRID3};
   Manta::Group * Group; //geometry
   Manta::AccelerationStructure * MantaAS; //acceleration structure for that geometry
   //ETX

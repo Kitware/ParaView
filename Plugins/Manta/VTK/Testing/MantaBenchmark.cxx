@@ -185,7 +185,7 @@ protected:
   vtkTimerLog *Timer;
 };
 
-vtkCxxRevisionMacro(MyProcess, "1.7");
+vtkCxxRevisionMacro(MyProcess, "1.8");
 vtkStandardNewMacro(MyProcess);
 
 MyProcess::MyProcess()
@@ -207,10 +207,13 @@ void MyProcess::Execute()
   bool changeData = true;
   bool changeCamera = true;
   int screensize = 400;
-  int triangles = 100000; //TODO: Values under 10000 are making it break
+  int triangles = 100000;
+  double fuzziness = 0.001;
+  int AStype = 0;
   int threads = 1;
   int processes = numProcs;
   bool useGL = false;
+
   for (int i = 0; i < this->Argc; i++)
     {
     if (!strcmp(this->Argv[i], "-screensize"))
@@ -221,9 +224,17 @@ void MyProcess::Execute()
       {
       triangles = atoi(this->Argv[i+1]);
       }
+    if (!strcmp(this->Argv[i], "-fuzziness"))
+      {
+      fuzziness = atof(this->Argv[i+1]);
+      }
     if (!strcmp(this->Argv[i], "-threads"))
       {
       threads = atoi(this->Argv[i+1]);
+      }
+    if (!strcmp(this->Argv[i], "-asType"))
+      {
+      AStype = atoi(this->Argv[i+1]);
       }
     if (!strcmp(this->Argv[i], "-useGL"))
       {
@@ -244,7 +255,7 @@ void MyProcess::Execute()
   double bds[6];
   vtkMantaTestSource *source=vtkMantaTestSource::New();
   source->SetResolution(triangles);
-  source->SetSlidingWindow(0.01);
+  source->SetSlidingWindow(fuzziness);
 #if 0
   //for comparison with Manta standalone
   vtkPLYWriter *writer = vtkPLYWriter::New();
@@ -344,7 +355,9 @@ void MyProcess::Execute()
     }
   else
     {
-    actor = vtkMantaActor::New();
+    vtkMantaActor *act = vtkMantaActor::New();
+    act->SetSortType(AStype);
+    actor = act;
     }
 
   actor->SetMapper(mapper);
