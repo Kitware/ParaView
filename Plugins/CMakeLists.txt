@@ -53,6 +53,7 @@ IF(PARAVIEW_BUILD_QT_GUI)
   paraview_build_optional_plugin(CoProcessingScriptGenerator "Plugin for creating python coprocessing scripts" CoProcessingScriptGenerator OFF)
 ENDIF(PARAVIEW_BUILD_QT_GUI)
 paraview_build_optional_plugin(AnalyzeNIfTIReaderWriter "Reader/Writer for Analyze and NIfTI." AnalyzeNIfTIReaderWriter ON)
+paraview_build_optional_plugin(ForceTime "Override time requests" ForceTime OFF)
 
 # We do not include VisTrails source in our repo for Licensing reasons. If the directory is manually copied into Plugins, build it.
 IF(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/VisTrails/CMakeLists.txt)

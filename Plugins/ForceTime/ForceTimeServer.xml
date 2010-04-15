@@ -1,0 +1,49 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="filters">
+    <SourceProxy name="ForceTime"
+                class="vtkForceTime"
+                label="Force Time">
+                
+      <InputProperty
+         name="Input"
+         command="SetInputConnection">
+            <ProxyGroupDomain name="groups">
+              <Group name="sources"/>
+              <Group name="filters"/>
+            </ProxyGroupDomain>
+            <DataTypeDomain name="input_type">
+              <DataType value="vtkDataSet"/>
+            </DataTypeDomain>
+            <Documentation>
+              This property specifies the input to the ForceTime filter.
+            </Documentation>
+      </InputProperty>
+
+      <IntVectorProperty
+        name="IgnorePipelineTime"
+        command="SetIgnorePipelineTime"
+        number_of_elements="1"
+        animatable="1"
+        default_values="1">
+        <BooleanDomain  name="bool"/>
+        <Documentation>
+          If set to 0, this filter will do nothing, only shallow copy the input to the output. If set to 1, this filter will always request the ForcedTime to the pipeline, ignoring time requests.
+        </Documentation>
+      </IntVectorProperty>
+
+      <DoubleVectorProperty
+        name="ForcedTime"
+        command="SetForcedTime"
+        number_of_elements="1"
+        animatable="1"
+        default_values="0.0">
+        <DoubleRangeDomain name="range"/>
+        <Documentation>
+          This property specifies the time to request.
+          If the IgnorePipelineTime property is set, then this value will override any time request in the VTK pipeline.
+        </Documentation>
+      </DoubleVectorProperty>
+
+    </SourceProxy>
+  </ProxyGroup>
+</ServerManagerConfiguration>
