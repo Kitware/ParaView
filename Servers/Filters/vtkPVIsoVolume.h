@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkPVAMRDualClip.h
+  Module:    vtkPVIsoVolume.h
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -12,7 +12,7 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVAMRDualClip - Generates contour given one or more cell array
+// .NAME vtkPVIsoVolume - Generates contour given one or more cell array
 // and a volume fraction value.
 //
 // .SECTION Description
@@ -20,23 +20,23 @@
 // .SEE vtkAMRDualClip
 //
 
-#ifndef __vtkPVAMRDualClip_h
-#define __vtkPVAMRDualClip_h
+#ifndef __vtkPVIsoVolume_h
+#define __vtkPVIsoVolume_h
 
 #include "vtkAMRDualClip.h"
 
 // Forware declaration.
-class vtkPVAMRDualClipInternal;
+class vtkPVIsoVolumeInternal;
 
-class VTK_EXPORT vtkPVAMRDualClip : public vtkAMRDualClip
+class VTK_EXPORT vtkPVIsoVolume : public vtkAMRDualClip
 {
 public:
-  static vtkPVAMRDualClip* New();
-  vtkTypeRevisionMacro(vtkPVAMRDualClip,vtkAMRDualClip);
+  static vtkPVIsoVolume* New();
+  vtkTypeRevisionMacro(vtkPVIsoVolume,vtkAMRDualClip);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  vtkPVAMRDualClip();
-  ~vtkPVAMRDualClip();
+  vtkPVIsoVolume();
+  ~vtkPVIsoVolume();
 
   // Description:
   // Add to list of cell arrays which are used for generating contours.
@@ -53,8 +53,8 @@ public:
                           vtkInformationVector*);
 
 private:
-  vtkPVAMRDualClip(const vtkPVAMRDualClip&);  // Not implemented.
-  void operator=(const vtkPVAMRDualClip&);    // Not implemented.
+  vtkPVIsoVolume(const vtkPVIsoVolume&);  // Not implemented.
+  void operator=(const vtkPVIsoVolume&);    // Not implemented.
 
   //ETX
 
@@ -62,7 +62,7 @@ protected:
 
   double VolumeFractionSurfaceValue;
 
-  vtkPVAMRDualClipInternal* Implementation;
+  vtkPVIsoVolumeInternal* Implementation;
 };
 
-#endif // __vtkPVAMRDualClip_h
+#endif // __vtkPVIsoVolume_h
