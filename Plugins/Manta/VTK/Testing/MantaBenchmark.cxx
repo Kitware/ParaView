@@ -185,7 +185,7 @@ protected:
   vtkTimerLog *Timer;
 };
 
-vtkCxxRevisionMacro(MyProcess, "1.8");
+vtkCxxRevisionMacro(MyProcess, "1.9");
 vtkStandardNewMacro(MyProcess);
 
 MyProcess::MyProcess()
@@ -213,13 +213,12 @@ void MyProcess::Execute()
   int threads = 1;
   int processes = numProcs;
   bool useGL = false;
+  bool useDisplayList = false;
+
+  long unsigned int kB = 0;
 
   for (int i = 0; i < this->Argc; i++)
     {
-    if (!strcmp(this->Argv[i], "-screensize"))
-      {
-      screensize = atoi(this->Argv[i+1]);
-      }
     if (!strcmp(this->Argv[i], "-triangles"))
       {
       triangles = atoi(this->Argv[i+1]);
@@ -239,6 +238,14 @@ void MyProcess::Execute()
     if (!strcmp(this->Argv[i], "-useGL"))
       {
       useGL = true;
+      }
+    if (!strcmp(this->Argv[i], "-useDisplayList"))
+      {
+      useDisplayList = true;
+      }
+    if (!strcmp(this->Argv[i], "-screensize"))
+      {
+      screensize = atoi(this->Argv[i+1]);
       }
     if (!strcmp(this->Argv[i], "-noCamera"))
       {
@@ -294,6 +301,7 @@ void MyProcess::Execute()
   if (useGL)
     {
     mapper = vtkPolyDataMapper::New();
+    mapper->SetImmediateModeRendering(!useDisplayList);
     }
   else
     {
@@ -361,7 +369,6 @@ void MyProcess::Execute()
     }
 
   actor->SetMapper(mapper);
-  mapper->Delete();
 
   renderer->AddViewProp(actor);
   actor->Delete();
@@ -472,6 +479,7 @@ void MyProcess::Execute()
     // initial render
     renWin->Render();
     this->NoteTime(prm, true);
+    kB = mapper->GetInputAsDataSet()->GetActualMemorySize();
 
     //Change elevation filter's parameter to test color transfer function
     for (int i=2; i>-1; i--)
@@ -623,10 +631,21 @@ void MyProcess::Execute()
     cerr << "threads " << (useGL?1:threads) << endl;
     cerr << "screensize " << screensize << endl;
     cerr << "triangles " << triangles << endl;
+    cerr << "fuzziness " << fuzziness << endl;
+    cerr << "kB " << kB << endl;
     cerr << "render_with " << (useGL?"GL":"Manta") << endl;
+    if (useGL)
+      {
+      cerr << "display_lists " << (useDisplayList?"ON":"OFF") << endl;
+      }
+    if (!useGL)
+      {
+      cerr << "accel_structure " << AStype << endl;
+      }
     this->PrintStats();
     }
-  
+
+  mapper->Delete();
   renWin->Delete();
   prm->Delete();
   elev->Delete();
