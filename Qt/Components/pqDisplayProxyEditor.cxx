@@ -210,6 +210,11 @@ void pqDisplayProxyEditor::setRepresentation(pqPipelineRepresentation* repr)
     {
      QObject::connect(this->Internal->ShowCubeAxes, SIGNAL(toggled(bool)),
        this, SLOT(cubeAxesVisibilityChanged()));
+     
+     //needed so the undo / redo properly activate the checkbox
+     this->Internal->Links->addPropertyLink(this->Internal->ShowCubeAxes,
+    "checked", SIGNAL(stateChanged(int)),
+    reprProxy, reprProxy->GetProperty("CubeAxesVisibility"));
     this->Internal->AnnotationGroup->show();
     }
   else
