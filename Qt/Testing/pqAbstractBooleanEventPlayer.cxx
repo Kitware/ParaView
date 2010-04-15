@@ -33,6 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqAbstractBooleanEventPlayer.h"
 
 #include <QAbstractButton>
+#include <QGroupBox>
 #include <QtDebug>
 #include <QAction>
 
@@ -64,6 +65,14 @@ bool pqAbstractBooleanEventPlayer::playEvent(QObject* Object, const QString& Com
     return true;
     }
 
+  if ( QGroupBox* const object =  qobject_cast<QGroupBox*>(Object))
+    {
+    if ( value != object->isChecked() )
+      {
+      object->setChecked( value );
+      }
+    return true;
+    }
   qCritical() << "calling set_boolean on unhandled type " << Object;
   Error = true;
   return true;
