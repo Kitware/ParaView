@@ -1,0 +1,165 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="representations">
+    <Extension name="GeometryRepresentation">
+      <!-- This is added to the "GeometryRepresentation" proxy xml defined in the
+           standard ParaView servermanager xml 
+      -->
+
+      <!-- this adds to what is already defined in PVRepresentationBase -->
+      <RepresentationType subproxy="PointSpriteRepresentation" text="Point Sprite"
+        subtype="0" />
+
+      <SubProxy>
+        <Proxy name="PointSpriteRepresentation"
+          proxygroup="representations" proxyname="PointSpriteRepresentation" />
+          
+          <ShareProperties subproxy="SurfaceRepresentation">
+            <Exception name="Visibility" />
+            <Exception name="Representation" />
+          </ShareProperties>
+          
+          <ExposedProperties>
+            <Property name="RenderMode"/>
+            <Property name="RadiusMode"/>
+            <Property name="MaxPixelSize"/>
+            
+            <Property name="OpacityArray"/>
+            <Property name="OpacityTransferFunctionEnabled"/>
+            <Property name="OpacityPainterEnabled"/>
+            <Property name="OpacityVectorComponent"/>
+            <Property name="OpacityScalarRange"/>
+            <Property name="OpacityUseScalarRange"/>
+            <Property name="OpacityTableValues"/>
+            <Property name="OpacityGaussianControlPoints"/>
+            <Property name="OpacityTransferFunctionMode"/>
+            <Property name="OpacityIsProportional"/>
+            <Property name="OpacityProportionalFactor"/>
+            
+            <Property name="RadiusArray"/>
+            <Property name="RadiusTransferFunctionEnabled"/>
+            <Property name="RadiusTableValues"/>
+            <Property name="RadiusGaussianControlPoints"/>
+            <Property name="RadiusTransferFunctionMode"/>
+            <Property name="RadiusVectorComponent"/>
+            <Property name="RadiusScalarRange"/>
+            <Property name="RadiusUseScalarRange"/>
+            <Property name="RadiusRange"/>
+            <Property name="ConstantRadius"/>
+            <Property name="RadiusIsProportional"/>
+            <Property name="RadiusProportionalFactor"/>
+            <Property name="RadiusInitialized"/>
+          </ExposedProperties>
+      </SubProxy>
+
+      <!-- End of GeometryRepresentation(Extension) -->
+    </Extension>
+
+    <Extension name="UnstructuredGridRepresentation">
+      <!-- This is added to the "UnstructuredGridRepresentation" proxy xml defined in the
+           standard ParaView servermanager xml 
+      -->
+
+      <!-- this adds to what is already defined in PVRepresentationBase -->
+      <RepresentationType subproxy="PointSpriteRepresentation" text="Point Sprite"
+        subtype="0" />
+
+      <SubProxy>
+        <Proxy name="PointSpriteRepresentation"
+          proxygroup="representations" proxyname="PointSpriteRepresentation" />
+          
+          <ShareProperties subproxy="SurfaceRepresentation">
+            <Exception name="Visibility" />
+            <Exception name="Representation" />
+          </ShareProperties>
+          <ExposedProperties>
+            <Property name="RenderMode"/>
+            <Property name="RadiusMode"/>
+            <Property name="MaxPixelSize"/>
+            
+            <Property name="OpacityArray"/>
+            <Property name="OpacityTransferFunctionEnabled"/>
+            <Property name="OpacityPainterEnabled"/>
+            <Property name="OpacityVectorComponent"/>
+            <Property name="OpacityScalarRange"/>
+            <Property name="OpacityUseScalarRange"/>
+            <Property name="OpacityTableValues"/>
+            <Property name="OpacityGaussianControlPoints"/>
+            <Property name="OpacityTransferFunctionMode"/>
+            <Property name="OpacityIsProportional"/>
+            <Property name="OpacityProportionalFactor"/>
+            
+            <Property name="RadiusArray"/>
+            <Property name="RadiusTransferFunctionEnabled"/>
+            <Property name="RadiusTableValues"/>
+            <Property name="RadiusGaussianControlPoints"/>
+            <Property name="RadiusTransferFunctionMode"/>
+            <Property name="RadiusVectorComponent"/>
+            <Property name="RadiusScalarRange"/>
+            <Property name="RadiusUseScalarRange"/>
+            <Property name="RadiusRange"/>
+            <Property name="ConstantRadius"/>
+            <Property name="RadiusIsProportional"/>
+            <Property name="RadiusProportionalFactor"/>
+            <Property name="RadiusInitialized"/>
+          </ExposedProperties>
+      </SubProxy>
+
+
+      <!-- End of UnstructuredGridRepresentation(Extension) -->
+    </Extension>
+
+    <Extension name="UniformGridRepresentation">
+      <!-- This is added to the "UniformGridRepresentation" proxy xml defined in the
+           standard ParaView servermanager xml 
+      -->
+
+      <!-- this adds to what is already defined in PVRepresentationBase -->
+      <RepresentationType subproxy="PointSpriteRepresentation" text="Point Sprite"
+        subtype="0"/>
+
+      <SubProxy>
+        <Proxy name="PointSpriteRepresentation"
+          proxygroup="representations" proxyname="PointSpriteRepresentation" />
+          
+          <ShareProperties subproxy="SurfaceRepresentation">
+            <Exception name="Visibility" />
+            <Exception name="Representation" />
+          </ShareProperties>
+          <ExposedProperties>
+            <Property name="RenderMode"/>
+            <Property name="RadiusMode"/>
+            <Property name="MaxPixelSize"/>
+            
+            <Property name="OpacityArray"/>
+            <Property name="OpacityTransferFunctionEnabled"/>
+            <Property name="OpacityPainterEnabled"/>
+            <Property name="OpacityVectorComponent"/>
+            <Property name="OpacityScalarRange"/>
+            <Property name="OpacityUseScalarRange"/>
+            <Property name="OpacityTableValues"/>
+            <Property name="OpacityGaussianControlPoints"/>
+            <Property name="OpacityTransferFunctionMode"/>
+            <Property name="OpacityIsProportional"/>
+            <Property name="OpacityProportionalFactor"/>
+            
+            <Property name="RadiusArray"/>
+            <Property name="RadiusTransferFunctionEnabled"/>
+            <Property name="RadiusTableValues"/>
+            <Property name="RadiusGaussianControlPoints"/>
+            <Property name="RadiusTransferFunctionMode"/>
+            <Property name="RadiusVectorComponent"/>
+            <Property name="RadiusScalarRange"/>
+            <Property name="RadiusUseScalarRange"/>
+            <Property name="RadiusRange"/>
+            <Property name="ConstantRadius"/>
+            <Property name="RadiusIsProportional"/>
+            <Property name="RadiusProportionalFactor"/>
+            <Property name="RadiusInitialized"/>
+            
+          </ExposedProperties>
+      </SubProxy>
+
+      <!-- End of UniformGridRepresentation(Extension) -->
+    </Extension>
+  </ProxyGroup>
+</ServerManagerConfiguration>
