@@ -36,6 +36,11 @@ vtkSMCubeAxesRepresentationProxy::vtkSMCubeAxesRepresentationProxy()
   this->Position[0] = this->Position[1] = this->Position[2] = 0.0;
   this->Orientation[0] = this->Orientation[1] = this->Orientation[2] = 0.0;
   this->Scale[0] = this->Scale[1] = this->Scale[2] = 1.0;
+  this->CustomBounds[0] = this->CustomBounds[2] = this->CustomBounds[4] = 0.0;
+  this->CustomBounds[1] = this->CustomBounds[3] = this->CustomBounds[5] = 1.0;
+  this->CustomBoundsActive[0] = 0;
+  this->CustomBoundsActive[1] = 0;
+  this->CustomBoundsActive[2] = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -229,6 +234,18 @@ void vtkSMCubeAxesRepresentationProxy::Update(vtkSMViewProxy* view)
         }
       vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
         this->CubeAxesActor->GetProperty("Bounds"));
+      
+      //overload bounds with the active custom bounds
+      int pos=0;
+      for ( int i=0; i < 3; ++i)
+        {
+        pos = i * 2;
+        if ( this->CustomBoundsActive[i] )
+          {
+          bds[pos]=this->CustomBounds[pos];
+          bds[pos+1]=this->CustomBounds[pos+1];
+          }
+        }
       dvp->SetElements(bds);
       this->CubeAxesActor->UpdateVTKObjects();
       }
