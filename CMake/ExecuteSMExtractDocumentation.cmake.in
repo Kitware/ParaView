@@ -1,6 +1,6 @@
 
 if(WIN32)
-  get_filename_component(@QT_QMAKE_EXECUTABLE@ QT_BIN_DIR PATH)
+  get_filename_component(QT_BIN_DIR @QT_QMAKE_EXECUTABLE@ PATH)
   set(ENV{PATH} ${QT_BIN_DIR})
 elseif(APPLE)
   set(ENV{DYLD_LIBRARY_PATH} @QT_LIBRARY_DIR@)
