@@ -2638,16 +2638,20 @@
         <BooleanDomain name="bool" />
       </IntVectorProperty>
 
-
-      <DoubleVectorProperty name="Bounds"
+      <DoubleVectorProperty
+        name="Bounds"
         command="SetBounds"
-        number_of_elements="6"
+        number_of_elements="6"            
+        information_property="BoundsInfo" 
         default_values="0 1 0 1 0 1">
-        <Documentation>
-          Set the bounds for this cube axes.
-        </Documentation>
-
-        <DoubleRangeDomain />
+      </DoubleVectorProperty>
+      
+      <DoubleVectorProperty 
+        name="BoundsInfo"
+        command="GetBounds"
+        number_of_elements="6"        
+        information_only="1"
+        default_values="0 1 0 1 0 1">
       </DoubleVectorProperty>
 
       <IntVectorProperty name="FlyMode"
@@ -2838,7 +2842,7 @@
           Specify if grid lines are drawn parallel to Z axis.
         </Documentation>
       </IntVectorProperty>
-
+      
       <IntVectorProperty name="TickLocation"
         command="SetTickLocation"
         number_of_elements="1"
@@ -8104,6 +8108,8 @@
           proxygroup="representations" proxyname="CubeAxesRepresentation">
         </Proxy>
         <ExposedProperties>
+          <Property name="CustomBounds"/>
+          <Property name="CustomBoundsActive"/>
           <Property exposed_name="CubeAxesColor" name="Color" />
           <Property exposed_name="CubeAxesCornerOffset" name="CornerOffset" />
           <Property exposed_name="CubeAxesFlyMode" name="FlyMode" />
@@ -8113,7 +8119,7 @@
           <Property exposed_name="CubeAxesXAxisTickVisibility" name="XAxisTickVisibility" />
           <Property exposed_name="CubeAxesXAxisVisibility" name="XAxisVisibility" />
           <Property exposed_name="CubeAxesXGridLines" name="XGridLines" />
-          <Property exposed_name="CubeAxesXTitle" name="XTitle" />
+          <Property exposed_name="CubeAxesXTitle" name="XTitle" />                              
           <Property exposed_name="CubeAxesYAxisMinorTickVisibility" name="YAxisMinorTickVisibility" />
           <Property exposed_name="CubeAxesYAxisTickVisibility" name="YAxisTickVisibility" />
           <Property exposed_name="CubeAxesYAxisVisibility" name="YAxisVisibility" />
@@ -8189,6 +8195,8 @@
           <Property name="SelectionRepresentation" />
 
           <!-- Inherit Cube-Axes properties -->
+          <Property name="CustomBounds"/>
+          <Property name="CustomBoundsActive"/>
           <Property name="CubeAxesColor"/>
           <Property name="CubeAxesCornerOffset"/>
           <Property name="CubeAxesFlyMode"/>
@@ -8292,6 +8300,8 @@
           <Property name="SelectionRepresentation" />
 
           <!-- Inherit Cube-Axes properties -->
+          <Property name="CustomBounds"/>
+          <Property name="CustomBoundsActive"/>
           <Property name="CubeAxesColor"/>
           <Property name="CubeAxesCornerOffset"/>
           <Property name="CubeAxesFlyMode"/>
@@ -8412,7 +8422,9 @@
           <Property name="SelectionPointSize" />
           <Property name="SelectionRepresentation" />
 
-          <!-- Inherit Cube-Axes properties -->
+          <!-- Inherit Cube-Axes properties -->  
+          <Property name="CustomBounds"/>
+          <Property name="CustomBoundsActive"/>
           <Property name="CubeAxesColor"/>
           <Property name="CubeAxesCornerOffset"/>
           <Property name="CubeAxesFlyMode"/>
@@ -10030,7 +10042,23 @@
         animateable="1">
         <DoubleRangeDomain name="range" />
       </DoubleVectorProperty>
-
+      
+      <DoubleVectorProperty
+        name="CustomBounds"
+        command="SetCustomBounds"
+        number_of_elements="6"  
+        default_values="0 1 0 1 0 1"
+        update_self="1">
+      </DoubleVectorProperty>   
+      
+      <IntVectorProperty
+        name="CustomBoundsActive"
+        command="SetCustomBoundsActive"
+        number_of_elements="3"
+        default_values="0 0 0"
+        update_self="1">        
+      </IntVectorProperty>
+      
       <SubProxy>
         <SourceProxy name="OutlineFilter" class="vtkPVGeometryFilter">
           <!--
@@ -10054,6 +10082,8 @@
         <Proxy name="Prop2D"
           proxygroup="props" proxyname="CubeAxesActor" />
         <ExposedProperties>
+          <Property name="Bounds" />
+          <Property name="BoundsInfo" />
           <Property name="CornerOffset" />
           <Property name="FlyMode" />
           <Property name="Inertia" />
@@ -10374,7 +10404,8 @@
           proxygroup="props" proxyname="CubeAxesActor">
         </Proxy>
         <ExposedProperties>
-<!--          <Property exposed_name="CubeAxesColor" name="Color" /> -->
+<!--          <Property exposed_name="CubeAxesColor" name="Color" /> -->   
+          <Property exposed_name="CubeBounds" name="Bounds" />              
           <Property exposed_name="CubeAxesCornerOffset" name="CornerOffset" />
           <Property exposed_name="CubeAxesFlyMode" name="FlyMode" />
           <Property exposed_name="CubeAxesInertia" name="Inertia" />

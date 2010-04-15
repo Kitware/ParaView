@@ -45,6 +45,12 @@ public:
   vtkSetVector3Macro(Scale, double);
   vtkGetVector3Macro(Scale, double);
 
+  vtkSetVector6Macro(CustomBounds, double);
+  vtkGetVector6Macro(CustomBounds, double);
+
+  vtkSetVector3Macro(CustomBoundsActive, int);
+  vtkGetVector3Macro(CustomBoundsActive, int);
+
 //BTX
 protected:
   vtkSMCubeAxesRepresentationProxy();
@@ -85,6 +91,8 @@ protected:
   vtkSMProxy* Property;
   vtkSMRepresentationStrategy* Strategy;
   double Position[3], Scale[3], Orientation[3];
+  double CustomBounds[6];
+  int CustomBoundsActive[3];
 private:
   vtkSMCubeAxesRepresentationProxy(const vtkSMCubeAxesRepresentationProxy&); // Not implemented
   void operator=(const vtkSMCubeAxesRepresentationProxy&); // Not implemented

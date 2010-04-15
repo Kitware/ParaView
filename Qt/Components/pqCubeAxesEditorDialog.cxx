@@ -46,6 +46,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqUndoStack.h"
 #include "pqStandardColorLinkAdaptor.h"
 
+#include "vtkSMPVRepresentationProxy.h"
+
 class pqCubeAxesEditorDialog::pqInternal : public Ui::CubeAxesEditorDialog
 {
 public:
@@ -86,8 +88,7 @@ pqCubeAxesEditorDialog::pqCubeAxesEditorDialog(
   QObject::connect(this->Internal->Ok, SIGNAL(clicked()),
     this, SLOT(accept()), Qt::QueuedConnection);
   QObject::connect(this->Internal->Cancel, SIGNAL(clicked()),
-    this, SLOT(reject()), Qt::QueuedConnection);
-
+    this, SLOT(reject()), Qt::QueuedConnection);  
 }
 
 //-----------------------------------------------------------------------------
@@ -97,6 +98,20 @@ pqCubeAxesEditorDialog::~pqCubeAxesEditorDialog()
 }
 
 
+
+#define PV_SPINBOX_REGISTER(ui, propName, index)\
+{\
+  this->Internal->PropertyManager->registerLink(\
+    this->Internal->ui, "value",SIGNAL(valueChanged(double)),\
+    repr, repr->GetProperty(propName), index);\
+}
+
+#define PV_GROUPBOX_REGISTER(ui, propName, index)\
+{\
+  this->Internal->PropertyManager->registerLink(\
+    this->Internal->ui, "checked",SIGNAL(toggled(bool)),\
+    repr, repr->GetProperty(propName), index);\
+}
 //-----------------------------------------------------------------------------
 void pqCubeAxesEditorDialog::setRepresentationProxy(vtkSMProxy* repr)
 {
@@ -117,7 +132,70 @@ void pqCubeAxesEditorDialog::setRepresentationProxy(vtkSMProxy* repr)
       repr, repr->GetProperty("CubeAxesColor"));
     new pqStandardColorLinkAdaptor(this->Internal->Color,
       repr, "CubeAxesColor");
+   
+    //fill the ui elements with the correct object bounds
+    double pvBounds[6];
+    vtkSMPVRepresentationProxy *pvProxy = vtkSMPVRepresentationProxy::SafeDownCast(repr);
+    if ( pvProxy )
+      {                
+      
+      //link the ui elements to the vtkSMCubeAxesRepresentationProxy
+      PV_SPINBOX_REGISTER(CubeAxesXCustomBoundsMin, "CustomBounds", 0);
+      PV_SPINBOX_REGISTER(CubeAxesXCustomBoundsMax, "CustomBounds", 1);
+      PV_SPINBOX_REGISTER(CubeAxesYCustomBoundsMin, "CustomBounds", 2);
+      PV_SPINBOX_REGISTER(CubeAxesYCustomBoundsMax, "CustomBounds", 3);
+      PV_SPINBOX_REGISTER(CubeAxesZCustomBoundsMin, "CustomBounds", 4);
+      PV_SPINBOX_REGISTER(CubeAxesZCustomBoundsMax, "CustomBounds", 5);
+
+      //link the activation of the group boxes to vtkSMCubeAxesRepresentationProxy
+      PV_GROUPBOX_REGISTER(CubeAxesXCustomBounds, "CustomBoundsActive", 0);
+      PV_GROUPBOX_REGISTER(CubeAxesYCustomBounds, "CustomBoundsActive", 1);
+      PV_GROUPBOX_REGISTER(CubeAxesZCustomBounds, "CustomBoundsActive", 2);
+
+      //now they are linked, set them to objects bounds.
+      pvProxy->GetBounds( pvBounds );
+      this->setupCustomAxes( pvBounds[0],pvBounds[1],
+        !this->Internal->CubeAxesXCustomBounds->isChecked(),
+        this->Internal->CubeAxesXCustomBoundsMin,
+        this->Internal->CubeAxesXCustomBoundsMax);       
+
+      this->setupCustomAxes( pvBounds[2], pvBounds[3],
+        !this->Internal->CubeAxesYCustomBounds->isChecked(),
+        this->Internal->CubeAxesYCustomBoundsMin,
+        this->Internal->CubeAxesYCustomBoundsMax);       
+
+      this->setupCustomAxes( pvBounds[4], pvBounds[5],
+        !this->Internal->CubeAxesZCustomBounds->isChecked(),
+        this->Internal->CubeAxesZCustomBoundsMin,
+        this->Internal->CubeAxesZCustomBoundsMax);       
+
+      }
     }
+}
+
+#undef PV_SPINBOX_REGISTER
+#undef PV_GROUPBOX_REGISTER
+
+//-----------------------------------------------------------------------------
+void pqCubeAxesEditorDialog::setupCustomAxes( const double &min, const double &max, 
+    const bool &enabled, QDoubleSpinBox *minWidget, QDoubleSpinBox *maxWidget)
+{
+  double stepSize = (max-min) * 0.05;
+
+  //setup min & max constraints
+  minWidget->setRange( min, max );      
+  maxWidget->setRange( min, max );      
+
+  //setup step size
+  minWidget->setSingleStep( stepSize );
+  maxWidget->setSingleStep( stepSize );
+  
+  //setup initial values
+  if ( enabled )
+    {
+    minWidget->setValue( min );
+    maxWidget->setValue( max );
+    }       
 }
 
 

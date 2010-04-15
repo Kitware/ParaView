@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QDialog>
 #include "pqComponentsExport.h"
 class vtkSMProxy;
+class QDoubleSpinBox;
 
 class PQCOMPONENTS_EXPORT pqCubeAxesEditorDialog : public QDialog
 {
@@ -58,9 +59,14 @@ signals:
   /// Fired when the browser is finished with the undoable change.
   void endUndo();
 
+
+
 private:
   pqCubeAxesEditorDialog(const pqCubeAxesEditorDialog&); // Not implemented.
   void operator=(const pqCubeAxesEditorDialog&); // Not implemented.
+
+  void setupCustomAxes( const double &min, const double &max, 
+    const bool &enabled, QDoubleSpinBox *minWidget, QDoubleSpinBox *maxWidget);
 
   class pqInternal;
   pqInternal* Internal;

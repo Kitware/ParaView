@@ -1,51 +1,50 @@
-<ui version="4.0" >
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
  <class>CubeAxesEditorDialog</class>
- <widget class="QDialog" name="CubeAxesEditorDialog" >
-  <property name="geometry" >
+ <widget class="QDialog" name="CubeAxesEditorDialog">
+  <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>331</width>
+    <width>338</width>
     <height>383</height>
    </rect>
   </property>
-  <property name="windowTitle" >
+  <property name="windowTitle">
    <string>Edit Cube Axes Properties</string>
   </property>
-  <layout class="QGridLayout" >
-   <property name="margin" >
+  <layout class="QGridLayout">
+   <property name="margin">
     <number>9</number>
    </property>
-   <property name="spacing" >
+   <property name="spacing">
     <number>6</number>
    </property>
-   <item row="5" column="0" colspan="2" >
-    <widget class="pqStandardColorButton" name="Color" >
-     <property name="enabled" >
+   <item row="5" column="0" colspan="2">
+    <widget class="pqStandardColorButton" name="Color">
+     <property name="enabled">
       <bool>true</bool>
      </property>
-     <property name="sizePolicy" >
-      <sizepolicy>
-       <hsizetype>1</hsizetype>
-       <vsizetype>0</vsizetype>
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
-     <property name="toolTip" >
-      <string>&lt;html>Set the color to use for axes.&lt;/html></string>
+     <property name="toolTip">
+      <string>&lt;html&gt;Set the color to use for axes.&lt;/html&gt;</string>
      </property>
-     <property name="text" >
+     <property name="text">
       <string>Set Axes Color...</string>
      </property>
     </widget>
    </item>
-   <item row="6" column="0" colspan="2" >
+   <item row="6" column="0" colspan="2">
     <spacer>
-     <property name="orientation" >
+     <property name="orientation">
       <enum>Qt::Vertical</enum>
      </property>
-     <property name="sizeHint" >
+     <property name="sizeHint" stdset="0">
       <size>
        <width>313</width>
        <height>16</height>
@@ -53,268 +52,391 @@
      </property>
     </spacer>
    </item>
-   <item row="2" column="1" >
-    <widget class="QComboBox" name="CubeAxesTickLocation" >
+   <item row="2" column="1">
+    <widget class="QComboBox" name="CubeAxesTickLocation">
      <item>
-      <property name="text" >
+      <property name="text">
        <string>Inside</string>
       </property>
      </item>
      <item>
-      <property name="text" >
+      <property name="text">
        <string>Outside</string>
       </property>
      </item>
      <item>
-      <property name="text" >
+      <property name="text">
        <string>Both</string>
       </property>
      </item>
     </widget>
    </item>
-   <item rowspan="2" row="3" column="1" >
-    <widget class="QDoubleSpinBox" name="CubeAxesCornerOffset" >
-     <property name="maximum" >
+   <item row="3" column="1" rowspan="2">
+    <widget class="QDoubleSpinBox" name="CubeAxesCornerOffset">
+     <property name="maximum">
       <double>1.000000000000000</double>
      </property>
-     <property name="singleStep" >
+     <property name="singleStep">
       <double>0.050000000000000</double>
      </property>
     </widget>
    </item>
-   <item rowspan="2" row="2" column="0" >
-    <widget class="QLabel" name="label_3" >
-     <property name="text" >
+   <item row="2" column="0" rowspan="2">
+    <widget class="QLabel" name="label_3">
+     <property name="text">
       <string>Tick Location</string>
      </property>
     </widget>
    </item>
-   <item row="4" column="0" >
-    <widget class="QLabel" name="label_2" >
-     <property name="text" >
+   <item row="4" column="0">
+    <widget class="QLabel" name="label_2">
+     <property name="text">
       <string>Corner Offset</string>
      </property>
     </widget>
    </item>
-   <item row="1" column="1" >
-    <widget class="QComboBox" name="CubeAxesFlyMode" >
+   <item row="1" column="1">
+    <widget class="QComboBox" name="CubeAxesFlyMode">
      <item>
-      <property name="text" >
+      <property name="text">
        <string>Outer Edges</string>
       </property>
      </item>
      <item>
-      <property name="text" >
+      <property name="text">
        <string>Closest Triad</string>
       </property>
      </item>
      <item>
-      <property name="text" >
+      <property name="text">
        <string>Furthest Triad</string>
       </property>
      </item>
      <item>
-      <property name="text" >
+      <property name="text">
        <string>Static Triad</string>
       </property>
      </item>
      <item>
-      <property name="text" >
+      <property name="text">
        <string>Static Edges</string>
       </property>
      </item>
     </widget>
    </item>
-   <item row="1" column="0" >
-    <widget class="QLabel" name="label" >
-     <property name="text" >
+   <item row="1" column="0">
+    <widget class="QLabel" name="label">
+     <property name="text">
       <string>Fly Mode</string>
      </property>
     </widget>
    </item>
-   <item row="0" column="0" colspan="2" >
-    <widget class="QTabWidget" name="tabWidget" >
-     <property name="currentIndex" >
+   <item row="0" column="0" colspan="2">
+    <widget class="QTabWidget" name="tabWidget">
+     <property name="currentIndex">
       <number>0</number>
      </property>
-     <widget class="QWidget" name="xtab" >
-      <attribute name="title" >
+     <widget class="QWidget" name="xtab">
+      <attribute name="title">
        <string>X Axis</string>
       </attribute>
-      <layout class="QGridLayout" >
-       <property name="margin" >
+      <layout class="QGridLayout">
+       <property name="margin">
         <number>9</number>
        </property>
-       <property name="spacing" >
+       <property name="spacing">
         <number>6</number>
        </property>
-       <item row="4" column="0" colspan="2" >
-        <widget class="QCheckBox" name="CubeAxesXGridLines" >
-         <property name="text" >
+       <item row="4" column="0" colspan="2">
+        <widget class="QCheckBox" name="CubeAxesXGridLines">
+         <property name="text">
           <string>Show Grid Lines</string>
          </property>
         </widget>
        </item>
-       <item row="3" column="0" colspan="2" >
-        <widget class="QCheckBox" name="CubeAxesXAxisMinorTickVisibility" >
-         <property name="text" >
+       <item row="3" column="0" colspan="2">
+        <widget class="QCheckBox" name="CubeAxesXAxisMinorTickVisibility">
+         <property name="text">
           <string>Show Minor Ticks</string>
          </property>
         </widget>
        </item>
-       <item row="2" column="0" colspan="2" >
-        <widget class="QCheckBox" name="CubeAxesXAxisTickVisibility" >
-         <property name="text" >
+       <item row="2" column="0" colspan="2">
+        <widget class="QCheckBox" name="CubeAxesXAxisTickVisibility">
+         <property name="text">
           <string>Show Ticks</string>
          </property>
         </widget>
        </item>
-       <item row="1" column="0" colspan="2" >
-        <widget class="QCheckBox" name="CubeAxesXAxisVisibility" >
-         <property name="text" >
+       <item row="1" column="0" colspan="2">
+        <widget class="QCheckBox" name="CubeAxesXAxisVisibility">
+         <property name="text">
           <string>Show Axis</string>
          </property>
         </widget>
        </item>
-       <item row="0" column="1" >
-        <widget class="QLineEdit" name="CubeAxesXTitle" />
+       <item row="0" column="1">
+        <widget class="QLineEdit" name="CubeAxesXTitle"/>
        </item>
-       <item row="0" column="0" >
-        <widget class="QLabel" name="label_5" >
-         <property name="text" >
+       <item row="0" column="0">
+        <widget class="QLabel" name="label_5">
+         <property name="text">
           <string>Title</string>
          </property>
-         <property name="alignment" >
+         <property name="alignment">
           <set>Qt::AlignCenter</set>
          </property>
         </widget>
        </item>
+       <item row="5" column="0">
+        <widget class="QGroupBox" name="CubeAxesXCustomBounds">
+         <property name="title">
+          <string>Custom Bounds</string>
+         </property>
+         <property name="checkable">
+          <bool>true</bool>
+         </property>
+         <property name="checked">
+          <bool>false</bool>
+         </property>
+         <layout class="QHBoxLayout" name="horizontalLayout">
+          <item>
+           <widget class="QDoubleSpinBox" name="CubeAxesXCustomBoundsMin">
+            <property name="decimals">
+             <number>4</number>
+            </property>
+            <property name="minimum">
+             <double>-999999999.000000000000000</double>
+            </property>
+            <property name="maximum">
+             <double>999999999.000000000000000</double>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QDoubleSpinBox" name="CubeAxesXCustomBoundsMax">
+            <property name="decimals">
+             <number>4</number>
+            </property>
+            <property name="minimum">
+             <double>-999999999.000000000000000</double>
+            </property>
+            <property name="maximum">
+             <double>999999999.990000009536743</double>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="ytab" >
-      <attribute name="title" >
+     <widget class="QWidget" name="ytab">
+      <attribute name="title">
        <string>Y Axis</string>
       </attribute>
-      <layout class="QGridLayout" >
-       <property name="margin" >
+      <layout class="QGridLayout">
+       <property name="margin">
         <number>9</number>
        </property>
-       <property name="spacing" >
+       <property name="spacing">
         <number>6</number>
        </property>
-       <item row="0" column="1" >
-        <widget class="QLineEdit" name="CubeAxesYTitle" />
+       <item row="0" column="1">
+        <widget class="QLineEdit" name="CubeAxesYTitle"/>
        </item>
-       <item row="0" column="0" >
-        <widget class="QLabel" name="label_6" >
-         <property name="text" >
+       <item row="0" column="0">
+        <widget class="QLabel" name="label_6">
+         <property name="text">
           <string>Title</string>
          </property>
-         <property name="alignment" >
+         <property name="alignment">
           <set>Qt::AlignCenter</set>
          </property>
         </widget>
        </item>
-       <item row="4" column="0" colspan="2" >
-        <widget class="QCheckBox" name="CubeAxesYGridLines" >
-         <property name="text" >
+       <item row="4" column="0" colspan="2">
+        <widget class="QCheckBox" name="CubeAxesYGridLines">
+         <property name="text">
           <string>Show Grid Lines</string>
          </property>
         </widget>
        </item>
-       <item row="3" column="0" colspan="2" >
-        <widget class="QCheckBox" name="CubeAxesYAxisMinorTickVisibility" >
-         <property name="text" >
+       <item row="3" column="0" colspan="2">
+        <widget class="QCheckBox" name="CubeAxesYAxisMinorTickVisibility">
+         <property name="text">
           <string>Show Minor Ticks</string>
          </property>
         </widget>
        </item>
-       <item row="1" column="0" colspan="2" >
-        <widget class="QCheckBox" name="CubeAxesYAxisVisibility" >
-         <property name="text" >
+       <item row="1" column="0" colspan="2">
+        <widget class="QCheckBox" name="CubeAxesYAxisVisibility">
+         <property name="text">
           <string>Show Axis</string>
          </property>
         </widget>
        </item>
-       <item row="2" column="0" colspan="2" >
-        <widget class="QCheckBox" name="CubeAxesYAxisTickVisibility" >
-         <property name="text" >
+       <item row="2" column="0" colspan="2">
+        <widget class="QCheckBox" name="CubeAxesYAxisTickVisibility">
+         <property name="text">
           <string>Show Ticks</string>
          </property>
+        </widget>
+       </item>
+       <item row="5" column="0">
+        <widget class="QGroupBox" name="CubeAxesYCustomBounds">
+         <property name="title">
+          <string>Custom Bounds</string>
+         </property>
+         <property name="checkable">
+          <bool>true</bool>
+         </property>
+         <property name="checked">
+          <bool>false</bool>
+         </property>
+         <layout class="QHBoxLayout" name="horizontalLayout_2">
+          <item>
+           <widget class="QDoubleSpinBox" name="CubeAxesYCustomBoundsMin">
+            <property name="decimals">
+             <number>4</number>
+            </property>
+            <property name="minimum">
+             <double>-999999999.000000000000000</double>
+            </property>
+            <property name="maximum">
+             <double>999999999.000000000000000</double>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QDoubleSpinBox" name="CubeAxesYCustomBoundsMax">
+            <property name="decimals">
+             <number>4</number>
+            </property>
+            <property name="minimum">
+             <double>-999999999.000000000000000</double>
+            </property>
+            <property name="maximum">
+             <double>999999999.990000009536743</double>
+            </property>
+           </widget>
+          </item>
+         </layout>
         </widget>
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="ztab" >
-      <attribute name="title" >
+     <widget class="QWidget" name="ztab">
+      <attribute name="title">
        <string>Z Axis</string>
       </attribute>
-      <layout class="QGridLayout" >
-       <property name="margin" >
+      <layout class="QGridLayout">
+       <property name="margin">
         <number>9</number>
        </property>
-       <property name="spacing" >
+       <property name="spacing">
         <number>6</number>
        </property>
-       <item row="0" column="1" >
-        <widget class="QLineEdit" name="CubeAxesZTitle" />
+       <item row="0" column="1">
+        <widget class="QLineEdit" name="CubeAxesZTitle"/>
        </item>
-       <item row="4" column="0" colspan="2" >
-        <widget class="QCheckBox" name="CubeAxesZGridLines" >
-         <property name="text" >
+       <item row="4" column="0" colspan="2">
+        <widget class="QCheckBox" name="CubeAxesZGridLines">
+         <property name="text">
           <string>Show Grid Lines</string>
          </property>
         </widget>
        </item>
-       <item row="0" column="0" >
-        <widget class="QLabel" name="label_7" >
-         <property name="text" >
+       <item row="0" column="0">
+        <widget class="QLabel" name="label_7">
+         <property name="text">
           <string>Title</string>
          </property>
-         <property name="alignment" >
+         <property name="alignment">
           <set>Qt::AlignCenter</set>
          </property>
         </widget>
        </item>
-       <item row="1" column="0" colspan="2" >
-        <widget class="QCheckBox" name="CubeAxesZAxisVisibility" >
-         <property name="text" >
+       <item row="1" column="0" colspan="2">
+        <widget class="QCheckBox" name="CubeAxesZAxisVisibility">
+         <property name="text">
           <string>Show Axis</string>
          </property>
         </widget>
        </item>
-       <item row="3" column="0" colspan="2" >
-        <widget class="QCheckBox" name="CubeAxesZAxisMinorTickVisibility" >
-         <property name="text" >
+       <item row="3" column="0" colspan="2">
+        <widget class="QCheckBox" name="CubeAxesZAxisMinorTickVisibility">
+         <property name="text">
           <string>Show Minor Ticks</string>
          </property>
         </widget>
        </item>
-       <item row="2" column="0" colspan="2" >
-        <widget class="QCheckBox" name="CubeAxesZAxisTickVisibility" >
-         <property name="text" >
+       <item row="2" column="0" colspan="2">
+        <widget class="QCheckBox" name="CubeAxesZAxisTickVisibility">
+         <property name="text">
           <string>Show Ticks</string>
          </property>
+        </widget>
+       </item>
+       <item row="5" column="0">
+        <widget class="QGroupBox" name="CubeAxesZCustomBounds">
+         <property name="title">
+          <string>Custom Bounds</string>
+         </property>
+         <property name="checkable">
+          <bool>true</bool>
+         </property>
+         <property name="checked">
+          <bool>false</bool>
+         </property>
+         <layout class="QHBoxLayout" name="horizontalLayout_3">
+          <item>
+           <widget class="QDoubleSpinBox" name="CubeAxesZCustomBoundsMin">
+            <property name="decimals">
+             <number>4</number>
+            </property>
+            <property name="minimum">
+             <double>-999999999.000000000000000</double>
+            </property>
+            <property name="maximum">
+             <double>999999999.000000000000000</double>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QDoubleSpinBox" name="CubeAxesZCustomBoundsMax">
+            <property name="decimals">
+             <number>4</number>
+            </property>
+            <property name="minimum">
+             <double>-999999999.000000000000000</double>
+            </property>
+            <property name="maximum">
+             <double>999999999.990000009536743</double>
+            </property>
+           </widget>
+          </item>
+         </layout>
         </widget>
        </item>
       </layout>
      </widget>
     </widget>
    </item>
-   <item row="7" column="0" colspan="2" >
-    <layout class="QHBoxLayout" >
-     <property name="margin" >
-      <number>0</number>
-     </property>
-     <property name="spacing" >
+   <item row="7" column="0" colspan="2">
+    <layout class="QHBoxLayout">
+     <property name="spacing">
       <number>4</number>
+     </property>
+     <property name="margin">
+      <number>0</number>
      </property>
      <item>
       <spacer>
-       <property name="orientation" >
+       <property name="orientation">
         <enum>Qt::Horizontal</enum>
        </property>
-       <property name="sizeHint" >
+       <property name="sizeHint" stdset="0">
         <size>
          <width>40</width>
          <height>20</height>
@@ -323,15 +445,15 @@
       </spacer>
      </item>
      <item>
-      <widget class="QPushButton" name="Ok" >
-       <property name="text" >
+      <widget class="QPushButton" name="Ok">
+       <property name="text">
         <string>Ok</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="Cancel" >
-       <property name="text" >
+      <widget class="QPushButton" name="Cancel">
+       <property name="text">
         <string>Cancel</string>
        </property>
       </widget>
