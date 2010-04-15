@@ -7,7 +7,7 @@
             <Group name="sources" />
             <Group name="filters" />
           </ProxyGroupDomain>
-          <DataTypeDomain name="input_type">
+          <DataTypeDomain name="input_type" composite_data_supported="0">
             <DataType value="vtkImageData" />
           </DataTypeDomain>
           <Documentation>
@@ -43,7 +43,7 @@
             <Group name="sources" />
             <Group name="filters" />
           </ProxyGroupDomain>
-          <DataTypeDomain name="input_type">
+          <DataTypeDomain name="input_type" composite_data_supported="0">
             <DataType value="vtkRectilinearGrid" />
           </DataTypeDomain>
           <Documentation>
@@ -80,7 +80,7 @@
             <Group name="filters" />
           </ProxyGroupDomain>
           <DataTypeDomain name="input_type">
-            <DataType value="vtkStructuredGrid" />
+            <DataType value="vtkStructuredGrid" composite_data_supported="0"/>
           </DataTypeDomain>
           <Documentation>
             The input.
@@ -115,7 +115,7 @@
             <Group name="sources" />
             <Group name="filters" />
           </ProxyGroupDomain>
-          <DataTypeDomain name="input_type">
+          <DataTypeDomain name="input_type" composite_data_supported="0">
             <DataType value="vtkPolyData" />
           </DataTypeDomain>
           <Documentation>
@@ -152,7 +152,7 @@
             <Group name="filters" />
           </ProxyGroupDomain>
           <DataTypeDomain name="input_type">
-            <DataType value="vtkUnstructuredGrid" />
+            <DataType value="vtkUnstructuredGrid" composite_data_supported="0"/>
           </DataTypeDomain>
           <Documentation>
             The input.
