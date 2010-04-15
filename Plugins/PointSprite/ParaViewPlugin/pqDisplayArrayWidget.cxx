@@ -511,7 +511,7 @@ const QString pqDisplayArrayWidget::getArrayName() const
   if(list.size() < 4)
     {
     return this->Internal->ConstantVariableName;
-    }
+  }
 
   QString array = list[4].toString();
 

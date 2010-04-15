@@ -21,17 +21,17 @@ set(KIT_LIBS
 # -----------------------------------------------------------------------------
 # Create the library
 # -----------------------------------------------------------------------------
-add_library(CSCS_PointSprite_Graphics ${KIT_SRCS})
-target_link_libraries(CSCS_PointSprite_Graphics ${KIT_LIBS})
+add_library(PointSprite_Graphics ${KIT_SRCS})
+target_link_libraries(PointSprite_Graphics ${KIT_LIBS})
 
 if (PV_INSTALL_BIN_DIR)
-  install(TARGETS CSCS_PointSprite_Graphics
+  install(TARGETS PointSprite_Graphics
     RUNTIME DESTINATION ${PV_INSTALL_BIN_DIR} COMPONENT Runtime
     LIBRARY DESTINATION ${PV_INSTALL_LIB_DIR} COMPONENT Runtime
     ARCHIVE DESTINATION ${PV_INSTALL_LIB_DIR} COMPONENT Development
     )
 else (PV_INSTALL_BIN_DIR)
-  install(TARGETS CSCS_PointSprite_Graphics
+  install(TARGETS PointSprite_Graphics
     RUNTIME DESTINATION bin COMPONENT Runtime
     LIBRARY DESTINATION lib COMPONENT Runtime
     ARCHIVE DESTINATION lib COMPONENT Development
@@ -49,7 +49,7 @@ IF(NOT VTK_INSTALL_NO_DEVELOPMENT)
 ENDIF(NOT VTK_INSTALL_NO_DEVELOPMENT)
 
 vtk_export_kit2(
-  "CSCS_PointSprite_Graphics" 
+  "PointSprite_Graphics" 
   "POINTSPRITE_GRAPHICS" 
   ${CMAKE_CURRENT_BINARY_DIR} 
   "${KIT_SRCS}"

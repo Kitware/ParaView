@@ -24,24 +24,24 @@ set(SM_SOURCES
   )
 
 set(SM_XMLS_Rendering
-  CSCS_PointSprite_Rendering.xml
-  CSCS_PointSpriteRepresentation.xml
+  PointSprite_Rendering.xml
+  PointSpriteRepresentation.xml
   )
   
 set(SM_XMLS_Graphics
-  CSCS_PointSprite_Graphics.xml
+  PointSprite_Graphics.xml
   )
 
-set(PLUGIN_NAME CSCS_PointSprite_Plugin)
+set(PLUGIN_NAME PointSprite_Plugin)
 
 set(CS_WRAP_Rendering)
-include(${PointSpritePlugin_BINARY_DIR}/Rendering/vtkCSCS_PointSprite_RenderingKit.cmake)
+include(${PointSpritePlugin_BINARY_DIR}/Rendering/vtkPointSprite_RenderingKit.cmake)
 foreach(class ${VTK_POINTSPRITE_RENDERING_CLASSES})
   set(CS_WRAP_Rendering ${CS_WRAP_Rendering} ${VTK_POINTSPRITE_RENDERING_HEADER_DIR}/${class}.h)
 endforeach(class)
 
 set(CS_WRAP_Graphics)
-include(${PointSpritePlugin_BINARY_DIR}/Graphics/vtkCSCS_PointSprite_GraphicsKit.cmake)
+include(${PointSpritePlugin_BINARY_DIR}/Graphics/vtkPointSprite_GraphicsKit.cmake)
 foreach(class ${VTK_POINTSPRITE_GRAPHICS_CLASSES})
   set(CS_WRAP_Graphics ${CS_WRAP_Graphics} ${VTK_POINTSPRITE_GRAPHICS_HEADER_DIR}/${class}.h)
 endforeach(class)
@@ -144,6 +144,6 @@ ELSE(PARAVIEW_BUILD_QT_GUI)
 ENDIF(PARAVIEW_BUILD_QT_GUI)
 
 target_link_libraries(${PLUGIN_NAME}
-  CSCS_PointSprite_Rendering
-  CSCS_PointSprite_Graphics
+  PointSprite_Rendering
+  PointSprite_Graphics
 )
