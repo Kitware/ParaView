@@ -436,6 +436,10 @@ def append_trace():
       if info.Group == "scalar_bars":
         ctorMethod = "CreateScalarBar"
         extraCtorCommands = "GetRenderView().Representations.append(%s)" % info.PyVariable
+        # Ensure the view is the active view:
+        view_proxy_info = get_view_proxy_info_for_rep(info)
+        if view_proxy_info:
+          ensure_active_view(view_proxy_info)
 
       if info.Group == "views":
         if info.Proxy.GetXMLLabel() == "XYChartView":

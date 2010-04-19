@@ -39,6 +39,10 @@ def get_all_inputs_registered(proxy):
     itr = servermanager.PropertyIterator(proxy.SMProxy)
     for prop in itr:
         if prop.IsA("vtkSMInputProperty"):
+            # Don't worry about input properties with ProxyListDomains,
+            # these input proxies do not need to be constructed by python.
+            if prop.GetDomain("proxy_list") is not None:
+                return True
             for i in xrange(prop.GetNumberOfProxies()):
                 input_proxy = prop.GetProxy(i)
                 info = smtrace.get_proxy_info(input_proxy, search_existing=False)
