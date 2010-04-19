@@ -1,9 +1,9 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqTreeLayoutStrategyInterface.h
+   Module:    $RCSfile$
 
-   Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
+   Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
@@ -28,33 +28,17 @@ LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-=========================================================================*/
+========================================================================*/
+#include "pqActionGroupInterface.h"
 
-#ifndef _pqTreeLayoutStrategyInterface_h
-#define _pqTreeLayoutStrategyInterface_h
-
-#include <QtPlugin>
-#include <QStringList>
-#include "pqCoreExport.h"
-
-class vtkAreaLayoutStrategy;
-
-/// interface class for plugins that create view modules
-class PQCORE_EXPORT pqTreeLayoutStrategyInterface
+//-----------------------------------------------------------------------------
+pqActionGroupInterface::pqActionGroupInterface()
 {
-public:
-  /// destructor
-  pqTreeLayoutStrategyInterface();
-  virtual ~pqTreeLayoutStrategyInterface();
-  
-  /// Return a list of layout strategies supported by this interface
-  virtual QStringList treeLayoutStrategies() const = 0;
+}
 
-  virtual vtkAreaLayoutStrategy* getTreeLayoutStrategy(const QString& layoutStrategy) = 0;
+//-----------------------------------------------------------------------------
+pqActionGroupInterface::~pqActionGroupInterface()
+{
+}
 
-};
-
-Q_DECLARE_INTERFACE(pqTreeLayoutStrategyInterface, "com.kitware/paraview/treeLayoutStrategy")
-
-#endif
 
