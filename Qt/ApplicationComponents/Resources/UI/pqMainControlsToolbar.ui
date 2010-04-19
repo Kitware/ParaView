@@ -22,7 +22,7 @@
      <normaloff>:/pqWidgets/Icons/pqOpen24.png</normaloff>:/pqWidgets/Icons/pqOpen24.png</iconset>
    </property>
    <property name="text">
-    <string>&amp;Open</string>
+    <string>Open</string>
    </property>
    <property name="statusTip">
     <string>Open</string>
