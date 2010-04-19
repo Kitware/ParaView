@@ -2,6 +2,14 @@
 <ui version="4.0">
  <class>pqPipelineBrowserContextMenu</class>
  <widget class="QWidget" name="pqPipelineBrowserContextMenu">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>100</width>
+    <height>30</height>
+   </rect>
+  </property>
   <action name="actionPBChangeInput">
    <property name="text">
     <string>Change &amp;Input...</string>
@@ -46,34 +54,38 @@
     <string>Disregard this source/filter's time from animations</string>
    </property>
   </action>
-  <action name="actionPBOpen" >
-   <property name="icon" >
-    <iconset resource="../../../Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pqOpen24.png</iconset>
+  <action name="actionPBOpen">
+   <property name="icon">
+    <iconset resource="../../../Components/Resources/pqComponents.qrc">
+     <normaloff>:/pqWidgets/Icons/pqOpen24.png</normaloff>:/pqWidgets/Icons/pqOpen24.png</iconset>
    </property>
-   <property name="text" >
-    <string>&amp;Open</string>
-   </property>
-   <property name="statusTip" >
+   <property name="text">
     <string>Open</string>
    </property>
-   <property name="shortcut" >
+   <property name="statusTip">
+    <string>Open</string>
+   </property>
+   <property name="shortcut">
     <string>Ctrl+O</string>
    </property>
+   <property name="shortcutContext">
+    <enum>Qt::WidgetShortcut</enum>
+   </property>
   </action>
-  <action name="actionPBCreateCustomFilter" >
-   <property name="text" >
+  <action name="actionPBCreateCustomFilter">
+   <property name="text">
     <string>&amp;Create Custom Filter...</string>
    </property>
   </action>
-  <addaction name="actionPBOpen" />
-  <addaction name="actionPBCreateCustomFilter" />
+  <addaction name="actionPBOpen"/>
+  <addaction name="actionPBCreateCustomFilter"/>
   <addaction name="actionPBChangeInput"/>
   <addaction name="actionPBIgnoreTime"/>
   <addaction name="actionPBDelete"/>
  </widget>
  <resources>
   <include location="../../../Components/Resources/pqComponents.qrc"/>
+  <include location="../../../Components/Resources/pqComponents.qrc"/>
  </resources>
  <connections/>
 </ui>
-
