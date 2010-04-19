@@ -119,21 +119,29 @@ SaveImage(vtkImageData* image, const char* filename, const char* writerName)
 }
 
 //----------------------------------------------------------------------------
-  // This is usually called on a serial client, but if it is called in
-  // a parallel job (for example, while coprocessing for a solver), then
-  // we really only want to write out an image on process 0.
+// This is usually called on a serial client, but if it is called in
+// a parallel job (for example, while coprocessing for a solver), then
+// we really only want to write out an image on process 0.
 int vtkSMUtilities::SaveImageOnProcessZero(vtkImageData* image,
                    const char* filename, const char* writerName)
 {
   int error_code;
   vtkMultiProcessController *controller =
     vtkMultiProcessController::GetGlobalController();
-  if (controller->GetLocalProcessId() == 0)
+
+  if (controller)
+    {
+    if (controller->GetLocalProcessId() == 0)
+      {
+      error_code = SaveImage(image, filename, writerName);
+      }
+    controller->Broadcast(&error_code, 1, 0);
+    }
+  else
     {
     error_code = SaveImage(image, filename, writerName);
     }
 
-  controller->Broadcast(&error_code, 1, 0);
   return error_code;
 }
 
