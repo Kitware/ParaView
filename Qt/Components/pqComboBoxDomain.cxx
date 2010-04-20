@@ -178,7 +178,7 @@ void pqComboBoxDomain::domainChanged()
     }
 
   this->markForUpdate(true);
-  QTimer::singleShot(0, this, SLOT(internalDomainChanged()));
+  this->internalDomainChanged();
 }
 
 void pqComboBoxDomain::internalDomainChanged()

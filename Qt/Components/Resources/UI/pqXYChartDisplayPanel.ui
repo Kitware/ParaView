@@ -24,6 +24,66 @@
     </widget>
    </item>
    <item>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QLabel" name="label">
+       <property name="text">
+        <string>Attribute Mode</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QComboBox" name="AttributeMode">
+       <item>
+        <property name="text">
+         <string>Point Data</string>
+        </property>
+        <property name="icon">
+         <iconset resource="../pqComponents.qrc">
+          <normaloff>:/pqWidgets/Icons/pqPointData16.png</normaloff>:/pqWidgets/Icons/pqPointData16.png</iconset>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Cell Data</string>
+        </property>
+        <property name="icon">
+         <iconset resource="../pqComponents.qrc">
+          <normaloff>:/pqWidgets/Icons/pqCellData16.png</normaloff>:/pqWidgets/Icons/pqCellData16.png</iconset>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Vertex Data</string>
+        </property>
+        <property name="icon">
+         <iconset resource="../pqComponents.qrc">
+          <normaloff>:/pqWidgets/Icons/pqPointData16.png</normaloff>:/pqWidgets/Icons/pqPointData16.png</iconset>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Edge Data</string>
+        </property>
+        <property name="icon">
+         <iconset resource="../pqComponents.qrc">
+          <normaloff>:/pqWidgets/Icons/pqRamp24.png</normaloff>:/pqWidgets/Icons/pqRamp24.png</iconset>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Row Data</string>
+        </property>
+        <property name="icon">
+         <iconset resource="../pqComponents.qrc">
+          <normaloff>:/pqWidgets/Icons/pqSpreadsheet16.png</normaloff>:/pqWidgets/Icons/pqSpreadsheet16.png</iconset>
+        </property>
+       </item>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
     <widget class="QGroupBox" name="groupBox">
      <property name="title">
       <string>X Axis Data</string>
@@ -295,7 +355,9 @@
    <header>pqColorChooserButton.h</header>
   </customwidget>
  </customwidgets>
- <resources/>
+ <resources>
+  <include location="../pqComponents.qrc"/>
+ </resources>
  <connections>
   <connection>
    <sender>UseDataArray</sender>

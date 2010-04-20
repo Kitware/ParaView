@@ -72,6 +72,7 @@ public:
     this->XAxisArrayDomain = 0;
     this->XAxisArrayAdaptor = 0;
     this->CompositeIndexAdaptor = 0;
+    this->AttributeModeAdaptor = 0;
     }
 
   ~pqInternal()
@@ -80,11 +81,13 @@ public:
     delete this->XAxisArrayDomain;
     delete this->XAxisArrayAdaptor;
     delete this->CompositeIndexAdaptor;
+    delete this->AttributeModeAdaptor;
     }
 
   vtkWeakPointer<vtkSMXYChartRepresentationProxy> ChartRepresentation;
   pqPlotSettingsModel* SettingsModel;
   pqComboBoxDomain* XAxisArrayDomain;
+  pqSignalAdaptorComboBox* AttributeModeAdaptor;
   pqSignalAdaptorComboBox* XAxisArrayAdaptor;
   pqPropertyLinks Links;
   pqSignalAdaptorCompositeTreeWidget* CompositeIndexAdaptor;
@@ -105,6 +108,8 @@ pqXYChartDisplayPanel::pqXYChartDisplayPanel(
 
   this->Internal->XAxisArrayAdaptor = new pqSignalAdaptorComboBox(
     this->Internal->XAxisArray);
+  this->Internal->AttributeModeAdaptor = new pqSignalAdaptorComboBox(
+    this->Internal->AttributeMode);
 
   QObject::connect(
     this->Internal->SeriesList, SIGNAL(activated(const QModelIndex &)),
@@ -197,7 +202,6 @@ void pqXYChartDisplayPanel::setDisplay(pqRepresentation* disp)
   // when ever the domain changes the widget is updated as well.
   this->Internal->XAxisArrayDomain = new pqComboBoxDomain(
       this->Internal->XAxisArray, proxy->GetProperty("XArrayName"));
-  this->Internal->XAxisArrayDomain->forceDomainChanged(); // init list
   this->Internal->Links.addPropertyLink(this->Internal->XAxisArrayAdaptor,
       "currentText", SIGNAL(currentTextChanged(const QString&)),
       proxy, proxy->GetProperty("XArrayName"));
@@ -207,6 +211,10 @@ void pqXYChartDisplayPanel::setDisplay(pqRepresentation* disp)
     this->Internal->UseArrayIndex, "checked",
     SIGNAL(toggled(bool)),
     proxy, proxy->GetProperty("UseIndexForXAxis"));
+
+  this->Internal->Links.addPropertyLink(this->Internal->AttributeModeAdaptor,
+    "currentText", SIGNAL(currentTextChanged(const QString&)),
+    proxy, proxy->GetProperty("AttributeType"));
 
   this->changeDialog(disp);
 

@@ -189,10 +189,6 @@ void vtkSMXYChartRepresentationProxy::Update(vtkSMViewProxy* view)
   // Set the table, in case it has changed.
   this->OptionsProxy->SetTable(vtkTable::SafeDownCast(this->GetOutput()));
 
-  // Calling RefreshPlots will make sure that the vtkChart is
-  // in sync with the vtkTable.
-  this->OptionsProxy->RefreshPlots();
-
   this->UpdatePropertyInformation();
 }
 

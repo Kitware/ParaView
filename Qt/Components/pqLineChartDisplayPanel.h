@@ -38,6 +38,7 @@ class pqRepresentation;
 class QModelIndex;
 
 /// Editor widget for line chart displays.
+///////////// DEPRECATED **********************************************
 class PQCOMPONENTS_EXPORT pqLineChartDisplayPanel : public pqDisplayPanel
 {
   Q_OBJECT

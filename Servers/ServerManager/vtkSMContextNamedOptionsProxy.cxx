@@ -145,12 +145,16 @@ void vtkSMContextNamedOptionsProxy::SetTable(vtkTable* table)
 {
   if (this->Internals->Table == table)
     {
-    return;
+    if (table && table->GetMTime() < this->RefreshTime)
+      {
+      return;
+      }
     }
 
   this->Internals->Table = table;
   this->RefreshPlots();
   this->SetTableVisibility(this->Internals->TableVisibility);
+  this->RefreshTime.Modified();
   this->Modified();
 }
 

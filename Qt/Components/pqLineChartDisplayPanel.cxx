@@ -60,6 +60,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <assert.h>
 
+
+///////////// DEPRECATED **********************************************
 // Protect the qt model classes in an anonymous namespace
 namespace {
   //-----------------------------------------------------------------------------
