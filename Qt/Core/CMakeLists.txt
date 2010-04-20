@@ -324,6 +324,8 @@ ADD_LIBRARY(pqCore
   pqServer.h
   pqServerManagerModel.cxx
   pqServerManagerModel.h
+  pqServerManagerModelInterface.cxx
+  pqServerManagerModelInterface.h
   pqServerManagerModelItem.cxx
   pqServerManagerModelItem.h
   pqServerManagerObserver.cxx
@@ -359,6 +361,8 @@ ADD_LIBRARY(pqCore
   pqTextRepresentation.h
   pqTimeKeeper.cxx
   pqTimeKeeper.h
+  pqTreeLayoutStrategyInterface.cxx
+  pqTreeLayoutStrategyInterface.h
   pqTwoDRenderView.cxx
   pqTwoDRenderView.h
   pqScatterPlotView.cxx
@@ -369,6 +373,8 @@ ADD_LIBRARY(pqCore
   pqView.h
   pqViewExporterManager.cxx
   pqViewExporterManager.h
+  pqViewModuleInterface.cxx
+  pqViewModuleInterface.h
   pqWriterFactory.cxx
   pqWriterFactory.h
   pqXMLEventObserver.cxx

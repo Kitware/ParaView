@@ -343,6 +343,8 @@ ADD_LIBRARY(pqComponents
   pq3DWidget.h
   pqAboutDialog.cxx
   pqAboutDialog.h
+  pqActionGroupInterface.cxx
+  pqActionGroupInterface.h
   pqActiveChartOptions.cxx
   pqActiveChartOptions.h
   pqActiveRenderViewOptions.cxx

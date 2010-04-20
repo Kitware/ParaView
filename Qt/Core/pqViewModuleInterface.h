@@ -33,6 +33,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqViewModuleInterface_h
 #define _pqViewModuleInterface_h
 
+#include "pqCoreExport.h"
+
 #include <QtPlugin>
 #include <QStringList>
 class vtkSMProxy;
@@ -42,11 +44,11 @@ class pqView;
 class pqDataRepresentation;
 
 /// interface class for plugins that create view modules
-class pqViewModuleInterface
+class PQCORE_EXPORT pqViewModuleInterface
 {
 public:
-  /// destructor
-  virtual ~pqViewModuleInterface() {}
+  pqViewModuleInterface();
+  virtual ~pqViewModuleInterface();
   
   /// Return a list of view types supported by this interface
   virtual QStringList viewTypes() const = 0;

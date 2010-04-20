@@ -33,15 +33,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __pqServerManagerModelInterface_h
 
 #include <QtPlugin>
+#include "pqCoreExport.h"
 
 class vtkSMProxy;
 class pqServer;
 class pqProxy;
 
-class pqServerManagerModelInterface
+class PQCORE_EXPORT pqServerManagerModelInterface
 {
 public:
-  virtual ~pqServerManagerModelInterface() {}
+  pqServerManagerModelInterface();
+  virtual ~pqServerManagerModelInterface();
 
   /// Creates a pqProxy subclass for the vtkSMProxy given the details for its
   /// registration with the proxy manager.
