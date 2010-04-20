@@ -77,6 +77,8 @@ pqDisplayRepresentationWidget::pqDisplayRepresentationWidget(
   QObject::connect(&this->Internal->Links,
     SIGNAL(qtWidgetChanged()),
     this, SLOT(onQtWidgetChanged()));
+
+  this->updateLinks();
 }
 
 //-----------------------------------------------------------------------------
@@ -88,7 +90,7 @@ pqDisplayRepresentationWidget::~pqDisplayRepresentationWidget()
 //-----------------------------------------------------------------------------
 void pqDisplayRepresentationWidget::setRepresentation(pqDataRepresentation* display)
 {
-  if(display != this->Internal->Display)
+  if(!display || display != this->Internal->Display)
     {
     this->Internal->Display = qobject_cast<pqPipelineRepresentation*>(display);
     this->updateLinks();
@@ -148,6 +150,11 @@ void pqDisplayRepresentationWidget::reloadGUI()
 //-----------------------------------------------------------------------------
 void pqDisplayRepresentationWidget::onQtWidgetChanged()
 {
+  if ( !this->Internal->Display )
+    {
+    //
+    return;
+    }
   BEGIN_UNDO_SET("Changed 'Representation'");
   QString text = this->Internal->Adaptor->currentText();
 
