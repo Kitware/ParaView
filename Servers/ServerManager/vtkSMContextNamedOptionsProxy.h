@@ -80,10 +80,6 @@ public:
 
   void RemovePlotsFromChart();
 
-  // Description:
-  // Initializes the plots map, and adds a default series to plot
-  void RefreshPlots();
-
 //BTX
   // Description:
   // Class for storing individual series properties like color, label, line thickness...
@@ -94,6 +90,11 @@ public:
 protected:
   vtkSMContextNamedOptionsProxy();
   ~vtkSMContextNamedOptionsProxy();
+
+  // Description:
+  // Initializes the plots map, and adds a default series to plot
+  void RefreshPlots();
+
 
   // Description:
   // Called to update the property information on the property. It is assured
@@ -113,6 +114,8 @@ protected:
 private:
   vtkSMContextNamedOptionsProxy(const vtkSMContextNamedOptionsProxy&); // Not implemented
   void operator=(const vtkSMContextNamedOptionsProxy&); // Not implemented
+
+  vtkTimeStamp RefreshTime;
 
   class vtkInternals;
   vtkInternals* Internals;
