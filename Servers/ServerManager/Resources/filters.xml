@@ -2086,7 +2086,7 @@ attributes of the fragments.
    </SourceProxy>
 
     <!-- ==================================================================== -->
-    <SourceProxy name="AMRDualClip" class="vtkAMRDualClip"
+    <!--<SourceProxy name="AMRDualClip" class="vtkAMRDualClip"
        label="AMR Clip">
       <Documentation
         short_help="Clip with decimation."
@@ -2176,11 +2176,10 @@ attributes of the fragments.
           Use more memory to merge points on the boundaries of blocks.
         </Documentation>
       </IntVectorProperty>
-      <!-- End AMR Dual Clip -->
-    </SourceProxy>
+    </SourceProxy>-->
 
     <!-- ==================================================================== -->
-    <SourceProxy name="IsoVolume" class="vtkPVIsoVolume" label="Iso Volume">
+    <SourceProxy name="AMRDualClip" class="vtkPVAMRDualClip" label="AMR Dual Clip">
       <Documentation
         short_help="Clip with decimation."
         long_help="Clip with scalars.  Tetrahedra.">

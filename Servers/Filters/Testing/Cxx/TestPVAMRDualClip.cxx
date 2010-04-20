@@ -1,10 +1,9 @@
-
 #include "vtkActor.h"
 #include "vtkDataSetSurfaceFilter.h"
 #include "vtkDummyController.h"
 #include "vtkPolyDataMapper.h"
 #include "vtkPVGeometryFilter.h"
-#include "vtkPVIsoVolume.h"
+#include "vtkPVAMRDualClip.h"
 #include "vtkRegressionTestImage.h"
 #include "vtkRenderer.h"
 #include "vtkRenderWindow.h"
@@ -18,7 +17,7 @@ int main(int argc, char* argv[])
   int retVal = 0;
 
   typedef vtkSmartPointer<vtkDataSetSurfaceFilter> vtkDataSetSurfaceFilterRefPtr;
-  typedef vtkSmartPointer<vtkPVIsoVolume> vtkPVIsoVolumeRefPtr;
+  typedef vtkSmartPointer<vtkPVAMRDualClip> vtkPVAMRDualClipRefPtr;
   typedef vtkSmartPointer<vtkSpyPlotReader> vtkSpyPlotReaderRefPtr;
   typedef vtkSmartPointer<vtkPolyDataMapper> vtkPolyDataMapperRefPtr;
   typedef vtkSmartPointer<vtkActor> vtkActorRefPtr;
@@ -48,7 +47,7 @@ int main(int argc, char* argv[])
   reader->SetCellArrayStatus("Material volume fraction - 3", 1);
   reader->Update();
 
-  vtkPVIsoVolumeRefPtr filter = vtkPVIsoVolumeRefPtr::New();
+  vtkPVAMRDualClipRefPtr filter = vtkPVAMRDualClipRefPtr::New();
   filter->SetInput(reader->GetOutputDataObject(0));
   filter->SetVolumeFractionSurfaceValue(0.1);
   filter->SetEnableMergePoints(1);
@@ -88,4 +87,3 @@ int main(int argc, char* argv[])
 
   return (retVal == vtkRegressionTester::PASSED) ? 0 : 1;
 }
-

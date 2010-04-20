@@ -106,7 +106,6 @@
   <Proxy group="filters" name="GroupDataSets" />
   <Proxy group="filters" name="IntegrateAttributes" />
   <Proxy group="filters" name="IntegrateFlowThroughSurface" />
-  <Proxy group="filters" name="IsoVolume" />
   <Proxy group="filters" name="LevelIdScalars" />
   <Proxy group="filters" name="LinearExtrusionFilter" />
   <Proxy group="filters" name="LoopSubdivisionFilter" />

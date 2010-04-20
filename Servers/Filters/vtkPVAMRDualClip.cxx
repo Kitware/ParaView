@@ -1,4 +1,4 @@
-#include "vtkPVIsoVolume.h"
+#include "vtkPVAMRDualClip.h"
 
 #include "vtkHierarchicalBoxDataSet.h"
 #include "vtkInformation.h"
@@ -11,13 +11,13 @@
 #include <vtkstd/string>  // STL required.
 #include <vtkstd/vector>  // STL required.
 
-vtkCxxRevisionMacro(vtkPVIsoVolume, "1.1");
-vtkStandardNewMacro(vtkPVIsoVolume);
+vtkCxxRevisionMacro(vtkPVAMRDualClip, "1.1");
+vtkStandardNewMacro(vtkPVAMRDualClip);
 
 const double PV_AMR_SURFACE_VALUE_UNSIGNED_CHAR=255;
 
 //-----------------------------------------------------------------------------
-class vtkPVIsoVolumeInternal
+class vtkPVAMRDualClipInternal
 {
 public:
 
@@ -25,15 +25,15 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-vtkPVIsoVolume::vtkPVIsoVolume() :
+vtkPVAMRDualClip::vtkPVAMRDualClip() :
   vtkAMRDualClip(),
   VolumeFractionSurfaceValue(1.0)
 {
-  this->Implementation = new vtkPVIsoVolumeInternal();
+  this->Implementation = new vtkPVAMRDualClipInternal();
 }
 
 //-----------------------------------------------------------------------------
-vtkPVIsoVolume::~vtkPVIsoVolume()
+vtkPVAMRDualClip::~vtkPVAMRDualClip()
 {
   if(this->Implementation)
     {
@@ -43,13 +43,13 @@ vtkPVIsoVolume::~vtkPVIsoVolume()
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVIsoVolume::PrintSelf(ostream &os, vtkIndent indent)
+void vtkPVAMRDualClip::PrintSelf(ostream &os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 }
 
 //-----------------------------------------------------------------------------
-int vtkPVIsoVolume::RequestData(vtkInformation* vtkNotUsed(request),
+int vtkPVAMRDualClip::RequestData(vtkInformation* vtkNotUsed(request),
                                   vtkInformationVector** inputVector,
                                   vtkInformationVector* outputVector)
 {
@@ -83,14 +83,14 @@ int vtkPVIsoVolume::RequestData(vtkInformation* vtkNotUsed(request),
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVIsoVolume::AddInputCellArrayToProcess(const char* name)
+void vtkPVAMRDualClip::AddInputCellArrayToProcess(const char* name)
 {
   this->Implementation->CellArrays.push_back(vtkstd::string(name));
   this->Modified();
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVIsoVolume::ClearInputCellArrayToProcess()
+void vtkPVAMRDualClip::ClearInputCellArrayToProcess()
 {
   this->Implementation->CellArrays.clear();
   this->Modified();
