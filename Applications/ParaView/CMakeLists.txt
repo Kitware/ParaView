@@ -76,7 +76,7 @@ set (plugins_ini "${plugins_ini}</Plugins>\n")
 FILE(WRITE "${EXECUTABLE_OUTPUT_PATH}/.plugins" "${plugins_ini}")
 
 # This ensure that the paraview.qch file is generated.
-ADD_DEPENDENCIES(paraview
+ADD_DEPENDENCIES(${paraview_client_real_exe_name}
   ParaViewOnlineHelp)
 
 IF (BUILD_TESTING)
