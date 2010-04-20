@@ -149,6 +149,8 @@ pqXYChartDisplayPanel::pqXYChartDisplayPanel(
 
   QObject::connect(&this->Internal->Links, SIGNAL(qtWidgetChanged()),
                    this, SLOT(reloadSeries()), Qt::QueuedConnection);
+  QObject::connect(&this->Internal->Links, SIGNAL(qtWidgetChanged()),
+                   this->Internal->SettingsModel, SLOT(reload()));
 }
 
 //-----------------------------------------------------------------------------
