@@ -68,8 +68,7 @@ vtkSMNewWidgetRepresentationProxy::vtkSMNewWidgetRepresentationProxy()
   this->Enabled = 0;
   this->Observer = vtkSMNewWidgetRepresentationObserver::New();
   this->Observer->Proxy = this;
-  this->Internal = new vtkSMNewWidgetRepresentationInternals;
-  this->StateLoaded = false;
+  this->Internal = new vtkSMNewWidgetRepresentationInternals;  
 }
 
 //----------------------------------------------------------------------------
@@ -215,14 +214,6 @@ void vtkSMNewWidgetRepresentationProxy::UpdateEnabled()
 }
 
 //-----------------------------------------------------------------------------
-int vtkSMNewWidgetRepresentationProxy::LoadState(vtkPVXMLElement* proxyElement, 
-                          vtkSMProxyLocator* loader)
-{
-  this->StateLoaded = true;
-  return this->Superclass::LoadState(proxyElement, loader);
-}
-
-//-----------------------------------------------------------------------------
 void vtkSMNewWidgetRepresentationProxy::CreateVTKObjects()
 {
   if (this->ObjectsCreated)
@@ -288,13 +279,12 @@ void vtkSMNewWidgetRepresentationProxy::CreateVTKObjects()
     vtkSMProperty* prop = piter->GetProperty();
     vtkSMProperty* info = prop->GetInformationProperty();
     if (info)
-      {
-      if (this->StateLoaded)
-        {
-        // This ensures that the property value from the loaded state is
-        // preserved.
-        info->Copy(prop);
-        }
+      {      
+      // This ensures that the property value from the loaded state is
+      // preserved, and not overwritten by the default value from 
+      // the property information
+      info->Copy(prop);
+      
       vtkSMPropertyLink* link = vtkSMPropertyLink::New();
       link->AddLinkedProperty(this, 
                               piter->GetKey(), 

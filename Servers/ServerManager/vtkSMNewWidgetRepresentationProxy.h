@@ -86,10 +86,6 @@ protected:
   // Updates the widget's enabled state.
   void UpdateEnabled();
 
-  // Description:
-  // Updates state from an XML element. Returns 0 on failure.
-  virtual int LoadState(vtkPVXMLElement* element, vtkSMProxyLocator* loader);
-
   vtkSMProxy* RepresentationProxy;
   vtkSMProxy* WidgetProxy;
   vtkAbstractWidget* Widget;
@@ -106,9 +102,7 @@ protected:
 private:
 
   vtkSMNewWidgetRepresentationProxy(const vtkSMNewWidgetRepresentationProxy&); // Not implemented
-  void operator=(const vtkSMNewWidgetRepresentationProxy&); // Not implemented
-
-  bool StateLoaded;
+  void operator=(const vtkSMNewWidgetRepresentationProxy&); // Not implemented  
 //ETX
 };
 
