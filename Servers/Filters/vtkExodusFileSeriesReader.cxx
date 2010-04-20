@@ -26,8 +26,8 @@
 #include "vtkExodusFileSeriesReader.h"
 
 #include "vtkDirectory.h"
-#include "vtkExodusIIReader.h"
 #include "vtkObjectFactory.h"
+#include "vtkPExodusIIReader.h"
 #include "vtkStdString.h"
 
 #include "vtkSmartPointer.h"
@@ -196,7 +196,22 @@ int vtkExodusFileSeriesReader::RequestInformationForInput(
     // Save the state of what to read in.
     vtkExodusFileSeriesReaderStatus readerStatus;
     readerStatus.RecordStatus(reader);
-      
+
+    // It is sometimes the case that the server manager state mechanism will
+    // push values to FilePattern and FilePrefix when in fact these should be
+    // set internally (bug #10570).  This is a problem when we really have a
+    // time file series.  Since the FilePattern/Prefix don't work with a time
+    // file series, just set them to NULL.
+    if (this->GetNumberOfFileNames() > 1)
+      {
+      vtkPExodusIIReader *preader = vtkPExodusIIReader::SafeDownCast(reader);
+      if (preader)
+        {
+        preader->SetFilePattern(NULL);
+        preader->SetFilePrefix(NULL);
+        }
+      }
+
     int retVal = this->Superclass::RequestInformationForInput(index, request,
                                                               outputVector);
 
