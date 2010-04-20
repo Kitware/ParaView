@@ -301,4 +301,9 @@ FUNCTION(build_paraview_client BPC_NAME)
     SET_TARGET_PROPERTIES(${pv_exe_name} PROPERTIES 
       MACOSX_BUNDLE_BUNDLE_NAME "${BPC_APPLICATION_NAME}")
   ENDIF (APPLE)
+
+  # HACK. When employing shared forwarding, I need to expose the real target so
+  # that dependencies can be added correctly. This will go away once we remove
+  # VTK_USE_RPATH option all together.
+  set (paraview_client_real_exe_name ${pv_exe_name} PARENT_SCOPE)
 ENDFUNCTION(build_paraview_client)
