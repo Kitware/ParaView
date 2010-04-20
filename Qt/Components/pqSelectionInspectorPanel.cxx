@@ -445,27 +445,15 @@ void pqSelectionInspectorPanel::select(pqOutputPort* opport, bool createNew)
     QObject::disconnect(this->Implementation->InputPort->getSource(), 0, this, 0);
     }
 
-  if(this->hasGlobalIDs(opport))
-    {
-    if(opport->getSelectionInput() &&
-       opport->getSelectionInput()->GetXMLName() == 
-       QString("CompositeDataIDSelectionSource"))
-      {
-      if (!this->hasGlobalIDs(this->Implementation->InputPort))
-        {
-        this->Implementation->InputPort = opport;
-        this->updateSelectionTypesAvailable();
-        this->setGlobalIDs();
-        return;
-        }
-      else
-        {
-        createNew = true;
-        }
-      }
-    }
   
   this->Implementation->InputPort = opport;
+  this->updateSelectionTypesAvailable();
+
+  if (createNew && this->hasGlobalIDs(opport))
+    {
+    this->Implementation->comboSelectionType->setCurrentIndex(
+      pqImplementation::GLOBALIDS);
+    }
 
   QString selectedObjectLabel = "<b>[none]</b>";
   if (opport)
