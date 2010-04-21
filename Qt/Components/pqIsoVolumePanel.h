@@ -59,4 +59,3 @@ protected:
 };
 
 #endif
-
