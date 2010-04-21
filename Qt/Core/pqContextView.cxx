@@ -283,6 +283,12 @@ void pqContextView::selectionChanged()
     opPort->getSource()->getProxy());
   vtkSMSourceProxy* selectionSource = opPort->getSelectionInput();
 
+  int selectionType = vtkSelectionNode::POINT;
+  if (QString(opPort->getDataClassName()) == "vtkTable")
+    {
+    selectionType = vtkSelectionNode::ROW;
+    }
+
   if (!selectionSource)
     {
     vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
@@ -290,7 +296,7 @@ void pqContextView::selectionChanged()
       vtkSMSourceProxy::SafeDownCast(pxm->NewProxy("sources", "IDSelectionSource"));
     selectionSource->SetConnectionID(pqRepr->getServer()->GetConnectionID());
     selectionSource->SetServers(vtkProcessModule::DATA_SERVER);
-    vtkSMPropertyHelper(selectionSource, "FieldType").Set(vtkSelectionNode::POINT);
+    vtkSMPropertyHelper(selectionSource, "FieldType").Set(selectionType);
     selectionSource->UpdateVTKObjects();
     }
   else
