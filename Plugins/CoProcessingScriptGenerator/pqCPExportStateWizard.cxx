@@ -144,8 +144,7 @@ pqCPExportStateWizard::pqCPExportStateWizard(
   this->Internals = new pqInternals();
   this->Internals->setupUi(this);
   ::ActiveWizard = NULL;
-  // the mac style does not have a cancel button so we want to not use it
-  this->setWizardStyle(ModernStyle); 
+  this->setOption(QWizard::NoCancelButton, false);
 
   QObject::connect(this->Internals->allInputs, SIGNAL(itemSelectionChanged()),
     this, SLOT(updateAddRemoveButton()));
