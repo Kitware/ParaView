@@ -73,18 +73,24 @@ glyph = FindSource("my glyph")
 clip = FindSource("my clip")
 group = FindSource("my group")
 
+print "background:", view.Background
+print "background2:", view2.Background
+print "representations:", view.Representations
+print "representations2:", view2.Representations
+
 # Test the results
+epsilon = 0.000001
 if not sphere:
     fail("Could not find sphere")
 if glyph.GlyphType.Resolution != 15:
     fail("Glyph cone resolution is incorrect.")
-if abs(clip.ClipType.Radius - 0.25) > 0.000001:
+if abs(clip.ClipType.Radius - 0.25) > epsilon:
     fail("Clip sphere radius is incorrect.")
 if sphere not in group.Input or clip not in group.Input:
     fail("Group has wrong inputs.")
 if GetDisplayProperties(group).Representation != "Surface With Edges":
     fail("Group representation is incorrect")
-if view.Background[1] != 0 or view.Background[2] != 1:
+if abs(view.Background[1] - 0) > epsilon or abs(view.Background[2] - 1) > epsilon:
     fail("View has incorrect background color")
 if len(view.Representations) != 1:
     fail("First view has incorrect number of representations.")
