@@ -28,10 +28,12 @@
 #include "vtkSelection.h"
 #include "vtkSelectionNode.h"
 #include "vtkSmartPointer.h"
+#include "vtkTable.h"
+#include "vtkGraph.h"
 
 #include <vtkstd/vector>
 
-class vtkPVExtractSelection::vtkSelectionNodeVector : 
+class vtkPVExtractSelection::vtkSelectionNodeVector :
   public vtkstd::vector<vtkSmartPointer<vtkSelectionNode> >
 {
 };
@@ -82,7 +84,7 @@ int vtkPVExtractSelection::RequestDataObject(
     {
     vtkInformation* info = outputVector->GetInformationObject(i);
     vtkSelection *selOut = vtkSelection::GetData(info);
-    if (!selOut || !selOut->IsA("vtkSelection")) 
+    if (!selOut || !selOut->IsA("vtkSelection"))
       {
       vtkDataObject* newOutput = vtkSelection::New();
       if (!newOutput)
@@ -117,15 +119,20 @@ int vtkPVExtractSelection::RequestData(
 
   vtkCompositeDataSet* cdInput = vtkCompositeDataSet::SafeDownCast(inputDO);
   vtkCompositeDataSet* cdOutput = vtkCompositeDataSet::GetData(outputVector, 0);
-  vtkDataSet *geomOutput = vtkDataSet::GetData(outputVector, 0);
+  vtkDataObject *dataObjectOutput = vtkDataObject::GetData(outputVector, 0);
 
   //make an ids selection for the second output
-  //we can do this because all of the extractSelectedX filters produce 
-  //arrays called "vtkOriginalXIds" that record what input cells produced 
+  //we can do this because all of the extractSelectedX filters produce
+  //arrays called "vtkOriginalXIds" that record what input cells produced
   //each output cell, at least as long as PRESERVE_TOPOLOGY is off
-  //when we start allowing PreserveTopology, this will have to instead run 
+  //when we start allowing PreserveTopology, this will have to instead run
   //through the vtkInsidedNess arrays, and for every on entry, record the
   //entries index
+  //
+  // TODO: The ExtractSelectedGraph filter does not produce the vtkOriginalXIds,
+  // so to add support for vtkGraph selection in ParaView the filter will have
+  // to be extended. This requires test cases in ParaView to confirm it functions
+  // as expected.
   vtkSelection *output = vtkSelection::SafeDownCast(
     outputVector->GetInformationObject(1)->Get(vtkDataObject::DATA_OBJECT()));
 
@@ -175,9 +182,9 @@ int vtkPVExtractSelection::RequestData(
     // vtkSelection instances correctly to help identify the block they came
     // from.
     vtkCompositeDataIterator* iter = cdInput->NewIterator();
-    vtkHierarchicalBoxDataIterator* hbIter = 
+    vtkHierarchicalBoxDataIterator* hbIter =
       vtkHierarchicalBoxDataIterator::SafeDownCast(iter);
-    for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); 
+    for (iter->InitTraversal(); !iter->IsDoneWithTraversal();
       iter->GoToNextItem())
       {
       vtkSelectionNode* curSel = this->LocateSelection(iter->GetCurrentFlatIndex(),
@@ -188,18 +195,18 @@ int vtkPVExtractSelection::RequestData(
           hbIter->GetCurrentIndex(), sel);
         }
 
-      geomOutput = vtkDataSet::SafeDownCast(cdOutput->GetDataSet(iter));
+      dataObjectOutput = vtkDataObject::SafeDownCast(cdOutput->GetDataSet(iter));
 
       vtkSelectionNodeVector curOVector;
-      if (curSel && geomOutput)
+      if (curSel && dataObjectOutput)
         {
-        this->RequestDataInternal(curOVector, geomOutput, curSel);
+        this->RequestDataInternal(curOVector, dataObjectOutput, curSel);
         }
 
       for (vtkSelectionNodeVector::iterator giter = non_composite_nodes.begin();
         giter != non_composite_nodes.end(); ++giter)
         {
-        this->RequestDataInternal(curOVector, geomOutput, giter->GetPointer());
+        this->RequestDataInternal(curOVector, dataObjectOutput, giter->GetPointer());
         }
 
       for (vtkSelectionNodeVector::iterator viter = curOVector.begin();
@@ -214,12 +221,12 @@ int vtkPVExtractSelection::RequestData(
       }
     iter->Delete();
     }
-  else if (geomOutput)
+  else if (dataObjectOutput) // and not composite dataset.
     {
     unsigned int numNodes = sel->GetNumberOfNodes();
     for (unsigned int i = 0; i < numNodes; i++)
       {
-      this->RequestDataInternal(oVector, geomOutput, sel->GetNode(i));
+      this->RequestDataInternal(oVector, dataObjectOutput, sel->GetNode(i));
       }
     }
 
@@ -267,7 +274,7 @@ vtkSelectionNode* vtkPVExtractSelection::LocateSelection(unsigned int composite_
     if (node)
       {
       if (node->GetProperties()->Has(vtkSelectionNode::COMPOSITE_INDEX()) &&
-          node->GetProperties()->Get(vtkSelectionNode::COMPOSITE_INDEX()) == 
+          node->GetProperties()->Get(vtkSelectionNode::COMPOSITE_INDEX()) ==
           static_cast<int>(composite_index))
         {
         return node;
@@ -279,9 +286,13 @@ vtkSelectionNode* vtkPVExtractSelection::LocateSelection(unsigned int composite_
 
 //----------------------------------------------------------------------------
 void vtkPVExtractSelection::RequestDataInternal(vtkSelectionNodeVector& outputs,
-  vtkDataSet* geomOutput, vtkSelectionNode* sel)
+  vtkDataObject* dataObjectOutput, vtkSelectionNode* sel)
 {
   // DON'T CLEAR THE outputs.
+
+  vtkDataSet* ds = vtkDataSet::SafeDownCast(dataObjectOutput);
+  vtkTable* table = vtkTable::SafeDownCast(dataObjectOutput);
+  vtkGraph* graph = vtkGraph::SafeDownCast(dataObjectOutput);
 
   int ft = vtkSelectionNode::CELL;
   if (sel && sel->GetProperties()->Has(vtkSelectionNode::FIELD_TYPE()))
@@ -289,13 +300,13 @@ void vtkPVExtractSelection::RequestDataInternal(vtkSelectionNodeVector& outputs,
     ft = sel->GetProperties()->Get(vtkSelectionNode::FIELD_TYPE());
     }
 
-  if (geomOutput && ft == vtkSelectionNode::CELL)
+  if (ds && ft == vtkSelectionNode::CELL)
     {
     vtkSelectionNode* output = vtkSelectionNode::New();
     output->GetProperties()->Copy(sel->GetProperties(), /*deep=*/1);
     output->SetContentType(vtkSelectionNode::INDICES);
     vtkIdTypeArray *oids = vtkIdTypeArray::SafeDownCast(
-      geomOutput->GetCellData()->GetArray("vtkOriginalCellIds"));
+      ds->GetCellData()->GetArray("vtkOriginalCellIds"));
     if (oids)
       {
       output->SetSelectionList(oids);
@@ -305,20 +316,47 @@ void vtkPVExtractSelection::RequestDataInternal(vtkSelectionNodeVector& outputs,
     }
 
   // no else, since original point indices are always passed.
-  if (geomOutput)
+  if (ds && (
+      ft == vtkSelectionNode::CELL || ft == vtkSelectionNode::POINT))
     {
     vtkSelectionNode* output = vtkSelectionNode::New();
     output->GetProperties()->Copy(sel->GetProperties(), /*deep=*/1);
     output->SetFieldType(vtkSelectionNode::POINT);
     output->SetContentType(vtkSelectionNode::INDICES);
     vtkIdTypeArray* oids = vtkIdTypeArray::SafeDownCast(
-      geomOutput->GetPointData()->GetArray("vtkOriginalPointIds"));
+      ds->GetPointData()->GetArray("vtkOriginalPointIds"));
     if (oids)
       {
       output->SetSelectionList(oids);
       outputs.push_back(output);
       }
     output->Delete();
+    }
+
+  if (table && ft == vtkSelectionNode::ROW)
+    {
+    vtkSelectionNode* output = vtkSelectionNode::New();
+    output->GetProperties()->Copy(sel->GetProperties(), /*deep=*/1);
+    output->SetFieldType(vtkSelectionNode::ROW);
+    output->SetContentType(vtkSelectionNode::INDICES);
+    vtkIdTypeArray* oids = vtkIdTypeArray::SafeDownCast(
+      table->GetRowData()->GetArray("vtkOriginalRowIds"));
+    if (oids)
+      {
+      output->SetSelectionList(oids);
+      outputs.push_back(output);
+      }
+    output->Delete();
+    }
+
+  // The ExtractSelectedGraph filter does not produce the vtkOriginal*Ids array,
+  // it will need extending to be able to follow the same pattern (with some
+  // test cases to verify functionality).
+  if (graph && ft == vtkSelectionNode::VERTEX)
+    {
+    }
+  if (graph && ft == vtkSelectionNode::EDGE)
+    {
     }
 }
 

@@ -29,6 +29,9 @@
 // cells in the subset with the original data set. This is used, for instance,
 // by ParaView's Spreadsheet view.
 //
+// Output port 2 -- is simply the input vtkSelection (set on input port number
+// 1).
+//
 // .SECTION See Also
 // vtkExtractSelection vtkSelection
 
@@ -81,7 +84,8 @@ private:
 
   class vtkSelectionNodeVector;
   void RequestDataInternal(vtkSelectionNodeVector& outputs,
-    vtkDataSet* geomOutput, vtkSelectionNode* sel);
+                           vtkDataObject* dataObjectOutput,
+                           vtkSelectionNode* sel);
 
   // Returns the combined content type for the selection.
   int GetContentType(vtkSelection* sel);
