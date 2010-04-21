@@ -309,7 +309,8 @@ void pqSpreadSheetViewModel::updateSelectionForBlock(vtkIdType blockNumber)
   vtkSMSpreadSheetRepresentationProxy* repr = this->Internal->Representation;
   if (repr && 
     (this->Internal->getFieldType() == vtkDataObject::FIELD_ASSOCIATION_CELLS ||
-    this->Internal->getFieldType() == vtkDataObject::FIELD_ASSOCIATION_POINTS))
+    this->Internal->getFieldType() == vtkDataObject::FIELD_ASSOCIATION_POINTS ||
+    this->Internal->getFieldType() == vtkDataObject::FIELD_ASSOCIATION_ROWS) )
     {
     // If we are showing only the selected items, then there's not point in
     // highlighting the selected items, since all items are selected. So we
