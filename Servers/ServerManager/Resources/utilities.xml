@@ -460,7 +460,7 @@
         name="Bounds"
         command="SetBounds"
         number_of_elements="6"
-        default_values="none" >
+        default_values="0 1 0 1 0 1" >
       </DoubleVectorProperty>
       <DoubleVectorProperty
         name="Position"
