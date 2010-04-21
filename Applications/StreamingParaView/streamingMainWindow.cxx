@@ -47,7 +47,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationCore.h"
 #include "pqCustomDisplayPolicy.h"
 
-#include <QShortCut>
+#include <QShortcut>
 #include <QStatusBar>
 
 #include <iostream>
