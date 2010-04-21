@@ -59,6 +59,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqExodusIIPanel.h"
 #include "pqExtractCTHPartsPanel.h"
 #include "pqGlyphPanel.h"
+#include "pqIsoVolumePanel.h"
 #include "pqLoadedFormObjectPanel.h"
 #include "pqNetCDFPanel.h"
 #include "pqObjectBuilder.h"
@@ -69,7 +70,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPluginManager.h"
 #include "pqPropertyManager.h"
 #include "pqProxyModifiedStateUndoElement.h"
-#include "pqPVThresholdPanel.h"
 #include "pqSelectThroughPanel.h"
 #include "pqServerManagerModel.h"
 #include "pqServerManagerObserver.h"
@@ -128,9 +128,9 @@ public:
         {
         return new pqThresholdPanel(proxy, p);
         }
-      if(QString("PVThreshold") == proxy->getProxy()->GetXMLName())
+      if(QString("IsoVolume") == proxy->getProxy()->GetXMLName())
         {
-        return new pqPVThresholdPanel(proxy, p);
+        return new pqIsoVolumePanel(proxy, p);
         }
       if(QString("Contour") == proxy->getProxy()->GetXMLName())
         {
@@ -182,7 +182,7 @@ public:
 //         QString("ExtractDataSets") == proxy->getProxy()->GetXMLName() ||
 //         QString("ParticleTracer") == proxy->getProxy()->GetXMLName() ||
          QString("Threshold") == proxy->getProxy()->GetXMLName() ||
-         QString("PVThreshold") == proxy->getProxy()->GetXMLName() ||
+         QString("IsoVolume") == proxy->getProxy()->GetXMLName() ||
          QString("ExtractSelection") == proxy->getProxy()->GetXMLName() ||
          QString("ExtractSelectionOverTime") == proxy->getProxy()->GetXMLName() ||
          QString("Contour") == proxy->getProxy()->GetXMLName() ||

@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   Visualization Toolkit
-  Module:    vtkPVThreshold.h
+  Module:    vtkIsoVolume.h
 
   Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
   All rights reserved.
@@ -12,7 +12,7 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVThreshold - This filter extract cells using lower / upper
+// .NAME vtkIsoVolume - This filter extract cells using lower / upper
 // threshold set and vtkPVClipDataSet filter.
 //
 // .SECTION Description
@@ -20,19 +20,19 @@
 // .SECTION See Also
 // vtkThreshold vtkPVClipDataSet
 
-#ifndef __vtkPVThreshold_h
-#define __vtkPVThreshold_h
+#ifndef __vtkIsoVolume_h
+#define __vtkIsoVolume_h
 
 #include "vtkUnstructuredGridAlgorithm.h"
 
 // Forware declarations.
 class vtkPVClipDataSet;
 
-class VTK_EXPORT vtkPVThreshold : public vtkUnstructuredGridAlgorithm
+class VTK_EXPORT vtkIsoVolume : public vtkUnstructuredGridAlgorithm
 {
 public:
-  static vtkPVThreshold *New();
-  vtkTypeRevisionMacro(vtkPVThreshold,vtkUnstructuredGridAlgorithm);
+  static vtkIsoVolume *New();
+  vtkTypeRevisionMacro(vtkIsoVolume,vtkUnstructuredGridAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
@@ -47,8 +47,8 @@ public:
 
 
 protected:
-  vtkPVThreshold();
- ~vtkPVThreshold();
+  vtkIsoVolume();
+ ~vtkIsoVolume();
 
   // Usual data generation methods.
   virtual int RequestData(vtkInformation*, vtkInformationVector**,
@@ -70,8 +70,8 @@ protected:
   vtkPVClipDataSet*   UpperBoundClipDS;
 
 private:
-  vtkPVThreshold(const vtkPVThreshold&);  // Not implemented.
-  void operator=(const vtkPVThreshold&);  // Not implemented.
+  vtkIsoVolume(const vtkIsoVolume&);  // Not implemented.
+  void operator=(const vtkIsoVolume&);  // Not implemented.
 };
 
-#endif // __vtkPVThreshold_h
+#endif // __vtkIsoVolume_h

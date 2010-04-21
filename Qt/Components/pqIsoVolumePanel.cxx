@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqPVThresholdPanel.cxx
+   Module:    pqIsoVolumePanel.cxx
 
    Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,19 +30,19 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#include "pqPVThresholdPanel.h"
+#include "pqIsoVolumePanel.h"
 
 #include <QComboBox>
 #include "pqDoubleRangeWidget.h"
 #include "pqSMAdaptor.h"
 #include "vtkSMProperty.h"
 #include "vtkSMProxy.h"
-#include "ui_pqPVThresholdPanel.h"
+#include "ui_pqIsoVolumePanel.h"
 
 
-class pqPVThresholdPanel::pqUI : public Ui::ThresholdPanel { };
+class pqIsoVolumePanel::pqUI : public Ui::IsoVolumePanel { };
 
-pqPVThresholdPanel::pqPVThresholdPanel(pqProxy* pxy, QWidget* p) :
+pqIsoVolumePanel::pqIsoVolumePanel(pqProxy* pxy, QWidget* p) :
   pqNamedObjectPanel(pxy, p)
 {
   this->UI = new pqUI;
@@ -60,12 +60,12 @@ pqPVThresholdPanel::pqPVThresholdPanel(pqProxy* pxy, QWidget* p) :
     Qt::QueuedConnection);
 }
 
-pqPVThresholdPanel::~pqPVThresholdPanel()
+pqIsoVolumePanel::~pqIsoVolumePanel()
 {
   delete this->UI;
 }
 
-void pqPVThresholdPanel::lowerChanged(double val)
+void pqIsoVolumePanel::lowerChanged(double val)
 {
   // clamp the lower threshold if we need to
   if(this->UI->ThresholdBetween_1->value() < val)
@@ -74,7 +74,7 @@ void pqPVThresholdPanel::lowerChanged(double val)
     }
 }
 
-void pqPVThresholdPanel::upperChanged(double val)
+void pqIsoVolumePanel::upperChanged(double val)
 {
   // clamp the lower threshold if we need to
   if(this->UI->ThresholdBetween_0->value() > val)
@@ -83,7 +83,7 @@ void pqPVThresholdPanel::upperChanged(double val)
     }
 }
 
-void pqPVThresholdPanel::variableChanged()
+void pqIsoVolumePanel::variableChanged()
 {
   // when the user changes the variable, adjust the ranges on the ThresholdBetween
   vtkSMProperty* prop = this->proxy()->GetProperty("ThresholdBetween");

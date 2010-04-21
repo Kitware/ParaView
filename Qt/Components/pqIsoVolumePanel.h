@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqPVThresholdPanel.h
+   Module:    pqIsoVolumePanel.h
 
    Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,22 +30,22 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _pqPVThresholdPanel_h
-#define _pqPVThresholdPanel_h
+#ifndef _pqIsoVolumePanel_h
+#define _pqIsoVolumePanel_h
 
 #include "pqNamedObjectPanel.h"
 #include "pqComponentsExport.h"
 class pqDoubleRangeWidget;
 
-class PQCOMPONENTS_EXPORT pqPVThresholdPanel :
+class PQCOMPONENTS_EXPORT pqIsoVolumePanel :
   public pqNamedObjectPanel
 {
   Q_OBJECT
 public:
   /// constructor
-  pqPVThresholdPanel(pqProxy* proxy, QWidget* p = NULL);
+  pqIsoVolumePanel(pqProxy* proxy, QWidget* p = NULL);
   /// destructor
-  ~pqPVThresholdPanel();
+  ~pqIsoVolumePanel();
 
 protected slots:
   void lowerChanged(double);

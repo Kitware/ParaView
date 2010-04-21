@@ -4835,7 +4835,7 @@ To select between these two options, select either Point Data or Cell Data from 
    </SourceProxy>
 
    <!-- ==================================================================== -->
-   <SourceProxy name="PVThreshold" class="vtkPVThreshold">
+   <SourceProxy name="IsoVolume" class="vtkIsoVolume" label="Iso Volume">
     <Documentation
        long_help="This filter extracts cells by clipping cells that have point
        scalars not in the specified range."
@@ -4905,7 +4905,7 @@ To select between these two options, select either Point Data or Cell Data from 
      <Hints>
        <Visibility replace_input="2" />
      </Hints>
-   <!-- End Threshold -->
+   <!-- End Iso Volume -->
    </SourceProxy>
 
    <!-- ==================================================================== -->

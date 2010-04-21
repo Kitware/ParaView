@@ -119,6 +119,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqHandleWidget.h
   pqImageTip.h
   pqImplicitPlaneWidget.h
+  pqIsoVolumePanel.h
   pqKeyFrameEditor.h
   pqKeyFrameTimeValidator.h
   pqKeyFrameTypeWidget.h
@@ -155,7 +156,6 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqProxyPanel.h
   pqProxySelectionWidget.h
   pqProxyTabWidget.h
-  pqPVThresholdPanel.h
   pqQueryClauseWidget.h
   pqQueryDialog.h
   pqRecentFilesMenu.h
@@ -251,6 +251,7 @@ SET(UI_FORMS
   Resources/UI/pqGlobalRenderViewOptions.ui
   Resources/UI/pqHandleWidget.ui
   Resources/UI/pqImplicitPlaneWidget.ui
+  Resources/UI/pqIsoVolumePanel.ui
   Resources/UI/pqKeyFrameEditor.ui
   Resources/UI/pqKeyFrameTypeWidget.ui
   Resources/UI/pqLineChartDisplayPanel.ui
@@ -270,7 +271,6 @@ SET(UI_FORMS
   Resources/UI/pqPluginDialog.ui
   Resources/UI/pqPointSourceControls.ui
   Resources/UI/pqProxyInformationWidget.ui
-  Resources/UI/pqPVThresholdPanel.ui
   Resources/UI/pqQueryClauseWidget.ui
   Resources/UI/pqQueryCompositeTreeDialog.ui
   Resources/UI/pqQueryDialog.ui
@@ -505,6 +505,8 @@ ADD_LIBRARY(pqComponents
   pqImageTip.h
   pqImplicitPlaneWidget.cxx
   pqImplicitPlaneWidget.h
+  pqIsoVolumePanel.h
+  pqIsoVolumePanel.cxx
   pqKeyFrameEditor.cxx
   pqKeyFrameEditor.h
   pqKeyFrameTimeValidator.cxx
@@ -641,8 +643,6 @@ ADD_LIBRARY(pqComponents
   pqSILWidget.h
   pqProxySILModel.cxx
   pqProxySILModel.h
-  pqPVThresholdPanel.cxx
-  pqPVThresholdPanel.h
   pqSimpleServerStartup.cxx
   pqSimpleServerStartup.h
   pqSourceComboBox.cxx

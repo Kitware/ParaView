@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   Visualization Toolkit
-  Module:    vtkPVThreshold.cxx
+  Module:    vtkIsoVolume.cxx
 
   Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
   All rights reserved.
@@ -12,7 +12,7 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#include "vtkPVThreshold.h"
+#include "vtkIsoVolume.h"
 
 #include "vtkCell.h"
 #include "vtkCellData.h"
@@ -27,13 +27,13 @@
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkUnstructuredGrid.h"
 
-vtkCxxRevisionMacro(vtkPVThreshold, "1.1");
-vtkStandardNewMacro(vtkPVThreshold);
+vtkCxxRevisionMacro(vtkIsoVolume, "1.1");
+vtkStandardNewMacro(vtkIsoVolume);
 
 //----------------------------------------------------------------------------
 // Construct with lower threshold=0, upper threshold=1, and threshold
 // function=upper
-vtkPVThreshold::vtkPVThreshold()
+vtkIsoVolume::vtkIsoVolume()
 {
   this->LowerThreshold         = 0.0;
   this->UpperThreshold         = 1.0;
@@ -49,7 +49,7 @@ vtkPVThreshold::vtkPVThreshold()
 }
 
 //----------------------------------------------------------------------------
-vtkPVThreshold::~vtkPVThreshold()
+vtkIsoVolume::~vtkIsoVolume()
 {
   // Release memory.
   if(this->LowerBoundClipDS)
@@ -64,7 +64,7 @@ vtkPVThreshold::~vtkPVThreshold()
 
 //----------------------------------------------------------------------------
 // Criterion is cells whose scalars are between lower and upper thresholds.
-void vtkPVThreshold::ThresholdBetween(double lower, double upper)
+void vtkIsoVolume::ThresholdBetween(double lower, double upper)
 {
   if(this->LowerThreshold != lower || this->UpperThreshold != upper)
     {
@@ -74,7 +74,7 @@ void vtkPVThreshold::ThresholdBetween(double lower, double upper)
     }
 }
 
-int vtkPVThreshold::RequestData(vtkInformation* request,
+int vtkIsoVolume::RequestData(vtkInformation* request,
                                 vtkInformationVector** inputVector,
                                 vtkInformationVector* outputVector)
 {
@@ -93,7 +93,7 @@ int vtkPVThreshold::RequestData(vtkInformation* request,
     return !retVal;
     }
 
-  vtkDebugMacro(<<"Executing vtkPVThreshold filter");
+  vtkDebugMacro(<<"Executing vtkIsoVolume filter");
 
   // Are we using pointScalars?
   vtkDataSet* input = vtkDataSet::SafeDownCast(
@@ -202,14 +202,14 @@ int vtkPVThreshold::RequestData(vtkInformation* request,
 }
 
 //----------------------------------------------------------------------------
-int vtkPVThreshold::FillInputPortInformation(int, vtkInformation *info)
+int vtkIsoVolume::FillInputPortInformation(int, vtkInformation *info)
 {
   info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkDataSet");
   return 1;
 }
 
 //----------------------------------------------------------------------------
-void vtkPVThreshold::PrintSelf(ostream& os, vtkIndent indent)
+void vtkIsoVolume::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
 
@@ -227,7 +227,7 @@ void vtkPVThreshold::PrintSelf(ostream& os, vtkIndent indent)
 }
 
 //----------------------------------------------------------------------------
-int vtkPVThreshold::ProcessRequest(vtkInformation* request,
+int vtkIsoVolume::ProcessRequest(vtkInformation* request,
                                    vtkInformationVector** inputVector,
                                    vtkInformationVector* outputVector)
 {
