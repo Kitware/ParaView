@@ -1545,6 +1545,26 @@ The Extract Surface filter extracts the polygons forming the outer surface of th
          If the value of this property is set to 1, internal surfaces along process boundaries will be removed. NOTE: Enabling this option might cause multiple executions of the data source because more information is needed to remove internal surfaces.
        </Documentation>
      </IntVectorProperty>
+
+     <IntVectorProperty name="NonlinearSubdivisionLevel"
+                        command="SetNonlinearSubdivisionLevel"
+                        number_of_elements="1"
+                        default_values="1">
+       <IntRangeDomain name="range" min="0" max="4" />
+       <Documentation>
+         If the input is an unstructured grid with nonlinear faces, this
+         parameter determines how many times the face is subdivided into
+         linear faces.  If 0, the output is the equivalent of its linear
+         couterpart (and the midpoints determining the nonlinear
+         interpolation are discarded).  If 1, the nonlinear face is
+         triangulated based on the midpoints.  If greater than 1, the
+         triangulated pieces are recursively subdivided to reach the
+         desired subdivision.  Setting the value to greater than 1 may
+         cause some point data to not be passed even if no quadratic faces
+         exist.  This option has no effect if the input is not an
+         unstructured grid.
+       </Documentation>
+     </IntVectorProperty>
    <!-- End DataSetSurfaceFilter -->
    </SourceProxy>
 
@@ -7436,6 +7456,20 @@ Tessellate a higher-order dataset.
         <BooleanDomain name="bool"/>
         <Documentation>
           Toggle whether to generate an outline or a surface.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty name="NonlinearSubdivisionLevel"
+                         command="SetNonlinearSubdivisionLevel"
+                         number_of_elements="1"
+                         default_values="1">
+        <IntRangeDomain name="range" min="0" max="4" />
+        <Documentation>
+          Nonlinear faces are approximated with flat polygons.  This
+          parameter controls how many times to subdivide nonlinear surface
+          cells.  Higher subdivisions generate closer approximations but
+          take more memory and rendering time.  Subdivision is recursive,
+          so the number of output polygons can grow exponentially with this
+          parameter.
         </Documentation>
       </IntVectorProperty>
       <IntVectorProperty

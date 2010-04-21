@@ -34,9 +34,11 @@ class vtkInformationVector;
 class vtkCompositeDataSet;
 class vtkMultiProcessController;
 class vtkOutlineSource;
+class vtkPVRecoverGeometryWireframe;
 class vtkRectilinearGrid;
 class vtkStructuredGrid;
 class vtkUnstructuredGrid;
+class vtkUnstructuredGridGeometryFilter;
 
 class VTK_EXPORT vtkPVGeometryFilter : public vtkPolyDataAlgorithm
 {
@@ -77,6 +79,15 @@ public:
   vtkSetMacro(GenerateCellNormals, int);
   vtkGetMacro(GenerateCellNormals, int);
   vtkBooleanMacro(GenerateCellNormals, int);
+
+  // Description:
+  // Nonlinear faces are approximated with flat polygons.  This parameter
+  // controls how many times to subdivide nonlinear surface cells.  Higher
+  // subdivisions generate closer approximations but take more memory and
+  // rendering time.  Subdivision is recursive, so the number of output polygons
+  // can grow exponentially with this parameter.
+  virtual void SetNonlinearSubdivisionLevel(int);
+  vtkGetMacro(NonlinearSubdivisionLevel, int);
 
   // Description:
   // Set and get the controller.
@@ -159,11 +170,14 @@ protected:
   int UseOutline;
   int UseStrips;
   int GenerateCellNormals;
+  int NonlinearSubdivisionLevel;
 
   vtkMultiProcessController* Controller;
   vtkOutlineSource *OutlineSource;
   vtkDataSetSurfaceFilter* DataSetSurfaceFilter;
   vtkGenericGeometryFilter *GenericGeometryFilter;
+  vtkUnstructuredGridGeometryFilter *UnstructuredGridGeometryFilter;
+  vtkPVRecoverGeometryWireframe *RecoverWireframeFilter;
   
   int CheckAttributes(vtkDataObject* input);
 

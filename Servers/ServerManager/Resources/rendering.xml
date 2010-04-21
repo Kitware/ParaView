@@ -7118,7 +7118,7 @@
 
       <SubProxy>
         <!--
-          Geometry filter is used to conver non-polydata input to polydata.
+          Geometry filter is used to convert non-polydata input to polydata.
           It is also used to convert poly data to triangle strips when
           requested.
         -->
@@ -7127,6 +7127,7 @@
         <ExposedProperties>
           <Property name="UseStrips" />
           <Property name="ForceStrips" />
+          <Property name="NonlinearSubdivisionLevel" />
         </ExposedProperties>
       </SubProxy>
 
@@ -7992,6 +7993,7 @@
           <!-- Geometry Filter properties -->
           <Property name="UseStrips" />
           <Property name="ForceStrips" />
+          <Property name="NonlinearSubdivisionLevel" />
 
           <!-- Mapper properties -->
           <Property name="LookupTable" />

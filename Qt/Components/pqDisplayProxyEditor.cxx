@@ -390,6 +390,15 @@ void pqDisplayProxyEditor::setRepresentation(pqPipelineRepresentation* repr)
     "value", SIGNAL(editingFinished()),
     reprProxy, reprProxy->GetProperty("Opacity"));
 
+  // setup of nonlinear subdivision
+  if (reprProxy->GetProperty("NonlinearSubdivisionLevel"))
+    {
+    this->Internal->Links->addPropertyLink(
+                this->Internal->NonlinearSubdivisionLevel,
+                "value", SIGNAL(valueChanged(int)),
+                reprProxy, reprProxy->GetProperty("NonlinearSubdivisionLevel"));
+    }
+
   // setup for map scalars
   this->Internal->Links->addPropertyLink(
     this->Internal->ColorMapScalars, "checked", SIGNAL(stateChanged(int)),
