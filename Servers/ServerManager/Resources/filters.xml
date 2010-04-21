@@ -4835,6 +4835,80 @@ To select between these two options, select either Point Data or Cell Data from 
    </SourceProxy>
 
    <!-- ==================================================================== -->
+   <SourceProxy name="PVThreshold" class="vtkPVThreshold">
+    <Documentation
+       long_help="This filter extracts cells by clipping cells that have point
+       scalars not in the specified range."
+       short_help="Extract cells that satisfy a threshold criterion.">
+       This filter clip away the cells using lower and upper thresholds.
+    </Documentation>
+    <InputProperty
+       name="Input"
+       command="SetInputConnection">
+          <ProxyGroupDomain name="groups">
+            <Group name="sources"/>
+            <Group name="filters"/>
+          </ProxyGroupDomain>
+          <DataTypeDomain name="input_type">
+            <DataType value="vtkDataSet"/>
+          </DataTypeDomain>
+          <InputArrayDomain name="input_array" number_of_components="1">
+             <RequiredProperties>
+                <Property name="SelectInputScalars"
+                          function="FieldDataSelection"/>
+             </RequiredProperties>
+          </InputArrayDomain>
+          <Documentation>
+            This property specifies the input to the Threshold filter.
+          </Documentation>
+     </InputProperty>
+
+     <StringVectorProperty
+        name="SelectInputScalars"
+        command="SetInputArrayToProcess"
+        number_of_elements="5"
+        element_types="0 0 0 0 2"
+        label="Input Scalars">
+           <ArrayListDomain name="array_list"
+                            attribute_type="Scalars">
+             <RequiredProperties>
+                <Property name="Input" function="Input"/>
+             </RequiredProperties>
+           </ArrayListDomain>
+           <FieldDataDomain name="field_list">
+             <RequiredProperties>
+                <Property name="Input" function="Input"/>
+             </RequiredProperties>
+           </FieldDataDomain>
+           <Documentation>
+             The value of this property contains the name of the scalar array from which to perform thresholding.
+           </Documentation>
+     </StringVectorProperty>
+
+     <DoubleVectorProperty
+        name="ThresholdBetween"
+        command="ThresholdBetween"
+        number_of_elements="2"
+        default_values="0 0"
+        label="Threshold Range">
+          <ArrayRangeDomain name="range">
+            <RequiredProperties>
+               <Property name="Input" function="Input"/>
+               <Property name="SelectInputScalars" function="ArraySelection"/>
+            </RequiredProperties>
+          </ArrayRangeDomain>
+          <Documentation>
+            The values of this property specify the upper and lower bounds of the thresholding operation.
+          </Documentation>
+     </DoubleVectorProperty>
+
+     <Hints>
+       <Visibility replace_input="2" />
+     </Hints>
+   <!-- End Threshold -->
+   </SourceProxy>
+
+   <!-- ==================================================================== -->
    <SourceProxy name="Contour" class="vtkContourFilter">
     <Documentation
        long_help="Generate isolines or isosurfaces using point scalars."

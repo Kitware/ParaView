@@ -140,6 +140,7 @@ SET(Filters_SRCS
   vtkPVServerTimeSteps.cxx
   vtkPVStringArrayHelper.cxx
   vtkPVTextSource.cxx
+  vtkPVThreshold.cxx
   vtkPVTrackballMoveActor.cxx
   vtkPVTrackballMultiRotate.cxx
   vtkPVTrackballPan.cxx

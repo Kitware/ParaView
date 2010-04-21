@@ -1,6 +1,6 @@
 PROJECT(pqComponents)
 
-# Any build configured headers should be added to this 
+# Any build configured headers should be added to this
 # variable so that they also get installed.
 SET (dynamicHeaders)
 
@@ -155,6 +155,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqProxyPanel.h
   pqProxySelectionWidget.h
   pqProxyTabWidget.h
+  pqPVThresholdPanel.h
   pqQueryClauseWidget.h
   pqQueryDialog.h
   pqRecentFilesMenu.h
@@ -269,7 +270,7 @@ SET(UI_FORMS
   Resources/UI/pqPluginDialog.ui
   Resources/UI/pqPointSourceControls.ui
   Resources/UI/pqProxyInformationWidget.ui
-#  Resources/UI/pqPVThresholdPanel.ui
+  Resources/UI/pqPVThresholdPanel.ui
   Resources/UI/pqQueryClauseWidget.ui
   Resources/UI/pqQueryCompositeTreeDialog.ui
   Resources/UI/pqQueryDialog.ui
@@ -316,7 +317,7 @@ GENERATE_QT_RESOURCE_FROM_FILES(
   "${CMAKE_CURRENT_BINARY_DIR}/pqExtraResources.qrc"
   "/ParaViewResources"
   ${ALL_GUI_RESOURCES})
-  
+
 SET(UI_RESOURCES
   Resources/pqComponents.qrc
   "${CMAKE_CURRENT_BINARY_DIR}/pqExtraResources.qrc"
@@ -640,6 +641,8 @@ ADD_LIBRARY(pqComponents
   pqSILWidget.h
   pqProxySILModel.cxx
   pqProxySILModel.h
+  pqPVThresholdPanel.cxx
+  pqPVThresholdPanel.h
   pqSimpleServerStartup.cxx
   pqSimpleServerStartup.h
   pqSourceComboBox.cxx
@@ -711,7 +714,7 @@ TARGET_LINK_LIBRARIES(pqComponents
 
 CONFIGURE_FILE("${CMAKE_CURRENT_SOURCE_DIR}/pqComponentsExport.h.in"
                "${CMAKE_CURRENT_BINARY_DIR}/pqComponentsExport.h")
-SET(dynamicHeaders 
+SET(dynamicHeaders
     "${dynamicHeaders};${CMAKE_CURRENT_BINARY_DIR}/pqComponentsExport.h")
 
 INSTALL(TARGETS pqComponents
@@ -723,7 +726,7 @@ IF (NOT PV_INSTALL_NO_DEVELOPMENT)
   # Headers
   GLOB_INSTALL_DEVELOPMENT(
       ${CMAKE_CURRENT_SOURCE_DIR}
-      ${PV_INSTALL_INCLUDE_DIR} 
+      ${PV_INSTALL_INCLUDE_DIR}
       "*.h;*.hxx;*.txx")
   INSTALL(
       FILES ${dynamicHeaders}
@@ -741,7 +744,7 @@ IF (NOT PV_INSTALL_NO_DEVELOPMENT)
     "${PV_INSTALL_INCLUDE_DIR}/Qt/Components/Resources/UI"
     "${resPath}/*.ui")
   SET(resPath "${CMAKE_CURRENT_SOURCE_DIR}/Resources/Icons")
-  GLOB_INSTALL_DEVELOPMENT( 
+  GLOB_INSTALL_DEVELOPMENT(
     "${CMAKE_CURRENT_SOURCE_DIR}"
     "${PV_INSTALL_INCLUDE_DIR}/Qt/Components/Resources/Icons"
     "${resPath}/*.ico;${resPath}/*.png;${resPath}/*.svg;${resPath}/*.xpm;${resPath}/*.rc")

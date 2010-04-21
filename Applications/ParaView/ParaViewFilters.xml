@@ -168,4 +168,5 @@
   <Proxy group="filters" name="NormalGlyphs" />
   <Proxy group="filters" name="TableToPolyData" />
   <Proxy group="filters" name="TableToStructuredGrid" />
+  <Proxy group="filters" name="PVThreshold" />
 </ParaViewFilters>
