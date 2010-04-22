@@ -51,6 +51,8 @@
 
 vtkStandardNewMacro(vtkAMRDualClip);
 
+vtkCxxSetObjectMacro(vtkAMRDualClip, Controller, vtkMultiProcessController);
+
 
 // 1: Create meta data just like AMR iso.
 // 2: Assign shared regions just like AMR iso.
@@ -1334,7 +1336,9 @@ vtkAMRDualClip::vtkAMRDualClip()
   this->EnableDegenerateCells = 0;
   this->EnableMultiProcessCommunication = 0;
   this->EnableMergePoints = 0;
-  this->Controller = vtkMultiProcessController::GetGlobalController();
+
+  this->Controller = NULL;
+  this->SetController(vtkMultiProcessController::GetGlobalController());
 
   // Pipeline
   this->SetNumberOfOutputPorts(1);
@@ -1354,15 +1358,19 @@ vtkAMRDualClip::~vtkAMRDualClip()
     delete this->BlockLocator;
     this->BlockLocator = 0;
     }
+  this->SetController(NULL);
 }
 
 //----------------------------------------------------------------------------
 void vtkAMRDualClip::PrintSelf(ostream& os, vtkIndent indent)
 {
-  // TODO print state
   this->Superclass::PrintSelf(os,indent);
 
   os << indent << "IsoValue: " << this->IsoValue << endl;
+  os << indent << "EnableDegenerateCells: "
+     << this->EnableDegenerateCells << endl;
+  os << indent << "EnableMergePoints: " << this->EnableMergePoints << endl;
+  os << indent << "Controller: " << this->Controller << endl;
 }
 
 //----------------------------------------------------------------------------
@@ -1476,7 +1484,14 @@ vtkAMRDualClip::DoRequestData(vtkHierarchicalBoxDataSet* hbdsInput,
 
   this->Helper = vtkAMRDualGridHelper::New();
   this->Helper->SetEnableDegenerateCells(this->EnableDegenerateCells);
-  this->Helper->SetEnableMultiProcessCommunication(this->EnableMultiProcessCommunication);
+  if (this->EnableMultiProcessCommunication)
+    {
+    this->Helper->SetController(this->Controller);
+    }
+  else
+    {
+    this->Helper->SetController(NULL);
+    }
 
   // @TODO: Check if this is the right thing to do.
   this->Helper->Initialize(hbdsInput, arrayNameToProcess);

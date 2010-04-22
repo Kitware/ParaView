@@ -74,6 +74,9 @@ public:
   vtkGetMacro(EnableMergePoints,int);
   vtkBooleanMacro(EnableMergePoints,int);
 
+  vtkGetObjectMacro(Controller, vtkMultiProcessController);
+  virtual void SetController(vtkMultiProcessController *);
+
 
 protected:
   vtkAMRDualClip();
