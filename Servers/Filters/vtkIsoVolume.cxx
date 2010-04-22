@@ -25,6 +25,7 @@
 #include "vtkPVClipDataSet.h"
 #include "vtkSmartPointer.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
+#include "vtkThreshold.h"
 #include "vtkUnstructuredGrid.h"
 
 vtkCxxRevisionMacro(vtkIsoVolume, "1.1");
@@ -41,6 +42,7 @@ vtkIsoVolume::vtkIsoVolume()
 
   this->LowerBoundClipDS = 0;
   this->UpperBoundClipDS = 0;
+  this->Threshold        = 0;
 
   this->SetInputArrayToProcess(
     0,0,0,vtkDataObject::FIELD_ASSOCIATION_POINTS,
@@ -59,6 +61,10 @@ vtkIsoVolume::~vtkIsoVolume()
   if(this->UpperBoundClipDS)
     {
     this->UpperBoundClipDS->Delete();
+    }
+  if(this->Threshold)
+    {
+    this->Threshold->Delete();
     }
 }
 
@@ -101,9 +107,25 @@ int vtkIsoVolume::RequestData(vtkInformation* request,
 
   int numPts = input->GetNumberOfPoints();
   this->UsingPointScalars = (inScalars->GetNumberOfTuples() == numPts);
+
+  // If not using point scalar we would like to extract volume using
+  // vtkThreshold filter.
   if(!this->UsingPointScalars)
     {
-    return !retVal;
+    if(this->Threshold)
+      {
+      this->Threshold->Delete();
+      }
+
+    this->Threshold = vtkThreshold::New();
+    this->Threshold->SetInputArrayToProcess(
+      0, 0, 0, vtkDataObject::FIELD_ASSOCIATION_CELLS, inScalars->GetName());
+    this->Threshold->ThresholdBetween(
+        this->LowerThreshold, this->UpperThreshold);
+    retVal =
+      this->Threshold->ProcessRequest(request, inputVector, outputVector);
+
+    return retVal;
     }
 
   double* range = input->GetScalarRange();
@@ -224,6 +246,10 @@ void vtkIsoVolume::PrintSelf(ostream& os, vtkIndent indent)
   (this->UpperBoundClipDS) ?
       os << indent << "UpperBoundClipDS: " << this->UpperBoundClipDS << "\n" :
       os << indent << "UpperBoundClipDS: " << "NULL" << "\n" ;
+
+  (this->Threshold) ?
+      os << indent << "Threshold: " << this->Threshold << "\n" :
+      os << indent << "Threshold: " << "NULL" << "\n" ;
 }
 
 //----------------------------------------------------------------------------

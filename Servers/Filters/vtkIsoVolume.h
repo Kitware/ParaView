@@ -27,6 +27,7 @@
 
 // Forware declarations.
 class vtkPVClipDataSet;
+class vtkThreshold;
 
 class VTK_EXPORT vtkIsoVolume : public vtkUnstructuredGridAlgorithm
 {
@@ -68,6 +69,8 @@ protected:
 
   vtkPVClipDataSet*   LowerBoundClipDS;
   vtkPVClipDataSet*   UpperBoundClipDS;
+
+  vtkThreshold*       Threshold;
 
 private:
   vtkIsoVolume(const vtkIsoVolume&);  // Not implemented.
