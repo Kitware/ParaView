@@ -35,57 +35,22 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqImageUtil.h"
 #include "pqOutputPort.h"
 #include "pqPipelineSource.h"
-#include "pqDataRepresentation.h"
 #include "pqServer.h"
 #include "pqImageUtil.h"
-#include "pqSMAdaptor.h"
 #include "vtkErrorCode.h"
 #include "vtkImageData.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVXMLElement.h"
-#include "vtkProcessModule.h"
 
 #include "vtkContextView.h"
 #include "vtkSMContextViewProxy.h"
 #include "vtkSMXYChartViewProxy.h"
 #include "vtkChartXY.h"
-#include "vtkAnnotationLink.h"
-#include "vtkSelection.h"
-#include "vtkSelectionNode.h"
-#include "vtkAbstractArray.h"
-#include "vtkIdTypeArray.h"
-#include "vtkVariant.h"
 #include "vtkSMSourceProxy.h"
-#include "vtkSMStringVectorProperty.h"
-#include "vtkSMProxyManager.h"
-#include "vtkSMPropertyHelper.h"
-
-#include "vtkCommand.h"
 
 #include "QVTKWidget.h"
 
-#include <QList>
-#include <QVariant>
 #include <QDebug>
-
-// Command implementation
-class pqContextView::command : public vtkCommand
-{
-public:
-  static command* New(pqContextView &view)
-  {
-    return new command(view);
-  }
-
-  command(pqContextView &view) : Target(view) { }
-
-  virtual void Execute(vtkObject*, unsigned long, void*)
-  {
-    Target.selectionChanged();
-  }
-
-  pqContextView& Target;
-};
 
 //-----------------------------------------------------------------------------
 pqContextView::pqContextView(
@@ -97,14 +62,11 @@ pqContextView::pqContextView(
 : Superclass(type, group, name, viewProxy, server, parentObject)
 {
   viewProxy->GetID(); // this results in calling CreateVTKObjects().
-  this->Command = command::New(*this);
-  viewProxy->AddObserver(vtkCommand::SelectionChangedEvent, this->Command);
 }
 
 //-----------------------------------------------------------------------------
 pqContextView::~pqContextView()
 {
-  this->Command->Delete();
 }
 
 //-----------------------------------------------------------------------------
@@ -260,82 +222,3 @@ bool pqContextView::canDisplay(pqOutputPort* opPort) const
   return (dataInfo && dataInfo->DataSetTypeIsA("vtkTable"));
 }
 
-void pqContextView::selectionChanged()
-{
-  // Get the representation's source
-  pqDataRepresentation* pqRepr = 0;
-
-  for (int i = 0; i < this->getNumberOfRepresentations(); ++i)
-    {
-    if (this->getRepresentation(i)->isVisible())
-      {
-      pqRepr = qobject_cast<pqDataRepresentation*>(this->getRepresentation(i));
-      }
-    }
-
-  if (!pqRepr)
-    {
-    return;
-    }
-
-  pqOutputPort* opPort = pqRepr->getOutputPortFromInput();
-  vtkSMSourceProxy* repSource = vtkSMSourceProxy::SafeDownCast(
-    opPort->getSource()->getProxy());
-  vtkSMSourceProxy* selectionSource = opPort->getSelectionInput();
-
-  if (!selectionSource)
-    {
-    vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
-    selectionSource =
-      vtkSMSourceProxy::SafeDownCast(pxm->NewProxy("sources", "IDSelectionSource"));
-    selectionSource->SetConnectionID(pqRepr->getServer()->GetConnectionID());
-    selectionSource->SetServers(vtkProcessModule::DATA_SERVER);
-    vtkSMPropertyHelper(selectionSource, "FieldType").Set(vtkSelectionNode::POINT);
-    selectionSource->UpdateVTKObjects();
-    }
-  else
-    {
-    selectionSource->Register(repSource);
-    }
-
-  // Fill the selection source with the selection from the view
-  vtkSelection* sel = this->getContextViewProxy()->GetChart()
-                      ->GetAnnotationLink()->GetCurrentSelection();
-
-  // Fill the selection source with the selection
-  vtkSMVectorProperty* vp = vtkSMVectorProperty::SafeDownCast(
-    selectionSource->GetProperty("IDs"));
-  QList<QVariant> ids = pqSMAdaptor::getMultipleElementProperty(vp);
-  int numElemsPerCommand = vp->GetNumberOfElementsPerCommand();
-
-  vtkSelectionNode* node = 0;
-
-  if (sel->GetNumberOfNodes())
-    {
-    node = sel->GetNode(0);
-    }
-  else
-    {
-    node = vtkSelectionNode::New();
-    sel->AddNode(node);
-    node->Delete();
-    }
-
-  vtkIdTypeArray *arr = vtkIdTypeArray::SafeDownCast(node->GetSelectionList());
-  ids.clear();
-  for (vtkIdType i = 0; i < arr->GetNumberOfTuples(); ++i)
-    {
-    ids.push_back(-1);
-    ids.push_back(arr->GetValue(i));
-    }
-
-  pqSMAdaptor::setMultipleElementProperty(vp, ids);
-  selectionSource->UpdateVTKObjects();
-
-  // Set the selection on the representation's source
-  repSource->CleanSelectionInputs(opPort->getPortNumber());
-  repSource->SetSelectionInput(opPort->getPortNumber(), selectionSource, 0);
-  selectionSource->Delete();
-
-  emit this->selected(opPort);
-}
