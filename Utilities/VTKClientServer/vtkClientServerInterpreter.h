@@ -61,7 +61,7 @@ class VTK_CLIENT_SERVER_EXPORT vtkClientServerInterpreter : public vtkObject
 {
 public:
   static vtkClientServerInterpreter* New();
-  vtkTypeRevisionMacro(vtkClientServerInterpreter, vtkObject);
+  vtkTypeMacro(vtkClientServerInterpreter, vtkObject);
 
   // Description:
   // Process all messages in a given vtkClientServerStream.  Return 1

@@ -22,7 +22,7 @@ class VTK_EXPORT vtkForceTime : public vtkTemporalDataSetAlgorithm
 {
 public :
   static vtkForceTime *New();
-  vtkTypeRevisionMacro(vtkForceTime, vtkTemporalDataSetAlgorithm);
+  vtkTypeMacro(vtkForceTime, vtkTemporalDataSetAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

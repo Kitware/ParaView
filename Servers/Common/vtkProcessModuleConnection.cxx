@@ -58,7 +58,6 @@ protected:
 
 };
 
-vtkCxxRevisionMacro(vtkProcessModuleConnection, "1.15");
 //-----------------------------------------------------------------------------
 vtkProcessModuleConnection::vtkProcessModuleConnection()
 {

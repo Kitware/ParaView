@@ -33,7 +33,7 @@ class VTK_EXPORT vtkSMFixedTypeDomain : public vtkSMDomain
 {
 public:
   static vtkSMFixedTypeDomain* New();
-  vtkTypeRevisionMacro(vtkSMFixedTypeDomain, vtkSMDomain);
+  vtkTypeMacro(vtkSMFixedTypeDomain, vtkSMDomain);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

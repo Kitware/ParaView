@@ -35,7 +35,7 @@
 class vtkSLACPlaneGlyphs : public vtkPolyDataAlgorithm
 {
 public:
-  vtkTypeRevisionMacro(vtkSLACPlaneGlyphs, vtkPolyDataAlgorithm);
+  vtkTypeMacro(vtkSLACPlaneGlyphs, vtkPolyDataAlgorithm);
   static vtkSLACPlaneGlyphs *New();
   virtual void PrintSelf(ostream &os, vtkIndent indent);
 

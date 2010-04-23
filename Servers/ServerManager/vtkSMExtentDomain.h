@@ -32,7 +32,7 @@ class VTK_EXPORT vtkSMExtentDomain : public vtkSMIntRangeDomain
 {
 public:
   static vtkSMExtentDomain* New();
-  vtkTypeRevisionMacro(vtkSMExtentDomain, vtkSMIntRangeDomain);
+  vtkTypeMacro(vtkSMExtentDomain, vtkSMIntRangeDomain);
   void PrintSelf(ostream& os, vtkIndent indent);
   
   // Description:

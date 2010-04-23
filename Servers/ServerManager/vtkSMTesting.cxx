@@ -22,7 +22,6 @@
 #include "vtkTesting.h"
 
 vtkStandardNewMacro(vtkSMTesting);
-vtkCxxRevisionMacro(vtkSMTesting, "1.4");
 vtkCxxSetObjectMacro(vtkSMTesting, RenderViewProxy, vtkSMRenderViewProxy);
 //-----------------------------------------------------------------------------
 vtkSMTesting::vtkSMTesting()

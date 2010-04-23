@@ -26,7 +26,7 @@ class VTK_EXPORT vtkPVHardwareSelector : public vtkHardwareSelector
 {
 public:
   static vtkPVHardwareSelector* New();
-  vtkTypeRevisionMacro(vtkPVHardwareSelector, vtkHardwareSelector);
+  vtkTypeMacro(vtkPVHardwareSelector, vtkHardwareSelector);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   void BeginSelection()

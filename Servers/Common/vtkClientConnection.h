@@ -27,7 +27,7 @@ class VTK_EXPORT vtkClientConnection : public vtkRemoteConnection
 {
 public:
   static vtkClientConnection* New();
-  vtkTypeRevisionMacro(vtkClientConnection, vtkRemoteConnection);
+  vtkTypeMacro(vtkClientConnection, vtkRemoteConnection);
   void PrintSelf(ostream &os, vtkIndent indent);
 
   // Description:

@@ -49,7 +49,6 @@ vtkznzlib.cxx (zipped or non-zipped library)
    use_compression==0 is no compression
    use_compression!=0 uses zlib (gzip) compression
 */
-vtkCxxRevisionMacro(vtkznzlib, "1.2");
 vtkStandardNewMacro(vtkznzlib);
 
 vtkznzlib::vtkznzlib()

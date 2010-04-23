@@ -159,7 +159,6 @@ public:
 
 
 vtkStandardNewMacro(vtkPVSelectionSource);
-vtkCxxRevisionMacro(vtkPVSelectionSource, "1.10");
 //----------------------------------------------------------------------------
 vtkPVSelectionSource::vtkPVSelectionSource()
 {

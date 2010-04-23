@@ -45,7 +45,6 @@ static void vtkDesktopDeliveryClientReceiveImageCallback(vtkObject *,
 
 //-----------------------------------------------------------------------------
 
-vtkCxxRevisionMacro(vtkDesktopDeliveryClient, "1.27");
 vtkStandardNewMacro(vtkDesktopDeliveryClient);
 
 //----------------------------------------------------------------------------

@@ -20,7 +20,6 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVServerOptions);
-vtkCxxRevisionMacro(vtkPVServerOptions, "1.7");
 
 //----------------------------------------------------------------------------
 vtkPVServerOptions::vtkPVServerOptions()

@@ -25,7 +25,6 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMInputProperty);
-vtkCxxRevisionMacro(vtkSMInputProperty, "1.25");
 
 int vtkSMInputProperty::InputsUpdateImmediately = 1;
 

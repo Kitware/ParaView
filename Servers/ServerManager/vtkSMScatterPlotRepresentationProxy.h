@@ -29,7 +29,7 @@ class VTK_EXPORT vtkSMScatterPlotRepresentationProxy : public vtkSMDataRepresent
 {
 public:
   static vtkSMScatterPlotRepresentationProxy* New();
-  vtkTypeRevisionMacro(vtkSMScatterPlotRepresentationProxy, vtkSMDataRepresentationProxy);
+  vtkTypeMacro(vtkSMScatterPlotRepresentationProxy, vtkSMDataRepresentationProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   virtual void AddInput(unsigned int inputPort,

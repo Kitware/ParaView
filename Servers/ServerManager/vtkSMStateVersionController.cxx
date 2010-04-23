@@ -22,7 +22,6 @@
 #include "vtksys/ios/sstream"
 
 vtkStandardNewMacro(vtkSMStateVersionController);
-vtkCxxRevisionMacro(vtkSMStateVersionController, "1.16");
 //----------------------------------------------------------------------------
 vtkSMStateVersionController::vtkSMStateVersionController()
 {

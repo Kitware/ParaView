@@ -34,7 +34,7 @@ class VTK_EXPORT vtkCompositeDataToUnstructuredGridFilter :
 {
 public:
   static vtkCompositeDataToUnstructuredGridFilter* New();
-  vtkTypeRevisionMacro(vtkCompositeDataToUnstructuredGridFilter, 
+  vtkTypeMacro(vtkCompositeDataToUnstructuredGridFilter,
     vtkUnstructuredGridAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 

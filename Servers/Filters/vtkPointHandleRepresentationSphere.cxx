@@ -32,7 +32,6 @@
 #include "vtkSphereSource.h"
 #include "vtkWindow.h"
 
-vtkCxxRevisionMacro(vtkPointHandleRepresentationSphere, "1.4");
 vtkStandardNewMacro(vtkPointHandleRepresentationSphere);
 
 vtkCxxSetObjectMacro(vtkPointHandleRepresentationSphere,Property,vtkProperty);

@@ -34,7 +34,6 @@
 #include "vtkMPIMoveData.h"
 #include "vtkTimerLog.h"
 
-vtkCxxRevisionMacro(vtkAdaptiveUpdateSuppressor, "1.2");
 vtkStandardNewMacro(vtkAdaptiveUpdateSuppressor);
 
 #if 0

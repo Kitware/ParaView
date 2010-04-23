@@ -17,7 +17,6 @@
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro(vtkPVNullSource);
-vtkCxxRevisionMacro(vtkPVNullSource, "1.1");
 //----------------------------------------------------------------------------
 vtkPVNullSource::vtkPVNullSource()
 {

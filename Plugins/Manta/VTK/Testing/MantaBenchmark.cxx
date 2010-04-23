@@ -100,7 +100,7 @@ public:
     this->Timer->Delete();
   }
 
-  vtkTypeRevisionMacro(MyProcess, vtkProcess);
+  vtkTypeMacro(MyProcess, vtkProcess);
   
   virtual void Execute();
 
@@ -185,7 +185,6 @@ protected:
   vtkTimerLog *Timer;
 };
 
-vtkCxxRevisionMacro(MyProcess, "1.9");
 vtkStandardNewMacro(MyProcess);
 
 MyProcess::MyProcess()

@@ -32,7 +32,7 @@ class vtkMultiBlockDataSet;
 class VTK_EXPORT vtkPlotEdges : public vtkMultiBlockDataSetAlgorithm
 {
 public:
-  vtkTypeRevisionMacro(vtkPlotEdges, vtkMultiBlockDataSetAlgorithm);
+  vtkTypeMacro(vtkPlotEdges, vtkMultiBlockDataSetAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
   
   static vtkPlotEdges *New();

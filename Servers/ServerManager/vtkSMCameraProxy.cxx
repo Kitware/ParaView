@@ -20,7 +20,6 @@
 #include "vtkCamera.h"
 
 vtkStandardNewMacro(vtkSMCameraProxy);
-vtkCxxRevisionMacro(vtkSMCameraProxy, "1.5");
 //-----------------------------------------------------------------------------
 vtkSMCameraProxy::vtkSMCameraProxy()
 {

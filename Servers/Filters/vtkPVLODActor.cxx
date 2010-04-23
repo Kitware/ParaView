@@ -29,7 +29,6 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLODActor);
-vtkCxxRevisionMacro(vtkPVLODActor, "1.8");
 
 vtkCxxSetObjectMacro(vtkPVLODActor, LODMapper, vtkMapper);
 //----------------------------------------------------------------------------

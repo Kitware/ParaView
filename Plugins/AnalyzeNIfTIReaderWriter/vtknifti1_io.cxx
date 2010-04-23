@@ -396,7 +396,6 @@ static const nifti_type_ele nifti_type_list[] = {
 
 
 
-vtkCxxRevisionMacro(vtknifti1_io, "1.2");
 vtkStandardNewMacro(vtknifti1_io);
 
 vtknifti1_io::vtknifti1_io()

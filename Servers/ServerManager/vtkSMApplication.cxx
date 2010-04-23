@@ -56,7 +56,6 @@ struct vtkSMApplicationInternals
 };
 
 vtkStandardNewMacro(vtkSMApplication);
-vtkCxxRevisionMacro(vtkSMApplication, "1.24");
 
 //---------------------------------------------------------------------------
 vtkSMApplication::vtkSMApplication()

@@ -33,7 +33,7 @@ class VTK_EXPORT vtkSMProxySelectionModel : public vtkSMObject
 {
 public:
   static vtkSMProxySelectionModel*  New();
-  vtkTypeRevisionMacro(vtkSMProxySelectionModel,  vtkSMObject);
+  vtkTypeMacro(vtkSMProxySelectionModel,  vtkSMObject);
   void PrintSelf(ostream&  os,  vtkIndent  indent);
  
 //BTX

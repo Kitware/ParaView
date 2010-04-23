@@ -39,7 +39,7 @@ class vtkPVXMLElement;
 class VTK_EXPORT vtkProcessModuleConnection : public vtkObject
 {
 public:
-  vtkTypeRevisionMacro(vtkProcessModuleConnection, vtkObject);
+  vtkTypeMacro(vtkProcessModuleConnection, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 //BTX
   // Description:

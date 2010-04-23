@@ -21,7 +21,6 @@
 #include "vtkDataObject.h"
 
 vtkStandardNewMacro(vtkPVDataSizeInformation);
-vtkCxxRevisionMacro(vtkPVDataSizeInformation, "1.1");
 //----------------------------------------------------------------------------
 vtkPVDataSizeInformation::vtkPVDataSizeInformation()
 {

@@ -14,7 +14,6 @@
 =========================================================================*/
 #include "vtkCPVector3FieldFunction.h"
 
-vtkCxxRevisionMacro(vtkCPVector3FieldFunction, "1.1");
 
 //----------------------------------------------------------------------------
 vtkCPVector3FieldFunction::vtkCPVector3FieldFunction()

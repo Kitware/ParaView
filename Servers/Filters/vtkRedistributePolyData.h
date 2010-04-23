@@ -34,7 +34,7 @@ class vtkSocketController;
 class VTK_EXPORT vtkRedistributePolyData : public vtkPolyDataToPolyDataFilter 
 {
 public:
-  vtkTypeRevisionMacro(vtkRedistributePolyData, vtkPolyDataToPolyDataFilter);
+  vtkTypeMacro(vtkRedistributePolyData, vtkPolyDataToPolyDataFilter);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

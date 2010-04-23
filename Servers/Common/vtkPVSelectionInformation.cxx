@@ -26,7 +26,6 @@
 #include "vtksys/ios/sstream"
 
 vtkStandardNewMacro(vtkPVSelectionInformation);
-vtkCxxRevisionMacro(vtkPVSelectionInformation, "1.8");
 
 //----------------------------------------------------------------------------
 vtkPVSelectionInformation::vtkPVSelectionInformation()

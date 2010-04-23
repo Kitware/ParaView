@@ -31,7 +31,7 @@ class vtkMultiProcessController;
 class VTK_EXPORT vtkBalancedRedistributePolyData : public vtkWeightedRedistributePolyData
 {
 public:
-  vtkTypeRevisionMacro(vtkBalancedRedistributePolyData, vtkWeightedRedistributePolyData);
+  vtkTypeMacro(vtkBalancedRedistributePolyData, vtkWeightedRedistributePolyData);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

@@ -13,7 +13,6 @@
 =========================================================================*/
 #include "vtkKWProcessStatistics.h"
 
-vtkCxxRevisionMacro(vtkKWProcessStatistics, "1.9");
 
 #ifdef __linux
 #include <sys/procfs.h>

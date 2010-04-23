@@ -1,7 +1,6 @@
 #include "vtkPiece.h"
 #include "vtkObjectFactory.h"
 
-vtkCxxRevisionMacro(vtkPiece, "1.1");
 vtkStandardNewMacro(vtkPiece);
 
 //----------------------------------------------------------------------------

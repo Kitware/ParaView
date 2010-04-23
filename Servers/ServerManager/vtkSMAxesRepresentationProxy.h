@@ -31,7 +31,7 @@ class VTK_EXPORT vtkSMAxesRepresentationProxy :
 {
 public:
   static vtkSMAxesRepresentationProxy* New();
-  vtkTypeRevisionMacro(vtkSMAxesRepresentationProxy, vtkSMRepresentationProxy);
+  vtkTypeMacro(vtkSMAxesRepresentationProxy, vtkSMRepresentationProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
  
 //BTX

@@ -67,7 +67,6 @@ private:
 };
 
 vtkStandardNewMacro(vtkSMUndoStackBuilder);
-vtkCxxRevisionMacro(vtkSMUndoStackBuilder, "1.4");
 vtkCxxSetObjectMacro(vtkSMUndoStackBuilder, UndoStack, vtkSMUndoStack);
 //-----------------------------------------------------------------------------
 vtkSMUndoStackBuilder::vtkSMUndoStackBuilder()

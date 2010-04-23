@@ -28,7 +28,6 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMFieldDataDomain);
-vtkCxxRevisionMacro(vtkSMFieldDataDomain, "1.12");
 
 //---------------------------------------------------------------------------
 vtkSMFieldDataDomain::vtkSMFieldDataDomain()

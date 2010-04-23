@@ -30,7 +30,6 @@
 #include "vtkClientServerStream.h"
 
 vtkStandardNewMacro(vtkSMScatterPlotViewProxy);
-vtkCxxRevisionMacro(vtkSMScatterPlotViewProxy, "1.10");
 //----------------------------------------------------------------------------
 vtkSMScatterPlotViewProxy::vtkSMScatterPlotViewProxy()
 {

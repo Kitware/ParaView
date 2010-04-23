@@ -28,7 +28,7 @@ class VTK_EXPORT vtkPVBatchOptions : public vtkPVOptions
 {
 public:
   static vtkPVBatchOptions* New();
-  vtkTypeRevisionMacro(vtkPVBatchOptions,vtkPVOptions);
+  vtkTypeMacro(vtkPVBatchOptions,vtkPVOptions);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   vtkGetStringMacro(BatchScriptName);

@@ -29,7 +29,7 @@ class VTK_EXPORT vtkPVCustomTestDriver : public vtkCPTestDriver
 {
 public:
   static vtkPVCustomTestDriver * New();
-  vtkTypeRevisionMacro(vtkPVCustomTestDriver, vtkCPTestDriver);
+  vtkTypeMacro(vtkPVCustomTestDriver, vtkCPTestDriver);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

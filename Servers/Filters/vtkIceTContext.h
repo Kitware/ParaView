@@ -48,7 +48,7 @@ class vtkIceTContextOpaqueHandle;
 class VTK_EXPORT vtkIceTContext : public vtkObject
 {
 public:
-  vtkTypeRevisionMacro(vtkIceTContext, vtkObject);
+  vtkTypeMacro(vtkIceTContext, vtkObject);
   static vtkIceTContext *New();
   virtual void PrintSelf(ostream &os, vtkIndent indent);
 

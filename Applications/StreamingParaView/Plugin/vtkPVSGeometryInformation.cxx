@@ -21,7 +21,6 @@
 #include "vtkStreamingDemandDrivenPipeline.h"
 
 vtkStandardNewMacro(vtkPVSGeometryInformation);
-vtkCxxRevisionMacro(vtkPVSGeometryInformation, "1.1");
 
 //----------------------------------------------------------------------------
 vtkPVSGeometryInformation::vtkPVSGeometryInformation()

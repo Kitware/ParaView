@@ -24,7 +24,6 @@
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkSMTextSourceRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMTextSourceRepresentationProxy, "1.9");
 //----------------------------------------------------------------------------
 vtkSMTextSourceRepresentationProxy::vtkSMTextSourceRepresentationProxy()
 {

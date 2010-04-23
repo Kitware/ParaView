@@ -26,7 +26,7 @@ class VTK_EXPORT vtkSMImplicitPlaneRepresentationProxy : public vtkSMWidgetRepre
 {
 public:
   static vtkSMImplicitPlaneRepresentationProxy* New();
-  vtkTypeRevisionMacro(vtkSMImplicitPlaneRepresentationProxy, vtkSMWidgetRepresentationProxy);
+  vtkTypeMacro(vtkSMImplicitPlaneRepresentationProxy, vtkSMWidgetRepresentationProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
 protected:

@@ -50,7 +50,7 @@ class VTK_EXPORT vtkCellPointsFilter : public vtkPolyDataAlgorithm
   public:
     // Description:
     // Standard Type-Macro
-    vtkTypeRevisionMacro(vtkCellPointsFilter,vtkPolyDataAlgorithm);
+    vtkTypeMacro(vtkCellPointsFilter,vtkPolyDataAlgorithm);
 
     // Description:
     // Create an instance of vtkCellPointsFilter

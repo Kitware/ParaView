@@ -36,7 +36,7 @@ class VTK_EXPORT vtkNetworkImageSource : public vtkImageAlgorithm
 {
 public:
   static vtkNetworkImageSource* New();
-  vtkTypeRevisionMacro(vtkNetworkImageSource, vtkImageAlgorithm);
+  vtkTypeMacro(vtkNetworkImageSource, vtkImageAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

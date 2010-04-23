@@ -27,7 +27,7 @@ class VTK_EXPORT vtkSMIceTMultiDisplayRenderViewProxy :
 {
 public:
   static vtkSMIceTMultiDisplayRenderViewProxy* New();
-  vtkTypeRevisionMacro(vtkSMIceTMultiDisplayRenderViewProxy, 
+  vtkTypeMacro(vtkSMIceTMultiDisplayRenderViewProxy,
     vtkSMIceTDesktopRenderViewProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 

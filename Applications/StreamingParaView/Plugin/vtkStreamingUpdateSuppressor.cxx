@@ -32,7 +32,6 @@
 #include "vtkMultiProcessController.h"
 #include "vtkMPIMoveData.h"
 
-vtkCxxRevisionMacro(vtkStreamingUpdateSuppressor, "1.2");
 vtkStandardNewMacro(vtkStreamingUpdateSuppressor);
 
 #define DEBUGPRINT_EXECUTION(arg)\

@@ -23,7 +23,6 @@
 extern const char* vtkPVColorMaterialHelper_vs;
 
 vtkStandardNewMacro(vtkPVColorMaterialHelper);
-vtkCxxRevisionMacro(vtkPVColorMaterialHelper, "1.1");
 vtkCxxSetObjectMacro(vtkPVColorMaterialHelper, Shader, vtkShaderProgram2);
 //----------------------------------------------------------------------------
 vtkPVColorMaterialHelper::vtkPVColorMaterialHelper()

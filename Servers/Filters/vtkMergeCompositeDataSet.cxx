@@ -31,7 +31,6 @@
 #define VTK_CREATE(type, name) \
   vtkSmartPointer<type> name = vtkSmartPointer<type>::New()
 
-vtkCxxRevisionMacro(vtkMergeCompositeDataSet, "1.3");
 vtkStandardNewMacro(vtkMergeCompositeDataSet);
 
 //-----------------------------------------------------------------------------

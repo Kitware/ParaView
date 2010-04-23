@@ -37,7 +37,6 @@ class vtkKdTreeManager::vtkAlgorithmSet :
   public vtkstd::set<vtkSmartPointer<vtkAlgorithm> > {};
 
 vtkStandardNewMacro(vtkKdTreeManager);
-vtkCxxRevisionMacro(vtkKdTreeManager, "1.8");
 vtkCxxSetObjectMacro(vtkKdTreeManager, StructuredProducer, vtkAlgorithm);
 //----------------------------------------------------------------------------
 vtkKdTreeManager::vtkKdTreeManager()

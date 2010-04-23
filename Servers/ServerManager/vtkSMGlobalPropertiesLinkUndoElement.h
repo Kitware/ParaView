@@ -27,7 +27,7 @@ class VTK_EXPORT vtkSMGlobalPropertiesLinkUndoElement : public vtkSMUndoElement
 {
 public:
   static vtkSMGlobalPropertiesLinkUndoElement* New();
-  vtkTypeRevisionMacro(vtkSMGlobalPropertiesLinkUndoElement, vtkSMUndoElement);
+  vtkTypeMacro(vtkSMGlobalPropertiesLinkUndoElement, vtkSMUndoElement);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

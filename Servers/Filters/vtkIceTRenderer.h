@@ -32,7 +32,7 @@ class VTK_EXPORT vtkIceTRenderer : public vtkOpenGLRenderer
 {
 public:
   static vtkIceTRenderer *New();
-  vtkTypeRevisionMacro(vtkIceTRenderer, vtkOpenGLRenderer);
+  vtkTypeMacro(vtkIceTRenderer, vtkOpenGLRenderer);
   virtual void PrintSelf(ostream &os, vtkIndent indent);
 
   // Description:

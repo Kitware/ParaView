@@ -21,7 +21,6 @@
 #include "vtkRenderer.h"
 #include "vtkMath.h"
 
-vtkCxxRevisionMacro(vtkTrackballPan, "1.2");
 vtkStandardNewMacro(vtkTrackballPan);
 
 //-------------------------------------------------------------------------

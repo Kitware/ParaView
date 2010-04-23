@@ -32,7 +32,7 @@ class VTK_EXPORT vtkMergeArrays : public vtkDataSetAlgorithm
 public:
   static vtkMergeArrays *New();
 
-  vtkTypeRevisionMacro(vtkMergeArrays,vtkDataSetAlgorithm);
+  vtkTypeMacro(vtkMergeArrays,vtkDataSetAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
 protected:

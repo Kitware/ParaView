@@ -59,7 +59,7 @@ class VTK_EXPORT vtkFileSeriesReader : public vtkDataObjectAlgorithm
 {
 public:
   static vtkFileSeriesReader* New();
-  vtkTypeRevisionMacro(vtkFileSeriesReader, vtkDataObjectAlgorithm);
+  vtkTypeMacro(vtkFileSeriesReader, vtkDataObjectAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

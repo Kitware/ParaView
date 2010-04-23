@@ -24,7 +24,6 @@
 #include <math.h>
 
 vtkStandardNewMacro(vtkSMCSVExporterProxy);
-vtkCxxRevisionMacro(vtkSMCSVExporterProxy, "1.3");
 //----------------------------------------------------------------------------
 vtkSMCSVExporterProxy::vtkSMCSVExporterProxy()
 {

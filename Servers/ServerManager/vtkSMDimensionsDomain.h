@@ -35,7 +35,7 @@ class VTK_EXPORT vtkSMDimensionsDomain : public vtkSMIntRangeDomain
 {
 public:
   static vtkSMDimensionsDomain* New();
-  vtkTypeRevisionMacro(vtkSMDimensionsDomain, vtkSMIntRangeDomain);
+  vtkTypeMacro(vtkSMDimensionsDomain, vtkSMIntRangeDomain);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

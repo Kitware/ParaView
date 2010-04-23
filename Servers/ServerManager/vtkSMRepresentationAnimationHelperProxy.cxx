@@ -19,7 +19,6 @@
 #include "vtkSMPropertyHelper.h"
 
 vtkStandardNewMacro(vtkSMRepresentationAnimationHelperProxy);
-vtkCxxRevisionMacro(vtkSMRepresentationAnimationHelperProxy, "1.1");
 //----------------------------------------------------------------------------
 vtkSMRepresentationAnimationHelperProxy::vtkSMRepresentationAnimationHelperProxy()
 {

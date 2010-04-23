@@ -41,7 +41,7 @@ class VTK_EXPORT vtkScatterPlotPainter: public vtkPainter
 {
 public:
   static vtkScatterPlotPainter* New();
-  vtkTypeRevisionMacro(vtkScatterPlotPainter, vtkPainter);
+  vtkTypeMacro(vtkScatterPlotPainter, vtkPainter);
   void PrintSelf(ostream& os, vtkIndent indent);
   virtual unsigned long GetMTime();
 

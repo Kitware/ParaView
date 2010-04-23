@@ -24,7 +24,6 @@
 #include <vtkstd/algorithm>
 
 vtkStandardNewMacro(vtkSMPQStateLoader);
-vtkCxxRevisionMacro(vtkSMPQStateLoader, "1.30");
 
 struct vtkSMPQStateLoaderInternals
 {

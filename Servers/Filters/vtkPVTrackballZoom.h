@@ -27,7 +27,7 @@ class VTK_EXPORT vtkPVTrackballZoom : public vtkCameraManipulator
 {
 public:
   static vtkPVTrackballZoom *New();
-  vtkTypeRevisionMacro(vtkPVTrackballZoom, vtkCameraManipulator);
+  vtkTypeMacro(vtkPVTrackballZoom, vtkCameraManipulator);
   void PrintSelf(ostream& os, vtkIndent indent);
   
   // Description:

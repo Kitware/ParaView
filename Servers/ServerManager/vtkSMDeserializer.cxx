@@ -22,7 +22,6 @@
 #include "vtkSMProxyManager.h"
 
 vtkStandardNewMacro(vtkSMDeserializer);
-vtkCxxRevisionMacro(vtkSMDeserializer, "1.1");
 //----------------------------------------------------------------------------
 vtkSMDeserializer::vtkSMDeserializer()
 {

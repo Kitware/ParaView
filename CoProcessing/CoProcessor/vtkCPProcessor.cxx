@@ -32,7 +32,6 @@ struct vtkCPProcessorInternals
   PipelineSet Pipelines;
 };
 
-vtkCxxRevisionMacro(vtkCPProcessor, "1.1");
 vtkStandardNewMacro(vtkCPProcessor);
 
 //----------------------------------------------------------------------------

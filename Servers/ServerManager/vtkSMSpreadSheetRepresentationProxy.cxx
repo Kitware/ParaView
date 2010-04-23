@@ -28,7 +28,6 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMSpreadSheetRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMSpreadSheetRepresentationProxy, "1.10");
 //----------------------------------------------------------------------------
 vtkSMSpreadSheetRepresentationProxy::vtkSMSpreadSheetRepresentationProxy()
 {

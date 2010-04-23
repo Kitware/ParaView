@@ -20,7 +20,6 @@
 #include "vtkObjectFactory.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 
-vtkCxxRevisionMacro(vtkForceTime, "1.1");
 vtkStandardNewMacro(vtkForceTime);
 
 //----------------------------------------------------------------------------

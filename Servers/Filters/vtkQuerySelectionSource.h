@@ -33,7 +33,7 @@ class VTK_EXPORT vtkQuerySelectionSource : public vtkSelectionAlgorithm
 {
 public:
   static vtkQuerySelectionSource* New();
-  vtkTypeRevisionMacro(vtkQuerySelectionSource, vtkSelectionAlgorithm);
+  vtkTypeMacro(vtkQuerySelectionSource, vtkSelectionAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   //BTX

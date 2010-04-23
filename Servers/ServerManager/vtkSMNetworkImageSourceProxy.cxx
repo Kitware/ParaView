@@ -20,7 +20,6 @@
 #include <vtksys/SystemTools.hxx>
 
 vtkStandardNewMacro(vtkSMNetworkImageSourceProxy);
-vtkCxxRevisionMacro(vtkSMNetworkImageSourceProxy, "1.8");
 //----------------------------------------------------------------------------
 vtkSMNetworkImageSourceProxy::vtkSMNetworkImageSourceProxy()
 {

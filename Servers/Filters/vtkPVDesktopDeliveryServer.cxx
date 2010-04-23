@@ -59,7 +59,6 @@ public:
 
 //-----------------------------------------------------------------------------
 
-vtkCxxRevisionMacro(vtkPVDesktopDeliveryServer, "1.16");
 vtkStandardNewMacro(vtkPVDesktopDeliveryServer);
 
 //----------------------------------------------------------------------------

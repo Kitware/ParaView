@@ -31,7 +31,7 @@ class VTK_EXPORT vtkSMSelectionHelper : public vtkSMObject
 {
 public:
   static vtkSMSelectionHelper* New();
-  vtkTypeRevisionMacro(vtkSMSelectionHelper, vtkSMObject);
+  vtkTypeMacro(vtkSMSelectionHelper, vtkSMObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

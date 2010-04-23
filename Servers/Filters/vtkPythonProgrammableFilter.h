@@ -51,7 +51,7 @@ class vtkPythonProgrammableFilterImplementation;
 class VTK_EXPORT vtkPythonProgrammableFilter : public vtkProgrammableFilter
 {
 public:
-  vtkTypeRevisionMacro(vtkPythonProgrammableFilter,vtkProgrammableFilter);
+  vtkTypeMacro(vtkPythonProgrammableFilter,vtkProgrammableFilter);
   void PrintSelf(ostream& os, vtkIndent indent);
   static vtkPythonProgrammableFilter *New();
 

@@ -44,7 +44,7 @@ class VTK_EXPORT vtkPointSpriteProperty : public vtkOpenGLProperty
 {
 public :
   static vtkPointSpriteProperty* New();
-  vtkTypeRevisionMacro(vtkPointSpriteProperty, vtkOpenGLProperty);
+  vtkTypeMacro(vtkPointSpriteProperty, vtkOpenGLProperty);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

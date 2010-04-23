@@ -53,7 +53,6 @@ protected:
 };
 
 
-vtkCxxRevisionMacro(vtkSMDataRepresentationProxy, "1.13");
 vtkCxxSetObjectMacro(vtkSMDataRepresentationProxy, InputProxy, vtkSMSourceProxy);
 //----------------------------------------------------------------------------
 vtkSMDataRepresentationProxy::vtkSMDataRepresentationProxy()

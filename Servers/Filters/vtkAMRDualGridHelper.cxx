@@ -24,7 +24,6 @@
 #include "vtkUnsignedCharArray.h"
 #include "vtkstd/vector"
 
-vtkCxxRevisionMacro(vtkAMRDualGridHelper, "1.8");
 vtkStandardNewMacro(vtkAMRDualGridHelper);
 
 class vtkAMRDualGridHelperSeed;

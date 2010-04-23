@@ -26,7 +26,7 @@ class VTK_EXPORT vtkSMCameraProxy : public vtkSMProxy
 {
 public:
   static vtkSMCameraProxy* New();
-  vtkTypeRevisionMacro(vtkSMCameraProxy, vtkSMProxy);
+  vtkTypeMacro(vtkSMCameraProxy, vtkSMProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

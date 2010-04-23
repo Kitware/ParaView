@@ -57,7 +57,6 @@
 #include <vtkstd/string>
 #include <assert.h>
 
-vtkCxxRevisionMacro(vtkScatterPlotPainter, "1.8");
 vtkStandardNewMacro(vtkScatterPlotPainter);
 
 vtkInformationKeyMacro(vtkScatterPlotPainter, THREED_MODE, Integer);

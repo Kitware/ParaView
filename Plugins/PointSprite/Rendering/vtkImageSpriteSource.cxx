@@ -37,7 +37,6 @@
 
 #include <math.h>
 
-vtkCxxRevisionMacro(vtkImageSpriteSource, "1.1")
 ;
 vtkStandardNewMacro(vtkImageSpriteSource)
 ;

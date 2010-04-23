@@ -23,7 +23,6 @@
 #include "vtkStreamingDemandDrivenPipeline.h"
 
 vtkStandardNewMacro(vtkPVImageSlicer);
-vtkCxxRevisionMacro(vtkPVImageSlicer, "1.7");
 //----------------------------------------------------------------------------
 vtkPVImageSlicer::vtkPVImageSlicer()
 {

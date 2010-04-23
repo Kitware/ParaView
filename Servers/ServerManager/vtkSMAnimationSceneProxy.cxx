@@ -119,7 +119,6 @@ private:
 
 
 vtkStandardNewMacro(vtkSMAnimationSceneProxy);
-vtkCxxRevisionMacro(vtkSMAnimationSceneProxy, "1.59");
 //----------------------------------------------------------------------------
 vtkSMAnimationSceneProxy::vtkSMAnimationSceneProxy()
 {

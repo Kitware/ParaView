@@ -45,7 +45,7 @@
 
 class Segment: public vtkObject
 {
-  vtkTypeRevisionMacro(Segment,vtkObject);
+  vtkTypeMacro(Segment,vtkObject);
   static Segment *New();
   virtual void PrintSelf(ostream& os, vtkIndent indent);
   
@@ -98,7 +98,7 @@ private:
 
 class Node : public vtkObject
 {
-  vtkTypeRevisionMacro(Node, vtkObject);
+  vtkTypeMacro(Node, vtkObject);
   static Node *New();
 
   vtkSetObjectMacro(PolyData, vtkPolyData);
@@ -126,7 +126,6 @@ private:
 };
 
 
-vtkCxxRevisionMacro(Segment, "1.8");
 vtkStandardNewMacro(Segment);
 
 Segment::Segment()
@@ -473,7 +472,6 @@ void Segment::InsertSegment(vtkIdType pos, Segment* segment)
   //cerr << __FUNCTION__ << "end." << endl;
 }
 
-vtkCxxRevisionMacro(Node, "1.8");
 vtkStandardNewMacro(Node);
 
 Node::Node()
@@ -555,7 +553,6 @@ double Node::ComputeConnectionScore(Segment* segment1, Segment* segment2)
   return angleScore * pointFrequencyScore * penaltyScore;
 }
 
-vtkCxxRevisionMacro(vtkPlotEdges, "1.8");
 vtkStandardNewMacro(vtkPlotEdges);
 
 // Construct object with MaximumLength set to 1000.

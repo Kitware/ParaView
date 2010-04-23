@@ -30,7 +30,7 @@ class VTK_EXPORT vtkSMPropertyModificationUndoElement : public vtkSMUndoElement
 {
 public:
   static vtkSMPropertyModificationUndoElement* New();
-  vtkTypeRevisionMacro(vtkSMPropertyModificationUndoElement, vtkSMUndoElement);
+  vtkTypeMacro(vtkSMPropertyModificationUndoElement, vtkSMUndoElement);
   void PrintSelf(ostream& os, vtkIndent indent);
   
   // Description:

@@ -38,7 +38,7 @@ class vtkDataSetAttributes;
 class VTK_EXPORT vtkPVArrayCalculator : public vtkArrayCalculator
 {
 public:
-  vtkTypeRevisionMacro( vtkPVArrayCalculator,vtkArrayCalculator );
+  vtkTypeMacro( vtkPVArrayCalculator,vtkArrayCalculator );
   void   PrintSelf( ostream & os, vtkIndent indent );
 
   static vtkPVArrayCalculator * New();

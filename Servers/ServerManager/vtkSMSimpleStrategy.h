@@ -25,7 +25,7 @@ class VTK_EXPORT vtkSMSimpleStrategy : public vtkSMRepresentationStrategy
 {
 public:
   static vtkSMSimpleStrategy* New();
-  vtkTypeRevisionMacro(vtkSMSimpleStrategy, vtkSMRepresentationStrategy);
+  vtkTypeMacro(vtkSMSimpleStrategy, vtkSMRepresentationStrategy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

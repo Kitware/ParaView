@@ -33,7 +33,7 @@ class vtkAnalyzeWriter : public vtkImageWriter
 {
 public:
   static vtkAnalyzeWriter *New();
-  vtkTypeRevisionMacro(vtkAnalyzeWriter,vtkImageWriter);
+  vtkTypeMacro(vtkAnalyzeWriter,vtkImageWriter);
   void PrintSelf(ostream& os, vtkIndent indent);
  
   void SetFileType(int inValue);

@@ -30,7 +30,7 @@ class VTK_EXPORT vtkSMBooleanDomain : public vtkSMDomain
 {
 public:
   static vtkSMBooleanDomain* New();
-  vtkTypeRevisionMacro(vtkSMBooleanDomain, vtkSMDomain);
+  vtkTypeMacro(vtkSMBooleanDomain, vtkSMDomain);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

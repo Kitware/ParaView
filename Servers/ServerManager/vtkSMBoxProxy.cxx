@@ -23,7 +23,6 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMBoxProxy);
-vtkCxxRevisionMacro(vtkSMBoxProxy, "1.4");
 
 //----------------------------------------------------------------------------
 vtkSMBoxProxy::vtkSMBoxProxy()

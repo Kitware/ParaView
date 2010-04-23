@@ -42,7 +42,6 @@ public:
 };
 
 vtkStandardNewMacro(vtkPVCacheKeeper);
-vtkCxxRevisionMacro(vtkPVCacheKeeper, "1.3");
 vtkCxxSetObjectMacro(vtkPVCacheKeeper, CacheSizeKeeper, vtkCacheSizeKeeper);
 //----------------------------------------------------------------------------
 vtkPVCacheKeeper::vtkPVCacheKeeper()

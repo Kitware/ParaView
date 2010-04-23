@@ -58,7 +58,6 @@ static void RenderRMI(void *arg, void *, int, int)
 }
 
 
-vtkCxxRevisionMacro(vtkPVClientServerRenderManager, "1.2");
 //----------------------------------------------------------------------------
 vtkPVClientServerRenderManager::vtkPVClientServerRenderManager()
 {

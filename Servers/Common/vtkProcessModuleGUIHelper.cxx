@@ -16,7 +16,6 @@
 #include "vtkProcessModule.h"
 #include "vtkPVOptions.h"
 
-vtkCxxRevisionMacro(vtkProcessModuleGUIHelper, "1.4");
 //-----------------------------------------------------------------------------
 vtkProcessModuleGUIHelper::vtkProcessModuleGUIHelper()
 {

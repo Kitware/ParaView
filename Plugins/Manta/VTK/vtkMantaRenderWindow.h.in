@@ -80,7 +80,7 @@ class vtkMantaRenderWindow : public @RenderWindowType@
 {
 public:
   static vtkMantaRenderWindow *New();
-  vtkTypeRevisionMacro(vtkMantaRenderWindow, @RenderWindowType@);
+  vtkTypeMacro(vtkMantaRenderWindow, @RenderWindowType@);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   //Description:

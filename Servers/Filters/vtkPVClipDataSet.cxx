@@ -16,7 +16,6 @@
 
 #include "vtkObjectFactory.h"
 
-vtkCxxRevisionMacro(vtkPVClipDataSet, "1.6");
 vtkStandardNewMacro(vtkPVClipDataSet);
 
 //----------------------------------------------------------------------------

@@ -27,7 +27,7 @@ class VTK_EXPORT vtkSMUtilities : public vtkSMObject
 {
 public:
   static vtkSMUtilities* New();
-  vtkTypeRevisionMacro(vtkSMUtilities, vtkSMObject);
+  vtkTypeMacro(vtkSMUtilities, vtkSMObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

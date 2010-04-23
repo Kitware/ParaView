@@ -28,7 +28,7 @@ class VTK_EXPORT vtkPVEnSightMasterServerReader : public vtkGenericEnSightReader
 {
 public:
   static vtkPVEnSightMasterServerReader* New();
-  vtkTypeRevisionMacro(vtkPVEnSightMasterServerReader, vtkGenericEnSightReader);
+  vtkTypeMacro(vtkPVEnSightMasterServerReader, vtkGenericEnSightReader);
   void PrintSelf(ostream& os, vtkIndent indent);
   
   // Description:

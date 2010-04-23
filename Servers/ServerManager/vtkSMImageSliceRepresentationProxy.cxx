@@ -25,7 +25,6 @@
 #include "vtkSMViewProxy.h"
 
 vtkStandardNewMacro(vtkSMImageSliceRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMImageSliceRepresentationProxy, "1.4");
 //-----------------------------------------------------------------------------
 vtkSMImageSliceRepresentationProxy::vtkSMImageSliceRepresentationProxy()
 {

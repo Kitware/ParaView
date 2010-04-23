@@ -19,7 +19,6 @@
 #include "vtkPVXMLElement.h"
 #include "vtkSMProxyLocator.h"
 
-vtkCxxRevisionMacro(vtkSMUndoElement, "1.5");
 vtkCxxSetObjectMacro(vtkSMUndoElement, XMLElement, vtkPVXMLElement);
 vtkCxxSetObjectMacro(vtkSMUndoElement, ProxyLocator, vtkSMProxyLocator);
 //-----------------------------------------------------------------------------

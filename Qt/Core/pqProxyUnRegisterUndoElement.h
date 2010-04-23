@@ -39,7 +39,7 @@ class PQCORE_EXPORT pqProxyUnRegisterUndoElement : public vtkSMProxyUnRegisterUn
 {
 public:
   static pqProxyUnRegisterUndoElement* New();
-  vtkTypeRevisionMacro(pqProxyUnRegisterUndoElement, vtkSMProxyUnRegisterUndoElement);
+  vtkTypeMacro(pqProxyUnRegisterUndoElement, vtkSMProxyUnRegisterUndoElement);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

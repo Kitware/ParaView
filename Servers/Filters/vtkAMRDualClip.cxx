@@ -49,7 +49,6 @@
 #include <ctime>
 
 
-vtkCxxRevisionMacro(vtkAMRDualClip, "1.9");
 vtkStandardNewMacro(vtkAMRDualClip);
 
 

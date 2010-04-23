@@ -42,7 +42,7 @@ class VTK_EXPORT vtkPVGeometryFilter : public vtkPolyDataAlgorithm
 {
 public:
   static vtkPVGeometryFilter *New();
-  vtkTypeRevisionMacro(vtkPVGeometryFilter,vtkPolyDataAlgorithm);
+  vtkTypeMacro(vtkPVGeometryFilter,vtkPolyDataAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

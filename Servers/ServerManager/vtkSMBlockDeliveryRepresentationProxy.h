@@ -31,7 +31,7 @@ class VTK_EXPORT vtkSMBlockDeliveryRepresentationProxy :
 {
 public:
   static vtkSMBlockDeliveryRepresentationProxy* New();
-  vtkTypeRevisionMacro(vtkSMBlockDeliveryRepresentationProxy, 
+  vtkTypeMacro(vtkSMBlockDeliveryRepresentationProxy,
     vtkSMDataRepresentationProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 

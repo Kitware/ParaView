@@ -32,7 +32,7 @@ class VTK_EXPORT vtkSMScalarBarWidgetRepresentationProxy :
 {
 public:
   static vtkSMScalarBarWidgetRepresentationProxy* New();
-  vtkTypeRevisionMacro(vtkSMScalarBarWidgetRepresentationProxy,
+  vtkTypeMacro(vtkSMScalarBarWidgetRepresentationProxy,
                        vtkSMNewWidgetRepresentationProxy);
   virtual void PrintSelf(ostream& os, vtkIndent indent);
 

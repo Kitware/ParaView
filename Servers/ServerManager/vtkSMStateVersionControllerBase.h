@@ -30,7 +30,7 @@ class vtkPVXMLElement;
 class VTK_EXPORT vtkSMStateVersionControllerBase : public vtkSMObject
 {
 public:
-  vtkTypeRevisionMacro(vtkSMStateVersionControllerBase, vtkSMObject);
+  vtkTypeMacro(vtkSMStateVersionControllerBase, vtkSMObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

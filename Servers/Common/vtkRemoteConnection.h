@@ -30,7 +30,7 @@ class vtkSocketController;
 class VTK_EXPORT vtkRemoteConnection : public vtkProcessModuleConnection
 {
 public:
-  vtkTypeRevisionMacro(vtkRemoteConnection, vtkProcessModuleConnection);
+  vtkTypeMacro(vtkRemoteConnection, vtkProcessModuleConnection);
   void PrintSelf(ostream& os, vtkIndent indent);
 //BTX
   enum

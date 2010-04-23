@@ -31,7 +31,7 @@ class VTK_EXPORT vtkSMAnimationSceneGeometryWriter : public vtkSMAnimationSceneW
 {
 public:
   static vtkSMAnimationSceneGeometryWriter* New();
-  vtkTypeRevisionMacro(vtkSMAnimationSceneGeometryWriter, 
+  vtkTypeMacro(vtkSMAnimationSceneGeometryWriter,
     vtkSMAnimationSceneWriter);
   void PrintSelf(ostream& os, vtkIndent indent);
 

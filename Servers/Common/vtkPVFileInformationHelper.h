@@ -31,7 +31,7 @@ class VTK_EXPORT vtkPVFileInformationHelper : public vtkObject
 {
 public:
   static vtkPVFileInformationHelper* New();
-  vtkTypeRevisionMacro(vtkPVFileInformationHelper, vtkObject);
+  vtkTypeMacro(vtkPVFileInformationHelper, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

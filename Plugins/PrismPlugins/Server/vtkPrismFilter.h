@@ -21,7 +21,7 @@ class vtkDoubleArray;
 class VTK_EXPORT vtkPrismFilter : public vtkMultiBlockDataSetAlgorithm 
 {
 public:
-  vtkTypeRevisionMacro(vtkPrismFilter,vtkMultiBlockDataSetAlgorithm);
+  vtkTypeMacro(vtkPrismFilter,vtkMultiBlockDataSetAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   static vtkPrismFilter *New();

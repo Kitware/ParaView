@@ -30,7 +30,7 @@ class VTK_EXPORT vtkSMDocumentation : public vtkSMObject
 {
 public:
   static vtkSMDocumentation* New();
-  vtkTypeRevisionMacro(vtkSMDocumentation, vtkSMObject);
+  vtkTypeMacro(vtkSMDocumentation, vtkSMObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

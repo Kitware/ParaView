@@ -27,7 +27,7 @@ class VTK_EXPORT vtkSMClientServerRenderViewProxy : public vtkSMMultiProcessRend
 {
 public:
   static vtkSMClientServerRenderViewProxy* New();
-  vtkTypeRevisionMacro(vtkSMClientServerRenderViewProxy, vtkSMMultiProcessRenderView);
+  vtkTypeMacro(vtkSMClientServerRenderViewProxy, vtkSMMultiProcessRenderView);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

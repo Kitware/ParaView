@@ -40,7 +40,6 @@
 # define vtkMyDebug(x)
 #endif
 
-vtkCxxRevisionMacro(vtkPVUpdateSuppressor, "1.63");
 vtkStandardNewMacro(vtkPVUpdateSuppressor);
 //----------------------------------------------------------------------------
 vtkPVUpdateSuppressor::vtkPVUpdateSuppressor()

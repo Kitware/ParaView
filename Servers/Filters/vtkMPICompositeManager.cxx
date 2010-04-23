@@ -20,7 +20,6 @@
 #include "vtkMultiProcessController.h"
 #include "vtkRenderWindow.h"
 vtkStandardNewMacro(vtkMPICompositeManager);
-vtkCxxRevisionMacro(vtkMPICompositeManager, "1.6");
 
 //-----------------------------------------------------------------------------
 static void vtkMPICompositeManagerGatherZBufferValueRMI(void *local, void *pArg, 

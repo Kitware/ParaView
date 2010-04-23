@@ -25,7 +25,7 @@ class vtkPVAnimationScene;
 class VTK_EXPORT vtkAnimationPlayer : public vtkObject
 {
 public:
-  vtkTypeRevisionMacro(vtkAnimationPlayer, vtkObject);
+  vtkTypeMacro(vtkAnimationPlayer, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

@@ -45,7 +45,7 @@ class vtkSMPointSpriteRepresentationProxy :
 {
 public:
   static vtkSMPointSpriteRepresentationProxy* New();
-  vtkTypeRevisionMacro(vtkSMPointSpriteRepresentationProxy, vtkSMSurfaceRepresentationProxy);
+  vtkTypeMacro(vtkSMPointSpriteRepresentationProxy, vtkSMSurfaceRepresentationProxy);
 
   bool BeginCreateVTKObjects();
   bool EndCreateVTKObjects();

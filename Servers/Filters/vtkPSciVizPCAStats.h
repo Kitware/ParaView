@@ -49,7 +49,7 @@ class VTK_EXPORT vtkPSciVizPCAStats : public vtkSciVizStatistics
 {
 public:
   static vtkPSciVizPCAStats* New();
-  vtkTypeRevisionMacro(vtkPSciVizPCAStats,vtkSciVizStatistics);
+  vtkTypeMacro(vtkPSciVizPCAStats,vtkSciVizStatistics);
   virtual void PrintSelf( ostream& os, vtkIndent indent );
 
   vtkSetMacro(NormalizationScheme,int);

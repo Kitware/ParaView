@@ -32,7 +32,7 @@ class VTK_EXPORT vtkVisibilityPrioritizer : public vtkPassInputTypeAlgorithm
 {
 public:
   static vtkVisibilityPrioritizer *New();
-  vtkTypeRevisionMacro(vtkVisibilityPrioritizer, vtkPassInputTypeAlgorithm);
+  vtkTypeMacro(vtkVisibilityPrioritizer, vtkPassInputTypeAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   void SetCameraState(double *EyeUpAt);

@@ -97,7 +97,7 @@ class VTK_EXPORT vtkSiloReader : public vtkMultiBlockDataSetAlgorithm
 {
 public:
   static vtkSiloReader *New();
-  vtkTypeRevisionMacro(vtkSiloReader, vtkMultiBlockDataSetAlgorithm);
+  vtkTypeMacro(vtkSiloReader, vtkMultiBlockDataSetAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
   void SetFileName(char *);
   vtkGetStringMacro(FileName);

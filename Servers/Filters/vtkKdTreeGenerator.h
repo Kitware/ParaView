@@ -53,7 +53,7 @@ class VTK_EXPORT vtkKdTreeGenerator : public vtkObject
 {
 public:
   static vtkKdTreeGenerator* New();
-  vtkTypeRevisionMacro(vtkKdTreeGenerator, vtkObject);
+  vtkTypeMacro(vtkKdTreeGenerator, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

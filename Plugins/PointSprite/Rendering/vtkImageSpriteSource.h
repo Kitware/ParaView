@@ -41,7 +41,7 @@ class VTK_EXPORT vtkImageSpriteSource : public vtkImageAlgorithm
 {
 public:
   static vtkImageSpriteSource *New();
-  vtkTypeRevisionMacro(vtkImageSpriteSource,vtkImageAlgorithm);
+  vtkTypeMacro(vtkImageSpriteSource,vtkImageAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

@@ -23,8 +23,6 @@
 #include "vtkRenderer.h"
 
 vtkStandardNewMacro(vtkPointSpriteCoincidentTopologyResolutionPainter);
-vtkCxxRevisionMacro(vtkPointSpriteCoincidentTopologyResolutionPainter,
-  "1.1");
 
 //-----------------------------------------------------------------------------
 vtkPointSpriteCoincidentTopologyResolutionPainter::

@@ -33,7 +33,6 @@
 #include <string>
 #include <vtkstd/vector>
 
-vtkCxxRevisionMacro(vtkRawStridedReader, "1.1");
 vtkStandardNewMacro(vtkRawStridedReader);
 
 #define DEBUGPRINT_STRIDED_READER_DETAILS(arg)\

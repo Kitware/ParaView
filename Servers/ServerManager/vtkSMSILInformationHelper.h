@@ -42,7 +42,7 @@ class VTK_EXPORT vtkSMSILInformationHelper : public vtkSMInformationHelper
 {
 public:
   static vtkSMSILInformationHelper* New();
-  vtkTypeRevisionMacro(vtkSMSILInformationHelper, vtkSMInformationHelper);
+  vtkTypeMacro(vtkSMSILInformationHelper, vtkSMInformationHelper);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   //BTX

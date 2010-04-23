@@ -28,7 +28,7 @@ class VTK_EXPORT vtkPVPythonOptions : public vtkPVOptions
 {
 public:
   static vtkPVPythonOptions* New();
-  vtkTypeRevisionMacro(vtkPVPythonOptions,vtkPVOptions);
+  vtkTypeMacro(vtkPVPythonOptions,vtkPVOptions);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

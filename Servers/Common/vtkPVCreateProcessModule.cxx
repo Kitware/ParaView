@@ -20,7 +20,6 @@
 #include "vtkToolkits.h" // For 
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkPVCreateProcessModule, "1.3");
 
 //----------------------------------------------------------------------------
 vtkProcessModule* vtkPVCreateProcessModule::CreateProcessModule(vtkPVOptions* op)

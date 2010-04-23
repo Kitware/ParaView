@@ -63,7 +63,7 @@ class vtkSMUndoStackUndoSet : public vtkUndoSet
 {
 public:
   static vtkSMUndoStackUndoSet* New();
-  vtkTypeRevisionMacro(vtkSMUndoStackUndoSet, vtkUndoSet);
+  vtkTypeMacro(vtkSMUndoStackUndoSet, vtkUndoSet);
  
   virtual int Undo() 
     {
@@ -188,11 +188,9 @@ private:
 };
 
 vtkStandardNewMacro(vtkSMUndoStackUndoSet);
-vtkCxxRevisionMacro(vtkSMUndoStackUndoSet, "1.18");
 //*****************************************************************************
 
 vtkStandardNewMacro(vtkSMUndoStack);
-vtkCxxRevisionMacro(vtkSMUndoStack, "1.18");
 vtkCxxSetObjectMacro(vtkSMUndoStack, StateLoader, vtkSMUndoRedoStateLoader);
 //-----------------------------------------------------------------------------
 vtkSMUndoStack::vtkSMUndoStack()

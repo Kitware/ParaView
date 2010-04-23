@@ -40,7 +40,7 @@ class PYTHONADAPTOR_EXPORT vtkPVPythonAdapterHelper : public vtkProcessModuleGUI
 {
 public: 
   static vtkPVPythonAdapterHelper* New();
-  vtkTypeRevisionMacro(vtkPVPythonAdapterHelper,vtkProcessModuleGUIHelper);
+  vtkTypeMacro(vtkPVPythonAdapterHelper,vtkProcessModuleGUIHelper);
   void PrintSelf(ostream& os, vtkIndent indent);
   // Description: 
   // run main gui loop from process module

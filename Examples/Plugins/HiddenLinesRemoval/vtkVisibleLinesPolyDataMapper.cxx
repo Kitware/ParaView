@@ -19,7 +19,6 @@
 #include "vtkDefaultPainter.h"
 
 vtkStandardNewMacro(vtkVisibleLinesPolyDataMapper);
-vtkCxxRevisionMacro(vtkVisibleLinesPolyDataMapper, "1.1");
 //----------------------------------------------------------------------------
 vtkVisibleLinesPolyDataMapper::vtkVisibleLinesPolyDataMapper()
 {

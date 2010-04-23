@@ -74,7 +74,6 @@ public:
 };
 
 vtkStandardNewMacro(vtkSMSILModel);
-vtkCxxRevisionMacro(vtkSMSILModel, "1.4");
 //-----------------------------------------------------------------------------
 vtkSMSILModel::vtkSMSILModel()
 {

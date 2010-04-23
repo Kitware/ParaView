@@ -75,7 +75,6 @@ static void vtkSMPluginManagerImportPlugin(vtkPVPlugin* plugin, void* calldata)
 
 //*****************************************************************************
 vtkStandardNewMacro(vtkSMPluginManager);
-vtkCxxRevisionMacro(vtkSMPluginManager, "1.11");
 //---------------------------------------------------------------------------
 vtkSMPluginManager::vtkSMPluginManager()
 {

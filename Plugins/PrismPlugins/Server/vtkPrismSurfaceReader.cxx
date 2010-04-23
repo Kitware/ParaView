@@ -35,7 +35,6 @@ Module:    vtkPrismSurfaceReader.cxx
 
 #include <math.h>
 
-vtkCxxRevisionMacro(vtkPrismSurfaceReader, "1.11");
 vtkStandardNewMacro(vtkPrismSurfaceReader);
 
 namespace
@@ -43,7 +42,7 @@ namespace
 class vtkSESAMEConversionFilter : public vtkPolyDataAlgorithm
 {
 public:
-  vtkTypeRevisionMacro(vtkSESAMEConversionFilter,vtkPolyDataAlgorithm);
+  vtkTypeMacro(vtkSESAMEConversionFilter,vtkPolyDataAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
@@ -66,7 +65,6 @@ private:
   void operator=(const vtkSESAMEConversionFilter&);  // Not implemented.
 };
 }
-vtkCxxRevisionMacro(vtkSESAMEConversionFilter, "1.11");
 vtkStandardNewMacro(vtkSESAMEConversionFilter);
 
 //----------------------------------------------------------------------------

@@ -42,7 +42,7 @@ class VTK_EXPORT vtkPieceCacheFilter : public vtkDataSetAlgorithm
 {
 public:
   static vtkPieceCacheFilter *New();
-  vtkTypeRevisionMacro(vtkPieceCacheFilter, vtkDataSetAlgorithm);
+  vtkTypeMacro(vtkPieceCacheFilter, vtkDataSetAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

@@ -28,7 +28,7 @@ class VTK_EXPORT vtkXMLPVAnimationWriter: public vtkXMLPVDWriter
 {
 public:
   static vtkXMLPVAnimationWriter* New();
-  vtkTypeRevisionMacro(vtkXMLPVAnimationWriter,vtkXMLPVDWriter);
+  vtkTypeMacro(vtkXMLPVAnimationWriter,vtkXMLPVDWriter);
   void PrintSelf(ostream& os, vtkIndent indent);  
   
   // Description:

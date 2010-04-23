@@ -30,7 +30,7 @@ class VTK_EXPORT vtkPVStringArrayHelper : public vtkPVServerObject
 {
 public:
   static vtkPVStringArrayHelper* New();
-  vtkTypeRevisionMacro(vtkPVStringArrayHelper, vtkPVServerObject);
+  vtkTypeMacro(vtkPVStringArrayHelper, vtkPVServerObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

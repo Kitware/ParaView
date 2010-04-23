@@ -27,7 +27,7 @@ class vtkIntArray;
 class VTK_EXPORT vtkEquivalenceSet : public vtkObject
 {
 public:
-  vtkTypeRevisionMacro(vtkEquivalenceSet,vtkObject);
+  vtkTypeMacro(vtkEquivalenceSet,vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
   static vtkEquivalenceSet *New();
   

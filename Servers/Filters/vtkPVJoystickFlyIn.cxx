@@ -21,7 +21,6 @@
 #include "vtkRenderer.h"
 #include "vtkRenderWindow.h"
 
-vtkCxxRevisionMacro(vtkPVJoystickFlyIn, "1.1");
 vtkStandardNewMacro(vtkPVJoystickFlyIn);
 
 //-------------------------------------------------------------------------

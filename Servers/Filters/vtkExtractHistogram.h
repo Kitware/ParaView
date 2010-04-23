@@ -38,7 +38,7 @@ class VTK_EXPORT vtkExtractHistogram : public vtkTableAlgorithm
 {
 public:
   static vtkExtractHistogram* New();
-  vtkTypeRevisionMacro(vtkExtractHistogram, vtkTableAlgorithm);
+  vtkTypeMacro(vtkExtractHistogram, vtkTableAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
   
   // Description:

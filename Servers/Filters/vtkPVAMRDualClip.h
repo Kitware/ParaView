@@ -32,7 +32,7 @@ class VTK_EXPORT vtkPVAMRDualClip : public vtkAMRDualClip
 {
 public:
   static vtkPVAMRDualClip* New();
-  vtkTypeRevisionMacro(vtkPVAMRDualClip,vtkAMRDualClip);
+  vtkTypeMacro(vtkPVAMRDualClip,vtkAMRDualClip);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   vtkPVAMRDualClip();

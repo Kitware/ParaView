@@ -37,7 +37,6 @@
 #include "vtkImageData.h"
 
 vtkStandardNewMacro(vtkSMSpriteTextureProxy);
-vtkCxxRevisionMacro(vtkSMSpriteTextureProxy, "1.1");
 //----------------------------------------------------------------------------
 vtkSMSpriteTextureProxy::vtkSMSpriteTextureProxy()
 {

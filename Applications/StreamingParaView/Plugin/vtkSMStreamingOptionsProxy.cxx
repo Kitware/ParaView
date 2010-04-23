@@ -26,7 +26,6 @@ int vtkSMStreamingOptionsProxy::StreamingFactoryRegistered = 0;
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMStreamingOptionsProxy);
-vtkCxxRevisionMacro(vtkSMStreamingOptionsProxy, "1.1");
 
 //----------------------------------------------------------------------------
 vtkSMStreamingOptionsProxy::vtkSMStreamingOptionsProxy()

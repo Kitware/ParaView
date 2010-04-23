@@ -18,7 +18,6 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkAdaptiveOptions);
-vtkCxxRevisionMacro(vtkAdaptiveOptions, "1.2");
 
 class vtkAdaptiveOptionsInternal {
 public:

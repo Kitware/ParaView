@@ -59,7 +59,6 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMPythonTraceObserver);
-vtkCxxRevisionMacro(vtkSMPythonTraceObserver, "1.4");
 
 //-----------------------------------------------------------------------------
 vtkSMPythonTraceObserver::vtkSMPythonTraceObserver()

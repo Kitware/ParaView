@@ -19,7 +19,6 @@
 #include "vtkRectilinearGrid.h"
 #include "vtkTransferFunctionEditorRepresentation1D.h"
 
-vtkCxxRevisionMacro(vtkTransferFunctionEditorWidget1D, "1.9");
 
 //----------------------------------------------------------------------------
 vtkTransferFunctionEditorWidget1D::vtkTransferFunctionEditorWidget1D()

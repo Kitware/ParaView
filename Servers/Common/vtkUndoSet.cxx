@@ -21,7 +21,6 @@
 #include "vtkUndoElement.h"
 
 vtkStandardNewMacro(vtkUndoSet);
-vtkCxxRevisionMacro(vtkUndoSet, "1.3");
 //-----------------------------------------------------------------------------
 vtkUndoSet::vtkUndoSet()
 {

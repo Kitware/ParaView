@@ -33,7 +33,7 @@ class VTK_EXPORT vtkIsoVolume : public vtkUnstructuredGridAlgorithm
 {
 public:
   static vtkIsoVolume *New();
-  vtkTypeRevisionMacro(vtkIsoVolume,vtkUnstructuredGridAlgorithm);
+  vtkTypeMacro(vtkIsoVolume,vtkUnstructuredGridAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

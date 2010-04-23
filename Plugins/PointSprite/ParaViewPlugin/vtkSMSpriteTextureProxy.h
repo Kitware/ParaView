@@ -41,7 +41,7 @@ class VTK_EXPORT vtkSMSpriteTextureProxy : public vtkSMSourceProxy
 {
 public:
   static vtkSMSpriteTextureProxy* New();
-  vtkTypeRevisionMacro(vtkSMSpriteTextureProxy, vtkSMSourceProxy);
+  vtkTypeMacro(vtkSMSpriteTextureProxy, vtkSMSourceProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

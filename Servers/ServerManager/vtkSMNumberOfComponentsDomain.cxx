@@ -25,7 +25,6 @@
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMNumberOfComponentsDomain);
-vtkCxxRevisionMacro(vtkSMNumberOfComponentsDomain, "1.2");
 //----------------------------------------------------------------------------
 vtkSMNumberOfComponentsDomain::vtkSMNumberOfComponentsDomain()
 {

@@ -23,7 +23,6 @@
 #include "vtkSMChartViewProxy.h"
 
 vtkStandardNewMacro(vtkSMChartRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMChartRepresentationProxy, "1.4");
 //----------------------------------------------------------------------------
 vtkSMChartRepresentationProxy::vtkSMChartRepresentationProxy()
 {

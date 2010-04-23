@@ -5,7 +5,6 @@
 #include "vtkstd/vector"
 #include "vtkstd/algorithm"
 
-vtkCxxRevisionMacro(vtkPieceList, "1.1");
 vtkStandardNewMacro(vtkPieceList);
 
 ///////////////////////////////////////////////////////////////////////////

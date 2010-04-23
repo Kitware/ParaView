@@ -21,7 +21,6 @@
 #include "vtkRenderWindowInteractor.h"
 #include "vtkRenderer.h"
 
-vtkCxxRevisionMacro(vtkPVTrackballMoveActor, "1.1");
 vtkStandardNewMacro(vtkPVTrackballMoveActor);
 
 //-------------------------------------------------------------------------

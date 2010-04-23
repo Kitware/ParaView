@@ -39,7 +39,7 @@ class VTK_EXPORT vtkImageSliceMapper : public vtkMapper
 {
 public:
   static vtkImageSliceMapper* New();
-  vtkTypeRevisionMacro(vtkImageSliceMapper, vtkMapper);
+  vtkTypeMacro(vtkImageSliceMapper, vtkMapper);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

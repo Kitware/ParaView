@@ -23,7 +23,6 @@
 #include "vtkObjectFactory.h"
 #include "vtkPointData.h"
 
-vtkCxxRevisionMacro(vtkMergeArrays, "1.7");
 vtkStandardNewMacro(vtkMergeArrays);
 
 //----------------------------------------------------------------------------

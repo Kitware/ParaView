@@ -22,7 +22,6 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMPluginProxy);
-vtkCxxRevisionMacro(vtkSMPluginProxy, "1.4");
 
 //----------------------------------------------------------------------------
 vtkSMPluginProxy::vtkSMPluginProxy()

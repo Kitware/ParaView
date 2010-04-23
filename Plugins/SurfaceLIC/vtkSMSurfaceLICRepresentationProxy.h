@@ -24,7 +24,7 @@ class vtkSMSurfaceLICRepresentationProxy : public vtkSMSurfaceRepresentationProx
 {
 public:
   static vtkSMSurfaceLICRepresentationProxy* New();
-  vtkTypeRevisionMacro(vtkSMSurfaceLICRepresentationProxy, vtkSMSurfaceRepresentationProxy);
+  vtkTypeMacro(vtkSMSurfaceLICRepresentationProxy, vtkSMSurfaceRepresentationProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   void  SelectInputVectors(int, int, int, int attributeMode, const char* name);

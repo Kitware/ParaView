@@ -48,7 +48,7 @@ class VTK_EXPORT vtkSMUndoRedoStateLoader : public vtkSMDeserializer
 {
 public:
   static vtkSMUndoRedoStateLoader* New();
-  vtkTypeRevisionMacro(vtkSMUndoRedoStateLoader, vtkSMDeserializer);
+  vtkTypeMacro(vtkSMUndoRedoStateLoader, vtkSMDeserializer);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

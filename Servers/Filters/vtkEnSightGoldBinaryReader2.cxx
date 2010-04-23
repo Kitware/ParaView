@@ -32,7 +32,6 @@
 #include <ctype.h>
 #include <vtkstd/string>
 
-vtkCxxRevisionMacro(vtkEnSightGoldBinaryReader2, "1.1");
 vtkStandardNewMacro(vtkEnSightGoldBinaryReader2);
 
 // This is half the precision of an int.

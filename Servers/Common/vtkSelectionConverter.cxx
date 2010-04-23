@@ -33,7 +33,6 @@
 #include <vtkstd/set>
 
 vtkStandardNewMacro(vtkSelectionConverter);
-vtkCxxRevisionMacro(vtkSelectionConverter, "1.18");
 
 //----------------------------------------------------------------------------
 vtkSelectionConverter::vtkSelectionConverter()

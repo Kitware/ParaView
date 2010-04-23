@@ -166,7 +166,6 @@ int RectilinearToUniformGrid(
 
 
 
-vtkCxxRevisionMacro(vtkVisItDatabase, "1.5");
 vtkStandardNewMacro(vtkVisItDatabase);
 
 //-----------------------------------------------------------------------------

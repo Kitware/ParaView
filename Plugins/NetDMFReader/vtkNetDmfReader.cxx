@@ -105,7 +105,6 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkNetDmfReader);
-vtkCxxRevisionMacro(vtkNetDmfReader, "1.5");
 
 //============================================================================
 class vtkNetDmfReaderInternal

@@ -42,7 +42,7 @@ class VTK_EXPORT vtkSMViewProxy : public vtkSMProxy
 {
 public:
   static vtkSMViewProxy* New();
-  vtkTypeRevisionMacro(vtkSMViewProxy, vtkSMProxy);
+  vtkTypeMacro(vtkSMViewProxy, vtkSMProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

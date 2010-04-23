@@ -19,7 +19,6 @@
 #include "vtkUniformGrid.h"
 
 vtkStandardNewMacro(vtkCPUniformGridBuilder);
-vtkCxxRevisionMacro(vtkCPUniformGridBuilder, "1.1");
 vtkCxxSetObjectMacro(vtkCPUniformGridBuilder, UniformGrid, vtkUniformGrid);
 
 //----------------------------------------------------------------------------

@@ -14,7 +14,6 @@
 =========================================================================*/
 #include "vtkCPTensorFieldFunction.h"
 
-vtkCxxRevisionMacro(vtkCPTensorFieldFunction, "1.1");
 
 //----------------------------------------------------------------------------
 vtkCPTensorFieldFunction::vtkCPTensorFieldFunction()

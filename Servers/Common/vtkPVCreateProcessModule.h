@@ -29,7 +29,7 @@ class vtkPVOptions;
 class VTK_EXPORT vtkPVCreateProcessModule : public vtkObject
 {
 public:
-  vtkTypeRevisionMacro(vtkPVCreateProcessModule,vtkObject);
+  vtkTypeMacro(vtkPVCreateProcessModule,vtkObject);
   static vtkProcessModule* CreateProcessModule(vtkPVOptions* options);
   void PrintSelf(ostream& os, vtkIndent indent);
 

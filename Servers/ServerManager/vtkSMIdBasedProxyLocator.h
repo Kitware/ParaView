@@ -27,7 +27,7 @@ class VTK_EXPORT vtkSMIdBasedProxyLocator : public vtkSMProxyLocator
 {
 public:
   static vtkSMIdBasedProxyLocator* New();
-  vtkTypeRevisionMacro(vtkSMIdBasedProxyLocator, vtkSMProxyLocator);
+  vtkTypeMacro(vtkSMIdBasedProxyLocator, vtkSMProxyLocator);
   void PrintSelf(ostream& os, vtkIndent indent);
 
 //BTX

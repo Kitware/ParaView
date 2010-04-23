@@ -34,7 +34,7 @@ class VTK_EXPORT vtkSMServerSideAnimationPlayer : public vtkSMObject
 {
 public:
   static vtkSMServerSideAnimationPlayer* New();
-  vtkTypeRevisionMacro(vtkSMServerSideAnimationPlayer, vtkSMObject);
+  vtkTypeMacro(vtkSMServerSideAnimationPlayer, vtkSMObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

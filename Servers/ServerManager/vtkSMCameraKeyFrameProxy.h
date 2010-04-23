@@ -30,7 +30,7 @@ class VTK_EXPORT vtkSMCameraKeyFrameProxy : public vtkSMKeyFrameProxy
 {
 public:
   static vtkSMCameraKeyFrameProxy* New();
-  vtkTypeRevisionMacro(vtkSMCameraKeyFrameProxy, vtkSMKeyFrameProxy);
+  vtkTypeMacro(vtkSMCameraKeyFrameProxy, vtkSMKeyFrameProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

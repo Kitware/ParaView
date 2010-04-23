@@ -31,7 +31,7 @@ class VTK_EXPORT vtkSynchronousMPISelfConnection : public vtkMPISelfConnection
 {
 public:
   static vtkSynchronousMPISelfConnection* New();
-  vtkTypeRevisionMacro(vtkSynchronousMPISelfConnection, vtkMPISelfConnection);
+  vtkTypeMacro(vtkSynchronousMPISelfConnection, vtkMPISelfConnection);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

@@ -11,7 +11,6 @@
 #include "vtkVariantArray.h"
 
 vtkStandardNewMacro(vtkPSciVizContingencyStats);
-vtkCxxRevisionMacro(vtkPSciVizContingencyStats,"1.2");
 
 vtkPSciVizContingencyStats::vtkPSciVizContingencyStats()
 {

@@ -32,7 +32,7 @@ class vtkSMProxyLocator;
 class VTK_EXPORT vtkSMLink : public vtkSMObject
 {
 public:
-  vtkTypeRevisionMacro(vtkSMLink, vtkSMObject);
+  vtkTypeMacro(vtkSMLink, vtkSMObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
 //BTX

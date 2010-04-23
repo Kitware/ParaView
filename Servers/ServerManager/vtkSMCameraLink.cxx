@@ -25,7 +25,6 @@
 #include <vtkstd/list>
 
 vtkStandardNewMacro(vtkSMCameraLink);
-vtkCxxRevisionMacro(vtkSMCameraLink, "1.20");
 
 //---------------------------------------------------------------------------
 class vtkSMCameraLink::vtkInternals

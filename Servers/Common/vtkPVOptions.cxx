@@ -24,7 +24,6 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVOptions);
-vtkCxxRevisionMacro(vtkPVOptions, "1.50");
 
 //----------------------------------------------------------------------------
 vtkPVOptions::vtkPVOptions()

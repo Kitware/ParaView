@@ -30,7 +30,7 @@ class VTK_EXPORT vtkSMProxyLocator : public vtkSMObject
 {
 public:
   static vtkSMProxyLocator* New();
-  vtkTypeRevisionMacro(vtkSMProxyLocator, vtkSMObject);
+  vtkTypeMacro(vtkSMProxyLocator, vtkSMObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

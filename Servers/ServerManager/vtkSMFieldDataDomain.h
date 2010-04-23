@@ -50,7 +50,7 @@ class VTK_EXPORT vtkSMFieldDataDomain : public vtkSMEnumerationDomain
 {
 public:
   static vtkSMFieldDataDomain* New();
-  vtkTypeRevisionMacro(vtkSMFieldDataDomain, vtkSMEnumerationDomain);
+  vtkTypeMacro(vtkSMFieldDataDomain, vtkSMEnumerationDomain);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

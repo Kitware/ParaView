@@ -19,7 +19,6 @@
 #include <vtkstd/vector>
 #include <vtkIOStream.h>
 
-vtkCxxRevisionMacro(vtkPEnSightGoldReader2, "1.4");
 vtkStandardNewMacro(vtkPEnSightGoldReader2);
 
 //BTX

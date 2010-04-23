@@ -23,7 +23,6 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMCompositeTreeDomain);
-vtkCxxRevisionMacro(vtkSMCompositeTreeDomain, "1.5");
 vtkCxxSetObjectMacro(vtkSMCompositeTreeDomain, Information, vtkPVDataInformation);
 //----------------------------------------------------------------------------
 vtkSMCompositeTreeDomain::vtkSMCompositeTreeDomain()

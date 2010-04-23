@@ -50,7 +50,6 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkPVDataInformation);
-vtkCxxRevisionMacro(vtkPVDataInformation, "1.64");
 
 //----------------------------------------------------------------------------
 vtkPVDataInformation::vtkPVDataInformation()

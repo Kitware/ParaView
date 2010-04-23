@@ -18,7 +18,6 @@
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro(vtkPVClassNameInformation);
-vtkCxxRevisionMacro(vtkPVClassNameInformation, "1.3");
 
 //----------------------------------------------------------------------------
 vtkPVClassNameInformation::vtkPVClassNameInformation()

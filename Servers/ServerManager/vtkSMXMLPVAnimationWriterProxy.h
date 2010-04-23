@@ -28,7 +28,7 @@ class VTK_EXPORT vtkSMXMLPVAnimationWriterProxy : public vtkSMSourceProxy
 {
 public:
   static vtkSMXMLPVAnimationWriterProxy* New();
-  vtkTypeRevisionMacro(vtkSMXMLPVAnimationWriterProxy, vtkSMSourceProxy);
+  vtkTypeMacro(vtkSMXMLPVAnimationWriterProxy, vtkSMSourceProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

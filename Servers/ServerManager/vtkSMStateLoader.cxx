@@ -34,7 +34,6 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMStateLoader);
-vtkCxxRevisionMacro(vtkSMStateLoader, "1.36");
 vtkCxxSetObjectMacro(vtkSMStateLoader, ProxyLocator, vtkSMProxyLocator);
 //---------------------------------------------------------------------------
 struct vtkSMStateLoaderRegistrationInfo

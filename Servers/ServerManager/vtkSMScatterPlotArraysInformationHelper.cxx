@@ -22,7 +22,6 @@
 #include <vtksys/ios/sstream>
 
 vtkStandardNewMacro(vtkSMScatterPlotArraysInformationHelper);
-vtkCxxRevisionMacro(vtkSMScatterPlotArraysInformationHelper, "1.3");
 //----------------------------------------------------------------------------
 vtkSMScatterPlotArraysInformationHelper::vtkSMScatterPlotArraysInformationHelper()
 {

@@ -27,7 +27,7 @@ class VTK_EXPORT vtkSMUnstructuredGridParallelStrategy : public vtkSMUnstructure
 {
 public:
   static vtkSMUnstructuredGridParallelStrategy* New();
-  vtkTypeRevisionMacro(vtkSMUnstructuredGridParallelStrategy, vtkSMUnstructuredDataParallelStrategy);
+  vtkTypeMacro(vtkSMUnstructuredGridParallelStrategy, vtkSMUnstructuredDataParallelStrategy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
 //BTX

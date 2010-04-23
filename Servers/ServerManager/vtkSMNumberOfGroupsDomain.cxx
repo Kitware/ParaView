@@ -22,7 +22,6 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMNumberOfGroupsDomain);
-vtkCxxRevisionMacro(vtkSMNumberOfGroupsDomain, "1.8");
 
 //---------------------------------------------------------------------------
 vtkSMNumberOfGroupsDomain::vtkSMNumberOfGroupsDomain()

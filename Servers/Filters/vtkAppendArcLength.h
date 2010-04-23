@@ -32,7 +32,7 @@ class VTK_EXPORT vtkAppendArcLength : public vtkPolyDataAlgorithm
 {
 public:
   static vtkAppendArcLength* New();
-  vtkTypeRevisionMacro(vtkAppendArcLength, vtkPolyDataAlgorithm);
+  vtkTypeMacro(vtkAppendArcLength, vtkPolyDataAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
 //BTX

@@ -18,7 +18,6 @@
 #include "vtkCommand.h"
 #include "vtkObjectFactory.h"
 
-vtkCxxRevisionMacro(vtkAnimationPlayer, "1.3");
 vtkCxxSetObjectMacro(vtkAnimationPlayer, AnimationScene, vtkPVAnimationScene);
 //----------------------------------------------------------------------------
 vtkAnimationPlayer::vtkAnimationPlayer()

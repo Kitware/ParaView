@@ -29,7 +29,6 @@
 
 //-------------------------------------------------------------------
 vtkStandardNewMacro(vtkWeightedRedistributePolyData);
-vtkCxxRevisionMacro(vtkWeightedRedistributePolyData, "1.9");
 
 //-------------------------------------------------------------------
 

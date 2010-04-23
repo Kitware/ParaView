@@ -41,7 +41,7 @@ class VTK_EXPORT vtkMPIMToNSocketConnection : public vtkObject
 {
 public:
   static vtkMPIMToNSocketConnection* New();
-  vtkTypeRevisionMacro(vtkMPIMToNSocketConnection,vtkObject);
+  vtkTypeMacro(vtkMPIMToNSocketConnection,vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
   
   // Description:

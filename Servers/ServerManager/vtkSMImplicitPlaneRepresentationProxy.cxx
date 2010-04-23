@@ -20,7 +20,6 @@
 #include "vtkProcessModule.h"
 
 vtkStandardNewMacro(vtkSMImplicitPlaneRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMImplicitPlaneRepresentationProxy, "1.4");
 
 //---------------------------------------------------------------------------
 vtkSMImplicitPlaneRepresentationProxy::vtkSMImplicitPlaneRepresentationProxy()

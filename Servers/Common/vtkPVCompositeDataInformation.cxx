@@ -27,7 +27,6 @@
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkPVCompositeDataInformation);
-vtkCxxRevisionMacro(vtkPVCompositeDataInformation, "1.17");
 
 struct vtkPVCompositeDataInformationInternals
 {

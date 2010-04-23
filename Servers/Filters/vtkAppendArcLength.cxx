@@ -24,7 +24,6 @@
 #include "vtkMath.h"
 
 vtkStandardNewMacro(vtkAppendArcLength);
-vtkCxxRevisionMacro(vtkAppendArcLength, "1.2");
 //----------------------------------------------------------------------------
 vtkAppendArcLength::vtkAppendArcLength()
 {

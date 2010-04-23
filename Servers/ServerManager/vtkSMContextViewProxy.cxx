@@ -42,7 +42,6 @@ public:
 };
 
 
-vtkCxxRevisionMacro(vtkSMContextViewProxy, "1.9");
 //----------------------------------------------------------------------------
 vtkSMContextViewProxy::vtkSMContextViewProxy()
 {

@@ -55,7 +55,7 @@ class VTK_EXPORT vtkTransferFunctionViewer : public vtkObject
 {
 public:
   static vtkTransferFunctionViewer* New();
-  vtkTypeRevisionMacro(vtkTransferFunctionViewer, vtkObject);
+  vtkTypeMacro(vtkTransferFunctionViewer, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

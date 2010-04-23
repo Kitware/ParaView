@@ -24,7 +24,6 @@
 #include <vtkstd/set>
 #include <vtksys/ios/sstream>
 
-vtkCxxRevisionMacro(vtkSciVizStatistics,"1.4");
 vtkInformationKeyMacro(vtkSciVizStatistics, MULTIPLE_MODELS, Integer);
 
 vtkSciVizStatistics::vtkSciVizStatistics()

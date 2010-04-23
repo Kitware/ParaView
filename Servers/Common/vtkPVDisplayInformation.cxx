@@ -25,7 +25,6 @@
 #endif
 
 vtkStandardNewMacro(vtkPVDisplayInformation);
-vtkCxxRevisionMacro(vtkPVDisplayInformation, "1.3");
 
 //----------------------------------------------------------------------------
 vtkPVDisplayInformation::vtkPVDisplayInformation()

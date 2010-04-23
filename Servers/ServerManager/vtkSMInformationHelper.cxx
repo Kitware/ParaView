@@ -14,7 +14,6 @@
 =========================================================================*/
 #include "vtkSMInformationHelper.h"
 
-vtkCxxRevisionMacro(vtkSMInformationHelper, "1.1");
 
 //---------------------------------------------------------------------------
 vtkSMInformationHelper::vtkSMInformationHelper()

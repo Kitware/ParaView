@@ -20,7 +20,6 @@
 #include "vtkSMRenderViewProxy.h"
 
 
-vtkCxxRevisionMacro(vtkSMCameraConfigurationReader,"1.1");
 vtkStandardNewMacro(vtkSMCameraConfigurationReader);
 
 //-----------------------------------------------------------------------------

@@ -28,7 +28,7 @@ struct vtkClientServerID;
 class VTK_EXPORT vtkSMClientServerRenderSyncManagerHelper : public vtkSMObject
 {
 public:
-  vtkTypeRevisionMacro(vtkSMClientServerRenderSyncManagerHelper, vtkSMObject);
+  vtkTypeMacro(vtkSMClientServerRenderSyncManagerHelper, vtkSMObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 //BTX
   // Description:

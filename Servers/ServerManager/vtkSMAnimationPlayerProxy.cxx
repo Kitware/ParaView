@@ -49,7 +49,6 @@ private:
 };
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMAnimationPlayerProxy);
-vtkCxxRevisionMacro(vtkSMAnimationPlayerProxy, "1.1");
 //----------------------------------------------------------------------------
 vtkSMAnimationPlayerProxy::vtkSMAnimationPlayerProxy()
 {

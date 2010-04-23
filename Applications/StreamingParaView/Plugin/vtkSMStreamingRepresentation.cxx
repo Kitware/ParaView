@@ -33,7 +33,6 @@
 #include "vtkSMStreamingParallelStrategy.h"
 #include "vtkStreamingOptions.h"
 
-vtkCxxRevisionMacro(vtkSMStreamingRepresentation, "1.2");
 vtkStandardNewMacro(vtkSMStreamingRepresentation);
 
 #define DEBUGPRINT_REPRESENTATION(arg)\

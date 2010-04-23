@@ -28,7 +28,6 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkPVTemporalDataInformation);
-vtkCxxRevisionMacro(vtkPVTemporalDataInformation, "1.1");
 //----------------------------------------------------------------------------
 vtkPVTemporalDataInformation::vtkPVTemporalDataInformation()
 {

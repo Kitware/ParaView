@@ -74,7 +74,6 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <Engine/Control/RTRT.h>
 #include <Engine/Display/SyncDisplay.h>
 
-vtkCxxRevisionMacro(vtkMantaRenderWindow, "1.13");
 vtkStandardNewMacro(vtkMantaRenderWindow);
 
 //----------------------------------------------------------------------------

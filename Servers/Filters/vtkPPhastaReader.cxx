@@ -55,7 +55,6 @@ struct vtkPPhastaReaderInternal
 };
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkPPhastaReader, "1.8");
 vtkStandardNewMacro(vtkPPhastaReader);
 
 //----------------------------------------------------------------------------

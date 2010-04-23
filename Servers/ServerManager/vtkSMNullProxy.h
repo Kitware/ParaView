@@ -25,7 +25,7 @@ class VTK_EXPORT vtkSMNullProxy : public vtkSMProxy
 {
 public:
   static vtkSMNullProxy* New();
-  vtkTypeRevisionMacro(vtkSMNullProxy, vtkSMProxy);
+  vtkTypeMacro(vtkSMNullProxy, vtkSMProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
 protected:

@@ -18,7 +18,6 @@
 #include "vtkSMProxy.h"
 #include "vtkSMVectorProperty.h"
 #include "vtkSMAnimationCueProxy.h"
-vtkCxxRevisionMacro(vtkSMBooleanKeyFrameProxy, "1.3");
 vtkStandardNewMacro(vtkSMBooleanKeyFrameProxy);
 
 //----------------------------------------------------------------------------

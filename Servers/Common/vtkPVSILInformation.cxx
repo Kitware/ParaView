@@ -25,7 +25,6 @@
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro(vtkPVSILInformation);
-vtkCxxRevisionMacro(vtkPVSILInformation, "1.2");
 vtkCxxSetObjectMacro(vtkPVSILInformation, SIL, vtkGraph);
 //----------------------------------------------------------------------------
 vtkPVSILInformation::vtkPVSILInformation()

@@ -28,7 +28,7 @@ class VTK_EXPORT vtkSMLineChartViewProxy : public vtkSMChartViewProxy
 {
 public:
   static vtkSMLineChartViewProxy* New();
-  vtkTypeRevisionMacro(vtkSMLineChartViewProxy, vtkSMChartViewProxy);
+  vtkTypeMacro(vtkSMLineChartViewProxy, vtkSMChartViewProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

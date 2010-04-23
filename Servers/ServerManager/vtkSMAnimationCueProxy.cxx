@@ -24,7 +24,6 @@
 #include "vtkSMProperty.h"
 #include "vtkSMProxyProperty.h"
 
-vtkCxxRevisionMacro(vtkSMAnimationCueProxy, "1.28");
 vtkStandardNewMacro(vtkSMAnimationCueProxy);
 
 vtkCxxSetObjectMacro(vtkSMAnimationCueProxy, AnimatedProxy, vtkSMProxy);

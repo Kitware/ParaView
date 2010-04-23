@@ -35,7 +35,7 @@ class VTK_EXPORT vtkFlashContour : public vtkMultiBlockDataSetAlgorithm
 {
 public:
   static vtkFlashContour *New();
-  vtkTypeRevisionMacro(vtkFlashContour,vtkMultiBlockDataSetAlgorithm);
+  vtkTypeMacro(vtkFlashContour,vtkMultiBlockDataSetAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   vtkSetMacro(IsoValue, double);

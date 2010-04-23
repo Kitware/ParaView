@@ -44,7 +44,7 @@ public:
 
   // Description:
   // Standard methods for instances of this class.
-  vtkTypeRevisionMacro(vtkPointHandleRepresentationSphere,vtkHandleRepresentation);
+  vtkTypeMacro(vtkPointHandleRepresentationSphere,vtkHandleRepresentation);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

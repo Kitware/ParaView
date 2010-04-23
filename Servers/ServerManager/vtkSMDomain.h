@@ -39,7 +39,7 @@ struct vtkSMDomainInternals;
 class VTK_EXPORT vtkSMDomain : public vtkSMObject
 {
 public:
-  vtkTypeRevisionMacro(vtkSMDomain, vtkSMObject);
+  vtkTypeMacro(vtkSMDomain, vtkSMObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

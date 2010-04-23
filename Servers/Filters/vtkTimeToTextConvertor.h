@@ -29,7 +29,7 @@ class VTK_EXPORT vtkTimeToTextConvertor : public vtkTableAlgorithm
 {
 public:
   static vtkTimeToTextConvertor* New();
-  vtkTypeRevisionMacro(vtkTimeToTextConvertor, vtkTableAlgorithm);
+  vtkTypeMacro(vtkTimeToTextConvertor, vtkTableAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

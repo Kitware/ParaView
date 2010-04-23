@@ -24,7 +24,6 @@
 #include "vtkIdTypeArray.h"
 #include "vtkCellArray.h"
 
-vtkCxxRevisionMacro(vtkMantaTestSource, "1.2");
 vtkStandardNewMacro(vtkMantaTestSource);
 
 //----------------------------------------------------------------------------

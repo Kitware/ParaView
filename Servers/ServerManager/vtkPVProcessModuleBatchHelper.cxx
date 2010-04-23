@@ -27,7 +27,6 @@
 #include <vtksys/SystemTools.hxx>
 #include <vtksys/ios/sstream>
 
-vtkCxxRevisionMacro(vtkPVProcessModuleBatchHelper, "1.13");
 vtkStandardNewMacro(vtkPVProcessModuleBatchHelper);
 
 EXTERN void TclSetLibraryPath _ANSI_ARGS_((Tcl_Obj * pathPtr));

@@ -25,7 +25,7 @@
 class VTK_EXPORT vtkPVClipDataSet : public vtkTableBasedClipDataSet
 {
 public:
-  vtkTypeRevisionMacro(vtkPVClipDataSet,vtkTableBasedClipDataSet);
+  vtkTypeMacro(vtkPVClipDataSet,vtkTableBasedClipDataSet);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

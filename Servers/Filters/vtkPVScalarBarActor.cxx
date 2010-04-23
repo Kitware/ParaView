@@ -52,7 +52,6 @@
 #define MY_ABS(x)       ((x) < 0 ? -(x) : (x))
 
 //=============================================================================
-vtkCxxRevisionMacro(vtkPVScalarBarActor, "1.15");
 vtkStandardNewMacro(vtkPVScalarBarActor);
 
 //=============================================================================

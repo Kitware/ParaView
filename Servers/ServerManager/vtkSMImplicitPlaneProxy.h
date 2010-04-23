@@ -27,7 +27,7 @@ class VTK_EXPORT vtkSMImplicitPlaneProxy : public vtkSMProxy
 {
 public:
   static vtkSMImplicitPlaneProxy* New();
-  vtkTypeRevisionMacro(vtkSMImplicitPlaneProxy, vtkSMProxy);
+  vtkTypeMacro(vtkSMImplicitPlaneProxy, vtkSMProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

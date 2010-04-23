@@ -26,7 +26,7 @@ class VTK_EXPORT vtkSMSimpleParallelStrategy : public vtkSMSimpleStrategy
 {
 public:
   static vtkSMSimpleParallelStrategy* New();
-  vtkTypeRevisionMacro(vtkSMSimpleParallelStrategy, vtkSMSimpleStrategy);
+  vtkTypeMacro(vtkSMSimpleParallelStrategy, vtkSMSimpleStrategy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

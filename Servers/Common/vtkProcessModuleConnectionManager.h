@@ -77,7 +77,7 @@ class VTK_EXPORT vtkProcessModuleConnectionManager : public vtkObject
 {
 public:
   static vtkProcessModuleConnectionManager* New();
-  vtkTypeRevisionMacro(vtkProcessModuleConnectionManager, vtkObject);
+  vtkTypeMacro(vtkProcessModuleConnectionManager, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

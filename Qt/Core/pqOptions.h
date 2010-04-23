@@ -46,7 +46,7 @@ class PQCORE_EXPORT pqOptions : public vtkPVOptions
 {
 public:
   static pqOptions *New();
-  vtkTypeRevisionMacro(pqOptions, vtkPVOptions);
+  vtkTypeMacro(pqOptions, vtkPVOptions);
   void PrintSelf(ostream &os, vtkIndent indent);
 
   vtkGetStringMacro(TestDirectory);

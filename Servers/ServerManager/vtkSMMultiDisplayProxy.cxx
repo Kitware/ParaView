@@ -20,7 +20,6 @@
 #include "vtkProcessModule.h"
 
 vtkStandardNewMacro(vtkSMMultiDisplayProxy);
-vtkCxxRevisionMacro(vtkSMMultiDisplayProxy, "1.7");
 //-----------------------------------------------------------------------------
 vtkSMMultiDisplayProxy::vtkSMMultiDisplayProxy()
 {

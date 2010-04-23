@@ -32,7 +32,7 @@ class VTK_EXPORT vtkClientServerMoveData : public vtkDataObjectAlgorithm
 {
 public:
   static vtkClientServerMoveData* New();
-  vtkTypeRevisionMacro(vtkClientServerMoveData, vtkDataObjectAlgorithm);
+  vtkTypeMacro(vtkClientServerMoveData, vtkDataObjectAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Set the connection on which we are moving the data.

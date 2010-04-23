@@ -53,7 +53,6 @@ protected:
 //-----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkSMInteractionUndoStackBuilder);
-vtkCxxRevisionMacro(vtkSMInteractionUndoStackBuilder, "1.5");
 vtkCxxSetObjectMacro(vtkSMInteractionUndoStackBuilder, UndoStack, vtkSMUndoStack);
 
 //-----------------------------------------------------------------------------

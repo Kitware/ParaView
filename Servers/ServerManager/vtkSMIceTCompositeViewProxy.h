@@ -30,7 +30,7 @@ class VTK_EXPORT vtkSMIceTCompositeViewProxy : public vtkSMMultiProcessRenderVie
 {
 public:
   static vtkSMIceTCompositeViewProxy* New();
-  vtkTypeRevisionMacro(vtkSMIceTCompositeViewProxy, vtkSMMultiProcessRenderView);
+  vtkTypeMacro(vtkSMIceTCompositeViewProxy, vtkSMMultiProcessRenderView);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

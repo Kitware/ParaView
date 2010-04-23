@@ -31,7 +31,7 @@ class VTK_EXPORT vtkPVPluginLoader : public vtkObject
 {
 public:
   static vtkPVPluginLoader* New();
-  vtkTypeRevisionMacro(vtkPVPluginLoader, vtkObject);
+  vtkTypeMacro(vtkPVPluginLoader, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

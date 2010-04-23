@@ -31,7 +31,6 @@
 #include "vtkProcessModule.h"
 #include "vtkUniformGrid.h"
 
-vtkCxxRevisionMacro(vtkPVGlyphFilter, "1.34");
 vtkStandardNewMacro(vtkPVGlyphFilter);
 
 //-----------------------------------------------------------------------------

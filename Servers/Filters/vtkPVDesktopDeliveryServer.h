@@ -41,7 +41,7 @@ class vtkImageCompressor;
 class VTK_EXPORT vtkPVDesktopDeliveryServer : public vtkPVClientServerRenderManager
 {
 public:
-  vtkTypeRevisionMacro(vtkPVDesktopDeliveryServer, vtkPVClientServerRenderManager);
+  vtkTypeMacro(vtkPVDesktopDeliveryServer, vtkPVClientServerRenderManager);
   virtual void PrintSelf(ostream &os, vtkIndent indent);
 
   static vtkPVDesktopDeliveryServer *New();

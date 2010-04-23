@@ -32,7 +32,6 @@
 #include "vtkObjectFactory.h"
 #include "vtkDataArray.h"
 
-vtkCxxRevisionMacro(vtk1DTransferFunction, "1.1")
 
 vtk1DTransferFunction::vtk1DTransferFunction()
 {

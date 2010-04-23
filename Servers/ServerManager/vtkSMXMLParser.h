@@ -31,7 +31,7 @@ class vtkSMProxyManager;
 class VTK_EXPORT vtkSMXMLParser : public vtkPVXMLParser
 {
 public:
-  vtkTypeRevisionMacro(vtkSMXMLParser,vtkPVXMLParser);
+  vtkTypeMacro(vtkSMXMLParser,vtkPVXMLParser);
   void PrintSelf(ostream& os, vtkIndent indent);
   static vtkSMXMLParser* New();
 

@@ -49,7 +49,6 @@
 #endif
 
 vtkStandardNewMacro(vtkPVMain);
-vtkCxxRevisionMacro(vtkPVMain, "1.26");
 
 int vtkPVMain::UseMPI = 1;
 int vtkPVMain::FinalizeMPI = 0;

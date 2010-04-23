@@ -25,7 +25,7 @@ class VTK_EXPORT vtkSequenceAnimationPlayer : public vtkAnimationPlayer
 {
 public:
   static vtkSequenceAnimationPlayer* New();
-  vtkTypeRevisionMacro(vtkSequenceAnimationPlayer, vtkAnimationPlayer);
+  vtkTypeMacro(vtkSequenceAnimationPlayer, vtkAnimationPlayer);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   vtkSetClampMacro(NumberOfFrames, int, 2, VTK_INT_MAX);

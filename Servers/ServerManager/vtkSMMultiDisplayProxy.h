@@ -29,7 +29,7 @@ class VTK_EXPORT vtkSMMultiDisplayProxy : public vtkSMCompositeDisplayProxy
 {
 public:
   static vtkSMMultiDisplayProxy* New();
-  vtkTypeRevisionMacro(vtkSMMultiDisplayProxy, vtkSMCompositeDisplayProxy);
+  vtkTypeMacro(vtkSMMultiDisplayProxy, vtkSMCompositeDisplayProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

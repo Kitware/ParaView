@@ -23,7 +23,6 @@
 #include "vtkSMAdaptiveViewProxy.h"
 #include "vtkAdaptiveOptions.h"
 
-vtkCxxRevisionMacro(vtkSMAdaptiveOutlineRepresentation, "1.1");
 vtkStandardNewMacro(vtkSMAdaptiveOutlineRepresentation);
 
 #define DEBUGPRINT_REPRESENTATION(arg)\

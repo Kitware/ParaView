@@ -37,7 +37,7 @@ class vtkRectilinearGrid;
 class VTK_EXPORT vtkTransferFunctionEditorWidget : public vtkAbstractWidget
 {
 public:
-  vtkTypeRevisionMacro(vtkTransferFunctionEditorWidget, vtkAbstractWidget);
+  vtkTypeMacro(vtkTransferFunctionEditorWidget, vtkAbstractWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

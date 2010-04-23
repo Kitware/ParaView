@@ -29,7 +29,7 @@ class VTK_EXPORT vtkPVCompositeDataInformationIterator : public vtkObject
 {
 public:
   static vtkPVCompositeDataInformationIterator* New();
-  vtkTypeRevisionMacro(vtkPVCompositeDataInformationIterator, vtkObject);
+  vtkTypeMacro(vtkPVCompositeDataInformationIterator, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

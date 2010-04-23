@@ -28,7 +28,7 @@ class VTK_EXPORT vtkPVServerSelectTimeSet : public vtkPVServerObject
 {
 public:
   static vtkPVServerSelectTimeSet* New();
-  vtkTypeRevisionMacro(vtkPVServerSelectTimeSet, vtkPVServerObject);
+  vtkTypeMacro(vtkPVServerSelectTimeSet, vtkPVServerObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

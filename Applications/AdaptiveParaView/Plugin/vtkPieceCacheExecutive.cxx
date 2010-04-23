@@ -23,7 +23,6 @@
 #include "vtkPieceCacheFilter.h"
 #include "vtkAdaptiveOptions.h"
 
-vtkCxxRevisionMacro(vtkPieceCacheExecutive, "1.1");
 vtkStandardNewMacro(vtkPieceCacheExecutive);
 
 #define DEBUGPRINT_CACHING(arg) \

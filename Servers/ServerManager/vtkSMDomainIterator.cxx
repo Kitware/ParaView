@@ -19,7 +19,6 @@
 #include "vtkSMPropertyInternals.h"
 
 vtkStandardNewMacro(vtkSMDomainIterator);
-vtkCxxRevisionMacro(vtkSMDomainIterator, "1.2");
 
 struct vtkSMDomainIteratorInternals
 {

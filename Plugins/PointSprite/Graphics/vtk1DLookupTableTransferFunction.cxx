@@ -34,7 +34,6 @@
 
 #include <cmath>
 
-vtkCxxRevisionMacro(vtk1DLookupTableTransferFunction, "1.1")
 vtkStandardNewMacro(vtk1DLookupTableTransferFunction)
 
 vtk1DLookupTableTransferFunction::vtk1DLookupTableTransferFunction()

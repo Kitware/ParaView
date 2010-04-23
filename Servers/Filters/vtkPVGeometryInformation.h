@@ -28,7 +28,7 @@ class VTK_EXPORT vtkPVGeometryInformation : public vtkPVDataInformation
 {
 public:
   static vtkPVGeometryInformation* New();
-  vtkTypeRevisionMacro(vtkPVGeometryInformation, vtkPVDataInformation);
+  vtkTypeMacro(vtkPVGeometryInformation, vtkPVDataInformation);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

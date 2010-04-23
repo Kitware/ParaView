@@ -30,7 +30,6 @@
 
 
 vtkStandardNewMacro(vtkSMProxyConfigurationWriter);
-vtkCxxRevisionMacro(vtkSMProxyConfigurationWriter, "1.1");
 
 
 //---------------------------------------------------------------------------

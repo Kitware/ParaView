@@ -33,7 +33,7 @@ class PQCORE_EXPORT pqProxyModifiedStateUndoElement : public vtkSMUndoElement
 {
 public:
   static pqProxyModifiedStateUndoElement* New();
-  vtkTypeRevisionMacro(pqProxyModifiedStateUndoElement, vtkSMUndoElement);
+  vtkTypeMacro(pqProxyModifiedStateUndoElement, vtkSMUndoElement);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   virtual int Undo()

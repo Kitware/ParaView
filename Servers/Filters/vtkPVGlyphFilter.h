@@ -27,7 +27,7 @@ class vtkMaskPoints;
 class VTK_EXPORT vtkPVGlyphFilter : public vtkGlyph3D
 {
 public:
-  vtkTypeRevisionMacro(vtkPVGlyphFilter,vtkGlyph3D);
+  vtkTypeMacro(vtkPVGlyphFilter,vtkGlyph3D);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description

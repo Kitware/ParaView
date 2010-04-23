@@ -31,7 +31,7 @@ class VTK_EXPORT vtkSMImageDataParallelStrategy :
 {
 public:
   static vtkSMImageDataParallelStrategy* New();
-  vtkTypeRevisionMacro(vtkSMImageDataParallelStrategy, 
+  vtkTypeMacro(vtkSMImageDataParallelStrategy,
     vtkSMSimpleParallelStrategy);
   void PrintSelf(ostream& os, vtkIndent indent);
 

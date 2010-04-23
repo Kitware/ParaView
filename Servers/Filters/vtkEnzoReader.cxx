@@ -59,7 +59,6 @@
 
 #include <vtkstd/string>
 
-vtkCxxRevisionMacro( vtkEnzoReader, "1.4" );
 vtkStandardNewMacro( vtkEnzoReader );
 
 // ============================================================================

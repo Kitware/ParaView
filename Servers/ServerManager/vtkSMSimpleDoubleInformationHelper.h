@@ -33,7 +33,7 @@ class VTK_EXPORT vtkSMSimpleDoubleInformationHelper : public vtkSMInformationHel
 {
 public:
   static vtkSMSimpleDoubleInformationHelper* New();
-  vtkTypeRevisionMacro(vtkSMSimpleDoubleInformationHelper, vtkSMInformationHelper);
+  vtkTypeMacro(vtkSMSimpleDoubleInformationHelper, vtkSMInformationHelper);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   //BTX

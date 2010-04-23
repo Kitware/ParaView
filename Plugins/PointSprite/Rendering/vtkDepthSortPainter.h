@@ -53,7 +53,7 @@ class vtkUnsignedCharArray;
 class VTK_EXPORT vtkDepthSortPainter : public vtkPainter
 {
 public:
-  vtkTypeRevisionMacro(vtkDepthSortPainter, vtkPainter);
+  vtkTypeMacro(vtkDepthSortPainter, vtkPainter);
   virtual void PrintSelf(ostream &os, vtkIndent indent);
   static vtkDepthSortPainter *New();
 

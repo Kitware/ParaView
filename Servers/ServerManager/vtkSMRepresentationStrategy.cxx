@@ -27,7 +27,6 @@
 #include "vtkSMSourceProxy.h"
 #include "vtkSMPropertyHelper.h"
 
-vtkCxxRevisionMacro(vtkSMRepresentationStrategy, "1.22");
 vtkCxxSetObjectMacro(vtkSMRepresentationStrategy, 
   RepresentedDataInformation, vtkPVDataInformation);
 //----------------------------------------------------------------------------

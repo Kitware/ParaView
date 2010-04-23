@@ -37,7 +37,7 @@
 class vtkPTemporalRanges::vtkRangeTableReduction : public vtkTableAlgorithm
 {
 public:
-  vtkTypeRevisionMacro(vtkPTemporalRanges::vtkRangeTableReduction, vtkTableAlgorithm);
+  vtkTypeMacro(vtkPTemporalRanges::vtkRangeTableReduction, vtkTableAlgorithm);
   static vtkRangeTableReduction *New() {
     // Just registers with debug leaks.  Not expecting a result.
     vtkObjectFactory::CreateInstance("vtkPTemporalRanges::vtkRangeTableReduction");
@@ -67,7 +67,6 @@ protected:
   vtkPTemporalRanges *Parent;
 };
 
-vtkCxxRevisionMacro(vtkPTemporalRanges::vtkRangeTableReduction, "1.1");
 
 //-----------------------------------------------------------------------------
 int vtkPTemporalRanges::vtkRangeTableReduction::RequestData(
@@ -92,7 +91,6 @@ int vtkPTemporalRanges::vtkRangeTableReduction::RequestData(
 
 //=============================================================================
 //=============================================================================
-vtkCxxRevisionMacro(vtkPTemporalRanges, "1.1");
 vtkStandardNewMacro(vtkPTemporalRanges);
 
 vtkCxxSetObjectMacro(vtkPTemporalRanges, Controller, vtkMultiProcessController);

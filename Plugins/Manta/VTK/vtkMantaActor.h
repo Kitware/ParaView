@@ -86,7 +86,7 @@ class VTK_vtkManta_EXPORT vtkMantaActor : public vtkActor
 {
 public:
   static vtkMantaActor *New();
-  vtkTypeRevisionMacro(vtkMantaActor,vtkActor);
+  vtkTypeMacro(vtkMantaActor,vtkActor);
   virtual void PrintSelf(ostream& os, vtkIndent indent);
     
   //Description:

@@ -33,7 +33,6 @@ All rights reserve
 // *************************************************************************
 
 vtkStandardNewMacro(vtkPrismCubeAxesActor);
-vtkCxxRevisionMacro(vtkPrismCubeAxesActor, "1.4");
 vtkCxxSetObjectMacro(vtkPrismCubeAxesActor, Camera,vtkCamera);
 
 // *************************************************************************

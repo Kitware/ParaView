@@ -27,7 +27,6 @@
 //VTK_FACTORY_INTERFACE_IMPLEMENT(vtkAdaptiveFactory)
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkAdaptiveFactory, "1.1");
 vtkStandardNewMacro(vtkAdaptiveFactory);
 
 //----------------------------------------------------------------------------

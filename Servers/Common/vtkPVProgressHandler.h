@@ -30,7 +30,7 @@ class VTK_EXPORT vtkPVProgressHandler : public vtkObject
 {
 public:
   static vtkPVProgressHandler* New();
-  vtkTypeRevisionMacro(vtkPVProgressHandler, vtkObject);
+  vtkTypeMacro(vtkPVProgressHandler, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

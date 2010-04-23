@@ -34,7 +34,7 @@ class VTK_EXPORT vtkSMAdaptiveViewProxy : public vtkSMViewProxy
 {
 public:
   static vtkSMAdaptiveViewProxy* New();
-  vtkTypeRevisionMacro(vtkSMAdaptiveViewProxy, vtkSMViewProxy);
+  vtkTypeMacro(vtkSMAdaptiveViewProxy, vtkSMViewProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   vtkSMRenderViewProxy *GetRootView();

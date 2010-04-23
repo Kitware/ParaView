@@ -19,7 +19,6 @@
 #include "vtkPVXMLElement.h"
 #include "vtkSMViewProxy.h"
 
-vtkCxxRevisionMacro(vtkSMExporterProxy, "1.2");
 vtkCxxSetObjectMacro(vtkSMExporterProxy, View, vtkSMViewProxy);
 //----------------------------------------------------------------------------
 vtkSMExporterProxy::vtkSMExporterProxy()

@@ -27,7 +27,7 @@ class VTK_EXPORT vtkPVMPICommunicator : public vtkMPICommunicator
 {
 public:
   static vtkPVMPICommunicator* New();
-  vtkTypeRevisionMacro(vtkPVMPICommunicator, vtkMPICommunicator);
+  vtkTypeMacro(vtkPVMPICommunicator, vtkMPICommunicator);
   void PrintSelf(ostream& os, vtkIndent indent);
 
 //BTX

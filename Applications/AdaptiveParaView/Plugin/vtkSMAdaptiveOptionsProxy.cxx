@@ -26,7 +26,6 @@ int vtkSMAdaptiveOptionsProxy::AdaptiveFactoryRegistered = 0;
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMAdaptiveOptionsProxy);
-vtkCxxRevisionMacro(vtkSMAdaptiveOptionsProxy, "1.1");
 
 //----------------------------------------------------------------------------
 vtkSMAdaptiveOptionsProxy::vtkSMAdaptiveOptionsProxy()

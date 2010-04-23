@@ -26,7 +26,7 @@ class VTK_EXPORT vtkMySpecialPolyDataMapper : public vtkPainterPolyDataMapper
 {
 public:
   static vtkMySpecialPolyDataMapper* New();
-  vtkTypeRevisionMacro(vtkMySpecialPolyDataMapper, vtkPainterPolyDataMapper);
+  vtkTypeMacro(vtkMySpecialPolyDataMapper, vtkPainterPolyDataMapper);
   void PrintSelf(ostream& os, vtkIndent indent);
 
 //BTX

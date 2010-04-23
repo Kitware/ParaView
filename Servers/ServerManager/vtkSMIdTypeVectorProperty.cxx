@@ -21,7 +21,6 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMIdTypeVectorProperty);
-vtkCxxRevisionMacro(vtkSMIdTypeVectorProperty, "1.25");
 
 struct vtkSMIdTypeVectorPropertyInternals
 {

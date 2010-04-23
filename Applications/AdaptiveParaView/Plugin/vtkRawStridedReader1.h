@@ -34,7 +34,7 @@ class VTK_EXPORT vtkRawStridedReader1 : public vtkImageAlgorithm
 {
 public:
   static vtkRawStridedReader1 *New();
-  vtkTypeRevisionMacro(vtkRawStridedReader1,vtkImageAlgorithm);
+  vtkTypeMacro(vtkRawStridedReader1,vtkImageAlgorithm);
   virtual void PrintSelf(ostream& os, vtkIndent indent);
   
   //By default the byte order is not swapped

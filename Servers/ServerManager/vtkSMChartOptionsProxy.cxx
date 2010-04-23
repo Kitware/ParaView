@@ -22,7 +22,6 @@
 #include "vtkSMChartViewProxy.h"
 
 vtkStandardNewMacro(vtkSMChartOptionsProxy);
-vtkCxxRevisionMacro(vtkSMChartOptionsProxy, "1.5");
 vtkCxxSetObjectMacro(vtkSMChartOptionsProxy, ChartView, vtkQtChartView);
 //----------------------------------------------------------------------------
 vtkSMChartOptionsProxy::vtkSMChartOptionsProxy()

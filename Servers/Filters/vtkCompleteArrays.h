@@ -33,7 +33,7 @@ class vtkDataSetAttributes;
 class VTK_EXPORT vtkCompleteArrays : public vtkDataSetAlgorithm 
 {
 public:
-  vtkTypeRevisionMacro(vtkCompleteArrays,vtkDataSetAlgorithm);
+  vtkTypeMacro(vtkCompleteArrays,vtkDataSetAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

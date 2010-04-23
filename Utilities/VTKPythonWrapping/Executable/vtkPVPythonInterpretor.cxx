@@ -243,7 +243,6 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPythonInterpretor);
-vtkCxxRevisionMacro(vtkPVPythonInterpretor, "1.30");
 
 //-----------------------------------------------------------------------------
 vtkPVPythonInterpretor::vtkPVPythonInterpretor()

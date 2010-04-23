@@ -154,7 +154,7 @@ class vtkClientConnectionUndoSet : public vtkUndoSet
 {
 public:
   static vtkClientConnectionUndoSet* New();
-  vtkTypeRevisionMacro(vtkClientConnectionUndoSet, vtkUndoSet);
+  vtkTypeMacro(vtkClientConnectionUndoSet, vtkUndoSet);
  
   virtual int Undo() 
     {
@@ -210,11 +210,9 @@ private:
 };
 
 vtkStandardNewMacro(vtkClientConnectionUndoSet);
-vtkCxxRevisionMacro(vtkClientConnectionUndoSet, "1.14");
 //-----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkClientConnection);
-vtkCxxRevisionMacro(vtkClientConnection, "1.14");
 //-----------------------------------------------------------------------------
 vtkClientConnection::vtkClientConnection()
 {

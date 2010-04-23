@@ -29,7 +29,6 @@
 #include <vtkstd/string>
 using namespace vtkstd;
 
-vtkCxxRevisionMacro(vtkCPProcessModulePythonHelper, "1.4");
 vtkStandardNewMacro(vtkCPProcessModulePythonHelper);
 
 //----------------------------------------------------------------------------

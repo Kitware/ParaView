@@ -34,7 +34,7 @@ class VTK_EXPORT vtkSMPluginManager : public vtkSMObject
 {
 public:
   static vtkSMPluginManager* New();
-  vtkTypeRevisionMacro(vtkSMPluginManager, vtkSMObject);
+  vtkTypeMacro(vtkSMPluginManager, vtkSMObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

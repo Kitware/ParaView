@@ -22,7 +22,6 @@
 #include <vtkstd/map>
 #include "vtkStdString.h"
 
-vtkCxxRevisionMacro(vtkSMDomain, "1.13");
 
 struct vtkSMDomainInternals
 {

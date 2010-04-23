@@ -13,7 +13,6 @@
 
 =========================================================================*/
 #include "vtkPVRenderViewProxy.h"
-vtkCxxRevisionMacro(vtkPVRenderViewProxy, "1.3");
 
 void vtkPVRenderViewProxy::PrintSelf(ostream& os, vtkIndent indent)
 {

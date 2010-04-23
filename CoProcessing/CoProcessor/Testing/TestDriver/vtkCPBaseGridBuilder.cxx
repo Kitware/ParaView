@@ -14,7 +14,6 @@
 =========================================================================*/
 #include "vtkCPBaseGridBuilder.h"
 
-vtkCxxRevisionMacro(vtkCPBaseGridBuilder, "1.1");
 
 //----------------------------------------------------------------------------
 vtkCPBaseGridBuilder::vtkCPBaseGridBuilder()

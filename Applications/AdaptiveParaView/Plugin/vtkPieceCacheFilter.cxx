@@ -26,7 +26,6 @@
 
 #include <vtkstd/vector>
 
-vtkCxxRevisionMacro(vtkPieceCacheFilter, "1.1");
 vtkStandardNewMacro(vtkPieceCacheFilter);
 #if 0
 

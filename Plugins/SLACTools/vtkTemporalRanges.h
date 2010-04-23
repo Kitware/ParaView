@@ -45,7 +45,7 @@ class vtkFieldData;
 class vtkTemporalRanges : public vtkTableAlgorithm
 {
 public:
-  vtkTypeRevisionMacro(vtkTemporalRanges, vtkTableAlgorithm);
+  vtkTypeMacro(vtkTemporalRanges, vtkTableAlgorithm);
   static vtkTemporalRanges *New();
   virtual void PrintSelf(ostream &os, vtkIndent indent);
 

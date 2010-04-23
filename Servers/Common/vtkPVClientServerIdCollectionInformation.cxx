@@ -24,7 +24,6 @@
 #include <vtkstd/set>
 
 vtkStandardNewMacro(vtkPVClientServerIdCollectionInformation);
-vtkCxxRevisionMacro(vtkPVClientServerIdCollectionInformation, "1.9");
 
 typedef vtkstd::set<vtkClientServerID> vtkClientServerIdSetBase;
 class vtkClientServerIdSetType : public vtkClientServerIdSetBase {};

@@ -41,7 +41,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QWidget>
 
 vtkStandardNewMacro(pqAnimationSceneImageWriter);
-vtkCxxRevisionMacro(pqAnimationSceneImageWriter, "1.5");
 //-----------------------------------------------------------------------------
 pqAnimationSceneImageWriter::pqAnimationSceneImageWriter()
 {

@@ -21,7 +21,6 @@
 #include "vtkSMPropertyHelper.h"
 
 vtkStandardNewMacro(vtkSMSurfaceLICRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMSurfaceLICRepresentationProxy, "1.1");
 //----------------------------------------------------------------------------
 vtkSMSurfaceLICRepresentationProxy::vtkSMSurfaceLICRepresentationProxy()
 {

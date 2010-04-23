@@ -35,7 +35,7 @@ class VTK_EXPORT vtkPVMergeTables : public vtkTableAlgorithm
 {
 public:
   static vtkPVMergeTables* New();
-  vtkTypeRevisionMacro(vtkPVMergeTables, vtkTableAlgorithm);
+  vtkTypeMacro(vtkPVMergeTables, vtkTableAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
 //BTX

@@ -25,7 +25,6 @@
 
 #define safeio(a) ((a)?(a):"NULL")
 
-vtkCxxRevisionMacro(vtkSMProxyConfigurationReader,"1.1");
 vtkStandardNewMacro(vtkSMProxyConfigurationReader);
 
 //-----------------------------------------------------------------------------

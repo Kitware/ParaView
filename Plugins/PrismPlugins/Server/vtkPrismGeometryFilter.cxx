@@ -24,7 +24,6 @@
 
 #include <math.h>
 
-vtkCxxRevisionMacro(vtkPrismGeometryFilter, "1.2");
 vtkStandardNewMacro(vtkPrismGeometryFilter);
 
 class vtkPrismGeometryFilter::MyInternal

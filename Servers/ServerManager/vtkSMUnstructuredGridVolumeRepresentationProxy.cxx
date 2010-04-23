@@ -38,7 +38,6 @@
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMUnstructuredGridVolumeRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMUnstructuredGridVolumeRepresentationProxy, "1.17");
 //----------------------------------------------------------------------------
 vtkSMUnstructuredGridVolumeRepresentationProxy::vtkSMUnstructuredGridVolumeRepresentationProxy()
 {

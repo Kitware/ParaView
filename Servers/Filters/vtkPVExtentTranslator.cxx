@@ -22,7 +22,6 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVExtentTranslator);
-vtkCxxRevisionMacro(vtkPVExtentTranslator, "1.4");
 
 //vtkCxxSetObjectMacro(vtkPVExtentTranslator, OriginalSource, vtkDataSet);
 

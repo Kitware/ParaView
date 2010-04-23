@@ -26,7 +26,7 @@ class VTK_EXPORT vtkPVJoystickFlyOut : public vtkPVJoystickFly
 {
 public:
   static vtkPVJoystickFlyOut *New();
-  vtkTypeRevisionMacro(vtkPVJoystickFlyOut, vtkPVJoystickFly);
+  vtkTypeMacro(vtkPVJoystickFlyOut, vtkPVJoystickFly);
   void PrintSelf(ostream& os, vtkIndent indent);
   
 protected:

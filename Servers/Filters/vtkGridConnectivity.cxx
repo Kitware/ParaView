@@ -81,7 +81,6 @@ Worry aobut this later.  Get something working...
 
 */
 
-vtkCxxRevisionMacro(vtkGridConnectivity, "1.8");
 vtkStandardNewMacro(vtkGridConnectivity);
 
 

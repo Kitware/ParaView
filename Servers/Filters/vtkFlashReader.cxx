@@ -64,7 +64,6 @@
 #include <vtkstd/string>
 #include <vtkstd/vector>
 
-vtkCxxRevisionMacro( vtkFlashReader, "1.14" );
 vtkStandardNewMacro( vtkFlashReader );
 
 // ============================================================================

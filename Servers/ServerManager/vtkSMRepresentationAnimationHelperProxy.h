@@ -30,7 +30,7 @@ class VTK_EXPORT vtkSMRepresentationAnimationHelperProxy : public vtkSMProxy
 {
 public:
   static vtkSMRepresentationAnimationHelperProxy* New();
-  vtkTypeRevisionMacro(vtkSMRepresentationAnimationHelperProxy, vtkSMProxy);
+  vtkTypeMacro(vtkSMRepresentationAnimationHelperProxy, vtkSMProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

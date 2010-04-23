@@ -19,7 +19,6 @@
 #include "vtkSMProxyInternals.h"
 
 vtkStandardNewMacro(vtkSMOrderedPropertyIterator);
-vtkCxxRevisionMacro(vtkSMOrderedPropertyIterator, "1.3");
 
 //---------------------------------------------------------------------------
 vtkSMOrderedPropertyIterator::vtkSMOrderedPropertyIterator()

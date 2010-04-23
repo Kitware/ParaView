@@ -35,7 +35,7 @@ class vtkPVXMLElement;
 class VTK_EXPORT vtkSMCameraConfigurationReader : public vtkSMProxyConfigurationReader
 {
 public:
-  vtkTypeRevisionMacro(vtkSMCameraConfigurationReader,vtkSMProxyConfigurationReader);
+  vtkTypeMacro(vtkSMCameraConfigurationReader,vtkSMProxyConfigurationReader);
   void PrintSelf(ostream& os, vtkIndent indent);
   static vtkSMCameraConfigurationReader *New();
 

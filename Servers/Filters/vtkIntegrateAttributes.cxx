@@ -35,7 +35,6 @@
 #include "vtkUnstructuredGrid.h"
 
 
-vtkCxxRevisionMacro(vtkIntegrateAttributes, "1.11");
 vtkStandardNewMacro(vtkIntegrateAttributes);
 
 class vtkIntegrateAttributes::vtkFieldList :

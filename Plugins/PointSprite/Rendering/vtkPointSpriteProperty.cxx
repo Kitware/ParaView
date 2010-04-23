@@ -45,7 +45,6 @@
 #include "vtkDataObject.h"
 #include <cmath>
 
-vtkCxxRevisionMacro(vtkPointSpriteProperty, "1.1")
 vtkStandardNewMacro(vtkPointSpriteProperty)
 
 // the shader strings

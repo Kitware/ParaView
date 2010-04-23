@@ -82,7 +82,7 @@ class VTK_EXPORT vtkSMProperty : public vtkSMObject
 {
 public:
   static vtkSMProperty* New();
-  vtkTypeRevisionMacro(vtkSMProperty, vtkSMObject);
+  vtkTypeMacro(vtkSMProperty, vtkSMObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

@@ -35,7 +35,7 @@ class VTK_EXPORT vtkSMSILDomain : public vtkSMArraySelectionDomain
 {
 public:
   static vtkSMSILDomain* New();
-  vtkTypeRevisionMacro(vtkSMSILDomain, vtkSMArraySelectionDomain);
+  vtkTypeMacro(vtkSMSILDomain, vtkSMArraySelectionDomain);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

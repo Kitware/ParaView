@@ -45,7 +45,7 @@ class VTK_EXPORT vtkPVDataInformation : public vtkPVInformation
 {
 public:
   static vtkPVDataInformation* New();
-  vtkTypeRevisionMacro(vtkPVDataInformation, vtkPVInformation);
+  vtkTypeMacro(vtkPVDataInformation, vtkPVInformation);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

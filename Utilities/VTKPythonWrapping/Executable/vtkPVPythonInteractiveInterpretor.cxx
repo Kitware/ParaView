@@ -26,7 +26,6 @@ public:
 };
 
 vtkStandardNewMacro(vtkPVPythonInteractiveInterpretor);
-vtkCxxRevisionMacro(vtkPVPythonInteractiveInterpretor, "1.4");
 //----------------------------------------------------------------------------
 vtkPVPythonInteractiveInterpretor::vtkPVPythonInteractiveInterpretor()
 {

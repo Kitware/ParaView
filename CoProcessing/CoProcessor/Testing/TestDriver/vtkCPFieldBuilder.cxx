@@ -16,7 +16,6 @@
 
 #include "vtkCPTensorFieldFunction.h"
 
-vtkCxxRevisionMacro(vtkCPFieldBuilder, "1.1");
 vtkCxxSetObjectMacro(vtkCPFieldBuilder, TensorFieldFunction, vtkCPTensorFieldFunction);
 
 //----------------------------------------------------------------------------

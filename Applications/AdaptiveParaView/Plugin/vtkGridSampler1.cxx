@@ -17,7 +17,6 @@
 #include "vtkObjectFactory.h"
 #include "vtkIntArray.h"
 
-vtkCxxRevisionMacro(vtkGridSampler1, "1.2");
 vtkStandardNewMacro(vtkGridSampler1);
 
 //define to 1 to adapt for thin k dimension

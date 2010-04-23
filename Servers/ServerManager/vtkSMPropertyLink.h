@@ -33,7 +33,7 @@ class VTK_EXPORT vtkSMPropertyLink : public vtkSMLink
 {
 public:
   static vtkSMPropertyLink* New();
-  vtkTypeRevisionMacro(vtkSMPropertyLink, vtkSMLink);
+  vtkTypeMacro(vtkSMPropertyLink, vtkSMLink);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

@@ -27,7 +27,7 @@ class VTK_EXPORT vtkSMPSWriterProxy : public vtkSMPWriterProxy
 {
 public:
   static vtkSMPSWriterProxy* New();
-  vtkTypeRevisionMacro(vtkSMPSWriterProxy, vtkSMPWriterProxy);
+  vtkTypeMacro(vtkSMPSWriterProxy, vtkSMPWriterProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
 protected:

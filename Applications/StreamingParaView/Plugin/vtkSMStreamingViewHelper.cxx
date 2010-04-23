@@ -19,7 +19,6 @@
 #include "vtkSMRenderViewProxy.h"
 
 vtkStandardNewMacro(vtkSMStreamingViewHelper);
-vtkCxxRevisionMacro(vtkSMStreamingViewHelper, "1.1");
 //----------------------------------------------------------------------------
 vtkSMStreamingViewHelper::vtkSMStreamingViewHelper()
 {

@@ -23,7 +23,6 @@
 #include <vtkstd/algorithm>
 #include <vtkstd/vector>
 
-vtkCxxRevisionMacro(vtkPVDReader, "1.7");
 vtkStandardNewMacro(vtkPVDReader);
 
 

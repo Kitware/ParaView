@@ -28,7 +28,7 @@ class VTK_EXPORT vtkVisibleLinesPainter : public vtkOpenGLRepresentationPainter
 {
 public:
   static vtkVisibleLinesPainter* New();
-  vtkTypeRevisionMacro(vtkVisibleLinesPainter, vtkOpenGLRepresentationPainter);
+  vtkTypeMacro(vtkVisibleLinesPainter, vtkOpenGLRepresentationPainter);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

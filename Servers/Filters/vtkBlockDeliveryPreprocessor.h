@@ -28,7 +28,7 @@ class VTK_EXPORT vtkBlockDeliveryPreprocessor : public vtkDataObjectAlgorithm
 {
 public:
   static vtkBlockDeliveryPreprocessor* New();
-  vtkTypeRevisionMacro(vtkBlockDeliveryPreprocessor, vtkDataObjectAlgorithm);
+  vtkTypeMacro(vtkBlockDeliveryPreprocessor, vtkDataObjectAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

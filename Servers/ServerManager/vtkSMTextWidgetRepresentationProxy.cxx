@@ -22,7 +22,6 @@
 //----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkSMTextWidgetRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMTextWidgetRepresentationProxy, "1.2");
 
 //----------------------------------------------------------------------------
 vtkSMTextWidgetRepresentationProxy::vtkSMTextWidgetRepresentationProxy()

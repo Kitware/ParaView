@@ -30,7 +30,7 @@ class VTK_EXPORT vtkAdaptiveOptions : public vtkObject
 {
  public:
   static vtkAdaptiveOptions* New();
-  vtkTypeRevisionMacro(vtkAdaptiveOptions, vtkObject);
+  vtkTypeMacro(vtkAdaptiveOptions, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   static bool GetEnableStreamMessages();

@@ -19,7 +19,6 @@
 #include "vtkProcessModule.h"
 
 vtkStandardNewMacro(vtkSMDistanceRepresentation2DProxy);
-vtkCxxRevisionMacro(vtkSMDistanceRepresentation2DProxy, "1.1");
 //----------------------------------------------------------------------------
 vtkSMDistanceRepresentation2DProxy::vtkSMDistanceRepresentation2DProxy()
 {

@@ -30,7 +30,6 @@ class vtkMultiViewManager::vtkRendererMap :
 
 
 vtkStandardNewMacro(vtkMultiViewManager);
-vtkCxxRevisionMacro(vtkMultiViewManager, "1.5");
 //----------------------------------------------------------------------------
 vtkMultiViewManager::vtkMultiViewManager()
 {

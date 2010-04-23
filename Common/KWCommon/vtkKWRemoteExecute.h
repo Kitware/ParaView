@@ -28,7 +28,7 @@ class VTK_EXPORT vtkKWRemoteExecute : public vtkObject
 {
 public:
   static vtkKWRemoteExecute* New();
-  vtkTypeRevisionMacro(vtkKWRemoteExecute,vtkObject);
+  vtkTypeMacro(vtkKWRemoteExecute,vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
 //BTX

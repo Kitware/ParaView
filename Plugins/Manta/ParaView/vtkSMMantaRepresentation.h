@@ -30,7 +30,7 @@ class VTK_EXPORT vtkSMMantaRepresentation :
 {
 public:
   static vtkSMMantaRepresentation* New();
-  vtkTypeRevisionMacro(vtkSMMantaRepresentation, 
+  vtkTypeMacro(vtkSMMantaRepresentation,
     vtkSMPVRepresentationProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 

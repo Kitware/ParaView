@@ -17,7 +17,6 @@
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro(vtkSMUpdateSuppressorProxy);
-vtkCxxRevisionMacro(vtkSMUpdateSuppressorProxy, "1.2");
 
 //---------------------------------------------------------------------------
 vtkSMUpdateSuppressorProxy::vtkSMUpdateSuppressorProxy()

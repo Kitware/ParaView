@@ -29,7 +29,6 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMStreamingParallelStrategy);
-vtkCxxRevisionMacro(vtkSMStreamingParallelStrategy, "1.2");
 
 //----------------------------------------------------------------------------
 vtkSMStreamingParallelStrategy::vtkSMStreamingParallelStrategy()

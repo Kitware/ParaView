@@ -39,7 +39,6 @@
 
 #include "vtkAdaptiveOptions.h"
 
-vtkCxxRevisionMacro(vtkRawStridedReader2, "1.6");
 vtkStandardNewMacro(vtkRawStridedReader2);
 
 #define MAPSIZE (1024 * 1024 * 1024) 

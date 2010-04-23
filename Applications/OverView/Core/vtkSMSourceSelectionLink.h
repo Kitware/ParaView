@@ -48,7 +48,7 @@ class OVERVIEW_CORE_EXPORT vtkSMSourceSelectionLink : public vtkObject
 {
 public:
   static vtkSMSourceSelectionLink *New();
-  vtkTypeRevisionMacro(vtkSMSourceSelectionLink, vtkObject);
+  vtkTypeMacro(vtkSMSourceSelectionLink, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   void AddSource(vtkSMSourceProxy* source);

@@ -31,7 +31,7 @@ class VTK_EXPORT vtkSMTesting : public vtkSMObject
 {
 public:
   static vtkSMTesting* New();
-  vtkTypeRevisionMacro(vtkSMTesting, vtkSMObject);
+  vtkTypeMacro(vtkSMTesting, vtkSMObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

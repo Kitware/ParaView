@@ -51,7 +51,6 @@
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkPVFileInformation);
-vtkCxxRevisionMacro(vtkPVFileInformation, "1.35");
 
 inline void vtkPVFileInformationAddTerminatingSlash(vtkstd::string& name)
 {

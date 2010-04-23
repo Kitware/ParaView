@@ -33,7 +33,7 @@ class vtkProcessModule;
 class VTK_EXPORT vtkInitializationHelper : public vtkObject
 {
 public:
-  vtkTypeRevisionMacro(vtkInitializationHelper,vtkObject);
+  vtkTypeMacro(vtkInitializationHelper,vtkObject);
 
   // Description:
   // Initializes the server manager. Do not use the server manager

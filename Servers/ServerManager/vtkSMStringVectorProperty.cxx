@@ -24,7 +24,6 @@
 #include "vtkStdString.h"
 
 vtkStandardNewMacro(vtkSMStringVectorProperty);
-vtkCxxRevisionMacro(vtkSMStringVectorProperty, "1.47");
 
 struct vtkSMStringVectorPropertyInternals
 {

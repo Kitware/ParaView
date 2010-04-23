@@ -26,7 +26,7 @@ class VTK_EXPORT vtkPVPluginInformation : public vtkPVInformation
 {
 public:
   static vtkPVPluginInformation* New();
-  vtkTypeRevisionMacro(vtkPVPluginInformation, vtkPVInformation);
+  vtkTypeMacro(vtkPVPluginInformation, vtkPVInformation);
   void PrintSelf(ostream& os, vtkIndent indent);
   
   // Description:

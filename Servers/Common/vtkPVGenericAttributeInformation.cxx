@@ -19,7 +19,6 @@
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro(vtkPVGenericAttributeInformation);
-vtkCxxRevisionMacro(vtkPVGenericAttributeInformation, "1.1");
 
 //----------------------------------------------------------------------------
 vtkPVGenericAttributeInformation::vtkPVGenericAttributeInformation()

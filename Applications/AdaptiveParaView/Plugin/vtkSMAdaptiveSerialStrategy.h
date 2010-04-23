@@ -25,7 +25,7 @@ class VTK_EXPORT vtkSMAdaptiveSerialStrategy : public vtkSMSimpleStrategy
 {
 public:
   static vtkSMAdaptiveSerialStrategy* New();
-  vtkTypeRevisionMacro(vtkSMAdaptiveSerialStrategy, vtkSMSimpleStrategy);
+  vtkTypeMacro(vtkSMAdaptiveSerialStrategy, vtkSMSimpleStrategy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

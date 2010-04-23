@@ -12,7 +12,6 @@
 #include "vtkVariantArray.h"
 
 vtkStandardNewMacro(vtkPSciVizMultiCorrelativeStats);
-vtkCxxRevisionMacro(vtkPSciVizMultiCorrelativeStats,"1.2");
 
 vtkPSciVizMultiCorrelativeStats::vtkPSciVizMultiCorrelativeStats()
 {

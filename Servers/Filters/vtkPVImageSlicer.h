@@ -31,7 +31,7 @@ class VTK_EXPORT vtkPVImageSlicer : public vtkImageAlgorithm
 {
 public:
   static vtkPVImageSlicer* New();
-  vtkTypeRevisionMacro(vtkPVImageSlicer, vtkImageAlgorithm);
+  vtkTypeMacro(vtkPVImageSlicer, vtkImageAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

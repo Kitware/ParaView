@@ -35,7 +35,7 @@ public:
   // Construct cone with angle of 45 degrees.
   static vtkPVArrowSource *New();
 
-  vtkTypeRevisionMacro(vtkPVArrowSource,vtkArrowSource);
+  vtkTypeMacro(vtkPVArrowSource,vtkArrowSource);
   void PrintSelf(ostream& os, vtkIndent indent);
     
 protected:

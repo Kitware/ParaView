@@ -25,7 +25,6 @@
 #include "vtkVariant.h"
 
 vtkStandardNewMacro(vtkPVMergeTables);
-vtkCxxRevisionMacro(vtkPVMergeTables, "1.4");
 //----------------------------------------------------------------------------
 vtkPVMergeTables::vtkPVMergeTables()
 {

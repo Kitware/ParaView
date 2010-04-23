@@ -77,7 +77,6 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define DEBUGPRINT_VIEW(arg) arg;
 
 //-----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkSMMantaClientServerViewProxy, "1.3");
 vtkStandardNewMacro(vtkSMMantaClientServerViewProxy);
 
 //-----------------------------------------------------------------------------

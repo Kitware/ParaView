@@ -34,7 +34,6 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkCommandOptions);
-vtkCxxRevisionMacro(vtkCommandOptions, "1.11");
 
 //----------------------------------------------------------------------------
 vtkCommandOptions::vtkCommandOptions()

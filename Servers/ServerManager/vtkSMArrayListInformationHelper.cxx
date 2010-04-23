@@ -21,7 +21,6 @@
 #include "vtkSMDomainIterator.h"
 
 vtkStandardNewMacro(vtkSMArrayListInformationHelper);
-vtkCxxRevisionMacro(vtkSMArrayListInformationHelper, "1.1");
 //-----------------------------------------------------------------------------
 vtkSMArrayListInformationHelper::vtkSMArrayListInformationHelper()
 {

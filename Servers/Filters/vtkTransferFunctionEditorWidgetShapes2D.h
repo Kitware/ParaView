@@ -26,7 +26,7 @@ class VTK_EXPORT vtkTransferFunctionEditorWidgetShapes2D : public vtkTransferFun
 {
 public:
   static vtkTransferFunctionEditorWidgetShapes2D* New();
-  vtkTypeRevisionMacro(vtkTransferFunctionEditorWidgetShapes2D, vtkTransferFunctionEditorWidget);
+  vtkTypeMacro(vtkTransferFunctionEditorWidgetShapes2D, vtkTransferFunctionEditorWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

@@ -28,7 +28,6 @@
 #include "vtkTransform.h"
 
 vtkStandardNewMacro(vtkSMCubeAxesRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMCubeAxesRepresentationProxy, "1.6");
 //----------------------------------------------------------------------------
 vtkSMCubeAxesRepresentationProxy::vtkSMCubeAxesRepresentationProxy()
 {

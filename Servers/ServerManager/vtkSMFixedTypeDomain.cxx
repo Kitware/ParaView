@@ -22,7 +22,6 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMFixedTypeDomain);
-vtkCxxRevisionMacro(vtkSMFixedTypeDomain, "1.5");
 
 //---------------------------------------------------------------------------
 vtkSMFixedTypeDomain::vtkSMFixedTypeDomain()

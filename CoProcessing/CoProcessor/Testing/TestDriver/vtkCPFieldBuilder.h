@@ -26,7 +26,7 @@ class vtkCPTensorFieldFunction;
 class VTK_EXPORT vtkCPFieldBuilder : public vtkCPBaseFieldBuilder
 {
 public:
-  vtkTypeRevisionMacro(vtkCPFieldBuilder, vtkCPBaseFieldBuilder);
+  vtkTypeMacro(vtkCPFieldBuilder, vtkCPBaseFieldBuilder);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

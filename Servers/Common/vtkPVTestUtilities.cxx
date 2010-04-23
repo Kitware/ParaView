@@ -27,7 +27,6 @@
 using vtkstd::string;
 using vtkstd::vector;
 
-vtkCxxRevisionMacro(vtkPVTestUtilities, "1.7");
 vtkStandardNewMacro(vtkPVTestUtilities);
 
 //-----------------------------------------------------------------------------

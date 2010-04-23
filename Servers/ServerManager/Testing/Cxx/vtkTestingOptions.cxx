@@ -22,7 +22,6 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkTestingOptions);
-vtkCxxRevisionMacro(vtkTestingOptions, "1.2");
 
 //----------------------------------------------------------------------------
 vtkTestingOptions::vtkTestingOptions()

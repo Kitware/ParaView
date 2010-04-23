@@ -24,7 +24,7 @@
 class VTK_EXPORT vtkSMBooleanKeyFrameProxy: public vtkSMKeyFrameProxy
 {
 public:
-  vtkTypeRevisionMacro(vtkSMBooleanKeyFrameProxy, vtkSMKeyFrameProxy);
+  vtkTypeMacro(vtkSMBooleanKeyFrameProxy, vtkSMKeyFrameProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
   static vtkSMBooleanKeyFrameProxy* New();
 

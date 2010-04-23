@@ -22,7 +22,6 @@
 #include "vtkSMProxyManager.h"
 #include "vtkSMRepresentationStrategy.h"
 
-vtkCxxRevisionMacro(vtkSMMultiProcessRenderView, "1.11");
 //----------------------------------------------------------------------------
 vtkSMMultiProcessRenderView::vtkSMMultiProcessRenderView()
 {

@@ -17,7 +17,6 @@
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro(vtkMySpecialPolyDataMapper);
-vtkCxxRevisionMacro(vtkMySpecialPolyDataMapper, "1.1");
 //----------------------------------------------------------------------------
 vtkMySpecialPolyDataMapper::vtkMySpecialPolyDataMapper()
 {

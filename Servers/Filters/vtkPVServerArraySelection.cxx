@@ -25,7 +25,6 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVServerArraySelection);
-vtkCxxRevisionMacro(vtkPVServerArraySelection, "1.6");
 
 //----------------------------------------------------------------------------
 class vtkPVServerArraySelectionInternals

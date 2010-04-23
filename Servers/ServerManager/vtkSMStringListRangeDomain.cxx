@@ -22,7 +22,6 @@
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMStringListRangeDomain);
-vtkCxxRevisionMacro(vtkSMStringListRangeDomain, "1.6");
 
 //---------------------------------------------------------------------------
 vtkSMStringListRangeDomain::vtkSMStringListRangeDomain()

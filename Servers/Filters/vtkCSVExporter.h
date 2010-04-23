@@ -27,7 +27,7 @@ class VTK_EXPORT vtkCSVExporter : public vtkObject
 {
 public:
   static vtkCSVExporter* New();
-  vtkTypeRevisionMacro(vtkCSVExporter, vtkObject);
+  vtkTypeMacro(vtkCSVExporter, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

@@ -37,7 +37,7 @@
 class VTK_EXPORT vtkDesktopDeliveryServer : public vtkParallelRenderManager
 {
 public:
-  vtkTypeRevisionMacro(vtkDesktopDeliveryServer, vtkParallelRenderManager);
+  vtkTypeMacro(vtkDesktopDeliveryServer, vtkParallelRenderManager);
   virtual void PrintSelf(ostream &os, vtkIndent indent);
 
   static vtkDesktopDeliveryServer *New();

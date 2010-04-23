@@ -52,7 +52,7 @@ class PQCORE_EXPORT pqHelperProxyRegisterUndoElement : public vtkSMUndoElement
 {
 public:
   static pqHelperProxyRegisterUndoElement* New();
-  vtkTypeRevisionMacro(pqHelperProxyRegisterUndoElement, vtkSMUndoElement);
+  vtkTypeMacro(pqHelperProxyRegisterUndoElement, vtkSMUndoElement);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   /// Description:

@@ -25,7 +25,6 @@
 #include "vtkSMPropertyHelper.h"
 
 vtkStandardNewMacro(vtkSMSimpleParallelStrategy);
-vtkCxxRevisionMacro(vtkSMSimpleParallelStrategy, "1.26");
 //----------------------------------------------------------------------------
 vtkSMSimpleParallelStrategy::vtkSMSimpleParallelStrategy()
 {

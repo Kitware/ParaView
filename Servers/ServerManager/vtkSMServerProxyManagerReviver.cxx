@@ -34,7 +34,6 @@
 #include <vtksys/ios/sstream>
 
 vtkStandardNewMacro(vtkSMServerProxyManagerReviver);
-vtkCxxRevisionMacro(vtkSMServerProxyManagerReviver, "1.19");
 //-----------------------------------------------------------------------------
 vtkSMServerProxyManagerReviver::vtkSMServerProxyManagerReviver()
 {

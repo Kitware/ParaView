@@ -31,7 +31,7 @@ class VTK_EXPORT vtkPieceList : public vtkObject
 {
 public:
   static vtkPieceList* New();
-  vtkTypeRevisionMacro(vtkPieceList, vtkObject);
+  vtkTypeMacro(vtkPieceList, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
   
   //Description

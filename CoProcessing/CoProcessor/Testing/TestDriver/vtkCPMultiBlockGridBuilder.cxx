@@ -23,7 +23,6 @@
 #include <vtkstd/algorithm> // for vtkstd::find
 
 vtkStandardNewMacro(vtkCPMultiBlockGridBuilder);
-vtkCxxRevisionMacro(vtkCPMultiBlockGridBuilder, "1.1");
 vtkCxxSetObjectMacro(vtkCPMultiBlockGridBuilder, Grid, vtkMultiBlockDataSet);
 
 struct vtkCPMultiBlockGridBuilderInternals

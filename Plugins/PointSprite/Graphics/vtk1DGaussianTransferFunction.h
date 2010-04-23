@@ -40,7 +40,7 @@ class VTK_EXPORT vtk1DGaussianTransferFunction: public vtk1DTransferFunction
 {
 public:
   static vtk1DGaussianTransferFunction* New();
-  vtkTypeRevisionMacro(vtk1DGaussianTransferFunction, vtk1DTransferFunction);
+  vtkTypeMacro(vtk1DGaussianTransferFunction, vtk1DTransferFunction);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

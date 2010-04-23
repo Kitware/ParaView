@@ -26,7 +26,6 @@
 #include "vtkSMAdaptiveViewProxy.h"
 #include "vtkAdaptiveOptions.h"
 
-vtkCxxRevisionMacro(vtkSMAdaptiveRepresentation, "1.1");
 vtkStandardNewMacro(vtkSMAdaptiveRepresentation);
 
 #define DEBUGPRINT_REPRESENTATION(arg)\

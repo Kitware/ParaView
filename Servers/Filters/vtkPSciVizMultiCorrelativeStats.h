@@ -71,7 +71,7 @@ class VTK_EXPORT vtkPSciVizMultiCorrelativeStats : public vtkSciVizStatistics
 {
 public:
   static vtkPSciVizMultiCorrelativeStats* New();
-  vtkTypeRevisionMacro(vtkPSciVizMultiCorrelativeStats,vtkSciVizStatistics);
+  vtkTypeMacro(vtkPSciVizMultiCorrelativeStats,vtkSciVizStatistics);
   virtual void PrintSelf( ostream& os, vtkIndent indent );
 
 protected:

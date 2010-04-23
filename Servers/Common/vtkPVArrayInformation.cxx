@@ -30,7 +30,6 @@ namespace
 class vtkPVArrayInformation::vtkInternalComponentNames : public vtkInternalComponentNameBase {};
 
 vtkStandardNewMacro(vtkPVArrayInformation);
-vtkCxxRevisionMacro(vtkPVArrayInformation, "1.13");
 
 //----------------------------------------------------------------------------
 vtkPVArrayInformation::vtkPVArrayInformation()

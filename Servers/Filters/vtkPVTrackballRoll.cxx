@@ -22,7 +22,6 @@
 #include "vtkRenderWindow.h"
 #include "vtkTransform.h"
 
-vtkCxxRevisionMacro(vtkPVTrackballRoll, "1.3");
 vtkStandardNewMacro(vtkPVTrackballRoll);
 
 //-------------------------------------------------------------------------

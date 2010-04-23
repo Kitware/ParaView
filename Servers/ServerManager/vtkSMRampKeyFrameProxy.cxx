@@ -19,7 +19,6 @@
 #include "vtkSMVectorProperty.h"
 #include "vtkSMAnimationCueProxy.h"
 #include "vtkSMSourceProxy.h"
-vtkCxxRevisionMacro(vtkSMRampKeyFrameProxy, "1.2");
 vtkStandardNewMacro(vtkSMRampKeyFrameProxy);
 
 //----------------------------------------------------------------------------

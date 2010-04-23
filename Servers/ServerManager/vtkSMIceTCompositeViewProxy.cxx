@@ -36,7 +36,6 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMIceTCompositeViewProxy);
-vtkCxxRevisionMacro(vtkSMIceTCompositeViewProxy, "1.25");
 
 vtkInformationKeyMacro(vtkSMIceTCompositeViewProxy, KD_TREE, ObjectBase);
 //----------------------------------------------------------------------------

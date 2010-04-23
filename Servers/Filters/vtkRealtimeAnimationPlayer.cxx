@@ -18,7 +18,6 @@
 #include "vtkTimerLog.h"
 
 vtkStandardNewMacro(vtkRealtimeAnimationPlayer);
-vtkCxxRevisionMacro(vtkRealtimeAnimationPlayer, "1.5");
 //----------------------------------------------------------------------------
 vtkRealtimeAnimationPlayer::vtkRealtimeAnimationPlayer()
 {

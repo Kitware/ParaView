@@ -20,7 +20,6 @@
 #include <vtksys/ios/sstream>
 
 vtkStandardNewMacro(vtkZlibImageCompressor);
-vtkCxxRevisionMacro(vtkZlibImageCompressor, "1.5");
 
 
 //=============================================================================

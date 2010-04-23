@@ -68,7 +68,6 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkMantaActor.h"
 #include "vtkMatrix4x4.h"
 
-vtkCxxRevisionMacro(vtkMantaLODActor, "1.1");
 vtkStandardNewMacro(vtkMantaLODActor);
 
 //----------------------------------------------------------------------------

@@ -32,7 +32,6 @@
 #include <vtkstd/string>
 #include <vtkstd/vector>
 
-vtkCxxRevisionMacro(vtkEnSightGoldReader2, "1.2");
 vtkStandardNewMacro(vtkEnSightGoldReader2);
 
 //BTX

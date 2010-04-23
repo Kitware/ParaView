@@ -29,7 +29,6 @@
 #include "vtkIntArray.h"
 
 vtkStandardNewMacro(vtkAttributeDataToTableFilter);
-vtkCxxRevisionMacro(vtkAttributeDataToTableFilter, "1.4");
 //----------------------------------------------------------------------------
 vtkAttributeDataToTableFilter::vtkAttributeDataToTableFilter()
 {

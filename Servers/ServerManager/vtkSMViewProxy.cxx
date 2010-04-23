@@ -122,7 +122,6 @@ void vtkSMViewProxy::CleanMultiViewInitializer()
 }
 
 vtkStandardNewMacro(vtkSMViewProxy);
-vtkCxxRevisionMacro(vtkSMViewProxy, "1.21");
 
 vtkInformationKeyMacro(vtkSMViewProxy, USE_CACHE, Integer);
 vtkInformationKeyMacro(vtkSMViewProxy, CACHE_TIME, Double);

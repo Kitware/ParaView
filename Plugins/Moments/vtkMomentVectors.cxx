@@ -102,7 +102,6 @@ inline double vtkMomentVectorsCellArea(vtkCell *cell)
 }
 
 //=============================================================================
-vtkCxxRevisionMacro(vtkMomentVectors, "1.1");
 vtkStandardNewMacro(vtkMomentVectors);
 
 //-----------------------------------------------------------------------------

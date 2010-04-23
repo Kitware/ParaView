@@ -29,7 +29,7 @@ class COPROCESSING_EXPORT vtkCPPythonHelper : public vtkObject
 {
 public:
   static vtkCPPythonHelper* New();
-  vtkTypeRevisionMacro(vtkCPPythonHelper,vtkObject);
+  vtkTypeMacro(vtkCPPythonHelper,vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   /// Get the interpretor that has been setup.

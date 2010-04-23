@@ -52,7 +52,7 @@ class VTK_EXPORT vtkNetDmfReader : public vtkDirectedGraphAlgorithm
 {
 public:
   static vtkNetDmfReader* New();
-  vtkTypeRevisionMacro(vtkNetDmfReader, vtkDirectedGraphAlgorithm);
+  vtkTypeMacro(vtkNetDmfReader, vtkDirectedGraphAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   void SetFileName(const vtkStdString& fileName);

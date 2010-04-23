@@ -16,7 +16,6 @@
 
 #include "vtkObjectFactory.h"
 
-vtkCxxRevisionMacro(vtkMyElevationFilter, "1.1");
 vtkStandardNewMacro(vtkMyElevationFilter);
 
 //----------------------------------------------------------------------------

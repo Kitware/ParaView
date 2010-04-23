@@ -18,7 +18,6 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVEnSightMasterServerTranslator);
-vtkCxxRevisionMacro(vtkPVEnSightMasterServerTranslator, "1.4");
 
 //----------------------------------------------------------------------------
 vtkPVEnSightMasterServerTranslator::vtkPVEnSightMasterServerTranslator()

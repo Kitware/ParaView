@@ -25,7 +25,7 @@ class VTK_EXPORT vtkMPICompositeManager : public vtkCompositeRenderManager
 {
 public:
   static vtkMPICompositeManager* New();
-  vtkTypeRevisionMacro(vtkMPICompositeManager, vtkCompositeRenderManager);
+  vtkTypeMacro(vtkMPICompositeManager, vtkCompositeRenderManager);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

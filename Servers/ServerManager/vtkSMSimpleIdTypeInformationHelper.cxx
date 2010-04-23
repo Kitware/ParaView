@@ -20,7 +20,6 @@
 #include "vtkSMIdTypeVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMSimpleIdTypeInformationHelper);
-vtkCxxRevisionMacro(vtkSMSimpleIdTypeInformationHelper, "1.1");
 
 //---------------------------------------------------------------------------
 vtkSMSimpleIdTypeInformationHelper::vtkSMSimpleIdTypeInformationHelper()

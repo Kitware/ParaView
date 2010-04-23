@@ -24,7 +24,6 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVTimerInformation);
-vtkCxxRevisionMacro(vtkPVTimerInformation, "1.5");
 
 
 

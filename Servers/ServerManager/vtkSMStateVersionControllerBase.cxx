@@ -17,7 +17,6 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
 
-vtkCxxRevisionMacro(vtkSMStateVersionControllerBase, "1.2");
 //----------------------------------------------------------------------------
 vtkSMStateVersionControllerBase::vtkSMStateVersionControllerBase()
 {

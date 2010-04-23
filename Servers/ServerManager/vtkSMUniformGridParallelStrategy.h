@@ -35,7 +35,7 @@ class VTK_EXPORT vtkSMUniformGridParallelStrategy : public vtkSMSimpleParallelSt
 {
 public:
   static vtkSMUniformGridParallelStrategy* New();
-  vtkTypeRevisionMacro(vtkSMUniformGridParallelStrategy, vtkSMSimpleParallelStrategy);
+  vtkTypeMacro(vtkSMUniformGridParallelStrategy, vtkSMSimpleParallelStrategy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

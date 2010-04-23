@@ -24,7 +24,6 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkBalancedRedistributePolyData);
-vtkCxxRevisionMacro(vtkBalancedRedistributePolyData, "1.4");
 
 //----------------------------------------------------------------------------
 vtkBalancedRedistributePolyData::vtkBalancedRedistributePolyData()

@@ -24,7 +24,6 @@
 
 #include <assert.h>
 
-vtkCxxRevisionMacro(vtkSMCameraKeyFrameProxy, "1.6");
 vtkStandardNewMacro(vtkSMCameraKeyFrameProxy);
 //----------------------------------------------------------------------------
 vtkSMCameraKeyFrameProxy::vtkSMCameraKeyFrameProxy()

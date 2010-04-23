@@ -27,7 +27,6 @@
 #include "vtkznzlib.h"
 #include "vtk_zlib.h"
 
-vtkCxxRevisionMacro(vtkNIfTIReader, "1.3");
 vtkStandardNewMacro(vtkNIfTIReader);
 
 

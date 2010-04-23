@@ -22,7 +22,6 @@
 #include "vtkSMViewProxy.h"
 
 vtkStandardNewMacro(vtkSMAxesRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMAxesRepresentationProxy, "1.3");
 
 //----------------------------------------------------------------------------
 vtkSMAxesRepresentationProxy::vtkSMAxesRepresentationProxy()

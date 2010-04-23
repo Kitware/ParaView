@@ -27,7 +27,7 @@ class VTK_EXPORT vtkFileSeriesWriter : public vtkDataObjectAlgorithm
 {
 public:
   static vtkFileSeriesWriter* New();
-  vtkTypeRevisionMacro(vtkFileSeriesWriter, vtkDataObjectAlgorithm);
+  vtkTypeMacro(vtkFileSeriesWriter, vtkDataObjectAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

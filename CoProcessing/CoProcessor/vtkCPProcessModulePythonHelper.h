@@ -29,7 +29,7 @@ class COPROCESSING_EXPORT vtkCPProcessModulePythonHelper : public vtkPVProcessMo
 {
 public: 
   static vtkCPProcessModulePythonHelper* New();
-  vtkTypeRevisionMacro(vtkCPProcessModulePythonHelper,vtkPVProcessModulePythonHelper);
+  vtkTypeMacro(vtkCPProcessModulePythonHelper,vtkPVProcessModulePythonHelper);
   void PrintSelf(ostream& os, vtkIndent indent);
   
   /// Run main gui loop from process module.

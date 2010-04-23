@@ -37,7 +37,7 @@ class VTK_EXPORT vtkPVExtractVOI : public vtkDataSetAlgorithm
 
 public:
   static vtkPVExtractVOI *New();
-  vtkTypeRevisionMacro(vtkPVExtractVOI,vtkDataSetAlgorithm);
+  vtkTypeMacro(vtkPVExtractVOI,vtkDataSetAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

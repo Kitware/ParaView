@@ -39,7 +39,6 @@ class vtkPVExtractSelection::vtkSelectionNodeVector :
 };
 
 
-vtkCxxRevisionMacro(vtkPVExtractSelection, "1.13");
 vtkStandardNewMacro(vtkPVExtractSelection);
 
 //----------------------------------------------------------------------------

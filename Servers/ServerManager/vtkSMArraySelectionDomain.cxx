@@ -18,7 +18,6 @@
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMArraySelectionDomain);
-vtkCxxRevisionMacro(vtkSMArraySelectionDomain, "1.6");
 
 //---------------------------------------------------------------------------
 vtkSMArraySelectionDomain::vtkSMArraySelectionDomain()

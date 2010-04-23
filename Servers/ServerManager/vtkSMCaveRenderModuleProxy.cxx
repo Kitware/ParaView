@@ -28,7 +28,6 @@
 #include "vtkPVServerInformation.h"
 
 vtkStandardNewMacro(vtkSMCaveRenderModuleProxy);
-vtkCxxRevisionMacro(vtkSMCaveRenderModuleProxy, "1.12");
 //-----------------------------------------------------------------------------
 vtkSMCaveRenderModuleProxy::vtkSMCaveRenderModuleProxy()
 {

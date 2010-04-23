@@ -27,7 +27,7 @@ class VTK_EXPORT vtkSMStreamingViewHelper : public vtkPVRenderViewProxy
 {
 public:
   static vtkSMStreamingViewHelper* New();
-  vtkTypeRevisionMacro(vtkSMStreamingViewHelper, vtkPVRenderViewProxy);
+  vtkTypeMacro(vtkSMStreamingViewHelper, vtkPVRenderViewProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Implemeting API from vtkPVRenderViewProxy.

@@ -27,7 +27,7 @@ class VTK_EXPORT vtkPVTimerInformation : public vtkPVInformation
 {
 public:
   static vtkPVTimerInformation* New();
-  vtkTypeRevisionMacro(vtkPVTimerInformation, vtkPVInformation);
+  vtkTypeMacro(vtkPVTimerInformation, vtkPVInformation);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

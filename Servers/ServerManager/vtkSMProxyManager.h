@@ -58,7 +58,7 @@ class VTK_EXPORT vtkSMProxyManager : public vtkSMObject
 {
 public:
   static vtkSMProxyManager* New();
-  vtkTypeRevisionMacro(vtkSMProxyManager, vtkSMObject);
+  vtkTypeMacro(vtkSMProxyManager, vtkSMObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

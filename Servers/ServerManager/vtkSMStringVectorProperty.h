@@ -38,7 +38,7 @@ class VTK_EXPORT vtkSMStringVectorProperty : public vtkSMVectorProperty
 {
 public:
   static vtkSMStringVectorProperty* New();
-  vtkTypeRevisionMacro(vtkSMStringVectorProperty, vtkSMVectorProperty);
+  vtkTypeMacro(vtkSMStringVectorProperty, vtkSMVectorProperty);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

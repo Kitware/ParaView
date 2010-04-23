@@ -32,7 +32,6 @@
 #include <QString>
 
 vtkStandardNewMacro(vtkSMParallelCoordinatesRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMParallelCoordinatesRepresentationProxy, "1.6");
 //----------------------------------------------------------------------------
 vtkSMParallelCoordinatesRepresentationProxy::vtkSMParallelCoordinatesRepresentationProxy()
 {

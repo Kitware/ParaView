@@ -82,7 +82,7 @@ class VTK_vtkManta_EXPORT vtkMantaCamera : public vtkCamera
 {
 public:
   static vtkMantaCamera *New();
-  vtkTypeRevisionMacro(vtkMantaCamera,vtkCamera);
+  vtkTypeMacro(vtkMantaCamera,vtkCamera);
   
   void Render(vtkRenderer *ren);
   

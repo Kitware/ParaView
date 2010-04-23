@@ -28,7 +28,7 @@
 class VTK_EXPORT vtkSMProxyManagerReviver : public vtkSMObject
 {
 public:
-  vtkTypeRevisionMacro(vtkSMProxyManagerReviver, vtkSMObject);
+  vtkTypeMacro(vtkSMProxyManagerReviver, vtkSMObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

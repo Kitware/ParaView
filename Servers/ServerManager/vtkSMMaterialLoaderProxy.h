@@ -30,7 +30,7 @@ class VTK_EXPORT vtkSMMaterialLoaderProxy : public vtkSMProxy
 {
 public:
   static vtkSMMaterialLoaderProxy* New();
-  vtkTypeRevisionMacro(vtkSMMaterialLoaderProxy, vtkSMProxy);
+  vtkTypeMacro(vtkSMMaterialLoaderProxy, vtkSMProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

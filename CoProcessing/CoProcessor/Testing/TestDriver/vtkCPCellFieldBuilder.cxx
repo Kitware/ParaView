@@ -24,7 +24,6 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkCPCellFieldBuilder);
-vtkCxxRevisionMacro(vtkCPCellFieldBuilder, "1.1");
 
 //----------------------------------------------------------------------------
 vtkCPCellFieldBuilder::vtkCPCellFieldBuilder()

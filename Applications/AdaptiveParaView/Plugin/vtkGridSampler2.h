@@ -36,7 +36,7 @@ class VTK_EXPORT vtkGridSampler2 : public vtkObject
 {
 public:
   static vtkGridSampler2 *New();
-  vtkTypeRevisionMacro(vtkGridSampler2,vtkObject);
+  vtkTypeMacro(vtkGridSampler2,vtkObject);
   virtual void PrintSelf(ostream& os, vtkIndent indent);
   
   void SetWholeExtent(int *);

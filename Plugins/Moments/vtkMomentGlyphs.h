@@ -38,7 +38,7 @@
 class vtkMomentGlyphs : public vtkPolyDataAlgorithm
 {
 public:
-  vtkTypeRevisionMacro(vtkMomentGlyphs, vtkPolyDataAlgorithm);
+  vtkTypeMacro(vtkMomentGlyphs, vtkPolyDataAlgorithm);
   static vtkMomentGlyphs *New();
   virtual void PrintSelf(ostream &os, vtkIndent indent);
 

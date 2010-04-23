@@ -24,7 +24,6 @@
 #include "vtkSMXMLPVAnimationWriterProxy.h"
 
 vtkStandardNewMacro(vtkSMAnimationSceneGeometryWriter);
-vtkCxxRevisionMacro(vtkSMAnimationSceneGeometryWriter, "1.3");
 vtkCxxSetObjectMacro(vtkSMAnimationSceneGeometryWriter, ViewModule, vtkSMProxy);
 
 //-----------------------------------------------------------------------------

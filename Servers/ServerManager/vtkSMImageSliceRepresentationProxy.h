@@ -27,7 +27,7 @@ class VTK_EXPORT vtkSMImageSliceRepresentationProxy : public vtkSMPropRepresenta
 {
 public:
   static vtkSMImageSliceRepresentationProxy* New();
-  vtkTypeRevisionMacro(vtkSMImageSliceRepresentationProxy, vtkSMPropRepresentationProxy);
+  vtkTypeMacro(vtkSMImageSliceRepresentationProxy, vtkSMPropRepresentationProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

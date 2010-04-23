@@ -22,7 +22,6 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVBatchOptions);
-vtkCxxRevisionMacro(vtkPVBatchOptions, "1.7");
 
 //----------------------------------------------------------------------------
 vtkPVBatchOptions::vtkPVBatchOptions()

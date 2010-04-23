@@ -28,7 +28,6 @@
 #include "vtkThreshold.h"
 #include "vtkUnstructuredGrid.h"
 
-vtkCxxRevisionMacro(vtkIsoVolume, "1.1");
 vtkStandardNewMacro(vtkIsoVolume);
 
 //----------------------------------------------------------------------------

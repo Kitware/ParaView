@@ -11,7 +11,6 @@
 #include <vtkstd/string>  // STL required.
 #include <vtkstd/vector>  // STL required.
 
-vtkCxxRevisionMacro(vtkPVAMRDualClip, "1.1");
 vtkStandardNewMacro(vtkPVAMRDualClip);
 
 const double PV_AMR_SURFACE_VALUE_UNSIGNED_CHAR=255;

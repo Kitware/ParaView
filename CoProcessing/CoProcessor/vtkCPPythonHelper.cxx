@@ -44,7 +44,6 @@ vtkInstantiatorNewMacro(vtkCPPythonHelper);
 
 vtkCPPythonHelper* vtkCPPythonHelper::Instance = 0;
 
-vtkCxxRevisionMacro(vtkCPPythonHelper, "1.2");
 
 //----------------------------------------------------------------------------
 vtkCPPythonHelper::vtkCPPythonHelper()

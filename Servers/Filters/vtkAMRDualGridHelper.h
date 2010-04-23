@@ -39,7 +39,7 @@ class VTK_EXPORT vtkAMRDualGridHelper : public vtkObject
 {
 public:
   static vtkAMRDualGridHelper *New();
-  vtkTypeRevisionMacro(vtkAMRDualGridHelper,vtkObject);
+  vtkTypeMacro(vtkAMRDualGridHelper,vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
   
   // Description:

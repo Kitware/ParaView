@@ -29,7 +29,7 @@ class VTK_EXPORT vtkSMCaveRenderModuleProxy : public vtkSMCompositeRenderModuleP
 {
 public:
   static vtkSMCaveRenderModuleProxy* New();
-  vtkTypeRevisionMacro(vtkSMCaveRenderModuleProxy, vtkSMCompositeRenderModuleProxy);
+  vtkTypeMacro(vtkSMCaveRenderModuleProxy, vtkSMCompositeRenderModuleProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
 protected:

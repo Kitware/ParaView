@@ -43,7 +43,7 @@
 class VTK_EXPORT vtkTableFFT : public vtkTableAlgorithm
 {
 public:
-  vtkTypeRevisionMacro(vtkTableFFT, vtkTableAlgorithm);
+  vtkTypeMacro(vtkTableFFT, vtkTableAlgorithm);
   static vtkTableFFT *New();
   virtual void PrintSelf(ostream &os, vtkIndent indent);
 

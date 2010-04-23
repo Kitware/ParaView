@@ -117,7 +117,6 @@ public:
   vtkstd::vector<Manta::Vector> texCoords;
 };
 
-vtkCxxRevisionMacro(vtkMantaPolyDataMapper, "1.14");
 vtkStandardNewMacro(vtkMantaPolyDataMapper);
 
 //----------------------------------------------------------------------------

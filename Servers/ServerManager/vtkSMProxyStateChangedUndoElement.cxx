@@ -21,7 +21,6 @@
 
 
 vtkStandardNewMacro(vtkSMProxyStateChangedUndoElement);
-vtkCxxRevisionMacro(vtkSMProxyStateChangedUndoElement, "1.1");
 //----------------------------------------------------------------------------
 vtkSMProxyStateChangedUndoElement::vtkSMProxyStateChangedUndoElement()
 {

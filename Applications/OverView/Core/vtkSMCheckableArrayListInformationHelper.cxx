@@ -38,7 +38,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMDomainIterator.h"
 
 vtkStandardNewMacro(vtkSMCheckableArrayListInformationHelper);
-vtkCxxRevisionMacro(vtkSMCheckableArrayListInformationHelper, "1.1");
 //-----------------------------------------------------------------------------
 vtkSMCheckableArrayListInformationHelper::vtkSMCheckableArrayListInformationHelper()
 {

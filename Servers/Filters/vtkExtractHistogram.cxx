@@ -51,7 +51,6 @@ struct vtkEHInternals
 };
 
 vtkStandardNewMacro(vtkExtractHistogram);
-vtkCxxRevisionMacro(vtkExtractHistogram, "1.26");
 //-----------------------------------------------------------------------------
 vtkExtractHistogram::vtkExtractHistogram() :
   Component(0),

@@ -25,7 +25,7 @@ class VTK_EXPORT vtkCPNodalFieldBuilder : public vtkCPFieldBuilder
 {
 public:
   static vtkCPNodalFieldBuilder * New();
-  vtkTypeRevisionMacro(vtkCPNodalFieldBuilder, vtkCPFieldBuilder);
+  vtkTypeMacro(vtkCPNodalFieldBuilder, vtkCPFieldBuilder);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

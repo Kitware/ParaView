@@ -24,7 +24,6 @@
 
 #define ANALYZE_HEADER_ARRAY "vtkAnalyzeReaderHeaderArray"
 
-vtkCxxRevisionMacro(vtkNIfTIWriter, "1.3");
 vtkStandardNewMacro(vtkNIfTIWriter);
 
 vtkNIfTIWriter::vtkNIfTIWriter()

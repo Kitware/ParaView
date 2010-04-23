@@ -33,7 +33,7 @@ class VTK_EXPORT vtkSelfConnection : public vtkProcessModuleConnection
 {
 public:
   static vtkSelfConnection* New();
-  vtkTypeRevisionMacro(vtkSelfConnection, vtkProcessModuleConnection);
+  vtkTypeMacro(vtkSelfConnection, vtkProcessModuleConnection);
   void PrintSelf(ostream& os, vtkIndent indent);
  
   // Description:

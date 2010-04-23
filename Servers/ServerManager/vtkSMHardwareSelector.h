@@ -26,7 +26,7 @@ class VTK_EXPORT vtkSMHardwareSelector : public vtkSMProxy
 {
 public:
   static vtkSMHardwareSelector* New();
-  vtkTypeRevisionMacro(vtkSMHardwareSelector, vtkSMProxy);
+  vtkTypeMacro(vtkSMHardwareSelector, vtkSMProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   vtkSelection* Select();

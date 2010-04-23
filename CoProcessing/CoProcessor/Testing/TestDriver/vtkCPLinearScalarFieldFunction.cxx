@@ -17,7 +17,6 @@
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro(vtkCPLinearScalarFieldFunction);
-vtkCxxRevisionMacro(vtkCPLinearScalarFieldFunction, "1.1");
 
 //----------------------------------------------------------------------------
 vtkCPLinearScalarFieldFunction::vtkCPLinearScalarFieldFunction()

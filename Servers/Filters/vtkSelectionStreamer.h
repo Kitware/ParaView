@@ -32,7 +32,7 @@ class VTK_EXPORT vtkSelectionStreamer : public vtkTableStreamer
 {
 public:
   static vtkSelectionStreamer* New();
-  vtkTypeRevisionMacro(vtkSelectionStreamer, vtkTableStreamer);
+  vtkTypeMacro(vtkSelectionStreamer, vtkTableStreamer);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

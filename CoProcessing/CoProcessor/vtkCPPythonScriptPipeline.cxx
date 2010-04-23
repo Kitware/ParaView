@@ -35,7 +35,6 @@ using vtksys_ios::ostringstream;
 
 vtkCPPythonHelper* vtkCPPythonScriptPipeline::PythonHelper = 0;
 
-vtkCxxRevisionMacro(vtkCPPythonScriptPipeline, "1.2");
 vtkStandardNewMacro(vtkCPPythonScriptPipeline);
 
 //----------------------------------------------------------------------------

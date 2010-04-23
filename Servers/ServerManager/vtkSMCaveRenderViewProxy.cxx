@@ -27,7 +27,6 @@
 #include "vtkSMRepresentationStrategy.h"
 
 vtkStandardNewMacro(vtkSMCaveRenderViewProxy);
-vtkCxxRevisionMacro(vtkSMCaveRenderViewProxy, "1.1");
 
 //-----------------------------------------------------------------------------
 vtkSMCaveRenderViewProxy::vtkSMCaveRenderViewProxy()

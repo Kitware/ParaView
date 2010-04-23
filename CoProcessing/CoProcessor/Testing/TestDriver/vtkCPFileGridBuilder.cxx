@@ -22,7 +22,6 @@
 #include "vtkCPFieldBuilder.h"
 #include "vtkPointData.h"
 
-vtkCxxRevisionMacro(vtkCPFileGridBuilder, "1.1");
 vtkCxxSetObjectMacro(vtkCPFileGridBuilder, Grid, vtkDataObject);
 
 //----------------------------------------------------------------------------

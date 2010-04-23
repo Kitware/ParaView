@@ -28,7 +28,7 @@ public:
   virtual const char* GetDescription();
 
   // Methods from vtkObject
-  vtkTypeRevisionMacro(vtkAdaptiveFactory, vtkObjectFactory);
+  vtkTypeMacro(vtkAdaptiveFactory, vtkObjectFactory);
   static vtkAdaptiveFactory *New();
   void PrintSelf(ostream& os, vtkIndent indent);
 

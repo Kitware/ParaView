@@ -45,7 +45,7 @@ class PQCOMPONENTS_EXPORT pqSplitViewUndoElement : public vtkSMUndoElement
 {
 public:
   static pqSplitViewUndoElement* New();
-  vtkTypeRevisionMacro(pqSplitViewUndoElement, vtkSMUndoElement);
+  vtkTypeMacro(pqSplitViewUndoElement, vtkSMUndoElement);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   /// Description:

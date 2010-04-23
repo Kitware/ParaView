@@ -33,7 +33,7 @@ struct vtkClientServerID;
 class VTK_EXPORT vtkSMKeyFrameProxy : public vtkSMProxy
 {
 public:
-  vtkTypeRevisionMacro(vtkSMKeyFrameProxy, vtkSMProxy);
+  vtkTypeMacro(vtkSMKeyFrameProxy, vtkSMProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
   static vtkSMKeyFrameProxy* New();
   

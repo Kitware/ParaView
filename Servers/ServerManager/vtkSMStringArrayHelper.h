@@ -31,7 +31,7 @@ class VTK_EXPORT vtkSMStringArrayHelper : public vtkSMInformationHelper
 {
 public:
   static vtkSMStringArrayHelper* New();
-  vtkTypeRevisionMacro(vtkSMStringArrayHelper, vtkSMInformationHelper);
+  vtkTypeMacro(vtkSMStringArrayHelper, vtkSMInformationHelper);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   //BTX

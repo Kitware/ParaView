@@ -29,7 +29,7 @@ class VTK_EXPORT vtkTimestepsAnimationPlayer : public vtkAnimationPlayer
 {
 public:
   static vtkTimestepsAnimationPlayer* New();
-  vtkTypeRevisionMacro(vtkTimestepsAnimationPlayer, vtkAnimationPlayer);
+  vtkTypeMacro(vtkTimestepsAnimationPlayer, vtkAnimationPlayer);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

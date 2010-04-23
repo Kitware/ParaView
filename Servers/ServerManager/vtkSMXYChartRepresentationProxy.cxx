@@ -27,7 +27,6 @@
 #include "vtkSelection.h"
 
 vtkStandardNewMacro(vtkSMXYChartRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMXYChartRepresentationProxy, "1.14");
 //----------------------------------------------------------------------------
 vtkSMXYChartRepresentationProxy::vtkSMXYChartRepresentationProxy()
 {

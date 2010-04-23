@@ -43,7 +43,7 @@ class VTK_EXPORT vtkHierarchicalFractal : public vtkCompositeDataSetAlgorithm
 public:
   static vtkHierarchicalFractal *New();
 
-  vtkTypeRevisionMacro(vtkHierarchicalFractal,vtkCompositeDataSetAlgorithm);
+  vtkTypeMacro(vtkHierarchicalFractal,vtkCompositeDataSetAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

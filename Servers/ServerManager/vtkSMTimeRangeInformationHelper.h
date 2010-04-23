@@ -32,7 +32,7 @@ class VTK_EXPORT vtkSMTimeRangeInformationHelper : public vtkSMInformationHelper
 {
 public:
   static vtkSMTimeRangeInformationHelper* New();
-  vtkTypeRevisionMacro(vtkSMTimeRangeInformationHelper, vtkSMInformationHelper);
+  vtkTypeMacro(vtkSMTimeRangeInformationHelper, vtkSMInformationHelper);
   void PrintSelf(ostream& os, vtkIndent indent);
   
 //BTX

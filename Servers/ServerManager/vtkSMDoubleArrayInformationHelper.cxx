@@ -20,7 +20,6 @@
 #include "vtkSMDoubleVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMDoubleArrayInformationHelper);
-vtkCxxRevisionMacro(vtkSMDoubleArrayInformationHelper, "1.1");
 //-----------------------------------------------------------------------------
 vtkSMDoubleArrayInformationHelper::vtkSMDoubleArrayInformationHelper()
 {

@@ -23,7 +23,6 @@
 #include "vtkSMProxy.h"
 #include "vtkSMProxyProperty.h"
 
-vtkCxxRevisionMacro(vtkSMClientServerRenderSyncManagerHelper, "1.5");
 //----------------------------------------------------------------------------
 vtkSMClientServerRenderSyncManagerHelper::vtkSMClientServerRenderSyncManagerHelper()
 {

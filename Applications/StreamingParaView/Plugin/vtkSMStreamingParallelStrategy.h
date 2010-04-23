@@ -25,7 +25,7 @@ class VTK_EXPORT vtkSMStreamingParallelStrategy
 {
 public:
   static vtkSMStreamingParallelStrategy* New();
-  vtkTypeRevisionMacro(vtkSMStreamingParallelStrategy,
+  vtkTypeMacro(vtkSMStreamingParallelStrategy,
                        vtkSMUnstructuredDataParallelStrategy);
   void PrintSelf(ostream& os, vtkIndent indent);
 

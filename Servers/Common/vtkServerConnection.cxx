@@ -35,7 +35,6 @@
 
 
 vtkStandardNewMacro(vtkServerConnection);
-vtkCxxRevisionMacro(vtkServerConnection, "1.19");
 //-----------------------------------------------------------------------------
 vtkServerConnection::vtkServerConnection()
 {

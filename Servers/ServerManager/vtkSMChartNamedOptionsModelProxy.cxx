@@ -44,7 +44,6 @@ public:
 };
 
 vtkStandardNewMacro(vtkSMChartNamedOptionsModelProxy);
-vtkCxxRevisionMacro(vtkSMChartNamedOptionsModelProxy, "1.7");
 //----------------------------------------------------------------------------
 vtkSMChartNamedOptionsModelProxy::vtkSMChartNamedOptionsModelProxy()
 {

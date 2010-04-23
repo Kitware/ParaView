@@ -73,7 +73,6 @@ public:
 };
 
 vtkStandardNewMacro(vtkSMBlockDeliveryRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMBlockDeliveryRepresentationProxy, "1.9");
 //----------------------------------------------------------------------------
 vtkSMBlockDeliveryRepresentationProxy::vtkSMBlockDeliveryRepresentationProxy()
 {

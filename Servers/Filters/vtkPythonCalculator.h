@@ -35,7 +35,7 @@
 class VTK_EXPORT vtkPythonCalculator : public vtkProgrammableFilter
 {
 public:
-  vtkTypeRevisionMacro(vtkPythonCalculator,vtkProgrammableFilter);
+  vtkTypeMacro(vtkPythonCalculator,vtkProgrammableFilter);
   void PrintSelf(ostream& os, vtkIndent indent);
   static vtkPythonCalculator *New();
 

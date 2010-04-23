@@ -30,7 +30,7 @@ class VTK_EXPORT vtkPVColorMaterialHelper : public vtkObject
 {
 public:
   static vtkPVColorMaterialHelper* New();
-  vtkTypeRevisionMacro(vtkPVColorMaterialHelper, vtkObject);
+  vtkTypeMacro(vtkPVColorMaterialHelper, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   void Initialize(vtkShaderProgram2*);

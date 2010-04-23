@@ -21,7 +21,6 @@
 #include "vtkSMProxyProperty.h"
 
 vtkStandardNewMacro(vtkSMFileSeriesReaderProxy);
-vtkCxxRevisionMacro(vtkSMFileSeriesReaderProxy, "1.1");
 
 //-----------------------------------------------------------------------------
 vtkSMFileSeriesReaderProxy::vtkSMFileSeriesReaderProxy()

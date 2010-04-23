@@ -26,7 +26,6 @@
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkTriangle.h"
 
-vtkCxxRevisionMacro(vtkSurfaceVectors, "1.4");
 vtkStandardNewMacro(vtkSurfaceVectors);
 
 //-----------------------------------------------------------------------------

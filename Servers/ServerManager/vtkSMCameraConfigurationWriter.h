@@ -34,7 +34,7 @@ class vtkSMProxy;
 class VTK_EXPORT vtkSMCameraConfigurationWriter : public vtkSMProxyConfigurationWriter
 {
 public:
-  vtkTypeRevisionMacro(vtkSMCameraConfigurationWriter,vtkSMProxyConfigurationWriter);
+  vtkTypeMacro(vtkSMCameraConfigurationWriter,vtkSMProxyConfigurationWriter);
   void PrintSelf(ostream& os, vtkIndent indent);
   static vtkSMCameraConfigurationWriter *New();
 

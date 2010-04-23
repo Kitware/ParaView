@@ -36,7 +36,7 @@ class vtkSMProperty;
 class VTK_EXPORT vtkSMInformationHelper : public vtkSMObject
 {
 public:
-  vtkTypeRevisionMacro(vtkSMInformationHelper, vtkSMObject);
+  vtkTypeMacro(vtkSMInformationHelper, vtkSMObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   //BTX

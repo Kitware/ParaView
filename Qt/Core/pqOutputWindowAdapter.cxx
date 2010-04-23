@@ -34,7 +34,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <vtkObjectFactory.h>
 
-vtkCxxRevisionMacro(pqOutputWindowAdapter, "1.4");
 vtkStandardNewMacro(pqOutputWindowAdapter);
 
 pqOutputWindowAdapter::pqOutputWindowAdapter() :

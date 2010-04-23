@@ -63,7 +63,7 @@ class VTK_EXPORT vtkIceTRenderManager : public vtkParallelRenderManager
 {
 public:
   static vtkIceTRenderManager *New();
-  vtkTypeRevisionMacro(vtkIceTRenderManager, vtkParallelRenderManager);
+  vtkTypeMacro(vtkIceTRenderManager, vtkParallelRenderManager);
   virtual void PrintSelf(ostream &os, vtkIndent indent);
 
   virtual vtkRenderer *MakeRenderer();

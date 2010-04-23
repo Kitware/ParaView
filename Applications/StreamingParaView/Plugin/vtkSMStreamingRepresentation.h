@@ -29,7 +29,7 @@ class VTK_EXPORT vtkSMStreamingRepresentation :
 {
 public:
   static vtkSMStreamingRepresentation* New();
-  vtkTypeRevisionMacro(vtkSMStreamingRepresentation, 
+  vtkTypeMacro(vtkSMStreamingRepresentation,
     vtkSMPVRepresentationProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 

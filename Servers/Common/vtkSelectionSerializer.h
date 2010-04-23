@@ -35,7 +35,7 @@ class VTK_EXPORT vtkSelectionSerializer : public vtkObject
 {
 public:
   static vtkSelectionSerializer* New();
-  vtkTypeRevisionMacro(vtkSelectionSerializer,vtkObject);
+  vtkTypeMacro(vtkSelectionSerializer,vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

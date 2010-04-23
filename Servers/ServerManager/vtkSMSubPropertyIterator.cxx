@@ -19,7 +19,6 @@
 #include "vtkSMPropertyInternals.h"
 
 vtkStandardNewMacro(vtkSMSubPropertyIterator);
-vtkCxxRevisionMacro(vtkSMSubPropertyIterator, "1.3");
 
 struct vtkSMSubPropertyIteratorInternals
 {

@@ -29,7 +29,7 @@ class VTK_EXPORT vtkSMBlockDeliveryStrategy : public vtkSMSimpleStrategy
 {
 public:
   static vtkSMBlockDeliveryStrategy* New();
-  vtkTypeRevisionMacro(vtkSMBlockDeliveryStrategy, vtkSMSimpleStrategy);
+  vtkTypeMacro(vtkSMBlockDeliveryStrategy, vtkSMSimpleStrategy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
 //BTX

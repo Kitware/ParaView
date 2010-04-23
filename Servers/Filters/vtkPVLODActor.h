@@ -32,7 +32,7 @@ class vtkMapper;
 class VTK_EXPORT vtkPVLODActor : public vtkActor
 {
 public:
-  vtkTypeRevisionMacro(vtkPVLODActor,vtkActor);
+  vtkTypeMacro(vtkPVLODActor,vtkActor);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   static vtkPVLODActor *New();

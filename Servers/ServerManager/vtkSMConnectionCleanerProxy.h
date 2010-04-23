@@ -38,7 +38,7 @@ class VTK_EXPORT vtkSMConnectionCleanerProxy : public vtkSMProxy
 {
 public:
   static vtkSMConnectionCleanerProxy* New();
-  vtkTypeRevisionMacro(vtkSMConnectionCleanerProxy, vtkSMProxy);
+  vtkTypeMacro(vtkSMConnectionCleanerProxy, vtkSMProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
 protected:

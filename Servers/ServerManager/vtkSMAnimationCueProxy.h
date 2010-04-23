@@ -38,7 +38,7 @@ class VTK_EXPORT vtkSMAnimationCueProxy : public vtkSMProxy
 {
 public:
   static vtkSMAnimationCueProxy* New();
-  vtkTypeRevisionMacro(vtkSMAnimationCueProxy, vtkSMProxy);
+  vtkTypeMacro(vtkSMAnimationCueProxy, vtkSMProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

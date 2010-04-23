@@ -49,7 +49,7 @@ class VTK_EXPORT vtkEnSightGoldReader2 : public vtkEnSightReader2
 {
 public:
   static vtkEnSightGoldReader2 *New();
-  vtkTypeRevisionMacro(vtkEnSightGoldReader2, vtkEnSightReader2);
+  vtkTypeMacro(vtkEnSightGoldReader2, vtkEnSightReader2);
   virtual void PrintSelf(ostream& os, vtkIndent indent);
 
 protected:

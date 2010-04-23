@@ -27,7 +27,6 @@
 #include <vtksys/ios/sstream>
 
 vtkStandardNewMacro(vtkSMTwoDRenderViewProxy);
-vtkCxxRevisionMacro(vtkSMTwoDRenderViewProxy, "1.5");
 //----------------------------------------------------------------------------
 vtkSMTwoDRenderViewProxy::vtkSMTwoDRenderViewProxy()
 {

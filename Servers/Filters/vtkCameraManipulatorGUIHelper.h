@@ -31,7 +31,7 @@
 class VTK_EXPORT vtkCameraManipulatorGUIHelper : public vtkObject
 {
 public:
-  vtkTypeRevisionMacro(vtkCameraManipulatorGUIHelper, vtkObject);
+  vtkTypeMacro(vtkCameraManipulatorGUIHelper, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

@@ -20,7 +20,6 @@
 #include "vtkSMIntVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMIntArrayInformationHelper);
-vtkCxxRevisionMacro(vtkSMIntArrayInformationHelper, "1.1");
 //-----------------------------------------------------------------------------
 vtkSMIntArrayInformationHelper::vtkSMIntArrayInformationHelper()
 {

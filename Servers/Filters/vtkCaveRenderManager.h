@@ -33,7 +33,7 @@ class VTK_EXPORT vtkCaveRenderManager : public vtkParallelRenderManager
 {
 public:
   static vtkCaveRenderManager *New();
-  vtkTypeRevisionMacro(vtkCaveRenderManager, vtkParallelRenderManager);
+  vtkTypeMacro(vtkCaveRenderManager, vtkParallelRenderManager);
   virtual void PrintSelf(ostream &os, vtkIndent indent);
 
   virtual vtkRenderer *MakeRenderer();

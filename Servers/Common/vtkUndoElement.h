@@ -34,7 +34,7 @@ class vtkPVXMLElement;
 class VTK_EXPORT vtkUndoElement : public vtkObject
 {
 public:
-  vtkTypeRevisionMacro(vtkUndoElement, vtkObject);
+  vtkTypeMacro(vtkUndoElement, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

@@ -31,7 +31,7 @@ class VTK_EXPORT vtkSMParallelCoordinatesRepresentationProxy :
 {
 public:
   static vtkSMParallelCoordinatesRepresentationProxy* New();
-  vtkTypeRevisionMacro(vtkSMParallelCoordinatesRepresentationProxy,
+  vtkTypeMacro(vtkSMParallelCoordinatesRepresentationProxy,
                        vtkSMClientDeliveryRepresentationProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 

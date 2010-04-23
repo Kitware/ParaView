@@ -21,7 +21,6 @@
 #include "vtkSMProxyLocator.h"
 
 vtkStandardNewMacro(vtkSMPropertyModificationUndoElement);
-vtkCxxRevisionMacro(vtkSMPropertyModificationUndoElement, "1.6");
 //-----------------------------------------------------------------------------
 vtkSMPropertyModificationUndoElement::vtkSMPropertyModificationUndoElement()
 {

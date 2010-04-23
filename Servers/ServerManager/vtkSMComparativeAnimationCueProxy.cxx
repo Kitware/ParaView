@@ -244,7 +244,6 @@ public:
 };
 
 vtkStandardNewMacro(vtkSMComparativeAnimationCueProxy);
-vtkCxxRevisionMacro(vtkSMComparativeAnimationCueProxy, "1.1");
 //----------------------------------------------------------------------------
 vtkSMComparativeAnimationCueProxy::vtkSMComparativeAnimationCueProxy()
 {

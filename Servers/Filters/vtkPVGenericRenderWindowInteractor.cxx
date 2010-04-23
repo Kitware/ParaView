@@ -66,7 +66,6 @@ protected:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVGenericRenderWindowInteractor);
-vtkCxxRevisionMacro(vtkPVGenericRenderWindowInteractor, "1.9");
 vtkCxxSetObjectMacro(vtkPVGenericRenderWindowInteractor,Renderer,vtkRenderer);
 
 //----------------------------------------------------------------------------

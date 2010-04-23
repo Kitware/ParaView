@@ -32,7 +32,7 @@ class vtkMapper;
 class VTK_EXPORT vtkPVLODVolume : public vtkVolume
 {
 public:
-  vtkTypeRevisionMacro(vtkPVLODVolume,vtkVolume);
+  vtkTypeMacro(vtkPVLODVolume,vtkVolume);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   static vtkPVLODVolume *New();

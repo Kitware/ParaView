@@ -27,7 +27,7 @@ class VTK_EXPORT vtkCacheSizeKeeper : public vtkObject
 {
 public:
   static vtkCacheSizeKeeper* New();
-  vtkTypeRevisionMacro(vtkCacheSizeKeeper, vtkObject);
+  vtkTypeMacro(vtkCacheSizeKeeper, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

@@ -26,7 +26,6 @@
 #include <vtksys/ios/sstream>
 #include <assert.h>
 
-vtkCxxRevisionMacro( vtkPVArrayCalculator, "1.5" );
 vtkStandardNewMacro( vtkPVArrayCalculator );
 // ----------------------------------------------------------------------------
 vtkPVArrayCalculator::vtkPVArrayCalculator()

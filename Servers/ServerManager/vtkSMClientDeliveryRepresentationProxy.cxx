@@ -28,7 +28,6 @@
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMClientDeliveryRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMClientDeliveryRepresentationProxy, "1.21");
 //----------------------------------------------------------------------------
 vtkSMClientDeliveryRepresentationProxy::vtkSMClientDeliveryRepresentationProxy()
 {

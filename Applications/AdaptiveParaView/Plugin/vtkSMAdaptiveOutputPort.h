@@ -28,7 +28,7 @@ class VTK_EXPORT vtkSMAdaptiveOutputPort : public vtkSMOutputPort
 {
 public:
   static vtkSMAdaptiveOutputPort* New();
-  vtkTypeRevisionMacro(vtkSMAdaptiveOutputPort, vtkSMOutputPort);
+  vtkTypeMacro(vtkSMAdaptiveOutputPort, vtkSMOutputPort);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

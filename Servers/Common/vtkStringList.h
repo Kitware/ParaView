@@ -27,7 +27,7 @@ class VTK_EXPORT vtkStringList : public vtkObject
 {
 public:
   static vtkStringList* New();
-  vtkTypeRevisionMacro(vtkStringList,vtkObject);
+  vtkTypeMacro(vtkStringList,vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
   
   // Description:

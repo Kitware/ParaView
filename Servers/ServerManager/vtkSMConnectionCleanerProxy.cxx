@@ -20,7 +20,6 @@
 #include "vtkProcessModule.h"
 
 vtkStandardNewMacro(vtkSMConnectionCleanerProxy);
-vtkCxxRevisionMacro(vtkSMConnectionCleanerProxy, "1.3");
 //-----------------------------------------------------------------------------
 vtkSMConnectionCleanerProxy::vtkSMConnectionCleanerProxy()
 {

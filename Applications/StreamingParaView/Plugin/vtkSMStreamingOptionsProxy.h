@@ -33,7 +33,7 @@ class VTK_EXPORT vtkSMStreamingOptionsProxy : public vtkSMProxy
 {
 public:
   static vtkSMStreamingOptionsProxy* New();
-  vtkTypeRevisionMacro(vtkSMStreamingOptionsProxy, vtkSMProxy);
+  vtkTypeMacro(vtkSMStreamingOptionsProxy, vtkSMProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

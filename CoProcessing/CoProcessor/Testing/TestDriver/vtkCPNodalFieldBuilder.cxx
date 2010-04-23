@@ -23,7 +23,6 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkCPNodalFieldBuilder);
-vtkCxxRevisionMacro(vtkCPNodalFieldBuilder, "1.1");
 
 //----------------------------------------------------------------------------
 vtkCPNodalFieldBuilder::vtkCPNodalFieldBuilder()

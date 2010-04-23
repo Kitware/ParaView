@@ -24,7 +24,6 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMProxySelectionModel);
-vtkCxxRevisionMacro(vtkSMProxySelectionModel, "1.3");
 
 //-----------------------------------------------------------------------------
 class vtkSMProxySelectionModel::vtkInternal

@@ -47,7 +47,6 @@
 #include <sstream>
 
 
-vtkCxxRevisionMacro(vtk1DTransferFunctionFilter, "1.1")
 vtkStandardNewMacro(vtk1DTransferFunctionFilter)
 
 vtkCxxSetObjectMacro(vtk1DTransferFunctionFilter, TransferFunction, vtk1DTransferFunction)

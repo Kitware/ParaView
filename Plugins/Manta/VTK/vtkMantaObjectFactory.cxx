@@ -84,7 +84,6 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkMantaLODActor.h"
 #endif
 
-vtkCxxRevisionMacro(vtkMantaObjectFactory, "1.1");
 vtkStandardNewMacro(vtkMantaObjectFactory);
 
 //----------------------------------------------------------------------------

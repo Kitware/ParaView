@@ -18,7 +18,6 @@
 #include "vtkSMRenderViewProxy.h"
 
 vtkStandardNewMacro(vtkSMRenderViewHelper);
-vtkCxxRevisionMacro(vtkSMRenderViewHelper, "1.2");
 //----------------------------------------------------------------------------
 vtkSMRenderViewHelper::vtkSMRenderViewHelper()
 {

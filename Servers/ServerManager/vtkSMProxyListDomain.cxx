@@ -45,7 +45,6 @@ public:
 //-----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkSMProxyListDomain);
-vtkCxxRevisionMacro(vtkSMProxyListDomain, "1.7");
 //-----------------------------------------------------------------------------
 vtkSMProxyListDomain::vtkSMProxyListDomain()
 {

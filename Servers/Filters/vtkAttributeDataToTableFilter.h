@@ -31,7 +31,7 @@ class VTK_EXPORT vtkAttributeDataToTableFilter : public vtkTableAlgorithm
 {
 public:
   static vtkAttributeDataToTableFilter* New();
-  vtkTypeRevisionMacro(vtkAttributeDataToTableFilter, vtkTableAlgorithm);
+  vtkTypeMacro(vtkAttributeDataToTableFilter, vtkTableAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

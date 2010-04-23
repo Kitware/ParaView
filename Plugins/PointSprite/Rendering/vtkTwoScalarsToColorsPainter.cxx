@@ -45,7 +45,6 @@
 #include "vtkOpenGL.h"
 #include "vtkMapper.h"
 
-vtkCxxRevisionMacro(vtkTwoScalarsToColorsPainter, "1.2")
 vtkStandardNewMacro(vtkTwoScalarsToColorsPainter)
 
 vtkTwoScalarsToColorsPainter::vtkTwoScalarsToColorsPainter()

@@ -26,7 +26,7 @@ class vtkDataObject;
 class VTK_EXPORT vtkCPBaseGridBuilder : public vtkObject
 {
 public:
-  vtkTypeRevisionMacro(vtkCPBaseGridBuilder, vtkObject);
+  vtkTypeMacro(vtkCPBaseGridBuilder, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

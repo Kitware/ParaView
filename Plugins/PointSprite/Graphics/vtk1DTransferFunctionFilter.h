@@ -43,7 +43,7 @@ class vtk1DTransferFunction;
 class VTK_EXPORT vtk1DTransferFunctionFilter : public vtkPassInputTypeAlgorithm
 {
 public:
-  vtkTypeRevisionMacro(vtk1DTransferFunctionFilter, vtkPassInputTypeAlgorithm);
+  vtkTypeMacro(vtk1DTransferFunctionFilter, vtkPassInputTypeAlgorithm);
   virtual void PrintSelf(ostream &os, vtkIndent indent);
   static vtk1DTransferFunctionFilter *New();
 

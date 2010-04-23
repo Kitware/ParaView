@@ -59,7 +59,7 @@ class COPROCESSING_EXPORT vtkCPProcessor : public vtkObject
 
 public:
   static vtkCPProcessor* New();
-  vtkTypeRevisionMacro(vtkCPProcessor,vtkObject);
+  vtkTypeMacro(vtkCPProcessor,vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   /// Add in a pipeline that is externally configured. Returns 1 if 

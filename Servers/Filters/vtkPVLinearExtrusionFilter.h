@@ -27,7 +27,7 @@ class VTK_EXPORT vtkPVLinearExtrusionFilter : public vtkPLinearExtrusionFilter
 {
 public:
   static vtkPVLinearExtrusionFilter *New();
-  vtkTypeRevisionMacro(vtkPVLinearExtrusionFilter, vtkPLinearExtrusionFilter);
+  vtkTypeMacro(vtkPVLinearExtrusionFilter, vtkPLinearExtrusionFilter);
   void PrintSelf(ostream &os, vtkIndent indent);
   
 protected:

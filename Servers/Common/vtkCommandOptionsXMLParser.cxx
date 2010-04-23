@@ -158,7 +158,6 @@ void vtkCommandOptionsXMLParserInternal::AddArgument(
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkCommandOptionsXMLParser);
-vtkCxxRevisionMacro(vtkCommandOptionsXMLParser, "1.3");
 
 //----------------------------------------------------------------------------
 vtkCommandOptionsXMLParser::vtkCommandOptionsXMLParser()

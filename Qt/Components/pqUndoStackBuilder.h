@@ -72,7 +72,7 @@ class PQCOMPONENTS_EXPORT pqUndoStackBuilder : public vtkSMUndoStackBuilder
 {
 public:
   static pqUndoStackBuilder* New();
-  vtkTypeRevisionMacro(pqUndoStackBuilder, vtkSMUndoStackBuilder);
+  vtkTypeMacro(pqUndoStackBuilder, vtkSMUndoStackBuilder);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   /// Get/Set if all modifications triggerred when not within a Begin/End

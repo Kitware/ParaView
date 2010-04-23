@@ -27,7 +27,6 @@
 #include "vtkMultiProcessController.h"
 
 vtkStandardNewMacro(vtkSelectionStreamer);
-vtkCxxRevisionMacro(vtkSelectionStreamer, "1.3");
 //----------------------------------------------------------------------------
 vtkSelectionStreamer::vtkSelectionStreamer()
 {

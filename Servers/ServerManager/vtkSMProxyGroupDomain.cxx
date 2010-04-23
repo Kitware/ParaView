@@ -26,7 +26,6 @@
 #include "vtkStdString.h"
 
 vtkStandardNewMacro(vtkSMProxyGroupDomain);
-vtkCxxRevisionMacro(vtkSMProxyGroupDomain, "1.10");
 
 struct vtkSMProxyGroupDomainInternals
 {

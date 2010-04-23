@@ -28,7 +28,6 @@ public:
 
 //*****************************************************************************
 vtkStandardNewMacro(vtkConnectionIterator);
-vtkCxxRevisionMacro(vtkConnectionIterator, "1.4");
 vtkCxxSetObjectMacro(vtkConnectionIterator, ConnectionManager,
   vtkProcessModuleConnectionManager);
 //-----------------------------------------------------------------------------

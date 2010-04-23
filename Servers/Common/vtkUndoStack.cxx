@@ -20,7 +20,6 @@
 
 
 vtkStandardNewMacro(vtkUndoStack);
-vtkCxxRevisionMacro(vtkUndoStack, "1.8");
 //-----------------------------------------------------------------------------
 vtkUndoStack::vtkUndoStack()
 {

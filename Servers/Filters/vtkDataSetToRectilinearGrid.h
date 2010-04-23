@@ -31,7 +31,7 @@ class VTK_EXPORT vtkDataSetToRectilinearGrid : public vtkRectilinearGridAlgorith
 {
 public:
   static vtkDataSetToRectilinearGrid* New();
-  vtkTypeRevisionMacro(vtkDataSetToRectilinearGrid, vtkRectilinearGridAlgorithm);
+  vtkTypeMacro(vtkDataSetToRectilinearGrid, vtkRectilinearGridAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
   
 protected: 

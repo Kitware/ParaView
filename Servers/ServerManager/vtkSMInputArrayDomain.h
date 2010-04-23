@@ -47,7 +47,7 @@ class VTK_EXPORT vtkSMInputArrayDomain : public vtkSMDomain
 {
 public:
   static vtkSMInputArrayDomain* New();
-  vtkTypeRevisionMacro(vtkSMInputArrayDomain, vtkSMDomain);
+  vtkTypeMacro(vtkSMInputArrayDomain, vtkSMDomain);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

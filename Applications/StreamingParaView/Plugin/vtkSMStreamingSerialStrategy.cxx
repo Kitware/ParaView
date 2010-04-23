@@ -31,7 +31,6 @@
     }
 
 vtkStandardNewMacro(vtkSMStreamingSerialStrategy);
-vtkCxxRevisionMacro(vtkSMStreamingSerialStrategy, "1.2");
 //----------------------------------------------------------------------------
 vtkSMStreamingSerialStrategy::vtkSMStreamingSerialStrategy()
 {

@@ -23,7 +23,6 @@
 #include "vtkSMProxyLocator.h"
 
 vtkStandardNewMacro(pqProxyModifiedStateUndoElement);
-vtkCxxRevisionMacro(pqProxyModifiedStateUndoElement, "1.1");
 //----------------------------------------------------------------------------
 pqProxyModifiedStateUndoElement::pqProxyModifiedStateUndoElement()
 {

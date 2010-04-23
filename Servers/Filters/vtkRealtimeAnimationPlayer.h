@@ -26,7 +26,7 @@ class VTK_EXPORT vtkRealtimeAnimationPlayer : public vtkAnimationPlayer
 {
 public:
   static vtkRealtimeAnimationPlayer* New();
-  vtkTypeRevisionMacro(vtkRealtimeAnimationPlayer, vtkAnimationPlayer);
+  vtkTypeMacro(vtkRealtimeAnimationPlayer, vtkAnimationPlayer);
   void PrintSelf(ostream& os, vtkIndent indent);
 
 

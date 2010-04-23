@@ -25,7 +25,6 @@
       arg;\
     }
 
-vtkCxxRevisionMacro(vtkMetaInfoDatabase, "1.1");
 vtkStandardNewMacro(vtkMetaInfoDatabase);
 
 struct vtkRangeRecord2

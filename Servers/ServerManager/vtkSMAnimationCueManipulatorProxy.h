@@ -41,7 +41,7 @@ struct vtkClientServerID;
 class VTK_EXPORT vtkSMAnimationCueManipulatorProxy : public vtkSMProxy
 {
 public:
-  vtkTypeRevisionMacro(vtkSMAnimationCueManipulatorProxy, vtkSMProxy);
+  vtkTypeMacro(vtkSMAnimationCueManipulatorProxy, vtkSMProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 //BTX
   // Description:

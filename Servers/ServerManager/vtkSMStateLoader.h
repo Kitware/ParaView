@@ -36,7 +36,7 @@ class VTK_EXPORT vtkSMStateLoader : public vtkSMDeserializer
 {
 public:
   static vtkSMStateLoader* New();
-  vtkTypeRevisionMacro(vtkSMStateLoader, vtkSMDeserializer);
+  vtkTypeMacro(vtkSMStateLoader, vtkSMDeserializer);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

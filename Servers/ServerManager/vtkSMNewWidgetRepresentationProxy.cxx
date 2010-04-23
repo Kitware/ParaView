@@ -34,7 +34,6 @@
 #include <vtkstd/list>
 
 vtkStandardNewMacro(vtkSMNewWidgetRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMNewWidgetRepresentationProxy, "1.14");
 
 class vtkSMNewWidgetRepresentationObserver : public vtkCommand
 {

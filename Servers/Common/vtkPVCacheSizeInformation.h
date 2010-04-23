@@ -26,7 +26,7 @@ class VTK_EXPORT vtkPVCacheSizeInformation : public vtkPVInformation
 {
 public:
   static vtkPVCacheSizeInformation* New();
-  vtkTypeRevisionMacro(vtkPVCacheSizeInformation, vtkPVInformation);
+  vtkTypeMacro(vtkPVCacheSizeInformation, vtkPVInformation);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

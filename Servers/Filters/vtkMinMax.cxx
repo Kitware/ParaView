@@ -31,7 +31,6 @@
 #include "vtkMultiProcessController.h"
 
 vtkStandardNewMacro(vtkMinMax);
-vtkCxxRevisionMacro(vtkMinMax, "1.7");
 
 template <class T>
 void vtkMinMaxExecute(

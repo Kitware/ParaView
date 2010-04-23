@@ -39,7 +39,7 @@ class VTK_EXPORT vtkSMAnimationSceneImageWriter : public vtkSMAnimationSceneWrit
 {
 public:
   static vtkSMAnimationSceneImageWriter* New();
-  vtkTypeRevisionMacro(vtkSMAnimationSceneImageWriter, vtkSMAnimationSceneWriter);
+  vtkTypeMacro(vtkSMAnimationSceneImageWriter, vtkSMAnimationSceneWriter);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

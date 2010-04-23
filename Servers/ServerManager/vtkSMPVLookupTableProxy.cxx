@@ -18,7 +18,6 @@
 #include "vtkProcessModule.h"
 
 vtkStandardNewMacro(vtkSMPVLookupTableProxy);
-vtkCxxRevisionMacro(vtkSMPVLookupTableProxy, "1.3");
 //-----------------------------------------------------------------------------
 vtkSMPVLookupTableProxy::vtkSMPVLookupTableProxy()
 {

@@ -18,7 +18,6 @@
 #include "vtkPVCacheKeeper.h"
 
 vtkStandardNewMacro(vtkPVCacheKeeperPipeline);
-vtkCxxRevisionMacro(vtkPVCacheKeeperPipeline, "1.1");
 //----------------------------------------------------------------------------
 vtkPVCacheKeeperPipeline::vtkPVCacheKeeperPipeline()
 {

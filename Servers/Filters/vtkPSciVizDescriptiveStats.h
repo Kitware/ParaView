@@ -38,7 +38,7 @@ class VTK_EXPORT vtkPSciVizDescriptiveStats : public vtkSciVizStatistics
 {
 public:
   static vtkPSciVizDescriptiveStats* New();
-  vtkTypeRevisionMacro(vtkPSciVizDescriptiveStats,vtkSciVizStatistics);
+  vtkTypeMacro(vtkPSciVizDescriptiveStats,vtkSciVizStatistics);
   virtual void PrintSelf( ostream& os, vtkIndent indent );
 
   vtkSetMacro(SignedDeviations,int);

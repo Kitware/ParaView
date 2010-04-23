@@ -50,7 +50,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <math.h>
 
-vtkCxxRevisionMacro(vtkPVAxesActor, "1.3");
 vtkStandardNewMacro(vtkPVAxesActor);
 
 vtkCxxSetObjectMacro( vtkPVAxesActor, UserDefinedTip, vtkPolyData );

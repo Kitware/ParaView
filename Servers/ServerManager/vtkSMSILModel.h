@@ -44,7 +44,7 @@ class VTK_EXPORT vtkSMSILModel : public vtkSMObject
 {
 public:
   static vtkSMSILModel* New();
-  vtkTypeRevisionMacro(vtkSMSILModel, vtkSMObject);
+  vtkTypeMacro(vtkSMSILModel, vtkSMObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   //BTX

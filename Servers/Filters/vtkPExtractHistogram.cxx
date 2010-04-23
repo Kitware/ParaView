@@ -36,7 +36,6 @@
 #include <vtksys/RegularExpression.hxx>
 
 vtkStandardNewMacro(vtkPExtractHistogram);
-vtkCxxRevisionMacro(vtkPExtractHistogram, "1.9");
 vtkCxxSetObjectMacro(vtkPExtractHistogram, Controller, vtkMultiProcessController);
 //-----------------------------------------------------------------------------
 vtkPExtractHistogram::vtkPExtractHistogram()

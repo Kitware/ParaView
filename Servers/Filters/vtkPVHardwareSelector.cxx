@@ -19,7 +19,6 @@
 #include "vtkProp.h"
 
 vtkStandardNewMacro(vtkPVHardwareSelector);
-vtkCxxRevisionMacro(vtkPVHardwareSelector, "1.4");
 //----------------------------------------------------------------------------
 vtkPVHardwareSelector::vtkPVHardwareSelector()
 {

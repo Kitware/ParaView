@@ -16,7 +16,6 @@
 
 #include "vtkObjectFactory.h"
 
-vtkCxxRevisionMacro(vtkSMProxyManagerReviver, "1.1");
 //-----------------------------------------------------------------------------
 vtkSMProxyManagerReviver::vtkSMProxyManagerReviver()
 {

@@ -41,7 +41,6 @@
 #include "vtkMultiProcessController.h"
 #include "vtkObject.h"
 
-vtkCxxRevisionMacro(vtkPEnSightReader2, "1.2");
 
 typedef vtkstd::vector< vtkPEnSightReader2::vtkPEnSightReader2CellIds* > vtkPEnSightReader2CellIdsTypeBase;
 class vtkPEnSightReader2CellIdsType: public vtkPEnSightReader2CellIdsTypeBase {};

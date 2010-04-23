@@ -23,7 +23,6 @@
 #include "vtkProcessModule.h"
 
 vtkStandardNewMacro(vtkPVServerArrayHelper);
-vtkCxxRevisionMacro(vtkPVServerArrayHelper, "1.3");
 //-----------------------------------------------------------------------------
 vtkPVServerArrayHelper::vtkPVServerArrayHelper()
 {

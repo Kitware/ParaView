@@ -32,7 +32,7 @@ class VTK_EXPORT vtkSMCompoundProxyDefinitionLoader : public vtkSMDeserializer
 {
 public:
   static vtkSMCompoundProxyDefinitionLoader* New();
-  vtkTypeRevisionMacro(vtkSMCompoundProxyDefinitionLoader, vtkSMDeserializer);
+  vtkTypeMacro(vtkSMCompoundProxyDefinitionLoader, vtkSMDeserializer);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

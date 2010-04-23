@@ -20,7 +20,6 @@
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMStringArrayHelper);
-vtkCxxRevisionMacro(vtkSMStringArrayHelper, "1.1");
 
 //---------------------------------------------------------------------------
 vtkSMStringArrayHelper::vtkSMStringArrayHelper()

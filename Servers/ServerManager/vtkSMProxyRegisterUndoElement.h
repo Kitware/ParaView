@@ -32,7 +32,7 @@ class VTK_EXPORT vtkSMProxyRegisterUndoElement : public vtkSMUndoElement
 {
 public:
   static vtkSMProxyRegisterUndoElement* New();
-  vtkTypeRevisionMacro(vtkSMProxyRegisterUndoElement, vtkSMUndoElement);
+  vtkTypeMacro(vtkSMProxyRegisterUndoElement, vtkSMUndoElement);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

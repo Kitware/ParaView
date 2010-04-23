@@ -33,7 +33,7 @@ class VTK_EXPORT vtkSMProxyLink : public vtkSMLink
 {
 public:
   static vtkSMProxyLink* New();
-  vtkTypeRevisionMacro(vtkSMProxyLink, vtkSMLink);
+  vtkTypeMacro(vtkSMProxyLink, vtkSMLink);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

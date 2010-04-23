@@ -37,7 +37,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationCore.h"
 
 vtkStandardNewMacro(pqSplitViewUndoElement);
-vtkCxxRevisionMacro(pqSplitViewUndoElement, "1.4");
 //-----------------------------------------------------------------------------
 pqSplitViewUndoElement::pqSplitViewUndoElement()
 {

@@ -28,7 +28,7 @@ class VTK_EXPORT vtkSMUnstructuredDataParallelStrategy : public vtkSMSimpleParal
 {
 public:
   static vtkSMUnstructuredDataParallelStrategy* New();
-  vtkTypeRevisionMacro(vtkSMUnstructuredDataParallelStrategy, vtkSMSimpleParallelStrategy);
+  vtkTypeMacro(vtkSMUnstructuredDataParallelStrategy, vtkSMSimpleParallelStrategy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

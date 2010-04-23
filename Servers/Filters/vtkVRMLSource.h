@@ -28,7 +28,7 @@ class vtkVRMLImporter;
 class VTK_EXPORT vtkVRMLSource : public vtkMultiBlockDataSetAlgorithm
 {
 public:
-  vtkTypeRevisionMacro(vtkVRMLSource,vtkMultiBlockDataSetAlgorithm);
+  vtkTypeMacro(vtkVRMLSource,vtkMultiBlockDataSetAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
   static vtkVRMLSource *New();
 

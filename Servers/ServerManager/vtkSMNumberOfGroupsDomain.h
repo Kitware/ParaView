@@ -35,7 +35,7 @@ class VTK_EXPORT vtkSMNumberOfGroupsDomain : public vtkSMIntRangeDomain
 {
 public:
   static vtkSMNumberOfGroupsDomain* New();
-  vtkTypeRevisionMacro(vtkSMNumberOfGroupsDomain, vtkSMIntRangeDomain);
+  vtkTypeMacro(vtkSMNumberOfGroupsDomain, vtkSMIntRangeDomain);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

@@ -38,7 +38,7 @@ class VTK_EXPORT vtkConnectionIterator : public vtkObject
 {
 public:
   static vtkConnectionIterator* New();
-  vtkTypeRevisionMacro(vtkConnectionIterator, vtkObject);
+  vtkTypeMacro(vtkConnectionIterator, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
