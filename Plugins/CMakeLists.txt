@@ -34,7 +34,9 @@ paraview_build_optional_plugin(Moments "Filters for Flux and Circulation Fields"
 paraview_build_optional_plugin(NetDMFReader "NetDMF file format reader" NetDMFReader OFF)
 paraview_build_optional_plugin(Prism "Prism" PrismPlugins ON)
 paraview_build_optional_plugin(PointSprite "Point Sprites" PointSprite ON) 
-paraview_build_optional_plugin(pvblot "pvblot" pvblot ON)
+IF(PARAVIEW_ENABLE_PYTHON)
+  paraview_build_optional_plugin(pvblot "pvblot" pvblot ON)
+ENDIF(PARAVIEW_ENABLE_PYTHON)
 paraview_build_optional_plugin(SierraPlotTools "SierraPlotTools" SierraPlotTools ON)
 paraview_build_optional_plugin(SLACTools "SLACTools" SLACTools ON)
 #paraview_build_optional_plugin(SQLDatabaseGraphSourcePanel "SQLDatabaseGraphSourcePanel" SQLDatabaseGraphSourcePanel OFF) 
@@ -58,3 +60,4 @@ paraview_build_optional_plugin(AnalyzeNIfTIReaderWriter "Reader/Writer for Analy
 IF(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/VisTrails/CMakeLists.txt)
   paraview_build_optional_plugin(VisTrailsPlugin "VisTrailsPlugin" VisTrails ON)
 ENDIF(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/VisTrails/CMakeLists.txt)
+
