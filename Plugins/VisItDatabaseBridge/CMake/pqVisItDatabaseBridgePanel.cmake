@@ -118,12 +118,3 @@ if (VISIT_WITH_MPI)
   message(STATUS "Configure vtkVisItDatabase for VisIt built with MPI.")
   set_source_files_properties(VisItReaderPlugin COMPILE_FLAGS ${COMPILE_FLAGS} "-DMPI")
 endif (VISIT_WITH_MPI)
-
-install (TARGETS VisItReaderPlugin
-  DESTINATION "${PV_INSTALL_BIN_DIR}/plugins/VisItReaderPlugin"
-  COMPONENT Runtime)
-
-install (TARGETS VisItReaderPlugin
-  DESTINATION "${PV_INSTALL_BIN_DIR}/plugins/VisItReaderPlugin"
-  COMPONENT Runtime)
-
