@@ -56,7 +56,7 @@ pqDeleteReaction::pqDeleteReaction(QAction* parentObject, bool delete_all)
       this, SLOT(updateEnableState()));
 
     QObject::connect(core->getSelectionModel(),
-      SIGNAL(currentChangedpqServerManagerModelItem*)),
+      SIGNAL(currentChangedpqServerManagerModelItem*),
       this, SLOT(updateEnableState()));
     }
 
