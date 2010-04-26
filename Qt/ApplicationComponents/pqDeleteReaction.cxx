@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqOutputPort.h"
 #include "pqPipelineSource.h"
 #include "pqServerManagerModel.h"
+#include "pqServerManagerObserver.h"
 #include "pqServerManagerSelectionModel.h"
 #include "pqUndoStack.h"
 #include "pqObjectBuilder.h"
@@ -55,9 +56,11 @@ pqDeleteReaction::pqDeleteReaction(QAction* parentObject, bool delete_all)
           const pqServerManagerSelection&)),
       this, SLOT(updateEnableState()));
 
-    QObject::connect(core->getSelectionModel(),
-      SIGNAL(currentChangedpqServerManagerModelItem*),
-      this, SLOT(updateEnableState()));
+    //needed for when you delete the only consumer of an item. The selection
+    //signal is emitted before the consumer is removed
+    QObject::connect( core->getServerManagerObserver(),
+      SIGNAL(proxyUnRegistered(const QString&, const QString&, vtkSMProxy*) ),
+      this, SLOT(updateEnableState()) );
     }
 
   this->updateEnableState();
