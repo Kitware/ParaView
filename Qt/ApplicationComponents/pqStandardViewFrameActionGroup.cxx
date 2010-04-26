@@ -68,14 +68,14 @@ bool pqStandardViewFrameActionGroup::connect(pqMultiViewFrame *frame, pqView *vi
     // Setup undo/redo connections if the view module
     // supports interaction undo.
     QAction* forwardAction = new QAction(QIcon(":/pqWidgets/Icons/pqRedoCamera24.png"),
-      "Camera Undo",
+      "Camera Redo",
       this);
     forwardAction->setObjectName("ForwardButton");
     frame->addTitlebarAction(forwardAction);
     new pqCameraUndoRedoReaction(forwardAction, false, view);
 
     QAction* backAction = new QAction(QIcon(":/pqWidgets/Icons/pqUndoCamera24.png"),
-      "Camera Redo",
+      "Camera Undo",
       this);
     backAction->setObjectName("BackButton");
     frame->addTitlebarAction(backAction);
