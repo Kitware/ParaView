@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -49,8 +49,8 @@ bool pqStandardViewFrameActionGroup::connect(pqMultiViewFrame *frame, pqView *vi
   pqRenderView* const render_module = qobject_cast<pqRenderView*>(view);
   if (render_module)
     {
-    QAction* cameraAction = new QAction(QIcon(":/pqWidgets/Icons/pqEditCamera16.png"), 
-      "Adjust Camera", 
+    QAction* cameraAction = new QAction(QIcon(":/pqWidgets/Icons/pqEditCamera16.png"),
+      "Adjust Camera",
       this);
     cameraAction->setObjectName("CameraButton");
     frame->addTitlebarAction(cameraAction);
@@ -67,15 +67,15 @@ bool pqStandardViewFrameActionGroup::connect(pqMultiViewFrame *frame, pqView *vi
     {
     // Setup undo/redo connections if the view module
     // supports interaction undo.
-    QAction* forwardAction = new QAction(QIcon(":/pqWidgets/Icons/pqRedoCamera24.png"), 
-      "", 
+    QAction* forwardAction = new QAction(QIcon(":/pqWidgets/Icons/pqRedoCamera24.png"),
+      "Camera Undo",
       this);
     forwardAction->setObjectName("ForwardButton");
     frame->addTitlebarAction(forwardAction);
     new pqCameraUndoRedoReaction(forwardAction, false, view);
 
-    QAction* backAction = new QAction(QIcon(":/pqWidgets/Icons/pqUndoCamera24.png"), 
-      "", 
+    QAction* backAction = new QAction(QIcon(":/pqWidgets/Icons/pqUndoCamera24.png"),
+      "Camera Redo",
       this);
     backAction->setObjectName("BackButton");
     frame->addTitlebarAction(backAction);
