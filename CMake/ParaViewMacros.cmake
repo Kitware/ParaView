@@ -79,8 +79,21 @@ ENDMACRO(pv_set_if_not_set)
 FUNCTION (pv_install_library libpath dest component)
   IF (NOT WIN32)
     GET_FILENAME_COMPONENT(dir_tmp ${libpath} PATH)
-    GET_FILENAME_COMPONENT(name_tmp ${libpath} NAME)
-    FILE(GLOB lib_list RELATIVE "${dir_tmp}" "${libpath}*")
+    SET(name_tmp)
+    # libs symlinks are always named lib.*.dylib on mac
+    # libs symlinks are always named lib.so.* on linux
+    IF (APPLE)
+      GET_FILENAME_COMPONENT(name_tmp ${libpath} NAME_WE)
+      FILE(GLOB lib_list "${dir_tmp}/${name_tmp}*")
+      message("glob: ${dir_tmp}/${name_tmp}")
+    ELSE (APPLE)
+      GET_FILENAME_COMPONENT(dir_tmp ${libpath} PATH)
+      GET_FILENAME_COMPONENT(name_tmp ${libpath} NAME)
+      FILE(GLOB lib_list RELATIVE "${dir_tmp}" "${libpath}*")
+    ENDIF (APPLE)
+    message("libpath: ${libpath}")
+    message("dir_tmp: ${dir_tmp}")
+    message("lib_list: ${lib_list}")
     INSTALL(CODE "
           MESSAGE(STATUS \"Installing ${name_tmp}\")
           EXECUTE_PROCESS (WORKING_DIRECTORY ${dir_tmp}
