@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -84,7 +84,7 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-pqCameraDialog::pqCameraDialog(QWidget* _p/*=null*/, 
+pqCameraDialog::pqCameraDialog(QWidget* _p/*=null*/,
   Qt::WFlags f/*=0*/): pqDialog(_p, f)
 {
   this->Internal = new pqCameraDialogInternal;
@@ -103,7 +103,7 @@ pqCameraDialog::pqCameraDialog(QWidget* _p/*=null*/,
     this, SLOT(resetViewDirectionPosY()));
   QObject::connect(
     this->Internal->viewYMinus, SIGNAL(clicked()),
-    this, SLOT(resetViewDirectionNegY()));  
+    this, SLOT(resetViewDirectionNegY()));
   QObject::connect(
     this->Internal->viewZPlus, SIGNAL(clicked()),
     this, SLOT(resetViewDirectionPosZ()));
@@ -160,10 +160,10 @@ pqCameraDialog::pqCameraDialog(QWidget* _p/*=null*/,
   pqSettings *settings=pqApplicationCore::instance()->settings();
   settings->beginGroup("CustomViewButtons");
   settings->beginGroup("ToolTips");
-  w->customView0->setToolTip(settings->value("0","not configured.").toString());
-  w->customView1->setToolTip(settings->value("1","not configured.").toString());
-  w->customView2->setToolTip(settings->value("2","not configured.").toString());
-  w->customView3->setToolTip(settings->value("3","not configured.").toString());
+  w->customView0->setToolTip(settings->value("0",pqCustomViewButtonDialog::DEFAULT_TOOLTIP).toString());
+  w->customView1->setToolTip(settings->value("1",pqCustomViewButtonDialog::DEFAULT_TOOLTIP).toString());
+  w->customView2->setToolTip(settings->value("2",pqCustomViewButtonDialog::DEFAULT_TOOLTIP).toString());
+  w->customView3->setToolTip(settings->value("3",pqCustomViewButtonDialog::DEFAULT_TOOLTIP).toString());
   settings->endGroup();
   settings->endGroup();
 }
@@ -186,7 +186,7 @@ void pqCameraDialog::setupGUI()
 {
   if (this->Internal->RenderModule)
     {
-    vtkSMRenderViewProxy* proxy = 
+    vtkSMRenderViewProxy* proxy =
       this->Internal->RenderModule->getRenderViewProxy();
     proxy->SynchronizeCameraProperties();
 
@@ -244,7 +244,7 @@ void pqCameraDialog::setupGUI()
       proxy, proxy->GetProperty("CameraViewUp"), 0);
     this->Internal->CameraLinks.addPropertyLink(
       this->Internal->viewUp1, "text", SIGNAL(editingFinished()),
-      proxy, proxy->GetProperty("CameraViewUp"), 1);  
+      proxy, proxy->GetProperty("CameraViewUp"), 1);
     this->Internal->CameraLinks.addPropertyLink(
       this->Internal->viewUp2, "text", SIGNAL(editingFinished()),
       proxy, proxy->GetProperty("CameraViewUp"), 2);
@@ -254,7 +254,7 @@ void pqCameraDialog::setupGUI()
       proxy, proxy->GetProperty("CenterOfRotation"), 0);
     this->Internal->CameraLinks.addPropertyLink(
       this->Internal->CenterY, "text", SIGNAL(editingFinished()),
-      proxy, proxy->GetProperty("CenterOfRotation"), 1);  
+      proxy, proxy->GetProperty("CenterOfRotation"), 1);
     this->Internal->CameraLinks.addPropertyLink(
       this->Internal->CenterZ, "text", SIGNAL(editingFinished()),
       proxy, proxy->GetProperty("CenterOfRotation"), 2);
@@ -333,7 +333,7 @@ void pqCameraDialog::adjustCamera(
 {
   if (this->Internal->RenderModule)
     {
-    vtkSMRenderViewProxy* proxy = 
+    vtkSMRenderViewProxy* proxy =
       this->Internal->RenderModule->getRenderViewProxy();
     proxy->SynchronizeCameraProperties();
     vtkCamera* camera = proxy->GetActiveCamera();
@@ -361,21 +361,21 @@ void pqCameraDialog::adjustCamera(
 //-----------------------------------------------------------------------------
 void pqCameraDialog::applyCameraRoll()
 {
-  this->adjustCamera(pqCameraDialog::Roll, 
+  this->adjustCamera(pqCameraDialog::Roll,
     this->Internal->rollAngle->value());
 }
 
 //-----------------------------------------------------------------------------
 void pqCameraDialog::applyCameraElevation()
 {
-  this->adjustCamera(pqCameraDialog::Elevation, 
+  this->adjustCamera(pqCameraDialog::Elevation,
     this->Internal->elevationAngle->value());
 }
 
 //-----------------------------------------------------------------------------
 void pqCameraDialog::applyCameraAzimuth()
 {
-  this->adjustCamera(pqCameraDialog::Azimuth, 
+  this->adjustCamera(pqCameraDialog::Azimuth,
     this->Internal->azimuthAngle->value());
 }
 
@@ -492,7 +492,7 @@ void pqCameraDialog::applyCustomView(int buttonId)
     if (!ok)
       {
       pqErrorMacro(
-          << "Invalid XML in custom view button " 
+          << "Invalid XML in custom view button "
           << buttonId << " configuration.");
       return;
       }

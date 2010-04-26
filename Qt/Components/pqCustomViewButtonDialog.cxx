@@ -47,6 +47,9 @@ public:
 };
 
 //------------------------------------------------------------------------------
+const QString pqCustomViewButtonDialog::DEFAULT_TOOLTIP = QString("not configured.");
+
+//------------------------------------------------------------------------------
 pqCustomViewButtonDialog::pqCustomViewButtonDialog(
     QWidget *Parent,
     Qt::WindowFlags flags,
@@ -382,10 +385,10 @@ void pqCustomViewButtonDialog::clearAll()
 {
   QStringList toolTips;
   toolTips
-      << "Not configured."
-      << "Not configured."
-      << "Not configured."
-      << "Not configured.";
+      << pqCustomViewButtonDialog::DEFAULT_TOOLTIP
+      << pqCustomViewButtonDialog::DEFAULT_TOOLTIP
+      << pqCustomViewButtonDialog::DEFAULT_TOOLTIP
+      << pqCustomViewButtonDialog::DEFAULT_TOOLTIP;
   this->setToolTips(toolTips);
 
   QStringList configs;
@@ -397,7 +400,10 @@ void pqCustomViewButtonDialog::clearAll()
 void pqCustomViewButtonDialog::assignCurrentView(int id)
 {
   this->Configurations[id]=this->CurrentConfiguration;
-
+  if ( this->ToolTips[id]->text() == pqCustomViewButtonDialog::DEFAULT_TOOLTIP )
+    {
+    this->ToolTips[id]->setText("Current View " + QString::number(id+1));
+    }
   this->ToolTips[id]->selectAll();
   this->ToolTips[id]->setFocus();
 }
