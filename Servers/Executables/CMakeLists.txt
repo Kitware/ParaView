@@ -59,6 +59,18 @@ CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/vtkSMTestDriverConfig.h.in
 add_executable_with_forwarding(pv_exe_suffix smTestDriver vtkSMTestDriver.cxx)
 TARGET_LINK_LIBRARIES(smTestDriver${pv_exe_suffix} vtksys)
 
+#------------------------------------------------------------------------
+# Install ffmpeg, if used.
+IF (VTK_USE_FFMPEG_ENCODER)
+  FOREACH(fmpglib avcodec avformat avutil)
+    IF (FFMPEG_${fmpglib}_LIBRARY)
+      pv_install_library(${FFMPEG_${fmpglib}_LIBRARY}
+        ${PV_INSTALL_LIB_DIR}
+        BrandedRuntime)
+    ENDIF(FFMPEG_${fmpglib}_LIBRARY)
+  ENDFOREACH(fmpglib)
+ENDIF (VTK_USE_FFMPEG_ENCODER)
+
 IF (NOT PV_INSTALL_NO_RUNTIME)
   INSTALL(TARGETS smTestDriver
           DESTINATION ${PV_INSTALL_BIN_DIR}
