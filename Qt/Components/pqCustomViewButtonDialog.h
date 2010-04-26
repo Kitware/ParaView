@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -70,6 +70,10 @@ public:
   ~pqCustomViewButtonDialog();
 
   // Description:
+  // Constant variable that contains the default name for the tool tips.
+  const static QString DEFAULT_TOOLTIP;
+
+  // Description:
   // Set/get a list of tool tips, one for each button.
   void setToolTips(QStringList &toolTips);
   QStringList getToolTips();
@@ -106,6 +110,5 @@ private:
 
   pqCustomViewButtonDialogUI *ui;
 };
-
 #endif
 
