@@ -42,7 +42,7 @@ namespace
 class vtkSESAMEConversionFilter : public vtkPolyDataAlgorithm
 {
 public:
-  vtkTypeMacro(vtkSESAMEConversionFilter,vtkPolyDataAlgorithm);
+  vtkTypeRevisionMacro(vtkSESAMEConversionFilter,vtkPolyDataAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
@@ -65,6 +65,7 @@ private:
   void operator=(const vtkSESAMEConversionFilter&);  // Not implemented.
 };
 }
+vtkCxxRevisionMacro(vtkSESAMEConversionFilter, "1.11");
 vtkStandardNewMacro(vtkSESAMEConversionFilter);
 
 //----------------------------------------------------------------------------
@@ -559,35 +560,13 @@ vtkDoubleArray* vtkPrismSurfaceReader::GetXRange ()
         if(!this->Internal->Reader->IsValidFile())
         {
             return this->Internal->XRangeArray;
-        }   
-        
+        }
+
         if(this->Internal->XRangeTime<this->GetMTime())
         {
         this->Internal->XRangeTime.Modified();
 
         this->GetVariableRange(this->GetXAxisVarName(),this->Internal->XRangeArray);
-
-        if(this->Internal->ArrayLogScaling[0])
-            {
-            if(this->Internal->XRangeArray->GetValue(0)>0)
-                {
-                this->Internal->XRangeArray->SetValue(0,log(this->Internal->XRangeArray->GetValue(0)));
-                }
-            else
-                {
-                this->Internal->XRangeArray->SetValue(0,0.0);
-                }
-
-
-            if(this->Internal->XRangeArray->GetValue(1)>0)
-                {
-                this->Internal->XRangeArray->SetValue(1,log(this->Internal->XRangeArray->GetValue(1)));
-                }
-            else
-                {
-                this->Internal->XRangeArray->SetValue(1,0.0);
-                }
-            }
         }
 
     return this->Internal->XRangeArray;
@@ -605,30 +584,6 @@ vtkDoubleArray* vtkPrismSurfaceReader::GetYRange ()
         {
         this->Internal->YRangeTime.Modified();
         this->GetVariableRange(this->GetYAxisVarName(),this->Internal->YRangeArray);
-       
-
-        
-        if(this->Internal->ArrayLogScaling[1])
-            {
-            if(this->Internal->YRangeArray->GetValue(0)>0)
-                {
-                this->Internal->YRangeArray->SetValue(0,log(this->Internal->YRangeArray->GetValue(0)));
-                }
-            else
-                {
-                this->Internal->YRangeArray->SetValue(0,0.0);
-                }
-
-
-            if(this->Internal->YRangeArray->GetValue(1)>0)
-                {
-                this->Internal->YRangeArray->SetValue(1,log(this->Internal->YRangeArray->GetValue(1)));
-                }
-            else
-                {
-                this->Internal->YRangeArray->SetValue(1,0.0);
-                }
-            }
         }
 
     return this->Internal->YRangeArray;
@@ -648,30 +603,7 @@ vtkDoubleArray* vtkPrismSurfaceReader::GetZRange ()
         if(this->Internal->ZRangeTime<this->GetMTime())
         {
         this->Internal->ZRangeTime.Modified();
-
         this->GetVariableRange(this->GetZAxisVarName(),this->Internal->ZRangeArray);
-
-        if(this->Internal->ArrayLogScaling[2])
-            {
-            if(this->Internal->ZRangeArray->GetValue(0)>0)
-                {
-                this->Internal->ZRangeArray->SetValue(0,log(this->Internal->ZRangeArray->GetValue(0)));
-                }
-            else
-                {
-                this->Internal->ZRangeArray->SetValue(0,0.0);
-                }
-
-
-            if(this->Internal->ZRangeArray->GetValue(1)>0)
-                {
-                this->Internal->ZRangeArray->SetValue(1,log(this->Internal->ZRangeArray->GetValue(1)));
-                }
-            else
-                {
-                this->Internal->ZRangeArray->SetValue(1,0.0);
-                }
-            }
         }
 
     return this->Internal->ZRangeArray;
@@ -1176,6 +1108,20 @@ int vtkPrismSurfaceReader::RequestData(
         scaleBounds[3] - scaleBounds[2],
         scaleBounds[5] - scaleBounds[4]
     };
+
+    if(delta[0]<=1e-8)
+    {
+      delta[0]=1e-8;
+    }
+    if(delta[1]<=1e-8)
+    {
+      delta[1]=1e-8;
+    }
+    if(delta[2]<=1e-8)
+    {
+      delta[2]=1e-8;
+    }
+
     this->AspectScale[0]=100/delta[0];
     this->AspectScale[1]=100/delta[1];
     this->AspectScale[2]=100/delta[2];
@@ -1292,4 +1238,3 @@ void vtkPrismSurfaceReader::PrintSelf(ostream& os, vtkIndent indent)
     os << indent << "Not Implemented: " << "\n";
 
     }
-
