@@ -35,6 +35,8 @@
 #include "vtkstd/list"
 #include "vtkstd/vector"
 
+#include "vtksys/SystemTools.hxx"
+
 // Determine if we can use the MPI controller for asynchronous communication.
 #include "vtkToolkits.h"
 #ifdef VTK_USE_MPI
