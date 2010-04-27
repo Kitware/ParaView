@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -47,6 +47,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMReaderFactory.h"
 
 #include <QDebug>
+
+#include "vtkStringList.h"
 
 //-----------------------------------------------------------------------------
 pqLoadDataReaction::pqLoadDataReaction(QAction* parentObject)
@@ -124,8 +126,29 @@ pqPipelineSource* pqLoadDataReaction::loadData(const QStringList& files)
   // Determine reader type based on first file. For now, we are relying
   // on the user to avoid mixing file types.
   QString filename = files[0];
-  QString readerType, readerGroup; 
-  if (readerFactory->CanReadFile(filename.toAscii().data(),
+
+  vtkStringList* list = readerFactory->GetReaders(filename.toAscii().data(),
+                                                  server->GetConnectionID());
+
+  QString readerType, readerGroup;
+
+  // If more than one readers found.
+  if(list->GetLength() > 3)
+    {
+    pqSelectReaderDialog prompt(filename, server,
+                                 list, pqCoreUtilities::mainWidget());
+    if (prompt.exec() == QDialog::Accepted)
+      {
+      readerType = prompt.getReader();
+      readerGroup = prompt.getGroup();
+      }
+    else
+      {
+      // User didn't choose any reader.
+      return NULL;
+      }
+    }
+  else if (readerFactory->CanReadFile(filename.toAscii().data(),
       server->GetConnectionID()))
     {
     readerType = readerFactory->GetReaderName();
@@ -135,8 +158,9 @@ pqPipelineSource* pqLoadDataReaction::loadData(const QStringList& files)
     {
     // The reader factory could not determine the type of reader to create for the
     // file. Ask the user.
-    pqSelectReaderDialog prompt(filename, server, 
+    pqSelectReaderDialog prompt(filename, server,
       readerFactory, pqCoreUtilities::mainWidget());
+
     if (prompt.exec() == QDialog::Accepted)
       {
       readerType = prompt.getReader();
@@ -150,7 +174,7 @@ pqPipelineSource* pqLoadDataReaction::loadData(const QStringList& files)
     }
 
   BEGIN_UNDO_SET("Create 'Reader'");
-  pqObjectBuilder* builder = 
+  pqObjectBuilder* builder =
     pqApplicationCore::instance()->getObjectBuilder();
   pqPipelineSource* reader = builder->createReader(readerGroup,
     readerType, files, server);

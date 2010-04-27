@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -42,7 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 class pqSelectReaderDialog::pqInternal : public QObject, public Ui::pqSelectReaderDialog
-{ 
+{
 public:
   pqInternal(QObject* p) : QObject(p) {}
 };
@@ -66,7 +66,7 @@ pqSelectReaderDialog::pqSelectReaderDialog(const QString& file,
 
   vtkStringList* readers = readerFactory->GetPossibleReaders(
     file.toAscii().data(), s->GetConnectionID());
-  
+
   for (int cc=0; (cc+2) < readers->GetNumberOfStrings(); cc+=3)
     {
     QString desc = readers->GetString(cc+2);
@@ -75,6 +75,34 @@ pqSelectReaderDialog::pqSelectReaderDialog(const QString& file,
     item->setData(Qt::UserRole+1, readers->GetString(cc+1));
     }
 };
+
+
+//-----------------------------------------------------------------------------
+pqSelectReaderDialog::pqSelectReaderDialog(const QString& file,
+                       pqServer* s,
+                       vtkStringList* list, QWidget* p)
+  : QDialog(p)
+{
+  this->Internal = new pqInternal(this);
+  this->Internal->setupUi(this);
+
+  // set the helper/information string
+  QString info = QString("More than one reader for \"%1\" found."
+                         "  Please choose one:").arg(file);
+  this->Internal->FileInfo->setText(info);
+
+  // populate the list view with readers
+  QListWidget* lw = this->Internal->listWidget;
+
+  for (int cc=0; (cc+2) < list->GetNumberOfStrings(); cc+=3)
+    {
+    QString desc = list->GetString(cc+2);
+    QListWidgetItem* item = new QListWidgetItem(desc, lw);
+    item->setData(Qt::UserRole, list->GetString(cc+0));
+    item->setData(Qt::UserRole+1, list->GetString(cc+1));
+    }
+};
+
 
 //-----------------------------------------------------------------------------
 pqSelectReaderDialog::~pqSelectReaderDialog()

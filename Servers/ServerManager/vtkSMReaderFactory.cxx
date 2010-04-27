@@ -215,7 +215,7 @@ bool vtkSMReaderFactory::vtkInternals::vtkValue::FilenameRegExTest(
 
 //----------------------------------------------------------------------------
 bool vtkSMReaderFactory::vtkInternals::vtkValue::CanReadFile(
-  const char* filename, 
+  const char* filename,
   const vtkstd::vector<vtkstd::string>& extensions,
   vtkIdType cid,
   bool skip_filename_test/*=false*/)
@@ -312,9 +312,9 @@ void vtkSMReaderFactory::RegisterPrototype(const char* xmlgroup, const char* xml
   vtkInternals::vtkValue value;
   value.Group = xmlgroup;
   value.Name = xmlname;
-  
+
   // fills extension information etc. from the prototype.
-  value.FillInformation(); 
+  value.FillInformation();
 
   this->Internals->Prototypes.push_front(value);
 }
@@ -331,9 +331,9 @@ void vtkSMReaderFactory::RegisterPrototype(
   vtkInternals::vtkValue value;
   value.Group = xmlgroup;
   value.Name = xmlname;
-  
+
   // fills extension information etc. from the prototype.
-  value.FillInformation(); 
+  value.FillInformation();
   if (description)
     {
     value.Description = description;
@@ -364,7 +364,7 @@ void vtkSMReaderFactory::UnRegisterPrototype(
 //----------------------------------------------------------------------------
 bool vtkSMReaderFactory::LoadConfigurationFile(const char* filename)
 {
-  vtkSmartPointer<vtkPVXMLParser> parser = 
+  vtkSmartPointer<vtkPVXMLParser> parser =
     vtkSmartPointer<vtkPVXMLParser>::New();
   parser->SetFileName(filename);
   if (!parser->Parse())
@@ -379,7 +379,7 @@ bool vtkSMReaderFactory::LoadConfigurationFile(const char* filename)
 //----------------------------------------------------------------------------
 bool vtkSMReaderFactory::LoadConfiguration(const char* xmlcontents)
 {
-  vtkSmartPointer<vtkPVXMLParser> parser = 
+  vtkSmartPointer<vtkPVXMLParser> parser =
     vtkSmartPointer<vtkPVXMLParser>::New();
 
   if (!parser->Parse(xmlcontents))
@@ -400,7 +400,7 @@ bool vtkSMReaderFactory::LoadConfiguration(vtkPVXMLElement* elem)
     return false;
     }
 
-  if (elem->GetName() && 
+  if (elem->GetName() &&
     strcmp(elem->GetName(), "ParaViewReaders") != 0)
     {
     return this->LoadConfiguration(
@@ -411,8 +411,8 @@ bool vtkSMReaderFactory::LoadConfiguration(vtkPVXMLElement* elem)
   for(unsigned int i=0; i<num; i++)
     {
     vtkPVXMLElement* reader = elem->GetNestedElement(i);
-    if (reader->GetName() && 
-      (strcmp(reader->GetName(),"Reader") == 0 || 
+    if (reader->GetName() &&
+      (strcmp(reader->GetName(),"Reader") == 0 ||
        strcmp(reader->GetName(), "Proxy") == 0))
       {
       const char* name = reader->GetAttribute("name");
@@ -435,6 +435,36 @@ bool vtkSMReaderFactory::LoadConfiguration(vtkPVXMLElement* elem)
 vtkStringList* vtkSMReaderFactory::GetReaders(vtkIdType cid)
 {
   return this->GetPossibleReaders(NULL, cid);
+}
+
+//----------------------------------------------------------------------------
+vtkStringList* vtkSMReaderFactory::GetReaders(const char* filename,
+                                              vtkIdType cid)
+{
+  this->Readers->RemoveAllItems();
+
+  if (!filename || filename[0] == 0)
+    {
+    return this->Readers;
+    }
+
+  vtkstd::vector<vtkstd::string> extensions;
+  this->Internals->BuildExtensions(filename, extensions);
+
+  vtkInternals::PrototypesType::iterator iter;
+  for (iter = this->Internals->Prototypes.begin();
+    iter != this->Internals->Prototypes.end(); ++iter)
+    {
+    if (iter->CanCreatePrototype(cid) &&
+        iter->CanReadFile(filename, extensions, cid))
+      {
+      this->Readers->AddString(iter->Group.c_str());
+      this->Readers->AddString(iter->Name.c_str());
+      this->Readers->AddString(iter->Description.c_str());
+      }
+    }
+
+  return this->Readers;
 }
 
 //----------------------------------------------------------------------------
@@ -555,7 +585,7 @@ const char* vtkSMReaderFactory::GetSupportedFileTypes(vtkIdType cid)
       }
     }
   all_types << ")";
-  
+
   vtkstd::set<vtkstd::string>::iterator iter2;
   for (iter2 = sorted_types.begin(); iter2 != sorted_types.end(); ++iter2)
     {
@@ -601,27 +631,27 @@ bool vtkSMReaderFactory::CanReadFile(const char* filename, vtkSMProxy* proxy)
 
   vtkClientServerStream stream;
   stream << vtkClientServerStream::Invoke
-         << pm->GetProcessModuleID() 
+         << pm->GetProcessModuleID()
          << "SetReportInterpreterErrors" << 0
          << vtkClientServerStream::End;
   stream << vtkClientServerStream::Invoke
          << proxy->GetID() << "CanReadFile" << filename
          << vtkClientServerStream::End;
-  pm->SendStream(proxy->GetConnectionID(), 
+  pm->SendStream(proxy->GetConnectionID(),
     vtkProcessModule::GetRootId(proxy->GetServers()), stream);
   pm->GetLastResult(proxy->GetConnectionID(),
     vtkProcessModule::GetRootId(proxy->GetServers())).GetArgument(0, 0, &canRead);
   stream << vtkClientServerStream::Invoke
-         << pm->GetProcessModuleID() 
+         << pm->GetProcessModuleID()
          << "SetReportInterpreterErrors" << 1
          << vtkClientServerStream::End;
-  pm->SendStream(proxy->GetConnectionID(), 
+  pm->SendStream(proxy->GetConnectionID(),
     vtkProcessModule::GetRootId(proxy->GetServers()), stream);
   return (canRead != 0);
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMReaderFactory::CanReadFile(const char* filename, 
+bool vtkSMReaderFactory::CanReadFile(const char* filename,
   const char* readerxmlgroup, const char* readerxmlname, vtkIdType cid)
 {
   vtkSMProxy* proxy = vtkSMProxyManager::GetProxyManager()->NewProxy(

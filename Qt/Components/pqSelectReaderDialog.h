@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -38,6 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class pqServer;
 class vtkSMReaderFactory;
+class vtkStringList;
 
 /// a dialog that prompts for a reader type to open a file
 class PQCOMPONENTS_EXPORT pqSelectReaderDialog : public QDialog
@@ -46,8 +47,13 @@ class PQCOMPONENTS_EXPORT pqSelectReaderDialog : public QDialog
 public:
   /// constructor
   pqSelectReaderDialog(const QString& file,
-                       pqServer* s, 
+                       pqServer* s,
                        vtkSMReaderFactory* factory,
+                       QWidget* p = 0);
+
+  pqSelectReaderDialog(const QString& file,
+                       pqServer* s,
+                       vtkStringList* list,
                        QWidget* p = 0);
   /// destructor
   ~pqSelectReaderDialog();

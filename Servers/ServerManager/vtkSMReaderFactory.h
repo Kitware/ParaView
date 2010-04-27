@@ -104,7 +104,15 @@ public:
   // Description:
   // Returns a list of 3-tuples where the 1st string is the group, the 2nd
   // string is the reader name and the 3rd string is the reader description
+  // This returns all the possible readers with a given connection id.
   vtkStringList* GetReaders(vtkIdType cid);
+
+  // Description:
+  // Returls list of readers that can read the file using its extension and
+  // connection id.
+  // Returns a list of 3-tuples where the 1st string is the group, the 2nd
+  // string is the reader name and the 3rd string is the reader description
+  vtkStringList* GetReaders(const char* filename, vtkIdType cid);
 
   // Description:
   // Helper method to test is a file is readable on the server side. This has
