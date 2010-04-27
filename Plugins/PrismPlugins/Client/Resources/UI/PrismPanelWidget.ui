@@ -1,7 +1,8 @@
-<ui version="4.0" >
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
  <class>PrismPanelWidget</class>
- <widget class="QWidget" name="PrismPanelWidget" >
-  <property name="geometry" >
+ <widget class="QWidget" name="PrismPanelWidget">
+  <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
@@ -9,40 +10,32 @@
     <height>909</height>
    </rect>
   </property>
-  <property name="windowTitle" >
+  <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QGridLayout" name="gridLayout_7" >
-   <item row="0" column="0" >
-    <widget class="QTabWidget" name="tabWidget" >
-     <property name="currentIndex" >
+  <layout class="QGridLayout" name="gridLayout_7">
+   <item row="0" column="0">
+    <widget class="QTabWidget" name="tabWidget">
+     <property name="currentIndex">
       <number>0</number>
      </property>
-     <widget class="QWidget" name="widget" >
-      <property name="geometry" >
-       <rect>
-        <x>0</x>
-        <y>0</y>
-        <width>312</width>
-        <height>864</height>
-       </rect>
-      </property>
-      <attribute name="title" >
+     <widget class="QWidget" name="widget">
+      <attribute name="title">
        <string>SESAME Data</string>
       </attribute>
-      <layout class="QGridLayout" name="gridLayout_6" >
-       <item row="0" column="0" >
-        <layout class="QHBoxLayout" name="horizontalLayout" >
+      <layout class="QGridLayout" name="gridLayout_6">
+       <item row="0" column="0">
+        <layout class="QHBoxLayout" name="horizontalLayout">
          <item>
-          <widget class="QLabel" name="label" >
-           <property name="text" >
+          <widget class="QLabel" name="label">
+           <property name="text">
             <string>SESAME Table Id:</string>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="QComboBox" name="TableIdWidget" >
-           <property name="minimumSize" >
+          <widget class="QComboBox" name="TableIdWidget">
+           <property name="minimumSize">
             <size>
              <width>110</width>
              <height>0</height>
@@ -51,11 +44,11 @@
           </widget>
          </item>
          <item>
-          <spacer name="horizontalSpacer" >
-           <property name="orientation" >
+          <spacer name="horizontalSpacer">
+           <property name="orientation">
             <enum>Qt::Horizontal</enum>
            </property>
-           <property name="sizeHint" stdset="0" >
+           <property name="sizeHint" stdset="0">
             <size>
              <width>0</width>
              <height>20</height>
@@ -65,22 +58,22 @@
          </item>
         </layout>
        </item>
-       <item row="1" column="0" >
-        <widget class="QGroupBox" name="groupBox" >
-         <property name="title" >
+       <item row="1" column="0">
+        <widget class="QGroupBox" name="groupBox">
+         <property name="title">
           <string>X Axis</string>
          </property>
-         <layout class="QGridLayout" name="gridLayout" >
-          <item row="0" column="0" >
-           <widget class="QLabel" name="label_2" >
-            <property name="text" >
+         <layout class="QGridLayout" name="gridLayout">
+          <item row="0" column="0">
+           <widget class="QLabel" name="label_2">
+            <property name="text">
              <string>Variable</string>
             </property>
            </widget>
           </item>
-          <item row="0" column="1" >
-           <widget class="QComboBox" name="XAxisVarName" >
-            <property name="minimumSize" >
+          <item row="0" column="1">
+           <widget class="QComboBox" name="XAxisVarName">
+            <property name="minimumSize">
              <size>
               <width>150</width>
               <height>0</height>
@@ -88,12 +81,12 @@
             </property>
            </widget>
           </item>
-          <item row="0" column="2" >
-           <spacer name="horizontalSpacer_2" >
-            <property name="orientation" >
+          <item row="0" column="2">
+           <spacer name="horizontalSpacer_2">
+            <property name="orientation">
              <enum>Qt::Horizontal</enum>
             </property>
-            <property name="sizeHint" stdset="0" >
+            <property name="sizeHint" stdset="0">
              <size>
               <width>2</width>
               <height>20</height>
@@ -101,48 +94,48 @@
             </property>
            </spacer>
           </item>
-          <item row="1" column="0" colspan="2" >
-           <widget class="QCheckBox" name="XLogScaling" >
-            <property name="text" >
+          <item row="1" column="0" colspan="2">
+           <widget class="QCheckBox" name="XLogScaling">
+            <property name="text">
              <string> Use Log Scaling</string>
             </property>
            </widget>
           </item>
-          <item row="2" column="0" >
-           <widget class="QLabel" name="label_7" >
-            <property name="text" >
+          <item row="2" column="0">
+           <widget class="QLabel" name="label_7">
+            <property name="text">
              <string>Lower Threshold</string>
             </property>
            </widget>
           </item>
-          <item row="2" column="1" >
-           <widget class="pqDoubleRangeWidget" native="1" name="ThresholdXBetweenLower" />
+          <item row="2" column="1">
+           <widget class="pqDoubleRangeWidget" name="ThresholdXBetweenLower" native="true"/>
           </item>
-          <item row="3" column="0" >
-           <widget class="QLabel" name="label_8" >
-            <property name="text" >
+          <item row="3" column="0">
+           <widget class="QLabel" name="label_8">
+            <property name="text">
              <string>Upper Threshold</string>
             </property>
            </widget>
           </item>
-          <item row="3" column="1" >
-           <widget class="pqDoubleRangeWidget" native="1" name="ThresholdXBetweenUpper" />
+          <item row="3" column="1">
+           <widget class="pqDoubleRangeWidget" name="ThresholdXBetweenUpper" native="true"/>
           </item>
          </layout>
         </widget>
        </item>
-       <item row="2" column="0" >
-        <widget class="QGroupBox" name="groupBox_2" >
-         <property name="title" >
+       <item row="2" column="0">
+        <widget class="QGroupBox" name="groupBox_2">
+         <property name="title">
           <string>Y Axis</string>
          </property>
-         <layout class="QGridLayout" name="gridLayout_3" >
-          <item row="0" column="2" >
-           <spacer name="horizontalSpacer_3" >
-            <property name="orientation" >
+         <layout class="QGridLayout" name="gridLayout_3">
+          <item row="0" column="2">
+           <spacer name="horizontalSpacer_3">
+            <property name="orientation">
              <enum>Qt::Horizontal</enum>
             </property>
-            <property name="sizeHint" stdset="0" >
+            <property name="sizeHint" stdset="0">
              <size>
               <width>0</width>
               <height>20</height>
@@ -150,16 +143,16 @@
             </property>
            </spacer>
           </item>
-          <item row="0" column="0" >
-           <widget class="QLabel" name="label_3" >
-            <property name="text" >
+          <item row="0" column="0">
+           <widget class="QLabel" name="label_3">
+            <property name="text">
              <string>Variable</string>
             </property>
            </widget>
           </item>
-          <item row="0" column="1" >
-           <widget class="QComboBox" name="YAxisVarName" >
-            <property name="minimumSize" >
+          <item row="0" column="1">
+           <widget class="QComboBox" name="YAxisVarName">
+            <property name="minimumSize">
              <size>
               <width>150</width>
               <height>0</height>
@@ -167,51 +160,51 @@
             </property>
            </widget>
           </item>
-          <item row="1" column="0" colspan="2" >
-           <widget class="QCheckBox" name="YLogScaling" >
-            <property name="text" >
+          <item row="1" column="0" colspan="2">
+           <widget class="QCheckBox" name="YLogScaling">
+            <property name="text">
              <string>Use Log Scaling</string>
             </property>
            </widget>
           </item>
-          <item row="2" column="0" >
-           <widget class="QLabel" name="label_9" >
-            <property name="text" >
+          <item row="2" column="0">
+           <widget class="QLabel" name="label_9">
+            <property name="text">
              <string>Lower Threshold</string>
             </property>
            </widget>
           </item>
-          <item row="2" column="1" >
-           <widget class="pqDoubleRangeWidget" native="1" name="ThresholdYBetweenLower" />
+          <item row="2" column="1">
+           <widget class="pqDoubleRangeWidget" name="ThresholdYBetweenLower" native="true"/>
           </item>
-          <item row="3" column="0" >
-           <widget class="QLabel" name="label_10" >
-            <property name="text" >
+          <item row="3" column="0">
+           <widget class="QLabel" name="label_10">
+            <property name="text">
              <string>Upper Threshold</string>
             </property>
            </widget>
           </item>
-          <item row="3" column="1" >
-           <widget class="pqDoubleRangeWidget" native="1" name="ThresholdYBetweenUpper" />
+          <item row="3" column="1">
+           <widget class="pqDoubleRangeWidget" name="ThresholdYBetweenUpper" native="true"/>
           </item>
          </layout>
         </widget>
        </item>
-       <item row="3" column="0" >
-        <widget class="QGroupBox" name="WarpSurface" >
-         <property name="title" >
+       <item row="3" column="0">
+        <widget class="QGroupBox" name="WarpSurface">
+         <property name="title">
           <string>Warp Surface</string>
          </property>
-         <property name="checkable" >
+         <property name="checkable">
           <bool>true</bool>
          </property>
-         <layout class="QGridLayout" name="gridLayout_4" >
-          <item row="0" column="3" >
-           <spacer name="horizontalSpacer_4" >
-            <property name="orientation" >
+         <layout class="QGridLayout" name="gridLayout_4">
+          <item row="0" column="3">
+           <spacer name="horizontalSpacer_4">
+            <property name="orientation">
              <enum>Qt::Horizontal</enum>
             </property>
-            <property name="sizeHint" stdset="0" >
+            <property name="sizeHint" stdset="0">
              <size>
               <width>0</width>
               <height>20</height>
@@ -219,15 +212,15 @@
             </property>
            </spacer>
           </item>
-          <item row="0" column="1" >
-           <spacer name="horizontalSpacer_6" >
-            <property name="orientation" >
+          <item row="0" column="1">
+           <spacer name="horizontalSpacer_6">
+            <property name="orientation">
              <enum>Qt::Horizontal</enum>
             </property>
-            <property name="sizeType" >
+            <property name="sizeType">
              <enum>QSizePolicy::Preferred</enum>
             </property>
-            <property name="sizeHint" stdset="0" >
+            <property name="sizeHint" stdset="0">
              <size>
               <width>40</width>
               <height>20</height>
@@ -235,23 +228,23 @@
             </property>
            </spacer>
           </item>
-          <item row="0" column="0" >
-           <widget class="QLabel" name="label_4" >
-            <property name="text" >
+          <item row="0" column="0">
+           <widget class="QLabel" name="label_4">
+            <property name="text">
              <string>Variable</string>
             </property>
            </widget>
           </item>
-          <item row="1" column="0" colspan="3" >
-           <widget class="QCheckBox" name="ZLogScaling" >
-            <property name="text" >
+          <item row="1" column="0" colspan="3">
+           <widget class="QCheckBox" name="ZLogScaling">
+            <property name="text">
              <string>Use Log Scaling</string>
             </property>
            </widget>
           </item>
-          <item row="0" column="2" >
-           <widget class="QComboBox" name="ZAxisVarName" >
-            <property name="minimumSize" >
+          <item row="0" column="2">
+           <widget class="QComboBox" name="ZAxisVarName">
+            <property name="minimumSize">
              <size>
               <width>150</width>
               <height>0</height>
@@ -262,185 +255,185 @@
          </layout>
         </widget>
        </item>
-       <item row="4" column="0" >
-        <widget class="QGroupBox" name="groupBox_3" >
-         <property name="title" >
+       <item row="5" column="0">
+        <widget class="QGroupBox" name="groupBox_3">
+         <property name="title">
           <string>Conversions</string>
          </property>
-         <layout class="QGridLayout" name="gridLayout_5" >
-          <item row="0" column="0" >
-           <widget class="QLabel" name="label_11" >
-            <property name="sizePolicy" >
-             <sizepolicy vsizetype="Preferred" hsizetype="Preferred" >
+         <layout class="QGridLayout" name="gridLayout_5">
+          <item row="0" column="0">
+           <widget class="QLabel" name="label_11">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
             </property>
-            <property name="text" >
+            <property name="text">
              <string>File Name:</string>
             </property>
            </widget>
           </item>
-          <item row="0" column="1" colspan="2" >
-           <layout class="QHBoxLayout" name="horizontalLayout_2" >
+          <item row="0" column="1" colspan="2">
+           <layout class="QHBoxLayout" name="horizontalLayout_2">
             <item>
-             <widget class="QLabel" name="ConversionFile" >
-              <property name="sizePolicy" >
-               <sizepolicy vsizetype="Preferred" hsizetype="Expanding" >
+             <widget class="QLabel" name="ConversionFile">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
                 <horstretch>0</horstretch>
                 <verstretch>0</verstretch>
                </sizepolicy>
               </property>
-              <property name="text" >
+              <property name="text">
                <string/>
               </property>
              </widget>
             </item>
             <item>
-             <widget class="QPushButton" name="ConversionFileButton" >
-              <property name="sizePolicy" >
-               <sizepolicy vsizetype="Fixed" hsizetype="Fixed" >
+             <widget class="QPushButton" name="ConversionFileButton">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                 <horstretch>25</horstretch>
                 <verstretch>0</verstretch>
                </sizepolicy>
               </property>
-              <property name="maximumSize" >
+              <property name="maximumSize">
                <size>
                 <width>25</width>
                 <height>16777215</height>
                </size>
               </property>
-              <property name="text" >
+              <property name="text">
                <string>...</string>
               </property>
              </widget>
             </item>
            </layout>
           </item>
-          <item row="2" column="0" colspan="3" >
-           <layout class="QHBoxLayout" name="horizontalLayout_3" >
+          <item row="2" column="0" colspan="3">
+           <layout class="QHBoxLayout" name="horizontalLayout_3">
             <item>
-             <widget class="QCheckBox" name="SICheckbox" >
-              <property name="text" >
+             <widget class="QCheckBox" name="SICheckbox">
+              <property name="text">
                <string>SESAME To SI</string>
               </property>
-              <property name="checked" >
+              <property name="checked">
                <bool>true</bool>
               </property>
-              <property name="autoExclusive" >
+              <property name="autoExclusive">
                <bool>true</bool>
               </property>
              </widget>
             </item>
             <item>
-             <widget class="QCheckBox" name="cgsCheckbox" >
-              <property name="text" >
+             <widget class="QCheckBox" name="cgsCheckbox">
+              <property name="text">
                <string>SESAME To cgs</string>
               </property>
-              <property name="autoExclusive" >
+              <property name="autoExclusive">
                <bool>true</bool>
               </property>
              </widget>
             </item>
             <item>
-             <widget class="QCheckBox" name="CustomCheckbox" >
-              <property name="text" >
+             <widget class="QCheckBox" name="CustomCheckbox">
+              <property name="text">
                <string>Custom</string>
               </property>
-              <property name="checked" >
+              <property name="checked">
                <bool>false</bool>
               </property>
-              <property name="autoExclusive" >
+              <property name="autoExclusive">
                <bool>true</bool>
               </property>
              </widget>
             </item>
            </layout>
           </item>
-          <item row="3" column="0" >
-           <widget class="QLabel" name="ConversionVar1_label" >
-            <property name="text" >
+          <item row="3" column="0">
+           <widget class="QLabel" name="ConversionVar1_label">
+            <property name="text">
              <string>Density</string>
             </property>
            </widget>
           </item>
-          <item row="3" column="1" >
-           <widget class="QLabel" name="ConversionVar1_label2" >
-            <property name="minimumSize" >
+          <item row="3" column="1">
+           <widget class="QLabel" name="ConversionVar1_label2">
+            <property name="minimumSize">
              <size>
               <width>120</width>
               <height>0</height>
              </size>
             </property>
-            <property name="text" >
+            <property name="text">
              <string/>
             </property>
-            <property name="alignment" >
+            <property name="alignment">
              <set>Qt::AlignCenter</set>
             </property>
            </widget>
           </item>
-          <item row="3" column="2" >
-           <widget class="QLineEdit" name="ConversionVar1" >
-            <property name="sizePolicy" >
-             <sizepolicy vsizetype="Fixed" hsizetype="Preferred" >
+          <item row="3" column="2">
+           <widget class="QLineEdit" name="ConversionVar1">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
             </property>
-            <property name="minimumSize" >
+            <property name="minimumSize">
              <size>
               <width>75</width>
               <height>0</height>
              </size>
             </property>
-            <property name="alignment" >
+            <property name="alignment">
              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
             </property>
            </widget>
           </item>
-          <item row="4" column="0" >
-           <widget class="QLabel" name="ConversionVar2_label" >
-            <property name="sizePolicy" >
-             <sizepolicy vsizetype="Preferred" hsizetype="Fixed" >
+          <item row="4" column="0">
+           <widget class="QLabel" name="ConversionVar2_label">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
             </property>
-            <property name="text" >
+            <property name="text">
              <string>Temperature</string>
             </property>
            </widget>
           </item>
-          <item row="4" column="1" >
-           <widget class="QLabel" name="ConversionVar2_label2" >
-            <property name="text" >
+          <item row="4" column="1">
+           <widget class="QLabel" name="ConversionVar2_label2">
+            <property name="text">
              <string/>
             </property>
-            <property name="alignment" >
+            <property name="alignment">
              <set>Qt::AlignCenter</set>
             </property>
            </widget>
           </item>
-          <item row="4" column="2" >
-           <widget class="QLineEdit" name="ConversionVar2" >
-            <property name="sizePolicy" >
-             <sizepolicy vsizetype="Fixed" hsizetype="Preferred" >
+          <item row="4" column="2">
+           <widget class="QLineEdit" name="ConversionVar2">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
             </property>
-            <property name="alignment" >
+            <property name="alignment">
              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
             </property>
            </widget>
           </item>
-          <item row="4" column="3" >
-           <spacer name="horizontalSpacer_5" >
-            <property name="orientation" >
+          <item row="4" column="3">
+           <spacer name="horizontalSpacer_5">
+            <property name="orientation">
              <enum>Qt::Horizontal</enum>
             </property>
-            <property name="sizeHint" stdset="0" >
+            <property name="sizeHint" stdset="0">
              <size>
               <width>0</width>
               <height>20</height>
@@ -448,69 +441,69 @@
             </property>
            </spacer>
           </item>
-          <item row="5" column="0" >
-           <widget class="QLabel" name="ConversionVar3_label" >
-            <property name="text" >
+          <item row="5" column="0">
+           <widget class="QLabel" name="ConversionVar3_label">
+            <property name="text">
              <string>Pressure</string>
             </property>
            </widget>
           </item>
-          <item row="5" column="1" >
-           <widget class="QLabel" name="ConversionVar3_label2" >
-            <property name="text" >
+          <item row="5" column="1">
+           <widget class="QLabel" name="ConversionVar3_label2">
+            <property name="text">
              <string/>
             </property>
-            <property name="alignment" >
+            <property name="alignment">
              <set>Qt::AlignCenter</set>
             </property>
            </widget>
           </item>
-          <item row="5" column="2" >
-           <widget class="QLineEdit" name="ConversionVar3" >
-            <property name="sizePolicy" >
-             <sizepolicy vsizetype="Fixed" hsizetype="Preferred" >
+          <item row="5" column="2">
+           <widget class="QLineEdit" name="ConversionVar3">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
             </property>
-            <property name="alignment" >
+            <property name="alignment">
              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
             </property>
            </widget>
           </item>
-          <item row="6" column="0" >
-           <widget class="QLabel" name="ConversionVar4_label" >
-            <property name="text" >
+          <item row="6" column="0">
+           <widget class="QLabel" name="ConversionVar4_label">
+            <property name="text">
              <string>Energy</string>
             </property>
            </widget>
           </item>
-          <item row="6" column="1" >
-           <widget class="QLabel" name="ConversionVar4_label2" >
-            <property name="text" >
+          <item row="6" column="1">
+           <widget class="QLabel" name="ConversionVar4_label2">
+            <property name="text">
              <string/>
             </property>
-            <property name="alignment" >
+            <property name="alignment">
              <set>Qt::AlignCenter</set>
             </property>
            </widget>
           </item>
-          <item row="6" column="2" >
-           <widget class="QLineEdit" name="ConversionVar4" >
-            <property name="sizePolicy" >
-             <sizepolicy vsizetype="Fixed" hsizetype="Preferred" >
+          <item row="6" column="2">
+           <widget class="QLineEdit" name="ConversionVar4">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
             </property>
-            <property name="alignment" >
+            <property name="alignment">
              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
             </property>
            </widget>
           </item>
-          <item row="1" column="0" colspan="3" >
-           <widget class="QLabel" name="ConversionTableId" >
-            <property name="text" >
+          <item row="1" column="0" colspan="3">
+           <widget class="QLabel" name="ConversionTableId">
+            <property name="text">
              <string/>
             </property>
            </widget>
@@ -518,34 +511,47 @@
          </layout>
         </widget>
        </item>
-       <item row="5" column="0" >
-        <widget class="QGroupBox" name="DisplaySESAMEContours" >
-         <property name="title" >
+       <item row="7" column="0">
+        <spacer name="verticalSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>0</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item row="4" column="0">
+        <widget class="QGroupBox" name="DisplaySESAMEContours">
+         <property name="title">
           <string>Display Contours</string>
          </property>
-         <property name="checkable" >
+         <property name="checkable">
           <bool>true</bool>
          </property>
-         <property name="checked" >
+         <property name="checked">
           <bool>true</bool>
          </property>
-         <layout class="QGridLayout" name="gridLayout_2" >
-          <item row="0" column="0" >
-           <widget class="QLabel" name="label_5" >
-            <property name="enabled" >
+         <layout class="QGridLayout" name="gridLayout_2">
+          <item row="0" column="0">
+           <widget class="QLabel" name="label_5">
+            <property name="enabled">
              <bool>true</bool>
             </property>
-            <property name="text" >
+            <property name="text">
              <string>Variable</string>
             </property>
            </widget>
           </item>
-          <item row="0" column="1" colspan="2" >
-           <widget class="QComboBox" name="ContourVarName" >
-            <property name="enabled" >
+          <item row="0" column="1" colspan="2">
+           <widget class="QComboBox" name="ContourVarName">
+            <property name="enabled">
              <bool>true</bool>
             </property>
-            <property name="minimumSize" >
+            <property name="minimumSize">
              <size>
               <width>150</width>
               <height>0</height>
@@ -553,12 +559,12 @@
             </property>
            </widget>
           </item>
-          <item row="0" column="3" >
-           <spacer name="horizontalSpacer_4a" >
-            <property name="orientation" >
+          <item row="0" column="3">
+           <spacer name="horizontalSpacer_4a">
+            <property name="orientation">
              <enum>Qt::Horizontal</enum>
             </property>
-            <property name="sizeHint" stdset="0" >
+            <property name="sizeHint" stdset="0">
              <size>
               <width>0</width>
               <height>20</height>
@@ -566,85 +572,85 @@
             </property>
            </spacer>
           </item>
-          <item row="1" column="0" colspan="3" >
-           <widget class="QLabel" name="ScalarRange" >
-            <property name="text" >
+          <item row="1" column="0" colspan="3">
+           <widget class="QLabel" name="ScalarRange">
+            <property name="text">
              <string>Scalar Range: 0.0 - 1.0</string>
             </property>
            </widget>
           </item>
-          <item rowspan="6" row="2" column="0" colspan="2" >
-           <widget class="QListView" name="Values" >
-            <property name="editTriggers" >
+          <item row="2" column="0" rowspan="6" colspan="2">
+           <widget class="QListView" name="Values">
+            <property name="editTriggers">
              <set>QAbstractItemView::DoubleClicked|QAbstractItemView::EditKeyPressed|QAbstractItemView::SelectedClicked</set>
             </property>
            </widget>
           </item>
-          <item row="2" column="2" >
-           <widget class="QPushButton" name="Delete" >
-            <property name="enabled" >
+          <item row="2" column="2">
+           <widget class="QPushButton" name="Delete">
+            <property name="enabled">
              <bool>true</bool>
             </property>
-            <property name="toolTip" >
+            <property name="toolTip">
              <string>Delete selected values from the current set</string>
             </property>
-            <property name="text" >
+            <property name="text">
              <string>Delete</string>
             </property>
            </widget>
           </item>
-          <item row="3" column="2" >
-           <widget class="QPushButton" name="DeleteAll" >
-            <property name="enabled" >
+          <item row="3" column="2">
+           <widget class="QPushButton" name="DeleteAll">
+            <property name="enabled">
              <bool>true</bool>
             </property>
-            <property name="toolTip" >
+            <property name="toolTip">
              <string>Delete selected values from the current set</string>
             </property>
-            <property name="text" >
+            <property name="text">
              <string>Delete All</string>
             </property>
            </widget>
           </item>
-          <item row="4" column="2" >
-           <widget class="QPushButton" name="NewValue" >
-            <property name="toolTip" >
+          <item row="4" column="2">
+           <widget class="QPushButton" name="NewValue">
+            <property name="toolTip">
              <string>Add a single value to the current set</string>
             </property>
-            <property name="statusTip" >
+            <property name="statusTip">
              <string>Add a single value to the current set.</string>
             </property>
-            <property name="text" >
+            <property name="text">
              <string>New Value</string>
             </property>
            </widget>
           </item>
-          <item row="5" column="2" >
-           <widget class="QPushButton" name="NewRange" >
-            <property name="toolTip" >
+          <item row="5" column="2">
+           <widget class="QPushButton" name="NewRange">
+            <property name="toolTip">
              <string>Add a single value to the current set</string>
             </property>
-            <property name="statusTip" >
+            <property name="statusTip">
              <string>Add a single value to the current set.</string>
             </property>
-            <property name="text" >
+            <property name="text">
              <string>New Range</string>
             </property>
            </widget>
           </item>
-          <item row="6" column="2" >
-           <widget class="QCheckBox" name="ScientificNotation" >
-            <property name="text" >
+          <item row="6" column="2">
+           <widget class="QCheckBox" name="ScientificNotation">
+            <property name="text">
              <string>Scientific</string>
             </property>
            </widget>
           </item>
-          <item row="7" column="2" >
-           <spacer name="spacer" >
-            <property name="orientation" >
+          <item row="7" column="2">
+           <spacer name="spacer">
+            <property name="orientation">
              <enum>Qt::Vertical</enum>
             </property>
-            <property name="sizeHint" stdset="0" >
+            <property name="sizeHint" stdset="0">
              <size>
               <width>75</width>
               <height>45</height>
@@ -655,50 +661,29 @@
          </layout>
         </widget>
        </item>
-       <item row="6" column="0" >
-        <spacer name="verticalSpacer" >
-         <property name="orientation" >
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeHint" stdset="0" >
-          <size>
-           <width>20</width>
-           <height>0</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="tab_2" >
-      <property name="geometry" >
-       <rect>
-        <x>0</x>
-        <y>0</y>
-        <width>312</width>
-        <height>864</height>
-       </rect>
-      </property>
-      <attribute name="title" >
+     <widget class="QWidget" name="tab_2">
+      <attribute name="title">
        <string>Simulation Data</string>
       </attribute>
-      <layout class="QGridLayout" name="gridLayout_8" >
-       <item row="0" column="0" >
-        <widget class="QLabel" name="label_6" >
-         <property name="text" >
+      <layout class="QGridLayout" name="gridLayout_8">
+       <item row="0" column="0">
+        <widget class="QLabel" name="label_6">
+         <property name="text">
           <string>Associate With X Axis</string>
          </property>
         </widget>
        </item>
-       <item row="0" column="1" >
-        <spacer name="horizontalSpacer_9" >
-         <property name="orientation" >
+       <item row="0" column="1">
+        <spacer name="horizontalSpacer_9">
+         <property name="orientation">
           <enum>Qt::Horizontal</enum>
          </property>
-         <property name="sizeType" >
+         <property name="sizeType">
           <enum>QSizePolicy::Preferred</enum>
          </property>
-         <property name="sizeHint" stdset="0" >
+         <property name="sizeHint" stdset="0">
           <size>
            <width>40</width>
            <height>20</height>
@@ -706,9 +691,9 @@
          </property>
         </spacer>
        </item>
-       <item row="0" column="2" >
-        <widget class="QComboBox" name="AssociateXAxis" >
-         <property name="minimumSize" >
+       <item row="0" column="2">
+        <widget class="QComboBox" name="AssociateXAxis">
+         <property name="minimumSize">
           <size>
            <width>150</width>
            <height>0</height>
@@ -716,22 +701,22 @@
          </property>
         </widget>
        </item>
-       <item row="1" column="0" >
-        <widget class="QLabel" name="label_14" >
-         <property name="text" >
+       <item row="1" column="0">
+        <widget class="QLabel" name="label_14">
+         <property name="text">
           <string>Associate With Y Axis</string>
          </property>
         </widget>
        </item>
-       <item row="1" column="1" >
-        <spacer name="horizontalSpacer_10" >
-         <property name="orientation" >
+       <item row="1" column="1">
+        <spacer name="horizontalSpacer_10">
+         <property name="orientation">
           <enum>Qt::Horizontal</enum>
          </property>
-         <property name="sizeType" >
+         <property name="sizeType">
           <enum>QSizePolicy::Preferred</enum>
          </property>
-         <property name="sizeHint" stdset="0" >
+         <property name="sizeHint" stdset="0">
           <size>
            <width>40</width>
            <height>20</height>
@@ -739,9 +724,9 @@
          </property>
         </spacer>
        </item>
-       <item row="1" column="2" >
-        <widget class="QComboBox" name="AssociateYAxis" >
-         <property name="minimumSize" >
+       <item row="1" column="2">
+        <widget class="QComboBox" name="AssociateYAxis">
+         <property name="minimumSize">
           <size>
            <width>150</width>
            <height>0</height>
@@ -749,22 +734,22 @@
          </property>
         </widget>
        </item>
-       <item row="2" column="0" >
-        <widget class="QLabel" name="label_15" >
-         <property name="text" >
+       <item row="2" column="0">
+        <widget class="QLabel" name="label_15">
+         <property name="text">
           <string>Associate With Z Axis</string>
          </property>
         </widget>
        </item>
-       <item row="2" column="1" >
-        <spacer name="horizontalSpacer_11" >
-         <property name="orientation" >
+       <item row="2" column="1">
+        <spacer name="horizontalSpacer_11">
+         <property name="orientation">
           <enum>Qt::Horizontal</enum>
          </property>
-         <property name="sizeType" >
+         <property name="sizeType">
           <enum>QSizePolicy::Preferred</enum>
          </property>
-         <property name="sizeHint" stdset="0" >
+         <property name="sizeHint" stdset="0">
           <size>
            <width>40</width>
            <height>20</height>
@@ -772,9 +757,9 @@
          </property>
         </spacer>
        </item>
-       <item row="2" column="2" >
-        <widget class="QComboBox" name="AssociateZAxis" >
-         <property name="minimumSize" >
+       <item row="2" column="2">
+        <widget class="QComboBox" name="AssociateZAxis">
+         <property name="minimumSize">
           <size>
            <width>150</width>
            <height>0</height>
@@ -782,12 +767,12 @@
          </property>
         </widget>
        </item>
-       <item row="3" column="0" colspan="3" >
-        <spacer name="verticalSpacer_2" >
-         <property name="orientation" >
+       <item row="3" column="0" colspan="3">
+        <spacer name="verticalSpacer_2">
+         <property name="orientation">
           <enum>Qt::Vertical</enum>
          </property>
-         <property name="sizeHint" stdset="0" >
+         <property name="sizeHint" stdset="0">
           <size>
            <width>20</width>
            <height>0</height>
@@ -795,12 +780,12 @@
          </property>
         </spacer>
        </item>
-       <item row="0" column="3" >
-        <spacer name="horizontalSpacer_8" >
-         <property name="orientation" >
+       <item row="0" column="3">
+        <spacer name="horizontalSpacer_8">
+         <property name="orientation">
           <enum>Qt::Horizontal</enum>
          </property>
-         <property name="sizeHint" stdset="0" >
+         <property name="sizeHint" stdset="0">
           <size>
            <width>0</width>
            <height>20</height>
