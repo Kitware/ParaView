@@ -82,8 +82,8 @@ vtkPVPluginLoader::vtkPVPluginLoader()
   if(env)
     {
     paths += env;
+    vtkPVPluginLoaderDebugMacro("PV_PLUGIN_PATH: " << env);
     }
-  vtkPVPluginLoaderDebugMacro("PV_PLUGIN_PATH: " << env);
 
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   vtkPVOptions* opt = pm ? pm->GetOptions() : NULL;
@@ -169,7 +169,7 @@ void vtkPVPluginLoader::SetFileName(const char* file)
   // * pv_plugin_query_verification_data -- to obtain version
   // * pv_plugin_instance -- to obtain the plugin instance.
 
-  pv_plugin_query_verification_data_fptr pv_plugin_query_verification_data = 
+  pv_plugin_query_verification_data_fptr pv_plugin_query_verification_data =
     (pv_plugin_query_verification_data_fptr)(
       vtkDynamicLoader::GetSymbolAddress(lib,
         "pv_plugin_query_verification_data"));
@@ -198,7 +198,7 @@ void vtkPVPluginLoader::SetFileName(const char* file)
   if (pv_verfication_data != __PV_PLUGIN_VERIFICATION_STRING__)
     {
     vtksys_ios::ostringstream error;
-    error << "Mismatch in versions: \n" << 
+    error << "Mismatch in versions: \n" <<
       "ParaView Signature: " << __PV_PLUGIN_VERIFICATION_STRING__ << "\n"
       "Plugin Signature: " << pv_verfication_data.c_str();
     vtkErrorMacro(<< error.str().c_str());
@@ -213,8 +213,8 @@ void vtkPVPluginLoader::SetFileName(const char* file)
 
   // If we succeeded so far, then obtain the instace of vtkPVPlugin for this
   // plugin and load it.
-  
-  pv_plugin_query_instance_fptr pv_plugin_query_instance = 
+
+  pv_plugin_query_instance_fptr pv_plugin_query_instance =
     (pv_plugin_query_instance_fptr)(
       vtkDynamicLoader::GetSymbolAddress(lib,
         "pv_plugin_instance"));
@@ -239,7 +239,7 @@ void vtkPVPluginLoader::SetFileName(const char* file)
     "correct ParaView version.");
 
   // BUG # 0008673
-  // Tell the platform to look in the plugin's directory for 
+  // Tell the platform to look in the plugin's directory for
   // its dependencies. This isn't the right thing to do. A better
   // solution would be to let the plugin tell us where to look so
   // that a list of locations could be added.
@@ -422,13 +422,13 @@ void vtkPVPluginLoader::PrintSelf(ostream& os, vtkIndent indent)
 {
   vtkIndent i2 = indent.GetNextIndent();
   this->Superclass::PrintSelf(os, indent);
-  os << indent << "ServerManagerXML: " 
+  os << indent << "ServerManagerXML: "
     << (this->ServerManagerXML ? "(exists)" : "(none)") << endl;
-  os << indent << "PythonModuleNames: " 
+  os << indent << "PythonModuleNames: "
     << (this->PythonModuleNames ? "(exists)" : "(none)") << endl;
-  os << indent << "PythonModuleSources: " 
+  os << indent << "PythonModuleSources: "
     << (this->PythonModuleSources ? "(exists)" : "(none)") << endl;
-  os << indent << "PythonPackageFlags: " 
+  os << indent << "PythonPackageFlags: "
     << (this->PythonPackageFlags ? "(exists)" : "(none)") << endl;
   os << indent << "PluginInfo: "  << endl;
   this->PluginInfo->PrintSelf(os, i2);
