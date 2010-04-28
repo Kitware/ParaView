@@ -81,7 +81,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMInputProperty.h"
 #include "vtkSMRepresentationProxy.h"
 
-#define DEBUGPRINT_VIEW(arg) arg;
+#define DEBUGPRINT_VIEW(arg);
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMMantaParallelViewProxy);
@@ -107,7 +107,7 @@ bool vtkSMMantaParallelViewProxy::BeginCreateVTKObjects()
 {
   DEBUGPRINT_VIEW(
     cerr 
-    << "PV(" << this << ") Creating parallel view " 
+    << "MPV(" << this << ") Creating parallel view "
     << this->GetXMLName() << endl;
     );
 
@@ -257,7 +257,7 @@ vtkSMRepresentationProxy*
     }
 
   DEBUGPRINT_VIEW(
-    cerr << "SV(" << this << ") CreateDefaultRepresentation" << endl;
+    cerr << "MPV(" << this << ") CreateDefaultRepresentation" << endl;
     );
 
   vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
@@ -282,7 +282,7 @@ vtkSMRepresentationProxy*
   if (g)
     {
     DEBUGPRINT_VIEW(
-      cerr << "SV(" << this << ") Created MantaGeometryRepresentation" << endl;
+      cerr << "MPV(" << this << ") Created MantaGeometryRepresentation" << endl;
       );
     return vtkSMRepresentationProxy::SafeDownCast(
       pxm->NewProxy("representations", "MantaGeometryRepresentation"));
