@@ -66,8 +66,10 @@ FIND_PATH ( MANTA_BUILD
 IF ( MANTA_BUILD )
   SET ( MANTA_BUILD_INCLUDE ${MANTA_BUILD}/include)
   SET ( MANTA_BUILD_LIB ${MANTA_BUILD}/lib)
-  #export this so paraview plugin can use it
-  SET (MANTA_BUILD_LIB ${MANTA_BUILD_LIB} PARENT_SCOPE)
+  IF (BUILD_AGAINST_PARAVIEW)
+    #export this so paraview plugin can use it
+    SET (MANTA_BUILD_LIB ${MANTA_BUILD_LIB} PARENT_SCOPE)
+  ENDIF (BUILD_AGAINST_PARAVIEW)
 ENDIF ( MANTA_BUILD )
 
 #TODO: Change Manta's config.h.in to point to source tree then autofind it
