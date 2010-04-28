@@ -43,6 +43,8 @@ vtkMantaManager::vtkMantaManager()
 {
   //cerr << "MX(" << this << ") CREATE" << endl;
   this->MantaEngine = Manta::createManta();
+  //TODO: this requires Manta >= r2439 but I can't check that programatically
+  this->MantaEngine->setDisplayBeforeRender(false);
   this->MantaFactory = new Manta::Factory( this->MantaEngine );
   this->Started = false;
 
@@ -62,10 +64,6 @@ vtkMantaManager::~vtkMantaManager()
   //TODO: This is screwy but the only way I've found to get it to consistently
   //shutdown without hanging.
   //int i = 0;
-  if (this->SyncDisplay)
-    {
-    this->SyncDisplay->doneRendering();
-    }
   v = this->MantaEngine->numWorkers();
   this->MantaEngine->changeNumWorkers(0);
   while (v != 0)
@@ -73,14 +71,20 @@ vtkMantaManager::~vtkMantaManager()
     //cerr << "MX(" << this << ") SYNC " << i++ << " " << v << endl;
     if (this->SyncDisplay)
       {
-      this->SyncDisplay->waitOnFrameReady();
       this->SyncDisplay->doneRendering();
+      v = this->MantaEngine->numWorkers();
+      if (v != 0)
+        {
+        this->SyncDisplay->waitOnFrameReady();
+        }
       }
     v = this->MantaEngine->numWorkers();
     }
+  this->MantaEngine->finish();
+  this->MantaEngine->blockUntilFinished();
+
   //cerr << "MX(" << this << ") SYNC DONE " << i << " " << v << endl;
   //cerr << "MX(" << this << ") wait" << endl;
-  this->MantaEngine->blockUntilFinished();
 
   if (this->MantaLightSet)
     {
