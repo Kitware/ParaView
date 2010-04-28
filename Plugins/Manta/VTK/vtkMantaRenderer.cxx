@@ -376,8 +376,6 @@ void vtkMantaRenderer::LayerRender()
   // let the render threads draw what we've asked them to
   this->GetSyncDisplay()->doneRendering();
   this->GetSyncDisplay()->waitOnFrameReady();
-  this->GetSyncDisplay()->doneRendering();
-  this->GetSyncDisplay()->waitOnFrameReady();
   vtkTimerLog::MarkEndEvent("ThreadSync");
 
   // collect some useful info
