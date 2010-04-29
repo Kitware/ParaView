@@ -9,5 +9,5 @@ else(WIN32)
 endif(WIN32)
 
 execute_process(
-  COMMAND @DOCUMENTATION_EXE@ @ParaView_BINARY_DIR@/Documentation ${fullXMLFile}
+  COMMAND @ParaView_BINARY_DIR@/bin/${OutDir}/vtkSMExtractDocumentation @ParaView_BINARY_DIR@/Documentation ${fullXMLFile}
   )

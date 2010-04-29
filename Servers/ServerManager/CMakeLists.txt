@@ -4,7 +4,7 @@ PROJECT(ServerManager)
 SET(VTK_INSTALL_PACKAGE_DIR_CM24 ${PV_INSTALL_LIB_DIR})
 #SET(VTK_INSTALL_PACKAGE_DIR ${PV_INSTALL_LIB_DIR})
 
-# Any build configured headers should be added to this 
+# Any build configured headers should be added to this
 # variable so that they also get installed.
 SET (dynamicHeaders)
 
@@ -350,12 +350,12 @@ ENDIF(PARAVIEW_MINIMAL_BUILD)
 ADD_LIBRARY(vtk${KIT}
   ${ServerManager_SRCS}
   ${MIN_INIT_SRC}
-  ${CMInstantiator_SRCS} 
-  ${vtkPVServerManagerCS_SRCS} 
+  ${CMInstantiator_SRCS}
+  ${vtkPVServerManagerCS_SRCS}
   ${KitInstantiator_SRCS}
   )
 TARGET_LINK_LIBRARIES(vtk${KIT}
-  vtkPVFiltersCS 
+  vtkPVFiltersCS
   vtkClientServer
   ${KWCommon_LIBRARIES}
   vtkXdmfCS vtkXdmf)
@@ -391,7 +391,7 @@ IF (PARAVIEW_ENABLE_PYTHON)
 #   SET(VTK_INSTALL_BIN_DIR      "${VTKPythonWrapping_INSTALL_BIN_DIR}")
   SET(VTK_INSTALL_LIB_DIR_CM24 "${VTKPythonWrapping_INSTALL_LIB_DIR}")
   SET(VTK_INSTALL_BIN_DIR_CM24 "${VTKPythonWrapping_INSTALL_BIN_DIR}")
-  
+
   # include python wrapping from VTK
   INCLUDE(KitCommonPythonWrapBlock)
 ENDIF (PARAVIEW_ENABLE_PYTHON)
@@ -416,10 +416,10 @@ SET(resourceFiles
   )
 IF(PARAVIEW_ENABLE_PYTHON)
   SET(resourceFiles
-      ${resourceFiles} 
+      ${resourceFiles}
       ${CMAKE_CURRENT_SOURCE_DIR}/Resources/pythonfilter.xml
-      ) 
-ENDIF(PARAVIEW_ENABLE_PYTHON) 
+      )
+ENDIF(PARAVIEW_ENABLE_PYTHON)
 
 ADD_CUSTOM_COMMAND(
   OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/vtkSMGeneratedModules.h
@@ -455,14 +455,8 @@ IF(NOT CMAKE_CROSSCOMPILING)
   add_executable_with_forwarding(PV_EXE_SUFFIX
     vtkSMExtractDocumentation vtkSMExtractDocumentation.cxx)
   TARGET_LINK_LIBRARIES(vtkSMExtractDocumentation${PV_EXE_SUFFIX} vtkPVServerManager)
-  EXPORT(TARGETS vtkSMExtractDocumentation${PV_EXE_SUFFIX} FILE ${EXPORT_EXECUTABLES_FILE} NAMESPACE "${EXPORT_EXECUTABLES_NAMESPACE}" APPEND) 
+  EXPORT(TARGETS vtkSMExtractDocumentation${PV_EXE_SUFFIX} FILE ${EXPORT_EXECUTABLES_FILE} NAMESPACE "${EXPORT_EXECUTABLES_NAMESPACE}" APPEND)
 ENDIF(NOT CMAKE_CROSSCOMPILING)
-
-IF(CMAKE_CROSSCOMPILING)
-  SET(DOCUMENTATION_EXE vtkSMExtractDocumentation)
-ELSE(CMAKE_CROSSCOMPILING)
-  GET_TARGET_PROPERTY(DOCUMENTATION_EXE vtkSMExtractDocumentation LOCATION)
-ENDIF(CMAKE_CROSSCOMPILING)
 
 # FIXME: DUDE! Dependency on Qt code in ServerManager!!!!
 
@@ -473,24 +467,15 @@ CONFIGURE_FILE(${ParaView_CMAKE_DIR}/ExecuteSMExtractDocumentation.cmake.in
 FOREACH(gcf ${GUI_CONFIG_FILES})
   SET(fullXMLFile ${ParaView_SOURCE_DIR}/Applications/ParaView/${gcf}.xml)
   SET(fullHTMLFile ${ParaView_BINARY_DIR}/Documentation/${gcf}.html)
-  
-  if(WIN32)
-    # run the following cmake script so that we can set the runtime path for Qt when executing 
-    # SMExtractDocumentation during the build.  
-    ADD_CUSTOM_COMMAND(
-      OUTPUT ${fullHTMLFile}
-      DEPENDS ${fullXMLFile} ${resourceFiles} vtkSMExtractDocumentation
-      COMMAND ${CMAKE_COMMAND}
-      ARGS -DfullXMLFile=${fullXMLFile} -P ${ParaView_BINARY_DIR}/CMake/ExecuteSMExtractDocumentation.cmake
-      COMMENT "Creating Documentation for ${gcf}"
-      )
-  else(WIN32)
-    ADD_CUSTOM_COMMAND(
-      OUTPUT ${fullHTMLFile}
-      DEPENDS ${fullXMLFile} ${resourceFiles} vtkSMExtractDocumentation
-      COMMAND ${DOCUMENTATION_EXE}
-      ARGS ${ParaView_BINARY_DIR}/Documentation ${fullXMLFile}
-      COMMENT "Creating Documentation for ${gcf}"
+
+  # run the following cmake script so that we can set the runtime path for Qt when executing
+  # SMExtractDocumentation during the build.
+  ADD_CUSTOM_COMMAND(
+    OUTPUT ${fullHTMLFile}
+    DEPENDS ${fullXMLFile} ${resourceFiles} vtkSMExtractDocumentation
+    COMMAND ${CMAKE_COMMAND}
+    ARGS -DfullXMLFile=${fullXMLFile} -DOutDir=${CMAKE_CFG_INTDIR} -P ${ParaView_BINARY_DIR}/CMake/ExecuteSMExtractDocumentation.cmake
+    COMMENT "Creating Documentation for ${gcf}"
     )
   endif(WIN32)
 
@@ -518,15 +503,15 @@ CONFIGURE_FILE(
   "${CMAKE_CURRENT_SOURCE_DIR}/vtkParaViewIncludeModulesToSMApplication.h.in"
   "${CMAKE_CURRENT_BINARY_DIR}/vtkParaViewIncludeModulesToSMApplication.h"
   @ONLY IMMEDIATE)
-SET (dynamicHeaders 
+SET (dynamicHeaders
     "${dynamicHeaders};${CMAKE_CURRENT_BINARY_DIR}/vtkParaViewIncludeModulesToSMApplication.h")
 
 
-SET_SOURCE_FILES_PROPERTIES(vtkSMApplication.cxx PROPERTIES OBJECT_DEPENDS 
+SET_SOURCE_FILES_PROPERTIES(vtkSMApplication.cxx PROPERTIES OBJECT_DEPENDS
   ${CMAKE_CURRENT_BINARY_DIR}/vtkSMGeneratedModules.h)
 
 # including MINI_INIT -nix
-# SET_SOURCE_FILES_PROPERTIES(vtkSMApplication.cxx PROPERTIES OBJECT_DEPENDS 
+# SET_SOURCE_FILES_PROPERTIES(vtkSMApplication.cxx PROPERTIES OBJECT_DEPENDS
 #   ${CMAKE_CURRENT_BINARY_DIR}/${MINI_INIT})
 
 # Install
@@ -536,7 +521,7 @@ IF(NOT PV_INSTALL_NO_LIBRARIES)
   SET (targets_to_install)
 
   IF(PARAVIEW_ENABLE_PYTHON)
-    SET (targets_to_install ${targets_to_install} 
+    SET (targets_to_install ${targets_to_install}
       vtk${KIT}Python)
   ENDIF(PARAVIEW_ENABLE_PYTHON)
 
@@ -557,11 +542,11 @@ ENDIF(NOT PV_INSTALL_NO_RUNTIME)
 IF (NOT PV_INSTALL_NO_DEVELOPMENT)
   GLOB_INSTALL_DEVELOPMENT(
       ${CMAKE_CURRENT_SOURCE_DIR}
-      ${PV_INSTALL_INCLUDE_DIR} 
+      ${PV_INSTALL_INCLUDE_DIR}
       "*.h;*.hxx;*.txx")
   INSTALL(
-      FILES ${dynamicHeaders} 
-      DESTINATION ${PV_INSTALL_INCLUDE_DIR} 
+      FILES ${dynamicHeaders}
+      DESTINATION ${PV_INSTALL_INCLUDE_DIR}
       COMPONENT Development)
 ENDIF (NOT PV_INSTALL_NO_DEVELOPMENT)
 
