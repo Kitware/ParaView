@@ -459,12 +459,6 @@ IF(NOT CMAKE_CROSSCOMPILING)
   EXPORT(TARGETS vtkSMExtractDocumentation${PV_EXE_SUFFIX} FILE ${EXPORT_EXECUTABLES_FILE} NAMESPACE "${EXPORT_EXECUTABLES_NAMESPACE}" APPEND) 
 ENDIF(NOT CMAKE_CROSSCOMPILING)
 
-IF(CMAKE_CROSSCOMPILING)
-  SET(DOCUMENTATION_EXE vtkSMExtractDocumentation)
-ELSE(CMAKE_CROSSCOMPILING)
-  GET_TARGET_PROPERTY(DOCUMENTATION_EXE vtkSMExtractDocumentation LOCATION)
-ENDIF(CMAKE_CROSSCOMPILING)
-
 # FIXME: DUDE! Dependency on Qt code in ServerManager!!!!
 
 CONFIGURE_FILE(${ParaView_CMAKE_DIR}/ExecuteSMExtractDocumentation.cmake.in
@@ -481,7 +475,7 @@ FOREACH(gcf ${GUI_CONFIG_FILES})
     OUTPUT ${fullHTMLFile}
     DEPENDS ${fullXMLFile} ${resourceFiles} vtkSMExtractDocumentation
     COMMAND ${CMAKE_COMMAND}
-    ARGS -DfullXMLFile=${fullXMLFile} -P ${ParaView_BINARY_DIR}/CMake/ExecuteSMExtractDocumentation.cmake
+    ARGS -DfullXMLFile=${fullXMLFile} -DOutDir=${CMAKE_CFG_INTDIR} -P ${ParaView_BINARY_DIR}/CMake/ExecuteSMExtractDocumentation.cmake
     COMMENT "Creating Documentation for ${gcf}"
     )
 
