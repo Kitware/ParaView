@@ -1,7 +1,12 @@
 # Copy all online help files from current directory over to the binary directory.
 # These do not include any server manager documentation htmls.
-file(GLOB PV_DOCUMENTATION_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
-  ${CMAKE_CURRENT_SOURCE_DIR}/[^.]*.*)
+file(GLOB PV_DOCUMENTATION_HTML_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
+  ${CMAKE_CURRENT_SOURCE_DIR}/[^.]*.html)
+  
+file(GLOB PV_DOCUMENTATION_PNG_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
+  ${CMAKE_CURRENT_SOURCE_DIR}/[^.]*.png)
+  
+LIST(APPEND PV_DOCUMENTATION_FILES ${PV_DOCUMENTATION_HTML_FILES} ${PV_DOCUMENTATION_PNG_FILES})
 
 foreach (file ${PV_DOCUMENTATION_FILES})
   configure_file(
@@ -9,6 +14,21 @@ foreach (file ${PV_DOCUMENTATION_FILES})
     "${CMAKE_CURRENT_BINARY_DIR}/${file}"
     COPYONLY)
 endforeach (file)
+
+configure_file(
+  "${CMAKE_CURRENT_SOURCE_DIR}/ParaViewDoc.css"
+  "${CMAKE_CURRENT_BINARY_DIR}/ParaViewDoc.css"
+  COPYONLY)
+    
+configure_file(
+    "${CMAKE_CURRENT_SOURCE_DIR}/index.html.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/index.html"
+    @ONLY)
+    
+configure_file(
+    "${CMAKE_CURRENT_SOURCE_DIR}/about.html.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/about.html"
+    @ONLY)
 
 OPTION(PARAVIEW_GENERATE_PROXY_DOCUMENTATION
   "Turn on to ensure that the documentation for filters/sources/readers and writers is built."
