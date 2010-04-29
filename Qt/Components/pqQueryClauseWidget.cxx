@@ -189,6 +189,8 @@ void pqQueryClauseWidget::populateSelectionCriteria(
     if (attrInfo->GetAttributeInformation(vtkDataSetAttributes::GLOBALIDS))
       {
       this->Internals->criteria->addItem("Global ID", GLOBALID);
+      this->Internals->criteria->setCurrentIndex(
+        this->Internals->criteria->count()-1);
       }
     }
 
