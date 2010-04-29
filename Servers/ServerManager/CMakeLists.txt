@@ -477,7 +477,6 @@ FOREACH(gcf ${GUI_CONFIG_FILES})
     ARGS -DfullXMLFile=${fullXMLFile} -DOutDir=${CMAKE_CFG_INTDIR} -P ${ParaView_BINARY_DIR}/CMake/ExecuteSMExtractDocumentation.cmake
     COMMENT "Creating Documentation for ${gcf}"
     )
-  endif(WIN32)
 
   SET(HTML_RESULTS ${HTML_RESULTS} ${fullHTMLFile})
 ENDFOREACH(gcf)
