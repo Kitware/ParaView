@@ -20,6 +20,7 @@
 
 #include "vtkCamera.h"
 #include "vtkCommand.h"
+#include "vtkHardwareSelector.h"
 #include "vtkIceTContext.h"
 #include "vtkIntArray.h"
 #include "vtkLightCollection.h"
@@ -27,7 +28,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkPKdTree.h"
 #include "vtkRenderWindow.h"
-#include "vtkHardwareSelector.h"
+#include "vtkTimerLog.h"
 
 #include <GL/ice-t.h>
 
@@ -182,6 +183,7 @@ void vtkIceTRenderer::GetTiledSizeAndOrigin(int *width, int *height,
 void vtkIceTRenderer::DeviceRender()
 {
   vtkDebugMacro("In vtkIceTRenderer::DeviceRender");
+  vtkTimerLog::MarkStartEvent("IceT Dev Render");
 
   //Update the Camera once.  ICE-T will shift the viewpoint around.
   this->Superclass::ClearLights();
@@ -351,6 +353,8 @@ void vtkIceTRenderer::DeviceRender()
 
   //This is also traditionally done in UpdateGeometry().
   this->RenderTime.Modified();
+
+  vtkTimerLog::MarkEndEvent("IceT Dev Render");
 }
 
 //-----------------------------------------------------------------------------

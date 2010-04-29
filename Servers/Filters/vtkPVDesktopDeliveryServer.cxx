@@ -364,6 +364,7 @@ void vtkPVDesktopDeliveryServer::PreRenderProcessing()
 void vtkPVDesktopDeliveryServer::PostRenderProcessing()
 {
   vtkDebugMacro("PostRenderProcessing");
+  vtkTimerLog::MarkStartEvent("Sending");
 
   vtkPVDesktopDeliveryServer::ImageParams ip;
   ip.RemoteDisplay = this->RemoteDisplay;
@@ -489,6 +490,8 @@ void vtkPVDesktopDeliveryServer::PostRenderProcessing()
     {
     this->RenderWindowImageUpToDate = 1;
     }
+
+  vtkTimerLog::MarkEndEvent("Sending");
 }
 
 //-----------------------------------------------------------------------------

@@ -270,6 +270,8 @@ void vtkPVDesktopDeliveryClient::PreRenderProcessing()
 //----------------------------------------------------------------------------
 void vtkPVDesktopDeliveryClient::PostRenderProcessing()
 {
+  vtkTimerLog::MarkStartEvent("Receiving");
+
   this->ReceiveImageFromServer();
 
   this->Timer->StopTimer();
@@ -290,6 +292,8 @@ void vtkPVDesktopDeliveryClient::PostRenderProcessing()
     this->RenderWindow->SwapBuffersOn();
     }
   this->RenderWindow->Frame();
+
+  vtkTimerLog::MarkEndEvent("Receiving");
 }
 
 //-----------------------------------------------------------------------------
