@@ -1054,6 +1054,7 @@ void vtkIceTRenderManager::PreRenderProcessing()
 void vtkIceTRenderManager::PostRenderProcessing()
 {
   vtkDebugMacro("PostRenderProcessing");
+  vtkTimerLog::MarkStartEvent("Compositing");
 
   this->Controller->Barrier();
 
@@ -1075,6 +1076,8 @@ void vtkIceTRenderManager::PostRenderProcessing()
     this->RenderWindow->SwapBuffersOn();
     }
   this->RenderWindow->Frame();
+
+  vtkTimerLog::MarkEndEvent("Compositing");
 }
 
 //-----------------------------------------------------------------------------
