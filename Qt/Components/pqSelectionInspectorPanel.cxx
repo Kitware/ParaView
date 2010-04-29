@@ -506,6 +506,15 @@ void pqSelectionInspectorPanel::select(pqOutputPort* opport, bool createNew)
 
   this->Implementation->UpdatingGUI = false;
 
+  if ( opport && opport->getSelectionInput() &&
+       opport->getSelectionInput()->GetXMLName() ==
+       QString("CompositeDataIDSelectionSource"))
+       {
+       this->Implementation->comboSelectionType->setCurrentIndex(
+         pqImplementation::GLOBALIDS);
+       return;
+       }
+
   if (createNew)
     {
     this->Implementation->SelectionManager->select(opport);
