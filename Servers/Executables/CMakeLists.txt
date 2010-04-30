@@ -62,7 +62,7 @@ TARGET_LINK_LIBRARIES(smTestDriver${pv_exe_suffix} vtksys)
 #------------------------------------------------------------------------
 # Install ffmpeg, if used.
 IF (VTK_USE_FFMPEG_ENCODER)
-  FOREACH(fmpglib avcodec avformat avutil)
+  FOREACH(fmpglib avcodec avformat avutil swscale)
     IF (FFMPEG_${fmpglib}_LIBRARY)
       pv_install_library(${FFMPEG_${fmpglib}_LIBRARY}
         ${PV_INSTALL_LIB_DIR}
