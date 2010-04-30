@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -47,13 +47,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationCore.h"
 #include "pqBarChartView.h"
 #include "pqDataRepresentation.h"
-#include "pqLineChartView.h"
 #include "pqObjectBuilder.h"
 #include "pqOutputPort.h"
 #include "pqPipelineSource.h"
 #include "pqRenderView.h"
 #include "pqServer.h"
 #include "pqTwoDRenderView.h"
+#include "pqXYBarChartView.h"
+#include "pqXYChartView.h"
 
 //-----------------------------------------------------------------------------
 pqDisplayPolicy::pqDisplayPolicy(QObject* _parent) :QObject(_parent)
@@ -81,7 +82,7 @@ QString pqDisplayPolicy::getPreferredViewType(pqOutputPort* opPort,
     {
     source->updatePipeline();
     }
-  
+
   vtkPVXMLElement* hints = source->getHints();
   if (hints)
     {
@@ -125,7 +126,7 @@ QString pqDisplayPolicy::getPreferredViewType(pqOutputPort* opPort,
   QString className = datainfo?  datainfo->GetDataClassName() : QString();
 
   // * Check if we should create the 2D view.
-  if ((className == "vtkImageData" || className == "vtkUniformGrid") && 
+  if ((className == "vtkImageData" || className == "vtkUniformGrid") &&
     datainfo->GetCompositeDataClassName()==0)
     {
     int extent[6];
@@ -136,6 +137,10 @@ QString pqDisplayPolicy::getPreferredViewType(pqOutputPort* opPort,
     if (dimensionality == 2)
       {
       return pqTwoDRenderView::twoDRenderViewType();
+      }
+    else if ( dimensionality == 1 )
+      {
+      return pqXYChartView::XYChartViewType();
       }
     }
 
@@ -162,15 +167,15 @@ QString pqDisplayPolicy::getPreferredViewType(pqOutputPort* opPort,
     if (dimensionality == 1 && cellDataInfo->GetNumberOfArrays() > 0)
       {
       // Has cell data, mostlikely this is a histogram.
-      view_type = pqBarChartView::barChartViewType();
+      view_type = pqXYBarChartView::XYBarChartViewType();
       }
-    else if (dimensionality == 1 && 
+    else if (dimensionality == 1 &&
       (pointDataInfo->GetNumberOfArrays() > 0 ||
-       cellDataInfo->GetNumberOfArrays() > 0 ) && 
+       cellDataInfo->GetNumberOfArrays() > 0 ) &&
       datainfo->GetNumberOfPoints() > 1)
       {
       // No cell data, but some point data -- may be a XY line plot.
-      view_type = pqLineChartView::lineChartViewType();
+      view_type = pqXYChartView::XYChartViewType();
       }
     }
 
@@ -181,9 +186,9 @@ QString pqDisplayPolicy::getPreferredViewType(pqOutputPort* opPort,
 pqView* pqDisplayPolicy::getPreferredView(
   pqOutputPort* opPort, pqView* currentView) const
 {
-  pqObjectBuilder* builder = 
+  pqObjectBuilder* builder =
     pqApplicationCore::instance()->getObjectBuilder();
-  QString view_type = this->getPreferredViewType(opPort, true); 
+  QString view_type = this->getPreferredViewType(opPort, true);
 
   if (!view_type.isNull())
     {
@@ -238,9 +243,9 @@ pqDataRepresentation* pqDisplayPolicy::createPreferredRepresentation(
     return NULL;
     }
 
-  if (!dont_create_view) 
+  if (!dont_create_view)
     {
-    view = this->getPreferredView(opPort, view); 
+    view = this->getPreferredView(opPort, view);
     if (!view)
       {
       // Could not create a view suitable for this source.
@@ -295,10 +300,10 @@ pqDataRepresentation* pqDisplayPolicy::setRepresentationVisibility(
 
   repr->setVisible(visible);
 
-  // If this is the only source displayed in the view, reset the camera to make 
-  // sure its visible. Only do so if a source is being turned ON. Otherwise when 
-  // the next to last source is turned off, the camera would be reset to fit the 
-  // last remaining one which would be unexpected to the user 
+  // If this is the only source displayed in the view, reset the camera to make
+  // sure its visible. Only do so if a source is being turned ON. Otherwise when
+  // the next to last source is turned off, the camera would be reset to fit the
+  // last remaining one which would be unexpected to the user
   // (hence the conditional on "visible")
   if(view->getNumberOfVisibleRepresentations()==1 && visible)
     {
@@ -343,7 +348,7 @@ pqDisplayPolicy::VisibilityState pqDisplayPolicy::getVisibility(
 
 
 //-----------------------------------------------------------------------------
-pqDataRepresentation* pqDisplayPolicy::newRepresentation(pqOutputPort* port, 
+pqDataRepresentation* pqDisplayPolicy::newRepresentation(pqOutputPort* port,
   pqView* view) const
 {
   return pqApplicationCore::instance()->getObjectBuilder()->
