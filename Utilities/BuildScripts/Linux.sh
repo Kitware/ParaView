@@ -33,8 +33,8 @@ SUPPORT_DIR=${BASE_DIR}/Support
 CORES=5
 
 PV_BASE=${BASE_DIR}/ParaView-${version}
-PV_SRC=${PV_BASE}/ParaView3
-PV_BIN=${PV_BASE}/ParaView3Bin
+PV_SRC=${PV_BASE}/ParaView
+PV_BIN=${PV_BASE}/ParaViewBin
 
 if [ ! -d $SUPPORT_DIR ];
 then
@@ -416,8 +416,8 @@ fi
 cd ${PV_BASE}
 
 ## Checkout the version requested.
-echo "Checking out version: ${cvstag}"
-cvs -q -d :pserver:anoncvs@www.paraview.org:/cvsroot/ParaView3 co -r ${cvstag} ParaView3
+#echo "Checking out version: ${cvstag}"
+#cvs -q -d :pserver:anoncvs@www.paraview.org:/cvsroot/ParaView3 co -r ${cvstag} ParaView3
 
 if [ ! -d ${PV_SRC}/Plugins/VisTrails ];
 then
