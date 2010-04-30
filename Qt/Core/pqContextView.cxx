@@ -257,7 +257,10 @@ bool pqContextView::canDisplay(pqOutputPort* opPort) const
     }
 
   vtkPVDataInformation* dataInfo = opPort->getDataInformation();
-  return (dataInfo && dataInfo->DataSetTypeIsA("vtkTable"));
+  bool supportedTypes = (dataInfo->DataSetTypeIsA("vtkTable") ||
+    dataInfo->DataSetTypeIsA("vtkRectilinearGrid")||
+    dataInfo->DataSetTypeIsA("vtkImageData"));
+  return (dataInfo && supportedTypes);
 }
 
 void pqContextView::selectionChanged()

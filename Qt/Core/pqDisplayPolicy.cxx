@@ -138,21 +138,10 @@ QString pqDisplayPolicy::getPreferredViewType(pqOutputPort* opPort,
       {
       return pqTwoDRenderView::twoDRenderViewType();
       }
-    else if ( dimensionality == 1 )
-      {
-      return pqXYChartView::XYChartViewType();
-      }
     }
 
-  // * Check if we should create any of the Plot Views.
-  if (className != "vtkRectilinearGrid")
-    {
-    return view_type;
-    }
-
-  // The proxy gives us no hint. In that case we try to determine the
-  // preferred view by looking at the output from the source.
-  if (datainfo)
+  //Check if we should create any of the Plot Views.
+  if (datainfo && ( className == "vtkRectilinearGrid" || className == "vtkImageData"  ) )
     {
     int extent[6];
     datainfo->GetExtent(extent);
@@ -179,6 +168,8 @@ QString pqDisplayPolicy::getPreferredViewType(pqOutputPort* opPort,
       }
     }
 
+   // The proxy gives us no hint. In that case we try to determine the
+  // preferred view by looking at the output from the source.
   return view_type;
 }
 
@@ -192,6 +183,7 @@ pqView* pqDisplayPolicy::getPreferredView(
 
   if (!view_type.isNull())
     {
+    QString tmp = currentView->getViewType();
     if (currentView && currentView->getViewType() == view_type)
       {
       // nothing to do, active view is preferred view.
