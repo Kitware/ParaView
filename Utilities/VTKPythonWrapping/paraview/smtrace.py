@@ -45,6 +45,10 @@ class proxy_trace_info:
     self.CurrentProps = dict()
     self.ModifiedProps = dict()
     self.ignore_next_unregister = False
+    # If this proxy is a helper proxy that belongs to the ProxyDomain of
+    # another proxy's ProxyProperty, this variable stores the proxy_trace_info
+    # for that other proxy.  For example, the Slice.SliceType
+    self.ParentProxyInfo = None
 
 class prop_trace_info:
   def __init__(self, proxyTraceInfo, prop):
@@ -249,7 +253,8 @@ def get_property_value_from_list_domain(proxyInfo, propInfo):
           info = get_proxy_info(proxyPropertyValue)
           if not info:
             info = proxy_trace_info(proxyPropertyValue, "helpers", pythonProp.Available[i])
-          info.PyVariable = "%s.%s" % (proxyInfo.PyVariable, propInfo.PyVariable)
+          info.PyVariable = propInfo.PyVariable
+          info.ParentProxyInfo = proxyInfo
           trace_globals.registered_proxies.append(info)
 
           # If capture_all_properties, record all the properties of this proxy
@@ -332,9 +337,16 @@ def trace_property_modified(info, prop):
   elif (prop.IsA("vtkSMProxyProperty")):
     propValue = proxy_smproperty_tostring(info, propInfo)
   if propValue != None:
-    info.Props[prop] = propValue
-    info.ModifiedProps[propInfo.PyVariable] = propValue
-    info.CurrentProps[propInfo.PyVariable] = propValue
+    if not info.ParentProxyInfo:
+        info.Props[prop] = propValue
+        info.ModifiedProps[propInfo.PyVariable] = propValue
+        info.CurrentProps[propInfo.PyVariable] = propValue
+    else:
+        parentProxyInfo = info.ParentProxyInfo
+        parentProxyInfo.Props[prop] = propValue
+        propPyVariable = "%s.%s" % (info.PyVariable, propInfo.PyVariable)
+        parentProxyInfo.ModifiedProps[propPyVariable] = propValue
+        parentProxyInfo.CurrentProps[propPyVariable] = propValue
   return propInfo
 
 
@@ -435,7 +447,7 @@ def append_trace():
 
       if info.Group == "scalar_bars":
         ctorMethod = "CreateScalarBar"
-        extraCtorCommands = "GetRenderView().Representations.append(%s)" % info.PyVariable
+        extraCtorCommands = "GetRenderView().Representations.append(%s)\n" % info.PyVariable
         # Ensure the view is the active view:
         view_proxy_info = get_view_proxy_info_for_rep(info)
         if view_proxy_info:
@@ -475,7 +487,11 @@ def append_trace():
 
       if setPropertiesInCtor:
         for propName, propValue in propNameValues:
-          ctorArgs.append("%s=%s"%(propName, propValue))
+          if not "." in propName:
+              ctorArgs.append("%s=%s" % (propName, propValue))
+          else:
+              # This line handles properties like:  my_slice.SliceType.Normal = [1, 0, 0]
+              extraCtorCommands += "%s.%s = %s\n" % (info.PyVariable, propName, propValue)
         propNameValues = []
 
       if trace_globals.proxy_ctor_hook:
