@@ -257,10 +257,29 @@ bool pqContextView::canDisplay(pqOutputPort* opPort) const
     }
 
   vtkPVDataInformation* dataInfo = opPort->getDataInformation();
-  bool supportedTypes = (dataInfo->DataSetTypeIsA("vtkTable") ||
-    dataInfo->DataSetTypeIsA("vtkRectilinearGrid")||
-    dataInfo->DataSetTypeIsA("vtkImageData"));
-  return (dataInfo && supportedTypes);
+  if ( !dataInfo )
+    {
+    return false;
+    }
+
+  QString className = dataInfo->GetDataClassName();
+  if( className == "vtkTable" )
+    {
+    return true;
+    }
+  else if(className == "vtkImageData" || className == "vtkRectilinearGrid")
+    {
+    int extent[6];
+    dataInfo->GetExtent(extent);
+    int temp[6]={0, 0, 0, 0, 0, 0};
+    int dimensionality = vtkStructuredData::GetDataDimension(
+      vtkStructuredData::SetExtent(extent, temp));
+    if (dimensionality == 1)
+      {
+      return true;
+      }
+    }
+  return false;
 }
 
 void pqContextView::selectionChanged()
