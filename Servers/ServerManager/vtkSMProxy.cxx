@@ -2208,6 +2208,11 @@ int vtkSMProxy::LoadState(
         vtkDebugMacro("Property " << prop_name<< " does not exist.");
         continue;
         }
+      if (property->GetInformationOnly())
+        {
+        // don't load state for information only property.
+        continue;
+        }
       if (!property->LoadState(currentElement, locator))
         {
         return 0;

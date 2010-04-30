@@ -20,6 +20,7 @@
 #include "vtkSmartPointer.h"
 #include "vtkSMCameraLink.h"
 #include "vtkSMGlobalPropertiesManager.h"
+#include "vtkSMProperty.h"
 #include "vtkSMPropertyLink.h"
 #include "vtkSMProxyIterator.h"
 #include "vtkSMProxyLink.h"
@@ -467,6 +468,18 @@ int vtkSMStateLoader::LoadState(vtkPVXMLElement* elem)
   this->ProxyLocator->SetDeserializer(this);
   int ret = this->LoadStateInternal(elem);
   this->ProxyLocator->SetDeserializer(0);
+
+  // BUG #10650. When animation scene time ranges are read from the state, they
+  // often override those that the timekeeper painstakingly computed. Here we
+  // explicitly trigger the timekeeper so that the scene re-determines the
+  // ranges, unless they are locked of course.
+  vtkSMProxy* timekeeper = this->GetProxyManager()->GetProxy("timekeeper", "TimeKeeper");
+  if (timekeeper)
+    {
+    timekeeper->GetProperty("TimeRange")->Modified();
+    timekeeper->GetProperty("TimestepValues")->Modified();
+    }
+
   return ret;
 }
 
