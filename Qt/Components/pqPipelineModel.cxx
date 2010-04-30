@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -33,9 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPipelineModel.h"
 
 #include "pqApplicationCore.h"
-#include "pqBarChartView.h"
 #include "pqDisplayPolicy.h"
-#include "pqLineChartView.h"
 #include "pqOutputPort.h"
 #include "pqPipelineFilter.h"
 #include "pqPipelineSource.h"
@@ -44,6 +42,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServerManagerObserver.h"
 #include "pqSpreadSheetView.h"
 #include "pqUndoStack.h"
+#include "pqXYBarChartView.h"
+#include "pqXYChartView.h"
 
 #include <QApplication>
 #include <QString>
@@ -83,7 +83,7 @@ public:
   // This is a terrible iVar, agreed. But it makes my life easier.
   // This is valid only for elements of Type==Proxy. These refer to the link
   // items present for this item, if any. This list is automatically kept
-  // updated. 
+  // updated.
   QList<pqPipelineModelDataItem*> Links;
 
   pqPipelineModelDataItem(QObject* p,
@@ -313,11 +313,11 @@ private:
       {
       QString type = policy->getPreferredViewType(
         port, false);
-      if (type == pqBarChartView::barChartViewType())
+      if (type == pqXYBarChartView::XYBarChartViewType())
         {
         return BARCHART;
         }
-      if (type == pqLineChartView::lineChartViewType())
+      if (type == pqXYChartView::XYChartViewType())
         {
         return LINECHART;
         }
@@ -331,7 +331,7 @@ private:
 };
 
 //-----------------------------------------------------------------------------
-class pqPipelineModelInternal 
+class pqPipelineModelInternal
 {
 public:
   pqPipelineModelInternal(pqPipelineModel* parent):
@@ -496,7 +496,7 @@ void pqPipelineModel::setSubtreeSelectable(pqServerManagerModelItem *smitem,
     }
   this->setSubtreeSelectable(item, selectable);
 }
-  
+
 //-----------------------------------------------------------------------------
 void pqPipelineModel::setSubtreeSelectable(pqPipelineModelDataItem* item,
   bool selectable)
@@ -589,7 +589,7 @@ QModelIndex pqPipelineModel::index(int row, int column,
     return QModelIndex();
     }
 
-  pqPipelineModelDataItem* parentItem = 0; 
+  pqPipelineModelDataItem* parentItem = 0;
   if(parentIndex.isValid())
     {
     parentItem = reinterpret_cast<pqPipelineModelDataItem*>(
@@ -597,7 +597,7 @@ QModelIndex pqPipelineModel::index(int row, int column,
     }
   else
     {
-    // The parent refers to the model root. 
+    // The parent refers to the model root.
     parentItem = &this->Internal->Root;
     }
 
@@ -611,7 +611,7 @@ QModelIndex pqPipelineModel::parent(const QModelIndex &idx) const
     {
     pqPipelineModelDataItem *item = reinterpret_cast<pqPipelineModelDataItem*>(
         idx.internalPointer());
-    
+
     pqPipelineModelDataItem* _parent = item->Parent;
     return this->getIndex(_parent);
     }
@@ -726,7 +726,7 @@ Qt::ItemFlags pqPipelineModel::flags(const QModelIndex &idx) const
       _flags |= Qt::ItemIsSelectable;
       }
 
-    if (this->Editable && 
+    if (this->Editable &&
       item->Type == pqPipelineModel::Proxy)
       {
       _flags |= Qt::ItemIsEditable;
@@ -780,7 +780,7 @@ pqPipelineModelDataItem* pqPipelineModel::getDataItem(pqServerManagerModelItem* 
     return 0;
     }
 
-  if (_parent->Object == item && 
+  if (_parent->Object == item &&
     (type == pqPipelineModel::Invalid ||
      type == _parent->Type))
     {
@@ -900,7 +900,7 @@ void pqPipelineModel::addServer(pqServer *server)
   pqPipelineModelDataItem* item = new pqPipelineModelDataItem(
     this, server, pqPipelineModel::Server, this);
   this->addChild(&this->Internal->Root, item);
-  QObject::connect(server, 
+  QObject::connect(server,
     SIGNAL(nameChanged(pqServerManagerModelItem*)),
     this, SLOT(updateData(pqServerManagerModelItem*)));
 }
@@ -934,11 +934,11 @@ void pqPipelineModel::addSource(pqPipelineSource* source)
     qDebug() << "Could not locate server on which the source is being added.";
     return;
     }
-  
+
   pqPipelineModelDataItem* item = new pqPipelineModelDataItem(
     this, source, pqPipelineModel::Proxy, this);
   item->Object = source;
-  item->Type = pqPipelineModel::Proxy; // source->getType(); 
+  item->Type = pqPipelineModel::Proxy; // source->getType();
 
   // Add the 'source' to the server.
   this->addChild(_parent, item);
@@ -955,14 +955,14 @@ void pqPipelineModel::addSource(pqPipelineSource* source)
       }
     }
 
-  QObject::connect(source, 
+  QObject::connect(source,
     SIGNAL(visibilityChanged(pqPipelineSource*, pqDataRepresentation*)),
     this, SLOT(updateVisibility(pqPipelineSource*)));
 
-  QObject::connect(source, 
+  QObject::connect(source,
     SIGNAL(nameChanged(pqServerManagerModelItem*)),
     this, SLOT(updateData(pqServerManagerModelItem*)));
-  QObject::connect(source, 
+  QObject::connect(source,
     SIGNAL(modifiedStateChanged(pqServerManagerModelItem*)),
     this, SLOT(updateData(pqServerManagerModelItem*)));
 }
@@ -1032,12 +1032,12 @@ void pqPipelineModel::addConnection(pqPipelineSource *source,
     }
 
   // Note: this slot is invoked after the connection has been set,
-  
+
   // The only decision we need to make here is whether the sink
-  // fanIn > 1. 
+  // fanIn > 1.
   // If fanIn == 1, take the sink form the server list
   // and put it under the source.
-  // If fanIn > 1, -- we will deal with this later :). 
+  // If fanIn > 1, -- we will deal with this later :).
 
   pqPipelineFilter* filter = qobject_cast<pqPipelineFilter*>(sink);
   if (!filter)
