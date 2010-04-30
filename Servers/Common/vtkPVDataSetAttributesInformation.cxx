@@ -25,6 +25,7 @@
 #include "vtkGenericAttribute.h"
 #include "vtkPVGenericAttributeInformation.h"
 
+#include <string.h>
 #include <algorithm>
 #include <vtkstd/vector>
 
@@ -32,18 +33,23 @@
 vtkStandardNewMacro(vtkPVDataSetAttributesInformation);
 
 //----------------------------------------------------------------------------
-struct vtkPVDataSetAttributesInformationSortArray
+struct  vtkPVDataSetAttributesInformationSortArray
 {
   int          arrayIndx;
   const char * arrayName;
 };
 
-bool   vtkPVDataSetAttributesInfromationAlphabeticSorting
-     ( vtkPVDataSetAttributesInformationSortArray & thisArray,
-       vtkPVDataSetAttributesInformationSortArray & thatArray )
+bool    vtkPVDataSetAttributesInfromationAlphabeticSorting
+( const vtkPVDataSetAttributesInformationSortArray & thisArray,
+  const vtkPVDataSetAttributesInformationSortArray & thatArray )
 {
+#if defined(_WIN32)
   return  (  stricmp( thisArray.arrayName, thatArray.arrayName )  <=  0  )
           ?  true  :  false;
+#else
+  return  (  strcasecmp( thisArray.arrayName, thatArray.arrayName )  <=  0  )
+          ?  true  :  false;
+#endif
 }
 
 //----------------------------------------------------------------------------

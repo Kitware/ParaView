@@ -20,24 +20,30 @@
 #include "vtkProcessModule.h"
 #include "vtkSMStringVectorProperty.h"
 
+#include <string.h>
 #include <algorithm>
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMArraySelectionInformationHelper);
 
 //---------------------------------------------------------------------------
-struct vtkSMArraySelectionInformationHelperSortArray
+struct  vtkSMArraySelectionInformationHelperSortArray
 {
   int          arrayIndx;
   const char * arrayName;
 };
 
-bool   vtkSMArraySelectionInformationHelperAlphabeticSorting
-     ( vtkSMArraySelectionInformationHelperSortArray & thisArray,
-       vtkSMArraySelectionInformationHelperSortArray & thatArray )
+bool    vtkSMArraySelectionInformationHelperAlphabeticSorting
+( const vtkSMArraySelectionInformationHelperSortArray & thisArray,
+  const vtkSMArraySelectionInformationHelperSortArray & thatArray )
 {
+#if defined(_WIN32)
   return  (  stricmp( thisArray.arrayName, thatArray.arrayName )  <=  0  )
           ?  true  :  false;
+#else
+  return  (  strcasecmp( thisArray.arrayName, thatArray.arrayName )  <=  0  )
+          ?  true  :  false;
+#endif
 }
 //---------------------------------------------------------------------------
 vtkSMArraySelectionInformationHelper::vtkSMArraySelectionInformationHelper()
