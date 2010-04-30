@@ -44,7 +44,7 @@ public:
   pqImplementation() :
     PreserveOrder(false),
     Format('g'),
-    Precision(3)
+    Precision(9)
   {
   }
   
