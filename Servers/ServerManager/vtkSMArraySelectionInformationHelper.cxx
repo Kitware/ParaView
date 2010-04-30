@@ -20,8 +20,25 @@
 #include "vtkProcessModule.h"
 #include "vtkSMStringVectorProperty.h"
 
+#include <algorithm>
+#include <vtkstd/vector>
+
 vtkStandardNewMacro(vtkSMArraySelectionInformationHelper);
 
+//---------------------------------------------------------------------------
+struct vtkSMArraySelectionInformationHelperSortArray
+{
+  int          arrayIndx;
+  const char * arrayName;
+};
+
+bool   vtkSMArraySelectionInformationHelperAlphabeticSorting
+     ( vtkSMArraySelectionInformationHelperSortArray & thisArray,
+       vtkSMArraySelectionInformationHelperSortArray & thatArray )
+{
+  return  (  stricmp( thisArray.arrayName, thatArray.arrayName )  <=  0  )
+          ?  true  :  false;
+}
 //---------------------------------------------------------------------------
 vtkSMArraySelectionInformationHelper::vtkSMArraySelectionInformationHelper()
 {
@@ -81,37 +98,53 @@ void vtkSMArraySelectionInformationHelper::UpdateProperty(
 
   int numArrays = arrays.GetNumberOfArguments(0)/2;
 
+  // sort the arrays alphabetically
+  int   arrayIndx = 0;
+  vtkstd::vector < vtkSMArraySelectionInformationHelperSortArray > sortArays;
+  sortArays.clear();
+
+  if ( numArrays > 0 )
+    {
+    sortArays.resize( numArrays );
+    for ( int j = 0; j < numArrays; j ++ )
+      {
+      sortArays[j].arrayIndx = j;
+      if (   !arrays.GetArgument
+              (  0,  j * 2,  &( sortArays[j].arrayName )  )   )
+        {
+        vtkErrorMacro( "Error getting array name from reader." );
+        break;
+        }
+      }
+
+    vtkstd::sort( sortArays.begin(), sortArays.end(),
+                  vtkSMArraySelectionInformationHelperAlphabeticSorting );
+    }
+
   svp->SetNumberOfElementsPerCommand(2);
   svp->SetElementType(0, vtkSMStringVectorProperty::STRING);
   svp->SetElementType(1, vtkSMStringVectorProperty::INT);
   svp->SetNumberOfElements(numArrays*2);
   for(int i=0; i < numArrays; ++i)
     {
-    // Get the array name.
-    const char* name;
-    if(!arrays.GetArgument(0, i*2, &name))
-      {
-      vtkErrorMacro("Error getting array name from reader.");
-      break;
-      }
-
     // Get the array status.
-    int status;
-    if(!arrays.GetArgument(0, i*2 + 1, &status))
+    int   status;
+    if(  !arrays.GetArgument
+          ( 0, sortArays[i].arrayIndx * 2 + 1, &status )  )
       {
-      vtkErrorMacro("Error getting array status from reader.");
+      vtkErrorMacro( "Error getting array status from reader." );
       break;
       }
 
     // Set the selection to match the reader.
-    svp->SetElement(2*i, name);
-    if(status)
+    svp->SetElement( 2 * i, sortArays[i].arrayName );
+    if( status )
       {
-      svp->SetElement(2*i+1, "1");
+      svp->SetElement( 2 * i + 1, "1" );
       }
     else
       {
-      svp->SetElement(2*i+1, "0");
+      svp->SetElement( 2 * i + 1, "0" );
       }
     }
 
