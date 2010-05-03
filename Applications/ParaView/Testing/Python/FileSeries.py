@@ -19,7 +19,7 @@ QtTesting.playCommand(object4, 'mouseRelease', '(0.225505,0.603083,1,0,0)')
 object5 = 'pqClientMainWindow/axesToolbar/1QToolButton0'
 QtTesting.playCommand(object5, 'set_boolean', 'false')
 object6 = 'pqClientMainWindow/variableToolbar/displayColor/Variables'
-QtTesting.playCommand(object6, 'set_string', 'cellNormals')
+#QtTesting.playCommand(object6, 'set_string', 'cellNormals')
 QtTesting.playCommand(object6, 'set_string', 'thickness')
 object7 = 'pqClientMainWindow/menubar/menuFilters/pqProxyGroupMenuManager0/WarpVector'
 QtTesting.playCommand(object7, 'activate', '')

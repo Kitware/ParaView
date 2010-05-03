@@ -26,31 +26,31 @@ At the same time it tests that the animation playing does not affect the undo st
   <pqevent object="pqClientMainWindow/MainControlsToolbar/actionRedo" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="currentChanged" arguments="/0/0|0" />
   <pqevent object="pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/1QScrollArea0/qt_scrollarea_viewport/1pqDisplayProxyEditorWidget0/pqDisplayProxyEditor/ColorGroup/ColorBy/Variables" command="set_string" arguments="RTData" />
-  <pqevent object="pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/1QScrollArea0/qt_scrollarea_viewport/1pqDisplayProxyEditorWidget0/pqDisplayProxyEditor/ColorGroup/ColorBy/Variables" command="set_string" arguments="cellNormals" />
+  <!--<pqevent object="pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/1QScrollArea0/qt_scrollarea_viewport/1pqDisplayProxyEditorWidget0/pqDisplayProxyEditor/ColorGroup/ColorBy/Variables" command="set_string" arguments="cellNormals" />
   <pqevent object="pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/1QScrollArea0/qt_scrollarea_viewport/1pqDisplayProxyEditorWidget0/pqDisplayProxyEditor/ColorGroup/ColorBy/Variables" command="set_string" arguments="RTData" />
   <pqevent object="pqClientMainWindow/MainControlsToolbar/actionUndo" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/MainControlsToolbar/actionUndo" command="activate" arguments="" />-->
   <pqevent object="pqClientMainWindow/MainControlsToolbar/actionUndo" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/MainControlsToolbar/actionUndo" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/MainControlsToolbar/actionUndo" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/MainControlsToolbar/actionUndo" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/MainControlsToolbar/actionUndo" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/MainControlsToolbar/actionRedo" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/MainControlsToolbar/actionRedo" command="activate" arguments="" />
+  <!--<pqevent object="pqClientMainWindow/MainControlsToolbar/actionRedo" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/MainControlsToolbar/actionRedo" command="activate" arguments="" />-->
   <pqevent object="pqClientMainWindow/MainControlsToolbar/actionRedo" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/MainControlsToolbar/actionRedo" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/MainControlsToolbar/actionRedo" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/MainControlsToolbar/actionRedo" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="currentChanged" arguments="/0/0|0" />
   <pqevent object="pqClientMainWindow/variableToolbar/1QToolButton0" command="set_boolean" arguments="true" />
+  <!--<pqevent object="pqClientMainWindow/MainControlsToolbar/actionUndo" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/MainControlsToolbar/actionUndo" command="activate" arguments="" />-->
   <pqevent object="pqClientMainWindow/MainControlsToolbar/actionUndo" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/MainControlsToolbar/actionUndo" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/MainControlsToolbar/actionUndo" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/MainControlsToolbar/actionUndo" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/MainControlsToolbar/actionUndo" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/MainControlsToolbar/actionUndo" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/MainControlsToolbar/actionUndo" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/MainControlsToolbar/actionRedo" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/MainControlsToolbar/actionRedo" command="activate" arguments="" />
+  <!--<pqevent object="pqClientMainWindow/MainControlsToolbar/actionRedo" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/MainControlsToolbar/actionRedo" command="activate" arguments="" />-->
   <pqevent object="pqClientMainWindow/MainControlsToolbar/actionRedo" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/MainControlsToolbar/actionRedo" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/MainControlsToolbar/actionRedo" command="activate" arguments="" />
