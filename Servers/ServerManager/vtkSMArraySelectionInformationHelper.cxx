@@ -105,7 +105,6 @@ void vtkSMArraySelectionInformationHelper::UpdateProperty(
   int numArrays = arrays.GetNumberOfArguments(0)/2;
 
   // sort the arrays alphabetically
-  int   arrayIndx = 0;
   vtkstd::vector < vtkSMArraySelectionInformationHelperSortArray > sortArays;
   sortArays.clear();
 
