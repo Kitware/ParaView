@@ -183,7 +183,6 @@ pqView* pqDisplayPolicy::getPreferredView(
 
   if (!view_type.isNull())
     {
-    QString tmp = currentView->getViewType();
     if (currentView && currentView->getViewType() == view_type)
       {
       // nothing to do, active view is preferred view.
