@@ -4770,6 +4770,122 @@ The Clip filter cuts away a portion of the input data set using an implicit plan
    </SourceProxy>
 
    <!-- ==================================================================== -->
+   <SourceProxy name="ClipClosedSurface" class="vtkPVClipClosedSurface"
+    label="Clip Closed Surface">
+    <Documentation
+       long_help="Clip a polygonal dataset with a plane to produce closed surfaces"
+       short_help="Clip a polygonal dataset with a plane to produce closed surfaces">
+This clip filter cuts away a portion of the input polygonal dataset using a plane to generate a new polygonal dataset.
+    </Documentation>
+    <InputProperty
+       name="Input"
+       command="SetInputConnection">
+          <ProxyGroupDomain name="groups">
+            <Group name="sources"/>
+            <Group name="filters"/>
+          </ProxyGroupDomain>
+          <DataTypeDomain name="input_type">
+            <DataType value="vtkPolyData"/>
+          </DataTypeDomain>
+          <InputArrayDomain name="input_array" attribute_type="point"
+                            number_of_components="1" optional="1"/>
+         <Documentation>
+           This property specifies the dataset on which the Clip filter will operate.
+          </Documentation>
+     </InputProperty>
+
+     <ProxyProperty name="ClippingPlane" command="SetClippingPlane"
+        label="Clipping Plane">
+
+           <ProxyGroupDomain name="groups">
+               <Group name="implicit_functions"/>
+           </ProxyGroupDomain>
+           <ProxyListDomain name="proxy_list">
+             <Proxy group="implicit_functions" name="Plane" />
+           </ProxyListDomain>
+
+           <Documentation>
+             This property specifies the parameters of the clipping plane used to clip the polygonal data.
+           </Documentation>
+     </ProxyProperty>
+
+     <IntVectorProperty name="GenerateFaces"
+       command="SetGenerateFaces"
+       number_of_elements="1"
+       default_values="1">
+       <BooleanDomain name="bool" />
+       <Documentation>
+         Generate polygonal faces in the output.
+       </Documentation>
+     </IntVectorProperty>
+
+     <IntVectorProperty name="GenerateOutline"
+       command="SetGenerateOutline"
+       number_of_elements="1"
+       default_values="0">
+       <BooleanDomain name="bool" />
+       <Documentation>
+         Generate clipping outlines in the output wherever an input face is cut by the clipping plane.
+       </Documentation>
+     </IntVectorProperty>
+
+     <IntVectorProperty name="GenerateColorScalars"
+       label="Generate Cell Origins"
+       command="SetGenerateColorScalars"
+       number_of_elements="1"
+       default_values="0">
+       <BooleanDomain name="bool" />
+       <Documentation>
+         Generate (cell) data for coloring purposes such that the newly generated cells (including capping faces and clipping outlines) can be distinguished from the input cells.
+       </Documentation>
+     </IntVectorProperty>
+
+     <IntVectorProperty
+         name="InsideOut"
+         command="SetInsideOut"
+         number_of_elements="1"
+         default_values="0" >
+       <BooleanDomain name="bool"/>
+       <Documentation>
+           If this flag is turned off, the clipper will return the portion of the data that lies within the clipping plane. Otherwise, the clipper will return the portion of the data that lies outside the clipping plane.
+       </Documentation>
+     </IntVectorProperty>
+
+     <DoubleVectorProperty name="Tolerance"
+       label="Clipping Tolerance"
+       command="SetTolerance"
+       number_of_elements="1"
+       default_values="0.000001" >
+       <DoubleRangeDomain name="range"/>
+       <Documentation>
+         Specify the tolerance for creating new points. A small value might incur degenerate triangles.
+       </Documentation>
+     </DoubleVectorProperty>
+
+     <DoubleVectorProperty name="BaseColor" command="SetBaseColor"
+       label="Base Color"
+       number_of_elements="3"
+       default_values="0.10 0.10 1.00">
+       <DoubleRangeDomain name="range" min="0 0 0" max="1 1 1"/>
+       <Documentation>
+         Specify the color for the faces from the input.
+       </Documentation>
+     </DoubleVectorProperty>
+
+     <DoubleVectorProperty name="ClipColor" command="SetClipColor"
+       label="Clip Color"
+       number_of_elements="3"
+       default_values="1.00 0.11 0.10">
+       <DoubleRangeDomain name="range" min="0 0 0" max="1 1 1"/>
+       <Documentation>
+         Specifiy the color for the capping faces (generated on the clipping interface).
+       </Documentation>
+     </DoubleVectorProperty>
+
+   <!-- End Clip -->
+   </SourceProxy>
+
+   <!-- ==================================================================== -->
    <SourceProxy name="Threshold" class="vtkThreshold">
     <Documentation
        long_help="This filter extracts cells that have point or cell scalars in the specified range."

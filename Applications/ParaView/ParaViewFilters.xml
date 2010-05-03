@@ -75,6 +75,7 @@
   <Proxy group="filters" name="CleanPolyData" />
   <Proxy group="filters" name="CleanUnstructuredGrid" />
   <Proxy group="filters" name="Clip" />
+  <Proxy group="filters" name="ClipClosedSurface" />
   <Proxy group="filters" name="Contour" />
   <Proxy group="filters" name="CTHFragmentConnect"/>
   <Proxy group="filters" name="CTHFragmentIntersect"/>
