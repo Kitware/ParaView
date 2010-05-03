@@ -36,11 +36,19 @@
 
 vtkStandardNewMacro(vtkSMArrayListDomain);
 
+struct vtkSMArrayListDomainInformationKey
+{
+  vtkStdString Location;
+  vtkStdString Name;
+  int Strategy;
+};
+
 struct vtkSMArrayListDomainInternals
 {
   vtkstd::map<vtkStdString, int> PartialMap;
   vtkstd::vector<int> DataTypes;
   vtkstd::vector<int> FieldAssociation;
+  vtkstd::vector<vtkSMArrayListDomainInformationKey> InformationKeys;
 };
 
 //---------------------------------------------------------------------------
@@ -141,11 +149,14 @@ void vtkSMArrayListDomain::AddArrays(vtkSMSourceProxy* sp,
       int nAcceptedTypes=static_cast<int>(this->ALDInternals->DataTypes.size());
       if ( nAcceptedTypes==0 )
         {
-        unsigned int newidx = this->AddString(arrayInfo->GetName());
-        this->ALDInternals->FieldAssociation[newidx] = association;
-        if (arrayInfo == attrInfo)
-          {
-          attrIdx = newidx;
+        if(this->CheckInformationKeys(arrayInfo))
+        {
+          unsigned int newidx = this->AddString(arrayInfo->GetName());
+          this->ALDInternals->FieldAssociation[newidx] = association;
+          if (arrayInfo == attrInfo)
+            {
+            attrIdx = newidx;
+            }
           }
         }
       for (int i=0; i<nAcceptedTypes; ++i)
@@ -153,11 +164,14 @@ void vtkSMArrayListDomain::AddArrays(vtkSMSourceProxy* sp,
         int thisDataType=this->ALDInternals->DataTypes[i];
         if (!thisDataType || (arrayInfo->GetDataType() == thisDataType))
           {
-          unsigned int newidx = this->AddString(arrayInfo->GetName());
-          this->ALDInternals->FieldAssociation[newidx] = association;
-          if (arrayInfo == attrInfo)
-            {
-            attrIdx = newidx;
+          if(this->CheckInformationKeys(arrayInfo))
+          {
+            unsigned int newidx = this->AddString(arrayInfo->GetName());
+            this->ALDInternals->FieldAssociation[newidx] = association;
+            if (arrayInfo == attrInfo)
+              {
+              attrIdx = newidx;
+              }
             }
           }
         }
@@ -353,7 +367,54 @@ int vtkSMArrayListDomain::ReadXMLAttributes(
   const char* none_string = element->GetAttribute("none_string");
   if (none_string)
     {
-      this->SetNoneString(none_string);
+    this->SetNoneString(none_string);
+    }
+
+  const char* key_locations = element->GetAttribute("key_locations");
+  const char* key_names = element->GetAttribute("key_names");
+  const char* key_strategies = element->GetAttribute("key_strategies");
+  if(key_locations == NULL)
+    {
+    // Default value : add a needed information key vtkAbstractArray::GUI_HIDE
+    this->AddInformationKey("vtkAbstractArray", "GUI_HIDE", vtkSMArrayListDomain::REJECT_KEY);
+    }
+  else
+    {
+    vtkstd::stringstream locations(key_locations);
+    vtkstd::stringstream names(key_names);
+    vtkstd::stringstream strategies(key_strategies);
+    vtkstd::string location, name, strategy, last_strategy;
+    int strat;
+    // default value for the strategy
+    last_strategy = "need_key";
+    while(locations >> location)
+      {
+      if(! (names >> name) )
+        {
+        vtkErrorMacro("The number of key names must be equal to the number of key locations");
+        break;
+        }
+      if(! (strategies >> strategy))
+        {
+        strategy = last_strategy;
+        }
+      last_strategy = strategy;
+
+      if(strategy == "need_key" || strategy == "NEED_KEY")
+        {
+        strat = vtkSMArrayListDomain::NEED_KEY;
+        }
+      else if(strategy == "reject_key" || strategy == "REJECT_KEY")
+        {
+        strat = vtkSMArrayListDomain::REJECT_KEY;
+        }
+      else
+        {
+        // maybe the strategy was coded as an integer.
+        strat=atoi(strategy.c_str());
+        }
+      this->AddInformationKey(location.c_str(), name.c_str(), strat);
+      }
     }
 
   // Search for attribute type with matching name.
@@ -519,6 +580,97 @@ int vtkSMArrayListDomain::SetDefaultValues(vtkSMProperty* prop)
 }
 
 //---------------------------------------------------------------------------
+int vtkSMArrayListDomain::CheckInformationKeys(vtkPVArrayInformation* arrayInfo)
+{
+  for (unsigned int i=0; i< this->GetNumberOfInformationKeys(); i++)
+    {
+    vtkSMArrayListDomainInformationKey& key = this->ALDInternals->InformationKeys[i];
+    int hasInfo = arrayInfo->HasInformationKey(key.Location, key.Name);
+    if(hasInfo && key.Strategy == vtkSMArrayListDomain::REJECT_KEY)
+      {
+      return 0;
+      }
+    if(!hasInfo && key.Strategy == vtkSMArrayListDomain::NEED_KEY)
+      {
+      return 0;
+      }
+    }
+  return 1;
+}
+
+//---------------------------------------------------------------------------
+unsigned int vtkSMArrayListDomain::AddInformationKey(const char* location, const char *name, int strategy)
+{
+  vtkSMArrayListDomainInformationKey key;
+  key.Location = location;
+  key.Name = name;
+  key.Strategy = strategy;
+  this->ALDInternals->InformationKeys.push_back(key);
+  return this->ALDInternals->InformationKeys.size() - 1;
+}
+
+//---------------------------------------------------------------------------
+unsigned int vtkSMArrayListDomain::RemoveInformationKey(const char* location, const char *name)
+{
+  vtkstd::vector<vtkSMArrayListDomainInformationKey>::iterator it
+    = this->ALDInternals->InformationKeys.begin();
+  int index = 0;
+  while(it != this->ALDInternals->InformationKeys.end())
+    {
+    vtkSMArrayListDomainInformationKey& key = *it;
+    if(key.Location == location && key.Name == name)
+      {
+      this->ALDInternals->InformationKeys.erase(it);
+      return index;
+      }
+    it++;
+    index++;
+    }
+}
+
+//---------------------------------------------------------------------------
+unsigned int vtkSMArrayListDomain::GetNumberOfInformationKeys()
+{
+  return static_cast<unsigned int>(this->ALDInternals->InformationKeys.size());
+}
+
+//---------------------------------------------------------------------------
+void vtkSMArrayListDomain::RemoveAllInformationKeys()
+{
+  this->ALDInternals->InformationKeys.clear();
+}
+
+//---------------------------------------------------------------------------
+const char* vtkSMArrayListDomain::GetInformationKeyLocation(unsigned int index)
+{
+  if(index < this->ALDInternals->InformationKeys.size())
+    {
+    return this->ALDInternals->InformationKeys[index].Location;
+    }
+  return NULL;
+}
+
+//---------------------------------------------------------------------------
+const char* vtkSMArrayListDomain::GetInformationKeyName(unsigned int index)
+{
+  if(index < this->ALDInternals->InformationKeys.size())
+    {
+    return this->ALDInternals->InformationKeys[index].Name;
+    }
+  return NULL;
+}
+
+//---------------------------------------------------------------------------
+int vtkSMArrayListDomain::GetInformationKeyStrategy(unsigned int index)
+{
+  if(index < this->ALDInternals->InformationKeys.size())
+    {
+    return this->ALDInternals->InformationKeys[index].Strategy;
+    }
+  return -1;
+}
+
+//---------------------------------------------------------------------------
 void vtkSMArrayListDomain::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
@@ -528,5 +680,24 @@ void vtkSMArrayListDomain::PrintSelf(ostream& os, vtkIndent indent)
   for (int i=0; i<nDataTypes; ++i)
     {
     os << indent << "DataType: " << this->ALDInternals->DataTypes[i] << endl;
+    }
+
+  for(int i=0; i<this->ALDInternals->InformationKeys.size(); i++)
+    {
+    vtkSMArrayListDomainInformationKey& key = this->ALDInternals->InformationKeys[i];
+    os << key.Location << "::" << key.Name << " ";
+    if(key.Strategy == vtkSMArrayListDomain::NEED_KEY)
+      {
+      os << "NEED_KEY";
+      }
+    else if(key.Strategy == vtkSMArrayListDomain::REJECT_KEY)
+      {
+      os << "REJECT_KEY";
+      }
+    else
+      {
+      os << "UNKNOWN KEY STRATEGY : " << key.Strategy;
+      }
+    os << endl;
     }
 }

@@ -3212,7 +3212,10 @@ The Point Data to Cell Data filter averages the values of the point attributes o
       <ArrayListDomain
           name="array_list"
           data_type="VTK_ID_TYPE"
-          attribute_type="Scalars">
+          attribute_type="Scalars"
+          key_locations="vtkQuadratureSchemeDefinition"
+          key_names="DICTIONARY"
+          key_strategies="NEED_KEY">
           <RequiredProperties>
             <Property name="Input" function="Input"/>
           </RequiredProperties>
@@ -3263,7 +3266,10 @@ The Point Data to Cell Data filter averages the values of the point attributes o
       <ArrayListDomain
           name="array_list"
           data_type="VTK_ID_TYPE"
-          attribute_type="Scalars">
+          attribute_type="Scalars"
+          key_locations="vtkQuadratureSchemeDefinition"
+          key_names="DICTIONARY"
+          key_strategies="NEED_KEY">
           <RequiredProperties>
             <Property name="Input" function="Input"/>
           </RequiredProperties>

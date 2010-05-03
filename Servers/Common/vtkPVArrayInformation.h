@@ -27,6 +27,7 @@
 #include "vtkPVInformation.h"
 class vtkClientServerStream;
 class vtkStdString;
+class vtkStringArray;
 
 class VTK_EXPORT vtkPVArrayInformation : public vtkPVInformation
 {
@@ -118,6 +119,19 @@ public:
   // Remove all infommation. Next add will be like a copy.
   void Initialize();
 
+  // Description:
+  // Merge (union) keys into this object.
+  void AddInformationKeys(vtkPVArrayInformation *info);
+  void AddInformationKey(const char* location, const char* name);
+  void AddUniqueInformationKey(const char* location, const char* name);
+
+  // Description:
+  // Get information on the InformationKeys of this array
+  int GetNumberOfInformationKeys();
+  const char* GetInformationKeyLocation(int);
+  const char* GetInformationKeyName(int);
+  int HasInformationKey(const char* location, const char* name);
+
 protected:
   vtkPVArrayInformation();
   ~vtkPVArrayInformation();
@@ -129,6 +143,12 @@ protected:
   char *Name;
   double *Ranges;
   
+  // this array is used to store existing information keys (location/name pairs)
+  //BTX
+  class vtkInternalInformationKeys;
+  vtkInternalInformationKeys *InformationKeys;
+  //ETX
+
   //this is used by GetComponentName, so that it always return a valid component name
   //BTX
   vtkStdString *DefaultComponentName;

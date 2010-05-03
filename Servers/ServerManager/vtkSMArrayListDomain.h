@@ -34,6 +34,14 @@
 //      is allowed
 // * none_string - when specified, this string appears as the first entry in
 //      the list and can be used to show "None", or "Not available" etc.
+// * key_location / key_name / key_strategy:
+//      those tree attributes are related to InformationKey of the array.
+//      key_location/key_name are the location and name of the given InformationKey
+//      key_strategy specifies if this specific key is needed to be in the domain
+//      or if this key is rejected. One of need_key or reject_key.
+//      if nothing is specified, the default is to add a vtkAbstractArray::GUI_HIDE
+//      key, with the reject_key strategy, so that arrays that have this InformationKey
+//      are not visible in the user interface.
 // @endverbatim
 // Additionally, vtkSMArrayListDomain support 'default_values' attribute which
 // specifies a string (only 1 string value is supported). When
@@ -57,6 +65,7 @@ class vtkPVDataSetAttributesInformation;
 class vtkSMInputArrayDomain;
 class vtkSMProxyProperty;
 class vtkSMSourceProxy;
+class vtkPVArrayInformation;
 
 //BTX
 struct vtkSMArrayListDomainInternals;
@@ -120,6 +129,55 @@ public:
   // Description:
   // Removes all strings from the domain.
   virtual void RemoveAllStrings();
+
+  //BTX
+  // This enum represents the possible strategies associated
+  // with a given InformationKey :
+  // NEED_KEY means that if the array will be in the domain only if
+  // it does contains the given information key in its information.
+  // REJECT_KEY means that if the array will be in the domain only if
+  // it does NOT contains the given information key in its information.
+  enum InformationKeyStrategy
+  {
+    NEED_KEY,
+    REJECT_KEY
+  };
+  //ETX
+
+  // Description:
+  // Adds a new InformationKey to the domain.
+  // The default strategy is NEED_KEY if none is specified.
+  // If no InformationKey is specified in the xml, the default
+  // behavior is to create a rejected key vtkAbstractArray::GUI_HIDE
+  virtual unsigned int AddInformationKey(const char* location, const char *name, int strategy);
+  virtual unsigned int AddInformationKey(const char* location, const char *name)
+  {
+    return this->AddInformationKey(location, name, vtkSMArrayListDomain::NEED_KEY);
+  }
+
+  // Description:
+  // Removes an InformationKey from this domain.
+  unsigned int RemoveInformationKey(const char* location, const char *name);
+
+  // Description:
+  // Returns the number of InformationKeys in this domain.
+  unsigned int GetNumberOfInformationKeys();
+
+  //Description:
+  // Removes all InformationKeys from this domain.
+  void RemoveAllInformationKeys();
+
+  // Description:
+  // Returns the location/name/strategy of a given InformationKey
+  const char* GetInformationKeyLocation(unsigned int);
+  const char* GetInformationKeyName(unsigned int);
+  int GetInformationKeyStrategy(unsigned int);
+
+  // Description:
+  // return 1 if the InformationKeys of this vtkPVArrayInformation
+  // fullfill the requirements of the InformationKey in this Domain.
+  // returns 0 on failure.
+  int CheckInformationKeys(vtkPVArrayInformation* arrayInfo);
 
 protected:
   vtkSMArrayListDomain();
