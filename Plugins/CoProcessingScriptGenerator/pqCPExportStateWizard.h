@@ -33,6 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __pqCPExportStateWizard_h
 
 #include <QWizard>
+#include <QString>
 
 class pqCPExportStateWizard : public QWizard
 {
@@ -49,6 +50,7 @@ protected slots:
   void updateAddRemoveButton();
   void onAdd();
   void onRemove();
+  void updateImageFileName(const QString&);
 
 private:
   Q_DISABLE_COPY(pqCPExportStateWizard)

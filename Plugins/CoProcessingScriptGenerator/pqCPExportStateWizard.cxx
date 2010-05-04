@@ -41,6 +41,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPythonManager.h"
 #include "pqFileDialog.h"
 
+#include <vtkPVXMLElement.h>
+#include <vtkSMProxyManager.h>
+#include <vtkSMSourceProxy.h>
+#include <vtksys/SystemTools.hxx>
+
 extern const char* cp_export_py;
 
 // HACK.
@@ -139,7 +144,15 @@ pqCPExportStateWizard::pqCPExportStateWizard(
   this->Internals = new pqInternals();
   this->Internals->setupUi(this);
   ::ActiveWizard = NULL;
+  //this->setWizardStyle(ModernStyle);
   this->setOption(QWizard::NoCancelButton, false);
+  this->Internals->imageFileName->hide();
+  this->Internals->imageType->hide();
+  this->Internals->imageWriteFrequency->hide();
+
+  this->Internals->imageFileNameLabel->hide();
+  this->Internals->imageTypeLabel->hide();
+  this->Internals->imageWriteFrequencyLabel->hide();
 
   QObject::connect(this->Internals->allInputs, SIGNAL(itemSelectionChanged()),
     this, SLOT(updateAddRemoveButton()));
@@ -149,6 +162,24 @@ pqCPExportStateWizard::pqCPExportStateWizard(
     this, SLOT(onAdd()));
   QObject::connect(this->Internals->removeButton, SIGNAL(clicked()),
     this, SLOT(onRemove()));
+
+
+  QObject::connect(this->Internals->outputRendering, SIGNAL(toggled(bool)),
+                   this->Internals->imageType, SLOT(setVisible(bool)));
+  QObject::connect(this->Internals->outputRendering, SIGNAL(toggled(bool)),
+                   this->Internals->imageFileName, SLOT(setVisible(bool)));
+  QObject::connect(this->Internals->outputRendering, SIGNAL(toggled(bool)),
+                   this->Internals->imageWriteFrequency, SLOT(setVisible(bool)));
+
+  QObject::connect(this->Internals->outputRendering, SIGNAL(toggled(bool)),
+                   this->Internals->imageTypeLabel, SLOT(setVisible(bool)));
+  QObject::connect(this->Internals->outputRendering, SIGNAL(toggled(bool)),
+                   this->Internals->imageFileNameLabel, SLOT(setVisible(bool)));
+  QObject::connect(this->Internals->outputRendering, SIGNAL(toggled(bool)),
+                   this->Internals->imageWriteFrequencyLabel, SLOT(setVisible(bool)));
+ 
+  QObject::connect(this->Internals->imageType, SIGNAL(currentIndexChanged(const QString&)),
+                   this, SLOT(updateImageFileName(const QString&)));
 }
 
 //-----------------------------------------------------------------------------
@@ -193,6 +224,18 @@ void pqCPExportStateWizard::onRemove()
 }
 
 //-----------------------------------------------------------------------------
+void pqCPExportStateWizard::updateImageFileName(const QString& fileExtension)
+{
+  QString displayText = this->Internals->imageFileName->text();
+  vtkstd::string newFileName = vtksys::SystemTools::GetFilenameWithoutExtension(
+    displayText.toLocal8Bit().constData());
+  
+  newFileName.append(".");
+  newFileName.append(fileExtension.toLocal8Bit().constData());
+  this->Internals->imageFileName->setText(QString::fromStdString(newFileName));
+}
+
+//-----------------------------------------------------------------------------
 bool pqCPExportStateWizard::validateCurrentPage()
 {
   if (!this->Superclass::validateCurrentPage())
@@ -204,6 +247,68 @@ bool pqCPExportStateWizard::validateCurrentPage()
     {
     // not yet done with the wizard.
     return true;
+    }
+
+  QString image_file_name("");
+  int image_write_frequency = 0;
+  QString export_rendering = "True";
+  if (this->Internals->outputRendering->isChecked() == 0)
+    {
+    export_rendering = "False";
+    // check to make sure that there is a writer hooked up since we aren't
+    // exporting an image
+    vtkSMProxyManager* proxyManager = vtkSMProxyManager::GetProxyManager();
+    pqServerManagerModel* smModel = pqApplicationCore::instance()->getServerManagerModel();
+    bool haveSomeWriters = false;
+    QStringList filtersWithoutConsumers;
+    for(unsigned int i=0;i<proxyManager->GetNumberOfProxies("sources");i++)
+      {
+      if(vtkSMSourceProxy* proxy = vtkSMSourceProxy::SafeDownCast(
+           proxyManager->GetProxy("sources", proxyManager->GetProxyName("sources", i))))
+        {
+        vtkPVXMLElement* coProcessingHint = proxy->GetHints();
+        if(coProcessingHint && coProcessingHint->FindNestedElementByName("CoProcessing"))
+          {
+          haveSomeWriters = true;
+          }
+        else
+          {
+          pqPipelineSource* input = smModel->findItem<pqPipelineSource*>(proxy);
+          if(input && input->getNumberOfConsumers() == 0)
+            {
+            filtersWithoutConsumers << proxyManager->GetProxyName("sources", i);
+            }
+          }
+        }
+      }
+    if(!haveSomeWriters)
+      {
+      QMessageBox messageBox;
+      QString message(tr("No output writers specified. Either add writers in the pipeline or uncheck <b>Ignore rendering components</b>."));
+      messageBox.setText(message);
+      messageBox.exec();
+      return false;
+      }
+    if(filtersWithoutConsumers.size() != 0)
+      {
+      QMessageBox messageBox;
+      QString message(tr("The following filters have no consumers and will not be saved:\n"));
+      for(QStringList::const_iterator iter=filtersWithoutConsumers.constBegin();
+          iter!=filtersWithoutConsumers.constEnd();iter++)
+        {
+        message.append("  ");
+        message.append(iter->toLocal8Bit().constData());
+        message.append("\n");
+        }
+      messageBox.setText(message);
+      messageBox.exec();
+      }
+    }
+  else // we are creating an image so we need to get the proper information from there
+    {
+    image_file_name = this->Internals->imageFileName->text();
+    image_write_frequency = this->Internals->imageWriteFrequency->value();
+
     }
 
   QString filters ="ParaView Python State Files (*.py);;All files (*)";
@@ -243,6 +348,7 @@ bool pqCPExportStateWizard::validateCurrentPage()
     }
   // remove last ","
   sim_inputs_map.chop(1);
+
   
   QString export_rendering = "True";
   if (this->Internals->ignoreRendering->isChecked())
@@ -250,7 +356,10 @@ bool pqCPExportStateWizard::validateCurrentPage()
     export_rendering = "False";
     }
   QString command =
-    QString(cp_export_py).arg(export_rendering).arg(sim_inputs_map).arg(filename);
+    QString(cp_export_py).arg(export_rendering).arg(sim_inputs_map).arg(image_file_name).arg(image_write_frequency).arg(filename);
+
+  //cout << command.toStdString() << " second " << endl;
+  
   dialog->runString(command);
   return true;
 }
