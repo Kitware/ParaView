@@ -1,3 +1,4 @@
+print 'i should be here!!!! in cp_export.py 11111'
 # boolean telling if we want to export rendering.
 export_rendering = %1
 
@@ -5,13 +6,19 @@ export_rendering = %1
 # simulation input name.
 simulation_input_map = { %2 };
 
+image_file_name = '%3'
+
+image_write_frequency = %4
+
 # This is map of lists of write frequencies. This is used to populate the
 # RequestDataDescription() method so that grids are requested only when needed.
 write_frequencies = {}
 
+# we do the views last and only if export_rendering is true
+view_proxies = []
+
 for key in simulation_input_map.values():
     write_frequencies[key] = []
-
 
 def cp_locate_simulation_inputs(proxy):
     if hasattr(proxy, "cpSimulationInput"):
@@ -32,8 +39,20 @@ def cp_locate_simulation_inputs(proxy):
     return simulation_inputs 
 
 
+def cp_locate_simulation_inputs_for_view(view_proxy):
+    reprProp = smtrace.servermanager.ProxyProperty(view_proxy, view_proxy.GetProperty("Representations"))
+    reprs = reprProp[:]
+    all_sim_inputs = []
+    print 'entering cp_locate_simulation_inputs_for_view 3 ', len(reprs)
+    for repr in reprs:
+        sim_inputs = cp_locate_simulation_inputs(repr)
+        print 'inputs ', sim_inputs, repr
+        all_sim_inputs = all_sim_inputs + sim_inputs
+    print 'leaving cp_locate_simulation_inputs_for_view', len(all_sim_inputs)
+    return all_sim_inputs
+
 def cp_hook(info, ctorMethod, ctorArgs, extraCtorCommands):
-    global write_frequencies, simulation_input_map
+    global write_frequencies, simulation_input_map, export_rendering, view_proxies
     if info.ProxyName in simulation_input_map.keys():
         # mark this proxy as a simulation input to make it easier to locate the
         # simulation input for the writers.
@@ -42,6 +61,9 @@ def cp_hook(info, ctorMethod, ctorArgs, extraCtorCommands):
           [ 'datadescription', '\"%s\"' % (simulation_input_map[info.ProxyName]) ], '')
     # handle writers.
     proxy = info.Proxy
+    if proxy.GetXMLGroup() == 'views' and export_rendering:
+        view_proxies.append(proxy)
+
     if not proxy.GetHints() or \
       not proxy.GetHints().FindNestedElementByName("CoProcessing"):
         return (ctorMethod, ctorArgs, extraCtorCommands)
@@ -82,9 +104,9 @@ smtrace.trace_globals.trace_output = []
 
 # Get list of proxy lists
 proxy_lists = smstate.get_proxy_lists_ordered_by_group(WithRendering=export_rendering)
-
 # Now register the proxies with the smtrace module
 for proxy_list in proxy_lists:
+    print 'proxy list is ', proxy_list
     smstate.register_proxies_by_dependency(proxy_list)
 
 # Calling append_trace causes the smtrace module to sort out all the
@@ -95,6 +117,17 @@ smtrace.append_trace()
 # Stop trace and print it to the console
 smtrace.stop_trace()
 
+ 
+for view_proxy in view_proxies:
+    # Locate which simulation input this write is connected to, if any. If so,
+    # we update the write_frequencies datastructure accordingly.
+    sim_inputs = cp_locate_simulation_inputs_for_view(view_proxy)
+    print sim_inputs[:], len(sim_inputs)
+    # sim_inputs is empty damn it
+    for sim_input_name in sim_inputs:
+        if not image_write_frequency in write_frequencies[sim_input_name]:
+            write_frequencies[sim_input_name].append(image_write_frequency)
+    #write_frequencies['input'].append(image_write_frequency)
 
 output_contents = """
 try: paraview.simple
@@ -120,6 +153,8 @@ def DoCoProcessing(datadescription):
         if timestep %% writer.cpFrequency == 0:
             writer.FileName = writer.cpFileName.replace("%%t", str(timestep))
             writer.UpdatePipeline()
+
+%s
 
 def CreateProducer(datadescription, gridname):
   "Creates a producer proxy for the grid"
@@ -160,14 +195,23 @@ for original_line in smtrace.trace_globals.trace_output:
 request_data_description = ""
 for sim_input in write_frequencies:
     freqs = write_frequencies[sim_input]
+
     if len(freqs) == 0:
         continue
     freqs.sort()
     condition_str = "(timestep % " + " == 0) or (timestep % ".join(map(str, freqs)) + " == 0)"
     request_data_description += timestep_expression % (sim_input, condition_str)
 
-fileName = "%3"
+image_writers = ""
+for writer in view_proxies:
+    image_writers += '    if timestep % ' + str(image_write_frequency) +' == 0:\n'
+    image_writers += '        Show()\n'
+    image_writers += '        fname = "' + image_file_name + '"\n'
+    image_writers += '        fname = fname.replace("%t", str(timestep))\n'
+    image_writers += '        WriteImage(fname)\n'
+
+fileName = "%5"
 outFile = open(fileName, 'w')
-outFile.write(output_contents % (request_data_description, do_coprocessing))
+outFile.write(output_contents % (request_data_description, do_coprocessing, image_writers))
 outFile.close()
 
