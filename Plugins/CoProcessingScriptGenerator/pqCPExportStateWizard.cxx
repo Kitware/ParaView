@@ -354,8 +354,6 @@ bool pqCPExportStateWizard::validateCurrentPage()
   QString command =
     QString(cp_export_py).arg(export_rendering).arg(sim_inputs_map).arg(image_file_name).arg(image_write_frequency).arg(filename);
 
-  //cout << command.toStdString() << " second " << endl;
-  
   dialog->runString(command);
   return true;
 }
