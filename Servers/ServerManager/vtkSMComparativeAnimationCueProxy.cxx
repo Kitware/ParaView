@@ -480,7 +480,7 @@ double* vtkSMComparativeAnimationCueProxy::GetValues(
         for (unsigned int cc=0; cc < count; cc++)
           {
           this->Values[cc] =  dx > 1 ? 
-            iter->MinValues[cc] + (x * (iter->MaxValues[cc] - iter->MaxValues[cc])) / (dx - 1) :
+            iter->MinValues[cc] + (x * (iter->MaxValues[cc] - iter->MinValues[cc])) / (dx - 1) :
             iter->MinValues[cc];
           }
         numValues = count;
@@ -493,7 +493,7 @@ double* vtkSMComparativeAnimationCueProxy::GetValues(
         for (unsigned int cc=0; cc < count; cc++)
           {
           this->Values[cc] =  dy > 1 ? 
-            iter->MinValues[cc] + (y * (iter->MaxValues[cc] - iter->MaxValues[cc])) / (dy - 1) :
+            iter->MinValues[cc] + (y * (iter->MaxValues[cc] - iter->MinValues[cc])) / (dy - 1) :
             iter->MinValues[cc];
           }
         numValues = count;
