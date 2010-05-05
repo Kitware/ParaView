@@ -34,7 +34,8 @@ public:
     SINGLE,
     XRANGE,
     YRANGE,
-    TRANGE
+    TRANGE,
+    TRANGE_VERTICAL_FIRST
     };
 
   // vtkCueCommand is a unit of computation used to compute the value at a given
@@ -372,7 +373,8 @@ void vtkSMComparativeAnimationCueProxy::UpdateYRange(
 
 //----------------------------------------------------------------------------
 void vtkSMComparativeAnimationCueProxy::UpdateWholeRange(
-  double *mint, double *maxt, unsigned int numValues)
+  double *mint, double *maxt, unsigned int numValues,
+  bool vertical_first)
 {
   vtkPVXMLElement* changeXML = vtkPVXMLElement::New();
   changeXML->SetName("StateChange");
@@ -392,7 +394,8 @@ void vtkSMComparativeAnimationCueProxy::UpdateWholeRange(
 
   this->Internals->CommandQueue.clear();
   vtkInternals::vtkCueCommand cmd;
-  cmd.Type = vtkInternals::TRANGE;
+  cmd.Type = vertical_first? vtkInternals::TRANGE_VERTICAL_FIRST :
+    vtkInternals::TRANGE;
   cmd.SetValues(mint, maxt, numValues);
   
   this->Internals->CommandQueue.push_back(cmd);
@@ -475,7 +478,7 @@ double* vtkSMComparativeAnimationCueProxy::GetValues(
       break;
       
     case vtkInternals::XRANGE:
-      if (y == iter->AnchorY)
+      if (y == iter->AnchorY || iter->AnchorY == -1)
         {
         for (unsigned int cc=0; cc < count; cc++)
           {
@@ -488,7 +491,7 @@ double* vtkSMComparativeAnimationCueProxy::GetValues(
       break;
 
     case vtkInternals::YRANGE:
-      if (x == iter->AnchorX)
+      if (x == iter->AnchorX || iter->AnchorX == -1)
         {
         for (unsigned int cc=0; cc < count; cc++)
           {
@@ -506,6 +509,19 @@ double* vtkSMComparativeAnimationCueProxy::GetValues(
           {
           this->Values[cc] = (dx*dy> 1)?
             iter->MinValues[cc] + (y*dx + x) * (iter->MaxValues[cc] -
+              iter->MinValues[cc]) / (dx*dy - 1) :
+            iter->MinValues[cc];
+          }
+        numValues = count;
+        }
+      break;
+
+    case vtkInternals::TRANGE_VERTICAL_FIRST:
+        {
+        for (unsigned int cc=0; cc < count; cc++)
+          {
+          this->Values[cc] = (dx*dy> 1)?
+            iter->MinValues[cc] + (x*dy + y) * (iter->MaxValues[cc] -
               iter->MinValues[cc]) / (dx*dy - 1) :
             iter->MinValues[cc];
           }

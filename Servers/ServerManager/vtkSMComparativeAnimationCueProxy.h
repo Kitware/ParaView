@@ -54,7 +54,12 @@ public:
   // set to -1, otherwise UpdateAnimatedValue() will raise an error. 
   void UpdateXRange(int y, double *minx, double* maxx, unsigned int numvalues);
   void UpdateYRange(int x, double *minx, double* maxx, unsigned int numvalues);
-  void UpdateWholeRange(double *mint, double *maxt, unsigned int numValues);
+  void UpdateWholeRange(double *mint, double *maxt, unsigned int numValues)
+    {
+    this->UpdateWholeRange(mint, maxt, numValues, false);
+    }
+  void UpdateWholeRange(double *mint, double *maxt, unsigned int numValues,
+    bool vertical_first);
   void UpdateValue(int x, int y, double *value, unsigned int numValues);
  
   // Description:

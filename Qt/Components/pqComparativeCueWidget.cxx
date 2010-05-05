@@ -253,6 +253,7 @@ void pqComparativeCueWidget::editRange()
   ui.setupUi(&dialog);
   bool csv = this->acceptsMultipleValues();
   ui.multivalueHint->setVisible(csv);
+  ui.mode->setVisible(ranges[0].rowCount() > 1 && ranges[0].columnCount() > 1);
 
   QRegExp floatNum = QRegExp("[-+]?[0-9]*\\.?[0-9]+([eE][-+]?[0-9]+)?");
   QRegExp csvFloatNum = QRegExp(QString("%1(,%1)*").arg(floatNum.pattern()));
@@ -266,6 +267,8 @@ void pqComparativeCueWidget::editRange()
     return;
     }
 
+  int parameter_change_mode = ui.mode->currentIndex();
+  enum { HORZ_FIRST, VERT_FIRST, HORZ_ONLY, VERT_ONLY };
 
   vtkstd::vector<double> minvalues = ::getValues(ui.minValue->text());
   vtkstd::vector<double> maxvalues = ::getValues(ui.maxValue->text());
@@ -297,24 +300,69 @@ void pqComparativeCueWidget::editRange()
   else if (range.columnCount() == this->size().width() &&
     range.rowCount() == this->size().height())
     {
-    // user set a t-range.
-    this->cue()->UpdateWholeRange(&minvalues[0], &maxvalues[0], numvalues);
+    // full range was covered.
+    switch (parameter_change_mode)
+      {
+    case HORZ_FIRST:
+      // user set a t-range.
+      this->cue()->UpdateWholeRange(&minvalues[0], &maxvalues[0], numvalues);
+      break;
+
+    case VERT_FIRST:
+      this->cue()->UpdateWholeRange(&minvalues[0], &maxvalues[0], numvalues,
+        true);
+      break;
+
+    case HORZ_ONLY:
+      this->cue()->UpdateXRange(-1, &minvalues[0], &maxvalues[0], numvalues);
+      break;
+
+    case VERT_ONLY:
+      this->cue()->UpdateYRange(-1, &minvalues[0], &maxvalues[0], numvalues);
+      break;
+
+    default:
+      qCritical("Invalid selection");
+      }
     }
   else
     {
     // cannot formulate user chose as a range. Set individual values.
     int count = range.rowCount() * range.columnCount() -1;
-
+    vtkstd::vector<double> newvalues;
+    newvalues.resize(minvalues.size(), 0.0);
     for (int xx=range.leftColumn(); xx <= range.rightColumn(); xx++)
       {
       for (int yy=range.topRow(); yy <= range.bottomRow(); yy++)
         {
         for (unsigned int cc=0; cc < numvalues; cc++)
           {
-          minvalues[cc] = minvalues[cc] + (yy * range.columnCount() + xx) * 
-            (maxvalues[cc] - minvalues[cc]) / count;
+          double scale_factor = 1.0;
+          switch (parameter_change_mode)
+            {
+          case HORZ_FIRST:
+            scale_factor = (yy * range.columnCount() + xx) * 1.0/count;
+            break;
+
+          case VERT_FIRST:
+            scale_factor = (xx * range.rowCount() + yy) * 1.0/count;
+            break;
+
+          case HORZ_ONLY:
+            Q_ASSERT(range.columnCount() > 1);
+            scale_factor = xx * 1.0 / (range.columnCount()-1);
+            break;
+
+          case VERT_ONLY:
+            Q_ASSERT(range.rowCount() > 1);
+            scale_factor = yy * 1.0 / (range.rowCount()-1);
+            break;
+          default:
+            qCritical("Invalid selection");
+            }
+          newvalues[cc] = minvalues[cc] + scale_factor * (maxvalues[cc] - minvalues[cc]);
           }
-        this->cue()->UpdateValue(xx, yy, &minvalues[0], numvalues);
+        this->cue()->UpdateValue(xx, yy, &newvalues[0], numvalues);
         }
       }
     }
