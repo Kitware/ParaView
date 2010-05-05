@@ -46,6 +46,14 @@ public:
   vtkGetVector3Macro(Scale, double);
  
 
+  vtkSetVector6Macro(CustomBounds, double);
+  vtkGetVector6Macro(CustomBounds, double);
+
+  vtkSetVector3Macro(CustomBoundsActive, int);
+  vtkGetVector3Macro(CustomBoundsActive, int);
+
+
+
  // Description:
   // Set cube axes visibility. This flag is considered only if
   // this->GetVisibility() == true, otherwise, cube axes is not shown.
@@ -92,6 +100,9 @@ protected:
   vtkSMProxy* Property;
   vtkSMRepresentationStrategy* Strategy;
   double Position[3], Scale[3], Orientation[3];
+  double CustomBounds[6];
+  int CustomBoundsActive[3];
+
 private:
   vtkSMPrismCubeAxesRepresentationProxy(const vtkSMPrismCubeAxesRepresentationProxy&); // Not implemented
   void operator=(const vtkSMPrismCubeAxesRepresentationProxy&); // Not implemented
