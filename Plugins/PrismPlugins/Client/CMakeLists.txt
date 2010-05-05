@@ -41,6 +41,7 @@ QT4_WRAP_CPP(MOC_SRCS PrismToolBarActions.h PrismCore.h PrismMenuActions.h Prism
 
 QT4_WRAP_UI(UI_BUILT_SOURCES
     Resources/UI/PrismSurfacePanelWidget.ui
+    Resources/UI/PrismDisplayProxyEditor.ui
     Resources/UI/PrismPanelWidget.ui)
 
 SET(UI_RESOURCES
