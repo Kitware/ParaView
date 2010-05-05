@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -59,7 +59,7 @@ public:
     vtkSmartPointer<vtkPVXMLElement> configuration =
       vtkSmartPointer<vtkPVXMLElement>::New();
     configuration->SetName("ManualStartup");
-    
+
     // Setup a builtin server as a hard-coded default ...
     Startups["builtin"] = new pqManualServerStartup(
       "builtin",
@@ -67,7 +67,7 @@ public:
       "builtin",
       configuration);
   }
-  
+
   ~pqImplementation()
   {
     for(
@@ -78,7 +78,7 @@ public:
       delete startup->second;
       }
   }
-  
+
   void deleteStartup(const QString& startup)
   {
     if(this->Startups.count(startup))
@@ -87,7 +87,7 @@ public:
     this->Startups.erase(startup);
     }
   }
-  
+
   static vtkSmartPointer<vtkPVXMLElement> save(const QString& name, pqServerStartup& startup)
   {
     vtkSmartPointer<vtkPVXMLElement> xml_server =
@@ -99,14 +99,14 @@ public:
     xml_server->AddNestedElement(startup.getConfiguration());
     return xml_server;
   }
-  
+
   pqServerStartup* load(vtkPVXMLElement* xml_server, bool userPrefs)
   {
     const QString name = xml_server->GetAttribute("name");
-  
+
     const pqServerResource server =
       pqServerResource(xml_server->GetAttribute("resource"));
-      
+
     int num = xml_server->GetNumberOfNestedElements();
     for (int i=0; i<num; i++)
       {
@@ -137,7 +137,7 @@ static QString userSettings()
 #if defined(Q_OS_WIN)
   settingsRoot = QString::fromLocal8Bit(getenv("APPDATA"));
 #else
-  settingsRoot = QString::fromLocal8Bit(getenv("HOME")) + 
+  settingsRoot = QString::fromLocal8Bit(getenv("HOME")) +
                  QDir::separator() + QString::fromLocal8Bit(".config");
 #endif
   QString settingsPath = QString("%2%1%3%1%4");
@@ -208,7 +208,7 @@ const pqServerStartups::StartupsT pqServerStartups::getStartups() const
     {
     results.push_back(startup->first);
     }
-    
+
   return results;
 }
 
@@ -226,7 +226,7 @@ const pqServerStartups::StartupsT pqServerStartups::getStartups(const pqServerRe
       results.push_back(startup->first);
       }
     }
-    
+
   return results;
 }
 
@@ -244,7 +244,7 @@ void pqServerStartups::setManualStartup(
   vtkSmartPointer<vtkPVXMLElement> configuration =
     vtkSmartPointer<vtkPVXMLElement>::New();
   configuration->SetName("ManualStartup");
-  
+
   this->Implementation->deleteStartup(name);
   this->Implementation->Startups.insert(
     vtkstd::make_pair(name, new pqManualServerStartup(name, server, true, configuration)));
@@ -262,7 +262,7 @@ void pqServerStartups::setCommandStartup(
   vtkSmartPointer<vtkPVXMLElement> configuration =
     vtkSmartPointer<vtkPVXMLElement>::New();
   configuration->SetName("CommandStartup");
-  
+
   vtkSmartPointer<vtkPVXMLElement> xml_command =
     vtkSmartPointer<vtkPVXMLElement>::New();
   xml_command->SetName("Command");
@@ -271,9 +271,9 @@ void pqServerStartups::setCommandStartup(
   xml_command->AddAttribute("exec", executable.toAscii().data());
   xml_command->AddAttribute("timeout", timeout);
   xml_command->AddAttribute("delay", delay);
-  
+
   xml_command->AddAttribute("Arguments", delay);
-  
+
   vtkSmartPointer<vtkPVXMLElement> xml_arguments =
     vtkSmartPointer<vtkPVXMLElement>::New();
   xml_arguments->SetName("Arguments");
@@ -303,7 +303,7 @@ void pqServerStartups::deleteStartups(const StartupsT& startups)
     {
     this->Implementation->deleteStartup(*startup);
     }
-    
+
   emit this->changed();
 }
 
@@ -321,7 +321,7 @@ void pqServerStartups::save(vtkPVXMLElement* xml, bool userPrefs) const
     {
     const QString startup_name = startup->first;
     pqServerStartup* const startup_command = startup->second;
-    if (userPrefs && startup_command->shouldSave())
+    if ( (userPrefs && startup_command->shouldSave()) || !userPrefs)
       {
       xml_servers->AddNestedElement(pqImplementation::save(startup_name, *startup_command));
       }
@@ -363,7 +363,7 @@ void pqServerStartups::load(vtkPVXMLElement* xml_servers, bool userPrefs)
     if(QString(xml_server->GetName()) == "Server")
       {
       const QString name = xml_server->GetAttribute("name");
-      if(pqServerStartup* const startup = 
+      if(pqServerStartup* const startup =
         this->Implementation->load(xml_server, userPrefs))
         {
         this->Implementation->deleteStartup(name);
