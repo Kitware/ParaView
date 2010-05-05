@@ -91,26 +91,29 @@
           proxygroup="props" proxyname="PrismCubeAxesActor"> 
         </Proxy>
         <ExposedProperties>
-          <Property name="CornerOffset" />
-          <Property name="FlyMode" />
-          <Property name="Inertia" />
-          <Property name="TickLocation" />
+          <Property name="CustomBounds"/>
+          <Property name="CustomBoundsActive"/>
+          <Property exposed_name="CubeAxesColor" name="Color" />
+          <Property exposed_name="CubeAxesCornerOffset" name="CornerOffset" />
+          <Property exposed_name="CubeAxesFlyMode" name="FlyMode" />
+          <Property exposed_name="CubeAxesInertia" name="Inertia" />
+          <Property exposed_name="CubeAxesTickLocation" name="TickLocation" />
+          <Property exposed_name="CubeAxesXAxisMinorTickVisibility" name="XAxisMinorTickVisibility" />
+          <Property exposed_name="CubeAxesXAxisTickVisibility" name="XAxisTickVisibility" />
+          <Property exposed_name="CubeAxesXAxisVisibility" name="XAxisVisibility" />
+          <Property exposed_name="CubeAxesXGridLines" name="XGridLines" />
+          <Property exposed_name="CubeAxesXTitle" name="XTitle" />
+          <Property exposed_name="CubeAxesYAxisMinorTickVisibility" name="YAxisMinorTickVisibility" />
+          <Property exposed_name="CubeAxesYAxisTickVisibility" name="YAxisTickVisibility" />
+          <Property exposed_name="CubeAxesYAxisVisibility" name="YAxisVisibility" />
+          <Property exposed_name="CubeAxesYGridLines" name="YGridLines" />
+          <Property exposed_name="CubeAxesYTitle" name="YTitle" />
+          <Property exposed_name="CubeAxesZAxisMinorTickVisibility" name="ZAxisMinorTickVisibility" />
+          <Property exposed_name="CubeAxesZAxisTickVisibility" name="ZAxisTickVisibility" />
+          <Property exposed_name="CubeAxesZAxisVisibility" name="ZAxisVisibility" />
+          <Property exposed_name="CubeAxesZGridLines" name="ZGridLines" />
+          <Property exposed_name="CubeAxesZTitle" name="ZTitle" />
           <Property name="Visibility" />
-          <Property name="XAxisMinorTickVisibility" />
-          <Property name="XAxisTickVisibility" />
-          <Property name="XAxisVisibility" />
-          <Property name="XGridLines" />
-          <Property name="XTitle" />
-          <Property name="YAxisMinorTickVisibility" />
-          <Property name="YAxisTickVisibility" />
-          <Property name="YAxisVisibility" />
-          <Property name="YGridLines" />
-          <Property name="YTitle" />
-          <Property name="ZAxisMinorTickVisibility" />
-          <Property name="ZAxisTickVisibility" />
-          <Property name="ZAxisVisibility" />
-          <Property name="ZGridLines" />
-          <Property name="ZTitle" />
         </ExposedProperties>
       </SubProxy>
 
