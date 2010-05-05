@@ -3,39 +3,106 @@
    Program: ParaView
    Module:    PrismDisplayProxyEditor.h
 
+   Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
+   All rights reserved.
+
+   ParaView is a free software; you can redistribute it and/or modify it
+   under the terms of the ParaView license version 1.2.
+
+   See License_v1.2.txt for the full ParaView license.
+   A copy of this license can be obtained by contacting
+   Kitware Inc.
+   28 Corporate Drive
+   Clifton Park, NY 12065
+   USA
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE AUTHORS OR
+CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
 =========================================================================*/
 #ifndef _PrismDisplayProxyEditor_h
 #define _PrismDisplayProxyEditor_h
 
 #include <QWidget>
+#include <QList>
 #include <QVariant>
-#include "pqDisplayPanelInterface.h"
-#include "pqPipelineRepresentation.h"
-#include "vtkSMProxy.h"
-#include "pqDisplayProxyEditor.h"
+#include "pqDisplayPanel.h"
 #include "vtkSMPrismCubeAxesRepresentationProxy.h"
 
-
-
+class PrismDisplayProxyEditorInternal;
+class pqPipelineRepresentation;
 
 /// Widget which provides an editor for the properties of a display.
-class  PrismDisplayProxyEditor : public pqDisplayProxyEditor
+class PrismDisplayProxyEditor : public pqDisplayPanel
 {
   Q_OBJECT
-  
+
+  // property adaptor for specular lighting
+  Q_PROPERTY(QVariant specularColor READ specularColor
+                                    WRITE setSpecularColor)
 public:
   /// constructor
   PrismDisplayProxyEditor(pqPipelineRepresentation* display, QWidget* p = NULL);
   /// destructor
   ~PrismDisplayProxyEditor();
-  protected slots:
-      virtual void editCubeAxes();
-      virtual void cubeAxesVisibilityChanged();
+
+  /// TODO: get rid of this function once the server manager can
+  /// inform us of display property changes
+  void reloadGUI();
+
+  /// When set to true (default) scalar coloring will result in disabling of the
+  /// specular GUI.
+  void setDisableSpecularOnScalarColoring(bool flag)
+    { this->DisableSpecularOnScalarColoring = flag; }
+
+signals:
+  void specularColorChanged();
+
+protected slots:
+  /// internally used to update the graphics window when a property changes
+  void openColorMapEditor();
+  void rescaleToDataRange();
+  void zoomToData();
+  void updateEnableState();
+  void updateMaterial(int idx);
+  virtual void editCubeAxes();
+  virtual void cubeAxesVisibilityChanged();
+  void sliceDirectionChanged();
+  void selectedMapperChanged();
+  void volumeBlockSelected();
+  void setSolidColor(const QColor& color);
+  void setBackfaceSolidColor(const QColor& color);
+  void setAutoAdjustSampleDistances(bool flag);
 
 protected:
   vtkSMPrismCubeAxesRepresentationProxy* CubeAxesActor;
-  QPointer<pqPipelineRepresentation> Representation;
+
+  /// Set the display whose properties we want to edit.
+  virtual void setRepresentation(pqPipelineRepresentation* display);
+  void updateSelectionLabelModes();
+
+  PrismDisplayProxyEditorInternal* Internal;
+  void setupGUIConnections();
+
+  QVariant specularColor() const;
+  void setSpecularColor(QVariant);
+
+  bool isCubeAxesVisible();
   pqServer* getActiveServer() const;
+
+
+  bool DisableSpecularOnScalarColoring;
+private:
+  bool DisableSlots;
 };
 
 #endif
