@@ -351,9 +351,16 @@ int pqPlotSettingsModel::getSeriesStyle(int row) const
 }
 
 //-----------------------------------------------------------------------------
-void pqPlotSettingsModel::setSeriesAxisCorner(int, int)
+void pqPlotSettingsModel::setSeriesAxisCorner(int row, int value)
 {
-
+  if (row >= 0 && row < this->rowCount(QModelIndex()))
+    {
+    vtkSMPropertyHelper(this->Implementation->RepresentationProxy,
+      "SeriesPlotCorner").SetStatus(
+      this->getSeriesName(row), value);
+    this->Implementation->RepresentationProxy->UpdateVTKObjects();
+    emit this->redrawChart();
+    }
 }
 
 //-----------------------------------------------------------------------------

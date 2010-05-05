@@ -2641,15 +2641,15 @@
       <DoubleVectorProperty
         name="Bounds"
         command="SetBounds"
-        number_of_elements="6"            
-        information_property="BoundsInfo" 
+        number_of_elements="6"
+        information_property="BoundsInfo"
         default_values="0 1 0 1 0 1">
       </DoubleVectorProperty>
-      
-      <DoubleVectorProperty 
+
+      <DoubleVectorProperty
         name="BoundsInfo"
         command="GetBounds"
-        number_of_elements="6"        
+        number_of_elements="6"
         information_only="1"
         default_values="0 1 0 1 0 1">
       </DoubleVectorProperty>
@@ -2842,7 +2842,7 @@
           Specify if grid lines are drawn parallel to Z axis.
         </Documentation>
       </IntVectorProperty>
-      
+
       <IntVectorProperty name="TickLocation"
         command="SetTickLocation"
         number_of_elements="1"
@@ -8121,7 +8121,7 @@
           <Property exposed_name="CubeAxesXAxisTickVisibility" name="XAxisTickVisibility" />
           <Property exposed_name="CubeAxesXAxisVisibility" name="XAxisVisibility" />
           <Property exposed_name="CubeAxesXGridLines" name="XGridLines" />
-          <Property exposed_name="CubeAxesXTitle" name="XTitle" />                              
+          <Property exposed_name="CubeAxesXTitle" name="XTitle" />
           <Property exposed_name="CubeAxesYAxisMinorTickVisibility" name="YAxisMinorTickVisibility" />
           <Property exposed_name="CubeAxesYAxisTickVisibility" name="YAxisTickVisibility" />
           <Property exposed_name="CubeAxesYAxisVisibility" name="YAxisVisibility" />
@@ -8424,7 +8424,7 @@
           <Property name="SelectionPointSize" />
           <Property name="SelectionRepresentation" />
 
-          <!-- Inherit Cube-Axes properties -->  
+          <!-- Inherit Cube-Axes properties -->
           <Property name="CustomBounds"/>
           <Property name="CustomBoundsActive"/>
           <Property name="CubeAxesColor"/>
@@ -8853,6 +8853,7 @@
           <Property name="LineStyle" exposed_name="SeriesLineStyle" />
           <Property name="Label" exposed_name="SeriesLabel" />
           <Property name="MarkerStyle" exposed_name="SeriesMarkerStyle" />
+          <Property name="PlotCorner" exposed_name="SeriesPlotCorner" />
 
           <Property name="VisibilityInfo" exposed_name="SeriesVisibilityInfo" />
           <Property name="ColorInfo" exposed_name="SeriesColorInfo" />
@@ -8860,6 +8861,7 @@
           <Property name="LineStyleInfo" exposed_name="SeriesLineStyleInfo" />
           <Property name="LabelInfo" exposed_name="SeriesLabelInfo" />
           <Property name="MarkerStyleInfo" exposed_name="SeriesMarkerStyleInfo" />
+          <Property name="PlotCornerInfo" exposed_name="SeriesPlotCornerInfo" />
         </ExposedProperties>
       </SubProxy>
 
@@ -9910,7 +9912,7 @@
           <Property name="Bold" exposed_name="PointLabelBold" />
           <Property name="Italic" exposed_name="PointLabelItalic" />
           <Property name="Shadow" exposed_name="PointLabelShadow" />
-          <Property name="Justification" exposed_name="PointLabelJustification" 
+          <Property name="Justification" exposed_name="PointLabelJustification"
                     default_values="1" />
           <Property name="FontSize" exposed_name="PointLabelFontSize" />
         </ExposedProperties>
@@ -9943,7 +9945,7 @@
           proxygroup="properties" proxyname="TextProperty">
         </Proxy>
         <ExposedProperties>
-          <Property name="Color" exposed_name="CellLabelColor" 
+          <Property name="Color" exposed_name="CellLabelColor"
                     default_values="0.0 1.0 0.0" />
           <Property name="Opacity" exposed_name="CellLabelOpacity" />
           <Property name="FontFamily" exposed_name="CellLabelFontFamily" />
@@ -10044,23 +10046,23 @@
         animateable="1">
         <DoubleRangeDomain name="range" />
       </DoubleVectorProperty>
-      
+
       <DoubleVectorProperty
         name="CustomBounds"
         command="SetCustomBounds"
-        number_of_elements="6"  
+        number_of_elements="6"
         default_values="0 1 0 1 0 1"
         update_self="1">
-      </DoubleVectorProperty>   
-      
+      </DoubleVectorProperty>
+
       <IntVectorProperty
         name="CustomBoundsActive"
         command="SetCustomBoundsActive"
         number_of_elements="3"
         default_values="0 0 0"
-        update_self="1">        
+        update_self="1">
       </IntVectorProperty>
-      
+
       <SubProxy>
         <SourceProxy name="OutlineFilter" class="vtkPVGeometryFilter">
           <!--
@@ -10406,8 +10408,8 @@
           proxygroup="props" proxyname="CubeAxesActor">
         </Proxy>
         <ExposedProperties>
-<!--          <Property exposed_name="CubeAxesColor" name="Color" /> -->   
-          <Property exposed_name="CubeBounds" name="Bounds" />              
+<!--          <Property exposed_name="CubeAxesColor" name="Color" /> -->
+          <Property exposed_name="CubeBounds" name="Bounds" />
           <Property exposed_name="CubeAxesCornerOffset" name="CornerOffset" />
           <Property exposed_name="CubeAxesFlyMode" name="FlyMode" />
           <Property exposed_name="CubeAxesInertia" name="Inertia" />
@@ -10572,6 +10574,28 @@
         information_property="MarkerStyleInfo">
         <Documentation>
           Set the series marker style.
+        </Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="PlotCornerInfo"
+        number_of_elements_per_command="2"
+        repeat_command="1"
+        information_only="1">
+        <Documentation>
+          Property which has the current state of marker style for the series
+          available currently.
+        </Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="PlotCorner"
+        command="SetAxisCorner"
+        update_self="1"
+        number_of_elements_per_command="2"
+        element_types="2 0"
+        repeat_command="1"
+        information_property="PlotCornerInfo">
+        <Documentation>
+          Set the series axis corner.
         </Documentation>
       </StringVectorProperty>
       <!-- End of PlotOptionsBase -->
