@@ -17,7 +17,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkStringList.h"
 #include "vtkSMStringVectorProperty.h"
-#include "vtkChart.h"
+#include "vtkChartXY.h"
 #include "vtkPlot.h"
 #include "vtkPlotLine.h"
 #include "vtkAxis.h"
@@ -45,6 +45,7 @@ public:
   int LineStyle;
   int MarkerStyle;
   int Visible;
+  int Corner;
   double Color[3];
 
   PlotInfo()
@@ -54,6 +55,7 @@ public:
     LineStyle = 1;
     MarkerStyle = 0;
     Visible = 1;
+    Corner = 0;
     Color[0] = Color[1] = Color[2] = 0;
     }
 
@@ -471,9 +473,18 @@ void vtkSMContextNamedOptionsProxy::SetColor(const char* name,
 }
 
 //----------------------------------------------------------------------------
-void vtkSMContextNamedOptionsProxy::SetAxisCorner(const char*, int)
+void vtkSMContextNamedOptionsProxy::SetAxisCorner(const char* name, int value)
 {
-
+  PlotInfo& plotInfo = this->GetPlotInfo(name);
+  plotInfo.Corner = value;
+  if (plotInfo.Plot && this->Internals->Chart)
+    {
+    vtkChartXY *chart = vtkChartXY::SafeDownCast(this->Internals->Chart);
+    if (chart)
+      {
+      chart->SetPlotCorner(plotInfo.Plot, value);
+      }
+    }
 }
 
 //----------------------------------------------------------------------------

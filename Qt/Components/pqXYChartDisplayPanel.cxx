@@ -399,9 +399,20 @@ void pqXYChartDisplayPanel::setCurrentSeriesMarkerStyle(int style)
 }
 
 //-----------------------------------------------------------------------------
-void pqXYChartDisplayPanel::setCurrentSeriesAxes(int)
+void pqXYChartDisplayPanel::setCurrentSeriesAxes(int value)
 {
-
+  QItemSelectionModel *model = this->Internal->SeriesList->selectionModel();
+  if (model)
+    {
+    this->Internal->InChange = true;
+    QModelIndexList indexes = model->selectedIndexes();
+    QModelIndexList::Iterator iter = indexes.begin();
+    for( ; iter != indexes.end(); ++iter)
+      {
+      this->Internal->SettingsModel->setSeriesAxisCorner(iter->row(), value);
+      }
+    this->Internal->InChange = false;
+    }
 }
 
 //-----------------------------------------------------------------------------

@@ -8812,6 +8812,7 @@
           <Property name="LineStyle" exposed_name="SeriesLineStyle" />
           <Property name="Label" exposed_name="SeriesLabel" />
           <Property name="MarkerStyle" exposed_name="SeriesMarkerStyle" />
+          <Property name="PlotCorner" exposed_name="SeriesPlotCorner" />
 
           <Property name="VisibilityInfo" exposed_name="SeriesVisibilityInfo" />
           <Property name="ColorInfo" exposed_name="SeriesColorInfo" />
@@ -8819,6 +8820,7 @@
           <Property name="LineStyleInfo" exposed_name="SeriesLineStyleInfo" />
           <Property name="LabelInfo" exposed_name="SeriesLabelInfo" />
           <Property name="MarkerStyleInfo" exposed_name="SeriesMarkerStyleInfo" />
+          <Property name="PlotCornerInfo" exposed_name="SeriesPlotCornerInfo" />
         </ExposedProperties>
       </SubProxy>
 
@@ -10336,6 +10338,28 @@
         information_property="MarkerStyleInfo">
         <Documentation>
           Set the series marker style.
+        </Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="PlotCornerInfo"
+        number_of_elements_per_command="2"
+        repeat_command="1"
+        information_only="1">
+        <Documentation>
+          Property which has the current state of marker style for the series
+          available currently.
+        </Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="PlotCorner"
+        command="SetAxisCorner"
+        update_self="1"
+        number_of_elements_per_command="2"
+        element_types="2 0"
+        repeat_command="1"
+        information_property="PlotCornerInfo">
+        <Documentation>
+          Set the series axis corner.
         </Documentation>
       </StringVectorProperty>
       <!-- End of PlotOptionsBase -->
