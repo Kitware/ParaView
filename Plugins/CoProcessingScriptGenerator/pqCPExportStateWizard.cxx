@@ -35,13 +35,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QPointer>
 #include <QtDebug>
 
-#include "pqPipelineFilter.h"
-#include "pqPipelineSource.h"
-#include "pqApplicationCore.h"
-#include "pqServerManagerModel.h"
-#include "pqPythonDialog.h"
-#include "pqPythonManager.h"
-#include "pqFileDialog.h"
+#include <pqApplicationCore.h>
+#include <pqFileDialog.h>
+#include <pqPipelineFilter.h>
+#include <pqPipelineSource.h>
+#include <pqPythonDialog.h>
+#include <pqPythonManager.h>
+#include <pqRenderView.h>
+#include <pqServerManagerModel.h>
 
 #include <vtkPVXMLElement.h>
 #include <vtkSMProxyManager.h>
@@ -179,6 +180,12 @@ pqCPExportStateWizard::pqCPExportStateWizard(
   QObject::connect(this->Internals->outputRendering, SIGNAL(toggled(bool)),
                    this->Internals->imageWriteFrequencyLabel, SLOT(setVisible(bool)));
  
+  pqServerManagerModel* smModel = pqApplicationCore::instance()->getServerManagerModel();
+  int numberOfViews = smModel->getNumberOfItems<pqRenderView*>();
+  if(numberOfViews > 1)
+    {
+    this->Internals->imageFileName->setText("image_%v_%t.png");
+    }
   QObject::connect(this->Internals->imageType, SIGNAL(currentIndexChanged(const QString&)),
                    this, SLOT(updateImageFileName(const QString&)));
 }
@@ -285,7 +292,7 @@ bool pqCPExportStateWizard::validateCurrentPage()
     if(!haveSomeWriters)
       {
       QMessageBox messageBox;
-      QString message(tr("No output writers specified. Either add writers in the pipeline or uncheck <b>Ignore rendering components</b>."));
+      QString message(tr("No output writers specified. Either add writers in the pipeline or check <b>Output rendering components</b>."));
       messageBox.setText(message);
       messageBox.exec();
       return false;
@@ -309,7 +316,6 @@ bool pqCPExportStateWizard::validateCurrentPage()
     {
     image_file_name = this->Internals->imageFileName->text();
     image_write_frequency = this->Internals->imageWriteFrequency->value();
-
     }
 
   QString filters ="ParaView Python State Files (*.py);;All files (*)";
@@ -349,7 +355,6 @@ bool pqCPExportStateWizard::validateCurrentPage()
     }
   // remove last ","
   sim_inputs_map.chop(1);
-
   
   QString command =
     QString(cp_export_py).arg(export_rendering).arg(sim_inputs_map).arg(image_file_name).arg(image_write_frequency).arg(filename);

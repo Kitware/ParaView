@@ -154,7 +154,13 @@ def DoCoProcessing(datadescription):
             writer.FileName = writer.cpFileName.replace("%%t", str(timestep))
             writer.UpdatePipeline()
 
-%s
+    if timestep %% %s == 0:
+        renderviews = servermanager.GetRenderViews()
+        imagefilename = "%s"
+        for view in range(len(renderviews)):
+            fname = imagefilename.replace("%%v", str(view))
+            fname = fname.replace("%%t", str(timestep))
+            WriteImage(fname, renderviews[view])
 
 def CreateProducer(datadescription, gridname):
   "Creates a producer proxy for the grid"
@@ -202,16 +208,9 @@ for sim_input in write_frequencies:
     condition_str = "(timestep % " + " == 0) or (timestep % ".join(map(str, freqs)) + " == 0)"
     request_data_description += timestep_expression % (sim_input, condition_str)
 
-image_writers = ""
-for writer in view_proxies:
-    image_writers += '    if timestep % ' + str(image_write_frequency) +' == 0:\n'
-    image_writers += '        Show()\n'
-    image_writers += '        fname = "' + image_file_name + '"\n'
-    image_writers += '        fname = fname.replace("%t", str(timestep))\n'
-    image_writers += '        WriteImage(fname)\n'
 
 fileName = "%5"
 outFile = open(fileName, 'w')
-outFile.write(output_contents % (request_data_description, do_coprocessing, image_writers))
+outFile.write(output_contents % (request_data_description, do_coprocessing, image_write_frequency, image_file_name))
 outFile.close()
 
