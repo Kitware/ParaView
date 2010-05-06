@@ -50,13 +50,15 @@ protected slots:
   void updateAddRemoveButton();
   void onAdd();
   void onRemove();
-  void updateImageFileName(const QString&);
+  void updateImageFileName();
+  void updateImageFileNameExtension(const QString&);
 
 private:
   Q_DISABLE_COPY(pqCPExportStateWizard)
 
   class pqInternals;
   pqInternals* Internals;
+  unsigned int NumberOfViews;
   friend class pqCPExportStateWizardPage2;
   friend class pqCPExportStateWizardPage3;
 };

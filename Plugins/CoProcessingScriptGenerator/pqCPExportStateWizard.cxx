@@ -31,9 +31,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqCPExportStateWizard.h"
 #include <QMessageBox>
-#include <QWizardPage>
 #include <QPointer>
-#include <QtDebug>
+#include <QRegExp>
+#include <QRegExpValidator>
+#include <QWizardPage>
 
 #include <pqApplicationCore.h>
 #include <pqFileDialog.h>
@@ -115,7 +116,6 @@ bool pqCPExportStateWizardPage2::isComplete() const
   return this->Internals->simulationInputs->count() > 0;
 }
 
-
 //-----------------------------------------------------------------------------
 void pqCPExportStateWizardPage3::initializePage()
 {
@@ -130,7 +130,6 @@ void pqCPExportStateWizardPage3::initializePage()
     this->Internals->nameWidget->setItem(cc, 1, new QTableWidgetItem(text));
     QTableWidgetItem* tableItem = this->Internals->nameWidget->item(cc, 1);
     tableItem->setFlags(tableItem->flags()|Qt::ItemIsEditable);
-
 
     tableItem = this->Internals->nameWidget->item(cc, 0);
     tableItem->setFlags(tableItem->flags() & ~Qt::ItemIsEditable);
@@ -165,7 +164,6 @@ pqCPExportStateWizard::pqCPExportStateWizard(
   QObject::connect(this->Internals->removeButton, SIGNAL(clicked()),
     this, SLOT(onRemove()));
 
-
   QObject::connect(this->Internals->outputRendering, SIGNAL(toggled(bool)),
                    this->Internals->imageType, SLOT(setVisible(bool)));
   QObject::connect(this->Internals->outputRendering, SIGNAL(toggled(bool)),
@@ -181,13 +179,18 @@ pqCPExportStateWizard::pqCPExportStateWizard(
                    this->Internals->imageWriteFrequencyLabel, SLOT(setVisible(bool)));
  
   pqServerManagerModel* smModel = pqApplicationCore::instance()->getServerManagerModel();
-  int numberOfViews = smModel->getNumberOfItems<pqRenderView*>();
-  if(numberOfViews > 1)
+  this->NumberOfViews = smModel->getNumberOfItems<pqRenderView*>();
+  if(this->NumberOfViews > 1)
     {
     this->Internals->imageFileName->setText("image_%v_%t.png");
     }
-  QObject::connect(this->Internals->imageType, SIGNAL(currentIndexChanged(const QString&)),
-                   this, SLOT(updateImageFileName(const QString&)));
+  QObject::connect(
+    this->Internals->imageFileName, SIGNAL(editingFinished()),
+    this, SLOT(updateImageFileName()));
+
+  QObject::connect(
+    this->Internals->imageType, SIGNAL(currentIndexChanged(const QString&)),
+    this, SLOT(updateImageFileNameExtension(const QString&)));
 }
 
 //-----------------------------------------------------------------------------
@@ -215,7 +218,8 @@ void pqCPExportStateWizard::onAdd()
     delete this->Internals->allInputs->takeItem(
       this->Internals->allInputs->row(item));
     }
-  dynamic_cast<pqCPExportStateWizardPage2*>(this->currentPage())->emitCompleteChanged();
+  dynamic_cast<pqCPExportStateWizardPage2*>(
+    this->currentPage())->emitCompleteChanged();
 }
 
 //-----------------------------------------------------------------------------
@@ -232,7 +236,43 @@ void pqCPExportStateWizard::onRemove()
 }
 
 //-----------------------------------------------------------------------------
-void pqCPExportStateWizard::updateImageFileName(const QString& fileExtension)
+void pqCPExportStateWizard::updateImageFileName()
+{
+  QString fileName = this->Internals->imageFileName->displayText();
+  if(fileName.isNull() || fileName.isEmpty())
+    {
+    fileName = "image";
+    }
+  QRegExp regExp("\\.(png|bmp|ppm|tif|tiff|jpg|jpeg)$");
+  if(fileName.contains(regExp) == 0)
+    {
+    fileName.append(".");
+    fileName.append(this->Internals->imageType->currentText());
+    }
+  else
+    {  // update imageType if it is different
+    int extensionIndex = fileName.lastIndexOf(".");
+    QString extension = fileName.right(fileName.size()-extensionIndex-1);
+    int index = this->Internals->imageType->findText(extension);
+    this->Internals->imageType->setCurrentIndex(index);
+    fileName = this->Internals->imageFileName->displayText();
+    }
+
+  if(this->NumberOfViews > 1 && fileName.contains("%v") == 0)
+    {
+    fileName.insert(fileName.lastIndexOf("."), "_%v");
+    }
+  if(fileName.contains("%t") == 0)
+    {
+    fileName.insert(fileName.lastIndexOf("."), "_%t");
+    }
+
+  this->Internals->imageFileName->setText(fileName);
+}
+
+//-----------------------------------------------------------------------------
+void pqCPExportStateWizard::updateImageFileNameExtension(
+  const QString& fileExtension)
 {
   QString displayText = this->Internals->imageFileName->text();
   vtkstd::string newFileName = vtksys::SystemTools::GetFilenameWithoutExtension(
@@ -266,7 +306,8 @@ bool pqCPExportStateWizard::validateCurrentPage()
     // check to make sure that there is a writer hooked up since we aren't
     // exporting an image
     vtkSMProxyManager* proxyManager = vtkSMProxyManager::GetProxyManager();
-    pqServerManagerModel* smModel = pqApplicationCore::instance()->getServerManagerModel();
+    pqServerManagerModel* smModel = 
+      pqApplicationCore::instance()->getServerManagerModel();
     bool haveSomeWriters = false;
     QStringList filtersWithoutConsumers;
     for(unsigned int i=0;i<proxyManager->GetNumberOfProxies("sources");i++)
