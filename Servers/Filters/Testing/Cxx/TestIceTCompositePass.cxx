@@ -27,6 +27,7 @@
 #include "vtkCamera.h"
 #include "vtkCameraPass.h"
 #include "vtkClearZPass.h"
+#include "vtkClientServerCompositePass.h"
 #include "vtkCompositeRenderManager.h"
 #include "vtkDataSetReader.h"
 #include "vtkDataSetSurfaceFilter.h"
@@ -51,7 +52,7 @@
 #include "vtkRenderWindowInteractor.h"
 #include "vtkSequencePass.h"
 #include "vtkSmartPointer.h"
-#include "vtkSmartPointer.h"
+#include "vtkSocketController.h"
 #include "vtkSphereSource.h"
 #include "vtkSynchronizedRenderers.h"
 #include "vtkSynchronizedRenderWindows.h"
@@ -59,6 +60,7 @@
 #include "vtkTranslucentPass.h"
 #include "vtkUnstructuredGrid.h"
 #include "vtkVolumetricPass.h"
+
 /*
 ** This test only builds if MPI is in use
 */
@@ -83,6 +85,8 @@ public:
   vtkSetMacro(ImageReductionFactor, int);
   vtkSetMacro(UseOrderedCompositing, int);
   vtkSetMacro(UseDepthPeeling, int);
+  vtkSetMacro(ServerMode, bool);
+  vtkSetObjectMacro(SocketController, vtkMultiProcessController);
 
   void SetArgs(int anArgc, char *anArgv[]);
 
@@ -96,12 +100,15 @@ private:
 
 protected:
   MyProcess();
+  ~MyProcess();
 
+  vtkMultiProcessController* SocketController;
   int Argc;
   char **Argv;
 
   int ImageReductionFactor;
   int TileDimensions[2];
+  bool ServerMode;
 };
 
 vtkCxxRevisionMacro(MyProcess, "$Revision$");
@@ -116,6 +123,14 @@ MyProcess::MyProcess()
   this->TileDimensions[0] = this->TileDimensions[1];
   this->UseOrderedCompositing = 0;
   this->UseDepthPeeling = 0;
+  this->ServerMode = false;
+  this->SocketController = 0;
+}
+
+//-----------------------------------------------------------------------------
+MyProcess::~MyProcess()
+{
+  this->SetSocketController(0);
 }
 
 //-----------------------------------------------------------------------------
@@ -217,7 +232,21 @@ void MyProcess::SetupRenderPasses(vtkRenderer* renderer)
   iceTPass->SetTileDimensions(this->TileDimensions);
   iceTPass->SetImageReductionFactor(this->ImageReductionFactor);
 
-  cameraP->SetDelegatePass(iceTPass);
+  if (this->ServerMode && this->Controller->GetLocalProcessId() == 0)
+    {
+    vtkClientServerCompositePass* csPass = vtkClientServerCompositePass::New();
+    csPass->SetRenderPass(iceTPass);
+    csPass->SetProcessIsServer(true);
+    csPass->ServerSideRenderingOn();
+    csPass->SetController(this->SocketController);
+    cameraP->SetDelegatePass(csPass);
+    csPass->Delete();
+    }
+  else
+    {
+    cameraP->SetDelegatePass(iceTPass);
+    }
+
   cameraP->SetAspectRatioOverride(
     (double)this->TileDimensions[0] / this->TileDimensions[1]);
 
@@ -276,9 +305,28 @@ void MyProcess::Execute()
     vtkRenderWindowInteractor* iren = vtkRenderWindowInteractor::New();
     iren->SetRenderWindow(renWin);
     renWin->SwapBuffersOn();
-    renWin->Render();
 
-    iren->Start();
+    if (this->ServerMode)
+      {
+      vtkSynchronizedRenderWindows* syncWindows2 =
+        vtkSynchronizedRenderWindows::New();
+      syncWindows2->SetRenderWindow(renWin);
+      syncWindows2->SetParallelController(this->SocketController);
+      syncWindows2->SetIdentifier(2);
+      syncWindows2->SetRootProcessId(1);
+
+      vtkSynchronizedRenderers* syncRenderers2 = vtkSynchronizedRenderers::New();
+      syncRenderers2->SetRenderer(renderer);
+      syncRenderers2->SetParallelController(this->SocketController);
+      syncRenderers2->SetRootProcessId(1);
+
+      this->SocketController->ProcessRMIs();
+      }
+    else
+      {
+      renWin->Render();
+      iren->Start();
+      }
     iren->Delete();
 
     this->Controller->TriggerBreakRMIs();
@@ -312,6 +360,7 @@ int main(int argc, char **argv)
   int image_reduction_factor = 1;
   int use_ordered_compositing = 0;
   int use_depth_peeling = 0;
+  int act_as_server = 0;
 
   vtksys::CommandLineArguments args;
   args.Initialize(argc, argv);
@@ -333,6 +382,11 @@ int main(int argc, char **argv)
     vtksys::CommandLineArguments::NO_ARGUMENT,
     &use_depth_peeling, "Use depth peeling."
     "This works only when --use-ordered-compositing is true.");
+  args.AddArgument("--server",
+    vtksys::CommandLineArguments::NO_ARGUMENT,
+    &act_as_server,
+    "When present, the root process acts as a server process for a client.");
+
   if (!args.Parse())
     {
     if (contr->GetLocalProcessId() == 0)
@@ -367,6 +421,18 @@ int main(int argc, char **argv)
   p->SetImageReductionFactor(image_reduction_factor);
   p->SetUseOrderedCompositing(use_ordered_compositing);
   p->SetUseDepthPeeling(use_depth_peeling);
+  p->SetServerMode(act_as_server != 0);
+
+  if (contr->GetLocalProcessId() == 0 && act_as_server)
+    {
+    vtkSmartPointer<vtkSocketController> socket_contr =
+      vtkSmartPointer<vtkSocketController>::New();
+    socket_contr->Initialize(&argc, &argv);
+    cout << "Waiting for client on 11111" << endl;
+    socket_contr->WaitForConnection(11111);
+    p->SetSocketController(socket_contr);
+    }
+
   contr->SetSingleProcessObject(p);
   contr->SingleMethodExecute();
 
