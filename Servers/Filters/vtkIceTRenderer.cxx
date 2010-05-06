@@ -175,6 +175,11 @@ void vtkIceTRenderer::GetTiledSizeAndOrigin(int *width, int *height,
     *lowerLeftY = (int)(viewport[1]+0.5);
     *width = (int)(viewport[2]+0.5) - *lowerLeftX;
     *height = (int)(viewport[3]+0.5) - *lowerLeftY;
+
+    cout << *width << ", "
+         << *height << ", "
+         << *lowerLeftX << ", "
+         << *lowerLeftY << endl;
     }
 }
 

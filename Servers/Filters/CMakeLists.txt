@@ -167,6 +167,7 @@ SET(Filters_SRCS
   vtkSquirtCompressor.cxx
   vtkZlibImageCompressor.cxx
   vtkSurfaceVectors.cxx
+  vtkTilesHelper.cxx
   vtkTableFFT.cxx
   vtkTableStreamer.cxx
 #  vtkTemporalCacheFilter.cxx
@@ -251,6 +252,7 @@ IF (PARAVIEW_USE_ICE_T)
       vtkIceTContext.cxx
       vtkIceTRenderManager.cxx
       vtkIceTRenderer.cxx
+      vtkIceTCompositePass.cxx
       )
   ENDIF(VTK_USE_MPI)
 ENDIF (PARAVIEW_USE_ICE_T)

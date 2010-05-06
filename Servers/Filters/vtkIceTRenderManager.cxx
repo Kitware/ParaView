@@ -301,6 +301,12 @@ void vtkIceTRenderManager::UpdateIceTContext()
                       visibleViewport[3]-visibleViewport[1],
                       this->TileRanks[x][y]);
 
+                      cout << " " << visibleViewport[0]
+                      << " " << visibleViewport[1]
+                      << " " << visibleViewport[2]-visibleViewport[0]
+                      << " " << visibleViewport[3]-visibleViewport[1]
+                      << " " << this->TileRanks[x][y] << endl;
+
           if (this->TileRanks[x][y] == this->Controller->GetLocalProcessId())
             {
             icetRen->SetPhysicalViewport(visibleViewport[0] - tileViewport[0],
