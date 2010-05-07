@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -121,7 +121,7 @@ void pqCPWritersMenuManager::createMenu()
 
   QByteArray dat = xmlFile.readAll();
   xmlFile.close();
-  vtkSmartPointer<vtkPVXMLParser> parser = 
+  vtkSmartPointer<vtkPVXMLParser> parser =
     vtkSmartPointer<vtkPVXMLParser>::New();
   if (!parser->Parse(dat.data()))
     {
@@ -193,7 +193,7 @@ void pqCPWritersMenuManager::updateEnableState()
     {
     item = *iter;
     pqPipelineSource* source = qobject_cast<pqPipelineSource *>(item);
-    pqOutputPort* port = source? source->getOutputPort(0) : 
+    pqOutputPort* port = source? source->getOutputPort(0) :
       qobject_cast<pqOutputPort*>(item);
     if (port)
       {
@@ -240,7 +240,7 @@ void pqCPWritersMenuManager::updateEnableState()
       continue;
       }
 
-    vtkSMInputProperty *input = ::getInputProperty(output); 
+    vtkSMInputProperty *input = ::getInputProperty(output);
     if (input)
       {
       if (!input->GetMultipleInput() && selItems->size() > 1)
@@ -288,10 +288,10 @@ void pqCPWritersMenuManager::createWriter(const QString& xmlgroup,
   const QString& xmlname)
 {
   pqApplicationCore* core = pqApplicationCore::instance();
-  pqObjectBuilder* builder = core->getObjectBuilder();  
+  pqObjectBuilder* builder = core->getObjectBuilder();
 
   vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
-  vtkSMProxy* prototype = 
+  vtkSMProxy* prototype =
     pxm->GetPrototypeProxy(xmlgroup.toAscii().data(), xmlname.toAscii().data());
   if (!prototype)
     {
@@ -319,13 +319,13 @@ void pqCPWritersMenuManager::createWriter(const QString& xmlgroup,
       selectedOutputPorts.push_back(source->getOutputPort(0));
       }
     }
-  
+
   QList<const char*> inputPortNames = pqPipelineFilter::getInputPorts(prototype);
   namedInputs[inputPortNames[0]] = selectedOutputPorts;
 
   pqApplicationCore::instance()->getUndoStack()->beginUndoSet(
     QString("Create '%1'").arg(xmlname));
-  pqPipelineSource* filter = builder->createFilter(xmlgroup, xmlname, 
+  pqPipelineSource* filter = builder->createFilter(xmlgroup, xmlname,
     namedInputs, selectedOutputPorts[0]->getServer());
   (void)filter;
   pqApplicationCore::instance()->getUndoStack()->endUndoSet();
