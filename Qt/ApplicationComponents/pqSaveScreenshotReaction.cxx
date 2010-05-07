@@ -33,9 +33,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqActiveObjects.h"
 #include "pqCoreUtilities.h"
-#include "pqPVApplicationCore.h"
 #include "pqFileDialog.h"
 #include "pqImageUtil.h"
+#include "pqPVApplicationCore.h"
+#include "pqRenderViewBase.h"
 #include "pqSaveSnapshotDialog.h"
 #include "pqSettings.h"
 #include "pqView.h"
@@ -148,6 +149,12 @@ void pqSaveScreenshotReaction::saveScreenshot()
     core->loadPalette(palette);
     }
 
+  int stereo = ssDialog.getStereoMode();
+  if (stereo)
+    {
+    pqRenderViewBase::setStereo(stereo);
+    }
+
   pqSaveScreenshotReaction::saveScreenshot(file,
     size, ssDialog.quality(), ssDialog.saveAllViews());
 
@@ -155,6 +162,12 @@ void pqSaveScreenshotReaction::saveScreenshot()
   if (!palette.isEmpty())
     {
     core->loadPalette(currentPalette);
+    }
+
+  if (stereo)
+    {
+    pqRenderViewBase::setStereo(0);
+    core->render();
     }
 }
 
