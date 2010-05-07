@@ -36,7 +36,7 @@ def cp_locate_simulation_inputs(proxy):
         for cur in cur_si:
             if not cur in simulation_inputs:
                 simulation_inputs.append(cur)
-    return simulation_inputs 
+    return simulation_inputs
 
 
 def cp_locate_simulation_inputs_for_view(view_proxy):
@@ -117,7 +117,7 @@ smtrace.append_trace()
 # Stop trace and print it to the console
 smtrace.stop_trace()
 
- 
+
 for view_proxy in view_proxies:
     # Locate which simulation input this write is connected to, if any. If so,
     # we update the write_frequencies datastructure accordingly.
@@ -196,7 +196,7 @@ timestep_expression = """
 do_coprocessing = ""
 for original_line in smtrace.trace_globals.trace_output:
     for line in original_line.split("\n"):
-        do_coprocessing += "    " + line + "\n"; 
+        do_coprocessing += "    " + line + "\n";
 
 request_data_description = ""
 for sim_input in write_frequencies:

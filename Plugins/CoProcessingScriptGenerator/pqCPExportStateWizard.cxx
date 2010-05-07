@@ -177,7 +177,7 @@ pqCPExportStateWizard::pqCPExportStateWizard(
                    this->Internals->imageFileNameLabel, SLOT(setVisible(bool)));
   QObject::connect(this->Internals->outputRendering, SIGNAL(toggled(bool)),
                    this->Internals->imageWriteFrequencyLabel, SLOT(setVisible(bool)));
- 
+
   pqServerManagerModel* smModel = pqApplicationCore::instance()->getServerManagerModel();
   this->NumberOfViews = smModel->getNumberOfItems<pqRenderView*>();
   if(this->NumberOfViews > 1)
@@ -277,7 +277,7 @@ void pqCPExportStateWizard::updateImageFileNameExtension(
   QString displayText = this->Internals->imageFileName->text();
   vtkstd::string newFileName = vtksys::SystemTools::GetFilenameWithoutExtension(
     displayText.toLocal8Bit().constData());
-  
+
   newFileName.append(".");
   newFileName.append(fileExtension.toLocal8Bit().constData());
   this->Internals->imageFileName->setText(QString::fromStdString(newFileName));
@@ -306,7 +306,7 @@ bool pqCPExportStateWizard::validateCurrentPage()
     // check to make sure that there is a writer hooked up since we aren't
     // exporting an image
     vtkSMProxyManager* proxyManager = vtkSMProxyManager::GetProxyManager();
-    pqServerManagerModel* smModel = 
+    pqServerManagerModel* smModel =
       pqApplicationCore::instance()->getServerManagerModel();
     bool haveSomeWriters = false;
     QStringList filtersWithoutConsumers;
@@ -396,7 +396,7 @@ bool pqCPExportStateWizard::validateCurrentPage()
     }
   // remove last ","
   sim_inputs_map.chop(1);
-  
+
   QString command =
     QString(cp_export_py).arg(export_rendering).arg(sim_inputs_map).arg(image_file_name).arg(image_write_frequency).arg(filename);
 
