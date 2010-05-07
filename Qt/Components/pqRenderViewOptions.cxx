@@ -313,8 +313,8 @@ void pqRenderViewOptions::connectGUI()
     this->selectSolidColor(true);
     }
 
-  this->restoreDefaultGradientColor1();
-  this->restoreDefaultGradientColor2();
+//  this->restoreDefaultGradientColor1();
+//  this->restoreDefaultGradientColor2();
 
   this->resetAnnotation();
 
@@ -428,6 +428,6 @@ void pqRenderViewOptions::restoreDefaultGradientColor2()
   if (this->Internal->RenderView)
     {
     this->Internal->gradientColor2->setChosenColor(QColor(0, 0, 44));
+    emit this->changesAvailable();
     }
-  emit this->changesAvailable();
 }
