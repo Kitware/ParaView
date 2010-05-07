@@ -37,11 +37,12 @@ VTK_MAKE_INSTANTIATOR3(vtk${KIT}Instantiator PrismInstantiator_SRCS
 
 
 
-QT4_WRAP_CPP(MOC_SRCS PrismToolBarActions.h PrismCore.h PrismMenuActions.h PrismDisplayProxyEditor.h PrismDisplayPanelsImplementation.h PrismObjectPanelsImplementation.h PrismSurfacePanel.h PrismPanel.h )
+QT4_WRAP_CPP(MOC_SRCS PrismToolBarActions.h PrismCore.h PrismMenuActions.h PrismDisplayProxyEditor.h PrismDisplayPanelsImplementation.h PrismObjectPanelsImplementation.h PrismSurfacePanel.h PrismPanel.h PrismCubeAxesEditorDialog.h )
 
 QT4_WRAP_UI(UI_BUILT_SOURCES
     Resources/UI/PrismSurfacePanelWidget.ui
     Resources/UI/PrismDisplayProxyEditor.ui
+    Resources/UI/PrismCubeAxesEditorDialog.ui
     Resources/UI/PrismPanelWidget.ui)
 
 SET(UI_RESOURCES
@@ -76,6 +77,7 @@ ADD_PARAVIEW_PLUGIN(PrismClientPlugin "1.1"
                     PrismCore.cxx 
                     PrismMenuActions.cxx 
                     PrismDisplayProxyEditor.cxx 
+                    PrismCubeAxesEditorDialog.cxx
                     PrismDisplayPanelsImplementation.cxx 
                     PrismObjectPanelsImplementation.cxx 
                     PrismSurfacePanel.cxx  

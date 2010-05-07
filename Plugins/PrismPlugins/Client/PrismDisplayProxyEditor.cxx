@@ -70,7 +70,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationCore.h"
 #include "pqColorScaleEditor.h"
 #include "pqCoreUtilities.h"
-#include "pqCubeAxesEditorDialog.h"
 #include "pqFileDialog.h"
 #include "pqOutputPort.h"
 #include "pqPipelineRepresentation.h"
@@ -84,6 +83,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqUndoStack.h"
 #include "pqWidgetRangeDomain.h"
 #include "pqObjectBuilder.h"
+#include "PrismCubeAxesEditorDialog.h"
 
 class PrismDisplayProxyEditorInternal : public Ui::PrismDisplayProxyEditor
 {
@@ -1081,7 +1081,7 @@ void PrismDisplayProxyEditor::cubeAxesVisibilityChanged()
 //-----------------------------------------------------------------------------
 void PrismDisplayProxyEditor::editCubeAxes()
 {
-  pqCubeAxesEditorDialog dialog(this);
+  PrismCubeAxesEditorDialog dialog(this);
   dialog.setRepresentationProxy(this->CubeAxesActor);
   dialog.exec();
 
