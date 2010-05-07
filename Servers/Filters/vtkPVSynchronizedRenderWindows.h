@@ -27,6 +27,7 @@
 #define __vtkPVSynchronizedRenderWindows_h
 
 #include "vtkObject.h"
+#include "vtkSmartPointer.h"
 
 class VTK_EXPORT vtkPVSynchronizedRenderWindows : public vtkObject
 {
@@ -99,11 +100,11 @@ protected:
   vtkPVSynchronizedRenderWindows();
   ~vtkPVSynchronizedRenderWindows();
 
-  vtkSynchronizedRenderWindows* SyncWindowsP;
-  vtkSynchronizedRenderers* SyncRenderersP;
+  vtkSmartPointer<vtkSynchronizedRenderWindows> SyncWindowsP;
+  vtkSmartPointer<vtkSynchronizedRenderers> SyncRenderersP;
 
-  vtkSynchronizedRenderWindows* SyncWindowsCS;
-  vtkSynchronizedRenderers* SyncRenderersCS;
+  vtkSmartPointer<vtkSynchronizedRenderWindows> SyncWindowsCS;
+  vtkSmartPointer<vtkSynchronizedRenderers> SyncRenderersCS;
 
   unsigned int Identifier;
   vtkRenderWindow* RenderWindow;

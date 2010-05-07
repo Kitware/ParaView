@@ -21,30 +21,46 @@ vtkCxxRevisionMacro(vtkPVSynchronizedRenderWindows, "$Revision$");
 //----------------------------------------------------------------------------
 vtkPVSynchronizedRenderWindows::vtkPVSynchronizedRenderWindows()
 {
-  this->SyncRenderersP = vtkSynchronizedRenderers::New();
-  this->SyncRenderersCS = vtkSynchronizedRenderers::New();
-
-  this->SyncWindowsP = vtkSynchronizedRenderWindows::New();
-  this->SyncWindowsCS = vtkSynchronizedRenderWindows::New();
-
-  // this class handles the render event propagation part.
-  this->SyncWindowsP->SetRenderEventPropagation(false);
-  this->SyncWindowsCS->SetRenderEventPropagation(false);
+  this->Identifier = 0;
+  this->ImageReductionFactor = 1;
+  this->RenderWindow = NULL;
+  this->RemoteRendering = true;
+  this->RenderEventPropagation = true;
 
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   vtkSocketController cs_controller =
     pm->GetActiveRenderServerSocketController();
 
   vtkMultiProcessController mpi_controller = vtkMultiProcessController::GetGlobalController();
-
-  if (!cs_controller)
+  if (cs_controller)
     {
-    this->SyncWindowsCS->ParallelRenderingOff();
+    bool is_server = pm->GetOptions()->GetServerMode() != 0;
+
+    this->SyncWindowsCS = vtkSmartPointer<vtkSynchronizedRenderWindows>::New();
+    this->SyncWindowsCS->SetParallelController(cs_controller);
+    this->SyncWindowsCS->SetRootProcessId(is_server? 1 : 0);
+
+    this->SyncRenderersCS = vtkSmartPointer<vtkSynchronizedRenderers>::New();
+    this->SyncRenderersCS->SetParallelController(cs_controller);
+    this->SyncRenderersCS->SetRootProcessId(is_server? 1 : 0);
     }
 
-  if (!mpi_controller || mpi_controller->GetNumberOfProcesses() == 1)
+  if (mpi_controller && mpi_controller->GetNumberOfProcesses() > 1)
     {
-    this->SyncWindowsP->ParallelRenderingOff();
+    // this is never true on client.
+
+    this->SyncWindowsP = vtkSmartPointer<vtkSynchronizedRenderWindows>::New();
+    this->SyncWindowsP->SetParallelController(mpi_controller);
+
+    this->SyncRenderersP = vtkSmartPointer<vtkSynchronizedRenderers>::New();
+    this->SyncRenderersP->SetParallelController(mpi_controller);
+
+    if (this->SyncWindowsCS)
+      {
+      // FIXME: If we are in client-server mode, then we don't need to write back
+      // images unless in tile-display or cave-rendering mode.
+      this->SyncRenderersP->WriteBackImagesOff();
+      }
     }
 }
 
@@ -52,26 +68,49 @@ vtkPVSynchronizedRenderWindows::vtkPVSynchronizedRenderWindows()
 vtkPVSynchronizedRenderWindows::~vtkPVSynchronizedRenderWindows()
 {
   this->SetRenderWindow(0);
-
-  this->SyncRenderersP->Delete();
-  this->SyncWindowsP->Delete();
-
-  this->SyncRenderersCS->Delete();
-  this->SyncWindowsCS->Delete();
 }
 
 //----------------------------------------------------------------------------
 void vtkPVSynchronizedRenderWindows::SetRenderWindow(vtkRenderWindow* window)
 {
   vtkSetObjectBodyMacro(RenderWindow, vtkRenderWindow, renWin);
-  this->SyncWindowsCS->SetRenderWindow(renWin);
-  this->SyncWindowsP->SetRenderWindow(renWin);
+  if (this->SyncWindowsCS)
+    {
+    this->SyncWindowsCS->SetRenderWindow(renWin);
+    }
+  if (this->SyncWindowsP)
+    {
+    this->SyncWindowsP->SetRenderWindow(renWin);
+    }
 }
 
 //----------------------------------------------------------------------------
 void vtkPVSynchronizedRenderWindows::SetIdentifier(unsigned int id)
 {
   this->Identifier = id;
+  if (this->SyncWindowsCS)
+    {
+    this->SyncWindowsCS->SetIdentifier(renWin);
+    }
+
+  if (this->SyncWindowsP)
+    {
+    this->SyncWindowsP->SetIdentifier(renWin);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVSynchronizedRenderWindows::AddSynchronizedRenderer(vtkRenderer* ren)
+{
+  if (this->SyncRenderersCS)
+    {
+    this->SyncRenderersCS->SetRenderer(ren);
+    }
+
+  if (this->SyncRenderersP)
+    {
+    this->SyncRenderersP->SetRenderer(ren);
+    }
 }
 
 //----------------------------------------------------------------------------
