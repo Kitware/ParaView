@@ -241,8 +241,8 @@ void pqXYChartDisplayPanel::changeDialog(pqRepresentation* disp)
   this->Internal->StyleListLabel->setVisible(visible);
   this->Internal->MarkerStyleList->setVisible(visible);
   this->Internal->MarkerStyleListLabel->setVisible(visible);
-  this->Internal->AxisList->setVisible(visible);
-  this->Internal->AxisListLabel->setVisible(visible);
+  this->Internal->AxisList->setVisible(false);
+  this->Internal->AxisListLabel->setVisible(false);
 }
 
 //-----------------------------------------------------------------------------
