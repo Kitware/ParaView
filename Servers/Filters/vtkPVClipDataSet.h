@@ -35,6 +35,12 @@ protected:
   vtkPVClipDataSet(vtkImplicitFunction *cf=NULL);
   ~vtkPVClipDataSet();
 
+  virtual int RequestData(vtkInformation*,
+                          vtkInformationVector**, vtkInformationVector* );
+
+  virtual int FillInputPortInformation(int, vtkInformation* info);
+
+
 private:
   vtkPVClipDataSet(const vtkPVClipDataSet&);  // Not implemented.
   void operator=(const vtkPVClipDataSet&);  // Not implemented.
