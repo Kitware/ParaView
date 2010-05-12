@@ -1109,17 +1109,17 @@ int vtkPrismSurfaceReader::RequestData(
         scaleBounds[5] - scaleBounds[4]
     };
 
-    if(delta[0]<=1e-8)
+    if(delta[0]<=1e-6)
     {
-      delta[0]=1e-8;
+      delta[0]=100;
     }
-    if(delta[1]<=1e-8)
+    if(delta[1]<=1e-6)
     {
-      delta[1]=1e-8;
+      delta[1]=100;
     }
-    if(delta[2]<=1e-8)
+    if(delta[2]<=1e-6)
     {
-      delta[2]=1e-8;
+      delta[2]=100;
     }
 
     this->AspectScale[0]=100/delta[0];
