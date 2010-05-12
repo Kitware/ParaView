@@ -107,6 +107,7 @@ SET(Filters_SRCS
   vtkPVClipClosedSurface.cxx
   vtkPVClipDataSet.cxx
   vtkPVConnectivityFilter.cxx
+  vtkPVContourFilter.cxx
   vtkPVDesktopDeliveryClient.cxx
   vtkPVDesktopDeliveryServer.cxx
   vtkPVDReader.cxx
