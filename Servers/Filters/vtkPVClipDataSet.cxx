@@ -25,6 +25,8 @@
 #include "vtkSmartPointer.h"
 #include "vtkUnstructuredGrid.h"
 
+#include "vtkInformationStringVectorKey.h"
+
 vtkStandardNewMacro(vtkPVClipDataSet);
 
 //----------------------------------------------------------------------------
@@ -178,10 +180,13 @@ int vtkPVClipDataSet::RequestData(vtkInformation* request,
   return Superclass::RequestData(request, inputVector, outputVector);
 }
 
-
-int vtkPVClipDataSet::FillInputPortInformation(int vtkNotUsed(port),
+//----------------------------------------------------------------------------
+int vtkPVClipDataSet::FillInputPortInformation(int port,
                                                vtkInformation * info)
 {
-  info->Set( vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkDataObject" );
+  this->Superclass::FillInputPortInformation(port, info);
+  vtkInformationStringVectorKey::SafeDownCast(info->GetKey(
+    vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE()))->Append(
+    info, "vtkHierarchicalBoxDataSet");
   return 1;
 }

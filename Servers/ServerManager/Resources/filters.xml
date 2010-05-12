@@ -4672,7 +4672,6 @@ The Clip filter cuts away a portion of the input data set using an implicit plan
           </ProxyGroupDomain>
           <DataTypeDomain name="input_type">
             <DataType value="vtkDataSet"/>
-            <DataType value="vtkCompositeDataSet"/>
           </DataTypeDomain>
           <InputArrayDomain name="input_array"
                             number_of_components="1" optional="1"/>
