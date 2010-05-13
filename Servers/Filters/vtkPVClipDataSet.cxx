@@ -87,28 +87,24 @@ int vtkPVClipDataSet::RequestData(vtkInformation* request,
     // If using scalars for clipping this should be NULL.
     if(!this->GetClipFunction())
       {
-      vtkSmartPointer<vtkAMRDualClip> amrDC =
-        vtkSmartPointer<vtkAMRDualClip>::New();
-      amrDC->SetIsoValue(this->GetValue());
-
       // This is a lot to go through to get the name of the array to process.
       vtkInformationVector *inArrayVec =
         this->GetInformation()->Get(INPUT_ARRAYS_TO_PROCESS());
       if (!inArrayVec)
         {
         vtkErrorMacro("Problem finding array to process");
-        return 0;
+        return 1;
         }
       vtkInformation *inArrayInfo = inArrayVec->GetInformationObject(0);
       if (!inArrayInfo)
         {
         vtkErrorMacro("Problem getting name of array to process.");
-        return 0;
+        return 1;
         }
       if ( ! inArrayInfo->Has(vtkDataObject::FIELD_NAME()))
         {
         vtkErrorMacro("Missing field name.");
-        return 0;
+        return 1;
         }
       const char *arrayNameToProcess =
         inArrayInfo->Get(vtkDataObject::FIELD_NAME());
@@ -116,9 +112,11 @@ int vtkPVClipDataSet::RequestData(vtkInformation* request,
       if(!arrayNameToProcess)
         {
         vtkErrorMacro("Unable to find valid array.");
-        return 0;
+        return 1;
         }
 
+      vtkSmartPointer<vtkAMRDualClip> amrDC =
+        vtkSmartPointer<vtkAMRDualClip>::New();
       amrDC->SetIsoValue(this->GetValue());
 
       // These default are safe to consider. Currently using GUI element just
@@ -162,7 +160,7 @@ int vtkPVClipDataSet::RequestData(vtkInformation* request,
       if(!append->GetOutput(0))
         {
         vtkErrorMacro("Unable to generate valid output.");
-        return 0;
+        return 1;
         }
 
       vtkUnstructuredGrid::SafeDownCast(outDataObj)->ShallowCopy(
@@ -173,7 +171,7 @@ int vtkPVClipDataSet::RequestData(vtkInformation* request,
     else
       {
       vtkErrorMacro("This algorithm allows clipping using scalars only.");
-      return 0;
+      return 1;
       }
     }
 
