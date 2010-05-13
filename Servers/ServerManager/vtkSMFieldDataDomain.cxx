@@ -46,7 +46,7 @@ vtkSMFieldDataDomain::~vtkSMFieldDataDomain()
 int vtkSMFieldDataDomain::CheckForArray(
   vtkSMSourceProxy* sp,
   int outputport,
-  vtkPVDataSetAttributesInformation* info, 
+  vtkPVDataSetAttributesInformation* info,
   vtkSMInputArrayDomain* iad)
 {
   int num = info->GetNumberOfArrays();
@@ -61,7 +61,7 @@ int vtkSMFieldDataDomain::CheckForArray(
 }
 
 //---------------------------------------------------------------------------
-void vtkSMFieldDataDomain::Update(vtkSMSourceProxy* sp, 
+void vtkSMFieldDataDomain::Update(vtkSMSourceProxy* sp,
                                   vtkSMInputArrayDomain* iad,
                                   int outputport)
 {
@@ -75,9 +75,11 @@ void vtkSMFieldDataDomain::Update(vtkSMSourceProxy* sp,
     }
 
   bool has_pd = 0 !=
-    this->CheckForArray(sp, outputport, info->GetPointDataInformation(), iad);
+    (info->GetNumberOfPoints() > 0 ||
+    this->CheckForArray(sp, outputport, info->GetPointDataInformation(), iad) );
   bool has_cd = 0 !=
-    this->CheckForArray(sp, outputport, info->GetCellDataInformation(), iad);
+    (info->GetNumberOfCells() > 0 ||
+    this->CheckForArray(sp, outputport, info->GetCellDataInformation(), iad) );
   bool has_vd = 0 !=
     this->CheckForArray(sp, outputport, info->GetVertexDataInformation(), iad);
   bool has_ed = 0 !=
@@ -144,7 +146,7 @@ void vtkSMFieldDataDomain::Update(vtkSMSourceProxy* sp,
 }
 
 //---------------------------------------------------------------------------
-void vtkSMFieldDataDomain::Update(vtkSMProxyProperty* pp, 
+void vtkSMFieldDataDomain::Update(vtkSMProxyProperty* pp,
                                   vtkSMSourceProxy* sp,
                                   int outputport)
 {
@@ -185,11 +187,11 @@ void vtkSMFieldDataDomain::Update(vtkSMProperty*)
 
   for (i=0; i<numProxs; i++)
     {
-    vtkSMSourceProxy* sp = 
+    vtkSMSourceProxy* sp =
       vtkSMSourceProxy::SafeDownCast(pp->GetUncheckedProxy(i));
     if (sp)
       {
-      this->Update(pp, sp, 
+      this->Update(pp, sp,
         (ip? ip->GetUncheckedOutputPortForConnection(i):0));
       return;
       }
@@ -200,7 +202,7 @@ void vtkSMFieldDataDomain::Update(vtkSMProperty*)
   numProxs = pp->GetNumberOfProxies();
   for (i=0; i<numProxs; i++)
     {
-    vtkSMSourceProxy* sp = 
+    vtkSMSourceProxy* sp =
       vtkSMSourceProxy::SafeDownCast(pp->GetProxy(i));
     if (sp)
       {
