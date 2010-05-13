@@ -121,7 +121,7 @@ void vtkCSVWriterGetDataString(
 //-----------------------------------------------------------------------------
 VTK_TEMPLATE_SPECIALIZE
 void vtkCSVWriterGetDataString(
-  vtkArrayIteratorTemplate<vtkStdString>* iter, vtkIdType tupleIndex, 
+  vtkArrayIteratorTemplate<vtkStdString>* iter, vtkIdType tupleIndex,
   ofstream* stream, vtkCSVWriter* writer, bool* first)
 {
   int numComps = iter->GetNumberOfComponents();
@@ -151,7 +151,37 @@ void vtkCSVWriterGetDataString(
 //-----------------------------------------------------------------------------
 VTK_TEMPLATE_SPECIALIZE
 void vtkCSVWriterGetDataString(
-  vtkArrayIteratorTemplate<char>* iter, vtkIdType tupleIndex, 
+  vtkArrayIteratorTemplate<char>* iter, vtkIdType tupleIndex,
+  ofstream* stream, vtkCSVWriter* writer, bool* first)
+{
+  int numComps = iter->GetNumberOfComponents();
+  vtkIdType index = tupleIndex* numComps;
+  for (int cc=0; cc < numComps; cc++)
+    {
+    if ((index+cc) < iter->GetNumberOfValues())
+      {
+      if (*first == false)
+        {
+        (*stream) << writer->GetFieldDelimiter();
+        }
+      *first = false;
+      (*stream) << static_cast<int>( iter->GetValue(index+cc) );
+      }
+    else
+      {
+      if (*first == false)
+        {
+        (*stream) << writer->GetFieldDelimiter();
+        }
+      *first = false;
+      }
+    }
+}
+
+//-----------------------------------------------------------------------------
+VTK_TEMPLATE_SPECIALIZE
+void vtkCSVWriterGetDataString(
+  vtkArrayIteratorTemplate<unsigned char>* iter, vtkIdType tupleIndex,
   ofstream* stream, vtkCSVWriter* writer, bool* first)
 {
   int numComps = iter->GetNumberOfComponents();
@@ -185,7 +215,7 @@ vtkStdString vtkCSVWriter::GetString(vtkStdString string)
   if (this->UseStringDelimiter && this->StringDelimiter)
     {
     vtkStdString temp = this->StringDelimiter;
-    temp += string + this->StringDelimiter; 
+    temp += string + this->StringDelimiter;
     return temp;
     }
   return string;
@@ -269,11 +299,11 @@ void vtkCSVWriter::WriteTable(vtkTable* table)
 void vtkCSVWriter::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  os << indent << "FieldDelimiter: " << (this->FieldDelimiter ? 
+  os << indent << "FieldDelimiter: " << (this->FieldDelimiter ?
     this->FieldDelimiter : "(none)") << endl;
   os << indent << "StringDelimiter: " << (this->StringDelimiter ?
     this->StringDelimiter : "(none)") << endl;
   os << indent << "UseStringDelimiter: " << this->UseStringDelimiter << endl;
-  os << indent << "FileName: " << (this->FileName? this->FileName : "none") 
+  os << indent << "FileName: " << (this->FileName? this->FileName : "none")
     << endl;
 }
