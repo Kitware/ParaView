@@ -1,0 +1,40 @@
+<?xml version="1.0" ?>
+<pqevents>
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuSources" />
+  <pqevent object="pqClientMainWindow/menubar/menuSources" command="activate" arguments="RTAnalyticSource" />
+  <pqevent object="pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/objectInspector/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/representationToolbar/displayRepresentation/comboBox" command="set_string" arguments="Wireframe" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/0/MultiViewFrameMenu/SplitVerticalAction" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/1/1QWidget0/1QScrollArea0/qt_scrollarea_viewport/EmptyView/ConvertActionsFrame/1QPushButton2" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuFilters" />
+  <pqevent object="pqClientMainWindow/menubar/menuFilters/Alphabetical" command="activate" arguments="PlotAttributes" />
+  <pqevent object="pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/objectInspector/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/MultiViewSplitter:1/0/pqSpreadSheetContainer/pqSpreadSheetViewDecorator/Attribute" command="set_string" arguments="Cell Data" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/MultiViewSplitter:1/0/pqSpreadSheetContainer/pqSpreadSheetViewDecorator/Source" command="set_string" arguments="PlotData1" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/MultiViewSplitter:1/0/pqSpreadSheetContainer/1pqSpreadSheetViewWidget0" command="mousePress" arguments="1,1,0,39,22,/2:1" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/MultiViewSplitter:1/0/pqSpreadSheetContainer/1pqSpreadSheetViewWidget0" command="mouseRelease" arguments="1,0,0,39,22,/2:1" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/MultiViewSplitter:1/0/pqSpreadSheetContainer/1pqSpreadSheetViewWidget0" command="mousePress" arguments="1,1,0,44,7,/2:1" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/MultiViewSplitter:1/0/pqSpreadSheetContainer/1pqSpreadSheetViewWidget0" command="mouseMove" arguments="1,0,0,52,27,/11:1" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/MultiViewSplitter:1/0/pqSpreadSheetContainer/1pqSpreadSheetViewWidget0" command="mouseRelease" arguments="1,0,0,52,27,/11:1" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/MultiViewSplitter:1/0/pqSpreadSheetContainer/1pqSpreadSheetViewWidget0" command="keyEvent" arguments="6,16777248,33554432,,0,1" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/MultiViewSplitter:1/0/pqSpreadSheetContainer/1pqSpreadSheetViewWidget0" command="keyEvent" arguments="7,16777248,0,,0,1" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/MultiViewSplitter:1/0/pqSpreadSheetContainer/1pqSpreadSheetViewWidget0" command="mousePress" arguments="1,1,0,16,21,/0:0" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/MultiViewSplitter:1/0/pqSpreadSheetContainer/1pqSpreadSheetViewWidget0" command="mouseRelease" arguments="1,0,0,16,21,/0:0" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/MultiViewSplitter:1/0/pqSpreadSheetContainer/1pqSpreadSheetViewWidget0" command="keyEvent" arguments="6,16777248,33554432,,0,1" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/MultiViewSplitter:1/0/pqSpreadSheetContainer/1pqSpreadSheetViewWidget0" command="keyEvent" arguments="6,16777237,33554432,,0,1" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/MultiViewSplitter:1/0/pqSpreadSheetContainer/1pqSpreadSheetViewWidget0" command="keyEvent" arguments="7,16777237,33554432,,1,1" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/MultiViewSplitter:1/0/pqSpreadSheetContainer/1pqSpreadSheetViewWidget0" command="keyEvent" arguments="6,16777237,33554432,,1,1" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/MultiViewSplitter:1/0/pqSpreadSheetContainer/1pqSpreadSheetViewWidget0" command="keyEvent" arguments="7,16777237,33554432,,1,1" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/MultiViewSplitter:1/0/pqSpreadSheetContainer/1pqSpreadSheetViewWidget0" command="keyEvent" arguments="6,16777237,33554432,,1,1" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/MultiViewSplitter:1/0/pqSpreadSheetContainer/1pqSpreadSheetViewWidget0" command="keyEvent" arguments="7,16777237,33554432,,1,1" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/MultiViewSplitter:1/0/pqSpreadSheetContainer/1pqSpreadSheetViewWidget0" command="keyEvent" arguments="6,16777237,33554432,,1,1" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/MultiViewSplitter:1/0/pqSpreadSheetContainer/1pqSpreadSheetViewWidget0" command="keyEvent" arguments="7,16777237,33554432,,1,1" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/MultiViewSplitter:1/0/pqSpreadSheetContainer/1pqSpreadSheetViewWidget0" command="keyEvent" arguments="6,16777237,33554432,,1,1" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/MultiViewSplitter:1/0/pqSpreadSheetContainer/1pqSpreadSheetViewWidget0" command="keyEvent" arguments="7,16777237,33554432,,1,1" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/MultiViewSplitter:1/0/pqSpreadSheetContainer/1pqSpreadSheetViewWidget0" command="keyEvent" arguments="6,16777237,33554432,,1,1" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/MultiViewSplitter:1/0/pqSpreadSheetContainer/1pqSpreadSheetViewWidget0" command="keyEvent" arguments="7,16777237,33554432,,1,1" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/MultiViewSplitter:1/0/pqSpreadSheetContainer/1pqSpreadSheetViewWidget0" command="keyEvent" arguments="6,16777237,33554432,,1,1" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/MultiViewSplitter:1/0/pqSpreadSheetContainer/1pqSpreadSheetViewWidget0" command="keyEvent" arguments="7,16777237,33554432,,1,1" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/MultiViewSplitter:1/0/pqSpreadSheetContainer/1pqSpreadSheetViewWidget0" command="keyEvent" arguments="6,16777237,33554432,,1,1" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/MultiViewSplitter:1/0/pqSpreadSheetContainer/1pqSpreadSheetViewWidget0" command="keyEvent" arguments="7,16777248,0,,0,1" />
+</pqevents>

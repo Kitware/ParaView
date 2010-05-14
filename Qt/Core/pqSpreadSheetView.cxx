@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -86,8 +86,8 @@ public:
 
 //-----------------------------------------------------------------------------
 pqSpreadSheetView::pqSpreadSheetView(
- const QString& group, const QString& name, 
-    vtkSMViewProxy* viewModule, pqServer* server, 
+ const QString& group, const QString& name,
+    vtkSMViewProxy* viewModule, pqServer* server,
     QObject* _parent/*=NULL*/):
    pqView(spreadsheetViewType(), group, name, viewModule, server, _parent)
 {
@@ -105,16 +105,17 @@ pqSpreadSheetView::pqSpreadSheetView(
   QObject::connect(
     &this->Internal->SelectionModel, SIGNAL(selection(vtkSMSourceProxy*)),
     this, SLOT(onCreateSelection(vtkSMSourceProxy*)));
-  
+
   QObject::connect( &(this->Internal->Model), SIGNAL( selectionOnly(int) ),
     this, SLOT( onSelectionOnly(int) ) );
-  
+
   foreach(pqRepresentation* rep, this->getRepresentations())
     {
     this->onAddRepresentation(rep);
     }
 
   this->Internal->Container = new QWidget();
+  this->Internal->Container->setObjectName("pqSpreadSheetContainer");
   QVBoxLayout *layout = new QVBoxLayout(this->Internal->Container);
   layout->setSpacing(2);
   layout->setContentsMargins(0, 0, 0, 0);
@@ -153,7 +154,7 @@ void pqSpreadSheetView::onRemoveRepresentation(pqRepresentation* repr)
 void pqSpreadSheetView::updateRepresentationVisibility(
   pqRepresentation* repr, bool visible)
 {
-  if (!visible && repr && 
+  if (!visible && repr &&
     this->Internal->Model.getRepresentationProxy() == repr->getProxy())
     {
     this->Internal->Model.setRepresentation(0);
@@ -196,7 +197,7 @@ void pqSpreadSheetView::onBeginRender()
         repr->GetProperty("CompositeDataSetIndex")).toUInt();
 
       pqOutputPort* inputPort = repr->
-      vtkPVDataInformation* info = 
+      vtkPVDataInformation* info =
       repr->GetProperty("CompositeDataSetIndex")->ResetToDefault();
       */
       }
@@ -215,7 +216,7 @@ void pqSpreadSheetView::onEndRender()
 //-----------------------------------------------------------------------------
 bool pqSpreadSheetView::canDisplay(pqOutputPort* opPort) const
 {
-  return (opPort && opPort->getServer()->GetConnectionID() == 
+  return (opPort && opPort->getServer()->GetConnectionID() ==
     this->getServer()->GetConnectionID());
 }
 
@@ -249,7 +250,7 @@ void pqSpreadSheetView::onSelectionOnly(int selOnly)
     {
     // The user is disallowed to make further (embedded / recursive) selection
     // once checkbox "Show Only Selected Elements" is checked.
-    this->Internal->Table->setSelectionMode(QAbstractItemView::NoSelection); 
+    this->Internal->Table->setSelectionMode(QAbstractItemView::NoSelection);
     }
   else
     {

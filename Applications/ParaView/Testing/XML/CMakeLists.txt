@@ -53,6 +53,8 @@ SET (TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/SelectReader.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/SimpleInteraction.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/Slice.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/Spreadsheet1.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/Spreadsheet2.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/SPTimeseries.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/StreamTracerUpdates.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/TemporalInterpolator.xml
@@ -106,6 +108,8 @@ set (ColorEditor4_BREAK TRUE)
 set (ReadXMLPolyDataFileSeries_BREAK TRUE)
 set (ExodusXML_BREAK TRUE)
 SET (ComparativeVisPanel_BREAK TRUE)
+SET (Spreadsheet1_BREAK TRUE)
+SET (SPTimeseries_BREAK TRUE)
 
 
 # Add image threshold overrides for tests.
@@ -172,4 +176,3 @@ IF (PARAVIEW_DATA_ROOT)
 # TODO: remote rendering tests and reverse connect tests.
 
 ENDIF (PARAVIEW_DATA_ROOT)
-
