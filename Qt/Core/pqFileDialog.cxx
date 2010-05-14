@@ -47,6 +47,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QAbstractButton>
 #include <QComboBox>
 #include <QAbstractItemView>
+#include <QKeyEvent>
 
 #include <vtkstd/string>
 #include <vtksys/SystemTools.hxx>
@@ -158,6 +159,29 @@ public:
     delete this->Model;
   }
 
+  bool pqImplementation::eventFilter(QObject *obj, QEvent *event )
+    {
+    if ( obj == this->Ui.Files )
+      {
+      if ( event->type() == QEvent::KeyPress )
+        {
+        QKeyEvent *keyEvent = static_cast<QKeyEvent*>(event);
+        if (keyEvent->key() == Qt::Key_Backspace ||
+          keyEvent->key() == Qt::Key_Backtab ||
+          keyEvent->key() == Qt::Key_Delete)
+          {
+          this->Ui.FileName->setFocus(Qt::OtherFocusReason);
+          //send out a backspace event to the file name now
+          QKeyEvent replicateDelete(keyEvent->type(), keyEvent->key(), keyEvent->modifiers());
+          QApplication::sendEvent( this->Ui.FileName, &replicateDelete);
+          return true;
+          }
+        }
+      return false;
+      }
+    return QObject::eventFilter(obj, event);
+    }
+
   QString getStartPath()
     {
     pqServer* s = this->Model->server();
@@ -189,6 +213,7 @@ public:
       {
       this->LocalFilePath = p;
       }
+    this->Ui.Files->setFocus(Qt::OtherFocusReason);
     }
 
   void addHistory(const QString& p)
@@ -252,6 +277,7 @@ pqFileDialog::pqFileDialog(
   this->Implementation->Ui.setupUi(this);
 
   this->Implementation->Ui.Files->setEditTriggers(QAbstractItemView::EditKeyPressed);
+  this->Implementation->Ui.Files->installEventFilter(this->Implementation);
 
   this->setWindowTitle(title);
 
@@ -379,8 +405,6 @@ pqFileDialog::pqFileDialog(
     }
   this->Implementation->addHistory(startPath);
   this->Implementation->setCurrentPath(startPath);
-  //restore edit/keyboard focus to the FileName LineEdit
-  this->Implementation->Ui.FileName->setFocus( Qt::OtherFocusReason );
 }
 
 //-----------------------------------------------------------------------------
@@ -727,10 +751,13 @@ void pqFileDialog::onActivateFile(const QModelIndex& index)
 }
 
 //-----------------------------------------------------------------------------
-void pqFileDialog::onTextEdited(const QString&)
+void pqFileDialog::onTextEdited(const QString &str)
 {
   this->Implementation->Ui.Favorites->clearSelection();
-  this->Implementation->Ui.Files->clearSelection();
+  if (str.size() > 0 )
+    {
+    this->Implementation->Ui.Files->keyboardSearch(str);
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -899,6 +926,12 @@ void pqFileDialog::acceptInternal(QStringList& selected_files)
 //-----------------------------------------------------------------------------
 void pqFileDialog::fileSelectionChanged()
 {
+  if (this->Implementation->Ui.FileName->hasFocus() )
+    {
+    //user is currently editing a name, don't change the text
+    return;
+    }
+
   // Selection changed, update the FileName entry box
   // to reflect the current selection.
   QString fileString;
