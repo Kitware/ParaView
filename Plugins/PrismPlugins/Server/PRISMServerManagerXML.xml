@@ -67,6 +67,22 @@
         <DoubleRangeDomain name="range" />
       </DoubleVectorProperty>
 
+      <DoubleVectorProperty
+        name="CustomBounds"
+        command="SetCustomBounds"
+        number_of_elements="6"
+        default_values="0 1 0 1 0 1"
+        update_self="1">
+      </DoubleVectorProperty>
+
+      <IntVectorProperty
+        name="CustomBoundsActive"
+        command="SetCustomBoundsActive"
+        number_of_elements="3"
+        default_values="0 0 0"
+        update_self="1">
+      </IntVectorProperty>
+
       <SubProxy>
         <SourceProxy name="OutlineFilter" class="vtkPVGeometryFilter">
           <!-- 
@@ -91,9 +107,6 @@
           proxygroup="props" proxyname="PrismCubeAxesActor"> 
         </Proxy>
         <ExposedProperties>
-          <Property name="CustomBounds"/>
-          <Property name="CustomBoundsActive"/>
-          <Property exposed_name="CubeAxesColor" name="Color" />
           <Property exposed_name="CubeAxesCornerOffset" name="CornerOffset" />
           <Property exposed_name="CubeAxesFlyMode" name="FlyMode" />
           <Property exposed_name="CubeAxesInertia" name="Inertia" />
@@ -168,6 +181,7 @@
 
         <DoubleRangeDomain />
       </DoubleVectorProperty>
+
 
       <DoubleVectorProperty name="LabelRanges"
         command="SetLabelRanges"

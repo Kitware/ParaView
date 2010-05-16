@@ -4673,7 +4673,7 @@ The Clip filter cuts away a portion of the input data set using an implicit plan
           <DataTypeDomain name="input_type">
             <DataType value="vtkDataSet"/>
           </DataTypeDomain>
-          <InputArrayDomain name="input_array" attribute_type="point"
+          <InputArrayDomain name="input_array"
                             number_of_components="1" optional="1"/>
          <Documentation>
            This property specifies the dataset on which the Clip filter will operate.
@@ -5045,7 +5045,7 @@ To select between these two options, select either Point Data or Cell Data from 
    </SourceProxy>
 
    <!-- ==================================================================== -->
-   <SourceProxy name="Contour" class="vtkContourFilter">
+   <SourceProxy name="Contour" class="vtkPVContourFilter">
     <Documentation
        long_help="Generate isolines or isosurfaces using point scalars."
        short_help="Generate isolines or isosurfaces.">
@@ -5061,7 +5061,7 @@ The Contour filter computes isolines or isosurfaces using a selected point-cente
           <DataTypeDomain name="input_type">
             <DataType value="vtkDataSet"/>
           </DataTypeDomain>
-          <InputArrayDomain name="input_array" attribute_type="point"
+          <InputArrayDomain name="input_array"
                             number_of_components="1"/>
           <Documentation>
             This property specifies the input dataset to be used by the contour filter.

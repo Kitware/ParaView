@@ -1,0 +1,375 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>PrismCubeAxesEditorDialog</class>
+ <widget class="QDialog" name="PrismCubeAxesEditorDialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>338</width>
+    <height>319</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Edit Cube Axes Properties</string>
+  </property>
+  <layout class="QGridLayout">
+   <property name="margin">
+    <number>9</number>
+   </property>
+   <property name="spacing">
+    <number>6</number>
+   </property>
+   <item row="5" column="0" colspan="2">
+    <widget class="pqStandardColorButton" name="Color">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="toolTip">
+      <string>&lt;html&gt;Set the color to use for axes.&lt;/html&gt;</string>
+     </property>
+     <property name="text">
+      <string>Set Axes Color...</string>
+     </property>
+    </widget>
+   </item>
+   <item row="6" column="0" colspan="2">
+    <spacer>
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>313</width>
+       <height>16</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="2" column="1">
+    <widget class="QComboBox" name="CubeAxesTickLocation">
+     <item>
+      <property name="text">
+       <string>Inside</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Outside</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Both</string>
+      </property>
+     </item>
+    </widget>
+   </item>
+   <item row="3" column="1" rowspan="2">
+    <widget class="QDoubleSpinBox" name="CubeAxesCornerOffset">
+     <property name="maximum">
+      <double>1.000000000000000</double>
+     </property>
+     <property name="singleStep">
+      <double>0.050000000000000</double>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="0" rowspan="2">
+    <widget class="QLabel" name="label_3">
+     <property name="text">
+      <string>Tick Location</string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="0">
+    <widget class="QLabel" name="label_2">
+     <property name="text">
+      <string>Corner Offset</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="1">
+    <widget class="QComboBox" name="CubeAxesFlyMode">
+     <item>
+      <property name="text">
+       <string>Outer Edges</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Closest Triad</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Furthest Triad</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Static Triad</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Static Edges</string>
+      </property>
+     </item>
+    </widget>
+   </item>
+   <item row="1" column="0">
+    <widget class="QLabel" name="label">
+     <property name="text">
+      <string>Fly Mode</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="0" colspan="2">
+    <widget class="QTabWidget" name="tabWidget">
+     <property name="currentIndex">
+      <number>0</number>
+     </property>
+     <widget class="QWidget" name="xtab">
+      <attribute name="title">
+       <string>X Axis</string>
+      </attribute>
+      <layout class="QGridLayout">
+       <property name="margin">
+        <number>9</number>
+       </property>
+       <property name="spacing">
+        <number>6</number>
+       </property>
+       <item row="4" column="0" colspan="2">
+        <widget class="QCheckBox" name="CubeAxesXGridLines">
+         <property name="text">
+          <string>Show Grid Lines</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="0" colspan="2">
+        <widget class="QCheckBox" name="CubeAxesXAxisMinorTickVisibility">
+         <property name="text">
+          <string>Show Minor Ticks</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0" colspan="2">
+        <widget class="QCheckBox" name="CubeAxesXAxisTickVisibility">
+         <property name="text">
+          <string>Show Ticks</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0" colspan="2">
+        <widget class="QCheckBox" name="CubeAxesXAxisVisibility">
+         <property name="text">
+          <string>Show Axis</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="QLineEdit" name="CubeAxesXTitle"/>
+       </item>
+       <item row="0" column="0">
+        <widget class="QLabel" name="label_5">
+         <property name="text">
+          <string>Title</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="ytab">
+      <attribute name="title">
+       <string>Y Axis</string>
+      </attribute>
+      <layout class="QGridLayout">
+       <property name="margin">
+        <number>9</number>
+       </property>
+       <property name="spacing">
+        <number>6</number>
+       </property>
+       <item row="0" column="1">
+        <widget class="QLineEdit" name="CubeAxesYTitle"/>
+       </item>
+       <item row="0" column="0">
+        <widget class="QLabel" name="label_6">
+         <property name="text">
+          <string>Title</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="0" colspan="2">
+        <widget class="QCheckBox" name="CubeAxesYGridLines">
+         <property name="text">
+          <string>Show Grid Lines</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="0" colspan="2">
+        <widget class="QCheckBox" name="CubeAxesYAxisMinorTickVisibility">
+         <property name="text">
+          <string>Show Minor Ticks</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0" colspan="2">
+        <widget class="QCheckBox" name="CubeAxesYAxisVisibility">
+         <property name="text">
+          <string>Show Axis</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0" colspan="2">
+        <widget class="QCheckBox" name="CubeAxesYAxisTickVisibility">
+         <property name="text">
+          <string>Show Ticks</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="ztab">
+      <attribute name="title">
+       <string>Z Axis</string>
+      </attribute>
+      <layout class="QGridLayout">
+       <property name="margin">
+        <number>9</number>
+       </property>
+       <property name="spacing">
+        <number>6</number>
+       </property>
+       <item row="0" column="1">
+        <widget class="QLineEdit" name="CubeAxesZTitle"/>
+       </item>
+       <item row="4" column="0" colspan="2">
+        <widget class="QCheckBox" name="CubeAxesZGridLines">
+         <property name="text">
+          <string>Show Grid Lines</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="0">
+        <widget class="QLabel" name="label_7">
+         <property name="text">
+          <string>Title</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0" colspan="2">
+        <widget class="QCheckBox" name="CubeAxesZAxisVisibility">
+         <property name="text">
+          <string>Show Axis</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="0" colspan="2">
+        <widget class="QCheckBox" name="CubeAxesZAxisMinorTickVisibility">
+         <property name="text">
+          <string>Show Minor Ticks</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0" colspan="2">
+        <widget class="QCheckBox" name="CubeAxesZAxisTickVisibility">
+         <property name="text">
+          <string>Show Ticks</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+   </item>
+   <item row="7" column="0" colspan="2">
+    <layout class="QHBoxLayout">
+     <property name="spacing">
+      <number>4</number>
+     </property>
+     <property name="margin">
+      <number>0</number>
+     </property>
+     <item>
+      <spacer>
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="Ok">
+       <property name="text">
+        <string>Ok</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="Cancel">
+       <property name="text">
+        <string>Cancel</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>pqStandardColorButton</class>
+   <extends>QPushButton</extends>
+   <header>pqStandardColorButton.h</header>
+  </customwidget>
+ </customwidgets>
+ <tabstops>
+  <tabstop>tabWidget</tabstop>
+  <tabstop>CubeAxesXTitle</tabstop>
+  <tabstop>CubeAxesXAxisVisibility</tabstop>
+  <tabstop>CubeAxesXAxisTickVisibility</tabstop>
+  <tabstop>CubeAxesXAxisMinorTickVisibility</tabstop>
+  <tabstop>CubeAxesXGridLines</tabstop>
+  <tabstop>CubeAxesYTitle</tabstop>
+  <tabstop>CubeAxesYAxisVisibility</tabstop>
+  <tabstop>CubeAxesYAxisTickVisibility</tabstop>
+  <tabstop>CubeAxesYAxisMinorTickVisibility</tabstop>
+  <tabstop>CubeAxesYGridLines</tabstop>
+  <tabstop>CubeAxesZTitle</tabstop>
+  <tabstop>CubeAxesZAxisVisibility</tabstop>
+  <tabstop>CubeAxesZAxisTickVisibility</tabstop>
+  <tabstop>CubeAxesZAxisMinorTickVisibility</tabstop>
+  <tabstop>CubeAxesZGridLines</tabstop>
+  <tabstop>CubeAxesFlyMode</tabstop>
+  <tabstop>CubeAxesTickLocation</tabstop>
+  <tabstop>CubeAxesCornerOffset</tabstop>
+  <tabstop>Color</tabstop>
+  <tabstop>Ok</tabstop>
+  <tabstop>Cancel</tabstop>
+ </tabstops>
+ <resources/>
+ <connections/>
+</ui>
