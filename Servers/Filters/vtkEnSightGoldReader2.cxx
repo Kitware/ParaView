@@ -1,8 +1,8 @@
 /*=========================================================================
 
   Program:   Visualization Toolkit
-  Module:    $RCSfile: vtkEnSightGoldReader2.cxx,v $
-
+  Module:    vtkEnSightGoldReader2.cxx
+  
   Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
   All rights reserved.
   See Copyright.txt or http://www.kitware.com/Copyright.htm for details.
@@ -32,7 +32,6 @@
 #include <vtkstd/string>
 #include <vtkstd/vector>
 
-vtkCxxRevisionMacro(vtkEnSightGoldReader2, "$Revision: 1.2 $");
 vtkStandardNewMacro(vtkEnSightGoldReader2);
 
 //BTX
