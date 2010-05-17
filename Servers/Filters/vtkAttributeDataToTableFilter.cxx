@@ -219,18 +219,17 @@ void vtkAttributeDataToTableFilter::Decorate(vtkTable* output,
     }
 
   if (this->FieldAssociation == vtkDataObject::FIELD_ASSOCIATION_CELLS &&
-    psInput && psInput->GetNumberOfCells() > 0)
+    input->GetNumberOfElements(vtkDataObject::CELL) > 0)
     {
-    //at minimum always have cell ids
-    vtkIdTypeArray* originalIndices = vtkIdTypeArray::New();
-    originalIndices->SetNumberOfComponents(1);
-    originalIndices->SetNumberOfTuples(psInput->GetNumberOfCells());
-    originalIndices->SetName("vtkOriginalIndices");
-    output->GetRowData()->AddArray(originalIndices);
-    originalIndices->Delete();
+      //at minimum always have cell ids
+      vtkIdTypeArray* originalIndices = vtkIdTypeArray::New();
+      originalIndices->SetNumberOfComponents(1);
+      originalIndices->SetNumberOfTuples( input->GetNumberOfElements(vtkDataObject::CELL));
+      originalIndices->SetName("vtkOriginalIndices");
+      output->GetRowData()->AddArray(originalIndices);
+      originalIndices->Delete();
     }
-
-  if (this->FieldAssociation == vtkDataObject::FIELD_ASSOCIATION_POINTS &&
+  else if (this->FieldAssociation == vtkDataObject::FIELD_ASSOCIATION_POINTS &&
     psInput && psInput->GetPoints())
     {
     output->GetRowData()->AddArray(psInput->GetPoints()->GetData());
