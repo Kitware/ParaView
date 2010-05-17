@@ -132,7 +132,7 @@ int vtkPVClipDataSet::RequestData(vtkInformation* request,
 
       amrDC->SetInput(0, inDataObj);
       amrDC->SetInputArrayToProcess(
-        0, 0, 0, inArrayInfo->Has(vtkDataObject::FIELD_ASSOCIATION()),
+        0, 0, 0, inArrayInfo->Get(vtkDataObject::FIELD_ASSOCIATION()),
         arrayNameToProcess);
 
       amrDC->Update();
