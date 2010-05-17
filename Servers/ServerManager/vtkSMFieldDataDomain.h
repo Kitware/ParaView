@@ -14,17 +14,17 @@
 =========================================================================*/
 // .NAME vtkSMFieldDataDomain - enumeration with point and cell data entries
 // .SECTION Description
-// vtkSMFieldDataDomain is a sub-class vtkSMEnumerationDomain that looks at 
+// vtkSMFieldDataDomain is a sub-class vtkSMEnumerationDomain that looks at
 // the input in Update() and populates the entry list based on whether
-// there are valid arrays in point/cell/vertex/edge/row data. 
+// there are valid arrays in point/cell/vertex/edge/row data.
 // At most it consists of two
-// entries: ("Point Data", vtkDataObject::FIELD_ASSOCIATION_POINTS) and 
+// entries: ("Point Data", vtkDataObject::FIELD_ASSOCIATION_POINTS) and
 // ("Cell Data",  vtkDataObject::FIELD_ASSOCIATION_CELLS) in case of vtkDataSet
-// subclasses 
+// subclasses
 // OR
 // ("Vertex Data", vtkDataObject::FIELD_ASSOCIATION_VERTICES) and
 // ("Edge Data", vtkDataObject::FIELD_ASSOCIATION_EDGES) in case of vtkGraph and
-// subclasses 
+// subclasses
 // OR
 // ("Row Data", vtkDataObject::FIELD_ASSOCIATION_ROWS) in case of vtkTable and
 // subclasses.
@@ -79,6 +79,11 @@ protected:
   // When true, we don't update the available list of attributes based on what's
   // actually available in the input (false by default).
   bool DisableUpdateDomainEntries;
+
+  // When true, "Point Data" and "Cell Data" is included to the domain even
+  //if they don't have any properties. This is used by the spreadsheet
+  //view.( false by default )
+  bool ForcePointAndCellDataSelection;
 private:
 
   // Used by SetDefaultValues.
@@ -87,7 +92,7 @@ private:
   // Description:
   // Utility functions called by Update()
   int CheckForArray(vtkSMSourceProxy* sp, int outputport,
-                    vtkPVDataSetAttributesInformation* info, 
+                    vtkPVDataSetAttributesInformation* info,
                     vtkSMInputArrayDomain* iad);
   void Update(vtkSMSourceProxy* sp, vtkSMInputArrayDomain* iad, int outputport);
   void Update(vtkSMProxyProperty* pp, vtkSMSourceProxy* sp, int outputport);

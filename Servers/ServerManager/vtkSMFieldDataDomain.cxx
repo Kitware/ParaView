@@ -34,6 +34,7 @@ vtkSMFieldDataDomain::vtkSMFieldDataDomain()
 {
   this->EnableFieldDataSelection = false;
   this->DisableUpdateDomainEntries = false;
+  this->ForcePointAndCellDataSelection = false;
   this->DefaultValue = -1;
 }
 
@@ -75,11 +76,11 @@ void vtkSMFieldDataDomain::Update(vtkSMSourceProxy* sp,
     }
 
   bool has_pd = 0 !=
-    (info->GetNumberOfPoints() > 0 ||
-    this->CheckForArray(sp, outputport, info->GetPointDataInformation(), iad) );
+    (this->ForcePointAndCellDataSelection &&  info->GetNumberOfPoints() > 0)||
+    this->CheckForArray(sp, outputport, info->GetPointDataInformation(), iad);
   bool has_cd = 0 !=
-    (info->GetNumberOfCells() > 0 ||
-    this->CheckForArray(sp, outputport, info->GetCellDataInformation(), iad) );
+    (this->ForcePointAndCellDataSelection &&  info->GetNumberOfCells() > 0)||
+    this->CheckForArray(sp, outputport, info->GetCellDataInformation(), iad);
   bool has_vd = 0 !=
     this->CheckForArray(sp, outputport, info->GetVertexDataInformation(), iad);
   bool has_ed = 0 !=
@@ -87,11 +88,11 @@ void vtkSMFieldDataDomain::Update(vtkSMSourceProxy* sp,
   bool has_rd = 0 !=
     this->CheckForArray(sp, outputport, info->GetRowDataInformation(), iad);
 
-  if (this->DisableUpdateDomainEntries || has_pd)
+  if (this->DisableUpdateDomainEntries || has_pd )
     {
     this->AddEntry("Point Data", vtkDataObject::FIELD_ASSOCIATION_POINTS);
     }
-  if (this->DisableUpdateDomainEntries || has_cd)
+  if (this->DisableUpdateDomainEntries || has_cd )
     {
     this->AddEntry("Cell Data",  vtkDataObject::FIELD_ASSOCIATION_CELLS);
     }
@@ -141,6 +142,7 @@ void vtkSMFieldDataDomain::Update(vtkSMSourceProxy* sp,
     {
     this->DefaultValue = vtkDataObject::FIELD_ASSOCIATION_NONE;
     }
+
 
   this->InvokeModified();
 }
@@ -245,8 +247,18 @@ int vtkSMFieldDataDomain::ReadXMLAttributes(
   if (element->GetScalarAttribute("disable_update_domain_entries",
       &disable_update_domain_entries))
     {
-    this->DisableUpdateDomainEntries = (disable_update_domain_entries!=0)? true : false;
+    this->DisableUpdateDomainEntries =
+      (disable_update_domain_entries!=0)? true : false;
     }
+
+  int force_point_cell_data =0;
+  if (element->GetScalarAttribute("force_point_cell_data",
+    &force_point_cell_data))
+    {
+    this->ForcePointAndCellDataSelection =
+      ( force_point_cell_data!=0) ? true : false;
+    }
+
 
   if (this->DisableUpdateDomainEntries)
     {
