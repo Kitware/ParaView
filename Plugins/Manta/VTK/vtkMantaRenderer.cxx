@@ -311,6 +311,7 @@ vtkCamera* vtkMantaRenderer::MakeCamera()
 //----------------------------------------------------------------------------
 void vtkMantaRenderer::DeviceRender()
 {
+
   // In ParaView, we are wasting time in rendering the "sync layer" with
   // empty background image just to be dropped in LayerRender(). We just
   // don't start the engine with sync layer.
@@ -319,6 +320,8 @@ void vtkMantaRenderer::DeviceRender()
     {
     return;
     }
+
+  vtkTimerLog::MarkStartEvent("Manta Dev Render");
 
   if (!this->EngineInited )
     {
@@ -353,6 +356,8 @@ void vtkMantaRenderer::DeviceRender()
     this->LayerRender();
     }
   vtkTimerLog::MarkEndEvent("Total LayerRender");
+
+  vtkTimerLog::MarkEndEvent("Manta Dev Render");
 }
 
 //----------------------------------------------------------------------------

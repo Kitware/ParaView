@@ -71,6 +71,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkDataSet.h"
 #include "vtkObjectFactory.h"
 #include "vtkRendererCollection.h"
+#include "vtkTimerLog.h"
 
 #include <Interface/Scene.h>
 #include <Interface/Context.h>
@@ -328,6 +329,7 @@ void vtkMantaActor::UpdateObjects( vtkRenderer * ren )
   //Add what we are now supposed to show.
   if (this->Group)
     {
+    vtkTimerLog::MarkStartEvent("Execute AccelStructBuild ");
     //Create an acceleration structure for the data and add it to the scene
 
     //We have to nest to make an AS for each inner group
@@ -375,6 +377,8 @@ void vtkMantaActor::UpdateObjects( vtkRenderer * ren )
                                      this->MantaManager->GetMantaLightSet());
     mantaWorldGroup->preprocess(context);
     //cerr << "PREP DONE" << endl;
+
+    vtkTimerLog::MarkEndEvent("Execute AccelStructBuild ");
     }
 }
 

@@ -290,3 +290,9 @@ vtkSMRepresentationProxy*
 
   return 0;
 }
+
+//-----------------------------------------------------------------------------
+const char* vtkSMMantaParallelViewProxy::GetSuggestedViewType(vtkIdType connectionID)
+{
+  return "MantaIceTDesktopRenderView";
+}
