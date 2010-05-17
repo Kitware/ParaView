@@ -26,6 +26,12 @@ GET_PROPERTY(PV_TARGET_SUPPORTS_SHARED_LIBS
 SET(PARAVIEW_PLUGINLIST_TXT "${ParaView_BINARY_DIR}/PluginList.txt")
 FILE(WRITE ${PARAVIEW_PLUGINLIST_TXT} "")
 
+
+#########################################################################
+# PARAVIEW_PLUGINLIST is used to generate the config file distributed with
+# ParaView that lists the plugins distributed with ParaView.
+SET(PARAVIEW_PLUGINLIST "" CACHE INTERNAL "List of configured plugins" FORCE)
+
 SET(PARAVIEW_PLUGIN_CONFIG_LIST "" CACHE INTERNAL "List of configured plugins.")
 
 #########################################################################
@@ -313,10 +319,7 @@ SET(PARAVIEW_SMTESTDRIVER_EXECUTABLE  ${EXECUTABLE_OUTPUT_PATH}/smTestDriver${PV
 # release/debug configuration gets considered.
 GET_TARGET_PROPERTY(PARAVIEW_PROCESS_XML_EXECUTABLE kwProcessXML LOCATION)
 
-#########################################################################
-# PARAVIEW_PLUGINLIST is used to generate the config file distributed with
-# ParaView that lists the plugins distributed with ParaView.
-SET(PARAVIEW_PLUGINLIST "" CACHE INTERNAL "List of configured plugins" FORCE)
+
 ADD_SUBDIRECTORY(Plugins)
 
 #########################################################################
