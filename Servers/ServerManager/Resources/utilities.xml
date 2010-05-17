@@ -2368,7 +2368,8 @@
            Select the attribute data to pass.
          </Documentation>
          <FieldDataDomain name="enum"
-            enable_field_data="1">
+            enable_field_data="1"
+            force_point_cell_data="1">
            <RequiredProperties>
               <Property name="Input" function="Input"/>
            </RequiredProperties>
