@@ -19,10 +19,12 @@
 #include "vtkAppendPolyData.h"
 #include "vtkCompositeDataIterator.h"
 #include "vtkDataObject.h"
+#include "vtkDemandDrivenPipeline.h"
 #include "vtkHierarchicalBoxDataSet.h"
 #include "vtkInformation.h"
 #include "vtkInformationStringVectorKey.h"
 #include "vtkInformationVector.h"
+#include "vtkMultiBlockDataSet.h"
 #include "vtkObjectFactory.h"
 #include "vtkSmartPointer.h"
 
@@ -44,6 +46,20 @@ vtkPVContourFilter::~vtkPVContourFilter()
 void vtkPVContourFilter::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+}
+
+//-----------------------------------------------------------------------------
+int vtkPVContourFilter::ProcessRequest(vtkInformation* request,
+                                       vtkInformationVector** inputVector,
+                                       vtkInformationVector* outputVector)
+{
+  // create the output
+  if(request->Has(vtkDemandDrivenPipeline::REQUEST_DATA_OBJECT()))
+    {
+    return this->RequestDataObject(request, inputVector, outputVector);
+    }
+
+  return this->Superclass::ProcessRequest(request, inputVector, outputVector);
 }
 
 //-----------------------------------------------------------------------------
@@ -115,9 +131,6 @@ int vtkPVContourFilter::RequestData(vtkInformation* request,
       return 1;
       }
 
-    vtkSmartPointer<vtkAppendPolyData> append(
-      vtkSmartPointer<vtkAppendPolyData>::New());
-
     vtkSmartPointer<vtkAMRDualContour> amrDC(
       vtkSmartPointer<vtkAMRDualContour>::New());
 
@@ -132,45 +145,15 @@ int vtkPVContourFilter::RequestData(vtkInformation* request,
     amrDC->SetTriangulateCap(1);
     amrDC->SetEnableMergePoints(1);
 
-    bool found = false;
     for(int i=0; i < this->GetNumberOfContours(); ++i)
       {
+      vtkSmartPointer<vtkMultiBlockDataSet> out (
+        vtkSmartPointer<vtkMultiBlockDataSet>::New());
       amrDC->SetIsoValue(this->GetValue(i));
       amrDC->Update();
-
-      vtkSmartPointer<vtkCompositeDataIterator> itr;
-      itr.TakeReference(vtkCompositeDataSet::SafeDownCast(
-          amrDC->GetOutputDataObject(0))->NewIterator());
-      itr->InitTraversal();
-
-      while(!itr->IsDoneWithTraversal())
-        {
-        vtkPolyData* pd =
-          vtkPolyData::SafeDownCast(itr->GetCurrentDataObject());
-
-        if(pd)
-          {
-          found = true;
-          append->AddInput(pd);
-          }
-
-        itr->GoToNextItem();
-        }
+      out->ShallowCopy(amrDC->GetOutput(0));
+      vtkMultiBlockDataSet::SafeDownCast(outDataObj)->SetBlock(i, out);
       }
-
-    // If not found do not update the pipeline.
-    if(found)
-      {
-      append->Update();
-      }
-
-    if(!append->GetOutput(0))
-      {
-      vtkErrorMacro("Unable to generate valid output.");
-      return 1;
-      }
-
-    vtkPolyData::SafeDownCast(outDataObj)->ShallowCopy(append->GetOutput(0));
 
     return 1;
     }
@@ -178,6 +161,56 @@ int vtkPVContourFilter::RequestData(vtkInformation* request,
    {
    return this->Superclass::RequestData(request, inputVector, outputVector);
    }
+}
+
+//-----------------------------------------------------------------------------
+int vtkPVContourFilter::RequestDataObject(vtkInformation* request,
+                                          vtkInformationVector** inputVector,
+                                          vtkInformationVector* outputVector)
+{
+  vtkInformation* inInfo = inputVector[0]->GetInformationObject(0);
+  if (!inInfo)
+    {
+    return 0;
+    }
+
+  vtkHierarchicalBoxDataSet *input = vtkHierarchicalBoxDataSet::GetData(inInfo);
+  vtkInformation* outInfo = outputVector->GetInformationObject(0);
+
+  if (input)
+    {
+    vtkMultiBlockDataSet* output = vtkMultiBlockDataSet::GetData(outInfo);
+    if (!output)
+      {
+      output = vtkMultiBlockDataSet::New();
+      output->SetPipelineInformation(outInfo);
+      this->GetOutputPortInformation(0)->Set(
+        vtkDataObject::DATA_EXTENT_TYPE(), output->GetExtentType());
+      output->Delete();
+      }
+    return 1;
+    }
+  else
+    {
+    vtkDataSet* output = vtkDataSet::GetData(outInfo);
+    if (!output)
+      {
+      output = vtkPolyData::New();
+      output->SetPipelineInformation(outInfo);
+      this->GetOutputPortInformation(0)->Set(
+        vtkDataObject::DATA_EXTENT_TYPE(), output->GetExtentType());
+      output->Delete();
+      }
+    return 1;
+    }
+}
+
+//-----------------------------------------------------------------------------
+int vtkPVContourFilter::FillOutputPortInformation(int vtkNotUsed(port),
+                                                  vtkInformation* info)
+{
+  info->Set(vtkDataObject::DATA_TYPE_NAME(), "vtkDataObject");
+  return 1;
 }
 
 //-----------------------------------------------------------------------------
