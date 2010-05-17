@@ -27,7 +27,7 @@ class vtkPlane;
 class VTK_EXPORT vtkPVClipClosedSurface : public vtkClipClosedSurface
 {
 public:
-  vtkTypeRevisionMacro( vtkPVClipClosedSurface, vtkClipClosedSurface );
+  vtkTypeMacro( vtkPVClipClosedSurface, vtkClipClosedSurface );
   void PrintSelf( ostream & os, vtkIndent indent );
   static vtkPVClipClosedSurface * New();
 

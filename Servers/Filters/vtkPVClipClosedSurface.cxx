@@ -18,7 +18,6 @@
 #include "vtkPlaneCollection.h"
 #include "vtkObjectFactory.h"
 
-vtkCxxRevisionMacro( vtkPVClipClosedSurface, "$Revision: 1.0 $" );
 vtkStandardNewMacro( vtkPVClipClosedSurface );
 
 //-----------------------------------------------------------------------------
