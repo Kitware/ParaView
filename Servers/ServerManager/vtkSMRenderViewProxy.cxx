@@ -538,12 +538,21 @@ bool vtkSMRenderViewProxy::GetLODDecision()
 void vtkSMRenderViewProxy::BeginInteractiveRender()
 {
   vtkRenderWindow *renWin = this->GetRenderWindow(); 
-  renWin->SetDesiredUpdateRate(5.0);
 
   // Determine if we are using LOD or not
   // This may partially update the representation pipelines to get correct data
   // size information.
-  this->SetUseLOD(this->GetLODDecision());
+  bool use_lod = this->GetLODDecision();
+  this->SetUseLOD(use_lod);
+
+  if (use_lod)
+    {
+    renWin->SetDesiredUpdateRate(5.0);
+    }
+  else
+    {
+    renWin->SetDesiredUpdateRate(0.002);
+    }
 
   this->Superclass::BeginInteractiveRender();
 }
