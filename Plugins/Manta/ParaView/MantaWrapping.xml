@@ -283,6 +283,98 @@
 
     </MantaParallelViewProxy>
 
+    <MantaBatchViewProxy
+       name="MantaBatchView"
+       base_proxygroup="views" base_proxyname="IceTCompositeView">
+
+      <Documentation>
+        A render view that uses Manta rendering in batch parallel configurations.
+      </Documentation>
+
+      <SubProxy>
+        <Proxy  name="ParallelRenderManager"
+                proxygroup="composite_managers"
+                proxyname="MantaCompositeRenderManager"
+                override="1">
+        </Proxy>
+        <ExposedProperties>
+          <Property name="Compositer" />
+        </ExposedProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy  name="Tree"
+                proxygroup="compositers"
+                proxyname="TreeCompositer">
+        </Proxy>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="Renderer"
+               proxygroup="renderers"
+               proxyname="Renderer"
+               override="1">
+        </Proxy>
+        <ExposedProperties>
+          <Property name="Background" />
+          <Property name="DepthPeeling" />
+          <Property name="MaximumNumberOfPeels" />
+          <Property name="Background2" />
+          <Property name="UseGradientBackground" />
+          <Property name="UseTexturedBackground" />
+        </ExposedProperties>
+      </SubProxy>
+
+      <IntVectorProperty name="Threads"
+        command="SetThreads"
+        update_self="1"
+        immediate_update="1"
+        number_of_elements="1"
+        default_values="1">
+        <IntRangeDomain name="range" min="1" />
+        <Documentation>
+          Controls number of render threads.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="EnableShadows"
+        command="SetEnableShadows"
+        update_self="1"
+        immediate_update="1"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Turns on shadow.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="Samples"
+        command="SetSamples"
+        update_self="1"
+        immediate_update="1"
+        number_of_elements="1"
+        default_values="1">
+        <IntRangeDomain name="range" min="1" />
+        <Documentation>
+          Controls multisampling.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="MaxDepth"
+        command="SetMaxDepth"
+        update_self="1"
+        immediate_update="1"
+        number_of_elements="1"
+        default_values="5">
+        <IntRangeDomain name="range" min="1" />
+        <Documentation>
+          Controls maximum number of ray bounces.
+        </Documentation>
+      </IntVectorProperty>
+
+    </MantaBatchViewProxy>
+
     <!-- End of Views -->
   </ProxyGroup>
 

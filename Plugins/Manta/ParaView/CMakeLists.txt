@@ -30,6 +30,7 @@ INCLUDE ( ${PARAVIEW_USE_FILE} )
 #Configure the plugin ######################################################
 SET(MANTA_PLUGIN_SS_SOURCES
   vtkServerSideFactory.cxx
+  vtkSMMantaBatchViewProxy.cxx
   vtkSMMantaClientServerViewProxy.cxx
   vtkSMMantaParallelViewProxy.cxx
   vtkSMMantaRepresentation.cxx
