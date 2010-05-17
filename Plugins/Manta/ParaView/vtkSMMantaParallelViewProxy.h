@@ -113,12 +113,19 @@ public:
   }
 
   // Description:
-  // Overridden to prevent LOD, since that causes rebuilds of the accel structure on every frame.
+  // Overridden to prevent LOD, since that causes rebuilds of the accel structure
+  // on every frame.
   virtual void SetLODThreshold(double)
   {
     this->LODThreshold = 100000.0;
   }
 //BTX
+
+  // Description:
+  // Overridden to choose the correct class for the render view in different
+  // configurations.
+  const char* GetSuggestedViewType(vtkIdType connectionID);
+
 protected:
   vtkSMMantaParallelViewProxy();
   ~vtkSMMantaParallelViewProxy();
