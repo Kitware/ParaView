@@ -31,6 +31,8 @@ public:
   // Description:
   static vtkPVClipDataSet *New();
 
+  virtual int ProcessRequest(vtkInformation *, vtkInformationVector **, vtkInformationVector *);
+
 protected:
   vtkPVClipDataSet(vtkImplicitFunction *cf=NULL);
   ~vtkPVClipDataSet();
@@ -38,7 +40,13 @@ protected:
   virtual int RequestData(vtkInformation*,
                           vtkInformationVector**, vtkInformationVector* );
 
+  virtual int RequestDataObject(vtkInformation*,
+                                vtkInformationVector**,
+                                vtkInformationVector*);
+
+
   virtual int FillInputPortInformation(int, vtkInformation* info);
+  virtual int FillOutputPortInformation(int, vtkInformation* info);
 
 
 private:

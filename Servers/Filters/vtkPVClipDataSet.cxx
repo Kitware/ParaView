@@ -17,15 +17,20 @@
 #include "vtkAMRDualClip.h"
 #include "vtkAppendFilter.h"
 #include "vtkCompositeDataIterator.h"
+#include "vtkDataSet.h"
+#include "vtkDemandDrivenPipeline.h"
 #include "vtkObjectFactory.h"
 #include "vtkHierarchicalBoxDataSet.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkMultiBlockDataSet.h"
 #include "vtkSmartPointer.h"
+#include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkUnstructuredGrid.h"
 
 #include "vtkInformationStringVectorKey.h"
+
+#include <cassert>
 
 vtkStandardNewMacro(vtkPVClipDataSet);
 
@@ -126,45 +131,14 @@ int vtkPVClipDataSet::RequestData(vtkInformation* request,
       amrDC->SetEnableMultiProcessCommunication(1);
 
       amrDC->SetInput(0, inDataObj);
-      amrDC->SetInputArrayToProcess(0, 0, 0, 0,
-                                    arrayNameToProcess);
+      amrDC->SetInputArrayToProcess(
+        0, 0, 0, inArrayInfo->Has(vtkDataObject::FIELD_ASSOCIATION()),
+        arrayNameToProcess);
+
       amrDC->Update();
 
-      vtkSmartPointer<vtkAppendFilter>
-        append (vtkSmartPointer<vtkAppendFilter>::New());
-
-      vtkSmartPointer<vtkCompositeDataIterator> itr;
-      itr.TakeReference(vtkCompositeDataSet::SafeDownCast(
-        amrDC->GetOutputDataObject(0))->NewIterator());
-      itr->InitTraversal();
-
-      bool found = false;
-      while(!itr->IsDoneWithTraversal())
-        {
-        vtkDataSet* ds = vtkDataSet::SafeDownCast(itr->GetCurrentDataObject());
-
-        if(ds)
-          {
-          found = true;
-          append->AddInput(ds);
-          }
-
-        itr->GoToNextItem();
-        }
-
-      if(found)
-        {
-        append->Update();
-        }
-
-      if(!append->GetOutput(0))
-        {
-        vtkErrorMacro("Unable to generate valid output.");
-        return 1;
-        }
-
-      vtkUnstructuredGrid::SafeDownCast(outDataObj)->ShallowCopy(
-        append->GetOutput(0));
+      vtkMultiBlockDataSet::SafeDownCast(outDataObj)->ShallowCopy(
+        amrDC->GetOutput(0));
 
       return 1;
       }
@@ -179,6 +153,63 @@ int vtkPVClipDataSet::RequestData(vtkInformation* request,
 }
 
 //----------------------------------------------------------------------------
+int vtkPVClipDataSet::RequestDataObject(vtkInformation* request,
+                                        vtkInformationVector** inputVector,
+                                        vtkInformationVector* outputVector)
+{
+  vtkInformation* inInfo = inputVector[0]->GetInformationObject(0);
+  if (!inInfo)
+    {
+    return 0;
+    }
+
+  vtkHierarchicalBoxDataSet *input = vtkHierarchicalBoxDataSet::GetData(inInfo);
+  vtkInformation* outInfo = outputVector->GetInformationObject(0);
+
+  if (input)
+    {
+    vtkMultiBlockDataSet* output = vtkMultiBlockDataSet::GetData(outInfo);
+    if (!output)
+      {
+      output = vtkMultiBlockDataSet::New();
+      output->SetPipelineInformation(outInfo);
+      this->GetOutputPortInformation(0)->Set(
+        vtkDataObject::DATA_EXTENT_TYPE(), output->GetExtentType());
+      output->Delete();
+      }
+    return 1;
+    }
+  else
+    {
+    vtkDataSet* output = vtkDataSet::GetData(outInfo);
+    if (!output)
+      {
+      output = vtkUnstructuredGrid::New();
+      output->SetPipelineInformation(outInfo);
+      this->GetOutputPortInformation(0)->Set(
+        vtkDataObject::DATA_EXTENT_TYPE(), output->GetExtentType());
+      output->Delete();
+      }
+    return 1;
+    }
+}
+
+
+//----------------------------------------------------------------------------
+int vtkPVClipDataSet::ProcessRequest(vtkInformation* request,
+                                         vtkInformationVector** inputVector,
+                                         vtkInformationVector* outputVector)
+{
+  // create the output
+  if(request->Has(vtkDemandDrivenPipeline::REQUEST_DATA_OBJECT()))
+    {
+    return this->RequestDataObject(request, inputVector, outputVector);
+    }
+
+  return this->Superclass::ProcessRequest(request, inputVector, outputVector);
+}
+
+//----------------------------------------------------------------------------
 int vtkPVClipDataSet::FillInputPortInformation(int port,
                                                vtkInformation * info)
 {
@@ -186,5 +217,12 @@ int vtkPVClipDataSet::FillInputPortInformation(int port,
   vtkInformationStringVectorKey::SafeDownCast(info->GetKey(
     vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE()))->Append(
     info, "vtkHierarchicalBoxDataSet");
+  return 1;
+}
+
+//----------------------------------------------------------------------------
+int vtkPVClipDataSet::FillOutputPortInformation(int port, vtkInformation *info)
+{
+  info->Set(vtkDataObject::DATA_TYPE_NAME(), "vtkObject");
   return 1;
 }
