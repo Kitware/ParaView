@@ -120,7 +120,6 @@ namespace vtkPVRecoverGeometryWireframeNamespace
 using namespace vtkPVRecoverGeometryWireframeNamespace;
 
 //=============================================================================
-vtkCxxRevisionMacro(vtkPVRecoverGeometryWireframe, "$Revision$");
 vtkStandardNewMacro(vtkPVRecoverGeometryWireframe);
 
 //-----------------------------------------------------------------------------
