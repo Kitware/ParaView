@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqFileDialogFilter.h"
 #include "pqServer.h"
 
+#include <QCompleter>
 #include <QDir>
 #include <QMessageBox>
 #include <QtDebug>
@@ -129,6 +130,7 @@ public:
   pqFileDialogFavoriteModel* const FavoriteModel;
   pqFileDialogRecentDirsModel* const RecentModel;
   pqFileDialogFilter FileFilter;
+  QCompleter *Completer;
   FileMode Mode;
   Ui::pqFileDialog Ui;
   QStringList SelectedFiles;
@@ -145,6 +147,7 @@ public:
     FavoriteModel(new pqFileDialogFavoriteModel(server, NULL)),
     RecentModel(new pqFileDialogRecentDirsModel(Model, server, NULL)),
     FileFilter(this->Model),
+    Completer(new QCompleter(this->Model, NULL)),
     Mode(ExistingFile),
     SupressOverwriteWarning(false)
   {
@@ -157,6 +160,7 @@ public:
     delete this->RecentModel;
     delete this->FavoriteModel;
     delete this->Model;
+    delete this->Completer;
   }
 
   bool pqImplementation::eventFilter(QObject *obj, QEvent *event )
@@ -277,7 +281,12 @@ pqFileDialog::pqFileDialog(
   this->Implementation->Ui.setupUi(this);
 
   this->Implementation->Ui.Files->setEditTriggers(QAbstractItemView::EditKeyPressed);
+
+  //install the event filter
   this->Implementation->Ui.Files->installEventFilter(this->Implementation);
+
+  //install the autocompleter
+  this->Implementation->Ui.FileName->setCompleter(this->Implementation->Completer);
 
   this->setWindowTitle(title);
 
