@@ -20,7 +20,9 @@ def reset_trace_globals():
   trace_globals.last_active_source = None
   trace_globals.last_registered_proxies = []
   trace_globals.registered_proxies = []
-  trace_globals.trace_output = ["try: paraview.simple\nexcept: from paraview.simple import *\n"]
+  trace_globals.trace_output = ["try: paraview.simple\n"
+                                "except: from paraview.simple import *\n"
+                                "paraview.simple._DisableFirstRenderCameraReset()\n"]
   trace_globals.trace_output_endblock = "Render()"
   trace_globals.traced_proxy_groups = ["sources", "representations", "views",
                                        "implicit_functions", "piecewise_functions",
