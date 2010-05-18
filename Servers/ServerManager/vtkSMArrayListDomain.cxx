@@ -683,7 +683,7 @@ void vtkSMArrayListDomain::PrintSelf(ostream& os, vtkIndent indent)
     os << indent << "DataType: " << this->ALDInternals->DataTypes[i] << endl;
     }
 
-  for(int i=0; i<this->ALDInternals->InformationKeys.size(); i++)
+  for(unsigned int i=0; i<this->ALDInternals->InformationKeys.size(); i++)
     {
     vtkSMArrayListDomainInformationKey& key = this->ALDInternals->InformationKeys[i];
     os << key.Location << "::" << key.Name << " ";
