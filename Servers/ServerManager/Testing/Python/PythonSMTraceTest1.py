@@ -35,7 +35,6 @@ fractal = OctreeFractal(guiName="Octree Fractal")
 APPLY()
 
 fractalRep = Show()
-Render()
 
 lut = CreateLookupTable(RGBPoints=[2.2222592830657959, 0.23000000000000001, 0.29899999999999999, 0.754, 100.0, 0.70599999999999996, 0.016, 0.14999999999999999], VectorMode='Magnitude', ColorSpace='Diverging')
 fractalRep.ColorArrayName = 'FractalIterations'

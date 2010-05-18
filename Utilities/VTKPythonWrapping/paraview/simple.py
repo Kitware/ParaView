@@ -194,6 +194,12 @@ def ResetCamera(view=None):
     view.ResetCamera()
     Render(view)
 
+def _DisableFirstRenderCameraReset():
+    """Disable the first render camera reset.  Normally a ResetCamera is called
+    automatically when Render is called for the first time after importing
+    this module."""
+    _funcs_internals.first_render = False
+
 def SetProperties(proxy=None, **params):
     """Sets one or more properties of the given pipeline object. If an argument
     is not provided, the active source is used. Pass a list of property_name=value
