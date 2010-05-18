@@ -37,7 +37,7 @@ vtkIsoVolume::vtkIsoVolume()
 {
   this->LowerThreshold         = 0.0;
   this->UpperThreshold         = 1.0;
-  this->UsingPointScalars      = 0.0;
+  this->UsingPointScalars      = false;
 
   this->LowerBoundClipDS = 0;
   this->UpperBoundClipDS = 0;

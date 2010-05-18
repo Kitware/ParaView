@@ -65,7 +65,7 @@ protected:
   double LowerThreshold;
   double UpperThreshold;
 
-  int    UsingPointScalars;
+  bool   UsingPointScalars;
 
   vtkPVClipDataSet*   LowerBoundClipDS;
   vtkPVClipDataSet*   UpperBoundClipDS;
