@@ -112,7 +112,7 @@ if FindSource("Extract Cells By Region"):
     sys.exit(1)
 
 # Compile the trace code and run it
-code = compile(trace_string, tempDir+"/PythonSMTraceTest1_err.txt", "exec")
+code = compile(trace_string, "<string>", "exec")
 exec(code)
 
 # Confirm that the extract cells filter has been recreated

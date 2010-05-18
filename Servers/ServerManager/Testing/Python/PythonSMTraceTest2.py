@@ -62,7 +62,7 @@ if len(GetRepresentations()) or len(GetRenderViews()) or len(GetSources()):
     fail("Not all proxies were cleaned up.")
 
 # Compile the trace code and run it
-code = compile(trace_string, "python trace string", "exec")
+code = compile(trace_string, "<string>", "exec")
 exec(code)
 
 # Get the recreated proxies
