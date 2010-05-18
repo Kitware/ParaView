@@ -81,6 +81,19 @@ def register_proxies_by_dependency(proxy_list):
         print "WARNING: Missing dependencies, could not register proxies:", proxies_to_register
 
 
+def get_sorted_proxies_in_group(group_name):
+    """Returns the list of proxies registered in the given group name.
+    The returned list of proxies will be sorted by the proxy's id."""
+
+    # GetProxiesInGroup returns a dictionary of the form:
+    #     { ('proxy_name', 'proxy_id') : proxy }
+    # We want to return the dictionary values (list of proxies) sorted by proxy_id.
+    proxy_dict = servermanager.ProxyManager().GetProxiesInGroup(group_name)
+    sorted_items = sorted(proxy_dict.items(), lambda a, b: cmp(int(a[0][1]), int(b[0][1])))
+    sorted_list = [pair[1] for pair in sorted_items]
+    return sorted_list
+
+
 def get_proxy_lists_ordered_by_group(WithRendering=True):
     """Returns a list of lists.  Each sub list contains all proxies that are
     currently registered under a given group name.  The order of the sub lists
@@ -109,8 +122,7 @@ def get_proxy_lists_ordered_by_group(WithRendering=True):
         proxy_groups = ["implicit_functions", "selection_sources",  "sources"]
 
     # Collect the proxies using a list comprehension
-    get_func = servermanager.ProxyManager().GetProxiesInGroup
-    proxy_lists = [get_func(proxy_group).values() for proxy_group in proxy_groups]
+    proxy_lists = [get_sorted_proxies_in_group(proxy_group) for proxy_group in proxy_groups]
     return proxy_lists
 
 
