@@ -236,7 +236,7 @@ public:
   }
   
   /// Returns the end of the document
-  const int documentEnd()
+  int documentEnd()
   {
     QTextCursor c(this->document());
     c.movePosition(QTextCursor::End);

@@ -79,7 +79,7 @@ pqSelectReaderDialog::pqSelectReaderDialog(const QString& file,
 
 //-----------------------------------------------------------------------------
 pqSelectReaderDialog::pqSelectReaderDialog(const QString& file,
-                       pqServer* s,
+                       pqServer* vtkNotUsed(server),
                        vtkStringList* list, QWidget* p)
   : QDialog(p)
 {

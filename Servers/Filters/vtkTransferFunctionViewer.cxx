@@ -432,7 +432,8 @@ void vtkTransferFunctionViewer::Render()
       vtkTransferFunctionEditorRepresentation *rep =
         vtkTransferFunctionEditorRepresentation::SafeDownCast(
           this->EditorWidget->GetRepresentation());
-      if (rep && this->Histogram->GetMTime() > rep->GetHistogramMTime() ||
+      if (
+          (rep && this->Histogram->GetMTime() > rep->GetHistogramMTime()) ||
           !this->EditorWidget->GetHistogram())
         {
         this->EditorWidget->SetHistogram(this->Histogram);

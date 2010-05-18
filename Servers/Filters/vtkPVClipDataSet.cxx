@@ -153,7 +153,7 @@ int vtkPVClipDataSet::RequestData(vtkInformation* request,
 }
 
 //----------------------------------------------------------------------------
-int vtkPVClipDataSet::RequestDataObject(vtkInformation* request,
+int vtkPVClipDataSet::RequestDataObject(vtkInformation* vtkNotUsed(request),
                                         vtkInformationVector** inputVector,
                                         vtkInformationVector* outputVector)
 {
@@ -221,7 +221,8 @@ int vtkPVClipDataSet::FillInputPortInformation(int port,
 }
 
 //----------------------------------------------------------------------------
-int vtkPVClipDataSet::FillOutputPortInformation(int port, vtkInformation *info)
+int vtkPVClipDataSet::FillOutputPortInformation(
+  int vtkNotUsed(port), vtkInformation *info)
 {
   info->Set(vtkDataObject::DATA_TYPE_NAME(), "vtkObject");
   return 1;

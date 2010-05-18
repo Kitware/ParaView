@@ -59,8 +59,9 @@ vtkQueue<DType>::~vtkQueue()
 template <class DType>
 int vtkQueue<DType>::EnqueueItem(DType a)
 {
-  if ( this->GetSize() == 0 || this->End == (this->Start + 1) % this->GetSize() &&
-       this->NumberOfItems > 0 )
+  if ( this->GetSize() == 0 ||
+    (this->End == (this->Start + 1) % this->GetSize() &&
+       this->NumberOfItems > 0 ) )
     {
     vtkIdType newsize = (this->Size+1) * 2;
     vtkIdType oldsize = this->Size;
