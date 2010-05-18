@@ -134,7 +134,7 @@ SET(CTEST_CUSTOM_WARNING_EXCEPTION
   "[Qq]t.*/include/qt.*"
 
   # disable warnings from UI files.
-  "ui_[^\\.]+.h"
+  "ui_.*"
   )
 
 IF(APPLE)
