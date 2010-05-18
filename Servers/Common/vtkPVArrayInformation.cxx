@@ -748,7 +748,6 @@ void vtkPVArrayInformation::CopyFromStream(const vtkClientServerStream* css)
   int nkeys;
   if (!css->GetArgument(0, pos, &nkeys))
     {
-    vtkErrorMacro("Error parsing number of keys from message.");
     return;
     }
 

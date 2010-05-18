@@ -626,6 +626,7 @@ unsigned int vtkSMArrayListDomain::RemoveInformationKey(const char* location, co
     it++;
     index++;
     }
+  return 0;
 }
 
 //---------------------------------------------------------------------------
