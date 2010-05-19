@@ -123,18 +123,8 @@ int vtkCleanUnstructuredGrid::RequestData(
     if (vtkUnstructuredGrid::SafeDownCast(input) &&
         input->GetCellType(id) == VTK_POLYHEDRON)
       {
-      vtkUnstructuredGrid * unstruct = vtkUnstructuredGrid::SafeDownCast(input);
-      unstruct->GetFaceStream(id, cellPoints);
-      vtkIdType* idPtr = cellPoints->GetPointer(0);
-      vtkIdType nfaces = *idPtr++;
-      for (vtkIdType i = 0; i < nfaces; i++)
-        {
-        vtkIdType npts = *idPtr++;
-        for (vtkIdType j = 0; j < npts; j++)
-          {
-          *idPtr++ = ptMap[*idPtr];
-          }
-        }
+      vtkUnstructuredGrid::SafeDownCast(input)->GetFaceStream(id, cellPoints);
+      vtkUnstructuredGrid::ConvertFaceStreamPointIds(cellPoints, ptMap);
       }
     else    
       {
