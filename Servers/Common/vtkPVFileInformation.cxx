@@ -374,6 +374,7 @@ vtkPVFileInformation::vtkPVFileInformation()
   this->Name = 0;
   this->FullPath = 0;
   this->FastFileTypeDetection = 0;
+  this->Hidden = false;
 }
 
 //-----------------------------------------------------------------------------
@@ -1109,6 +1110,8 @@ void vtkPVFileInformation::OrganizeCollection(vtkPVFileInformationSet& info_set)
           group->SetName(groupName.c_str());
           group->SetFullPath((prefix + groupName).c_str());
           group->Type = FILE_GROUP;
+          //the group inherits the hidden flag of the first item in the group
+          group->Hidden = obj->Hidden;
           group->FastFileTypeDetection = this->FastFileTypeDetection;
           //fileGroups[groupName] = group;
           vtkInfo info;

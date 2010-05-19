@@ -379,7 +379,7 @@ public:
             childIter->GetCurrentObject());
           groupFiles.push_back(pqFileDialogModelFileInfo(child->GetName(), child->GetFullPath(),
             static_cast<vtkPVFileInformation::FileTypes>(child->GetType()),
-            info->GetHidden()));
+            child->GetHidden()));
           }
         files.push_back(pqFileDialogModelFileInfo(info->GetName(), groupFiles[0].filePath(),
           vtkPVFileInformation::SINGLE_FILE,info->GetHidden(), groupFiles));
