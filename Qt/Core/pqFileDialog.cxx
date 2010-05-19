@@ -48,7 +48,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QAbstractButton>
 #include <QComboBox>
 #include <QAbstractItemView>
+
 #include <QKeyEvent>
+#include <QMouseEvent>
 
 #include <vtkstd/string>
 #include <vtksys/SystemTools.hxx>
@@ -217,7 +219,7 @@ public:
       }
     this->Ui.Favorites->clearSelection();
     this->Ui.Recent->clearSelection();
-    this->Ui.FileName->setFocus(Qt::OtherFocusReason);
+    this->Ui.Files->setFocus(Qt::OtherFocusReason);
     }
 
   void addHistory(const QString& p)
@@ -388,6 +390,11 @@ pqFileDialog::pqFileDialog(
                    SIGNAL(activated(const QModelIndex&)),
                    this,
                    SLOT(onActivateFile(const QModelIndex&)));
+
+    QObject::connect(this->Implementation->Ui.Files,
+                   SIGNAL(doubleClicked(const QModelIndex&)),
+                   this,
+                   SLOT(onDoubleClickFile(const QModelIndex&)));
 
   QObject::connect(this->Implementation->Ui.FileName,
                    SIGNAL(textEdited(const QString&)),
@@ -615,7 +622,7 @@ void pqFileDialog::accept()
     files.append(filename);
     }
 
-  this->acceptInternal(files);
+  this->acceptInternal(files,false);
 }
 
 //-----------------------------------------------------------------------------
@@ -727,7 +734,7 @@ void pqFileDialog::onClickedRecent(const QModelIndex&)
 }
 
 //-----------------------------------------------------------------------------
-void pqFileDialog::onClickedFile(const QModelIndex&)
+void pqFileDialog::onClickedFile(const QModelIndex& index)
 {
   this->Implementation->Ui.Favorites->clearSelection();
 }
@@ -761,7 +768,19 @@ void pqFileDialog::onActivateFile(const QModelIndex& index)
   QStringList selected_files;
   selected_files << this->Implementation->Model->getFilePaths(actual_index);
 
-  this->acceptInternal(selected_files);
+  this->acceptInternal(selected_files,false);
+}
+//-----------------------------------------------------------------------------
+void pqFileDialog::onDoubleClickFile(const QModelIndex& index)
+{
+  QModelIndex actual_index = index;
+  if(actual_index.model() == &this->Implementation->FileFilter)
+    actual_index = this->Implementation->FileFilter.mapToSource(actual_index);
+
+  QStringList selected_files;
+  selected_files << this->Implementation->Model->getFilePaths(actual_index);
+
+  this->acceptInternal(selected_files,true);
 }
 
 //-----------------------------------------------------------------------------
@@ -844,7 +863,7 @@ QString pqFileDialog::fixFileExtension(
 }
 
 //-----------------------------------------------------------------------------
-void pqFileDialog::acceptInternal(QStringList& selected_files)
+void pqFileDialog::acceptInternal(QStringList& selected_files, const bool &doubleclicked)
 {
   if(selected_files.empty())
     {
@@ -858,9 +877,12 @@ void pqFileDialog::acceptInternal(QStringList& selected_files)
     switch(this->Implementation->Mode)
       {
       case Directory:
-        this->emitFilesSelected(QStringList(file));
-        break;
-
+        if ( !doubleclicked )
+          {
+          this->emitFilesSelected(QStringList(file));
+          this->onNavigate(file);
+          break;
+          }
       case ExistingFile:
       case ExistingFiles:
       case AnyFile:
@@ -980,8 +1002,27 @@ void pqFileDialog::fileSelectionChanged()
       }
     }
 
+  //if we are in directory mode we have to enable / disable the OK button
+  //based on if the user has selected a file.
+  if ( this->Implementation->Mode == pqFileDialog::Directory &&
+    indices[0].model() == &this->Implementation->FileFilter)
+    {
+    QModelIndex idx = this->Implementation->FileFilter.mapToSource(indices[0]);
+    bool enabled = this->Implementation->Model->isDir(idx);
+    this->Implementation->Ui.OK->setEnabled( enabled );
+    if ( enabled )
+      {
+      this->Implementation->Ui.FileName->setText(fileString);
+      }
+    else
+      {
+      this->Implementation->Ui.FileName->clear();
+      }
+    return;
+    }
 
   this->Implementation->Ui.FileName->setText(fileString);
+
 }
 
 bool pqFileDialog::selectFile(const QString& f)

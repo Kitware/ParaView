@@ -84,7 +84,17 @@ def runTests():
   QtTesting.playCommand(fdFiles, 'currentChanged', '/7|0')
   QtTesting.playCommand(fdOk, 'activate', '')
   checkFile('Filec.bmp')
-
+  # switch to directory mode
+  QtTesting.playCommand(filter, 'set_string', '')
+  QtTesting.playCommand(mode, 'set_string', 'Directory')
+  QtTesting.playCommand(openDialog, 'activate', '')
+  QtTesting.playCommand(fdFiles, 'currentChanged', '/0|0')
+  QtTesting.playCommand(fdFiles, 'currentChanged', '/3|0')
+  QtTesting.playCommand(fdFiles, 'currentChanged', '/4|0')
+  QtTesting.playCommand(fdOk, 'activate', '')
+  QtTesting.playCommand(fdFiles, 'currentChanged', '/2|0')
+  QtTesting.playCommand(fdOk, 'activate', '')
+  checkFile('SubDir3')
 
 
 QtTesting.playCommand(connection, 'set_string', 'Local')

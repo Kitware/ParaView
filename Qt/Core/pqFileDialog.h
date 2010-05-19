@@ -148,6 +148,8 @@ private slots:
   void onActivateRecent(const QModelIndex&);
   void onActivateFile(const QModelIndex&);
 
+  void onDoubleClickFile( const QModelIndex& );
+
   void onTextEdited(const QString&);
 
   void onShowHiddenFiles( const bool &hide );
@@ -171,7 +173,7 @@ private:
   class pqImplementation;
   pqImplementation* const Implementation;
 
-  void acceptInternal(QStringList& selected_files);
+  void acceptInternal(QStringList& selected_files, const bool &doubleclicked);
   QString fixFileExtension(const QString& filename, const QString& filter);
 };
 
