@@ -80,6 +80,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMSourceProxy.h"
 #include "vtkSMInputProperty.h"
 #include "vtkSMRepresentationProxy.h"
+#include "vtkRenderWindow.h"
 
 #define DEBUGPRINT_VIEW(arg);
 
@@ -295,4 +296,12 @@ vtkSMRepresentationProxy*
 const char* vtkSMMantaBatchViewProxy::GetSuggestedViewType(vtkIdType connectionID)
 {
   return "MantaBatchView";
+}
+
+//----------------------------------------------------------------------------
+void vtkSMMantaBatchViewProxy::SetViewSize(int x, int y)
+{
+  this->ViewSize[0] = x;
+  this->ViewSize[1] = y;
+  this->RenderWindow->SetSize(x, y);
 }
