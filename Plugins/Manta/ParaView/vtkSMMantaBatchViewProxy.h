@@ -127,6 +127,10 @@ public:
   // configurations.
   const char* GetSuggestedViewType(vtkIdType connectionID);
 
+  // Description:
+  // Set the view size.
+  virtual void SetViewSize(int width, int height);
+
 protected:
   vtkSMMantaBatchViewProxy();
   ~vtkSMMantaBatchViewProxy();
