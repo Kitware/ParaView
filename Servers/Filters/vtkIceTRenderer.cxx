@@ -196,6 +196,7 @@ void vtkIceTRenderer::DeviceRender()
     glMatrixMode(GL_MODELVIEW);
     glPopMatrix();
     this->InvokeEvent(vtkCommand::EndEvent,NULL);
+    vtkTimerLog::MarkEndEvent("IceT Dev Render");
     return;
     }
 
