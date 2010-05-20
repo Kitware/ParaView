@@ -28,7 +28,7 @@ class vtkPVOptions;
 class VTK_EXPORT vtkProcessModuleGUIHelper : public vtkObject
 {
 public:
-  vtkTypeRevisionMacro(vtkProcessModuleGUIHelper,vtkObject);
+  vtkTypeMacro(vtkProcessModuleGUIHelper,vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

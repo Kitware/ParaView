@@ -29,7 +29,6 @@ public:
 //----------------------------------------------------------------------------
 
 
-vtkCxxRevisionMacro(vtkSMKeyFrameProxy, "1.12");
 vtkStandardNewMacro(vtkSMKeyFrameProxy);
 //----------------------------------------------------------------------------
 vtkSMKeyFrameProxy::vtkSMKeyFrameProxy()

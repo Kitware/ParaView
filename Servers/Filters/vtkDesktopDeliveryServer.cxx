@@ -44,7 +44,6 @@ static void SatelliteEndParallelRender(vtkObject *caller,
                                        unsigned long vtkNotUsed(event),
                                        void *clientData, void *);
 
-vtkCxxRevisionMacro(vtkDesktopDeliveryServer, "1.23");
 vtkStandardNewMacro(vtkDesktopDeliveryServer);
 
 //----------------------------------------------------------------------------

@@ -31,7 +31,7 @@ class vtkCPDataDescription;
 class COPROCESSING_EXPORT vtkCPPipeline : public vtkObject
 {
 public:
-  vtkTypeRevisionMacro(vtkCPPipeline,vtkObject);
+  vtkTypeMacro(vtkCPPipeline,vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

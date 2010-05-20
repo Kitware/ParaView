@@ -44,7 +44,7 @@ class VTK_EXPORT vtkVisItDatabase : public vtkObject
 {
 public:
   static vtkVisItDatabase *New();
-  vtkTypeRevisionMacro(vtkVisItDatabase, vtkObject);
+  vtkTypeMacro(vtkVisItDatabase, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

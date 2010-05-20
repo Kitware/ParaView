@@ -24,7 +24,7 @@ class VTK_EXPORT vtkTestingOptions : public vtkPVOptions
 {
 public:
   static vtkTestingOptions* New();
-  vtkTypeRevisionMacro(vtkTestingOptions,vtkPVOptions);
+  vtkTypeMacro(vtkTestingOptions,vtkPVOptions);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // The name of the State XML to load.

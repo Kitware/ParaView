@@ -31,7 +31,7 @@ class VTK_EXPORT vtkSMGlobalPropertiesManager : public vtkSMProxy
 {
 public:
   static vtkSMGlobalPropertiesManager* New();
-  vtkTypeRevisionMacro(vtkSMGlobalPropertiesManager, vtkSMProxy);
+  vtkTypeMacro(vtkSMGlobalPropertiesManager, vtkSMProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

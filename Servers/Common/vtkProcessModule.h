@@ -55,7 +55,7 @@ class VTK_EXPORT vtkProcessModule : public vtkObject
 {
 public:
   static vtkProcessModule* New();
-  vtkTypeRevisionMacro(vtkProcessModule, vtkObject);
+  vtkTypeMacro(vtkProcessModule, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
 //BTX

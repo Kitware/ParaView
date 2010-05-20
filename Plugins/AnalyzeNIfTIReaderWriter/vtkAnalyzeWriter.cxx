@@ -24,7 +24,6 @@
 
 #define NIFTI_HEADER_ARRAY "vtkNIfTIReaderHeaderArray"
 
-vtkCxxRevisionMacro(vtkAnalyzeWriter, "1.2");
 vtkStandardNewMacro(vtkAnalyzeWriter);
 
 vtkAnalyzeWriter::vtkAnalyzeWriter()

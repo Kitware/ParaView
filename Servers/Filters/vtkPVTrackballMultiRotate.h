@@ -43,7 +43,7 @@ class vtkPVTrackballRotate;
 class VTK_EXPORT vtkPVTrackballMultiRotate : public vtkCameraManipulator
 {
 public:
-  vtkTypeRevisionMacro(vtkPVTrackballMultiRotate, vtkCameraManipulator);
+  vtkTypeMacro(vtkPVTrackballMultiRotate, vtkCameraManipulator);
   static vtkPVTrackballMultiRotate *New();
   virtual void PrintSelf(ostream &os, vtkIndent indent);
 

@@ -21,7 +21,6 @@
 #include "vtkSMSurfaceRepresentationProxy.h"
 #include "vtkProcessModule.h"
 
-vtkCxxRevisionMacro(vtkSMMantaRepresentation, "1.1");
 vtkStandardNewMacro(vtkSMMantaRepresentation);
 
 //----------------------------------------------------------------------------

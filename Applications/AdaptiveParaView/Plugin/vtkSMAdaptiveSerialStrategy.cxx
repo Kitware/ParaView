@@ -31,7 +31,6 @@
     }
 
 vtkStandardNewMacro(vtkSMAdaptiveSerialStrategy);
-vtkCxxRevisionMacro(vtkSMAdaptiveSerialStrategy, "1.1");
 //----------------------------------------------------------------------------
 vtkSMAdaptiveSerialStrategy::vtkSMAdaptiveSerialStrategy()
 {

@@ -34,7 +34,7 @@ class VTK_EXPORT vtkSMCameraManipulatorProxy :
 {
 public:
   static vtkSMCameraManipulatorProxy* New();
-  vtkTypeRevisionMacro(vtkSMCameraManipulatorProxy, 
+  vtkTypeMacro(vtkSMCameraManipulatorProxy,
     vtkSMKeyFrameAnimationCueManipulatorProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 

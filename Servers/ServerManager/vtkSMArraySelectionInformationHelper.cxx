@@ -21,7 +21,6 @@
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMArraySelectionInformationHelper);
-vtkCxxRevisionMacro(vtkSMArraySelectionInformationHelper, "1.4");
 
 //---------------------------------------------------------------------------
 vtkSMArraySelectionInformationHelper::vtkSMArraySelectionInformationHelper()

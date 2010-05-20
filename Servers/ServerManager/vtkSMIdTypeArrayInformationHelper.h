@@ -31,7 +31,7 @@ class VTK_EXPORT vtkSMIdTypeArrayInformationHelper :
 {
 public:
   static vtkSMIdTypeArrayInformationHelper* New();
-  vtkTypeRevisionMacro(vtkSMIdTypeArrayInformationHelper, vtkSMInformationHelper);
+  vtkTypeMacro(vtkSMIdTypeArrayInformationHelper, vtkSMInformationHelper);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   //BTX

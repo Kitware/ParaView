@@ -43,7 +43,6 @@
 
 //---------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMSourceProxy);
-vtkCxxRevisionMacro(vtkSMSourceProxy, "1.68");
 
 // This struct will keep all information associated with the output port.
 struct vtkSMSourceProxyOutputPort

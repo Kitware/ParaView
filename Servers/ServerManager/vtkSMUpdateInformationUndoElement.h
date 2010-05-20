@@ -30,7 +30,7 @@ class VTK_EXPORT vtkSMUpdateInformationUndoElement : public vtkSMUndoElement
 {
 public:
   static vtkSMUpdateInformationUndoElement* New();
-  vtkTypeRevisionMacro(vtkSMUpdateInformationUndoElement, vtkSMUndoElement);
+  vtkTypeMacro(vtkSMUpdateInformationUndoElement, vtkSMUndoElement);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

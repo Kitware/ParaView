@@ -19,7 +19,6 @@
 #include "vtkSMSILInformationHelper.h"
 
 vtkStandardNewMacro(vtkSMSILDomain);
-vtkCxxRevisionMacro(vtkSMSILDomain, "1.2");
 //----------------------------------------------------------------------------
 vtkSMSILDomain::vtkSMSILDomain()
 {

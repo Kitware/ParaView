@@ -18,7 +18,7 @@
 class VTK_EXPORT vtkPrismSurfaceReader : public vtkPolyDataAlgorithm 
 {
 public:
-  vtkTypeRevisionMacro(vtkPrismSurfaceReader,vtkPolyDataAlgorithm);
+  vtkTypeMacro(vtkPrismSurfaceReader,vtkPolyDataAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   static vtkPrismSurfaceReader *New();

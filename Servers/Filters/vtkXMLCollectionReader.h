@@ -34,7 +34,7 @@ class VTK_EXPORT vtkXMLCollectionReader : public vtkXMLReader
 {
 public:
   static vtkXMLCollectionReader* New();
-  vtkTypeRevisionMacro(vtkXMLCollectionReader,vtkXMLReader);
+  vtkTypeMacro(vtkXMLCollectionReader,vtkXMLReader);
   void PrintSelf(ostream& os, vtkIndent indent);
   
   // Description:

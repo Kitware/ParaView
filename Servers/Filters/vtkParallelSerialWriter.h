@@ -30,7 +30,7 @@ class VTK_EXPORT vtkParallelSerialWriter : public vtkDataObjectAlgorithm
 {
 public:
   static vtkParallelSerialWriter* New();
-  vtkTypeRevisionMacro(vtkParallelSerialWriter, vtkDataObjectAlgorithm);
+  vtkTypeMacro(vtkParallelSerialWriter, vtkDataObjectAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

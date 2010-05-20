@@ -22,7 +22,6 @@
 #include "vtkMPI.h"
 
 vtkStandardNewMacro(vtkPVMPICommunicator);
-vtkCxxRevisionMacro(vtkPVMPICommunicator, "1.3");
 //----------------------------------------------------------------------------
 vtkPVMPICommunicator::vtkPVMPICommunicator()
 {

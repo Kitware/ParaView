@@ -70,7 +70,7 @@ class VTK_EXPORT vtkSpyPlotReader : public vtkCompositeDataSetAlgorithm
 {
 public:
   static vtkSpyPlotReader* New();
-  vtkTypeRevisionMacro(vtkSpyPlotReader,vtkCompositeDataSetAlgorithm);
+  vtkTypeMacro(vtkSpyPlotReader,vtkCompositeDataSetAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
   void PrintBlockList(vtkHierarchicalBoxDataSet *hbds, int myProcId);
 

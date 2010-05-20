@@ -38,7 +38,7 @@ class vtkInformationIntegerKey;
 class VTK_EXPORT vtkSciVizStatistics : public vtkTableAlgorithm
 {
 public:
-  vtkTypeRevisionMacro(vtkSciVizStatistics,vtkTableAlgorithm);
+  vtkTypeMacro(vtkSciVizStatistics,vtkTableAlgorithm);
   virtual void PrintSelf( ostream& os, vtkIndent indent );
 
   // Description:

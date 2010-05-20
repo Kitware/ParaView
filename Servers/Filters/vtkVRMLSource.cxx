@@ -33,7 +33,6 @@
 #include "vtkVRMLImporter.h"
 
 
-vtkCxxRevisionMacro(vtkVRMLSource, "1.12");
 vtkStandardNewMacro(vtkVRMLSource);
 
 //------------------------------------------------------------------------------

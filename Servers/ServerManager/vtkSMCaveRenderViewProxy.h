@@ -27,7 +27,7 @@ class VTK_EXPORT vtkSMCaveRenderViewProxy :
 {
 public:
   static vtkSMCaveRenderViewProxy* New();
-  vtkTypeRevisionMacro(vtkSMCaveRenderViewProxy, 
+  vtkTypeMacro(vtkSMCaveRenderViewProxy,
     vtkSMIceTMultiDisplayRenderViewProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 

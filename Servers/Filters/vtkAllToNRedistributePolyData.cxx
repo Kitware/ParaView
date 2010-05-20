@@ -25,7 +25,6 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkAllToNRedistributePolyData);
-vtkCxxRevisionMacro(vtkAllToNRedistributePolyData, "1.6");
 
 //----------------------------------------------------------------------------
 vtkAllToNRedistributePolyData::vtkAllToNRedistributePolyData()

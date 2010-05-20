@@ -61,7 +61,6 @@
 #include "vtkPolyData.h"
 
 //-----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkDepthSortPainter, "1.2")
 vtkStandardNewMacro(vtkDepthSortPainter)
 //-----------------------------------------------------------------------------
 vtkCxxSetObjectMacro(vtkDepthSortPainter,DepthSortPolyData,vtkDepthSortPolyData)

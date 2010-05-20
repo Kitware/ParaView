@@ -22,7 +22,6 @@
 #include "vtkSMIntVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMClientServerRenderViewProxy);
-vtkCxxRevisionMacro(vtkSMClientServerRenderViewProxy, "1.12");
 
 //----------------------------------------------------------------------------
 vtkSMClientServerRenderViewProxy::vtkSMClientServerRenderViewProxy()

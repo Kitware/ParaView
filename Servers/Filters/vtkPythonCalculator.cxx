@@ -32,7 +32,6 @@
 #include <vtkstd/map>
 #include <vtkstd/string>
 
-vtkCxxRevisionMacro(vtkPythonCalculator, "1.6");
 vtkStandardNewMacro(vtkPythonCalculator);
 
 //----------------------------------------------------------------------------

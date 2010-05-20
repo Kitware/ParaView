@@ -28,7 +28,7 @@ class VTK_EXPORT vtkPVGenericRenderWindowInteractor : public vtkRenderWindowInte
 {
 public:
   static vtkPVGenericRenderWindowInteractor *New();
-  vtkTypeRevisionMacro(vtkPVGenericRenderWindowInteractor, vtkRenderWindowInteractor);
+  vtkTypeMacro(vtkPVGenericRenderWindowInteractor, vtkRenderWindowInteractor);
   void PrintSelf(ostream& os, vtkIndent indent);
   
   void SetPVRenderView(vtkPVRenderViewProxy *view);

@@ -26,7 +26,6 @@
 #include <sys/stat.h>
 
 vtkStandardNewMacro(vtkClientServerInterpreter);
-vtkCxxRevisionMacro(vtkClientServerInterpreter, "1.23");
 
 //----------------------------------------------------------------------------
 class vtkClientServerInterpreterInternals

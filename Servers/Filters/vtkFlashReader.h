@@ -61,7 +61,7 @@ class VTK_EXPORT vtkFlashReader : public vtkMultiBlockDataSetAlgorithm
 {
 public:
   static vtkFlashReader * New();
-  vtkTypeRevisionMacro( vtkFlashReader, vtkMultiBlockDataSetAlgorithm );
+  vtkTypeMacro( vtkFlashReader, vtkMultiBlockDataSetAlgorithm );
   void PrintSelf( ostream & os, vtkIndent indent );
 
   // Description:

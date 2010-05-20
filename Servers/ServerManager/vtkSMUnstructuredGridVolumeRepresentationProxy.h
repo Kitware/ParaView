@@ -28,7 +28,7 @@ class VTK_EXPORT vtkSMUnstructuredGridVolumeRepresentationProxy :
 {
 public:
   static vtkSMUnstructuredGridVolumeRepresentationProxy* New();
-  vtkTypeRevisionMacro(vtkSMUnstructuredGridVolumeRepresentationProxy, 
+  vtkTypeMacro(vtkSMUnstructuredGridVolumeRepresentationProxy,
     vtkSMPropRepresentationProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 

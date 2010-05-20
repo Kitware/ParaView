@@ -45,7 +45,7 @@ class VTK_EXPORT vtkSMReaderFactory : public vtkSMObject
 {
 public:
   static vtkSMReaderFactory* New();
-  vtkTypeRevisionMacro(vtkSMReaderFactory, vtkSMObject);
+  vtkTypeMacro(vtkSMReaderFactory, vtkSMObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

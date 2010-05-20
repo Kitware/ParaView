@@ -26,7 +26,6 @@
 #include "vtkDoubleArray.h"
 
 vtkStandardNewMacro(vtkPolyLineToRectilinearGridFilter);
-vtkCxxRevisionMacro(vtkPolyLineToRectilinearGridFilter, "1.3");
 //-----------------------------------------------------------------------------
 vtkPolyLineToRectilinearGridFilter::vtkPolyLineToRectilinearGridFilter()
 {

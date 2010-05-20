@@ -33,7 +33,6 @@
 #include "vtk1DLookupTableTransferFunction.h"
 #include "vtk1DGaussianTransferFunction.h"
 
-vtkCxxRevisionMacro(vtk1DTransferFunctionChooser, "1.1")
 vtkStandardNewMacro(vtk1DTransferFunctionChooser)
 
 vtkCxxSetObjectMacro(vtk1DTransferFunctionChooser, LookupTableTransferFunction, vtk1DLookupTableTransferFunction)

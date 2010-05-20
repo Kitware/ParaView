@@ -25,7 +25,7 @@ class VTK_EXPORT vtkCPImplementedTestDriver : public vtkCPTestDriver
 {
 public:
   static vtkCPImplementedTestDriver * New();
-  vtkTypeRevisionMacro(vtkCPImplementedTestDriver, vtkCPTestDriver);
+  vtkTypeMacro(vtkCPImplementedTestDriver, vtkCPTestDriver);
   void PrintSelf(ostream& os, vtkIndent indent)
     {
       this->Superclass::PrintSelf(os, indent);
@@ -70,7 +70,6 @@ private:
 };
 
 vtkStandardNewMacro(vtkCPImplementedTestDriver);
-vtkCxxRevisionMacro(vtkCPImplementedTestDriver, "1.1");
 
 
 int main()

@@ -33,7 +33,6 @@
 
 
 vtkStandardNewMacro(vtkNetworkImageSource);
-vtkCxxRevisionMacro(vtkNetworkImageSource, "1.4");
 //----------------------------------------------------------------------------
 vtkNetworkImageSource::vtkNetworkImageSource()
 {

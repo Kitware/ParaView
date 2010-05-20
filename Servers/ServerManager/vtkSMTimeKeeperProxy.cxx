@@ -36,7 +36,6 @@ public:
 };
 
 vtkStandardNewMacro(vtkSMTimeKeeperProxy);
-vtkCxxRevisionMacro(vtkSMTimeKeeperProxy, "1.4");
 //----------------------------------------------------------------------------
 vtkSMTimeKeeperProxy::vtkSMTimeKeeperProxy()
 {

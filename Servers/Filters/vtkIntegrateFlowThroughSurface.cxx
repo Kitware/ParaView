@@ -31,7 +31,6 @@
 #include "vtkUnstructuredGrid.h"
 #include "vtkSmartPointer.h"
 
-vtkCxxRevisionMacro(vtkIntegrateFlowThroughSurface, "1.8");
 vtkStandardNewMacro(vtkIntegrateFlowThroughSurface);
 
 //-----------------------------------------------------------------------------

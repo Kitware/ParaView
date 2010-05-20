@@ -144,7 +144,6 @@ void vtkExodusFileSeriesReaderStatus::RestoreStatus(vtkExodusIIReader *reader)
 }
 
 //=============================================================================
-vtkCxxRevisionMacro(vtkExodusFileSeriesReader, "1.2");
 vtkStandardNewMacro(vtkExodusFileSeriesReader);
 
 //-----------------------------------------------------------------------------

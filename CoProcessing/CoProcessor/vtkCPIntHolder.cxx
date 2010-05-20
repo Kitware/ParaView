@@ -15,7 +15,6 @@
 #include "vtkCPIntHolder.h"
 #include "vtkObjectFactory.h"
 
-vtkCxxRevisionMacro(vtkCPIntHolder, "1.1");
 vtkStandardNewMacro(vtkCPIntHolder);
 
 vtkCPIntHolder::vtkCPIntHolder()

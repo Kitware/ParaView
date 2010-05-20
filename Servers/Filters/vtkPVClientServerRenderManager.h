@@ -31,7 +31,7 @@ class vtkImageCompressor;
 class VTK_EXPORT vtkPVClientServerRenderManager : public vtkParallelRenderManager
 {
 public:
-  vtkTypeRevisionMacro(vtkPVClientServerRenderManager, vtkParallelRenderManager);
+  vtkTypeMacro(vtkPVClientServerRenderManager, vtkParallelRenderManager);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

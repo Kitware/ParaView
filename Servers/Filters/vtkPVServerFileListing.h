@@ -27,7 +27,7 @@ class VTK_EXPORT vtkPVServerFileListing : public vtkPVServerObject
 {
 public:
   static vtkPVServerFileListing* New();
-  vtkTypeRevisionMacro(vtkPVServerFileListing, vtkPVServerObject);
+  vtkTypeMacro(vtkPVServerFileListing, vtkPVServerObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

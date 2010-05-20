@@ -85,7 +85,7 @@ class VTK_vtkManta_EXPORT vtkMantaProperty : public vtkProperty
 {
 public:
   static vtkMantaProperty *New();
-  vtkTypeRevisionMacro(vtkMantaProperty,vtkProperty) ;
+  vtkTypeMacro(vtkMantaProperty,vtkProperty) ;
   virtual void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

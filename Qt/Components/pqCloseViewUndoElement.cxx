@@ -38,7 +38,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqViewManager.h"
 
 vtkStandardNewMacro(pqCloseViewUndoElement);
-vtkCxxRevisionMacro(pqCloseViewUndoElement, "1.3");
 //----------------------------------------------------------------------------
 pqCloseViewUndoElement::pqCloseViewUndoElement()
 {

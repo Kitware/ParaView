@@ -18,7 +18,6 @@
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMFileListDomain);
-vtkCxxRevisionMacro(vtkSMFileListDomain, "1.2");
 
 //---------------------------------------------------------------------------
 vtkSMFileListDomain::vtkSMFileListDomain()

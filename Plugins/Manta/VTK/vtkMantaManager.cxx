@@ -36,7 +36,6 @@
 #include <Model/Groups/Group.h>
 #include <Model/Lights/HeadLight.h>
 
-vtkCxxRevisionMacro(vtkMantaManager, "1.5");
 vtkStandardNewMacro(vtkMantaManager);
 
 //----------------------------------------------------------------------------

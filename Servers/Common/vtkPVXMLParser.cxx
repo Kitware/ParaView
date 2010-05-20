@@ -17,7 +17,6 @@
 #include "vtkPVXMLElement.h"
 #include "vtksys/ios/sstream"
 
-vtkCxxRevisionMacro(vtkPVXMLParser, "1.3");
 vtkStandardNewMacro(vtkPVXMLParser);
 
 //----------------------------------------------------------------------------

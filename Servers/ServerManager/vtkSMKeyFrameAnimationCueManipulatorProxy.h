@@ -44,7 +44,7 @@ class VTK_EXPORT vtkSMKeyFrameAnimationCueManipulatorProxy :
   public vtkSMAnimationCueManipulatorProxy
 {
 public:
-  vtkTypeRevisionMacro(vtkSMKeyFrameAnimationCueManipulatorProxy, 
+  vtkTypeMacro(vtkSMKeyFrameAnimationCueManipulatorProxy,
     vtkSMAnimationCueManipulatorProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
   static vtkSMKeyFrameAnimationCueManipulatorProxy* New();

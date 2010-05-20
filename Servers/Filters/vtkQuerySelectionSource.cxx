@@ -72,7 +72,6 @@ public:
 };
 
 vtkStandardNewMacro(vtkQuerySelectionSource);
-vtkCxxRevisionMacro(vtkQuerySelectionSource, "1.1");
 //----------------------------------------------------------------------------
 vtkQuerySelectionSource::vtkQuerySelectionSource()
 {

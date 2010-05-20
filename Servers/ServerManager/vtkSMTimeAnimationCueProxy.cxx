@@ -20,7 +20,6 @@
 #include "vtkSMProperty.h"
 
 vtkStandardNewMacro(vtkSMTimeAnimationCueProxy);
-vtkCxxRevisionMacro(vtkSMTimeAnimationCueProxy, "1.3");
 //----------------------------------------------------------------------------
 vtkSMTimeAnimationCueProxy::vtkSMTimeAnimationCueProxy()
 {

@@ -21,7 +21,6 @@
 #include "vtkTransferFunctionEditorRepresentation.h"
 #include "vtkTransferFunctionEditorWidget.h"
 
-vtkCxxRevisionMacro(vtkInteractorStyleTransferFunctionEditor, "1.4");
 vtkStandardNewMacro(vtkInteractorStyleTransferFunctionEditor);
 
 vtkCxxSetObjectMacro(vtkInteractorStyleTransferFunctionEditor, Widget,

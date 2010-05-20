@@ -83,7 +83,7 @@ class VTK_vtkManta_EXPORT vtkMantaLight : public vtkLight
 {
 public:
   static vtkMantaLight *New();
-  vtkTypeRevisionMacro(vtkMantaLight, vtkLight);
+  vtkTypeMacro(vtkMantaLight, vtkLight);
   virtual void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

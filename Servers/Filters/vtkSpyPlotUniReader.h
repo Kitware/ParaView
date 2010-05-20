@@ -43,7 +43,7 @@ class vtkSpyPlotIStream;
 class VTK_EXPORT vtkSpyPlotUniReader : public vtkObject
 {
 public:
-  vtkTypeRevisionMacro(vtkSpyPlotUniReader, vtkObject);
+  vtkTypeMacro(vtkSpyPlotUniReader, vtkObject);
   static vtkSpyPlotUniReader* New();
   void PrintSelf(ostream& os, vtkIndent indent);
 

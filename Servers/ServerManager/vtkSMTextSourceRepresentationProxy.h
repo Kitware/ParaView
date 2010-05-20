@@ -28,7 +28,7 @@ class VTK_EXPORT vtkSMTextSourceRepresentationProxy : public vtkSMClientDelivery
 {
 public:
   static vtkSMTextSourceRepresentationProxy* New();
-  vtkTypeRevisionMacro(vtkSMTextSourceRepresentationProxy, vtkSMClientDeliveryRepresentationProxy);
+  vtkTypeMacro(vtkSMTextSourceRepresentationProxy, vtkSMClientDeliveryRepresentationProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

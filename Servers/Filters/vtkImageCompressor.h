@@ -34,7 +34,7 @@ class vtkMultiProcessStream;
 class VTK_EXPORT vtkImageCompressor : public vtkObject
 {
 public:
-  vtkTypeRevisionMacro(vtkImageCompressor, vtkObject);
+  vtkTypeMacro(vtkImageCompressor, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

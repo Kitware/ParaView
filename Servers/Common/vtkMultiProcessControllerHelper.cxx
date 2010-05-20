@@ -19,7 +19,6 @@
 #include "vtkMultiProcessStream.h"
 
 vtkStandardNewMacro(vtkMultiProcessControllerHelper);
-vtkCxxRevisionMacro(vtkMultiProcessControllerHelper, "1.2");
 //----------------------------------------------------------------------------
 vtkMultiProcessControllerHelper::vtkMultiProcessControllerHelper()
 {

@@ -31,7 +31,7 @@ class VTK_EXPORT vtkTransferFunctionEditorWidgetSimple1D : public vtkTransferFun
 {
 public:
   static vtkTransferFunctionEditorWidgetSimple1D* New();
-  vtkTypeRevisionMacro(vtkTransferFunctionEditorWidgetSimple1D, vtkTransferFunctionEditorWidget1D);
+  vtkTypeMacro(vtkTransferFunctionEditorWidgetSimple1D, vtkTransferFunctionEditorWidget1D);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

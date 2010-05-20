@@ -34,7 +34,7 @@ class VTK_EXPORT vtkSMNumberOfComponentsDomain : public vtkSMIntRangeDomain
 {
 public:
   static vtkSMNumberOfComponentsDomain* New();
-  vtkTypeRevisionMacro(vtkSMNumberOfComponentsDomain, vtkSMIntRangeDomain);
+  vtkTypeMacro(vtkSMNumberOfComponentsDomain, vtkSMIntRangeDomain);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

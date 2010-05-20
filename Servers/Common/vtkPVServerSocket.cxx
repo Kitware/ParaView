@@ -19,7 +19,6 @@
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro(vtkPVServerSocket);
-vtkCxxRevisionMacro(vtkPVServerSocket, "1.1");
 //-----------------------------------------------------------------------------
 vtkPVServerSocket::vtkPVServerSocket()
 {

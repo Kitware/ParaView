@@ -29,7 +29,7 @@ class VTK_EXPORT vtkSMUniformGridVolumeRepresentationProxy :
 {
 public:
   static vtkSMUniformGridVolumeRepresentationProxy* New();
-  vtkTypeRevisionMacro(vtkSMUniformGridVolumeRepresentationProxy,
+  vtkTypeMacro(vtkSMUniformGridVolumeRepresentationProxy,
     vtkSMPropRepresentationProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 

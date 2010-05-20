@@ -24,7 +24,6 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVServerTimeSteps);
-vtkCxxRevisionMacro(vtkPVServerTimeSteps, "1.5");
 
 //----------------------------------------------------------------------------
 class vtkPVServerTimeStepsInternals

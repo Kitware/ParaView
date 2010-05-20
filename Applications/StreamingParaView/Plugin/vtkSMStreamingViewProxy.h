@@ -34,7 +34,7 @@ class VTK_EXPORT vtkSMStreamingViewProxy : public vtkSMViewProxy
 {
 public:
   static vtkSMStreamingViewProxy* New();
-  vtkTypeRevisionMacro(vtkSMStreamingViewProxy, vtkSMViewProxy);
+  vtkTypeMacro(vtkSMStreamingViewProxy, vtkSMViewProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   vtkSMRenderViewProxy *GetRootView();

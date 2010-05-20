@@ -310,7 +310,7 @@ class vtknifti1_io : public vtkObject
 {
 public:
   static vtknifti1_io *New();
-  vtkTypeRevisionMacro(vtknifti1_io,vtkObject);
+  vtkTypeMacro(vtknifti1_io,vtkObject);
   virtual void PrintSelf(ostream& os, vtkIndent indent);
 
 /*****************************************************************************/

@@ -34,7 +34,6 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLODVolume);
-vtkCxxRevisionMacro(vtkPVLODVolume, "1.13");
 
 //----------------------------------------------------------------------------
 vtkPVLODVolume::vtkPVLODVolume()

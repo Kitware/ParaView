@@ -18,7 +18,6 @@
 
 
 vtkStandardNewMacro(vtkSMNullProxy);
-vtkCxxRevisionMacro(vtkSMNullProxy, "1.2");
 //-----------------------------------------------------------------------------
 vtkSMNullProxy::vtkSMNullProxy()
 {

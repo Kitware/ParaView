@@ -25,7 +25,7 @@ class VTK_EXPORT vtkSMChartingArraysInformationHelper : public vtkSMInformationH
 {
 public:
   static vtkSMChartingArraysInformationHelper* New();
-  vtkTypeRevisionMacro(vtkSMChartingArraysInformationHelper, vtkSMInformationHelper);
+  vtkTypeMacro(vtkSMChartingArraysInformationHelper, vtkSMInformationHelper);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   //BTX

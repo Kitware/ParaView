@@ -24,7 +24,6 @@
 #include <vtksys/SystemTools.hxx>
 
 vtkStandardNewMacro(vtkSMMaterialLoaderProxy);
-vtkCxxRevisionMacro(vtkSMMaterialLoaderProxy, "1.3");
 vtkCxxSetObjectMacro(vtkSMMaterialLoaderProxy, PropertyProxy, vtkSMProxy);
 
 //-----------------------------------------------------------------------------

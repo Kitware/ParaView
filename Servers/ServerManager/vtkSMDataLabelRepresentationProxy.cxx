@@ -33,7 +33,6 @@
 #include "vtkSMIntVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMDataLabelRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMDataLabelRepresentationProxy, "Revision: 1.1$");
 
 //-----------------------------------------------------------------------------
 vtkSMDataLabelRepresentationProxy::vtkSMDataLabelRepresentationProxy()

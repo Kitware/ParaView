@@ -27,7 +27,7 @@ class VTK_EXPORT vtkSMServerFileListingProxy : public vtkSMProxy
 {
 public:
   static vtkSMServerFileListingProxy* New();
-  vtkTypeRevisionMacro(vtkSMServerFileListingProxy, vtkSMProxy);
+  vtkTypeMacro(vtkSMServerFileListingProxy, vtkSMProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description

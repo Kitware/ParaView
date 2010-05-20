@@ -30,7 +30,7 @@ class VTK_EXPORT vtkPVServerOptions : public vtkPVOptions
 {
 public:
   static vtkPVServerOptions* New();
-  vtkTypeRevisionMacro(vtkPVServerOptions,vtkPVOptions);
+  vtkTypeMacro(vtkPVServerOptions,vtkPVOptions);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

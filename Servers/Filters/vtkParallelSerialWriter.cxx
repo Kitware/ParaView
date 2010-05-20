@@ -34,7 +34,6 @@
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkParallelSerialWriter);
-vtkCxxRevisionMacro(vtkParallelSerialWriter, "1.7");
 vtkCxxSetObjectMacro(vtkParallelSerialWriter, Writer, vtkAlgorithm);
 vtkCxxSetObjectMacro(vtkParallelSerialWriter, PreGatherHelper, vtkAlgorithm);
 vtkCxxSetObjectMacro(vtkParallelSerialWriter, PostGatherHelper, vtkAlgorithm);

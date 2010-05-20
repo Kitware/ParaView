@@ -20,7 +20,6 @@
 #include "vtkSMDoubleVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMTimeStepsInformationHelper);
-vtkCxxRevisionMacro(vtkSMTimeStepsInformationHelper, "1.7");
 
 //---------------------------------------------------------------------------
 vtkSMTimeStepsInformationHelper::vtkSMTimeStepsInformationHelper()

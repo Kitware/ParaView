@@ -31,7 +31,7 @@ class VTK_EXPORT vtkSMDeserializer : public vtkSMObject
 {
 public:
   static vtkSMDeserializer* New();
-  vtkTypeRevisionMacro(vtkSMDeserializer, vtkSMObject);
+  vtkTypeMacro(vtkSMDeserializer, vtkSMObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
 //BTX

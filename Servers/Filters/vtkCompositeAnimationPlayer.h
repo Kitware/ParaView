@@ -27,7 +27,7 @@ class VTK_EXPORT vtkCompositeAnimationPlayer : public vtkAnimationPlayer
 {
 public:
   static vtkCompositeAnimationPlayer* New();
-  vtkTypeRevisionMacro(vtkCompositeAnimationPlayer, vtkAnimationPlayer);
+  vtkTypeMacro(vtkCompositeAnimationPlayer, vtkAnimationPlayer);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

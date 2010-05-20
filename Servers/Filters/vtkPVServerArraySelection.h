@@ -28,7 +28,7 @@ class VTK_EXPORT vtkPVServerArraySelection : public vtkPVServerObject
 {
 public:
   static vtkPVServerArraySelection* New();
-  vtkTypeRevisionMacro(vtkPVServerArraySelection, vtkPVServerObject);
+  vtkTypeMacro(vtkPVServerArraySelection, vtkPVServerObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

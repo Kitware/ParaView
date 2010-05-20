@@ -33,7 +33,7 @@ class VTK_EXPORT vtkSMInteractionUndoStackBuilder : public vtkSMObject
 {
 public:
   static vtkSMInteractionUndoStackBuilder* New();
-  vtkTypeRevisionMacro(vtkSMInteractionUndoStackBuilder, vtkSMObject);
+  vtkTypeMacro(vtkSMInteractionUndoStackBuilder, vtkSMObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

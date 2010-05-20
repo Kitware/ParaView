@@ -48,7 +48,7 @@ class VTK_EXPORT vtkSMWriterFactory : public vtkSMObject
 {
 public:
   static vtkSMWriterFactory* New();
-  vtkTypeRevisionMacro(vtkSMWriterFactory, vtkSMObject);
+  vtkTypeMacro(vtkSMWriterFactory, vtkSMObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

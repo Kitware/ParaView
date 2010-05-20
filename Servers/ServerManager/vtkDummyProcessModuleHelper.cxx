@@ -15,7 +15,6 @@
 #include "vtkDummyProcessModuleHelper.h"
 
 #include "vtkObjectFactory.h"
-vtkCxxRevisionMacro(vtkDummyProcessModuleHelper, "1.1");
 vtkStandardNewMacro(vtkDummyProcessModuleHelper);
 
 //----------------------------------------------------------------------------

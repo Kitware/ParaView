@@ -29,7 +29,7 @@ class VTK_EXPORT vtkSMCameraLink : public vtkSMProxyLink
 {
 public:
   static vtkSMCameraLink* New();
-  vtkTypeRevisionMacro(vtkSMCameraLink, vtkSMProxyLink);
+  vtkTypeMacro(vtkSMCameraLink, vtkSMProxyLink);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

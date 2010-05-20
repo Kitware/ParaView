@@ -20,7 +20,6 @@
 #include "vtkSMMultiProcessRenderView.h"
 
 vtkStandardNewMacro(vtkSMRenderViewExporterProxy);
-vtkCxxRevisionMacro(vtkSMRenderViewExporterProxy, "1.2");
 //----------------------------------------------------------------------------
 vtkSMRenderViewExporterProxy::vtkSMRenderViewExporterProxy()
 {

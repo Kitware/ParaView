@@ -31,7 +31,7 @@ class vtkRenderWindow;
 class VTK_EXPORT vtkPVRenderViewProxy : public vtkObject
 {
 public:
-  vtkTypeRevisionMacro(vtkPVRenderViewProxy, vtkObject);
+  vtkTypeMacro(vtkPVRenderViewProxy, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

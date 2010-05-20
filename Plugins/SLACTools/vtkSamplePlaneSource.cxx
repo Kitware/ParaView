@@ -36,7 +36,6 @@
 #include <math.h>
 
 //=============================================================================
-vtkCxxRevisionMacro(vtkSamplePlaneSource, "1.2");
 vtkStandardNewMacro(vtkSamplePlaneSource);
 
 vtkCxxSetObjectMacro(vtkSamplePlaneSource, Controller,

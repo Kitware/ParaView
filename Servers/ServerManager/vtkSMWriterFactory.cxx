@@ -143,7 +143,6 @@ public:
 };
 
 vtkStandardNewMacro(vtkSMWriterFactory);
-vtkCxxRevisionMacro(vtkSMWriterFactory, "1.2");
 //----------------------------------------------------------------------------
 vtkSMWriterFactory::vtkSMWriterFactory()
 {

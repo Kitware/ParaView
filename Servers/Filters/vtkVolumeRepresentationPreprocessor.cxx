@@ -24,7 +24,6 @@
 #include "vtkObjectFactory.h"
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkVolumeRepresentationPreprocessor, "1.3");
 vtkStandardNewMacro(vtkVolumeRepresentationPreprocessor);
 
 //----------------------------------------------------------------------------

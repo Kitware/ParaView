@@ -37,7 +37,6 @@ public:
 
 //-----------------------------------------------------------------------------
 
-vtkCxxRevisionMacro(vtkIceTContext, "1.1");
 vtkStandardNewMacro(vtkIceTContext);
 
 vtkIceTContext::vtkIceTContext()

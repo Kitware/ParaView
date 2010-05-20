@@ -60,7 +60,7 @@ class COPROCESSING_EXPORT vtkCPProcessor : public vtkObject
 
 public:
   static vtkCPProcessor* New();
-  vtkTypeRevisionMacro(vtkCPProcessor,vtkObject);
+  vtkTypeMacro(vtkCPProcessor,vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

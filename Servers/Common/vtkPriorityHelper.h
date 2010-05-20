@@ -32,7 +32,7 @@ class VTK_EXPORT vtkPriorityHelper : public vtkObject
 {
 public:
   static vtkPriorityHelper* New();
-  vtkTypeRevisionMacro(vtkPriorityHelper, vtkObject);
+  vtkTypeMacro(vtkPriorityHelper, vtkObject);
   
   void SetInputConnection(vtkAlgorithmOutput *input);
 

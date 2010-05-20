@@ -27,7 +27,6 @@
 
 
 vtkStandardNewMacro(vtkSMDataTypeDomain);
-vtkCxxRevisionMacro(vtkSMDataTypeDomain, "1.15");
 
 struct vtkSMDataTypeDomainInternals
 {

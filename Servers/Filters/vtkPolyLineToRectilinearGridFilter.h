@@ -32,7 +32,7 @@ class VTK_EXPORT vtkPolyLineToRectilinearGridFilter :
 {
 public:
   static vtkPolyLineToRectilinearGridFilter* New();
-  vtkTypeRevisionMacro(vtkPolyLineToRectilinearGridFilter, 
+  vtkTypeMacro(vtkPolyLineToRectilinearGridFilter,
     vtkRectilinearGridAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 

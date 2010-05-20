@@ -28,7 +28,7 @@ class VTK_EXPORT vtkCPUniformGridBuilder : public vtkCPGridBuilder
 {
 public:
   static vtkCPUniformGridBuilder* New();
-  vtkTypeRevisionMacro(vtkCPUniformGridBuilder, vtkCPGridBuilder);
+  vtkTypeMacro(vtkCPUniformGridBuilder, vtkCPGridBuilder);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

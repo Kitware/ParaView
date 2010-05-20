@@ -17,7 +17,6 @@
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro(vtkCPConstantScalarFieldFunction);
-vtkCxxRevisionMacro(vtkCPConstantScalarFieldFunction, "1.1");
 
 //----------------------------------------------------------------------------
 vtkCPConstantScalarFieldFunction::vtkCPConstantScalarFieldFunction()

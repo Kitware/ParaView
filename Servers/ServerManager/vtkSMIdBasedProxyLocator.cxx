@@ -21,7 +21,6 @@
 #include "vtkClientServerInterpreter.h"
 
 vtkStandardNewMacro(vtkSMIdBasedProxyLocator);
-vtkCxxRevisionMacro(vtkSMIdBasedProxyLocator, "1.1");
 //----------------------------------------------------------------------------
 vtkSMIdBasedProxyLocator::vtkSMIdBasedProxyLocator()
 {

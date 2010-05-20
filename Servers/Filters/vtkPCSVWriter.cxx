@@ -28,7 +28,6 @@
 #include "vtkStreamingDemandDrivenPipeline.h"
 
 vtkStandardNewMacro(vtkPCSVWriter);
-vtkCxxRevisionMacro(vtkPCSVWriter, "1.6");
 
 vtkCxxSetObjectMacro(vtkPCSVWriter, Controller, vtkMultiProcessController);
 

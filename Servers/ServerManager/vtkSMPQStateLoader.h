@@ -32,7 +32,7 @@ class VTK_EXPORT vtkSMPQStateLoader : public vtkSMStateLoader
 {
 public:
   static vtkSMPQStateLoader* New();
-  vtkTypeRevisionMacro(vtkSMPQStateLoader, vtkSMStateLoader);
+  vtkTypeMacro(vtkSMPQStateLoader, vtkSMStateLoader);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

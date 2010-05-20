@@ -45,7 +45,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServerManagerModel.h"
 
 vtkStandardNewMacro(pqHelperProxyRegisterUndoElement);
-vtkCxxRevisionMacro(pqHelperProxyRegisterUndoElement, "1.5");
 //-----------------------------------------------------------------------------
 pqHelperProxyRegisterUndoElement::pqHelperProxyRegisterUndoElement()
 {

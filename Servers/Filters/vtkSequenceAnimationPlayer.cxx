@@ -17,7 +17,6 @@
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro(vtkSequenceAnimationPlayer);
-vtkCxxRevisionMacro(vtkSequenceAnimationPlayer, "1.5");
 //----------------------------------------------------------------------------
 vtkSequenceAnimationPlayer::vtkSequenceAnimationPlayer()
 {

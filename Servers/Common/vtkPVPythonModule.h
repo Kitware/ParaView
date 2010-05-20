@@ -35,7 +35,7 @@
 class VTK_EXPORT vtkPVPythonModule : public vtkObject
 {
 public:
-  vtkTypeRevisionMacro(vtkPVPythonModule, vtkObject);
+  vtkTypeMacro(vtkPVPythonModule, vtkObject);
   static vtkPVPythonModule *New();
   virtual void PrintSelf(ostream &os, vtkIndent indent);
 

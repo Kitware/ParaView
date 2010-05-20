@@ -19,7 +19,6 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMBlockDeliveryStrategy);
-vtkCxxRevisionMacro(vtkSMBlockDeliveryStrategy, "1.1");
 //----------------------------------------------------------------------------
 vtkSMBlockDeliveryStrategy::vtkSMBlockDeliveryStrategy()
 {

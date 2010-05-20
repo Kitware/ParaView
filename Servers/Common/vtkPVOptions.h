@@ -45,7 +45,7 @@ public:
 //ETX
   
   static vtkPVOptions* New();
-  vtkTypeRevisionMacro(vtkPVOptions,vtkCommandOptions);
+  vtkTypeMacro(vtkPVOptions,vtkCommandOptions);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   vtkGetMacro(ServerMode, int);

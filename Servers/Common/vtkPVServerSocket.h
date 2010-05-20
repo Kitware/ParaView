@@ -27,7 +27,7 @@ class VTK_EXPORT vtkPVServerSocket : public vtkServerSocket
 {
 public:
   static vtkPVServerSocket* New();
-  vtkTypeRevisionMacro(vtkPVServerSocket, vtkServerSocket);
+  vtkTypeMacro(vtkPVServerSocket, vtkServerSocket);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

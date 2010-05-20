@@ -28,7 +28,7 @@ class VTK_EXPORT vtkSMIceTDesktopRenderViewProxy : public vtkSMIceTCompositeView
 {
 public:
   static vtkSMIceTDesktopRenderViewProxy* New();
-  vtkTypeRevisionMacro(vtkSMIceTDesktopRenderViewProxy, vtkSMIceTCompositeViewProxy);
+  vtkTypeMacro(vtkSMIceTDesktopRenderViewProxy, vtkSMIceTCompositeViewProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

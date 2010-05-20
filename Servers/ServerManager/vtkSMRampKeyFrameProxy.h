@@ -24,7 +24,7 @@
 class VTK_EXPORT vtkSMRampKeyFrameProxy : public vtkSMKeyFrameProxy
 {
 public:
-  vtkTypeRevisionMacro(vtkSMRampKeyFrameProxy, vtkSMKeyFrameProxy);
+  vtkTypeMacro(vtkSMRampKeyFrameProxy, vtkSMKeyFrameProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
   static vtkSMRampKeyFrameProxy* New();
 

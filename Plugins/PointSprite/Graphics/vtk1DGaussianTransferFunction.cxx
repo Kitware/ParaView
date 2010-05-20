@@ -36,7 +36,6 @@
 #define MAX(a, b) (a>b? a : b)
 #endif
 
-vtkCxxRevisionMacro(vtk1DGaussianTransferFunction, "1.1")
 vtkStandardNewMacro(vtk1DGaussianTransferFunction)
 
 vtk1DGaussianTransferFunction::vtk1DGaussianTransferFunction()

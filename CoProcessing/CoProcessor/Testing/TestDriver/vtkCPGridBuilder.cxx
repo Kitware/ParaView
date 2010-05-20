@@ -16,7 +16,6 @@
 
 #include "vtkCPBaseFieldBuilder.h"
 
-vtkCxxRevisionMacro(vtkCPGridBuilder, "1.1");
 vtkCxxSetObjectMacro(vtkCPGridBuilder, FieldBuilder, vtkCPBaseFieldBuilder);
 
 //----------------------------------------------------------------------------

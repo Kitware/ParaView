@@ -32,7 +32,6 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMAdaptiveOutputPort);
-vtkCxxRevisionMacro(vtkSMAdaptiveOutputPort, "1.3");
 
 //----------------------------------------------------------------------------
 vtkSMAdaptiveOutputPort::vtkSMAdaptiveOutputPort()

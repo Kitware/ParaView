@@ -22,7 +22,6 @@
 #include "vtkSmartPointer.h"
 
 vtkStandardNewMacro(vtkCPTestDriver);
-vtkCxxRevisionMacro(vtkCPTestDriver, "1.2");
 vtkCxxSetObjectMacro(vtkCPTestDriver, GridBuilder, vtkCPBaseGridBuilder);
 
 //----------------------------------------------------------------------------

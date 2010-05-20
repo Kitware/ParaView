@@ -24,7 +24,6 @@
 #include "vtkStdString.h"
 
 vtkStandardNewMacro(vtkSMEnumerationDomain);
-vtkCxxRevisionMacro(vtkSMEnumerationDomain, "1.16");
 
 struct vtkSMEnumerationDomainInternals
 {

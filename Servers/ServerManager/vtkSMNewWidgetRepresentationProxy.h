@@ -36,7 +36,7 @@ class VTK_EXPORT vtkSMNewWidgetRepresentationProxy :
 {
 public:
   static vtkSMNewWidgetRepresentationProxy* New();
-  vtkTypeRevisionMacro(vtkSMNewWidgetRepresentationProxy, vtkSMRepresentationProxy);
+  vtkTypeMacro(vtkSMNewWidgetRepresentationProxy, vtkSMRepresentationProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
  
   // Description:

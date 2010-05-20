@@ -52,7 +52,6 @@ vtkPVPythonModule *vtkPVPythonModule::GetModule(const char *fullname)
 }
 
 //=============================================================================
-vtkCxxRevisionMacro(vtkPVPythonModule, "1.1");
 vtkStandardNewMacro(vtkPVPythonModule);
 
 //-----------------------------------------------------------------------------

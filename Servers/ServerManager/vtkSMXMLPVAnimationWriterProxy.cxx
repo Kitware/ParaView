@@ -25,7 +25,6 @@
 #include <vtksys/ios/sstream>
 
 vtkStandardNewMacro(vtkSMXMLPVAnimationWriterProxy);
-vtkCxxRevisionMacro(vtkSMXMLPVAnimationWriterProxy, "1.10");
 //*****************************************************************************
 class vtkSMXMLPVAnimationWriterProxyInternals
 {

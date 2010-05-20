@@ -29,7 +29,7 @@ class VTK_EXPORT vtkSMNetworkImageSourceProxy : public vtkSMSourceProxy
 {
 public:
   static vtkSMNetworkImageSourceProxy* New();
-  vtkTypeRevisionMacro(vtkSMNetworkImageSourceProxy, vtkSMSourceProxy);
+  vtkTypeMacro(vtkSMNetworkImageSourceProxy, vtkSMSourceProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

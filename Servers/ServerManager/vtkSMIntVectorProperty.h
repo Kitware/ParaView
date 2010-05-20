@@ -32,7 +32,7 @@ class VTK_EXPORT vtkSMIntVectorProperty : public vtkSMVectorProperty
 {
 public:
   static vtkSMIntVectorProperty* New();
-  vtkTypeRevisionMacro(vtkSMIntVectorProperty, vtkSMVectorProperty);
+  vtkTypeMacro(vtkSMIntVectorProperty, vtkSMVectorProperty);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

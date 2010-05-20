@@ -20,7 +20,6 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMImplicitPlaneProxy);
-vtkCxxRevisionMacro(vtkSMImplicitPlaneProxy, "1.7");
 
 //----------------------------------------------------------------------------
 vtkSMImplicitPlaneProxy::vtkSMImplicitPlaneProxy()

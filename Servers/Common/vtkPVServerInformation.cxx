@@ -23,7 +23,6 @@
 #include "vtkToolkits.h"
 
 vtkStandardNewMacro(vtkPVServerInformation);
-vtkCxxRevisionMacro(vtkPVServerInformation, "1.18");
 
 //----------------------------------------------------------------------------
 vtkPVServerInformation::vtkPVServerInformation()

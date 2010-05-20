@@ -31,7 +31,7 @@ class VTK_EXPORT vtkCommandOptions : public vtkObject
 {
 public:
   static vtkCommandOptions* New();
-  vtkTypeRevisionMacro(vtkCommandOptions,vtkObject);
+  vtkTypeMacro(vtkCommandOptions,vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
 //BTX

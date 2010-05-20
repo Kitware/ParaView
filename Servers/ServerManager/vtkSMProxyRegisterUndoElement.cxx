@@ -22,7 +22,6 @@
 #include "vtkSMProxyManager.h"
 
 vtkStandardNewMacro(vtkSMProxyRegisterUndoElement);
-vtkCxxRevisionMacro(vtkSMProxyRegisterUndoElement, "1.8");
 //-----------------------------------------------------------------------------
 vtkSMProxyRegisterUndoElement::vtkSMProxyRegisterUndoElement()
 {

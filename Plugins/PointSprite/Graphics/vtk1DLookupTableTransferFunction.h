@@ -40,7 +40,7 @@ class VTK_EXPORT vtk1DLookupTableTransferFunction: public vtk1DTransferFunction
 {
 public:
   static vtk1DLookupTableTransferFunction* New();
-  vtkTypeRevisionMacro(vtk1DLookupTableTransferFunction, vtk1DTransferFunction);
+  vtkTypeMacro(vtk1DLookupTableTransferFunction, vtk1DTransferFunction);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

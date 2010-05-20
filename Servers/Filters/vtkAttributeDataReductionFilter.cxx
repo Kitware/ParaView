@@ -27,7 +27,6 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkAttributeDataReductionFilter);
-vtkCxxRevisionMacro(vtkAttributeDataReductionFilter, "1.8");
 //-----------------------------------------------------------------------------
 vtkAttributeDataReductionFilter::vtkAttributeDataReductionFilter()
 {

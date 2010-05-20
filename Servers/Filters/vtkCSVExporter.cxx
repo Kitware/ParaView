@@ -19,7 +19,6 @@
 #include "vtkAbstractArray.h"
 
 vtkStandardNewMacro(vtkCSVExporter);
-vtkCxxRevisionMacro(vtkCSVExporter, "1.2");
 //----------------------------------------------------------------------------
 vtkCSVExporter::vtkCSVExporter()
 {

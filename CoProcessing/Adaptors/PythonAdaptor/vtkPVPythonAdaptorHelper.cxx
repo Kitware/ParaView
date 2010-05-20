@@ -24,7 +24,6 @@
 
 #include <vtkstd/vector>
 
-vtkCxxRevisionMacro(vtkPVPythonAdapterHelper, "1.1");
 vtkStandardNewMacro(vtkPVPythonAdapterHelper);
 
 //----------------------------------------------------------------------------

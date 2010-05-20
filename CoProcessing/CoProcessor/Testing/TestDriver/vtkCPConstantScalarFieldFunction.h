@@ -25,7 +25,7 @@ class VTK_EXPORT vtkCPConstantScalarFieldFunction : public vtkCPScalarFieldFunct
 {
 public:
   static vtkCPConstantScalarFieldFunction * New();
-  vtkTypeRevisionMacro(vtkCPConstantScalarFieldFunction, vtkCPScalarFieldFunction);
+  vtkTypeMacro(vtkCPConstantScalarFieldFunction, vtkCPScalarFieldFunction);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

@@ -72,7 +72,7 @@ class VTK_vtkManta_EXPORT vtkMantaLODActor : public vtkPVLODActor
 {
 public:
   static vtkMantaLODActor *New();
-  vtkTypeRevisionMacro(vtkMantaLODActor,vtkPVLODActor);
+  vtkTypeMacro(vtkMantaLODActor,vtkPVLODActor);
   virtual void PrintSelf(ostream& os, vtkIndent indent);
 
   vtkActor * GetDevice() { return  this->Device; }

@@ -23,7 +23,6 @@
 #include <vtksys/ios/sstream>
 
 vtkStandardNewMacro(vtkSquirtCompressor);
-vtkCxxRevisionMacro(vtkSquirtCompressor, "1.7");
 
 
 //-----------------------------------------------------------------------------

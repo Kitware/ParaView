@@ -36,7 +36,7 @@ class VTK_EXPORT vtkSMStringListDomain : public vtkSMDomain
 {
 public:
   static vtkSMStringListDomain* New();
-  vtkTypeRevisionMacro(vtkSMStringListDomain, vtkSMDomain);
+  vtkTypeMacro(vtkSMStringListDomain, vtkSMDomain);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

@@ -31,7 +31,7 @@ class VTK_EXPORT vtkDummyProcessModuleHelper : public vtkProcessModuleGUIHelper
 {
 public: 
   static vtkDummyProcessModuleHelper* New();
-  vtkTypeRevisionMacro(vtkDummyProcessModuleHelper,vtkProcessModuleGUIHelper);
+  vtkTypeMacro(vtkDummyProcessModuleHelper,vtkProcessModuleGUIHelper);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description: 

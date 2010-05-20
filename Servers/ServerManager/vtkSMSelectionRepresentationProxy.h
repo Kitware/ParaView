@@ -28,7 +28,7 @@ class VTK_EXPORT vtkSMSelectionRepresentationProxy : public vtkSMDataRepresentat
 {
 public:
   static vtkSMSelectionRepresentationProxy* New();
-  vtkTypeRevisionMacro(vtkSMSelectionRepresentationProxy, vtkSMDataRepresentationProxy);
+  vtkTypeMacro(vtkSMSelectionRepresentationProxy, vtkSMDataRepresentationProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

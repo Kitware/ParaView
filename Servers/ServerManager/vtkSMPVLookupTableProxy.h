@@ -27,7 +27,7 @@ class VTK_EXPORT vtkSMPVLookupTableProxy : public vtkSMProxy
 {
 public:
   static vtkSMPVLookupTableProxy* New();
-  vtkTypeRevisionMacro(vtkSMPVLookupTableProxy, vtkSMProxy);
+  vtkTypeMacro(vtkSMPVLookupTableProxy, vtkSMProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

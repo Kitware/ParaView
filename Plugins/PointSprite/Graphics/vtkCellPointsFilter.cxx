@@ -41,7 +41,6 @@
 #include "vtkAppendPolyData.h"
 #include "vtkSmartPointer.h"
 //---------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkCellPointsFilter, "1.1")
 vtkStandardNewMacro(vtkCellPointsFilter)
 //----------------------------------------------------------------------------
 

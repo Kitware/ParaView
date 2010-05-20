@@ -75,7 +75,6 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <math.h>
 
-vtkCxxRevisionMacro(vtkMantaLight, "1.8");
 vtkStandardNewMacro(vtkMantaLight);
 
 //----------------------------------------------------------------------------

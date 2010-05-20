@@ -29,7 +29,6 @@ public:
 };
 
 vtkStandardNewMacro(vtkSMProxyLocator);
-vtkCxxRevisionMacro(vtkSMProxyLocator, "1.1");
 vtkCxxSetObjectMacro(vtkSMProxyLocator, Deserializer, vtkSMDeserializer);
 //----------------------------------------------------------------------------
 vtkSMProxyLocator::vtkSMProxyLocator()

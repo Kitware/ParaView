@@ -33,7 +33,7 @@ class VTK_EXPORT vtkSMSpreadSheetRepresentationProxy :
 {
 public:
   static vtkSMSpreadSheetRepresentationProxy* New();
-  vtkTypeRevisionMacro(vtkSMSpreadSheetRepresentationProxy, 
+  vtkTypeMacro(vtkSMSpreadSheetRepresentationProxy,
     vtkSMBlockDeliveryRepresentationProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 

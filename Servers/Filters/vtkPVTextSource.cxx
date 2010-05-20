@@ -19,7 +19,6 @@
 #include "vtkStringArray.h"
 
 vtkStandardNewMacro(vtkPVTextSource);
-vtkCxxRevisionMacro(vtkPVTextSource, "1.1");
 //----------------------------------------------------------------------------
 vtkPVTextSource::vtkPVTextSource()
 {

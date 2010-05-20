@@ -53,7 +53,7 @@ class VTK_EXPORT vtkAMRDualContour : public vtkMultiBlockDataSetAlgorithm
 {
 public:
   static vtkAMRDualContour *New();
-  vtkTypeRevisionMacro(vtkAMRDualContour,vtkMultiBlockDataSetAlgorithm);
+  vtkTypeMacro(vtkAMRDualContour,vtkMultiBlockDataSetAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   vtkSetMacro(IsoValue, double);

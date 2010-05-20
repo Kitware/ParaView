@@ -22,7 +22,6 @@
 class vtkTimestepsAnimationPlayerSetOfDouble : public vtkstd::set<double> {};
 
 vtkStandardNewMacro(vtkTimestepsAnimationPlayer);
-vtkCxxRevisionMacro(vtkTimestepsAnimationPlayer, "1.2");
 //-----------------------------------------------------------------------------
 vtkTimestepsAnimationPlayer::vtkTimestepsAnimationPlayer()
 {

@@ -33,7 +33,7 @@ class VTK_EXPORT vtkSMSurfaceRepresentationProxy :
 {
 public:
   static vtkSMSurfaceRepresentationProxy* New();
-  vtkTypeRevisionMacro(vtkSMSurfaceRepresentationProxy, vtkSMPropRepresentationProxy);
+  vtkTypeMacro(vtkSMSurfaceRepresentationProxy, vtkSMPropRepresentationProxy);
   virtual void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

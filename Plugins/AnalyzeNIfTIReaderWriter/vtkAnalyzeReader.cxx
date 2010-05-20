@@ -29,7 +29,6 @@
 #include "vtkBitArray.h"
 #include "vtkDataArray.h"
 
-vtkCxxRevisionMacro(vtkAnalyzeReader, "1.3");
 vtkStandardNewMacro(vtkAnalyzeReader);
 
 

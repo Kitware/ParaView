@@ -29,7 +29,7 @@
 class VTK_EXPORT vtkSMSinusoidKeyFrameProxy : public vtkSMKeyFrameProxy
 {
 public:
-  vtkTypeRevisionMacro(vtkSMSinusoidKeyFrameProxy, vtkSMKeyFrameProxy);
+  vtkTypeMacro(vtkSMSinusoidKeyFrameProxy, vtkSMKeyFrameProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
   static vtkSMSinusoidKeyFrameProxy* New();
 

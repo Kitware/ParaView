@@ -4,7 +4,6 @@
 #include "vtkBoundingBox.h"
 #include "vtkDataObject.h"
 
-vtkCxxRevisionMacro(vtkPiece, "1.1");
 vtkStandardNewMacro(vtkPiece);
 
 //----------------------------------------------------------------------------

@@ -37,7 +37,6 @@
 #include <string>
 #include <vtkstd/vector>
 
-vtkCxxRevisionMacro(vtkRawStridedReader1, "1.2");
 vtkStandardNewMacro(vtkRawStridedReader1);
 
 #if 0

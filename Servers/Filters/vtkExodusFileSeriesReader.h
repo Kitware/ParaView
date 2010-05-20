@@ -41,7 +41,7 @@
 class VTK_EXPORT vtkExodusFileSeriesReader : public vtkFileSeriesReader
 {
 public:
-  vtkTypeRevisionMacro(vtkExodusFileSeriesReader, vtkFileSeriesReader);
+  vtkTypeMacro(vtkExodusFileSeriesReader, vtkFileSeriesReader);
   static vtkExodusFileSeriesReader *New();
   virtual void PrintSelf(ostream &os, vtkIndent indent);
 

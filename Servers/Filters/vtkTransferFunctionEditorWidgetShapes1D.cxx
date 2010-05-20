@@ -17,7 +17,6 @@
 #include "vtkObjectFactory.h"
 #include "vtkTransferFunctionEditorRepresentationShapes1D.h"
 
-vtkCxxRevisionMacro(vtkTransferFunctionEditorWidgetShapes1D, "1.2");
 vtkStandardNewMacro(vtkTransferFunctionEditorWidgetShapes1D);
 
 //----------------------------------------------------------------------------

@@ -16,7 +16,6 @@
 
 #include "vtkObjectFactory.h"
 
-vtkCxxRevisionMacro(vtkPVJoystickFlyOut, "1.1");
 vtkStandardNewMacro(vtkPVJoystickFlyOut);
 
 //-------------------------------------------------------------------------

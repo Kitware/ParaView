@@ -28,7 +28,7 @@ class VTK_EXPORT vtkSMContextNamedOptionsProxy : public vtkSMProxy
 {
 public:
   static vtkSMContextNamedOptionsProxy* New();
-  vtkTypeRevisionMacro(vtkSMContextNamedOptionsProxy, vtkSMProxy);
+  vtkTypeMacro(vtkSMContextNamedOptionsProxy, vtkSMProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

@@ -86,7 +86,7 @@ class vtkMantaTexture : public vtkTexture
 {
 public:
   static vtkMantaTexture *New();
-  vtkTypeRevisionMacro(vtkMantaTexture,vtkTexture);
+  vtkTypeMacro(vtkMantaTexture,vtkTexture);
   virtual void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

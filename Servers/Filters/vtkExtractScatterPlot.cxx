@@ -27,7 +27,6 @@
 
 #include "vtkIOStream.h"
 
-vtkCxxRevisionMacro(vtkExtractScatterPlot, "1.6");
 vtkStandardNewMacro(vtkExtractScatterPlot);
 
 vtkExtractScatterPlot::vtkExtractScatterPlot() :

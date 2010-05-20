@@ -34,7 +34,7 @@ class VTK_EXPORT vtkPVCacheKeeper : public vtkDataObjectAlgorithm
 {
 public:
   static vtkPVCacheKeeper* New();
-  vtkTypeRevisionMacro(vtkPVCacheKeeper, vtkDataObjectAlgorithm);
+  vtkTypeMacro(vtkPVCacheKeeper, vtkDataObjectAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

@@ -29,7 +29,7 @@ class VTK_EXPORT vtkSMXYChartViewProxy : public vtkSMContextViewProxy
 {
 public:
   static vtkSMXYChartViewProxy* New();
-  vtkTypeRevisionMacro(vtkSMXYChartViewProxy, vtkSMContextViewProxy);
+  vtkTypeMacro(vtkSMXYChartViewProxy, vtkSMContextViewProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

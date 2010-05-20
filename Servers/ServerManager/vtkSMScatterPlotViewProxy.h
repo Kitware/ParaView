@@ -29,7 +29,7 @@ class VTK_EXPORT vtkSMScatterPlotViewProxy : public vtkSMViewProxy
 {
 public:
   static vtkSMScatterPlotViewProxy* New();
-  vtkTypeRevisionMacro(vtkSMScatterPlotViewProxy, vtkSMViewProxy);
+  vtkTypeMacro(vtkSMScatterPlotViewProxy, vtkSMViewProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

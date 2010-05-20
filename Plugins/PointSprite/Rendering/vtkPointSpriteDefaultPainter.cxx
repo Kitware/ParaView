@@ -40,7 +40,6 @@
 #include "vtkDepthSortPainter.h"
 #include "vtkMapper.h"
 
-vtkCxxRevisionMacro(vtkPointSpriteDefaultPainter, "1.2")
 vtkStandardNewMacro(vtkPointSpriteDefaultPainter)
 
 vtkCxxSetObjectMacro(vtkPointSpriteDefaultPainter, DepthSortPainter, vtkDepthSortPainter)

@@ -40,7 +40,7 @@ class vtkDataArray;
 class VTK_EXPORT vtk1DTransferFunction: public vtkObject
 {
 public:
-  vtkTypeRevisionMacro(vtk1DTransferFunction, vtkObject);
+  vtkTypeMacro(vtk1DTransferFunction, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

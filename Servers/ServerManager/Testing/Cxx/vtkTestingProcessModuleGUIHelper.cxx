@@ -84,7 +84,6 @@ vtkStandardNewMacro(vtkTestingOutputWindow);
 
 
 
-vtkCxxRevisionMacro(vtkTestingProcessModuleGUIHelper, "1.9");
 vtkStandardNewMacro(vtkTestingProcessModuleGUIHelper);
 
 //----------------------------------------------------------------------------

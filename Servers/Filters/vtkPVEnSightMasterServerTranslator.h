@@ -24,7 +24,7 @@ class VTK_EXPORT vtkPVEnSightMasterServerTranslator : public vtkExtentTranslator
 {
 public:
   static vtkPVEnSightMasterServerTranslator* New();
-  vtkTypeRevisionMacro(vtkPVEnSightMasterServerTranslator, vtkExtentTranslator);
+  vtkTypeMacro(vtkPVEnSightMasterServerTranslator, vtkExtentTranslator);
   void PrintSelf(ostream& os, vtkIndent indent);
   
   // Description:

@@ -35,7 +35,7 @@ class vtkAnalyzeReader : public vtkImageReader
 {
 public:
   static vtkAnalyzeReader *New();
-  vtkTypeRevisionMacro(vtkAnalyzeReader,vtkImageReader);
+  vtkTypeMacro(vtkAnalyzeReader,vtkImageReader);
   virtual void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description: is the given file name a png file?

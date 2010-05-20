@@ -35,7 +35,6 @@
 #include "vtkStdString.h"
 
 vtkStandardNewMacro(vtkSMArrayListDomain);
-vtkCxxRevisionMacro(vtkSMArrayListDomain, "1.25");
 
 struct vtkSMArrayListDomainInternals
 {

@@ -16,7 +16,6 @@
 
 #include "vtkObjectFactory.h"
 
-vtkCxxRevisionMacro(vtkPVLinearExtrusionFilter, "1.1");
 vtkStandardNewMacro(vtkPVLinearExtrusionFilter);
 
 vtkPVLinearExtrusionFilter::vtkPVLinearExtrusionFilter()

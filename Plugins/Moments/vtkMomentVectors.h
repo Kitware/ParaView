@@ -37,7 +37,7 @@
 class vtkMomentVectors : public vtkDataSetAlgorithm
 {
 public:
-  vtkTypeRevisionMacro(vtkMomentVectors, vtkDataSetAlgorithm);
+  vtkTypeMacro(vtkMomentVectors, vtkDataSetAlgorithm);
   static vtkMomentVectors *New();
   virtual void PrintSelf(ostream &os, vtkIndent indent);
 

@@ -31,7 +31,7 @@ class VTK_EXPORT vtkAttributeDataReductionFilter : public vtkDataObjectAlgorithm
 {
 public:
   static vtkAttributeDataReductionFilter* New();
-  vtkTypeRevisionMacro(vtkAttributeDataReductionFilter, vtkDataObjectAlgorithm);
+  vtkTypeMacro(vtkAttributeDataReductionFilter, vtkDataObjectAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 //BTX
   enum ReductionTypes

@@ -26,7 +26,7 @@ class VTK_EXPORT vtkPVCacheKeeperPipeline : public vtkCompositeDataPipeline
 {
 public:
   static vtkPVCacheKeeperPipeline* New();
-  vtkTypeRevisionMacro(vtkPVCacheKeeperPipeline, vtkCompositeDataPipeline);
+  vtkTypeMacro(vtkPVCacheKeeperPipeline, vtkCompositeDataPipeline);
   void PrintSelf(ostream& os, vtkIndent indent);
 
 //BTX

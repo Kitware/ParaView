@@ -47,7 +47,7 @@ class VTK_EXPORT vtkSMTimeKeeperProxy : public vtkSMProxy
 {
 public:
   static vtkSMTimeKeeperProxy* New();
-  vtkTypeRevisionMacro(vtkSMTimeKeeperProxy, vtkSMProxy);
+  vtkTypeMacro(vtkSMTimeKeeperProxy, vtkSMProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

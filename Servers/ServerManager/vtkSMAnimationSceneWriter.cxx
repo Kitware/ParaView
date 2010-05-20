@@ -51,7 +51,6 @@ protected:
   vtkSMAnimationSceneWriter* Target;
 };
 
-vtkCxxRevisionMacro(vtkSMAnimationSceneWriter, "1.6");
 //-----------------------------------------------------------------------------
 vtkSMAnimationSceneWriter::vtkSMAnimationSceneWriter()
 {

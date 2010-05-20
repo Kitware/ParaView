@@ -36,7 +36,7 @@ class VTK_EXPORT vtkCleanUnstructuredGrid: public vtkUnstructuredGridAlgorithm
 public:
   static vtkCleanUnstructuredGrid *New();
 
-  vtkTypeRevisionMacro(vtkCleanUnstructuredGrid, vtkUnstructuredGridAlgorithm);
+  vtkTypeMacro(vtkCleanUnstructuredGrid, vtkUnstructuredGridAlgorithm);
 
   void PrintSelf(ostream& os, vtkIndent indent);
 

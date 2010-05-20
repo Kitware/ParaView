@@ -23,7 +23,6 @@
 #include "vtkSMRenderViewProxy.h"
 
 vtkStandardNewMacro(vtkSMCameraManipulatorProxy);
-vtkCxxRevisionMacro(vtkSMCameraManipulatorProxy, "1.5");
 //------------------------------------------------------------------------------
 vtkSMCameraManipulatorProxy::vtkSMCameraManipulatorProxy()
 {

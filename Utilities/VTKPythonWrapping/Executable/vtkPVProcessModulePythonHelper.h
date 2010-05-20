@@ -29,7 +29,7 @@ class VTK_EXPORT vtkPVProcessModulePythonHelper : public vtkProcessModuleGUIHelp
 {
 public: 
   static vtkPVProcessModulePythonHelper* New();
-  vtkTypeRevisionMacro(vtkPVProcessModulePythonHelper,vtkProcessModuleGUIHelper);
+  vtkTypeMacro(vtkPVProcessModulePythonHelper,vtkProcessModuleGUIHelper);
   void PrintSelf(ostream& os, vtkIndent indent);
   // Description: 
   // run main gui loop from process module

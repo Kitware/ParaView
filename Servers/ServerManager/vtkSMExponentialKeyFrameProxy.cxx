@@ -21,7 +21,6 @@
 
 #include <math.h>
 
-vtkCxxRevisionMacro(vtkSMExponentialKeyFrameProxy, "1.5");
 vtkStandardNewMacro(vtkSMExponentialKeyFrameProxy);
 
 //----------------------------------------------------------------------------

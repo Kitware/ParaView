@@ -28,7 +28,7 @@ class VTK_EXPORT vtkSMAdaptiveOutlineRepresentation :
 {
 public:
   static vtkSMAdaptiveOutlineRepresentation* New();
-  vtkTypeRevisionMacro(vtkSMAdaptiveOutlineRepresentation, 
+  vtkTypeMacro(vtkSMAdaptiveOutlineRepresentation,
     vtkSMOutlineRepresentationProxy);
 
   virtual bool AddToView(vtkSMViewProxy *view);

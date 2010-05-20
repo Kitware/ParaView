@@ -31,7 +31,7 @@ class vtkIdList;
 class VTK_EXPORT vtkCellIntegrator : public vtkObject
 {
 public:
-  vtkTypeRevisionMacro(vtkCellIntegrator,vtkObject);
+  vtkTypeMacro(vtkCellIntegrator,vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

@@ -27,7 +27,6 @@
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkSMProxyLink);
-vtkCxxRevisionMacro(vtkSMProxyLink, "1.13");
 
 //---------------------------------------------------------------------------
 struct vtkSMProxyLinkInternals

@@ -66,7 +66,6 @@ void vtkSMSourceSelectionLinkCommand::Execute(
   this->Target->SelectionChanged(vtkSMSourceProxy::SafeDownCast(caller));
 }
 
-vtkCxxRevisionMacro(vtkSMSourceSelectionLink, "1.1");
 vtkStandardNewMacro(vtkSMSourceSelectionLink);
 vtkSMSourceSelectionLink::vtkSMSourceSelectionLink()
 {

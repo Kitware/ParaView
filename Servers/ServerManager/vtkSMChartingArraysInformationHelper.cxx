@@ -20,7 +20,6 @@
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMChartingArraysInformationHelper);
-vtkCxxRevisionMacro(vtkSMChartingArraysInformationHelper, "1.3");
 //----------------------------------------------------------------------------
 vtkSMChartingArraysInformationHelper::vtkSMChartingArraysInformationHelper()
 {

@@ -24,7 +24,6 @@
 #include "vtkSmartPointer.h"
 
 vtkStandardNewMacro(vtkSMUnstructuredDataParallelStrategy);
-vtkCxxRevisionMacro(vtkSMUnstructuredDataParallelStrategy, "1.6");
 //----------------------------------------------------------------------------
 vtkSMUnstructuredDataParallelStrategy::vtkSMUnstructuredDataParallelStrategy()
 {

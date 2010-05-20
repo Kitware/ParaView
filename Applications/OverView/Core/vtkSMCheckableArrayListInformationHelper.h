@@ -47,7 +47,7 @@ class OVERVIEW_CORE_EXPORT vtkSMCheckableArrayListInformationHelper : public vtk
 {
 public:
   static vtkSMCheckableArrayListInformationHelper* New();
-  vtkTypeRevisionMacro(vtkSMCheckableArrayListInformationHelper, vtkSMInformationHelper);
+  vtkTypeMacro(vtkSMCheckableArrayListInformationHelper, vtkSMInformationHelper);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   //BTX

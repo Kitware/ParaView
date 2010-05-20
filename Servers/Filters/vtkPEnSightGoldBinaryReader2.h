@@ -42,7 +42,7 @@ class VTK_EXPORT vtkPEnSightGoldBinaryReader2 : public vtkPEnSightReader2
 {
  public:
   static vtkPEnSightGoldBinaryReader2 *New();
-  vtkTypeRevisionMacro(vtkPEnSightGoldBinaryReader2, vtkPEnSightReader2);
+  vtkTypeMacro(vtkPEnSightGoldBinaryReader2, vtkPEnSightReader2);
   virtual void PrintSelf(ostream& os, vtkIndent indent);
 
  protected:

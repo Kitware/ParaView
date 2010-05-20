@@ -36,7 +36,7 @@ class VTK_EXPORT vtkTexturePainter : public vtkPainter
 {
 public:
   static vtkTexturePainter* New();
-  vtkTypeRevisionMacro(vtkTexturePainter, vtkPainter);
+  vtkTypeMacro(vtkTexturePainter, vtkPainter);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

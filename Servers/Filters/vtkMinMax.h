@@ -36,7 +36,7 @@ class VTK_EXPORT vtkMinMax : public vtkPolyDataAlgorithm
 {
 public:
   static vtkMinMax* New();
-  vtkTypeRevisionMacro(vtkMinMax, vtkPolyDataAlgorithm);
+  vtkTypeMacro(vtkMinMax, vtkPolyDataAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   //Description:

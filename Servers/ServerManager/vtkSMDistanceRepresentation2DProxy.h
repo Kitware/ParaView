@@ -25,7 +25,7 @@ class VTK_EXPORT vtkSMDistanceRepresentation2DProxy : public vtkSMWidgetRepresen
 {
 public:
   static vtkSMDistanceRepresentation2DProxy* New();
-  vtkTypeRevisionMacro(vtkSMDistanceRepresentation2DProxy, vtkSMWidgetRepresentationProxy);
+  vtkTypeMacro(vtkSMDistanceRepresentation2DProxy, vtkSMWidgetRepresentationProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
 //BTX

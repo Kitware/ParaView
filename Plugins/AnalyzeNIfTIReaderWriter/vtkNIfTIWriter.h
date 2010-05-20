@@ -36,7 +36,7 @@ class vtkNIfTIWriter : public vtkImageWriter
 {
 public:
   static vtkNIfTIWriter *New();
-  vtkTypeRevisionMacro(vtkNIfTIWriter,vtkImageWriter);
+  vtkTypeMacro(vtkNIfTIWriter,vtkImageWriter);
   void PrintSelf(ostream& os, vtkIndent indent);
  
   void SetFileType(int inValue);

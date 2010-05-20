@@ -6,7 +6,6 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMPrismDoubleRangeDomain);
-vtkCxxRevisionMacro(vtkSMPrismDoubleRangeDomain, "1.1");
 
 struct vtkSMPrismDoubleRangeDomainInternals
     {

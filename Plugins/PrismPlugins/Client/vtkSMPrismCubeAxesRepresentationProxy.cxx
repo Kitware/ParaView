@@ -35,7 +35,6 @@
 #include "pqSMAdaptor.h"
 
 vtkStandardNewMacro(vtkSMPrismCubeAxesRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMPrismCubeAxesRepresentationProxy, "1.4");
 //----------------------------------------------------------------------------
 vtkSMPrismCubeAxesRepresentationProxy::vtkSMPrismCubeAxesRepresentationProxy()
 {

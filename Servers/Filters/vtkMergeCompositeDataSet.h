@@ -34,7 +34,7 @@
 class VTK_EXPORT vtkMergeCompositeDataSet : public vtkVertexGlyphFilter
 {
 public:
-  vtkTypeRevisionMacro(vtkMergeCompositeDataSet, vtkVertexGlyphFilter);
+  vtkTypeMacro(vtkMergeCompositeDataSet, vtkVertexGlyphFilter);
   virtual void PrintSelf(ostream &os, vtkIndent indent);
   static vtkMergeCompositeDataSet *New();
 

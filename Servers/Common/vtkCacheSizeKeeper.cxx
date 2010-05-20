@@ -18,7 +18,6 @@
 
 
 vtkStandardNewMacro(vtkCacheSizeKeeper);
-vtkCxxRevisionMacro(vtkCacheSizeKeeper, "1.2");
 //-----------------------------------------------------------------------------
 vtkCacheSizeKeeper::vtkCacheSizeKeeper()
 {

@@ -17,7 +17,6 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
 
-vtkCxxRevisionMacro(vtkUndoElement, "1.2");
 //-----------------------------------------------------------------------------
 vtkUndoElement::vtkUndoElement()
 {

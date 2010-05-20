@@ -47,7 +47,6 @@ public:
 };
 
 vtkStandardNewMacro(vtkImageSliceMapper);
-vtkCxxRevisionMacro(vtkImageSliceMapper, "1.6");
 //----------------------------------------------------------------------------
 vtkImageSliceMapper::vtkImageSliceMapper()
 {

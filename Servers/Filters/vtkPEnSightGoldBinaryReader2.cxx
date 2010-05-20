@@ -18,7 +18,6 @@
 #include <ctype.h>
 #include <vtkstd/string>
 
-vtkCxxRevisionMacro(vtkPEnSightGoldBinaryReader2, "1.3");
 vtkStandardNewMacro(vtkPEnSightGoldBinaryReader2);
 
 // This is half the precision of an int.

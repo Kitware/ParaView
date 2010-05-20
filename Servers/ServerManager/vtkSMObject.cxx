@@ -19,7 +19,6 @@
 #include "vtkSMProxyManager.h"
 
 vtkStandardNewMacro(vtkSMObject);
-vtkCxxRevisionMacro(vtkSMObject, "1.7");
 
 vtkSMProxyManager* vtkSMObject::ProxyManager = 0;
 vtkSMApplication* vtkSMObject::Application = 0;

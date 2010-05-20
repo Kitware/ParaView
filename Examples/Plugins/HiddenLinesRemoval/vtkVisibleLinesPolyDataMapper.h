@@ -25,7 +25,7 @@ class VTK_EXPORT vtkVisibleLinesPolyDataMapper : public vtkPainterPolyDataMapper
 {
 public:
   static vtkVisibleLinesPolyDataMapper* New();
-  vtkTypeRevisionMacro(vtkVisibleLinesPolyDataMapper, vtkPainterPolyDataMapper);
+  vtkTypeMacro(vtkVisibleLinesPolyDataMapper, vtkPainterPolyDataMapper);
   void PrintSelf(ostream& os, vtkIndent indent);
 
 //BTX

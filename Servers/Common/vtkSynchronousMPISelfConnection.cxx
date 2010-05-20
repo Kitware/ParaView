@@ -21,7 +21,6 @@
 #include "vtkClientServerStream.h"
 
 vtkStandardNewMacro(vtkSynchronousMPISelfConnection);
-vtkCxxRevisionMacro(vtkSynchronousMPISelfConnection, "1.4");
 //----------------------------------------------------------------------------
 vtkSynchronousMPISelfConnection::vtkSynchronousMPISelfConnection()
 {

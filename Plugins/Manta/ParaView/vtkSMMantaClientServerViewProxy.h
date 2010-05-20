@@ -74,7 +74,7 @@ class vtkSMMantaClientServerViewProxy : public vtkSMClientServerRenderViewProxy
 {
 public:
   static vtkSMMantaClientServerViewProxy* New();
-  vtkTypeRevisionMacro(vtkSMMantaClientServerViewProxy, vtkSMClientServerRenderViewProxy);
+  vtkTypeMacro(vtkSMMantaClientServerViewProxy, vtkSMClientServerRenderViewProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

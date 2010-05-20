@@ -49,7 +49,6 @@ inline void vtkSMProxySetInt(
 }
 
 vtkStandardNewMacro(vtkSMGlyphRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMGlyphRepresentationProxy, "1.2");
 //-----------------------------------------------------------------------------
 vtkSMGlyphRepresentationProxy::vtkSMGlyphRepresentationProxy()
 {

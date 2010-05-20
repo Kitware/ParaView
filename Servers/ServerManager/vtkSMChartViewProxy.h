@@ -28,7 +28,7 @@ class vtkQtChartWidget;
 class VTK_EXPORT vtkSMChartViewProxy : public vtkSMViewProxy
 {
 public:
-  vtkTypeRevisionMacro(vtkSMChartViewProxy, vtkSMViewProxy);
+  vtkTypeMacro(vtkSMChartViewProxy, vtkSMViewProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

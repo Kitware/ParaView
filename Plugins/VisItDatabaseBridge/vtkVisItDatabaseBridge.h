@@ -39,7 +39,7 @@ class vtkVisItDatabaseBridge : public vtkDataObjectAlgorithm
 {
 public:
   static vtkVisItDatabaseBridge *New();
-  vtkTypeRevisionMacro(vtkVisItDatabaseBridge,vtkDataObjectAlgorithm);
+  vtkTypeMacro(vtkVisItDatabaseBridge,vtkDataObjectAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
   // Description:
   // Get/Set the file to read.

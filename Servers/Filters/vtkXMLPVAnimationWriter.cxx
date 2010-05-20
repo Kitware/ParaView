@@ -29,7 +29,6 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkXMLPVAnimationWriter);
-vtkCxxRevisionMacro(vtkXMLPVAnimationWriter, "1.10");
 
 //----------------------------------------------------------------------------
 class vtkXMLPVAnimationWriterInternals

@@ -60,7 +60,6 @@ protected:
 //-----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkSMServerSideAnimationPlayer);
-vtkCxxRevisionMacro(vtkSMServerSideAnimationPlayer, "1.10");
 vtkCxxSetObjectMacro(vtkSMServerSideAnimationPlayer, Writer, 
   vtkSMAnimationSceneImageWriter);
 //-----------------------------------------------------------------------------

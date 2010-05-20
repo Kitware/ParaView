@@ -25,7 +25,6 @@
 #include "vtkSmartPointer.h"
 
 vtkStandardNewMacro(vtkPConvertSelection);
-vtkCxxRevisionMacro(vtkPConvertSelection, "1.3");
 vtkCxxSetObjectMacro(vtkPConvertSelection, Controller, vtkMultiProcessController);
 //----------------------------------------------------------------------------
 vtkPConvertSelection::vtkPConvertSelection()

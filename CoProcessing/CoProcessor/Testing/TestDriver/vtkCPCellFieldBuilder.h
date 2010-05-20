@@ -35,7 +35,7 @@ class VTK_EXPORT vtkCPCellFieldBuilder : public vtkCPFieldBuilder
 {
 public:
   static vtkCPCellFieldBuilder* New();
-  vtkTypeRevisionMacro(vtkCPCellFieldBuilder, vtkCPFieldBuilder);
+  vtkTypeMacro(vtkCPCellFieldBuilder, vtkCPFieldBuilder);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

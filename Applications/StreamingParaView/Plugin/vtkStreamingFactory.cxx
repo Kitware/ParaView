@@ -27,7 +27,6 @@
 //VTK_FACTORY_INTERFACE_IMPLEMENT(vtkStreamingFactory)
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkStreamingFactory, "1.1");
 vtkStandardNewMacro(vtkStreamingFactory);
 
 //----------------------------------------------------------------------------

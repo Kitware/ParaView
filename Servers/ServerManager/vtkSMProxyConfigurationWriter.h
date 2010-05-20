@@ -44,7 +44,7 @@ class VTK_EXPORT vtkSMProxyConfigurationWriter : public vtkSMObject
 {
 public:
   static vtkSMProxyConfigurationWriter* New();
-  vtkTypeRevisionMacro(vtkSMProxyConfigurationWriter, vtkSMObject);
+  vtkTypeMacro(vtkSMProxyConfigurationWriter, vtkSMObject);
   virtual void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

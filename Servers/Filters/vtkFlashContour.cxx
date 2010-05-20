@@ -29,7 +29,6 @@
 #include "vtkUnsignedCharArray.h"
 #include "vtkMarchingCubesCases.h"
 
-vtkCxxRevisionMacro(vtkFlashContour, "1.4");
 vtkStandardNewMacro(vtkFlashContour);
 
 

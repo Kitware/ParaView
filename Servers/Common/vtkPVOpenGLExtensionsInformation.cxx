@@ -40,7 +40,6 @@ public:
 //-----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkPVOpenGLExtensionsInformation);
-vtkCxxRevisionMacro(vtkPVOpenGLExtensionsInformation, "1.3");
 //-----------------------------------------------------------------------------
 vtkPVOpenGLExtensionsInformation::vtkPVOpenGLExtensionsInformation()
 {

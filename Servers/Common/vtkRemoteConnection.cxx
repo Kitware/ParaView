@@ -30,7 +30,6 @@ class vtkRemoteConnection::vtkInternal : public
 };
 
 
-vtkCxxRevisionMacro(vtkRemoteConnection, "1.4");
 //-----------------------------------------------------------------------------
 vtkRemoteConnection::vtkRemoteConnection()
 {

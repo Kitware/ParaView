@@ -72,7 +72,7 @@ class VTK_vtkManta_EXPORT vtkMantaObjectFactory : public vtkObjectFactory
 
 public:
   // Methods from vtkObject
-  vtkTypeRevisionMacro(vtkMantaObjectFactory,vtkObjectFactory);
+  vtkTypeMacro(vtkMantaObjectFactory,vtkObjectFactory);
   static vtkMantaObjectFactory *New();
   void PrintSelf(ostream& os, vtkIndent indent);
   virtual const char* GetVTKSourceVersion();

@@ -29,7 +29,7 @@ class VTK_EXPORT vtkMyElevationFilter : public vtkElevationFilter
 {
 public:
   static vtkMyElevationFilter* New();
-  vtkTypeRevisionMacro(vtkMyElevationFilter, vtkElevationFilter);
+  vtkTypeMacro(vtkMyElevationFilter, vtkElevationFilter);
   void PrintSelf(ostream& os, vtkIndent indent);
 
 protected:

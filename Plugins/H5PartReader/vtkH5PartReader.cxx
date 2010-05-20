@@ -142,7 +142,6 @@ static hid_t H5PartGetDiskShape(H5PartFile *f, hid_t dataset)
 }
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkH5PartReader, "1.3.2.1");
 vtkStandardNewMacro(vtkH5PartReader);
 //----------------------------------------------------------------------------
 vtkH5PartReader::vtkH5PartReader()

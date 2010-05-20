@@ -21,7 +21,6 @@
 #include "vtkPVCacheKeeper.h"
 
 vtkStandardNewMacro(vtkPVGeometryInformation);
-vtkCxxRevisionMacro(vtkPVGeometryInformation, "1.4");
 
 //----------------------------------------------------------------------------
 vtkPVGeometryInformation::vtkPVGeometryInformation()

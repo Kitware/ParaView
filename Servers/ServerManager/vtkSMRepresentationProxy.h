@@ -37,7 +37,7 @@ class vtkInformation;
 class VTK_EXPORT vtkSMRepresentationProxy : public vtkSMProxy
 {
 public:
-  vtkTypeRevisionMacro(vtkSMRepresentationProxy, vtkSMProxy);
+  vtkTypeMacro(vtkSMRepresentationProxy, vtkSMProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

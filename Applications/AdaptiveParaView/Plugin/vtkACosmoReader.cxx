@@ -81,7 +81,6 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkLongLongArray.h"
 #endif
 
-vtkCxxRevisionMacro(vtkACosmoReader, "1.3");
 vtkStandardNewMacro(vtkACosmoReader);
 
 #define FILE_BIG_ENDIAN 0

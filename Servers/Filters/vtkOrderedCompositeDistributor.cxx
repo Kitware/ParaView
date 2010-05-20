@@ -55,7 +55,6 @@ static void D3UpdateProgress(vtkObject *_D3, unsigned long,
 
 //-----------------------------------------------------------------------------
 
-vtkCxxRevisionMacro(vtkOrderedCompositeDistributor, "1.11");
 vtkStandardNewMacro(vtkOrderedCompositeDistributor);
 
 vtkCxxSetObjectMacro(vtkOrderedCompositeDistributor, PKdTree, vtkPKdTree);

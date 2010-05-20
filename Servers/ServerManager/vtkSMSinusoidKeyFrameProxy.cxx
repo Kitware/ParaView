@@ -21,7 +21,6 @@
 
 #include <math.h>
 
-vtkCxxRevisionMacro(vtkSMSinusoidKeyFrameProxy, "1.7");
 vtkStandardNewMacro(vtkSMSinusoidKeyFrameProxy);
 
 //----------------------------------------------------------------------------

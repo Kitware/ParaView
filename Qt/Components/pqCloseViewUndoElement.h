@@ -47,7 +47,7 @@ class VTK_EXPORT pqCloseViewUndoElement : public vtkSMUndoElement
 {
 public:
   static pqCloseViewUndoElement* New();
-  vtkTypeRevisionMacro(pqCloseViewUndoElement, vtkSMUndoElement);
+  vtkTypeMacro(pqCloseViewUndoElement, vtkSMUndoElement);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   /// Description:

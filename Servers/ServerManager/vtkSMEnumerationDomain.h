@@ -37,7 +37,7 @@ class VTK_EXPORT vtkSMEnumerationDomain : public vtkSMDomain
 {
 public:
   static vtkSMEnumerationDomain* New();
-  vtkTypeRevisionMacro(vtkSMEnumerationDomain, vtkSMDomain);
+  vtkTypeMacro(vtkSMEnumerationDomain, vtkSMDomain);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

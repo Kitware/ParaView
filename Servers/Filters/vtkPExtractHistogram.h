@@ -28,7 +28,7 @@ class VTK_EXPORT vtkPExtractHistogram : public vtkExtractHistogram
 {
 public:
   static vtkPExtractHistogram* New();
-  vtkTypeRevisionMacro(vtkPExtractHistogram, vtkExtractHistogram);
+  vtkTypeMacro(vtkPExtractHistogram, vtkExtractHistogram);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

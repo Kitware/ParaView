@@ -28,7 +28,7 @@ class VTK_EXPORT vtkSMStreamingOutputPort : public vtkSMOutputPort
 {
 public:
   static vtkSMStreamingOutputPort* New();
-  vtkTypeRevisionMacro(vtkSMStreamingOutputPort, vtkSMOutputPort);
+  vtkTypeMacro(vtkSMStreamingOutputPort, vtkSMOutputPort);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

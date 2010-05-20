@@ -39,7 +39,7 @@ class VTK_EXPORT vtkSMCompositeTreeDomain : public vtkSMDomain
 {
 public:
   static vtkSMCompositeTreeDomain* New();
-  vtkTypeRevisionMacro(vtkSMCompositeTreeDomain, vtkSMDomain);
+  vtkTypeMacro(vtkSMCompositeTreeDomain, vtkSMDomain);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

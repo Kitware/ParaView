@@ -37,7 +37,7 @@ class VTK_EXPORT vtkMetaInfoDatabase : public vtkObject
 {
 public:
   static vtkMetaInfoDatabase *New();
-  vtkTypeRevisionMacro(vtkMetaInfoDatabase,vtkObject);
+  vtkTypeMacro(vtkMetaInfoDatabase,vtkObject);
   virtual void PrintSelf(ostream& os, vtkIndent indent);
 
   //insert a scalar range record for piece p/np at resolution res

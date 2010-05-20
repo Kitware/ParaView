@@ -51,7 +51,7 @@ class vtkPKdTree;
 class VTK_EXPORT vtkOrderedCompositeDistributor : public vtkPointSetAlgorithm
 {
 public:
-  vtkTypeRevisionMacro(vtkOrderedCompositeDistributor, vtkPointSetAlgorithm);
+  vtkTypeMacro(vtkOrderedCompositeDistributor, vtkPointSetAlgorithm);
   static vtkOrderedCompositeDistributor *New();
   virtual void PrintSelf(ostream &os, vtkIndent indent);
 

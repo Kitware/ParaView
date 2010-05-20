@@ -22,7 +22,6 @@
 #include "vtkClientServerStream.h"
 
 vtkStandardNewMacro(vtkSMHardwareSelector);
-vtkCxxRevisionMacro(vtkSMHardwareSelector, "1.1");
 //----------------------------------------------------------------------------
 vtkSMHardwareSelector::vtkSMHardwareSelector()
 {

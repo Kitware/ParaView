@@ -28,7 +28,7 @@ class vtkDataSet;
 class VTK_EXPORT vtkCPBaseFieldBuilder : public vtkObject
 {
 public:
-  vtkTypeRevisionMacro(vtkCPBaseFieldBuilder, vtkObject);
+  vtkTypeMacro(vtkCPBaseFieldBuilder, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

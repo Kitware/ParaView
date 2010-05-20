@@ -25,7 +25,7 @@ class VTK_EXPORT vtkSMStreamingSerialStrategy : public vtkSMSimpleStrategy
 {
 public:
   static vtkSMStreamingSerialStrategy* New();
-  vtkTypeRevisionMacro(vtkSMStreamingSerialStrategy, vtkSMSimpleStrategy);
+  vtkTypeMacro(vtkSMStreamingSerialStrategy, vtkSMSimpleStrategy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

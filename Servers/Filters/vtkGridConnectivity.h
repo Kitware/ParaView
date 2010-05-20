@@ -44,7 +44,7 @@ class vtkPolyData;
 class VTK_EXPORT vtkGridConnectivity : public vtkMultiBlockDataSetAlgorithm
 {
 public:
-  vtkTypeRevisionMacro(vtkGridConnectivity,vtkMultiBlockDataSetAlgorithm);
+  vtkTypeMacro(vtkGridConnectivity,vtkMultiBlockDataSetAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
   static vtkGridConnectivity *New();
 

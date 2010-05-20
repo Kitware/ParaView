@@ -26,7 +26,7 @@ class VTK_EXPORT vtkCSVWriter : public vtkWriter
 {
 public:
   static vtkCSVWriter* New();
-  vtkTypeRevisionMacro(vtkCSVWriter, vtkWriter);
+  vtkTypeMacro(vtkCSVWriter, vtkWriter);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

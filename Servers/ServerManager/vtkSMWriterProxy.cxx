@@ -24,7 +24,6 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMWriterProxy);
-vtkCxxRevisionMacro(vtkSMWriterProxy, "Revision: 1.1 $");
 //-----------------------------------------------------------------------------
 vtkSMWriterProxy::vtkSMWriterProxy()
 {

@@ -43,7 +43,7 @@ class VTK_EXPORT vtk1DTransferFunctionChooser: public vtk1DTransferFunction
 {
 public:
   static vtk1DTransferFunctionChooser* New();
-  vtkTypeRevisionMacro(vtk1DTransferFunctionChooser, vtk1DTransferFunction);
+  vtkTypeMacro(vtk1DTransferFunctionChooser, vtk1DTransferFunction);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   //BTX

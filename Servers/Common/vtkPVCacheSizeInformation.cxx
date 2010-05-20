@@ -20,7 +20,6 @@
 #include "vtkProcessModule.h"
 
 vtkStandardNewMacro(vtkPVCacheSizeInformation);
-vtkCxxRevisionMacro(vtkPVCacheSizeInformation, "1.1");
 //-----------------------------------------------------------------------------
 vtkPVCacheSizeInformation::vtkPVCacheSizeInformation()
 {

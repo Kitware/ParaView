@@ -40,7 +40,6 @@ public:
 };
 
 vtkStandardNewMacro(vtkPVCompositeDataInformationIterator);
-vtkCxxRevisionMacro(vtkPVCompositeDataInformationIterator, "1.3");
 vtkCxxSetObjectMacro(vtkPVCompositeDataInformationIterator, DataInformation, vtkPVDataInformation);
 //----------------------------------------------------------------------------
 vtkPVCompositeDataInformationIterator::vtkPVCompositeDataInformationIterator()

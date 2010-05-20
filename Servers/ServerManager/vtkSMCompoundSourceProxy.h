@@ -38,7 +38,7 @@ class VTK_EXPORT vtkSMCompoundSourceProxy : public vtkSMSourceProxy
 {
 public:
   static vtkSMCompoundSourceProxy* New();
-  vtkTypeRevisionMacro(vtkSMCompoundSourceProxy, vtkSMSourceProxy);
+  vtkTypeMacro(vtkSMCompoundSourceProxy, vtkSMSourceProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

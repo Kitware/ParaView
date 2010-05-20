@@ -35,7 +35,6 @@ class vtkSMUndoRedoStateLoaderVector :
 
 
 vtkStandardNewMacro(vtkSMUndoRedoStateLoader);
-vtkCxxRevisionMacro(vtkSMUndoRedoStateLoader, "1.6");
 vtkCxxSetObjectMacro(vtkSMUndoRedoStateLoader, RootElement, vtkPVXMLElement);
 //-----------------------------------------------------------------------------
 vtkSMUndoRedoStateLoader::vtkSMUndoRedoStateLoader()

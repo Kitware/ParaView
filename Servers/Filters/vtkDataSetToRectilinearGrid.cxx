@@ -27,7 +27,6 @@
 #include "vtkStreamingDemandDrivenPipeline.h"
 
 vtkStandardNewMacro(vtkDataSetToRectilinearGrid);
-vtkCxxRevisionMacro(vtkDataSetToRectilinearGrid, "1.1");
 
 //-----------------------------------------------------------------------------
 vtkDataSetToRectilinearGrid::vtkDataSetToRectilinearGrid() 

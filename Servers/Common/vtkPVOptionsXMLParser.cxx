@@ -18,7 +18,6 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVOptionsXMLParser);
-vtkCxxRevisionMacro(vtkPVOptionsXMLParser, "1.3");
 
 //----------------------------------------------------------------------------
 void vtkPVOptionsXMLParser::SetProcessType(const char* ptype)

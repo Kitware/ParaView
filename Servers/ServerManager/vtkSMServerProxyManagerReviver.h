@@ -42,7 +42,7 @@ class VTK_EXPORT vtkSMServerProxyManagerReviver : public vtkSMProxyManagerRevive
 {
 public:
   static vtkSMServerProxyManagerReviver* New();
-  vtkTypeRevisionMacro(vtkSMServerProxyManagerReviver, vtkSMProxyManagerReviver);
+  vtkTypeMacro(vtkSMServerProxyManagerReviver, vtkSMProxyManagerReviver);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

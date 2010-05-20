@@ -45,7 +45,6 @@
 #include <vtksys/ios/sstream>
 
 //-----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkSMAdaptiveViewProxy, "1.4");
 vtkStandardNewMacro(vtkSMAdaptiveViewProxy);
 
 #define DEBUGPRINT_VIEW(arg)\

@@ -30,7 +30,7 @@ class VTK_EXPORT vtkSMTimeAnimationCueProxy : public vtkSMAnimationCueProxy
 {
 public:
   static vtkSMTimeAnimationCueProxy* New();
-  vtkTypeRevisionMacro(vtkSMTimeAnimationCueProxy, vtkSMAnimationCueProxy);
+  vtkTypeMacro(vtkSMTimeAnimationCueProxy, vtkSMAnimationCueProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

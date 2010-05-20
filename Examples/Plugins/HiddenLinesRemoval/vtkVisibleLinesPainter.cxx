@@ -38,7 +38,6 @@ extern const char* vtkVisibleLinesPainter_vs;
 extern const char* vtkVisibleLinesPainter_fs;
 
 vtkStandardNewMacro(vtkVisibleLinesPainter);
-vtkCxxRevisionMacro(vtkVisibleLinesPainter, "1.1");
 #define vtkGetIndex(r,c)    (c*4+r)
 
 inline double vtkClamp(double val, const double& min, const double& max)

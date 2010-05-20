@@ -28,7 +28,7 @@ class VTK_EXPORT vtkSMDataLabelRepresentationProxy : public vtkSMDataRepresentat
 {
 public:
   static vtkSMDataLabelRepresentationProxy* New();
-  vtkTypeRevisionMacro(vtkSMDataLabelRepresentationProxy, vtkSMDataRepresentationProxy);
+  vtkTypeMacro(vtkSMDataLabelRepresentationProxy, vtkSMDataRepresentationProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

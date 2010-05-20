@@ -46,7 +46,7 @@ class VTK_EXPORT vtkSMUndoStack : public vtkUndoStack
 {
 public:
   static vtkSMUndoStack* New();
-  vtkTypeRevisionMacro(vtkSMUndoStack, vtkUndoStack);
+  vtkTypeMacro(vtkSMUndoStack, vtkUndoStack);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

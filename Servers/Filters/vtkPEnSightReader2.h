@@ -58,7 +58,7 @@ class vtkPEnSightReader2CellIdsType;
 class VTK_EXPORT vtkPEnSightReader2 : public vtkGenericEnSightReader2
 {
  public:
-  vtkTypeRevisionMacro(vtkPEnSightReader2, vtkGenericEnSightReader2);
+  vtkTypeMacro(vtkPEnSightReader2, vtkGenericEnSightReader2);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   //BTX

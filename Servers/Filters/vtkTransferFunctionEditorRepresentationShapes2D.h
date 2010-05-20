@@ -27,7 +27,7 @@ class VTK_EXPORT vtkTransferFunctionEditorRepresentationShapes2D : public vtkTra
 {
 public:
   static vtkTransferFunctionEditorRepresentationShapes2D* New();
-  vtkTypeRevisionMacro(vtkTransferFunctionEditorRepresentationShapes2D, vtkTransferFunctionEditorRepresentation);
+  vtkTypeMacro(vtkTransferFunctionEditorRepresentationShapes2D, vtkTransferFunctionEditorRepresentation);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

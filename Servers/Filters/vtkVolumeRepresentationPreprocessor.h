@@ -41,7 +41,7 @@ class VTK_EXPORT vtkVolumeRepresentationPreprocessor :
 {
 public:
   static vtkVolumeRepresentationPreprocessor *New();
-  vtkTypeRevisionMacro(vtkVolumeRepresentationPreprocessor, vtkUnstructuredGridAlgorithm);
+  vtkTypeMacro(vtkVolumeRepresentationPreprocessor, vtkUnstructuredGridAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

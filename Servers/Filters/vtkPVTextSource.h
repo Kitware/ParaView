@@ -26,7 +26,7 @@ class VTK_EXPORT vtkPVTextSource : public vtkTableAlgorithm
 {
 public:
   static vtkPVTextSource* New();
-  vtkTypeRevisionMacro(vtkPVTextSource, vtkTableAlgorithm);
+  vtkTypeMacro(vtkPVTextSource, vtkTableAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

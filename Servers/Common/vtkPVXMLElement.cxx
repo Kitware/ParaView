@@ -18,7 +18,6 @@
 #include "vtkObjectFactory.h"
 #include "vtkSmartPointer.h"
 
-vtkCxxRevisionMacro(vtkPVXMLElement, "1.25");
 vtkStandardNewMacro(vtkPVXMLElement);
 
 #include <vtkstd/string>

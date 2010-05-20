@@ -34,7 +34,7 @@ class VTK_EXPORT vtkExtractScatterPlot :
 {
 public:
   static vtkExtractScatterPlot* New();
-  vtkTypeRevisionMacro(vtkExtractScatterPlot, vtkPolyDataAlgorithm);
+  vtkTypeMacro(vtkExtractScatterPlot, vtkPolyDataAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
   
   // Description:

@@ -70,7 +70,6 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <Engine/Control/RTRT.h>
 #include <math.h>
 
-vtkCxxRevisionMacro(vtkMantaCamera, "1.7");
 vtkStandardNewMacro(vtkMantaCamera);
 
 //----------------------------------------------------------------------------

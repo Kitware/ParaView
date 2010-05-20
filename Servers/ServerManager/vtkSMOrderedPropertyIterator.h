@@ -34,7 +34,7 @@ class VTK_EXPORT vtkSMOrderedPropertyIterator : public vtkSMObject
 {
 public:
   static vtkSMOrderedPropertyIterator* New();
-  vtkTypeRevisionMacro(vtkSMOrderedPropertyIterator, vtkSMObject);
+  vtkTypeMacro(vtkSMOrderedPropertyIterator, vtkSMObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

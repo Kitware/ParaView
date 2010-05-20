@@ -25,7 +25,6 @@
 
 #include <vtkstd/vector>
 
-vtkCxxRevisionMacro(vtkPieceCacheFilter, "1.1");
 vtkStandardNewMacro(vtkPieceCacheFilter);
 
 #define DEBUGPRINT_CACHING(arg) \

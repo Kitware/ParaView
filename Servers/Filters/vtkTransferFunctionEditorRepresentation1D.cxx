@@ -22,7 +22,6 @@
 #include "vtkPolyDataMapper.h"
 #include "vtkUnsignedCharArray.h"
 
-vtkCxxRevisionMacro(vtkTransferFunctionEditorRepresentation1D, "1.13");
 
 //----------------------------------------------------------------------------
 vtkTransferFunctionEditorRepresentation1D::vtkTransferFunctionEditorRepresentation1D()

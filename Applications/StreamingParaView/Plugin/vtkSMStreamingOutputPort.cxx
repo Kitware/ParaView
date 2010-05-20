@@ -32,7 +32,6 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMStreamingOutputPort);
-vtkCxxRevisionMacro(vtkSMStreamingOutputPort, "1.1");
 
 //----------------------------------------------------------------------------
 vtkSMStreamingOutputPort::vtkSMStreamingOutputPort()

@@ -28,7 +28,7 @@ class VTK_EXPORT vtkCleanArrays : public vtkDataSetAlgorithm
 {
 public:
   static vtkCleanArrays* New();
-  vtkTypeRevisionMacro(vtkCleanArrays, vtkDataSetAlgorithm);
+  vtkTypeMacro(vtkCleanArrays, vtkDataSetAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

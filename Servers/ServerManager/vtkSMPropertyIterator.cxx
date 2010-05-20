@@ -19,7 +19,6 @@
 #include "vtkSMProxyInternals.h"
 
 vtkStandardNewMacro(vtkSMPropertyIterator);
-vtkCxxRevisionMacro(vtkSMPropertyIterator, "1.11");
 
 struct vtkSMPropertyIteratorInternals
 {

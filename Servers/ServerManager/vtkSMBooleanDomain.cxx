@@ -19,7 +19,6 @@
 #include "vtkSMIntVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMBooleanDomain);
-vtkCxxRevisionMacro(vtkSMBooleanDomain, "1.4");
 
 //---------------------------------------------------------------------------
 vtkSMBooleanDomain::vtkSMBooleanDomain()

@@ -44,7 +44,7 @@ class VTK_EXPORT vtkSMUndoStackBuilder : public vtkSMObject
 {
 public:
   static vtkSMUndoStackBuilder* New();
-  vtkTypeRevisionMacro(vtkSMUndoStackBuilder, vtkSMObject);
+  vtkTypeMacro(vtkSMUndoStackBuilder, vtkSMObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

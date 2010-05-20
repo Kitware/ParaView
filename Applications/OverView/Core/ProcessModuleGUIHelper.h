@@ -47,7 +47,7 @@ class OVERVIEW_CORE_EXPORT ProcessModuleGUIHelper : public pqProcessModuleGUIHel
 {
 public:
   static ProcessModuleGUIHelper* New();
-  vtkTypeRevisionMacro(ProcessModuleGUIHelper, pqProcessModuleGUIHelper);
+  vtkTypeMacro(ProcessModuleGUIHelper, pqProcessModuleGUIHelper);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   void SetWindowType(const QString& window_type);

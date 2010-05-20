@@ -20,7 +20,6 @@
 #include "vtkPoints.h"
 
 vtkStandardNewMacro(vtkCameraInterpolator2);
-vtkCxxRevisionMacro(vtkCameraInterpolator2, "1.1");
 //----------------------------------------------------------------------------
 vtkCameraInterpolator2::vtkCameraInterpolator2()
 {

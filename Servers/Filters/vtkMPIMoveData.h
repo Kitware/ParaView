@@ -33,7 +33,7 @@ class VTK_EXPORT vtkMPIMoveData : public vtkPassInputTypeAlgorithm
 {
 public:
   static vtkMPIMoveData *New();
-  vtkTypeRevisionMacro(vtkMPIMoveData, vtkPassInputTypeAlgorithm);
+  vtkTypeMacro(vtkMPIMoveData, vtkPassInputTypeAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

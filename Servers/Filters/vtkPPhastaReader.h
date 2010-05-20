@@ -129,7 +129,7 @@ class VTK_EXPORT vtkPPhastaReader : public vtkMultiBlockDataSetAlgorithm
 {
 public:
   static vtkPPhastaReader* New();
-  vtkTypeRevisionMacro(vtkPPhastaReader, vtkMultiBlockDataSetAlgorithm);
+  vtkTypeMacro(vtkPPhastaReader, vtkMultiBlockDataSetAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

@@ -30,7 +30,7 @@ class VTK_EXPORT vtkStreamingOptions : public vtkObject
 {
  public:
   static vtkStreamingOptions* New();
-  vtkTypeRevisionMacro(vtkStreamingOptions, vtkObject);
+  vtkTypeMacro(vtkStreamingOptions, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   static int GetStreamedPasses();

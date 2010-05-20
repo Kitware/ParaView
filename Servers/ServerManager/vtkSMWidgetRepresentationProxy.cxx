@@ -20,7 +20,6 @@
 #include "vtkProcessModule.h"
 
 vtkStandardNewMacro(vtkSMWidgetRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMWidgetRepresentationProxy, "1.1");
 
 //---------------------------------------------------------------------------
 vtkSMWidgetRepresentationProxy::vtkSMWidgetRepresentationProxy()

@@ -39,7 +39,7 @@ class VTK_EXPORT vtkUndoSet : public vtkObject
 {
 public:
   static vtkUndoSet* New();
-  vtkTypeRevisionMacro(vtkUndoSet, vtkObject);
+  vtkTypeMacro(vtkUndoSet, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

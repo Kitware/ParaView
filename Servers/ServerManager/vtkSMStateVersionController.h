@@ -26,7 +26,7 @@ class VTK_EXPORT vtkSMStateVersionController : public vtkSMStateVersionControlle
 {
 public:
   static vtkSMStateVersionController* New();
-  vtkTypeRevisionMacro(vtkSMStateVersionController, vtkSMStateVersionControllerBase);
+  vtkTypeMacro(vtkSMStateVersionController, vtkSMStateVersionControllerBase);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

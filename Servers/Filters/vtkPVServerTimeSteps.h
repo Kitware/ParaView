@@ -30,7 +30,7 @@ class VTK_EXPORT vtkPVServerTimeSteps : public vtkPVServerObject
 {
 public:
   static vtkPVServerTimeSteps* New();
-  vtkTypeRevisionMacro(vtkPVServerTimeSteps, vtkPVServerObject);
+  vtkTypeMacro(vtkPVServerTimeSteps, vtkPVServerObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

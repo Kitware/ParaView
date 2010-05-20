@@ -47,7 +47,6 @@
 #include <ctime>
 
 
-vtkCxxRevisionMacro(vtkAMRDualContour, "1.8");
 vtkStandardNewMacro(vtkAMRDualContour);
 
 static int vtkAMRDualIsoEdgeToPointsTable[12][2] =

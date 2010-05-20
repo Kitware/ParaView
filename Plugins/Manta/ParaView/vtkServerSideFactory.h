@@ -72,7 +72,7 @@ class vtkServerSideFactory : public vtkObject
 {
 public:
   static vtkServerSideFactory* New();
-  vtkTypeRevisionMacro(vtkServerSideFactory, vtkObject);
+  vtkTypeMacro(vtkServerSideFactory, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
   
   void EnableFactory();

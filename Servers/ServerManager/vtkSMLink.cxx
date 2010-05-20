@@ -22,7 +22,6 @@
 
 #include <vtkstd/list>
 
-vtkCxxRevisionMacro(vtkSMLink, "1.7");
 //-----------------------------------------------------------------------------
 class vtkSMLinkObserver : public vtkCommand
 {

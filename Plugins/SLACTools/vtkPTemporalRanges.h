@@ -36,7 +36,7 @@ class vtkMultiProcessController;
 class vtkPTemporalRanges : public vtkTemporalRanges
 {
 public:
-  vtkTypeRevisionMacro(vtkPTemporalRanges, vtkTemporalRanges);
+  vtkTypeMacro(vtkPTemporalRanges, vtkTemporalRanges);
   static vtkPTemporalRanges *New();
   virtual void PrintSelf(ostream &os, vtkIndent indent);
 

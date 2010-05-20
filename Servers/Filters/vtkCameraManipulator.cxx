@@ -19,7 +19,6 @@
 #include "vtkRenderWindowInteractor.h"
 #include "vtkRenderer.h"
 
-vtkCxxRevisionMacro(vtkCameraManipulator, "1.2");
 vtkStandardNewMacro(vtkCameraManipulator);
 vtkCxxSetObjectMacro(vtkCameraManipulator, GUIHelper,
   vtkCameraManipulatorGUIHelper);

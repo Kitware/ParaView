@@ -36,7 +36,6 @@
 #include <assert.h>
 #include <ctype.h> /* isspace */
 
-vtkCxxRevisionMacro(vtkGenericEnSightReader2, "1.2");
 vtkStandardNewMacro(vtkGenericEnSightReader2);
 
 vtkCxxSetObjectMacro(vtkGenericEnSightReader2,TimeSets,

@@ -26,7 +26,7 @@ class VTK_EXPORT vtkSMAnimationPlayerProxy : public vtkSMProxy
 {
 public:
   static vtkSMAnimationPlayerProxy* New();
-  vtkTypeRevisionMacro(vtkSMAnimationPlayerProxy, vtkSMProxy);
+  vtkTypeMacro(vtkSMAnimationPlayerProxy, vtkSMProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

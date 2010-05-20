@@ -27,7 +27,6 @@
   }
 #endif
 
-vtkCxxRevisionMacro(vtkGridSampler2, "1.5");
 vtkStandardNewMacro(vtkGridSampler2);
 
 //define to 1 to adapt for thin k dimension

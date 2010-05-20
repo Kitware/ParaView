@@ -22,7 +22,6 @@
 #include "vtkInformation.h"
 
 vtkStandardNewMacro(vtkPVAlgorithmPortsInformation);
-vtkCxxRevisionMacro(vtkPVAlgorithmPortsInformation, "1.1");
 
 //----------------------------------------------------------------------------
 vtkPVAlgorithmPortsInformation::vtkPVAlgorithmPortsInformation()

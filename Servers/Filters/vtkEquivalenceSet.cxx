@@ -17,7 +17,6 @@
 #include "vtkIntArray.h"
 
 
-vtkCxxRevisionMacro(vtkEquivalenceSet, "1.2");
 vtkStandardNewMacro(vtkEquivalenceSet);
 
 

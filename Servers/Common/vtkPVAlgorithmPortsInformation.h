@@ -27,7 +27,7 @@ class VTK_EXPORT vtkPVAlgorithmPortsInformation : public vtkPVInformation
 {
 public:
   static vtkPVAlgorithmPortsInformation* New();
-  vtkTypeRevisionMacro(vtkPVAlgorithmPortsInformation, vtkPVInformation);
+  vtkTypeMacro(vtkPVAlgorithmPortsInformation, vtkPVInformation);
   void PrintSelf(ostream &os, vtkIndent indent);
 
   // Description:

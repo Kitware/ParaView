@@ -32,7 +32,7 @@ class VTK_EXPORT vtkSMDomainIterator : public vtkSMObject
 {
 public:
   static vtkSMDomainIterator* New();
-  vtkTypeRevisionMacro(vtkSMDomainIterator, vtkSMObject);
+  vtkTypeMacro(vtkSMDomainIterator, vtkSMObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

@@ -14,7 +14,6 @@
 =========================================================================*/
 #include "vtkCPScalarFieldFunction.h"
 
-vtkCxxRevisionMacro(vtkCPScalarFieldFunction, "1.1");
 
 //----------------------------------------------------------------------------
 vtkCPScalarFieldFunction::vtkCPScalarFieldFunction()

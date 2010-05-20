@@ -52,7 +52,7 @@ class PQCORE_EXPORT vtkPVAxesWidget : public vtkInteractorObserver
 {
 public:
   static vtkPVAxesWidget* New();
-  vtkTypeRevisionMacro(vtkPVAxesWidget, vtkInteractorObserver);
+  vtkTypeMacro(vtkPVAxesWidget, vtkInteractorObserver);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

@@ -24,7 +24,6 @@
 
 #include <QWidget>
 
-vtkCxxRevisionMacro(vtkSMChartViewProxy, "1.8.2.1");
 //----------------------------------------------------------------------------
 vtkSMChartViewProxy::vtkSMChartViewProxy()
 {

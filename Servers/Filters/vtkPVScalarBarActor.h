@@ -41,7 +41,7 @@
 class VTK_EXPORT vtkPVScalarBarActor : public vtkScalarBarActor
 {
 public:
-  vtkTypeRevisionMacro(vtkPVScalarBarActor, vtkScalarBarActor);
+  vtkTypeMacro(vtkPVScalarBarActor, vtkScalarBarActor);
   virtual void PrintSelf(ostream &os, vtkIndent indent);
   static vtkPVScalarBarActor *New();
 

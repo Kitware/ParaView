@@ -30,7 +30,7 @@ class VTK_EXPORT vtkCPMultiBlockGridBuilder : public vtkCPBaseGridBuilder
 {
 public:
   static vtkCPMultiBlockGridBuilder* New();
-  vtkTypeRevisionMacro(vtkCPMultiBlockGridBuilder, vtkCPBaseGridBuilder);
+  vtkTypeMacro(vtkCPMultiBlockGridBuilder, vtkCPBaseGridBuilder);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

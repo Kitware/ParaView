@@ -5,7 +5,6 @@
 #include "vtkAlgorithmOutput.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 
-vtkCxxRevisionMacro(vtkPriorityHelper, "1.3");
 vtkStandardNewMacro(vtkPriorityHelper);
 
 #define DEBUGPRINT_PRIORITY(arg)\

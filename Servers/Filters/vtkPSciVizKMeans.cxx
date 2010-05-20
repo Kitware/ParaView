@@ -11,7 +11,6 @@
 #include "vtkVariantArray.h"
 
 vtkStandardNewMacro(vtkPSciVizKMeans);
-vtkCxxRevisionMacro(vtkPSciVizKMeans,"1.2");
 
 vtkPSciVizKMeans::vtkPSciVizKMeans()
 {

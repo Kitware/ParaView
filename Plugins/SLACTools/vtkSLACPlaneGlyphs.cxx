@@ -34,7 +34,6 @@
   vtkSmartPointer<type> name = vtkSmartPointer<type>::New()
 
 //=============================================================================
-vtkCxxRevisionMacro(vtkSLACPlaneGlyphs, "1.1");
 vtkStandardNewMacro(vtkSLACPlaneGlyphs);
 
 //-----------------------------------------------------------------------------

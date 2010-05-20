@@ -19,7 +19,6 @@
 #include "vtkProcessModule.h"
 
 vtkStandardNewMacro(vtkSMDataSourceProxy);
-vtkCxxRevisionMacro(vtkSMDataSourceProxy, "1.2");
 
 //---------------------------------------------------------------------------
 vtkSMDataSourceProxy::vtkSMDataSourceProxy()

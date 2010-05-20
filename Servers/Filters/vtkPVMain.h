@@ -29,7 +29,7 @@ class VTK_EXPORT vtkPVMain : public vtkObject
 {
 public:
   static vtkPVMain* New();
-  vtkTypeRevisionMacro(vtkPVMain,vtkObject);
+  vtkTypeMacro(vtkPVMain,vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
   typedef void (*INITIALIZE_INTERPRETER_FUNCTION )(vtkProcessModule* pm);
 

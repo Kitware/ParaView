@@ -30,7 +30,7 @@ class VTK_EXPORT vtkMPIMToNSocketConnectionPortInformation : public vtkPVInforma
 {
 public:
   static vtkMPIMToNSocketConnectionPortInformation* New();
-  vtkTypeRevisionMacro(vtkMPIMToNSocketConnectionPortInformation, vtkPVInformation);
+  vtkTypeMacro(vtkMPIMToNSocketConnectionPortInformation, vtkPVInformation);
   void PrintSelf(ostream &os, vtkIndent indent);
 
   // Description:

@@ -33,7 +33,6 @@
 #include "vtkStdString.h"
 
 vtkStandardNewMacro(vtkSMProxyProperty);
-vtkCxxRevisionMacro(vtkSMProxyProperty, "1.59");
 
 struct vtkSMProxyPropertyInternals
 {

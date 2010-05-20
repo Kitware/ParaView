@@ -23,7 +23,6 @@
 #include "vtkStdString.h"
 
 vtkStandardNewMacro(vtkSMStringListDomain);
-vtkCxxRevisionMacro(vtkSMStringListDomain, "1.25");
 
 struct vtkSMStringListDomainInternals
 {

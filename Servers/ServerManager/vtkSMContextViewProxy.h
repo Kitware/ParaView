@@ -31,7 +31,7 @@ class QVTKWidget;
 class VTK_EXPORT vtkSMContextViewProxy : public vtkSMViewProxy
 {
 public:
-  vtkTypeRevisionMacro(vtkSMContextViewProxy, vtkSMViewProxy);
+  vtkTypeMacro(vtkSMContextViewProxy, vtkSMViewProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

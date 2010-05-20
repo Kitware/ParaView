@@ -12,7 +12,6 @@
 #include "vtkVariantArray.h"
 
 vtkStandardNewMacro(vtkPSciVizPCAStats);
-vtkCxxRevisionMacro(vtkPSciVizPCAStats,"1.2");
 
 vtkPSciVizPCAStats::vtkPSciVizPCAStats()
 {

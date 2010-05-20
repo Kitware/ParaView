@@ -31,7 +31,7 @@ class VTK_EXPORT vtkCPUnstructuredGridBuilder : public vtkCPGridBuilder
 {
 public:
   static vtkCPUnstructuredGridBuilder* New();
-  vtkTypeRevisionMacro(vtkCPUnstructuredGridBuilder, vtkCPGridBuilder);
+  vtkTypeMacro(vtkCPUnstructuredGridBuilder, vtkCPGridBuilder);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

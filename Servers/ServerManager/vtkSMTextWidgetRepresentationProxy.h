@@ -26,7 +26,7 @@ class VTK_EXPORT vtkSMTextWidgetRepresentationProxy : public vtkSMNewWidgetRepre
 {
 public:
   static vtkSMTextWidgetRepresentationProxy* New();
-  vtkTypeRevisionMacro(vtkSMTextWidgetRepresentationProxy, vtkSMNewWidgetRepresentationProxy);
+  vtkTypeMacro(vtkSMTextWidgetRepresentationProxy, vtkSMNewWidgetRepresentationProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
   
 protected:

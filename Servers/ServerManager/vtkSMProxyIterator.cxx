@@ -19,7 +19,6 @@
 #include "vtkSMProxyManagerInternals.h"
 
 vtkStandardNewMacro(vtkSMProxyIterator);
-vtkCxxRevisionMacro(vtkSMProxyIterator, "1.8");
 
 struct vtkSMProxyIteratorInternals
 {

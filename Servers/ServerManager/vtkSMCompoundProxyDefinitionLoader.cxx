@@ -21,7 +21,6 @@
 #include "vtkSMProxyManager.h"
 
 vtkStandardNewMacro(vtkSMCompoundProxyDefinitionLoader);
-vtkCxxRevisionMacro(vtkSMCompoundProxyDefinitionLoader, "1.5");
 
 //---------------------------------------------------------------------------
 vtkSMCompoundProxyDefinitionLoader::vtkSMCompoundProxyDefinitionLoader()

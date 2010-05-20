@@ -38,7 +38,6 @@
 #include <vtkstd/string>
 
 
-vtkCxxRevisionMacro( vtkRectilinearGridConnectivity, "1.3" );
 vtkStandardNewMacro( vtkRectilinearGridConnectivity );
 
 // An extended marching cubes case table for generating cube faces (either

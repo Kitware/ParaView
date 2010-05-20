@@ -110,7 +110,6 @@ namespace vtkTemporalRangesNamespace{
 using namespace vtkTemporalRangesNamespace;
 
 //=============================================================================
-vtkCxxRevisionMacro(vtkTemporalRanges, "1.3");
 vtkStandardNewMacro(vtkTemporalRanges);
 
 //-----------------------------------------------------------------------------

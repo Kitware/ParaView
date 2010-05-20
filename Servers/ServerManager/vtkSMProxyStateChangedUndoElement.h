@@ -27,7 +27,7 @@ class VTK_EXPORT vtkSMProxyStateChangedUndoElement : public vtkSMUndoElement
 {
 public:
   static vtkSMProxyStateChangedUndoElement* New();
-  vtkTypeRevisionMacro(vtkSMProxyStateChangedUndoElement, vtkSMUndoElement);
+  vtkTypeMacro(vtkSMProxyStateChangedUndoElement, vtkSMUndoElement);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

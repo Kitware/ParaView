@@ -26,7 +26,6 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPythonOptions);
-vtkCxxRevisionMacro(vtkPVPythonOptions, "1.6");
 
 //----------------------------------------------------------------------------
 vtkPVPythonOptions::vtkPVPythonOptions()

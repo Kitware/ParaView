@@ -1136,7 +1136,7 @@ void vtkParseOutput(FILE *fp, FileInfo *data)
             "    {\n"
             "    vtkOStrStreamWrapper vtkmsg;\n"
             "    vtkmsg << \"Cannot cast \" << ob->GetClassName() << \" object to %s.  \"\n"
-            "           << \"This probably means the class specifies the incorrect superclass in vtkTypeRevisionMacro.\";\n"
+            "           << \"This probably means the class specifies the incorrect superclass in vtkTypeMacro.\";\n"
             "    resultStream.Reset();\n"
             "    resultStream << vtkClientServerStream::Error\n"
             "                 << vtkmsg.str() << 0 << vtkClientServerStream::End;\n"

@@ -37,7 +37,7 @@ class vtkDataSet;
 class VTK_EXPORT vtkPCSVWriter : public vtkCSVWriter
 {
 public:
-  vtkTypeRevisionMacro(vtkPCSVWriter, vtkCSVWriter);
+  vtkTypeMacro(vtkPCSVWriter, vtkCSVWriter);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

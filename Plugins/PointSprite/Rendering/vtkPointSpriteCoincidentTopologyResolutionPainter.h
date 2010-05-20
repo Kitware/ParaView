@@ -26,7 +26,7 @@ class VTK_EXPORT vtkPointSpriteCoincidentTopologyResolutionPainter :
 {
 public:
   static vtkPointSpriteCoincidentTopologyResolutionPainter* New();
-  vtkTypeRevisionMacro(vtkPointSpriteCoincidentTopologyResolutionPainter,
+  vtkTypeMacro(vtkPointSpriteCoincidentTopologyResolutionPainter,
     vtkCoincidentTopologyResolutionPainter);
   void PrintSelf(ostream& os, vtkIndent indent);
 

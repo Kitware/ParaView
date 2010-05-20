@@ -41,7 +41,7 @@ class VTK_EXPORT vtkPSciVizContingencyStats : public vtkSciVizStatistics
 {
 public:
   static vtkPSciVizContingencyStats* New();
-  vtkTypeRevisionMacro(vtkPSciVizContingencyStats,vtkSciVizStatistics);
+  vtkTypeMacro(vtkPSciVizContingencyStats,vtkSciVizStatistics);
   virtual void PrintSelf( ostream& os, vtkIndent indent );
 
 protected:

@@ -29,7 +29,7 @@ class VTK_EXPORT vtkKdTreeManager : public vtkObject
 {
 public:
   static vtkKdTreeManager* New();
-  vtkTypeRevisionMacro(vtkKdTreeManager, vtkObject);
+  vtkTypeMacro(vtkKdTreeManager, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

@@ -32,7 +32,6 @@ using vtkstd::string;
 #endif
 
 vtkStandardNewMacro(vtkPVCustomTestDriver);
-vtkCxxRevisionMacro(vtkPVCustomTestDriver, "1.2");
 
 //----------------------------------------------------------------------------
 vtkPVCustomTestDriver::vtkPVCustomTestDriver()

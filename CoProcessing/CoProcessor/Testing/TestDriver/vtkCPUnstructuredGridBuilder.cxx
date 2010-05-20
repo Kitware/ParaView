@@ -21,7 +21,6 @@
 #include "vtkUnstructuredGrid.h"
 
 vtkStandardNewMacro(vtkCPUnstructuredGridBuilder);
-vtkCxxRevisionMacro(vtkCPUnstructuredGridBuilder, "1.1");
 vtkCxxSetObjectMacro(vtkCPUnstructuredGridBuilder, UnstructuredGrid, vtkUnstructuredGrid);
 
 //----------------------------------------------------------------------------

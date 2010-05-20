@@ -30,7 +30,7 @@ class VTK_EXPORT vtkPieceCacheExecutive :
 {
 public:
   static vtkPieceCacheExecutive* New();
-  vtkTypeRevisionMacro(vtkPieceCacheExecutive,
+  vtkTypeMacro(vtkPieceCacheExecutive,
                        vtkCompositeDataPipeline);
 
 protected:

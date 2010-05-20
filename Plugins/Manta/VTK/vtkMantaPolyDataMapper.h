@@ -96,7 +96,7 @@ class VTK_vtkManta_EXPORT vtkMantaPolyDataMapper : public vtkPolyDataMapper
 {
 public:
   static vtkMantaPolyDataMapper *New();
-  vtkTypeRevisionMacro(vtkMantaPolyDataMapper,vtkPolyDataMapper);
+  vtkTypeMacro(vtkMantaPolyDataMapper,vtkPolyDataMapper);
   //virtual void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

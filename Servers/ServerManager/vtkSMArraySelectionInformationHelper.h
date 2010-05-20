@@ -34,7 +34,7 @@ class VTK_EXPORT vtkSMArraySelectionInformationHelper : public vtkSMInformationH
 {
 public:
   static vtkSMArraySelectionInformationHelper* New();
-  vtkTypeRevisionMacro(vtkSMArraySelectionInformationHelper, vtkSMInformationHelper);
+  vtkTypeMacro(vtkSMArraySelectionInformationHelper, vtkSMInformationHelper);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   //BTX

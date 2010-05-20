@@ -20,7 +20,6 @@
 #include "vtkInformation.h"
 #include "vtkPVDataInformation.h"
 
-vtkCxxRevisionMacro(vtkSMRepresentationProxy, "1.10");
 vtkCxxSetObjectMacro(vtkSMRepresentationProxy, ViewInformation, vtkInformation);
 //----------------------------------------------------------------------------
 vtkSMRepresentationProxy::vtkSMRepresentationProxy()

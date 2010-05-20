@@ -55,7 +55,6 @@
 bool vtkMPIMoveData::UseZLibCompression = false;
 
 
-vtkCxxRevisionMacro(vtkMPIMoveData, "1.26");
 vtkStandardNewMacro(vtkMPIMoveData);
 
 vtkCxxSetObjectMacro(vtkMPIMoveData,Controller, vtkMultiProcessController);

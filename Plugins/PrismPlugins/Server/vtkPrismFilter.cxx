@@ -30,7 +30,6 @@ Module:    vtkPrismFilter.cxx
 #include "vtkTransform.h"
 #include <math.h>
 
-vtkCxxRevisionMacro(vtkPrismFilter, "1.14");
 vtkStandardNewMacro(vtkPrismFilter);
 
 class vtkPrismFilter::MyInternal

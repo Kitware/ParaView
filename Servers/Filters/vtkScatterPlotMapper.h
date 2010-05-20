@@ -38,7 +38,7 @@ class VTK_EXPORT vtkScatterPlotMapper : public vtkCompositePolyDataMapper2
 {
 public:
   static vtkScatterPlotMapper* New();
-  vtkTypeRevisionMacro(vtkScatterPlotMapper, vtkCompositePolyDataMapper2);
+  vtkTypeMacro(vtkScatterPlotMapper, vtkCompositePolyDataMapper2);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   //BTX

@@ -29,7 +29,7 @@ class VTK_EXPORT vtkPVOpenGLExtensionsInformation : public vtkPVInformation
 {
 public:
   static vtkPVOpenGLExtensionsInformation* New();
-  vtkTypeRevisionMacro(vtkPVOpenGLExtensionsInformation, vtkPVInformation);
+  vtkTypeMacro(vtkPVOpenGLExtensionsInformation, vtkPVInformation);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

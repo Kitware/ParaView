@@ -32,7 +32,7 @@
 class VTK_EXPORT vtkTransferFunctionEditorRepresentation1D : public vtkTransferFunctionEditorRepresentation
 {
 public:
-  vtkTypeRevisionMacro(vtkTransferFunctionEditorRepresentation1D, vtkTransferFunctionEditorRepresentation);
+  vtkTypeMacro(vtkTransferFunctionEditorRepresentation1D, vtkTransferFunctionEditorRepresentation);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

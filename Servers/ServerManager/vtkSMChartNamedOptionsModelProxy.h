@@ -29,7 +29,7 @@ class VTK_EXPORT vtkSMChartNamedOptionsModelProxy : public vtkSMProxy
 {
 public:
   static vtkSMChartNamedOptionsModelProxy* New();
-  vtkTypeRevisionMacro(vtkSMChartNamedOptionsModelProxy, vtkSMProxy);
+  vtkTypeMacro(vtkSMChartNamedOptionsModelProxy, vtkSMProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 //BTX
   vtkQtChartNamedSeriesOptionsModel* GetOptionsModel();

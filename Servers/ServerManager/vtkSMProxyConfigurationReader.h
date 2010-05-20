@@ -43,7 +43,7 @@ class VTK_EXPORT vtkSMProxyConfigurationReader : public vtkSMObject
 {
 public:
   static vtkSMProxyConfigurationReader *New();
-  vtkTypeRevisionMacro(vtkSMProxyConfigurationReader,vtkSMObject);
+  vtkTypeMacro(vtkSMProxyConfigurationReader,vtkSMObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

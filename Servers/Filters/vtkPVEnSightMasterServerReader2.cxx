@@ -44,7 +44,6 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVEnSightMasterServerReader2);
-vtkCxxRevisionMacro(vtkPVEnSightMasterServerReader2, "1.3");
 
 vtkCxxSetObjectMacro(vtkPVEnSightMasterServerReader2, Controller,
     vtkMultiProcessController);

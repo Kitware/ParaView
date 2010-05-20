@@ -49,7 +49,7 @@ class VTK_EXPORT vtkAMRDualClip : public vtkMultiBlockDataSetAlgorithm
 {
 public:
   static vtkAMRDualClip *New();
-  vtkTypeRevisionMacro(vtkAMRDualClip,vtkMultiBlockDataSetAlgorithm);
+  vtkTypeMacro(vtkAMRDualClip,vtkMultiBlockDataSetAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   vtkSetMacro(IsoValue, double);

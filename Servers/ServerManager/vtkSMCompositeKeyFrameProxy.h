@@ -32,7 +32,7 @@ class VTK_EXPORT vtkSMCompositeKeyFrameProxy : public vtkSMKeyFrameProxy
 {
 public:
   static vtkSMCompositeKeyFrameProxy* New();
-  vtkTypeRevisionMacro(vtkSMCompositeKeyFrameProxy, vtkSMKeyFrameProxy);
+  vtkTypeMacro(vtkSMCompositeKeyFrameProxy, vtkSMKeyFrameProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
   //BTX
   enum

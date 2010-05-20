@@ -19,7 +19,6 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMImageDataParallelStrategy);
-vtkCxxRevisionMacro(vtkSMImageDataParallelStrategy, "1.1");
 //----------------------------------------------------------------------------
 vtkSMImageDataParallelStrategy::vtkSMImageDataParallelStrategy()
 {

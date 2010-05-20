@@ -28,7 +28,7 @@ class VTK_EXPORT vtkPVSelectionSource : public vtkSelectionAlgorithm
 {
 public:
   static vtkPVSelectionSource* New();
-  vtkTypeRevisionMacro(vtkPVSelectionSource, vtkSelectionAlgorithm);
+  vtkTypeMacro(vtkPVSelectionSource, vtkSelectionAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

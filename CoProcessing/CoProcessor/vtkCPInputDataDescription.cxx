@@ -34,7 +34,6 @@ public:
 };
 
 vtkStandardNewMacro(vtkCPInputDataDescription);
-vtkCxxRevisionMacro(vtkCPInputDataDescription, "1.1");
 vtkCxxSetObjectMacro(vtkCPInputDataDescription, Grid, vtkDataObject);
 //----------------------------------------------------------------------------
 vtkCPInputDataDescription::vtkCPInputDataDescription()

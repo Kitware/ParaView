@@ -20,7 +20,6 @@
 #include "vtkStringList.h"
 
 vtkStandardNewMacro(vtkSMNamedPropertyIterator);
-vtkCxxRevisionMacro(vtkSMNamedPropertyIterator, "1.1");
 
 typedef vtkSMProxyInternals::PropertyInfoMap::iterator PropertyIterator;
 typedef vtkSMProxyInternals::ExposedPropertyInfoMap::iterator ExposedPropertyIterator;

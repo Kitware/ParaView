@@ -30,7 +30,7 @@ class VTK_EXPORT vtkSMPluginProxy : public vtkSMProxy
 {
 public:
   static vtkSMPluginProxy* New();
-  vtkTypeRevisionMacro(vtkSMPluginProxy, vtkSMProxy);
+  vtkTypeMacro(vtkSMPluginProxy, vtkSMProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

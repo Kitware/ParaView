@@ -42,7 +42,7 @@ class vtkSelectionNode;
 class VTK_EXPORT vtkPVExtractSelection : public vtkExtractSelection
 {
 public:
-  vtkTypeRevisionMacro(vtkPVExtractSelection,vtkExtractSelection);
+  vtkTypeMacro(vtkPVExtractSelection,vtkExtractSelection);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

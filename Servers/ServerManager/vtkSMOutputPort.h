@@ -34,7 +34,7 @@ class VTK_EXPORT vtkSMOutputPort : public vtkSMProxy
 {
 public:
   static vtkSMOutputPort* New();
-  vtkTypeRevisionMacro(vtkSMOutputPort, vtkSMProxy);
+  vtkTypeMacro(vtkSMOutputPort, vtkSMProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

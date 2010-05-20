@@ -54,7 +54,6 @@
 // vtkCaveRenderManager implementation.
 //******************************************************************
 
-vtkCxxRevisionMacro(vtkCaveRenderManager, "1.6");
 vtkStandardNewMacro(vtkCaveRenderManager);
 
 vtkCaveRenderManager::vtkCaveRenderManager()

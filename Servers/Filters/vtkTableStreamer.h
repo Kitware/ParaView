@@ -28,7 +28,7 @@ class VTK_EXPORT vtkTableStreamer : public vtkDataObjectAlgorithm
 {
 public:
   static vtkTableStreamer* New();
-  vtkTypeRevisionMacro(vtkTableStreamer, vtkDataObjectAlgorithm);
+  vtkTypeMacro(vtkTableStreamer, vtkDataObjectAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

@@ -27,7 +27,7 @@ class vtkCPBaseFieldBuilder;
 class VTK_EXPORT vtkCPGridBuilder : public vtkCPBaseGridBuilder
 {
 public:
-  vtkTypeRevisionMacro(vtkCPGridBuilder, vtkCPBaseGridBuilder);
+  vtkTypeMacro(vtkCPGridBuilder, vtkCPBaseGridBuilder);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

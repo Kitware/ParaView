@@ -45,7 +45,7 @@ class VTK_EXPORT vtkMultiViewManager : public vtkObject
 {
 public:
   static vtkMultiViewManager* New();
-  vtkTypeRevisionMacro(vtkMultiViewManager, vtkObject);
+  vtkTypeMacro(vtkMultiViewManager, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

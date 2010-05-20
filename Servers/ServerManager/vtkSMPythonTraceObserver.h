@@ -30,7 +30,7 @@ class VTK_EXPORT vtkSMPythonTraceObserver : public vtkSMObject
 {
 public:
   static vtkSMPythonTraceObserver* New();
-  vtkTypeRevisionMacro(vtkSMPythonTraceObserver, vtkSMObject);
+  vtkTypeMacro(vtkSMPythonTraceObserver, vtkSMObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   vtkSMProxy* GetLastPropertyModifiedProxy();

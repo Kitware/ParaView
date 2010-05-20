@@ -49,7 +49,6 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkXMLPVDWriter);
-vtkCxxRevisionMacro(vtkXMLPVDWriter, "1.17");
 
 class vtkXMLPVDWriterInternals
 {

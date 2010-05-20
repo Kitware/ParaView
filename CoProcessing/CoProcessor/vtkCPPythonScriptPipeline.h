@@ -35,7 +35,7 @@ class COPROCESSING_EXPORT vtkCPPythonScriptPipeline : public vtkCPPipeline
 {
 public:
   static vtkCPPythonScriptPipeline* New();
-  vtkTypeRevisionMacro(vtkCPPythonScriptPipeline,vtkCPPipeline);
+  vtkTypeMacro(vtkCPPythonScriptPipeline,vtkCPPipeline);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

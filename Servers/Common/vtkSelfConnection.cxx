@@ -29,7 +29,7 @@ class vtkSelfConnectionUndoSet : public vtkUndoSet
 {
 public:
   static vtkSelfConnectionUndoSet* New();
-  vtkTypeRevisionMacro(vtkSelfConnectionUndoSet, vtkUndoSet);
+  vtkTypeMacro(vtkSelfConnectionUndoSet, vtkUndoSet);
  
   virtual int Undo() 
     {
@@ -61,12 +61,10 @@ private:
 };
 
 vtkStandardNewMacro(vtkSelfConnectionUndoSet);
-vtkCxxRevisionMacro(vtkSelfConnectionUndoSet, "1.5");
 vtkCxxSetObjectMacro(vtkSelfConnectionUndoSet, XMLElement, vtkPVXMLElement);
 //-----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkSelfConnection);
-vtkCxxRevisionMacro(vtkSelfConnection, "1.5");
 //-----------------------------------------------------------------------------
 vtkSelfConnection::vtkSelfConnection()
 {

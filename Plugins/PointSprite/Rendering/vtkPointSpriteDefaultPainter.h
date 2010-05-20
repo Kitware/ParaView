@@ -41,7 +41,7 @@ class VTK_EXPORT vtkPointSpriteDefaultPainter : public vtkDefaultPainter
 {
 public :
   static vtkPointSpriteDefaultPainter* New();
-  vtkTypeRevisionMacro(vtkPointSpriteDefaultPainter, vtkDefaultPainter);
+  vtkTypeMacro(vtkPointSpriteDefaultPainter, vtkDefaultPainter);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

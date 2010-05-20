@@ -27,7 +27,7 @@
 class VTK_EXPORT vtkPVConnectivityFilter : public vtkConnectivityFilter
 {
 public:
-  vtkTypeRevisionMacro(vtkPVConnectivityFilter, vtkConnectivityFilter);
+  vtkTypeMacro(vtkPVConnectivityFilter, vtkConnectivityFilter);
   void PrintSelf(ostream& os, vtkIndent indent);
   
   static vtkPVConnectivityFilter *New();

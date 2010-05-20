@@ -23,7 +23,7 @@ class VTK_EXPORT vtkTestingProcessModuleGUIHelper : public vtkProcessModuleGUIHe
 {
 public: 
   static vtkTestingProcessModuleGUIHelper* New();
-  vtkTypeRevisionMacro(vtkTestingProcessModuleGUIHelper,vtkProcessModuleGUIHelper);
+  vtkTypeMacro(vtkTestingProcessModuleGUIHelper,vtkProcessModuleGUIHelper);
   void PrintSelf(ostream& os, vtkIndent indent);
   // Description: 
   // run main gui loop from process module

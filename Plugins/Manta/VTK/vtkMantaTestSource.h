@@ -28,7 +28,7 @@
 class VTK_vtkManta_EXPORT vtkMantaTestSource : public vtkPolyDataAlgorithm
 {
 public:
-  vtkTypeRevisionMacro(vtkMantaTestSource,vtkPolyDataAlgorithm);
+  vtkTypeMacro(vtkMantaTestSource,vtkPolyDataAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

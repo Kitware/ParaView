@@ -26,7 +26,7 @@ class vtkPVXMLElement;
 class VTK_EXPORT vtkPVXMLParser : public vtkXMLParser
 {
 public:
-  vtkTypeRevisionMacro(vtkPVXMLParser,vtkXMLParser);
+  vtkTypeMacro(vtkPVXMLParser,vtkXMLParser);
   void PrintSelf(ostream& os, vtkIndent indent);
   static vtkPVXMLParser* New();
 

@@ -54,7 +54,7 @@ class PQCORE_EXPORT pqOutputWindowAdapter :
   
 public:
   static pqOutputWindowAdapter *New();
-  vtkTypeRevisionMacro(pqOutputWindowAdapter, vtkOutputWindow);
+  vtkTypeMacro(pqOutputWindowAdapter, vtkOutputWindow);
 
   /// Returns the number of text messages received
   unsigned int getTextCount();

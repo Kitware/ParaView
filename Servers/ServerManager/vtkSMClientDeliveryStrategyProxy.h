@@ -28,7 +28,7 @@ class VTK_EXPORT vtkSMClientDeliveryStrategyProxy : public vtkSMSimpleStrategy
 {
 public:
   static vtkSMClientDeliveryStrategyProxy* New();
-  vtkTypeRevisionMacro(vtkSMClientDeliveryStrategyProxy, vtkSMSimpleStrategy);
+  vtkTypeMacro(vtkSMClientDeliveryStrategyProxy, vtkSMSimpleStrategy);
   void PrintSelf(ostream& os, vtkIndent indent);
   
   // Description:

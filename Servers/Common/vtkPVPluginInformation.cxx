@@ -22,7 +22,6 @@ cxx     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 #include "vtkPVPluginLoader.h"
 
 vtkStandardNewMacro(vtkPVPluginInformation);
-vtkCxxRevisionMacro(vtkPVPluginInformation, "1.4");
 
 //----------------------------------------------------------------------------
 vtkPVPluginInformation::vtkPVPluginInformation()

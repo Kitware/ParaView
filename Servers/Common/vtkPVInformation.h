@@ -26,7 +26,7 @@ class vtkClientServerStream;
 class VTK_EXPORT vtkPVInformation : public vtkObject
 {
 public:
-  vtkTypeRevisionMacro(vtkPVInformation, vtkObject);
+  vtkTypeMacro(vtkPVInformation, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

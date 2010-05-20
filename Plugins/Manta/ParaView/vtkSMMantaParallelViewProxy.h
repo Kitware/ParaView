@@ -74,7 +74,7 @@ class vtkSMMantaParallelViewProxy : public vtkSMIceTDesktopRenderViewProxy
 {
 public:
   static vtkSMMantaParallelViewProxy* New();
-  vtkTypeRevisionMacro(vtkSMMantaParallelViewProxy, vtkSMIceTDesktopRenderViewProxy);
+  vtkTypeMacro(vtkSMMantaParallelViewProxy, vtkSMIceTDesktopRenderViewProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

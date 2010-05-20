@@ -14,7 +14,6 @@
 =========================================================================*/
 #include "vtkCPBaseFieldBuilder.h"
 
-vtkCxxRevisionMacro(vtkCPBaseFieldBuilder, "1.1");
 
 //----------------------------------------------------------------------------
 vtkCPBaseFieldBuilder::vtkCPBaseFieldBuilder()

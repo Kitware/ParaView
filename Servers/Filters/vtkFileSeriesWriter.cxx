@@ -30,7 +30,6 @@
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkFileSeriesWriter);
-vtkCxxRevisionMacro(vtkFileSeriesWriter, "1.3");
 vtkCxxSetObjectMacro(vtkFileSeriesWriter, Writer, vtkAlgorithm);
 //-----------------------------------------------------------------------------
 vtkFileSeriesWriter::vtkFileSeriesWriter()

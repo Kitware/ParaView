@@ -29,7 +29,6 @@
 #include "vtkTable.h"
 
 vtkStandardNewMacro(vtkBlockDeliveryPreprocessor);
-vtkCxxRevisionMacro(vtkBlockDeliveryPreprocessor, "1.4");
 //----------------------------------------------------------------------------
 vtkBlockDeliveryPreprocessor::vtkBlockDeliveryPreprocessor()
 {

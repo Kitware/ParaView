@@ -17,7 +17,7 @@
 class VTK_EXPORT vtkPrismGeometryFilter : public vtkPointDataToCellData 
 {
 public:
-  vtkTypeRevisionMacro(vtkPrismGeometryFilter,vtkPointDataToCellData);
+  vtkTypeMacro(vtkPrismGeometryFilter,vtkPointDataToCellData);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   static vtkPrismGeometryFilter *New();

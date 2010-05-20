@@ -26,7 +26,7 @@ class VTK_EXPORT vtkSMUpdateSuppressorProxy : public vtkSMSourceProxy
 {
 public:
   static vtkSMUpdateSuppressorProxy* New();
-  vtkTypeRevisionMacro(vtkSMUpdateSuppressorProxy, vtkSMSourceProxy);
+  vtkTypeMacro(vtkSMUpdateSuppressorProxy, vtkSMSourceProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   //// Description:

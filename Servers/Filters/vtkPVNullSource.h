@@ -27,7 +27,7 @@ class VTK_EXPORT vtkPVNullSource : public vtkLineSource
 {
 public:
   static vtkPVNullSource* New();
-  vtkTypeRevisionMacro(vtkPVNullSource, vtkLineSource);
+  vtkTypeMacro(vtkPVNullSource, vtkLineSource);
   void PrintSelf(ostream& os, vtkIndent indent);
 
 //BTX

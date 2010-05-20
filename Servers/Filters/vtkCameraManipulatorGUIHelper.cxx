@@ -16,7 +16,6 @@
 
 #include "vtkObjectFactory.h"
 
-vtkCxxRevisionMacro(vtkCameraManipulatorGUIHelper, "1.1");
 //-----------------------------------------------------------------------------
 vtkCameraManipulatorGUIHelper::vtkCameraManipulatorGUIHelper()
 {

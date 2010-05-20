@@ -43,7 +43,6 @@ static void vtkFillComponent(vtkUnsignedIntArray* array,
 }
  
 vtkStandardNewMacro(vtkTableStreamer);
-vtkCxxRevisionMacro(vtkTableStreamer, "1.3");
 vtkCxxSetObjectMacro(vtkTableStreamer, Controller, vtkMultiProcessController);
 //----------------------------------------------------------------------------
 vtkTableStreamer::vtkTableStreamer()

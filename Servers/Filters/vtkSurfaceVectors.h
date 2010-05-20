@@ -29,7 +29,7 @@ class vtkIdList;
 class VTK_EXPORT vtkSurfaceVectors : public vtkDataSetAlgorithm
 {
 public:
-  vtkTypeRevisionMacro(vtkSurfaceVectors,vtkDataSetAlgorithm);
+  vtkTypeMacro(vtkSurfaceVectors,vtkDataSetAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
   static vtkSurfaceVectors *New();
 

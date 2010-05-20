@@ -21,7 +21,6 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMIntRangeDomain);
-vtkCxxRevisionMacro(vtkSMIntRangeDomain, "1.18");
 
 struct vtkSMIntRangeDomainInternals
 {

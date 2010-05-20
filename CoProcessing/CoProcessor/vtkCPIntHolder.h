@@ -22,7 +22,7 @@ class COPROCESSING_EXPORT vtkCPIntHolder : public vtkObject
 {
 public:
   static vtkCPIntHolder* New();
-  vtkTypeRevisionMacro(vtkCPIntHolder,vtkObject);
+  vtkTypeMacro(vtkCPIntHolder,vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
   
   int GetInt();

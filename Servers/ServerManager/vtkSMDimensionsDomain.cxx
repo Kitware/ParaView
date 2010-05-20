@@ -22,7 +22,6 @@
 #include "vtkPVDataInformation.h"
 
 vtkStandardNewMacro(vtkSMDimensionsDomain);
-vtkCxxRevisionMacro(vtkSMDimensionsDomain, "1.2");
 //----------------------------------------------------------------------------
 vtkSMDimensionsDomain::vtkSMDimensionsDomain()
 {

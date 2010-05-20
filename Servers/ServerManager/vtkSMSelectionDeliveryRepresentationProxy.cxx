@@ -18,7 +18,6 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMSelectionDeliveryRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMSelectionDeliveryRepresentationProxy, "1.2");
 //----------------------------------------------------------------------------
 vtkSMSelectionDeliveryRepresentationProxy::vtkSMSelectionDeliveryRepresentationProxy()
 {

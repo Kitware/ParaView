@@ -39,7 +39,7 @@ class VTK_EXPORT vtkSelectionConverter : public vtkObject
 {
 public:
   static vtkSelectionConverter* New();
-  vtkTypeRevisionMacro(vtkSelectionConverter,vtkObject);
+  vtkTypeMacro(vtkSelectionConverter,vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

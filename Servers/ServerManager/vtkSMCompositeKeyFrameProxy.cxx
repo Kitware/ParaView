@@ -20,7 +20,6 @@
 #include "vtkMemberFunctionCommand.h"
 
 vtkStandardNewMacro(vtkSMCompositeKeyFrameProxy);
-vtkCxxRevisionMacro(vtkSMCompositeKeyFrameProxy, "1.6");
 //-----------------------------------------------------------------------------
 vtkSMCompositeKeyFrameProxy::vtkSMCompositeKeyFrameProxy()
 {

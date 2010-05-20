@@ -18,7 +18,6 @@
 #include "vtkProcessModule.h"
 
 vtkStandardNewMacro(vtkSMServerFileListingProxy);
-vtkCxxRevisionMacro(vtkSMServerFileListingProxy, "1.5");
 //-----------------------------------------------------------------------------
 vtkSMServerFileListingProxy::vtkSMServerFileListingProxy()
 {

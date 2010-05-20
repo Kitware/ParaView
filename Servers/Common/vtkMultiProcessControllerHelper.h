@@ -29,7 +29,7 @@ class VTK_EXPORT vtkMultiProcessControllerHelper : public vtkObject
 {
 public:
   static vtkMultiProcessControllerHelper* New();
-  vtkTypeRevisionMacro(vtkMultiProcessControllerHelper, vtkObject);
+  vtkTypeMacro(vtkMultiProcessControllerHelper, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   //BTX

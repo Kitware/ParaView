@@ -67,7 +67,7 @@ class vtkDataSet;
 class vtkPrismCubeAxesActor : public vtkActor
 {
 public:
-  vtkTypeRevisionMacro(vtkPrismCubeAxesActor,vtkActor);
+  vtkTypeMacro(vtkPrismCubeAxesActor,vtkActor);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

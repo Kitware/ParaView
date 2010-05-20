@@ -23,7 +23,6 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVStringArrayHelper);
-vtkCxxRevisionMacro(vtkPVStringArrayHelper, "1.2");
 
 //----------------------------------------------------------------------------
 class vtkPVStringArrayHelperInternals

@@ -84,7 +84,6 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define DEBUGPRINT_VIEW(arg);
 
 //-----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkSMMantaParallelViewProxy, "1.3");
 vtkStandardNewMacro(vtkSMMantaParallelViewProxy);
 
 

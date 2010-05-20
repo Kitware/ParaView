@@ -20,7 +20,6 @@
 #include "vtkSMNamedPropertyIterator.h"
 #include "vtkSMRenderViewProxy.h"
 
-vtkCxxRevisionMacro(vtkSMCameraConfigurationWriter,"1.1");
 vtkStandardNewMacro(vtkSMCameraConfigurationWriter);
 
 //-----------------------------------------------------------------------------

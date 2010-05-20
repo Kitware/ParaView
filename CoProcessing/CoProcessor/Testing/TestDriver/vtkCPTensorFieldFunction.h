@@ -24,7 +24,7 @@
 class VTK_EXPORT vtkCPTensorFieldFunction : public vtkObject
 {
 public:
-  vtkTypeRevisionMacro(vtkCPTensorFieldFunction, vtkObject);
+  vtkTypeMacro(vtkCPTensorFieldFunction, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

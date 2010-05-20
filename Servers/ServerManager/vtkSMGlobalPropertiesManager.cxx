@@ -43,7 +43,6 @@ public:
 
 
 vtkStandardNewMacro(vtkSMGlobalPropertiesManager);
-vtkCxxRevisionMacro(vtkSMGlobalPropertiesManager, "1.4");
 //----------------------------------------------------------------------------
 vtkSMGlobalPropertiesManager::vtkSMGlobalPropertiesManager()
 {

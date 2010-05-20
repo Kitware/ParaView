@@ -61,7 +61,7 @@ class OVERVIEW_CORE_EXPORT vtkSMClientDeliverySource :
 {
 public:
   static vtkSMClientDeliverySource *New();
-  vtkTypeRevisionMacro(vtkSMClientDeliverySource, vtkDataObjectAlgorithm);
+  vtkTypeMacro(vtkSMClientDeliverySource, vtkDataObjectAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   vtkSetObjectMacro(DeliveryProxy, vtkSMClientDeliveryRepresentationProxy);

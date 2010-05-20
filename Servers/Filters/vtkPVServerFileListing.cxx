@@ -42,7 +42,6 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVServerFileListing);
-vtkCxxRevisionMacro(vtkPVServerFileListing, "1.10");
 
 //----------------------------------------------------------------------------
 class vtkPVServerFileListingInternals

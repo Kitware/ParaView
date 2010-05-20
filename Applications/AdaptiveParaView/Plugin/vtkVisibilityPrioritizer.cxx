@@ -26,7 +26,6 @@
 #include "vtkBoundingBox.h"
 #include "vtkExtractSelectedFrustum.h"
 
-vtkCxxRevisionMacro(vtkVisibilityPrioritizer, "1.2");
 vtkStandardNewMacro(vtkVisibilityPrioritizer);
 
 #define DEBUGPRINT_PRIORITY(arg)\

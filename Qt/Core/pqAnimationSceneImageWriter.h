@@ -41,7 +41,7 @@ class PQCORE_EXPORT pqAnimationSceneImageWriter : public vtkSMAnimationSceneImag
 {
 public:
   static pqAnimationSceneImageWriter* New();
-  vtkTypeRevisionMacro(pqAnimationSceneImageWriter, vtkSMAnimationSceneImageWriter);
+  vtkTypeMacro(pqAnimationSceneImageWriter, vtkSMAnimationSceneImageWriter);
   void PrintSelf(ostream& os, vtkIndent indent);
 
 protected:

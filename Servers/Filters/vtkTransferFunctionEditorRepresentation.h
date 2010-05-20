@@ -41,7 +41,7 @@ class vtkTexture;
 class VTK_EXPORT vtkTransferFunctionEditorRepresentation : public vtkWidgetRepresentation
 {
 public:
-  vtkTypeRevisionMacro(vtkTransferFunctionEditorRepresentation, vtkWidgetRepresentation);
+  vtkTypeMacro(vtkTransferFunctionEditorRepresentation, vtkWidgetRepresentation);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

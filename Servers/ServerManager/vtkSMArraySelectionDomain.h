@@ -32,7 +32,7 @@ class VTK_EXPORT vtkSMArraySelectionDomain : public vtkSMStringListRangeDomain
 {
 public:
   static vtkSMArraySelectionDomain* New();
-  vtkTypeRevisionMacro(vtkSMArraySelectionDomain, vtkSMStringListRangeDomain);
+  vtkTypeMacro(vtkSMArraySelectionDomain, vtkSMStringListRangeDomain);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

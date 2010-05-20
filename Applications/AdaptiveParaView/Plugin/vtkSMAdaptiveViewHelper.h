@@ -27,7 +27,7 @@ class VTK_EXPORT vtkSMAdaptiveViewHelper : public vtkPVRenderViewProxy
 {
 public:
   static vtkSMAdaptiveViewHelper* New();
-  vtkTypeRevisionMacro(vtkSMAdaptiveViewHelper, vtkPVRenderViewProxy);
+  vtkTypeMacro(vtkSMAdaptiveViewHelper, vtkPVRenderViewProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Implemeting API from vtkPVRenderViewProxy.

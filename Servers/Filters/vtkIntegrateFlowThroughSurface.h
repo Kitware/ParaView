@@ -30,7 +30,7 @@ class vtkDataSetAttributes;
 class VTK_EXPORT vtkIntegrateFlowThroughSurface : public vtkUnstructuredGridAlgorithm
 {
 public:
-  vtkTypeRevisionMacro(vtkIntegrateFlowThroughSurface,vtkUnstructuredGridAlgorithm);
+  vtkTypeMacro(vtkIntegrateFlowThroughSurface,vtkUnstructuredGridAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
   static vtkIntegrateFlowThroughSurface *New();
   

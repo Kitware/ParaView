@@ -53,7 +53,6 @@
 using vtkstd::string;
 
 vtkStandardNewMacro(vtkSMPointSpriteRepresentationProxy)
-vtkCxxRevisionMacro(vtkSMPointSpriteRepresentationProxy, "1.3")
 //----------------------------------------------------------------------------
 vtkSMPointSpriteRepresentationProxy::vtkSMPointSpriteRepresentationProxy()
 {

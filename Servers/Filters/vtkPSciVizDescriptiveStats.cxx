@@ -10,7 +10,6 @@
 #include "vtkVariantArray.h"
 
 vtkStandardNewMacro(vtkPSciVizDescriptiveStats);
-vtkCxxRevisionMacro(vtkPSciVizDescriptiveStats,"1.2");
 
 vtkPSciVizDescriptiveStats::vtkPSciVizDescriptiveStats()
 {

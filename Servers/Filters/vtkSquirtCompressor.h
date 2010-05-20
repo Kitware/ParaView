@@ -53,7 +53,7 @@ class VTK_EXPORT vtkSquirtCompressor : public vtkImageCompressor
 {
 public:
   static vtkSquirtCompressor* New();
-  vtkTypeRevisionMacro(vtkSquirtCompressor, vtkImageCompressor);
+  vtkTypeMacro(vtkSquirtCompressor, vtkImageCompressor);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

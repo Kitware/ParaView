@@ -37,7 +37,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkInformationVector.h"
 #include "vtkObjectFactory.h"
 
-vtkCxxRevisionMacro(vtkSMClientDeliverySource, "1.1");
 vtkStandardNewMacro(vtkSMClientDeliverySource);
 
 // Construct programmable filter with empty execute method.

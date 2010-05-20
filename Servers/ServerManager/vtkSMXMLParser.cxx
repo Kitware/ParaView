@@ -18,7 +18,6 @@
 #include "vtkPVXMLElement.h"
 #include "vtkSMProxyManager.h"
 
-vtkCxxRevisionMacro(vtkSMXMLParser, "1.1");
 vtkStandardNewMacro(vtkSMXMLParser);
 
 //----------------------------------------------------------------------------

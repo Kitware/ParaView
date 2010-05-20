@@ -22,7 +22,6 @@
 #include "vtkSMPropertyHelper.h"
 
 vtkStandardNewMacro(vtkSMUniformGridParallelStrategy);
-vtkCxxRevisionMacro(vtkSMUniformGridParallelStrategy, "1.6");
 //----------------------------------------------------------------------------
 vtkSMUniformGridParallelStrategy::vtkSMUniformGridParallelStrategy()
 {

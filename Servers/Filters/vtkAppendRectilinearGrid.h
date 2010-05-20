@@ -27,7 +27,7 @@ class VTK_EXPORT vtkAppendRectilinearGrid : public vtkRectilinearGridAlgorithm
 {
 public:
   static vtkAppendRectilinearGrid* New();
-  vtkTypeRevisionMacro(vtkAppendRectilinearGrid, vtkRectilinearGridAlgorithm);
+  vtkTypeMacro(vtkAppendRectilinearGrid, vtkRectilinearGridAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
 protected:

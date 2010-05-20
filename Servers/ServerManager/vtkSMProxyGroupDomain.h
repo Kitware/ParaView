@@ -38,7 +38,7 @@ class VTK_EXPORT vtkSMProxyGroupDomain : public vtkSMDomain
 {
 public:
   static vtkSMProxyGroupDomain* New();
-  vtkTypeRevisionMacro(vtkSMProxyGroupDomain, vtkSMDomain);
+  vtkTypeMacro(vtkSMProxyGroupDomain, vtkSMDomain);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

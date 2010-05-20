@@ -28,7 +28,7 @@
 class VTK_EXPORT vtkPVUpdateSuppressor : public vtkDataObjectAlgorithm
 {
 public:
-  vtkTypeRevisionMacro(vtkPVUpdateSuppressor,vtkDataObjectAlgorithm);
+  vtkTypeMacro(vtkPVUpdateSuppressor,vtkDataObjectAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

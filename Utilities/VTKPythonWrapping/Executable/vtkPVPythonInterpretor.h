@@ -34,7 +34,7 @@ class VTK_EXPORT vtkPVPythonInterpretor : public vtkObject
 {
 public:
   static vtkPVPythonInterpretor* New();
-  vtkTypeRevisionMacro(vtkPVPythonInterpretor, vtkObject);
+  vtkTypeMacro(vtkPVPythonInterpretor, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

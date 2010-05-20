@@ -16,7 +16,6 @@
 
 #include "vtkObjectFactory.h"
 
-vtkCxxRevisionMacro(vtkSMAnimationCueManipulatorProxy, "1.9");
 
 //----------------------------------------------------------------------------
 vtkSMAnimationCueManipulatorProxy::vtkSMAnimationCueManipulatorProxy()

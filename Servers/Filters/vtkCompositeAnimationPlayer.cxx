@@ -28,7 +28,6 @@ public:
 };
 
 vtkStandardNewMacro(vtkCompositeAnimationPlayer);
-vtkCxxRevisionMacro(vtkCompositeAnimationPlayer, "1.2");
 //----------------------------------------------------------------------------
 vtkCompositeAnimationPlayer::vtkCompositeAnimationPlayer()
 {

@@ -26,7 +26,7 @@ class VTK_EXPORT vtkUpdateSuppressorPipeline : public vtkCompositeDataPipeline
 {
 public:
   static vtkUpdateSuppressorPipeline* New();
-  vtkTypeRevisionMacro(vtkUpdateSuppressorPipeline, vtkCompositeDataPipeline);
+  vtkTypeMacro(vtkUpdateSuppressorPipeline, vtkCompositeDataPipeline);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

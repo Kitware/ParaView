@@ -32,7 +32,6 @@
 #include <vtksys/ios/sstream>
 
 vtkStandardNewMacro(vtkCSVWriter);
-vtkCxxRevisionMacro(vtkCSVWriter, "1.10");
 //-----------------------------------------------------------------------------
 vtkCSVWriter::vtkCSVWriter()
 {

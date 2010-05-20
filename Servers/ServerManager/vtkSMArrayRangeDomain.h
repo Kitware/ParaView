@@ -35,7 +35,7 @@ class VTK_EXPORT vtkSMArrayRangeDomain : public vtkSMDoubleRangeDomain
 {
 public:
   static vtkSMArrayRangeDomain* New();
-  vtkTypeRevisionMacro(vtkSMArrayRangeDomain, vtkSMDoubleRangeDomain);
+  vtkTypeMacro(vtkSMArrayRangeDomain, vtkSMDoubleRangeDomain);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

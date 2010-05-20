@@ -29,7 +29,7 @@ class VTK_EXPORT vtkPVTrackballPan : public vtkCameraManipulator
 {
 public:
   static vtkPVTrackballPan *New();
-  vtkTypeRevisionMacro(vtkPVTrackballPan, vtkCameraManipulator);
+  vtkTypeMacro(vtkPVTrackballPan, vtkCameraManipulator);
   void PrintSelf(ostream& os, vtkIndent indent);
   
   // Description:

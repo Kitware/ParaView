@@ -41,7 +41,7 @@ class vtkMultiProcessController;
 class vtkSamplePlaneSource : public vtkPolyDataAlgorithm
 {
 public:
-  vtkTypeRevisionMacro(vtkSamplePlaneSource, vtkPolyDataAlgorithm);
+  vtkTypeMacro(vtkSamplePlaneSource, vtkPolyDataAlgorithm);
   static vtkSamplePlaneSource *New();
   virtual void PrintSelf(ostream &os, vtkIndent indent);
 

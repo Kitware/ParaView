@@ -28,7 +28,7 @@ class VTK_EXPORT vtkSMScalarBarActorProxy : public vtkSMProxy
 {
 public:
   static vtkSMScalarBarActorProxy* New();
-  vtkTypeRevisionMacro(vtkSMScalarBarActorProxy, vtkSMProxy);
+  vtkTypeMacro(vtkSMScalarBarActorProxy, vtkSMProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Methods to set the position and position2 coordinate 

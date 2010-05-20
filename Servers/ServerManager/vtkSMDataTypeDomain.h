@@ -40,7 +40,7 @@ class VTK_EXPORT vtkSMDataTypeDomain : public vtkSMDomain
 {
 public:
   static vtkSMDataTypeDomain* New();
-  vtkTypeRevisionMacro(vtkSMDataTypeDomain, vtkSMDomain);
+  vtkTypeMacro(vtkSMDataTypeDomain, vtkSMDomain);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

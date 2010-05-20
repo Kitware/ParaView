@@ -35,7 +35,7 @@ class VTK_EXPORT vtkSMProxyIterator : public vtkSMObject
 {
 public:
   static vtkSMProxyIterator* New();
-  vtkTypeRevisionMacro(vtkSMProxyIterator, vtkSMObject);
+  vtkTypeMacro(vtkSMProxyIterator, vtkSMObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

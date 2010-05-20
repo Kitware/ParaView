@@ -19,7 +19,6 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMUnstructuredGridParallelStrategy);
-vtkCxxRevisionMacro(vtkSMUnstructuredGridParallelStrategy, "1.3");
 //----------------------------------------------------------------------------
 vtkSMUnstructuredGridParallelStrategy::vtkSMUnstructuredGridParallelStrategy()
 {

@@ -26,7 +26,6 @@
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMSILInformationHelper);
-vtkCxxRevisionMacro(vtkSMSILInformationHelper, "1.3");
 vtkCxxSetObjectMacro(vtkSMSILInformationHelper, SIL, vtkGraph);
 //----------------------------------------------------------------------------
 vtkSMSILInformationHelper::vtkSMSILInformationHelper()

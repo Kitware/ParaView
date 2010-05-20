@@ -29,8 +29,8 @@ class VTK_EXPORT vtkSMGlyphRepresentationProxy : public vtkSMPVRepresentationPro
 {
 public:
   static vtkSMGlyphRepresentationProxy* New();
-  //vtkTypeRevisionMacro(vtkSMGlyphRepresentationProxy, vtkSMScatterPlotRepresentationProxy);
-  vtkTypeRevisionMacro(vtkSMGlyphRepresentationProxy, vtkSMPVRepresentationProxy);
+  //vtkTypeMacro(vtkSMGlyphRepresentationProxy, vtkSMScatterPlotRepresentationProxy);
+  vtkTypeMacro(vtkSMGlyphRepresentationProxy, vtkSMPVRepresentationProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   virtual void AddInput(unsigned int inputPort,

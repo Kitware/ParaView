@@ -27,7 +27,6 @@
 #include "vtkPointData.h"
 #include "vtkPieceCacheFilter.h"
 
-vtkCxxRevisionMacro(vtkPieceCacheExecutive, "1.1");
 vtkStandardNewMacro(vtkPieceCacheExecutive);
 
 #define DEBUGPRINT_CACHING(arg) \

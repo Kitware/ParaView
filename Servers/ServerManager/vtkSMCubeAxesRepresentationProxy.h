@@ -26,7 +26,7 @@ class VTK_EXPORT vtkSMCubeAxesRepresentationProxy : public vtkSMDataRepresentati
 {
 public:
   static vtkSMCubeAxesRepresentationProxy* New();
-  vtkTypeRevisionMacro(vtkSMCubeAxesRepresentationProxy, vtkSMDataRepresentationProxy);
+  vtkTypeMacro(vtkSMCubeAxesRepresentationProxy, vtkSMDataRepresentationProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

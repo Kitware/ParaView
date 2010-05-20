@@ -28,7 +28,7 @@ class VTK_EXPORT vtkPiece : public vtkObject
 {
 public:
   static vtkPiece* New();
-  vtkTypeRevisionMacro(vtkPiece, vtkObject);
+  vtkTypeMacro(vtkPiece, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   vtkSetMacro(Piece, int);

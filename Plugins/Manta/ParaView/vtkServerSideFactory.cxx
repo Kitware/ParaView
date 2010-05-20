@@ -75,7 +75,6 @@ extern "C" void vtkMantaCS_Initialize(vtkClientServerInterpreter *arlu);
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkServerSideFactory);
-vtkCxxRevisionMacro(vtkServerSideFactory, "1.1");
 
 int vtkServerSideFactory::FactoryRegistered = 0;
 

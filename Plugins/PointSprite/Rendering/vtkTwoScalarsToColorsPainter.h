@@ -42,7 +42,7 @@ class VTK_EXPORT vtkTwoScalarsToColorsPainter : public vtkOpenGLScalarsToColorsP
 {
 public :
   static vtkTwoScalarsToColorsPainter* New();
-  vtkTypeRevisionMacro(vtkTwoScalarsToColorsPainter, vtkOpenGLScalarsToColorsPainter);
+  vtkTypeMacro(vtkTwoScalarsToColorsPainter, vtkOpenGLScalarsToColorsPainter);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

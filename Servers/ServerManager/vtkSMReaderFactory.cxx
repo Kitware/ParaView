@@ -253,7 +253,6 @@ bool vtkSMReaderFactory::vtkInternals::vtkValue::CanReadFile(
 }
 
 vtkStandardNewMacro(vtkSMReaderFactory);
-vtkCxxRevisionMacro(vtkSMReaderFactory, "1.4");
 //----------------------------------------------------------------------------
 vtkSMReaderFactory::vtkSMReaderFactory()
 {

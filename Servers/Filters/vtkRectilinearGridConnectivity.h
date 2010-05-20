@@ -93,7 +93,7 @@ class VTK_EXPORT vtkRectilinearGridConnectivity :
 {
 public:
 
-  vtkTypeRevisionMacro( vtkRectilinearGridConnectivity, 
+  vtkTypeMacro( vtkRectilinearGridConnectivity,
                         vtkMultiBlockDataSetAlgorithm );
   static vtkRectilinearGridConnectivity * New();
   void   PrintSelf( ostream & os, vtkIndent indent );

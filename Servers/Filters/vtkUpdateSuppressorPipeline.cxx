@@ -20,7 +20,6 @@
 
 #include "vtkProcessModule.h"
 
-vtkCxxRevisionMacro(vtkUpdateSuppressorPipeline, "1.10");
 vtkStandardNewMacro(vtkUpdateSuppressorPipeline);
 
 

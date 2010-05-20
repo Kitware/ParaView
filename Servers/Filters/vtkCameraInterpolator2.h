@@ -29,7 +29,7 @@ class VTK_EXPORT vtkCameraInterpolator2 : public vtkObject
 {
 public:
   static vtkCameraInterpolator2* New();
-  vtkTypeRevisionMacro(vtkCameraInterpolator2, vtkObject);
+  vtkTypeMacro(vtkCameraInterpolator2, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Add points on the path. For a fixed location, simply add 1 point.

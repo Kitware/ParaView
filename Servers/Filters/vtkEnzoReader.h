@@ -61,7 +61,7 @@ class VTK_EXPORT vtkEnzoReader : public vtkMultiBlockDataSetAlgorithm
 {
 public:
   static vtkEnzoReader * New();
-  vtkTypeRevisionMacro( vtkEnzoReader, vtkMultiBlockDataSetAlgorithm );
+  vtkTypeMacro( vtkEnzoReader, vtkMultiBlockDataSetAlgorithm );
   void PrintSelf( ostream & os, vtkIndent indent );
   
   // Description:

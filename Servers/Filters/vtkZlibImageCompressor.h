@@ -35,7 +35,7 @@ class VTK_EXPORT vtkZlibImageCompressor : public vtkImageCompressor
 {
 public:
   static vtkZlibImageCompressor* New();
-  vtkTypeRevisionMacro(vtkZlibImageCompressor, vtkImageCompressor);
+  vtkTypeMacro(vtkZlibImageCompressor, vtkImageCompressor);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

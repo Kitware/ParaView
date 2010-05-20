@@ -37,7 +37,6 @@ public:
   GridDescriptionMapType GridDescriptionMap;
 };
 
-vtkCxxRevisionMacro(vtkCPDataDescription, "1.2");
 vtkStandardNewMacro(vtkCPDataDescription);
 //----------------------------------------------------------------------------
 vtkCPDataDescription::vtkCPDataDescription()

@@ -27,7 +27,7 @@ class vtkMPIMoveData;
 class VTK_EXPORT vtkStreamingUpdateSuppressor : public vtkPVUpdateSuppressor
 {
 public:
-  vtkTypeRevisionMacro(vtkStreamingUpdateSuppressor,vtkPVUpdateSuppressor);
+  vtkTypeMacro(vtkStreamingUpdateSuppressor,vtkPVUpdateSuppressor);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

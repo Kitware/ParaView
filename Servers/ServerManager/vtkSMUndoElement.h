@@ -30,7 +30,7 @@ class vtkSMProxyLocator;
 class VTK_EXPORT vtkSMUndoElement : public vtkUndoElement
 {
 public:
-  vtkTypeRevisionMacro(vtkSMUndoElement, vtkUndoElement);
+  vtkTypeMacro(vtkSMUndoElement, vtkUndoElement);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

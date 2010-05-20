@@ -25,7 +25,6 @@
 #include "vtkStreamingDemandDrivenPipeline.h"
 
 vtkStandardNewMacro(vtkAppendRectilinearGrid);
-vtkCxxRevisionMacro(vtkAppendRectilinearGrid, "1.1");
 //-----------------------------------------------------------------------------
 vtkAppendRectilinearGrid::vtkAppendRectilinearGrid()
 {

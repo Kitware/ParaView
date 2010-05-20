@@ -18,7 +18,6 @@
 #include "vtkPVXMLElement.h"
 
 vtkStandardNewMacro(vtkSMDocumentation);
-vtkCxxRevisionMacro(vtkSMDocumentation, "1.2");
 vtkCxxSetObjectMacro(vtkSMDocumentation, DocumentationElement,
   vtkPVXMLElement);
 //-----------------------------------------------------------------------------

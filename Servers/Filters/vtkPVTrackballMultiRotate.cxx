@@ -31,7 +31,6 @@
 #define MY_SQR(x)    ((x)*(x))
 
 //=============================================================================
-vtkCxxRevisionMacro(vtkPVTrackballMultiRotate, "1.2");
 vtkStandardNewMacro(vtkPVTrackballMultiRotate);
 
 //-----------------------------------------------------------------------------

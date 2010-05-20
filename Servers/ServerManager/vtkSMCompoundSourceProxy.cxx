@@ -47,7 +47,6 @@ public:
 
 
 vtkStandardNewMacro(vtkSMCompoundSourceProxy);
-vtkCxxRevisionMacro(vtkSMCompoundSourceProxy, "1.5");
 //----------------------------------------------------------------------------
 vtkSMCompoundSourceProxy::vtkSMCompoundSourceProxy()
 {

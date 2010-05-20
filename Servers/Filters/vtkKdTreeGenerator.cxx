@@ -31,7 +31,6 @@
 class vtkKdTreeGeneratorVector : public vtkstd::vector<int> {};
 
 vtkStandardNewMacro(vtkKdTreeGenerator);
-vtkCxxRevisionMacro(vtkKdTreeGenerator, "1.5");
 vtkCxxSetObjectMacro(vtkKdTreeGenerator, ExtentTranslator, vtkExtentTranslator);
 vtkCxxSetObjectMacro(vtkKdTreeGenerator, KdTree, vtkPKdTree);
 //-----------------------------------------------------------------------------

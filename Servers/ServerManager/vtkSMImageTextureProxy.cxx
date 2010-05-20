@@ -22,7 +22,6 @@
 #include "vtkImageData.h"
 
 vtkStandardNewMacro(vtkSMImageTextureProxy);
-vtkCxxRevisionMacro(vtkSMImageTextureProxy, "1.2");
 //----------------------------------------------------------------------------
 vtkSMImageTextureProxy::vtkSMImageTextureProxy()
 {

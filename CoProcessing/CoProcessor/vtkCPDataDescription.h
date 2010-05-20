@@ -33,7 +33,7 @@ class COPROCESSING_EXPORT vtkCPDataDescription : public vtkObject
 {
 public:
   static vtkCPDataDescription* New();
-  vtkTypeRevisionMacro(vtkCPDataDescription,vtkObject);
+  vtkTypeMacro(vtkCPDataDescription,vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

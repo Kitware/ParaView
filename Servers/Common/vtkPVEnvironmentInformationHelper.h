@@ -27,7 +27,7 @@ class VTK_EXPORT vtkPVEnvironmentInformationHelper : public vtkObject
 {
 public:
   static vtkPVEnvironmentInformationHelper* New();
-  vtkTypeRevisionMacro(vtkPVEnvironmentInformationHelper, vtkObject);
+  vtkTypeMacro(vtkPVEnvironmentInformationHelper, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
   
   // Description:

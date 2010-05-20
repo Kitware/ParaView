@@ -18,7 +18,6 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkStreamingOptions);
-vtkCxxRevisionMacro(vtkStreamingOptions, "1.1");
 
 class vtkStreamingOptionsInternal {
 public:

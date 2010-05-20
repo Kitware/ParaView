@@ -12,7 +12,7 @@ class VTK_EXPORT vtkSMPrismDoubleRangeDomain : public vtkSMDoubleRangeDomain
 {
 public:
   static vtkSMPrismDoubleRangeDomain* New();
-  vtkTypeRevisionMacro(vtkSMPrismDoubleRangeDomain, vtkSMDoubleRangeDomain);
+  vtkTypeMacro(vtkSMPrismDoubleRangeDomain, vtkSMDoubleRangeDomain);
   void PrintSelf(ostream& os, vtkIndent indent);
 
 

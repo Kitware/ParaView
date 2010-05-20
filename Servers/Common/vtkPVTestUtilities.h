@@ -28,7 +28,7 @@ class VTK_EXPORT vtkPVTestUtilities : public vtkObject
 {
 public:
   // the usual vtk stuff
-  vtkTypeRevisionMacro(vtkPVTestUtilities,vtkObject);
+  vtkTypeMacro(vtkPVTestUtilities,vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
   static vtkPVTestUtilities *New();
 
