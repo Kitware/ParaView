@@ -76,10 +76,8 @@ void vtkSMFieldDataDomain::Update(vtkSMSourceProxy* sp,
     }
 
   bool has_pd = 0 !=
-    (this->ForcePointAndCellDataSelection &&  info->GetNumberOfPoints() > 0)||
     this->CheckForArray(sp, outputport, info->GetPointDataInformation(), iad);
   bool has_cd = 0 !=
-    (this->ForcePointAndCellDataSelection &&  info->GetNumberOfCells() > 0)||
     this->CheckForArray(sp, outputport, info->GetCellDataInformation(), iad);
   bool has_vd = 0 !=
     this->CheckForArray(sp, outputport, info->GetVertexDataInformation(), iad);
@@ -87,6 +85,14 @@ void vtkSMFieldDataDomain::Update(vtkSMSourceProxy* sp,
     this->CheckForArray(sp, outputport, info->GetEdgeDataInformation(), iad);
   bool has_rd = 0 !=
     this->CheckForArray(sp, outputport, info->GetRowDataInformation(), iad);
+
+  if ( this->ForcePointAndCellDataSelection &&
+    !(has_vd || has_ed || has_rd ) )
+    {
+    //only force cell & data on DataSets
+    has_pd = ( info->GetNumberOfPoints() > 0);
+    has_cd = ( info->GetNumberOfCells() > 0);
+    }
 
   if (this->DisableUpdateDomainEntries || has_pd )
     {
