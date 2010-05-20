@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   Visualization Toolkit
-  Module:    $RCSfile: vtkPVClipClosedSurface.cxx,v $
+  Module:    vtkPVClipClosedSurface.cxx
 
   Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
   All rights reserved.
@@ -18,7 +18,6 @@
 #include "vtkPlaneCollection.h"
 #include "vtkObjectFactory.h"
 
-vtkCxxRevisionMacro( vtkPVClipClosedSurface, "$Revision: 1.0 $" );
 vtkStandardNewMacro( vtkPVClipClosedSurface );
 
 //-----------------------------------------------------------------------------

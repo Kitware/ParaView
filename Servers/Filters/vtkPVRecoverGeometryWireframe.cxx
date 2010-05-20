@@ -2,7 +2,7 @@
 /*=========================================================================
 
   Program:   Visualization Toolkit
-  Module:    $RCSfile: pqBlotDialog.h,v $
+  Module:    vtkPVRecoverGeometryWireframe.cxx
 
   Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
   All rights reserved.
@@ -120,7 +120,6 @@ namespace vtkPVRecoverGeometryWireframeNamespace
 using namespace vtkPVRecoverGeometryWireframeNamespace;
 
 //=============================================================================
-vtkCxxRevisionMacro(vtkPVRecoverGeometryWireframe, "$Revision$");
 vtkStandardNewMacro(vtkPVRecoverGeometryWireframe);
 
 //-----------------------------------------------------------------------------

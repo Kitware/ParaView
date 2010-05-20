@@ -44,7 +44,7 @@
 class VTK_EXPORT vtkPVRecoverGeometryWireframe : public vtkPolyDataAlgorithm
 {
 public:
-  vtkTypeRevisionMacro(vtkPVRecoverGeometryWireframe, vtkPolyDataAlgorithm);
+  vtkTypeMacro(vtkPVRecoverGeometryWireframe, vtkPolyDataAlgorithm);
   static vtkPVRecoverGeometryWireframe *New();
   virtual void PrintSelf(ostream &os, vtkIndent indent);
 
