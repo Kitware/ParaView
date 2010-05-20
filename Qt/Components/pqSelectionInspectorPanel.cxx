@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -83,7 +83,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqTreeWidgetSelectionHelper.h"
 
 //////////////////////////////////////////////////////////////////////////////
-class pqSelectionInspectorTreeItem : public QTreeWidgetItem 
+class pqSelectionInspectorTreeItem : public QTreeWidgetItem
 {
 public:
   pqSelectionInspectorTreeItem(QTreeWidget* _parent, const QStringList& l)
@@ -91,7 +91,7 @@ public:
     {
     }
 
-  virtual bool operator< ( const QTreeWidgetItem & other ) const  
+  virtual bool operator< ( const QTreeWidgetItem & other ) const
     {
     int sortCol = this->treeWidget()? this->treeWidget()->sortColumn() : 0;
     double myNumber = this->text(sortCol).toDouble();
@@ -130,7 +130,7 @@ QTreeWidgetItem* pqSelectionInspectorPanelNewItem (QTreeWidget* tree, const QStr
 struct pqSelectionInspectorPanel::pqImplementation : public Ui::SelectionInspectorPanel
 {
 public:
-  pqImplementation() 
+  pqImplementation()
     {
     this->SelectionLinks = new pqPropertyLinks;
     this->RepLinks = new pqPropertyLinks;
@@ -192,7 +192,7 @@ public:
   // from this->InputPort.
   vtkSMSourceProxy* getSelectionSource() const
     {
-    return (this->InputPort? this->InputPort->getSelectionInput() : 
+    return (this->InputPort? this->InputPort->getSelectionInput() :
       static_cast<vtkSMSourceProxy*>(NULL));
     }
 
@@ -246,7 +246,7 @@ public:
   QList<vtkSmartPointer<vtkSMNewWidgetRepresentationProxy> > LocationWigets;
   vtkSmartPointer<vtkSMRepresentationProxy> FrustumWidget;
 
-  enum 
+  enum
     {
     IDS = 0,
     FRUSTUM = 1,
@@ -254,7 +254,7 @@ public:
     THRESHOLDS = 3,
     BLOCKS = 4,
     QUERY = 5,
-    GLOBALIDS = 6 // GLOBALIDS has to be last 
+    GLOBALIDS = 6 // GLOBALIDS has to be last
     };
 
   static const char* getText(int val, int type)
@@ -264,7 +264,7 @@ public:
       {
     case IDS:
       return "IDs";
-      
+
     case GLOBALIDS:
       if (type == 0)
         {
@@ -348,10 +348,10 @@ void pqSelectionInspectorPanel::setupGUI()
     this->Implementation->comboFieldType);
 
   // Updates the enable state of "Containing Cells" check box based on whether
-  // we are doing a point selection or cell selection. 
-  QObject::connect(this->Implementation->FieldTypeAdaptor, 
+  // we are doing a point selection or cell selection.
+  QObject::connect(this->Implementation->FieldTypeAdaptor,
     SIGNAL(currentTextChanged(const QString&)),
-    this, SLOT(onFieldTypeChanged(const QString&)), 
+    this, SLOT(onFieldTypeChanged(const QString&)),
     Qt::QueuedConnection);
 
   this->setupIDSelectionGUI();
@@ -445,11 +445,12 @@ void pqSelectionInspectorPanel::select(pqOutputPort* opport, bool createNew)
     QObject::disconnect(this->Implementation->InputPort->getSource(), 0, this, 0);
     }
 
-  
+
   this->Implementation->InputPort = opport;
   this->updateSelectionTypesAvailable();
 
-  if (createNew && this->hasGlobalIDs(opport))
+  bool hasGIDs = this->hasGlobalIDs(opport);
+  if (createNew && hasGIDs)
     {
     this->Implementation->comboSelectionType->setCurrentIndex(
       pqImplementation::GLOBALIDS);
@@ -489,12 +490,12 @@ void pqSelectionInspectorPanel::select(pqOutputPort* opport, bool createNew)
   // Set up property links between the selection representation and the GUI.
   this->updateDisplayStyleGUI();
 
-  // update the enable state of the panel.
   this->updateEnabledState();
 
   if (opport)
     {
-    // Need to determine if GlobalID selection is possible on this input and
+    // Need to determine if GlobalID selection is possible
+  // update the enable state of the panel. on this input and
     // disallow the user from creating one if not.
     this->updateSelectionTypesAvailable();
     QObject::connect(opport->getSource(), SIGNAL(dataUpdated(pqPipelineSource*)),
@@ -506,7 +507,7 @@ void pqSelectionInspectorPanel::select(pqOutputPort* opport, bool createNew)
 
   this->Implementation->UpdatingGUI = false;
 
-  if ( opport && opport->getSelectionInput() &&
+  if ( opport && hasGIDs && opport->getSelectionInput() &&
        opport->getSelectionInput()->GetXMLName() ==
        QString("CompositeDataIDSelectionSource"))
        {
@@ -536,7 +537,7 @@ void pqSelectionInspectorPanel::updateSelectionGUI()
 
   // composite tree is only shown for "CompositeDataIDSelectionSource".
   this->Implementation->compositeTree->setVisible(false);
-   
+
   vtkSMSourceProxy* selSource = this->Implementation->getSelectionSource();
   if (!selSource)
     {
@@ -563,7 +564,7 @@ void pqSelectionInspectorPanel::updateSelectionGUI()
     this->Implementation->Indices->setColumnCount(2);
     this->Implementation->Indices->setHeaderLabels(
       QStringList() << "Process ID" << "Index");
-      
+
     this->Implementation->Indices->setColumnHidden(0,
       !this->Implementation->UseProcessID);
     this->Implementation->Indices->setColumnHidden(1, false);
@@ -580,15 +581,15 @@ void pqSelectionInspectorPanel::updateSelectionGUI()
     this->Implementation->Indices->setColumnCount(3);
     this->Implementation->Indices->setHeaderLabels(
       QStringList() << "Composite ID" << "Process ID" << "Index");
-      
+
     this->Implementation->Indices->setColumnHidden(0, false);
     this->Implementation->Indices->setColumnHidden(1,
       !this->Implementation->UseProcessID);
     this->Implementation->Indices->setColumnHidden(2, false);
     idsAdaptor = this->Implementation->IndicesAdaptor;
-    this->Implementation->CompositeTreeAdaptor = 
+    this->Implementation->CompositeTreeAdaptor =
       new pqSignalAdaptorCompositeTreeWidget(
-        this->Implementation->compositeTree, 
+        this->Implementation->compositeTree,
         this->Implementation->InputPort->getOutputPortProxy(),
         vtkSMCompositeTreeDomain::NONE,
         pqSignalAdaptorCompositeTreeWidget::INDEX_MODE_FLAT);
@@ -605,7 +606,7 @@ void pqSelectionInspectorPanel::updateSelectionGUI()
     this->Implementation->Indices->setColumnCount(3);
     this->Implementation->Indices->setHeaderLabels(
       QStringList() << "Level" << "DataSet" << "Index");
-      
+
     this->Implementation->Indices->setColumnHidden(0, false);
     this->Implementation->Indices->setColumnHidden(1, false);
     this->Implementation->Indices->setColumnHidden(2, false);
@@ -631,12 +632,12 @@ void pqSelectionInspectorPanel::updateSelectionGUI()
     {
     this->Implementation->comboSelectionType->setCurrentIndex(
       pqImplementation::BLOCKS);
-    this->Implementation->BlocksAdaptor = 
+    this->Implementation->BlocksAdaptor =
       new pqSignalAdaptorCompositeTreeWidget(
-        this->Implementation->Blocks, 
+        this->Implementation->Blocks,
         this->Implementation->InputPort->getOutputPortProxy(),
         vtkSMCompositeTreeDomain::LEAVES,
-        pqSignalAdaptorCompositeTreeWidget::INDEX_MODE_FLAT, 
+        pqSignalAdaptorCompositeTreeWidget::INDEX_MODE_FLAT,
         /*selectMultiple=*/true,
         /*autoUpdateVisibility=*/false);
     }
@@ -652,7 +653,7 @@ void pqSelectionInspectorPanel::updateSelectionGUI()
     }
 
   this->Implementation->SelectionLinks->addPropertyLink(
-    this->Implementation->FieldTypeAdaptor, "currentText", 
+    this->Implementation->FieldTypeAdaptor, "currentText",
     SIGNAL(currentTextChanged(const QString&)),
     selSource, selSource->GetProperty("FieldType"));
 
@@ -681,7 +682,7 @@ void pqSelectionInspectorPanel::updateSelectionGUI()
   if (selSource->GetProperty("Blocks"))
     {
     this->Implementation->SelectionLinks->addPropertyLink(
-      this->Implementation->BlocksAdaptor, "values", 
+      this->Implementation->BlocksAdaptor, "values",
       SIGNAL(valuesChanged()),
       selSource, selSource->GetProperty("Blocks"));
     }
@@ -690,7 +691,7 @@ void pqSelectionInspectorPanel::updateSelectionGUI()
     {
     // Link Threshold selection properties
     this->Implementation->SelectionLinks->addPropertyLink(
-      this->Implementation->ThresholdScalarArrayAdaptor, "currentText", 
+      this->Implementation->ThresholdScalarArrayAdaptor, "currentText",
       SIGNAL(currentTextChanged(const QString&)),
       selSource, selSource->GetProperty("ArrayName"));
 
@@ -703,7 +704,7 @@ void pqSelectionInspectorPanel::updateSelectionGUI()
     {
     selSource->UpdatePropertyInformation();
     this->Implementation->SelectionLinks->addPropertyLink(
-      this->Implementation->queryText, "plainText", 
+      this->Implementation->queryText, "plainText",
       SIGNAL(textChanged()),
       selSource, selSource->GetProperty("UserFriendlyText"));
     }
@@ -712,7 +713,7 @@ void pqSelectionInspectorPanel::updateSelectionGUI()
 //-----------------------------------------------------------------------------
 void pqSelectionInspectorPanel::updateDisplayStyleGUI()
 {
-  pqDataRepresentation* selRepresentation = 
+  pqDataRepresentation* selRepresentation =
     this->Implementation->getSelectionRepresentation();
 
   if (this->Implementation->PrevRepresentation == selRepresentation)
@@ -739,13 +740,13 @@ void pqSelectionInspectorPanel::updateDisplayStyleGUI()
   this->updateSelectionCellLabelArrayName();
   this->Implementation->VTKConnectRep->Connect(
     reprProxy->GetProperty("SelectionPointFieldDataArrayName"),
-    vtkCommand::ModifiedEvent, this, 
+    vtkCommand::ModifiedEvent, this,
     SLOT(updateSelectionPointLabelArrayName()),
     NULL, 0.0,
     Qt::QueuedConnection);
   this->Implementation->VTKConnectRep->Connect(
     reprProxy->GetProperty("SelectionCellFieldDataArrayName"),
-    vtkCommand::ModifiedEvent, this, 
+    vtkCommand::ModifiedEvent, this,
     SLOT(updateSelectionCellLabelArrayName()),
     NULL, 0.0,
     Qt::QueuedConnection);
@@ -798,7 +799,7 @@ void pqSelectionInspectorPanel::updateDisplayStyleGUI()
     this->Implementation->toolButtonShadow_Point, "checked", SIGNAL(toggled(bool)),
     reprProxy, reprProxy->GetProperty("SelectionPointLabelShadow"), 1);
 
-  this->Implementation->RepLinks->addPropertyLink(this->Implementation->PointColorAdaptor, 
+  this->Implementation->RepLinks->addPropertyLink(this->Implementation->PointColorAdaptor,
     "color", SIGNAL(colorChanged(const QVariant&)),
     reprProxy, reprProxy->GetProperty("SelectionPointLabelColor"));
   this->Implementation->RepLinks->addPropertyLink(this->Implementation->PointFontFamilyAdaptor,
@@ -831,7 +832,7 @@ void pqSelectionInspectorPanel::updateDisplayStyleGUI()
     this->Implementation->toolButtonShadow_Cell, "checked", SIGNAL(toggled(bool)),
     reprProxy, reprProxy->GetProperty("SelectionCellLabelShadow"), 1);
 
-  this->Implementation->RepLinks->addPropertyLink(this->Implementation->CellColorAdaptor, 
+  this->Implementation->RepLinks->addPropertyLink(this->Implementation->CellColorAdaptor,
     "color", SIGNAL(colorChanged(const QVariant&)),
     reprProxy, reprProxy->GetProperty("SelectionCellLabelColor"));
   this->Implementation->RepLinks->addPropertyLink(this->Implementation->CellFontFamilyAdaptor,
@@ -879,7 +880,7 @@ void pqSelectionInspectorPanel::updateThreholdDataArrays()
     return;
     }
 
-  vtkPVDataInformation* geomInfo = 
+  vtkPVDataInformation* geomInfo =
     this->Implementation->InputPort->getDataInformation();
 
   vtkPVDataSetAttributesInformation* attrInfo;
@@ -912,16 +913,16 @@ void pqSelectionInspectorPanel::setupSelectionLabelGUI()
     "chosenColor",
     SIGNAL(chosenColorChanged(const QColor&)), false);
   this->Implementation->PointColorAdaptor = new pqSignalAdaptorColor(
-    this->Implementation->buttonColor_Point, "chosenColor", 
+    this->Implementation->buttonColor_Point, "chosenColor",
     SIGNAL(chosenColorChanged(const QColor&)), false);
   this->Implementation->PointFontFamilyAdaptor = new pqSignalAdaptorComboBox(
     this->Implementation->comboFontFamily_Point);
 
-  QObject::connect(this->Implementation->comboLabelMode_Point, 
+  QObject::connect(this->Implementation->comboLabelMode_Point,
     SIGNAL(currentIndexChanged(const QString&)),
     this, SLOT(updatePointLabelMode(const QString&)));
-  QObject::connect(this->Implementation->comboLabelMode_Point, 
-    SIGNAL(currentIndexChanged(const QString&)), 
+  QObject::connect(this->Implementation->comboLabelMode_Point,
+    SIGNAL(currentIndexChanged(const QString&)),
     this, SLOT(updateRepresentationViews()), Qt::QueuedConnection);
 
   this->Implementation->PointLabelAlignmentAdaptor = new pqSignalAdaptorComboBox(
@@ -929,16 +930,16 @@ void pqSelectionInspectorPanel::setupSelectionLabelGUI()
 
 
   this->Implementation->CellColorAdaptor = new pqSignalAdaptorColor(
-    this->Implementation->buttonColor_Cell, "chosenColor", 
+    this->Implementation->buttonColor_Cell, "chosenColor",
     SIGNAL(chosenColorChanged(const QColor&)), false);
   this->Implementation->CellFontFamilyAdaptor = new pqSignalAdaptorComboBox(
     this->Implementation->comboFontFamily_Cell);
 
-  QObject::connect(this->Implementation->comboLabelMode_Cell, 
+  QObject::connect(this->Implementation->comboLabelMode_Cell,
     SIGNAL(currentIndexChanged(const QString&)),
     this, SLOT(updateCellLabelMode(const QString&)), Qt::QueuedConnection);
-  QObject::connect(this->Implementation->comboLabelMode_Cell, 
-    SIGNAL(currentIndexChanged(const QString&)), 
+  QObject::connect(this->Implementation->comboLabelMode_Cell,
+    SIGNAL(currentIndexChanged(const QString&)),
     this, SLOT(updateRepresentationViews()), Qt::QueuedConnection);
 
   this->Implementation->CellLabelAlignmentAdaptor = new pqSignalAdaptorComboBox(
@@ -979,7 +980,7 @@ void pqSelectionInspectorPanel::updateSelectionPointLabelArrayName()
 
   this->Implementation->comboLabelMode_Point->setCurrentIndex(
     this->Implementation->comboLabelMode_Point->findText(text));
-} 
+}
 
 //-----------------------------------------------------------------------------
 // Called when the SMProperty for SelectionCellFieldDataArrayName changes.
@@ -1013,10 +1014,10 @@ void pqSelectionInspectorPanel::updateSelectionCellLabelArrayName()
 
   this->Implementation->comboLabelMode_Cell->setCurrentIndex(
     this->Implementation->comboLabelMode_Cell->findText(text));
-} 
+}
 
 //-----------------------------------------------------------------------------
-// Called when the Qt combobox for point label mode changes. We update the 
+// Called when the Qt combobox for point label mode changes. We update the
 // SMProperty accordingly.
 void pqSelectionInspectorPanel::updatePointLabelMode(const QString& text)
 {
@@ -1043,7 +1044,7 @@ void pqSelectionInspectorPanel::updatePointLabelMode(const QString& text)
       reprProxy->GetProperty("SelectionPointFieldDataArrayName"),text);
     }
   reprProxy->UpdateVTKObjects();
-} 
+}
 
 //-----------------------------------------------------------------------------
 // Called when the Qt combobox for cell label mode changes. We update the
@@ -1100,7 +1101,7 @@ void pqSelectionInspectorPanel::updateSelectionLabelEnableState()
       }
     }
   else
-    { 
+    {
     this->Implementation->groupSelectionLabel->setEnabled(false);
     }
 }
@@ -1108,7 +1109,7 @@ void pqSelectionInspectorPanel::updateSelectionLabelEnableState()
 //-----------------------------------------------------------------------------
 void pqSelectionInspectorPanel::setupLocationsSelectionGUI()
 {
-  this->Implementation->LocationsAdaptor = 
+  this->Implementation->LocationsAdaptor =
     new pqSignalAdaptorTreeWidget(this->Implementation->Locations, true);
   this->Implementation->LocationsAdaptor->setItemCreatorFunction(
     &pqSelectionInspectorPanelNewItem);
@@ -1165,7 +1166,7 @@ void pqSelectionInspectorPanel::setupIDSelectionGUI()
 
   // Update the newly added items composite index to the index of the current
   // selected node, if applicable.
-  QObject::connect(this->Implementation->IndicesAdaptor, 
+  QObject::connect(this->Implementation->IndicesAdaptor,
     SIGNAL(tableGrown(QTreeWidgetItem*)),
     this, SLOT(onTableGrown(QTreeWidgetItem*)));
 
@@ -1204,12 +1205,12 @@ void pqSelectionInspectorPanel::newValue()
     adaptor = this->Implementation->ThresholdsAdaptor;
     break;
 
-  case pqImplementation::LOCATIONS: 
+  case pqImplementation::LOCATIONS:
     activeTree = this->Implementation->Locations;
     adaptor = this->Implementation->LocationsAdaptor;
     break;
-    
-  case pqImplementation::BLOCKS: 
+
+  case pqImplementation::BLOCKS:
   case pqImplementation::FRUSTUM:
   default:
     // don't support newValue().
@@ -1263,7 +1264,7 @@ void pqSelectionInspectorPanel::deleteValue()
     return;
     }
 
-  QList<QTreeWidgetItem*> items = activeTree->selectedItems(); 
+  QList<QTreeWidgetItem*> items = activeTree->selectedItems();
   foreach (QTreeWidgetItem* item, items)
     {
     delete item;
@@ -1292,7 +1293,7 @@ void pqSelectionInspectorPanel::deleteAllValues()
     activeTree = this->Implementation->Locations;
     break;
 
-  case pqImplementation::BLOCKS: 
+  case pqImplementation::BLOCKS:
   case pqImplementation::FRUSTUM: // Frustum
   default:
     // Not supported.
@@ -1304,14 +1305,14 @@ void pqSelectionInspectorPanel::deleteAllValues()
 
 //-----------------------------------------------------------------------------
 // Updates the enable state of "Containing Cells" check box based on whether
-// we are doing a point selection or cell selection. 
+// we are doing a point selection or cell selection.
 void pqSelectionInspectorPanel::onFieldTypeChanged(const QString& type)
 {
   if(type == QString("POINT"))
     {
     this->Implementation->checkboxContainCell->setEnabled(true);
     }
-  else 
+  else
     {
     this->Implementation->checkboxContainCell->setEnabled(false);
     }
@@ -1321,7 +1322,7 @@ void pqSelectionInspectorPanel::onFieldTypeChanged(const QString& type)
 //-----------------------------------------------------------------------------
 void pqSelectionInspectorPanel::setupFrustumSelectionGUI()
 {
-  // TODO: add widgets to interact with the the Frutum box 
+  // TODO: add widgets to interact with the the Frutum box
   QObject::connect(this->Implementation->checkboxShowFrustum,
     SIGNAL(toggled(bool)),
     this, SLOT(updateFrustum()), Qt::QueuedConnection);
@@ -1393,7 +1394,7 @@ void pqSelectionInspectorPanel::onTableGrown(QTreeWidgetItem* item)
   if (this->Implementation->CompositeTreeAdaptor)
     {
     bool valid = false;
-    unsigned int composite_index = 
+    unsigned int composite_index =
       this->Implementation->CompositeTreeAdaptor->getCurrentFlatIndex(&valid);
     if (valid)
       {
@@ -1434,7 +1435,7 @@ void pqSelectionInspectorPanel::createSelectionForCurrentObject()
     return;
     }
 
-  if (this->Implementation->InputPort != port && 
+  if (this->Implementation->InputPort != port &&
     this->Implementation->getSelectionSource())
     {
     // remove old selection since ParaView can only have 1 active selection at a
@@ -1442,7 +1443,7 @@ void pqSelectionInspectorPanel::createSelectionForCurrentObject()
     this->Implementation->InputPort->setSelectionInput(0, 0);
     }
 
-  this->select(port, true);  
+  this->select(port, true);
   port->renderAllViews();
 }
 
@@ -1452,7 +1453,7 @@ int pqSelectionInspectorPanel::getContentType() const
   switch (this->Implementation->itemsStackedWidget->currentIndex())
     {
   case pqImplementation::IDS: // IDs
-    return vtkSelectionNode::INDICES; 
+    return vtkSelectionNode::INDICES;
 
   case pqImplementation::GLOBALIDS: // GlobalsIDs
     return vtkSelectionNode::GLOBALIDS;
@@ -1489,7 +1490,7 @@ void pqSelectionInspectorPanel::createNewSelectionSourceIfNeeded()
 
   vtkSMSourceProxy* curSelSource = this->Implementation->getSelectionSource();
 
-  if (curSelSource && 
+  if (curSelSource &&
     port->getServer()->isRemote() &&
     (outputType == vtkSelectionNode::INDICES || outputType == vtkSelectionNode::GLOBALIDS))
     {
@@ -1499,15 +1500,15 @@ void pqSelectionInspectorPanel::createNewSelectionSourceIfNeeded()
       strcmp(curSelSource->GetXMLName(), "ThresholdSelectionSource") == 0)
       {
       // We need to determine how many ids are present approximately.
-      vtkSMSourceProxy* sourceProxy = 
+      vtkSMSourceProxy* sourceProxy =
         vtkSMSourceProxy::SafeDownCast(port->getSource()->getProxy());
       vtkPVDataInformation* selectedInformation = sourceProxy->GetSelectionOutput(
         port->getPortNumber())->GetDataInformation();
       int fdType = pqSMAdaptor::getElementProperty(
         curSelSource->GetProperty("FieldType")).toInt();
-      if ((fdType == vtkSelectionNode::POINT && 
+      if ((fdType == vtkSelectionNode::POINT &&
           selectedInformation->GetNumberOfPoints() > 10000) ||
-        (fdType == vtkSelectionNode::CELL && 
+        (fdType == vtkSelectionNode::CELL &&
          selectedInformation->GetNumberOfCells() > 10000))
         {
         if (QMessageBox::warning(this, tr("Convert Selection"),
@@ -1568,7 +1569,7 @@ void pqSelectionInspectorPanel::removeWidgetsFromView()
     return;
     }
 
-  vtkSMRenderViewProxy* view = 
+  vtkSMRenderViewProxy* view =
     this->Implementation->ActiveView->getRenderViewProxy();
 
   foreach (vtkSMNewWidgetRepresentationProxy* widget,
@@ -1589,7 +1590,7 @@ void pqSelectionInspectorPanel::addWidgetsToView()
     return;
     }
 
-  vtkSMRenderViewProxy* view = 
+  vtkSMRenderViewProxy* view =
     this->Implementation->ActiveView->getRenderViewProxy();
 
   foreach (vtkSMNewWidgetRepresentationProxy* widget,
@@ -1610,7 +1611,7 @@ void pqSelectionInspectorPanel::allocateWidgets(unsigned int numWidgets)
 
   while (static_cast<unsigned int>(this->Implementation->LocationWigets.size()) > numWidgets)
     {
-    vtkSmartPointer<vtkSMNewWidgetRepresentationProxy> widget = 
+    vtkSmartPointer<vtkSMNewWidgetRepresentationProxy> widget =
       this->Implementation->LocationWigets.takeLast();
     if (this->Implementation->ActiveView)
       {
@@ -1622,15 +1623,15 @@ void pqSelectionInspectorPanel::allocateWidgets(unsigned int numWidgets)
     factory->free3DWidget(widget);
     }
 
-  for (unsigned int kk = this->Implementation->LocationWigets.size(); 
+  for (unsigned int kk = this->Implementation->LocationWigets.size();
     kk < numWidgets; kk++)
     {
-    vtkSMNewWidgetRepresentationProxy* widget = 
+    vtkSMNewWidgetRepresentationProxy* widget =
       factory->get3DWidget("HandleWidgetRepresentation",
         this->Implementation->InputPort->getServer());
     widget->UpdateVTKObjects();
 
-    this->Implementation->VTKConnectSelInput->Connect(widget, 
+    this->Implementation->VTKConnectSelInput->Connect(widget,
       vtkCommand::EndInteractionEvent,
       this, SLOT(updateLocationFromWidgets()), 0, 0, Qt::QueuedConnection);
     this->Implementation->LocationWigets.push_back(widget);
@@ -1640,7 +1641,7 @@ void pqSelectionInspectorPanel::allocateWidgets(unsigned int numWidgets)
 //-----------------------------------------------------------------------------
 void pqSelectionInspectorPanel::updateLocationWidgets()
 {
-  bool show_widgets = 
+  bool show_widgets =
     (this->Implementation->showLocationWidgets->checkState() == Qt::Checked);
   if (!show_widgets || this->getContentType() != vtkSelectionNode::LOCATIONS ||
     !this->Implementation->getSelectionSource())
@@ -1662,7 +1663,7 @@ void pqSelectionInspectorPanel::updateLocationWidgets()
 
   for (unsigned int cc=0; cc < numLocations; cc++)
     {
-    vtkSMNewWidgetRepresentationProxy* widget = 
+    vtkSMNewWidgetRepresentationProxy* widget =
       this->Implementation->LocationWigets[cc];
     QList<QVariant> posValues;
     posValues << values[3*cc] << values[3*cc+1] << values[3*cc+2];
@@ -1675,7 +1676,7 @@ void pqSelectionInspectorPanel::updateLocationWidgets()
 //-----------------------------------------------------------------------------
 void pqSelectionInspectorPanel::updateLocationFromWidgets()
 {
-  bool show_widgets = 
+  bool show_widgets =
     (this->Implementation->showLocationWidgets->checkState() == Qt::Checked);
   if (!show_widgets || this->getContentType() != vtkSelectionNode::LOCATIONS ||
     !this->Implementation->getSelectionSource())
@@ -1690,12 +1691,12 @@ void pqSelectionInspectorPanel::updateLocationFromWidgets()
     QList<QVariant> values;
     for (int kk = 0; kk < numLocations; kk++)
       {
-      vtkSMNewWidgetRepresentationProxy* widget = 
+      vtkSMNewWidgetRepresentationProxy* widget =
         this->Implementation->LocationWigets[kk];
       widget->UpdatePropertyInformation();
       QList<QVariant> posValues = pqSMAdaptor::getMultipleElementProperty(
         widget->GetProperty("WorldPosition"));
-      values += posValues; 
+      values += posValues;
       }
     adaptor->setValues(values);
     }
@@ -1789,10 +1790,10 @@ void pqSelectionInspectorPanel::updateSelectionTypesAvailable()
 void pqSelectionInspectorPanel::updateSelectionTypesAvailable(pqOutputPort* port)
 {
   int cur_index = this->Implementation->comboSelectionType->currentIndex();
-  
+
   // If currently we are showing a GlobalID based selection and the global IDs
   // disappear from under us, we don't remove them from the combo.
-  bool has_gids = this->hasGlobalIDs(port)|| 
+  bool has_gids = this->hasGlobalIDs(port)||
     (cur_index == pqImplementation::GLOBALIDS);
 
   bool prev = this->Implementation->comboSelectionType->blockSignals(true);
@@ -1805,7 +1806,7 @@ void pqSelectionInspectorPanel::updateSelectionTypesAvailable(pqOutputPort* port
       }
     this->Implementation->comboSelectionType->addItem(
       pqImplementation::getText(cc,
-        this->Implementation->comboFieldType->currentText() == 
+        this->Implementation->comboFieldType->currentText() ==
           QString("POINT")? 1 : 0));
     }
   this->Implementation->comboSelectionType->setCurrentIndex(cur_index);
@@ -1846,15 +1847,15 @@ void pqSelectionInspectorPanel::setGlobalIDs()
     pqImplementation::GLOBALIDS); // Global IDs
   // the celllabelarraydomain and pointlabelarraydomain are valid only when
   // the user turn the visibility to ON.
-  // Hence we connect to the event when the domain is valid to select the 
+  // Hence we connect to the event when the domain is valid to select the
   // Global {Element|node} Id array.
-  // But before this event, we artificially add a "Global {Element|Node} Id" 
+  // But before this event, we artificially add a "Global {Element|Node} Id"
   // entrie in the combobox (that will be cleared when the domain is updated)
   if(!this->Implementation->comboLabelMode_Cell->count())
     {
     this->Implementation->CellLabelArrayDomain->addString("GlobalElementId");
     this->Implementation->PointLabelArrayDomain->addString("GlobalNodeId");
-  
+
     this->Implementation->comboLabelMode_Cell->addItem("GlobalElementId", QString("GlobalElementId"));
     this->Implementation->comboLabelMode_Cell->setCurrentIndex(
       this->Implementation->comboLabelMode_Cell->count()-1);
@@ -1865,13 +1866,13 @@ void pqSelectionInspectorPanel::setGlobalIDs()
       ->getProxy();
     this->Implementation->VTKConnectRep->Connect(
       reprProxy->GetProperty("SelectionPointFieldDataArrayName")->FindDomain("vtkSMDomain"),
-      vtkCommand::DomainModifiedEvent, this, 
+      vtkCommand::DomainModifiedEvent, this,
       SLOT(forceLabelGlobalId(vtkObject*)),
       NULL, 0.0,//reprProxy->GetProperty("SelectionPointFieldDataArrayName")->FindDomain("vtkSMDomain"), 0.0,
       Qt::QueuedConnection);
     this->Implementation->VTKConnectRep->Connect(
       reprProxy->GetProperty("SelectionCellFieldDataArrayName")->FindDomain("vtkSMDomain"),
-      vtkCommand::DomainModifiedEvent, this, 
+      vtkCommand::DomainModifiedEvent, this,
       SLOT(forceLabelGlobalId(vtkObject*)),
       NULL, 0.0,//reprProxy->GetProperty("SelectionCellFieldDataArrayName")->FindDomain("vtkSMDomain"), 0.0,
       Qt::QueuedConnection);
@@ -1896,7 +1897,7 @@ void pqSelectionInspectorPanel::forceLabelGlobalId(vtkObject* object)
     return;
     }
 
-  if( dynamic_cast<vtkSMDomain*>(object) == 
+  if( dynamic_cast<vtkSMDomain*>(object) ==
       reprProxy->GetProperty("SelectionCellFieldDataArrayName")
       ->FindDomain("vtkSMDomain") )
     {
@@ -1906,7 +1907,7 @@ void pqSelectionInspectorPanel::forceLabelGlobalId(vtkObject* object)
     // one shot forcing
     this->Implementation->VTKConnectRep->Disconnect(
       reprProxy->GetProperty("SelectionCellFieldDataArrayName")
-      ->FindDomain("vtkSMDomain"), vtkCommand::DomainModifiedEvent, 
+      ->FindDomain("vtkSMDomain"), vtkCommand::DomainModifiedEvent,
       this, SLOT(forceLabelGlobalId(vtkObject*)));
     this->Implementation->CellLabelArrayDomain->removeString("GlobalElementId");
     }
@@ -1918,7 +1919,7 @@ void pqSelectionInspectorPanel::forceLabelGlobalId(vtkObject* object)
     // one shot forcing
     this->Implementation->VTKConnectRep->Disconnect(
       reprProxy->GetProperty("SelectionPointFieldDataArrayName")
-      ->FindDomain("vtkSMDomain"), vtkCommand::DomainModifiedEvent, 
+      ->FindDomain("vtkSMDomain"), vtkCommand::DomainModifiedEvent,
       this, SLOT(forceLabelGlobalId(vtkObject*)));
     this->Implementation->PointLabelArrayDomain->removeString("GlobalNodeId");
     }
