@@ -4406,7 +4406,7 @@
         use_index="1"
         number_of_elements_per_command="3"
         number_of_elements="12"
-        default_values="0 0 0   0 0 0   0 0 0.5   0 0 0.5" >
+        default_values="0 0 0   0 0 0   0 0 0   0 0 0" >
         <DoubleRangeDomain name="range" min="0" max="1" />
       </DoubleVectorProperty>
 
@@ -4788,7 +4788,7 @@
         use_index="1"
         number_of_elements_per_command="3"
         number_of_elements="12"
-        default_values="0 0 0   0 0 0   0 0 0.5   0 0 0.5" >
+        default_values="0 0 0   0 0 0   0 0 0   0 0 0" >
         <DoubleRangeDomain name="range" min="0" max="1" />
       </DoubleVectorProperty>
 
