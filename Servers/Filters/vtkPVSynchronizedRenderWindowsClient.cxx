@@ -27,10 +27,13 @@ public:
     vtkSmartPointer<vtkRenderWindow> RenderWindow;
     int Size[2];
     int Position[2];
+    unsigned long StartRenderTag;
+    unsigned long EndRenderTag;
     RenderWindowInfo()
       {
       this->Size[0] = this->Size[1] = 0;
       this->Position[0] = this->Position[1] = 0;
+      this->StartRenderTag = this->EndRenderTag = 0;
       }
     };
 
@@ -50,6 +53,65 @@ public:
       }
     return 0;
     }
+
+  vtkSmartPointer<vtkRenderWindow> SharedRenderWindow;
+};
+
+//----------------------------------------------------------------------------
+class vtkPVSynchronizedRenderWindowsClient::vtkObserver : public vtkCommand
+{
+public:
+  static vtkObserver* New()
+    {
+    vtkObserver* obs = new vtkObserver();
+    obs->Target = NULL;
+    return obs;
+    }
+
+  virtual void Execute(vtkObject *ocaller, unsigned long eventId, void *)
+    {
+    vtkRenderWindow* renWin = vtkRenderWindow::SafeDownCast(ocaller);
+    if (this->Target)
+      {
+      switch (eventId)
+        {
+      case vtkCommand::StartEvent:
+        this->Target->HandleStartRender(renWin);
+        break;
+
+      case vtkCommand::EndEvent:
+        this->Target->HandleEndRender(renWin);
+        break;
+
+      case vtkCommand::AbortCheckEvent:
+        this->Target->HandleAbortRender(renWin);
+        break;
+        }
+      }
+    }
+
+  vtkPVSynchronizedRenderWindowsClient* Target;
+};
+
+//----------------------------------------------------------------------------
+namespace
+{
+  void RenderRMI(void *localArg,
+    void *remoteArg, int remoteArgLength, int vtkNotUsed(remoteProcessId))
+    {
+    vtkMultiProcessStream stream;
+    stream.SetRawData(reinterpret_cast<unsigned char*>(remoteArg),
+      remoteArgLength);
+    unsigned int id = 0;
+    stream >> id;
+    vtkPVSynchronizedRenderWindowsClient* self =
+      reinterpret_cast<vtkPVSynchronizedRenderWindowsClient*>(localArg);
+    vtkRenderWindow* window = self->GetRenderWindow(id);
+    if (window)
+      {
+      window->Render();
+      }
+    }
 };
 
 vtkStandardNewMacro(vtkPVSynchronizedRenderWindowsClient);
@@ -57,10 +119,17 @@ vtkCxxRevisionMacro(vtkPVSynchronizedRenderWindowsClient, "$Revision$");
 //----------------------------------------------------------------------------
 vtkPVSynchronizedRenderWindowsClient::vtkPVSynchronizedRenderWindowsClient()
 {
+  this->Mode = INVALID;
+  this->ClientServerController = 0;
+  this->ParallelController = 0;
+  this->ClientServerRMITag = 0;
+  this->ParallelRMITag = 0;
   this->Internals = new vtkInternals();
+  this->Observer = vtkObserver::New();
+  this->Observer->Target = this;
 
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  if (!pm || pm->GetActiveRenderServerSocketController())
+  if (!pm)
     {
     vtkErrorMacro(
       "vtkPVSynchronizedRenderWindowsClient cannot be used in the current\n"
@@ -68,27 +137,142 @@ vtkPVSynchronizedRenderWindowsClient::vtkPVSynchronizedRenderWindowsClient()
     abort();
     }
 
-  this->SetParallelController(pm->GetActiveRenderServerSocketController());
+  if (pm->GetActiveRemoteConnection() == NULL)
+    {
+    this->Mode = BUILTIN;
+    if (pm->GetNumberOfLocalPartitions() > 1)
+      {
+      this->Mode = BATCH;
+      }
+    }
+  else if (pm->GetActiveRemoteConnection()->IsA("vtkClientConnection"))
+    {
+    this->Mode = SERVER;
+    }
+  else if (pm->GetActiveRemoteConnection()->IsA("vtkServerConnection"))
+    {
+    this->Mode = CLIENT;
+    }
 
-  // since the processes on which this class is instantiated is always the
-  // client. As far as the superclass is concerned, this process is the root
-  // node.
-  this->SetRootProcessId(0);
+  // Setup the controllers for the communication.
+  switch (this->Mode)
+    {
+  case BUILTIN:
+    // nothing to do.
+    break;
+
+  case BATCH:
+    this->SetParallelController(vtkMultiProcessController::GetGlobalController());
+    break;
+
+  case SERVER:
+    this->SetParallelController(vtkMultiProcessController::GetGlobalController());
+    this->SetClientServerController(pm->GetActiveRenderServerSocketController());
+    break;
+
+  case CLIENT:
+    this->SetClientServerController(pm->GetActiveRenderServerSocketController());
+    break;
+
+  default:
+    vtkErrorMacro("Invalid process type.");
+    abort();
+    }
 }
 
 //----------------------------------------------------------------------------
 vtkPVSynchronizedRenderWindowsClient::~vtkPVSynchronizedRenderWindowsClient()
 {
+  this->SetClientServerController(0);
+  this->SetParallelController(0);
+
   delete this->Internals;
   this->Internals = 0;
+
+  this->Observer->Target = NULL;
+  this->Observer->Delete();
+  this->Observer = NULL;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVSynchronizedRenderWindowsClient::SetClientServerController(
+  vtkMultiProcessController* controller)
+{
+  if (this->ClientServerController == controller)
+    {
+    return;
+    }
+
+  if (this->ClientServerController && this->ClientServerRMITag)
+    {
+    this->ClientServerController->RemoveRMICallback(this->ClientServerRMITag);
+    }
+
+  vtkSetObjectBodyMacro(
+    ClientServerController, vtkMultiProcessController, controller);
+  this->ClientServerRMITag = 0;
+
+  // Only the server processes needs to listen to SYNC_RENDER_TAG triggers from
+  // the client.
+  if (controller && this->Mode == SERVER)
+    {
+    this->ClientServerRMITag =
+      controller->AddRMICallback(::RenderRMI, this, SYNC_RENDER_TAG);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVSynchronizedRenderWindowsClient::SetParallelController(
+  vtkMultiProcessController* controller)
+{
+  if (this->ParallelController == controller)
+    {
+    return;
+    }
+
+  if (this->ParallelController && this->ParallelRMITag)
+    {
+    this->ParallelController->RemoveRMICallback(this->ParallelRMITag);
+    }
+
+  vtkSetObjectBodyMacro(
+    ParallelController, vtkMultiProcessController, controller);
+  this->ParallelRMITag = 0;
+
+  // Only satellites listen to the SYNC_RENDER_TAG triggers from the root.
+  if (controller &&
+     (this->Mode == SERVER || this->Mode == BATCH) &&
+     controller->GetLocalProcessId() > 0)
+    {
+    this->ParallelRMITag =
+      controller->AddRMICallback(::RenderRMI, this, SYNC_RENDER_TAG);
+    }
 }
 
 //----------------------------------------------------------------------------
 vtkRenderWindow* vtkPVSynchronizedRenderWindowsClient:NewRenderWindow()
 {
-  // client always creates new window for each view in the multi layout
-  // configuration.
-  return vtkRenderWindow::New();
+  switch (this->Mode)
+    {
+  case BUILTIN:
+  case CLIENT:
+    // client always creates new window for each view in the multi layout
+    // configuration.
+    return vtkRenderWindow::New();
+
+  case SERVER:
+  case BATCH:
+    // all views share the same render window.
+    if (!this->Internals->SharedRenderWindow)
+      {
+      this->Internals->SharedRenderWindow =
+        vtkSmartPointer<vtkRenderWindow>::New();
+      }
+    this->Internals->SharedRenderWindow->Register(this);
+    return this->Internals->SharedRenderWindow;
+    }
+
+  return NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -105,15 +289,16 @@ void vtkPVSynchronizedRenderWindowsClient::AddRenderWindow(
     }
 
   this->Internals->RenderWindows[id].RenderWindow = renWin;
-  renWin->AddObserver(vtkCommand::StartEvent, this->Observer);
-  renWin->AddObserver(vtkCommand::EndEvent, this->Observer);
-}
-
-//----------------------------------------------------------------------------
-void vtkPVSynchronizedRenderWindowsClient::RemoveRenderWindow(
-  vtkRenderWindow* renWin)
-{
-  this->RemoveRenderWindow(this->Internals->GetKey(renWin));
+  if (!renWin->HasObserver(vtkCommand::StartEvent, this->Observer))
+    {
+    this->Internals->RenderWindow[id].StartRenderTag =
+      renWin->AddObserver(vtkCommand::StartEvent, this->Observer);
+    }
+  if (!renWin->HasObserver(vtkCommand::EndEvent, this->Observer))
+    {
+    this->Internals->RenderWindow[id].EndRenderTag =
+      renWin->AddObserver(vtkCommand::EndEvent, this->Observer);
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -123,45 +308,28 @@ void vtkPVSynchronizedRenderWindowsClient::RemoveRenderWindow(unsigned int id)
     this->Internals->RenderWindows.find(id);
   if (iter != this->Internals->RenderWindows.end())
     {
-    iter->second.RemoveObserver(this->Observer);
+    if (iter->second.StartRenderTag)
+      {
+      iter->second.RemoveObserver(iter->second.StartRenderTag);
+      }
+    if (iter->second.EndRenderTag)
+      {
+      iter->second.RemoveObserver(iter->second.EndRenderTag);
+      }
     this->Internals->RenderWindows.erase(iter);
     }
 }
 
 //----------------------------------------------------------------------------
-void vtkPVSynchronizedRenderWindows::HandleStartRender(vtkRenderWindow* renWin)
+vtkRenderWindow* vtkPVSynchronizedRenderWindowsClient::GetRenderWindow(unsigned int id)
 {
-  this->RenderWindow = renWin;
-  this->Superclass::HandleStartRender(renWin);
-  this->RenderWindow = NULL;
-}
-
-//----------------------------------------------------------------------------
-void vtkPVSynchronizedRenderWindows::MasterStartRender()
-{
-  // Need to the tell the server which is the active render window.
-  vtkMultiProcessStream stream;
-  stream << this->Internals->GetKey(this->RenderWindow);
-
-  // Pass in the information about the layout for all the windows.
-  // TODO: This gets called when rendering each render window. However, this
-  // information does not necessarily get invalidated that frequently. Can we be
-  // smart about it?
-  this->SaveWindowLayout(stream);
-
-  vtkstd::vector<unsigned char> data;
-  stream.GetRawData(data);
-
-  this->ParallelController->TriggerRMIOnAllChildren(
-    &data[0], static_cast<int>(data.size()), SYNC_MULTI_RENDER_WINDOW_TAG);
-
-  this->Superclass::MasterStartRender();
-}
-
-//----------------------------------------------------------------------------
-void vtkPVSynchronizedRenderWindows::SlaveStartRender()
-{
-  vtkErrorMacro("This class must be created on the slave process.");
+  vtkInternals::RenderWindowsMap::iterator iter =
+    this->Internals->RenderWindows.find(id);
+  if (iter != this->Internals->RenderWindows.end())
+    {
+    return this->Internals->RenderWindows.RenderWindow;
+    }
+  return NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -202,6 +370,57 @@ const int *vtkPVSynchronizedRenderWindowsClient::GetWindowPosition(unsigned int 
     return iter->second.Position;
     }
   return NULL;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVSynchronizedRenderWindowsClient::HandleRenderRMI()
+{
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  switch (this->Mode)
+    {
+  case SERVER:
+  case BATCH:
+    if (pm->GetLocalProcessId() > 0)
+      {
+      //HERE
+      }
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVSynchronizedRenderWindows::HandleStartRender(vtkRenderWindow* renWin)
+{
+  this->RenderWindow = renWin;
+  this->Superclass::HandleStartRender(renWin);
+  this->RenderWindow = NULL;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVSynchronizedRenderWindows::MasterStartRender()
+{
+  // Need to the tell the server which is the active render window.
+  vtkMultiProcessStream stream;
+  stream << this->Internals->GetKey(this->RenderWindow);
+
+  // Pass in the information about the layout for all the windows.
+  // TODO: This gets called when rendering each render window. However, this
+  // information does not necessarily get invalidated that frequently. Can we be
+  // smart about it?
+  this->SaveWindowLayout(stream);
+
+  vtkstd::vector<unsigned char> data;
+  stream.GetRawData(data);
+
+  this->ParallelController->TriggerRMIOnAllChildren(
+    &data[0], static_cast<int>(data.size()), SYNC_MULTI_RENDER_WINDOW_TAG);
+
+  this->Superclass::MasterStartRender();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVSynchronizedRenderWindows::SlaveStartRender()
+{
+  vtkErrorMacro("This class must be created on the slave process.");
 }
 
 //----------------------------------------------------------------------------

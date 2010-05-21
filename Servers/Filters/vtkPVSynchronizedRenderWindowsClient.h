@@ -24,26 +24,24 @@
 #ifndef __vtkPVSynchronizedRenderWindowsClient_h
 #define __vtkPVSynchronizedRenderWindowsClient_h
 
-#include "vtkSynchronizedRenderWindows.h"
+#include "vtkObject.h"
 
-class VTK_EXPORT vtkPVSynchronizedRenderWindowsClient : public vtkSynchronizedRenderWindows
+class VTK_EXPORT vtkPVSynchronizedRenderWindowsClient : public vtkObject
 {
 public:
   static vtkPVSynchronizedRenderWindowsClient* New();
-  vtkTypeRevisionMacro(vtkPVSynchronizedRenderWindowsClient, vtkSynchronizedRenderWindows);
+  vtkTypeRevisionMacro(vtkPVSynchronizedRenderWindowsClient, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
   // Returns a render window for use (possibly new).
-  // FIXME: this API must be defined in a PV specific superclass.
   virtual vtkRenderWindow* NewRenderWindow();
 
   // Description:
   // Register/UnRegister a window.
-  // FIXME: this API must be defined in a PV specific superclass.
   virtual void AddRenderWindow(unsigned int id, vtkRenderWindow*);
-  virtual void RemoveRenderWindow(vtkRenderWindow*);
   virtual void RemoveRenderWindow(unsigned int id);
+  vtkRenderWindow* GetRenderWindow(unsigned int id);
 
   // Description:
   // The views are not supposed to updated the render window position or size
@@ -67,9 +65,22 @@ public:
     {
     SYNC_MULTI_RENDER_WINDOW_TAG = 15002,
     };
+
+  // INTERNAL METHOD. DON'T USE.
+  void HandleRenderRMI();
 protected:
   vtkPVSynchronizedRenderWindowsClient();
   ~vtkPVSynchronizedRenderWindowsClient();
+
+  // Description:
+  // Set/Get the controller used for communication among parallel processes.
+  void SetParallelController(vtkMultiProcessController*);
+  vtkGetObjectMacro(ParallelController, vtkMultiProcessController);
+
+  // Description:
+  // Set/Get the controller used for client-server communication.
+  void SetClientServerController(vtkMultiProcessController*);
+  vtkGetObjectMacro(ClientServerController, vtkMultiProcessController);
 
   // These methods are called on all processes as a consequence of corresponding
   // events being called on the render window.
@@ -77,22 +88,33 @@ protected:
   virtual void HandleEndRender(vtkRenderWindow*) {}
   virtual void HandleAbortRender(vtkRenderWindow*) {}
 
-  virtual void MasterStartRender();
-  virtual void SlaveStartRender();
+  virtual void ClientStartRender();
+  virtual void RootStartRender();
+  virtual void SatelliteStartRender();
+
+  enum ModeEnum
+    {
+    INVALID
+    BUILTIN,
+    CLIENT,
+    SERVER,
+    BATCH
+    };
+
+
+  ModeEnum Mode;
+  vtkMultiProcessController* ParallelController;
+  vtkMultiProcessController* ClientServerController;
+  unsigned long ClientServerRMITag;
+  unsigned long ParallelRMITag;
 
 private:
   vtkPVSynchronizedRenderWindowsClient(const vtkPVSynchronizedRenderWindowsClient&); // Not implemented
   void operator=(const vtkPVSynchronizedRenderWindowsClient&); // Not implemented
 
-  virtual void SetRenderWindow(vtkRenderWindow* win)
-    {
-    if (win)
-      {
-      vtkErrorMacro("This method is not supported.");
-      return;
-      }
-    return this->Superclass::SetRenderWindow(win);
-    }
+  class vtkInternals;
+  class vtkObserver;
+  vtkObserver* Observer;
 //ETX
 };
 
