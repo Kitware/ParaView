@@ -2,7 +2,7 @@
 
   Program:   Visualization Toolkit
   Module:    vtkEnSightGoldReader2.cxx
-
+  
   Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
   All rights reserved.
   See Copyright.txt or http://www.kitware.com/Copyright.htm for details.
@@ -2109,6 +2109,25 @@ int vtkEnSightGoldReader2::CreateUnstructuredGridOutput(int partId,
             }
           lineRead = this->ReadNextDataLine(line);
           }
+          
+        // prepare an array of Ids describing the vtkPolyhedron object yyy begin
+        int         nodeIndx = 0; // indexing the raw array of point Ids
+        int         arrayIdx = 0; // indexing the new array of Ids
+        vtkIdType * theFaces = new vtkIdType // vtkPolyhedron's info of faces
+                               [ elementNodeCount + numFacesPerElement[i] ];
+        for ( j = 0; j < numFacesPerElement[i]; j ++ )
+          {
+          // number of points constituting this face
+          theFaces[ arrayIdx ++ ] = numNodesPerFace[ faceCount + j ];
+          
+          for (  k = 0;  k < numNodesPerFace[ faceCount + j ];  k ++  )
+            {
+            // convert EnSight 1-based indexing to VTK 0-based indexing
+            theFaces[ arrayIdx ++ ] = intIds[ nodeIndx ++ ] - 1;
+            }
+          }
+        //*//// yyy end
+        
         faceCount += numFacesPerElement[i];
 
         // Build element
@@ -2123,9 +2142,19 @@ int vtkEnSightGoldReader2::CreateUnstructuredGridOutput(int partId,
             elementNodeCount += 1;
             }
           }
-        cellId = output->InsertNextCell(VTK_CONVEX_POINT_SET,
-          elementNodeCount,
-          nodeIds);
+        /*/ xxx begin
+        cellId = output->InsertNextCell( VTK_CONVEX_POINT_SET,
+                                         elementNodeCount, nodeIds );
+        //*//// xxx end
+        
+        // insert the cell as a vtkPolyhedron object yyy begin 
+        cellId = output->InsertNextCell( VTK_POLYHEDRON, elementNodeCount,
+                                         nodeIds, numFacesPerElement[i],
+                                         theFaces );
+        delete [] theFaces;
+        theFaces = NULL;
+        //*//// yyy end
+                                         
         this->GetCellIds(idx, vtkEnSightReader2::NFACED)->InsertNextId(cellId);
         delete [] nodeIds;
         delete [] intIds;

@@ -119,12 +119,22 @@ int vtkCleanUnstructuredGrid::RequestData(
       {
       this->UpdateProgress(0.8+0.2*((float)id/num));
       }
-    input->GetCellPoints(id, cellPoints);
-    for (int i=0; i < cellPoints->GetNumberOfIds(); i++)
+    // special handling for polyhedron cells
+    if (vtkUnstructuredGrid::SafeDownCast(input) &&
+        input->GetCellType(id) == VTK_POLYHEDRON)
       {
-      int cellPtId = cellPoints->GetId(i);
-      newId = ptMap[cellPtId];
-      cellPoints->SetId(i, newId);
+      vtkUnstructuredGrid::SafeDownCast(input)->GetFaceStream(id, cellPoints);
+      vtkUnstructuredGrid::ConvertFaceStreamPointIds(cellPoints, ptMap);
+      }
+    else    
+      {
+      input->GetCellPoints(id, cellPoints);
+      for (int i=0; i < cellPoints->GetNumberOfIds(); i++)
+        {
+        int cellPtId = cellPoints->GetId(i);
+        newId = ptMap[cellPtId];
+        cellPoints->SetId(i, newId);
+        }
       }
     output->InsertNextCell(input->GetCellType(id), cellPoints);
     }
