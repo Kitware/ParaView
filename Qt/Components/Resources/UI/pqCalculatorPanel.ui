@@ -658,6 +658,14 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>AttributeMode</tabstop>
+  <tabstop>CoordinateResults</tabstop>
+  <tabstop>ResultArrayName</tabstop>
+  <tabstop>Function</tabstop>
+  <tabstop>ReplaceInvalidResult</tabstop>
+  <tabstop>ReplacementValue</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>
