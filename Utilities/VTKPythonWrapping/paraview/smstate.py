@@ -88,10 +88,10 @@ def get_sorted_proxies_in_group(group_name):
     # GetProxiesInGroup returns a dictionary of the form:
     #     { ('proxy_name', 'proxy_id') : proxy }
     # We want to return the dictionary values (list of proxies) sorted by proxy_id.
-    proxy_dict = servermanager.ProxyManager().GetProxiesInGroup(group_name)
-    sorted_items = sorted(proxy_dict.items(), lambda a, b: cmp(int(a[0][1]), int(b[0][1])))
-    sorted_list = [pair[1] for pair in sorted_items]
-    return sorted_list
+    dict_items = servermanager.ProxyManager().GetProxiesInGroup(group_name).items()
+    dict_items.sort(lambda a, b: cmp(int(a[0][1]), int(b[0][1])))
+    sorted_proxy_list = [pair[1] for pair in dict_items]
+    return sorted_proxy_list
 
 
 def get_proxy_lists_ordered_by_group(WithRendering=True):
