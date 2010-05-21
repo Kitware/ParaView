@@ -44,6 +44,13 @@ public:
   vtkRenderWindow* GetRenderWindow(unsigned int id);
 
   // Description:
+  // Register/UnRegister the renderers. One can add multiple renderers for the
+  // same id. The id must be same as that specified when adding the
+  // corresponding render window.
+  virtual void AddRenderer(unsigned int id, vtkRenderer*);
+  virtual void RemoveAllRenderers(unsigned int id);
+
+  // Description:
   // The views are not supposed to updated the render window position or size
   // directly. They should always go through this API to update the window sizes
   // and positions. This makes it possible to provide a consistent API
@@ -52,6 +59,20 @@ public:
   virtual void SetWindowPosition(unsigned int id, int posx, int posy);
   virtual const int* GetWindowSize(unsigned int id);
   virtual const int* GetWindowPosition(unsigned int id);
+
+  // Description:
+  // Enable/Disable parallel rendering.
+  vtkSetMacro(Enabled, bool);
+  vtkGetMacro(Enabled, bool);
+  vtkBooleanMacro(Enabled, bool);
+
+  // Description:
+  // Enable/Disable propagation of the render event. This is typically true,
+  // unless the application is managing calling Render() on all processes
+  // involved.
+  vtkSetMacro(RenderEventPropagation, bool);
+  vtkGetMacro(RenderEventPropagation, bool);
+  vtkBooleanMacro(RenderEventPropagation, bool);
 
   // Description:
   // Saves the information about all the windows known to this class and how
@@ -66,8 +87,6 @@ public:
     SYNC_MULTI_RENDER_WINDOW_TAG = 15002,
     };
 
-  // INTERNAL METHOD. DON'T USE.
-  void HandleRenderRMI();
 protected:
   vtkPVSynchronizedRenderWindowsClient();
   ~vtkPVSynchronizedRenderWindowsClient();
@@ -88,9 +107,9 @@ protected:
   virtual void HandleEndRender(vtkRenderWindow*) {}
   virtual void HandleAbortRender(vtkRenderWindow*) {}
 
-  virtual void ClientStartRender();
-  virtual void RootStartRender();
-  virtual void SatelliteStartRender();
+  virtual void ClientStartRender(vtkRenderWindow*);
+  virtual void RootStartRender(vtkRenderWindow*);
+  virtual void SatelliteStartRender(vtkRenderWindow*);
 
   enum ModeEnum
     {
@@ -107,6 +126,8 @@ protected:
   vtkMultiProcessController* ClientServerController;
   unsigned long ClientServerRMITag;
   unsigned long ParallelRMITag;
+  bool Enabled;
+  bool RenderEventPropagation;
 
 private:
   vtkPVSynchronizedRenderWindowsClient(const vtkPVSynchronizedRenderWindowsClient&); // Not implemented
