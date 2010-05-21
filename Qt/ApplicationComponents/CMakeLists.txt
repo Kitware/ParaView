@@ -20,8 +20,7 @@ INCLUDE_DIRECTORIES(
   ${QtWidgets_SOURCE_DIR}
   ${QtWidgets_BINARY_DIR}
   ${QtPython_BINARY_DIR}
-  ${QtPython_SOURCE_DIR}
-  ${QT_QTASSISTANTCLIENT_INCLUDE_DIR})
+  ${QtPython_SOURCE_DIR})
 
 # List headers to be processed by moc
 SET (MOC_HEADERS
