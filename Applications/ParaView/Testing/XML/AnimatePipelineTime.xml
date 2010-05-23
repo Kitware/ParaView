@@ -37,5 +37,6 @@
   <pqevent object="pqPipelineTimeKeyFrameEditor/container/pqKeyFrameEditor/tableView" command="keyEvent" arguments="7,50,536870912,2,0,1" />
   <pqevent object="pqPipelineTimeKeyFrameEditor/1QDialogButtonBox0/1QPushButton0" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/variableToolbar/displayColor/Variables" command="set_string" arguments="VEL" />
+  <pqevent object="pqClientMainWindow/animationViewDock/qt_dockwidget_closebutton" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/VCRToolbar/1QToolButton2" command="activate" arguments="" />
 </pqevents>
