@@ -4723,6 +4723,11 @@ The Clip filter cuts away a portion of the input data set using an implicit plan
                 <Property name="Input" function="Input"/>
              </RequiredProperties>
            </ArrayListDomain>
+           <FieldDataDomain name="field_list">
+             <RequiredProperties>
+                <Property name="Input" function="Input"/>
+             </RequiredProperties>
+           </FieldDataDomain>
            <Documentation>
              If clipping with scalars, this property specifies the name of the scalar array on which to perform the clip operation.
            </Documentation>

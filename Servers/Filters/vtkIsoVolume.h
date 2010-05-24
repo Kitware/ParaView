@@ -27,13 +27,12 @@
 
 // Forware declarations.
 class vtkPVClipDataSet;
-class vtkThreshold;
 
 class VTK_EXPORT vtkIsoVolume : public vtkUnstructuredGridAlgorithm
 {
 public:
-  static vtkIsoVolume *New();
-  vtkTypeMacro(vtkIsoVolume,vtkUnstructuredGridAlgorithm);
+  static vtkIsoVolume* New();
+  vtkTypeMacro(vtkIsoVolume, vtkUnstructuredGridAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
@@ -43,8 +42,8 @@ public:
 
   // Description:
   // Get the Upper and Lower thresholds.
-  vtkGetMacro(UpperThreshold,double);
-  vtkGetMacro(LowerThreshold,double);
+  vtkGetMacro(UpperThreshold, double);
+  vtkGetMacro(LowerThreshold, double);
 
 
 protected:
@@ -52,25 +51,24 @@ protected:
  ~vtkIsoVolume();
 
   // Usual data generation methods.
-  virtual int RequestData(vtkInformation*, vtkInformationVector**,
+  virtual int RequestData(vtkInformation* request, vtkInformationVector**,
                           vtkInformationVector*);
 
   virtual int FillInputPortInformation(int port, vtkInformation* info);
+  virtual int FillOutputPortInformation(int port, vtkInformation* info);
 
   virtual int ProcessRequest(vtkInformation*, vtkInformationVector**,
                              vtkInformationVector*);
 
-  vtkGetMacro(UsingPointScalars, int);
+  virtual int RequestDataObject(vtkInformation* request,
+                                vtkInformationVector** inputVector,
+                                vtkInformationVector* outputVector);
 
   double LowerThreshold;
   double UpperThreshold;
 
-  bool   UsingPointScalars;
-
   vtkPVClipDataSet*   LowerBoundClipDS;
   vtkPVClipDataSet*   UpperBoundClipDS;
-
-  vtkThreshold*       Threshold;
 
 private:
   vtkIsoVolume(const vtkIsoVolume&);  // Not implemented.

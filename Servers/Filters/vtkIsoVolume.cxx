@@ -16,16 +16,19 @@
 
 #include "vtkCell.h"
 #include "vtkCellData.h"
+#include "vtkCompositeDataIterator.h"
 #include "vtkGenericClip.h"
+#include "vtkHierarchicalBoxDataSet.h"
 #include "vtkIdList.h"
 #include "vtkInformation.h"
+#include "vtkInformationStringVectorKey.h"
 #include "vtkInformationVector.h"
+#include "vtkMultiBlockDataSet.h"
 #include "vtkObjectFactory.h"
 #include "vtkPointData.h"
 #include "vtkPVClipDataSet.h"
 #include "vtkSmartPointer.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
-#include "vtkThreshold.h"
 #include "vtkUnstructuredGrid.h"
 
 vtkStandardNewMacro(vtkIsoVolume);
@@ -37,15 +40,10 @@ vtkIsoVolume::vtkIsoVolume()
 {
   this->LowerThreshold         = 0.0;
   this->UpperThreshold         = 1.0;
-  this->UsingPointScalars      = false;
 
   this->LowerBoundClipDS = 0;
   this->UpperBoundClipDS = 0;
-  this->Threshold        = 0;
 
-  this->SetInputArrayToProcess(
-    0,0,0,vtkDataObject::FIELD_ASSOCIATION_POINTS,
-    vtkDataSetAttributes::SCALARS);
   this->SetNumberOfInputPorts(1);
 }
 
@@ -61,10 +59,6 @@ vtkIsoVolume::~vtkIsoVolume()
     {
     this->UpperBoundClipDS->Delete();
     }
-  if(this->Threshold)
-    {
-    this->Threshold->Delete();
-    }
 }
 
 //----------------------------------------------------------------------------
@@ -79,153 +73,251 @@ void vtkIsoVolume::ThresholdBetween(double lower, double upper)
     }
 }
 
+//----------------------------------------------------------------------------
 int vtkIsoVolume::RequestData(vtkInformation* request,
-                                vtkInformationVector** inputVector,
-                                vtkInformationVector* outputVector)
+                              vtkInformationVector** inputVector,
+                              vtkInformationVector* outputVector)
 {
   int retVal = 1;
 
-  // Get the info objects.
+  // Get the input information.
   vtkInformation* inInfo  = inputVector[0]->GetInformationObject(0);
   vtkInformation* outInfo = outputVector->GetInformationObject(0);
 
-  vtkDataArray* inScalars = this->GetInputArrayToProcess(0,inputVector);
+  // Get output information.
+  vtkDataObject* inObj  = inInfo->Get(vtkDataObject::DATA_OBJECT());
   vtkDataObject* outObj = outInfo->Get(vtkDataObject::DATA_OBJECT());
 
-  if (!inScalars)
+
+  // Comman vars.
+  vtkStdString  arrayName("");
+  int           fieldAssociation (-1);
+  double*       range (0);
+  vtkDataArray* inScalars(0);
+  bool          usingLowerBoundClipDS (false);
+  bool          usingUpperBoundClipDS (false);
+
+  vtkSmartPointer<vtkDataObject> outObj1(0);
+  vtkSmartPointer<vtkDataObject> outObj2(0);
+
+  // Get the array name and field information.
+  vtkInformationVector *inArrayVec =
+    this->GetInformation()->Get(INPUT_ARRAYS_TO_PROCESS());
+
+  vtkInformation* inArrayInfo  = inArrayVec->GetInformationObject(0);
+
+  if(!inArrayInfo->Has(vtkDataObject::FIELD_ASSOCIATION()))
     {
-    vtkDebugMacro(<<"No scalar data to threshold");
-    return !retVal;
+    vtkErrorMacro("Unable to get field association.");
+    return 1;
+    }
+  fieldAssociation = inArrayInfo->Get(vtkDataObject::FIELD_ASSOCIATION());
+
+  if ( ! inArrayInfo->Has(vtkDataObject::FIELD_NAME()))
+    {
+    vtkErrorMacro("Missing field name.");
+    return 1;
+    }
+  arrayName = vtkStdString(inArrayInfo->Get(vtkDataObject::FIELD_NAME()));
+
+  // Here is the logic.
+  // If(AMR) {pass through:}
+  // else if(Composite} {iterate and pass thru only if condition is true.}
+  // else if(vtkDataSet) {pass through:}
+
+  // Check if the input data is vtkDataSet or AMR or Multiblock.
+  vtkHierarchicalBoxDataSet* hbds = vtkHierarchicalBoxDataSet::SafeDownCast(
+    inObj);
+
+  vtkDataSet* ds =vtkDataSet::SafeDownCast(inObj);
+
+  vtkCompositeDataSet* cds = vtkCompositeDataSet::SafeDownCast(inObj);
+
+  if(this->LowerBoundClipDS)
+    {
+    this->LowerBoundClipDS->Delete();
+    this->LowerBoundClipDS = 0;
     }
 
-  vtkDebugMacro(<<"Executing vtkIsoVolume filter");
-
-  // Are we using pointScalars?
-  vtkDataSet* input = vtkDataSet::SafeDownCast(
-    inInfo->Get(vtkDataObject::DATA_OBJECT()));
-
-  int numPts = input->GetNumberOfPoints();
-  this->UsingPointScalars = (inScalars->GetNumberOfTuples() == numPts);
-
-  // If not using point scalar we would like to extract volume using
-  // vtkThreshold filter.
-  if(!this->UsingPointScalars)
+  if(this->UpperBoundClipDS)
     {
-    if(this->Threshold)
-      {
-      this->Threshold->Delete();
-      }
-
-    this->Threshold = vtkThreshold::New();
-    this->Threshold->SetInputArrayToProcess(
-      0, 0, 0, vtkDataObject::FIELD_ASSOCIATION_CELLS, inScalars->GetName());
-    this->Threshold->ThresholdBetween(
-        this->LowerThreshold, this->UpperThreshold);
-    retVal =
-      this->Threshold->ProcessRequest(request, inputVector, outputVector);
-
-    return retVal;
+    this->UpperBoundClipDS->Delete();
+    this->UpperBoundClipDS = 0;
     }
 
-  double* range = input->GetScalarRange();
 
-  // Use the lower bound clip filter only if the data contained
-  // has values lower or equal then the threshold.
-  bool usingLowerBoundClipDS = false;
-  if(range[0] <= this->LowerThreshold)
+  if(hbds || ds)
     {
+    outObj1.TakeReference(outObj->NewInstance());
+
     usingLowerBoundClipDS = true;
 
-    if(this->LowerBoundClipDS)
+    if(!this->LowerBoundClipDS)
       {
-      this->LowerBoundClipDS->Delete();
+      this->LowerBoundClipDS = vtkPVClipDataSet::New();
       }
 
-    this->LowerBoundClipDS = vtkPVClipDataSet::New();
-    this->LowerBoundClipDS->SetInputArrayToProcess(0, 0, 0,
-      vtkDataObject::FIELD_ASSOCIATION_POINTS, inScalars->GetName());
+    this->LowerBoundClipDS->SetInput(0, inObj);
+    this->LowerBoundClipDS->SetInputArrayToProcess(0, 0, 0, fieldAssociation,
+                                                   arrayName);
     this->LowerBoundClipDS->SetValue(this->LowerThreshold);
-    this->LowerBoundClipDS->GenerateClipScalarsOff();
-    retVal = this->LowerBoundClipDS->ProcessRequest(request, inputVector,
-                                                    outputVector);
+    this->LowerBoundClipDS->Update();
+    outObj1->ShallowCopy(this->LowerBoundClipDS->GetOutputDataObject(0));
     }
-
-  // Its useless to create upper bound clip filter
-  // if range[1] is lower than upper threshold.
-  if(range[1] > this->UpperThreshold)
+  else if(cds)
     {
-    if(this->UpperBoundClipDS)
+    outObj1.TakeReference(outObj->NewInstance());
+    vtkCompositeDataSet* out1cds = vtkCompositeDataSet::SafeDownCast(outObj1);
+    out1cds->CopyStructure(cds);
+
+    vtkSmartPointer<vtkCompositeDataIterator> itr (0);
+    itr.TakeReference(cds->NewIterator());
+
+    // Iterate thru each dataset and process only if the condition is true.
+    for(itr->InitTraversal(); !itr->IsDoneWithTraversal();
+        itr->GoToNextItem())
       {
-      this->UpperBoundClipDS->Delete();
-      }
+      vtkSmartPointer<vtkDataObject> obj(0);
+      obj.TakeReference(itr->GetCurrentDataObject()->NewInstance());
+      vtkDataSet* lds = vtkDataSet::SafeDownCast(itr->GetCurrentDataObject());
+      range = lds->GetScalarRange();
 
-    this->UpperBoundClipDS = vtkPVClipDataSet::New();
-    this->UpperBoundClipDS->SetInputArrayToProcess(0, 0, 0,
-      vtkDataObject::FIELD_ASSOCIATION_POINTS, inScalars->GetName());
-    this->UpperBoundClipDS->SetValue(this->UpperThreshold);
-    this->UpperBoundClipDS->GenerateClipScalarsOff();
-    this->UpperBoundClipDS->InsideOutOn();
-
-    vtkInformation*       lbcdsInfo(0);
-    vtkInformationVector* outputInfoVec(0);
-    vtkUnstructuredGrid*  output(0);
-    vtkInformation*       outInfo2(0);
-
-    if(usingLowerBoundClipDS)
-      {
-      lbcdsInfo = outputVector->GetInformationObject(0);
-
-      // If there is a valid output create new output
-      // information and information vector object.
-      if(lbcdsInfo->Get(vtkDataObject::DATA_OBJECT()))
+      if(range[0] <= this->LowerThreshold)
         {
-        output = vtkUnstructuredGrid::New();
-        outInfo2 = vtkInformation::New();
-        outInfo2->Copy(outInfo);
-        outInfo2->Set(vtkDataObject::DATA_OBJECT(), output);
-        outputInfoVec = vtkInformationVector::New();
-        outputInfoVec->SetNumberOfInformationObjects(1);
-        outputInfoVec->SetInformationObject(0, outInfo2);
+        usingLowerBoundClipDS = true;
+        if(!this->LowerBoundClipDS)
+          {
+          this->LowerBoundClipDS  = vtkPVClipDataSet::New();
+          }
+        this->LowerBoundClipDS->SetInput(0, lds);
+        this->LowerBoundClipDS->SetInputArrayToProcess(0, 0, 0, fieldAssociation,
+                                                       arrayName);
+        this->LowerBoundClipDS->SetValue(this->LowerThreshold);
+        this->LowerBoundClipDS->Update();
+        obj->ShallowCopy(this->LowerBoundClipDS->GetOutputDataObject(0));
+        out1cds->SetDataSet(itr, obj);
         }
       else
         {
-        // If not a valid output data object then set
-        // the flag to false.
-        usingLowerBoundClipDS = false;
+        out1cds->SetDataSet(itr, itr->GetCurrentDataObject());
         }
-      }
-
-
-    // If not using the previous clip filter use original args.
-    if(!usingLowerBoundClipDS && this->UpperBoundClipDS)
-      {
-      retVal =  this->UpperBoundClipDS->ProcessRequest(request, inputVector,
-                                                       outputVector);
-      }
-    else if(usingLowerBoundClipDS && this->UpperBoundClipDS)
-      {
-      // If using the previous clip filter then use the newly created
-      // information vector object and once done free up the memory.
-      this->UpperBoundClipDS->ProcessRequest(request, &outputVector,
-                                             outputInfoVec);
-      vtkUnstructuredGrid::SafeDownCast(outObj)->ShallowCopy(output);
-      output->Delete();
-      outInfo2->Delete();
-      outputInfoVec->Delete();
-      }
-    else
-      {
-      // Do nothing.
-      }
+      } // End for
+    } // End if(cds)
+  else
+    {
+    vtkErrorMacro("Unable to handle this data type.");
+    return 1;
     }
 
-  return retVal;
+  // Check if the input to this filter is vtkDataSet or AMR or composite.
+  if(!usingLowerBoundClipDS)
+    {
+    outObj1 = inObj;
+    }
+
+  vtkHierarchicalBoxDataSet* hbds2 = vtkHierarchicalBoxDataSet::SafeDownCast(
+    outObj1);
+
+  vtkDataSet* ds2 = vtkDataSet::SafeDownCast(outObj1);
+
+  vtkCompositeDataSet* cds2 = vtkCompositeDataSet::SafeDownCast(
+    outObj1);
+
+  if(hbds2 || ds2)
+    {
+    usingUpperBoundClipDS = true;
+    outObj2.TakeReference(outObj->NewInstance());
+
+    if(!this->UpperBoundClipDS)
+      {
+      this->UpperBoundClipDS = vtkPVClipDataSet::New();
+      }
+
+    this->UpperBoundClipDS->SetInput(0, outObj1);
+    this->UpperBoundClipDS->SetInputArrayToProcess(0, 0, 0, fieldAssociation,
+                                                   arrayName);
+    this->UpperBoundClipDS->SetValue(this->UpperThreshold);
+    this->UpperBoundClipDS->SetInsideOut(1);
+    this->UpperBoundClipDS->Update();
+    outObj2->ShallowCopy(this->UpperBoundClipDS->GetOutputDataObject(0));
+    }
+  else if(cds2)
+    {
+    outObj2.TakeReference(outObj->NewInstance());
+    vtkCompositeDataSet* out2cds = vtkCompositeDataSet::SafeDownCast(outObj2);
+    out2cds->CopyStructure(cds2);
+
+    vtkSmartPointer<vtkCompositeDataIterator> itr (0);
+    itr.TakeReference(cds2->NewIterator());
+
+    for(itr->InitTraversal(); !itr->IsDoneWithTraversal();
+        itr->GoToNextItem())
+      {
+      vtkSmartPointer<vtkDataObject> obj(0);
+      obj.TakeReference(itr->GetCurrentDataObject()->NewInstance());
+      vtkDataSet* lds = vtkDataSet::SafeDownCast(itr->GetCurrentDataObject());
+
+      if(!lds->GetCellData()->GetAbstractArray(arrayName) &&
+         !lds->GetPointData()->GetAbstractArray(arrayName))
+        {
+        usingUpperBoundClipDS = false;
+        continue;
+        }
+
+      usingUpperBoundClipDS = true;
+
+      range = lds->GetScalarRange();
+
+      if(range[1] >= this->UpperThreshold || !usingLowerBoundClipDS)
+        {
+        if(!this->UpperBoundClipDS)
+          {
+          this->UpperBoundClipDS  = vtkPVClipDataSet::New();
+          }
+        this->UpperBoundClipDS->SetInput(0, lds);
+        this->UpperBoundClipDS->SetInputArrayToProcess(0, 0, 0, fieldAssociation,
+                                                       arrayName);
+        this->UpperBoundClipDS->SetValue(this->UpperThreshold);
+        this->UpperBoundClipDS->SetInsideOut(1);
+        this->UpperBoundClipDS->Update();
+        obj->ShallowCopy(this->UpperBoundClipDS->GetOutputDataObject(0));
+        out2cds->SetDataSet(itr, obj);
+        }
+      else
+        {
+        out2cds->SetDataSet(itr, itr->GetCurrentDataObject());
+        }
+      }
+    }
+  else
+    {
+    vtkErrorMacro("Unable to handle this data type.");
+    return 1;
+    }
+
+  if(usingLowerBoundClipDS && !usingUpperBoundClipDS)
+    {
+    outObj->ShallowCopy(outObj1);
+    return 1;
+    }
+  else
+    {
+    outObj->ShallowCopy(outObj2);
+    return 1;
+    }
 }
 
 //----------------------------------------------------------------------------
-int vtkIsoVolume::FillInputPortInformation(int, vtkInformation *info)
+int vtkIsoVolume::FillInputPortInformation(int port, vtkInformation *info)
 {
-  info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkDataSet");
+  info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkDataObject");
+  return 1;
+}
+
+//----------------------------------------------------------------------------
+int vtkIsoVolume::FillOutputPortInformation(int port, vtkInformation *info)
+{
+  info->Set(vtkDataObject::DATA_TYPE_NAME(), "vtkDataObject");
   return 1;
 }
 
@@ -236,7 +328,6 @@ void vtkIsoVolume::PrintSelf(ostream& os, vtkIndent indent)
 
   os << indent << "LowerThreshold: " << this->LowerThreshold << "\n";
   os << indent << "UpperThreshold: " << this->UpperThreshold << "\n";
-  os << indent << "UsingPointScalars: " << this->UsingPointScalars << "\n";
 
   (this->LowerBoundClipDS) ?
       os << indent << "LowerBoundClipDS: " << this->LowerBoundClipDS << "\n" :
@@ -245,10 +336,6 @@ void vtkIsoVolume::PrintSelf(ostream& os, vtkIndent indent)
   (this->UpperBoundClipDS) ?
       os << indent << "UpperBoundClipDS: " << this->UpperBoundClipDS << "\n" :
       os << indent << "UpperBoundClipDS: " << "NULL" << "\n" ;
-
-  (this->Threshold) ?
-      os << indent << "Threshold: " << this->Threshold << "\n" :
-      os << indent << "Threshold: " << "NULL" << "\n" ;
 }
 
 //----------------------------------------------------------------------------
@@ -256,29 +343,53 @@ int vtkIsoVolume::ProcessRequest(vtkInformation* request,
                                    vtkInformationVector** inputVector,
                                    vtkInformationVector* outputVector)
 {
-  if(request->Has(
-    vtkStreamingDemandDrivenPipeline::REQUEST_UPDATE_EXTENT_INFORMATION()))
+  // create the output
+  if(request->Has(vtkDemandDrivenPipeline::REQUEST_DATA_OBJECT()))
     {
-    int retValLCF = 1;
-    int retValUCF = 1;
-
-    if(this->LowerBoundClipDS)
-      {
-      retValLCF = this->LowerBoundClipDS->ProcessRequest(
-        request, inputVector, outputVector);
-      }
-
-    if(this->UpperBoundClipDS)
-      {
-      retValUCF = this->LowerBoundClipDS->ProcessRequest(
-        request, inputVector, outputVector);
-      }
-
-    if(retValLCF != 1 && retValUCF != 1)
-      {
-      return 0;
-      }
+    return this->RequestDataObject(request, inputVector, outputVector);
     }
 
   return this->Superclass::ProcessRequest(request, inputVector, outputVector);
+}
+
+//----------------------------------------------------------------------------
+int vtkIsoVolume::RequestDataObject(vtkInformation* vtkNotUsed(request),
+                                    vtkInformationVector** inputVector,
+                                    vtkInformationVector* outputVector)
+{
+  vtkInformation* inInfo = inputVector[0]->GetInformationObject(0);
+  if (!inInfo)
+    {
+    return 0;
+    }
+
+  vtkCompositeDataSet* input = vtkCompositeDataSet::GetData(inInfo);
+  vtkInformation* outInfo = outputVector->GetInformationObject(0);
+
+  if (input)
+    {
+    vtkMultiBlockDataSet* output = vtkMultiBlockDataSet::GetData(outInfo);
+    if (!output)
+      {
+      output = vtkMultiBlockDataSet::New();
+      output->SetPipelineInformation(outInfo);
+      this->GetOutputPortInformation(0)->Set(
+        vtkDataObject::DATA_EXTENT_TYPE(), output->GetExtentType());
+      output->Delete();
+      }
+    return 1;
+    }
+  else
+    {
+    vtkDataSet* output = vtkDataSet::GetData(outInfo);
+    if (!output)
+      {
+      output = vtkUnstructuredGrid::New();
+      output->SetPipelineInformation(outInfo);
+      this->GetOutputPortInformation(0)->Set(
+        vtkDataObject::DATA_EXTENT_TYPE(), output->GetExtentType());
+      output->Delete();
+      }
+    return 1;
+    }
 }

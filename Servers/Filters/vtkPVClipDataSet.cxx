@@ -20,10 +20,12 @@
 #include "vtkDataSet.h"
 #include "vtkDemandDrivenPipeline.h"
 #include "vtkObjectFactory.h"
+#include "vtkHierarchicalBoxDataIterator.h"
 #include "vtkHierarchicalBoxDataSet.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkMultiBlockDataSet.h"
+#include "vtkThreshold.h"
 #include "vtkSmartPointer.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkUnstructuredGrid.h"
@@ -86,10 +88,11 @@ int vtkPVClipDataSet::RequestData(vtkInformation* request,
     vtkErrorMacro( << "Failed to get output data object.");
     }
 
-  // Check if the input data is AMR.
-  if(vtkHierarchicalBoxDataSet::SafeDownCast(inDataObj))
+  // Check if the input data is AMR and we are doing clip by cell scalars.
+  if(vtkHierarchicalBoxDataSet* input =
+     vtkHierarchicalBoxDataSet::SafeDownCast(inDataObj))
     {
-    // If using scalars for clipping this should be NULL.
+    // Using scalars.
     if(!this->GetClipFunction())
       {
       // This is a lot to go through to get the name of the array to process.
@@ -120,36 +123,184 @@ int vtkPVClipDataSet::RequestData(vtkInformation* request,
         return 1;
         }
 
-      vtkSmartPointer<vtkAMRDualClip> amrDC =
-        vtkSmartPointer<vtkAMRDualClip>::New();
-      amrDC->SetIsoValue(this->GetValue());
+      int fieldAssociation(-1);
+      if(!inArrayInfo->Has(vtkDataObject::FIELD_ASSOCIATION()))
+        {
+        vtkErrorMacro("Unable to query field association for the scalar.");
+        return 1;
+        }
 
-      // These default are safe to consider. Currently using GUI element just
-      // for AMRDualClip filter enables all of these too.
-      amrDC->SetEnableMergePoints(1);
-      amrDC->SetEnableDegenerateCells(1);
-      amrDC->SetEnableMultiProcessCommunication(1);
+      fieldAssociation = inArrayInfo->Get(vtkDataObject::FIELD_ASSOCIATION());
 
-      amrDC->SetInput(0, inDataObj);
-      amrDC->SetInputArrayToProcess(
-        0, 0, 0, vtkDataObject::FIELD_ASSOCIATION_CELLS,
-        arrayNameToProcess);
+      if(fieldAssociation == vtkDataObject::FIELD_ASSOCIATION_POINTS)
+        {
+        // Create a new output hierarchical dataset.
+        vtkSmartPointer<vtkHierarchicalBoxDataSet> output =
+          vtkSmartPointer<vtkHierarchicalBoxDataSet>::New();
 
-      amrDC->Update();
+        output->CopyStructure(input);
 
-      vtkMultiBlockDataSet::SafeDownCast(outDataObj)->ShallowCopy(
-        amrDC->GetOutput(0));
+        vtkSmartPointer<vtkHierarchicalBoxDataIterator> itr(0);
+        itr.TakeReference(vtkHierarchicalBoxDataIterator::SafeDownCast(
+          input->NewIterator()));
 
-      return 1;
+        // Loop over all the datasets.
+        for(itr->InitTraversal(); !itr->IsDoneWithTraversal();
+            itr->GoToNextItem())
+          {
+          vtkSmartPointer<vtkThreshold> th
+            (vtkSmartPointer<vtkThreshold>::New());
+
+          th->SetInput(itr->GetCurrentDataObject());
+          th->SetInputArrayToProcess(0, 0, 0, fieldAssociation,
+                                     arrayNameToProcess);
+
+          if(this->GetInsideOut())
+            {
+            th->ThresholdByLower(this->GetValue());
+            }
+          else
+            {
+            th->ThresholdByUpper(this->GetValue());
+            }
+
+          th->Update();
+
+          vtkSmartPointer<vtkUnstructuredGrid> out
+            (vtkSmartPointer<vtkUnstructuredGrid>::New());
+          out->ShallowCopy(th->GetOutput());
+          output->SetDataSet(itr, out);
+         }
+
+        outDataObj->ShallowCopy(output);
+        return 1;
+        }
+      else if(fieldAssociation == vtkDataObject::FIELD_ASSOCIATION_CELLS)
+        {
+        vtkSmartPointer<vtkAMRDualClip> amrDC =
+          vtkSmartPointer<vtkAMRDualClip>::New();
+        amrDC->SetIsoValue(this->GetValue());
+
+        // These default are safe to consider. Currently using GUI element just
+        // for AMRDualClip filter enables all of these too.
+        amrDC->SetEnableMergePoints(1);
+        amrDC->SetEnableDegenerateCells(1);
+        amrDC->SetEnableMultiProcessCommunication(1);
+
+        amrDC->SetInput(0, inDataObj);
+        amrDC->SetInputArrayToProcess(
+          0, 0, 0, vtkDataObject::FIELD_ASSOCIATION_CELLS,
+          arrayNameToProcess);
+
+        amrDC->Update();
+
+        vtkMultiBlockDataSet::SafeDownCast(outDataObj)->ShallowCopy(
+          amrDC->GetOutput(0));
+
+        return 1;
+        }
+      else
+        {
+        vtkErrorMacro("Requires points or cell scalars.");
+        return 1;
+        }
       }
     else
       {
-      vtkErrorMacro("This algorithm allows clipping using scalars only.");
+      // Create a new output hierarchical dataset.
+      vtkSmartPointer<vtkHierarchicalBoxDataSet> output =
+        vtkSmartPointer<vtkHierarchicalBoxDataSet>::New();
+
+      output->CopyStructure(input);
+
+      vtkSmartPointer<vtkHierarchicalBoxDataIterator> itr(0);
+      itr.TakeReference(vtkHierarchicalBoxDataIterator::SafeDownCast(
+        input->NewIterator()));
+
+      // Loop over all the datasets.
+      for(itr->InitTraversal(); !itr->IsDoneWithTraversal(); itr->GoToNextItem())
+        {
+        //@TODO: Do we need to check if the incoming dataset is
+        // unstructered grid on not?
+
+        // Creating new input information.
+        vtkInformationVector* newInInfoVec = vtkInformationVector::New();
+        vtkSmartPointer<vtkInformation> newInInfo =
+          vtkSmartPointer<vtkInformation>::New();
+        newInInfo->Set(vtkDataObject::DATA_OBJECT(), itr->GetCurrentDataObject());
+        newInInfoVec->SetInformationObject(0, newInInfo);
+
+        // Creating new output information.
+        vtkSmartPointer<vtkUnstructuredGrid> usGrid =
+          vtkSmartPointer<vtkUnstructuredGrid>::New();
+        vtkSmartPointer<vtkInformationVector> newOutInfoVec =
+          vtkSmartPointer<vtkInformationVector>::New();
+        vtkSmartPointer<vtkInformation> newOutInfo =
+          vtkSmartPointer<vtkInformation>::New();
+        newOutInfo->Set(vtkDataObject::DATA_OBJECT(), usGrid);
+        newOutInfoVec->SetInformationObject(0, newOutInfo);
+
+        this->Superclass::RequestData(request, &newInInfoVec,
+                                      newOutInfoVec.GetPointer());
+
+        output->SetDataSet(itr, usGrid);
+        newInInfoVec->Delete();
+       }
+
+      outDataObj->ShallowCopy(output);
       return 1;
       }
     }
+  else // For vtkDataSet.
+    {
+    if(this->GetClipFunction())
+      {
+      return Superclass::RequestData(request, inputVector, outputVector);
+      }
 
-  return Superclass::RequestData(request, inputVector, outputVector);
+    vtkDataSet* ds (vtkDataSet::SafeDownCast(inDataObj));
+    if(!ds)
+      {
+      vtkErrorMacro("Failed to get vtkDataSet.");
+      return 1;
+      }
+
+    vtkDataArray* dArray (this->GetInputArrayToProcess(0, ds));
+    if(!dArray)
+      {
+      vtkErrorMacro("Failed to get data array.");
+      return 1;
+      }
+
+    // If using point scalars.
+    if(ds->GetNumberOfPoints() == dArray->GetNumberOfTuples())
+      {
+      return Superclass::RequestData(request, inputVector, outputVector);
+      } // End if using point scalars.
+    else
+      {
+      // Use vtkPVThreshold here.
+      vtkSmartPointer<vtkThreshold> th (vtkSmartPointer<vtkThreshold>::New());
+      th->SetInput(0, inDataObj);
+      th->SetInputArrayToProcess(0, 0, 0,
+                                 vtkDataObject::FIELD_ASSOCIATION_CELLS,
+                                 dArray->GetName());
+      if(this->GetInsideOut())
+        {
+        th->ThresholdByLower(this->GetValue());
+        }
+      else
+        {
+        th->ThresholdByUpper(this->GetValue());
+        }
+
+      th->Update();
+
+      outDataObj->ShallowCopy(th->GetOutput(0));
+
+      return 1;
+      }
+    } // End for vtkDataSet.
 }
 
 //----------------------------------------------------------------------------
@@ -224,6 +375,6 @@ int vtkPVClipDataSet::FillInputPortInformation(int port,
 int vtkPVClipDataSet::FillOutputPortInformation(
   int vtkNotUsed(port), vtkInformation *info)
 {
-  info->Set(vtkDataObject::DATA_TYPE_NAME(), "vtkObject");
+  info->Set(vtkDataObject::DATA_TYPE_NAME(), "vtkDataObject");
   return 1;
 }
