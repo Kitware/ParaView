@@ -480,6 +480,8 @@ void vtkPVSynchronizedRenderWindows::ClientStartRender(vtkRenderWindow* renWin)
   this->SaveWindowAndLayout(renWin, stream);
 
   this->ClientServerController->Broadcast(stream, 0);
+
+  this->UpdateWindowLayout();
 }
 
 //----------------------------------------------------------------------------

@@ -4738,6 +4738,16 @@
     </XYChartViewProxy>
 #endif
 
+    <Proxy name="RenderView2" class="vtkPVRenderView"
+           processes="client|renderserver">
+      <IntVectorProperty
+        name="Identifier"
+        command="Initialize"
+        number_of_elements="1"
+        default_values="none">
+      </IntVectorProperty>
+    </Proxy>
+
     <Proxy name="RenderViewBase"
       base_proxygroup="views"
       base_proxyname="ViewBase">
