@@ -59,6 +59,7 @@ SET(Filters_SRCS
   vtkFlashReader.cxx
   vtkHierarchicalFractal.cxx
   vtkGridConnectivity.cxx
+  vtkIceTSynchronizedRenderers.cxx
   vtkImageCompressor.cxx
   vtkImageSliceMapper.cxx
   vtkIntegrateAttributes.cxx

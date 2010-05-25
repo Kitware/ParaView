@@ -23,7 +23,9 @@
 #define __vtkPVRenderView_h
 
 #include "vtkRenderView.h"
+
 class vtkPVSynchronizedRenderWindows;
+class vtkCamera;
 
 class VTK_EXPORT vtkPVRenderView : public vtkRenderView
 {
@@ -33,15 +35,28 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Gets the non-composited renderer for this view.
+  // Initialize the view with an identifier. Unless noted otherwise, this method
+  // must be called before calling any other methods on this class.
+  void Initialize(unsigned int id);
+
+  // Description:
+  // Set the position on this view in the multiview configuration.
+  // This can be called only after Initialize().
+  void SetPosition(int, int);
+
+  // Description:
+  // Set the size of this view in the multiview configuration.
+  // This can be called only after Initialize().
+  void SetSize(int, int);
+
+  // Description:
+  // Gets the non-composited renderer for this view. This is typically used for
+  // labels, 2D annotations etc.
   vtkGetObjectMacro(NonCompositedRenderer, vtkRenderer);
 
   // Description:
-  // Initialize the view with an identifier.
-  void Initialize(unsigned int id);
-
-  void SetPosition(int, int);
-  void SetSize(int, int);
+  // Get the active camera.
+  vtkCamera* GetActiveCamera();
 
 //BTX
 protected:

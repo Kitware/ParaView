@@ -128,7 +128,6 @@ void vtkPVRenderView::Initialize(unsigned int id)
   this->SynchronizedWindows->AddRenderer(id, this->GetNonCompositedRenderer());
 }
 
-
 //----------------------------------------------------------------------------
 void vtkPVRenderView::SetPosition(int x, int y)
 {
@@ -141,6 +140,12 @@ void vtkPVRenderView::SetSize(int x, int y)
 {
   assert(this->Identifier != 0);
   this->SynchronizedWindows->SetWindowSize(this->Identifier, x, y);
+}
+
+//----------------------------------------------------------------------------
+vtkCamera* vtkPVRenderView::GetActiveCamera()
+{
+  return this->GetRenderer()->GetActiveCamera();
 }
 
 //----------------------------------------------------------------------------

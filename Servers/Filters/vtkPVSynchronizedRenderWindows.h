@@ -12,7 +12,8 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVSynchronizedRenderWindows
+// .NAME vtkPVSynchronizedRenderWindows - synchronizes render-windows among
+// processes in ParaView configurations.
 // .SECTION Description
 // vtkPVSynchronizedRenderWindows is the class used to synchronize render
 // windows in ParaView. This class can be instantiated on all processes in all
