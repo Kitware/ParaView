@@ -13,7 +13,6 @@ ParaViewBinaryDir="@ParaView_BINARY_DIR@"
 ParaViewExeName="@PV_EXE_NAME@"
 ParaView_App="@EXECUTABLE_OUTPUT_PATH@/$ParaViewExeName.app"
 
-
 # Remove the previous app package so we start with a clean bundle
 #
 echo "Remove previous bundle"
@@ -26,6 +25,12 @@ echo "Copy paraview.app from the build tree to $InstallPrefix/"
 mkdir -p "$InstallPrefix"
 cp -Rp "$ParaView_App" "$InstallPrefix/"
 mv "$InstallPrefix/paraview.app" "$InstallPrefix/ParaView @PARAVIEW_VERSION_FULL@.app"
+
+if [ ! -f @VISTRAILS_PLUGIN_APP@ ]; then
+  echo "Copy VisTrailsPlug.app to $InstallPrefix/"
+  VisTrails_App="@VISTRAILS_PLUGIN_APP@"
+  cp -Rp "$VisTrails_App" "$InstallPrefix/"
+fi
 
 
 # Now operate on the bundle in the install tree:
