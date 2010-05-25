@@ -133,7 +133,7 @@ ENDIF(_install_qt_libs)
 #------------------------------------------------------------------------
 # Install ffmpeg, if used.
 IF (VTK_USE_FFMPEG_ENCODER)
-  FOREACH(fmpglib ${FFMPEG_BASIC_LIBRARIES})
+  FOREACH(fmpglib avcodec avformat avutil swscale)
     IF (FFMPEG_${fmpglib}_LIBRARY)
       pv_install_library(${FFMPEG_${fmpglib}_LIBRARY}
         ${PV_INSTALL_LIB_DIR}

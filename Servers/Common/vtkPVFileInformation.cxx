@@ -878,6 +878,23 @@ void vtkPVFileInformation::GetDirectoryListing()
     info->SetName(d->d_name);
     info->SetFullPath((prefix + d->d_name).c_str());
     info->Type = INVALID;
+
+    // fix to bug #09452 such that directories with trailing names can be
+    // shown in the file dialog
+#if defined (__SVR4) && defined (__sun)
+    struct stat status;
+    stat( d->d_name, &status );
+    if ( status.st_mode & S_IFDIR )
+     {
+     info->Type = DIRECTORY;
+     }
+#else
+    if ( d->d_type & DT_DIR )
+      {
+      info->Type = DIRECTORY;
+      }
+#endif
+
     info->FastFileTypeDetection = this->FastFileTypeDetection;
     info_set.insert(info);
     info->Delete();
