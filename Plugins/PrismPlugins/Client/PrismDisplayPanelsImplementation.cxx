@@ -58,10 +58,14 @@ pqDisplayPanel* PrismDisplayPanelsImplementation::createPanel(pqRepresentation* 
         if(name=="PrismFilter" || name=="PrismSurfaceReader")
             {
 
-            pqPipelineRepresentation* pd = qobject_cast<pqPipelineRepresentation*>(repr);
+              pqPipelineRepresentation* pd = qobject_cast<pqPipelineRepresentation*>(repr);
 
-            return new PrismDisplayProxyEditor(pd,p);
-            }
+              if(pd)
+              {
+                return new PrismDisplayProxyEditor(pd,p);
+              }
+
+        }
 
         }
     return NULL;
