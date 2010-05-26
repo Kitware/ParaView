@@ -80,7 +80,7 @@ vtkPVSynchronizedRenderer::vtkPVSynchronizedRenderer()
       else
         {
         this->CSSynchronizer = vtkClientServerSynchronizedRenderers::New();
-        this->CSSynchronizer->WriteBackImagesOff();
+        this->CSSynchronizer->WriteBackImagesOn();
         }
       this->CSSynchronizer->SetRootProcessId(0);
       this->CSSynchronizer->SetParallelController(
