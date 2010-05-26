@@ -112,7 +112,10 @@ def OpenDataFile(filename, **extraArgs):
     prototype = servermanager.ProxyManager().GetPrototypeProxy(
       reader_factor.GetReaderGroup(), reader_factor.GetReaderName())
     xml_name = paraview.make_name_valid(prototype.GetXMLLabel())
-    reader = globals()[xml_name](FileName=filename, **extraArgs)
+    if prototype.GetProperty("FileNames"):
+      reader = globals()[xml_name](FileNames=filename, **extraArgs)
+    else :
+      reader = globals()[xml_name](FileName=filename, **extraArgs)
     return reader
 
 def GetRenderView():
