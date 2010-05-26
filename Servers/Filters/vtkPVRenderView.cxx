@@ -14,26 +14,79 @@
 =========================================================================*/
 #include "vtkPVRenderView.h"
 
+#include "vtkCommand.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVSynchronizedRenderer.h"
 #include "vtkPVSynchronizedRenderWindows.h"
 #include "vtkRenderer.h"
 #include "vtkRenderWindow.h"
 #include "vtkRenderWindowInteractor.h"
 #include "vtkSmartPointer.h"
 #include "vtkWeakPointer.h"
-#include "vtkCommand.h"
 
-#include "vtkAxesActor.h"
-#include "vtkSphereSource.h"
-#include "vtkPolyDataMapper.h"
 #include "vtkActor.h"
+#include "vtkDataSetSurfaceFilter.h"
+#include "vtkDistributedDataFilter.h"
+#include "vtkMultiProcessController.h"
+#include "vtkPieceScalars.h"
+#include "vtkPolyDataMapper.h"
+#include "vtkSphereSource.h"
 
 #include <assert.h>
 
 namespace
 {
   static vtkWeakPointer<vtkPVSynchronizedRenderWindows> SynchronizedWindows;
+
+  //-----------------------------------------------------------------------------
+  void CreatePipeline(vtkMultiProcessController* controller, vtkRenderer* renderer)
+    {
+    int num_procs = controller->GetNumberOfProcesses();
+    int my_id = controller->GetLocalProcessId();
+
+    vtkSphereSource* sphere = vtkSphereSource::New();
+    sphere->SetPhiResolution(100);
+    sphere->SetThetaResolution(100);
+
+    vtkDistributedDataFilter* d3 = vtkDistributedDataFilter::New();
+    d3->SetInputConnection(sphere->GetOutputPort());
+    d3->SetController(controller);
+    d3->SetBoundaryModeToSplitBoundaryCells();
+    d3->UseMinimalMemoryOff();
+
+    vtkDataSetSurfaceFilter* surface = vtkDataSetSurfaceFilter::New();
+    surface->SetInputConnection(d3->GetOutputPort());
+
+    vtkPieceScalars *piecescalars = vtkPieceScalars::New();
+    piecescalars->SetInputConnection(surface->GetOutputPort());
+    piecescalars->SetScalarModeToCellData();
+
+    vtkPolyDataMapper* mapper = vtkPolyDataMapper::New();
+    mapper->SetInputConnection(piecescalars->GetOutputPort());
+    mapper->SetScalarModeToUseCellFieldData();
+    mapper->SelectColorArray("Piece");
+    mapper->SetScalarRange(0, num_procs-1);
+    mapper->SetPiece(my_id);
+    mapper->SetNumberOfPieces(num_procs);
+    mapper->Update();
+
+    //this->KdTree = d3->GetKdtree();
+
+    vtkActor* actor = vtkActor::New();
+    actor->SetMapper(mapper);
+    //actor->GetProperty()->SetOpacity(this->UseOrderedCompositing? 0.5 : 1.0);
+    renderer->AddActor(actor);
+
+    actor->Delete();
+    mapper->Delete();
+    piecescalars->Delete();
+    surface->Delete();
+    d3->Delete();
+    sphere->Delete();
+    }
 };
+
+
 
 
 vtkStandardNewMacro(vtkPVRenderView);
@@ -51,6 +104,8 @@ vtkPVRenderView::vtkPVRenderView()
     this->SynchronizedWindows = ::SynchronizedWindows;
     this->SynchronizedWindows->Register(this);
     }
+
+  this->SynchronizedRenderers = vtkPVSynchronizedRenderer::New();
 
   this->Identifier = 0;
 
@@ -96,16 +151,7 @@ vtkPVRenderView::vtkPVRenderView()
   // We don't add the LabelRenderer.
 
   // DUMMY SPHERE FOR TESTING
-  vtkSphereSource* sphere = vtkSphereSource::New();
-  vtkPolyDataMapper* mapper = vtkPolyDataMapper::New();
-  mapper->SetInputConnection(sphere->GetOutputPort());
-  sphere->Delete();
-  vtkActor* actor = vtkActor::New();
-  actor->SetMapper(mapper);
-  mapper->Delete();
-
-  this->Renderer->AddActor(actor);
-  actor->Delete();
+  ::CreatePipeline(vtkMultiProcessController::GetGlobalController(), this->Renderer);
 }
 
 //----------------------------------------------------------------------------
@@ -114,6 +160,7 @@ vtkPVRenderView::~vtkPVRenderView()
   this->SynchronizedWindows->RemoveAllRenderers(this->Identifier);
   this->SynchronizedWindows->RemoveRenderWindow(this->Identifier);
   this->SynchronizedWindows->Delete();
+  this->SynchronizedRenderers->Delete();
   this->NonCompositedRenderer->Delete();
 }
 
@@ -126,6 +173,7 @@ void vtkPVRenderView::Initialize(unsigned int id)
   this->SynchronizedWindows->AddRenderWindow(id, this->GetRenderWindow());
   this->SynchronizedWindows->AddRenderer(id, this->GetRenderer());
   this->SynchronizedWindows->AddRenderer(id, this->GetNonCompositedRenderer());
+  this->SynchronizedRenderers->SetRenderer(this->GetRenderer());
 }
 
 //----------------------------------------------------------------------------

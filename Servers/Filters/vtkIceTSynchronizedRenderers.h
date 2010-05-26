@@ -90,8 +90,6 @@ public:
     }
 
 //BTX
-  void DrawCallback();
-
 protected:
   vtkIceTSynchronizedRenderers();
   ~vtkIceTSynchronizedRenderers();

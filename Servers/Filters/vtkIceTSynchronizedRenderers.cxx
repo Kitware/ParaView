@@ -48,7 +48,7 @@ public:
     this->UpdateLights(s->GetRenderer());
 
     // set matrix mode for actors
-    glMatrixMode(GL_MODELVIEW);
+    //glMatrixMode(GL_MODELVIEW);
 
     this->RenderPass->Render(s);
 

@@ -25,6 +25,7 @@
 #include "vtkRenderView.h"
 
 class vtkPVSynchronizedRenderWindows;
+class vtkPVSynchronizedRenderer;
 class vtkCamera;
 
 class VTK_EXPORT vtkPVRenderView : public vtkRenderView
@@ -65,6 +66,7 @@ protected:
 
   vtkRenderer* NonCompositedRenderer;
   vtkPVSynchronizedRenderWindows* SynchronizedWindows;
+  vtkPVSynchronizedRenderer* SynchronizedRenderers;
   unsigned int Identifier;
 
 private:

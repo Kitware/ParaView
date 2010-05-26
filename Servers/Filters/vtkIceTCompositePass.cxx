@@ -57,7 +57,7 @@ vtkIceTCompositePass::vtkIceTCompositePass()
   this->RenderPass = 0;
   this->KdTree = 0;
   this->TileMullions[0] = this->TileMullions[1] = 0;
-  this->TileDimensions[0] = 2;
+  this->TileDimensions[0] = 1;
   this->TileDimensions[1] = 1;
 
   this->LastTileDimensions[0] = this->LastTileDimensions[1] = -1;

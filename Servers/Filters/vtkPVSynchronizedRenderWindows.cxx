@@ -283,17 +283,31 @@ vtkRenderWindow* vtkPVSynchronizedRenderWindows::NewRenderWindow()
     {
   case BUILTIN:
   case CLIENT:
-    // client always creates new window for each view in the multi layout
-    // configuration.
-    return vtkRenderWindow::New();
+      {
+      // client always creates new window for each view in the multi layout
+      // configuration.
+      vtkRenderWindow* window = vtkRenderWindow::New();
+      window->DoubleBufferOn();
+      window->AlphaBitPlanesOn();
+      return window;
+      }
 
   case SERVER:
   case BATCH:
     // all views share the same render window.
     if (!this->Internals->SharedRenderWindow)
       {
-      this->Internals->SharedRenderWindow =
-        vtkSmartPointer<vtkRenderWindow>::New();
+      vtkRenderWindow* window = vtkRenderWindow::New();
+      window->DoubleBufferOn();
+      window->AlphaBitPlanesOn();
+      // SwapBuffers should be ON only on root node in BATCH mode
+      // or when operating in tile-display mode.
+      bool swap_buffers = true;
+      swap_buffers |= (this->Mode == BATCH &&
+        this->ParallelController->GetLocalProcessId() == 0);
+      //FIXME: for tile-displays
+      window->SetSwapBuffers(swap_buffers? 1 : 0);
+      this->Internals->SharedRenderWindow.TakeReference(window);
       }
     this->Internals->SharedRenderWindow->Register(this);
     return this->Internals->SharedRenderWindow;
@@ -536,7 +550,7 @@ void vtkPVSynchronizedRenderWindows::SatelliteStartRender(
   if (this->ParallelController)
     {
     vtkMultiProcessStream stream;
-    this->ParallelController->Broadcast(stream, 1);
+    this->ParallelController->Broadcast(stream, 0);
 
     // Load the layout for all the windows from the root.
     this->LoadWindowAndLayout(renWin, stream);
