@@ -25,6 +25,9 @@ cvstag=$3
 #sudo apt-get install libglut3
 #sudo apt-get install libglut3-dev
 #sudo apt-get install libglib2.0-dev
+#sudo apt-get install libgstreamer0.10-dev
+#sudo apt-get install libgstreamer-plugins-base0.10-dev
+#sudo apt-get install libgstreamer-plugins0.8-dev
 
 export FC=gfortran
 
@@ -60,7 +63,7 @@ then
   mv src/ qt-4.6.2/src
 
   cd qt-4.6.2/src/
-  echo yes | ./configure --prefix=${SUPPORT_DIR}/qt-4.6.2/bin/ -opengl -optimized-qmake -release -opensource
+  echo yes | ./configure --prefix=${SUPPORT_DIR}/qt-4.6.2/bin/ -opengl -optimized-qmake -release -opensource -phonon
   make -j${CORES}
   make install
 
@@ -114,11 +117,6 @@ then
 else
   echo "PyQt Complete"
 fi
-
-# CMake
-# ./configure --qt-gui --qt-qmake=${SUPPORT_DIR}/qt-4.6.2/bin/bin/qmake
-# make -j${CORES}
-# sudo make install
 
 # VisIt
 
@@ -405,7 +403,7 @@ fi
 # Visit needs a build of VTK so we do a first pass build of ParaView
 # the final pass will then just be an incremental build.
 
-if [ ! -f ${PV_BIN}/bin/paraview123 ];
+if [ ! -f ${PV_BIN}/bin/paraview ];
 then
 
 if [ ! -d ${PV_BASE} ];
@@ -476,7 +474,7 @@ fi
 #=======
 # write out config file
 
-if [ ! -f ${SUPPORT_DIR}/VisIt-1.10.0.X-all/VisItDev1.10.0.X/src/lib/libplugin123.so ];
+if [ ! -f ${SUPPORT_DIR}/VisIt-1.10.0.X-all/VisItDev1.10.0.X/src/lib/libplugin.so ];
 then
 
 cd ${SUPPORT_DIR}/VisIt-1.10.0.X-all
