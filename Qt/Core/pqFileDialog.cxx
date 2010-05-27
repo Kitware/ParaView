@@ -789,6 +789,19 @@ void pqFileDialog::onShowHiddenFiles( const bool &hidden )
   this->Implementation->FileFilter.setShowHidden(hidden);
 }
 
+
+//-----------------------------------------------------------------------------
+void pqFileDialog::setShowHidden( const bool &hidden )
+{
+  this->onShowHiddenFiles(hidden);
+}
+
+//-----------------------------------------------------------------------------
+bool pqFileDialog::getShowHidden()
+{
+  return this->Implementation->FileFilter.getShowHidden();
+}
+
 //-----------------------------------------------------------------------------
 void pqFileDialog::onTextEdited(const QString &str)
 {

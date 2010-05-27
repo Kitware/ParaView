@@ -52,6 +52,7 @@ public:
 public slots:
   void setFilter(const QStringList& wildcards);
   void setShowHidden( const bool &hidden);
+  bool getShowHidden(){return showHidden;};
 
 protected:
   bool filterAcceptsRow(int row_source, const QModelIndex& source_parent) const;

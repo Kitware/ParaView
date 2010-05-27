@@ -121,6 +121,12 @@ public:
   /// set a file current to support test playback
   bool selectFile(const QString&);
 
+  /// set if we show hidden files and holders
+  void setShowHidden( const bool& hidden);
+
+  ///returns the state of the show hidden flag
+  bool getShowHidden();
+
 signals:
   /// Signal emitted when the user has chosen a set of files
   /// and accepted the dialog
