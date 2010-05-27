@@ -17,25 +17,17 @@
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
 #include "vtkRenderer.h"
-#include "vtkRenderPass.h"
 #include "vtkRenderState.h"
 #include "vtkRenderWindow.h"
+#include "vtkTimerLog.h"
 
-#include "vtkCameraPass.h"
-#include "vtkSequencePass.h"
-#include "vtkClearZPass.h"
-#include "vtkVolumetricPass.h"
-#include "vtkOverlayPass.h"
-#include "vtkLightsPass.h"
-#include "vtkRenderPassCollection.h"
-#include "vtkOpaquePass.h"
-#include "vtkTranslucentPass.h"
-#include "vtkDepthPeelingPass.h"
-
-#include "vtkgl.h"
+#include <vtkgl.h>
+#include <GL/ice-t.h>
 
 namespace
 {
+  void IceTDrawCallback();
+
   class vtkInitialPass : public vtkRenderPass
   {
 public:
@@ -43,58 +35,94 @@ public:
   static vtkInitialPass* New();
   virtual void Render(const vtkRenderState *s)
     {
-    // This code is similar to that in vtkOpenGLRenderer::DeviceRender().
+    vtkRenderer* renderer = s->GetRenderer();
+    vtkRenderWindow* window = renderer->GetRenderWindow();
+
+    // CODE COPIED FROM vtkOpenGLRenderer.
+    // Oh! How I hate such kind of copying, sigh :(.
+    vtkTimerLog::MarkStartEvent("OpenGL Dev Render");
 
     // Do not remove this MakeCurrent! Due to Start / End methods on
     // some objects which get executed during a pipeline update,
     // other windows might get rendered since the last time
     // a MakeCurrent was called.
-    s->GetRenderer()->GetRenderWindow()->MakeCurrent();
+    window->MakeCurrent();
 
     // standard render method
-    this->ClearLights(s->GetRenderer());
+    this->ClearLights(renderer);
+    this->UpdateCamera(renderer);
 
-    this->UpdateCamera(s->GetRenderer());
-    this->RenderPass->Render(s);
+    // Don't do any geometry-related rendering just yet. That needs to be done
+    // in the icet callback.
+    this->IceTCompositePass->SetupContext(s);
 
-    // clean up the model view matrix set up by the camera
+    // FIXME: No need to display unless we are in tile-display mode.
+    // icetDisable(ICET_DISPLAY);
+    // icetDisable(ICET_DISPLAY_INFLATE);
+
+    icetDrawFunc(IceTDrawCallback);
+    vtkInitialPass::ActiveRenderer = renderer;
+    vtkInitialPass::ActivePass = this;
+    icetDrawFrame();
+    vtkInitialPass::ActiveRenderer = NULL;
+    vtkInitialPass::ActivePass = NULL;
+
+    this->IceTCompositePass->CleanupContext(s);
+
+    //// clean up the model view matrix set up by the camera
     glMatrixMode(GL_MODELVIEW);
     glPopMatrix();
+
+    vtkTimerLog::MarkEndEvent("OpenGL Dev Render");
     }
 
-  vtkSetObjectMacro(RenderPass, vtkRenderPass);
+  static void Draw()
+    {
+    if (vtkInitialPass::ActiveRenderer && vtkInitialPass::ActivePass)
+      {
+      vtkInitialPass::ActivePass->DrawInternal(vtkInitialPass::ActiveRenderer);
+      }
+    }
+
+  vtkSetObjectMacro(IceTCompositePass, vtkIceTCompositePass);
 protected:
+  static vtkInitialPass* ActivePass;
+  static vtkRenderer* ActiveRenderer;
+
   vtkInitialPass()
     {
-    this->RenderPass = 0;
+    this->IceTCompositePass = 0;
     }
+
   ~vtkInitialPass()
     {
-    this->SetRenderPass(0);
+    this->SetIceTCompositePass(0);
     }
 
-  vtkRenderPass* RenderPass;
+  void DrawInternal(vtkRenderer* ren)
+    {
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    this->UpdateLightGeometry(ren);
+    this->UpdateLights(ren);
+
+    //// set matrix mode for actors
+    glMatrixMode(GL_MODELVIEW);
+
+    this->UpdateGeometry(ren);
+    }
+
+  vtkIceTCompositePass* IceTCompositePass;
   };
+
+  vtkInitialPass* vtkInitialPass::ActivePass = NULL;
+  vtkRenderer* vtkInitialPass::ActiveRenderer = NULL;
   vtkStandardNewMacro(vtkInitialPass);
 
-  class vtkUpdateGeometryPass : public vtkRenderPass
-  {
-public:
-  vtkTypeMacro(vtkUpdateGeometryPass, vtkRenderPass);
-  static vtkUpdateGeometryPass* New();
-  virtual void Render(const vtkRenderState *s)
+
+  void IceTDrawCallback()
     {
-    this->UpdateLightGeometry(s->GetRenderer());
-    this->UpdateLights(s->GetRenderer());
-
-    // set matrix mode for actors
-    // glMatrixMode(GL_MODELVIEW);
-
-    // need to add code for visibility culling.
-    this->UpdateGeometry(s->GetRenderer());
+    vtkInitialPass::Draw();
     }
-  };
-  vtkStandardNewMacro(vtkUpdateGeometryPass);
 };
 
 
@@ -108,14 +136,8 @@ vtkIceTSynchronizedRenderers::vtkIceTSynchronizedRenderers()
   this->IceTCompositePass = vtkIceTCompositePass::New();
 
   vtkInitialPass* initPass = vtkInitialPass::New();
-  initPass->SetRenderPass(this->IceTCompositePass);
-
-  vtkUpdateGeometryPass* updateGeoPass = vtkUpdateGeometryPass::New();
-  this->IceTCompositePass->SetRenderPass(updateGeoPass);
-  updateGeoPass->Delete();
-
+  initPass->SetIceTCompositePass(this->IceTCompositePass);
   this->RenderPass = initPass;
-
   this->SetParallelController(vtkMultiProcessController::GetGlobalController());
 }
 
@@ -131,7 +153,15 @@ vtkIceTSynchronizedRenderers::~vtkIceTSynchronizedRenderers()
 //----------------------------------------------------------------------------
 void vtkIceTSynchronizedRenderers::SetRenderer(vtkRenderer* ren)
 {
+  if (this->Renderer && this->Renderer->GetPass() == this->RenderPass)
+    {
+    this->Renderer->SetPass(NULL);
+    }
   this->Superclass::SetRenderer(ren);
+  if (ren)
+    {
+    ren->SetPass(this->RenderPass);
+    }
 }
 
 //----------------------------------------------------------------------------

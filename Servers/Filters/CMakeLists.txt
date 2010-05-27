@@ -59,7 +59,6 @@ SET(Filters_SRCS
   vtkFlashReader.cxx
   vtkHierarchicalFractal.cxx
   vtkGridConnectivity.cxx
-  vtkIceTSynchronizedRenderers.cxx
   vtkImageCompressor.cxx
   vtkImageSliceMapper.cxx
   vtkIntegrateAttributes.cxx
@@ -253,11 +252,11 @@ IF (PARAVIEW_USE_ICE_T)
     SET(Filters_SRCS
       ${Filters_SRCS}
       vtkCaveRenderManager.cxx
-      vtkIceTContext.cxx
-      vtkIceTRenderManager.cxx
-      vtkIceTRenderer.cxx
-      vtkIceTRenderer2.cxx
       vtkIceTCompositePass.cxx
+      vtkIceTContext.cxx
+      vtkIceTRenderer.cxx
+      vtkIceTRenderManager.cxx
+      vtkIceTSynchronizedRenderers.cxx
       )
   ENDIF(VTK_USE_MPI)
 ENDIF (PARAVIEW_USE_ICE_T)

@@ -19,7 +19,10 @@
 // Tiles) for parallel rendering and compositing.
 // This class simply uses vtkIceTCompositePass internally, even though this
 // class is designed to be used with traditional renderers and not those using
-// render-passes.
+// render-passes. Note that this class internally does indeed leverage the
+// RenderPass mechanism to intercept render calls from a vtkRenderer. In other
+// words, if you are using render passes, you should not use this class. Your
+// render passes will  be overridden.
 
 #ifndef __vtkIceTSynchronizedRenderers_h
 #define __vtkIceTSynchronizedRenderers_h

@@ -15,13 +15,17 @@
 #include "vtkPVSynchronizedRenderer.h"
 
 #include "vtkClientServerSynchronizedRenderers.h"
-#include "vtkSynchronizedRenderers.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
+#include "vtkPVConfig.h"
 #include "vtkPVOptions.h"
 #include "vtkPVServerInformation.h"
 #include "vtkRemoteConnection.h"
 #include "vtkSocketController.h"
+
+#ifdef PARAVIEW_USE_ICE_T
+# include "vtkIceTSynchronizedRenderers.h"
+#endif
 
 vtkStandardNewMacro(vtkPVSynchronizedRenderer);
 vtkCxxRevisionMacro(vtkPVSynchronizedRenderer, "$Revision$");
@@ -112,7 +116,12 @@ vtkPVSynchronizedRenderer::vtkPVSynchronizedRenderer()
   case BATCH:
     if (pm->GetNumberOfLocalPartitions() > 1)
       {
+#ifdef PARAVIEW_USE_ICE_T
+      this->ParallelSynchronizer = vtkIceTSynchronizedRenderers::New();
+#else
+      // FIXME: need to add support for compositing.
       this->ParallelSynchronizer = vtkSynchronizedRenderers::New();
+#endif
       this->ParallelSynchronizer->SetParallelController(
         vtkMultiProcessController::GetGlobalController());
       if (pm->GetPartitionId() == 0 && this->Mode == BATCH)
