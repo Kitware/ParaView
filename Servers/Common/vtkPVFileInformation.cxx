@@ -92,7 +92,7 @@ static bool IsNetworkPath(const vtkstd::string& path)
 }
 
 // returns true if path is valid, false otherwise
-// returns subdirs, if any 
+// returns subdirs, if any
 
 static bool getNetworkSubdirs(const vtkstd::string& name,
                               DWORD DisplayType,
@@ -163,7 +163,7 @@ static bool getNetworkSubdirs(const vtkstd::string& path,
 
   static DWORD DisplayType[MaxTokens] =
     {
-    RESOURCEDISPLAYTYPE_NETWORK, 
+    RESOURCEDISPLAYTYPE_NETWORK,
     RESOURCEDISPLAYTYPE_DOMAIN,
     RESOURCEDISPLAYTYPE_SERVER,
     RESOURCEDISPLAYTYPE_SHARE
@@ -196,7 +196,7 @@ static bool getNetworkSubdirs(const vtkstd::string& path,
 static bool getUncSharesOnServer(const vtkstd::string& server,
                           vtkstd::vector<vtkstd::string>& ret)
 {
-  return getNetworkSubdirs(vtkstd::string("\\\\") + server, 
+  return getNetworkSubdirs(vtkstd::string("\\\\") + server,
                          RESOURCEDISPLAYTYPE_SERVER, ret);
 }
 
@@ -207,7 +207,7 @@ static int vtkPVFileInformationGetType(const char* path)
   int type = vtkPVFileInformation::INVALID;
 
   vtkstd::string realpath = path;
-  
+
   if(vtksys::SystemTools::FileExists(realpath.c_str()))
     {
     type = vtkPVFileInformation::SINGLE_FILE;
@@ -220,7 +220,7 @@ static int vtkPVFileInformationGetType(const char* path)
   // doing stat on root of devices doesn't work
 
   // is it the root of a drive?
-  if (realpath[0] && realpath[1] == ':' && (realpath[2] == '\0' || 
+  if (realpath[0] && realpath[1] == ':' && (realpath[2] == '\0' ||
       (realpath[2] == '\\' && realpath[3] == '\0')))
     {
     // Path may be drive letter.
@@ -234,7 +234,7 @@ static int vtkPVFileInformationGetType(const char* path)
 
   if(IsNetworkPath(realpath))
     {
-    // this code doesn't give out anything with 
+    // this code doesn't give out anything with
     // "Windows Network\..." unless its a directory.
     // that may change
     vtkstd::vector<vtksys::String> pathtokens;
@@ -304,15 +304,15 @@ static vtkstd::string vtkPVFileInformationResolveLink(const vtkstd::string& fnam
   bool coInit = false;
   vtkstd::string result;
 
-  hr = ::CoCreateInstance(CLSID_ShellLink, NULL, 
+  hr = ::CoCreateInstance(CLSID_ShellLink, NULL,
                           CLSCTX_INPROC_SERVER, IID_IShellLink,
                           (LPVOID*)&shellLink);
   if(hr == CO_E_NOTINITIALIZED)
     {
     coInit = true;
     ::CoInitialize(NULL);
-    hr = ::CoCreateInstance(CLSID_ShellLink, NULL, 
-                            CLSCTX_INPROC_SERVER, IID_IShellLink, 
+    hr = ::CoCreateInstance(CLSID_ShellLink, NULL,
+                            CLSCTX_INPROC_SERVER, IID_IShellLink,
                             (LPVOID*)&shellLink);
     }
   if(SUCCEEDED(hr))
@@ -360,7 +360,7 @@ vtkstd::string MakeAbsolutePath(const vtkstd::string& path,
 
 
 //-----------------------------------------------------------------------------
-class vtkPVFileInformationSet : 
+class vtkPVFileInformationSet :
   public vtkstd::set<vtkSmartPointer<vtkPVFileInformation> >
 {
 };
@@ -386,7 +386,7 @@ vtkPVFileInformation::~vtkPVFileInformation()
 
 bool vtkPVFileInformation::IsDirectory(int t)
 {
-  return t == DIRECTORY || t == DIRECTORY_LINK || 
+  return t == DIRECTORY || t == DIRECTORY_LINK ||
          t == DRIVE || t == NETWORK_ROOT ||
          t == NETWORK_DOMAIN || t == NETWORK_SERVER ||
          t == NETWORK_SHARE;
@@ -397,7 +397,7 @@ void vtkPVFileInformation::CopyFromObject(vtkObject* object)
 {
   this->Initialize();
 
-  vtkPVFileInformationHelper* helper = 
+  vtkPVFileInformationHelper* helper =
     vtkPVFileInformationHelper::SafeDownCast(object);
   if (!helper)
     {
@@ -414,7 +414,7 @@ void vtkPVFileInformation::CopyFromObject(vtkObject* object)
 
   this->FastFileTypeDetection = helper->GetFastFileTypeDetection();
 
-  vtkstd::string working_directory = 
+  vtkstd::string working_directory =
     vtksys::SystemTools::GetCurrentWorkingDirectory().c_str();
   if (helper->GetWorkingDirectory() && helper->GetWorkingDirectory()[0])
     {
@@ -434,7 +434,7 @@ void vtkPVFileInformation::CopyFromObject(vtkObject* object)
     {
     path.replace(idx, 1, 1, '\\');
     }
-  
+
   int len = static_cast<int>(path.size());
   if(len > 4 && path.compare(len-4, 4, ".lnk") == 0)
     {
@@ -456,9 +456,12 @@ void vtkPVFileInformation::CopyFromObject(vtkObject* object)
     this->Type = DIRECTORY_LINK;
     }
 
+  //determine if this is a hidden directory/file
+  this->setHiddenFlag();
+
   if (this->IsDirectory(this->Type) && helper->GetDirectoryListing())
     {
-    // Since we want a directory listing, we now to platform specific listing 
+    // Since we want a directory listing, we now to platform specific listing
     // with intelligent pattern matching hee-haa.
 #if defined(_WIN32)
     this->GetWindowsDirectoryListing();
@@ -477,7 +480,7 @@ void vtkPVFileInformation::GetSpecialDirectories()
   // Return favorite directories ...
 
   TCHAR szPath[MAX_PATH];
-  
+
   if(SUCCEEDED(SHGetSpecialFolderPath(NULL, szPath, CSIDL_PERSONAL, false)))
     {
     vtkSmartPointer<vtkPVFileInformation> info =
@@ -525,7 +528,7 @@ void vtkPVFileInformation::GetSpecialDirectories()
       this->Contents->AddItem(info);
       }
     }
-  
+
   vtkSmartPointer<vtkPVFileInformation> info =
       vtkSmartPointer<vtkPVFileInformation>::New();
   info->SetFullPath(WindowsNetworkRoot.c_str());
@@ -536,7 +539,7 @@ void vtkPVFileInformation::GetSpecialDirectories()
 #else // _WIN32
 #if defined (__APPLE__ )
   //-------- Get the List of Mounted Volumes from the System
-  
+
   int idx = 1;
   HFSUniStr255 hfsname;
   FSRef ref;
@@ -663,7 +666,7 @@ void vtkPVFileInformation::GetSpecialDirectories()
     this->Contents->AddItem(info);
     }
 #endif
-#endif // !_WIN32  
+#endif // !_WIN32
 }
 
 //-----------------------------------------------------------------------------
@@ -682,7 +685,7 @@ void vtkPVFileInformation::GetWindowsDirectoryListing()
         {
         vtkPVFileInformation* info = vtkPVFileInformation::New();
         info->SetName(shares[i].c_str());
-        vtkstd::string fullpath = 
+        vtkstd::string fullpath =
           vtksys::SystemTools::CollapseFullPath(shares[i].c_str(), this->FullPath);
         info->SetFullPath(fullpath.c_str());
         info->Type = type;
@@ -781,8 +784,7 @@ void vtkPVFileInformation::GetWindowsDirectoryListing()
 
     DWORD isdir = data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY;
     DWORD isfile = (data.dwFileAttributes & FILE_ATTRIBUTE_NORMAL) ||
-                  (!(data.dwFileAttributes & FILE_ATTRIBUTE_HIDDEN) &&
-                   !(data.dwFileAttributes & FILE_ATTRIBUTE_SYSTEM) &&
+                   (!(data.dwFileAttributes & FILE_ATTRIBUTE_SYSTEM) &&
                    !(data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY));
 
     FileTypes type = isdir ? DIRECTORY : SINGLE_FILE;
@@ -798,6 +800,7 @@ void vtkPVFileInformation::GetWindowsDirectoryListing()
       infoD->SetFullPath(fullpath.c_str());
       infoD->Type = type;
       infoD->FastFileTypeDetection = this->FastFileTypeDetection;
+      infoD->setHiddenFlag(); //needs full path set first
       info_set.insert(infoD);
       infoD->Delete();
       }
@@ -836,7 +839,7 @@ void vtkPVFileInformation::GetWindowsDirectoryListing()
 }
 
 /* There is a problem with the Portland compiler, large file
-support and glibc/Linux system headers: 
+support and glibc/Linux system headers:
              http://www.pgroup.com/userforum/viewtopic.php?
              p=1992&sid=f16167f51964f1a68fe5041b8eb213b6
 */
@@ -905,7 +908,7 @@ void vtkPVFileInformation::GetDirectoryListing()
 
   // Now we detect the file types for items.
   // We dissolve any groups that contain non-file items.
-  
+
   for (vtkPVFileInformationSet::iterator iter = info_set.begin();
     iter != info_set.end(); ++iter)
     {
@@ -931,6 +934,44 @@ void vtkPVFileInformation::GetDirectoryListing()
 #endif
 }
 
+//-----------------------------------------------------------------------------
+void vtkPVFileInformation::setHiddenFlag( )
+{
+  if ( !this->FullPath )
+    {
+    this->Hidden = false;
+    }
+#if defined(_WIN32)
+  LPCSTR fp = this->FullPath;
+  DWORD flags= GetFileAttributes(fp);
+  this->Hidden =( flags & FILE_ATTRIBUTE_HIDDEN) ? true: false;
+#elif defined (__APPLE__)
+  OSErr error = noErr;
+  FSRef ref;
+  error = FSPathMakeRefWithOptions(this->FullPath,
+        kFSPathMakeRefDoNotFollowLeafSymlink, &ref, 0);
+  if ( error != noErr )
+    {
+    this->Hidden = false;
+    return;
+    }
+  FSCatalogInfo catalogInfo;
+  error = FSGetCatalogInfo(&ref, kFSCatInfoFinderInfo,
+    &catalogInfo, NULL, NULL, NULL);
+  if (error != noErr)
+    {
+    this->Hidden = false;
+    return;
+    }
+  FileInfo* const fInfo =
+    reinterpret_cast<FileInfo*>(&catalogInfo.finderInfo);
+  this->Hidden = (fInfo->finderFlags & kIsInvisible) ? true:false;
+#else
+  this->Hidden =( filePath &&strlen(filePath) > 0 &&filePath[0] == '.' )
+    ? true:false;
+#endif
+
+}
 
 //-----------------------------------------------------------------------------
 bool vtkPVFileInformation::DetectType()
@@ -965,7 +1006,7 @@ bool vtkPVFileInformation::DetectType()
     {
     if (vtksys::SystemTools::FileExists(this->FullPath))
       {
-      this-> Type = 
+      this-> Type =
         (vtksys::SystemTools::FileIsDirectory(this->FullPath))?
         DIRECTORY : SINGLE_FILE;
       return true;
@@ -988,7 +1029,7 @@ void vtkPVFileInformation::OrganizeCollection(vtkPVFileInformationSet& info_set)
 {
   typedef vtkstd::map<vtkstd::string, vtkInfo> MapOfStringToInfo;
   MapOfStringToInfo fileGroups;
-  
+
   vtkstd::string prefix = this->FullPath;
   vtkPVFileInformationAddTerminatingSlash(prefix);
 
@@ -996,7 +1037,7 @@ void vtkPVFileInformation::OrganizeCollection(vtkPVFileInformationSet& info_set)
   vtksys::RegularExpression reg_ex("^(.*)\\.([0-9.]+)$");
   // sequence ending with extension.
   vtksys::RegularExpression reg_ex2("^(.*)(\\.|_|-)([0-9.]+)\\.(.*)$");
-  
+
   // sequence ending with extension, but with no ". or _" before
   // the series number.
   vtksys::RegularExpression reg_ex3("^(.*)([a-zA-Z])([0-9.]+)\\.(.*)$");
@@ -1089,7 +1130,7 @@ void vtkPVFileInformation::OrganizeCollection(vtkPVFileInformationSet& info_set)
 
 
   // Now scan through all created groups and dissolve trivial groups
-  // i.e. groups with single entries. Add all other groups to the 
+  // i.e. groups with single entries. Add all other groups to the
   // results.
  for (MapOfStringToInfo::iterator iter2 = fileGroups.begin();
    iter2 != fileGroups.end(); ++iter2)
@@ -1125,8 +1166,9 @@ void vtkPVFileInformation::CopyToStream(vtkClientServerStream* stream)
     << this->Name
     << this->FullPath
     << this->Type
+    << this->Hidden
     << this->Contents->GetNumberOfItems();
-  
+
   vtkSmartPointer<vtkCollectionIterator> iter;
   iter.TakeReference(this->Contents->NewIterator());
   for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
@@ -1165,8 +1207,14 @@ void vtkPVFileInformation::CopyFromStream(const vtkClientServerStream* css)
     return;
     }
 
+  if (!css->GetArgument(0, 3, &this->Hidden))
+    {
+    vtkErrorMacro("Error parsing Hidden.");
+    return;
+    }
+
   int num_of_children =0;
-  if (!css->GetArgument(0, 3, &num_of_children))
+  if (!css->GetArgument(0, 4, &num_of_children))
     {
     vtkErrorMacro("Error parsing Number of children.");
     return;
@@ -1175,7 +1223,7 @@ void vtkPVFileInformation::CopyFromStream(const vtkClientServerStream* css)
     {
     vtkPVFileInformation* child = vtkPVFileInformation::New();
     vtkClientServerStream childStream;
-    if (!css->GetArgument(0, 4+cc, &childStream))
+    if (!css->GetArgument(0, 5+cc, &childStream))
       {
       vtkErrorMacro("Error parsing child #" << cc);
       return;
@@ -1192,6 +1240,7 @@ void vtkPVFileInformation::Initialize()
   this->SetName(0);
   this->SetFullPath(0);
   this->Type = INVALID;
+  this->Hidden = false;
   this->Contents->RemoveAllItems();
 }
 
@@ -1200,7 +1249,7 @@ void vtkPVFileInformation::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
   os << indent << "Name: " << (this->Name? this->Name: "(null)") << endl;
-  os << indent << "FullPath: " 
+  os << indent << "FullPath: "
     << (this->FullPath? this->FullPath : "(null)") << endl;
   os << indent << "Type: " ;
   switch (this->Type)
@@ -1220,6 +1269,7 @@ void vtkPVFileInformation::PrintSelf(ostream& os, vtkIndent indent)
   case FILE_GROUP:
     os << "FILE_GROUP" << endl;
     }
+  os << indent << "Hidden: "<< this->Hidden << endl;
   os << indent << "FastFileTypeDetection: " << this->FastFileTypeDetection << endl;
 
   for (int cc=0; cc < this->Contents->GetNumberOfItems(); cc++)

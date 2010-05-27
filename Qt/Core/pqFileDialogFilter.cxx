@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -29,7 +29,7 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-  
+
 
 #include "pqFileDialogFilter.h"
 
@@ -39,7 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqFileDialogModel.h"
 
 pqFileDialogFilter::pqFileDialogFilter(pqFileDialogModel* model, QObject* Parent)
-  : QSortFilterProxyModel(Parent), Model(model)
+  : QSortFilterProxyModel(Parent), Model(model), showHidden(false)
 {
   this->setSourceModel(model);
 }
@@ -55,22 +55,39 @@ void pqFileDialogFilter::setFilter(const QStringList& wildcards)
     {
     Wildcards.append(QRegExp(p, Qt::CaseInsensitive, QRegExp::Wildcard));
     }
+  this->invalidateFilter();
+}
+
+void pqFileDialogFilter::setShowHidden( const bool &hidden)
+{
+  if ( this->showHidden != hidden )
+    {
+    this->showHidden = hidden;
+    this->invalidateFilter();
+    }
+
 }
 
 bool pqFileDialogFilter::filterAcceptsRow(int row_source, const QModelIndex& source_parent) const
 {
   QModelIndex idx = this->Model->index(row_source, 0, source_parent);
+
+  //hidden flag supersedes anything else
+  if ( this->Model->isHidden(idx) && !this->showHidden)
+    {
+    return false;
+    }
+
   if(this->Model->isDir(idx))
     {
     return true;
     }
-
   QString str = this->sourceModel()->data(idx).toString();
-  
+
   // To fix bug #0008159, grouped files MUST undergo the for-loop below
-  // to check if the extension part really matches the wildcards / filters. 
+  // to check if the extension part really matches the wildcards / filters.
   bool pass = false;
-  
+
   // The following if-statement is intended to support the visibility
   // of grouped 'spcth' files in the file dialog. 'str' is updated below
   // with the full name of the first 'spcth' file (for a group of 'spcth'
@@ -88,7 +105,7 @@ bool pqFileDialogFilter::filterAcceptsRow(int row_source, const QModelIndex& sou
     {
     pass = this->Wildcards[i].exactMatch(str);
     }
-    
+
   return pass;
 }
 

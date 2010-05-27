@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -60,14 +60,14 @@ class pqServer;
     SIGNAL(filesSelected(const QStringList&)),
     this,
     SLOT(onOpenSessionFile(const QStringList&)));
-  
+
   dialog->show();
   /endcode
 
   For "modal" operation, create an instance of pqFileDialog on the stack,
   call its exec() method, and retrieve the user's file selection with the
   getSelectedFiles() method:
-  
+
   /code
   pqFileDialog dialog(NULL, this);
   if(Qt::Accepted == dialog.exec())
@@ -75,7 +75,7 @@ class pqServer;
     QStringList files = dialog.getSelectedFiles();
     }
   /endcode
-  
+
   \sa pqFileDialogModel
 */
 
@@ -87,22 +87,22 @@ class PQCORE_EXPORT pqFileDialog :
 public:
 
   /// choose mode for selecting file/folder.
-  /// AnyFile: The name of a file, whether it exists or not.  
+  /// AnyFile: The name of a file, whether it exists or not.
   ///   Typically used by "Save As..."
   /// ExistingFile: The name of a single existing file.
   ///   Typically used by "Open..."
   /// ExistingFiles: The names of zero or more existing files.
   /// Directory: The name of a directory.
   enum FileMode { AnyFile, ExistingFile, ExistingFiles, Directory };
-    
+
   /// Creates a file dialog with the specified server
   /// if the server is NULL, files are browsed locally
   /// the title, and start directory may be specified
   /// the filter is a string of semi-colon separated filters
   pqFileDialog(pqServer*,
-    QWidget* Parent, 
-    const QString& Title = QString(), 
-    const QString& Directory = QString(), 
+    QWidget* Parent,
+    const QString& Title = QString(),
+    const QString& Directory = QString(),
     const QString& Filter = QString());
   ~pqFileDialog();
 
@@ -143,13 +143,15 @@ private slots:
   void onClickedRecent(const QModelIndex&);
   void onClickedFavorite(const QModelIndex&);
   void onClickedFile(const QModelIndex&);
-  
+
   void onActivateFavorite(const QModelIndex&);
   void onActivateRecent(const QModelIndex&);
   void onActivateFile(const QModelIndex&);
-  
+
   void onTextEdited(const QString&);
-  
+
+  void onShowHiddenFiles( const bool &hide );
+
   // Called when the user changes the file selection.
   void fileSelectionChanged();
 
@@ -165,7 +167,7 @@ private slots:
 private:
   pqFileDialog(const pqFileDialog&);
   pqFileDialog& operator=(const pqFileDialog&);
-  
+
   class pqImplementation;
   pqImplementation* const Implementation;
 

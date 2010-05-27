@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -55,7 +55,7 @@ To use, pass a new instance of pqServerFileDialogModel to pqFileDialog object.
 class PQCORE_EXPORT pqFileDialogModel : public QAbstractItemModel
 {
   typedef QAbstractItemModel base;
-  
+
   Q_OBJECT
 
 public:
@@ -66,11 +66,14 @@ public:
 
   /// Sets the path that the file dialog will display
   void setCurrentPath(const QString&);
-  
+
   /// Returns the path the the file dialog will display
   QString getCurrentPath();
-  
-  /// Return true iff the given row is a directory
+
+  /// Return true if the file at the index is hidden
+  bool isHidden( const QModelIndex& );
+
+  /// Return true if the given row is a directory
   bool isDir(const QModelIndex&);
 
   // Creates a directory. "dirName" can be relative or absolute path
@@ -78,26 +81,26 @@ public:
 
   // Removes a directory. "dirName" can be relative or absolute path
   bool rmdir(const QString& dirname);
-  
+
   // Renames a directory or file.
   bool rename(const QString& oldname, const QString& newname);
 
   /// Returns whether the file exists
   /// also returns the full path, which could be a resolved shortcut
   bool fileExists(const QString& file, QString& fullpath);
-  
+
   /// Returns whether a directory exists
   /// also returns the full path, which could be a resolved shortcut
   bool dirExists(const QString& dir, QString& fullpath);
-  
+
   /// returns the path delimiter, could be \ or / depending on the platform
   /// this model is browsing
   QChar separator() const;
 
   /// return the absolute path for this file
   QString absoluteFilePath(const QString&);
-  
-  /// Returns the set of file paths associated with the given row 
+
+  /// Returns the set of file paths associated with the given row
   /// (a row may represent one-to-many paths if grouping is implemented)
   /// this also resolved symlinks if necessary
   QStringList getFilePaths(const QModelIndex&);
@@ -107,7 +110,7 @@ public:
 
   /// sets data (used by the view when editing names of folders)
   bool setData(const QModelIndex& idx, const QVariant& value, int role);
-  
+
   // overloads for QAbstractItemModel
 
   /// return the number of columns in the model
@@ -126,7 +129,7 @@ public:
   QVariant headerData(int section, Qt::Orientation, int role) const;
   /// returns flags for item
   Qt::ItemFlags flags(const QModelIndex& idx) const;
-  
+
 private:
   class pqImplementation;
   pqImplementation* const Implementation;
@@ -136,7 +139,7 @@ private:
 class pqFileDialogModelIconProvider : protected QFileIconProvider
 {
 public:
-  enum IconType { Computer, Drive, Folder, File, FolderLink, FileLink, 
+  enum IconType { Computer, Drive, Folder, File, FolderLink, FileLink,
                   NetworkRoot, NetworkDomain, NetworkFolder };
   pqFileDialogModelIconProvider();
   QIcon icon(IconType t) const;

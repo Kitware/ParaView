@@ -17,7 +17,7 @@
 // .SECTION Description
 // vtkPVFileInformation can be used to collect information about file
 // or directory. vtkPVFileInformation can collect information
-// from a vtkPVFileInformationHelper object alone. 
+// from a vtkPVFileInformationHelper object alone.
 // .SECTION See Also
 // vtkPVFileInformationHelper
 
@@ -63,7 +63,7 @@ public:
     };
 
   // Description:
-  // Helper that returns whether a FileType is a 
+  // Helper that returns whether a FileType is a
   // directory (DIRECTORY, DRIVE, NETWORK_ROOT, etc...)
   // Or in other words, a type that we can do a DirectoryListing on.
   static bool IsDirectory(int t);
@@ -75,18 +75,22 @@ public:
   void Initialize();
 
   // Description:
-  // Get the name of the file/directory whose information is 
+  // Get the name of the file/directory whose information is
   // represented by this object.
   vtkGetStringMacro(Name);
 
   // Description:
-  // Get the full path of the file/directory whose information is 
+  // Get the full path of the file/directory whose information is
   // represented by this object.
   vtkGetStringMacro(FullPath);
 
   // Description:
   // Get the type of this file object.
   vtkGetMacro(Type, int);
+
+  // Description:
+  // Get the state of the hidden flag for the file/directory.
+  vtkGetMacro(Hidden,bool);
 
   // Description:
   // Get the Contents for this directory.
@@ -100,10 +104,11 @@ protected:
   ~vtkPVFileInformation();
 
   vtkCollection* Contents;
-  
+
   char* Name;     // Name of this file/directory.
   char* FullPath; // Full path for this file/directory.
   int Type;       // Type i.e. File/Directory/FileGroup.
+  bool Hidden;    // If file/directory is hidden
 
   vtkSetStringMacro(Name);
   vtkSetStringMacro(FullPath);
@@ -113,12 +118,12 @@ protected:
   void GetDirectoryListing();
 
   // Goes thru the collection of vtkPVFileInformation objects
-  // are creates file groups, if possible. 
+  // are creates file groups, if possible.
   void OrganizeCollection(vtkPVFileInformationSet& vector);
 
   bool DetectType();
   void GetSpecialDirectories();
-
+  void setHiddenFlag( );
   int FastFileTypeDetection;
 private:
   vtkPVFileInformation(const vtkPVFileInformation&); // Not implemented.

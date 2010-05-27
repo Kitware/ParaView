@@ -170,9 +170,7 @@ public:
       if ( event->type() == QEvent::KeyPress )
         {
         QKeyEvent *keyEvent = static_cast<QKeyEvent*>(event);
-        if (keyEvent->key() == Qt::Key_Backspace ||
-          keyEvent->key() == Qt::Key_Backtab ||
-          keyEvent->key() == Qt::Key_Delete)
+        if (keyEvent->matches(QKeySequence::Delete) )
           {
           this->Ui.FileName->setFocus(Qt::OtherFocusReason);
           //send out a backspace event to the file name now
@@ -217,7 +215,9 @@ public:
       {
       this->LocalFilePath = p;
       }
-    this->Ui.Files->setFocus(Qt::OtherFocusReason);
+    this->Ui.Favorites->clearSelection();
+    this->Ui.Recent->clearSelection();
+    this->Ui.FileName->setFocus(Qt::OtherFocusReason);
     }
 
   void addHistory(const QString& p)
@@ -279,6 +279,7 @@ pqFileDialog::pqFileDialog(
   Implementation(new pqImplementation(this, server))
 {
   this->Implementation->Ui.setupUi(this);
+  this->setWindowTitle(title);
 
   this->Implementation->Ui.Files->setEditTriggers(QAbstractItemView::EditKeyPressed);
 
@@ -288,7 +289,6 @@ pqFileDialog::pqFileDialog(
   //install the autocompleter
   this->Implementation->Ui.FileName->setCompleter(this->Implementation->Completer);
 
-  this->setWindowTitle(title);
 
   QPixmap back = style()->standardPixmap(QStyle::SP_FileDialogBack);
   this->Implementation->Ui.NavigateBack->setIcon(back);
@@ -393,6 +393,11 @@ pqFileDialog::pqFileDialog(
                    SIGNAL(textEdited(const QString&)),
                    this,
                    SLOT(onTextEdited(const QString&)));
+
+    QObject::connect(this->Implementation->Ui.ShowHiddenFiles,
+                   SIGNAL(clicked(const bool&)),
+                   this,
+                   SLOT(onShowHiddenFiles(const bool&)));
 
   QStringList filterList = MakeFilterList(nameFilter);
   if(filterList.empty())
@@ -757,6 +762,12 @@ void pqFileDialog::onActivateFile(const QModelIndex& index)
   selected_files << this->Implementation->Model->getFilePaths(actual_index);
 
   this->acceptInternal(selected_files);
+}
+
+//-----------------------------------------------------------------------------
+void pqFileDialog::onShowHiddenFiles( const bool &hidden )
+{
+  this->Implementation->FileFilter.setShowHidden(hidden);
 }
 
 //-----------------------------------------------------------------------------
