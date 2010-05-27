@@ -20,6 +20,7 @@
 #include "vtkProcessModule.h"
 #include "vtkRemoteConnection.h"
 #include "vtkRenderer.h"
+#include "vtkRendererCollection.h"
 #include "vtkRenderWindow.h"
 #include "vtkSmartPointer.h"
 #include "vtkSocketController.h"
@@ -79,6 +80,7 @@ public:
     }
 
   vtkSmartPointer<vtkRenderWindow> SharedRenderWindow;
+  unsigned int ActiveId;
 };
 
 //----------------------------------------------------------------------------
@@ -130,11 +132,7 @@ namespace
     stream >> id;
     vtkPVSynchronizedRenderWindows* self =
       reinterpret_cast<vtkPVSynchronizedRenderWindows*>(localArg);
-    vtkRenderWindow* window = self->GetRenderWindow(id);
-    if (window)
-      {
-      window->Render();
-      }
+    self->Render(id);
     }
 };
 
@@ -302,7 +300,7 @@ vtkRenderWindow* vtkPVSynchronizedRenderWindows::NewRenderWindow()
       window->AlphaBitPlanesOn();
       // SwapBuffers should be ON only on root node in BATCH mode
       // or when operating in tile-display mode.
-      bool swap_buffers = false;
+      bool swap_buffers = true;
       swap_buffers |= (this->Mode == BATCH &&
         this->ParallelController->GetLocalProcessId() == 0);
       //FIXME: for tile-displays
@@ -436,6 +434,41 @@ const int *vtkPVSynchronizedRenderWindows::GetWindowPosition(unsigned int id)
 }
 
 //----------------------------------------------------------------------------
+void vtkPVSynchronizedRenderWindows::Render(unsigned int id)
+{
+  cout << "Rendering: " << id << endl;
+  vtkInternals::RenderWindowsMap::iterator iter =
+    this->Internals->RenderWindows.find(id);
+  if (iter == this->Internals->RenderWindows.end())
+    {
+    return;
+    }
+
+  // disable all other renderers.
+  vtkRendererCollection* renderers = iter->second.RenderWindow->GetRenderers();
+  renderers->InitTraversal();
+  while (vtkRenderer* ren = renderers->GetNextItem())
+    {
+    ren->DrawOff();
+    }
+
+  vtkInternals::VectorOfRenderers::iterator iterRen;
+  for (iterRen = iter->second.Renderers.begin();
+    iterRen != iter->second.Renderers.end(); ++iterRen)
+    {
+    iterRen->GetPointer()->DrawOn();
+    }
+
+  // FIXME: When root node tries to communicate to the satellites the active
+  // id, there's no clean way of determining the active id since on root node
+  // the render window is shared among all views. Hence, we have this hack :(.
+  this->Internals->ActiveId = id;
+  iter->second.RenderWindow->Render();
+  this->Internals->ActiveId = 0;
+  cout << "Done Rendering: " << id << endl;
+}
+
+//----------------------------------------------------------------------------
 void vtkPVSynchronizedRenderWindows::HandleStartRender(vtkRenderWindow* renWin)
 {
   // This method is called when a render window starts rendering. This is called
@@ -524,7 +557,7 @@ void vtkPVSynchronizedRenderWindows::RootStartRender(vtkRenderWindow* renWin)
     {
     // * Tell the satellites to start rendering.
     vtkMultiProcessStream stream;
-    stream << this->Internals->GetKey(renWin);
+    stream << this->Internals->ActiveId;
     vtkstd::vector<unsigned char> data;
     stream.GetRawData(data);
     this->ParallelController->TriggerRMIOnAllChildren(

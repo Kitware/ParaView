@@ -93,6 +93,8 @@ public:
     SYNC_MULTI_RENDER_WINDOW_TAG = 15002,
     };
 
+  void Render(unsigned int);
+
 protected:
   vtkPVSynchronizedRenderWindows();
   ~vtkPVSynchronizedRenderWindows();

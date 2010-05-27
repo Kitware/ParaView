@@ -88,9 +88,9 @@ void vtkIceTRenderer2::IceTDeviceRender()
 
   this->IceTCompositePass->SetupContext(&ren_state);
 
-  // No need to display unless we are in tile-display mode.
-  icetDisable(ICET_DISPLAY);
-  icetDisable(ICET_DISPLAY_INFLATE);
+  // FIXME: No need to display unless we are in tile-display mode.
+  // icetDisable(ICET_DISPLAY);
+  // icetDisable(ICET_DISPLAY_INFLATE);
 
   icetDrawFunc(vtkIceTRenderer2DrawCallback);
   IceTDrawCallbackHandle = this;

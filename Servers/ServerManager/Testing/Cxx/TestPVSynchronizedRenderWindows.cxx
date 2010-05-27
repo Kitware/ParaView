@@ -31,20 +31,20 @@ int main(int argc, char** argv)
 
   vtkPVRenderView* rv = vtkPVRenderView::SafeDownCast(proxy->GetClientSideObject());
   rv->GetRenderWindow()->Render();
-  rv->GetInteractor()->Start();
+  //rv->GetInteractor()->Start();
 
-  //vtkSMProxy* proxy2 = vtkSMProxyManager::GetProxyManager()->NewProxy("views",
-  //  "RenderView2");
-  //proxy2->SetConnectionID(connectionID);
-  //vtkSMPropertyHelper(proxy2, "Size").Set(0, 400);
-  //vtkSMPropertyHelper(proxy2, "Size").Set(1, 400);
-  //vtkSMPropertyHelper(proxy2, "Position").Set(0, 400);
-  //proxy2->UpdateVTKObjects();
+  vtkSMProxy* proxy2 = vtkSMProxyManager::GetProxyManager()->NewProxy("views",
+    "RenderView2");
+  proxy2->SetConnectionID(connectionID);
+  vtkSMPropertyHelper(proxy2, "Size").Set(0, 400);
+  vtkSMPropertyHelper(proxy2, "Size").Set(1, 400);
+  vtkSMPropertyHelper(proxy2, "Position").Set(0, 400);
+  proxy2->UpdateVTKObjects();
 
-  //vtkPVRenderView* rv2 = vtkPVRenderView::SafeDownCast(proxy2->GetClientSideObject());
-  //rv2->GetRenderWindow()->Render();
-  //rv2->GetInteractor()->Start();
-  //proxy2->Delete();
+  vtkPVRenderView* rv2 = vtkPVRenderView::SafeDownCast(proxy2->GetClientSideObject());
+  rv2->GetRenderWindow()->Render();
+  rv2->GetInteractor()->Start();
+  proxy2->Delete();
 
   proxy->Delete();
 
