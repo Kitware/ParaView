@@ -172,7 +172,8 @@ public:
       if ( event->type() == QEvent::KeyPress )
         {
         QKeyEvent *keyEvent = static_cast<QKeyEvent*>(event);
-        if (keyEvent->matches(QKeySequence::Delete) )
+        if (keyEvent->key() == Qt::Key_Backspace ||
+          keyEvent->key() == Qt::Key_Delete )
           {
           this->Ui.FileName->setFocus(Qt::OtherFocusReason);
           //send out a backspace event to the file name now
@@ -385,11 +386,6 @@ pqFileDialog::pqFileDialog(
                    SIGNAL(activated(const QModelIndex&)),
                    this,
                    SLOT(onActivateRecent(const QModelIndex&)));
-
-  QObject::connect(this->Implementation->Ui.Files,
-                   SIGNAL(activated(const QModelIndex&)),
-                   this,
-                   SLOT(onActivateFile(const QModelIndex&)));
 
     QObject::connect(this->Implementation->Ui.Files,
                    SIGNAL(doubleClicked(const QModelIndex&)),
@@ -758,18 +754,6 @@ void pqFileDialog::onActivateRecent(const QModelIndex& index)
   this->Implementation->Ui.FileName->selectAll();
 }
 
-//-----------------------------------------------------------------------------
-void pqFileDialog::onActivateFile(const QModelIndex& index)
-{
-  QModelIndex actual_index = index;
-  if(actual_index.model() == &this->Implementation->FileFilter)
-    actual_index = this->Implementation->FileFilter.mapToSource(actual_index);
-
-  QStringList selected_files;
-  selected_files << this->Implementation->Model->getFilePaths(actual_index);
-
-  this->acceptInternal(selected_files,false);
-}
 //-----------------------------------------------------------------------------
 void pqFileDialog::onDoubleClickFile(const QModelIndex& index)
 {

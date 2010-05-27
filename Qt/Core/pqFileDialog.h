@@ -152,8 +152,6 @@ private slots:
 
   void onActivateFavorite(const QModelIndex&);
   void onActivateRecent(const QModelIndex&);
-  void onActivateFile(const QModelIndex&);
-
   void onDoubleClickFile( const QModelIndex& );
 
   void onTextEdited(const QString&);
