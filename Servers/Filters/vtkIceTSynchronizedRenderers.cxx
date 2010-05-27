@@ -198,14 +198,14 @@ vtkIceTSynchronizedRenderers::CaptureRenderedImage()
 
   if (!rawImage.IsValid())
     {
-    if (!this->IceTCompositePass->GetLastRenderedTile(rawImage))
+    this->IceTCompositePass->GetLastRenderedTile(rawImage);
+    if (!rawImage.IsValid())
       {
       vtkErrorMacro("IceT couldn't provide a tile on this process.");
       }
     }
   return rawImage;
 }
-
 
 //----------------------------------------------------------------------------
 void vtkIceTSynchronizedRenderers::PrintSelf(ostream& os, vtkIndent indent)

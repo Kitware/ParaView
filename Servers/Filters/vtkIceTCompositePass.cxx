@@ -344,19 +344,20 @@ void vtkIceTCompositePass::UpdateTileInformation(
 }
 
 //----------------------------------------------------------------------------
-bool vtkIceTCompositePass::GetLastRenderedTile(
+void vtkIceTCompositePass::GetLastRenderedTile(
   vtkSynchronizedRenderers::vtkRawImage& tile)
 {
+  tile.MarkInValid();
+
   GLint color_format;
   icetGetIntegerv(ICET_COLOR_FORMAT, &color_format);
-  assert(color_format == GL_RGBA);
   int *physicalViewport = this->LastTileViewport;
   int width  = physicalViewport[2] - physicalViewport[0];
   int height = physicalViewport[3] - physicalViewport[1];
 
   if (width < 1 || height < 1)
     {
-    return false;
+    return;
     }
 
   tile.Resize(width, height, 4);
@@ -364,9 +365,31 @@ bool vtkIceTCompositePass::GetLastRenderedTile(
   // Copy as 4-bytes.  It's faster.
   GLuint *dest = (GLuint *)tile.GetRawPtr()->GetVoidPointer(0);
   GLuint *src = (GLuint *)icetGetColorBuffer();
-  memcpy(dest, src, sizeof(GLuint)*width*height);
-  tile.MarkValid();
-  return true;
+
+  if (color_format == GL_RGBA)
+    {
+    memcpy(dest, src, sizeof(GLuint)*width*height);
+    tile.MarkValid();
+    }
+  else if (static_cast<GLenum>(color_format) == vtkgl::BGRA)
+    {
+    for (int j = 0; j < height; j++)
+      {
+      for (int i = 0; i < width; i++)
+        {
+        dest[0] = src[2];
+        dest[1] = src[1];
+        dest[2] = src[0];
+        dest[3] = src[3];
+        dest += 4;  src += 4;
+        }
+      }
+    tile.MarkValid();
+    }
+  else
+    {
+    vtkErrorMacro("ICE-T using unknown image format.");
+    }
 }
 
 //----------------------------------------------------------------------------

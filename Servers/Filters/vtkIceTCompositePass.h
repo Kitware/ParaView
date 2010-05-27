@@ -124,8 +124,8 @@ public:
 
   // Description:
   // Returns the last rendered tile from this process, if any.
-  // Return false is tile is no available on the current process.
-  bool GetLastRenderedTile(vtkSynchronizedRenderers::vtkRawImage& tile);
+  // Image is invalid if tile is not available on the current process.
+  void GetLastRenderedTile(vtkSynchronizedRenderers::vtkRawImage& tile);
 
 protected:
   vtkIceTCompositePass();
