@@ -458,7 +458,7 @@ void vtkPVFileInformation::CopyFromObject(vtkObject* object)
     }
 
   //determine if this is a hidden directory/file
-  this->setHiddenFlag();
+  this->SetHiddenFlag();
 
   if (this->IsDirectory(this->Type) && helper->GetDirectoryListing())
     {
@@ -801,7 +801,7 @@ void vtkPVFileInformation::GetWindowsDirectoryListing()
       infoD->SetFullPath(fullpath.c_str());
       infoD->Type = type;
       infoD->FastFileTypeDetection = this->FastFileTypeDetection;
-      infoD->setHiddenFlag(); //needs full path set first
+      infoD->SetHiddenFlag(); //needs full path set first
       info_set.insert(infoD);
       infoD->Delete();
       }
@@ -882,6 +882,7 @@ void vtkPVFileInformation::GetDirectoryListing()
     info->SetName(d->d_name);
     info->SetFullPath((prefix + d->d_name).c_str());
     info->Type = INVALID;
+    info->SetHiddenFlag();
 
     // fix to bug #09452 such that directories with trailing names can be
     // shown in the file dialog
@@ -936,40 +937,24 @@ void vtkPVFileInformation::GetDirectoryListing()
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVFileInformation::setHiddenFlag( )
+void vtkPVFileInformation::SetHiddenFlag( )
 {
+#if defined(_WIN32)
   if ( !this->FullPath )
     {
     this->Hidden = false;
+    return;
     }
-#if defined(_WIN32)
   LPCSTR fp = this->FullPath;
   DWORD flags= GetFileAttributes(fp);
   this->Hidden =( flags & FILE_ATTRIBUTE_HIDDEN) ? true: false;
-#elif defined (__APPLE__)
-  OSErr error = noErr;
-  FSRef ref;
-  error = FSPathMakeRefWithOptions(this->FullPath,
-        kFSPathMakeRefDoNotFollowLeafSymlink, &ref, 0);
-  if ( error != noErr )
-    {
-    this->Hidden = false;
-    return;
-    }
-  FSCatalogInfo catalogInfo;
-  error = FSGetCatalogInfo(&ref, kFSCatInfoFinderInfo,
-    &catalogInfo, NULL, NULL, NULL);
-  if (error != noErr)
-    {
-    this->Hidden = false;
-    return;
-    }
-  FileInfo* const fInfo =
-    reinterpret_cast<FileInfo*>(&catalogInfo.finderInfo);
-  this->Hidden = (fInfo->finderFlags & kIsInvisible) ? true:false;
 #else
-  this->Hidden =( filePath &&strlen(filePath) > 0 &&filePath[0] == '.' )
-    ? true:false;
+  if ( !this->Name )
+    {
+    this->Hidden = false;
+    return;
+    }
+  this->Hidden =( this->Name[0] == '.' )? true:false;
 #endif
 
 }

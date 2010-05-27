@@ -123,7 +123,7 @@ protected:
 
   bool DetectType();
   void GetSpecialDirectories();
-  void setHiddenFlag( );
+  void SetHiddenFlag( );
   int FastFileTypeDetection;
 private:
   vtkPVFileInformation(const vtkPVFileInformation&); // Not implemented.

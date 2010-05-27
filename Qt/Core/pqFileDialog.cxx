@@ -165,7 +165,7 @@ public:
     delete this->Completer;
   }
 
-  bool pqImplementation::eventFilter(QObject *obj, QEvent *event )
+  bool eventFilter(QObject *obj, QEvent *event )
     {
     if ( obj == this->Ui.Files )
       {
