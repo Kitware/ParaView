@@ -393,9 +393,6 @@ void PrismCore::onPrismSelection(vtkObject* caller,
         pqServerManagerModel* model= pqApplicationCore::instance()->getServerManagerModel();
         pqPipelineSource* pqPrismP=model->findItem<pqPipelineSource*>(prismP);
 
-        pqOutputPort* opport = pqPrismP->getOutputPort(portIndex);
-
-
 
         vtkSMSourceProxy* selPrism = prismP->GetSelectionInput(portIndex);
         if(!selPrism)
@@ -506,9 +503,6 @@ void PrismCore::onGeometrySelection(vtkObject* caller,
 
         pqServerManagerModel* model= pqApplicationCore::instance()->getServerManagerModel();
         pqPipelineSource* pqSourceP=model->findItem<pqPipelineSource*>(sourceP);
-
-        pqOutputPort* opport = pqSourceP->getOutputPort(portIndex);
-
 
         vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
 
