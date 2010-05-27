@@ -117,7 +117,9 @@ public:
 //BTX
   // Description:
   // Internal callback. Don't call directly.
+  void SetupContext(const vtkRenderState*);
   void Draw(const vtkRenderState*);
+  void CleanupContext(const vtkRenderState*);
 protected:
   vtkIceTCompositePass();
   ~vtkIceTCompositePass();

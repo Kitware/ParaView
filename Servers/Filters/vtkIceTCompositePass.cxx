@@ -88,7 +88,7 @@ void vtkIceTCompositePass::ReleaseGraphicsResources(vtkWindow* window)
 }
 
 //----------------------------------------------------------------------------
-void vtkIceTCompositePass::Render(const vtkRenderState* render_state)
+void vtkIceTCompositePass::SetupContext(const vtkRenderState* render_state)
 {
   this->IceTContext->SetController(this->Controller);
   if (!this->IceTContext->IsValid())
@@ -186,7 +186,6 @@ void vtkIceTCompositePass::Render(const vtkRenderState* render_state)
                      allBounds[4], allBounds[5]);
     }
 
-  icetDrawFunc(IceTDrawCallback);
   icetEnable(ICET_DISPLAY);
   icetEnable(ICET_DISPLAY_INFLATE);
   if (this->DataReplicatedOnAllProcesses)
@@ -209,15 +208,33 @@ void vtkIceTCompositePass::Render(const vtkRenderState* render_state)
   glClearDepth(static_cast<GLclampf>(1.0));
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   icetEnable(ICET_CORRECT_COLORED_BACKGROUND);
+}
 
+//----------------------------------------------------------------------------
+void vtkIceTCompositePass::CleanupContext(const vtkRenderState*)
+{
+}
 
+//----------------------------------------------------------------------------
+void vtkIceTCompositePass::Render(const vtkRenderState* render_state)
+{
+  this->IceTContext->SetController(this->Controller);
+  if (!this->IceTContext->IsValid())
+    {
+    vtkErrorMacro("Could not initialize IceT context.");
+    return;
+    }
+
+  this->SetupContext(render_state);
+
+  icetDrawFunc(IceTDrawCallback);
   IceTDrawCallbackHandle = this;
   IceTDrawCallbackState = render_state;
   icetDrawFrame();
   IceTDrawCallbackHandle = NULL;
   IceTDrawCallbackState = NULL;
 
-
+  this->CleanupContext(render_state);
 }
 
 //----------------------------------------------------------------------------
