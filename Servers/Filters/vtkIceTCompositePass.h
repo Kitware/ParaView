@@ -32,6 +32,7 @@
 #define __vtkIceTCompositePass_h
 
 #include "vtkRenderPass.h"
+#include "vtkSynchronizedRenderers.h" //  needed for vtkRawImage.
 
 class vtkMultiProcessController;
 class vtkPKdTree;
@@ -120,6 +121,12 @@ public:
   void SetupContext(const vtkRenderState*);
   void Draw(const vtkRenderState*);
   void CleanupContext(const vtkRenderState*);
+
+  // Description:
+  // Returns the last rendered tile from this process, if any.
+  // Return false is tile is no available on the current process.
+  bool GetLastRenderedTile(vtkSynchronizedRenderers::vtkRawImage& tile);
+
 protected:
   vtkIceTCompositePass();
   ~vtkIceTCompositePass();

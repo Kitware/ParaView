@@ -97,6 +97,10 @@ protected:
   vtkIceTSynchronizedRenderers();
   ~vtkIceTSynchronizedRenderers();
 
+  // Description:
+  // Overridden to capture image from icet buffers instead of the screen.
+  virtual vtkRawImage& CaptureRenderedImage();
+
   // We use vtkIceTCompositePass internally.
   vtkRenderPass* RenderPass;
   vtkIceTCompositePass* IceTCompositePass;

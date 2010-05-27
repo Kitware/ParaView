@@ -56,9 +56,18 @@ public:
     // in the icet callback.
     this->IceTCompositePass->SetupContext(s);
 
-    // FIXME: No need to display unless we are in tile-display mode.
-    // icetDisable(ICET_DISPLAY);
-    // icetDisable(ICET_DISPLAY_INFLATE);
+    // Don't make icet render the composited image to the screen unless
+    // necessary.
+    if (this->IceTSynchronizedRenderers->GetWriteBackImages())
+      {
+      icetEnable(ICET_DISPLAY);
+      icetEnable(ICET_DISPLAY_INFLATE);
+      }
+    else
+      {
+      icetDisable(ICET_DISPLAY);
+      icetDisable(ICET_DISPLAY_INFLATE);
+      }
 
     icetDrawFunc(IceTDrawCallback);
     vtkInitialPass::ActiveRenderer = renderer;
@@ -84,6 +93,7 @@ public:
       }
     }
 
+  vtkIceTSynchronizedRenderers* IceTSynchronizedRenderers;
   vtkSetObjectMacro(IceTCompositePass, vtkIceTCompositePass);
 protected:
   static vtkInitialPass* ActivePass;
@@ -92,11 +102,13 @@ protected:
   vtkInitialPass()
     {
     this->IceTCompositePass = 0;
+    this->IceTSynchronizedRenderers = 0;
     }
 
   ~vtkInitialPass()
     {
     this->SetIceTCompositePass(0);
+    this->IceTSynchronizedRenderers = 0;
     }
 
   void DrawInternal(vtkRenderer* ren)
@@ -136,6 +148,7 @@ vtkIceTSynchronizedRenderers::vtkIceTSynchronizedRenderers()
   this->IceTCompositePass = vtkIceTCompositePass::New();
 
   vtkInitialPass* initPass = vtkInitialPass::New();
+  initPass->IceTSynchronizedRenderers = this;
   initPass->SetIceTCompositePass(this->IceTCompositePass);
   this->RenderPass = initPass;
   this->SetParallelController(vtkMultiProcessController::GetGlobalController());
@@ -173,6 +186,26 @@ void vtkIceTSynchronizedRenderers::SetImageReductionFactor(int val)
   // this->Superclass::SetImageReductionFactor(val);
   this->IceTCompositePass->SetImageReductionFactor(val);
 }
+
+//----------------------------------------------------------------------------
+vtkSynchronizedRenderers::vtkRawImage&
+vtkIceTSynchronizedRenderers::CaptureRenderedImage()
+{
+  // FIXME: capture from icet buffers.
+  vtkRawImage& rawImage =
+    (this->GetImageReductionFactor() == 1)?
+    this->FullImage : this->ReducedImage;
+
+  if (!rawImage.IsValid())
+    {
+    if (!this->IceTCompositePass->GetLastRenderedTile(rawImage))
+      {
+      vtkErrorMacro("IceT couldn't provide a tile on this process.");
+      }
+    }
+  return rawImage;
+}
+
 
 //----------------------------------------------------------------------------
 void vtkIceTSynchronizedRenderers::PrintSelf(ostream& os, vtkIndent indent)

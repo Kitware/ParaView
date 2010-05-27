@@ -65,6 +65,17 @@ vtkPVSynchronizedRenderer::vtkPVSynchronizedRenderer()
   this->CSSynchronizer = 0;
   this->ParallelSynchronizer = 0;
 
+  bool in_tile_display_mode = false;
+  if (pm->GetActiveRemoteConnection())
+    {
+    vtkIdType connectionID = pm->GetConnectionID(
+      pm->GetActiveRemoteConnection());
+    vtkPVServerInformation* server_info = pm->GetServerInformation(
+      connectionID);
+    in_tile_display_mode = (server_info->GetTileDimensions()[0] > 0 ||
+      server_info->GetTileDimensions()[1] > 0);
+    }
+
   switch (this->Mode)
     {
   case BUILTIN:
@@ -72,11 +83,7 @@ vtkPVSynchronizedRenderer::vtkPVSynchronizedRenderer()
 
   case CLIENT:
       {
-      vtkIdType connectionID = pm->GetConnectionID(
-        pm->GetActiveRemoteConnection());
-      vtkPVServerInformation* server_info = pm->GetServerInformation(
-        connectionID);
-      if (server_info->GetTileDimensions()[0])
+      if (in_tile_display_mode)
         {
         this->CSSynchronizer = vtkSynchronizedRenderers::New();
         this->CSSynchronizer->WriteBackImagesOff();
@@ -95,8 +102,7 @@ vtkPVSynchronizedRenderer::vtkPVSynchronizedRenderer()
 
   case SERVER:
       {
-      vtkPVOptions* options = pm->GetOptions();
-      if (options->GetTileDimensions()[0])
+      if (in_tile_display_mode)
         {
         this->CSSynchronizer = vtkSynchronizedRenderers::New();
         }
@@ -124,7 +130,8 @@ vtkPVSynchronizedRenderer::vtkPVSynchronizedRenderer()
 #endif
       this->ParallelSynchronizer->SetParallelController(
         vtkMultiProcessController::GetGlobalController());
-      if (pm->GetPartitionId() == 0 && this->Mode == BATCH)
+      if ( (pm->GetPartitionId() == 0 && this->Mode == BATCH) ||
+            in_tile_display_mode)
         {
         this->ParallelSynchronizer->WriteBackImagesOn();
         }
@@ -136,8 +143,15 @@ vtkPVSynchronizedRenderer::vtkPVSynchronizedRenderer()
       }
     break;
 
-
   default: abort();
+    }
+
+  // This ensures that CSSynchronizer simply fetches the captured buffer from
+  // iceT without requiring icet to render to screen on the root node.
+  if (this->ParallelSynchronizer && this->CSSynchronizer)
+    {
+    this->CSSynchronizer->SetCaptureDelegate(
+      this->ParallelSynchronizer);
     }
 }
 

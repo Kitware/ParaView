@@ -27,6 +27,7 @@
 #include "vtkSmartPointer.h"
 #include "vtkTilesHelper.h"
 
+#include <assert.h>
 #include "vtkgl.h"
 #include <GL/ice-t.h>
 
@@ -340,6 +341,32 @@ void vtkIceTCompositePass::UpdateTileInformation(
   this->LastTileViewport[1] = my_tile_viewport[1];
   this->LastTileViewport[2] = my_tile_viewport[2];
   this->LastTileViewport[3] = my_tile_viewport[3];
+}
+
+//----------------------------------------------------------------------------
+bool vtkIceTCompositePass::GetLastRenderedTile(
+  vtkSynchronizedRenderers::vtkRawImage& tile)
+{
+  GLint color_format;
+  icetGetIntegerv(ICET_COLOR_FORMAT, &color_format);
+  assert(color_format == GL_RGBA);
+  int *physicalViewport = this->LastTileViewport;
+  int width  = physicalViewport[2] - physicalViewport[0];
+  int height = physicalViewport[3] - physicalViewport[1];
+
+  if (width < 1 || height < 1)
+    {
+    return false;
+    }
+
+  tile.Resize(width, height, 4);
+
+  // Copy as 4-bytes.  It's faster.
+  GLuint *dest = (GLuint *)tile.GetRawPtr()->GetVoidPointer(0);
+  GLuint *src = (GLuint *)icetGetColorBuffer();
+  memcpy(dest, src, sizeof(GLuint)*width*height);
+  tile.MarkValid();
+  return true;
 }
 
 //----------------------------------------------------------------------------
