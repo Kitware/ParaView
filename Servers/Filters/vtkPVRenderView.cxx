@@ -19,6 +19,7 @@
 #include "vtkPVSynchronizedRenderer.h"
 #include "vtkPVSynchronizedRenderWindows.h"
 #include "vtkRenderer.h"
+#include "vtkIceTRenderer2.h"
 #include "vtkRenderWindow.h"
 #include "vtkRenderWindowInteractor.h"
 #include "vtkSmartPointer.h"
@@ -31,6 +32,9 @@
 #include "vtkPieceScalars.h"
 #include "vtkPolyDataMapper.h"
 #include "vtkSphereSource.h"
+
+#include "vtkProcessModule.h"
+#include "vtkRemoteConnection.h"
 
 #include <assert.h>
 
@@ -113,6 +117,12 @@ vtkPVRenderView::vtkPVRenderView()
   this->RenderWindow->RemoveObserver(this->GetObserver());
   this->RenderWindow->Delete();
   this->RenderWindow = 0;
+
+  if (vtkProcessModule::GetProcessModule()->GetNumberOfLocalPartitions() > 1)
+    {
+    this->Renderer->Delete();
+    this->Renderer = vtkIceTRenderer2::New();
+    }
 
   // Get the window from the SynchronizedWindows.
   this->RenderWindow = this->SynchronizedWindows->NewRenderWindow();

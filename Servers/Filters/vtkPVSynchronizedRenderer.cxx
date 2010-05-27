@@ -15,7 +15,7 @@
 #include "vtkPVSynchronizedRenderer.h"
 
 #include "vtkClientServerSynchronizedRenderers.h"
-#include "vtkIceTSynchronizedRenderers.h"
+#include "vtkSynchronizedRenderers.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
 #include "vtkPVOptions.h"
@@ -112,7 +112,7 @@ vtkPVSynchronizedRenderer::vtkPVSynchronizedRenderer()
   case BATCH:
     if (pm->GetNumberOfLocalPartitions() > 1)
       {
-      this->ParallelSynchronizer = vtkIceTSynchronizedRenderers::New();
+      this->ParallelSynchronizer = vtkSynchronizedRenderers::New();
       this->ParallelSynchronizer->SetParallelController(
         vtkMultiProcessController::GetGlobalController());
       if (pm->GetPartitionId() == 0 && this->Mode == BATCH)

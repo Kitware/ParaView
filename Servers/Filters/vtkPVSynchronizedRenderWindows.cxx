@@ -302,7 +302,7 @@ vtkRenderWindow* vtkPVSynchronizedRenderWindows::NewRenderWindow()
       window->AlphaBitPlanesOn();
       // SwapBuffers should be ON only on root node in BATCH mode
       // or when operating in tile-display mode.
-      bool swap_buffers = true;
+      bool swap_buffers = false;
       swap_buffers |= (this->Mode == BATCH &&
         this->ParallelController->GetLocalProcessId() == 0);
       //FIXME: for tile-displays

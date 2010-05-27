@@ -131,59 +131,7 @@ vtkIceTSynchronizedRenderers::~vtkIceTSynchronizedRenderers()
 //----------------------------------------------------------------------------
 void vtkIceTSynchronizedRenderers::SetRenderer(vtkRenderer* ren)
 {
-  if (this->Renderer && this->Renderer->GetPass() == this->RenderPass)
-    {
-    this->Renderer->SetPass(NULL);
-    }
-
   this->Superclass::SetRenderer(ren);
-  if (ren)
-    {
-    // the rendering passes
-    vtkCameraPass *cameraP=vtkCameraPass::New();
-    vtkSequencePass *seq=vtkSequencePass::New();
-    vtkOpaquePass *opaque=vtkOpaquePass::New();
-    vtkDepthPeelingPass *peeling=vtkDepthPeelingPass::New();
-    peeling->SetMaximumNumberOfPeels(200);
-    peeling->SetOcclusionRatio(0.1);
-
-    vtkTranslucentPass *translucent=vtkTranslucentPass::New();
-    peeling->SetTranslucentPass(translucent);
-
-    vtkVolumetricPass *volume=vtkVolumetricPass::New();
-    vtkOverlayPass *overlay=vtkOverlayPass::New();
-    vtkLightsPass *lights=vtkLightsPass::New();
-
-    vtkClearZPass *clearZ=vtkClearZPass::New();
-    clearZ->SetDepth(0.9);
-
-    vtkRenderPassCollection *passes=vtkRenderPassCollection::New();
-    passes->AddItem(lights);
-    passes->AddItem(opaque);
-    //  passes->AddItem(clearZ);
-    passes->AddItem(translucent);
-    passes->AddItem(volume);
-    passes->AddItem(overlay);
-    seq->SetPasses(passes);
-
-    this->IceTCompositePass->SetRenderPass(seq);
-    cameraP->SetDelegatePass(this->IceTCompositePass);
-    ren->SetPass(cameraP);
-
-    // setting viewport doesn't work in tile-display mode correctly yet.
-    //renderer->SetViewport(0, 0, 0.75, 1);
-
-    opaque->Delete();
-    peeling->Delete();
-    translucent->Delete();
-    volume->Delete();
-    overlay->Delete();
-    seq->Delete();
-    passes->Delete();
-    cameraP->Delete();
-    lights->Delete();
-    clearZ->Delete();
-    }
 }
 
 //----------------------------------------------------------------------------

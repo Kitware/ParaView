@@ -256,6 +256,7 @@ IF (PARAVIEW_USE_ICE_T)
       vtkIceTContext.cxx
       vtkIceTRenderManager.cxx
       vtkIceTRenderer.cxx
+      vtkIceTRenderer2.cxx
       vtkIceTCompositePass.cxx
       )
   ENDIF(VTK_USE_MPI)
