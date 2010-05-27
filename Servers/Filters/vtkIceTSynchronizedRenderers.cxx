@@ -68,6 +68,7 @@ public:
       icetDisable(ICET_DISPLAY);
       icetDisable(ICET_DISPLAY_INFLATE);
       }
+    icetDisable(ICET_CORRECT_COLORED_BACKGROUND);
 
     icetDrawFunc(IceTDrawCallback);
     vtkInitialPass::ActiveRenderer = renderer;

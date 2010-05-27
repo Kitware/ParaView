@@ -25,6 +25,7 @@
 #include "vtkWeakPointer.h"
 
 #include "vtkActor.h"
+#include "vtkProperty.h"
 #include "vtkDataSetSurfaceFilter.h"
 #include "vtkDistributedDataFilter.h"
 #include "vtkMultiProcessController.h"
@@ -78,6 +79,7 @@ namespace
     vtkActor* actor = vtkActor::New();
     actor->SetMapper(mapper);
     //actor->GetProperty()->SetOpacity(this->UseOrderedCompositing? 0.5 : 1.0);
+    //actor->GetProperty()->SetOpacity(0.5);
     renderer->AddActor(actor);
 
     actor->Delete();
@@ -88,9 +90,6 @@ namespace
     sphere->Delete();
     }
 };
-
-
-
 
 vtkStandardNewMacro(vtkPVRenderView);
 vtkCxxRevisionMacro(vtkPVRenderView, "$Revision$");
