@@ -397,11 +397,6 @@ pqFileDialog::pqFileDialog(
                    this,
                    SLOT(onTextEdited(const QString&)));
 
-    QObject::connect(this->Implementation->Ui.ShowHiddenFiles,
-                   SIGNAL(clicked(const bool&)),
-                   this,
-                   SLOT(onShowHiddenFiles(const bool&)));
-
   QStringList filterList = MakeFilterList(nameFilter);
   if(filterList.empty())
     {
@@ -487,19 +482,24 @@ void pqFileDialog::onCreateNewFolder()
 //-----------------------------------------------------------------------------
 void pqFileDialog::onContextMenuRequested(const QPoint &menuPos)
 {
-  // Only display new dir option if we're saving, not opening
-  if (this->Implementation->Mode != pqFileDialog::AnyFile)
-    {
-    return;
-    }
-
   QMenu menu;
   menu.setObjectName("FileDialogContextMenu");
 
-  QAction *actionNewDir = new QAction("Create New Folder",this);
-  QObject::connect(actionNewDir, SIGNAL(triggered()),
-      this, SLOT(onCreateNewFolder()));
-  menu.addAction(actionNewDir);
+  // Only display new dir option if we're saving, not opening
+  if (this->Implementation->Mode == pqFileDialog::AnyFile)
+    {
+    QAction *actionNewDir = new QAction("Create New Folder",this);
+      QObject::connect(actionNewDir, SIGNAL(triggered()),
+          this, SLOT(onCreateNewFolder()));
+    menu.addAction(actionNewDir);
+    }
+
+  QAction *actionHiddenFiles = new QAction("Show Hidden Files",this);
+  actionHiddenFiles->setCheckable( true );
+  actionHiddenFiles->setChecked( this->Implementation->FileFilter.getShowHidden());
+  QObject::connect(actionHiddenFiles, SIGNAL(triggered(bool)),
+    this, SLOT(onShowHiddenFiles(bool)));
+  menu.addAction(actionHiddenFiles);
 
   menu.exec(this->Implementation->Ui.Files->mapToGlobal(menuPos));
 }
