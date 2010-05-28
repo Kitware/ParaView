@@ -78,8 +78,6 @@ int vtkIsoVolume::RequestData(vtkInformation* request,
                               vtkInformationVector** inputVector,
                               vtkInformationVector* outputVector)
 {
-  int retVal = 1;
-
   // Get the input information.
   vtkInformation* inInfo  = inputVector[0]->GetInformationObject(0);
   vtkInformation* outInfo = outputVector->GetInformationObject(0);
@@ -88,12 +86,10 @@ int vtkIsoVolume::RequestData(vtkInformation* request,
   vtkDataObject* inObj  = inInfo->Get(vtkDataObject::DATA_OBJECT());
   vtkDataObject* outObj = outInfo->Get(vtkDataObject::DATA_OBJECT());
 
-
   // Comman vars.
   vtkStdString  arrayName("");
   int           fieldAssociation (-1);
   double*       range (0);
-  vtkDataArray* inScalars(0);
   bool          usingLowerBoundClipDS (false);
   bool          usingUpperBoundClipDS (false);
 
@@ -308,14 +304,16 @@ int vtkIsoVolume::RequestData(vtkInformation* request,
 }
 
 //----------------------------------------------------------------------------
-int vtkIsoVolume::FillInputPortInformation(int port, vtkInformation *info)
+int vtkIsoVolume::FillInputPortInformation(int vtkNotUsed(port),
+                                           vtkInformation *info)
 {
   info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkDataObject");
   return 1;
 }
 
 //----------------------------------------------------------------------------
-int vtkIsoVolume::FillOutputPortInformation(int port, vtkInformation *info)
+int vtkIsoVolume::FillOutputPortInformation(int vtkNotUsed(port),
+                                            vtkInformation *info)
 {
   info->Set(vtkDataObject::DATA_TYPE_NAME(), "vtkDataObject");
   return 1;
