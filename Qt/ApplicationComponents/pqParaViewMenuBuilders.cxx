@@ -249,7 +249,8 @@ void pqParaViewMenuBuilders::buildPipelineBrowserContextMenu(QWidget& widget)
   widget.setObjectName(objectName);
   widget.setContextMenuPolicy(Qt::ActionsContextMenu);
 
-  if (widget.metaObject()->indexOfSignal("deleteKey()") != -1)
+  QByteArray signalName=QMetaObject::normalizedSignature("deleteKey()");
+  if (widget.metaObject()->indexOfSignal(signalName) != -1)
     {
     // Trigger a delete when the user requests a delete.
     QObject::connect(&widget, SIGNAL(deleteKey()),
