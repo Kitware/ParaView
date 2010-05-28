@@ -22,12 +22,6 @@ GET_PROPERTY(PV_TARGET_SUPPORTS_SHARED_LIBS
   GLOBAL PROPERTY TARGET_SUPPORTS_SHARED_LIBS)
 
 #########################################################################
-# Clear the Plugin List text file
-SET(PARAVIEW_PLUGINLIST_TXT "${ParaView_BINARY_DIR}/PluginList.txt")
-FILE(WRITE ${PARAVIEW_PLUGINLIST_TXT} "")
-
-
-#########################################################################
 # PARAVIEW_PLUGINLIST is used to generate the config file distributed with
 # ParaView that lists the plugins distributed with ParaView.
 SET(PARAVIEW_PLUGINLIST "" CACHE INTERNAL "List of configured plugins" FORCE)
