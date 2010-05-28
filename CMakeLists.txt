@@ -32,8 +32,6 @@ FILE(WRITE ${PARAVIEW_PLUGINLIST_TXT} "")
 # ParaView that lists the plugins distributed with ParaView.
 SET(PARAVIEW_PLUGINLIST "" CACHE INTERNAL "List of configured plugins" FORCE)
 
-SET(PARAVIEW_PLUGIN_CONFIG_LIST "" CACHE INTERNAL "List of configured plugins.")
-
 #########################################################################
 # Warn about ParaQ
 SET(PARAVIEW_WARN_ABOUT_PARAQ)

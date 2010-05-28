@@ -1010,12 +1010,10 @@ FUNCTION(ADD_PARAVIEW_PLUGIN NAME VERSION)
 
     # this builds a list of actual plugin names added by plugins provided in the
     # ParaView source directory itself.
-    # This is used to generate the ".plugins" configuration file.
-    if (BUILD_PARAVIEW_PLUGINLIST)
-      SET(PARAVIEW_PLUGINLIST ${PARAVIEW_PLUGINLIST} ${NAME} CACHE INTERNAL
+    # This is used to generate the ".plugins" configuration file, as well as
+    # when creating the mac bundle.
+    SET(PARAVIEW_PLUGINLIST ${PARAVIEW_PLUGINLIST} ${NAME} CACHE INTERNAL
         "List of configured plugins")
-    endif (BUILD_PARAVIEW_PLUGINLIST)
-
   ENDIF(GUI_SRCS OR SM_SRCS OR ARG_SOURCES OR ARG_PYTHON_MODULES)
   
 ENDFUNCTION(ADD_PARAVIEW_PLUGIN)

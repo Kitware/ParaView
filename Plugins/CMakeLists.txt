@@ -1,9 +1,5 @@
 INCLUDE(${ParaView_CMAKE_DIR}/ParaViewPlugins.cmake)
 
-# PARAVIEW_PLUGINLIST is used to generate the config file distributed with
-# ParaView that lists the plugins distributed with ParaView.
-SET (BUILD_PARAVIEW_PLUGINLIST ON)
-
 MACRO(paraview_build_optional_plugin name comment subdirectory default)
   OPTION(PARAVIEW_BUILD_PLUGIN_${name} "Build ${comment}" ${default})
   MARK_AS_ADVANCED(PARAVIEW_BUILD_PLUGIN_${name})
