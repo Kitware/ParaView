@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -88,7 +88,7 @@ pqCubeAxesEditorDialog::pqCubeAxesEditorDialog(
   QObject::connect(this->Internal->Ok, SIGNAL(clicked()),
     this, SLOT(accept()), Qt::QueuedConnection);
   QObject::connect(this->Internal->Cancel, SIGNAL(clicked()),
-    this, SLOT(reject()), Qt::QueuedConnection);  
+    this, SLOT(reject()), Qt::QueuedConnection);
 }
 
 //-----------------------------------------------------------------------------
@@ -127,18 +127,18 @@ void pqCubeAxesEditorDialog::setRepresentationProxy(vtkSMProxy* repr)
     // set up links between the property manager and the widgets.
     pqNamedWidgets::link(this, repr, this->Internal->PropertyManager);
     this->Internal->PropertyManager->registerLink(
-      this->Internal->ColorAdaptor, "color", 
+      this->Internal->ColorAdaptor, "color",
       SIGNAL(colorChanged(const QVariant&)),
       repr, repr->GetProperty("CubeAxesColor"));
     new pqStandardColorLinkAdaptor(this->Internal->Color,
       repr, "CubeAxesColor");
-   
+
     //fill the ui elements with the correct object bounds
     double pvBounds[6];
     vtkSMPVRepresentationProxy *pvProxy = vtkSMPVRepresentationProxy::SafeDownCast(repr);
     if ( pvProxy )
-      {                
-      
+      {
+
       //link the ui elements to the vtkSMCubeAxesRepresentationProxy
       PV_SPINBOX_REGISTER(CubeAxesXCustomBoundsMin, "CustomBounds", 0);
       PV_SPINBOX_REGISTER(CubeAxesXCustomBoundsMax, "CustomBounds", 1);
@@ -157,17 +157,17 @@ void pqCubeAxesEditorDialog::setRepresentationProxy(vtkSMProxy* repr)
       this->setupCustomAxes( pvBounds[0],pvBounds[1],
         !this->Internal->CubeAxesXCustomBounds->isChecked(),
         this->Internal->CubeAxesXCustomBoundsMin,
-        this->Internal->CubeAxesXCustomBoundsMax);       
+        this->Internal->CubeAxesXCustomBoundsMax);
 
       this->setupCustomAxes( pvBounds[2], pvBounds[3],
         !this->Internal->CubeAxesYCustomBounds->isChecked(),
         this->Internal->CubeAxesYCustomBoundsMin,
-        this->Internal->CubeAxesYCustomBoundsMax);       
+        this->Internal->CubeAxesYCustomBoundsMax);
 
       this->setupCustomAxes( pvBounds[4], pvBounds[5],
         !this->Internal->CubeAxesZCustomBounds->isChecked(),
         this->Internal->CubeAxesZCustomBoundsMin,
-        this->Internal->CubeAxesZCustomBoundsMax);       
+        this->Internal->CubeAxesZCustomBoundsMax);
 
       }
     }
@@ -177,25 +177,21 @@ void pqCubeAxesEditorDialog::setRepresentationProxy(vtkSMProxy* repr)
 #undef PV_GROUPBOX_REGISTER
 
 //-----------------------------------------------------------------------------
-void pqCubeAxesEditorDialog::setupCustomAxes( const double &min, const double &max, 
+void pqCubeAxesEditorDialog::setupCustomAxes( const double &min, const double &max,
     const bool &enabled, QDoubleSpinBox *minWidget, QDoubleSpinBox *maxWidget)
 {
   double stepSize = (max-min) * 0.05;
 
-  //setup min & max constraints
-  minWidget->setRange( min, max );      
-  maxWidget->setRange( min, max );      
-
   //setup step size
   minWidget->setSingleStep( stepSize );
   maxWidget->setSingleStep( stepSize );
-  
+
   //setup initial values
   if ( enabled )
     {
     minWidget->setValue( min );
     maxWidget->setValue( max );
-    }       
+    }
 }
 
 
