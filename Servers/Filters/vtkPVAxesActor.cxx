@@ -1,32 +1,15 @@
 /*=========================================================================
 
-   Program: ParaView
-   Module:    vtkPVAxesActor.cxx
+  Program:   ParaView
+  Module:    vtkSMProxy.h
 
-   Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
-   All rights reserved.
+  Copyright (c) Kitware, Inc.
+  All rights reserved.
+  See Copyright.txt or http://www.paraview.org/HTML/Copyright.html for details.
 
-   ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
-
-   See License_v1.2.txt for the full ParaView license.
-   A copy of this license can be obtained by contacting
-   Kitware Inc.
-   28 Corporate Drive
-   Clifton Park, NY 12065
-   USA
-
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE AUTHORS OR
-CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
-EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
-PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
-PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
-LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
-NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+     This software is distributed WITHOUT ANY WARRANTY; without even
+     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+     PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
 #include "vtkPVAxesActor.h"
@@ -61,11 +44,11 @@ vtkPVAxesActor::vtkPVAxesActor()
   this->XAxisLabelText = NULL;
   this->YAxisLabelText = NULL;
   this->ZAxisLabelText = NULL;
-    
+
   this->SetXAxisLabelText("X");
   this->SetYAxisLabelText("Y");
   this->SetZAxisLabelText("Z");
-  
+
   //colors chosen to match the output of vtkAxes.cxx's LUT.
   this->XAxisShaft = vtkActor::New();
   this->XAxisShaft->GetProperty()->SetColor(1, 0, 0);
@@ -83,7 +66,7 @@ vtkPVAxesActor::vtkPVAxesActor()
 
   this->CylinderSource = vtkCylinderSource::New();
   this->CylinderSource->SetHeight(1.0);
-  
+
   this->LineSource = vtkLineSource::New();
   this->LineSource->SetPoint1( 0.0, 0.0, 0.0 );
   this->LineSource->SetPoint2( 0.0, 1.0, 0.0 );
@@ -91,29 +74,29 @@ vtkPVAxesActor::vtkPVAxesActor()
   this->ConeSource = vtkConeSource::New();
   this->ConeSource->SetDirection( 0, 1, 0 );
   this->ConeSource->SetHeight( 1.0 );
-   
+
   this->SphereSource = vtkSphereSource::New();
-  
+
   vtkPolyDataMapper *shaftMapper = vtkPolyDataMapper::New();
-  
+
   this->XAxisShaft->SetMapper( shaftMapper );
   this->YAxisShaft->SetMapper( shaftMapper );
   this->ZAxisShaft->SetMapper( shaftMapper );
-  
+
   shaftMapper->Delete();
 
   vtkPolyDataMapper *tipMapper = vtkPolyDataMapper::New();
-  
+
   this->XAxisTip->SetMapper( tipMapper );
   this->YAxisTip->SetMapper( tipMapper );
   this->ZAxisTip->SetMapper( tipMapper );
-  
+
   tipMapper->Delete();
 
   this->TotalLength[0] = 1.0;
   this->TotalLength[1] = 1.0;
   this->TotalLength[2] = 1.0;
- 
+
   this->NormalizedShaftLength[0] = 0.8;
   this->NormalizedShaftLength[1] = 0.8;
   this->NormalizedShaftLength[2] = 0.8;
@@ -125,15 +108,15 @@ vtkPVAxesActor::vtkPVAxesActor()
   this->ConeResolution = 16;
   this->SphereResolution = 16;
   this->CylinderResolution = 16;
-  
+
   this->ConeRadius = 0.4;
   this->SphereRadius = 0.5;
   this->CylinderRadius = 0.05;
-  
+
   this->XAxisLabelPosition = 1;
   this->YAxisLabelPosition = 1;
   this->ZAxisLabelPosition = 1;
-  
+
   this->ShaftType = vtkPVAxesActor::LINE_SHAFT;
   this->TipType   = vtkPVAxesActor::CONE_TIP;
 
@@ -143,27 +126,27 @@ vtkPVAxesActor::vtkPVAxesActor()
   this->XAxisVectorText = vtkVectorText::New();
   this->YAxisVectorText = vtkVectorText::New();
   this->ZAxisVectorText = vtkVectorText::New();
-  
+
   this->XAxisLabel = vtkFollower::New();
   this->YAxisLabel = vtkFollower::New();
   this->ZAxisLabel = vtkFollower::New();
-  
+
   vtkPolyDataMapper *xmapper = vtkPolyDataMapper::New();
   vtkPolyDataMapper *ymapper = vtkPolyDataMapper::New();
   vtkPolyDataMapper *zmapper = vtkPolyDataMapper::New();
-  
+
   xmapper->SetInput( this->XAxisVectorText->GetOutput() );
   ymapper->SetInput( this->YAxisVectorText->GetOutput() );
   zmapper->SetInput( this->ZAxisVectorText->GetOutput() );
-  
+
   this->XAxisLabel->SetMapper( xmapper );
   this->YAxisLabel->SetMapper( ymapper );
   this->ZAxisLabel->SetMapper( zmapper );
-  
+
   xmapper->Delete();
   ymapper->Delete();
   zmapper->Delete();
-  
+
   this->UpdateProps();
 }
 
@@ -173,23 +156,23 @@ vtkPVAxesActor::~vtkPVAxesActor()
   this->CylinderSource->Delete();
   this->LineSource->Delete();
   this->ConeSource->Delete();
-  this->SphereSource->Delete();  
-  
+  this->SphereSource->Delete();
+
   this->XAxisShaft->Delete();
   this->YAxisShaft->Delete();
-  this->ZAxisShaft->Delete();  
+  this->ZAxisShaft->Delete();
 
   this->XAxisTip->Delete();
   this->YAxisTip->Delete();
-  this->ZAxisTip->Delete();  
-  
+  this->ZAxisTip->Delete();
+
   this->SetUserDefinedTip( NULL );
   this->SetUserDefinedShaft( NULL );
-  
+
   this->SetXAxisLabelText( NULL );
   this->SetYAxisLabelText( NULL );
   this->SetZAxisLabelText( NULL );
-  
+
   this->XAxisVectorText->Delete();
   this->YAxisVectorText->Delete();
   this->ZAxisVectorText->Delete();
@@ -230,16 +213,16 @@ void vtkPVAxesActor::GetActors(vtkPropCollection *ac)
 //-----------------------------------------------------------------------------
 int vtkPVAxesActor::RenderOpaqueGeometry(vtkViewport *vp)
 {
-  int          renderedSomething = 0; 
+  int          renderedSomething = 0;
 
   vtkRenderer *ren = vtkRenderer::SafeDownCast( vp );
 
   this->UpdateProps();
-  
+
   this->XAxisLabel->SetCamera( ren->GetActiveCamera() );
   this->YAxisLabel->SetCamera( ren->GetActiveCamera() );
   this->ZAxisLabel->SetCamera( ren->GetActiveCamera() );
-  
+
   this->XAxisShaft->RenderOpaqueGeometry(vp);
   this->YAxisShaft->RenderOpaqueGeometry(vp);
   this->ZAxisShaft->RenderOpaqueGeometry(vp);
@@ -251,17 +234,17 @@ int vtkPVAxesActor::RenderOpaqueGeometry(vtkViewport *vp)
   this->XAxisLabel->RenderOpaqueGeometry(vp);
   this->YAxisLabel->RenderOpaqueGeometry(vp);
   this->ZAxisLabel->RenderOpaqueGeometry(vp);
-  
+
   return renderedSomething;
 }
 
 //-----------------------------------------------------------------------------
 int vtkPVAxesActor::RenderTranslucentPolygonalGeometry(vtkViewport *vp)
 {
-  int renderedSomething=0; 
+  int renderedSomething=0;
 
   this->UpdateProps();
-  
+
   renderedSomething += this->XAxisShaft->RenderTranslucentPolygonalGeometry(vp);
   renderedSomething += this->YAxisShaft->RenderTranslucentPolygonalGeometry(vp);
   renderedSomething += this->ZAxisShaft->RenderTranslucentPolygonalGeometry(vp);
@@ -269,21 +252,21 @@ int vtkPVAxesActor::RenderTranslucentPolygonalGeometry(vtkViewport *vp)
   renderedSomething += this->XAxisTip->RenderTranslucentPolygonalGeometry(vp);
   renderedSomething += this->YAxisTip->RenderTranslucentPolygonalGeometry(vp);
   renderedSomething += this->ZAxisTip->RenderTranslucentPolygonalGeometry(vp);
-  
+
   renderedSomething += this->XAxisLabel->RenderTranslucentPolygonalGeometry(vp);
   renderedSomething += this->YAxisLabel->RenderTranslucentPolygonalGeometry(vp);
   renderedSomething += this->ZAxisLabel->RenderTranslucentPolygonalGeometry(vp);
-  
+
   return renderedSomething;
 }
 
 //-----------------------------------------------------------------------------
 int vtkPVAxesActor::HasTranslucentPolygonalGeometry()
 {
-  int result = 0; 
+  int result = 0;
 
   this->UpdateProps();
-  
+
   result |= this->XAxisShaft->HasTranslucentPolygonalGeometry();
   result |= this->YAxisShaft->HasTranslucentPolygonalGeometry();
   result |= this->ZAxisShaft->HasTranslucentPolygonalGeometry();
@@ -291,11 +274,11 @@ int vtkPVAxesActor::HasTranslucentPolygonalGeometry()
   result |= this->XAxisTip->HasTranslucentPolygonalGeometry();
   result |= this->YAxisTip->HasTranslucentPolygonalGeometry();
   result |= this->ZAxisTip->HasTranslucentPolygonalGeometry();
-  
+
   result |= this->XAxisLabel->HasTranslucentPolygonalGeometry();
   result |= this->YAxisLabel->HasTranslucentPolygonalGeometry();
   result |= this->ZAxisLabel->HasTranslucentPolygonalGeometry();
-  
+
   return result;
 }
 
@@ -311,7 +294,7 @@ void vtkPVAxesActor::ReleaseGraphicsResources(vtkWindow *win)
   this->XAxisTip->ReleaseGraphicsResources( win );
   this->YAxisTip->ReleaseGraphicsResources( win );
   this->ZAxisTip->ReleaseGraphicsResources( win );
-    
+
   this->XAxisLabel->ReleaseGraphicsResources( win );
   this->YAxisLabel->ReleaseGraphicsResources( win );
   this->ZAxisLabel->ReleaseGraphicsResources( win );
@@ -335,52 +318,52 @@ double *vtkPVAxesActor::GetBounds()
 {
   double bounds[6];
   int i;
-  
+
   this->XAxisShaft->GetBounds(this->Bounds);
 
   this->YAxisShaft->GetBounds(bounds);
   for (i=0; i<3; i++)
     {
-    this->Bounds[2*i+1] = 
-      (bounds[2*i+1]>this->Bounds[2*i+1])?(bounds[2*i+1]):(this->Bounds[2*i+1]);    
+    this->Bounds[2*i+1] =
+      (bounds[2*i+1]>this->Bounds[2*i+1])?(bounds[2*i+1]):(this->Bounds[2*i+1]);
     }
 
   this->ZAxisShaft->GetBounds(bounds);
   for (i=0; i<3; i++)
     {
-    this->Bounds[2*i+1] = 
-      (bounds[2*i+1]>this->Bounds[2*i+1])?(bounds[2*i+1]):(this->Bounds[2*i+1]);    
+    this->Bounds[2*i+1] =
+      (bounds[2*i+1]>this->Bounds[2*i+1])?(bounds[2*i+1]):(this->Bounds[2*i+1]);
     }
 
   this->XAxisTip->GetBounds(bounds);
   for (i=0; i<3; i++)
     {
-    this->Bounds[2*i+1] = 
-      (bounds[2*i+1]>this->Bounds[2*i+1])?(bounds[2*i+1]):(this->Bounds[2*i+1]);    
+    this->Bounds[2*i+1] =
+      (bounds[2*i+1]>this->Bounds[2*i+1])?(bounds[2*i+1]):(this->Bounds[2*i+1]);
     }
 
   this->YAxisTip->GetBounds(bounds);
   for (i=0; i<3; i++)
     {
-    this->Bounds[2*i+1] = 
-      (bounds[2*i+1]>this->Bounds[2*i+1])?(bounds[2*i+1]):(this->Bounds[2*i+1]);    
+    this->Bounds[2*i+1] =
+      (bounds[2*i+1]>this->Bounds[2*i+1])?(bounds[2*i+1]):(this->Bounds[2*i+1]);
     }
 
   this->ZAxisTip->GetBounds(bounds);
   for (i=0; i<3; i++)
     {
-    this->Bounds[2*i+1] = 
-      (bounds[2*i+1]>this->Bounds[2*i+1])?(bounds[2*i+1]):(this->Bounds[2*i+1]);    
+    this->Bounds[2*i+1] =
+      (bounds[2*i+1]>this->Bounds[2*i+1])?(bounds[2*i+1]):(this->Bounds[2*i+1]);
     }
 
   double dbounds[6];
   (vtkPolyDataMapper::SafeDownCast(this->YAxisShaft->GetMapper()))->
     GetInput()->GetBounds( dbounds );
-  
+
   for (i=0; i<3; i++)
     {
-    this->Bounds[2*i+1] = 
-      (dbounds[2*i+1]>this->Bounds[2*i+1])?(dbounds[2*i+1]):(this->Bounds[2*i+1]);    
+    this->Bounds[2*i+1] =
+      (dbounds[2*i+1]>this->Bounds[2*i+1])?(dbounds[2*i+1]):(this->Bounds[2*i+1]);
     }
 
   // We want this actor to rotate / re-center about the origin, so give it
@@ -474,9 +457,9 @@ void vtkPVAxesActor::SetTotalLength( float x, float y, float z )
     this->TotalLength[0] = x;
     this->TotalLength[1] = y;
     this->TotalLength[2] = z;
-  
+
     this->Modified();
-    
+
     this->UpdateProps();
     }
 }
@@ -491,9 +474,9 @@ void vtkPVAxesActor::SetNormalizedShaftLength( float x, float y, float z )
     this->NormalizedShaftLength[0] = x;
     this->NormalizedShaftLength[1] = y;
     this->NormalizedShaftLength[2] = z;
-  
+
     this->Modified();
-    
+
     this->UpdateProps();
     }
 }
@@ -508,9 +491,9 @@ void vtkPVAxesActor::SetNormalizedTipLength( float x, float y, float z )
     this->NormalizedTipLength[0] = x;
     this->NormalizedTipLength[1] = y;
     this->NormalizedTipLength[2] = z;
-  
+
     this->Modified();
-    
+
     this->UpdateProps();
     }
 }
@@ -521,9 +504,9 @@ void vtkPVAxesActor::SetShaftType( int type )
   if ( this->ShaftType != type )
     {
     this->ShaftType = type;
-  
+
     this->Modified();
-    
+
     this->UpdateProps();
     }
 }
@@ -534,9 +517,9 @@ void vtkPVAxesActor::SetTipType( int type )
   if ( this->TipType != type )
     {
     this->TipType = type;
-  
+
     this->Modified();
-    
+
     this->UpdateProps();
     }
 }
@@ -546,15 +529,15 @@ void vtkPVAxesActor::UpdateProps()
 {
   this->CylinderSource->SetRadius(this->CylinderRadius);
   this->CylinderSource->SetResolution(this->CylinderResolution);
-  
-  
+
+
   this->ConeSource->SetResolution(this->ConeResolution);
   this->ConeSource->SetRadius(this->ConeRadius);
- 
+
   this->SphereSource->SetThetaResolution( this->SphereResolution );
   this->SphereSource->SetPhiResolution( this->SphereResolution );
   this->SphereSource->SetRadius(this->SphereRadius);
-  
+
   switch ( this->ShaftType )
     {
     case vtkPVAxesActor::CYLINDER_SHAFT:
@@ -569,50 +552,50 @@ void vtkPVAxesActor::UpdateProps()
       (vtkPolyDataMapper::SafeDownCast(this->XAxisShaft->GetMapper()))->
         SetInput( this->UserDefinedShaft );
     }
-  
+
   switch ( this->TipType )
     {
     case vtkPVAxesActor::CONE_TIP:
       (vtkPolyDataMapper::SafeDownCast(this->XAxisTip->GetMapper()))->
         SetInput( this->ConeSource->GetOutput() );
-      break;      
+      break;
     case vtkPVAxesActor::SPHERE_TIP:
       (vtkPolyDataMapper::SafeDownCast(this->XAxisTip->GetMapper()))->
         SetInput( this->SphereSource->GetOutput() );
-      break;      
+      break;
     case vtkPVAxesActor::USER_DEFINED_TIP:
       (vtkPolyDataMapper::SafeDownCast(this->XAxisTip->GetMapper()))->
         SetInput( this->UserDefinedTip );
     }
-  
+
   (vtkPolyDataMapper::SafeDownCast(this->XAxisTip->GetMapper()))->
     GetInput()->Update();
   (vtkPolyDataMapper::SafeDownCast(this->XAxisShaft->GetMapper()))->
     GetInput()->Update();
-      
-  
-  
+
+
+
   float scale[3];
   double bounds[6];
 
   (vtkPolyDataMapper::SafeDownCast(this->XAxisShaft->GetMapper()))->
     GetInput()->GetBounds( bounds );
-  
+
   int i;
   for ( i = 0; i < 3; i++ )
     {
-    scale[i] = 
-      this->NormalizedShaftLength[i]*this->TotalLength[i] / 
+    scale[i] =
+      this->NormalizedShaftLength[i]*this->TotalLength[i] /
       (bounds[3] - bounds[2]);
     }
-  
+
   vtkTransform *xTransform = vtkTransform::New();
   vtkTransform *yTransform = vtkTransform::New();
   vtkTransform *zTransform = vtkTransform::New();
-  
+
   xTransform->RotateZ( -90 );
   zTransform->RotateX( 90 );
-  
+
   xTransform->Scale( scale[0], scale[0], scale[0] );
   yTransform->Scale( scale[1], scale[1], scale[1] );
   zTransform->Scale( scale[2], scale[2], scale[2] );
@@ -626,8 +609,8 @@ void vtkPVAxesActor::UpdateProps()
   zTransform->Translate( -(bounds[0]+bounds[1])/2,
                          -bounds[2],
                          -(bounds[4]+bounds[5])/2 );
-  
-  
+
+
 
   this->XAxisShaft->SetUserTransform( xTransform );
   this->YAxisShaft->SetUserTransform( yTransform );
@@ -636,37 +619,37 @@ void vtkPVAxesActor::UpdateProps()
   xTransform->Delete();
   yTransform->Delete();
   zTransform->Delete();
-  
+
   (vtkPolyDataMapper::SafeDownCast(this->XAxisTip->GetMapper()))->
     GetInput()->GetBounds( bounds );
-  
+
   xTransform = vtkTransform::New();
   yTransform = vtkTransform::New();
   zTransform = vtkTransform::New();
-  
+
   xTransform->RotateZ( -90 );
   zTransform->RotateX( 90 );
-  
+
   xTransform->Scale( this->TotalLength[0], this->TotalLength[0], this->TotalLength[0] );
   yTransform->Scale( this->TotalLength[1], this->TotalLength[1], this->TotalLength[1] );
   zTransform->Scale( this->TotalLength[2], this->TotalLength[2], this->TotalLength[2] );
-  
+
   xTransform->Translate( 0, (1.0 - this->NormalizedTipLength[0]), 0 );
   yTransform->Translate( 0, (1.0 - this->NormalizedTipLength[1]), 0 );
   zTransform->Translate( 0, (1.0 - this->NormalizedTipLength[2]), 0 );
-  
-  xTransform->Scale( this->NormalizedTipLength[0], 
-                     this->NormalizedTipLength[0], 
+
+  xTransform->Scale( this->NormalizedTipLength[0],
+                     this->NormalizedTipLength[0],
                      this->NormalizedTipLength[0] );
 
-  yTransform->Scale( this->NormalizedTipLength[1], 
-                     this->NormalizedTipLength[1], 
+  yTransform->Scale( this->NormalizedTipLength[1],
+                     this->NormalizedTipLength[1],
                      this->NormalizedTipLength[1] );
-  
-  zTransform->Scale( this->NormalizedTipLength[2], 
-                     this->NormalizedTipLength[2], 
+
+  zTransform->Scale( this->NormalizedTipLength[2],
+                     this->NormalizedTipLength[2],
                      this->NormalizedTipLength[2] );
-  
+
   xTransform->Translate( -(bounds[0]+bounds[1])/2,
                          -bounds[2],
                          -(bounds[4]+bounds[5])/2 );
@@ -677,7 +660,7 @@ void vtkPVAxesActor::UpdateProps()
                          -bounds[2],
                          -(bounds[4]+bounds[5])/2 );
 
-  
+
   this->XAxisTip->SetUserTransform( xTransform );
   this->YAxisTip->SetUserTransform( yTransform );
   this->ZAxisTip->SetUserTransform( zTransform );
@@ -689,11 +672,11 @@ void vtkPVAxesActor::UpdateProps()
   this->XAxisVectorText->SetText( this->XAxisLabelText );
   this->YAxisVectorText->SetText( this->YAxisLabelText );
   this->ZAxisVectorText->SetText( this->ZAxisLabelText );
-  
-  
-  float avgScale = 
+
+
+  float avgScale =
     (this->TotalLength[0] + this->TotalLength[1] + this->TotalLength[2])/15;
-  
+
   this->XAxisShaft->GetBounds(bounds);
   this->XAxisLabel->SetScale( avgScale, avgScale, avgScale );
   this->XAxisLabel->SetPosition( bounds[0] + this->XAxisLabelPosition *
@@ -703,14 +686,14 @@ void vtkPVAxesActor::UpdateProps()
 
   this->YAxisShaft->GetBounds(bounds);
   this->YAxisLabel->SetScale( avgScale, avgScale, avgScale );
-  this->YAxisLabel->SetPosition( (bounds[0]+bounds[1])/2, 
+  this->YAxisLabel->SetPosition( (bounds[0]+bounds[1])/2,
                                  bounds[2] + this->YAxisLabelPosition *
                                  (bounds[3]-bounds[2]),
                                  bounds[5] + (bounds[5]-bounds[4])/2.0 );
 
   this->ZAxisShaft->GetBounds(bounds);
   this->ZAxisLabel->SetScale( avgScale, avgScale, avgScale );
-  this->ZAxisLabel->SetPosition( bounds[0], 
+  this->ZAxisLabel->SetPosition( bounds[0],
                                  bounds[2] - (bounds[3]-bounds[2])*2.0,
                                  bounds[4] + this->ZAxisLabelPosition *
                                  (bounds[5]-bounds[4]) );
@@ -720,7 +703,7 @@ void vtkPVAxesActor::UpdateProps()
 void vtkPVAxesActor::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
-  
+
   os << indent << "UserDefinedShaft: ";
   if (this->UserDefinedShaft)
     {
@@ -730,7 +713,7 @@ void vtkPVAxesActor::PrintSelf(ostream& os, vtkIndent indent)
     {
     os << "(none)" << endl;
     }
-  
+
   os << indent << "UserDefinedTip: ";
   if (this->UserDefinedTip)
     {
@@ -740,7 +723,7 @@ void vtkPVAxesActor::PrintSelf(ostream& os, vtkIndent indent)
     {
     os << "(none)" << endl;
     }
-  
+
   os << indent << "XAxisLabelText: " << (this->XAxisLabelText ?
                                          this->XAxisLabelText : "(none)")
      << endl;
@@ -753,23 +736,23 @@ void vtkPVAxesActor::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "XAxisLabelPosition: " << this->XAxisLabelPosition << endl;
   os << indent << "YAxisLabelPosition: " << this->YAxisLabelPosition << endl;
   os << indent << "ZAxisLabelPosition: " << this->ZAxisLabelPosition << endl;
-  
+
   os << indent << "SphereRadius: " << this->SphereRadius << endl;
   os << indent << "SphereResolution: " << this->SphereResolution << endl;
   os << indent << "CylinderRadius: " << this->CylinderRadius << endl;
   os << indent << "CylinderResolution: " << this->CylinderResolution << endl;
   os << indent << "ConeRadius: " << this->ConeRadius << endl;
   os << indent << "ConeResolution: " << this->ConeResolution << endl;
-  
-  os << indent << "NormalizedShaftLength: " 
+
+  os << indent << "NormalizedShaftLength: "
      << this->NormalizedShaftLength[0] << ","
      << this->NormalizedShaftLength[1] << ","
      << this->NormalizedShaftLength[2] << endl;
-  os << indent << "NormalizedTipLength: " 
+  os << indent << "NormalizedTipLength: "
      << this->NormalizedTipLength[0] << ","
      << this->NormalizedTipLength[1] << ","
      << this->NormalizedTipLength[2] << endl;
-  os << indent << "TotalLength: " 
+  os << indent << "TotalLength: "
      << this->TotalLength[0] << ","
      << this->TotalLength[1] << ","
      << this->TotalLength[2] << endl;

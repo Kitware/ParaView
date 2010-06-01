@@ -1,32 +1,15 @@
 /*=========================================================================
 
-   Program: ParaView
-   Module:    vtkPVAxesWidget.cxx
+  Program:   ParaView
+  Module:    vtkSMProxy.h
 
-   Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
-   All rights reserved.
+  Copyright (c) Kitware, Inc.
+  All rights reserved.
+  See Copyright.txt or http://www.paraview.org/HTML/Copyright.html for details.
 
-   ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
-
-   See License_v1.2.txt for the full ParaView license.
-   A copy of this license can be obtained by contacting
-   Kitware Inc.
-   28 Corporate Drive
-   Clifton Park, NY 12065
-   USA
-
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE AUTHORS OR
-CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
-EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
-PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
-PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
-LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
-NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+     This software is distributed WITHOUT ANY WARRANTY; without even
+     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+     PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
 #include "vtkPVAxesWidget.h"
@@ -57,12 +40,12 @@ class vtkPVAxesWidgetObserver : public vtkCommand
 public:
   static vtkPVAxesWidgetObserver *New()
     {return new vtkPVAxesWidgetObserver;};
-  
+
   vtkPVAxesWidgetObserver()
     {
       this->AxesWidget = 0;
     }
-  
+
   virtual void Execute(vtkObject* wdg, unsigned long event, void *calldata)
     {
       if (this->AxesWidget)
@@ -70,7 +53,7 @@ public:
         this->AxesWidget->ExecuteEvent(wdg, event, calldata);
         }
     }
-  
+
   vtkPVAxesWidget *AxesWidget;
 };
 
@@ -80,7 +63,7 @@ vtkPVAxesWidget::vtkPVAxesWidget()
   this->StartEventObserverId = 0;
 
   this->EventCallbackCommand->SetCallback(vtkPVAxesWidget::ProcessEvents);
-  
+
   this->Observer = vtkPVAxesWidgetObserver::New();
   this->Observer->AxesWidget = this;
   this->Renderer = vtkRenderer::New();
@@ -90,16 +73,16 @@ vtkPVAxesWidget::vtkPVAxesWidget()
   this->Priority = 0.55;
   this->AxesActor = vtkPVAxesActor::New();
   this->Renderer->AddActor(this->AxesActor);
-  
+
   this->ParentRenderer = NULL;
-  
+
   this->Moving = 0;
   this->MouseCursorState = vtkPVAxesWidget::Outside;
 
   this->StartTag = 0;
-  
+
   this->Interactive = 1;
-  
+
   this->Outline = vtkPolyData::New();
   this->Outline->Allocate();
   vtkPoints *points = vtkPoints::New();
@@ -119,7 +102,7 @@ vtkPVAxesWidget::vtkPVAxesWidget()
   this->OutlineActor->SetMapper(mapper);
   this->OutlineActor->SetPosition(0, 0);
   this->OutlineActor->SetPosition2(1, 1);
-  
+
   points->Delete();
   mapper->Delete();
   tcoord->Delete();
@@ -143,7 +126,7 @@ void vtkPVAxesWidget::SetEnabled(int enabling)
     {
     vtkErrorMacro("The interactor must be set prior to enabling/disabling widget");
     }
-  
+
   if (enabling)
     {
     if (this->Enabled)
@@ -157,7 +140,7 @@ void vtkPVAxesWidget::SetEnabled(int enabling)
       }
 
     this->Enabled = 1;
-    
+
     if ( this->EventCallbackCommand )
       {
       vtkRenderWindowInteractor *i = this->Interactor;
@@ -168,7 +151,7 @@ void vtkPVAxesWidget::SetEnabled(int enabling)
       i->AddObserver(vtkCommand::LeftButtonReleaseEvent,
         this->EventCallbackCommand, this->Priority);
       }
-    
+
     this->ParentRenderer->GetRenderWindow()->AddRenderer(this->Renderer);
     if (this->ParentRenderer->GetRenderWindow()->GetNumberOfLayers() < 2)
       {
@@ -177,7 +160,7 @@ void vtkPVAxesWidget::SetEnabled(int enabling)
     this->AxesActor->SetVisibility(1);
     // We need to copy the camera before the compositing observer is called.
     // Compositing temporarily changes the camera to display an image.
-    this->StartEventObserverId = 
+    this->StartEventObserverId =
       this->ParentRenderer->AddObserver(vtkCommand::StartEvent,this->Observer,1);
     this->InvokeEvent(vtkCommand::EnableEvent, NULL);
     }
@@ -187,10 +170,10 @@ void vtkPVAxesWidget::SetEnabled(int enabling)
       {
       return;
       }
-    
+
     this->Enabled = 0;
     this->Interactor->RemoveObserver(this->EventCallbackCommand);
-    
+
     this->AxesActor->SetVisibility(0);
     if (this->ParentRenderer)
       {
@@ -204,7 +187,7 @@ void vtkPVAxesWidget::SetEnabled(int enabling)
         this->ParentRenderer->RemoveObserver(this->StartEventObserverId);
         }
       }
-    
+
     this->InvokeEvent(vtkCommand::DisableEvent, NULL);
     }
 }
@@ -218,19 +201,19 @@ void vtkPVAxesWidget::ExecuteEvent(vtkObject *vtkNotUsed(o),
     {
     return;
     }
-  
+
   vtkCamera *cam = this->ParentRenderer->GetActiveCamera();
   double pos[3], fp[3], viewup[3];
   cam->GetPosition(pos);
   cam->GetFocalPoint(fp);
   cam->GetViewUp(viewup);
-  
+
   cam = this->Renderer->GetActiveCamera();
   cam->SetPosition(pos);
   cam->SetFocalPoint(fp);
   cam->SetViewUp(viewup);
   this->Renderer->ResetCamera();
-  
+
   this->SquareRenderer();
 }
 
@@ -241,24 +224,24 @@ void vtkPVAxesWidget::UpdateCursorIcon()
     this->SetMouseCursor(vtkPVAxesWidget::Outside);
     return;
     }
-  
+
   if (this->Moving)
     {
     return;
     }
-  
+
   int *parentSize = this->ParentRenderer->GetSize();
-  
+
   int x = this->Interactor->GetEventPosition()[0];
   int y = this->Interactor->GetEventPosition()[1];
   double xNorm = x / (double)parentSize[0];
   double yNorm = y / (double)parentSize[1];
-  
+
   double pos[4];
   this->Renderer->GetViewport(pos);
-  
+
   int pState = this->MouseCursorState;
-  
+
   if (xNorm > pos[0] && xNorm < pos[2] && yNorm > pos[1] && yNorm < pos[3])
     {
     this->MouseCursorState = vtkPVAxesWidget::Inside;
@@ -288,7 +271,7 @@ void vtkPVAxesWidget::UpdateCursorIcon()
     {
     return;
     }
-  
+
   if (this->MouseCursorState == vtkPVAxesWidget::Outside)
     {
     this->Renderer->RemoveActor(this->OutlineActor);
@@ -298,7 +281,7 @@ void vtkPVAxesWidget::UpdateCursorIcon()
     this->Renderer->AddActor(this->OutlineActor);
     }
   this->Interactor->Render();
-  
+
   this->SetMouseCursor(this->MouseCursorState);
 }
 
@@ -341,7 +324,7 @@ void vtkPVAxesWidget::ProcessEvents(vtkObject* vtkNotUsed(object),
     {
     return;
     }
-  
+
   switch (event)
     {
     case vtkCommand::LeftButtonPressEvent:
@@ -363,12 +346,12 @@ void vtkPVAxesWidget::OnButtonPress()
     {
     return;
     }
-  
+
   this->SetMouseCursor(this->MouseCursorState);
 
   this->StartPosition[0] = this->Interactor->GetEventPosition()[0];
   this->StartPosition[1] = this->Interactor->GetEventPosition()[1];
-  
+
   this->Moving = 1;
   this->EventCallbackCommand->SetAbortFlag(1);
   this->StartInteraction();
@@ -382,7 +365,7 @@ void vtkPVAxesWidget::OnButtonRelease()
     {
     return;
     }
-  
+
   this->Moving = 0;
   this->EndInteraction();
   this->InvokeEvent(vtkCommand::EndInteractionEvent, NULL);
@@ -411,7 +394,7 @@ void vtkPVAxesWidget::OnMouseMove()
         this->ResizeBottomRight();
         break;
       }
-    
+
     this->UpdateCursorIcon();
     this->EventCallbackCommand->SetAbortFlag(1);
     this->InvokeEvent(vtkCommand::InteractionEvent, NULL);
@@ -427,7 +410,7 @@ void vtkPVAxesWidget::MoveWidget()
 {
   int x = this->Interactor->GetEventPosition()[0];
   int y = this->Interactor->GetEventPosition()[1];
-  
+
   int dx = x - this->StartPosition[0];
   int dy = y - this->StartPosition[1];
 
@@ -437,9 +420,9 @@ void vtkPVAxesWidget::MoveWidget()
   int *size = this->ParentRenderer->GetSize();
   double dxNorm = dx / (double)size[0];
   double dyNorm = dy / (double)size[1];
-  
+
   double *vp = this->Renderer->GetViewport();
-  
+
   double newPos[4];
   newPos[0] = vp[0] + dxNorm;
   newPos[1] = vp[1] + dyNorm;
@@ -480,19 +463,19 @@ void vtkPVAxesWidget::ResizeTopLeft()
 {
   int x = this->Interactor->GetEventPosition()[0];
   int y = this->Interactor->GetEventPosition()[1];
-  
+
   int dx = x - this->StartPosition[0];
   int dy = y - this->StartPosition[1];
-  
+
   int *size = this->ParentRenderer->GetSize();
   double dxNorm = dx / (double)size[0];
   double dyNorm = dy / (double)size[1];
-  
+
   int useX;
   double change;
   double absDx = fabs(dxNorm);
   double absDy = fabs(dyNorm);
-  
+
   if (absDx > absDy)
     {
     change = dxNorm;
@@ -503,18 +486,18 @@ void vtkPVAxesWidget::ResizeTopLeft()
     change = dyNorm;
     useX = 0;
     }
-  
+
   double *vp = this->Renderer->GetViewport();
-  
+
   this->StartPosition[0] = x;
   this->StartPosition[1] = y;
-  
+
   double newPos[4];
   newPos[0] = useX ? vp[0] + change : vp[0] - change;
   newPos[1] = vp[1];
   newPos[2] = vp[2];
   newPos[3] = useX ? vp[3] - change : vp[3] + change;
-  
+
   if (newPos[0] < 0)
     {
     this->StartPosition[0] = 0;
@@ -533,7 +516,7 @@ void vtkPVAxesWidget::ResizeTopLeft()
     {
     newPos[3] = newPos[1] + 0.01;
     }
-  
+
   this->Renderer->SetViewport(newPos);
   this->Interactor->Render();
 }
@@ -543,10 +526,10 @@ void vtkPVAxesWidget::ResizeTopRight()
 {
   int x = this->Interactor->GetEventPosition()[0];
   int y = this->Interactor->GetEventPosition()[1];
-  
+
   int dx = x - this->StartPosition[0];
   int dy = y - this->StartPosition[1];
-  
+
   int *size = this->ParentRenderer->GetSize();
   double dxNorm = dx / (double)size[0];
   double dyNorm = dy / (double)size[1];
@@ -554,7 +537,7 @@ void vtkPVAxesWidget::ResizeTopRight()
   double change;
   double absDx = fabs(dxNorm);
   double absDy = fabs(dyNorm);
-  
+
   if (absDx > absDy)
     {
     change = dxNorm;
@@ -563,18 +546,18 @@ void vtkPVAxesWidget::ResizeTopRight()
     {
     change = dyNorm;
     }
-  
+
   double *vp = this->Renderer->GetViewport();
-  
+
   this->StartPosition[0] = x;
   this->StartPosition[1] = y;
-  
+
   double newPos[4];
   newPos[0] = vp[0];
   newPos[1] = vp[1];
   newPos[2] = vp[2] + change;
   newPos[3] = vp[3] + change;
-  
+
   if (newPos[2] > 1)
     {
     this->StartPosition[0] = size[0];
@@ -593,7 +576,7 @@ void vtkPVAxesWidget::ResizeTopRight()
     {
     newPos[3] = newPos[1] + 0.01;
     }
-  
+
   this->Renderer->SetViewport(newPos);
   this->Interactor->Render();
 }
@@ -603,19 +586,19 @@ void vtkPVAxesWidget::ResizeBottomLeft()
 {
   int x = this->Interactor->GetEventPosition()[0];
   int y = this->Interactor->GetEventPosition()[1];
-  
+
   int dx = x - this->StartPosition[0];
   int dy = y - this->StartPosition[1];
-  
+
   int *size = this->ParentRenderer->GetSize();
   double dxNorm = dx / (double)size[0];
   double dyNorm = dy / (double)size[1];
   double *vp = this->Renderer->GetViewport();
-  
+
   double change;
   double absDx = fabs(dxNorm);
   double absDy = fabs(dyNorm);
-  
+
   if (absDx > absDy)
     {
     change = dxNorm;
@@ -624,16 +607,16 @@ void vtkPVAxesWidget::ResizeBottomLeft()
     {
     change = dyNorm;
     }
-  
+
   this->StartPosition[0] = x;
   this->StartPosition[1] = y;
-  
+
   double newPos[4];
   newPos[0] = vp[0] + change;
   newPos[1] = vp[1] + change;
   newPos[2] = vp[2];
   newPos[3] = vp[3];
-  
+
   if (newPos[0] < 0)
     {
     this->StartPosition[0] = 0;
@@ -652,7 +635,7 @@ void vtkPVAxesWidget::ResizeBottomLeft()
     {
     newPos[1] = newPos[3] - 0.01;
     }
-  
+
   this->Renderer->SetViewport(newPos);
   this->Interactor->Render();
 }
@@ -662,21 +645,21 @@ void vtkPVAxesWidget::ResizeBottomRight()
 {
   int x = this->Interactor->GetEventPosition()[0];
   int y = this->Interactor->GetEventPosition()[1];
-  
+
   int dx = x - this->StartPosition[0];
   int dy = y - this->StartPosition[1];
-  
+
   int *size = this->ParentRenderer->GetSize();
   double dxNorm = dx / (double)size[0];
   double dyNorm = dy / (double)size[1];
-  
+
   double *vp = this->Renderer->GetViewport();
-  
+
   int useX;
   double change;
   double absDx = fabs(dxNorm);
   double absDy = fabs(dyNorm);
-  
+
   if (absDx > absDy)
     {
     change = dxNorm;
@@ -687,16 +670,16 @@ void vtkPVAxesWidget::ResizeBottomRight()
     change = dyNorm;
     useX = 0;
     }
-  
+
   this->StartPosition[0] = x;
   this->StartPosition[1] = y;
-  
+
   double newPos[4];
   newPos[0] = vp[0];
   newPos[1] = useX ? vp[1] - change : vp[1] + change;
   newPos[2] = useX ? vp[2] + change : vp[2] - change;
   newPos[3] = vp[3];
-  
+
   if (newPos[2] > 1)
     {
     this->StartPosition[0] = size[0];
@@ -715,7 +698,7 @@ void vtkPVAxesWidget::ResizeBottomRight()
     {
     newPos[1] = newPos[3]-0.01;
     }
-  
+
   this->Renderer->SetViewport(newPos);
   this->Interactor->Render();
 }
@@ -728,10 +711,10 @@ void vtkPVAxesWidget::SquareRenderer()
     {
     return;
     }
-  
+
   double vp[4];
   this->Renderer->GetViewport(vp);
-  
+
   double deltaX = vp[2] - vp[0];
   double newDeltaX = size[1] * deltaX / (double)size[0];
   double deltaY = vp[3] - vp[1];
@@ -774,12 +757,12 @@ void vtkPVAxesWidget::SquareRenderer()
       vp[0] = vp[2] - newDeltaX;
       }
     }
-  
+
   this->Renderer->SetViewport(vp);
-  
+
   this->Renderer->NormalizedDisplayToDisplay(vp[0], vp[1]);
   this->Renderer->NormalizedDisplayToDisplay(vp[2], vp[3]);
-  
+
   vtkPoints *points = this->Outline->GetPoints();
   points->SetPoint(0, vp[0]+1, vp[1]+1, 0);
   points->SetPoint(1, vp[2]-1, vp[1]+1, 0);
@@ -794,7 +777,7 @@ void vtkPVAxesWidget::SetInteractive(int state)
     {
     this->Interactive = state;
     }
-  
+
   if (!state)
     {
     this->OnButtonRelease();
@@ -861,7 +844,7 @@ double* vtkPVAxesWidget::GetViewport()
 void vtkPVAxesWidget::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  
+
   os << indent << "AxesActor: " << this->AxesActor << endl;
   os << indent << "Interactive: " << this->Interactive << endl;
 }

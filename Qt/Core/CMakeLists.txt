@@ -393,11 +393,6 @@ ADD_LIBRARY(pqCore
   ${UI_BUILT_SOURCES}
 
   ${PYTHON_CORE_SRCS}
-
-  vtkPVAxesWidget.cxx
-  vtkPVAxesWidget.h
-  vtkPVAxesActor.cxx
-  vtkPVAxesActor.h
   vtkPVGUIPluginInterface.cxx
   vtkPVGUIPluginInterface.h
 )

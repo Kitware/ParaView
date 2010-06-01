@@ -324,6 +324,10 @@ protected:
   void SynchronizeRenderers();
 
   // Description:
+  // Updates the position and scale for the center axes.
+  void UpdateCenterAxesPositionAndScale();
+
+  // Description:
   // Returns a new selection consisting of all the selections with the given
   // prop id in the surfaceSelection.
   vtkSelection* NewSelectionForProp(vtkSelection* surfaceSelection, 
@@ -343,6 +347,8 @@ protected:
   vtkSMProxy* InteractorProxy;
   vtkSMProxy* LightKitProxy;
   vtkSMProxy* LightProxy;
+  vtkSMProxy* CenterAxesProxy;
+  vtkSMProxy* OrientationWidgetProxy;
 
   // Pointer to client side objects,
   // for convienience.

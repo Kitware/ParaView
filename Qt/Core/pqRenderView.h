@@ -207,9 +207,6 @@ public slots:
     this->setCenterOfRotation(xyz[0], xyz[1], xyz[2]);
     }
 
-  // Sets the position and scale of the axes when the center of rotation has been modified
-  void updateCenterAxes();
-
   // Toggle center axes visibility.
   void setCenterAxesVisibility(bool visible);
 
@@ -251,17 +248,6 @@ private slots:
   void textAnnotationColorChanged();
 
 protected:
-  /// Center Axes represents the 3D axes in the view. When GUI creates the view,
-  /// we explicitly create a center axes, register it and add it to the view 
-  /// displays.
-  /// However, when the view is not created by GUI explicitly i.e. created 
-  /// through undo-redo/state/python, we try to use the first Axes display in 
-  /// the view as the center axes if any. Otherwise a new center axes will be 
-  /// created for the view then setCenterAxesVisibility(true) is called. Thus, 
-  /// for such views the behavior is analogous to center axis visibility being 
-  /// off. Once, the user enables the center axes, we will show one.
-  void initializeCenterAxes();
-
   /// Restores the visibility etc. for the annotations added by this view such
   /// as center axis, orientation axis.
   void restoreAnnotationSettings();

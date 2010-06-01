@@ -37,6 +37,7 @@
 #include "vtkPointData.h"
 #include "vtkProcessModuleConnectionManager.h"
 #include "vtkProcessModule.h"
+#include "vtkPVAxesWidget.h"
 #include "vtkPVClientServerIdCollectionInformation.h"
 #include "vtkPVGenericRenderWindowInteractor.h"
 #include "vtkPVGeometryInformation.h"
@@ -112,6 +113,8 @@ vtkSMRenderViewProxy::vtkSMRenderViewProxy()
   this->InteractorProxy = 0;
   this->InteractorStyleProxy = 0;
   this->LightKitProxy = 0;
+  this->CenterAxesProxy = 0;
+  this->OrientationWidgetProxy = 0;
   this->RenderInterruptsEnabled = 1;
 
   this->Renderer = 0;
@@ -158,6 +161,8 @@ vtkSMRenderViewProxy::~vtkSMRenderViewProxy()
   this->RenderWindowProxy = 0;
   this->InteractorProxy = 0;
   this->LightKitProxy = 0;
+  this->CenterAxesProxy = 0;
+  this->OrientationWidgetProxy = 0;
 
   this->Renderer = 0;
   this->Renderer2D = 0;
@@ -247,6 +252,8 @@ bool vtkSMRenderViewProxy::BeginCreateVTKObjects()
   this->InteractorStyleProxy = this->GetSubProxy("InteractorStyle");
   this->LightKitProxy = this->GetSubProxy("LightKit");
   this->LightProxy = this->GetSubProxy("Light");
+  this->CenterAxesProxy = this->GetSubProxy("CenterAxes");
+  this->OrientationWidgetProxy = this->GetSubProxy("OrientationWidget");
 
   if (!this->RendererProxy)
     {
@@ -304,6 +311,19 @@ bool vtkSMRenderViewProxy::BeginCreateVTKObjects()
     return false;
     }
 
+  if (!this->CenterAxesProxy)
+    {
+    vtkErrorMacro("CenterAxes subproxy missing.");
+    return false;
+    }
+
+  if (!this->OrientationWidgetProxy)
+    {
+    vtkErrorMacro("OrientationWidget subproxy missing.");
+    return false;
+    }
+
+
   // Set the servers on which each of the subproxies is to be created.
 
   this->RendererProxy->SetServers(
@@ -327,6 +347,7 @@ bool vtkSMRenderViewProxy::BeginCreateVTKObjects()
     vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
   this->LightProxy->SetServers(
     vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
+  this->OrientationWidgetProxy->SetServers(vtkProcessModule::CLIENT);
 
   return this->Superclass::BeginCreateVTKObjects();
 }
@@ -441,7 +462,32 @@ void vtkSMRenderViewProxy::EndCreateVTKObjects()
       }
     }
 
+  // Setup and add the center axes.
+  vtkSMPropertyHelper(this->CenterAxesProxy, "Scale").Set(0, 0.25);
+  vtkSMPropertyHelper(this->CenterAxesProxy, "Scale").Set(1, 0.25);
+  vtkSMPropertyHelper(this->CenterAxesProxy, "Scale").Set(2, 0.25);
+  vtkSMPropertyHelper(this->CenterAxesProxy, "Pickable").Set(0);
+  this->CenterAxesProxy->UpdateVTKObjects();
+  this->AddRepresentation(
+    vtkSMRepresentationProxy::SafeDownCast(this->CenterAxesProxy));
+
   this->Interactor->Enable();
+
+  if (this->GetProperty("CenterOfRotation"))
+    {
+    this->GetProperty("CenterOfRotation")->AddObserver(
+      vtkCommand::ModifiedEvent, this->GetObserver());
+    }
+
+  // Updates the position and scale for the center axes.
+  this->UpdateCenterAxesPositionAndScale();
+
+  vtkPVAxesWidget* orientationWidget = vtkPVAxesWidget::SafeDownCast(
+    this->OrientationWidgetProxy->GetClientSideObject());
+  orientationWidget->SetParentRenderer(this->Renderer);
+  orientationWidget->SetViewport(0, 0, 0.25, 0.25);
+  orientationWidget->SetInteractor(this->GetInteractor());
+  this->OrientationWidgetProxy->UpdateVTKObjects();
 }
 
 //-----------------------------------------------------------------------------
@@ -467,6 +513,12 @@ void vtkSMRenderViewProxy::ProcessEvents(vtkObject* caller, unsigned long eventI
     // At the start of every render ensure that the 2D renderer and 3D renderer
     // have the same camera.
     this->SynchronizeRenderers();
+    }
+  else if (eventId == vtkCommand::ModifiedEvent && caller ==
+    this->GetProperty("CenterOfRotation"))
+    {
+    this->UpdateCenterAxesPositionAndScale();
+    return;
     }
 
   this->Superclass::ProcessEvents(caller, eventId, callData);
@@ -828,6 +880,8 @@ void vtkSMRenderViewProxy::ResetCamera(double bds[6])
   this->GetRenderer()->ResetCamera(bds);
   this->ActiveCameraProxy->UpdatePropertyInformation();
   this->SynchronizeCameraProperties();
+
+  this->UpdateCenterAxesPositionAndScale();
 
   this->Modified();
   this->InvokeEvent(vtkCommand::ResetCameraEvent);
@@ -1875,6 +1929,43 @@ const char* vtkSMRenderViewProxy::GetSuggestedViewType(vtkIdType connectionID)
     }
   
   return renderViewName;
+}
+
+namespace
+{
+  static double vtkMAX(double x, double y) { return x > y ? x : y; }
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMRenderViewProxy::UpdateCenterAxesPositionAndScale()
+{
+  // Position of the axes is same as the center of rotation.
+  double center[3];
+  vtkSMPropertyHelper(this, "CenterOfRotation").Get(center, 3);
+  vtkSMPropertyHelper(this->CenterAxesProxy, "Position").Set(center, 3);
+
+  // FIXME: We may want to look at the 3D widget code to automatically scale the
+  // axes instead of computing the bounds.
+  // Reset size of the axes.
+  double bounds[6];
+  this->ComputeVisiblePropBounds(bounds);
+
+  double widths[3];
+  widths[0] = (bounds[1]-bounds[0]);
+  widths[1] = (bounds[3]-bounds[2]);
+  widths[2] = (bounds[5]-bounds[4]);
+
+  // lets make some thickness in all directions
+  double diameterOverTen = vtkMAX(widths[0], vtkMAX(widths[1], widths[2])) / 10.0;
+  widths[0] = widths[0] < diameterOverTen ? diameterOverTen : widths[0];
+  widths[1] = widths[1] < diameterOverTen ? diameterOverTen : widths[1];
+  widths[2] = widths[2] < diameterOverTen ? diameterOverTen : widths[2];
+
+  widths[0] *= 0.25;
+  widths[1] *= 0.25;
+  widths[2] *= 0.25;
+  vtkSMPropertyHelper(this->CenterAxesProxy, "Scale").Set(widths, 3);
+  this->CenterAxesProxy->UpdateVTKObjects();
 }
 
 //-----------------------------------------------------------------------------

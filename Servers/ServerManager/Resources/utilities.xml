@@ -809,6 +809,44 @@
       </Documentation>
     </Proxy>
 
+
+    <Proxy name="AxesWidget" class="vtkPVAxesWidget"
+           processes="client">
+      <Documentation>
+        Orientation widget used by Render View.
+      </Documentation>
+
+      <IntVectorProperty name="Interactivity"
+          command="SetInteractive"
+          number_of_elements="1"
+          default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Set whether to allow this 3D widget to be interactively moved/scaled.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="Visibility"
+          command="SetEnabled"
+          number_of_elements="1"
+          default_values="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      <DoubleVectorProperty name="LabelColor"
+          command="SetAxisLabelColor"
+          number_of_elements="3"
+          default_values="1 1 1">
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="OutlineColor"
+          command="SetOutlineColor"
+          number_of_elements="3"
+          default_values="1 1 1">
+      </DoubleVectorProperty>
+      <!-- End of AxesWidget -->
+    </Proxy>
+
     <!-- End of ProxyGroup 3d_widgets -->
   </ProxyGroup>
 

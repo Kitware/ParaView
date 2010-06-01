@@ -5174,6 +5174,33 @@
         </ExposedProperties>
       </SubProxy>
 
+      <SubProxy>
+        <Proxy name="CenterAxes"
+          proxygroup="representations"
+          proxyname="AxesRepresentation" />
+          <ExposedProperties>
+            <Property name="Visibility"
+              exposed_name="CenterAxesVisibility" />
+          </ExposedProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="OrientationWidget"
+               proxygroup="3d_widgets"
+               proxyname="AxesWidget">
+        </Proxy>
+        <ExposedProperties>
+          <Property name="Interactivity"
+            exposed_name="OrientationAxesInteractivity" />
+          <Property name="Visibility"
+            exposed_name="OrientationAxesVisibility" />
+          <Property name="LabelColor"
+            exposed_name="OrientationAxesLabelColor" />
+          <Property name="OutlineColor"
+            exposed_name="OrientationAxesOutlineColor" />
+        </ExposedProperties>
+      </SubProxy>
+
       <!-- End of RenderViewBase -->
     </Proxy>
 
@@ -5702,6 +5729,12 @@
           <!-- Interactor -->
           <Property name="CameraManipulators" />
           <Property name="CenterOfRotation" />
+          <!-- Annotations -->
+          <Property name="CenterAxesVisibility" />
+          <Property name="OrientationAxesInteractivity" />
+          <Property name="OrientationAxesVisibility" />
+          <Property name="OrientationAxesLabelColor" />
+          <Property name="OrientationAxesOutlineColor" />
           <!-- Renderer -->
           <Property name="Background" />
           <Property name="Background2" />
@@ -5777,6 +5810,12 @@
           <!-- Interactor -->
           <Property name="CameraManipulators" />
           <Property name="CenterOfRotation" />
+          <!-- Annotations -->
+          <Property name="CenterAxesVisibility" />
+          <Property name="OrientationAxesInteractivity" />
+          <Property name="OrientationAxesVisibility" />
+          <Property name="OrientationAxesLabelColor" />
+          <Property name="OrientationAxesOutlineColor" />
           <!-- Renderer -->
           <Property name="Background" />
           <Property name="Background2" />
@@ -5858,6 +5897,12 @@
           <!-- Interactor -->
           <Property name="CameraManipulators" />
           <Property name="CenterOfRotation" />
+          <!-- Annotations -->
+          <Property name="CenterAxesVisibility" />
+          <Property name="OrientationAxesInteractivity" />
+          <Property name="OrientationAxesVisibility" />
+          <Property name="OrientationAxesLabelColor" />
+          <Property name="OrientationAxesOutlineColor" />
           <!-- Renderer -->
           <Property name="Background" />
           <Property name="Background2" />
@@ -5943,6 +5988,12 @@
           <!-- Interactor -->
           <Property name="CameraManipulators" />
           <Property name="CenterOfRotation" />
+          <!-- Annotations -->
+          <Property name="CenterAxesVisibility" />
+          <Property name="OrientationAxesInteractivity" />
+          <Property name="OrientationAxesVisibility" />
+          <Property name="OrientationAxesLabelColor" />
+          <Property name="OrientationAxesOutlineColor" />
           <!-- Renderer -->
           <Property name="Background" />
           <Property name="Background2" />
