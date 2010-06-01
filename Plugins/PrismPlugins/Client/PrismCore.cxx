@@ -412,6 +412,13 @@ void PrismCore::onPrismSelection(vtkObject* caller,
           return;
         }
 
+        pqApplicationCore* const core = pqApplicationCore::instance();
+        pqSelectionManager* slmanager = qobject_cast<pqSelectionManager*>(
+            core->manager("SelectionManager"));
+        pqOutputPort* opport = pqPrismP->getOutputPort(portIndex);
+
+        slmanager->select(opport);
+
 
 
         if (strcmp(selPrism->GetXMLName(), "FrustumSelectionSource") == 0 ||
@@ -523,6 +530,15 @@ void PrismCore::onGeometrySelection(vtkObject* caller,
           }
           return;
         }
+
+        pqApplicationCore* const core = pqApplicationCore::instance();
+        pqSelectionManager* slmanager = qobject_cast<pqSelectionManager*>(
+            core->manager("SelectionManager"));
+        pqOutputPort* opport = pqSourceP->getOutputPort(portIndex);
+
+        slmanager->select(opport);
+
+
 
         if (strcmp(selSource->GetXMLName(), "FrustumSelectionSource") == 0 ||
           strcmp(selSource->GetXMLName(), "ThresholdSelectionSource") == 0)
