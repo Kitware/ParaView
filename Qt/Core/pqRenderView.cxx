@@ -858,5 +858,5 @@ void pqRenderView::textAnnotationColorChanged()
     value, 3);
   vtkSMPropertyHelper(this->getProxy(), "OrientationAxesLabelColor").Set(
     value, 3);
-  this->getProxy()->UpdateVTKObjects();
+  this->getProxy()->UpdateProperty("OrientationAxesLabelColor");
 }
