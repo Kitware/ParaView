@@ -214,7 +214,7 @@ int vtkIsoVolume::RequestData(vtkInformation* request,
     {
     vtkDataObject* inputClone = inObj->NewInstance();
     inputClone->ShallowCopy(inObj);
-    outObj1 = inObj;
+    outObj1 = inputClone;
     }
 
   vtkHierarchicalBoxDataSet* hbds2 = vtkHierarchicalBoxDataSet::SafeDownCast(
