@@ -35,7 +35,7 @@ public:
   virtual int ProcessRequest(vtkInformation*,
                              vtkInformationVector**,
                              vtkInformationVector*);
-
+//BTX
 protected:
   vtkPVClipDataSet(vtkImplicitFunction *cf=NULL);
   ~vtkPVClipDataSet();
@@ -51,10 +51,18 @@ protected:
   virtual int FillInputPortInformation(int, vtkInformation* info);
   virtual int FillOutputPortInformation(int, vtkInformation* info);
 
+  // Description:
+  // Uses superclass to clip the input. This also handles composite datasets
+  // (since superclass does not handle composite datasets). This method loops
+  // over the composite dataset calling superclass repeatedly.
+  int ClipUsingSuperclass(
+    vtkInformation* request, vtkInformationVector** inputVector,
+    vtkInformationVector* outputVector);
 
 private:
   vtkPVClipDataSet(const vtkPVClipDataSet&);  // Not implemented.
   void operator=(const vtkPVClipDataSet&);  // Not implemented.
+//ETX
 };
 
 #endif

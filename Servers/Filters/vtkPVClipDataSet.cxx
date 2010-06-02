@@ -89,8 +89,7 @@ int vtkPVClipDataSet::RequestData(vtkInformation* request,
     }
 
   // Check if the input data is AMR and we are doing clip by cell scalars.
-  if(vtkHierarchicalBoxDataSet* input =
-     vtkHierarchicalBoxDataSet::SafeDownCast(inDataObj))
+  if (vtkHierarchicalBoxDataSet::SafeDownCast(inDataObj))
     {
     // Using scalars.
     if(!this->GetClipFunction())
@@ -134,46 +133,7 @@ int vtkPVClipDataSet::RequestData(vtkInformation* request,
 
       if(fieldAssociation == vtkDataObject::FIELD_ASSOCIATION_POINTS)
         {
-        // Create a new output hierarchical dataset.
-        vtkSmartPointer<vtkHierarchicalBoxDataSet> output =
-          vtkSmartPointer<vtkHierarchicalBoxDataSet>::New();
-
-        output->CopyStructure(input);
-
-        vtkSmartPointer<vtkHierarchicalBoxDataIterator> itr(0);
-        itr.TakeReference(vtkHierarchicalBoxDataIterator::SafeDownCast(
-          input->NewIterator()));
-
-        // Loop over all the datasets.
-        for(itr->InitTraversal(); !itr->IsDoneWithTraversal();
-            itr->GoToNextItem())
-          {
-          vtkSmartPointer<vtkThreshold> th
-            (vtkSmartPointer<vtkThreshold>::New());
-
-          th->SetInput(itr->GetCurrentDataObject());
-          th->SetInputArrayToProcess(0, 0, 0, fieldAssociation,
-                                     arrayNameToProcess);
-
-          if(this->GetInsideOut())
-            {
-            th->ThresholdByLower(this->GetValue());
-            }
-          else
-            {
-            th->ThresholdByUpper(this->GetValue());
-            }
-
-          th->Update();
-
-          vtkSmartPointer<vtkUnstructuredGrid> out
-            (vtkSmartPointer<vtkUnstructuredGrid>::New());
-          out->ShallowCopy(th->GetOutput());
-          output->SetDataSet(itr, out);
-         }
-
-        outDataObj->ShallowCopy(output);
-        return 1;
+        return this->ClipUsingSuperclass(request, inputVector, outputVector);
         }
       else if(fieldAssociation == vtkDataObject::FIELD_ASSOCIATION_CELLS)
         {
@@ -187,16 +147,18 @@ int vtkPVClipDataSet::RequestData(vtkInformation* request,
         amrDC->SetEnableDegenerateCells(1);
         amrDC->SetEnableMultiProcessCommunication(1);
 
-        amrDC->SetInput(0, inDataObj);
+        vtkDataObject* inputClone = inDataObj->NewInstance();
+        inputClone->ShallowCopy(inDataObj);
+        amrDC->SetInput(0, inputClone);
+        inputClone->Delete();
+
         amrDC->SetInputArrayToProcess(
           0, 0, 0, vtkDataObject::FIELD_ASSOCIATION_CELLS,
           arrayNameToProcess);
 
         amrDC->Update();
 
-        vtkMultiBlockDataSet::SafeDownCast(outDataObj)->ShallowCopy(
-          amrDC->GetOutput(0));
-
+        outDataObj->ShallowCopy(amrDC->GetOutput(0));
         return 1;
         }
       else
@@ -207,55 +169,14 @@ int vtkPVClipDataSet::RequestData(vtkInformation* request,
       }
     else
       {
-      // Create a new output hierarchical dataset.
-      vtkSmartPointer<vtkHierarchicalBoxDataSet> output =
-        vtkSmartPointer<vtkHierarchicalBoxDataSet>::New();
-
-      output->CopyStructure(input);
-
-      vtkSmartPointer<vtkHierarchicalBoxDataIterator> itr(0);
-      itr.TakeReference(vtkHierarchicalBoxDataIterator::SafeDownCast(
-        input->NewIterator()));
-
-      // Loop over all the datasets.
-      for(itr->InitTraversal(); !itr->IsDoneWithTraversal(); itr->GoToNextItem())
-        {
-        //@TODO: Do we need to check if the incoming dataset is
-        // unstructered grid on not?
-
-        // Creating new input information.
-        vtkInformationVector* newInInfoVec = vtkInformationVector::New();
-        vtkSmartPointer<vtkInformation> newInInfo =
-          vtkSmartPointer<vtkInformation>::New();
-        newInInfo->Set(vtkDataObject::DATA_OBJECT(), itr->GetCurrentDataObject());
-        newInInfoVec->SetInformationObject(0, newInInfo);
-
-        // Creating new output information.
-        vtkSmartPointer<vtkUnstructuredGrid> usGrid =
-          vtkSmartPointer<vtkUnstructuredGrid>::New();
-        vtkSmartPointer<vtkInformationVector> newOutInfoVec =
-          vtkSmartPointer<vtkInformationVector>::New();
-        vtkSmartPointer<vtkInformation> newOutInfo =
-          vtkSmartPointer<vtkInformation>::New();
-        newOutInfo->Set(vtkDataObject::DATA_OBJECT(), usGrid);
-        newOutInfoVec->SetInformationObject(0, newOutInfo);
-
-        this->Superclass::RequestData(request, &newInInfoVec,
-                                      newOutInfoVec.GetPointer());
-
-        output->SetDataSet(itr, usGrid);
-        newInInfoVec->Delete();
-       }
-
-      outDataObj->ShallowCopy(output);
-      return 1;
+      return this->ClipUsingSuperclass(request, inputVector, outputVector);
       }
     }
   else // For vtkDataSet.
     {
     if(this->GetClipFunction())
       {
-      return Superclass::RequestData(request, inputVector, outputVector);
+      return this->ClipUsingSuperclass(request, inputVector, outputVector);
       }
 
     vtkDataSet* ds (vtkDataSet::SafeDownCast(inDataObj));
@@ -275,13 +196,16 @@ int vtkPVClipDataSet::RequestData(vtkInformation* request,
     // If using point scalars.
     if(ds->GetNumberOfPoints() == dArray->GetNumberOfTuples())
       {
-      return Superclass::RequestData(request, inputVector, outputVector);
+      return this->ClipUsingSuperclass(request, inputVector, outputVector);
       } // End if using point scalars.
     else
       {
       // Use vtkPVThreshold here.
       vtkSmartPointer<vtkThreshold> th (vtkSmartPointer<vtkThreshold>::New());
+      vtkDataObject* inputClone = inDataObj->NewInstance();
+      inputClone->ShallowCopy(inDataObj);
       th->SetInput(0, inDataObj);
+      inputClone->Delete();
       th->SetInputArrayToProcess(0, 0, 0,
                                  vtkDataObject::FIELD_ASSOCIATION_CELLS,
                                  dArray->GetName());
@@ -301,6 +225,63 @@ int vtkPVClipDataSet::RequestData(vtkInformation* request,
       return 1;
       }
     } // End for vtkDataSet.
+
+  return 0;
+}
+
+//----------------------------------------------------------------------------
+int vtkPVClipDataSet::ClipUsingSuperclass(
+  vtkInformation* request, vtkInformationVector** inputVector,
+  vtkInformationVector* outputVector)
+{
+  vtkDataObject* inputDO = vtkDataObject::GetData(inputVector[0], 0);
+  vtkDataObject* outputDO = vtkDataObject::GetData(outputVector, 0);
+
+  vtkCompositeDataSet* inputCD = vtkCompositeDataSet::SafeDownCast(inputDO);
+  if (!inputCD)
+    {
+    return this->Superclass::RequestData(request, inputVector, outputVector);
+    }
+
+  vtkCompositeDataSet* outputCD = vtkCompositeDataSet::SafeDownCast(outputDO);
+
+  outputCD->CopyStructure(inputCD);
+
+  vtkSmartPointer<vtkHierarchicalBoxDataIterator> itr(0);
+  itr.TakeReference(vtkHierarchicalBoxDataIterator::SafeDownCast(
+      inputCD->NewIterator()));
+
+  // Loop over all the datasets.
+  for (itr->InitTraversal(); !itr->IsDoneWithTraversal(); itr->GoToNextItem())
+    {
+    // Creating new input information.
+    vtkSmartPointer<vtkInformationVector> newInInfoVec=
+      vtkSmartPointer<vtkInformationVector>::New();
+    vtkSmartPointer<vtkInformation> newInInfo =
+      vtkSmartPointer<vtkInformation>::New();
+    newInInfo->Set(vtkDataObject::DATA_OBJECT(), itr->GetCurrentDataObject());
+    newInInfoVec->SetInformationObject(0, newInInfo);
+
+    // Creating new output information.
+    vtkSmartPointer<vtkUnstructuredGrid> usGrid =
+      vtkSmartPointer<vtkUnstructuredGrid>::New();
+    vtkSmartPointer<vtkInformationVector> newOutInfoVec =
+      vtkSmartPointer<vtkInformationVector>::New();
+    vtkSmartPointer<vtkInformation> newOutInfo =
+      vtkSmartPointer<vtkInformation>::New();
+    newOutInfo->Set(vtkDataObject::DATA_OBJECT(), usGrid);
+    newOutInfoVec->SetInformationObject(0, newOutInfo);
+
+    vtkInformationVector* newInInfoVecPtr = newInInfoVec.GetPointer();
+    if (!this->Superclass::RequestData(request, &newInInfoVecPtr,
+        newOutInfoVec.GetPointer()))
+      {
+      return 0;
+      }
+    outputCD->SetDataSet(itr, usGrid);
+    }
+
+  return 1;
 }
 
 //----------------------------------------------------------------------------
