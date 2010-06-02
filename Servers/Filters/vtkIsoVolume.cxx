@@ -153,7 +153,9 @@ int vtkIsoVolume::RequestData(vtkInformation* request,
       this->LowerBoundClipDS = vtkPVClipDataSet::New();
       }
 
-    this->LowerBoundClipDS->SetInput(0, inObj);
+    vtkDataObject* inputClone = inObj->NewInstance();
+    inputClone->ShallowCopy(inObj);
+    this->LowerBoundClipDS->SetInput(0, inputClone);
     this->LowerBoundClipDS->SetInputArrayToProcess(0, 0, 0, fieldAssociation,
                                                    arrayName);
     this->LowerBoundClipDS->SetValue(this->LowerThreshold);
@@ -175,7 +177,9 @@ int vtkIsoVolume::RequestData(vtkInformation* request,
       {
       vtkSmartPointer<vtkDataObject> obj(0);
       obj.TakeReference(itr->GetCurrentDataObject()->NewInstance());
-      vtkDataSet* lds = vtkDataSet::SafeDownCast(itr->GetCurrentDataObject());
+      vtkDataObject* inputClone = itr->GetCurrentDataObject()->NewInstance();
+      inputClone->ShallowCopy(itr->GetCurrentDataObject());
+      vtkDataSet* lds = vtkDataSet::SafeDownCast(inputClone);
       range = lds->GetScalarRange();
 
       if(range[0] <= this->LowerThreshold)
@@ -208,6 +212,7 @@ int vtkIsoVolume::RequestData(vtkInformation* request,
   // Check if the input to this filter is vtkDataSet or AMR or composite.
   if(!usingLowerBoundClipDS)
     {
+    vtkDataObject* inputClone = inObj->NewInstance();
     outObj1 = inObj;
     }
 
