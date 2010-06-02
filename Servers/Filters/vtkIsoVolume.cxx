@@ -213,6 +213,7 @@ int vtkIsoVolume::RequestData(vtkInformation* request,
   if(!usingLowerBoundClipDS)
     {
     vtkDataObject* inputClone = inObj->NewInstance();
+    inputClone->ShallowCopy(inObj);
     outObj1 = inObj;
     }
 
