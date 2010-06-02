@@ -115,7 +115,7 @@ protected:
   // Read an unstructured part (partId) from the geometry file and create a
   // vtkUnstructuredGrid output.  Return 0 if EOF reached. Return -1 if
   // an error occurred.
-  virtual int CreateUnstructuredGridOutput(int partId, 
+  virtual int CreateUnstructuredGridOutput(int partId,
     char line[256],
     const char* name,
     vtkMultiBlockDataSet *output);
@@ -123,7 +123,7 @@ protected:
   // Description:
   // Read a structured part from the geometry file and create a
   // vtkStructuredGrid output.  Return 0 if EOF reached.
-  virtual int CreateStructuredGridOutput(int partId, 
+  virtual int CreateStructuredGridOutput(int partId,
     char line[256],
     const char* name,
     vtkMultiBlockDataSet *output);
@@ -156,7 +156,7 @@ protected:
   vtkGetStringMacro(MatchFileName);
 
   // Description:
-  // Skip next line in file if the 'undef' or 'partial' keyword was 
+  // Skip next line in file if the 'undef' or 'partial' keyword was
   // specified after a sectional keyword
   int CheckForUndefOrPartial(const char *line);
 
