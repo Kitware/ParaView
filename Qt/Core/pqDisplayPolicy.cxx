@@ -52,6 +52,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPipelineSource.h"
 #include "pqRenderView.h"
 #include "pqServer.h"
+#include "pqSpreadSheetView.h"
 #include "pqTwoDRenderView.h"
 #include "pqXYBarChartView.h"
 #include "pqXYChartView.h"
@@ -166,6 +167,12 @@ QString pqDisplayPolicy::getPreferredViewType(pqOutputPort* opPort,
       // No cell data, but some point data -- may be a XY line plot.
       view_type = pqXYChartView::XYChartViewType();
       }
+    }
+
+  // Show table in spreadsheet view by default.
+  if (className == "vtkTable")
+    {
+    return pqSpreadSheetView::spreadsheetViewType(); 
     }
 
    // The proxy gives us no hint. In that case we try to determine the
