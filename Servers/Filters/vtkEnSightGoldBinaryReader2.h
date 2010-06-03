@@ -185,7 +185,7 @@ protected:
 
   ifstream *IFile;
   // The size of the file could be used to choose byte order.
-  long FileSize;
+  int FileSize;
 
 private:
   vtkEnSightGoldBinaryReader2(const vtkEnSightGoldBinaryReader2&);  // Not implemented.
