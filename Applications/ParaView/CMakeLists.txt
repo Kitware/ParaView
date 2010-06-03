@@ -102,8 +102,6 @@ IF (VTK_USE_QVTK_QTOPENGL)
   LIST(APPEND qtliblist QTOPENGL)
 ENDIF (VTK_USE_QVTK_QTOPENGL)
 
-SET(_install_qt_libs ON)
-
 IF (INSTALL_THIRD_PARTY_LIBRARIES)
    install_qt_libs("${qtliblist}" BrandedRuntime)
   
