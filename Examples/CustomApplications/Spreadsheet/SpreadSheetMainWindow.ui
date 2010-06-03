@@ -13,6 +13,10 @@
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
+  <property name="windowIcon">
+   <iconset resource="SpreadSheet.qrc">
+    <normaloff>:/SpreadSheet_Icons/ss_icon.png</normaloff>:/SpreadSheet_Icons/ss_icon.png</iconset>
+  </property>
   <widget class="QWidget" name="centralwidget"/>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
@@ -20,7 +24,7 @@
      <x>0</x>
      <y>0</y>
      <width>559</width>
-     <height>27</height>
+     <height>26</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu_File">
@@ -64,6 +68,8 @@
    </property>
   </action>
  </widget>
- <resources/>
+ <resources>
+  <include location="SpreadSheet.qrc"/>
+ </resources>
  <connections/>
 </ui>

@@ -21,6 +21,19 @@ QT4_WRAP_UI(UI_BUILT_SOURCES
   SpreadSheetMainWindow.ui
 )
 
+##########################################################################
+## Add resources (icons etc.)
+SET (UI_RESOURCES
+  SpreadSheet.qrc
+)
+
+QT4_ADD_RESOURCES(RCS_BUILT_SOURCES
+  ${UI_RESOURCES}
+)
+
+SOURCE_GROUP("Resources" FILES
+  ${UI_RESOURCES})
+
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}
   ${CMAKE_CURRENT_BINARY_DIR})
 
@@ -37,7 +50,7 @@ build_paraview_client(spreadsheet
     PVMAIN_WINDOW_INCLUDE SpreadSheetMainWindow.h
     GUI_CONFIGURATION_XMLS
       ${CMAKE_CURRENT_SOURCE_DIR}/SupportedReader.xml
-    SOURCES ${SOURCE_FILES} ${MOC_SRCS} ${UI_BUILT_SOURCES}
+    SOURCES ${SOURCE_FILES} ${MOC_SRCS} ${UI_BUILT_SOURCES} ${RCS_BUILT_SOURCES}
 )
 
 #------------------------------------------------------------------------

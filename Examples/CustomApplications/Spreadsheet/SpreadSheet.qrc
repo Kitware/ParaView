@@ -1,0 +1,5 @@
+<RCC>
+  <qresource prefix="/SpreadSheet_Icons" >
+    <file>ss_icon.png</file>
+  </qresource>
+</RCC>
