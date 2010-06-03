@@ -359,6 +359,12 @@ public:
   // NewProxy() will fail.
   int ProxyElementExists(const char* groupName,  const char* proxyName);
 
+  // Description:
+  // This a boolean that is set to true before the RegisterEvent/UnRegisterEvent
+  // is triggered to indicate that an new definition has been added. This is
+  // used by python wrapping to decide if the modules should be updated.
+  vtkGetMacro(ProxyDefinitionsUpdated, bool);
+
 //BTX
   struct RegisteredProxyInformation
   {
@@ -544,6 +550,7 @@ protected:
     vtkSMProxy* proxy);
 
   int UpdateInputProxies;
+  bool ProxyDefinitionsUpdated;
 
   vtkSMReaderFactory* ReaderFactory;
   vtkSMWriterFactory* WriterFactory;
