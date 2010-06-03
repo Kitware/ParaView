@@ -619,6 +619,8 @@ export LD_LIBRARY_PATH=${SUPPORT_DIR}/qt-4.6.2/bin/lib:${SUPPORT_DIR}/ffmpeg/lib
 
 rm CMakeCache.txt
 
+if [ ! -f CMakeCache.txt ]; then
+
 cat >> CMakeCache.txt << EOF
 BUILD_TESTING:BOOL=OFF
 CMAKE_BUILD_TYPE:STRING=Release
@@ -648,11 +650,15 @@ BUILD_DOCUMENTATION:BOOL=ON
 PARAVIEW_GENERATE_PROXY_DOCUMENTATION:BOOL=ON
 EOF
 
+fi
+
 cmake ${PV_SRC}
 make -j${CORES}
 
 echo "Generating package using CPACK"
 cpack --config ${PV_BIN}/Applications/ParaView/CPackParaViewConfig.cmake -G TGZ
+
+exit 0
 
 package_name=`ls -1 | grep tar | cut -f-3 -d.`
 echo "The package is ${package_name}"
