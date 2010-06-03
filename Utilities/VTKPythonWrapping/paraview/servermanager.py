@@ -2905,6 +2905,20 @@ _createModules()
 loader = _ModuleLoader()
 sys.meta_path.append(loader)
 
+def _proxyDefinitionsUpdated(caller, event):
+    """callback that gets called when RegisterEvent or UnRegisterEvent gets
+       fired from the proxy manager. These events are fired when definitions are
+       added or proxys are registered. We need to ensure that we update the
+       modules only when definitions have changed."""
+    if vtkSMObject.GetProxyManager().GetProxyDefinitionsUpdated():
+        updateModules()
+
+# Setup observer to update the modules when new proxy definitions are added.
+# Unfortunately, we don't have a specific even when a definition is added. So
+# this callback will get called even when proxy is registered :(
+vtkSMObject.GetProxyManager().AddObserver("RegisterEvent",
+  _proxyDefinitionsUpdated)
+
 if hasattr(sys, "ps1"):
     # session is interactive.
     print vtkSMProxyManager.GetParaViewSourceVersion();

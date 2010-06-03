@@ -117,6 +117,7 @@ vtkSMProxyManager::vtkSMProxyManager()
 
   this->ReaderFactory = vtkSMReaderFactory::New();
   this->WriterFactory = vtkSMWriterFactory::New();
+  this->ProxyDefinitionsUpdated = false;
 }
 
 //---------------------------------------------------------------------------
@@ -1508,7 +1509,10 @@ void vtkSMProxyManager::UnRegisterCustomProxyDefinition(
     info.GroupName = group;
     info.ProxyName = name;
     info.Type = RegisteredProxyInformation::COMPOUND_PROXY_DEFINITION;
+    bool prev = this->ProxyDefinitionsUpdated;
+    this->ProxyDefinitionsUpdated = true;
     this->InvokeEvent(vtkCommand::UnRegisterEvent, &info);
+    this->ProxyDefinitionsUpdated = prev;
     elementMap.erase(iter);
     return;
     }
@@ -1555,7 +1559,10 @@ void vtkSMProxyManager::RegisterCustomProxyDefinition(
   info.GroupName = group;
   info.ProxyName = name;
   info.Type = RegisteredProxyInformation::COMPOUND_PROXY_DEFINITION;
+  bool prev = this->ProxyDefinitionsUpdated;
+  this->ProxyDefinitionsUpdated = true;
   this->InvokeEvent(vtkCommand::RegisterEvent, &info);
+  this->ProxyDefinitionsUpdated = prev;
 }
 
 //---------------------------------------------------------------------------
