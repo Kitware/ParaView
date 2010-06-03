@@ -658,8 +658,6 @@ make -j${CORES}
 echo "Generating package using CPACK"
 cpack --config ${PV_BIN}/Applications/ParaView/CPackParaViewConfig.cmake -G TGZ
 
-exit 0
-
 package_name=`ls -1 | grep tar | cut -f-3 -d.`
 echo "The package is ${package_name}"
 
