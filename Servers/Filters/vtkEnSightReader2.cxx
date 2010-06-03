@@ -205,7 +205,7 @@ int vtkEnSightReader2::RequestData(
     this->ActualTimeValue = steps[cnt];
     }
 
-  cout << "Executing with: " << this->ActualTimeValue << endl;
+  vtkDebugMacro("Executing with: " << this->ActualTimeValue);
 
   int i, timeSet, fileSet, timeStep, timeStepInFile, fileNum;
   vtkDataArray *times;
@@ -1567,7 +1567,7 @@ int vtkEnSightReader2::ReadVariableFiles(vtkMultiBlockDataSet *output)
         numStepsList = static_cast<vtkIdList*>(this->FileSetNumberOfSteps->
                                GetItemAsObject(this->FileSets->IsId(fileSet)));
 
-        if (timeStep > numStepsList->GetId(0))
+        if (numStepsList!=0 && timeStep > numStepsList->GetId(0))
           {
           numSteps = numStepsList->GetId(0);
           timeStepInFile -= numSteps;
