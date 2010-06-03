@@ -47,6 +47,7 @@ pqFileChooserWidget::pqFileChooserWidget(QWidget* p)
 {
   this->ForceSingleFile = false;
   this->UseDirectoryMode = false;
+  this->UseFilenameList = false;
   
   QHBoxLayout* l = new QHBoxLayout(this);
   l->setMargin(0);
@@ -65,7 +66,7 @@ pqFileChooserWidget::pqFileChooserWidget(QWidget* p)
 
   QObject::connect(this->LineEdit,
                    SIGNAL(textChanged(const QString&)),
-                   this, SLOT(emitFilenamesChanged(const QString&)));
+                   this, SLOT(handleFileLineEditChanged(const QString&)));
 
 }
 
@@ -76,11 +77,21 @@ pqFileChooserWidget::~pqFileChooserWidget()
 
 QStringList pqFileChooserWidget::filenames()
 {
-  return pqFileChooserWidget::splitFilenames(this->LineEdit->text());
+  if (this->UseFilenameList)
+    {
+    return this->FilenameList;
+    }
+  else
+    {
+    return pqFileChooserWidget::splitFilenames(this->LineEdit->text());
+    }
 }
 
 void pqFileChooserWidget::setFilenames(const QStringList& files)
 {
+  this->UseFilenameList = false;
+  this->LineEdit->setEnabled(true);
+
   if(this->UseDirectoryMode)
     {
     if (!files.isEmpty())
@@ -102,6 +113,14 @@ void pqFileChooserWidget::setFilenames(const QStringList& files)
       {
       this->LineEdit->setText("");
       }
+    }
+  else if (files.size() > 1)
+    {
+    this->UseFilenameList = true;
+    this->LineEdit->setEnabled(false);
+    this->LineEdit->setText(files[0] + ";...");
+    this->FilenameList = files;
+    this->emitFilenamesChanged(files);
     }
   else
     {
@@ -176,9 +195,19 @@ void pqFileChooserWidget::chooseFile()
     }
 }
 
-void pqFileChooserWidget::emitFilenamesChanged(const QString &fileString)
+void pqFileChooserWidget::handleFileLineEditChanged(const QString &fileString)
 {
+  if (this->UseFilenameList)
+    {
+    // Ignoring string from line edit.  Ignore this signal.
+    return;
+    }
   QStringList fileList = pqFileChooserWidget::splitFilenames(fileString);
+  this->emitFilenamesChanged(fileList);
+}
+
+void pqFileChooserWidget::emitFilenamesChanged(const QStringList &fileList)
+{
   emit this->filenamesChanged(fileList);
   if (!fileList.empty())
     {

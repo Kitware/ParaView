@@ -112,10 +112,8 @@ signals:
 protected slots:
   /// Called when the user hits the choose file button.
   void chooseFile();
-  /// Takes a string with delimited files and emits the filenamesChanged
-  /// signals.  Generally used to convert the textChanged signal of the line
-  /// edit to the filenamesChanged signals.
-  void emitFilenamesChanged(const QString &fileString);
+  /// Respond to changes with the filename in the line edit box.
+  void handleFileLineEditChanged(const QString &fileString);
 
 protected:
   QString Extension;
@@ -123,6 +121,12 @@ protected:
   pqServer* Server;
   bool ForceSingleFile;
   bool UseDirectoryMode;
+  QStringList FilenameList;
+  bool UseFilenameList;
+
+  /// Takes a string with delimited files and emits the filenamesChanged
+  ///  and filenameChanged signals.
+  void emitFilenamesChanged(const QStringList &fileList);
 };
 
 #endif // _pqFileChooserWidget_h
