@@ -45,6 +45,8 @@ build_paraview_client(adaptive_paraview
     ${CMAKE_CURRENT_SOURCE_DIR}/CustomResources/CustomFilters.xml
     ${CMAKE_CURRENT_SOURCE_DIR}/CustomResources/CustomSources.xml
   SOURCES ${Application_SOURCE_FILES}
+  INSTALL_BIN_DIR "${PV_INSTALL_BIN_DIR}"
+  INSTALL_LIB_DIR "${PV_INSTALL_LIB_DIR}"
 )
 
 ADD_EXECUTABLE(ppRawStridedReader2 ppRawStridedReader2.cxx)
