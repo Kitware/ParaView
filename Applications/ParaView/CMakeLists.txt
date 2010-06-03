@@ -104,13 +104,7 @@ ENDIF (VTK_USE_QVTK_QTOPENGL)
 
 SET(_install_qt_libs ON)
 
-# Don't install Qt runtime libs if we are doing a development install and 
-# DEVELOPMENT_INSTALL_QT_LIBS is off
-IF (PARAVIEW_INSTALL_DEVELOPMENT AND NOT DEVELOPMENT_INSTALL_QT_LIBS)
-  SET(_install_qt_libs OFF)
-ENDIF(PARAVIEW_INSTALL_DEVELOPMENT AND NOT DEVELOPMENT_INSTALL_QT_LIBS)
-
-IF(_install_qt_libs)
+IF (INSTALL_THIRD_PARTY_LIBRARIES)
    install_qt_libs("${qtliblist}" BrandedRuntime)
   
   if(WIN32)
@@ -130,19 +124,19 @@ IF(_install_qt_libs)
               PATTERN "*.so"
               PATTERN "*.dll")
   endif(WIN32)
-ENDIF(_install_qt_libs)
 
-#------------------------------------------------------------------------
-# Install ffmpeg, if used.
-IF (VTK_USE_FFMPEG_ENCODER)
-  FOREACH(fmpglib ${FFMPEG_BASIC_LIBRARIES})
-    IF (FFMPEG_${fmpglib}_LIBRARY)
-      pv_install_library(${FFMPEG_${fmpglib}_LIBRARY}
-        ${PV_INSTALL_LIB_DIR}
-        BrandedRuntime)
-    ENDIF(FFMPEG_${fmpglib}_LIBRARY)
-  ENDFOREACH(fmpglib)
-ENDIF (VTK_USE_FFMPEG_ENCODER)
+  #------------------------------------------------------------------------
+  # Install ffmpeg, if used.
+  IF (VTK_USE_FFMPEG_ENCODER)
+    FOREACH(fmpglib avcodec avformat avutil swscale)
+      IF (FFMPEG_${fmpglib}_LIBRARY)
+        pv_install_library(${FFMPEG_${fmpglib}_LIBRARY}
+          ${PV_INSTALL_LIB_DIR}
+          BrandedRuntime)
+      ENDIF(FFMPEG_${fmpglib}_LIBRARY)
+    ENDFOREACH(fmpglib)
+  ENDIF (VTK_USE_FFMPEG_ENCODER)
+ENDIF(INSTALL_THIRD_PARTY_LIBRARIES)
 
 #------------------------------------------------------------------------
 # Import site specific installation rules file, if any.
