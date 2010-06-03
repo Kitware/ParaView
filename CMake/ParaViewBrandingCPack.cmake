@@ -121,14 +121,14 @@ FUNCTION(install_qt_libs qtliblist componentname)
           GET_FILENAME_COMPONENT(QT_LIB_DIR_tmp ${QT_${qtlib}_LIBRARY_RELEASE} PATH)
           GET_FILENAME_COMPONENT(QT_LIB_NAME_tmp ${QT_${qtlib}_LIBRARY_RELEASE} NAME)
           FILE(GLOB QT_LIB_LIST RELATIVE "${QT_LIB_DIR_tmp}" "${QT_${qtlib}_LIBRARY_RELEASE}*")
-          IF(NOT ${QT_LIB_DIR_tmp} MATCHES "\\.debug$")
+          IF(NOT ${QT_LIB_NAME_tmp} MATCHES "\\.debug$")
             INSTALL(CODE "
-              MESSAGE(STATUS \"Installing \${CMAKE_INSTALL_PREFIX}/${PV_INSTALL_LIB_DIR}/${QT_LIB_NAME_tmp}\")
+              MESSAGE(STATUS \"!!!!Installing \${CMAKE_INSTALL_PREFIX}/${PV_INSTALL_LIB_DIR}/${QT_LIB_NAME_tmp}\")
               EXECUTE_PROCESS (WORKING_DIRECTORY ${QT_LIB_DIR_tmp}
                    COMMAND tar c ${QT_LIB_LIST}
                    COMMAND tar -xC \${CMAKE_INSTALL_PREFIX}/${PV_INSTALL_LIB_DIR})
                    " COMPONENT ${componentname})
-           ENDIF(NOT ${QT_LIB_DIR_tmp} MATCHES "\\.debug$")
+           ENDIF(NOT ${QT_LIB_NAME_tmp} MATCHES "\\.debug$")
         ENDIF (QT_${qtlib}_LIBRARY_RELEASE)
       ELSE (NOT WIN32)
         GET_FILENAME_COMPONENT(QT_DLL_PATH_tmp ${QT_QMAKE_EXECUTABLE} PATH)
