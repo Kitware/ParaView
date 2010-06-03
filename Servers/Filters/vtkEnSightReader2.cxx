@@ -33,6 +33,7 @@
 #include <vtkstd/string>
 #include <vtkstd/vector>
 
+
 //----------------------------------------------------------------------------
 typedef vtkstd::vector< vtkSmartPointer<vtkIdList> > vtkEnSightReader2CellIdsTypeBase;
 class vtkEnSightReader2CellIdsType: public vtkEnSightReader2CellIdsTypeBase {};
@@ -204,7 +205,7 @@ int vtkEnSightReader2::RequestData(
     this->ActualTimeValue = steps[cnt];
     }
 
-  vtkDebugMacro( << "Executing with: " << this->ActualTimeValue << "\n");
+  cout << "Executing with: " << this->ActualTimeValue << endl;
 
   int i, timeSet, fileSet, timeStep, timeStepInFile, fileNum;
   vtkDataArray *times;
@@ -1566,7 +1567,7 @@ int vtkEnSightReader2::ReadVariableFiles(vtkMultiBlockDataSet *output)
         numStepsList = static_cast<vtkIdList*>(this->FileSetNumberOfSteps->
                                GetItemAsObject(this->FileSets->IsId(fileSet)));
 
-        if (numStepsList!=0 && timeStep > numStepsList->GetId(0))
+        if (timeStep > numStepsList->GetId(0))
           {
           numSteps = numStepsList->GetId(0);
           timeStepInFile -= numSteps;
