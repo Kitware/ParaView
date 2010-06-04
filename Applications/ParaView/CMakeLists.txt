@@ -102,7 +102,7 @@ IF (VTK_USE_QVTK_QTOPENGL)
   LIST(APPEND qtliblist QTOPENGL)
 ENDIF (VTK_USE_QVTK_QTOPENGL)
 
-IF (INSTALL_THIRD_PARTY_LIBRARIES)
+IF (PARAVIEW_INSTALL_THIRD_PARTY_LIBRARIES)
    install_qt_libs("${qtliblist}" BrandedRuntime)
   
   if(WIN32)
@@ -134,7 +134,7 @@ IF (INSTALL_THIRD_PARTY_LIBRARIES)
       ENDIF(FFMPEG_${fmpglib}_LIBRARY)
     ENDFOREACH(fmpglib)
   ENDIF (VTK_USE_FFMPEG_ENCODER)
-ENDIF(INSTALL_THIRD_PARTY_LIBRARIES)
+ENDIF(PARAVIEW_INSTALL_THIRD_PARTY_LIBRARIES)
 
 #------------------------------------------------------------------------
 # Import site specific installation rules file, if any.
