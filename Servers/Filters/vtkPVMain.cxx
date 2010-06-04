@@ -48,6 +48,8 @@
 # include <io.h> /* unlink */
 #endif
 
+#include <clocale>
+
 vtkStandardNewMacro(vtkPVMain);
 
 int vtkPVMain::UseMPI = 1;
@@ -87,6 +89,8 @@ vtkPVMain::~vtkPVMain()
 
 void vtkPVMain::Initialize(int* argc, char** argv[])
 {
+  setlocale(LC_NUMERIC,"C");
+
 #ifdef VTK_USE_MPI
   if(vtkPVMain::UseMPI)
     {
