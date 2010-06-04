@@ -43,6 +43,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QPlastiqueStyle>
 #endif
 
+#include <clocale>
+
 int main(int argc, char* argv[])
 {
 #ifdef Q_WS_X11
@@ -69,6 +71,7 @@ int main(int argc, char* argv[])
   QApplication::setOrganizationName("@BPC_ORGANIZATION@");
 
   QApplication qtapp(argc, argv);
+  setlocale(LC_NUMERIC,"C");
   pq@BPC_NAME@Initializer pvInitializer;
   if (!pvInitializer.Initialize(argc, argv))
     {
