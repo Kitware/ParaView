@@ -1,4 +1,3 @@
-print 'i should be here!!!! in cp_export.py 11111'
 # boolean telling if we want to export rendering.
 export_rendering = %1
 
@@ -43,12 +42,9 @@ def cp_locate_simulation_inputs_for_view(view_proxy):
     reprProp = smtrace.servermanager.ProxyProperty(view_proxy, view_proxy.GetProperty("Representations"))
     reprs = reprProp[:]
     all_sim_inputs = []
-    print 'entering cp_locate_simulation_inputs_for_view 3 ', len(reprs)
     for repr in reprs:
         sim_inputs = cp_locate_simulation_inputs(repr)
-        print 'inputs ', sim_inputs, repr
         all_sim_inputs = all_sim_inputs + sim_inputs
-    print 'leaving cp_locate_simulation_inputs_for_view', len(all_sim_inputs)
     return all_sim_inputs
 
 def cp_hook(info, ctorMethod, ctorArgs, extraCtorCommands):
@@ -106,7 +102,6 @@ smtrace.trace_globals.trace_output = []
 proxy_lists = smstate.get_proxy_lists_ordered_by_group(WithRendering=export_rendering)
 # Now register the proxies with the smtrace module
 for proxy_list in proxy_lists:
-    print 'proxy list is ', proxy_list
     smstate.register_proxies_by_dependency(proxy_list)
 
 # Calling append_trace causes the smtrace module to sort out all the
@@ -122,8 +117,6 @@ for view_proxy in view_proxies:
     # Locate which simulation input this write is connected to, if any. If so,
     # we update the write_frequencies datastructure accordingly.
     sim_inputs = cp_locate_simulation_inputs_for_view(view_proxy)
-    print sim_inputs[:], len(sim_inputs)
-    # sim_inputs is empty damn it
     for sim_input_name in sim_inputs:
         if not image_write_frequency in write_frequencies[sim_input_name]:
             write_frequencies[sim_input_name].append(image_write_frequency)
@@ -161,6 +154,21 @@ def DoCoProcessing(datadescription):
             fname = imagefilename.replace("%%v", str(view))
             fname = fname.replace("%%t", str(timestep))
             WriteImage(fname, renderviews[view])
+
+    # explicitly delete the proxies -- may have to do this multiple times
+    pxm = servermanager.ProxyManager()
+    somethingdeleted = 1
+    while somethingdeleted == 1:
+      somethingdeleted = 0
+      for grp in range(pxm.GetNumberOfXMLGroups()):
+        groupname = pxm.GetXMLGroupName(grp)
+        for proxy in range(pxm.GetNumberOfProxies(groupname)):
+            proxyname = pxm.GetProxyName(groupname, proxy)
+            if(proxyname):
+                prx = pxm.GetProxy(groupname, proxyname)
+                if(prx != None):
+                    Delete(prx)
+                    somethingdeleted = 1
 
 def CreateProducer(datadescription, gridname):
   "Creates a producer proxy for the grid"
@@ -211,6 +219,9 @@ for sim_input in write_frequencies:
 
 fileName = "%5"
 outFile = open(fileName, 'w')
+if image_write_frequency < 1:
+    image_write_frequency = 1
+
 outFile.write(output_contents % (request_data_description, do_coprocessing, image_write_frequency, image_file_name))
 outFile.close()
 

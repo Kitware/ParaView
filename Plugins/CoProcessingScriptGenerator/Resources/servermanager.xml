@@ -67,7 +67,7 @@
       <PipelineIcon name=":pqComponents/pqSave32.png" />
 
       <!-- This will help us when exporting the CoProcessing state -->
-      <CoProcessing group="writers" name="XMLPRectlinearGridWriter" />
+      <CoProcessing group="writers" name="XMLPRectilinearGridWriter" />
      </Hints>
      <!-- End of XMLRectilinearGridWriter -->
     </SourceProxy>
