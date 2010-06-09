@@ -66,15 +66,23 @@ vtkPVSynchronizedRenderer::vtkPVSynchronizedRenderer()
   this->ParallelSynchronizer = 0;
 
   bool in_tile_display_mode = false;
+  int tile_dims[2] = {0, 0};
+  vtkPVServerInformation* server_info = NULL;
   if (pm->GetActiveRemoteConnection())
     {
     vtkIdType connectionID = pm->GetConnectionID(
       pm->GetActiveRemoteConnection());
-    vtkPVServerInformation* server_info = pm->GetServerInformation(
-      connectionID);
-    in_tile_display_mode = (server_info->GetTileDimensions()[0] > 0 ||
-      server_info->GetTileDimensions()[1] > 0);
+    server_info = pm->GetServerInformation(connectionID);
     }
+  else
+    {
+    server_info = pm->GetServerInformation(0);
+    }
+  tile_dims[0] = server_info->GetTileDimensions()[0];
+  tile_dims[1] = server_info->GetTileDimensions()[1];
+  in_tile_display_mode = (tile_dims[0] > 1 || tile_dims[1] > 1);
+  cout << "in_tile_display_mode: " << in_tile_display_mode << endl;
+  cout << "tile_dims: " << tile_dims[0] << ", " << tile_dims[1] << endl;
 
   switch (this->Mode)
     {
@@ -124,6 +132,8 @@ vtkPVSynchronizedRenderer::vtkPVSynchronizedRenderer()
       {
 #ifdef PARAVIEW_USE_ICE_T
       this->ParallelSynchronizer = vtkIceTSynchronizedRenderers::New();
+      static_cast<vtkIceTSynchronizedRenderers*>(this->ParallelSynchronizer)->SetTileDimensions(
+        tile_dims[0], tile_dims[1]);
 #else
       // FIXME: need to add support for compositing.
       this->ParallelSynchronizer = vtkSynchronizedRenderers::New();

@@ -38,6 +38,8 @@ public:
     vtkRenderer* renderer = s->GetRenderer();
     vtkRenderWindow* window = renderer->GetRenderWindow();
 
+    window->SetTileScale(this->IceTCompositePass->GetTileDimensions());
+
     // CODE COPIED FROM vtkOpenGLRenderer.
     // Oh! How I hate such kind of copying, sigh :(.
     vtkTimerLog::MarkStartEvent("OpenGL Dev Render");

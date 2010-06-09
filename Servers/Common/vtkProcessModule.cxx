@@ -316,6 +316,10 @@ int vtkProcessModule::Start(int argc, char** argv)
   this->ConnectionManager->AddObserver(vtkCommand::ConnectionClosedEvent,
     this->Observer);
 
+  // fill up ServerInformation with local information.
+  // This just comes in handy on the server-processes, if needed.
+  this->ServerInformation->CopyFromObject(this);
+
   int myId;
   // This call blocks on the Satellite nodes (never on root node).
   if (this->ConnectionManager->Initialize(argc, argv, 
@@ -323,7 +327,6 @@ int vtkProcessModule::Start(int argc, char** argv)
     {
     return 1;
     }
-
 
   if (myId == 0)
     {
