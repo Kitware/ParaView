@@ -4,7 +4,7 @@ rate achieved in triangles/sec. """
 
 import time
 import sys
-from paraview import servermanager
+from paraview.simple import *
 
 def render(ss, v, title, nframes):
   print '============================================================'
@@ -15,13 +15,13 @@ def render(ss, v, title, nframes):
     ss.PhiResolution = phires
     c = v.GetActiveCamera()
     v.CameraPosition = [-3, 0, 0]
-    v.CameraFocalPoints = [0, 0, 0]
+    v.CameraFocalPoint = [0, 0, 0]
     v.CameraViewUp = [0, 0, 1]
-    v.StillRender()
+    Render()
     c1 = time.time()
     for i in range(nframes):
       c.Elevation(0.5)
-      v.StillRender()
+      Render()
       if not servermanager.fromGUI:
         sys.stdout.write(".")
         sys.stdout.flush()
@@ -44,24 +44,18 @@ def run(filename=None, nframes=60):
   a particular configuration is rendered. Higher numbers lead to more accurate
   averages. """
   # Turn off progress printing
-  if servermanager.progressObserverTag:
-    servermanager.ToggleProgressPrinting()
+  paraview.servermanager.SetProgressPrintingEnabled(0)
   
   # Create a sphere source to use in the benchmarks
-  pm = servermanager.ProxyManager()
-  ss = servermanager.sources.SphereSource(ThetaResolution=1000, PhiResolution=500, registrationGroup="sources", registrationName="benchmark source")
-  
-  # The view and representation
-  v = servermanager.GetRenderView()
-  if not v:
-    v = servermanager.CreateRenderView()
-  
-  rep = servermanager.CreateRepresentation(ss, v, registrationGroup="representations", registrationName="benchmark rep")
+  ss = Sphere(ThetaResolution=1000, PhiResolution=500)
+  rep = Show()
+  v = Render()
   
   results = []
 
   # Start with these defaults
-  v.RemoteRenderThreshold = 0
+
+  #v.RemoteRenderThreshold = 0
   v.UseImmediateMode = 0
   v.UseTriangleStrips = 0
   
@@ -83,14 +77,14 @@ def run(filename=None, nframes=60):
   title = 'no display lists, triangle strips, solid color'
   v.UseTriangleStrips = 1
   results.append(render(ss, v, title, nframes))
-  
+
   # Color by normals
   lt = servermanager.rendering.PVLookupTable()
   rep.LookupTable = lt
   rep.ColorAttributeType = 0 # point data
   rep.ColorArrayName = "Normals"
   lt.RGBPoints = [-1, 0, 0, 1, 0.0288, 1, 0, 0]
-  lt.ColorSpace = 1 # HSV
+  lt.ColorSpace = 'HSV'
   lt.VectorComponent = 0
   
   v.UseImmediateMode = 0
@@ -111,21 +105,6 @@ def run(filename=None, nframes=60):
   title = 'no display lists, triangle strips, color by array'
   v.UseTriangleStrips = 1
   results.append(render(ss, v, title, nframes))
-  
-  newr = []
-  for r in v.Representations:
-    if r != rep:
-      newr.append(r)
-  v.Representations = newr
-  
-  pm.UnRegisterProxy("sources", "benchmark source", ss)
-  pm.UnRegisterProxy("representations", "benchmark rep", rep)
-  
-  ss = None
-  rep = None
-  
-  v.StillRender()
-  v = None
 
   if filename:
     f = open(filename, "w")
@@ -136,5 +115,4 @@ def run(filename=None, nframes=60):
     print >>f, '"%s", %g, %g' % (i[0], i[1][1], i[2][1])  
 
 if __name__ == "__main__":
-  servermanager.Connect()
   run()
