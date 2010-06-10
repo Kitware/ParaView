@@ -484,9 +484,15 @@ void vtkSMRenderViewProxy::EndCreateVTKObjects()
 
   vtkPVAxesWidget* orientationWidget = vtkPVAxesWidget::SafeDownCast(
     this->OrientationWidgetProxy->GetClientSideObject());
-  orientationWidget->SetParentRenderer(this->Renderer);
-  orientationWidget->SetViewport(0, 0, 0.25, 0.25);
-  orientationWidget->SetInteractor(this->GetInteractor());
+
+  if (
+    (pm->GetOptions()->GetProcessType() & vtkPVOptions::PVBATCH) == 0 &&
+    pm->GetNumberOfLocalPartitions() == 1)
+    {
+    orientationWidget->SetParentRenderer(this->Renderer);
+    orientationWidget->SetViewport(0, 0, 0.25, 0.25);
+    orientationWidget->SetInteractor(this->GetInteractor());
+    }
   this->OrientationWidgetProxy->UpdateVTKObjects();
 }
 

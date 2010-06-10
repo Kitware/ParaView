@@ -124,7 +124,8 @@ void vtkPVAxesWidget::SetEnabled(int enabling)
 {
   if (!this->Interactor)
     {
-    vtkErrorMacro("The interactor must be set prior to enabling/disabling widget");
+    //vtkErrorMacro("The interactor must be set prior to enabling/disabling widget");
+    return;
     }
 
   if (enabling)
