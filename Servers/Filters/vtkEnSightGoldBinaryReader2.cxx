@@ -3819,24 +3819,50 @@ int vtkEnSightGoldBinaryReader2::ReadLine(char result[80])
 
   // if the first 4 bytes is the length, then this data is no doubt
   // a fortran data write!, copy the last 76 into the beginning
-  int c;
-  char len[4] = {0x50, 0x00, 0x00, 0x00};
-  if (this->ByteOrder == FILE_BIG_ENDIAN)
+  char le_len[4] = {0x50, 0x00, 0x00, 0x00};
+  char be_len[4] = {0, 0, 0, 0x50};
+
+  // the fortran test here depends on the byte ordering. But if the user didn't
+  // set any byte ordering then, we have to try both byte orderings. There was a
+  // bug here which was resulting in binary-fortran-big-endian files being read
+  // incorrectly on intel machines (BUG #10593). This dual-check avoids that
+  // bug.
+  bool le_isFortran = true;
+  bool be_isFortran = true;
+  for (int c=0; c<4; c++)
     {
-    vtkByteSwap::Swap4BE(len);
+    le_isFortran = le_isFortran && (result[c] == le_len[c]);
+    be_isFortran = be_isFortran && (result[c] == be_len[c]);
     }
 
-  bool isFortran = false;
-  for (c=0; c<4; c++)
+  switch (this->ByteOrder)
     {
-    if (result[c]!=len[c])
+  case FILE_BIG_ENDIAN:
+    this->Fortran = be_isFortran;
+    break;
+
+  case FILE_LITTLE_ENDIAN:
+    this->Fortran = le_isFortran;
+    break;
+
+  case FILE_UNKNOWN_ENDIAN:
+    if (le_isFortran)
       {
-      isFortran = false;
-      break;
+      this->Fortran = true;
+      this->ByteOrder = FILE_LITTLE_ENDIAN;
       }
-    else isFortran = true;
+    else if (be_isFortran)
+      {
+      this->Fortran = true;
+      this->ByteOrder = FILE_BIG_ENDIAN;
+      }
+    else
+      {
+      this->Fortran = false;
+      }
+    break;
     }
-  this->Fortran = isFortran;
+
   if (this->Fortran)
     {
     strncpy(result, &result[4], 76);
