@@ -72,7 +72,10 @@ def _wrap_property(proxy, smproperty):
             iter = smproperty.NewDomainIterator()
             isFileName = False
             while not iter.IsAtEnd():
-                if iter.GetDomain().IsA("vtkSMFileListDomain"):
+                # Refer to BUG #9710 to see why optional domains need to be
+                # ignored.
+                if iter.GetDomain().IsA("vtkSMFileListDomain") and \
+                  iter.GetDomain().GetIsOptional() == 0 :
                     isFileName = True
                     break
                 iter.Next()
