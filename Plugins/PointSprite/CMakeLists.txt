@@ -56,11 +56,17 @@ add_subdirectory(Graphics)
 # -----------------------------------------------------------------------------
 # Build the tests
 # -----------------------------------------------------------------------------
-set(PointSpritePlugin_BUILD_EXAMPLES ON CACHE BOOL "Build the example.")
-if(PointSpritePlugin_BUILD_EXAMPLES)
-    add_subdirectory(Examples)
-endif(PointSpritePlugin_BUILD_EXAMPLES)
-mark_as_advanced(PointSpritePlugin_BUILD_EXAMPLES)
+IF (DEFINED BUILD_EXAMPLES)
+  IF (BUILD_EXAMPLES)
+      add_subdirectory(Examples)
+  ENDIF (BUILD_EXAMPLES)
+ELSE (DEFINED BUILD_EXAMPLES)
+  set(PointSpritePlugin_BUILD_EXAMPLES ON CACHE BOOL "Build the example.")
+  IF(PointSpritePlugin_BUILD_EXAMPLES)
+      add_subdirectory(Examples)
+  ENDIF(PointSpritePlugin_BUILD_EXAMPLES)
+  mark_as_advanced(PointSpritePlugin_BUILD_EXAMPLES)
+ENDIF (DEFINED BUILD_EXAMPLES)
 # -----------------------------------------------------------------------------
 # Build the Paraview plugins
 # -----------------------------------------------------------------------------
