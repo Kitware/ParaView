@@ -353,6 +353,10 @@ void vtkSMRenderViewProxy::EndCreateVTKObjects()
 
   // Set the helper for interaction.
   this->Interactor->SetPVRenderView(this->RenderViewHelper);
+  this->Interactor->AddObserver(vtkCommand::StartInteractionEvent,
+    this->GetObserver());
+  this->Interactor->AddObserver(vtkCommand::EndInteractionEvent,
+    this->GetObserver());
 
   // Mark 2D renderer as non-interactive, since it's a slave to the 3D renderer.
   this->Renderer2D->SetInteractive(0);
@@ -467,6 +471,23 @@ void vtkSMRenderViewProxy::ProcessEvents(vtkObject* caller, unsigned long eventI
     // At the start of every render ensure that the 2D renderer and 3D renderer
     // have the same camera.
     this->SynchronizeRenderers();
+    }
+
+  // REFER TO BUG #10672.
+  // Sending Prepare/Cleanup and start/end on inteaction ensures we don't send
+  // repeated progress on/off while interacting, ensuring better performance
+  // when interacting.
+  else if (eventId == vtkCommand::StartInteractionEvent &&
+    caller == this->GetInteractor())
+    {
+    vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+    pm->SendPrepareProgress(this->ConnectionID);
+    }
+  else if (eventId == vtkCommand::EndInteractionEvent &&
+    caller == this->GetInteractor())
+    {
+    vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+    pm->SendCleanupPendingProgress(this->ConnectionID);
     }
 
   this->Superclass::ProcessEvents(caller, eventId, callData);
