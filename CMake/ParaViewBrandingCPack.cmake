@@ -132,9 +132,10 @@ FUNCTION(install_qt_libs qtliblist componentname)
         ENDIF (QT_${qtlib}_LIBRARY_RELEASE)
       ELSE (NOT WIN32)
         GET_FILENAME_COMPONENT(QT_DLL_PATH_tmp ${QT_QMAKE_EXECUTABLE} PATH)
-          INSTALL(FILES ${QT_DLL_PATH_tmp}/${qtlib}4.dll 
-                  DESTINATION ${PV_INSTALL_BIN_DIR} 
-                  COMPONENT ${componentname})
+        #GET_FILENAME_COMPONENT(QT_DLL_tmp "${QT_${qtlib}_LIBRARY_RELEASE" NAME_WE)
+        INSTALL(FILES ${QT_DLL_PATH_tmp}/${qtlib}4.dll 
+                DESTINATION ${PV_INSTALL_BIN_DIR} 
+                COMPONENT ${componentname})
       ENDIF (NOT WIN32)
     ENDFOREACH(qtlib)
   ENDIF (NOT APPLE)
