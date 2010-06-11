@@ -190,6 +190,7 @@ TARGET_LINK_LIBRARIES(pqWidgets
 )
 
 if(APPLE)
+  TARGET_LINK_LIBRARIES(pqWidgets ${QT_QTCLUCENE_LIBRARY})
   if(VTK_USE_CARBON)
     TARGET_LINK_LIBRARIES(pqWidgets "-framework Carbon")
   endif(VTK_USE_CARBON)
