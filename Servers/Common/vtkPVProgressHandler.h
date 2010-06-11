@@ -35,15 +35,7 @@ public:
 
   // Description:
   // Get/Set the connection. This is not reference-counted to avoid cycles.
-  void SetConnection(vtkProcessModuleConnection* conn)
-    {
-    if (this->Connection != conn)
-      {
-      this->Connection = conn;
-      this->DetermineProcessType();
-      this->Modified();
-      }
-    }
+  void SetConnection(vtkProcessModuleConnection* conn);
   vtkGetObjectMacro(Connection, vtkProcessModuleConnection);
 
   // Description:
@@ -64,6 +56,11 @@ public:
   // Called when the client connection (vtkClientConnection) receives progress
   // from the server.
   void HandleServerProgress(int progress, const char* text);
+
+  // Description:
+  // Get/Set the progress frequency in seconds. Default is 0.5 seconds.
+  vtkSetClampMacro(ProgressFrequency, double, 0.01, 30.0);
+  vtkGetMacro(ProgressFrequency, double);
 
 //BTX
   // Description:
@@ -118,6 +115,8 @@ protected:
   void SendProgressToRoot();
   int ReceiveProgressFromSatellites();
   void ReceiveProgressFromServer();
+
+  double ProgressFrequency;
 
   vtkProcessModuleConnection* Connection;
   eProcessTypes ProcessType;

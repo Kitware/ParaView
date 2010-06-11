@@ -43,8 +43,6 @@
 #endif
 
 
-#define MIN_PROGRESS_INTERVAL_IN_SECS 0.3
-
 inline const char* vtkGetProgressText(vtkObjectBase* o)
 {
   vtkAlgorithm* alg = vtkAlgorithm::SafeDownCast(o);
@@ -250,7 +248,9 @@ vtkPVProgressHandler::vtkPVProgressHandler()
   this->Internals = new vtkInternals();
   this->Observer = vtkPVProgressHandler::vtkObserver::New();
   this->Observer->SetTarget(this);
-  this->ProcessType = INVALID; 
+  this->ProcessType = INVALID;
+  this->ProgressFrequency = 2.0; // seconds
+
 }
 
 //----------------------------------------------------------------------------
@@ -270,6 +270,17 @@ void vtkPVProgressHandler::RegisterProgressEvent(vtkObject* object, int id)
     {
     this->Internals->RegisteredObjects[object] = id;
     object->AddObserver(vtkCommand::ProgressEvent, this->Observer);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVProgressHandler::SetConnection(vtkProcessModuleConnection* conn)
+{
+  if (this->Connection != conn)
+    {
+    this->Connection = conn;
+    this->DetermineProcessType();
+    this->Modified();
     }
 }
 
@@ -480,9 +491,8 @@ bool vtkPVProgressHandler::GetIsRoot()
 bool vtkPVProgressHandler::ReportProgress(double progress)
 {
   this->Internals->ProgressTimer->StopTimer();
-  if (progress <= 0.0 ||
-    progress >= 1.0 ||
-    this->Internals->ProgressTimer->GetElapsedTime() > MIN_PROGRESS_INTERVAL_IN_SECS)
+  if (progress <= 0.0 || progress >= 1.0 ||
+    this->Internals->ProgressTimer->GetElapsedTime() > this->ProgressFrequency)
     {
     this->Internals->ProgressTimer->StartTimer();
     return true;
@@ -533,10 +543,8 @@ void vtkPVProgressHandler::HandleServerProgress(int progress, const char* text)
 //----------------------------------------------------------------------------
 void vtkPVProgressHandler::SetLocalProgress(int progress, const char* text)
 {
-  this->Internals->ProgressTimer->StopTimer();
-  //if (this->Internals->ProgressTimer->GetElapsedTime() > MIN_PROGRESS_INTERVAL_IN_SECS)
+  if (this->ReportProgress(progress/100.0))
     {
-    this->Internals->ProgressTimer->StartTimer();
     vtkProcessModule::GetProcessModule()->SetLocalProgress(text, progress);
     }
 }
@@ -636,8 +644,8 @@ void vtkPVProgressHandler::SendProgressToRoot()
   if (this->Internals->AsyncRequestValid &&
     this->Internals->AsyncRequest.Test())
     {
-    // The previous Send() has been consumed by the root, so we no longer have
-    // a pending send.
+    // This simply marks whether the previously sent message caused any errors.
+    // This does not imply that the message has been received by the root node.
     this->Internals->AsyncRequestValid =false;
     }
 

@@ -251,6 +251,8 @@ vtkIdType vtkProcessModuleConnectionManager::OpenSelfConnection()
   vtkIdType cid = this->GetUniqueConnectionID();
   vtkSelfConnection* selfConnection = vtkSelfConnection::New();
   this->SetConnection(cid, selfConnection);
+  int partitionId;
+  selfConnection->Initialize(0, NULL, &partitionId);
   selfConnection->Delete();
   this->InvokeEvent(vtkCommand::ConnectionCreatedEvent, &cid);
   return cid;
