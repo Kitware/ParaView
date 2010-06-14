@@ -284,6 +284,9 @@ void MyProcess::Execute()
   // don't waste time swapping buffers unless needed.
   renWin->SwapBuffersOff();
 
+  // Depth-peeling requires that multi-samples ==0.
+  renWin->SetMultiSamples(0);
+
   vtkRenderer* renderer = vtkRenderer::New();
   renWin->AddRenderer(renderer);
 
