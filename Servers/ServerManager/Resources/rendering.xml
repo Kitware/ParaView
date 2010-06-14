@@ -9506,6 +9506,7 @@
           <Property name="Normal" />
           <Property name="PlaceWidget" />
           <Property name="Visibility" />
+          <Property name="PlaceFactor" />
         </ExposedProperties>
       </SubProxy>
 
