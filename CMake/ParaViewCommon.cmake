@@ -265,7 +265,12 @@ IF(CMAKE_SYSTEM MATCHES Catamount)
 #  SET(CMAKE_REQUIRED_FLAGS -Wl,--fatal-warnings)
 ENDIF(CMAKE_SYSTEM MATCHES Catamount)
 
-
+# Is this a 32 bit or 64bit build. Display this in about dialog.
+if("${CMAKE_SIZEOF_VOID_P}" EQUAL 8)
+  set(PARAVIEW_BUILD_ARCHITECTURE "64")
+else()
+  set(PARAVIEW_BUILD_ARCHITECTURE "32")
+endif()
 
 #########################################################################
 # Configure Testing
