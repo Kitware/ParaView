@@ -2,15 +2,15 @@
 #########################################################################
 
 
-# GLOB_INSTALL_DEVELOPMENT: 
-#     Scrape directory for glob pattern 
+# GLOB_INSTALL_DEVELOPMENT:
+#     Scrape directory for glob pattern
 #     install the found files to Development
 #     component.
-#                   
+#
 # from:    directory to scrape.
 # to:      destination
 # exts:    list of glob patterns
-# 
+#
 # NOTE: To search in directory other than the current
 #       put the search dir in "exts".
 MACRO(GLOB_INSTALL_DEVELOPMENT from to exts)
@@ -130,7 +130,7 @@ ENDIF(NOT PV_INSTALL_DOC_DIR)
 
 #########################################################################
 # Install no development files by default, but allow the user to get
-# them installed by setting PV_INSTALL_DEVELOPMENT to true. 
+# them installed by setting PV_INSTALL_DEVELOPMENT to true.
 OPTION(PARAVIEW_INSTALL_DEVELOPMENT "Install ParaView plugin development files." OFF)
 MARK_AS_ADVANCED(PARAVIEW_INSTALL_DEVELOPMENT)
 IF(NOT PARAVIEW_INSTALL_DEVELOPMENT)
@@ -175,7 +175,7 @@ SET (VTK_INSTALL_NO_VTKPYTHON 1)
 SET (VTK_INSTALL_PYTHON_USING_CMAKE 1)
 
 # KWCommon config
-#TODO move this stuff into /ParaView3/Common/CMakeLists.txt 
+#TODO move this stuff into /ParaView3/Common/CMakeLists.txt
 SET(PV_INSTALL_HAS_CMAKE_24 1)
 SET(PV_INSTALL_BIN_DIR_CM24 ${PV_INSTALL_BIN_DIR})
 SET(PV_INSTALL_LIB_DIR_CM24 ${PV_INSTALL_LIB_DIR})
@@ -320,9 +320,9 @@ ENDIF (PARAVIEW_DISABLE_VTK_TESTING)
 #########################################################################
 # Set the ICET MPI variables from the VTK ones.
 # use a set cache internal so people don't try and use them
-SET(ICET_MPIRUN_EXE "${VTK_MPIRUN_EXE}" CACHE INTERNAL 
+SET(ICET_MPIRUN_EXE "${VTK_MPIRUN_EXE}" CACHE INTERNAL
   "This is set from VTK_MPIRUN_EXE.")
-SET(ICET_MPI_PREFLAGS 
+SET(ICET_MPI_PREFLAGS
   "${VTK_MPI_PRENUMPROC_FLAGS};${VTK_MPI_NUMPROC_FLAG};${VTK_MPI_MAX_NUMPROCS};${VTK_MPI_PREFLAGS}" CACHE INTERNAL
   "This is set from a combination of VTK_MPI_PREFLAGS VTK_MPI_NUMPROC_FLAG VTK_MPI_MAX_NUMPROCS VTK_MPI_PREFLAGS.")
 SET(ICET_MPI_POSTFLAGS "${VTK_MPI_POSTFLAGS}"  CACHE INTERNAL
@@ -338,6 +338,14 @@ SET(VTK_INCLUDE_DIR
   ${ParaView_SOURCE_DIR}/VTK/Wrapping
   ${ParaView_BINARY_DIR}/VTK/Wrapping
   )
+
+IF(PARAVIEW_ENABLE_PYTHON)
+  SET(VTK_INCLUDE_DIR ${VTK_INCLUDE_DIR}
+    ${ParaView_SOURCE_DIR}/VTK/Wrapping/Python
+    ${ParaView_BINARY_DIR}/VTK/Wrapping/Python
+    )
+ENDIF(PARAVIEW_ENABLE_PYTHON)
+
 SET(kits Common Charts Filtering GenericFiltering IO Imaging Rendering Parallel Graphics Hybrid VolumeRendering Widgets)
 FOREACH(kit ${kits})
   SET(VTK_INCLUDE_DIR ${VTK_INCLUDE_DIR}
@@ -435,7 +443,7 @@ ELSE(PARAVIEW_USE_SYSTEM_HDF5)
   ELSE(VTK_USE_SYSTEM_ZLIB)
     SET(HDF5_ZLIB_HEADER "vtk_zlib.h")
   ENDIF(VTK_USE_SYSTEM_ZLIB)
-  SET(HDF5_INCLUDE_DIR 
+  SET(HDF5_INCLUDE_DIR
     ${ParaView_SOURCE_DIR}/Utilities/hdf5
     ${ParaView_BINARY_DIR}/Utilities/hdf5)
 
@@ -524,7 +532,7 @@ IF(VTK_USE_MPI)
     ENDIF (PARAVIEW_TEST_COMPOSITING)
   ENDIF (BUILD_TESTING)
   IF(PARAVIEW_USE_ICE_T)
-    SET(ICE_T_INCLUDE_DIR 
+    SET(ICE_T_INCLUDE_DIR
       ${ParaView_SOURCE_DIR}/Utilities/IceT/src/include
       ${ParaView_BINARY_DIR}/Utilities/IceT/src/include
       )
@@ -664,7 +672,7 @@ FOREACH(external ${PARAVIEW_EXTRA_EXTERNAL_MODULES})
   OPTION(PARAVIEW_USE_${external} "Build using ${external} library. Requires access to ${external} libraries" OFF)
   MARK_AS_ADVANCED(PARAVIEW_USE_${external})
   IF(PARAVIEW_USE_${external})
-    FIND_PATH(${external}_SOURCE_DIR 
+    FIND_PATH(${external}_SOURCE_DIR
       ${external}ParaViewImport.cmake
       ${CMAKE_CURRENT_SOURCE_DIR}/../${external}
       ${CMAKE_CURRENT_SOURCE_DIR}/vtkSNL/IO
@@ -751,7 +759,7 @@ SET(PARAVIEW_INCLUDE_DIRS
 CONFIGURE_FILE(${ParaView_SOURCE_DIR}/vtkPVConfig.h.in
   ${ParaView_BINARY_DIR}/vtkPVConfig.h
   ESCAPE_QUOTES IMMEDIATE)
-  
+
 IF (NOT PV_INSTALL_NO_DEVELOPMENT)
   INSTALL(
       FILES  ${ParaView_BINARY_DIR}/vtkPVConfig.h

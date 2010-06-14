@@ -10,6 +10,7 @@ INCLUDE_DIRECTORIES(
   "${ParaView_BINARY_DIR}/VTK"
   "${ParaView_SOURCE_DIR}/VTK/Common"
   "${ParaView_SOURCE_DIR}/VTK/Parallel"
+  "${ParaView_SOURCE_DIR}/VTK/Wrapping/Python"
   "${ParaView_SOURCE_DIR}/Servers/Common"
   "${ParaView_SOURCE_DIR}/Servers/Filters"
   "${ParaView_SOURCE_DIR}/Servers/ServerManager"
@@ -113,9 +114,9 @@ TARGET_LINK_LIBRARIES(vtkPVPythonInterpretor
   ${PYTHON_UTIL_LIBRARY_LIB})
 
 # Link against all the kit wrappers.
-SET(_PVPYTHON_LINK_LIBS 
+SET(_PVPYTHON_LINK_LIBS
   vtkPVServerManagerPythonD
-  vtkCommon 
+  vtkCommon
   vtkFiltering
   vtkIO
   vtkGraphics
@@ -156,7 +157,7 @@ FOREACH(pvexe ${PV_EXE_LIST})
       COMPONENT Runtime)
     IF (PV_EXE_SUFFIX)
       # Shared forwarding enabled.
-      INSTALL(TARGETS ${pvexe}${PV_EXE_SUFFIX} 
+      INSTALL(TARGETS ${pvexe}${PV_EXE_SUFFIX}
         DESTINATION ${PV_INSTALL_LIB_DIR}
         COMPONENT Runtime)
     ENDIF (PV_EXE_SUFFIX)
