@@ -277,6 +277,11 @@ int vtkOrderedCompositeDistributor::RequestData(
   this->D3->SetBoundaryModeToSplitBoundaryCells();
   this->D3->SetInput(input);
   this->D3->SetCuts(cuts);
+  // We need to pass the region assignments from PKdTree to D3
+  // (Refer to BUG #10828).
+  this->D3->SetUserRegionAssignments(
+    this->PKdTree->GetRegionAssignmentMap(),
+    this->PKdTree->GetRegionAssignmentMapLength());
   this->D3->SetController(this->Controller);
   this->D3->Modified();
   this->D3->Update();
