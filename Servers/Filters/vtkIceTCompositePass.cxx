@@ -320,8 +320,8 @@ void vtkIceTCompositePass::UpdateTileInformation(
         (tile_viewport[3] - tile_viewport[1])/image_reduction_factor,
         cur_rank);
       // setting this should be needed so that the 2d actors work correctly.
-      // However that messes up the tile-displays esp. when
-      // image_reduction_factor > 1.
+      // However that messes up the tile-displays with tdy > 0
+#if 0
       if (cur_rank == rank)
         {
         render_state->GetRenderer()->GetVTKWindow()->SetTileViewport(
@@ -330,6 +330,7 @@ void vtkIceTCompositePass::UpdateTileInformation(
           tile_viewport[2]/(double) tile_size[0],
           tile_viewport[3]/(double) tile_size[1]);
         }
+#endif
       }
     }
 
