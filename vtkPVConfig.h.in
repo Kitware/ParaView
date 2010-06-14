@@ -25,6 +25,7 @@
 #cmakedefine PARAVIEW_BLT_LIBRARY
 #cmakedefine PARAVIEW_ENABLE_PYTHON
 #cmakedefine PARAVIEW_MINIMAL_BUILD
+#cmakedefine PARAVIEW_BUILD_ARCHITECTURE "@PARAVIEW_BUILD_ARCHITECTURE@"
 
 // Indicates the Qt support is enabled in VTK.
 #cmakedefine VTK_USE_QVTK
@@ -48,6 +49,9 @@
 
 #define CMAKE_CXX_COMPILER_ID "@CMAKE_CXX_COMPILER_ID@"
 @PARAVIEW_CONFIG_EXTRA_DEFINES@
+
+// defined when SSEND must be used for communication by default.
+#cmakedefine PARAVIEW_USE_MPI
 
 // defined when SSEND must be used for communication by default.
 #cmakedefine PARAVIEW_USE_MPI_SSEND

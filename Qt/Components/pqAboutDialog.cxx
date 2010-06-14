@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -79,15 +79,16 @@ pqAboutDialog::pqAboutDialog(QWidget* Parent) :
   info = info.remove(0, idx);
 
   this->Ui->VersionLabel->setText(
-    QString("<html><b>Version: <i>%1</i></b></html>").arg(PARAVIEW_VERSION_FULL));
+    QString("<html><b>Version: <i>%1</i></b></html>").arg(
+      QString(PARAVIEW_VERSION_FULL) + " " + QString(PARAVIEW_BUILD_ARCHITECTURE) + "-bit"));
 
   this->AddClientInformation();
   this->AddServerInformation();
 
  // this->Ui->ClientInformation->append("<a href=\"http://www.paraview.org\">www.paraview.org</a>");
   //  this->Ui->ClientInformation->append("<a href=\"http://www.kitware.com\">www.kitware.com</a>");
-  
-  // For now, don't add any runtime information, it's 
+
+  // For now, don't add any runtime information, it's
   // incorrect for PV3 (made sense of PV2).
   // this->Ui->Information->append("\n");
   // this->Ui->Information->append(info);
@@ -121,8 +122,15 @@ void pqAboutDialog::AddClientInformation()
 
   QTreeWidget* tree = this->Ui->ClientInformation;
 
-  ::addItem(tree, "Version", PARAVIEW_VERSION_FULL);
+  ::addItem(tree, "Version", QString(PARAVIEW_VERSION_FULL) + " " + QString(PARAVIEW_BUILD_ARCHITECTURE) + "-bit");
   ::addItem(tree, "Qt Version", QT_VERSION_STR);
+
+#if defined(PARAVIEW_BUILD_ARCHITECTURE)
+  ::addItem(tree, "Architecture", PARAVIEW_BUILD_ARCHITECTURE);
+#else
+  ::addItem(tree, "Architecture", PARAVIEW_BUILD_ARCHITECTURE);
+#endif
+
 #if defined(PARAVIEW_ENABLE_PYTHON)
   ::addItem(tree, "Embedded Python", "On");
 #else
@@ -131,8 +139,14 @@ void pqAboutDialog::AddClientInformation()
 
 #if defined(QT_TESTING_WITH_PYTHON)
   ::addItem(tree, "Python Testing", "On");
-#else 
+#else
   ::addItem(tree, "Python Testing", "Off");
+#endif
+
+#if defined(PARAVIEW_USE_MPI)
+  ::addItem(tree, "MPI Enabled", "On");
+#else
+  ::addItem(tree, "MPI Enabled", "Off");
 #endif
 
   ::addItem(tree, "Disable Registry", opts->GetDisableRegistry()? "On" : "Off");
@@ -158,7 +172,7 @@ void pqAboutDialog::AddServerInformation()
 void pqAboutDialog::AddServerInformation(pqServer* server, QTreeWidget* tree)
 {
   pqOptions* clientOptions = pqOptions::SafeDownCast(server->getOptions());
-  vtkPVServerInformation* serverInfo = server->getServerInformation(); 
+  vtkPVServerInformation* serverInfo = server->getServerInformation();
 
   vtkSMViewProxy* renderViewPrototype = vtkSMViewProxy::SafeDownCast(
     vtkSMProxyManager::GetProxyManager()->GetPrototypeProxy("views", "RenderView"));
@@ -170,7 +184,7 @@ void pqAboutDialog::AddServerInformation(pqServer* server, QTreeWidget* tree)
         server->GetConnectionID()));
     return;
     }
- 
+
   const pqServerResource& resource = server->getResource();
   QString scheme = resource.scheme();
   bool separate_render_server = (scheme == "cdsrs" || scheme == "cdsrsrc");
@@ -208,7 +222,7 @@ void pqAboutDialog::AddServerInformation(pqServer* server, QTreeWidget* tree)
     }
   // TODO: handle separate render server partitions.
   ::addItem(tree, "Number of Processes", server->getNumberOfPartitions());
-  
+
   ::addItem(tree, "Disable Remote Rendering",
     serverInfo->GetRemoteRendering()? "Off":"On");
   ::addItem(tree, "IceT",
