@@ -80,9 +80,13 @@ vtkPVSynchronizedRenderer::vtkPVSynchronizedRenderer()
     }
   tile_dims[0] = server_info->GetTileDimensions()[0];
   tile_dims[1] = server_info->GetTileDimensions()[1];
-  in_tile_display_mode = (tile_dims[0] > 1 || tile_dims[1] > 1);
-  cout << "in_tile_display_mode: " << in_tile_display_mode << endl;
-  cout << "tile_dims: " << tile_dims[0] << ", " << tile_dims[1] << endl;
+  in_tile_display_mode = (tile_dims[0] > 0 || tile_dims[1] > 0);
+
+  // we ensure that tile_dims are non-zero. We are passing the tile_dims to
+  // vtkIceTSynchronizedRenderers and should be (1, 1) when not in tile-display
+  // mode.
+  tile_dims[0] = tile_dims[0] > 0 ? tile_dims[0] : 1;
+  tile_dims[1] = tile_dims[1] > 0 ? tile_dims[1] : 1;
 
   switch (this->Mode)
     {

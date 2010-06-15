@@ -48,7 +48,10 @@ public:
   // Set the tile dimensions. Default is (1, 1).
   // If any of the dimensions is > 1 then tile display mode is assumed.
   void SetTileDimensions(int x, int y)
-    { this->IceTCompositePass->SetTileDimensions(x, y); }
+    {
+    this->IceTCompositePass->SetTileDimensions(x, y);
+    this->UpdateCameraAspect(x, y);
+    }
 
   // Description:
   // Set the tile mullions. The mullions are measured in pixels. Use
@@ -96,6 +99,11 @@ public:
 protected:
   vtkIceTSynchronizedRenderers();
   ~vtkIceTSynchronizedRenderers();
+
+  // Description:
+  // When rendering in tile-display mode, we need to tell the camera-pass the
+  // aspect ratio overriding factor that depends on the tile dimensions.
+  void UpdateCameraAspect(int, int);
 
   // Description:
   // Overridden to capture image from icet buffers instead of the screen.

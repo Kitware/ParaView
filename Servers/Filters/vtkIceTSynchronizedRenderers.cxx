@@ -21,6 +21,8 @@
 #include "vtkRenderWindow.h"
 #include "vtkTimerLog.h"
 
+#include "vtkCameraPass.h"
+
 #include <vtkgl.h>
 #include <GL/ice-t.h>
 
@@ -38,21 +40,15 @@ public:
     vtkRenderer* renderer = s->GetRenderer();
     vtkRenderWindow* window = renderer->GetRenderWindow();
 
-    window->SetTileScale(this->IceTCompositePass->GetTileDimensions());
-
     // CODE COPIED FROM vtkOpenGLRenderer.
     // Oh! How I hate such kind of copying, sigh :(.
-    vtkTimerLog::MarkStartEvent("OpenGL Dev Render");
+    vtkTimerLog::MarkStartEvent("vtkInitialPass::Render");
 
     // Do not remove this MakeCurrent! Due to Start / End methods on
     // some objects which get executed during a pipeline update,
     // other windows might get rendered since the last time
     // a MakeCurrent was called.
     window->MakeCurrent();
-
-    // standard render method
-    this->ClearLights(renderer);
-    this->UpdateCamera(renderer);
 
     // Don't do any geometry-related rendering just yet. That needs to be done
     // in the icet callback.
@@ -80,12 +76,7 @@ public:
     vtkInitialPass::ActivePass = NULL;
 
     this->IceTCompositePass->CleanupContext(s);
-
-    //// clean up the model view matrix set up by the camera
-    glMatrixMode(GL_MODELVIEW);
-    glPopMatrix();
-
-    vtkTimerLog::MarkEndEvent("OpenGL Dev Render");
+    vtkTimerLog::MarkEndEvent("vtkInitialPass::Render");
     }
 
   static void Draw()
@@ -117,6 +108,8 @@ protected:
   void DrawInternal(vtkRenderer* ren)
     {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    this->ClearLights(ren);
     this->UpdateLightGeometry(ren);
     this->UpdateLights(ren);
 
@@ -153,7 +146,12 @@ vtkIceTSynchronizedRenderers::vtkIceTSynchronizedRenderers()
   vtkInitialPass* initPass = vtkInitialPass::New();
   initPass->IceTSynchronizedRenderers = this;
   initPass->SetIceTCompositePass(this->IceTCompositePass);
-  this->RenderPass = initPass;
+
+  vtkCameraPass* cameraPass = vtkCameraPass::New();
+  cameraPass->SetDelegatePass(initPass);
+  initPass->Delete();
+
+  this->RenderPass = cameraPass;
   this->SetParallelController(vtkMultiProcessController::GetGlobalController());
 }
 
@@ -164,6 +162,13 @@ vtkIceTSynchronizedRenderers::~vtkIceTSynchronizedRenderers()
   this->IceTCompositePass = 0;
   this->RenderPass->Delete();
   this->RenderPass = 0;
+}
+
+//----------------------------------------------------------------------------
+void vtkIceTSynchronizedRenderers::UpdateCameraAspect(int x, int y)
+{
+  vtkCameraPass* cp = vtkCameraPass::SafeDownCast(this->RenderPass);
+  cp->SetAspectRatioOverride((double)(x)/y);
 }
 
 //----------------------------------------------------------------------------
@@ -194,7 +199,8 @@ void vtkIceTSynchronizedRenderers::SetImageReductionFactor(int val)
 vtkSynchronizedRenderers::vtkRawImage&
 vtkIceTSynchronizedRenderers::CaptureRenderedImage()
 {
-  // FIXME: capture from icet buffers.
+  // We capture the image from IceTCompositePass. This avoids the capture of
+  // buffer from screen when not necessary.
   vtkRawImage& rawImage =
     (this->GetImageReductionFactor() == 1)?
     this->FullImage : this->ReducedImage;
