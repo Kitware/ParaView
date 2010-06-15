@@ -127,7 +127,7 @@ protected:
   // These methods are called on all processes as a consequence of corresponding
   // events being called on the render window.
   virtual void HandleStartRender(vtkRenderWindow*);
-  virtual void HandleEndRender(vtkRenderWindow*) {}
+  virtual void HandleEndRender(vtkRenderWindow*);
   virtual void HandleAbortRender(vtkRenderWindow*) {}
 
   virtual void ClientStartRender(vtkRenderWindow*);

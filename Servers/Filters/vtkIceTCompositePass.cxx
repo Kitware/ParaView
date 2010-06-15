@@ -261,8 +261,9 @@ void vtkIceTCompositePass::UpdateTileInformation(
   else
     {
     vtkWindow* window = render_state->GetRenderer()->GetVTKWindow();
-    tile_size[0] = window->GetSize()[0];
-    tile_size[1] = window->GetSize()[1];
+    // NOTE: GetActualSize() does not include the TileScale.
+    tile_size[0] = window->GetActualSize()[0];
+    tile_size[1] = window->GetActualSize()[1];
     render_state->GetRenderer()->GetViewport(viewport);
     }
 
@@ -321,16 +322,15 @@ void vtkIceTCompositePass::UpdateTileInformation(
         cur_rank);
       // setting this should be needed so that the 2d actors work correctly.
       // However that messes up the tile-displays with tdy > 0
-#if 0
-      if (cur_rank == rank)
-        {
-        render_state->GetRenderer()->GetVTKWindow()->SetTileViewport(
-          tile_viewport[0]/(double) tile_size[0],
-          tile_viewport[1]/(double) tile_size[1],
-          tile_viewport[2]/(double) tile_size[0],
-          tile_viewport[3]/(double) tile_size[1]);
-        }
-#endif
+      // if (cur_rank == rank)
+      //   {
+      //   render_state->GetRenderer()->GetVTKWindow()->SetTileScale(this->TileDimensions);
+      //   render_state->GetRenderer()->GetVTKWindow()->SetTileViewport(
+      //     tile_viewport[0]/(double) (tile_size[0]*this->TileDimensions[0]),
+      //     tile_viewport[1]/(double) (tile_size[1]*this->TileDimensions[1]),
+      //     tile_viewport[2]/(double) (tile_size[0]*this->TileDimensions[0]),
+      //     tile_viewport[3]/(double) (tile_size[1]*this->TileDimensions[1]));
+      //   }
       }
     }
 

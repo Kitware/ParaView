@@ -24,6 +24,8 @@
 #include "vtkRenderWindow.h"
 #include "vtkSmartPointer.h"
 #include "vtkSocketController.h"
+#include "vtkPVServerInformation.h"
+#include "vtkTilesHelper.h"
 
 #include <vtkstd/map>
 #include <vtkstd/vector>
@@ -501,6 +503,24 @@ void vtkPVSynchronizedRenderWindows::HandleStartRender(vtkRenderWindow* renWin)
 }
 
 //----------------------------------------------------------------------------
+void vtkPVSynchronizedRenderWindows::HandleEndRender(vtkRenderWindow*)
+{
+  switch (this->Mode)
+    {
+  case CLIENT:
+    this->ClientServerController->Barrier();
+    break;
+
+  case SERVER:
+    this->ClientServerController->Barrier();
+    break;
+
+  default:
+    return;
+    }
+}
+
+//----------------------------------------------------------------------------
 void vtkPVSynchronizedRenderWindows::ClientStartRender(vtkRenderWindow* renWin)
 {
   // In client-server mode, the client needs to collect the window layouts and
@@ -673,6 +693,9 @@ void vtkPVSynchronizedRenderWindows::LoadWindowAndLayout(
   stream >> full_size[0] >> full_size[1];
 
   // Now load the window's tile scale and tile-viewport.
+  // tile-scale and viewport are overloaded. They are used when rendering large
+  // images as well as when rendering in tile-display mode. The code here
+  // handles the case when rendering large images.
   int tileScale[2];
   double tileViewport[4];
   double desiredUpdateRate;
@@ -726,25 +749,61 @@ void vtkPVSynchronizedRenderWindows::UpdateWindowLayout()
 
   case SERVER:
   case BATCH:
-    this->Internals->SharedRenderWindow->SetSize(full_size);
-    //this->Internals->SharedRenderWindow->SetPosition(0, 0);
-
-    for (iter = this->Internals->RenderWindows.begin();
-      iter != this->Internals->RenderWindows.end(); ++iter)
       {
-      const int *actual_size = iter->second.Size;
-      const int *position = iter->second.Position;
+      // If we are in tile-display mode, we should update the tile-scale
+      // and tile-viewport for the render window. That is required for the camera
+      // as well as for the annotations to show correctly.
+      vtkPVServerInformation* server_info =
+        vtkProcessModule::GetProcessModule()->GetServerInformation(NULL);
+      int tile_dims[2];
+      tile_dims[0] = server_info->GetTileDimensions()[0];
+      tile_dims[1] = server_info->GetTileDimensions()[1];
+      if (tile_dims[0] > 0 || tile_dims[1] > 0)
+        {
+        tile_dims[0] = (tile_dims[0] == 0)? 1 : tile_dims[0];
+        tile_dims[1] = (tile_dims[1] == 0)? 1 : tile_dims[1];
+        this->Internals->SharedRenderWindow->SetTileScale(tile_dims);
 
-      // This class only supports full-viewports.
-      double viewport[4];
-      viewport[0] = position[0]/static_cast<double>(full_size[0]);
-      viewport[1] = position[1]/static_cast<double>(full_size[1]);
-      viewport[2] = (position[0] + actual_size[0])/
-                    static_cast<double>(full_size[0]);
-      viewport[3] = (position[1] + actual_size[1])/
-                    static_cast<double>(full_size[1]);
-      this->Internals->UpdateViewports(
-        iter->second.Renderers, viewport);
+        vtkTilesHelper* helper = vtkTilesHelper::New();
+        helper->SetTileDimensions(tile_dims);
+        helper->SetTileWindowSize(512, 512);
+
+        double viewport[4] = {0, 0, 1, 1};
+        int rank = this->ParallelController->GetLocalProcessId();
+        const int *tile_viewport = helper->GetTileViewport(viewport,
+          rank);
+        this->Internals->SharedRenderWindow->SetTileViewport(
+          tile_viewport[0]/(512.0 * tile_dims[0]),
+          tile_viewport[1]/(512.0 * tile_dims[1]),
+          tile_viewport[2]/(512.0 * tile_dims[0]),
+          tile_viewport[3]/(512.0 * tile_dims[1]));
+        helper->Delete();
+        // FIXME: handle full-screen case
+        this->Internals->SharedRenderWindow->SetSize(400, 400);
+        }
+      else
+        {
+        this->Internals->SharedRenderWindow->SetSize(full_size);
+        //this->Internals->SharedRenderWindow->SetPosition(0, 0);
+        }
+
+      for (iter = this->Internals->RenderWindows.begin();
+        iter != this->Internals->RenderWindows.end(); ++iter)
+        {
+        const int *actual_size = iter->second.Size;
+        const int *position = iter->second.Position;
+
+        // This class only supports full-viewports.
+        double viewport[4];
+        viewport[0] = position[0]/static_cast<double>(full_size[0]);
+        viewport[1] = position[1]/static_cast<double>(full_size[1]);
+        viewport[2] = (position[0] + actual_size[0])/
+          static_cast<double>(full_size[0]);
+        viewport[3] = (position[1] + actual_size[1])/
+          static_cast<double>(full_size[1]);
+        this->Internals->UpdateViewports(
+          iter->second.Renderers, viewport);
+        }
       }
     break;
 
