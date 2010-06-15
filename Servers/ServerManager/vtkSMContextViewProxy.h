@@ -25,6 +25,7 @@
 class vtkContextView;
 class vtkChart;
 class vtkImageData;
+class vtkRenderWindow;
 //BTX
 class QVTKWidget;
 //ETX
@@ -57,6 +58,11 @@ public:
   // Description:
   // Capture the contents of the window at the specified magnification level.
   vtkImageData* CaptureWindow(int magnification);
+
+  // Description:
+  // Return the render window from which offscreen rendering and interactor can
+  // be accessed
+  vtkRenderWindow* GetRenderWindow();
 
 //BTX
 protected:

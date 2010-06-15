@@ -90,6 +90,12 @@ QVTKWidget* vtkSMContextViewProxy::GetChartWidget()
 }
 
 //----------------------------------------------------------------------------
+vtkRenderWindow* vtkSMContextViewProxy::GetRenderWindow()
+{
+  return this->ChartView->GetRenderWindow();
+}
+
+//----------------------------------------------------------------------------
 vtkContextView* vtkSMContextViewProxy::GetChartView()
 {
   return this->ChartView;
