@@ -30,7 +30,7 @@ int arg_is_pointer_to_data(int argType, int count)
 {
   return
     (count == 0 &&
-     ((argType & VTK_PARSE_INDIRECT) == VTK_PARSE_POINTER) && /* T*   */
+     (argType & VTK_PARSE_INDIRECT) == VTK_PARSE_POINTER && /* T*   */
      (argType & VTK_PARSE_BASE_TYPE) != VTK_PARSE_STRING && /* vtkStdString* */
      (argType & VTK_PARSE_BASE_TYPE) != VTK_PARSE_VOID && /* void*    */
      (argType & VTK_PARSE_BASE_TYPE) != VTK_PARSE_CHAR && /* char*    */
@@ -717,26 +717,31 @@ int managableArguments(FunctionInfo *curFunction)
       }
 
     /* if it has a reference arg, don't wrap it */
-    if (((argType & VTK_PARSE_INDIRECT) != 0) &&
-        ((argType & VTK_PARSE_INDIRECT) != VTK_PARSE_POINTER))
+    if ((argType & VTK_PARSE_INDIRECT) == VTK_PARSE_REF)
       {
       /* make exception for "vtkClientServerStream&" */
       if (((argType & VTK_PARSE_BASE_TYPE) != VTK_PARSE_VTK_OBJECT) ||
-          ((argType & VTK_PARSE_INDIRECT) != VTK_PARSE_REF) ||
           strcmp(curFunction->ArgClasses[i], "vtkClientServerStream"))
         {
         /* also make exception for "vtkStdString" */
-        if (((argType & VTK_PARSE_BASE_TYPE) != VTK_PARSE_STRING) ||
-            ((argType & VTK_PARSE_INDIRECT) != VTK_PARSE_REF))
+        if ((argType & VTK_PARSE_BASE_TYPE) != VTK_PARSE_STRING)
           {
           args_ok = 0;
           }
         }
       }
 
-    /* if it is a vtk object that isn't a pointer, don't wrap it */
+    /* if it is a vtk object that isn't a pointer or ref, don't wrap it */
     if (((argType & VTK_PARSE_INDIRECT) == 0) &&
         ((argType & VTK_PARSE_BASE_TYPE) == VTK_PARSE_VTK_OBJECT))
+      {
+      args_ok = 0;
+      }
+
+    /* if it is "**" or "*&" then don't wrap it */
+    if (((argType & VTK_PARSE_INDIRECT) != 0) &&
+        ((argType & VTK_PARSE_INDIRECT) != VTK_PARSE_POINTER) &&
+        ((argType & VTK_PARSE_INDIRECT) != VTK_PARSE_REF))
       {
       args_ok = 0;
       }
@@ -767,17 +772,14 @@ int managableArguments(FunctionInfo *curFunction)
     }
 
   /* if it is a reference, then don't wrap it */
-  if (((returnType & VTK_PARSE_INDIRECT) != 0) &&
-      ((returnType & VTK_PARSE_INDIRECT) != VTK_PARSE_POINTER))
+  if ((returnType & VTK_PARSE_INDIRECT) == VTK_PARSE_REF)
     {
     /* make exception for "vtkClientServerStream&" */
     if (((returnType & VTK_PARSE_BASE_TYPE) != VTK_PARSE_VTK_OBJECT) ||
-        ((returnType & VTK_PARSE_INDIRECT) != VTK_PARSE_REF) ||
         strcmp(curFunction->ReturnClass, "vtkClientServerStream"))
       {
       /* also make exception for "vtkStdString" */
-      if (((returnType & VTK_PARSE_BASE_TYPE) != VTK_PARSE_STRING) ||
-          ((returnType & VTK_PARSE_INDIRECT) != VTK_PARSE_REF))
+      if ((returnType & VTK_PARSE_BASE_TYPE) != VTK_PARSE_STRING)
         {
         args_ok = 0;
         }
@@ -787,6 +789,14 @@ int managableArguments(FunctionInfo *curFunction)
   /* if it is a vtk object that isn't a pointer, don't wrap it */
   if (((returnType & VTK_PARSE_INDIRECT) == 0) &&
       ((returnType & VTK_PARSE_BASE_TYPE) == VTK_PARSE_VTK_OBJECT))
+    {
+    args_ok = 0;
+    }
+
+  /* if it is "**" or "*&" then don't wrap it */
+  if (((returnType & VTK_PARSE_INDIRECT) != 0) &&
+      ((returnType & VTK_PARSE_INDIRECT) != VTK_PARSE_POINTER) &&
+      ((returnType & VTK_PARSE_INDIRECT) != VTK_PARSE_REF))
     {
     args_ok = 0;
     }
