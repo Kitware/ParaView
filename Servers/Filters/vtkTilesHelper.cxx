@@ -95,8 +95,8 @@ const double* vtkTilesHelper::GetNormalizedTileViewport(double* viewport, int ra
       normalized_tile_viewport[3]);
     }
 
-  if (normalized_tile_viewport[2] < normalized_tile_viewport[0] ||
-    normalized_tile_viewport[3] < normalized_tile_viewport[1])
+  if (normalized_tile_viewport[2] <= normalized_tile_viewport[0] ||
+    normalized_tile_viewport[3] <= normalized_tile_viewport[1])
     {
     return NULL;
     }
