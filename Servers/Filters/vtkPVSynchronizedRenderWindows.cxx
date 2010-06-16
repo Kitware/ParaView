@@ -287,7 +287,7 @@ vtkRenderWindow* vtkPVSynchronizedRenderWindows::NewRenderWindow()
       // client always creates new window for each view in the multi layout
       // configuration.
       vtkRenderWindow* window = vtkRenderWindow::New();
-      window->DoubleBufferOn();
+      window->DoubleBufferOn(); //FIXME;
       window->AlphaBitPlanesOn();
       return window;
       }
@@ -298,7 +298,7 @@ vtkRenderWindow* vtkPVSynchronizedRenderWindows::NewRenderWindow()
     if (!this->Internals->SharedRenderWindow)
       {
       vtkRenderWindow* window = vtkRenderWindow::New();
-      window->DoubleBufferOn();
+      window->DoubleBufferOn(); //FIXME
       window->AlphaBitPlanesOn();
       // SwapBuffers should be ON only on root node in BATCH mode
       // or when operating in tile-display mode.
@@ -715,6 +715,7 @@ void vtkPVSynchronizedRenderWindows::UpdateWindowLayout()
   int full_size[2] = {0, 0};
   vtkInternals::RenderWindowsMap::iterator iter;
 
+
   // Compute full_size.
   for (iter = this->Internals->RenderWindows.begin();
     iter != this->Internals->RenderWindows.end(); ++iter)
@@ -737,9 +738,6 @@ void vtkPVSynchronizedRenderWindows::UpdateWindowLayout()
       {
       const int *actual_size = iter->second.Size;
       const int *position = iter->second.Position;
-      iter->second.RenderWindow->SetSize(actual_size[0], actual_size[1]);
-      iter->second.RenderWindow->SetPosition(position[0], position[1]);
-
       // This class only supports full-viewports.
       double viewport[4] = {0, 0, 1, 1};
       this->Internals->UpdateViewports(
@@ -758,26 +756,15 @@ void vtkPVSynchronizedRenderWindows::UpdateWindowLayout()
       int tile_dims[2];
       tile_dims[0] = server_info->GetTileDimensions()[0];
       tile_dims[1] = server_info->GetTileDimensions()[1];
-      if (tile_dims[0] > 0 || tile_dims[1] > 0)
+      bool in_tile_display_mode = (tile_dims[0] > 0 || tile_dims[1] > 0);
+      // FIXME: at somepoint we need to set the tile-scale and tile-viewport
+      // correctly on the render-window so that 2D annotations show up
+      // correctly.
+      tile_dims[0] = (tile_dims[0] == 0)? 1 : tile_dims[0];
+      tile_dims[1] = (tile_dims[1] == 0)? 1 : tile_dims[1];
+      this->Internals->SharedRenderWindow->SetTileScale(tile_dims);
+      if (in_tile_display_mode)
         {
-        tile_dims[0] = (tile_dims[0] == 0)? 1 : tile_dims[0];
-        tile_dims[1] = (tile_dims[1] == 0)? 1 : tile_dims[1];
-        this->Internals->SharedRenderWindow->SetTileScale(tile_dims);
-
-        vtkTilesHelper* helper = vtkTilesHelper::New();
-        helper->SetTileDimensions(tile_dims);
-        helper->SetTileWindowSize(512, 512);
-
-        double viewport[4] = {0, 0, 1, 1};
-        int rank = this->ParallelController->GetLocalProcessId();
-        const int *tile_viewport = helper->GetTileViewport(viewport,
-          rank);
-        this->Internals->SharedRenderWindow->SetTileViewport(
-          tile_viewport[0]/(512.0 * tile_dims[0]),
-          tile_viewport[1]/(512.0 * tile_dims[1]),
-          tile_viewport[2]/(512.0 * tile_dims[0]),
-          tile_viewport[3]/(512.0 * tile_dims[1]));
-        helper->Delete();
         // FIXME: handle full-screen case
         this->Internals->SharedRenderWindow->SetSize(400, 400);
         }
@@ -787,6 +774,9 @@ void vtkPVSynchronizedRenderWindows::UpdateWindowLayout()
         //this->Internals->SharedRenderWindow->SetPosition(0, 0);
         }
 
+      // Iterate over all (logical) windows and set the viewport on the
+      // renderers to reflect the position and size of the actual window on the
+      // client side.
       for (iter = this->Internals->RenderWindows.begin();
         iter != this->Internals->RenderWindows.end(); ++iter)
         {
@@ -801,6 +791,12 @@ void vtkPVSynchronizedRenderWindows::UpdateWindowLayout()
           static_cast<double>(full_size[0]);
         viewport[3] = (position[1] + actual_size[1])/
           static_cast<double>(full_size[1]);
+
+        // This viewport is the viewport for the renderers treating the all the
+        // tiles as one large display.
+        cout << "Current Viewport:" << viewport[0]
+          << ", " << viewport[1] << ", " << viewport[2]
+          << ", " << viewport[3] << endl;
         this->Internals->UpdateViewports(
           iter->second.Renderers, viewport);
         }

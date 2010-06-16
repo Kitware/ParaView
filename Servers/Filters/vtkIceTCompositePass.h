@@ -127,6 +127,7 @@ public:
   // Image is invalid if tile is not available on the current process.
   void GetLastRenderedTile(vtkSynchronizedRenderers::vtkRawImage& tile);
 
+  void IceTInflateAndDisplay(vtkRenderer*);
 protected:
   vtkIceTCompositePass();
   ~vtkIceTCompositePass();
@@ -146,6 +147,7 @@ protected:
   int LastTileDimensions[2];
   int LastTileMullions[2];
   int LastTileViewport[4];
+  double PhysicalViewport[4];
 
   int ImageReductionFactor;
 private:

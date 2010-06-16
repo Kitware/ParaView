@@ -20,6 +20,8 @@
 #include "vtkRenderState.h"
 #include "vtkRenderWindow.h"
 #include "vtkTimerLog.h"
+#include "vtkSmartPointer.h"
+#include "vtkTilesHelper.h"
 
 #include "vtkCameraPass.h"
 
@@ -29,6 +31,30 @@
 namespace
 {
   void IceTDrawCallback();
+
+  class vtkMyCameraPass : public vtkCameraPass
+  {
+public:
+  vtkTypeMacro(vtkMyCameraPass, vtkCameraPass);
+  static vtkMyCameraPass* New();
+
+  virtual void GetTiledSizeAndOrigin(
+    const vtkRenderState* render_state,
+    int* width, int* height, int *originX,
+    int* originY)
+    {
+    this->Superclass::GetTiledSizeAndOrigin(render_state, width, height, originX, originY);
+
+    *originX *= this->IceTCompositePass->GetTileDimensions()[0];
+    *originY *= this->IceTCompositePass->GetTileDimensions()[1];
+    *width *= this->IceTCompositePass->GetTileDimensions()[0];
+    *height *= this->IceTCompositePass->GetTileDimensions()[1];
+    }
+
+  vtkIceTCompositePass* IceTCompositePass;
+  };
+
+  vtkStandardNewMacro(vtkMyCameraPass);
 
   class vtkInitialPass : public vtkRenderPass
   {
@@ -54,19 +80,18 @@ public:
     // in the icet callback.
     this->IceTCompositePass->SetupContext(s);
 
-    // Don't make icet render the composited image to the screen unless
-    // necessary.
-    if (this->IceTSynchronizedRenderers->GetWriteBackImages())
-      {
-      icetEnable(ICET_DISPLAY);
-      icetEnable(ICET_DISPLAY_INFLATE);
-      }
-    else
-      {
-      icetDisable(ICET_DISPLAY);
-      icetDisable(ICET_DISPLAY_INFLATE);
-      }
+    // Don't make icet render the composited image to the screen. We'll paste it
+    // explicitly if needed. This is required since IceT/Viewport interactions
+    // lead to weird results in multi-view configurations. Much easier to simply
+    // paste back the image to the correct region after icet has rendered.
+    icetDisable(ICET_DISPLAY);
+    icetDisable(ICET_DISPLAY_INFLATE);
     icetDisable(ICET_CORRECT_COLORED_BACKGROUND);
+
+    int *size = window->GetActualSize();
+    glViewport(0, 0, size[0], size[1]);
+    glDisable(GL_SCISSOR_TEST);
+    glClearColor(0, 0, 0, 0);
 
     icetDrawFunc(IceTDrawCallback);
     vtkInitialPass::ActiveRenderer = renderer;
@@ -74,6 +99,11 @@ public:
     icetDrawFrame();
     vtkInitialPass::ActiveRenderer = NULL;
     vtkInitialPass::ActivePass = NULL;
+
+    if (this->IceTSynchronizedRenderers->GetWriteBackImages())
+      {
+      this->IceTCompositePass->IceTInflateAndDisplay(renderer);
+      }
 
     this->IceTCompositePass->CleanupContext(s);
     vtkTimerLog::MarkEndEvent("vtkInitialPass::Render");
@@ -147,7 +177,8 @@ vtkIceTSynchronizedRenderers::vtkIceTSynchronizedRenderers()
   initPass->IceTSynchronizedRenderers = this;
   initPass->SetIceTCompositePass(this->IceTCompositePass);
 
-  vtkCameraPass* cameraPass = vtkCameraPass::New();
+  vtkMyCameraPass* cameraPass = vtkMyCameraPass::New();
+  cameraPass->IceTCompositePass = this->IceTCompositePass;
   cameraPass->SetDelegatePass(initPass);
   initPass->Delete();
 
@@ -168,7 +199,30 @@ vtkIceTSynchronizedRenderers::~vtkIceTSynchronizedRenderers()
 void vtkIceTSynchronizedRenderers::UpdateCameraAspect(int x, int y)
 {
   vtkCameraPass* cp = vtkCameraPass::SafeDownCast(this->RenderPass);
-  cp->SetAspectRatioOverride((double)(x)/y);
+  //cp->SetAspectRatioOverride((double)(x)/y);
+}
+
+//----------------------------------------------------------------------------
+void vtkIceTSynchronizedRenderers::RenderIceTImageToScreen()
+{
+  vtkRawImage &img = this->CaptureRenderedImage();
+  double old_viewport[4];
+  this->Renderer->GetViewport(old_viewport);
+
+  vtkSmartPointer<vtkTilesHelper> tilesHelper = vtkSmartPointer<vtkTilesHelper>::New();
+  tilesHelper->SetTileDimensions(this->IceTCompositePass->GetTileDimensions());
+  tilesHelper->SetTileMullions(this->IceTCompositePass->GetTileMullions());
+  tilesHelper->SetTileWindowSize(800, 800); // doesn't matter since we need
+                                            // normalized viewport.
+
+  const double* n_v = tilesHelper->GetNormalizedTileViewport(
+    old_viewport, this->ParallelController->GetLocalProcessId());
+  if (n_v)
+    {
+    this->Renderer->SetViewport(n_v[0], n_v[1], n_v[2], n_v[3]);
+    img.PushToViewport(this->Renderer);
+    this->Renderer->SetViewport(old_viewport);
+    }
 }
 
 //----------------------------------------------------------------------------

@@ -95,6 +95,7 @@ public:
     this->IceTCompositePass->SetController(cont);
     }
 
+  void RenderIceTImageToScreen();
 //BTX
 protected:
   vtkIceTSynchronizedRenderers();
@@ -116,6 +117,8 @@ protected:
 private:
   vtkIceTSynchronizedRenderers(const vtkIceTSynchronizedRenderers&); // Not implemented
   void operator=(const vtkIceTSynchronizedRenderers&); // Not implemented
+
+  static vtkRawImage* GlobalProcessTile;
 //ETX
 };
 

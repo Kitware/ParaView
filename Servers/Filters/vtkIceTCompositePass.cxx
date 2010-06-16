@@ -125,7 +125,7 @@ void vtkIceTCompositePass::SetupContext(const vtkRenderState* render_state)
       ICET_COLOR_BUFFER_BIT | ICET_DEPTH_BUFFER_BIT);
     }
 
-  icetDisable(ICET_FLOATING_VIEWPORT);
+  icetEnable(ICET_FLOATING_VIEWPORT);
   if (use_ordered_compositing)
     {
     // if ordered compositing is enabled, pass the process order from the kdtree
@@ -275,24 +275,55 @@ void vtkIceTCompositePass::UpdateTileInformation(
   int rank = this->Controller->GetLocalProcessId();
   const int *my_tile_viewport = tilesHelper->GetTileViewport(viewport,
     rank);
-
-  if (!my_tile_viewport)
+  if (my_tile_viewport)
     {
-    cout << "********* nothing to render." << endl;
-    return;
+    this->LastTileViewport[0] = my_tile_viewport[0];
+    this->LastTileViewport[1] = my_tile_viewport[1];
+    this->LastTileViewport[2] = my_tile_viewport[2];
+    this->LastTileViewport[3] = my_tile_viewport[3];
+
+    int x = rank % this->TileDimensions[0];
+    int y = rank / this->TileDimensions[0];
+    if (y >= this->TileDimensions[1])
+      {
+      y = this->TileDimensions[1] - 1;
+      }
+
+    // invert y so that the 0th rank corresponds to the top-left tile rather than
+    // bottom left tile.
+    y = this->TileDimensions[1] - y - 1;
+
+    this->PhysicalViewport[0] =
+      (my_tile_viewport[0] - x* (tile_size[0] + this->TileMullions[0]))/
+      tile_size[0];
+    this->PhysicalViewport[1] =
+      (my_tile_viewport[1] - x* (tile_size[1] + this->TileMullions[1]))/
+      tile_size[1];
+    this->PhysicalViewport[2] = this->PhysicalViewport[0] +
+      (my_tile_viewport[2]-my_tile_viewport[0])/tile_size[0];
+    this->PhysicalViewport[3] = this->PhysicalViewport[1] +
+      (my_tile_viewport[3]-my_tile_viewport[1])/tile_size[1];
     }
+  else
+    {
+    this->LastTileViewport[0] = this->LastTileViewport[1] =
+      this->LastTileViewport[2] = this->LastTileViewport[3] = 0;
+    this->PhysicalViewport[0] = this->PhysicalViewport[1] =
+      this->PhysicalViewport[2] = this->PhysicalViewport[3] = 0.0;
+    }
+  cout << "Physical Viewport: "
+    << this->PhysicalViewport[0] << ", "
+    << this->PhysicalViewport[1] << ", "
+    << this->PhysicalViewport[2] << ", "
+    << this->PhysicalViewport[3] << endl;
 
   if (this->LastTileMullions[0] == this->TileMullions[0] &&
     this->LastTileMullions[1] == this->TileMullions[1] &&
     this->LastTileDimensions[0] == this->TileDimensions[0] &&
-    this->LastTileDimensions[1] == this->TileDimensions[1] &&
-    this->LastTileViewport[0] == my_tile_viewport[0] &&
-    this->LastTileViewport[1] == my_tile_viewport[1] &&
-    this->LastTileViewport[2] == my_tile_viewport[2] &&
-    this->LastTileViewport[3] == my_tile_viewport[3])
+    this->LastTileDimensions[1] == this->TileDimensions[1])
     {
     // No need to update the tile parameters.
-    return;
+    //return;
     }
 
   double image_reduction_factor = this->ImageReductionFactor;
@@ -309,7 +340,7 @@ void vtkIceTCompositePass::UpdateTileInformation(
         {
         continue;
         }
-      cout << cur_rank << " : "
+      cout << this << "=" << cur_rank << " : "
         << tile_viewport[0]/image_reduction_factor << ", "
         << tile_viewport[1]/image_reduction_factor << ", "
         << tile_viewport[2]/image_reduction_factor << ", "
@@ -338,10 +369,6 @@ void vtkIceTCompositePass::UpdateTileInformation(
   this->LastTileMullions[1] = this->TileMullions[1];
   this->LastTileDimensions[0] = this->TileDimensions[0];
   this->LastTileDimensions[1] = this->TileDimensions[1];
-  this->LastTileViewport[0] = my_tile_viewport[0];
-  this->LastTileViewport[1] = my_tile_viewport[1];
-  this->LastTileViewport[2] = my_tile_viewport[2];
-  this->LastTileViewport[3] = my_tile_viewport[3];
 }
 
 //----------------------------------------------------------------------------
@@ -352,9 +379,11 @@ void vtkIceTCompositePass::GetLastRenderedTile(
 
   GLint color_format;
   icetGetIntegerv(ICET_COLOR_FORMAT, &color_format);
-  int *physicalViewport = this->LastTileViewport;
-  int width  = physicalViewport[2] - physicalViewport[0];
-  int height = physicalViewport[3] - physicalViewport[1];
+  int width  = this->LastTileViewport[2] - this->LastTileViewport[0];
+  int height = this->LastTileViewport[3] - this->LastTileViewport[1];
+
+  // FIXME: when image_reduction_factor > 1, we need to scale width and height
+  // accordingly.
 
   if (width < 1 || height < 1)
     {
@@ -391,6 +420,29 @@ void vtkIceTCompositePass::GetLastRenderedTile(
     {
     vtkErrorMacro("ICE-T using unknown image format.");
     }
+}
+
+//----------------------------------------------------------------------------
+void vtkIceTCompositePass::IceTInflateAndDisplay(vtkRenderer* renderer)
+{
+  vtkSynchronizedRenderers::vtkRawImage image;
+  this->GetLastRenderedTile(image);
+  if (!image.IsValid())
+    {
+    return;
+    }
+
+  // FIXME, use correct physical viewport for this renderer.
+  double viewport[4];
+  renderer->GetViewport(viewport);
+  renderer->SetViewport(0, 0, 1, 1);
+  int tile_scale[2];
+  renderer->GetVTKWindow()->GetTileScale(tile_scale);
+  renderer->GetVTKWindow()->SetTileScale(1, 1);
+  renderer->Clear();
+  image.PushToViewport(renderer);
+  renderer->GetVTKWindow()->SetTileScale(tile_scale);
+  renderer->SetViewport(viewport);
 }
 
 //----------------------------------------------------------------------------
