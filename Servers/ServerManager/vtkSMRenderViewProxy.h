@@ -80,7 +80,9 @@ public:
   vtkGetObjectMacro(Renderer2DProxy, vtkSMProxy);
   vtkGetObjectMacro(RenderWindowProxy, vtkSMProxy);
   vtkGetObjectMacro(InteractorProxy, vtkSMProxy);
-  
+  vtkGetObjectMacro(CenterAxesProxy, vtkSMProxy);
+  vtkGetObjectMacro(OrientationWidgetProxy, vtkSMProxy);
+
   // Description:
   // Convenience method to set the background color.
   void SetBackgroundColorCM(double rgb[3]);

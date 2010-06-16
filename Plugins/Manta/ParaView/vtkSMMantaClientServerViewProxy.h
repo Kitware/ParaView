@@ -128,6 +128,7 @@ protected:
   // Description:
   // Called at the start of CreateVTKObjects().
   virtual bool BeginCreateVTKObjects();
+  virtual void EndCreateVTKObjects();
 
   // Description:
   // Overridden to prevent screen space downsampling until it works with manta.

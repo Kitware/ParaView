@@ -81,6 +81,12 @@
           <!-- Interactor -->
           <Property name="CameraManipulators" />
           <Property name="CenterOfRotation" />
+          <!-- Annotations -->
+          <Property name="CenterAxesVisibility" />
+          <Property name="OrientationAxesInteractivity" />
+          <Property name="OrientationAxesVisibility" />
+          <Property name="OrientationAxesLabelColor" />
+          <Property name="OrientationAxesOutlineColor" />
           <!-- Renderer -->
           <Property name="Background" />
           <!-- RenderWindow -->

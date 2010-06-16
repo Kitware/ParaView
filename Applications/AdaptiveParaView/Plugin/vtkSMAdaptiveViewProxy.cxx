@@ -170,6 +170,18 @@ void vtkSMAdaptiveViewProxy::EndCreateVTKObjects()
   vtkPVGenericRenderWindowInteractor *iren = 
     this->Internals->RootView->GetInteractor();
   iren->SetPVRenderView(this->RenderViewHelper);
+
+  //turn off the axes widgets by default
+  vtkSMIntVectorProperty *vis;
+  vtkSMProxy *annotation;
+  annotation = this->Internals->RootView->GetOrientationWidgetProxy();
+  vis = vtkSMIntVectorProperty::SafeDownCast(annotation->GetProperty("Visibility"));
+  vis->SetElement(0,0);
+  annotation = this->Internals->RootView->GetCenterAxesProxy();
+  vis = vtkSMIntVectorProperty::SafeDownCast(annotation->GetProperty("Visibility"));
+  vis->SetElement(0,0);
+
+  this->UpdateVTKObjects();
 }
 
 //-----------------------------------------------------------------------------

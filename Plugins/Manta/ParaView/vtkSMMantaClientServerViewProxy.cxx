@@ -118,6 +118,20 @@ bool vtkSMMantaClientServerViewProxy::BeginCreateVTKObjects()
   return this->Superclass::BeginCreateVTKObjects();
 }
 
+//----------------------------------------------------------------------------
+void vtkSMMantaClientServerViewProxy::EndCreateVTKObjects()
+{
+  //turn off the axes widgets by default
+  vtkSMIntVectorProperty *vis;
+  vtkSMProxy *annotation;
+  annotation = this->GetSubProxy("OrientationWidget");
+  vis = vtkSMIntVectorProperty::SafeDownCast(annotation->GetProperty("Visibility"));
+  vis->SetElement(0,0);
+  annotation = this->GetSubProxy("CenterAxes");
+  vis = vtkSMIntVectorProperty::SafeDownCast(annotation->GetProperty("Visibility"));
+  vis->SetElement(0,0);
+}
+
 //-----------------------------------------------------------------------------
 void vtkSMMantaClientServerViewProxy::PrintSelf(ostream& os, vtkIndent indent)
 {

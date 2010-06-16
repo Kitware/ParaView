@@ -144,9 +144,21 @@ void vtkSMStreamingViewProxy::EndCreateVTKObjects()
   //replace the real view's interactor, which points to the real view
   //with one that points to this so that mouse events will result in streaming
   //renders
-  vtkPVGenericRenderWindowInteractor *iren = 
+  vtkPVGenericRenderWindowInteractor *iren =
     this->Internals->RootView->GetInteractor();
   iren->SetPVRenderView(this->RenderViewHelper);
+
+  //turn off the axes widgets by default
+  vtkSMIntVectorProperty *vis;
+  vtkSMProxy *annotation;
+  annotation = this->Internals->RootView->GetOrientationWidgetProxy();
+  vis = vtkSMIntVectorProperty::SafeDownCast(annotation->GetProperty("Visibility"));
+  vis->SetElement(0,0);
+  annotation = this->Internals->RootView->GetCenterAxesProxy();
+  vis = vtkSMIntVectorProperty::SafeDownCast(annotation->GetProperty("Visibility"));
+  vis->SetElement(0,0);
+
+  this->UpdateVTKObjects();
 }
 
 //-----------------------------------------------------------------------------
@@ -158,7 +170,7 @@ vtkSMRenderViewProxy *vtkSMStreamingViewProxy::GetRootView()
 //----------------------------------------------------------------------------
 void vtkSMStreamingViewProxy::AddRepresentation(vtkSMRepresentationProxy* rep)
 {
-  vtkSMStreamingRepresentation *repr = 
+  vtkSMStreamingRepresentation *repr =
     vtkSMStreamingRepresentation::SafeDownCast(rep);
   if (!repr)
     {
@@ -169,9 +181,9 @@ void vtkSMStreamingViewProxy::AddRepresentation(vtkSMRepresentationProxy* rep)
   vtkSMViewProxy* RVP = this->GetRootView();
   if (repr && !RVP->Representations->IsItemPresent(repr))
     {
-    //There is magic inside AddToView, such that it actually adds rep to RVP, 
+    //There is magic inside AddToView, such that it actually adds rep to RVP,
     //but uses this to to create repr's streaming strategy.
-    if (repr->AddToView(this)) 
+    if (repr->AddToView(this))
       {
       RVP->AddRepresentationInternal(repr);
       }
@@ -332,10 +344,10 @@ vtkSMRepresentationStrategy* vtkSMStreamingViewProxy::NewStrategyInternal(
 {
   vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
   vtkSMRepresentationStrategy* strategy = 0;
-    
+
   if (this->IsSerial)
     {
-    if (dataType == VTK_POLY_DATA || dataType == VTK_UNIFORM_GRID || 
+    if (dataType == VTK_POLY_DATA || dataType == VTK_UNIFORM_GRID ||
         dataType == VTK_IMAGE_DATA || dataType == VTK_UNSTRUCTURED_GRID )
       {
       DEBUGPRINT_VIEW(
@@ -352,7 +364,7 @@ vtkSMRepresentationStrategy* vtkSMStreamingViewProxy::NewStrategyInternal(
     }
   else
     {
-    if (dataType == VTK_POLY_DATA || dataType == VTK_UNIFORM_GRID || 
+    if (dataType == VTK_POLY_DATA || dataType == VTK_UNIFORM_GRID ||
         dataType == VTK_IMAGE_DATA || dataType == VTK_UNSTRUCTURED_GRID )
       {
       DEBUGPRINT_VIEW(
@@ -366,7 +378,7 @@ vtkSMRepresentationStrategy* vtkSMStreamingViewProxy::NewStrategyInternal(
       vtkWarningMacro("This view does not provide a suitable strategy for "
                       << dataType);
       }
-    }  
+    }
 
   vtkSMIntVectorProperty *ivp = vtkSMIntVectorProperty::SafeDownCast(
     strategy->GetProperty("SetNumberOfPasses"));
@@ -384,7 +396,7 @@ vtkSMRepresentationStrategy* vtkSMStreamingViewProxy::NewStrategyInternal(
 void vtkSMStreamingViewProxy::PrepareRenderPass()
 {
   static bool firstpass=true;
-  vtkRenderWindow *renWin = this->GetRootView()->GetRenderWindow(); 
+  vtkRenderWindow *renWin = this->GetRootView()->GetRenderWindow();
   vtkRenderer *ren = this->GetRootView()->GetRenderer();
 
   bool CamChanged = this->CameraChanged();
@@ -411,7 +423,7 @@ void vtkSMStreamingViewProxy::PrepareRenderPass()
                                                        stream);
       firstpass = false;
       }
-    ren->Clear(); 
+    ren->Clear();
     //don't cls on following render passes
     renWin->EraseOff();
     ren->EraseOff();
@@ -423,13 +435,13 @@ void vtkSMStreamingViewProxy::PrepareRenderPass()
       {
       vtkSmartPointer<vtkCollectionIterator> iter;
       iter.TakeReference(this->GetRootView()->Representations->NewIterator());
-      for (iter->InitTraversal(); 
-           !iter->IsDoneWithTraversal(); 
+      for (iter->InitTraversal();
+           !iter->IsDoneWithTraversal();
            iter->GoToNextItem())
         {
-        vtkSMStreamingRepresentation* srep = 
+        vtkSMStreamingRepresentation* srep =
           vtkSMStreamingRepresentation::SafeDownCast(iter->GetCurrentObject());
-        if (srep && srep->GetVisibility()) 
+        if (srep && srep->GetVisibility())
           {
           srep->SetViewState(this->Internals->CamState, this->Internals->Frustum);
           }
@@ -476,7 +488,7 @@ void vtkSMStreamingViewProxy::CopyBackBufferToFrontBuffer()
     }
   this->PixelArray->Initialize();
   this->PixelArray->SetNumberOfComponents(4);
-  this->PixelArray->SetNumberOfTuples(size[0]*size[1]);  
+  this->PixelArray->SetNumberOfTuples(size[0]*size[1]);
 
   //capture back buffer
   renWin->GetRGBACharPixelData(0, 0, size[0]-1, size[1]-1, 0, this->PixelArray);
@@ -509,11 +521,11 @@ void vtkSMStreamingViewProxy::UpdateAllRepresentations()
   vtkSmartPointer<vtkCollectionIterator> iter;
   iter.TakeReference(RVP->Representations->NewIterator());
   bool enable_progress = false;
-  for (iter->InitTraversal(); 
-       !iter->IsDoneWithTraversal(); 
+  for (iter->InitTraversal();
+       !iter->IsDoneWithTraversal();
        iter->GoToNextItem())
     {
-    vtkSMRepresentationProxy* repr = 
+    vtkSMRepresentationProxy* repr =
       vtkSMRepresentationProxy::SafeDownCast(iter->GetCurrentObject());
     if (!repr->GetVisibility())
       {
@@ -530,8 +542,8 @@ void vtkSMStreamingViewProxy::UpdateAllRepresentations()
         vtkProcessModule::CLIENT | vtkProcessModule::DATA_SERVER);
       enable_progress = true;
       }
-    
-    vtkSMStreamingRepresentation *drepr = 
+
+    vtkSMStreamingRepresentation *drepr =
       vtkSMStreamingRepresentation::SafeDownCast(repr);
     if (drepr && nPasses > 1)
       {
@@ -595,26 +607,26 @@ void vtkSMStreamingViewProxy::PerformRender()
   if (this->MaxPass > -1 && this->MaxPass < nPasses)
     {
     nPasses = this->MaxPass;
-    } 
+    }
 
   vtkSmartPointer<vtkCollectionIterator> iter;
   iter.TakeReference(RVP->Representations->NewIterator());
-  for (iter->InitTraversal(); 
-       !iter->IsDoneWithTraversal(); 
+  for (iter->InitTraversal();
+       !iter->IsDoneWithTraversal();
        iter->GoToNextItem())
     {
-    vtkSMRepresentationProxy* repr = 
+    vtkSMRepresentationProxy* repr =
       vtkSMRepresentationProxy::SafeDownCast(iter->GetCurrentObject());
     if (!repr->GetVisibility())
       {
       // Invisible representations are not updated.
       continue;
       }
-    vtkSMStreamingRepresentation *drepr = 
+    vtkSMStreamingRepresentation *drepr =
       vtkSMStreamingRepresentation::SafeDownCast(repr);
     if (drepr)
       {
-      //if representation supports pieces, choose most important one to render in this pass      
+      //if representation supports pieces, choose most important one to render in this pass
       if (this->Pass < nPasses)
         {
         DEBUGPRINT_VIEW(
@@ -640,13 +652,13 @@ void vtkSMStreamingViewProxy::PerformRender()
       cerr << "SV(" << this << ") All passes finished " << endl;
                     );
     }
-  
+
   if ( RVP->GetMeasurePolygonsPerSecond() )
     {
     this->RenderTimer->StartTimer();
     }
 
-  //vtkRenderWindow *renWin = RVP->GetRenderWindow(); 
+  //vtkRenderWindow *renWin = RVP->GetRenderWindow();
   //RVP->RenderMe();
 
   vtkSMProxy *RWProxy = RVP->GetRenderWindowProxy();
@@ -702,14 +714,14 @@ bool vtkSMStreamingViewProxy::CameraChanged()
     cam->GetViewUp(&camState[3]);
     cam->GetFocalPoint(&camState[6]);
     for (int i = 0; i < 9; i++)
-      {          
+      {
       if (camState[i] != this->Internals->CamState[i])
         {
         changed = true;
         break;
         }
       }
-    memcpy(this->Internals->CamState, camState, 9*sizeof(double));      
+    memcpy(this->Internals->CamState, camState, 9*sizeof(double));
 
     if (changed)
       {
@@ -732,8 +744,8 @@ bool vtkSMStreamingViewProxy::CameraChanged()
       memcpy(this->Internals->Frustum, viewP, 32*sizeof(double));
       for (int index=0; index<8; index++)
         {
-        renderer->ViewToWorld(this->Internals->Frustum[index*4+0], 
-                              this->Internals->Frustum[index*4+1], 
+        renderer->ViewToWorld(this->Internals->Frustum[index*4+0],
+                              this->Internals->Frustum[index*4+1],
                               this->Internals->Frustum[index*4+2]);
         }
       }
@@ -755,4 +767,3 @@ const char* vtkSMStreamingViewProxy::GetSuggestedViewType(vtkIdType connectionID
 
   return this->Superclass::GetSuggestedViewType(connectionID);
 }
-

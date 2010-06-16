@@ -69,6 +69,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkProcessModule.h"
 #include "vtkSMInputProperty.h"
+#include "vtkSMIntVectorProperty.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMRepresentationProxy.h"
 #include "vtkSMSourceProxy.h"
@@ -132,6 +133,16 @@ bool vtkSMMantaViewProxy::BeginCreateVTKObjects()
 void vtkSMMantaViewProxy::EndCreateVTKObjects()
 {
   this->Superclass::EndCreateVTKObjects();
+
+  //turn off the axes widgets by default
+  vtkSMIntVectorProperty *vis;
+  vtkSMProxy *annotation;
+  annotation = this->GetSubProxy("OrientationWidget");
+  vis = vtkSMIntVectorProperty::SafeDownCast(annotation->GetProperty("Visibility"));
+  vis->SetElement(0,0);
+  annotation = this->GetSubProxy("CenterAxes");
+  vis = vtkSMIntVectorProperty::SafeDownCast(annotation->GetProperty("Visibility"));
+  vis->SetElement(0,0);
 }
 
 //-----------------------------------------------------------------------------

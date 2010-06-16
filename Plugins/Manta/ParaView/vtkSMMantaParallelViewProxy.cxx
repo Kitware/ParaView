@@ -137,6 +137,17 @@ void vtkSMMantaParallelViewProxy::EndCreateVTKObjects()
     vtkSMProxyProperty::SafeDownCast(this->GetProperty("Compositer"));
   vtkSMProxy *tree = this->GetSubProxy("Tree");
   pp->SetProxy(0, tree);
+
+  //turn off the axes widgets by default
+  vtkSMIntVectorProperty *vis;
+  vtkSMProxy *annotation;
+  annotation = this->GetSubProxy("OrientationWidget");
+  vis = vtkSMIntVectorProperty::SafeDownCast(annotation->GetProperty("Visibility"));
+  vis->SetElement(0,0);
+  annotation = this->GetSubProxy("CenterAxes");
+  vis = vtkSMIntVectorProperty::SafeDownCast(annotation->GetProperty("Visibility"));
+  vis->SetElement(0,0);
+
   this->UpdateVTKObjects();
 }
 
