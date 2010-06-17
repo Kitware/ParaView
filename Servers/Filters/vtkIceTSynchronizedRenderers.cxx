@@ -14,16 +14,16 @@
 =========================================================================*/
 #include "vtkIceTSynchronizedRenderers.h"
 
+#include "vtkCameraPass.h"
+#include "vtkCullerCollection.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
 #include "vtkRenderer.h"
 #include "vtkRenderState.h"
 #include "vtkRenderWindow.h"
-#include "vtkTimerLog.h"
 #include "vtkSmartPointer.h"
 #include "vtkTilesHelper.h"
-
-#include "vtkCameraPass.h"
+#include "vtkTimerLog.h"
 
 #include <vtkgl.h>
 #include <GL/ice-t.h>
@@ -207,7 +207,6 @@ protected:
     }
 };
 
-
 vtkStandardNewMacro(vtkIceTSynchronizedRenderers);
 //----------------------------------------------------------------------------
 vtkIceTSynchronizedRenderers::vtkIceTSynchronizedRenderers()
@@ -282,6 +281,10 @@ void vtkIceTSynchronizedRenderers::SetRenderer(vtkRenderer* ren)
   if (ren)
     {
     ren->SetPass(this->RenderPass);
+    // icet cannot work correctly in tile-display mode is software culling is
+    // applied in vtkRenderer inself. vtkInitialPass will cull out-of-frustum
+    // props using icet-model-view matrix later.
+    ren->GetCullers()->RemoveAllItems();
     }
 }
 
