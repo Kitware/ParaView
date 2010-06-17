@@ -12,8 +12,22 @@
 #include "vtkRenderWindow.h"
 #include "vtkSMPropertyHelper.h"
 
+#include <QApplication>
+#include <QMainWindow>
+#include "QVTKWidget.h"
+#include <QHBoxLayout>
+
+#define SECOND_WINDOW
+
 int main(int argc, char** argv)
 {
+  QApplication app(argc, argv);
+
+  QMainWindow mainWindow;
+  mainWindow.resize(400, 400);
+  mainWindow.show();
+  QApplication::processEvents();
+
   vtkPVOptions* options = vtkPVOptions::New();
   vtkInitializationHelper::Initialize(argc, argv, options);
   options->Delete();
@@ -30,24 +44,36 @@ int main(int argc, char** argv)
   proxy->UpdateVTKObjects();
 
   vtkPVRenderView* rv = vtkPVRenderView::SafeDownCast(proxy->GetClientSideObject());
-  rv->GetRenderWindow()->Render();
-  rv->GetInteractor()->Start();
+  QVTKWidget* qwidget = new QVTKWidget(&mainWindow);
+  qwidget->SetRenderWindow(rv->GetRenderWindow());
 
- // vtkSMProxy* proxy2 = vtkSMProxyManager::GetProxyManager()->NewProxy("views",
- //   "RenderView2");
- // proxy2->SetConnectionID(connectionID);
- // vtkSMPropertyHelper(proxy2, "Size").Set(0, 400);
- // vtkSMPropertyHelper(proxy2, "Size").Set(1, 400);
- // vtkSMPropertyHelper(proxy2, "Position").Set(0, 400);
- // proxy2->UpdateVTKObjects();
+  QWidget *centralWidget = new QWidget(&mainWindow);
+  QHBoxLayout* hbox = new QHBoxLayout(centralWidget);
+  mainWindow.setCentralWidget(centralWidget);
+  hbox->addWidget(qwidget);
 
- // vtkPVRenderView* rv2 = vtkPVRenderView::SafeDownCast(proxy2->GetClientSideObject());
- // rv2->GetRenderWindow()->Render();
- // rv2->GetInteractor()->Start();
- // proxy2->Delete();
+#ifdef SECOND_WINDOW
 
+  vtkSMProxy* proxy2 = vtkSMProxyManager::GetProxyManager()->NewProxy("views",
+    "RenderView2");
+  proxy2->SetConnectionID(connectionID);
+  vtkSMPropertyHelper(proxy2, "Size").Set(0, 400);
+  vtkSMPropertyHelper(proxy2, "Size").Set(1, 400);
+  vtkSMPropertyHelper(proxy2, "Position").Set(0, 400);
+  proxy2->UpdateVTKObjects();
+
+  vtkPVRenderView* rv2 = vtkPVRenderView::SafeDownCast(proxy2->GetClientSideObject());
+  qwidget = new QVTKWidget(&mainWindow);
+  qwidget->SetRenderWindow(rv2->GetRenderWindow());
+  hbox->addWidget(qwidget);
+#endif
+  mainWindow.show();
+  int ret = app.exec();
+#ifdef SECOND_WINDOW
+  proxy2->Delete();
+#endif
   proxy->Delete();
 
   vtkInitializationHelper::Finalize();
-  return 0;
+  return ret;
 }

@@ -123,22 +123,23 @@ vtkPVRenderView::vtkPVRenderView()
   // FIXME: This code is copied from vtkRenderView. Ideally I'd like a graceful
   // way for overriding the render window without having to duplicate code.
 
-  if (!this->GetInteractor())
-    {
-    // We will handle all interactor renders by turning off rendering
-    // in the interactor and listening to the interactor's render event.
-    vtkSmartPointer<vtkRenderWindowInteractor> iren =
-      vtkSmartPointer<vtkRenderWindowInteractor>::New();
-    iren->EnableRenderOff();
-    iren->AddObserver(vtkCommand::RenderEvent, this->GetObserver());
-    iren->AddObserver(vtkCommand::StartInteractionEvent, this->GetObserver());
-    iren->AddObserver(vtkCommand::EndInteractionEvent, this->GetObserver());
-    this->RenderWindow->SetInteractor(iren);
+  // COMMENTING SINCE QVTKWidget doesn't work otherwise. FIXME
+  //if (!this->GetInteractor())
+  //  {
+  //  // We will handle all interactor renders by turning off rendering
+  //  // in the interactor and listening to the interactor's render event.
+  //  vtkSmartPointer<vtkRenderWindowInteractor> iren =
+  //    vtkSmartPointer<vtkRenderWindowInteractor>::New();
+  //  iren->EnableRenderOff();
+  //  iren->AddObserver(vtkCommand::RenderEvent, this->GetObserver());
+  //  iren->AddObserver(vtkCommand::StartInteractionEvent, this->GetObserver());
+  //  iren->AddObserver(vtkCommand::EndInteractionEvent, this->GetObserver());
+  //  this->RenderWindow->SetInteractor(iren);
 
-    // The interaction mode is -1 before calling SetInteractionMode,
-    // this will force an initialization of the interaction mode/style.
-    this->SetInteractionModeTo3D();
-    }
+  //  // The interaction mode is -1 before calling SetInteractionMode,
+  //  // this will force an initialization of the interaction mode/style.
+  //  this->SetInteractionModeTo3D();
+  //  }
 
   // Intialize the selector and listen to render events to help Selector know when to
   // update the full-screen hardware pick.
