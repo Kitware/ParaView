@@ -14,7 +14,7 @@
  =========================================================================*/
 #include "vtkPVArrayInformation.h"
 
-#include "vtkClientServerStream.h"  
+#include "vtkClientServerStream.h"
 #include "vtkDataArray.h"
 #include "vtkObjectFactory.h"
 #include "vtkInformation.h"
@@ -78,6 +78,13 @@ void vtkPVArrayInformation::Initialize()
 
   if (this->ComponentNames)
     {
+    for ( unsigned int i=0; i < this->ComponentNames->size(); ++i)
+      {
+      if ( this->ComponentNames->at(i) )
+        {
+        delete this->ComponentNames->at(i);
+        }
+      }
     this->ComponentNames->clear();
     delete this->ComponentNames;
     this->ComponentNames = 0;
@@ -253,7 +260,7 @@ const char* vtkPVArrayInformation::GetComponentName(vtkIdType component)
       return compName->c_str();
       }
     }
-  //we have failed to find a user set component name, use the default component name    
+  //we have failed to find a user set component name, use the default component name
   this->DetermineDefaultComponentName(component, this->GetNumberOfComponents());
   return this->DefaultComponentName->c_str();
 }
@@ -434,18 +441,26 @@ void vtkPVArrayInformation::DeepCopy(vtkPVArrayInformation *info)
     this->Ranges[idx] = info->Ranges[idx];
     }
 
-  if (!this->ComponentNames)
-    {
-    this->ComponentNames
-        = new vtkPVArrayInformation::vtkInternalComponentNames();
-    }
-
   //clear the vector of old data
-  this->ComponentNames->clear();
+  if (this->ComponentNames)
+    {
+    for ( unsigned int i=0; i < this->ComponentNames->size(); ++i)
+      {
+      if ( this->ComponentNames->at(i) )
+        {
+        delete this->ComponentNames->at(i);
+        }
+      }
+    this->ComponentNames->clear();
+    delete this->ComponentNames;
+    this->ComponentNames = 0;
+    }
 
   if (info->ComponentNames)
     {
-    //copy the passed in components if they exist   
+    this->ComponentNames
+        = new vtkPVArrayInformation::vtkInternalComponentNames();
+    //copy the passed in components if they exist
     this->ComponentNames->reserve(info->ComponentNames->size());
     const char *name;
     for (unsigned i = 0; i < info->ComponentNames->size(); ++i)
@@ -517,7 +532,7 @@ void vtkPVArrayInformation::CopyFromObject(vtkObject* obj)
   if (array->HasAComponentName())
     {
     const char *name;
-    //copy the component names over    
+    //copy the component names over
     for (int i = 0; i < this->GetNumberOfComponents(); ++i)
       {
       name = array->GetComponentName(i);
@@ -691,7 +706,7 @@ void vtkPVArrayInformation::CopyFromStream(const vtkClientServerStream* css)
     num++;
     }
 
-  // Range of each component.  
+  // Range of each component.
   for (int i = 0; i < num; ++i)
     {
     if (!css->GetArgument(0, 4 + i, this->Ranges + 2 * i, 2))
@@ -710,12 +725,23 @@ void vtkPVArrayInformation::CopyFromStream(const vtkClientServerStream* css)
 
   if (numOfComponentNames > 0)
     {
-    if (!this->ComponentNames)
+      //clear the vector of old data
+    if (this->ComponentNames)
       {
-      this->ComponentNames
-          = new vtkPVArrayInformation::vtkInternalComponentNames();
+      for ( unsigned int i=0; i < this->ComponentNames->size(); ++i)
+        {
+        if ( this->ComponentNames->at(i) )
+          {
+          delete this->ComponentNames->at(i);
+          }
+        }
+      this->ComponentNames->clear();
+      delete this->ComponentNames;
+      this->ComponentNames = 0;
       }
-    this->ComponentNames->clear();
+    this->ComponentNames
+          = new vtkPVArrayInformation::vtkInternalComponentNames();
+
     this->ComponentNames->reserve(numOfComponentNames);
 
     for (int cc=0; cc < numOfComponentNames; cc++)
