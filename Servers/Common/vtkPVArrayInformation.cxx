@@ -635,12 +635,7 @@ void vtkPVArrayInformation::CopyToStream(vtkClientServerStream* css)
   for (int i = 0; i < num; ++i)
     {
     compName = this->ComponentNames->at(i);
-    if (compName)
-      {
-      //we can't presume that every component has been named, so only stream valid component names
-      *css << i;
-      *css << compName->c_str();
-      }
+    *css << (compName? compName->c_str() : static_cast<const char*>(NULL));
     }
 
   int nkeys = this->GetNumberOfInformationKeys();
@@ -706,13 +701,14 @@ void vtkPVArrayInformation::CopyFromStream(const vtkClientServerStream* css)
       }
     }
   int pos = 4 + num;
-  int numOfComponents;
-  if (!css->GetArgument(0, pos++, &numOfComponents))
+  int numOfComponentNames;
+  if (!css->GetArgument(0, pos++, &numOfComponentNames))
     {
     vtkErrorMacro("Error parsing number of component names.");
     return;
     }
-  if (numOfComponents > 0)
+
+  if (numOfComponentNames > 0)
     {
     if (!this->ComponentNames)
       {
@@ -720,40 +716,30 @@ void vtkPVArrayInformation::CopyFromStream(const vtkClientServerStream* css)
           = new vtkPVArrayInformation::vtkInternalComponentNames();
       }
     this->ComponentNames->clear();
-    this->ComponentNames->reserve(numOfComponents);
+    this->ComponentNames->reserve(numOfComponentNames);
 
-    num = 0;
-    int i = 0;
-    //the component names don't have to be continuous
-    // but they are in ascending order
-    while (num < (numOfComponents - 1))
+    for (int cc=0; cc < numOfComponentNames; cc++)
       {
-      if (!css->GetArgument(0, pos + (i * 2), &num))
-        {
-        vtkErrorMacro("Error parsing component name position from message.");
-        return;
-        }
-      if (!css->GetArgument(0, pos + (i * 2 + 1), &name))
+      const char* comp_name;
+      if (!css->GetArgument(0, pos++, &comp_name))
         {
         vtkErrorMacro("Error parsing component name from message.");
         return;
         }
-      this->SetComponentName(num, name);
-      ++i;
+      // note comp_name may be NULL, but that's okay.
+      this->SetComponentName(cc, comp_name);
       }
     }
 
   // information keys
-  pos = pos + 2 * numOfComponents;
   int nkeys;
-  if (!css->GetArgument(0, pos, &nkeys))
+  if (!css->GetArgument(0, pos++, &nkeys))
     {
     return;
     }
 
-  int keystart = pos + 1;
   // Location and name for each key.
-  if(this->InformationKeys)
+  if (this->InformationKeys)
     {
     this->InformationKeys->clear();
     delete this->InformationKeys;
@@ -761,14 +747,14 @@ void vtkPVArrayInformation::CopyFromStream(const vtkClientServerStream* css)
     }
   for (int i = 0; i < nkeys; ++i)
     {
-    if (!css->GetArgument(0, keystart + 2 * i, &name))
+    if (!css->GetArgument(0, pos++, &name))
       {
       vtkErrorMacro("Error parsing information key location from message.");
       return;
       }
     vtkStdString key_location = name;
 
-    if (!css->GetArgument(0, keystart + 2 * i + 1, &name))
+    if (!css->GetArgument(0, pos++, &name))
       {
       vtkErrorMacro("Error parsing information key name from message.");
       return;
