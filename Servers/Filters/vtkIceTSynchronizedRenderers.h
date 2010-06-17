@@ -95,11 +95,12 @@ public:
     this->IceTCompositePass->SetController(cont);
     }
 
-  void RenderIceTImageToScreen();
 //BTX
 protected:
   vtkIceTSynchronizedRenderers();
   ~vtkIceTSynchronizedRenderers();
+
+  virtual void HandleEndRender();
 
   // Description:
   // When rendering in tile-display mode, we need to tell the camera-pass the
@@ -117,8 +118,6 @@ protected:
 private:
   vtkIceTSynchronizedRenderers(const vtkIceTSynchronizedRenderers&); // Not implemented
   void operator=(const vtkIceTSynchronizedRenderers&); // Not implemented
-
-  static vtkRawImage* GlobalProcessTile;
 //ETX
 };
 

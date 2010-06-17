@@ -28,6 +28,8 @@
 #include <vtkgl.h>
 #include <GL/ice-t.h>
 
+#include <vtkstd/map>
+
 namespace
 {
   void IceTDrawCallback();
@@ -100,11 +102,6 @@ public:
     vtkInitialPass::ActiveRenderer = NULL;
     vtkInitialPass::ActivePass = NULL;
 
-    if (this->IceTSynchronizedRenderers->GetWriteBackImages())
-      {
-      this->IceTCompositePass->IceTInflateAndDisplay(renderer);
-      }
-
     this->IceTCompositePass->CleanupContext(s);
     vtkTimerLog::MarkEndEvent("vtkInitialPass::Render");
     }
@@ -161,6 +158,54 @@ protected:
     {
     vtkInitialPass::Draw();
     }
+
+  // We didn't want to have a singleton for vtkIceTSynchronizedRenderers to
+  // manage multi-view configurations. But, in tile-display mode, after each
+  // view is rendered, the tiles end up with the residue of that rendered view
+  // on all tiles. Which is not what is expected -- one would expect the views
+  // that are present on those tiles to be drawn back. That becomes tricky
+  // without a singleton. So we have a internal map that tracks all rendered
+  // tiles.
+  class vtkTile
+    {
+  public:
+    vtkSynchronizedRenderers::vtkRawImage TileImage;
+
+    // PhysicalViewport is the viewport where the TileImage maps into the tile
+    // rendered by this processes i.e. the render window for this process.
+    double PhysicalViewport[4];
+
+    // GlobalViewport is the viewport for this image treating all tiles as a
+    // single large display.
+    double GlobalViewport[4];
+    };
+
+  typedef vtkstd::map<vtkIceTSynchronizedRenderers*, vtkTile> TilesMapType;
+  static TilesMapType TilesMap;
+
+  // Iterates over all valid tiles in the TilesMap and flush the images to the
+  // screen.
+  void FlushTiles(vtkRenderer* renderer)
+    {
+    for (TilesMapType::iterator iter = ::TilesMap.begin();
+      iter != :: TilesMap.end(); ++iter)
+      {
+      vtkTile& tile = iter->second;
+      if (tile.TileImage.IsValid())
+        {
+        double viewport[4];
+        renderer->GetViewport(viewport);
+        renderer->SetViewport(tile.PhysicalViewport);
+        int tile_scale[2];
+        renderer->GetVTKWindow()->GetTileScale(tile_scale);
+        renderer->GetVTKWindow()->SetTileScale(1, 1);
+        renderer->Clear();
+        tile.TileImage.PushToViewport(renderer);
+        renderer->GetVTKWindow()->SetTileScale(tile_scale);
+        renderer->SetViewport(viewport);
+        }
+      }
+    }
 };
 
 
@@ -203,25 +248,60 @@ void vtkIceTSynchronizedRenderers::UpdateCameraAspect(int x, int y)
 }
 
 //----------------------------------------------------------------------------
-void vtkIceTSynchronizedRenderers::RenderIceTImageToScreen()
+//void vtkIceTSynchronizedRenderers::RenderIceTImageToScreen()
+//{
+//  vtkRawImage &img = this->CaptureRenderedImage();
+//  double old_viewport[4];
+//  this->Renderer->GetViewport(old_viewport);
+//
+//  vtkSmartPointer<vtkTilesHelper> tilesHelper = vtkSmartPointer<vtkTilesHelper>::New();
+//  tilesHelper->SetTileDimensions(this->IceTCompositePass->GetTileDimensions());
+//  tilesHelper->SetTileMullions(this->IceTCompositePass->GetTileMullions());
+//  tilesHelper->SetTileWindowSize(800, 800); // doesn't matter since we need
+//                                            // normalized viewport.
+//
+//  const double* n_v = tilesHelper->GetNormalizedTileViewport(
+//    old_viewport, this->ParallelController->GetLocalProcessId());
+//  if (n_v)
+//    {
+//    this->Renderer->SetViewport(n_v[0], n_v[1], n_v[2], n_v[3]);
+//    img.PushToViewport(this->Renderer);
+//    this->Renderer->SetViewport(old_viewport);
+//    }
+//}
+
+//----------------------------------------------------------------------------
+void vtkIceTSynchronizedRenderers::HandleEndRender()
 {
-  vtkRawImage &img = this->CaptureRenderedImage();
-  double old_viewport[4];
-  this->Renderer->GetViewport(old_viewport);
-
-  vtkSmartPointer<vtkTilesHelper> tilesHelper = vtkSmartPointer<vtkTilesHelper>::New();
-  tilesHelper->SetTileDimensions(this->IceTCompositePass->GetTileDimensions());
-  tilesHelper->SetTileMullions(this->IceTCompositePass->GetTileMullions());
-  tilesHelper->SetTileWindowSize(800, 800); // doesn't matter since we need
-                                            // normalized viewport.
-
-  const double* n_v = tilesHelper->GetNormalizedTileViewport(
-    old_viewport, this->ParallelController->GetLocalProcessId());
-  if (n_v)
+  if (this->WriteBackImages)
     {
-    this->Renderer->SetViewport(n_v[0], n_v[1], n_v[2], n_v[3]);
-    img.PushToViewport(this->Renderer);
-    this->Renderer->SetViewport(old_viewport);
+    this->WriteBackImages = false;
+    this->Superclass::HandleEndRender();
+    this->WriteBackImages = true;
+    }
+  else
+    {
+    this->Superclass::HandleEndRender();
+    }
+
+  if (this->WriteBackImages)
+    {
+    vtkSynchronizedRenderers::vtkRawImage lastRenderedImage =
+      this->CaptureRenderedImage();
+    if (lastRenderedImage.IsValid())
+      {
+      vtkTile& tile = TilesMap[this];
+      tile.TileImage = lastRenderedImage;
+      // FIXME: Get real physcial viewport from vtkIceTCompositePass.
+      tile.PhysicalViewport[0] = 0;
+      tile.PhysicalViewport[1] = 0;
+      tile.PhysicalViewport[2] = 1;
+      tile.PhysicalViewport[3] = 1;
+      }
+
+    // Write-back either the freshly rendered tile or what was most recently
+    // rendered.
+    ::FlushTiles(this->Renderer);
     }
 }
 
