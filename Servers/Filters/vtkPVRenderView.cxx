@@ -108,6 +108,7 @@ vtkPVRenderView::vtkPVRenderView()
     }
 
   this->SynchronizedRenderers = vtkPVSynchronizedRenderer::New();
+  this->SynchronizedRenderers->SetImageReductionFactor(4);
 
   this->Identifier = 0;
 

@@ -22,7 +22,6 @@
 #include "vtkRenderState.h"
 #include "vtkRenderWindow.h"
 #include "vtkSmartPointer.h"
-#include "vtkTilesHelper.h"
 #include "vtkTimerLog.h"
 
 #include <vtkgl.h>

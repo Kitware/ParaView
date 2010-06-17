@@ -25,7 +25,6 @@
 #include "vtkSmartPointer.h"
 #include "vtkSocketController.h"
 #include "vtkPVServerInformation.h"
-#include "vtkTilesHelper.h"
 
 #include <vtkstd/map>
 #include <vtkstd/vector>

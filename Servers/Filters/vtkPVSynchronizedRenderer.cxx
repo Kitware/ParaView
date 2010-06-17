@@ -138,6 +138,8 @@ vtkPVSynchronizedRenderer::vtkPVSynchronizedRenderer()
       this->ParallelSynchronizer = vtkIceTSynchronizedRenderers::New();
       static_cast<vtkIceTSynchronizedRenderers*>(this->ParallelSynchronizer)->SetTileDimensions(
         tile_dims[0], tile_dims[1]);
+      static_cast<vtkIceTSynchronizedRenderers*>(this->ParallelSynchronizer)->SetTileMullions(
+        20, 20);
 #else
       // FIXME: need to add support for compositing.
       this->ParallelSynchronizer = vtkSynchronizedRenderers::New();
@@ -196,6 +198,35 @@ void vtkPVSynchronizedRenderer::SetRenderer(vtkRenderer* ren)
     {
     this->CSSynchronizer->SetRenderer(ren);
     }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVSynchronizedRenderer::SetImageReductionFactor(int factor)
+{
+  if (this->ImageReductionFactor == factor || factor < 1 || factor > 50)
+    {
+    return;
+    }
+
+  this->ImageReductionFactor = factor;
+
+  switch (this->Mode)
+    {
+  case SERVER:
+  case BATCH:
+    if (this->ParallelSynchronizer)
+      {
+      this->ParallelSynchronizer->SetImageReductionFactor(this->ImageReductionFactor);
+      }
+    break;
+
+  case BUILTIN:
+  case CLIENT:
+  default:
+    break;
+    }
+
+  this->Modified();
 }
 
 //----------------------------------------------------------------------------

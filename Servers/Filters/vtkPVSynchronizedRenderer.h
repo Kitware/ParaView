@@ -33,6 +33,8 @@ public:
   vtkTypeRevisionMacro(vtkPVSynchronizedRenderer, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
+  // Description:
+  // Set the renderer that is being synchronized.
   void SetRenderer(vtkRenderer*);
 
   // Description:
@@ -43,7 +45,8 @@ public:
 
   // Description:
   // Get/Set the image reduction factor.
-  vtkSetClampMacro(ImageReductionFactor, int, 1, 50);
+  // This needs to be set on all processes and must match up.
+  void SetImageReductionFactor(int);
   vtkGetMacro(ImageReductionFactor, int);
 
 //BTX
