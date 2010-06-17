@@ -76,16 +76,11 @@ bool vtkTilesHelper::GetNormalizedTileViewport(
   normalized_tile_size[0] = 1.0/this->TileDimensions[0];
   normalized_tile_size[1] = 1.0/this->TileDimensions[1];
 
-  // The spacing of the tiles (including the mullions).
-  double normalized_tile_spacing[2];
-  normalized_tile_spacing[0] = normalized_tile_size[0] + normalized_mullions[0];
-  normalized_tile_spacing[1] = normalized_tile_size[1] + normalized_mullions[1];
-
   int x, y;
   this->GetTileIndex(rank, &x, &y);
 
-  out_tile_viewport[0] = x * normalized_tile_spacing[0];
-  out_tile_viewport[1] = y * normalized_tile_spacing[1];
+  out_tile_viewport[0] = x * normalized_tile_size[0];
+  out_tile_viewport[1] = y * normalized_tile_size[1];
   out_tile_viewport[2] = out_tile_viewport[0] + normalized_tile_size[0];
   out_tile_viewport[3] = out_tile_viewport[1] + normalized_tile_size[1];
 
@@ -110,6 +105,11 @@ bool vtkTilesHelper::GetNormalizedTileViewport(
     return false;
     }
 
+  // Shift the entire viewport around using the mullions.
+  out_tile_viewport[0] += x * normalized_mullions[0];
+  out_tile_viewport[1] += y * normalized_mullions[1];
+  out_tile_viewport[2] += x * normalized_mullions[0];
+  out_tile_viewport[3] += y * normalized_mullions[1];
   return true;
 }
 
