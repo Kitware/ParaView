@@ -273,36 +273,14 @@ void vtkIceTCompositePass::UpdateTileInformation(
   tilesHelper->SetTileWindowSize(tile_size);
 
   int rank = this->Controller->GetLocalProcessId();
-  const int *my_tile_viewport = tilesHelper->GetTileViewport(viewport,
-    rank);
-  if (my_tile_viewport)
+  int my_tile_viewport[4];
+  if (tilesHelper->GetTileViewport(viewport, rank, my_tile_viewport))
     {
     this->LastTileViewport[0] = my_tile_viewport[0];
     this->LastTileViewport[1] = my_tile_viewport[1];
     this->LastTileViewport[2] = my_tile_viewport[2];
     this->LastTileViewport[3] = my_tile_viewport[3];
-
-    int x = rank % this->TileDimensions[0];
-    int y = rank / this->TileDimensions[0];
-    if (y >= this->TileDimensions[1])
-      {
-      y = this->TileDimensions[1] - 1;
-      }
-
-    // invert y so that the 0th rank corresponds to the top-left tile rather than
-    // bottom left tile.
-    y = this->TileDimensions[1] - y - 1;
-
-    this->PhysicalViewport[0] =
-      (my_tile_viewport[0] - x* (tile_size[0] + this->TileMullions[0]))/
-      tile_size[0];
-    this->PhysicalViewport[1] =
-      (my_tile_viewport[1] - x* (tile_size[1] + this->TileMullions[1]))/
-      tile_size[1];
-    this->PhysicalViewport[2] = this->PhysicalViewport[0] +
-      (my_tile_viewport[2]-my_tile_viewport[0])/tile_size[0];
-    this->PhysicalViewport[3] = this->PhysicalViewport[1] +
-      (my_tile_viewport[3]-my_tile_viewport[1])/tile_size[1];
+    tilesHelper->GetPhysicalViewport(viewport, rank, this->PhysicalViewport);
     }
   else
     {
@@ -335,8 +313,8 @@ void vtkIceTCompositePass::UpdateTileInformation(
     for (int y=0; y < this->TileDimensions[1]; y++)
       {
       int cur_rank  = y * this->TileDimensions[0] + x;
-      const int* tile_viewport = tilesHelper->GetTileViewport(viewport, cur_rank);
-      if (!tile_viewport)
+      int tile_viewport[4];
+      if (!tilesHelper->GetTileViewport(viewport, cur_rank, tile_viewport))
         {
         continue;
         }
@@ -429,6 +407,7 @@ void vtkIceTCompositePass::IceTInflateAndDisplay(vtkRenderer* renderer)
   this->GetLastRenderedTile(image);
   if (!image.IsValid())
     {
+    cout << "------ no image to render" << endl;
     return;
     }
 

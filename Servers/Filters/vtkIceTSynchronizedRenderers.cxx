@@ -199,7 +199,6 @@ protected:
         int tile_scale[2];
         renderer->GetVTKWindow()->GetTileScale(tile_scale);
         renderer->GetVTKWindow()->SetTileScale(1, 1);
-        renderer->Clear();
         tile.TileImage.PushToViewport(renderer);
         renderer->GetVTKWindow()->SetTileScale(tile_scale);
         renderer->SetViewport(viewport);
@@ -241,36 +240,6 @@ vtkIceTSynchronizedRenderers::~vtkIceTSynchronizedRenderers()
 }
 
 //----------------------------------------------------------------------------
-void vtkIceTSynchronizedRenderers::UpdateCameraAspect(int x, int y)
-{
-  vtkCameraPass* cp = vtkCameraPass::SafeDownCast(this->RenderPass);
-  //cp->SetAspectRatioOverride((double)(x)/y);
-}
-
-//----------------------------------------------------------------------------
-//void vtkIceTSynchronizedRenderers::RenderIceTImageToScreen()
-//{
-//  vtkRawImage &img = this->CaptureRenderedImage();
-//  double old_viewport[4];
-//  this->Renderer->GetViewport(old_viewport);
-//
-//  vtkSmartPointer<vtkTilesHelper> tilesHelper = vtkSmartPointer<vtkTilesHelper>::New();
-//  tilesHelper->SetTileDimensions(this->IceTCompositePass->GetTileDimensions());
-//  tilesHelper->SetTileMullions(this->IceTCompositePass->GetTileMullions());
-//  tilesHelper->SetTileWindowSize(800, 800); // doesn't matter since we need
-//                                            // normalized viewport.
-//
-//  const double* n_v = tilesHelper->GetNormalizedTileViewport(
-//    old_viewport, this->ParallelController->GetLocalProcessId());
-//  if (n_v)
-//    {
-//    this->Renderer->SetViewport(n_v[0], n_v[1], n_v[2], n_v[3]);
-//    img.PushToViewport(this->Renderer);
-//    this->Renderer->SetViewport(old_viewport);
-//    }
-//}
-
-//----------------------------------------------------------------------------
 void vtkIceTSynchronizedRenderers::HandleEndRender()
 {
   if (this->WriteBackImages)
@@ -293,10 +262,7 @@ void vtkIceTSynchronizedRenderers::HandleEndRender()
       vtkTile& tile = TilesMap[this];
       tile.TileImage = lastRenderedImage;
       // FIXME: Get real physcial viewport from vtkIceTCompositePass.
-      tile.PhysicalViewport[0] = 0;
-      tile.PhysicalViewport[1] = 0;
-      tile.PhysicalViewport[2] = 1;
-      tile.PhysicalViewport[3] = 1;
+      this->IceTCompositePass->GetPhysicalViewport(tile.PhysicalViewport);
       }
 
     // Write-back either the freshly rendered tile or what was most recently
@@ -344,7 +310,8 @@ vtkIceTSynchronizedRenderers::CaptureRenderedImage()
     this->IceTCompositePass->GetLastRenderedTile(rawImage);
     if (!rawImage.IsValid())
       {
-      vtkErrorMacro("IceT couldn't provide a tile on this process.");
+      cout << "no image captured " << endl;
+      //vtkErrorMacro("IceT couldn't provide a tile on this process.");
       }
     }
   return rawImage;

@@ -762,7 +762,7 @@ void vtkPVSynchronizedRenderWindows::UpdateWindowLayout()
       // correctly.
       tile_dims[0] = (tile_dims[0] == 0)? 1 : tile_dims[0];
       tile_dims[1] = (tile_dims[1] == 0)? 1 : tile_dims[1];
-      this->Internals->SharedRenderWindow->SetTileScale(tile_dims);
+      //this->Internals->SharedRenderWindow->SetTileScale(tile_dims);
       if (in_tile_display_mode)
         {
         // FIXME: handle full-screen case

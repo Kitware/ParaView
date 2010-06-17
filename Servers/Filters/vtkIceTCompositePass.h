@@ -126,6 +126,7 @@ public:
   // Returns the last rendered tile from this process, if any.
   // Image is invalid if tile is not available on the current process.
   void GetLastRenderedTile(vtkSynchronizedRenderers::vtkRawImage& tile);
+  vtkGetVector4Macro(PhysicalViewport, double);
 
   void IceTInflateAndDisplay(vtkRenderer*);
 protected:

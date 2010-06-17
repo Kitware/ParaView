@@ -52,16 +52,27 @@ public:
   // \c rank. \c viewport is in normalized display coordinates i.e. in range
   // [0, 1] indicating the viewport covered by the current renderer on the whole
   // i.e. treating all tiles as one large display if TileDimensions > (1, 1).
-  // Note returned value is only valid until the next call to GetTileViewport or
-  // GetNormalizedTileViewport.
-  const int* GetTileViewport(double* viewport, int rank);
+  // Returns false to indicate the result hasn't been computed.
+  bool GetTileViewport(const double *viewport, int rank,
+    int out_tile_viewport[4]);
 
   // Description:
   // Same as GetTileViewport() except that the returns values are in
   // normalized-display coordinates instead of display coordinates.
-  // Note returned value is only valid until the next call to GetTileViewport or
-  // GetNormalizedTileViewport.
-  const double* GetNormalizedTileViewport(double* viewport, int rank);
+  // Returns false to indicate the result hasn't been computed.
+  bool GetNormalizedTileViewport(const double* viewport, int rank,
+    double out_tile_viewport[4]);
+
+  // Description:
+  // Given a global-viewport for a renderer, returns the physical viewport on
+  // the rank indicated.
+  // Returns false to indicate the result hasn't been computed.
+  bool GetPhysicalViewport(const double *global_viewport, int rank,
+    double out_phyiscal_viewport[4]);
+
+  // Description:
+  // Given the rank, returns the tile location.
+  void GetTileIndex(int rank, int* tileX, int* tileY);
 
 //BTX
 protected:
