@@ -25,6 +25,15 @@ repr = servermanager.CreateRepresentation(reader, view);
 
 view.UseOffscreenRenderingForScreenshotsOff()
 view.ResetCamera()
+# Hackery to ensure that we don't end up with overlapping windows when running
+# this test.
+try:
+    pm = servermanager.vtkProcessModule.GetProcessModule()
+    if pm.GetPartitionId() == 0:
+        window = view.GetRenderWindow()
+        window.SetPosition(450, 0)
+except:
+    pass
 view.StillRender()
 
 SMPythonTesting.DoRegressionTesting(view.SMProxy)
