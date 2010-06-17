@@ -252,6 +252,9 @@ void vtkIceTCompositePass::Draw(const vtkRenderState* render_state)
 void vtkIceTCompositePass::UpdateTileInformation(
   const vtkRenderState* render_state)
 {
+  double image_reduction_factor = this->ImageReductionFactor > 0?
+    this->ImageReductionFactor : 1.0;
+
   int tile_size[2];
   double viewport[4] = {0, 0, 1, 1};
   if (render_state->GetFrameBuffer())
@@ -276,10 +279,15 @@ void vtkIceTCompositePass::UpdateTileInformation(
   int my_tile_viewport[4];
   if (tilesHelper->GetTileViewport(viewport, rank, my_tile_viewport))
     {
-    this->LastTileViewport[0] = my_tile_viewport[0];
-    this->LastTileViewport[1] = my_tile_viewport[1];
-    this->LastTileViewport[2] = my_tile_viewport[2];
-    this->LastTileViewport[3] = my_tile_viewport[3];
+    // LastTileViewport is the icet viewport for the current renderer (treating
+    // all tiles as one large display).
+    this->LastTileViewport[0] = my_tile_viewport[0]/image_reduction_factor;
+    this->LastTileViewport[1] = my_tile_viewport[1]/image_reduction_factor;
+    this->LastTileViewport[2] = my_tile_viewport[2]/image_reduction_factor;
+    this->LastTileViewport[3] = my_tile_viewport[3]/image_reduction_factor;
+
+    // PhysicalViewport is the viewport in the current render-window where the
+    // renderer maps.
     tilesHelper->GetPhysicalViewport(viewport, rank, this->PhysicalViewport);
     }
   else
@@ -304,7 +312,6 @@ void vtkIceTCompositePass::UpdateTileInformation(
     //return;
     }
 
-  double image_reduction_factor = this->ImageReductionFactor;
 
   cout << "_------------------" << endl;
   icetResetTiles();
