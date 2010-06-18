@@ -60,7 +60,8 @@
 #include "vtkTranslucentPass.h"
 #include "vtkUnstructuredGrid.h"
 #include "vtkVolumetricPass.h"
-
+#include "vtkGaussianBlurPass.h"
+#include "vtkSobelGradientMagnitudePass.h"
 /*
 ** This test only builds if MPI is in use
 */
@@ -75,6 +76,8 @@ class MyProcess : public vtkProcess
   vtkSmartPointer<vtkPKdTree> KdTree;
   int UseOrderedCompositing;
   int UseDepthPeeling;
+  bool UseBlurPass;
+  bool UseSobelPass;
 public:
   static MyProcess *New();
   vtkTypeRevisionMacro(MyProcess, vtkProcess);
@@ -86,6 +89,8 @@ public:
   vtkSetMacro(UseOrderedCompositing, int);
   vtkSetMacro(UseDepthPeeling, int);
   vtkSetMacro(ServerMode, bool);
+  vtkSetMacro(UseBlurPass, bool);
+  vtkSetMacro(UseSobelPass, bool);
   vtkSetObjectMacro(SocketController, vtkMultiProcessController);
 
   void SetArgs(int anArgc, char *anArgv[]);
@@ -125,6 +130,8 @@ MyProcess::MyProcess()
   this->UseDepthPeeling = 0;
   this->ServerMode = false;
   this->SocketController = 0;
+  this->UseBlurPass = false;
+  this->UseSobelPass = false;
 }
 
 //-----------------------------------------------------------------------------
@@ -252,11 +259,27 @@ void MyProcess::SetupRenderPasses(vtkRenderer* renderer)
 
   renderer->SetPass(cameraP);
 
+  if (this->UseBlurPass)
+    {
+    vtkGaussianBlurPass* blurPass = vtkGaussianBlurPass::New();
+    blurPass->SetDelegatePass(renderer->GetPass());
+    renderer->SetPass(blurPass);
+    blurPass->Delete();
+    }
+
+  if (this->UseSobelPass)
+    {
+    vtkSobelGradientMagnitudePass *sobelPass =
+      vtkSobelGradientMagnitudePass::New();
+    sobelPass->SetDelegatePass(renderer->GetPass());
+    renderer->SetPass(sobelPass);
+    sobelPass->Delete();
+    }
+
   // setting viewport doesn't work in tile-display mode correctly yet.
   //renderer->SetViewport(0, 0, 0.75, 1);
 
   iceTPass->Delete();
-
   opaque->Delete();
   peeling->Delete();
   translucent->Delete();
@@ -364,6 +387,8 @@ int main(int argc, char **argv)
   int use_ordered_compositing = 0;
   int use_depth_peeling = 0;
   int act_as_server = 0;
+  int add_blur_pass = 0;
+  int add_sobel_pass = 0;
 
   vtksys::CommandLineArguments args;
   args.Initialize(argc, argv);
@@ -389,6 +414,14 @@ int main(int argc, char **argv)
     vtksys::CommandLineArguments::NO_ARGUMENT,
     &act_as_server,
     "When present, the root process acts as a server process for a client.");
+  args.AddArgument("--blur",
+    vtksys::CommandLineArguments::NO_ARGUMENT,
+    &add_blur_pass,
+    "When present, a vtkGaussianBlurPass will be added.");
+   args.AddArgument("--sobel",
+    vtksys::CommandLineArguments::NO_ARGUMENT,
+    &add_sobel_pass,
+    "When present, a vtkGaussianBlurPass will be added.");
 
   if (!args.Parse())
     {
@@ -425,6 +458,8 @@ int main(int argc, char **argv)
   p->SetUseOrderedCompositing(use_ordered_compositing);
   p->SetUseDepthPeeling(use_depth_peeling);
   p->SetServerMode(act_as_server != 0);
+  p->SetUseBlurPass(add_blur_pass != 0);
+  p->SetUseSobelPass(add_sobel_pass != 0);
 
   if (contr->GetLocalProcessId() == 0 && act_as_server)
     {
