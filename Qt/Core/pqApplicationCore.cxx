@@ -469,18 +469,11 @@ void pqApplicationCore::loadState(const char* filename, pqServer* server)
     return ;
     }
 
-  QList<pqView*> current_views = 
-    this->ServerManagerModel->findItems<pqView*>(server);
-  foreach (pqView* view, current_views)
-    {
-    this->ObjectBuilder->destroy(view);
-    }
-
-  // FIXME: this->LoadingState cannot be relied upon.
-  this->LoadingState = true;
-  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
-  pxm->LoadState(filename, server->GetConnectionID());
-  this->LoadingState = false;
+  vtkPVXMLParser* parser = vtkPVXMLParser::New();
+  parser->SetFileName(filename);
+  parser->Parse();
+  this->loadState(parser->GetRootElement(), server);
+  parser->Delete();
 }
 
 //-----------------------------------------------------------------------------
@@ -498,6 +491,8 @@ void pqApplicationCore::loadState(
     {
     this->ObjectBuilder->destroy(view);
     }
+
+  emit this->aboutToLoadState(rootElement);
 
   // FIXME: this->LoadingState cannot be relied upon.
   this->LoadingState = true;

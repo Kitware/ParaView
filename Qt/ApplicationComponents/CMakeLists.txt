@@ -52,6 +52,7 @@ SET (MOC_HEADERS
   pqEditColorMapReaction.h
   pqExportReaction.h
   pqFiltersMenuReaction.h
+  pqFixPathsInStateFilesBehavior.h
   pqHelpReaction.h
   pqIgnoreSourceTimeReaction.h
   pqListNewProxyDefinitionsBehavior.h
@@ -174,6 +175,8 @@ SET (SOURCE_FILES
   pqExportReaction.h
   pqFiltersMenuReaction.cxx
   pqFiltersMenuReaction.h
+  pqFixPathsInStateFilesBehavior.cxx
+  pqFixPathsInStateFilesBehavior.h
   pqHelpReaction.cxx
   pqHelpReaction.h
   pqIgnoreSourceTimeReaction.cxx

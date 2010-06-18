@@ -40,6 +40,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServerResources.h"
 #include "vtkPVXMLParser.h"
 
+#include <QFileInfo>
+
 //-----------------------------------------------------------------------------
 pqLoadStateReaction::pqLoadStateReaction(QAction* parentObject)
   : Superclass(parentObject)
