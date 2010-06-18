@@ -891,7 +891,7 @@ void vtkMantaPolyDataMapper::Draw(vtkRenderer *renderer, vtkActor *actor)
         tubeGroup->add(segment);
         coord0[0] = coord1[0];
         coord0[1] = coord1[1];
-        coord0[2] = coord1[3];
+        coord0[2] = coord1[2];
         }
       }    
     }
