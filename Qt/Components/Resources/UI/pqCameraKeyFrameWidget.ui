@@ -1,7 +1,8 @@
-<ui version="4.0" >
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
  <class>CameraKeyFrameWidget</class>
- <widget class="QWidget" name="CameraKeyFrameWidget" >
-  <property name="geometry" >
+ <widget class="QWidget" name="CameraKeyFrameWidget">
+  <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
@@ -9,182 +10,141 @@
     <height>221</height>
    </rect>
   </property>
-  <property name="windowTitle" >
+  <property name="windowTitle">
    <string>Camera Animation</string>
   </property>
-  <layout class="QGridLayout" >
-   <item row="0" column="0" >
-    <widget class="QStackedWidget" name="stackedWidgetMode" >
-     <property name="currentIndex" >
-      <number>0</number>
+  <layout class="QGridLayout">
+   <item row="0" column="0">
+    <widget class="QStackedWidget" name="stackedWidgetMode">
+     <property name="currentIndex">
+      <number>1</number>
      </property>
-     <widget class="QWidget" name="page_4" >
-      <layout class="QGridLayout" >
-       <property name="leftMargin" >
+     <widget class="QWidget" name="page_4">
+      <layout class="QGridLayout">
+       <property name="margin">
         <number>0</number>
        </property>
-       <property name="topMargin" >
-        <number>0</number>
-       </property>
-       <property name="rightMargin" >
-        <number>0</number>
-       </property>
-       <property name="bottomMargin" >
-        <number>0</number>
-       </property>
-       <item row="0" column="0" >
-        <layout class="QHBoxLayout" >
+       <item row="0" column="0">
+        <layout class="QHBoxLayout">
          <item>
-          <widget class="QTreeWidget" name="leftPane" >
-           <property name="rootIsDecorated" >
+          <widget class="QTreeWidget" name="leftPane">
+           <property name="rootIsDecorated">
             <bool>false</bool>
            </property>
            <column>
-            <property name="text" >
+            <property name="text">
              <string>1</string>
             </property>
            </column>
            <item>
-            <property name="text" >
+            <property name="text">
              <string>Camera Position</string>
             </property>
            </item>
            <item>
-            <property name="text" >
+            <property name="text">
              <string>Camera Focus</string>
             </property>
            </item>
            <item>
-            <property name="text" >
+            <property name="text">
              <string>Up Direction</string>
             </property>
            </item>
           </widget>
          </item>
          <item>
-          <widget class="QStackedWidget" name="stackedWidget" >
-           <property name="currentIndex" >
+          <widget class="QStackedWidget" name="stackedWidget">
+           <property name="currentIndex">
             <number>0</number>
            </property>
-           <widget class="QWidget" name="page_3" >
-            <layout class="QGridLayout" >
-             <property name="leftMargin" >
+           <widget class="QWidget" name="page_3">
+            <layout class="QGridLayout">
+             <property name="margin">
               <number>0</number>
              </property>
-             <property name="topMargin" >
-              <number>0</number>
-             </property>
-             <property name="rightMargin" >
-              <number>0</number>
-             </property>
-             <property name="bottomMargin" >
-              <number>0</number>
-             </property>
-             <item row="0" column="0" >
-              <widget class="QTextBrowser" name="textBrowser" >
-               <property name="html" >
-                <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;style type="text/css">
+             <item row="0" column="0">
+              <widget class="QTextBrowser" name="textBrowser">
+               <property name="html">
+                <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
-&lt;/style>&lt;/head>&lt;body style=" font-family:'Helvetica'; font-size:9pt; font-weight:400; font-style:normal;">
-&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">&lt;span style=" font-weight:600;">Define Camera Parameters&lt;/span>&lt;/p>
-&lt;p style="-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-weight:600;">&lt;/p>
-&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-weight:600;">&lt;span style=" font-weight:400;">Using the left pane, edit the path followed by the camera's position and focal point for the keyframe being edited.&lt;/span>&lt;/p>&lt;/body>&lt;/html></string>
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Helvetica'; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;table style=&quot;-qt-table-type: root; margin-top:4px; margin-bottom:4px; margin-left:4px; margin-right:4px;&quot;&gt;
+&lt;tr&gt;
+&lt;td style=&quot;border: none;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Define Camera Parameters&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-weight:600;&quot;&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Using the left pane, edit the path followed by the camera's position and focal point for the keyframe being edited.&lt;/p&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/body&gt;&lt;/html&gt;</string>
                </property>
               </widget>
              </item>
             </layout>
            </widget>
-           <widget class="QWidget" name="page" >
-            <layout class="QVBoxLayout" >
-             <property name="leftMargin" >
-              <number>0</number>
-             </property>
-             <property name="topMargin" >
-              <number>0</number>
-             </property>
-             <property name="rightMargin" >
-              <number>0</number>
-             </property>
-             <property name="bottomMargin" >
+           <widget class="QWidget" name="page">
+            <layout class="QVBoxLayout">
+             <property name="margin">
               <number>0</number>
              </property>
              <item>
-              <widget class="pqCollapsedGroup" name="positionContainer" >
-               <property name="title" >
+              <widget class="pqCollapsedGroup" name="positionContainer">
+               <property name="title">
                 <string>Position Control Points</string>
                </property>
-               <property name="checkable" >
+               <property name="checkable">
                 <bool>true</bool>
                </property>
               </widget>
              </item>
             </layout>
            </widget>
-           <widget class="QWidget" name="page_6" >
-            <layout class="QGridLayout" >
-             <property name="leftMargin" >
+           <widget class="QWidget" name="page_6">
+            <layout class="QGridLayout">
+             <property name="margin">
               <number>0</number>
              </property>
-             <property name="topMargin" >
-              <number>0</number>
-             </property>
-             <property name="rightMargin" >
-              <number>0</number>
-             </property>
-             <property name="bottomMargin" >
-              <number>0</number>
-             </property>
-             <item row="0" column="0" >
-              <widget class="pqCollapsedGroup" name="focusContainer" >
-               <property name="title" >
+             <item row="0" column="0">
+              <widget class="pqCollapsedGroup" name="focusContainer">
+               <property name="title">
                 <string>Focus Control Points</string>
                </property>
               </widget>
              </item>
             </layout>
            </widget>
-           <widget class="QWidget" name="page_2" >
-            <layout class="QVBoxLayout" >
-             <property name="leftMargin" >
-              <number>0</number>
-             </property>
-             <property name="topMargin" >
-              <number>0</number>
-             </property>
-             <property name="rightMargin" >
-              <number>0</number>
-             </property>
-             <property name="bottomMargin" >
+           <widget class="QWidget" name="page_2">
+            <layout class="QVBoxLayout">
+             <property name="margin">
               <number>0</number>
              </property>
              <item>
-              <layout class="QGridLayout" >
-               <item row="0" column="0" >
-                <widget class="QDoubleSpinBox" name="viewUpX" >
-                 <property name="minimum" >
+              <layout class="QGridLayout">
+               <item row="0" column="0">
+                <widget class="QLineEdit" name="viewUpX">
+                 <property name="minimum" stdset="0">
                   <double>-1000.000000000000000</double>
                  </property>
-                 <property name="maximum" >
+                 <property name="maximum" stdset="0">
                   <double>1000.000000000000000</double>
                  </property>
                 </widget>
                </item>
-               <item row="0" column="1" >
-                <widget class="QDoubleSpinBox" name="viewUpY" >
-                 <property name="minimum" >
+               <item row="0" column="1">
+                <widget class="QLineEdit" name="viewUpY">
+                 <property name="minimum" stdset="0">
                   <double>-1000.000000000000000</double>
                  </property>
-                 <property name="maximum" >
+                 <property name="maximum" stdset="0">
                   <double>1000.000000000000000</double>
                  </property>
                 </widget>
                </item>
-               <item row="0" column="2" >
-                <widget class="QDoubleSpinBox" name="viewUpZ" >
-                 <property name="minimum" >
+               <item row="0" column="2">
+                <widget class="QLineEdit" name="viewUpZ">
+                 <property name="minimum" stdset="0">
                   <double>-1000.000000000000000</double>
                  </property>
-                 <property name="maximum" >
+                 <property name="maximum" stdset="0">
                   <double>1000.000000000000000</double>
                  </property>
                 </widget>
@@ -193,10 +153,10 @@ p, li { white-space: pre-wrap; }
              </item>
              <item>
               <spacer>
-               <property name="orientation" >
+               <property name="orientation">
                 <enum>Qt::Vertical</enum>
                </property>
-               <property name="sizeHint" >
+               <property name="sizeHint" stdset="0">
                 <size>
                  <width>20</width>
                  <height>40</height>
@@ -212,161 +172,89 @@ p, li { white-space: pre-wrap; }
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="page_5" >
-      <layout class="QGridLayout" >
-       <property name="leftMargin" >
+     <widget class="QWidget" name="page_5">
+      <layout class="QGridLayout">
+       <property name="margin">
         <number>0</number>
        </property>
-       <property name="topMargin" >
-        <number>0</number>
-       </property>
-       <property name="rightMargin" >
-        <number>0</number>
-       </property>
-       <property name="bottomMargin" >
-        <number>0</number>
-       </property>
-       <item row="0" column="0" >
-        <widget class="QPushButton" name="useCurrent" >
-         <property name="text" >
+       <item row="0" column="0">
+        <widget class="QPushButton" name="useCurrent">
+         <property name="text">
           <string>Use Current</string>
          </property>
         </widget>
        </item>
-       <item row="1" column="0" >
-        <widget class="QLabel" name="label_10" >
-         <property name="text" >
+       <item row="1" column="0">
+        <widget class="QLabel" name="label_10">
+         <property name="text">
           <string>Position</string>
          </property>
         </widget>
        </item>
-       <item row="1" column="1" >
-        <widget class="QDoubleSpinBox" name="position0" >
-         <property name="minimum" >
-          <double>-10000.000000000000000</double>
-         </property>
-         <property name="maximum" >
-          <double>10000.000000000000000</double>
-         </property>
-        </widget>
+       <item row="1" column="1">
+        <widget class="QLineEdit" name="position0"/>
        </item>
-       <item row="1" column="2" >
-        <widget class="QDoubleSpinBox" name="position1" >
-         <property name="minimum" >
-          <double>-10000.000000000000000</double>
-         </property>
-         <property name="maximum" >
-          <double>10000.000000000000000</double>
-         </property>
-        </widget>
+       <item row="1" column="2">
+        <widget class="QLineEdit" name="position1"/>
        </item>
-       <item row="1" column="3" >
-        <widget class="QDoubleSpinBox" name="position2" >
-         <property name="minimum" >
-          <double>-10000.000000000000000</double>
-         </property>
-         <property name="maximum" >
-          <double>10000.000000000000000</double>
-         </property>
-        </widget>
+       <item row="1" column="3">
+        <widget class="QLineEdit" name="position2"/>
        </item>
-       <item row="2" column="0" >
-        <widget class="QLabel" name="label_12" >
-         <property name="text" >
+       <item row="2" column="0">
+        <widget class="QLabel" name="label_12">
+         <property name="text">
           <string>Focal Point</string>
          </property>
         </widget>
        </item>
-       <item row="2" column="1" >
-        <widget class="QDoubleSpinBox" name="focalPoint0" >
-         <property name="minimum" >
-          <double>-10000.000000000000000</double>
-         </property>
-         <property name="maximum" >
-          <double>10000.000000000000000</double>
-         </property>
-        </widget>
+       <item row="2" column="1">
+        <widget class="QLineEdit" name="focalPoint0"/>
        </item>
-       <item row="2" column="2" >
-        <widget class="QDoubleSpinBox" name="focalPoint1" >
-         <property name="minimum" >
-          <double>-10000.000000000000000</double>
-         </property>
-         <property name="maximum" >
-          <double>10000.000000000000000</double>
-         </property>
-        </widget>
+       <item row="2" column="2">
+        <widget class="QLineEdit" name="focalPoint1"/>
        </item>
-       <item row="2" column="3" >
-        <widget class="QDoubleSpinBox" name="focalPoint2" >
-         <property name="minimum" >
-          <double>-10000.000000000000000</double>
-         </property>
-         <property name="maximum" >
-          <double>10000.000000000000000</double>
-         </property>
-        </widget>
+       <item row="2" column="3">
+        <widget class="QLineEdit" name="focalPoint2"/>
        </item>
-       <item row="3" column="0" >
-        <widget class="QLabel" name="label_13" >
-         <property name="text" >
+       <item row="3" column="0">
+        <widget class="QLabel" name="label_13">
+         <property name="text">
           <string>View Up</string>
          </property>
         </widget>
        </item>
-       <item row="3" column="1" >
-        <widget class="QDoubleSpinBox" name="viewUp0" >
-         <property name="minimum" >
-          <double>-10000.000000000000000</double>
-         </property>
-         <property name="maximum" >
-          <double>10000.000000000000000</double>
-         </property>
-        </widget>
+       <item row="3" column="1">
+        <widget class="QLineEdit" name="viewUp0"/>
        </item>
-       <item row="3" column="2" >
-        <widget class="QDoubleSpinBox" name="viewUp1" >
-         <property name="minimum" >
-          <double>-10000.000000000000000</double>
-         </property>
-         <property name="maximum" >
-          <double>10000.000000000000000</double>
-         </property>
-        </widget>
+       <item row="3" column="2">
+        <widget class="QLineEdit" name="viewUp1"/>
        </item>
-       <item row="3" column="3" >
-        <widget class="QDoubleSpinBox" name="viewUp2" >
-         <property name="minimum" >
-          <double>-10000.000000000000000</double>
-         </property>
-         <property name="maximum" >
-          <double>10000.000000000000000</double>
-         </property>
-        </widget>
+       <item row="3" column="3">
+        <widget class="QLineEdit" name="viewUp2"/>
        </item>
-       <item row="4" column="0" >
-        <widget class="QLabel" name="label_11" >
-         <property name="text" >
+       <item row="4" column="0">
+        <widget class="QLabel" name="label_11">
+         <property name="text">
           <string>View Angle</string>
          </property>
         </widget>
        </item>
-       <item row="4" column="1" >
-        <widget class="QDoubleSpinBox" name="viewAngle" >
-         <property name="minimum" >
+       <item row="4" column="1">
+        <widget class="QDoubleSpinBox" name="viewAngle">
+         <property name="minimum">
           <double>-360.000000000000000</double>
          </property>
-         <property name="maximum" >
+         <property name="maximum">
           <double>360.000000000000000</double>
          </property>
         </widget>
        </item>
-       <item row="5" column="0" >
+       <item row="5" column="0">
         <spacer>
-         <property name="orientation" >
+         <property name="orientation">
           <enum>Qt::Vertical</enum>
          </property>
-         <property name="sizeHint" >
+         <property name="sizeHint" stdset="0">
           <size>
            <width>20</width>
            <height>40</height>
