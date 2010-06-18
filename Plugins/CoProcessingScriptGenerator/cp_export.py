@@ -155,20 +155,27 @@ def DoCoProcessing(datadescription):
             fname = fname.replace("%%t", str(timestep))
             WriteImage(fname, renderviews[view])
 
-    # explicitly delete the proxies -- may have to do this multiple times
-    pxm = servermanager.ProxyManager()
-    somethingdeleted = 1
-    while somethingdeleted == 1:
-      somethingdeleted = 0
-      for grp in range(pxm.GetNumberOfXMLGroups()):
-        groupname = pxm.GetXMLGroupName(grp)
-        for proxy in range(pxm.GetNumberOfProxies(groupname)):
-            proxyname = pxm.GetProxyName(groupname, proxy)
-            if(proxyname):
-                prx = pxm.GetProxy(groupname, proxyname)
-                if(prx != None):
-                    Delete(prx)
-                    somethingdeleted = 1
+    # explicitly delete the proxies -- we do it this way to avoid problems with prototypes
+    tobedeleted = GetProxiesToDelete()
+    while len(tobedeleted) > 0:
+        Delete(tobedeleted[0])
+        tobedeleted = GetProxiesToDelete()
+
+def GetProxiesToDelete():
+    iter = servermanager.vtkSMProxyIterator()
+    iter.Begin()
+    tobedeleted = []
+    while not iter.IsAtEnd():
+      if iter.GetGroup().find("prototypes") != -1:
+         iter.Next()
+         continue
+      proxy = servermanager._getPyProxy(iter.GetProxy())
+      proxygroup = iter.GetGroup()
+      iter.Next()
+      if proxygroup != 'timekeeper' and proxy != None and proxygroup.find("pq_helper_proxies") == -1 :
+          tobedeleted.append(proxy)
+
+    return tobedeleted
 
 def CreateProducer(datadescription, gridname):
   "Creates a producer proxy for the grid"
