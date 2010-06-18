@@ -135,7 +135,7 @@ vtkPVGeometryFilter::vtkPVGeometryFilter ()
   this->OutlineFlag = 0;
   this->UseOutline = 1;
   this->UseStrips = 0;
-  this->GenerateCellNormals = 0;
+  this->GenerateCellNormals = 1;
   this->NonlinearSubdivisionLevel = 1;
 
   this->DataSetSurfaceFilter = vtkDataSetSurfaceFilter::New();
