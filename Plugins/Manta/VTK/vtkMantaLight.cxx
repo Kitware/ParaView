@@ -144,7 +144,7 @@ void vtkMantaLight::CreateMantaLight(vtkRenderer *ren)
   double *color, *position, *focal, direction[3];
 
   // Manta Lights only have one "color"
-  color    = this->GetColor();
+  color    = this->GetDiffuseColor();
   position = this->GetTransformedPosition();
   focal    = this->GetTransformedFocalPoint();
 
@@ -188,7 +188,7 @@ void vtkMantaLight::UpdateMantaLight(vtkRenderer *ren)
   double on = (this->GetSwitch()?1.0:0.0);
 
   // Manta Lights only have one "color"
-  color    = this->GetColor();
+  color    = this->GetDiffuseColor();
   position = this->GetTransformedPosition();
   focal    = this->GetTransformedFocalPoint();
 
