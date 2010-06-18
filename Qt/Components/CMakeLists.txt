@@ -114,6 +114,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqExtractCTHPartsPanel.h
   pqFileChooserWidget.h
   pqFieldSelectionAdaptor.h
+  pqFixStateFilenamesDialog.h
   pqGlobalRenderViewOptions.h
   pqGlyphPanel.h
   pqHandleWidget.h
@@ -248,6 +249,7 @@ SET(UI_FORMS
   Resources/UI/pqEditServerStartupDialog.ui
   Resources/UI/pqEmptyView.ui
   Resources/UI/pqExodusIIPanel.ui
+  Resources/UI/pqFixStateFilenamesDialog.ui
   Resources/UI/pqGlobalRenderViewOptions.ui
   Resources/UI/pqHandleWidget.ui
   Resources/UI/pqImplicitPlaneWidget.ui
@@ -495,6 +497,8 @@ ADD_LIBRARY(pqComponents
   pqFileChooserWidget.h
   pqFieldSelectionAdaptor.cxx
   pqFieldSelectionAdaptor.h
+  pqFixStateFilenamesDialog.cxx
+  pqFixStateFilenamesDialog.h
   pqGlobalRenderViewOptions.cxx
   pqGlobalRenderViewOptions.h
   pqGlyphPanel.cxx

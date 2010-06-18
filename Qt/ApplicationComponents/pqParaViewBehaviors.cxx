@@ -39,6 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqDataTimeStepBehavior.h"
 #include "pqDefaultViewBehavior.h"
 #include "pqDeleteBehavior.h"
+#include "pqFixPathsInStateFilesBehavior.h"
 #include "pqPersistentMainWindowStateBehavior.h"
 #include "pqPluginActionGroupBehavior.h"
 #include "pqPluginDockWidgetsBehavior.h"
@@ -81,6 +82,7 @@ pqParaViewBehaviors::pqParaViewBehaviors(
   new pqAutoLoadPluginXMLBehavior(this);
   new pqPluginDockWidgetsBehavior(mainWindow);
   new pqPluginActionGroupBehavior(mainWindow);
+  new pqFixPathsInStateFilesBehavior(this);
   new pqCommandLineOptionsBehavior(this);
   new pqPersistentMainWindowStateBehavior(mainWindow);
 

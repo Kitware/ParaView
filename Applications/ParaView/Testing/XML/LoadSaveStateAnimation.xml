@@ -28,6 +28,7 @@
   <pqevent object="pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/objectInspector/Delete" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/menubar/menu_File" command="activate" arguments="actionFileLoadServerState" />
   <pqevent object="pqClientMainWindow/FileLoadServerStateDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/temp.pvsm" />
+  <pqevent object="pqClientMainWindow/FixStateFilenamesDialog/buttonBox/1QPushButton0" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/VCRToolbar/1QToolButton1" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/VCRToolbar/1QToolButton1" command="activate" arguments="" />
 </pqevents>

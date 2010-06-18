@@ -255,14 +255,21 @@ public slots:
   void render();
 
 signals:
-  // Fired when a state file is loaded successfully.
-  // GUI components that may have state saved in the XML state file must listen
-  // to this signal and handle process the XML to update their state.
+  /// Fired before a state xml is being loaded. One can add slots for this signal
+  /// and modify the fired xml-element as part of pre-processing before
+  /// attempting to load the state xml. Note that never attempt to connect to
+  /// signal in a delayed fashion i.e using Qt::QueuedConnection etc. since the
+  /// \c root will be destroyed.
+  void aboutToLoadState(vtkPVXMLElement* root);
+
+  /// Fired when a state file is loaded successfully.
+  /// GUI components that may have state saved in the XML state file must listen
+  /// to this signal and handle process the XML to update their state.
   void stateLoaded(vtkPVXMLElement* root, vtkSMProxyLocator* locator);
 
-  // Fired to save state xml. Components that need to save XML state should
-  // listen to this signal and add their XML elements to the root. DO NOT MODIFY
-  // THE ROOT besides adding new children.
+  /// Fired to save state xml. Components that need to save XML state should
+  /// listen to this signal and add their XML elements to the root. DO NOT MODIFY
+  /// THE ROOT besides adding new children.
   void stateSaved(vtkPVXMLElement* root);
 
   /// Fired when the undo stack is set.
