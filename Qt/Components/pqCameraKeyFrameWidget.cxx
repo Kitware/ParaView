@@ -49,6 +49,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QVBoxLayout>
 #include <QHeaderView>
 #include <QDebug>
+#include <QDoubleValidator>
 
 class pqCameraKeyFrameWidget::pqInternal : public Ui::CameraKeyFrameWidget
 {
@@ -63,60 +64,75 @@ public:
     {
     }
 
+  void setupValidators(QObject* parent)
+    {
+    this->position0->setValidator(new QDoubleValidator(parent));
+    this->position1->setValidator(new QDoubleValidator(parent));
+    this->position2->setValidator(new QDoubleValidator(parent));
+
+    this->focalPoint0->setValidator(new QDoubleValidator(parent));
+    this->focalPoint1->setValidator(new QDoubleValidator(parent));
+    this->focalPoint2->setValidator(new QDoubleValidator(parent));
+
+    this->viewUp0->setValidator(new QDoubleValidator(parent));
+    this->viewUp1->setValidator(new QDoubleValidator(parent));
+    this->viewUp2->setValidator(new QDoubleValidator(parent));
+    }
+
   void setPosition(const double pos[3])
     {
-    this->position0->setValue(pos[0]);
-    this->position1->setValue(pos[1]);
-    this->position2->setValue(pos[2]);
+    this->position0->setText(QString::number(pos[0]));
+    this->position1->setText(QString::number(pos[1]));
+    this->position2->setText(QString::number(pos[2]));
     }
 
   const double* position()
     {
-    this->Data[0] = this->position0->value();
-    this->Data[1] = this->position1->value();
-    this->Data[2] = this->position2->value();
+    this->Data[0] = this->position0->text().toDouble();
+    this->Data[1] = this->position1->text().toDouble();
+    this->Data[2] = this->position2->text().toDouble();
     return this->Data;
     }
 
   void setFocalPoint(const double pos[3])
     {
-    this->focalPoint0->setValue(pos[0]);
-    this->focalPoint1->setValue(pos[1]);
-    this->focalPoint2->setValue(pos[2]);
+    this->focalPoint0->setText(QString::number(pos[0]));
+    this->focalPoint1->setText(QString::number(pos[1]));
+    this->focalPoint2->setText(QString::number(pos[2]));
     }
 
   const double* focalPoint()
     {
-    this->Data[0] = this->focalPoint0->value();
-    this->Data[1] = this->focalPoint1->value();
-    this->Data[2] = this->focalPoint2->value();
+    this->Data[0] = this->focalPoint0->text().toDouble();
+    this->Data[1] = this->focalPoint1->text().toDouble();
+    this->Data[2] = this->focalPoint2->text().toDouble();
     return this->Data;
     }
 
   void setViewUp(const double pos[3])
     {
-    this->viewUp0->setValue(pos[0]);
-    this->viewUp1->setValue(pos[1]);
-    this->viewUp2->setValue(pos[2]);
+    this->viewUp0->setText(QString::number(pos[0]));
+    this->viewUp1->setText(QString::number(pos[1]));
+    this->viewUp2->setText(QString::number(pos[2]));
 
-    this->viewUpX->setValue(pos[0]);
-    this->viewUpY->setValue(pos[1]);
-    this->viewUpZ->setValue(pos[2]);
+    this->viewUpX->setText(QString::number(pos[0]));
+    this->viewUpY->setText(QString::number(pos[1]));
+    this->viewUpZ->setText(QString::number(pos[2]));
     }
 
   const double* viewUp_NonPath()
     {
-    this->Data[0] = this->viewUp0->value();
-    this->Data[1] = this->viewUp1->value();
-    this->Data[2] = this->viewUp2->value();
+    this->Data[0] = this->viewUp0->text().toDouble();
+    this->Data[1] = this->viewUp1->text().toDouble();
+    this->Data[2] = this->viewUp2->text().toDouble();
     return this->Data;
     }
 
   const double* viewUp_Path()
     {
-    this->Data[0] = this->viewUpX->value();
-    this->Data[1] = this->viewUpY->value();
-    this->Data[2] = this->viewUpZ->value();
+    this->Data[0] = this->viewUpX->text().toDouble();
+    this->Data[1] = this->viewUpY->text().toDouble();
+    this->Data[2] = this->viewUpZ->text().toDouble();
     return this->Data;
     }
 
@@ -137,6 +153,9 @@ pqCameraKeyFrameWidget::pqCameraKeyFrameWidget(QWidget* parentObject)
 {
   this->Internal = new pqInternal();
   this->Internal->setupUi(this);
+
+  // setup validators.
+  this->Internal->setupValidators(this);
 
   // hide the header for the tree widget.
   this->Internal->leftPane->header()->hide();
