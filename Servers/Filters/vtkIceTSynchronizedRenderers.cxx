@@ -44,12 +44,31 @@ public:
     int* width, int* height, int *originX,
     int* originY)
     {
-    this->Superclass::GetTiledSizeAndOrigin(render_state, width, height, originX, originY);
+    int tile_dims[2];
+    this->IceTCompositePass->GetTileDimensions(tile_dims);
+    if (tile_dims[0] > 1 || tile_dims[1]  > 1)
+      {
+      // we have a complicated relationship with tile-scale when we are in
+      // tile-display mode :).
+      int tile_scale[2];
+      double tile_viewport[4];
+      render_state->GetRenderer()->GetRenderWindow()->GetTileScale(tile_scale);
+      render_state->GetRenderer()->GetRenderWindow()->GetTileViewport(tile_viewport);
+      render_state->GetRenderer()->GetRenderWindow()->SetTileScale(1, 1);
+      render_state->GetRenderer()->GetRenderWindow()->SetTileViewport(0,0,1,1);
+      this->Superclass::GetTiledSizeAndOrigin(render_state, width, height, originX, originY);
+      render_state->GetRenderer()->GetRenderWindow()->SetTileScale(tile_scale);
+      render_state->GetRenderer()->GetRenderWindow()->SetTileViewport(tile_viewport);
 
-    *originX *= this->IceTCompositePass->GetTileDimensions()[0];
-    *originY *= this->IceTCompositePass->GetTileDimensions()[1];
-    *width *= this->IceTCompositePass->GetTileDimensions()[0];
-    *height *= this->IceTCompositePass->GetTileDimensions()[1];
+      *originX *= this->IceTCompositePass->GetTileDimensions()[0];
+      *originY *= this->IceTCompositePass->GetTileDimensions()[1];
+      *width *= this->IceTCompositePass->GetTileDimensions()[0];
+      *height *= this->IceTCompositePass->GetTileDimensions()[1];
+      }
+    else
+      {
+      this->Superclass::GetTiledSizeAndOrigin(render_state, width, height, originX, originY);
+      }
     }
 
   vtkIceTCompositePass* IceTCompositePass;

@@ -32,6 +32,8 @@
 #include "vtkPieceScalars.h"
 #include "vtkPolyDataMapper.h"
 #include "vtkSphereSource.h"
+#include "vtkScalarBarActor.h"
+#include "vtkLookupTable.h"
 
 #include "vtkProcessModule.h"
 #include "vtkRemoteConnection.h"
@@ -42,6 +44,17 @@ namespace
 {
   static vtkWeakPointer<vtkPVSynchronizedRenderWindows> SynchronizedWindows;
 
+  //-----------------------------------------------------------------------------
+  void Create2DPipeline(vtkRenderer* ren)
+    {
+    vtkScalarBarActor* repr = vtkScalarBarActor::New();
+    vtkLookupTable* lut = vtkLookupTable::New();
+    lut->Build();
+    repr->SetLookupTable(lut);
+    lut->Delete();
+    ren->AddActor(repr);
+    repr->Delete();
+    }
   //-----------------------------------------------------------------------------
   void CreatePipeline(vtkMultiProcessController* controller, vtkRenderer* renderer)
     {
@@ -149,13 +162,17 @@ vtkPVRenderView::vtkPVRenderView()
   this->NonCompositedRenderer = vtkRenderer::New();
   this->NonCompositedRenderer->EraseOff();
   this->NonCompositedRenderer->InteractiveOff();
+  this->NonCompositedRenderer->SetLayer(2);
   this->NonCompositedRenderer->SetActiveCamera(this->Renderer->GetActiveCamera());
   this->RenderWindow->AddRenderer(this->NonCompositedRenderer);
+  this->RenderWindow->SetNumberOfLayers(3);
 
   // We don't add the LabelRenderer.
 
   // DUMMY SPHERE FOR TESTING
   ::CreatePipeline(vtkMultiProcessController::GetGlobalController(), this->Renderer);
+
+  ::Create2DPipeline(this->NonCompositedRenderer);
 }
 
 //----------------------------------------------------------------------------

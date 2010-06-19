@@ -17,14 +17,15 @@
 #include "vtkCommand.h"
 #include "vtkMultiProcessStream.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVServerInformation.h"
 #include "vtkProcessModule.h"
 #include "vtkRemoteConnection.h"
+#include "vtkRenderWindow.h"
 #include "vtkRenderer.h"
 #include "vtkRendererCollection.h"
-#include "vtkRenderWindow.h"
 #include "vtkSmartPointer.h"
 #include "vtkSocketController.h"
-#include "vtkPVServerInformation.h"
+#include "vtkTilesHelper.h"
 
 #include <vtkstd/map>
 #include <vtkstd/vector>
@@ -450,7 +451,10 @@ void vtkPVSynchronizedRenderWindows::Render(unsigned int id)
   renderers->InitTraversal();
   while (vtkRenderer* ren = renderers->GetNextItem())
     {
-    ren->DrawOff();
+    if (ren->GetErase() != 0)
+      {
+      ren->DrawOff();
+      }
     }
 
   vtkInternals::VectorOfRenderers::iterator iterRen;
@@ -761,11 +765,24 @@ void vtkPVSynchronizedRenderWindows::UpdateWindowLayout()
       // correctly.
       tile_dims[0] = (tile_dims[0] == 0)? 1 : tile_dims[0];
       tile_dims[1] = (tile_dims[1] == 0)? 1 : tile_dims[1];
-      //this->Internals->SharedRenderWindow->SetTileScale(tile_dims);
       if (in_tile_display_mode)
         {
         // FIXME: handle full-screen case
         this->Internals->SharedRenderWindow->SetSize(400, 400);
+
+        // TileScale and TileViewport must be setup on render window correctly
+        // so that 2D props show up correctly in tile display mode.
+        double tile_viewport[4];
+        vtkTilesHelper* helper = vtkTilesHelper::New();
+        helper->SetTileDimensions(tile_dims);
+        helper->SetTileMullions(server_info->GetTileMullions());
+        helper->SetTileWindowSize(this->Internals->SharedRenderWindow->GetActualSize());
+        helper->GetNormalizedTileViewport(NULL,
+          this->ParallelController->GetLocalProcessId(), tile_viewport);
+        helper->Delete();
+
+        this->Internals->SharedRenderWindow->SetTileScale(tile_dims);
+        this->Internals->SharedRenderWindow->SetTileViewport(tile_viewport);
         }
       else
         {
