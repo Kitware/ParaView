@@ -233,7 +233,9 @@ pqFixStateFilenamesDialog::pqFixStateFilenamesDialog(
       gridLayout->addWidget(label, propnum, 0);
 
       pqFileChooserWidget* fileChooser = new pqFileChooserWidget(this);
-      fileChooser->setObjectName(QString("%1+%2").arg(iter.key()).arg(iter2.key()));
+      fileChooser->setObjectName(iter2.key());
+      fileChooser->setProperty("pq_proxy_key", iter.key());
+      fileChooser->setProperty("pq_property_key", iter2.key());
       fileChooser->setForceSingleFile(!iter2.value().SupportsMultiple);
       fileChooser->setUseDirectoryMode(iter2.value().IsDirectory);
       fileChooser->setFilenames(iter2.value().Values);
@@ -264,9 +266,11 @@ void pqFixStateFilenamesDialog::onFileNamesChanged()
   pqFileChooserWidget* file_widget =
     qobject_cast<pqFileChooserWidget*>(this->sender());
   QStringList parts = file_widget->objectName().split('+');
+  int key1 = file_widget->property("pq_proxy_key").toInt();
+  QString key2 = file_widget->property("pq_property_key").toString();
 
   pqInternals::PropertyInfo& info =
-    this->Internals->PropertiesMap[parts[0].toInt()][parts[1]];
+    this->Internals->PropertiesMap[key1][key2];
 
   QStringList filenames = file_widget->filenames();
   if (info.Values != filenames)
