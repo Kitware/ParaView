@@ -23,6 +23,7 @@
 class vtkPVRenderViewProxy;
 class vtkRenderer;
 class vtkPVGenericRenderWindowInteractorObserver;
+class vtkPVGenericRenderWindowInteractorTimer;
 
 class VTK_EXPORT vtkPVGenericRenderWindowInteractor : public vtkRenderWindowInteractor
 {
@@ -35,22 +36,12 @@ public:
   vtkGetObjectMacro(PVRenderView, vtkPVRenderViewProxy);
 
   // Description:
-  // Fire various events, SetEventInformation should be called just prior
-  // to calling any of these methods.  This methods will Invoke the 
-  // corresponding vtk event.
-  virtual void ConfigureEvent();
-
-  // Description:
   // My sollution to the poked renderer problem.
   // This interactor class always returns this renderer as poked render.
   // This insures the 2D renderer will never be poked.
   void SetRenderer(vtkRenderer *view);
   vtkGetObjectMacro(Renderer,vtkRenderer);
   virtual vtkRenderer *FindPokedRenderer(int,int);
-
-  // Description:
-  // Set the event onformation, but remember keys from before.
-  void SetMoveEventInformationFlipY(int x, int y);
 
   // Description:
   // 3D widgets call render on this interactor directly.
@@ -62,11 +53,27 @@ public:
   vtkBooleanMacro(InteractiveRenderEnabled,int);
 
   // Description:
+  // vtkPVGenericRenderWindowInteractor allows applications to support
+  // "delayed-switch-to-non-interative-render" mode i.e. when user stops
+  // interacting, the application does not want the scene to be immediately
+  // rendered in non-interactive mode, but wait for a few seconds. This will
+  // allow the user to do multiple adjustments while staying locked in the
+  // interactive mode. For that, the application must first set
+  // SetNonInteractiveRenderDelay(unsigned long milliseconds). If
+  // milliseconds==0, then the application switches to non-interactive mode
+  // immediately.
+  // Note, currently delayed render is only supported when compiled with
+  // VTK_USE_QVTK set to ON.
+  vtkSetMacro(NonInteractiveRenderDelay, unsigned long);
+  vtkGetMacro(NonInteractiveRenderDelay, unsigned long);
+
+  // Description:
   // Triggers a render.
   virtual void Render();
 
   // Description:
-  // Methods broadcasted to the satellites to synchronize 3D widgets.
+  // These methods merely call SetEventInformation() and then fire the
+  // appropriate vtk-event.
   virtual void OnLeftPress(int x, int y, int control, int shift);
   virtual void OnMiddlePress(int x, int y, int control, int shift);
   virtual void OnRightPress(int x, int y, int control, int shift);
@@ -98,13 +105,21 @@ protected:
   int InteractiveRenderEnabled;
   vtkRenderer* Renderer;
 
+  unsigned long NonInteractiveRenderDelay;
   double CenterOfRotation[3];
 
 private:
   vtkPVGenericRenderWindowInteractor(const vtkPVGenericRenderWindowInteractor&); // Not implemented
   void operator=(const vtkPVGenericRenderWindowInteractor&); // Not implemented
 
+  friend class vtkPVGenericRenderWindowInteractorTimer;
+
+  vtkPVGenericRenderWindowInteractorTimer* Timer;
   vtkPVGenericRenderWindowInteractorObserver* Observer;
+
+  bool ForceInteractiveRender;
+  vtkSetMacro(ForceInteractiveRender, bool);
+  void DisableInteractiveRenderInternal();
 };
 
 #endif
