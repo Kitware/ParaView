@@ -41,13 +41,12 @@ class vtkPVGenericRenderWindowInteractorTimer : public
 
 public:
   static vtkPVGenericRenderWindowInteractorTimer* New();
-  vtkTypeMacro(vtkPVGenericRenderWindowInteractorTimer,
 #ifdef VTK_USE_QVTK
-    QVTKInteractor
+  vtkTypeMacro(vtkPVGenericRenderWindowInteractorTimer, QVTKInteractor);
 #else
-    vtkRenderWindowInteractor
+  vtkTypeMacro(vtkPVGenericRenderWindowInteractorTimer,
+    vtkRenderWindowInteractor);
 #endif
-  )
 
   void Timeout(unsigned long timeout)
     {
