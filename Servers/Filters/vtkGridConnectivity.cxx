@@ -1523,11 +1523,11 @@ double vtkGridConnectivity::IntegrateHex(vtkCell* hex)
 
   // For volume, I will tetrahedralize and add the volume of each tetra.
   double volume = 0.0;
-  volume += this->ComputeTetrahedronVolume(pts[0],pts[1],pts[2],pts[4]);
-  volume += this->ComputeTetrahedronVolume(pts[5],pts[7],pts[1],pts[4]);
-  volume += this->ComputeTetrahedronVolume(pts[6],pts[7],pts[4],pts[2]);
-  volume += this->ComputeTetrahedronVolume(pts[1],pts[7],pts[3],pts[2]);
-  volume += this->ComputeTetrahedronVolume(pts[4],pts[7],pts[1],pts[2]);
+  volume += this->ComputeTetrahedronVolume(pts[0],pts[1],pts[3],pts[4]);
+  volume += this->ComputeTetrahedronVolume(pts[5],pts[6],pts[1],pts[4]);
+  volume += this->ComputeTetrahedronVolume(pts[7],pts[6],pts[4],pts[3]);
+  volume += this->ComputeTetrahedronVolume(pts[1],pts[6],pts[2],pts[3]);
+  volume += this->ComputeTetrahedronVolume(pts[4],pts[6],pts[1],pts[3]);
 
   return volume;
 }
