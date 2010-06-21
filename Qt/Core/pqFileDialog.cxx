@@ -762,7 +762,15 @@ void pqFileDialog::onDoubleClickFile(const QModelIndex& index)
     actual_index = this->Implementation->FileFilter.mapToSource(actual_index);
 
   QStringList selected_files;
-  selected_files << this->Implementation->Model->getFilePaths(actual_index);
+  QStringList paths;
+  QString path;
+
+  paths = this->Implementation->Model->getFilePaths(actual_index);
+  foreach(path, paths)
+    {
+    selected_files <<
+      this->Implementation->Model->absoluteFilePath( path );
+    }
 
   this->acceptInternal(selected_files,true);
 }
