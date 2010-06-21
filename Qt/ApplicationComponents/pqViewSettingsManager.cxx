@@ -31,14 +31,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqViewSettingsManager.h"
 
-#include "pqActiveChartOptions.h"
 #include "pqActiveXYChartOptions.h"
 #include "pqActiveObjects.h"
 #include "pqActiveRenderViewOptions.h"
 #include "pqActiveTwoDRenderViewOptions.h"
 #include "pqApplicationCore.h"
-#include "pqBarChartView.h"
-#include "pqLineChartView.h"
 #include "pqXYChartView.h"
 #include "pqXYBarChartView.h"
 #include "pqPluginManager.h"
@@ -50,11 +47,8 @@ pqViewSettingsManager::pqViewSettingsManager(QObject* parentObject)
   : Superclass(parentObject)
 {
   this->setRenderViewOptions(new pqActiveRenderViewOptions(this));
-  pqActiveChartOptions *chartOptions = new pqActiveChartOptions(this);
   pqActiveXYChartOptions *xyChartOptions = new pqActiveXYChartOptions(this);
   pqActiveXYChartOptions *xyBarChartOptions = new pqActiveXYChartOptions(this);
-  this->registerOptions(pqBarChartView::barChartViewType(), chartOptions);
-  this->registerOptions(pqLineChartView::lineChartViewType(), chartOptions);
   this->registerOptions(pqXYChartView::XYChartViewType(), xyChartOptions);
   this->registerOptions(pqXYBarChartView::XYBarChartViewType(), xyBarChartOptions);
   pqActiveTwoDRenderViewOptions* twoDOptions =

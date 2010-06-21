@@ -2268,57 +2268,6 @@
     <!-- Group for internal filters -->
 
     <!-- ==================================================================== -->
-    <SourceProxy name="ChartRepresentationPreprocessor"
-       class="vtkBlockDeliveryPreprocessor">
-       <Documentation>
-         vtkBlockDeliveryPreprocessor is an internal filter. This is used by
-         chart representations to preprocess the table that is delivered to the
-         client.
-       </Documentation>
-
-       <InputProperty name="Input"
-         command="SetInputConnection">
-         <Documentation>
-           This property specifies the input to the Extract Datasets filter.
-         </Documentation>
-       </InputProperty>
-
-       <IntVectorProperty name="FieldAssociation"
-         command="SetFieldAssociation"
-         number_of_elements="1"
-         default_values="0">
-         <Documentation>
-           Select the attribute data to pass.
-         </Documentation>
-         <FieldDataDomain name="enum"
-            enable_field_data="1"
-            disable_update_domain_entries="1" >
-           <RequiredProperties>
-              <Property name="Input" function="Input"/>
-           </RequiredProperties>
-         </FieldDataDomain>
-       </IntVectorProperty>
-
-       <IntVectorProperty name="CompositeDataSetIndex"
-         command="SetCompositeDataSetIndex"
-         number_of_elements="1"
-         default_values="0">
-         <Documentation>
-           In case of Composite datasets, set the flat index of the dataset to 
-           pass. The flat index must point to a non-empty, non-composite dataset 
-           for anything to be passed through. If the input is not a composite 
-           dataset, then this index is ignored.
-         </Documentation>
-         <CompositeTreeDomain name="tree" mode="leaves">
-           <RequiredProperties>
-              <Property name="Input" function="Input"/>
-           </RequiredProperties>
-        </CompositeTreeDomain>
-       </IntVectorProperty>
-    <!-- End of ChartRepresentationPreprocessor -->
-    </SourceProxy>
-
-    <!-- ==================================================================== -->
     <SourceProxy name="XYChartRepresentationPreprocessor"
        class="vtkBlockDeliveryPreprocessor">
        <Documentation>

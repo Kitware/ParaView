@@ -40,13 +40,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QDebug>
 
 #include "pqApplicationCore.h"
-#include "pqBarChartDisplayPanel.h"
 #include "pqDisplayPanelDecoratorInterface.h"
 #include "pqDisplayPanelInterface.h"
 #include "pqDisplayPolicy.h"
 #include "pqDisplayProxyEditor.h"
-#include "pqLineChartDisplayPanel.h"
 #include "pqOutputPort.h"
+#include "pqParallelCoordinatesChartDisplayPanel.h"
 #include "pqPipelineRepresentation.h"
 #include "pqPipelineSource.h"
 #include "pqPluginManager.h"
@@ -55,10 +54,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSpreadSheetDisplayEditor.h"
 #include "pqTextDisplayPropertiesWidget.h"
 #include "pqTextRepresentation.h"
-#include "pqXYChartDisplayPanel.h"
-#include "pqParallelCoordinatesChartDisplayPanel.h"
 #include "pqUndoStack.h"
 #include "pqView.h"
+#include "pqXYChartDisplayPanel.h"
 
 /// standard display panels
 class pqStandardDisplayPanels : public QObject,
@@ -104,11 +102,6 @@ public:
       }
 
     QString type = proxy->getProxy()->GetXMLName();
-
-    if (type == QString("XYPlotRepresentation"))
-      {
-      return new pqLineChartDisplayPanel(proxy, p);
-      }
     if (type == QString("XYChartRepresentation"))
       {
       return new pqXYChartDisplayPanel(proxy, p);
@@ -117,11 +110,6 @@ public:
       {
       return new pqXYChartDisplayPanel(proxy, p);
       }
-    if (type == QString("BarChartRepresentation"))
-      {
-      return new pqBarChartDisplayPanel(proxy, p);
-      }
-
     if (type == "SpreadSheetRepresentation")
       {
       return new pqSpreadSheetDisplayEditor(proxy, p);

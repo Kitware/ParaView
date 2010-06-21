@@ -41,17 +41,12 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqAnimationCue.h
   pqAnimationScene.h
   pqApplicationCore.h
-  pqBarChartView.h
   pqBrandPluginsLoader.h
   pqChartRepresentation.h
-  pqChartView.h
   pqContextView.h
   pqColorButtonEventPlayer.h
   pqColorButtonEventTranslator.h
   pqCommandServerStartup.h
-  pqComparativeBarChartView.h
-  pqComparativeChartView.h
-  pqComparativeLineChartView.h
   pqComparativeRenderView.h
   pqCoreTestUtility.h
   pqDataRepresentation.h
@@ -66,7 +61,6 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqFormBuilder.h
   pqHelperProxyStateLoader.h
   pqHistogramTableModel.h
-  pqLineChartView.h
   pqLinksModel.h
   pqLinkViewWidget.h
   pqLookupTableManager.h
@@ -183,14 +177,10 @@ ADD_LIBRARY(pqCore
   pqAnimationSceneImageWriter.h
   pqApplicationCore.cxx
   pqApplicationCore.h
-  pqBarChartView.cxx
-  pqBarChartView.h
   pqBrandPluginsLoader.cxx
   pqBrandPluginsLoader.h
   pqChartRepresentation.cxx
   pqChartRepresentation.h
-  pqChartView.cxx
-  pqChartView.h
   pqContextView.cxx
   pqContextView.h
   pqColorButtonEventPlayer.cxx
@@ -199,12 +189,6 @@ ADD_LIBRARY(pqCore
   pqColorButtonEventTranslator.h
   pqCommandServerStartup.cxx
   pqCommandServerStartup.h
-  pqComparativeBarChartView.cxx
-  pqComparativeBarChartView.h
-  pqComparativeChartView.cxx
-  pqComparativeChartView.h
-  pqComparativeLineChartView.cxx
-  pqComparativeLineChartView.h
   pqComparativeRenderView.cxx
   pqComparativeRenderView.h
   pqCoreExport.h
@@ -246,8 +230,6 @@ ADD_LIBRARY(pqCore
   pqHistogramTableModel.h
   pqImageUtil.cxx
   pqImageUtil.h
-  pqLineChartView.cxx
-  pqLineChartView.h
   pqLinksModel.cxx
   pqLinksModel.h
   pqLinkViewWidget.cxx

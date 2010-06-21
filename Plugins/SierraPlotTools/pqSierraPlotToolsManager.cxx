@@ -56,7 +56,7 @@
 #include "pqActiveView.h"
 #include "pqApplicationCore.h"
 #include "pqDisplayPolicy.h"
-#include "pqLineChartView.h"
+#include "pqXYChartView.h"
 #include "pqObjectBuilder.h"
 #include "pqOutputPort.h"
 #include "pqPipelineRepresentation.h"
@@ -722,7 +722,7 @@ pqView *pqSierraPlotToolsManager::getMeshView()
 pqView *pqSierraPlotToolsManager::getPlotView()
 {
   return this->findView(this->getPlotFilter(), 0,
-                        pqLineChartView::lineChartViewType());
+                        pqXYChartView::XYChartViewType());
 }
 
 //-----------------------------------------------------------------------------

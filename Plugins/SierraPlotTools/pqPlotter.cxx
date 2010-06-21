@@ -27,7 +27,7 @@
 #include "pqActiveView.h"
 #include "pqApplicationCore.h"
 #include "pqDataRepresentation.h"
-#include "pqLineChartView.h"
+#include "pqXYChartView.h"
 #include "pqObjectBuilder.h"
 #include "pqPipelineRepresentation.h"
 #include "pqPipelineSource.h"
@@ -603,7 +603,7 @@ pqView * pqPlotter::findView(pqPipelineSource *source, int port,
 pqView * pqPlotter::getPlotView(pqPipelineSource * plotFilter)
 {
   return this->findView(plotFilter, 0,
-                        pqLineChartView::lineChartViewType());
+                        pqXYChartView::XYChartViewType());
 }
 
 //-----------------------------------------------------------------------------

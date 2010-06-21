@@ -21,7 +21,6 @@
 #include "vtkErrorCode.h"
 
 #include "vtkObjectFactory.h"
-#include "vtkSMChartOptionsProxy.h"
 #include "vtkSMUtilities.h"
 
 #include "QVTKWidget.h"

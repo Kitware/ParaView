@@ -56,8 +56,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqAnimationModel.h"
 #include "pqAnimationTrack.h"
 #include "pqApplicationCore.h"
-#include "pqComparativeChartView.h"
-#include "pqComparativeRenderView.h"
 #include "pqPipelineSource.h"
 #include "pqPropertyLinks.h"
 #include "pqServer.h"
@@ -67,6 +65,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSMProxy.h"
 #include "pqTimeKeeper.h"
 #include "pqUndoStack.h"
+#include "pqView.h"
 
 class pqComparativeVisPanel::pqInternal : public Ui::pqComparativeVisPanel
 {
@@ -266,9 +265,11 @@ void pqComparativeVisPanel::setView(pqView* _view)
   this->Internal->View = _view;
   this->Internal->activeParameters->clearContents();
 
+  vtkSMComparativeViewProxy* viewProxy = _view?
+    vtkSMComparativeViewProxy::SafeDownCast(_view->getProxy()) : NULL;
+
   // View must be a comparative render/plot view
-  if (!qobject_cast<pqComparativeRenderView*>(_view)
-      && !qobject_cast<pqComparativeChartView*>(_view))
+  if (viewProxy == NULL)
     {
     this->Internal->View = 0;
     this->setEnabled(false);
@@ -279,8 +280,7 @@ void pqComparativeVisPanel::setView(pqView* _view)
     SIGNAL(valuesChanged()),
     this->Internal->View, SLOT(render()));
 
-  vtkSMComparativeViewProxy* viewProxy =
-    vtkSMComparativeViewProxy::SafeDownCast(_view->getProxy());
+
   this->setEnabled(true);
 
   // Connect layoutX spinbox value to vtkSMComparativeViewProxy's "Dimensions" property

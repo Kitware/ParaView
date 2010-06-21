@@ -227,16 +227,9 @@ SET(Kit_SRCS
 IF (VTK_USE_QVTK)
   SET (Kit_SRCS
     ${Kit_SRCS}
-    vtkSMBarChartViewProxy.cxx
-    vtkSMChartingArraysInformationHelper.cxx
-    vtkSMChartNamedOptionsModelProxy.cxx
-    vtkSMChartOptionsProxy.cxx
-    vtkSMChartRepresentationProxy.cxx
-    vtkSMChartViewProxy.cxx
-    vtkSMContextNamedOptionsProxy.cxx
     vtkSMContextArraysInformationHelper.cxx
+    vtkSMContextNamedOptionsProxy.cxx
     vtkSMContextViewProxy.cxx
-    vtkSMLineChartViewProxy.cxx
     vtkSMParallelCoordinatesRepresentationProxy.cxx
     vtkSMXYChartRepresentationProxy.cxx
     vtkSMXYChartViewProxy.cxx
@@ -252,7 +245,6 @@ IF (VTK_USE_QVTK)
     ${ParaView_BINARY_DIR}/VTK/GUISupport/Qt/Chart)
 
   SET_SOURCE_FILES_PROPERTIES(
-    vtkSMChartViewProxy.cxx
     vtkSMContextViewProxy.cxx
     ABSTRACT)
 ENDIF (VTK_USE_QVTK)
