@@ -254,18 +254,14 @@ public:
       helper->Delete();
       helper->UpdateVTKObjects();
       helper->UpdatePropertyInformation();
-      QString separator = pqSMAdaptor::getElementProperty(
-        helper->GetProperty("PathSeparator")).toString();
-      this->Separator = separator.toAscii().data()[0];
       }
     else
       {
       vtkPVFileInformationHelper* helper = vtkPVFileInformationHelper::New();
       this->FileInformationHelper = helper;
       helper->Delete();
-      this->Separator = helper->GetPathSeparator()[0];
       }
-
+    this->Separator = '/'; //we now are always generating UNIX paths
     this->FileInformation.TakeReference(vtkPVFileInformation::New());
 
     // current path

@@ -630,7 +630,7 @@ void pqFileDialog::onModelReset()
   QChar separator = this->Implementation->Model->separator();
   QStringList parents = currentPath.split(separator, QString::SkipEmptyParts);
 
-  // put our root back in,  could be \\ (UNC), \ (Windows), / (Unix)
+  // put our root back in
   if(parents.count())
     {
     int idx = currentPath.indexOf(parents[0]);
@@ -657,8 +657,7 @@ void pqFileDialog::onModelReset()
       }
     this->Implementation->Ui.Parents->addItem(str);
     }
-
-  this->Implementation->Ui.Parents->setCurrentIndex(parents.size() - 1);
+   this->Implementation->Ui.Parents->setCurrentIndex(parents.size() - 1);
 }
 
 //-----------------------------------------------------------------------------
