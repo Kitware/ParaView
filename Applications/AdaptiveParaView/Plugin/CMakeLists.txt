@@ -146,8 +146,7 @@ IF (PARAVIEW_ENABLE_PYTHON)
     vtkPVSGeometryInformation.cxx
     vtkSMAdaptiveViewHelper.cxx
     )
-  #temporarily disabled so I can use pv_plugin_path in peace, the python wrapped lib contains widgets and paravew tries to create them twice if both pywrapped and non pywrapped are visible
-  #WRAP_PLUGIN_FOR_PYTHON(AdaptivePlugin "${ADAPTIVE_SS_SOURCES}" "${DONT_WRAP_LIST}")
+  WRAP_PLUGIN_FOR_PYTHON(AdaptivePlugin "${ADAPTIVE_SS_SOURCES}" "${DONT_WRAP_LIST}")
 ENDIF (PARAVIEW_ENABLE_PYTHON)
 
 #configure regression tests
