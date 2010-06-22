@@ -53,7 +53,10 @@ def Connect(ds_host=None, ds_port=11111, rs_host=None, rs_port=11111):
     > Connect("amber", 11111, "vis_cluster", 11111) # connect to data server, render server pair"""
     _disconnect()
     cid = servermanager.Connect(ds_host, ds_port, rs_host, rs_port)
-    servermanager.ProxyManager().RegisterProxy("timekeeper", "tk", servermanager.misc.TimeKeeper())
+    tk =  servermanager.misc.TimeKeeper()
+    servermanager.ProxyManager().RegisterProxy("timekeeper", "tk", tk)
+    scene = AnimationScene()
+    scene.TimeKeeper = tk
     return cid
 
 def ReverseConnect(port=11111):
@@ -61,7 +64,10 @@ def ReverseConnect(port=11111):
     an incoming connection from the server."""
     _disconnect()
     cid = servermanager.ReverseConnect(port)
-    servermanager.ProxyManager().RegisterProxy("timekeeper", "tk", servermanager.misc.TimeKeeper())
+    tk =  servermanager.misc.TimeKeeper()
+    servermanager.ProxyManager().RegisterProxy("timekeeper", "tk", tk)
+    scene = AnimationScene()
+    scene.TimeKeeper = tk
     return cid
 
 def _create_view(view_xml_name):
@@ -76,7 +82,12 @@ def _create_view(view_xml_name):
     views = tk.Views
     if not view in views:
         views.append(view)
-
+    try:
+        scene = GetAnimationScene()
+        if not view in scene.ViewModules:
+            scene.ViewModules.append(view)
+    except servermanager.MissingProxy:
+        pass
     return view
 
 def CreateRenderView():
@@ -597,7 +608,8 @@ def _func_name_valid(name):
     return valid
 
 def _add_functions(g):
-    for m in [servermanager.filters, servermanager.sources, servermanager.writers]:
+    for m in [servermanager.filters, servermanager.sources,
+              servermanager.writers, servermanager.animation]:
         dt = m.__dict__
         for key in dt.keys():
             cl = dt[key]
@@ -626,6 +638,94 @@ def GetActiveCamera():
     """Returns the active camera for the active view. The returned object
     is an instance of vtkCamera."""
     return GetActiveView().GetActiveCamera()
+
+def GetAnimationScene():
+    """Returns the application-wide animation scene. ParaView has only one
+    global animation scene. This method provides access to that. Users are
+    free to create additional animation scenes directly, but those scenes
+    won't be shown in the ParaView GUI."""
+    animation_proxies = servermanager.ProxyManager().GetProxiesInGroup("animation")
+    scene = None
+    for aProxy in animation_proxies.values():
+        if aProxy.GetXMLName() == "AnimationScene":
+            scene = aProxy
+            break
+    if not scene:
+        raise servermanager.MissingProxy, "Could not locate global AnimationScene."
+    return scene
+
+def GetAnimationTrack(propertyname_or_property, index=None, proxy=None):
+    """Returns an animation cue for the property. If one doesn't exist then a
+    new one will be created.
+    Typical usage:
+        track = GetAnimationTrack("Center", 0, sphere) or
+        track = GetAnimationTrack(sphere.GetProperty("Radius"))
+    """
+    if not proxy:
+        proxy = GetActiveSource()
+    if not isinstance(proxy, servermanager.Proxy):
+        raise TypeError, "proxy must be a servermanager.Proxy instance"
+    if isinstance(propertyname_or_property, str):
+        propertyname = propertyname_or_property
+        prop = proxy.GetProperty(propertyname)
+    elif isinstance(propertyname, servermanager.Property):
+        prop = propertyname_or_property
+        propertyname = prop.Name
+    else:
+        raise TypeError, "propertyname_or_property must be a string or servermanager.Property"
+
+    scene = GetAnimationScene()
+    for cue in scene.Cues:
+        try:
+            if cue.AnimatedProxy == prop.Proxy and\
+               cue.AnimatedPropertyName == prop.Name:
+                if index == None or index == cue.AnimatedElement:
+                    return cue
+        except AttributeError:
+            pass
+    # matching animation track wasn't found, create a new one.
+    cue = KeyFrameAnimationCue()
+    cue.AnimatedProxy = prop.Proxy
+    cue.AnimatedPropertyName = prop.Name
+    if index != None:
+        cue.AnimatedElement = index
+    scene.Cues.append(cue)
+    return cue
+
+def GetCameraTrack(view=None):
+    """Returns the camera animation track for the given view. If no view is
+    specified, active view will be used. If no exisiting camera animation track
+    is found, a new one will be created."""
+    if not view:
+        view = GetActiveView()
+    if not view:
+        raise ValueError, "No view specified"
+    scene = GetAnimationScene()
+    for cue in scene.Cues:
+        if cue.AnimatedProxy == view and\
+           cue.GetXMLName() == "CameraAnimationCue":
+            return cue
+    # no cue was found, create a new one.
+    cue = CameraAnimationCue()
+    cue.AnimatedProxy = view
+    scene.Cues.append(cue)
+    return cue
+
+def GetTimeTrack():
+    """Returns the animation track used to control the time requested from all
+    readers/filters during playback.
+    This is the "TimeKeeper - Time" track shown in ParaView's 'Animation View'.
+    If none exists, a new one will be created."""
+    scene = GetAnimationScene()
+    tk = scene.TimeKeeper
+    for cue in scene.Cues:
+        if cue.GetXMLName() == "TimeAnimationCue" and cue.AnimatedProxy == tk:
+            return cue
+    # no cue was found, create a new one.
+    cue = TimeAnimationCue()
+    cue.AnimatedProxy = tk
+    scene.Cues.append(cue)
+    return cue
 
 def LoadXML(xmlstring, ns=None):
     """Given a server manager XML as a string, parse and process it.

@@ -532,6 +532,9 @@ class Property(object):
         "Unknown attribute requests get forwarded to SMProperty."
         return getattr(self.SMProperty, name)
 
+    Name = property(_FindPropertyName, None, None,
+           "Returns the name for the property")
+
 class GenericIterator(object):
     """Iterator for container type objects"""
 
@@ -2578,6 +2581,8 @@ def __determineGroup(proxy):
         return "implicit_functions"
     elif xmlgroup == "piecewise_functions":
         return "piecewise_functions"
+    elif xmlgroup == "animation" or xmlgroup == "animation_keyframes":
+        return "animation"
     return None
 
 __nameCounter = {}
@@ -2603,6 +2608,10 @@ def __getName(proxy, group):
 class MissingRegistrationInformation(Exception):
     """Exception for missing registration information. Raised when a name or group 
     is not specified or when a group cannot be deduced."""
+    pass
+
+class MissingProxy(Exception):
+    """Exception fired when the requested proxy is missing."""
     pass
     
 def Register(proxy, **extraArgs):

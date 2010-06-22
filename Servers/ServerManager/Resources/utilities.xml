@@ -1371,6 +1371,7 @@
         name="KeyFrames"
         command="AddKeyFrame"
         remove_command="RemoveKeyFrame"
+        repeat_command="1"
         update_self="1">
         <ProxyGroupDomain name="groups">
           <Group name="animation_keyframes" />
