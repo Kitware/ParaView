@@ -130,7 +130,7 @@ int vtkSMArrayListDomain::RemoveString(const char* string)
 //---------------------------------------------------------------------------
 void vtkSMArrayListDomain::AddArrays(vtkSMSourceProxy* sp,
                                      int outputport,
-                                     vtkPVDataSetAttributesInformation* info, 
+                                     vtkPVDataSetAttributesInformation* info,
                                      vtkSMInputArrayDomain* iad,
                                      int association)
 {
@@ -185,7 +185,7 @@ void vtkSMArrayListDomain::AddArrays(vtkSMSourceProxy* sp,
 }
 
 //---------------------------------------------------------------------------
-void vtkSMArrayListDomain::Update(vtkSMSourceProxy* sp, 
+void vtkSMArrayListDomain::Update(vtkSMSourceProxy* sp,
                                   vtkSMInputArrayDomain* iad,
                                   int outputport)
 {
@@ -305,11 +305,11 @@ void vtkSMArrayListDomain::Update(vtkSMProxyProperty* pp)
   unsigned int numProxs = pp->GetNumberOfUncheckedProxies();
   for (i=0; i<numProxs; i++)
     {
-    vtkSMSourceProxy* sp = 
+    vtkSMSourceProxy* sp =
       vtkSMSourceProxy::SafeDownCast(pp->GetUncheckedProxy(i));
     if (sp)
       {
-      this->Update(pp, sp, 
+      this->Update(pp, sp,
         (ip? ip->GetUncheckedOutputPortForConnection(i) : 0));
       return;
       }
@@ -320,7 +320,7 @@ void vtkSMArrayListDomain::Update(vtkSMProxyProperty* pp)
   numProxs = pp->GetNumberOfProxies();
   for (i=0; i<numProxs; i++)
     {
-    vtkSMSourceProxy* sp = 
+    vtkSMSourceProxy* sp =
       vtkSMSourceProxy::SafeDownCast(pp->GetProxy(i));
     if (sp)
       {
@@ -338,7 +338,7 @@ void vtkSMArrayListDomain::Update(vtkSMProperty*)
   if (this->NoneString)
     {
     this->AddString(this->NoneString);
-    this->ALDInternals->FieldAssociation[0] = 
+    this->ALDInternals->FieldAssociation[0] =
       vtkDataObject::NUMBER_OF_ASSOCIATIONS;
     }
 
@@ -356,7 +356,7 @@ int vtkSMArrayListDomain::ReadXMLAttributes(
 {
   this->Superclass::ReadXMLAttributes(prop, element);
 
-  const char* input_domain_name = 
+  const char* input_domain_name =
     element->GetAttribute("input_domain_name");
   if (input_domain_name)
     {
@@ -526,6 +526,26 @@ int vtkSMArrayListDomain::ReadXMLAttributes(
       else if ( thisType=="VTK_UNSIGNED___INT64" )
         {
         this->ALDInternals->DataTypes.push_back(VTK_UNSIGNED___INT64);
+        }
+      else if ( thisType=="VTK_DATA_ARRAY" )
+        {
+          this->ALDInternals->DataTypes.push_back(VTK_BIT);
+          this->ALDInternals->DataTypes.push_back(VTK_CHAR);
+          this->ALDInternals->DataTypes.push_back(VTK_SIGNED_CHAR);
+          this->ALDInternals->DataTypes.push_back(VTK_UNSIGNED_CHAR);
+          this->ALDInternals->DataTypes.push_back(VTK_SHORT);
+          this->ALDInternals->DataTypes.push_back(VTK_UNSIGNED_SHORT);
+          this->ALDInternals->DataTypes.push_back(VTK_INT);
+          this->ALDInternals->DataTypes.push_back(VTK_UNSIGNED_INT);
+          this->ALDInternals->DataTypes.push_back(VTK_LONG);
+          this->ALDInternals->DataTypes.push_back(VTK_FLOAT);
+          this->ALDInternals->DataTypes.push_back(VTK_DOUBLE);
+          this->ALDInternals->DataTypes.push_back(VTK_ID_TYPE);
+          this->ALDInternals->DataTypes.push_back(VTK_LONG_LONG);
+          this->ALDInternals->DataTypes.push_back(VTK_UNSIGNED_LONG);
+          this->ALDInternals->DataTypes.push_back(VTK_UNSIGNED_LONG_LONG);
+          this->ALDInternals->DataTypes.push_back(VTK___INT64);
+          this->ALDInternals->DataTypes.push_back(VTK_UNSIGNED___INT64);
         }
       else
         {
