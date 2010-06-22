@@ -29,6 +29,7 @@ vtkSMGlyph3DMapperRepresentationProxy::vtkSMGlyph3DMapperRepresentationProxy()
 {
   this->GlyphMapper = 0;
   this->SourceOutputPort = 0;
+  this->GlyphSourceStrategy = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -65,6 +66,14 @@ void vtkSMGlyph3DMapperRepresentationProxy::AddInput(
 
   this->Source = input;
   this->SourceOutputPort = outputPort;
+
+  // FIXME: Uncomment this once the glyph mapper starts working correctly.
+  //if (this->GlyphSourceStrategy)
+  //  {
+  //  vtkSMPropertyHelper(this->GlyphSourceStrategy, "Input").Set(
+  //    this->Source, this->SourceOutputPort);
+  //  this->GlyphSourceStrategy->UpdateVTKObjects();
+  //  }
 }
 
 //----------------------------------------------------------------------------
@@ -90,7 +99,7 @@ bool vtkSMGlyph3DMapperRepresentationProxy::EndCreateVTKObjects()
     }
 
   // Switch the mapper to use the GlyphMapper instead of the standard mapper.
-  this->Connect(this->GlyphMapper, this->Prop3D, "Mapper");
+  vtkSMPropertyHelper(this->Prop3D, "Mapper").Set(this->GlyphMapper);
   this->GlyphMapper->UpdateVTKObjects();
   return true;
 }
@@ -123,8 +132,20 @@ bool vtkSMGlyph3DMapperRepresentationProxy::InitializeStrategy(vtkSMViewProxy* v
 
   strategy->SetEnableLOD(false);
 
-  this->Connect(this->Source, strategy, "Input", this->SourceOutputPort);
-  this->Connect(strategy->GetOutput(), this->GlyphMapper, "Source");
+  if (this->Source)
+    {
+    Connect(this->Source, strategy, "Input", this->SourceOutputPort);
+    vtkSMPropertyHelper(strategy, "Input").Set(
+      this->Source, this->SourceOutputPort);
+    }
+  else
+    {
+    vtkSMPropertyHelper(strategy, "Input").Set(
+      this->GetSubProxy("DefaultGlyphSource"), 0);
+    }
+  vtkSMPropertyHelper(this->GlyphMapper, "Source").Set(
+    strategy->GetOutput());
+  this->GlyphSourceStrategy = strategy;
 
   // Creates the strategy objects.
   strategy->UpdateVTKObjects();

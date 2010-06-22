@@ -74,6 +74,8 @@ protected:
   vtkSmartPointer<vtkSMProxy> Source;
   unsigned int SourceOutputPort;
   vtkSMProxy* GlyphMapper;
+
+  vtkSMRepresentationStrategy* GlyphSourceStrategy;
 private:
   vtkSMGlyph3DMapperRepresentationProxy(const vtkSMGlyph3DMapperRepresentationProxy&); // Not implemented
   void operator=(const vtkSMGlyph3DMapperRepresentationProxy&); // Not implemented

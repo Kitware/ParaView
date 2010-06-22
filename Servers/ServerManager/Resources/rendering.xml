@@ -10083,6 +10083,11 @@
       </InputProperty>
 
       <SubProxy>
+        <Proxy name="DefaultGlyphSource" proxygroup="sources"
+               proxyname="ArrowSource" />
+      </SubProxy>
+
+      <SubProxy>
         <!-- 
           GlyphMapper for high-res geometry.
         -->
