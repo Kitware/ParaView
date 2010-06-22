@@ -85,6 +85,7 @@ SET(Kit_SRCS
   vtkSMFixedTypeDomain.cxx
   vtkSMGlobalPropertiesManager.cxx
   vtkSMGlobalPropertiesLinkUndoElement.cxx
+  vtkSMGlyph3DMapperRepresentationProxy.cxx
   vtkSMHardwareSelector.cxx
   vtkSMIceTCompositeViewProxy.cxx
   vtkSMIceTDesktopRenderViewProxy.cxx

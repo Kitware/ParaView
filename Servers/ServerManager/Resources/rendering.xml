@@ -1419,6 +1419,200 @@
 
     </SourceProxy>
 
+    <SourceProxy name="Glyph3DMapper" class="vtkGlyph3DMapper"
+      base_proxygroup="mappers" base_proxyname="MapperBase">
+      <Documentation>
+        Mapper for optimized glyph placement.
+        Do the same job than vtkGlyph3D but on the GPU. For this reason, it is
+        a mapper not a vtkPolyDataAlgorithm. Also, some methods of vtkGlyph3D
+        don't make sense in vtkGlyph3DMapper: GeneratePointIds, old-style
+        SetSource, PointIdsName, IsPointVisible.
+      </Documentation>
+
+      <InputProperty name="Input" command="SetInputConnection">
+        <Documentation>
+          Set the input dataset which is to be glyphed.
+        </Documentation>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataSet" />
+        </DataTypeDomain>
+        <InputArrayDomain name="input_array_1" attribute_type="point"
+          number_of_components="1" optional="1"/>
+        <InputArrayDomain name="input_array_3" attribute_type="point"
+          number_of_components="3" optional="1"/>
+        <InputArrayDomain name="input_array_any" attribute_type="point" optional="1"/>
+      </InputProperty>
+
+      <InputProperty name="Source" 
+        command="SetSourceConnection" 
+        label="Glyph Type" >
+        <Documentation>
+          Specify the source objects.
+        </Documentation>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkPolyData" />
+        </DataTypeDomain>
+        <ProxyListDomain name="proxy_list">
+          <Proxy group="sources" name="ArrowSource" />
+          <Proxy group="sources" name="ConeSource" />
+          <Proxy group="sources" name="CubeSource" />
+          <Proxy group="sources" name="CylinderSource" />
+          <Proxy group="sources" name="LineSource" />
+          <Proxy group="sources" name="SphereSource" />
+          <Proxy group="sources" name="GlyphSource2D" />
+        </ProxyListDomain>
+      </InputProperty>
+
+      <StringVectorProperty 
+        name="SelectMaskArray" 
+        command="SetInputArrayToProcess"
+        number_of_elements="5"
+        element_types="0 0 0 0 2"
+        default_values="2"
+        label="Mask Array">
+        <ArrayListDomain name="array_list" attribute_type="Scalars" 
+             input_domain_name="input_array_1">
+          <RequiredProperties>
+             <Property name="Input" function="Input"/>
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Documentation>
+        </Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty 
+        name="SelectScaleArray" 
+        command="SetInputArrayToProcess"
+        number_of_elements="5"
+        element_types="0 0 0 0 2"
+        default_values="0" 
+        label="Scale"> 
+        <ArrayListDomain name="array_list" attribute_type="Scalars"
+             input_domain_name="input_array_any">
+          <RequiredProperties>
+             <Property name="Input" function="Input"/>
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Documentation>
+        </Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty 
+        name="SelectOrientationVectors" 
+        command="SetInputArrayToProcess"
+        number_of_elements="5"
+        element_types="0 0 0 0 2"
+        default_values="3" 
+        label="Orientation Vectors">  
+          <!-- default value=5 so orientation vectors go to the right place -->
+        <ArrayListDomain name="array_list" attribute_type="Vectors"
+             input_domain_name="input_array_2">
+          <RequiredProperties>
+             <Property name="Input" function="Input"/>
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Documentation>
+        </Documentation>
+      </StringVectorProperty>
+
+      <IntVectorProperty name="Scaling"
+        command="SetScaling"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Enable/Disable scaling of source geometry.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="ScaleMode"
+        command="SetScaleMode"
+        number_of_elements="1"
+        default_values="0">
+        <EnumerationDomain name="enum">
+          <Entry text="No Data Scaling Off" value="0" />
+          <Entry text="Magnitude" value="1" />
+          <Entry text="Vector Components" value="2" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+
+      <DoubleVectorProperty name="ScaleFactor"
+        command="SetScaleFactor"
+        number_of_elements="1"
+        default_values="1.0" >
+        <BoundsDomain name="bounds" mode="scaled_extent" scale_factor="0.1">
+          <RequiredProperties>
+             <Property name="Input" function="Input"/>
+          </RequiredProperties>
+        </BoundsDomain>
+        <ArrayRangeDomain name="scalar_range">
+          <RequiredProperties>
+             <Property name="Input" function="Input"/>
+             <Property name="SelectInputScalars" function="ArraySelection"/>
+          </RequiredProperties>
+        </ArrayRangeDomain>
+        <ArrayRangeDomain name="vector_range">
+          <RequiredProperties>
+             <Property name="Input" function="Input"/>
+             <Property name="SelectInputVectors" function="ArraySelection"/>
+          </RequiredProperties>
+        </ArrayRangeDomain>
+        <Documentation>
+          The value of this property will be used as a multiplier for scaling
+          the glyphs before adding them to the output.
+        </Documentation>
+     </DoubleVectorProperty>
+
+      <IntVectorProperty name="Orient" 
+        command="SetOrient" 
+        number_of_elements="1"
+        default_values="0" > 
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          If this property is set to 1, the glyphs will be oriented based on the
+          selected orientation vector array.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="OrientationMode"
+        command="SetOrientationMode"
+        number_of_elements="1"
+        default_values="0">
+        <EnumerationDomain name="enum">
+          <Entry text="Direction" value="0" />
+          <Entry text="Rotation" value="1" />
+        </EnumerationDomain>
+        <Documentation>
+          Orientation mode indicates if the OrientationArray provides the
+          direction vector for the orientation or the rotations around each
+          axes.  Default is DIRECTION.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="Masking"
+        command="SetMasking"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Tells the mapper to skip glyphing input points that haves false values
+          in the mask array. If there is no mask array (id access mode is set
+          and there is no such id, or array name access mode is set and
+          the there is no such name), masking is silently ignored.
+          A mask array is a vtkBitArray with only one component.
+        </Documentation>
+      </IntVectorProperty>
+
+      <DoubleVectorProperty name="BoundsInfo"
+        command="GetBounds"
+        number_of_elements="6"
+        information_only="1"
+        default_values="0 1 0 1 0 1" >
+        <SimpleDoubleInformationHelper />
+      </DoubleVectorProperty>
+      <!-- End of Glyph3DMapper -->
+    </SourceProxy>
+    
   <!-- End of "mappers" -->
   </ProxyGroup>
 
@@ -7517,6 +7711,8 @@
         subproxy="SurfaceRepresentation" text="Surface" subtype="2" />
       <RepresentationType
         subproxy="SurfaceRepresentation" text="Surface With Edges" subtype="3" />
+      <RepresentationType
+        subproxy="Glyph3DRepresentation" text="3D Glyphs" subtype="2" />
 
       <IntVectorProperty
         name="Representation"
@@ -7714,6 +7910,26 @@
           <Exception name="Input" />
           <Exception name="Visibility" />
         </ShareProperties>
+      </SubProxy>
+      <SubProxy>
+        <Proxy name="Glyph3DRepresentation"
+          proxygroup="representations" proxyname="Glyph3DRepresentation" />
+        <ShareProperties subproxy="SurfaceRepresentation">
+          <Exception name="Input" />
+          <Exception name="Visibility" />
+        </ShareProperties>
+        <ExposedProperties>
+          <Property name="Source" />
+          <Property name="SelectMaskArray" />
+          <Property name="SelectScaleArray" />
+          <Property name="SelectOrientationVectors" />
+          <Property name="Scaling" />
+          <Property name="ScaleMode" />
+          <Property name="ScaleFactor" />
+          <Property name="Orient" />
+          <Property name="OrientationMode" />
+          <Property name="Masking" />
+        </ExposedProperties>
       </SubProxy>
     <!-- End of PVRepresentationBase -->
     </PVRepresentationProxy>
@@ -9834,6 +10050,59 @@
       <!-- End of ScatterPlotRepresentation -->
     </ScatterPlotRepresentationProxy>
 
+    <Glyph3DMapperRepresentationProxy name="Glyph3DRepresentation"
+      base_proxygroup="representations" base_proxyname="SurfaceRepresentation">
+      <Documentation>
+        Representation that uses vtkGlyph3DMapper for glyphing.
+      </Documentation>
+
+      <InputProperty name="Source" 
+        command="not-used" 
+        port_index="1"
+        multiple_input="1"
+        label="Glyph Type" >
+        <Documentation>
+          Specify the source objects.
+        </Documentation>
+        <!-- 
+          We don't directly connect to the mapper, since the data produced by
+          the source needs to be delivered to the rendering nodes.
+        -->
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkPolyData" />
+        </DataTypeDomain>
+        <ProxyListDomain name="proxy_list">
+          <Proxy group="sources" name="ArrowSource" />
+          <Proxy group="sources" name="ConeSource" />
+          <Proxy group="sources" name="CubeSource" />
+          <Proxy group="sources" name="CylinderSource" />
+          <Proxy group="sources" name="LineSource" />
+          <Proxy group="sources" name="SphereSource" />
+          <Proxy group="sources" name="GlyphSource2D" />
+        </ProxyListDomain>
+      </InputProperty>
+
+      <SubProxy>
+        <!-- 
+          GlyphMapper for high-res geometry.
+        -->
+        <Proxy name="GlyphMapper" proxygroup="mappers" proxyname="Glyph3DMapper" />
+        <ExposedProperties>
+          <Property name="SelectMaskArray" />
+          <Property name="SelectScaleArray" />
+          <Property name="SelectOrientationVectors" />
+          <Property name="Scaling" />
+          <Property name="ScaleMode" />
+          <Property name="ScaleFactor" />
+          <Property name="Orient" />
+          <Property name="OrientationMode" />
+          <Property name="Masking" />
+        </ExposedProperties>
+        <ShareProperties subproxy="Mapper">
+        </ShareProperties>
+      </SubProxy>
+      
+    </Glyph3DMapperRepresentationProxy>
   </ProxyGroup>
 
   <ProxyGroup name="options">
