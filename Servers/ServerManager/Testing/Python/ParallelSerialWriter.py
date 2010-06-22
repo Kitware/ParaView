@@ -23,7 +23,7 @@ if view.GetProperty("RemoteRenderThreshold"):
 
 repr = servermanager.CreateRepresentation(reader, view);
 
-view.UseOffscreenRenderingForScreenshotsOff()
+#view.UseOffscreenRenderingForScreenshotsOff()
 view.ResetCamera()
 # Hackery to ensure that we don't end up with overlapping windows when running
 # this test.
