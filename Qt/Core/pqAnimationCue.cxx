@@ -96,6 +96,23 @@ pqAnimationCue::~pqAnimationCue()
 }
 
 //-----------------------------------------------------------------------------
+void pqAnimationCue::addKeyFrameInternal(vtkSMProxy* keyframe)
+{
+  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+  pxm->RegisterProxy("animation",
+    QString("KeyFrame%1").arg(keyframe->GetSelfIDAsString()).toAscii().data(),
+    keyframe);
+}
+
+//-----------------------------------------------------------------------------
+void pqAnimationCue::removeKeyFrameInternal(vtkSMProxy* keyframe)
+{
+  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+  pxm->UnRegisterProxy("animation",
+      pxm->GetProxyName("animation", keyframe), keyframe);
+}
+
+//-----------------------------------------------------------------------------
 vtkSMProxy* pqAnimationCue::getManipulatorProxy() const
 {
   return this->Internal->Manipulator;
@@ -290,8 +307,7 @@ void pqAnimationCue::deleteKeyFrame(int index)
     pp->AddProxy(curKf);
     }
   this->Internal->Manipulator->UpdateVTKObjects();
-
-  this->removeHelperProxy("KeyFrames", keyframe);
+  this->removeKeyFrameInternal(keyframe);
 }
 
 //-----------------------------------------------------------------------------
@@ -388,7 +404,7 @@ vtkSMProxy* pqAnimationCue::insertKeyFrame(int index)
 
   pqSMAdaptor::setElementProperty(kf->GetProperty("KeyTime"), keyTime);
   kf->UpdateVTKObjects();
-  this->addHelperProxy("KeyFrames", kf);
+  this->addKeyFrameInternal(kf);
 
   vtkSMProxyProperty* pp =vtkSMProxyProperty::SafeDownCast(
     this->Internal->Manipulator->GetProperty("KeyFrames"));

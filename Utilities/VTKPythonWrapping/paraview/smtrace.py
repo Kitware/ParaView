@@ -26,10 +26,12 @@ def reset_trace_globals():
   trace_globals.trace_output_endblock = "Render()"
   trace_globals.traced_proxy_groups = ["sources", "representations", "views",
                                        "implicit_functions", "piecewise_functions",
-                                       "lookup_tables", "scalar_bars", "selection_sources"]
-  trace_globals.ignored_view_properties = ["ViewSize", "GUISize",
-                                           "ViewPosition", "Representations"]
-  trace_globals.ignored_representation_properties = ["Input"]
+                                       "lookup_tables", "scalar_bars",
+                                       "selection_sources", "animation"]
+  trace_globals.ignored_properties = {
+    "views" : ["ViewSize", "GUISize", "ViewPosition", "Representations"],
+    "representations" : ["Input"],
+    "animation" : ["Cues"]}
   trace_globals.proxy_ctor_hook = None
   reset_trace_observer()
 reset_trace_globals()
@@ -47,6 +49,7 @@ class proxy_trace_info:
     self.CurrentProps = dict()
     self.ModifiedProps = dict()
     self.ignore_next_unregister = False
+    self.ctor_traced = False
     # If this proxy is a helper proxy that belongs to the ProxyDomain of
     # another proxy's ProxyProperty, this variable stores the proxy_trace_info
     # for that other proxy.  For example, the Slice.SliceType
@@ -63,20 +66,40 @@ class prop_trace_info:
       self.PyVariable = proxyTraceInfo.Proxy.GetPropertyName(prop)
     self.PyVariable = servermanager._make_name_valid(self.PyVariable)
 
+class list_of_tuples (list):
+  """This class is used when a list of tuples is needed where each tuple is of
+     the form (key, object)"""
+
+  def purge(self, key):
+    """This method can be used to properties from the list of tuples.
+    Returns the purged list."""
+    clone = list_of_tuples()
+    for pair in self:
+      if pair[0] == key:
+        pass
+      else:
+        clone.append(pair)
+    return clone
+
+  def get_value(self, key):
+    for pair in self:
+      if pair[0] == key:
+        return pair[1]
+    raise KeyError, "%s does not exist" % str(key)
+
+  def has_key(self, key):
+    for pair in self:
+      if pair[0] == key:
+        return True
+    return False
+
 
 def trace_observer():
   return trace_globals.observer
 
-def ignoredViewProperties():
-  return trace_globals.ignored_view_properties
-
-def ignoredRepresentationProperties():
-  return trace_globals.ignored_representation_properties
-
 def propIsIgnored(info, propName):
-  if info.Group == "views" and propName in ignoredViewProperties(): return True
-  if info.Group == "representations" \
-    and propName in ignoredRepresentationProperties(): return True
+  if info.Group in trace_globals.ignored_properties:
+    return propName in trace_globals.ignored_properties[info.Group]
   return False
 
 def track_existing_sources():
@@ -87,6 +110,7 @@ def track_existing_sources():
 
 def track_existing_source_proxy(proxy, proxy_name):
     proxy_info = proxy_trace_info(proxy, "sources", proxy_name)
+    proxy_info.ctor_traced = True
     trace_globals.registered_proxies.append(proxy_info)
     if not trace_globals.last_active_source and proxy == trace_globals.active_source_at_start:
       trace_globals.last_active_source = proxy
@@ -97,6 +121,7 @@ def track_existing_source_proxy(proxy, proxy_name):
 
 def track_existing_view_proxy(proxy, proxy_name):
     proxy_info = proxy_trace_info(proxy, "views", proxy_name)
+    proxy_info.ctor_traced = True
     trace_globals.registered_proxies.append(proxy_info)
     if not trace_globals.last_active_view and proxy == trace_globals.active_view_at_start:
       trace_globals.last_active_view = proxy
@@ -116,6 +141,7 @@ def track_existing_representation_proxy(proxy, proxy_name):
     input_proxy_info = get_proxy_info(input_proxy)
     if input_proxy_info:
       proxy_info = proxy_trace_info(proxy, "representations", proxy_name)
+      proxy_info.ctor_traced = True
       trace_globals.registered_proxies.append(proxy_info)
       trace_globals.trace_output.append("%s = GetDisplayProperties(%s)" \
         % (proxy_info.PyVariable, input_proxy_info.PyVariable))
@@ -134,6 +160,17 @@ def track_existing_lookuptable_proxy(proxy, proxy_name):
     the GUI. So we simply pretend as if the LUT was registered."""
     return trace_proxy_registered(proxy, "lookup_tables", proxy_name)
 
+def track_existing_animation_scene_proxy(proxy, proxy_name):
+    proxy_info = proxy_trace_info(proxy, "animation", proxy_name)
+    proxy_info.ctor_traced = True
+    trace_globals.registered_proxies.append(proxy_info)
+    trace_globals.trace_output.append("%s = GetAnimationScene()" \
+        % (proxy_info.PyVariable))
+    return proxy_info
+
+def track_existing_animation_cue_proxy(proxy, proxy_name):
+    return trace_proxy_registered(proxy, "animation", proxy_name)
+
 def track_existing_proxy(proxy):
   proxy_name = get_source_proxy_registration_name(proxy)
   if proxy_name:
@@ -147,22 +184,25 @@ def track_existing_proxy(proxy):
   proxy_name = get_lookuptable_proxy_registration_name(proxy)
   if proxy_name:
     return track_existing_lookuptable_proxy(proxy, proxy_name)
+  proxy_name = get_animation_scene_proxy_registration_name(proxy)
+  if proxy_name:
+    return track_existing_animation_scene_proxy(proxy, proxy_name)
+  proxy_name = get_animation_cue_proxy_registration_name(proxy)
+  if proxy_name:
+    return track_existing_animation_cue_proxy(proxy, proxy_name)
   return None
 
 def get_proxy_info(p, search_existing=True):
   """Lookup the proxy_trace_info object for the given proxy or pyvariable.
   If no proxy_trace_info object is found, and search_existing is True
   (the default) then a new proxy_trace_info will be created if the proxy can
-  be found in the list of existing servermanager source proxies."""
-  for info in trace_globals.last_registered_proxies:
-    if info.Proxy == p: return info
-    if info.PyVariable == p: return info
-  for info in trace_globals.registered_proxies:
+  be found in the list of existing servermanager proxies."""
+  for info in trace_globals.last_registered_proxies + trace_globals.registered_proxies:
     if info.Proxy == p: return info
     if info.PyVariable == p: return info
   # It must be a proxy that existed before trace started
-  if search_existing: return track_existing_proxy(p)
-
+  if search_existing:
+    return track_existing_proxy(p)
   return None
 
 def ensure_active_source(proxy_info):
@@ -200,6 +240,15 @@ def get_view_proxy_info_for_rep(rep_info):
               if rep_info.Proxy == rep_prop.GetProxy(i): return p
     return None
 
+def get_animated_proxy(cue_info):
+    """Given a proxy_trace_info object for a animation cue proxy, returns the
+    proxy_trace_info for the animated proxy.  If one is not found,
+    returns None."""
+    # The cue info must have 'AnimatedProxy' in its current properties dict:
+    if "AnimatedProxy" in cue_info.CurrentProps:
+        input_proxy_pyvariable = cue_info.CurrentProps["AnimatedProxy"]
+        return get_proxy_info(input_proxy_pyvariable)
+    return None
 
 def get_source_proxy_registration_name(proxy):
     """Assuming the given proxy is registered in the group 'sources',
@@ -220,6 +269,22 @@ def get_lookuptable_proxy_registration_name(proxy):
     """Assuming the give proxy is registered in the group "lookup_tables",
     lookup the proxy's registration name with the servermanager"""
     return servermanager.ProxyManager().GetProxyName("lookup_tables", proxy)
+
+def get_animation_scene_proxy_registration_name(proxy):
+    """Assuming the give proxy is registered in the group "animation",
+    lookup the proxy's registration name with the servermanager"""
+    if proxy.GetXMLName() == "AnimationScene":
+        return servermanager.ProxyManager().GetProxyName("animation", proxy)
+    return None
+
+def get_animation_cue_proxy_registration_name(proxy):
+    """Assuming the give proxy is registered in the group "animation",
+    lookup the proxy's registration name with the servermanager"""
+    if proxy.GetXMLName() == "KeyFrameAnimationCue" or \
+       proxy.GetXMLName() == "CameraAnimationCue" or \
+       proxy.GetXMLName() == "TimeAnimationCue":
+        return servermanager.ProxyManager().GetProxyName("animation", proxy)
+    return None
 
 def make_comma_separated_string(values):
   ret = str()
@@ -340,12 +405,12 @@ def trace_property_modified(info, prop):
     propValue = proxy_smproperty_tostring(info, propInfo)
   if propValue != None:
     if not info.ParentProxyInfo:
-        info.Props[prop] = propValue
+        info.Props[prop] = propInfo
         info.ModifiedProps[propInfo.PyVariable] = propValue
         info.CurrentProps[propInfo.PyVariable] = propValue
     else:
         parentProxyInfo = info.ParentProxyInfo
-        parentProxyInfo.Props[prop] = propValue
+        parentProxyInfo.Props[prop] = propInfo
         propPyVariable = "%s.%s" % (info.PyVariable, propInfo.PyVariable)
         parentProxyInfo.ModifiedProps[propPyVariable] = propValue
         parentProxyInfo.CurrentProps[propPyVariable] = propValue
@@ -374,6 +439,34 @@ def trace_save_screenshot(filename, size, allViews):
       trace_globals.trace_output.append(saveStr)
   trace_globals.trace_output.append("\n")
 
+def property_references_untraced_proxy(propPyVariable, propValue, propInfoList):
+  """Given a property pyvariable, the property value, and a list of prop_trace_info
+  objects, this methods looks for the prop_trace_info in the list with the matching
+  pyvariable.  If the property if not a proxy property, return False.  If it is proxy
+  property then check each proxy referenced by the property to see if its ctor has
+  been traced already.  If any proxy referenced has not been traced, return True, else
+  return True."""
+  for propInfo in propInfoList:
+    if propInfo.PyVariable != propPyVariable: continue
+    if propInfo.Prop.IsA("vtkSMProxyProperty"):
+
+      # Skip properties with proxy_list domains
+      if propInfo.Prop.GetDomain('proxy_list'): continue
+
+      # Maybe instead of using the propValue string we should just ask the
+      # proxy property for its current proxy values, but for now use the propValue string.
+      # Convert string like '[proxyA, proxyB]]' into list ['proxyA', 'proxyB']
+      proxyPyVariables = [name.strip() for name in propValue.replace('[','',).replace(']','').split(',')]
+
+      # For each proxy pyvariable, check if its ctor has been traced.
+      # When calling get_proxy_info we set search_existing to false because
+      # we already have a pyvariable for the proxy, indicating we are not
+      # trying to looking up an undiscovered proxy.
+      for proxyPyVariable in proxyPyVariables:
+        proxyInfo = get_proxy_info(proxyPyVariable, search_existing=False)
+        if not proxyInfo or proxyInfo.ctor_traced: continue
+        return True
+  return False
 
 def sort_proxy_info_by_group(infoList):
   views = []
@@ -399,9 +492,10 @@ def append_trace():
 
   for info in modified_proxies:
     traceOutput = ""
+    deferredProperties = []
 
     # Generate list of tuples : (propName, propValue)
-    propNameValues = []
+    propNameValues = list_of_tuples()
     for propName, propValue in info.ModifiedProps.iteritems():
       if propIsIgnored(info, propName): continue
 
@@ -414,14 +508,18 @@ def append_trace():
         inputProxyInfo = get_proxy_info(propValue)
         ensure_active_source(inputProxyInfo)
         continue
-      propNameValues.append( (propName,propValue) )
+
+      if property_references_untraced_proxy(propName, propValue, info.Props.values()):
+        deferredProperties.append((propName, propValue))
+      else:
+        propNameValues.append((propName, propValue))
 
     # Clear the modified prop list
     info.ModifiedProps.clear()
 
     # If info is in the last_registered_proxies list, then we need to add the
     # proxy's constructor call to the trace
-    if info in trace_globals.last_registered_proxies:
+    if info in trace_globals.last_registered_proxies and not info.ctor_traced:
 
       # Determine the function call to construct the proxy
       setPropertiesInCtor = True
@@ -486,6 +584,38 @@ def append_trace():
       if info.Group == "piecewise_functions":
         ctorMethod = "CreatePiecewiseFunction"
 
+      if info.Group == "animation":
+        if info.Proxy.GetXMLName() == "KeyFrameAnimationCue":
+          ctorMethod = "GetAnimationTrack"
+          propname = None
+          index = None
+          if propNameValues.has_key("AnimatedPropertyName"):
+            propname = propNameValues.get_value("AnimatedPropertyName")
+            propNameValues = propNameValues.purge("AnimatedPropertyName")
+          if propNameValues.has_key("AnimatedElement"):
+            propname = propNameValues.get_value("AnimatedElement")
+            propNameValues = propNameValues.purge("AnimatedElement")
+          propNameValues = propNameValues.purge("AnimatedProxy")
+          input_proxy_info = get_animated_proxy(info)
+          if input_proxy_info:
+            ensure_active_source(input_proxy_info)
+          ctorArgs.append(propname)
+          if index != None:
+            ctorArgs.append(index)
+          setPropertiesInCtor = False
+        elif info.Proxy.GetXMLName() == "CameraAnimationCue":
+          view_proxy_info = get_animated_proxy(info)
+          if view_proxy_info:
+            ensure_active_view(view_proxy_info)
+          ctorMethod = "GetCameraTrack"
+          propNameValues = propNameValues.purge("AnimatedProxy")
+          propNameValues = propNameValues.purge("AnimatedPropertyName")
+          setPropertiesInCtor = False
+        elif info.Proxy.GetXMLName() == "TimeAnimationCue":
+          ctorMethod = "GetTimeTrack"
+          propNameValues = propNameValues.purge("AnimatedProxy")
+          propNameValues = propNameValues.purge("AnimatedPropertyName")
+          setPropertiesInCtor = False
 
       if setPropertiesInCtor:
         for propName, propValue in propNameValues:
@@ -494,7 +624,7 @@ def append_trace():
           else:
               # This line handles properties like:  my_slice.SliceType.Normal = [1, 0, 0]
               extraCtorCommands += "%s.%s = %s\n" % (info.PyVariable, propName, propValue)
-        propNameValues = []
+        propNameValues = list_of_tuples()
 
       if trace_globals.proxy_ctor_hook:
         ctorMethod, ctorArgs, extraCtorCommands = trace_globals.proxy_ctor_hook(info,
@@ -502,17 +632,22 @@ def append_trace():
 
       ctorArgString = make_comma_separated_string(ctorArgs)
       traceOutput = "%s = %s(%s)\n%s" % (info.PyVariable, ctorMethod, ctorArgString, extraCtorCommands)
+      info.ctor_traced = True
 
     # Set properties on the proxy
     for propName, propValue in propNameValues:
       traceOutput += "%s.%s = %s\n" % (info.PyVariable, propName, propValue)
 
-    if (len(traceOutput)):
+    if traceOutput:
       trace_globals.trace_output.append(traceOutput)
-  for p in trace_globals.last_registered_proxies:
-    trace_globals.registered_proxies.append(p)
-  while (len(trace_globals.last_registered_proxies)):
-    trace_globals.last_registered_proxies.pop()
+
+    if deferredProperties:
+      modified_proxies.append(info)
+      for pair in deferredProperties:
+        info.ModifiedProps[pair[0]] = pair[1]
+
+  trace_globals.registered_proxies += trace_globals.last_registered_proxies
+  del trace_globals.last_registered_proxies[:]
 
 
 def get_trace_string():

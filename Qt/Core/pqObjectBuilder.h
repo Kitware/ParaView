@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QMap>
 #include <QVariant>
 
+class pqAnimationCue;
 class pqAnimationScene;
 class pqDataRepresentation;
 class pqNameCount;
@@ -47,9 +48,9 @@ class pqRepresentation;
 class pqScalarBarRepresentation;
 class pqScalarsToColors;
 class pqServer;
+class pqServerResource;
 class pqView;
 class vtkSMProxy;
-class pqServerResource;
 
 /// pqObjectBuilder is loosely based on the \c Builder design pattern.
 /// It is used to create as well as destroy complex objects such as 
@@ -156,6 +157,9 @@ public:
   // Note that the source must have no consumers, otherwise,
   // one cannot delete the source.
   virtual void destroy(pqPipelineSource* source);
+
+  /// Destroys an animation cue and all keyframe objects, if any in that cue.
+  virtual void destroy(pqAnimationCue* cue);
 
   /// Convenience method, simply unregisters the Server Manager proxy 
   /// which the pqProxy represents.
