@@ -5559,7 +5559,7 @@
     </ComparativeViewProxy>
 
 #ifdef VTK_USE_QVTK
-    <ComparativeViewProxy name="ComparativeXYPlotView"
+    <ComparativeViewProxy name="ComparativeXYChartView"
       base_proxygroup="views" base_proxyname="ComparativeViewBase">
       <Documentation>
         The is comparative view comprising of individual "XYChartView" proxies
@@ -5594,12 +5594,12 @@
         <!-- End of "RootView" subproxy -->
       </SubProxy>
 
-      <!-- End of ComparativeXYPlotView -->
+      <!-- End of ComparativeXYChartView -->
     </ComparativeViewProxy>
 #endif
 
 #ifdef VTK_USE_QVTK
-    <ComparativeViewProxy name="ComparativeBarChartView"
+    <ComparativeViewProxy name="ComparativeXYBarChartView"
       base_proxygroup="views" base_proxyname="ComparativeViewBase">
       <Documentation>
         The is comparative view comprising of individual "XYBarChartView" proxies
@@ -5634,7 +5634,7 @@
         <!-- End of "RootView" subproxy -->
       </SubProxy>
 
-      <!-- End of ComparativeBarChartView -->
+      <!-- End of ComparativeXYBarChartView -->
     </ComparativeViewProxy>
 #endif
 
