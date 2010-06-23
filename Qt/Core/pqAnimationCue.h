@@ -128,6 +128,10 @@ private:
   pqAnimationCue(const pqAnimationCue&); // Not implemented.
   void operator=(const pqAnimationCue&); // Not implemented.
 
+  /// Methods used to register/unregister keyframe proxies.
+  void addKeyFrameInternal(vtkSMProxy*);
+  void removeKeyFrameInternal(vtkSMProxy*);
+
   QString KeyFrameType;
   QString ManipulatorType;
   class pqInternals;
