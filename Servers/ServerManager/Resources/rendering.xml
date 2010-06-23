@@ -4257,7 +4257,7 @@
         number_of_elements="4"
         element_types="2 0 0 0"
         default_values_delimiter=";"
-        default_values="Helvetica;9;0;0" >
+        default_values="Arial;14;0;0" >
         <Documentation>
           Set the chart title font (familyname, size, bold, italics).
         </Documentation>
@@ -4392,7 +4392,7 @@
         element_types="2 0 0 0"
         number_of_elements="16"
         default_values_delimiter=";"
-        default_values="Helvetica;9;0;0;Helvetica;9;0;0;Helvetica;9;0;0;Helvetica;9;0;0" >
+        default_values="Arial;12;0;0;Arial;12;0;0;Arial;12;0;0;Arial;12;0;0" >
         <Documentation>
           Set the axis title font (familyname, size, bold, italics).
         </Documentation>
@@ -4517,7 +4517,7 @@
         element_types="2 0 0 0"
         number_of_elements="16"
         default_values_delimiter=";"
-        default_values="Helvetica;9;0;0;Helvetica;9;0;0;Helvetica;9;0;0;Helvetica;9;0;0">
+        default_values="Arial;12;1;0;Arial;12;1;0;Arial;12;1;0;Arial;12;1;0">
         <Documentation>
           Set the axis title font (familyname, size, bold, italics).
         </Documentation>
