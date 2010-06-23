@@ -277,11 +277,9 @@ void pqPythonToolsWidget::onStartTraceClicked()
   pqPythonDialog* pyDiag = this->pythonShellDialog();
   if (pyDiag)
     {
-    pyDiag->runString("try:\n"
-                      "  from paraview import smtrace\n"
-                      "  smtrace.start_trace()\n"
-                      "  print 'Trace started.'\n"
-                      "except: raise RuntimeError('could not import paraview.smtrace')\n");
+    pyDiag->runString("from paraview import smtrace\n"
+                      "smtrace.start_trace()\n"
+                      "print 'Trace started.'\n");
     this->Internal->StartTraceButton->setEnabled(0);
     this->Internal->TraceStateButton->setEnabled(0);
     this->Internal->StopTraceButton->setEnabled(1);
@@ -294,10 +292,7 @@ void pqPythonToolsWidget::onTraceStateClicked()
   pqPythonDialog* pyDiag = this->pythonShellDialog();
   if (pyDiag)
     {
-    pyDiag->runString("try:\n"
-                      "    from paraview import smstate\n"
-                      "except:\n"
-                      "    raise RuntimeError('could not import paraview.smstate')\n"
+    pyDiag->runString("from paraview import smstate\n"
                       "smstate.run()\n");
     }
 }
@@ -308,11 +303,9 @@ void pqPythonToolsWidget::onStopTraceClicked()
   pqPythonDialog* pyDiag = this->pythonShellDialog();
   if (pyDiag)
     {
-    pyDiag->runString("try:\n"
-                      "  from paraview import smtrace\n"
-                      "  smtrace.stop_trace()\n"
-                      "  print 'Trace stopped.'\n"
-                      "except: raise RuntimeError('could not import paraview.smtrace')\n");
+    pyDiag->runString("from paraview import smtrace\n"
+                      "smtrace.stop_trace()\n"
+                      "print 'Trace stopped.'\n");
     this->Internal->StartTraceButton->setEnabled(1);
     this->Internal->TraceStateButton->setEnabled(1);
     this->Internal->StopTraceButton->setEnabled(0);
@@ -382,18 +375,14 @@ QString pqPythonToolsWidget::getTraceString()
   pqPythonDialog* pyDiag = this->pythonShellDialog();
   if (pyDiag)
     {
-    pyDiag->runString("try:\n"
-                      "  from paraview import smtrace\n"
-                      "  __smtraceString = smtrace.get_trace_string()\n"
-                      "except:\n"
-                      "  __smtraceString = str()\n"
-                      "  raise RuntimeError('could not import paraview.smtrace')\n");
+    pyDiag->runString("from paraview import smtrace\n"
+                      "__smtraceString = smtrace.get_trace_string()\n");
     pyDiag->shell()->makeCurrent();
     PyObject* main_module = PyImport_AddModule((char*)"__main__");
     PyObject* global_dict = PyModule_GetDict(main_module);
     PyObject* string_object = PyDict_GetItemString(
       global_dict, "__smtraceString");
-    char* string_ptr = PyString_AsString(string_object);
+    char* string_ptr = string_object ? PyString_AsString(string_object) : 0;
     if (string_ptr)
       {
       traceString = string_ptr;
@@ -410,16 +399,14 @@ QString pqPythonToolsWidget::getPVModuleDirectory()
   pqPythonDialog* pyDiag = this->pythonShellDialog();
   if (pyDiag)
     {
-    pyDiag->runString("try:\n"
-                      "  import os\n"
-                      "  __pvModuleDirectory = os.path.dirname(paraview.__file__)\n"
-                      "except: __pvModuleDirectory = str()\n");
+    pyDiag->runString("import os\n"
+                      "__pvModuleDirectory = os.path.dirname(paraview.__file__)\n");
     pyDiag->shell()->makeCurrent();
     PyObject* main_module = PyImport_AddModule((char*)"__main__");
     PyObject* global_dict = PyModule_GetDict(main_module);
     PyObject* string_object = PyDict_GetItemString(
       global_dict, "__pvModuleDirectory");
-    char* string_ptr = PyString_AsString(string_object);
+    char* string_ptr = string_object ? PyString_AsString(string_object) : 0;
     if (string_ptr)
       {
       dirString = string_ptr;
