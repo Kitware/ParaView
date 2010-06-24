@@ -20,8 +20,6 @@ ENDIF(NOT WIN32)
 SET (PVCommandOptions_SRCS
   vtkCommandOptions.cxx
   vtkCommandOptionsXMLParser.cxx
-  vtkPVOptions.cxx
-  vtkPVOptionsXMLParser.cxx
   vtkPVXMLParser.cxx
   vtkPVXMLElement.cxx
 )
@@ -60,13 +58,17 @@ SET(Kit_SRCS
   vtkPVGenericAttributeInformation.cxx
   vtkPVInformation.cxx
   vtkPVOpenGLExtensionsInformation.cxx
+  vtkPVOptions.cxx
+  vtkPVOptionsXMLParser.cxx
   vtkPVPlugin.cxx
   vtkPVPluginInformation.cxx
   vtkPVPluginLoader.cxx
   vtkPVProgressHandler.cxx
   vtkPVPythonModule.cxx
+  vtkPVPythonPluginInterface.cxx
   vtkPVSelectionInformation.cxx
   vtkPVServerInformation.cxx
+  vtkPVServerManagerPluginInterface.cxx
   vtkPVServerOptions.cxx
   vtkPVSILInformation.cxx
   vtkPVTemporalDataInformation.cxx
@@ -82,8 +84,6 @@ SET(Kit_SRCS
   vtkUndoElement.cxx
   vtkUndoSet.cxx
   vtkUndoStack.cxx
-  vtkPVServerManagerPluginInterface.cxx
-  vtkPVPythonPluginInterface.cxx
 
 # these files seem to be socket related, so for Cray Xt3/Catamount they probably have to 
 # be excluded, e.g. via IF(HAVE_SOCKETS) coming from VTK/Parallel/VTKParallelCMakeTests.cmake, Alex
