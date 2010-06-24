@@ -62,15 +62,6 @@ public:
   virtual ~pqActiveViewOptionsManager();
 
   /// \brief
-  ///   Sets the default render view options dialog handler.
-  ///
-  /// The default render view options dialog is used when no view
-  /// options dialog is registered for the render view type.
-  ///
-  /// \param renderOptions The new render view default.
-  void setRenderViewOptions(pqActiveViewOptions *renderOptions);
-
-  /// \brief
   ///   Registers an options dialog handler with a view type.
   /// \param viewType The name of the view type.
   /// \param options The options dialog handler.

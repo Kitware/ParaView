@@ -31,26 +31,39 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqViewSettingsManager.h"
 
-#include "pqActiveXYChartOptions.h"
 #include "pqActiveObjects.h"
 #include "pqActiveRenderViewOptions.h"
 #include "pqActiveTwoDRenderViewOptions.h"
+#include "pqActiveXYChartOptions.h"
 #include "pqApplicationCore.h"
-#include "pqXYChartView.h"
-#include "pqXYBarChartView.h"
+#include "pqComparativeRenderView.h"
+#include "pqComparativeXYBarChartView.h"
+#include "pqComparativeXYChartView.h"
 #include "pqPluginManager.h"
 #include "pqTwoDRenderView.h"
 #include "pqViewOptionsInterface.h"
+#include "pqXYBarChartView.h"
+#include "pqXYChartView.h"
 
 //-----------------------------------------------------------------------------
 pqViewSettingsManager::pqViewSettingsManager(QObject* parentObject)
   : Superclass(parentObject)
 {
-  this->setRenderViewOptions(new pqActiveRenderViewOptions(this));
+  pqActiveRenderViewOptions* renderViewOptions = new
+    pqActiveRenderViewOptions(this);
+  this->registerOptions(pqRenderView::renderViewType(), renderViewOptions);
+  this->registerOptions(pqComparativeRenderView::comparativeRenderViewType(),
+    renderViewOptions);
+
   pqActiveXYChartOptions *xyChartOptions = new pqActiveXYChartOptions(this);
   pqActiveXYChartOptions *xyBarChartOptions = new pqActiveXYChartOptions(this);
   this->registerOptions(pqXYChartView::XYChartViewType(), xyChartOptions);
   this->registerOptions(pqXYBarChartView::XYBarChartViewType(), xyBarChartOptions);
+
+  // register for comparative views.
+  this->registerOptions(pqComparativeXYChartView::chartViewType(), xyChartOptions);
+  this->registerOptions(pqComparativeXYBarChartView::chartViewType(), xyBarChartOptions);
+
   pqActiveTwoDRenderViewOptions* twoDOptions =
     new pqActiveTwoDRenderViewOptions(this);
   this->registerOptions(pqTwoDRenderView::twoDRenderViewType(), twoDOptions);

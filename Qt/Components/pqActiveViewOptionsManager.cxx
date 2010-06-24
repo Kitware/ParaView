@@ -37,7 +37,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqActiveViewOptions.h"
 #include "pqCoreUtilities.h"
-#include "pqRenderView.h"
 #include "pqView.h"
 
 #include <QMap>
@@ -53,7 +52,6 @@ public:
   ~pqActiveViewOptionsManagerInternal() {}
 
   QMap<QString, pqActiveViewOptions *> Handlers;
-  pqActiveViewOptions *RenderOptions;
   pqActiveViewOptions *Current;
   pqView *ActiveView;
   bool IgnoreClose;
@@ -64,7 +62,6 @@ public:
 pqActiveViewOptionsManagerInternal::pqActiveViewOptionsManagerInternal()
   : Handlers()
 {
-  this->RenderOptions = 0;
   this->Current = 0;
   this->ActiveView = 0;
   this->IgnoreClose = false;
@@ -85,26 +82,6 @@ pqActiveViewOptionsManager::~pqActiveViewOptionsManager()
 }
 
 //-----------------------------------------------------------------------------
-void pqActiveViewOptionsManager::setRenderViewOptions(
-    pqActiveViewOptions *renderOptions)
-{
-  if(this->Internal->RenderOptions &&
-      !this->isRegistered(this->Internal->RenderOptions))
-    {
-    this->disconnect(this->Internal->RenderOptions, 0, this, 0);
-    }
-
-  this->Internal->RenderOptions = renderOptions;
-  if(this->Internal->RenderOptions &&
-      !this->isRegistered(this->Internal->RenderOptions))
-    {
-    this->connect(this->Internal->RenderOptions,
-        SIGNAL(optionsClosed(pqActiveViewOptions *)),
-        this, SLOT(removeCurrent(pqActiveViewOptions *)));
-    }
-}
-
-//-----------------------------------------------------------------------------
 bool pqActiveViewOptionsManager::registerOptions(const QString &viewType,
     pqActiveViewOptions *options)
 {
@@ -122,11 +99,8 @@ bool pqActiveViewOptionsManager::registerOptions(const QString &viewType,
     }
 
   this->Internal->Handlers.insert(viewType, options);
-  if(options != this->Internal->RenderOptions)
-    {
-    this->connect(options, SIGNAL(optionsClosed(pqActiveViewOptions *)),
-        this, SLOT(removeCurrent(pqActiveViewOptions *)));
-    }
+  this->connect(options, SIGNAL(optionsClosed(pqActiveViewOptions *)),
+    this, SLOT(removeCurrent(pqActiveViewOptions *)));
 
   return true;
 }
@@ -155,11 +129,7 @@ void pqActiveViewOptionsManager::unregisterOptions(
       }
     }
 
-  if(options != this->Internal->RenderOptions)
-    {
-    this->disconnect(options, 0, this, 0);
-    }
-
+  this->disconnect(options, 0, this, 0);
   if(options == this->Internal->Current)
     {
     // Close the options dialog.
@@ -277,18 +247,6 @@ pqActiveViewOptions *pqActiveViewOptionsManager::getCurrent() const
     if(iter != this->Internal->Handlers.end())
       {
       options = *iter;
-      }
-
-    if(!options)
-      {
-      // If the view is a rendered view, use the default render
-      // options dialog.
-      pqRenderView *renderView = qobject_cast<pqRenderView *>(
-          this->Internal->ActiveView);
-      if(renderView)
-        {
-        options = this->Internal->RenderOptions;
-        }
       }
     }
 

@@ -47,12 +47,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QDebug>
 
 // Use the property links/manager etc
+#include "pqComparativeXYBarChartView.h"
+#include "pqComparativeXYChartView.h"
 #include "pqNamedWidgets.h"
 #include "pqPropertyManager.h"
-#include "pqXYChartView.h"
-#include "pqXYBarChartView.h"
 #include "pqSignalAdaptors.h"
 #include "pqSMAdaptor.h"
+#include "pqXYBarChartView.h"
+#include "pqXYChartView.h"
 
 #include <math.h>
 
@@ -61,10 +63,18 @@ class pqXYChartOptionsEditorForm;
 class pqXYChartOptionsEditor::pqInternal
 {
 public:
-  QPointer<pqXYChartView> XYChartView;
-  QPointer<pqXYBarChartView> XYBarChartView;
   pqPropertyManager Links;
   pqXYChartOptionsEditorForm *Form;
+  QPointer<pqView> View;
+
+  enum ChartType
+    {
+    INVALID,
+    LINE,
+    BAR
+    };
+
+  ChartType Type;
 };
 
 class pqXYChartOptionsEditorAxis
@@ -211,6 +221,7 @@ pqXYChartOptionsEditor::pqXYChartOptionsEditor(QWidget *widgetParent)
   : pqOptionsContainer(widgetParent)
 {
   this->Internal = new pqInternal;
+  this->Internal->Type = pqInternal::INVALID;
   this->Internal->Form = new pqXYChartOptionsEditorForm();
   this->Internal->Form->setupUi(this);
 
@@ -298,10 +309,25 @@ pqXYChartOptionsEditor::~pqXYChartOptionsEditor()
 void pqXYChartOptionsEditor::setView(pqView* view)
 {
   this->disconnectGUI();
-  this->Internal->XYChartView = qobject_cast<pqXYChartView *>(view);
-  this->Internal->XYBarChartView = qobject_cast<pqXYBarChartView *>(view);
-  if (this->Internal->XYChartView || this->Internal->XYBarChartView)
+  if (qobject_cast<pqXYChartView*>(view) ||
+    qobject_cast<pqComparativeXYChartView*>(view))
     {
+    this->Internal->Type = pqInternal::LINE;
+    }
+  else if (qobject_cast<pqXYBarChartView*>(view) ||
+    qobject_cast<pqComparativeXYBarChartView*>(view))
+    {
+    this->Internal->Type = pqInternal::BAR;
+    }
+  else
+    {
+    this->Internal->Type = pqInternal::INVALID;
+    }
+
+  this->Internal->View = NULL;
+  if (this->Internal->Type != pqInternal::INVALID)
+    {
+    this->Internal->View = view;
     this->connectGUI();
     this->setPage(this->Internal->Form->CurrentPage);
     }
@@ -309,14 +335,7 @@ void pqXYChartOptionsEditor::setView(pqView* view)
 
 pqView* pqXYChartOptionsEditor::getView()
 {
-  if (this->Internal->XYChartView)
-    {
-    return this->Internal->XYChartView;
-    }
-  else
-    {
-    return this->Internal->XYBarChartView;
-    }
+  return this->Internal->View;
 }
 
 void pqXYChartOptionsEditor::setPage(const QString &page)
@@ -379,7 +398,7 @@ QStringList pqXYChartOptionsEditor::getPageList()
   pages.append("Bottom Axis");
   pages.append("Bottom Axis.Layout");
   pages.append("Bottom Axis.Title");
-  if (this->Internal->XYChartView)
+  if (this->Internal->Type == pqInternal::LINE)
     {
     pages.append("Right Axis");
     pages.append("Right Axis.Layout");
@@ -393,7 +412,7 @@ QStringList pqXYChartOptionsEditor::getPageList()
 
 void pqXYChartOptionsEditor::applyChanges()
 {
-  if (!this->Internal->XYChartView && !this->Internal->XYBarChartView)
+  if (this->Internal->Type == pqInternal::INVALID)
     {
     return;
     }
@@ -1095,13 +1114,5 @@ void pqXYChartOptionsEditor::updateDescription(QLabel *label,
 
 vtkSMProxy* pqXYChartOptionsEditor::getProxy()
 {
-  if (this->Internal->XYChartView)
-    {
-    return this->Internal->XYChartView->getProxy();
-    }
-  else if (this->Internal->XYBarChartView)
-    {
-    return this->Internal->XYBarChartView->getProxy();
-    }
-  return 0;
+  return (this->getView()?  this->getView()->getProxy() : NULL);
 }
