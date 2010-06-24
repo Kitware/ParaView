@@ -123,7 +123,7 @@ void vtkInitializationHelper::Initialize(int argc, char**argv, vtkPVOptions* opt
   // don't change process type if the caller has already initialized it.
   if (options->GetProcessType() == vtkPVOptions::ALLPROCESS)
     {
-    vtkInitializationHelper::Options->SetProcessType(vtkPVOptions::PVCLIENT);
+    options->SetProcessType(vtkPVOptions::PVCLIENT);
     }
 
   if (options->GetProcessType() == vtkPVOptions::PVCLIENT)
