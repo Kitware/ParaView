@@ -10230,18 +10230,6 @@ This property controls how the filter works to generate tensor cell data. You ca
        </Documentation>
      </DoubleVectorProperty>
 
-     <DoubleVectorProperty
-        name="ParticleMass"
-        command="SetParticleMass"
-        label="particle mass"
-        number_of_elements="1"
-        default_values="1.0" >
-     <DoubleRangeDomain name="range" min="0" />
-       <Documentation>
-         The mass of a particle.
-       </Documentation>
-     </DoubleVectorProperty>
-
    </SourceProxy>
 
   </ProxyGroup>
