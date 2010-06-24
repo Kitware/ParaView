@@ -32,18 +32,6 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // When set to true, the python script is run on satellites as well, otherwise
-  // only the root node processes the python script. Disabled by default.
-  vtkSetMacro(EnableSymmetricScripting, int);
-  vtkGetMacro(EnableSymmetricScripting, int);
-
-  // Description:
-  // Called to create the primary self-connection. Default implementation
-  // handles all paraview cases. Makes it possible for new paraview-based
-  // applications to provide new primary connection types.
-  virtual vtkSelfConnection* NewSelfConnection();
-
-  // Description:
   // Get the python script name.
   vtkGetStringMacro(PythonScriptName);
 
@@ -61,10 +49,6 @@ protected:
   void Synchronize();
 
   // Description:
-  // Initialize arguments.
-  virtual void Initialize();
-
-  // Description:
   // After parsing, process extra option dependencies.
   virtual int PostProcess(int argc, const char* const* argv);
 
@@ -77,7 +61,6 @@ protected:
   vtkSetStringMacro(PythonScriptName);
   char* PythonScriptName;
 
-  int EnableSymmetricScripting;
 private:
   vtkPVPythonOptions(const vtkPVPythonOptions&); // Not implemented
   void operator=(const vtkPVPythonOptions&); // Not implemented

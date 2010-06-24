@@ -53,7 +53,7 @@ int vtkPVProcessModulePythonHelper::RunGUIStart(int argc, char **argv,
 {
   vtkPVPythonOptions* boptions = vtkPVPythonOptions::SafeDownCast(
     this->ProcessModule->GetOptions());
-  if (myId > 0 && !boptions->GetEnableSymmetricScripting())
+  if (myId > 0 && !boptions->GetSymmetricMPIMode())
     {
     return 0;
     }

@@ -39,6 +39,7 @@ public:
   // Initializes the server manager. Do not use the server manager
   // before calling this.
   static void Initialize(const char* executable);
+  static void Initialize(const char* executable, vtkPVOptions* options);
 
   // Description:
   // Alternative API to initialize the server manager. This takes in  the

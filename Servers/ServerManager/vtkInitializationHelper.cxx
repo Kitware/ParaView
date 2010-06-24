@@ -39,10 +39,11 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkClientServerInterpreter.h"
 
 #include "vtkDummyProcessModuleHelper.h"
+#include "vtkProcessModule.h"
 #include "vtkPVMain.h"
 #include "vtkPVOptions.h"
-#include "vtkProcessModule.h"
 #include "vtkSMApplication.h"
+#include "vtkSmartPointer.h"
 #include "vtkSMProperty.h"
 
 #include <vtkstd/string>
@@ -77,6 +78,13 @@ vtkSMApplication* vtkInitializationHelper::Application = 0;
 //----------------------------------------------------------------------------
 void vtkInitializationHelper::Initialize(const char* executable)
 {
+  vtkInitializationHelper::Initialize(executable, NULL);
+}
+
+//----------------------------------------------------------------------------
+void vtkInitializationHelper::Initialize(const char* executable,
+  vtkPVOptions* options)
+{
   if (!executable)
     {
     vtkGenericWarningMacro("Executable name has to be defined.");
@@ -86,8 +94,13 @@ void vtkInitializationHelper::Initialize(const char* executable)
   // Pass the program name to make option parser happier
   char* argv = new char[strlen(executable)+1];
   strcpy(argv, executable);
-  vtkPVOptions* options = vtkPVOptions::New();
-  vtkInitializationHelper::Initialize(1, &argv, options);
+
+  vtkSmartPointer<vtkPVOptions> newoptions = options;
+  if (!options)
+    {
+    newoptions = vtkSmartPointer<vtkPVOptions>::New();
+    }
+  vtkInitializationHelper::Initialize(1, &argv, newoptions);
   options->Delete();
   delete[] argv;
 }
@@ -107,12 +120,21 @@ void vtkInitializationHelper::Initialize(int argc, char**argv, vtkPVOptions* opt
     return;
     }
 
-  vtkPVMain::SetUseMPI(0); // don't use MPI even when available.
+  // don't change process type if the caller has already initialized it.
+  if (options->GetProcessType() == vtkPVOptions::ALLPROCESS)
+    {
+    vtkInitializationHelper::Options->SetProcessType(vtkPVOptions::PVCLIENT);
+    }
+
+  if (options->GetProcessType() == vtkPVOptions::PVCLIENT)
+    {
+    // in client mode, we don't provide access to MPI.
+    vtkPVMain::SetUseMPI(0); // don't use MPI even when available.
+    }
   vtkInitializationHelper::PVMain = vtkPVMain::New();
   vtkInitializationHelper::Options = options;
   vtkInitializationHelper::Options->Register(0); // keep reference.
 
-  vtkInitializationHelper::Options->SetProcessType(vtkPVOptions::PVCLIENT);
 
   // This process module helper does nothing. ProcessModuleHelpers are to be
   // deprecated, then don't serve much anymore.

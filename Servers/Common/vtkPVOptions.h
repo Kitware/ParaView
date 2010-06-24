@@ -117,6 +117,15 @@ public:
   vtkGetMacro(ClientRenderServer, int);
 
   // Description:
+  // Indicates if the application is in symmetric mpi mode.
+  // This is applicable only to PVBATCH type of processes.
+  // Typically, when set to true, the python script is run on satellites as
+  // well, otherwise only the root node processes the python script. Disabled by
+  // default.
+  vtkGetMacro(SymmetricMPIMode, int);
+  vtkSetMacro(SymmetricMPIMode, int);
+
+  // Description:
   // Should this run print the version numbers and exit.
   vtkGetMacro(TellVersion, int);
 
@@ -181,6 +190,8 @@ protected:
   int ServerMode;
   int ClientMode;
   int RenderServerMode;
+
+  int SymmetricMPIMode;
 
   // Command Option for loading state file(Bug #5711)
   vtkSetStringMacro(StateFileName);

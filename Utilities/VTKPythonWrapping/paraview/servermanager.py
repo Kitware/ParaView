@@ -2898,7 +2898,13 @@ ActiveConnection = None
 # Needs to be called when paraview module is loaded from python instead
 # of pvpython, pvbatch or GUI.
 if not vtkSMObject.GetProxyManager():
-    vtkInitializationHelper.Initialize(sys.executable)
+    pvoptions = None
+    if paraview.options.batch:
+      pvoptions = vtkPVOptions();
+      options.SetProcessType(0x40)
+      if paraview.options.symmetric:
+        options.SetSymmetricMPIMode(True)
+    vtkInitializationHelper.Initialize(sys.executable, options)
 
 # Initialize progress printing. Can be turned off by calling
 # ToggleProgressPrinting() again.

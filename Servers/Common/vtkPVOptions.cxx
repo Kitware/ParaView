@@ -16,6 +16,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVConfig.h" //For PARAVIEW_ALWAYS_SECURE_CONNECTION option
 #include "vtkPVOptionsXMLParser.h"
+#include "vtkParallelRenderManager.h"
 
 #include <vtksys/CommandLineArguments.hxx>
 #include <vtksys/SystemTools.hxx>
@@ -50,6 +51,7 @@ vtkPVOptions::vtkPVOptions()
   this->ClientMode = 0;
   this->ServerMode = 0;
   this->RenderServerMode = 0;
+  this->SymmetricMPIMode = 0;
 
   this->TellVersion = 0;
 
@@ -230,6 +232,11 @@ void vtkPVOptions::Initialize()
   this->AddArgument("--state", 0, &this->StateFileName,
     "Load the specified statefile (.pvsm).",
     vtkPVOptions::PVCLIENT|vtkPVOptions::PARAVIEW);
+
+  this->AddBooleanArgument("--symmetric", "-sym",
+    &this->SymmetricMPIMode,
+    "When specified, the python script is processed symmetrically on all processes.",
+    vtkPVOptions::PVBATCH);
 }
 
 //----------------------------------------------------------------------------
@@ -300,6 +307,13 @@ int vtkPVOptions::PostProcess(int, const char* const*)
     return 0;
     }
 #endif //PARAVIEW_ALWAYS_SECURE_CONNECTION
+
+  if (this->GetSymmetricMPIMode())
+    {
+    // Disable render event propagation since satellites are no longer doing
+    // ProcessRMIs() since symmetric script processing is enabled.
+    vtkParallelRenderManager::SetDefaultRenderEventPropagation(false);
+    }
   return 1;
 }
 
@@ -430,5 +444,5 @@ void vtkPVOptions::PrintSelf(ostream& os, vtkIndent indent)
     << (this->StateFileName?this->StateFileName:"(none)") << endl;
   os << indent << "LogFileName: "
     << (this->LogFileName? this->LogFileName : "(none)") << endl; 
-
+  os << indent << "SymmetricMPIMode: " << this->SymmetricMPIMode << endl;
 }
