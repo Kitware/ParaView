@@ -49,3 +49,13 @@ QtTesting.playCommand(object12, 'key', '16777220')
 #QtTesting.playCommand(object8, 'activate', 'actionToolsRecordTestScreenshot')
 #QtTesting.playCommand(object9, 'filesSelected', '$PARAVIEW_DATA_ROOT/Baseline/FileSeries2.png')
 QtTestingImage.compareImage(snapshotWidget, 'FileSeries2.png', 300, 300);
+
+# export the result as VRML.
+object1 = 'pqClientMainWindow/menubar'
+QtTesting.playCommand(object1, 'activate', 'menu_File')
+object2 = 'pqClientMainWindow/menubar/menu_File'
+QtTesting.playCommand(object2, 'activate', 'actionExport')
+object4 = 'pqClientMainWindow/FileExportDialog'
+QtTesting.playCommand(object4, 'filesSelected', '$PARAVIEW_TEST_ROOT/FileSeries.vrml')
+# Not interested in testing the result of the VRML export, since that's a VTK
+# test. Just want to test that exporting works in ParaView.
