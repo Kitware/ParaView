@@ -41,27 +41,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QWidget>
 
 
-/// \class pqOptionsPageApplyHandler
-/// \brief
-///   The pqOptionsPageApplyHandler class is used to apply the changes
-///   made to an options page.
-///
-/// The apply handler separates the data storage from the options UI.
-/// This allows the same page to be reused.
-class PQCOMPONENTS_EXPORT pqOptionsPageApplyHandler
-{
-public:
-  pqOptionsPageApplyHandler() {}
-  virtual ~pqOptionsPageApplyHandler() {}
-
-  /// Applies changes to the options data.
-  virtual void applyChanges() = 0;
-
-  /// Resets the changes to the options data.
-  virtual void resetChanges() = 0;
-};
-
-
 /// \class pqOptionsPage
 /// \brief
 ///   The pqOptionsPage class is used to add a single page of options
@@ -81,18 +60,7 @@ public:
   ///   Gets whether or not the apply button is used by the options.
   /// \return
   ///   True if the apply button is used by the options.
-  virtual bool isApplyUsed() const {return this->Handler != 0;}
-
-  /// \brief
-  ///   Gets the apply handler for the options.
-  /// \return
-  ///   A pointer to the apply handler for the options.
-  pqOptionsPageApplyHandler *getApplyHandler() const {return this->Handler;}
-
-  /// \brief
-  ///   Sets the apply handler for the options.
-  /// \param handler The new apply handler.
-  void setApplyHandler(pqOptionsPageApplyHandler *handler);
+  virtual bool isApplyUsed() const {return false; }
 
   /// Sends a signal that changes are available to apply.
   void sendChangesAvailable();
@@ -104,19 +72,18 @@ public slots:
   /// The apply handler is used to save the changes. Sub-classes can
   /// override this method to save the changes directly instead of
   /// using an apply handler.
-  virtual void applyChanges();
+  virtual void applyChanges()=0;
 
   /// \brief
   ///   Resets the changes to the options data.
   /// \sa pqOptionsPage::applyChanges()
-  virtual void resetChanges();
+  virtual void resetChanges()=0;
 
 signals:
   /// Emitted when there are changes to be applied.
   void changesAvailable();
 
 private:
-  pqOptionsPageApplyHandler *Handler; ///< Stores the apply handler.
 };
 
 #endif

@@ -39,36 +39,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 pqOptionsPage::pqOptionsPage(QWidget *widgetParent)
   : QWidget(widgetParent)
 {
-  this->Handler = 0;
-}
-
-void pqOptionsPage::setApplyHandler(pqOptionsPageApplyHandler *handler)
-{
-  this->Handler = handler;
 }
 
 void pqOptionsPage::sendChangesAvailable()
 {
-  if(this->Handler)
-    {
-    emit this->changesAvailable();
-    }
-}
-
-void pqOptionsPage::applyChanges()
-{
-  if(this->Handler)
-    {
-    this->Handler->applyChanges();
-    }
-}
-
-void pqOptionsPage::resetChanges()
-{
-  if(this->Handler)
-    {
-    this->Handler->resetChanges();
-    }
+  emit this->changesAvailable();
 }
 
 

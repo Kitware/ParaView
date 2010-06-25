@@ -379,8 +379,6 @@ ADD_LIBRARY(pqComponents
   pqChangeInputDialog.h
   pqChartOptionsEditor.cxx
   pqChartOptionsEditor.h
-  pqChartOptionsHandler.cxx
-  pqChartOptionsHandler.h
   pqChartPixelScale.cxx
   pqChartPixelScale.h
   pqChartValue.cxx
