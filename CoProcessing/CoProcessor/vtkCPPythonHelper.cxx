@@ -102,7 +102,7 @@ vtkCPPythonHelper* vtkCPPythonHelper::New()
     vtkCPPythonHelper::Instance->PVMain = vtkPVMain::New();
     vtkCPPythonHelper::Instance->PythonOptions = vtkPVPythonOptions::New();
     vtkCPPythonHelper::Instance->PythonOptions->SetProcessType(vtkPVOptions::PVBATCH);
-    vtkCPPythonHelper::Instance->PythonOptions->SetEnableSymmetricScripting(1);
+    vtkCPPythonHelper::Instance->PythonOptions->SetSymmetricMPIMode(1);
     vtkCPPythonHelper::Instance->ProcessModuleHelper = vtkCPProcessModulePythonHelper::New();
     vtkCPPythonHelper::Instance->ProcessModuleHelper->SetDisableConsole(true);
     int ret = vtkCPPythonHelper::Instance->PVMain->Initialize(
