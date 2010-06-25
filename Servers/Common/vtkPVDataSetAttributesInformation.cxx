@@ -188,7 +188,8 @@ vtkPVDataSetAttributesInformation
     for ( int i = 0; i < num; i ++ )
       {
       sortArays[i].arrayIndx = i;
-      sortArays[i].arrayName = da->GetArrayName( i );
+      sortArays[i].arrayName = da->GetArrayName( i ) ?
+        da->GetArrayName(i) : "";
       }
 
     vtkstd::sort( sortArays.begin(), sortArays.end(),
