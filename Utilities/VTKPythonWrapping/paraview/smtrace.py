@@ -201,7 +201,7 @@ def get_proxy_info(p, search_existing=True):
     if info.Proxy == p: return info
     if info.PyVariable == p: return info
   # It must be a proxy that existed before trace started
-  if search_existing:
+  if search_existing and not isinstance(p, str):
     return track_existing_proxy(p)
   return None
 
@@ -240,14 +240,16 @@ def get_view_proxy_info_for_rep(rep_info):
               if rep_info.Proxy == rep_prop.GetProxy(i): return p
     return None
 
-def get_animated_proxy(cue_info):
+def get_animated_proxy_info(cue_info):
     """Given a proxy_trace_info object for a animation cue proxy, returns the
-    proxy_trace_info for the animated proxy.  If one is not found,
-    returns None."""
+    proxy_trace_info for the animated proxy.  If one is not found, returns None."""
     # The cue info must have 'AnimatedProxy' in its current properties dict:
-    if "AnimatedProxy" in cue_info.CurrentProps:
-        input_proxy_pyvariable = cue_info.CurrentProps["AnimatedProxy"]
-        return get_proxy_info(input_proxy_pyvariable)
+    prop = cue_info.Proxy.GetProperty("AnimatedProxy")
+    if prop and prop.GetNumberOfProxies():
+        proxy = prop.GetProxy(0)
+        if proxy.GetXMLName() == "RepresentationAnimationHelper":
+            proxy = proxy.GetProperty("Source").GetProxy(0)
+        return get_proxy_info(proxy)
     return None
 
 def get_source_proxy_registration_name(proxy):
@@ -596,15 +598,15 @@ def append_trace():
             propname = propNameValues.get_value("AnimatedElement")
             propNameValues = propNameValues.purge("AnimatedElement")
           propNameValues = propNameValues.purge("AnimatedProxy")
-          input_proxy_info = get_animated_proxy(info)
-          if input_proxy_info:
-            ensure_active_source(input_proxy_info)
+          source_proxy_info = get_animated_proxy_info(info)
+          if source_proxy_info:
+            ensure_active_source(source_proxy_info)
           ctorArgs.append(propname)
           if index != None:
             ctorArgs.append(index)
           setPropertiesInCtor = False
         elif info.Proxy.GetXMLName() == "CameraAnimationCue":
-          view_proxy_info = get_animated_proxy(info)
+          view_proxy_info = get_animated_proxy_info(info)
           if view_proxy_info:
             ensure_active_view(view_proxy_info)
           ctorMethod = "GetCameraTrack"
