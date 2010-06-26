@@ -2901,10 +2901,10 @@ if not vtkSMObject.GetProxyManager():
     pvoptions = None
     if paraview.options.batch:
       pvoptions = vtkPVOptions();
-      options.SetProcessType(0x40)
+      pvoptions.SetProcessType(0x40)
       if paraview.options.symmetric:
-        options.SetSymmetricMPIMode(True)
-    vtkInitializationHelper.Initialize(sys.executable, options)
+        pvoptions.SetSymmetricMPIMode(True)
+    vtkInitializationHelper.Initialize(sys.executable, pvoptions)
 
 # Initialize progress printing. Can be turned off by calling
 # ToggleProgressPrinting() again.
