@@ -28,6 +28,7 @@ vtkCxxRevisionMacro(vtkSMGlyph3DMapperRepresentationProxy, "$Revision: 1774 $");
 vtkSMGlyph3DMapperRepresentationProxy::vtkSMGlyph3DMapperRepresentationProxy()
 {
   this->GlyphMapper = 0;
+  this->LODGlyphMapper = 0;
   this->SourceOutputPort = 0;
   this->GlyphSourceStrategy = 0;
 }
@@ -87,6 +88,10 @@ bool vtkSMGlyph3DMapperRepresentationProxy::BeginCreateVTKObjects()
   this->GlyphMapper = this->GetSubProxy("GlyphMapper");
   this->GlyphMapper->SetServers(
     vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
+
+  this->LODGlyphMapper = this->GetSubProxy("LODGlyphMapper");
+  this->LODGlyphMapper->SetServers(
+    vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
   return true;
 }
 
@@ -101,6 +106,10 @@ bool vtkSMGlyph3DMapperRepresentationProxy::EndCreateVTKObjects()
   // Switch the mapper to use the GlyphMapper instead of the standard mapper.
   vtkSMPropertyHelper(this->Prop3D, "Mapper").Set(this->GlyphMapper);
   this->GlyphMapper->UpdateVTKObjects();
+
+  vtkSMPropertyHelper(this->Prop3D, "LODMapper").Set(this->LODGlyphMapper);
+  this->LODGlyphMapper->UpdateVTKObjects();
+  this->Prop3D->UpdateVTKObjects();
   return true;
 }
 
@@ -114,6 +123,9 @@ bool vtkSMGlyph3DMapperRepresentationProxy::InitializeStrategy(vtkSMViewProxy* v
 
   vtkSMPropertyHelper(this->GlyphMapper, "Input").Set(
     vtkSMPropertyHelper(this->Mapper, "Input").GetAsProxy());
+
+  vtkSMPropertyHelper(this->LODGlyphMapper, "Input").Set(
+    vtkSMPropertyHelper(this->LODMapper, "Input").GetAsProxy());
 
   // source input is always polydata.
   vtkSmartPointer<vtkSMRepresentationStrategy> strategy;
@@ -130,11 +142,10 @@ bool vtkSMGlyph3DMapperRepresentationProxy::InitializeStrategy(vtkSMViewProxy* v
   // can assume that the objects for this proxy have been created.
   // (Look at vtkSMDataRepresentationProxy::AddToView()).
 
-  strategy->SetEnableLOD(false);
+  strategy->SetEnableLOD(true);
 
   if (this->Source)
     {
-    Connect(this->Source, strategy, "Input", this->SourceOutputPort);
     vtkSMPropertyHelper(strategy, "Input").Set(
       this->Source, this->SourceOutputPort);
     }
@@ -145,6 +156,8 @@ bool vtkSMGlyph3DMapperRepresentationProxy::InitializeStrategy(vtkSMViewProxy* v
     }
   vtkSMPropertyHelper(this->GlyphMapper, "Source").Set(
     strategy->GetOutput());
+  vtkSMPropertyHelper(this->LODGlyphMapper, "Source").Set(
+    strategy->GetLODOutput());
   this->GlyphSourceStrategy = strategy;
 
   // Creates the strategy objects.
@@ -153,6 +166,7 @@ bool vtkSMGlyph3DMapperRepresentationProxy::InitializeStrategy(vtkSMViewProxy* v
   this->AddStrategy(strategy);
 
   this->GlyphMapper->UpdateVTKObjects();
+  this->LODMapper->UpdateVTKObjects();
   return true;
 }
 

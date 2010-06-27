@@ -10106,6 +10106,16 @@
         <ShareProperties subproxy="Mapper">
         </ShareProperties>
       </SubProxy>
+
+      <SubProxy>
+        <!-- 
+          GlyphMapper for low-res geometry.
+        -->
+        <Proxy name="LODGlyphMapper" proxygroup="mappers" proxyname="Glyph3DMapper" />
+        <ShareProperties subproxy="GlyphMapper">
+        </ShareProperties>
+      </SubProxy>
+
       
     </Glyph3DMapperRepresentationProxy>
   </ProxyGroup>

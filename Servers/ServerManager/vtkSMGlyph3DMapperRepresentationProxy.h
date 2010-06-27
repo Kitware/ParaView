@@ -74,6 +74,7 @@ protected:
   vtkSmartPointer<vtkSMProxy> Source;
   unsigned int SourceOutputPort;
   vtkSMProxy* GlyphMapper;
+  vtkSMProxy* LODGlyphMapper;
 
   vtkSMRepresentationStrategy* GlyphSourceStrategy;
 private:
