@@ -73,6 +73,12 @@ bool pqAbstractIntEventPlayer::playEvent(QObject* Object, const QString& Command
       }
     }
 
+  if (Command == "spin")
+    {
+    // let pqAbstractDoubleEventPlayer handle it if possible.
+    return false;
+    }
+
   qCritical() << "calling set_int on unhandled type " << Object;
   Error = true;
   return true;

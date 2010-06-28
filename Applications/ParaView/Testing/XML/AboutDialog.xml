@@ -2,4 +2,77 @@
 <pqevents>
   <pqevent object="pqClientMainWindow/menubar/menu_Help" command="activate" arguments="actionAbout" />
   <pqevent object="pqClientMainWindow/pqAboutDialog/OK" command="activate" arguments="" />
+
+  <!-- tests the server configuration dialogs and xmls -->
+  <pqevent object="pqClientMainWindow/MainControlsToolbar/actionServerConnect" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/ServerStartupBrowser/addServer" command="activate" arguments="" />
+  <pqevent object="pqCreateServerStartupDialog/name" command="set_string" arguments="f" />
+  <pqevent object="pqCreateServerStartupDialog/name" command="set_string" arguments="fo" />
+  <pqevent object="pqCreateServerStartupDialog/name" command="set_string" arguments="foo" />
+  <pqevent object="pqCreateServerStartupDialog/okButton" command="activate" arguments="" />
+  <pqevent object="pqEditServerStartupDialog/type" command="set_string" arguments="Manual" />
+  <pqevent object="pqEditServerStartupDialog/cancelButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/ServerStartupBrowser/addServer" command="activate" arguments="" />
+  <pqevent object="pqCreateServerStartupDialog/name" command="set_string" arguments="f" />
+  <pqevent object="pqCreateServerStartupDialog/name" command="set_string" arguments="fo" />
+  <pqevent object="pqCreateServerStartupDialog/name" command="set_string" arguments="foo" />
+  <pqevent object="pqCreateServerStartupDialog/type" command="set_string" arguments="Client / Data Server / Render Server" />
+  <pqevent object="pqCreateServerStartupDialog/dataServerHost" command="set_string" arguments="localhost" />
+  <pqevent object="pqCreateServerStartupDialog/renderServerHost" command="set_string" arguments="localhost" />
+  <pqevent object="pqCreateServerStartupDialog/okButton" command="activate" arguments="" />
+  <pqevent object="pqEditServerStartupDialog/type" command="set_string" arguments="Manual" />
+  <pqevent object="pqEditServerStartupDialog/okButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/ServerStartupBrowser/startups" command="mousePress" arguments="1,1,0,27,5,/0:0" />
+  <pqevent object="pqClientMainWindow/ServerStartupBrowser/startups" command="mouseRelease" arguments="1,0,0,27,5,/0:0" />
+  <pqevent object="pqClientMainWindow/ServerStartupBrowser/deleteServer" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/ServerStartupBrowser/startups" command="mousePress" arguments="1,1,0,17,6,/0:0" />
+  <pqevent object="pqClientMainWindow/ServerStartupBrowser/startups" command="mouseRelease" arguments="1,0,0,17,6,/0:0" />
+  <pqevent object="pqClientMainWindow/ServerStartupBrowser/editServer" command="activate" arguments="" />
+  <pqevent object="pqEditServerStartupDialog/cancelButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/ServerStartupBrowser/load" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/ServerStartupBrowser/LoadServerConfigurationDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Data/servers-wiki.pvsc" />
+  <pqevent object="pqClientMainWindow/ServerStartupBrowser/startups" command="mousePress" arguments="1,1,0,26,12,/0:0" />
+  <pqevent object="pqClientMainWindow/ServerStartupBrowser/startups" command="mouseRelease" arguments="1,0,0,26,12,/0:0" />
+  <pqevent object="pqClientMainWindow/ServerStartupBrowser/startups" command="mousePress" arguments="1,1,0,36,7,/2:0" />
+  <pqevent object="pqClientMainWindow/ServerStartupBrowser/startups" command="mouseRelease" arguments="1,0,0,36,7,/2:0" />
+  <pqevent object="pqClientMainWindow/ServerStartupBrowser/startups" command="mouseDblClick" arguments="1,1,0,36,7,/2:0" />
+  <pqevent object="pqClientMainWindow/ServerStartupBrowser/startups" command="mouseRelease" arguments="1,0,0,36,7,/2:0" />
+  <pqevent object="1QDialog0/1QSpinBox0" command="spin" arguments="up" />
+  <pqevent object="1QDialog0/1QSpinBox0" command="spin" arguments="up" />
+  <pqevent object="1QDialog0/1QPushButton1" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/MainControlsToolbar/actionServerConnect" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/ServerStartupBrowser/startups" command="mousePress" arguments="1,1,0,35,7,/4:0" />
+  <pqevent object="pqClientMainWindow/ServerStartupBrowser/startups" command="mouseRelease" arguments="1,0,0,35,7,/4:0" />
+  <pqevent object="pqClientMainWindow/ServerStartupBrowser/startups" command="mouseDblClick" arguments="1,1,0,35,7,/4:0" />
+  <pqevent object="pqClientMainWindow/ServerStartupBrowser/startups" command="mouseRelease" arguments="1,0,0,35,7,/4:0" />
+  <pqevent object="1QDialog0/1QPushButton1" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/MainControlsToolbar/actionServerConnect" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/ServerStartupBrowser/startups" command="mousePress" arguments="1,1,0,31,6,/5:0" />
+  <pqevent object="pqClientMainWindow/ServerStartupBrowser/startups" command="mouseRelease" arguments="1,0,0,31,6,/5:0" />
+  <pqevent object="pqClientMainWindow/ServerStartupBrowser/startups" command="mouseDblClick" arguments="1,1,0,31,6,/5:0" />
+  <pqevent object="pqClientMainWindow/ServerStartupBrowser/startups" command="mouseRelease" arguments="1,0,0,31,6,/5:0" />
+  <pqevent object="1QDialog0/1QPushButton1" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/MainControlsToolbar/actionServerConnect" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/ServerStartupBrowser/startups" command="mousePress" arguments="1,1,0,22,12,/6:0" />
+  <pqevent object="pqClientMainWindow/ServerStartupBrowser/startups" command="mouseRelease" arguments="1,0,0,22,12,/6:0" />
+  <pqevent object="pqClientMainWindow/ServerStartupBrowser/startups" command="mouseDblClick" arguments="1,1,0,22,12,/6:0" />
+  <pqevent object="pqClientMainWindow/ServerStartupBrowser/startups" command="mouseRelease" arguments="1,0,0,22,12,/6:0" />
+  <pqevent object="1QDialog0/1QPushButton1" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/MainControlsToolbar/actionServerConnect" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/ServerStartupBrowser/startups" command="mousePress" arguments="1,1,0,39,9,/7:0" />
+  <pqevent object="pqClientMainWindow/ServerStartupBrowser/startups" command="mouseRelease" arguments="1,0,0,39,9,/7:0" />
+  <pqevent object="pqClientMainWindow/ServerStartupBrowser/startups" command="mouseDblClick" arguments="1,1,0,39,9,/7:0" />
+  <pqevent object="pqClientMainWindow/ServerStartupBrowser/startups" command="mouseRelease" arguments="1,0,0,39,9,/7:0" />
+  <pqevent object="1QDialog0/1pqFileChooserWidget0/FileButton" command="activate" arguments="" />
+  <pqevent object="1QDialog0/1pqFileChooserWidget0/pqFileDialog" command="cancelled" arguments="" />
+  <pqevent object="1QDialog0/1QPushButton1" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/MainControlsToolbar/actionServerConnect" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/ServerStartupBrowser/startups" command="mousePress" arguments="1,1,0,18,12,/8:0" />
+  <pqevent object="pqClientMainWindow/ServerStartupBrowser/startups" command="mouseRelease" arguments="1,0,0,18,12,/8:0" />
+  <pqevent object="pqClientMainWindow/ServerStartupBrowser/startups" command="mouseDblClick" arguments="1,1,0,18,12,/8:0" />
+  <pqevent object="pqClientMainWindow/ServerStartupBrowser/startups" command="mouseRelease" arguments="1,0,0,18,12,/8:0" />
+  <pqevent object="1QDialog0/1QCheckBox0" command="set_boolean" arguments="true" />
+  <pqevent object="1QDialog0/1QCheckBox0" command="set_boolean" arguments="false" />
+  <pqevent object="1QDialog0/1QComboBox0" command="set_string" arguments="MPICH Ver 2.0" />
+  <pqevent object="1QDialog0/1QPushButton1" command="activate" arguments="" />
 </pqevents>

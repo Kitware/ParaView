@@ -56,4 +56,30 @@
   <pqevent object="pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/ClipFunction/pqImplicitPlaneWidget/useXNormal" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/ClipFunction/pqImplicitPlaneWidget/useZNormal" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/objectInspector/Accept" command="activate" arguments="" />
+
+  <!-- Add some test for the Camera Setting Dialog -->
+  <pqevent object="pqClientMainWindow/pqParaViewBehaviors0/pqViewFrameActionsBehavior0/pqStandardViewFrameActionGroup0/CameraButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqCameraDialog/groupBox_2/viewsGroup/viewXPlus" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqCameraDialog/groupBox_2/viewsGroup/viewXMinus" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqCameraDialog/groupBox_2/viewsGroup" command="mouseMove" arguments="1,0,0,88,46" />
+  <pqevent object="pqClientMainWindow/pqCameraDialog/groupBox_2/viewsGroup" command="mouseRelease" arguments="1,0,0,88,46" />
+  <pqevent object="pqClientMainWindow/pqCameraDialog/groupBox_2/viewsGroup/viewYPlus" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqCameraDialog/groupBox_2/viewsGroup/viewYMinus" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqCameraDialog/orientationsGroup/rollAngle" command="spin" arguments="up" />
+  <pqevent object="pqClientMainWindow/pqCameraDialog/orientationsGroup/rollAngle" command="spin" arguments="up" />
+  <pqevent object="pqClientMainWindow/pqCameraDialog/orientationsGroup/rollButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqCameraDialog/orientationsGroup/elevationAngle" command="spin" arguments="up" />
+  <pqevent object="pqClientMainWindow/pqCameraDialog/orientationsGroup/elevationAngle" command="spin" arguments="up" />
+  <pqevent object="pqClientMainWindow/pqCameraDialog/orientationsGroup/elevationButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqCameraDialog/orientationsGroup/azimuthAngle" command="spin" arguments="up" />
+  <pqevent object="pqClientMainWindow/pqCameraDialog/orientationsGroup/azimuthButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqCameraDialog/orientationsGroup/azimuthAngle" command="set_double" arguments="0" />
+  <pqevent object="pqClientMainWindow/pqCameraDialog/orientationsGroup/azimuthButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqCameraDialog/orientationsGroup/elevationAngle" command="set_double" arguments="0" />
+  <pqevent object="pqClientMainWindow/pqCameraDialog/orientationsGroup/elevationButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqCameraDialog/orientationsGroup/rollAngle" command="set_double" arguments="0" />
+  <pqevent object="pqClientMainWindow/pqCameraDialog/orientationsGroup/rollButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqCameraDialog/groupBox_2/viewsGroup/viewZPlus" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqCameraDialog/groupBox_2/viewsGroup/viewYMinus" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqCameraDialog/closeButton" command="activate" arguments="" />
 </pqevents>

@@ -170,8 +170,6 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqServerStartupBrowser.h
   pqServerStartupDialog.h
   pqSignalAdaptorCompositeTreeWidget.h
-  pqSignalAdaptorKeyFrameValue.h
-  pqSignalAdaptorKeyFrameTime.h
   pqSignalAdaptorKeyFrameType.h
   pqSignalAdaptorSelectionTreeWidget.h
   pqSignalAdaptorTreeWidget.h
@@ -275,7 +273,6 @@ SET(UI_FORMS
   Resources/UI/pqSelectReaderDialog.ui
   Resources/UI/pqServerBrowser.ui
   Resources/UI/pqServerStartupDialog.ui
-  Resources/UI/pqSignalAdaptorKeyFrameValue.ui
   Resources/UI/pqSphereWidget.ui
   Resources/UI/pqSplineWidget.ui
   Resources/UI/pqSpreadSheetDisplayEditor.ui
@@ -590,10 +587,6 @@ ADD_LIBRARY(pqComponents
   pqServerStartupDialog.h
   pqSignalAdaptorCompositeTreeWidget.cxx
   pqSignalAdaptorCompositeTreeWidget.h
-  pqSignalAdaptorKeyFrameValue.cxx
-  pqSignalAdaptorKeyFrameValue.h
-  pqSignalAdaptorKeyFrameTime.cxx
-  pqSignalAdaptorKeyFrameTime.h
   pqSignalAdaptorKeyFrameType.cxx
   pqSignalAdaptorKeyFrameType.h
   pqSignalAdaptorSelectionTreeWidget.cxx
