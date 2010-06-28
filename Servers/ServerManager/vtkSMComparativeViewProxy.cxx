@@ -49,7 +49,6 @@ static void vtkCopyClone(vtkSMProxy* source, vtkSMProxy* clone,
   for (; !iterSource->IsAtEnd() && !iterDest->IsAtEnd();
     iterSource->Next(), iterDest->Next())
     {
-
     // Skip the property if it is in the exceptions list.
     if (exceptions && 
       exceptions->find(iterSource->GetKey()) != exceptions->end())
@@ -59,7 +58,7 @@ static void vtkCopyClone(vtkSMProxy* source, vtkSMProxy* clone,
     vtkSMProperty* destProp = iterDest->GetProperty();
 
     // Skip the property if it is information only or is internal.
-    if (destProp->GetInformationOnly() || destProp->GetIsInternal())
+    if (destProp->GetInformationOnly())
       {
       continue;
       }
