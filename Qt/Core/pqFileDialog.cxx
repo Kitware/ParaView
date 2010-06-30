@@ -627,7 +627,12 @@ void pqFileDialog::onModelReset()
   this->Implementation->Ui.Parents->clear();
 
   QString currentPath = this->Implementation->Model->getCurrentPath();
-  QChar separator = this->Implementation->Model->separator();
+  //clean the path to always look like a unix path
+  currentPath = QDir::cleanPath( currentPath );
+
+  //the separator is always the unix separator
+  QChar separator = '/';
+
   QStringList parents = currentPath.split(separator, QString::SkipEmptyParts);
 
   // put our root back in
@@ -658,6 +663,7 @@ void pqFileDialog::onModelReset()
     this->Implementation->Ui.Parents->addItem(str);
     }
    this->Implementation->Ui.Parents->setCurrentIndex(parents.size() - 1);
+
 }
 
 //-----------------------------------------------------------------------------
