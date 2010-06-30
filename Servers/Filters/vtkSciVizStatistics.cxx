@@ -179,9 +179,7 @@ int vtkSciVizStatistics::RequestDataObject(
   vtkCompositeDataSet* inDataComp = vtkCompositeDataSet::SafeDownCast( inData );
 
   // Output 0: Model
-  // The output model type depends on whether the input data is a composite dataset or not.
-  // If the input data is composite, both the output data and model will be composite.
-  // Otherwise, the output model will be of the type specified by the subclass through GetModelDataTypeName().
+  // The output model type should always be a multiblock dataset, but it is possible to override this for specific statistics.
   vtkInformation* oinfom = output->GetInformationObject( 0 );
   vtkDataObject* ouModel = oinfom->Get( vtkDataObject::DATA_OBJECT() );
 
@@ -458,7 +456,7 @@ int vtkSciVizStatistics::RequestData(
     else
       {
       modelOut->Initialize();
-      stat = this->FitModel( modelOut, train );
+      stat = this->FitModel( vtkMultiBlockDataSet::SafeDownCast( modelOut ), train );
       }
 
     if ( train )
@@ -490,7 +488,7 @@ int vtkSciVizStatistics::RequestData(
     }
   if ( this->Task != CREATE_MODEL && this->Task != FULL_STATISTICS )
     { // we need to assess the data using the input or the just-created model
-    stat = this->AssessData( tableIn, observationsOut, modelOut );
+    stat = this->AssessData( tableIn, observationsOut, vtkMultiBlockDataSet::SafeDownCast( modelOut ) );
     }
   tableIn->Delete();
 

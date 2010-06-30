@@ -31,7 +31,7 @@ void vtkPSciVizKMeans::PrintSelf( ostream& os, vtkIndent indent )
   os << indent << "Tolerance: " << this->Tolerance << "\n";
 }
 
-int vtkPSciVizKMeans::FitModel( vtkDataObject* modelDO, vtkTable* trainingData )
+int vtkPSciVizKMeans::FitModel( vtkMultiBlockDataSet* modelDO, vtkTable* trainingData )
 {
   // Create the statistics filter and run it
   vtkPKMeansStatistics* stats = vtkPKMeansStatistics::New();
@@ -57,7 +57,7 @@ int vtkPSciVizKMeans::FitModel( vtkDataObject* modelDO, vtkTable* trainingData )
   return 1;
 }
 
-int vtkPSciVizKMeans::AssessData( vtkTable* observations, vtkDataObject* assessedOut, vtkDataObject* modelOut )
+int vtkPSciVizKMeans::AssessData( vtkTable* observations, vtkDataObject* assessedOut, vtkMultiBlockDataSet* modelOut )
 {
   if ( ! assessedOut )
     {

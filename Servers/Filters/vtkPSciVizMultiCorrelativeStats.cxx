@@ -26,7 +26,7 @@ void vtkPSciVizMultiCorrelativeStats::PrintSelf( ostream& os, vtkIndent indent )
   this->Superclass::PrintSelf( os, indent );
 }
 
-int vtkPSciVizMultiCorrelativeStats::FitModel( vtkDataObject* modelDO, vtkTable* trainingData )
+int vtkPSciVizMultiCorrelativeStats::FitModel( vtkMultiBlockDataSet* modelDO, vtkTable* trainingData )
 {
   // Create the statistics filter and run it
   vtkPMultiCorrelativeStatistics* stats = vtkPMultiCorrelativeStatistics::New();
@@ -49,7 +49,7 @@ int vtkPSciVizMultiCorrelativeStats::FitModel( vtkDataObject* modelDO, vtkTable*
   return 1;
 }
 
-int vtkPSciVizMultiCorrelativeStats::AssessData( vtkTable* observations, vtkDataObject* assessedOut, vtkDataObject* modelOut )
+int vtkPSciVizMultiCorrelativeStats::AssessData( vtkTable* observations, vtkDataObject* assessedOut, vtkMultiBlockDataSet* modelOut )
 {
   if ( ! assessedOut )
     {

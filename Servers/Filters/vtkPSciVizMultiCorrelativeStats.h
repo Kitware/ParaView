@@ -60,7 +60,7 @@
 // covariance matrix (which is triangular, so its upper triangle is zero).
 // Because the diagonal must be stored for both matrices, an additional
 // row is required - hence the N+1 rows and the final entry of the column
-// named "Column". 
+// named "Column".
 
 #ifndef __vtkPSciVizMultiCorrelativeStats_h
 #define __vtkPSciVizMultiCorrelativeStats_h
@@ -78,10 +78,8 @@ protected:
   vtkPSciVizMultiCorrelativeStats();
   virtual ~vtkPSciVizMultiCorrelativeStats();
 
-  virtual const char* GetModelDataTypeName() { return "vtkMultiBlockDataSet"; }
-
-  virtual int FitModel( vtkDataObject* model, vtkTable* trainingData );
-  virtual int AssessData( vtkTable* observations, vtkDataObject* dataset, vtkDataObject* model );
+  virtual int FitModel( vtkMultiBlockDataSet* model, vtkTable* trainingData );
+  virtual int AssessData( vtkTable* observations, vtkDataObject* dataset, vtkMultiBlockDataSet* model );
 
 private:
   vtkPSciVizMultiCorrelativeStats( const vtkPSciVizMultiCorrelativeStats& ); // Not implemented.

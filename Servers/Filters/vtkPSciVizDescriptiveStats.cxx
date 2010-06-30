@@ -4,6 +4,7 @@
 #include "vtkDataSetAttributes.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
+#include "vtkMultiBlockDataSet.h"
 #include "vtkObjectFactory.h"
 #include "vtkPDescriptiveStatistics.h"
 #include "vtkTable.h"
@@ -26,13 +27,11 @@ void vtkPSciVizDescriptiveStats::PrintSelf( ostream& os, vtkIndent indent )
   os << indent << "SignedDeviations: " << this->SignedDeviations << "\n";
 }
 
-int vtkPSciVizDescriptiveStats::FitModel( vtkDataObject* modelDO, vtkTable* trainingData )
+int vtkPSciVizDescriptiveStats::FitModel( vtkMultiBlockDataSet* modelDO, vtkTable* trainingData )
 {
-  // Get where we'll store the output statistical model.
-  vtkTable* modelOut = vtkTable::SafeDownCast( modelDO );
-  if ( ! modelOut )
+  if ( ! modelDO )
     {
-    vtkErrorMacro( "Output is not a table" );
+    vtkErrorMacro( "No place to store output tables." );
     return 0;
     }
 
@@ -53,13 +52,13 @@ int vtkPSciVizDescriptiveStats::FitModel( vtkDataObject* modelDO, vtkTable* trai
   stats->Update();
 
   // Copy the output of the statistics filter to our output
-  modelOut->ShallowCopy( stats->GetOutput( vtkStatisticsAlgorithm::OUTPUT_MODEL ) );
+  modelDO->ShallowCopy( stats->GetOutputDataObject( vtkStatisticsAlgorithm::OUTPUT_MODEL ) );
   stats->Delete();
 
   return 1;
 }
 
-int vtkPSciVizDescriptiveStats::AssessData( vtkTable* observations, vtkDataObject* assessedOut, vtkDataObject* modelOut )
+int vtkPSciVizDescriptiveStats::AssessData( vtkTable* observations, vtkDataObject* assessedOut, vtkMultiBlockDataSet* modelOut )
 {
   if ( ! assessedOut )
     {

@@ -31,9 +31,10 @@
 class vtkCompositeDataSet;
 class vtkDataObjectToTable;
 class vtkFieldData;
+class vtkInformationIntegerKey;
+class vtkMultiBlockDataSet;
 class vtkSciVizStatisticsP;
 class vtkStatisticsAlgorithm;
-class vtkInformationIntegerKey;
 
 class VTK_EXPORT vtkSciVizStatistics : public vtkTableAlgorithm
 {
@@ -69,7 +70,7 @@ public:
   //
   // The random sample of the original dataset (say, of size N) is obtained by choosing N random numbers in [0,1).
   // Any sample where the random number is less than \a TrainingFraction is included in the training data.
-  // Samples are then randomly added or removed from the training data until it is the desired size. 
+  // Samples are then randomly added or removed from the training data until it is the desired size.
   vtkSetClampMacro(TrainingFraction,double,0.0,1.0);
   vtkGetMacro(TrainingFraction,double);
 
@@ -134,7 +135,7 @@ protected:
   // If you override this method, you <b>may</b> also override CreateModelDataType();
   // if you don't, then the instantiator will be used to create an object of the type
   // specified by GetModelDataTypeName().
-  virtual const char* GetModelDataTypeName() { return "vtkTable"; }
+  virtual const char* GetModelDataTypeName() { return "vtkMultiBlockDataSet"; }
 
   // Description:
   // Method subclasses <b>may</b> override to change the output model type from a vtkTable to some other Type.
@@ -147,7 +148,7 @@ protected:
   // Method subclasses <b>must</b> override to fit a model to the given training data.
   // The model should be placed on the first output port of the passed vtkInformationVector
   // as well as returned in the \a model parameter.
-  virtual int FitModel( vtkDataObject* model, vtkTable* trainingData ) = 0;
+  virtual int FitModel( vtkMultiBlockDataSet* model, vtkTable* trainingData ) = 0;
 
   // Description:
   // Method subclasses <b>must</b> override to assess an input table given a model of the proper type.
@@ -159,7 +160,7 @@ protected:
   // @param observations - a table containing the field data of the \a dataset converted to a table
   // @param dataset - a shallow copy of the input dataset that should be altered to include an assessment of the output.
   // @param model - the statistical model with which to assess the \a observations.
-  virtual int AssessData( vtkTable* observations, vtkDataObject* dataset, vtkDataObject* model ) = 0;
+  virtual int AssessData( vtkTable* observations, vtkDataObject* dataset, vtkMultiBlockDataSet* model ) = 0;
 
   // Description:
   // Subclasses <b>may</b> (but need not) override this function to guarantee that
@@ -168,7 +169,7 @@ protected:
   //   observations->GetNumberOfRows() * this->TrainingFraction and
   //   min( observations->GetNumberOfRows(), 100 ).
   // Thus, it will require the entire set of observations unless there are more than 100.
-  // 
+  //
   // @params[in] observations - a table containing the full number of available observations (in this process).
   virtual vtkIdType GetNumberOfObservationsForTraining( vtkTable* observations );
 

@@ -34,7 +34,7 @@ void vtkPSciVizPCAStats::PrintSelf( ostream& os, vtkIndent indent )
   os << indent << "FixedBasisEnergy: " << this->FixedBasisEnergy << "\n";
 }
 
-int vtkPSciVizPCAStats::FitModel( vtkDataObject* modelDO, vtkTable* trainingData )
+int vtkPSciVizPCAStats::FitModel( vtkMultiBlockDataSet* modelDO, vtkTable* trainingData )
 {
   // Create the statistics filter and run it
   vtkPPCAStatistics* stats = vtkPPCAStatistics::New();
@@ -58,7 +58,7 @@ int vtkPSciVizPCAStats::FitModel( vtkDataObject* modelDO, vtkTable* trainingData
   return 1;
 }
 
-int vtkPSciVizPCAStats::AssessData( vtkTable* observations, vtkDataObject* assessedOut, vtkDataObject* modelOut )
+int vtkPSciVizPCAStats::AssessData( vtkTable* observations, vtkDataObject* assessedOut, vtkMultiBlockDataSet* modelOut )
 {
   if ( ! assessedOut )
     {

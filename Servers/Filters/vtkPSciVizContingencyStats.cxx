@@ -25,7 +25,7 @@ void vtkPSciVizContingencyStats::PrintSelf( ostream& os, vtkIndent indent )
   this->Superclass::PrintSelf( os, indent );
 }
 
-int vtkPSciVizContingencyStats::FitModel( vtkDataObject* modelDO, vtkTable* trainingData )
+int vtkPSciVizContingencyStats::FitModel( vtkMultiBlockDataSet* modelDO, vtkTable* trainingData )
 {
   // Create the statistics filter and run it
   vtkPContingencyStatistics* stats = vtkPContingencyStatistics::New();
@@ -49,7 +49,7 @@ int vtkPSciVizContingencyStats::FitModel( vtkDataObject* modelDO, vtkTable* trai
   return 1;
 }
 
-int vtkPSciVizContingencyStats::AssessData( vtkTable* observations, vtkDataObject* assessedOut, vtkDataObject* modelOut )
+int vtkPSciVizContingencyStats::AssessData( vtkTable* observations, vtkDataObject* assessedOut, vtkMultiBlockDataSet* modelOut )
 {
   if ( ! assessedOut )
     {
