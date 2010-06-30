@@ -220,8 +220,8 @@ static int vtkPVFileInformationGetType(const char* path)
   // doing stat on root of devices doesn't work
 
   // is it the root of a drive?
-  if (realpath[0] && realpath[1] == ':' && (realpath[2] == '\0' ||
-      (realpath[2] == '\\' && realpath[3] == '\0')))
+  if (realpath.size() > 0 && realpath[1] == ':' && (realpath[2] == '\0' ||
+    realpath[2]== '/' || (realpath[2] == '\\' && realpath.size() == 3)))
     {
     // Path may be drive letter.
     DWORD n = GetLogicalDrives();
