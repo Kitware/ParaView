@@ -21,11 +21,13 @@
 
 #include "vtkSMSurfaceRepresentationProxy.h"
 #include "vtkSmartPointer.h"
+//needed for maintaining the protected Source Proxy
+
 class VTK_EXPORT vtkSMGlyph3DMapperRepresentationProxy : public vtkSMSurfaceRepresentationProxy
 {
 public:
   static vtkSMGlyph3DMapperRepresentationProxy* New();
-  vtkTypeRevisionMacro(vtkSMGlyph3DMapperRepresentationProxy, vtkSMSurfaceRepresentationProxy);
+  vtkTypeMacro(vtkSMGlyph3DMapperRepresentationProxy, vtkSMSurfaceRepresentationProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
