@@ -23,7 +23,6 @@
 #include "vtkSMViewProxy.h"
 
 vtkStandardNewMacro(vtkSMGlyph3DMapperRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMGlyph3DMapperRepresentationProxy, "$Revision: 1774 $");
 //----------------------------------------------------------------------------
 vtkSMGlyph3DMapperRepresentationProxy::vtkSMGlyph3DMapperRepresentationProxy()
 {
