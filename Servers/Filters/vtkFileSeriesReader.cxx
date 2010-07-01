@@ -336,6 +336,9 @@ vtkFileSeriesReader::vtkFileSeriesReader()
 
   this->Reader = 0;
 
+  this->HiddenReaderModification = 0;
+  this->SavedReaderModification = 0;
+
   this->Internal = new vtkFileSeriesReaderInternals;
   this->Internal->FileNameIsSet = false;
   this->Internal->TimeRanges = new vtkFileSeriesReaderTimeRanges;
@@ -369,11 +372,25 @@ vtkFileSeriesReader::~vtkFileSeriesReader()
 unsigned long vtkFileSeriesReader::GetMTime()
 {
   unsigned long mTime=this->vtkObject::GetMTime();
-  unsigned long readerMTime;
 
   if ( this->Reader )
     {
-    readerMTime = this->Reader->GetMTime();
+    // In general, we want Modifieds in Reader to be reflected in this object's
+    // MTime.  However, we will also be making modifications to the Reader (such
+    // as changing the filename) that we want to suppress from the reporting.
+    // When this happens, we save the timestamp before our modification into
+    // this->SavedReaderModification and capture the resulting MTime in
+    // this->HiddenReaderModification.  If we run into that modification,
+    // suppress it by reporting the saved modification.
+    unsigned long readerMTime;
+    if (this->Reader->GetMTime() == this->HiddenReaderModification)
+      {
+      readerMTime = this->SavedReaderModification;
+      }
+    else
+      {
+      readerMTime = this->Reader->GetMTime();
+      }
     mTime = ( readerMTime > mTime ? readerMTime : mTime );
     }
 
@@ -682,6 +699,10 @@ void vtkFileSeriesReader::SetReaderFileName(const char* fname)
       vtkProcessModule::GetProcessModule()->GetIDFromObject(this->Reader);
     if (csId.ID && this->FileNameMethod)
       {
+      // We want to suppress the modification time change in the Reader.  See
+      // vtkFileSeriesReader::GetMTime() for details on how this works.
+      this->SavedReaderModification = this->GetMTime();
+
       vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
       // Get the local process interpreter.
       vtkClientServerInterpreter* interp = pm->GetInterpreter();
@@ -690,9 +711,34 @@ void vtkFileSeriesReader::SetReaderFileName(const char* fname)
              << csId << this->FileNameMethod << fname
              << vtkClientServerStream::End;
       interp->ProcessStream(stream);
+
+      this->HiddenReaderModification = this->Reader->GetMTime();
       }
     }
   this->SetCurrentFileName(fname);
+}
+
+//-----------------------------------------------------------------------------
+void vtkFileSeriesReader::SetCurrentFileName(const char *fname)
+{
+  // Basically operates the same as the code created by the vtkSetStringMacro
+  // except that it does NOT call Modified.  This method is only called
+  // internally and just manages the state of the actuall reader, usually
+  // while in ProcessRequest.
+  if (this->CurrentFileName == fname) return;
+  if (this->CurrentFileName)
+    {
+    delete[] this->CurrentFileName;
+    }
+  if (fname)
+    {
+    this->CurrentFileName = new char[strlen(fname) + 1];
+    strcpy(this->CurrentFileName, fname);
+    }
+  else
+    {
+    this->CurrentFileName = NULL;
+    }
 }
 
 //-----------------------------------------------------------------------------

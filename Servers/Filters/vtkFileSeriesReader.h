@@ -169,7 +169,10 @@ protected:
   virtual void SetReaderFileName(const char* fname);
   vtkAlgorithm* Reader;
 
-  vtkSetStringMacro(CurrentFileName);
+  unsigned long HiddenReaderModification;
+  unsigned long SavedReaderModification;
+
+  virtual void SetCurrentFileName(const char *fname);
   char* CurrentFileName;
   char* FileNameMethod;
 
