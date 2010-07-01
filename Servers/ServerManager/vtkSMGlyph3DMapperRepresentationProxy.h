@@ -20,8 +20,7 @@
 #define __vtkSMGlyph3DMapperRepresentationProxy_h
 
 #include "vtkSMSurfaceRepresentationProxy.h"
-#include "vtkSmartPointer.h"
-//needed for maintaining the protected Source Proxy
+#include "vtkSmartPointer.h" //needed for maintaining the protected Source Proxy
 
 class VTK_EXPORT vtkSMGlyph3DMapperRepresentationProxy : public vtkSMSurfaceRepresentationProxy
 {
