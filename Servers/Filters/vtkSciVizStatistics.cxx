@@ -574,7 +574,6 @@ int vtkSciVizStatistics::PrepareFullDataTable( vtkTable* tableIn, vtkFieldData* 
   vtkIdType ncols = tableIn->GetNumberOfColumns();
   if ( ncols < 1 )
     {
-    tableIn->Delete();
     vtkWarningMacro( "Every requested array wasn't a scalar or wasn't present." )
     return -1;
     }
