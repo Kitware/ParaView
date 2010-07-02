@@ -21,11 +21,6 @@ int numberOfWrappedFunctions = 0;
 FunctionInfo *wrappedFunctions[1000];
 extern FunctionInfo *currentFunction;
 
-/* for backwards compatibility only, will be removed soon */
-#ifndef VTK_PARSE_STRING
-#define VTK_PARSE_STRING 0x21
-#endif
-
 int arg_is_pointer_to_data(int argType, int count)
 {
   return
@@ -98,7 +93,7 @@ void output_temp(FILE *fp, int i, int argType, char *Id, int count)
     case VTK_PARSE_BOOL:        fprintf(fp,"bool "); break;
     case VTK_PARSE_VTK_OBJECT:  fprintf(fp,"%s ",Id); break;
     case VTK_PARSE_STRING:
-      if (i == MAX_ARGS)      { fprintf(fp,"vtkStdString "); }
+      if (i == MAX_ARGS)      { fprintf(fp,"%s ",Id); break; }
       else                    { fprintf(fp,"char    *"); } break;
 
     case VTK_PARSE_UNKNOWN: return;
@@ -335,7 +330,7 @@ void get_args(FILE *fp, int i)
 int managableArguments(FunctionInfo *curFunction);
 int notWrappable(FunctionInfo *curFunction);
 
-void outputFunction(FILE *fp, FileInfo *data)
+void outputFunction(FILE *fp, ClassInfo *data)
 {
   int i;
 
@@ -346,8 +341,8 @@ void outputFunction(FILE *fp, FileInfo *data)
 
   /* if the args are OK and it is not a constructor or destructor */
   if (managableArguments(currentFunction) &&
-      strcmp(data->ClassName,currentFunction->Name) &&
-      strcmp(data->ClassName,currentFunction->Name + 1))
+      strcmp(data->Name,currentFunction->Name) &&
+      strcmp(data->Name,currentFunction->Name + 1))
     {
     if(currentFunction->IsLegacy)
       {
@@ -438,7 +433,7 @@ void outputFunction(FILE *fp, FileInfo *data)
     }
 
 #if 0
-  if (!strcmp("vtkObject",data->ClassName))
+  if (!strcmp("vtkObject",data->Name))
     {
     fprintf(fp,"  if (!strcmp(\"AddProgressObserver\",method) && msg.NumberOfArguments == 3 &&\n");
     fprintf(fp,"      msg.ArgumentTypes[2] == vtkClietnServerStream::string_value)\n");
@@ -530,7 +525,7 @@ void outputMetaInfoExtractFunction(FILE *fp, NewClassInfo *data)
           "    data.OutputFileName = \"%s\";\n"
           "      {\n",
           data->ClassName,
-          data->ClassName,
+          data->FileName,
           data->HasDelete,
           data->IsAbstract,
           data->IsConcrete,
@@ -971,7 +966,7 @@ int collectUniqueFunctionInfo(FunctionInfo *src, int srcSize, UniqueFunctionInfo
  * @param data hold the collected file data form the parser
  * @param classData the form into which we want to convert
  */
-void getClassInfo(FileInfo *data, NewClassInfo* classData)
+void getClassInfo(ClassInfo *data, NewClassInfo* classData)
 {
   int i;
   int TotalUniqueFunctions=0;
@@ -982,25 +977,25 @@ void getClassInfo(FileInfo *data, NewClassInfo* classData)
   /* Collect all the information */
   classData->HasDelete = data->HasDelete;
   classData->IsAbstract = data->IsAbstract;
-  classData->IsConcrete = data->IsConcrete;
-  classData->ClassName = data->ClassName;
-  classData->FileName = data->FileName;
-  classData->OutputFileName = data->OutputFileName;
+  classData->IsConcrete = !data->IsAbstract;
+  classData->ClassName = data->Name;
+  classData->FileName = "";
+  classData->OutputFileName = "";
   classData->NumberOfSuperClasses = data->NumberOfSuperClasses;
   for (i = 0; i < data->NumberOfSuperClasses; ++i)
     {
     classData->SuperClasses[i] = data->SuperClasses[i];
     }
-  classData->NameComment = data->NameComment;
-  classData->Description = data->Description;
-  classData->Caveats = data->Caveats;
-  classData->SeeAlso = data->SeeAlso;
+  classData->NameComment = "";
+  classData->Description = "";
+  classData->Caveats = "";
+  classData->SeeAlso = "";
 
   /* Collect only wrappable functions*/
-  TotalFunctions = extractWrappable(&data->Functions[0],
+  TotalFunctions = extractWrappable(data->Functions[0],
                                     data->NumberOfFunctions,
                                     tempFun,
-                                    data->ClassName);
+                                    data->Name);
   /* Sort the function data. */
   //qsort(tempFun,TotalFunctions,sizeof(FunctionInfo),funCmp);
 
@@ -1199,7 +1194,7 @@ void output_InitFunction(FILE *fp, NewClassInfo *data)
           "    once = true;\n", data->ClassName);
   for (i=0; i < totalClasses; ++i)
     fprintf(fp,"    %s_Init(csi);\n",classes[i]);
-  if(data->IsConcrete)
+  if(!data->IsAbstract)
     fprintf(fp,"    csi->AddNewInstanceFunction(\"%s\", %sClientServerNewCommand);\n",
             data->ClassName,data->ClassName);
   fprintf(fp,"    csi->AddCommandFunction(\"%s\", %sCommand);\n",
@@ -1208,14 +1203,14 @@ void output_InitFunction(FILE *fp, NewClassInfo *data)
 }
 
 /* check all methods for use of vtkStdString */
-int classUsesStdString(FileInfo *data)
+int classUsesStdString(ClassInfo *data)
 {
   int i, j;
   FunctionInfo *info;
 
   for (i = 0; i < data->NumberOfFunctions; i++)
     {
-    info = &data->Functions[i];
+    info = data->Functions[i];
     if ((info->ReturnType & VTK_PARSE_BASE_TYPE) == VTK_PARSE_STRING)
       {
       return 1;
@@ -1232,20 +1227,23 @@ int classUsesStdString(FileInfo *data)
 }
 
 /* print the parsed structures */
-void vtkParseOutput(FILE *fp, FileInfo *data)
+void vtkParseOutput(FILE *fp, FileInfo *fileInfo)
 {
+  ClassInfo *data;
   NewClassInfo *classData;
   int i;
 
-  fprintf(fp,"// ClientServer wrapper for %s object\n//\n",data->ClassName);
+  data = fileInfo->MainClass;
+
+  fprintf(fp,"// ClientServer wrapper for %s object\n//\n",data->Name);
   fprintf(fp,"#define VTK_WRAPPING_CXX\n");
-  if(strcmp("vtkObjectBase", data->ClassName) != 0)
+  if(strcmp("vtkObjectBase", data->Name) != 0)
     {
     /* Block inclusion of full streams. */
     fprintf(fp,"#define VTK_STREAMS_FWD_ONLY\n");
     }
   fprintf(fp,"#include \"vtkSystemIncludes.h\"\n");
-  fprintf(fp,"#include \"%s.h\"\n",data->ClassName);
+  fprintf(fp,"#include \"%s.h\"\n",data->Name);
   if (classUsesStdString(data))
     {
     fprintf(fp,"#include \"vtkStdString.h\"\n");
@@ -1253,19 +1251,19 @@ void vtkParseOutput(FILE *fp, FileInfo *data)
   fprintf(fp,"#include \"vtkClientServerInterpreter.h\"\n");
   fprintf(fp,"#include \"vtkClientServerStream.h\"\n\n");
 #if 0
-  if (!strcmp("vtkObject",data->ClassName))
+  if (!strcmp("vtkObject",data->Name))
     {
     fprintf(fp,"#include \"vtkClientServerProgressObserver.h\"\n\n");
     }
 #endif
-  if (!strcmp("vtkObjectBase",data->ClassName))
+  if (!strcmp("vtkObjectBase",data->Name))
     {
     fprintf(fp,"#include <vtksys/ios/sstream>\n");
     }
-  if (data->IsConcrete)
+  if (!data->IsAbstract)
     {
-    fprintf(fp,"\nvtkObjectBase *%sClientServerNewCommand()\n{\n",data->ClassName);
-    fprintf(fp,"  return %s::New();\n}\n\n",data->ClassName);
+    fprintf(fp,"\nvtkObjectBase *%sClientServerNewCommand()\n{\n",data->Name);
+    fprintf(fp,"  return %s::New();\n}\n\n",data->Name);
     }
 
   for (i = 0; i < data->NumberOfSuperClasses; i++)
@@ -1286,17 +1284,17 @@ void vtkParseOutput(FILE *fp, FileInfo *data)
           " const char *method, const vtkClientServerStream& msg,"
           " vtkClientServerStream& resultStream)\n"
           "{\n",
-          data->ClassName);
+          data->Name);
 
-  if(strcmp(data->ClassName, "vtkObjectBase") == 0)
+  if(strcmp(data->Name, "vtkObjectBase") == 0)
     {
     fprintf(fp,"  %s *op = ob;\n",
-            data->ClassName);
+            data->Name);
     }
   else
     {
     fprintf(fp,"  %s *op = %s::SafeDownCast(ob);\n",
-            data->ClassName, data->ClassName);
+            data->Name, data->Name);
     fprintf(fp,
             "  if(!op)\n"
             "    {\n"
@@ -1307,7 +1305,7 @@ void vtkParseOutput(FILE *fp, FileInfo *data)
             "    resultStream << vtkClientServerStream::Error\n"
             "                 << vtkmsg.str() << 0 << vtkClientServerStream::End;\n"
             "    return 0;\n"
-            "    }\n", data->ClassName);
+            "    }\n", data->Name);
     }
 
   fprintf(fp, "  (void)arlu;\n");
@@ -1318,7 +1316,7 @@ void vtkParseOutput(FILE *fp, FileInfo *data)
   /* insert function handling code here */
   for (i = 0; i < data->NumberOfFunctions; i++)
     {
-    currentFunction = data->Functions + i;
+    currentFunction = data->Functions[i];
     outputFunction(fp, data);
     }
 
@@ -1330,7 +1328,7 @@ void vtkParseOutput(FILE *fp, FileInfo *data)
     fprintf(fp,"    {\n    return 1;\n    }\n");
     }
   /* Add the Print method to vtkObjectBase. */
-  if (!strcmp("vtkObjectBase",data->ClassName))
+  if (!strcmp("vtkObjectBase",data->Name))
     {
     fprintf(fp,
             "  if (!strcmp(\"Print\",method) && msg.GetNumberOfArguments(0) == 2)\n"
@@ -1345,7 +1343,7 @@ void vtkParseOutput(FILE *fp, FileInfo *data)
             "    }\n");
     }
   /* Add the special form of AddObserver to vtkObject. */
-  if (!strcmp("vtkObject",data->ClassName))
+  if (!strcmp("vtkObject",data->Name))
     {
     fprintf(fp,
             "  if (!strcmp(\"AddObserver\",method) && msg.GetNumberOfArguments(0) == 4)\n"
@@ -1373,7 +1371,7 @@ void vtkParseOutput(FILE *fp, FileInfo *data)
           "  resultStream << vtkClientServerStream::Error\n"
           "               << vtkmsg.str() << vtkClientServerStream::End;\n"
           "  vtkmsg.rdbuf()->freeze(0);\n",
-          data->ClassName);
+          data->Name);
   fprintf(fp,
           "  return 0;\n"
           "}\n");
