@@ -462,7 +462,7 @@ typedef struct _UniqueFunctionInfo
 {
   char *Name;
   int TotalPolymorphTypes;
-  FunctionInfo Function[20];
+  FunctionInfo *Function[20];
 } UniqueFunctionInfo;
 
 
@@ -489,147 +489,6 @@ typedef struct _NewClassInfo
   char *Caveats;
   char *SeeAlso;
 } NewClassInfo;
-
-//--------------------------------------------------------------------------nix
-/*
- * This function makes writes a function which makes its own meta-infomation
- * available to the caller.
- *
- * @param fp Wrapper file to be written
- * @param data The data which is written
- */
-void outputMetaInfoExtractFunction(FILE *fp, NewClassInfo *data)
-{
-  int i,j,k;
-  fprintf(fp,
-          "//-------------------------------------------------------------------------auto\n"
-          "/*\n"
-          " * %sMetaInfo function creates meta-information each time\n"
-          " * it gets called. This can be used for any Meta Object Protocol needs.\n"
-          " *\n"
-          " * @return fileinfo structure with class metadata\n"
-          " */\n"
-          "NewClassInfo& %sMetaInfo()\n"
-          "{\n"
-          "  static bool once = 1;\n"
-          "  static NewClassInfo data;\n"
-          "  if(once)\n"
-          "    {\n"
-          "    once = 0;\n"
-          "\n"
-          "    data.HasDelete  = %d;\n"
-          "    data.IsAbstract = %d;\n"
-          "    data.IsConcrete = %d;\n"
-          "    data.ClassName      = \"%s\";\n"
-          "    data.FileName       = \"%s\";\n"
-          "    data.OutputFileName = \"%s\";\n"
-          "      {\n",
-          data->ClassName,
-          data->FileName,
-          data->HasDelete,
-          data->IsAbstract,
-          data->IsConcrete,
-          data->ClassName,
-          data->FileName,
-          data->OutputFileName
-          );
-  for(i=0; i < data->NumberOfSuperClasses;i++)
-    {
-    fprintf(fp,
-            "            data.SuperClasses[%d]= \"%s\";\n",
-            i,data->SuperClasses[i]
-            );
-
-    }
-  fprintf(fp,
-          "      }\n"
-          "    data.NumberOfSuperClasses = %d;\n"
-          "    data.NumberOfFunctions = %d;\n"
-          "      {\n",
-          data->NumberOfSuperClasses,
-          data->NumberOfFunctions
-          );
-
-  for(i=0; i< data->NumberOfFunctions;i++)
-    {
-    fprintf(fp,
-            "      // %s\n"
-            "      data.Functions[%d].Name = \"%s\";\n"
-            "      data.Functions[%d].TotalPolymorphTypes = %d;\n"
-            "        {\n",
-            data->Functions[i].Name,
-            i,data->Functions[i].Name,
-            i,data->Functions[i].TotalPolymorphTypes
-            );
-    for(j=0;j<data->Functions[i].TotalPolymorphTypes;++j)
-      {
-      fprintf(fp,
-              "        //____________________________\n"
-              "        data.Functions[%d].Function[%d].Name = \"%s\";\n"
-              "        data.Functions[%d].Function[%d].NumberOfArguments = %d ;\n"
-              "        data.Functions[%d].Function[%d].ArrayFailure = %d;\n"
-              "        data.Functions[%d].Function[%d].IsPureVirtual = %d;\n"
-              "        data.Functions[%d].Function[%d].IsPublic = %d;\n"
-              "        data.Functions[%d].Function[%d].IsProtected = %d;\n"
-              "        data.Functions[%d].Function[%d].IsOperator = %d;\n"
-              "        data.Functions[%d].Function[%d].HaveHint = %d;\n"
-              "        data.Functions[%d].Function[%d].HintSize = %d;\n"
-              "          {\n",
-
-              i,j,data->Functions[i].Function[j].Name,
-              i,j,data->Functions[i].Function[j].NumberOfArguments,
-              i,j,data->Functions[i].Function[j].ArrayFailure,
-              i,j,data->Functions[i].Function[j].IsPureVirtual,
-              i,j,data->Functions[i].Function[j].IsPublic,
-              i,j,data->Functions[i].Function[j].IsProtected,
-              i,j,data->Functions[i].Function[j].IsOperator,
-              i,j,data->Functions[i].Function[j].HaveHint,
-              i,j,data->Functions[i].Function[j].HintSize
-              );
-      for(k=0;k<data->Functions[i].Function[j].NumberOfArguments;k++)
-        {
-        fprintf(fp,
-                "          data.Functions[%d].Function[%d].ArgTypes[%d]   = 0x%x;\n"
-                "          data.Functions[%d].Function[%d].ArgCounts[%d]  = %d;\n"
-                "          data.Functions[%d].Function[%d].ArgClasses[%d] = \"%s\";\n",
-                i,j,k,data->Functions[i].Function[j].ArgTypes[k],
-                i,j,k,data->Functions[i].Function[j].ArgCounts[k],
-                i,j,k,data->Functions[i].Function[j].ArgClasses[k]
-                );
-        }
-      fprintf(fp,
-              "          }\n"
-              "        data.Functions[%d].Function[%d].ReturnType  = 0x%x;\n"
-              "        data.Functions[%d].Function[%d].ReturnClass = \"%s\";\n"
-              //"              data.Functions[%d].Function[%d].Comment     = \"%s\";\n"
-              "        data.Functions[%d].Function[%d].Signature   = \"%s\";\n"
-              "        data.Functions[%d].Function[%d].IsLegacy    = %d;\n",
-              i,j,data->Functions[i].Function[j].ReturnType,
-              i,j,data->Functions[i].Function[j].ReturnClass,
-              //                i,data->Functions[i].Function[j].Comment,
-              i,j,data->Functions[i].Function[j].Signature,
-              i,j,data->Functions[i].Function[j].IsLegacy
-              );
-      }
-    fprintf(fp,
-            "        }\n"
-            );
-    }
-  fprintf(fp,
-          "      }\n"
-          //"        data.NameComment = \"%s\";\n"
-          //"        data.Description = \"%s\";\n"
-          //"        data.Caveats     = \"%s\";\n"
-          //"        data.SeeAlso     = \"%s\";\n"
-          "    }\n"
-          "  return data;\n"
-          "}\n\n"//,
-          //            data->NameComment,
-          //            data->Description,
-          //            data->Caveats,
-          //            data->SeeAlso
-          );
-}
 
 //--------------------------------------------------------------------------nix
 /*
@@ -850,7 +709,7 @@ int managableArguments(FunctionInfo *curFunction)
  * @return values returned by strcmp
  */
 
-static int funCmp(const void  *fun1, const void *fun2)
+int funCmp(const void  *fun1, const void *fun2)
 {
   FunctionInfo *a = (FunctionInfo*)fun1;
   FunctionInfo *b = (FunctionInfo*)fun2;
@@ -891,9 +750,9 @@ int copy(FunctionInfo* from, int fromSize, FunctionInfo* to)
  *
  * @return the size of the destination array (this may not be the size of the source)
  */
-int extractWrappable(FunctionInfo* from,
+int extractWrappable(FunctionInfo* from[],
                      int fromSize,
-                     FunctionInfo* to,
+                     FunctionInfo* to[],
                      char* ClassName)
 {
   int i,j;
@@ -902,11 +761,11 @@ int extractWrappable(FunctionInfo* from,
     /* if the function is wrappable and
        args are OK and
        it is not a constructor or destructor */
-    if(!notWrappable(&from[i]) &&
-       managableArguments(&from[i]) &&
-       strcmp(ClassName,from[i].Name) && strcmp(ClassName,from[i].Name + 1))
+    if(!notWrappable(from[i]) &&
+       managableArguments(from[i]) &&
+       strcmp(ClassName,from[i]->Name) && strcmp(ClassName,from[i]->Name + 1))
       {
-      memcpy(&to[j], &from[i], sizeof(FunctionInfo));
+      to[j] = from[i];
       ++j;
       }
     }
@@ -924,29 +783,28 @@ int extractWrappable(FunctionInfo* from,
  *
  * @return the total number of elements in the dest array
  */
-int collectUniqueFunctionInfo(FunctionInfo *src, int srcSize, UniqueFunctionInfo *dest)
+int collectUniqueFunctionInfo(FunctionInfo *src[], int srcSize, UniqueFunctionInfo dest[])
 {
   int i,j,k;
 
   for (i=0; i < srcSize; i++)
     {
-    dest[i].Name = src[i].Name;
+    dest[i].Name = src[i]->Name;
     dest[i].TotalPolymorphTypes = 1;
-    memcpy(&dest[i].Function[0], &src[i], sizeof(FunctionInfo));
+    dest[i].Function[0] = src[i];
     for(j=i+1; j < srcSize; j++)
       {
-      if(funCmp(&dest[i], &src[j]) == 0)
+      if(strcmp(dest[i].Name, src[j]->Name) == 0)
         {
         //printf("%d [%d]> dest = %s :: src = %s\n",i,srcSize, dest[i].Name,src[j].Name);
         //printf("    > [SAME]\n");
-        memcpy(&dest[i].Function[dest[i].TotalPolymorphTypes],
-               &src[j], sizeof(FunctionInfo));
+        dest[i].Function[dest[i].TotalPolymorphTypes] = src[j];
         dest[i].TotalPolymorphTypes++;
 
         for(k=j; k < srcSize-1; k++)
           {
-          //printf("remaining = %s\n",src[k].Name);
-          memcpy(&src[k], &src[k+1], sizeof(FunctionInfo));
+          //printf("remaining = %s\n",src[k]->Name);
+          src[k] = src[k+1];
           }
         j--;
         srcSize--;
@@ -966,33 +824,33 @@ int collectUniqueFunctionInfo(FunctionInfo *src, int srcSize, UniqueFunctionInfo
  * @param data hold the collected file data form the parser
  * @param classData the form into which we want to convert
  */
-void getClassInfo(ClassInfo *data, NewClassInfo* classData)
+void getClassInfo(FileInfo *fileInfo, ClassInfo *data, NewClassInfo* classData)
 {
   int i;
   int TotalUniqueFunctions=0;
   int TotalFunctions;
-  FunctionInfo *tempFun =(FunctionInfo*) malloc
-    (sizeof(FunctionInfo)*data->NumberOfFunctions);
+  FunctionInfo **tempFun =(FunctionInfo**)malloc
+    (sizeof(FunctionInfo*)*data->NumberOfFunctions);
 
   /* Collect all the information */
   classData->HasDelete = data->HasDelete;
   classData->IsAbstract = data->IsAbstract;
   classData->IsConcrete = !data->IsAbstract;
   classData->ClassName = data->Name;
-  classData->FileName = "";
+  classData->FileName = fileInfo->FileName;
   classData->OutputFileName = "";
   classData->NumberOfSuperClasses = data->NumberOfSuperClasses;
   for (i = 0; i < data->NumberOfSuperClasses; ++i)
     {
     classData->SuperClasses[i] = data->SuperClasses[i];
     }
-  classData->NameComment = "";
-  classData->Description = "";
-  classData->Caveats = "";
-  classData->SeeAlso = "";
+  classData->NameComment = fileInfo->NameComment;
+  classData->Description = fileInfo->Description;
+  classData->Caveats = fileInfo->Caveats;
+  classData->SeeAlso = fileInfo->SeeAlso;
 
   /* Collect only wrappable functions*/
-  TotalFunctions = extractWrappable(data->Functions[0],
+  TotalFunctions = extractWrappable(data->Functions,
                                     data->NumberOfFunctions,
                                     tempFun,
                                     data->Name);
@@ -1135,26 +993,26 @@ int extractOtherClassesUsed(NewClassInfo *data, char * classes[])
     {
     for (j = 0; j < data->Functions[i].TotalPolymorphTypes; ++j)
       {
-      for (k=0; k < data->Functions[i].Function[j].NumberOfArguments; ++k)
+      for (k=0; k < data->Functions[i].Function[j]->NumberOfArguments; ++k)
         {
-        if((data->Functions[i].Function[j].ArgTypes[k] & VTK_PARSE_BASE_TYPE)
+        if((data->Functions[i].Function[j]->ArgTypes[k] & VTK_PARSE_BASE_TYPE)
            == VTK_PARSE_VTK_OBJECT)
           {
           if (!isExternalObject(data->ClassName,
-                 data->Functions[i].Function[j].ArgClasses[k]))
+                 data->Functions[i].Function[j]->ArgClasses[k]))
             {
-            classes[count]=data->Functions[i].Function[j].ArgClasses[k];
+            classes[count]=data->Functions[i].Function[j]->ArgClasses[k];
             ++count;
             }
           }
         }
-      if((data->Functions[i].Function[j].ReturnType & VTK_PARSE_BASE_TYPE)
+      if((data->Functions[i].Function[j]->ReturnType & VTK_PARSE_BASE_TYPE)
          == VTK_PARSE_VTK_OBJECT)
         {
         if (!isExternalObject(data->ClassName,
-               data->Functions[i].Function[j].ReturnClass))
+               data->Functions[i].Function[j]->ReturnClass))
           {
-          classes[count]=data->Functions[i].Function[j].ReturnClass;
+          classes[count]=data->Functions[i].Function[j]->ReturnClass;
           ++count;
           }
         }
@@ -1377,7 +1235,7 @@ void vtkParseOutput(FILE *fp, FileInfo *fileInfo)
           "}\n");
 
   classData = (NewClassInfo*)malloc(sizeof(NewClassInfo));
-  getClassInfo(data,classData);
+  getClassInfo(fileInfo,data,classData);
   output_InitFunction(fp,classData);
   free(classData);
 }
