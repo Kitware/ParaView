@@ -21,7 +21,7 @@ int numberOfWrappedFunctions = 0;
 FunctionInfo *wrappedFunctions[1000];
 extern FunctionInfo *currentFunction;
 
-int arg_is_pointer_to_data(int argType, int count)
+int arg_is_pointer_to_data(unsigned int argType, int count)
 {
   return
     (count == 0 &&
@@ -33,7 +33,7 @@ int arg_is_pointer_to_data(int argType, int count)
      (argType & VTK_PARSE_BASE_TYPE) != VTK_PARSE_VTK_OBJECT /* vtkFoo*  */);
 }
 
-void output_temp(FILE *fp, int i, int argType, char *Id, int count)
+void output_temp(FILE *fp, int i, unsigned int argType, char *Id, int count)
 {
   /* Store whether this is pointer to data.  */
   int isPointerToData = i != MAX_ARGS && arg_is_pointer_to_data(argType, count);
@@ -134,7 +134,7 @@ void output_temp(FILE *fp, int i, int argType, char *Id, int count)
 /* when the cpp file doesn't have enough info use the hint file */
 void use_hints(FILE *fp)
 {
-  int rType = currentFunction->ReturnType;
+  unsigned int rType = currentFunction->ReturnType;
 
   /* use the hint */
   if ((rType & VTK_PARSE_INDIRECT) == VTK_PARSE_POINTER)
@@ -159,7 +159,7 @@ void use_hints(FILE *fp)
 
 void return_result(FILE *fp)
 {
-  int rType = currentFunction->ReturnType;
+  unsigned int rType = currentFunction->ReturnType;
   const char *rClass = currentFunction->ReturnClass;
 
   switch (rType & VTK_PARSE_BASE_TYPE)
@@ -240,7 +240,7 @@ void return_result(FILE *fp)
 
 void get_args(FILE *fp, int i)
 {
-  int argType = currentFunction->ArgTypes[i];
+  unsigned int argType = currentFunction->ArgTypes[i];
   int argCount = currentFunction->ArgCounts[i];
   const char *argClass = currentFunction->ArgClasses[i];
   int j;
@@ -517,7 +517,7 @@ int notWrappable(FunctionInfo *curFunction)
  */
 int managableArguments(FunctionInfo *curFunction)
 {
-  static int supported_types[] = {
+  static unsigned int supported_types[] = {
     VTK_PARSE_VOID, VTK_PARSE_BOOL, VTK_PARSE_FLOAT, VTK_PARSE_DOUBLE,
     VTK_PARSE_CHAR, VTK_PARSE_UNSIGNED_CHAR, VTK_PARSE_SIGNED_CHAR,
     VTK_PARSE_INT, VTK_PARSE_UNSIGNED_INT,
@@ -532,9 +532,9 @@ int managableArguments(FunctionInfo *curFunction)
 
   int i, j;
   int args_ok = 1;
-  int returnType = 0;
-  int argType = 0;
-  int baseType = 0;
+  unsigned int returnType = 0;
+  unsigned int argType = 0;
+  unsigned int baseType = 0;
 
   /* check to see if we can handle the args */
   for (i = 0; i < curFunction->NumberOfArguments; i++)
