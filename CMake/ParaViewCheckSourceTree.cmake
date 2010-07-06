@@ -36,36 +36,27 @@ if(NOT VTK_IGNORE_HOOKS AND NOT ParaView_FROM_CTEST AND
   # Now check the VTK local hooks - mostly a convenience to avoid two failures.
   if(NOT EXISTS "${VTK_SOURCE_DIR}/.git/hooks/.git/config")
     set(VTK_GIT_HOOKS
-"cd ${VTK_SOURCE_DIR}/.git/hooks
+"cd \"${VTK_SOURCE_DIR}/.git/hooks\"
  git init
  git pull .. remotes/origin/hooks")
 
-    set(VTK_GIT_HOOKS2 "
- If you wish to ignore this check for a build set the CMake cache variable
- VTK_IGNORE_HOOKS to ON. To ignore this check in all builds either archive
- your clone, or create the file ${VTK_SOURCE_DIR}/.git/hooks/.git/config
- in your source tree.
+    set(VTK_GIT_HOOKS2
+"If you wish to ignore this check for a build set the CMake cache variable VTK_IGNORE_HOOKS to ON. To ignore this check in all builds either archive your clone, or create the file\n ${VTK_SOURCE_DIR}/.git/hooks/.git/config\nin your source tree.
  ")
   endif()
 endif()
 if(NOT ParaView_IGNORE_HOOKS AND NOT ParaView_FROM_CTEST AND
     EXISTS "${ParaView_SOURCE_DIR}/.git/config")
   if(NOT EXISTS "${ParaView_SOURCE_DIR}/.git/hooks/.git/config")
-    message(FATAL_ERROR "
- Please initialize your local Git hooks, paste the following into a shell:
-
- cd ${ParaView_SOURCE_DIR}/.git/hooks
+    message(FATAL_ERROR
+"Please initialize your local Git hooks, paste the following into a shell:
+ cd \"${ParaView_SOURCE_DIR}/.git/hooks\"
  git init
  git pull .. remotes/origin/hooks
  ${VTK_GIT_HOOKS}
- cd ${ParaView_SOURCE_DIR}
-
- See http://www.vtk.org/Wiki/VTK/Git#Hooks for more details.
-
- If you wish to ignore this check for a build set the CMake cache variable
- ParaView_IGNORE_HOOKS to ON. To ignore this check in all builds either archive
- your clone, or create the file ${ParaView_SOURCE_DIR}/.git/hooks/.git/config
- in your source tree.
- ${VTK_GIT_HOOKS2}")
+ cd \"${ParaView_SOURCE_DIR}\"
+See http://www.vtk.org/Wiki/VTK/Git#Hooks for more details.
+If you wish to ignore this check for a build set the CMake cache variable ParaView_IGNORE_HOOKS to ON. To ignore this check in all builds either archive your clone, or create the file\n ${ParaView_SOURCE_DIR}/.git/hooks/.git/config\nin your source tree.
+${VTK_GIT_HOOKS2}")
   endif()
 endif()
