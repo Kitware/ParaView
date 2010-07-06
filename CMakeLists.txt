@@ -232,8 +232,9 @@ SET (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${ParaView_CMAKE_DIR})
 SET(ParaView_QT_DIR ${ParaView_SOURCE_DIR}/Qt)
 SET(PARAVIEW_QT_QMAKE_EXECUTABLE ${QT_QMAKE_EXECUTABLE})
 
-# Check that the Git submodules have been initialized correctly
-INCLUDE(ParaViewCheckSubmodules)
+# Check that the Git submodules have been initialized correctly, and the local
+# Git hooks have been installed.
+INCLUDE(ParaViewCheckSourceTree)
 
 INCLUDE(ParaViewMacros)
 INCLUDE(ParaViewCommon)
