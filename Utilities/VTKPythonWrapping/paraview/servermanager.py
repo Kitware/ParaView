@@ -2931,11 +2931,23 @@ def _proxyDefinitionsUpdated(caller, event):
     if vtkSMObject.GetProxyManager().GetProxyDefinitionsUpdated():
         updateModules()
 
-# Setup observer to update the modules when new proxy definitions are added.
-# Unfortunately, we don't have a specific even when a definition is added. So
-# this callback will get called even when proxy is registered :(
-vtkSMObject.GetProxyManager().AddObserver("RegisterEvent",
-  _proxyDefinitionsUpdated)
+class __DefinitionUpdater(object):
+    """Internal class used to add observer to the proxy manager to handle
+       addition of new definitions."""
+    def __init__(self):
+        # Setup observer to update the modules when new proxy definitions are
+        # added. Unfortunately, we don't have a specific even when a definition
+        # is added. So this callback will get called even when proxy is
+        # registered :(
+        self.Tag = vtkSMObject.GetProxyManager().AddObserver("RegisterEvent",
+          _proxyDefinitionsUpdated)
+        pass
+
+    def __del__(self):
+        vtkSMObject.GetProxyManager().RemoveObserver(self.Tag)
+        pass
+
+_defUpdater = __DefinitionUpdater()
 
 if hasattr(sys, "ps1"):
     # session is interactive.
