@@ -79,11 +79,7 @@ endfunction(gp_item_default_embedded_path_override)
 # Copy the .app bundle from the build tree to the install tree.
 # Set up the InstallPrefix ENV var and execute the shell script:
 #
-if("$ENV{ParaView_CPACK_GENERATOR}" STREQUAL "DragNDrop")
-  set(InstallPrefix "${CMAKE_INSTALL_PREFIX}")
-else()
-  set(InstallPrefix "$ENV{DESTDIR}/Applications")
-endif()
+set(InstallPrefix "${CMAKE_INSTALL_PREFIX}")
  
 set(ENV{InstallPrefix} "${InstallPrefix}")
  

@@ -1,10 +1,10 @@
 #!/bin/sh
 
 # InstallPrefix environment variable may be set by caller...
-# If not, default to "$DESTDIR/Applications"
+# If not, default to "$DESTDIR"
 #
 if [ "x$InstallPrefix" = "x" ]; then
-  InstallPrefix="$DESTDIR/Applications"
+  InstallPrefix="$DESTDIR"
   echo "info: Using default InstallPrefix value:"
   echo "      $InstallPrefix"
 fi
