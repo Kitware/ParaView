@@ -308,7 +308,7 @@ const int* pqRenderView::defaultBackgroundColor() const
 //-----------------------------------------------------------------------------
 void pqRenderView::setOrientationAxesVisibility(bool visible)
 {
-  vtkSMPropertyHelper(this->getProxy(), "OrientationAxesVisibility").Set(
+  vtkSMPropertyHelper(this->getProxy(), "OrientationAxesVisibility", true).Set(
     visible? 1 : 0);
   this->getProxy()->UpdateVTKObjects();
 }
@@ -317,7 +317,7 @@ void pqRenderView::setOrientationAxesVisibility(bool visible)
 bool pqRenderView::getOrientationAxesVisibility() const
 {
   return vtkSMPropertyHelper(this->getProxy(),
-    "OrientationAxesVisibility").GetAsInt() == 0? false : true;
+    "OrientationAxesVisibility", true).GetAsInt() == 0? false : true;
 }
 
 //-----------------------------------------------------------------------------
@@ -365,7 +365,7 @@ void pqRenderView::setOrientationAxesLabelColor(const QColor& color)
   colorf[0] = color.redF();
   colorf[1] = color.greenF();
   colorf[2] = color.blueF();
-  vtkSMPropertyHelper(this->getProxy(), "OrientationAxesLabelColor").Set(
+  vtkSMPropertyHelper(this->getProxy(), "OrientationAxesLabelColor", true).Set(
     colorf, 3);
   this->getProxy()->UpdateVTKObjects();
 }
@@ -374,8 +374,8 @@ void pqRenderView::setOrientationAxesLabelColor(const QColor& color)
 QColor pqRenderView::getOrientationAxesLabelColor() const
 {
   QColor color;
-  double dcolor[3];
-  vtkSMPropertyHelper(this->getProxy(), "OrientationAxesLabelColor").Get(
+  double dcolor[3] = {1, 1, 1};
+  vtkSMPropertyHelper(this->getProxy(), "OrientationAxesLabelColor", true).Get(
     dcolor, 3);
   color.setRgbF(dcolor[0], dcolor[1], dcolor[2]);
   return color;
@@ -856,7 +856,7 @@ void pqRenderView::textAnnotationColorChanged()
   double value[3];
   vtkSMPropertyHelper(globalPropertiesManager, "TextAnnotationColor").Get(
     value, 3);
-  vtkSMPropertyHelper(this->getProxy(), "OrientationAxesLabelColor").Set(
+  vtkSMPropertyHelper(this->getProxy(), "OrientationAxesLabelColor", true).Set(
     value, 3);
   this->getProxy()->UpdateProperty("OrientationAxesLabelColor");
 }
