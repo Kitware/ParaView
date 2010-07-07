@@ -27,6 +27,9 @@
 #include "vtkPVTemporalDataInformation.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSMSourceProxy.h"
+#include "vtkTimerLog.h"
+
+#include <vtksys/ios/sstream>
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMOutputPort);
@@ -195,7 +198,11 @@ vtkPVDataInformation* vtkSMOutputPort::GetDataInformation()
 {
   if (!this->DataInformationValid)
     {
+    vtksys_ios::ostringstream mystr;
+    mystr << this->GetSourceProxy()->GetXMLName() << "::GatherInformation";
+    vtkTimerLog::MarkStartEvent(mystr.str().c_str());
     this->GatherDataInformation();
+    vtkTimerLog::MarkEndEvent(mystr.str().c_str());
     }
   return this->DataInformation;
 }

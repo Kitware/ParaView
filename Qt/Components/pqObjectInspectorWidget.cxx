@@ -83,6 +83,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSiloPanel.h"
 #endif
 
+#include "vtkTimerLog.h"
 
 bool pqObjectInspectorWidget::AutoAccept = false;
 
@@ -497,6 +498,7 @@ void pqObjectInspectorWidget::setProxy(pqProxy *proxy)
 void pqObjectInspectorWidget::accept()
 {
   BEGIN_UNDO_SET("Apply");
+  vtkTimerLog::MarkStartEvent("Apply");
   emit this->preaccept();
 
   QSet<pqProxy*> proxies_to_show;
@@ -545,6 +547,7 @@ void pqObjectInspectorWidget::accept()
   emit this->postaccept();
 
   END_UNDO_SET();
+  vtkTimerLog::MarkEndEvent("Apply");
 
   // Essential to render all views.
   pqApplicationCore::instance()->render();
