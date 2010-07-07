@@ -7,8 +7,8 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
-   
+   under the terms of the ParaView license version 1.2.
+
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
    Kitware Inc.
@@ -29,7 +29,7 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqContourWidget_h 
+#ifndef __pqContourWidget_h
 #define __pqContourWidget_h
 
 #include "pq3DWidget.h"
@@ -48,7 +48,7 @@ public:
   virtual ~pqContourWidget();
 
   /// Resets the bounds of the 3D widget to the reference proxy bounds.
-  /// This typically calls PlaceWidget on the underlying 3D Widget 
+  /// This typically calls PlaceWidget on the underlying 3D Widget
   /// with reference proxy bounds.
   /// This should be explicitly called after the panel is created
   /// and the widget is initialized i.e. the reference proxy, controlled proxy
@@ -56,12 +56,12 @@ public:
   virtual void resetBounds(double /*bounds*/[6]) {}
   virtual void resetBounds()
     { return this->Superclass::resetBounds(); }
- 
+
   // Some convenient methods
-  // Set the point placer/line interpolator    
+  // Set the point placer/line interpolator
   virtual void setPointPlacer(vtkSMProxy*);
   virtual void setLineInterpolator(vtkSMProxy*);
-  
+
   /// Activates the widget. Respects the visibility flag.
   virtual void select();
   /// Deactivates the widget.
@@ -69,29 +69,43 @@ public:
 
   /// Get the bounds of the representation
   virtual bool getBounds(double bounds[6]) const;
-  
+
   /// Set the line color
   virtual void setLineColor(const QColor& color);
-  
+
 signals:
-  /// Signal emitted when the representation proxy's "ClosedLoop" property 
+  /// Signal emitted when the representation proxy's "ClosedLoop" property
   /// is modified.
   void contourLoopClosed();
-  
+  void contourDone();
+
 public slots:
   void removeAllNodes();
   void checkContourLoopClosed();
-  void closeLoop(bool);
-  
+
   /// Close the contour loop
+  void closeLoop(bool);
+
+  ///Move to the next mode ( Drawing, Editing, Done )
+  void updateMode( );
+
+  ///Finish editing the contour
+  void finishContour( );
+
+  /// Resets pending changes. Default implementation
+  /// pushes the property values of the controlled widget to the
+  /// 3D widget properties.
+  /// The correspondence is determined from the <Hints />
+  /// associated with the controlled proxy.
+  virtual void reset();
 
 protected:
   /// Internal method to create the widget.
   void createWidget(pqServer*);
-  
+
   /// Update the widget visibility according to the WidgetVisible and Selected flags
   virtual void updateWidgetVisibility();
-  
+
   /// Internal method to cleanup widget.
   void cleanupWidget();
 private:
@@ -100,7 +114,7 @@ private:
 
   void updateRepProperty(vtkSMProxy* smProxy,
     const char* propertyName);
-  
+
   class pqInternals;
   pqInternals* Internals;
 };

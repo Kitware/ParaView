@@ -661,6 +661,18 @@
       <Property name="CloseLoop" command="CloseLoop" />
       <Property name="Initialize" command="Initialize" />
 
+      <IntVectorProperty name="WidgetState"
+        command="SetWidgetState"
+        number_of_elements="1"
+        information_property="WidgetStateInfo"
+        default_values="1">
+      </IntVectorProperty>
+
+      <IntVectorProperty name="WidgetStateInfo"
+        command="GetWidgetState"
+        information_only="1" >
+      </IntVectorProperty>
+
       <IntVectorProperty name="AllowNodePicking"
         command="SetAllowNodePicking"
         number_of_elements="1"

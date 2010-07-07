@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -66,8 +66,9 @@ pqContourWidget::pqContourWidget(
   Superclass(_smproxy, pxy, p)
 {
   this->Internals = new pqInternals();
-  this->Internals->ClosedLoopConnect = 
+  this->Internals->ClosedLoopConnect =
     vtkSmartPointer<vtkEventQtSlotConnect>::New();
+
   this->Internals->setupUi(this);
 
   this->Internals->Visibility->setChecked(this->widgetVisible());
@@ -78,10 +79,18 @@ pqContourWidget::pqContourWidget(
     SIGNAL(toggled(bool)), this, SLOT(setWidgetVisible(bool)));
 
   QObject::connect(this->Internals->Closed,
-    SIGNAL(toggled(bool)), this, SLOT(closeLoop(bool)));    
+    SIGNAL(toggled(bool)), this, SLOT(closeLoop(bool)));
 
   QObject::connect(this->Internals->Delete, SIGNAL(clicked()),
     this, SLOT(removeAllNodes()));
+
+  QObject::connect(this->Internals->EditMode, SIGNAL(toggled(bool)),
+    this, SLOT(updateMode()));
+  QObject::connect(this->Internals->DrawMode, SIGNAL(toggled(bool)),
+    this, SLOT(updateMode()));
+  QObject::connect(this->Internals->Finished, SIGNAL(clicked()),
+    this, SLOT(finishContour()));
+
 
   pqServerManagerModel* smmodel =
     pqApplicationCore::instance()->getServerManagerModel();
@@ -102,7 +111,7 @@ void pqContourWidget::createWidget(pqServer* server)
     pqApplicationCore::instance()->get3DWidgetFactory()->
     get3DWidget("ContourWidgetRepresentation", server);
   this->setWidgetProxy(widget);
-  
+
   widget->UpdateVTKObjects();
   widget->UpdatePropertyInformation();
 
@@ -115,7 +124,7 @@ void pqContourWidget::createWidget(pqServer* server)
 void pqContourWidget::cleanupWidget()
 {
   vtkSMNewWidgetRepresentationProxy* widget = this->getWidgetProxy();
-  
+
   if (widget)
     {
     widget->InvokeCommand("Initialize");
@@ -187,6 +196,7 @@ void pqContourWidget::checkContourLoopClosed()
       emit this->contourLoopClosed();
       }
     }
+
 }
 
 //-----------------------------------------------------------------------------
@@ -205,14 +215,40 @@ void pqContourWidget::closeLoop(bool val)
         {
         widget->InvokeCommand("CloseLoop");
         }
+      this->Internals->DrawMode->setChecked(val);
       pqSMAdaptor::setElementProperty(
         widget->GetRepresentationProxy()->GetProperty("ClosedLoop"), val);
       widget->GetRepresentationProxy()->UpdateVTKObjects();
       this->setModified();
       this->render();
-      
       }
     }
+}
+//-----------------------------------------------------------------------------
+void pqContourWidget::updateMode()
+{
+  //the text should always be updated to this.
+  vtkSMNewWidgetRepresentationProxy* widget = this->getWidgetProxy();
+  if (widget)
+    {
+    if (this->Internals->EditMode->isChecked() )
+      {
+       pqSMAdaptor::setElementProperty(
+        widget->GetProperty("WidgetState"), 1);
+      }
+    else if (this->Internals->DrawMode->isChecked() )
+      {
+      pqSMAdaptor::setElementProperty(
+        widget->GetProperty("WidgetState"), 2);
+      }
+    widget->UpdateVTKObjects();
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqContourWidget::finishContour( )
+{
+  emit this->contourDone();
 }
 
 //----------------------------------------------------------------------------
@@ -228,6 +264,18 @@ void pqContourWidget::setLineInterpolator(vtkSMProxy* interpProxy)
 }
 
 //-----------------------------------------------------------------------------
+void pqContourWidget::reset()
+{
+  this->Superclass::reset();
+
+  //update our mode
+  this->Internals->EditMode->setChecked(true);
+  this->Internals->Closed->blockSignals(true);
+  this->Internals->Closed->setChecked(false);
+  this->Internals->Closed->blockSignals(false);
+}
+
+//-----------------------------------------------------------------------------
 void pqContourWidget::setLineColor(const QColor& color)
 {
   vtkSMProxy* widget = this->getWidgetProxy();
@@ -237,7 +285,7 @@ void pqContourWidget::setLineColor(const QColor& color)
     "LineColor").Set(1,color.greenF());
   vtkSMPropertyHelper(widget,
     "LineColor").Set(2 , color.blueF());
-  widget->UpdateVTKObjects(); 
+  widget->UpdateVTKObjects();
 }
 
 //-----------------------------------------------------------------------------
@@ -247,7 +295,7 @@ void pqContourWidget::updateRepProperty(
   vtkSMNewWidgetRepresentationProxy* widget = this->getWidgetProxy();
   if (widget && propertyName && *propertyName)
     {
-    vtkSMProxyProperty* proxyProp = 
+    vtkSMProxyProperty* proxyProp =
       vtkSMProxyProperty::SafeDownCast(
         widget->GetProperty(propertyName));
     if (proxyProp)

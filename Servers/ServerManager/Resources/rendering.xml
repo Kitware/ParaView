@@ -2801,7 +2801,7 @@
       </IntVectorProperty>
       <Hints>
         <!-- View can be used to specify the way to get the poly data for the representation -->
-        <Output command="GetContourRepresentationAsPolyData" />
+        <Output />
       </Hints>
       <!-- End of OrientedGlyphContourRepresentation -->
     </Proxy>
@@ -9274,6 +9274,8 @@
         <ExposedProperties>
           <Property name="Enabled" />
           <Property name="CloseLoop" />
+          <Property name="WidgetState" />
+          <Property name="WidgetStateInfo" />
           <Property name="AllowNodePicking" />
           <Property name="Initialize" />
           <Property name="ProcessEvents"/>
