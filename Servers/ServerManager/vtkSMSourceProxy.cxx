@@ -90,7 +90,6 @@ vtkSMSourceProxy::vtkSMSourceProxy()
   this->PInternals = new  vtkSMSourceProxyInternals;
   this->OutputPortsCreated = 0;
 
-  this->DataInformationValid = false;
   this->ExecutiveName = 0;
   this->SetExecutiveName("vtkCompositeDataPipeline");
 
@@ -610,14 +609,12 @@ vtkPVDataInformation* vtkSMSourceProxy::GetDataInformation(
     return 0;
     }
 
-  this->DataInformationValid = true;
   return this->GetOutputPort(idx)->GetDataInformation();
 }
 
 //----------------------------------------------------------------------------
 void vtkSMSourceProxy::InvalidateDataInformation()
 {
-  this->DataInformationValid = false;
   if (this->OutputPortsCreated)
     {
     vtkSMSourceProxyInternals::VectorOfPorts::iterator it =
@@ -843,7 +840,6 @@ void vtkSMSourceProxy::SetServers(vtkTypeUInt32 servers)
 void vtkSMSourceProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  os << indent << "DataInformationValid: " << this->DataInformationValid << endl;
   os << indent << "OutputPortsCreated: " << this->OutputPortsCreated << endl;
   os << indent << "ProcessSupport: " << this->ProcessSupport << endl;
 }

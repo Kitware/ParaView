@@ -227,11 +227,6 @@ protected:
 
   int ProcessSupport;
 
-  // After the algorithm executes, this will be set to false.
-  // Once a client fetches new data using GetDataInformation(),
-  // this will be set to true.
-  bool DataInformationValid;
-  
   // Description:
   // Mark the data information as invalid.
   void InvalidateDataInformation();
