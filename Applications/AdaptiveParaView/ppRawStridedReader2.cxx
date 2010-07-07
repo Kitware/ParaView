@@ -4,6 +4,8 @@
 #include <math.h>
 #include <sys/stat.h>
 
+#include <vtksys/SystemTools.hxx>
+
 #ifdef __APPLE__
 #include <mach/mach_time.h>
 #endif
@@ -110,7 +112,11 @@ int main(int argc, char* argv[]) {
   FILE** output = new FILE*[height];
   char *fn = new char[strlen(argv[1]) + 256];
   sprintf(fn, "%s-%d-%d-%ds", argv[1], height - 1, degree, rate);
-  mkdir(fn, 0755);
+  if (!vtksys::SystemTools::MakeDirectory(fn))
+    {
+    fprintf(stderr, "Could not make directory [%s].\n", fn);
+    exit(0);
+    }
   for(unsigned int h = 1; h < height; h = h + 1) 
     {
     sprintf(fn, "%s-%d-%d-%ds/%d", argv[1], height - 1, degree, rate, h);

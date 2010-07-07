@@ -69,7 +69,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class vtkDataArraySelection;
 class vtkStdString;
 
-class VTK_IO_EXPORT vtkACosmoReader : public vtkUnstructuredGridAlgorithm
+class VTK_EXPORT vtkACosmoReader : public vtkUnstructuredGridAlgorithm
 {
 public:
   static vtkACosmoReader *New();

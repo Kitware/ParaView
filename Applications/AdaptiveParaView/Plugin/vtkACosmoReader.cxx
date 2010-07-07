@@ -175,7 +175,7 @@ int vtkACosmoReader::RequestInformation(
       }
 
     int totalpieces = (int)
-    ((pow(this->splits, this->maxlevel + 1) - 1) / (this->splits - 1));
+    ((pow((float)this->splits, this->maxlevel + 1) - 1) / (this->splits - 1));
     this->pieceBounds = new float[6 * totalpieces];
     
     // actually read the meta data
@@ -195,7 +195,7 @@ int vtkACosmoReader::RequestInformation(
       *meta >> bounds[5];
 
       piecelevel = (int)
-        ((pow(this->splits, piecelevel) - 1) / (this->splits - 1));
+        ((pow((float)this->splits, piecelevel) - 1) / (this->splits - 1));
       piecenumber = (piecelevel + piecenumber) * 6;
 
       this->pieceBounds[piecenumber + 0] = bounds[0];
@@ -244,7 +244,7 @@ int vtkACosmoReader::RequestInformation(
     }
 
   int index = (int)
-    ((pow(this->splits, this->currentLevel) - 1) / (this->splits - 1));
+    ((pow((float)this->splits, this->currentLevel) - 1) / (this->splits - 1));
   index = (index + this->PieceNumber) * 6;
 
   bounds[0] = this->pieceBounds[index + 0];
@@ -425,7 +425,7 @@ int vtkACosmoReader::ReadFile(vtkUnstructuredGrid *output)
 
   // record elements
   vtkTypeFloat32 fBlock[NUMBER_OF_FLOATS]; // x,xvel,y,yvel,z,zvel,mass
-  char iBlock[NUMBER_OF_INTS * tagBytes];
+  char *iBlock = new char[NUMBER_OF_INTS * tagBytes];
 
   // Loop to read all particle data
   this->FileStream->seekg(0, ios::beg);
@@ -524,6 +524,7 @@ int vtkACosmoReader::ReadFile(vtkUnstructuredGrid *output)
     } // end loop over PositionRange
 
   // Clean up internal storage
+  delete[] iBlock;
   velocity->Delete();
   //mass->Delete();
   tag->Delete();
@@ -559,7 +560,7 @@ int vtkACosmoReader::ProcessRequest(vtkInformation *request,
     }
 
   int index = (int)
-    ((pow(this->splits, this->currentLevel) - 1) / (this->splits - 1));
+    ((pow((float)this->splits, this->currentLevel) - 1) / (this->splits - 1));
   index = (index + this->PieceNumber) * 6;
 
   double bounds[6];

@@ -50,4 +50,5 @@ build_paraview_client(adaptive_paraview
 )
 
 ADD_EXECUTABLE(ppRawStridedReader2 ppRawStridedReader2.cxx)
+TARGET_LINK_LIBRARIES(ppRawStridedReader2 vtksys)
 # ADD_EXECUTABLE(ppACosmoReader ppACosmoReader.cxx)
