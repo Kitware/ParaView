@@ -280,7 +280,7 @@ void vtkPVDataInformation::AddFromMultiPieceDataSet(vtkCompositeDataSet* data)
       dinf->SetDataClassName(dobj->GetClassName());
       dinf->DataSetType = dobj->GetDataObjectType();
       this->AddInformation(dinf, /*addingParts=*/ 1);
-      dinf->Delete();
+      dinf->FastDelete();
       }
     }
   iter->Delete();

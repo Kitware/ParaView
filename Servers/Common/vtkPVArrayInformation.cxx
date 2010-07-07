@@ -576,7 +576,7 @@ void vtkPVArrayInformation::CopyFromObject(vtkObject* obj)
     {
     vtkInformation* info = array->GetInformation();
     vtkInformationIterator* it = vtkInformationIterator::New();
-    it->SetInformation(info);
+    it->SetInformationWeak(info);
     it->GoToFirstItem();
     while (!it->IsDoneWithTraversal())
       {
