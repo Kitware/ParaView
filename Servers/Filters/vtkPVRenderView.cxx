@@ -19,6 +19,7 @@
 #include "vtkPVSynchronizedRenderer.h"
 #include "vtkPVSynchronizedRenderWindows.h"
 #include "vtkRenderer.h"
+#include "vtkRenderViewBase.h"
 #include "vtkRenderWindow.h"
 #include "vtkRenderWindowInteractor.h"
 #include "vtkSmartPointer.h"
@@ -105,7 +106,6 @@ namespace
 };
 
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "$Revision$");
 //----------------------------------------------------------------------------
 vtkPVRenderView::vtkPVRenderView()
 {
@@ -121,56 +121,29 @@ vtkPVRenderView::vtkPVRenderView()
     }
 
   this->SynchronizedRenderers = vtkPVSynchronizedRenderer::New();
-  this->SynchronizedRenderers->SetImageReductionFactor(4);
+  //this->SynchronizedRenderers->SetImageReductionFactor(4);
+
+  vtkRenderWindow* window = this->SynchronizedWindows->NewRenderWindow();
+  this->RenderView = vtkRenderViewBase::New();
+  this->RenderView->SetRenderWindow(window);
+  window->Delete();
 
   this->Identifier = 0;
-
-  // Destroy the render window superclass created.
-  this->RenderWindow->RemoveObserver(this->GetObserver());
-  this->RenderWindow->Delete();
-  this->RenderWindow = 0;
-
-  // Get the window from the SynchronizedWindows.
-  this->RenderWindow = this->SynchronizedWindows->NewRenderWindow();
-  this->RenderWindow->AddRenderer(this->Renderer);
-
-  // FIXME: This code is copied from vtkRenderView. Ideally I'd like a graceful
-  // way for overriding the render window without having to duplicate code.
-
-  // COMMENTING SINCE QVTKWidget doesn't work otherwise. FIXME
-  //if (!this->GetInteractor())
-  //  {
-  //  // We will handle all interactor renders by turning off rendering
-  //  // in the interactor and listening to the interactor's render event.
-  //  vtkSmartPointer<vtkRenderWindowInteractor> iren =
-  //    vtkSmartPointer<vtkRenderWindowInteractor>::New();
-  //  iren->EnableRenderOff();
-  //  iren->AddObserver(vtkCommand::RenderEvent, this->GetObserver());
-  //  iren->AddObserver(vtkCommand::StartInteractionEvent, this->GetObserver());
-  //  iren->AddObserver(vtkCommand::EndInteractionEvent, this->GetObserver());
-  //  this->RenderWindow->SetInteractor(iren);
-
-  //  // The interaction mode is -1 before calling SetInteractionMode,
-  //  // this will force an initialization of the interaction mode/style.
-  //  this->SetInteractionModeTo3D();
-  //  }
-
-  // Intialize the selector and listen to render events to help Selector know when to
-  // update the full-screen hardware pick.
-  this->RenderWindow->AddObserver(vtkCommand::EndEvent, this->GetObserver());
 
   this->NonCompositedRenderer = vtkRenderer::New();
   this->NonCompositedRenderer->EraseOff();
   this->NonCompositedRenderer->InteractiveOff();
   this->NonCompositedRenderer->SetLayer(2);
-  this->NonCompositedRenderer->SetActiveCamera(this->Renderer->GetActiveCamera());
-  this->RenderWindow->AddRenderer(this->NonCompositedRenderer);
-  this->RenderWindow->SetNumberOfLayers(3);
+  this->NonCompositedRenderer->SetActiveCamera(
+    this->RenderView->GetRenderer()->GetActiveCamera());
+  window->AddRenderer(this->NonCompositedRenderer);
+  window->SetNumberOfLayers(3);
 
   // We don't add the LabelRenderer.
 
   // DUMMY SPHERE FOR TESTING
-  ::CreatePipeline(vtkMultiProcessController::GetGlobalController(), this->Renderer);
+  ::CreatePipeline(vtkMultiProcessController::GetGlobalController(),
+    this->RenderView->GetRenderer());
 
   ::Create2DPipeline(this->NonCompositedRenderer);
 }
@@ -183,6 +156,7 @@ vtkPVRenderView::~vtkPVRenderView()
   this->SynchronizedWindows->Delete();
   this->SynchronizedRenderers->Delete();
   this->NonCompositedRenderer->Delete();
+  this->RenderView->Delete();
 }
 
 //----------------------------------------------------------------------------
@@ -191,10 +165,10 @@ void vtkPVRenderView::Initialize(unsigned int id)
   assert(this->Identifier == 0 && id != 0);
 
   this->Identifier = id;
-  this->SynchronizedWindows->AddRenderWindow(id, this->GetRenderWindow());
-  this->SynchronizedWindows->AddRenderer(id, this->GetRenderer());
+  this->SynchronizedWindows->AddRenderWindow(id, this->RenderView->GetRenderWindow());
+  this->SynchronizedWindows->AddRenderer(id, this->RenderView->GetRenderer());
   this->SynchronizedWindows->AddRenderer(id, this->GetNonCompositedRenderer());
-  this->SynchronizedRenderers->SetRenderer(this->GetRenderer());
+  this->SynchronizedRenderers->SetRenderer(this->RenderView->GetRenderer());
 }
 
 //----------------------------------------------------------------------------
@@ -214,7 +188,22 @@ void vtkPVRenderView::SetSize(int x, int y)
 //----------------------------------------------------------------------------
 vtkCamera* vtkPVRenderView::GetActiveCamera()
 {
-  return this->GetRenderer()->GetActiveCamera();
+  return this->RenderView->GetRenderer()->GetActiveCamera();
+}
+
+//----------------------------------------------------------------------------
+vtkRenderWindow* vtkPVRenderView::GetRenderWindow()
+{
+  return this->RenderView->GetRenderWindow();
+}
+
+//----------------------------------------------------------------------------
+// Note this is called on all processes.
+void vtkPVRenderView::ResetCamera()
+{
+  double bounds[6];
+  this->SynchronizedRenderers->ComputeVisiblePropBounds(bounds);
+  this->RenderView->GetRenderer()->ResetCamera(bounds);
 }
 
 //----------------------------------------------------------------------------

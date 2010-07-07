@@ -52,6 +52,7 @@ int main(int argc, char** argv)
   mainWindow.setCentralWidget(centralWidget);
   hbox->addWidget(qwidget);
 
+  proxy->InvokeCommand("ResetCamera");
 #ifdef SECOND_WINDOW
 
   vtkSMProxy* proxy2 = vtkSMProxyManager::GetProxyManager()->NewProxy("views",
@@ -66,8 +67,11 @@ int main(int argc, char** argv)
   qwidget = new QVTKWidget(&mainWindow);
   qwidget->SetRenderWindow(rv2->GetRenderWindow());
   hbox->addWidget(qwidget);
+  proxy2->InvokeCommand("ResetCamera");
+
 #endif
   mainWindow.show();
+
   int ret = app.exec();
 #ifdef SECOND_WINDOW
   proxy2->Delete();

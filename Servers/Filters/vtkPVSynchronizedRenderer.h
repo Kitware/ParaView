@@ -49,6 +49,13 @@ public:
   void SetImageReductionFactor(int);
   vtkGetMacro(ImageReductionFactor, int);
 
+  // Description:
+  // Compute visible props bounds. This method must be called on all processes.
+  // It will result is providing the full data bounds on all processes involved.
+  // NOTE: If this method is not called on all processes at the same time, it
+  // WILL result in deadlocks.
+  void ComputeVisiblePropBounds(double bounds[6]);
+
 //BTX
 protected:
   vtkPVSynchronizedRenderer();
@@ -69,6 +76,7 @@ protected:
   ModeEnum Mode;
   bool Enabled;
   int ImageReductionFactor;
+  vtkRenderer* Renderer;
 private:
   vtkPVSynchronizedRenderer(const vtkPVSynchronizedRenderer&); // Not implemented
   void operator=(const vtkPVSynchronizedRenderer&); // Not implemented

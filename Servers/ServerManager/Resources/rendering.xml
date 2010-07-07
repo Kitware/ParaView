@@ -4754,6 +4754,8 @@
         number_of_elements="2"
         default_values="400 400" >
       </IntVectorProperty>
+
+      <Property name="ResetCamera" command="ResetCamera" />
     </RenderView2Proxy>
 
     <Proxy name="RenderViewBase"
