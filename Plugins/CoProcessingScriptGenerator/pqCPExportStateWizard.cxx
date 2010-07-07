@@ -252,8 +252,8 @@ void pqCPExportStateWizard::updateImageFileName()
   else
     {  // update imageType if it is different
     int extensionIndex = fileName.lastIndexOf(".");
-    QString extension = fileName.right(fileName.size()-extensionIndex-1);
-    int index = this->Internals->imageType->findText(extension);
+    QString anExtension = fileName.right(fileName.size()-extensionIndex-1);
+    int index = this->Internals->imageType->findText(anExtension);
     this->Internals->imageType->setCurrentIndex(index);
     fileName = this->Internals->imageFileName->displayText();
     }

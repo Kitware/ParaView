@@ -164,7 +164,7 @@ int vtkPVContourFilter::RequestData(vtkInformation* request,
 }
 
 //-----------------------------------------------------------------------------
-int vtkPVContourFilter::RequestDataObject(vtkInformation* request,
+int vtkPVContourFilter::RequestDataObject(vtkInformation* vtkNotUsed(request),
                                           vtkInformationVector** inputVector,
                                           vtkInformationVector* outputVector)
 {

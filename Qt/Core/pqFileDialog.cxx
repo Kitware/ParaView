@@ -165,13 +165,13 @@ public:
     delete this->Completer;
   }
 
-  bool eventFilter(QObject *obj, QEvent *event )
+  bool eventFilter(QObject *obj, QEvent *anEvent )
     {
     if ( obj == this->Ui.Files )
       {
-      if ( event->type() == QEvent::KeyPress )
+      if ( anEvent->type() == QEvent::KeyPress )
         {
-        QKeyEvent *keyEvent = static_cast<QKeyEvent*>(event);
+        QKeyEvent *keyEvent = static_cast<QKeyEvent*>(anEvent);
         if (keyEvent->key() == Qt::Key_Backspace ||
           keyEvent->key() == Qt::Key_Delete )
           {
@@ -184,7 +184,7 @@ public:
         }
       return false;
       }
-    return QObject::eventFilter(obj, event);
+    return QObject::eventFilter(obj, anEvent);
     }
 
   QString getStartPath()
@@ -735,7 +735,7 @@ void pqFileDialog::onClickedRecent(const QModelIndex&)
 }
 
 //-----------------------------------------------------------------------------
-void pqFileDialog::onClickedFile(const QModelIndex& index)
+void pqFileDialog::onClickedFile(const QModelIndex& vtkNotUsed(index))
 {
   this->Implementation->Ui.Favorites->clearSelection();
 }

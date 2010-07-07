@@ -74,7 +74,7 @@ void vtkIsoVolume::ThresholdBetween(double lower, double upper)
 }
 
 //----------------------------------------------------------------------------
-int vtkIsoVolume::RequestData(vtkInformation* request,
+int vtkIsoVolume::RequestData(vtkInformation* vtkNotUsed(request),
                               vtkInformationVector** inputVector,
                               vtkInformationVector* outputVector)
 {
