@@ -45,4 +45,20 @@ def make_name_valid(name):
         name = 'a' + name
     return name
 
-        
+class options:
+    """Values set here have any effect, only when importing the paraview module
+       in python interpretor directly i.e. not through pvpython or pvbatch. In
+       that case, one should use command line arguments for the two
+       executables"""
+
+    """When True, act as pvbatch. Default behaviour is to act like pvpython"""
+    batch = False
+
+    """When True, acts like pvbatch --symmetric. Requires that batch is set to
+    True to have any effect."""
+    symmetric = False
+
+
+"""Set by vvtkPythonProgrammableFilter"""
+fromFilter = False
+
