@@ -621,7 +621,7 @@ int vtkPVGeometryFilter::RequestCompositeData(vtkInformation*,
       for (blocksIter = blocks.begin(); blocksIter != blocks.end();
         ++blocksIter)
         {
-        (*blocksIter)->FastDelete();
+        (*blocksIter)->Delete();
         }
       vtkTimerLog::MarkEndEvent("Append Blocks");
 
