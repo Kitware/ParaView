@@ -38,6 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyIterator.h"
 #include "vtkSMProxy.h"
+#include "vtkSMProxyIterator.h"
 #include "vtkSMProxyManager.h"
 
 #include <QMap>
@@ -125,6 +126,25 @@ void pqProxy::removeHelperProxy(const QString& key, vtkSMProxy* proxy)
 }
 
 //-----------------------------------------------------------------------------
+void pqProxy::updateHelperProxies() const
+{
+  QString groupname = QString("pq_helper_proxies.%1").arg(
+    this->getProxy()->GetSelfIDAsString());
+  vtkSMProxyIterator* iter = vtkSMProxyIterator::New();
+  iter->SetModeToOneGroup();
+  for (iter->Begin(groupname.toAscii().data()); !iter->IsAtEnd(); iter->Next())
+    {
+    const char* key = iter->GetKey();
+    vtkSMProxy* proxy = iter->GetProxy();
+    if (proxy != NULL && !this->Internal->ProxyLists[key].contains(proxy))
+      {
+      this->Internal->ProxyLists[key].push_back(proxy);
+      }
+    }
+  iter->Delete();
+}
+
+//-----------------------------------------------------------------------------
 void pqProxy::clearHelperProxies()
 {
   vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
@@ -156,12 +176,15 @@ void pqProxy::clearHelperProxies()
 //-----------------------------------------------------------------------------
 QList<QString> pqProxy::getHelperKeys() const
 {
+  this->updateHelperProxies();
   return this->Internal->ProxyLists.keys();
 }
 
 //-----------------------------------------------------------------------------
 QList<vtkSMProxy*> pqProxy::getHelperProxies(const QString& key) const
 {
+  this->updateHelperProxies();
+
   QList<vtkSMProxy*> list;
 
   if (this->Internal->ProxyLists.contains(key))
@@ -177,6 +200,8 @@ QList<vtkSMProxy*> pqProxy::getHelperProxies(const QString& key) const
 //-----------------------------------------------------------------------------
 QList<vtkSMProxy*> pqProxy::getHelperProxies() const
 {
+  this->updateHelperProxies();
+
   QList<vtkSMProxy*> list;
 
   pqProxyInternal::ProxyListsType::iterator iter

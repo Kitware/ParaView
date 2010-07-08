@@ -654,12 +654,40 @@ def GetAnimationScene():
         raise servermanager.MissingProxy, "Could not locate global AnimationScene."
     return scene
 
+def _GetRepresentationAnimationHelper(sourceproxy):
+    """Internal method that returns the representation animation helper for a
+       source proxy. It creates a new one if none exists."""
+    # ascertain that proxy is a source proxy
+    if not sourceproxy in GetSources().values():
+        return None
+    for proxy in servermanager.ProxyManager():
+        if proxy.GetXMLName() == "RepresentationAnimationHelper" and\
+           proxy.GetProperty("Source").IsProxyAdded(sourceproxy.SMProxy):
+             return proxy
+    # create a new helper
+    proxy = servermanager.misc.RepresentationAnimationHelper(
+      Source=sourceproxy)
+    servermanager.ProxyManager().RegisterProxy(
+      "pq_helper_proxies.%s" % sourceproxy.GetSelfIDAsString(),
+      "RepresentationAnimationHelper", proxy)
+    return proxy
+
 def GetAnimationTrack(propertyname_or_property, index=None, proxy=None):
     """Returns an animation cue for the property. If one doesn't exist then a
     new one will be created.
     Typical usage:
         track = GetAnimationTrack("Center", 0, sphere) or
-        track = GetAnimationTrack(sphere.GetProperty("Radius"))
+        track = GetAnimationTrack(sphere.GetProperty("Radius")) or
+
+        # this returns the track to animate visibility of the active source in
+        # all views.
+        track = GetAnimationTrack("Visibility")
+
+     For animating properties on implicit planes etc., use the following
+     signatures:
+        track = GetAnimationTrack(slice.SliceType.GetProperty("Origin"), 0) or
+        track = GetAnimationTrack("Origin", 0, slice.SliceType)
+
     """
     if not proxy:
         proxy = GetActiveSource()
@@ -667,26 +695,35 @@ def GetAnimationTrack(propertyname_or_property, index=None, proxy=None):
         raise TypeError, "proxy must be a servermanager.Proxy instance"
     if isinstance(propertyname_or_property, str):
         propertyname = propertyname_or_property
-        prop = proxy.GetProperty(propertyname)
-    elif isinstance(propertyname, servermanager.Property):
+    elif isinstance(propertyname_or_property, servermanager.Property):
         prop = propertyname_or_property
         propertyname = prop.Name
+        proxy = prop.Proxy
     else:
         raise TypeError, "propertyname_or_property must be a string or servermanager.Property"
+
+    # To handle the case where the property is actually a "display" property, in
+    # which case we are actually animating the "RepresentationAnimationHelper"
+    # associated with the source.
+    if propertyname in ["Visibility", "Opacity"]:
+        proxy = _GetRepresentationAnimationHelper(proxy)
+    if not proxy or not proxy.GetProperty(propertyname):
+        raise AttributeError, "Failed to locate property %s" % propertyname
 
     scene = GetAnimationScene()
     for cue in scene.Cues:
         try:
-            if cue.AnimatedProxy == prop.Proxy and\
-               cue.AnimatedPropertyName == prop.Name:
+            if cue.AnimatedProxy == proxy and\
+               cue.AnimatedPropertyName == propertyname:
                 if index == None or index == cue.AnimatedElement:
                     return cue
         except AttributeError:
             pass
+
     # matching animation track wasn't found, create a new one.
     cue = KeyFrameAnimationCue()
-    cue.AnimatedProxy = prop.Proxy
-    cue.AnimatedPropertyName = prop.Name
+    cue.AnimatedProxy = proxy
+    cue.AnimatedPropertyName = propertyname
     if index != None:
         cue.AnimatedElement = index
     scene.Cues.append(cue)
