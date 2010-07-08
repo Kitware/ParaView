@@ -372,7 +372,7 @@ class SourceProxy(Proxy):
         """This method updates the server-side VTK pipeline and the associated
         data information. Make sure to update a source to validate the output
         meta-data."""
-        if time:
+        if time != None:
             self.SMProxy.UpdatePipeline(time)
         else:
             self.SMProxy.UpdatePipeline()
@@ -393,7 +393,7 @@ class SourceProxy(Proxy):
     def GetDataInformation(self, idx=None):
         """This method returns a DataInformation wrapper around a
         vtkPVDataInformation"""
-        if not idx:
+        if idx == None:
             idx = self.Port
         if self.SMProxy:
             return DataInformation( \
