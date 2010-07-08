@@ -23,6 +23,7 @@
 #include "vtkRenderWindow.h"
 #include "vtkRenderWindowInteractor.h"
 #include "vtkSmartPointer.h"
+#include "vtkTimerLog.h"
 #include "vtkWeakPointer.h"
 
 #include "vtkActor.h"
@@ -109,6 +110,10 @@ vtkStandardNewMacro(vtkPVRenderView);
 //----------------------------------------------------------------------------
 vtkPVRenderView::vtkPVRenderView()
 {
+  this->StillRenderImageReductionFactor = 1;
+  this->InteractiveRenderImageReductionFactor = 2;
+
+
   if (::SynchronizedWindows == NULL)
     {
     this->SynchronizedWindows = vtkPVSynchronizedRenderWindows::New();
@@ -121,7 +126,6 @@ vtkPVRenderView::vtkPVRenderView()
     }
 
   this->SynchronizedRenderers = vtkPVSynchronizedRenderer::New();
-  //this->SynchronizedRenderers->SetImageReductionFactor(4);
 
   vtkRenderWindow* window = this->SynchronizedWindows->NewRenderWindow();
   this->RenderView = vtkRenderViewBase::New();
@@ -203,7 +207,50 @@ void vtkPVRenderView::ResetCamera()
 {
   double bounds[6];
   this->SynchronizedRenderers->ComputeVisiblePropBounds(bounds);
+  // Remember, vtkRenderer::ResetCamera() call
+  // vtkRenderer::ResetCameraClippingPlanes() with the given bounds.
   this->RenderView->GetRenderer()->ResetCamera(bounds);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::StillRender()
+{
+  // Decide if we are doing remote rendering or local rendering.
+
+  vtkTimerLog::MarkStartEvent("Still Render");
+
+  // set the image reduction factor. 
+  this->SynchronizedRenderers->SetImageReductionFactor(
+    this->StillRenderImageReductionFactor);
+ 
+  if (this->SynchronizedWindows->GetLocalProcessIsDriver() ||
+    !this->SynchronizedWindows->GetRenderEventPropagation())
+    {
+    this->GetRenderWindow()->Render();
+    }
+
+  vtkTimerLog::MarkEndEvent("Still Render");
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::InteractiveRender()
+{
+  // * Decide if we are doing LOD or full-res rendering.
+
+  // * Decide if we are doing remote rendering or local rendering.
+
+  vtkTimerLog::MarkStartEvent("Interactive Render");
+
+  this->SynchronizedRenderers->SetImageReductionFactor(
+    this->InteractiveRenderImageReductionFactor);
+
+  if (this->SynchronizedWindows->GetLocalProcessIsDriver() ||
+    !this->SynchronizedWindows->GetRenderEventPropagation())
+    {
+    this->GetRenderWindow()->Render();
+    }
+
+  vtkTimerLog::MarkEndEvent("Interactive Render");
 }
 
 //----------------------------------------------------------------------------

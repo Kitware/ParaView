@@ -28,6 +28,10 @@
 //                            deciding if we are doing remote rendering or local
 //                            rendering etc.
 
+// Utkarsh: Try to use methods that will be called on all processes for most
+// decision making similar to what ResetCamera() does. This will avoid the need
+// to have special code in vtkSMRenderViewProxy and will simplify life when
+// creating new views. "Move logic to VTK" -- that's the Mantra.
 #ifndef __vtkPVRenderView_h
 #define __vtkPVRenderView_h
 
@@ -84,6 +88,35 @@ public:
   // @CallOnAllProcessess
   void ResetCamera();
 
+  // Description:
+  // Triggers a high-resolution render.
+  // @CallOnAllProcessess
+  void StillRender();
+
+  // Description:
+  // Triggers a interactive render. Based on the settings on the view, this may
+  // result in a low-resolution rendering or a simplified geometry rendering.
+  // @CallOnAllProcessess
+  void InteractiveRender();
+
+  // Description:
+  // Get/Set the reduction-factor to use when for StillRender(). This is
+  // typically set to 1, but in some cases with terrible connectivity or really
+  // large displays, one may want to use a sub-sampled image even for
+  // StillRender(). This is set it number of pixels to be sub-sampled by.
+  // Note that image reduction factors have no effect when in built-in mode.
+  // @CallOnAllProcessess
+  vtkSetClampMacro(StillRenderImageReductionFactor, int, 1, 20);
+  vtkGetMacro(StillRenderImageReductionFactor, int);
+
+  // Description:
+  // Get/Set the reduction-factor to use when for InteractiveRender().
+  // This is set it number of pixels to be sub-sampled by.
+  // Note that image reduction factors have no effect when in built-in mode.
+  // @CallOnAllProcessess
+  vtkSetClampMacro(InteractiveRenderImageReductionFactor, int, 1, 20);
+  vtkGetMacro(InteractiveRenderImageReductionFactor, int);
+
 //BTX
 protected:
   vtkPVRenderView();
@@ -95,6 +128,8 @@ protected:
   vtkPVSynchronizedRenderer* SynchronizedRenderers;
   unsigned int Identifier;
 
+  int StillRenderImageReductionFactor;
+  int InteractiveRenderImageReductionFactor;
 private:
   vtkPVRenderView(const vtkPVRenderView&); // Not implemented
   void operator=(const vtkPVRenderView&); // Not implemented

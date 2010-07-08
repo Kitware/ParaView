@@ -221,6 +221,31 @@ vtkPVSynchronizedRenderWindows::~vtkPVSynchronizedRenderWindows()
 }
 
 //----------------------------------------------------------------------------
+bool vtkPVSynchronizedRenderWindows::GetLocalProcessIsDriver()
+{
+  switch (this->Mode)
+    {
+  case BUILTIN:
+    return true;
+
+  case CLIENT:
+    return true;
+
+  case SERVER:
+    return false;
+
+  case BATCH:
+    if (this->ParallelController &&
+      this->ParallelController->GetLocalProcessId() == 0)
+      {
+      return true;
+      }
+  default:
+    return false;
+    }
+}
+
+//----------------------------------------------------------------------------
 void vtkPVSynchronizedRenderWindows::SetClientServerController(
   vtkMultiProcessController* controller)
 {
@@ -739,8 +764,8 @@ void vtkPVSynchronizedRenderWindows::UpdateWindowLayout()
     for (iter = this->Internals->RenderWindows.begin();
       iter != this->Internals->RenderWindows.end(); ++iter)
       {
-      const int *actual_size = iter->second.Size;
-      const int *position = iter->second.Position;
+      //const int *actual_size = iter->second.Size;
+      //const int *position = iter->second.Position;
       // This class only supports full-viewports.
       double viewport[4] = {0, 0, 1, 1};
       this->Internals->UpdateViewports(

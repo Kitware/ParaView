@@ -87,12 +87,20 @@ public:
   vtkGetMacro(RenderEventPropagation, bool);
   vtkBooleanMacro(RenderEventPropagation, bool);
 
+  // Description:
+  // This method returns true if the local process is the 'driver' process. In
+  // client-server configurations, client is the driver. In batch
+  // configurations, root-node is the driver. In built-in mode, this always
+  // returns true.
+  bool GetLocalProcessIsDriver();
+
 //BTX
   enum
     {
     SYNC_MULTI_RENDER_WINDOW_TAG = 15002,
     };
 
+  // Internal-callback-method
   void Render(unsigned int);
 
 protected:

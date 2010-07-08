@@ -17,7 +17,8 @@
 #include "QVTKWidget.h"
 #include <QHBoxLayout>
 
-#define SECOND_WINDOW
+//#define SECOND_WINDOW
+//#define REMOTE_CONNECTION
 
 int main(int argc, char** argv)
 {
@@ -33,7 +34,11 @@ int main(int argc, char** argv)
   options->Delete();
 
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+#ifdef REMOTE_CONNECTION
   vtkIdType connectionID = pm->ConnectToRemote("localhost", 11111);
+#else
+  vtkIdType connectionID = pm->ConnectToSelf();
+#endif
 
   vtkSMProxy* proxy = vtkSMProxyManager::GetProxyManager()->NewProxy("views",
     "RenderView2");
