@@ -225,6 +225,8 @@ void vtkPythonCalculator::Exec(const char* expression,
   vtkPythonProgrammableFilter::GetGlobalPipelineInterpretor()->RunSimpleString(fscript.c_str());
 
   vtkstd::string runscript;
+  runscript += "import paraview\n";
+  runscript += "paraview.fromFilter = True\n";
   runscript += "from paraview import vtk\n";
   runscript += "from paraview.vtk import dataset_adapter\n";
   runscript += "from numpy import *\n";

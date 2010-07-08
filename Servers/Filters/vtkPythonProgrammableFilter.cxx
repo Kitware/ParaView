@@ -311,6 +311,9 @@ void vtkPythonProgrammableFilter::Exec(const char* script,
 
   vtkstd::string runscript;
 
+  runscript += "import paraview\n";
+  runscript += "paraview.fromFilter = True\n";
+  runscript += "from paraview import vtk\n";
   runscript += "from paraview import vtk\n";
   runscript += "from paraview import servermanager\n";
   runscript += "if servermanager.progressObserverTag:\n";

@@ -57,3 +57,7 @@ class options:
     """When True, acts like pvbatch --symmetric. Requires that batch is set to
     True to have any effect."""
     symmetric = False
+
+
+"""Set by vvtkPythonProgrammableFilter"""
+fromFilter = False

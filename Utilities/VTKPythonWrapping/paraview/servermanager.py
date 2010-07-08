@@ -2944,10 +2944,14 @@ class __DefinitionUpdater(object):
         pass
 
     def __del__(self):
-        vtkSMObject.GetProxyManager().RemoveObserver(self.Tag)
-        pass
+        if vtkSMObject.GetProxyManager():
+            vtkSMObject.GetProxyManager().RemoveObserver(self.Tag)
 
-_defUpdater = __DefinitionUpdater()
+if not paraview.fromFilter:
+    # fromFilter is set when this module is imported from the programmable
+    # filter
+    global _defUpdater
+    _defUpdater = __DefinitionUpdater()
 
 if hasattr(sys, "ps1"):
     # session is interactive.
