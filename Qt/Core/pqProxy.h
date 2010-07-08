@@ -128,6 +128,11 @@ public:
   /// Unregisters all helper proxies.
   void clearHelperProxies();
 
+  /// Updates the internal datastructures using the proxies currently registered
+  /// under the group that would be used for helper proxies. This makes it
+  /// possible to locate helper proxies created from Python.
+  void updateHelperProxies() const;
+
 signals:
   /// Fired when the name of the proxy is changed.
   void nameChanged(pqServerManagerModelItem*);
