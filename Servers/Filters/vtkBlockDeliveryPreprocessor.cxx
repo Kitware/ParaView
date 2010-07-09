@@ -35,6 +35,7 @@ vtkBlockDeliveryPreprocessor::vtkBlockDeliveryPreprocessor()
   this->CompositeDataSetIndex = 0;
   this->FieldAssociation = vtkDataObject::FIELD_ASSOCIATION_POINTS;
   this->FlattenTable = 0;
+  this->GenerateOriginalIds = true;
 }
 
 //----------------------------------------------------------------------------
@@ -105,6 +106,7 @@ int vtkBlockDeliveryPreprocessor::RequestData(vtkInformation*,
   adtf->SetInput(clone);
   adtf->SetAddMetaData(true);
   adtf->SetFieldAssociation(this->FieldAssociation);
+  adtf->SetGenerateOriginalIds(this->GenerateOriginalIds);
   adtf->Update();
 
   // Create a pointer of the base class type, so that later stages need not be

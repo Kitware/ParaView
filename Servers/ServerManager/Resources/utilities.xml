@@ -2385,6 +2385,13 @@
            </RequiredProperties>
         </CompositeTreeDomain>
        </IntVectorProperty>
+
+       <IntVectorProperty name="GenerateOriginalIds"
+          command="SetGenerateOriginalIds"
+          number_of_elements="1"
+          default_values="1">
+          <BooleanDomain name="bool" />
+       </IntVectorProperty>
     <!-- End of BlockDeliveryPreprocessor -->
     </SourceProxy>
 
@@ -2420,15 +2427,6 @@
          </Documentation>
        </IdTypeVectorProperty>
 
-       <IntVectorProperty name="GenerateOriginalIds"
-         command="SetGenerateOriginalIds"
-         default_values="1"
-         number_of_elements="1">
-         <Documentation>
-           When set (default) the vtkOriginalIndices array will be added to the
-           output. Can be overridden by setting this flag to 0.
-         </Documentation>
-       </IntVectorProperty>
     <!-- End of TableStreamer --> 
     </SourceProxy>
 

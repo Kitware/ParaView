@@ -33,7 +33,6 @@ vtkSMSpreadSheetRepresentationProxy::vtkSMSpreadSheetRepresentationProxy()
 {
   this->SelectionRepresentation = 0;
   this->SelectionOnly = 0;
-  this->PreviousSelectionOnly = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -144,33 +143,42 @@ void vtkSMSpreadSheetRepresentationProxy::PassEssentialAttributes()
 }
 
 //----------------------------------------------------------------------------
+void vtkSMSpreadSheetRepresentationProxy::SetSelectionOnly(int newvalue)
+{
+  if (this->SelectionOnly == newvalue)
+    {
+    return;
+    }
+  this->SelectionOnly = newvalue;
+  if (this->SelectionOnly)
+    {
+    this->Connect(
+      this->GetInputProxy()->GetSelectionOutput(this->OutputPort),
+      this->PreProcessor);
+    vtkSMPropertyHelper(this->PreProcessor, "GenerateOriginalIds").Set(0);
+    }
+  else
+    {
+    this->Connect(this->GetInputProxy(),
+      this->PreProcessor, "Input", this->OutputPort);
+    vtkSMPropertyHelper(this->PreProcessor, "GenerateOriginalIds").Set(1);
+    }
+  this->PreProcessor->UpdateVTKObjects();
+  this->Modified();
+  this->MarkModified(NULL);
+}
+
+//----------------------------------------------------------------------------
 void vtkSMSpreadSheetRepresentationProxy::Update(vtkSMViewProxy* view)
 {
-  if (this->PreviousSelectionOnly != this->SelectionOnly)
+  if (this->UpdateRequired())
     {
-    this->MarkModified(0);
-    // change the pipeline to deliver correct data.
-    // Note this is a bit unconventional, changing the pipeline in Update()
-    // so we must be careful.
-  
-    if (this->SelectionOnly)
-      {
-      this->Connect(
-        this->GetInputProxy()->GetSelectionOutput(this->OutputPort),
-        this->PreProcessor);
-      vtkSMPropertyHelper(this->Streamer, "GenerateOriginalIds").Set(0);
-      }
-    else
-      {
-      this->Connect(this->GetInputProxy(),
-        this->PreProcessor, "Input", this->OutputPort);
-      vtkSMPropertyHelper(this->Streamer, "GenerateOriginalIds").Set(1);
-      }
-    this->Streamer->UpdateVTKObjects();
-
-    this->PreviousSelectionOnly = this->SelectionOnly;
+    // this is essential since this proxy's real input is sometimes the extract
+    // selection proxy, in which case since the representation is not a true
+    // consumer of the extract selection proxy, it does not realize that the
+    // pipeline has changed when selection changes. BUG #10479.
+    this->NeedsUpdate = true;
     }
-
   this->Superclass::Update(view);
   if (this->SelectionRepresentation->GetVisibility())
     {

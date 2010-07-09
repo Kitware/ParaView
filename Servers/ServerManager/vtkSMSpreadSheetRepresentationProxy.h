@@ -60,7 +60,7 @@ public:
   // Description:
   // Set if the representation should deliver only the selected elements to the
   // client.
-  vtkSetMacro(SelectionOnly, int);
+  void SetSelectionOnly(int);
   vtkGetMacro(SelectionOnly, int);
   vtkBooleanMacro(SelectionOnly, int);
 
@@ -93,7 +93,6 @@ protected:
   vtkSMBlockDeliveryRepresentationProxy* SelectionRepresentation;
 
   int SelectionOnly;
-  int PreviousSelectionOnly;
 private:
   vtkSMSpreadSheetRepresentationProxy(const vtkSMSpreadSheetRepresentationProxy&); // Not implemented
   void operator=(const vtkSMSpreadSheetRepresentationProxy&); // Not implemented

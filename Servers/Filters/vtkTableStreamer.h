@@ -43,12 +43,6 @@ public:
   vtkGetMacro(Block, vtkIdType);
 
   // Description:
-  // When set (default) the vtkOriginalIndices array will be added to the
-  // output. Can be overridden by setting this flag to 0.
-  vtkSetMacro(GenerateOriginalIds, int);
-  vtkGetMacro(GenerateOriginalIds, int);
-
-  // Description:
   // Get/Set the MPI controller used for gathering.
   void SetController(vtkMultiProcessController*);
   vtkGetObjectMacro(Controller, vtkMultiProcessController);
@@ -81,7 +75,6 @@ protected:
 
   vtkIdType Block;
   vtkIdType BlockSize;
-  int GenerateOriginalIds;
   vtkMultiProcessController* Controller;
 private:
   vtkTableStreamer(const vtkTableStreamer&); // Not implemented
