@@ -35,6 +35,7 @@ vtkAttributeDataToTableFilter::vtkAttributeDataToTableFilter()
 {
   this->FieldAssociation = vtkDataObject::FIELD_ASSOCIATION_POINTS;
   this->AddMetaData = false;
+  this->GenerateOriginalIds = false;
 }
 
 //----------------------------------------------------------------------------
@@ -218,18 +219,7 @@ void vtkAttributeDataToTableFilter::Decorate(vtkTable* output,
     dimensions = cellDims;
     }
 
-  if (this->FieldAssociation == vtkDataObject::FIELD_ASSOCIATION_CELLS &&
-    input->GetNumberOfElements(vtkDataObject::CELL) > 0)
-    {
-      //at minimum always have cell ids
-      vtkIdTypeArray* originalIndices = vtkIdTypeArray::New();
-      originalIndices->SetNumberOfComponents(1);
-      originalIndices->SetNumberOfTuples( input->GetNumberOfElements(vtkDataObject::CELL));
-      originalIndices->SetName("vtkOriginalIndices");
-      output->GetRowData()->AddArray(originalIndices);
-      originalIndices->Delete();
-    }
-  else if (this->FieldAssociation == vtkDataObject::FIELD_ASSOCIATION_POINTS &&
+  if (this->FieldAssociation == vtkDataObject::FIELD_ASSOCIATION_POINTS &&
     psInput && psInput->GetPoints())
     {
     output->GetRowData()->AddArray(psInput->GetPoints()->GetData());
@@ -248,6 +238,25 @@ void vtkAttributeDataToTableFilter::Decorate(vtkTable* output,
     output->GetFieldData()->AddArray(dArray);
     dArray->Delete();
     }
+
+  if (this->GenerateOriginalIds)
+    {
+    // Add an original ids array. I know, this is going to bloat up the memory a
+    // bit, but it's much easier to add the array now than later (esp. in
+    // vtkTableStreamer) since it's ending up buggy and hard to track.
+
+    vtkIdTypeArray* indicesArray = vtkIdTypeArray::New();
+    indicesArray->SetName("vtkOriginalIndices");
+    indicesArray->SetNumberOfComponents(1);
+    vtkIdType numElements = input->GetNumberOfElements(this->FieldAssociation);
+    indicesArray->SetNumberOfTuples(numElements);
+    for (vtkIdType cc=0; cc < numElements; cc++)
+      {
+      indicesArray->SetValue(cc, cc);
+      }
+    output->GetRowData()->AddArray(indicesArray);
+    indicesArray->FastDelete();
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -256,6 +265,7 @@ void vtkAttributeDataToTableFilter::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os, indent);
   os << indent << "FieldAssociation: " << this->FieldAssociation << endl;
   os << indent << "AddMetaData: " << this->AddMetaData << endl;
+  os << indent << "GenerateOriginalIds: " << this->GenerateOriginalIds << endl;
 }
 
 

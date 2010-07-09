@@ -56,6 +56,13 @@ public:
   vtkGetMacro(AddMetaData, bool);
   vtkBooleanMacro(AddMetaData, bool);
 
+  // Description:
+  // When set (default) the vtkOriginalIndices array will be added to the
+  // output. Can be overridden by setting this flag to 0.
+  // This is only respected when AddMetaData is true.
+  vtkSetMacro(GenerateOriginalIds, bool);
+  vtkGetMacro(GenerateOriginalIds, bool);
+
 //BTX
 protected:
   vtkAttributeDataToTableFilter();
@@ -90,6 +97,7 @@ protected:
 
   int FieldAssociation;
   bool AddMetaData;
+  bool GenerateOriginalIds;
 private:
   vtkAttributeDataToTableFilter(const vtkAttributeDataToTableFilter&); // Not implemented
   void operator=(const vtkAttributeDataToTableFilter&); // Not implemented

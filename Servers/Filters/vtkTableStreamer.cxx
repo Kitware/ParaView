@@ -51,7 +51,6 @@ vtkTableStreamer::vtkTableStreamer()
   this->SetController(vtkMultiProcessController::GetGlobalController());
   this->BlockSize = 1024;
   this->Block = 0;
-  this->GenerateOriginalIds = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -177,15 +176,6 @@ int vtkTableStreamer::RequestData(vtkInformation*,
     outTable->GetRowData()->CopyAllocate(curTable->GetRowData());
     outTable->GetRowData()->SetNumberOfTuples(curCount);
 
-    vtkSmartPointer<vtkIdTypeArray> originalIndices;
-    if (this->GenerateOriginalIds)
-      {
-      originalIndices = vtkSmartPointer<vtkIdTypeArray>::New();
-      originalIndices->SetNumberOfComponents(1);
-      originalIndices->SetNumberOfTuples(curCount);
-      originalIndices->SetName("vtkOriginalIndices");
-      }
-
     int dimensions[3] = {0, 0, 0};
     vtkSmartPointer<vtkIdTypeArray> structuredIndices;
     if (curTable->GetFieldData()->GetArray("STRUCTURED_DIMENSIONS"))
@@ -229,10 +219,6 @@ int vtkTableStreamer::RequestData(vtkInformation*,
       vtkIdType inIndex = curOffset+jj;
       outTable->GetRowData()->CopyData(
         curTable->GetRowData(), inIndex, jj);
-      if (originalIndices)
-        {
-        originalIndices->SetValue(jj, inIndex);
-        }
       if (structuredIndices)
         {
         // Compute i,j,k from point id.
@@ -242,10 +228,6 @@ int vtkTableStreamer::RequestData(vtkInformation*,
         tuple[2] = (inIndex/(dimensions[0]*dimensions[1]));
         structuredIndices->SetTupleValue(jj, tuple);
         }
-      }
-    if (originalIndices)
-      {
-      outTable->GetRowData()->AddArray(originalIndices);
       }
     if (structuredIndices)
       {

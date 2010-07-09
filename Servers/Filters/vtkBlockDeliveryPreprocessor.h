@@ -57,6 +57,13 @@ public:
   vtkSetMacro(FlattenTable, int);
   vtkGetMacro(FlattenTable, int);
 
+  // Description:
+  // When set (default) the vtkOriginalIndices array will be added to the
+  // output. Can be overridden by setting this flag to 0.
+  // This is only respected when AddMetaData is true.
+  vtkSetMacro(GenerateOriginalIds, bool);
+  vtkGetMacro(GenerateOriginalIds, bool);
+
 //BTX
 protected:
   vtkBlockDeliveryPreprocessor();
@@ -78,6 +85,7 @@ protected:
   int FieldAssociation;
   unsigned int CompositeDataSetIndex;
   int FlattenTable;
+  bool GenerateOriginalIds;
 private:
   vtkBlockDeliveryPreprocessor(const vtkBlockDeliveryPreprocessor&); // Not implemented
   void operator=(const vtkBlockDeliveryPreprocessor&); // Not implemented
