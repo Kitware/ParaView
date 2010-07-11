@@ -33,7 +33,8 @@ int arg_is_pointer_to_data(unsigned int argType, int count)
      (argType & VTK_PARSE_BASE_TYPE) != VTK_PARSE_VTK_OBJECT /* vtkFoo*  */);
 }
 
-void output_temp(FILE *fp, int i, unsigned int argType, char *Id, int count)
+void output_temp(FILE *fp, int i, unsigned int argType, const char *Id,
+                 int count)
 {
   /* Store whether this is pointer to data.  */
   int isPointerToData = i != MAX_ARGS && arg_is_pointer_to_data(argType, count);
@@ -460,7 +461,7 @@ void outputFunction(FILE *fp, ClassInfo *data)
  */
 typedef struct _UniqueFunctionInfo
 {
-  char *Name;
+  const char *Name;
   int TotalPolymorphTypes;
   FunctionInfo *Function[20];
 } UniqueFunctionInfo;
@@ -474,20 +475,20 @@ typedef struct _UniqueFunctionInfo
  */
 typedef struct _NewClassInfo
 {
-  int   HasDelete;
-  int   IsAbstract;
-  int   IsConcrete;
-  char *ClassName;
-  char *FileName;
-  char *OutputFileName;
-  char *SuperClasses[10];
-  int   NumberOfSuperClasses;
-  int   NumberOfFunctions;
+  int          HasDelete;
+  int          IsAbstract;
+  int          IsConcrete;
+  const        char *ClassName;
+  const        char *FileName;
+  const        char *OutputFileName;
+  const        char *SuperClasses[10];
+  int          NumberOfSuperClasses;
+  int          NumberOfFunctions;
   UniqueFunctionInfo Functions[1000];
-  char *NameComment;
-  char *Description;
-  char *Caveats;
-  char *SeeAlso;
+  const char  *NameComment;
+  const char  *Description;
+  const char  *Caveats;
+  const char  *SeeAlso;
 } NewClassInfo;
 
 //--------------------------------------------------------------------------nix
@@ -753,7 +754,7 @@ int copy(FunctionInfo* from, int fromSize, FunctionInfo* to)
 int extractWrappable(FunctionInfo* from[],
                      int fromSize,
                      FunctionInfo* to[],
-                     char* ClassName)
+                     const char* ClassName)
 {
   int i,j;
   for (i=0,j=0 ; i<fromSize ;i++)
@@ -888,7 +889,7 @@ void getClassInfo(FileInfo *fileInfo, ClassInfo *data, NewClassInfo* classData)
  *
  * @return 0 if found and 1 if not
  */
-int isUniqueString(char* main, char *list[], int total)
+int isUniqueString(const char* main, const char *list[], int total)
 {
   int i;
   for (i = 0; i < total; ++i)
@@ -909,11 +910,11 @@ int isUniqueString(char* main, char *list[], int total)
  *
  * @return the total list of unique classes
  */
-int uniqueClasses(char *classes[],int total,char *classSelfName)
+int uniqueClasses(const char *classes[],int total,const char *classSelfName)
 {
   int i,j=0;
-  char *temp[1000];
-  char* current_class_name;
+  const char *temp[1000];
+  const char* current_class_name;
   for (i = total-1; i>=0; --i)
   {
     current_class_name = classes[i];
@@ -978,7 +979,7 @@ static int isExternalObject(const char *classname, const char *argclass)
  *
  * @return the count of the extracted unique classes
  */
-int extractOtherClassesUsed(NewClassInfo *data, char * classes[])
+int extractOtherClassesUsed(NewClassInfo *data, const char *classes[])
 {
   int i,j,k;
   int count=0;
@@ -1033,7 +1034,7 @@ int extractOtherClassesUsed(NewClassInfo *data, char * classes[])
  */
 void output_InitFunction(FILE *fp, NewClassInfo *data)
 {
-  char* classes[1000];
+  const char* classes[1000];
   int totalClasses,i;
   totalClasses=  extractOtherClassesUsed(data,classes);
   fprintf(fp,"\n");
