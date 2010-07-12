@@ -5261,7 +5261,17 @@ The Glyph filter generates a glyph (i.e., an arrow, cone, cube, cylinder, line, 
            <Documentation>
              This property determines which type of glyph will be placed at the points in the input dataset.
            </Documentation>
-      </InputProperty>
+     </InputProperty>
+
+     <ProxyProperty name="Transform" command="SetSourceTransform">
+           <ProxyListDomain name="proxy_list">
+              <Proxy group="transforms" name="Transform2" />
+           </ProxyListDomain>
+           <Documentation>
+             The values in this property allow you to specify the transform
+             (translation, rotation, and scaling) to apply to the glyph source.
+           </Documentation>
+     </ProxyProperty>
 
      <IntVectorProperty
         label="Orient"
