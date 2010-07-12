@@ -275,8 +275,8 @@ void vtkPVCompositeDataInformation::AddInformation(vtkPVInformation* pvi)
       {
       if (!localName.empty() && localName != otherName)
         {
-        vtkWarningMacro("Same block is named as \'" << localName.c_str()
-          << "\' as well as \'" << otherName.c_str() << "\'");
+        //vtkWarningMacro("Same block is named as \'" << localName.c_str()
+        //  << "\' as well as \'" << otherName.c_str() << "\'");
         }
       localName = otherName;
       }
