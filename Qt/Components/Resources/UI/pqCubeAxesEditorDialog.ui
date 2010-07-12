@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>338</width>
-    <height>383</height>
+    <height>396</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -175,19 +175,6 @@
          </property>
         </widget>
        </item>
-       <item row="0" column="1">
-        <widget class="QLineEdit" name="CubeAxesXTitle"/>
-       </item>
-       <item row="0" column="0">
-        <widget class="QLabel" name="label_5">
-         <property name="text">
-          <string>Title</string>
-         </property>
-         <property name="alignment">
-          <set>Qt::AlignCenter</set>
-         </property>
-        </widget>
-       </item>
        <item row="5" column="0">
         <widget class="QGroupBox" name="CubeAxesXCustomBounds">
          <property name="title">
@@ -201,30 +188,55 @@
          </property>
          <layout class="QHBoxLayout" name="horizontalLayout">
           <item>
-           <widget class="QDoubleSpinBox" name="CubeAxesXCustomBoundsMin">
-            <property name="decimals">
-             <number>4</number>
+           <widget class="QLineEdit" name="CubeAxesXCustomBoundsMin"/>
+          </item>
+          <item>
+           <widget class="QLineEdit" name="CubeAxesXCustomBoundsMax"/>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item row="0" column="0">
+        <widget class="QWidget" name="widget" native="true">
+         <layout class="QHBoxLayout" name="horizontalLayout_4">
+          <item>
+           <widget class="QLabel" name="label_5">
+            <property name="text">
+             <string>Title</string>
             </property>
-            <property name="minimum">
-             <double>-999999999.000000000000000</double>
-            </property>
-            <property name="maximum">
-             <double>999999999.000000000000000</double>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QDoubleSpinBox" name="CubeAxesXCustomBoundsMax">
-            <property name="decimals">
-             <number>4</number>
+           <spacer name="horizontalSpacer">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
             </property>
-            <property name="minimum">
-             <double>-999999999.000000000000000</double>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
             </property>
-            <property name="maximum">
-             <double>999999999.990000009536743</double>
+           </spacer>
+          </item>
+          <item>
+           <widget class="QLineEdit" name="CubeAxesXTitle"/>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer_2">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
             </property>
-           </widget>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
           </item>
          </layout>
         </widget>
@@ -242,19 +254,6 @@
        <property name="spacing">
         <number>6</number>
        </property>
-       <item row="0" column="1">
-        <widget class="QLineEdit" name="CubeAxesYTitle"/>
-       </item>
-       <item row="0" column="0">
-        <widget class="QLabel" name="label_6">
-         <property name="text">
-          <string>Title</string>
-         </property>
-         <property name="alignment">
-          <set>Qt::AlignCenter</set>
-         </property>
-        </widget>
-       </item>
        <item row="4" column="0" colspan="2">
         <widget class="QCheckBox" name="CubeAxesYGridLines">
          <property name="text">
@@ -296,30 +295,55 @@
          </property>
          <layout class="QHBoxLayout" name="horizontalLayout_2">
           <item>
-           <widget class="QDoubleSpinBox" name="CubeAxesYCustomBoundsMin">
-            <property name="decimals">
-             <number>4</number>
+           <widget class="QLineEdit" name="CubeAxesYCustomBoundsMin"/>
+          </item>
+          <item>
+           <widget class="QLineEdit" name="CubeAxesYCustomBoundsMax"/>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item row="0" column="0">
+        <widget class="QWidget" name="widget_2" native="true">
+         <layout class="QHBoxLayout" name="horizontalLayout_5">
+          <item>
+           <widget class="QLabel" name="label_6">
+            <property name="text">
+             <string>Title</string>
             </property>
-            <property name="minimum">
-             <double>-999999999.000000000000000</double>
-            </property>
-            <property name="maximum">
-             <double>999999999.000000000000000</double>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QDoubleSpinBox" name="CubeAxesYCustomBoundsMax">
-            <property name="decimals">
-             <number>4</number>
+           <spacer name="horizontalSpacer_4">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
             </property>
-            <property name="minimum">
-             <double>-999999999.000000000000000</double>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
             </property>
-            <property name="maximum">
-             <double>999999999.990000009536743</double>
+           </spacer>
+          </item>
+          <item>
+           <widget class="QLineEdit" name="CubeAxesYTitle"/>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer_3">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
             </property>
-           </widget>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
           </item>
          </layout>
         </widget>
@@ -337,23 +361,10 @@
        <property name="spacing">
         <number>6</number>
        </property>
-       <item row="0" column="1">
-        <widget class="QLineEdit" name="CubeAxesZTitle"/>
-       </item>
        <item row="4" column="0" colspan="2">
         <widget class="QCheckBox" name="CubeAxesZGridLines">
          <property name="text">
           <string>Show Grid Lines</string>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="0">
-        <widget class="QLabel" name="label_7">
-         <property name="text">
-          <string>Title</string>
-         </property>
-         <property name="alignment">
-          <set>Qt::AlignCenter</set>
          </property>
         </widget>
        </item>
@@ -391,30 +402,55 @@
          </property>
          <layout class="QHBoxLayout" name="horizontalLayout_3">
           <item>
-           <widget class="QDoubleSpinBox" name="CubeAxesZCustomBoundsMin">
-            <property name="decimals">
-             <number>4</number>
+           <widget class="QLineEdit" name="CubeAxesZCustomBoundsMin"/>
+          </item>
+          <item>
+           <widget class="QLineEdit" name="CubeAxesZCustomBoundsMax"/>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item row="0" column="0">
+        <widget class="QWidget" name="widget_3" native="true">
+         <layout class="QHBoxLayout" name="horizontalLayout_6">
+          <item>
+           <widget class="QLabel" name="label_7">
+            <property name="text">
+             <string>Title</string>
             </property>
-            <property name="minimum">
-             <double>-999999999.000000000000000</double>
-            </property>
-            <property name="maximum">
-             <double>999999999.000000000000000</double>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QDoubleSpinBox" name="CubeAxesZCustomBoundsMax">
-            <property name="decimals">
-             <number>4</number>
+           <spacer name="horizontalSpacer_5">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
             </property>
-            <property name="minimum">
-             <double>-999999999.000000000000000</double>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
             </property>
-            <property name="maximum">
-             <double>999999999.990000009536743</double>
+           </spacer>
+          </item>
+          <item>
+           <widget class="QLineEdit" name="CubeAxesZTitle"/>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer_6">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
             </property>
-           </widget>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
           </item>
          </layout>
         </widget>
@@ -471,17 +507,14 @@
  </customwidgets>
  <tabstops>
   <tabstop>tabWidget</tabstop>
-  <tabstop>CubeAxesXTitle</tabstop>
   <tabstop>CubeAxesXAxisVisibility</tabstop>
   <tabstop>CubeAxesXAxisTickVisibility</tabstop>
   <tabstop>CubeAxesXAxisMinorTickVisibility</tabstop>
   <tabstop>CubeAxesXGridLines</tabstop>
-  <tabstop>CubeAxesYTitle</tabstop>
   <tabstop>CubeAxesYAxisVisibility</tabstop>
   <tabstop>CubeAxesYAxisTickVisibility</tabstop>
   <tabstop>CubeAxesYAxisMinorTickVisibility</tabstop>
   <tabstop>CubeAxesYGridLines</tabstop>
-  <tabstop>CubeAxesZTitle</tabstop>
   <tabstop>CubeAxesZAxisVisibility</tabstop>
   <tabstop>CubeAxesZAxisTickVisibility</tabstop>
   <tabstop>CubeAxesZAxisMinorTickVisibility</tabstop>

@@ -35,7 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QDialog>
 #include "pqComponentsExport.h"
 class vtkSMProxy;
-class QDoubleSpinBox;
+class QLineEdit;
 
 class PQCOMPONENTS_EXPORT pqCubeAxesEditorDialog : public QDialog
 {
@@ -66,7 +66,7 @@ private:
   void operator=(const pqCubeAxesEditorDialog&); // Not implemented.
 
   void setupCustomAxes( const double &min, const double &max, 
-    const bool &enabled, QDoubleSpinBox *minWidget, QDoubleSpinBox *maxWidget);
+    const bool &enabled, QLineEdit *minWidget, QLineEdit *maxWidget);
 
   class pqInternal;
   pqInternal* Internal;

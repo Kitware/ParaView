@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProxy.h"
 
 // Qt Includes.
+#include <QDoubleValidator>
 
 // ParaView Includes.
 #include "pqApplicationCore.h"
@@ -99,10 +100,10 @@ pqCubeAxesEditorDialog::~pqCubeAxesEditorDialog()
 
 
 
-#define PV_SPINBOX_REGISTER(ui, propName, index)\
+#define PV_LINEEDIT_REGISTER(ui, propName, index)\
 {\
   this->Internal->PropertyManager->registerLink(\
-    this->Internal->ui, "value",SIGNAL(valueChanged(double)),\
+    this->Internal->ui, "text",SIGNAL(editingFinished()),\
     repr, repr->GetProperty(propName), index);\
 }
 
@@ -140,12 +141,12 @@ void pqCubeAxesEditorDialog::setRepresentationProxy(vtkSMProxy* repr)
       {                
       
       //link the ui elements to the vtkSMCubeAxesRepresentationProxy
-      PV_SPINBOX_REGISTER(CubeAxesXCustomBoundsMin, "CustomBounds", 0);
-      PV_SPINBOX_REGISTER(CubeAxesXCustomBoundsMax, "CustomBounds", 1);
-      PV_SPINBOX_REGISTER(CubeAxesYCustomBoundsMin, "CustomBounds", 2);
-      PV_SPINBOX_REGISTER(CubeAxesYCustomBoundsMax, "CustomBounds", 3);
-      PV_SPINBOX_REGISTER(CubeAxesZCustomBoundsMin, "CustomBounds", 4);
-      PV_SPINBOX_REGISTER(CubeAxesZCustomBoundsMax, "CustomBounds", 5);
+      PV_LINEEDIT_REGISTER(CubeAxesXCustomBoundsMin, "CustomBounds", 0);
+      PV_LINEEDIT_REGISTER(CubeAxesXCustomBoundsMax, "CustomBounds", 1);
+      PV_LINEEDIT_REGISTER(CubeAxesYCustomBoundsMin, "CustomBounds", 2);
+      PV_LINEEDIT_REGISTER(CubeAxesYCustomBoundsMax, "CustomBounds", 3);
+      PV_LINEEDIT_REGISTER(CubeAxesZCustomBoundsMin, "CustomBounds", 4);
+      PV_LINEEDIT_REGISTER(CubeAxesZCustomBoundsMax, "CustomBounds", 5);
 
       //link the activation of the group boxes to vtkSMCubeAxesRepresentationProxy
       PV_GROUPBOX_REGISTER(CubeAxesXCustomBounds, "CustomBoundsActive", 0);
@@ -173,29 +174,23 @@ void pqCubeAxesEditorDialog::setRepresentationProxy(vtkSMProxy* repr)
     }
 }
 
-#undef PV_SPINBOX_REGISTER
+#undef PV_LINEEDIT_REGISTER
 #undef PV_GROUPBOX_REGISTER
 
 //-----------------------------------------------------------------------------
-void pqCubeAxesEditorDialog::setupCustomAxes( const double &min, const double &max, 
-    const bool &enabled, QDoubleSpinBox *minWidget, QDoubleSpinBox *maxWidget)
+void pqCubeAxesEditorDialog::setupCustomAxes( const double &min, const double &max,
+    const bool &enabled, QLineEdit *minWidget, QLineEdit *maxWidget)
 {
-  double stepSize = (max-min) * 0.05;
+  //setup the validator for this axes
+  minWidget->setValidator(new QDoubleValidator(minWidget));
+  maxWidget->setValidator(new QDoubleValidator(maxWidget));
 
-  //setup min & max constraints
-  minWidget->setRange( min, max );      
-  maxWidget->setRange( min, max );      
-
-  //setup step size
-  minWidget->setSingleStep( stepSize );
-  maxWidget->setSingleStep( stepSize );
-  
   //setup initial values
   if ( enabled )
     {
-    minWidget->setValue( min );
-    maxWidget->setValue( max );
-    }       
+    minWidget->setText( QString::number(min) );
+    maxWidget->setText( QString::number(max) );
+    }
 }
 
 
