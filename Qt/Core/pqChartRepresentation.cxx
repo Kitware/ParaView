@@ -171,6 +171,7 @@ QStringList pqChartRepresentation::defaultHiddenSeriesSetting()
 
   // Hide vtkOriginalRowIds.
   hiddenSeries << "vtkOriginalRowIds";
+  hiddenSeries << "vtkOriginalIndices";
 
   return hiddenSeries;
 }
