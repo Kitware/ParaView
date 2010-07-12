@@ -10155,7 +10155,7 @@ This property controls how the filter works to generate tensor cell data. You ca
 
    </SourceProxy> <!-- PCAStatistics -->
 
-   <SourceProxy name="HaloFinder" class="vtkPCosmoHaloFinder" label="Cosmology Halo Finder">
+   <SourceProxy name="HaloFinder" class="vtkPCosmoHaloFinder" label="Cosmology FOF Halo Finder">
      <InputProperty
         name="Input"
         command="SetInputConnection">
@@ -10169,21 +10169,62 @@ This property controls how the filter works to generate tensor cell data. You ca
      </InputProperty>
 
      <IntVectorProperty
+        name="HaloPositionType"
+        command="SetHaloPositionType"
+        label="Halo position for 3D visualization"
+        number_of_elements="1"
+        default_values="0" >
+       <EnumerationDomain name="enum">
+         <Entry value="0" text="Average"/>
+         <Entry value="1" text="Center of Mass"/>
+         <Entry value="2" text="Most Bound Particle"/>
+         <Entry value="3" text="Most Connected Particle"/>
+       </EnumerationDomain>
+       <Documentation>
+       This sets the position for the halo catalog particles (second output) in 3D space for visualization.  Input particle positions (first output) will be unaltered by this.  MBP and MCP for particle positions can potentially take a very long time to calculate.
+       </Documentation>
+     </IntVectorProperty>
+
+     <IntVectorProperty
         name="CopyHaloDataToParticles"
         command="SetCopyHaloDataToParticles"
-        label="Copy halo information to original particles"
+        label="Copy halo catalog information to original particles"
         number_of_elements="1"
         default_values="1" >
      <BooleanDomain name="bool" />
        <Documentation>
-       If checked, halo data will be copied to the original particles.  If unchecked, the particles will not be annotated with halo data.
+       If checked, the halo catalog information will be copied to the original particles as well. 
+       </Documentation>
+     </IntVectorProperty>
+
+     <IntVectorProperty
+        name="ComputeMostBoundParticle"
+        command="SetComputeMostBoundParticle"
+        label="Compute the most bound particle for halos"
+        number_of_elements="1"
+        default_values="0" >
+     <BooleanDomain name="bool" />
+       <Documentation>
+       If checked, the most bound particle will be calculated.  This can be very slow.
+       </Documentation>
+     </IntVectorProperty>
+
+     <IntVectorProperty
+        name="ComputeMostConnectedParticle"
+        command="SetComputeMostConnectedParticle"
+        label="Compute the most connected particle for halos"
+        number_of_elements="1"
+        default_values="0" >
+     <BooleanDomain name="bool" />
+       <Documentation>
+       If checked, the most connected particle will be calculated.  This can be very slow.
        </Documentation>
      </IntVectorProperty>
 
      <IntVectorProperty
         name="NP"
         command="SetNP"
-        label="np (number of seeded particles in one dimension)"
+        label="np (number of seeded particles in one dimension, i.e., total particles = np^3)"
         number_of_elements="1"
         default_values="256" >
      <IntRangeDomain name="range" min="0" />
@@ -10200,7 +10241,7 @@ This property controls how the filter works to generate tensor cell data. You ca
         default_values="90.140846" >
      <DoubleRangeDomain name="range" min="0" />
        <Documentation>
-       The box side length used to wrap particles around if they exceed rL (or less than 0) in any dimension.
+       The box side length used to wrap particles around if they exceed rL (or less than 0) in any dimension (only positive positions are allowed in the input, or the are wrapped around).
        </Documentation>
      </DoubleVectorProperty>
 
@@ -10219,19 +10260,19 @@ This property controls how the filter works to generate tensor cell data. You ca
      <IntVectorProperty
         name="PMin"
         command="SetPMin"
-        label="pmin (minimum particles for a halo)"
+        label="pmin (minimum particle threshold for a halo)"
         number_of_elements="1"
         default_values="10" >
      <IntRangeDomain name="range" min="1" />
        <Documentation>
-         Minimal number of particles needed before a group is called a halo.
+         Minimum number of particles (threshold) needed before a group is called a halo.
        </Documentation>
      </IntVectorProperty>
 
      <DoubleVectorProperty
         name="BB"
         command="SetBB"
-        label="bb (linking distance)"
+        label="bb (linking length/distance)"
         number_of_elements="1"
         default_values="0.20" >
      <DoubleRangeDomain name="range" min="0" />
