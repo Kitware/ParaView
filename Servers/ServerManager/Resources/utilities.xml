@@ -2129,8 +2129,7 @@
     <!-- End PointSource -->
     </SourceProxy>
 
-    <TransformProxy name="Transform2" class="vtkTransform"
-      label="Transform">
+    <TransformProxy name="Transform2" class="vtkTransform" >
       <!--Transform proxy with unconventional interface, used by BoxWidget -->
       <DoubleVectorProperty
         name="Position"
