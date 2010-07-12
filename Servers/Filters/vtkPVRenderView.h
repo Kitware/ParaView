@@ -35,7 +35,7 @@
 #ifndef __vtkPVRenderView_h
 #define __vtkPVRenderView_h
 
-#include "vtkView.h"
+#include "vtkPVView.h"
 
 class vtkCamera;
 class vtkPVSynchronizedRenderer;
@@ -44,11 +44,11 @@ class vtkRenderViewBase;
 class vtkRenderer;
 class vtkRenderWindow;
 
-class VTK_EXPORT vtkPVRenderView : public vtkView
+class VTK_EXPORT vtkPVRenderView : public vtkPVView
 {
 public:
   static vtkPVRenderView* New();
-  vtkTypeMacro(vtkPVRenderView, vtkView);
+  vtkTypeMacro(vtkPVRenderView, vtkPVView);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
@@ -91,13 +91,13 @@ public:
   // Description:
   // Triggers a high-resolution render.
   // @CallOnAllProcessess
-  void StillRender();
+  virtual void StillRender();
 
   // Description:
   // Triggers a interactive render. Based on the settings on the view, this may
   // result in a low-resolution rendering or a simplified geometry rendering.
   // @CallOnAllProcessess
-  void InteractiveRender();
+  virtual void InteractiveRender();
 
   // Description:
   // Get/Set the reduction-factor to use when for StillRender(). This is
@@ -117,10 +117,26 @@ public:
   vtkSetClampMacro(InteractiveRenderImageReductionFactor, int, 1, 20);
   vtkGetMacro(InteractiveRenderImageReductionFactor, int);
 
+  // Description:
+  // Get/Set the data-size in kilobytes above which remote-rendering should be
+  // used, if possible.
+  // @CallOnAllProcessess
+  vtkSetMacro(RemoteRenderingThreshold, unsigned long);
+  vtkGetMacro(RemoteRenderingThreshold, unsigned long);
+
 //BTX
 protected:
   vtkPVRenderView();
   ~vtkPVRenderView();
+
+  // Description:
+  // Sychronizes the geometry size information on all nodes.
+  // @CallOnAllProcessess
+  void GatherGeometrySizeInformation();
+
+  // Description:
+  // Returns true if distributed rendering should be used.
+  bool GetUseDistributedRendering();
 
   vtkRenderViewBase* RenderView;
   vtkRenderer* NonCompositedRenderer;
@@ -130,6 +146,9 @@ protected:
 
   int StillRenderImageReductionFactor;
   int InteractiveRenderImageReductionFactor;
+
+  unsigned long GeometrySize;
+  unsigned long RemoteRenderingThreshold;
 private:
   vtkPVRenderView(const vtkPVRenderView&); // Not implemented
   void operator=(const vtkPVRenderView&); // Not implemented

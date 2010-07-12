@@ -103,6 +103,10 @@ public:
   // Internal-callback-method
   void Render(unsigned int);
 
+  // Description:
+  vtkGetObjectMacro(ParallelController, vtkMultiProcessController);
+  vtkGetObjectMacro(ClientServerController, vtkMultiProcessController);
+
 protected:
   vtkPVSynchronizedRenderWindows();
   ~vtkPVSynchronizedRenderWindows();
@@ -110,12 +114,10 @@ protected:
   // Description:
   // Set/Get the controller used for communication among parallel processes.
   void SetParallelController(vtkMultiProcessController*);
-  vtkGetObjectMacro(ParallelController, vtkMultiProcessController);
 
   // Description:
   // Set/Get the controller used for client-server communication.
   void SetClientServerController(vtkMultiProcessController*);
-  vtkGetObjectMacro(ClientServerController, vtkMultiProcessController);
 
   // Description:
   // Saves the information about all the windows known to this class and how

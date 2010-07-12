@@ -112,7 +112,8 @@ vtkPVRenderView::vtkPVRenderView()
 {
   this->StillRenderImageReductionFactor = 1;
   this->InteractiveRenderImageReductionFactor = 2;
-
+  this->GeometrySize = 0;
+  this->RemoteRenderingThreshold = 0;
 
   if (::SynchronizedWindows == NULL)
     {
@@ -215,16 +216,33 @@ void vtkPVRenderView::ResetCamera()
 //----------------------------------------------------------------------------
 void vtkPVRenderView::StillRender()
 {
-  // Decide if we are doing remote rendering or local rendering.
-
   vtkTimerLog::MarkStartEvent("Still Render");
+
+  // Update all representations.
+  // This should update mostly just the inputs to the representations, and maybe
+  // the internal geometry filter.
+  this->Update();
+
+  // Gather information about geometry sizes from all representations.
+  this->GatherGeometrySizeInformation();
+
+  // Decide if we are doing remote rendering or local rendering.
+  bool use_distributed_rendering = this->GetUseDistributedRendering();
+  this->SynchronizedWindows->SetEnabled(use_distributed_rendering);
+
+  // Now we need a mechanism to pass this information about whether we are using
+  // remote-rendering or not to the representation.
 
   // set the image reduction factor. 
   this->SynchronizedRenderers->SetImageReductionFactor(
     this->StillRenderImageReductionFactor);
- 
+
+  // Call Render() on local render window only if
+  // 1: Local process is the driver OR
+  // 2: RenderEventPropagation is Off and we are doing distributed rendering.
   if (this->SynchronizedWindows->GetLocalProcessIsDriver() ||
-    !this->SynchronizedWindows->GetRenderEventPropagation())
+    (!this->SynchronizedWindows->GetRenderEventPropagation() && 
+     use_distributed_rendering))
     {
     this->GetRenderWindow()->Render();
     }
@@ -235,22 +253,98 @@ void vtkPVRenderView::StillRender()
 //----------------------------------------------------------------------------
 void vtkPVRenderView::InteractiveRender()
 {
-  // * Decide if we are doing LOD or full-res rendering.
+  //// * Decide if we are doing LOD or full-res rendering.
 
-  // * Decide if we are doing remote rendering or local rendering.
+  //// * Decide if we are doing remote rendering or local rendering.
 
-  vtkTimerLog::MarkStartEvent("Interactive Render");
+  //vtkTimerLog::MarkStartEvent("Interactive Render");
 
-  this->SynchronizedRenderers->SetImageReductionFactor(
-    this->InteractiveRenderImageReductionFactor);
+  //this->SynchronizedRenderers->SetImageReductionFactor(
+  //  this->InteractiveRenderImageReductionFactor);
 
-  if (this->SynchronizedWindows->GetLocalProcessIsDriver() ||
-    !this->SynchronizedWindows->GetRenderEventPropagation())
+  //if (this->SynchronizedWindows->GetLocalProcessIsDriver() ||
+  //  !this->SynchronizedWindows->GetRenderEventPropagation())
+  //  {
+  //  this->GetRenderWindow()->Render();
+  //  }
+
+  //vtkTimerLog::MarkEndEvent("Interactive Render");
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::GatherGeometrySizeInformation()
+{
+  this->GeometrySize = 0;
+  unsigned long geometry_size = 0;
+  int num_reprs = this->GetNumberOfRepresentations();
+  for (int cc=0; cc < num_reprs; cc++)
     {
-    this->GetRenderWindow()->Render();
+    vtkDataRepresentation *drepr = this->GetRepresentation(cc);
+    //vtkPVDataRepresentation *pvrepr =
+    //  vtkPVDataRepresentation::SafeDownCast(drepr);
+    //if (pvrepr)
+    //  {
+    //  geometry_size += pvrepr->GetLocalGeometrySize();
+    //  }
+    //else
+    //  {
+    //  // We can look at the input dataobject for the vtkDataRepresentation and
+    //  // then get size information from it. We'll do that in future. For now,
+    //  // let's assume that we don't care about such geometry size.
+    //  }
     }
 
-  vtkTimerLog::MarkEndEvent("Interactive Render");
+  // Now synchronize the geometry size.
+  vtkMultiProcessController* parallelController =
+    this->SynchronizedWindows->GetParallelController();
+  vtkMultiProcessController* csController =
+    this->SynchronizedWindows->GetClientServerController();
+
+  if (parallelController)
+    {
+    unsigned long reduced_value=0;
+    parallelController->AllReduce(&geometry_size, &reduced_value, 1,
+      vtkCommunicator::SUM_OP);
+    geometry_size = reduced_value;
+    }
+
+  if (csController)
+    {
+    // FIXME: won't it be easier to add some support for collective operations
+    // to the vtkSocketCommunicator?
+    if (this->SynchronizedWindows->GetLocalProcessIsDriver())
+      {
+      // client
+      unsigned long value;
+      csController->Broadcast(&geometry_size, 1, 0);
+      csController->Broadcast(&value, 1, 1);
+      geometry_size += value;
+      }
+    else
+      {
+      // server-root.
+      unsigned long value;
+      csController->Broadcast(&value, 1, 1);
+      csController->Broadcast(&geometry_size, 1, 0);
+      geometry_size += value;
+      }
+    }
+
+  if (parallelController)
+    {
+    unsigned long reduced_value=0;
+    parallelController->AllReduce(&geometry_size, &reduced_value, 1,
+      vtkCommunicator::SUM_OP);
+    geometry_size = reduced_value;
+    }
+
+  this->GeometrySize = geometry_size;
+}
+
+//----------------------------------------------------------------------------
+bool vtkPVRenderView::GetUseDistributedRendering()
+{
+  return this->RemoteRenderingThreshold <= this->GeometrySize;  
 }
 
 //----------------------------------------------------------------------------
