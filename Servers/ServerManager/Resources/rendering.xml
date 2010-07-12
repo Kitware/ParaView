@@ -2275,7 +2275,7 @@
 
       <SubProxy>
         <Proxy name="Transform"
-          proxygroup="transforms" proxyname="Transform2">
+          proxygroup="extended_sources" proxyname="Transform2">
         </Proxy>
         <ExposedProperties>
           <Property name="Position" />

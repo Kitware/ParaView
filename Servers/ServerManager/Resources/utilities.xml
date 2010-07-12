@@ -553,68 +553,6 @@
         argument_is_array="1"
         default_values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0" />
     </Proxy>
-    
-    <TransformProxy name="Transform2" class="vtkTransform"
-      label="Transform">
-      <!--Transform proxy with unconventional interface, used by BoxWidget -->
-      <DoubleVectorProperty
-        name="Position"
-        command="SetPosition"
-        number_of_elements="3"
-        update_self="1"
-        label="Translate"
-        information_property="PositionInfo"
-        default_values="0.0 0.0 0.0" >
-        <DoubleRangeDomain name="range" />
-      </DoubleVectorProperty>
-
-      <DoubleVectorProperty name="PositionInfo"
-        command="GetPosition"
-        information_only="1"
-        number_of_elements="3"
-        default_values="0.0 0.0 0.0">
-        <SimpleDoubleInformationHelper />
-      </DoubleVectorProperty>
-
-      <DoubleVectorProperty
-        name="Rotation"
-        command="SetRotation"
-        number_of_elements="3"
-        update_self="1"
-        information_property="RotationInfo"
-        label="Rotate"
-        default_values="0.0 0.0 0.0" >
-        <DoubleRangeDomain name="range" />
-      </DoubleVectorProperty>
-
-      <DoubleVectorProperty name="RotationInfo"
-        command="GetOrientation"
-        information_only="1"
-        number_of_elements="3"
-        default_values="0.0 0.0 0.0">
-        <SimpleDoubleInformationHelper />
-      </DoubleVectorProperty>
-
-      <DoubleVectorProperty
-        name="Scale"
-        command="SetScale"
-        number_of_elements="3"
-        update_self="1"
-        label="Scale"
-        information_property="ScaleInfo"
-        default_values="1.0 1.0 1.0" >
-        <DoubleRangeDomain name="range" />
-      </DoubleVectorProperty>
-
-      <DoubleVectorProperty name="ScaleInfo"
-        command="GetScale"
-        information_only="1"
-        number_of_elements="3"
-        default_values="1.0 1.0 1.0">
-        <SimpleDoubleInformationHelper />
-      </DoubleVectorProperty>
-    </TransformProxy>
-
   </ProxyGroup>
 
   <ProxyGroup name="matrices">
@@ -2190,6 +2128,67 @@
        </Hints>
     <!-- End PointSource -->
     </SourceProxy>
+
+    <TransformProxy name="Transform2" class="vtkTransform"
+      label="Transform">
+      <!--Transform proxy with unconventional interface, used by BoxWidget -->
+      <DoubleVectorProperty
+        name="Position"
+        command="SetPosition"
+        number_of_elements="3"
+        update_self="1"
+        label="Translate"
+        information_property="PositionInfo"
+        default_values="0.0 0.0 0.0" >
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="PositionInfo"
+        command="GetPosition"
+        information_only="1"
+        number_of_elements="3"
+        default_values="0.0 0.0 0.0">
+        <SimpleDoubleInformationHelper />
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+        name="Rotation"
+        command="SetRotation"
+        number_of_elements="3"
+        update_self="1"
+        information_property="RotationInfo"
+        label="Rotate"
+        default_values="0.0 0.0 0.0" >
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="RotationInfo"
+        command="GetOrientation"
+        information_only="1"
+        number_of_elements="3"
+        default_values="0.0 0.0 0.0">
+        <SimpleDoubleInformationHelper />
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+        name="Scale"
+        command="SetScale"
+        number_of_elements="3"
+        update_self="1"
+        label="Scale"
+        information_property="ScaleInfo"
+        default_values="1.0 1.0 1.0" >
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="ScaleInfo"
+        command="GetScale"
+        information_only="1"
+        number_of_elements="3"
+        default_values="1.0 1.0 1.0">
+        <SimpleDoubleInformationHelper />
+      </DoubleVectorProperty>
+    </TransformProxy>
 
     <TransformProxy name="Transform3" class="vtkTransform" label="Transform">
       <DoubleVectorProperty
