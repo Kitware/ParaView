@@ -103,7 +103,7 @@ pqCubeAxesEditorDialog::~pqCubeAxesEditorDialog()
 #define PV_LINEEDIT_REGISTER(ui, propName, index)\
 {\
   this->Internal->PropertyManager->registerLink(\
-    this->Internal->ui, "text",SIGNAL(editingFinished()),\
+    this->Internal->ui, "text",SIGNAL(textChanged(const QString &)),\
     repr, repr->GetProperty(propName), index);\
 }
 
@@ -139,7 +139,6 @@ void pqCubeAxesEditorDialog::setRepresentationProxy(vtkSMProxy* repr)
     vtkSMPVRepresentationProxy *pvProxy = vtkSMPVRepresentationProxy::SafeDownCast(repr);
     if ( pvProxy )
       {
-
       //link the ui elements to the vtkSMCubeAxesRepresentationProxy
       PV_LINEEDIT_REGISTER(CubeAxesXCustomBoundsMin, "CustomBounds", 0);
       PV_LINEEDIT_REGISTER(CubeAxesXCustomBoundsMax, "CustomBounds", 1);
@@ -181,9 +180,15 @@ void pqCubeAxesEditorDialog::setRepresentationProxy(vtkSMProxy* repr)
 void pqCubeAxesEditorDialog::setupCustomAxes( const double &min, const double &max,
     const bool &enabled, QLineEdit *minWidget, QLineEdit *maxWidget)
 {
-  //setup the validator for this axes
-  minWidget->setValidator(new QDoubleValidator(minWidget));
-  maxWidget->setValidator(new QDoubleValidator(maxWidget));
+  //setup the validator for this axes]
+  if (minWidget->validator() == NULL )
+    {
+    minWidget->setValidator(new QDoubleValidator(minWidget));
+    }
+  if (maxWidget->validator() == NULL )
+    {
+    maxWidget->setValidator(new QDoubleValidator(maxWidget));
+    }
 
   //setup initial values
   if ( enabled )
