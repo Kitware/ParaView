@@ -5263,7 +5263,7 @@ The Glyph filter generates a glyph (i.e., an arrow, cone, cube, cylinder, line, 
            </Documentation>
      </InputProperty>
 
-     <ProxyProperty name="Transform" command="SetSourceTransform">
+     <ProxyProperty name="GlyphTransform" command="SetSourceTransform">
            <ProxyListDomain name="proxy_list">
               <Proxy group="transforms" name="Transform2" />
            </ProxyListDomain>
