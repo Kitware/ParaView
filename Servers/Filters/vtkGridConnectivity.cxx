@@ -1445,8 +1445,23 @@ void vtkGridConnectivity::ResolveIntegrationArrays()
   for (int ii = 0; ii < numMembers; ++ii)
     {
     int setId = this->EquivalenceSet->GetEquivalentSetId(ii);
-    finalVolumePtr[setId] += *partialVolumePtr++;
+    finalVolumePtr[setId] += *partialVolumePtr;
+
+    //we know need to update all the cell intergration arrays
+    //do not update when the EquivalenceSet matches an item to itself
+    int numArrays = static_cast<int>(this->CellAttributesIntegration.size());
+    for (int j = 0; j < numArrays && setId != ii; ++j)
+      {
+      vtkDoubleArray* da = this->CellAttributesIntegration[j];
+      double *oldIntegrationPtr = da->GetPointer(ii);
+      double *resolvedPtr = da->GetPointer(setId);
+      *resolvedPtr += *oldIntegrationPtr;
+      }
+
+    //update to the next fragment volume
+    ++partialVolumePtr;
     }
+
   // Now replace the old partial fragment volume array with the
   // new total fragment volume array.
   this->FragmentVolumes->Delete();
