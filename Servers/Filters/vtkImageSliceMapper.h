@@ -56,7 +56,7 @@ public:
   // Description:
   // Specify the input data to map.
   void SetInput(vtkImageData *in);
-  vtkImageData *GetInput();
+  virtual vtkImageData *GetInput();
 
   // Description:
   // Set/Get the current X/Y or Z slice number. 
