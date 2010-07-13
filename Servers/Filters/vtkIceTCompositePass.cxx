@@ -85,7 +85,10 @@ vtkIceTCompositePass::~vtkIceTCompositePass()
 //----------------------------------------------------------------------------
 void vtkIceTCompositePass::ReleaseGraphicsResources(vtkWindow* window)
 {
-  this->Superclass::ReleaseGraphicsResources(window);
+  if(this->RenderPass!=0)
+    {
+    this->RenderPass->ReleaseGraphicsResources(window);
+    }
 }
 
 //----------------------------------------------------------------------------

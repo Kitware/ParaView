@@ -44,11 +44,11 @@ class vtkRenderViewBase;
 class vtkRenderer;
 class vtkRenderWindow;
 
-class VTK_EXPORT vtkPVRenderView : public vtkPVView
+class VTK_EXPORT vtkPVRenderView : public vtkView
 {
 public:
   static vtkPVRenderView* New();
-  vtkTypeMacro(vtkPVRenderView, vtkPVView);
+  vtkTypeMacro(vtkPVRenderView, vtkView);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
