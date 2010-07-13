@@ -773,6 +773,23 @@ void vtkGridConnectivity::InitializeIntegrationArrays(
       this->CellAttributesIntegration.push_back(integrationArray);
       }
     }
+
+  //only supports double arrays
+  int numPointArrays = inputs[0]->GetPointData()->GetNumberOfArrays();
+  for ( arrayIndex = 0; arrayIndex < numCellArrays; ++arrayIndex)
+    {
+    vtkDoubleArray* da = vtkDoubleArray::SafeDownCast(
+      inputs[0]->GetPointData()->GetArray(arrayIndex));
+
+    if ( da )
+      {
+      vtkSmartPointer< vtkDoubleArray > integrationArray;
+      integrationArray = vtkSmartPointer<vtkDoubleArray>::New();
+      integrationArray->SetName(da->GetName());
+      integrationArray->SetNumberOfComponents( da->GetNumberOfComponents() );
+      this->PointAttributesIntegration.push_back(integrationArray);
+      }
+    }
 }
 
 
@@ -921,7 +938,7 @@ void vtkGridConnectivity::GenerateOutput(
   vtkPolyData* output, 
   vtkUnstructuredGrid* inputs[])
 {
-  int numArrays;
+  int numCellArrays, numPointArrays;
   vtkDoubleArray* da;
   vtkDoubleArray* outArray;
   // Use the face hash to create cells in the output.
@@ -935,13 +952,24 @@ void vtkGridConnectivity::GenerateOutput(
   volumeArray->SetName("Volume");
 
   // Create all of the integration arrays.
-  numArrays = static_cast<int>(this->CellAttributesIntegration.size());
-  for (int ii = 0; ii < numArrays; ++ii)
+  numCellArrays = static_cast<int>(this->CellAttributesIntegration.size());
+  for (int ii = 0; ii < numCellArrays; ++ii)
     {
     da = this->CellAttributesIntegration[ii];
     outArray = vtkDoubleArray::New();
     outArray->SetName(da->GetName());
     output->GetCellData()->AddArray(outArray);
+    outArray->Delete();
+    }
+
+  numPointArrays = static_cast<int>(this->PointAttributesIntegration.size());
+  for (int ii = 0; ii < numPointArrays; ++ii)
+    {
+    da = this->PointAttributesIntegration[ii];
+    outArray = vtkDoubleArray::New();
+    outArray->SetName(da->GetName());
+    outArray->SetNumberOfComponents( da->GetNumberOfComponents() );
+    output->GetPointData()->AddArray(outArray);
     outArray->Delete();
     }
 
@@ -989,17 +1017,33 @@ void vtkGridConnectivity::GenerateOutput(
         this->FragmentVolumes->GetValue(face->FragmentId));
 
       // Insert values for the integration arrays.
-      for (int ii = 0; ii < numArrays; ++ii)
+      for (int ii = 0; ii < numCellArrays; ++ii)
         {
         da = this->CellAttributesIntegration[ii];
         outArray = vtkDoubleArray::SafeDownCast(output->GetCellData()->GetArray(da->GetName()));
         if (outArray == 0)
           {
-          vtkErrorMacro("Missing integration array.");
+          vtkErrorMacro("Missing cell integration array.");
           continue;
           }
         outArray->InsertNextValue(
           da->GetValue(face->FragmentId));
+        }
+
+      // Insert values for the integration arrays.
+      for (int ii = 0; ii < numPointArrays; ++ii)
+        {
+        da = this->PointAttributesIntegration[ii];
+        outArray = vtkDoubleArray::SafeDownCast(output->GetPointData()->GetArray(da->GetName()));
+        if (outArray == 0)
+          {
+          vtkErrorMacro("Missing point integration array.");
+          continue;
+          }
+        for ( vtkIdType p = 0; p < numFacePts; ++p)
+          {
+          outArray->InsertNextTuple(face->FragmentId,da);
+          }
         }
 
       // These arrays are just for debugging.
@@ -1018,10 +1062,19 @@ void vtkGridConnectivity::GenerateOutput(
 
   // Add all of the integration arrays to field data.
   // Should we change the names to integrated...?
-  numArrays = this->CellAttributesIntegration.size();
-  for (int ii = 0; ii < numArrays; ++ii)
+  numCellArrays = this->CellAttributesIntegration.size();
+  for (int ii = 0; ii < numCellArrays; ++ii)
     {
     da = this->CellAttributesIntegration[ii];
+    output->GetFieldData()->AddArray(da);
+    }
+
+  // Add all of the integration arrays to field data.
+  // Should we change the names to integrated...?
+  numPointArrays = this->PointAttributesIntegration.size();
+  for (int ii = 0; ii < numPointArrays; ++ii)
+    {
+    da = this->PointAttributesIntegration[ii];
     output->GetFieldData()->AddArray(da);
     }
     
@@ -1030,6 +1083,7 @@ void vtkGridConnectivity::GenerateOutput(
   this->FragmentVolumes->Delete();
   this->FragmentVolumes = 0;
   this->CellAttributesIntegration.clear();
+  this->PointAttributesIntegration.clear();
 
   blockIdArray->Delete();
   cellIdArray->Delete();
@@ -1089,29 +1143,49 @@ void vtkGridConnectivity::IntegrateCellVolume(
         *volumePtr++ = 0.0;
         }
       }
+
+    //resize all of the point integration arrays
+    numArrays = static_cast<int>(this->PointAttributesIntegration.size());
+    for (int ii = 0; ii < numArrays; ++ii)
+      {
+      vtkDoubleArray *da = this->PointAttributesIntegration[ii];
+      da->Resize(newLength);
+      da->SetNumberOfTuples(fragmentId+1);
+      // Initialize new values to 0.0
+      for (vtkIdType jj = length; jj < newLength; ++jj)
+        {
+        for (int comp = 0; comp < da->GetNumberOfComponents(); ++comp)
+          {
+          da->SetComponent(jj,comp,0.0);
+          }
+        }
+      }
     }
   
   // Now compute the volume of the cell.
   int cellType = cell->GetCellType();
   double cellVolume = 0.0;
-  
   switch (cellType)
     {
     case VTK_HEXAHEDRON:
-      cellVolume = this->IntegrateHex(cell);
+      cellVolume = this->IntegrateHex(cell,input,fragmentId);
       break;
     case VTK_VOXEL:
-      cellVolume = this->IntegrateVoxel(cell);
+      cellVolume = this->IntegrateVoxel(cell,input,fragmentId);
       break;
     case VTK_TETRA:
-      cellVolume = this->IntegrateTetrahedron(cell);
+      cellVolume = this->IntegrateTetrahedron(cell,input,fragmentId);
       break;
     default:
       {
       cell->Triangulate(1, this->CellPointIds, this->CellPoints);
-      cellVolume = this->IntegrateGeneral3DCell(cell);
+      cellVolume = this->IntegrateGeneral3DCell(cell,input,fragmentId);
       }
     }
+
+  //update the volume integration
+  volumePtr = this->FragmentVolumes->GetPointer(fragmentId);
+  *volumePtr += cellVolume;
 
   // Integrate all of the cell arrays.
   int numArrays = static_cast<int>(this->CellAttributesIntegration.size());
@@ -1129,14 +1203,7 @@ void vtkGridConnectivity::IntegrateCellVolume(
     double attributeValue = inputArray->GetValue(cellIndex);
     *ptr += attributeValue * cellVolume;
     }
-
-  volumePtr = this->FragmentVolumes->GetPointer(fragmentId);
-  *volumePtr += cellVolume;
 }
-
-
-
-
 
 //----------------------------------------------------------------------------
 // This method expects that every process has raw (unresolved) equivalence set
@@ -1449,13 +1516,30 @@ void vtkGridConnectivity::ResolveIntegrationArrays()
 
     //we know need to update all the cell intergration arrays
     //do not update when the EquivalenceSet matches an item to itself
-    int numArrays = static_cast<int>(this->CellAttributesIntegration.size());
-    for (int j = 0; j < numArrays && setId != ii; ++j)
+    if ( setId != ii )
       {
-      vtkDoubleArray* da = this->CellAttributesIntegration[j];
-      double *oldIntegrationPtr = da->GetPointer(ii);
-      double *resolvedPtr = da->GetPointer(setId);
-      *resolvedPtr += *oldIntegrationPtr;
+      int numArrays = static_cast<int>(this->CellAttributesIntegration.size());
+      for (int j = 0; j < numArrays; ++j)
+        {
+        vtkDoubleArray* da = this->CellAttributesIntegration[j];
+        double *oldIntegrationPtr = da->GetPointer(ii);
+        double *resolvedPtr = da->GetPointer(setId);
+        *resolvedPtr += *oldIntegrationPtr;
+        }
+
+      //update point attributes
+      numArrays = static_cast<int>(this->PointAttributesIntegration.size());
+      for (int j = 0; j < numArrays; ++j)
+        {
+        vtkDoubleArray* da = this->PointAttributesIntegration[j];
+        for ( int k=0; k < da->GetNumberOfComponents(); ++k)
+          {
+          double old = da->GetComponent(ii,k);
+          double resolved = da->GetComponent(setId,k);
+          resolved += old;
+          da->SetComponent(setId,k,resolved);
+          }
+        }
       }
 
     //update to the next fragment volume
@@ -1507,9 +1591,42 @@ double vtkGridConnectivity::ComputeTetrahedronVolume(
   vtkMath::Cross(a,b,n);
   return fabs(vtkMath::Dot(c, n) / 6.0);
 }
+//-----------------------------------------------------------------------------
+void vtkGridConnectivity::ComputePointIntegration( vtkUnstructuredGrid* input,
+  vtkIdType pt0Id, vtkIdType pt1Id, vtkIdType pt2Id, vtkIdType pt3Id,
+  double volume, int fragmentId )
+  {
+  //Integrate all of the point arrays.
+  int numArrays = static_cast<int>(this->PointAttributesIntegration.size());
+  for (int i = 0; i < numArrays; ++i)
+    {
+    vtkDoubleArray* da = this->PointAttributesIntegration[i];
+    vtkDoubleArray* inputArray = vtkDoubleArray::SafeDownCast(
+      input->GetPointData()->GetArray(da->GetName()));
+    if (inputArray == 0)
+      {
+      vtkErrorMacro("Missing integration array.");
+      continue;
+      }
+
+    double sum, outValue;
+    for ( int j=0; j < inputArray->GetNumberOfComponents(); ++j)
+      {
+      sum = inputArray->GetComponent(pt0Id, j);
+      sum += inputArray->GetComponent(pt1Id, j);
+      sum += inputArray->GetComponent(pt2Id, j);
+      sum += inputArray->GetComponent(pt3Id, j);
+
+      outValue = da->GetComponent(fragmentId,j);
+      outValue += ((sum * 0.25) * volume);
+      da->SetComponent(fragmentId,j,outValue);
+      }
+    }
+}
 
 //-----------------------------------------------------------------------------
-double vtkGridConnectivity::IntegrateTetrahedron(vtkCell* tetra)
+double vtkGridConnectivity::IntegrateTetrahedron(vtkCell* tetra,
+  vtkUnstructuredGrid* input, int fragmentId)
 {
   double pts[4][3];
   vtkPoints* points = tetra->GetPoints();
@@ -1518,12 +1635,23 @@ double vtkGridConnectivity::IntegrateTetrahedron(vtkCell* tetra)
   points->GetPoint(2,pts[2]);
   points->GetPoint(3,pts[3]);
 
-  return this->ComputeTetrahedronVolume(pts[0], pts[1], pts[2], pts[3]);
+  double volume = this->ComputeTetrahedronVolume(pts[0], pts[1],
+    pts[2], pts[3]);
+
+  vtkIdType ptIds[4];
+  ptIds[0] = tetra->GetPointId(0);
+  ptIds[1] = tetra->GetPointId(1);
+  ptIds[2] = tetra->GetPointId(2);
+  ptIds[3] = tetra->GetPointId(3);
+  this->ComputePointIntegration(input,ptIds[0],ptIds[1],ptIds[2],ptIds[3],
+    volume,fragmentId);
+  return volume;
 }
 
 //-----------------------------------------------------------------------------
 // For axis alligned hexahedral cells
-double vtkGridConnectivity::IntegrateHex(vtkCell* hex)
+double vtkGridConnectivity::IntegrateHex(vtkCell* hex,
+  vtkUnstructuredGrid* input, int fragmentId)
 {
   vtkPoints* points = hex->GetPoints();
   double pts[8][3];
@@ -1536,20 +1664,50 @@ double vtkGridConnectivity::IntegrateHex(vtkCell* hex)
   points->GetPoint(6,pts[6]);
   points->GetPoint(7,pts[7]);
 
+  vtkIdType ptIds[8];
+  ptIds[0] = hex->GetPointId(0);
+  ptIds[1] = hex->GetPointId(1);
+  ptIds[2] = hex->GetPointId(2);
+  ptIds[3] = hex->GetPointId(3);
+  ptIds[4] = hex->GetPointId(4);
+  ptIds[5] = hex->GetPointId(5);
+  ptIds[6] = hex->GetPointId(6);
+  ptIds[7] = hex->GetPointId(7);
+
   // For volume, I will tetrahedralize and add the volume of each tetra.
-  double volume = 0.0;
-  volume += this->ComputeTetrahedronVolume(pts[0],pts[1],pts[3],pts[4]);
-  volume += this->ComputeTetrahedronVolume(pts[5],pts[6],pts[1],pts[4]);
-  volume += this->ComputeTetrahedronVolume(pts[7],pts[6],pts[4],pts[3]);
-  volume += this->ComputeTetrahedronVolume(pts[1],pts[6],pts[2],pts[3]);
-  volume += this->ComputeTetrahedronVolume(pts[4],pts[6],pts[1],pts[3]);
+  double volume = 0.0, tetraVolume = 0.0;
+  tetraVolume = this->ComputeTetrahedronVolume(pts[0],pts[1],pts[3],pts[4]);
+  this->ComputePointIntegration(input,ptIds[0],ptIds[1],ptIds[3],ptIds[4],
+    tetraVolume,fragmentId );
+  volume += tetraVolume;
+
+  tetraVolume = this->ComputeTetrahedronVolume(pts[5],pts[6],pts[1],pts[4]);
+  this->ComputePointIntegration(input,ptIds[5],ptIds[6],ptIds[1],ptIds[4],
+    tetraVolume,fragmentId );
+  volume += tetraVolume;
+
+  tetraVolume = this->ComputeTetrahedronVolume(pts[7],pts[6],pts[4],pts[3]);
+  this->ComputePointIntegration(input,ptIds[7],ptIds[6],ptIds[4],ptIds[3],
+    tetraVolume,fragmentId );
+  volume += tetraVolume;
+
+  tetraVolume = this->ComputeTetrahedronVolume(pts[1],pts[6],pts[2],pts[3]);
+  this->ComputePointIntegration(input,ptIds[1],ptIds[6],ptIds[2],ptIds[3],
+    tetraVolume,fragmentId );
+  volume += tetraVolume;
+
+  tetraVolume = this->ComputeTetrahedronVolume(pts[4],pts[6],pts[1],pts[3]);
+  this->ComputePointIntegration(input,ptIds[4],ptIds[6],ptIds[1],ptIds[3],
+    tetraVolume,fragmentId );
+  volume += tetraVolume;
 
   return volume;
 }
 
 //-----------------------------------------------------------------------------
 // For axis alligned hexahedral cells
-double vtkGridConnectivity::IntegrateVoxel(vtkCell* voxel)
+double vtkGridConnectivity::IntegrateVoxel(vtkCell* voxel,
+  vtkUnstructuredGrid* input, int fragmentId)
 {
   vtkPoints* points = voxel->GetPoints();
   double pts[8][3];
@@ -1562,19 +1720,49 @@ double vtkGridConnectivity::IntegrateVoxel(vtkCell* voxel)
   points->GetPoint(6,pts[6]);
   points->GetPoint(7,pts[7]);
 
+  vtkIdType ptIds[8];
+  ptIds[0] = voxel->GetPointId(0);
+  ptIds[1] = voxel->GetPointId(1);
+  ptIds[2] = voxel->GetPointId(2);
+  ptIds[3] = voxel->GetPointId(3);
+  ptIds[4] = voxel->GetPointId(4);
+  ptIds[5] = voxel->GetPointId(5);
+  ptIds[6] = voxel->GetPointId(6);
+  ptIds[7] = voxel->GetPointId(7);
+
   // For volume, I will tetrahedralize and add the volume of each tetra.
-  double volume = 0.0;
-  volume += this->ComputeTetrahedronVolume(pts[0],pts[1],pts[2],pts[4]);
-  volume += this->ComputeTetrahedronVolume(pts[5],pts[7],pts[1],pts[4]);
-  volume += this->ComputeTetrahedronVolume(pts[6],pts[7],pts[4],pts[2]);
-  volume += this->ComputeTetrahedronVolume(pts[1],pts[7],pts[3],pts[2]);
-  volume += this->ComputeTetrahedronVolume(pts[4],pts[7],pts[1],pts[2]);
+  double volume = 0.0, tetraVolume = 0.0;
+  tetraVolume = this->ComputeTetrahedronVolume(pts[0],pts[1],pts[2],pts[4]);
+  this->ComputePointIntegration(input,ptIds[0],ptIds[1],ptIds[2],ptIds[4],
+    tetraVolume,fragmentId );
+  volume += tetraVolume;
+
+  tetraVolume = this->ComputeTetrahedronVolume(pts[5],pts[7],pts[1],pts[4]);
+  this->ComputePointIntegration(input,ptIds[5],ptIds[7],ptIds[1],ptIds[4],
+    tetraVolume,fragmentId );
+  volume += tetraVolume;
+
+  tetraVolume = this->ComputeTetrahedronVolume(pts[6],pts[7],pts[4],pts[2]);
+  this->ComputePointIntegration(input,ptIds[6],ptIds[7],ptIds[4],ptIds[2],
+    tetraVolume,fragmentId );
+  volume += tetraVolume;
+
+  tetraVolume = this->ComputeTetrahedronVolume(pts[1],pts[7],pts[3],pts[2]);
+  this->ComputePointIntegration(input,ptIds[1],ptIds[7],ptIds[3],ptIds[2],
+    tetraVolume,fragmentId );
+  volume += tetraVolume;
+
+  tetraVolume = this->ComputeTetrahedronVolume(pts[4],pts[7],pts[1],pts[2]);
+  this->ComputePointIntegration(input,ptIds[4],ptIds[7],ptIds[1],ptIds[2],
+    tetraVolume,fragmentId );
+  volume += tetraVolume;
 
   return volume;
 }
 
 //-----------------------------------------------------------------------------
-double vtkGridConnectivity::IntegrateGeneral3DCell(vtkCell *cell)
+double vtkGridConnectivity::IntegrateGeneral3DCell(vtkCell *cell,
+  vtkUnstructuredGrid*, int)
 {
   cell = cell;
   /*

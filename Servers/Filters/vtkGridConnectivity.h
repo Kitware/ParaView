@@ -92,17 +92,25 @@ protected:
   vtkDoubleArray* FragmentVolumes;
 //BTX
   vtkstd::vector<vtkSmartPointer<vtkDoubleArray> > CellAttributesIntegration;
+  vtkstd::vector<vtkSmartPointer<vtkDoubleArray> > PointAttributesIntegration;
 //ETX
   // Temporary structures to help integration.
   vtkPoints* CellPoints;
   vtkIdList* CellPointIds;
-  double IntegrateTetrahedron(vtkCell* tetra);
-  double IntegrateHex(vtkCell* hex);
-  double IntegrateVoxel(vtkCell* voxel);
-  double IntegrateGeneral3DCell(vtkCell* cell);
+  double IntegrateTetrahedron(vtkCell* tetra, vtkUnstructuredGrid* input,
+    int fragmentId);
+  double IntegrateHex(vtkCell* hex, vtkUnstructuredGrid* input,
+    int fragmentId);
+  double IntegrateVoxel(vtkCell* voxel, vtkUnstructuredGrid* input,
+    int fragmentId);
+  double IntegrateGeneral3DCell(vtkCell* cell, vtkUnstructuredGrid* input,
+    int fragmentId);
   double ComputeTetrahedronVolume(
     double* pts0, double* pts1,
     double* pts2, double* pts3);
+  void ComputePointIntegration( vtkUnstructuredGrid* input, vtkIdType pt0Id,
+    vtkIdType pt1Id, vtkIdType pt2Id, vtkIdType pt3Id, double volume, int fragmentId );
+
   void ResolveIntegrationArrays();
   void ResolveFaceFragmentIds();
 
