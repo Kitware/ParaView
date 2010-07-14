@@ -135,6 +135,11 @@ SET (XdmfReadImageDataCollection_THRESHOLD 20)
 SET (SaveCSV_THRESHOLD 40)
 
 # Disable some testing configurations for these tests.
+
+# Disable ClientRenderServer and Client Server test for GridConnectivity
+SET(GridConnectivity_DISABLE_CS TRUE)
+SET(GridConnectivity_DISABLE_CRS TRUE)
+
 ## Disable ClientRenderServer tests for FFTOverTime. This is done since
 ## selection is not supported in render server mode esp. when number of render
 ## server processess is not same as the data server processes
