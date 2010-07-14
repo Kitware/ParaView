@@ -54,6 +54,10 @@ protected:
   vtkSMMantaRepresentation();
   ~vtkSMMantaRepresentation();
 
+  // Description:
+  // Called at the start of CreateVTKObjects().
+  virtual bool BeginCreateVTKObjects();
+
   char *MaterialType;
   double Reflectance;
   double Thickness;
