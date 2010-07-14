@@ -71,7 +71,6 @@
           <String value="transparent"/>
           <String value="thindielectric"/>
           <String value="dielectric"/>
-          <String value="ambientocclusion"/>
           <String value="metal"/>
           <String value="orennayer"/>
         </StringListDomain>

@@ -147,8 +147,7 @@ private:
   //ETX
 
   // type of material to use. possible values are: "lambertian", "phong",
-  // "transparent", "thindielectric", "dielectric", "ambientocclusion",
-  // "metal", "orennayer"
+  // "transparent", "thindielectric", "dielectric", "metal", "orennayer"
   char * MaterialType;
 
   // amount of reflection to use. should be between 0.0 and 1.0

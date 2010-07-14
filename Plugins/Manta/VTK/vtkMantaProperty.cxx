@@ -68,7 +68,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <Core/Color/RGBColor.h>
 #include <Engine/Control/RTRT.h>
-#include <Model/Materials/AmbientOcclusion.h>
+//#include <Model/Materials/AmbientOcclusion.h>
 #include <Model/Materials/Dielectric.h>
 #include <Model/Materials/Flat.h>
 #include <Model/Materials/Lambertian.h>
@@ -336,32 +336,26 @@ void vtkMantaProperty::CreateMantaProperty()
                                          this->DiffuseTexture );
               }
             else
-              if ( strcmp( this->MaterialType, "ambientocclusion" ) == 0 )
+              if ( strcmp( this->MaterialType, "metal" ) == 0 )
                 {
-                this->MantaMaterial =
-                  new Manta::AmbientOcclusion( this->DiffuseTexture, 20, 20 );
+                this->MantaMaterial = new Manta::MetalMaterial( this->DiffuseTexture );
                 }
               else
-                if (strcmp( this->MaterialType, "metal" ) == 0 )
+                if ( strcmp( this->MaterialType, "orennayer" ) == 0 )
                   {
-                  this->MantaMaterial = new Manta::MetalMaterial( this->DiffuseTexture );
+                  this->MantaMaterial = new Manta::OrenNayar( this->DiffuseTexture );
                   }
                 else
-                  if ( strcmp( this->MaterialType, "orennayer" ) == 0 )
-                    {
-                    this->MantaMaterial = new Manta::OrenNayar( this->DiffuseTexture );
-                    }
-                  else
-                    {
-                    // just default to phong
-                    this->MantaMaterial
-                      = new Manta::Phong( this->DiffuseTexture,
-                                          this->SpecularTexture,
-                                          static_cast<int> ( this->GetSpecularPower() ),
-                                          new Manta::Constant<Manta::ColorComponent>
-                                          (
-                                           this->Reflectance) );
-                    }
+                  {
+                  // just default to phong
+                  this->MantaMaterial
+                    = new Manta::Phong( this->DiffuseTexture,
+                                        this->SpecularTexture,
+                                        static_cast<int> ( this->GetSpecularPower() ),
+                                        new Manta::Constant<Manta::ColorComponent>
+                                        (
+                                         this->Reflectance) );
+                  }
     }
 
   //cerr << "CREATED " << this->MantaMaterial << endl;
