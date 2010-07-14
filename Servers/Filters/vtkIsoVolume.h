@@ -23,16 +23,16 @@
 #ifndef __vtkIsoVolume_h
 #define __vtkIsoVolume_h
 
-#include "vtkUnstructuredGridAlgorithm.h"
+#include "vtkDataObjectAlgorithm.h"
 
 // Forware declarations.
 class vtkPVClipDataSet;
 
-class VTK_EXPORT vtkIsoVolume : public vtkUnstructuredGridAlgorithm
+class VTK_EXPORT vtkIsoVolume : public vtkDataObjectAlgorithm
 {
 public:
   static vtkIsoVolume* New();
-  vtkTypeMacro(vtkIsoVolume, vtkUnstructuredGridAlgorithm);
+  vtkTypeMacro(vtkIsoVolume, vtkDataObjectAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
@@ -45,7 +45,6 @@ public:
   vtkGetMacro(UpperThreshold, double);
   vtkGetMacro(LowerThreshold, double);
 
-
 protected:
   vtkIsoVolume();
  ~vtkIsoVolume();
@@ -54,21 +53,18 @@ protected:
   virtual int RequestData(vtkInformation* request, vtkInformationVector**,
                           vtkInformationVector*);
 
-  virtual int FillInputPortInformation(int port, vtkInformation* info);
-  virtual int FillOutputPortInformation(int port, vtkInformation* info);
-
-  virtual int ProcessRequest(vtkInformation*, vtkInformationVector**,
-                             vtkInformationVector*);
-
+  // Description:
+  // This filter produces a vtkMultiBlockDataSet when the input is a
+  // vtkCompositeDataSet otherwise, it produces a vtkUnstructuredGrid.
   virtual int RequestDataObject(vtkInformation* request,
                                 vtkInformationVector** inputVector,
                                 vtkInformationVector* outputVector);
 
+  vtkDataObject* Clip(vtkDataObject* input,
+    double value, const char* array_name, int fieldAssociation, bool invert);
+
   double LowerThreshold;
   double UpperThreshold;
-
-  vtkPVClipDataSet*   LowerBoundClipDS;
-  vtkPVClipDataSet*   UpperBoundClipDS;
 
 private:
   vtkIsoVolume(const vtkIsoVolume&);  // Not implemented.

@@ -17,17 +17,18 @@
 #include "vtkAMRDualClip.h"
 #include "vtkAppendFilter.h"
 #include "vtkCompositeDataIterator.h"
+#include "vtkCompositeDataPipeline.h"
 #include "vtkDataSet.h"
 #include "vtkDemandDrivenPipeline.h"
-#include "vtkObjectFactory.h"
 #include "vtkHierarchicalBoxDataIterator.h"
 #include "vtkHierarchicalBoxDataSet.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkMultiBlockDataSet.h"
-#include "vtkThreshold.h"
+#include "vtkObjectFactory.h"
 #include "vtkSmartPointer.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
+#include "vtkThreshold.h"
 #include "vtkUnstructuredGrid.h"
 
 #include "vtkInformationStringVectorKey.h"
@@ -42,6 +43,8 @@ vtkPVClipDataSet::vtkPVClipDataSet(vtkImplicitFunction *vtkNotUsed(cf))
   // setting NumberOfOutputPorts to 1 because ParaView does not allow you to
   // generate the clipped output
   this->SetNumberOfOutputPorts(1);
+
+  this->UseAMRDualClipForAMR = true;
 }
 
 //----------------------------------------------------------------------------
@@ -53,6 +56,8 @@ vtkPVClipDataSet::~vtkPVClipDataSet()
 void vtkPVClipDataSet::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
+  os << indent
+    << "UseAMRDualClipForAMR: " << this->UseAMRDualClipForAMR << endl;
 }
 
 //----------------------------------------------------------------------------
@@ -92,7 +97,7 @@ int vtkPVClipDataSet::RequestData(vtkInformation* request,
   if (vtkHierarchicalBoxDataSet::SafeDownCast(inDataObj))
     {
     // Using scalars.
-    if(!this->GetClipFunction())
+    if (!this->GetClipFunction())
       {
       // This is a lot to go through to get the name of the array to process.
       vtkInformationVector *inArrayVec =
@@ -137,28 +142,36 @@ int vtkPVClipDataSet::RequestData(vtkInformation* request,
         }
       else if(fieldAssociation == vtkDataObject::FIELD_ASSOCIATION_CELLS)
         {
-        vtkSmartPointer<vtkAMRDualClip> amrDC =
-          vtkSmartPointer<vtkAMRDualClip>::New();
-        amrDC->SetIsoValue(this->GetValue());
+        if (this->UseAMRDualClipForAMR)
+          {
+          vtkSmartPointer<vtkAMRDualClip> amrDC =
+            vtkSmartPointer<vtkAMRDualClip>::New();
+          amrDC->SetIsoValue(this->GetValue());
 
-        // These default are safe to consider. Currently using GUI element just
-        // for AMRDualClip filter enables all of these too.
-        amrDC->SetEnableMergePoints(1);
-        amrDC->SetEnableDegenerateCells(1);
-        amrDC->SetEnableMultiProcessCommunication(1);
+          // These default are safe to consider. Currently using GUI element just
+          // for AMRDualClip filter enables all of these too.
+          amrDC->SetEnableMergePoints(1);
+          amrDC->SetEnableDegenerateCells(1);
+          amrDC->SetEnableMultiProcessCommunication(1);
 
-        vtkDataObject* inputClone = inDataObj->NewInstance();
-        inputClone->ShallowCopy(inDataObj);
-        amrDC->SetInput(0, inputClone);
-        inputClone->Delete();
+          vtkDataObject* inputClone = inDataObj->NewInstance();
+          inputClone->ShallowCopy(inDataObj);
+          amrDC->SetInput(0, inputClone);
+          inputClone->FastDelete();
 
-        amrDC->SetInputArrayToProcess(
-          0, 0, 0, vtkDataObject::FIELD_ASSOCIATION_CELLS,
-          arrayNameToProcess);
+          amrDC->SetInputArrayToProcess(
+            0, 0, 0, vtkDataObject::FIELD_ASSOCIATION_CELLS,
+            arrayNameToProcess);
 
-        amrDC->Update();
+          amrDC->Update();
 
-        outDataObj->ShallowCopy(amrDC->GetOutput(0));
+          outDataObj->ShallowCopy(amrDC->GetOutput(0));
+          }
+        else
+          {
+          return this->ClipUsingThreshold(request, inputVector, outputVector,
+            arrayNameToProcess);
+          }
         return 1;
         }
       else
@@ -201,32 +214,47 @@ int vtkPVClipDataSet::RequestData(vtkInformation* request,
     else
       {
       // Use vtkPVThreshold here.
-      vtkSmartPointer<vtkThreshold> th (vtkSmartPointer<vtkThreshold>::New());
-      vtkDataObject* inputClone = inDataObj->NewInstance();
-      inputClone->ShallowCopy(inDataObj);
-      th->SetInput(0, inDataObj);
-      inputClone->Delete();
-      th->SetInputArrayToProcess(0, 0, 0,
-                                 vtkDataObject::FIELD_ASSOCIATION_CELLS,
-                                 dArray->GetName());
-      if(this->GetInsideOut())
-        {
-        th->ThresholdByLower(this->GetValue());
-        }
-      else
-        {
-        th->ThresholdByUpper(this->GetValue());
-        }
-
-      th->Update();
-
-      outDataObj->ShallowCopy(th->GetOutput(0));
-
-      return 1;
+      return this->ClipUsingThreshold(request, inputVector, outputVector,
+        dArray->GetName());
       }
     } // End for vtkDataSet.
 
   return 0;
+}
+
+//----------------------------------------------------------------------------
+int vtkPVClipDataSet::ClipUsingThreshold(
+  vtkInformation* , vtkInformationVector** inputVector,
+  vtkInformationVector* outputVector, const char* arrayname)
+{
+  vtkDataObject* inputDO = vtkDataObject::GetData(inputVector[0], 0);
+  vtkDataObject* outputDO = vtkDataObject::GetData(outputVector, 0);
+
+  vtkSmartPointer<vtkThreshold> threshold (vtkSmartPointer<vtkThreshold>::New());
+
+  vtkCompositeDataPipeline* executive = vtkCompositeDataPipeline::New();
+  threshold->SetExecutive(executive);
+  executive->FastDelete();
+
+  vtkDataObject* inputClone = inputDO->NewInstance();
+  inputClone->ShallowCopy(inputDO);
+  threshold->SetInput(0, inputDO);
+  inputClone->FastDelete();
+  threshold->SetInputArrayToProcess(0, 0, 0,
+    vtkDataObject::FIELD_ASSOCIATION_CELLS, arrayname);
+
+  if (this->GetInsideOut())
+    {
+    threshold->ThresholdByLower(this->GetValue());
+    }
+  else
+    {
+    threshold->ThresholdByUpper(this->GetValue());
+    }
+
+  threshold->Update();
+  outputDO->ShallowCopy(threshold->GetOutputDataObject(0));
+  return 1;
 }
 
 //----------------------------------------------------------------------------
@@ -307,7 +335,7 @@ int vtkPVClipDataSet::RequestDataObject(vtkInformation* vtkNotUsed(request),
       output->SetPipelineInformation(outInfo);
       this->GetOutputPortInformation(0)->Set(
         vtkDataObject::DATA_EXTENT_TYPE(), output->GetExtentType());
-      output->Delete();
+      output->FastDelete();
       }
     return 1;
     }
@@ -320,7 +348,7 @@ int vtkPVClipDataSet::RequestDataObject(vtkInformation* vtkNotUsed(request),
       output->SetPipelineInformation(outInfo);
       this->GetOutputPortInformation(0)->Set(
         vtkDataObject::DATA_EXTENT_TYPE(), output->GetExtentType());
-      output->Delete();
+      output->FastDelete();
       }
     return 1;
     }

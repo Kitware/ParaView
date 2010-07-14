@@ -35,6 +35,14 @@ public:
   virtual int ProcessRequest(vtkInformation*,
                              vtkInformationVector**,
                              vtkInformationVector*);
+
+  // Description:
+  // This filter uses vtkAMRDualClip for clipping AMR datasets. Do disable that
+  // behavior, turn this flag off.
+  vtkSetMacro(UseAMRDualClipForAMR, bool);
+  vtkGetMacro(UseAMRDualClipForAMR, bool);
+  vtkBooleanMacro(UseAMRDualClipForAMR, bool);
+
 //BTX
 protected:
   vtkPVClipDataSet(vtkImplicitFunction *cf=NULL);
@@ -58,7 +66,11 @@ protected:
   int ClipUsingSuperclass(
     vtkInformation* request, vtkInformationVector** inputVector,
     vtkInformationVector* outputVector);
+  int ClipUsingThreshold(
+    vtkInformation* request, vtkInformationVector** inputVector,
+    vtkInformationVector* outputVector, const char* arrayname);
 
+  bool UseAMRDualClipForAMR;
 private:
   vtkPVClipDataSet(const vtkPVClipDataSet&);  // Not implemented.
   void operator=(const vtkPVClipDataSet&);  // Not implemented.
