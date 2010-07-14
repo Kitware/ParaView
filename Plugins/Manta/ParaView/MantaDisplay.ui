@@ -67,11 +67,6 @@
        </item>
        <item>
         <property name="text">
-         <string>ambientocclusion</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
          <string>metal</string>
         </property>
        </item>
@@ -126,7 +121,7 @@
         <string>Refractive index of dielectric material</string>
        </property>
        <property name="maximum">
-        <double>10.00000000000000</double>
+        <double>10.000000000000000</double>
        </property>
        <property name="singleStep">
         <double>0.020000000000000</double>
@@ -153,7 +148,7 @@
         <string>Thickness of dielectric material</string>
        </property>
        <property name="maximum">
-        <double>10.00000000000000</double>
+        <double>10.000000000000000</double>
        </property>
        <property name="singleStep">
         <double>0.100000000000000</double>
@@ -180,7 +175,7 @@
         <string>Outside index of refraction of dielectric material.</string>
        </property>
        <property name="maximum">
-        <double>10.00000000000000</double>
+        <double>10.000000000000000</double>
        </property>
        <property name="singleStep">
         <double>0.100000000000000</double>
@@ -207,7 +202,7 @@
         <string>Inside transmissive index of refraction for dielectric material.</string>
        </property>
        <property name="maximum">
-        <double>10.00000000000000</double>
+        <double>10.000000000000000</double>
        </property>
        <property name="singleStep">
         <double>0.100000000000000</double>
