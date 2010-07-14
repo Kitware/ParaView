@@ -45,6 +45,25 @@ void vtkSMMantaRepresentation::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os, indent);
 }
 
+//------------------------------------------------------------------------------
+bool vtkSMMantaRepresentation::BeginCreateVTKObjects()
+{
+  //kicks off object factory override, that swaps GL classes for manta ones
+  //does so ONLY on the server
+  vtkProcessModule *pm = vtkProcessModule::GetProcessModule();
+  vtkClientServerStream stream;
+  vtkClientServerID id = pm->NewStreamObject("vtkServerSideFactory", stream);
+  stream << vtkClientServerStream::Invoke
+         << id << "EnableFactory"
+         << vtkClientServerStream::End;
+  pm->DeleteStreamObject(id, stream);
+  pm->SendStream(this->GetConnectionID(),
+                 vtkProcessModule::RENDER_SERVER,
+                 stream);
+
+  return this->Superclass::BeginCreateVTKObjects();
+}
+
 //----------------------------------------------------------------------------
 void vtkSMMantaRepresentation::CallMethod(char *methodName, 
                                           char *strArg, 
