@@ -22,6 +22,7 @@
 #include "vtkSMProxy.h"
 
 class vtkSelection;
+class vtkCommand;
 class VTK_EXPORT vtkSMHardwareSelector : public vtkSMProxy
 {
 public:
@@ -29,15 +30,27 @@ public:
   vtkTypeMacro(vtkSMHardwareSelector, vtkSMProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  vtkSelection* Select();
+  vtkSelection* Select(unsigned int region[4]);
+
+  // Description:
+  // Forcibly clears the buffers.
+  void ClearBuffers();
 
 //BTX
 protected:
   vtkSMHardwareSelector();
   ~vtkSMHardwareSelector();
 
+  // Description:
+  // Overridden to ensure that MTime is updated.
+  virtual void MarkModified(vtkSMProxy* modifiedProxy);
+
+  void CaptureBuffers();
+
   void StartSelectionPass();
 
+  vtkTimeStamp CaptureTime;
+  vtkCommand* CameraObserver;
 private:
   vtkSMHardwareSelector(const vtkSMHardwareSelector&); // Not implemented
   void operator=(const vtkSMHardwareSelector&); // Not implemented

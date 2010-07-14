@@ -32,6 +32,7 @@ class vtkPVOpenGLExtensionsInformation;
 class vtkRenderer;
 class vtkRenderWindow;
 class vtkSelection;
+class vtkSMHardwareSelector;
 class vtkSMRenderViewHelper;
 class vtkSMRepresentationProxy;
 class vtkTimerLog;
@@ -404,6 +405,13 @@ protected:
   // Get the number of polygons this render module is rendering
   vtkIdType GetTotalNumberOfPolygons();
 
+  // Description:
+  // The hardware selector is created the first time it's needed.
+  // vtkSMHardwareSelector has the ability to cache buffers. This makes it
+  // possible to do repeated selections without having to re-capture the
+  // buffers. We clear the buffers if camera changes or any of the selection
+  // parameters change or the window size changes.
+  vtkSMHardwareSelector* HardwareSelector;
 private:
   vtkSMRenderViewProxy(const vtkSMRenderViewProxy&); // Not implemented.
   void operator=(const vtkSMRenderViewProxy&); // Not implemented.

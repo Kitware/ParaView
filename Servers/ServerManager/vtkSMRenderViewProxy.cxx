@@ -145,6 +145,8 @@ vtkSMRenderViewProxy::vtkSMRenderViewProxy()
   this->Information->Set(USE_COMPOSITING(), 0);
 
   this->LightKitAdded = false;
+
+  this->HardwareSelector = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -175,6 +177,12 @@ vtkSMRenderViewProxy::~vtkSMRenderViewProxy()
     {
     this->OpenGLExtensionsInformation->Delete();
     this->OpenGLExtensionsInformation = 0;
+    }
+
+  if (this->HardwareSelector)
+    {
+    this->HardwareSelector->Delete();
+    this->HardwareSelector = NULL;
     }
 }
 
@@ -701,6 +709,11 @@ void vtkSMRenderViewProxy::AddRepresentationInternal(
   SetIntVectorProperty(repr, "ImmediateModeRendering", this->UseImmediateMode, false);
 
   this->Superclass::AddRepresentationInternal(repr);
+
+  if (this->HardwareSelector)
+    {
+    this->HardwareSelector->ClearBuffers();
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -1668,9 +1681,9 @@ bool vtkSMRenderViewProxy::SelectFrustum(unsigned int x0,
 }
 
 //-----------------------------------------------------------------------------
-vtkSelection* vtkSMRenderViewProxy::SelectVisibleCells(unsigned int x0, 
+vtkSelection* vtkSMRenderViewProxy::SelectVisibleCells(unsigned int x0,
   unsigned int y0, unsigned int x1, unsigned int y1, int ofPoints)
-{  
+{
   if (!this->IsSelectionAvailable())
     {
     vtkSelection *selection = vtkSelection::New();
@@ -1696,7 +1709,7 @@ vtkSelection* vtkSMRenderViewProxy::SelectVisibleCells(unsigned int x0,
   vtkCollectionIterator* iter = this->Representations->NewIterator();
   for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
     {
-    vtkSMRepresentationProxy* repr = 
+    vtkSMRepresentationProxy* repr =
       vtkSMRepresentationProxy::SafeDownCast(iter->GetCurrentObject());
     if (!repr || !repr->GetVisibility())
       {
@@ -1716,11 +1729,17 @@ vtkSelection* vtkSMRenderViewProxy::SelectVisibleCells(unsigned int x0,
     }
   iter->Delete();
 
-  vtkSMProxyManager* proxyManager = vtkSMObject::GetProxyManager();  
-  vtkSMHardwareSelector *vcsProxy = vtkSMHardwareSelector::SafeDownCast(
+  if (this->HardwareSelector == NULL)
+    {
+    vtkSMProxyManager* proxyManager = vtkSMObject::GetProxyManager();
+    this->HardwareSelector = vtkSMHardwareSelector::SafeDownCast(
       proxyManager->NewProxy("PropPickers", "HardwareSelector"));
-  vcsProxy->SetConnectionID(this->ConnectionID);
-  vcsProxy->SetServers(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
+    this->HardwareSelector->SetConnectionID(this->ConnectionID);
+    this->HardwareSelector->SetServers(
+      vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
+    }
+
+  vtkSMHardwareSelector *vcsProxy = this->HardwareSelector;
 
   //don't let the RenderSyncManager control back/front buffer swapping so that
   //we can do it here instead.
@@ -1738,13 +1757,16 @@ vtkSelection* vtkSMRenderViewProxy::SelectVisibleCells(unsigned int x0,
     }
 
   // Set default property values for the selector.
-  int area[4] = {x0, y0, x1, y1};
+  // if any of the properties here change, then the hardware selector ensures
+  // that it clears the old buffers.
+  //int area[4] = {x0, y0, x1, y1};
+  int area[4] = {0, 0, win_size[0] - 1, win_size[1] - 1};
   vtkSMPropertyHelper(vcsProxy, "Renderer").Set(this->RendererProxy);
   vtkSMPropertyHelper(vcsProxy, "Area").Set(area, 4);
   vtkSMPropertyHelper(vcsProxy, "FieldAssociation").Set(ofPoints? 0 : 1);
   vtkSMPropertyHelper(vcsProxy, "NumberOfProcesses").Set(numProcessors);
   vtkSMPropertyHelper(vcsProxy, "NumberOfIDs").Set(maxNumCells);
-  vcsProxy->UpdateVTKObjects();   
+  vcsProxy->UpdateVTKObjects();
 
   //don't draw the scalar bar, text annotation, orientation axes
   vtkRendererCollection *rcol = this->RenderWindow->GetRenderers();
@@ -1752,7 +1774,7 @@ vtkSelection* vtkSMRenderViewProxy::SelectVisibleCells(unsigned int x0,
   int *renOldVis = new int[numlayers];
   for (int i = 0; i < numlayers; i++)
     {
-    //I tried Using vtkRendererCollection::GetItem but that was giving me 
+    //I tried Using vtkRendererCollection::GetItem but that was giving me
     //NULL for i=1,2 so I am doing it the long way
     vtkObject *anObj = rcol->GetItemAsObject(i);
     if (!anObj)
@@ -1767,11 +1789,11 @@ vtkSelection* vtkSMRenderViewProxy::SelectVisibleCells(unsigned int x0,
     renOldVis[i] = nextRen->GetDraw();
     if (nextRen != this->Renderer)
       {
-      nextRen->DrawOff();      
+      nextRen->DrawOff();
       }
     }
 
-  //If stripping is on, turn it off (if anything has been changed since the 
+  //If stripping is on, turn it off (if anything has been changed since the
   //last time we turned it off)
   //TODO: encode the cell original ids directly into the color and
   //to make this ugly hack uneccessary
@@ -1779,11 +1801,12 @@ vtkSelection* vtkSMRenderViewProxy::SelectVisibleCells(unsigned int x0,
   if (use_strips)
     {
     this->ForceTriStripUpdate = 1;
-    this->SetUseTriangleStrips(0);    
+    this->SetUseTriangleStrips(0);
     this->ForceTriStripUpdate = 0;
     }
 
-  vtkSelection* selection = vcsProxy->Select(); 
+  unsigned int region[4] = {x0, y0, x1, y1};
+  vtkSelection* selection = vcsProxy->Select(region);
 
   //Turn stripping back on if we had turned it off
   if (use_strips)
@@ -1813,8 +1836,7 @@ vtkSelection* vtkSMRenderViewProxy::SelectVisibleCells(unsigned int x0,
     setAllowBuffSwap->SetElements1(1);
     renderSyncManager->UpdateVTKObjects();
     }
-  
-  vcsProxy->Delete();
+
   return selection;
 }
 
