@@ -105,6 +105,13 @@ IF (PVServerManagerTestData AND GENERATOR_EXPRESSIONS_SUPPORTED)
         -T ${ParaView_BINARY_DIR}/Testing/Temporary
         -S ${SMSTATE_FILE_DIR})
   ENDFOREACH(tfile)
+
+  # This is necessary because PythonFilters generates and executes python scripts
+  # on the fly which throws exceptions but cannot be caught by the host script
+  # for some reason. Therefore, those exceptions are not considered as failures
+  # by the ctest framework. Set this property causes ctest to parse the outputs of
+  # the generated scripts for the regex "Error" which can cause a test failure.
+  set_tests_properties(PythonFilters-ServerManagerPython PROPERTIES FAIL_REGULAR_EXPRESSION "Error")
 ENDIF (PVServerManagerTestData AND GENERATOR_EXPRESSIONS_SUPPORTED)
 ###############################################################################
 # Add tests for pvbatch.
@@ -112,6 +119,7 @@ ENDIF (PVServerManagerTestData AND GENERATOR_EXPRESSIONS_SUPPORTED)
 SET (PVBATCH_TESTS
   Simple
   ParallelSerialWriter
+  PythonFilters
 )
 
 IF (PVServerManagerTestData AND GENERATOR_EXPRESSIONS_SUPPORTED)
@@ -155,5 +163,13 @@ IF (PVServerManagerTestData AND GENERATOR_EXPRESSIONS_SUPPORTED)
           -S ${SMSTATE_FILE_DIR})
     ENDIF (VTK_MPIRUN_EXE AND VTK_MPI_MAX_NUMPROCS GREATER 1)
   ENDFOREACH (tfile)
+
+  # This is necessary because PythonFilters generates and executes python scripts
+  # on the fly which throws exceptions but cannot be caught by the host script
+  # for some reason. Therefore, those exceptions are not considered as failures
+  # by the ctest framework. Set this property causes ctest to parse the outputs of
+  # the generated scripts for the regex "Error" which can cause a test failure.
+  set_tests_properties(PythonFilters-Batch PROPERTIES FAIL_REGULAR_EXPRESSION "Error")
+  set_tests_properties(PythonFilters-SymmetricBatch PROPERTIES FAIL_REGULAR_EXPRESSION "Error")
 ENDIF (PVServerManagerTestData AND GENERATOR_EXPRESSIONS_SUPPORTED)
 
