@@ -164,6 +164,21 @@
     <string>B</string>
    </property>
   </action>
+  <action name="actionPickObject">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../../../Components/Resources/pqComponents.qrc">
+     <normaloff>:/pqWidgets/Icons/pqMousePick15.png</normaloff>:/pqWidgets/Icons/pqSelectBlock24.png</iconset>
+   </property>
+   <property name="text">
+    <string>Pick Object</string>
+   </property>
+  </action>
 
   <addaction name="actionMoveMode" />
   <addaction name="actionSelectionMode" />
@@ -171,6 +186,7 @@
   <addaction name="actionSelect_Frustum" />
   <addaction name="actionSelectFrustumPoints" />
   <addaction name="actionSelect_Block" />
+  <addaction name="actionPickObject" />
  </widget>
  <resources>
   <include location="../../../Components/Resources/pqComponents.qrc"/>

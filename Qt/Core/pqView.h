@@ -183,6 +183,10 @@ signals:
   ///    have been initialized to a selection source.
   void selected(pqOutputPort* opport);
 
+  /// Fired when a port is picked.
+  /// \c opport is the port that got picked.
+  void picked(pqOutputPort* opport);
+
   /// Fired before doing any actions that may result in progress events that
   /// must be reported by the client.
   void beginProgress();

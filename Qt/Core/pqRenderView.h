@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -57,17 +57,17 @@ public:
   // \c server:- server on which the proxy is created.
   // \c parent:- QObject parent.
   pqRenderView( const QString& group,
-                const QString& name, 
-                vtkSMViewProxy* renModule, 
-                pqServer* server, 
+                const QString& name,
+                vtkSMViewProxy* renModule,
+                pqServer* server,
                 QObject* parent=NULL);
 
   // This version allows subclasses to substitute their own renderViewType.
   pqRenderView( const QString& tname,
                 const QString& group,
-                const QString& name, 
-                vtkSMViewProxy* renModule, 
-                pqServer* server, 
+                const QString& name,
+                vtkSMViewProxy* renModule,
+                pqServer* server,
                 QObject* parent=NULL);
 
   // Destructor.
@@ -90,11 +90,11 @@ public:
   virtual vtkImageData* captureImage(const QSize& asize)
     { return this->Superclass::captureImage(asize); }
 
-  /// Sets default values for the underlying proxy. 
-  /// This is during the initialization stage of the pqProxy 
+  /// Sets default values for the underlying proxy.
+  /// This is during the initialization stage of the pqProxy
   /// for proxies created by the GUI itself i.e.
   /// for proxies loaded through state or created by python client
-  /// this method won't be called. 
+  /// this method won't be called.
   virtual void setDefaultPropertyValues();
 
   /// restore the default background color
@@ -127,18 +127,18 @@ public:
   /// Get the current center of rotation.
   void getCenterOfRotation(double center[3]) const;
 
-  /// Returns if this view module can support 
+  /// Returns if this view module can support
   /// undo/redo. Returns false by default. Subclassess must override
   /// if that's not the case.
   virtual bool supportsUndo() const { return true; }
- 
+
   /// Returns if the view module can undo/redo interaction
   /// given the current state of the interaction undo stack.
   virtual bool canUndo() const;
   virtual bool canRedo() const;
 
   /// For linking of interaction undo stacks.
-  /// This method is used by pqLinksModel to link 
+  /// This method is used by pqLinksModel to link
   /// interaction undo stack for linked render views.
   void linkUndoStack(pqRenderView* other);
   void unlinkUndoStack(pqRenderView* other);
@@ -175,6 +175,11 @@ public:
   void selectOnSurface(int rectangle[4], bool expand=false);
   void selectPointsOnSurface(int rectangle[4], bool expand=false);
 
+  /// Picks the representation at the given position.
+  /// This will result in firing the picked(pqOutputPort*) signal on successful
+  /// pick.
+  void pick(int pos[2]);
+
   /// Creates a new frustum selection given the rectangle in display
   /// coordinates.
   void selectFrustum(int rectangle[4]);
@@ -187,7 +192,7 @@ public:
 public slots:
   // Toggle the orientation axes visibility.
   void setOrientationAxesVisibility(bool visible);
-  
+
   // Toggle orientation axes interactivity.
   void setOrientationAxesInteractivity(bool interactive);
 
@@ -199,7 +204,7 @@ public slots:
 
   // Set the center of rotation. For this to work,
   // one should have approriate interaction style (vtkPVInteractorStyle subclass)
-  // and camera manipulators that use the center of rotation. 
+  // and camera manipulators that use the center of rotation.
   // They are setup correctly by default.
   void setCenterOfRotation(double x, double y, double z);
   void setCenterOfRotation(double xyz[3])
@@ -239,12 +244,12 @@ private slots:
   // ResetCameraEvent.
   void onResetCameraEvent();
 
-  /// Called when undo stack changes. We fires appropriate 
+  /// Called when undo stack changes. We fires appropriate
   /// undo signals as required by pqView.
   void onUndoStackChanged();
 
   /// When the default text annotation color changes, we need to update the
-  /// orientation text actor. 
+  /// orientation text actor.
   void textAnnotationColorChanged();
 
 protected:
@@ -296,10 +301,10 @@ protected:
   /// of whether it is created from state/undo-redo/python or by the GUI. Hence
   /// don't change any render module properties here.
   virtual void initializeWidgets();
-private: 
+private:
   class pqInternal;
   pqInternal* Internal;
-  void selectOnSurfaceInternal(int rect[4], QList<pqOutputPort*>&, 
+  void selectOnSurfaceInternal(int rect[4], QList<pqOutputPort*>&,
     bool select_points, bool expand, bool select_blocks);
   void emitSelectionSignal(QList<pqOutputPort*>);
   void collectSelectionPorts(vtkCollection* selectedRepresentations,

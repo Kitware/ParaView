@@ -62,6 +62,7 @@ void pqSelectionToolbar::constructor()
   modeGroup->addAction(ui.actionSelect_Frustum);
   modeGroup->addAction(ui.actionSelectFrustumPoints);
   modeGroup->addAction(ui.actionSelect_Block);
+  modeGroup->addAction(ui.actionPickObject);
 
   // Set up selection buttons.
   QObject::connect(
@@ -89,6 +90,10 @@ void pqSelectionToolbar::constructor()
     this->SelectionHelper,
     SIGNAL(enableBlockSelection(bool)),
     ui.actionSelect_Block, SLOT(setEnabled(bool)));
+  QObject::connect(
+    this->SelectionHelper,
+    SIGNAL(enablePick(bool)),
+    ui.actionPickObject, SLOT(setEnabled(bool)));
 
   QObject::connect(
     ui.actionSelectionMode, SIGNAL(triggered()),
@@ -106,6 +111,10 @@ void pqSelectionToolbar::constructor()
     ui.actionSelect_Block, SIGNAL(triggered()),
     this->SelectionHelper,
     SLOT(beginBlockSelection()));
+  QObject::connect(
+    ui.actionPickObject, SIGNAL(triggered()),
+    this->SelectionHelper,
+    SLOT(beginPick()));
 
   QObject::connect(
     this->SelectionHelper,

@@ -40,6 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqDefaultViewBehavior.h"
 #include "pqDeleteBehavior.h"
 #include "pqFixPathsInStateFilesBehavior.h"
+#include "pqObjectPickingBehavior.h"
 #include "pqPersistentMainWindowStateBehavior.h"
 #include "pqPluginActionGroupBehavior.h"
 #include "pqPluginDockWidgetsBehavior.h"
@@ -85,6 +86,7 @@ pqParaViewBehaviors::pqParaViewBehaviors(
   new pqFixPathsInStateFilesBehavior(this);
   new pqCommandLineOptionsBehavior(this);
   new pqPersistentMainWindowStateBehavior(mainWindow);
+  new pqObjectPickingBehavior(this);
 
   // Setup quick-launch shortcuts.
   QShortcut *ctrlSpace = new QShortcut(Qt::CTRL + Qt::Key_Space,

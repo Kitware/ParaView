@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -71,16 +71,22 @@ public:
     FRUSTUM,
     FRUSTUM_POINTS,
     BLOCKS,
-    ZOOM
+    ZOOM,
+    PICK,
+    PICK_ON_CLICK
   };
+  // PICK_ON_CLICK mode is same as pick, except that the helper does not change
+  // the interactor or draw any rubber bands, now change the cursor. It just
+  // sets up observer to call "pick" when user clicks.
   //ETX
+
 
 public slots:
   /// Set active view. If a view has been set previously, this method ensures
   /// that it is not in selection mode.
   void setView(pqView*);
 
-  /// Begin rubber band surface selection on the view. 
+  /// Begin rubber band surface selection on the view.
   /// Has any effect only if active view is a render view.
   void beginSurfaceSelection();
   void beginSurfacePointsSelection();
@@ -88,16 +94,20 @@ public slots:
   void beginFrustumPointsSelection();
   void beginBlockSelection();
   void beginZoom();
+  void beginPick();
+  void beginPickOnClick();
 
   /// End rubber band selection.
   /// Has any effect only if active view is a render view.
   void endSelection();
+  void endPick()
+    { this->endSelection(); }
   void endZoom()
     { this->endSelection(); }
 
   /// Called to disable selection.
   void DisabledPush();
-  
+
   /// Called to pop disabling of selection. If there are as many DisabledPop() as
   /// DisabledPush(), the selection will be enabled.
   void DisabledPop();
@@ -114,8 +124,9 @@ signals:
   void enableFrustumPointSelection(bool enabled);
   void enableBlockSelection(bool enabled);
   void enableZoom(bool enabled);
+  void enablePick(bool enabled);
 
-  /// Fired with selection mode changes. 
+  /// Fired with selection mode changes.
   /// \c selectionMode is enum Modes{...}.
   void selectionModeChanged(int selectionMode);
 

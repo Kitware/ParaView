@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -57,7 +57,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqRubberBandHelper::vtkPQSelectionObserver : public vtkCommand
 {
 public:
-  static vtkPQSelectionObserver *New() 
+  static vtkPQSelectionObserver *New()
     { return new vtkPQSelectionObserver; }
 
   virtual void Execute(vtkObject*, unsigned long event, void* )
@@ -68,7 +68,7 @@ public:
         }
     }
 
-  vtkPQSelectionObserver() : RubberBandHelper(0) 
+  vtkPQSelectionObserver() : RubberBandHelper(0)
     {
     }
 
@@ -108,14 +108,14 @@ public:
   pqInternal(pqRubberBandHelper* parent) :
     ZoomCursor(QPixmap(zoom_xpm), 11, 11)
     {
-    this->RubberBandStyle = 
+    this->RubberBandStyle =
       vtkSmartPointer<vtkInteractorStyleRubberBandPick>::New();
     this->ZoomStyle = vtkSmartPointer<vtkInteractorStyleRubberBandZoom>::New();
-    this->SelectionObserver = 
+    this->SelectionObserver =
       vtkSmartPointer<vtkPQSelectionObserver>::New();
     this->SelectionObserver->RubberBandHelper = parent;
     }
-  
+
   ~pqInternal()
     {
     this->SelectionObserver->RubberBandHelper = 0;
@@ -164,6 +164,7 @@ void pqRubberBandHelper::emitEnabledSignals()
     {
     emit this->enableSurfaceSelection(false);
     emit this->enableZoom(false);
+    emit this->enablePick(false);
     emit this->enableSurfacePointsSelection(false);
     emit this->enableFrustumSelection(false);
     emit this->enableFrustumPointSelection(false);
@@ -172,7 +173,7 @@ void pqRubberBandHelper::emitEnabledSignals()
 
   if (this->DisableCount == 0 && this->Internal->RenderView)
     {
-    vtkSMRenderViewProxy* proxy = 
+    vtkSMRenderViewProxy* proxy =
       this->Internal->RenderView->getRenderViewProxy();
     emit this->enableSurfaceSelection(
       proxy->IsSelectVisibleCellsAvailable() == NULL);
@@ -181,6 +182,7 @@ void pqRubberBandHelper::emitEnabledSignals()
     emit this->enableFrustumSelection(true);
     emit this->enableFrustumPointSelection(true);
     emit this->enableZoom(true);
+    emit this->enablePick(true);
     }
 }
 
@@ -242,16 +244,16 @@ int pqRubberBandHelper::setRubberBandOn(int selectionMode)
     this->Internal->RenderView->getWidget()->setCursor(
       this->Internal->ZoomCursor);
     }
-  else
+  else if (selectionMode != PICK_ON_CLICK)
     {
     rwi->SetInteractorStyle(this->Internal->RubberBandStyle);
     this->Internal->RubberBandStyle->StartSelect();
     this->Internal->RenderView->getWidget()->setCursor(Qt::CrossCursor);
     }
 
-  rwi->AddObserver(vtkCommand::LeftButtonPressEvent, 
+  rwi->AddObserver(vtkCommand::LeftButtonPressEvent,
     this->Internal->SelectionObserver);
-  rwi->AddObserver(vtkCommand::LeftButtonReleaseEvent, 
+  rwi->AddObserver(vtkCommand::LeftButtonReleaseEvent,
     this->Internal->SelectionObserver);
 
 
@@ -347,6 +349,18 @@ void pqRubberBandHelper::beginZoom()
 }
 
 //-----------------------------------------------------------------------------
+void pqRubberBandHelper::beginPick()
+{
+  this->setRubberBandOn(PICK);
+}
+
+//-----------------------------------------------------------------------------
+void pqRubberBandHelper::beginPickOnClick()
+{
+  this->setRubberBandOn(PICK_ON_CLICK);
+}
+
+//-----------------------------------------------------------------------------
 void pqRubberBandHelper::endSelection()
 {
   this->setRubberBandOff();
@@ -361,7 +375,7 @@ void pqRubberBandHelper::processEvents(unsigned long eventId)
     return;
     }
 
-  vtkSMRenderViewProxy* rmp = 
+  vtkSMRenderViewProxy* rmp =
     this->Internal->RenderView->getRenderViewProxy();
   if (!rmp)
     {
@@ -382,32 +396,32 @@ void pqRubberBandHelper::processEvents(unsigned long eventId)
     {
     case vtkCommand::LeftButtonPressEvent:
       this->Xs = eventpos[0];
-      if (this->Xs < 0) 
+      if (this->Xs < 0)
         {
         this->Xs = 0;
         }
       this->Ys = eventpos[1];
-      if (this->Ys < 0) 
+      if (this->Ys < 0)
         {
         this->Ys = 0;
         }
       break;
     case vtkCommand::LeftButtonReleaseEvent:
       this->Xe = eventpos[0];
-      if (this->Xe < 0) 
+      if (this->Xe < 0)
         {
         this->Xe = 0;
         }
       this->Ye = eventpos[1];
-      if (this->Ye < 0) 
+      if (this->Ye < 0)
         {
         this->Ye = 0;
         }
-  
+
       int rect[4] = {this->Xs, this->Ys, this->Xe, this->Ye};
       int rectOut[4];
       this->ReorderBoundingBox(rect, rectOut);
-      if (this->Internal->RenderView) 
+      if (this->Internal->RenderView)
         {
         switch (this->Mode)
           {
@@ -434,6 +448,17 @@ void pqRubberBandHelper::processEvents(unsigned long eventId)
         case ZOOM:
           // nothing to do.
           this->Internal->RenderView->resetCenterOfRotationIfNeeded();
+          break;
+
+        case PICK:
+          this->Internal->RenderView->pick(rect);
+          break;
+
+        case PICK_ON_CLICK:
+          if (rect[0] == rect[2] && rect[1] == rect[3])
+            {
+            this->Internal->RenderView->pick(rect);
+            }
           break;
           }
         }

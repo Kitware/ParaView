@@ -678,6 +678,22 @@ void pqRenderView::emitSelectionSignal(QList<pqOutputPort*> opPorts)
 }
 
 //-----------------------------------------------------------------------------
+void pqRenderView::pick(int pos[2])
+{
+  vtkSMRenderViewProxy* renderView = this->getRenderViewProxy();
+  vtkSMRepresentationProxy* repr = renderView->Pick(pos[0], pos[1]);
+  if (repr)
+    {
+    pqDataRepresentation* pq_repr =
+      pqApplicationCore::instance()->getServerManagerModel()->findItem<pqDataRepresentation*>(repr);
+    if (pq_repr)
+      {
+      emit this->picked(pq_repr->getOutputPortFromInput());
+      }
+    }
+}
+
+//-----------------------------------------------------------------------------
 void pqRenderView::collectSelectionPorts(
   vtkCollection* selectedRepresentations,
   vtkCollection* selectionSources,

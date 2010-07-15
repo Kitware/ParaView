@@ -813,87 +813,6 @@ double vtkSMRenderViewProxy::GetZBufferValue(int x, int y)
 }
 
 //----------------------------------------------------------------------------
-vtkPVClientServerIdCollectionInformation* vtkSMRenderViewProxy
-  ::Pick(int xs, int ys, int xe, int ye)
-{
-  vtkProcessModule* processModule = NULL;
-  vtkSMProxyManager* proxyManager = NULL;
-  vtkSMProxy *areaPickerProxy = NULL;
-  vtkSMProxyProperty *setRendererMethod = NULL;
-  vtkSMDoubleVectorProperty *setCoordsMethod = NULL;
-  vtkSMProperty *pickMethod = NULL;
-
-  bool OK = true;
-
-  //create an areapicker and find its methods
-  processModule = vtkProcessModule::GetProcessModule();
-  if (!processModule)
-    {
-    vtkErrorMacro("Failed to find processmodule.");
-    OK = false;
-    }  
-  proxyManager = vtkSMObject::GetProxyManager();  
-  if (OK && !proxyManager)
-    {
-    vtkErrorMacro("Failed to find the proxy manager.");
-    OK = false;
-    }
-  areaPickerProxy = proxyManager->NewProxy("PropPickers", "AreaPicker"); 
-  if (OK && !areaPickerProxy)
-    {
-    vtkErrorMacro("Failed to make AreaPicker proxy.");
-    OK = false;
-    }
-  setRendererMethod = vtkSMProxyProperty::SafeDownCast(
-    areaPickerProxy->GetProperty("SetRenderer"));
-  if (OK && !setRendererMethod)
-    {
-    vtkErrorMacro("Failed to find the set renderer property.");
-    OK = false;
-    }
-  setCoordsMethod = vtkSMDoubleVectorProperty::SafeDownCast(
-    areaPickerProxy->GetProperty("SetPickCoords"));
-  if (OK && !setCoordsMethod)
-    {
-    vtkErrorMacro("Failed to find the set pick coords property.");
-    OK = false;
-    }
-  pickMethod = areaPickerProxy->GetProperty("Pick");
-  if (OK && !pickMethod)
-    {
-    vtkErrorMacro("Failed to find the pick property.");
-    OK = false;
-    }
-
-  vtkPVClientServerIdCollectionInformation *propCollectionInfo = NULL;    
-  if (OK)
-    {
-    //execute the areapick
-    setRendererMethod->AddProxy(this->RendererProxy);
-    setCoordsMethod->SetElements4(xs, ys, xe, ye);
-    areaPickerProxy->UpdateVTKObjects();   
-    pickMethod->Modified();
-    areaPickerProxy->UpdateVTKObjects();   
-    
-    //gather the results from the AreaPicker
-    propCollectionInfo = vtkPVClientServerIdCollectionInformation::New();
-    processModule->GatherInformation(
-      vtkProcessModuleConnectionManager::GetRootServerConnectionID(),
-      vtkProcessModule::RENDER_SERVER, 
-      propCollectionInfo, 
-      areaPickerProxy->GetID()
-      );
-    }
-
-  if (areaPickerProxy)
-    {
-    areaPickerProxy->Delete();
-    }
-  
-  return propCollectionInfo;
-}
-
-//-----------------------------------------------------------------------------
 void vtkSMRenderViewProxy::ResetCamera()
 {
   // Dont' call UpdateAllRepresentations() explicitly, since
@@ -1524,6 +1443,38 @@ bool vtkSMRenderViewProxy::SelectOnSurface(unsigned int x0,
   return true;
 }
 
+//-----------------------------------------------------------------------------
+vtkSMRepresentationProxy* vtkSMRenderViewProxy::Pick(unsigned int x, unsigned int y)
+{
+  // 1) Create surface selection.
+  //   Will returns a surface selection in terms of cells selected on the
+  //   visible props from all representations.
+  vtkSmartPointer<vtkSelection> surfaceSel;
+  surfaceSel.TakeReference(this->SelectVisibleCells(x, y, x, y, false));
+  vtkSMRenderViewProxyShrinkSelection(surfaceSel);
+
+  if (surfaceSel->GetNumberOfNodes() == 0)
+    {
+    return NULL;
+    }
+
+  vtkProp3D* prop = vtkProp3D::SafeDownCast(
+    surfaceSel->GetNode(0)->GetProperties()->Get(vtkSelectionNode::PROP()));
+
+  vtkSmartPointer<vtkCollectionIterator> iter;
+  iter.TakeReference(this->Representations->NewIterator());
+  for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
+    {
+    vtkSMPropRepresentationProxy* repr =
+      vtkSMPropRepresentationProxy::SafeDownCast(iter->GetCurrentObject());
+    if (repr && repr->HasVisibleProp3D(prop))
+      {
+      return repr;
+      }
+    }
+
+  return NULL;
+}
 
 //-----------------------------------------------------------------------------
 bool vtkSMRenderViewProxy::SelectFrustum(unsigned int x0, 

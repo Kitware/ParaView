@@ -104,12 +104,6 @@ public:
   virtual double GetZBufferValue(int x, int y);
 
   // Description:
-  // Performs a pick in the selected screen area and returns a list
-  // of ClientServerIds for the representation proxies hit.
-  vtkPVClientServerIdCollectionInformation* 
-    Pick(int xs, int ys, int xe, int ye);
-
-  // Description:
   // Reset camera to the given bounds.
   void ResetCamera(double bds[6]);
 
@@ -238,6 +232,13 @@ public:
     vtkCollection* frustumSelection=0,
     bool multiple_selections=true,
     bool ofPoints = false);
+
+  // Description:
+  // Locates the representation at the given location, if any, and returns it.
+  // Returns NULL, if the location does not have a valid representation visible.
+  // The implementation currently uses hardware selection alone. Hence it is
+  // supported only on nodes that can support hardware selection.
+  vtkSMRepresentationProxy* Pick(unsigned int x, unsigned int y);
 
   // Description:
   // Methods called by Representation proxies to add/remove the
