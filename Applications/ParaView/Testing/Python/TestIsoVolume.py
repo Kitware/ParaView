@@ -76,6 +76,8 @@ QtTesting.playCommand(object3, 'activate', '')
 object21 = 'pqClientMainWindow/variableToolbar/displayColor/Variables'
 QtTesting.playCommand(object21, 'set_string', 'AsH3')
 QtTesting.playCommand(object9, 'set_boolean', 'true')
+object22 = 'pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/CutFunction/pqImplicitPlaneWidget/show3DWidget'
+QtTesting.playCommand(object22, 'set_boolean', 'false')
 # DO_IMAGE_COMPARE
 QtTestingImage.compareImage(snapshotWidget, 'TestIsoVolume3.png', 300, 300);
 
