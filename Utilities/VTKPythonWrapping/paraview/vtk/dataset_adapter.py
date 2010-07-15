@@ -7,6 +7,11 @@ sure that it is installed properly.")
 from paraview import servermanager
 from paraview import numpy_support
 
+class ArrayAssociation :
+    POINT = 1
+    CELL  = 2
+    FIELD = 3
+
 class VTKObjectWrapper(object):
     "Superclass for classes that wrap VTK objects with Python objects."
     def __init__(self, vtkobject):
@@ -72,6 +77,7 @@ class VTKArray(numpy.matrix):
         # Input array is an already formed ndarray instance
         # We first cast to be our class type
         obj = numpy.asarray(input_array).view(cls)
+        obj.Association = ArrayAssociation.FIELD
         if len(obj.shape) == 1:
             obj = obj.reshape(obj.shape[0], 1)
         # add the new attributes to the created instance
@@ -79,6 +85,7 @@ class VTKArray(numpy.matrix):
         if dataset:
             import weakref
             obj.DataSet = weakref.ref(dataset)
+            # obj.DataSet = dataset
         # Finally, we must return the newly created object:
         return obj
 
@@ -86,11 +93,17 @@ class VTKArray(numpy.matrix):
         # Copy the VTK array only if the two share data
         slf = make_tensor_array_contiguous(self)
         obj2 = make_tensor_array_contiguous(obj)
-        if hasattr(slf, 'data') and hasattr(obj2, 'data') and \
-          slf.data == obj2.data:
-            self.VTKObject = getattr(obj, 'VTKObject', None)
-        else:
-            self.VTKObject = None
+
+        self.VTKObject = None
+        try:
+            # This line tells us that they are referring to the same buffer.
+            # Much like two pointers referring to same memory location in C/C++.
+            if buffer(slf) == buffer(obj2):
+                self.VTKObject = getattr(obj, 'VTKObject', None)
+        except TypeError:
+            pass
+
+        self.Association = getattr(obj, 'Association', None)
         self.DataSet = getattr(obj, 'DataSet', None)
 
     def __getattr__(self, name):
@@ -116,6 +129,7 @@ class DataSetAttributes(VTKObjectWrapper):
         self.VTKObject = vtkobject
         import weakref
         self.DataSet = weakref.ref(dataset)
+        self.Association = association
 
     def __getitem__(self, idx):
         """Implements the [] operator. Accepts an array name."""
@@ -126,7 +140,9 @@ class DataSetAttributes(VTKObjectWrapper):
         vtkarray = self.VTKObject.GetArray(idx)
         if not vtkarray:
             return None
-        return vtkDataArrayToVTKArray(vtkarray, self.DataSet())
+        array = vtkDataArrayToVTKArray(vtkarray, self.DataSet())
+        array.Association = self.Association
+        return array
 
     def keys(self):
         """Returns the names of the arrays as a list."""
