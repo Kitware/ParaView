@@ -166,12 +166,12 @@
         </item>
         <item>
          <property name="text">
-          <string>Top-Left</string>
+          <string>Top-Right</string>
          </property>
         </item>
         <item>
          <property name="text">
-          <string>Top-Right</string>
+          <string>Top-Left</string>
          </property>
         </item>
        </widget>
