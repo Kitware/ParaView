@@ -679,7 +679,11 @@ void vtkSMRenderViewProxy::PerformRender()
     this->RenderTimer->StartTimer();
     } 
 
-  this->GetRenderer()->ResetCameraClippingRange();
+  // Don't call this here, since we are observing ResetCameraClippingRangeEvent,
+  // every time the camera changes, that event gets fired and we automatically
+  // adjust the clipping range. This is totally unnecessary and it's messing
+  // with the cached selection buffer in parallel.
+  //this->GetRenderer()->ResetCameraClippingRange();
 
   vtkClientServerStream stream;
   stream << vtkClientServerStream::Invoke
@@ -1458,8 +1462,11 @@ vtkSMRepresentationProxy* vtkSMRenderViewProxy::Pick(unsigned int x, unsigned in
     return NULL;
     }
 
+  vtkClientServerID propID(
+    surfaceSel->GetNode(0)->GetProperties()->Get(vtkSelectionNode::PROP_ID()));
+
   vtkProp3D* prop = vtkProp3D::SafeDownCast(
-    surfaceSel->GetNode(0)->GetProperties()->Get(vtkSelectionNode::PROP()));
+    vtkProcessModule::GetProcessModule()->GetObjectFromID(propID));
 
   vtkSmartPointer<vtkCollectionIterator> iter;
   iter.TakeReference(this->Representations->NewIterator());

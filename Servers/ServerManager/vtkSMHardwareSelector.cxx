@@ -78,7 +78,7 @@ void vtkSMHardwareSelector::CaptureBuffers()
 
   if (this->CaptureTime < this->GetMTime())
     {
-    // cout << "Clear And ReCapture" << endl;
+    //cout << "Clear And ReCapture" << endl;
 
     vtkMemberFunctionCommand<vtkSMHardwareSelector>* observer =
       vtkMemberFunctionCommand<vtkSMHardwareSelector>::New();
@@ -119,13 +119,17 @@ void vtkSMHardwareSelector::CaptureBuffers()
 //----------------------------------------------------------------------------
 void vtkSMHardwareSelector::ClearBuffers()
 {
-  vtkPVHardwareSelector* selector = vtkPVHardwareSelector::SafeDownCast(
-    this->GetClientSideObject());
-  if (selector)
+  if (this->CaptureTime > this->GetMTime())
     {
-    selector->ClearBuffers();
+    // the check avoid calling ClearBuffers() when capture is happening.
+    vtkPVHardwareSelector* selector = vtkPVHardwareSelector::SafeDownCast(
+      this->GetClientSideObject());
+    if (selector)
+      {
+      selector->ClearBuffers();
+      }
+    this->Modified();
     }
-  this->Modified();
 }
 
 //----------------------------------------------------------------------------
