@@ -79,8 +79,12 @@ public:
     {
     if(timerId == this->TimerId && this->Target)
       {
+      bool need_render = this->Target->InteractiveRenderHappened;
       this->Target->SetForceInteractiveRender(false);
-      this->Target->Render();
+      if (need_render)
+        {
+        this->Target->Render();
+        }
       }
     this->Superclass::TimerEvent(timerId);
     this->CleanTimer();
@@ -128,8 +132,12 @@ public:
         int cur_enabled = this->Target->GetInteractiveRenderEnabled();
         if (cur_enabled)
           {
+          bool need_render = this->Target->InteractiveRenderHappened;
           this->Target->SetInteractiveRenderEnabled(0);
-          this->Target->Render();
+          if (need_render)
+            {
+            this->Target->Render();
+            }
           }
         }
       }
@@ -163,6 +171,7 @@ vtkPVGenericRenderWindowInteractor::vtkPVGenericRenderWindowInteractor()
   this->Timer->SetTarget(this);
   this->ForceInteractiveRender = false;
   this->NonInteractiveRenderDelay = 2000;
+  this->InteractiveRenderHappened = false;
 }
 
 //----------------------------------------------------------------------------
@@ -270,15 +279,17 @@ void vtkPVGenericRenderWindowInteractor::Render()
   // This should fix the problem of the plane widget render 
   if (this->InteractiveRenderEnabled)
     {
+    this->InteractiveRenderHappened = true;
     this->InvokeEvent(vtkCommand::InteractionEvent);
     this->PVRenderView->Render();
     }
-  else if (this->ForceInteractiveRender)
+  else if (this->ForceInteractiveRender && this->InteractiveRenderHappened)
     {
     this->PVRenderView->Render();
     }
   else
     {
+    this->InteractiveRenderHappened = false;
     this->PVRenderView->EventuallyRender();
     }
 }

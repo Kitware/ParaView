@@ -113,6 +113,7 @@ private:
   void operator=(const vtkPVGenericRenderWindowInteractor&); // Not implemented
 
   friend class vtkPVGenericRenderWindowInteractorTimer;
+  friend class vtkPVGenericRenderWindowInteractorObserver;
 
   vtkPVGenericRenderWindowInteractorTimer* Timer;
   vtkPVGenericRenderWindowInteractorObserver* Observer;
@@ -120,6 +121,7 @@ private:
   bool ForceInteractiveRender;
   vtkSetMacro(ForceInteractiveRender, bool);
   void DisableInteractiveRenderInternal();
+  bool InteractiveRenderHappened;
 };
 
 #endif
