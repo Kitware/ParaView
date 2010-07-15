@@ -679,11 +679,7 @@ void vtkSMRenderViewProxy::PerformRender()
     this->RenderTimer->StartTimer();
     } 
 
-  // Don't call this here, since we are observing ResetCameraClippingRangeEvent,
-  // every time the camera changes, that event gets fired and we automatically
-  // adjust the clipping range. This is totally unnecessary and it's messing
-  // with the cached selection buffer in parallel.
-  //this->GetRenderer()->ResetCameraClippingRange();
+  this->ResetCameraClippingRange();
 
   vtkClientServerStream stream;
   stream << vtkClientServerStream::Invoke
