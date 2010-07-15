@@ -330,7 +330,7 @@ void pq3DWidget::setWidgetProxy(vtkSMNewWidgetRepresentationProxy* pxy)
     {
     this->Internal->VTKConnect->Connect(pxy, vtkCommand::StartInteractionEvent,
       this, SIGNAL(widgetStartInteraction()));
-    this->Internal->VTKConnect->Connect(pxy, vtkCommand::StartInteractionEvent,
+    this->Internal->VTKConnect->Connect(pxy, vtkCommand::InteractionEvent,
       this, SLOT(setModified()));
     this->Internal->VTKConnect->Connect(pxy, vtkCommand::InteractionEvent,
       this, SIGNAL(widgetInteraction()));
