@@ -385,6 +385,7 @@ pqView* pqObjectBuilder::createView(const QString& type,
     }
 
   proxy->SetConnectionID(server->GetConnectionID());
+  proxy->UpdateVTKObjects();
 
   QString name = ::pqObjectBuilderGetName(proxy, this->NameGenerator);
   pxm->RegisterProxy("views", name.toAscii().data(), proxy);

@@ -24,4 +24,5 @@
   <pqevent object="pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/1/Viewport" command="mousePress" arguments="(0.414634,0.0233333,1,1,0)" />
   <pqevent object="pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/1/Viewport" command="mouseMove" arguments="(0.414634,0.0233333,1,0,0)" />
   <pqevent object="pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/1/Viewport" command="mouseRelease" arguments="(0.414634,0.0233333,1,0,0)" />
+  <pqevent object="pqClientMainWindow/menubar/menuTools" command="activate" arguments="actionTesting_Window_Size" />
 </pqevents>
