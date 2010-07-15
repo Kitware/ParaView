@@ -238,7 +238,7 @@ int vtkPVClipDataSet::ClipUsingThreshold(
 
   vtkDataObject* inputClone = inputDO->NewInstance();
   inputClone->ShallowCopy(inputDO);
-  threshold->SetInput(0, inputDO);
+  threshold->SetInput(0, inputClone);
   inputClone->FastDelete();
   threshold->SetInputArrayToProcess(0, 0, 0,
     vtkDataObject::FIELD_ASSOCIATION_CELLS, arrayname);
