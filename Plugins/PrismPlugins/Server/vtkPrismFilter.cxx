@@ -410,6 +410,58 @@ int vtkPrismFilter::RequestGeometryData(
                 polydata->InsertNextCell( VTK_VERTEX, 1, newIDs );
             }
 
+            vtkIdType pointId;
+            vtkIdType numberPts = newPoints->GetNumberOfPoints();
+
+
+            for(pointId=0;pointId<numberPts;pointId++)
+            {
+
+              double coords[3];
+
+              newPoints->GetPoint(pointId,coords);
+
+
+              if(this->GetSESAMEXLogScaling())
+              {
+                if(coords[0]>0)
+                {
+                  coords[0]=log(coords[0]);
+                }
+                else
+                {
+                  coords[0]=0.0;
+                }
+              }
+
+              if(this->GetSESAMEYLogScaling())
+              {
+                if(coords[1]>0)
+                {
+                  coords[1]=log(coords[1]);
+                }
+                else
+                {
+                  coords[1]=0.0;
+                }
+              }
+
+              if(this->GetSESAMEZLogScaling())
+              {
+                if(coords[2]>0)
+                {
+                  coords[2]=log(coords[2]);
+                }
+                else
+                {
+                  coords[2]=0.0;
+                }
+              }
+
+              newPoints->InsertPoint(pointId,coords);
+
+            }
+
             polydata->SetPoints( newPoints );
             newPoints->Delete();
             polydata->Squeeze();
@@ -444,9 +496,9 @@ int vtkPrismFilter::RequestGeometryData(
 
 vtkDoubleArray* vtkPrismFilter::GetRanges()
 {
-    this->Internal->Reader->GetRanges(this->Internal->RangeArray);
+  this->Internal->Reader->GetRanges(this->Internal->RangeArray);
 
-    return this->Internal->RangeArray;
+  return this->Internal->RangeArray;
 }
 
 
@@ -561,7 +613,7 @@ void vtkPrismFilter::SetSESAMEZLogScaling(bool b)
 
 bool vtkPrismFilter::GetSESAMEXLogScaling()
 {
-    return this->Internal->Reader->GetZLogScaling();
+    return this->Internal->Reader->GetXLogScaling();
 }
 
 bool vtkPrismFilter::GetSESAMEYLogScaling()
