@@ -128,8 +128,8 @@ QtTesting.playCommand(object22, 'set_string', 'Material volume fraction - 1')
 QtTesting.playCommand(object16, 'set_int', '44')
 QtTesting.playCommand(object17, 'set_int', '77')
 QtTesting.playCommand(object3, 'activate', '')
-QtTesting.playCommand(object21, 'set_string', 'Material volume fraction - 1 (partial)')
-QtTesting.playCommand(object9, 'set_boolean', 'true')
+#QtTesting.playCommand(object21, 'set_string', 'Material volume fraction - 1 (partial)')
+#QtTesting.playCommand(object9, 'set_boolean', 'true')
 # DO_IMAGE_COMPARE
 QtTestingImage.compareImage(snapshotWidget, 'TestIsoVolume5.png', 300, 300);
 QtTesting.playCommand(object7, 'activate', '')
