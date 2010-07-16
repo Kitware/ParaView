@@ -719,6 +719,56 @@
     </SourceProxy>
  </ProxyGroup>
  <ProxyGroup name="sources">
+   <SourceProxy name="PrismSESAMEReader"
+                class="vtkPrismSESAMEReader"
+                label="Prism SESAME Reader">
+     <Documentation
+       short_help="Read SESAME data files."
+       long_help="Read SESAME data files, producing rectilinear grids.">
+       The SESAME reader reads SESAME data files, and outputs rectilinear grids. The expected file extension is .sesame.
+     </Documentation>
+     <StringVectorProperty
+        name="FileName"
+        command="SetFileName"
+        animateable="0"
+        number_of_elements="1">
+        <FileListDomain name="files"/>
+        <Documentation>
+          This property specifies the file name for the SESAME reader.
+        </Documentation>
+     </StringVectorProperty>
+     <IntVectorProperty
+         name="TableId"
+         command="SetTable"
+         number_of_elements="1"
+         default_values="-1">
+         <EnumerationDomain name="enum">
+           <RequiredProperties>
+             <Property name="TableIds" function="Enumeration"/>
+          </RequiredProperties>
+         </EnumerationDomain>
+         <Documentation>
+           This proeprty indicates which table to read.
+         </Documentation>
+     </IntVectorProperty>
+     <IntVectorProperty
+         name="TableIds"
+         command="GetTableIdsAsArray"
+         information_only="1">
+         <IntArrayInformationHelper />
+     </IntVectorProperty>
+     <StringVectorProperty
+         name="TableArrayInfo"
+         information_only="1">
+         <ArraySelectionInformationHelper attribute_name="Table"/>
+     </StringVectorProperty>
+
+     <Hints>
+      <ReaderFactory extensions="sesame"
+          file_description="SESAME" />
+     </Hints>
+     <!-- End SESAMEReader -->
+   </SourceProxy>
    <SourceProxy name="PrismSurfaceReader"
                 class="vtkPrismSurfaceReader">
      <OutputPort name="SESAME Surface" index="0" />

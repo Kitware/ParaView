@@ -19,7 +19,7 @@ Module:    vtkPrismSurfaceReader.cxx
 #include "vtkRectilinearGrid.h"
 #include "vtkContourFilter.h"
 #include "vtkCellData.h"
-#include "vtkSESAMEReader.h"
+#include "vtkPrismSESAMEReader.h"
 #include "vtkRectilinearGridGeometryFilter.h"
 #include "vtkSmartPointer.h"
 #include "vtkPoints.h"
@@ -166,18 +166,36 @@ int vtkSESAMEConversionFilter::RequestData(
 
 
 
+     vtkStringArray* xName= vtkStringArray::SafeDownCast(input->GetFieldData()->GetAbstractArray("XAxisName"));
+     vtkStringArray* yName= vtkStringArray::SafeDownCast(input->GetFieldData()->GetAbstractArray("YAxisName"));
 
-    vtkSmartPointer<vtkFloatArray> densityArray= vtkSmartPointer<vtkFloatArray>::New();
-    densityArray->SetNumberOfComponents(1);
-    densityArray->Allocate(numPts);
-    densityArray->SetName("Density");
-    densityArray->SetNumberOfTuples(numPts);
 
-    vtkSmartPointer<vtkFloatArray> temperatureArray= vtkSmartPointer<vtkFloatArray>::New();
-    temperatureArray->SetNumberOfComponents(1);
-    temperatureArray->Allocate(numPts);
-    temperatureArray->SetName("Temperature");
-    temperatureArray->SetNumberOfTuples(numPts);
+
+    vtkSmartPointer<vtkFloatArray> xArray= vtkSmartPointer<vtkFloatArray>::New();
+    xArray->SetNumberOfComponents(1);
+    xArray->Allocate(numPts);
+    if(xName)
+    {
+      xArray->SetName(xName->GetValue(0).c_str());
+    }
+    else
+    {
+      xArray->SetName("Density");
+    }
+    xArray->SetNumberOfTuples(numPts);
+
+    vtkSmartPointer<vtkFloatArray> yArray= vtkSmartPointer<vtkFloatArray>::New();
+    yArray->SetNumberOfComponents(1);
+    yArray->Allocate(numPts);
+    if(yName)
+    {
+      yArray->SetName(yName->GetValue(0).c_str());
+    }
+    else
+    {
+      yArray->SetName("Temperature");
+    }
+    yArray->SetNumberOfTuples(numPts);
 
 
     vtkSmartPointer<vtkPoints> newPts = vtkSmartPointer<vtkPoints>::New();
@@ -189,12 +207,12 @@ int vtkSESAMEConversionFilter::RequestData(
         {
         double coords[3];
         inPts->GetPoint(ptId,coords);
-        densityArray->InsertValue(ptId,coords[0]*this->Conversions[0]);
-        temperatureArray->InsertValue(ptId,coords[1]*this->Conversions[1]);
+        xArray->InsertValue(ptId,coords[0]*this->Conversions[0]);
+        yArray->InsertValue(ptId,coords[1]*this->Conversions[1]);
         }
 
-    localOutput->GetPointData()->AddArray(densityArray);
-    localOutput->GetPointData()->AddArray(temperatureArray);
+    localOutput->GetPointData()->AddArray(xArray);
+    localOutput->GetPointData()->AddArray(yArray);
 
 
     Output->ShallowCopy(localOutput);
@@ -210,7 +228,7 @@ int vtkSESAMEConversionFilter::RequestData(
 class vtkPrismSurfaceReader::MyInternal
     {
     public:
-         vtkSmartPointer<vtkSESAMEReader> Reader;
+         vtkSmartPointer<vtkPrismSESAMEReader> Reader;
         vtkSmartPointer<vtkSESAMEConversionFilter> ConversionFilter;
          vtkSmartPointer<vtkRectilinearGridGeometryFilter> RectGridGeometry;
         vtkSmartPointer<vtkContourFilter> ContourFilter;
@@ -288,7 +306,7 @@ class vtkPrismSurfaceReader::MyInternal
 
             this->ContourFilter=vtkSmartPointer<vtkContourFilter>::New();
 
-            this->Reader =  vtkSmartPointer<vtkSESAMEReader>::New();
+            this->Reader =  vtkSmartPointer<vtkPrismSESAMEReader>::New();
             this->RectGridGeometry =  vtkSmartPointer<vtkRectilinearGridGeometryFilter>::New();
 
             this->RectGridGeometry->SetInput(this->Reader->GetOutput());
@@ -666,8 +684,12 @@ void vtkPrismSurfaceReader::SetThresholdYBetween(double lower, double upper)
 vtkStringArray* vtkPrismSurfaceReader::GetAxisVarNames()
     {
     this->Internal->ArrayNames->Reset();
-    this->Internal->ArrayNames->InsertNextValue("Density");
-    this->Internal->ArrayNames->InsertNextValue("Temperature");
+    //this->Internal->ArrayNames->InsertNextValue("Density");
+    //this->Internal->ArrayNames->InsertNextValue("Temperature");
+
+
+this->Internal->ArrayNames->InsertNextValue(this->Internal->Reader->GetTableXAxisName());
+this->Internal->ArrayNames->InsertNextValue(this->Internal->Reader->GetTableYAxisName());
 
     int numberArrayNames=this->Internal->Reader->GetNumberOfTableArrayNames();
     for(int i=0;i<numberArrayNames;i++)
