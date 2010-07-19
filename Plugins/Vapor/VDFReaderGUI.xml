@@ -1,0 +1,6 @@
+<ParaViewReaders>
+  <Reader name="VDFReader"
+    extensions="vdf"
+    file_description="Vapor Data File">
+  </Reader>
+</ParaViewReaders>
