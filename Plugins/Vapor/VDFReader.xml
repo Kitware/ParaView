@@ -1,0 +1,106 @@
+<ServerManagerConfiguration>
+  <!-- Begin VDFReader -->
+  <ProxyGroup name="sources">
+    <SourceProxy name="VDFReader" class="vtkVDFReader" label="VDF Reader">
+      <Documentation
+        short_help="Read NCAR Vapor files."
+        long_help="Read NCAR Vapor format atmospheric, oceanic, and solar research format files.">
+        The Vapor Data Format (VDF) reader loads wavelet compressed data files. The refinement parameter controls the resolution of the data that is read in which gives you a speed/fidelity tradeoff control. See http://www.vapor.ucar.edu.
+      </Documentation>
+
+      <StringVectorProperty
+        name="FileName"
+        command="SetFileName"
+        number_of_elements="1">
+        <FileListDomain name="files"/>
+      </StringVectorProperty>
+
+      <IntVectorProperty
+         name="RefinementRangeInfo"
+         command="GetRefinementRange"
+         number_of_elements="2"
+         default_values="0 0"
+         information_only="1">
+         <SimpleIntInformationHelper/>
+      </IntVectorProperty>
+
+      <IntVectorProperty
+         name="Refinement"
+         command="SetRefinement"
+         number_of_elements="1"
+         default_values="0"
+         animateable="0"
+         information_property="RefinementRangeInfo" >
+        <IntRangeDomain name="range">
+           <RequiredProperties>
+              <Property name="RefinementRangeInfo" function="Range"/>
+           </RequiredProperties>
+        </IntRangeDomain>
+        <Documentation>
+          This property controls the maximum refinement level
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty
+        name="Variable Type"
+        command="SetVariableType"
+        number_of_elements="1"
+        default_values="0">
+                <EnumerationDomain name="enum">
+                  <Entry value="0" text="3D XYZ" />
+                  <Entry value="1" text="2D  XY" />
+                  <Entry value="2" text="2D  XZ" />
+                  <Entry value="3" text="2D  YZ" />
+                </EnumerationDomain>
+      </IntVectorProperty>
+
+          <StringVectorProperty
+            name="PointArrayInfo"
+                information_only="1" >
+                <ArraySelectionInformationHelper
+                  attribute_name="Point" />
+          </StringVectorProperty>
+
+          <StringVectorProperty
+            name="PointArrayStatus" command="SetPointArrayStatus"
+                number_of_elements="0"
+                repeat_command="1" number_of_elements_per_command="2"
+                element_types="2 0"
+                information_property="PointArrayInfo"
+                label="Point Arrays">
+                <ArraySelectionDomain name="array_list">
+                  <RequiredProperties>
+                        <Property name="PointArrayInfo"
+                                  function="ArrayList" />
+                  </RequiredProperties>
+                </ArraySelectionDomain>
+          </StringVectorProperty>
+
+      <IntVectorProperty
+        name="Cache size (MB)"
+        command="SetCacheSize"
+        number_of_elements="1"
+        default_values="1024">
+      </IntVectorProperty>
+
+      <DoubleVectorProperty
+            name="TimeRange"
+                information_only="1" >
+                <TimeRangeInformationHelper/>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+                name="TimestepValues"
+                information_only="1" >
+                <TimeStepsInformationHelper/>
+      </DoubleVectorProperty>
+
+      <Hints>
+        <ReaderFactory extensions="vdf"
+           file_description="Vapor Data File"/>
+      </Hints>
+
+    </SourceProxy>
+  </ProxyGroup>
+  <!-- End VDFReader -->
+</ServerManagerConfiguration>
