@@ -153,6 +153,7 @@ void vtkSMContextViewProxy::PerformRender()
 {
   int size[2];
   this->GetGUISize(size);
+  this->GetChartView()->Render();
 }
 
 //----------------------------------------------------------------------------
@@ -160,5 +161,3 @@ void vtkSMContextViewProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 }
-
-
