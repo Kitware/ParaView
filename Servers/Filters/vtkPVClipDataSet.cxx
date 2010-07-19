@@ -100,43 +100,16 @@ int vtkPVClipDataSet::RequestData(vtkInformation* request,
     if (!this->GetClipFunction())
       {
       // This is a lot to go through to get the name of the array to process.
-      vtkInformationVector *inArrayVec =
-        this->GetInformation()->Get(INPUT_ARRAYS_TO_PROCESS());
-      if (!inArrayVec)
-        {
-        vtkErrorMacro("Problem finding array to process");
-        return 1;
-        }
-      vtkInformation *inArrayInfo = inArrayVec->GetInformationObject(0);
-      if (!inArrayInfo)
-        {
-        vtkErrorMacro("Problem getting name of array to process.");
-        return 1;
-        }
-      if ( ! inArrayInfo->Has(vtkDataObject::FIELD_NAME()))
-        {
-        vtkErrorMacro("Missing field name.");
-        return 1;
-        }
-      const char *arrayNameToProcess =
-        inArrayInfo->Get(vtkDataObject::FIELD_NAME());
-
-      if(!arrayNameToProcess)
-        {
-        vtkErrorMacro("Unable to find valid array.");
-        return 1;
-        }
-
+      vtkInformation* inArrayInfo = this->GetInputArrayInformation(0);
       int fieldAssociation(-1);
-      if(!inArrayInfo->Has(vtkDataObject::FIELD_ASSOCIATION()))
+      if (!inArrayInfo->Has(vtkDataObject::FIELD_ASSOCIATION()))
         {
         vtkErrorMacro("Unable to query field association for the scalar.");
         return 1;
         }
-
       fieldAssociation = inArrayInfo->Get(vtkDataObject::FIELD_ASSOCIATION());
 
-      if(fieldAssociation == vtkDataObject::FIELD_ASSOCIATION_POINTS)
+      if (fieldAssociation == vtkDataObject::FIELD_ASSOCIATION_POINTS)
         {
         return this->ClipUsingSuperclass(request, inputVector, outputVector);
         }
@@ -159,18 +132,14 @@ int vtkPVClipDataSet::RequestData(vtkInformation* request,
           amrDC->SetInput(0, inputClone);
           inputClone->FastDelete();
 
-          amrDC->SetInputArrayToProcess(
-            0, 0, 0, vtkDataObject::FIELD_ASSOCIATION_CELLS,
-            arrayNameToProcess);
-
+          amrDC->SetInputArrayToProcess(0,
+            this->GetInputArrayInformation(0));
           amrDC->Update();
-
           outDataObj->ShallowCopy(amrDC->GetOutput(0));
           }
         else
           {
-          return this->ClipUsingThreshold(request, inputVector, outputVector,
-            arrayNameToProcess);
+          return this->ClipUsingThreshold(request, inputVector, outputVector);
           }
         return 1;
         }
@@ -199,23 +168,20 @@ int vtkPVClipDataSet::RequestData(vtkInformation* request,
       return 1;
       }
 
-    vtkDataArray* dArray (this->GetInputArrayToProcess(0, ds));
-    if(!dArray)
-      {
-      vtkErrorMacro("Failed to get data array.");
-      return 1;
-      }
-
+    int association = this->GetInputArrayAssociation(0, ds);
     // If using point scalars.
-    if(ds->GetNumberOfPoints() == dArray->GetNumberOfTuples())
+    if (association == vtkDataObject::FIELD_ASSOCIATION_POINTS)
       {
       return this->ClipUsingSuperclass(request, inputVector, outputVector);
       } // End if using point scalars.
-    else
+    else if (association == vtkDataObject::FIELD_ASSOCIATION_CELLS)
       {
       // Use vtkPVThreshold here.
-      return this->ClipUsingThreshold(request, inputVector, outputVector,
-        dArray->GetName());
+      return this->ClipUsingThreshold(request, inputVector, outputVector);
+      }
+    else
+      {
+      vtkErrorMacro("Unhandled association: " <<  association);
       }
     } // End for vtkDataSet.
 
@@ -225,7 +191,7 @@ int vtkPVClipDataSet::RequestData(vtkInformation* request,
 //----------------------------------------------------------------------------
 int vtkPVClipDataSet::ClipUsingThreshold(
   vtkInformation* , vtkInformationVector** inputVector,
-  vtkInformationVector* outputVector, const char* arrayname)
+  vtkInformationVector* outputVector)
 {
   vtkDataObject* inputDO = vtkDataObject::GetData(inputVector[0], 0);
   vtkDataObject* outputDO = vtkDataObject::GetData(outputVector, 0);
@@ -240,8 +206,7 @@ int vtkPVClipDataSet::ClipUsingThreshold(
   inputClone->ShallowCopy(inputDO);
   threshold->SetInput(0, inputClone);
   inputClone->FastDelete();
-  threshold->SetInputArrayToProcess(0, 0, 0,
-    vtkDataObject::FIELD_ASSOCIATION_CELLS, arrayname);
+  threshold->SetInputArrayToProcess(0, this->GetInputArrayInformation(0));
 
   if (this->GetInsideOut())
     {

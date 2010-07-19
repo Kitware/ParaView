@@ -68,7 +68,7 @@ protected:
     vtkInformationVector* outputVector);
   int ClipUsingThreshold(
     vtkInformation* request, vtkInformationVector** inputVector,
-    vtkInformationVector* outputVector, const char* arrayname);
+    vtkInformationVector* outputVector);
 
   bool UseAMRDualClipForAMR;
 private:
