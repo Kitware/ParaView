@@ -334,6 +334,11 @@ void vtkSMContextNamedOptionsProxy::UpdatePropertyInformationInternal(
       newValues->AddString(
         QString::number(plotInfo.MarkerStyle).toAscii().data());
       }
+    else if (strcmp(propertyName, "PlotCornerInfo") == 0)
+      {
+      newValues->AddString(
+        QString::number(plotInfo.Corner).toAscii().data());
+      }
     else
       {
       skip = true;

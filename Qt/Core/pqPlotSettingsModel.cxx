@@ -364,9 +364,10 @@ void pqPlotSettingsModel::setSeriesAxisCorner(int row, int value)
 }
 
 //-----------------------------------------------------------------------------
-int pqPlotSettingsModel::getSeriesAxisCorner(int) const
+int pqPlotSettingsModel::getSeriesAxisCorner(int row) const
 {
-  return 0;
+  return vtkSMPropertyHelper(this->Implementation->RepresentationProxy,
+    "SeriesPlotCorner").GetStatus(this->getSeriesName(row), 1);
 }
 
 //-----------------------------------------------------------------------------
