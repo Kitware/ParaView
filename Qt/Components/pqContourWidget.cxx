@@ -86,7 +86,7 @@ pqContourWidget::pqContourWidget(
 
   QObject::connect(this->Internals->EditMode, SIGNAL(toggled(bool)),
     this, SLOT(updateMode()));
-  QObject::connect(this->Internals->DrawMode, SIGNAL(toggled(bool)),
+  QObject::connect(this->Internals->ModifyMode, SIGNAL(toggled(bool)),
     this, SLOT(updateMode()));
   QObject::connect(this->Internals->Finished, SIGNAL(clicked()),
     this, SLOT(finishContour()));
@@ -192,7 +192,8 @@ void pqContourWidget::checkContourLoopClosed()
       {
       this->Internals->Closed->blockSignals(true);
       this->Internals->Closed->setChecked(1);
-      this->Internals->Closed->blockSignals(0);
+      this->Internals->Closed->blockSignals(false);
+      this->Internals->ModifyMode->setChecked(1);
       emit this->contourLoopClosed();
       }
     }
@@ -215,7 +216,7 @@ void pqContourWidget::closeLoop(bool val)
         {
         widget->InvokeCommand("CloseLoop");
         }
-      this->Internals->DrawMode->setChecked(val);
+      this->Internals->ModifyMode->setChecked(val);
       pqSMAdaptor::setElementProperty(
         widget->GetRepresentationProxy()->GetProperty("ClosedLoop"), val);
       widget->GetRepresentationProxy()->UpdateVTKObjects();
@@ -236,7 +237,7 @@ void pqContourWidget::updateMode()
        pqSMAdaptor::setElementProperty(
         widget->GetProperty("WidgetState"), 1);
       }
-    else if (this->Internals->DrawMode->isChecked() )
+    else if (this->Internals->ModifyMode->isChecked() )
       {
       pqSMAdaptor::setElementProperty(
         widget->GetProperty("WidgetState"), 2);

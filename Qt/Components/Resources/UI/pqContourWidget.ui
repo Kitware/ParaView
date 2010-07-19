@@ -98,7 +98,7 @@ p, li { white-space: pre-wrap; }
          <item>
           <widget class="QRadioButton" name="EditMode">
            <property name="text">
-            <string> Edit Mode</string>
+            <string>Edit Mode</string>
            </property>
            <property name="checked">
             <bool>true</bool>
@@ -106,9 +106,9 @@ p, li { white-space: pre-wrap; }
           </widget>
          </item>
          <item>
-          <widget class="QRadioButton" name="DrawMode">
+          <widget class="QRadioButton" name="ModifyMode">
            <property name="text">
-            <string> Draw Mode</string>
+            <string>Modify Mode</string>
            </property>
           </widget>
          </item>
