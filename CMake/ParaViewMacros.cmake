@@ -159,7 +159,8 @@ FUNCTION (add_executable_with_forwarding2
   ENDIF (APPLE)
 
   SET(PV_EXE_SUFFIX)
-  IF (BUILD_SHARED_LIBS AND CMAKE_SKIP_RPATH AND NOT mac_bundle)
+  message("CMAKE_SKIP_RPATH ${CMAKE_SKIP_RPATH}")
+  IF (BUILD_SHARED_LIBS AND NOT mac_bundle)
     IF(NOT WIN32)
       SET(exe_output_path ${EXECUTABLE_OUTPUT_PATH})
       IF (NOT EXECUTABLE_OUTPUT_PATH)
@@ -186,7 +187,7 @@ FUNCTION (add_executable_with_forwarding2
         ${CMAKE_CURRENT_BINARY_DIR}/${exe_name}-forward.c)
       ADD_DEPENDENCIES(${exe_name} ${exe_name}${PV_EXE_SUFFIX})
     ENDIF(NOT WIN32)
-  ENDIF (BUILD_SHARED_LIBS AND CMAKE_SKIP_RPATH AND NOT mac_bundle)
+  ENDIF (BUILD_SHARED_LIBS AND NOT mac_bundle)
 
   add_executable(${exe_name}${PV_EXE_SUFFIX} ${ARGN})
 

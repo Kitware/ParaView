@@ -94,6 +94,8 @@ SET(VTK_DONT_INCLUDE_USE_X 1)
 
 # Choose static or shared libraries.  This provides BUILD_SHARED_LIBS
 # and VTK_USE_RPATH.
+# Always force RPATH on. Make install and cpack should strip out RPATH as necessary.
+SET(VTK_FORCE_RPATH ON)
 INCLUDE(${VTK_CMAKE_DIR}/vtkSelectSharedLibraries.cmake)
 
 # ParaView needs static Tcl/Tk if not using shared libraries.
