@@ -98,6 +98,11 @@ vtkContextView* vtkSMContextViewProxy::GetChartView()
 //-----------------------------------------------------------------------------
 vtkImageData* vtkSMContextViewProxy::CaptureWindow(int magnification)
 {
+  // Now update all representation pipelines - should not be necessary once
+  // ParaView is ported to use vtkRenderViewBase, and handle the logic
+  // centrally for all views derived from the base view.
+  this->UpdateAllRepresentations();
+
   this->GetChartView()->Render();
 
   vtkWindowToImageFilter* w2i = vtkWindowToImageFilter::New();
