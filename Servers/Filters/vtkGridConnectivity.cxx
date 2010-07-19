@@ -776,7 +776,7 @@ void vtkGridConnectivity::InitializeIntegrationArrays(
 
   //only supports double arrays
   int numPointArrays = inputs[0]->GetPointData()->GetNumberOfArrays();
-  for ( arrayIndex = 0; arrayIndex < numCellArrays; ++arrayIndex)
+  for ( arrayIndex = 0; arrayIndex < numPointArrays; ++arrayIndex)
     {
     vtkDoubleArray* da = vtkDoubleArray::SafeDownCast(
       inputs[0]->GetPointData()->GetArray(arrayIndex));
