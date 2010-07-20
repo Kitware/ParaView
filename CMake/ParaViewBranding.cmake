@@ -282,7 +282,7 @@ FUNCTION(build_paraview_client BPC_NAME)
     INSTALL(TARGETS ${BPC_NAME}
       DESTINATION ${BPC_INSTALL_BIN_DIR}
       COMPONENT BrandedRuntime)
-  ENDIF(NOT MAKE_BUNDLE)
+  ENDIF(NOT DEFINED MAKE_BUNDLE)
 
   IF (pv_exe_suffix)
     # Shared forwarding enabled.
