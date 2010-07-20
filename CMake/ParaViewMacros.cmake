@@ -177,7 +177,7 @@ FUNCTION (add_executable_with_forwarding2
         SET (PV_FORWARD_PATH_INSTALL "${PV_FORWARD_PATH_INSTALL},\"${dir}\"")
       ENDFOREACH(dir)
 
-      SET(PV_FORWARD_EXE ${exe_name}${PV_EXE_SUFFIX})
+      SET(PV_FORWARD_EXE ${exe_name})
       CONFIGURE_FILE(
         ${ParaView_CMAKE_DIR}/pv-forward.c.in
         ${CMAKE_CURRENT_BINARY_DIR}/${exe_name}-forward.c
