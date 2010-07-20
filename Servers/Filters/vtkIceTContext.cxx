@@ -84,6 +84,7 @@ void vtkIceTContext::SetController(vtkMultiProcessController *controller)
     MPI_Comm mpiComm = *communicator->GetMPIComm()->GetHandle();
     IceTCommunicator icetComm = icetCreateMPICommunicator(mpiComm);
     newContext = icetCreateContext(icetComm);
+    icetDestroyMPICommunicator(icetComm);
 
     if (this->Controller)
       {
