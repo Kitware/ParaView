@@ -278,9 +278,12 @@ FUNCTION(build_paraview_client BPC_NAME)
     ${BPC_EXTRA_DEPENDENCIES}
     )
 
-  INSTALL(TARGETS ${BPC_NAME}
-    DESTINATION ${BPC_INSTALL_BIN_DIR}
-    COMPONENT BrandedRuntime)
+  IF(NOT DEFINED MAKE_BUNDLE)
+    INSTALL(TARGETS ${BPC_NAME}
+      DESTINATION ${BPC_INSTALL_BIN_DIR}
+      COMPONENT BrandedRuntime)
+  ENDIF(NOT MAKE_BUNDLE)
+
   IF (pv_exe_suffix)
     # Shared forwarding enabled.
     INSTALL(TARGETS ${pv_exe_name}
