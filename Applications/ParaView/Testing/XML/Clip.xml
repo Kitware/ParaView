@@ -84,6 +84,7 @@
   <pqevent object="pqClientMainWindow/pqCameraDialog/groupBox_2/viewsGroup/viewZPlus" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/pqCameraDialog/groupBox_2/viewsGroup/viewYMinus" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/pqCameraDialog/closeButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/cameraToolbar/actionResetCamera" command="activate" arguments="" />
 
   <!-- Do some pick-to-select testing -->
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuTools" />
@@ -96,6 +97,7 @@
   <pqevent object="pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/0/Viewport" command="mousePress" arguments="(0.58,0.266667,1,1,0)" />
   <pqevent object="pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/0/Viewport" command="mouseMove" arguments="(0.58,0.266667,1,0,0)" />
   <pqevent object="pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/0/Viewport" command="mouseRelease" arguments="(0.58,0.266667,1,0,0)" />
+  <!--
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuSources" />
   <pqevent object="pqClientMainWindow/menubar/menuSources" command="activate" arguments="SphereSource" />
   <pqevent object="pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/Radius" command="set_string" arguments="1" />
@@ -117,4 +119,5 @@
   <pqevent object="pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/0/Viewport" command="mouseMove" arguments="(0.503333,0.583333,1,0,0)" />
   <pqevent object="pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/0/Viewport" command="mouseRelease" arguments="(0.503333,0.583333,1,0,0)" />
   <pqevent object="pqClientMainWindow/menubar/menuTools" command="activate" arguments="actionTesting_Window_Size" />
+  -->
 </pqevents>
