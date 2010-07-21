@@ -22,7 +22,7 @@ ENDMACRO (process_args)
 SET (TEST_GROUP_SIZE 3)
 
 FUNCTION (add_pv_test prefix skip_test_flag_suffix)
-  PV_PARSE_ARGUMENTS(ACT "TEST_SCRIPTS;BASELINE_DIR;COMMAND" "" ${ARGN})
+  PV_PARSE_ARGUMENTS(ACT "TEST_SCRIPTS;BASELINE_DIR;COMMAND" "PARALLEL" ${ARGN})
   while (ACT_TEST_SCRIPTS)
     set (counter 0)
     set (extra_args)
@@ -66,6 +66,10 @@ FUNCTION (add_pv_test prefix skip_test_flag_suffix)
         ${extra_args}
         --exit
         )
+      if(${ACT_PARALLEL} STREQUAL "FALSE")
+        set_tests_properties("${prefix}${full_test_name}" PROPERTIES RUN_SERIAL ON)
+      endif()
+      #if (ACT_PARALLEL
     endif (extra_args)
   endwhile (ACT_TEST_SCRIPTS)
 

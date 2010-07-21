@@ -159,12 +159,14 @@ SET (ViewSettingsDialog_DISABLE_CRS TRUE)
 SET (CutMulti_REVERSE_CONNECT TRUE)
 
 add_client_tests("pv"
-  TEST_SCRIPTS ${TESTS_WITHOUT_BASELINES})
+  TEST_SCRIPTS ${TESTS_WITHOUT_BASELINES}
+  PARALLEL)
 
 IF (PARAVIEW_DATA_ROOT)
   add_client_tests("pv"
     BASELINE_DIR ${PARAVIEW_DATA_ROOT}/Baseline
     TEST_SCRIPTS ${TESTS_WITH_BASELINES}
+    PARALLEL
   )
 
   add_client_server_tests("pvcs"

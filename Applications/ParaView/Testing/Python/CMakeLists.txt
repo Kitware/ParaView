@@ -22,11 +22,13 @@ set (TestIsoVolume_BREAK TRUE)
 SET(SaveLargeScreenshot_THRESHOLD 10000)
 
 add_client_tests(
-  TEST_SCRIPTS ${TESTS_WITHOUT_BASELINES})
+  TEST_SCRIPTS ${TESTS_WITHOUT_BASELINES}
+  PARALLEL)
 
 IF (PARAVIEW_DATA_ROOT)
   add_client_tests("pypv"
     TEST_SCRIPTS ${TESTS_WITH_BASELINES}
+    PARALLEL
   )
 
   add_client_server_tests("pypvcs"
