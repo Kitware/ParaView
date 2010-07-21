@@ -105,7 +105,7 @@ static void vtkPythonAppInitPrependPath(const char* self_dir)
   pkg_prefix += "/..";
 #endif
   vtkPythonAppInitPrependPath2(pkg_prefix, "Utilities/mpi4py");
-  if (vtkPythonAppInitPrependPath2(pkg_prefix, "Utilities/VTKPythonWrapping"))
+  if (vtkPythonAppInitPrependPath2(pkg_prefix, "Utilities/VTKPythonWrapping/site-packages"))
     {
     // This executable is running from the build tree.  Prepend the
     // library directory to the search path.
