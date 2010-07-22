@@ -142,6 +142,9 @@ int vtkSMProxyRegisterUndoElement::Redo()
     vtkErrorMacro("Failed to locate the proxy to register.");
     return 0;
     }
+  // ensure that the proxy is alive and well before registering it.
+  proxy->UpdateVTKObjects();
+
   vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
   pxm->RegisterProxy(group_name, proxy_name, proxy);
   // We note that the proxy is registered after its state has been 
