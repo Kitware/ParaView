@@ -20,18 +20,6 @@
   <pqevent object="pqPipelineTimeKeyFrameEditor/container/pqKeyFrameEditor/tableView" command="mousePress" arguments="1,1,0,52,19,/1:2" />
   <pqevent object="pqPipelineTimeKeyFrameEditor/container/pqKeyFrameEditor/tableView" command="mouseRelease" arguments="1,0,0,52,19,/1:2" />
   <pqevent object="pqPipelineTimeKeyFrameEditor/container/pqKeyFrameEditor/tableView" command="keyEvent" arguments="6,48,536870912,0,0,1" />
-  <pqevent object="pqPipelineTimeKeyFrameEditor/container/pqKeyFrameEditor/tableView/qt_scrollarea_viewport/1QLineEdit0" command="set_string" arguments="0" />
-  <pqevent object="pqPipelineTimeKeyFrameEditor/container/pqKeyFrameEditor/tableView" command="keyEvent" arguments="7,48,536870912,0,0,1" />
-  <pqevent object="pqPipelineTimeKeyFrameEditor/container/pqKeyFrameEditor/tableView" command="keyEvent" arguments="7,48,536870912,0,0,1" />
-  <pqevent object="pqPipelineTimeKeyFrameEditor/container/pqKeyFrameEditor/tableView/qt_scrollarea_viewport/1QLineEdit0" command="key" arguments="46" />
-  <pqevent object="pqPipelineTimeKeyFrameEditor/container/pqKeyFrameEditor/tableView" command="keyEvent" arguments="7,46,536870912,.,0,1" />
-  <pqevent object="pqPipelineTimeKeyFrameEditor/container/pqKeyFrameEditor/tableView" command="keyEvent" arguments="7,46,536870912,.,0,1" />
-  <pqevent object="pqPipelineTimeKeyFrameEditor/container/pqKeyFrameEditor/tableView/qt_scrollarea_viewport/1QLineEdit0" command="set_string" arguments="0.0" />
-  <pqevent object="pqPipelineTimeKeyFrameEditor/container/pqKeyFrameEditor/tableView" command="keyEvent" arguments="7,48,536870912,0,0,1" />
-  <pqevent object="pqPipelineTimeKeyFrameEditor/container/pqKeyFrameEditor/tableView" command="keyEvent" arguments="7,48,536870912,0,0,1" />
-  <pqevent object="pqPipelineTimeKeyFrameEditor/container/pqKeyFrameEditor/tableView/qt_scrollarea_viewport/1QLineEdit0" command="set_string" arguments="0.00" />
-  <pqevent object="pqPipelineTimeKeyFrameEditor/container/pqKeyFrameEditor/tableView" command="keyEvent" arguments="7,48,536870912,0,0,1" />
-  <pqevent object="pqPipelineTimeKeyFrameEditor/container/pqKeyFrameEditor/tableView" command="keyEvent" arguments="7,48,536870912,0,0,1" />
   <pqevent object="pqPipelineTimeKeyFrameEditor/container/pqKeyFrameEditor/tableView/qt_scrollarea_viewport/1QLineEdit0" command="set_string" arguments="0.002" />
   <pqevent object="pqPipelineTimeKeyFrameEditor/container/pqKeyFrameEditor/tableView" command="keyEvent" arguments="7,50,536870912,2,0,1" />
   <pqevent object="pqPipelineTimeKeyFrameEditor/container/pqKeyFrameEditor/tableView" command="keyEvent" arguments="7,50,536870912,2,0,1" />
