@@ -76,10 +76,6 @@ vtkSMXYChartViewProxy::~vtkSMXYChartViewProxy()
 vtkContextView* vtkSMXYChartViewProxy::NewChartView()
 {
   // Construct a new chart view and return the view of it
-
-  // Use the buffer id - performance issues are fixed.
-  this->ChartView->GetScene()->SetUseBufferId(true);
-
   return this->ChartView;
 }
 
