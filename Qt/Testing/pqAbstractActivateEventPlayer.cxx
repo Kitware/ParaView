@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -81,7 +81,7 @@ bool pqAbstractActivateEventPlayer::playEvent(QObject* Object,
 
   if(QMenu* const object = qobject_cast<QMenu*>(Object))
     {
-    
+
     QAction* action = NULL;
     QList<QAction*> actions = object->actions();
     for(int j = 0; j != actions.size() && !action; ++j)
@@ -91,7 +91,7 @@ bool pqAbstractActivateEventPlayer::playEvent(QObject* Object,
         action = actions[j];
         }
       }
-    
+
     // fall back to the text of the action
     if(!action)
       {
@@ -111,11 +111,11 @@ bool pqAbstractActivateEventPlayer::playEvent(QObject* Object,
       return true;
       }
 
-    // get a list of menus that must be navigated to 
+    // get a list of menus that must be navigated to
     // click on the action
     QObjectList menus;
-    for(QObject* p = object; 
-        qobject_cast<QMenu*>(p) || qobject_cast<QMenuBar*>(p); 
+    for(QObject* p = object;
+        qobject_cast<QMenu*>(p) || qobject_cast<QMenuBar*>(p);
         p = p->parent())
       {
       menus.push_front(p);
@@ -140,7 +140,7 @@ bool pqAbstractActivateEventPlayer::playEvent(QObject* Object,
       else if(QMenu* menu = qobject_cast<QMenu*>(p))
         {
         menu->setActiveAction(next->menuAction());
-        
+
         int max_wait = 0;
         while(!next->isVisible() && (++max_wait) <= 10)
           {
@@ -177,7 +177,7 @@ bool pqAbstractActivateEventPlayer::playEvent(QObject* Object,
     //QApplication::processEvents();
     return true;
     }
-  
+
   qCritical() << "calling activate on unhandled type " << Object;
   Error = true;
   return true;
