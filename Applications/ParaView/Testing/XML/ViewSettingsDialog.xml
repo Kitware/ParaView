@@ -11,6 +11,4 @@
   <pqevent object="pqClientMainWindow/ActiveRenderViewOptions/Stack/pqRenderViewOptions/stackedWidget/General/stackedWidget2/imagePage/Texture/LoadTextureDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Data/NE2_ps_bath.png" />
   <pqevent object="pqClientMainWindow/ActiveRenderViewOptions/ApplyButton" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/ActiveRenderViewOptions/CloseButton" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/ActiveRenderViewOptions/ApplyButton" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/ActiveRenderViewOptions/CloseButton" command="activate" arguments="" />
 </pqevents>

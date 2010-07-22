@@ -8,16 +8,10 @@
   <pqevent object="pqClientMainWindow/menubar/menuFilters/Alphabetical" command="activate" arguments="Contour" />
   <pqevent object="pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/objectInspector/Accept" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/0pqCollapsedGroup1/pqSampleScalarWidget/NewRange" command="activate" arguments="" />
-  <pqevent object="pqSampleScalarAddRangeDialog/from" command="set_string" arguments="." />
   <pqevent object="pqSampleScalarAddRangeDialog/from" command="set_string" arguments=".2" />
-  <pqevent object="pqSampleScalarAddRangeDialog/to" command="set_string" arguments="" />
-  <pqevent object="pqSampleScalarAddRangeDialog/to" command="set_string" arguments="." />
   <pqevent object="pqSampleScalarAddRangeDialog/to" command="set_string" arguments=".6" />
-  <pqevent object="pqSampleScalarAddRangeDialog/steps" command="set_string" arguments="" />
-  <pqevent object="pqSampleScalarAddRangeDialog/steps" command="set_string" arguments="10" />
   <pqevent object="pqSampleScalarAddRangeDialog/steps" command="set_string" arguments="10" />
   <pqevent object="pqSampleScalarAddRangeDialog/okButton" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/objectInspector/Accept" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/objectInspector/Accept" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_tabbar" command="set_tab" arguments="1" />
   <pqevent object="pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/1QScrollArea0/qt_scrollarea_viewport/1pqDisplayProxyEditorWidget0/pqDisplayProxyEditor/ColorGroup/ColorBy/Variables" command="set_string" arguments="Momentum" />
