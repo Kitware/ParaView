@@ -101,7 +101,10 @@ void vtkInitializationHelper::Initialize(const char* executable,
     newoptions = vtkSmartPointer<vtkPVOptions>::New();
     }
   vtkInitializationHelper::Initialize(1, &argv, newoptions);
-  options->Delete();
+  if(options)
+    {
+    options->Delete();
+    }
   delete[] argv;
 }
 
