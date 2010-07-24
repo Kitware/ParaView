@@ -92,6 +92,7 @@ IF (PARAVIEW_ENABLE_PYTHON)
     __init__
     numeric
     util
+    variant
     benchmark
     simple
     smtrace
