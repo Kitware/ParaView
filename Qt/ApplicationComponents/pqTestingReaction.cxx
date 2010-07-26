@@ -39,8 +39,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqViewManager.h"
 
 //-----------------------------------------------------------------------------
-pqTestingReaction::pqTestingReaction(QAction* parentObject, Mode mode)
-  : Superclass(parentObject)
+pqTestingReaction::pqTestingReaction(QAction* parentObject, Mode mode,Qt::ConnectionType type)
+  : Superclass(parentObject,type)
 {
   this->ReactionMode = mode;
   if (mode == LOCK_VIEW_SIZE)

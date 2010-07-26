@@ -49,7 +49,7 @@ public:
     LOCK_VIEW_SIZE_CUSTOM
     };
 
-  pqTestingReaction(QAction* parentObject, Mode mode);
+  pqTestingReaction(QAction* parentObject, Mode mode,Qt::ConnectionType type = Qt::AutoConnection);
 
   /// Records test.
   static void recordTest(const QString& filename);

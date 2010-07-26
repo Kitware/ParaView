@@ -51,7 +51,7 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqReaction : public QObject
   typedef QObject Superclass;
 public:
   /// Constructor. Parent cannot be NULL.
-  pqReaction(QAction* parent);
+  pqReaction(QAction* parent,Qt::ConnectionType type = Qt::AutoConnection );
   virtual ~pqReaction();
 
   /// Provides access to the parent action.
