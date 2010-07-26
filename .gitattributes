@@ -5,3 +5,4 @@
 newalpha         crlf=input
 newversion       crlf=input
 pvblot.in        crlf=input
+pre-commit       crlf=input
