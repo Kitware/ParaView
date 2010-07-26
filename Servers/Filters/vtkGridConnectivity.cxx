@@ -1419,7 +1419,7 @@ void vtkGridConnectivity::ResolveProcessesFaces()
         memset(faceMask,0,numFaces*sizeof(int));
         // Loop over the faces in the hash.
         this->FaceHash->InitTraversal();
-        while ( (face = this->FaceHash->GetNextFace()) != 0);
+        while ( (face = this->FaceHash->GetNextFace()) != 0)
           {
           if (face->ProcessId == procIdx)
             {
