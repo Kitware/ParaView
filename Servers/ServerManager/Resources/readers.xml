@@ -5890,9 +5890,10 @@
      <OutputPort name="Field" index="0" />
      <OutputPort name="Blade" index="1" />
 
-      <StringVectorProperty name="Filename"
+      <StringVectorProperty name="FileName"
         command="SetFilename"
-        animateable="0" >
+        animateable="0"
+        number_of_elements="1" >
         <FileListDomain name="files"/>
       </StringVectorProperty>
 
