@@ -119,7 +119,7 @@ protected:
   
   void ResolveEquivalentFragments();
   void ResolveProcessesFaces();
-  void CollectFacesAndArraysToRootProcess(int* fragmentIdOffsets);
+  void CollectFacesAndArraysToRootProcess(int* fragmentIdMap, int* fragmentNumFaces);
 
 private:
   vtkGridConnectivity(const vtkGridConnectivity&);  // Not implemented.
