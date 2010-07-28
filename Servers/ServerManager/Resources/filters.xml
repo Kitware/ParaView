@@ -5091,6 +5091,11 @@ The Contour filter computes isolines or isosurfaces using a selected point-cente
                <Property name="Input" function="Input"/>
             </RequiredProperties>
           </ArrayListDomain>
+           <FieldDataDomain name="field_list">
+             <RequiredProperties>
+                <Property name="Input" function="Input"/>
+             </RequiredProperties>
+           </FieldDataDomain>
           <Documentation>
             This property specifies the name of the scalar array from which the contour filter will compute isolines and/or isosurfaces.
           </Documentation>

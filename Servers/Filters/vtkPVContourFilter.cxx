@@ -96,71 +96,50 @@ int vtkPVContourFilter::RequestData(vtkInformation* request,
     }
 
   // Check if input is AMR data.
-  if(vtkHierarchicalBoxDataSet::SafeDownCast(inDataObj))
+  if (vtkHierarchicalBoxDataSet::SafeDownCast(inDataObj))
     {
     // This is a lot to go through to get the name of the array to process.
-     vtkInformationVector *inArrayVec =
-       this->GetInformation()->Get(INPUT_ARRAYS_TO_PROCESS());
-
-     if(!inArrayVec)
-       {
-       vtkErrorMacro("Problem finding array to process");
-       return 1;
-       }
-
-    vtkInformation *inArrayInfo = inArrayVec->GetInformationObject(0);
-
-    if(!inArrayInfo)
+    vtkInformation *inArrayInfo = this->GetInputArrayInformation(0);
+    if (!inArrayInfo)
       {
       vtkErrorMacro("Problem getting name of array to process.");
+      return 0;
+      }
+    int fieldAssociation = -1;
+    if (!inArrayInfo->Has(vtkDataObject::FIELD_ASSOCIATION()))
+      {
+      vtkErrorMacro("Unable to query field association for the scalar.");
+      return 0;
+      }
+    fieldAssociation = inArrayInfo->Get(vtkDataObject::FIELD_ASSOCIATION());
+    if (fieldAssociation == vtkDataObject::FIELD_ASSOCIATION_CELLS)
+      {
+      vtkSmartPointer<vtkAMRDualContour> amrDC(
+        vtkSmartPointer<vtkAMRDualContour>::New());
+
+      amrDC->SetInput(0, inDataObj);
+      amrDC->SetInputArrayToProcess(0, inArrayInfo);
+      amrDC->SetEnableCapping(1);
+      amrDC->SetEnableDegenerateCells(1);
+      amrDC->SetEnableMultiProcessCommunication(1);
+      amrDC->SetSkipGhostCopy(1);
+      amrDC->SetTriangulateCap(1);
+      amrDC->SetEnableMergePoints(1);
+
+      for (int i=0; i < this->GetNumberOfContours(); ++i)
+        {
+        vtkSmartPointer<vtkMultiBlockDataSet> out (
+          vtkSmartPointer<vtkMultiBlockDataSet>::New());
+        amrDC->SetIsoValue(this->GetValue(i));
+        amrDC->Update();
+        out->ShallowCopy(amrDC->GetOutput(0));
+        vtkMultiBlockDataSet::SafeDownCast(outDataObj)->SetBlock(i, out);
+        }
       return 1;
       }
-
-    if(! inArrayInfo->Has(vtkDataObject::FIELD_NAME()))
-      {
-      vtkErrorMacro("Missing field name.");
-      return 1;
-      }
-
-    const char* arrayNameToProcess =
-      inArrayInfo->Get(vtkDataObject::FIELD_NAME());
-
-    if(!arrayNameToProcess)
-      {
-      vtkErrorMacro("Unable to find valid array name.");
-      return 1;
-      }
-
-    vtkSmartPointer<vtkAMRDualContour> amrDC(
-      vtkSmartPointer<vtkAMRDualContour>::New());
-
-    amrDC->SetInput(0, inDataObj);
-    amrDC->SetInputArrayToProcess(0, 0, 0,
-                                  vtkDataObject::FIELD_ASSOCIATION_CELLS,
-                                  arrayNameToProcess);
-    amrDC->SetEnableCapping(1);
-    amrDC->SetEnableDegenerateCells(1);
-    amrDC->SetEnableMultiProcessCommunication(1);
-    amrDC->SetSkipGhostCopy(1);
-    amrDC->SetTriangulateCap(1);
-    amrDC->SetEnableMergePoints(1);
-
-    for(int i=0; i < this->GetNumberOfContours(); ++i)
-      {
-      vtkSmartPointer<vtkMultiBlockDataSet> out (
-        vtkSmartPointer<vtkMultiBlockDataSet>::New());
-      amrDC->SetIsoValue(this->GetValue(i));
-      amrDC->Update();
-      out->ShallowCopy(amrDC->GetOutput(0));
-      vtkMultiBlockDataSet::SafeDownCast(outDataObj)->SetBlock(i, out);
-      }
-
-    return 1;
     }
- else
-   {
-   return this->Superclass::RequestData(request, inputVector, outputVector);
-   }
+
+  return this->ContourUsingSuperclass(request, inputVector, outputVector);
 }
 
 //-----------------------------------------------------------------------------
@@ -205,6 +184,60 @@ int vtkPVContourFilter::RequestDataObject(vtkInformation* vtkNotUsed(request),
     }
 }
 
+//----------------------------------------------------------------------------
+int vtkPVContourFilter::ContourUsingSuperclass(
+  vtkInformation* request, vtkInformationVector** inputVector,
+  vtkInformationVector* outputVector)
+{
+  vtkDataObject* inputDO = vtkDataObject::GetData(inputVector[0], 0);
+  vtkDataObject* outputDO = vtkDataObject::GetData(outputVector, 0);
+
+  vtkCompositeDataSet* inputCD = vtkCompositeDataSet::SafeDownCast(inputDO);
+  if (!inputCD)
+    {
+    return this->Superclass::RequestData(request, inputVector, outputVector);
+    }
+
+  vtkCompositeDataSet* outputCD = vtkCompositeDataSet::SafeDownCast(outputDO);
+  outputCD->CopyStructure(inputCD);
+
+  vtkSmartPointer<vtkCompositeDataIterator> iter;
+  iter.TakeReference(inputCD->NewIterator());
+
+  // for input.
+  vtkSmartPointer<vtkInformationVector> newInInfoVec=
+    vtkSmartPointer<vtkInformationVector>::New();
+  vtkSmartPointer<vtkInformation> newInInfo =
+    vtkSmartPointer<vtkInformation>::New();
+  newInInfoVec->SetInformationObject(0, newInInfo);
+
+  // for output.
+  vtkSmartPointer<vtkInformationVector> newOutInfoVec =
+    vtkSmartPointer<vtkInformationVector>::New();
+  vtkSmartPointer<vtkInformation> newOutInfo =
+    vtkSmartPointer<vtkInformation>::New();
+  newOutInfoVec->SetInformationObject(0, newOutInfo);
+
+  // Loop over all the datasets.
+  for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
+    {
+    newInInfo->Set(vtkDataObject::DATA_OBJECT(), iter->GetCurrentDataObject());
+    vtkPolyData* polydata = vtkPolyData::New();
+    newOutInfo->Set(vtkDataObject::DATA_OBJECT(), polydata);
+    polydata->FastDelete();
+
+    vtkInformationVector* newInInfoVecPtr = newInInfoVec.GetPointer();
+    if (!this->Superclass::RequestData(request, &newInInfoVecPtr,
+        newOutInfoVec.GetPointer()))
+      {
+      return 0;
+      }
+    outputCD->SetDataSet(iter, polydata);
+    }
+
+  return 1;
+}
+
 //-----------------------------------------------------------------------------
 int vtkPVContourFilter::FillOutputPortInformation(int vtkNotUsed(port),
                                                   vtkInformation* info)
@@ -221,8 +254,7 @@ int vtkPVContourFilter::FillInputPortInformation(int port,
 
   // According to the documentation this is the way to append additional
   // input data set type since VTK 5.2.
-  vtkInformationStringVectorKey::SafeDownCast(info->GetKey(
-    vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE()))->Append(
-      info, "vtkHierarchicalBoxDataSet");
+  info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(),
+    "vtkHierarchicalBoxDataSet");
   return 1;
 }

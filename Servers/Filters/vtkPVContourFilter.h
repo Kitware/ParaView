@@ -58,6 +58,12 @@ protected:
  virtual int FillInputPortInformation(int port, vtkInformation* info);
  virtual int FillOutputPortInformation(int port, vtkInformation* info);
 
+ // Description:
+ // Class superclass request data. Also handles iterating over
+ // vtkHierarchicalBoxDataSet.
+ int ContourUsingSuperclass(
+   vtkInformation* request, vtkInformationVector** inputVector,
+   vtkInformationVector* outputVector);
 
 private:
  vtkPVContourFilter(const vtkPVContourFilter&); // Not implemented.
