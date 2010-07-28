@@ -1026,6 +1026,7 @@ void vtkGridConnectivity::GenerateOutput(
           vtkErrorMacro("Missing cell integration array.");
           continue;
           }
+
         outArray->InsertNextValue(
           da->GetValue(face->FragmentId));
         }
@@ -1058,6 +1059,8 @@ void vtkGridConnectivity::GenerateOutput(
   output->GetCellData()->AddArray(blockIdArray);
   output->GetCellData()->AddArray(cellIdArray);
   this->FragmentVolumes->SetName("Fragment Volume");
+  int size = this->FragmentVolumes->GetNumberOfTuples();
+
   output->GetFieldData()->AddArray(this->FragmentVolumes);
 
   // Add all of the integration arrays to field data.
@@ -1215,10 +1218,10 @@ void vtkGridConnectivity::IntegrateCellVolume(
 // the inputs used to create the surface geometry.  The marshalId is the index
 // of the face in the originating process hash.
 // All processes call this method at the same time (potential to hang).
-// The fragmentIdOffsets is an empty array allocated byu the caller.
+// The fragmentIdMap is an empty array allocated byu the caller.
 // The function that maps the local fragment ids to global fragment ids
 // is returned in the array.
-void vtkGridConnectivity::CollectFacesAndArraysToRootProcess(int* fragmentIdOffsets)
+void vtkGridConnectivity::CollectFacesAndArraysToRootProcess(int* fragmentIdMap, int* fragmentNumFaces)
 {
   vtkIdType msg1[2];
   vtkIdType numFaces;
@@ -1264,14 +1267,31 @@ void vtkGridConnectivity::CollectFacesAndArraysToRootProcess(int* fragmentIdOffs
       delete [] msg2;
       // Now send the integration arrays (volume).
       this->Controller->Send(this->FragmentVolumes->GetPointer(0), numFragments, 0, 5634780);
+
+      //send all point and cell information
+      int tag = 5634780;
+      int numArrays = static_cast<int>(this->CellAttributesIntegration.size());
+      this->Controller->Send(&numArrays,1,0,++tag);
+      for (int i = 0; i < numArrays; ++i)
+        {
+        this->Controller->Send(this->CellAttributesIntegration.at(i),0,++tag);
+        }
+
+      numArrays = static_cast<int>(this->PointAttributesIntegration.size());
+      this->Controller->Send(&numArrays,1,0,++tag);
+      for (int i = 0; i < numArrays; ++i)
+        {
+        this->Controller->Send(this->PointAttributesIntegration.at(i),0,++tag);
+        }
       } // endif numFaces > 0
     } // end if not process 0
   else
     { // Process is 0
     // Build up a map to make each processes fragment
     int numProcs = this->Controller->GetNumberOfProcesses();
-    fragmentIdOffsets[0] = 0;
-    fragmentIdOffsets[1] = this->EquivalenceSet->GetNumberOfMembers();
+    fragmentIdMap[0] = 0;
+    fragmentIdMap[1] = this->EquivalenceSet->GetNumberOfMembers();
+    fragmentNumFaces[0] = 0;
     for (int procIdx = 1; procIdx < numProcs; ++procIdx)
       { // loop over every process. 
       // Receive
@@ -1279,7 +1299,8 @@ void vtkGridConnectivity::CollectFacesAndArraysToRootProcess(int* fragmentIdOffs
       numberOfFragments = msg1[0];
       numFaces = msg1[1];
       // Create a map to assign global fragment ids.
-      fragmentIdOffsets[procIdx+1] = fragmentIdOffsets[procIdx] + numFaces;
+      fragmentIdMap[procIdx+1] = fragmentIdMap[procIdx] + numberOfFragments;
+      fragmentNumFaces[procIdx] = numFaces;
       if (numFaces > 0)
         {
         // Receive faces from a remote process.
@@ -1296,8 +1317,9 @@ void vtkGridConnectivity::CollectFacesAndArraysToRootProcess(int* fragmentIdOffs
           cellId = *msgPtr++;
           faceId = *msgPtr++;
           fragmentId = *msgPtr++;
+          int oldFragmentId = fragmentId;
           // Translate the fragmentId to global value.
-          fragmentId +=fragmentIdOffsets[procIdx];
+          fragmentId +=fragmentIdMap[procIdx];
           // Add the face to the hash.
           face = this->FaceHash->AddFace(corner1, corner2, corner3);
           if (face->FragmentId > 0)
@@ -1321,20 +1343,74 @@ void vtkGridConnectivity::CollectFacesAndArraysToRootProcess(int* fragmentIdOffs
             } // end if face is new or shared.
           } // end loop over faces in messages
         // Now receive the integration arrays and add them to ours.
-        this->FragmentVolumes->Resize(fragmentIdOffsets[procIdx+1]);
+        this->FragmentVolumes->Resize(fragmentIdMap[procIdx+1]);
         // I hope the vtkDataArray allocates more than we ask.
-        this->FragmentVolumes->SetNumberOfTuples(fragmentIdOffsets[procIdx+1]);
+        this->FragmentVolumes->SetNumberOfTuples(fragmentIdMap[procIdx+1]);
         // Read the array right into the end of our array.
         this->Controller->Receive(
-          this->FragmentVolumes->GetPointer(fragmentIdOffsets[procIdx]), 
-          numberOfFragments, 
+          this->FragmentVolumes->GetPointer(fragmentIdMap[procIdx]),
+          numberOfFragments,
           procIdx,
           5634780);
+
+        //get all the point and cell information from each processor
+        //we don't use gather, since it presumes equal length arrays on each processor
+        int tag = 5634780;
+        int numArrays = 0;
+        vtkDoubleArray *da;
+        vtkDoubleArray *rec;
+        vtkIdType daSize;
+        vtkIdType recSize;
+
+        this->Controller->Receive(&numArrays,1,procIdx,++tag);
+        for (int i = 0; i < numArrays; ++i)
+          {
+          rec = vtkDoubleArray::New();
+          this->Controller->Receive(rec,procIdx,++tag);
+
+          //now that we have the array from the client, append it to our array
+          da = this->CellAttributesIntegration.at(i);
+          daSize = da->GetNumberOfTuples();
+          recSize = rec->GetNumberOfTuples();
+          da->Resize( daSize + recSize );
+          da->SetNumberOfTuples( daSize + recSize );
+          for ( int j=0; j < recSize; ++j )
+            {
+            da->SetValue(daSize+j,rec->GetValue(j));
+            }
+          rec->Delete();
+          }
+
+        this->Controller->Receive(&numArrays,1,procIdx,++tag);
+        for (int i = 0; i < numArrays; ++i)
+          {
+          rec = vtkDoubleArray::New();
+          this->Controller->Receive(rec,procIdx,++tag);
+
+          //now that we have the array from the client, append it to our array
+          da = this->PointAttributesIntegration.at(i);
+          daSize = da->GetNumberOfTuples();
+          recSize = rec->GetNumberOfTuples();
+          da->Resize( daSize + recSize );
+          da->SetNumberOfTuples( daSize + recSize );
+          for ( int j=0; j < recSize; ++j )
+            {
+             for ( int k=0; k < da->GetNumberOfComponents(); ++k)
+              {
+              da->SetComponent(daSize+j,k,rec->GetComponent(j,k));
+              }
+            }
+          rec->Delete();
+          }
         } // endif numFace > 0
       } // end loop over processes
+    } // end if process 0.
+
+  if ( this->Controller->GetLocalProcessId() == 0 )
+    {
     // Resolve all the fragments, faces and arrays for all processes.
     this->ResolveEquivalentFragments();
-    } // end if process 0.
+    }
 }
 
 
@@ -1360,9 +1436,10 @@ void vtkGridConnectivity::ResolveProcessesFaces()
 {
   vtkIdType numFaces;
   int numProcs = this->Controller->GetNumberOfProcesses();
-  int* fragmentIdOffsets = new int[numProcs+1];
+  int* fragmentIdMap = new int[numProcs+1];
+  int* fragmentNumFaces = new int[numProcs+1];
 
-  this->CollectFacesAndArraysToRootProcess(fragmentIdOffsets);
+  this->CollectFacesAndArraysToRootProcess(fragmentIdMap, fragmentNumFaces);
   
   // Now send the mask and arrays back to the remote processes.
   // It may not be necessary to send the entire volume array to all processes,
@@ -1394,6 +1471,20 @@ void vtkGridConnectivity::ResolveProcessesFaces()
       this->FragmentVolumes->SetNumberOfTuples(numFragments);
       this->Controller->Receive(this->FragmentVolumes->GetPointer(0), 
                                 numFragments, 0, 909035);
+
+       //receive all point and cell information
+      int tag = 909035;
+      int numArrays = static_cast<int>(this->CellAttributesIntegration.size());
+      for (int i = 0; i < numArrays; ++i)
+        {
+        this->Controller->Receive(this->CellAttributesIntegration.at(i),0,++tag);
+        }
+
+      numArrays = static_cast<int>(this->PointAttributesIntegration.size());
+      for (int i = 0; i < numArrays; ++i)
+        {
+        this->Controller->Receive(this->PointAttributesIntegration.at(i),0,++tag);
+        }
       } // endif numFaces != 0
     } // endif remote process.
   else
@@ -1408,7 +1499,7 @@ void vtkGridConnectivity::ResolveProcessesFaces()
       {
       // decode the number of faces from the offsets.
       vtkGridConnectivityFace* face;
-      numFaces = fragmentIdOffsets[procIdx+1] - fragmentIdOffsets[procIdx];
+      numFaces = fragmentNumFaces[procIdx];
       if (numFaces)
         { // just in case new or MPI does not like 0 length arrays.
         // Construct the mask / message
@@ -1435,6 +1526,20 @@ void vtkGridConnectivity::ResolveProcessesFaces()
         this->Controller->Send(&numFragments, 1, procIdx, 909034);
         this->Controller->Send(this->FragmentVolumes->GetPointer(0),
                                numFragments, procIdx, 909035);
+
+        //send all point and cell information
+        int tag = 909035;
+        int numArrays = static_cast<int>(this->CellAttributesIntegration.size());
+        for (int i = 0; i < numArrays; ++i)
+          {
+          this->Controller->Send(this->CellAttributesIntegration.at(i),procIdx,++tag);
+          }
+
+        numArrays = static_cast<int>(this->PointAttributesIntegration.size());
+        for (int i = 0; i < numArrays; ++i)
+          {
+          this->Controller->Send(this->PointAttributesIntegration.at(i),procIdx,++tag);
+          }
         } // endif numFaces > 0
       } // endloop procIdx
     } // endelse process 0 (root)
@@ -1460,7 +1565,8 @@ void vtkGridConnectivity::ResolveProcessesFaces()
 
 
 
-  delete [] fragmentIdOffsets;
+  delete [] fragmentIdMap;
+  delete [] fragmentNumFaces;
 
 }
 
@@ -1486,7 +1592,7 @@ void vtkGridConnectivity::ResolveEquivalentFragments()
 // are summed to get the output integration values.
 //
 // Create a new fragment volume array indexed by the resolved fragment ids.
-// Merge intermediate fagment volume array to get final values.
+// Merge intermediate fragment volume array to get final values.
 void vtkGridConnectivity::ResolveIntegrationArrays()
 {
   if ( ! this->EquivalenceSet->Resolved)
@@ -1513,35 +1619,6 @@ void vtkGridConnectivity::ResolveIntegrationArrays()
     {
     int setId = this->EquivalenceSet->GetEquivalentSetId(ii);
     finalVolumePtr[setId] += *partialVolumePtr;
-
-    //we know need to update all the cell intergration arrays
-    //do not update when the EquivalenceSet matches an item to itself
-    if ( setId != ii )
-      {
-      int numArrays = static_cast<int>(this->CellAttributesIntegration.size());
-      for (int j = 0; j < numArrays; ++j)
-        {
-        vtkDoubleArray* da = this->CellAttributesIntegration[j];
-        double *oldIntegrationPtr = da->GetPointer(ii);
-        double *resolvedPtr = da->GetPointer(setId);
-        *resolvedPtr += *oldIntegrationPtr;
-        }
-
-      //update point attributes
-      numArrays = static_cast<int>(this->PointAttributesIntegration.size());
-      for (int j = 0; j < numArrays; ++j)
-        {
-        vtkDoubleArray* da = this->PointAttributesIntegration[j];
-        for ( int k=0; k < da->GetNumberOfComponents(); ++k)
-          {
-          double old = da->GetComponent(ii,k);
-          double resolved = da->GetComponent(setId,k);
-          resolved += old;
-          da->SetComponent(setId,k,resolved);
-          }
-        }
-      }
-
     //update to the next fragment volume
     ++partialVolumePtr;
     }
@@ -1550,6 +1627,49 @@ void vtkGridConnectivity::ResolveIntegrationArrays()
   // new total fragment volume array.
   this->FragmentVolumes->Delete();
   this->FragmentVolumes = newVolumes;
+
+  //we now need to update all the cell integration arrays
+  //do not update when the EquivalenceSet matches an item to itself
+  int numArrays = static_cast<int>(this->CellAttributesIntegration.size());
+  for (int j = 0; j < numArrays; ++j)
+    {
+    vtkDoubleArray* da = this->CellAttributesIntegration[j];
+    for ( int i=0; i < da->GetNumberOfTuples(); ++i )
+      {
+      int setId = this->EquivalenceSet->GetEquivalentSetId(i);
+      if ( i != setId )
+        {
+        double *oldIntegrationPtr = da->GetPointer(i);
+        double *resolvedPtr = da->GetPointer(setId);
+        *resolvedPtr += *oldIntegrationPtr;
+        }
+      }
+    //now that we have shrunken the array, actual resize it
+    da->Resize( numSets );
+    }
+
+  //update point attributes
+  numArrays = static_cast<int>(this->PointAttributesIntegration.size());
+  for (int j = 0; j < numArrays; ++j)
+    {
+    vtkDoubleArray* da = this->PointAttributesIntegration[j];
+    for ( int i=0; i < da->GetNumberOfTuples(); ++i )
+      {
+      int setId = this->EquivalenceSet->GetEquivalentSetId(i);
+      if ( i != setId )
+        {
+        for ( int k=0; k < da->GetNumberOfComponents(); ++k)
+          {
+          double old = da->GetComponent(i,k);
+          double resolved = da->GetComponent(setId,k);
+          resolved += old;
+          da->SetComponent(setId,k,resolved);
+          }
+        }
+      }
+    //now that we have shrunken the array, actual resize it
+    da->Resize( numSets );
+    }
 }
 
 
@@ -1557,7 +1677,7 @@ void vtkGridConnectivity::ResolveIntegrationArrays()
 // This method expects that the equivalence set has been resolved,
 // but the faces in the has still have partial fragment ids.
 // At the end of this method, all the face fragment ids have been passed
-// through the equivalence set so that they point to the reolved fragments.
+// through the equivalence set so that they point to the resolved fragments.
 void vtkGridConnectivity::ResolveFaceFragmentIds()
 {
   vtkGridConnectivityFace* face;
