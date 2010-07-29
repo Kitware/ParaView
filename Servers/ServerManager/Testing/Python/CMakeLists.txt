@@ -60,6 +60,7 @@ ENDIF (PVServerManagerTestData AND GENERATOR_EXPRESSIONS_SUPPORTED)
 
 # Add python script names here.
 SET (PY_TESTS
+  Animation
   ProxyPropertyLinks
   PythonPVSimpleCone
   PythonPVSimpleExII
