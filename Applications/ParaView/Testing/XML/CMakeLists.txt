@@ -36,6 +36,7 @@ SET (TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/GlobalProperties.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/GridConnectivity.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/LinePlot.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/LoadPlugins.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/LoadSaveStateAnimation.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/LoadState.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/NormalGlyphs.xml
@@ -150,6 +151,10 @@ SET (ColorEditor3_DISABLE_CRS TRUE)
 # in local render mode.
 SET (ViewSettingsDialog_DISABLE_CS TRUE)
 SET (ViewSettingsDialog_DISABLE_CRS TRUE)
+
+# There is a Client server specific version of this test.
+SET (LoadPlugins_DISABLE_CS TRUE)
+SET (LoadPlugins_DISABLE_CRS TRUE)
 
 # Make these tests use reverse connection.
 SET (CutMulti_REVERSE_CONNECT TRUE)
