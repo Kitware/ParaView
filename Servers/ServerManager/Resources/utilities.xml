@@ -2803,6 +2803,62 @@
     <!-- End of GlobalProperties -->
     </Proxy>
 
+    <Proxy name="CoincidentTopologyResolution"
+           class="vtkPolyDataMapper"
+           processes="client|renderserver">
+      <Documentation>
+        This proxy is useful for changing the coincident topology resolution
+        setting on all rendering proceses.
+      </Documentation>
+      <IntVectorProperty name="Mode"
+        command="SetResolveCoincidentTopology"
+        number_of_elements="1"
+        default_values="none">
+        <EnumerationDomain name="enum">
+          <Entry text="Off" value="0"/>
+          <Entry text="PolygonOffset" value="1"/>
+          <Entry text="ShiftZBuffer" value="2"/>
+        </EnumerationDomain>
+      </IntVectorProperty>
+
+      <DoubleVectorProperty name="PolygonOffsetParameters"
+        command="SetResolveCoincidentTopologyPolygonOffsetParameters"
+        number_of_elements="2"
+        default_values="none">
+        <Documentation>
+          Used to set the polygon offset scale factor and units. Used when
+          ResolveCoincidentTopology is set to PolygonOffset. These are global
+          variables.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <IntVectorProperty name="PolygonOffsetFaces"
+        command="SetResolveCoincidentTopologyPolygonOffsetFaces"
+        number_of_elements="1"
+        default_values="none">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Used when ResolveCoincidentTopology is set to PolygonOffset. The
+          polygon offset can be applied either to the solid polygonal faces or
+          the lines/vertices. When set (default), the offset is applied to the
+          faces otherwise it is applied to lines and vertices. This is a global
+          variable.
+        </Documentation>
+      </IntVectorProperty>
+
+      <DoubleVectorProperty name="ZShift"
+        command="SetResolveCoincidentTopologyZShift"
+        number_of_elements="1"
+        default_values="none">
+        <Documentation>
+          Used to set the z-shift if ResolveCoincidentTopology is set to
+          ShiftZBuffer. This is a global variable.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <!-- End of CoincidentTopologyResolution -->
+    </Proxy>
+
     <!-- End of group "misc" -->
   </ProxyGroup>
 

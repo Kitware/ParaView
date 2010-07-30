@@ -38,6 +38,7 @@ class vtkProcessModule;
 class vtkPVOptions;
 class vtkPVServerInformation;
 class vtkSMApplication;
+class vtkSMProxy;
 class vtkSMProxyManager;
 class vtkSMRenderViewProxy;
 
@@ -45,6 +46,7 @@ class vtkSMRenderViewProxy;
 #include "pqServerManagerModelItem.h"
 #include "pqServerResource.h"
 #include "vtkSmartPointer.h"
+#include "vtkWeakPointer.h"
 #include <QPointer>
 
 /// Abstracts the concept of a "server connection" so that ParaView clients may: 
@@ -100,6 +102,16 @@ public:
   static void setHeartBeatTimeoutSetting(int msec);
   static int getHeartBeatTimeoutSetting();
 
+  // Get/Set the application wide coincident topology resolution settings.
+  static void setCoincidentTopologyResolutionModeSetting(int mode);
+  static int coincidentTopologyResolutionModeSetting();
+  static void setPolygonOffsetParametersSetting(double factor, double value);
+  static void polygonOffsetParametersSetting(double &factor, double &value);
+  static void setPolygonOffsetFacesSetting(bool);
+  static bool polygonOffsetFacesSetting();
+  static void setZShiftSetting(double shift);
+  static double zShiftSetting();
+
   /// Convenience method to obtain the renderview xml name for the given
   /// connection type. This is deprecated and will soon be removed.
   QString getRenderViewXMLName() const;
@@ -128,6 +140,13 @@ protected:
 
   /// Set the heartbeat timeout for this instance of pqServer.
   void setHeartBeatTimeout(int msec);
+  void setCoincidentTopologyResolutionMode(int);
+  void setPolygonOffsetParameters(double factor, double units);
+  void setPolygonOffsetFaces(bool offset_faces);
+  void setZShift(double shift);
+
+  // updates all servers with the current settings.
+  static void updateCoincidentTopologySettings();
 
 protected slots:
   /// Called to send a heartbeat to the server.
@@ -139,6 +158,7 @@ private:
 
   pqServerResource Resource;
   vtkIdType ConnectionID;
+  vtkWeakPointer<vtkSMProxy> CoincidentTopologyResolutionProxy;
 
   // TODO:
   // Each connection will eventually have a PVOptions object. 

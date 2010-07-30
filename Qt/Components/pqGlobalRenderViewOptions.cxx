@@ -37,19 +37,21 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ui_pqGlobalRenderViewOptions.h"
 
 #include <QPointer>
+#include <QDoubleValidator>
 
 #include "vtkType.h"
 #include <vtksys/ios/sstream>
 
 #include "pqApplicationCore.h"
-#include "pqPipelineRepresentation.h"  
+#include "pqImageCompressorType.h"
+#include "pqPipelineRepresentation.h"
 #include "pqPluginManager.h"
 #include "pqRenderView.h"
-#include "pqTwoDRenderView.h"
+#include "pqServer.h"
 #include "pqServerManagerModel.h"
 #include "pqSettings.h"
+#include "pqTwoDRenderView.h"
 #include "pqViewModuleInterface.h"
-#include "pqImageCompressorType.h"
 
 typedef pqRenderView::ManipulatorType Manip;
 
@@ -189,6 +191,12 @@ void pqGlobalRenderViewOptions::init()
       }
     }
 
+  QDoubleValidator* dv = new QDoubleValidator(this);
+  this->Internal->offsetFactor->setValidator(dv);
+  this->Internal->offsetUnits->setValidator(dv);
+  this->Internal->zshift->setValidator(dv);
+  this->Internal->restartWarningLabel->hide();
+
   // start fresh
   this->resetChanges();
 
@@ -314,9 +322,36 @@ void pqGlobalRenderViewOptions::init()
                     SIGNAL(currentIndexChanged(int)),
                     this, SIGNAL(changesAvailable()));
     }
-  
+
   QObject::connect(this->Internal->resetCameraDefault,
     SIGNAL(clicked()), this, SLOT(resetDefaultCameraManipulators()));
+
+  QObject::connect(this->Internal->topologyMode,
+    SIGNAL(currentIndexChanged(int)), this, SIGNAL(changesAvailable()));
+  QObject::connect(this->Internal->offsetFactor,
+    SIGNAL(textChanged(const QString&)), this, SIGNAL(changesAvailable()));
+  QObject::connect(this->Internal->offsetUnits,
+    SIGNAL(textChanged(const QString&)), this, SIGNAL(changesAvailable()));
+  QObject::connect(this->Internal->zshift,
+    SIGNAL(textChanged(const QString&)), this, SIGNAL(changesAvailable()));
+  QObject::connect(this->Internal->offsetFaces,
+    SIGNAL(toggled(bool)), this, SIGNAL(changesAvailable()));
+
+  QObject::connect(this->Internal->topologyMode,
+    SIGNAL(currentIndexChanged(int)),
+    this->Internal->restartWarningLabel, SLOT(show()));
+  QObject::connect(this->Internal->offsetFactor,
+    SIGNAL(textChanged(const QString&)),
+    this->Internal->restartWarningLabel, SLOT(show()));
+  QObject::connect(this->Internal->offsetUnits,
+    SIGNAL(textChanged(const QString&)),
+    this->Internal->restartWarningLabel, SLOT(show()));
+  QObject::connect(this->Internal->zshift,
+    SIGNAL(textChanged(const QString&)),
+    this->Internal->restartWarningLabel, SLOT(show()));
+  QObject::connect(this->Internal->offsetFaces,
+    SIGNAL(toggled(bool)),
+    this->Internal->restartWarningLabel, SLOT(show()));
 
 #if defined(__APPLE__)
   // Offscreen rendering is not needed on Mac (and it doesn't work on some
@@ -542,6 +577,15 @@ void pqGlobalRenderViewOptions::applyChanges()
     view->restoreSettings(true);
     }
 
+  pqServer::setCoincidentTopologyResolutionModeSetting(
+    this->Internal->topologyMode->currentIndex());
+  pqServer::setPolygonOffsetParametersSetting(
+    this->Internal->offsetFactor->text().toDouble(),
+    this->Internal->offsetUnits->text().toDouble());
+  pqServer::setPolygonOffsetFacesSetting(
+    this->Internal->offsetFaces->isChecked());
+  pqServer::setZShiftSetting(
+    this->Internal->zshift->text().toDouble());
 }
 
 //-----------------------------------------------------------------------------
@@ -568,7 +612,7 @@ void pqGlobalRenderViewOptions::resetChanges()
     this->Internal->lodThreshold->setValue(static_cast<int>(val.toDouble()*10));
     this->Internal->updateLODThresholdLabel(this->Internal->lodThreshold->value());
     }
-  
+
   val = settings->value("LODResolution", 50);
   this->Internal->lodResolution->setValue(static_cast<int>(160-val.toDouble() + 10));
   this->Internal->updateLODResolutionLabel(this->Internal->lodResolution->value());
@@ -785,9 +829,18 @@ void pqGlobalRenderViewOptions::resetChanges()
     this->Internal->CameraControl2DComboBoxList[i]->setCurrentIndex(idx);
     }
   settings->endGroup();
-  
-}
 
+  // setup coincident topology resolution settings.
+  this->Internal->topologyMode->setCurrentIndex(
+    pqServer::coincidentTopologyResolutionModeSetting());
+  double factor, units;
+  pqServer::polygonOffsetParametersSetting(factor, units);
+  this->Internal->offsetFactor->setText(QString::number(factor));
+  this->Internal->offsetUnits->setText(QString::number(units));
+  this->Internal->offsetFaces->setChecked(
+    pqServer::polygonOffsetFacesSetting());
+  this->Internal->zshift->setText(QString::number(pqServer::zShiftSetting()));
+}
 
 //-----------------------------------------------------------------------------
 void pqGlobalRenderViewOptions::lodThresholdSliderChanged(int value)
