@@ -32,19 +32,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqServer.h"
 
-// VTK includes
-#include "vtkToolkits.h"
+#include "vtkClientServerStream.h"
+#include "vtkMapper.h"
 #include "vtkObjectFactory.h"
-
-// ParaView Server Manager includes
 #include "vtkProcessModuleConnectionManager.h"
 #include "vtkProcessModuleGUIHelper.h"
 #include "vtkProcessModule.h"
 #include "vtkPVOptions.h"
 #include "vtkPVServerInformation.h"
+#include "vtkSMPropertyHelper.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMRenderViewProxy.h"
-#include "vtkClientServerStream.h"
+#include "vtkToolkits.h"
 
 // Qt includes.
 #include <QCoreApplication>
@@ -117,7 +116,6 @@ pqServer::~pqServer()
     vtkProcessModule::GetProcessModule()->Disconnect(this->ConnectionID);
     }
     */
-
   this->ConnectionID = vtkProcessModuleConnectionManager::GetNullConnectionID();
   delete this->Internals;
 }
@@ -131,6 +129,16 @@ void pqServer::initialize()
   // connection times together.
   this->createTimeKeeper();
 
+  // Create the CoincidentTopologyResolutionProxy.
+  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+  vtkSMProxy* proxy = pxm->NewProxy("misc", "CoincidentTopologyResolution");
+  proxy->SetConnectionID(this->ConnectionID);
+  proxy->UpdateVTKObjects();
+  pxm->RegisterProxy("temp_prototypes", "CoincidentTopologyResolution", proxy);
+  this->CoincidentTopologyResolutionProxy = proxy;
+  proxy->Delete();
+
+  this->updateCoincidentTopologySettings();
 }
 
 //-----------------------------------------------------------------------------
@@ -286,7 +294,7 @@ void pqServer::setHeartBeatTimeoutSetting(int msec)
     {
     server->setHeartBeatTimeout(msec);
     }
-} 
+}
 
 //-----------------------------------------------------------------------------
 int pqServer::getHeartBeatTimeoutSetting()
@@ -303,4 +311,145 @@ int pqServer::getHeartBeatTimeoutSetting()
       }
     }
   return 1*60*1000; // 1 minutes.
+}
+
+//-----------------------------------------------------------------------------
+void pqServer::setCoincidentTopologyResolutionMode(int mode)
+{
+  vtkSMPropertyHelper(this->CoincidentTopologyResolutionProxy,
+    "Mode").Set(mode);
+  this->CoincidentTopologyResolutionProxy->UpdateVTKObjects();
+}
+
+//-----------------------------------------------------------------------------
+void pqServer::setPolygonOffsetParameters(double factor, double units)
+{
+  vtkSMPropertyHelper helper(this->CoincidentTopologyResolutionProxy,
+    "PolygonOffsetParameters");
+  helper.Set(0, factor);
+  helper.Set(1, units);
+  this->CoincidentTopologyResolutionProxy->UpdateVTKObjects();
+}
+
+//-----------------------------------------------------------------------------
+void pqServer::setPolygonOffsetFaces(bool offset_faces)
+{
+  vtkSMPropertyHelper(this->CoincidentTopologyResolutionProxy,
+    "PolygonOffsetFaces").Set(offset_faces? 1 : 0);
+  this->CoincidentTopologyResolutionProxy->UpdateVTKObjects();
+}
+
+//-----------------------------------------------------------------------------
+void pqServer::setZShift(double shift)
+{
+  vtkSMPropertyHelper(this->CoincidentTopologyResolutionProxy,
+    "ZShift").Set(shift);
+  this->CoincidentTopologyResolutionProxy->UpdateVTKObjects();
+}
+
+//-----------------------------------------------------------------------------
+void pqServer::setCoincidentTopologyResolutionModeSetting(int mode)
+{
+  pqApplicationCore* core = pqApplicationCore::instance();
+  pqSettings* settings = core->settings();
+  settings->setValue("/server/CoincidentTopologyResolution/Mode", mode);
+
+  // update all existing servers.
+  pqServer::updateCoincidentTopologySettings();
+}
+
+//-----------------------------------------------------------------------------
+int pqServer::coincidentTopologyResolutionModeSetting()
+{
+  pqApplicationCore* core = pqApplicationCore::instance();
+  pqSettings* settings = core->settings();
+  return settings->value("/server/CoincidentTopologyResolution/Mode",
+    VTK_RESOLVE_SHIFT_ZBUFFER).toInt();
+}
+
+//-----------------------------------------------------------------------------
+void pqServer::setPolygonOffsetParametersSetting(double factor, double units)
+{
+  pqApplicationCore* core = pqApplicationCore::instance();
+  pqSettings* settings = core->settings();
+  settings->setValue("/server/CoincidentTopologyResolution/PolygonOffsetFactor",
+    factor);
+  settings->setValue("/server/CoincidentTopologyResolution/PolygonOffsetUnits",
+    units);
+
+  // update all existing servers.
+  pqServer::updateCoincidentTopologySettings();
+}
+
+//-----------------------------------------------------------------------------
+void pqServer::polygonOffsetParametersSetting(double &factor, double &units)
+{
+  pqApplicationCore* core = pqApplicationCore::instance();
+  pqSettings* settings = core->settings();
+  factor = settings->value("/server/CoincidentTopologyResolution/PolygonOffsetFactor",
+    1.0).toDouble();
+  units = settings->value("/server/CoincidentTopologyResolution/PolygonOffsetUnits",
+    1.0).toDouble();
+}
+
+//-----------------------------------------------------------------------------
+void pqServer::setPolygonOffsetFacesSetting(bool value)
+{
+  pqApplicationCore* core = pqApplicationCore::instance();
+  pqSettings* settings = core->settings();
+  settings->setValue("/server/CoincidentTopologyResolution/OffsetFaces", value);
+
+  // update all existing servers.
+  pqServer::updateCoincidentTopologySettings();
+}
+
+//-----------------------------------------------------------------------------
+bool pqServer::polygonOffsetFacesSetting()
+{
+  pqApplicationCore* core = pqApplicationCore::instance();
+  pqSettings* settings = core->settings();
+  return settings->value("/server/CoincidentTopologyResolution/OffsetFaces",
+    true).toBool();
+}
+
+//-----------------------------------------------------------------------------
+void pqServer::setZShiftSetting(double shift)
+{
+  pqApplicationCore* core = pqApplicationCore::instance();
+  pqSettings* settings = core->settings();
+  settings->setValue("/server/CoincidentTopologyResolution/ZShift", shift);
+
+  // update all existing servers.
+  pqServer::updateCoincidentTopologySettings();
+
+}
+
+//-----------------------------------------------------------------------------
+double pqServer::zShiftSetting()
+{
+  pqApplicationCore* core = pqApplicationCore::instance();
+  pqSettings* settings = core->settings();
+  return settings->value("/server/CoincidentTopologyResolution/ZShift",
+    2.0e-3).toDouble();
+}
+
+//-----------------------------------------------------------------------------
+void pqServer::updateCoincidentTopologySettings()
+{
+  pqApplicationCore* core = pqApplicationCore::instance();
+  pqServerManagerModel* smmodel = core->getServerManagerModel();
+  QList<pqServer*> servers = smmodel->findItems<pqServer*>();
+  foreach (pqServer* server, servers)
+    {
+    server->setCoincidentTopologyResolutionMode(
+      pqServer::coincidentTopologyResolutionModeSetting());
+
+    double factor, units;
+    pqServer::polygonOffsetParametersSetting(factor, units);
+    server->setPolygonOffsetParameters(factor, units);
+
+    server->setPolygonOffsetFaces(pqServer::polygonOffsetFacesSetting());
+
+    server->setZShift(pqServer::zShiftSetting());
+    }
 }
