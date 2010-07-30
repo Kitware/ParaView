@@ -8,7 +8,7 @@
 struct vtkSMPrismDoubleRangeDomainInternals;
 //ETX
 
-class VTK_EXPORT vtkSMPrismDoubleRangeDomain : public vtkSMDoubleRangeDomain 
+class VTK_EXPORT vtkSMPrismDoubleRangeDomain : public vtkSMDoubleRangeDomain
 {
 public:
   static vtkSMPrismDoubleRangeDomain* New();

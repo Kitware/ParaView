@@ -6,7 +6,7 @@
         simply shows an axes along the bounding box of the dataobject.
       </Documentation>
 
-      <InputProperty name="Input" 
+      <InputProperty name="Input"
         command="NotUsed">
         <Documentation>
           Input around which the bound box is to be shown.
@@ -85,7 +85,7 @@
 
       <SubProxy>
         <SourceProxy name="OutlineFilter" class="vtkPVGeometryFilter">
-          <!-- 
+          <!--
             Outline filter generates a partial outline on all processes.
           -->
           <InputProperty name="Input"
@@ -103,8 +103,8 @@
       </SubProxy>
 
       <SubProxy>
-        <Proxy name="Prop2D" 
-          proxygroup="props" proxyname="PrismCubeAxesActor"> 
+        <Proxy name="Prop2D"
+          proxygroup="props" proxyname="PrismCubeAxesActor">
         </Proxy>
         <ExposedProperties>
           <Property exposed_name="CubeAxesCornerOffset" name="CornerOffset" />
@@ -137,7 +137,7 @@
           <Property name="Color" />
         </ExposedProperties>
       </SubProxy>
-      
+
       <!-- End of CubeAxesRepresentation -->
     </PrismCubeAxesRepresentationProxy>
     <Proxy name="PrismCubeAxesActor" class="vtkPrismCubeAxesActor">
@@ -152,7 +152,7 @@
           Set the property used to determine the appearance of the axes.
         </Documentation>
       </ProxyProperty>
-      
+
       <IntVectorProperty name="Visibility"
         command="SetVisibility"
         number_of_elements="1"
@@ -206,8 +206,8 @@
           <Entry text="Static Edges" value="4" />
         </EnumerationDomain>
         <Documentation>
-          Specify a mode to control how the axes are drawn: either static, 
-          closest triad, furthest triad or outer edges in relation to the 
+          Specify a mode to control how the axes are drawn: either static,
+          closest triad, furthest triad or outer edges in relation to the
           camera position.
         </Documentation>
       </IntVectorProperty>
@@ -219,7 +219,7 @@
         <IntRangeDomain name="range" min="1" />
         <Documentation>
           Set the inertial factor that controls how often (i.e, how
-          many renders) the axes can switch position (jump from one axes 
+          many renders) the axes can switch position (jump from one axes
           to another).
         </Documentation>
       </IntVectorProperty>
@@ -231,7 +231,7 @@
         <DoubleRangeDomain name="range" />
         <Documentation>
           Specify an offset value to "pull back" the axes from the corner at
-          which they are joined to avoid overlap of axes labels. The 
+          which they are joined to avoid overlap of axes labels. The
           "CornerOffset" is the fraction of the axis length to pull back.
         </Documentation>
       </DoubleVectorProperty>
@@ -446,9 +446,9 @@
            <InputArrayDomain name="input_array" attribute_type="cell"/>
            <FixedTypeDomain name="fixed_type"/>
       </InputProperty>
-     <IntVectorProperty 
-        name="TableConversion" 
-        command="SetTable" 
+     <IntVectorProperty
+        name="TableConversion"
+        command="SetTable"
         number_of_elements="1"
         default_values="0" >
        <EnumerationDomain name="enum">
@@ -465,29 +465,29 @@
         <DoubleArrayInformationHelper/>
       </DoubleVectorProperty>
 
-     <StringVectorProperty 
+     <StringVectorProperty
         name="XAxisVarNameInfo"
         command="GetXAxisVarName"
         information_only="1">
         <SimpleStringInformationHelper/>
      </StringVectorProperty>
 
-     <StringVectorProperty 
+     <StringVectorProperty
         name="YAxisVarNameInfo"
         command="GetYAxisVarName"
         information_only="1">
         <SimpleStringInformationHelper/>
      </StringVectorProperty>
 
-     <StringVectorProperty 
+     <StringVectorProperty
         name="ZAxisVarNameInfo"
         command="GetZAxisVarName"
         information_only="1">
         <SimpleStringInformationHelper/>
      </StringVectorProperty>
 
-     <StringVectorProperty 
-        name="AssociateXAxis" 
+     <StringVectorProperty
+        name="AssociateXAxis"
         command="SetXAxisVarName"
           number_of_elements="1"
           element_types="2">
@@ -497,8 +497,8 @@
              </RequiredProperties>
            </ArrayListDomain>
      </StringVectorProperty>
-     <StringVectorProperty 
-        name="AssociateYAxis" 
+     <StringVectorProperty
+        name="AssociateYAxis"
         command="SetYAxisVarName"
           number_of_elements="1"
           element_types="2">
@@ -508,8 +508,8 @@
              </RequiredProperties>
            </ArrayListDomain>
      </StringVectorProperty>
-     <StringVectorProperty 
-        name="AssociateZAxis" 
+     <StringVectorProperty
+        name="AssociateZAxis"
         command="SetZAxisVarName"
           number_of_elements="1"
           element_types="2">
@@ -520,15 +520,15 @@
            </ArrayListDomain>
      </StringVectorProperty>
 
-     <StringVectorProperty 
+     <StringVectorProperty
         name="SESAMEAxisVarNameInfo"
         command="GetSESAMEAxisVarNames"
         information_only="1">
         <StringArrayHelper/>
      </StringVectorProperty>
 
-     <StringVectorProperty 
-        name="SESAMEXAxisVariableName" 
+     <StringVectorProperty
+        name="SESAMEXAxisVariableName"
         command="SetSESAMEXAxisVarName"
         number_of_elements="1"
         default_values="Density">
@@ -539,8 +539,8 @@
         </StringListDomain>
      </StringVectorProperty>
 
-     <StringVectorProperty 
-        name="SESAMEYAxisVariableName" 
+     <StringVectorProperty
+        name="SESAMEYAxisVariableName"
         command="SetSESAMEYAxisVarName"
         number_of_elements="1"
         default_values="Temperature">
@@ -551,8 +551,8 @@
         </StringListDomain>
      </StringVectorProperty>
 
-     <StringVectorProperty 
-        name="SESAMEZAxisVariableName" 
+     <StringVectorProperty
+        name="SESAMEZAxisVariableName"
         command="SetSESAMEZAxisVarName"
         number_of_elements="1"
         default_values="Density">
@@ -563,8 +563,8 @@
         </StringListDomain>
      </StringVectorProperty>
 
-     <StringVectorProperty 
-        name="SESAMEContourVariableName" 
+     <StringVectorProperty
+        name="SESAMEContourVariableName"
         command="SetSESAMEContourVarName"
         number_of_elements="1"
         default_values="Density">
@@ -575,27 +575,27 @@
         </StringListDomain>
      </StringVectorProperty>
 
-     <StringVectorProperty 
+     <StringVectorProperty
         name="SESAMEXAxisVarNameInfo"
         command="GetSESAMEXAxisVarName"
         information_only="1">
         <SimpleStringInformationHelper/>
      </StringVectorProperty>
 
-     <StringVectorProperty 
+     <StringVectorProperty
         name="SESAMEYAxisVarNameInfo"
         command="GetSESAMEYAxisVarName"
         information_only="1">
         <SimpleStringInformationHelper/>
      </StringVectorProperty>
 
-     <StringVectorProperty 
+     <StringVectorProperty
         name="SESAMEZAxisVarNameInfo"
         command="GetSESAMEZAxisVarName"
         information_only="1">
         <SimpleStringInformationHelper/>
      </StringVectorProperty>
-     <StringVectorProperty 
+     <StringVectorProperty
         name="SESAMEContourVarNameInfo"
         command="GetSESAMEContourVarName"
         information_only="1">
@@ -649,35 +649,35 @@
        </DoubleRangeDomain>
      </DoubleVectorProperty>
 
-     <DoubleVectorProperty 
+     <DoubleVectorProperty
         name="SESAMEContourVarRange"
         command="GetSESAMEContourVarRange"
         information_only="1">
         <DoubleArrayInformationHelper/>
      </DoubleVectorProperty>
 
-     <DoubleVectorProperty 
+     <DoubleVectorProperty
         name="SESAMEXAxisRange"
         command="GetSESAMEXRange"
         information_only="1">
         <DoubleArrayInformationHelper/>
      </DoubleVectorProperty>
 
-     <DoubleVectorProperty 
+     <DoubleVectorProperty
         name="SESAMEYAxisRange"
         command="GetSESAMEYRange"
         information_only="1">
         <DoubleArrayInformationHelper/>
      </DoubleVectorProperty>
 
-     <DoubleVectorProperty 
+     <DoubleVectorProperty
         name="ThresholdSESAMEXBetweenInfo"
         command="GetSESAMEXThresholdBetween"
         information_only="1">
      </DoubleVectorProperty>
 
-     <DoubleVectorProperty 
-        name="ThresholdSESAMEXBetween" 
+     <DoubleVectorProperty
+        name="ThresholdSESAMEXBetween"
         command="SetThresholdSESAMEXBetween"
         number_of_elements="2"
         default_values="0 0"
@@ -689,21 +689,21 @@
        </PrismDoubleRangeDomain>
      </DoubleVectorProperty>
 
-     <DoubleVectorProperty 
-        name="SESAMEConversions" 
+     <DoubleVectorProperty
+        name="SESAMEConversions"
         command="SetSESAMEConversions"
         number_of_elements="4"
         default_values="1.0 1.0 1.0 1.0">
      </DoubleVectorProperty>
 
-     <DoubleVectorProperty 
+     <DoubleVectorProperty
         name="ThresholdSESAMEYBetweenInfo"
         command="GetSESAMEYThresholdBetween"
         information_only="1">
      </DoubleVectorProperty>
 
-     <DoubleVectorProperty 
-        name="ThresholdSESAMEYBetween" 
+     <DoubleVectorProperty
+        name="ThresholdSESAMEYBetween"
         command="SetThresholdSESAMEYBetween"
         number_of_elements="2"
         default_values="0 0"
@@ -714,7 +714,6 @@
           </RequiredProperties>
        </PrismDoubleRangeDomain>
      </DoubleVectorProperty>
-     
      <!-- End Prism -->
     </SourceProxy>
  </ProxyGroup>
@@ -802,15 +801,15 @@
          <ArraySelectionInformationHelper attribute_name="Table"/>
      </StringVectorProperty>
 
-     <StringVectorProperty 
+     <StringVectorProperty
         name="AxisVarNameInfo"
         command="GetAxisVarNames"
         information_only="1">
         <StringArrayHelper/>
      </StringVectorProperty>
 
-     <StringVectorProperty 
-        name="XAxisVariableName" 
+     <StringVectorProperty
+        name="XAxisVariableName"
         command="SetXAxisVarName"
         number_of_elements="1"
         default_values="Density">
@@ -821,8 +820,8 @@
         </StringListDomain>
      </StringVectorProperty>
 
-     <StringVectorProperty 
-        name="YAxisVariableName" 
+     <StringVectorProperty
+        name="YAxisVariableName"
         command="SetYAxisVarName"
         number_of_elements="1"
         default_values="Temperature">
@@ -833,8 +832,8 @@
         </StringListDomain>
      </StringVectorProperty>
 
-     <StringVectorProperty 
-        name="ZAxisVariableName" 
+     <StringVectorProperty
+        name="ZAxisVariableName"
         command="SetZAxisVarName"
         number_of_elements="1"
         default_values="Density">
@@ -845,8 +844,8 @@
         </StringListDomain>
      </StringVectorProperty>
 
-     <StringVectorProperty 
-        name="ContourVariableName" 
+     <StringVectorProperty
+        name="ContourVariableName"
         command="SetContourVarName"
         number_of_elements="1"
         default_values="Density">
@@ -857,27 +856,27 @@
         </StringListDomain>
      </StringVectorProperty>
 
-     <StringVectorProperty 
+     <StringVectorProperty
         name="XAxisVarNameInfo"
         command="GetXAxisVarName"
         information_only="1">
         <SimpleStringInformationHelper/>
      </StringVectorProperty>
 
-     <StringVectorProperty 
+     <StringVectorProperty
         name="YAxisVarNameInfo"
         command="GetYAxisVarName"
         information_only="1">
         <SimpleStringInformationHelper/>
      </StringVectorProperty>
 
-     <StringVectorProperty 
+     <StringVectorProperty
         name="ZAxisVarNameInfo"
         command="GetZAxisVarName"
         information_only="1">
         <SimpleStringInformationHelper/>
      </StringVectorProperty>
-     <StringVectorProperty 
+     <StringVectorProperty
         name="ContourVarNameInfo"
         command="GetContourVarName"
         information_only="1">
@@ -931,42 +930,42 @@
        </DoubleRangeDomain>
      </DoubleVectorProperty>
 
-     <DoubleVectorProperty 
+     <DoubleVectorProperty
         name="ContourVarRange"
         command="GetContourVarRange"
         information_only="1">
         <DoubleArrayInformationHelper/>
      </DoubleVectorProperty>
 
-     <DoubleVectorProperty 
+     <DoubleVectorProperty
         name="XAxisRange"
         command="GetXRange"
         information_only="1">
         <DoubleArrayInformationHelper/>
      </DoubleVectorProperty>
 
-     <DoubleVectorProperty 
+     <DoubleVectorProperty
         name="YAxisRange"
         command="GetYRange"
         information_only="1">
         <DoubleArrayInformationHelper/>
      </DoubleVectorProperty>
 
-     <DoubleVectorProperty 
-        name="Conversions" 
+     <DoubleVectorProperty
+        name="Conversions"
         command="SetConversions"
         number_of_elements="4"
         default_values="1.0 1.0 1.0 1.0">
      </DoubleVectorProperty>
 
-     <DoubleVectorProperty 
+     <DoubleVectorProperty
         name="ThresholdXBetweenInfo"
         command="GetXThresholdBetween"
         information_only="1">
      </DoubleVectorProperty>
 
-     <DoubleVectorProperty 
-        name="ThresholdXBetween" 
+     <DoubleVectorProperty
+        name="ThresholdXBetween"
         command="SetThresholdXBetween"
         number_of_elements="2"
         default_values="0 0"
@@ -978,13 +977,13 @@
        </PrismDoubleRangeDomain>
      </DoubleVectorProperty>
 
-     <DoubleVectorProperty 
+     <DoubleVectorProperty
         name="ThresholdYBetweenInfo"
         command="GetYThresholdBetween"
         information_only="1">
      </DoubleVectorProperty>
-     <DoubleVectorProperty 
-        name="ThresholdYBetween" 
+     <DoubleVectorProperty
+        name="ThresholdYBetween"
         command="SetThresholdYBetween"
         number_of_elements="2"
         default_values="0 0"
@@ -1024,15 +1023,15 @@
          information_only="1">
          <ArraySelectionInformationHelper attribute_name="Table"/>
      </StringVectorProperty>
-     <StringVectorProperty 
+     <StringVectorProperty
         name="SESAMEAxisVarNameInfo"
         command="GetSESAMEAxisVarNames"
         information_only="1">
         <StringArrayHelper/>
      </StringVectorProperty>
 
-     <StringVectorProperty 
-        name="SESAMEXAxisVariableName" 
+     <StringVectorProperty
+        name="SESAMEXAxisVariableName"
         command="SetSESAMEXAxisVarName"
         number_of_elements="1"
         default_values="Density">
@@ -1043,8 +1042,8 @@
         </StringListDomain>
      </StringVectorProperty>
 
-     <StringVectorProperty 
-        name="SESAMEYAxisVariableName" 
+     <StringVectorProperty
+        name="SESAMEYAxisVariableName"
         command="SetSESAMEYAxisVarName"
         number_of_elements="1"
         default_values="Temperature">
@@ -1055,8 +1054,8 @@
         </StringListDomain>
      </StringVectorProperty>
 
-     <StringVectorProperty 
-        name="SESAMEZAxisVariableName" 
+     <StringVectorProperty
+        name="SESAMEZAxisVariableName"
         command="SetSESAMEZAxisVarName"
         number_of_elements="1"
         default_values="Density">
@@ -1067,8 +1066,8 @@
         </StringListDomain>
      </StringVectorProperty>
 
-     <StringVectorProperty 
-        name="SESAMEContourVariableName" 
+     <StringVectorProperty
+        name="SESAMEContourVariableName"
         command="SetSESAMEContourVarName"
         number_of_elements="1"
         default_values="Density">
@@ -1079,27 +1078,27 @@
         </StringListDomain>
      </StringVectorProperty>
 
-     <StringVectorProperty 
+     <StringVectorProperty
         name="SESAMEXAxisVarNameInfo"
         command="GetSESAMEXAxisVarName"
         information_only="1">
         <SimpleStringInformationHelper/>
      </StringVectorProperty>
 
-     <StringVectorProperty 
+     <StringVectorProperty
         name="SESAMEYAxisVarNameInfo"
         command="GetSESAMEYAxisVarName"
         information_only="1">
         <SimpleStringInformationHelper/>
      </StringVectorProperty>
 
-     <StringVectorProperty 
+     <StringVectorProperty
         name="SESAMEZAxisVarNameInfo"
         command="GetSESAMEZAxisVarName"
         information_only="1">
         <SimpleStringInformationHelper/>
      </StringVectorProperty>
-     <StringVectorProperty 
+     <StringVectorProperty
         name="SESAMEContourVarNameInfo"
         command="GetSESAMEContourVarName"
         information_only="1">
@@ -1153,42 +1152,42 @@
        </DoubleRangeDomain>
      </DoubleVectorProperty>
 
-     <DoubleVectorProperty 
+     <DoubleVectorProperty
         name="SESAMEContourVarRange"
         command="GetSESAMEContourVarRange"
         information_only="1">
         <DoubleArrayInformationHelper/>
      </DoubleVectorProperty>
 
-     <DoubleVectorProperty 
+     <DoubleVectorProperty
         name="SESAMEXAxisRange"
         command="GetSESAMEXRange"
         information_only="1">
         <DoubleArrayInformationHelper/>
      </DoubleVectorProperty>
 
-     <DoubleVectorProperty 
+     <DoubleVectorProperty
         name="SESAMEYAxisRange"
         command="GetSESAMEYRange"
         information_only="1">
         <DoubleArrayInformationHelper/>
      </DoubleVectorProperty>
 
-     <DoubleVectorProperty 
-        name="SESAMEConversions" 
+     <DoubleVectorProperty
+        name="SESAMEConversions"
         command="SetSESAMEConversions"
         number_of_elements="4"
         default_values="1.0 1.0 1.0 1.0">
      </DoubleVectorProperty>
 
-     <DoubleVectorProperty 
+     <DoubleVectorProperty
         name="ThresholdSESAMEXBetweenInfo"
         command="GetSESAMEXThresholdBetween"
         information_only="1">
      </DoubleVectorProperty>
 
-     <DoubleVectorProperty 
-        name="ThresholdSESAMEXBetween" 
+     <DoubleVectorProperty
+        name="ThresholdSESAMEXBetween"
         command="SetThresholdSESAMEXBetween"
         number_of_elements="2"
         default_values="0 0"
@@ -1200,14 +1199,14 @@
        </PrismDoubleRangeDomain>
      </DoubleVectorProperty>
 
-     <DoubleVectorProperty 
+     <DoubleVectorProperty
         name="ThresholdSESAMEYBetweenInfo"
         command="GetSESAMEYThresholdBetween"
         information_only="1">
      </DoubleVectorProperty>
 
-     <DoubleVectorProperty 
-        name="ThresholdSESAMEYBetween" 
+     <DoubleVectorProperty
+        name="ThresholdSESAMEYBetween"
         command="SetThresholdSESAMEYBetween"
         number_of_elements="2"
         default_values="0 0"
@@ -1223,10 +1222,10 @@
     <Proxy name="SESAMEReaderHelper" class="">
       <Documentation>
         This proxy helps apps with the interaction of
-        interdependent properties in the SESAMEReader 
+        interdependent properties in the SESAMEReader
       </Documentation>
-     
-     <StringVectorProperty 
+
+     <StringVectorProperty
         name="AxisVarNameInfo"
         command="GetAxisVarNames"
         information_only="1">
@@ -1257,8 +1256,8 @@
          <ArraySelectionInformationHelper attribute_name="Table"/>
      </StringVectorProperty>
 
-     <StringVectorProperty 
-        name="XAxisVariableName" 
+     <StringVectorProperty
+        name="XAxisVariableName"
         command="SetXAxisVarName"
         number_of_elements="1"
         default_values="Density">
@@ -1269,8 +1268,8 @@
         </StringListDomain>
      </StringVectorProperty>
 
-     <StringVectorProperty 
-        name="YAxisVariableName" 
+     <StringVectorProperty
+        name="YAxisVariableName"
         command="SetYAxisVarName"
         number_of_elements="1"
         default_values="Temperature">
@@ -1281,8 +1280,8 @@
         </StringListDomain>
      </StringVectorProperty>
 
-     <StringVectorProperty 
-        name="ZAxisVariableName" 
+     <StringVectorProperty
+        name="ZAxisVariableName"
         command="SetZAxisVarName"
         number_of_elements="1"
         default_values="Density">
@@ -1293,8 +1292,8 @@
         </StringListDomain>
      </StringVectorProperty>
 
-     <StringVectorProperty 
-        name="ContourVariableName" 
+     <StringVectorProperty
+        name="ContourVariableName"
         command="SetContourVarName"
         number_of_elements="1"
         default_values="Density">
@@ -1305,21 +1304,21 @@
         </StringListDomain>
      </StringVectorProperty>
 
-     <DoubleVectorProperty 
-        name="Conversions" 
+     <DoubleVectorProperty
+        name="Conversions"
         command="SetConversions"
         number_of_elements="4"
         default_values="1.0 1.0 1.0 1.0">
      </DoubleVectorProperty>
 
-     <DoubleVectorProperty 
+     <DoubleVectorProperty
         name="ThresholdXBetweenInfo"
         command="GetXThresholdBetween"
         information_only="1">
      </DoubleVectorProperty>
 
-     <DoubleVectorProperty 
-        name="ThresholdXBetween" 
+     <DoubleVectorProperty
+        name="ThresholdXBetween"
         command="SetThresholdXBetween"
         number_of_elements="2"
         default_values="0 0"
@@ -1331,13 +1330,13 @@
        </PrismDoubleRangeDomain>
      </DoubleVectorProperty>
 
-     <DoubleVectorProperty 
+     <DoubleVectorProperty
         name="ThresholdYBetweenInfo"
         command="GetYThresholdBetween"
         information_only="1">
      </DoubleVectorProperty>
-     <DoubleVectorProperty 
-        name="ThresholdYBetween" 
+     <DoubleVectorProperty
+        name="ThresholdYBetween"
         command="SetThresholdYBetween"
         number_of_elements="2"
         default_values="0 0"
@@ -1349,21 +1348,21 @@
        </PrismDoubleRangeDomain>
      </DoubleVectorProperty>
 
-     <DoubleVectorProperty 
+     <DoubleVectorProperty
         name="ContourVarRange"
         command="GetContourVarRange"
         information_only="1">
         <DoubleArrayInformationHelper/>
      </DoubleVectorProperty>
 
-     <DoubleVectorProperty 
+     <DoubleVectorProperty
         name="XAxisRange"
         command="GetXRange"
         information_only="1">
         <DoubleArrayInformationHelper/>
      </DoubleVectorProperty>
 
-     <DoubleVectorProperty 
+     <DoubleVectorProperty
         name="YAxisRange"
         command="GetYRange"
         information_only="1">

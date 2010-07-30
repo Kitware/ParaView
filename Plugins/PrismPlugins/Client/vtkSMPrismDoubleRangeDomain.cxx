@@ -29,7 +29,7 @@ vtkSMPrismDoubleRangeDomain::~vtkSMPrismDoubleRangeDomain()
 //---------------------------------------------------------------------------
 void vtkSMPrismDoubleRangeDomain::Update(vtkSMProperty* prop)
     {
-    vtkSMDoubleVectorProperty* dvp = 
+    vtkSMDoubleVectorProperty* dvp =
         vtkSMDoubleVectorProperty::SafeDownCast(prop);
     if (!dvp)
         {
@@ -46,7 +46,7 @@ void vtkSMPrismDoubleRangeDomain::Update(vtkSMProperty* prop)
 //---------------------------------------------------------------------------
 int vtkSMPrismDoubleRangeDomain::SetDefaultValues(vtkSMProperty* prop)
     {
-    vtkSMDoubleVectorProperty* dvp = 
+    vtkSMDoubleVectorProperty* dvp =
         vtkSMDoubleVectorProperty::SafeDownCast(prop);
     if (!dvp)
         {
