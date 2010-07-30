@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -62,7 +62,12 @@ bool pqTreeViewEventTranslator::translateEvent(
 
   if (tr_event->type() == QEvent::FocusIn)
     {
-    QObject::disconnect(treeWidget, 0, this, 0);
+    if(this->TreeView)
+      {
+      QObject::disconnect(this->TreeView, 0, this, 0);
+      QObject::disconnect(this->TreeView->selectionModel(), 0, this, 0);
+      }
+
     QObject::connect(treeWidget, SIGNAL(clicked(const QModelIndex&)),
       this, SLOT(onItemChanged(const QModelIndex&)));
     QObject::connect(treeWidget, SIGNAL(expanded(const QModelIndex&)),
@@ -81,7 +86,7 @@ bool pqTreeViewEventTranslator::translateEvent(
 void pqTreeViewEventTranslator::onItemChanged(
   const QModelIndex& index)
 {
-  QTreeView* treeWidget = qobject_cast<QTreeView*>(this->sender()); 
+  QTreeView* treeWidget = qobject_cast<QTreeView*>(this->sender());
   QString str_index = this->getIndexAsString(index);
   if ( (index.model()->flags(index) & Qt::ItemIsUserCheckable) != 0)
     {
@@ -95,7 +100,7 @@ void pqTreeViewEventTranslator::onItemChanged(
 //-----------------------------------------------------------------------------
 void pqTreeViewEventTranslator::onExpanded(const QModelIndex& index)
 {
-  QTreeView* treeWidget = qobject_cast<QTreeView*>(this->sender()); 
+  QTreeView* treeWidget = qobject_cast<QTreeView*>(this->sender());
 
   // record the check state change if the item is user-checkable.
   emit this->recordEvent( treeWidget, "expand",
@@ -105,10 +110,10 @@ void pqTreeViewEventTranslator::onExpanded(const QModelIndex& index)
 //-----------------------------------------------------------------------------
 void pqTreeViewEventTranslator::onCollapsed(const QModelIndex& index)
 {
-  QTreeView* treeWidget = qobject_cast<QTreeView*>(this->sender()); 
+  QTreeView* treeWidget = qobject_cast<QTreeView*>(this->sender());
 
   // record the check state change if the item is user-checkable.
-  emit this->recordEvent( treeWidget, "collapse", 
+  emit this->recordEvent( treeWidget, "collapse",
     this->getIndexAsString(index));
 }
 
@@ -131,7 +136,7 @@ QString pqTreeViewEventTranslator::getIndexAsString(const QModelIndex& index)
 //-----------------------------------------------------------------------------
 void pqTreeViewEventTranslator::onCurrentChanged(const QModelIndex& index)
 {
-  QTreeView* treeWidget = this->TreeView; 
+  QTreeView* treeWidget = this->TreeView;
   if (treeWidget)
     {
     // record the check state change if the item is user-checkable.
