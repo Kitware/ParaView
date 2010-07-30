@@ -101,7 +101,7 @@ public slots:
 
 protected:
   /// Internal method to create the widget.
-  void createWidget(pqServer*);
+  virtual void createWidget(pqServer*);
 
   /// Update the widget visibility according to the WidgetVisible and Selected flags
   virtual void updateWidgetVisibility();

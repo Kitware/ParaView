@@ -107,9 +107,15 @@ pqContourWidget::~pqContourWidget()
 //-----------------------------------------------------------------------------
 void pqContourWidget::createWidget(pqServer* server)
 {
-  vtkSMNewWidgetRepresentationProxy* widget =
-    pqApplicationCore::instance()->get3DWidgetFactory()->
+  vtkSMNewWidgetRepresentationProxy* widget = NULL;
+  widget = pqApplicationCore::instance()->get3DWidgetFactory()->
+    get3DWidget("ContourWidgetRepresentation2", server);
+  if ( !widget )
+    {
+    widget = pqApplicationCore::instance()->get3DWidgetFactory()->
     get3DWidget("ContourWidgetRepresentation", server);
+    }
+
   this->setWidgetProxy(widget);
 
   widget->UpdateVTKObjects();
