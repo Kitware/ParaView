@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -61,7 +61,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqManageCustomFiltersReaction.h"
 #include "pqManageLinksReaction.h"
 #include "pqManagePluginsReaction.h"
-#include "pqOptions.h"
 #include "pqProxyGroupMenuManager.h"
 #include "pqPVApplicationCore.h"
 #include "pqPythonShellReaction.h"
@@ -206,7 +205,7 @@ void pqParaViewMenuBuilders::buildToolsMenu(QMenu& menu)
   action2->setStatusTip(action2->toolTip());
 #endif
 
-   
+
   menu.addSeparator();
   //<addaction name="actionToolsDumpWidgetNames" />
   new pqTestingReaction(menu.addAction("Record Test")
@@ -321,24 +320,10 @@ void pqParaViewMenuBuilders::buildToolbars(QMainWindow& mainWindow)
   timeToolbar->layout()->setSpacing(0);
   mainWindow.addToolBar(Qt::TopToolBarArea, timeToolbar);
 
-  // Prevent the toolbar from being too crowded during testing.
-  // Otherwise some buttons can be hidden, causing test failures.
-  if (pqApplicationCore::instance()->getOptions()->GetDisableRegistry())
-    {
-    mainWindow.insertToolBarBreak(timeToolbar);
-    }
-
   QToolBar* colorToolbar = new pqColorToolbar(&mainWindow)
     << pqSetName("variableToolbar");
   colorToolbar->layout()->setSpacing(0);
   mainWindow.addToolBar(Qt::TopToolBarArea, colorToolbar);
-
-  // Prevent the toolbar from being too crowded during testing.
-  // Otherwise some buttons can be hidden, causing test failures.
-  if (!pqApplicationCore::instance()->getOptions()->GetDisableRegistry())
-    {
-    mainWindow.insertToolBarBreak(timeToolbar);
-    }
 
   QToolBar* reprToolbar = new pqRepresentationToolbar(&mainWindow)
     << pqSetName("representationToolbar");
@@ -349,13 +334,6 @@ void pqParaViewMenuBuilders::buildToolbars(QMainWindow& mainWindow)
     << pqSetName("cameraToolbar");
   cameraToolbar->layout()->setSpacing(0);
   mainWindow.addToolBar(Qt::TopToolBarArea, cameraToolbar);
-
-  // Prevent the toolbar from being too crowded during testing.
-  // Otherwise some buttons can be hidden, causing test failures.
-  if (pqApplicationCore::instance()->getOptions()->GetDisableRegistry())
-    {
-    mainWindow.insertToolBarBreak(cameraToolbar);
-    }
 
   QToolBar* axesToolbar = new pqAxesToolbar(&mainWindow)
     << pqSetName("axesToolbar");
