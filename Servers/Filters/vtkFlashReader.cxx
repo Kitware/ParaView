@@ -30,6 +30,7 @@
 
 #include "vtkFlashReader.h"
 
+#include "vtkByteSwap.h"
 #include "vtkPoints.h"
 #include "vtkDataSet.h"
 #include "vtkPolyData.h"
@@ -672,6 +673,10 @@ void vtkFlashReaderInternal::ReadVersionInformation( hid_t fileIndx )
       H5Tclose( si_type );
       H5Dclose( h5_SI );
 
+      // FileFormatVersion is readin as little-endian. On BE machines, we need to
+      // ensure that it's swapped back to right order.
+      // The following will have no effect on LE machines.
+      vtkByteSwap::SwapLE(&this->SimulationInformation.FileFormatVersion);
       this->FileFormatVersion = this->SimulationInformation.FileFormatVersion;
       }
       
