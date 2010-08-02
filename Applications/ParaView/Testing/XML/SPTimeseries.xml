@@ -14,14 +14,14 @@
   <pqevent object="pqClientMainWindow/menubar/menuFilters/Alphabetical" command="activate" arguments="CTHPart" />
   <pqevent object="pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/objectInspector/Accept" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/variableToolbar/displayColor/Variables" command="set_string" arguments="Solid Color" />
-  <pqevent object="pqClientMainWindow/VCRToolbar/1QToolButton2" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/VCRToolbar/1QToolButton1" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/VCRToolbar/1QToolButton1" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/VCRToolbar/1QToolButton1" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/VCRToolbar/1QToolButton1" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/VCRToolbar/1QToolButton1" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/VCRToolbar/1QToolButton1" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/VCRToolbar/1QToolButton3" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/VCRToolbar/1QToolButton3" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/VCRToolbar/1QToolButton3" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/VCRToolbar/actionVCRPlay" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/VCRToolbar/actionVCRPreviousFrame" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/VCRToolbar/actionVCRPreviousFrame" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/VCRToolbar/actionVCRPreviousFrame" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/VCRToolbar/actionVCRPreviousFrame" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/VCRToolbar/actionVCRPreviousFrame" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/VCRToolbar/actionVCRPreviousFrame" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/VCRToolbar/actionVCRNextFrame" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/VCRToolbar/actionVCRNextFrame" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/VCRToolbar/actionVCRNextFrame" command="activate" arguments="" />
 </pqevents>

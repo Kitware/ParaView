@@ -3,8 +3,8 @@
   <pqevent object="pqClientMainWindow/MainControlsToolbar/actionOpenData" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Data/singleSphereAnimation/singleSphereAnimation_source93T..vtp" />
   <pqevent object="pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/objectInspector/Accept" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/VCRToolbar/1QToolButton2" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/VCRToolbar/1QToolButton1" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/VCRToolbar/1QToolButton1" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/VCRToolbar/1QToolButton1" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/VCRToolbar/actionVCRPlay" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/VCRToolbar/actionVCRPreviousFrame" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/VCRToolbar/actionVCRPreviousFrame" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/VCRToolbar/actionVCRPreviousFrame" command="activate" arguments="" />
 </pqevents>
