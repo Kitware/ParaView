@@ -61,6 +61,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqManageCustomFiltersReaction.h"
 #include "pqManageLinksReaction.h"
 #include "pqManagePluginsReaction.h"
+#include "pqOptions.h"
 #include "pqProxyGroupMenuManager.h"
 #include "pqPVApplicationCore.h"
 #include "pqPythonShellReaction.h"
@@ -320,11 +321,24 @@ void pqParaViewMenuBuilders::buildToolbars(QMainWindow& mainWindow)
   timeToolbar->layout()->setSpacing(0);
   mainWindow.addToolBar(Qt::TopToolBarArea, timeToolbar);
 
+  // Prevent the toolbar from being too crowded during testing.
+  // Otherwise some buttons can be hidden, causing test failures.
+  if (pqApplicationCore::instance()->getOptions()->GetDisableRegistry())
+    {
+    mainWindow.insertToolBarBreak(timeToolbar);
+    }
+
   QToolBar* colorToolbar = new pqColorToolbar(&mainWindow)
     << pqSetName("variableToolbar");
   colorToolbar->layout()->setSpacing(0);
   mainWindow.addToolBar(Qt::TopToolBarArea, colorToolbar);
-  mainWindow.insertToolBarBreak(colorToolbar);
+
+  // Prevent the toolbar from being too crowded during testing.
+  // Otherwise some buttons can be hidden, causing test failures.
+  if (!pqApplicationCore::instance()->getOptions()->GetDisableRegistry())
+    {
+    mainWindow.insertToolBarBreak(timeToolbar);
+    }
 
   QToolBar* reprToolbar = new pqRepresentationToolbar(&mainWindow)
     << pqSetName("representationToolbar");
@@ -335,6 +349,13 @@ void pqParaViewMenuBuilders::buildToolbars(QMainWindow& mainWindow)
     << pqSetName("cameraToolbar");
   cameraToolbar->layout()->setSpacing(0);
   mainWindow.addToolBar(Qt::TopToolBarArea, cameraToolbar);
+
+  // Prevent the toolbar from being too crowded during testing.
+  // Otherwise some buttons can be hidden, causing test failures.
+  if (pqApplicationCore::instance()->getOptions()->GetDisableRegistry())
+    {
+    mainWindow.insertToolBarBreak(cameraToolbar);
+    }
 
   QToolBar* axesToolbar = new pqAxesToolbar(&mainWindow)
     << pqSetName("axesToolbar");
