@@ -324,6 +324,7 @@ void pqParaViewMenuBuilders::buildToolbars(QMainWindow& mainWindow)
     << pqSetName("variableToolbar");
   colorToolbar->layout()->setSpacing(0);
   mainWindow.addToolBar(Qt::TopToolBarArea, colorToolbar);
+  mainWindow.insertToolBarBreak(colorToolbar);
 
   QToolBar* reprToolbar = new pqRepresentationToolbar(&mainWindow)
     << pqSetName("representationToolbar");
