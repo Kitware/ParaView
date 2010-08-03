@@ -139,6 +139,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqOutputPortComboBox.h
 #  pqParticleTracerPanel.h
   pqParallelCoordinatesChartDisplayPanel.h
+  pqPluginTreeWidget.h
   pqPQLookupTableManager.h
   pqPipelineBrowserWidget.h
   pqPipelineModel.h
@@ -535,6 +536,7 @@ ADD_LIBRARY(pqComponents
   pqPipelineTimeKeyFrameEditor.h
   pqPluginDialog.cxx
   pqPluginDialog.h
+  pqPluginTreeWidget.h
   pqPointSourceWidget.cxx
   pqPointSourceWidget.h
   pqProxyInformationWidget.cxx

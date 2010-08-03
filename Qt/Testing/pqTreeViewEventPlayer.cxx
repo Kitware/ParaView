@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -31,9 +31,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqTreeViewEventPlayer.h"
 #include "pqEventDispatcher.h"
+#include "pqPluginTreeWidget.h"
 
 #include <QTreeWidget>
 #include <QDebug>
+#include <QVariant>
 
 //-----------------------------------------------------------------------------
 pqTreeViewEventPlayer::pqTreeViewEventPlayer(QObject* parentObject)
@@ -46,6 +48,7 @@ pqTreeViewEventPlayer::~pqTreeViewEventPlayer()
 {
 }
 
+//-----------------------------------------------------------------------------
 QModelIndex pqTreeViewEventPlayerGetIndex(const QString& str_index,
   QTreeView* treeView, bool &error)
 {
@@ -67,8 +70,36 @@ QModelIndex pqTreeViewEventPlayerGetIndex(const QString& str_index,
 }
 
 //-----------------------------------------------------------------------------
+QModelIndex pqTreeViewEventPlayerGetIndexByColumnValue(const int column,
+  const QString& columnValue, QTreeView* treeView, bool &error)
+{
+  QModelIndex index;
+  int rows = treeView->model()->rowCount();
+  for (int i=0; i < rows; ++i)
+    {
+    index = treeView->model()->index(i, column, treeView->rootIndex());
+    if(index.isValid())
+      {
+      QString value = index.data().toString();
+      if(index.data().toString() == columnValue)
+        {
+        break;
+        }
+      }
+    else
+      {
+      error=true;
+      qCritical() << "ERROR: Tree view must have changed. "
+        << "Indices recorded in the test are no longer valid. Cannot playback.";
+      break;
+      }
+    }
+  return index;
+}
+
+//-----------------------------------------------------------------------------0000000
 bool pqTreeViewEventPlayer::playEvent(
-  QObject* object, const QString& command, 
+  QObject* object, const QString& command,
   const QString& arguments, bool& error)
 {
   QTreeView* treeView= qobject_cast<QTreeView*>(object);
@@ -76,7 +107,7 @@ bool pqTreeViewEventPlayer::playEvent(
     {
     return false;
     }
-  
+
   QRegExp regExp0("^([\\d\\.]+),(\\d+),(\\d+)$");
   if (command == "setTreeItemCheckState" && regExp0.indexIn(arguments) != -1)
     {
@@ -89,7 +120,7 @@ bool pqTreeViewEventPlayer::playEvent(
     QString str_index = regExp0.cap(1);
     int column = regExp0.cap(2).toInt();
     int check_state = regExp0.cap(3).toInt();
-    
+
     QStringList indices = str_index.split(".",QString::SkipEmptyParts);
     QTreeWidgetItem* cur_item = NULL;
     foreach (QString cur_index, indices)
@@ -120,7 +151,7 @@ bool pqTreeViewEventPlayer::playEvent(
     {
     QString str_index = regExp1.cap(1);
     int check_state = regExp1.cap(2).toInt();
-    
+
     QModelIndex index = ::pqTreeViewEventPlayerGetIndex(str_index, treeView, error);
     if (error)
       {
@@ -148,13 +179,28 @@ bool pqTreeViewEventPlayer::playEvent(
     }
   else if (command == "setCurrent")
     {
-    QString str_index = arguments;
-    QModelIndex index = ::pqTreeViewEventPlayerGetIndex(str_index, treeView, error);
-    if (error)
+    // For plugin widgets compare the argument to column 0.
+    if(dynamic_cast<pqPluginTreeWidget *>(treeView) != NULL)
       {
-      return true;
+      QString columnValue = arguments;
+      QModelIndex index = ::pqTreeViewEventPlayerGetIndexByColumnValue(
+        0, columnValue, treeView, error);
+      if (error)
+        {
+        return true;
+        }
+      treeView->setCurrentIndex(index);
       }
-    treeView->setCurrentIndex(index);
+    else
+      {
+      QString str_index = arguments;
+      QModelIndex index = ::pqTreeViewEventPlayerGetIndex(str_index, treeView, error);
+      if (error)
+        {
+        return true;
+        }
+      treeView->setCurrentIndex(index);
+      }
     return true;
     }
   return false;

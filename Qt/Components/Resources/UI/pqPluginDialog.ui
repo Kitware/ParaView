@@ -53,7 +53,7 @@
        </spacer>
       </item>
       <item row="0" column="0" rowspan="2" colspan="5">
-       <widget class="QTreeWidget" name="remotePlugins">
+       <widget class="pqPluginTreeWidget" name="remotePlugins">
         <property name="contextMenuPolicy">
          <enum>Qt::NoContextMenu</enum>
         </property>
@@ -123,7 +123,7 @@
        </spacer>
       </item>
       <item row="0" column="0" rowspan="2" colspan="4">
-       <widget class="QTreeWidget" name="localPlugins">
+       <widget class="pqPluginTreeWidget" name="localPlugins">
         <property name="contextMenuPolicy">
          <enum>Qt::NoContextMenu</enum>
         </property>
@@ -217,4 +217,11 @@
    </hints>
   </connection>
  </connections>
+ <customwidgets>
+  <customwidget>
+    <class>pqPluginTreeWidget</class>
+    <extends>QTreeWidget</extends>
+    <header>pqPluginTreeWidget.h</header>
+  </customwidget>
+ </customwidgets>
 </ui>
