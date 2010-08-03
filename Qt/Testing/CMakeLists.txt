@@ -35,8 +35,6 @@ ENDIF(QT_TESTING_WITH_PYTHON)
 INCLUDE_DIRECTORIES(
   ${QtTesting_BINARY_DIR}
   ${QtTesting_SOURCE_DIR}
-  ${pqComponents_SOURCE_DIR}
-  ${pqComponents_BINARY_DIR}
 )
 
 # Reduce the number of dirs that get included on moc command line

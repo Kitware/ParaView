@@ -31,11 +31,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqTreeViewEventPlayer.h"
 #include "pqEventDispatcher.h"
-#include "pqPluginTreeWidget.h"
 
 #include <QTreeWidget>
 #include <QDebug>
-#include <QVariant>
 
 //-----------------------------------------------------------------------------
 pqTreeViewEventPlayer::pqTreeViewEventPlayer(QObject* parentObject)
@@ -59,34 +57,6 @@ QModelIndex pqTreeViewEventPlayerGetIndex(const QString& str_index,
     index = treeView->model()->index(indices[cc].toInt(), indices[cc+1].toInt(),
       index);
     if (!index.isValid())
-      {
-      error=true;
-      qCritical() << "ERROR: Tree view must have changed. "
-        << "Indices recorded in the test are no longer valid. Cannot playback.";
-      break;
-      }
-    }
-  return index;
-}
-
-//-----------------------------------------------------------------------------
-QModelIndex pqTreeViewEventPlayerGetIndexByColumnValue(const int column,
-  const QString& columnValue, QTreeView* treeView, bool &error)
-{
-  QModelIndex index;
-  int rows = treeView->model()->rowCount();
-  for (int i=0; i < rows; ++i)
-    {
-    index = treeView->model()->index(i, column, treeView->rootIndex());
-    if(index.isValid())
-      {
-      QString value = index.data().toString();
-      if(index.data().toString() == columnValue)
-        {
-        break;
-        }
-      }
-    else
       {
       error=true;
       qCritical() << "ERROR: Tree view must have changed. "
@@ -179,28 +149,13 @@ bool pqTreeViewEventPlayer::playEvent(
     }
   else if (command == "setCurrent")
     {
-    // For plugin widgets compare the argument to column 0.
-    if(dynamic_cast<pqPluginTreeWidget *>(treeView) != NULL)
+    QString str_index = arguments;
+    QModelIndex index = ::pqTreeViewEventPlayerGetIndex(str_index, treeView, error);
+    if (error)
       {
-      QString columnValue = arguments;
-      QModelIndex index = ::pqTreeViewEventPlayerGetIndexByColumnValue(
-        0, columnValue, treeView, error);
-      if (error)
-        {
-        return true;
-        }
-      treeView->setCurrentIndex(index);
+      return true;
       }
-    else
-      {
-      QString str_index = arguments;
-      QModelIndex index = ::pqTreeViewEventPlayerGetIndex(str_index, treeView, error);
-      if (error)
-        {
-        return true;
-        }
-      treeView->setCurrentIndex(index);
-      }
+    treeView->setCurrentIndex(index);
     return true;
     }
   return false;

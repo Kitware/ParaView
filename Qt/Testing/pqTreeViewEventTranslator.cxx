@@ -30,10 +30,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
 #include "pqTreeViewEventTranslator.h"
-#include "pqPluginTreeWidget.h"
 
 #include <QTreeView>
-#include <QTreeWidget>
 #include <QEvent>
 
 //-----------------------------------------------------------------------------
@@ -138,22 +136,12 @@ QString pqTreeViewEventTranslator::getIndexAsString(const QModelIndex& index)
 //-----------------------------------------------------------------------------
 void pqTreeViewEventTranslator::onCurrentChanged(const QModelIndex& index)
 {
-  QTreeWidget* treeWidget = qobject_cast<QTreeWidget *>(this->TreeView);
+  QTreeView* treeWidget = this->TreeView;
+
   if (treeWidget)
     {
-    if(dynamic_cast<pqPluginTreeWidget *>(treeWidget) != NULL)
-      {
-      QTreeWidgetItem * currentItem = treeWidget->currentItem();
-      if(currentItem)
-        {
-        emit this->recordEvent(treeWidget, "setCurrent", currentItem->text(0));
-        }
-      }
-    else
-      {
-      // record the check state change if the item is user-checkable.
-      emit this->recordEvent(treeWidget,
-        "setCurrent", this->getIndexAsString(index));
-      }
+    // record the check state change if the item is user-checkable.
+    emit this->recordEvent(treeWidget,
+      "setCurrent", this->getIndexAsString(index));
     }
 }
