@@ -99,6 +99,70 @@ int vtkEnSightGoldBinaryReader2::OpenFile(const char* filename)
     vtkErrorMacro(<< "Could not open file " << filename);
     return 0;
     }
+
+  //we now need to check for Fortran and byte ordering
+
+  //we need to look at the first 4 bytes of the file, and the 84-87 bytes
+  //of the file to correctly determine what it is. If we only check the first
+  //4 bytes we can get incorrect detection if it is a property file named "P"
+  //we check the 84-87 bytes as that is the start of the next line on a fortran file
+
+  char result[88];
+  this->IFile->read(result, 88);
+  if ( this->IFile->eof() || this->IFile->fail() )
+    {
+    vtkErrorMacro(<<filename << " is missing header information");
+    return 0;
+    }
+  this->IFile->seekg (0, ios::beg);  //reset the file to the start
+
+  // if the first 4 bytes is the length, then this data is no doubt
+  // a fortran data write!, copy the last 76 into the beginning
+  char le_len[4] = {0x50, 0x00, 0x00, 0x00};
+  char be_len[4] = {0x00, 0x00, 0x00, 0x50};
+
+  // the fortran test here depends on the byte ordering. But if the user didn't
+  // set any byte ordering then, we have to try both byte orderings. There was a
+  // bug here which was resulting in binary-fortran-big-endian files being read
+  // incorrectly on intel machines (BUG #10593). This dual-check avoids that
+  // bug.
+  bool le_isFortran = true;
+  bool be_isFortran = true;
+  for (int c=0; c<4; c++)
+    {
+    le_isFortran = le_isFortran && (result[c] == le_len[c])
+      && (result[c+84] == le_len[c]);
+    be_isFortran = be_isFortran && (result[c] == be_len[c])
+      && (result[c+84] == be_len[c]);
+    }
+
+  switch (this->ByteOrder)
+    {
+  case FILE_BIG_ENDIAN:
+    this->Fortran = be_isFortran;
+    break;
+
+  case FILE_LITTLE_ENDIAN:
+    this->Fortran = le_isFortran;
+    break;
+
+  case FILE_UNKNOWN_ENDIAN:
+    if (le_isFortran)
+      {
+      this->Fortran = true;
+      this->ByteOrder = FILE_LITTLE_ENDIAN;
+      }
+    else if (be_isFortran)
+      {
+      this->Fortran = true;
+      this->ByteOrder = FILE_BIG_ENDIAN;
+      }
+    else
+      {
+      this->Fortran = false;
+      }
+    break;
+    }
   return 1;
 }
 
@@ -3816,52 +3880,6 @@ int vtkEnSightGoldBinaryReader2::ReadLine(char result[80])
     }
   // fix to the memory leakage problem detected by Valgrind
   result[79] = '\0';
-
-  // if the first 4 bytes is the length, then this data is no doubt
-  // a fortran data write!, copy the last 76 into the beginning
-  char le_len[4] = {0x50, 0x00, 0x00, 0x00};
-  char be_len[4] = {0, 0, 0, 0x50};
-
-  // the fortran test here depends on the byte ordering. But if the user didn't
-  // set any byte ordering then, we have to try both byte orderings. There was a
-  // bug here which was resulting in binary-fortran-big-endian files being read
-  // incorrectly on intel machines (BUG #10593). This dual-check avoids that
-  // bug.
-  bool le_isFortran = true;
-  bool be_isFortran = true;
-  for (int c=0; c<4; c++)
-    {
-    le_isFortran = le_isFortran && (result[c] == le_len[c]);
-    be_isFortran = be_isFortran && (result[c] == be_len[c]);
-    }
-
-  switch (this->ByteOrder)
-    {
-  case FILE_BIG_ENDIAN:
-    this->Fortran = be_isFortran;
-    break;
-
-  case FILE_LITTLE_ENDIAN:
-    this->Fortran = le_isFortran;
-    break;
-
-  case FILE_UNKNOWN_ENDIAN:
-    if (le_isFortran)
-      {
-      this->Fortran = true;
-      this->ByteOrder = FILE_LITTLE_ENDIAN;
-      }
-    else if (be_isFortran)
-      {
-      this->Fortran = true;
-      this->ByteOrder = FILE_BIG_ENDIAN;
-      }
-    else
-      {
-      this->Fortran = false;
-      }
-    break;
-    }
 
   if (this->Fortran)
     {
