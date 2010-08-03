@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -31,6 +31,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqComponentsTestUtility.h"
 
+#include "pqPluginTreeWidgetEventPlayer.h"
+#include "pqPluginTreeWidgetEventTranslator.h"
+
 #include "pqActiveObjects.h"
 #include "pqView.h"
 #include "vtkImageData.h"
@@ -39,10 +42,20 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QWidget>
 #include <QDebug>
 
+pqComponentsTestUtility::pqComponentsTestUtility(QObject* parentObj) :
+  Superclass(parentObj)
+{
+  this->eventTranslator()->addWidgetEventTranslator(
+    new pqPluginTreeWidgetEventTranslator(this));
+
+  this->eventPlayer()->addWidgetEventPlayer(
+    new pqPluginTreeWidgetEventPlayer(this));
+}
+
 //-----------------------------------------------------------------------------
 bool pqComponentsTestUtility::CompareView(
   const QString& referenceImage,
-  double threshold, 
+  double threshold,
   const QString& tempDirectory)
 {
   pqView* curView = pqActiveObjects::instance().activeView();
@@ -75,7 +88,7 @@ bool pqComponentsTestUtility::CompareView(
     }
   test_image->SetExtent(extents);
 
-  bool ret = pqCoreTestUtility::CompareImage(test_image, referenceImage, 
+  bool ret = pqCoreTestUtility::CompareImage(test_image, referenceImage,
     threshold, cout, tempDirectory);
   test_image->Delete();
   curView->getWidget()->resize(cur_size);
