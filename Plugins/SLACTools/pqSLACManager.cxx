@@ -611,6 +611,8 @@ void pqSLACManager::showParticles(bool show)
 
   pqDataRepresentation *repr = reader->getRepresentation(view);
   repr->setVisible(show);
+
+  view->render();
 }
 
 //-----------------------------------------------------------------------------
