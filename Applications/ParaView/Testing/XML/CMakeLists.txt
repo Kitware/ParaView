@@ -4,6 +4,7 @@ SET (TESTS_WITHOUT_BASELINES
 )
 
 SET (TESTS_WITH_BASELINES
+  ${CMAKE_CURRENT_SOURCE_DIR}/AnalyzeReaderWriterPlugin.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/AnimatePipelineTime.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/3DWidgetInCustomFilter.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/CalcParens.xml
@@ -155,12 +156,16 @@ SET (ViewSettingsDialog_DISABLE_CRS TRUE)
 
 # Plugins are only built as shared libraries.
 IF (NOT BUILD_SHARED_LIBS)
+  SET(AnalyzeReaderWriterPlugin_DISABLE_C TRUE)
   SET(LoadPlugins_DISABLE_C TRUE)
   SET(NiftiReaderWriterPlugin_DISABLE_C TRUE)
+
 ENDIF (NOT BUILD_SHARED_LIBS)
 # There should be a client server specific version of this test.
+SET (AnalyzeReaderWriterPlugin_DISABLE_CS TRUE)
 SET (LoadPlugins_DISABLE_CS TRUE)
 SET (NiftiReaderWriterPlugin_DISABLE_CS TRUE)
+SET (AnalyzeReaderWriterPlugin_DISABLE_CRS TRUE)
 SET (LoadPlugins_DISABLE_CRS TRUE)
 SET (NiftiReaderWriterPlugin_DISABLE_CRS TRUE)
 
