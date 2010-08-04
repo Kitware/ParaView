@@ -37,6 +37,7 @@ SET (TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/GlobalProperties.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/GridConnectivity.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/LinePlot.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/H5PartReaderPlugin.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/LoadPlugins.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/LoadSaveStateAnimation.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/LoadState.xml
@@ -109,6 +110,8 @@ set (ColorEditor1_BREAK TRUE)
 set (ColorEditor2_BREAK TRUE)
 set (ColorEditor3_BREAK TRUE)
 set (ColorEditor4_BREAK TRUE)
+set (GridConnectivity_BREAK_TRUE)
+set (H5PartReaderPlugin_BREAK_TRUE)
 set (ReadXMLPolyDataFileSeries_BREAK TRUE)
 set (ExodusXML_BREAK TRUE)
 SET (ComparativeVisPanel_BREAK TRUE)
@@ -156,16 +159,18 @@ SET (ViewSettingsDialog_DISABLE_CRS TRUE)
 
 # Plugins are only built as shared libraries.
 IF (NOT BUILD_SHARED_LIBS)
-  SET(AnalyzeReaderWriterPlugin_DISABLE_C TRUE)
-  SET(LoadPlugins_DISABLE_C TRUE)
-  SET(NiftiReaderWriterPlugin_DISABLE_C TRUE)
-
+  SET (AnalyzeReaderWriterPlugin_DISABLE_C TRUE)
+  SET (H5PartReaderPlugin_DISABLE_C TRUE)
+  SET (LoadPlugins_DISABLE_C TRUE)
+  SET (NiftiReaderWriterPlugin_DISABLE_C TRUE)
 ENDIF (NOT BUILD_SHARED_LIBS)
 # There should be a client server specific version of this test.
 SET (AnalyzeReaderWriterPlugin_DISABLE_CS TRUE)
+SET (H5PartReaderPlugin_DISABLE_CS TRUE)
 SET (LoadPlugins_DISABLE_CS TRUE)
 SET (NiftiReaderWriterPlugin_DISABLE_CS TRUE)
 SET (AnalyzeReaderWriterPlugin_DISABLE_CRS TRUE)
+SET (H5PartReaderPlugin_DISABLE_CRS TRUE)
 SET (LoadPlugins_DISABLE_CRS TRUE)
 SET (NiftiReaderWriterPlugin_DISABLE_CRS TRUE)
 
