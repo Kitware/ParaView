@@ -152,7 +152,11 @@ SET (ColorEditor3_DISABLE_CRS TRUE)
 SET (ViewSettingsDialog_DISABLE_CS TRUE)
 SET (ViewSettingsDialog_DISABLE_CRS TRUE)
 
-# There is a Client server specific version of this test.
+# Plugins are only built as shared libraries.
+IF (NOT BUILD_SHARED_LIBS)
+  SET(LoadPlugins_DISABLE_C TRUE)
+ENDIF (NOT BUILD_SHARED_LIBS)
+# There should be a client server specific version of this test.
 SET (LoadPlugins_DISABLE_CS TRUE)
 SET (LoadPlugins_DISABLE_CRS TRUE)
 
