@@ -1,8 +1,8 @@
 <?xml version="1.0" ?>
 <!-- Test the SLACTools plugin:
-     Load the plugin.
-     Load the files.
-     Reset the field ranges over all time
+     Show the magnetic field.
+     Show the solid wireframe.
+     Toggle OFF the particles.
      -->
 <pqevents>
   <!-- Load the plugin. -->
@@ -22,8 +22,12 @@
   <pqevent object="pqClientMainWindow/pqSLACDataLoadManager/particlesFile/pqFileDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Data/SLAC/pic-example/particles_..ncdf" />
   <pqevent object="pqClientMainWindow/pqSLACDataLoadManager/buttonBox/1QPushButton0" command="activate" arguments="" />
 
-  <!-- Reset the temporal range. -->
-  <pqevent object="pqClientMainWindow/SLAC/qt_toolbar_ext_button" command="set_boolean" arguments="true" />
-  <pqevent object="pqSLACActionHolder/actionTemporalResetRange" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/SLAC/qt_toolbar_ext_button" command="set_boolean" arguments="false" />
+  <!-- Show the magnetic field. -->
+  <pqevent object="pqSLACActionHolder/actionShowBField" command="activate" arguments="" />
+
+  <!-- Show the solid wireframe. -->
+  <pqevent object="pqSLACActionHolder/actionWireframeSolidMesh" command="activate" arguments="" />
+
+  <!-- Toggle OFF the particles. -->
+  <pqevent object="pqSLACActionHolder/actionShowParticles" command="set_boolean" arguments="false" />
 </pqevents>

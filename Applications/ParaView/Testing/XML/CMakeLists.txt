@@ -56,6 +56,7 @@ SET (TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/SelectReader.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/SimpleInteraction.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/SLACToolsStandardViewTemporalReset.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/SLACToolsWireSolidBFieldNoParticles.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/Slice.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/SpreadSheet1.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/SpreadSheet2.xml
@@ -165,10 +166,13 @@ SET (LoadPlugins_DISABLE_CRS TRUE)
 # Likewise, the SLACTools tests need to load that plugin.
 IF (NOT BUILD_SHARED_LIBS)
   SET(SLACToolsStandardViewTemporalReset_DISABLE_C TRUE)
+  SET(SLACToolsWireSolidBFieldNoParticles_DISABLE_C TRUE)
 ENDIF (NOT BUILD_SHARED_LIBS)
 # There should be a client server specific version of this test.
 SET (SLACToolsStandardViewTemporalReset_DISABLE_CS TRUE)
 SET (SLACToolsStandardViewTemporalReset_DISABLE_CRS TRUE)
+SET (SLACToolsWireSolidBFieldNoParticles_DISABLE_CS TRUE)
+SET (SLACToolsWireSolidBFieldNoParticles_DISABLE_CRS TRUE)
 
 # Make these tests use reverse connection.
 SET (CutMulti_REVERSE_CONNECT TRUE)
