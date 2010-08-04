@@ -40,6 +40,7 @@ SET (TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/LoadSaveStateAnimation.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/LoadState.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/NormalGlyphs.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/NiftiReaderWriterPlugin.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/ObjectInspectorSphere.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/OpenSaveData.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/Plot3DReader.xml
