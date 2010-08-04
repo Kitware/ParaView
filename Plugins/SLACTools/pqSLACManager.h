@@ -27,6 +27,7 @@
 class QAction;
 
 class pqPipelineSource;
+class pqRenderView;
 class pqServer;
 class pqView;
 
@@ -64,6 +65,7 @@ public:
 
   /// Get the window used for viewing the mesh.
   pqView *getMeshView();
+  pqRenderView *getMeshRenderView();
 
   /// Get the window used for viewing plots.
   pqView *getPlotView();

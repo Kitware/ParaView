@@ -37,7 +37,6 @@
 #include "pqActiveView.h"
 #include "pqApplicationCore.h"
 #include "pqDisplayPolicy.h"
-#include "pqXYChartView.h"
 #include "pqObjectBuilder.h"
 #include "pqOutputPort.h"
 #include "pqPipelineRepresentation.h"
@@ -49,7 +48,7 @@
 #include "pqServerManagerModel.h"
 #include "pqSMAdaptor.h"
 #include "pqUndoStack.h"
-#include "pqView.h"
+#include "pqXYChartView.h"
 
 #include <QMainWindow>
 #include <QPointer>
@@ -252,6 +251,11 @@ pqView *pqSLACManager::getMeshView()
 {
   return this->findView(this->getMeshReader(), 0,
                         pqRenderView::renderViewType());
+}
+
+pqRenderView *pqSLACManager::getMeshRenderView()
+{
+  return reinterpret_cast<pqRenderView*>(this->getMeshView());
 }
 
 pqView *pqSLACManager::getPlotView()
@@ -788,7 +792,7 @@ void pqSLACManager::createPlotOverZ()
 //-----------------------------------------------------------------------------
 void pqSLACManager::toggleBackgroundBW()
 {
-  pqView *view = this->getMeshView();
+  pqRenderView *view = this->getMeshRenderView();
   if (!view) return;
   vtkSMProxy *viewProxy = view->getProxy();
 
@@ -802,6 +806,15 @@ void pqSLACManager::toggleBackgroundBW()
       && (oldBackground[2].toDouble() == 0.0) )
     {
     newBackground << 1.0 << 1.0 << 1.0;
+    }
+  else if (   (oldBackground[0].toDouble() == 1.0)
+           && (oldBackground[1].toDouble() == 1.0)
+           && (oldBackground[2].toDouble() == 1.0) )
+    {
+    const int *defaultBackground = view->defaultBackgroundColor();
+    newBackground << defaultBackground[0]/255.0
+                  << defaultBackground[1]/255.0
+                  << defaultBackground[2]/255.0;
     }
   else
     {
