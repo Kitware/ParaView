@@ -156,10 +156,13 @@ SET (ViewSettingsDialog_DISABLE_CRS TRUE)
 # Plugins are only built as shared libraries.
 IF (NOT BUILD_SHARED_LIBS)
   SET(LoadPlugins_DISABLE_C TRUE)
+  SET(NiftiReaderWriterPlugin_DISABLE_C TRUE)
 ENDIF (NOT BUILD_SHARED_LIBS)
 # There should be a client server specific version of this test.
 SET (LoadPlugins_DISABLE_CS TRUE)
+SET (NiftiReaderWriterPlugin_DISABLE_CS TRUE)
 SET (LoadPlugins_DISABLE_CRS TRUE)
+SET (NiftiReaderWriterPlugin_DISABLE_CRS TRUE)
 
 # Make these tests use reverse connection.
 SET (CutMulti_REVERSE_CONNECT TRUE)
