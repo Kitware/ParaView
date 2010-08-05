@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   Visualization Toolkit
-  Module:    vtkPEnSightReader2.cxx
+  Module:    vtkPEnSightReader.cxx
 
   Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
   All rights reserved.
@@ -13,7 +13,7 @@
 
   =========================================================================*/
 
-#include "vtkPEnSightReader2.h"
+#include "vtkPEnSightReader.h"
 
 #include "vtkDataArrayCollection.h"
 #include "vtkFloatArray.h"
@@ -42,11 +42,12 @@
 #include "vtkObject.h"
 
 
-typedef vtkstd::vector< vtkPEnSightReader2::vtkPEnSightReader2CellIds* > vtkPEnSightReader2CellIdsTypeBase;
-class vtkPEnSightReader2CellIdsType: public vtkPEnSightReader2CellIdsTypeBase {};
+
+typedef vtkstd::vector< vtkPEnSightReader::vtkPEnSightReaderCellIds* > vtkPEnSightReaderCellIdsTypeBase;
+class vtkPEnSightReaderCellIdsType: public vtkPEnSightReaderCellIdsTypeBase {};
 
 //----------------------------------------------------------------------------
-vtkPEnSightReader2::vtkPEnSightReader2()
+vtkPEnSightReader::vtkPEnSightReader()
 {
   this->MeasuredFileName = NULL;
   this->MatchFileName = NULL;
@@ -102,14 +103,14 @@ vtkPEnSightReader2::vtkPEnSightReader2()
   this->NumberOfNewOutputs = 0;
 
   // -2 is the default starting value
-  this->multiProcessLocalProcessId = -2;
-  this->multiProcessNumberOfProcesses = -2;
+  this->MultiProcessLocalProcessId = -2;
+  this->MultiProcessNumberOfProcesses = -2;
 
   this->GhostLevels = 0;
 }
 
 //----------------------------------------------------------------------------
-vtkPEnSightReader2::~vtkPEnSightReader2()
+vtkPEnSightReader::~vtkPEnSightReader()
 {
   int i;
 
@@ -192,7 +193,7 @@ vtkPEnSightReader2::~vtkPEnSightReader2()
 }
 
 //----------------------------------------------------------------------------
-int vtkPEnSightReader2::RequestData(
+int vtkPEnSightReader::RequestData(
                                     vtkInformation *vtkNotUsed(request),
                                     vtkInformationVector **vtkNotUsed(inputVector),
                                     vtkInformationVector *outputVector)
@@ -439,7 +440,7 @@ int vtkPEnSightReader2::RequestData(
 }
 
 //----------------------------------------------------------------------------
-int vtkPEnSightReader2::RequestInformation(
+int vtkPEnSightReader::RequestInformation(
                                            vtkInformation *vtkNotUsed(request),
                                            vtkInformationVector **vtkNotUsed(inputVector),
                                            vtkInformationVector *outputVector)
@@ -493,7 +494,7 @@ int vtkPEnSightReader2::RequestInformation(
 }
 
 //----------------------------------------------------------------------------
-int vtkPEnSightReader2::ReadCaseFileGeometry(char* line)
+int vtkPEnSightReader::ReadCaseFileGeometry(char* line)
 {
   char subLine[256];
   int timeSet, fileSet, lineRead;
@@ -562,7 +563,7 @@ int vtkPEnSightReader2::ReadCaseFileGeometry(char* line)
 }
 
 //----------------------------------------------------------------------------
-int vtkPEnSightReader2::ReadCaseFileVariable(char* line)
+int vtkPEnSightReader::ReadCaseFileVariable(char* line)
 {
   char subLine[256], subLine2[256];
   int timeSet, fileSet,  lineRead;
@@ -598,7 +599,7 @@ int vtkPEnSightReader2::ReadCaseFileVariable(char* line)
       if (strcmp(subLine, "node:") == 0)
         {
         vtkDebugMacro("scalar per node");
-        this->VariableMode = vtkPEnSightReader2::SCALAR_PER_NODE;
+        this->VariableMode = vtkPEnSightReader::SCALAR_PER_NODE;
         if (sscanf(line, " %*s %*s %*s %d %d %s", &timeSet, &fileSet,
                    subLine) == 3)
           {
@@ -625,7 +626,7 @@ int vtkPEnSightReader2::ReadCaseFileVariable(char* line)
       else if (strcmp(subLine, "element:") == 0)
         {
         vtkDebugMacro("scalar per element");
-        this->VariableMode = vtkPEnSightReader2::SCALAR_PER_ELEMENT;
+        this->VariableMode = vtkPEnSightReader::SCALAR_PER_ELEMENT;
         if (sscanf(line, " %*s %*s %*s %d %d %s", &timeSet, &fileSet,
                    subLine) == 3)
           {
@@ -652,7 +653,7 @@ int vtkPEnSightReader2::ReadCaseFileVariable(char* line)
       else if (strcmp(subLine, "measured") == 0)
         {
         vtkDebugMacro("scalar per measured node");
-        this->VariableMode = vtkPEnSightReader2::SCALAR_PER_MEASURED_NODE;
+        this->VariableMode = vtkPEnSightReader::SCALAR_PER_MEASURED_NODE;
         if (sscanf(line, " %*s %*s %*s %*s %d %d %s", &timeSet, &fileSet,
                    subLine) == 3)
           {
@@ -686,7 +687,7 @@ int vtkPEnSightReader2::ReadCaseFileVariable(char* line)
       if (strcmp(subLine, "node:") == 0)
         {
         vtkDebugMacro("vector per node");
-        this->VariableMode = vtkPEnSightReader2::VECTOR_PER_NODE;
+        this->VariableMode = vtkPEnSightReader::VECTOR_PER_NODE;
         if (sscanf(line, " %*s %*s %*s %d %d %s", &timeSet, &fileSet,
                    subLine) == 3)
           {
@@ -713,7 +714,7 @@ int vtkPEnSightReader2::ReadCaseFileVariable(char* line)
       else if (strcmp(subLine, "element:") == 0)
         {
         vtkDebugMacro("vector per element");
-        this->VariableMode = vtkPEnSightReader2::VECTOR_PER_ELEMENT;
+        this->VariableMode = vtkPEnSightReader::VECTOR_PER_ELEMENT;
         if (sscanf(line, " %*s %*s %*s %d %d %s", &timeSet, &fileSet,
                    subLine) == 3)
           {
@@ -740,7 +741,7 @@ int vtkPEnSightReader2::ReadCaseFileVariable(char* line)
       else if (strcmp(subLine, "measured") == 0)
         {
         vtkDebugMacro("vector per measured node");
-        this->VariableMode = vtkPEnSightReader2::VECTOR_PER_MEASURED_NODE;
+        this->VariableMode = vtkPEnSightReader::VECTOR_PER_MEASURED_NODE;
         if (sscanf(line, " %*s %*s %*s %*s %d %d %s", &timeSet, &fileSet,
                    subLine) == 3)
           {
@@ -800,7 +801,7 @@ int vtkPEnSightReader2::ReadCaseFileVariable(char* line)
       if (strcmp(subLine, "node:") == 0)
         {
         vtkDebugMacro("tensor symm per node");
-        this->VariableMode = vtkPEnSightReader2::TENSOR_SYMM_PER_NODE;
+        this->VariableMode = vtkPEnSightReader::TENSOR_SYMM_PER_NODE;
         if (sscanf(line, " %*s %*s %*s %*s %d %d %s", &timeSet, &fileSet,
                    subLine) == 3)
           {
@@ -828,7 +829,7 @@ int vtkPEnSightReader2::ReadCaseFileVariable(char* line)
       else if (strcmp(subLine, "element:") == 0)
         {
         vtkDebugMacro("tensor symm per element");
-        this->VariableMode = vtkPEnSightReader2::TENSOR_SYMM_PER_ELEMENT;
+        this->VariableMode = vtkPEnSightReader::TENSOR_SYMM_PER_ELEMENT;
         if (sscanf(line, " %*s %*s %*s %*s %d %d %s", &timeSet, &fileSet,
                    subLine) == 3)
           {
@@ -869,7 +870,7 @@ int vtkPEnSightReader2::ReadCaseFileVariable(char* line)
         if (strcmp(subLine, "node:") == 0)
           {
           vtkDebugMacro("complex scalar per node");
-          this->VariableMode = vtkPEnSightReader2::COMPLEX_SCALAR_PER_NODE;
+          this->VariableMode = vtkPEnSightReader::COMPLEX_SCALAR_PER_NODE;
           if (sscanf(line, " %*s %*s %*s %*s %d %d %s", &timeSet, &fileSet,
                      subLine) == 3)
             {
@@ -899,7 +900,7 @@ int vtkPEnSightReader2::ReadCaseFileVariable(char* line)
         else if (strcmp(subLine, "element:") == 0)
           {
           vtkDebugMacro("complex scalar per element");
-          this->VariableMode = vtkPEnSightReader2::COMPLEX_SCALAR_PER_ELEMENT;
+          this->VariableMode = vtkPEnSightReader::COMPLEX_SCALAR_PER_ELEMENT;
           if (sscanf(line, " %*s %*s %*s %*s %d %d %s", &timeSet, &fileSet,
                      subLine) == 3)
             {
@@ -933,7 +934,7 @@ int vtkPEnSightReader2::ReadCaseFileVariable(char* line)
         if (strcmp(subLine, "node:") == 0)
           {
           vtkDebugMacro("complex vector per node");
-          this->VariableMode = vtkPEnSightReader2::COMPLEX_VECTOR_PER_NODE;
+          this->VariableMode = vtkPEnSightReader::COMPLEX_VECTOR_PER_NODE;
           if (sscanf(line, " %*s %*s %*s %*s %d %d %s", &timeSet, &fileSet,
                      subLine) == 3)
             {
@@ -963,7 +964,7 @@ int vtkPEnSightReader2::ReadCaseFileVariable(char* line)
         else if (strcmp(subLine, "element:") == 0)
           {
           vtkDebugMacro("complex vector per element");
-          this->VariableMode = vtkPEnSightReader2::COMPLEX_VECTOR_PER_ELEMENT;
+          this->VariableMode = vtkPEnSightReader::COMPLEX_VECTOR_PER_ELEMENT;
           if (sscanf(line, " %*s %*s %*s %*s %d %d %s", &timeSet, &fileSet,
                      subLine) == 3)
             {
@@ -1010,7 +1011,7 @@ int vtkPEnSightReader2::ReadCaseFileVariable(char* line)
 }
 
 //----------------------------------------------------------------------------
-int vtkPEnSightReader2::ReadCaseFileTime(char* line)
+int vtkPEnSightReader::ReadCaseFileTime(char* line)
 {
   char formatLine[256];
   char subLine[256];
@@ -1035,7 +1036,7 @@ int vtkPEnSightReader2::ReadCaseFileTime(char* line)
     if ( lineScanResult != 2 ||
          strncmp(line, "time", 4) != 0 || strcmp(subLine, "set:") != 0 )
       {
-      vtkErrorMacro("Error with vtkEnSightReader2: 'time set' not found!!!");
+      vtkErrorMacro("Error with vtkEnSightReader: 'time set' not found!!!");
       return  0;
       }
     this->TimeSetIds->InsertNextId(timeSet);
@@ -1044,7 +1045,7 @@ int vtkPEnSightReader2::ReadCaseFileTime(char* line)
     // i.e.., the number of 'filename numbers' and equally that of 'time values'
     if ( this->ReadNextDataLine(line) == 0 )
       {
-      vtkErrorMacro("Error with vtkEnSightReader2: 'number of steps' not found!!!");
+      vtkErrorMacro("Error with vtkEnSightReader: 'number of steps' not found!!!");
       return  0;
       }
 
@@ -1052,7 +1053,7 @@ int vtkPEnSightReader2::ReadCaseFileTime(char* line)
     if ( lineScanResult != 2 ||
          strncmp(line, "number", 6) != 0 || strcmp(subLine, "steps:") != 0 )
       {
-      vtkErrorMacro("Error with vtkEnSightReader2: 'number of steps' not found!!!");
+      vtkErrorMacro("Error with vtkEnSightReader: 'number of steps' not found!!!");
       return  0;
       }
 
@@ -1062,7 +1063,7 @@ int vtkPEnSightReader2::ReadCaseFileTime(char* line)
     // --- to obtain a sequence of filenameNum(s) which might span multiple lines
     if ( this->ReadNextDataLine(line) == 0 )
       {
-      vtkErrorMacro("Error with vtkEnSightReader2: 'filename ......' not found!!!");
+      vtkErrorMacro("Error with vtkEnSightReader: 'filename ......' not found!!!");
       return  0;
       }
 
@@ -1073,7 +1074,7 @@ int vtkPEnSightReader2::ReadCaseFileTime(char* line)
 
       if ( sscanf(line, "%*s %s", subLine) != 1 )
         {
-        vtkErrorMacro("Error with vtkEnSightReader2: 'filename ......' not found!!!");
+        vtkErrorMacro("Error with vtkEnSightReader: 'filename ......' not found!!!");
         return  0;
         }
 
@@ -1088,7 +1089,7 @@ int vtkPEnSightReader2::ReadCaseFileTime(char* line)
           // not "inline"
           if ( this->ReadNextDataLine(line) == 0 )
             {
-            vtkErrorMacro("Error with vtkEnSightReader2: filename numbers not found!!!");
+            vtkErrorMacro("Error with vtkEnSightReader: filename numbers not found!!!");
             return  0;
             }
           // access the sub-strings from the very beginning
@@ -1113,7 +1114,7 @@ int vtkPEnSightReader2::ReadCaseFileTime(char* line)
             {
             if ( this->ReadNextDataLine(line) == 0 )
               {
-              vtkErrorMacro("Error with vtkEnSightReader2: insufficient filename numbers!!!");
+              vtkErrorMacro("Error with vtkEnSightReader: insufficient filename numbers!!!");
               return  0;
               }
 
@@ -1125,7 +1126,7 @@ int vtkPEnSightReader2::ReadCaseFileTime(char* line)
                  strncmp(line, "FILE", 4) == 0
                  )
               {
-              vtkErrorMacro("Error with vtkEnSightReader2: insufficient filename numbers!!!");
+              vtkErrorMacro("Error with vtkEnSightReader: insufficient filename numbers!!!");
               return  0;
               }
 
@@ -1146,20 +1147,20 @@ int vtkPEnSightReader2::ReadCaseFileTime(char* line)
         if ( strcmp(subLine, "start") != 0 ||
              sscanf(line, "%*s %*s %*s %d", &filenameNum) != 1 )
           {
-          vtkErrorMacro("Error with vtkEnSightReader2: 'filename start number' not found!!!");
+          vtkErrorMacro("Error with vtkEnSightReader: 'filename start number' not found!!!");
           return  0;
           }
 
         if ( this->ReadNextDataLine(line) == 0 )
           {
-          vtkErrorMacro("Error with vtkEnSightReader2: 'filename increment' not found!!!");
+          vtkErrorMacro("Error with vtkEnSightReader: 'filename increment' not found!!!");
           return  0;
           }
 
         lineScanResult = sscanf(line, "%*s %s %d", subLine, &increment);
         if ( lineScanResult != 2 || strcmp(subLine, "increment:") != 0 )
           {
-          vtkErrorMacro("Error with vtkEnSightReader2: 'filename increment' not found!!!");
+          vtkErrorMacro("Error with vtkEnSightReader: 'filename increment' not found!!!");
           return  0;
           }
 
@@ -1180,7 +1181,7 @@ int vtkPEnSightReader2::ReadCaseFileTime(char* line)
 
       if ( lineRead == 0 )
         {
-        vtkErrorMacro("Error with vtkEnSightReader2: 'time values' not found!!!");
+        vtkErrorMacro("Error with vtkEnSightReader: 'time values' not found!!!");
         return  0;
         }
       }
@@ -1198,7 +1199,7 @@ int vtkPEnSightReader2::ReadCaseFileTime(char* line)
       // not "inline"
       if ( this->ReadNextDataLine(line) == 0 )
         {
-        vtkErrorMacro("Error with vtkEnSightReader2: time values not found!!!");
+        vtkErrorMacro("Error with vtkEnSightReader: time values not found!!!");
         return  0;
         }
       // access the sub-strings from the very beginning
@@ -1223,14 +1224,14 @@ int vtkPEnSightReader2::ReadCaseFileTime(char* line)
         {
         if ( this->ReadNextDataLine(line) == 0 )
           {
-          vtkErrorMacro("Error with vtkEnSightReader2: insufficient time values!!!");
+          vtkErrorMacro("Error with vtkEnSightReader: insufficient time values!!!");
           return  0;
           }
 
         // in case of insufficient time values
         if ( strncmp(line, "time set", 8) == 0 || strncmp(line, "FILE", 4) == 0 )
           {
-          vtkErrorMacro("Error with vtkEnSightReader2: insufficient time values!!!");
+          vtkErrorMacro("Error with vtkEnSightReader: insufficient time values!!!");
           return  0;
           }
 
@@ -1295,7 +1296,7 @@ int vtkPEnSightReader2::ReadCaseFileTime(char* line)
 }
 
 //----------------------------------------------------------------------------
-int vtkPEnSightReader2::ReadCaseFileFile(char* line)
+int vtkPEnSightReader::ReadCaseFileFile(char* line)
 {
   int fileSet, numTimeSteps, filenameNum, lineRead;
 
@@ -1345,14 +1346,14 @@ int vtkPEnSightReader2::ReadCaseFileFile(char* line)
 }
 
 //----------------------------------------------------------------------------
-int vtkPEnSightReader2::ReadCaseFile()
+int vtkPEnSightReader::ReadCaseFile()
 {
   char line[256];
   char subLine[256];
   int stringRead;
   int i;
   int ret;
-  vtkDebugMacro("In vtkPEnSightReader2::ReadCaseFile");
+  vtkDebugMacro("In vtkPEnSightReader::ReadCaseFile");
 
   // Initialize
   //
@@ -1433,9 +1434,9 @@ int vtkPEnSightReader2::ReadCaseFile()
     if (stringRead == 1)
       {
       if (strcmp(subLine, "gold") == 0 &&
-          strcmp(this->GetClassName(), "vtkEnSight6Reader2") == 0)
+          strcmp(this->GetClassName(), "vtkEnSight6Reader") == 0)
         {
-        // The class is vtkEnSight6Reader2, but the case file says "gold".
+        // The class is vtkEnSight6Reader, but the case file says "gold".
         vtkErrorMacro("This is not an EnSight6 file.");
         delete this->IS;
         this->IS = NULL;
@@ -1444,9 +1445,9 @@ int vtkPEnSightReader2::ReadCaseFile()
       }
     else
       {
-      if (strcmp(this->GetClassName(), "vtkEnSightGoldReader2") == 0)
+      if (strcmp(this->GetClassName(), "vtkEnSightGoldReader") == 0)
         {
-        // The class is vtkEnSightGoldReader2, but the case file does
+        // The class is vtkEnSightGoldReader, but the case file does
         // not say "gold".
         vtkErrorMacro("This is not an EnSight Gold file.");
         delete this->IS;
@@ -1505,7 +1506,7 @@ int vtkPEnSightReader2::ReadCaseFile()
 }
 
 //----------------------------------------------------------------------------
-int vtkPEnSightReader2::ReadVariableFiles(vtkMultiBlockDataSet *output)
+int vtkPEnSightReader::ReadVariableFiles(vtkMultiBlockDataSet *output)
 {
   int i, j;
   char description[256];
@@ -1633,35 +1634,35 @@ int vtkPEnSightReader2::ReadVariableFiles(vtkMultiBlockDataSet *output)
       {
       switch (this->VariableTypes[i])
         {
-        case vtkPEnSightReader2::SCALAR_PER_NODE:
+        case vtkPEnSightReader::SCALAR_PER_NODE:
           this->ReadScalarsPerNode(fileName, this->VariableDescriptions[i],
                                    timeStepInFile, output);
           break;
-        case vtkPEnSightReader2::SCALAR_PER_MEASURED_NODE:
+        case vtkPEnSightReader::SCALAR_PER_MEASURED_NODE:
           this->ReadScalarsPerNode(fileName, this->VariableDescriptions[i],
                                    timeStepInFile, output, 1);
           break;
-        case vtkPEnSightReader2::VECTOR_PER_NODE:
+        case vtkPEnSightReader::VECTOR_PER_NODE:
           this->ReadVectorsPerNode(fileName, this->VariableDescriptions[i],
                                    timeStepInFile, output);
           break;
-        case vtkPEnSightReader2::VECTOR_PER_MEASURED_NODE:
+        case vtkPEnSightReader::VECTOR_PER_MEASURED_NODE:
           this->ReadVectorsPerNode(fileName, this->VariableDescriptions[i],
                                    timeStepInFile, output, 1);
           break;
-        case vtkPEnSightReader2::TENSOR_SYMM_PER_NODE:
+        case vtkPEnSightReader::TENSOR_SYMM_PER_NODE:
           this->ReadTensorsPerNode(fileName, this->VariableDescriptions[i],
                                    timeStepInFile, output);
           break;
-        case vtkPEnSightReader2::SCALAR_PER_ELEMENT:
+        case vtkPEnSightReader::SCALAR_PER_ELEMENT:
           this->ReadScalarsPerElement(fileName, this->VariableDescriptions[i],
                                       timeStepInFile, output);
           break;
-        case vtkPEnSightReader2::VECTOR_PER_ELEMENT:
+        case vtkPEnSightReader::VECTOR_PER_ELEMENT:
           this->ReadVectorsPerElement(fileName, this->VariableDescriptions[i],
                                       timeStepInFile, output);
           break;
-        case vtkPEnSightReader2::TENSOR_SYMM_PER_ELEMENT:
+        case vtkPEnSightReader::TENSOR_SYMM_PER_ELEMENT:
           this->ReadTensorsPerElement(fileName, this->VariableDescriptions[i],
                                       timeStepInFile, output);
           break;
@@ -1778,7 +1779,7 @@ int vtkPEnSightReader2::ReadVariableFiles(vtkMultiBlockDataSet *output)
       {
       switch (this->ComplexVariableTypes[i])
         {
-        case vtkPEnSightReader2::COMPLEX_SCALAR_PER_NODE:
+        case vtkPEnSightReader::COMPLEX_SCALAR_PER_NODE:
           this->ReadScalarsPerNode(fileName,
                                    this->ComplexVariableDescriptions[i],
                                    timeStepInFile, output, 0, 2);
@@ -1786,7 +1787,7 @@ int vtkPEnSightReader2::ReadVariableFiles(vtkMultiBlockDataSet *output)
                                    this->ComplexVariableDescriptions[i],
                                    timeStepInFile, output, 0, 2, 1);
           break;
-        case vtkPEnSightReader2::COMPLEX_VECTOR_PER_NODE:
+        case vtkPEnSightReader::COMPLEX_VECTOR_PER_NODE:
           strcpy(description, this->ComplexVariableDescriptions[i]);
           strcat(description, "_r");
           this->ReadVectorsPerNode(fileName, description, timeStepInFile,
@@ -1796,7 +1797,7 @@ int vtkPEnSightReader2::ReadVariableFiles(vtkMultiBlockDataSet *output)
           this->ReadVectorsPerNode(fileName2, description, timeStepInFile,
                                    output);
           break;
-        case vtkPEnSightReader2::COMPLEX_SCALAR_PER_ELEMENT:
+        case vtkPEnSightReader::COMPLEX_SCALAR_PER_ELEMENT:
           this->ReadScalarsPerElement(fileName,
                                       this->ComplexVariableDescriptions[i],
                                       timeStepInFile, output, 2);
@@ -1804,7 +1805,7 @@ int vtkPEnSightReader2::ReadVariableFiles(vtkMultiBlockDataSet *output)
                                       this->ComplexVariableDescriptions[i],
                                       timeStepInFile, output, 2, 1);
           break;
-        case vtkPEnSightReader2::COMPLEX_VECTOR_PER_ELEMENT:
+        case vtkPEnSightReader::COMPLEX_VECTOR_PER_ELEMENT:
           strcpy(description, this->ComplexVariableDescriptions[i]);
           strcat(description, "_r");
           this->ReadVectorsPerElement(fileName, description, timeStepInFile,
@@ -1824,7 +1825,7 @@ int vtkPEnSightReader2::ReadVariableFiles(vtkMultiBlockDataSet *output)
 }
 
 //----------------------------------------------------------------------------
-void vtkPEnSightReader2::AddVariableFileName(const char* fileName1,
+void vtkPEnSightReader::AddVariableFileName(const char* fileName1,
                                              const char* fileName2)
 {
   int size;
@@ -1904,7 +1905,7 @@ void vtkPEnSightReader2::AddVariableFileName(const char* fileName1,
 }
 
 //----------------------------------------------------------------------------
-void vtkPEnSightReader2::AddVariableDescription(const char* description)
+void vtkPEnSightReader::AddVariableDescription(const char* description)
 {
   int size;
   int i;
@@ -1982,7 +1983,7 @@ void vtkPEnSightReader2::AddVariableDescription(const char* description)
 }
 
 //----------------------------------------------------------------------------
-void vtkPEnSightReader2::AddVariableType()
+void vtkPEnSightReader::AddVariableType()
 {
   int size;
   int i;
@@ -2041,19 +2042,19 @@ void vtkPEnSightReader2::AddVariableType()
 }
 
 //----------------------------------------------------------------------------
-int vtkPEnSightReader2::GetSectionType(const char *line)
+int vtkPEnSightReader::GetSectionType(const char *line)
 {
   if (strncmp(line, "coordinates", 5) == 0)
     {
-    return vtkPEnSightReader2::COORDINATES;
+    return vtkPEnSightReader::COORDINATES;
     }
   else if (strncmp(line, "block", 4) == 0)
     {
-    return vtkPEnSightReader2::BLOCK;
+    return vtkPEnSightReader::BLOCK;
     }
   else if (this->GetElementType(line) != -1)
     {
-    return vtkPEnSightReader2::ELEMENT;
+    return vtkPEnSightReader::ELEMENT;
     }
   else
     {
@@ -2062,75 +2063,75 @@ int vtkPEnSightReader2::GetSectionType(const char *line)
 }
 
 //----------------------------------------------------------------------------
-int vtkPEnSightReader2::GetElementType(const char* line)
+int vtkPEnSightReader::GetElementType(const char* line)
 {
   if (strncmp(line, "point", 5) == 0)
     {
-    return vtkPEnSightReader2::POINT;
+    return vtkPEnSightReader::POINT;
     }
   else if (strncmp(line, "bar2", 4) == 0)
     {
-    return vtkPEnSightReader2::BAR2;
+    return vtkPEnSightReader::BAR2;
     }
   else if (strncmp(line, "bar3", 4) == 0)
     {
-    return vtkPEnSightReader2::BAR3;
+    return vtkPEnSightReader::BAR3;
     }
   else if (strncmp(line, "nsided", 6) == 0)
     {
-    return vtkPEnSightReader2::NSIDED;
+    return vtkPEnSightReader::NSIDED;
     }
   else if (strncmp(line, "tria3", 5) == 0)
     {
-    return vtkPEnSightReader2::TRIA3;
+    return vtkPEnSightReader::TRIA3;
     }
   else if (strncmp(line, "tria6", 5) == 0)
     {
-    return vtkPEnSightReader2::TRIA6;
+    return vtkPEnSightReader::TRIA6;
     }
   else if (strncmp(line, "quad4", 5) == 0)
     {
-    return vtkPEnSightReader2::QUAD4;
+    return vtkPEnSightReader::QUAD4;
     }
   else if (strncmp(line, "quad8", 5) == 0)
     {
-    return vtkPEnSightReader2::QUAD8;
+    return vtkPEnSightReader::QUAD8;
     }
   else if (strncmp(line, "nfaced", 6) == 0)
     {
-    return vtkPEnSightReader2::NFACED;
+    return vtkPEnSightReader::NFACED;
     }
   else if (strncmp(line, "tetra4", 6) == 0)
     {
-    return vtkPEnSightReader2::TETRA4;
+    return vtkPEnSightReader::TETRA4;
     }
   else if (strncmp(line, "tetra10", 7) == 0)
     {
-    return vtkPEnSightReader2::TETRA10;
+    return vtkPEnSightReader::TETRA10;
     }
   else if (strncmp(line, "pyramid5", 8) == 0)
     {
-    return vtkPEnSightReader2::PYRAMID5;
+    return vtkPEnSightReader::PYRAMID5;
     }
   else if (strncmp(line, "pyramid13", 9) == 0)
     {
-    return vtkPEnSightReader2::PYRAMID13;
+    return vtkPEnSightReader::PYRAMID13;
     }
   else if (strncmp(line, "hexa8", 5) == 0)
     {
-    return vtkPEnSightReader2::HEXA8;
+    return vtkPEnSightReader::HEXA8;
     }
   else if (strncmp(line, "hexa20", 6) == 0)
     {
-    return vtkPEnSightReader2::HEXA20;
+    return vtkPEnSightReader::HEXA20;
     }
   else if (strncmp(line, "penta6", 6) == 0)
     {
-    return vtkPEnSightReader2::PENTA6;
+    return vtkPEnSightReader::PENTA6;
     }
   else if (strncmp(line, "penta15", 7) == 0)
     {
-    return vtkPEnSightReader2::PENTA15;
+    return vtkPEnSightReader::PENTA15;
     }
   else
     {
@@ -2138,7 +2139,7 @@ int vtkPEnSightReader2::GetElementType(const char* line)
     }
 }
 
-void vtkPEnSightReader2::ReplaceWildcards(char* filename, int num)
+void vtkPEnSightReader::ReplaceWildcards(char* filename, int num)
 {
   int wildcardPos, numWildcards, i, j;
   char pattern[32];
@@ -2179,7 +2180,7 @@ void vtkPEnSightReader2::ReplaceWildcards(char* filename, int num)
 }
 
 //----------------------------------------------------------------------------
-void vtkPEnSightReader2::RemoveLeadingBlanks(char *line)
+void vtkPEnSightReader::RemoveLeadingBlanks(char *line)
 {
   int count = 0;
   int len = static_cast<int>(strlen(line));
@@ -2191,7 +2192,7 @@ void vtkPEnSightReader2::RemoveLeadingBlanks(char *line)
 }
 
 //----------------------------------------------------------------------------
-vtkPEnSightReader2::vtkPEnSightReader2CellIds* vtkPEnSightReader2::GetCellIds(int index, int cellType)
+vtkPEnSightReader::vtkPEnSightReaderCellIds* vtkPEnSightReader::GetCellIds(int index, int cellType)
 {
   // Check argument range.
   if(cellType < POINT || cellType >= NUMBER_OF_ELEMENT_TYPES)
@@ -2214,7 +2215,7 @@ vtkPEnSightReader2::vtkPEnSightReader2CellIds* vtkPEnSightReader2::GetCellIds(in
   // Create the container if necessary.
   if(!this->CellIds)
     {
-    this->CellIds = new vtkPEnSightReader2CellIdsType;
+    this->CellIds = new vtkPEnSightReaderCellIdsType;
     }
 
   // Get the index of the actual vtkIdList requested.
@@ -2234,12 +2235,12 @@ vtkPEnSightReader2::vtkPEnSightReader2CellIds* vtkPEnSightReader2::GetCellIds(in
     // we need another way of store these ids...
     if( this->StructuredPartIds->IsId(index) != -1 )
       {
-      (*this->CellIds)[cellIdsIndex] = new vtkPEnSightReader2CellIds(IMPLICIT_STRUCTURED_MODE);
+      (*this->CellIds)[cellIdsIndex] = new vtkPEnSightReaderCellIds(IMPLICIT_STRUCTURED_MODE);
       }
     else if( this->GetMultiProcessNumberOfProcesses() > 12 )
-      (*this->CellIds)[cellIdsIndex] = new vtkPEnSightReader2CellIds(SPARSE_MODE);
+      (*this->CellIds)[cellIdsIndex] = new vtkPEnSightReaderCellIds(SPARSE_MODE);
     else
-      (*this->CellIds)[cellIdsIndex] = new vtkPEnSightReader2CellIds(NON_SPARSE_MODE);
+      (*this->CellIds)[cellIdsIndex] = new vtkPEnSightReaderCellIds(NON_SPARSE_MODE);
     }
 
   // Return the requested vtkIdList.
@@ -2247,7 +2248,7 @@ vtkPEnSightReader2::vtkPEnSightReader2CellIds* vtkPEnSightReader2::GetCellIds(in
 }
 
 //----------------------------------------------------------------------------
-vtkPEnSightReader2::vtkPEnSightReader2CellIds* vtkPEnSightReader2::GetPointIds(int index)
+vtkPEnSightReader::vtkPEnSightReaderCellIds* vtkPEnSightReader::GetPointIds(int index)
 {
   // Check argument range.
   if(index < 0 || ( (this->UnstructuredPartIds->IsId(index) == -1) && (this->StructuredPartIds->IsId(index) == -1) ))
@@ -2263,7 +2264,7 @@ vtkPEnSightReader2::vtkPEnSightReader2CellIds* vtkPEnSightReader2::GetPointIds(i
   // Create the container if necessary.
   if(!this->PointIds)
     {
-    this->PointIds = new vtkPEnSightReader2CellIdsType;
+    this->PointIds = new vtkPEnSightReaderCellIdsType;
     }
 
   // Make sure the container is large enough for this index.
@@ -2278,12 +2279,12 @@ vtkPEnSightReader2::vtkPEnSightReader2CellIds* vtkPEnSightReader2::GetPointIds(i
     // TODO: FIXME: map consumes x12 times more memory than vector
     if( this->StructuredPartIds->IsId(index) != -1 )
       {
-      (*this->PointIds)[index] = new vtkPEnSightReader2CellIds(IMPLICIT_STRUCTURED_MODE);
+      (*this->PointIds)[index] = new vtkPEnSightReaderCellIds(IMPLICIT_STRUCTURED_MODE);
       }
     else if( this->GetMultiProcessNumberOfProcesses() > 12 )
-      (*this->PointIds)[index] = new vtkPEnSightReader2CellIds(SPARSE_MODE);
+      (*this->PointIds)[index] = new vtkPEnSightReaderCellIds(SPARSE_MODE);
     else
-      (*this->PointIds)[index] = new vtkPEnSightReader2CellIds(NON_SPARSE_MODE);
+      (*this->PointIds)[index] = new vtkPEnSightReaderCellIds(NON_SPARSE_MODE);
     }
 
   // Return the requested vtkIdList.
@@ -2291,7 +2292,7 @@ vtkPEnSightReader2::vtkPEnSightReader2CellIds* vtkPEnSightReader2::GetPointIds(i
 }
 
 //----------------------------------------------------------------------------
-vtkIdType vtkPEnSightReader2::GetTotalNumberOfCellIds(int index)
+vtkIdType vtkPEnSightReader::GetTotalNumberOfCellIds(int index)
 {
   int i;
   vtkIdType result = 0;
@@ -2320,7 +2321,7 @@ vtkIdType vtkPEnSightReader2::GetTotalNumberOfCellIds(int index)
     }
 }
 
-vtkIdType vtkPEnSightReader2::GetLocalTotalNumberOfCellIds(int index)
+vtkIdType vtkPEnSightReader::GetLocalTotalNumberOfCellIds(int index)
 {
   int i;
   vtkIdType numCellIds = 0;
@@ -2352,7 +2353,7 @@ vtkIdType vtkPEnSightReader2::GetLocalTotalNumberOfCellIds(int index)
 
 
 //----------------------------------------------------------------------------
-void vtkPEnSightReader2::InsertVariableComponent(vtkFloatArray* array, int i, int component, float* content, int partId, int ensightCellType, int insertionType)
+void vtkPEnSightReader::InsertVariableComponent(vtkFloatArray* array, int i, int component, float* content, int partId, int ensightCellType, int insertionType)
 {
 
   vtkIdType realId;
@@ -2387,7 +2388,7 @@ void vtkPEnSightReader2::InsertVariableComponent(vtkFloatArray* array, int i, in
 }
 
 //----------------------------------------------------------------------------
-void vtkPEnSightReader2::InsertNextCellAndId(vtkUnstructuredGrid* output, int vtkCellType, vtkIdType numPoints, vtkIdType *points , int partId, int ensightCellType, vtkIdType globalId, vtkIdType numElements)
+void vtkPEnSightReader::InsertNextCellAndId(vtkUnstructuredGrid* output, int vtkCellType, vtkIdType numPoints, vtkIdType *points , int partId, int ensightCellType, vtkIdType globalId, vtkIdType numElements)
 {
   // Reader is Distributed. Insert If necessary, and keep global Id trace
   // Should be based on pointIds, aka points, but for now it is based on globalId
@@ -2430,7 +2431,7 @@ void vtkPEnSightReader2::InsertNextCellAndId(vtkUnstructuredGrid* output, int vt
 }
 
 //----------------------------------------------------------------------------
-void vtkPEnSightReader2::PrepareStructuredDimensionsForDistribution(int partId, int *oldDimensions, int *newDimensions, int *splitDimension, int *splitDimensionBeginIndex,
+void vtkPEnSightReader::PrepareStructuredDimensionsForDistribution(int partId, int *oldDimensions, int *newDimensions, int *splitDimension, int *splitDimensionBeginIndex,
                                                                     int ghostLevel, vtkUnsignedCharArray *pointGhostArray, vtkUnsignedCharArray *cellGhostArray)
 {
   // Structured decomposition:
@@ -2589,7 +2590,7 @@ void vtkPEnSightReader2::PrepareStructuredDimensionsForDistribution(int partId, 
 }
 
 //----------------------------------------------------------------------------
-void vtkPEnSightReader2::AddToBlock(vtkMultiBlockDataSet* output,
+void vtkPEnSightReader::AddToBlock(vtkMultiBlockDataSet* output,
                                     unsigned int blockNo,
                                     vtkDataSet* dataset)
 {
@@ -2604,7 +2605,7 @@ void vtkPEnSightReader2::AddToBlock(vtkMultiBlockDataSet* output,
 }
 
 //----------------------------------------------------------------------------
-vtkDataSet* vtkPEnSightReader2::GetDataSetFromBlock(
+vtkDataSet* vtkPEnSightReader::GetDataSetFromBlock(
                                                     vtkMultiBlockDataSet* output,
                                                     unsigned int blockno)
 {
@@ -2612,14 +2613,14 @@ vtkDataSet* vtkPEnSightReader2::GetDataSetFromBlock(
 }
 
 //----------------------------------------------------------------------------
-void vtkPEnSightReader2::SetBlockName(vtkMultiBlockDataSet* output,
+void vtkPEnSightReader::SetBlockName(vtkMultiBlockDataSet* output,
                                       unsigned int blockNo, const char* name)
 {
   output->GetMetaData(blockNo)->Set(vtkCompositeDataSet::NAME(), name);
 }
 
 //----------------------------------------------------------------------------
-void vtkPEnSightReader2::PrintSelf(ostream& os, vtkIndent indent)
+void vtkPEnSightReader::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
 

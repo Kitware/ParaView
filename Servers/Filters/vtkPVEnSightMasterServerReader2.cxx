@@ -62,7 +62,7 @@ public:
   int NumberOfOutputs;
   vtkstd::vector<int> CumulativeTimeSetSizes;
   vtkstd::vector<float> TimeSetValues;
-  vtkstd::vector<vtkGenericEnSightReader2*> RealReaders;
+  vtkstd::vector<vtkGenericEnSightReader*> RealReaders;
 };
 
 //----------------------------------------------------------------------------
@@ -686,7 +686,7 @@ void vtkPVEnSightMasterServerReader2::SetCaseFileName(const char* fileName)
     }
   for(rIdx = 0; rIdx < this->NumberOfPieces; rIdx++)
     {
-    vtkGenericEnSightReader2* aReader = vtkGenericEnSightReader2::New();
+    vtkGenericEnSightReader* aReader = vtkGenericEnSightReader::New();
     aReader->SetFilePath(this->GetFilePath());
     aReader->SetCaseFileName(this->Internal->PieceFileNames[rIdx].c_str());
     this->Internal->RealReaders.push_back(aReader);
@@ -795,7 +795,7 @@ void vtkPVEnSightMasterServerReader2::SetByteOrder(int byteOrder)
 //----------------------------------------------------------------------------
 int vtkPVEnSightMasterServerReader2::GetByteOrder()
 {
-  return this->Internal->RealReaders.size() == 0 ? vtkGenericEnSightReader2::FILE_UNKNOWN_ENDIAN
+  return this->Internal->RealReaders.size() == 0 ? vtkGenericEnSightReader::FILE_UNKNOWN_ENDIAN
       : this->Internal->RealReaders[0]->GetByteOrder();
 }
 

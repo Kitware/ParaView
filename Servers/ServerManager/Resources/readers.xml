@@ -2804,7 +2804,7 @@
    </SourceProxy>
 
    <SourceProxy name="ensight" 
-                class="vtkGenericEnSightReader2"
+                class="vtkPGenericEnSightReader"
                 label="EnSight Reader">
      <Documentation
        short_help="Read EnSight files."

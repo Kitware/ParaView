@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   Visualization Toolkit
-  Module:    vtkPEnSightReader2.h
+  Module:    vtkPEnSightReader.h
 
   Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
   All rights reserved.
@@ -12,7 +12,7 @@
   PURPOSE.  See the above copyright notice for more information.
 
   =========================================================================*/
-// .NAME vtkPEnSightReader2
+// .NAME vtkPEnSightReader
 // .SECTION Description
 // Superclass for EnSight file parallel readers
 // .SECTION Thanks
@@ -30,10 +30,10 @@
 // </verbatim>
 
 
-#ifndef __vtkPEnSightReader2_h
-#define __vtkPEnSightReader2_h
+#ifndef __vtkPEnSightReader_h
+#define __vtkPEnSightReader_h
 
-#include "vtkGenericEnSightReader2.h"
+#include "vtkPGenericEnSightReader.h"
 
 #include "vtkIdTypeArray.h" // For ivars
 #include <vtkstd/map> // For ivars
@@ -51,14 +51,14 @@ class vtkInformationVector;
 class vtkUnsignedCharArray;
 class vtkUnstructuredGrid;
 class vtkFloatArray;
-class vtkPEnSightReader2CellIdsType;
+class vtkPEnSightReaderCellIdsType;
 
 #define NEXTMODULO3( x ) (x==0) ? 1 : ((x==1) ? 2 : 0 )
 
-class VTK_EXPORT vtkPEnSightReader2 : public vtkGenericEnSightReader2
+class VTK_EXPORT vtkPEnSightReader : public vtkPGenericEnSightReader
 {
  public:
-  vtkTypeMacro(vtkPEnSightReader2, vtkGenericEnSightReader2);
+  vtkTypeMacro(vtkPEnSightReader, vtkPGenericEnSightReader);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   //BTX
@@ -68,21 +68,21 @@ class VTK_EXPORT vtkPEnSightReader2 : public vtkGenericEnSightReader2
   // vtkstd::vector in non distributed mode
   // vtkstd::map in distributed mode
   // note: Ensight Ids are INTEGERS, not longs
-  class vtkPEnSightReader2CellIds
+  class vtkPEnSightReaderCellIds
   {
 
   public:
     typedef vtkstd::map< int , int > IntIntMap;
     typedef vtkstd::vector< int > IntVector;
 
-    vtkPEnSightReader2CellIds()
+    vtkPEnSightReaderCellIds()
       {
       this->mode = NON_SPARSE_MODE;
       this->cellMap = NULL;
       this->cellVector = NULL;
       }
 
-    vtkPEnSightReader2CellIds(EnsightReaderCellIdMode amode)
+    vtkPEnSightReaderCellIds(EnsightReaderCellIdMode amode)
       {
       this->mode = amode;
       if( this->mode == SPARSE_MODE )
@@ -107,7 +107,7 @@ class VTK_EXPORT vtkPEnSightReader2 : public vtkGenericEnSightReader2
         }
       }
 
-    ~vtkPEnSightReader2CellIds()
+    ~vtkPEnSightReaderCellIds()
       {
       if( this->mode == SPARSE_MODE )
         delete this->cellMap;
@@ -584,8 +584,8 @@ class VTK_EXPORT vtkPEnSightReader2 : public vtkGenericEnSightReader2
   vtkBooleanMacro(ParticleCoordinatesByIndex, int);
 
  protected:
-  vtkPEnSightReader2();
-  ~vtkPEnSightReader2();
+  vtkPEnSightReader();
+  ~vtkPEnSightReader();
 
   virtual int RequestInformation(vtkInformation*,
                                  vtkInformationVector**,
@@ -723,7 +723,7 @@ class VTK_EXPORT vtkPEnSightReader2 : public vtkGenericEnSightReader2
 
   // Description:
   // Get the list for the given output index and cell type.
-  vtkPEnSightReader2CellIds* GetCellIds(int index, int cellType);
+  vtkPEnSightReaderCellIds* GetCellIds(int index, int cellType);
 
   // Description:
   // Distributed Read Only.
@@ -734,7 +734,7 @@ class VTK_EXPORT vtkPEnSightReader2 : public vtkGenericEnSightReader2
   // Description:
   // Distributed Read Only.
   // Get the list for the given points index.
-  vtkPEnSightReader2CellIds* GetPointIds(int index);
+  vtkPEnSightReaderCellIds* GetPointIds(int index);
 
   // Description:
   // Convenience method use to convert the readers from VTK 5 multiblock API
@@ -772,10 +772,10 @@ class VTK_EXPORT vtkPEnSightReader2 : public vtkGenericEnSightReader2
   char* MatchFileName; // may not actually be necessary to read this file
 
   // pointer to lists of list (cell ids per element type per part)
-  vtkPEnSightReader2CellIdsType* CellIds;
+  vtkPEnSightReaderCellIdsType* CellIds;
 
   // pointer to lists of list (point ids per element type per part)
-  vtkPEnSightReader2CellIdsType* PointIds;
+  vtkPEnSightReaderCellIdsType* PointIds;
 
   // part ids of unstructured outputs
   vtkIdList* UnstructuredPartIds;
@@ -855,8 +855,8 @@ class VTK_EXPORT vtkPEnSightReader2 : public vtkGenericEnSightReader2
 //ETX
 
  private:
-  vtkPEnSightReader2(const vtkPEnSightReader2&);  // Not implemented.
-  void operator=(const vtkPEnSightReader2&);  // Not implemented.
+  vtkPEnSightReader(const vtkPEnSightReader&);  // Not implemented.
+  void operator=(const vtkPEnSightReader&);  // Not implemented.
 };
 
 #endif

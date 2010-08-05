@@ -18,17 +18,17 @@
 #ifndef __vtkPVEnSightMasterServerReader2_h
 #define __vtkPVEnSightMasterServerReader2_h
 
-#include "vtkGenericEnSightReader2.h"
+#include "vtkPGenericEnSightReader.h"
 
 class vtkMultiProcessController;
 class vtkPVEnSightMasterServerReader2Internal;
 class vtkPVEnSightMasterServerTranslator;
 
-class VTK_EXPORT vtkPVEnSightMasterServerReader2 : public vtkGenericEnSightReader2
+class VTK_EXPORT vtkPVEnSightMasterServerReader2 : public vtkPGenericEnSightReader
 {
 public:
   static vtkPVEnSightMasterServerReader2* New();
-  vtkTypeMacro(vtkPVEnSightMasterServerReader2, vtkGenericEnSightReader2);
+  vtkTypeMacro(vtkPVEnSightMasterServerReader2, vtkPGenericEnSightReader);
   void PrintSelf(ostream& os, vtkIndent indent);
   
   // Description:
