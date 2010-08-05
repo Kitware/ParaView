@@ -125,7 +125,7 @@ class DataSetAttributes(VTKObjectWrapper):
     """This is a python friendly wrapper of vtkDataSetAttributes. It
     returns VTKArrays. It also provides the dictionary interface."""
     
-    def __init__(self, vtkobject, dataset):
+    def __init__(self, vtkobject, dataset, association):
         self.VTKObject = vtkobject
         import weakref
         self.DataSet = weakref.ref(dataset)
@@ -232,16 +232,16 @@ class DataSet(VTKObjectWrapper):
     
     def GetPointData(self):
         "Returns the point data as a DataSetAttributes instance."
-        return DataSetAttributes(self.VTKObject.GetPointData(), self)
+        return DataSetAttributes(self.VTKObject.GetPointData(), self, ArrayAssociation.POINT)
 
     def GetCellData(self):
         "Returns the cell data as a DataSetAttributes instance."
-        return DataSetAttributes(self.VTKObject.GetCellData(), self)
+        return DataSetAttributes(self.VTKObject.GetCellData(), self, ArrayAssociation.CELL)
 
     def GetFieldData(self):
         "Returns the field data as a DataSetAttributes instance."
-        return DataSetAttributes(self.VTKObject.GetFieldData(), self)
-        
+        return DataSetAttributes(self.VTKObject.GetFieldData(), self, ArrayAssociation.FIELD)
+
     PointData = property(GetPointData, None, None, "This property returns \
         the point data of the dataset.")
     CellData = property(GetCellData, None, None, "This property returns \

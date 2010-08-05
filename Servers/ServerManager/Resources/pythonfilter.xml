@@ -50,7 +50,7 @@
       <IntVectorProperty 
          name="ArrayAssociation" 
          command="SetArrayAssociation" 
-         number_of_elements="0"
+         number_of_elements="1"
          default_values="0"> 
         <EnumerationDomain name="enum">
           <Entry value="0" text="Point Data"/>
