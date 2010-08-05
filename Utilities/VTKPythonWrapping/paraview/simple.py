@@ -116,10 +116,13 @@ def OpenDataFile(filename, **extraArgs):
     if  reader_factor.GetNumberOfRegisteredPrototypes() == 0:
       reader_factor.RegisterPrototypes("sources")
     cid = servermanager.ActiveConnection.ID
-    if not reader_factor.TestFileReadability(filename, cid):
-        raise RuntimeError, "File not readable: %s " % filename
-    if not reader_factor.CanReadFile(filename, cid):
-        raise RuntimeError, "File not readable. No reader found for '%s' " % filename
+    first_file = filename
+    if type(filename) == list:
+        first_file = filename[0]
+    if not reader_factor.TestFileReadability(first_file, cid):
+        raise RuntimeError, "File not readable: %s " % first_file
+    if not reader_factor.CanReadFile(first_file, cid):
+        raise RuntimeError, "File not readable. No reader found for '%s' " % first_file
     prototype = servermanager.ProxyManager().GetPrototypeProxy(
       reader_factor.GetReaderGroup(), reader_factor.GetReaderName())
     xml_name = paraview.make_name_valid(prototype.GetXMLLabel())
