@@ -68,35 +68,42 @@ int vtkPGenericEnSightReader::RequestInformation(
     //or we can't handle this data format in parallel
     return vtkGenericEnSightReader::RequestInformation(request,inputVector,outputVector);
     }
-  else if (version == vtkPGenericEnSightReader::ENSIGHT_GOLD && this->Reader)
+  else if (version == vtkPGenericEnSightReader::ENSIGHT_GOLD )
     {
-    if (strcmp(this->Reader->GetClassName(), "vtkPEnSightGoldReader") == 0)
+    if ( this->Reader )
       {
-      createReader = 0;
-      }
-    else
-      {
-      this->Reader->Delete();
+      if (strcmp(this->Reader->GetClassName(), "vtkPEnSightGoldReader") == 0)
+        {
+        createReader = 0;
+        }
+      else
+        {
+        this->Reader->Delete();
+        }
       }
     if (createReader)
       {
       this->Reader = vtkPEnSightGoldReader::New();
       }
     }
-  else if(version == vtkPGenericEnSightReader::ENSIGHT_GOLD_BINARY && this->Reader)
+  else if(version == vtkPGenericEnSightReader::ENSIGHT_GOLD_BINARY)
     {
-    if (strcmp(this->Reader->GetClassName(),"vtkPEnSightGoldBinaryReader")== 0)
+    if ( this->Reader )
       {
-      createReader = 0;
-      }
-    else
-      {
-      this->Reader->Delete();
+      if (strcmp(this->Reader->GetClassName(),"vtkPEnSightGoldBinaryReader")== 0)
+        {
+        createReader = 0;
+        }
+      else
+        {
+        this->Reader->Delete();
+        }
       }
     if (createReader)
       {
       this->Reader = vtkPEnSightGoldBinaryReader::New();
       }
+
     }
   else
     {
