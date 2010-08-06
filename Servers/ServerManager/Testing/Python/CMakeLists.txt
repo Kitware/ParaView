@@ -93,7 +93,9 @@ SET(PY_TESTS_NO_BASELINE
   ProxyManager
   SMPropertyAdaptor
   VRMLSource
-  PythonFilters
+  # Disable this because some systems do not have numpy
+  # Need to implement logic to detect the presence of numpy
+  # PythonFilters
 )
 
 IF (PVServerManagerTestData AND GENERATOR_EXPRESSIONS_SUPPORTED)
@@ -111,7 +113,7 @@ IF (PVServerManagerTestData AND GENERATOR_EXPRESSIONS_SUPPORTED)
   # for some reason. Therefore, those exceptions are not considered as failures
   # by the ctest framework. Set this property causes ctest to parse the outputs of
   # the generated scripts for the regex "Error" which can cause a test failure.
-  set_tests_properties(PythonFilters-ServerManagerPython PROPERTIES FAIL_REGULAR_EXPRESSION "Error")
+  # set_tests_properties(PythonFilters-ServerManagerPython PROPERTIES FAIL_REGULAR_EXPRESSION "Error")
 ENDIF (PVServerManagerTestData AND GENERATOR_EXPRESSIONS_SUPPORTED)
 ###############################################################################
 # Add tests for pvbatch.
