@@ -80,8 +80,8 @@ vtkPVEnSightMasterServerReader2::~vtkPVEnSightMasterServerReader2()
 {
   int rIdx;
   this->SetController(0);
-  for(rIdx = static_cast<int> (this->Internal->RealReaders.size() - 1); rIdx
-      > 0; rIdx--)
+  for(rIdx = static_cast<int> (this->Internal->RealReaders.size() - 1);
+    rIdx >= 0; rIdx--)
     {
     this->Internal->RealReaders[rIdx]->Delete();
     this->Internal->RealReaders.pop_back();
