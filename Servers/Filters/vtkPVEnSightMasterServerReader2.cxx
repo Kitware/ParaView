@@ -310,8 +310,9 @@ int vtkPVEnSightMasterServerReader2::RequestInformation(vtkInformation * vtkNotU
         = (this->Internal->CumulativeTimeSetSizes[i]
             + timeSets->GetItem(i)->GetNumberOfTuples());
     }
+
   if(vtkPVEnSightMasterServerReader2SyncValues(
-      &*this->Internal->CumulativeTimeSetSizes.begin(),
+      &this->Internal->CumulativeTimeSetSizes.at(0),
       this->Internal->NumberOfTimeSets + 1,
       this->Controller->GetNumberOfProcesses(), this->Controller) != VTK_OK)
     {
@@ -356,8 +357,9 @@ int vtkPVEnSightMasterServerReader2::RequestInformation(vtkInformation * vtkNotU
       this->Internal->TimeSetValues.push_back(array->GetTuple1(j));
       }
     }
+
   if(vtkPVEnSightMasterServerReader2SyncValues(
-      &*this->Internal->TimeSetValues.begin(),
+      &this->Internal->CumulativeTimeSetSizes.at(0),
       static_cast<int> (this->Internal->TimeSetValues.size()),
       this->Controller->GetNumberOfProcesses(), this->Controller) != VTK_OK)
     {
