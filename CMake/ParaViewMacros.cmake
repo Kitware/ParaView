@@ -191,7 +191,7 @@ FUNCTION (add_executable_with_forwarding2
 
   add_executable(${exe_name}${PV_EXE_SUFFIX} ${ARGN})
   set_target_properties(${exe_name}${PV_EXE_SUFFIX} PROPERTIES
-        RUNTIME_OUTPUT_NAME ${exe_name})
+        OUTPUT_NAME ${exe_name})
 
   set (${out_real_exe_suffix} "${PV_EXE_SUFFIX}" PARENT_SCOPE)
 ENDFUNCTION (add_executable_with_forwarding2)
