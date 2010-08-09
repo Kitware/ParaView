@@ -796,6 +796,10 @@ class ArraySelectionProperty(VectorProperty):
         elif len(values) == 2:
             if isinstance(values[0], str):
                 val = str(ASSOCIATIONS[values[0]])
+            else:
+                # In case user didn't specify valid association,
+                # just pick POINTS.
+                val = str(ASSOCIATIONS['POINTS'])
             self.SMProperty.SetElement(3,  str(val))
             self.SMProperty.SetElement(4, values[1])
         else:
