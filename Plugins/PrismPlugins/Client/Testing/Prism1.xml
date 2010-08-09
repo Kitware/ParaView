@@ -1,0 +1,70 @@
+<?xml version="1.0" ?>
+<pqevents>
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuTools" />
+  <pqevent object="pqClientMainWindow/menubar/menuTools" command="activate" arguments="actionManage_Plugins" />
+  <pqevent object="pqClientMainWindow/PluginManagerDialog/localGroup/localPlugins" command="setCurrent" arguments="NIfTIWriter" />
+  <pqevent object="pqClientMainWindow/PluginManagerDialog/localGroup/localPlugins" command="setCurrent" arguments="PrismClientPlugin" />
+  <pqevent object="pqClientMainWindow/PluginManagerDialog/localGroup/loadSelected_Local" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/PluginManagerDialog/localGroup/localPlugins" command="setCurrent" arguments="NIfTIWriter" />
+  <pqevent object="pqClientMainWindow/PluginManagerDialog/localGroup/localPlugins" command="setCurrent" arguments="PrismServerPlugin" />
+  <pqevent object="pqClientMainWindow/PluginManagerDialog/localGroup/loadSelected_Local" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/PluginManagerDialog/buttonBox/1QPushButton0" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_File" />
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_File" />
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_File" />
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_File" />
+  <pqevent object="pqClientMainWindow/menubar/menu_File" command="activate" arguments="actionFileOpen" />
+  <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Data/PrismBrick.e" />
+  <pqevent object="pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/Variables" command="setCurrent" arguments="0.0" />
+  <pqevent object="pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/Variables/1QHeaderView0" command="mousePress" arguments="1,1,0,0,0,0" />
+  <pqevent object="pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/Variables/1QHeaderView0" command="mouseRelease" arguments="1,0,0,0,0,0" />
+  <pqevent object="pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/objectInspector/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/variableToolbar/displayColor/Variables" command="set_string" arguments="Pressure" />
+  <pqevent object="pqClientMainWindow/PrismToolBarActions0/QAction0" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Data/SESAME301" />
+  <pqevent object="pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/tabWidget/qt_tabwidget_tabbar" command="set_tab" arguments="1" />
+  <pqevent object="pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/tabWidget/qt_tabwidget_stackedwidget/tab_2/AssociateYAxis" command="set_string" arguments="Temperature" />
+  <pqevent object="pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/tabWidget/qt_tabwidget_stackedwidget/tab_2/AssociateZAxis" command="set_string" arguments="Pressure" />
+  <pqevent object="pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/tabWidget/qt_tabwidget_tabbar" command="set_tab" arguments="0" />
+  <pqevent object="pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/objectInspector/ScrollArea/qt_scrollarea_vcontainer/1QScrollBar0" command="mousePress" arguments="1,1,0,9,106" />
+  <pqevent object="pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/objectInspector/ScrollArea/qt_scrollarea_vcontainer/1QScrollBar0" command="mouseMove" arguments="1,0,0,-30,294" />
+  <pqevent object="pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/objectInspector/ScrollArea/qt_scrollarea_vcontainer/1QScrollBar0" command="mouseRelease" arguments="1,0,0,-30,294" />
+  <pqevent object="pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/tabWidget/qt_tabwidget_stackedwidget/widget/DisplaySESAMEContours" command="mousePress" arguments="1,1,0,15,10" />
+  <pqevent object="pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/tabWidget/qt_tabwidget_stackedwidget/widget/DisplaySESAMEContours" command="mouseRelease" arguments="1,0,0,15,10" />
+  <pqevent object="pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/tabWidget/qt_tabwidget_stackedwidget/widget/DisplaySESAMEContours/ContourVarName" command="set_string" arguments="Total EOS (Pressure)" />
+  <pqevent object="pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/tabWidget/qt_tabwidget_stackedwidget/widget/DisplaySESAMEContours/NewRange" command="activate" arguments="" />
+  <pqevent object="pqSampleScalarAddRangeDialog/okButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/objectInspector/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mousePress" arguments="1,1,0,84,1,/0:0/0:0/0:0/0:0" />
+  <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mouseRelease" arguments="1,0,0,84,1,/0:0/0:0/0:0/0:0" />
+  <pqevent object="pqClientMainWindow/variableToolbar/displayColor/Variables" command="set_string" arguments="301: Total EOS (Pressure)" />
+  <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mousePress" arguments="1,1,0,90,6,/0:0/0:0/0:0/2:0" />
+  <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mouseRelease" arguments="1,0,0,90,6,/0:0/0:0/0:0/2:0" />
+  <pqevent object="pqClientMainWindow/variableToolbar/displayColor/Variables" command="set_string" arguments="Pressure" />
+  <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mousePress" arguments="1,1,0,106,6,/0:0/0:0/0:0/1:0" />
+  <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mouseRelease" arguments="1,0,0,106,6,/0:0/0:0/0:0/1:0" />
+  <pqevent object="pqClientMainWindow/variableToolbar/displayColor/Variables" command="set_string" arguments="301: Total EOS (Pressure)" />
+  <pqevent object="pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/objectInspector/ScrollArea/qt_scrollarea_vcontainer/1QScrollBar0" command="mousePress" arguments="1,1,0,8,230" />
+  <pqevent object="pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/objectInspector/ScrollArea/qt_scrollarea_vcontainer/1QScrollBar0" command="mouseMove" arguments="1,0,0,17,153" />
+  <pqevent object="pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/objectInspector/ScrollArea/qt_scrollarea_vcontainer/1QScrollBar0" command="mouseRelease" arguments="1,0,0,17,153" />
+  <pqevent object="pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/tabWidget/qt_tabwidget_stackedwidget/widget/WarpSurface/ZLogScaling" command="set_boolean" arguments="true" />
+  <pqevent object="pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/objectInspector/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/selectionToolbar/actionSelectionMode" command="set_boolean" arguments="true" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/0/Viewport" command="mousePress" arguments="(0.143836,0.0872274,1,1,0)" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/0/Viewport" command="mouseMove" arguments="(0.359589,0.242991,1,0,0)" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/0/Viewport" command="mouseRelease" arguments="(0.359589,0.242991,1,0,0)" />
+  <pqevent object="pqClientMainWindow/selectionToolbar/actionSelectionMode" command="set_boolean" arguments="true" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/0/Viewport" command="mousePress" arguments="(0.386986,0.0851506,1,1,0)" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/0/Viewport" command="mouseMove" arguments="(0.767123,0.259605,1,0,0)" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/0/Viewport" command="mouseRelease" arguments="(0.767123,0.259605,1,0,0)" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/1/Viewport" command="mousePress" arguments="(0.356164,0.136033,1,1,0)" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/1/Viewport" command="mouseMove" arguments="(0.356164,0.136033,1,0,0)" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/1/Viewport" command="mouseRelease" arguments="(0.356164,0.136033,1,0,0)" />
+  <pqevent object="pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_tabbar" command="set_tab" arguments="1" />
+  <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mousePress" arguments="1,1,0,73,3,/0:0/0:0/0:0/0:0" />
+  <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mouseRelease" arguments="1,0,0,73,3,/0:0/0:0/0:0/0:0" />
+  <pqevent object="pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/1QScrollArea0/qt_scrollarea_viewport/1pqDisplayProxyEditorWidget0/PrismDisplayProxyEditor/AnnotationGroup/ShowCubeAxes" command="set_boolean" arguments="true" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/1/Viewport" command="mousePress" arguments="(0.376712,0.498442,4,4,0)" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/1/Viewport" command="mouseMove" arguments="(0.571918,0.298027,4,0,0)" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/1/Viewport" command="mouseRelease" arguments="(0.571918,0.298027,4,0,0)" />
+</pqevents>

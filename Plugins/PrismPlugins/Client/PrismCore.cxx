@@ -20,12 +20,15 @@
 #include "pqDataRepresentation.h"
 #include "pqSMAdaptor.h"
 #include "pqObjectBuilder.h"
+#include "pqCoreUtilities.h"
 #include <QApplication>
+#include <QActionGroup>
 #include <QStyle>
 #include <QMessageBox>
 #include <QtDebug>
 #include <pqFileDialog.h>
 #include <QAction>
+#include <QMainWindow>
 #include "pqUndoStack.h"
 #include "vtkSMPropertyLink.h"
 #include "vtkSMSelectionHelper.h"
@@ -38,18 +41,8 @@ PrismCore::PrismCore(QObject* p)
     {
     this->ProcessingEvent=false;
     this->VTKConnections = NULL;
-
-    this->PrismViewAction = new QAction("Prism View",this);
-    this->PrismViewAction->setToolTip("Create Prism View");
-    this->PrismViewAction->setIcon(QIcon(":/Prism/Icons/PrismSmall.png"));
-
-    QObject::connect(this->PrismViewAction, SIGNAL(triggered(bool)), this, SLOT(onCreatePrismView()));
-
-    this->SesameViewAction = new QAction("SESAME Surface",this);
-    this->SesameViewAction->setToolTip("Open SESAME Surface");
-    this->SesameViewAction->setIcon(QIcon(":/Prism/Icons/CreateSESAME.png"));
-
-    QObject::connect(this->SesameViewAction, SIGNAL(triggered(bool)), this, SLOT(onSESAMEFileOpen()));
+    this->PrismViewAction=NULL;
+    this->SesameViewAction=NULL;
 
     pqServerManagerModel* model=pqApplicationCore::instance()->getServerManagerModel();
 
@@ -98,11 +91,24 @@ PrismCore* PrismCore::instance()
 
 
 
-void PrismCore::actions(QList<QAction*>& tmp)
+void PrismCore::createActions(QActionGroup* ag)
     {
-    tmp.clear();
-    tmp.push_back(this->SesameViewAction);
-    tmp.push_back(this->PrismViewAction);
+      if(!this->PrismViewAction)
+      {
+        this->PrismViewAction = new QAction("Prism View",ag);
+        this->PrismViewAction->setToolTip("Create Prism View");
+        this->PrismViewAction->setIcon(QIcon(":/Prism/Icons/PrismSmall.png"));
+
+        QObject::connect(this->PrismViewAction, SIGNAL(triggered(bool)), this, SLOT(onCreatePrismView()));
+      }
+      if(!this->SesameViewAction)
+      {
+        this->SesameViewAction = new QAction("SESAME Surface",ag);
+        this->SesameViewAction->setToolTip("Open SESAME Surface");
+        this->SesameViewAction->setIcon(QIcon(":/Prism/Icons/CreateSESAME.png"));
+
+        QObject::connect(this->SesameViewAction, SIGNAL(triggered(bool)), this, SLOT(onSESAMEFileOpen()));
+      }
     }
 
 pqPipelineSource* PrismCore::getActiveSource() const
@@ -171,9 +177,12 @@ void PrismCore::onSESAMEFileOpen()
         qDebug() << "No active server selected.";
         }
 
+
+
+
     QString filters = "All files (*)";
     pqFileDialog* const file_dialog = new pqFileDialog(server, 
-        NULL, tr("Open File:"), QString(), filters);
+        pqCoreUtilities::mainWidget(), tr("Open File:"), QString(), filters);
 
     file_dialog->setAttribute(Qt::WA_DeleteOnClose);
     file_dialog->setObjectName("FileOpenDialog");
@@ -258,7 +267,7 @@ void PrismCore::onCreatePrismView()
 
     QString filters = "All files (*)";
     pqFileDialog* const file_dialog = new pqFileDialog(server, 
-        NULL, tr("Open File:"), QString(), filters);
+         pqCoreUtilities::mainWidget(), tr("Open File:"), QString(), filters);
 
     file_dialog->setAttribute(Qt::WA_DeleteOnClose);
     file_dialog->setObjectName("FileOpenDialog");
@@ -626,14 +635,20 @@ void PrismCore::onSelectionChanged()
             pqSMAdaptor::setUncheckedProxyProperty(input, source->getProxy());
             if(input->IsInDomains())
                 {
-                this->PrismViewAction->setEnabled(true);
+                  if(this->PrismViewAction)
+                  {
+                    this->PrismViewAction->setEnabled(true);
+                  }
                 return;
                 }
             }
-        }
+      }
 
-    this->PrismViewAction->setEnabled(false);
-    }
+    if(this->PrismViewAction)
+      {
+      this->PrismViewAction->setEnabled(false);
+      }
+}
 
 pqServerManagerModelItem *PrismCore::getActiveObject() const
     {
@@ -656,5 +671,3 @@ pqServerManagerModelItem *PrismCore::getActiveObject() const
 
     return item;
     }
-
-
