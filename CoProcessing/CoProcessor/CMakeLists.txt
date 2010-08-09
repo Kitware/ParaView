@@ -102,6 +102,25 @@ IF(PY_STATIC_MODULES_LIST)
 ENDIF(PY_STATIC_MODULES_LIST)
 
 
+# Install
+#----------------------------------------------------------------------------------------------------
+# Libraries
+IF(NOT PV_INSTALL_NO_LIBRARIES)
+
+  INSTALL(TARGETS vtkCoProcessor vtkCoProcessorPython vtkCoProcessorPythonD
+      RUNTIME DESTINATION ${PV_INSTALL_BIN_DIR} COMPONENT Runtime
+      LIBRARY DESTINATION ${PV_INSTALL_LIB_DIR} COMPONENT Runtime
+      ARCHIVE DESTINATION ${PV_INSTALL_LIB_DIR} COMPONENT Development)
+ENDIF(NOT PV_INSTALL_NO_LIBRARIES)
+#
+# Development
+IF (NOT PV_INSTALL_NO_DEVELOPMENT)
+  GLOB_INSTALL_DEVELOPMENT(
+      ${CMAKE_CURRENT_SOURCE_DIR}
+      ${PV_INSTALL_INCLUDE_DIR}
+      "*.h;*.hxx;*.txx")
+ENDIF (NOT PV_INSTALL_NO_DEVELOPMENT)
+
 if(BUILD_TESTING)
   add_subdirectory(Testing)
 endif(BUILD_TESTING)
