@@ -311,22 +311,6 @@ void vtkIceTCompositePass::Render(const vtkRenderState* render_state)
     GLint w=vp[4*id+2];
     GLint h=vp[4*id+3];
     delete[] vp;
-#if 0
-    glMatrixMode(GL_MODELVIEW);
-    glPushMatrix();
-    glLoadIdentity();
-    glMatrixMode(GL_PROJECTION); // can we change that within IceT?
-    glPushMatrix();
-    glLoadIdentity();
-    glRasterPos2f( -1, -1);
-    glMatrixMode(GL_PROJECTION);
-    glPopMatrix();
-    glMatrixMode(GL_MODELVIEW);
-    glPopMatrix();
-    glPixelStorei(GL_PACK_ALIGNMENT,1);
-    glDrawPixels(w,h,GL_DEPTH_COMPONENT,GL_UNSIGNED_INT,depthBuffer);
-#else
-    // with a shader
 
     // pbo arguments.
     unsigned int dims[2];
@@ -388,7 +372,6 @@ void vtkIceTCompositePass::Render(const vtkRenderState* render_state)
     vtkgl::ActiveTexture(vtkgl::TEXTURE0);
 
     glPopAttrib();
-#endif
     }
   this->CleanupContext(render_state);
 }
