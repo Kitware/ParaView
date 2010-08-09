@@ -9,7 +9,6 @@ SET(ServersFilters_SRCS
   TestExtractHistogram
   TestExtractScatterPlot
   TestMPI
-  TestIceTCompositePass
   )
 
 IF (VTK_DATA_ROOT)
@@ -29,6 +28,29 @@ FOREACH(name ${ServersFilters_SRCS})
     )
   TARGET_LINK_LIBRARIES(${name} vtkPVFilters)
 ENDFOREACH(name)
+
+ADD_EXECUTABLE(TestIceTCompositePass TestIceTCompositePass.cxx)
+    TARGET_LINK_LIBRARIES(TestIceTCompositePass vtkPVFilters)
+
+ ADD_TEST(TestIceTCompositePass-image
+            ${VTK_MPIRUN_EXE} ${VTK_MPI_PRENUMPROC_FLAGS} ${VTK_MPI_NUMPROC_FLAG} 2 ${VTK_MPI_PREFLAGS}
+            ${CXX_TEST_PATH}/\${CTEST_CONFIGURATION_TYPE}/TestIceTCompositePass
+            --tdx 2
+            -D ${PARAVIEW_DATA_ROOT}
+            -T ${ParaView_BINARY_DIR}/Testing/Temporary
+            -V Baseline/TestIceTCompositePass.cxx.png
+            ${VTK_MPI_POSTFLAGS})
+
+ ADD_TEST(TestIceTCompositePassDepthOnly-image
+            ${VTK_MPIRUN_EXE} ${VTK_MPI_PRENUMPROC_FLAGS} ${VTK_MPI_NUMPROC_FLAG} 2 ${VTK_MPI_PREFLAGS}
+            ${CXX_TEST_PATH}/\${CTEST_CONFIGURATION_TYPE}/TestIceTCompositePass
+            --tdx 2
+            --depth-only
+            -D ${PARAVIEW_DATA_ROOT}
+            -T ${ParaView_BINARY_DIR}/Testing/Temporary
+            -V Baseline/TestIceTCompositePassDepthOnly.cxx.png
+            ${VTK_MPI_POSTFLAGS})
+
 
 ADD_EXECUTABLE(TestIceTShadowMapPass TestIceTShadowMapPass.cxx)
     TARGET_LINK_LIBRARIES(TestIceTShadowMapPass vtkPVFilters)
@@ -59,4 +81,3 @@ TestPVAMRDualClip
     TARGET_LINK_LIBRARIES(${name} vtkPVFilters)
   ENDFOREACH(name)
 ENDIF (VTK_USE_DISPLAY AND VTK_DATA_ROOT AND PARAVIEW_DATA_ROOT)
-

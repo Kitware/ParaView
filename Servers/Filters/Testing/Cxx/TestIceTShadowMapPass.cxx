@@ -430,7 +430,7 @@ void MyProcess::Execute()
   const int width=400;
   const int height=400;
 
-  // 300x300 windows, +24 in y to avoid gnome menu bar.
+  // 400x400 windows, +24 in y to avoid gnome menu bar.
   renWin->SetPosition(x*(width+6),y*(height+20)+24);
 
   // enable alpha bit-planes.

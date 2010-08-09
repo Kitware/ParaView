@@ -37,6 +37,10 @@
 class vtkMultiProcessController;
 class vtkPKdTree;
 class vtkIceTContext;
+class vtkPixelBufferObject;
+class vtkTextureObject;
+class vtkShaderProgram2;
+class vtkOpenGLRenderWindow;
 
 class VTK_EXPORT vtkIceTCompositePass : public vtkRenderPass
 {
@@ -67,6 +71,7 @@ public:
   // Description:
   // Get/Set the render pass used to do the actual rendering. The result of this
   // delete pass is what gets composited using IceT.
+  // Initial value is a NULL pointer.
   void SetRenderPass(vtkRenderPass*);
   vtkGetObjectMacro(RenderPass, vtkRenderPass);
 
@@ -79,6 +84,7 @@ public:
   // Description:
   // Get/Set the tile mullions. The mullions are measured in pixels. Use
   // negative numbers for overlap.
+  // Initial value is {0,0}.
   vtkSetVector2Macro(TileMullions, int);
   vtkGetVector2Macro(TileMullions, int);
 
@@ -86,6 +92,7 @@ public:
   // Set to true if data is replicated on all processes. This will enable IceT
   // to minimize communications since data is available on all process. Off by
   // default.
+  // Initial value is false.
   vtkSetMacro(DataReplicatedOnAllProcesses, bool);
   vtkGetMacro(DataReplicatedOnAllProcesses, bool);
   vtkBooleanMacro(DataReplicatedOnAllProcesses, bool);
@@ -96,6 +103,7 @@ public:
   // that on vtkSynchronizedRenderers since using
   // vtkSynchronizedRenderers::ImageReductionFactor will not work correctly with
   // IceT.
+  // Initial value is 1.
   vtkSetClampMacro(ImageReductionFactor, int, 1, 50);
   vtkGetMacro(ImageReductionFactor, int);
 
@@ -111,9 +119,18 @@ public:
   // necessary when rendering volumes or translucent geometries. When
   // UseOrderedCompositing is set to true, it is expected that the KdTree is set as
   // well. The KdTree is used to decide the process-order for compositing.
+  // Initial value is false.
   vtkGetMacro(UseOrderedCompositing, bool);
   vtkSetMacro(UseOrderedCompositing, bool);
   vtkBooleanMacro(UseOrderedCompositing, bool);
+
+  // Description:
+  // Tell to only deal with the depth component and ignore the color
+  // components.
+  // If true, UseOrderedCompositing is ignored.
+  // Initial value is false.
+  vtkGetMacro(DepthOnly,bool);
+  vtkSetMacro(DepthOnly,bool);
 
 //BTX
   // Description:
@@ -133,6 +150,13 @@ protected:
   vtkIceTCompositePass();
   ~vtkIceTCompositePass();
 
+  // Description:
+  // Create program for texture mapping.
+  // \pre context_exists: context!=0
+  // \pre Program_void: this->Program==0
+  // \post Program_exists: this->Program!=0
+  void CreateProgram(vtkOpenGLRenderWindow *context);
+
   void UpdateTileInformation(const vtkRenderState*);
 
   vtkMultiProcessController *Controller;
@@ -141,6 +165,7 @@ protected:
   vtkIceTContext* IceTContext;
 
   bool UseOrderedCompositing;
+  bool DepthOnly;
   bool DataReplicatedOnAllProcesses;
   int TileDimensions[2];
   int TileMullions[2];
@@ -151,6 +176,11 @@ protected:
   double PhysicalViewport[4];
 
   int ImageReductionFactor;
+
+  vtkPixelBufferObject *PBO;
+  vtkTextureObject *ZTexture;
+  vtkShaderProgram2 *Program;
+
 private:
   vtkIceTCompositePass(const vtkIceTCompositePass&); // Not implemented
   void operator=(const vtkIceTCompositePass&); // Not implemented

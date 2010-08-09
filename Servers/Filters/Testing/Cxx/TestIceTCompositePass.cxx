@@ -62,6 +62,8 @@
 #include "vtkVolumetricPass.h"
 #include "vtkGaussianBlurPass.h"
 #include "vtkSobelGradientMagnitudePass.h"
+#include "vtkPlaneSource.h"
+
 /*
 ** This test only builds if MPI is in use
 */
@@ -78,6 +80,7 @@ class MyProcess : public vtkProcess
   int UseDepthPeeling;
   bool UseBlurPass;
   bool UseSobelPass;
+  bool DepthOnly;
 public:
   static MyProcess *New();
   vtkTypeRevisionMacro(MyProcess, vtkProcess);
@@ -91,6 +94,7 @@ public:
   vtkSetMacro(ServerMode, bool);
   vtkSetMacro(UseBlurPass, bool);
   vtkSetMacro(UseSobelPass, bool);
+  vtkSetMacro(DepthOnly, bool);
   vtkSetObjectMacro(SocketController, vtkMultiProcessController);
 
   void SetArgs(int anArgc, char *anArgv[]);
@@ -99,6 +103,9 @@ public:
 private:
   // Creates the visualization pipeline and adds it to the renderer.
   void CreatePipeline(vtkRenderer* renderer);
+  // Creates the visualization pipeline and adds it to the renderer on layer
+  // 1.
+  void CreatePipeline2(vtkRenderer* renderer);
 
   // Setups render passes.
   void SetupRenderPasses(vtkRenderer* renderer);
@@ -132,6 +139,7 @@ MyProcess::MyProcess()
   this->SocketController = 0;
   this->UseBlurPass = false;
   this->UseSobelPass = false;
+  this->DepthOnly=false;
 }
 
 //-----------------------------------------------------------------------------
@@ -195,6 +203,51 @@ void MyProcess::CreatePipeline(vtkRenderer* renderer)
 }
 
 //-----------------------------------------------------------------------------
+void MyProcess::CreatePipeline2(vtkRenderer* renderer)
+{
+  int num_procs = this->Controller->GetNumberOfProcesses();
+  int my_id = this->Controller->GetLocalProcessId();
+
+  vtkPlaneSource *plane=vtkPlaneSource::New();
+
+  vtkDistributedDataFilter* d3 = vtkDistributedDataFilter::New();
+  d3->SetInputConnection(plane->GetOutputPort());
+  d3->SetController(this->Controller);
+  d3->SetBoundaryModeToSplitBoundaryCells();
+  d3->UseMinimalMemoryOff();
+
+  vtkDataSetSurfaceFilter* surface = vtkDataSetSurfaceFilter::New();
+  surface->SetInputConnection(d3->GetOutputPort());
+
+  vtkPieceScalars *piecescalars = vtkPieceScalars::New();
+  piecescalars->SetInputConnection(surface->GetOutputPort());
+  piecescalars->SetScalarModeToCellData();
+
+  vtkPolyDataMapper* mapper = vtkPolyDataMapper::New();
+  mapper->SetInputConnection(piecescalars->GetOutputPort());
+  mapper->SetScalarModeToUseCellFieldData();
+  mapper->SelectColorArray("Piece");
+  mapper->SetScalarRange(0, num_procs-1);
+  mapper->SetPiece(my_id);
+  mapper->SetNumberOfPieces(num_procs);
+  mapper->Update();
+
+  this->KdTree = d3->GetKdtree();
+
+  vtkActor* actor = vtkActor::New();
+  actor->SetMapper(mapper);
+  actor->GetProperty()->SetOpacity(this->UseOrderedCompositing? 0.5 : 1.0);
+  renderer->AddActor(actor);
+
+  actor->Delete();
+  mapper->Delete();
+  piecescalars->Delete();
+  surface->Delete();
+  d3->Delete();
+  plane->Delete();
+}
+
+//-----------------------------------------------------------------------------
 void MyProcess::SetupRenderPasses(vtkRenderer* renderer)
 {
   // the rendering passes
@@ -238,6 +291,7 @@ void MyProcess::SetupRenderPasses(vtkRenderer* renderer)
   iceTPass->SetRenderPass(seq);
   iceTPass->SetTileDimensions(this->TileDimensions);
   iceTPass->SetImageReductionFactor(this->ImageReductionFactor);
+  iceTPass->SetDepthOnly(this->DepthOnly);
 
   if (this->ServerMode && this->Controller->GetLocalProcessId() == 0)
     {
@@ -295,9 +349,20 @@ void MyProcess::SetupRenderPasses(vtkRenderer* renderer)
 //-----------------------------------------------------------------------------
 void MyProcess::Execute()
 {
-  int my_id = this->Controller->GetLocalProcessId();
+  int myId = this->Controller->GetLocalProcessId();
 
   vtkRenderWindow* renWin = vtkRenderWindow::New();
+
+  int y=myId/this->TileDimensions[0];
+  int x=myId%this->TileDimensions[0];
+
+  const int width=400;
+  const int height=400;
+
+  // 400x400 windows, +24 in y to avoid gnome menu bar.
+  renWin->SetPosition(x*(width+6),y*(height+20)+24);
+  renWin->SetSize(width,height);
+
   // enable alpha bit-planes.
   renWin->AlphaBitPlanesOn();
 
@@ -313,6 +378,22 @@ void MyProcess::Execute()
   vtkRenderer* renderer = vtkRenderer::New();
   renWin->AddRenderer(renderer);
 
+  vtkSynchronizedRenderers *syncRenderers2=0;
+  if(this->DepthOnly)
+    {
+    vtkRenderer *renderer2=vtkRenderer::New();
+    renderer2->SetLayer(1);
+    renderer2->SetPreserveDepthBuffer(true);
+
+    renWin->AddRenderer(renderer2);
+    renWin->SetNumberOfLayers(2);
+    renderer2->Delete();
+    this->CreatePipeline2(renderer2);
+//    syncRenderers2 = vtkSynchronizedRenderers::New();
+//    syncRenderers2->SetRenderer(renderer2);
+//    syncRenderers2->SetParallelController(this->Controller);
+    }
+
   vtkSynchronizedRenderWindows* syncWindows =
     vtkSynchronizedRenderWindows::New();
   syncWindows->SetRenderWindow(renWin);
@@ -326,8 +407,10 @@ void MyProcess::Execute()
   this->CreatePipeline(renderer);
   this->SetupRenderPasses(renderer);
 
-  if (my_id == 0)
+  int retVal;
+  if (myId == 0)
     {
+    // root node
     vtkRenderWindowInteractor* iren = vtkRenderWindowInteractor::New();
     iren->SetRenderWindow(renWin);
     renWin->SwapBuffersOn();
@@ -351,7 +434,11 @@ void MyProcess::Execute()
     else
       {
       renWin->Render();
-      iren->Start();
+      retVal=vtkTesting::Test(this->Argc, this->Argv, renWin, 10);
+      if(retVal==vtkRegressionTester::DO_INTERACTOR)
+        {
+        iren->Start();
+        }
       }
     iren->Delete();
 
@@ -360,18 +447,26 @@ void MyProcess::Execute()
     }
   else
     {
+    // satellite nodes
     if (this->TileDimensions[0] > 1 || this->TileDimensions[1] > 1)
       {
       renWin->SwapBuffersOn();
       }
     this->Controller->ProcessRMIs();
     this->Controller->Barrier();
+    retVal=vtkTesting::PASSED;
     }
 
   renderer->Delete();
   renWin->Delete();
   syncWindows->Delete();
   syncRenderers->Delete();
+  if(syncRenderers2!=0)
+    {
+    syncRenderers2->Delete();
+    }
+
+  this->ReturnValue=retVal;
 }
 
 //-----------------------------------------------------------------------------
@@ -389,18 +484,31 @@ int main(int argc, char **argv)
   int act_as_server = 0;
   int add_blur_pass = 0;
   int add_sobel_pass = 0;
+  int depthOnly=0;
+  int interactive=0;
+  vtkstd::string data;
+  vtkstd::string temp;
+  vtkstd::string baseline;
 
   vtksys::CommandLineArguments args;
   args.Initialize(argc, argv);
   args.StoreUnusedArguments(false);
-  args.AddArgument("-tdx", vtksys::CommandLineArguments::SPACE_ARGUMENT,
+  args.AddArgument("-D", vtksys::CommandLineArguments::SPACE_ARGUMENT,
+                   &data, "");
+  args.AddArgument("-T", vtksys::CommandLineArguments::SPACE_ARGUMENT,
+                   &temp, "");
+  args.AddArgument("-V", vtksys::CommandLineArguments::SPACE_ARGUMENT,
+                   &baseline, "");
+  args.AddArgument("-I", vtksys::CommandLineArguments::NO_ARGUMENT,
+                   &interactive, "");
+  args.AddArgument("--tdx", vtksys::CommandLineArguments::SPACE_ARGUMENT,
     &tile_dimensions[0], "");
-  args.AddArgument("-tdy", vtksys::CommandLineArguments::SPACE_ARGUMENT,
+  args.AddArgument("--tdy", vtksys::CommandLineArguments::SPACE_ARGUMENT,
     &tile_dimensions[1], "");
   args.AddArgument("--image-reduction-factor",
     vtksys::CommandLineArguments::SPACE_ARGUMENT,
     &image_reduction_factor, "Image reduction factor");
-  args.AddArgument("-irf",
+  args.AddArgument("--irf",
     vtksys::CommandLineArguments::SPACE_ARGUMENT,
     &image_reduction_factor, "Image reduction factor");
   args.AddArgument("--use-ordered-compositing",
@@ -410,6 +518,9 @@ int main(int argc, char **argv)
     vtksys::CommandLineArguments::NO_ARGUMENT,
     &use_depth_peeling, "Use depth peeling."
     "This works only when --use-ordered-compositing is true.");
+  args.AddArgument("--depth-only",
+    vtksys::CommandLineArguments::NO_ARGUMENT,
+    &depthOnly, "pass depth buffer only.");
   args.AddArgument("--server",
     vtksys::CommandLineArguments::NO_ARGUMENT,
     &act_as_server,
@@ -460,6 +571,7 @@ int main(int argc, char **argv)
   p->SetServerMode(act_as_server != 0);
   p->SetUseBlurPass(add_blur_pass != 0);
   p->SetUseSobelPass(add_sobel_pass != 0);
+  p->SetDepthOnly(depthOnly==1);
 
   if (contr->GetLocalProcessId() == 0 && act_as_server)
     {

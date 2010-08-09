@@ -26,10 +26,20 @@
 #include "vtkRenderWindow.h"
 #include "vtkSmartPointer.h"
 #include "vtkTilesHelper.h"
+#include "vtkOpenGLRenderWindow.h"
+#include "vtkPixelBufferObject.h"
+#include "vtkTextureObject.h"
+#include "vtkTextureUnitManager.h"
+#include "vtkShaderProgram2.h"
+#include "vtkUniformVariables.h"
+#include "vtkShader2.h"
+#include "vtkShader2Collection.h"
 
 #include <assert.h>
 #include "vtkgl.h"
 #include <GL/ice-t.h>
+
+extern const char *vtkIceTCompositeZPassShader_fs;
 
 namespace
 {
@@ -70,11 +80,29 @@ vtkIceTCompositePass::vtkIceTCompositePass()
   this->ImageReductionFactor = 1;
 
   this->UseOrderedCompositing = false;
+  this->DepthOnly=false;
+
+  this->PBO=0;
+  this->ZTexture=0;
+  this->Program=0;
 }
 
 //----------------------------------------------------------------------------
 vtkIceTCompositePass::~vtkIceTCompositePass()
 {
+  if(this->PBO!=0)
+    {
+    vtkErrorMacro(<<"PixelBufferObject should have been deleted in ReleaseGraphicsResources().");
+    }
+  if(this->ZTexture!=0)
+    {
+    vtkErrorMacro(<<"ZTexture should have been deleted in ReleaseGraphicsResources().");
+    }
+  if(this->Program!=0)
+    {
+    this->Program->Delete();
+    }
+
   this->SetKdTree(0);
   this->SetRenderPass(0);
   this->SetController(0);
@@ -88,6 +116,21 @@ void vtkIceTCompositePass::ReleaseGraphicsResources(vtkWindow* window)
   if(this->RenderPass!=0)
     {
     this->RenderPass->ReleaseGraphicsResources(window);
+    }
+
+  if(this->PBO!=0)
+    {
+    this->PBO->Delete();
+    this->PBO=0;
+    }
+  if(this->ZTexture!=0)
+    {
+    this->ZTexture->Delete();
+    this->ZTexture=0;
+    }
+  if(this->Program!=0)
+    {
+    this->Program->ReleaseGraphicsResources();
     }
 }
 
@@ -112,21 +155,29 @@ void vtkIceTCompositePass::SetupContext(const vtkRenderState* render_state)
   icetStrategy(ICET_STRATEGY_REDUCE);
 
   bool use_ordered_compositing =
-    (this->KdTree && this->UseOrderedCompositing &&
+    (this->KdTree && this->UseOrderedCompositing && !this->DepthOnly &&
      this->KdTree->GetNumberOfRegions() >=
      this->IceTContext->GetController()->GetNumberOfProcesses());
 
-  // If translucent geometry is present, then we should not include
-  // ICET_DEPTH_BUFFER_BIT in  the input-buffer argument.
-  if (use_ordered_compositing)
+  GLenum flags;
+  if(this->DepthOnly)
     {
-    icetInputOutputBuffers(ICET_COLOR_BUFFER_BIT, ICET_COLOR_BUFFER_BIT);
+    flags=ICET_DEPTH_BUFFER_BIT;
     }
   else
     {
-    icetInputOutputBuffers(ICET_COLOR_BUFFER_BIT | ICET_DEPTH_BUFFER_BIT,
-      ICET_COLOR_BUFFER_BIT | ICET_DEPTH_BUFFER_BIT);
+    // If translucent geometry is present, then we should not include
+    // ICET_DEPTH_BUFFER_BIT in  the input-buffer argument.
+    if (use_ordered_compositing)
+      {
+      flags=ICET_COLOR_BUFFER_BIT;
+      }
+    else
+      {
+      flags=ICET_COLOR_BUFFER_BIT | ICET_DEPTH_BUFFER_BIT;
+      }
     }
+  icetInputOutputBuffers(flags,flags);
 
   icetEnable(ICET_FLOATING_VIEWPORT);
   if (use_ordered_compositing)
@@ -238,16 +289,154 @@ void vtkIceTCompositePass::Render(const vtkRenderState* render_state)
   IceTDrawCallbackHandle = NULL;
   IceTDrawCallbackState = NULL;
 
+  if(this->DepthOnly)
+    {
+    GLuint *depthBuffer=icetGetDepthBuffer();
+    // OpenGL code to copy it back
+    // merly the code from vtkOpenGLRenderWindow::SetZbufferData() except that
+    // the data are not float but unsigned int.
+
+    // get the dimension of the buffer
+    GLint id;
+    icetGetIntegerv(ICET_TILE_DISPLAYED,&id);
+    GLint ids;
+    icetGetIntegerv(ICET_NUM_TILES,&ids);
+
+    GLint *vp=new GLint[4*ids];
+
+    icetGetIntegerv(ICET_TILE_VIEWPORTS,vp);
+
+    GLint x=vp[4*id];
+    GLint y=vp[4*id+1];
+    GLint w=vp[4*id+2];
+    GLint h=vp[4*id+3];
+    delete[] vp;
+#if 0
+    glMatrixMode(GL_MODELVIEW);
+    glPushMatrix();
+    glLoadIdentity();
+    glMatrixMode(GL_PROJECTION); // can we change that within IceT?
+    glPushMatrix();
+    glLoadIdentity();
+    glRasterPos2f( -1, -1);
+    glMatrixMode(GL_PROJECTION);
+    glPopMatrix();
+    glMatrixMode(GL_MODELVIEW);
+    glPopMatrix();
+    glPixelStorei(GL_PACK_ALIGNMENT,1);
+    glDrawPixels(w,h,GL_DEPTH_COMPONENT,GL_UNSIGNED_INT,depthBuffer);
+#else
+    // with a shader
+
+    // pbo arguments.
+    unsigned int dims[2];
+    vtkIdType continuousInc[3];
+
+    dims[0]=static_cast<unsigned int>(w);
+    dims[1]=static_cast<unsigned int>(h);
+    continuousInc[0]=0;
+    continuousInc[1]=0;
+    continuousInc[2]=0;
+
+    vtkOpenGLRenderWindow *context=
+      static_cast<vtkOpenGLRenderWindow *>(
+        render_state->GetRenderer()->GetRenderWindow());
+
+    if(this->PBO==0)
+      {
+      this->PBO=vtkPixelBufferObject::New();
+      this->PBO->SetContext(context);
+      }
+    if(this->ZTexture==0)
+      {
+      this->ZTexture=vtkTextureObject::New();
+      this->ZTexture->SetContext(context);
+      }
+
+    // client to PBO
+    this->PBO->Upload2D(VTK_UNSIGNED_INT,depthBuffer,dims,1,continuousInc);
+
+    // PBO to TO
+    this->ZTexture->CreateDepth(dims[0],dims[1],vtkTextureObject::Native,
+                                this->PBO);
+
+    // TO to FB: apply TO on quad with special zcomposite fragment shader.
+    glPushAttrib(GL_DEPTH_BUFFER_BIT|GL_COLOR_BUFFER_BIT);
+    glColorMask(GL_FALSE,GL_FALSE,GL_FALSE,GL_FALSE);
+    glEnable(GL_DEPTH_TEST);
+    glDepthMask(GL_TRUE);
+    glDepthFunc(GL_ALWAYS);
+
+    if(this->Program==0)
+      {
+      this->CreateProgram(context);
+      }
+
+    vtkTextureUnitManager *tu=context->GetTextureUnitManager();
+    int sourceId=tu->Allocate();
+    this->Program->GetUniformVariables()->SetUniformi("depth",1,&sourceId);
+    vtkgl::ActiveTexture(vtkgl::TEXTURE0+static_cast<GLenum>(sourceId));
+    this->Program->Use();
+    this->ZTexture->Bind();
+    this->ZTexture->CopyToFrameBuffer(0,0,
+                                      w-1,h-1,
+                                      0,0,w,h);
+    this->ZTexture->UnBind();
+    this->Program->Restore();
+
+    tu->Free(sourceId);
+    vtkgl::ActiveTexture(vtkgl::TEXTURE0);
+
+    glPopAttrib();
+#endif
+    }
   this->CleanupContext(render_state);
+}
+
+// ----------------------------------------------------------------------------
+void vtkIceTCompositePass::CreateProgram(vtkOpenGLRenderWindow *context)
+{
+  assert("pre: context_exists" && context!=0);
+  assert("pre: Program_void" && this->Program==0);
+
+  this->Program=vtkShaderProgram2::New();
+  this->Program->SetContext(context);
+
+  vtkShader2 *shader=vtkShader2::New();
+  shader->SetContext(context);
+
+  this->Program->GetShaders()->AddItem(shader);
+  shader->Delete();
+  shader->SetType(VTK_SHADER_TYPE_FRAGMENT);
+  shader->SetSourceCode(vtkIceTCompositeZPassShader_fs);
+  this->Program->Build();
+  if(this->Program->GetLastBuildStatus()!=VTK_SHADER_PROGRAM2_LINK_SUCCEEDED)
+    {
+    vtkErrorMacro("prog build failed");
+    }
+
+  assert("post: Program_exists" && this->Program!=0);
 }
 
 //----------------------------------------------------------------------------
 void vtkIceTCompositePass::Draw(const vtkRenderState* render_state)
 {
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  if(!this->DepthOnly)
+    {
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    }
+  else
+    {
+    glClear(GL_DEPTH_BUFFER_BIT);
+    glColorMask(GL_FALSE,GL_FALSE,GL_FALSE,GL_FALSE);
+    }
   if (this->RenderPass)
     {
     this->RenderPass->Render(render_state);
+    }
+  if(this->DepthOnly)
+    {
+    glColorMask(GL_TRUE,GL_TRUE,GL_TRUE,GL_TRUE);
     }
 }
 

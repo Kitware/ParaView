@@ -224,6 +224,11 @@ SET_SOURCE_FILES_PROPERTIES(
   vtkTransferFunctionEditorWidget.cxx
   ABSTRACT)
 
+# The set of source files to be encoded.
+SET(glsl_files
+  vtkIceTCompositeZPassShader_fs
+  )
+
 IF(PARAVIEW_ENABLE_PYTHON)
   SET(Filters_SRCS ${Filters_SRCS}
     vtkPythonCalculator.cxx
@@ -301,6 +306,31 @@ ENDIF(APPLE)
 IF(VTK_USE_MPI)
   INCLUDE_DIRECTORIES(${MPI_INCLUDE_PATH})
 ENDIF(VTK_USE_MPI)
+
+
+IF(VTK_USE_RENDERING)
+# Create custom commands to encode each assembly file into a C string
+# literal in a header file.
+
+SET(glsl_h_files)
+FOREACH(file ${glsl_files})
+  SET(src ${PVFilters_SOURCE_DIR}/${file}.glsl)
+  SET(res ${PVFilters_BINARY_DIR}/${file}.cxx)
+  SET(resh ${PVFilters_BINARY_DIR}/${file}.h)
+  SET(glsl_h_files ${glsl_h_files} "${resh}")
+  ADD_CUSTOM_COMMAND(
+    OUTPUT ${res} ${resh}
+    DEPENDS ${src} vtkEncodeString
+    COMMAND ${VTK_ENCODESTRING_EXE}
+    ARGS ${res} ${src} ${file} --build-header VTK_EXPORT vtkSystemIncludes.h
+    )
+  SET(Filters_SRCS ${Filters_SRCS} ${res})
+  SET_SOURCE_FILES_PROPERTIES( ${res} WRAP_EXCLUDE)
+ENDFOREACH(file)
+
+ENDIF(VTK_USE_RENDERING)
+
+
 
 #########################################################################
 # Configure ParaViewAdaptor
