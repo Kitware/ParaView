@@ -237,6 +237,11 @@ class Proxy(object):
     def __eq__(self, other):
         "Returns true if the underlying SMProxies are the same."
         if isinstance(other, Proxy):
+            try:
+                if self.Port != other.Port:
+                    return False
+            except:
+                pass
             return self.SMProxy == other.SMProxy
         return self.SMProxy == other
 
