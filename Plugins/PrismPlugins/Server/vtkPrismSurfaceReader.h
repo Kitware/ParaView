@@ -147,7 +147,7 @@ public:
 
 protected:
   vtkPrismSurfaceReader();
-  ~vtkPrismSurfaceReader() {}
+  ~vtkPrismSurfaceReader();
 
 
   double AspectScale[3];

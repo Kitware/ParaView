@@ -160,7 +160,7 @@ public:
 
 protected:
   vtkPrismFilter();
-  ~vtkPrismFilter() {}
+  ~vtkPrismFilter();
 
 
   //BTX 

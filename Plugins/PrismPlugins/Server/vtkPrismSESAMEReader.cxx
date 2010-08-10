@@ -16,6 +16,7 @@
 #include <vtkstd/vector>
 #include <vtkstd/string>
 #include <vtkStringArray.h>
+#include <vtkSmartPointer.h>
 
 vtkStandardNewMacro(vtkPrismSESAMEReader);
 
@@ -537,10 +538,10 @@ void vtkPrismSESAMEReader::ReadTable()
 
 
 
-  vtkStringArray* xName=vtkStringArray::New();
+  vtkSmartPointer<vtkStringArray> xName=vtkSmartPointer<vtkStringArray>::New();
   xName->SetName("XAxisName");
   xName->InsertNextValue(this->Internal->TableXAxisName);
-  vtkStringArray* yName=vtkStringArray::New();
+  vtkSmartPointer<vtkStringArray> yName=vtkSmartPointer<vtkStringArray>::New();
   yName->SetName("YAxisName");
   yName->InsertNextValue(this->Internal->TableYAxisName);
 

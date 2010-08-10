@@ -357,6 +357,10 @@ vtkPrismSurfaceReader::vtkPrismSurfaceReader()
 
 
     }
+vtkPrismSurfaceReader::~vtkPrismSurfaceReader()
+{
+  delete this->Internal;
+}
 
 unsigned long vtkPrismSurfaceReader::GetMTime()
 {

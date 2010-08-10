@@ -30,6 +30,7 @@ Module:    PrismPanel.cxx
 #include "vtkEventQtSlotConnect.h"
 #include "vtkXMLDataElement.h"
 #include "vtkXMLUtilities.h"
+#include "vtkSmartPointer.h"
 
 
 // ParaView includes
@@ -104,13 +105,12 @@ public:
         PanelHelper.TakeReference(pm->NewProxy("misc", "PrismFilterHelper"));
         PanelHelper->InitializeAndCopyFromProxy(p->proxy());
         this->PanelHelper->UpdatePropertyInformation();
-        this->Connection = vtkEventQtSlotConnect::New();
+        this->Connection = vtkSmartPointer<vtkEventQtSlotConnect>::New();
 
     }
 
     ~pqUI()
     {
-        this->Connection->Delete();
     }
 
 
@@ -118,7 +118,7 @@ public:
     vtkSmartPointer<vtkSMProxy> PanelHelper;
     pqScalarSetModel Model;
 
-    vtkEventQtSlotConnect* Connection;
+    vtkSmartPointer<vtkEventQtSlotConnect> Connection;
 
     QString ConversionFileName;
     QMap<int,SESAMEConversionsForTable> SESAMEConversions;
@@ -290,6 +290,7 @@ pqNamedObjectPanel(object_proxy, p)
 //----------------------------------------------------------------------------
 PrismPanel::~PrismPanel()
 {
+  delete this->UI;
 }
 
 void PrismPanel::onDensityConversionChanged(const QString & )
@@ -2116,8 +2117,6 @@ void PrismPanel::useXLogScaling( bool b)
     this->UI->PanelHelper->UpdateVTKObjects();
     this->UI->PanelHelper->UpdatePropertyInformation();
 
-    this->updateXThresholds();
-
     this->setModified();
 }
 void PrismPanel::useYLogScaling(bool b)
@@ -2128,7 +2127,6 @@ void PrismPanel::useYLogScaling(bool b)
     this->UI->PanelHelper->UpdateVTKObjects();
     this->UI->PanelHelper->UpdatePropertyInformation();
 
-    this->updateYThresholds();
     this->setModified();
 
 }

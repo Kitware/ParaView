@@ -4,6 +4,7 @@
 #define _PrismCore_h
 #include <QObject>
 #include <QString>
+#include "vtkSmartPointer.h"
 class pqServerManagerModelItem;
 class pqPipelineSource;
 class pqServer;
@@ -46,7 +47,7 @@ private:
  QAction *SesameViewAction;
  QAction *PrismViewAction;
 
- vtkEventQtSlotConnect* VTKConnections;
+ vtkSmartPointer<vtkEventQtSlotConnect> VTKConnections;
  bool ProcessingEvent;
 
 

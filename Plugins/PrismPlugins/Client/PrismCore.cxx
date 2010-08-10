@@ -48,6 +48,7 @@ PrismCore::PrismCore(QObject* p)
 
     this->connect(model, SIGNAL(connectionAdded(pqPipelineSource*,pqPipelineSource*, int)),
         this, SLOT(onConnectionAdded(pqPipelineSource*,pqPipelineSource*)));
+    this->setParent(model);
 
     pqServerManagerSelectionModel *selection =
         pqApplicationCore::instance()->getSelectionModel();
@@ -69,10 +70,8 @@ PrismCore::PrismCore(QObject* p)
 
 PrismCore::~PrismCore()
     {
-    if(this->VTKConnections!=NULL)
-        {
-        this->VTKConnections->Delete();
-        }
+
+    Instance=NULL;
     }
 
 
@@ -353,7 +352,7 @@ void PrismCore::onConnectionAdded(pqPipelineSource* source,
 
             if(this->VTKConnections==NULL)
                 {
-                this->VTKConnections = vtkEventQtSlotConnect::New();
+                this->VTKConnections = vtkSmartPointer<vtkEventQtSlotConnect>::New();
                 }
 
             this->VTKConnections->Connect(sourceP, vtkCommand::SelectionChangedEvent,

@@ -74,7 +74,10 @@ vtkPrismFilter::vtkPrismFilter()
     this->SetNumberOfOutputPorts(3);
 
 }
-
+vtkPrismFilter::~vtkPrismFilter()
+{
+  delete this->Internal;
+}
 unsigned long vtkPrismFilter::GetMTime()
 {
     unsigned long time = this->Superclass::GetMTime();
