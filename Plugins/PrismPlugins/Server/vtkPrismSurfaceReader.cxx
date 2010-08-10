@@ -1083,15 +1083,62 @@ int vtkPrismSurfaceReader::RequestData(
         bounds[5]=10;
         }
 
+    double thresholdValues[6];
+
+        if(this->GetXLogScaling())
+            {
+            if(this->XThresholdBetween[0]>0)
+                {
+                thresholdValues[0]=log(this->XThresholdBetween[0]);
+                }
+            else
+                {
+                thresholdValues[0]=0.0;
+                }
+            if(this->XThresholdBetween[1]>0)
+                {
+                thresholdValues[1]=log(this->XThresholdBetween[1]);
+                }
+            else
+              {
+              thresholdValues[1]=0.0;
+              }
+            }
+        else
+          {
+          thresholdValues[0]=this->XThresholdBetween[0];
+          thresholdValues[1]=this->XThresholdBetween[1];
+          }
+        if(this->GetYLogScaling())
+            {
+            if(this->YThresholdBetween[0]>0)
+                {
+                thresholdValues[2]=log(this->YThresholdBetween[0]);
+                }
+            else
+                {
+                thresholdValues[2]=0.0;
+                }
+            if(this->YThresholdBetween[1]>0)
+                {
+                thresholdValues[3]=log(this->YThresholdBetween[1]);
+                }
+            else
+                {
+                thresholdValues[3]=0.0;
+                }
+            }
+        else
+          {
+          thresholdValues[2]=this->YThresholdBetween[0];
+          thresholdValues[3]=this->YThresholdBetween[1];
+          }
+        thresholdValues[4]=bounds[4];
+        thresholdValues[5]=bounds[5];
+
 
     this->Internal->ExtractGeometry->SetInput(localOutput);
-    this->Internal->Box->SetBounds(
-        this->XThresholdBetween[0],
-        this->XThresholdBetween[1],
-        this->YThresholdBetween[0],
-        this->YThresholdBetween[1],
-        bounds[4],
-        bounds[5]);
+    this->Internal->Box->SetBounds(thresholdValues);
 
     this->Internal->CleanPolyData->SetInput( this->Internal->ExtractGeometry->GetOutput());
 
@@ -1099,8 +1146,11 @@ int vtkPrismSurfaceReader::RequestData(
 
     vtkSmartPointer<vtkFloatArray> newXArray= vtkFloatArray::SafeDownCast(this->Internal->CleanPolyData->GetOutput()->GetPointData()->GetArray(xArray->GetName()));
     vtkSmartPointer<vtkFloatArray> newYArray= vtkFloatArray::SafeDownCast(this->Internal->CleanPolyData->GetOutput()->GetPointData()->GetArray(yArray->GetName()));
-    vtkSmartPointer<vtkFloatArray> newZArray= vtkFloatArray::SafeDownCast(this->Internal->CleanPolyData->GetOutput()->GetPointData()->GetArray(zArray->GetName()));
-
+    vtkSmartPointer<vtkFloatArray> newZArray;
+    if(this->Internal->WarpSurface)
+      {
+      newZArray= vtkFloatArray::SafeDownCast(this->Internal->CleanPolyData->GetOutput()->GetPointData()->GetArray(zArray->GetName()));
+      }
     double scaleBounds[6];
     this->Internal->CleanPolyData->GetOutput()->GetPoints()->GetBounds(scaleBounds);
 
