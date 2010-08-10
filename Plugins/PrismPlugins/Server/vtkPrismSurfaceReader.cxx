@@ -432,6 +432,7 @@ void vtkPrismSurfaceReader::SetNumberOfContours(int i)
     if(this->Internal->NumberOfContours!=i)
         {
         this->Internal->NumberOfContours=i;
+        this->Internal->ContourFilter->SetNumberOfContours(i);
         this->Modified();
         }
     }
