@@ -292,6 +292,7 @@ void MyProcess::SetupRenderPasses(vtkRenderer* renderer)
   iceTPass->SetTileDimensions(this->TileDimensions);
   iceTPass->SetImageReductionFactor(this->ImageReductionFactor);
   iceTPass->SetDepthOnly(this->DepthOnly);
+  iceTPass->SetFixBackground(true);
 
   if (this->ServerMode && this->Controller->GetLocalProcessId() == 0)
     {
@@ -377,6 +378,9 @@ void MyProcess::Execute()
 
   vtkRenderer* renderer = vtkRenderer::New();
   renWin->AddRenderer(renderer);
+  renderer->SetBackground(0.66,0.66,0.66);
+  renderer->SetBackground2(157.0/255.0*0.66,186/255.0*0.66,192.0/255.0*0.66);
+  renderer->SetGradientBackground(true);
 
   vtkSynchronizedRenderers *syncRenderers2=0;
   if(this->DepthOnly)

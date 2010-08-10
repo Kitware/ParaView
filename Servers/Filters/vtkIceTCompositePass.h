@@ -132,6 +132,14 @@ public:
   vtkGetMacro(DepthOnly,bool);
   vtkSetMacro(DepthOnly,bool);
 
+  // Description:
+  // Ice-T does not deal well with the background, by setting FixBackground to
+  // true, the pass will take care of displaying the correct background at the
+  // price of some copy operations.
+  // Initial value is false.
+  vtkGetMacro(FixBackground,bool);
+  vtkSetMacro(FixBackground,bool);
+
 //BTX
   // Description:
   // Internal callback. Don't call directly.
@@ -180,6 +188,10 @@ protected:
   vtkPixelBufferObject *PBO;
   vtkTextureObject *ZTexture;
   vtkShaderProgram2 *Program;
+
+  bool FixBackground;
+  vtkTextureObject *BackgroundTexture;
+  vtkTextureObject *IceTTexture;
 
 private:
   vtkIceTCompositePass(const vtkIceTCompositePass&); // Not implemented
