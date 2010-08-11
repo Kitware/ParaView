@@ -409,10 +409,13 @@ SET(resourceFiles
   ${PARAVIEW_EXTRA_SERVERMANAGER_RESOURCES}
   )
 IF(PARAVIEW_ENABLE_PYTHON)
-  SET(resourceFiles
+  OPTION(PARAVIEW_ENABLE_PYTHON_FILTERS "Enable Python calculator and programmable filters." ON)
+  IF(PARAVIEW_ENABLE_PYTHON_FILTERS)
+    SET(resourceFiles
       ${resourceFiles} 
       ${CMAKE_CURRENT_SOURCE_DIR}/Resources/pythonfilter.xml
       ) 
+  ENDIF(PARAVIEW_ENABLE_PYTHON_FILTERS)
 ENDIF(PARAVIEW_ENABLE_PYTHON) 
 
 ADD_CUSTOM_COMMAND(
