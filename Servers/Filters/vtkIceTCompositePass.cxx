@@ -263,8 +263,10 @@ void vtkIceTCompositePass::SetupContext(const vtkRenderState* render_state)
                      allBounds[4], allBounds[5]);
     }
 
-  icetDisable(ICET_DISPLAY);
-  icetDisable(ICET_DISPLAY_INFLATE);
+  // These line are required when shadow maps are used.
+  icetEnable(ICET_DISPLAY);
+  icetEnable(ICET_DISPLAY_INFLATE);
+
   if (this->DataReplicatedOnAllProcesses)
     {
     icetDataReplicationGroupColor(1);
