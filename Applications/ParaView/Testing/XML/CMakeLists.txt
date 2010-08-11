@@ -87,7 +87,8 @@ SET (TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/XdmfReadStructuredGridCollection.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/XdmfGridAttributes.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/XYChart.xml
-#  ${CMAKE_CURRENT_SOURCE_DIR}/XYBarChart.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/XYHistogram.xml
+  #  ${CMAKE_CURRENT_SOURCE_DIR}/XYBarChart.xml
 )
 
 # Mark tests that change change state considerably requires a restart of the
@@ -118,6 +119,7 @@ set (ExodusXML_BREAK TRUE)
 SET (ComparativeVisPanel_BREAK TRUE)
 SET (SpreadSheet1_BREAK TRUE)
 SET (SPTimeseries_BREAK TRUE)
+SET (XYChart_BREAK TRUE)
 
 
 # Add image threshold overrides for tests.
