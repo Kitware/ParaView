@@ -121,6 +121,7 @@ public:
   vtkGetVector2Macro(YThresholdBetween,double);
 
 
+  vtkGetVector6Macro(ActualThresholdBounds,double);
 
 
   void SetWarpSurface(bool);
@@ -155,7 +156,9 @@ protected:
   double VariableRange[2];
   double XThresholdBetween[2];
   double YThresholdBetween[2];
- 
+
+  double ActualThresholdBounds[6];
+
 
  
   bool GetVariableRange (const char *name,vtkDoubleArray*);

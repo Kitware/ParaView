@@ -28,6 +28,9 @@ Module:    vtkPrismFilter.cxx
 #include "vtkCompositeDataIterator.h"
 #include "vtkTransformFilter.h"
 #include "vtkTransform.h"
+#include "vtkExtractPolyDataGeometry.h"
+#include "vtkBox.h"
+
 #include <math.h>
 
 vtkStandardNewMacro(vtkPrismFilter);
@@ -36,6 +39,8 @@ class vtkPrismFilter::MyInternal
 {
 public:
 
+    vtkSmartPointer<vtkExtractPolyDataGeometry > ExtractGeometry;
+    vtkSmartPointer<vtkBox> Box;
     vtkSmartPointer<vtkTransformFilter> TransformFilter;
     vtkPrismSurfaceReader *Reader;
     vtkSmartPointer<vtkDoubleArray> RangeArray;
@@ -53,6 +58,15 @@ public:
         this->AxisVarName[2]      = "none";
 
         this->TransformFilter=vtkSmartPointer<vtkTransformFilter>::New(); 
+
+
+        this->ExtractGeometry=vtkSmartPointer<vtkExtractPolyDataGeometry >::New();
+
+        this->Box=  vtkSmartPointer<vtkBox>::New();
+        this->ExtractGeometry->SetImplicitFunction(this->Box);
+        this->ExtractGeometry->ExtractInsideOn();
+        this->ExtractGeometry->ExtractBoundaryCellsOn();
+
 
     }
     ~MyInternal()
@@ -472,12 +486,18 @@ int vtkPrismFilter::RequestGeometryData(
             delete [] weights;
 
 
+            this->Internal->ExtractGeometry->SetInput(polydata);
+            double thresholdBounds[6];
+            this->Internal->Reader->GetActualThresholdBounds(thresholdBounds);
+            this->Internal->Box->SetBounds(thresholdBounds);
+
+
             double scale[3];
             this->Internal->Reader->GetAspectScale(scale);
             vtkSmartPointer<vtkTransform> transform= vtkSmartPointer<vtkTransform>::New();
             transform->Scale(scale);
             this->Internal->TransformFilter->SetTransform(transform);
-            this->Internal->TransformFilter->SetInput(polydata);
+            this->Internal->TransformFilter->SetInput( this->Internal->ExtractGeometry->GetOutput());
             this->Internal->TransformFilter->Update();
 
             polydata->ShallowCopy(this->Internal->TransformFilter->GetOutput());
