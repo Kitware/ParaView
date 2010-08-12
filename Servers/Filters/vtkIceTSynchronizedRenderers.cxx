@@ -205,8 +205,8 @@ protected:
   // screen.
   void FlushTiles(vtkRenderer* renderer)
     {
-    for (TilesMapType::iterator iter = ::TilesMap.begin();
-      iter != :: TilesMap.end(); ++iter)
+    for (TilesMapType::iterator iter = TilesMap.begin();
+      iter != TilesMap.end(); ++iter)
       {
       vtkTile& tile = iter->second;
       if (tile.TileImage.IsValid())
