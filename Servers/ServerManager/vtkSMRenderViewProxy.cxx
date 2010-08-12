@@ -134,6 +134,7 @@ vtkSMRenderViewProxy::vtkSMRenderViewProxy()
   this->ResetPolygonsPerSecondResults();
   this->MeasurePolygonsPerSecond = 0;
   this->UseOffscreenRenderingForScreenshots = 0;
+  this->UseInteractiveRenderingForSceenshots = 0;
 
   this->LODThreshold = 0.0;
 
@@ -1090,7 +1091,16 @@ vtkImageData* vtkSMRenderViewProxy::CaptureWindow(int magnification)
 #endif
 
   this->GetRenderWindow()->SwapBuffersOff();
-  this->StillRender();
+
+  if(this->UseInteractiveRenderingForSceenshots)
+    {
+    this->InteractiveRender();
+    }
+  else
+    {
+    this->StillRender();
+    }
+
 
   vtkWindowToImageFilter* w2i = vtkWindowToImageFilter::New();
   w2i->SetInput(this->GetRenderWindow());

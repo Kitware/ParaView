@@ -167,6 +167,13 @@ public:
   vtkGetMacro(UseOffscreenRenderingForScreenshots, int);
 
   // Description:
+  // Set or get whether capture should be done as
+  // StillRender or InteractiveRender inside CaptureWindow calls.
+  vtkSetClampMacro(UseInteractiveRenderingForSceenshots, int, 0, 1);
+  vtkBooleanMacro(UseInteractiveRenderingForSceenshots, int);
+  vtkGetMacro(UseInteractiveRenderingForSceenshots, int);
+
+  // Description:
   // Switches the render window into an offscreen mode.
   void SetUseOffscreen(int offscreen);
   int GetUseOffscreen();
@@ -401,6 +408,7 @@ protected:
   int MeasurePolygonsPerSecond;
   int UseOffscreenRenderingForScreenshots;
   bool LightKitAdded;
+  int UseInteractiveRenderingForSceenshots;
 
   // Description:
   // Get the number of polygons this render module is rendering
