@@ -120,14 +120,18 @@ bool vtkTilesHelper::GetTileViewport(const double* viewport, int rank,
   double normalized_tile_viewport[4];
   if (this->GetNormalizedTileViewport(viewport, rank, normalized_tile_viewport))
     {
-    out_tile_viewport[0] = normalized_tile_viewport[0] * this->TileWindowSize[0] *
-      this->TileDimensions[0];
-    out_tile_viewport[1] = normalized_tile_viewport[1] * this->TileWindowSize[1] *
-      this->TileDimensions[1];
-    out_tile_viewport[2] = 0.5 + normalized_tile_viewport[2] * this->TileWindowSize[0] *
-      this->TileDimensions[0];
-    out_tile_viewport[3] = 0.5 + normalized_tile_viewport[3] * this->TileWindowSize[1] *
-      this->TileDimensions[1];
+    out_tile_viewport[0] = static_cast<int>(
+      normalized_tile_viewport[0] * this->TileWindowSize[0] *
+      this->TileDimensions[0]);
+    out_tile_viewport[1] = static_cast<int>(
+      normalized_tile_viewport[1] * this->TileWindowSize[1] *
+      this->TileDimensions[1]);
+    out_tile_viewport[2] = static_cast<int>(
+      0.5 + normalized_tile_viewport[2] * this->TileWindowSize[0] *
+      this->TileDimensions[0]);
+    out_tile_viewport[3] = static_cast<int>(
+      0.5 + normalized_tile_viewport[3] * this->TileWindowSize[1] *
+      this->TileDimensions[1]);
     return true;
     }
   return false;

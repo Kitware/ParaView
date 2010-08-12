@@ -76,8 +76,8 @@
 class MyProcess : public vtkProcess
 {
   vtkSmartPointer<vtkPKdTree> KdTree;
-  int UseOrderedCompositing;
-  int UseDepthPeeling;
+  bool UseOrderedCompositing;
+  bool UseDepthPeeling;
   bool UseBlurPass;
   bool UseSobelPass;
   bool DepthOnly;
@@ -89,8 +89,8 @@ public:
   vtkGetVector2Macro(TileDimensions, int);
 
   vtkSetMacro(ImageReductionFactor, int);
-  vtkSetMacro(UseOrderedCompositing, int);
-  vtkSetMacro(UseDepthPeeling, int);
+  vtkSetMacro(UseOrderedCompositing, bool);
+  vtkSetMacro(UseDepthPeeling, bool);
   vtkSetMacro(ServerMode, bool);
   vtkSetMacro(UseBlurPass, bool);
   vtkSetMacro(UseSobelPass, bool);
@@ -133,8 +133,8 @@ MyProcess::MyProcess()
   this->Argv=0;
   this->ImageReductionFactor = 1;
   this->TileDimensions[0] = this->TileDimensions[1];
-  this->UseOrderedCompositing = 0;
-  this->UseDepthPeeling = 0;
+  this->UseOrderedCompositing = false;
+  this->UseDepthPeeling = false;
   this->ServerMode = false;
   this->SocketController = 0;
   this->UseBlurPass = false;
@@ -570,8 +570,8 @@ int main(int argc, char **argv)
   p->SetArgs(argc,argv);
   p->SetTileDimensions(tile_dimensions);
   p->SetImageReductionFactor(image_reduction_factor);
-  p->SetUseOrderedCompositing(use_ordered_compositing);
-  p->SetUseDepthPeeling(use_depth_peeling);
+  p->SetUseOrderedCompositing(use_ordered_compositing==1);
+  p->SetUseDepthPeeling(use_depth_peeling==1);
   p->SetServerMode(act_as_server != 0);
   p->SetUseBlurPass(add_blur_pass != 0);
   p->SetUseSobelPass(add_sobel_pass != 0);

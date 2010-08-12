@@ -603,10 +603,14 @@ void vtkIceTCompositePass::UpdateTileInformation(
     {
     // LastTileViewport is the icet viewport for the current renderer (treating
     // all tiles as one large display).
-    this->LastTileViewport[0] = my_tile_viewport[0]/image_reduction_factor;
-    this->LastTileViewport[1] = my_tile_viewport[1]/image_reduction_factor;
-    this->LastTileViewport[2] = my_tile_viewport[2]/image_reduction_factor;
-    this->LastTileViewport[3] = my_tile_viewport[3]/image_reduction_factor;
+    this->LastTileViewport[0] = static_cast<int>(
+      my_tile_viewport[0]/image_reduction_factor);
+    this->LastTileViewport[1] = static_cast<int>(
+      my_tile_viewport[1]/image_reduction_factor);
+    this->LastTileViewport[2] = static_cast<int>(
+      my_tile_viewport[2]/image_reduction_factor);
+    this->LastTileViewport[3] = static_cast<int>(
+      my_tile_viewport[3]/image_reduction_factor);
 
     // PhysicalViewport is the viewport in the current render-window where the
     // renderer maps.
@@ -654,9 +658,12 @@ void vtkIceTCompositePass::UpdateTileInformation(
         << tile_viewport[3]/image_reduction_factor << endl;
 
       icetAddTile(
-        tile_viewport[0]/image_reduction_factor, tile_viewport[1]/image_reduction_factor,
-        (tile_viewport[2] - tile_viewport[0])/image_reduction_factor,
-        (tile_viewport[3] - tile_viewport[1])/image_reduction_factor,
+        static_cast<GLint>(tile_viewport[0]/image_reduction_factor),
+        static_cast<GLint>(tile_viewport[1]/image_reduction_factor),
+        static_cast<GLsizei>(
+          (tile_viewport[2] - tile_viewport[0])/image_reduction_factor),
+        static_cast<GLsizei>(
+          (tile_viewport[3] - tile_viewport[1])/image_reduction_factor),
         cur_rank);
       // setting this should be needed so that the 2d actors work correctly.
       // However that messes up the tile-displays with tdy > 0
