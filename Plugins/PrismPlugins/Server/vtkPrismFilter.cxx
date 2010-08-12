@@ -28,7 +28,7 @@ Module:    vtkPrismFilter.cxx
 #include "vtkCompositeDataIterator.h"
 #include "vtkTransformFilter.h"
 #include "vtkTransform.h"
-#include "vtkExtractPolyDataGeometry.h"
+#include "vtkExtractGeometry.h"
 #include "vtkBox.h"
 
 #include <math.h>
@@ -39,7 +39,9 @@ class vtkPrismFilter::MyInternal
 {
 public:
 
-    vtkSmartPointer<vtkExtractPolyDataGeometry > ExtractGeometry;
+    bool SimulationDataThreshold;
+
+    vtkSmartPointer<vtkExtractGeometry > ExtractGeometry;
     vtkSmartPointer<vtkBox> Box;
     vtkSmartPointer<vtkTransformFilter> TransformFilter;
     vtkPrismSurfaceReader *Reader;
@@ -47,6 +49,7 @@ public:
     vtkstd::string AxisVarName[3];
     MyInternal()
     {
+        this->SimulationDataThreshold=false;
         this->RangeArray = vtkSmartPointer<vtkDoubleArray>::New();
         this->RangeArray->Initialize();
         this->RangeArray->SetNumberOfComponents(1);
@@ -60,7 +63,7 @@ public:
         this->TransformFilter=vtkSmartPointer<vtkTransformFilter>::New(); 
 
 
-        this->ExtractGeometry=vtkSmartPointer<vtkExtractPolyDataGeometry >::New();
+        this->ExtractGeometry=vtkSmartPointer<vtkExtractGeometry >::New();
 
         this->Box=  vtkSmartPointer<vtkBox>::New();
         this->ExtractGeometry->SetImplicitFunction(this->Box);
@@ -92,6 +95,18 @@ vtkPrismFilter::~vtkPrismFilter()
 {
   delete this->Internal;
 }
+
+void vtkPrismFilter::SetSimulationDataThreshold(bool b)
+{
+    this->Internal->SimulationDataThreshold=b;
+    this->Modified();
+}
+
+bool vtkPrismFilter::GetSimulationDataThreshold()
+{
+    return this->Internal->SimulationDataThreshold;
+}
+
 unsigned long vtkPrismFilter::GetMTime()
 {
     unsigned long time = this->Superclass::GetMTime();
@@ -486,10 +501,22 @@ int vtkPrismFilter::RequestGeometryData(
             delete [] weights;
 
 
-            this->Internal->ExtractGeometry->SetInput(polydata);
-            double thresholdBounds[6];
-            this->Internal->Reader->GetActualThresholdBounds(thresholdBounds);
-            this->Internal->Box->SetBounds(thresholdBounds);
+            if(false)
+            //if(this->Internal->SimulationDataThreshold)
+              {
+              //TODO Using the threshold causes problems with the linked selection.
+              //This feature has been removed from Prism PavaView panel until
+              //a solution can be found.
+              this->Internal->ExtractGeometry->SetInput(polydata);
+              double thresholdBounds[6];
+              this->Internal->Reader->GetActualThresholdBounds(thresholdBounds);
+              this->Internal->Box->SetBounds(thresholdBounds);
+              this->Internal->TransformFilter->SetInput( this->Internal->ExtractGeometry->GetOutput());
+              }
+            else
+              {
+              this->Internal->TransformFilter->SetInput(polydata);
+              }
 
 
             double scale[3];
@@ -497,7 +524,6 @@ int vtkPrismFilter::RequestGeometryData(
             vtkSmartPointer<vtkTransform> transform= vtkSmartPointer<vtkTransform>::New();
             transform->Scale(scale);
             this->Internal->TransformFilter->SetTransform(transform);
-            this->Internal->TransformFilter->SetInput( this->Internal->ExtractGeometry->GetOutput());
             this->Internal->TransformFilter->Update();
 
             polydata->ShallowCopy(this->Internal->TransformFilter->GetOutput());
