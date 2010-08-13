@@ -29,7 +29,9 @@ FOREACH(name ${ServersFilters_SRCS})
   TARGET_LINK_LIBRARIES(${name} vtkPVFilters)
 ENDFOREACH(name)
 
-ADD_EXECUTABLE(TestIceTCompositePass TestIceTCompositePass.cxx)
+IF(PARAVIEW_USE_ICE_T AND VTK_USE_MPI AND VTK_USE_DISPLAY AND
+   PARAVIEW_DATA_ROOT)
+ ADD_EXECUTABLE(TestIceTCompositePass TestIceTCompositePass.cxx)
     TARGET_LINK_LIBRARIES(TestIceTCompositePass vtkPVFilters)
 
  ADD_TEST(TestIceTCompositePass-image
@@ -52,7 +54,7 @@ ADD_EXECUTABLE(TestIceTCompositePass TestIceTCompositePass.cxx)
             ${VTK_MPI_POSTFLAGS})
 
 
-ADD_EXECUTABLE(TestIceTShadowMapPass TestIceTShadowMapPass.cxx)
+ ADD_EXECUTABLE(TestIceTShadowMapPass TestIceTShadowMapPass.cxx)
     TARGET_LINK_LIBRARIES(TestIceTShadowMapPass vtkPVFilters)
 
  ADD_TEST(TestIceTShadowMapPass-image
@@ -63,6 +65,8 @@ ADD_EXECUTABLE(TestIceTShadowMapPass TestIceTShadowMapPass.cxx)
             -T ${ParaView_BINARY_DIR}/Testing/Temporary
             -V Baseline/TestIceTShadowMapPass.cxx.png
             ${VTK_MPI_POSTFLAGS})
+ENDIF()
+
 
 IF (VTK_USE_DISPLAY AND VTK_DATA_ROOT AND PARAVIEW_DATA_ROOT)
   SET(ServersFiltersImage_SRCS
