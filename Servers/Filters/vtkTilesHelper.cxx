@@ -17,7 +17,6 @@
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro(vtkTilesHelper);
-vtkCxxRevisionMacro(vtkTilesHelper, "$Revision$");
 //----------------------------------------------------------------------------
 vtkTilesHelper::vtkTilesHelper()
 {

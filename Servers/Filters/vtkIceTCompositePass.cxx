@@ -55,7 +55,6 @@ namespace
 };
 
 vtkStandardNewMacro(vtkIceTCompositePass);
-vtkCxxRevisionMacro(vtkIceTCompositePass, "$Revision$");
 vtkCxxSetObjectMacro(vtkIceTCompositePass, RenderPass, vtkRenderPass);
 vtkCxxSetObjectMacro(vtkIceTCompositePass, KdTree, vtkPKdTree);
 vtkCxxSetObjectMacro(vtkIceTCompositePass, Controller,

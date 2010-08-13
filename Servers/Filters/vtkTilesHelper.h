@@ -27,7 +27,7 @@ class VTK_EXPORT vtkTilesHelper : public vtkObject
 {
 public:
   static vtkTilesHelper* New();
-  vtkTypeRevisionMacro(vtkTilesHelper, vtkObject);
+  vtkTypeMacro(vtkTilesHelper, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

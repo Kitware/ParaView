@@ -46,7 +46,7 @@ class VTK_EXPORT vtkIceTCompositePass : public vtkRenderPass
 {
 public:
   static vtkIceTCompositePass* New();
-  vtkTypeRevisionMacro(vtkIceTCompositePass, vtkRenderPass);
+  vtkTypeMacro(vtkIceTCompositePass, vtkRenderPass);
   void PrintSelf(ostream& os, vtkIndent indent);
 //BTX
   // Description:

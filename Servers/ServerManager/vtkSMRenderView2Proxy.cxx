@@ -19,7 +19,6 @@
 #include "vtkProcessModule.h"
 
 vtkStandardNewMacro(vtkSMRenderView2Proxy);
-vtkCxxRevisionMacro(vtkSMRenderView2Proxy, "$Revision$");
 //----------------------------------------------------------------------------
 vtkSMRenderView2Proxy::vtkSMRenderView2Proxy()
 {

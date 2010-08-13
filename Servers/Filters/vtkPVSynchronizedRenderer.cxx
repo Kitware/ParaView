@@ -30,7 +30,6 @@
 #endif
 
 vtkStandardNewMacro(vtkPVSynchronizedRenderer);
-vtkCxxRevisionMacro(vtkPVSynchronizedRenderer, "$Revision$");
 //----------------------------------------------------------------------------
 vtkPVSynchronizedRenderer::vtkPVSynchronizedRenderer()
 {

@@ -30,7 +30,7 @@ class VTK_EXPORT vtkPVSynchronizedRenderer : public vtkObject
 {
 public:
   static vtkPVSynchronizedRenderer* New();
-  vtkTypeRevisionMacro(vtkPVSynchronizedRenderer, vtkObject);
+  vtkTypeMacro(vtkPVSynchronizedRenderer, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

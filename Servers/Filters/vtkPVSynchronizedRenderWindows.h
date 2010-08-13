@@ -40,7 +40,7 @@ class VTK_EXPORT vtkPVSynchronizedRenderWindows : public vtkObject
 {
 public:
   static vtkPVSynchronizedRenderWindows* New();
-  vtkTypeRevisionMacro(vtkPVSynchronizedRenderWindows, vtkObject);
+  vtkTypeMacro(vtkPVSynchronizedRenderWindows, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

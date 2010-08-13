@@ -139,7 +139,6 @@ namespace
 };
 
 vtkStandardNewMacro(vtkPVSynchronizedRenderWindows);
-vtkCxxRevisionMacro(vtkPVSynchronizedRenderWindows, "$Revision$");
 //----------------------------------------------------------------------------
 vtkPVSynchronizedRenderWindows::vtkPVSynchronizedRenderWindows()
 {
