@@ -4738,64 +4738,6 @@
     </XYChartViewProxy>
 #endif
 
-    <RenderView2Proxy name="RenderView2" class="vtkPVRenderView"
-           processes="client|renderserver">
-
-      <IntVectorProperty
-        name="Position"
-        command="SetPosition"
-        number_of_elements="2"
-        default_values="0 0">
-        <Documentation>
-          Set the position on this view in the multiview configuration.
-        </Documentation>
-      </IntVectorProperty>
-
-      <IntVectorProperty
-        name="Size"
-        command="SetSize"
-        number_of_elements="2"
-        default_values="400 400" >
-        <Documentation>
-          Set the size of this view in the multiview configuration.
-        </Documentation>
-      </IntVectorProperty>
-
-      <IntVectorProperty
-        name="StillRenderImageReductionFactor"
-        command="SetStillRenderImageReductionFactor"
-        number_of_elements="1"
-        default_values="1">
-        <IntRangeDomain name="range" min="1" max="20" />
-        <Documentation>
-          Get/Set the reduction-factor to use when for StillRender(). This is
-          typically set to 1, but in some cases with terrible connectivity or
-          really large displays, one may want to use a sub-sampled image even
-          for StillRender(). This is set it number of pixels to be sub-sampled
-          by.  Note that image reduction factors have no effect when in built-in
-          mode.
-        </Documentation>
-      </IntVectorProperty>
-
-      <IntVectorProperty
-        name="InteractiveRenderImageReductionFactor"
-        command="SetInteractiveRenderImageReductionFactor"
-        number_of_elements="1"
-        default_values="2">
-        <IntRangeDomain name="range" min="1" max="20" />
-        <Documentation>
-          Get/Set the reduction-factor to use when for InteractiveRender(). This
-          is set it number of pixels to be sub-sampled by. Note that image
-          reduction factors have no effect when in built-in mode.
-        </Documentation>
-      </IntVectorProperty>
-
-      <Property name="ResetCamera" command="ResetCamera" />
-      <Property name="StillRender" command="StillRender" />
-      <Property name="InteractiveRender" command="InteractiveRender" />
-
-    </RenderView2Proxy>
-
     <Proxy name="RenderViewBase"
       base_proxygroup="views"
       base_proxyname="ViewBase">

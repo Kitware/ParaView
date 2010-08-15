@@ -158,7 +158,6 @@ SET(Kit_SRCS
   vtkSMReaderFactory.cxx
   vtkSMRenderViewHelper.cxx
   vtkSMRenderViewProxy.cxx
-  vtkSMRenderView2Proxy.cxx
   vtkSMRenderViewExporterProxy.cxx
   vtkSMRepresentationAnimationHelperProxy.cxx
   vtkSMRepresentationProxy.cxx

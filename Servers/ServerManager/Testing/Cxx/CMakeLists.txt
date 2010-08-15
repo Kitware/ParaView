@@ -53,11 +53,3 @@ IF (PVServerManagerTestData)
       ${SMSTATE_FILE_DIR}/${tfile}.pvsm)
   ENDFOREACH(tfile)
 ENDIF (PVServerManagerTestData)
-
-
-################################################################################
-ADD_EXECUTABLE(TestPVSynchronizedRenderWindows
-  TestPVSynchronizedRenderWindows.cxx)
-
-TARGET_LINK_LIBRARIES(TestPVSynchronizedRenderWindows
-  vtkPVServerManager)
