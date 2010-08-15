@@ -34,23 +34,35 @@ IF(PARAVIEW_USE_ICE_T AND VTK_USE_MPI AND VTK_USE_DISPLAY AND
  ADD_EXECUTABLE(TestIceTCompositePass TestIceTCompositePass.cxx)
     TARGET_LINK_LIBRARIES(TestIceTCompositePass vtkPVFilters)
 
- ADD_TEST(TestIceTCompositePass-image
+ ADD_TEST(TestIceTCompositePassWithBlurAndOrderedCompositing
             ${VTK_MPIRUN_EXE} ${VTK_MPI_PRENUMPROC_FLAGS} ${VTK_MPI_NUMPROC_FLAG} 2 ${VTK_MPI_PREFLAGS}
             ${CXX_TEST_PATH}/\${CTEST_CONFIGURATION_TYPE}/TestIceTCompositePass
             --tdx 2
+            --blur
+            --use-ordered-compositing
+            --use-depth-peeling
             -D ${PARAVIEW_DATA_ROOT}
             -T ${ParaView_BINARY_DIR}/Testing/Temporary
-            -V Baseline/TestIceTCompositePass.cxx.png
+            -V Baseline/TestIceTCompositePassWithBlurAndOrderedCompositing.png
             ${VTK_MPI_POSTFLAGS})
 
- ADD_TEST(TestIceTCompositePassDepthOnly-image
+ ADD_TEST(TestIceTCompositePassWithSobel
+            ${VTK_MPIRUN_EXE} ${VTK_MPI_PRENUMPROC_FLAGS} ${VTK_MPI_NUMPROC_FLAG} 2 ${VTK_MPI_PREFLAGS}
+            ${CXX_TEST_PATH}/\${CTEST_CONFIGURATION_TYPE}/TestIceTCompositePass
+            --sobel
+            -D ${PARAVIEW_DATA_ROOT}
+            -T ${ParaView_BINARY_DIR}/Testing/Temporary
+            -V Baseline/TestIceTCompositePassWithSobel.png
+            ${VTK_MPI_POSTFLAGS})
+
+ ADD_TEST(TestIceTCompositePassDepthOnly
             ${VTK_MPIRUN_EXE} ${VTK_MPI_PRENUMPROC_FLAGS} ${VTK_MPI_NUMPROC_FLAG} 2 ${VTK_MPI_PREFLAGS}
             ${CXX_TEST_PATH}/\${CTEST_CONFIGURATION_TYPE}/TestIceTCompositePass
             --tdx 2
             --depth-only
             -D ${PARAVIEW_DATA_ROOT}
             -T ${ParaView_BINARY_DIR}/Testing/Temporary
-            -V Baseline/TestIceTCompositePassDepthOnly.cxx.png
+            -V Baseline/TestIceTCompositePassDepthOnly.png
             ${VTK_MPI_POSTFLAGS})
 
 

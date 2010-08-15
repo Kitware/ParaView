@@ -24,6 +24,7 @@
 // To run memory conserving code instead: SetUseMinimalMemoryOn()
 
 #include "vtkActor.h"
+#include "vtkCallbackCommand.h"
 #include "vtkCamera.h"
 #include "vtkCameraPass.h"
 #include "vtkClearZPass.h"
@@ -33,6 +34,7 @@
 #include "vtkDataSetSurfaceFilter.h"
 #include "vtkDepthPeelingPass.h"
 #include "vtkDistributedDataFilter.h"
+#include "vtkGaussianBlurPass.h"
 #include "vtkIceTCompositePass.h"
 #include "vtkImageRenderManager.h"
 #include "vtkLightsPass.h"
@@ -43,6 +45,7 @@
 #include "vtkParallelFactory.h"
 #include "vtkPieceScalars.h"
 #include "vtkPKdTree.h"
+#include "vtkPlaneSource.h"
 #include "vtkPolyDataMapper.h"
 #include "vtkProperty.h"
 #include "vtkRegressionTestImage.h"
@@ -52,6 +55,7 @@
 #include "vtkRenderWindowInteractor.h"
 #include "vtkSequencePass.h"
 #include "vtkSmartPointer.h"
+#include "vtkSobelGradientMagnitudePass.h"
 #include "vtkSocketController.h"
 #include "vtkSphereSource.h"
 #include "vtkSynchronizedRenderers.h"
@@ -60,18 +64,26 @@
 #include "vtkTranslucentPass.h"
 #include "vtkUnstructuredGrid.h"
 #include "vtkVolumetricPass.h"
-#include "vtkGaussianBlurPass.h"
-#include "vtkSobelGradientMagnitudePass.h"
-#include "vtkPlaneSource.h"
 
 /*
 ** This test only builds if MPI is in use
 */
 #include "vtkMPICommunicator.h"
+#include <mpi.h>
 
 #include "vtkProcess.h"
 
 #include <vtksys/CommandLineArguments.hxx>
+
+
+void ResetCameraClippingRange(vtkObject *caller,
+  unsigned long vtkNotUsed(eid), void *clientdata,
+  void *vtkNotUsed(calldata))
+{
+  double* bounds = reinterpret_cast<double*>(clientdata);
+  vtkRenderer* ren = vtkRenderer::SafeDownCast(caller);
+  ren->ResetCameraClippingRange(bounds);
+}
 
 class MyProcess : public vtkProcess
 {
@@ -162,8 +174,8 @@ void MyProcess::CreatePipeline(vtkRenderer* renderer)
   int my_id = this->Controller->GetLocalProcessId();
 
   vtkSphereSource* sphere = vtkSphereSource::New();
-  sphere->SetPhiResolution(100);
-  sphere->SetThetaResolution(100);
+  sphere->SetPhiResolution(20);
+  sphere->SetThetaResolution(20);
 
   vtkDistributedDataFilter* d3 = vtkDistributedDataFilter::New();
   d3->SetInputConnection(sphere->GetOutputPort());
@@ -192,6 +204,8 @@ void MyProcess::CreatePipeline(vtkRenderer* renderer)
   vtkActor* actor = vtkActor::New();
   actor->SetMapper(mapper);
   actor->GetProperty()->SetOpacity(this->UseOrderedCompositing? 0.5 : 1.0);
+  actor->GetProperty()->SetInterpolationToFlat();
+  actor->GetProperty()->EdgeVisibilityOn();
   renderer->AddActor(actor);
 
   actor->Delete();
@@ -205,46 +219,26 @@ void MyProcess::CreatePipeline(vtkRenderer* renderer)
 //-----------------------------------------------------------------------------
 void MyProcess::CreatePipeline2(vtkRenderer* renderer)
 {
-  int num_procs = this->Controller->GetNumberOfProcesses();
-  int my_id = this->Controller->GetLocalProcessId();
+  renderer->SetInteractive(0);
 
   vtkPlaneSource *plane=vtkPlaneSource::New();
-
-  vtkDistributedDataFilter* d3 = vtkDistributedDataFilter::New();
-  d3->SetInputConnection(plane->GetOutputPort());
-  d3->SetController(this->Controller);
-  d3->SetBoundaryModeToSplitBoundaryCells();
-  d3->UseMinimalMemoryOff();
-
-  vtkDataSetSurfaceFilter* surface = vtkDataSetSurfaceFilter::New();
-  surface->SetInputConnection(d3->GetOutputPort());
-
-  vtkPieceScalars *piecescalars = vtkPieceScalars::New();
-  piecescalars->SetInputConnection(surface->GetOutputPort());
-  piecescalars->SetScalarModeToCellData();
-
+  plane->SetOrigin(-0.5, -0.5, 2);
+  plane->SetPoint1(0.5, -0.5, 2);
+  plane->SetPoint2(-0.5, 0.5, 2);
   vtkPolyDataMapper* mapper = vtkPolyDataMapper::New();
-  mapper->SetInputConnection(piecescalars->GetOutputPort());
+  mapper->SetInputConnection(plane->GetOutputPort());
   mapper->SetScalarModeToUseCellFieldData();
-  mapper->SelectColorArray("Piece");
-  mapper->SetScalarRange(0, num_procs-1);
-  mapper->SetPiece(my_id);
-  mapper->SetNumberOfPieces(num_procs);
-  mapper->Update();
-
-  this->KdTree = d3->GetKdtree();
 
   vtkActor* actor = vtkActor::New();
   actor->SetMapper(mapper);
-  actor->GetProperty()->SetOpacity(this->UseOrderedCompositing? 0.5 : 1.0);
   renderer->AddActor(actor);
 
   actor->Delete();
   mapper->Delete();
-  piecescalars->Delete();
-  surface->Delete();
-  d3->Delete();
   plane->Delete();
+
+  double bds[] = {-0.25, 0.25, -0.25, 0.25, 2, 2};
+  renderer->ResetCamera(bds);
 }
 
 //-----------------------------------------------------------------------------
@@ -381,9 +375,15 @@ void MyProcess::Execute()
   renderer->SetBackground(0.66,0.66,0.66);
   renderer->SetBackground2(157.0/255.0*0.66,186/255.0*0.66,192.0/255.0*0.66);
   renderer->SetGradientBackground(true);
+  vtkCallbackCommand* observer = vtkCallbackCommand::New();
+  observer->SetCallback(&ResetCameraClippingRange);
+  double bounds[6] = {-0.5, 0.5, -0.5, 0.5, -0.5, 0.5};
+  observer->SetClientData(&bounds);
+  renderer->AddObserver(vtkCommand::ResetCameraClippingRangeEvent, observer);
+  observer->Delete();
 
   vtkSynchronizedRenderers *syncRenderers2=0;
-  if(this->DepthOnly)
+  if (this->DepthOnly)
     {
     vtkRenderer *renderer2=vtkRenderer::New();
     renderer2->SetLayer(1);
@@ -437,6 +437,16 @@ void MyProcess::Execute()
       }
     else
       {
+      if (!this->DepthOnly)
+        {
+        renderer->GetActiveCamera()->SetPosition(-0.78, 0.68, -0.20);
+        renderer->GetActiveCamera()->SetFocalPoint(0, 0, 0);
+        renderer->GetActiveCamera()->SetViewUp(-0.3, -0.57, -0.75);
+        }
+      else
+        {
+        renderer->ResetCamera(bounds);
+        }
       renWin->Render();
       retVal=vtkTesting::Test(this->Argc, this->Argv, renWin, 10);
       if(retVal==vtkRegressionTester::DO_INTERACTOR)
@@ -478,8 +488,14 @@ int main(int argc, char **argv)
 {
   int retVal = 1;
 
+  // This is here to avoid false leak messages from vtkDebugLeaks when
+  // using mpich. It appears that the root process which spawns all the
+  // main processes waits in MPI_Init() and calls exit() when
+  // the others are done, causing apparent memory leaks for any objects
+  // created before MPI_Init().
+  MPI_Init(&argc, &argv);
   vtkSmartPointer<vtkMPIController> contr = vtkSmartPointer<vtkMPIController>::New();
-  contr->Initialize(&argc, &argv);
+  contr->Initialize(&argc, &argv, 1);
 
   int tile_dimensions[2] = {1, 1};
   int image_reduction_factor = 1;

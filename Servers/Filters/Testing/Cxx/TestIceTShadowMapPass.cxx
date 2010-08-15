@@ -81,6 +81,7 @@
 #include "vtkMPICommunicator.h"
 
 #include "vtkProcess.h"
+#include "mpi.h"
 
 #include <vtksys/CommandLineArguments.hxx>
 
@@ -529,8 +530,14 @@ int main(int argc, char **argv)
 {
   int retVal = 1;
 
+  // This is here to avoid false leak messages from vtkDebugLeaks when
+  // using mpich. It appears that the root process which spawns all the
+  // main processes waits in MPI_Init() and calls exit() when
+  // the others are done, causing apparent memory leaks for any objects
+  // created before MPI_Init().
+  MPI_Init(&argc, &argv);
   vtkSmartPointer<vtkMPIController> contr = vtkSmartPointer<vtkMPIController>::New();
-  contr->Initialize(&argc, &argv);
+  contr->Initialize(&argc, &argv, 1);
 
   int tile_dimensions[2] = {1, 1};
   int image_reduction_factor = 1;
