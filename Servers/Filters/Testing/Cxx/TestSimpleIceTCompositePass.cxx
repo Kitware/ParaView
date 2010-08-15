@@ -154,6 +154,7 @@ int main(int argc, char**argv)
       iren->SetRenderWindow(renWin);
       renderer->ResetCamera(-0.5, 0.5, -0.5, 0.5, -0.5, 0.5);
 
+      renWin->Render();
       retVal = vtkTesting::Test(argc, argv, renWin, 10);
       if (retVal == vtkRegressionTester::DO_INTERACTOR)
         {
@@ -170,5 +171,5 @@ int main(int argc, char**argv)
       }
     }
   controller->Finalize();
-  return retVal;
+  return !retVal;
 }

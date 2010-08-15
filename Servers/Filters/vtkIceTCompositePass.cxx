@@ -501,13 +501,15 @@ void vtkIceTCompositePass::UpdateTileInformation(
         << tile_viewport[2]/image_reduction_factor << ", "
         << tile_viewport[3]/image_reduction_factor);
 
+      // SYNTAX:
+      // icetAddTile(x, y, width, height, display_rank);
       icetAddTile(
         static_cast<GLint>(tile_viewport[0]/image_reduction_factor),
         static_cast<GLint>(tile_viewport[1]/image_reduction_factor),
         static_cast<GLsizei>(
-          (tile_viewport[2] - tile_viewport[0])/image_reduction_factor),
+          (tile_viewport[2] - tile_viewport[0])/image_reduction_factor + 1),
         static_cast<GLsizei>(
-          (tile_viewport[3] - tile_viewport[1])/image_reduction_factor),
+          (tile_viewport[3] - tile_viewport[1])/image_reduction_factor + 1),
         cur_rank);
       // setting this should be needed so that the 2d actors work correctly.
       // However that messes up the tile-displays with tdy > 0
