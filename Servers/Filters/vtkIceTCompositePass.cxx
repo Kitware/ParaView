@@ -252,7 +252,7 @@ void vtkIceTCompositePass::SetupContext(const vtkRenderState* render_state)
   //nothing is in bounds.
   if (allBounds[0] > allBounds[1])
     {
-    cout << "nothing visible" << endl;
+    vtkDebugMacro("nothing visible" << endl);
     float tmp = VTK_LARGE_FLOAT;
     icetBoundingVertices(1, ICET_FLOAT, 0, 1, &tmp);
     }
@@ -262,9 +262,19 @@ void vtkIceTCompositePass::SetupContext(const vtkRenderState* render_state)
                      allBounds[4], allBounds[5]);
     }
 
-  // These line are required when shadow maps are used.
-  icetEnable(ICET_DISPLAY);
-  icetEnable(ICET_DISPLAY_INFLATE);
+  // Let IceT do the pasting composited image to screen when it can do so
+  // correctly.
+  if (!this->FixBackground && !this->DepthOnly)
+    {
+    icetEnable(ICET_DISPLAY);
+    icetEnable(ICET_DISPLAY_INFLATE);
+    }
+  else
+    {
+    // we'll push the icet composited-buffer to screen at the end.
+    icetDisable(ICET_DISPLAY);
+    icetDisable(ICET_DISPLAY_INFLATE);
+    }
 
   if (this->DataReplicatedOnAllProcesses)
     {
@@ -277,7 +287,7 @@ void vtkIceTCompositePass::SetupContext(const vtkRenderState* render_state)
     }
 
   // capture color buffer
-  if(this->FixBackground)
+  if (this->FixBackground)
     {
     vtkRenderWindow *win=render_state->GetRenderer()->GetRenderWindow();
     int *size=win->GetActualSize();
@@ -290,7 +300,7 @@ void vtkIceTCompositePass::SetupContext(const vtkRenderState* render_state)
       static_cast<vtkOpenGLRenderWindow *>(
         render_state->GetRenderer()->GetRenderWindow());
 
-    if(this->BackgroundTexture==0)
+    if (this->BackgroundTexture==0)
       {
       this->BackgroundTexture=vtkTextureObject::New();
       this->BackgroundTexture->SetContext(context);
@@ -338,187 +348,13 @@ void vtkIceTCompositePass::Render(const vtkRenderState* render_state)
 
   if(this->DepthOnly)
     {
-    GLuint *depthBuffer=icetGetDepthBuffer();
-    // OpenGL code to copy it back
-    // merly the code from vtkCompositeZPass
-
-    // get the dimension of the buffer
-    GLint id;
-    icetGetIntegerv(ICET_TILE_DISPLAYED,&id);
-    GLint ids;
-    icetGetIntegerv(ICET_NUM_TILES,&ids);
-
-    GLint *vp=new GLint[4*ids];
-
-    icetGetIntegerv(ICET_TILE_VIEWPORTS,vp);
-
-    GLint x=vp[4*id];
-    GLint y=vp[4*id+1];
-    GLint w=vp[4*id+2];
-    GLint h=vp[4*id+3];
-    delete[] vp;
-
-    // pbo arguments.
-    unsigned int dims[2];
-    vtkIdType continuousInc[3];
-
-    dims[0]=static_cast<unsigned int>(w);
-    dims[1]=static_cast<unsigned int>(h);
-    continuousInc[0]=0;
-    continuousInc[1]=0;
-    continuousInc[2]=0;
-
-    vtkOpenGLRenderWindow *context=
-      static_cast<vtkOpenGLRenderWindow *>(
-        render_state->GetRenderer()->GetRenderWindow());
-
-    if(this->PBO==0)
-      {
-      this->PBO=vtkPixelBufferObject::New();
-      this->PBO->SetContext(context);
-      }
-    if(this->ZTexture==0)
-      {
-      this->ZTexture=vtkTextureObject::New();
-      this->ZTexture->SetContext(context);
-      }
-
-    // client to PBO
-    this->PBO->Upload2D(VTK_UNSIGNED_INT,depthBuffer,dims,1,continuousInc);
-
-    // PBO to TO
-    this->ZTexture->CreateDepth(dims[0],dims[1],vtkTextureObject::Native,
-                                this->PBO);
-
-    // TO to FB: apply TO on quad with special zcomposite fragment shader.
-    glPushAttrib(GL_DEPTH_BUFFER_BIT|GL_COLOR_BUFFER_BIT);
-    glColorMask(GL_FALSE,GL_FALSE,GL_FALSE,GL_FALSE);
-    glEnable(GL_DEPTH_TEST);
-    glDepthMask(GL_TRUE);
-    glDepthFunc(GL_ALWAYS);
-
-    if(this->Program==0)
-      {
-      this->CreateProgram(context);
-      }
-
-    vtkTextureUnitManager *tu=context->GetTextureUnitManager();
-    int sourceId=tu->Allocate();
-    this->Program->GetUniformVariables()->SetUniformi("depth",1,&sourceId);
-    vtkgl::ActiveTexture(vtkgl::TEXTURE0+static_cast<GLenum>(sourceId));
-    this->Program->Use();
-    this->ZTexture->Bind();
-    this->ZTexture->CopyToFrameBuffer(0,0,
-                                      w-1,h-1,
-                                      0,0,w,h);
-    this->ZTexture->UnBind();
-    this->Program->Restore();
-
-    tu->Free(sourceId);
-    vtkgl::ActiveTexture(vtkgl::TEXTURE0);
-
-    glPopAttrib();
+    this->PushIceTDepthBufferToScreen(render_state);
     }
-  else
+  else if (this->FixBackground)
     {
-    if(this->FixBackground)
-      {
-      // get the dimension of the buffer
-      GLint id;
-      icetGetIntegerv(ICET_TILE_DISPLAYED,&id);
-      GLint ids;
-      icetGetIntegerv(ICET_NUM_TILES,&ids);
-
-      GLint *vp=new GLint[4*ids];
-
-      icetGetIntegerv(ICET_TILE_VIEWPORTS,vp);
-
-      GLint x=vp[4*id];
-      GLint y=vp[4*id+1];
-      GLint w=vp[4*id+2];
-      GLint h=vp[4*id+3];
-      delete[] vp;
-
-      // pbo arguments.
-      unsigned int dims[2];
-      vtkIdType continuousInc[3];
-
-      dims[0]=static_cast<unsigned int>(w);
-      dims[1]=static_cast<unsigned int>(h);
-      continuousInc[0]=0;
-      continuousInc[1]=0;
-      continuousInc[2]=0;
-
-      // merly the code from vtkCompositeRGBAPass
-
-      glPushAttrib(GL_DEPTH_BUFFER_BIT|GL_COLOR_BUFFER_BIT|GL_LIGHTING);
-      glColorMask(GL_TRUE,GL_TRUE,GL_TRUE,GL_TRUE);
-
-      // per-fragment operations
-      glDisable(GL_ALPHA_TEST);
-      glDisable(GL_STENCIL_TEST);
-      glDisable(GL_DEPTH_TEST);
-      glDisable(GL_BLEND);
-      glDisable(GL_INDEX_LOGIC_OP);
-      glDisable(GL_COLOR_LOGIC_OP);
-
-      // framebuffers have their color premultiplied by alpha.
-      vtkgl::BlendFuncSeparate(GL_ONE,GL_ONE_MINUS_SRC_ALPHA,
-                               GL_ONE,GL_ONE_MINUS_SRC_ALPHA);
-
-      // fixed vertex shader
-      glDisable(GL_LIGHTING);
-
-      // fixed fragment shader
-      glEnable(GL_TEXTURE_2D);
-      glDisable(GL_FOG);
-
-      glTexEnvi(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE,GL_REPLACE);
-      glPixelStorei(GL_UNPACK_ALIGNMENT,1);// client to server
-
-      // Copy background to colorbuffer
-      vtkgl::ActiveTexture(vtkgl::TEXTURE0);
-      // fixed-pipeline for vertex and fragment shaders.
-      this->BackgroundTexture->Bind();
-      this->BackgroundTexture->CopyToFrameBuffer(0,0,w-1,h-1,0,0,w,h);
-      this->BackgroundTexture->UnBind();
-
-      // Apply (with blending) IceT color buffer on top of background
-
-      vtkOpenGLRenderWindow *context=
-      static_cast<vtkOpenGLRenderWindow *>(
-        render_state->GetRenderer()->GetRenderWindow());
-
-      if(this->PBO==0)
-        {
-        this->PBO=vtkPixelBufferObject::New();
-        this->PBO->SetContext(context);
-        }
-      if(this->IceTTexture==0)
-        {
-        this->IceTTexture=vtkTextureObject::New();
-        this->IceTTexture->SetContext(context);
-        }
-
-      GLubyte *rgbaBuffer=icetGetColorBuffer();
-
-      // client to PBO
-      this->PBO->Upload2D(VTK_UNSIGNED_CHAR,rgbaBuffer,dims,4,continuousInc);
-
-      // PBO to TO
-      this->IceTTexture->Create2D(dims[0],dims[1],4,this->PBO,false);
-
-      glEnable(GL_BLEND);
-
-      vtkgl::ActiveTexture(vtkgl::TEXTURE0);
-      // fixed-pipeline for vertex and fragment shaders.
-      this->IceTTexture->Bind();
-      this->IceTTexture->CopyToFrameBuffer(0,0,w-1,h-1,0,0,w,h);
-      this->IceTTexture->UnBind();
-
-      glPopAttrib();
-      }
+    this->PushIceTColorBufferToScreen(render_state);
     }
+
   this->CleanupContext(render_state);
 }
 
@@ -622,11 +458,11 @@ void vtkIceTCompositePass::UpdateTileInformation(
     this->PhysicalViewport[0] = this->PhysicalViewport[1] =
       this->PhysicalViewport[2] = this->PhysicalViewport[3] = 0.0;
     }
-  cout << "Physical Viewport: "
+  vtkDebugMacro("Physical Viewport: "
     << this->PhysicalViewport[0] << ", "
     << this->PhysicalViewport[1] << ", "
     << this->PhysicalViewport[2] << ", "
-    << this->PhysicalViewport[3] << endl;
+    << this->PhysicalViewport[3]);
 
   if (this->LastTileMullions[0] == this->TileMullions[0] &&
     this->LastTileMullions[1] == this->TileMullions[1] &&
@@ -637,8 +473,6 @@ void vtkIceTCompositePass::UpdateTileInformation(
     //return;
     }
 
-
-  cout << "_------------------" << endl;
   icetResetTiles();
   for (int x=0; x < this->TileDimensions[0]; x++)
     {
@@ -650,11 +484,12 @@ void vtkIceTCompositePass::UpdateTileInformation(
         {
         continue;
         }
-      cout << this << "=" << cur_rank << " : "
+
+      vtkDebugMacro(<< this << "=" << cur_rank << " : "
         << tile_viewport[0]/image_reduction_factor << ", "
         << tile_viewport[1]/image_reduction_factor << ", "
         << tile_viewport[2]/image_reduction_factor << ", "
-        << tile_viewport[3]/image_reduction_factor << endl;
+        << tile_viewport[3]/image_reduction_factor);
 
       icetAddTile(
         static_cast<GLint>(tile_viewport[0]/image_reduction_factor),
@@ -736,27 +571,189 @@ void vtkIceTCompositePass::GetLastRenderedTile(
 }
 
 //----------------------------------------------------------------------------
-void vtkIceTCompositePass::IceTInflateAndDisplay(vtkRenderer* renderer)
+void vtkIceTCompositePass::PushIceTDepthBufferToScreen(
+  const vtkRenderState* render_state)
 {
-  vtkSynchronizedRenderers::vtkRawImage image;
-  this->GetLastRenderedTile(image);
-  if (!image.IsValid())
+  GLuint *depthBuffer=icetGetDepthBuffer();
+  // OpenGL code to copy it back
+  // merly the code from vtkCompositeZPass
+
+  // get the dimension of the buffer
+  GLint id;
+  icetGetIntegerv(ICET_TILE_DISPLAYED,&id);
+  GLint ids;
+  icetGetIntegerv(ICET_NUM_TILES,&ids);
+
+  GLint *vp=new GLint[4*ids];
+
+  icetGetIntegerv(ICET_TILE_VIEWPORTS,vp);
+
+  // GLint x=vp[4*id];
+  // GLint y=vp[4*id+1];
+  GLint w=vp[4*id+2];
+  GLint h=vp[4*id+3];
+  delete[] vp;
+
+  // pbo arguments.
+  unsigned int dims[2];
+  vtkIdType continuousInc[3];
+
+  dims[0]=static_cast<unsigned int>(w);
+  dims[1]=static_cast<unsigned int>(h);
+  continuousInc[0]=0;
+  continuousInc[1]=0;
+  continuousInc[2]=0;
+
+  vtkOpenGLRenderWindow *context=
+    static_cast<vtkOpenGLRenderWindow *>(
+      render_state->GetRenderer()->GetRenderWindow());
+
+  if(this->PBO==0)
     {
-    cout << "------ no image to render" << endl;
-    return;
+    this->PBO=vtkPixelBufferObject::New();
+    this->PBO->SetContext(context);
+    }
+  if(this->ZTexture==0)
+    {
+    this->ZTexture=vtkTextureObject::New();
+    this->ZTexture->SetContext(context);
     }
 
-  // FIXME, use correct physical viewport for this renderer.
-  double viewport[4];
-  renderer->GetViewport(viewport);
-  renderer->SetViewport(0, 0, 1, 1);
-  int tile_scale[2];
-  renderer->GetVTKWindow()->GetTileScale(tile_scale);
-  renderer->GetVTKWindow()->SetTileScale(1, 1);
-  renderer->Clear();
-  image.PushToViewport(renderer);
-  renderer->GetVTKWindow()->SetTileScale(tile_scale);
-  renderer->SetViewport(viewport);
+  // client to PBO
+  this->PBO->Upload2D(VTK_UNSIGNED_INT,depthBuffer,dims,1,continuousInc);
+
+  // PBO to TO
+  this->ZTexture->CreateDepth(dims[0],dims[1],vtkTextureObject::Native,
+    this->PBO);
+
+  // TO to FB: apply TO on quad with special zcomposite fragment shader.
+  glPushAttrib(GL_DEPTH_BUFFER_BIT|GL_COLOR_BUFFER_BIT);
+  glColorMask(GL_FALSE,GL_FALSE,GL_FALSE,GL_FALSE);
+  glEnable(GL_DEPTH_TEST);
+  glDepthMask(GL_TRUE);
+  glDepthFunc(GL_ALWAYS);
+
+  if(this->Program==0)
+    {
+    this->CreateProgram(context);
+    }
+
+  vtkTextureUnitManager *tu=context->GetTextureUnitManager();
+  int sourceId=tu->Allocate();
+  this->Program->GetUniformVariables()->SetUniformi("depth",1,&sourceId);
+  vtkgl::ActiveTexture(vtkgl::TEXTURE0+static_cast<GLenum>(sourceId));
+  this->Program->Use();
+  this->ZTexture->Bind();
+  this->ZTexture->CopyToFrameBuffer(0,0,
+    w-1,h-1,
+    0,0,w,h);
+  this->ZTexture->UnBind();
+  this->Program->Restore();
+
+  tu->Free(sourceId);
+  vtkgl::ActiveTexture(vtkgl::TEXTURE0);
+
+  glPopAttrib();
+}
+
+//----------------------------------------------------------------------------
+void vtkIceTCompositePass::PushIceTColorBufferToScreen(
+  const vtkRenderState* render_state)
+{
+  // get the dimension of the buffer
+  GLint id;
+  icetGetIntegerv(ICET_TILE_DISPLAYED,&id);
+  GLint ids;
+  icetGetIntegerv(ICET_NUM_TILES,&ids);
+
+  GLint *vp=new GLint[4*ids];
+
+  icetGetIntegerv(ICET_TILE_VIEWPORTS,vp);
+
+  // GLint x=vp[4*id];
+  // GLint y=vp[4*id+1];
+  GLint w=vp[4*id+2];
+  GLint h=vp[4*id+3];
+  delete[] vp;
+
+  // pbo arguments.
+  unsigned int dims[2];
+  vtkIdType continuousInc[3];
+
+  dims[0]=static_cast<unsigned int>(w);
+  dims[1]=static_cast<unsigned int>(h);
+  continuousInc[0]=0;
+  continuousInc[1]=0;
+  continuousInc[2]=0;
+
+  // merly the code from vtkCompositeRGBAPass
+
+  glPushAttrib(GL_DEPTH_BUFFER_BIT|GL_COLOR_BUFFER_BIT|GL_LIGHTING);
+  glColorMask(GL_TRUE,GL_TRUE,GL_TRUE,GL_TRUE);
+
+  // per-fragment operations
+  glDisable(GL_ALPHA_TEST);
+  glDisable(GL_STENCIL_TEST);
+  glDisable(GL_DEPTH_TEST);
+  glDisable(GL_BLEND);
+  glDisable(GL_INDEX_LOGIC_OP);
+  glDisable(GL_COLOR_LOGIC_OP);
+
+  // framebuffers have their color premultiplied by alpha.
+  vtkgl::BlendFuncSeparate(GL_ONE,GL_ONE_MINUS_SRC_ALPHA,
+    GL_ONE,GL_ONE_MINUS_SRC_ALPHA);
+
+  // fixed vertex shader
+  glDisable(GL_LIGHTING);
+
+  // fixed fragment shader
+  glEnable(GL_TEXTURE_2D);
+  glDisable(GL_FOG);
+
+  glTexEnvi(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE,GL_REPLACE);
+  glPixelStorei(GL_UNPACK_ALIGNMENT,1);// client to server
+
+  // Copy background to colorbuffer
+  vtkgl::ActiveTexture(vtkgl::TEXTURE0);
+  // fixed-pipeline for vertex and fragment shaders.
+  this->BackgroundTexture->Bind();
+  this->BackgroundTexture->CopyToFrameBuffer(0,0,w-1,h-1,0,0,w,h);
+  this->BackgroundTexture->UnBind();
+
+  // Apply (with blending) IceT color buffer on top of background
+
+  vtkOpenGLRenderWindow *context=
+    static_cast<vtkOpenGLRenderWindow *>(
+      render_state->GetRenderer()->GetRenderWindow());
+
+  if(this->PBO==0)
+    {
+    this->PBO=vtkPixelBufferObject::New();
+    this->PBO->SetContext(context);
+    }
+  if(this->IceTTexture==0)
+    {
+    this->IceTTexture=vtkTextureObject::New();
+    this->IceTTexture->SetContext(context);
+    }
+
+  GLubyte *rgbaBuffer=icetGetColorBuffer();
+
+  // client to PBO
+  this->PBO->Upload2D(VTK_UNSIGNED_CHAR,rgbaBuffer,dims,4,continuousInc);
+
+  // PBO to TO
+  this->IceTTexture->Create2D(dims[0],dims[1],4,this->PBO,false);
+
+  glEnable(GL_BLEND);
+
+  vtkgl::ActiveTexture(vtkgl::TEXTURE0);
+  // fixed-pipeline for vertex and fragment shaders.
+  this->IceTTexture->Bind();
+  this->IceTTexture->CopyToFrameBuffer(0,0,w-1,h-1,0,0,w,h);
+  this->IceTTexture->UnBind();
+
+  glPopAttrib();
 }
 
 //----------------------------------------------------------------------------
