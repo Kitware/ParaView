@@ -289,12 +289,20 @@ void vtkIceTCompositePass::SetupContext(const vtkRenderState* render_state)
   // capture color buffer
   if (this->FixBackground)
     {
-    vtkRenderWindow *win=render_state->GetRenderer()->GetRenderWindow();
-    int *size=win->GetActualSize();
-
-    unsigned int dims[2];
-    dims[0]=static_cast<unsigned int>(size[0]);
-    dims[1]=static_cast<unsigned int>(size[1]);
+    // This can  be optimized. This is currently capturing the whole render
+    // window, we only need to capture the part covered by this renderer.
+    int tile_size[2];
+    if (render_state->GetFrameBuffer())
+      {
+      render_state->GetFrameBuffer()->GetLastSize(tile_size);
+      }
+    else
+      {
+      vtkWindow* window = render_state->GetRenderer()->GetVTKWindow();
+      // NOTE: GetActualSize() does not include the TileScale.
+      tile_size[0] = window->GetActualSize()[0];
+      tile_size[1] = window->GetActualSize()[1];
+      }
 
     vtkOpenGLRenderWindow *context=
       static_cast<vtkOpenGLRenderWindow *>(
@@ -306,8 +314,10 @@ void vtkIceTCompositePass::SetupContext(const vtkRenderState* render_state)
       this->BackgroundTexture->SetContext(context);
       }
     // only get RGB, this is the background so we ignore A.
-    this->BackgroundTexture->Allocate2D(dims[0],dims[1],3,VTK_UNSIGNED_CHAR);
-    this->BackgroundTexture->CopyFromFrameBuffer(0,0,0,0,size[0],size[1]);
+    this->BackgroundTexture->Allocate2D(tile_size[0], tile_size[1], 3,
+      VTK_UNSIGNED_CHAR);
+    this->BackgroundTexture->CopyFromFrameBuffer(0, 0, 0, 0,
+      tile_size[0], tile_size[1]);
     }
 
   // IceT will use the full render window.  We'll move images back where they
@@ -574,13 +584,18 @@ void vtkIceTCompositePass::GetLastRenderedTile(
 void vtkIceTCompositePass::PushIceTDepthBufferToScreen(
   const vtkRenderState* render_state)
 {
-  GLuint *depthBuffer=icetGetDepthBuffer();
   // OpenGL code to copy it back
   // merly the code from vtkCompositeZPass
 
   // get the dimension of the buffer
   GLint id;
   icetGetIntegerv(ICET_TILE_DISPLAYED,&id);
+  if (id < 0)
+    {
+    // current processes is not displaying any tile.
+    return;
+    }
+
   GLint ids;
   icetGetIntegerv(ICET_NUM_TILES,&ids);
 
@@ -593,6 +608,8 @@ void vtkIceTCompositePass::PushIceTDepthBufferToScreen(
   GLint w=vp[4*id+2];
   GLint h=vp[4*id+3];
   delete[] vp;
+
+  GLuint *depthBuffer=icetGetDepthBuffer();
 
   // pbo arguments.
   unsigned int dims[2];
@@ -663,6 +680,12 @@ void vtkIceTCompositePass::PushIceTColorBufferToScreen(
   // get the dimension of the buffer
   GLint id;
   icetGetIntegerv(ICET_TILE_DISPLAYED,&id);
+  if (id < 0)
+    {
+    // current processes is not displaying any tile.
+    return;
+    }
+
   GLint ids;
   icetGetIntegerv(ICET_NUM_TILES,&ids);
 
