@@ -697,7 +697,7 @@
       </IntVectorProperty>
     </Proxy>
 
-    <SourceProxy name="PolyDataMapper" class="vtkPolyDataMapper"
+    <SourceProxy name="PolyDataMapper" class="vtkCompositePolyDataMapper2"
       base_proxygroup="mappers" base_proxyname="MapperBase">
       <InputProperty name="Input" command="SetInputConnection">
         <ProxyGroupDomain name="groups">
