@@ -62,7 +62,7 @@ int main(int argc, char* argv[])
   surface->Update();
 
   vtkPolyDataMapperRefPtr mapper (vtkPolyDataMapperRefPtr::New());
-  mapper->SetInput(surface->GetOutput());
+  mapper->SetInputConnection(surface->GetOutputPort());
   mapper->Update();
 
   vtkActorRefPtr actor (vtkActorRefPtr::New());
