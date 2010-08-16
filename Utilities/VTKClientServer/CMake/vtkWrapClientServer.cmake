@@ -32,6 +32,26 @@ MACRO(VTK_WRAP_ClientServer TARGET SRC_LIST_NAME SOURCES)
     MESSAGE(FATAL_ERROR "did not find ClientServer for target: ${TARGET}")
   ENDIF(NOT VTK_WRAP_ClientServer_EXE)
 
+  # all the compiler "-D" args
+  GET_DIRECTORY_PROPERTY(TMP_DEF_LIST DEFINITION COMPILE_DEFINITIONS)
+  SET(TMP_DEFINITIONS)
+  FOREACH(TMP_DEF ${TMP_DEF_LIST})
+    SET(TMP_DEFINITIONS ${TMP_DEFINITIONS} -D "${TMP_DEF}")
+  ENDFOREACH(TMP_DEF ${TMP_DEF_LIST})
+
+  # all the include directories
+  SET(TMP_INCLUDE_DIRS ${VTK_INCLUDE_DIR})
+  SET(TMP_INCLUDE)
+  FOREACH(INCLUDE_DIR ${TMP_INCLUDE_DIRS})
+    SET(TMP_INCLUDE ${TMP_INCLUDE} -I "${INCLUDE_DIR}")
+  ENDFOREACH(INCLUDE_DIR ${TMP_INCLUDE_DIRS})
+
+  IF (VTK_WRAP_HINTS)
+    SET(TMP_HINTS "--hints" "${VTK_WRAP_HINTS}")
+  ELSE (VTK_WRAP_HINTS)
+    SET(TMP_HINTS)
+  ENDIF (VTK_WRAP_HINTS)
+
   # For each class
   FOREACH(FILE ${SOURCES})
 
@@ -57,9 +77,9 @@ MACRO(VTK_WRAP_ClientServer TARGET SRC_LIST_NAME SOURCES)
       # is it abstract?
       GET_SOURCE_FILE_PROPERTY(TMP_ABSTRACT ${FILE} ABSTRACT)
       IF (TMP_ABSTRACT)
-        SET(TMP_CONCRETE 0)
+        SET(TMP_CONCRETE "--abstract")
       ELSE (TMP_ABSTRACT)
-        SET(TMP_CONCRETE 1)
+        SET(TMP_CONCRETE "--concrete")
         # add it to the init file's contents
         SET (CXX_CONTENTS 
           "${CXX_CONTENTS}extern void ${TMP_FILENAME}_Init(vtkClientServerInterpreter* csi);\n")
@@ -78,7 +98,12 @@ MACRO(VTK_WRAP_ClientServer TARGET SRC_LIST_NAME SOURCES)
         MAIN_DEPENDENCY ${TMP_INPUT}
         DEPENDS ${VTK_WRAP_ClientServer_EXE} ${VTK_WRAP_HINTS}
         COMMAND ${VTK_WRAP_ClientServer_EXE}
-        ARGS ${TMP_INPUT} ${VTK_WRAP_HINTS} ${TMP_CONCRETE} 
+        ARGS
+        ${TMP_CONCRETE}
+        ${TMP_HINTS}
+        ${TMP_DEFINITIONS}
+        ${TMP_INCLUDE}
+        ${TMP_INPUT}
         ${CMAKE_CURRENT_BINARY_DIR}/${TMP_FILENAME}ClientServer.cxx
         )
 

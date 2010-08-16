@@ -1,5 +1,10 @@
 # Tell vtkWrapPython.cmake to set VTK_PYTHON_LIBRARIES for us.
 SET(VTK_WRAP_PYTHON_FIND_LIBS 1)
+SET(VTK_WRAP_INCLUDE_DIRS
+  "${ParaView_BINARY_DIR}/VTK"
+  "${ParaView_SOURCE_DIR}/VTK/Common"
+  "${ParaView_SOURCE_DIR}/VTK/Parallel"
+  )
 INCLUDE("${VTK_CMAKE_DIR}/vtkWrapPython.cmake")
 
 INCLUDE_DIRECTORIES(

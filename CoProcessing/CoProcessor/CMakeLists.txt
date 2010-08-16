@@ -57,6 +57,7 @@ target_link_libraries(
 
 # Create Python bindings for the co-processing library
 INCLUDE(FindPythonLibs)
+SET(VTK_WRAP_INCLUDE_DIRS ${VTK_INCLUDE_DIR})
 INCLUDE(${VTK_CMAKE_DIR}/vtkWrapPython.cmake)
 
 VTK_WRAP_PYTHON3(vtkCoProcessorPython CPPython_SRCS "${CoProcessor_SRCS}")
