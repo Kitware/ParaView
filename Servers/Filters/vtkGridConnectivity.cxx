@@ -1059,8 +1059,6 @@ void vtkGridConnectivity::GenerateOutput(
   output->GetCellData()->AddArray(blockIdArray);
   output->GetCellData()->AddArray(cellIdArray);
   this->FragmentVolumes->SetName("Fragment Volume");
-  int size = this->FragmentVolumes->GetNumberOfTuples();
-
   output->GetFieldData()->AddArray(this->FragmentVolumes);
 
   // Add all of the integration arrays to field data.
