@@ -141,7 +141,7 @@ void pqPluginTreeWidgetEventTranslator::onCurrentChanged(const QModelIndex& inde
 {
   pqPluginTreeWidget * treeWidget = this->TreeView;
 
-  if (treeWidget)
+  if (treeWidget && index.isValid())
     {
     QTreeWidgetItem * currentItem = treeWidget->currentItem();
     if(currentItem)
