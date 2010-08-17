@@ -427,21 +427,45 @@ IF(PARAVIEW_USE_SYSTEM_HDF5)
 
 ELSE(PARAVIEW_USE_SYSTEM_HDF5)
 
-  SET(VTKHDF5_INSTALL_NO_DEVELOPMENT ${PV_INSTALL_NO_DEVELOPMENT})
-  SET(VTKHDF5_INSTALL_NO_RUNTIME ${PV_INSTALL_NO_RUNTIME})
-  SET(VTKHDF5_INSTALL_LIB_DIR ${PV_INSTALL_LIB_DIR})
-  SET(PARAVIEW_HDF5_LIBRARIES vtkhdf5)
-  IF(VTK_USE_SYSTEM_ZLIB)
-    SET(HDF5_ZLIB_HEADER "zlib.h")
-  ELSE(VTK_USE_SYSTEM_ZLIB)
-    SET(HDF5_ZLIB_HEADER "vtk_zlib.h")
-  ENDIF(VTK_USE_SYSTEM_ZLIB)
-  SET(HDF5_INCLUDE_DIR 
-    ${ParaView_SOURCE_DIR}/Utilities/hdf5
-    ${ParaView_BINARY_DIR}/Utilities/hdf5)
+  # Tell hdf5 that we are manually overriding certain settings
+  SET(HDF5_EXTERNALLY_CONFIGURED 1)
+  # Avoid duplicating names of installed libraries
+  SET(HDF5_EXTERNAL_LIB_PREFIX "vtk")
+  # Export configuration to this export variable
+  SET(HDF5_EXPORTED_TARGETS "paraview-targets")
 
-  SET(HDF5_CONFIG ${ParaView_BINARY_DIR}/Utilities/hdf5/HDF5Config.cmake)
+  SET(HDF5_INSTALL_NO_DEVELOPMENT ${PV_INSTALL_NO_DEVELOPMENT})
+  SET(HDF5_INSTALL_BIN_DIR ${PV_INSTALL_BIN_DIR})
+  SET(HDF5_INSTALL_LIB_DIR ${PV_INSTALL_LIB_DIR})
+  SET(HDF5_INSTALL_INCLUDE_DIR ${PV_INSTALL_INCLUDE_DIR})
+
+  # Setup all necessary overrides for zlib so that HDF5 uses our
+  # internally compiled zlib rather than any other version
+  IF(HDF5_ENABLE_Z_LIB_SUPPORT)
+    # We must tell the main HDF5 library that it depends on our zlib
+    SET(HDF5_LIB_DEPENDENCIES vtkzlib)
+    # Override the zlib header file
+    IF(VTK_USE_SYSTEM_ZLIB)
+      SET(H5_ZLIB_HEADER "zlib.h")
+    ELSE(VTK_USE_SYSTEM_ZLIB)
+      SET(H5_ZLIB_HEADER "vtk_zlib.h")
+      # Set vars that FindZlib would have set if used in sub project
+      SET(ZLIB_INCLUDE_DIRS "${VTK_ZLIB_INCLUDE_DIRS}")
+      SET(ZLIB_LIBRARIES vtkzlib)
+    ENDIF(VTK_USE_SYSTEM_ZLIB)
+  ENDIF(HDF5_ENABLE_Z_LIB_SUPPORT)
+
+  # Add the sub project
   ADD_SUBDIRECTORY(Utilities/hdf5)
+
+  # Some other modules use these vars to get the hdf5 lib name(s)
+  SET(PARAVIEW_HDF5_LIBRARIES hdf5)
+  SET(HDF5_LIBRARIES ${PARAVIEW_HDF5_LIBRARIES})
+
+  # Add the HDF5 dirs to our include path
+  SET(HDF5_INCLUDE_DIR
+    ${ParaView_SOURCE_DIR}/Utilities/hdf5/src
+    ${ParaView_BINARY_DIR}/Utilities/hdf5)
 
 ENDIF(PARAVIEW_USE_SYSTEM_HDF5)
 
