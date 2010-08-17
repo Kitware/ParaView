@@ -28,7 +28,6 @@ class vtkGenericDataSet;
 class vtkGenericGeometryFilter;
 class vtkHyperOctree;
 class vtkImageData;
-class vtkInformationIntegerKey;
 class vtkInformationVector;
 class vtkMultiProcessController;
 class vtkOutlineSource;
@@ -119,8 +118,6 @@ public:
   vtkGetMacro(MakeOutlineOfInput,int);
   vtkBooleanMacro(MakeOutlineOfInput,int);
 
-  static vtkInformationIntegerKey* AMR_LEVEL();
-  static vtkInformationIntegerKey* AMR_INDEX();
 //BTX
 protected:
   vtkPVGeometryFilter();

@@ -28,9 +28,12 @@
 #include "vtkSelectionSerializer.h"
 #include "vtkSmartPointer.h"
 #include "vtkUnsignedIntArray.h"
+#include "vtkCompositeDataIterator.h"
+#include "vtkCompositeDataSet.h"
 
 #include <vtkstd/map>
 #include <vtkstd/set>
+#include <assert.h>
 
 vtkStandardNewMacro(vtkSelectionConverter);
 
@@ -43,44 +46,6 @@ vtkSelectionConverter::vtkSelectionConverter()
 vtkSelectionConverter::~vtkSelectionConverter()
 {
 }
-
-class vtkSelectionConverter::vtkKeyType
-{
-public:
-  unsigned int HierarchicalIndex[2];
-  unsigned int CompositeIndex;
-
-  vtkKeyType()
-    {
-    this->CompositeIndex = 0;
-    this->HierarchicalIndex[0]=0;
-    this->HierarchicalIndex[1]=0;
-    }
-  vtkKeyType(unsigned int ci)
-    {
-    this->CompositeIndex = ci;
-    this->HierarchicalIndex[0]=0;
-    this->HierarchicalIndex[1]=0;
-    }
-  vtkKeyType(unsigned int level, unsigned int index)
-    {
-    this->CompositeIndex = 0;
-    this->HierarchicalIndex[0] = level;
-    this->HierarchicalIndex[1] = index;
-    }
-  bool operator < (const vtkKeyType& other) const
-    {
-    if (this->CompositeIndex == other.CompositeIndex)
-      {
-      if (this->HierarchicalIndex[0] == other.HierarchicalIndex[0])
-        {
-        return this->HierarchicalIndex[1] < other.HierarchicalIndex[1];
-        }
-      return this->HierarchicalIndex[0] < other.HierarchicalIndex[0];
-      }
-    return this->CompositeIndex < other.CompositeIndex;
-    }
-};
 
 //----------------------------------------------------------------------------
 void vtkSelectionConverter::Convert(vtkSelection* input, vtkSelection* output,
@@ -121,34 +86,6 @@ void vtkSelectionConverter::Convert(vtkSelectionNode* input, vtkSelection* outpu
       inputProperties->Get(vtkSelectionNode::CONTENT_TYPE()));
     }
 
-#if 0
-  unsigned int numChildren = input->GetNumberOfChildren();
-  for (unsigned int i=0; i<numChildren; i++)
-    {
-    vtkInformation *childProps = input->GetChild(i)->GetProperties();
-    if (!childProps->Has(vtkSelectionNode::PROCESS_ID()) ||
-        ( childProps->Get(vtkSelectionNode::PROCESS_ID()) ==
-          vtkProcessModule::GetProcessModule()->GetPartitionId() )
-      )
-      {
-      vtkSelection* newOutput = vtkSelectionNode::New();
-      this->Convert(input->GetChild(i), newOutput, global_ids);
-      if (newOutput->GetNumberOfChildren() > 0)
-        {
-        for (unsigned int cc=0; cc < newOutput->GetNumberOfChildren(); cc++)
-          {
-          output->AddChild(newOutput->GetChild(cc));
-          }
-        }
-      else
-        {
-        output->AddChild(newOutput);
-        }
-      newOutput->Delete();
-      }
-    }
-#endif
-
   if (inputProperties->Get(vtkSelectionNode::CONTENT_TYPE()) !=
     vtkSelectionNode::INDICES ||
     !inputProperties->Has(vtkSelectionNode::FIELD_TYPE()))
@@ -187,8 +124,15 @@ void vtkSelectionConverter::Convert(vtkSelectionNode* input, vtkSelection* outpu
     return;
     }
 
-  vtkDataSet* ds = vtkDataSet::SafeDownCast(
-    geomAlg->GetOutputDataObject(0));
+  vtkDataObject* geometryFilterOutput = geomAlg->GetOutputDataObject(0);
+  vtkDataSet* ds = vtkDataSet::SafeDownCast(geometryFilterOutput);
+  vtkCompositeDataSet* cd = vtkCompositeDataSet::SafeDownCast(geometryFilterOutput);
+  if (cd)
+    {
+    assert(inputProperties->Has(vtkSelectionNode::COMPOSITE_INDEX()));
+    ds = this->LocateDataSet(cd,
+        inputProperties->Get(vtkSelectionNode::COMPOSITE_INDEX()));
+    }
   if (!ds)
     {
     return;
@@ -200,20 +144,7 @@ void vtkSelectionConverter::Convert(vtkSelectionNode* input, vtkSelection* outpu
     return;
     }
 
-  // NOTE: these are cell-data arrays.
-  vtkUnsignedIntArray* compositeIndexArray = vtkUnsignedIntArray::SafeDownCast(
-    ds->GetCellData()->GetArray("vtkCompositeIndex"));
-  // compositeIndexArray may not be present at all if the input dataset is not a
-  // composite dataset.
-  vtkUnsignedIntArray* amrLevelArray = vtkUnsignedIntArray::SafeDownCast(
-    ds->GetCellData()->GetArray("vtkAMRLevel")); // may be null.
-  vtkUnsignedIntArray* amrIndexArray = vtkUnsignedIntArray::SafeDownCast(
-    ds->GetCellData()->GetArray("vtkAMRIndex")); // may be null.
-
-  // key == composite index or hierarchical index.
-  // value == set of indices.
-  // If compositeIndexArray is NULL, then all indicies are put under key==0.
-  typedef vtkstd::map<vtkKeyType, vtkstd::set<vtkIdType> > indicesType;
+  typedef vtkstd::set<vtkIdType> indicesType;
   indicesType indices;
 
   vtkIdType numHits = inputList->GetNumberOfTuples() *
@@ -242,32 +173,7 @@ void vtkSelectionConverter::Convert(vtkSelectionNode* input, vtkSelection* outpu
         continue;
         }
       vtkIdType pointId = pointMapArray->GetValue(geomPointId);
-
-      // Composite index information is available only on cells, hence, 
-      // for each point we find the first cell it belongs to and then lookup the
-      // composite index.
-      ds->GetPointCells(geomPointId, idlist);
-      vtkIdType geomCellId = 0;
-      if (idlist->GetNumberOfIds() > 0)
-        {
-        geomCellId = idlist->GetId(0);
-        }
-      vtkKeyType key;
-      if (amrLevelArray && amrIndexArray)
-        {
-        unsigned int val[2];
-        amrLevelArray->GetTupleValue(geomCellId, &val[0]);
-        amrIndexArray->GetTupleValue(geomCellId, &val[1]);
-        key = vtkKeyType(val[0], val[1]);
-        }
-      else if (compositeIndexArray)
-        {
-        unsigned int composite_index = 0;
-        composite_index = compositeIndexArray->GetValue(geomCellId);
-        key = vtkKeyType(composite_index);
-        }
-      vtkstd::set<vtkIdType>& visverts = indices[key];
-      visverts.insert(pointId);
+      indices.insert(pointId);
       }
     idlist->Delete();
     }
@@ -279,28 +185,12 @@ void vtkSelectionConverter::Convert(vtkSelectionNode* input, vtkSelection* outpu
       {
       return;
       }
-    
+
     for (vtkIdType hitId=0; hitId<numHits; hitId++)
       {
       vtkIdType geomCellId = inputList->GetValue(hitId);
       vtkIdType cellIndex = cellMapArray->GetValue(geomCellId);
-
-      vtkKeyType key;
-      if (amrLevelArray && amrIndexArray)
-        {
-        unsigned int val[2];
-        amrLevelArray->GetTupleValue(geomCellId, &val[0]);
-        amrIndexArray->GetTupleValue(geomCellId, &val[1]);
-        key = vtkKeyType(val[0], val[1]);
-        }
-      else if (compositeIndexArray)
-        {
-        unsigned int composite_index =
-          compositeIndexArray->GetValue(geomCellId);
-        key = vtkKeyType(composite_index);
-        }
-      vtkstd::set<vtkIdType>& cellindices = indices[key];
-      cellindices.insert(cellIndex);
+      indices.insert(cellIndex);
       }
     }
 
@@ -314,69 +204,53 @@ void vtkSelectionConverter::Convert(vtkSelectionNode* input, vtkSelection* outpu
                           inputProperties->Get(vtkSelectionNode::PROCESS_ID()));
     }
 
-  if (indices.size() > 1)
+  if (inputProperties->Has(vtkSelectionNode::COMPOSITE_INDEX()))
     {
-    indicesType::iterator mit;
-    for (mit=indices.begin(); mit != indices.end(); ++mit)
-      {
-      vtkSelectionNode* child = vtkSelectionNode::New();
-      child->GetProperties()->Copy(outputProperties, /*deep=*/0);
-      if (amrLevelArray && amrIndexArray)
-        {
-        child->GetProperties()->Set(vtkSelectionNode::HIERARCHICAL_LEVEL(),
-          mit->first.HierarchicalIndex[0]);
-        child->GetProperties()->Set(vtkSelectionNode::HIERARCHICAL_INDEX(),
-          mit->first.HierarchicalIndex[1]);
-        }
-      else if (compositeIndexArray)
-        {
-        child->GetProperties()->Set(vtkSelectionNode::COMPOSITE_INDEX(),
-          mit->first.CompositeIndex);
-        }
-
-      vtkIdTypeArray* outputArray = vtkIdTypeArray::New();
-      vtkstd::set<vtkIdType> &ids = mit->second;
-      vtkstd::set<vtkIdType>::iterator sit;
-      outputArray->SetNumberOfTuples(ids.size());
-      vtkIdType index=0;
-      for (sit = ids.begin(); sit != ids.end(); sit++, index++)
-        {
-        outputArray->SetValue(index, *sit);
-        }
-      child->SetSelectionList(outputArray);
-      outputArray->Delete();
-
-      outputSel->AddNode(child);
-      child->Delete();
-      }
+    outputProperties->Set(vtkSelectionNode::COMPOSITE_INDEX(),
+      inputProperties->Get(vtkSelectionNode::COMPOSITE_INDEX()));
     }
-  else if (indices.size() == 1)
+
+  if (indices.size() > 0)
     {
     vtkIdTypeArray* outputArray = vtkIdTypeArray::New();
-    vtkstd::set<vtkIdType> &ids = indices.begin()->second;
     vtkstd::set<vtkIdType>::iterator sit;
-    outputArray->SetNumberOfTuples(ids.size());
+    outputArray->SetNumberOfTuples(indices.size());
+    vtkIdType* out_ptr = outputArray->GetPointer(0);
     vtkIdType index=0;
-    for (sit = ids.begin(); sit != ids.end(); sit++, index++)
+    for (sit = indices.begin(); sit != indices.end(); sit++, index++)
       {
-      outputArray->SetValue(index, *sit);
-      }
-    if (amrLevelArray && amrIndexArray)
-      {
-      outputProperties->Set(vtkSelectionNode::HIERARCHICAL_LEVEL(),
-        indices.begin()->first.HierarchicalIndex[0]);
-      outputProperties->Set(vtkSelectionNode::HIERARCHICAL_INDEX(),
-        indices.begin()->first.HierarchicalIndex[1]);
-      }
-    else if (compositeIndexArray)
-      {
-      outputProperties->Set(vtkSelectionNode::COMPOSITE_INDEX(),
-        indices.begin()->first.CompositeIndex);
+      out_ptr[index] = *sit;
       }
     output->SetSelectionList(outputArray);
-    outputArray->Delete();
+    outputArray->FastDelete();
     outputSel->AddNode(output);
+    //outputSel->Print(cout);
     }
+}
+
+
+//----------------------------------------------------------------------------
+vtkDataSet* vtkSelectionConverter::LocateDataSet(
+  vtkCompositeDataSet* cd, unsigned int index)
+{
+  // FIXME: this needs to be optimized.
+  vtkSmartPointer<vtkCompositeDataIterator> iter;
+  iter.TakeReference(cd->NewIterator());
+  for (iter->InitTraversal(); !iter->IsDoneWithTraversal();
+    iter->GoToNextItem())
+    {
+    if (iter->GetCurrentFlatIndex() < index)
+      {
+      continue;
+      }
+    if (iter->GetCurrentFlatIndex() == index)
+      {
+      return vtkDataSet::SafeDownCast(iter->GetCurrentDataObject());
+      }
+    break;
+    }
+
+  return NULL;
 }
 
 //----------------------------------------------------------------------------

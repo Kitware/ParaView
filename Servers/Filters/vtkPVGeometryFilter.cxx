@@ -37,7 +37,6 @@
 #include "vtkHyperOctreeSurfaceFilter.h"
 #include "vtkImageData.h"
 #include "vtkInformation.h"
-#include "vtkInformationIntegerKey.h"
 #include "vtkInformationVector.h"
 #include "vtkMultiBlockDataSet.h"
 #include "vtkMultiProcessController.h"
@@ -49,6 +48,7 @@
 #include "vtkPVRecoverGeometryWireframe.h"
 #include "vtkRectilinearGrid.h"
 #include "vtkRectilinearGridOutlineFilter.h"
+#include "vtkSelectionNode.h"
 #include "vtkSmartPointer.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkStripper.h"
@@ -70,8 +70,6 @@
 
 vtkStandardNewMacro(vtkPVGeometryFilter);
 vtkCxxSetObjectMacro(vtkPVGeometryFilter, Controller, vtkMultiProcessController);
-vtkInformationKeyMacro(vtkPVGeometryFilter, AMR_LEVEL, Integer);
-vtkInformationKeyMacro(vtkPVGeometryFilter, AMR_INDEX, Integer);
 class vtkPVGeometryFilter::BoundsReductionOperation : public vtkCommunicator::Operation
 {
 public:
@@ -498,9 +496,13 @@ int vtkPVGeometryFilter::RequestCompositeData(vtkInformation*,
 
     if (hdIter)
       {
+      // This will be used later by vtkSelectionConverter to realize that this
+      // multi-block of polydatas is actually coming from an AMR.
       vtkInformation* metadata = output->GetMetaData(iter);
-      metadata->Set(AMR_LEVEL(), hdIter->GetCurrentLevel());
-      metadata->Set(AMR_INDEX(), hdIter->GetCurrentIndex());
+      metadata->Set(vtkSelectionNode::HIERARCHICAL_LEVEL(),
+        hdIter->GetCurrentLevel());
+      metadata->Set(vtkSelectionNode::HIERARCHICAL_INDEX(),
+        hdIter->GetCurrentIndex());
       }
 
     numInputs++;
