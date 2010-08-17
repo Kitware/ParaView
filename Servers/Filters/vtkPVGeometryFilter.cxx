@@ -37,6 +37,7 @@
 #include "vtkHyperOctreeSurfaceFilter.h"
 #include "vtkImageData.h"
 #include "vtkInformation.h"
+#include "vtkInformationIntegerKey.h"
 #include "vtkInformationVector.h"
 #include "vtkMultiBlockDataSet.h"
 #include "vtkMultiProcessController.h"
@@ -68,14 +69,9 @@
   vtkSmartPointer<type> name = vtkSmartPointer<type>::New()
 
 vtkStandardNewMacro(vtkPVGeometryFilter);
-
 vtkCxxSetObjectMacro(vtkPVGeometryFilter, Controller, vtkMultiProcessController);
-
-class vtkPVGeometryFilter::vtkPolyDataVector :
-  public vtkstd::vector<vtkPolyData*>
-{
-};
-
+vtkInformationKeyMacro(vtkPVGeometryFilter, AMR_LEVEL, Integer);
+vtkInformationKeyMacro(vtkPVGeometryFilter, AMR_INDEX, Integer);
 class vtkPVGeometryFilter::BoundsReductionOperation : public vtkCommunicator::Operation
 {
 public:
@@ -306,141 +302,6 @@ int vtkPVGeometryFilter::CheckAttributes(vtkDataObject* input)
   return 0;
 }
 
-typedef vtkstd::map<vtkstd::string, vtkDataSetAttributes*> vtkArrayMap;
-
-//----------------------------------------------------------------------------
-static void vtkBuildArrayMap(vtkDataSetAttributes* dsa, vtkArrayMap& arrayMap)
-{
-  int numArrays = dsa->GetNumberOfArrays();
-  for (int kk=0; kk < numArrays; kk++)
-    {
-    vtkDataArray* array = dsa->GetArray(kk);
-
-    if (!array || !array->GetName())
-      {
-      continue;
-      }
-
-    if (array == dsa->GetNormals() || array == dsa->GetTCoords() ||
-      array == dsa->GetGlobalIds() || array == dsa->GetPedigreeIds())
-      {
-      // Normals, Tcoords, GIDs, PIDs are not filled up with filling partial arrays.
-      continue;
-      }
-
-    if (arrayMap.find(array->GetName()) == arrayMap.end())
-      {
-      arrayMap[array->GetName()] = dsa;
-      }
-    }
-}
-
-//----------------------------------------------------------------------------
-static void vtkFillPartialArrays(vtkDataSetAttributes* dsa,
-  vtkArrayMap& arrayMap, vtkIdType count)
-{
-  vtkArrayMap::iterator iter;
-  for (iter = arrayMap.begin(); iter != arrayMap.end(); ++iter)
-    {
-    if (dsa->GetArray(iter->first.c_str()) == NULL)
-      {
-      vtkDataArray* srcArray = iter->second->GetArray(iter->first.c_str());
-      vtkDataArray* clone = srcArray->NewInstance();
-      clone->SetName(srcArray->GetName());
-      clone->SetNumberOfComponents(srcArray->GetNumberOfComponents());
-      clone->SetNumberOfTuples(count);
-      for (int cc=0; cc < clone->GetNumberOfComponents(); cc++)
-        {
-        clone->FillComponent(cc, 0.0);
-        }
-      dsa->AddArray(clone);
-      clone->Delete();
-      }
-    }
-}
-
-//----------------------------------------------------------------------------
-void vtkPVGeometryFilter::FillPartialArrays(
-  vtkPVGeometryFilter::vtkPolyDataVector& inputs)
-{
-  if (inputs.size() == 0)
-    {
-    return;
-    }
-
-  vtkArrayMap arrayMapPD;
-  vtkArrayMap arrayMapCD;
-
-  // build arrayMap with representative arrays for each array name.
-  // As far as active attributes are concerned, we only fill in the scalars or
-  // vectors. For appendPolyData to work correctly, it is essential that the
-  // active scalars/vectors are the same array on all the inputs. To avoid
-  // contention, we choose the first available scalars/vectors.
-  vtkstd::string activePScalars, activeCScalars, activePVectors, activeCVectors;
-
-  for (vtkPolyDataVector::iterator iter = inputs.begin();
-    iter!= inputs.end(); ++iter)
-    {
-    vtkPolyData* ds = *iter;
-    if (ds)
-      {
-      if (activePScalars=="" && ds->GetPointData()->GetScalars() &&
-        ds->GetPointData()->GetScalars()->GetName())
-        {
-        activePScalars = ds->GetPointData()->GetScalars()->GetName();
-        }
-      if (activeCScalars=="" && ds->GetCellData()->GetScalars() &&
-        ds->GetCellData()->GetScalars()->GetName())
-        {
-        activeCScalars = ds->GetCellData()->GetScalars()->GetName();
-        }
-
-      if (activePVectors=="" && ds->GetPointData()->GetVectors() &&
-        ds->GetPointData()->GetVectors()->GetName())
-        {
-        activePVectors = ds->GetPointData()->GetVectors()->GetName();
-        }
-      if (activeCVectors=="" && ds->GetCellData()->GetVectors() &&
-        ds->GetCellData()->GetVectors()->GetName())
-        {
-        activeCVectors = ds->GetCellData()->GetVectors()->GetName();
-        }
-
-      ::vtkBuildArrayMap(ds->GetPointData(), arrayMapPD);
-      ::vtkBuildArrayMap(ds->GetCellData(), arrayMapCD);
-      }
-    }
-
-  // Now fill partial arrays.
-  for (vtkPolyDataVector::iterator iter = inputs.begin();
-    iter!= inputs.end(); ++iter)
-    {
-    vtkPolyData* ds = *iter;
-    if (ds)
-      {
-      ::vtkFillPartialArrays(ds->GetPointData(), arrayMapPD, ds->GetNumberOfPoints());
-      ::vtkFillPartialArrays(ds->GetCellData(), arrayMapCD, ds->GetNumberOfCells());
-
-      if (activePScalars != "")
-        {
-        ds->GetPointData()->SetActiveScalars(activePScalars.c_str());
-        }
-      if (activeCScalars != "")
-        {
-        ds->GetCellData()->SetActiveScalars(activeCScalars.c_str());
-        }
-      if (activePVectors != "")
-        {
-        ds->GetPointData()->SetActiveVectors(activePVectors.c_str());
-        }
-      if (activeCVectors != "")
-        {
-        ds->GetCellData()->SetActiveVectors(activeCVectors.c_str());
-        }
-      }
-    }
-}
-
 //----------------------------------------------------------------------------
 int vtkPVGeometryFilter::RequestInformation(
   vtkInformation*, vtkInformationVector** vtkNotUsed(inVectors), vtkInformationVector* outputVector)
@@ -632,26 +493,23 @@ int vtkPVGeometryFilter::RequestCompositeData(vtkInformation*,
     this->ExecuteBlock(block, tmpOut, 0);
     this->ExecuteCellNormals(tmpOut, 0);
     this->RemoveGhostCells(tmpOut);
-
-    // FIXME: Need to add information about cid and level/index to the output,
-    // maybe as meta-data, to aid in selection.
-    //if (hdIter)
-    //  {
-    //  this->AddHierarchicalIndex(tmpOut,
-    //    hdIter->GetCurrentLevel(), hdIter->GetCurrentIndex());
-    //  }
-    //else
-    //  {
-    //  this->AddCompositeIndex(tmpOut, iter->GetCurrentFlatIndex());
-    //  }
     output->SetDataSet(iter, tmpOut);
     tmpOut->FastDelete();
+
+    if (hdIter)
+      {
+      vtkInformation* metadata = output->GetMetaData(iter);
+      metadata->Set(AMR_LEVEL(), hdIter->GetCurrentLevel());
+      metadata->Set(AMR_INDEX(), hdIter->GetCurrentIndex());
+      }
 
     numInputs++;
     this->UpdateProgress(static_cast<float>(numInputs)/totNumBlocks);
     }
   vtkTimerLog::MarkEndEvent("vtkPVGeometryFilter::ExecuteCompositeDataSet");
 
+  // TODO: Merge mutli-pieces to avoid efficiency setbacks when ordered
+  // compositing is employed.
   vtkTimerLog::MarkEndEvent("vtkPVGeometryFilter::RequestCompositeData");
   return 1;
 }
@@ -685,56 +543,6 @@ void vtkPVGeometryFilter::AddHierarchicalIndex(vtkPolyData* pd,
   dsindex->SetName("vtkAMRIndex");
   pd->GetCellData()->AddArray(dsindex);
   dsindex->Delete();
-}
-
-//----------------------------------------------------------------------------
-int vtkPVGeometryFilter::ExecuteCompositeDataSet(
-  vtkCompositeDataSet* mgInput,
-  vtkPolyDataVector &outputs,
-  int& numInputs)
-{
-  vtkTimerLog::MarkStartEvent("vtkPVGeometryFilter::ExecuteCompositeDataSet");
-  vtkSmartPointer<vtkCompositeDataIterator> iter;
-  iter.TakeReference(mgInput->NewIterator());
-
-  vtkHierarchicalBoxDataIterator* hdIter =
-    vtkHierarchicalBoxDataIterator::SafeDownCast(iter);
-
-  unsigned int totNumBlocks=0;
-  for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
-    {
-    // iter skips empty blocks automatically.
-    totNumBlocks++;
-    }
-
-  unsigned int group = 0;
-  for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem(), group++)
-    {
-    this->CompositeIndex = iter->GetCurrentFlatIndex();
-    vtkDataObject* block = iter->GetCurrentDataObject();
-
-    vtkPolyData* tmpOut = vtkPolyData::New();
-    this->ExecuteBlock(block, tmpOut, 0);
-    //// assert(tmpOut->GetReferenceCount() == 1);
-
-    if (hdIter)
-      {
-      this->AddHierarchicalIndex(tmpOut,
-        hdIter->GetCurrentLevel(), hdIter->GetCurrentIndex());
-      }
-    else
-      {
-      this->AddCompositeIndex(tmpOut, iter->GetCurrentFlatIndex());
-      }
-
-    outputs.push_back(tmpOut);
-
-    numInputs++;
-    this->UpdateProgress(static_cast<float>(numInputs)/totNumBlocks);
-    }
-
-  vtkTimerLog::MarkEndEvent("vtkPVGeometryFilter::ExecuteCompositeDataSet");
-  return 1;
 }
 
 //----------------------------------------------------------------------------

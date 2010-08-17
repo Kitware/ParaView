@@ -21,16 +21,14 @@
 #define __vtkPVGeometryFilter_h
 
 #include "vtkDataObjectAlgorithm.h"
-class vtkAppendPolyData;
 class vtkCallbackCommand;
-class vtkCompositeDataSet;
-class vtkDataObject;
 class vtkDataSet;
 class vtkDataSetSurfaceFilter;
 class vtkGenericDataSet;
 class vtkGenericGeometryFilter;
 class vtkHyperOctree;
 class vtkImageData;
+class vtkInformationIntegerKey;
 class vtkInformationVector;
 class vtkMultiProcessController;
 class vtkOutlineSource;
@@ -121,12 +119,12 @@ public:
   vtkGetMacro(MakeOutlineOfInput,int);
   vtkBooleanMacro(MakeOutlineOfInput,int);
 
+  static vtkInformationIntegerKey* AMR_LEVEL();
+  static vtkInformationIntegerKey* AMR_INDEX();
 //BTX
 protected:
   vtkPVGeometryFilter();
   ~vtkPVGeometryFilter();
-
-  class vtkPolyDataVector;
 
   // Description:
   // Overridden to create vtkMultiBlockDataSet when input is a
@@ -167,10 +165,6 @@ protected:
   void OctreeExecute(
     vtkHyperOctree* input, vtkPolyData* output, int doCommunicate);
   void ExecuteCellNormals(vtkPolyData* output, int doCommunicate);
-  int ExecuteCompositeDataSet(vtkCompositeDataSet* mgInput,
-                              vtkPolyDataVector &outputs,
-                              int& numInputs);
-
   void ChangeUseStripsInternal(int val, int force);
 
   int OutlineFlag;
@@ -190,8 +184,6 @@ protected:
   // Call CheckAttributes on the \c input which ensures that all attribute
   // arrays have valid lengths.
   int CheckAttributes(vtkDataObject* input);
-
-  void FillPartialArrays(vtkPolyDataVector& inputs);
 
   // Callback registered with the InternalProgressObserver.
   static void InternalProgressCallbackFunction(vtkObject*, unsigned long,
