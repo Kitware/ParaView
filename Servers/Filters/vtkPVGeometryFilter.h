@@ -215,11 +215,6 @@ private:
   vtkPVGeometryFilter(const vtkPVGeometryFilter&); // Not implemented
   void operator=(const vtkPVGeometryFilter&); // Not implemented
 
-  void AddCompositeIndex(vtkPolyData* pd, unsigned int index);
-  void AddHierarchicalIndex(vtkPolyData* pd, unsigned int level, unsigned int index);
-
-  unsigned int CompositeIndex;
-
   class BoundsReductionOperation;
 //ETX
 };

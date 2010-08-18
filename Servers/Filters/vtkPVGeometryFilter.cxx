@@ -59,6 +59,7 @@
 #include "vtkUnsignedIntArray.h"
 #include "vtkUnstructuredGridGeometryFilter.h"
 #include "vtkUnstructuredGrid.h"
+#include "vtkMultiPieceDataSet.h"
 
 #include <vtkstd/map>
 #include <vtkstd/vector>
@@ -148,8 +149,6 @@ vtkPVGeometryFilter::vtkPVGeometryFilter ()
   this->SetController(vtkMultiProcessController::GetGlobalController());
 
   this->OutlineSource = vtkOutlineSource::New();
-
-  this->CompositeIndex = 0;
 
   this->PassThroughCellIds = 1;
   this->PassThroughPointIds = 1;
@@ -444,6 +443,53 @@ int vtkPVGeometryFilter::RequestData(vtkInformation* request,
   return 1;
 }
 
+namespace
+{
+  static void vtkPVGeometryFilterAddPieceIndexArray(
+    vtkPolyData* pd, unsigned int index)
+    {
+    vtkUnsignedIntArray* cindex = vtkUnsignedIntArray::New();
+    cindex->SetNumberOfComponents(1);
+    cindex->SetNumberOfTuples(pd->GetNumberOfCells());
+    cindex->FillComponent(0, index);
+    cindex->SetName("vtkPieceIndex");
+    pd->GetCellData()->AddArray(cindex);
+    cindex->Delete();
+    }
+
+  static void vtkPVGeometryFilterMergePieces(vtkMultiPieceDataSet* mp)
+    {
+    vtkstd::vector<vtkPolyData*> inputs;
+    for (unsigned int cc=0; cc < mp->GetNumberOfPieces(); cc++)
+      {
+      vtkPolyData* piece = vtkPolyData::SafeDownCast(mp->GetPiece(cc));
+      if (piece && piece->GetNumberOfPoints() > 0)
+        {
+        // add the vtkPieceIndex array which is used by vtkSelectionConverter
+        // for selection conversion.
+        vtkPVGeometryFilterAddPieceIndexArray(piece, cc);
+        inputs.push_back(piece);
+        }
+      }
+
+    if (inputs.size() > 0)
+      {
+      vtkPolyData* output = vtkPolyData::New();
+      vtkAppendPolyData* appender = vtkAppendPolyData::New();
+      appender->ExecuteAppend(output, &inputs[0],
+        static_cast<int>(inputs.size()));
+      appender->Delete();
+      inputs.clear();
+      for (unsigned int cc=0; cc < mp->GetNumberOfPieces(); cc++)
+        {
+        mp->SetPiece(cc, NULL);
+        }
+      mp->SetPiece(0, output);
+      output->FastDelete();
+      }
+    }
+};
+
 //----------------------------------------------------------------------------
 int vtkPVGeometryFilter::RequestCompositeData(vtkInformation*,
                                               vtkInformationVector** inputVector,
@@ -484,7 +530,6 @@ int vtkPVGeometryFilter::RequestCompositeData(vtkInformation*,
   int numInputs = 0;
   for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
     {
-    this->CompositeIndex = iter->GetCurrentFlatIndex();
     vtkDataObject* block = iter->GetCurrentDataObject();
 
     vtkPolyData* tmpOut = vtkPolyData::New();
@@ -510,41 +555,30 @@ int vtkPVGeometryFilter::RequestCompositeData(vtkInformation*,
     }
   vtkTimerLog::MarkEndEvent("vtkPVGeometryFilter::ExecuteCompositeDataSet");
 
-  // TODO: Merge mutli-pieces to avoid efficiency setbacks when ordered
+  // Merge mutli-pieces to avoid efficiency setbacks when ordered
   // compositing is employed.
+  iter.TakeReference(output->NewIterator());
+  iter->VisitOnlyLeavesOff();
+
+  vtkstd::vector<vtkMultiPieceDataSet*> pieces_to_merge;
+  for (iter->InitTraversal(); !iter->IsDoneWithTraversal();
+    iter->GoToNextItem())
+    {
+    vtkDataObject* curNode = iter->GetCurrentDataObject();
+    if (curNode && vtkMultiPieceDataSet::SafeDownCast(curNode))
+      {
+      vtkMultiPieceDataSet* piece = vtkMultiPieceDataSet::SafeDownCast(curNode);
+      pieces_to_merge.push_back(piece);
+      }
+    }
+
+  for (size_t cc=0; cc < pieces_to_merge.size(); cc++)
+    {
+    vtkPVGeometryFilterMergePieces(pieces_to_merge[cc]);
+    }
+
   vtkTimerLog::MarkEndEvent("vtkPVGeometryFilter::RequestCompositeData");
   return 1;
-}
-
-//----------------------------------------------------------------------------
-void vtkPVGeometryFilter::AddCompositeIndex(vtkPolyData* pd, unsigned int index)
-{
-  vtkUnsignedIntArray* cindex = vtkUnsignedIntArray::New();
-  cindex->SetNumberOfComponents(1);
-  cindex->SetNumberOfTuples(pd->GetNumberOfCells());
-  cindex->FillComponent(0, index);
-  cindex->SetName("vtkCompositeIndex");
-  pd->GetCellData()->AddArray(cindex);
-  cindex->Delete();
-}
-
-//----------------------------------------------------------------------------
-void vtkPVGeometryFilter::AddHierarchicalIndex(vtkPolyData* pd,
-  unsigned int level, unsigned int index)
-{
-  vtkUnsignedIntArray* dslevel = vtkUnsignedIntArray::New();
-  dslevel->SetNumberOfTuples(pd->GetNumberOfCells());
-  dslevel->FillComponent(0, level);
-  dslevel->SetName("vtkAMRLevel");
-  pd->GetCellData()->AddArray(dslevel);
-  dslevel->Delete();
-
-  vtkUnsignedIntArray* dsindex = vtkUnsignedIntArray::New();
-  dsindex->SetNumberOfTuples(pd->GetNumberOfCells());
-  dsindex->FillComponent(0, index);
-  dsindex->SetName("vtkAMRIndex");
-  pd->GetCellData()->AddArray(dsindex);
-  dsindex->Delete();
 }
 
 //----------------------------------------------------------------------------
