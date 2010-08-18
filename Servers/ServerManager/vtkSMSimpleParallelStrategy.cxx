@@ -162,6 +162,11 @@ void vtkSMSimpleParallelStrategy::CreatePipelineInternal(
           << collect->GetID()
           << "SetServerToClient"
           << vtkClientServerStream::End;
+  stream << vtkClientServerStream::Invoke
+         << collect->GetID()
+         << "SetOutputDataType"
+         << data_type_id
+         << vtkClientServerStream::End;
   pm->SendStream(this->ConnectionID, vtkProcessModule::CLIENT, stream);
 }
 
