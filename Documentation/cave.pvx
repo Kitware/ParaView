@@ -1,0 +1,131 @@
+<?xml version="1.0" ?>
+<pvx>
+ <Process Type="client" />
+  <Process Type="server">
+    <!-- Tiled wall in Kitware -->
+  <Machine Name="Amber1"
+           Environment="DISPLAY=:0"
+           LowerLeft=" -0.5588      -0.3048  -0.0762"
+           LowerRight="-0.186266667 -0.3048  -0.0762"
+           UpperRight="-0.186266667 -0.0     -0.0762"/>
+  <Machine Name="Amber2"
+           Environment="DISPLAY=:0"
+	   LowerLeft=" -0.5588      -0.6096  -0.0762"
+           LowerRight="-0.186266667 -0.6096  -0.0762"
+           UpperRight="-0.186266667 -0.3048  -0.0762"/>
+  <Machine Name="Amber3"
+           Environment="DISPLAY=:0"
+           LowerLeft=" -0.186266667 -0.3048  -0.0762"
+           LowerRight=" 0.186266667 -0.3048  -0.0762"
+           UpperRight=" 0.186266667  0.0     -0.0762"/>
+  <Machine Name="Amber4"
+           Environment="DISPLAY=:0"
+	   LowerLeft=" -0.186266667 -0.6096  -0.0762"
+           LowerRight=" 0.186266667 -0.6096  -0.0762"
+           UpperRight=" 0.186266667 -0.3048  -0.0762"/>
+  <Machine Name="Amber5"
+           Environment="DISPLAY=:0"
+           LowerLeft="  0.186266667 -0.3048  -0.0762"
+           LowerRight=" 0.5588      -0.3048  -0.0762"
+           UpperRight=" 0.5588       0.0     -0.0762"/>
+  <Machine Name="Amber6"
+           Environment="DISPLAY=:0"
+	   LowerLeft="  0.186266667 -0.6096  -0.0762"
+           LowerRight=" 0.5588      -0.6096  -0.0762"
+           UpperRight=" 0.5588      -0.3048  -0.0762"/>
+
+
+
+    <!-- CAVE 6 screens -->
+  <!-- <Machine Name="Front" -->
+  <!--          Environment="DISPLAY=:0" -->
+  <!--          LowerLeft=" -1 -1 -1" -->
+  <!--          LowerRight=" 1 -1 -1" -->
+  <!--          UpperRight=" 1  1 -1" /> -->
+  <!-- <Machine Name="Right" -->
+  <!--          Environment="DISPLAY=:0" -->
+  <!--          LowerLeft="  1 -1 -1" -->
+  <!--          LowerRight=" 1 -1  1" -->
+  <!--          UpperRight=" 1  1  1" /> -->
+  <!-- <Machine Name="Left" -->
+  <!--          Environment="DISPLAY=:0" -->
+  <!--          LowerLeft=" -1 -1  1" -->
+  <!--          LowerRight="-1 -1 -1" -->
+  <!--          UpperRight="-1  1 -1"/> -->
+  <!-- <Machine Name="Top" -->
+  <!--          Environment="DISPLAY=:0" -->
+  <!--          LowerLeft=" -1  1 -1" -->
+  <!--          LowerRight=" 1  1 -1" -->
+  <!--          UpperRight=" 1  1  1"/> -->
+  <!-- <Machine Name="Bottom" -->
+  <!--          Environment="DISPLAY=:0" -->
+  <!--          LowerLeft=" -1 -1  1" -->
+  <!--          LowerRight=" 1 -1  1" -->
+  <!--          UpperRight=" 1 -1 -1"/> -->
+  <!-- <Machine Name="Back" -->
+  <!--          Environment="DISPLAY=:0" -->
+  <!--          LowerLeft="  1 -1  1" -->
+  <!--          LowerRight="-1 -1  1" -->
+  <!--          UpperRight="-1  1  1"/> -->
+
+
+
+  <!-- CAVE Three screens (HMM) -->
+  <!-- <Machine Name="Front" -->
+  <!--          Environment="DISPLAY=:0" -->
+  <!--          LowerLeft=" -1 -1 -1" -->
+  <!--          LowerRight=" 1 -1 -1" -->
+  <!--          UpperRight=" 1  1 -1" /> -->
+  <!-- <Machine Name="Right" -->
+  <!--          Environment="DISPLAY=:0" -->
+  <!--          LowerLeft="  1 -1 -1" -->
+  <!--          LowerRight=" 1 -1  1" -->
+  <!--          UpperRight=" 1  1  1" /> -->
+  <!-- <Machine Name="Left" -->
+  <!--          Environment="DISPLAY=:0" -->
+  <!--          LowerLeft=" -1 -1  1" -->
+  <!--          LowerRight="-1 -1 -1" -->
+  <!--          UpperRight="-1  1 -1"/> -->
+
+  <!-- Two screen configuration Left and right (YAY)  -->
+  <!-- <Machine Name="Right" -->
+  <!--          Environment="DISPLAY=:0" -->
+  <!--          LowerLeft="  0 -1 -2" -->
+  <!--          LowerRight=" 2 -1 -2" -->
+  <!--          UpperRight="  2  1 -2" /> -->
+  <!-- <Machine Name="Left" -->
+  <!--          Environment="DISPLAY=:0" -->
+  <!--          LowerLeft=" -2 -1 -2" -->
+  <!--          LowerRight=" 0 -1 -2" -->
+  <!--          UpperRight="  0  1 -2" /> -->
+
+  <!-- Three screens (YAY) -->
+  <!-- <Machine Name="Front" -->
+  <!--          Environment="DISPLAY=:0" -->
+  <!--          LowerLeft=" -1 -1 -2" -->
+  <!--          LowerRight=" 1 -1 -2" -->
+  <!--          UpperRight=" 1  1 -2" /> -->
+  <!-- <Machine Name="Right" -->
+  <!--          Environment="DISPLAY=:0" -->
+  <!--          LowerLeft="  1 -1 -2" -->
+  <!--          LowerRight=" 3 -1 -2" -->
+  <!--          UpperRight=" 3  1 -2" /> -->
+  <!-- <Machine Name="Left" -->
+  <!--          Environment="DISPLAY=:0" -->
+  <!--          LowerLeft=" -3 -1 -2" -->
+  <!--          LowerRight="-1 -1 -2" -->
+  <!--          UpperRight="-1  1 -2" /> -->
+
+  <!-- Back projected wall in CREATE (NAY)-->
+  <!-- <machine Name="Left" -->
+  <!--          Environment="DISPLAY=:0" -->
+  <!--          LowerLeft="-1.525 1.08 -3.2" -->
+  <!--          LowerRight="0.201 1.08 -3.2" -->
+  <!--          UpperRight="0.201 2.38 -3.2" /> -->
+  <!-- <Machine Name="Right" -->
+  <!--          Environment="DISPLAY=:0" -->
+  <!--          LowerLeft=" -0.201 1.08 -3.2" -->
+  <!--          LowerRight=" 1.525 1.08 -3.2" -->
+  <!--          UpperRight=" 1.525 2.38 -3.2" /> -->
+ </Process>
+</pvx>
