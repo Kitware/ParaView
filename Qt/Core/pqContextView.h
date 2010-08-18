@@ -87,6 +87,12 @@ public:
   /// Returns true if data on the given output port can be displayed by this view.
   virtual bool canDisplay(pqOutputPort* opPort) const;
 
+protected slots:
+  virtual void initializeAfterObjectsCreated();
+
+  /// Sets up the interactors correctly.
+  virtual void initializeInteractors();
+
 protected:
   /// Constructor:
   /// \c type  :- view type.
@@ -102,6 +108,10 @@ protected:
     pqServer* server,
     QObject* parent=NULL);
 
+  /// Creates a new instance of the QWidget subclass to be used to show this
+  /// view. Default implementation creates a QVTKWidget.
+  virtual QWidget* createWidget();
+
   /// Overridden to set up some default signal-slot connections.
   virtual void initialize();
 
@@ -113,8 +123,9 @@ protected:
 private:
   pqContextView(const pqContextView&); // Not implemented.
   void operator=(const pqContextView&); // Not implemented.
+
+  class pqInternal;
+  pqInternal* Internal;
 };
 
 #endif
-
-

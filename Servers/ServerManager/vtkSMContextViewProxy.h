@@ -26,9 +26,6 @@ class vtkContextView;
 class vtkChart;
 class vtkImageData;
 class vtkRenderWindow;
-//BTX
-class QVTKWidget;
-//ETX
 
 class VTK_EXPORT vtkSMContextViewProxy : public vtkSMViewProxy
 {
@@ -42,10 +39,6 @@ public:
   int WriteImage(const char* filename, const char* writerName, int magnification);
 
 //BTX
-  // Description:
-  // Provides access to the chart view's widget.
-  QVTKWidget* GetChartWidget();
-
   // Description:
   // Provides access to the vtk chart view.
   vtkContextView* GetChartView();

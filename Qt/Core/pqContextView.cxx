@@ -39,6 +39,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServer.h"
 #include "pqImageUtil.h"
 #include "pqSMAdaptor.h"
+
+#include "vtkEventQtSlotConnect.h"
 #include "vtkErrorCode.h"
 #include "vtkImageData.h"
 #include "vtkPVDataInformation.h"
@@ -66,6 +68,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QList>
 #include <QVariant>
+#include <QPointer>
 #include <QDebug>
 
 // Command implementation
@@ -87,6 +90,22 @@ public:
   pqContextView& Target;
 };
 
+class pqContextView::pqInternal
+{
+public:
+  QPointer<QWidget> Viewport;
+  bool InitializedAfterObjectsCreated;
+
+  pqInternal()
+    {
+    this->InitializedAfterObjectsCreated=false;
+    }
+  ~pqInternal()
+    {
+    delete this->Viewport;
+    }
+};
+
 //-----------------------------------------------------------------------------
 pqContextView::pqContextView(
   const QString& type, const QString& group,
@@ -96,6 +115,7 @@ pqContextView::pqContextView(
   QObject* parentObject)
 : Superclass(type, group, name, viewProxy, server, parentObject)
 {
+  this->Internal = new pqContextView::pqInternal();
   viewProxy->GetID(); // this results in calling CreateVTKObjects().
   this->Command = command::New(*this);
   viewProxy->AddObserver(vtkCommand::SelectionChangedEvent, this->Command);
@@ -105,21 +125,97 @@ pqContextView::pqContextView(
 pqContextView::~pqContextView()
 {
   this->Command->Delete();
+  delete this->Internal;
+}
+
+//-----------------------------------------------------------------------------
+QWidget* pqContextView::createWidget()
+{
+  QVTKWidget* vtkwidget = new QVTKWidget();
+
+  // do image caching for performance
+  // For now, we are doing this only on Apple because it can render
+  // and capture a frame buffer even when it is obstructred by a
+  // window. This does not work as well on other platforms.
+#if defined(__APPLE__)
+  vtkwidget->setAutomaticImageCacheEnabled(true);
+
+  // help the QVTKWidget know when to clear the cache
+  this->getConnector()->Connect(
+    this->getProxy(), vtkCommand::ModifiedEvent,
+    vtkwidget, SLOT(markCachedImageAsDirty()));
+#endif
+
+  return vtkwidget;
 }
 
 //-----------------------------------------------------------------------------
 void pqContextView::initialize()
 {
   this->Superclass::initialize();
+
+  // The render module needs to obtain client side objects
+  // for the RenderWindow etc. to initialize the QVTKWidget
+  // correctly. It cannot do this unless the underlying proxy
+  // has been created. Since any pqProxy should never call
+  // UpdateVTKObjects() on itself in the constructor, we
+  // do the following.
+  vtkSMProxy* proxy = this->getProxy();
+  if (!proxy->GetObjectsCreated())
+    {
+    // Wait till first UpdateVTKObjects() call on the render module.
+    // Under usual circumstances, after UpdateVTKObjects() the
+    // render module objects will be created.
+    this->getConnector()->Connect(proxy, vtkCommand::UpdateEvent,
+      this, SLOT(initializeAfterObjectsCreated()));
+    }
+  else
+    {
+    this->initializeAfterObjectsCreated();
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqContextView::initializeAfterObjectsCreated()
+{
+  if (!this->Internal->InitializedAfterObjectsCreated)
+    {
+    this->Internal->InitializedAfterObjectsCreated = true;
+    // Initialize the interactors and all global settings. global-settings
+    // override the values specified in state files or through python client.
+    this->initializeInteractors();
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqContextView::initializeInteractors()
+{
+  vtkSMContextViewProxy* proxy =
+    vtkSMContextViewProxy::SafeDownCast(this->getProxy());
+  QVTKWidget* qvtk = qobject_cast<QVTKWidget*>(this->Internal->Viewport);
+
+  if(proxy && qvtk)
+    {
+    vtkContextView* view = proxy->GetChartView();
+    view->SetInteractor(qvtk->GetInteractor());
+    qvtk->SetRenderWindow(view->GetRenderWindow());
+    }
 }
 
 //-----------------------------------------------------------------------------
 /// Return a widget associated with this view.
 QWidget* pqContextView::getWidget()
 {
-  vtkSMContextViewProxy *proxy =
-      vtkSMContextViewProxy::SafeDownCast(this->getProxy());
-  return proxy ? proxy->GetChartWidget() : NULL;
+  if(!this->Internal->Viewport)
+    {
+    this->Internal->Viewport = this->createWidget();
+    // we manage the context menu ourself, so it doesn't interfere with
+    // render window interactions
+    this->Internal->Viewport->setContextMenuPolicy(Qt::NoContextMenu);
+    this->Internal->Viewport->installEventFilter(this);
+    this->Internal->Viewport->setObjectName("Viewport");
+    }
+  return this->Internal->Viewport;
 }
 
 //-----------------------------------------------------------------------------
