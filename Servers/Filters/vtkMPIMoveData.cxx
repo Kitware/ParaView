@@ -29,6 +29,7 @@
 #include "vtkInformationVector.h"
 #include "vtkMergeGraphs.h"
 #include "vtkMPIMToNSocketConnection.h"
+#include "vtkMultiBlockDataSet.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
 #include "vtkOutlineFilter.h"
@@ -167,6 +168,14 @@ int vtkMPIMoveData::RequestDataObject(vtkInformation*,
       return 1;
       }
     outputCopy = vtkUndirectedGraph::New();
+    }
+  else if (this->OutputDataType == VTK_MULTIBLOCK_DATA_SET)
+    {
+    if (output && output->IsA("vtkMultiBlockDataSet"))
+      {
+      return 1;
+      }
+    outputCopy = vtkMultiBlockDataSet::New();
     }
   else
     {
