@@ -34,7 +34,7 @@
 
 class vtkSelection;
 class vtkSelectionNode;
-class vtkCompositeDataSet;
+class vtkCompositeDataIterator;
 class vtkDataSet;
 
 class VTK_EXPORT vtkSelectionConverter : public vtkObject
@@ -58,7 +58,8 @@ protected:
   ~vtkSelectionConverter();
 
   void Convert(vtkSelectionNode* input, vtkSelection* output, int global_ids);
-  vtkDataSet* LocateDataSet(vtkCompositeDataSet* cd, unsigned int index);
+
+  vtkDataSet* LocateDataSet(vtkCompositeDataIterator* iter, unsigned int index);
 
 private:
   vtkSelectionConverter(const vtkSelectionConverter&);  // Not implemented.

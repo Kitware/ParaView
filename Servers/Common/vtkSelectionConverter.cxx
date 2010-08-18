@@ -66,29 +66,20 @@ void vtkSelectionConverter::Convert(vtkSelection* input, vtkSelection* output,
 }
 
 //----------------------------------------------------------------------------
-void vtkSelectionConverter::Convert(vtkSelectionNode* input, vtkSelection* outputSel,
-  int global_ids)
+void vtkSelectionConverter::Convert(
+  vtkSelectionNode* inputNode, vtkSelection* output, int global_ids)
 {
-  vtkSmartPointer<vtkSelectionNode> output = vtkSmartPointer<vtkSelectionNode>::New();
-  vtkInformation* inputProperties =  input->GetProperties();
-  vtkInformation* outputProperties = output->GetProperties();
-
   if (global_ids)
     {
-    outputProperties->Set(
-      vtkSelectionNode::CONTENT_TYPE(),
-      vtkSelectionNode::GLOBALIDS);
-    }
-  else
-    {
-    outputProperties->Set(
-      vtkSelectionNode::CONTENT_TYPE(),
-      inputProperties->Get(vtkSelectionNode::CONTENT_TYPE()));
+    // At somepoint in future for effeciency reasons, we may want to bring back
+    // the support for converting to global ids
+    vtkErrorMacro("Global id selection no longer supported.");
+    return;
     }
 
+  vtkInformation* inputProperties =  inputNode->GetProperties();
   if (inputProperties->Get(vtkSelectionNode::CONTENT_TYPE()) !=
-    vtkSelectionNode::INDICES ||
-    !inputProperties->Has(vtkSelectionNode::FIELD_TYPE()))
+    vtkSelectionNode::INDICES || !inputProperties->Has(vtkSelectionNode::FIELD_TYPE()))
     {
     return;
     }
@@ -101,20 +92,19 @@ void vtkSelectionConverter::Convert(vtkSelectionNode* input, vtkSelection* outpu
     }
 
   if (!inputProperties->Has(vtkSelectionNode::SOURCE_ID()) ||
-      !inputProperties->Has(vtkSelectionSerializer::ORIGINAL_SOURCE_ID()))
+    !inputProperties->Has(vtkSelectionSerializer::ORIGINAL_SOURCE_ID()))
     {
     return;
     }
 
   vtkIdTypeArray* inputList = vtkIdTypeArray::SafeDownCast(
-    input->GetSelectionList());
+    inputNode->GetSelectionList());
   if (!inputList)
     {
     return;
     }
 
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-
   vtkClientServerID id;
   id.ID = inputProperties->Get(vtkSelectionNode::SOURCE_ID());
   vtkAlgorithm* geomAlg = vtkAlgorithm::SafeDownCast(
@@ -127,70 +117,82 @@ void vtkSelectionConverter::Convert(vtkSelectionNode* input, vtkSelection* outpu
   vtkDataObject* geometryFilterOutput = geomAlg->GetOutputDataObject(0);
   vtkDataSet* ds = vtkDataSet::SafeDownCast(geometryFilterOutput);
   vtkCompositeDataSet* cd = vtkCompositeDataSet::SafeDownCast(geometryFilterOutput);
+  bool is_amr = false;
+  int amr_index[2] = {0, 0};
   if (cd)
     {
+    vtkCompositeDataIterator* iter = cd->NewIterator();
     assert(inputProperties->Has(vtkSelectionNode::COMPOSITE_INDEX()));
-    ds = this->LocateDataSet(cd,
+    ds = this->LocateDataSet(iter,
         inputProperties->Get(vtkSelectionNode::COMPOSITE_INDEX()));
+    if (ds && iter->HasCurrentMetaData())
+      {
+      vtkInformation* metadata = iter->GetCurrentMetaData();
+      if (metadata->Has(vtkSelectionNode::HIERARCHICAL_INDEX()) &&
+        metadata->Has(vtkSelectionNode::HIERARCHICAL_LEVEL()))
+        {
+        is_amr = true;
+        amr_index[0] = metadata->Get(vtkSelectionNode::HIERARCHICAL_LEVEL());
+        amr_index[1] = metadata->Get(vtkSelectionNode::HIERARCHICAL_INDEX());
+        }
+      }
+    iter->Delete();
     }
   if (!ds)
     {
     return;
     }
 
-  if (global_ids)
+  vtkIdType numHits = inputList->GetNumberOfTuples() *
+    inputList->GetNumberOfComponents();
+
+  vtkIdTypeArray* originalIdsArray = NULL;
+  if (inputProperties->Get(vtkSelectionNode::FIELD_TYPE()) == vtkSelectionNode::POINT)
     {
-    vtkErrorMacro("Global id selection no longer supported.");
+    originalIdsArray = vtkIdTypeArray::SafeDownCast(
+      ds->GetPointData()->GetArray("vtkOriginalPointIds"));
+    }
+  else
+    {
+    originalIdsArray = vtkIdTypeArray::SafeDownCast(
+      ds->GetCellData()->GetArray("vtkOriginalCellIds"));
+    }
+
+  if (!originalIdsArray)
+    {
+    vtkErrorMacro("Could not locate the original ids arrays. Did the "
+      "geometry not produce them?");
     return;
     }
+
+  vtkSelectionNode* outputNode = vtkSelectionNode::New();
+  vtkInformation* outputProperties = outputNode->GetProperties();
+  if (global_ids)
+    {
+    // this is not applicable anymore, but leaving it here as a guide in future
+    // if we need to bring back the conversion to global-id support.
+    //outputProperties->Set( vtkSelectionNode::CONTENT_TYPE(),
+    //  vtkSelectionNode::GLOBALIDS);
+    }
+  else
+    {
+    outputProperties->Set(vtkSelectionNode::CONTENT_TYPE(),
+      inputProperties->Get(vtkSelectionNode::CONTENT_TYPE()));
+    }
+
+  outputProperties->Set(vtkSelectionNode::FIELD_TYPE(),
+    inputProperties->Get(vtkSelectionNode::FIELD_TYPE()));
 
   typedef vtkstd::set<vtkIdType> indicesType;
   indicesType indices;
 
-  vtkIdType numHits = inputList->GetNumberOfTuples() *
-    inputList->GetNumberOfComponents();
-
-  if (inputProperties->Get(vtkSelectionNode::FIELD_TYPE()) == vtkSelectionNode::POINT)
+  for (vtkIdType hitId=0; hitId<numHits; hitId++)
     {
-    vtkIdTypeArray* pointMapArray = vtkIdTypeArray::SafeDownCast(
-      ds->GetPointData()->GetArray("vtkOriginalPointIds"));
-    if (!pointMapArray)
+    vtkIdType element_id = inputList->GetValue(hitId);
+    if (element_id >= 0 && element_id < originalIdsArray->GetNumberOfTuples())
       {
-      return;
-      }
-
-    outputProperties->Set(vtkSelectionNode::FIELD_TYPE(), vtkSelectionNode::POINT);
-
-    vtkIdList *idlist = vtkIdList::New();
-
-    //lookup each hit cell in the polygonal shell, and find those of its
-    //vertices which were hit. For those lookup vertex id in original data set.
-    for (vtkIdType hitId=0; hitId<numHits; hitId++)
-      {
-      vtkIdType geomPointId = inputList->GetValue(hitId);
-      if (geomPointId < 0 || geomPointId >=  pointMapArray->GetNumberOfTuples())
-        {
-        continue;
-        }
-      vtkIdType pointId = pointMapArray->GetValue(geomPointId);
-      indices.insert(pointId);
-      }
-    idlist->Delete();
-    }
-  else
-    {
-    vtkIdTypeArray* cellMapArray = vtkIdTypeArray::SafeDownCast(
-      ds->GetCellData()->GetArray("vtkOriginalCellIds"));
-    if (!cellMapArray)
-      {
-      return;
-      }
-
-    for (vtkIdType hitId=0; hitId<numHits; hitId++)
-      {
-      vtkIdType geomCellId = inputList->GetValue(hitId);
-      vtkIdType cellIndex = cellMapArray->GetValue(geomCellId);
-      indices.insert(cellIndex);
+      vtkIdType original_element_id= originalIdsArray->GetValue(element_id);
+      indices.insert(original_element_id);
       }
     }
 
@@ -201,10 +203,17 @@ void vtkSelectionConverter::Convert(vtkSelectionNode* input, vtkSelection* outpu
   if (inputProperties->Has(vtkSelectionNode::PROCESS_ID()))
     {
     outputProperties->Set(vtkSelectionNode::PROCESS_ID(),
-                          inputProperties->Get(vtkSelectionNode::PROCESS_ID()));
+      inputProperties->Get(vtkSelectionNode::PROCESS_ID()));
     }
 
-  if (inputProperties->Has(vtkSelectionNode::COMPOSITE_INDEX()))
+  if (is_amr)
+    {
+    outputProperties->Set(vtkSelectionNode::HIERARCHICAL_LEVEL(),
+      amr_index[0]);
+    outputProperties->Set(vtkSelectionNode::HIERARCHICAL_INDEX(),
+      amr_index[1]);
+    }
+  else if (inputProperties->Has(vtkSelectionNode::COMPOSITE_INDEX()))
     {
     outputProperties->Set(vtkSelectionNode::COMPOSITE_INDEX(),
       inputProperties->Get(vtkSelectionNode::COMPOSITE_INDEX()));
@@ -221,21 +230,23 @@ void vtkSelectionConverter::Convert(vtkSelectionNode* input, vtkSelection* outpu
       {
       out_ptr[index] = *sit;
       }
-    output->SetSelectionList(outputArray);
+    outputNode->SetSelectionList(outputArray);
     outputArray->FastDelete();
-    outputSel->AddNode(output);
-    //outputSel->Print(cout);
+    output->AddNode(outputNode);
+    outputNode->FastDelete();
+    }
+  else
+    {
+    outputNode->Delete();
     }
 }
 
 
 //----------------------------------------------------------------------------
 vtkDataSet* vtkSelectionConverter::LocateDataSet(
-  vtkCompositeDataSet* cd, unsigned int index)
+  vtkCompositeDataIterator* iter,  unsigned int index)
 {
   // FIXME: this needs to be optimized.
-  vtkSmartPointer<vtkCompositeDataIterator> iter;
-  iter.TakeReference(cd->NewIterator());
   for (iter->InitTraversal(); !iter->IsDoneWithTraversal();
     iter->GoToNextItem())
     {
