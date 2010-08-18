@@ -4439,7 +4439,6 @@
       <!-- End of SpreadSheetView -->
     </ViewProxy>
 
-#ifdef VTK_USE_QVTK
     <XYChartViewProxy name="XYChartViewBase"
       base_proxygroup="views"
       base_proxyname="ViewBase">
@@ -4736,7 +4735,6 @@
       </StringVectorProperty>
 
     </XYChartViewProxy>
-#endif
 
     <Proxy name="RenderViewBase"
       base_proxygroup="views"
@@ -5756,7 +5754,6 @@
       <!-- End of ComparativeClientServerRenderView -->
     </ComparativeViewProxy>
 
-#ifdef VTK_USE_QVTK
     <ComparativeViewProxy name="ComparativeXYChartView"
       base_proxygroup="views" base_proxyname="ComparativeViewBase">
       <Documentation>
@@ -5794,9 +5791,7 @@
 
       <!-- End of ComparativeXYChartView -->
     </ComparativeViewProxy>
-#endif
 
-#ifdef VTK_USE_QVTK
     <ComparativeViewProxy name="ComparativeXYBarChartView"
       base_proxygroup="views" base_proxyname="ComparativeViewBase">
       <Documentation>
@@ -5834,7 +5829,6 @@
 
       <!-- End of ComparativeXYBarChartView -->
     </ComparativeViewProxy>
-#endif
 
     <TwoDRenderViewProxy name="2DRenderViewBase"
       base_proxygroup="views" base_proxyname="ViewBase">
@@ -8372,7 +8366,6 @@
     </ClientDeliveryRepresentationProxy>
 
     <!-- =================================================================== -->
-#ifdef VTK_USE_QVTK
     <!-- New representation for ContextView based charts. -->
     <XYChartRepresentationProxy name="XYChartRepresentationBase"
       base_proxygroup="representations" >
@@ -8695,8 +8688,6 @@
         default_values="Bar" >
       </StringVectorProperty>
     </XYChartRepresentationProxy>
-
-#endif
 
     <BlockDeliveryRepresentationProxy name="BlockDeliveryRepresentation">
       <Documentation>
