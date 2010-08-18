@@ -95,6 +95,9 @@ protected:
 private:
   pqComparativeContextView(const pqComparativeContextView&); // Not implemented.
   void operator=(const pqComparativeContextView&); // Not implemented.
+
+  class pqInternal;
+  pqInternal* Internal;
 };
 
 #endif
