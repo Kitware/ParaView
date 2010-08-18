@@ -29,8 +29,7 @@
 #include "vtkSmartPointer.h"
 
 #include "vtkstd/map"
-
-#include <QString>
+#include "vtksys/ios/sstream"
 
 //----------------------------------------------------------------------------
 // Class to store information about each plot.
@@ -307,7 +306,7 @@ void vtkSMContextNamedOptionsProxy::UpdatePropertyInformationInternal(
 
     if (strcmp(propertyName, "VisibilityInfo") == 0)
       {
-      newValues->AddString(QString::number(plotInfo.Visible).toAscii().data());
+      newValues->AddString(plotInfo.Visible ? "1" : "0");
       }
     else if (strcmp(propertyName, "LabelInfo") == 0)
       {
@@ -315,29 +314,39 @@ void vtkSMContextNamedOptionsProxy::UpdatePropertyInformationInternal(
       }
     else if (strcmp(propertyName, "LineThicknessInfo") == 0)
       {
-      newValues->AddString(
-        QString::number(plotInfo.LineThickness).toAscii().data());
+      vtksys_ios::ostringstream string;
+      string << plotInfo.LineThickness;
+      newValues->AddString(string.str().c_str());
       }
     else if (strcmp(propertyName, "ColorInfo") == 0)
       {
-      newValues->AddString(QString::number(plotInfo.Color[0]).toAscii().data());
-      newValues->AddString(QString::number(plotInfo.Color[1]).toAscii().data());
-      newValues->AddString(QString::number(plotInfo.Color[2]).toAscii().data());
+      vtksys_ios::ostringstream string;
+      string << plotInfo.Color[0];
+      newValues->AddString(string.str().c_str());
+      string.clear();
+      string << plotInfo.Color[1];
+      newValues->AddString(string.str().c_str());
+      string.clear();
+      string << plotInfo.Color[2];
+      newValues->AddString(string.str().c_str());
       }
     else if (strcmp(propertyName, "LineStyleInfo") == 0)
       {
-      newValues->AddString(
-        QString::number(plotInfo.LineStyle).toAscii().data());
+      vtksys_ios::ostringstream string;
+      string << plotInfo.LineStyle;
+      newValues->AddString(string.str().c_str());
       }
     else if (strcmp(propertyName, "MarkerStyleInfo") == 0)
       {
-      newValues->AddString(
-        QString::number(plotInfo.MarkerStyle).toAscii().data());
+      vtksys_ios::ostringstream string;
+      string << plotInfo.MarkerStyle;
+      newValues->AddString(string.str().c_str());
       }
     else if (strcmp(propertyName, "PlotCornerInfo") == 0)
       {
-      newValues->AddString(
-        QString::number(plotInfo.Corner).toAscii().data());
+      vtksys_ios::ostringstream string;
+      string << plotInfo.Corner;
+      newValues->AddString(string.str().c_str());
       }
     else
       {

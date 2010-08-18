@@ -35,13 +35,30 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkCollection.h"
 #include "vtkEventQtSlotConnect.h"
 #include "vtkPVServerInformation.h"
-#include "vtkSMXYChartViewProxy.h"
+#include "vtkSMContextViewProxy.h"
 #include "vtkSMComparativeViewProxy.h"
 #include "vtkSMPropertyHelper.h"
 #include "QVTKWidget.h"
+#include "vtkContextView.h"
+#include "vtkSmartPointer.h"
 
+#include <QMap>
+#include <QPointer>
+#include <QSet>
 #include <QGridLayout>
 #include <QWidget>
+
+class pqComparativeContextView::pqInternal
+{
+public:
+  QMap<vtkSMViewProxy*, QPointer<QVTKWidget> > RenderWidgets;
+  vtkSmartPointer<vtkEventQtSlotConnect> VTKConnect;
+
+  pqInternal()
+    {
+    this->VTKConnect = vtkSmartPointer<vtkEventQtSlotConnect>::New();
+    }
+};
 
 //-----------------------------------------------------------------------------
 pqComparativeContextView::pqComparativeContextView(const QString& type,
@@ -52,6 +69,7 @@ pqComparativeContextView::pqComparativeContextView(const QString& type,
                                                    QObject* parentObject)
   : Superclass(type, group, name, view, server, parentObject)
 {
+  this->Internal = new pqInternal();
   this->Widget = new QWidget;
   this->getConnector()->Connect(view, vtkCommand::ConfigureEvent,
                                 this, SLOT(onComparativeVisLayoutChanged()));
@@ -60,6 +78,11 @@ pqComparativeContextView::pqComparativeContextView(const QString& type,
 //-----------------------------------------------------------------------------
 pqComparativeContextView::~pqComparativeContextView()
 {
+  foreach (QVTKWidget* widget, this->Internal->RenderWidgets.values())
+    {
+    delete widget;
+    }
+  delete this->Internal;
   delete this->Widget;
 }
 
@@ -73,7 +96,7 @@ void pqComparativeContextView::initialize()
 //-----------------------------------------------------------------------------
 vtkContextView* pqComparativeContextView::getVTKChartView() const
 {
-  return vtkSMXYChartViewProxy::SafeDownCast(this->getViewProxy())
+  return vtkSMContextViewProxy::SafeDownCast(this->getViewProxy())
       ->GetChartView();
 }
 
@@ -112,37 +135,80 @@ vtkSMViewProxy* pqComparativeContextView::getViewProxy() const
 
 //-----------------------------------------------------------------------------
 void pqComparativeContextView::onComparativeVisLayoutChanged()
-{
-  // Get a collection of the current views from the ComparativeViewProxy
+  {
+  // This logic is adapted from pqComparativeRenderView, the two should be
+  // consolidated/refactored to have a common base class.
+  // Create QVTKWidgets for new view modules and destroy old ones.
   vtkCollection* currentViews =  vtkCollection::New();
-  vtkSMComparativeViewProxy* compView = this->getComparativeViewProxy();
+
+  vtkSMComparativeViewProxy* compView = vtkSMComparativeViewProxy::SafeDownCast(
+    this->getProxy());
   compView->GetViews(currentViews);
 
-  // Get dimensions for new view layout
+  QSet<vtkSMViewProxy*> currentViewsSet;
+
+  currentViews->InitTraversal();
+  vtkSMViewProxy* temp = vtkSMViewProxy::SafeDownCast(
+    currentViews->GetNextItemAsObject());
+  for (; temp !=0; temp =
+       vtkSMViewProxy::SafeDownCast(currentViews->GetNextItemAsObject()))
+    {
+    currentViewsSet.insert(temp);
+    }
+
+  QSet<vtkSMViewProxy*> oldViews = QSet<vtkSMViewProxy*>::fromList(
+    this->Internal->RenderWidgets.keys());
+
+  QSet<vtkSMViewProxy*> removed = oldViews - currentViewsSet;
+  QSet<vtkSMViewProxy*> added = currentViewsSet - oldViews;
+
+  // Destroy old QVTKWidgets widgets.
+  foreach (vtkSMViewProxy* key, removed)
+    {
+    QVTKWidget* item = this->Internal->RenderWidgets.take(key);
+    delete item;
+    }
+
+  // Create QVTKWidgets for new ones.
+  foreach (vtkSMViewProxy* key, added)
+    {
+    vtkSMContextViewProxy* renView = vtkSMContextViewProxy::SafeDownCast(key);
+    renView->UpdateVTKObjects();
+
+    QVTKWidget* widget = new QVTKWidget();
+    renView->GetChartView()->SetInteractor(widget->GetInteractor());
+    widget->SetRenderWindow(renView->GetChartView()->GetRenderWindow());
+    widget->installEventFilter(this);
+    widget->setContextMenuPolicy(Qt::NoContextMenu);
+    this->Internal->RenderWidgets[key] = widget;
+    }
+
+  // Now layout the views.
   int dimensions[2];
   compView->GetDimensions(dimensions);
+  if (compView->GetOverlayAllComparisons())
+    {
+    dimensions[0] = dimensions[1] = 1;
+    }
 
-  // Destroy the old layout.
+  // destroy the old layout and create a new one.
   QWidget* widget = this->getWidget();
   delete widget->layout();
 
-  // Create the new layout
   QGridLayout* layout = new QGridLayout(widget);
   layout->setSpacing(1);
   layout->setMargin(0);
-  for (int x=0; x < dimensions[0]; ++x)
+  for (int x = 0; x < dimensions[0]; ++x)
     {
-    for (int y=0; y < dimensions[1]; ++y)
+    for (int y = 0; y < dimensions[1]; ++y)
       {
       int index = y*dimensions[0]+x;
-      vtkSMXYChartViewProxy* view =
-          vtkSMXYChartViewProxy::SafeDownCast(currentViews->GetItemAsObject(index));
-      if (view)
-        {
-        layout->addWidget(view->GetChartWidget(), y, x);
-        }
+      vtkSMViewProxy* view = vtkSMViewProxy::SafeDownCast(
+        currentViews->GetItemAsObject(index));
+      QVTKWidget* vtkwidget = this->Internal->RenderWidgets[view];
+      layout->addWidget(vtkwidget, y, x);
       }
     }
-  // Clean up current views collection
+
   currentViews->Delete();
 }
