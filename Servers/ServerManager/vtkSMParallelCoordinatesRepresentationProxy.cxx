@@ -29,8 +29,6 @@
 #include "vtkStringList.h"
 #include "vtkSMStringVectorProperty.h"
 
-#include <QString>
-
 vtkStandardNewMacro(vtkSMParallelCoordinatesRepresentationProxy);
 //----------------------------------------------------------------------------
 vtkSMParallelCoordinatesRepresentationProxy::vtkSMParallelCoordinatesRepresentationProxy()
