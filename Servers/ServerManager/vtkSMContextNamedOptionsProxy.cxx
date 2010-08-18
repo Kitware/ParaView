@@ -321,14 +321,12 @@ void vtkSMContextNamedOptionsProxy::UpdatePropertyInformationInternal(
     else if (strcmp(propertyName, "ColorInfo") == 0)
       {
       vtksys_ios::ostringstream string;
-      string << plotInfo.Color[0];
-      newValues->AddString(string.str().c_str());
-      string.clear();
-      string << plotInfo.Color[1];
-      newValues->AddString(string.str().c_str());
-      string.clear();
-      string << plotInfo.Color[2];
-      newValues->AddString(string.str().c_str());
+      for (int i = 0; i < 3; ++i)
+        {
+        string << plotInfo.Color[i];
+        newValues->AddString(string.str().c_str());
+        string.str("");
+        }
       }
     else if (strcmp(propertyName, "LineStyleInfo") == 0)
       {
