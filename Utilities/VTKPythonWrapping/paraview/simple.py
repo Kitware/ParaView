@@ -657,6 +657,14 @@ def GetAnimationScene():
         raise servermanager.MissingProxy, "Could not locate global AnimationScene."
     return scene
 
+def WriteAnimation(filename):
+    """Helper to automate saving an animation."""
+    scene = GetAnimationScene()
+    iw = servermanager.vtkSMAnimationSceneImageWriter()
+    iw.SetAnimationScene(scene.SMProxy)
+    iw.SetFileName(filename)
+    iw.Save()
+
 def _GetRepresentationAnimationHelper(sourceproxy):
     """Internal method that returns the representation animation helper for a
        source proxy. It creates a new one if none exists."""
