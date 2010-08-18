@@ -24,9 +24,7 @@
 #include "vtkTextProperty.h"
 
 #include "vtkstd/string"
-
-#include <QString>
-#include <QRegExp>
+#include "vtksys/ios/sstream"
 
 #include "vtkCommand.h"
 
@@ -118,8 +116,8 @@ void vtkSMXYChartViewProxy::SetTitle(const char* title)
 {
   if (this->Chart)
     {
-    QString tmp(title);
-    if (tmp.contains("${TIME}",  Qt::CaseInsensitive))
+    vtkstd::string tmp(title);
+    if (tmp.find("${TIME}") != vtkstd::string::npos)
       {
       this->SetInternalTitle(title);
       }
@@ -344,11 +342,16 @@ void vtkSMXYChartViewProxy::PerformRender()
     }
   if (this->InternalTitle)
     {
-    QString time = QString::number(this->GetViewUpdateTime());
-    QRegExp regExp("\\$\\{TIME\\}", Qt::CaseInsensitive);
-    QString title = this->InternalTitle;
-    title = title.replace(regExp, time);
-    this->Chart->SetTitle(title.toAscii().data());
+    vtksys_ios::ostringstream timeStream;
+    vtkstd::string title(this->InternalTitle);
+    size_t pos = title.find("${TIME}");
+    if (pos != vtkstd::string::npos)
+      {
+      // The string was found - replace it and set the chart title.
+      timeStream << this->GetViewUpdateTime();
+      title.replace(pos, pos+6, timeStream.str());
+      this->Chart->SetTitle(title.c_str());
+      }
     }
 
   this->ChartView->Render();
