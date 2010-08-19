@@ -6131,7 +6131,8 @@
      </DoubleVectorProperty>
 
      <Hints>
-       <ReaderFactory extensions="ddm" file_description="MPAS Netcdf Files" />
+       <ReaderFactory extensions="mpas.ncdf mpas.nc"
+                      file_description="MPAS Netcdf Files" />
      </Hints>
 
    </SourceProxy>
