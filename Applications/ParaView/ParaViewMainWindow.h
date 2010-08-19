@@ -46,6 +46,9 @@ public:
 protected slots:
   void showHelpForProxy(const QString& proxyname);
 
+protected:
+  QTimer *VRPNTimer;
+
 private:
   ParaViewMainWindow(const ParaViewMainWindow&); // Not implemented.
   void operator=(const ParaViewMainWindow&); // Not implemented.

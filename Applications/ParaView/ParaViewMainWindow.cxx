@@ -37,11 +37,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqParaViewBehaviors.h"
 #include "pqParaViewMenuBuilders.h"
 #include "vtkPVPlugin.h"
+#include "ParaViewVRPN.h"
 
 
 
 class ParaViewMainWindow::pqInternals : public Ui::pqClientMainWindow
 {
+public:
+  ParaViewVRPN *InputDevice;
 };
 
 //-----------------------------------------------------------------------------
@@ -99,6 +102,17 @@ ParaViewMainWindow::ParaViewMainWindow()
 
   // Setup the help menu.
   pqParaViewMenuBuilders::buildHelpMenu(*this->Internals->menu_Help);
+
+  // VRPN input events.
+  this->VRPNTimer=new QTimer(this);
+  this->VRPNTimer->setInterval(40); // in ms
+  // to define: obj and callback()
+  this->Internals->InputDevice=new ParaViewVRPN;
+  this->Internals->InputDevice->SetName("Tracker0@localhost");
+  this->Internals->InputDevice->Init();
+  connect(this->VRPNTimer,SIGNAL(timeout()),
+          this->Internals->InputDevice,SLOT(callback()));
+  this->VRPNTimer->start();
 
   // Final step, define application behaviors. Since we want all ParaView
   // behaviors, we use this convenience method.
