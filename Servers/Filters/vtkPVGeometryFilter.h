@@ -28,6 +28,7 @@ class vtkGenericDataSet;
 class vtkGenericGeometryFilter;
 class vtkHyperOctree;
 class vtkImageData;
+class vtkInformationIntegerVectorKey;
 class vtkInformationVector;
 class vtkMultiProcessController;
 class vtkOutlineSource;
@@ -118,6 +119,14 @@ public:
   vtkGetMacro(MakeOutlineOfInput,int);
   vtkBooleanMacro(MakeOutlineOfInput,int);
 
+  // Description:
+  // These keys are put in the output composite-data metadata for multipieces
+  // since this filter merges multipieces together.
+  static vtkInformationIntegerVectorKey* POINT_OFFSETS();
+  static vtkInformationIntegerVectorKey* VERTS_OFFSETS();
+  static vtkInformationIntegerVectorKey* LINES_OFFSETS();
+  static vtkInformationIntegerVectorKey* POLYS_OFFSETS();
+  static vtkInformationIntegerVectorKey* STRIPS_OFFSETS();
 //BTX
 protected:
   vtkPVGeometryFilter();

@@ -156,6 +156,7 @@ SET(Filters_SRCS
   vtkScatterPlotMapper.cxx
   vtkScatterPlotPainter.cxx
   vtkSciVizStatistics.cxx
+  vtkSelectionConverter.cxx
   vtkSelectionStreamer.cxx
   vtkSequenceAnimationPlayer.cxx
   vtkSpyPlotBlock.cxx

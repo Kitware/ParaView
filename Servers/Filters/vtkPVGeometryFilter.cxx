@@ -37,6 +37,7 @@
 #include "vtkHyperOctreeSurfaceFilter.h"
 #include "vtkImageData.h"
 #include "vtkInformation.h"
+#include "vtkInformationIntegerVectorKey.h"
 #include "vtkInformationVector.h"
 #include "vtkMultiBlockDataSet.h"
 #include "vtkMultiProcessController.h"
@@ -71,6 +72,11 @@
 
 vtkStandardNewMacro(vtkPVGeometryFilter);
 vtkCxxSetObjectMacro(vtkPVGeometryFilter, Controller, vtkMultiProcessController);
+vtkInformationKeyMacro(vtkPVGeometryFilter, POINT_OFFSETS, IntegerVector);
+vtkInformationKeyMacro(vtkPVGeometryFilter, VERTS_OFFSETS, IntegerVector);
+vtkInformationKeyMacro(vtkPVGeometryFilter, LINES_OFFSETS, IntegerVector);
+vtkInformationKeyMacro(vtkPVGeometryFilter, POLYS_OFFSETS, IntegerVector);
+vtkInformationKeyMacro(vtkPVGeometryFilter, STRIPS_OFFSETS, IntegerVector);
 class vtkPVGeometryFilter::BoundsReductionOperation : public vtkCommunicator::Operation
 {
 public:
@@ -445,48 +451,87 @@ int vtkPVGeometryFilter::RequestData(vtkInformation* request,
 
 namespace
 {
-  static void vtkPVGeometryFilterAddPieceIndexArray(
-    vtkPolyData* pd, unsigned int index)
-    {
-    vtkUnsignedIntArray* cindex = vtkUnsignedIntArray::New();
-    cindex->SetNumberOfComponents(1);
-    cindex->SetNumberOfTuples(pd->GetNumberOfCells());
-    cindex->FillComponent(0, index);
-    cindex->SetName("vtkPieceIndex");
-    pd->GetCellData()->AddArray(cindex);
-    cindex->Delete();
-    }
-
   static void vtkPVGeometryFilterMergePieces(vtkMultiPieceDataSet* mp)
     {
+    unsigned int num_pieces = mp->GetNumberOfPieces();
+    if (num_pieces==0)
+      {
+      return;
+      }
+
     vtkstd::vector<vtkPolyData*> inputs;
-    for (unsigned int cc=0; cc < mp->GetNumberOfPieces(); cc++)
+    vtkstd::vector<int> points_counts, cell_counts, verts_counts, polys_counts,
+      lines_counts, strips_counts;
+
+    polys_counts.resize(num_pieces); verts_counts.resize(num_pieces);
+    lines_counts.resize(num_pieces); strips_counts.resize(num_pieces);
+    points_counts.resize(num_pieces); cell_counts.resize(num_pieces);
+    for (unsigned int cc=0; cc < num_pieces; cc++)
       {
       vtkPolyData* piece = vtkPolyData::SafeDownCast(mp->GetPiece(cc));
       if (piece && piece->GetNumberOfPoints() > 0)
         {
-        // add the vtkPieceIndex array which is used by vtkSelectionConverter
-        // for selection conversion.
-        vtkPVGeometryFilterAddPieceIndexArray(piece, cc);
         inputs.push_back(piece);
+        points_counts[cc] = piece->GetNumberOfPoints();
+        cell_counts[cc] = piece->GetNumberOfCells();
+        verts_counts[cc] = piece->GetNumberOfVerts();
+        polys_counts[cc] = piece->GetNumberOfPolys();
+        lines_counts[cc] = piece->GetNumberOfLines();
+        strips_counts[cc] = piece->GetNumberOfStrips();
         }
       }
 
-    if (inputs.size() > 0)
+    if (inputs.size() == 0)
       {
-      vtkPolyData* output = vtkPolyData::New();
-      vtkAppendPolyData* appender = vtkAppendPolyData::New();
-      appender->ExecuteAppend(output, &inputs[0],
-        static_cast<int>(inputs.size()));
-      appender->Delete();
-      inputs.clear();
-      for (unsigned int cc=0; cc < mp->GetNumberOfPieces(); cc++)
-        {
-        mp->SetPiece(cc, NULL);
-        }
-      mp->SetPiece(0, output);
-      output->FastDelete();
+      // not much to do, this is an empty multi-piece.
+      return;
       }
+
+    vtkPolyData* output = vtkPolyData::New();
+    vtkAppendPolyData* appender = vtkAppendPolyData::New();
+    appender->ExecuteAppend(output, &inputs[0],
+      static_cast<int>(inputs.size()));
+    appender->Delete();
+    inputs.clear();
+
+    vtkstd::vector<int> points_offsets, verts_offsets, lines_offsets,
+      polys_offsets, strips_offsets;
+    polys_offsets.resize(num_pieces); verts_offsets.resize(num_pieces);
+    lines_offsets.resize(num_pieces); strips_offsets.resize(num_pieces);
+    points_offsets.resize(num_pieces);
+    points_offsets[0] = 0;
+    verts_offsets[0] = 0;
+    lines_offsets[0] = output->GetNumberOfVerts();
+    polys_offsets[0] = lines_offsets[0] + output->GetNumberOfLines();
+    strips_offsets[0] = polys_offsets[0] + output->GetNumberOfPolys();
+    for (unsigned int cc=1; cc < num_pieces; cc++)
+      {
+      points_offsets[cc] = points_offsets[cc-1] + points_counts[cc-1];
+      verts_offsets[cc] = verts_offsets[cc-1] + verts_counts[cc-1];
+      lines_offsets[cc] = lines_offsets[cc-1] + lines_counts[cc-1];
+      polys_offsets[cc] = polys_offsets[cc-1] + polys_counts[cc-1];
+      strips_offsets[cc] = strips_offsets[cc-1] + strips_counts[cc-1];
+      }
+
+    for (unsigned int cc=0; cc < num_pieces; cc++)
+      {
+      mp->SetPiece(cc, NULL);
+      }
+
+    mp->SetPiece(0, output);
+    output->FastDelete();
+
+    vtkInformation* metadata = mp->GetMetaData(static_cast<unsigned int>(0));
+    metadata->Set(vtkPVGeometryFilter::POINT_OFFSETS(),
+      &points_offsets[0], static_cast<int>(num_pieces));
+    metadata->Set(vtkPVGeometryFilter::VERTS_OFFSETS(),
+      &verts_offsets[0], static_cast<int>(num_pieces));
+    metadata->Set(vtkPVGeometryFilter::LINES_OFFSETS(),
+      &lines_offsets[0], static_cast<int>(num_pieces));
+    metadata->Set(vtkPVGeometryFilter::POLYS_OFFSETS(),
+      &polys_offsets[0], static_cast<int>(num_pieces));
+    metadata->Set(vtkPVGeometryFilter::STRIPS_OFFSETS(),
+      &strips_offsets[0], static_cast<int>(num_pieces));
     }
 };
 
