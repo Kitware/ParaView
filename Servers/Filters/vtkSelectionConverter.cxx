@@ -227,7 +227,7 @@ void vtkSelectionConverter::Convert(
     return;
     }
 
-  // key==piece offset, while value list of ids for that piece.
+  // key==piece offset, while value==list of ids for that piece.
   typedef vtkstd::map<int, vtkstd::set<vtkIdType> > indicesType;
   indicesType indices;
 
@@ -236,7 +236,7 @@ void vtkSelectionConverter::Convert(
     vtkIdType element_id = inputList->GetValue(hitId);
     if (element_id >= 0 && element_id < originalIdsArray->GetNumberOfTuples())
       {
-      vtkIdType original_element_id= originalIdsArray->GetValue(element_id);
+      vtkIdType original_element_id = originalIdsArray->GetValue(element_id);
       int piece_offset = using_cell?
         GetCellPieceOffset(pieceMetaData, element_id) :
         GetPointPieceOffset(pieceMetaData, element_id);
