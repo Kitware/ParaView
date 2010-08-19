@@ -63,4 +63,5 @@
   <Proxy group="sources" name="VPICReader" />
   <Proxy group="sources" name="WindBladeReader" />
   <Proxy group="sources" name="NetCDFPOPReader" />
+  <Proxy group="sources" name="MPASReader" />
 </ParaViewReaders>

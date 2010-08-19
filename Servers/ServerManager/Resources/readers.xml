@@ -6038,5 +6038,104 @@
      </Hints>
    </FileSeriesReaderProxy>
 
+   <SourceProxy name="MPASReader"
+                class="vtkMPASReader"
+                label="NetCDF MPAS reader">
+     <Documentation
+         short_help="Read unstructured grid MPAS data from a file."
+         long_help="Read unstructured grid data from a file. ">
+       The Image reader reads unstructured grid from a file.  Grid is dual grid.
+     </Documentation>
+
+     <StringVectorProperty name="FileName"
+                           command="SetFileName"
+                           animateable="0" >
+       <FileListDomain name="files"/>
+       <Documentation>
+         This property specifies the file name to read.
+       </Documentation>
+     </StringVectorProperty>
+
+     <StringVectorProperty
+         name="PointArrayInfo"
+         information_only="1">
+       <ArraySelectionInformationHelper attribute_name="Point"/>
+     </StringVectorProperty>
+
+     <StringVectorProperty
+         name="PointArrayStatus"
+         command="SetPointArrayStatus"
+         number_of_elements="2"
+         repeat_command="1"
+         number_of_elements_per_command="2"
+         element_types="2 0"
+         information_property="PointArrayInfo" >
+       <ArraySelectionDomain name="array_list" >
+         <RequiredProperties>
+           <Property name="PointArrayInfo" function="ArrayList"/>
+         </RequiredProperties>
+       </ArraySelectionDomain>
+       <Documentation>
+         This property lists which netCDF dual-grid point variables to load.
+       </Documentation>
+     </StringVectorProperty>
+
+     <StringVectorProperty
+         name="CellArrayInfo"
+         information_only="1">
+       <ArraySelectionInformationHelper attribute_name="Cell"/>
+     </StringVectorProperty>
+
+     <StringVectorProperty
+         name="CellArrayStatus"
+         command="SetCellArrayStatus"
+         number_of_elements="2"
+         repeat_command="1"
+         number_of_elements_per_command="2"
+         element_types="2 0"
+         information_property="CellArrayInfo" >
+       <ArraySelectionDomain name="array_list" >
+         <RequiredProperties>
+           <Property name="CellArrayInfo" function="ArrayList"/>
+         </RequiredProperties>
+       </ArraySelectionDomain>
+       <Documentation>
+         This property lists which netCDF dual-grid cell variables to load.
+       </Documentation>
+     </StringVectorProperty>
+
+     <IntVectorProperty
+         name="VerticalLevelRangeInfo"
+         command="GetVerticalLevelRange"
+         information_only="1">
+       <SimpleIntInformationHelper/>
+     </IntVectorProperty>
+
+     <IntVectorProperty
+         name="VerticalLevel"
+         command="SetVerticalLevel"
+         number_of_elements="1"
+         default_values="0">
+       <IntRangeDomain name="range" >
+         <RequiredProperties>
+           <Property name="VerticalLevelRangeInfo" function="Range"/>
+         </RequiredProperties>
+       </IntRangeDomain>
+     </IntVectorProperty>
+
+     <DoubleVectorProperty
+         name="TimestepValues"
+         repeatable="1"
+         information_only="1">
+       <TimeStepsInformationHelper/>
+     </DoubleVectorProperty>
+
+     <Hints>
+       <ReaderFactory extensions="ddm" file_description="MPAS Netcdf Files" />
+     </Hints>
+
+   </SourceProxy>
+   <!-- End MPASReader -->
+
   </ProxyGroup>
 </ServerManagerConfiguration>
