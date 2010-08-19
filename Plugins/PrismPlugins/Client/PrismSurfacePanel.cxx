@@ -807,12 +807,12 @@ void PrismSurfacePanel::accept()
  
  
     pqSMAdaptor::setElementProperty(
-        this->proxy()->GetProperty("SESAMEXLogScaling"), this->UI->XLogScaling->isChecked());
+        this->proxy()->GetProperty("XLogScaling"), this->UI->XLogScaling->isChecked());
 
     pqSMAdaptor::setElementProperty(
-        this->proxy()->GetProperty("SESAMEYLogScaling"), this->UI->YLogScaling->isChecked());
+        this->proxy()->GetProperty("YLogScaling"), this->UI->YLogScaling->isChecked());
     pqSMAdaptor::setElementProperty(
-        this->proxy()->GetProperty("SESAMEZLogScaling"), this->UI->ZLogScaling->isChecked());
+        this->proxy()->GetProperty("ZLogScaling"), this->UI->ZLogScaling->isChecked());
     pqSettings* settings = pqApplicationCore::instance()->settings();
     settings->setValue("PrismPlugin/Conversions/SESAMEFileName", this->UI->ConversionFileName);
 
@@ -1293,6 +1293,41 @@ void PrismSurfacePanel::setupTableWidget()
         pqSMAdaptor::setElementProperty(
             this->UI->PanelHelper->GetProperty("TableId"),
             tableWidget->currentText());
+        int tID=tableWidget->currentText().toInt();
+        if(tID==502 ||
+          tID==503 ||
+          tID==504 ||
+          tID==505 ||
+          tID==601 ||
+          tID==602 ||
+          tID==603 ||
+          tID==604 ||
+          tID==605)
+          {
+          this->UI->XLogScaling->blockSignals(true);
+          this->UI->YLogScaling->blockSignals(true);
+          this->UI->ZLogScaling->blockSignals(true);
+
+          this->UI->XLogScaling->setChecked(true);
+          this->UI->YLogScaling->setChecked(true);
+          this->UI->ZLogScaling->setChecked(true);
+
+          this->UI->XLogScaling->blockSignals(false);
+          this->UI->YLogScaling->blockSignals(false);
+          this->UI->ZLogScaling->blockSignals(false);
+
+          pqSMAdaptor::setElementProperty(
+            this->UI->PanelHelper->GetProperty("XLogScaling"), true);
+          pqSMAdaptor::setElementProperty(
+            this->UI->PanelHelper->GetProperty("YLogScaling"), true);
+          pqSMAdaptor::setElementProperty(
+            this->UI->PanelHelper->GetProperty("ZLogScaling"), true);
+
+          }
+
+
+
+
         this->UI->PanelHelper->UpdateVTKObjects();
         this->UI->PanelHelper->UpdatePropertyInformation();
     }
@@ -1911,6 +1946,42 @@ void PrismSurfacePanel::setTableId(QString newId)
     //get access to the property that lets us pick the domain
     pqSMAdaptor::setElementProperty(
         this->UI->PanelHelper->GetProperty("TableId"), newId);
+
+        int tID=newId.toInt();
+        if(tID==502 ||
+          tID==503 ||
+          tID==504 ||
+          tID==505 ||
+          tID==601 ||
+          tID==602 ||
+          tID==603 ||
+          tID==604 ||
+          tID==605)
+          {
+          this->UI->XLogScaling->blockSignals(true);
+          this->UI->YLogScaling->blockSignals(true);
+          this->UI->ZLogScaling->blockSignals(true);
+
+          this->UI->XLogScaling->setChecked(true);
+          this->UI->YLogScaling->setChecked(true);
+          this->UI->ZLogScaling->setChecked(true);
+
+          this->UI->XLogScaling->blockSignals(false);
+          this->UI->YLogScaling->blockSignals(false);
+          this->UI->ZLogScaling->blockSignals(false);
+
+          pqSMAdaptor::setElementProperty(
+            this->UI->PanelHelper->GetProperty("XLogScaling"), true);
+          pqSMAdaptor::setElementProperty(
+            this->UI->PanelHelper->GetProperty("YLogScaling"), true);
+          pqSMAdaptor::setElementProperty(
+            this->UI->PanelHelper->GetProperty("ZLogScaling"), true);
+
+          }
+
+
+
+
     this->UI->PanelHelper->UpdateVTKObjects();
     this->UI->PanelHelper->UpdatePropertyInformation();
 

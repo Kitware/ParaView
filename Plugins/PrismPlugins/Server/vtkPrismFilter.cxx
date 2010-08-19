@@ -454,41 +454,70 @@ int vtkPrismFilter::RequestGeometryData(
               newPoints->GetPoint(pointId,coords);
 
 
-              if(this->GetSESAMEXLogScaling())
-              {
-                if(coords[0]>0)
+              int tID=this->GetTable();
+              if(tID==502 ||
+                tID==503 ||
+                tID==504 ||
+                tID==505 ||
+                tID==601 ||
+                tID==602 ||
+                tID==603 ||
+                tID==604 ||
+                tID==605)
                 {
-                  coords[0]=log(coords[0]);
-                }
-                else
-                {
-                  coords[0]=0.0;
-                }
-              }
+                if(!this->GetSESAMEXLogScaling())
+                  {
+                  coords[0]=pow(10,coords[0]);
+                  }
 
-              if(this->GetSESAMEYLogScaling())
-              {
-                if(coords[1]>0)
-                {
-                  coords[1]=log(coords[1]);
-                }
-                else
-                {
-                  coords[1]=0.0;
-                }
-              }
+                if(!this->GetSESAMEYLogScaling())
+                  {
+                  coords[1]=pow(10,coords[1]);
+                  }
 
-              if(this->GetSESAMEZLogScaling())
-              {
-                if(coords[2]>0)
-                {
-                  coords[2]=log(coords[2]);
+                if(!this->GetSESAMEZLogScaling())
+                  {
+                  coords[2]=pow(10,coords[2]);
+                  }
                 }
-                else
+              else
                 {
-                  coords[2]=0.0;
+                if(this->GetSESAMEXLogScaling())
+                  {
+                  if(coords[0]>0)
+                    {
+                    coords[0]=log(coords[0]);
+                    }
+                  else
+                    {
+                    coords[0]=0.0;
+                    }
+                  }
+
+                if(this->GetSESAMEYLogScaling())
+                  {
+                  if(coords[1]>0)
+                    {
+                    coords[1]=log(coords[1]);
+                    }
+                  else
+                    {
+                    coords[1]=0.0;
+                    }
+                  }
+
+                if(this->GetSESAMEZLogScaling())
+                  {
+                  if(coords[2]>0)
+                    {
+                    coords[2]=log(coords[2]);
+                    }
+                  else
+                    {
+                    coords[2]=0.0;
+                    }
+                  }
                 }
-              }
 
               newPoints->InsertPoint(pointId,coords);
 

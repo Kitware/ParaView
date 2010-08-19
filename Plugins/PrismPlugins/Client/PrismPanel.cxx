@@ -954,6 +954,40 @@ void PrismPanel::setupTableWidget()
         pqSMAdaptor::setElementProperty(
             this->UI->PanelHelper->GetProperty("TableId"),
             tableWidget->currentText());
+
+    int tID=tableWidget->currentText().toInt();
+    if(tID==502 ||
+      tID==503 ||
+      tID==504 ||
+      tID==505 ||
+      tID==601 ||
+      tID==602 ||
+      tID==603 ||
+      tID==604 ||
+      tID==605)
+      {
+      this->UI->XLogScaling->blockSignals(true);
+      this->UI->YLogScaling->blockSignals(true);
+      this->UI->ZLogScaling->blockSignals(true);
+
+      this->UI->XLogScaling->setChecked(true);
+      this->UI->YLogScaling->setChecked(true);
+      this->UI->ZLogScaling->setChecked(true);
+
+      this->UI->XLogScaling->blockSignals(false);
+      this->UI->YLogScaling->blockSignals(false);
+      this->UI->ZLogScaling->blockSignals(false);
+
+      pqSMAdaptor::setElementProperty(
+        this->UI->PanelHelper->GetProperty("SESAMEXLogScaling"), true);
+      pqSMAdaptor::setElementProperty(
+        this->UI->PanelHelper->GetProperty("SESAMEYLogScaling"), true);
+      pqSMAdaptor::setElementProperty(
+        this->UI->PanelHelper->GetProperty("SESAMEZLogScaling"), true);
+
+      }
+
+
         this->UI->PanelHelper->UpdateVTKObjects();
         this->UI->PanelHelper->UpdatePropertyInformation();
     }
@@ -1941,9 +1975,43 @@ void PrismPanel::setTableId(QString newId)
 
     //get access to the property that lets us pick the domain
     pqSMAdaptor::setElementProperty(
-        this->UI->PanelHelper->GetProperty("TableId"), newId);
+      this->UI->PanelHelper->GetProperty("TableId"), newId);
+
+    int tID=newId.toInt();
+    if(tID==502 ||
+      tID==503 ||
+      tID==504 ||
+      tID==505 ||
+      tID==601 ||
+      tID==602 ||
+      tID==603 ||
+      tID==604 ||
+      tID==605)
+      {
+      this->UI->XLogScaling->blockSignals(true);
+      this->UI->YLogScaling->blockSignals(true);
+      this->UI->ZLogScaling->blockSignals(true);
+
+      this->UI->XLogScaling->setChecked(true);
+      this->UI->YLogScaling->setChecked(true);
+      this->UI->ZLogScaling->setChecked(true);
+
+      this->UI->XLogScaling->blockSignals(false);
+      this->UI->YLogScaling->blockSignals(false);
+      this->UI->ZLogScaling->blockSignals(false);
+
+      pqSMAdaptor::setElementProperty(
+        this->UI->PanelHelper->GetProperty("SESAMEXLogScaling"), true);
+      pqSMAdaptor::setElementProperty(
+        this->UI->PanelHelper->GetProperty("SESAMEYLogScaling"), true);
+      pqSMAdaptor::setElementProperty(
+        this->UI->PanelHelper->GetProperty("SESAMEZLogScaling"), true);
+
+      }
+
     this->UI->PanelHelper->UpdateVTKObjects();
     this->UI->PanelHelper->UpdatePropertyInformation();
+
 
     this->updateVariables();
     this->updateConversionsLabels();
@@ -1952,8 +2020,6 @@ void PrismPanel::setTableId(QString newId)
     this->updateYThresholds();
 
     this->setModified();
-
-
 }
 
 void PrismPanel::setXVariable(QString name)

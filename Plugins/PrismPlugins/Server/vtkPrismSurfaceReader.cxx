@@ -708,7 +708,10 @@ this->Internal->ArrayNames->InsertNextValue(this->Internal->Reader->GetTableYAxi
         {
         vtkStdString str=this->Internal->Reader->GetTableArrayName(i);
         vtkStdString::size_type pos=str.find_first_of(":");
-        str.erase(0,pos+2);
+        if(pos!=vtkStdString::npos)
+          {
+          str.erase(0,pos+2);
+          }
         this->Internal->ArrayNames->InsertNextValue(str);
 
         }
@@ -833,8 +836,6 @@ void vtkPrismSurfaceReader::SetTable(int tableId)
 
     if(this->Internal->Reader->GetTable() != tableId)
         {
-
-
         this->Internal->Reader->SetTable(tableId);
         }
     }
@@ -1034,14 +1035,13 @@ int vtkPrismSurfaceReader::RequestData(
             if (this->GetAbortExecute())
                 {
                 break;
-                }
-            }
-
+              }
+          }
 
 
         double coords[3];
         if(xArray)
-            {
+          {
             coords[0]=xArray->GetValue(ptId);
             }
         else
@@ -1068,42 +1068,70 @@ int vtkPrismSurfaceReader::RequestData(
             }
 
 
-        if(this->GetXLogScaling())
+        int tID=this->GetTable();
+        if(tID==502 ||
+          tID==503 ||
+          tID==504 ||
+          tID==505 ||
+          tID==601 ||
+          tID==602 ||
+          tID==603 ||
+          tID==604 ||
+          tID==605)
+          {
+          if(!this->GetXLogScaling())
+            {
+            coords[0]=pow(10,coords[0]);
+            }
+
+          if(!this->GetYLogScaling())
+            {
+            coords[1]=pow(10,coords[1]);
+            }
+
+          if(!this->GetZLogScaling())
+            {
+            coords[2]=pow(10,coords[2]);
+            }
+          }
+        else
+          {
+          if(this->GetXLogScaling())
             {
             if(coords[0]>0)
-                {
-                coords[0]=log(coords[0]);
-                }
+              {
+              coords[0]=log(coords[0]);
+              }
             else
-                {
-                coords[0]=0.0;
-                }
+              {
+              coords[0]=0.0;
+              }
             }
 
-        if(this->GetYLogScaling())
+          if(this->GetYLogScaling())
             {
             if(coords[1]>0)
-                {
-                coords[1]=log(coords[1]);
-                }
+              {
+              coords[1]=log(coords[1]);
+              }
             else
-                {
-                coords[1]=0.0;
-                }
+              {
+              coords[1]=0.0;
+              }
             }
 
-        if(this->GetZLogScaling())
+          if(this->GetZLogScaling())
             {
             if(coords[2]>0)
-                {
-                coords[2]=log(coords[2]);
-                }
+              {
+              coords[2]=log(coords[2]);
+              }
             else
-                {
-                coords[2]=0.0;
-                }
+              {
+              coords[2]=0.0;
+              }
             }
-
+          }
         newPts->InsertPoint(ptId,coords);
 
         }
