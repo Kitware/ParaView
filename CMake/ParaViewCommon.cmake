@@ -449,6 +449,10 @@ ELSE(PARAVIEW_USE_SYSTEM_HDF5)
   # Export configuration to this export variable
   SET(HDF5_EXPORTED_TARGETS "paraview-targets")
 
+  # Silence HDF5's warnings. We'll let them get fixed upstream
+  # and merge in updates as necessary.
+  SET(HDF5_DISABLE_COMPILER_WARNINGS ON)
+
   SET(HDF5_INSTALL_NO_DEVELOPMENT ${PV_INSTALL_NO_DEVELOPMENT})
   SET(HDF5_INSTALL_BIN_DIR ${PV_INSTALL_BIN_DIR})
   SET(HDF5_INSTALL_LIB_DIR ${PV_INSTALL_LIB_DIR})
