@@ -15,6 +15,7 @@
 #include <vtkRectilinearGrid.h>
 #include <vtkstd/vector>
 #include <vtkstd/string>
+#include <vtksys/ios/sstream>
 #include <vtkStringArray.h>
 #include <vtkSmartPointer.h>
 
@@ -30,6 +31,7 @@ public:
   FILE* File;
   vtkstd::vector<int> TableIds;
   vtkstd::vector<long> TableLocations;
+  vtkIdType NumberTableVariables;
   vtkIdType TableId;
   vtkstd::vector<vtkstd::string> TableArrays;
   vtkstd::vector<int> TableArrayStatus;
@@ -415,6 +417,7 @@ void vtkPrismSESAMEReader::ExecuteInformation()
   if(this->Internal->TableIds.empty())
     {
     this->Internal->TableLocations.clear();
+    this->Internal->NumberTableVariables=-1;
 
     // get the table ids
 
@@ -423,7 +426,7 @@ void vtkPrismSESAMEReader::ExecuteInformation()
     int internalId;
     int tableId;
 
-    // read lines from the file the whole file
+
     while( fgets(buffer, SESAME_NUM_CHARS, this->Internal->File) != NULL )
       {
       // see if the line matches the  " 0 9999 602" format
@@ -439,43 +442,105 @@ void vtkPrismSESAMEReader::ExecuteInformation()
       }
     }
 
-  //if(this->Internal->TableId == -1 &&
-  //   !this->Internal->TableIds.empty())
-  //  {
-  //  this->Internal->TableId = this->Internal->TableIds[0];
-  //  }
-
-  if(this->Internal->TableId != -1)
-    {
-    JumpToTable(this->Internal->TableId);
-    float v[5] = { 0.0, 0.0, 0.0, 0.0, 0.0 };
-    if ( ReadTableValueLine( &(v[0]), &(v[1]),
-                             &(v[2]), &(v[3]), &(v[4]) ) != 0)
-      {
-      // first two values are dimensions of
-      // grid
-      this->GetOutput()->SetWholeExtent(0, (int)(v[0]) - 1,
-                                        0, (int)(v[1]) - 1, 0, 0 );
-      }
-    }
-
   if(this->Internal->TableId != -1 &&
-     this->Internal->TableArrays.empty())
+    this->Internal->TableArrays.empty())
     {
+
+    float v[5] = { 0.0, 0.0, 0.0, 0.0, 0.0 };
+    int datadims[2] = { 0, 0 };
+    int numRead = 0;
+    int result=0;
+
+    JumpToTable(this->Internal->TableId);
+
+    result=ReadTableValueLine( &(v[0]), &(v[1]), &(v[2]), &(v[3]), &(v[4]) );
+    // get the table header
+    if (result!= 0)
+      {
+      this->GetOutput()->SetWholeExtent(0, (int)(v[0]) - 1,
+        0, (int)(v[1]) - 1, 0, 0 );
+      // dimensions of grid
+      datadims[0] = (int)(v[0]);
+      datadims[1] = (int)(v[1]);
+      }
+    unsigned int scalarIndex = 0;
+    int scalarCount = 0;
+    int readFromTable = 0;
+
+    if (result!= 0)
+      {
+      for (int k=2;k<5;k++)
+        {
+        if ( numRead >= (datadims[0] + datadims[1]) )
+          {
+          scalarCount++;
+          if(scalarCount == datadims[0] * datadims[1])
+            {
+            scalarCount = 1;
+            scalarIndex++;
+            }
+          }
+        numRead++;
+        }
+      }
+
+    while ( (readFromTable = ReadTableValueLine( &(v[0]), &(v[1]), &(v[2]), &(v[3]),
+      &(v[4])  )) != 0)
+      {
+      for (int k=0;k<readFromTable;k++)
+        {
+        if ( numRead >= (datadims[0] + datadims[1]) )
+          {
+          scalarCount++;
+          if(scalarCount == datadims[0] * datadims[1])
+            {
+            scalarCount = 1;
+            scalarIndex++;
+            }
+          }
+        numRead++;
+        }
+      }
+
+    this->Internal->NumberTableVariables=scalarIndex;
+
+
+
     // get the names of the arrays in the table
-    int tableIndex = TableIndex(this->Internal->TableId);
+   int tableIndex = TableIndex(this->Internal->TableId);
 
     this->Internal->TableXAxisName=TableDefs[tableIndex].XAxisName;
     this->Internal->TableYAxisName=TableDefs[tableIndex].YAxisName;
+
+    int numVarNames=0;
     for(int j=0; TableDefs[tableIndex].Arrays[j] != 0; j++)
       {
-      this->Internal->TableArrays.push_back(
-                TableDefs[tableIndex].Arrays[j]);
-      this->Internal->TableArrayStatus.push_back(1);  // all arrays are on
-                                                      // by default
+      numVarNames++;
+      }
+
+    for(int j=0;j<this->Internal->NumberTableVariables; j++)
+      {
+      if(j<numVarNames)
+        {
+        this->Internal->TableArrays.push_back(
+          TableDefs[tableIndex].Arrays[j]);
+        this->Internal->TableArrayStatus.push_back(1);  // all arrays are on
+        // by default
+        }
+      else
+        {
+        vtkstd::stringstream ss;
+        vtkstd::string varID;
+        ss<<j+1;
+        ss>>varID;
+        vtkstd::string varName="Variable ";
+        varName.append(varID);
+        this->Internal->TableArrays.push_back(varName);
+        this->Internal->TableArrayStatus.push_back(1);  // all arrays are on
+        // by default
+        }
       }
     }
-
 }
 
 int vtkPrismSESAMEReader::JumpToTable( int toTable )
@@ -527,12 +592,6 @@ void vtkPrismSESAMEReader::ReadTable()
     yCoords->Allocate( datadims[1] );
     zCoords->Allocate( 1 );
     zCoords->InsertNextTuple1( 0.0 );
-
-    // the first three values are x samples Update: this only works if X has at least 3 values.
-    //xCoords->InsertNextTuple1( v[2] );
-    //xCoords->InsertNextTuple1( v[3] );
-    //xCoords->InsertNextTuple1( v[4] );
-    //numRead = 3;
     }
 
 
