@@ -430,7 +430,7 @@ ELSE(PARAVIEW_USE_SYSTEM_HDF5)
   # Tell hdf5 that we are manually overriding certain settings
   SET(HDF5_EXTERNALLY_CONFIGURED 1)
   # Avoid duplicating names of installed libraries
-  SET(HDF5_EXTERNAL_LIB_PREFIX "vtk")
+  #SET(HDF5_EXTERNAL_LIB_PREFIX "vtk")
   # Export configuration to this export variable
   SET(HDF5_EXPORTED_TARGETS "paraview-targets")
 
