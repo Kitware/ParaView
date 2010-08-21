@@ -17,7 +17,8 @@ IF(NOT WIN32)
   SET(CMAKE_C_FLAGS "${CMAKE_ANSI_CFLAGS} ${CMAKE_C_FLAGS}")
   ADD_DEFINITIONS(-D_HPUX_SOURCE)
 ENDIF(NOT WIN32)
-
+SET (Kit_SRCS)
+IF (FIXME)
 SET(Kit_SRCS
   vtkDummyProcessModuleHelper.cxx
   vtkInitializationHelper.cxx
@@ -235,7 +236,7 @@ SET( ServerManagerNonWrapped_SRCS
   vtkPVBatchOptions.cxx
   vtkSMXMLParser.cxx
   )
-
+ENDIF (FIXME)
 SET( ServerManager_SRCS
   ${ServerManagerCS_SRCS}
   ${Kit_SRCS}
@@ -244,6 +245,7 @@ SET( ServerManager_SRCS
   )
 
 # Abstract and Wrap exclude
+IF (FIXME)
 SET_SOURCE_FILES_PROPERTIES(
   vtkInitializationHelper.cxx
   vtkSMAnimationCueManipulatorProxy.cxx
@@ -272,7 +274,7 @@ SET_SOURCE_FILES_PROPERTIES(
   vtkSMRenderViewHelper.cxx
   vtkSMPropertyHelper.cxx
   WRAP_EXCLUDE)
-
+ENDIF (FIXME)
 
 INCLUDE_DIRECTORIES(
   ${VTK_INCLUDE_DIR}
@@ -285,8 +287,16 @@ INCLUDE_DIRECTORIES(
   ${ParaView_BINARY_DIR}/Servers/Common
   ${ParaView_BINARY_DIR}/Servers/Filters
   ${KWCommon_INCLUDE_PATH}
-
+  ${protobuf_SOURCE_DIR}/src
   )
+
+#------------------------------------------------------------------------------
+# Compile protobuf resources.
+set (protobuf_generated_files)
+protobuf_generate(
+  protobuf_generated_files
+  ${CMAKE_CURRENT_SOURCE_DIR}/Resources/vtkPVMessage.proto)
+#------------------------------------------------------------------------------
 
 SET(VTK_WRAP_HINTS ${CMAKE_CURRENT_SOURCE_DIR}/hints)
 
@@ -328,8 +338,10 @@ ADD_LIBRARY(vtk${KIT}
   ${CMInstantiator_SRCS}
   ${vtkPVServerManagerCS_SRCS}
   ${KitInstantiator_SRCS}
+  ${protobuf_generated_files}
   )
 TARGET_LINK_LIBRARIES(vtk${KIT}
+  protobuf
   vtkPVFiltersCS
   vtkClientServer
   ${KWCommon_LIBRARIES}
@@ -423,6 +435,8 @@ SET(GUI_CONFIG_FILES
   ParaViewWriters
 )
 
+IF (FIXME)
+
 IF(NOT CMAKE_CROSSCOMPILING)
   add_executable_with_forwarding(PV_EXE_SUFFIX
     vtkSMExtractDocumentation vtkSMExtractDocumentation.cxx)
@@ -458,6 +472,8 @@ ADD_CUSTOM_TARGET(HTMLDocumentation
 )
 SET (HTMLDocumentation_FILES ${HTML_RESULTS} CACHE INTERNAL
   "HTMLDocumentation files generated from ServerManager")
+
+ENDIF (FIXME)
 
 SET(PARAVIEW_INCLUDE_MODULES_TO_SMAPPLICATION "")
 FOREACH(rf ${resourceFiles})

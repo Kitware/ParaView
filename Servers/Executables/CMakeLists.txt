@@ -1,4 +1,6 @@
 PROJECT(PVServers)
+
+IF (FIXME)
 INCLUDE_DIRECTORIES(
   ${ParaView_BINARY_DIR}
   ${PVSERVERCOMMON_INCLUDE_DIR}
@@ -104,4 +106,4 @@ build_paraview_client_cpack_config_init(
 SET (CPACK_INSTALL_CMAKE_PROJECTS_DRAGNDROP
   ${CPACK_INSTALL_CMAKE_PROJECTS})
 build_paraview_client_cpack_config()
-
+ENDIF (FIXME)

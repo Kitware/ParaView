@@ -1,3 +1,4 @@
+IF (FIXME)
 ################################################################################
 SET(ServersServerManager_SRCS
   ServersServerManagerPrintSelf
@@ -53,3 +54,4 @@ IF (PVServerManagerTestData)
       ${SMSTATE_FILE_DIR}/${tfile}.pvsm)
   ENDFOREACH(tfile)
 ENDIF (PVServerManagerTestData)
+ENDIF (FIXME)
