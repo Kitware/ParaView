@@ -18,7 +18,7 @@
 // .SECTION Description
 // vtkSMProxyDefinitionIterator iterates over all proxy definitions known to
 // the proxy manager. The iterator defines mode in which it can be made to
-// iterate over definitions of a particular group alone. This iterator can 
+// iterate over definitions of a particular group alone. This iterator can
 // also be used to iterate over compound proxy definitions.
 // .SECTION See Also
 // vtkSMProxyManager
@@ -28,9 +28,8 @@
 
 #include "vtkSMObject.h"
 
-class vtkSMProxyManager;
-class vtkSMProxyDefinitionIteratorInternals;
 class vtkPVXMLElement;
+class vtkSMProxyDefinitionManager;
 
 class VTK_EXPORT vtkSMProxyDefinitionIterator : public vtkSMObject
 {
@@ -39,82 +38,45 @@ public:
   vtkTypeMacro(vtkSMProxyDefinitionIterator, vtkSMObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Go to the beginning of the collection.
-  void Begin();
+  // ********* Iterator Commom methods **********
 
   // Description:
-  // Go to the beginning of one group.
-  void Begin(const char* groupName);
+  // Move the iterator to the beginning.
+  virtual void GoToFirstItem();
 
   // Description:
-  // Is the iterator pointing past the last element?
-  int IsAtEnd();
+  // Move the iterator to the next item.
+  virtual void GoToNextItem();
+
+    // Description:
+  // Move the iterator to the next group.
+  virtual void GoToNextGroup();
 
   // Description:
-  // Move to the next property.
-  void Next();
+  // Test whether the iterator is currently pointing to a valid
+  // item.
+  virtual bool IsDoneWithTraversal();
 
-  // Description:
-  // Get the group at the current iterator location.
-  const char* GetGroup();
 
-  // Description:
-  // Get the key (proxy name) at the current iterator location.
-  const char* GetKey();
+  // ********* Access methods **********
 
-  // Description:
-  // Returns the XML element defining the proxy.
-  vtkPVXMLElement* GetDefinition();
+  // Access methods
+  /// Return the current group name or NULL if Next() was never called.
+  virtual const char* GetGroupName();
+  /// Return the current proxy name or NULL if Next() was never called.
+  virtual const char* GetProxyName();
+  /// Return true if the current definition has been defined in the Custom scope
+  virtual bool  IsCustom();
+  /// Return the current XML proxy definition
+  virtual vtkPVXMLElement* GetProxyDefinition();
 
-  // Description:
-  // Returns if the current definition is a custom proxy definition.
-  bool IsCustom();
-
-  // Description:
-  // The traversal mode for the iterator. It is not advisable to change the mode
-  // during an iteration i.e. after changing mode, one must call Begin() before
-  // using the iterator.
-  // If the traversal mode is
-  // set to GROUPS, each Next() will move to the next group, in
-  // ONE_GROUP mode, all proxy definitions in one group are visited,
-  // In CUSTOM_ONLY mode, the iterator
-  // iterates over custom proxy definitions. 
-  // in ALL mode, all proxy definitions are visited. 
-  vtkSetMacro(Mode, int);
-  vtkGetMacro(Mode, int);
-  void SetModeToGroupsOnly() { this->SetMode(GROUPS_ONLY); }
-  void SetModeToOneGroup() { this->SetMode(ONE_GROUP); }
-  void SetModeToAll() { this->SetMode(ALL); }
-  void SetModeToCustomOnly() { this->SetMode(CUSTOM_ONLY); }
-//BTX
-  enum TraversalMode
-  {
-    GROUPS_ONLY=0,
-    ONE_GROUP=1,
-    CUSTOM_ONLY=2,
-    ALL=3
-  };
-//ETX
 protected:
   vtkSMProxyDefinitionIterator();
   ~vtkSMProxyDefinitionIterator();
 
-  // Description:
-  // If current item is not a custom proxy definition, then 
-  // simply keeps on calling NextInternal() until the end is reached or a custom
-  // proxy definition is encountered. Used in CUSTOM_ONLY mode.
-  void MoveTillCustom();
-
-  // Description:
-  // Implementation for Next().
-  void NextInternal();
-  int Mode;
 private:
   vtkSMProxyDefinitionIterator(const vtkSMProxyDefinitionIterator&); // Not implemented.
   void operator=(const vtkSMProxyDefinitionIterator&); // Not implemented.
-
-  vtkSMProxyDefinitionIteratorInternals* Internals;
 };
 
 

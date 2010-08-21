@@ -17,7 +17,18 @@ IF(NOT WIN32)
   SET(CMAKE_C_FLAGS "${CMAKE_ANSI_CFLAGS} ${CMAKE_C_FLAGS}")
   ADD_DEFINITIONS(-D_HPUX_SOURCE)
 ENDIF(NOT WIN32)
-SET (Kit_SRCS)
+
+SET (Kit_SRCS
+  vtkPMObject.cxx
+  vtkSMObject.cxx
+  vtkSMProxyDefinitionIterator.cxx
+  vtkSMProxyDefinitionManager.cxx
+  vtkSMSessionClient.cxx
+  vtkSMSessionCore.cxx
+  vtkSMSession.cxx
+  vtkSMSessionServer.cxx
+  )
+
 IF (FIXME)
 SET(Kit_SRCS
   vtkDummyProcessModuleHelper.cxx
@@ -245,6 +256,16 @@ SET( ServerManager_SRCS
   )
 
 # Abstract and Wrap exclude
+
+SET_SOURCE_FILES_PROPERTIES(
+  vtkSMSession.cxx
+  ABSTRACT
+  )
+
+SET_SOURCE_FILES_PROPERTIES(
+  vtkSMSessionCore.cxx
+  WRAP_EXCLUDE)
+
 IF (FIXME)
 SET_SOURCE_FILES_PROPERTIES(
   vtkInitializationHelper.cxx
