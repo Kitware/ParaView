@@ -558,6 +558,10 @@ ADD_SUBDIRECTORY(Utilities/Xdmf2)
 
 
 #########################################################################
+# Configure protobuf
+ADD_SUBDIRECTORY(Utilities/protobuf)
+
+#########################################################################
 # Configure mpeg2 encoding
 SET(VTKMPEG2_INSTALL_NO_DEVELOPMENT ${PV_INSTALL_NO_DEVELOPMENT})
 SET(VTKMPEG2_INSTALL_NO_RUNTIME ${PV_INSTALL_NO_RUNTIME})

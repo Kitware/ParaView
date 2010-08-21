@@ -197,3 +197,20 @@ FUNCTION (add_executable_with_forwarding2
   set (${out_real_exe_suffix} "${PV_EXE_SUFFIX}" PARENT_SCOPE)
 ENDFUNCTION (add_executable_with_forwarding2)
           
+#########################################################################
+# Function to compile a proto file to generate a .h and .cc file
+# Arguments:
+# out_cpp_file_variable: variable that gets set with the full path to output file
+# in_proto_file: full path to input file (e.g. ${CMAKE_CURRENT_SOURCE_DIR}/foo.pb)
+
+FUNCTION (protobuf_generate out_cpp_file in_proto_file)
+  GET_FILENAME_COMPONENT(basename ${in_proto_file} NAME_WE)
+  GET_FILENAME_COMPONENT(absolute ${in_proto_file} ABSOLUTE)
+  GET_FILENAME_COMPONENT(path ${absolute} PATH)
+  SET(${outfile} ${CMAKE_CURRENT_BINARY_DIR}/${basename}.pb.cc)
+  ADD_CUSTOM_COMMAND(
+    OUTPUT ${${outfile}}
+    COMMAND protoc_compiler --cpp_out=${CMAKE_CURRENT_BINARY_DIR} --proto_path ${path} ${absolute}
+    DEPENDS ${in_proto_file} protoc_compiler
+  )
+ENDFUNCTION (protobuf_generate)
