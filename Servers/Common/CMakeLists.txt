@@ -29,6 +29,16 @@ TARGET_LINK_LIBRARIES(vtkPVCommandOptions
   vtkIO)
 
 SET(Kit_SRCS
+# NEW CLASSES
+  vtkClientServerInterpreterInitializer.cxx
+  vtkNetworkAccessManager.cxx
+  vtkTCPNetworkAccessManager.cxx
+  vtkProcessModule2.cxx
+  vtkSession.cxx
+  vtkSessionIterator.cxx
+
+# OLD CLASSES
+
   vtkCacheSizeKeeper.cxx
   vtkCellIntegrator.cxx
   vtkClientConnection.cxx
@@ -114,6 +124,9 @@ ENDIF (VTK_USE_MPI)
 
 # Abstract and Wrap exclude
 SET_SOURCE_FILES_PROPERTIES(
+  vtkNetworkAccessManager.cxx
+  vtkSession.cxx
+
   vtkCellIntegrator.cxx
   vtkProcessModuleConnection
   vtkProcessModuleGUIHelper
@@ -127,6 +140,8 @@ SET_SOURCE_FILES_PROPERTIES(
   ABSTRACT
   )
 SET_SOURCE_FILES_PROPERTIES(
+  vtkClientServerInterpreterInitializer.cxx
+
   vtkCommandOptionsXMLParser.cxx
   vtkConnectionIterator.cxx
   vtkPVCreateProcessModule
