@@ -27,29 +27,26 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkIOInstantiator.h"
 #include "vtkImagingInstantiator.h"
 #include "vtkGraphicsInstantiator.h"
-
 #include "vtkRenderingInstantiator.h"
 #include "vtkVolumeRenderingInstantiator.h"
 #include "vtkHybridInstantiator.h"
 #include "vtkParallelInstantiator.h"
-
 #include "vtkPVServerCommonInstantiator.h"
 #include "vtkPVFiltersInstantiator.h"
 #include "vtkPVServerManagerInstantiator.h"
 #include "vtkClientServerInterpreter.h"
 
-#include "vtkDummyProcessModuleHelper.h"
-#include "vtkProcessModule.h"
-#include "vtkPVMain.h"
+#include "vtkClientServerInterpreterInitializer.h"
+#include "vtkOutputWindow.h"
+#include "vtkProcessModule2.h"
 #include "vtkPVOptions.h"
-#include "vtkSMApplication.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMProperty.h"
 
 #include <vtkstd/string>
+#include <vtksys/ios/sstream>
 
-
-static void vtkInitializationHelperInit(vtkProcessModule* pm);
+static void vtkInitializationHelperInit(vtkClientServerInterpreter*);
 
 //----------------------------------------------------------------------------
 // ClientServer wrapper initialization functions.
@@ -70,20 +67,15 @@ extern "C" void vtkPVServerCommonCS_Initialize(vtkClientServerInterpreter*);
 extern "C" void vtkPVFiltersCS_Initialize(vtkClientServerInterpreter*);
 extern "C" void vtkXdmfCS_Initialize(vtkClientServerInterpreter *);
 
-vtkProcessModuleGUIHelper* vtkInitializationHelper::Helper = 0;
-vtkPVMain* vtkInitializationHelper::PVMain = 0;
-vtkPVOptions* vtkInitializationHelper::Options = 0;
-vtkSMApplication* vtkInitializationHelper::Application = 0;
-
 //----------------------------------------------------------------------------
-void vtkInitializationHelper::Initialize(const char* executable)
+void vtkInitializationHelper::Initialize(const char* executable, int type)
 {
-  vtkInitializationHelper::Initialize(executable, NULL);
+  vtkInitializationHelper::Initialize(executable, type, NULL);
 }
 
 //----------------------------------------------------------------------------
 void vtkInitializationHelper::Initialize(const char* executable,
-  vtkPVOptions* options)
+  int type, vtkPVOptions* options)
 {
   if (!executable)
     {
@@ -100,16 +92,17 @@ void vtkInitializationHelper::Initialize(const char* executable,
     {
     newoptions = vtkSmartPointer<vtkPVOptions>::New();
     }
-  vtkInitializationHelper::Initialize(1, &argv, newoptions);
+  vtkInitializationHelper::Initialize(1, &argv, type, newoptions);
   delete[] argv;
 }
 
 //----------------------------------------------------------------------------
-void vtkInitializationHelper::Initialize(int argc, char**argv, vtkPVOptions* options)
+void vtkInitializationHelper::Initialize(int argc, char**argv,
+  int type, vtkPVOptions* options)
 {
-  if (vtkInitializationHelper::PVMain)
+  if (vtkProcessModule2::GetProcessModule())
     {
-    vtkGenericWarningMacro("Python module already initialize. Skipping.");
+    vtkGenericWarningMacro("Process already initialize. Skipping.");
     return;
     }
 
@@ -119,66 +112,49 @@ void vtkInitializationHelper::Initialize(int argc, char**argv, vtkPVOptions* opt
     return;
     }
 
-  // don't change process type if the caller has already initialized it.
-  if (options->GetProcessType() == vtkPVOptions::ALLPROCESS)
+  vtkClientServerInterpreterInitializer::GetInitializer()->
+    RegisterCallback(&::vtkInitializationHelperInit);
+
+  vtkProcessModule2::Initialize(
+    static_cast<vtkProcessModule2::ProcessTypes>(type), argc, argv);
+  vtksys_ios::ostringstream sscerr;
+  if (argv && !options->Parse(argc, argv) )
     {
-    options->SetProcessType(vtkPVOptions::PVCLIENT);
+    if ( options->GetUnknownArgument() )
+      {
+      sscerr << "Got unknown argument: " << options->GetUnknownArgument() << endl;
+      }
+    if ( options->GetErrorMessage() )
+      {
+      sscerr << "Error: " << options->GetErrorMessage() << endl;
+      }
+    options->SetHelpSelected(1);
+    }
+  if (options->GetHelpSelected())
+    {
+    sscerr << options->GetHelp() << endl;
+    vtkOutputWindow::GetInstance()->DisplayText( sscerr.str().c_str() );
+    // TODO: indicate to the caller that application must quit.
     }
 
-  if (options->GetProcessType() == vtkPVOptions::PVCLIENT)
+  if (options->GetTellVersion() )
     {
-    // in client mode, we don't provide access to MPI.
-    vtkPVMain::SetUseMPI(0); // don't use MPI even when available.
+    int MajorVersion = PARAVIEW_VERSION_MAJOR;
+    int MinorVersion = PARAVIEW_VERSION_MINOR;
+    char name[128];
+    sprintf(name, "ParaView%d.%d\n", MajorVersion, MinorVersion);
+    vtkOutputWindow::GetInstance()->DisplayText(name);
+    // TODO: indicate to the caller that application must quit.
     }
-  vtkInitializationHelper::PVMain = vtkPVMain::New();
-  vtkInitializationHelper::Options = options;
-  vtkInitializationHelper::Options->Register(0); // keep reference.
 
-
-  // This process module helper does nothing. ProcessModuleHelpers are to be
-  // deprecated, then don't serve much anymore.
-  vtkInitializationHelper::Helper = vtkDummyProcessModuleHelper::New();
-
-  // First initialization
-  PVMain->Initialize(
-    vtkInitializationHelper::Options, 
-    vtkInitializationHelper::Helper,
-    vtkInitializationHelperInit, 
-    argc, argv);
-
-  vtkInitializationHelper::Application = vtkSMApplication::New();
-  vtkInitializationHelper::Application->Initialize();
-  vtkSMProperty::SetCheckDomains(0);
-  vtkProcessModule::GetProcessModule()->SupportMultipleConnectionsOn();
-  // Initialize everything else
-  vtkInitializationHelper::PVMain->Run(Options);
+  // FIXME
+  // vtkSMProperty::SetCheckDomains(0);
 }
 
 //----------------------------------------------------------------------------
 void vtkInitializationHelper::Finalize()
 {
-  vtkSMObject::SetProxyManager(0);
-  if (PVMain)
-    {
-    PVMain->Delete();
-    PVMain = 0;
-    }
-  if (Application)
-    {
-    Application->Delete();
-    Application = 0;
-    }
-  if (Helper)
-    {
-    Helper->Delete();
-    Helper = 0;
-    }
-  if (Options)
-    {
-    Options->Delete();
-    Options = 0;
-    }
-  vtkProcessModule::SetProcessModule(0);
+  vtkProcessModule2::Finalize();
 }
 
 //-----------------------------------------------------------------------------
@@ -189,38 +165,27 @@ void vtkInitializationHelper::Finalize()
  *
  * @param pm IN used to pass the interpreter for every *_Initialize function.
  */
-void vtkInitializationHelperInit(vtkProcessModule* pm)
+void vtkInitializationHelperInit(vtkClientServerInterpreter* interp)
 {
 
 #ifdef PARAVIEW_MINIMAL_BUILD
-  vtkParaviewMinInit_Initialize(pm->GetInterpreter());
+  vtkParaviewMinInit_Initialize(interp);
 #else
   // Initialize built-in wrapper modules.
-  vtkCommonCS_Initialize(pm->GetInterpreter());
-  vtkFilteringCS_Initialize(pm->GetInterpreter());
-  vtkGenericFilteringCS_Initialize(pm->GetInterpreter());
-  vtkImagingCS_Initialize(pm->GetInterpreter());
-  vtkInfovisCS_Initialize(pm->GetInterpreter());
-  vtkGraphicsCS_Initialize(pm->GetInterpreter());
-  vtkIOCS_Initialize(pm->GetInterpreter());
-  vtkRenderingCS_Initialize(pm->GetInterpreter());
-  vtkVolumeRenderingCS_Initialize(pm->GetInterpreter());
-  vtkHybridCS_Initialize(pm->GetInterpreter());
-  vtkWidgetsCS_Initialize(pm->GetInterpreter());
-  vtkParallelCS_Initialize(pm->GetInterpreter());
-  vtkPVServerCommonCS_Initialize(pm->GetInterpreter());
-  vtkPVFiltersCS_Initialize(pm->GetInterpreter());
-  vtkXdmfCS_Initialize(pm->GetInterpreter());
+  vtkCommonCS_Initialize(interp);
+  vtkFilteringCS_Initialize(interp);
+  vtkGenericFilteringCS_Initialize(interp);
+  vtkImagingCS_Initialize(interp);
+  vtkInfovisCS_Initialize(interp);
+  vtkGraphicsCS_Initialize(interp);
+  vtkIOCS_Initialize(interp);
+  vtkRenderingCS_Initialize(interp);
+  vtkVolumeRenderingCS_Initialize(interp);
+  vtkHybridCS_Initialize(interp);
+  vtkWidgetsCS_Initialize(interp);
+  vtkParallelCS_Initialize(interp);
+  vtkPVServerCommonCS_Initialize(interp);
+  vtkPVFiltersCS_Initialize(interp);
+  vtkXdmfCS_Initialize(interp);
 #endif
-}
-
-//----------------------------------------------------------------------------
-/*
- * The primary interface used to Initialize all the kits.
- *
- * @param pm IN process module is passed to vtkInitilizationHelperInit function
- */
-void vtkInitializationHelper::InitializeInterpretor(vtkProcessModule* pm)
-{
-  ::vtkInitializationHelperInit(pm);
 }

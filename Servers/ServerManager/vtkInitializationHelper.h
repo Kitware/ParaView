@@ -24,11 +24,7 @@
 
 #include "vtkObject.h"
 
-class vtkProcessModuleGUIHelper;
-class vtkPVMain;
 class vtkPVOptions;
-class vtkSMApplication;
-class vtkProcessModule;
 
 class VTK_EXPORT vtkInitializationHelper : public vtkObject
 {
@@ -38,35 +34,25 @@ public:
   // Description:
   // Initializes the server manager. Do not use the server manager
   // before calling this.
-  static void Initialize(const char* executable);
-  static void Initialize(const char* executable, vtkPVOptions* options);
+  static void Initialize(const char* executable, int type);
+  static void Initialize(const char* executable, int type, vtkPVOptions* options);
 
   // Description:
   // Alternative API to initialize the server manager. This takes in  the
   // command line arguments and the vtkPVOptions instance to use to process the
   // command line options.
-  static void Initialize(int argc, char**argv, vtkPVOptions* options);
+  static void Initialize(int argc, char**argv, int type, vtkPVOptions* options);
 
   // Description:
   // Finalizes the server manager. Do not use the server manager
   // after calling this.
   static void Finalize();
 
-  // Description:
-  // To be used by executables. Call this method to initialize the client-server
-  // interpretor.
-  static void InitializeInterpretor(vtkProcessModule*);
 protected:
   vtkInitializationHelper() {};
   virtual ~vtkInitializationHelper() {};
 
-  static vtkPVMain* PVMain;
-  static vtkSMApplication* Application;
-  static vtkPVOptions* Options;
-  static vtkProcessModuleGUIHelper* Helper;
-
 private:
-
   vtkInitializationHelper(const vtkInitializationHelper&); // Not implemented
   void operator=(const vtkInitializationHelper&); // Not implemented
 };

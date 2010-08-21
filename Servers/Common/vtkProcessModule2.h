@@ -137,6 +137,11 @@ public:
   vtkGetObjectMacro(NetworkAccessManager, vtkNetworkAccessManager);
   void SetNetworkAccessManager(vtkNetworkAccessManager*);
 
+  // Description:
+  // Provides access to the global MPI controller, if any. Same can be obtained
+  // using vtkMultiProcessController::GetGlobalController();
+  vtkMultiProcessController* GetGlobalController();
+
 //BTX
 protected:
   vtkProcessModule2();

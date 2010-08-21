@@ -40,6 +40,7 @@ public:
   // necessary components.
   virtual void Initialize(vtkSMSessionCore* session);
 
+//BTX
   // Description:
   // Push a new state to the underneath implementation
   virtual void Push(vtkSMMessage* msg) = 0;
@@ -51,12 +52,14 @@ public:
   // Description:
   // Invoke a given method on the underneath objects
   virtual void Invoke(vtkSMMessage* msg) = 0;
+//ETX
 
   // Description:
   /// Method called when the vtkPMObject should be deleted and should release
   /// its internal content
   virtual void Finalize();
 
+//BTX
 protected:
   vtkPMObject();
   virtual ~vtkPMObject();
@@ -71,6 +74,7 @@ protected:
 private:
   vtkPMObject(const vtkPMObject&);    // Not implemented
   void operator=(const vtkPMObject&); // Not implemented
+//ETX
 };
 
 #endif // #ifndef __vtkPMObject_h

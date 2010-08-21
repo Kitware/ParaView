@@ -19,6 +19,7 @@ IF(NOT WIN32)
 ENDIF(NOT WIN32)
 
 SET (Kit_SRCS
+  vtkInitializationHelper.cxx
   vtkPMObject.cxx
   vtkSMObject.cxx
   vtkSMProxyDefinitionIterator.cxx
@@ -32,7 +33,6 @@ SET (Kit_SRCS
 IF (FIXME)
 SET(Kit_SRCS
   vtkDummyProcessModuleHelper.cxx
-  vtkInitializationHelper.cxx
   vtkSMAnimationCueManipulatorProxy.cxx
   vtkSMAnimationCueProxy.cxx
   vtkSMAnimationPlayerProxy.cxx
@@ -259,16 +259,17 @@ SET( ServerManager_SRCS
 
 SET_SOURCE_FILES_PROPERTIES(
   vtkSMSession.cxx
+  vtkInitializationHelper.cxx
+  vtkPMObject.cxx
   ABSTRACT
   )
 
-SET_SOURCE_FILES_PROPERTIES(
-  vtkSMSessionCore.cxx
-  WRAP_EXCLUDE)
+#SET_SOURCE_FILES_PROPERTIES(
+#  vtkSMSessionCore.cxx
+#  WRAP_EXCLUDE)
 
 IF (FIXME)
 SET_SOURCE_FILES_PROPERTIES(
-  vtkInitializationHelper.cxx
   vtkSMAnimationCueManipulatorProxy.cxx
   vtkSMAnimationSceneWriter.cxx
   vtkSMClientServerRenderSyncManagerHelper.cxx

@@ -34,6 +34,7 @@ public:
   vtkTypeMacro(vtkSMSessionCore, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
+  //BTX
   // Description:
   // Provides access to the interpreter.
   vtkGetObjectMacro(Interpreter, vtkClientServerInterpreter);
@@ -57,6 +58,7 @@ public:
   // Description:
   // Invoke a method remotely
   virtual void DeletePMObject(vtkSMMessage* msg);
+  //ETX
 
 //BTX
   enum MessageTypes

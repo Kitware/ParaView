@@ -1,6 +1,5 @@
 PROJECT(PVServers)
 
-IF (FIXME)
 INCLUDE_DIRECTORIES(
   ${ParaView_BINARY_DIR}
   ${PVSERVERCOMMON_INCLUDE_DIR}
@@ -10,6 +9,7 @@ INCLUDE_DIRECTORIES(
   ${VTK_INCLUDE_DIR}
   ${XDMF_INCLUDE_DIRS}
   ${CMAKE_CURRENT_BINARY_DIR}
+  ${protobuf_SOURCE_DIR}/src
   )
 SET(LIBS vtkPVServerCommon vtkPVFilters vtkPVServerManager)
 IF(VTK_USE_MPI)
@@ -21,7 +21,10 @@ IF(VTK_WRAP_TCL)
 ENDIF(VTK_WRAP_TCL)
 
 # Add main server executables.
+SET(PV_EXE_LIST pvserver)
+IF (FIXME)
 SET(PV_EXE_LIST pvserver pvrenderserver pvdataserver)
+ENDIF (FIXME)
 FOREACH(pvexe ${PV_EXE_LIST})
   add_executable_with_forwarding(pv_exe_suffix
     ${pvexe} ${pvexe}.cxx)
@@ -41,6 +44,7 @@ FOREACH(pvexe ${PV_EXE_LIST})
 
 ENDFOREACH(pvexe)
 
+IF (FIXME)
 SET(PV_TEST_INIT_COMMAND "" CACHE STRING
   "Command to run before a test begins. Multiple commands are separated by ';'.")
 MARK_AS_ADVANCED(PV_TEST_INIT_COMMAND)

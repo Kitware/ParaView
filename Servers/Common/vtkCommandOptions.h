@@ -50,6 +50,7 @@ public:
   // Description:
   // Was help selected?
   vtkGetMacro(HelpSelected, int);
+  vtkSetMacro(HelpSelected, int);
 
   // Description:
   // Set/Get the type of the process for this set of options.

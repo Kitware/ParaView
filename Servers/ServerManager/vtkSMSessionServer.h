@@ -20,7 +20,6 @@
 #define __vtkSMSessionServer_h
 
 #include "vtkSMSession.h"
-#include "vtkSMMessage.h"
 
 class vtkMultiProcessController;
 
@@ -49,11 +48,11 @@ public:
   // Returns true is this session is active/alive/valid.
   virtual bool GetIsAlive();
 
+//BTX
   // Description:
   // Push the state.
   virtual void PushState(vtkSMMessage* msg);
 
-//BTX
   void OnClientServerMessageRMI(void* message, int message_length);
   void OnCloseSessionRMI();
 

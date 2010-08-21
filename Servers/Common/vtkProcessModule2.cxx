@@ -257,6 +257,12 @@ vtkSessionIterator* vtkProcessModule2::NewSessionIterator()
 }
 
 //----------------------------------------------------------------------------
+vtkMultiProcessController* vtkProcessModule2::GetGlobalController()
+{
+  return vtkProcessModule2::GlobalController;
+}
+
+//----------------------------------------------------------------------------
 void vtkProcessModule2::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);

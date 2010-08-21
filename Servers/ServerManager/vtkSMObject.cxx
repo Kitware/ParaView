@@ -28,26 +28,26 @@ vtkSMObject::~vtkSMObject()
 {
 }
 
-//---------------------------------------------------------------------------
-vtkSMProxyManager* vtkSMObject::GetProxyManager()
-{
-  abort();
-  // FIXME
-  // Locate proxy manager from first SMSession and return it for backwards
-  // compatibility.
-  return NULL;
-}
-
-//---------------------------------------------------------------------------
-vtkSMApplication* vtkSMObject::GetApplication()
-{
-  abort();
-  // FIXME
-  // return vtkSMApplication::GetInstance();
-  //return vtkSMObject::Application;
-  return NULL;
-}
-
+////---------------------------------------------------------------------------
+//vtkSMProxyManager* vtkSMObject::GetProxyManager()
+//{
+//  abort();
+//  // FIXME
+//  // Locate proxy manager from first SMSession and return it for backwards
+//  // compatibility.
+//  return NULL;
+//}
+//
+////---------------------------------------------------------------------------
+//vtkSMApplication* vtkSMObject::GetApplication()
+//{
+//  abort();
+//  // FIXME
+//  // return vtkSMApplication::GetInstance();
+//  //return vtkSMObject::Application;
+//  return NULL;
+//}
+//
 //---------------------------------------------------------------------------
 void vtkSMObject::PrintSelf(ostream& os, vtkIndent indent)
 {

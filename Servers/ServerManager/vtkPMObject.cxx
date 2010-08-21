@@ -17,6 +17,8 @@
 #include "vtkObjectFactory.h"
 #include "vtkSMSessionCore.h"
 
+#include <assert.h>
+
 //----------------------------------------------------------------------------
 vtkPMObject::vtkPMObject()
 {

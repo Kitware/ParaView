@@ -35,6 +35,7 @@ public:
   // Description:
   virtual bool GetIsAlive() { return true; }
 
+//BTX
   // Description:
   // Push the state message.
   virtual void PushState(vtkSMMessage* msg);
@@ -50,6 +51,7 @@ public:
   // Description:
   // Delete server side object. (PMObject)
   virtual void DeletePMObject(vtkSMMessage* msg);
+//ETX
 
   // Description:
   // Provides access to the session core.
@@ -60,6 +62,7 @@ public:
   virtual vtkTypeUInt32 GetNextGlobalUniqueIdentifier()
     { return ++LastGUID; }
 
+//BTX
   // Description:
   // Returns the vtkSMProxyManager attached to that session. Note that the
   // ProxyManager may not be active on every process e.g. in client-server
