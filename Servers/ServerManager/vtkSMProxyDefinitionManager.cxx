@@ -14,19 +14,21 @@
 =========================================================================*/
 #include "vtkSMProxyDefinitionManager.h"
 
-#include "vtkObjectFactory.h"
-#include "vtkInstantiator.h"
-#include "vtkPVXMLElement.h"
-#include "vtkPVXMLParser.h"
-#include "vtkSmartPointer.h"
-#include "vtkSMProxyDefinitionIterator.h"
-#include "vtkStdString.h"
-#include "vtkStringList.h"
-// #include "vtkSMProxyManager.h" // FIXME <===========================================================================
-#include "vtkCommand.h"
 #include "vtkCollection.h"
 #include "vtkCollectionIterator.h"
+#include "vtkCommand.h"
+#include "vtkInstantiator.h"
+#include "vtkObjectFactory.h"
+#include "vtkPVConfig.h"
+#include "vtkPVXMLElement.h"
+#include "vtkPVXMLParser.h"
+#include "vtkSMGeneratedModules.h"
+#include "vtkSMProxyDefinitionIterator.h"
+#include "vtkSmartPointer.h"
+#include "vtkStdString.h"
+#include "vtkStringList.h"
 
+// #include "vtkSMProxyManager.h" // FIXME <===========================================================================
 #include <vtkstd/map>
 #include <vtkstd/set>
 #include <vtkstd/string>
@@ -34,6 +36,8 @@
 #include <vtksys/DateStamp.h> // For date stamp
 #include <vtksys/ios/sstream>
 #include <vtksys/RegularExpression.hxx>
+
+#include <assert.h>
 
 //****************************************************************************/
 //                    Internal Classes and typedefs
@@ -371,6 +375,10 @@ vtkSMProxyDefinitionManager::vtkSMProxyDefinitionManager()
 {
   this->Internals = new vtkInternals;
   this->InternalsFlatten = new vtkInternals;
+
+  // Load the generated modules
+# include "vtkParaViewIncludeModulesToSMApplication.h"
+
 }
 
 //---------------------------------------------------------------------------
