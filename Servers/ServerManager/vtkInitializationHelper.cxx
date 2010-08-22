@@ -117,6 +117,7 @@ void vtkInitializationHelper::Initialize(int argc, char**argv,
 
   vtkProcessModule2::Initialize(
     static_cast<vtkProcessModule2::ProcessTypes>(type), argc, argv);
+
   vtksys_ios::ostringstream sscerr;
   if (argv && !options->Parse(argc, argv) )
     {
@@ -146,6 +147,8 @@ void vtkInitializationHelper::Initialize(int argc, char**argv,
     vtkOutputWindow::GetInstance()->DisplayText(name);
     // TODO: indicate to the caller that application must quit.
     }
+
+  vtkProcessModule2::GetProcessModule()->SetOptions(options);
 
   // FIXME
   // vtkSMProperty::SetCheckDomains(0);

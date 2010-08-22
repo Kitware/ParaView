@@ -37,7 +37,9 @@ int main(int argc, char* argv[])
   vtkMultiProcessController* controller = pm->GetGlobalController();
   if (controller->GetLocalProcessId() > 0)
     {
-    // satellite.
+    // satellites never wait for client connections. They simply have 1 session
+    // instance and then they simply listen for the root node to issue requests
+    // for actions.
     vtkSMSession* session = vtkSMSession::New();
     controller->ProcessRMIs();
     session->Delete();
@@ -47,14 +49,18 @@ int main(int argc, char* argv[])
     vtkNetworkAccessManager* nam = pm->GetNetworkAccessManager();
     vtkSMSessionServer* session = vtkSMSessionServer::New();
     cout << "Waiting for client" << endl;
-    cout << session->Connect("cs://localhost:11111") << endl;
-    // TODO: detect when a error happens in processing events.
-    while (nam->ProcessEvents(0) != -1)
+    if (session->Connect())
       {
-      // more
+      // TODO: detect when an error happens in processing events.
+      while (nam->ProcessEvents(0) != -1)
+        {
+        // more
+        }
       }
     cout << "Exiting..." << endl;
     session->Delete();
     }
+  vtkInitializationHelper::Finalize();
+  options->Delete();
   return ret_value;
 }

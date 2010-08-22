@@ -19,6 +19,7 @@
 #include "vtkNetworkAccessManager.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule2.h"
+#include "vtkPVOptions.h"
 #include "vtkPVConfig.h"
 #include "vtkSMSessionClient.h"
 #include "vtkSocketCommunicator.h"
@@ -93,6 +94,40 @@ void vtkSMSessionServer::SetClientController(
 }
 
 //----------------------------------------------------------------------------
+bool vtkSMSessionServer::Connect()
+{
+  vtksys_ios::ostringstream url;
+
+  vtkProcessModule2* pm = vtkProcessModule2::GetProcessModule();
+  vtkPVOptions* options = pm->GetOptions();
+
+  switch (pm->GetProcessType())
+    {
+  case vtkProcessModule2::PROCESS_SERVER:
+    url << "cs";
+    url << ((options->GetReverseConnection())?  "rc://" : "://");
+    url << options->GetClientHostName() << ":" << options->GetServerPort();
+    break;
+
+  case vtkProcessModule2::PROCESS_RENDER_SERVER:
+  case vtkProcessModule2::PROCESS_DATA_SERVER:
+    url << "cdsrs";
+    url << ((options->GetReverseConnection())?  "rc://" : "://");
+    url << options->GetClientHostName() << ":" << options->GetDataServerPort()
+      << "/"
+      << options->GetClientHostName() << ":" << options->GetRenderServerPort();
+    break;
+
+  default:
+    vtkErrorMacro("vtkSMSessionServer cannot be created on this process type.");
+    return false;
+    }
+
+  cout << "Connection URL: " << url.str() << endl;
+  return this->Connect(url.str().c_str());
+}
+
+//----------------------------------------------------------------------------
 bool vtkSMSessionServer::Connect(const char* url)
 {
   vtkNetworkAccessManager* nam =
@@ -123,7 +158,7 @@ bool vtkSMSessionServer::Connect(const char* url)
     int port = atoi(pvserver_reverse.match(3).c_str());
     port = (port == 0)? 11111: port;
     vtksys_ios::ostringstream stream;
-    stream << "tcp://localhost:" << port << "?listen=true&" << handshake.str();
+    stream << "tcp://localhost:" << port << "?" << handshake.str();
     client_url = stream.str();
 
     using_reverse_connect = true;
@@ -131,10 +166,10 @@ bool vtkSMSessionServer::Connect(const char* url)
 
   vtkMultiProcessController* ccontroller =
     nam->NewConnection(client_url.c_str());
-  if (nam)
+  if (ccontroller)
     {
     this->SetClientController(ccontroller);
-    nam->Delete();
+    ccontroller->Delete();
     }
 
   // TODO:

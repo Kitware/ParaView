@@ -45,6 +45,11 @@ public:
   virtual bool Connect(const char* url);
 
   // Description:
+  // Overload that constructs the url using the command line parameters
+  // specified and then calls Connect(url).
+  bool Connect();
+
+  // Description:
   // Returns true is this session is active/alive/valid.
   virtual bool GetIsAlive();
 
