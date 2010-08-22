@@ -28,6 +28,7 @@ SET (Kit_SRCS
   vtkSMSessionCore.cxx
   vtkSMSession.cxx
   vtkSMSessionServer.cxx
+  vtkSMRemoteObject.cxx
   )
 
 IF (FIXME)
@@ -261,11 +262,11 @@ SET_SOURCE_FILES_PROPERTIES(
   vtkSMSession.cxx
   vtkInitializationHelper.cxx
   vtkPMObject.cxx
+  vtkSMRemoteObject.cxx
   ABSTRACT
   )
 
 #SET_SOURCE_FILES_PROPERTIES(
-#  vtkSMSessionCore.cxx
 #  WRAP_EXCLUDE)
 
 IF (FIXME)
