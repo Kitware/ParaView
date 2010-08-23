@@ -46,6 +46,10 @@
 #ifdef H5_HAVE_STDINT_H
 #   include <stdint.h>		/*for C9x types				     */
 #endif
+#else
+#ifdef H5_HAVE_STDINT_H_CXX
+#   include <stdint.h>		/*for C9x types				     */
+#endif
 #endif
 #ifdef H5_HAVE_INTTYPES_H
 #   include <inttypes.h>        /* For uint64_t on some platforms            */
