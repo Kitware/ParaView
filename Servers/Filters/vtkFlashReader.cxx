@@ -1775,7 +1775,7 @@ vtkFlashReader::vtkFlashReader()
 
   this->FileName = NULL;
   this->Internal = new vtkFlashReaderInternal;
-  this->MaximumNumberOfBlocks = 100;
+  this->MaximumNumberOfBlocks = -1;
   this->LoadParticles   = 1;
   this->LoadMortonCurve = 0;
   this->BlockOutputType = 0;
@@ -2348,7 +2348,8 @@ void vtkFlashReader::GenerateBlockMap()
       }
     }
   
-  while (((int)(this->ToGlobalBlockMap.size())+7) <= this->MaximumNumberOfBlocks)
+  while (((int)(this->ToGlobalBlockMap.size())+7) <= this->MaximumNumberOfBlocks ||
+    this->MaximumNumberOfBlocks < 0)
     { // Find the block with the highest rank.
     int bestIdx = 0;
     double bestRank = -1.0;
