@@ -18,11 +18,13 @@
 #include "vtkCellType.h"
 #include "vtkCommunicator.h"
 #include "vtkKdTreeGenerator.h"
+#include "vtkMultiBlockDataSet.h"
+#include "vtkMultiPieceDataSet.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
 #include "vtkPKdTree.h"
-#include "vtkPoints.h"
 #include "vtkPVUpdateSuppressor.h"
+#include "vtkPoints.h"
 #include "vtkSmartPointer.h"
 #include "vtkSphereSource.h"
 #include "vtkUnstructuredGrid.h"
@@ -108,16 +110,15 @@ void vtkKdTreeManager::SetKdTree(vtkPKdTree* tree)
 void vtkKdTreeManager::Update()
 {
   vtkAlgorithmSet::iterator iter;
-  vtkstd::vector<vtkDataSet*> outputs;
-  vtkstd::vector<vtkDataSet*>::iterator dsIter;
+  vtkstd::vector<vtkDataObject*> outputs;
+  vtkstd::vector<vtkDataObject*>::iterator dsIter;
   
   bool update_required =  (this->GetMTime() > this->UpdateTime);
 
   // Update all inputs.
   for (iter = this->Producers->begin(); iter != this->Producers->end(); ++iter)
     {
-    vtkDataSet*output = vtkDataSet::SafeDownCast(
-      iter->GetPointer()->GetOutputDataObject(0));
+    vtkDataObject *output = iter->GetPointer()->GetOutputDataObject(0);
     if (output)
       {
       outputs.push_back(output);
@@ -161,7 +162,7 @@ void vtkKdTreeManager::Update()
     }
   for (dsIter = outputs.begin(); dsIter != outputs.end(); ++dsIter)
     {
-    this->AddDataSetToKdTree(*dsIter);
+    this->AddDataObjectToKdTree(*dsIter);
     } 
 
   if (this->StructuredProducer)
@@ -183,7 +184,48 @@ void vtkKdTreeManager::Update()
     }
 
   this->KdTree->BuildLocator();
+  //this->KdTree->PrintTree();
   this->UpdateTime.Modified();
+}
+
+//-----------------------------------------------------------------------------
+void vtkKdTreeManager::AddDataObjectToKdTree(vtkDataObject* data)
+{
+
+  // FIXME: Need to determine if vtkKdTree needs same number of datasets on all
+  // processes. If not, we won't have to ensure that empty blocks are passed in
+  // as well.
+  vtkMultiBlockDataSet* mbs = vtkMultiBlockDataSet::SafeDownCast(data);
+  if (!mbs)
+    {
+    vtkDataSet* ds = vtkDataSet::SafeDownCast(data);
+    this->AddDataSetToKdTree(ds);
+    return;
+    }
+
+  unsigned int numBlocks = mbs->GetNumberOfBlocks();
+  for (unsigned int cc=0; cc < numBlocks; cc++)
+    {
+    vtkDataObject* block = mbs->GetBlock(cc);
+    vtkMultiPieceDataSet* mps = vtkMultiPieceDataSet::SafeDownCast(block);
+    // for vtkPKdTree to work correctly, we need ensure that the number of
+    // inputs on all processes match up. To ensure that for composite datasets,
+    // we add each leaf (NULL or not). However, when we add a NULL leaf,
+    // AddDataSetToKdTree() automatically creates an empty dataset for it. For
+    // multi-piece datasets, we know that the vtkPVGeometryFilter has already
+    // appended all pieces into the first piece on all processes. So we don't
+    // bother passing the other pieces for vtkPKdTree thus avoiding having to
+    // create empty datasets for the other pieces which will be empty on all
+    // processes.
+    if (mps)
+      {
+      this->AddDataObjectToKdTree(mps->GetPiece(0));
+      }
+    else
+      {
+      this->AddDataObjectToKdTree(block);
+      }
+    }
 }
 
 //-----------------------------------------------------------------------------
