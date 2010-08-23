@@ -185,9 +185,15 @@ class Proxy(object):
                 del args['registrationName']
             pxm = ProxyManager()
             pxm.RegisterProxy(registrationGroup, registrationName, self.SMProxy)
+        update = True
+        if 'no_update' in args:
+            if args['no_update']:
+                update = False
+            del args['no_update']
+        if update:
+            self.UpdateVTKObjects()
         for key in args.keys():
             setattr(self, key, args[key])
-        self.UpdateVTKObjects()
         # Visit all properties so that they are created
         for prop in self:
             pass
