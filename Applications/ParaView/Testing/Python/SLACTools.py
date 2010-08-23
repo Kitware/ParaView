@@ -47,6 +47,12 @@ QtTesting.playCommand(object11, 'activate', '')
 
 #Image compare
 snapshotWidget = 'pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/0/Viewport'
+# For some reason, the snapshot is being grabbed before the image is updated
+# when the dialog closes.  To get around this issue, simulate a mouse click
+# in the view.  I'm not really happy with this hack because it won't catch if
+# accepting the dialog really doesn't render the final view.
+QtTesting.playCommand(snapshotWidget, 'mousePress', '(0.5,0.5,1,1,0)')
+QtTesting.playCommand(snapshotWidget, 'mouseRelease', '(0.5,0.5,1,0,0)')
 QtTestingImage.compareImage(snapshotWidget, 'SLACToolsInitialLoad.png', 300, 300);
 
 

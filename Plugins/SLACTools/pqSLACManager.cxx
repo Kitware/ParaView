@@ -843,6 +843,7 @@ void pqSLACManager::showStandardViewpoint()
     view->resetViewDirection(1, 0, 0,
                              0, 1, 0);
     }
+  view->render();
 }
 
 //-----------------------------------------------------------------------------
