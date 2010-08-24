@@ -43,7 +43,7 @@ public:
 
   virtual void SetRenderWindow(vtkRenderWindow *renwin);
 
-  //void ComputeCameraNew(vtkCamera* cam);
+  void ComputeCameraNew(vtkCamera* cam);
   void ComputeCamera(vtkCamera* cam);
   void SetNumberOfDisplays(int numberOfDisplays);
   void SetDisplay(double idx, double origin0, double origin1, double origin2,
@@ -51,13 +51,13 @@ public:
                               double y0, double y1, double y2);
   void DefineDisplay(int idx, double origin[3], double x[3], double y[3]);
 
-  //Description:
+  // Description:
   // This method is used to configure the display at startup. The
   // display is only configurable if the head tracking is set. The
   // typical use case is a CAVE like VR setting and we would like the
   // head-tracked camera to be aware of the display in the room
   // coordinates.
-  // void SetDisplayConfig();
+  void SetDisplayConfig();
 
 protected:
   vtkCaveRenderManager();
@@ -75,8 +75,8 @@ protected:
   // Description:
   // This sets the SurfaceRot transfromation based on the screen
   // basis and the room basis
-  // void SetSurfaceRotation( double xBase[3], double yBase[3], double zBase[3],
-  // 			   double xRoom[3], double yRoom[3], double zRoom[3] );
+  void SetSurfaceRotation( double xBase[3], double yBase[3], double zBase[3],
+                           double xRoom[3], double yRoom[3], double zRoom[3] );
 
 
   int ContextDirty;
@@ -90,12 +90,12 @@ protected:
   double DisplayY[4];
 
   // parms to send
-  // vtkMatrix4x4 *SurfaceRot;
-  // double O2Screen;
-  // double O2Right;
-  // double O2Left;
-  // double O2Top;
-  // double O2Bottom;
+  vtkMatrix4x4 *SurfaceRot;
+  double O2Screen;
+  double O2Right;
+  double O2Left;
+  double O2Top;
+  double O2Bottom;
 
 private:
   vtkCaveRenderManager(const vtkCaveRenderManager&); // Not implemented
