@@ -645,13 +645,17 @@ int vtkPVGeometryFilter::RequestCompositeData(vtkInformation*,
   if (this->Controller && this->Controller->GetNumberOfProcesses() > 1)
     {
     int count = static_cast<int>(non_null_leaves.size());
-    this->Controller->AllReduce(&count, &count, 1, vtkCommunicator::MAX_OP);
-    assert(count >= non_null_leaves.size());
-    non_null_leaves.resize(count);
-    this->Controller->AllReduce(&non_null_leaves[0], &non_null_leaves[0], count, vtkCommunicator::MAX_OP);
+    int reduced_size;
+    this->Controller->AllReduce(&count, &reduced_size, 1, vtkCommunicator::MAX_OP);
+    assert(reduced_size >= static_cast<int>(non_null_leaves.size()));
+    non_null_leaves.resize(reduced_size, 0);
+    vtkstd::vector<unsigned char>reduced_non_null_leaves;
+    reduced_non_null_leaves.resize(reduced_size, 0);
+    this->Controller->AllReduce(
+      &non_null_leaves[0], &reduced_non_null_leaves[0],
+      reduced_size, vtkCommunicator::MAX_OP);
 
     vtkPolyData* trivalInput = vtkPolyData::New();
-
     iter->SkipEmptyNodesOff();
     for (iter->InitTraversal(); !iter->IsDoneWithTraversal();
       iter->GoToNextItem())
