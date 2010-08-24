@@ -52,7 +52,7 @@
 
 #ifdef VTK_USE_MPI
 #include "vtkMPICommunicator.h"
-#include "vtkAllToNRedistributePolyData.h"
+#include "vtkAllToNRedistributeCompositePolyData.h"
 #endif
 
 #include <vtkstd/vector>
@@ -565,12 +565,10 @@ int vtkMPIMoveData::RequestData(vtkInformation*,
 //-----------------------------------------------------------------------------
 // Use LANL filter to redistribute the data.
 // We will marshal more than once, but that is OK.
-void vtkMPIMoveData::DataServerAllToN(vtkDataObject* inData,
-                                      vtkDataObject* outData, int n)
+void vtkMPIMoveData::DataServerAllToN(vtkDataObject* input,
+                                      vtkDataObject* output, int n)
 {
   vtkMultiProcessController* controller = this->Controller;
-  vtkPolyData* input = vtkPolyData::SafeDownCast(inData);
-  vtkPolyData* output = vtkPolyData::SafeDownCast(outData);
   int m;
 
   if (controller == 0)
@@ -598,20 +596,16 @@ void vtkMPIMoveData::DataServerAllToN(vtkDataObject* inData,
 
   // Perform the M to N operation.
 #ifdef VTK_USE_MPI
-  vtkPolyData* tmp;
-   vtkAllToNRedistributePolyData* AllToN = NULL;
-   vtkPolyData* inputCopy = vtkPolyData::New();
+   vtkAllToNRedistributeCompositePolyData* AllToN = NULL;
+   vtkDataObject* inputCopy = input->NewInstance();
    inputCopy->ShallowCopy(input);
-   AllToN = vtkAllToNRedistributePolyData::New();
+   AllToN = vtkAllToNRedistributeCompositePolyData::New();
    AllToN->SetController(controller);
    AllToN->SetNumberOfProcesses(n);
    AllToN->SetInput(inputCopy);
    inputCopy->Delete();
-   tmp = AllToN->GetOutput();
-   tmp->SetUpdateNumberOfPieces(this->UpdateNumberOfPieces);
-   tmp->SetUpdatePiece(this->UpdatePiece);
-   tmp->Update();
-   output->ShallowCopy(tmp);
+   AllToN->Update();
+   output->ShallowCopy(AllToN->GetOutputDataObject(0));
    AllToN->Delete();
    AllToN= 0;
 #endif

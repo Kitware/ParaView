@@ -563,6 +563,7 @@ int vtkPVGeometryFilter::RequestCompositeData(vtkInformation*,
   vtkSmartPointer<vtkCompositeDataIterator> iter;
   iter.TakeReference(input->NewIterator());
 
+
   vtkHierarchicalBoxDataIterator* hdIter =
     vtkHierarchicalBoxDataIterator::SafeDownCast(iter);
   unsigned int totNumBlocks=0;
@@ -571,6 +572,9 @@ int vtkPVGeometryFilter::RequestCompositeData(vtkInformation*,
     // iter skips empty blocks automatically.
     totNumBlocks++;
     }
+
+  vtkstd::vector<unsigned char> non_null_leaves;
+  non_null_leaves.reserve(totNumBlocks); //just an estimate.
 
   int numInputs = 0;
   for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
@@ -581,8 +585,19 @@ int vtkPVGeometryFilter::RequestCompositeData(vtkInformation*,
     this->ExecuteBlock(block, tmpOut, 0);
     this->ExecuteCellNormals(tmpOut, 0);
     this->RemoveGhostCells(tmpOut);
-    output->SetDataSet(iter, tmpOut);
-    tmpOut->FastDelete();
+    //skip empty nodes.
+    if (tmpOut->GetNumberOfPoints() > 0)
+      {
+      unsigned int current_flat_index = iter->GetCurrentFlatIndex();
+      non_null_leaves.resize(current_flat_index);
+      non_null_leaves[current_flat_index] = 1;
+      output->SetDataSet(iter, tmpOut);
+      tmpOut->FastDelete();
+      }
+    else
+      {
+      tmpOut->Delete();
+      }
 
     if (hdIter)
       {
@@ -620,6 +635,35 @@ int vtkPVGeometryFilter::RequestCompositeData(vtkInformation*,
   for (size_t cc=0; cc < pieces_to_merge.size(); cc++)
     {
     vtkPVGeometryFilterMergePieces(pieces_to_merge[cc]);
+    }
+
+  // Now, when running in parallel, processes may have NULL-leaf nodes at
+  // different locations. To make our life easier in subsquent filtering such as
+  // vtkAllToNRedistributeCompositePolyData or vtkKdTreeManager we ensure that
+  // all NULL-leafs match up across processes i.e. if any leaf is non-null on
+  // any process, then all other processes add empty polydatas for that leaf.
+  if (this->Controller && this->Controller->GetNumberOfProcesses() > 1)
+    {
+    int count = static_cast<int>(non_null_leaves.size());
+    this->Controller->AllReduce(&count, &count, 1, vtkCommunicator::MAX_OP);
+    assert(count >= non_null_leaves.size());
+    non_null_leaves.resize(count);
+    this->Controller->AllReduce(&non_null_leaves[0], &non_null_leaves[0], count, vtkCommunicator::MAX_OP);
+
+    vtkPolyData* trivalInput = vtkPolyData::New();
+
+    iter->SkipEmptyNodesOff();
+    for (iter->InitTraversal(); !iter->IsDoneWithTraversal();
+      iter->GoToNextItem())
+      {
+      unsigned int index = iter->GetCurrentFlatIndex();
+      if (iter->GetCurrentDataObject() == NULL && non_null_leaves[index] != 0)
+        {
+        output->SetDataSet(iter, trivalInput);
+        }
+      }
+
+    trivalInput->Delete();
     }
 
   vtkTimerLog::MarkEndEvent("vtkPVGeometryFilter::RequestCompositeData");

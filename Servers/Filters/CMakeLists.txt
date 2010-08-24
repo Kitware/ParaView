@@ -245,6 +245,7 @@ IF(VTK_USE_MPI)
   SET(Filters_SRCS ${Filters_SRCS}
     vtkBalancedRedistributePolyData.cxx
     vtkAllToNRedistributePolyData.cxx
+    vtkAllToNRedistributeCompositePolyData.cxx
     vtkRedistributePolyData.cxx
     vtkWeightedRedistributePolyData.cxx
     )

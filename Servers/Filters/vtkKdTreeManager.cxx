@@ -17,9 +17,9 @@
 #include "vtkAlgorithm.h"
 #include "vtkCellType.h"
 #include "vtkCommunicator.h"
+#include "vtkCompositeDataIterator.h"
+#include "vtkCompositeDataSet.h"
 #include "vtkKdTreeGenerator.h"
-#include "vtkMultiBlockDataSet.h"
-#include "vtkMultiPieceDataSet.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
 #include "vtkPKdTree.h"
@@ -192,10 +192,7 @@ void vtkKdTreeManager::Update()
 void vtkKdTreeManager::AddDataObjectToKdTree(vtkDataObject* data)
 {
 
-  // FIXME: Need to determine if vtkKdTree needs same number of datasets on all
-  // processes. If not, we won't have to ensure that empty blocks are passed in
-  // as well.
-  vtkMultiBlockDataSet* mbs = vtkMultiBlockDataSet::SafeDownCast(data);
+  vtkCompositeDataSet* mbs = vtkCompositeDataSet::SafeDownCast(data);
   if (!mbs)
     {
     vtkDataSet* ds = vtkDataSet::SafeDownCast(data);
@@ -203,29 +200,23 @@ void vtkKdTreeManager::AddDataObjectToKdTree(vtkDataObject* data)
     return;
     }
 
-  unsigned int numBlocks = mbs->GetNumberOfBlocks();
-  for (unsigned int cc=0; cc < numBlocks; cc++)
+  // for vtkPKdTree to work correctly, we need ensure that the number of
+  // inputs on all processes match up. To ensure that for composite datasets,
+  // we should add each leaf (NULL or not). However vtkPVGeometryFilter ensures
+  // that the non-null leafs match up on all processes. Hence we can avoid the
+  // extra headache.
+
+  vtkCompositeDataIterator* iter = mbs->NewIterator();
+  for (iter->InitTraversal(); !iter->IsDoneWithTraversal();
+    iter->GoToNextItem())
     {
-    vtkDataObject* block = mbs->GetBlock(cc);
-    vtkMultiPieceDataSet* mps = vtkMultiPieceDataSet::SafeDownCast(block);
-    // for vtkPKdTree to work correctly, we need ensure that the number of
-    // inputs on all processes match up. To ensure that for composite datasets,
-    // we add each leaf (NULL or not). However, when we add a NULL leaf,
-    // AddDataSetToKdTree() automatically creates an empty dataset for it. For
-    // multi-piece datasets, we know that the vtkPVGeometryFilter has already
-    // appended all pieces into the first piece on all processes. So we don't
-    // bother passing the other pieces for vtkPKdTree thus avoiding having to
-    // create empty datasets for the other pieces which will be empty on all
-    // processes.
-    if (mps)
+    vtkDataSet* ds = vtkDataSet::SafeDownCast(iter->GetCurrentDataObject());
+    if (ds)
       {
-      this->AddDataObjectToKdTree(mps->GetPiece(0));
-      }
-    else
-      {
-      this->AddDataObjectToKdTree(block);
+      this->AddDataSetToKdTree(ds);
       }
     }
+  iter->Delete();
 }
 
 //-----------------------------------------------------------------------------
