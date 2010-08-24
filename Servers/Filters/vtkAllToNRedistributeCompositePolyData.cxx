@@ -133,6 +133,8 @@ int vtkAllToNRedistributeCompositePolyData::RequestData(vtkInformation* request,
       pdOutput->FastDelete();
 
       allToN->SetInput(pdInput);
+      allToN->Modified(); //essential to force modification just in case the two
+          // blocks are the same polydata instance on any one of the processes.
       allToN->Update();
       pdOutput->ShallowCopy(allToN->GetOutput());
       }
