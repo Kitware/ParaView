@@ -79,80 +79,34 @@ void vtkSMStringVectorProperty::WriteTo(vtkSMMessage* msg)
 {
   ProxyState_Property *prop = msg->AddExtension(ProxyState::property);
   prop->set_name(this->GetXMLName());
-  Variant *var = 0;
-  for(unsigned int i=0;i<this->GetNumberOfElements();i++)
+  Variant *variant = prop->add_value();
+  variant->set_type(Variant::STRING);
+  for (unsigned int i=0;i<this->GetNumberOfElements();i++)
     {
-    // One element by variant
-    var = prop->add_value();
-    switch (this->GetElementType(i))
-      {
-      case INT:
-        var->set_type(Variant::INT);
-        var->add_integer(atoi(this->GetElement(i)));
-        break;
-      case DOUBLE:
-        var->set_type(Variant::FLOAT64);
-        var->add_float64(atof(this->GetElement(i)));
-        break;
-      case STRING:
-        var->set_type(Variant::STRING);
-        var->add_txt(this->GetElement(i));
-        break;
-      }
+    variant->add_txt(this->GetElement(i));
     }
 }
+
 //---------------------------------------------------------------------------
-void vtkSMStringVectorProperty::ReadFrom(vtkSMMessage* msg, int message_offset)
+void vtkSMStringVectorProperty::ReadFrom(vtkSMMessage* msg, int offset)
 {
-  //cout << ">>>>>>>>>>>>" << endl;
-  //msg->PrintDebugString();
-  //cout << "<<<<<<<<<<<<" << endl;
+  assert(msg->ExtensionSize(ProxyState::property) > offset);
 
-  bool found = false;
-  for(int i=0;i<msg->ExtensionSize(ProxyState::property);++i)
+  const ProxyState_Property *prop = &msg->GetExtension(ProxyState::property,
+    offset);
+  assert(strcmp(prop->name().c_str(), this->GetXMLName()) == 0);
+
+  const Variant *variant = &prop->value(0); // Only one type
+
+  int num_elems = variant->txt_size();
+  const char **values = new const char*[num_elems+1];
+  for (int cc=0; cc < num_elems; cc++)
     {
-    const ProxyState_Property *prop = &msg->GetExtension(ProxyState::property, i);
-    if(strcmp(prop->name().c_str(), this->GetXMLName()) == 0)
-      {
-      // Several variant but one element by variant
-      this->SetNumberOfElements(prop->value_size());
-
-      // Loop over variants
-      for(int i=0;i<prop->value_size();i++)
-        {
-        const Variant *value = &prop->value(i);
-        vtksys_ios::ostringstream oss;
-        switch(value->type())
-          {
-          case Variant::INT:
-            oss << value->integer(0); // One element by variant
-            this->SetElement(i, oss.str().c_str());
-            break;
-          case Variant::FLOAT64:
-            oss << value->float64(0); // One element by variant
-            this->SetElement(i, oss.str().c_str());
-            break;
-          case Variant::STRING:
-            this->SetNumberOfElements(value->txt_size());
-            this->SetElement(i, value->txt(0).c_str()); // One element by variant
-            break;
-          default:
-            break;
-          }
-        }
-
-      // Found the property, so exit the loop
-      found = true;
-      break;
-      }
+    values[cc] = variant->txt(cc).c_str();
     }
-  if(!found)
-    {
-    cout << "Not found " << this->GetXMLName() << endl;
-    // FIXME do nothing or throw exception ==================================================================================
-    }
+  this->SetElements(num_elems, values);
+  delete[] values;
 }
-
 
 //---------------------------------------------------------------------------
 void vtkSMStringVectorProperty::SetNumberOfUncheckedElements(unsigned int num)

@@ -64,36 +64,26 @@ void vtkSMIntVectorProperty::WriteTo(vtkSMMessage* msg)
 //---------------------------------------------------------------------------
 void vtkSMIntVectorProperty::ReadFrom(vtkSMMessage* msg, int offset)
 {
-  (void)msg;
-  (void)offset;
-#ifdef FIXME
-  // avoid this n^2 iteration to find the message belonging to this property.
   //cout << ">>>>>>>>>>>>" << endl;
   //msg->PrintDebugString();
   //cout << "<<<<<<<<<<<<" << endl;
 
-  bool found = false;
-  for(int i=0;i<msg->ExtensionSize(ProxyState::property);++i)
+  assert(msg->ExtensionSize(ProxyState::property) > offset);
+
+  const ProxyState_Property *prop = &msg->GetExtension(ProxyState::property,
+    offset);
+  assert(strcmp(prop->name().c_str(), this->GetXMLName()) == 0);
+
+  const Variant *variant = &prop->value(0); // Only one type
+
+  int num_elems = variant->integer_size();
+  int *values = new int[num_elems+1];
+  for (int cc=0; cc < num_elems; cc++)
     {
-    const ProxyState_Property *prop = &msg->GetExtension(ProxyState::property, i);
-    if(strcmp(prop->name().c_str(), this->GetXMLName()) == 0)
-      {
-      found = true;
-      const Variant *value = &prop->value(0); // Only one type
-      this->SetNumberOfElements(value->integer_size());
-      for(int i=0;i<value->integer_size();i++)
-        {
-        this->SetElement(i, value->integer(i));
-        }
-      break;
-      }
+    values[cc] = variant->integer(cc);
     }
-  if(!found)
-    {
-    cout << "Not found " << this->GetXMLName() << endl;
-    // FIXME do nothing or throw exception ==================================================================================
-    }
-#endif
+  this->SetElements(values, num_elems);
+  delete[] values;
 }
 
 //---------------------------------------------------------------------------

@@ -62,38 +62,24 @@ void vtkSMDoubleVectorProperty::WriteTo(vtkSMMessage* msg)
 }
 
 //---------------------------------------------------------------------------
-void vtkSMDoubleVectorProperty::ReadFrom(vtkSMMessage* msg, int message_offset)
+void vtkSMDoubleVectorProperty::ReadFrom(vtkSMMessage* msg, int offset)
 {
-  (void)msg;
-  (void)message_offset;
-#ifdef FIXME
-  // avoid this n^2 iteration to find the message belonging to this property.
-  //cout << ">>>>>>>>>>>>" << endl;
-  //msg->PrintDebugString();
-  //cout << "<<<<<<<<<<<<" << endl;
+  assert(msg->ExtensionSize(ProxyState::property) > offset);
 
-  bool found = false;
-  for(int i=0;i<msg->ExtensionSize(ProxyState::property);++i)
+  const ProxyState_Property *prop = &msg->GetExtension(ProxyState::property,
+    offset);
+  assert(strcmp(prop->name().c_str(), this->GetXMLName()) == 0);
+
+  const Variant *variant = &prop->value(0); // Only one type
+
+  int num_elems = variant->float64_size();
+  double *values = new double[num_elems];
+  for (int cc=0; cc < num_elems; cc++)
     {
-    const ProxyState_Property *prop = &msg->GetExtension(ProxyState::property, i);
-    if(strcmp(prop->name().c_str(), this->GetXMLName()) == 0)
-      {
-      found = true;
-      const Variant *value = &prop->value(0); // Only one type
-      this->SetNumberOfElements(value->float64_size());
-      for(int i=0;i<value->float64_size();i++)
-        {
-        this->SetElement(i, value->float64(i));
-        }
-      break;
-      }
+    values[cc] = variant->float64(cc);
     }
-  if(!found)
-    {
-    cout << "Not found " << this->GetXMLName() << endl;
-    // FIXME do nothing or throw exception ==================================================================================
-    }
-#endif
+  this->SetElements(values, num_elems);
+  delete[] values;
 }
 
 

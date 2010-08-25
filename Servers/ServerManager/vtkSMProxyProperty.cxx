@@ -361,6 +361,7 @@ void vtkSMProxyProperty::WriteTo(vtkSMMessage* msg)
 void vtkSMProxyProperty::ReadFrom(vtkSMMessage* msg, int message_offset)
 {
   (void)msg;
+  (void)message_offset;
 #ifdef FIXME
   bool found = false;
   for(int i=0;i<msg->ExtensionSize(ProxyState::property);++i)
