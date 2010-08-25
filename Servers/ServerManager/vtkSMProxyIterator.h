@@ -77,13 +77,6 @@ public:
   void SetModeToOneGroup() { this->SetMode(ONE_GROUP); }
   void SetModeToAll() { this->SetMode(ALL); }
 
-  // Description:
-  // If the connection ID is set, only the proxies with the connection
-  // ID are iterated over. By default the connection ID
-  // is set to NullConnectionID.
-  vtkSetMacro(ConnectionID, vtkIdType);
-  vtkGetMacro(ConnectionID, vtkIdType);
-
 //BTX
   enum TraversalMode
   {
@@ -98,8 +91,6 @@ protected:
   ~vtkSMProxyIterator();
 
   int Mode;
-  vtkIdType ConnectionID;
-
   void NextInternal();
 private:
   vtkSMProxyIteratorInternals* Internals;

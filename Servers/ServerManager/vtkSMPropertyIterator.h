@@ -71,19 +71,11 @@ public:
   // Returns the property at the current iterator position.
   virtual vtkSMProperty* GetProperty();
 
-  // Description:
-  // If TraverseSubProxies is false, only the properties belonging
-  // to the root proxy are returned. Default is true.
-  vtkSetMacro(TraverseSubProxies, int);
-  vtkGetMacro(TraverseSubProxies, int);
-
 protected:
   vtkSMPropertyIterator();
   ~vtkSMPropertyIterator();
 
   vtkSMProxy* Proxy;
-
-  int TraverseSubProxies;
 
 private:
   vtkSMPropertyIteratorInternals* Internals;

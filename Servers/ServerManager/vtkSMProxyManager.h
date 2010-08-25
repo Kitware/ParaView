@@ -25,8 +25,7 @@
 // Server connection on which the proxy exists. Changing the ConnectionID
 // must be done immediately after the proxy is instantiated.
 // .SECTION See Also
-// vtkSMXMLParser
-
+// vtkSMProxyDefinitionManager
 #ifndef __vtkSMProxyManager_h
 #define __vtkSMProxyManager_h
 
@@ -454,7 +453,6 @@ protected:
   friend class vtkSMProxyDefinitionIterator;
   friend class vtkSMProxyIterator;
   friend class vtkSMProxyManagerObserver;
-  friend class vtkSMXMLParser;
 
   // Description:
   // Given an XML element and group name create a proxy

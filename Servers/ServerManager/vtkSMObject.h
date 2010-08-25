@@ -33,9 +33,9 @@ public:
   vtkTypeMacro(vtkSMObject, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  //// Description:
-  //// Proxy manager singleton stores all proxy groups and instances.
-  //static vtkSMProxyManager* GetProxyManager();
+  // Description:
+  // Proxy manager singleton stores all proxy groups and instances.
+  static vtkSMProxyManager* GetProxyManager();
 
   //// Description:
   //// Application singleton is used to initialize server manager

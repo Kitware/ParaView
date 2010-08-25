@@ -58,9 +58,6 @@ struct vtkSMProxyInternals
 
   vtkstd::vector<int> ServerIDs;
 
-  typedef vtkstd::map<vtkStdString,  vtkSmartPointer<vtkSMProxy> > ProxyMap;
-  ProxyMap SubProxies;
-
   struct ConnectionInfo
   {
     ConnectionInfo(vtkSMProperty* prop, vtkSMProxy* prox) : Property(prop),
@@ -70,22 +67,7 @@ struct vtkSMProxyInternals
   };
   vtkstd::vector<ConnectionInfo> Consumers;
   vtkstd::vector<ConnectionInfo> Producers;
- 
-  struct ExposedPropertyInfo
-  {
-    vtkStdString SubProxyName;
-    vtkStdString PropertyName;
-  };
 
-  // Map for exposed properties. The key is the exposed property name,
-  // value is a ExposedPropertyInfo object which indicates the subproxy name
-  // and the property name in that subproxy.
-  typedef vtkstd::map<vtkStdString, ExposedPropertyInfo> ExposedPropertyInfoMap;
-  ExposedPropertyInfoMap ExposedProperties;
-
-  // Vector of vtkSMProxyLink for shared properties among subproxies.
-  typedef  vtkstd::vector<vtkSmartPointer<vtkSMProxyLink> > SubProxyLinksType;
-  SubProxyLinksType SubProxyLinks;
 };
 
 #endif

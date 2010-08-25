@@ -25,7 +25,9 @@
 #include "vtkPVXMLParser.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMCompoundProxyDefinitionLoader.h"
+#ifdef FIXME
 #include "vtkSMCompoundSourceProxy.h"
+#endif
 #include "vtkSMDocumentation.h"
 #include "vtkSMPropertyIterator.h"
 #include "vtkSMProxyDefinitionIterator.h"
@@ -38,7 +40,6 @@
 #include "vtkSMStateLoader.h"
 #include "vtkSMUndoStack.h"
 #include "vtkSMWriterFactory.h"
-#include "vtkSMXMLParser.h"
 #include "vtkStdString.h"
 #include "vtkStringList.h"
 
@@ -192,8 +193,7 @@ void vtkSMProxyManager::InstantiateGroupPrototypes(const char* groupName)
       vtkSMProxy* proxy = this->NewProxy(groupName, xml_name);
       if (proxy)
         {
-        proxy->SetConnectionID(
-          vtkProcessModuleConnectionManager::GetNullConnectionID());
+        proxy->SetSession(NULL);
         this->RegisterProxy(newgroupname.str().c_str(), xml_name, proxy);
         proxy->FastDelete();
         }
@@ -272,8 +272,10 @@ vtkSMProxy* vtkSMProxyManager::NewProxy(vtkPVXMLElement* pelement,
                                         const char* groupname,
                                         const char* proxyname)
 {
+
   if (strcmp(pelement->GetName(), "CompoundSourceProxy") == 0)
     {
+#ifdef FIX
     vtkSMCompoundProxyDefinitionLoader* loader =
       vtkSMCompoundProxyDefinitionLoader::New();
     vtkSMCompoundSourceProxy* cproxy = loader->LoadDefinition(pelement);
@@ -284,6 +286,8 @@ vtkSMProxy* vtkSMProxyManager::NewProxy(vtkPVXMLElement* pelement,
       cproxy->SetXMLGroup(groupname);
       }
     return cproxy;
+#endif
+    return 0;
     }
 
   vtkObject* object = 0;
@@ -404,8 +408,7 @@ vtkSMProxy* vtkSMProxyManager::GetPrototypeProxy(const char* groupname,
     {
     return 0;
     }
-  proxy->SetConnectionID(
-    vtkProcessModuleConnectionManager::GetNullConnectionID());
+  proxy->SetSession(NULL);
   // register the proxy as a prototype.
   this->RegisterProxy(protype_group.c_str(), name, proxy);
   proxy->Delete();
@@ -719,12 +722,11 @@ void vtkSMProxyManager::UnRegisterProxy(vtkSMProxy* proxy)
 }
 
 //---------------------------------------------------------------------------
-void vtkSMProxyManager::UnRegisterProxies(vtkIdType cid)
+void vtkSMProxyManager::UnRegisterProxies(vtkIdType)
 {
   vtkstd::vector<vtkSMProxyManagerProxyInformation> toUnRegister;
   vtkSMProxyIterator* iter = vtkSMProxyIterator::New();
   iter->SetModeToAll();
-  iter->SetConnectionID(cid);
 
   for (iter->Begin(); !iter->IsAtEnd(); iter->Next())
     {
@@ -1617,14 +1619,8 @@ vtkSMGlobalPropertiesManager* vtkSMProxyManager::GetGlobalPropertiesManager(
 //---------------------------------------------------------------------------
 bool vtkSMProxyManager::LoadConfigurationXML(const char* xml)
 {
-  vtkSmartPointer<vtkSMXMLParser> parser =
-    vtkSmartPointer<vtkSMXMLParser>::New();
-  if (xml && parser->Parse(xml))
-    {
-    parser->ProcessConfiguration(this);
-    return true;
-    }
-  return false;
+  assert(this->ProxyDefinitionManager != 0);
+  return this->ProxyDefinitionManager->LoadConfigurationXML(xml);
 }
 
 //---------------------------------------------------------------------------

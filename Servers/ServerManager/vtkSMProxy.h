@@ -120,7 +120,7 @@
 #ifndef __vtkSMProxy_h
 #define __vtkSMProxy_h
 
-#include "vtkSMObject.h"
+#include "vtkSMRemoteObject.h"
 #include "vtkClientServerID.h" // needed for vtkClientServerID
 
 //BTX
@@ -136,27 +136,17 @@ class vtkSMProxyObserver;
 class vtkClientServerStream;
 class vtkSMProxyLocator;
 
-class VTK_EXPORT vtkSMProxy : public vtkSMObject
+class VTK_EXPORT vtkSMProxy : public vtkSMRemoteObject
 {
 public:
   static vtkSMProxy* New();
-  vtkTypeMacro(vtkSMProxy, vtkSMObject);
+  vtkTypeMacro(vtkSMProxy, vtkSMRemoteObject);
   void PrintSelf(ostream& os, vtkIndent indent);
-
-  // Description:
-  // Add a property with the given key (name). The name can then
-  // be used to retrieve the property with GetProperty(). If a
-  // property with the given name has been added before, it will
-  // be replaced. This includes properties in sub-proxies.
-  void AddProperty(const char* name, vtkSMProperty* prop);
 
   // Description:
   // Return the property with the given name. If no property is found
   // NULL is returned.
-  vtkSMProperty* GetProperty(const char* name) 
-    {
-      return this->GetProperty(name, 0);
-    }
+  virtual vtkSMProperty* GetProperty(const char* name);
 
   // Description:
   // Given a property pointer, returns the name that was used
@@ -191,21 +181,6 @@ public:
     }
 
   // Description:
-  // Calls UpdateVTKObjects() on self and all proxies that depend
-  // on this proxy (through vtkSMProxyProperty properties). It will
-  // traverse the dependence tree and update starting from the source.
-  // This allows instantiating a whole pipeline (including connectivity)
-  // without having to worry about the order. Here is how to do it:
-  // \li * Create all proxies
-  // \li * Set all property values - make sure that input properties
-  //      do not auto update by calling 
-  //      vtkSMInputProperty::SetInputsUpdateImmediately(0); 
-  // \li * Call UpdateSelfAndAllInputs() on either all proxies or
-  //   one that depends on all others (usually one or more DisplayWindows)
-  // \li * If necessary vtkSMInputProperty::SetInputsUpdateImmediately(1); 
-  virtual void UpdateSelfAndAllInputs();
-
-  // Description:
   // Returns the type of object managed by the proxy.
   vtkGetStringMacro(VTKClassName);
 
@@ -214,37 +189,6 @@ public:
   // This is used only when creating the server objects. Once the server
   // object(s) have been created, changing this has no effect.
   vtkSetStringMacro(VTKClassName);
-
-  // Description:
-  // Overloaded to break the reference loop caused by the fact that
-  // proxies store their own ClientServer ids.
-  // Overloaded also for garbage collection.
-  virtual void UnRegister(vtkObjectBase* obj);
-
-  // Description:
-  // Overloaded also for garbage collection.
-  virtual void Register(vtkObjectBase* obj);
-
-  // Description:
-  // Returns the id of a server object.
-  int GetIDAsInt()
-  {
-    vtkClientServerID id = this->GetID();
-    return id.ID;
-  }
-
-//BTX
-  // Description:
-  // Returns the id of a server object.
-  vtkClientServerID GetID();
-
-  // Description:
-  // Returns the Self ID of the proxy.
-  // If the SelfID is not assigned yet, then this method will assign this proxy
-  // a unique SelfID on the interpretor for the connection on which this 
-  // proxy exists i.e. this->ConnectionID.
-  vtkClientServerID GetSelfID();
-//ETX
 
   // Description:
   // Returns a new (initialized) iterator of the properties.
@@ -321,22 +265,6 @@ public:
   // property values in the properties is synced with the values in the
   // actual objects.
   virtual void MarkAllPropertiesAsModified();
-  
-  // Description:
-  // Set server ids on self and sub-proxies.
-  virtual void SetServers(vtkTypeUInt32 servers);
- 
-  // Description:
-  // Return the servers.
-  vtkTypeUInt32 GetServers();
-
-  // Description:
-  // Set the server connection ID on self and sub-proxies.
-  virtual void SetConnectionID(vtkIdType id);
-
-  // Description:
-  // Returns the server connection ID.
-  vtkIdType GetConnectionID();
 
 //BTX
   // Description:
@@ -369,11 +297,6 @@ public:
   virtual void MarkModified(vtkSMProxy* modifiedProxy);
 
   // Description:
-  // Returns the self ID as string. If the name was overwritten
-  // with SetName(), it returns that instead.
-  const char* GetSelfIDAsString();
-
-  // Description:
   // Returns the documentation for this proxy.
   vtkGetObjectMacro(Documentation, vtkSMDocumentation);
 
@@ -391,71 +314,6 @@ public:
   vtkGetMacro(ObjectsCreated, int);
 
   // Description:
-  // Given a source proxy, makes this proxy point to the same server-side
-  // object (with a new id). This method copies connection id as well as
-  // server ids. This method can be called only once on an uninitialized
-  // proxy (CreateVTKObjects() also initialized a proxy) This is useful to
-  // make two (or more) proxies represent the same VTK object. This method
-  // does not copy IDs for any subproxies.
-  void InitializeAndCopyFromProxy(vtkSMProxy* source);
-
-//BTX
-  // Description:
-  // Initializes this proxy with the given id for an already created server
-  // side object. Make sure to set Servers before calling this method.
-  // This method will call CreateVTKObjects() on all sub-proxies. This
-  // method can be called only once on an uninitialized proxy
-  // (CreateVTKObjects() also initialized a proxy)
-  virtual void InitializeWithID(vtkClientServerID id);
-
-  // Description:
-  // Initializes this proxy with a new id referring to the same object on the
-  // server as of the given id already created server
-  // side object. Make sure to set Servers before calling this method.
-  // This method will call CreateVTKObjects() on all sub-proxies. This
-  // method can be called only once on an uninitialized proxy
-  // (CreateVTKObjects() also initialized a proxy)
-  virtual void InitializeAndCopyFromID(vtkClientServerID id);
-//ETX
-
-  // Description:
-  // Saves the state of the proxy. This state can be reloaded
-  // to create a new proxy that is identical the present state of this proxy.
-  // The resulting proxy's XML hieratchy is returned, in addition if the root
-  // argument is not NULL then it's also inserted as a nested element.
-  // This call saves all a proxy's properties, including exposed properties
-  // and sub-proxies. More control is provided by the following overload.
-  virtual vtkPVXMLElement* SaveState(vtkPVXMLElement* root);
-
-  // Description:
-  // Saves the state of the proxy. This state can be reloaded
-  // to create a new proxy that is identical the present state of this proxy.
-  // The resulting proxy's XML hieratchy is returned, in addition if the root
-  // argument is not NULL then it's also inserted as a nested element.
-  // The iterator argument is provided as a means for subsetting properties.
-  // The saveSubProxies argument turns on and off the saving of sub-proxies.
-  virtual vtkPVXMLElement* SaveState(
-        vtkPVXMLElement* root,
-        vtkSMPropertyIterator *iter,
-        int saveSubProxies);
-
-  // Description:
-  // Loads the proxy state from the XML element. Returns 0 on failure.
-  // \c locator is used to locate other proxies that may be referred to in the
-  // state XML (which happens in case of properties of type vtkSMProxyProperty
-  // or subclasses). If locator is NULL, then such properties are left
-  // unchanged.
-  virtual int LoadState(vtkPVXMLElement* element, vtkSMProxyLocator* locator);
-
-  // Description:
-  // Same as LoadState except that the proxy will try to undo the changes
-  // recorded in the state. Default implementation simply throws an warning.
-  // Subclasses that don't have traditional properties but fire
-  // vtkCommand::StateChangedEvent to capture state changes, need to override
-  // this method to support undo/redo.
-  virtual int RevertState(vtkPVXMLElement* element, vtkSMProxyLocator* locator);
-
-  // Description:
   // Dirty means this algorithm will execute during next update.
   // This all marks all consumers as dirty.
   virtual void MarkDirty(vtkSMProxy* modifiedProxy);
@@ -471,31 +329,16 @@ protected:
   ~vtkSMProxy();
 
   // Description:
+  // Add a property with the given key (name). The name can then
+  // be used to retrieve the property with GetProperty(). If a
+  // property with the given name has been added before, it will
+  // be replaced. This includes properties in sub-proxies.
+  virtual void AddProperty(const char* name, vtkSMProperty* prop);
+
+
+  // Description:
   // Calls MarkDirty() on all consumers.
   virtual void MarkConsumersAsDirty(vtkSMProxy* modifiedProxy);
-
-
-  // Description:
-  // Overloaded for garbage collection.
-  virtual void ReportReferences(vtkGarbageCollector* collector);
-
-  // Description:
-  // Expose a subproxy property from the base proxy. The property with the name
-  // "property_name" on the subproxy with the name "subproxy_name" is exposed 
-  // with the name "exposed_name". 
-  // If the overrideOK flag is set, then no warning is printed when a new 
-  // exposed property replaces a preexisting one.
-  void ExposeSubProxyProperty(const char* subproxy_name, 
-                              const char* property_name,
-                              const char* exposed_name,
-                              int overrideOK = 0);
-
-
-  // Description:
-  // Pushes the property. For non update-self properties, the command is
-  // collected in the stream and not pushed directly.
-  bool UpdatePropertyInternal(const char* name, bool force,
-    vtkClientServerStream& stream);
 
   // Description:
   // These classes have been declared as friends to minimize the
@@ -541,52 +384,10 @@ protected:
   vtkSetStringMacro(XMLLabel);
 
   // Description:
-  // It is possible to set the SelfID for a proxy. However then the setter
-  // has the responsiblity to ensure that the ID is going to be unique 
-  // for the lifetime of the proxy. Also the SelfID can be set, only before
-  // an ID was assigned to the proxy. 
-  void SetSelfID(vtkClientServerID id);
-
-  // Description:
-  // Returns the Self ID of the proxy.
-  // Note: unlike GetSelfID(), this method simply return SelfID without assigning it 
-  // if the SelfID is not assigned yet, so the SelfID.ID could be zero.
-  vtkClientServerID GetSelfIDInternal()
-    { return this->SelfID; }
-  
-  // Description:
   // Given a class name (by setting VTKClassName) and server ids (by
   // setting ServerIDs), this methods instantiates the objects on the
   // server(s)
   virtual void CreateVTKObjects();
-
-  // Description:
-  // This method is complementary to CreateVTKObjects() when we want the
-  // proxy to reuse the VTK object ID are defined. When reviving a proxy
-  // on the client, this method creates new client-side objects and reuses
-  // the server side objects.  When reviving a proxy on the server, it
-  // reuses the server objects while creating new "client-only" objects on
-  // the server itself.
-  virtual void ReviveVTKObjects();
-
-  // Description:
-  // UnRegister all managed objects. This also resets the ID list.
-  // However, it does not remove the properties.
-  void UnRegisterVTKObjects();
-
-  // Description:
-  // Server IDs determine on which server(s) the VTK objects are
-  // instantiated. Use the following methods to set/get the server
-  // IDs. Server IDs have to be set before the object is created.
-  // Changing them after creation has no effect.
-  // See vtkProcessModule.h for a list of all server types.
-  // To add a server, OR it's value with the servers ivar.
-  // Set server ids on self
-  void SetServersSelf(vtkTypeUInt32 servers);
-
-  // Description:
-  // Set the server connection id on self.
-  void SetConnectionIDSelf(vtkIdType id);
 
   // Description:
   // Cleanup code. Remove all observers from all properties assigned to
@@ -617,67 +418,9 @@ protected:
   virtual void SetPropertyModifiedFlag(const char* name, int flag);
 
   // Description:
-  // Add a property to either self (subProxyName = 0) or a sub-proxy.
-  // \b IMPORTANT: If subProxyName = 0, AddProperty() checks for a
-  // proxy with the given name in self and all sub-proxies, if one
-  // exists, it replaces it. In this special case, it is possible for
-  // the property to be added to a sub-proxy as opposed to self.
-  void AddProperty(const char* subProxyName,
-                   const char* name, 
-                   vtkSMProperty* prop);
-
-  // Description:
   // Remove a property from the list.
   // If selfOnly is true, this method will not traverse into the subproxies.
   void RemoveProperty(const char* name);
-
-  // Description:
-  // Add a property to self.
-  void AddPropertyToSelf(const char* name, vtkSMProperty* prop);
-
-  // Description:
-  // Add a sub-proxy.
-  // If the overrideOK flag is set, then no warning is printed when a new 
-  // subproxy replaces a preexisting one.
-  void AddSubProxy(const char* name, vtkSMProxy* proxy,
-                   int overrideOK=0);
-
-  // Description:
-  // Remove a sub-proxy.
-  void RemoveSubProxy(const char* name);
-
-  // Description:
-  // Returns a sub-proxy. Returns 0 if sub-proxy does not exist.
-  vtkSMProxy* GetSubProxy(const char* name);
-
-  // Description:
-  // Returns a sub-proxy. Returns 0 if sub-proxy does not exist.
-  vtkSMProxy* GetSubProxy(unsigned int index);
-
-  // Description:
-  // Returns the name used to store sub-proxy. Returns 0 if sub-proxy does
-  // not exist.
-  const char* GetSubProxyName(unsigned int index);
-
-  // Description:
-  // Returns the name used to store sub-proxy. Returns 0 is the sub-proxy
-  // does not exist.
-  const char* GetSubProxyName(vtkSMProxy*);
-
-  // Description:
-  // Returns the number of sub-proxies.
-  unsigned int GetNumberOfSubProxies();
-
-  // Description:
-  // Save relevant information about subproxies. Note that we don't need
-  // to save subproxy property information since only 
-  // exposed properties are saved.
-  void SaveSubProxyState(vtkPVXMLElement* root);
-
-  // Description:
-  // Load the subproxy state.
-  void LoadSubProxyState(vtkPVXMLElement* subproxyElement, 
-    vtkSMProxyLocator* locator);
 
   // Description:
   // Called by a proxy property, this adds the property,proxy
@@ -723,43 +466,11 @@ protected:
   vtkSMProperty* NewProperty(const char* name, vtkPVXMLElement* propElement);
 
   // Description:
-  // Return a property of the given name from self or one of
-  // the sub-proxies. If selfOnly is set, the sub-proxies are
-  // not checked.
-  virtual vtkSMProperty* GetProperty(const char* name, int selfOnly);
-
-  // Description:
   // Read attributes from an XML element.
   virtual int ReadXMLAttributes(vtkSMProxyManager* pm, vtkPVXMLElement* element);
 
-  // Description:
-  // Used by ReadXMLAttributes() to read the very core attributes such as
-  // documentaion, hints, name etc.
-  void ReadCoreXMLAttributes(vtkPVXMLElement* element);
-
-  // Description:
-  // Handle events fired by subproxies.
-  virtual void ExecuteSubProxyEvent(vtkSMProxy* o, unsigned long event, 
-    void* data);
-
-  // Description:
-  // This method simply iterates over subproxies and calls 
-  // UpdatePipelineInformation() on them. vtkSMSourceProxy overrides this method
-  // (makes it public) and updates the pipeline information.
-  virtual void UpdatePipelineInformation();
-
-  // Description:
-  // Internal UpdateVTKObjects() which collapses all server-side sends into the
-  // stream.
-  virtual void UpdateVTKObjects(vtkClientServerStream& stream);
-
-  // Description:
-  // Loads the revival state for the proxy.
-  // RevivalState includes the entire state saved by calling 
-  // SaveState() as well additional information such as server side
-  // object ID. This makes it possible to restore the servermanager state
-  // while reusing server side object id.
-  virtual int LoadRevivalState(vtkPVXMLElement* revivalElement);
+  virtual int CreateSubProxiesAndProperties(vtkSMProxyManager* pm,
+    vtkPVXMLElement *element);
 
   // Description:
   // Called to update the property information on the property. It is assured
@@ -767,9 +478,6 @@ protected:
   // overloads of UpdatePropertyInformation() call this method, so subclass can
   // override this method to perform special tasks.
   virtual void UpdatePropertyInformationInternal(vtkSMProperty*);
- 
-  virtual int CreateSubProxiesAndProperties(vtkSMProxyManager* pm, 
-    vtkPVXMLElement *element);
 
   char* Name;
   char* VTKClassName;
@@ -777,7 +485,6 @@ protected:
   char* XMLName;
   char* XMLLabel;
   int ObjectsCreated;
-  vtkTypeUInt32 Servers;
   int DoNotUpdateImmediately;
   int DoNotModifyProperty;
 
@@ -790,36 +497,18 @@ protected:
   // Description:
   // Flag used to help speed up UpdateVTKObjects and ArePropertiesModified
   // calls.
-  int SelfPropertiesModified;
+  bool PropertiesModified;
 
   // Description:
   // Indicates if any properties are modified.
-  int ArePropertiesModified(int selfOnly = 0);
+  bool ArePropertiesModified()
+    { return this->PropertiesModified; }
 
   void SetHints(vtkPVXMLElement* hints);
   void SetDeprecated(vtkPVXMLElement* deprecated);
 
   void SetXMLElement(vtkPVXMLElement* element);
   vtkPVXMLElement* XMLElement;
-
-  // Description:
-  // This method saves state information about the proxy
-  // which can be used to revive the proxy using server side objects
-  // already present. RevivalState includes the entire state saved by calling 
-  // SaveState() as well additional information such as server side
-  // object ID. This makes it possible to restore the servermanager state
-  // while reusing server side object ids.
-  virtual vtkPVXMLElement* SaveRevivalState(vtkPVXMLElement* root);
-
-  void SetupSharedProperties(vtkSMProxy* subproxy, vtkPVXMLElement *element);
-  void SetupExposedProperties(const char* subproxy_name, vtkPVXMLElement *element);
-  
-  int CreateProxyHierarchy(vtkSMProxyManager* pm, vtkPVXMLElement* element);
-
-  // Description:
-  // This ID is the connection ID to the server on which this
-  // proxy exists, if at all. By default, it is the RootServerConnectionID.
-  vtkIdType ConnectionID;
 
   vtkSMDocumentation* Documentation;
   vtkPVXMLElement* Hints;
@@ -828,29 +517,8 @@ protected:
   // Flag used to break consumer loops.
   int InMarkModified;
 
-  // Description:
-  // Client/server id of the VTK object this is a proxy of.
-  vtkClientServerID VTKObjectID;
-
 private:
   vtkSMProxyInternals* Internals;
-  vtkSMProxyObserver* SubProxyObserver;
-
-  // Description:
-  // SelfID is private to avoid direct access by subclasses.
-  // They must use GetSelfID().
-  vtkClientServerID SelfID; 
-
-  // Description:
-  // PVEE only
-  // DO NOT USE THIS. THIS IS TEMPORARY AND TO BE USED
-  // IN PVEE ONLY
-  // A proxy can be assigned a name. The name is used to
-  // indentify the proxy when saving ServerManager state.
-  // By default the name is set to the SelfID of the proxy.
-  vtkSetStringMacro(Name);
-
-  void RegisterSelfID();
 
   vtkSMProxy(const vtkSMProxy&); // Not implemented
   void operator=(const vtkSMProxy&); // Not implemented

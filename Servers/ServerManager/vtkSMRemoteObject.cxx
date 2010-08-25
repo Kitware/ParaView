@@ -23,11 +23,14 @@
 vtkSMRemoteObject::vtkSMRemoteObject()
 {
   this->GlobalID = 0;
+  this->Location = 0;
+  this->Session = NULL;
 }
 
 //----------------------------------------------------------------------------
 vtkSMRemoteObject::~vtkSMRemoteObject()
 {
+  this->SetSession(0);
 }
 
 //----------------------------------------------------------------------------

@@ -29,15 +29,15 @@ vtkSMObject::~vtkSMObject()
 }
 
 ////---------------------------------------------------------------------------
-//vtkSMProxyManager* vtkSMObject::GetProxyManager()
-//{
-//  abort();
-//  // FIXME
-//  // Locate proxy manager from first SMSession and return it for backwards
-//  // compatibility.
-//  return NULL;
-//}
-//
+vtkSMProxyManager* vtkSMObject::GetProxyManager()
+{
+  abort();
+  // FIXME
+  // Locate proxy manager from first SMSession and return it for backwards
+  // compatibility.
+  return NULL;
+}
+
 ////---------------------------------------------------------------------------
 //vtkSMApplication* vtkSMObject::GetApplication()
 //{

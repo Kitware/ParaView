@@ -33,7 +33,6 @@ vtkSMProxyIterator::vtkSMProxyIterator()
   this->Internals = new vtkSMProxyIteratorInternals;
 
   this->Mode = vtkSMProxyIterator::ALL;
-  this->ConnectionID = 0;
   this->Begin();
 }
 
@@ -63,15 +62,6 @@ void vtkSMProxyIterator::Begin(const char* groupName)
       {
       this->Internals->ProxyIterator =
         this->Internals->ProxyListIterator->second.begin();
-      }
-    }
-
-  if (this->ConnectionID != 0)
-    {
-    while (!this->IsAtEnd() 
-      && this->GetProxy()->GetConnectionID() != this->ConnectionID)
-      {
-      this->Next();
       }
     }
 }
@@ -109,15 +99,6 @@ void vtkSMProxyIterator::Begin()
       }
     this->Internals->GroupIterator++;
     }
-
-  if (this->ConnectionID != 0)
-    {
-    while (!this->IsAtEnd() 
-      && this->GetProxy()->GetConnectionID() != this->ConnectionID)
-      {
-      this->NextInternal();
-      }
-    }
 }
 
 //---------------------------------------------------------------------------
@@ -147,14 +128,6 @@ int vtkSMProxyIterator::IsAtEnd()
 void vtkSMProxyIterator::Next()
 {
   this->NextInternal();
-  if (this->ConnectionID != 0)
-    {
-    while (!this->IsAtEnd() 
-      && this->GetProxy()->GetConnectionID() != this->ConnectionID)
-      {
-      this->NextInternal();
-      }
-    }
 }
 
 //---------------------------------------------------------------------------
@@ -332,5 +305,4 @@ void vtkSMProxyIterator::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os, indent);
 
   os << indent << "Mode: " << this->Mode << endl;
-  os << indent << "ConnectionID: " << this->ConnectionID << endl;
 }

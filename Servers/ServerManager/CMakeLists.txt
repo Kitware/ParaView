@@ -30,6 +30,12 @@ SET (Kit_SRCS
   vtkSMSessionServer.cxx
   vtkSMRemoteObject.cxx
   vtkSMProxyManager.cxx
+  vtkSMProxy.cxx
+  vtkSMPropertyIterator.cxx
+  vtkSMDocumentation.cxx
+  vtkSMProxyIterator.cxx
+  vtkSMProxySelectionModel.cxx
+  vtkSMLink.cxx
   )
 
 IF (FIXME)
@@ -125,7 +131,6 @@ SET(Kit_SRCS
   vtkSMKeyFrameAnimationCueManipulatorProxy.cxx
   vtkSMKeyFrameProxy.cxx
   vtkSMLinearAnimationCueManipulatorProxy.cxx
-  vtkSMLink.cxx
   vtkSMLookupTableProxy.cxx
   vtkSMMaterialLoaderProxy.cxx
   vtkSMMultiProcessRenderView.cxx
@@ -147,25 +152,20 @@ SET(Kit_SRCS
   vtkSMPropertyAdaptor.cxx
   vtkSMProperty.cxx
   vtkSMPropertyHelper.cxx
-  vtkSMPropertyIterator.cxx
   vtkSMNamedPropertyIterator.cxx
   vtkSMPropertyLink.cxx
   vtkSMPropertyModificationUndoElement.cxx
   vtkSMPropRepresentationProxy.cxx
-  vtkSMProxy.cxx
   vtkSMProxyConfigurationReader.cxx
   vtkSMProxyConfigurationWriter.cxx
   vtkSMProxyDefinitionIterator.cxx
   vtkSMProxyGroupDomain.cxx
-  vtkSMProxyIterator.cxx
   vtkSMProxyLink.cxx
   vtkSMProxyListDomain.cxx
   vtkSMProxyLocator.cxx
-  vtkSMProxyManager.cxx
   vtkSMProxyManagerReviver.cxx
   vtkSMProxyProperty.cxx
   vtkSMProxyRegisterUndoElement.cxx
-  vtkSMProxySelectionModel.cxx
   vtkSMProxyStateChangedUndoElement.cxx
   vtkSMProxyUnRegisterUndoElement.cxx
   vtkSMPythonTraceObserver.cxx
@@ -264,6 +264,7 @@ SET_SOURCE_FILES_PROPERTIES(
   vtkInitializationHelper.cxx
   vtkPMObject.cxx
   vtkSMRemoteObject.cxx
+  vtkSMLink.cxx
   ABSTRACT
   )
 
@@ -279,7 +280,6 @@ SET_SOURCE_FILES_PROPERTIES(
   vtkSMDataRepresentationProxy.cxx
   vtkSMDomain.cxx
   vtkSMInformationHelper.cxx
-  vtkSMLink.cxx
   vtkSMMultiProcessRenderView.cxx
   vtkSMMultiProcessRenderView.cxx
   vtkSMProxyManagerReviver.cxx
