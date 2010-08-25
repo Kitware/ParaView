@@ -66,7 +66,7 @@ typedef struct H5E_t H5E_t;
    ret_value = ret_val;                                                       \
 }
 #else
-#define HDONE_ERROR(maj, min, args, ...) {              \
+#define HDONE_ERROR(maj, min, ret_val, args) {              \
    HCOMMON_ERROR(maj, min, args);                \
    ret_value = ret_val;                                                       \
 }
