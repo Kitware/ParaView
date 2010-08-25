@@ -5972,6 +5972,19 @@
         This property lists which netCDF variables to load.
       </Documentation>
     </StringVectorProperty>
+
+     <IntVectorProperty
+        name="Stride"
+        command="SetStride"
+        number_of_elements="3"
+        default_values="1 1 1"
+        animateable="0">
+        <IntRangeDomain name="range" min="1 1 1" />
+        <Documentation>
+         This property indicate the number of indices per dimension (i,j,k) to skip between each point included
+         in this output.
+        </Documentation>
+     </IntVectorProperty>
     
     <Hints>
       <ReaderFactory extensions="pop.ncdf pop.nc"
