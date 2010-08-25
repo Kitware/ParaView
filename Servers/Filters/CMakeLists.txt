@@ -113,6 +113,7 @@ SET(Filters_SRCS
   vtkPVClientServerRenderManager.cxx
   vtkPVClipClosedSurface.cxx
   vtkPVClipDataSet.cxx
+  vtkPVCompositeDataPipeline.cxx
   vtkPVConnectivityFilter.cxx
   vtkPVContourFilter.cxx
   vtkPVDesktopDeliveryClient.cxx
@@ -139,6 +140,8 @@ SET(Filters_SRCS
   vtkPVMain.cxx
   vtkPVMergeTables.cxx
   vtkPVNullSource.cxx
+  vtkPVPostFilter.cxx
+  vtkPVPostFilterExecutive.cxx
   vtkPVRecoverGeometryWireframe.cxx
   vtkPVRenderViewProxy.cxx
   vtkPVScalarBarActor.cxx
