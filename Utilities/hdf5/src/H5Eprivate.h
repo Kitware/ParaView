@@ -32,22 +32,23 @@ typedef struct H5E_t H5E_t;
  * and a FUNC_LEAVE() within a function body.  The arguments are the major
  * error number, the minor error number, and a description of the error.
  */
-#if defined(_MSC_VER) && (_MSC_VER >= 1400)
-#  define HERROR(maj_id, min_id, ...) H5E_printf_stack(NULL, __FILE__, FUNC, __LINE__, H5E_ERR_CLS_g, maj_id, min_id, __VA_ARGS__)
-#else
+#if defined(_MSC_VER) && (_MSC_VER < 1400)
 #  define HERROR(maj_id, min_id, args) H5E_printf_stack(NULL, __FILE__, FUNC, __LINE__, H5E_ERR_CLS_g, maj_id, min_id, args)
+#else
+#  define HERROR(maj_id, min_id, ...) H5E_printf_stack(NULL, __FILE__, FUNC, __LINE__, H5E_ERR_CLS_g, maj_id, min_id, __VA_ARGS__)
 #endif
+
 /*
  * HCOMMON_ERROR macro, used by HDONE_ERROR and HGOTO_ERROR
  * (Shouldn't need to be used outside this header file)
  */
-#if defined(_MSC_VER) && (_MSC_VER >= 1400)
-#define HCOMMON_ERROR(maj, min, ...)                        \
-   HERROR(maj, min, __VA_ARGS__);                  \
-   err_occurred = TRUE;
-#else
+#if defined(_MSC_VER) && (_MSC_VER < 1400)
 #define HCOMMON_ERROR(maj, min, args)                        \
    HERROR(maj, min, args);                  \
+   err_occurred = TRUE;
+#else
+#define HCOMMON_ERROR(maj, min, ...)                        \
+   HERROR(maj, min, __VA_ARGS__);                  \
    err_occurred = TRUE;
 #endif
 
@@ -60,14 +61,14 @@ typedef struct H5E_t H5E_t;
  * (This macro can also be used to push an error and set the return value
  *      without jumping to any labels)
  */
-#if defined(_MSC_VER) && (_MSC_VER >= 1400)
-#define HDONE_ERROR(maj, min, ret_val, ...) {              \
-   HCOMMON_ERROR(maj, min, __VA_ARGS__);                \
+#if defined(_MSC_VER) && (_MSC_VER < 1400)
+#define HDONE_ERROR(maj, min, ret_val, args) {              \
+   HCOMMON_ERROR(maj, min, args);                \
    ret_value = ret_val;                                                       \
 }
 #else
-#define HDONE_ERROR(maj, min, ret_val, args) {              \
-   HCOMMON_ERROR(maj, min, args);                \
+#define HDONE_ERROR(maj, min, ret_val, ...) {              \
+   HCOMMON_ERROR(maj, min, __VA_ARGS__);                \
    ret_value = ret_val;                                                       \
 }
 #endif
@@ -79,14 +80,14 @@ typedef struct H5E_t H5E_t;
  * error string.  The return value is assigned to a variable `ret_value' and
  * control branches to the `done' label.
  */
-#if defined(_MSC_VER) && (_MSC_VER >= 1400)
-#define HGOTO_ERROR(maj, min, ret_val, ...) {              \
-   HCOMMON_ERROR(maj, min, __VA_ARGS__);                \
+#if defined(_MSC_VER) && (_MSC_VER < 1400)
+#define HGOTO_ERROR(maj, min, ret_val, args) {              \
+   HCOMMON_ERROR(maj, min, args);                \
    HGOTO_DONE(ret_val)                          \
 }
 #else
-#define HGOTO_ERROR(maj, min, ret_val, args) {              \
-   HCOMMON_ERROR(maj, min, args);                \
+#define HGOTO_ERROR(maj, min, ret_val, ...) {              \
+   HCOMMON_ERROR(maj, min, __VA_ARGS__);                \
    HGOTO_DONE(ret_val)                          \
 }
 #endif
