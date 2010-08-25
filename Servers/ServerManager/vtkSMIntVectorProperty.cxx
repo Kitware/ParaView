@@ -62,9 +62,10 @@ void vtkSMIntVectorProperty::WriteTo(vtkSMMessage* msg)
 }
 
 //---------------------------------------------------------------------------
-void vtkSMIntVectorProperty::ReadFrom(vtkSMMessage* msg)
+void vtkSMIntVectorProperty::ReadFrom(vtkSMMessage* msg, int offset)
 {
   (void)msg;
+  (void)offset;
 #ifdef FIXME
   // avoid this n^2 iteration to find the message belonging to this property.
   //cout << ">>>>>>>>>>>>" << endl;

@@ -477,7 +477,7 @@ protected:
   // that the property passed in as an argument is a self property. Both the
   // overloads of UpdatePropertyInformation() call this method, so subclass can
   // override this method to perform special tasks.
-  virtual void UpdatePropertyInformationInternal(vtkSMProperty*);
+  virtual void UpdatePropertyInformationInternal(vtkSMProperty* prop=NULL);
 
   char* Name;
   char* VTKClassName;

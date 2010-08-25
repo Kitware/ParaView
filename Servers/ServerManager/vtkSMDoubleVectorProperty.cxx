@@ -62,9 +62,10 @@ void vtkSMDoubleVectorProperty::WriteTo(vtkSMMessage* msg)
 }
 
 //---------------------------------------------------------------------------
-void vtkSMDoubleVectorProperty::ReadFrom(vtkSMMessage* msg)
+void vtkSMDoubleVectorProperty::ReadFrom(vtkSMMessage* msg, int message_offset)
 {
   (void)msg;
+  (void)message_offset;
 #ifdef FIXME
   // avoid this n^2 iteration to find the message belonging to this property.
   //cout << ">>>>>>>>>>>>" << endl;

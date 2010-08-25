@@ -273,8 +273,6 @@ void vtkSMProxy::AddProperty(const char* name, vtkSMProperty* prop)
 //---------------------------------------------------------------------------
 bool vtkSMProxy::UpdateProperty(const char* name, int force)
 {
-  this->CreateVTKObjects();
-
   vtkSMProxyInternals::PropertyInfoMap::iterator it =
     this->Internals->Properties.find(name);
   if (it == this->Internals->Properties.end())
@@ -287,6 +285,14 @@ bool vtkSMProxy::UpdateProperty(const char* name, int force)
     return false;
     }
 
+  if (it->second.Property->GetInformationOnly())
+    {
+    // cannot update information only properties.
+    return false;
+    }
+
+  this->CreateVTKObjects();
+
   // In case this property is a self property and causes
   // another UpdateVTKObjects(), make sure that it does
   // not cause recursion. If this is not set, UpdateVTKObjects()
@@ -294,19 +300,14 @@ bool vtkSMProxy::UpdateProperty(const char* name, int force)
   // to push the same property.
   it->second.ModifiedFlag = 0;
 
-  //vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  //vtkSMProperty* prop = it->second.Property.GetPointer();
-
-  // TODO: Push the state of the property.
-  // after having pushed the state, invoke the UpdatePropertyEvent and trigger
-  // MarkModified() to tell the consumers that the property was pushed.
+  vtkSMMessage message;
+  it->second.Property->WriteTo(&message);
+  this->PushState(&message);
 
   // Fire event to let everyone know that a property has been updated.
-  this->InvokeEvent(vtkCommand::UpdatePropertyEvent, (void*)name);
-  if (!this->InUpdateVTKObjects) // if updating multiple properties
-    {                            // MarkModified() is called only once.
-    this->MarkModified(this);
-    }
+  this->InvokeEvent(vtkCommand::UpdatePropertyEvent,
+    const_cast<char*>(name));
+  this->MarkModified(this);
   return true;
 }
 
@@ -338,17 +339,6 @@ void vtkSMProxy::SetPropertyModifiedFlag(const char* name, int flag)
 
   if (flag && !this->DoNotUpdateImmediately && prop->GetImmediateUpdate())
     {
-    //// If ImmediateUpdate is set, update the server immediatly.
-    //// Also set the modified flag to 0.
-    ////
-    //// --> I am not sure not sure this restriction on CreateVTKObjects is
-    ////     applicable anymore.
-    //// This special condition is necessary because VTK objects cannot
-    //// be created before the input is set.
-    //if (!vtkSMInputProperty::SafeDownCast(prop))
-    //  {
-    //  this->CreateVTKObjects();
-    //  }
     this->UpdateProperty(it->first.c_str());
     }
   else
@@ -372,27 +362,18 @@ void vtkSMProxy::MarkAllPropertiesAsModified()
 //---------------------------------------------------------------------------
 void vtkSMProxy::UpdatePropertyInformation(vtkSMProperty* prop)
 {
-  // If property does not belong to this proxy do nothing.
-  int found = 0;
-  vtkSMProxyInternals::PropertyInfoMap::iterator it;
-  for (it  = this->Internals->Properties.begin();
-       it != this->Internals->Properties.end();
-       ++it)
-    {
-    if (prop == it->second.Property.GetPointer())
-      {
-      found = 1;
-      break;
-      }
-    }
-
-  this->CreateVTKObjects();
   this->UpdatePropertyInformationInternal(prop);
-  prop->UpdateDependentDomains();
 }
 
 //---------------------------------------------------------------------------
 void vtkSMProxy::UpdatePropertyInformation()
+{
+  this->UpdatePropertyInformationInternal(NULL);
+}
+
+//---------------------------------------------------------------------------
+void vtkSMProxy::UpdatePropertyInformationInternal(
+  vtkSMProperty* single_property/*=NULL*/)
 {
   this->CreateVTKObjects();
 
@@ -401,14 +382,53 @@ void vtkSMProxy::UpdatePropertyInformation()
     return;
     }
 
+  bool some_thing_to_fetch = false;
+  vtkSMMessage message;
+  Variant* var = message.AddExtension(PullRequest::arguments);
+  var->set_type(Variant::STRING);
+
   vtkSMProxyInternals::PropertyInfoMap::iterator it;
-  // Update all properties.
-  for (it  = this->Internals->Properties.begin();
-    it != this->Internals->Properties.end();
-    ++it)
+  if (single_property != NULL)
     {
-    vtkSMProperty* prop = it->second.Property.GetPointer();
-    this->UpdatePropertyInformationInternal(prop);
+    if (single_property->GetInformationOnly())
+      {
+      var->add_txt(it->first.c_str());
+      some_thing_to_fetch = true;
+      }
+    }
+  else
+    {
+    // Update all information properties.
+    for (it  = this->Internals->Properties.begin();
+      it != this->Internals->Properties.end(); ++it)
+      {
+      vtkSMProperty* prop = it->second.Property.GetPointer();
+      if (prop->GetInformationOnly())
+        {
+        var->add_txt(it->first.c_str());
+        some_thing_to_fetch = true;
+        }
+      }
+    }
+
+  if (!some_thing_to_fetch)
+    {
+    return;
+    }
+
+  // Hmm, this changes message itself. Funky.
+  this->PullState(&message);
+
+  for (int i=0; i < message.ExtensionSize(ProxyState::property); ++i)
+    {
+    const ProxyState_Property *prop_message = &message.GetExtension(ProxyState::property, i);
+    const char* pname = prop_message->name().c_str();
+    it = this->Internals->Properties.find(pname);
+    if (it != this->Internals->Properties.end() &&
+      it->second.Property->GetInformationOnly())
+      {
+      it->second.Property->ReadFrom(&message, i);
+      }
     }
 
   // Make sure all dependent domains are updated. UpdateInformation()
@@ -426,31 +446,44 @@ void vtkSMProxy::UpdatePropertyInformation()
 }
 
 //---------------------------------------------------------------------------
-void vtkSMProxy::UpdatePropertyInformationInternal(vtkSMProperty* prop)
-{
-  if (this->ObjectsCreated)
-    {
-    // FIXME: fetch information from server.
-    (void)prop;
-    }
-}
-
-//---------------------------------------------------------------------------
 void vtkSMProxy::UpdateVTKObjects()
 {
-  if (this->InUpdateVTKObjects || !this->ArePropertiesModified())
+  this->CreateVTKObjects();
+  if (!this->ObjectsCreated || this->InUpdateVTKObjects ||
+    !this->ArePropertiesModified())
     {
     return;
     }
 
   this->InUpdateVTKObjects = 1;
 
-  // TODO: iterate over all properties and push them.
+  // iterate over all properties and push modified ones.
 
+  vtkSMMessage message;
+  vtkSMProxyInternals::PropertyInfoMap::iterator iter;
+  for (iter = this->Internals->Properties.begin();
+    iter != this->Internals->Properties.end(); ++iter)
+    {
+    vtkSMProperty* property = iter->second.Property;
+    if (property && !property->GetInformationOnly() &&
+      iter->second.ModifiedFlag)
+      {
+      property->WriteTo(&message);
+
+      // Fire event to let everyone know that a property has been updated.
+      // This is currently used by vtkSMLink. Need to see if we can avoid this
+      // as firing these events ain't inexpensive.
+      this->InvokeEvent(vtkCommand::UpdatePropertyEvent,
+        const_cast<char*>(iter->first.c_str()));
+      }
+    }
   this->InUpdateVTKObjects = 0;
   this->PropertiesModified = false;
-  this->MarkModified(this);
 
+  // Send the message
+  this->PushState(&message);
+
+  this->MarkModified(this);
   this->InvokeEvent(vtkCommand::UpdateEvent, 0);
 }
 
@@ -463,6 +496,14 @@ void vtkSMProxy::CreateVTKObjects()
     }
   this->ObjectsCreated = 1;
   this->WarnIfDeprecated();
+
+  vtkSMMessage message;
+  message.SetExtension(DefinitionHeader::client_class, this->GetClassName());
+  message.SetExtension(DefinitionHeader::server_class, "vtkPMProxy"
+    /* this->GetKernelClassName() */);
+  message.SetExtension(ProxyState::xml_group, this->GetXMLGroup());
+  message.SetExtension(ProxyState::xml_name, this->GetXMLName());
+  this->PushState(&message);
 
 #ifdef FIXME
   // ensure that this is happening correctly in PMProxy

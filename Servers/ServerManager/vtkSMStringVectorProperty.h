@@ -133,7 +133,7 @@ protected:
 
   // Description:
   // Let the property read and set its content from the stream
-  virtual void ReadFrom(vtkSMMessage*);
+  virtual void ReadFrom(vtkSMMessage*, int message_offset);
 
 
 private:

@@ -102,7 +102,7 @@ void vtkSMStringVectorProperty::WriteTo(vtkSMMessage* msg)
     }
 }
 //---------------------------------------------------------------------------
-void vtkSMStringVectorProperty::ReadFrom(vtkSMMessage* msg)
+void vtkSMStringVectorProperty::ReadFrom(vtkSMMessage* msg, int message_offset)
 {
   //cout << ">>>>>>>>>>>>" << endl;
   //msg->PrintDebugString();
