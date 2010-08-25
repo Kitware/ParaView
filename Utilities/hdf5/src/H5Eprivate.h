@@ -79,7 +79,7 @@ typedef struct H5E_t H5E_t;
  * error string.  The return value is assigned to a variable `ret_value' and
  * control branches to the `done' label.
  */
-#if defined(_MSC_VER) && (_MSC_VER >= 1400)
+#if defined(_MSC_VER) && (_MSC_VER < 1400)
 #define HGOTO_ERROR(maj, min, ret_val, args) {              \
    HCOMMON_ERROR(maj, min, args);                \
    HGOTO_DONE(ret_val)                          \
