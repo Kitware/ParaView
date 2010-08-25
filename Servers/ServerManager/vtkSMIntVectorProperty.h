@@ -24,10 +24,6 @@
 
 #include "vtkSMVectorProperty.h"
 
-//BTX
-struct vtkSMIntVectorPropertyInternals;
-//ETX
-
 class VTK_EXPORT vtkSMIntVectorProperty : public vtkSMVectorProperty
 {
 public:
@@ -57,6 +53,7 @@ public:
   // or one or more of the values is not in all domains.
   // Returns 1 otherwise.
   int SetElements(const int* values);
+  int SetElements(const int* values, unsigned int numElems);
   int *GetElements();
 
   // Description:
@@ -126,23 +123,27 @@ public:
   // Returns the default value, if any, specified in the XML.
   int GetDefaultValue(int idx);
 
+//BTX
 protected:
   vtkSMIntVectorProperty();
   ~vtkSMIntVectorProperty();
 
+  // Description:
+  // Let the property write its content into the stream
+  virtual void WriteTo(vtkSMMessage*);
+
+  // Description:
+  // Let the property read and set its content from the stream
+  virtual void ReadFrom(vtkSMMessage*);
+
+
   virtual int ReadXMLAttributes(vtkSMProxy* parent, 
                                 vtkPVXMLElement* element);
 
-  vtkSMIntVectorPropertyInternals* Internals;
+  class vtkInternals;
+  vtkInternals* Internals;
 
   int ArgumentIsArray;
-
-  // Description:
-  // Updates state from an XML element. Returns 0 on failure.
-  virtual int LoadState(vtkPVXMLElement* element, 
-    vtkSMProxyLocator* loader, int loadLastPushedValues=0);
-
-  virtual void ChildSaveState(vtkPVXMLElement* parent, int saveLastPushedValues);
 
   // Description:
   // Sets the size of unchecked elements. Usually this is
@@ -150,23 +151,14 @@ protected:
   // before a domain check is performed.
   virtual void SetNumberOfUncheckedElements(unsigned int num);
 
-  //BTX  
-  // Description:
-  // Append a command to update the vtk object with the property values(s).
-  // The proxy objects create a stream by calling this method on all the
-  // modified properties.
-  virtual void AppendCommandToStream(
-    vtkSMProxy*, vtkClientServerStream* stream, vtkClientServerID objectId );
-  //ETX
-
   // Subclass may override this if ResetToDefault can reset to default
   // value specified in the configuration file.
   virtual void ResetToDefaultInternal();
 
-  bool Initialized;
 private:
   vtkSMIntVectorProperty(const vtkSMIntVectorProperty&); // Not implemented
   void operator=(const vtkSMIntVectorProperty&); // Not implemented
+//ETX
 };
 
 #endif

@@ -120,8 +120,10 @@ vtkSMProxyManager::vtkSMProxyManager()
   this->AddObserver(vtkCommand::UnRegisterEvent, obs);
 #endif
 
+#ifdef FIXME
   this->ReaderFactory = vtkSMReaderFactory::New();
   this->WriterFactory = vtkSMWriterFactory::New();
+#endif
 }
 
 //---------------------------------------------------------------------------
@@ -133,11 +135,13 @@ vtkSMProxyManager::~vtkSMProxyManager()
   this->Observer->SetTarget(0);
   this->Observer->Delete();
 
+#ifdef FIXME
   this->ReaderFactory->Delete();
   this->ReaderFactory = 0;
 
   this->WriterFactory->Delete();
   this->WriterFactory = 0;
+#endif
 }
 
 //----------------------------------------------------------------------------
@@ -1028,6 +1032,7 @@ int vtkSMProxyManager::AreProxiesModified()
   return (this->Internals->ModifiedProxies.size() > 0)? 1: 0;
 }
 
+#ifdef FIXME
 //---------------------------------------------------------------------------
 void vtkSMProxyManager::LoadState(const char* filename, vtkIdType id,
   vtkSMStateLoader* loader/*=NULL*/)
@@ -1047,7 +1052,6 @@ void vtkSMProxyManager::LoadState(vtkPVXMLElement* rootElement, vtkIdType id,
   (void)rootElement;
   (void)id;
   (void)loader;
-#ifdef FIXME
   if (!rootElement)
     {
     return;
@@ -1070,7 +1074,6 @@ void vtkSMProxyManager::LoadState(vtkPVXMLElement* rootElement, vtkIdType id,
     info.ProxyLocator = spLoader->GetProxyLocator();
     this->InvokeEvent(vtkCommand::LoadStateEvent, &info);
     }
-#endif
 }
 
 //---------------------------------------------------------------------------
@@ -1090,6 +1093,7 @@ void vtkSMProxyManager::LoadState(vtkPVXMLElement* rootElement,
     vtkProcessModuleConnectionManager::GetRootServerConnectionID(),
     loader);
 }
+#endif
 
 //---------------------------------------------------------------------------
 void vtkSMProxyManager::SaveState(const char* filename)

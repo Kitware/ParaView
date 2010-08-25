@@ -28,10 +28,6 @@
 
 #include "vtkSMVectorProperty.h"
 
-//BTX
-struct vtkSMStringVectorPropertyInternals;
-//ETX
-
 class vtkStringList;
 
 class VTK_EXPORT vtkSMStringVectorProperty : public vtkSMVectorProperty
@@ -122,36 +118,30 @@ protected:
   vtkSMStringVectorProperty();
   ~vtkSMStringVectorProperty();
 
-  vtkSMStringVectorPropertyInternals* Internals;
-
   // Description:
   // Sets the size of unchecked elements. Usually this is
   // the same as the number of elements but can be different
   // before a domain check is performed.
   virtual void SetNumberOfUncheckedElements(unsigned int num);
 
-  //BTX  
-  // Description:
-  // Update the vtk object (with the given id and on the given
-  // nodes) with the property values(s).
-  virtual void AppendCommandToStream(
-    vtkSMProxy*, vtkClientServerStream* stream, vtkClientServerID objectId );
-  //ETX
-
-  virtual int ReadXMLAttributes(vtkSMProxy* parent, 
-                                vtkPVXMLElement* element);
+  virtual int ReadXMLAttributes(vtkSMProxy* parent,
+    vtkPVXMLElement* element);
 
   // Description:
-  // Updates state from an XML element. Returns 0 on failure.
-  virtual int LoadState(vtkPVXMLElement* element, vtkSMProxyLocator* loader,
-    int loadLastPushedValues=0);
+  // Let the property write its content into the stream
+  virtual void WriteTo(vtkSMMessage*);
 
-  virtual void ChildSaveState(vtkPVXMLElement* parent, int saveLastPushedValues);
-  bool Initialized;
+  // Description:
+  // Let the property read and set its content from the stream
+  virtual void ReadFrom(vtkSMMessage*);
+
 
 private:
   vtkSMStringVectorProperty(const vtkSMStringVectorProperty&); // Not implemented
   void operator=(const vtkSMStringVectorProperty&); // Not implemented
+
+  class vtkInternals;
+  vtkInternals* Internals;
 };
 
 #endif

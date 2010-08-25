@@ -63,8 +63,7 @@
 #define __vtkSMProperty_h
 
 #include "vtkSMObject.h"
-#include "vtkClientServerID.h" // needed for vtkClientServerID
-
+#include "vtkSMMessage.h"
 class vtkClientServerStream;
 class vtkPVXMLElement;
 class vtkSMDocumentation;
@@ -106,11 +105,6 @@ public:
   // server objects.
   vtkSetMacro(UpdateSelf, int);
   vtkGetMacro(UpdateSelf, int);
-
-  // Description:
-  // Returns a sub-property with the given name. If the sub-property
-  // does not exist, NULL is returned.
-  vtkSMProperty* GetSubProperty(const char* name);
 
   // Description:
   // Returns true if all values are in all domains, false otherwise.
@@ -247,21 +241,17 @@ public:
     }
 
   // Description:
-  // Provides access to the information helper used by this property, if any.
-  vtkGetObjectMacro(InformationHelper, vtkSMInformationHelper);
-
-  // Description:
   // Get the proxy to which this property belongs. Note that is this property is
   // belong to a sub-proxy of a proxy, the returned value will indeed be that
   // sub-proxy (and not the outer container proxy).
   vtkSMProxy* GetParent()
     { return this->Proxy; }
 
+//BTX
 protected:
   vtkSMProperty();
   ~vtkSMProperty();
 
-  //BTX
   friend class vtkSMProxyManager;
   friend class vtkSMProxy;
   friend class vtkSMSubPropertyIterator;
@@ -271,19 +261,12 @@ protected:
   friend class vtkSMPropertyModificationUndoElement;
 
   // Description:
-  // Append a command to update the vtk object with the property values(s).
-  // The proxy objects create a stream by calling this method on all the
-  // modified properties.
-  virtual void AppendCommandToStream(
-    vtkSMProxy*, vtkClientServerStream* stream, vtkClientServerID objectId );
+  // Let the property write its content into the stream
+  virtual void WriteTo(vtkSMMessage*) {};
 
   // Description:
-  // If this is an information property (InformationOnly is true),
-  // this method fills the vector with the values obtained from
-  // the server. This work is forwarded to the information helper.
-  virtual void UpdateInformation(vtkIdType connectionId, int serverids, 
-    vtkClientServerID objectId);
-  //ETX
+  // Let the property read and set its content from the stream
+  virtual void ReadFrom(vtkSMMessage*) {};
 
   // Description:
   // Set the appropriate ivars from the xml element. Should
@@ -311,14 +294,6 @@ protected:
   vtkGetStringMacro(XMLName);
 
   // Description:
-  // Add a sub-property with the given name.
-  void AddSubProperty(const char* name, vtkSMProperty* proxy);
-
-  // Description:
-  // Remove the named sub-property.
-  void RemoveSubProperty(const char* name);
-
-  // Description:
   // Internal. Used during XML parsing to get a property with
   // given name. Used by the domains when setting required properties.
   vtkSMProperty* NewProperty(const char* name);
@@ -331,27 +306,6 @@ protected:
   // Description:
   // Removes all dependents.
   void RemoveAllDependents();
-
-  // Description:
-  // Save the state in XML.
-  virtual void SaveState(vtkPVXMLElement* parent, const char* property_name, 
-    const char* uid, int saveDomains=1, int saveLastPushedValues=0);
-  virtual void ChildSaveState(vtkPVXMLElement* propertyElement, 
-    int saveLastPushedValues);
-  void SaveDomainState(vtkPVXMLElement* propertyElement, const char* uid);
-
-  // Description:
-  // Updates state from an XML element. Returns 0 on failure.
-  // If \c loadLastPushedValues is set, then last pushed values
-  // are loaded from the xml if present. If not present, the value 
-  // of the property remains unchanged.
-  virtual int LoadState(vtkPVXMLElement* element, vtkSMProxyLocator* loader,
-    int loadLastPushedValues=0);
-
-  // Description:
-  // Set from the XML file, information helpers fill in the property
-  // values with information obtained from server.
-  void SetInformationHelper(vtkSMInformationHelper* helper);
 
   void SetHints(vtkPVXMLElement* hints);
   vtkPVXMLElement* Hints;
@@ -372,7 +326,7 @@ protected:
   vtkSMDomainIterator* DomainIterator;
 
   static int CheckDomains;
-  
+
   vtkSetMacro(InformationOnly, int);
   int InformationOnly;
 
@@ -423,6 +377,7 @@ private:
 
   bool PendingModifiedEvents;
   bool BlockModifiedEvents;
+//ETX
 };
 
 #endif

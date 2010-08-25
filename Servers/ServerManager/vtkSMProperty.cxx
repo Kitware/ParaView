@@ -22,10 +22,8 @@
 #include "vtkSMDocumentation.h"
 #include "vtkSMDomain.h"
 #include "vtkSMDomainIterator.h"
-#include "vtkSMInformationHelper.h"
 #include "vtkSMProperty.h"
 #include "vtkSMProxy.h"
-#include "vtkSMSubPropertyIterator.h"
 
 #include <vtkstd/vector>
 #include <vtksys/ios/sstream>
@@ -34,7 +32,6 @@
 
 vtkStandardNewMacro(vtkSMProperty);
 
-vtkCxxSetObjectMacro(vtkSMProperty, InformationHelper, vtkSMInformationHelper);
 vtkCxxSetObjectMacro(vtkSMProperty, InformationProperty, vtkSMProperty);
 vtkCxxSetObjectMacro(vtkSMProperty, Documentation, vtkSMDocumentation);
 vtkCxxSetObjectMacro(vtkSMProperty, Hints, vtkPVXMLElement);
@@ -55,7 +52,6 @@ vtkSMProperty::vtkSMProperty()
   this->DomainIterator->SetProperty(this);
   this->Proxy = 0;
   this->InformationOnly = 0;
-  this->InformationHelper = 0;
   this->InformationProperty = 0;
   this->IsInternal = 1;
   this->Documentation = 0;
@@ -76,7 +72,6 @@ vtkSMProperty::~vtkSMProperty()
   this->SetXMLName(0);
   this->SetXMLLabel(0);
   this->DomainIterator->Delete();
-  this->SetInformationHelper(0);
   this->SetInformationProperty(0);
   this->SetDocumentation(0);
   this->SetHints(0);
@@ -99,7 +94,6 @@ void vtkSMProperty::UnRegister(vtkObjectBase* obj)
     return;
     }
   this->Superclass::UnRegister(obj);
-
 }
 
 //---------------------------------------------------------------------------
@@ -216,77 +210,6 @@ void vtkSMProperty::UpdateDependentDomains()
 }
 
 //---------------------------------------------------------------------------
-void vtkSMProperty::UpdateInformation(vtkIdType cid, int serverIds, 
-  vtkClientServerID objectId)
-{
-  if (!this->InformationOnly)
-    {
-    return;
-    }
-
-  if (this->InformationHelper)
-    {
-    this->InformationHelper->UpdateProperty(cid, serverIds, objectId, this);
-    }
-}
-
-//---------------------------------------------------------------------------
-vtkSMProperty* vtkSMProperty::GetSubProperty(const char* name)
-{
-  vtkSMPropertyInternals::PropertyMap::iterator it =
-    this->PInternals->SubProperties.find(name);
-
-  if (it == this->PInternals->SubProperties.end())
-    {
-    return 0;
-    }
-
-  return it->second.GetPointer();
-}
-
-//---------------------------------------------------------------------------
-void vtkSMProperty::AddSubProperty(const char* name, vtkSMProperty* property)
-{
-  // Check if the proxy already exists. If it does, we will
-  // replace it
-  vtkSMPropertyInternals::PropertyMap::iterator it =
-    this->PInternals->SubProperties.find(name);
-
-  if (it != this->PInternals->SubProperties.end())
-    {
-    vtkWarningMacro("Property " << name  << " already exists. Replacing");
-    }
-
-  this->PInternals->SubProperties[name] = property;
-}
-
-//---------------------------------------------------------------------------
-void vtkSMProperty::RemoveSubProperty(const char* name)
-{
-  vtkSMPropertyInternals::PropertyMap::iterator it =
-    this->PInternals->SubProperties.find(name);
-
-  if (it != this->PInternals->SubProperties.end())
-    {
-    this->PInternals->SubProperties.erase(it);
-    }
-}
-
-//---------------------------------------------------------------------------
-void vtkSMProperty::AppendCommandToStream(
-  vtkSMProxy*, vtkClientServerStream* str, vtkClientServerID objectId )
-{
-  if (!this->Command || this->InformationOnly)
-    {
-    return;
-    }
-
-  *str << vtkClientServerStream::Invoke 
-       << objectId << this->Command
-       << vtkClientServerStream::End;
-}
-
-//---------------------------------------------------------------------------
 vtkSMProperty* vtkSMProperty::NewProperty(const char* name)
 {
   if (!this->Proxy)
@@ -340,6 +263,9 @@ void vtkSMProperty::CreatePrettyLabel(const char* xmlname)
 int vtkSMProperty::ReadXMLAttributes(vtkSMProxy* vtkNotUsed(proxy),
                                      vtkPVXMLElement* element)
 {
+  // FIXME: some of the attributes are no longer necessary on the proxy-side,
+  // eg. "Command". We will remove those once we've verified that they are
+  // present on the PMProperty side.
   const char* xmlname = element->GetAttribute("name");
   if(xmlname) 
     { 
@@ -438,7 +364,6 @@ int vtkSMProperty::ReadXMLAttributes(vtkSMProxy* vtkNotUsed(proxy),
     if (object)
       {
       vtkSMDomain* domain = vtkSMDomain::SafeDownCast(object);
-      vtkSMInformationHelper* ih = vtkSMInformationHelper::SafeDownCast(object);
       if (domain)
         {
         if (domain->ReadXMLAttributes(this, domainEl))
@@ -449,13 +374,6 @@ int vtkSMProperty::ReadXMLAttributes(vtkSMProxy* vtkNotUsed(proxy),
             domain->SetXMLName(dname);
             this->AddDomain(dname, domain);
             }
-          }
-        }
-      else if (ih)
-        {
-        if (ih->ReadXMLAttributes(this, domainEl))
-          {
-          this->SetInformationHelper(ih);
           }
         }
       else
@@ -475,72 +393,6 @@ int vtkSMProperty::ReadXMLAttributes(vtkSMProxy* vtkNotUsed(proxy),
   return 1;
 }
 
-//---------------------------------------------------------------------------
-int vtkSMProperty::LoadState(vtkPVXMLElement* propertyElement, 
-  vtkSMProxyLocator* loader, int vtkNotUsed(loadLastPushedValues))
-{
-  // Process the domains.
-  unsigned int numElems = propertyElement->GetNumberOfNestedElements();
-  for (unsigned int cc=0;  cc < numElems; cc++)
-    {
-    vtkPVXMLElement* child = propertyElement->GetNestedElement(cc);
-    if (!child->GetName())
-      {
-      continue;
-      }
-    if (strcmp(child->GetName(),"Domain") == 0)
-      {
-      const char* name = child->GetAttribute("name");
-      vtkSMDomain* domain = name? this->GetDomain(name) : 0;
-      if (domain)
-        {
-        domain->LoadState(child, loader);
-        }
-      }
-    }
-  return 1;
-}
-
-//---------------------------------------------------------------------------
-void vtkSMProperty::ChildSaveState(vtkPVXMLElement* /*propertyElement*/,
-  int /*saveLastPushedValues*/)
-{
-}
-
-//---------------------------------------------------------------------------
-void vtkSMProperty::SaveState(vtkPVXMLElement* parent, 
-  const char* property_name, const char* uid,
-  int saveDomains/*=1*/, int saveLastPushedValues/*=0*/)
-{
-  vtkPVXMLElement* propertyElement = vtkPVXMLElement::New();
-  propertyElement->SetName("Property");
-  propertyElement->AddAttribute("name", property_name);
-  propertyElement->AddAttribute("id", uid);
-
-  this->ChildSaveState(propertyElement, saveLastPushedValues);
-
-  if (saveDomains)
-    {
-    this->SaveDomainState(propertyElement, uid);
-    }
-  parent->AddNestedElement(propertyElement);
-  propertyElement->Delete();
-}
-
-//---------------------------------------------------------------------------
-void vtkSMProperty::SaveDomainState(vtkPVXMLElement* propertyElement, 
-  const char* uid)
-{
-  this->DomainIterator->Begin();
-  while(!this->DomainIterator->IsAtEnd())
-    {
-    vtksys_ios::ostringstream dname;
-    dname << uid << "." << this->DomainIterator->GetKey() << ends;
-    this->DomainIterator->GetDomain()->SaveState(propertyElement,
-      dname.str().c_str());
-    this->DomainIterator->Next();
-    }
-}
 //---------------------------------------------------------------------------
 void vtkSMProperty::SetCheckDomains(int check)
 {
@@ -602,19 +454,4 @@ void vtkSMProperty::PrintSelf(ostream& os, vtkIndent indent)
     {
     os << "(none)" << endl;
     }
-
-  vtkSMSubPropertyIterator* iter = vtkSMSubPropertyIterator::New();
-  iter->SetProperty(this);
-  iter->Begin();
-  while(!iter->IsAtEnd())
-    {
-    vtkSMProperty* property = iter->GetSubProperty();
-    if (property)
-      {
-      os << indent << "Sub-property " << iter->GetKey() << ": " << endl;
-      property->PrintSelf(os, indent.GetNextIndent());
-      }
-    iter->Next();
-    }
-  iter->Delete();
 }

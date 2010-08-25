@@ -17,42 +17,30 @@
 #include "vtkClientServerStream.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
-#include "vtkProcessModule.h"
 #include "vtkStringList.h"
-
-#include <vtkstd/vector>
+#include "vtkSMVectorPropertyTemplate.h"
 #include "vtkStdString.h"
+
+#include <vtksys/ios/sstream>
 
 vtkStandardNewMacro(vtkSMStringVectorProperty);
 
-struct vtkSMStringVectorPropertyInternals
+class vtkSMStringVectorProperty::vtkInternals :
+  public vtkSMVectorPropertyTemplate<vtkStdString>
 {
-  vtkstd::vector<vtkStdString> Values;
-  vtkstd::vector<vtkStdString> UncheckedValues;
-  vtkstd::vector<vtkStdString> LastPushedValues;
+public:
   vtkstd::vector<int> ElementTypes;
-  vtkstd::vector<vtkStdString> DefaultValues;
 
-  void UpdateLastPushedValues()
-    {
-    // Save LastPushedValues.
-    this->LastPushedValues.clear();
-    this->LastPushedValues.insert(this->LastPushedValues.end(),
-      this->Values.begin(), this->Values.end());
-    }
-
-  void Resize(unsigned int num)
-    {
-    this->Values.resize(num);
-    this->UncheckedValues.resize(num);
-    }
+  vtkInternals(vtkSMStringVectorProperty* ivp):
+    vtkSMVectorPropertyTemplate<vtkStdString>(ivp)
+  {
+  }
 };
 
 //---------------------------------------------------------------------------
 vtkSMStringVectorProperty::vtkSMStringVectorProperty()
 {
-  this->Internals = new vtkSMStringVectorPropertyInternals;
-  this->Initialized = false;
+  this->Internals = new vtkInternals(this);
 }
 
 //---------------------------------------------------------------------------
@@ -87,124 +75,113 @@ int vtkSMStringVectorProperty::GetElementType(unsigned int idx)
 }
 
 //---------------------------------------------------------------------------
-void vtkSMStringVectorProperty::AppendCommandToStream(
-  vtkSMProxy*, vtkClientServerStream* str, vtkClientServerID objectId )
+void vtkSMStringVectorProperty::WriteTo(vtkSMMessage* msg)
 {
-  if (this->InformationOnly || !this->Initialized)
+  ProxyState_Property *prop = msg->AddExtension(ProxyState::property);
+  prop->set_name(this->GetXMLName());
+  Variant *var = 0;
+  for(unsigned int i=0;i<this->GetNumberOfElements();i++)
     {
-    return;
-    }
-
-  if (!this->Command)
-    {
-    this->Internals->UpdateLastPushedValues();
-    return;
-    }
-
-  if (this->CleanCommand)
-    {
-    *str << vtkClientServerStream::Invoke
-      << objectId << this->CleanCommand
-      << vtkClientServerStream::End;
-    }
-
-  int i;
-  int numArgs = this->GetNumberOfElements();
-  if (!this->RepeatCommand)
-    {
-    *str << vtkClientServerStream::Invoke << objectId << this->Command;
-    for(i=0; i<numArgs; i++)
+    // One element by variant
+    var = prop->add_value();
+    switch (this->GetElementType(i))
       {
-      // Convert to the appropriate type and add to stream
-      switch (this->GetElementType(i))
-        {
-        case INT:
-          *str << atoi(this->GetElement(i));
-          break;
-        case DOUBLE:
-          *str << atof(this->GetElement(i));
-          break;
-        case STRING:
-          *str << this->GetElement(i);
-          break;
-        }
+      case INT:
+        var->set_type(Variant::INT);
+        var->add_integer(atoi(this->GetElement(i)));
+        break;
+      case DOUBLE:
+        var->set_type(Variant::FLOAT64);
+        var->add_float64(atof(this->GetElement(i)));
+        break;
+      case STRING:
+        var->set_type(Variant::STRING);
+        var->add_txt(this->GetElement(i));
+        break;
       }
-    *str << vtkClientServerStream::End;
     }
-  else
+}
+//---------------------------------------------------------------------------
+void vtkSMStringVectorProperty::ReadFrom(vtkSMMessage* msg)
+{
+  //cout << ">>>>>>>>>>>>" << endl;
+  //msg->PrintDebugString();
+  //cout << "<<<<<<<<<<<<" << endl;
+
+  bool found = false;
+  for(int i=0;i<msg->ExtensionSize(ProxyState::property);++i)
     {
-    int numCommands = numArgs / this->NumberOfElementsPerCommand;
-    for(i=0; i<numCommands; i++)
+    const ProxyState_Property *prop = &msg->GetExtension(ProxyState::property, i);
+    if(strcmp(prop->name().c_str(), this->GetXMLName()) == 0)
       {
-      *str << vtkClientServerStream::Invoke << objectId << this->Command;
-      if (this->UseIndex)
+      // Several variant but one element by variant
+      this->SetNumberOfElements(prop->value_size());
+
+      // Loop over variants
+      for(int i=0;i<prop->value_size();i++)
         {
-        *str << i;
-        }
-      for (int j=0; j<this->NumberOfElementsPerCommand; j++)
-        {
-        // Convert to the appropriate type and add to stream
-        switch (this->GetElementType(j))
+        const Variant *value = &prop->value(i);
+        vtksys_ios::ostringstream oss;
+        switch(value->type())
           {
-          case INT:
-            *str << atoi(this->GetElement(i*this->NumberOfElementsPerCommand+j));
+          case Variant::INT:
+            oss << value->integer(0); // One element by variant
+            this->SetElement(i, oss.str().c_str());
             break;
-          case DOUBLE:
-            *str << atof(this->GetElement(i*this->NumberOfElementsPerCommand+j));
+          case Variant::FLOAT64:
+            oss << value->float64(0); // One element by variant
+            this->SetElement(i, oss.str().c_str());
             break;
-          case STRING:
-            *str << this->GetElement(i*this->NumberOfElementsPerCommand+j);
+          case Variant::STRING:
+            this->SetNumberOfElements(value->txt_size());
+            this->SetElement(i, value->txt(0).c_str()); // One element by variant
+            break;
+          default:
             break;
           }
         }
-      *str << vtkClientServerStream::End;
+
+      // Found the property, so exit the loop
+      found = true;
+      break;
       }
     }
-  this->Internals->UpdateLastPushedValues();
+  if(!found)
+    {
+    cout << "Not found " << this->GetXMLName() << endl;
+    // FIXME do nothing or throw exception ==================================================================================
+    }
 }
+
 
 //---------------------------------------------------------------------------
 void vtkSMStringVectorProperty::SetNumberOfUncheckedElements(unsigned int num)
 {
-  this->Internals->UncheckedValues.resize(num);
+  this->Internals->SetNumberOfUncheckedElements(num);
 }
 
 //---------------------------------------------------------------------------
 void vtkSMStringVectorProperty::SetNumberOfElements(unsigned int num)
 {
-  if (num == this->Internals->Values.size())
-    {
-    return;
-    }
-  this->Internals->Resize(num);
-  if (num == 0)
-    {
-    // If num == 0, then we already have the intialized values (so to speak).
-    this->Initialized = true;
-    }
-  else
-    {
-    this->Initialized = false;
-    }
-  this->Modified();
+  this->Internals->SetNumberOfElements(num);
 }
 
 //---------------------------------------------------------------------------
 unsigned int vtkSMStringVectorProperty::GetNumberOfUncheckedElements()
 {
-  return this->Internals->UncheckedValues.size();
+  return this->Internals->GetNumberOfUncheckedElements();
 }
 
 //---------------------------------------------------------------------------
 unsigned int vtkSMStringVectorProperty::GetNumberOfElements()
 {
-  return this->Internals->Values.size();
+  return this->Internals->GetNumberOfElements();
 }
 
 //---------------------------------------------------------------------------
 const char* vtkSMStringVectorProperty::GetElement(unsigned int idx)
 {
-  return this->Internals->Values[idx].c_str();
+  return this->Internals->GetElement(idx).c_str();
 }
 
 //---------------------------------------------------------------------------
@@ -220,61 +197,9 @@ void vtkSMStringVectorProperty::GetElements(vtkStringList* list)
 }
 
 //---------------------------------------------------------------------------
-int vtkSMStringVectorProperty::SetElements(vtkStringList* list)
-{
-  unsigned int count = static_cast<unsigned int>(list->GetLength());
-  unsigned int numElems = this->GetNumberOfElements();
-
-  if (this->Initialized && count == numElems)
-    {
-    // Check is cur values are same as the new values.
-    int modified = 0;
-    for (unsigned int cc=0; cc < numElems; cc++)
-      {
-      const char* value = list->GetString(cc)? list->GetString(cc) : "";
-      if (this->Internals->Values[cc] != value)
-        {
-        modified = 1;
-        break;
-        }
-      }
-    if (!modified)
-      {
-      // nothing changed.
-      return 1;
-      }
-    }
-
-  if ( vtkSMProperty::GetCheckDomains() )
-    {
-    this->SetNumberOfUncheckedElements(count);
-    for(unsigned int cc=0; cc<count; cc++)
-      {
-      this->SetUncheckedElement(cc, list->GetString(cc)?
-        list->GetString(cc):"");
-      }
-
-    if (!this->IsInDomains())
-      {
-      this->SetNumberOfUncheckedElements(this->GetNumberOfElements());
-      return 0;
-      }
-    }
-
-  this->Internals->Resize(count);
-  for (unsigned int cc=0; cc < count; cc++)
-    {
-    this->Internals->Values[cc] = list->GetString(cc)? list->GetString(cc) : "";
-    }
-  this->Initialized = true;
-  this->Modified();
-  return 1;
-}
-
-//---------------------------------------------------------------------------
 const char* vtkSMStringVectorProperty::GetUncheckedElement(unsigned int idx)
 {
-  return this->Internals->UncheckedValues[idx].c_str();
+  return this->Internals->GetUncheckedElement(idx).c_str();
 }
 
 //---------------------------------------------------------------------------
@@ -285,62 +210,34 @@ void vtkSMStringVectorProperty::SetUncheckedElement(
     {
     value = "";
     }
+  this->Internals->SetUncheckedElement(idx, value);
+}
 
-  if (idx >= this->GetNumberOfUncheckedElements())
+//---------------------------------------------------------------------------
+int vtkSMStringVectorProperty::SetElements(vtkStringList* list)
+{
+  unsigned int count = static_cast<unsigned int>(list->GetLength());
+  vtkStdString* values = new vtkStdString[count+1];
+  for (unsigned int cc=0; cc < count; cc++)
     {
-    this->SetNumberOfUncheckedElements(idx+1);
+    values[cc] = list->GetString(cc)? list->GetString(cc): "";
     }
-  this->Internals->UncheckedValues[idx] = value;
+  int ret_val = this->Internals->SetElements(values, count);
+  delete[] values;
+  return ret_val;
 }
 
 //---------------------------------------------------------------------------
 int vtkSMStringVectorProperty::SetElements(unsigned int count, const char* values[])
 {
-  unsigned int numElems = this->GetNumberOfElements();
-
-  if (this->Initialized && count == numElems)
-    {
-    // Check is cur values are same as the new values.
-    int modified = 0;
-    for (unsigned int cc=0; cc < numElems; cc++)
-      {
-      const char* value = values[cc]? values[cc] : "";
-      if (this->Internals->Values[cc] != value)
-        {
-        modified = 1;
-        break;
-        }
-      }
-    if (!modified)
-      {
-      // nothing changed.
-      return 1;
-      }
-    }
-
-  if ( vtkSMProperty::GetCheckDomains() )
-    {
-    this->SetNumberOfUncheckedElements(count);
-    for(unsigned int cc=0; cc<count; cc++)
-      {
-      this->SetUncheckedElement(cc, values[cc]?values[cc]:"");
-      }
-
-    if (!this->IsInDomains())
-      {
-      this->SetNumberOfUncheckedElements(this->GetNumberOfElements());
-      return 0;
-      }
-    }
-
-  this->Internals->Resize(count);
+  vtkStdString* std_values = new vtkStdString[count+1];
   for (unsigned int cc=0; cc < count; cc++)
     {
-    this->Internals->Values[cc] = values[cc]? values[cc]: "";
+    std_values[cc] = values[cc]? values[cc] : "";
     }
-  this->Initialized = true;
-  this->Modified();
-  return 1;
+  int ret_val = this->Internals->SetElements(std_values, count);
+  delete[] std_values;
+  return ret_val;
 }
 
 //---------------------------------------------------------------------------
@@ -350,40 +247,7 @@ int vtkSMStringVectorProperty::SetElement(unsigned int idx, const char* value)
     {
     value = "";
     }
-
-  unsigned int numElems = this->GetNumberOfElements();
-
-  if (this->Initialized &&
-      idx < numElems && strcmp(value, this->GetElement(idx)) == 0)
-    {
-    return 1;
-    }
-
-  if ( vtkSMProperty::GetCheckDomains() )
-    {
-    for(unsigned int i=0; i<this->GetNumberOfElements(); i++)
-      {
-      this->SetUncheckedElement(i, this->GetElement(i));
-      }
-
-    this->SetUncheckedElement(idx, value);
-    if (!this->IsInDomains())
-      {
-      this->SetNumberOfUncheckedElements(this->GetNumberOfElements());
-      return 0;
-      }
-    }
-
-  if (idx >= this->GetNumberOfElements())
-    {
-    this->SetNumberOfElements(idx+1);
-    }
-  this->Internals->Values[idx] = value;
-  // Make sure to initialize BEFORE Modified() is called. Otherwise,
-  // the value would not be pushed.
-  this->Initialized = true;
-  this->Modified();
-  return 1;
+  return this->Internals->SetElement(idx, value);
 }
 
 //---------------------------------------------------------------------------
@@ -460,7 +324,6 @@ int vtkSMStringVectorProperty::ReadXMLAttributes(vtkSMProxy* proxy,
       this->SetElement(0, tmp);
       this->Internals->DefaultValues.push_back(tmp);
       }
-    this->Internals->UpdateLastPushedValues();
     }
   return 1;
 }
@@ -468,119 +331,7 @@ int vtkSMStringVectorProperty::ReadXMLAttributes(vtkSMProxy* proxy,
 //---------------------------------------------------------------------------
 const char* vtkSMStringVectorProperty::GetDefaultValue(int idx)
 {
-  if(idx >= 0 && idx < (int)this->Internals->DefaultValues.size() &&
-    !this->Internals->DefaultValues[idx].empty())
-    {
-    return this->Internals->DefaultValues[idx].c_str();
-    }
-  return 0;
-}
-
-//---------------------------------------------------------------------------
-int vtkSMStringVectorProperty::LoadState(vtkPVXMLElement* element,
-  vtkSMProxyLocator* loader, int loadLastPushedValues/*=0*/)
-{
-  int prevImUpdate = this->ImmediateUpdate;
-
-  // Wait until all values are set before update (if ImmediateUpdate)
-  this->ImmediateUpdate = 0;
-  this->Superclass::LoadState(element, loader, loadLastPushedValues);
-
-  if (loadLastPushedValues)
-    {
-    unsigned int numElems = element->GetNumberOfNestedElements();
-    vtkPVXMLElement* actual_element = NULL;
-    for (unsigned int i=0; i < numElems; i++)
-      {
-      vtkPVXMLElement* currentElement = element->GetNestedElement(i);
-      if (currentElement->GetName() &&
-        strcmp(currentElement->GetName(), "LastPushedValues") == 0)
-        {
-        actual_element = currentElement;
-        break;
-        }
-      }
-    if (!actual_element)
-      {
-      // No LastPushedValues present, do nothing.
-      return 1;
-      }
-    element = actual_element;
-    }
-
-  bool prev = this->SetBlockModifiedEvents(true);
-  unsigned int numElems = element->GetNumberOfNestedElements();
-  for (unsigned int i=0; i<numElems; i++)
-    {
-    vtkPVXMLElement* currentElement = element->GetNestedElement(i);
-    if (currentElement->GetName() &&
-        strcmp(currentElement->GetName(), "Element") == 0)
-      {
-      int index;
-      if (currentElement->GetScalarAttribute("index", &index))
-        {
-        const char* value = currentElement->GetAttribute("value");
-        if (value)
-          {
-          this->SetElement(index, value);
-          }
-        }
-      }
-    }
-  this->SetBlockModifiedEvents(prev);
-
-  // Do not immediately update. Leave it to the loader.
-  if (this->GetPendingModifiedEvents())
-    {
-    this->Modified();
-    }
-  this->ImmediateUpdate = prevImUpdate;
-
-  return 1;
-}
-
-//---------------------------------------------------------------------------
-void vtkSMStringVectorProperty::ChildSaveState(vtkPVXMLElement* propertyElement,
-  int saveLastPushedValues)
-{
-  this->Superclass::ChildSaveState(propertyElement, saveLastPushedValues);
-
-  unsigned int size = this->GetNumberOfElements();
-  if (size > 0)
-    {
-    propertyElement->AddAttribute("number_of_elements", size);
-    }
-  for (unsigned int i=0; i<size; i++)
-    {
-    vtkPVXMLElement* elementElement = vtkPVXMLElement::New();
-    elementElement->SetName("Element");
-    elementElement->AddAttribute("index", i);
-    elementElement->AddAttribute("value",
-                                 (this->GetElement(i)?this->GetElement(i):""));
-    propertyElement->AddNestedElement(elementElement);
-    elementElement->Delete();
-    }
-
-  if (saveLastPushedValues)
-    {
-    size = this->Internals->LastPushedValues.size();
-
-    vtkPVXMLElement* element = vtkPVXMLElement::New();
-    element->SetName("LastPushedValues");
-    element->AddAttribute("number_of_elements", size);
-    for (unsigned int cc=0; cc < size; ++cc)
-      {
-      vtkPVXMLElement* elementElement = vtkPVXMLElement::New();
-      elementElement->SetName("Element");
-      elementElement->AddAttribute("index", cc);
-      elementElement->AddAttribute("value",
-        this->Internals->LastPushedValues[cc]);
-      element->AddNestedElement(elementElement);
-      elementElement->Delete();
-      }
-    propertyElement->AddNestedElement(element);
-    element->Delete();
-    }
+  return this->Internals->GetDefaultValue(idx).c_str();
 }
 
 //---------------------------------------------------------------------------
@@ -590,24 +341,9 @@ void vtkSMStringVectorProperty::Copy(vtkSMProperty* src)
 
   vtkSMStringVectorProperty* dsrc = vtkSMStringVectorProperty::SafeDownCast(
     src);
-  if (dsrc && dsrc->Initialized)
+  if (dsrc)
     {
-    bool modified = false;
-    if (this->Internals->Values != dsrc->Internals->Values )
-      {
-      this->Internals->Values = dsrc->Internals->Values;
-      modified = true;
-      }
-    // If we were not initialized, we are now modified even if the value
-    // did not change
-    modified = modified || !this->Initialized;
-    this->Initialized = true;
-
-    this->Internals->UncheckedValues = dsrc->Internals->UncheckedValues;
-    if (modified)
-      {
-      this->Modified();
-      }
+    this->Internals->Copy(dsrc->Internals);
     }
 }
 

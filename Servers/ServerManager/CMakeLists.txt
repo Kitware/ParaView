@@ -36,6 +36,15 @@ SET (Kit_SRCS
   vtkSMProxyIterator.cxx
   vtkSMProxySelectionModel.cxx
   vtkSMLink.cxx
+  vtkSMProperty.cxx
+  vtkSMDomain.cxx
+  vtkSMDomainIterator.cxx
+  vtkSMVectorProperty.cxx
+  vtkSMIntVectorProperty.cxx
+  vtkSMDoubleVectorProperty.cxx
+  vtkSMIdTypeVectorProperty.cxx
+  vtkSMStringVectorProperty.cxx
+  vtkSMProxyProperty.cxx
   )
 
 IF (FIXME)
@@ -93,11 +102,8 @@ SET(Kit_SRCS
   vtkSMDimensionsDomain.cxx
   vtkSMDistanceRepresentation2DProxy.cxx
   vtkSMDocumentation.cxx
-  vtkSMDomain.cxx
-  vtkSMDomainIterator.cxx
   vtkSMDoubleArrayInformationHelper.cxx
   vtkSMDoubleRangeDomain.cxx
-  vtkSMDoubleVectorProperty.cxx
   vtkSMEnumerationDomain.cxx
   vtkSMExponentialKeyFrameProxy.cxx
   vtkSMExporterProxy.cxx
@@ -114,7 +120,6 @@ SET(Kit_SRCS
   vtkSMIceTDesktopRenderViewProxy.cxx
   vtkSMIceTMultiDisplayRenderViewProxy.cxx
   vtkSMIdBasedProxyLocator.cxx
-  vtkSMIdTypeVectorProperty.cxx
   vtkSMImageDataParallelStrategy.cxx
   vtkSMImageSliceRepresentationProxy.cxx
   vtkSMImageTextureProxy.cxx
@@ -127,7 +132,6 @@ SET(Kit_SRCS
   vtkSMIntArrayInformationHelper.cxx
   vtkSMInteractionUndoStackBuilder.cxx
   vtkSMIntRangeDomain.cxx
-  vtkSMIntVectorProperty.cxx
   vtkSMKeyFrameAnimationCueManipulatorProxy.cxx
   vtkSMKeyFrameProxy.cxx
   vtkSMLinearAnimationCueManipulatorProxy.cxx
@@ -164,7 +168,6 @@ SET(Kit_SRCS
   vtkSMProxyListDomain.cxx
   vtkSMProxyLocator.cxx
   vtkSMProxyManagerReviver.cxx
-  vtkSMProxyProperty.cxx
   vtkSMProxyRegisterUndoElement.cxx
   vtkSMProxyStateChangedUndoElement.cxx
   vtkSMProxyUnRegisterUndoElement.cxx
@@ -209,8 +212,6 @@ SET(Kit_SRCS
   vtkSMStringArrayHelper.cxx
   vtkSMStringListDomain.cxx
   vtkSMStringListRangeDomain.cxx
-  vtkSMStringVectorProperty.cxx
-  vtkSMSubPropertyIterator.cxx
   vtkSMSurfaceRepresentationProxy.cxx
 #  vtkSMTemporalInputDomain.cxx
   vtkSMTesting.cxx
@@ -234,7 +235,6 @@ SET(Kit_SRCS
   vtkSMUtilities.cxx
   vtkSMUpdateInformationUndoElement.cxx
   vtkSMUpdateSuppressorProxy.cxx
-  vtkSMVectorProperty.cxx
   vtkSMViewProxy.cxx
   vtkSMWidgetRepresentationProxy.cxx
   vtkSMWriterFactory.cxx
@@ -265,6 +265,8 @@ SET_SOURCE_FILES_PROPERTIES(
   vtkPMObject.cxx
   vtkSMRemoteObject.cxx
   vtkSMLink.cxx
+  vtkSMVectorProperty.cxx
+  vtkSMDomain.cxx
   ABSTRACT
   )
 
@@ -278,7 +280,6 @@ SET_SOURCE_FILES_PROPERTIES(
   vtkSMClientServerRenderSyncManagerHelper.cxx
   vtkSMContextViewProxy.cxx
   vtkSMDataRepresentationProxy.cxx
-  vtkSMDomain.cxx
   vtkSMInformationHelper.cxx
   vtkSMMultiProcessRenderView.cxx
   vtkSMMultiProcessRenderView.cxx
@@ -288,7 +289,6 @@ SET_SOURCE_FILES_PROPERTIES(
   vtkSMStateVersionControllerBase.cxx
   vtkSMStateVersionControllerBase.cxx
   vtkSMUndoElement.cxx
-  vtkSMVectorProperty.cxx
   vtkSMPropertyHelper.cxx
   vtkSMExporterProxy.cxx
   ABSTRACT

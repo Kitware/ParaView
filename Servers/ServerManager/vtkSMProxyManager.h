@@ -250,6 +250,9 @@ public:
   void SaveCustomProxyDefinitions(const char* filename);
   void SaveCustomProxyDefinitions(vtkPVXMLElement* root);
 
+  //BTX
+#ifdef FIXME
+
   // Description:
   // Loads the state of the server manager from XML.
   // If loader is not specified, a vtkSMStateLoader instance is used.
@@ -263,6 +266,8 @@ public:
     vtkSMStateLoader* loader=NULL);
   void LoadState(const char* filename, vtkIdType id,
     vtkSMStateLoader* loader=NULL);
+#endif
+  //ETX
 
   // Description:
   // Save the state of the server manager in XML format in a file.
@@ -406,6 +411,7 @@ public:
   // registered.
   vtkSMProxySelectionModel* GetSelectionModel(const char* name);
 
+//BTX
   // Description:
   // ParaView has notion of "global properties". These are application wide
   // properties such as foreground color, text color etc. Changing values of
@@ -422,6 +428,7 @@ public:
   vtkSMGlobalPropertiesManager* GetGlobalPropertiesManager(const char* name);
   const char* GetGlobalPropertiesManagerName(vtkSMGlobalPropertiesManager*);
 
+#ifdef FIXME
   // Description:
   // Provides access to the reader factory. Before using the reader factory, it
   // is essential that it's configured correctly.
@@ -431,6 +438,8 @@ public:
   // Provides access to the writer factory. Before using the reader factory, it
   // is essential that it's configured correctly.
   vtkGetObjectMacro(WriterFactory, vtkSMWriterFactory);
+#endif
+//ETX
 
   // Description:
   // Loads server-manager configuration xml.

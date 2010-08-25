@@ -113,21 +113,9 @@ vtkSMProxy::~vtkSMProxy()
 {
   this->RemoveAllObservers();
 
-  vtkSMProxyInternals::PropertyInfoMap::iterator it =
-    this->Internals->Properties.begin();
-  // To remove cyclic dependancy as well as this proxy from
-  // the consumer list of all
-  for(; it != this->Internals->Properties.end(); it++)
-    {
-    vtkSMProperty* prop = it->second.Property.GetPointer();
-    prop->RemoveAllDependents();
-    if (prop->IsA("vtkSMProxyProperty"))
-      {
-      vtkSMProxyProperty::SafeDownCast(
-        prop)->RemoveConsumerFromPreviousProxies(this);
-      }
-    prop->SetParent(0);
-    }
+  // ensure that the properties are destroyed before we delete this->Internals.
+  this->Internals->Properties.clear();
+
   delete this->Internals;
   this->SetVTKClassName(0);
   this->SetXMLGroup(0);

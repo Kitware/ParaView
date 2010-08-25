@@ -36,43 +36,6 @@ vtkSMVectorProperty::~vtkSMVectorProperty()
 }
 
 //---------------------------------------------------------------------------
-int vtkSMVectorProperty::LoadState(vtkPVXMLElement* element,
-  vtkSMProxyLocator* loader, int loadLastPushedValues/*=0*/)
-{
-  this->Superclass::LoadState(element, loader, loadLastPushedValues);
-
-  if (loadLastPushedValues)
-    {
-    unsigned int numElems = element->GetNumberOfNestedElements();
-    vtkPVXMLElement* actual_element = NULL;
-    for (unsigned int i=0; i < numElems; i++)
-      {
-      vtkPVXMLElement* currentElement = element->GetNestedElement(i);
-      if (currentElement->GetName() &&
-        strcmp(currentElement->GetName(), "LastPushedValues") == 0)
-        {
-        actual_element = currentElement;
-        break;
-        }
-      }
-    if (!actual_element)
-      {
-      // No LastPushedValues present, do nothing.
-      return 1;
-      }
-    element = actual_element;
-    }
-
-  int numEls;
-  if (element->GetScalarAttribute("number_of_elements", &numEls))
-    {
-    this->SetNumberOfElements(numEls);
-    }
-
-  return 1;
-}
-
-//---------------------------------------------------------------------------
 int vtkSMVectorProperty::ReadXMLAttributes(vtkSMProxy* parent, 
                                            vtkPVXMLElement* element)
 {

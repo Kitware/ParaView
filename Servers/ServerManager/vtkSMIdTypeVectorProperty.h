@@ -24,10 +24,6 @@
 
 #include "vtkSMVectorProperty.h"
 
-//BTX
-struct vtkSMIdTypeVectorPropertyInternals;
-//ETX
-
 class VTK_EXPORT vtkSMIdTypeVectorProperty : public vtkSMVectorProperty
 {
 public:
@@ -57,6 +53,7 @@ public:
   // or one or more of the values is not in all domains.
   // Returns 1 otherwise.
   int SetElements(const vtkIdType* values);
+  int SetElements(const vtkIdType* values, unsigned int numValues);
 
   // Description:
   // Set the value of 1st element. The vector is resized as necessary.
@@ -125,19 +122,18 @@ protected:
   vtkSMIdTypeVectorProperty();
   ~vtkSMIdTypeVectorProperty();
 
+  // Description:
+  // Let the property write its content into the stream
+  virtual void WriteTo(vtkSMMessage*);
+
+  // Description:
+  // Let the property read and set its content from the stream
+  virtual void ReadFrom(vtkSMMessage*);
+
   virtual int ReadXMLAttributes(vtkSMProxy* parent, 
                                 vtkPVXMLElement* element);
 
-  vtkSMIdTypeVectorPropertyInternals* Internals;
-
   int ArgumentIsArray;
-
-  // Description:
-  // Updates state from an XML element. Returns 0 on failure.
-  virtual int LoadState(vtkPVXMLElement* element, 
-    vtkSMProxyLocator* loader, int loadLastPushedValues=0);
-
-  virtual void ChildSaveState(vtkPVXMLElement* parent, int saveLastPushedValues);
 
   // Description:
   // Sets the size of unchecked elements. Usually this is
@@ -145,24 +141,16 @@ protected:
   // before a domain check is performed.
   virtual void SetNumberOfUncheckedElements(unsigned int num);
 
-  //BTX  
-  // Description:
-  // Append a command to update the vtk object with the property values(s).
-  // The proxy objects create a stream by calling this method on all the
-  // modified properties.
-  virtual void AppendCommandToStream(
-    vtkSMProxy*, vtkClientServerStream* stream, vtkClientServerID objectId );
-  //ETX
-
   // Subclass may override this if ResetToDefault can reset to default
   // value specified in the configuration file.
   virtual void ResetToDefaultInternal();
 
-  bool Initialized;
-
 private:
   vtkSMIdTypeVectorProperty(const vtkSMIdTypeVectorProperty&); // Not implemented
   void operator=(const vtkSMIdTypeVectorProperty&); // Not implemented
+
+  class vtkInternals;
+  vtkInternals* Internals;
 };
 
 #endif

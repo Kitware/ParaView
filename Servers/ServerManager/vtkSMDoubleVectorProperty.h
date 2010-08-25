@@ -24,10 +24,6 @@
 
 #include "vtkSMVectorProperty.h"
 
-//BTX
-struct vtkSMDoubleVectorPropertyInternals;
-//ETX
-
 class VTK_EXPORT vtkSMDoubleVectorProperty : public vtkSMVectorProperty
 {
 public:
@@ -147,33 +143,18 @@ protected:
   //ETX
 
   // Description:
-  // This method sets the internal data structure that saves 
-  // last pushed values to the current values of the property.
-  virtual void UpdateLastPushedValues();
+  // Let the property write its content into the stream
+  virtual void WriteTo(vtkSMMessage*);
 
-  virtual int ReadXMLAttributes(vtkSMProxy* parent, 
-                                vtkPVXMLElement* element);
-
-//BTX  
   // Description:
-  // Append a command to update the vtk object with the property values(s).
-  // The proxy objects create a stream by calling this method on all the
-  // modified properties.
-  virtual void AppendCommandToStream(
-    vtkSMProxy*, vtkClientServerStream* stream, vtkClientServerID objectId );
-//ETX
+  // Let the property read and set its content from the stream
+  virtual void ReadFrom(vtkSMMessage*);
 
-  vtkSMDoubleVectorPropertyInternals* Internals;
+  virtual int ReadXMLAttributes(vtkSMProxy* parent,
+                                vtkPVXMLElement* element);
 
   int Precision;
   int ArgumentIsArray;
-
-  // Description:
-  // Updates state from an XML element. Returns 0 on failure.
-  virtual int LoadState(vtkPVXMLElement* element, 
-    vtkSMProxyLocator* loader, int loadLastPushedValues=0);
-
-  virtual void ChildSaveState(vtkPVXMLElement* parent, int saveLastPushedValues);
 
   // Description:
   // Sets the size of unchecked elements. Usually this is
@@ -184,13 +165,12 @@ protected:
   // Subclass may override this if ResetToDefault can reset to default
   // value specified in the configuration file.
   virtual void ResetToDefaultInternal();
-
-
-  bool Initialized;
-
 private:
   vtkSMDoubleVectorProperty(const vtkSMDoubleVectorProperty&); // Not implemented
   void operator=(const vtkSMDoubleVectorProperty&); // Not implemented
+
+  class vtkInternals;
+  vtkInternals* Internals;
 };
 
 #endif
