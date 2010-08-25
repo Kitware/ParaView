@@ -328,84 +328,7 @@ void vtkCaveRenderManager::DefineDisplay(int idx, double origin[3],
 // It is the room camera transformed by the world camera.
 void vtkCaveRenderManager::ComputeCameraNew(vtkCamera* cam)
 {
-//  vtkTransform* trans = cam->GetViewTransformObject();
-  //trans->PrintSelf(std::cout, ( vtkIndent )1 );
- // this->PrintSelf( std::cout, ( vtkIndent )1 );
-  // std::cout <<"Origin :"
-  //        << this->DisplayOrigin[0] << " "
-  //        << this->DisplayOrigin[1] << " "
-  //        << this->DisplayOrigin[2] << " "
-  //        << this->DisplayOrigin[3] << std::endl;
-  // std::cout <<"X      :"
-  //        << this->DisplayX[0] << " "
-  //        << this->DisplayX[1] << " "
-  //        << this->DisplayX[2] << " "
-  //        << this->DisplayX[3] << std::endl;
-  // std::cout <<"Y      :"
-  //        << this->DisplayY[0] << " "
-  //        << this->DisplayY[1] << " "
-  //        << this->DisplayY[2] << " "
-  //        << this->DisplayY[3] << std::endl;
   this->SetDisplayConfig();
-#if 0
-  int idx;
-  // pos is the user position
-  double pos[4];
-  //cam->GetPosition(pos);
-  pos[0] = 0.;
-  pos[1] = 0.;
-  pos[2] = 0.;
-  pos[3] = 1.;
-
-  // Use the camera here  tempoarily to get the client view transform.
- // Create a transform from the client camera.
-  vtkTransform* trans = cam->GetViewTransformObject();
-  // The displays are defined in camera coordinates.
-  // We want to convert them to world coordinates.
-  trans->Inverse();
-
-  // Apply the transform on the local display info.
-  double p[4];
-  double o[4];
-  double x[4];
-  double y[4];
-  trans->MultiplyPoint(pos, p);
-  trans->MultiplyPoint(this->DisplayOrigin, o);
-  trans->MultiplyPoint(this->DisplayX, x);
-  trans->MultiplyPoint(this->DisplayY, y);
-
-  // Handle homogeneous coordinates.
-  for (idx = 0; idx < 3; ++idx)
-    {
-    p[idx] = p[idx] / p[3];
-    o[idx] = o[idx] / o[3];
-    x[idx] = x[idx] / x[3];
-    y[idx] = y[idx] / y[3];
-    }
-
-  // Now compute the camera.
-  float vn[3];
-  float ox[3];
-  float oy[3];
-  float cp[3];
-  float center[3];
-
-  // Compute the view plane normal.
-  for ( idx = 0; idx < 3; ++idx)
-    {
-    ox[idx] = x[idx] - o[idx];
-    oy[idx] = y[idx] - o[idx];
-    center[idx] = o[idx] + 0.5*(ox[idx] + oy[idx]);
-    cp[idx] = p[idx] - center[idx];
-    }
-  vtkMath::Cross(ox, oy, vn);
-  vtkMath::Normalize(vn);
-
-  // Point the camera orthogonal toward the plane.
-  cam->SetPosition(p[0], p[1], p[2]);
-  cam->SetFocalPoint(p[0]-vn[0], p[1]-vn[1], p[2]-vn[2]);
-  cam->SetViewUp(oy[0], oy[1], oy[2]);
-#endif
 }
 
 //------------------------------------------------------------------HeadTracked
@@ -426,50 +349,20 @@ void vtkCaveRenderManager::SetDisplayConfig()
     }
   vtkMath::Cross( xBase, yBase, zBase );
 
-
-  // vtkMath::Normalize( xBase );
-  // vtkMath::Normalize( yBase );
-  // vtkMath::Normalize( zBase );
-
-  //Calculate directional cosine matrix to get surface rotation
-  // this->SurfaceRot->SetElement( 0, 0, vtkMath::Dot( xBase, xRoom ) );
-  // this->SurfaceRot->SetElement( 0, 1, vtkMath::Dot( yBase, xRoom ) );
-  // this->SurfaceRot->SetElement( 0, 2, vtkMath::Dot( zBase, xRoom ) );
-
-  // this->SurfaceRot->SetElement( 1, 0, vtkMath::Dot( xBase, yRoom ) );
-  // this->SurfaceRot->SetElement( 1, 1, vtkMath::Dot( yBase, yRoom ) );
-  // this->SurfaceRot->SetElement( 1, 2, vtkMath::Dot( zBase, yRoom ) );
-
-  // this->SurfaceRot->SetElement( 2, 0, vtkMath::Dot( xBase, zRoom ) );
-  // this->SurfaceRot->SetElement( 2, 1, vtkMath::Dot( yBase, zRoom ) );
-  // this->SurfaceRot->SetElement( 2, 2, vtkMath::Dot( zBase, zRoom ) );
-
-  // this->SurfaceRot->SetElement( 0, 0, 1.0 );
-  // this->SurfaceRot->SetElement( 0, 1, 0.0 );
-  // this->SurfaceRot->SetElement( 0, 2, 0.0 );
-
-  // this->SurfaceRot->SetElement( 1, 0, 0.0 );
-  // this->SurfaceRot->SetElement( 1, 1, 1.0 );
-  // this->SurfaceRot->SetElement( 1, 2, 0.0 );
-
-  // this->SurfaceRot->SetElement( 2, 0, 0.0 );
-  // this->SurfaceRot->SetElement( 2, 1, 0.0 );
-  // this->SurfaceRot->SetElement( 2, 2, 1.0 );
-
   this->SetSurfaceRotation( xBase, yBase, zBase, xRoom, yRoom, zRoom );
 
-  std::cout <<"x-basis ( "
-            << xBase[0] << " "
-            << xBase[1] << " "
-            << xBase[2] << " )" << std::endl;
-  std::cout <<"y-basis ( "
-            << yBase[0] << " "
-            << yBase[1] << " "
-            << yBase[2] << " )" << std::endl;
-  std::cout <<"z-basis ( "
-            << zBase[0] << " "
-            << zBase[1] << " "
-            << zBase[2] << " )" << std::endl;
+  // std::cout <<"x-basis ( "
+  //           << xBase[0] << " "
+  //           << xBase[1] << " "
+  //           << xBase[2] << " )" << std::endl;
+  // std::cout <<"y-basis ( "
+  //           << yBase[0] << " "
+  //           << yBase[1] << " "
+  //           << yBase[2] << " )" << std::endl;
+  // std::cout <<"z-basis ( "
+  //           << zBase[0] << " "
+  //           << zBase[1] << " "
+  //           << zBase[2] << " )" << std::endl;
 
   // Get the new DisplayOrigin, DisplayX and DisplayY after transfromation
   this->SurfaceRot->MultiplyPoint( this->DisplayOrigin, this->DisplayOrigin );
@@ -488,24 +381,33 @@ void vtkCaveRenderManager::SetDisplayConfig()
   rens->InitTraversal();
   vtkRenderer* ren = rens->GetNextItem();
   vtkCamera * cam = 0;
+  while ( ren )
+    {
+    if ( ren->GetLayer() == 0 )
+      {
+      break;
+      }
+    ren = rens->GetNextItem();
+    }
   if (ren == NULL)
     {
     vtkErrorMacro("Renderer mismatch.");
     }
   else
     {
+    assert( ren->IsA( "vtkIceTRenderer" ) );
     cam = ren->GetActiveCamera();
-    }
-  cam->SetHeadTracked( 1 );
-  cam->SetHeadPose( 1.0, 0.0, 0.0, 0.0,
-                    0.0, 1.0, 0.0, 0.0,
-                    0.0, 0.0, 1.0, 0.0,
-                    0.0, 0.0, 0.0, 1.0 );
-  cam->SetConfigParams( O2Screen, O2Right, O2Left,O2Top, O2Bottom,
-                        0.064, 1.0,
-                        this->SurfaceRot);
-  cam->ComputeProjAndViewParams();
 
+    // cam->SetHeadTracked( 1 );
+    // cam->SetHeadPose( 1.0, 0.0, 0.0, 0.0,
+    //                0.0, 1.0, 0.0, 0.0,
+    //                0.0, 0.0, 1.0, 0.0,
+    //                0.0, 0.0, 0.0, 1.0 );
+    cam->SetConfigParams( O2Screen, O2Right, O2Left,O2Top, O2Bottom,
+                          0.064, 1.0,
+                          this->SurfaceRot);
+    //cam->ComputeProjAndViewParams();
+    }
 }
 
 //------------------------------------------------------------------HeadTracked
@@ -667,6 +569,11 @@ void vtkCaveRenderManager::PreRenderProcessing()
   // updated the first time if the camera does not exist and we want
   // it to happen before we block in receive"
   ren = rens->GetNextItem();
+  vtkIceTRenderer* iceTRen = vtkIceTRenderer::SafeDownCast(ren);
+  if (iceTRen)
+    {
+    iceTRen->SetDisableIceT(true);
+    }
   if (ren == NULL)
     {
     vtkErrorMacro("Renderer mismatch.");

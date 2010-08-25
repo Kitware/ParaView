@@ -79,12 +79,13 @@ void vtkSMCaveRenderViewProxy::SetHeadPose(
     vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
     pm->SendStream( this->ConnectionID, vtkProcessModule::RENDER_SERVER |
                     vtkProcessModule::CLIENT, stream );
+    this->StillRender();
 }
 
 //-----------------------------------------------------------------------------
 void vtkSMCaveRenderViewProxy::ConfigureRenderManagerFromServerInformation()
 {
-  // this->HeadTracked( 1 );
+  this->HeadTracked( 1 );
   // this->SetHeadPose( 1.0 , 0.0, 0.0, 0.0,
   //                    0.0 , 1.0, 0.0, 0.0,
   //                    0.0 , 0.0, 1.0, 0.0,

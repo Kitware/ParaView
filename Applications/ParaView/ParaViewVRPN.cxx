@@ -119,6 +119,20 @@ void VRPN_CALLBACK handleTrackerPosQuat(void *userdata,
            t.sensor,
            t.pos[0], t.pos[1], t.pos[2],
            t.quat[0], t.quat[1], t.quat[2], t.quat[3]);
+    pqView *view = 0;
+    view = pqActiveObjects::instance().activeView();
+    if ( view )
+      {
+      vtkSMCaveRenderViewProxy *proxy = 0;
+      proxy = vtkSMCaveRenderViewProxy::SafeDownCast( view->getViewProxy() );
+      if ( proxy )
+        {
+        proxy->SetHeadPose( 0.0, 0.0, 0.0, t.pos[0]*5,
+                            0.0, 0.0, 0.0, t.pos[2]*-5,
+                            0.0, 0.0, 0.0, t.pos[1]*5,
+                            0.0, 0.0, 0.0, 0.0 );
+        }
+      }
     }
 }
 
