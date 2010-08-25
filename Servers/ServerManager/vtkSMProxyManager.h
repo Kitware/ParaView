@@ -48,6 +48,7 @@ class vtkSMReaderFactory;
 class vtkSMStateLoader;
 class vtkSMWriterFactory;
 class vtkStringList;
+class vtkSMProxyDefinitionManager;
 
 //BTX
 struct vtkSMProxyManagerInternals;
@@ -107,24 +108,6 @@ public:
   // returns 0.
   vtkSMProxy* GetProxy(const char* groupname, const char* name);
   vtkSMProxy* GetProxy(const char* name);
-
-  // Description:
-  // Given an proxy self ID, this method returns a proxy, if any.
-  // This is a convenience method, this merely asks the process module
-  // for the object on the given connection with the given ID. The proxy
-  // may not be registered at all with the proxy manager.
-  vtkSMProxy* GetProxy(vtkIdType connectionID, int id);
-  //BTX
-  vtkSMProxy* GetProxy(vtkIdType connectionID, vtkClientServerID id);
-  //ETX
-
-  // Description:
-  // Returns a proxy with the given self ID registered under the indicated
-  // group, if any.
-  vtkSMProxy* GetProxy(const char* groupname, int id);
-  //BTX
-  vtkSMProxy* GetProxy(const char* groupname, vtkClientServerID id);
-  //ETX
 
   // Description:
   // Returns all proxies registered under the given group with the given name.
@@ -313,18 +296,6 @@ public:
   vtkPVXMLElement* SaveState(vtkCollection* proxies, bool save_referred_proxies);
 
   // Description:
-  // Saves the revival states for all proxies on the given connection.
-  // In most cases, the generic SaveState must be used which saves
-  // state that can be reloaded by the proxy manager.
-  // Revival states are useful to revive a proxy using already present
-  // server side objects.
-  // RevivalState includes the entire state saved by calling
-  // SaveState() as well as additional information such as server side
-  // object IDs. This makes it possible to restore the servermanager state
-  // while reusing server side object ids.
-  vtkPVXMLElement* SaveRevivalState(vtkIdType cid);
-
-  // Description:
   // Given a group name, create prototypes and store them
   // in a instance group called groupName_prototypes.
   // Prototypes have their ConnectionID set to the SelfConnection.
@@ -335,35 +306,10 @@ public:
   void InstantiatePrototypes();
 
   // Description:
-  // Returns the number of XML groups from which proxies can
-  // be created.
-  unsigned int GetNumberOfXMLGroups();
-
-  // Description:
-  // Returns the name of nth XML group.
-  const char* GetXMLGroupName(unsigned int n);
-
-  // Description:
-  // Returns the number of proxies under the group with \c groupName for which
-  // proxies can be created.
-  unsigned int GetNumberOfXMLProxies(const char* groupName);
-
-  // Description:
-  // Returns the name for the nth XML proxy element under the
-  // group with name \c groupName.
-  const char* GetXMLProxyName(const char* groupName, unsigned int n);
-
-  // Description:
   // Returns 1 if a proxy element of given group and exists, 0
   // otherwise. If a proxy element does not exist, a call to
   // NewProxy() will fail.
   int ProxyElementExists(const char* groupName,  const char* proxyName);
-
-  // Description:
-  // This a boolean that is set to true before the RegisterEvent/UnRegisterEvent
-  // is triggered to indicate that an new definition has been added. This is
-  // used by python wrapping to decide if the modules should be updated.
-  vtkGetMacro(ProxyDefinitionsUpdated, bool);
 
 //BTX
   struct RegisteredProxyInformation
@@ -491,16 +437,17 @@ public:
   // Loads server-manager configuration xml.
   bool LoadConfigurationXML(const char* xmlcontents);
 
+  // Description:
+  // Get/Set the proxy definition manager.
+  // Proxy definition manager maintains all the information about proxy
+  // definitions.
+  void SetProxyDefinitionManager(vtkSMProxyDefinitionManager*);
+  vtkGetObjectMacro(ProxyDefinitionManager, vtkSMProxyDefinitionManager);
+
 //BTX
 protected:
   vtkSMProxyManager();
   ~vtkSMProxyManager();
-
-  // Description:
-  // Called by the XML parser to add an element from which a proxy
-  // can be created. Called during parsing.
-  void AddElement(
-    const char* groupName, const char* name, vtkPVXMLElement* element);
 
   friend class vtkSMGlobalPropertiesManager;
   friend class vtkSMProxy;
@@ -550,11 +497,10 @@ protected:
     vtkSMProxy* proxy);
 
   int UpdateInputProxies;
-  bool ProxyDefinitionsUpdated;
 
   vtkSMReaderFactory* ReaderFactory;
   vtkSMWriterFactory* WriterFactory;
-
+  vtkSMProxyDefinitionManager* ProxyDefinitionManager;
 private:
   vtkSMProxyManagerInternals* Internals;
   vtkSMProxyManagerObserver* Observer;

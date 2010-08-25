@@ -29,6 +29,7 @@ SET (Kit_SRCS
   vtkSMSession.cxx
   vtkSMSessionServer.cxx
   vtkSMRemoteObject.cxx
+  vtkSMProxyManager.cxx
   )
 
 IF (FIXME)

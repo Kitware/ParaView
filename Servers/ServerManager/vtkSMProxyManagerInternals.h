@@ -16,7 +16,6 @@
 #ifndef __vtkSMProxyManagerInternals_h
 #define __vtkSMProxyManagerInternals_h
 
-#include "vtkPVXMLElement.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMGlobalPropertiesManager.h"
 #include "vtkSMLink.h"
@@ -29,59 +28,7 @@
 #include <vtksys/ios/sstream>
 #include "vtkStdString.h"
 
-class vtkSMProxyManagerElement : public vtkSmartPointer<vtkPVXMLElement>
-{
-  typedef vtkSmartPointer<vtkPVXMLElement> Superclass;
-public:
-  bool Custom; // custom is true for definitions not added by vtkSMXMLParser.
-  vtkSMProxyManagerElement() :Custom(false) {}
-  vtkSMProxyManagerElement(vtkPVXMLElement* elem)
-    {
-    this->Custom = false;
-    this->Superclass::operator=(elem);
-    }
-  vtkSMProxyManagerElement(vtkPVXMLElement* elem, bool custom)
-    {
-    this->Custom = custom;
-    this->Superclass::operator=(elem);
-    }
-
-  // Description:
-  // Assign object to reference.  This removes any reference to an old
-  // object.
-  vtkSMProxyManagerElement& operator=(vtkPVXMLElement* r)
-    {
-    this->Custom = false;
-    this->Superclass::operator=(r);
-    return *this;
-    }
-
-  // Description:
-  // Returns true if the defintions match.
-  bool DefinitionsMatch(vtkPVXMLElement* other)
-    {
-    vtkPVXMLElement* self = this->GetPointer();
-    if (self == other)
-      {
-      return true;
-      }
-    if (!other || !self)
-      {
-      return false;
-      }
-    vtksys_ios::ostringstream selfstream;
-    vtksys_ios::ostringstream otherstream;
-    self->PrintXML(selfstream, vtkIndent());
-    other->PrintXML(otherstream, vtkIndent());
-    return (selfstream.str() == otherstream.str());
-    }
-
-};
-
 // Sub-classed to avoid symbol length explosion.
-class vtkSMProxyManagerElementMapType:
-  public vtkstd::map<vtkStdString, vtkSMProxyManagerElement> {};
-
 class vtkSMProxyManagerProxyInfo : public vtkObjectBase
 {
 public:
@@ -190,12 +137,6 @@ class vtkSMProxyManagerProxyMapType:
 //-----------------------------------------------------------------------------
 struct vtkSMProxyManagerInternals
 {
-  // This data structure stores the XML elements (prototypes) from which
-  // proxies and properties are instantiated and initialized.
-  typedef 
-  vtkstd::map<vtkStdString, vtkSMProxyManagerElementMapType> GroupMapType;
-  GroupMapType GroupMap;
-
   // This data structure stores actual proxy instances grouped in
   // collections.
   typedef 
@@ -221,33 +162,6 @@ struct vtkSMProxyManagerInternals
           vtkSmartPointer<vtkSMGlobalPropertiesManager> >
             GlobalPropertiesManagersType;
   GlobalPropertiesManagersType GlobalPropertiesManagers;
-
-  // Helper method to retrieve the proxy element.
-  vtkPVXMLElement* GetProxyElement(const char* groupName, const char* proxyName)
-    {
-    if (!groupName || !proxyName)
-      {
-      return 0;
-      }
-    vtkPVXMLElement* element = 0;
-
-    // Find the XML element from the proxy.
-    // 
-    vtkSMProxyManagerInternals::GroupMapType::iterator it =
-      this->GroupMap.find(groupName);
-    if (it != this->GroupMap.end())
-      {
-      vtkSMProxyManagerElementMapType::iterator it2 =
-        it->second.find(proxyName);
-
-      if (it2 != it->second.end())
-        {
-        element = it2->second.GetPointer();
-        }
-      }
-
-    return element;
-    }
 };
 
 #endif

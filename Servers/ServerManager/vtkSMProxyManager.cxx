@@ -29,6 +29,7 @@
 #include "vtkSMDocumentation.h"
 #include "vtkSMPropertyIterator.h"
 #include "vtkSMProxyDefinitionIterator.h"
+#include "vtkSMProxyDefinitionManager.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyIterator.h"
 #include "vtkSMProxyLocator.h"
@@ -47,6 +48,7 @@
 #include <vtksys/DateStamp.h> // For date stamp
 #include <vtksys/ios/sstream>
 #include <vtksys/RegularExpression.hxx>
+#include <assert.h>
 
 #include "vtkSMProxyManagerInternals.h"
 
@@ -102,6 +104,8 @@ protected:
 
 //*****************************************************************************
 vtkStandardNewMacro(vtkSMProxyManager);
+vtkCxxSetObjectMacro(vtkSMProxyManager, ProxyDefinitionManager,
+  vtkSMProxyDefinitionManager);
 //---------------------------------------------------------------------------
 vtkSMProxyManager::vtkSMProxyManager()
 {
@@ -117,7 +121,6 @@ vtkSMProxyManager::vtkSMProxyManager()
 
   this->ReaderFactory = vtkSMReaderFactory::New();
   this->WriterFactory = vtkSMWriterFactory::New();
-  this->ProxyDefinitionsUpdated = false;
 }
 
 //---------------------------------------------------------------------------
@@ -168,52 +171,58 @@ void vtkSMProxyManager::InstantiateGroupPrototypes(const char* groupName)
     return;
     }
 
+  assert(this->ProxyDefinitionManager != 0);
+
   vtksys_ios::ostringstream newgroupname;
   newgroupname << groupName << "_prototypes" << ends;
+
+  // Not a huge fan of this iterator API. Need to make it more consistent with
+  // VTK.
+  vtkSMProxyDefinitionIterator* iter =
+    this->ProxyDefinitionManager->NewSingleGroupIterator(groupName, 0);
+
   // Find the XML elements from which the proxies can be instantiated and
   // initialized
-  vtkSMProxyManagerInternals::GroupMapType::iterator it =
-    this->Internals->GroupMap.find(groupName);
-  if (it != this->Internals->GroupMap.end())
+  for (iter->InitTraversal(); !iter->IsDoneWithTraversal();
+    iter->GoToNextItem())
     {
-    vtkSMProxyManagerElementMapType::iterator it2 =
-      it->second.begin();
-
-    for(; it2 != it->second.end(); it2++)
+    const char* xml_name = iter->GetProxyName();
+    if (this->GetProxy(newgroupname.str().c_str(), xml_name) == NULL)
       {
-      vtkPVXMLElement* element = it2->second.GetPointer();
-      if (!this->GetProxy(newgroupname.str().c_str(), it2->first.c_str()))
+      vtkSMProxy* proxy = this->NewProxy(groupName, xml_name);
+      if (proxy)
         {
-        vtkSMProxy* proxy = this->NewProxy(element, groupName, it2->first.c_str());
-        if (proxy)
-          {
-          proxy->SetConnectionID(
-            vtkProcessModuleConnectionManager::GetNullConnectionID());
-          this->RegisterProxy(newgroupname.str().c_str(), it2->first.c_str(), proxy);
-          proxy->Delete();
-          }
+        proxy->SetConnectionID(
+          vtkProcessModuleConnectionManager::GetNullConnectionID());
+        this->RegisterProxy(newgroupname.str().c_str(), xml_name, proxy);
+        proxy->FastDelete();
         }
       }
-
     }
+  iter->Delete();
 }
 
 //----------------------------------------------------------------------------
 void vtkSMProxyManager::InstantiatePrototypes()
 {
-  vtkSMProxyManagerInternals::GroupMapType::iterator it =
-    this->Internals->GroupMap.begin();
-  for (; it != this->Internals->GroupMap.end(); ++it)
+  assert(this->ProxyDefinitionManager != 0);
+  vtkSMProxyDefinitionIterator* iter =
+    this->ProxyDefinitionManager->NewIterator(0);
+
+  for (iter->InitTraversal(); !iter->IsDoneWithTraversal();
+    iter->GoToNextGroup())
     {
-    this->InstantiateGroupPrototypes(it->first.c_str());
+    this->InstantiateGroupPrototypes(iter->GetGroupName());
     }
 }
 
+#ifdef FIXME
 //----------------------------------------------------------------------------
 void vtkSMProxyManager::AddElement(const char* groupName,
                                    const char* name,
                                    vtkPVXMLElement* element)
 {
+  // FIXME: ensure that extensions are handled by vtkSMProxyDefinitionManager.
   vtkSMProxyManagerElementMapType& elementMap =
     this->Internals->GroupMap[groupName];
 
@@ -237,6 +246,7 @@ void vtkSMProxyManager::AddElement(const char* groupName,
     elementMap[name] = element;
     }
 }
+#endif
 
 //----------------------------------------------------------------------------
 vtkSMProxy* vtkSMProxyManager::NewProxy(
@@ -335,108 +345,18 @@ vtkSMDocumentation* vtkSMProxyManager::GetPropertyDocumentation(
 int vtkSMProxyManager::ProxyElementExists(const char* groupName,
                                           const char* proxyName)
 {
-  if (!groupName || !proxyName)
-    {
-    return 0;
-    }
-  // Find the XML element from the proxy.
-  //
-  vtkSMProxyManagerInternals::GroupMapType::iterator it =
-    this->Internals->GroupMap.find(groupName);
-  if (it != this->Internals->GroupMap.end())
-    {
-    vtkSMProxyManagerElementMapType::iterator it2 =
-      it->second.find(proxyName);
-
-    if (it2 != it->second.end())
-      {
-      vtkPVXMLElement* element = it2->second.GetPointer();
-      if (element)
-        {
-        return 1;
-        }
-      }
-    }
-  return 0;
+  assert(this->ProxyDefinitionManager != 0);
+  return this->ProxyDefinitionManager->ProxyElementExists(groupName, proxyName)?
+    1 : 0;
 }
 
 //---------------------------------------------------------------------------
 vtkPVXMLElement* vtkSMProxyManager::GetProxyElement(const char* groupName,
                                                     const char* proxyName)
 {
-  vtkPVXMLElement* element = this->Internals->GetProxyElement(groupName, proxyName);
-  if (element)
-    {
-    return element;
-    }
-
-  vtkErrorMacro( << "No proxy that matches: group=" << groupName
-                 << " and proxy=" << proxyName << " were found.");
-  return 0;
-}
-
-//---------------------------------------------------------------------------
-unsigned int vtkSMProxyManager::GetNumberOfXMLGroups()
-{
-  return this->Internals->GroupMap.size();
-}
-
-//---------------------------------------------------------------------------
-const char* vtkSMProxyManager::GetXMLGroupName(unsigned int n)
-{
-  unsigned int idx;
-  vtkSMProxyManagerInternals::GroupMapType::iterator it =
-    this->Internals->GroupMap.begin();
-  for (idx=0;
-       it != this->Internals->GroupMap.end() && idx < n;
-       it++)
-    {
-    idx++;
-    }
-
-  if (idx == n && it != this->Internals->GroupMap.end())
-    {
-    return it->first.c_str();
-    }
-  return 0;
-}
-
-//---------------------------------------------------------------------------
-unsigned int vtkSMProxyManager::GetNumberOfXMLProxies(const char* groupName)
-{
-  vtkSMProxyManagerInternals::GroupMapType::iterator it =
-    this->Internals->GroupMap.find(groupName);
-  if (it != this->Internals->GroupMap.end())
-    {
-    return it->second.size();
-    }
-  return 0;
-}
-
-
-//---------------------------------------------------------------------------
-const char* vtkSMProxyManager::GetXMLProxyName(const char* groupName,
-  unsigned int n)
-{
-  vtkSMProxyManagerInternals::GroupMapType::iterator it =
-    this->Internals->GroupMap.find(groupName);
-  if (it != this->Internals->GroupMap.end())
-    {
-    vtkSMProxyManagerElementMapType::iterator it2 =
-      it->second.begin();
-    unsigned int idx;
-    for (idx=0;
-      it2 != it->second.end() && idx < n;
-      it2++)
-      {
-      idx++;
-      }
-    if (idx == n && it2 != it->second.end())
-      {
-      return it2->first.c_str();
-      }
-    }
-  return 0;
+  assert(this->ProxyDefinitionManager != 0);
+  return this->ProxyDefinitionManager->GetProxyDefinition(
+    groupName, proxyName, true);
 }
 
 //---------------------------------------------------------------------------
@@ -472,7 +392,7 @@ vtkSMProxy* vtkSMProxyManager::GetPrototypeProxy(const char* groupname,
     return proxy;
     }
 
-  if (!this->Internals->GetProxyElement(groupname, name))
+  if (!this->GetProxyElement(groupname, name))
     {
     // No definition was located for the requested proxy.
     // Cannot create the prototype.
@@ -513,36 +433,6 @@ vtkSMProxy* vtkSMProxyManager::GetProxy(const char* group, const char* name)
 }
 
 //---------------------------------------------------------------------------
-vtkSMProxy* vtkSMProxyManager::GetProxy(const char* groupname, int id)
-{
-  vtkClientServerID cid(id);
-  return this->GetProxy(groupname, cid);
-}
-
-//---------------------------------------------------------------------------
-vtkSMProxy* vtkSMProxyManager::GetProxy(const char* groupname, vtkClientServerID id)
-{
-  vtkSMProxyManagerInternals::ProxyGroupType::iterator it =
-    this->Internals->RegisteredProxyMap.find(groupname);
-  if (it != this->Internals->RegisteredProxyMap.end())
-    {
-    vtkSMProxyManagerProxyMapType::iterator it2;
-    for (it2 = it->second.begin(); it2 != it->second.end(); it2++)
-      {
-      vtkSMProxyManagerProxyListType::iterator it3;
-      for (it3 = it2->second.begin();it3 != it2->second.end(); it3++)
-        {
-        if (it3->GetPointer()->Proxy->GetSelfID() == id)
-          {
-          return it3->GetPointer()->Proxy;
-          }
-        }
-      }
-    }
-  return 0;
-}
-
-//---------------------------------------------------------------------------
 vtkSMProxy* vtkSMProxyManager::GetProxy(const char* name)
 {
   vtkSMProxyManagerInternals::ProxyGroupType::iterator it =
@@ -560,22 +450,6 @@ vtkSMProxy* vtkSMProxyManager::GetProxy(const char* name)
       }
     }
   return 0;
-}
-
-//---------------------------------------------------------------------------
-vtkSMProxy* vtkSMProxyManager::GetProxy(vtkIdType vtkNotUsed(connectionID),
-  vtkClientServerID id)
-{
-  return vtkSMProxy::SafeDownCast(
-    vtkProcessModule::GetProcessModule()->GetObjectFromID(id));
-}
-
-//---------------------------------------------------------------------------
-vtkSMProxy* vtkSMProxyManager::GetProxy(vtkIdType connectionID, int id)
-{
-  vtkClientServerID cid;
-  cid.ID = id;
-  return this->GetProxy(connectionID, cid);
 }
 
 //---------------------------------------------------------------------------
@@ -1168,6 +1042,10 @@ void vtkSMProxyManager::LoadState(const char* filename, vtkIdType id,
 void vtkSMProxyManager::LoadState(vtkPVXMLElement* rootElement, vtkIdType id,
   vtkSMStateLoader* loader/*=NULL*/)
 {
+  (void)rootElement;
+  (void)id;
+  (void)loader;
+#ifdef FIXME
   if (!rootElement)
     {
     return;
@@ -1190,6 +1068,7 @@ void vtkSMProxyManager::LoadState(vtkPVXMLElement* rootElement, vtkIdType id,
     info.ProxyLocator = spLoader->GetProxyLocator();
     this->InvokeEvent(vtkCommand::LoadStateEvent, &info);
     }
+#endif
 }
 
 //---------------------------------------------------------------------------
@@ -1255,12 +1134,6 @@ vtkPVXMLElement* vtkSMProxyManager::SaveState(vtkIdType connectionID)
 }
 
 //---------------------------------------------------------------------------
-vtkPVXMLElement* vtkSMProxyManager::SaveRevivalState(vtkIdType connectionID)
-{
-  return this->SaveStateInternal(connectionID, 0, 1);
-}
-
-//---------------------------------------------------------------------------
 vtkPVXMLElement* vtkSMProxyManager::SaveState(vtkCollection* proxies,
   bool save_referred_proxies)
 {
@@ -1310,6 +1183,11 @@ void vtkSMProxyManager::CollectReferredProxies(
 vtkPVXMLElement* vtkSMProxyManager::SaveStateInternal(vtkIdType connectionID,
  vtkSMProxyManagerProxySet* proxySet, int revival)
 {
+  (void)proxySet;
+  (void)revival;
+  (void)connectionID;
+  return NULL;
+#ifdef FIXME
   vtkPVXMLElement* rootElement = vtkPVXMLElement::New();
   rootElement->SetName("ServerManagerState");
 
@@ -1467,102 +1345,36 @@ vtkPVXMLElement* vtkSMProxyManager::SaveStateInternal(vtkIdType connectionID,
   globalProps->Delete();
 
   return rootElement;
+#endif
 }
 
 //---------------------------------------------------------------------------
 void vtkSMProxyManager::UnRegisterCustomProxyDefinitions()
 {
-  vtkSMProxyManagerInternals::GroupMapType::iterator groupIter =
-    this->Internals->GroupMap.begin();
-  for ( ;groupIter != this->Internals->GroupMap.end(); ++groupIter)
-    {
-    vtkSMProxyManagerElementMapType::iterator elemIter=
-      groupIter->second.begin();
-
-    for(; elemIter != groupIter->second.end(); )
-      {
-      if (elemIter->second.Custom)
-        {
-        vtkSMProxyManagerElementMapType::iterator prev = elemIter;
-        elemIter++;
-        groupIter->second.erase(prev);
-        }
-      else
-        {
-        elemIter++;
-        }
-      }
-    }
+  assert(this->ProxyDefinitionManager != 0);
+  this->ProxyDefinitionManager->ClearCustomProxyDefinition();
 }
 
 //---------------------------------------------------------------------------
 void vtkSMProxyManager::UnRegisterCustomProxyDefinition(
   const char* group, const char* name)
 {
-  vtkSMProxyManagerElementMapType& elementMap =
-    this->Internals->GroupMap[group];
-  vtkSMProxyManagerElementMapType::iterator iter = elementMap.find(name) ;
-  if (iter != elementMap.end() && iter->second.Custom)
-    {
-    RegisteredProxyInformation info;
-    info.Proxy = 0;
-    info.GroupName = group;
-    info.ProxyName = name;
-    info.Type = RegisteredProxyInformation::COMPOUND_PROXY_DEFINITION;
-    bool prev = this->ProxyDefinitionsUpdated;
-    this->ProxyDefinitionsUpdated = true;
-    this->InvokeEvent(vtkCommand::UnRegisterEvent, &info);
-    this->ProxyDefinitionsUpdated = prev;
-    elementMap.erase(iter);
-    return;
-    }
-  else
-    {
-    vtkErrorMacro("No custom proxy definition found with group \""
-      << group << "\" and name \"" << name << "\".");
-    }
+  assert(this->ProxyDefinitionManager != 0);
+  this->ProxyDefinitionManager->RemoveCustomProxyDefinition(group, name);
+
+  // Backwards compatibility issue: We are no longer firing events from proxy
+  // manager when definitions are added.
 }
 
 //---------------------------------------------------------------------------
 void vtkSMProxyManager::RegisterCustomProxyDefinition(
   const char* group, const char* name, vtkPVXMLElement* top)
 {
-  if (!top)
-    {
-    return;
-    }
+  assert(this->ProxyDefinitionManager != 0);
+  this->ProxyDefinitionManager->AddCustomProxyDefinition(group, name, top);
 
-
-  vtkSMProxyManagerElementMapType& elementMap =
-    this->Internals->GroupMap[group];
-  vtkSMProxyManagerElementMapType::iterator iter = elementMap.find(name);
-  if (iter != elementMap.end())
-    {
-    // There's a possibility that the custom proxy definition is the
-    // state has already been loaded (or another proxy definition with
-    // the same name exists). If that existing definition matches what
-    // the state is requesting, we don't need to raise any errors,
-    // simply skip it.
-
-    if (!iter->second.DefinitionsMatch(top))
-      {
-      vtkErrorMacro("Proxy definition has already been registered with name \""
-        << name << "\" under group \"" << group <<"\".");
-      }
-    return;
-    }
-
-  elementMap[name] = vtkSMProxyManagerElement(top, true);
-
-  RegisteredProxyInformation info;
-  info.Proxy = 0;
-  info.GroupName = group;
-  info.ProxyName = name;
-  info.Type = RegisteredProxyInformation::COMPOUND_PROXY_DEFINITION;
-  bool prev = this->ProxyDefinitionsUpdated;
-  this->ProxyDefinitionsUpdated = true;
-  this->InvokeEvent(vtkCommand::RegisterEvent, &info);
-  this->ProxyDefinitionsUpdated = prev;
+  // Backwards compatibility issue: We are no longer firing events from proxy
+  // manager when definitions are added.
 }
 
 //---------------------------------------------------------------------------
@@ -1575,100 +1387,38 @@ vtkPVXMLElement* vtkSMProxyManager::GetProxyDefinition(
     return 0;
     }
 
-  return this->Internals->GetProxyElement(group, name);
+  assert(this->ProxyDefinitionManager != 0);
+  return this->ProxyDefinitionManager->GetProxyDefinition(
+    group, name, false);
 }
 
 //---------------------------------------------------------------------------
 void vtkSMProxyManager::LoadCustomProxyDefinitions(vtkPVXMLElement* root)
 {
-  if (!root)
-    {
-    return;
-    }
-
-  vtksys::RegularExpression proxyDefRe(".*Proxy$");
-  unsigned int numElems = root->GetNumberOfNestedElements();
-  for (unsigned int i=0; i<numElems; i++)
-    {
-    vtkPVXMLElement* currentElement = root->GetNestedElement(i);
-    if (currentElement->GetName() &&
-        strcmp(currentElement->GetName(), "CustomProxyDefinition") == 0)
-      {
-      const char* group = currentElement->GetAttribute("group");
-      const char* name = currentElement->GetAttribute("name");
-      if (name && group)
-        {
-        if (currentElement->GetNumberOfNestedElements() == 1)
-          {
-          vtkPVXMLElement* defElement = currentElement->GetNestedElement(0);
-          const char* tagName = defElement->GetName();
-          if (tagName && proxyDefRe.find(tagName))
-            {
-            // Register custom proxy definitions for all elements ending with
-            // "Proxy".
-            this->RegisterCustomProxyDefinition(group, name, defElement);
-            }
-          }
-        }
-      else
-        {
-        vtkErrorMacro("Missing name or group");
-        }
-      }
-    }
+  assert(this->ProxyDefinitionManager != 0);
+  this->ProxyDefinitionManager->LoadCustomProxyDefinitions(root);
 }
 
 //---------------------------------------------------------------------------
 void vtkSMProxyManager::LoadCustomProxyDefinitions(const char* filename)
 {
-  vtkPVXMLParser* parser = vtkPVXMLParser::New();
-  parser->SetFileName(filename);
-  parser->Parse();
-
-  this->LoadCustomProxyDefinitions(parser->GetRootElement());
-  parser->Delete();
+  assert(this->ProxyDefinitionManager != 0);
+  this->ProxyDefinitionManager->LoadCustomProxyDefinitions(filename);
 }
 
 //---------------------------------------------------------------------------
 void vtkSMProxyManager::SaveCustomProxyDefinitions(
   vtkPVXMLElement* rootElement)
 {
-  if (!rootElement)
-    {
-    vtkErrorMacro("root element must be specified.");
-    return;
-    }
-
-  vtkSMProxyDefinitionIterator* iter = vtkSMProxyDefinitionIterator::New();
-  iter->SetModeToCustomOnly();
-
-  for(iter->Begin(); !iter->IsAtEnd(); iter->Next())
-    {
-    vtkPVXMLElement* elem = iter->GetDefinition();
-    if (elem)
-      {
-      vtkPVXMLElement* defElement = vtkPVXMLElement::New();
-      defElement->SetName("CustomProxyDefinition");
-      defElement->AddAttribute("name", iter->GetKey());
-      defElement->AddAttribute("group", iter->GetGroup());
-      defElement->AddNestedElement(elem, 0);
-      rootElement->AddNestedElement(defElement);
-      defElement->Delete();
-      }
-    }
-  iter->Delete();
+  assert(this->ProxyDefinitionManager != 0);
+  this->ProxyDefinitionManager->SaveCustomProxyDefinitions(rootElement);
 }
 
 //---------------------------------------------------------------------------
 void vtkSMProxyManager::SaveCustomProxyDefinitions(const char* filename)
 {
-  vtkPVXMLElement* root = vtkPVXMLElement::New();
-  root->SetName("CustomProxyDefinitions");
-  this->SaveCustomProxyDefinitions(root);
-
-  ofstream os(filename, ios::out);
-  root->PrintXML(os, vtkIndent());
-  root->Delete();
+  assert(this->ProxyDefinitionManager != 0);
+  this->ProxyDefinitionManager->SaveCustomProxyDefinitions(filename);
 }
 
 //---------------------------------------------------------------------------

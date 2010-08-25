@@ -43,6 +43,8 @@ public:
   // Description:
   // Move the iterator to the beginning.
   virtual void GoToFirstItem();
+  virtual void InitTraversal()
+    { this->GoToFirstItem(); }
 
   // Description:
   // Move the iterator to the next item.
