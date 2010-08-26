@@ -1922,7 +1922,7 @@
 
    </SourceProxy>
 
-   <SourceProxy name="PNGReader"
+   <SourceProxy name="PNGReaderCore"
                 class="vtkPNGReader"
                 label="PNG Reader">
      <Documentation
@@ -4036,20 +4036,15 @@
 
    </SourceProxy> <!-- NrrdReader -->
 
-   <FileSeriesReaderProxy name="FileSeriesPNGReader"
+   <FileSeriesReaderProxy name="PNGReader"
                           class="vtkFileSeriesReader"
-                          label="File Series PNG Reader"
+                          label="PNG Reader"
                           file_name_method="SetFileName">
      <Documentation
        short_help="Read a PNG file."
        long_help="Read a PNG file into an image data.">
        The PNG reader reads PNG (Portable Network Graphics) files, and the output is a uniform rectilinear (image/volume) dataset. The default file extension is .png.
      </Documentation>
-      <SubProxy>
-        <Proxy name="Reader"
-          proxygroup="internal_sources" proxyname="PNGReader">
-        </Proxy>
-      </SubProxy>
 
      <StringVectorProperty
         name="FileNames"
@@ -4075,6 +4070,12 @@
           Available timestep values.
         </Documentation>
      </DoubleVectorProperty>
+
+     <SubProxy>
+        <Proxy name="Reader"
+          proxygroup="internal_sources" proxyname="PNGReaderCore">
+        </Proxy>
+      </SubProxy>
 
      <Hints>
         <ReaderFactory extensions="png"
