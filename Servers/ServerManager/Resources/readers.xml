@@ -1922,6 +1922,32 @@
 
    </SourceProxy>
 
+   <SourceProxy name="PNGReader"
+                class="vtkPNGReader"
+                label="PNG Reader">
+     <Documentation
+       short_help="Read a PNG file."
+       long_help="Read a PNG file into an image data.">
+       The PNG reader reads PNG (Portable Network Graphics) files, and the output is a uniform rectilinear (image/volume) dataset. The default file extension is .png.
+     </Documentation>
+     <StringVectorProperty
+        name="FileName"
+        animateable="0"
+        command="SetFileName"
+        number_of_elements="1">
+        <FileListDomain name="files"/>
+        <Documentation>
+          This property specifies the file name for the PNG reader.
+        </Documentation>
+      </StringVectorProperty>
+
+      <Hints>
+        <ReaderFactory extensions="png"
+          file_description="PNG Image Files" />
+      </Hints>
+     <!-- End PNGReader -->
+   </SourceProxy>
+
     <!-- End of "internal_sources" -->
   </ProxyGroup>
 
@@ -4010,6 +4036,54 @@
 
    </SourceProxy> <!-- NrrdReader -->
 
+   <FileSeriesReaderProxy name="FileSeriesPNGReader"
+                          class="vtkFileSeriesReader"
+                          label="File Series PNG Reader"
+                          file_name_method="SetFileName">
+     <Documentation
+       short_help="Read a PNG file."
+       long_help="Read a PNG file into an image data.">
+       The PNG reader reads PNG (Portable Network Graphics) files, and the output is a uniform rectilinear (image/volume) dataset. The default file extension is .png.
+     </Documentation>
+      <SubProxy>
+        <Proxy name="Reader"
+          proxygroup="internal_sources" proxyname="PNGReader">
+        </Proxy>
+      </SubProxy>
+
+     <StringVectorProperty
+        name="FileNames"
+        clean_command="RemoveAllFileNames"
+        command="AddFileName"
+        animateable="0"
+        number_of_elements="0"
+        repeat_command="1">
+        <FileListDomain name="files"/>
+       <Documentation>
+         The list of files to be read by the reader. If more than 1 file is specified,
+         the reader will switch to file series mode in which it will pretend that it
+         can support time and provide 1 file per time step.
+       </Documentation>
+     </StringVectorProperty>
+
+     <DoubleVectorProperty
+        name="TimestepValues"
+        repeatable="1"
+        information_only="1">
+        <TimeStepsInformationHelper/>
+        <Documentation>
+          Available timestep values.
+        </Documentation>
+     </DoubleVectorProperty>
+
+     <Hints>
+        <ReaderFactory extensions="png"
+          file_description="PNG Image Files" />
+     </Hints>
+
+     <!-- End FileSeriesPNGReader -->
+   </FileSeriesReaderProxy>
+
    <SourceProxy name="XdmfReader" 
                 class="vtkXdmfReader"
                 label="XDMF Reader">
@@ -4546,32 +4620,6 @@
           file_description="Meta Image Data Files" />
      </Hints>
    <!-- End Meta Image Reader -->
-   </SourceProxy>
-
-   <SourceProxy name="PNGReader" 
-                class="vtkPNGReader"
-                label="PNG Reader">
-     <Documentation
-       short_help="Read a PNG file."
-       long_help="Read a PNG file into an image data.">
-       The PNG reader reads PNG (Portable Network Graphics) files, and the output is a uniform rectilinear (image/volume) dataset. The default file extension is .png.
-     </Documentation>
-     <StringVectorProperty
-        name="FileName"
-        animateable="0"
-        command="SetFileName"
-        number_of_elements="1">
-        <FileListDomain name="files"/>
-        <Documentation>
-          This property specifies the file name for the PNG reader.
-        </Documentation>
-     </StringVectorProperty>
-
-     <Hints>
-      <ReaderFactory extensions="png"
-          file_description="PNG Image Files" />
-     </Hints>
-   <!-- End PNGReader -->
    </SourceProxy>
 
   <SourceProxy name="TIFFReader" 
