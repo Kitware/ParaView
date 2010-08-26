@@ -77,23 +77,60 @@ MACRO(build_paraview_client_cpack_config_init)
       SET(CPACK_SYSTEM_NAME Darwin-${CMAKE_OSX_ARCHITECTURES})
     ENDIF(_length GREATER 1)
   ENDIF(${CPACK_SYSTEM_NAME} MATCHES Darwin AND CMAKE_OSX_ARCHITECTURES)
-  
+
   SET (CPACK_INSTALL_CMAKE_PROJECTS 
     "${ParaView_BINARY_DIR}" "ParaView Runtime Libs" "Runtime" "/"
+    "${ParaView_BINARY_DIR}" "HDF5 Core Library" "libraries" "/"
   )
+
+  IF(HDF5_BUILD_CPP_LIB)
+    LIST(APPEND CPACK_INSTALL_CMAKE_PROJECTS
+      "${ParaView_BINARY_DIR}" "HDF5 C++ Library" "cpplibraries" "/"
+    )
+  ENDIF(HDF5_BUILD_CPP_LIB)
+
+  IF(HDF5_BUILD_HL_LIB)
+    LIST(APPEND CPACK_INSTALL_CMAKE_PROJECTS
+      "${ParaView_BINARY_DIR}" "HDF5 HL Library" "hllibraries" "/"
+    )
+    IF(HDF5_BUILD_CPP_LIB)
+      LIST(APPEND CPACK_INSTALL_CMAKE_PROJECTS
+        "${ParaView_BINARY_DIR}" "HDF5 HL C++ Library" "hlcpplibraries" "/"
+      )
+    ENDIF(HDF5_BUILD_CPP_LIB)
+  ENDIF(HDF5_BUILD_HL_LIB)
 
   # Append in CPACK rule for the Development Component
   IF(NOT PV_INSTALL_NO_DEVELOPMENT)
     LIST(APPEND CPACK_INSTALL_CMAKE_PROJECTS
       "${ParaView_BINARY_DIR}" "ParaView Development Headers, Libs and Tools" "Development" "/"
+      "${ParaView_BINARY_DIR}" "HDF5 Core Headers" "headers" "/"
     )
+
+    IF(HDF5_BUILD_CPP_LIB)
+      LIST(APPEND CPACK_INSTALL_CMAKE_PROJECTS
+        "${ParaView_BINARY_DIR}" "HDF5 C++ Library" "cppheaders" "/"
+      )
+    ENDIF(HDF5_BUILD_CPP_LIB)
+
+    IF(HDF5_BUILD_HL_LIB)
+      LIST(APPEND CPACK_INSTALL_CMAKE_PROJECTS
+        "${ParaView_BINARY_DIR}" "HDF5 HL Library" "hllheaders" "/"
+      )
+
+      IF(HDF5_BUILD_CPP_LIB)
+        LIST(APPEND CPACK_INSTALL_CMAKE_PROJECTS
+          "${ParaView_BINARY_DIR}" "HDF5 HL C++ Library" "hlcppheaders" "/"
+        )
+      ENDIF(HDF5_BUILD_CPP_LIB)
+    ENDIF(HDF5_BUILD_HL_LIB)
   ENDIF(NOT PV_INSTALL_NO_DEVELOPMENT)
 
   LIST(APPEND CPACK_INSTALL_CMAKE_PROJECTS
     "${ParaView_BINARY_DIR}" "VTK Runtime Libs" "RuntimeLibraries" "/"
     "${CMAKE_CURRENT_BINARY_DIR}" "${BCC_PACKAGE_NAME} Components" "BrandedRuntime" "/"
   )
-  
+
   # Override this variable to choose a different component for mac drag-n-drop
   # generator.
   SET (CPACK_INSTALL_CMAKE_PROJECTS_DRAGNDROP
