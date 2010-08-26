@@ -5901,20 +5901,23 @@
    <!-- End WindBladeReader -->
    <SourceProxy name="NetCDFPOPReader"
               class="vtkNetCDFPOPReader"
-              label="NetCDF reader">
+              label="NetCDF POP reader">
    <Documentation
      short_help="Read raw regular rectilinear grid data from a file."
      long_help="Read raw regular rectilinear grid data from a file. The dimensions and type of the data must be specified.">
      The Image reader reads raw regular rectilinear grid (image/volume) data from a file. Because no metadata is provided, the user must specify information about the size, spacing, dimensionality, etc. about the dataset.
    </Documentation>
-    <StringVectorProperty name="FileName"
-      command="SetFilename"
-      animateable="0" >
-      <FileListDomain name="files"/>
-      <Documentation>
-        This property specifies the file name to read.
-      </Documentation>
-    </StringVectorProperty>
+
+     <StringVectorProperty
+        name="FileName"
+        animateable="0"
+        command="SetFileName"
+        number_of_elements="1">
+        <FileListDomain name="files"/>
+        <Documentation>
+          This property specifies the file name to read.
+        </Documentation>
+     </StringVectorProperty>
 
     <StringVectorProperty name="VariableArrayInfo"
                           information_only="1">
