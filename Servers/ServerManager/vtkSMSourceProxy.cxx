@@ -499,11 +499,7 @@ void vtkSMSourceProxy::CreateOutputPortsInternal(vtkSMProxy* op)
     for(it=this->PInternals->OutputPorts.begin();
       it != this->PInternals->OutputPorts.end(); it++)
         {
-        it->Port.GetPointer()->CreateTranslatorIfNecessary();
-        if (this->GetNumberOfAlgorithmRequiredInputPorts() == 0)
-          {
-          it->Port.GetPointer()->InsertPostFilterIfNecessary();
-          }
+        it->Port.GetPointer()->InsertPostFilterIfNecessary();
         }
     }
 }
