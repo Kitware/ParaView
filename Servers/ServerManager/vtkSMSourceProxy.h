@@ -17,7 +17,7 @@
 // vtkSMSourceProxy manages VTK source(s) that are created on a server
 // using the proxy pattern. In addition to functionality provided
 // by vtkSMProxy, vtkSMSourceProxy provides method to connect and
-// update sources. Each source proxy has one or more output ports 
+// update sources. Each source proxy has one or more output ports
 // (vtkSMOutputPort).
 // Each port represents one output of one filter. These are created
 // automatically (when CreateOutputPorts() is called) by the source.
@@ -59,13 +59,13 @@ public:
   virtual void UpdatePipeline();
 
   // Description:
-  // Calls Update() on all sources with the given time request. 
+  // Calls Update() on all sources with the given time request.
   // It also creates output ports if they are not already created.
   virtual void UpdatePipeline(double time);
 
   // Description:
   // Connects filters/sinks to an input. If the filter(s) is not
-  // created, this will create it. 
+  // created, this will create it.
   virtual void AddInput(unsigned int inputPort,
                         vtkSMSourceProxy* input,
                         unsigned int outputPort,
@@ -75,9 +75,9 @@ public:
   {
     this->AddInput(0, input, 0, method);
   }
-  
+
   // Description:
-  // Calls method on all VTK sources. Used by the input property 
+  // Calls method on all VTK sources. Used by the input property
   // to remove inputs. Made public to allow access by wrappers. Do
   // not use.
   void CleanInputs(const char* method);
@@ -130,26 +130,26 @@ public:
   vtkSMDocumentation* GetOutputPortDocumentation(const char* portname);
 
   // Description:
-  // Creates the output port proxiess for this filter. 
+  // Creates the output port proxiess for this filter.
   // Each output port proxy corresponds to an actual output port on the
   // algorithm.
   virtual void CreateOutputPorts();
 
   // Description:
   // DataInformation is used by the source proxy to obtain information
-  // on the output(s) from the server. 
-  // If \c update is false the pipeline will not 
+  // on the output(s) from the server.
+  // If \c update is false the pipeline will not
   // be updated before gathering the data information.
   vtkPVDataInformation* GetDataInformation()
   {
     return this->GetDataInformation(0);
   }
   vtkPVDataInformation* GetDataInformation(unsigned int outputIdx);
-    
+
   // Description:
   // This method saves state information about the proxy
   // which can be used to revive the proxy using server side objects
-  // already present. This includes the entire state saved by calling 
+  // already present. This includes the entire state saved by calling
   // SaveState() as well additional information such as server side
   // object IDs.
   // Overridden to save information pertinant to reviving the output ports.
@@ -167,7 +167,7 @@ public:
   // If no extraction proxies are present, this method has no effect.
   void SetSelectionInput(unsigned int portIndex, vtkSMSourceProxy* input,
     unsigned int outputPort);
-  
+
   // Description:
   // API to query selection input set using SetSelectionInput.
   vtkSMSourceProxy* GetSelectionInput(unsigned int portIndex);
@@ -212,7 +212,7 @@ public:
   // Set server ids on self and sub-proxies.
   // Overridden to set servers on the output ports.
   virtual void SetServers(vtkTypeUInt32 servers);
-  
+
   // Description:
   // Marks the selection proxies dirty as well as chain to superclass.
   virtual void MarkDirty(vtkSMProxy* modifiedProxy);
@@ -223,7 +223,7 @@ protected:
 
   friend class vtkSMInputProperty;
 
-  int OutputPortsCreated; 
+  int OutputPortsCreated;
 
   int ProcessSupport;
 
@@ -232,7 +232,7 @@ protected:
   void InvalidateDataInformation();
 
   // Description:
-  // Call superclass' and then assigns a new executive 
+  // Call superclass' and then assigns a new executive
   // (vtkCompositeDataPipeline)
   virtual void CreateVTKObjects();
 
@@ -256,10 +256,11 @@ protected:
   void RemoveAllOutputPorts();
 
   // Description:
-  // Overwritten from superclass to invoke 
+  // Overwritten from superclass to invoke
   virtual void PostUpdateData();
-  
+
   int DoInsertExtractPieces;
+  int DoInsertPostFilter;
   int SelectionProxiesCreated;
 
 private:

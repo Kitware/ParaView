@@ -94,6 +94,7 @@ vtkSMSourceProxy::vtkSMSourceProxy()
   this->SetExecutiveName("vtkPVCompositeDataPipeline");
 
   this->DoInsertExtractPieces = 1;
+  this->DoInsertPostFilter = 1;
   this->SelectionProxiesCreated = 0;
 
   this->NumberOfAlgorithmOutputPorts = VTK_UNSIGNED_INT_MAX;
@@ -489,6 +490,21 @@ void vtkSMSourceProxy::CreateOutputPortsInternal(vtkSMProxy* op)
         it->Port.GetPointer()->InsertExtractPiecesIfNecessary();
         }
       }
+    }
+
+  if ( this->DoInsertPostFilter )
+    {
+    //add the post filters to the source proxy
+    //so that we can do automatic conversion of properties.
+    for(it=this->PInternals->OutputPorts.begin();
+      it != this->PInternals->OutputPorts.end(); it++)
+        {
+        it->Port.GetPointer()->CreateTranslatorIfNecessary();
+        if (this->GetNumberOfAlgorithmRequiredInputPorts() == 0)
+          {
+          it->Port.GetPointer()->InsertPostFilterIfNecessary();
+          }
+        }
     }
 }
 

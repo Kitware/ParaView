@@ -40,7 +40,7 @@ public:
   // Description:
   // Returns data information. If data information is marked
   // invalid, calls GatherDataInformation.
-  // If data information is gathered then this fires the 
+  // If data information is gathered then this fires the
   // vtkCommand::UpdateInformationEvent event.
   virtual vtkPVDataInformation* GetDataInformation();
 
@@ -101,7 +101,7 @@ public:
   // Description:
   // This method saves state information about the proxy
   // which can be used to revive the proxy using server side objects
-  // already present. This includes the entire state saved by calling 
+  // already present. This includes the entire state saved by calling
   // SaveState() as well additional information such as server side
   // object IDs.
   // Overridden to save information pertinant to reviving the output ports.
@@ -162,18 +162,23 @@ private:
 //BTX
   friend class vtkSMSourceProxy;
   void UpdatePipeline();
-  
+
   // Update Pipeline with the given timestep request.
   void UpdatePipeline(double time);
 
-  void InitializeWithIDs(vtkClientServerID outputID, 
-                         vtkClientServerID producerID, 
+  void InitializeWithIDs(vtkClientServerID outputID,
+                         vtkClientServerID producerID,
                          vtkClientServerID executiveID);
 
   // Description:
   // Insert a filter to extract (and redistribute) unstructured
   // pieces if the source cannot generate pieces.
   void InsertExtractPiecesIfNecessary();
+
+    // Description:
+  // Insert a filter to create the Post Filter
+  // so that filters can request data conversions
+  void InsertPostFilterIfNecessary();
 
   // Description:
   // Replace the default extent translator with vtkPVExtentTranslator.
