@@ -21,30 +21,31 @@ ENDIF(NOT WIN32)
 SET (Kit_SRCS
   vtkInitializationHelper.cxx
   vtkPMObject.cxx
+  vtkSMBooleanDomain.cxx
+  vtkSMDocumentation.cxx
+  vtkSMDomain.cxx
+  vtkSMDomainIterator.cxx
+  vtkSMDoubleVectorProperty.cxx
+  vtkSMIdTypeVectorProperty.cxx
+  vtkSMIntVectorProperty.cxx
+  vtkSMLink.cxx
   vtkSMObject.cxx
+  vtkSMProperty.cxx
+  vtkSMPropertyIterator.cxx
+  vtkSMProxy.cxx
   vtkSMProxyDefinitionIterator.cxx
   vtkSMProxyDefinitionManager.cxx
+  vtkSMProxyIterator.cxx
+  vtkSMProxyManager.cxx
+  vtkSMProxyProperty.cxx
+  vtkSMProxySelectionModel.cxx
+  vtkSMRemoteObject.cxx
   vtkSMSessionClient.cxx
   vtkSMSessionCore.cxx
   vtkSMSession.cxx
   vtkSMSessionServer.cxx
-  vtkSMRemoteObject.cxx
-  vtkSMProxyManager.cxx
-  vtkSMProxy.cxx
-  vtkSMPropertyIterator.cxx
-  vtkSMDocumentation.cxx
-  vtkSMProxyIterator.cxx
-  vtkSMProxySelectionModel.cxx
-  vtkSMLink.cxx
-  vtkSMProperty.cxx
-  vtkSMDomain.cxx
-  vtkSMDomainIterator.cxx
-  vtkSMVectorProperty.cxx
-  vtkSMIntVectorProperty.cxx
-  vtkSMDoubleVectorProperty.cxx
-  vtkSMIdTypeVectorProperty.cxx
   vtkSMStringVectorProperty.cxx
-  vtkSMProxyProperty.cxx
+  vtkSMVectorProperty.cxx
   )
 
 IF (FIXME)
@@ -66,7 +67,6 @@ SET(Kit_SRCS
   vtkSMAxesRepresentationProxy.cxx
   vtkSMBlockDeliveryRepresentationProxy.cxx
   vtkSMBlockDeliveryStrategy.cxx
-  vtkSMBooleanDomain.cxx
   vtkSMBooleanKeyFrameProxy.cxx
   vtkSMBoundsDomain.cxx
   vtkSMBoxProxy.cxx
@@ -519,6 +519,9 @@ SET (dynamicHeaders
 
 
 SET_SOURCE_FILES_PROPERTIES(vtkSMApplication.cxx PROPERTIES OBJECT_DEPENDS
+  ${CMAKE_CURRENT_BINARY_DIR}/vtkSMGeneratedModules.h)
+
+SET_SOURCE_FILES_PROPERTIES(vtkSMProxyDefinitionManager.cxx PROPERTIES OBJECT_DEPENDS
   ${CMAKE_CURRENT_BINARY_DIR}/vtkSMGeneratedModules.h)
 
 # including MINI_INIT -nix

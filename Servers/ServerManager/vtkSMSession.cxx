@@ -25,9 +25,11 @@ vtkStandardNewMacro(vtkSMSession);
 vtkSMSession::vtkSMSession()
 {
   this->Core = vtkSMSessionCore::New();
-//  this->ProxyManager = vtkSMProxyManager::New();
-//  this->ProxyManager->SetProxyDefinitionManager(
-//    this->Core->GetProxyDefinitionManager());
+  this->ProxyManager = vtkSMProxyManager::New();
+  this->ProxyManager->SetSession(this);
+  this->ProxyManager->SetProxyDefinitionManager(
+    this->Core->GetProxyDefinitionManager());
+  this->LastGUID = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -35,8 +37,8 @@ vtkSMSession::~vtkSMSession()
 {
   this->Core->Delete();
   this->Core = NULL;
-//  this->ProxyManager->Delete();
-//  this->ProxyManager = NULL;
+  this->ProxyManager->Delete();
+  this->ProxyManager = NULL;
 }
 
 //----------------------------------------------------------------------------

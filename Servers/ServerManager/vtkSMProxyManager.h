@@ -29,7 +29,7 @@
 #ifndef __vtkSMProxyManager_h
 #define __vtkSMProxyManager_h
 
-#include "vtkSMObject.h"
+#include "vtkSMRemoteObject.h"
 
 class vtkCollection;
 class vtkPVXMLElement;
@@ -54,11 +54,11 @@ struct vtkSMProxyManagerInternals;
 struct vtkClientServerID;
 //ETX
 
-class VTK_EXPORT vtkSMProxyManager : public vtkSMObject
+class VTK_EXPORT vtkSMProxyManager : public vtkSMRemoteObject
 {
 public:
   static vtkSMProxyManager* New();
-  vtkTypeMacro(vtkSMProxyManager, vtkSMObject);
+  vtkTypeMacro(vtkSMProxyManager, vtkSMRemoteObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

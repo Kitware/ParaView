@@ -41,6 +41,7 @@ public:
 
   // Description:
   // Get/Set the session on wihch this object exists.
+  // Note that session is not reference counted.
   void SetSession(vtkSMSession*);
   vtkSMSession* GetSession();
 

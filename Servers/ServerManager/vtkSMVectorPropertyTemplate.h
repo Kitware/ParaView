@@ -55,7 +55,7 @@ public:
   //---------------------------------------------------------------------------
   void SetNumberOfUncheckedElements(unsigned int num)
     {
-    this->UncheckedValues.resize(num, 0);
+    this->UncheckedValues.resize(num);
     }
 
   //---------------------------------------------------------------------------
@@ -77,8 +77,8 @@ public:
       {
       return;
       }
-    this->Values.resize(num, 0);
-    this->UncheckedValues.resize(num, 0);
+    this->Values.resize(num);
+    this->UncheckedValues.resize(num);
     if (num == 0)
       {
       // If num == 0, then we already have the intialized values (so to speak).

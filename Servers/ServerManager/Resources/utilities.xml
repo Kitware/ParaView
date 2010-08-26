@@ -2525,7 +2525,6 @@
         command="GetPathSeparator"
         information_only="1"
         number_of_elements="1" >
-        <SimpleStringInformationHelper />
       </StringVectorProperty>
 
       <StringVectorProperty 

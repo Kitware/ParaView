@@ -120,6 +120,8 @@ vtkSMProxyManager::vtkSMProxyManager()
   this->AddObserver(vtkCommand::UnRegisterEvent, obs);
 #endif
 
+  this->ProxyDefinitionManager = NULL;
+
 #ifdef FIXME
   this->ReaderFactory = vtkSMReaderFactory::New();
   this->WriterFactory = vtkSMWriterFactory::New();
@@ -142,6 +144,8 @@ vtkSMProxyManager::~vtkSMProxyManager()
   this->WriterFactory->Delete();
   this->WriterFactory = 0;
 #endif
+
+  this->SetProxyDefinitionManager(NULL);
 }
 
 //----------------------------------------------------------------------------
@@ -302,6 +306,7 @@ vtkSMProxy* vtkSMProxyManager::NewProxy(vtkPVXMLElement* pelement,
   vtkSMProxy* proxy = vtkSMProxy::SafeDownCast(object);
   if (proxy)
     {
+    proxy->SetSession(this->GetSession());
     proxy->ReadXMLAttributes(this, pelement);
     proxy->SetXMLName(proxyname);
     proxy->SetXMLGroup(groupname);

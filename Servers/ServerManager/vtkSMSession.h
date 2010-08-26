@@ -60,9 +60,11 @@ public:
   // Description:
   // Provides a unique identifier across processes of that session
   virtual vtkTypeUInt32 GetNextGlobalUniqueIdentifier()
-    { return ++LastGUID; }
+    {
+    this->LastGUID++;
+    return this->LastGUID;
+    }
 
-//BTX
   // Description:
   // Returns the vtkSMProxyManager attached to that session. Note that the
   // ProxyManager may not be active on every process e.g. in client-server

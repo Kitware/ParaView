@@ -45,19 +45,19 @@ public:
 
   // Description:
   // Push the state message.
-  virtual void PushState(vtkSMMessage* msg);
+  virtual void PushState(vtkSMMessage* message);
 
   // Description:
   // Pull the state message.
-  virtual void PullState(vtkSMMessage* msg);
+  virtual void PullState(vtkSMMessage* message);
 
   // Description:
   // Invoke a method remotely
-  virtual void Invoke(vtkSMMessage* msg);
+  virtual void Invoke(vtkSMMessage* message);
 
   // Description:
   // Invoke a method remotely
-  virtual void DeletePMObject(vtkSMMessage* msg);
+  virtual void DeletePMObject(vtkSMMessage* message);
   //ETX
 
 //BTX
@@ -72,6 +72,9 @@ public:
 protected:
   vtkSMSessionCore();
   ~vtkSMSessionCore();
+
+  // Description:
+  virtual void PushStateInternal(vtkSMMessage*);
 
   enum
     {

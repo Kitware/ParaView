@@ -25,6 +25,8 @@
 #include "vtkProcessModule2.h"
 #include "vtkSMProxyDefinitionManager.h"
 
+#include "assert.h"
+
 namespace
 {
   void RMICallback(void *localArg, void *remoteArg,
@@ -110,43 +112,60 @@ vtkSMSessionCore::~vtkSMSessionCore()
 }
 
 //----------------------------------------------------------------------------
-void vtkSMSessionCore::PushState(vtkSMMessage* msg)
+void vtkSMSessionCore::PushStateInternal(vtkSMMessage* message)
 {
-  if (true) // FIXME make sure that the PMObject should be created here
+  // When the control reaches here, we are assured that the PMObject needs be
+  // created/exist on the local process.
+  vtkPMObject* obj = this->Internals->GetPMObject(message->global_id());
+  if (!obj)
     {
-    vtkPMObject* obj = this->Internals->GetPMObject(msg->global_id());
-    if (!obj)
+    if (!message->HasExtension(DefinitionHeader::server_class))
       {
-      // Create the corresponding PM object.
-      vtkClientServerID tempID = this->Interpreter->GetNextAvailableId();
-      vtkClientServerStream stream;
-      stream << vtkClientServerStream::New
-             << msg->GetExtension(DefinitionHeader::server_class).c_str()
-             << tempID
-             << vtkClientServerStream::End;
-      this->Interpreter->ProcessStream(stream);
-      obj = vtkPMObject::SafeDownCast(
-        this->Interpreter->GetObjectFromID(tempID));
-      if (obj == NULL)
-        {
-        vtkErrorMacro("Object must be a vtkPMObject subclass. "
-          "Aborting for debugging purposes.");
-        abort();
-        }
-      obj->Initialize(this);
-      this->Internals->PMObjectMap[msg->global_id()] = obj;
-
-      // release the reference held by the interpreter.
-      stream << vtkClientServerStream::Delete
-             << tempID
-             << vtkClientServerStream::End;
-      this->Interpreter->ProcessStream(stream);
+      vtkErrorMacro("Message missing DefinitionHeader."
+        "Aborting for debugging purposes.");
+      abort();
       }
-    // Push default values
-    obj->Push(msg);
+    // Create the corresponding PM object.
+    vtkClientServerID tempID = this->Interpreter->GetNextAvailableId();
+    vtkClientServerStream stream;
+    stream << vtkClientServerStream::New
+           << message->GetExtension(DefinitionHeader::server_class).c_str()
+           << tempID
+           << vtkClientServerStream::End;
+    this->Interpreter->ProcessStream(stream);
+    obj = vtkPMObject::SafeDownCast(
+      this->Interpreter->GetObjectFromID(tempID, /*noerror*/ 1));
+    if (obj == NULL)
+      {
+      vtkErrorMacro("Object must be a vtkPMObject subclass. "
+        "Aborting for debugging purposes.");
+      abort();
+      }
+    obj->Initialize(this);
+    this->Internals->PMObjectMap[message->global_id()] = obj;
+
+    // release the reference held by the interpreter.
+    stream << vtkClientServerStream::Delete << tempID
+      << vtkClientServerStream::End;
+    this->Interpreter->ProcessStream(stream);
     }
 
-  if ( (msg->location() & vtkProcessModule2::SERVERS) == 0)
+  // Push the message to the PMObject.
+  obj->Push(message);
+}
+
+//----------------------------------------------------------------------------
+void vtkSMSessionCore::PushState(vtkSMMessage* message)
+{
+  // This can only be called on the root node.
+  assert(this->ParallelController == NULL ||
+    this->ParallelController->GetLocalProcessId() == 0);
+
+  // When the control reaches here, we are assured that the PMObject needs be
+  // created/exist on the local process.
+  this->PushStateInternal(message);
+
+  if ( (message->location() & vtkProcessModule2::SERVERS) == 0)
     {
     // the state was pushed only to the CLIENT or ROOT nodes. So we don't
     // forward it to the satellites.
@@ -157,31 +176,45 @@ void vtkSMSessionCore::PushState(vtkSMMessage* msg)
     this->ParallelController->GetNumberOfProcesses() > 1 &&
     this->ParallelController->GetLocalProcessId() == 0)
     {
+    // Forward the message to the satellites if the object is expected to exist
+    // on the satellites.
+
+    // FIXME: There's one flaw in this logic. If a object is to be created on
+    // DATA_SERVER_ROOT, but on all RENDER_SERVER nodes, then in render-server
+    // configuration, the message will end up being send to all data-server
+    // nodes as well. Although we never do that presently, it's a possibility
+    // and we should fix this.
     unsigned char type = PUSH_STATE;
     this->ParallelController->TriggerRMIOnAllChildren(&type, 1,
       ROOT_SATELLITE_RMI_TAG);
 
-    vtkMultiProcessStream stream;
-    stream << msg->SerializeAsString();
-    this->ParallelController->Broadcast(stream, 0);
+    int byte_size = message->ByteSize();
+    unsigned char *raw_data = new unsigned char[byte_size + 1];
+    this->ParallelController->Broadcast(&byte_size, 1, 0);
+    this->ParallelController->Broadcast(raw_data, byte_size, 0);
+    delete [] raw_data;
     }
 }
 
 //----------------------------------------------------------------------------
 void vtkSMSessionCore::PushStateSatelliteCallback()
 {
-  vtkMultiProcessStream stream;
-  this->ParallelController->Broadcast(stream, 0);
+  int byte_size = 0;
+  this->ParallelController->Broadcast(&byte_size, 1, 0);
 
-  vtkstd::string string;
-  stream >> string;
-  Message msg;
-  msg.ParseFromString(string);
-  cout << ">>> vtkSMSessionCore::PushStateSatelliteCallback" << endl;
-  cout << string << endl; // FIXME debug stuff
-  msg.PrintDebugString(); // FIXME debug stuff
-  cout << "<<< vtkSMSessionCore::PushStateSatelliteCallback" << endl;
-  this->PushState(&msg);
+  unsigned char *raw_data = new unsigned char[byte_size + 1];
+  this->ParallelController->Broadcast(raw_data, byte_size, 0);
+
+  vtkSMMessage message;
+  if (!message.ParseFromArray(raw_data, byte_size))
+    {
+    vtkErrorMacro("Failed to parse protobuf message.");
+    }
+  else
+    {
+    this->PushStateInternal(&message);
+    }
+  delete [] raw_data;
 }
 
 //----------------------------------------------------------------------------
@@ -190,29 +223,30 @@ void vtkSMSessionCore::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os, indent);
 }
 //----------------------------------------------------------------------------
-void vtkSMSessionCore::PullState(vtkSMMessage* msg)
+void vtkSMSessionCore::PullState(vtkSMMessage* message)
 {
   vtkPMObject* obj;
   if(true &&  // FIXME make sure that the PMObject should be created here
-     (obj = this->Internals->GetPMObject(msg->global_id())))
+     (obj = this->Internals->GetPMObject(message->global_id())))
     {
-    obj->Pull(msg);
+    obj->Pull(message);
     }
 }
+
 //----------------------------------------------------------------------------
-void vtkSMSessionCore::Invoke(vtkSMMessage* msg)
+void vtkSMSessionCore::Invoke(vtkSMMessage* message)
 {
   vtkPMObject* obj;
   if(true &&  // FIXME make sure that the PMObject should be created here
-     (obj = this->Internals->GetPMObject(msg->global_id())))
+     (obj = this->Internals->GetPMObject(message->global_id())))
     {
-    obj->Invoke(msg);
+    obj->Invoke(message);
     }
 }
 //----------------------------------------------------------------------------
-void vtkSMSessionCore::DeletePMObject(vtkSMMessage* msg)
+void vtkSMSessionCore::DeletePMObject(vtkSMMessage* message)
 {
-  this->Internals->Delete(msg->global_id());
+  this->Internals->Delete(message->global_id());
 }
 
 //----------------------------------------------------------------------------
