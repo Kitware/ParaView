@@ -499,7 +499,7 @@ void vtkSMProxy::CreateVTKObjects()
 
   vtkSMMessage message;
   message.SetExtension(DefinitionHeader::client_class, this->GetClassName());
-  message.SetExtension(DefinitionHeader::server_class, "vtkPMObject"
+  message.SetExtension(DefinitionHeader::server_class, "vtkPMProxy"
     /* this->GetKernelClassName() */);
   message.SetExtension(ProxyState::xml_group, this->GetXMLGroup());
   message.SetExtension(ProxyState::xml_name, this->GetXMLName());
@@ -1010,9 +1010,6 @@ void vtkSMProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
  
-  os << indent << "Name: " 
-     << (this->Name ? this->Name : "(null)")
-     << endl;
   os << indent << "VTKClassName: " 
      << (this->VTKClassName ? this->VTKClassName : "(null)")
      << endl;

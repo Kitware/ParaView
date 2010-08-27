@@ -479,7 +479,6 @@ protected:
   // override this method to perform special tasks.
   virtual void UpdatePropertyInformationInternal(vtkSMProperty* prop=NULL);
 
-  char* Name;
   char* VTKClassName;
   char* XMLGroup;
   char* XMLName;

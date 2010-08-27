@@ -18,6 +18,7 @@
 #include "vtkClientServerInterpreter.h"
 #include "vtkClientServerInterpreterInitializer.h"
 #include "vtkClientServerStream.h"
+#include "vtkInstantiator.h"
 #include "vtkMultiProcessController.h"
 #include "vtkMultiProcessStream.h"
 #include "vtkObjectFactory.h"
@@ -25,6 +26,7 @@
 #include "vtkProcessModule2.h"
 #include "vtkSMProxyDefinitionManager.h"
 
+#include <vtkstd/string>
 #include "assert.h"
 
 namespace
@@ -101,6 +103,7 @@ vtkSMSessionCore::vtkSMSessionCore()
 vtkSMSessionCore::~vtkSMSessionCore()
 {
   this->Interpreter->Delete();
+  this->Interpreter = 0;
   if (this->ParallelController &&
     this->ParallelController->GetLocalProcessId() == 0)
     {
@@ -126,15 +129,15 @@ void vtkSMSessionCore::PushStateInternal(vtkSMMessage* message)
       abort();
       }
     // Create the corresponding PM object.
-    vtkClientServerID tempID = this->Interpreter->GetNextAvailableId();
-    vtkClientServerStream stream;
-    stream << vtkClientServerStream::New
-           << message->GetExtension(DefinitionHeader::server_class).c_str()
-           << tempID
-           << vtkClientServerStream::End;
-    this->Interpreter->ProcessStream(stream);
-    obj = vtkPMObject::SafeDownCast(
-      this->Interpreter->GetObjectFromID(tempID, /*noerror*/ 0));
+    vtkstd::string classname = message->GetExtension(DefinitionHeader::server_class);
+    vtkSmartPointer<vtkObject> object;
+    object.TakeReference(vtkInstantiator::CreateInstance(classname.c_str()));
+    if (!object)
+      {
+      vtkErrorMacro("Failed to instantiate " << classname.c_str());
+      abort();
+      }
+    obj = vtkPMObject::SafeDownCast(object);
     if (obj == NULL)
       {
       vtkErrorMacro("Object must be a vtkPMObject subclass. "
@@ -143,11 +146,6 @@ void vtkSMSessionCore::PushStateInternal(vtkSMMessage* message)
       }
     obj->Initialize(this);
     this->Internals->PMObjectMap[message->global_id()] = obj;
-
-    // release the reference held by the interpreter.
-    stream << vtkClientServerStream::Delete << tempID
-      << vtkClientServerStream::End;
-    this->Interpreter->ProcessStream(stream);
     }
 
   // Push the message to the PMObject.

@@ -14,6 +14,7 @@
 =========================================================================*/
 #include "vtkPMObject.h"
 
+#include "vtkClientServerInterpreter.h"
 #include "vtkObjectFactory.h"
 #include "vtkSMSessionCore.h"
 
@@ -23,6 +24,7 @@
 vtkPMObject::vtkPMObject()
 {
   this->Interpreter = 0;
+  this->SessionCore = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -49,4 +51,10 @@ void vtkPMObject::Finalize()
 {
   this->Interpreter = NULL;
   this->SessionCore = NULL;
+}
+
+//----------------------------------------------------------------------------
+vtkClientServerInterpreter* vtkPMObject::GetInterpreter()
+{
+  return this->Interpreter;
 }

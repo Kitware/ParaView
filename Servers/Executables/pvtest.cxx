@@ -20,6 +20,9 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkSMSession.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMProxy.h"
+#include "vtkSMStringVectorProperty.h"
+#include "vtkSMIntVectorProperty.h"
+
 //----------------------------------------------------------------------------
 int main(int argc, char* argv[])
 {
@@ -52,6 +55,10 @@ int main(int argc, char* argv[])
 
     vtkSMProxyManager* pxm = session->GetProxyManager();
     vtkSMProxy* proxy = pxm->NewProxy("misc", "FileInformationHelper");
+    vtkSMStringVectorProperty::SafeDownCast(
+      proxy->GetProperty("Path"))->SetElement(0, "/tmp");
+    vtkSMIntVectorProperty::SafeDownCast(
+      proxy->GetProperty("SpecialDirectories"))->SetElement(0, 1);
     proxy->UpdateVTKObjects();
     proxy->Delete();
     cout << "Exiting..." << endl;

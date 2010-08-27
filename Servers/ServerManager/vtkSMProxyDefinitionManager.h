@@ -40,12 +40,22 @@ public:
   // Moreover, error can be throw if the definition was not found if the flag
   // throwError is true.
   vtkPVXMLElement* GetProxyDefinition(const char* group, const char* name, bool throwError);
+  vtkPVXMLElement* GetProxyDefinition(const char* group, const char* name)
+    {
+    return this->GetProxyDefinition(group, name, true);
+    }
+
 
   // Description:
   // Returns the same thing as GetProxyDefinition in a flatten manner.
   // By flatten, we mean that the class hierarchy has been walked and merged
   // into a single vtkPVXMLElement definition.
   vtkPVXMLElement* GetCollapsedProxyDefinition(const char* group, const char* name, bool throwError);
+  vtkPVXMLElement* GetCollapsedProxyDefinition(const char* group, const char* name)
+    {
+    return this->GetCollapsedProxyDefinition(group, name, true);
+    }
+
 
   // Description:
   // Add a custom proxy definition. Custom definitions are NOT ALLOWED to

@@ -21,6 +21,8 @@ ENDIF(NOT WIN32)
 SET (Kit_SRCS
   vtkInitializationHelper.cxx
   vtkPMObject.cxx
+  vtkPMProperty.cxx
+  vtkPMProxy.cxx
   vtkSMBooleanDomain.cxx
   vtkSMDocumentation.cxx
   vtkSMDomain.cxx
@@ -46,6 +48,9 @@ SET (Kit_SRCS
   vtkSMSessionServer.cxx
   vtkSMStringVectorProperty.cxx
   vtkSMVectorProperty.cxx
+  vtkPMVectorProperty.cxx
+  vtkPMStringVectorProperty.cxx
+  vtkPMIntVectorProperty.cxx
   )
 
 IF (FIXME)
@@ -155,7 +160,6 @@ SET(Kit_SRCS
 #  vtkSMPluginInformationHelper.cxx
   vtkSMPropertyAdaptor.cxx
   vtkSMProperty.cxx
-  vtkSMPropertyHelper.cxx
   vtkSMNamedPropertyIterator.cxx
   vtkSMPropertyLink.cxx
   vtkSMPropertyModificationUndoElement.cxx
@@ -260,13 +264,14 @@ SET( ServerManager_SRCS
 # Abstract and Wrap exclude
 
 SET_SOURCE_FILES_PROPERTIES(
-  vtkSMSession.cxx
   vtkInitializationHelper.cxx
   vtkPMObject.cxx
-  vtkSMRemoteObject.cxx
-  vtkSMLink.cxx
-  vtkSMVectorProperty.cxx
+  vtkPMVectorProperty.cxx
   vtkSMDomain.cxx
+  vtkSMLink.cxx
+  vtkSMRemoteObject.cxx
+  vtkSMSession.cxx
+  vtkSMVectorProperty.cxx
   ABSTRACT
   )
 

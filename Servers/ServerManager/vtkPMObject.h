@@ -60,15 +60,16 @@ public:
   virtual void Finalize();
 
 //BTX
+
+  // Description:
+  // Provides access to the Interpreter.
+  vtkClientServerInterpreter* GetInterpreter();
+
 protected:
   vtkPMObject();
   virtual ~vtkPMObject();
 
-  // Description:
-  // Provides access to the Interpreter.
-  vtkGetObjectMacro(Interpreter, vtkClientServerInterpreter);
-
-  vtkClientServerInterpreter* Interpreter;
+  vtkWeakPointer<vtkClientServerInterpreter> Interpreter;
   vtkWeakPointer<vtkSMSessionCore> SessionCore;
 
 private:
