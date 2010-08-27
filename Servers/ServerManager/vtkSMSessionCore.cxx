@@ -134,7 +134,7 @@ void vtkSMSessionCore::PushStateInternal(vtkSMMessage* message)
            << vtkClientServerStream::End;
     this->Interpreter->ProcessStream(stream);
     obj = vtkPMObject::SafeDownCast(
-      this->Interpreter->GetObjectFromID(tempID, /*noerror*/ 1));
+      this->Interpreter->GetObjectFromID(tempID, /*noerror*/ 0));
     if (obj == NULL)
       {
       vtkErrorMacro("Object must be a vtkPMObject subclass. "
@@ -161,44 +161,45 @@ void vtkSMSessionCore::PushState(vtkSMMessage* message)
   assert(this->ParallelController == NULL ||
     this->ParallelController->GetLocalProcessId() == 0);
 
+
+  if ( (message->location() & vtkProcessModule2::SERVERS) != 0)
+    {
+    // send message to satellites and then start processing.
+
+    if (this->ParallelController &&
+      this->ParallelController->GetNumberOfProcesses() > 1 &&
+      this->ParallelController->GetLocalProcessId() == 0)
+      {
+      // Forward the message to the satellites if the object is expected to exist
+      // on the satellites.
+
+      // FIXME: There's one flaw in this logic. If a object is to be created on
+      // DATA_SERVER_ROOT, but on all RENDER_SERVER nodes, then in render-server
+      // configuration, the message will end up being send to all data-server
+      // nodes as well. Although we never do that presently, it's a possibility
+      // and we should fix this.
+      unsigned char type = PUSH_STATE;
+      this->ParallelController->TriggerRMIOnAllChildren(&type, 1,
+        ROOT_SATELLITE_RMI_TAG);
+
+      int byte_size = message->ByteSize();
+      unsigned char *raw_data = new unsigned char[byte_size + 1];
+      message->SerializeToArray(raw_data, byte_size);
+      this->ParallelController->Broadcast(&byte_size, 1, 0);
+      this->ParallelController->Broadcast(raw_data, byte_size, 0);
+      delete [] raw_data;
+      }
+    }
+
   // When the control reaches here, we are assured that the PMObject needs be
   // created/exist on the local process.
   this->PushStateInternal(message);
-
-  if ( (message->location() & vtkProcessModule2::SERVERS) == 0)
-    {
-    // the state was pushed only to the CLIENT or ROOT nodes. So we don't
-    // forward it to the satellites.
-    return;
-    }
-
-  if (this->ParallelController &&
-    this->ParallelController->GetNumberOfProcesses() > 1 &&
-    this->ParallelController->GetLocalProcessId() == 0)
-    {
-    // Forward the message to the satellites if the object is expected to exist
-    // on the satellites.
-
-    // FIXME: There's one flaw in this logic. If a object is to be created on
-    // DATA_SERVER_ROOT, but on all RENDER_SERVER nodes, then in render-server
-    // configuration, the message will end up being send to all data-server
-    // nodes as well. Although we never do that presently, it's a possibility
-    // and we should fix this.
-    unsigned char type = PUSH_STATE;
-    this->ParallelController->TriggerRMIOnAllChildren(&type, 1,
-      ROOT_SATELLITE_RMI_TAG);
-
-    int byte_size = message->ByteSize();
-    unsigned char *raw_data = new unsigned char[byte_size + 1];
-    this->ParallelController->Broadcast(&byte_size, 1, 0);
-    this->ParallelController->Broadcast(raw_data, byte_size, 0);
-    delete [] raw_data;
-    }
 }
 
 //----------------------------------------------------------------------------
 void vtkSMSessionCore::PushStateSatelliteCallback()
 {
+  cout << "PushStateSatelliteCallback" << endl;
   int byte_size = 0;
   this->ParallelController->Broadcast(&byte_size, 1, 0);
 

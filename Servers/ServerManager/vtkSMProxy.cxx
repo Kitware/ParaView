@@ -499,7 +499,7 @@ void vtkSMProxy::CreateVTKObjects()
 
   vtkSMMessage message;
   message.SetExtension(DefinitionHeader::client_class, this->GetClassName());
-  message.SetExtension(DefinitionHeader::server_class, "vtkPMProxy"
+  message.SetExtension(DefinitionHeader::server_class, "vtkPMObject"
     /* this->GetKernelClassName() */);
   message.SetExtension(ProxyState::xml_group, this->GetXMLGroup());
   message.SetExtension(ProxyState::xml_name, this->GetXMLName());
