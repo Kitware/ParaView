@@ -17,7 +17,7 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkAlgorithm.h"
 #include "vtkAlgorithmOutput.h"
 #include "vtkCompositeDataIterator.h"
-#include "vtkImageData.h"
+#include "vtkDataObject.h"
 #include "vtkInformationDoubleKey.h"
 #include "vtkInformationExecutivePortKey.h"
 #include "vtkInformationExecutivePortVectorKey.h"
@@ -29,17 +29,11 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkInformationObjectBaseKey.h"
 #include "vtkInformationStringKey.h"
 #include "vtkInformationVector.h"
-#include "vtkMultiBlockDataSet.h"
 #include "vtkObjectFactory.h"
-#include "vtkPolyData.h"
-#include "vtkRectilinearGrid.h"
-#include "vtkSmartPointer.h"
-#include "vtkStructuredGrid.h"
-#include "vtkTemporalDataSet.h"
-#include "vtkUniformGrid.h"
+#include "vtkPVPostFilterExecutive.h"
+
 
 vtkStandardNewMacro(vtkPVCompositeDataPipeline);
-
 
 //----------------------------------------------------------------------------
 vtkPVCompositeDataPipeline::vtkPVCompositeDataPipeline()
@@ -60,69 +54,26 @@ void vtkPVCompositeDataPipeline::CopyDefaultInformation(
   vtkInformationVector* outInfoVec)
 {
   this->Superclass::CopyDefaultInformation(request, direction,
-                                           inInfoVec, outInfoVec);
+    inInfoVec, outInfoVec);
 
-  if (request->Has(REQUEST_INFORMATION()))
+  if (request->Has(REQUEST_UPDATE_EXTENT()))
     {
     if (this->GetNumberOfInputPorts() > 0)
       {
-      if (vtkInformation* inInfo = inInfoVec[0]->GetInformationObject(0))
+      int index = 0;
+      //TODO:
+      //we need to support multiple inputs
+      //and multiple connections on the first input
+      vtkInformation *inArrayInfo = this->Algorithm->GetInputArrayInformation(index);
+      if (inArrayInfo && inArrayInfo->Has(vtkAlgorithm::INPUT_PORT()))
         {
-        // Copy information from the first input to all outputs.
-        for(int i=0; i < outInfoVec->GetNumberOfInformationObjects(); ++i)
+        vtkExecutive* e = this->GetInputExecutive(0,0);
+        //make sure the executive is of the correct type
+        vtkPVPostFilterExecutive *pvpfe =
+          vtkPVPostFilterExecutive::SafeDownCast(e);
+        if(pvpfe)
           {
-          vtkInformation* outInfo = outInfoVec->GetInformationObject(i);
-          outInfo->CopyEntry(inInfo, COMPOSITE_DATA_META_DATA());
-          }
-        }
-      }
-    }
-
-  if(request->Has(REQUEST_UPDATE_EXTENT()))
-    {
-    // Find the port that has a data that we will iterator over.
-    // If there is one, make sure that we use piece extent for
-    // that port. Composite data pipeline works with piece extents
-    // only.
-    int compositePort;
-    if (this->ShouldIterateOverInput(compositePort))
-      {
-      // Get the output port from which to copy the extent.
-      int outputPort = -1;
-      if(request->Has(FROM_OUTPUT_PORT()))
-        {
-        outputPort = request->Get(FROM_OUTPUT_PORT());
-        }
-
-      // Setup default information for the inputs.
-      if(outInfoVec->GetNumberOfInformationObjects() > 0)
-        {
-        // Copy information from the output port that made the request.
-        // Since VerifyOutputInformation has already been called we know
-        // there is output information with a data object.
-        vtkInformation* outInfo =
-          outInfoVec->GetInformationObject((outputPort >= 0)? outputPort : 0);
-
-        // Loop over all connections on this input port.
-        int numInConnections =
-          inInfoVec[compositePort]->GetNumberOfInformationObjects();
-        for (int j=0; j<numInConnections; j++)
-          {
-          // Get the pipeline information for this input connection.
-          vtkInformation* inInfo =
-            inInfoVec[compositePort]->GetInformationObject(j);
-
-          inInfo->CopyEntry(outInfo, UPDATE_TIME_STEPS());
-          inInfo->CopyEntry(outInfo, FAST_PATH_OBJECT_ID());
-          inInfo->CopyEntry(outInfo, FAST_PATH_ID_TYPE());
-          inInfo->CopyEntry(outInfo, FAST_PATH_OBJECT_TYPE());
-          vtkDebugMacro(<< "CopyEntry UPDATE_PIECE_NUMBER() " << outInfo->Get(UPDATE_PIECE_NUMBER()) << " " << outInfo);
-
-          inInfo->CopyEntry(outInfo, UPDATE_PIECE_NUMBER());
-          inInfo->CopyEntry(outInfo, UPDATE_NUMBER_OF_PIECES());
-          inInfo->CopyEntry(outInfo, UPDATE_NUMBER_OF_GHOST_LEVELS());
-          inInfo->CopyEntry(outInfo, UPDATE_EXTENT_INITIALIZED());
-          inInfo->CopyEntry(outInfo, UPDATE_COMPOSITE_INDICES());
+          pvpfe->SetPostArrayToProcessInformation(index,inArrayInfo);
           }
         }
       }

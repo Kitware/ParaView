@@ -48,7 +48,7 @@ class vtkInformationStringKey;
 class vtkInformationDataObjectKey;
 class vtkInformationIntegerKey;
 
-class VTK_FILTERING_EXPORT vtkPVCompositeDataPipeline : public vtkCompositeDataPipeline
+class VTK_EXPORT vtkPVCompositeDataPipeline : public vtkCompositeDataPipeline
 {
 public:
   static vtkPVCompositeDataPipeline* New();
