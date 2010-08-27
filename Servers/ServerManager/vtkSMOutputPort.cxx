@@ -569,16 +569,15 @@ void vtkSMOutputPort::InsertPostFilterIfNecessary()
   vtkClientServerStream stream;
   vtkClientServerID tempPostFilter;
 
-  if (strcmp(className, "vtkTable") != 0)
-    {
-    stream << vtkClientServerStream::Invoke
-           << this->GetProducerID() << "UpdateInformation"
-           << vtkClientServerStream::End;
-    pm->SendStream(this->ConnectionID,
-                   this->Servers,
-                   stream);
-    tempPostFilter = pm->NewStreamObject("vtkPVPostFilter", stream);
-    }
+
+  stream << vtkClientServerStream::Invoke
+    << this->GetProducerID() << "UpdateInformation"
+    << vtkClientServerStream::End;
+  pm->SendStream(this->ConnectionID,
+    this->Servers,
+    stream);
+  tempPostFilter = pm->NewStreamObject("vtkPVPostFilter", stream);
+
 
   // If no filter is to be inserted, just return.
   if(tempPostFilter.ID == 0)
