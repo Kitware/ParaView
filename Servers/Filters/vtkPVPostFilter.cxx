@@ -101,6 +101,7 @@ int vtkPVPostFilter::RequestData(
   vtkInformationVector **inputVector,
   vtkInformationVector *outputVector)
 {
+  //TODO: Store the info so we can check for duplicates
   int converted = 0;
   if (this->Information->Has(vtkPVPostFilterExecutive::POST_ARRAYS_TO_PROCESS()) )
     {
@@ -121,7 +122,6 @@ int vtkPVPostFilter::RequestData(
       output->ShallowCopy(input);
       }
     }
-
   return 1;
 }
 //----------------------------------------------------------------------------
@@ -138,18 +138,6 @@ int vtkPVPostFilter::DetermineNeededConversion(  vtkInformation *request,
   vtkInformationVector* postVector =
     this->Information->Get(vtkPVPostFilterExecutive::POST_ARRAYS_TO_PROCESS());
   vtkInformation *postArrayInfo = postVector->GetInformationObject(0);
-
-  if ( this->Information->Has(vtkAlgorithm::INPUT_ARRAYS_TO_PROCESS()))
-    {
-    //determine if the POST_ARRAYS_TO_PROCESS property
-    //is already been copied
-    vtkInformation *inputArrayInfo = this->GetInputArrayInformation(0);
-    if ( this->MatchingPropertyInformation(inputArrayInfo,postArrayInfo) )
-      {
-      return 0;
-      }
-    //otherwise we are going to have to overwrite it
-    }
 
   int ret = this->DeterminePointCellConversion(postArrayInfo,input);
   if ( ret & PointToCell )
@@ -236,23 +224,6 @@ int vtkPVPostFilter::DeterminePointCellConversion(vtkInformation *postArrayInfo,
 int vtkPVPostFilter::DetermineVectorConversion(vtkInformation *postArrayInfo, vtkDataObject *input)
 {
   return 0;
-}
-
-//----------------------------------------------------------------------------
-bool vtkPVPostFilter::MatchingPropertyInformation(
-                                            vtkInformation* inputArrayInfo,
-                                            vtkInformation* postArrayInfo)
-{
-  return (inputArrayInfo->Has(vtkDataObject::FIELD_NAME()) &&
-      postArrayInfo->Has(vtkDataObject::FIELD_NAME()) &&
-      inputArrayInfo->Get(INPUT_PORT()) ==
-        postArrayInfo->Get(INPUT_PORT()) &&
-      inputArrayInfo->Get(INPUT_CONNECTION()) ==
-        postArrayInfo->Get(INPUT_CONNECTION()) &&
-      inputArrayInfo->Get(vtkDataObject::FIELD_ASSOCIATION()) ==
-        postArrayInfo->Get(vtkDataObject::FIELD_ASSOCIATION()) &&
-      strcmp(inputArrayInfo->Get(vtkDataObject::FIELD_NAME()),
-        postArrayInfo->Get(vtkDataObject::FIELD_NAME()))==0);
 }
 
 //----------------------------------------------------------------------------

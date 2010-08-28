@@ -16,6 +16,7 @@ PURPOSE.  See the above copyright notice for more information.
 
 #include "vtkAlgorithm.h"
 #include "vtkCommand.h"
+#include "vtkDataObject.h"
 #include "vtkInformation.h"
 #include "vtkInformationInformationVectorKey.h"
 #include "vtkInformationVector.h"
@@ -28,7 +29,7 @@ vtkInformationKeyMacro(vtkPVPostFilterExecutive, POST_ARRAYS_TO_PROCESS, Informa
 //----------------------------------------------------------------------------
 vtkPVPostFilterExecutive::vtkPVPostFilterExecutive()
 {
-
+  this->UpdatedPostArray = false;
 }
 
 //----------------------------------------------------------------------------
@@ -43,7 +44,13 @@ int vtkPVPostFilterExecutive::NeedToExecuteData(
   vtkInformationVector** inInfoVec,
   vtkInformationVector* outInfoVec)
 {
-  return 1;
+  if ( this->Algorithm->GetInformation()->Has(POST_ARRAYS_TO_PROCESS()))
+    {
+    bool mod = this->UpdatedPostArray;
+    this->UpdatedPostArray = false;
+    return mod;
+    }
+  return true;
 }
 
 //----------------------------------------------------------------------------
@@ -72,8 +79,29 @@ vtkInformation *vtkPVPostFilterExecutive::GetPostArrayToProcessInformation(int i
 void vtkPVPostFilterExecutive::SetPostArrayToProcessInformation(int idx, vtkInformation *inInfo)
 {
   vtkInformation *info = this->GetPostArrayToProcessInformation(idx);
-  info->Copy(inInfo,1);
-  this->Modified();
+  if ( !this->MatchingPropertyInformation(info,inInfo) )
+    {
+    info->Copy(inInfo,1);
+    this->UpdatedPostArray = true;
+    }
+}
+
+//----------------------------------------------------------------------------
+bool vtkPVPostFilterExecutive::MatchingPropertyInformation(
+                                            vtkInformation* inputArrayInfo,
+                                            vtkInformation* postArrayInfo)
+{
+  return ( inputArrayInfo && postArrayInfo &&
+      inputArrayInfo->Has(vtkDataObject::FIELD_NAME()) &&
+      postArrayInfo->Has(vtkDataObject::FIELD_NAME()) &&
+      inputArrayInfo->Get(vtkAlgorithm::INPUT_PORT()) ==
+        postArrayInfo->Get(vtkAlgorithm::INPUT_PORT()) &&
+      inputArrayInfo->Get(vtkAlgorithm::INPUT_CONNECTION()) ==
+        postArrayInfo->Get(vtkAlgorithm::INPUT_CONNECTION()) &&
+      inputArrayInfo->Get(vtkDataObject::FIELD_ASSOCIATION()) ==
+        postArrayInfo->Get(vtkDataObject::FIELD_ASSOCIATION()) &&
+      strcmp(inputArrayInfo->Get(vtkDataObject::FIELD_NAME()),
+        postArrayInfo->Get(vtkDataObject::FIELD_NAME()))==0);
 }
 
 //----------------------------------------------------------------------------

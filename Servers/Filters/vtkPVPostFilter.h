@@ -54,8 +54,6 @@ protected:
   int DeterminePointCellConversion(vtkInformation *postArrayInfo, vtkDataObject *input);
   int DetermineVectorConversion(vtkInformation *postArrayInfo, vtkDataObject *input);
 
-  bool MatchingPropertyInformation(vtkInformation* inputArrayInfo,vtkInformation* postArrayInfo);
-
 private:
   vtkPVPostFilter(const vtkPVPostFilter&);  // Not implemented.
   void operator=(const vtkPVPostFilter&);  // Not implemented.

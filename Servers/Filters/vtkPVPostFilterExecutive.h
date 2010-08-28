@@ -59,6 +59,9 @@ protected:
   virtual int NeedToExecuteData(int outputPort,
                                 vtkInformationVector** inInfoVec,
                                 vtkInformationVector* outInfoVec);
+
+  bool MatchingPropertyInformation(vtkInformation* inputArrayInfo,vtkInformation* postArrayInfo);
+  bool UpdatedPostArray;
 private:
   vtkPVPostFilterExecutive(const vtkPVPostFilterExecutive&);  // Not implemented.
   void operator=(const vtkPVPostFilterExecutive&);  // Not implemented.
