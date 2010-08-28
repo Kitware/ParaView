@@ -31,6 +31,8 @@
 
 #include "vtkCompositeDataPipeline.h"
 
+class vtkInformationInformationVectorKey;
+
 class VTK_EXPORT vtkPVPostFilterExecutive : public vtkCompositeDataPipeline
 {
 public:
@@ -38,11 +40,16 @@ public:
   vtkTypeMacro(vtkPVPostFilterExecutive,vtkCompositeDataPipeline);
   void PrintSelf(ostream& os, vtkIndent indent);
 
+  static vtkInformationInformationVectorKey* POST_ARRAYS_TO_PROCESS();
+
   // Description:
   // Returns the data object stored with the DATA_OBJECT() in the
   // input port
   vtkDataObject* GetCompositeInputData(
     int port, int index, vtkInformationVector **inInfoVec);
+
+  vtkInformation* GetPostArrayToProcessInformation(int idx);
+  void SetPostArrayToProcessInformation(int idx, vtkInformation *inInfo);
 
 protected:
   vtkPVPostFilterExecutive();
