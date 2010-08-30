@@ -19,12 +19,14 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkDataObject.h"
 #include "vtkInformation.h"
 #include "vtkInformationInformationVectorKey.h"
+#include "vtkInformationStringVectorKey.h"
 #include "vtkInformationVector.h"
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro(vtkPVPostFilterExecutive);
 
 vtkInformationKeyMacro(vtkPVPostFilterExecutive, POST_ARRAYS_TO_PROCESS, InformationVector);
+vtkInformationKeyMacro(vtkPVPostFilterExecutive, POST_ARRAY_COMPONENT_KEY, StringVector);
 
 //----------------------------------------------------------------------------
 vtkPVPostFilterExecutive::vtkPVPostFilterExecutive()
@@ -46,9 +48,9 @@ int vtkPVPostFilterExecutive::NeedToExecuteData(
 {
   if ( this->Algorithm->GetInformation()->Has(POST_ARRAYS_TO_PROCESS()))
     {
-    bool mod = this->UpdatedPostArray;
-    this->UpdatedPostArray = false;
-    return mod;
+    //we need to say update twice to actually pass the info to
+    //request data
+    return (this->UpdatedPostArray-- > 0 );
     }
   return true;
 }
@@ -82,7 +84,8 @@ void vtkPVPostFilterExecutive::SetPostArrayToProcessInformation(int idx, vtkInfo
   if ( !this->MatchingPropertyInformation(info,inInfo) )
     {
     info->Copy(inInfo,1);
-    this->UpdatedPostArray = true;
+    info->Set(vtkPVPostFilterExecutive::POST_ARRAY_COMPONENT_KEY(),"_");
+    this->UpdatedPostArray = 2;
     }
 }
 

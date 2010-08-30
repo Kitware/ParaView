@@ -28,6 +28,7 @@ PURPOSE.  See the above copyright notice for more information.
 
 #include "vtkCellDataToPointData.h"
 #include "vtkPointDataToCellData.h"
+#include "vtkArrayCalculator.h"
 
 vtkStandardNewMacro(vtkPVPostFilter);
 
@@ -101,31 +102,26 @@ int vtkPVPostFilter::RequestData(
   vtkInformationVector **inputVector,
   vtkInformationVector *outputVector)
 {
-  //TODO: Store the info so we can check for duplicates
-  int converted = 0;
-  if (this->Information->Has(vtkPVPostFilterExecutive::POST_ARRAYS_TO_PROCESS()) )
+
+  //we need to just copy the data, so we can fixup the output as needed
+  vtkInformation *inInfo = inputVector[0]->GetInformationObject(0);
+  vtkInformation *outInfo = outputVector->GetInformationObject(0);
+
+  vtkDataObject* input= inInfo->Get(vtkDataObject::DATA_OBJECT());
+  vtkDataObject* output= outInfo->Get(vtkDataObject::DATA_OBJECT());
+
+  if (output && input)
     {
-    converted = this->DetermineNeededConversion(request,inputVector,outputVector);
-    }
-
-  if (!converted)
-    {
-    //we need to just copy the data, since we are not needed
-    vtkInformation *inInfo = inputVector[0]->GetInformationObject(0);
-    vtkInformation *outInfo = outputVector->GetInformationObject(0);
-
-    vtkDataObject* input= inInfo->Get(vtkDataObject::DATA_OBJECT());
-    vtkDataObject* output= outInfo->Get(vtkDataObject::DATA_OBJECT());
-
-    if (output && input)
+    output->ShallowCopy(input);
+    if (this->Information->Has(vtkPVPostFilterExecutive::POST_ARRAYS_TO_PROCESS()) )
       {
-      output->ShallowCopy(input);
+      this->DoAnyNeededConversions(request,inputVector,outputVector);
       }
     }
   return 1;
 }
 //----------------------------------------------------------------------------
-int vtkPVPostFilter::DetermineNeededConversion(  vtkInformation *request,
+int vtkPVPostFilter::DoAnyNeededConversions(  vtkInformation *request,
   vtkInformationVector **inputVector,
   vtkInformationVector *outputVector)
 {
@@ -133,6 +129,7 @@ int vtkPVPostFilter::DetermineNeededConversion(  vtkInformation *request,
   vtkInformation *inInfo = inputVector[port]->GetInformationObject(0);
   vtkInformation *outInfo = outputVector->GetInformationObject(0);
   vtkDataObject *input = inInfo->Get(vtkDataObject::DATA_OBJECT());
+  vtkDataObject* output = outInfo->Get(vtkDataObject::DATA_OBJECT());
 
   //get the array to convert info
   vtkInformationVector* postVector =
@@ -144,13 +141,10 @@ int vtkPVPostFilter::DetermineNeededConversion(  vtkInformation *request,
     {
     vtkPointDataToCellData *converter = vtkPointDataToCellData::New();
     //we need to connect this to our inputs outputport!
-    converter->SetInputConnection(0,this->GetInputConnection(port,0));
+    converter->SetInputConnection(this->GetOutputPort(port));
     converter->PassPointDataOn();
     converter->Update();
 
-    vtkInformation *outInfo = outputVector->GetInformationObject(0);
-    vtkDataObject* output = vtkDataObject::SafeDownCast(
-      outInfo->Get(vtkDataObject::DATA_OBJECT()));
     output->ShallowCopy(converter->GetOutputDataObject(0));
     converter->Delete();
     }
@@ -158,13 +152,10 @@ int vtkPVPostFilter::DetermineNeededConversion(  vtkInformation *request,
     {
     vtkCellDataToPointData *converter = vtkCellDataToPointData::New();
     //we need to connect this to our inputs outputport!
-    converter->SetInputConnection(0,this->GetInputConnection(port,0));
+    converter->SetInputConnection(this->GetOutputPort(port));
     converter->PassCellDataOn();
     converter->Update();
 
-    vtkInformation *outInfo = outputVector->GetInformationObject(0);
-    vtkDataObject* output = vtkDataObject::SafeDownCast(
-      outInfo->Get(vtkDataObject::DATA_OBJECT()));
     output->ShallowCopy(converter->GetOutputDataObject(0));
     converter->Delete();
     }
@@ -175,7 +166,7 @@ int vtkPVPostFilter::DetermineNeededConversion(  vtkInformation *request,
     //the current plan is that we are going to have the name
     //of the property signify what component we should extract
     //so PROPERTY - COMPONENT NAME
-    ret = this->DetermineVectorConversion(postArrayInfo,input);
+    ret = this->DoVectorConversion(postArrayInfo,input,output);
     }
 
   return (ret != 0);
@@ -193,8 +184,7 @@ int vtkPVPostFilter::DeterminePointCellConversion(vtkInformation *postArrayInfo,
   if (dsInput && fieldAssociation == vtkDataObject::FIELD_ASSOCIATION_POINTS)
     {
     name = postArrayInfo->Get(vtkDataObject::FIELD_NAME());
-    int exists = dsInput->GetCellData()->HasArray(name);
-    if ( exists )
+    if (dsInput->GetCellData()->HasArray(name))
       {
       retCode |= CellToPoint;
       if ( dsInput->GetCellData()->GetArray(name)->GetNumberOfTuples() > 1 )
@@ -207,8 +197,7 @@ int vtkPVPostFilter::DeterminePointCellConversion(vtkInformation *postArrayInfo,
   else if (dsInput && fieldAssociation == vtkDataObject::FIELD_ASSOCIATION_POINTS)
     {
     name = postArrayInfo->Get(vtkDataObject::FIELD_NAME());
-    int exists = dsInput->GetPointData()->HasArray(name);
-    if ( exists )
+    if (dsInput->GetPointData()->HasArray(name))
       {
       retCode |= PointToCell;
       if ( dsInput->GetPointData()->GetArray(name)->GetNumberOfTuples() > 1 )
@@ -221,9 +210,88 @@ int vtkPVPostFilter::DeterminePointCellConversion(vtkInformation *postArrayInfo,
 }
 
 //----------------------------------------------------------------------------
-int vtkPVPostFilter::DetermineVectorConversion(vtkInformation *postArrayInfo, vtkDataObject *input)
+int vtkPVPostFilter::DoVectorConversion(vtkInformation *postArrayInfo,
+                                      vtkDataObject *input,vtkDataObject *output)
 {
-  return 0;
+  const char *mangledName, *name, *keyName;
+  mangledName = postArrayInfo->Get(vtkDataObject::FIELD_NAME());
+  keyName = postArrayInfo->Get(vtkPVPostFilterExecutive::POST_ARRAY_COMPONENT_KEY());
+  if ( !keyName )
+    {
+    return 0;
+    }
+  std::string key(keyName);
+  std::string tempName(mangledName);
+  size_t found;
+  found = tempName.rfind(key);
+  if (found == std::string::npos)
+    {
+    //no vector conversion needed
+    return 0;
+    }
+
+  //lets grab the array now
+  std::string compIndex = tempName.substr(found+1,tempName.size());
+  tempName = tempName.substr(0,found);
+  name = tempName.c_str();
+  int fieldAssociation = postArrayInfo->Get(vtkDataObject::FIELD_ASSOCIATION());
+  vtkDataArray *vectorProp = NULL;
+  vtkDataSet *dsInput = vtkDataSet::SafeDownCast(input);
+  if (fieldAssociation == vtkDataObject::FIELD_ASSOCIATION_POINTS)
+    {
+    if (dsInput->GetPointData()->HasArray(name))
+      {
+      vectorProp = dsInput->GetPointData()->GetArray(name);
+      }
+    }
+  else if(fieldAssociation == vtkDataObject::FIELD_ASSOCIATION_POINTS)
+    {
+    if (dsInput->GetCellData()->HasArray(name))
+      {
+      vectorProp = dsInput->GetCellData()->GetArray(name);
+      }
+    }
+
+  if(!vectorProp)
+    {
+    //we failed to find the property
+    return 0;
+    }
+
+
+  //convert the component index
+  int port = 0;
+  int cIndex = atoi(compIndex.c_str());
+  //the resulting name will support component names
+  std::string resultName = tempName;
+  const char* cn =  vectorProp->GetComponentName(cIndex);
+  if (cn)
+    {
+    resultName += cn;
+    }
+  else
+    {
+    resultName += compIndex;
+    }
+
+  vtkArrayCalculator *calc = vtkArrayCalculator::New();
+  calc->SetInputConnection(0,this->GetOutputPort(port));
+  if ( fieldAssociation == vtkDataObject::FIELD_ASSOCIATION_POINTS )
+    {
+    calc->SetAttributeModeToUsePointData();
+    }
+  else if ( fieldAssociation == vtkDataObject::FIELD_ASSOCIATION_CELLS )
+    {
+    calc->SetAttributeModeToUseCellData();
+    }
+  calc->AddScalarVariable(mangledName,name,cIndex);
+  calc->SetFunction(mangledName);
+  calc->SetResultArrayName(resultName.c_str());
+  calc->Update();
+
+  output->ShallowCopy(calc->GetOutputDataObject(0));
+  calc->Delete();
+  return 1;
 }
 
 //----------------------------------------------------------------------------

@@ -32,6 +32,7 @@
 #include "vtkCompositeDataPipeline.h"
 
 class vtkInformationInformationVectorKey;
+class vtkInformationStringVectorKey;
 
 class VTK_EXPORT vtkPVPostFilterExecutive : public vtkCompositeDataPipeline
 {
@@ -41,6 +42,7 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   static vtkInformationInformationVectorKey* POST_ARRAYS_TO_PROCESS();
+  static vtkInformationStringVectorKey* POST_ARRAY_COMPONENT_KEY();
 
   // Description:
   // Returns the data object stored with the DATA_OBJECT() in the
@@ -61,7 +63,7 @@ protected:
                                 vtkInformationVector* outInfoVec);
 
   bool MatchingPropertyInformation(vtkInformation* inputArrayInfo,vtkInformation* postArrayInfo);
-  bool UpdatedPostArray;
+  int UpdatedPostArray;
 private:
   vtkPVPostFilterExecutive(const vtkPVPostFilterExecutive&);  // Not implemented.
   void operator=(const vtkPVPostFilterExecutive&);  // Not implemented.

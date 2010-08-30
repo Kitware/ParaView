@@ -46,13 +46,13 @@ protected:
 
   virtual int RequestDataObject(vtkInformation *, vtkInformationVector **, vtkInformationVector *);
   virtual int RequestData(vtkInformation *, vtkInformationVector **, vtkInformationVector *);
-  virtual int DetermineNeededConversion(vtkInformation *, vtkInformationVector **, vtkInformationVector *);
+  virtual int DoAnyNeededConversions(vtkInformation *, vtkInformationVector **, vtkInformationVector *);
 
   // Description:
   // Determines if we are going to be converting cell to point or point to cell
   // also returns if we detected the property is a vectory property
   int DeterminePointCellConversion(vtkInformation *postArrayInfo, vtkDataObject *input);
-  int DetermineVectorConversion(vtkInformation *postArrayInfo, vtkDataObject *input);
+  int DoVectorConversion(vtkInformation *postArrayInfo, vtkDataObject *input, vtkDataObject *output);
 
 private:
   vtkPVPostFilter(const vtkPVPostFilter&);  // Not implemented.
