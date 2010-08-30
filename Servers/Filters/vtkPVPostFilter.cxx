@@ -110,9 +110,9 @@ int vtkPVPostFilter::RequestData(
   vtkDataObject* input= inInfo->Get(vtkDataObject::DATA_OBJECT());
   vtkDataObject* output= outInfo->Get(vtkDataObject::DATA_OBJECT());
 
-  if (output && input)
+  if (output && output)
     {
-    output->ShallowCopy(input);
+    input->ShallowCopy(input);
     if (this->Information->Has(vtkPVPostFilterExecutive::POST_ARRAYS_TO_PROCESS()) )
       {
       this->DoAnyNeededConversions(request,inputVector,outputVector);

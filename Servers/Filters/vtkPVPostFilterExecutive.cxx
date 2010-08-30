@@ -31,7 +31,6 @@ vtkInformationKeyMacro(vtkPVPostFilterExecutive, POST_ARRAY_COMPONENT_KEY, Strin
 //----------------------------------------------------------------------------
 vtkPVPostFilterExecutive::vtkPVPostFilterExecutive()
 {
-  this->UpdatedPostArray = false;
 }
 
 //----------------------------------------------------------------------------
@@ -48,11 +47,9 @@ int vtkPVPostFilterExecutive::NeedToExecuteData(
 {
   if ( this->Algorithm->GetInformation()->Has(POST_ARRAYS_TO_PROCESS()))
     {
-    //we need to say update twice to actually pass the info to
-    //request data
-    return (this->UpdatedPostArray-- > 0 );
+    return true;
     }
-  return true;
+  return this->Superclass::NeedToExecuteData(outputPort,inInfoVec,outInfoVec);
 }
 
 //----------------------------------------------------------------------------
@@ -85,7 +82,6 @@ void vtkPVPostFilterExecutive::SetPostArrayToProcessInformation(int idx, vtkInfo
     {
     info->Copy(inInfo,1);
     info->Set(vtkPVPostFilterExecutive::POST_ARRAY_COMPONENT_KEY(),"_");
-    this->UpdatedPostArray = 2;
     }
 }
 

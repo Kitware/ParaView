@@ -63,7 +63,6 @@ protected:
                                 vtkInformationVector* outInfoVec);
 
   bool MatchingPropertyInformation(vtkInformation* inputArrayInfo,vtkInformation* postArrayInfo);
-  int UpdatedPostArray;
 private:
   vtkPVPostFilterExecutive(const vtkPVPostFilterExecutive&);  // Not implemented.
   void operator=(const vtkPVPostFilterExecutive&);  // Not implemented.
