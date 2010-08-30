@@ -33,6 +33,14 @@ SET(ParaView_SOURCE_FILES
   ParaViewMainWindow.h
   ParaViewVRPN.cxx
   ParaViewVRPN.h
+  ParaViewVRUI.cxx
+  ParaViewVRUI.h
+  vruiPipe.cxx
+  vruiPipe.h
+  vruiServerState.cxx
+  vruiServerState.h
+  vruiTrackerState.cxx
+  vruiTrackerState.h
   ${MOC_BUILT_SOURCES}
   ${UI_BUILT_SOURCES})
 
