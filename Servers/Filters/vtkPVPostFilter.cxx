@@ -165,7 +165,7 @@ int vtkPVPostFilter::DoAnyNeededConversions(  vtkInformation *request,
     {
     //the current plan is that we are going to have the name
     //of the property signify what component we should extract
-    //so PROPERTY - COMPONENT NAME
+    //so PROPERTY_COMPONENT NAME
     ret = this->DoVectorConversion(postArrayInfo,input,output);
     }
 
