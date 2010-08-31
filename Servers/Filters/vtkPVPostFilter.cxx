@@ -110,9 +110,9 @@ int vtkPVPostFilter::RequestData(
   vtkDataObject* input= inInfo->Get(vtkDataObject::DATA_OBJECT());
   vtkDataObject* output= outInfo->Get(vtkDataObject::DATA_OBJECT());
 
-  if (output && output)
+  if (output && input)
     {
-    input->ShallowCopy(input);
+    output->ShallowCopy(input);
     if (this->Information->Has(vtkPVPostFilterExecutive::POST_ARRAYS_TO_PROCESS()) )
       {
       this->DoAnyNeededConversions(request,inputVector,outputVector);
@@ -216,7 +216,7 @@ int vtkPVPostFilter::DoVectorConversion(vtkInformation *postArrayInfo,
   const char *mangledName, *name, *keyName;
   mangledName = postArrayInfo->Get(vtkDataObject::FIELD_NAME());
   keyName = postArrayInfo->Get(vtkPVPostFilterExecutive::POST_ARRAY_COMPONENT_KEY());
-  if ( !keyName )
+  if ( !keyName || !mangledName )
     {
     return 0;
     }
@@ -260,7 +260,6 @@ int vtkPVPostFilter::DoVectorConversion(vtkInformation *postArrayInfo,
 
 
   //convert the component index
-  int port = 0;
   int cIndex = atoi(compIndex.c_str());
   //the resulting name will support component names
   std::string resultName = tempName;
@@ -275,7 +274,7 @@ int vtkPVPostFilter::DoVectorConversion(vtkInformation *postArrayInfo,
     }
 
   vtkArrayCalculator *calc = vtkArrayCalculator::New();
-  calc->SetInputConnection(0,this->GetOutputPort(port));
+  calc->SetInputConnection(0,this->GetInputConnection(0,0));
   if ( fieldAssociation == vtkDataObject::FIELD_ASSOCIATION_POINTS )
     {
     calc->SetAttributeModeToUsePointData();
@@ -287,7 +286,6 @@ int vtkPVPostFilter::DoVectorConversion(vtkInformation *postArrayInfo,
   calc->AddScalarVariable(mangledName,name,cIndex);
   calc->SetFunction(mangledName);
   calc->SetResultArrayName(resultName.c_str());
-  calc->Update();
 
   output->ShallowCopy(calc->GetOutputDataObject(0));
   calc->Delete();
