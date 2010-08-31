@@ -589,7 +589,7 @@ int vtkPVGeometryFilter::RequestCompositeData(vtkInformation*,
     if (tmpOut->GetNumberOfPoints() > 0)
       {
       unsigned int current_flat_index = iter->GetCurrentFlatIndex();
-      non_null_leaves.resize(current_flat_index);
+      non_null_leaves.resize(current_flat_index+1);
       non_null_leaves[current_flat_index] = 1;
       output->SetDataSet(iter, tmpOut);
       tmpOut->FastDelete();
@@ -631,7 +631,6 @@ int vtkPVGeometryFilter::RequestCompositeData(vtkInformation*,
       pieces_to_merge.push_back(piece);
       }
     }
-
   for (size_t cc=0; cc < pieces_to_merge.size(); cc++)
     {
     vtkPVGeometryFilterMergePieces(pieces_to_merge[cc]);
@@ -657,16 +656,18 @@ int vtkPVGeometryFilter::RequestCompositeData(vtkInformation*,
 
     vtkPolyData* trivalInput = vtkPolyData::New();
     iter->SkipEmptyNodesOff();
+    iter->VisitOnlyLeavesOff();
     for (iter->InitTraversal(); !iter->IsDoneWithTraversal();
       iter->GoToNextItem())
       {
       unsigned int index = iter->GetCurrentFlatIndex();
-      if (iter->GetCurrentDataObject() == NULL && non_null_leaves[index] != 0)
+      if (iter->GetCurrentDataObject() == NULL &&
+        index < static_cast<unsigned int>(reduced_non_null_leaves.size()) &&
+        reduced_non_null_leaves[index] != 0)
         {
         output->SetDataSet(iter, trivalInput);
         }
       }
-
     trivalInput->Delete();
     }
 
