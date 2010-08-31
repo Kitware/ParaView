@@ -216,15 +216,15 @@ int vtkPVGeometryFilter::RequestDataObject(vtkInformation*,
       {
       if (vtkMultiBlockDataSet::SafeDownCast(output) == NULL)
         {
-        if (vtkHierarchicalBoxDataSet::SafeDownCast(input))
-          {
-          output = vtkMultiBlockDataSet::New();
-          }
-        else
+        if (vtkMultiBlockDataSet::SafeDownCast(input))
           {
           // Some developers have sub-classed vtkMultiBlockDataSet, in which
           // case, we try to preserve the type.
           output = input->NewInstance();
+          }
+        else
+          {
+          output = vtkMultiBlockDataSet::New();
           }
         output->SetPipelineInformation(outputVector->GetInformationObject(0));
         output->FastDelete();
@@ -536,6 +536,38 @@ namespace
 };
 
 //----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
+void vtkPVGeometryFilter::AddCompositeIndex(vtkPolyData* pd, unsigned int index)
+{
+  vtkUnsignedIntArray* cindex = vtkUnsignedIntArray::New();
+  cindex->SetNumberOfComponents(1);
+  cindex->SetNumberOfTuples(pd->GetNumberOfCells());
+  cindex->FillComponent(0, index);
+  cindex->SetName("vtkCompositeIndex");
+  pd->GetCellData()->AddArray(cindex);
+  cindex->FastDelete();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVGeometryFilter::AddHierarchicalIndex(vtkPolyData* pd,
+  unsigned int level, unsigned int index)
+{
+  vtkUnsignedIntArray* dslevel = vtkUnsignedIntArray::New();
+  dslevel->SetNumberOfTuples(pd->GetNumberOfCells());
+  dslevel->FillComponent(0, level);
+  dslevel->SetName("vtkAMRLevel");
+  pd->GetCellData()->AddArray(dslevel);
+  dslevel->FastDelete();
+
+  vtkUnsignedIntArray* dsindex = vtkUnsignedIntArray::New();
+  dsindex->SetNumberOfTuples(pd->GetNumberOfCells());
+  dsindex->FillComponent(0, index);
+  dsindex->SetName("vtkAMRIndex");
+  pd->GetCellData()->AddArray(dsindex);
+  dsindex->FastDelete();
+}
+
+//----------------------------------------------------------------------------
 int vtkPVGeometryFilter::RequestCompositeData(vtkInformation*,
                                               vtkInformationVector** inputVector,
                                               vtkInformationVector* outputVector)
@@ -543,7 +575,10 @@ int vtkPVGeometryFilter::RequestCompositeData(vtkInformation*,
   vtkTimerLog::MarkStartEvent("vtkPVGeometryFilter::RequestCompositeData");
 
   vtkCompositeDataSet *output = vtkCompositeDataSet::GetData(outputVector, 0);
-  if (!output) {return 0;}
+  if (!output)
+    {
+    return 0;
+    }
 
   vtkCompositeDataSet *input = vtkCompositeDataSet::GetData(inputVector[0], 0);
   if (!input)
@@ -562,7 +597,6 @@ int vtkPVGeometryFilter::RequestCompositeData(vtkInformation*,
   vtkTimerLog::MarkStartEvent("vtkPVGeometryFilter::ExecuteCompositeDataSet");
   vtkSmartPointer<vtkCompositeDataIterator> iter;
   iter.TakeReference(input->NewIterator());
-
 
   vtkHierarchicalBoxDataIterator* hdIter =
     vtkHierarchicalBoxDataIterator::SafeDownCast(iter);
@@ -593,10 +627,13 @@ int vtkPVGeometryFilter::RequestCompositeData(vtkInformation*,
       non_null_leaves[current_flat_index] = 1;
       output->SetDataSet(iter, tmpOut);
       tmpOut->FastDelete();
+
+      this->AddCompositeIndex(tmpOut, current_flat_index);
       }
     else
       {
       tmpOut->Delete();
+      tmpOut = NULL;
       }
 
     if (hdIter)
@@ -608,6 +645,11 @@ int vtkPVGeometryFilter::RequestCompositeData(vtkInformation*,
         hdIter->GetCurrentLevel());
       metadata->Set(vtkSelectionNode::HIERARCHICAL_INDEX(),
         hdIter->GetCurrentIndex());
+      if (tmpOut)
+        {
+        this->AddHierarchicalIndex(tmpOut,
+          hdIter->GetCurrentLevel(), hdIter->GetCurrentIndex());
+        }
       }
 
     numInputs++;
