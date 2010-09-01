@@ -1989,27 +1989,10 @@
       </StringVectorProperty>
 
       <StringVectorProperty name="VariableArrayInfo"
+                            command="GetAllVariableArrayNames"
                             information_only="1">
-        <ArraySelectionInformationHelper attribute_name="Variable"/>
+        <StringArrayHelper />
       </StringVectorProperty>
-
-      <!-- <StringVectorProperty name="VariableArrayStatus" -->
-      <!--                       command="SetVariableArrayStatus" -->
-      <!--                       number_of_elements="0" -->
-      <!--                       repeat_command="1" -->
-      <!--                       number_of_elements_per_command="2" -->
-      <!--                       element_types="2 0" -->
-      <!--                       information_property="VariableArrayInfo" -->
-      <!--                       label="Variables"> -->
-      <!--   <ArraySelectionDomain name="array_list"> -->
-      <!--     <RequiredProperties> -->
-      <!--       <Property name="VariableArrayInfo" function="ArrayList" /> -->
-      <!--     </RequiredProperties> -->
-      <!--   </ArraySelectionDomain> -->
-      <!--   <Documentation> -->
-      <!--     This property lists which netCDF variables to load. -->
-      <!--   </Documentation> -->
-      <!-- </StringVectorProperty> -->
 
       <IntVectorProperty name="SphericalCoordinates"
                          command="SetSphericalCoordinates"
