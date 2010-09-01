@@ -5494,7 +5494,7 @@
 
      <Hints>
       <ReaderFactory extensions="ncdf nc"
-          file_description="netCDF Files" />
+          file_description="netCDF files generic and CF conventions" />
      </Hints>
 
     </FileSeriesReaderProxy> <!-- netCDFReader -->
@@ -6083,8 +6083,8 @@
      </IntVectorProperty>
     
     <Hints>
-      <ReaderFactory extensions="pop.ncdf pop.nc"
-          file_description="Ocean Netcdf Files" />
+      <ReaderFactory extensions="ncdf nc"
+          file_description="POP Ocean NetCDF (Rectilinear)" />
     </Hints>
       
    </SourceProxy>
@@ -6240,8 +6240,8 @@
      </DoubleVectorProperty>
 
      <Hints>
-       <ReaderFactory extensions="mpas.ncdf mpas.nc"
-                      file_description="MPAS Netcdf Files" />
+       <ReaderFactory extensions="ncdf nc"
+                      file_description="MPAS Ocean NetCDF (Unstructured)" />
      </Hints>
 
    </SourceProxy>
