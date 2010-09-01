@@ -1185,15 +1185,7 @@ int vtkSMRenderViewProxy::WriteImage(const char* filename,
 
   vtkSmartPointer<vtkImageData> shot;
   shot.TakeReference(this->CaptureWindow(magnification));
-
-  if (vtkProcessModule::GetProcessModule()->GetOptions()->GetSymmetricMPIMode())
-    {
-    return vtkSMUtilities::SaveImageOnProcessZero(shot, filename, writerName);
-    }
-  else
-    {
-    return vtkSMUtilities::SaveImage(shot, filename, writerName);
-    }
+  return vtkSMUtilities::SaveImageOnProcessZero(shot, filename, writerName);
 }
 
 //-----------------------------------------------------------------------------
