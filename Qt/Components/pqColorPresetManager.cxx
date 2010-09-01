@@ -592,6 +592,30 @@ void pqColorPresetManager::importColorMap(vtkPVXMLElement *element)
       // Add the new color point to the color map.
       colorMap.addPoint(pqChartValue(px), color, pqChartValue(a));
       }
+    else if (QString("NaN") == point->GetName())
+      {
+      double r = 0.25, g = 0.0, b = 0.0;
+
+      if (point->GetScalarAttribute("r", &r) == 0)
+        {
+        continue;
+        }
+      if (point->GetScalarAttribute("g", &g) == 0)
+        {
+        continue;
+        }
+      if (point->GetScalarAttribute("b", &b) == 0)
+        {
+        continue;
+        }
+
+      QColor color = QColor::fromRgbF(r, g, b);
+      colorMap.setNanColor(color);
+      }
+    else
+      {
+      // Unrecognized tag.  Ignore.
+      }
     }
 
   if(colorMap.getNumberOfPoints() > 1)
@@ -638,6 +662,19 @@ void pqColorPresetManager::exportColorMap(const QModelIndex &index,
       element->AddNestedElement(point);
       point->Delete();
       }
+
+    QColor color;
+    colorMap->getNanColor(color);
+    vtkPVXMLElement *nanElement = vtkPVXMLElement::New();
+    nanElement->SetName("NaN");
+    nanElement->SetAttribute("r",
+                             QString::number(color.redF()).toAscii().data());
+    nanElement->SetAttribute("g",
+                             QString::number(color.greenF()).toAscii().data());
+    nanElement->SetAttribute("b",
+                             QString::number(color.blueF()).toAscii().data());
+    element->AddNestedElement(nanElement);
+    nanElement->Delete();
     }
 }
 

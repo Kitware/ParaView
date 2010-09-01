@@ -134,6 +134,7 @@ pqColorMapModel::pqColorMapModel(QObject *parentObject)
 {
   this->Internal = new pqColorMapModelInternal();
   this->Space = pqColorMapModel::HsvSpace;
+  this->NanColor = QColor(127, 0, 0);
   this->InModify = false;
 }
 
@@ -142,6 +143,7 @@ pqColorMapModel::pqColorMapModel(const pqColorMapModel &other)
 {
   this->Internal = new pqColorMapModelInternal();
   this->Space = other.Space;
+  this->NanColor = other.NanColor;
   this->InModify = false;
 
   // Copy the list of points.
@@ -401,6 +403,23 @@ void pqColorMapModel::getValueRange(pqChartValue &min, pqChartValue &max) const
     }
 }
 
+void pqColorMapModel::getNanColor(QColor &color) const
+{
+  color = this->NanColor;
+}
+
+void pqColorMapModel::setNanColor(const QColor &color)
+{
+  if (this->NanColor != color)
+    {
+    this->NanColor = color;
+    if (!this->InModify)
+      {
+      emit nanColorChanged(this->NanColor);
+      }
+    }
+}
+
 void pqColorMapModel::setValueRange(const pqChartValue &min,
     const pqChartValue &max)
 {
@@ -634,7 +653,6 @@ pqColorMapModel &pqColorMapModel::operator=(const pqColorMapModel &other)
   bool oldModify = this->InModify;
   this->InModify = false;
   this->removeAllPoints();
-  this->InModify = oldModify;
   QList<pqColorMapModelItem *>::ConstIterator iter = other.Internal->begin();
   for( ; iter != other.Internal->end(); ++iter)
     {
@@ -642,6 +660,9 @@ pqColorMapModel &pqColorMapModel::operator=(const pqColorMapModel &other)
         (*iter)->Value, (*iter)->Color, (*iter)->Opacity));
     }
 
+  other.getNanColor(this->NanColor);
+
+  this->InModify = oldModify;
   if(!this->InModify)
     {
     emit this->pointsReset();

@@ -208,6 +208,9 @@ pqColorScaleEditor::pqColorScaleEditor(QWidget *widgetParent)
   this->connect(this->Form->ColorSpace, SIGNAL(currentIndexChanged(int)),
       this, SLOT(setColorSpace(int)));
 
+  this->connect(this->Form->NanColor,SIGNAL(chosenColorChanged(const QColor &)),
+                this, SLOT(setNanColor(const QColor &)));
+
   this->connect(this->Form->SaveButton, SIGNAL(clicked()),
       this, SLOT(savePreset()));
   this->connect(this->Form->PresetButton, SIGNAL(clicked()),
@@ -648,6 +651,22 @@ void pqColorScaleEditor::setColorSpace(int index)
     }
 }
 
+void pqColorScaleEditor::setNanColor(const QColor &color)
+{
+  if (this->ColorMap)
+    {
+    this->Form->InSetColors = true;
+    vtkSMProxy *lookupTable = this->ColorMap->getProxy();
+    QList<QVariant> values;
+    values << color.redF() << color.greenF() << color.blueF();
+    pqSMAdaptor::setMultipleElementProperty(
+                                  lookupTable->GetProperty("NanColor"), values);
+    this->Form->InSetColors = false;
+    lookupTable->UpdateVTKObjects();
+    this->Display->renderViewEventually();
+    }
+}
+
 void pqColorScaleEditor::savePreset()
 {
   // Get the color preset model from the manager.
@@ -677,6 +696,7 @@ void pqColorScaleEditor::savePreset()
         }
       }
     }
+  colorMap.setNanColor(this->Form->NanColor->chosenColor());
 
   model->addColorMap(colorMap, "New Color Preset");
 
@@ -766,6 +786,25 @@ void pqColorScaleEditor::loadPreset()
             lookupTable->GetProperty("ColorSpace"), colorSpace);
         pqSMAdaptor::setElementProperty(
             lookupTable->GetProperty("HSVWrap"), wrap);
+        this->Form->InSetColors = false;
+        }
+
+      // Update the NaN color.
+      QColor nanColor;
+      colorMap->getNanColor(nanColor);
+      this->Form->NanColor->blockSignals(true);
+      this->Form->NanColor->setChosenColor(nanColor);
+      this->Form->NanColor->blockSignals(false);
+
+      if (this->ColorMap)
+        {
+        // Set the property on the lookup table.
+        this->Form->InSetColors = true;
+        vtkSMProxy *lookupTable = this->ColorMap->getProxy();
+        QList<QVariant> values;
+        values << nanColor.redF() << nanColor.greenF() << nanColor.blueF();
+        pqSMAdaptor::setMultipleElementProperty(
+                                  lookupTable->GetProperty("NanColor"), values);
         this->Form->InSetColors = false;
         }
 
@@ -1046,30 +1085,35 @@ void pqColorScaleEditor::loadBuiltinColorPresets()
   colorMap.setColorSpace(pqColorMapModel::DivergingSpace);
   colorMap.addPoint(pqChartValue((double)0.0), QColor( 59, 76, 192), 0.0);
   colorMap.addPoint(pqChartValue((double)1.0), QColor(180,  4,  38), 1.0);
+  colorMap.setNanColor(QColor(63, 0, 0));
   model->addBuiltinColorMap(colorMap, "Cool to Warm");
 
   colorMap.removeAllPoints();
   colorMap.setColorSpace(pqColorMapModel::HsvSpace);
   colorMap.addPoint(pqChartValue((double)0.0), QColor(0, 0, 255), (double)0.0);
   colorMap.addPoint(pqChartValue((double)1.0), QColor(255, 0, 0), (double)0.0);
+  colorMap.setNanColor(QColor(127, 127, 127));
   model->addBuiltinColorMap(colorMap, "Blue to Red Rainbow");
 
   colorMap.removeAllPoints();
   colorMap.setColorSpace(pqColorMapModel::HsvSpace);
   colorMap.addPoint(pqChartValue((double)0.0), QColor(255, 0, 0), (double)0.0);
   colorMap.addPoint(pqChartValue((double)1.0), QColor(0, 0, 255), (double)1.0);
+  colorMap.setNanColor(QColor(127, 127, 127));
   model->addBuiltinColorMap(colorMap, "Red to Blue Rainbow");
 
   colorMap.removeAllPoints();
   colorMap.setColorSpace(pqColorMapModel::RgbSpace);
   colorMap.addPoint(pqChartValue((double)0.0), QColor(0,   0,   0  ), (double)0.0);
   colorMap.addPoint(pqChartValue((double)1.0), QColor(255, 255, 255), (double)1.0);
+  colorMap.setNanColor(QColor(255, 0, 0));
   model->addBuiltinColorMap(colorMap, "Grayscale");
 
   colorMap.removeAllPoints();
   colorMap.setColorSpace(pqColorMapModel::RgbSpace);
   colorMap.addPoint(pqChartValue((double)0.0), QColor( 10,  10, 242), (double)0.0);
   colorMap.addPoint(pqChartValue((double)1.0), QColor(242, 242,  10), (double)1.0);
+  colorMap.setNanColor(QColor(255, 0, 0));
   model->addBuiltinColorMap(colorMap, "Blue to Yellow");
 
   colorMap.removeAllPoints();
@@ -1078,12 +1122,14 @@ void pqColorScaleEditor::loadBuiltinColorPresets()
   colorMap.addPoint(pqChartValue((double)0.4), QColor(230, 0,   0  ), (double)0.4);
   colorMap.addPoint(pqChartValue((double)0.8), QColor(230, 230, 0  ), (double)0.8);
   colorMap.addPoint(pqChartValue((double)1.0), QColor(255, 255, 255), (double)1.0);
+  colorMap.setNanColor(QColor(0, 127, 255));
   model->addBuiltinColorMap(colorMap, "Black-Body Radiation");
 
   colorMap.removeAllPoints();
   colorMap.setColorSpace(pqColorMapModel::LabSpace);
   colorMap.addPoint(pqChartValue((double)0.0), QColor(0, 153, 191), (double)0.0);
   colorMap.addPoint(pqChartValue((double)1.0), QColor(196, 119, 87),(double)1.0);
+  colorMap.setNanColor(QColor(255, 255, 0));
   model->addBuiltinColorMap(colorMap, "CIELab Blue to Red");
 }
 
@@ -1227,6 +1273,17 @@ void pqColorScaleEditor::initColorScale()
     this->Form->ColorSpace->blockSignals(false);
 
     this->Viewer->SetColorSpace(this->Form->ColorSpace->currentIndex());
+
+    // Set up the NaN color.
+    this->Form->NanColor->blockSignals(true);
+    QList<QVariant> nanColorValues = pqSMAdaptor::getMultipleElementProperty(
+                                          lookupTable->GetProperty("NanColor"));
+    QColor nanColor;
+    nanColor.setRgbF(nanColorValues[0].toDouble(),
+                     nanColorValues[1].toDouble(),
+                     nanColorValues[2].toDouble());
+    this->Form->NanColor->setChosenColor(nanColor);
+    this->Form->NanColor->blockSignals(false);
 
     // Set up the log scale checkbox. If the log scale is not valid
     // because of the range, loadColorPoints will clear the flag.

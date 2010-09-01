@@ -6,61 +6,15 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>475</width>
-    <height>454</height>
+    <width>604</width>
+    <height>477</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Color Scale Editor</string>
   </property>
-  <layout class="QGridLayout">
-   <property name="margin">
-    <number>9</number>
-   </property>
-   <property name="spacing">
-    <number>6</number>
-   </property>
-   <item row="1" column="0">
-    <layout class="QHBoxLayout">
-     <property name="spacing">
-      <number>6</number>
-     </property>
-     <property name="margin">
-      <number>0</number>
-     </property>
-     <item>
-      <spacer>
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>251</width>
-         <height>27</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item>
-      <widget class="QPushButton" name="MakeDefaultButton">
-       <property name="text">
-        <string>Make Default</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="CloseButton">
-       <property name="text">
-        <string>&amp;Close</string>
-       </property>
-       <property name="default">
-        <bool>true</bool>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </item>
-   <item row="0" column="0">
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
     <widget class="QTabWidget" name="ColorTabs">
      <property name="currentIndex">
       <number>0</number>
@@ -69,7 +23,7 @@
       <attribute name="title">
        <string>Color Scale</string>
       </attribute>
-      <layout class="QGridLayout">
+      <layout class="QGridLayout" name="gridLayout">
        <item row="0" column="0" colspan="4">
         <widget class="QVTKWidget" name="ColorScale" native="true">
          <property name="sizePolicy">
@@ -123,6 +77,33 @@
          </property>
         </widget>
        </item>
+       <item row="2" column="0" colspan="2">
+        <layout class="QHBoxLayout" name="horizontalLayout">
+         <item>
+          <spacer name="horizontalSpacer">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>168</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="pqColorChooserButton" name="NanColor">
+           <property name="toolTip">
+            <string>The color to use for not-a-number values.</string>
+           </property>
+           <property name="text">
+            <string>NaN Color</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
        <item row="2" column="2">
         <widget class="QLabel" name="ScaleLabel">
          <property name="text">
@@ -149,12 +130,6 @@
        </item>
        <item row="3" column="2" colspan="2">
         <layout class="QHBoxLayout">
-         <property name="spacing">
-          <number>6</number>
-         </property>
-         <property name="margin">
-          <number>0</number>
-         </property>
          <item>
           <spacer>
            <property name="orientation">
@@ -190,7 +165,7 @@
          </item>
         </layout>
        </item>
-       <item row="4" column="0" colspan="4">
+       <item row="4" column="0" colspan="2">
         <widget class="QCheckBox" name="UseLogScale">
          <property name="whatsThis">
           <string>Check this option to use a logarithmic scale on the color map.</string>
@@ -200,7 +175,7 @@
          </property>
         </widget>
        </item>
-       <item row="5" column="0" colspan="4">
+       <item row="5" column="0" colspan="2">
         <widget class="QCheckBox" name="UseAutoRescale">
          <property name="whatsThis">
           <string>Check this option to automatically rescale the color map to the current data range.</string>
@@ -261,12 +236,6 @@
        </item>
        <item row="7" column="0" colspan="4">
         <layout class="QHBoxLayout">
-         <property name="spacing">
-          <number>6</number>
-         </property>
-         <property name="margin">
-          <number>0</number>
-         </property>
          <item>
           <spacer>
            <property name="orientation">
@@ -330,7 +299,7 @@
          </item>
         </layout>
        </item>
-       <item row="8" column="0" colspan="4">
+       <item row="8" column="0" colspan="2">
         <widget class="QCheckBox" name="UseDiscreteColors">
          <property name="whatsThis">
           <string>Check this box if the color table should have discrete colors, otherwise color values will be interpolated.</string>
@@ -343,14 +312,8 @@
          </property>
         </widget>
        </item>
-       <item row="9" column="0" colspan="4">
+       <item row="9" column="0" colspan="3">
         <layout class="QHBoxLayout">
-         <property name="spacing">
-          <number>6</number>
-         </property>
-         <property name="margin">
-          <number>0</number>
-         </property>
          <item>
           <widget class="QLabel" name="TableSizeLabel">
            <property name="text">
@@ -412,12 +375,6 @@
        <string>Color Legend</string>
       </attribute>
       <layout class="QGridLayout">
-       <property name="margin">
-        <number>9</number>
-       </property>
-       <property name="spacing">
-        <number>6</number>
-       </property>
        <item row="0" column="0" colspan="5">
         <widget class="QCheckBox" name="ShowColorLegend">
          <property name="whatsThis">
@@ -440,12 +397,6 @@
           <string>Title</string>
          </property>
          <layout class="QGridLayout">
-          <property name="margin">
-           <number>9</number>
-          </property>
-          <property name="spacing">
-           <number>6</number>
-          </property>
           <item row="2" column="1">
            <widget class="QSpinBox" name="TitleFontSize">
             <property name="minimum">
@@ -494,12 +445,6 @@
           </item>
           <item row="0" column="1" colspan="6">
            <layout class="QHBoxLayout">
-            <property name="spacing">
-             <number>6</number>
-            </property>
-            <property name="margin">
-             <number>0</number>
-            </property>
             <item>
              <widget class="QLineEdit" name="TitleName">
               <property name="whatsThis">
@@ -519,9 +464,6 @@
           <item row="1" column="6">
            <layout class="QHBoxLayout">
             <property name="spacing">
-             <number>0</number>
-            </property>
-            <property name="margin">
              <number>0</number>
             </property>
             <item>
@@ -710,9 +652,6 @@
           <item row="0" column="7">
            <layout class="QHBoxLayout">
             <property name="spacing">
-             <number>0</number>
-            </property>
-            <property name="margin">
              <number>0</number>
             </property>
             <item>
@@ -921,6 +860,40 @@
      </widget>
     </widget>
    </item>
+   <item>
+    <layout class="QHBoxLayout">
+     <item>
+      <spacer>
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>251</width>
+         <height>27</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="MakeDefaultButton">
+       <property name="text">
+        <string>Make Default</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="CloseButton">
+       <property name="text">
+        <string>&amp;Close</string>
+       </property>
+       <property name="default">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
   </layout>
  </widget>
  <customwidgets>
@@ -933,6 +906,11 @@
    <class>QVTKWidget</class>
    <extends>QWidget</extends>
    <header>QVTKWidget.h</header>
+  </customwidget>
+  <customwidget>
+   <class>pqColorChooserButton</class>
+   <extends>QToolButton</extends>
+   <header>pqColorChooserButton.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>
