@@ -1948,6 +1948,147 @@
      <!-- End PNGReader -->
    </SourceProxy>
 
+    <SourceProxy name="netCDFReaderCore"
+                 class="vtkNetCDFCFReader">
+
+      <StringVectorProperty name="FileName"
+                            command="SetFileName"
+                            animateable="0"
+                            number_of_elements="1">
+        <FileListDomain name="files" />
+        <Documentation>
+          The name of the file to load.
+        </Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="DimensionInfo"
+                            command="GetAllDimensions"
+                            information_only="1">
+        <StringArrayHelper />
+      </StringVectorProperty>
+
+      <StringVectorProperty name="Dimensions"
+                            command="SetDimensions"
+                            number_of_elements="1"
+                            animatelable="0">
+        <StringListDomain name="array_list">
+          <RequiredProperties>
+            <Property name="DimensionInfo" function="ArrayList" />
+          </RequiredProperties>
+        </StringListDomain>
+        <Documentation>
+          Load the grid with the given dimensions.  Any arrays that conform
+          to these dimensions will be loaded.
+        </Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="VariableDimensionInfo"
+                            command="GetVariableDimensions"
+                            information_only="1">
+        <StringArrayHelper />
+      </StringVectorProperty>
+
+      <StringVectorProperty name="VariableArrayInfo"
+                            information_only="1">
+        <ArraySelectionInformationHelper attribute_name="Variable"/>
+      </StringVectorProperty>
+
+      <!-- <StringVectorProperty name="VariableArrayStatus" -->
+      <!--                       command="SetVariableArrayStatus" -->
+      <!--                       number_of_elements="0" -->
+      <!--                       repeat_command="1" -->
+      <!--                       number_of_elements_per_command="2" -->
+      <!--                       element_types="2 0" -->
+      <!--                       information_property="VariableArrayInfo" -->
+      <!--                       label="Variables"> -->
+      <!--   <ArraySelectionDomain name="array_list"> -->
+      <!--     <RequiredProperties> -->
+      <!--       <Property name="VariableArrayInfo" function="ArrayList" /> -->
+      <!--     </RequiredProperties> -->
+      <!--   </ArraySelectionDomain> -->
+      <!--   <Documentation> -->
+      <!--     This property lists which netCDF variables to load. -->
+      <!--   </Documentation> -->
+      <!-- </StringVectorProperty> -->
+
+      <IntVectorProperty name="SphericalCoordinates"
+                         command="SetSphericalCoordinates"
+                         animateable="0"
+                         number_of_elements="1"
+                         default_values="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          If on, then data with latitude/longitude dimensions will be
+          read in as curvilinear data shaped like spherical coordinates.
+          If false, then the data will always be read in Cartesian
+          coordinates.
+        </Documentation>
+      </IntVectorProperty>
+
+      <DoubleVectorProperty name="VerticalScale"
+                            command="SetVerticalScale"
+                            number_of_elements="1"
+                            default_values="1">
+        <Documentation>
+          The scale of the vertical component of spherical coordinates.  It
+          is common to write the vertical component with respect to
+          something other than the center of the sphere (for example, the
+          surface).  In this case, it might be necessary to scale and/or
+          bias the vertical height.  The height will become height*scale +
+          bias.  Keep in mind that if the positive attribute of the
+          vertical dimension is down, then the height is negated.  The
+          scaling will be adjusted if it results in invalid (negative)
+          vertical values.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="VerticalBias"
+                            command="SetVerticalBias"
+                            number_of_elements="1"
+                            default_values="0">
+        <Documentation>
+          The bias of the vertical component of spherical coordinates.  It
+          is common to write the vertical component with respect to
+          something other than the center of the sphere (for example, the
+          surface).  In this case, it might be necessary to scale and/or
+          bias the vertical height.  The height will become height*scale +
+          bias.  Keep in mind that if the positive attribute of the
+          vertical dimension is down, then the height is negated.  The
+          scaling will be adjusted if it results in invalid (negative)
+          vertical values.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <IntVectorProperty name="ReplaceFillValueWithNan"
+                         command="SetReplaceFillValueWithNan"
+                         number_of_elements="1"
+                         default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          If on, any float or double variable read that has a _FillValue
+          attribute will have that fill value replaced with a not-a-number
+          (NaN) value.  The advantage of setting these to NaN values is
+          that, if implemented properly by the system and careful math
+          operations are used, they can implicitly be ignored by
+          calculations like finding the range of the values.  That said,
+          this option should be used with caution as VTK does not fully
+          support NaN values and therefore odd calculations may occur.
+        </Documentation>
+      </IntVectorProperty>
+
+      <DoubleVectorProperty name="TimestepValues"
+                            repeatable="1"
+                            information_only="1">
+        <TimeStepsInformationHelper />
+        <Documentation>
+          This magic property sends time information to the animation
+          panel.  ParaView will then automatically set up the animation to
+          visit the time steps defined in the file.
+        </Documentation>
+      </DoubleVectorProperty>
+
+    </SourceProxy> <!-- netCDFReaderCore -->
+
     <!-- End of "internal_sources" -->
   </ProxyGroup>
 
@@ -5296,9 +5437,10 @@
    </SourceProxy>
    <!-- End of LSDyna Reader -->
 
-    <SourceProxy name="netCDFReader"
-                 class="vtkNetCDFCFReader"
-                 label="NetCDF Reader">
+    <FileSeriesReaderProxy name="netCDFReader"
+                           class="vtkFileSeriesReader"
+                           label="NetCDF Reader"
+                           file_name_method="SetFileName">
       <Documentation short_help="Read regular arrays from netCDF files."
                      long_help="Read regular arrays from netCDF files.  Will also read any topological information specified by the COARDS and CF conventions.">
         Reads arrays from netCDF files into structured VTK data sets.  In
@@ -5313,129 +5455,31 @@
       </Documentation>
 
       <StringVectorProperty name="FileName"
-                            command="SetFileName"
+                            clean_command="RemoveAllFileNames"
+                            command="AddFileName"
                             animateable="0"
-                            number_of_elements="1">
+                            number_of_elements="0"
+                            repeat_command="1">
         <FileListDomain name="files" />
         <Documentation>
-          The name of the file to load.
+          The name of the files to load.
         </Documentation>
       </StringVectorProperty>
 
-      <StringVectorProperty name="DimensionInfo"
-                            command="GetAllDimensions"
-                            information_only="1">
-        <StringArrayHelper />
-      </StringVectorProperty>
-
-      <StringVectorProperty name="Dimensions"
-                            command="SetDimensions"
-                            number_of_elements="1"
-                            animatelable="0">
-        <StringListDomain name="array_list">
-          <RequiredProperties>
-            <Property name="DimensionInfo" function="ArrayList" />
-          </RequiredProperties>
-        </StringListDomain>
-        <Documentation>
-          Load the grid with the given dimensions.  Any arrays that conform
-          to these dimensions will be loaded.
-        </Documentation>
-      </StringVectorProperty>
-
-      <StringVectorProperty name="VariableDimensionInfo"
-                            command="GetVariableDimensions"
-                            information_only="1">
-        <StringArrayHelper />
-      </StringVectorProperty>
-
-      <StringVectorProperty name="VariableArrayInfo"
-                            information_only="1">
-        <ArraySelectionInformationHelper attribute_name="Variable"/>
-      </StringVectorProperty>
-
-      <!-- <StringVectorProperty name="VariableArrayStatus" -->
-      <!--                       command="SetVariableArrayStatus" -->
-      <!--                       number_of_elements="0" -->
-      <!--                       repeat_command="1" -->
-      <!--                       number_of_elements_per_command="2" -->
-      <!--                       element_types="2 0" -->
-      <!--                       information_property="VariableArrayInfo" -->
-      <!--                       label="Variables"> -->
-      <!--   <ArraySelectionDomain name="array_list"> -->
-      <!--     <RequiredProperties> -->
-      <!--       <Property name="VariableArrayInfo" function="ArrayList" /> -->
-      <!--     </RequiredProperties> -->
-      <!--   </ArraySelectionDomain> -->
-      <!--   <Documentation> -->
-      <!--     This property lists which netCDF variables to load. -->
-      <!--   </Documentation> -->
-      <!-- </StringVectorProperty> -->
- 
-      <IntVectorProperty name="SphericalCoordinates"
-                         command="SetSphericalCoordinates"
-                         animateable="0"
-                         number_of_elements="1"
-                         default_values="1">
-        <BooleanDomain name="bool" />
-        <Documentation>
-          If on, then data with latitude/longitude dimensions will be
-          read in as curvilinear data shaped like spherical coordinates.
-          If false, then the data will always be read in Cartesian
-          coordinates.
-        </Documentation>
-      </IntVectorProperty>
-
-      <DoubleVectorProperty name="VerticalScale"
-                            command="SetVerticalScale"
-                            number_of_elements="1"
-                            default_values="1">
-        <Documentation>
-          The scale of the vertical component of spherical coordinates.  It
-          is common to write the vertical component with respect to
-          something other than the center of the sphere (for example, the
-          surface).  In this case, it might be necessary to scale and/or
-          bias the vertical height.  The height will become height*scale +
-          bias.  Keep in mind that if the positive attribute of the
-          vertical dimension is down, then the height is negated.  The
-          scaling will be adjusted if it results in invalid (negative)
-          vertical values.
-        </Documentation>
-      </DoubleVectorProperty>
-
-      <DoubleVectorProperty name="VerticalBias"
-                            command="SetVerticalBias"
-                            number_of_elements="1"
-                            default_values="0">
-        <Documentation>
-          The bias of the vertical component of spherical coordinates.  It
-          is common to write the vertical component with respect to
-          something other than the center of the sphere (for example, the
-          surface).  In this case, it might be necessary to scale and/or
-          bias the vertical height.  The height will become height*scale +
-          bias.  Keep in mind that if the positive attribute of the
-          vertical dimension is down, then the height is negated.  The
-          scaling will be adjusted if it results in invalid (negative)
-          vertical values.
-        </Documentation>
-      </DoubleVectorProperty>
-
-      <IntVectorProperty name="RepalceFillValueWithNan"
-                         command="SetReplaceFillValueWithNan"
-                         number_of_elements="1"
-                         default_values="0">
-        <BooleanDomain name="bool" />
-        <Documentation>
-          If on, any float or double variable read that has a _FillValue
-          attribute will have that fill value replaced with a not-a-number
-          (NaN) value.  The advantage of setting these to NaN values is
-          that, if implemented properly by the system and careful math
-          operations are used, they can implicitly be ignored by
-          calculations like finding the range of the values.  That said,
-          this option should be used with caution as VTK does not fully
-          support NaN values and therefore odd calculations may occur.
-        </Documentation>
-      </IntVectorProperty>
+      <SubProxy>
+        <Proxy name="Reader"
+               proxygroup="internal_sources" proxyname="netCDFReaderCore" />
+        <ExposedProperties>
+          <Property name="DimensionInfo" />
+          <Property name="Dimensions" />
+          <Property name="VariableDimensionInfo" />
+          <Property name="VariableArrayInfo" />
+          <Property name="SphericalCoordinates" />
+          <Property name="VerticalScale" />
+          <Property name="VerticalBias" />
+          <Property name="ReplaceFillValueWithNan" />
+        </ExposedProperties>
+      </SubProxy>
 
       <DoubleVectorProperty name="TimestepValues"
                             repeatable="1"
@@ -5453,7 +5497,7 @@
           file_description="netCDF Files" />
      </Hints>
 
-    </SourceProxy> <!-- netCDFReader -->
+    </FileSeriesReaderProxy> <!-- netCDFReader -->
 
     <SourceProxy name="SLACReader"
                  class="vtkPSLACReader"
