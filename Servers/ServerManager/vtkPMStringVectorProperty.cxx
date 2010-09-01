@@ -41,7 +41,7 @@ bool vtkPMStringVectorProperty::Push(vtkSMMessage* message, int offset)
     offset);
   assert(strcmp(prop->name().c_str(), this->GetXMLName()) == 0);
 
-  const Variant *variant = &prop->value(0); // Only one type
+  const Variant *variant = &prop->value();
   int num_elems = variant->txt_size();
   vtkstd::vector<vtkstd::string> values;
   values.resize(num_elems);
@@ -142,7 +142,7 @@ bool vtkPMStringVectorProperty::Push(const vtkstd::vector<vtkstd::string> &value
     for (iter = values.begin(); iter != values.end(); ++iter, ++i)
       {
       // Convert to the appropriate type and add to stream
-      int type = (i < this->ElementTypes.size())?
+      int type = (i < static_cast<int>(this->ElementTypes.size()))?
         this->ElementTypes[i] : STRING;
       switch (type)
         {
@@ -172,7 +172,7 @@ bool vtkPMStringVectorProperty::Push(const vtkstd::vector<vtkstd::string> &value
       for (int j=0; j<this->NumberOfElementsPerCommand; j++)
         {
         // Convert to the appropriate type and add to stream
-        int type = (j < this->ElementTypes.size())?
+        int type = (j < static_cast<int>(this->ElementTypes.size()))?
           this->ElementTypes[j] : STRING;
         switch (type)
           {

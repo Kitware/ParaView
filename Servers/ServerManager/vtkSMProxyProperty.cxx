@@ -348,8 +348,7 @@ void vtkSMProxyProperty::WriteTo(vtkSMMessage* msg)
 {
   ProxyState_Property *prop = msg->AddExtension(ProxyState::property);
   prop->set_name(this->GetXMLName());
-  Variant *var = 0;
-  var = prop->add_value();
+  Variant *var = prop->mutable_value();
   var->set_type(Variant::PROXY);
   for (unsigned int i=0;i<this->GetNumberOfProxies();i++)
     {

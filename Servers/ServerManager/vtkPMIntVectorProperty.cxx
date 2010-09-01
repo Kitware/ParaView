@@ -42,7 +42,7 @@ bool vtkPMIntVectorProperty::Push(vtkSMMessage* message, int offset)
     offset);
   assert(strcmp(prop->name().c_str(), this->GetXMLName()) == 0);
 
-  const Variant *variant = &prop->value(0); // Only one type
+  const Variant *variant = &prop->value();
   int num_elems = variant->integer_size();
   vtkstd::vector<int> values;
   values.resize(num_elems + 1);

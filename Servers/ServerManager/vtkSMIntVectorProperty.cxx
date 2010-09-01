@@ -50,7 +50,7 @@ void vtkSMIntVectorProperty::WriteTo(vtkSMMessage* msg)
 {
   ProxyState_Property *prop = msg->AddExtension(ProxyState::property);
   prop->set_name(this->GetXMLName());
-  Variant *variant = prop->add_value();
+  Variant *variant = prop->mutable_value();
   variant->set_type(Variant::INT);
 
   vtkstd::vector<int>::iterator iter;
@@ -74,8 +74,7 @@ void vtkSMIntVectorProperty::ReadFrom(vtkSMMessage* msg, int offset)
     offset);
   assert(strcmp(prop->name().c_str(), this->GetXMLName()) == 0);
 
-  const Variant *variant = &prop->value(0); // Only one type
-
+  const Variant *variant = &prop->value();
   int num_elems = variant->integer_size();
   int *values = new int[num_elems+1];
   for (int cc=0; cc < num_elems; cc++)

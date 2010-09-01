@@ -79,7 +79,7 @@ void vtkSMStringVectorProperty::WriteTo(vtkSMMessage* msg)
 {
   ProxyState_Property *prop = msg->AddExtension(ProxyState::property);
   prop->set_name(this->GetXMLName());
-  Variant *variant = prop->add_value();
+  Variant *variant = prop->mutable_value();
   variant->set_type(Variant::STRING);
   for (unsigned int i=0;i<this->GetNumberOfElements();i++)
     {
@@ -96,7 +96,7 @@ void vtkSMStringVectorProperty::ReadFrom(vtkSMMessage* msg, int offset)
     offset);
   assert(strcmp(prop->name().c_str(), this->GetXMLName()) == 0);
 
-  const Variant *variant = &prop->value(0); // Only one type
+  const Variant *variant = &prop->value();
 
   int num_elems = variant->txt_size();
   const char **values = new const char*[num_elems+1];

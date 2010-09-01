@@ -51,7 +51,7 @@ void vtkSMDoubleVectorProperty::WriteTo(vtkSMMessage* msg)
 {
   ProxyState_Property *prop = msg->AddExtension(ProxyState::property);
   prop->set_name(this->GetXMLName());
-  Variant *variant = prop->add_value();
+  Variant *variant = prop->mutable_value();
   variant->set_type(Variant::FLOAT64);
   vtkstd::vector<double>::iterator iter;
   for (iter = this->Internals->Values.begin(); iter!=
@@ -70,8 +70,7 @@ void vtkSMDoubleVectorProperty::ReadFrom(vtkSMMessage* msg, int offset)
     offset);
   assert(strcmp(prop->name().c_str(), this->GetXMLName()) == 0);
 
-  const Variant *variant = &prop->value(0); // Only one type
-
+  const Variant *variant = &prop->value();
   int num_elems = variant->float64_size();
   double *values = new double[num_elems];
   for (int cc=0; cc < num_elems; cc++)
