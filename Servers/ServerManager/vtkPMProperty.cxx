@@ -15,6 +15,7 @@
 #include "vtkPMProperty.h"
 
 #include "vtkClientServerInterpreter.h"
+#include "vtkClientServerStream.h"
 #include "vtkObjectFactory.h"
 #include "vtkPMProxy.h"
 #include "vtkPVXMLElement.h"
@@ -103,6 +104,18 @@ bool vtkPMProperty::ProcessMessage(vtkClientServerStream& stream)
     return this->ProxyHelper->GetInterpreter()->ProcessStream(stream) != 0;
     }
   return false;
+}
+
+//----------------------------------------------------------------------------
+const vtkClientServerStream& vtkPMProperty::GetLastResult()
+{
+  if (this->ProxyHelper)
+    {
+    return this->ProxyHelper->GetInterpreter()->GetLastResult();
+    }
+
+  static vtkClientServerStream stream;
+  return stream;
 }
 
 //----------------------------------------------------------------------------

@@ -12,24 +12,24 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#include "vtkPMIntVectorProperty.h"
+#include "vtkPMIdTypeVectorProperty.h"
 #include "vtkPMVectorPropertyTemplate.txx"
 #include "vtkObjectFactory.h"
 
 
-vtkStandardNewMacro(vtkPMIntVectorProperty);
+vtkStandardNewMacro(vtkPMIdTypeVectorProperty);
 //----------------------------------------------------------------------------
-vtkPMIntVectorProperty::vtkPMIntVectorProperty()
+vtkPMIdTypeVectorProperty::vtkPMIdTypeVectorProperty()
 {
 }
 
 //----------------------------------------------------------------------------
-vtkPMIntVectorProperty::~vtkPMIntVectorProperty()
+vtkPMIdTypeVectorProperty::~vtkPMIdTypeVectorProperty()
 {
 }
 
 //----------------------------------------------------------------------------
-void vtkPMIntVectorProperty::PrintSelf(ostream& os, vtkIndent indent)
+void vtkPMIdTypeVectorProperty::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 }

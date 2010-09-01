@@ -12,33 +12,33 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPMIntVectorProperty
+// .NAME vtkPMDoubleVectorProperty
 // .SECTION Description
 //
 
-#ifndef __vtkPMIntVectorProperty_h
-#define __vtkPMIntVectorProperty_h
+#ifndef __vtkPMDoubleVectorProperty_h
+#define __vtkPMDoubleVectorProperty_h
 
 #include "vtkPMVectorProperty.h"
 #include "vtkPMVectorPropertyTemplate.h"
 
-#define vtkPMVectorProperty vtkPMVectorPropertyTemplate<int>
-class VTK_EXPORT vtkPMIntVectorProperty : public vtkPMVectorProperty
+#define vtkPMVectorProperty vtkPMVectorPropertyTemplate<double>
+class VTK_EXPORT vtkPMDoubleVectorProperty : public vtkPMVectorProperty
 #undef vtkPMVectorProperty
 {
 public:
-  static vtkPMIntVectorProperty* New();
-  vtkTypeMacro(vtkPMIntVectorProperty, vtkPMVectorProperty);
+  static vtkPMDoubleVectorProperty* New();
+  vtkTypeMacro(vtkPMDoubleVectorProperty, vtkPMVectorProperty);
   void PrintSelf(ostream& os, vtkIndent indent);
 
 //BTX
 protected:
-  vtkPMIntVectorProperty();
-  ~vtkPMIntVectorProperty();
+  vtkPMDoubleVectorProperty();
+  ~vtkPMDoubleVectorProperty();
 
 private:
-  vtkPMIntVectorProperty(const vtkPMIntVectorProperty&); // Not implemented
-  void operator=(const vtkPMIntVectorProperty&); // Not implemented
+  vtkPMDoubleVectorProperty(const vtkPMDoubleVectorProperty&); // Not implemented
+  void operator=(const vtkPMDoubleVectorProperty&); // Not implemented
 //ETX
 };
 

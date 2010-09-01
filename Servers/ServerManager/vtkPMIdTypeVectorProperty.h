@@ -12,33 +12,33 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPMIntVectorProperty
+// .NAME vtkPMIdTypeVectorProperty
 // .SECTION Description
 //
 
-#ifndef __vtkPMIntVectorProperty_h
-#define __vtkPMIntVectorProperty_h
+#ifndef __vtkPMIdTypeVectorProperty_h
+#define __vtkPMIdTypeVectorProperty_h
 
 #include "vtkPMVectorProperty.h"
 #include "vtkPMVectorPropertyTemplate.h"
 
-#define vtkPMVectorProperty vtkPMVectorPropertyTemplate<int>
-class VTK_EXPORT vtkPMIntVectorProperty : public vtkPMVectorProperty
+#define vtkPMVectorProperty vtkPMVectorPropertyTemplate<vtkIdType, bool>
+class VTK_EXPORT vtkPMIdTypeVectorProperty : public vtkPMVectorProperty
 #undef vtkPMVectorProperty
 {
 public:
-  static vtkPMIntVectorProperty* New();
-  vtkTypeMacro(vtkPMIntVectorProperty, vtkPMVectorProperty);
+  static vtkPMIdTypeVectorProperty* New();
+  vtkTypeMacro(vtkPMIdTypeVectorProperty, vtkPMVectorProperty);
   void PrintSelf(ostream& os, vtkIndent indent);
 
 //BTX
 protected:
-  vtkPMIntVectorProperty();
-  ~vtkPMIntVectorProperty();
+  vtkPMIdTypeVectorProperty();
+  ~vtkPMIdTypeVectorProperty();
 
 private:
-  vtkPMIntVectorProperty(const vtkPMIntVectorProperty&); // Not implemented
-  void operator=(const vtkPMIntVectorProperty&); // Not implemented
+  vtkPMIdTypeVectorProperty(const vtkPMIdTypeVectorProperty&); // Not implemented
+  void operator=(const vtkPMIdTypeVectorProperty&); // Not implemented
 //ETX
 };
 

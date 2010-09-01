@@ -51,6 +51,8 @@ SET (Kit_SRCS
   vtkPMVectorProperty.cxx
   vtkPMStringVectorProperty.cxx
   vtkPMIntVectorProperty.cxx
+  vtkPMDoubleVectorProperty.cxx
+  vtkPMIdTypeVectorProperty.cxx
   )
 
 IF (FIXME)
