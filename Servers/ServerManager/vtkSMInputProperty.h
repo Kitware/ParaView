@@ -47,13 +47,6 @@ public:
   vtkGetMacro(MultipleInput, int);
 
   // Description:
-  // If InputsUpdateImmediately is true, all input properties push
-  // their values as soon as they are modified. Otherwise, the values
-  // are pushed UpdateVTKObjects
-  static int GetInputsUpdateImmediately();
-  static void SetInputsUpdateImmediately(int up);
-
-  // Description:
   // Add a proxy to the list of input proxies. The outputPort controls
   // which outputPort will be used in connecting the pipeline.
   // The proxy is added with corresponding Add and Set methods and
@@ -143,8 +136,6 @@ protected:
   int PortIndex;
 
   vtkSMInputPropertyInternals* IPInternals;
-
-  static int InputsUpdateImmediately;
 
 private:
   vtkSMInputProperty(const vtkSMInputProperty&); // Not implemented

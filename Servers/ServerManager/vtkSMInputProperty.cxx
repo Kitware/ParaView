@@ -26,7 +26,6 @@
 
 vtkStandardNewMacro(vtkSMInputProperty);
 
-int vtkSMInputProperty::InputsUpdateImmediately = 1;
 
 struct vtkSMInputPropertyInternals
 {
@@ -37,8 +36,6 @@ struct vtkSMInputPropertyInternals
 //---------------------------------------------------------------------------
 vtkSMInputProperty::vtkSMInputProperty()
 {
-  this->ImmediateUpdate = vtkSMInputProperty::InputsUpdateImmediately;
-  this->UpdateSelf = 1;
   this->MultipleInput = 0;
   this->PortIndex = 0;
 
@@ -49,38 +46,6 @@ vtkSMInputProperty::vtkSMInputProperty()
 vtkSMInputProperty::~vtkSMInputProperty()
 {
   delete this->IPInternals;
-}
-
-//---------------------------------------------------------------------------
-int vtkSMInputProperty::GetInputsUpdateImmediately()
-{
-  return vtkSMInputProperty::InputsUpdateImmediately;
-}
-
-//---------------------------------------------------------------------------
-void vtkSMInputProperty::SetInputsUpdateImmediately(int up)
-{
-  vtkSMInputProperty::InputsUpdateImmediately = up;
-
-  vtkSMPropertyIterator* piter = vtkSMPropertyIterator::New();
-  vtkSMProxyIterator* iter = vtkSMProxyIterator::New();
-  while(!iter->IsAtEnd())
-    {
-    piter->SetProxy(iter->GetProxy());
-    while(!piter->IsAtEnd())
-      {
-      vtkSMInputProperty* ip = vtkSMInputProperty::SafeDownCast(
-        piter->GetProperty());
-      if (ip)
-        {
-        ip->SetImmediateUpdate(up);
-        }
-      piter->Next();
-      }
-    iter->Next();
-    }
-  iter->Delete();
-  piter->Delete();
 }
 
 //---------------------------------------------------------------------------

@@ -20,15 +20,23 @@ ENDIF(NOT WIN32)
 
 SET (Kit_SRCS
   vtkInitializationHelper.cxx
+  vtkPMDoubleVectorProperty.cxx
+  vtkPMIdTypeVectorProperty.cxx
+  vtkPMInputProperty.cxx
+  vtkPMIntVectorProperty.cxx
   vtkPMObject.cxx
   vtkPMProperty.cxx
   vtkPMProxy.cxx
+  vtkPMProxyProperty.cxx
+  vtkPMStringVectorProperty.cxx
+  vtkPMVectorProperty.cxx
   vtkSMBooleanDomain.cxx
   vtkSMDocumentation.cxx
   vtkSMDomain.cxx
   vtkSMDomainIterator.cxx
   vtkSMDoubleVectorProperty.cxx
   vtkSMIdTypeVectorProperty.cxx
+  vtkSMInputProperty.cxx
   vtkSMIntVectorProperty.cxx
   vtkSMLink.cxx
   vtkSMObject.cxx
@@ -48,13 +56,6 @@ SET (Kit_SRCS
   vtkSMSessionServer.cxx
   vtkSMStringVectorProperty.cxx
   vtkSMVectorProperty.cxx
-  vtkPMVectorProperty.cxx
-  vtkPMStringVectorProperty.cxx
-  vtkPMIntVectorProperty.cxx
-  vtkPMDoubleVectorProperty.cxx
-  vtkPMIdTypeVectorProperty.cxx
-  vtkSMInputProperty.cxx
-  vtkPMProxyProperty.cxx
   )
 
 IF (FIXME)
@@ -110,7 +111,6 @@ SET(Kit_SRCS
   vtkSMDeserializer.cxx
   vtkSMDimensionsDomain.cxx
   vtkSMDistanceRepresentation2DProxy.cxx
-  vtkSMDocumentation.cxx
   vtkSMDoubleArrayInformationHelper.cxx
   vtkSMDoubleRangeDomain.cxx
   vtkSMEnumerationDomain.cxx
@@ -136,7 +136,6 @@ SET(Kit_SRCS
   vtkSMImplicitPlaneRepresentationProxy.cxx
   vtkSMInformationHelper.cxx
   vtkSMInputArrayDomain.cxx
-  vtkSMInputProperty.cxx
   vtkSMIdTypeArrayInformationHelper.cxx
   vtkSMIntArrayInformationHelper.cxx
   vtkSMInteractionUndoStackBuilder.cxx
@@ -151,7 +150,6 @@ SET(Kit_SRCS
   vtkSMNullProxy.cxx
   vtkSMNumberOfComponentsDomain.cxx
   vtkSMNumberOfGroupsDomain.cxx
-  vtkSMObject.cxx
   vtkSMOrderedPropertyIterator.cxx
   vtkSMOutlineRepresentationProxy.cxx
   vtkSMOutputPort.cxx
@@ -163,14 +161,12 @@ SET(Kit_SRCS
   vtkSMPluginProxy.cxx
 #  vtkSMPluginInformationHelper.cxx
   vtkSMPropertyAdaptor.cxx
-  vtkSMProperty.cxx
   vtkSMNamedPropertyIterator.cxx
   vtkSMPropertyLink.cxx
   vtkSMPropertyModificationUndoElement.cxx
   vtkSMPropRepresentationProxy.cxx
   vtkSMProxyConfigurationReader.cxx
   vtkSMProxyConfigurationWriter.cxx
-  vtkSMProxyDefinitionIterator.cxx
   vtkSMProxyGroupDomain.cxx
   vtkSMProxyLink.cxx
   vtkSMProxyListDomain.cxx
