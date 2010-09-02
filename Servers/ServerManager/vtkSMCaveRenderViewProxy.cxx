@@ -39,21 +39,56 @@ vtkSMCaveRenderViewProxy::~vtkSMCaveRenderViewProxy()
 }
 
 //-----------------------------------------------------------------------------
+void vtkSMCaveRenderViewProxy::SetStereoRender(int val)
+{
+  vtkClientServerStream stream;
+  stream << vtkClientServerStream::Invoke
+         << this->RendererProxy->GetID()
+         << "GetRenderWindow"
+         << vtkClientServerStream::End;
+  stream << vtkClientServerStream::Invoke
+         << vtkClientServerStream::LastResult
+         << "SetStereoRender"
+         << val
+         << vtkClientServerStream::End;
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  pm->SendStream( this->ConnectionID, vtkProcessModule::RENDER_SERVER |
+                 vtkProcessModule::CLIENT, stream );
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMCaveRenderViewProxy::SetStereoTypeToAnaglyph()
+{
+  vtkClientServerStream stream;
+  stream << vtkClientServerStream::Invoke
+         << this->RendererProxy->GetID()
+         << "GetRenderWindow"
+         << vtkClientServerStream::End;
+  stream << vtkClientServerStream::Invoke
+         << vtkClientServerStream::LastResult
+         << "SetStereoTypeToAnaglyph"
+         << vtkClientServerStream::End;
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  pm->SendStream( this->ConnectionID, vtkProcessModule::RENDER_SERVER |
+                 vtkProcessModule::CLIENT, stream );
+}
+
+//-----------------------------------------------------------------------------
 void vtkSMCaveRenderViewProxy::HeadTracked(int val)
 {
-    vtkClientServerStream stream;
-    stream << vtkClientServerStream::Invoke
-           << this->RendererProxy->GetID()
-           << "GetActiveCamera"
-           << vtkClientServerStream::End;
-    stream << vtkClientServerStream::Invoke
-           << vtkClientServerStream::LastResult
-           << "SetHeadTracked"
-           << val
-           << vtkClientServerStream::End;
-    vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-    pm->SendStream( this->ConnectionID, vtkProcessModule::RENDER_SERVER |
-                    vtkProcessModule::CLIENT, stream );
+  vtkClientServerStream stream;
+  stream << vtkClientServerStream::Invoke
+         << this->RendererProxy->GetID()
+         << "GetActiveCamera"
+         << vtkClientServerStream::End;
+  stream << vtkClientServerStream::Invoke
+         << vtkClientServerStream::LastResult
+         << "SetHeadTracked"
+         << val
+         << vtkClientServerStream::End;
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  pm->SendStream( this->ConnectionID, vtkProcessModule::RENDER_SERVER , stream);
+  // vtkProcessModule::CLIENT, stream );
 }
 
 //-----------------------------------------------------------------------------
@@ -86,6 +121,8 @@ void vtkSMCaveRenderViewProxy::SetHeadPose(
 void vtkSMCaveRenderViewProxy::ConfigureRenderManagerFromServerInformation()
 {
   this->HeadTracked( 1 );
+  this->SetStereoRender(1);
+  this->SetStereoTypeToAnaglyph();
   // this->SetHeadPose( 1.0 , 0.0, 0.0, 0.0,
   //                    0.0 , 1.0, 0.0, 0.0,
   //                    0.0 , 0.0, 1.0, 0.0,

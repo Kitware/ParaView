@@ -351,19 +351,6 @@ void vtkCaveRenderManager::SetDisplayConfig()
 
   this->SetSurfaceRotation( xBase, yBase, zBase, xRoom, yRoom, zRoom );
 
-  // std::cout <<"x-basis ( "
-  //           << xBase[0] << " "
-  //           << xBase[1] << " "
-  //           << xBase[2] << " )" << std::endl;
-  // std::cout <<"y-basis ( "
-  //           << yBase[0] << " "
-  //           << yBase[1] << " "
-  //           << yBase[2] << " )" << std::endl;
-  // std::cout <<"z-basis ( "
-  //           << zBase[0] << " "
-  //           << zBase[1] << " "
-  //           << zBase[2] << " )" << std::endl;
-
   // Get the new DisplayOrigin, DisplayX and DisplayY after transfromation
   this->SurfaceRot->MultiplyPoint( this->DisplayOrigin, this->DisplayOrigin );
   this->SurfaceRot->MultiplyPoint( this->DisplayX, this->DisplayX );
@@ -397,16 +384,9 @@ void vtkCaveRenderManager::SetDisplayConfig()
     {
     assert( ren->IsA( "vtkIceTRenderer" ) );
     cam = ren->GetActiveCamera();
-
-    // cam->SetHeadTracked( 1 );
-    // cam->SetHeadPose( 1.0, 0.0, 0.0, 0.0,
-    //                0.0, 1.0, 0.0, 0.0,
-    //                0.0, 0.0, 1.0, 0.0,
-    //                0.0, 0.0, 0.0, 1.0 );
     cam->SetConfigParams( O2Screen, O2Right, O2Left,O2Top, O2Bottom,
-                          0.064, 1.0,
+                          0.065, 1.0,
                           this->SurfaceRot);
-    //cam->ComputeProjAndViewParams();
     }
 }
 
@@ -420,18 +400,30 @@ void vtkCaveRenderManager::SetSurfaceRotation(
   vtkMath::Normalize( yBase );
   vtkMath::Normalize( zBase );
 
-  // Calculate directional cosine matrix to get surface rotation
-  SurfaceRot->SetElement( 0, 0, vtkMath::Dot( xBase, xRoom ) );
-  SurfaceRot->SetElement( 0, 1, vtkMath::Dot( yBase, xRoom ) );
-  SurfaceRot->SetElement( 0, 2, vtkMath::Dot( zBase, xRoom ) );
+  SurfaceRot->SetElement( 0, 0, xBase[0] );
+  SurfaceRot->SetElement( 0, 1, xBase[1] );
+  SurfaceRot->SetElement( 0, 2, xBase[2] );
 
-  SurfaceRot->SetElement( 1, 0, vtkMath::Dot( xBase, yRoom ) );
-  SurfaceRot->SetElement( 1, 1, vtkMath::Dot( yBase, yRoom ) );
-  SurfaceRot->SetElement( 1, 2, vtkMath::Dot( zBase, yRoom ) );
+  SurfaceRot->SetElement( 1, 0, yBase[0] );
+  SurfaceRot->SetElement( 1, 1, yBase[1] );
+  SurfaceRot->SetElement( 1, 2, yBase[2] );
 
-  SurfaceRot->SetElement( 2, 0, vtkMath::Dot( xBase, zRoom ) );
-  SurfaceRot->SetElement( 2, 1, vtkMath::Dot( yBase, zRoom ) );
-  SurfaceRot->SetElement( 2, 2, vtkMath::Dot( zBase, zRoom ) );
+  SurfaceRot->SetElement( 2, 0, zBase[0]);
+  SurfaceRot->SetElement( 2, 1, zBase[1]);
+  SurfaceRot->SetElement( 2, 2, zBase[2]);
+
+  // // Calculate directional cosine matrix to get surface rotation
+  // SurfaceRot->SetElement( 0, 0, vtkMath::Dot( xBase, xRoom ) );
+  // SurfaceRot->SetElement( 0, 1, vtkMath::Dot( yBase, xRoom ) );
+  // SurfaceRot->SetElement( 0, 2, vtkMath::Dot( zBase, xRoom ) );
+
+  // SurfaceRot->SetElement( 1, 0, vtkMath::Dot( xBase, yRoom ) );
+  // SurfaceRot->SetElement( 1, 1, vtkMath::Dot( yBase, yRoom ) );
+  // SurfaceRot->SetElement( 1, 2, vtkMath::Dot( zBase, yRoom ) );
+
+  // SurfaceRot->SetElement( 2, 0, vtkMath::Dot( xBase, zRoom ) );
+  // SurfaceRot->SetElement( 2, 1, vtkMath::Dot( yBase, zRoom ) );
+  // SurfaceRot->SetElement( 2, 2, vtkMath::Dot( zBase, zRoom ) );
 }
 
 

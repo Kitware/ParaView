@@ -42,6 +42,14 @@ public:
                     double x20,  double x21,  double x22,  double x23,
                     double x30,  double x31,  double x32,  double x33 );
 
+  // Description:
+  // Setting strereo rendering in remote window
+  void SetStereoRender(int val);
+
+  // Description:
+  // Setting the stereo rendering to Anaglyph
+  void SetStereoTypeToAnaglyph();
+
 //BTX
 protected:
   vtkSMCaveRenderViewProxy();

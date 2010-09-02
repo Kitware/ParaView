@@ -36,6 +36,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vrpn_Analog.h>
 #include <vrpn_Dial.h>
 #include <vrpn_Text.h>
+#include "vtkMath.h"
+
 
 #include <vtkstd/vector>
 #include <iostream>
@@ -97,7 +99,7 @@ public:
 };
 
 void VRPN_CALLBACK handleTrackerPosQuat(void *userdata,
-                                        const vrpn_TRACKERCB t)
+const vrpn_TRACKERCB t)
 {
   t_user_callback *tData=static_cast<t_user_callback *>(userdata);
 
@@ -109,16 +111,16 @@ void VRPN_CALLBACK handleTrackerPosQuat(void *userdata,
 
   // See if we have gotten enough reports from this sensor that we should
   // print this one.  If so, print and reset the count.
-  const unsigned tracker_stride = 1;    // Every nth report will be printed
+  const unsigned tracker_stride = 15;    // Every nth report will be printed
 
   if ( ++tData->t_counts[t.sensor] >= tracker_stride )
     {
     tData->t_counts[t.sensor] = 0;
     printf("Tracker %s, sensor %d:\n        pos (%5.2f, %5.2f, %5.2f); quat (%5.2f, %5.2f, %5.2f, %5.2f)\n",
-           tData->t_name,
-           t.sensor,
-           t.pos[0], t.pos[1], t.pos[2],
-           t.quat[0], t.quat[1], t.quat[2], t.quat[3]);
+    tData->t_name,
+    t.sensor,
+    t.pos[0], t.pos[1], t.pos[2],
+    t.quat[0], t.quat[1], t.quat[2], t.quat[3]);
     pqView *view = 0;
     view = pqActiveObjects::instance().activeView();
     if ( view )
@@ -127,10 +129,16 @@ void VRPN_CALLBACK handleTrackerPosQuat(void *userdata,
       proxy = vtkSMCaveRenderViewProxy::SafeDownCast( view->getViewProxy() );
       if ( proxy )
         {
-        proxy->SetHeadPose( 0.0, 0.0, 0.0, t.pos[0]*5,
-                            0.0, 0.0, 0.0, t.pos[2]*-5,
-                            0.0, 0.0, 0.0, t.pos[1]*5,
-                            0.0, 0.0, 0.0, 0.0 );
+        double rotMat[3][3];
+        vtkMath::QuaternionToMatrix3x3(t.quat,rotMat);
+        proxy->SetHeadPose( rotMat[0][0], rotMat[0][1],rotMat[0][2], t.pos[0]*1,
+        rotMat[1][0], rotMat[1][1],rotMat[1][2], t.pos[1]*1,
+        rotMat[2][0], rotMat[2][1],rotMat[2][2], t.pos[2]*1,
+        0.0, 0.0, 0.0, 1.0 );
+        // proxy->SetHeadPose( 1.0, 0.0, 0.0, t.pos[0]*1,
+        //                     0.0, 1.0, 0.0, t.pos[2]*-1,
+        //                     0.0, 0.0, 1.0, t.pos[1]*1,
+        //                     0.0, 0.0, 0.0, 1.0 );
         }
       }
     }
