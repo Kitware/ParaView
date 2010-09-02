@@ -440,6 +440,12 @@ void pqSLACManager::showField(const char *name)
   pqSMAdaptor::setMultipleElementProperty(lutProxy->GetProperty("RGBPoints"),
                                           RGBPoints);
 
+  // NaN color is a 3-tuple RGB.
+  QList<QVariant> NanColor;
+  NanColor << 0.5 << 0.5 << 0.5;
+  pqSMAdaptor::setMultipleElementProperty(lutProxy->GetProperty("NanColor"),
+                                          NanColor);
+
   // Set up range of scalars to best we know of.
   pqPipelineSource *temporalRanges = this->getTemporalRanges();
   if (temporalRanges)
