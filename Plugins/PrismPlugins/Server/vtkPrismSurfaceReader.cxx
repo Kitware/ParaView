@@ -19,7 +19,7 @@ Module:    vtkPrismSurfaceReader.cxx
 #include "vtkRectilinearGrid.h"
 #include "vtkContourFilter.h"
 #include "vtkCellData.h"
-#include "vtkSESAMEReader.h"
+#include "vtkPrismSESAMEReader.h"
 #include "vtkRectilinearGridGeometryFilter.h"
 #include "vtkSmartPointer.h"
 #include "vtkPoints.h"
@@ -166,18 +166,36 @@ int vtkSESAMEConversionFilter::RequestData(
 
 
 
+     vtkStringArray* xName= vtkStringArray::SafeDownCast(input->GetFieldData()->GetAbstractArray("XAxisName"));
+     vtkStringArray* yName= vtkStringArray::SafeDownCast(input->GetFieldData()->GetAbstractArray("YAxisName"));
 
-    vtkSmartPointer<vtkFloatArray> densityArray= vtkSmartPointer<vtkFloatArray>::New();
-    densityArray->SetNumberOfComponents(1);
-    densityArray->Allocate(numPts);
-    densityArray->SetName("Density");
-    densityArray->SetNumberOfTuples(numPts);
 
-    vtkSmartPointer<vtkFloatArray> temperatureArray= vtkSmartPointer<vtkFloatArray>::New();
-    temperatureArray->SetNumberOfComponents(1);
-    temperatureArray->Allocate(numPts);
-    temperatureArray->SetName("Temperature");
-    temperatureArray->SetNumberOfTuples(numPts);
+
+    vtkSmartPointer<vtkFloatArray> xArray= vtkSmartPointer<vtkFloatArray>::New();
+    xArray->SetNumberOfComponents(1);
+    xArray->Allocate(numPts);
+    if(xName)
+    {
+      xArray->SetName(xName->GetValue(0).c_str());
+    }
+    else
+    {
+      xArray->SetName("Density");
+    }
+    xArray->SetNumberOfTuples(numPts);
+
+    vtkSmartPointer<vtkFloatArray> yArray= vtkSmartPointer<vtkFloatArray>::New();
+    yArray->SetNumberOfComponents(1);
+    yArray->Allocate(numPts);
+    if(yName)
+    {
+      yArray->SetName(yName->GetValue(0).c_str());
+    }
+    else
+    {
+      yArray->SetName("Temperature");
+    }
+    yArray->SetNumberOfTuples(numPts);
 
 
     vtkSmartPointer<vtkPoints> newPts = vtkSmartPointer<vtkPoints>::New();
@@ -189,12 +207,12 @@ int vtkSESAMEConversionFilter::RequestData(
         {
         double coords[3];
         inPts->GetPoint(ptId,coords);
-        densityArray->InsertValue(ptId,coords[0]*this->Conversions[0]);
-        temperatureArray->InsertValue(ptId,coords[1]*this->Conversions[1]);
+        xArray->InsertValue(ptId,coords[0]*this->Conversions[0]);
+        yArray->InsertValue(ptId,coords[1]*this->Conversions[1]);
         }
 
-    localOutput->GetPointData()->AddArray(densityArray);
-    localOutput->GetPointData()->AddArray(temperatureArray);
+    localOutput->GetPointData()->AddArray(xArray);
+    localOutput->GetPointData()->AddArray(yArray);
 
 
     Output->ShallowCopy(localOutput);
@@ -210,7 +228,7 @@ int vtkSESAMEConversionFilter::RequestData(
 class vtkPrismSurfaceReader::MyInternal
     {
     public:
-         vtkSmartPointer<vtkSESAMEReader> Reader;
+         vtkSmartPointer<vtkPrismSESAMEReader> Reader;
         vtkSmartPointer<vtkSESAMEConversionFilter> ConversionFilter;
          vtkSmartPointer<vtkRectilinearGridGeometryFilter> RectGridGeometry;
         vtkSmartPointer<vtkContourFilter> ContourFilter;
@@ -288,7 +306,7 @@ class vtkPrismSurfaceReader::MyInternal
 
             this->ContourFilter=vtkSmartPointer<vtkContourFilter>::New();
 
-            this->Reader =  vtkSmartPointer<vtkSESAMEReader>::New();
+            this->Reader =  vtkSmartPointer<vtkPrismSESAMEReader>::New();
             this->RectGridGeometry =  vtkSmartPointer<vtkRectilinearGridGeometryFilter>::New();
 
             this->RectGridGeometry->SetInput(this->Reader->GetOutput());
@@ -336,9 +354,20 @@ vtkPrismSurfaceReader::vtkPrismSurfaceReader()
     this->YThresholdBetween[0]=0.0;
     this->YThresholdBetween[1]=1.0;
 
+    this->ActualThresholdBounds[0]=0.0;
+    this->ActualThresholdBounds[1]=1.0;
+    this->ActualThresholdBounds[2]=0.0;
+    this->ActualThresholdBounds[3]=1.0;
+    this->ActualThresholdBounds[4]=0.0;
+    this->ActualThresholdBounds[5]=1.0;
+
 
 
     }
+vtkPrismSurfaceReader::~vtkPrismSurfaceReader()
+{
+  delete this->Internal;
+}
 
 unsigned long vtkPrismSurfaceReader::GetMTime()
 {
@@ -414,6 +443,7 @@ void vtkPrismSurfaceReader::SetNumberOfContours(int i)
     if(this->Internal->NumberOfContours!=i)
         {
         this->Internal->NumberOfContours=i;
+        this->Internal->ContourFilter->SetNumberOfContours(i);
         this->Modified();
         }
     }
@@ -666,8 +696,12 @@ void vtkPrismSurfaceReader::SetThresholdYBetween(double lower, double upper)
 vtkStringArray* vtkPrismSurfaceReader::GetAxisVarNames()
     {
     this->Internal->ArrayNames->Reset();
-    this->Internal->ArrayNames->InsertNextValue("Density");
-    this->Internal->ArrayNames->InsertNextValue("Temperature");
+    //this->Internal->ArrayNames->InsertNextValue("Density");
+    //this->Internal->ArrayNames->InsertNextValue("Temperature");
+
+
+this->Internal->ArrayNames->InsertNextValue(this->Internal->Reader->GetTableXAxisName());
+this->Internal->ArrayNames->InsertNextValue(this->Internal->Reader->GetTableYAxisName());
 
     int numberArrayNames=this->Internal->Reader->GetNumberOfTableArrayNames();
     for(int i=0;i<numberArrayNames;i++)
@@ -1082,15 +1116,60 @@ int vtkPrismSurfaceReader::RequestData(
         bounds[5]=10;
         }
 
+        if(this->GetXLogScaling())
+            {
+            if(this->XThresholdBetween[0]>0)
+                {
+                this->ActualThresholdBounds[0]=log(this->XThresholdBetween[0]);
+                }
+            else
+                {
+                this->ActualThresholdBounds[0]=0.0;
+                }
+            if(this->XThresholdBetween[1]>0)
+                {
+                this->ActualThresholdBounds[1]=log(this->XThresholdBetween[1]);
+                }
+            else
+              {
+              this->ActualThresholdBounds[1]=0.0;
+              }
+            }
+        else
+          {
+          this->ActualThresholdBounds[0]=this->XThresholdBetween[0];
+          this->ActualThresholdBounds[1]=this->XThresholdBetween[1];
+          }
+        if(this->GetYLogScaling())
+            {
+            if(this->YThresholdBetween[0]>0)
+                {
+                this->ActualThresholdBounds[2]=log(this->YThresholdBetween[0]);
+                }
+            else
+                {
+                this->ActualThresholdBounds[2]=0.0;
+                }
+            if(this->YThresholdBetween[1]>0)
+                {
+                this->ActualThresholdBounds[3]=log(this->YThresholdBetween[1]);
+                }
+            else
+                {
+                this->ActualThresholdBounds[3]=0.0;
+                }
+            }
+        else
+          {
+          this->ActualThresholdBounds[2]=this->YThresholdBetween[0];
+          this->ActualThresholdBounds[3]=this->YThresholdBetween[1];
+          }
+        this->ActualThresholdBounds[4]=bounds[4];
+        this->ActualThresholdBounds[5]=bounds[5];
+
 
     this->Internal->ExtractGeometry->SetInput(localOutput);
-    this->Internal->Box->SetBounds(
-        this->XThresholdBetween[0],
-        this->XThresholdBetween[1],
-        this->YThresholdBetween[0],
-        this->YThresholdBetween[1],
-        bounds[4],
-        bounds[5]);
+    this->Internal->Box->SetBounds(this->ActualThresholdBounds);
 
     this->Internal->CleanPolyData->SetInput( this->Internal->ExtractGeometry->GetOutput());
 
@@ -1098,8 +1177,11 @@ int vtkPrismSurfaceReader::RequestData(
 
     vtkSmartPointer<vtkFloatArray> newXArray= vtkFloatArray::SafeDownCast(this->Internal->CleanPolyData->GetOutput()->GetPointData()->GetArray(xArray->GetName()));
     vtkSmartPointer<vtkFloatArray> newYArray= vtkFloatArray::SafeDownCast(this->Internal->CleanPolyData->GetOutput()->GetPointData()->GetArray(yArray->GetName()));
-    vtkSmartPointer<vtkFloatArray> newZArray= vtkFloatArray::SafeDownCast(this->Internal->CleanPolyData->GetOutput()->GetPointData()->GetArray(zArray->GetName()));
-
+    vtkSmartPointer<vtkFloatArray> newZArray;
+    if(this->Internal->WarpSurface)
+      {
+      newZArray= vtkFloatArray::SafeDownCast(this->Internal->CleanPolyData->GetOutput()->GetPointData()->GetArray(zArray->GetName()));
+      }
     double scaleBounds[6];
     this->Internal->CleanPolyData->GetOutput()->GetPoints()->GetBounds(scaleBounds);
 

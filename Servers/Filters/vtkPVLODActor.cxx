@@ -60,11 +60,11 @@ vtkPVLODActor::~vtkPVLODActor()
 // A good example is verts.  One cell can contain any number of verticies.
 vtkMapper *vtkPVLODActor::SelectMapper()
 {
-  if (this->Mapper == NULL || this->Mapper->GetInput() == NULL)
+  if (this->Mapper == NULL || this->Mapper->GetInputDataObject(0, 0) == NULL)
     {
     return this->LODMapper;
     }
-  if (this->LODMapper == NULL || this->LODMapper->GetInput() == NULL)
+  if (this->LODMapper == NULL || this->LODMapper->GetInputDataObject(0, 0) == NULL)
     {
     return this->Mapper;
     }

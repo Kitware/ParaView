@@ -96,7 +96,7 @@ pqNetCDFPanel::pqNetCDFPanel(pqProxy *object_proxy, QWidget *_parent)
                                  smproxy->GetProperty("VariableDimensionInfo"));
   QList<QVariant> variables = pqSMAdaptor::getMultipleElementProperty(
                                      smproxy->GetProperty("VariableArrayInfo"));
-  if (2*dimensions.size() != variables.size())
+  if (dimensions.size() != variables.size())
     {
     qWarning() << "Sizes of Variable names and dimension arrays are different?";
     }
@@ -104,7 +104,7 @@ pqNetCDFPanel::pqNetCDFPanel(pqProxy *object_proxy, QWidget *_parent)
     {
     for (int i = 0; i < dimensions.size(); i++)
       {
-      QString var = variables[2*i].toString();
+      QString var = variables[i].toString();
       QString dim = dimensions[i].toString();
       this->DimensionMap->insert(dim, var);
       }

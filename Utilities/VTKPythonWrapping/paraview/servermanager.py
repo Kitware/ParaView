@@ -185,9 +185,15 @@ class Proxy(object):
                 del args['registrationName']
             pxm = ProxyManager()
             pxm.RegisterProxy(registrationGroup, registrationName, self.SMProxy)
+        update = True
+        if 'no_update' in args:
+            if args['no_update']:
+                update = False
+            del args['no_update']
+        if update:
+            self.UpdateVTKObjects()
         for key in args.keys():
             setattr(self, key, args[key])
-        self.UpdateVTKObjects()
         # Visit all properties so that they are created
         for prop in self:
             pass
@@ -237,6 +243,11 @@ class Proxy(object):
     def __eq__(self, other):
         "Returns true if the underlying SMProxies are the same."
         if isinstance(other, Proxy):
+            try:
+                if self.Port != other.Port:
+                    return False
+            except:
+                pass
             return self.SMProxy == other.SMProxy
         return self.SMProxy == other
 
@@ -796,6 +807,10 @@ class ArraySelectionProperty(VectorProperty):
         elif len(values) == 2:
             if isinstance(values[0], str):
                 val = str(ASSOCIATIONS[values[0]])
+            else:
+                # In case user didn't specify valid association,
+                # just pick POINTS.
+                val = str(ASSOCIATIONS['POINTS'])
             self.SMProperty.SetElement(3,  str(val))
             self.SMProperty.SetElement(4, values[1])
         else:

@@ -52,7 +52,6 @@
 #include "vtkPVXMLElement.h"
 #include "vtkPVXMLParser.h"
 #include "vtkRemoteConnection.h"
-#include "vtkSelectionConverter.h"
 #include "vtkSelectionSerializer.h"
 #include "vtkSelfConnection.h"
 #include "vtkServerConnection.h"
@@ -105,7 +104,6 @@ int main(int, char * [])
   c = vtkPVServerSocket::New(); c->Print(cout); c->Delete();
   c = vtkProcessModuleConnectionManager::New(); c->Print(cout); c->Delete();
   c = vtkRemoteConnection::New(); c->Print(cout); c->Delete();
-  c = vtkSelectionConverter::New(); c->Print(cout); c->Delete();
   c = vtkSelectionSerializer::New(); c->Print(cout); c->Delete();
   c = vtkSelfConnection::New(); c->Print(cout); c->Delete();
   c = vtkServerConnection::New(); c->Print(cout); c->Delete();

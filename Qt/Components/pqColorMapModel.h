@@ -93,6 +93,9 @@ public:
 
   void getValueRange(pqChartValue &min, pqChartValue &max) const;
 
+  void getNanColor(QColor &color) const;
+  void setNanColor(const QColor &color);
+
   /// \brief
   ///   Scales the current points to fit in the given range.
   /// \note
@@ -128,6 +131,10 @@ signals:
   /// \param color The point's new color.
   void colorChanged(int index, const QColor &color);
 
+  /// Emitted when the NaN color changes.
+  /// \param color The new NaN color.
+  void nanColorChanged(const QColor &color);
+
   /// Emitted when all or many of the points have changed.
   void pointsReset();
 
@@ -161,6 +168,7 @@ signals:
 private:
   pqColorMapModelInternal *Internal; ///< Stores the points.
   ColorSpace Space;                  ///< Stores the color space.
+  QColor NanColor;                   ///< Stores the NaN color.
   bool InModify;                     ///< True if in modify mode.
 };
 

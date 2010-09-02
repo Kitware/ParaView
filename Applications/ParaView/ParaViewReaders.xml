@@ -43,7 +43,7 @@
   <Proxy group="sources" name="MetaImageReader" />
   <Proxy group="sources" name="NrrdReader" />
   <Proxy group="sources" name="Facet Proxy" />
-  <Proxy group="sources" name="PNGReader" />
+  <Proxy group="sources" name="FileSeriesPNGReader" />
   <Proxy group="sources" name="TIFFReader" />
   <Proxy group="sources" name="PhastaReader" />
   <Proxy group="sources" name="EnzoReader" />
@@ -63,4 +63,5 @@
   <Proxy group="sources" name="VPICReader" />
   <Proxy group="sources" name="WindBladeReader" />
   <Proxy group="sources" name="NetCDFPOPReader" />
+  <Proxy group="sources" name="MPASReader" />
 </ParaViewReaders>

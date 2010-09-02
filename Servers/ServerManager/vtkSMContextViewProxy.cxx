@@ -23,9 +23,6 @@
 #include "vtkObjectFactory.h"
 #include "vtkSMUtilities.h"
 
-#include "QVTKWidget.h"
-#include <QPointer>
-
 //-----------------------------------------------------------------------------
 // Minimal storage class for STL containers etc.
 class vtkSMContextViewProxy::Private
@@ -34,10 +31,7 @@ public:
   Private() { }
   ~Private()
   {
-  delete this->Widget;
   }
-
-  QPointer<QVTKWidget> Widget;
 };
 
 
@@ -73,19 +67,6 @@ void vtkSMContextViewProxy::CreateVTKObjects()
   this->NewChartView();
 
   this->Superclass::CreateVTKObjects();
-}
-
-//----------------------------------------------------------------------------
-QVTKWidget* vtkSMContextViewProxy::GetChartWidget()
-{
-  if (!this->Storage->Widget)
-    {
-    this->Storage->Widget = new QVTKWidget;
-    this->ChartView->SetInteractor(this->Storage->Widget->GetInteractor());
-    this->Storage->Widget->SetRenderWindow(this->ChartView->GetRenderWindow());
-    }
-
-  return this->Storage->Widget;
 }
 
 //----------------------------------------------------------------------------

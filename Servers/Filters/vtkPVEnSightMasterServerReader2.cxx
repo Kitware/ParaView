@@ -62,7 +62,7 @@ public:
   int NumberOfOutputs;
   vtkstd::vector<int> CumulativeTimeSetSizes;
   vtkstd::vector<float> TimeSetValues;
-  vtkstd::vector<vtkGenericEnSightReader2*> RealReaders;
+  vtkstd::vector<vtkGenericEnSightReader*> RealReaders;
 };
 
 //----------------------------------------------------------------------------
@@ -80,8 +80,8 @@ vtkPVEnSightMasterServerReader2::~vtkPVEnSightMasterServerReader2()
 {
   int rIdx;
   this->SetController(0);
-  for(rIdx = static_cast<int> (this->Internal->RealReaders.size() - 1); rIdx
-      > 0; rIdx--)
+  for(rIdx = static_cast<int> (this->Internal->RealReaders.size() - 1);
+    rIdx >= 0; rIdx--)
     {
     this->Internal->RealReaders[rIdx]->Delete();
     this->Internal->RealReaders.pop_back();
@@ -310,8 +310,9 @@ int vtkPVEnSightMasterServerReader2::RequestInformation(vtkInformation * vtkNotU
         = (this->Internal->CumulativeTimeSetSizes[i]
             + timeSets->GetItem(i)->GetNumberOfTuples());
     }
+
   if(vtkPVEnSightMasterServerReader2SyncValues(
-      &*this->Internal->CumulativeTimeSetSizes.begin(),
+      &this->Internal->CumulativeTimeSetSizes.at(0),
       this->Internal->NumberOfTimeSets + 1,
       this->Controller->GetNumberOfProcesses(), this->Controller) != VTK_OK)
     {
@@ -356,8 +357,9 @@ int vtkPVEnSightMasterServerReader2::RequestInformation(vtkInformation * vtkNotU
       this->Internal->TimeSetValues.push_back(array->GetTuple1(j));
       }
     }
+
   if(vtkPVEnSightMasterServerReader2SyncValues(
-      &*this->Internal->TimeSetValues.begin(),
+      &this->Internal->CumulativeTimeSetSizes.at(0),
       static_cast<int> (this->Internal->TimeSetValues.size()),
       this->Controller->GetNumberOfProcesses(), this->Controller) != VTK_OK)
     {
@@ -686,7 +688,7 @@ void vtkPVEnSightMasterServerReader2::SetCaseFileName(const char* fileName)
     }
   for(rIdx = 0; rIdx < this->NumberOfPieces; rIdx++)
     {
-    vtkGenericEnSightReader2* aReader = vtkGenericEnSightReader2::New();
+    vtkGenericEnSightReader* aReader = vtkGenericEnSightReader::New();
     aReader->SetFilePath(this->GetFilePath());
     aReader->SetCaseFileName(this->Internal->PieceFileNames[rIdx].c_str());
     this->Internal->RealReaders.push_back(aReader);
@@ -795,7 +797,7 @@ void vtkPVEnSightMasterServerReader2::SetByteOrder(int byteOrder)
 //----------------------------------------------------------------------------
 int vtkPVEnSightMasterServerReader2::GetByteOrder()
 {
-  return this->Internal->RealReaders.size() == 0 ? vtkGenericEnSightReader2::FILE_UNKNOWN_ENDIAN
+  return this->Internal->RealReaders.size() == 0 ? vtkGenericEnSightReader::FILE_UNKNOWN_ENDIAN
       : this->Internal->RealReaders[0]->GetByteOrder();
 }
 

@@ -109,6 +109,9 @@ public:
   bool GetSESAMEYLogScaling();
   bool GetSESAMEZLogScaling();
 
+  void SetSimulationDataThreshold(bool);
+  bool GetSimulationDataThreshold();
+
   void SetSESAMEConversions(double,double,double, double);
   virtual double *GetSESAMEConversions();
   virtual void GetSESAMEConversions (double &_arg1, double &_arg2,double &_arg3,double &_arg4);
@@ -160,7 +163,7 @@ public:
 
 protected:
   vtkPrismFilter();
-  ~vtkPrismFilter() {}
+  ~vtkPrismFilter();
 
 
   //BTX 

@@ -48,11 +48,6 @@ SET(Filters_SRCS
   vtkDataSetToRectilinearGrid.cxx
   vtkDesktopDeliveryClient.cxx
   vtkDesktopDeliveryServer.cxx
-  vtkEnSight6BinaryReader2.cxx
-  vtkEnSight6Reader2.cxx
-  vtkEnSightGoldReader2.cxx
-  vtkEnSightGoldBinaryReader2.cxx
-  vtkEnSightReader2.cxx
   vtkEnzoReader.cxx
   vtkEquivalenceSet.cxx
   vtkExodusFileSeriesReader.cxx
@@ -63,7 +58,6 @@ SET(Filters_SRCS
   vtkFlashContour.cxx
   vtkFlashReader.cxx
   vtkHierarchicalFractal.cxx
-  vtkGenericEnSightReader2.cxx
   vtkGridConnectivity.cxx
   vtkImageCompressor.cxx
   vtkImageSliceMapper.cxx
@@ -84,9 +78,10 @@ SET(Filters_SRCS
   vtkPConvertSelection.cxx
   vtkPExtractHistogram.cxx
   vtkParallelSerialWriter.cxx
-  vtkPEnSightGoldBinaryReader2.cxx
-  vtkPEnSightGoldReader2.cxx
-  vtkPEnSightReader2.cxx
+  vtkPEnSightGoldBinaryReader.cxx
+  vtkPEnSightGoldReader.cxx
+  vtkPEnSightReader.cxx
+  vtkPGenericEnSightReader.cxx
   vtkPhastaReader.cxx
   vtkPlotEdges.cxx
   vtkPointHandleRepresentationSphere.cxx
@@ -161,6 +156,7 @@ SET(Filters_SRCS
   vtkScatterPlotMapper.cxx
   vtkScatterPlotPainter.cxx
   vtkSciVizStatistics.cxx
+  vtkSelectionConverter.cxx
   vtkSelectionStreamer.cxx
   vtkSequenceAnimationPlayer.cxx
   vtkSpyPlotBlock.cxx
@@ -172,6 +168,7 @@ SET(Filters_SRCS
   vtkSquirtCompressor.cxx
   vtkZlibImageCompressor.cxx
   vtkSurfaceVectors.cxx
+  vtkTilesHelper.cxx
   vtkTableFFT.cxx
   vtkTableStreamer.cxx
 #  vtkTemporalCacheFilter.cxx
@@ -213,9 +210,8 @@ SET_SOURCE_FILES_PROPERTIES(
 SET_SOURCE_FILES_PROPERTIES(
   vtkAnimationPlayer.cxx
   vtkCameraManipulatorGUIHelper.cxx
-  vtkEnSightReader2.cxx
   vtkImageCompressor.cxx
-  vtkPEnSightReader2.cxx
+  vtkPEnSightReader.cxx
   vtkPVClientServerRenderManager.cxx
   vtkPVJoystickFly.cxx
   vtkPVRenderViewProxy.cxx
@@ -225,6 +221,11 @@ SET_SOURCE_FILES_PROPERTIES(
   vtkTransferFunctionEditorWidget1D.cxx
   vtkTransferFunctionEditorWidget.cxx
   ABSTRACT)
+
+# The set of source files to be encoded.
+SET(glsl_files
+  vtkIceTCompositeZPassShader_fs
+  )
 
 IF(PARAVIEW_ENABLE_PYTHON)
   SET(Filters_SRCS ${Filters_SRCS}
@@ -244,6 +245,7 @@ IF(VTK_USE_MPI)
   SET(Filters_SRCS ${Filters_SRCS}
     vtkBalancedRedistributePolyData.cxx
     vtkAllToNRedistributePolyData.cxx
+    vtkAllToNRedistributeCompositePolyData.cxx
     vtkRedistributePolyData.cxx
     vtkWeightedRedistributePolyData.cxx
     )
@@ -254,9 +256,10 @@ IF (PARAVIEW_USE_ICE_T)
     SET(Filters_SRCS
       ${Filters_SRCS}
       vtkCaveRenderManager.cxx
+      vtkIceTCompositePass.cxx
       vtkIceTContext.cxx
-      vtkIceTRenderManager.cxx
       vtkIceTRenderer.cxx
+      vtkIceTRenderManager.cxx
       )
   ENDIF(VTK_USE_MPI)
 ENDIF (PARAVIEW_USE_ICE_T)
@@ -301,6 +304,31 @@ ENDIF(APPLE)
 IF(VTK_USE_MPI)
   INCLUDE_DIRECTORIES(${MPI_INCLUDE_PATH})
 ENDIF(VTK_USE_MPI)
+
+
+IF(VTK_USE_RENDERING)
+# Create custom commands to encode each assembly file into a C string
+# literal in a header file.
+
+SET(glsl_h_files)
+FOREACH(file ${glsl_files})
+  SET(src ${PVFilters_SOURCE_DIR}/${file}.glsl)
+  SET(res ${PVFilters_BINARY_DIR}/${file}.cxx)
+  SET(resh ${PVFilters_BINARY_DIR}/${file}.h)
+  SET(glsl_h_files ${glsl_h_files} "${resh}")
+  ADD_CUSTOM_COMMAND(
+    OUTPUT ${res} ${resh}
+    DEPENDS ${src} vtkEncodeString
+    COMMAND ${VTK_ENCODESTRING_EXE}
+    ARGS ${res} ${src} ${file} --build-header VTK_EXPORT vtkSystemIncludes.h
+    )
+  SET(Filters_SRCS ${Filters_SRCS} ${res})
+  SET_SOURCE_FILES_PROPERTIES( ${res} WRAP_EXCLUDE)
+ENDFOREACH(file)
+
+ENDIF(VTK_USE_RENDERING)
+
+
 
 #########################################################################
 # Configure ParaViewAdaptor
@@ -356,6 +384,8 @@ TARGET_LINK_LIBRARIES(vtkPVFilters
   vtkParallelCS
   vtkVolumeRenderingCS
   vtkWidgetsCS
+  vtkViews
+  vtkViewsCS
   KWCommon
   vtksys
   ${OPENGL_gl_LIBRARY}
@@ -405,9 +435,11 @@ IF (PARAVIEW_ENABLE_PYTHON)
   SET(Kit_PYTHON_EXTRA_SRCS)
   SET(KIT_PYTHON_LIBS
     vtkPVFilters vtkPVServerCommonPythonD vtkPVFiltersPythonD vtkPVFiltersCS vtkRenderingPythonD vtkWidgetsPythonD vtkParallelPythonD
+    vtkViewsPythonD
     )
   # Tell vtkWrapPython.cmake to set VTK_PYTHON_LIBRARIES for us.
   SET(VTK_WRAP_PYTHON_FIND_LIBS 1)
+  SET(VTK_WRAP_INCLUDE_DIRS ${VTK_INCLUDE_DIR})
   INCLUDE("${VTK_CMAKE_DIR}/vtkWrapPython.cmake")
   INCLUDE_DIRECTORIES(${PYTHON_INCLUDE_PATH})
   SET(KIT_PYTHON_DEPS)

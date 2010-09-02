@@ -33,23 +33,22 @@ vtkSMDataSourceProxy::~vtkSMDataSourceProxy()
 //----------------------------------------------------------------------------
 void vtkSMDataSourceProxy::CopyData(vtkSMSourceProxy *sourceProxy)
 {
-  if (!sourceProxy)
+  if (!sourceProxy || this->Servers != sourceProxy->GetServers())
     {
     return;
     }
-
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   vtkClientServerStream stream;
   stream  << vtkClientServerStream::Invoke
           << sourceProxy->GetID() << "GetOutput"
           << vtkClientServerStream::End;
-  pm->SendStream(this->ConnectionID, vtkProcessModule::DATA_SERVER_ROOT, stream);
+  pm->SendStream(this->ConnectionID, this->Servers, stream);
 
   stream  << vtkClientServerStream::Invoke
           << this->GetID() << "CopyData" 
-          << pm->GetLastResult(this->ConnectionID,vtkProcessModule::DATA_SERVER_ROOT).GetArgument(0,0)
+          << vtkClientServerStream::LastResult
           << vtkClientServerStream::End;
-  pm->SendStream(this->ConnectionID, vtkProcessModule::DATA_SERVER_ROOT, stream);
+  pm->SendStream(this->ConnectionID, this->Servers, stream);
 
   this->MarkModified(this);
 }
@@ -59,5 +58,3 @@ void vtkSMDataSourceProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 }
-
-

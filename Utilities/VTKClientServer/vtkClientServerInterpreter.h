@@ -144,6 +144,12 @@ public:
   int Load(const char* moduleName);
   int Load(const char* moduleName, const char*const* optionalPaths);
 
+  // Description:
+  // Return the next available Id that can be used to create a new object.
+  // This only work if all class that created object into the interpretor have
+  // used this method. Basically it is just a counter available with the
+  // interpreter instance.
+  vtkClientServerID GetNextAvailableId();
 
 protected:
   // constructor and destructor
@@ -180,6 +186,7 @@ private:
 private:
   vtkClientServerInterpreter(const vtkClientServerInterpreter&);  // Not implemented.
   void operator=(const vtkClientServerInterpreter&);  // Not implemented.
+  int NextAvailableId;
 };
 
 #endif

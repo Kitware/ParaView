@@ -67,13 +67,12 @@ void vtkSMGlyph3DMapperRepresentationProxy::AddInput(
   this->Source = input;
   this->SourceOutputPort = outputPort;
 
-  // FIXME: Uncomment this once the glyph mapper starts working correctly.
-  //if (this->GlyphSourceStrategy)
-  //  {
-  //  vtkSMPropertyHelper(this->GlyphSourceStrategy, "Input").Set(
-  //    this->Source, this->SourceOutputPort);
-  //  this->GlyphSourceStrategy->UpdateVTKObjects();
-  //  }
+  if (this->GlyphSourceStrategy)
+   {
+   vtkSMPropertyHelper(this->GlyphSourceStrategy, "Input").Set(
+     this->Source, this->SourceOutputPort);
+   this->GlyphSourceStrategy->UpdateVTKObjects();
+   }
 }
 
 //----------------------------------------------------------------------------

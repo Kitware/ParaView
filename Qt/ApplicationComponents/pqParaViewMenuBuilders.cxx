@@ -213,7 +213,7 @@ void pqParaViewMenuBuilders::buildToolsMenu(QMenu& menu)
     pqTestingReaction::RECORD);
   new pqTestingReaction(menu.addAction("Play Test")
     << pqSetName("actionToolsPlayTest"),
-    pqTestingReaction::PLAYBACK);
+    pqTestingReaction::PLAYBACK,Qt::QueuedConnection);
   new pqTestingReaction(menu.addAction("Lock View Size")
     << pqSetName("actionTesting_Window_Size"),
     pqTestingReaction::LOCK_VIEW_SIZE);

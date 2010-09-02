@@ -1,7 +1,7 @@
 #include "vtkActor.h"
 #include "vtkDataSetSurfaceFilter.h"
 #include "vtkDummyController.h"
-#include "vtkPolyDataMapper.h"
+#include "vtkCompositePolyDataMapper2.h"
 #include "vtkPVGeometryFilter.h"
 #include "vtkPVAMRDualClip.h"
 #include "vtkRegressionTestImage.h"
@@ -19,7 +19,7 @@ int main(int argc, char* argv[])
   typedef vtkSmartPointer<vtkDataSetSurfaceFilter> vtkDataSetSurfaceFilterRefPtr;
   typedef vtkSmartPointer<vtkPVAMRDualClip> vtkPVAMRDualClipRefPtr;
   typedef vtkSmartPointer<vtkSpyPlotReader> vtkSpyPlotReaderRefPtr;
-  typedef vtkSmartPointer<vtkPolyDataMapper> vtkPolyDataMapperRefPtr;
+  typedef vtkSmartPointer<vtkCompositePolyDataMapper2> vtkPolyDataMapperRefPtr;
   typedef vtkSmartPointer<vtkActor> vtkActorRefPtr;
   typedef vtkSmartPointer<vtkRenderer> vtkRenderRefPtr;
   typedef vtkSmartPointer<vtkRenderWindow> vtkRenderWindowRefPtr;
@@ -62,7 +62,7 @@ int main(int argc, char* argv[])
   surface->Update();
 
   vtkPolyDataMapperRefPtr mapper (vtkPolyDataMapperRefPtr::New());
-  mapper->SetInput(surface->GetOutput());
+  mapper->SetInputConnection(surface->GetOutputPort());
   mapper->Update();
 
   vtkActorRefPtr actor (vtkActorRefPtr::New());

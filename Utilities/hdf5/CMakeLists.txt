@@ -1,582 +1,792 @@
-PROJECT(VTKHDF5 C)
+cmake_minimum_required (VERSION 2.8)
+PROJECT (HDF5 C CXX)
 
-CMAKE_MINIMUM_REQUIRED(VERSION 2.0)
-IF(COMMAND CMAKE_POLICY)
-  CMAKE_POLICY(SET CMP0003 NEW)
-ENDIF(COMMAND CMAKE_POLICY)
+#-----------------------------------------------------------------------------
+# Instructions for use : Normal Build
+#
+# For standard build of HDF5 libraries,tests and tools.
+# Run cmake using the HDF5 source tree to generate a build tree.
+# Enable/Disable options according to requirements and
+# set CMAKE_INSTALL_PREFIX to the required install path.
+# Make install can be used to install all components for system-wide use.
+#
+#-----------------------------------------------------------------------------
+# Instructions for use : Sub-Project Build
+#
+# To include HDF5 as a sub-project within another project.
+# Set HDF5_EXTERNALLY_CONFIGURED to 1 in the parent project and
+# supply values for the following variables...
+#
+# HDF5_EXPORTED_TARGETS :
+#   Set this to the name of the targets variable which controls exports
+#   If unset (because parent project does not support/use the
+#   INSTALL (EXPORT target...) syntax), then targets are not configured
+#   for export during install.
+#
+# HDF5_LIB_DEPENDENCIES :
+#   If the build of HDF5 libs is being customized, then rules for the
+#   dependencies of the HDF5 libs may be 'incomplete', add additional
+#   dependencies to this variable so that external projects pick them up
+#
+# HDF5_EXTERNAL_LIB_PREFIX :
+#   If the parent project needs to install hdf libraries, but avoid 
+#   name conflicts with system versions, then a prefix may be added
+#   to ensure that the correct versions configured are used.
+#
+# HDF5_INSTALL_BIN_DIR, HDF5_INSTALL_LIB_DIR, HDF5_INSTALL_INCLUDE_DIR :
+#   Customize the 'bin', 'lib', and 'include' installation directories.
+#
+# HDF5_INSTALL_NO_DEVELOPMENT :
+#   Set to true to skip installation of headers and CMake package files.
+#
+# Consider this example from the ParaView project, it builds its own zlib
+# library and tells HDF5 to add it as a dependency - this ensures that
+# any project making use of this build of HDF5 will use the correct zlib
+#
+#   # Tell hdf5 that we are manually overriding certain settings
+#   SET(HDF5_EXTERNALLY_CONFIGURED 1)
+#   # Avoid duplicating names of installed libraries
+#   SET(HDF5_EXTERNAL_LIB_PREFIX "vtk")
+#   # Export configuration to this export variable
+#   SET(HDF5_EXPORTED_TARGETS "paraview-targets")
+#
+#   # Setup all necessary overrides for zlib so that HDF5 uses our
+#   # internally compiled zlib rather than any other version
+#   IF(HDF5_ENABLE_Z_LIB_SUPPORT)
+#     # We must tell the main HDF5 library that it depends on our zlib 
+#     SET(HDF5_LIB_DEPENDENCIES vtkzlib)    
+#     # Override the zlib header file
+#     IF(VTK_USE_SYSTEM_ZLIB)
+#       SET(H5_ZLIB_HEADER "zlib.h")
+#     ELSE(VTK_USE_SYSTEM_ZLIB)
+#       SET(H5_ZLIB_HEADER "vtk_zlib.h")
+#       # Set vars that FindZlib would have set if used in sub project
+#       SET(ZLIB_INCLUDE_DIRS "${VTK_ZLIB_INCLUDE_DIRS}")
+#       SET(ZLIB_LIBRARIES vtkzlib)
+#     ENDIF(VTK_USE_SYSTEM_ZLIB)
+#   ENDIF(HDF5_ENABLE_Z_LIB_SUPPORT)
+# 
+#   # Add the sub project
+#   ADD_SUBDIRECTORY(Utilities/hdf5-1.8)
+#-----------------------------------------------------------------------------
 
-MARK_AS_ADVANCED(HDF5_STREAM_VFD HDF5_ENABLE_HSIZET HDF5_ENABLE_LINUX_LFS HDF5_ENABLE_PARALLEL)
+#-----------------------------------------------------------------------------
+# Set the core names of all the libraries
+#-----------------------------------------------------------------------------
+SET (HDF5_LIB_CORENAME              "hdf5")
+SET (HDF5_TEST_LIB_CORENAME         "hdf5_test")
+SET (HDF5_CPP_LIB_CORENAME          "hdf5_cpp")
+SET (HDF5_HL_LIB_CORENAME           "hdf5_hl")
+SET (HDF5_HL_CPP_LIB_CORENAME       "hdf5_hl_cpp")
+SET (HDF5_TOOLS_LIB_CORENAME        "hdf5_tools")
+SET (HDF5_F90_LIB_CORENAME          "hdf5_fortran")
+SET (HDF5_F90_C_LIB_CORENAME        "hdf5_f90cstub")
+SET (HDF5_F90_TEST_LIB_CORENAME     "hdf5_test_fortran")
+SET (HDF5_F90_C_TEST_LIB_CORENAME   "hdf5_test_f90cstub")
+SET (HDF5_HL_F90_LIB_CORENAME       "hdf5_hl_fortran")
+SET (HDF5_HL_F90_C_LIB_CORENAME     "hdf5_hl_f90cstub")
 
-INCLUDE_REGULAR_EXPRESSION("^.*\\.[ch]$")
+#-----------------------------------------------------------------------------
+# Set the true names of all the libraries if customized by external project
+#-----------------------------------------------------------------------------
+SET (HDF5_LIB_NAME              "${HDF5_EXTERNAL_LIB_PREFIX}${HDF5_LIB_CORENAME}")
+SET (HDF5_TEST_LIB_NAME         "${HDF5_EXTERNAL_LIB_PREFIX}${HDF5_TEST_LIB_CORENAME}")
+SET (HDF5_CPP_LIB_NAME          "${HDF5_EXTERNAL_LIB_PREFIX}${HDF5_CPP_LIB_CORENAME}")
+SET (HDF5_HL_LIB_NAME           "${HDF5_EXTERNAL_LIB_PREFIX}${HDF5_HL_LIB_CORENAME}")
+SET (HDF5_HL_CPP_LIB_NAME       "${HDF5_EXTERNAL_LIB_PREFIX}${HDF5_HL_CPP_LIB_CORENAME}")
+SET (HDF5_TOOLS_LIB_NAME        "${HDF5_EXTERNAL_LIB_PREFIX}${HDF5_TOOLS_LIB_CORENAME}")
+SET (HDF5_F90_LIB_NAME          "${HDF5_EXTERNAL_LIB_PREFIX}${HDF5_F90_LIB_CORENAME}")
+SET (HDF5_F90_C_LIB_NAME        "${HDF5_EXTERNAL_LIB_PREFIX}${HDF5_F90_C_LIB_CORENAME}")
+SET (HDF5_F90_TEST_LIB_NAME     "${HDF5_EXTERNAL_LIB_PREFIX}${HDF5_F90_TEST_LIB_CORENAME}")
+SET (HDF5_F90_C_TEST_LIB_NAME   "${HDF5_EXTERNAL_LIB_PREFIX}${HDF5_F90_C_TEST_LIB_CORENAME}")
+SET (HDF5_HL_F90_LIB_NAME       "${HDF5_EXTERNAL_LIB_PREFIX}${HDF5_HL_F90_LIB_CORENAME}")
+SET (HDF5_HL_F90_C_LIB_NAME     "${HDF5_EXTERNAL_LIB_PREFIX}${HDF5_HL_F90_C_LIB_CORENAME}")
 
-# EXPORT() will be in cmake 2.6, add an empty macro so older cmake versions still work
-IF(NOT COMMAND EXPORT)
-  MACRO(EXPORT)
-  ENDMACRO(EXPORT)
-ENDIF(NOT COMMAND EXPORT)
+#-----------------------------------------------------------------------------
+# Set the target names of all the libraries
+#-----------------------------------------------------------------------------
+SET (HDF5_LIB_TARGET              ${HDF5_LIB_CORENAME})
+SET (HDF5_TEST_LIB_TARGET         ${HDF5_TEST_LIB_CORENAME})
+SET (HDF5_CPP_LIB_TARGET          ${HDF5_CPP_LIB_CORENAME})
+SET (HDF5_HL_LIB_TARGET           ${HDF5_HL_LIB_CORENAME})
+SET (HDF5_HL_CPP_LIB_TARGET       ${HDF5_HL_CPP_LIB_CORENAME})
+SET (HDF5_TOOLS_LIB_TARGET        ${HDF5_TOOLS_LIB_CORENAME})
+SET (HDF5_F90_LIB_TARGET          ${HDF5_F90_LIB_CORENAME})
+SET (HDF5_F90_C_LIB_TARGET        ${HDF5_F90_C_LIB_CORENAME})
+SET (HDF5_F90_TEST_LIB_TARGET     ${HDF5_F90_TEST_LIB_CORENAME})
+SET (HDF5_F90_C_TEST_LIB_TARGET   ${HDF5_F90_C_TEST_LIB_CORENAME})
+SET (HDF5_HL_F90_LIB_TARGET       ${HDF5_HL_F90_LIB_CORENAME})
+SET (HDF5_HL_F90_C_LIB_TARGET     ${HDF5_HL_F90_C_LIB_CORENAME})
 
-# Add configured headers to this var to have them installed
-SET(hinToInstall)
-# Add configured cmake files to this var to have them installed
-SET(cmakeinToInstall)
+#-----------------------------------------------------------------------------
+# Define some CMake variables for use later in the project
+#-----------------------------------------------------------------------------
+SET (HDF5_RESOURCES_DIR      ${HDF5_SOURCE_DIR}/config/cmake)
+SET (HDF5_SRC_DIR            ${HDF5_SOURCE_DIR}/src)
+SET (HDF5_TEST_SOURCE_DIR    ${HDF5_SOURCE_DIR}/test)
+SET (HDF5_CPP_SOURCE_DIR     ${HDF5_SOURCE_DIR}/c++)
+SET (HDF5_CPP_TEST_DIR       ${HDF5_CPP_SOURCE_DIR}/test)
+SET (HDF5_HL_SOURCE_DIR      ${HDF5_SOURCE_DIR}/hl)
+SET (HDF5_TOOLS_SOURCE_DIR   ${HDF5_SOURCE_DIR}/tools)
+SET (HDF5_PERFORM_SOURCE_DIR ${HDF5_SOURCE_DIR}/perform)
+SET (HDF5_F90_SOURCE_DIR     ${HDF5_SOURCE_DIR}/fortran)
 
-SET(LIBRARY_OUTPUT_PATH ${VTKHDF5_BINARY_DIR}/bin CACHE PATH
-  "Single output directory for building all libraries.")
-SET(EXECUTABLE_OUTPUT_PATH ${VTKHDF5_BINARY_DIR}/bin CACHE PATH
-  "Single output directory for building all executables.")
-MARK_AS_ADVANCED(LIBRARY_OUTPUT_PATH EXECUTABLE_OUTPUT_PATH)
+# set default prefix location
+SET (CMAKE_INSTALL_PREFIX "./hdf5" CACHE PATH "Install path prefix, prepended onto install directories")
 
-# Choose install directories.
-IF(NOT VTKHDF5_INSTALL_LIB_DIR)
-  SET(VTKHDF5_INSTALL_LIB_DIR /lib)
-ENDIF(NOT VTKHDF5_INSTALL_LIB_DIR)
+IF (NOT HDF5_INSTALL_BIN_DIR)
+  SET(HDF5_INSTALL_BIN_DIR bin)
+ENDIF()
+IF (NOT HDF5_INSTALL_LIB_DIR)
+  SET(HDF5_INSTALL_LIB_DIR lib)
+ENDIF()
+IF (NOT HDF5_INSTALL_INCLUDE_DIR)
+  SET(HDF5_INSTALL_INCLUDE_DIR include)
+ENDIF()
 
-# Let parent project set VTKHDF5_INSTALL_NO_DEVELOPMENT or
-# VTKHDF5_INSTALL_NO_RUNTIME to remove components from the installation.
-SET(VTKHDF5_INSTALL_NO_LIBRARIES)
-IF(BUILD_SHARED_LIBS)
-  IF(VTKHDF5_INSTALL_NO_RUNTIME AND VTKHDF5_INSTALL_NO_DEVELOPMENT)
-    SET(VTKHDF5_INSTALL_NO_LIBRARIES 1)
-  ENDIF(VTKHDF5_INSTALL_NO_RUNTIME AND VTKHDF5_INSTALL_NO_DEVELOPMENT)
-ELSE(BUILD_SHARED_LIBS)
-  IF(VTKHDF5_INSTALL_NO_DEVELOPMENT)
-    SET(VTKHDF5_INSTALL_NO_LIBRARIES 1)
-  ENDIF(VTKHDF5_INSTALL_NO_DEVELOPMENT)
-ENDIF(BUILD_SHARED_LIBS)
+#-----------------------------------------------------------------------------
+# parse the full version number from H5public.h and include in H5_VERS_INFO
+#-----------------------------------------------------------------------------
+FILE (READ ${HDF5_SRC_DIR}/H5public.h _h5public_h_contents)
+STRING (REGEX REPLACE ".*#define[ \t]+H5_VERS_MAJOR[ \t]+([0-9]*).*$"
+    "\\1" H5_VERS_MAJOR ${_h5public_h_contents})
+STRING (REGEX REPLACE ".*#define[ \t]+H5_VERS_MINOR[ \t]+([0-9]*).*$"
+    "\\1" H5_VERS_MINOR ${_h5public_h_contents})
+STRING (REGEX REPLACE ".*#define[ \t]+H5_VERS_RELEASE[ \t]+([0-9]*).*$"
+    "\\1" H5_VERS_RELEASE ${_h5public_h_contents})
+STRING (REGEX REPLACE ".*#define[ \t]+H5_VERS_SUBRELEASE[ \t]+\"([0-9A-Za-z.]*)\".*$"
+    "\\1" H5_VERS_SUBRELEASE ${_h5public_h_contents})
+#MESSAGE (STATUS "VERSION: ${H5_VERS_MAJOR}.${H5_VERS_MINOR}.${H5_VERS_RELEASE}-${H5_VERS_SUBRELEASE}")
 
-SET(CMAKE_C_FLAGS "${CMAKE_ANSI_CFLAGS} ${CMAKE_C_FLAGS}")
+#-----------------------------------------------------------------------------
+# Basic HDF5 stuff here
+#-----------------------------------------------------------------------------
+SET (HDF5_PACKAGE "hdf5")
+SET (HDF5_PACKAGE_NAME "HDF5")
+SET (HDF5_PACKAGE_VERSION "${H5_VERS_MAJOR}.${H5_VERS_MINOR}.${H5_VERS_RELEASE}")
+SET (HDF5_PACKAGE_VERSION_MAJOR "${H5_VERS_MAJOR}.${H5_VERS_MINOR}")
+SET (HDF5_PACKAGE_VERSION_MINOR "${H5_VERS_RELEASE}")
+SET (HDF5_PACKAGE_STRING "${HDF5_PACKAGE_NAME} ${HDF5_PACKAGE_VERSION}-${H5_VERS_SUBRELEASE}")
+SET (HDF5_PACKAGE_TARNAME "hdf5")
+SET (HDF5_PACKAGE_URL "http://www.hdfgroup.org")
+SET (HDF5_PACKAGE_BUGREPORT "help@hdfgroup.org")
 
-IF(NOT HDF5_ZLIB_HEADER)
-  SET(HDF5_ZLIB_HEADER "zlib.h")
-ENDIF(NOT HDF5_ZLIB_HEADER)
-CONFIGURE_FILE(
-  ${VTKHDF5_SOURCE_DIR}/hdf5_zlib.h.in
-  ${VTKHDF5_BINARY_DIR}/hdf5_zlib.h
-  IMMEDIATE)
-SET(hinToInstall "${hinToInstall};${VTKHDF5_BINARY_DIR}/hdf5_zlib.h")
+#-----------------------------------------------------------------------------
+# Include some macros for reusable code
+#-----------------------------------------------------------------------------
+INCLUDE (${HDF5_RESOURCES_DIR}/HDF5Macros.cmake)
 
-# Block warnings unless we are instructed to allow them.
-# SET(HDF5_WARNINGS_ALLOW 1)
-IF(NOT HDF5_WARNINGS_ALLOW)
+#-----------------------------------------------------------------------------
+# Setup output Directories
+#-----------------------------------------------------------------------------
+IF (NOT HDF5_EXTERNALLY_CONFIGURED)
+  SET (CMAKE_RUNTIME_OUTPUT_DIRECTORY
+      ${PROJECT_BINARY_DIR}/bin CACHE PATH "Single Directory for all Executables."
+  )
+  SET (CMAKE_LIBRARY_OUTPUT_DIRECTORY
+      ${PROJECT_BINARY_DIR}/bin CACHE PATH "Single Directory for all Libraries"
+  )
+  SET (CMAKE_ARCHIVE_OUTPUT_DIRECTORY
+      ${PROJECT_BINARY_DIR}/bin CACHE PATH "Single Directory for all static libraries."
+  )
+  SET (CMAKE_Fortran_MODULE_DIRECTORY
+      ${PROJECT_BINARY_DIR}/bin/fortran CACHE PATH "Single Directory for all fortran modules."
+  )
+ELSE (NOT HDF5_EXTERNALLY_CONFIGURED)
+  # if we are externally configured, but the project uses old cmake scripts
+  # this may not be set and utilities like H5detect will fail
+  IF (NOT CMAKE_RUNTIME_OUTPUT_DIRECTORY)
+    SET (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${EXECUTABLE_OUTPUT_PATH})
+  ENDIF (NOT CMAKE_RUNTIME_OUTPUT_DIRECTORY)
+ENDIF(NOT HDF5_EXTERNALLY_CONFIGURED)
+
+#-----------------------------------------------------------------------------
+# Targets built within this project are exported at Install time for use
+# by other projects using FindHDF5. 
+#-----------------------------------------------------------------------------
+IF (NOT HDF5_EXPORTED_TARGETS)
+  SET (HDF5_EXPORTED_TARGETS "hdf5-targets")
+ENDIF (NOT HDF5_EXPORTED_TARGETS)
+
+#-----------------------------------------------------------------------------
+# To include a library in the list exported by the project AT BUILD TIME,
+# add it to this variable. This is NOT used by Make Install, but for projects
+# which include hdf5 as a sub-project within their build tree
+#-----------------------------------------------------------------------------
+SET_GLOBAL_VARIABLE (HDF5_LIBRARIES_TO_EXPORT "")
+
+#-----------------------------------------------------------------------------
+# Run all the CMake configuration tests for our build environment
+#-----------------------------------------------------------------------------
+INCLUDE (${HDF5_RESOURCES_DIR}/ConfigureChecks.cmake)
+
+#-----------------------------------------------------------------------------
+# Option to use legacy naming for windows libs/programs, default is legacy
+#-----------------------------------------------------------------------------
+IF (WIN32)
+  OPTION (H5_LEGACY_NAMING "Use Legacy Names for Libraries and Programs" ON)
+ENDIF (WIN32)
+
+#-----------------------------------------------------------------------------
+# Option to Build Shared/Static libs, default is static
+#-----------------------------------------------------------------------------
+OPTION (BUILD_SHARED_LIBS "Build Shared Libraries" OFF)
+SET (LIB_TYPE STATIC)
+IF (BUILD_SHARED_LIBS)
+  SET (LIB_TYPE SHARED)
+  SET (H5_BUILT_AS_DYNAMIC_LIB 1)
+  IF (MSVC)
+    SET (CMAKE_MFC_FLAG 0)
+    FOREACH (flag_var
+        CMAKE_C_FLAGS CMAKE_C_FLAGS_DEBUG CMAKE_C_FLAGS_RELEASE
+        CMAKE_C_FLAGS_MINSIZEREL CMAKE_C_FLAGS_RELWITHDEBINFO
+        CMAKE_CXX_FLAGS CMAKE_CXX_FLAGS_DEBUG CMAKE_CXX_FLAGS_RELEASE
+        CMAKE_CXX_FLAGS_MINSIZEREL CMAKE_CXX_FLAGS_RELWITHDEBINFO)
+      IF (${flag_var} MATCHES "/MT")
+        STRING (REGEX REPLACE "/MT" "/MD" ${flag_var} "${${flag_var}}")
+      ENDIF (${flag_var} MATCHES "/MT")
+    ENDFOREACH (flag_var)
+  ENDIF (MSVC)
+ELSE (BUILD_SHARED_LIBS)
+  IF (NOT WIN32)
+    # should this be a user setting : Everyone uses it anyway ?
+    ADD_DEFINITIONS (-DPIC)
+  ENDIF (NOT WIN32)
+  IF (MSVC)
+    SET (CMAKE_MFC_FLAG 0)
+    #FOREACH (flag_var
+    #    CMAKE_C_FLAGS CMAKE_C_FLAGS_DEBUG CMAKE_C_FLAGS_RELEASE
+    #    CMAKE_C_FLAGS_MINSIZEREL CMAKE_C_FLAGS_RELWITHDEBINFO
+    #    CMAKE_CXX_FLAGS CMAKE_CXX_FLAGS_DEBUG CMAKE_CXX_FLAGS_RELEASE
+    #    CMAKE_CXX_FLAGS_MINSIZEREL CMAKE_CXX_FLAGS_RELWITHDEBINFO)
+    #  IF (${flag_var} MATCHES "/MD")
+    #    STRING (REGEX REPLACE "/MD" "/MT" ${flag_var} "${${flag_var}}")
+    #  ENDIF (${flag_var} MATCHES "/MD")
+    #ENDFOREACH (flag_var)
+  ENDIF (MSVC)
+ENDIF (BUILD_SHARED_LIBS)
+
+#-----------------------------------------------------------------------------
+# Option to use code coverage
+#-----------------------------------------------------------------------------
+OPTION (HDF5_ENABLE_COVERAGE "Enable code coverage for Libraries and Programs" OFF)
+IF (HDF5_ENABLE_COVERAGE)
+    SET (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -O0 -fprofile-arcs -ftest-coverage")
+    SET (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -O0 -fprofile-arcs -ftest-coverage")
+    SET (LDFLAGS "${LDFLAGS} -fprofile-arcs -ftest-coverage")   
+ENDIF (HDF5_ENABLE_COVERAGE)
+
+#-----------------------------------------------------------------------------
+# When building utility executables that generate other (source) files :
+# we make use of the following variables defined in the root CMakeLists.
+# Certain systems may add /Debug or /Release to output paths
+# and we need to call the executable from inside the CMake configuration
+#-----------------------------------------------------------------------------
+SET (EXE_EXT "")
+IF (WIN32)
+  SET (EXE_EXT ".exe")
+  ADD_DEFINITIONS (-DBIND_TO_CURRENT_VCLIBS_VERSION=1)
+  ADD_DEFINITIONS (-D_CRT_SECURE_NO_WARNINGS)
+ENDIF (WIN32)
+
+SET (MAKE_SYSTEM)
+IF (CMAKE_BUILD_TOOL MATCHES "make")
+  SET (MAKE_SYSTEM 1)
+ENDIF (CMAKE_BUILD_TOOL MATCHES "make")
+
+SET (CFG_INIT "/${CMAKE_CFG_INTDIR}")
+IF (MAKE_SYSTEM)
+  SET (CFG_INIT "")
+ENDIF (MAKE_SYSTEM)
+
+#-----------------------------------------------------------------------------
+# Add some definitions for Debug Builds
+#-----------------------------------------------------------------------------
+IF (CMAKE_BUILD_TYPE MATCHES Debug)
+  ADD_DEFINITIONS (-DDEBUG)
+  ADD_DEFINITIONS (
+      -DH5_DEBUG_API -DH5Z_DEBUG -DH5V_DEBUG -DH5T_DEBUG
+      -DH5S_DEBUG -DH5P_DEBUG -DH5O_DEBUG -DH5MM_DEBUG -DH5MF_DEBUG
+      -DH5I_DEBUG -DH5HL_DEBUG -DH5HG_DEBUG -DH5G_DEBUG -DH5F_DEBUG
+      -DH5E_DEBUG -DH5D_DEBUG -DH5B_DEBUG -DH5AC_DEBUG -UNDEBUG
+  )
+  #-- NMake Makefiles will overwhelm the console with warnings if -Wall is used.
+  IF (NOT WIN32)
+    ADD_DEFINITIONS (-Wall)
+  ENDIF (NOT WIN32)
+ELSE (CMAKE_BUILD_TYPE MATCHES Debug)
+  ADD_DEFINITIONS (-UH5_DEBUG_API -DNDEBUG)
+ENDIF (CMAKE_BUILD_TYPE MATCHES Debug)
+
+#-----------------------------------------------------------------------------
+# Compiler specific flags : Shouldn't there be compiler tests for these
+#-----------------------------------------------------------------------------
+IF (CMAKE_COMPILER_IS_GNUCC)
+  SET (CMAKE_C_FLAGS "${CMAKE_ANSI_CFLAGS} ${CMAKE_C_FLAGS} -std=c99 -fomit-frame-pointer -finline-functions -fno-common")
+ENDIF (CMAKE_COMPILER_IS_GNUCC)
+
+#-----------------------------------------------------------------------------
+# Option to allow the user to disable compiler warnings
+#-----------------------------------------------------------------------------
+OPTION (HDF5_DISABLE_COMPILER_WARNINGS "Disable compiler warnings" OFF)
+IF (HDF5_DISABLE_COMPILER_WARNINGS)
   # MSVC uses /w to suppress warnings.  It also complains if another
   # warning level is given, so remove it.
-  IF(MSVC)
-    SET(HDF5_WARNINGS_BLOCKED 1)
-    STRING(REGEX REPLACE "(^| )([/-])W[0-9]( |$)" " "
-      CMAKE_C_FLAGS "${CMAKE_C_FLAGS}")
-    SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /w")
-  ENDIF(MSVC)
-
+  IF (MSVC)
+    SET (HDF5_WARNINGS_BLOCKED 1)
+    STRING (REGEX REPLACE "(^| )([/-])W[0-9]( |$)" " "
+        CMAKE_C_FLAGS "${CMAKE_C_FLAGS}")
+    SET (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /w")
+  ENDIF (MSVC)
+  IF (WIN32)
+    ADD_DEFINITIONS (-D_CRT_SECURE_NO_WARNINGS)
+  ENDIF (WIN32)
   # Borland uses -w- to suppress warnings.
-  IF(BORLAND)
-    SET(HDF5_WARNINGS_BLOCKED 1)
-    SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -w-")
-  ENDIF(BORLAND)
+  IF (BORLAND)
+    SET (HDF5_WARNINGS_BLOCKED 1)
+    SET (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -w-")
+  ENDIF (BORLAND)
 
   # Most compilers use -w to suppress warnings.
-  IF(NOT HDF5_WARNINGS_BLOCKED)
-    SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -w")
-  ENDIF(NOT HDF5_WARNINGS_BLOCKED)
-ENDIF(NOT HDF5_WARNINGS_ALLOW)
+  IF (NOT HDF5_WARNINGS_BLOCKED)
+    SET (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -w")
+  ENDIF (NOT HDF5_WARNINGS_BLOCKED)
+ENDIF (HDF5_DISABLE_COMPILER_WARNINGS)
 
-SET(PACKAGE_VERSION "\"1.6.5\"")
-SET(PACKAGE_TARNAME "\"hdf5\"")
-SET(PACKAGE_NAME "\"HDF5\"")
-SET(PACKAGE_STRING "\"HDF5 1.6.5\"")
-SET(PACKAGE_BUGREPORT "\"hdfhelp@ncsa.uiuc.edu\"")
+#-----------------------------------------------------------------------------
+# This is in here to help some of the GCC based IDES like Eclipse
+# and code blocks parse the compiler errors and warnings better.
+#-----------------------------------------------------------------------------
+IF (CMAKE_COMPILER_IS_GNUCC)
+  SET (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fmessage-length=0")
+ENDIF (CMAKE_COMPILER_IS_GNUCC)
+IF (CMAKE_COMPILER_IS_GNUCXX)
+  SET (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fmessage-length=0")
+ENDIF (CMAKE_COMPILER_IS_GNUCXX)
 
-SET(LINUX_LFS 0)
-IF(CMAKE_SYSTEM MATCHES "Linux-([3-9]\\.[0-9]|2\\.[4-9])\\.")
-  OPTION(HDF5_ENABLE_LINUX_LFS
-    "Enable support for large (64-bit) files on Linux." ON)
-  IF(HDF5_ENABLE_LINUX_LFS)
-    SET(LINUX_LFS 1)
-  ENDIF(HDF5_ENABLE_LINUX_LFS)
-ENDIF(CMAKE_SYSTEM MATCHES "Linux-([3-9]\\.[0-9]|2\\.[4-9])\\.")
-SET(HDF5_EXTRA_FLAGS)
-IF(LINUX_LFS)
-  SET(HDF5_EXTRA_FLAGS
-    -D_FILE_OFFSET_BITS=64
-    -D_LARGEFILE64_SOURCE
-    -D_LARGEFILE_SOURCE)
-ENDIF(LINUX_LFS)
-ADD_DEFINITIONS(${HDF5_EXTRA_FLAGS})
+#-----------------------------------------------------------------------------
+# All libs/tests/examples need the main include directories
+#-----------------------------------------------------------------------------
+INCLUDE_DIRECTORIES (${HDF5_BINARY_DIR} ${HDF5_SRC_DIR})
 
-OPTION(HDF5_STREAM_VFD "Compile Stream Virtual File Driver support" ON)
-OPTION(HDF5_ENABLE_HSIZET "Enable datasets larger than memory" ON)
-IF(VTK_USE_MPI)
-  OPTION(HDF5_ENABLE_PARALLEL "Enable parallel build (uses MPI)" OFF)
-ENDIF(VTK_USE_MPI)
+#-----------------------------------------------------------------------------
+# Option to Enable MPI Parallel
+#-----------------------------------------------------------------------------
+OPTION (HDF5_ENABLE_PARALLEL "Enable parallel build (requires MPI)" OFF)
+IF (HDF5_ENABLE_PARALLEL)
+  INCLUDE (FindMPI)
+  INCLUDE_DIRECTORIES (${MPI_INCLUDE_PATH})
+  IF (MPI_FOUND)
+    SET (H5_HAVE_PARALLEL 1)
+    # MPI checks, only do these if MPI_FOUND is true, otherwise they always fail
+    # and once set, they are cached as false and not regenerated
+    SET (CMAKE_REQUIRED_INCLUDES "${MPI_INCLUDE_PATH}/mpi.h" )
+    SET (CMAKE_REQUIRED_LIBRARIES "${MPI_LIBRARY}" )
+    CHECK_FUNCTION_EXISTS (MPI_File_get_size H5_HAVE_MPI_GET_SIZE) 
+    # Used by Fortran + MPI
+    CHECK_SYMBOL_EXISTS (MPI_Comm_c2f "${MPI_INCLUDE_PATH}/mpi.h"  H5_HAVE_MPI_MULTI_LANG_Comm)
+    CHECK_SYMBOL_EXISTS (MPI_Info_c2f "${MPI_INCLUDE_PATH}/mpi.h"  H5_HAVE_MPI_MULTI_LANG_Info)
+  ENDIF (MPI_FOUND)
+ENDIF (HDF5_ENABLE_PARALLEL)
 
-# Include all the necessary files for macros
-INCLUDE (CheckFunctionExists)
-INCLUDE (CheckIncludeFile)
-INCLUDE (CheckIncludeFileCXX)
-INCLUDE (CheckIncludeFiles)
-INCLUDE (CheckLibraryExists)
-INCLUDE (CheckSymbolExists)
-INCLUDE (CheckTypeSize)
+# Parallel IO usage requires MPI to be Linked and Included
+IF (H5_HAVE_PARALLEL)
+  SET (LINK_LIBS ${LINK_LIBS} ${MPI_LIBRARY})
+  IF (MPI_LINK_FLAGS)
+    SET (CMAKE_EXE_LINKER_FLAGS ${MPI_LINK_FLAGS} ${CMAKE_EXE_LINKER_FLAGS})
+  ENDIF (MPI_LINK_FLAGS)
+  IF (MPI_EXTRA_LIBRARY)
+    SET (LINK_LIBS ${LINK_LIBS} ${MPI_EXTRA_LIBRARY})
+  ENDIF (MPI_EXTRA_LIBRARY)
+ENDIF (H5_HAVE_PARALLEL)
 
-# This macro checks if the symbol exists in the library and if it
-# does, it appends library to the list.
-SET(LINK_LIBS "")
-MACRO(CHECK_LIBRARY_EXISTS_CONCAT LIBRARY SYMBOL VARIABLE)
-  CHECK_LIBRARY_EXISTS("${LIBRARY};${LINK_LIBS}" ${SYMBOL} "" ${VARIABLE})
-  IF(${VARIABLE})
-    SET(LINK_LIBS ${LINK_LIBS} ${LIBRARY})
-  ENDIF(${VARIABLE})
-ENDMACRO(CHECK_LIBRARY_EXISTS_CONCAT)
+#-----------------------------------------------------------------------------
+# Option to use 1.6.x API
+#-----------------------------------------------------------------------------
+OPTION (HDF5_USE_16_API_DEFAULT "Use the HDF5 1.6.x API by default" OFF)
+SET (H5_USE_16_API_DEFAULT 0)
+IF (HDF5_USE_16_API_DEFAULT)
+  SET (H5_USE_16_API_DEFAULT 1)
+ENDIF (HDF5_USE_16_API_DEFAULT)
 
-CHECK_LIBRARY_EXISTS_CONCAT("m" printf HAVE_LIBM)
-CHECK_LIBRARY_EXISTS_CONCAT("ws2_32" printf HAVE_LIBWS2_32)
-CHECK_LIBRARY_EXISTS_CONCAT("wsock32" printf HAVE_LIBWSOCK32)
-#CHECK_LIBRARY_EXISTS_CONCAT("dl"     dlopen       HAVE_LIBDL)
-CHECK_LIBRARY_EXISTS_CONCAT("ucb"    gethostname  HAVE_LIBUCB)
-CHECK_LIBRARY_EXISTS_CONCAT("socket" connect      HAVE_LIBSOCKET)
-CHECK_LIBRARY_EXISTS("c" gethostbyname "" NOT_NEED_LIBNSL)
+#-----------------------------------------------------------------------------
+# Options for HDF5 Filters
+#-----------------------------------------------------------------------------
+MACRO (HDF5_SETUP_FILTERS FILTER)
+  OPTION (HDF5_USE_FILTER_${FILTER} "Use the ${FILTER} Filter" ON)
+  IF (HDF5_USE_FILTER_${FILTER})
+    SET (H5_HAVE_FILTER_${FILTER} 1)
+  ENDIF (HDF5_USE_FILTER_${FILTER})
+  # MESSAGE (STATUS "Filter ${FILTER} is ${HDF5_USE_FILTER_${FILTER}}")
+ENDMACRO (HDF5_SETUP_FILTERS)
 
-IF(NOT NOT_NEED_LIBNSL)
-  CHECK_LIBRARY_EXISTS_CONCAT("nsl"    gethostbyname  HAVE_LIBNSL)
-ENDIF(NOT NOT_NEED_LIBNSL)
+HDF5_SETUP_FILTERS (SHUFFLE)
+HDF5_SETUP_FILTERS (FLETCHER32)
+HDF5_SETUP_FILTERS (NBIT)
+HDF5_SETUP_FILTERS (SCALEOFFSET)
 
+#-----------------------------------------------------------------------------
+# Option for ZLib support
+#-----------------------------------------------------------------------------
+OPTION (HDF5_ENABLE_Z_LIB_SUPPORT "Enable Zlib Filters" OFF)
+IF (HDF5_ENABLE_Z_LIB_SUPPORT)
+  IF (NOT H5_ZLIB_HEADER)
+    FIND_PACKAGE (ZLIB REQUIRED)
+    IF (ZLIB_FOUND)
+      SET (H5_HAVE_FILTER_DEFLATE 1)
+      SET (H5_HAVE_ZLIB_H 1)
+      SET (H5_HAVE_LIBZ 1)
+      SET (H5_ZLIB_HEADER "zlib.h")
+    ELSE (ZLIB_FOUND)
+      MESSAGE (FATAL " ZLib is Required for ZLib support in HDF5")
+    ENDIF (ZLIB_FOUND)
+  ELSE (NOT H5_ZLIB_HEADER)
+    # This project is being called from within another and ZLib is already configured
+    SET (H5_HAVE_FILTER_DEFLATE 1)
+    SET (H5_HAVE_ZLIB_H 1)
+    SET (H5_HAVE_LIBZ 1)
+  ENDIF (NOT H5_ZLIB_HEADER)
+  SET (LINK_LIBS ${LINK_LIBS} ${ZLIB_LIBRARIES})
+  INCLUDE_DIRECTORIES (${ZLIB_INCLUDE_DIRS})
+  MESSAGE (STATUS "Filter ZLIB is ON")
+ENDIF (HDF5_ENABLE_Z_LIB_SUPPORT)
 
-SET(USE_INCLUDES "")
-# Check if header file exists and add it to the list.
-MACRO(CHECK_INCLUDE_FILE_CONCAT FILE VARIABLE)
-  CHECK_INCLUDE_FILES("${USE_INCLUDES};${FILE}" ${VARIABLE})
-  IF(${VARIABLE})
-    SET(USE_INCLUDES ${USE_INCLUDES} ${FILE})
-  ENDIF(${VARIABLE})
-ENDMACRO(CHECK_INCLUDE_FILE_CONCAT)
+#-----------------------------------------------------------------------------
+# Option for SzLib support
+#-----------------------------------------------------------------------------
+SET (CMAKE_MODULE_PATH ${HDF5_RESOURCES_DIR} ${CMAKE_MODULE_PATH})
+OPTION (HDF5_ENABLE_SZIP_SUPPORT "Use SZip Filter" OFF)
+IF (HDF5_ENABLE_SZIP_SUPPORT)
+  FIND_PACKAGE (SZIP REQUIRED)
+  IF (SZIP_FOUND)
+    SET (H5_HAVE_FILTER_SZIP 1)
+    SET (H5_HAVE_SZLIB_H 1)
+    SET (H5_HAVE_LIBSZ 1)
+    SET (LINK_LIBS ${LINK_LIBS} ${SZIP_LIBRARIES})
+    INCLUDE_DIRECTORIES (${SZIP_INCLUDE_DIRS})
+#      MESSAGE (STATUS "SZIP_INCLUDE_DIRS: ${SZIP_INCLUDE_DIRS}")
+#      MESSAGE (STATUS "SZIP_INCLUDE_DIR: ${SZIP_INCLUDE_DIR}")
+    MESSAGE (STATUS "Filter SZIP is ON")
+    OPTION (HDF5_ENABLE_SZIP_ENCODING "Use SZip Encoding" OFF)
+    IF (HDF5_ENABLE_SZIP_ENCODING)
+      SET (H5_HAVE_SZIP_ENCODER 1)
+    ENDIF (HDF5_ENABLE_SZIP_ENCODING)
+  ELSE (SZIP_FOUND)
+      MESSAGE (FATAL_ERROR "SZIP is Required for SZIP support in HDF5")
+  ENDIF (SZIP_FOUND)
+ENDIF (HDF5_ENABLE_SZIP_SUPPORT)
 
-CHECK_INCLUDE_FILE_CONCAT("globus/common.h" HAVE_GLOBUS_COMMON_H)
-CHECK_INCLUDE_FILE_CONCAT("io.h" HAVE_IO_H)
-CHECK_INCLUDE_FILE_CONCAT("mfhdf.h" HAVE_MFHDF_H)
-CHECK_INCLUDE_FILE_CONCAT("pdb.h" HAVE_PDB_H)
-CHECK_INCLUDE_FILE_CONCAT("pthread.h" HAVE_PTHREAD_H)
-CHECK_INCLUDE_FILE_CONCAT("setjmp.h" HAVE_SETJMP_H)
-CHECK_INCLUDE_FILE_CONCAT("srbclient.h" HAVE_SRBCLIENT_H)
-CHECK_INCLUDE_FILE_CONCAT("stddef.h" HAVE_STDDEF_H)
-CHECK_INCLUDE_FILE_CONCAT("stdint.h" HAVE_STDINT_H)
-CHECK_INCLUDE_FILE_CONCAT("string.h" HAVE_STRING_H)
-CHECK_INCLUDE_FILE_CONCAT("strings.h" HAVE_STRINGS_H)
-CHECK_INCLUDE_FILE_CONCAT("sys/ioctl.h" HAVE_SYS_IOCTL_H)
-CHECK_INCLUDE_FILE_CONCAT("sys/proc.h" HAVE_SYS_PROC_H)
-CHECK_INCLUDE_FILE_CONCAT("sys/resource.h" HAVE_SYS_RESOURCE_H)
-CHECK_INCLUDE_FILE_CONCAT("sys/socket.h" HAVE_SYS_SOCKET_H)
-CHECK_INCLUDE_FILE_CONCAT("sys/stat.h" HAVE_SYS_STAT_H)
-IF(CMAKE_SYSTEM_NAME MATCHES "OSF")
-  CHECK_INCLUDE_FILE_CONCAT("sys/sysinfo.h" HAVE_SYS_SYSINFO_H)
-ELSE(CMAKE_SYSTEM_NAME MATCHES "OSF")
-  SET(HAVE_SYS_SYSINFO_H "" CACHE INTERNAL "" FORCE)
-ENDIF(CMAKE_SYSTEM_NAME MATCHES "OSF")
-CHECK_INCLUDE_FILE_CONCAT("sys/time.h" HAVE_SYS_TIME_H)
-CHECK_INCLUDE_FILE_CONCAT("sys/timeb.h" HAVE_SYS_TIMEB_H)
-CHECK_INCLUDE_FILE_CONCAT("sys/types.h" HAVE_SYS_TYPES_H)
-CHECK_INCLUDE_FILE_CONCAT("unistd.h" HAVE_UNISTD_H)
-CHECK_INCLUDE_FILE_CONCAT("stdlib.h" HAVE_STDLIB_H)
-CHECK_INCLUDE_FILE_CONCAT("memory.h" HAVE_MEMORY_H)
-CHECK_INCLUDE_FILE_CONCAT("dlfcn.h" HAVE_DLFCN_H)
-CHECK_INCLUDE_FILE_CONCAT("features.h" HAVE_FEATURES_H)
-CHECK_INCLUDE_FILE_CONCAT("inttypes.h" HAVE_INTTYPES_H)
-CHECK_INCLUDE_FILE_CONCAT("winsock.h" HAVE_WINSOCK_H)
+#-----------------------------------------------------------------------------
+# Option to use PACKED BITS SUPPORT
+#-----------------------------------------------------------------------------
+OPTION (HDF5_USE_H5DUMP_PACKED_BITS "Use the PACKED BITS feature in h5dump" OFF)
+SET (H5_HAVE_H5DUMP_PACKED_BITS 0)
+IF (HDF5_USE_H5DUMP_PACKED_BITS)
+  SET (H5_HAVE_H5DUMP_PACKED_BITS 1)
+ENDIF (HDF5_USE_H5DUMP_PACKED_BITS)
 
-# if the c compiler found stdint, check the C++ as well. On some systems this
-# file will be found by C but not C++, only do this test if the C++ compiler
-# has been initialized (e.g. the project also includes some c++)
-IF (HAVE_STDINT_H AND CMAKE_CXX_COMPILER_LOADED)
-  CHECK_INCLUDE_FILE_CXX("stdint.h" HAVE_STDINT_H_CXX)
-  IF (NOT HAVE_STDINT_H_CXX)
-    SET (HAVE_STDINT_H "" CACHE INTERNAL "Have includes HAVE_STDINT_H")
-  ENDIF (NOT HAVE_STDINT_H_CXX)
-ENDIF (HAVE_STDINT_H AND CMAKE_CXX_COMPILER_LOADED)
+#-----------------------------------------------------------------------------
+# Add the HDF5 Library Target to the build
+#-----------------------------------------------------------------------------
+ADD_SUBDIRECTORY (${HDF5_SOURCE_DIR}/src ${PROJECT_BINARY_DIR}/src)
 
-IF(HDF5_ZLIB_INCLUDE_DIRS OR VTK_ZLIB_LIBRARIES)
-  SET(HAVE_ZLIB_H 1)
-ELSE(HDF5_ZLIB_INCLUDE_DIRS OR VTK_ZLIB_LIBRARIES)
-  CHECK_INCLUDE_FILE_CONCAT("zlib.h" HAVE_ZLIB_H)
-ENDIF(HDF5_ZLIB_INCLUDE_DIRS OR VTK_ZLIB_LIBRARIES)
+#-----------------------------------------------------------------------------
+# Build utility to copy and strip X lines of file
+#-----------------------------------------------------------------------------
+IF (HDF5_BUILD_TOOLS AND BUILD_TESTING)
+  SET (XLATE_UTILITY "xlatefile")
+  ADD_EXECUTABLE(${XLATE_UTILITY} ${HDF5_RESOURCES_DIR}/xlatefile.c)
+ENDIF (HDF5_BUILD_TOOLS AND BUILD_TESTING)
 
-CHECK_TYPE_SIZE(char           SIZEOF_CHAR)
-CHECK_TYPE_SIZE(short          SIZEOF_SHORT)
-CHECK_TYPE_SIZE(int            SIZEOF_INT)
-CHECK_TYPE_SIZE(long           SIZEOF_LONG)
-CHECK_TYPE_SIZE(float          SIZEOF_FLOAT)
-CHECK_TYPE_SIZE(double         SIZEOF_DOUBLE)
-CHECK_TYPE_SIZE("long double"  SIZEOF_LONG_DOUBLE)
-CHECK_TYPE_SIZE(int8_t         SIZEOF_INT8_T)
-CHECK_TYPE_SIZE(uint8_t        SIZEOF_UINT8_T)
-CHECK_TYPE_SIZE(int_least8_t   SIZEOF_INT_LEAST8_T)
-CHECK_TYPE_SIZE(uint_least8_t  SIZEOF_UINT_LEAST8_T)
-CHECK_TYPE_SIZE(int_fast8_t    SIZEOF_INT_FAST8_T)
-CHECK_TYPE_SIZE(uint_fast8_t   SIZEOF_UINT_FAST8_T)
-CHECK_TYPE_SIZE(int16_t        SIZEOF_INT16_T)
-CHECK_TYPE_SIZE(uint16_t       SIZEOF_UINT16_T)
-CHECK_TYPE_SIZE(int_least16_t  SIZEOF_INT_LEAST16_T)
-CHECK_TYPE_SIZE(uint_least16_t SIZEOF_UINT_LEAST16_T)
-CHECK_TYPE_SIZE(int_fast16_t   SIZEOF_INT_FAST16_T)
-CHECK_TYPE_SIZE(uint_fast16_t  SIZEOF_UINT_FAST16_T)
-CHECK_TYPE_SIZE(int32_t        SIZEOF_INT32_T)
-CHECK_TYPE_SIZE(uint32_t       SIZEOF_UINT32_T)
-CHECK_TYPE_SIZE(int_least32_t  SIZEOF_INT_LEAST32_T)
-CHECK_TYPE_SIZE(uint_least32_t SIZEOF_UINT_LEAST32_T)
-CHECK_TYPE_SIZE(int_fast32_t   SIZEOF_INT_FAST32_T)
-CHECK_TYPE_SIZE(uint_fast32_t  SIZEOF_UINT_FAST32_T)
-CHECK_TYPE_SIZE(int64_t        SIZEOF_INT64_T)
-CHECK_TYPE_SIZE(uint64_t       SIZEOF_UINT64_T)
-CHECK_TYPE_SIZE(jdshkjfhdks    SIZEOF_JDSHKJFHDKS)
-CHECK_TYPE_SIZE(int_least64_t  SIZEOF_INT_LEAST64_T)
-CHECK_TYPE_SIZE(uint_least64_t SIZEOF_UINT_LEAST64_T)
-CHECK_TYPE_SIZE(int_fast64_t   SIZEOF_INT_FAST64_T)
-CHECK_TYPE_SIZE(uint_fast64_t  SIZEOF_UINT_FAST64_T)
-CHECK_TYPE_SIZE(size_t         SIZEOF_SIZE_T)
-CHECK_TYPE_SIZE(ssize_t        SIZEOF_SSIZE_T)
-CHECK_TYPE_SIZE(off_t          SIZEOF_OFF_T)
-CHECK_TYPE_SIZE(__int64        SIZEOF___INT64)
-CHECK_TYPE_SIZE("long long"    SIZEOF_LONG_LONG)
+#-----------------------------------------------------------------------------
+# Dashboard and Testing Settings
+#-----------------------------------------------------------------------------
+OPTION (BUILD_TESTING "Build HDF5 Unit Testing" OFF)
+IF (BUILD_TESTING)
+  SET (DART_TESTING_TIMEOUT 1200
+      CACHE INTEGER
+      "Timeout in seconds for each test (default 1200=20minutes)"
+  )
+  ENABLE_TESTING ()
+  INCLUDE (CTest)
+  IF (NOT HDF5_EXTERNALLY_CONFIGURED)
+    IF(EXISTS "${HDF5_SOURCE_DIR}/test" AND IS_DIRECTORY "${HDF5_SOURCE_DIR}/test")
+      ADD_SUBDIRECTORY (${HDF5_SOURCE_DIR}/tools/lib ${PROJECT_BINARY_DIR}/tools/lib)
+      ADD_SUBDIRECTORY (${HDF5_SOURCE_DIR}/test      ${PROJECT_BINARY_DIR}/test)
+    ENDIF(EXISTS "${HDF5_SOURCE_DIR}/test" AND IS_DIRECTORY "${HDF5_SOURCE_DIR}/test")
+    IF(EXISTS "${HDF5_SOURCE_DIR}/perform" AND IS_DIRECTORY "${HDF5_SOURCE_DIR}/perform")
+      ADD_SUBDIRECTORY (${HDF5_SOURCE_DIR}/perform   ${PROJECT_BINARY_DIR}/perform)
+    ENDIF(EXISTS "${HDF5_SOURCE_DIR}/perform" AND IS_DIRECTORY "${HDF5_SOURCE_DIR}/perform")
+  ENDIF (NOT HDF5_EXTERNALLY_CONFIGURED)
+  INCLUDE (${HDF5_SOURCE_DIR}/CTestConfig.cmake)
+ENDIF (BUILD_TESTING)
 
-# For other tests to use the same libraries
-SET(CMAKE_REQUIRED_LIBRARIES ${LINK_LIBS})
+#-----------------------------------------------------------------------------
+# Option to build Fortran bindings/tests/examples
+# Make sure this appears before the CONFIGURE_FILE step
+# so that fortran name mangling is detected before writing H5pubconf.h
+#-----------------------------------------------------------------------------
+# Set default name mangling : overridden by Fortran detection in fortran dir
+SET (H5_FC_FUNC  "H5_FC_FUNC(name,NAME) name ## _")
+SET (H5_FC_FUNC_ "H5_FC_FUNC_(name,NAME) name ## _")
+IF(EXISTS "${HDF5_SOURCE_DIR}/fortran" AND IS_DIRECTORY "${HDF5_SOURCE_DIR}/fortran")
+  OPTION (HDF5_BUILD_FORTRAN "Build FORTRAN support" OFF)
+  IF (HDF5_BUILD_FORTRAN)
+    ADD_SUBDIRECTORY (${HDF5_SOURCE_DIR}/fortran ${PROJECT_BINARY_DIR}/fortran)
+    IF (HDF5_BUILD_HL_LIB)
+      IF(EXISTS "${HDF5_SOURCE_DIR}/hl/fortran" AND IS_DIRECTORY "${HDF5_SOURCE_DIR}/hl/fortran")
+        #-- Build the High Level Fortran source codes
+        ADD_SUBDIRECTORY (${HDF5_SOURCE_DIR}/hl/fortran ${HDF5_BINARY_DIR}/hl/fortran)
+      ENDIF(EXISTS "${HDF5_SOURCE_DIR}/hl/fortran" AND IS_DIRECTORY "${HDF5_SOURCE_DIR}/hl/fortran")
+    ENDIF (HDF5_BUILD_HL_LIB)
+  ENDIF (HDF5_BUILD_FORTRAN)
+ENDIF(EXISTS "${HDF5_SOURCE_DIR}/fortran" AND IS_DIRECTORY "${HDF5_SOURCE_DIR}/fortran")
 
-# Check for some functions that are used
-CHECK_FUNCTION_EXISTS(strdup            HAVE_STRDUP)
-CHECK_FUNCTION_EXISTS(snprintf          HAVE_SNPRINTF)
-CHECK_FUNCTION_EXISTS(system            HAVE_SYSTEM)
-CHECK_FUNCTION_EXISTS(vsnprintf         HAVE_VSNPRINTF)
-CHECK_FUNCTION_EXISTS(waitpid           HAVE_WAITPID)
-CHECK_FUNCTION_EXISTS(signal            HAVE_SIGNAL)
-CHECK_FUNCTION_EXISTS(ioctl             HAVE_IOCTL)
-CHECK_FUNCTION_EXISTS(sigaction         HAVE_SIGACTION)
-CHECK_FUNCTION_EXISTS(getpwuid          HAVE_GETPWUID)
-CHECK_FUNCTION_EXISTS(getrusage         HAVE_GETRUSAGE)
-CHECK_FUNCTION_EXISTS(gettimeofday      HAVE_GETTIMEOFDAY)
-CHECK_FUNCTION_EXISTS(longjmp           HAVE_LONGJMP)
-CHECK_FUNCTION_EXISTS(fork              HAVE_FORK)
-CHECK_FUNCTION_EXISTS(difftime          HAVE_DIFFTIME)
-CHECK_FUNCTION_EXISTS(gethostname       HAVE_GETHOSTNAME)
-CHECK_FUNCTION_EXISTS(sigaction         HAVE_SIGACTION)
-CHECK_FUNCTION_EXISTS(frexpf            HAVE_FREXPF)
-CHECK_FUNCTION_EXISTS(frexpl            HAVE_FREXPL)
+#-----------------------------------------------------------------------------
+# Option to build examples
+#-----------------------------------------------------------------------------
+IF(EXISTS "${HDF5_SOURCE_DIR}/examples" AND IS_DIRECTORY "${HDF5_SOURCE_DIR}/examples")
+  OPTION (HDF5_BUILD_EXAMPLES  "Build HDF5 Library Examples" OFF)
+  IF (HDF5_BUILD_EXAMPLES)
+    ADD_SUBDIRECTORY (${HDF5_SOURCE_DIR}/examples ${PROJECT_BINARY_DIR}/examples)
+  ENDIF (HDF5_BUILD_EXAMPLES)
+ENDIF(EXISTS "${HDF5_SOURCE_DIR}/examples" AND IS_DIRECTORY "${HDF5_SOURCE_DIR}/examples")
 
-CHECK_SYMBOL_EXISTS(TIOCGWINSZ "sys/ioctl.h" HAVE_TIOCGWINSZ)
-CHECK_SYMBOL_EXISTS(TIOCGETD   "sys/ioctl.h" HAVE_TIOCGETD)
-# e.g. IBM BlueGene/L doesn't have SO_REUSEADDR, because "setsockopt is not needed for
-# BlueGene/L applications" according to the BlueGene/L Application Development handbook
-CHECK_SYMBOL_EXISTS(SO_REUSEADDR "sys/types.h;sys/socket.h" HAVE_SO_REUSEADDR)
+#-----------------------------------------------------------------------------
+# Option to build HDF5 C++ Library
+#-----------------------------------------------------------------------------
+IF(EXISTS "${HDF5_SOURCE_DIR}/c++" AND IS_DIRECTORY "${HDF5_SOURCE_DIR}/c++")
+  OPTION (HDF5_BUILD_CPP_LIB  "Build HDF5 C++ Library" OFF)
+  IF (HDF5_BUILD_CPP_LIB)
+    ADD_SUBDIRECTORY (${HDF5_SOURCE_DIR}/c++ ${PROJECT_BINARY_DIR}/c++)
+  ENDIF (HDF5_BUILD_CPP_LIB)
+ENDIF(EXISTS "${HDF5_SOURCE_DIR}/c++" AND IS_DIRECTORY "${HDF5_SOURCE_DIR}/c++")
 
-IF(HDF5_STREAM_VFD)
-  CHECK_INCLUDE_FILE_CONCAT("netdb.h" HAVE_NETDB_H)
-  CHECK_INCLUDE_FILE_CONCAT("netinet/tcp.h" HAVE_NETINET_TCP_H)
-  CHECK_INCLUDE_FILE_CONCAT("sys/filio.h" HAVE_SYS_FILIO_H)
-  SET(H5_HAVE_STREAM 1)
-ENDIF(HDF5_STREAM_VFD)
+#-----------------------------------------------------------------------------
+# Option to build HDF5 Tools
+#-----------------------------------------------------------------------------
+IF(EXISTS "${HDF5_SOURCE_DIR}/tools" AND IS_DIRECTORY "${HDF5_SOURCE_DIR}/tools")
+  OPTION (HDF5_BUILD_TOOLS  "Build HDF5 Tools" OFF)
+  IF (HDF5_BUILD_TOOLS)
+    ADD_SUBDIRECTORY (${HDF5_SOURCE_DIR}/tools ${PROJECT_BINARY_DIR}/tools)
+  ENDIF (HDF5_BUILD_TOOLS)
+ENDIF(EXISTS "${HDF5_SOURCE_DIR}/tools" AND IS_DIRECTORY "${HDF5_SOURCE_DIR}/tools")
 
-# Cray Xt3/Catamount doesn't support IP networking
-IF(CMAKE_SYSTEM MATCHES Catamount)
-  SET(H5_HAVE_STREAM 0)
-ENDIF(CMAKE_SYSTEM MATCHES Catamount)
+#-----------------------------------------------------------------------------
+# Option to build High Level API's
+#-----------------------------------------------------------------------------
+IF(EXISTS "${HDF5_SOURCE_DIR}/hl" AND IS_DIRECTORY "${HDF5_SOURCE_DIR}/hl")
+  OPTION (HDF5_BUILD_HL_LIB  "Build HIGH Level HDF5 Library" OFF)
+  IF (HDF5_BUILD_HL_LIB)
+    SET (H5_INCLUDE_HL 1)
+    ADD_SUBDIRECTORY (${HDF5_SOURCE_DIR}/hl ${PROJECT_BINARY_DIR}/hl)
+  ENDIF (HDF5_BUILD_HL_LIB)
+ENDIF(EXISTS "${HDF5_SOURCE_DIR}/hl" AND IS_DIRECTORY "${HDF5_SOURCE_DIR}/hl")
 
+#-----------------------------------------------------------------------------
+# Generate the H5pubconf.h file containing user settings needed by compilation
+#-----------------------------------------------------------------------------
+CONFIGURE_FILE (${HDF5_RESOURCES_DIR}/H5pubconf.h.in ${HDF5_BINARY_DIR}/H5pubconf.h @ONLY)
 
-# For other other specific tests, use this macro.
-MACRO(OTHER_INTERNAL_TEST OTHER_TEST)
-  IF("${OTHER_TEST}" MATCHES "^${OTHER_TEST}$")
-    SET(MACRO_CHECK_FUNCTION_DEFINITIONS
-      "-D${OTHER_TEST} ${CMAKE_REQUIRED_FLAGS}")
-    SET(OTHER_TEST_ADD_LIBRARIES)
-    IF(CMAKE_REQUIRED_LIBRARIES)
-      SET(OTHER_TEST_ADD_LIBRARIES
-        "-DLINK_LIBRARIES:STRING=${CMAKE_REQUIRED_LIBRARIES}")
-    ENDIF(CMAKE_REQUIRED_LIBRARIES)
-    FOREACH(def ${HDF5_EXTRA_TEST_DEFINITIONS})
-      SET(MACRO_CHECK_FUNCTION_DEFINITIONS
-        "${MACRO_CHECK_FUNCTION_DEFINITIONS} -D${def}=${${def}}")
-    ENDFOREACH(def)
+#-----------------------------------------------------------------------------
+# Add file(s) to CMake Install
+#-----------------------------------------------------------------------------
+IF (NOT HDF5_INSTALL_NO_DEVELOPMENT)
+  INSTALL (
+      FILES
+          ${PROJECT_BINARY_DIR}/H5pubconf.h
+      DESTINATION
+          ${HDF5_INSTALL_INCLUDE_DIR}
+      COMPONENT
+          headers
+  )
+ENDIF ()
 
-    FOREACH(def
-        HAVE_SYS_TIME_H
-        HAVE_UNISTD_H
-        HAVE_SYS_TYPES_H
-        HAVE_SYS_SOCKET_H)
-      IF("${def}")
-        SET(MACRO_CHECK_FUNCTION_DEFINITIONS
-          "${MACRO_CHECK_FUNCTION_DEFINITIONS} -D${def}")
-      ENDIF("${def}")
-    ENDFOREACH(def)
-    IF(LINUX_LFS)
-    #don't be tempted to put this all in one multiline string macro will fail
-      SET(MACRO_CHECK_FUNCTION_DEFINITIONS
-        "${MACRO_CHECK_FUNCTION_DEFINITIONS} -D_FILE_OFFSET_BITS=64")
-      SET(MACRO_CHECK_FUNCTION_DEFINITIONS
-        "${MACRO_CHECK_FUNCTION_DEFINITIONS} -D_LARGEFILE64_SOURCE")
-      SET(MACRO_CHECK_FUNCTION_DEFINITIONS
-        "${MACRO_CHECK_FUNCTION_DEFINITIONS} -D_LARGEFILE_SOURCE")
-    ENDIF(LINUX_LFS)
+#-----------------------------------------------------------------------------
+# Add Target(s) to CMake Install for import into other projects
+#-----------------------------------------------------------------------------
+IF (NOT HDF5_EXTERNALLY_CONFIGURED)
+  INSTALL (
+      EXPORT
+          ${HDF5_EXPORTED_TARGETS}
+      DESTINATION
+          lib/cmake/hdf5-${HDF5_PACKAGE_VERSION}
+      FILE
+          hdf5-targets.cmake
+  )
+ENDIF ()
 
-    MESSAGE(STATUS "Performing Other Test ${OTHER_TEST}")
-    TRY_COMPILE(${OTHER_TEST}
-      ${CMAKE_BINARY_DIR}
-      ${VTKHDF5_SOURCE_DIR}/CMake/HDF5Tests.c
-      CMAKE_FLAGS -DCOMPILE_DEFINITIONS:STRING=${MACRO_CHECK_FUNCTION_DEFINITIONS}
-      "${OTHER_TEST_ADD_LIBRARIES}"
-      OUTPUT_VARIABLE OUTPUT)
-    IF(${OTHER_TEST})
-      SET(${OTHER_TEST} 1 CACHE INTERNAL "Other test ${FUNCTION}")
-      MESSAGE(STATUS "Performing Other Test ${OTHER_TEST} - Success")
-    ELSE(${OTHER_TEST})
-      MESSAGE(STATUS "Performing Other Test ${OTHER_TEST} - Failed")
-      SET(${OTHER_TEST} "" CACHE INTERNAL "Other test ${FUNCTION}")
-      WRITE_FILE(${CMAKE_BINARY_DIR}/CMakeFiles/CMakeError.log
-        "Performing Other Test ${OTHER_TEST} failed with the following "
-        "output:\n${OUTPUT}\n" APPEND)
-    ENDIF(${OTHER_TEST})
-  ENDIF("${OTHER_TEST}" MATCHES "^${OTHER_TEST}$")
-ENDMACRO(OTHER_INTERNAL_TEST)
+#-----------------------------------------------------------------------------
+# Export all exported targets to the build tree for use by parent project
+#-----------------------------------------------------------------------------
+IF (NOT HDF5_EXTERNALLY_CONFIGURED)
+  EXPORT (
+      TARGETS
+          ${HDF5_LIBRARIES_TO_EXPORT} ${HDF5_LIB_DEPENDENCIES}
+      FILE
+          hdf5-targets.cmake
+  )
+ENDIF ()
 
-# Do curl specific tests
-FOREACH(CURL_TEST
-    TIME_WITH_SYS_TIME
-    STDC_HEADERS
-    HAVE_TM_ZONE
-    HAVE_STRUCT_TM_TM_ZONE
-    HAVE_ATTRIBUTE
-    HAVE_FUNCTION
-    HAVE_TM_GMTOFF
-    HAVE_TIMEZONE
-    HAVE_STRUCT_TIMEZONE
-    HAVE_STAT_ST_BLOCKS
-    HAVE_FUNCTION
-    SYSTEM_SCOPE_THREADS
-    HAVE_SOCKLEN_T
-    DEV_T_IS_SCALAR
-    HAVE_OFF64_T
+#-----------------------------------------------------------------------------
+# Configure the hdf5-config.cmake file for the build directory
+#-----------------------------------------------------------------------------
+SET (HDF5_INCLUDES_BUILD_TIME
+    ${HDF5_SRC_DIR} ${HDF5_CPP_SOURCE_DIR} ${HDF5_HL_SOURCE_DIR}
+    ${HDF5_TOOLS_SOURCE_DIR} ${HDF5_BINARY_DIR}
+)
+SET (HDF5_VERSION_STRING @HDF5_PACKAGE_VERSION@)
+SET (HDF5_VERSION_MAJOR  @HDF5_PACKAGE_VERSION_MAJOR@)
+SET (HDF5_VERSION_MINOR  @HDF5_PACKAGE_VERSION_MINOR@)
+
+CONFIGURE_FILE (
+    ${HDF5_RESOURCES_DIR}/hdf5-config.cmake.build.in 
+    ${HDF5_BINARY_DIR}/hdf5-config.cmake @ONLY
+)
+
+#-----------------------------------------------------------------------------
+# Configure the hdf5-config.cmake file for the install directory
+#-----------------------------------------------------------------------------
+IF (NOT HDF5_EXTERNALLY_CONFIGURED)
+  CONFIGURE_FILE (
+      ${HDF5_RESOURCES_DIR}/hdf5-config.cmake.install.in
+      ${HDF5_BINARY_DIR}/CMakeFiles/hdf5-config.cmake @ONLY
+  )
+  INSTALL (
+      FILES
+          ${HDF5_BINARY_DIR}/CMakeFiles/hdf5-config.cmake
+      DESTINATION
+          lib/cmake/hdf5-${HDF5_PACKAGE_VERSION}
+  )
+ENDIF ()
+
+#-----------------------------------------------------------------------------
+# Configure the hdf5-config-version .cmake file for the install directory
+#-----------------------------------------------------------------------------
+IF (NOT HDF5_EXTERNALLY_CONFIGURED)
+  CONFIGURE_FILE (
+      ${HDF5_RESOURCES_DIR}/hdf5-config-version.cmake.in
+      ${HDF5_BINARY_DIR}/CMakeFiles/hdf5-config-version.cmake @ONLY
+  )
+  INSTALL (
+      FILES
+          ${HDF5_BINARY_DIR}/CMakeFiles/hdf5-config-version.cmake
+      DESTINATION
+          lib/cmake/hdf5-${HDF5_PACKAGE_VERSION}
+  )
+ENDIF ()
+
+#-----------------------------------------------------------------------------
+# Set the cpack variables
+#-----------------------------------------------------------------------------
+IF (NOT HDF5_EXTERNALLY_CONFIGURED AND EXISTS "${HDF5_SOURCE_DIR}/release_docs")
+  SET (CPACK_PACKAGE_VENDOR "The HDF Group")
+  SET (CPACK_PACKAGE_NAME "${HDF5_PACKAGE_NAME}")
+  SET (CPACK_PACKAGE_VERSION "${HDF5_PACKAGE_VERSION}")
+  SET (CPACK_PACKAGE_VERSION_MAJOR "${HDF5_PACKAGE_VERSION_MAJOR}")
+  SET (CPACK_PACKAGE_VERSION_MINOR "${HDF5_PACKAGE_VERSION_MINOR}")
+  SET (CPACK_PACKAGE_VERSION_PATCH "")
+  SET (CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/release_docs/COPYING")
+  
+  IF (WIN32)
+    SET (CPACK_NSIS_PACKAGE_NAME "HDF5 ${HDF5_PACKAGE_VERSION}")
+  ENDIF (WIN32)
+  
+  INCLUDE (CPack)
+
+  #---------------------------------------------------------------------------
+  # Now list the cpack commands
+  #---------------------------------------------------------------------------
+  CPACK_ADD_COMPONENT (applications 
+      DISPLAY_NAME "HDF5 Applications" 
+      DEPENDS libraries
+      GROUP Applications
+  )
+  CPACK_ADD_COMPONENT (libraries 
+      DISPLAY_NAME "HDF5 Libraries"
+      GROUP Runtime
+  )
+  CPACK_ADD_COMPONENT (headers 
+      DISPLAY_NAME "HDF5 Headers" 
+      DEPENDS libraries
+      GROUP Development
+  )
+  
+  IF (HDF5_BUILD_FORTRAN)
+    CPACK_ADD_COMPONENT (fortlibraries 
+        DISPLAY_NAME "HDF5 Fortran Libraries" 
+        DEPENDS libraries
+        GROUP Runtime
     )
-  OTHER_INTERNAL_TEST(${CURL_TEST})
-ENDFOREACH(CURL_TEST)
-
-IF(HAVE_OFF64_T)
-  CHECK_FUNCTION_EXISTS(lseek64           HAVE_LSEEK64)
-  CHECK_FUNCTION_EXISTS(fseek64           HAVE_FSEEK64)
-ENDIF(HAVE_OFF64_T)
-
-SET(HDF5_EXTRA_TEST_DEFINITIONS INLINE_TEST_INLINE)
-FOREACH(inline_test inline __inline__ __inline)
-  SET(INLINE_TEST_INLINE ${inline_test})
-  OTHER_INTERNAL_TEST(INLINE_TEST_${inline_test})
-ENDFOREACH(inline_test)
-SET(HDF5_EXTRA_TEST_DEFINITIONS)
-IF(INLINE_TEST___inline__)
-  SET(inline __inline__)
-ELSE(INLINE_TEST___inline__)
-  IF(INLINE_TEST___inline)
-    SET(inline __inline)
-  ELSE(INLINE_TEST___inline)
-    IF(INLINE_TEST_inline)
-      SET(inline inline)
-    ENDIF(INLINE_TEST_inline)
-  ENDIF(INLINE_TEST___inline)
-ENDIF(INLINE_TEST___inline__)
-
-
-IF(PRINTF_LL_WIDTH MATCHES "^PRINTF_LL_WIDTH$")
-  MESSAGE(STATUS "Checking for apropriate format for 64 bit long:")
-  SET(CURRENT_TEST_DEFINITIONS "-DPRINTF_LL_WIDTH")
-  IF(SIZEOF_LONG_LONG)
-    SET(CURRENT_TEST_DEFINITIONS "${CURRENT_TEST_DEFINITIONS} -DHAVE_LONG_LONG")
-  ENDIF(SIZEOF_LONG_LONG)
-  TRY_RUN(HDF5_PRINTF_LL_TEST_RUN HDF5_PRINTF_LL_TEST_COMPILE
-    ${VTKHDF5_BINARY_DIR}/CMake
-    ${VTKHDF5_SOURCE_DIR}/CMake/HDF5Tests.c
-    CMAKE_FLAGS -DCOMPILE_DEFINITIONS:STRING=${CURRENT_TEST_DEFINITIONS}
-    OUTPUT_VARIABLE OUTPUT)
-
-  IF   (HDF5_PRINTF_LL_TEST_COMPILE)
-    IF   (HDF5_PRINTF_LL_TEST_RUN MATCHES 0)
-      STRING(REGEX REPLACE ".*PRINTF_LL_WIDTH=\\[(.+)\\].*" "\\1" PRINTF_LL_WIDTH "${OUTPUT}" )
-      SET(PRINTF_LL_WIDTH "\"${PRINTF_LL_WIDTH}\"" CACHE INTERNAL "Width for printf for type `long long' or `__int64', us. `ll")
-    ELSE (HDF5_PRINTF_LL_TEST_RUN MATCHES 0)
-      SET(PRINTF_LL_WIDTH "\"unknown\"" CACHE INTERNAL "Width for printf for type `long long' or `__int64', us. `ll")
-    ENDIF(HDF5_PRINTF_LL_TEST_RUN MATCHES 0)
-  ELSE (HDF5_PRINTF_LL_TEST_COMPILE)
-    WRITE_FILE(${CMAKE_BINARY_DIR}/CMakeFiles/CMakeError.log
-      "Test PRINTF_LL_WIDTH failed with the following output:\n${OUTPUT}\n" APPEND)
-  ENDIF(HDF5_PRINTF_LL_TEST_COMPILE)
-  MESSAGE(STATUS "Checking for apropriate format for 64 bit long: ${PRINTF_LL_WIDTH}")
-ENDIF(PRINTF_LL_WIDTH MATCHES "^PRINTF_LL_WIDTH$")
-
-# Some things that are always true
-SET(CONVERT_DENORMAL_FLOAT 1)
-SET(HAVE_LIBZ 1)
-SET(HAVE_FILTER_DEFLATE 1)
-SET(HAVE_FILTER_FLETCHER32 1)
-SET(HAVE_FILTER_SHUFFLE 1)
-IF(HDF5_ENABLE_HSIZET)
-  SET(HAVE_LARGE_HSIZET 1)
-ENDIF(HDF5_ENABLE_HSIZET)
-
-IF(HDF5_ENABLE_PARALLEL AND VTK_USE_MPI)
-  SET(HAVE_PARALLEL 1)
-  FIND_PACKAGE(MPI)
-  ADD_DEFINITIONS("-DMPICH_IGNORE_CXX_SEEK") 
-  INCLUDE_DIRECTORIES(${MPI_INCLUDE_PATH})
-  SET(HDF5_MPI_INCLUDE_PATH ${MPI_INCLUDE_PATH})
-ENDIF (HDF5_ENABLE_PARALLEL AND VTK_USE_MPI)
-
-IF(CYGWIN)
-  SET(HAVE_LSEEK64 0)
-ENDIF(CYGWIN)
-
-SET(common_SRCS
-H5.c          H5FDmpio.c      H5HP.c        H5Pfapl.c      H5Tconv.c
-H5A.c         H5FDmpiposix.c  H5I.c         H5Pfcpl.c      H5Tcset.c
-H5AC.c        H5FDmulti.c     H5MF.c        H5Ptest.c      H5Tenum.c
-H5B.c         H5FDsec2.c      H5MM.c        H5R.c          H5Tfields.c
-H5C.c         H5FDsrb.c       H5O.c         H5RC.c         H5Tfixed.c
-H5D.c         H5FDstdio.c     H5Oattr.c     H5RS.c         H5Tfloat.c
-H5Dcompact.c  H5FDstream.c    H5Obogus.c    H5S.c          H5Tnative.c
-H5Dcontig.c   H5FL.c          H5Ocont.c     H5SL.c         H5Toffset.c
-H5Defl.c      H5FO.c          H5Odtype.c    H5ST.c         H5Topaque.c
-H5Dio.c       H5FS.c          H5Oefl.c      H5Sall.c       H5Torder.c
-H5Distore.c   H5Fdbg.c        H5Ofill.c     H5Shyper.c     H5Tpad.c
-H5Dmpio.c     H5Fmount.c      H5Olayout.c   H5Smpio.c      H5Tprecis.c
-H5Dselect.c   H5Fsfile.c      H5Omtime.c    H5Snone.c      H5Tstrpad.c
-H5Dtest.c     H5Fsuper.c      H5Oname.c     H5Spoint.c     H5Tvlen.c
-H5E.c         H5G.c           H5Onull.c     H5Sselect.c    H5V.c
-H5F.c         H5Gent.c        H5Opline.c    H5Stest.c      H5Z.c
-H5FD.c        H5Gnode.c       H5Osdspace.c  H5T.c          H5Zdeflate.c
-H5FDcore.c    H5Gstab.c       H5Oshared.c   H5TS.c         H5Zfletcher32.c
-H5FDfamily.c  H5HG.c          H5Ostab.c     H5Tarray.c     H5Zshuffle.c
-H5FDgass.c    H5HGdbg.c       H5P.c         H5Tbit.c       H5Zszip.c
-H5FDlog.c     H5HL.c          H5Pdcpl.c     H5Tcommit.c
-H5FDmpi.c     H5HLdbg.c       H5Pdxpl.c     H5Tcompound.c
-  )
-
-IF(APPLE)
-  SET_SOURCE_FILES_PROPERTIES(
-  H5.c
-  H5D.c
-  H5E.c
-  PROPERTIES
-  COMPILE_FLAGS -fno-common)
-ENDIF(APPLE)
-
-INCLUDE_DIRECTORIES(${VTKHDF5_SOURCE_DIR}
-  ${VTKHDF5_BINARY_DIR})
-
-# This variable is used in H5pubconf to detect shared libraries.
-IF(BUILD_SHARED_LIBS)
-  SET(VTKHDF5_BUILD_SHARED_LIBS 1)
-ELSE(BUILD_SHARED_LIBS)
-  SET(VTKHDF5_BUILD_SHARED_LIBS 0)
-ENDIF(BUILD_SHARED_LIBS)
-
-SET(CONFIG_FILE_EXT h.cmake)
-
-CONFIGURE_FILE(
-  ${VTKHDF5_SOURCE_DIR}/H5config.${CONFIG_FILE_EXT}.in
-  ${VTKHDF5_BINARY_DIR}/H5config.h 
-  IMMEDIATE)
-SET(hinToInstall "${hinToInstall};${VTKHDF5_BINARY_DIR}/H5config.h")
-
-FILE(READ "${VTKHDF5_BINARY_DIR}/H5config.h" HDF5_PUBLIC_CONFIG)
-STRING(REGEX REPLACE "#define " "#define H5_" HDF5_PUBLIC_CONFIG ${HDF5_PUBLIC_CONFIG})
-STRING(REGEX REPLACE "#undef " "#undef H5_" HDF5_PUBLIC_CONFIG ${HDF5_PUBLIC_CONFIG})
-
-CONFIGURE_FILE(
-  ${VTKHDF5_SOURCE_DIR}/H5pubconf.${CONFIG_FILE_EXT}.in
-  ${VTKHDF5_BINARY_DIR}/H5pubconf.h
-  IMMEDIATE)
-SET(hinToInstall "${hinToInstall};${VTKHDF5_BINARY_DIR}/H5pubconf.h")
-
-SET(common_SRCS ${common_SRCS} ${VTKHDF5_BINARY_DIR}/H5Tinit.c)
-SET_SOURCE_FILES_PROPERTIES (${VTKHDF5_BINARY_DIR}/H5Tinit.c GENERATED)
-
-IF(HDF5_ZLIB_INCLUDE_DIRS)
-  INCLUDE_DIRECTORIES(${HDF5_ZLIB_INCLUDE_DIRS})
-ENDIF(HDF5_ZLIB_INCLUDE_DIRS)
-IF(VTK_ZLIB_INCLUDE_DIRS)
-  INCLUDE_DIRECTORIES(${VTK_ZLIB_INCLUDE_DIRS})
-ENDIF(VTK_ZLIB_INCLUDE_DIRS)
-
-ADD_LIBRARY(vtkhdf5 ${common_SRCS})
-TARGET_LINK_LIBRARIES(vtkhdf5 ${LINK_LIBS})
-
-IF(HDF5_ENABLE_PARALLEL AND VTK_USE_MPI)
-  IF (MPI_LIBRARY) 
-    SET(HDFMPI_LIBS "${MPI_LIBRARY}")   
-  ELSE (MPI_LIBRARY)   
-    MESSAGE("Could not find the required MPI libraries")
-  ENDIF (MPI_LIBRARY)   
-  IF (MPI_EXTRA_LIBRARY)   
-    SET(HDFMPI_LIBS ${HDFMPI_LIBS} "${MPI_EXTRA_LIBRARY}")   
-  ENDIF (MPI_EXTRA_LIBRARY) 
-  TARGET_LINK_LIBRARIES(vtkhdf5 ${HDFMPI_LIBS})
-ENDIF (HDF5_ENABLE_PARALLEL AND VTK_USE_MPI)
-
-IF(XDMF_ZLIB_LIBRARIES)
-  TARGET_LINK_LIBRARIES(vtkhdf5 ${XDMF_ZLIB_LIBRARIES})
-ENDIF(XDMF_ZLIB_LIBRARIES)
-
-IF(VTK_ZLIB_LIBRARIES)
-  TARGET_LINK_LIBRARIES(vtkhdf5 ${VTK_ZLIB_LIBRARIES})
-ENDIF(VTK_ZLIB_LIBRARIES)
-
-IF(NOT VTKHDF5_INSTALL_NO_LIBRARIES)
-  INSTALL(TARGETS vtkhdf5
-    RUNTIME DESTINATION ${PV_INSTALL_BIN_DIR} COMPONENT Runtime
-    LIBRARY DESTINATION ${PV_INSTALL_LIB_DIR} COMPONENT Runtime
-    ARCHIVE DESTINATION ${PV_INSTALL_LIB_DIR} COMPONENT Development)
-ENDIF(NOT VTKHDF5_INSTALL_NO_LIBRARIES)
-
-IF(NOT CMAKE_CROSSCOMPILING)
-  ADD_EXECUTABLE(H5detect H5detect.c)
-  TARGET_LINK_LIBRARIES(H5detect ${LINK_LIBS})
-  EXPORT(TARGETS H5detect FILE ${EXPORT_EXECUTABLES_FILE} NAMESPACE "${EXPORT_EXECUTABLES_NAMESPACE}" APPEND)
-  IF(COMPILE_TOOLS_TARGET)
-    ADD_DEPENDENCIES(${COMPILE_TOOLS_TARGET} H5detect)
-  ENDIF(COMPILE_TOOLS_TARGET)
-ENDIF(NOT CMAKE_CROSSCOMPILING)
-
-IF(CMAKE_CROSSCOMPILING)
-  SET(CMD H5detect)
-ELSE(CMAKE_CROSSCOMPILING)
-  GET_TARGET_PROPERTY(CMD H5detect LOCATION)
-ENDIF(CMAKE_CROSSCOMPILING)
-
-ADD_CUSTOM_COMMAND(
-  OUTPUT ${VTKHDF5_BINARY_DIR}/H5Tinit.c
-  COMMAND ${CMD}
-  ARGS > ${VTKHDF5_BINARY_DIR}/H5Tinit.c
-  DEPENDS H5detect
-  )
-
-CONFIGURE_FILE(
-  ${VTKHDF5_SOURCE_DIR}/HDF5Config.cmake.in
-  ${VTKHDF5_BINARY_DIR}/HDF5Config.cmake 
-  @ONLY
-  IMMEDIATE)
-SET(cmakeinToInstall "${cmakeinToInstall};${VTKHDF5_BINARY_DIR}/HDF5Config.cmake")
-
-CONFIGURE_FILE(
-  ${VTKHDF5_SOURCE_DIR}/CTestCustom.ctest.in
-  ${VTKHDF5_BINARY_DIR}/CTestCustom.ctest 
-  @ONLY
-  IMMEDIATE)
-
-# Development files install
-IF (NOT PV_INSTALL_NO_DEVELOPMENT)
-  FILE(GLOB hToInstall
-      RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}"
-      "*.h")
-  INSTALL(
-      FILES ${hToInstall}
-      DESTINATION "${PV_INSTALL_INCLUDE_DIR}/hdf5"
-      COMPONENT Development)
-  INSTALL(
-      FILES ${hinToInstall}
-      DESTINATION "${PV_INSTALL_INCLUDE_DIR}/hdf5"
-      COMPONENT Development)
-  INSTALL(
-      FILES ${cmakeinToInstall} 
-      DESTINATION ${PV_INSTALL_LIB_DIR}
-      COMPONENT Development)
-ENDIF (NOT PV_INSTALL_NO_DEVELOPMENT)
+    CPACK_ADD_COMPONENT (fortheaders 
+        DISPLAY_NAME "HDF5 Fortran Headers" 
+        DEPENDS fortlibraries
+        GROUP Development
+    )
+  ENDIF (HDF5_BUILD_FORTRAN)
+  
+  IF (HDF5_BUILD_CPP_LIB)
+    CPACK_ADD_COMPONENT (cpplibraries 
+        DISPLAY_NAME "HDF5 C++ Libraries" 
+        DEPENDS libraries
+        GROUP Runtime
+    )
+    CPACK_ADD_COMPONENT (cppheaders 
+        DISPLAY_NAME "HDF5 C++ Headers" 
+        DEPENDS cpplibraries
+        GROUP Development
+    )
+  ENDIF (HDF5_BUILD_CPP_LIB)
+  
+  IF (HDF5_BUILD_TOOLS)
+    CPACK_ADD_COMPONENT (toolsapplications 
+        DISPLAY_NAME "HDF5 Tools Applications" 
+        DEPENDS toolslibraries
+        GROUP Applications
+    )
+    CPACK_ADD_COMPONENT (toolslibraries 
+        DISPLAY_NAME "HDF5 Tools Libraries" 
+        DEPENDS libraries
+        GROUP Runtime
+    )
+    CPACK_ADD_COMPONENT (toolsheaders 
+        DISPLAY_NAME "HDF5 Tools Headers" 
+        DEPENDS toolslibraries
+        GROUP Development
+    )
+  ENDIF (HDF5_BUILD_TOOLS)
+  
+  IF (HDF5_BUILD_HL_LIB)
+    CPACK_ADD_COMPONENT (hllibraries 
+        DISPLAY_NAME "HDF5 HL Libraries" 
+        DEPENDS libraries
+        GROUP Runtime
+    )
+    CPACK_ADD_COMPONENT (hlheaders 
+        DISPLAY_NAME "HDF5 HL Headers" 
+        DEPENDS hllibraries
+        GROUP Development
+    )
+    CPACK_ADD_COMPONENT (hltoolsapplications 
+        DISPLAY_NAME "HDF5 HL Tools Applications" 
+        DEPENDS hllibraries
+        GROUP Applications
+    )
+    CPACK_ADD_COMPONENT (hlcpplibraries 
+        DISPLAY_NAME "HDF5 HL C++ Libraries" 
+        DEPENDS hllibraries
+        GROUP Runtime
+    )
+    CPACK_ADD_COMPONENT (hlcppheaders 
+        DISPLAY_NAME "HDF5 HL C++ Headers" 
+        DEPENDS hlcpplibraries
+        GROUP Development
+    )
+    CPACK_ADD_COMPONENT (hlfortlibraries 
+        DISPLAY_NAME "HDF5 HL Fortran Libraries" 
+        DEPENDS fortlibraries
+        GROUP Runtime
+    )
+  ENDIF (HDF5_BUILD_HL_LIB)
+  
+ENDIF (NOT HDF5_EXTERNALLY_CONFIGURED AND EXISTS "${HDF5_SOURCE_DIR}/release_docs")

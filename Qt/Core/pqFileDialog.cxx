@@ -762,22 +762,28 @@ void pqFileDialog::onActivateRecent(const QModelIndex& index)
 //-----------------------------------------------------------------------------
 void pqFileDialog::onDoubleClickFile(const QModelIndex& index)
 {
-  QModelIndex actual_index = index;
-  if(actual_index.model() == &this->Implementation->FileFilter)
-    actual_index = this->Implementation->FileFilter.mapToSource(actual_index);
-
-  QStringList selected_files;
-  QStringList paths;
-  QString path;
-
-  paths = this->Implementation->Model->getFilePaths(actual_index);
-  foreach(path, paths)
+  if ( this->Implementation->Mode == Directory)
     {
-    selected_files <<
-      this->Implementation->Model->absoluteFilePath( path );
-    }
+    QModelIndex actual_index = index;
+    if(actual_index.model() == &this->Implementation->FileFilter)
+      actual_index = this->Implementation->FileFilter.mapToSource(actual_index);
 
-  this->acceptInternal(selected_files,true);
+    QStringList selected_files;
+    QStringList paths;
+    QString path;
+
+    paths = this->Implementation->Model->getFilePaths(actual_index);
+    foreach(path, paths)
+      {
+      selected_files <<
+        this->Implementation->Model->absoluteFilePath( path );
+      }
+    this->acceptInternal(selected_files,true);
+    }
+  else
+    {
+    this->accept();
+    }
 }
 
 //-----------------------------------------------------------------------------

@@ -42,6 +42,7 @@ public:
 //----------------------------------------------------------------------------
 vtkClientServerInterpreter::vtkClientServerInterpreter()
 {
+  this->NextAvailableId = 0;
   this->Internal = new vtkClientServerInterpreterInternals;
   this->LastResultMessage = new vtkClientServerStream(this);
   this->LogStream = 0;
@@ -898,4 +899,9 @@ int vtkClientServerInterpreter::LoadInternal(const char* moduleName,
 void vtkClientServerInterpreter::ClearLastResult()
 {
   this->LastResultMessage->Reset();
+}
+//----------------------------------------------------------------------------
+vtkClientServerID vtkClientServerInterpreter::GetNextAvailableId()
+{
+  return vtkClientServerID(++this->NextAvailableId);
 }

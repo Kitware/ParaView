@@ -4,6 +4,7 @@ SET (TESTS_WITHOUT_BASELINES
 )
 
 SET (TESTS_WITH_BASELINES
+  ${CMAKE_CURRENT_SOURCE_DIR}/AnalyzeReaderWriterPlugin.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/AnimatePipelineTime.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/3DWidgetInCustomFilter.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/CalcParens.xml
@@ -21,6 +22,7 @@ SET (TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/CustomSourceProbe.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/D3SmallCells.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/DualSphereAnimation.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/EnSight.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/ExodusIIPanel.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/ExodusModeShapes.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/ExodusXML.xml
@@ -36,6 +38,7 @@ SET (TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/GlobalProperties.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/GridConnectivity.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/LinePlot.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/H5PartReaderPlugin.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/LoadPlugins.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/LoadSaveStateAnimation.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/LoadState.xml
@@ -84,7 +87,8 @@ SET (TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/XdmfReadStructuredGridCollection.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/XdmfGridAttributes.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/XYChart.xml
-#  ${CMAKE_CURRENT_SOURCE_DIR}/XYBarChart.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/XYHistogram.xml
+  #  ${CMAKE_CURRENT_SOURCE_DIR}/XYBarChart.xml
 )
 
 # Mark tests that change change state considerably requires a restart of the
@@ -108,11 +112,14 @@ set (ColorEditor1_BREAK TRUE)
 set (ColorEditor2_BREAK TRUE)
 set (ColorEditor3_BREAK TRUE)
 set (ColorEditor4_BREAK TRUE)
+set (GridConnectivity_BREAK_TRUE)
+set (H5PartReaderPlugin_BREAK_TRUE)
 set (ReadXMLPolyDataFileSeries_BREAK TRUE)
 set (ExodusXML_BREAK TRUE)
 SET (ComparativeVisPanel_BREAK TRUE)
 SET (SpreadSheet1_BREAK TRUE)
 SET (SPTimeseries_BREAK TRUE)
+SET (XYChart_BREAK TRUE)
 
 
 # Add image threshold overrides for tests.
@@ -123,6 +130,7 @@ SET (UndoRedo4_THRESHOLD 15)
 
 # Since often there are issues with fonts etc.
 SET (XYChart_THRESHOLD 150)
+SET (XYHistogram_THRESHOLD 60)
 
 # These Xdmf tests have wireframes, hence the increased thresholds.
 SET (XdmfReadImageData_THRESHOLD 20)
@@ -155,11 +163,20 @@ SET (ViewSettingsDialog_DISABLE_CRS TRUE)
 
 # Plugins are only built as shared libraries.
 IF (NOT BUILD_SHARED_LIBS)
-  SET(LoadPlugins_DISABLE_C TRUE)
+  SET (AnalyzeReaderWriterPlugin_DISABLE_C TRUE)
+  SET (H5PartReaderPlugin_DISABLE_C TRUE)
+  SET (LoadPlugins_DISABLE_C TRUE)
+  SET (NiftiReaderWriterPlugin_DISABLE_C TRUE)
 ENDIF (NOT BUILD_SHARED_LIBS)
 # There should be a client server specific version of this test.
+SET (AnalyzeReaderWriterPlugin_DISABLE_CS TRUE)
+SET (H5PartReaderPlugin_DISABLE_CS TRUE)
 SET (LoadPlugins_DISABLE_CS TRUE)
+SET (NiftiReaderWriterPlugin_DISABLE_CS TRUE)
+SET (AnalyzeReaderWriterPlugin_DISABLE_CRS TRUE)
+SET (H5PartReaderPlugin_DISABLE_CRS TRUE)
 SET (LoadPlugins_DISABLE_CRS TRUE)
+SET (NiftiReaderWriterPlugin_DISABLE_CRS TRUE)
 
 # Make these tests use reverse connection.
 SET (CutMulti_REVERSE_CONNECT TRUE)

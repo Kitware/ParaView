@@ -53,10 +53,6 @@ protected:
   ~vtkSMUniformGridParallelStrategy();
 
   // Description:
-  // Overridden to fix the Collect filter output data type etc.
-  virtual void EndCreateVTKObjects();
-
-  // Description:
   // Overridden to avoid unnecessary LOD information collection.
   virtual void GatherLODInformation(vtkPVInformation*) {}
 

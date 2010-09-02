@@ -27,15 +27,6 @@ SET(MOC_INCLUDE_DIRS ${MOC_INCLUDE_DIRS} ${QT_QTDESIGNER_INCLUDE_DIR} ${pqCompon
 GET_DIRECTORY_PROPERTY(include_dirs_tmp INCLUDE_DIRECTORIES)
 SET_DIRECTORY_PROPERTIES(PROPERTIES INCLUDE_DIRECTORIES "${MOC_INCLUDE_DIRS}")
 
-SET(KIT Prism)
-INCLUDE(${ParaView_SOURCE_DIR}/VTK/CMake/vtkMakeInstantiator.cmake)
-VTK_MAKE_INSTANTIATOR3(vtk${KIT}Instantiator PrismInstantiator_SRCS
-  vtkSMPrismCubeAxesRepresentationProxy.cxx
-  VTK_EXPORT
-  "${CMAKE_CURRENT_BINARY_DIR}" "")
-
-
-
 
 QT4_WRAP_CPP(MOC_SRCS PrismToolBarActions.h PrismCore.h PrismMenuActions.h PrismDisplayProxyEditor.h PrismDisplayPanelsImplementation.h PrismObjectPanelsImplementation.h PrismSurfacePanel.h PrismPanel.h PrismCubeAxesEditorDialog.h )
 
@@ -70,27 +61,29 @@ ADD_PARAVIEW_ACTION_GROUP(MENUBARIFACE MENU_IFACE_SRCS CLASS_NAME PrismMenuActio
                           GROUP_NAME "MenuBar/Prism")
 # create a plugin for this panel
 ADD_PARAVIEW_PLUGIN(PrismClientPlugin "1.1" 
-                    GUI_INTERFACES ${TOOLBARIFACE} ${MENUBARIFACE} PrismDisplayPanels PrismObjectPanels 
-                    SERVER_MANAGER_SOURCES vtkSMPrismCubeAxesRepresentationProxy.cxx
-                    GUI_SOURCES 
-                    PrismToolBarActions.cxx 
-                    PrismCore.cxx 
-                    PrismMenuActions.cxx 
-                    PrismDisplayProxyEditor.cxx 
+                    SERVER_MANAGER_XML PRISMServerManagerXML.xml
+                    GUI_INTERFACES ${TOOLBARIFACE} ${MENUBARIFACE} PrismDisplayPanels PrismObjectPanels
+                    SERVER_MANAGER_SOURCES vtkSMPrismCubeAxesRepresentationProxy.cxx vtkSMPrismDoubleRangeDomain.cxx
+                    GUI_SOURCES
+                    PrismToolBarActions.cxx
+                    PrismCore.cxx
+                    PrismMenuActions.cxx
+                    PrismDisplayProxyEditor.cxx
                     PrismCubeAxesEditorDialog.cxx
-                    PrismDisplayPanelsImplementation.cxx 
-                    PrismObjectPanelsImplementation.cxx 
-                    PrismSurfacePanel.cxx  
+                    PrismDisplayPanelsImplementation.cxx
+                    PrismObjectPanelsImplementation.cxx
+                    PrismSurfacePanel.cxx
                     PrismPanel.cxx
-                    ${PrismInstantiator_SRCS} 
-                    ${RCS_SOURCES} 
-                    ${MOC_SRCS} 
-                    ${TOOLBAR_IFACE_SRCS} 
+                    ${RCS_SOURCES}
+                    ${MOC_SRCS}
+                    ${TOOLBAR_IFACE_SRCS}
                     ${MENU_IFACE_SRCS}
                     ${UI_BUILT_SOURCES}
-    
+                    REQUIRED_ON_CLIENT
 )
-  
+
+IF (BUILD_TESTING)
+  SUBDIRS(Testing)
+ENDIF (BUILD_TESTING)
 
 ENDIF(QT4_FOUND)
-

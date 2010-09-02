@@ -35,20 +35,6 @@ vtkSMUniformGridParallelStrategy::~vtkSMUniformGridParallelStrategy()
 }
 
 //----------------------------------------------------------------------------
-void vtkSMUniformGridParallelStrategy::EndCreateVTKObjects()
-{
-  this->Superclass::EndCreateVTKObjects();
-
-  // Collect filter must be told the output data type since the data may not be
-  // available on all processess.
-  vtkSMPropertyHelper(this->Collect, "OutputDataType").Set(VTK_IMAGE_DATA);
-  this->Collect->UpdateVTKObjects();
-
-  vtkSMPropertyHelper(this->CollectLOD, "OutputDataType").Set(VTK_POLY_DATA);
-  this->CollectLOD->UpdateVTKObjects();
-}
-
-//----------------------------------------------------------------------------
 int vtkSMUniformGridParallelStrategy::GetMoveMode()
 {
   return vtkMPIMoveData::PASS_THROUGH;

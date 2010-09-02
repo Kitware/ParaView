@@ -20,31 +20,30 @@
 #ifndef __vtkPVGeometryFilter_h
 #define __vtkPVGeometryFilter_h
 
-#include "vtkPolyDataAlgorithm.h"
-class vtkAppendPolyData;
+#include "vtkDataObjectAlgorithm.h"
 class vtkCallbackCommand;
-class vtkDataObject;
 class vtkDataSet;
 class vtkDataSetSurfaceFilter;
 class vtkGenericDataSet;
 class vtkGenericGeometryFilter;
 class vtkHyperOctree;
 class vtkImageData;
+class vtkInformationIntegerVectorKey;
 class vtkInformationVector;
-class vtkCompositeDataSet;
 class vtkMultiProcessController;
 class vtkOutlineSource;
+class vtkPolyData;
 class vtkPVRecoverGeometryWireframe;
 class vtkRectilinearGrid;
 class vtkStructuredGrid;
 class vtkUnstructuredGrid;
 class vtkUnstructuredGridGeometryFilter;
 
-class VTK_EXPORT vtkPVGeometryFilter : public vtkPolyDataAlgorithm
+class VTK_EXPORT vtkPVGeometryFilter : public vtkDataObjectAlgorithm
 {
 public:
   static vtkPVGeometryFilter *New();
-  vtkTypeMacro(vtkPVGeometryFilter,vtkPolyDataAlgorithm);
+  vtkTypeMacro(vtkPVGeometryFilter,vtkDataObjectAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
@@ -95,38 +94,50 @@ public:
   vtkGetObjectMacro(Controller, vtkMultiProcessController);
 
   // Description:
-  // If on, the output polygonal dataset will have a celldata array that 
+  // If on, the output polygonal dataset will have a celldata array that
   // holds the cell index of the original 3D cell that produced each output
-  // cell. This is useful for picking. The default is off to conserve 
+  // cell. This is useful for picking. The default is off to conserve
   // memory.
   void SetPassThroughCellIds(int);
   vtkGetMacro(PassThroughCellIds,int);
   vtkBooleanMacro(PassThroughCellIds,int);
 
   // Description:
-  // If on, the output polygonal dataset will have a pointdata array that 
+  // If on, the output polygonal dataset will have a pointdata array that
   // holds the point index of the original vertex that produced each output
-  // vertex. This is useful for picking. The default is off to conserve 
+  // vertex. This is useful for picking. The default is off to conserve
   // memory.
   void SetPassThroughPointIds(int);
   vtkGetMacro(PassThroughPointIds,int);
   vtkBooleanMacro(PassThroughPointIds,int);
-  
+
   // Description:
-  // If off, which is the default, extracts the surface of the data fed 
-  // into the geometry filter. If on, it produces a bounding box for the 
+  // If off, which is the default, extracts the surface of the data fed
+  // into the geometry filter. If on, it produces a bounding box for the
   // input to the filter that is producing that data instead.
   vtkSetMacro(MakeOutlineOfInput,int);
   vtkGetMacro(MakeOutlineOfInput,int);
   vtkBooleanMacro(MakeOutlineOfInput,int);
 
+  // Description:
+  // These keys are put in the output composite-data metadata for multipieces
+  // since this filter merges multipieces together.
+  static vtkInformationIntegerVectorKey* POINT_OFFSETS();
+  static vtkInformationIntegerVectorKey* VERTS_OFFSETS();
+  static vtkInformationIntegerVectorKey* LINES_OFFSETS();
+  static vtkInformationIntegerVectorKey* POLYS_OFFSETS();
+  static vtkInformationIntegerVectorKey* STRIPS_OFFSETS();
 //BTX
 protected:
   vtkPVGeometryFilter();
   ~vtkPVGeometryFilter();
 
-  class vtkPolyDataVector;
-
+  // Description:
+  // Overridden to create vtkMultiBlockDataSet when input is a
+  // composite-dataset and vtkPolyData when input is a vtkDataSet.
+  virtual int RequestDataObject(vtkInformation*,
+                                vtkInformationVector**,
+                                vtkInformationVector*);
   virtual int RequestInformation(vtkInformation* request,
                                  vtkInformationVector** inputVector,
                                  vtkInformationVector* outputVector);
@@ -140,16 +151,16 @@ protected:
   // Create a default executive.
   virtual vtkExecutive* CreateDefaultExecutive();
 
-  void ExecuteBlock(vtkDataObject* input, 
-                    vtkPolyData* output, 
+  void ExecuteBlock(vtkDataObject* input,
+                    vtkPolyData* output,
                     int doCommunicate);
 
   void DataSetExecute(vtkDataSet* input, vtkPolyData* output,
                       int doCommunicate);
   void GenericDataSetExecute(vtkGenericDataSet* input, vtkPolyData* output,
                              int doCommunicate);
-  void ImageDataExecute(vtkImageData* input, 
-                        vtkPolyData* output, 
+  void ImageDataExecute(vtkImageData* input,
+                        vtkPolyData* output,
                         int doCommunicate);
   void StructuredGridExecute(vtkStructuredGrid* input, vtkPolyData* output);
   void RectilinearGridExecute(vtkRectilinearGrid* input, vtkPolyData* output);
@@ -160,10 +171,6 @@ protected:
   void OctreeExecute(
     vtkHyperOctree* input, vtkPolyData* output, int doCommunicate);
   void ExecuteCellNormals(vtkPolyData* output, int doCommunicate);
-  int ExecuteCompositeDataSet(vtkCompositeDataSet* mgInput, 
-                              vtkPolyDataVector &outputs,
-                              int& numInputs);
-
   void ChangeUseStripsInternal(int val, int force);
 
   int OutlineFlag;
@@ -178,10 +185,11 @@ protected:
   vtkGenericGeometryFilter *GenericGeometryFilter;
   vtkUnstructuredGridGeometryFilter *UnstructuredGridGeometryFilter;
   vtkPVRecoverGeometryWireframe *RecoverWireframeFilter;
-  
-  int CheckAttributes(vtkDataObject* input);
 
-  void FillPartialArrays(vtkPolyDataVector& inputs);
+  // Description:
+  // Call CheckAttributes on the \c input which ensures that all attribute
+  // arrays have valid lengths.
+  int CheckAttributes(vtkDataObject* input);
 
   // Callback registered with the InternalProgressObserver.
   static void InternalProgressCallbackFunction(vtkObject*, unsigned long,
@@ -218,13 +226,8 @@ private:
 
   void AddCompositeIndex(vtkPolyData* pd, unsigned int index);
   void AddHierarchicalIndex(vtkPolyData* pd, unsigned int level, unsigned int index);
-
-  unsigned int CompositeIndex;
-
   class BoundsReductionOperation;
 //ETX
 };
 
 #endif
-
-

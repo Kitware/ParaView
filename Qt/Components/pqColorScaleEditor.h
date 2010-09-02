@@ -84,6 +84,8 @@ private slots:
 
   void setColorSpace(int index);
 
+  void setNanColor(const QColor &color);
+
   void savePreset();
   void loadPreset();
 

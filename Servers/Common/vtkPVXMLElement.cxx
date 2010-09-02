@@ -662,3 +662,62 @@ void vtkPVXMLElement::Merge(vtkPVXMLElement* element, const char* attributeName)
     }
 }
 
+//----------------------------------------------------------------------------
+void vtkPVXMLElement::Copy(vtkPVXMLElement* other)
+{
+  other->SetName(GetName());
+  other->SetId(GetId());
+  other->Internal->AttributeNames = this->Internal->AttributeNames;
+  other->Internal->AttributeValues = this->Internal->AttributeValues;
+  other->AddCharacterData(this->Internal->CharacterData.c_str(),
+                          this->Internal->CharacterData.size());
+
+  // Copy recursivly
+  vtkPVXMLElementInternals::VectorOfElements::iterator iter;
+  for(iter = this->Internal->NestedElements.begin();
+      iter != this->Internal->NestedElements.end(); ++iter)
+    {
+    vtkSmartPointer<vtkPVXMLElement> newElement =
+        vtkSmartPointer<vtkPVXMLElement>::New();
+    (*iter)->Copy(newElement);
+    other->AddNestedElement(newElement);
+    }
+}
+
+//----------------------------------------------------------------------------
+bool vtkPVXMLElement::Equals(vtkPVXMLElement* other)
+{
+  if (this == other)
+    {
+    return true;
+    }
+  if (!other)
+    {
+    return false;
+    }
+  vtksys_ios::ostringstream selfstream;
+  vtksys_ios::ostringstream otherstream;
+  this->PrintXML(selfstream, vtkIndent());
+  other->PrintXML(otherstream, vtkIndent());
+  return (selfstream.str() == otherstream.str());
+}
+
+//----------------------------------------------------------------------------
+void vtkPVXMLElement::RemoveAttribute(const char* name)
+{
+  vtkstd::vector<vtkstd::string>::iterator nameIterator = this->Internal->AttributeNames.begin();
+  vtkstd::vector<vtkstd::string>::iterator valueIterator = this->Internal->AttributeValues.begin();
+  while(nameIterator != this->Internal->AttributeNames.end())
+    {
+    if(strcmp(nameIterator->c_str(), name) == 0)
+      {
+      this->Internal->AttributeNames.erase(nameIterator);
+      this->Internal->AttributeValues.erase(valueIterator);
+      return;
+      }
+    nameIterator++;
+    valueIterator++;
+    }
+}
+
+//----------------------------------------------------------------------------

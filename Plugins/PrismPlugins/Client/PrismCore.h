@@ -4,6 +4,7 @@
 #define _PrismCore_h
 #include <QObject>
 #include <QString>
+#include "vtkSmartPointer.h"
 class pqServerManagerModelItem;
 class pqPipelineSource;
 class pqServer;
@@ -12,6 +13,7 @@ class vtkObject;
 class vtkEventQtSlotConnect;
 class pqDataRepresentation;
 class QAction;
+class QActionGroup;
 
 class PrismCore : public QObject
 {
@@ -22,7 +24,7 @@ public:
 
    static PrismCore* instance();
 
-  void  actions(QList<QAction*>&);
+  void  createActions(QActionGroup*);
 
 public slots:
   void onSESAMEFileOpen();
@@ -42,11 +44,10 @@ private:
   pqServerManagerModelItem *getActiveObject() const;
   pqPipelineSource *getActiveSource() const;
   pqServer* getActiveServer() const;
-
  QAction *SesameViewAction;
  QAction *PrismViewAction;
 
- vtkEventQtSlotConnect* VTKConnections;
+ vtkSmartPointer<vtkEventQtSlotConnect> VTKConnections;
  bool ProcessingEvent;
 
 

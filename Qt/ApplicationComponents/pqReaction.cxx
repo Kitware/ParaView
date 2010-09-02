@@ -32,12 +32,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqReaction.h"
 
 //-----------------------------------------------------------------------------
-pqReaction::pqReaction(QAction* parentObject) : Superclass(parentObject)
+pqReaction::pqReaction(QAction* parentObject,Qt::ConnectionType type) : Superclass(parentObject)
 {
   Q_ASSERT(parentObject != NULL);
 
   QObject::connect(parentObject, SIGNAL(triggered(bool)),
-    this, SLOT(onTriggered()));
+    this, SLOT(onTriggered()),type);
 }
 
 //-----------------------------------------------------------------------------

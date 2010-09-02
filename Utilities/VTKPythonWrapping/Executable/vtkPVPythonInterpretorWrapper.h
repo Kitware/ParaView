@@ -49,6 +49,14 @@ struct vtkPVPythonInterpretorWrapper
       }
     }
 
+  void Flush()
+    {
+    if (this->Interpretor)
+      {
+      this->Interpretor->FlushMessages();
+      }
+    }
+
   vtkStdString Read()
     {
     vtkStdString ret;
@@ -62,11 +70,13 @@ struct vtkPVPythonInterpretorWrapper
 
 static PyObject* vtkWrite(PyObject* self, PyObject* args);
 static PyObject* vtkRead(PyObject* self, PyObject* args);
+static PyObject* vtkFlush(PyObject* self, PyObject* args);
 
 // const_cast since older versions of python are not const correct.
 static PyMethodDef vtkPVPythonInterpretorWrapperMethods[] = {
     {const_cast<char*>("write"), vtkWrite, METH_VARARGS, const_cast<char*>("Dump message")},
     {const_cast<char*>("readline"), vtkRead, METH_VARARGS, const_cast<char*>("Read input line")},
+    {const_cast<char*>("flush"), vtkFlush, METH_VARARGS, const_cast<char*>("Flush")},
     {0, 0, 0, 0}
 };
 
@@ -171,6 +181,23 @@ static PyObject* vtkRead(PyObject* self, PyObject* args)
     ret = wrapper->Read();
     }
   return Py_BuildValue(const_cast<char*>("s"), const_cast<char*>(ret.c_str()));
+}
+
+static PyObject* vtkFlush(PyObject* self, PyObject* args)
+{
+  (void)args;
+  if(!self || !PyObject_TypeCheck(self, &vtkPVPythonInterpretorWrapperType))
+    {
+    return 0;
+    }
+
+  vtkPVPythonInterpretorWrapper* wrapper =
+    reinterpret_cast<vtkPVPythonInterpretorWrapper*>(self);
+  if (wrapper)
+    {
+    wrapper->Flush();
+    }
+  return Py_BuildValue(const_cast<char*>(""));
 }
 
 static vtkPVPythonInterpretorWrapper* vtkWrapInterpretor(vtkPVPythonInterpretor* interpretor)

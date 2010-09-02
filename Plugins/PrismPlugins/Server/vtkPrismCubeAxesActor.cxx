@@ -1,16 +1,16 @@
 /*=========================================================================
 
-  Program:   Prism 
+  Program:   Prism
   Module:    vtkPrismCubeAxesActor.cxx
-  Thanks:    Kathleen Bonnell, B Division, Lawrence Livermore Nat'l Laboratory 
+  Thanks:    Kathleen Bonnell, B Division, Lawrence Livermore Nat'l Laboratory
   This class is largely based on vtkPrismCubeAxisActor
 
-Copyright (c) 1993-2001 Ken Martin, Will Schroeder, Bill Lorensen 
-All rights reserve  
+Copyright (c) 1993-2001 Ken Martin, Will Schroeder, Bill Lorensen
+All rights reserve
   See Copyright.txt or http://www.kitware.com/Copyright.htm for details.
 
-     This software is distributed WITHOUT ANY WARRANTY; without even 
-     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR 
+     This software is distributed WITHOUT ANY WARRANTY; without even
+     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
      PURPOSE.  See the above copyright notice for more information.
 =========================================================================*/
 #include "vtkPrismCubeAxesActor.h"
@@ -28,7 +28,7 @@ All rights reserve
 // *************************************************************************
 // Modifications:
 //   Kathleen Bonnell, Wed Mar  6 13:48:48 PST 2002
-//   Replace 'New' method with Macro to match VTK 4.0 API. 
+//   Replace 'New' method with Macro to match VTK 4.0 API.
 //
 // *************************************************************************
 
@@ -43,21 +43,21 @@ vtkCxxSetObjectMacro(vtkPrismCubeAxesActor, Camera,vtkCamera);
 //   Intialize new members lastPow, last*AxisDigits.
 //
 //   Kathleen Bonnell, Wed Nov  7 16:19:16 PST 2001
-//   Intialize new members:  Last*Extent, LastFlyMode, 
+//   Intialize new members:  Last*Extent, LastFlyMode,
 //   renderAxes*, numAxes*.
 //
 //   Hank Childs, Fri Sep 27 17:15:07 PDT 2002
 //   Initialize new members for units.
 //
-//   Kathleen Bonnell, Fri Jul 25 14:37:32 PDT 2003 
+//   Kathleen Bonnell, Fri Jul 25 14:37:32 PDT 2003
 //   Remove 'Input' and 'Prop' members, initialize new members
 //   valueScaleFactor, mustAdjustValue, ForceLabelReset.
 //
-//   Kathleen Bonnell, Wed Aug  6 13:59:15 PDT 2003 
+//   Kathleen Bonnell, Wed Aug  6 13:59:15 PDT 2003
 //   Remove valueScaleFactor, replace mustAdjustValue and ForceLabelReset
 //   with one for each axis type.
 //
-//   Kathleen Bonnell, Tue Dec 16 11:27:30 PST 2003 
+//   Kathleen Bonnell, Tue Dec 16 11:27:30 PST 2003
 //   Replace Last*Extent with Last*Range.  (* = X, Y, Z)
 //   Add AutoLabelScaling, UserXPow, UserYPow, UserZPow.
 //
@@ -77,7 +77,7 @@ vtkPrismCubeAxesActor::vtkPrismCubeAxesActor()
   this->LabelRanges[0] = -1.0; this->LabelRanges[1] = 1.0;
   this->LabelRanges[2] = -1.0; this->LabelRanges[3] = 1.0;
   this->LabelRanges[4] = -1.0; this->LabelRanges[5] = 1.0;
-  
+
   this->TickLocation = VTK_TICKS_INSIDE;
   this->Camera = NULL;
   this->FlyMode = VTK_FLY_CLOSEST_TRIAD;
@@ -109,11 +109,11 @@ vtkPrismCubeAxesActor::vtkPrismCubeAxesActor()
     this->ZAxes[i]->SetAxisPosition(i);
     }
 
-  this->XLabelFormat = new char[8]; 
+  this->XLabelFormat = new char[8];
   sprintf(this->XLabelFormat, "%s", "%-#6.3g");
   this->YLabelFormat = new char[8];
   sprintf(this->YLabelFormat, "%s", "%-#6.3g");
-  this->ZLabelFormat = new char[8]; 
+  this->ZLabelFormat = new char[8];
   sprintf(this->ZLabelFormat, "%s", "%-#6.3g");
   this->CornerOffset = 0.0;
   this->Inertia = 1;
@@ -199,11 +199,11 @@ vtkPrismCubeAxesActor::vtkPrismCubeAxesActor()
 //   Kathleen Bonnell, Wed Mar  6 13:48:48 PST 2002
 //   Call superclass method the new VTK 4.0 way.
 //
-//   Kathleen Bonnell, Fri Jul 25 14:37:32 PDT 2003 
+//   Kathleen Bonnell, Fri Jul 25 14:37:32 PDT 2003
 //   Remove 'Input' and 'Prop' members, added new members
 //   valueScaleFactor, mustAdjustValue, ForceLabelReset.
 //
-//   Kathleen Bonnell, Wed Aug  6 13:59:15 PDT 2003 
+//   Kathleen Bonnell, Wed Aug  6 13:59:15 PDT 2003
 //   Remove valueScaleFactor, replace mustAdjustValue and ForceLabelReset
 //   with one for each axis type.
 //
@@ -248,36 +248,36 @@ vtkPrismCubeAxesActor::~vtkPrismCubeAxesActor()
   this->SetCamera(NULL);
   for (int i = 0; i < 4; i++)
     {
-    if (this->XAxes[i]) 
+    if (this->XAxes[i])
       {
       this->XAxes[i]->Delete();
       this->XAxes[i] = NULL;
       }
-    if (this->YAxes[i]) 
+    if (this->YAxes[i])
       {
       this->YAxes[i]->Delete();
       this->YAxes[i] = NULL;
       }
-    if (this->ZAxes[i]) 
+    if (this->ZAxes[i])
       {
       this->ZAxes[i]->Delete();
       this->ZAxes[i] = NULL;
       }
     }
 
-  if (this->XLabelFormat) 
+  if (this->XLabelFormat)
     {
     delete [] this->XLabelFormat;
     this->XLabelFormat = NULL;
     }
 
-  if (this->YLabelFormat) 
+  if (this->YLabelFormat)
     {
     delete [] this->YLabelFormat;
     this->YLabelFormat = NULL;
     }
 
-  if (this->ZLabelFormat) 
+  if (this->ZLabelFormat)
     {
     delete [] this->ZLabelFormat;
     this->ZLabelFormat = NULL;
@@ -334,26 +334,26 @@ vtkPrismCubeAxesActor::~vtkPrismCubeAxesActor()
 
 // *************************************************************************
 // Project the bounding box and compute edges on the border of the bounding
-// cube. Determine which parts of the edges are visible via intersection 
+// cube. Determine which parts of the edges are visible via intersection
 // with the boundary of the viewport (minus borders).
 //
 //  Modifications:
 //    Kathleen Bonnell, Wed Oct 31 07:57:49 PST 2001
-//    Added calls to AdjustValues, AdjustRange. 
+//    Added calls to AdjustValues, AdjustRange.
 //
 //   Kathleen Bonnell, Wed Nov  7 16:19:16 PST 2001
-//   Only render those axes needed for current FlyMode.  
+//   Only render those axes needed for current FlyMode.
 //   Moved bulk of 'build' code to BuildAxes method, added calls to
 //   BuildAxes and DetermineRenderAxes methods.
 //
-//   Kathleen Bonnell, Fri Jul 25 14:37:32 PDT 2003 
-//   Added initial build of each axis. 
+//   Kathleen Bonnell, Fri Jul 25 14:37:32 PDT 2003
+//   Added initial build of each axis.
 // *************************************************************************
 
 int vtkPrismCubeAxesActor::RenderOpaqueGeometry(vtkViewport *viewport)
 {
   int i, renderedSomething=0;
-  static bool initialRender = true; 
+  static bool initialRender = true;
   // Initialization
   if (!this->Camera)
     {
@@ -361,8 +361,8 @@ int vtkPrismCubeAxesActor::RenderOpaqueGeometry(vtkViewport *viewport)
     this->RenderSomething = 0;
     return 0;
     }
- 
-  this->BuildAxes(viewport); 
+
+  this->BuildAxes(viewport);
 
   if (initialRender)
     {
@@ -375,7 +375,7 @@ int vtkPrismCubeAxesActor::RenderOpaqueGeometry(vtkViewport *viewport)
     }
   initialRender = false;
 
-  this->DetermineRenderAxes(viewport); 
+  this->DetermineRenderAxes(viewport);
 
   //Render the axes
   if (this->XAxisVisibility)
@@ -408,9 +408,9 @@ int vtkPrismCubeAxesActor::RenderOpaqueGeometry(vtkViewport *viewport)
 }
 
 // Do final adjustment of axes to control offset, etc.
-void vtkPrismCubeAxesActor::AdjustAxes(double bounds[6], double xCoords[4][6], 
+void vtkPrismCubeAxesActor::AdjustAxes(double bounds[6], double xCoords[4][6],
                                   double yCoords[4][6], double zCoords[4][6],
-                                  double xRange[2], double yRange[2], 
+                                  double xRange[2], double yRange[2],
                                   double zRange[2])
 {
   xRange[0] = bounds[0];
@@ -498,23 +498,23 @@ void vtkPrismCubeAxesActor::ReleaseGraphicsResources(vtkWindow *win)
 
 // *************************************************************************
 // Compute the bounds
-// 
+//
 // Modifications:
-//   Kathleen Bonnell, Fri Jul 25 14:37:32 PDT 2003 
-//   Removed support for Prop and Input. 
+//   Kathleen Bonnell, Fri Jul 25 14:37:32 PDT 2003
+//   Removed support for Prop and Input.
 // *************************************************************************
 void vtkPrismCubeAxesActor::GetBounds(double bounds[6])
 {
-   
+
     for (int i=0; i< 6; i++)
     {
         bounds[i] = this->Bounds[i];
     }
-   
+
 }
 
 // Compute the bounds
-void vtkPrismCubeAxesActor::GetBounds(double& xmin, double& xmax, 
+void vtkPrismCubeAxesActor::GetBounds(double& xmin, double& xmax,
                                  double& ymin, double& ymax,
                                  double& zmin, double& zmax)
 {
@@ -545,11 +545,11 @@ void vtkPrismCubeAxesActor::GetLabelRanges(double ranges[6])
 }
 
 // Compute the bounds
-void vtkPrismCubeAxesActor::GetLabelRanges(double& xmin, double& xmax, 
+void vtkPrismCubeAxesActor::GetLabelRanges(double& xmin, double& xmax,
                                  double& ymin, double& ymax,
                                  double& zmin, double& zmax)
 {
-  
+
 
   xmin = this->LabelRanges[0];
   xmax = this->LabelRanges[1];
@@ -569,7 +569,7 @@ double *vtkPrismCubeAxesActor::GetLabelRanges()
 //   Kathleen Bonnell, Wed Mar  6 13:48:48 PST 2002
 //   Call superclass method the new VTK 4.0 way.
 //
-//   Kathleen Bonnell, Fri Jul 25 14:37:32 PDT 2003 
+//   Kathleen Bonnell, Fri Jul 25 14:37:32 PDT 2003
 //   Removed Input and Prop.
 //
 // ******************************************************************
@@ -579,11 +579,11 @@ void vtkPrismCubeAxesActor::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os,indent);
 
   os << indent << "Bounds: \n";
-  os << indent << "  Xmin,Xmax: (" << this->Bounds[0] << ", " 
+  os << indent << "  Xmin,Xmax: (" << this->Bounds[0] << ", "
      << this->Bounds[1] << ")\n";
-  os << indent << "  Ymin,Ymax: (" << this->Bounds[2] << ", " 
+  os << indent << "  Ymin,Ymax: (" << this->Bounds[2] << ", "
      << this->Bounds[3] << ")\n";
-  os << indent << "  Zmin,Zmax: (" << this->Bounds[4] << ", " 
+  os << indent << "  Zmin,Zmax: (" << this->Bounds[4] << ", "
      << this->Bounds[5] << ")\n";
 
   if (this->Camera)
@@ -612,7 +612,7 @@ void vtkPrismCubeAxesActor::PrintSelf(ostream& os, vtkIndent indent)
     {
     os << indent << "Fly Mode: STATIC_EDGES\n";
     }
-  else 
+  else
     {
     os << indent << "Fly Mode: OUTER_EDGES\n";
     }
@@ -621,11 +621,11 @@ void vtkPrismCubeAxesActor::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "Y Axis Title: " << this->YTitle << "\n";
   os << indent << "Z Axis Title: " << this->ZTitle << "\n";
 
-  os << indent << "X Axis Visibility: " 
+  os << indent << "X Axis Visibility: "
      << (this->XAxisVisibility ? "On\n" : "Off\n");
-  os << indent << "Y Axis Visibility: " 
+  os << indent << "Y Axis Visibility: "
      << (this->YAxisVisibility ? "On\n" : "Off\n");
-  os << indent << "Z Axis Visibility: " 
+  os << indent << "Z Axis Visibility: "
      << (this->ZAxisVisibility ? "On\n" : "Off\n");
 
   os << indent << "X Axis Label Format: " << this->XLabelFormat << "\n";
@@ -669,8 +669,8 @@ void vtkPrismCubeAxesActor::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "DrawZGridlines: " << this->DrawZGridlines << endl;
 }
 
-void vtkPrismCubeAxesActor::TransformBounds(vtkViewport *viewport, 
-                                       const double bounds[6], 
+void vtkPrismCubeAxesActor::TransformBounds(vtkViewport *viewport,
+                                       const double bounds[6],
                                        double pts[8][3])
 {
   int i, j, k, idx;
@@ -707,13 +707,13 @@ void vtkPrismCubeAxesActor::TransformBounds(vtkViewport *viewport,
 //    Kathleen Bonnell, Wed Nov  7 16:19:16 PST 2001
 //    Added logic for early-termination.
 //
-//    Kathleen Bonnell, Fri Jul 18 09:09:31 PDT 2003 
+//    Kathleen Bonnell, Fri Jul 18 09:09:31 PDT 2003
 //    Added return value, added calls to AdjustTicksComputeRange and
-//    BuildLabels. 
+//    BuildLabels.
 //
-//    Kathleen Bonnell, Mon Dec 15 14:59:26 PST 2003 
+//    Kathleen Bonnell, Mon Dec 15 14:59:26 PST 2003
 //    Use the actual range values instead of range-extents to determine
-//    if tick size needs to be recomputed. 
+//    if tick size needs to be recomputed.
 //
 // ***********************************************************************
 
@@ -821,26 +821,26 @@ bool vtkPrismCubeAxesActor::ComputeTickSize(double bounds[6],double ranges[6])
 //  Creation:   July 11, 2000
 //
 //  Modifications:
-//    Kathleen Bonnell, Wed Oct 31 07:57:49 PST 2001 
-//    Regardless of individual ranges, if any coord direction has too 
-//    small/large a range, all will have a scale factor set for scaling their 
-//    label values, and their titles adjusted accordingly. 
+//    Kathleen Bonnell, Wed Oct 31 07:57:49 PST 2001
+//    Regardless of individual ranges, if any coord direction has too
+//    small/large a range, all will have a scale factor set for scaling their
+//    label values, and their titles adjusted accordingly.
 //
-//    Kathleen Bonnell, Thu Sep  5 17:32:16 PDT 2002 
-//    Only use dimensions with range > 0 for determining scale factor. 
-//    
+//    Kathleen Bonnell, Thu Sep  5 17:32:16 PDT 2002
+//    Only use dimensions with range > 0 for determining scale factor.
+//
 //    Hank Childs, Fri Sep 27 17:15:07 PDT 2002
 //    Account for units.
 //
 //    Kathleen Bonnell, Wed Aug  6 13:59:15 PDT 2003
 //    Each axis type now has its own 'mustAdjustValue' and 'lastPow'.
 //
-//    Kathleen Bonnell, Tue Dec 16 11:23:31 PST 2003 
+//    Kathleen Bonnell, Tue Dec 16 11:23:31 PST 2003
 //    Allow the LabelExponent to be user-settable (autLabelScaling is off).
-//    For title use '10e' instead of just 'e' to designate that exponent 
+//    For title use '10e' instead of just 'e' to designate that exponent
 //    has been used.
 //
-//    Kathleen Bonnell, Tue Jul 20 11:41:45 PDT 2004 
+//    Kathleen Bonnell, Tue Jul 20 11:41:45 PDT 2004
 //    For title use 'x10^' instead of '10e' to designate that exponent.
 //
 //    Brad Whitlock, Fri Jul 23 18:27:30 PST 2004
@@ -860,7 +860,7 @@ void vtkPrismCubeAxesActor::AdjustValues(const double rngs[6])
     yPow = this->LabelExponent(rngs[2], rngs[3]);
     zPow = this->LabelExponent(rngs[4], rngs[5]);
     }
-  else 
+  else
     {
     xPow = UserXPow;
     yPow = UserYPow;
@@ -868,7 +868,7 @@ void vtkPrismCubeAxesActor::AdjustValues(const double rngs[6])
     }
 
   if (xPow != 0)
-    { 
+    {
     if (!this->MustAdjustXValue || this->LastXPow != xPow)
       {
       this->ForceXLabelReset = true;
@@ -888,8 +888,8 @@ void vtkPrismCubeAxesActor::AdjustValues(const double rngs[6])
       sprintf(xTitle, "%s (x10^%d %s)", this->XTitle, xPow, XUnits);
       }
     }
-  else 
-    { 
+  else
+    {
     if (this->MustAdjustXValue)
       {
       this->Modified();
@@ -932,8 +932,8 @@ void vtkPrismCubeAxesActor::AdjustValues(const double rngs[6])
       sprintf(yTitle, "%s (x10^%d %s)", this->YTitle, yPow, YUnits);
       }
     }
-  else 
-    { 
+  else
+    {
     if (this->MustAdjustYValue)
       {
       this->Modified();
@@ -956,7 +956,7 @@ void vtkPrismCubeAxesActor::AdjustValues(const double rngs[6])
 
   char zTitle[64];
   if (zPow != 0)
-    { 
+    {
     if (!this->MustAdjustZValue || this->LastZPow != zPow)
       {
       this->ForceZLabelReset = true;
@@ -976,8 +976,8 @@ void vtkPrismCubeAxesActor::AdjustValues(const double rngs[6])
       sprintf(zTitle, "%s (x10^%d %s)", this->ZTitle, zPow, ZUnits);
       }
     }
-  else 
-    { 
+  else
+    {
     if (this->MustAdjustZValue)
       {
       this->Modified();
@@ -1022,13 +1022,13 @@ void vtkPrismCubeAxesActor::AdjustValues(const double rngs[6])
 //  Creation:   July 11, 2000
 //
 //  Modifications:
-//    Kathleen Bonnell, Wed Oct 31 07:57:49 PST 2001 
+//    Kathleen Bonnell, Wed Oct 31 07:57:49 PST 2001
 //    Moved from VisWinAxes3D.
 //
-//    Kathleen Bonnell, Thu Aug  1 14:05:05 PDT 2002 
-//    Send lastPos as argument to Digits. 
+//    Kathleen Bonnell, Thu Aug  1 14:05:05 PDT 2002
+//    Send lastPos as argument to Digits.
 //
-//    Kathleen Bonnell, Wed Aug  6 13:59:15 PDT 2003 
+//    Kathleen Bonnell, Wed Aug  6 13:59:15 PDT 2003
 //    Adjust the range values using LastXPow, LastYPow, LastZPow.
 //
 // ****************************************************************************
@@ -1107,17 +1107,17 @@ void vtkPrismCubeAxesActor::AdjustRange(const double rngs[6])
 //    Hank Childs, Tue Sep 18 11:58:33 PDT 2001
 //    Cast ipow10 to get rid of compiler warning.
 //
-//    Kathleen Bonnell, Wed Oct 31 07:57:49 PST 2001 
+//    Kathleen Bonnell, Wed Oct 31 07:57:49 PST 2001
 //    Moved from VisWinAxes3D.
 //
-//    Kathleen Bonnell, Thu Aug  1 13:44:02 PDT 2002 
+//    Kathleen Bonnell, Thu Aug  1 13:44:02 PDT 2002
 //    Added lastPow argument, it specifies whether or not scientific notation
 //    is being used on the labels.
 //
 //    Kathleen Bonnell, Wed Aug  6 13:59:15 PDT 2003
 //    Removed lastPow argment, as the adjustment necessary is now taking
-//    place in AdjustRange. 
-//    
+//    place in AdjustRange.
+//
 // ****************************************************************************
 
 int vtkPrismCubeAxesActor::Digits(double min, double max )
@@ -1127,7 +1127,7 @@ int vtkPrismCubeAxesActor::Digits(double min, double max )
   int    ipow10  = static_cast<int>(floor(pow10));
   int    digitsPastDecimal = -ipow10;
 
-  if (digitsPastDecimal < 0) 
+  if (digitsPastDecimal < 0)
     {
     //
     // The range is more than 10, but not so big we need scientific
@@ -1139,7 +1139,7 @@ int vtkPrismCubeAxesActor::Digits(double min, double max )
     {
     //
     // We want one more than the range since there is more than one
-    // tick per decade.  
+    // tick per decade.
     //
     digitsPastDecimal++;
 
@@ -1180,10 +1180,10 @@ int vtkPrismCubeAxesActor::Digits(double min, double max )
 //    Hank Childs, Tue Sep 18 11:58:33 PDT 2001
 //    Cast return value to get rid of compiler warning.
 //
-//    Kathleen Bonnell, Wed Oct 31 07:57:49 PST 2001 
+//    Kathleen Bonnell, Wed Oct 31 07:57:49 PST 2001
 //    Moved from VisWinAxes3D.
 //
-//    Kathleen Bonnell, Wed Aug  6 13:59:15 PDT 2003 
+//    Kathleen Bonnell, Wed Aug  6 13:59:15 PDT 2003
 //    Added test for min==max.
 //
 // ****************************************************************************
@@ -1228,9 +1228,9 @@ int vtkPrismCubeAxesActor::LabelExponent(double min, double max)
 }
 
 // *************************************************************************
-//  Build the axes. Determine coordinates, position, etc. 
+//  Build the axes. Determine coordinates, position, etc.
 //
-//  Note:  Bulk of code moved here from RenderOpaqueGeomtry.  
+//  Note:  Bulk of code moved here from RenderOpaqueGeomtry.
 //         Early-termination test added.
 //
 //  Programmer:  Kathleen Bonnell
@@ -1241,10 +1241,10 @@ int vtkPrismCubeAxesActor::LabelExponent(double min, double max)
 //    Compare vtkTimeStamps correctly.
 //
 //    Kathleen Bonnell, Fri Jul 25 14:37:32 PDT 2003
-//    Added logic to compute and set for each axis the labels and title 
-//    scale size. 
+//    Added logic to compute and set for each axis the labels and title
+//    scale size.
 //
-//    Kathleen Bonnell, Wed Aug  6 13:59:15 PDT 2003 
+//    Kathleen Bonnell, Wed Aug  6 13:59:15 PDT 2003
 //    Indivdual axes now have their own ForceLabelReset.
 //
 // *************************************************************************
@@ -1252,9 +1252,9 @@ int vtkPrismCubeAxesActor::LabelExponent(double min, double max)
 void vtkPrismCubeAxesActor::BuildAxes(vtkViewport *viewport)
 {
   double pts[8][3];
-  int i; 
+  int i;
 
-  if ((this->GetMTime() < this->BuildTime.GetMTime())) 
+  if ((this->GetMTime() < this->BuildTime.GetMTime()))
     {
     return;
     }
@@ -1297,37 +1297,64 @@ void vtkPrismCubeAxesActor::BuildAxes(vtkViewport *viewport)
     }
 
 
-  // adjust for sci. notation if necessary 
+  // adjust for sci. notation if necessary
   // May set a flag for each axis specifying that label values should
   // be scaled, may change title of each axis, may change label format.
   this->AdjustValues(this->LabelRanges);
   this->AdjustRange(this->LabelRanges);
 
-  // Prepare axes for rendering with user-definable options 
+  // Prepare axes for rendering with user-definable options
   for (i = 0; i < 4; i++)
     {
-    this->XAxes[i]->GetPoint1Coordinate()->SetValue(xCoords[i][0], 
+    this->XAxes[i]->GetPoint1Coordinate()->SetValue(xCoords[i][0],
                                                     xCoords[i][1],
                                                     xCoords[i][2]);
-    this->XAxes[i]->GetPoint2Coordinate()->SetValue(xCoords[i][3], 
+    this->XAxes[i]->GetPoint2Coordinate()->SetValue(xCoords[i][3],
                                                     xCoords[i][4],
                                                     xCoords[i][5]);
-    this->YAxes[i]->GetPoint1Coordinate()->SetValue(yCoords[i][0], 
+    this->YAxes[i]->GetPoint1Coordinate()->SetValue(yCoords[i][0],
                                                     yCoords[i][1],
                                                     yCoords[i][2]);
-    this->YAxes[i]->GetPoint2Coordinate()->SetValue(yCoords[i][3], 
+    this->YAxes[i]->GetPoint2Coordinate()->SetValue(yCoords[i][3],
                                                     yCoords[i][4],
                                                     yCoords[i][5]);
-    this->ZAxes[i]->GetPoint1Coordinate()->SetValue(zCoords[i][0], 
+    this->ZAxes[i]->GetPoint1Coordinate()->SetValue(zCoords[i][0],
                                                     zCoords[i][1],
                                                     zCoords[i][2]);
-    this->ZAxes[i]->GetPoint2Coordinate()->SetValue(zCoords[i][3], 
+    this->ZAxes[i]->GetPoint2Coordinate()->SetValue(zCoords[i][3],
                                                     zCoords[i][4],
                                                     zCoords[i][5]);
 
     this->XAxes[i]->SetRange(this->LabelRanges[0], this->LabelRanges[1]);
     this->YAxes[i]->SetRange(this->LabelRanges[2], this->LabelRanges[3]);
     this->ZAxes[i]->SetRange(this->LabelRanges[4], this->LabelRanges[5]);
+//TO DO:
+//The following is a workaround to overcome a problem with the vtkAxisActor
+//The vtkAxisActor doesn't rebuild the tick marks when the range is changed.
+//only when the bounds are changed.
+//So to work around this we set the bounds to bogus values and back to the original values
+//to force a rebuild of the tick marks.
+    double originalBounds[6];
+    double fakeBounds[6];
+    fakeBounds[0]=0;
+    fakeBounds[1]=0;
+    fakeBounds[2]=0;
+    fakeBounds[3]=0;
+    fakeBounds[4]=0;
+    fakeBounds[5]=0;
+
+    this->XAxes[i]->GetBounds(originalBounds);
+    this->XAxes[i]->SetBounds(fakeBounds);
+    this->XAxes[i]->SetBounds(originalBounds);
+
+    this->YAxes[i]->GetBounds(originalBounds);
+    this->YAxes[i]->SetBounds(fakeBounds);
+    this->YAxes[i]->SetBounds(originalBounds);
+
+    this->ZAxes[i]->GetBounds(originalBounds);
+    this->ZAxes[i]->SetBounds(fakeBounds);
+    this->ZAxes[i]->SetBounds(originalBounds);
+//To Here
 
     this->XAxes[i]->SetTitle(this->ActualXLabel);
     this->YAxes[i]->SetTitle(this->ActualYLabel);
@@ -1339,7 +1366,7 @@ void vtkPrismCubeAxesActor::BuildAxes(vtkViewport *viewport)
   //
   // Labels are built during ComputeTickSize. if
   // ticks were not recomputed, but we need a label
-  // reset, then build the labels here. 
+  // reset, then build the labels here.
   //
   if (!ticksRecomputed)
     {
@@ -1360,8 +1387,8 @@ void vtkPrismCubeAxesActor::BuildAxes(vtkViewport *viewport)
   if (ticksRecomputed || this->ForceXLabelReset || this->ForceYLabelReset ||
       this->ForceZLabelReset)
     {
-    // labels were re-built, need to recompute the scale. 
-    double center[3]; 
+    // labels were re-built, need to recompute the scale.
+    double center[3];
 
     center[0] = (this->Bounds[1] - this->Bounds[0]) * 0.5;
     center[1] = (this->Bounds[3] - this->Bounds[2]) * 0.5;
@@ -1418,8 +1445,8 @@ void vtkPrismCubeAxesActor::BuildAxes(vtkViewport *viewport)
 }
 
 // *************************************************************************
-//  Sends attributes to each vtkAxisActor.  Only sets those that are 
-//  not dependent upon viewport changes, and thus do not need to be set 
+//  Sends attributes to each vtkAxisActor.  Only sets those that are
+//  not dependent upon viewport changes, and thus do not need to be set
 //  very often.
 //
 //  Programmer:  Kathleen Bonnell
@@ -1479,7 +1506,7 @@ void vtkPrismCubeAxesActor::SetNonDependentAttributes()
 
 enum {mm = 0, mX, XX, Xm };
 //
-// For CLOSEST_TRIAD, and FURTHEST_TRIAD, this variable determines 
+// For CLOSEST_TRIAD, and FURTHEST_TRIAD, this variable determines
 // which locations in the cube each 'Major' axis should take.
 //
 static int vtkPrismCubeAxesActorTriads[8][3] = {
@@ -1495,9 +1522,9 @@ static int vtkPrismCubeAxesActorConn[8][3] = {{1,2,4}, {0,3,5}, {3,0,6}, {2,1,7}
 //
 // Programmer:  Kathleen Bonnell
 // Creation:    November 7, 2001
-// 
+//
 // Modifications:
-//   Kathleen Bonnell, Thu Jul 18 10:33:07 PDT 2002  
+//   Kathleen Bonnell, Thu Jul 18 10:33:07 PDT 2002
 //   Ensure that primary axes visibility flags are set properly, and
 //   that secondary axes visibility flags are turned off.
 // *************************************************************************
@@ -1513,56 +1540,56 @@ void vtkPrismCubeAxesActor::DetermineRenderAxes(vtkViewport *viewport)
     {
     for (i = 0; i < 4; i++)
       {
-      this->RenderAxesX[i] = i; 
-      this->RenderAxesY[i] = i; 
-      this->RenderAxesZ[i] = i; 
+      this->RenderAxesX[i] = i;
+      this->RenderAxesY[i] = i;
+      this->RenderAxesZ[i] = i;
       }
     this->NumberOfAxesX = this->NumberOfAxesY = this->NumberOfAxesZ = 4;
     return;
     }
-  if (this->FlyMode == VTK_FLY_STATIC_TRIAD) 
+  if (this->FlyMode == VTK_FLY_STATIC_TRIAD)
     {
-    this->RenderAxesX[0] = 0; 
-    this->RenderAxesY[0] = 0; 
-    this->RenderAxesZ[0] = 0; 
+    this->RenderAxesX[0] = 0;
+    this->RenderAxesY[0] = 0;
+    this->RenderAxesZ[0] = 0;
     if (this->DrawXGridlines)
       {
-      this->RenderAxesX[1] = 2; 
-      this->NumberOfAxesX = 2; 
+      this->RenderAxesX[1] = 2;
+      this->NumberOfAxesX = 2;
       this->XAxes[RenderAxesX[1]]->SetTickVisibility(0);
       this->XAxes[RenderAxesX[1]]->SetLabelVisibility(0);
       this->XAxes[RenderAxesX[1]]->SetTitleVisibility(0);
       this->XAxes[RenderAxesX[1]]->SetMinorTicksVisible(0);
       }
-    else 
+    else
       {
-      this->NumberOfAxesX = 1; 
+      this->NumberOfAxesX = 1;
       }
     if (this->DrawYGridlines)
       {
-      this->RenderAxesY[1] = 2; 
-      this->NumberOfAxesY = 2; 
+      this->RenderAxesY[1] = 2;
+      this->NumberOfAxesY = 2;
       this->YAxes[RenderAxesY[1]]->SetTickVisibility(0);
       this->YAxes[RenderAxesY[1]]->SetLabelVisibility(0);
       this->YAxes[RenderAxesY[1]]->SetTitleVisibility(0);
       this->YAxes[RenderAxesY[1]]->SetMinorTicksVisible(0);
       }
-    else 
+    else
       {
-      this->NumberOfAxesY = 1; 
+      this->NumberOfAxesY = 1;
       }
     if (this->DrawZGridlines)
       {
-      this->RenderAxesZ[1] = 2; 
-      this->NumberOfAxesZ = 2; 
+      this->RenderAxesZ[1] = 2;
+      this->NumberOfAxesZ = 2;
       this->ZAxes[RenderAxesZ[1]]->SetTickVisibility(0);
       this->ZAxes[RenderAxesZ[1]]->SetLabelVisibility(0);
       this->ZAxes[RenderAxesZ[1]]->SetTitleVisibility(0);
       this->ZAxes[RenderAxesZ[1]]->SetMinorTicksVisible(0);
       }
-    else 
+    else
       {
-      this->NumberOfAxesZ = 1; 
+      this->NumberOfAxesZ = 1;
       }
     return;
     }
@@ -1624,7 +1651,7 @@ void vtkPrismCubeAxesActor::DetermineRenderAxes(vtkViewport *viewport)
           }
         }
 
-      // find minimum slope point connected to closest point and on 
+      // find minimum slope point connected to closest point and on
       // right side (in projected coordinates). This is the first edge.
       minSlope = VTK_LARGE_FLOAT;
       for (xIdx=0, i=0; i<3; i++)
@@ -1666,7 +1693,7 @@ void vtkPrismCubeAxesActor::DetermineRenderAxes(vtkViewport *viewport)
         yAxes = (xAxes + 2) % 3;
         }
 
-      // Find the final point by determining which global x-y-z axes have not 
+      // Find the final point by determining which global x-y-z axes have not
       // been represented, and then determine the point closest to the viewer.
       zAxes = (xAxes != 0 && yAxes != 0 ? 0 :
               (xAxes != 1 && yAxes != 1 ? 1 : 2));
@@ -1738,48 +1765,48 @@ void vtkPrismCubeAxesActor::DetermineRenderAxes(vtkViewport *viewport)
 
   this->RenderAxesX[0] = xloc % 4;
   if (this->DrawXGridlines)
-    { 
+    {
     this->RenderAxesX[1] = (xloc + 2) % 4;
     this->NumberOfAxesX = 2;
     this->XAxes[RenderAxesX[1]]->SetTickVisibility(0);
     this->XAxes[RenderAxesX[1]]->SetLabelVisibility(0);
     this->XAxes[RenderAxesX[1]]->SetTitleVisibility(0);
     this->XAxes[RenderAxesX[1]]->SetMinorTicksVisible(0);
-    } 
+    }
   else
-    { 
+    {
     this->NumberOfAxesX = 1;
-    } 
+    }
 
   this->RenderAxesY[0] = yloc % 4;
   if (this->DrawYGridlines)
-    { 
+    {
     this->RenderAxesY[1] = (yloc + 2) % 4;
     this->NumberOfAxesY = 2;
     this->YAxes[RenderAxesY[1]]->SetTickVisibility(0);
     this->YAxes[RenderAxesY[1]]->SetLabelVisibility(0);
     this->YAxes[RenderAxesY[1]]->SetTitleVisibility(0);
     this->YAxes[RenderAxesY[1]]->SetMinorTicksVisible(0);
-    } 
+    }
   else
-    { 
+    {
     this->NumberOfAxesY = 1;
-    } 
+    }
 
   this->RenderAxesZ[0] = zloc % 4;
   if (this->DrawZGridlines)
-    { 
+    {
     this->RenderAxesZ[1] = (zloc + 2) % 4;
     this->NumberOfAxesZ = 2;
     this->ZAxes[RenderAxesZ[1]]->SetTickVisibility(0);
     this->ZAxes[RenderAxesZ[1]]->SetLabelVisibility(0);
     this->ZAxes[RenderAxesZ[1]]->SetTitleVisibility(0);
     this->ZAxes[RenderAxesZ[1]]->SetMinorTicksVisible(0);
-    } 
+    }
   else
-    { 
+    {
     this->NumberOfAxesZ = 1;
-    } 
+    }
   //
   //  Make sure that the primary axis visibility flags are set correctly.
   //
@@ -1804,7 +1831,7 @@ void vtkPrismCubeAxesActor::DetermineRenderAxes(vtkViewport *viewport)
 
 double vtkPrismCubeAxesActor::MaxOf(double a, double b)
 {
-  return (a > b ? a : b); 
+  return (a > b ? a : b);
 }
 
 double vtkPrismCubeAxesActor::MaxOf(double a, double b, double c, double d)
@@ -1833,30 +1860,30 @@ inline double vtkPrismCubeAxesActor::FSign(double value, double sign)
 //
 // Purpose: Sets private members controlling the number and position
 //          of ticks.
-//   
+//
 // Arguments:
 //   inRange   The range for this axis.
 //
 // Note:    The bulk of this method was taken from vtkHankAxisActor.C
 //          The original method was reduced to serve the purposes
-//          of this class.   
+//          of this class.
 //
-// Programmer: Kathleen Bonnell 
-// Creation:   29 August, 2001 
+// Programmer: Kathleen Bonnell
+// Creation:   29 August, 2001
 //
 // Modifications:
 //   Kathleen Bonnell, Fri Jul 25 14:37:32 PDT 2003
 //   Moved from vtkAxisActor. Added calls to set inividual axis'
-//   MajorStart, MinorStart, deltaMajor, deltaMinor. 
+//   MajorStart, MinorStart, deltaMajor, deltaMinor.
 //
 // *******************************************************************
 
-void vtkPrismCubeAxesActor::AdjustTicksComputeRange(vtkAxisActor *axes[4], double minBounds, double maxBounds) 
+void vtkPrismCubeAxesActor::AdjustTicksComputeRange(vtkAxisActor *axes[4], double minBounds, double maxBounds)
 {
     double sortedRange[2], range, span;
     double fxt, fnt, frac;
     double div, major, minor;
-    double majorStart, minorStart; 
+    double majorStart, minorStart;
     int numTicks;
     double *inRange = axes[0]->GetRange();
 
@@ -1926,22 +1953,36 @@ void vtkPrismCubeAxesActor::AdjustTicksComputeRange(vtkAxisActor *axes[4], doubl
         minorStart = minor*(this->FFix(sortedRange[0]*(1./minor)) + 1.);
         }
 
+    //TODO this is a work around for a problem in vtkAxisActor;
+    //The vtkAxisActor has a problem that as you march from the
+    //MajorStart to the end of the bounds using the DeltaMajor
+    //the number of major tick marks locations created
+    //may not match the number of lables created. This is because of
+    //tolerance error introduced.
+    //This may result in the last lable being placed at a wierd location.
+    //To fix this the span was shrunk a little to overcome the tolerance error.
+    //Line 997 in the vtkAxisActor.cxx file should probably have a tolerance check included.
+    //while (x <= p2[0] && numTicks < VTK_MAX_TICKS) --> while (x <= p2[0]+tolerance && numTicks < VTK_MAX_TICKS)
+    span-=.00001;
+    //TO here
+
     double ratio= span/range;
 
     major*=ratio;
     minor*=ratio;
 
+
     majorStart=(majorStart-sortedRange[0])*ratio +minBounds;
     minorStart=(minorStart-sortedRange[0])*ratio + minBounds;
 
     for (int i = 0; i < 4; i++)
-        {
-        axes[i]->SetMinorStart(minorStart); 
-        axes[i]->SetMajorStart(majorStart); 
+    {
+      axes[i]->SetMinorStart(minorStart);
+      axes[i]->SetMajorStart(majorStart);
 
-        axes[i]->SetDeltaMinor(minor); 
-        axes[i]->SetDeltaMajor(major); 
-        }
+      axes[i]->SetDeltaMinor(minor);
+      axes[i]->SetDeltaMajor(major);
+    }
 }
 
 // ****************************************************************
@@ -1951,8 +1992,8 @@ void vtkPrismCubeAxesActor::AdjustTicksComputeRange(vtkAxisActor *axes[4], doubl
 //    Kathleen Bonnell, Wed Aug  6 13:59:15 PDT 2003
 //    Each axis type now has it's own 'mustAdjustValue' and 'pow'.
 //
-//    Kathleen Bonnell, Tue Jul 20 14:29:10 PDT 2004 
-//    Ensure that '-0.0' is never used as a label. 
+//    Kathleen Bonnell, Tue Jul 20 14:29:10 PDT 2004
+//    Ensure that '-0.0' is never used as a label.
 //
 //    Eric Brugger, Mon Jul 26 16:09:26 PDT 2004
 //    Correct a bug with a misplaced closing parenthesis.
@@ -1995,7 +2036,7 @@ void vtkPrismCubeAxesActor::BuildLabels(vtkAxisActor *axes[4])
   double sortedRange[2], range;
   double fxt, fnt, frac;
   double div, major;
-  double majorStart; 
+  double majorStart;
   int numTicks;
 
   sortedRange[0] = (double)(inRange[0] < inRange[1] ? inRange[0] : inRange[1]);
@@ -2020,7 +2061,7 @@ void vtkPrismCubeAxesActor::BuildLabels(vtkAxisActor *axes[4])
     }
 
   fxt = pow(10., this->FFix(pow10));
-    
+
   // Find the number of integral points in the interval.
   fnt  = range/fxt;
   fnt  = this->FFix(fnt);
@@ -2040,7 +2081,7 @@ void vtkPrismCubeAxesActor::BuildLabels(vtkAxisActor *axes[4])
   // If there aren't enough major tick points in this decade, use the next
   // decade.
   major = fxt;
- 
+
   if (div != 1.)
     {
     major /= div;
@@ -2057,7 +2098,7 @@ void vtkPrismCubeAxesActor::BuildLabels(vtkAxisActor *axes[4])
     {
     majorStart = major*(this->FFix(sortedRange[0]*(1./major)) + 1.);
     }
-    
+
    val = majorStart;
    double deltaMajor= major;
 
@@ -2069,7 +2110,7 @@ void vtkPrismCubeAxesActor::BuildLabels(vtkAxisActor *axes[4])
     }
 
   labels->SetNumberOfValues(labelCount);
-  
+
   double scaleFactor = 1.;
   if (lastPow != 0)
     {
@@ -2083,9 +2124,9 @@ void vtkPrismCubeAxesActor::BuildLabels(vtkAxisActor *axes[4])
       {
       // We just happened to fall at something near zero and the range is
       // large, so set it to zero to avoid ugliness.
-      val = 0.;  
+      val = 0.;
       }
-    if (mustAdjustValue) 
+    if (mustAdjustValue)
       {
       sprintf(label, format, val*scaleFactor);
       }
@@ -2095,10 +2136,10 @@ void vtkPrismCubeAxesActor::BuildLabels(vtkAxisActor *axes[4])
       }
     if (fabs(val) < 0.01)
       {
-      // 
+      //
       // Ensure that -0.0 is never a label
       // The maximum number of digits that we allow past the decimal is 5.
-      // 
+      //
       if (strcmp(label, "-0") == 0)
         {
         sprintf(label, "0");
@@ -2126,7 +2167,7 @@ void vtkPrismCubeAxesActor::BuildLabels(vtkAxisActor *axes[4])
       }
     labels->SetValue(i, label);
     val += deltaMajor;
-   
+
     }
 
   for (i = 0; i < 4; i++)
@@ -2138,10 +2179,10 @@ void vtkPrismCubeAxesActor::BuildLabels(vtkAxisActor *axes[4])
 }
 
 // ****************************************************************************
-//  Set automatic label scaling mode, set exponents for each axis type. 
+//  Set automatic label scaling mode, set exponents for each axis type.
 //
 // ****************************************************************************
-void vtkPrismCubeAxesActor::SetLabelScaling(bool autoscale, int upowX, int upowY, 
+void vtkPrismCubeAxesActor::SetLabelScaling(bool autoscale, int upowX, int upowY,
                                        int upowZ)
 {
   if (autoscale != this->AutoLabelScaling || upowX != this->UserXPow ||
@@ -2152,5 +2193,5 @@ void vtkPrismCubeAxesActor::SetLabelScaling(bool autoscale, int upowX, int upowY
     this->UserYPow = upowY;
     this->UserZPow = upowZ;
     this->Modified();
-    } 
-} 
+    }
+}

@@ -2,14 +2,19 @@
 
 #include "PrismToolBarActions.h"
 #include "PrismCore.h"
+#include "pqCoreUtilities.h"
 
 PrismToolBarActions::PrismToolBarActions(QObject* p)
 : QActionGroup(p)
     {
+     this->setParent(pqCoreUtilities::mainWidget());
     PrismCore* core=PrismCore::instance();
 
+    core->createActions(this);
 
-    QAction* PrismViewAction = new QAction("Prism View",this);
+
+  /*     PrismCore* core=PrismCore::instance();
+ QAction* PrismViewAction = new QAction("Prism View",this);
     PrismViewAction->setToolTip("Create Prism View");
     PrismViewAction->setIcon(QIcon(":/Prism/Icons/PrismSmall.png"));
 
@@ -19,7 +24,7 @@ PrismToolBarActions::PrismToolBarActions(QObject* p)
     SesameViewAction->setToolTip("Open SESAME Surface");
     SesameViewAction->setIcon(QIcon(":/Prism/Icons/CreateSESAME.png"));
 
-    QObject::connect(SesameViewAction, SIGNAL(triggered(bool)), core, SLOT(onSESAMEFileOpen()));
+    QObject::connect(SesameViewAction, SIGNAL(triggered(bool)), core, SLOT(onSESAMEFileOpen()));*/
 
 
 

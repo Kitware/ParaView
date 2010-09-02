@@ -132,6 +132,10 @@ public:
 #endif
 
   // Description:
+  // Remove the attribute from the current element
+  void RemoveAttribute(const char* attrName);
+
+  // Description:
   // Given it's name and value, set an attribute.
   // If an attribute with the given name already exists,
   // it replaces the old attribute.
@@ -171,6 +175,16 @@ public:
   // Description:
   // Encode a string. 
   static vtkStdString Encode(const char* plaintext);
+
+  // Description:
+  // Return true if the current object has the same content as the other.
+  // The comparison implementation is pretty weak in the mean that
+  // we compare resulting XML string.
+  bool Equals(vtkPVXMLElement* other);
+
+  // Description:
+  // Copy the current XML element content into the provided one
+  void Copy(vtkPVXMLElement* other);
 
 protected:
   vtkPVXMLElement();
