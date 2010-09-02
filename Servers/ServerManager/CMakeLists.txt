@@ -56,6 +56,8 @@ SET (Kit_SRCS
   vtkSMSessionServer.cxx
   vtkSMStringVectorProperty.cxx
   vtkSMVectorProperty.cxx
+  vtkSMDoubleRangeDomain.cxx
+  vtkSMIntRangeDomain.cxx
   )
 
 IF (FIXME)
@@ -112,7 +114,6 @@ SET(Kit_SRCS
   vtkSMDimensionsDomain.cxx
   vtkSMDistanceRepresentation2DProxy.cxx
   vtkSMDoubleArrayInformationHelper.cxx
-  vtkSMDoubleRangeDomain.cxx
   vtkSMEnumerationDomain.cxx
   vtkSMExponentialKeyFrameProxy.cxx
   vtkSMExporterProxy.cxx
@@ -139,7 +140,6 @@ SET(Kit_SRCS
   vtkSMIdTypeArrayInformationHelper.cxx
   vtkSMIntArrayInformationHelper.cxx
   vtkSMInteractionUndoStackBuilder.cxx
-  vtkSMIntRangeDomain.cxx
   vtkSMKeyFrameAnimationCueManipulatorProxy.cxx
   vtkSMKeyFrameProxy.cxx
   vtkSMLinearAnimationCueManipulatorProxy.cxx

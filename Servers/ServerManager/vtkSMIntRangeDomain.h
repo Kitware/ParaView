@@ -179,8 +179,6 @@ protected:
   // be overwritten by subclass if adding ivars.
   virtual int ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* element);
 
-  virtual void ChildSaveState(vtkPVXMLElement* domainElement);
-
   // Description:
   // General purpose method called by both AddMinimum() and AddMaximum()
   void SetEntry(unsigned int idx, int minOrMax, int set, int value);

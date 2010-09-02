@@ -351,52 +351,6 @@ void vtkSMDoubleRangeDomain::SetEntry(
 }
 
 //---------------------------------------------------------------------------
-void vtkSMDoubleRangeDomain::ChildSaveState(vtkPVXMLElement* domainElement) 
-{
-  this->Superclass::ChildSaveState(domainElement);
-
-  unsigned int size = this->GetNumberOfEntries();
-  unsigned int i;
-  for(i=0; i<size; i++)
-    {
-    if (this->DRInternals->Entries[i].MinSet)
-      {
-      vtkPVXMLElement* minElem = vtkPVXMLElement::New();
-      minElem->SetName("Min");
-      minElem->AddAttribute("index", i);
-      minElem->AddAttribute("value", this->DRInternals->Entries[i].Min);
-      domainElement->AddNestedElement(minElem);
-      minElem->Delete();
-      }
-    }
-  for(i=0; i<size; i++)
-    {
-    if (this->DRInternals->Entries[i].MaxSet)
-      {
-      vtkPVXMLElement* maxElem = vtkPVXMLElement::New();
-      maxElem->SetName("Max");
-      maxElem->AddAttribute("index", i);
-      maxElem->AddAttribute("value", this->DRInternals->Entries[i].Max);
-      domainElement->AddNestedElement(maxElem);
-      maxElem->Delete();
-      }
-    }
-  for(i=0; i<size; i++)
-    {
-    if (this->DRInternals->Entries[i].ResolutionSet)
-      {
-      vtkPVXMLElement* resolutionElem = vtkPVXMLElement::New();
-      resolutionElem->SetName("Resolution");
-      resolutionElem->AddAttribute("index", i);
-      resolutionElem->AddAttribute("value", 
-                                   this->DRInternals->Entries[i].Resolution);
-      domainElement->AddNestedElement(resolutionElem);
-      resolutionElem->Delete();
-      }
-    }
-}
-
-//---------------------------------------------------------------------------
 int vtkSMDoubleRangeDomain::ReadXMLAttributes(
   vtkSMProperty* prop, vtkPVXMLElement* element)
 {
