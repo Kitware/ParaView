@@ -25,6 +25,7 @@
 
 class vtkClientServerInterpreter;
 class vtkMultiProcessController;
+class vtkPMObject;
 class vtkSMProxyDefinitionManager;
 
 class VTK_EXPORT vtkSMSessionCore : public vtkObject
@@ -59,6 +60,10 @@ public:
   // Invoke a method remotely
   virtual void DeletePMObject(vtkSMMessage* message);
   //ETX
+
+  // Description:
+  // Returns a vtkPMObject or subclass given its global id, if any.
+  vtkPMObject* GetPMObject(vtkTypeUInt32 globalid);
 
 //BTX
   enum MessageTypes

@@ -107,19 +107,12 @@ struct vtkSMProxyPropertyInternals
 vtkSMProxyProperty::vtkSMProxyProperty()
 {
   this->PPInternals = new vtkSMProxyPropertyInternals;
-  this->CleanCommand = 0;
-  this->RepeatCommand = 0;
-  this->RemoveCommand = 0;
-  this->IsInternal = 0;
-  this->NullOnEmpty = 0;
 }
 
 //---------------------------------------------------------------------------
 vtkSMProxyProperty::~vtkSMProxyProperty()
 {
   delete this->PPInternals;
-  this->SetCleanCommand(0);
-  this->SetRemoveCommand(0);
 }
 
 //---------------------------------------------------------------------------
@@ -344,28 +337,29 @@ vtkSMProxy* vtkSMProxyProperty::GetUncheckedProxy(unsigned int idx)
 
 
 //---------------------------------------------------------------------------
-void vtkSMProxyProperty::WriteTo(vtkSMMessage* msg)
+void vtkSMProxyProperty::WriteTo(vtkSMMessage* message)
 {
-  ProxyState_Property *prop = msg->AddExtension(ProxyState::property);
+  ProxyState_Property *prop = message->AddExtension(ProxyState::property);
   prop->set_name(this->GetXMLName());
   Variant *var = prop->mutable_value();
   var->set_type(Variant::PROXY);
-  for (unsigned int i=0;i<this->GetNumberOfProxies();i++)
+  for (unsigned int i=0; i<this->GetNumberOfProxies(); i++)
     {
     var->add_proxy_global_id(this->GetProxy(i)->GetGlobalID());
     }
 }
 
 //---------------------------------------------------------------------------
-void vtkSMProxyProperty::ReadFrom(vtkSMMessage* msg, int message_offset)
+void vtkSMProxyProperty::ReadFrom(vtkSMMessage* message, int message_offset)
 {
-  (void)msg;
+  abort();
+  (void)message;
   (void)message_offset;
 #ifdef FIXME
   bool found = false;
-  for(int i=0;i<msg->ExtensionSize(ProxyState::property);++i)
+  for(int i=0;i<message->ExtensionSize(ProxyState::property);++i)
     {
-    const ProxyState_Property *prop = &msg->GetExtension(ProxyState::property, i);
+    const ProxyState_Property *prop = &message->GetExtension(ProxyState::property, i);
     if(strcmp(prop->name().c_str(), this->GetXMLName()) == 0)
       {
       const Variant *value = &prop->value(0);
@@ -426,42 +420,7 @@ void vtkSMProxyProperty::ReadFrom(vtkSMMessage* msg, int message_offset)
 int vtkSMProxyProperty::ReadXMLAttributes(vtkSMProxy* parent,
                                           vtkPVXMLElement* element)
 {
-  int ret = this->Superclass::ReadXMLAttributes(parent, element);
-  
-  const char* clean_command = element->GetAttribute("clean_command");
-  if(clean_command) 
-    { 
-    this->SetCleanCommand(clean_command); 
-    }
-
-  int repeat_command;
-  int retVal = element->GetScalarAttribute("repeat_command", &repeat_command);
-  if(retVal) 
-    { 
-    this->SetRepeatCommand(repeat_command);
-    this->Repeatable = repeat_command;
-    }
-
-  const char* remove_command = element->GetAttribute("remove_command");
-  if (remove_command)
-    {
-    this->SetRemoveCommand(remove_command);
-    }
-
-  int null_on_empty;
-  if (element->GetScalarAttribute("null_on_empty", &null_on_empty))
-    {
-    this->SetNullOnEmpty(null_on_empty);
-    }
-
-
-  //if (this->RemoveCommand && !this->GetUpdateSelf())
-  //  {
-  //  vtkErrorMacro("Due to reference counting issue, remove command can "
-  //    "only be used for update self properties. " << endl <<
-  //    "Offending property: " << this->XMLName);
-  //  }
-  return ret;
+  return this->Superclass::ReadXMLAttributes(parent, element);
 }
 
 //---------------------------------------------------------------------------
@@ -582,8 +541,4 @@ void vtkSMProxyProperty::PrintSelf(ostream& os, vtkIndent indent)
     os << this->GetProxy(i) << " ";
     }
   os << endl;
-  os << indent 
-     << "CleanCommand: "
-     << (this->CleanCommand ? this->CleanCommand : "(none)") 
-     << endl;
 }

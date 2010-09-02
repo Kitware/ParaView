@@ -65,6 +65,10 @@ public:
   // Provides access to the Interpreter.
   vtkClientServerInterpreter* GetInterpreter();
 
+  // Description:
+  // Convenience method to obtain a vtkPMObject subclass given its global id.
+  vtkPMObject* GetPMObject(vtkTypeUInt32 globalid);
+
 protected:
   vtkPMObject();
   virtual ~vtkPMObject();

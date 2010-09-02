@@ -97,6 +97,16 @@ vtkClientServerID vtkPMProperty::GetVTKObjectID()
 }
 
 //----------------------------------------------------------------------------
+vtkPMObject* vtkPMProperty::GetPMObject(vtkTypeUInt32 globalid)
+{
+  if (this->ProxyHelper)
+    {
+    return this->ProxyHelper->GetPMObject(globalid);
+    }
+  return NULL;
+}
+
+//----------------------------------------------------------------------------
 bool vtkPMProperty::ProcessMessage(vtkClientServerStream& stream)
 {
   if (this->ProxyHelper)

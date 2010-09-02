@@ -122,44 +122,28 @@ protected:
   vtkSMInputProperty();
   ~vtkSMInputProperty();
 
+  // Description:
+  // Let the property write its content into the stream
+  virtual void WriteTo(vtkSMMessage* msg);
+
+  // Description:
+  // Let the property read and set its content from the stream
+  virtual void ReadFrom(vtkSMMessage* msg, int message_offset);
+
+
   virtual void RemoveAllProxies(int modify);
-
-  unsigned int GetPreviousOutputPortForConnection(unsigned int idx);
-
-  // Description:
-  // Updates state from an XML element. Returns 0 on failure.
-  virtual int LoadState(vtkPVXMLElement* element, 
-    vtkSMProxyLocator* loader, int loadLastPushedValues=0);
-
-  // Description:
-  // Called by ChildSaveState to save the XML for every proxy. Overridden to
-  // save output port information.
-  virtual vtkPVXMLElement* SaveProxyElementState(
-    unsigned int idx, bool use_previous_proxies);
-
-  //BTX
-  // Description:
-  // Description:
-  // Append a command to update the vtk object with the property values(s).
-  // The proxy objects create a stream by calling this method on all the
-  // modified properties.
-  // Note that if the proxy has multiple IDs, they are all appended to the 
-  // command stream.  
-  virtual void AppendCommandToStream(
-    vtkSMProxy*, vtkClientServerStream* stream, vtkClientServerID objectId );
-  //ETX
 
   // Description:
   // Set the appropriate ivars from the xml element. Should
   // be overwritten by subclass if adding ivars.
-  virtual int ReadXMLAttributes(vtkSMProxy* parent, 
+  virtual int ReadXMLAttributes(vtkSMProxy* parent,
                                 vtkPVXMLElement* element);
 
   int MultipleInput;
   int PortIndex;
 
   vtkSMInputPropertyInternals* IPInternals;
-  
+
   static int InputsUpdateImmediately;
 
 private:

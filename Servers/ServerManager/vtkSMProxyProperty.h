@@ -152,13 +152,6 @@ public:
   virtual void DeepCopy(vtkSMProperty* src, const char* exceptionClass, 
     int proxyPropertyCopyFlag);
 
-  // Description:
-  // If RepeatCommand is true, the command is invoked multiple times,
-  // once for every proxy.
-  vtkGetMacro(RepeatCommand, int);
-  vtkSetMacro(RepeatCommand, int);
-  vtkBooleanMacro(RepeatCommand, int);
-
 //BTX
 protected:
   vtkSMProxyProperty();
@@ -180,39 +173,10 @@ protected:
   vtkSMProxyPropertyInternals* PPInternals;
 
   // Description:
-  // Command that can be used to remove inputs. If set, this
-  // command is called before the main Command is called with
-  // all the arguments.
-  vtkSetStringMacro(CleanCommand);
-  vtkGetStringMacro(CleanCommand);
-  char* CleanCommand;
-
-  // Description:
-  // Remove command is the command called to remove the VTK
-  // object on the server-side. If set, CleanCommand is ignored.
-  // Instead for every proxy that was absent from the proxies
-  // previously pushed, the RemoveCommand is invoked.
-  // NOTE: Do not share properties that have RemoveCommand set
-  // among proxies, as they will not work. If required,
-  // the support can be added.
-  vtkSetStringMacro(RemoveCommand);
-  vtkGetStringMacro(RemoveCommand);
-  char* RemoveCommand;
-  
-  // Description:
   // Set the appropriate ivars from the xml element. Should
   // be overwritten by subclass if adding ivars.
   virtual int ReadXMLAttributes(vtkSMProxy* parent, 
                                 vtkPVXMLElement* element);
-
-  int RepeatCommand;
-
-  // When set to true, the property will push a NULL i.e. 0 when there are no
-  // proxies in the property. Not used when CleanCommand or RemoveCommand is
-  // set. Default is false. 
-  vtkSetMacro(NullOnEmpty, int);
-  vtkGetMacro(NullOnEmpty, int);
-  int NullOnEmpty;
 
 private:
   vtkSMProxyProperty(const vtkSMProxyProperty&); // Not implemented

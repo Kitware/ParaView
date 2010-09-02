@@ -54,6 +54,16 @@ void vtkPMObject::Finalize()
 }
 
 //----------------------------------------------------------------------------
+vtkPMObject* vtkPMObject::GetPMObject(vtkTypeUInt32 globalid)
+{
+  if (this->SessionCore)
+    {
+    this->SessionCore->GetPMObject(globalid);
+    }
+  return NULL;
+}
+
+//----------------------------------------------------------------------------
 vtkClientServerInterpreter* vtkPMObject::GetInterpreter()
 {
   return this->Interpreter;

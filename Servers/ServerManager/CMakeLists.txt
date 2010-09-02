@@ -53,6 +53,8 @@ SET (Kit_SRCS
   vtkPMIntVectorProperty.cxx
   vtkPMDoubleVectorProperty.cxx
   vtkPMIdTypeVectorProperty.cxx
+  vtkSMInputProperty.cxx
+  vtkPMProxyProperty.cxx
   )
 
 IF (FIXME)

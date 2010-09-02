@@ -24,10 +24,10 @@
 #include "vtkSMObject.h"
 #include "vtkWeakPointer.h"
 
-class vtkPVXMLElement;
-class vtkPMProxy;
 class vtkClientServerStream;
-
+class vtkPMObject;
+class vtkPMProxy;
+class vtkPVXMLElement;
 
 class VTK_EXPORT vtkPMProperty : public vtkSMObject
 {
@@ -72,7 +72,13 @@ protected:
 
   friend class vtkPMProxy;
 
+  // Description:
+  // Convenience method to obtain interpreter id for the VTK Object.
   vtkClientServerID GetVTKObjectID();
+
+  // Description:
+  // Convenience method to obtain a vtkPMObject subclass given its global id.
+  vtkPMObject* GetPMObject(vtkTypeUInt32 globalid);
 
   // Description:
   // Push a new state to the underneath implementation

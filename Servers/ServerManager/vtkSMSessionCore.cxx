@@ -115,6 +115,12 @@ vtkSMSessionCore::~vtkSMSessionCore()
 }
 
 //----------------------------------------------------------------------------
+vtkPMObject* vtkSMSessionCore::GetPMObject(vtkTypeUInt32 globalid)
+{
+  return this->Internals->GetPMObject(globalid);
+}
+
+//----------------------------------------------------------------------------
 void vtkSMSessionCore::PushStateInternal(vtkSMMessage* message)
 {
   // When the control reaches here, we are assured that the PMObject needs be
