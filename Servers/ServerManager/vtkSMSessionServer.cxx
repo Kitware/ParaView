@@ -14,13 +14,17 @@
 =========================================================================*/
 #include "vtkSMSessionServer.h"
 
+#include "vtkClientServerStream.h"
+#include "vtkInstantiator.h"
 #include "vtkMultiProcessController.h"
 #include "vtkMultiProcessStream.h"
 #include "vtkNetworkAccessManager.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule2.h"
-#include "vtkPVOptions.h"
 #include "vtkPVConfig.h"
+#include "vtkPVInformation.h"
+#include "vtkPVOptions.h"
+#include "vtkSmartPointer.h"
 #include "vtkSMSessionClient.h"
 #include "vtkSocketCommunicator.h"
 
@@ -212,6 +216,47 @@ void vtkSMSessionServer::OnClientServerMessageRMI(void* message, int message_len
       }
     break;
 
+  case vtkSMSessionClient::GATHER_INFORMATION:
+      {
+      vtkstd::string classname;
+      vtkTypeUInt32 location, globalid;
+      stream >> location >> classname >> globalid;
+      this->GatherInformationInternal(location, classname.c_str(), globalid);
+      }
+    break;
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkSMSessionServer::GatherInformationInternal(
+  vtkTypeUInt32 location, const char* classname, vtkTypeUInt32 globalid)
+{
+  vtkSmartPointer<vtkObject> o;
+  o.TakeReference(vtkInstantiator::CreateInstance(classname));
+
+  vtkPVInformation* info = vtkPVInformation::SafeDownCast(o);
+  if (info)
+    {
+    this->Superclass::GatherInformation(location, info, globalid);
+
+    vtkClientServerStream css;
+    info->CopyToStream(&css);
+    size_t length;
+    const unsigned char* data;
+    css.GetData(&data, &length);
+    int len = static_cast<int>(length);
+    this->ClientController->Send(&len, 1, 1,
+      vtkSMSessionClient::REPLY_GATHER_INFORMATION_TAG);
+    this->ClientController->Send(const_cast<unsigned char*>(data),
+      length, 1, vtkSMSessionClient::REPLY_GATHER_INFORMATION_TAG);
+    }
+  else
+    {
+    vtkErrorMacro("Could not create information object.");
+    // let client know that gather failed.
+    int len = 0;
+    this->ClientController->Send(&len, 1, 1,
+      vtkSMSessionClient::REPLY_GATHER_INFORMATION_TAG);
     }
 }
 

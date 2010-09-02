@@ -22,8 +22,10 @@
 #include "vtkMultiProcessController.h"
 #include "vtkMultiProcessStream.h"
 #include "vtkObjectFactory.h"
-#include "vtkPMObject.h"
+#include "vtkPMProxy.h"
 #include "vtkProcessModule2.h"
+#include "vtkPVInformation.h"
+#include "vtkSmartPointer.h"
 #include "vtkSMProxyDefinitionManager.h"
 
 #include <vtkstd/string>
@@ -38,8 +40,12 @@ namespace
     unsigned char type = *(reinterpret_cast<unsigned char*>(remoteArg));
     switch (type)
       {
-      case vtkSMSessionCore::PUSH_STATE:
+    case vtkSMSessionCore::PUSH_STATE:
       sessioncore->PushStateSatelliteCallback();
+      break;
+
+    case vtkSMSessionCore::GATHER_INFORMATION:
+      sessioncore->GatherInformationStatelliteCallback();
       break;
       }
     }
@@ -254,4 +260,165 @@ void vtkSMSessionCore::DeletePMObject(vtkSMMessage* message)
   this->Internals->Delete(message->global_id());
 }
 
+
 //----------------------------------------------------------------------------
+bool vtkSMSessionCore::GatherInformationInternal(
+  vtkPVInformation* information, vtkTypeUInt32 globalid)
+{
+  // default is to gather information from VTKObject, if FromPMObject is true,
+  // then gather from PMObject.
+  vtkPMObject* pmobject = this->GetPMObject(globalid);
+  if (!pmobject)
+    {
+    vtkErrorMacro("No object with global-id: " << globalid);
+    return false;
+    }
+
+  vtkPMProxy* pmproxy = vtkPMProxy::SafeDownCast(pmobject);
+  if (pmproxy /*&& !information->GetUsePMObject()*/)
+    {
+    vtkObject* object = vtkObject::SafeDownCast(pmproxy->GetVTKObject());
+    information->CopyFromObject(object);
+    }
+  else
+    {
+    // gather information from PMObject itself.
+    information->CopyFromObject(pmobject);
+    }
+  return true;
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMSessionCore::GatherInformation(vtkTypeUInt32 location,
+  vtkPVInformation* information, vtkTypeUInt32 globalid)
+{
+  // This can only be called on the root node.
+  assert(this->ParallelController == NULL ||
+    this->ParallelController->GetLocalProcessId() == 0);
+
+  if (!this->GatherInformationInternal(information, globalid))
+    {
+    return false;
+    }
+
+  if (information->GetRootOnly() || (location & vtkProcessModule2::SERVERS) == 0)
+    {
+    return true;
+    }
+
+  // send message to satellites and then start processing.
+
+  if (this->ParallelController &&
+    this->ParallelController->GetNumberOfProcesses() > 1 &&
+    this->ParallelController->GetLocalProcessId() == 0)
+    {
+    // Forward the message to the satellites if the object is expected to exist
+    // on the satellites.
+
+    // FIXME: There's one flaw in this logic. If a object is to be created on
+    // DATA_SERVER_ROOT, but on all RENDER_SERVER nodes, then in render-server
+    // configuration, the message will end up being send to all data-server
+    // nodes as well. Although we never do that presently, it's a possibility
+    // and we should fix this.
+    unsigned char type = GATHER_INFORMATION;
+    this->ParallelController->TriggerRMIOnAllChildren(&type, 1,
+      ROOT_SATELLITE_RMI_TAG);
+
+    vtkMultiProcessStream stream;
+    stream << information->GetClassName() << globalid;
+    this->ParallelController->Broadcast(stream, 0);
+    }
+
+  return this->CollectInformation(information);
+}
+
+//----------------------------------------------------------------------------
+void vtkSMSessionCore::GatherInformationStatelliteCallback()
+{
+  vtkMultiProcessStream stream;
+  this->ParallelController->Broadcast(stream, 0);
+
+  vtkstd::string classname;
+  vtkTypeUInt32 globalid;
+  stream >> classname >> globalid;
+
+  vtkSmartPointer<vtkObject> o;
+  o.TakeReference(vtkInstantiator::CreateInstance(classname.c_str()));
+
+  vtkPVInformation* info = vtkPVInformation::SafeDownCast(o);
+  if (info)
+    {
+    this->GatherInformationInternal(info, globalid);
+    this->CollectInformation(info);
+    }
+  else
+    {
+    vtkErrorMacro("Could not gather information on Satellite.");
+    // let the parent know, otherwise root will hang.
+    this->CollectInformation(NULL);
+    }
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMSessionCore::CollectInformation(vtkPVInformation* info)
+{
+  vtkMultiProcessController* controller = this->ParallelController;
+  int myid = controller->GetLocalProcessId();
+  int numProcs = controller->GetNumberOfProcesses();
+
+  int children[2] = {2*myid + 1, 2*myid + 2};
+  int parent = myid > 0? (myid-1)/2 : -1;
+
+  // General rule is: receive from children and send to parent
+  for (int childno=0; childno < 2; childno++)
+    {
+    int childid = children[childno];
+    if (childid >= numProcs)
+      {
+      // Skip nonexistent children.
+      continue;
+      }
+
+    int length;
+    controller->Receive(&length, 1, childid, ROOT_SATELLITE_INFO_TAG);
+    if (length <= 0)
+      {
+      vtkErrorMacro(
+        "Failed to Gather Information from satellite no: " << childid);
+      continue;
+      }
+
+    unsigned char* data = new unsigned char[length];
+    controller->Receive(data, length, childid, ROOT_SATELLITE_INFO_TAG);
+    vtkClientServerStream stream;
+    stream.SetData(data, length);
+    vtkPVInformation* tempInfo = info->NewInstance();
+    tempInfo->CopyFromStream(&stream);
+    info->AddInformation(tempInfo);
+    tempInfo->Delete();
+    delete [] data;
+    }
+
+  // Now send to parent, if parent is indeed valid.
+  if (parent >= 0)
+    {
+    if (info)
+      {
+      vtkClientServerStream css;
+      info->CopyToStream(&css);
+      size_t length;
+      const unsigned char* data;
+      css.GetData(&data, &length);
+      int len = static_cast<int>(length);
+      controller->Send(&len, 1, parent, ROOT_SATELLITE_INFO_TAG);
+      controller->Send(const_cast<unsigned char*>(data),
+        length, parent, ROOT_SATELLITE_INFO_TAG);
+      }
+    else
+      {
+      int len = 0;
+      controller->Send(&len, 1, parent, ROOT_SATELLITE_INFO_TAG);
+      }
+    }
+  return true;
+}

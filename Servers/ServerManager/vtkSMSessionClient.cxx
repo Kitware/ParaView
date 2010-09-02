@@ -14,6 +14,7 @@
 =========================================================================*/
 #include "vtkSMSessionClient.h"
 
+#include "vtkClientServerStream.h"
 #include "vtkCommand.h"
 #include "vtkMultiProcessController.h"
 #include "vtkMultiProcessStream.h"
@@ -21,6 +22,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule2.h"
 #include "vtkPVConfig.h"
+#include "vtkPVInformation.h"
 #include "vtkSocketCommunicator.h"
 
 #include <vtkstd/string>
@@ -230,32 +232,29 @@ void vtkSMSessionClient::CloseSession()
 }
 
 //----------------------------------------------------------------------------
-void vtkSMSessionClient::PushState(vtkSMMessage* msg)
+void vtkSMSessionClient::PushState(vtkSMMessage* message)
 {
   if (this->RenderServerController == NULL)
     {
     // re-route all render-server messages to data-server.
-    if (msg->location() & vtkProcessModule2::RENDER_SERVER)
+    if (message->location() & vtkProcessModule2::RENDER_SERVER)
       {
-      msg->set_location(msg->location() | vtkProcessModule2::DATA_SERVER);
-      msg->set_location(msg->location() & ~vtkProcessModule2::RENDER_SERVER);
+      message->set_location(message->location() | vtkProcessModule2::DATA_SERVER);
+      message->set_location(message->location() & ~vtkProcessModule2::RENDER_SERVER);
       }
-    if (msg->location() & vtkProcessModule2::RENDER_SERVER_ROOT)
+    if (message->location() & vtkProcessModule2::RENDER_SERVER_ROOT)
       {
-      msg->set_location(msg->location() | vtkProcessModule2::DATA_SERVER_ROOT);
-      msg->set_location(msg->location() & ~vtkProcessModule2::RENDER_SERVER_ROOT);
+      message->set_location(message->location() | vtkProcessModule2::DATA_SERVER_ROOT);
+      message->set_location(message->location() & ~vtkProcessModule2::RENDER_SERVER_ROOT);
       }
     }
 
-  if ( (msg->location() & vtkProcessModule2::DATA_SERVER) != 0 ||
-    (msg->location() & vtkProcessModule2::DATA_SERVER_ROOT) != 0)
+  if ( (message->location() & vtkProcessModule2::DATA_SERVER) != 0 ||
+    (message->location() & vtkProcessModule2::DATA_SERVER_ROOT) != 0)
     {
-    // FIXME integrate the new protobuf transport layer
-    // FIXME xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
     vtkMultiProcessStream stream;
     stream << static_cast<int>(PUSH);
-    stream << msg->SerializeAsString();
-//    stream << static_cast<int>(PUSH) << servers << objectid << state;
+    stream << message->SerializeAsString();
     vtkstd::vector<unsigned char> raw_message;
     stream.GetRawData(raw_message);
     this->DataServerController->TriggerRMIOnAllChildren(
@@ -264,15 +263,12 @@ void vtkSMSessionClient::PushState(vtkSMMessage* msg)
     }
 
   if (this->RenderServerController != NULL &&
-    (msg->location() & vtkProcessModule2::RENDER_SERVER) != 0 ||
-    (msg->location() & vtkProcessModule2::RENDER_SERVER_ROOT) != 0)
+    ((message->location() & vtkProcessModule2::RENDER_SERVER) != 0 ||
+    (message->location() & vtkProcessModule2::RENDER_SERVER_ROOT) != 0))
     {
-    // FIXME integrate the new protobuf transport layer
-    // FIXME xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
     vtkMultiProcessStream stream;
     stream << static_cast<int>(PUSH);
-    stream << msg->SerializeAsString();
-    // stream << PUSH << servers << objectid << state;
+    stream << message->SerializeAsString();
     vtkstd::vector<unsigned char> raw_message;
     stream.GetRawData(raw_message);
     this->RenderServerController->TriggerRMIOnAllChildren(
@@ -280,10 +276,87 @@ void vtkSMSessionClient::PushState(vtkSMMessage* msg)
       CLIENT_SERVER_MESSAGE_RMI);
     }
 
-  if ( (msg->location() & vtkProcessModule2::CLIENT) != 0)
+  if ( (message->location() & vtkProcessModule2::CLIENT) != 0)
     {
-    this->Superclass::PushState(msg);
+    this->Superclass::PushState(message);
     }
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMSessionClient::GatherInformation(
+  vtkTypeUInt32 location, vtkPVInformation* information, vtkTypeUInt32 globalid)
+{
+  if (this->RenderServerController == NULL)
+    {
+    // re-route all render-server messages to data-server.
+    if (location & vtkProcessModule2::RENDER_SERVER)
+      {
+      location |= vtkProcessModule2::DATA_SERVER;
+      location &= ~vtkProcessModule2::RENDER_SERVER;
+      }
+    if (location & vtkProcessModule2::RENDER_SERVER_ROOT)
+      {
+      location |= vtkProcessModule2::DATA_SERVER_ROOT;
+      location &= ~vtkProcessModule2::RENDER_SERVER_ROOT;
+      }
+    }
+
+  if ( (location & vtkProcessModule2::CLIENT) != 0)
+    {
+    return this->Superclass::GatherInformation(location, information, globalid);
+    }
+
+  vtkMultiProcessStream stream;
+  stream << static_cast<int>(GATHER_INFORMATION)
+    << location
+    << information->GetClassName()
+    << globalid;
+  vtkstd::vector<unsigned char> raw_message;
+  stream.GetRawData(raw_message);
+
+  vtkMultiProcessController* controller = NULL;
+
+  if ( (location & vtkProcessModule2::DATA_SERVER) != 0 ||
+    (location & vtkProcessModule2::DATA_SERVER_ROOT) != 0)
+    {
+    controller = this->DataServerController;
+    }
+
+  else if (this->RenderServerController != NULL &&
+    ((location & vtkProcessModule2::RENDER_SERVER) != 0 ||
+    (location & vtkProcessModule2::RENDER_SERVER_ROOT) != 0))
+    {
+    controller = this->RenderServerController;
+    }
+
+  if (controller)
+    {
+    controller->TriggerRMIOnAllChildren(
+      &raw_message[0], static_cast<int>(raw_message.size()),
+      CLIENT_SERVER_MESSAGE_RMI);
+
+    int length2 = 0;
+    controller->Receive(&length2, 1, 1, REPLY_GATHER_INFORMATION_TAG);
+    if (length2 <= 0)
+      {
+      vtkErrorMacro("Server failed to gather information.");
+      return false;
+      }
+    unsigned char* data2 = new unsigned char[length2];
+    if (!controller->Receive((char*)data2, length2, 1,
+        REPLY_GATHER_INFORMATION_TAG))
+      {
+      vtkErrorMacro("Failed to receive information correctly.");
+      delete [] data2;
+      return false;
+      }
+    vtkClientServerStream csstream;
+    csstream.SetData(data2, length2);
+    information->CopyFromStream(&csstream);
+    delete [] data2;
+    }
+
+  return false;
 }
 
 //----------------------------------------------------------------------------

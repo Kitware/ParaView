@@ -31,7 +31,6 @@
 #define __vtkSMSourceProxy_h
 
 #include "vtkSMProxy.h"
-#include "vtkClientServerID.h" // Needed for ClientServerID
 
 class vtkPVArrayInformation;
 class vtkPVDataInformation;
@@ -62,25 +61,6 @@ public:
   // Calls Update() on all sources with the given time request. 
   // It also creates output ports if they are not already created.
   virtual void UpdatePipeline(double time);
-
-  // Description:
-  // Connects filters/sinks to an input. If the filter(s) is not
-  // created, this will create it. 
-  virtual void AddInput(unsigned int inputPort,
-                        vtkSMSourceProxy* input,
-                        unsigned int outputPort,
-                        const char* method);
-  virtual void AddInput(vtkSMSourceProxy* input,
-                        const char* method)
-  {
-    this->AddInput(0, input, 0, method);
-  }
-  
-  // Description:
-  // Calls method on all VTK sources. Used by the input property 
-  // to remove inputs. Made public to allow access by wrappers. Do
-  // not use.
-  void CleanInputs(const char* method);
 
   // Description:
   // Chains to superclass and calls UpdateInformation()

@@ -58,6 +58,23 @@ public:
   // Push the state.
   virtual void PushState(vtkSMMessage* msg);
 
+  // Description:
+  // Gather information about an object referred by the \c globalid.
+  // \c location identifies the processes to gather the information from.
+  // Overridden to fetch the information from server if needed, otherwise it's
+  // handled locally.
+  virtual bool GatherInformation(vtkTypeUInt32, vtkPVInformation*, vtkTypeUInt32)
+    {
+    vtkErrorMacro("GatherInformation cannot be called on the server processes.");
+    return false;
+    }
+
+
+  // Description:
+  // Called when client triggers GatherInformation().
+  void GatherInformationInternal(
+    vtkTypeUInt32 location, const char* classname, vtkTypeUInt32 globalid);
+
   void OnClientServerMessageRMI(void* message, int message_length);
   void OnCloseSessionRMI();
 

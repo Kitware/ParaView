@@ -135,6 +135,7 @@ class vtkSMProxyManager;
 class vtkSMProxyObserver;
 class vtkClientServerStream;
 class vtkSMProxyLocator;
+class vtkPVInformation;
 
 class VTK_EXPORT vtkSMProxy : public vtkSMRemoteObject
 {
@@ -322,6 +323,12 @@ public:
   // Returns the client side object associated with the VTKObjectID (if any).
   // Returns 0 otherwise.
   vtkObjectBase* GetClientSideObject();
+
+  // Description:
+  // Gathers information about this proxy.
+  // On success, the \c information object is filled up with details about the
+  // VTK object.
+  bool GatherInformation(vtkPVInformation* information);
 
 //BTX
 protected:

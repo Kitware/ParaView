@@ -34,12 +34,15 @@ SET (Kit_SRCS
   vtkSMDocumentation.cxx
   vtkSMDomain.cxx
   vtkSMDomainIterator.cxx
+  vtkSMDoubleRangeDomain.cxx
   vtkSMDoubleVectorProperty.cxx
   vtkSMIdTypeVectorProperty.cxx
   vtkSMInputProperty.cxx
+  vtkSMIntRangeDomain.cxx
   vtkSMIntVectorProperty.cxx
   vtkSMLink.cxx
   vtkSMObject.cxx
+#  vtkSMOutputPort.cxx
   vtkSMProperty.cxx
   vtkSMPropertyIterator.cxx
   vtkSMProxy.cxx
@@ -54,10 +57,9 @@ SET (Kit_SRCS
   vtkSMSessionCore.cxx
   vtkSMSession.cxx
   vtkSMSessionServer.cxx
+#vtkSMSourceProxy.cxx
   vtkSMStringVectorProperty.cxx
   vtkSMVectorProperty.cxx
-  vtkSMDoubleRangeDomain.cxx
-  vtkSMIntRangeDomain.cxx
   )
 
 IF (FIXME)
@@ -152,7 +154,6 @@ SET(Kit_SRCS
   vtkSMNumberOfGroupsDomain.cxx
   vtkSMOrderedPropertyIterator.cxx
   vtkSMOutlineRepresentationProxy.cxx
-  vtkSMOutputPort.cxx
   vtkSMNetworkImageSourceProxy.cxx
   vtkSMParallelCoordinatesRepresentationProxy.cxx
   vtkSMPQStateLoader.cxx
@@ -208,7 +209,6 @@ SET(Kit_SRCS
   vtkSMSimpleStrategy.cxx
   vtkSMSimpleStringInformationHelper.cxx
   vtkSMSinusoidKeyFrameProxy.cxx
-  vtkSMSourceProxy.cxx
   vtkSMSpreadSheetRepresentationProxy.cxx
   vtkSMStateLoader.cxx
   vtkSMStateVersionControllerBase.cxx

@@ -183,13 +183,9 @@ void vtkSMSourceProxy::UpdatePipelineInformation()
 {
   if (!this->GetID().IsNull())
     {
-    vtkClientServerStream command;
-    command << vtkClientServerStream::Invoke 
-      << this->GetID() << "UpdateInformation" 
-      << vtkClientServerStream::End;
-
-    vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-    pm->SendStream(this->ConnectionID, this->Servers, command);
+    vtkSMMessage message;
+    message.SetExtension(InvokeRequest::method, "UpdateInformation");
+    this->Invoke(&message);
     }
 
   // This simply iterates over subproxies and calls UpdatePropertyInformation();
@@ -520,62 +516,6 @@ void vtkSMSourceProxy::PostUpdateData()
 }
 
 //----------------------------------------------------------------------------
-void vtkSMSourceProxy::CleanInputs(const char* method)
-{
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-
-  vtkClientServerStream stream;
-  vtkClientServerID sourceID = this->GetID();
-  stream << vtkClientServerStream::Invoke 
-         << sourceID << method 
-         << vtkClientServerStream::End;
-  
-  pm->SendStream(this->ConnectionID, this->Servers, stream);
-}
-
-//----------------------------------------------------------------------------
-void vtkSMSourceProxy::AddInput(unsigned int inputPort,
-                                vtkSMSourceProxy *input, 
-                                unsigned int outputPort,
-                                const char* method)
-{
-
-  if (!input)
-    {
-    return;
-    }
-
-  input->CreateOutputPorts();
-  unsigned int numPorts = input->GetNumberOfOutputPorts();
-  if (outputPort >= numPorts)
-    {
-    vtkErrorMacro("Specified output port (" << outputPort << ") does "
-                  "not exist. Cannot make connection");
-    return;
-    }
-
-  this->CreateVTKObjects();
-
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  vtkClientServerStream stream;
-  vtkClientServerID sourceID = this->GetID();
-  vtkSMOutputPort* opPort = input->GetOutputPort(outputPort);
-  stream << vtkClientServerStream::Invoke;
-  if (inputPort > 0)
-    {
-    stream << sourceID << method << inputPort << opPort->GetID();
-    }
-  else
-    {
-    stream << sourceID << method << opPort->GetID();
-    }
-  stream << vtkClientServerStream::End;
-  pm->SendStream(this->ConnectionID, 
-                 this->Servers & input->GetServers(), 
-                 stream);
-}
-
-//----------------------------------------------------------------------------
 void vtkSMSourceProxy::MarkDirty(vtkSMProxy* modifiedProxy)
 {
   // Mark the extract selection proxies modified as well.
@@ -690,6 +630,12 @@ void vtkSMSourceProxy::CreateSelectionProxies()
     }
   this->CreateOutputPorts();
 
+  // ServerManager2.0:
+  // I am wondering if this should simply move to the server-side. Selection
+  // outputs are only used by representations, never by anything else. So the
+  // representations can ask for the selection port directly. We'll need to
+  // provide mechanism to set the SelectionInput() somehow.
+#ifdef FIXME
   vtkClientServerStream stream;
   vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
   unsigned int numOutputPorts = this->GetNumberOfOutputPorts(); 
@@ -729,6 +675,7 @@ void vtkSMSourceProxy::CreateSelectionProxies()
     this->ConnectionID, this->Servers, stream);
 
   this->SelectionProxiesCreated = 1;
+#endif
 }
 
 //---------------------------------------------------------------------------

@@ -24,6 +24,7 @@
 
 class vtkSMProxyManager;
 class vtkSMSessionCore;
+class vtkPVInformation;
 
 class VTK_EXPORT vtkSMSession : public vtkSession
 {
@@ -71,6 +72,12 @@ public:
   // configurations, the proxy manager is active only on the client. Using the
   // proxy-manager on the server in such a session can have unexpected results.
   virtual vtkSMProxyManager* GetProxyManager();
+
+  // Description:
+  // Gather information about an object referred by the \c globalid.
+  // \c location identifies the processes to gather the information from.
+  virtual bool GatherInformation(vtkTypeUInt32 location,
+    vtkPVInformation* information, vtkTypeUInt32 globalid);
 
 //BTX
 protected:

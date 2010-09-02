@@ -68,13 +68,23 @@ public:
   // Gracefully exits the session.
   void CloseSession();
 
+  // Description:
+  // Gather information about an object referred by the \c globalid.
+  // \c location identifies the processes to gather the information from.
+  // Overridden to fetch the information from server if needed, otherwise it's
+  // handled locally.
+  virtual bool GatherInformation(vtkTypeUInt32 location,
+    vtkPVInformation* information, vtkTypeUInt32 globalid);
+
 //BTX
   enum {
     PUSH=1,
     INVOKE=2,
     PULL=3,
+    GATHER_INFORMATION=4,
     CLIENT_SERVER_MESSAGE_RMI=55625,
-    CLOSE_SESSION=55626
+    CLOSE_SESSION=55626,
+    REPLY_GATHER_INFORMATION_TAG=55627
     };
 
 protected:

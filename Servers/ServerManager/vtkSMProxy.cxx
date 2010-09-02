@@ -19,8 +19,8 @@
 #include "vtkGarbageCollector.h"
 #include "vtkInstantiator.h"
 #include "vtkObjectFactory.h"
-#include "vtkProcessModuleConnectionManager.h"
 #include "vtkProcessModule2.h"
+#include "vtkProcessModuleConnectionManager.h"
 #include "vtkPVOptions.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSMDocumentation.h"
@@ -28,13 +28,14 @@
 #include "vtkSMPropertyIterator.h"
 #include "vtkSMProxyLocator.h"
 #include "vtkSMProxyManager.h"
+#include "vtkSMSession.h"
 
 #include "vtkSMProxyInternals.h"
 
 #include <vtkstd/algorithm>
-#include <vtkstd/set>
 #include <vtkstd/string>
 #include <vtksys/ios/sstream>
+#include <assert.h>
 
 //---------------------------------------------------------------------------
 // Observer for modified event of the property
@@ -529,6 +530,18 @@ void vtkSMProxy::CreateVTKObjects()
     it2->second.GetPointer()->CreateVTKObjects();
     }
 #endif
+}
+
+//---------------------------------------------------------------------------
+bool vtkSMProxy::GatherInformation(vtkPVInformation* information)
+{
+  assert(information);
+  if (this->GetSession())
+    {
+    return this->GetSession()->GatherInformation(this->Location,
+      information, this->GetGlobalID());
+    }
+  return false;
 }
 
 //---------------------------------------------------------------------------

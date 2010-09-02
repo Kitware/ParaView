@@ -248,6 +248,16 @@ void vtkPMProxy::DeleteVTKObjects()
 }
 
 //----------------------------------------------------------------------------
+vtkObjectBase* vtkPMProxy::GetVTKObject()
+{
+  if (this->VTKObjectID.IsNull() == false && this->Interpreter)
+    {
+    return this->Interpreter->GetObjectFromID(this->VTKObjectID);
+    }
+  return NULL;
+}
+
+//----------------------------------------------------------------------------
 bool vtkPMProxy::ReadXMLAttributes(vtkPVXMLElement* element)
 {
   for(unsigned int i=0; i < element->GetNumberOfNestedElements(); ++i)

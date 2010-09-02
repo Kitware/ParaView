@@ -22,6 +22,7 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkSMProxy.h"
 #include "vtkSMStringVectorProperty.h"
 #include "vtkSMIntVectorProperty.h"
+#include "vtkPVFileInformation.h"
 
 //----------------------------------------------------------------------------
 int main(int argc, char* argv[])
@@ -58,8 +59,15 @@ int main(int argc, char* argv[])
     vtkSMStringVectorProperty::SafeDownCast(
       proxy->GetProperty("Path"))->SetElement(0, "/tmp");
     vtkSMIntVectorProperty::SafeDownCast(
-      proxy->GetProperty("SpecialDirectories"))->SetElement(0, 1);
+      proxy->GetProperty("SpecialDirectories"))->SetElement(0, 0);
     proxy->UpdateVTKObjects();
+
+
+    vtkPVFileInformation* info = vtkPVFileInformation::New();
+    proxy->GatherInformation(info);
+    info->Print(cout);
+    info->Delete();
+
     proxy->Delete();
     cout << "Exiting..." << endl;
     session->Delete();

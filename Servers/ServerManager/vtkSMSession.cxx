@@ -80,6 +80,13 @@ vtkSMProxyManager* vtkSMSession::GetProxyManager()
 }
 
 //----------------------------------------------------------------------------
+bool vtkSMSession::GatherInformation(vtkTypeUInt32 location,
+    vtkPVInformation* information, vtkTypeUInt32 globalid)
+{
+  return this->Core->GatherInformation(location, information, globalid);
+}
+
+//----------------------------------------------------------------------------
 void vtkSMSession::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);

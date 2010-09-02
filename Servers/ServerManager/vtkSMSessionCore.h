@@ -27,6 +27,7 @@ class vtkClientServerInterpreter;
 class vtkMultiProcessController;
 class vtkPMObject;
 class vtkSMProxyDefinitionManager;
+class vtkPVInformation;
 
 class VTK_EXPORT vtkSMSessionCore : public vtkObject
 {
@@ -65,14 +66,22 @@ public:
   // Returns a vtkPMObject or subclass given its global id, if any.
   vtkPMObject* GetPMObject(vtkTypeUInt32 globalid);
 
+  // Description:
+  // Gather information about an object referred by the \c globalid.
+  // \c location identifies the processes to gather the information from.
+  virtual bool GatherInformation(vtkTypeUInt32 location,
+    vtkPVInformation* information, vtkTypeUInt32 globalid);
+
 //BTX
   enum MessageTypes
     {
     PUSH_STATE   = 12,
     PULL_STATE   = 13,
-    INVOKE_STATE = 14
+    INVOKE_STATE = 14,
+    GATHER_INFORMATION = 15
     };
   void PushStateSatelliteCallback();
+  void GatherInformationStatelliteCallback();
 
 protected:
   vtkSMSessionCore();
@@ -80,10 +89,14 @@ protected:
 
   // Description:
   virtual void PushStateInternal(vtkSMMessage*);
+  bool GatherInformationInternal(
+    vtkPVInformation* information, vtkTypeUInt32 globalid);
+  bool CollectInformation(vtkPVInformation*);
 
   enum
     {
-    ROOT_SATELLITE_RMI_TAG =  887822
+    ROOT_SATELLITE_RMI_TAG =  887822,
+    ROOT_SATELLITE_INFO_TAG = 887823
     };
 
   vtkSMProxyDefinitionManager* ProxyDefinitionManager;
