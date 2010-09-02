@@ -6113,7 +6113,7 @@
 
      <Hints>
        <ReaderFactory extensions="ncdf nc"
-                      file_description="MPAS Ocean NetCDF (Unstructured)" />
+                      file_description="MPAS NetCDF (Unstructured)" />
      </Hints>
 
    </SourceProxy>
