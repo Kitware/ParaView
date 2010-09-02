@@ -46,6 +46,8 @@ public:
 
   bool playEvent(QObject* object, const QString& command, const QString&
     arguments, bool& error);
+
+  static const QString &EVENT_NAME();
 private:
   pqColorButtonEventPlayer(const pqColorButtonEventPlayer&); // Not implemented.
   void operator=(const pqColorButtonEventPlayer&); // Not implemented.
