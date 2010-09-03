@@ -66,6 +66,11 @@ public:
   vtkGetStringMacro(InformationScript)
 
   // Description:
+  // Set the text of the python script to execute in RequestUpdateExtent().
+  vtkSetStringMacro(UpdateExtentScript)
+  vtkGetStringMacro(UpdateExtentScript)
+
+  // Description:
   // Set a name-value parameter that will be available to the script
   // when it is run
   void SetParameter(const char *name, const char *value);
@@ -121,8 +126,13 @@ protected:
                                  vtkInformationVector** inputVector,
                                  vtkInformationVector* outputVector);
 
+  virtual int RequestUpdateExtent(vtkInformation* request,
+                                 vtkInformationVector** inputVector,
+                                 vtkInformationVector* outputVector);
+
   char *Script;
   char *InformationScript;
+  char *UpdateExtentScript;
   char *PythonPath;
   int OutputDataSetType;
 
