@@ -62,6 +62,18 @@ public:
   // Tell if Init() was called succesfully
   bool GetInitialized() const;
 
+  // Description:
+  void Activate();
+
+  // Description:
+  void Deactivate();
+
+  // Description:
+  void StartStream();
+
+  // Description:
+  void StopStream();
+
 protected slots:
   void callback();
 

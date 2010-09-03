@@ -35,8 +35,17 @@ bool vruiPipe::WaitForServerReply(int msecs)
 vruiPipe::MessageTag vruiPipe::Receive()
 {
   MessageTagPropocol message;
-  this->Socket->read(reinterpret_cast<char *>(&message),
-                     sizeof(MessageTagPropocol));
+
+  qint64 bytes=0;
+
+  while(bytes!=sizeof(MessageTagPropocol)) // 2
+    {
+    bytes=this->Socket->read(reinterpret_cast<char *>(&message),
+                             sizeof(MessageTagPropocol));
+    }
+
+//  cout << "bytes=" << bytes << endl;
+//  cout << "sizeof=" << sizeof(MessageTagPropocol) <<  endl;
 
   return static_cast<MessageTag>(message);
 }
@@ -49,12 +58,24 @@ void vruiPipe::ReadLayout(vruiServerState *state)
   int value;
   this->Socket->read(reinterpret_cast<char *>(&value),sizeof(int));
   state->GetTrackerStates()->resize(value);
+  int i=0;
+  while(i<value)
+    {
+    (*(state->GetTrackerStates()))[i]=vruiTrackerState::New();
+    ++i;
+    }
+
+  cout << "number of trackers: " << value << endl;
 
   this->Socket->read(reinterpret_cast<char *>(&value),sizeof(int));
   state->GetButtonStates()->resize(value);
 
+  cout << "number of buttons: " << value << endl;
+
   this->Socket->read(reinterpret_cast<char *>(&value),sizeof(int));
   state->GetValuatorStates()->resize(value);
+
+  cout << "number of valuators: " << value << endl;
 }
 
 // ----------------------------------------------------------------------------
@@ -68,8 +89,15 @@ void vruiPipe::ReadState(vruiServerState *state)
   size_t c=trackers->size();
   while(i<c)
     {
-    this->Socket->read(reinterpret_cast<char *>((*trackers)[i].GetPointer()),
-                       sizeof(vruiTrackerState));
+    vruiTrackerState *tracker=(*trackers)[i].GetPointer();
+    this->Socket->read(reinterpret_cast<char *>(tracker->GetPosition()),
+                       3*sizeof(float));
+    this->Socket->read(reinterpret_cast<char *>(tracker->GetUnitQuaternion()),
+                       4*sizeof(float));
+    this->Socket->read(reinterpret_cast<char *>(tracker->GetLinearVelocity()),
+                       3*sizeof(float));
+    this->Socket->read(reinterpret_cast<char *>(tracker->GetAngularVelocity()),
+                       3*sizeof(float));
     ++i;
     }
   // read all buttons states.

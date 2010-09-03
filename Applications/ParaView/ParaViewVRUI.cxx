@@ -185,16 +185,40 @@ void ParaViewVRUI::Init()
     }
 
   this->Internals->State=new vruiServerState;
+  this->Internals->StateMutex=new QMutex;
 
   this->Internals->Pipe->ReadLayout(this->Internals->State);
 
-  // Activate
+  this->Activate();
+
+//  this->StartStream();
+
+  this->Initialized=true;
+}
+
+// ----------------------------------------------------------------------------
+void ParaViewVRUI::Activate()
+{
   if(!this->Internals->Active)
     {
     this->Internals->Pipe->Send(vruiPipe::ACTIVATE_REQUEST);
     this->Internals->Active=true;
     }
-  // Start Stream
+}
+
+// ----------------------------------------------------------------------------
+void ParaViewVRUI::Deactivate()
+{
+  if(this->Internals->Active)
+    {
+    this->Internals->Active=false;
+    this->Internals->Pipe->Send(vruiPipe::DEACTIVATE_REQUEST);
+    }
+}
+
+// ----------------------------------------------------------------------------
+void ParaViewVRUI::StartStream()
+{
   if(this->Internals->Active)
     {
     this->Internals->Thread=new vruiThread;
@@ -213,29 +237,26 @@ void ParaViewVRUI::Init()
     m.unlock();
 
     this->Internals->Streaming=true;
-
-    this->Initialized=true;
     }
-
 }
 
 // ----------------------------------------------------------------------------
-ParaViewVRUI::~ParaViewVRUI()
+void ParaViewVRUI::StopStream()
 {
-  // Stop stream
   if(this->Internals->Streaming)
     {
     this->Internals->Streaming=false;
     this->Internals->Pipe->Send(vruiPipe::STOPSTREAM_REQUEST);
     this->Internals->Thread->wait();
     }
+}
 
-  // Deactivate
-  if(this->Internals->Active)
-    {
-    this->Internals->Active=false;
-    this->Internals->Pipe->Send(vruiPipe::DEACTIVATE_REQUEST);
-    }
+// ----------------------------------------------------------------------------
+ParaViewVRUI::~ParaViewVRUI()
+{
+  this->StopStream();
+
+  this->Deactivate();
 
   delete this->Internals;
   if(this->Name!=0)
@@ -268,12 +289,14 @@ void ParaViewVRUI::GetNextPacket()
     {
     if(this->Internals->Streaming)
       {
+      // With a thread
       this->Internals->PacketSignalCondMutex->lock();
       this->Internals->PacketSignalCond->wait(this->Internals->PacketSignalCondMutex);
       this->Internals->PacketSignalCondMutex->unlock();
       }
     else
       {
+      // With a loop
       this->Internals->Pipe->Send(vruiPipe::PACKET_REQUEST);
       if(this->Internals->Pipe->WaitForServerReply(10000))
         {
@@ -313,4 +336,8 @@ void ParaViewVRUI::PrintPositionOrientation()
   cout << "pos=("<< pos[0] << "," << pos[1] << "," << pos[2] << ")" << endl;
   cout << "q=("<< q[0] << "," << q[1] << "," << q[2] << "," << q[3] << ")"
        << endl;
+
+  vtkstd::vector<bool> *buttons=this->Internals->State->GetButtonStates();
+  cout << "button0=" << (*buttons)[0] << endl;
+
 }

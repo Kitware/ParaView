@@ -105,7 +105,7 @@ ParaViewMainWindow::ParaViewMainWindow()
   // Setup the help menu.
   pqParaViewMenuBuilders::buildHelpMenu(*this->Internals->menu_Help);
 
-#if 0
+#if 1
   // VRPN input events.
   this->VRPNTimer=new QTimer(this);
   this->VRPNTimer->setInterval(40); // in ms
