@@ -54,6 +54,7 @@ public:
   // Description:
   // Push the state.
   virtual void PushState(vtkSMMessage* msg);
+  virtual void Invoke(vtkSMMessage* msg);
 
 //ETX
 

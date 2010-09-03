@@ -216,6 +216,16 @@ void vtkSMSessionServer::OnClientServerMessageRMI(void* message, int message_len
       }
     break;
 
+  case vtkSMSessionClient::INVOKE:
+      {
+      vtkstd::string string;
+      stream >> string;
+      vtkSMMessage msg;
+      msg.ParseFromString(string);
+      this->Invoke(&msg);
+      }
+    break;
+
   case vtkSMSessionClient::GATHER_INFORMATION:
       {
       vtkstd::string classname;

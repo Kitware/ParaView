@@ -81,6 +81,7 @@ public:
     GATHER_INFORMATION = 15
     };
   void PushStateSatelliteCallback();
+  void InvokeSatelliteCallback();
   void GatherInformationStatelliteCallback();
 
 protected:
@@ -89,6 +90,7 @@ protected:
 
   // Description:
   virtual void PushStateInternal(vtkSMMessage*);
+  virtual void InvokeInternal(vtkSMMessage*);
   bool GatherInformationInternal(
     vtkPVInformation* information, vtkTypeUInt32 globalid);
   bool CollectInformation(vtkPVInformation*);

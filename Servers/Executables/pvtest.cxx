@@ -16,12 +16,12 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkMultiProcessController.h"
 #include "vtkNetworkAccessManager.h"
 #include "vtkProcessModule2.h"
-#include "vtkPVServerOptions.h"
-#include "vtkSMSession.h"
-#include "vtkSMProxyManager.h"
-#include "vtkSMProxy.h"
 #include "vtkPVFileInformation.h"
+#include "vtkPVServerOptions.h"
 #include "vtkSMPropertyHelper.h"
+#include "vtkSMProxyManager.h"
+#include "vtkSMSession.h"
+#include "vtkSMSourceProxy.h"
 
 //----------------------------------------------------------------------------
 int main(int argc, char* argv[])
@@ -74,6 +74,7 @@ int main(int argc, char* argv[])
     vtkSMProxy* shrink = pxm->NewProxy("filters", "ShrinkFilter");
     vtkSMPropertyHelper(shrink, "Input").Set(proxy);
     shrink->UpdateVTKObjects();
+    vtkSMSourceProxy::SafeDownCast(shrink)->UpdatePipeline();
 
     proxy->Delete();
     shrink->Delete();

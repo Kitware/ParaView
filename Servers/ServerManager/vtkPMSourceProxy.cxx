@@ -18,6 +18,7 @@
 #include "vtkClientServerInterpreter.h"
 #include "vtkClientServerStream.h"
 #include "vtkInformation.h"
+#include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVExtentTranslator.h"
 #include "vtkPVXMLElement.h"
@@ -264,7 +265,61 @@ bool vtkPMSourceProxy::ReadXMLAttributes(vtkPVXMLElement* element)
 //----------------------------------------------------------------------------
 void vtkPMSourceProxy::Invoke(vtkSMMessage* message)
 {
-  cout << "Invoke not handled yet"<< endl;
+  vtkstd::string command;
+  const VariantList* arguments;
+  command = message->GetExtension(InvokeRequest::method);
+  arguments = &message->GetExtension(InvokeRequest::arguments);
+
+  if (command == "UpdatePipeline")
+    {
+    assert(arguments->variant_size() == 3);
+    int port_index = arguments->variant(0).integer(0);
+    double time = arguments->variant(1).float64(0);
+    bool doTime = arguments->variant(2).integer(0) != 0;
+    this->UpdatePipeline(port_index, time, doTime);
+    message->Clear();
+    return;
+    }
+  else if (command == "UpdateInformation")
+    {
+    this->UpdateInformation();
+    message->Clear();
+    return;
+    }
+
+  return this->Superclass::Invoke(message);
+}
+
+//----------------------------------------------------------------------------
+void vtkPMSourceProxy::UpdateInformation()
+{
+  vtkAlgorithm* algo = vtkAlgorithm::SafeDownCast(this->GetVTKObject());
+  assert(algo);
+  algo->UpdateInformation();
+}
+
+//----------------------------------------------------------------------------
+void vtkPMSourceProxy::UpdatePipeline(int port, double time, bool doTime)
+{
+  int processid =
+    vtkMultiProcessController::GetGlobalController()->GetLocalProcessId();
+  int numprocs =
+    vtkMultiProcessController::GetGlobalController()->GetNumberOfProcesses();
+
+  vtkAlgorithm* algo = vtkAlgorithm::SafeDownCast(this->GetVTKObject());
+  assert(algo);
+
+  algo->UpdateInformation();
+  vtkStreamingDemandDrivenPipeline* sddp =
+    vtkStreamingDemandDrivenPipeline::SafeDownCast(
+      algo->GetExecutive());
+
+  sddp->SetUpdateExtent(port, processid, numprocs, /*ghost level*/0);
+  if (doTime)
+    {
+    sddp->SetUpdateTimeStep(port, time);
+    }
+  sddp->Update(port);
 }
 
 //----------------------------------------------------------------------------

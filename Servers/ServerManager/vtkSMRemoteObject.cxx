@@ -95,7 +95,7 @@ bool vtkSMRemoteObject::PullState(vtkSMMessage* msg)
     }
   else
     {
-    cout << "No session found" << endl;
+    vtkErrorMacro("No session found");
     // FIXME Throw exception or error feed back : Not PVSession found !
     return false;
     }
@@ -109,11 +109,11 @@ void vtkSMRemoteObject::Invoke(vtkSMMessage* msg)
   msg->set_location(this->Location);
   if(this->GetSession())
     {
-    // FIXME this->GetSession()->InvokeEvent(this->ConnectionID, msg);
+    this->GetSession()->Invoke(msg);
     }
   else
     {
-    // FIXME Throw exception or error feed back : Not PVSession found !
+    vtkErrorMacro("No session found");
     }
 }
 

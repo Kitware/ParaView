@@ -59,6 +59,10 @@ protected:
   // Create the output ports and add post filters for each output port.
   virtual bool CreateOutputPorts();
 
+  // Description:
+  // Called to initialize a single output port. This assigns each output port an
+  // interpreter id and then initializes the translator/extract pieces/post
+  // filters.
   virtual bool InitializeOutputPort(vtkAlgorithm* alo, int port);
 
   // Description:
@@ -70,6 +74,14 @@ protected:
   // Insert a filter to extract (and redistribute) unstructured
   // pieces if the source cannot generate pieces.
   void InsertExtractPiecesIfNecessary(vtkAlgorithm* algo, int port);
+
+  // Description:
+  // Triggers UpdatePipeline().
+  virtual void UpdatePipeline(int port, double time, bool doTime);
+
+  // Description:
+  // Triggers UpdateInformation().
+  virtual void UpdateInformation()
 
   char *ExecutiveName;
   vtkSetStringMacro(ExecutiveName);

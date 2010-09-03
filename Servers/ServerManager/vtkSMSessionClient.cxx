@@ -283,6 +283,57 @@ void vtkSMSessionClient::PushState(vtkSMMessage* message)
 }
 
 //----------------------------------------------------------------------------
+void vtkSMSessionClient::Invoke(vtkSMMessage* message)
+{
+  if (this->RenderServerController == NULL)
+    {
+    // re-route all render-server messages to data-server.
+    if (message->location() & vtkProcessModule2::RENDER_SERVER)
+      {
+      message->set_location(message->location() | vtkProcessModule2::DATA_SERVER);
+      message->set_location(message->location() & ~vtkProcessModule2::RENDER_SERVER);
+      }
+    if (message->location() & vtkProcessModule2::RENDER_SERVER_ROOT)
+      {
+      message->set_location(message->location() | vtkProcessModule2::DATA_SERVER_ROOT);
+      message->set_location(message->location() & ~vtkProcessModule2::RENDER_SERVER_ROOT);
+      }
+    }
+
+  if ( (message->location() & vtkProcessModule2::DATA_SERVER) != 0 ||
+    (message->location() & vtkProcessModule2::DATA_SERVER_ROOT) != 0)
+    {
+    vtkMultiProcessStream stream;
+    stream << static_cast<int>(INVOKE);
+    stream << message->SerializeAsString();
+    vtkstd::vector<unsigned char> raw_message;
+    stream.GetRawData(raw_message);
+    this->DataServerController->TriggerRMIOnAllChildren(
+      &raw_message[0], static_cast<int>(raw_message.size()),
+      CLIENT_SERVER_MESSAGE_RMI);
+    }
+
+  if (this->RenderServerController != NULL &&
+    ((message->location() & vtkProcessModule2::RENDER_SERVER) != 0 ||
+    (message->location() & vtkProcessModule2::RENDER_SERVER_ROOT) != 0))
+    {
+    vtkMultiProcessStream stream;
+    stream << static_cast<int>(INVOKE);
+    stream << message->SerializeAsString();
+    vtkstd::vector<unsigned char> raw_message;
+    stream.GetRawData(raw_message);
+    this->RenderServerController->TriggerRMIOnAllChildren(
+      &raw_message[0], static_cast<int>(raw_message.size()),
+      CLIENT_SERVER_MESSAGE_RMI);
+    }
+
+  if ( (message->location() & vtkProcessModule2::CLIENT) != 0)
+    {
+    this->Superclass::PushState(message);
+    }
+}
+
+//----------------------------------------------------------------------------
 bool vtkSMSessionClient::GatherInformation(
   vtkTypeUInt32 location, vtkPVInformation* information, vtkTypeUInt32 globalid)
 {
