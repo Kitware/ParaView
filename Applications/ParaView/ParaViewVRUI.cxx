@@ -31,71 +31,57 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "ParaViewVRUI.h"
 
-#include <vrpn_Tracker.h>
-#include <vrpn_Button.h>
-#include <vrpn_Analog.h>
-#include <vrpn_Dial.h>
-#include <vrpn_Text.h>
-
+#include "vruiPipe.h"
+#include "vruiServerState.h"
+#include "vruiThread.h"
 #include <vtkstd/vector>
 #include <iostream>
-
-class t_user_callback
-{
-public:
-  char t_name[vrpn_MAX_TEXT_LEN];
-  vtkstd::vector<unsigned> t_counts;
-};
+#include <QTcpSocket>
+#include <QWaitCondition>
+#include <QMutex>
 
 class ParaViewVRUI::pqInternals
 {
 public:
   pqInternals()
     {
-      this->Tracker=0;
-      this->Button=0;
-      this->Analog=0;
-      this->Dial=0;
-      this->Text=0;
-      this->TC1=0;
+      this->Pipe=0;
+      this->State=0;
+      this->Active=false;
+      this->Streaming=false;
+      this->Thread=0;
+      this->StateMutex=0;
+      this->PacketSignalCond=0;
+      this->PacketSignalCondMutex=0;
     }
   ~pqInternals()
     {
-      if(this->Tracker!=0)
+      if(this->Pipe!=0)
         {
-        delete this->Tracker;
+        delete this->Pipe;
         }
-      if(this->Button!=0)
+      if(this->State!=0)
         {
-        delete this->Button;
+        delete this->State;
         }
-      if(this->Analog!=0)
+      if(this->Thread!=0)
         {
-        delete this->Analog;
-        }
-      if(this->Dial!=0)
-        {
-        delete this->Dial;
-        }
-      if(this->Text!=0)
-        {
-        delete this->Text;
-        }
-      if(this->TC1!=0)
-        {
-        delete this->TC1;
+        delete this->Thread;
         }
     }
+  vruiPipe *Pipe;
+  vruiServerState *State;
+  bool Active;
+  bool Streaming;
+  vruiThread *Thread;
 
-  vrpn_Tracker_Remote *Tracker;
-  vrpn_Button_Remote  *Button;
-  vrpn_Analog_Remote  *Analog;
-  vrpn_Dial_Remote    *Dial;
-  vrpn_Text_Receiver  *Text;
+  QMutex *StateMutex;
 
-  t_user_callback *TC1;
+  QWaitCondition *PacketSignalCond;
+  QMutex *PacketSignalCondMutex;
 };
 
+#if 0
 void VRUI_CALLBACK handleTrackerPosQuat(void *userdata,
                                         const vrpn_TRACKERCB t)
 {
@@ -121,6 +107,7 @@ void VRUI_CALLBACK handleTrackerPosQuat(void *userdata,
            t.quat[0], t.quat[1], t.quat[2], t.quat[3]);
     }
 }
+#endif
 
 // ----------------------------------------------------------------------------
 ParaViewVRUI::ParaViewVRUI()
@@ -180,51 +167,76 @@ void ParaViewVRUI::Init()
 {
   QTcpSocket *socket=new QTcpSocket;
   socket->connectToHost(QString(this->Name),this->Port); // ReadWrite?
-  this->Pipe=new vruiPipe(socket);
-  this->Pipe->Send(vruiPipe::CONNECT_REQUEST);
-  if(!this->Pipe->WaitForData())
+  this->Internals->Pipe=new vruiPipe(socket);
+  this->Internals->Pipe->Send(vruiPipe::CONNECT_REQUEST);
+  if(!this->Internals->Pipe->WaitForServerReply(30000)) // 30s
     {
     cerr << "Timeout while waiting for CONNECT_REPLY" << endl;
-    delete this->Pipe;
+    delete this->Internals->Pipe;
+    this->Internals->Pipe=0;
     return;
     }
-  if(this->Pipe->Receive()!=vruiPipe::CONNECT_REPLY)
+  if(this->Internals->Pipe->Receive()!=vruiPipe::CONNECT_REPLY)
     {
     cerr << "Mismatching message while waiting for CONNECT_REPLY" << endl;
-    delete this->Pipe;
+    delete this->Internals->Pipe;
+    this->Internals->Pipe=0;
     return;
     }
 
-  this->State=new vruiServerState;
+  this->Internals->State=new vruiServerState;
 
-  this->Pipe->ReadLayout(this->State);
-#if 0
-  this->Internals->Tracker = new vrpn_Tracker_Remote(this->Name);
-  this->Internals->Analog = new vrpn_Analog_Remote(this->Name);
-  this->Internals->Button = new vrpn_Button_Remote(this->Name);
-  this->Internals->Dial = new vrpn_Dial_Remote(this->Name);
-  this->Internals->Text = new vrpn_Text_Receiver(this->Name);
+  this->Internals->Pipe->ReadLayout(this->Internals->State);
 
-  this->Initialized=this->Internals->Tracker!=0
-    && this->Internals->Analog!=0
-    && this->Internals->Button!=0
-    && this->Internals->Dial!=0
-    && this->Internals->Text!=0;
-
-  if(this->Initialized)
+  // Activate
+  if(!this->Internals->Active)
     {
-    this->Internals->TC1=new t_user_callback;
-    strncpy(this->Internals->TC1->t_name, this->Name,
-            sizeof(this->Internals->TC1->t_name));
-    this->Internals->Tracker->register_change_handler(this->Internals->TC1,
-                                                      handleTrackerPosQuat);
+    this->Internals->Pipe->Send(vruiPipe::ACTIVATE_REQUEST);
+    this->Internals->Active=true;
     }
-#endif
+  // Start Stream
+  if(this->Internals->Active)
+    {
+    this->Internals->Thread=new vruiThread;
+    this->Internals->Streaming=true;
+    this->Internals->Thread->SetPipe(this->Internals->Pipe);
+    this->Internals->Thread->SetServerState(this->Internals->State);
+    this->Internals->Thread->SetStateMutex(this->Internals->StateMutex);
+    this->Internals->Thread->start();
+
+    this->Internals->PacketSignalCond=new QWaitCondition;
+    QMutex m;
+    m.lock();
+
+    this->Internals->Pipe->Send(vruiPipe::STARTSTREAM_REQUEST);
+    this->Internals->PacketSignalCond->wait(&m);
+    m.unlock();
+
+    this->Internals->Streaming=true;
+
+    this->Initialized=true;
+    }
+
 }
 
 // ----------------------------------------------------------------------------
 ParaViewVRUI::~ParaViewVRUI()
 {
+  // Stop stream
+  if(this->Internals->Streaming)
+    {
+    this->Internals->Streaming=false;
+    this->Internals->Pipe->Send(vruiPipe::STOPSTREAM_REQUEST);
+    this->Internals->Thread->wait();
+    }
+
+  // Deactivate
+  if(this->Internals->Active)
+    {
+    this->Internals->Active=false;
+    this->Internals->Pipe->Send(vruiPipe::DEACTIVATE_REQUEST);
+    }
+
   delete this->Internals;
   if(this->Name!=0)
     {
@@ -237,11 +249,68 @@ void ParaViewVRUI::callback()
 {
   if(this->Initialized)
     {
-//    std::cout << "callback()" << std::endl;
-    this->Internals->Tracker->mainloop();
-    this->Internals->Button->mainloop();
-    this->Internals->Analog->mainloop();
-    this->Internals->Dial->mainloop();
-    this->Internals->Text->mainloop();
+    std::cout << "callback()" << std::endl;
+
+    this->Internals->StateMutex->lock();
+
+    // Print position and orientation of tracker 0. (real callback)
+    this->PrintPositionOrientation();
+
+    this->Internals->StateMutex->unlock();
+    this->GetNextPacket(); // for the next step
     }
+}
+
+// ----------------------------------------------------------------------------
+void ParaViewVRUI::GetNextPacket()
+{
+  if(this->Internals->Active)
+    {
+    if(this->Internals->Streaming)
+      {
+      this->Internals->PacketSignalCondMutex->lock();
+      this->Internals->PacketSignalCond->wait(this->Internals->PacketSignalCondMutex);
+      this->Internals->PacketSignalCondMutex->unlock();
+      }
+    else
+      {
+      this->Internals->Pipe->Send(vruiPipe::PACKET_REQUEST);
+      if(this->Internals->Pipe->WaitForServerReply(10000))
+        {
+        if(this->Internals->Pipe->Receive()!=vruiPipe::PACKET_REPLY)
+          {
+          cout << "PVRUI Mismatching message while waiting for PACKET_REPLY" << endl;
+          }
+        else
+          {
+          this->Internals->StateMutex->lock();
+          this->Internals->Pipe->ReadState(this->Internals->State);
+          this->Internals->StateMutex->unlock();
+
+//          this->PacketNotificationMutex->lock();
+//          this->PacketNotificationMutex->unlock();
+          }
+        }
+      else
+        {
+        cout << "timeout for PACKET_REPLY" << endl;
+        }
+      }
+    }
+}
+
+// ----------------------------------------------------------------------------
+void ParaViewVRUI::PrintPositionOrientation()
+{
+  vtkstd::vector<vtkSmartPointer<vruiTrackerState> > *trackers=
+    this->Internals->State->GetTrackerStates();
+
+  float pos[3];
+  float q[4];
+  (*trackers)[0]->GetPosition(pos);
+  (*trackers)[0]->GetUnitQuaternion(q);
+
+  cout << "pos=("<< pos[0] << "," << pos[1] << "," << pos[2] << ")" << endl;
+  cout << "q=("<< q[0] << "," << q[1] << "," << q[2] << "," << q[3] << ")"
+       << endl;
 }

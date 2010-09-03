@@ -3,6 +3,7 @@
 
 #include "vruiTrackerState.h"
 #include "vtkSmartPointer.h"
+#include <vtkstd/vector>
 
 class vruiServerState
 {
@@ -21,7 +22,7 @@ public:
 
   // Description:
   // Return the state of all the valuators (whatever it is).
-  vtkstd::vector<bool> *GetButtonStates();
+  vtkstd::vector<float> *GetValuatorStates();
 
 protected:
   vtkstd::vector<vtkSmartPointer<vruiTrackerState> > TrackerStates;

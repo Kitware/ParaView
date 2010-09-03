@@ -9,7 +9,9 @@ message("VRPN_LIBRARY=${VRPN_LIBRARY}")
 # Add extra library containing custom code for the client.
 QT4_WRAP_CPP(MOC_BUILT_SOURCES
   ParaViewMainWindow.h
-  ParaViewVRPN.h)
+  ParaViewVRPN.h
+  ParaViewVRUI.h
+  vruiThread.h)
 
 QT4_WRAP_UI(UI_BUILT_SOURCES
   ParaViewMainWindow.ui
@@ -39,6 +41,8 @@ SET(ParaView_SOURCE_FILES
   vruiPipe.h
   vruiServerState.cxx
   vruiServerState.h
+  vruiThread.cxx
+  vruiThread.h
   vruiTrackerState.cxx
   vruiTrackerState.h
   ${MOC_BUILT_SOURCES}

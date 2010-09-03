@@ -6,19 +6,20 @@ vruiServerState::vruiServerState()
 }
 
 // ----------------------------------------------------------------------------
-vtkstd::vector<vtkSmartPointer<vruiTrackerState> > *GetTrackerStates()
+vtkstd::vector<vtkSmartPointer<vruiTrackerState> > *
+vruiServerState::GetTrackerStates()
 {
   return &(this->TrackerStates);
 }
 
 // ----------------------------------------------------------------------------
-vtkstd::vector<bool> *GetButtonStates()
+vtkstd::vector<bool> *vruiServerState::GetButtonStates()
 {
   return &(this->ButtonStates);
 }
 
 // ----------------------------------------------------------------------------
-vtkstd::vector<float> *GetValuatorStates()
+vtkstd::vector<float> *vruiServerState::GetValuatorStates()
 {
   return &(this->ValuatorStates);
 }

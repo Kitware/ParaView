@@ -34,7 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QObject>
 
-/// Callback to listen to VRUI events
+/// VRUI client
 class ParaViewVRUI : public QObject
 {
   Q_OBJECT
@@ -66,6 +66,9 @@ protected slots:
   void callback();
 
 protected:
+  void PrintPositionOrientation();
+  void GetNextPacket();
+
   char *Name;
   int NameCapacity;
   int Port;

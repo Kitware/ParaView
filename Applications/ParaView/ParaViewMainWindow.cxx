@@ -38,6 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqParaViewMenuBuilders.h"
 #include "vtkPVPlugin.h"
 #include "ParaViewVRPN.h"
+#include "ParaViewVRUI.h"
 
 
 
@@ -45,6 +46,7 @@ class ParaViewMainWindow::pqInternals : public Ui::pqClientMainWindow
 {
 public:
   ParaViewVRPN *InputDevice;
+  ParaViewVRUI *InputDevice2;
 };
 
 //-----------------------------------------------------------------------------
@@ -103,6 +105,7 @@ ParaViewMainWindow::ParaViewMainWindow()
   // Setup the help menu.
   pqParaViewMenuBuilders::buildHelpMenu(*this->Internals->menu_Help);
 
+#if 0
   // VRPN input events.
   this->VRPNTimer=new QTimer(this);
   this->VRPNTimer->setInterval(40); // in ms
@@ -113,6 +116,21 @@ ParaViewMainWindow::ParaViewMainWindow()
   connect(this->VRPNTimer,SIGNAL(timeout()),
           this->Internals->InputDevice,SLOT(callback()));
   this->VRPNTimer->start();
+#endif
+
+#if 1
+  // VRUI input events.
+  this->VRUITimer=new QTimer(this);
+  this->VRUITimer->setInterval(40); // in ms
+  // to define: obj and callback()
+  this->Internals->InputDevice2=new ParaViewVRUI;
+  this->Internals->InputDevice2->SetName("localhost");
+  this->Internals->InputDevice2->SetPort(8555);
+  this->Internals->InputDevice2->Init();
+  connect(this->VRUITimer,SIGNAL(timeout()),
+          this->Internals->InputDevice2,SLOT(callback()));
+  this->VRUITimer->start();
+#endif
 
   // Final step, define application behaviors. Since we want all ParaView
   // behaviors, we use this convenience method.

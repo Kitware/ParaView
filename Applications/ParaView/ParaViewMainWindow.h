@@ -48,6 +48,7 @@ protected slots:
 
 protected:
   QTimer *VRPNTimer;
+  QTimer *VRUITimer;
 
 private:
   ParaViewMainWindow(const ParaViewMainWindow&); // Not implemented.

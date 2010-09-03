@@ -1,4 +1,5 @@
 #include "vruiTrackerState.h"
+#include "vtkObjectFactory.h"
 
 vtkStandardNewMacro(vruiTrackerState);
 
