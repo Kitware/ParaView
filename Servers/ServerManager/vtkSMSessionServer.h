@@ -22,6 +22,7 @@
 #include "vtkSMSession.h"
 
 class vtkMultiProcessController;
+class vtkMultiProcessStream;
 
 class VTK_EXPORT vtkSMSessionServer : public vtkSMSession
 {
@@ -73,7 +74,8 @@ public:
   // Description:
   // Called when client triggers GatherInformation().
   void GatherInformationInternal(
-    vtkTypeUInt32 location, const char* classname, vtkTypeUInt32 globalid);
+    vtkTypeUInt32 location, const char* classname, vtkTypeUInt32 globalid,
+    vtkMultiProcessStream&);
 
   void OnClientServerMessageRMI(void* message, int message_length);
   void OnCloseSessionRMI();

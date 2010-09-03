@@ -34,7 +34,6 @@
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
 #include "vtkPointData.h"
-#include "vtkProcessModule.h"
 #include "vtkPVArrayInformation.h"
 #include "vtkPVCompositeDataInformation.h"
 #include "vtkPVDataSetAttributesInformation.h"
@@ -46,6 +45,7 @@
 #include "vtkUniformGrid.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkPriorityHelper.h"
+#include "vtkMultiProcessStream.h"
 
 #include <vtkstd/vector>
 
@@ -81,6 +81,8 @@ vtkPVDataInformation::vtkPVDataInformation()
   this->TimeSpan[1] = -VTK_DOUBLE_MAX;
   this->HasTime = 0;
   this->Time = 0.0;
+
+  this->PortNumber = -1;
 }
 
 //----------------------------------------------------------------------------
@@ -107,11 +109,29 @@ vtkPVDataInformation::~vtkPVDataInformation()
 }
 
 //----------------------------------------------------------------------------
+void vtkPVDataInformation::CopyParametersToStream(vtkMultiProcessStream& str)
+{
+  str << 828792 << this->PortNumber;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVDataInformation::CopyParametersFromStream(vtkMultiProcessStream& str)
+{
+  int magic_number;
+  str >> magic_number >> this->PortNumber;
+  if (magic_number != 828792)
+    {
+    vtkErrorMacro("Magic number mismatch.");
+    }
+}
+
+//----------------------------------------------------------------------------
 void vtkPVDataInformation::PrintSelf(ostream& os, vtkIndent indent)
 {
   vtkIndent i2 = indent.GetNextIndent();
   this->Superclass::PrintSelf(os,indent);
 
+  os << indent << "PortNumber: " << this->PortNumber << endl;
   os << indent << "DataSetType: " << this->DataSetType << endl;
   os << indent << "CompositeDataSetType: " << this->CompositeDataSetType << endl;
   os << indent << "NumberOfPoints: " << this->NumberOfPoints << endl;
@@ -406,6 +426,7 @@ void vtkPVDataInformation::CopyFromDataSet(vtkDataSet* data)
     {
     this->NumberOfCells = data->GetNumberOfCells();
     }
+#if 0
   vtkProcessModule *pm = vtkProcessModule::GetProcessModule();
   ofstream *tmpFile = pm->GetLogFile();
   if (tmpFile)
@@ -424,6 +445,7 @@ void vtkPVDataInformation::CopyFromDataSet(vtkDataSet* data)
     *tmpFile << "\t" << this->NumberOfPoints << " points" << endl;
     *tmpFile << "\t" << this->NumberOfCells << " cells" << endl;
     }
+#endif
 
   bds = data->GetBounds();
   for (idx = 0; idx < 6; ++idx)
@@ -560,25 +582,27 @@ void vtkPVDataInformation::CopyFromObject(vtkObject* object)
   if (!dobj)
     {
     vtkAlgorithmOutput* algOutput = vtkAlgorithmOutput::SafeDownCast(object);
+    vtkPriorityHelper *helper = vtkPriorityHelper::SafeDownCast(object);
+    vtkAlgorithm* algo = vtkAlgorithm::SafeDownCast(object);
     if (algOutput && algOutput->GetProducer())
       {
       dobj = algOutput->GetProducer()->GetOutputDataObject(
         algOutput->GetIndex());
       }
-    else
+    else if (helper)
       {
       //Streaming ParaView puts this helper filter into the pipeline.
       //The helper prevent the whole_extent from being requested and makes
       //sure that the sub extent that is requested is worthwhile.
-      vtkPriorityHelper *helper = vtkPriorityHelper::SafeDownCast(object);
-      if (helper)
+      dobj = helper->ConditionallyGetDataObject();
+      if (!dobj)
         {
-        dobj = helper->ConditionallyGetDataObject();
-        if (!dobj)
-          {
-          return;
-          }
+        return;
         }
+      }
+    else if (algo)
+      {
+      dobj = algo->GetOutputDataObject(this->PortNumber);
       }
     }
 

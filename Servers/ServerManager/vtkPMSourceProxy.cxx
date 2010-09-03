@@ -217,8 +217,6 @@ bool vtkPMSourceProxy::CreateTranslatorIfNecessary(vtkAlgorithm* algo, int port)
 //----------------------------------------------------------------------------
 void vtkPMSourceProxy::InsertExtractPiecesIfNecessary(vtkAlgorithm*, int port)
 {
-  return;
-  // FIXME
   vtkClientServerID portID = this->Internals->OutputPortIDs[port];
   vtkClientServerID extractID = this->Interpreter->GetNextAvailableId();
 
@@ -243,6 +241,8 @@ void vtkPMSourceProxy::InsertExtractPiecesIfNecessary(vtkAlgorithm*, int port)
          << portID
          << vtkClientServerStream::LastResult
          << vtkClientServerStream::End;
+
+  // FIXME: need to release vtkPVExtractPieces reference on delete.
   this->Interpreter->ProcessStream(stream);
 }
 

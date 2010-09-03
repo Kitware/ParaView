@@ -22,6 +22,7 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkSMProxyManager.h"
 #include "vtkSMSession.h"
 #include "vtkSMSourceProxy.h"
+#include "vtkPVDataInformation.h"
 
 //----------------------------------------------------------------------------
 int main(int argc, char* argv[])
@@ -71,10 +72,12 @@ int main(int argc, char* argv[])
     proxy->UpdateVTKObjects();
 
 
-    vtkSMProxy* shrink = pxm->NewProxy("filters", "ShrinkFilter");
+    vtkSMSourceProxy* shrink = vtkSMSourceProxy::SafeDownCast(
+      pxm->NewProxy("filters", "ProcessIdScalars"));
     vtkSMPropertyHelper(shrink, "Input").Set(proxy);
     shrink->UpdateVTKObjects();
-    vtkSMSourceProxy::SafeDownCast(shrink)->UpdatePipeline();
+    shrink->UpdatePipeline();
+    shrink->GetDataInformation(0)->Print(cout);
 
     proxy->Delete();
     shrink->Delete();

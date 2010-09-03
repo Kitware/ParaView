@@ -231,7 +231,8 @@ void vtkSMSessionServer::OnClientServerMessageRMI(void* message, int message_len
       vtkstd::string classname;
       vtkTypeUInt32 location, globalid;
       stream >> location >> classname >> globalid;
-      this->GatherInformationInternal(location, classname.c_str(), globalid);
+      this->GatherInformationInternal(location, classname.c_str(), globalid,
+        stream);
       }
     break;
     }
@@ -239,7 +240,8 @@ void vtkSMSessionServer::OnClientServerMessageRMI(void* message, int message_len
 
 //----------------------------------------------------------------------------
 void vtkSMSessionServer::GatherInformationInternal(
-  vtkTypeUInt32 location, const char* classname, vtkTypeUInt32 globalid)
+  vtkTypeUInt32 location, const char* classname, vtkTypeUInt32 globalid,
+  vtkMultiProcessStream& stream)
 {
   vtkSmartPointer<vtkObject> o;
   o.TakeReference(vtkInstantiator::CreateInstance(classname));
@@ -247,6 +249,10 @@ void vtkSMSessionServer::GatherInformationInternal(
   vtkPVInformation* info = vtkPVInformation::SafeDownCast(o);
   if (info)
     {
+    // ensures that the vtkPVInformation has the same ivars locally as on the
+    // client.
+    info->CopyParametersFromStream(stream);
+
     this->Superclass::GatherInformation(location, info, globalid);
 
     vtkClientServerStream css;

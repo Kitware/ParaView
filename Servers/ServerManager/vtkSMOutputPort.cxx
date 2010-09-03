@@ -106,7 +106,7 @@ void vtkSMOutputPort::InvalidateDataInformation()
 //----------------------------------------------------------------------------
 void vtkSMOutputPort::GatherDataInformation()
 {
-  if (this->SourceProxy)
+  if (!this->SourceProxy)
     {
     vtkErrorMacro("Invalid vtkSMOutputPort.");
     return;
@@ -116,6 +116,7 @@ void vtkSMOutputPort::GatherDataInformation()
   //vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   //pm->SendPrepareProgress(this->ConnectionID);
   this->DataInformation->Initialize();
+  this->DataInformation->SetPortNumber(this->PortIndex);
   this->SourceProxy->GatherInformation(this->DataInformation);
   this->DataInformationValid = true;
 
@@ -125,7 +126,7 @@ void vtkSMOutputPort::GatherDataInformation()
 //----------------------------------------------------------------------------
 void vtkSMOutputPort::GatherTemporalDataInformation()
 {
-  if (this->SourceProxy)
+  if (!this->SourceProxy)
     {
     vtkErrorMacro("Invalid vtkSMOutputPort.");
     return;
@@ -144,7 +145,7 @@ void vtkSMOutputPort::GatherTemporalDataInformation()
 //----------------------------------------------------------------------------
 void vtkSMOutputPort::GatherClassNameInformation()
 {
-  if (this->SourceProxy)
+  if (!this->SourceProxy)
     {
     vtkErrorMacro("Invalid vtkSMOutputPort.");
     return;

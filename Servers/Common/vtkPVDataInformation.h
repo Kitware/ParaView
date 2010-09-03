@@ -49,6 +49,13 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
+  // Port number controls which output port the information is gathered from.
+  // This is the only parameter that can be set on  the client-side before
+  // gathering the information.
+  vtkSetMacro(PortNumber, int);
+  vtkGetMacro(PortNumber, int);
+
+  // Description:
   // Transfer information about a single object into this object.
   virtual void CopyFromObject(vtkObject*);
 
@@ -66,6 +73,14 @@ public:
   // Manage a serialized version of the information.
   virtual void CopyToStream(vtkClientServerStream*);
   virtual void CopyFromStream(const vtkClientServerStream*);
+
+  // Description:
+  // Serialize/Deserialize the parameters that control how/what information is
+  // gathered. This are different from the ivars that constitute the gathered
+  // information itself. For example, PortNumber on vtkPVDataInformation
+  // controls what output port the data-information is gathered from.
+  virtual void CopyParametersToStream(vtkMultiProcessStream&);
+  virtual void CopyParametersFromStream(vtkMultiProcessStream&);
 
   // Description:
   // Remove all information.  The next add will be like a copy.
@@ -208,6 +223,8 @@ protected:
 private:
   vtkPVDataInformation(const vtkPVDataInformation&); // Not implemented
   void operator=(const vtkPVDataInformation&); // Not implemented
+
+  int PortNumber;
 };
 
 #endif

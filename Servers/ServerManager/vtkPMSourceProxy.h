@@ -81,7 +81,7 @@ protected:
 
   // Description:
   // Triggers UpdateInformation().
-  virtual void UpdateInformation()
+  virtual void UpdateInformation();
 
   char *ExecutiveName;
   vtkSetStringMacro(ExecutiveName);

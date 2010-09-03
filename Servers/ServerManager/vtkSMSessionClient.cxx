@@ -367,6 +367,7 @@ bool vtkSMSessionClient::GatherInformation(
     << location
     << information->GetClassName()
     << globalid;
+  information->CopyParametersToStream(stream);
   vtkstd::vector<unsigned char> raw_message;
   stream.GetRawData(raw_message);
 

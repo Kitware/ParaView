@@ -89,7 +89,6 @@ void vtkPMProxy::Push(vtkSMMessage* message)
         }
       }
     }
-  this->VTKObject->Print(cout);
 }
 
 //----------------------------------------------------------------------------

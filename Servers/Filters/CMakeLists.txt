@@ -112,6 +112,7 @@ SET(Filters_SRCS
   vtkPVEnSightMasterServerReader2.cxx
   vtkPVEnSightMasterServerTranslator.cxx
   vtkPVExtentTranslator.cxx
+  vtkPVExtractPieces.cxx
   vtkPVExtractSelection.cxx
   vtkPVExtractVOI.cxx
   vtkPVGenericRenderWindowInteractor.cxx

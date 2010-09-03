@@ -325,7 +325,6 @@ void vtkSMSessionCore::DeletePMObject(vtkSMMessage* message)
   this->Internals->Delete(message->global_id());
 }
 
-
 //----------------------------------------------------------------------------
 bool vtkSMSessionCore::GatherInformationInternal(
   vtkPVInformation* information, vtkTypeUInt32 globalid)
@@ -391,6 +390,10 @@ bool vtkSMSessionCore::GatherInformation(vtkTypeUInt32 location,
 
     vtkMultiProcessStream stream;
     stream << information->GetClassName() << globalid;
+
+    // serialize information parameters so all processes have the same ivars.
+    information->CopyParametersToStream(stream);
+
     this->ParallelController->Broadcast(stream, 0);
     }
 
@@ -409,10 +412,10 @@ void vtkSMSessionCore::GatherInformationStatelliteCallback()
 
   vtkSmartPointer<vtkObject> o;
   o.TakeReference(vtkInstantiator::CreateInstance(classname.c_str()));
-
   vtkPVInformation* info = vtkPVInformation::SafeDownCast(o);
   if (info)
     {
+    info->CopyParametersFromStream(stream);
     this->GatherInformationInternal(info, globalid);
     this->CollectInformation(info);
     }

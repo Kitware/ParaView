@@ -22,6 +22,7 @@
 #include "vtkObject.h"
 
 class vtkClientServerStream;
+class vtkMultiProcessStream;
 
 class VTK_EXPORT vtkPVInformation : public vtkObject
 {
@@ -42,18 +43,26 @@ public:
   // Manage a serialized version of the information.
   virtual void CopyToStream(vtkClientServerStream*) = 0;
   virtual void CopyFromStream(const vtkClientServerStream*);
+
+  // Description:
+  // Serialize/Deserialize the parameters that control how/what information is
+  // gathered. This are different from the ivars that constitute the gathered
+  // information itself. For example, PortNumber on vtkPVDataInformation
+  // controls what output port the data-information is gathered from.
+  virtual void CopyParametersToStream(vtkMultiProcessStream&) {};
+  virtual void CopyParametersFromStream(vtkMultiProcessStream&) {};
   //ETX
 
   // Description:
   // Set/get whether to gather information only from the root.
   vtkGetMacro(RootOnly, int);
-  vtkSetMacro(RootOnly, int);
 
 protected:
   vtkPVInformation();
   ~vtkPVInformation();
 
   int RootOnly;
+  vtkSetMacro(RootOnly, int);
 
   vtkPVInformation(const vtkPVInformation&); // Not implemented
   void operator=(const vtkPVInformation&); // Not implemented
