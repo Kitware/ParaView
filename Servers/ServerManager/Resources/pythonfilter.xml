@@ -173,6 +173,19 @@
              This property is a python script that is executed during the RequestInformation pipeline pass. Use this to provide information such as WHOLE_EXTENT to the pipeline downstream.
            </Documentation>
          </StringVectorProperty>
+
+         <StringVectorProperty
+            name="UpdateExtentScript"
+            command="SetUpdateExtentScript"
+            label="RequestUpdateExtent Script"
+            number_of_elements="1">
+           <Hints>
+             <Widget type="multi_line"/>
+           </Hints>
+           <Documentation>
+             This property is a python script that is executed during the RequestUpdateExtent pipeline pass. Use this to modify the update extent that your filter ask up stream for.
+           </Documentation>
+         </StringVectorProperty>
          
          <IntVectorProperty 
             name="CopyArrays" 
