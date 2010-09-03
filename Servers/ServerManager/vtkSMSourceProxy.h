@@ -260,7 +260,6 @@ protected:
   virtual void PostUpdateData();
 
   int DoInsertExtractPieces;
-  int DoInsertPostFilter;
   int SelectionProxiesCreated;
 
 private:
