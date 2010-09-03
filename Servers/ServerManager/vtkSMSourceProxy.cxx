@@ -87,6 +87,8 @@ struct vtkSMSourceProxyInternals
 //---------------------------------------------------------------------------
 vtkSMSourceProxy::vtkSMSourceProxy()
 {
+  this->SetKernelClassName("vtkPMSourceProxy");
+
   this->PInternals = new  vtkSMSourceProxyInternals;
   this->OutputPortsCreated = 0;
 
@@ -181,15 +183,17 @@ vtkSMDocumentation* vtkSMSourceProxy::GetOutputPortDocumentation(
 //---------------------------------------------------------------------------
 void vtkSMSourceProxy::UpdatePipelineInformation()
 {
-  if (!this->GetID().IsNull())
+  if (this->ObjectsCreated)
     {
     vtkSMMessage message;
-    message.SetExtension(InvokeRequest::method, "UpdateInformation");
+    message << pvstream::InvokeRequest() << "UpdateInformation";
     this->Invoke(&message);
     }
 
+  // This is no longer applicable since subproxies don't exists on the
+  // client-side.
   // This simply iterates over subproxies and calls UpdatePropertyInformation();
-  this->Superclass::UpdatePipelineInformation();
+  // this->Superclass::UpdatePipelineInformation();
 
   this->InvokeEvent(vtkCommand::UpdateInformationEvent);
   // this->MarkModified(this);  
@@ -310,6 +314,8 @@ void vtkSMSourceProxy::CreateVTKObjects()
 
   this->Superclass::CreateVTKObjects();
 
+#ifdef FIXME
+  // THIS CODE MUST MOVE TO vtkPMSourceProxy.
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
 
   vtkClientServerID sourceID = this->GetID();
@@ -351,9 +357,11 @@ void vtkSMSourceProxy::CreateVTKObjects()
          << vtkClientServerStream::End;
   
   pm->SendStream(this->ConnectionID, this->Servers, stream);
+#endif
 
-  this->PInternals->ResizeOutputPorts(
-    this->GetNumberOfAlgorithmOutputPorts());
+  // We are going to fix the ports such that we don't have to update the
+  // pipeline or even UpdateInformation() to create the ports.
+  this->CreateOutputPorts();
 }
 
 //---------------------------------------------------------------------------
@@ -365,19 +373,11 @@ unsigned int vtkSMSourceProxy::GetNumberOfAlgorithmOutputPorts()
     return this->NumberOfAlgorithmOutputPorts;
     }
 
-  if (this->ObjectsCreated && !this->GetID().IsNull())
+  if (this->ObjectsCreated)
     {
-    vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-
-    // TODO replace this with UpdateInformation and OutputInformation
-    // property.
-    vtkSmartPointer<vtkPVAlgorithmPortsInformation> info = 
+    vtkSmartPointer<vtkPVAlgorithmPortsInformation> info =
       vtkSmartPointer<vtkPVAlgorithmPortsInformation>::New();
-
-    // Create one output port proxy for each output of the filter
-    vtkClientServerStream stream;
-    pm->GatherInformation(
-      this->ConnectionID, this->Servers, info, this->GetID());
+    this->GatherInformation(info);
     this->NumberOfAlgorithmOutputPorts = info->GetNumberOfOutputs();
     this->NumberOfAlgorithmRequiredInputPorts = info->GetNumberOfRequiredInputs();
     return this->NumberOfAlgorithmOutputPorts;
@@ -403,12 +403,6 @@ unsigned int vtkSMSourceProxy::GetNumberOfAlgorithmRequiredInputPorts()
 //---------------------------------------------------------------------------
 void vtkSMSourceProxy::CreateOutputPorts()
 {
-  this->CreateOutputPortsInternal(this);
-}
-
-//---------------------------------------------------------------------------
-void vtkSMSourceProxy::CreateOutputPortsInternal(vtkSMProxy* op)
-{
   if (this->OutputPortsCreated && this->GetNumberOfOutputPorts())
     {
     return;
@@ -419,18 +413,13 @@ void vtkSMSourceProxy::CreateOutputPortsInternal(vtkSMProxy* op)
   // This happens when connecting a filter to a source which is not
   // initialized. In other situations, SetInput() creates the VTK
   // objects before this gets called.
-  op->CreateVTKObjects();
+  this->CreateVTKObjects();
 
   // We simply set/replace the Port pointers in the
   // this->PInternals->OutputPorts. This ensures that the port names,
   // port documentation is preserved.
 
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-
-
   // Create one output port proxy for each output of the filter
-  vtkClientServerStream stream;
-  vtkClientServerID sourceID = op->GetID();
   int numOutputs = this->GetNumberOfAlgorithmOutputPorts();
 
   // Ensure that output ports size matches the number of output ports provided
@@ -438,53 +427,11 @@ void vtkSMSourceProxy::CreateOutputPortsInternal(vtkSMProxy* op)
   this->PInternals->ResizeOutputPorts(numOutputs);
   for (int j=0; j<numOutputs; j++)
     {
-    stream << vtkClientServerStream::Invoke << sourceID
-           << "GetOutputPort" << j <<  vtkClientServerStream::End;
-    vtkClientServerID portID = pm->GetUniqueID();
-    stream << vtkClientServerStream::Assign << portID
-           << vtkClientServerStream::LastResult
-           << vtkClientServerStream::End;
-
-    vtkClientServerID producerID = pm->GetUniqueID();
-    stream << vtkClientServerStream::Assign << producerID
-           << sourceID
-           << vtkClientServerStream::End;
-
-    stream << vtkClientServerStream::Invoke << sourceID
-           << "GetExecutive" <<  vtkClientServerStream::End;
-    vtkClientServerID execID = pm->GetUniqueID();
-    stream << vtkClientServerStream::Assign << execID
-           << vtkClientServerStream::LastResult
-           << vtkClientServerStream::End;
-
     vtkSMOutputPort* opPort = vtkSMOutputPort::New();
-    opPort->SetConnectionID(this->ConnectionID);
-    opPort->SetServers(this->Servers);
-    opPort->InitializeWithIDs(portID, producerID, execID);
     opPort->SetPortIndex(j);
     opPort->SetSourceProxy(this);
     this->PInternals->OutputPorts[j].Port = opPort;
     opPort->Delete();
-    }
-  if (stream.GetNumberOfMessages() > 0)
-    {
-    pm->SendStream(this->ConnectionID, op->GetServers(), stream);
-    }
-
-  vtkSMSourceProxyInternals::VectorOfPorts::iterator it =
-     this->PInternals->OutputPorts.begin();
-
-  if (this->DoInsertExtractPieces)
-    {
-    for(; it != this->PInternals->OutputPorts.end(); it++)
-      {
-      it->Port.GetPointer()->CreateTranslatorIfNecessary();
-      if (strcmp(this->GetVTKClassName(), "vtkPVEnSightMasterServerReader") != 0  &&
-        this->GetNumberOfAlgorithmRequiredInputPorts() == 0)
-        {
-        it->Port.GetPointer()->InsertExtractPiecesIfNecessary();
-        }
-      }
     }
 }
 
@@ -532,13 +479,6 @@ void vtkSMSourceProxy::MarkDirty(vtkSMProxy* modifiedProxy)
   // this->InvalidateDataInformation();
 }
 
-//---------------------------------------------------------------------------
-void vtkSMSourceProxy::UpdateSelfAndAllInputs()
-{
-  this->Superclass::UpdateSelfAndAllInputs();
-  this->UpdatePipelineInformation();
-}
-
 //----------------------------------------------------------------------------
 vtkPVDataInformation* vtkSMSourceProxy::GetDataInformation(
   unsigned int idx)
@@ -564,61 +504,6 @@ void vtkSMSourceProxy::InvalidateDataInformation()
       it->Port.GetPointer()->InvalidateDataInformation();
       }
     }
-}
-
-//---------------------------------------------------------------------------
-vtkPVXMLElement* vtkSMSourceProxy::SaveRevivalState(vtkPVXMLElement* root)
-{
-  vtkPVXMLElement* revivalElem = this->Superclass::SaveRevivalState(root);
-  if (revivalElem && this->OutputPortsCreated)
-    {
-    vtkSMSourceProxyInternals::VectorOfPorts::iterator it =
-      this->PInternals->OutputPorts.begin();
-    for(; it != this->PInternals->OutputPorts.end(); ++it)
-      {
-      vtkPVXMLElement* opPortsElement = vtkPVXMLElement::New();
-      opPortsElement->SetName("OutputPort");
-      revivalElem->AddNestedElement(opPortsElement);
-      opPortsElement->Delete();
-      it->Port.GetPointer()->SaveRevivalState(opPortsElement);
-      }
-    }
-  return revivalElem;
-}
-
-//---------------------------------------------------------------------------
-int vtkSMSourceProxy::LoadRevivalState(vtkPVXMLElement* revivalElem)
-{
-  if (!this->Superclass::LoadRevivalState(revivalElem))
-    {
-    return 0;
-    }
-
-  unsigned int num_elems = revivalElem->GetNumberOfNestedElements();
-  unsigned int index=0;
-  for (unsigned int cc=0; cc <num_elems; cc++)
-    {
-    vtkPVXMLElement* curElement = revivalElem->GetNestedElement(cc);
-    if (curElement->GetName() && strcmp(curElement->GetName(), "OutputPort") == 0)
-      {
-      vtkSmartPointer<vtkSMOutputPort> opPort = vtkSmartPointer<vtkSMOutputPort>::New();
-      opPort->SetConnectionID(this->ConnectionID);
-      opPort->SetServers(this->Servers);
-      if (opPort->LoadRevivalState(curElement->GetNestedElement(0)))
-        {
-        this->PInternals->EnsureOutputPortsSize(index+1);
-        this->PInternals->OutputPorts[index].Port = opPort;
-        index++;
-        }
-      else
-        {
-        vtkErrorMacro("Failed to revive output port");
-        return 0;
-        }
-      }
-    }
-  this->OutputPortsCreated = 1;
-  return 1;
 }
 
 //---------------------------------------------------------------------------
@@ -765,22 +650,6 @@ vtkSMSourceProxy* vtkSMSourceProxy::GetSelectionOutput(unsigned int portIndex)
     }
 
   return 0;
-}
-
-//---------------------------------------------------------------------------
-void vtkSMSourceProxy::SetServers(vtkTypeUInt32 servers)
-{
-  this->Superclass::SetServers(servers);
-
-  vtkSMSourceProxyInternals::VectorOfPorts::iterator it =
-    this->PInternals->OutputPorts.begin();
-  for (; it != this->PInternals->OutputPorts.end(); it++)
-    {
-    if (it->Port.GetPointer())
-      {
-      it->Port->SetServers(servers);
-      }
-    }
 }
 
 //---------------------------------------------------------------------------

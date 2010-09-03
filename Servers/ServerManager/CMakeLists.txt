@@ -28,9 +28,11 @@ SET (Kit_SRCS
   vtkPMProperty.cxx
   vtkPMProxy.cxx
   vtkPMProxyProperty.cxx
+  vtkPMSourceProxy.cxx
   vtkPMStringVectorProperty.cxx
   vtkPMVectorProperty.cxx
   vtkSMBooleanDomain.cxx
+  vtkSMDataTypeDomain.cxx
   vtkSMDocumentation.cxx
   vtkSMDomain.cxx
   vtkSMDomainIterator.cxx
@@ -42,12 +44,14 @@ SET (Kit_SRCS
   vtkSMIntVectorProperty.cxx
   vtkSMLink.cxx
   vtkSMObject.cxx
-#  vtkSMOutputPort.cxx
+  vtkSMOutputPort.cxx
   vtkSMProperty.cxx
+  vtkSMPropertyHelper.cxx
   vtkSMPropertyIterator.cxx
   vtkSMProxy.cxx
   vtkSMProxyDefinitionIterator.cxx
   vtkSMProxyDefinitionManager.cxx
+  vtkSMProxyGroupDomain.cxx
   vtkSMProxyIterator.cxx
   vtkSMProxyManager.cxx
   vtkSMProxyProperty.cxx
@@ -57,7 +61,7 @@ SET (Kit_SRCS
   vtkSMSessionCore.cxx
   vtkSMSession.cxx
   vtkSMSessionServer.cxx
-#vtkSMSourceProxy.cxx
+  vtkSMSourceProxy.cxx
   vtkSMStringVectorProperty.cxx
   vtkSMVectorProperty.cxx
   )
@@ -111,7 +115,6 @@ SET(Kit_SRCS
   vtkSMCubeAxesRepresentationProxy.cxx
   vtkSMDataLabelRepresentationProxy.cxx
   vtkSMDataRepresentationProxy.cxx
-  vtkSMDataTypeDomain.cxx
   vtkSMDeserializer.cxx
   vtkSMDimensionsDomain.cxx
   vtkSMDistanceRepresentation2DProxy.cxx
@@ -168,7 +171,6 @@ SET(Kit_SRCS
   vtkSMPropRepresentationProxy.cxx
   vtkSMProxyConfigurationReader.cxx
   vtkSMProxyConfigurationWriter.cxx
-  vtkSMProxyGroupDomain.cxx
   vtkSMProxyLink.cxx
   vtkSMProxyListDomain.cxx
   vtkSMProxyLocator.cxx
@@ -272,11 +274,13 @@ SET_SOURCE_FILES_PROPERTIES(
   vtkSMRemoteObject.cxx
   vtkSMSession.cxx
   vtkSMVectorProperty.cxx
+  vtkSMPropertyHelper.cxx
   ABSTRACT
   )
 
-#SET_SOURCE_FILES_PROPERTIES(
-#  WRAP_EXCLUDE)
+SET_SOURCE_FILES_PROPERTIES(
+  vtkSMPropertyHelper.cxx
+  WRAP_EXCLUDE)
 
 IF (FIXME)
 SET_SOURCE_FILES_PROPERTIES(
@@ -294,14 +298,12 @@ SET_SOURCE_FILES_PROPERTIES(
   vtkSMStateVersionControllerBase.cxx
   vtkSMStateVersionControllerBase.cxx
   vtkSMUndoElement.cxx
-  vtkSMPropertyHelper.cxx
   vtkSMExporterProxy.cxx
   ABSTRACT
   )
 
 SET_SOURCE_FILES_PROPERTIES(
   vtkSMRenderViewHelper.cxx
-  vtkSMPropertyHelper.cxx
   WRAP_EXCLUDE)
 ENDIF (FIXME)
 

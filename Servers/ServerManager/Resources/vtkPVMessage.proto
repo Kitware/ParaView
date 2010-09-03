@@ -28,6 +28,10 @@ message Variant {
   repeated string txt             = 8;
 }
 
+message VariantList {
+  repeated Variant variant = 1;
+}
+
 // Generic message Collection type ********************************************
 
 message MessageCollection
@@ -105,7 +109,7 @@ message PullRequest {
 message InvokeRequest {
   extend Message {
     required string method = 50;
-    repeated Variant arguments = 51;
+    required VariantList arguments = 51;
   }
 }
 

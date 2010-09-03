@@ -86,6 +86,9 @@ vtkCxxSetObjectMacro(vtkSMProxy, Deprecated, vtkPVXMLElement);
 vtkSMProxy::vtkSMProxy()
 {
   this->Internals = new vtkSMProxyInternals;
+  this->KernelClassName = 0;
+  this->SetKernelClassName("vtkPMProxy");
+
   // By default, all objects are created on data server.
   this->Location = vtkProcessModule2::DATA_SERVER;
   this->VTKClassName = 0;
@@ -126,6 +129,7 @@ vtkSMProxy::~vtkSMProxy()
   this->Documentation->Delete();
   this->SetHints(0);
   this->SetDeprecated(0);
+  this->SetKernelClassName(0);
 }
 
 
@@ -500,8 +504,7 @@ void vtkSMProxy::CreateVTKObjects()
 
   vtkSMMessage message;
   message.SetExtension(DefinitionHeader::client_class, this->GetClassName());
-  message.SetExtension(DefinitionHeader::server_class, "vtkPMProxy"
-    /* this->GetKernelClassName() */);
+  message.SetExtension(DefinitionHeader::server_class, this->GetKernelClassName());
   message.SetExtension(ProxyState::xml_group, this->GetXMLGroup());
   message.SetExtension(ProxyState::xml_name, this->GetXMLName());
   this->PushState(&message);
@@ -538,6 +541,9 @@ bool vtkSMProxy::GatherInformation(vtkPVInformation* information)
   assert(information);
   if (this->GetSession())
     {
+    // ensure that the proxy is created.
+    this->CreateVTKObjects();
+
     return this->GetSession()->GatherInformation(this->Location,
       information, this->GetGlobalID());
     }

@@ -303,7 +303,12 @@ bool vtkSMSessionClient::GatherInformation(
 
   if ( (location & vtkProcessModule2::CLIENT) != 0)
     {
-    return this->Superclass::GatherInformation(location, information, globalid);
+    bool ret_value = this->Superclass::GatherInformation(
+      location, information, globalid);
+    if (information->GetRootOnly())
+      {
+      return ret_value;
+      }
     }
 
   vtkMultiProcessStream stream;

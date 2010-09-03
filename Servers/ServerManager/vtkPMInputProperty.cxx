@@ -14,9 +14,10 @@
 =========================================================================*/
 #include "vtkPMInputProperty.h"
 
-#include "vtkObjectFactory.h"
-#include "vtkPVXMLElement.h"
 #include "vtkClientServerStream.h"
+#include "vtkObjectFactory.h"
+#include "vtkPMSourceProxy.h"
+#include "vtkPVXMLElement.h"
 
 #include <assert.h>
 
@@ -64,6 +65,7 @@ bool vtkPMInputProperty::Push(vtkSMMessage* message, int offset)
   vtkstd::vector<int> output_ports;
 
   proxy_ids.resize(variant->proxy_global_id_size());
+  output_ports.resize(proxy_ids.size());
   for (int cc=0; cc < variant->proxy_global_id_size(); cc++)
     {
     proxy_ids[cc] = variant->proxy_global_id(cc);
@@ -80,7 +82,6 @@ bool vtkPMInputProperty::Push(vtkSMMessage* message, int offset)
       << vtkClientServerStream::End;
     }
 
-#ifdef FIXME
   for (size_t cc=0; cc < proxy_ids.size(); cc++)
     {
     vtkPMSourceProxy* pmproxy = vtkPMSourceProxy::SafeDownCast(
@@ -96,7 +97,6 @@ bool vtkPMInputProperty::Push(vtkSMMessage* message, int offset)
       << (pmproxy? pmproxy->GetOutputPortID(output_ports[cc]) : vtkClientServerID(0))
       << vtkClientServerStream::End;
     }
-#endif
 
   if (this->NullOnEmpty && this->CleanCommand == NULL && proxy_ids.size() == 0)
     {

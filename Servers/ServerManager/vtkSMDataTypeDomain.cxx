@@ -185,23 +185,6 @@ int vtkSMDataTypeDomain::IsInDomain(vtkSMSourceProxy* proxy,
 }
 
 //---------------------------------------------------------------------------
-void vtkSMDataTypeDomain::ChildSaveState(vtkPVXMLElement* domainElement)
-{
-  this->Superclass::ChildSaveState(domainElement);
-
-  unsigned int size = this->GetNumberOfDataTypes();
-  for(unsigned int i=0; i<size; i++)
-    {
-    vtkPVXMLElement* dataTypeElem = vtkPVXMLElement::New();
-    dataTypeElem->SetName("DataType");
-    dataTypeElem->AddAttribute("value", this->GetDataType(i));
-    domainElement->AddNestedElement(dataTypeElem);
-    dataTypeElem->Delete();
-    }
-
-}
-
-//---------------------------------------------------------------------------
 int vtkSMDataTypeDomain::ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* element)
 {
   this->Superclass::ReadXMLAttributes(prop, element);

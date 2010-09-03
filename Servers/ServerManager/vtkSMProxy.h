@@ -486,6 +486,13 @@ protected:
   // override this method to perform special tasks.
   virtual void UpdatePropertyInformationInternal(vtkSMProperty* prop=NULL);
 
+  // Description:
+  // KernelClassName identifies the classname for the helper on the server side.
+  vtkSetStringMacro(KernelClassName);
+  vtkGetStringMacro(KernelClassName);
+  char* KernelClassName;
+
+
   char* VTKClassName;
   char* XMLGroup;
   char* XMLName;

@@ -58,7 +58,7 @@ vtkPMObject* vtkPMObject::GetPMObject(vtkTypeUInt32 globalid)
 {
   if (this->SessionCore)
     {
-    this->SessionCore->GetPMObject(globalid);
+    return this->SessionCore->GetPMObject(globalid);
     }
   return NULL;
 }

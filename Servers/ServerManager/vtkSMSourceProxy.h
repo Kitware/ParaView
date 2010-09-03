@@ -63,10 +63,6 @@ public:
   virtual void UpdatePipeline(double time);
 
   // Description:
-  // Chains to superclass and calls UpdateInformation()
-  virtual void UpdateSelfAndAllInputs();
-
-  // Description:
   // Returns if the output port proxies have been created.
   vtkGetMacro(OutputPortsCreated, int);
 
@@ -125,16 +121,7 @@ public:
     return this->GetDataInformation(0);
   }
   vtkPVDataInformation* GetDataInformation(unsigned int outputIdx);
-    
-  // Description:
-  // This method saves state information about the proxy
-  // which can be used to revive the proxy using server side objects
-  // already present. This includes the entire state saved by calling 
-  // SaveState() as well additional information such as server side
-  // object IDs.
-  // Overridden to save information pertinant to reviving the output ports.
-  virtual vtkPVXMLElement* SaveRevivalState(vtkPVXMLElement* root);
-  virtual int LoadRevivalState(vtkPVXMLElement* revivalElement);
+
 
   // Description:
   // Creates extract selection proxies for each output port if not already
@@ -189,11 +176,6 @@ public:
   };
 
   // Description:
-  // Set server ids on self and sub-proxies.
-  // Overridden to set servers on the output ports.
-  virtual void SetServers(vtkTypeUInt32 servers);
-  
-  // Description:
   // Marks the selection proxies dirty as well as chain to superclass.
   virtual void MarkDirty(vtkSMProxy* modifiedProxy);
 
@@ -202,6 +184,7 @@ protected:
   ~vtkSMSourceProxy();
 
   friend class vtkSMInputProperty;
+  friend class vtkSMOutputPort;
 
   int OutputPortsCreated; 
 

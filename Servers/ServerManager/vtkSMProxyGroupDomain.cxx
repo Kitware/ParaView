@@ -202,23 +202,6 @@ vtkSMProxy* vtkSMProxyGroupDomain::GetProxy(const char* name)
 }
 
 //---------------------------------------------------------------------------
-void vtkSMProxyGroupDomain::ChildSaveState(vtkPVXMLElement* domainElement)
-{
-  this->Superclass::ChildSaveState(domainElement);
-
-  unsigned int size = this->GetNumberOfGroups();
-  for(unsigned int i=0; i<size; i++)
-    {
-    vtkPVXMLElement* groupElem = vtkPVXMLElement::New();
-    groupElem->SetName("Group");
-    groupElem->AddAttribute("value", this->GetGroup(i));
-    domainElement->AddNestedElement(groupElem);
-    groupElem->Delete();
-    }
-
-}
-
-//---------------------------------------------------------------------------
 int vtkSMProxyGroupDomain::ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* element)
 {
   this->Superclass::ReadXMLAttributes(prop, element);
