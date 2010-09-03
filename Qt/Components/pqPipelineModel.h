@@ -85,7 +85,7 @@ class pqPipelineModelDataItem;
 /// vtkSMProxyManager maintains all proxies and hence it is difficult 
 /// to detect/trasvers pipelines etc etc. The pqServerManagerModel
 /// provides a simplified view of the Server Manager. This class
-/// takes that simplified "model" and transforms it into hierachical
+/// takes that simplified "model" and transforms it into hierarchical
 /// tables which can be represented by the Tree View.
 class PQCOMPONENTS_EXPORT pqPipelineModel : public QAbstractItemModel
 {

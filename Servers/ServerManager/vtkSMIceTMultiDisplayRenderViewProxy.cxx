@@ -66,7 +66,7 @@ void vtkSMIceTMultiDisplayRenderViewProxy::EndCreateVTKObjects()
   if (!this->RemoteRenderAvailable)
     {
     vtkErrorMacro("Display not accessible on server. "
-      "Cannot render on tiles with inaccesible display.");
+      "Cannot render on tiles with inaccessible display.");
     return;
     }
 

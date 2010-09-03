@@ -50,7 +50,7 @@ public:
   int CanReadFile(const char *file);
   // Description:
   // Get/Set the path to the database plugin (.so's) directory. This
-  // typically need only to be donce once right after construction.
+  // typically needs only to be done once right after construction.
   void SetPluginPath(const char *path);
   vtkGetStringMacro(PluginPath);
   // Description:
