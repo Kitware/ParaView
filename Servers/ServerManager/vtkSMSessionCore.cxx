@@ -19,6 +19,7 @@
 #include "vtkClientServerInterpreterInitializer.h"
 #include "vtkClientServerStream.h"
 #include "vtkInstantiator.h"
+#include "vtkMemberFunctionCommand.h"
 #include "vtkMultiProcessController.h"
 #include "vtkMultiProcessStream.h"
 #include "vtkObjectFactory.h"
@@ -28,6 +29,7 @@
 #include "vtkSmartPointer.h"
 #include "vtkSMProxyDefinitionManager.h"
 
+#include <vtksys/ios/sstream>
 #include <vtkstd/string>
 #include "assert.h"
 
@@ -96,6 +98,14 @@ vtkSMSessionCore::vtkSMSessionCore()
 {
   this->Interpreter =
     vtkClientServerInterpreterInitializer::GetInitializer()->NewInterpreter();
+
+  vtkMemberFunctionCommand<vtkSMSessionCore>* observer =
+    vtkMemberFunctionCommand<vtkSMSessionCore>::New();
+  observer->SetCallback(*this, &vtkSMSessionCore::OnInterpreterError);
+  this->Interpreter->AddObserver(vtkCommand::UserEvent,
+    observer);
+  observer->Delete();
+
   this->Internals = new vtkInternals();
 
   this->ProxyDefinitionManager = vtkSMProxyDefinitionManager::New();
@@ -122,6 +132,33 @@ vtkSMSessionCore::~vtkSMSessionCore()
   delete this->Internals;
   this->ProxyDefinitionManager->Delete();
   this->ProxyDefinitionManager = NULL;
+}
+
+//----------------------------------------------------------------------------
+void vtkSMSessionCore::OnInterpreterError(vtkObject*, unsigned long,
+  void* calldata)
+{
+  // Need to add mechanism to ignore errors.
+  // if (!this->ReportInterpreterErrors)
+  //   {
+  //   return;
+  //   }
+  const char* errorMessage;
+  vtkClientServerInterpreterErrorCallbackInfo* info
+    = static_cast<vtkClientServerInterpreterErrorCallbackInfo*>(calldata);
+  const vtkClientServerStream& last = this->Interpreter->GetLastResult();
+  if(last.GetNumberOfMessages() > 0 &&
+    (last.GetCommand(0) == vtkClientServerStream::Error) &&
+    last.GetArgument(0, 0, &errorMessage))
+    {
+    vtksys_ios::ostringstream error;
+    error << "\nwhile processing\n";
+    info->css->PrintMessage(error, info->message);
+    error << ends;
+    vtkErrorMacro(<< errorMessage << error.str().c_str());
+    vtkErrorMacro("Aborting execution for debugging purposes.");
+    abort();
+    }
 }
 
 //----------------------------------------------------------------------------

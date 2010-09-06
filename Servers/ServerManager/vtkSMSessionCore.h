@@ -95,6 +95,11 @@ protected:
     vtkPVInformation* information, vtkTypeUInt32 globalid);
   bool CollectInformation(vtkPVInformation*);
 
+
+  // Description:
+  // Callback for reporting interpreter errors.
+  void OnInterpreterError(vtkObject*, unsigned long, void* calldata);
+
   enum
     {
     ROOT_SATELLITE_RMI_TAG =  887822,
