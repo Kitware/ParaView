@@ -18,7 +18,7 @@
 // .SECTION See Also
 // vtkContainer
 
-// .SECTION Caveates
+// .SECTION Caveats
 // VTK Iterators are not reliable when adding or deleting elements 
 // from the container. Use iterators for traversing only.
 
