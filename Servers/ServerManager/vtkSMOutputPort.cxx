@@ -152,6 +152,7 @@ void vtkSMOutputPort::GatherClassNameInformation()
     }
 
 
+  this->ClassNameInformation->SetPortNumber(this->PortIndex);
   vtkObjectBase* cso = this->GetSourceProxy()->GetClientSideObject();
   if (cso)
     {
@@ -161,38 +162,7 @@ void vtkSMOutputPort::GatherClassNameInformation()
     }
   else
     {
-#if FIXME
-    vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-    // Can't do this anymore also information won't work since no way to pass
-    // information ivar to server side :(.
-
-    // Temporarily assign an id to the output object so that we
-    // can obtain it's name.
-    vtkClientServerStream stream;
-    stream << vtkClientServerStream::Invoke
-           << this->GetProducerID()
-           << "GetOutputDataObject"
-           << this->PortIndex
-           << vtkClientServerStream::End;
-    vtkClientServerID uid = pm->GetUniqueID();
-    stream << vtkClientServerStream::Assign 
-           << uid << vtkClientServerStream::LastResult
-           << vtkClientServerStream::End;
-
-    pm->SendStream(this->ConnectionID, this->Servers, stream);
-
-    pm->GatherInformation(this->ConnectionID, 
-                          this->Servers,
-                          this->ClassNameInformation, 
-                          uid);
-
-    // Unassign the id.
-    stream << vtkClientServerStream::Delete 
-           << uid 
-           << vtkClientServerStream::End;
-    pm->SendStream(this->ConnectionID, this->Servers, stream);
-#endif
-    abort();
+    this->SourceProxy->GatherInformation(this->ClassNameInformation);
     }
   this->ClassNameInformationValid = 1;
 }

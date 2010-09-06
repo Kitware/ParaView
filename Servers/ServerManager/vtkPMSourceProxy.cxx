@@ -33,6 +33,7 @@ class vtkPMSourceProxy::vtkInternals
 {
 public:
   vtkstd::vector<vtkClientServerID> OutputPortIDs;
+  vtkstd::vector<vtkClientServerID> ExtractPiecesIDs;
 };
 
 vtkStandardNewMacro(vtkPMSourceProxy);
@@ -48,6 +49,23 @@ vtkPMSourceProxy::vtkPMSourceProxy()
 //----------------------------------------------------------------------------
 vtkPMSourceProxy::~vtkPMSourceProxy()
 {
+  if (this->Interpreter)
+    {
+    vtkClientServerStream stream;
+    vtkstd::vector<vtkClientServerID>::iterator iter;
+    for (iter = this->Internals->ExtractPiecesIDs.begin();
+      iter != this->Internals->ExtractPiecesIDs.end(); ++iter)
+      {
+      if (!iter->IsNull())
+        {
+        stream << vtkClientServerStream::Delete
+          << *iter
+          << vtkClientServerStream::End;
+        }
+      }
+    this->Interpreter->ProcessStream(stream);
+    }
+
   this->SetExecutiveName(0);
   delete this->Internals;
 }
@@ -141,6 +159,7 @@ bool vtkPMSourceProxy::CreateOutputPorts()
 
   int ports = algo->GetNumberOfOutputPorts();
   this->Internals->OutputPortIDs.resize(ports, vtkClientServerID(0));
+  this->Internals->ExtractPiecesIDs.resize(ports, vtkClientServerID(0));
 
   for (int cc=0; cc < ports; cc++)
     {
@@ -184,6 +203,7 @@ bool vtkPMSourceProxy::InitializeOutputPort(vtkAlgorithm* algo, int port)
 
   if (algo->IsA("vtkPVEnSightMasterServerReader") == 0 &&
     algo->IsA("vtkPVUpdateSuppressor") == 0 &&
+    algo->IsA("vtkMPIMoveData") == 0 &&
     num_of_required_inputs == 0)
     {
     this->InsertExtractPiecesIfNecessary(algo, port);
@@ -220,6 +240,8 @@ void vtkPMSourceProxy::InsertExtractPiecesIfNecessary(vtkAlgorithm*, int port)
   vtkClientServerID portID = this->Internals->OutputPortIDs[port];
   vtkClientServerID extractID = this->Interpreter->GetNextAvailableId();
 
+  this->Internals->ExtractPiecesIDs[port] = extractID;
+
   vtkClientServerStream stream;
   stream << vtkClientServerStream::New
     << "vtkPVExtractPieces" << extractID
@@ -241,8 +263,6 @@ void vtkPMSourceProxy::InsertExtractPiecesIfNecessary(vtkAlgorithm*, int port)
          << portID
          << vtkClientServerStream::LastResult
          << vtkClientServerStream::End;
-
-  // FIXME: need to release vtkPVExtractPieces reference on delete.
   this->Interpreter->ProcessStream(stream);
 }
 
