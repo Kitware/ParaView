@@ -131,6 +131,7 @@ SET(Filters_SRCS
   vtkPVMain.cxx
   vtkPVMergeTables.cxx
   vtkPVNullSource.cxx
+  vtkPVPlane.cxx
   vtkPVRecoverGeometryWireframe.cxx
   vtkPVRenderViewProxy.cxx
   vtkPVScalarBarActor.cxx

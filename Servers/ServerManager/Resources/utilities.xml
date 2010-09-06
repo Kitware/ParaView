@@ -372,7 +372,7 @@
     <NullProxy name="Scalar">
     </NullProxy>
 
-    <ImplicitPlaneProxy name="Plane" class="vtkPlane">
+    <Proxy name="Plane" class="vtkPVPlane">
       <InputProperty
         name="Input"
         is_internal="1">
@@ -440,7 +440,7 @@
         </ProxyList>
       </Hints>
 
-    </ImplicitPlaneProxy>
+    </Proxy>
 
     <Proxy name="Planes" class="vtkPlanes">
       <ProxyProperty name="Points" command="SetPoints">

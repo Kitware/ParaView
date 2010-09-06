@@ -143,7 +143,6 @@ SET(Kit_SRCS
   vtkSMImageDataParallelStrategy.cxx
   vtkSMImageSliceRepresentationProxy.cxx
   vtkSMImageTextureProxy.cxx
-  vtkSMImplicitPlaneProxy.cxx
   vtkSMImplicitPlaneRepresentationProxy.cxx
   vtkSMInformationHelper.cxx
   vtkSMIdTypeArrayInformationHelper.cxx
