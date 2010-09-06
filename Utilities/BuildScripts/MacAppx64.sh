@@ -20,7 +20,7 @@ mkdir ${builddir}
 cd ${builddir}
 echo "Reconfiguring and rebuilding in ${builddir}"
 
-rm CMakeCache.txt
+#rm CMakeCache.txt
 
 cat >> CMakeCache.txt << EOF
 CMAKE_BUILD_TYPE:STRING=Release
@@ -40,21 +40,20 @@ CMAKE_OSX_ARCHITECTURES:STRING=x86_64
 CMAKE_OSX_SYSROOT:PATH=/Developer/SDKs/MacOSX10.5.sdk
 CMAKE_OSX_DEPLOYMENT_TARGET:STRING=10.5
 QT_QMAKE_EXECUTABLE:FILEPATH=/Users/partyd/Dashboards/Support/qt-4.6.2-10.5/install/bin/qmake
-#VTK_USE_FFMPEG_ENCODER:BOOL=ON
+VTK_USE_FFMPEG_ENCODER:BOOL=ON
 VTK_USE_QVTK_QTOPENGL:BOOL=ON
-#FFMPEG_INCLUDE_DIR:PATH=/Users/partyd/Kitware/Support/ffmpeg/bin/include
-#FFMPEG_avcodec_LIBRARY:FILEPATH=/Users/partyd/Kitware/Support/ffmpeg/bin/lib/libavcodec.dylib
-#FFMPEG_avformat_LIBRARY:FILEPATH=/Users/partyd/Kitware/Support/ffmpeg/bin/lib/libavformat.dylib
-#FFMPEG_avutil_LIBRARY:FILEPATH=/Users/partyd/Kitware/Support/ffmpeg/bin/lib/libavutil.dylib
-#FFMPEG_swscale_LIBRARY:FILEPATH=/Users/partyd/Kitware/Support/ffmpeg/bin/lib/libswscale.dylib
+FFMPEG_INCLUDE_DIR:PATH=/Users/partyd/Kitware/Support/ffmpeg/bin/include
+FFMPEG_avcodec_LIBRARY:FILEPATH=/Users/partyd/Kitware/Support/ffmpeg/bin/lib/libavcodec.dylib
+FFMPEG_avformat_LIBRARY:FILEPATH=/Users/partyd/Kitware/Support/ffmpeg/bin/lib/libavformat.dylib
+FFMPEG_avutil_LIBRARY:FILEPATH=/Users/partyd/Kitware/Support/ffmpeg/bin/lib/libavutil.dylib
+FFMPEG_swscale_LIBRARY:FILEPATH=/Users/partyd/Kitware/Support/ffmpeg/bin/lib/libswscale.dylib
 VTK_USE_64BIT_IDS:BOOL=OFF
 BUILD_DOCUMENTATION:BOOL=ON
 PARAVIEW_GENERATE_PROXY_DOCUMENTATION:BOOL=ON
 GENERATE_FILTERS_DOCUMENTATION:BOOL=ON
 PARAVIEW_INSTALL_DEVELOPMENT:BOOL=OFF
-#PARAVIEW_BUILD_PLUGIN_VisTrailsPlugin:BOOL=ON
-#VISTRAILS_PLUGIN:FILEPATH=/Users/partyd/Desktop/VisTrails_ParaView_Mac_10.5/libVisTrailsPlugin.dylib
-#VISTRAILS_PLUGIN_APP:FILEPATH=/Users/partyd/Desktop/VisTrails_ParaView_Mac_10.5/VisTrailsParaViewPlugin.app
+PARAVIEW_BUILD_PLUGIN_VisTrailsPlugin:BOOL=ON
+VISTRAILS_PLUGIN_APP:FILEPATH=/Users/partyd/Kitware/Support/VisTrails_ParaView_3.8.1-RC1_Mac_10.5/VisTrailsParaViewPlugin.app
 EOF
 
 cmake ${srcdir}
