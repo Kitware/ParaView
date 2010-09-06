@@ -1,28 +1,19 @@
 #!/bin/bash
-# Typical usage:
-#  ~/Kitware/buildPackage.sh /tmp/Kitware/ParaView3/ /tmp/Kitware/ParaView3Bin
-#  ~/Kitware/buildParaViewPackage.sh <version> <cvstag>
 
-if [ "$#" != "1" ]; then
-  echo "Usage: $0 <cvstag>"
-  exit 1
-fi
+#cd ../..
+#PV_SRC=${PWD}
+#PV_BIN=${ROOT_DIR}/build
+#cd ..
+#ROOT_DIR=${PWD}
+#SUPPORT_DIR=${ROOT_DIR}/Support
 
+cd ../..
+srcdir=${PWD}
+cd ..
+rootdir=${PWD}
+builddir=${rootdir}/ParaViewAppBinx64
 
-cvstag=$1
-
-srcdir_prefix=${PWD}
-srcdir=${srcdir_prefix}/ParaView
-builddir=${srcdir_prefix}/ParaViewAppBin
-
-export DYLD_LIBRARY_PATH=/Users/partyd/Dashboards/Support/qt-4.6.2/bin/lib:/Users/partyd/Kitware/Support/ffmpeg-universal/lib:${builddir}/bin
-
-mkdir ${srcdir_prefix}
-cd ${srcdir_prefix}
-
-## Checkout the version requested.
-#echo "Checking out version: ${cvstag}"
-#cvs -q -d :pserver:anoncvs@www.paraview.org:/cvsroot/ParaView3 co -r ${cvstag} ParaView3 
+export DYLD_LIBRARY_PATH=/Users/partyd/Dashboards/Support/qt-4.6.2-10.4/install/lib:/Users/partyd/Kitware/Support/ffmpeg-universal/lib:${builddir}/bin
 
 # Make the binary directory.
 mkdir ${builddir}
@@ -36,6 +27,8 @@ rm CMakeCache.txt
 
 cat >> CMakeCache.txt << EOF
 CMAKE_BUILD_TYPE:STRING=Release
+CMAKE_CXX_FLAGS_RELEASE:STRING=-O2 -DNDEBUG
+CMAKE_C_FLAGS_RELEASE:STRING=-O2 -DNDEBUG
 BUILD_SHARED_LIBS:BOOL=ON
 BUILD_TESTING:BOOL=OFF
 VTK_USE_RPATH:BOOL=OFF
@@ -62,11 +55,12 @@ PARAVIEW_GENERATE_PROXY_DOCUMENTATION:BOOL=ON
 GENERATE_FILTERS_DOCUMENTATION:BOOL=ON
 EOF
 
-cmake ../ParaView
+cmake ${srcdir}
 
 echo "Building Full Package..."
-make -j5
+make -j18
 
 echo "Generating package(s) using CPACK"
-cpack --config ${builddir}/Applications/ParaView/CPackParaViewConfig.cmake -G DragNDrop 
+cpack --config ${builddir}/Applications/ParaView/CPackParaViewConfig.cmake -G DragNDrop
 cd ${builddir}
+
