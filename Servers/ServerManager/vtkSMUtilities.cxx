@@ -124,7 +124,7 @@ SaveImage(vtkImageData* image, const char* filename, const char* writerName)
 int vtkSMUtilities::SaveImageOnProcessZero(vtkImageData* image,
                    const char* filename, const char* writerName)
 {
-  int error_code;
+  int error_code = vtkErrorCode::NoError;
   vtkMultiProcessController *controller =
     vtkMultiProcessController::GetGlobalController();
 
@@ -134,7 +134,6 @@ int vtkSMUtilities::SaveImageOnProcessZero(vtkImageData* image,
       {
       error_code = SaveImage(image, filename, writerName);
       }
-    controller->Broadcast(&error_code, 1, 0);
     }
   else
     {
