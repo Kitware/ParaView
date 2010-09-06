@@ -121,8 +121,8 @@ void vtkSMCaveRenderViewProxy::SetHeadPose(
 void vtkSMCaveRenderViewProxy::ConfigureRenderManagerFromServerInformation()
 {
   this->HeadTracked( 1 );
-  this->SetStereoRender(1);
-  this->SetStereoTypeToAnaglyph();
+  // this->SetStereoRender(1);
+  // this->SetStereoTypeToAnaglyph();
   // this->SetHeadPose( 1.0 , 0.0, 0.0, 0.0,
   //                    0.0 , 1.0, 0.0, 0.0,
   //                    0.0 , 0.0, 1.0, 0.0,
