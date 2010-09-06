@@ -31,18 +31,32 @@ SET (Kit_SRCS
   vtkPMSourceProxy.cxx
   vtkPMStringVectorProperty.cxx
   vtkPMVectorProperty.cxx
+  vtkSMArrayListDomain.cxx
+  vtkSMArrayRangeDomain.cxx
+  vtkSMArraySelectionDomain.cxx
   vtkSMBooleanDomain.cxx
+  vtkSMBoundsDomain.cxx
+  vtkSMCompositeTreeDomain.cxx
   vtkSMDataTypeDomain.cxx
+  vtkSMDimensionsDomain.cxx
   vtkSMDocumentation.cxx
   vtkSMDomain.cxx
   vtkSMDomainIterator.cxx
   vtkSMDoubleRangeDomain.cxx
   vtkSMDoubleVectorProperty.cxx
+  vtkSMEnumerationDomain.cxx
+  vtkSMExtentDomain.cxx
+  vtkSMFieldDataDomain.cxx
+  vtkSMFileListDomain.cxx
+  vtkSMFixedTypeDomain.cxx
   vtkSMIdTypeVectorProperty.cxx
+  vtkSMInputArrayDomain.cxx
   vtkSMInputProperty.cxx
   vtkSMIntRangeDomain.cxx
   vtkSMIntVectorProperty.cxx
   vtkSMLink.cxx
+  vtkSMNumberOfComponentsDomain.cxx
+  vtkSMNumberOfGroupsDomain.cxx
   vtkSMObject.cxx
   vtkSMOutputPort.cxx
   vtkSMProperty.cxx
@@ -53,6 +67,7 @@ SET (Kit_SRCS
   vtkSMProxyDefinitionManager.cxx
   vtkSMProxyGroupDomain.cxx
   vtkSMProxyIterator.cxx
+  vtkSMProxyListDomain.cxx
   vtkSMProxyManager.cxx
   vtkSMProxyProperty.cxx
   vtkSMProxySelectionModel.cxx
@@ -62,13 +77,14 @@ SET (Kit_SRCS
   vtkSMSession.cxx
   vtkSMSessionServer.cxx
   vtkSMSourceProxy.cxx
+  vtkSMStringListDomain.cxx
+  vtkSMStringListRangeDomain.cxx
   vtkSMStringVectorProperty.cxx
   vtkSMVectorProperty.cxx
   )
 
 IF (FIXME)
 SET(Kit_SRCS
-  vtkDummyProcessModuleHelper.cxx
   vtkSMAnimationCueManipulatorProxy.cxx
   vtkSMAnimationCueProxy.cxx
   vtkSMAnimationPlayerProxy.cxx
@@ -77,17 +93,13 @@ SET(Kit_SRCS
   vtkSMAnimationSceneProxy.cxx
   vtkSMAnimationSceneWriter.cxx
   vtkSMApplication.cxx
-  vtkSMArrayListDomain.cxx
   vtkSMArrayListInformationHelper.cxx
-  vtkSMArrayRangeDomain.cxx
-  vtkSMArraySelectionDomain.cxx
   vtkSMArraySelectionInformationHelper.cxx
   vtkSMAxesRepresentationProxy.cxx
   vtkSMBlockDeliveryRepresentationProxy.cxx
   vtkSMBlockDeliveryStrategy.cxx
   vtkSMBooleanKeyFrameProxy.cxx
-  vtkSMBoundsDomain.cxx
-  vtkSMBoxProxy.cxx
+
   vtkSMBoxRepresentationProxy.cxx
   vtkSMCameraConfigurationReader.cxx
   vtkSMCameraConfigurationWriter.cxx
@@ -104,7 +116,6 @@ SET(Kit_SRCS
   vtkSMComparativeAnimationCueProxy.cxx
   vtkSMComparativeViewProxy.cxx
   vtkSMCompositeKeyFrameProxy.cxx
-  vtkSMCompositeTreeDomain.cxx
   vtkSMCompoundSourceProxy.cxx
   vtkSMCompoundProxyDefinitionLoader.cxx
   vtkSMConnectionCleanerProxy.cxx
@@ -116,17 +127,11 @@ SET(Kit_SRCS
   vtkSMDataLabelRepresentationProxy.cxx
   vtkSMDataRepresentationProxy.cxx
   vtkSMDeserializer.cxx
-  vtkSMDimensionsDomain.cxx
   vtkSMDistanceRepresentation2DProxy.cxx
   vtkSMDoubleArrayInformationHelper.cxx
-  vtkSMEnumerationDomain.cxx
   vtkSMExponentialKeyFrameProxy.cxx
   vtkSMExporterProxy.cxx
-  vtkSMExtentDomain.cxx
-  vtkSMFieldDataDomain.cxx
-  vtkSMFileListDomain.cxx
   vtkSMFileSeriesReaderProxy.cxx
-  vtkSMFixedTypeDomain.cxx
   vtkSMGlobalPropertiesManager.cxx
   vtkSMGlobalPropertiesLinkUndoElement.cxx
   vtkSMGlyph3DMapperRepresentationProxy.cxx
@@ -141,7 +146,6 @@ SET(Kit_SRCS
   vtkSMImplicitPlaneProxy.cxx
   vtkSMImplicitPlaneRepresentationProxy.cxx
   vtkSMInformationHelper.cxx
-  vtkSMInputArrayDomain.cxx
   vtkSMIdTypeArrayInformationHelper.cxx
   vtkSMIntArrayInformationHelper.cxx
   vtkSMInteractionUndoStackBuilder.cxx
@@ -153,8 +157,6 @@ SET(Kit_SRCS
   vtkSMMultiProcessRenderView.cxx
   vtkSMNewWidgetRepresentationProxy.cxx
   vtkSMNullProxy.cxx
-  vtkSMNumberOfComponentsDomain.cxx
-  vtkSMNumberOfGroupsDomain.cxx
   vtkSMOrderedPropertyIterator.cxx
   vtkSMOutlineRepresentationProxy.cxx
   vtkSMNetworkImageSourceProxy.cxx
@@ -172,7 +174,6 @@ SET(Kit_SRCS
   vtkSMProxyConfigurationReader.cxx
   vtkSMProxyConfigurationWriter.cxx
   vtkSMProxyLink.cxx
-  vtkSMProxyListDomain.cxx
   vtkSMProxyLocator.cxx
   vtkSMProxyManagerReviver.cxx
   vtkSMProxyRegisterUndoElement.cxx
@@ -201,8 +202,8 @@ SET(Kit_SRCS
   vtkSMServerFileListingProxy.cxx
   vtkSMServerProxyManagerReviver.cxx
   vtkSMServerSideAnimationPlayer.cxx
-  vtkSMSILDomain.cxx
   vtkSMSILInformationHelper.cxx
+  vtkSMSILDomain.cxx
   vtkSMSILModel.cxx
   vtkSMSimpleDoubleInformationHelper.cxx
   vtkSMSimpleIdTypeInformationHelper.cxx
@@ -216,8 +217,6 @@ SET(Kit_SRCS
   vtkSMStateVersionControllerBase.cxx
   vtkSMStateVersionController.cxx
   vtkSMStringArrayHelper.cxx
-  vtkSMStringListDomain.cxx
-  vtkSMStringListRangeDomain.cxx
   vtkSMSurfaceRepresentationProxy.cxx
 #  vtkSMTemporalInputDomain.cxx
   vtkSMTesting.cxx

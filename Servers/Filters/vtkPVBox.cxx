@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkSMBoxProxy.cxx
+  Module:    $RCSfile$
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -12,20 +12,14 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#include "vtkSMBoxProxy.h"
+#include "vtkPVBox.h"
 
-#include "vtkClientServerStream.h"
 #include "vtkObjectFactory.h"
-#include "vtkMatrix4x4.h"
 #include "vtkTransform.h"
-#include "vtkProcessModule.h"
-#include "vtkSMDoubleVectorProperty.h"
 
+vtkStandardNewMacro(vtkPVBox);
 //----------------------------------------------------------------------------
-vtkStandardNewMacro(vtkSMBoxProxy);
-
-//----------------------------------------------------------------------------
-vtkSMBoxProxy::vtkSMBoxProxy()
+vtkPVBox::vtkPVBox()
 {
   this->Position[0] = this->Position[1] = this->Position[2] = 0.0;
   this->Rotation[0] = this->Rotation[1] = this->Rotation[2] = 0.0;
@@ -33,29 +27,36 @@ vtkSMBoxProxy::vtkSMBoxProxy()
 }
 
 //----------------------------------------------------------------------------
-vtkSMBoxProxy::~vtkSMBoxProxy()
+vtkPVBox::~vtkPVBox()
 {
-
 }
 
 //----------------------------------------------------------------------------
-void vtkSMBoxProxy::UpdateVTKObjects(vtkClientServerStream& stream)
+void vtkPVBox::SetPosition(const double pos[3])
 {
-  this->Superclass::UpdateVTKObjects(stream);
-  
-  vtkMatrix4x4* mat = vtkMatrix4x4::New();
-  this->GetMatrix(mat);
-   
-  stream  << vtkClientServerStream::Invoke
-          << this->GetID() 
-          << "SetTransform"
-          << vtkClientServerStream::InsertArray(&(mat->Element[0][0]),16)
-          << vtkClientServerStream::End;
-  mat->Delete();
+  memcpy(this->Position, pos, sizeof(double)*3);
+  this->UpdateTransform();
+  this->Modified();
 }
 
 //----------------------------------------------------------------------------
-void vtkSMBoxProxy::GetMatrix(vtkMatrix4x4* mat)
+void vtkPVBox::SetRotation(const double pos[3])
+{
+  memcpy(this->Rotation, pos, sizeof(double)*3);
+  this->UpdateTransform();
+  this->Modified();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVBox::SetScale(const double pos[3])
+{
+  memcpy(this->Scale, pos, sizeof(double)*3);
+  this->UpdateTransform();
+  this->Modified();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVBox::UpdateTransform()
 {
   vtkTransform* trans = vtkTransform::New();
   trans->Identity();
@@ -64,16 +65,14 @@ void vtkSMBoxProxy::GetMatrix(vtkMatrix4x4* mat)
   trans->RotateX(this->Rotation[0]);
   trans->RotateY(this->Rotation[1]);
   trans->Scale(this->Scale);
-  mat->DeepCopy(trans->GetMatrix());
-  mat->Invert();
+  this->SetTransform(trans);
   trans->Delete();
 }
 
 //----------------------------------------------------------------------------
-void vtkSMBoxProxy::PrintSelf(ostream& os, vtkIndent indent)
+void vtkPVBox::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-
   os << indent << "Position: " << this->Position[0] << ","
                                << this->Position[1] << ","
                                << this->Position[2] << endl;

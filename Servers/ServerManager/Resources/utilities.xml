@@ -455,7 +455,7 @@
       </ProxyProperty>
     </Proxy>
 
-    <BoxProxy name="Box" class="vtkBox">
+    <Proxy name="Box" class="vtkPVBox">
       <DoubleVectorProperty
         name="Bounds"
         command="SetBounds"
@@ -505,7 +505,7 @@
 
       </Hints>
       <!-- End of Box -->
-    </BoxProxy>
+    </Proxy>
     
     <Proxy name="Sphere" class="vtkSphere">
       <DoubleVectorProperty

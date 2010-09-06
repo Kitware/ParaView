@@ -98,6 +98,7 @@ SET(Filters_SRCS
   vtkPVArrowSource.cxx
   vtkPVAxesActor.cxx
   vtkPVAxesWidget.cxx
+  vtkPVBox.cxx
   vtkPVCacheKeeper.cxx
   vtkPVCacheKeeperPipeline.cxx
   vtkPVClientServerRenderManager.cxx
