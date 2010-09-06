@@ -129,10 +129,18 @@ static void vtkPythonAppInitPrependPath(const char* self_dir)
       "/lib/python/paraview", // UNIX --home
       "/Lib/site-packages/paraview", "/Lib/paraview", // Windows
       "/site-packages/paraview", "/paraview", // Windows
+      "/../lib/paraview-" PARAVIEW_VERSION "/site-packages/paraview",
+      "/../lib/paraview-" PARAVIEW_VERSION "/site-packages",
       0
     };
     vtkstd::string prefix = self_dir;
     vtkPythonAppInitPrependPythonPath(self_dir);
+#if defined(WIN32)
+    vtkstd::string lib_dir = vtkstd::string(prefix + "/../lib/paraview-" + PARAVIEW_VERSION);
+    lib_dir = vtksys::SystemTools::CollapseFullPath( lib_dir.c_str());
+    vtkPythonAppInitPrependPythonPath(lib_dir.c_str());
+#endif
+
 #if defined(__APPLE__)
     // On OS X distributions, the libraries are in a different directory
     // than the module. They are in a place relative to the executable.
