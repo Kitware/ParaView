@@ -224,6 +224,25 @@ bool vtkPMProxy::CreateVTKObjects(vtkSMMessage* message)
     return false;
     }
 
+
+#ifdef FIXME
+  // ensure that this is happening correctly in PMProxy
+  if (this->VTKClassName && this->VTKClassName[0] != '\0')
+    {
+    vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+    vtkClientServerStream stream;
+    this->VTKObjectID =
+      pm->NewStreamObject(this->VTKClassName, stream);
+    stream << vtkClientServerStream::Invoke
+           << pm->GetProcessModuleID()
+           << "RegisterProgressEvent"
+           << this->VTKObjectID
+           << static_cast<int>(this->VTKObjectID.ID)
+           << vtkClientServerStream::End;
+    pm->SendStream(this->ConnectionID, this->Servers, stream);
+    }
+#endif
+
   this->SetXMLName(message->GetExtension(ProxyState::xml_group).c_str());
   this->SetXMLGroup(message->GetExtension(ProxyState::xml_name).c_str());
   this->ObjectsCreated = true;

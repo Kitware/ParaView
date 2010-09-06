@@ -25,6 +25,7 @@
 class vtkSMProxyManager;
 class vtkSMSessionCore;
 class vtkPVInformation;
+class vtkPMObject;
 
 class VTK_EXPORT vtkSMSession : public vtkSession
 {
@@ -57,6 +58,10 @@ public:
   // Description:
   // Provides access to the session core.
   vtkGetObjectMacro(Core, vtkSMSessionCore);
+
+  // Description:
+  // Returns a vtkPMObject or subclass given its global id, if any.
+  vtkPMObject* GetPMObject(vtkTypeUInt32 globalid);
 
   // Description:
   // Provides a unique identifier across processes of that session

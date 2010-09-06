@@ -19,6 +19,7 @@
 #include "vtkGarbageCollector.h"
 #include "vtkInstantiator.h"
 #include "vtkObjectFactory.h"
+#include "vtkPMProxy.h"
 #include "vtkProcessModule2.h"
 #include "vtkProcessModuleConnectionManager.h"
 #include "vtkPVOptions.h"
@@ -136,12 +137,17 @@ vtkSMProxy::~vtkSMProxy()
 //---------------------------------------------------------------------------
 vtkObjectBase* vtkSMProxy::GetClientSideObject()
 {
-  // FIXME:
-  abort();
+  if (this->Session)
+    {
+    vtkTypeUInt32 gid = this->GetGlobalID();
+    vtkPMProxy* pmproxy =
+      vtkPMProxy::SafeDownCast(this->Session->GetPMObject(gid));
+    if (pmproxy)
+      {
+      return pmproxy->GetVTKObject();
+      }
+    }
   return NULL;
-//  return vtkProcessModule::GetProcessModule()->GetObjectFromID(
-//    this->GetID(), true); // the second argument means that no error
-                          // will be printed if the ID is invalid.
 }
 
 //---------------------------------------------------------------------------
@@ -508,31 +514,6 @@ void vtkSMProxy::CreateVTKObjects()
   message.SetExtension(ProxyState::xml_group, this->GetXMLGroup());
   message.SetExtension(ProxyState::xml_name, this->GetXMLName());
   this->PushState(&message);
-
-#ifdef FIXME
-  // ensure that this is happening correctly in PMProxy
-  if (this->VTKClassName && this->VTKClassName[0] != '\0')
-    {
-    vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-    vtkClientServerStream stream;
-    this->VTKObjectID =
-      pm->NewStreamObject(this->VTKClassName, stream);
-    stream << vtkClientServerStream::Invoke 
-           << pm->GetProcessModuleID()
-           << "RegisterProgressEvent" 
-           << this->VTKObjectID
-           << static_cast<int>(this->VTKObjectID.ID)
-           << vtkClientServerStream::End;
-    pm->SendStream(this->ConnectionID, this->Servers, stream);
-    }
-
-  vtkSMProxyInternals::ProxyMap::iterator it2 =
-    this->Internals->SubProxies.begin();
-  for( ; it2 != this->Internals->SubProxies.end(); it2++)
-    {
-    it2->second.GetPointer()->CreateVTKObjects();
-    }
-#endif
 }
 
 //---------------------------------------------------------------------------

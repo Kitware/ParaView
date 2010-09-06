@@ -74,6 +74,12 @@ void vtkSMSession::DeletePMObject(vtkSMMessage* msg)
 }
 
 //----------------------------------------------------------------------------
+vtkPMObject* vtkSMSession::GetPMObject(vtkTypeUInt32 globalid)
+{
+  this->Core->GetPMObject(globalid);
+}
+
+//----------------------------------------------------------------------------
 vtkSMProxyManager* vtkSMSession::GetProxyManager()
 {
   return this->ProxyManager;

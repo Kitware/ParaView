@@ -314,51 +314,6 @@ void vtkSMSourceProxy::CreateVTKObjects()
 
   this->Superclass::CreateVTKObjects();
 
-#ifdef FIXME
-  // THIS CODE MUST MOVE TO vtkPMSourceProxy.
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-
-  vtkClientServerID sourceID = this->GetID();
-  vtkClientServerStream stream;
-
-  if (sourceID.IsNull())
-    {
-    return;
-    }
-
-  if (this->ExecutiveName)
-    {
-    vtkClientServerID execId = pm->NewStreamObject(
-      this->ExecutiveName, stream);
-    stream << vtkClientServerStream::Invoke 
-           << sourceID << "SetExecutive" << execId 
-           << vtkClientServerStream::End;
-    pm->DeleteStreamObject(execId, stream);
-    }
-
-  // Keep track of how long each filter takes to execute.
-  vtksys_ios::ostringstream filterName_with_warning_C4701;
-  filterName_with_warning_C4701 << "Execute " << this->VTKClassName
-                                << " id: " << sourceID.ID << ends;
-  vtkClientServerStream start;
-  start << vtkClientServerStream::Invoke << pm->GetProcessModuleID() 
-        << "LogStartEvent" << filterName_with_warning_C4701.str().c_str()
-        << vtkClientServerStream::End;
-  vtkClientServerStream end;
-  end << vtkClientServerStream::Invoke << pm->GetProcessModuleID() 
-      << "LogEndEvent" << filterName_with_warning_C4701.str().c_str()
-      << vtkClientServerStream::End;
-  
-  stream << vtkClientServerStream::Invoke 
-         << sourceID << "AddObserver" << "StartEvent" << start
-         << vtkClientServerStream::End;
-  stream << vtkClientServerStream::Invoke 
-         << sourceID << "AddObserver" << "EndEvent" << end
-         << vtkClientServerStream::End;
-  
-  pm->SendStream(this->ConnectionID, this->Servers, stream);
-#endif
-
   // We are going to fix the ports such that we don't have to update the
   // pipeline or even UpdateInformation() to create the ports.
   this->CreateOutputPorts();
