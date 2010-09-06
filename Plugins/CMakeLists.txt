@@ -58,5 +58,5 @@ paraview_build_optional_plugin(AnalyzeNIfTIReaderWriter "Reader/Writer for Analy
 
 # We do not include VisTrails source in our repo for Licensing reasons. If the directory is manually copied into Plugins, build it.
 IF(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/VisTrails/CMakeLists.txt)
-  paraview_build_optional_plugin(VisTrailsPlugin "VisTrailsPlugin" VisTrails ON)
+  paraview_build_optional_plugin(VisTrailsPlugin "VisTrailsPlugin" VisTrails OFF)
 ENDIF(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/VisTrails/CMakeLists.txt)
