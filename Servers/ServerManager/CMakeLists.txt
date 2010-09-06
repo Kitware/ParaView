@@ -31,32 +31,16 @@ SET (Kit_SRCS
   vtkPMSourceProxy.cxx
   vtkPMStringVectorProperty.cxx
   vtkPMVectorProperty.cxx
-  vtkSMArrayListDomain.cxx
-  vtkSMArrayRangeDomain.cxx
-  vtkSMArraySelectionDomain.cxx
-  vtkSMBooleanDomain.cxx
-  vtkSMBoundsDomain.cxx
-  vtkSMCompositeTreeDomain.cxx
-  vtkSMDataTypeDomain.cxx
-  vtkSMDimensionsDomain.cxx
+  vtkSMCompoundSourceProxy.cxx
+  vtkSMCompoundSourceProxyDefinitionBuilder.cxx
   vtkSMDocumentation.cxx
   vtkSMDomain.cxx
   vtkSMDomainIterator.cxx
-  vtkSMDoubleRangeDomain.cxx
   vtkSMDoubleVectorProperty.cxx
-  vtkSMEnumerationDomain.cxx
-  vtkSMExtentDomain.cxx
-  vtkSMFieldDataDomain.cxx
-  vtkSMFileListDomain.cxx
-  vtkSMFixedTypeDomain.cxx
   vtkSMIdTypeVectorProperty.cxx
-  vtkSMInputArrayDomain.cxx
   vtkSMInputProperty.cxx
-  vtkSMIntRangeDomain.cxx
   vtkSMIntVectorProperty.cxx
   vtkSMLink.cxx
-  vtkSMNumberOfComponentsDomain.cxx
-  vtkSMNumberOfGroupsDomain.cxx
   vtkSMObject.cxx
   vtkSMOutputPort.cxx
   vtkSMProperty.cxx
@@ -65,9 +49,7 @@ SET (Kit_SRCS
   vtkSMProxy.cxx
   vtkSMProxyDefinitionIterator.cxx
   vtkSMProxyDefinitionManager.cxx
-  vtkSMProxyGroupDomain.cxx
   vtkSMProxyIterator.cxx
-  vtkSMProxyListDomain.cxx
   vtkSMProxyManager.cxx
   vtkSMProxyProperty.cxx
   vtkSMProxySelectionModel.cxx
@@ -77,11 +59,41 @@ SET (Kit_SRCS
   vtkSMSession.cxx
   vtkSMSessionServer.cxx
   vtkSMSourceProxy.cxx
-  vtkSMStringListDomain.cxx
-  vtkSMStringListRangeDomain.cxx
   vtkSMStringVectorProperty.cxx
   vtkSMVectorProperty.cxx
   )
+
+# List all types of domains.
+SET (Domain_SRCS
+  vtkSMArrayListDomain.cxx
+  vtkSMArrayRangeDomain.cxx
+  vtkSMArraySelectionDomain.cxx
+  vtkSMBooleanDomain.cxx
+  vtkSMBoundsDomain.cxx
+  vtkSMCompositeTreeDomain.cxx
+  vtkSMDataTypeDomain.cxx
+  vtkSMDimensionsDomain.cxx
+  vtkSMDoubleRangeDomain.cxx
+  vtkSMEnumerationDomain.cxx
+  vtkSMExtentDomain.cxx
+  vtkSMFieldDataDomain.cxx
+  vtkSMFileListDomain.cxx
+  vtkSMFixedTypeDomain.cxx
+  vtkSMInputArrayDomain.cxx
+  vtkSMIntRangeDomain.cxx
+  vtkSMNumberOfComponentsDomain.cxx
+  vtkSMNumberOfGroupsDomain.cxx
+  vtkSMProxyGroupDomain.cxx
+  vtkSMProxyListDomain.cxx
+#  vtkSMSILDomain.cxx
+  vtkSMStringListDomain.cxx
+  vtkSMStringListRangeDomain.cxx
+)
+
+SET (Kit_SRCS
+  ${Kit_SRCS}
+  ${Domain_SRCS}
+)
 
 IF (FIXME)
 SET(Kit_SRCS
@@ -202,7 +214,6 @@ SET(Kit_SRCS
   vtkSMServerProxyManagerReviver.cxx
   vtkSMServerSideAnimationPlayer.cxx
   vtkSMSILInformationHelper.cxx
-  vtkSMSILDomain.cxx
   vtkSMSILModel.cxx
   vtkSMSimpleDoubleInformationHelper.cxx
   vtkSMSimpleIdTypeInformationHelper.cxx

@@ -29,7 +29,7 @@ vtkSMSession::vtkSMSession()
   this->ProxyManager->SetSession(this);
   this->ProxyManager->SetProxyDefinitionManager(
     this->Core->GetProxyDefinitionManager());
-  this->LastGUID = NULL;
+  this->LastGUID = 0;
 }
 
 //----------------------------------------------------------------------------

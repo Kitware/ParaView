@@ -25,9 +25,6 @@
 #include "vtkPVXMLParser.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMCompoundProxyDefinitionLoader.h"
-#ifdef FIXME
-#include "vtkSMCompoundSourceProxy.h"
-#endif
 #include "vtkSMDocumentation.h"
 #include "vtkSMPropertyIterator.h"
 #include "vtkSMProxyDefinitionIterator.h"
@@ -280,24 +277,6 @@ vtkSMProxy* vtkSMProxyManager::NewProxy(vtkPVXMLElement* pelement,
                                         const char* groupname,
                                         const char* proxyname)
 {
-
-  if (strcmp(pelement->GetName(), "CompoundSourceProxy") == 0)
-    {
-#ifdef FIX
-    vtkSMCompoundProxyDefinitionLoader* loader =
-      vtkSMCompoundProxyDefinitionLoader::New();
-    vtkSMCompoundSourceProxy* cproxy = loader->LoadDefinition(pelement);
-    loader->Delete();
-    if (cproxy)
-      {
-      cproxy->SetXMLName(proxyname);
-      cproxy->SetXMLGroup(groupname);
-      }
-    return cproxy;
-#endif
-    return 0;
-    }
-
   vtkObject* object = 0;
   vtksys_ios::ostringstream cname;
   cname << "vtkSM" << pelement->GetName() << ends;
