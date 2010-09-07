@@ -14,25 +14,25 @@
 =========================================================================*/
 // .NAME vtkSelectionStreamer -  streamer for vtkSelection
 // .SECTION Description
-// vtkSelectionStreamer is a streamer for vtkSelection corresponding to
-// vtkTableStreamer. This is used to sections from input vtkSelection relevant
-// to the sections passed through by a vtkTableStreamer with same attributes and
-// inputs.
+// vtkSelectionStreamer is a streamer for vtkSelection. In fact it is using
+// a vtkSortedTableStreamer as one of its input to filter the output ids.
 
 #ifndef __vtkSelectionStreamer_h
 #define __vtkSelectionStreamer_h
 
-#include "vtkTableStreamer.h"
+#include "vtkDataObjectAlgorithm.h"
 
 class vtkSelection;
 class vtkSelectionNode;
 class vtkCompositeDataIterator;
+class vtkMultiProcessController;
+class vtkTable;
 
-class VTK_EXPORT vtkSelectionStreamer : public vtkTableStreamer
+class VTK_EXPORT vtkSelectionStreamer : public vtkDataObjectAlgorithm
 {
 public:
   static vtkSelectionStreamer* New();
-  vtkTypeMacro(vtkSelectionStreamer, vtkTableStreamer);
+  vtkTypeMacro(vtkSelectionStreamer, vtkDataObjectAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
@@ -49,6 +49,11 @@ public:
   // associated with the input dataobject is extracted.
   vtkSetMacro(FieldAssociation, int);
   vtkGetMacro(FieldAssociation, int);
+
+  // Description:
+  // Get/Set the MPI controller used for gathering.
+  void SetController(vtkMultiProcessController*);
+  vtkGetObjectMacro(Controller, vtkMultiProcessController);
 
 //BTX
 protected:
@@ -79,9 +84,10 @@ protected:
   bool LocateSelection(vtkSelectionNode* node);
 
   bool PassBlock(vtkSelectionNode* output, vtkSelectionNode* input,
-    vtkIdType offset, vtkIdType count);
+                 vtkTable* inputDO);
 
   int FieldAssociation;
+  vtkMultiProcessController* Controller;
 private:
   vtkSelectionStreamer(const vtkSelectionStreamer&); // Not implemented
   void operator=(const vtkSelectionStreamer&); // Not implemented

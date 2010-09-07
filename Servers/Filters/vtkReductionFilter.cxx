@@ -316,7 +316,7 @@ void vtkReductionFilter::Reduce(vtkDataObject* input, vtkDataObject* output)
     {
     // Note that preOutput is never the input directly (it is shallow copied at
     // the least, hence we can add arrays to it.
-    if (tablePreOutput->GetNumberOfRows() > 0)
+    if (tablePreOutput->GetNumberOfRows() > 0 && !tablePreOutput->GetColumnByName("vtkOriginalProcessIds"))
       {
       vtkIdTypeArray* originalProcessIds = vtkIdTypeArray::New();
       originalProcessIds->SetNumberOfComponents(1);

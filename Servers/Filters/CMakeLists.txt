@@ -159,6 +159,7 @@ SET(Filters_SRCS
   vtkSelectionConverter.cxx
   vtkSelectionStreamer.cxx
   vtkSequenceAnimationPlayer.cxx
+  vtkSortedTableStreamer.cxx
   vtkSpyPlotBlock.cxx
   vtkSpyPlotBlockIterator.cxx
   vtkSpyPlotIStream.cxx
@@ -170,7 +171,6 @@ SET(Filters_SRCS
   vtkSurfaceVectors.cxx
   vtkTilesHelper.cxx
   vtkTableFFT.cxx
-  vtkTableStreamer.cxx
 #  vtkTemporalCacheFilter.cxx
 #  vtkTemporalPickFilter.cxx
 #  vtkTemporalProbeFilter.cxx

@@ -8757,6 +8757,8 @@
         </Proxy>
         <ExposedProperties>
           <Property name="BlockSize" />
+          <Property name="ColumnToSort" />
+          <Property name="InvertOrder" />
         </ExposedProperties>
       </SubProxy>
 

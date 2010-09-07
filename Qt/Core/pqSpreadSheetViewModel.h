@@ -97,6 +97,12 @@ public:
   /// specified orientation.
   QVariant headerData (int section, Qt::Orientation orientation, 
     int role=Qt::DisplayRole) const; 
+
+  /// Make a server request to sort based on a given column with a given order
+  void sortSection (int section, Qt::SortOrder order);
+
+  /// Return true only if the given column is sortable.
+  bool isSortable(int section);
  
   /// Set/Get the data representation. This internally calls
   /// setRepresentationProxy().
