@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqColorButtonEventTranslator.h"
 
 #include "pqCoreTestUtility.h"
+#include "pqColorButtonEventPlayer.h"
 #include "pqColorChooserButton.h"
 
 #include <QEvent>
@@ -92,5 +93,6 @@ void pqColorButtonEventTranslator::onColorChosen(const QColor& color)
   QString colorvalue = QString("%1,%2,%3").arg(
     color.red()).arg(color.green()).arg(color.blue());
  
-  emit this->recordEvent(color_button, "colorChosen", colorvalue);
+  emit this->recordEvent(color_button, pqColorButtonEventPlayer::EVENT_NAME(),
+                         colorvalue);
 }
