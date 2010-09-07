@@ -5,7 +5,7 @@ cd ../..
 srcdir=${PWD}
 cd ..
 rootdir=${PWD}
-builddir=${rootdir}/ParaViewCmdBin
+builddir=${rootdir}/ParaViewCmdBinx64
 
 export DYLD_LIBRARY_PATH=/Users/partyd/Kitware/Support/ffmpeg/bin/lib:${builddir}/bin
 
@@ -26,6 +26,7 @@ VTK_USE_RPATH:BOOL=OFF
 CMAKE_OSX_ARCHITECTURES:STRING=x86_64
 CMAKE_OSX_SYSROOT:PATH=/Developer/SDKs/MacOSX10.5.sdk
 CMAKE_OSX_DEPLOYMENT_TARGET:STRING=10.5
+PARAVIEW_USE_MPI:BOOL=ON
 PARAVIEW_BUILD_QT_GUI:BOOL=OFF
 PARAVIEW_ENABLE_PYTHON:BOOL=ON
 PYTHON_EXECUTABLE:FILEPATH=/System/Library/Frameworks/Python.framework/Versions/2.5/bin/python

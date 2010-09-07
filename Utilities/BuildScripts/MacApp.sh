@@ -5,7 +5,7 @@ cd ../..
 srcdir=${PWD}
 cd ..
 rootdir=${PWD}
-builddir=${rootdir}/ParaViewAppBinx64
+builddir=${rootdir}/ParaViewAppBin
 
 export DYLD_LIBRARY_PATH=/Users/partyd/Dashboards/Support/qt-4.6.2-10.4/install/lib:/Users/partyd/Kitware/Support/ffmpeg-universal/lib:${builddir}/bin
 
