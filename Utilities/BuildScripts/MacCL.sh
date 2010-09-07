@@ -1,28 +1,13 @@
 #!/bin/bash
-# Typical usage:
-#  ~/Kitware/buildPackage.sh /tmp/Kitware/ParaView3/ /tmp/Kitware/ParaView3Bin
-#  ~/Kitware/buildParaViewPackage.sh <version> <cvstag>
-
-if [ "$#" != "1" ]; then
-  echo "Usage: $0 <cvstag>"
-  exit 1
-fi
 
 
-cvstag=$1
+cd ../..
+srcdir=${PWD}
+cd ..
+rootdir=${PWD}
+builddir=${rootdir}/ParaViewCmdBin
 
-srcdir_prefix=${PWD}
-srcdir=${srcdir_prefix}/ParaView
-builddir=${srcdir_prefix}/ParaViewCmdBin
-
-export DYLD_LIBRARY_PATH=/Users/partyd/Kitware/Support/ffmpeg/bin/lib:${builddir}/bin
-
-#mkdir ${srcdir_prefix}
-cd ${srcdir_prefix}
-
-## Checkout the version requested.
-#echo "Checking out version: ${cvstag}"
-#cvs -q -d :pserver:anoncvs@www.paraview.org:/cvsroot/ParaView3 co -r ${cvstag} ParaView3 
+export DYLD_LIBRARY_PATH=/Users/partyd/Kitware/Support/ffmpeg-universal/lib:${builddir}/bin
 
 # Make the binary directory.
 mkdir ${builddir}
@@ -36,6 +21,8 @@ rm CMakeCache.txt
 
 cat >> CMakeCache.txt << EOF
 CMAKE_BUILD_TYPE:STRING=Release
+CMAKE_CXX_FLAGS_RELEASE:STRING=-O2 -DNDEBUG
+CMAKE_C_FLAGS_RELEASE:STRING=-O2 -DNDEBUG
 BUILD_SHARED_LIBS:BOOL=ON
 BUILD_TESTING:BOOL=OFF
 VTK_USE_RPATH:BOOL=OFF
@@ -58,14 +45,13 @@ FFMPEG_INCLUDE_DIR:PATH=/Users/partyd/Kitware/Support/ffmpeg-universal/include
 FFMPEG_avcodec_LIBRARY:FILEPATH=/Users/partyd/Kitware/Support/ffmpeg-universal/lib/libavcodec.dylib
 FFMPEG_avformat_LIBRARY:FILEPATH=/Users/partyd/Kitware/Support/ffmpeg-universal/lib/libavformat.dylib
 FFMPEG_avutil_LIBRARY:FILEPATH=/Users/partyd/Kitware/Support/ffmpeg-universal/lib/libavutil.dylib
-PARAVIEW_BUILD_PLUGIN_VisTrailsPlugin:BOOL=OFF
 VTK_USE_64BIT_IDS:BOOL=OFF
 EOF
 
-cmake ../ParaView
+cmake ${srcdir}
 
 echo "Building Command Line Tools..."
-make -j5
+make -j18
 
 echo "Generating package(s) using CPACK"
 cpack --config ${builddir}/Servers/Executables/CPackParaViewServersConfig.cmake -G TGZ

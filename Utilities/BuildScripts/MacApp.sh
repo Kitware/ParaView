@@ -1,11 +1,5 @@
 #!/bin/bash
 
-#cd ../..
-#PV_SRC=${PWD}
-#PV_BIN=${ROOT_DIR}/build
-#cd ..
-#ROOT_DIR=${PWD}
-#SUPPORT_DIR=${ROOT_DIR}/Support
 
 cd ../..
 srcdir=${PWD}
