@@ -130,7 +130,15 @@ SET (UndoRedo4_THRESHOLD 15)
 
 # Since often there are issues with fonts etc.
 SET (XYChart_THRESHOLD 150)
+
 SET (XYHistogram_THRESHOLD 60)
+
+# Histogram filter produces different results when running in parallel, so
+# disable it.
+IF (PARAVIEW_USE_MPI)
+  SET (XYHistogram_DISABLE_CS TRUE)
+  SET (XYHistogram_DISABLE_CRS TRUE)
+ENDIF (PARAVIEW_USE_MPI)
 
 # These Xdmf tests have wireframes, hence the increased thresholds.
 SET (XdmfReadImageData_THRESHOLD 20)
