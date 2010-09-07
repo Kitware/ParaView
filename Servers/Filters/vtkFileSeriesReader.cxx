@@ -192,6 +192,12 @@ int vtkFileSeriesReaderTimeRanges::GetAggregateTimeInfo(vtkInformation *outInfo)
 int vtkFileSeriesReaderTimeRanges::GetInputTimeInfo(int index,
                                                     vtkInformation *outInfo)
 {
+  if (this->InputLookup.find(index) == this->InputLookup.end())
+    {
+    // if there are no files specified, there's no time information to provide.
+    return 1;
+    }
+
   vtkInformation *storedInfo = this->InputLookup[index];
   outInfo->CopyEntry(storedInfo,vtkStreamingDemandDrivenPipeline::TIME_RANGE());
   if (storedInfo->Has(vtkStreamingDemandDrivenPipeline::TIME_STEPS()))
@@ -619,6 +625,14 @@ int vtkFileSeriesReader::RequestUpdateExtent(
     }
 
   int index = *(inputs.begin());
+  if (index >= static_cast<int>(this->GetNumberOfFileNames()))
+    {
+    // this happens when there are no files set. That's an acceptable condition
+    // when the file-series is not an essential filename eg. the Q file for
+    // Plot3D reader.
+    index = -1;
+    }
+
   // Make sure that the reader file name is set correctly and that
   // RequestInformation has been called.
   this->RequestInformationForInput(index);
@@ -654,8 +668,11 @@ int vtkFileSeriesReader::RequestData(vtkInformation *request,
 
   int retVal = this->Reader->ProcessRequest(request, inputVector, outputVector);
 
-  // Now restore the information.
-  this->Internal->TimeRanges->GetAggregateTimeInfo(outInfo);
+  if (this->GetNumberOfFileNames() > 0)
+    {
+    // Now restore the information.
+    this->Internal->TimeRanges->GetAggregateTimeInfo(outInfo);
+    }
 
   return retVal;
 }
@@ -672,6 +689,11 @@ int vtkFileSeriesReader::RequestInformationForInput(
       {
       this->SetReaderFileName(this->GetFileName(index));
       }
+    else
+      {
+      this->SetReaderFileName(0);
+      }
+
     this->LastRequestInformationIndex = index;
     // Need to call RequestInformation on reader to refresh any metadata for the
     // new filename.
@@ -704,7 +726,7 @@ int vtkFileSeriesReader::RequestInformationForInput(
 //-----------------------------------------------------------------------------
 void vtkFileSeriesReader::SetReaderFileName(const char* fname)
 {
-  if (this->Reader && fname)
+  if (this->Reader)
     {
     vtkClientServerID csId = 
       vtkProcessModule::GetProcessModule()->GetIDFromObject(this->Reader);
