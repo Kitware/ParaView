@@ -77,6 +77,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqFileChooserWidget.h"
 #include "pqIntRangeWidget.h"
 #include "pqListWidgetItemObject.h"
+#include "pqObjectBuilder.h"
 #include "pqObjectPanel.h"
 #include "pqPipelineFilter.h"
 #include "pqPropertyManager.h"
@@ -698,6 +699,13 @@ static void processHints(QGridLayout* panelLayout,
     propertiesToHide.push_back(pname);
     }
 
+  // Skip the filename property.
+  QString filenameProperty = pqObjectBuilder::getFileNamePropertyName(smProxy);
+  if (!filenameProperty.isEmpty())
+    {
+    propertiesToHide.push_back(filenameProperty);
+    }
+
   // Get the hints for this proxy.
   // The hints may contain stuff about property groupping/layout
   // etc etc.
@@ -815,7 +823,6 @@ void pqNamedWidgets::createWidgets(QGridLayout* panelLayout, vtkSMProxy* pxy)
   bool row_streched = false; // when set, the extra setRowStretch() at the end
                              // is skipped
   int rowCount = 0;
-  int skippedFirstFileProperty = 0;
   bool isCompoundProxy = pxy->IsA("vtkSMCompoundSourceProxy");
 
   // query for proxy properties, and create widgets
@@ -878,32 +885,6 @@ void pqNamedWidgets::createWidgets(QGridLayout* panelLayout, vtkSMProxy* pxy)
         SMProperty->GetIsInternal())
       {
       continue;
-      }
-    
-    if (!propertiesToShow.contains(propertyName))
-      {
-      if (SMProperty->IsA("vtkSMStringVectorProperty") && !skippedFirstFileProperty)
-        {
-        // Do not show the first file property. We do not allow changing of
-        // the main filename from the gui. The user has to create another
-        // instance of the reader and reconnect the pipeline.
-        vtkSmartPointer<vtkSMDomainIterator> diter;
-        diter.TakeReference(SMProperty->NewDomainIterator());
-        diter->Begin();
-        while(!diter->IsAtEnd())
-          {
-          if (diter->GetDomain()->IsA("vtkSMFileListDomain"))
-            {
-            break;
-            }
-          diter->Next();
-          }
-        if (!diter->IsAtEnd())
-          {
-          skippedFirstFileProperty = 1;
-          continue;
-          }
-        }
       }
 
     // update domains we might ask for
@@ -1336,11 +1317,14 @@ void pqNamedWidgets::createWidgets(QGridLayout* panelLayout, vtkSMProxy* pxy)
       {
       pqFileChooserWidget* chooser;
       chooser = new pqFileChooserWidget(panelLayout->parentWidget());
-      if(informationOnly)
+      if (informationOnly)
         {
         chooser->setEnabled(false);
         }
-     
+
+      // decide whether to allow multiple files
+      chooser->setForceSingleFile((SMProperty->GetRepeatable() == 0));
+
       // If there's a hint on the property indicating that this property expects a
       // directory name, then, we will use the directory mode.
       if (SMProperty->IsA("vtkSMStringVectorProperty") && SMProperty->GetHints() && 
@@ -1348,7 +1332,7 @@ void pqNamedWidgets::createWidgets(QGridLayout* panelLayout, vtkSMProxy* pxy)
         {
         chooser->setUseDirectoryMode(1);
         }
-        
+
       pqServerManagerModel* m =
         pqApplicationCore::instance()->getServerManagerModel();
       chooser->setServer(m->findServer(pxy->GetConnectionID()));
@@ -1356,7 +1340,7 @@ void pqNamedWidgets::createWidgets(QGridLayout* panelLayout, vtkSMProxy* pxy)
       QLabel* label = createPanelLabel(panelLayout->parentWidget(),
                                        propertyLabel,
                                        propertyName);
-      
+
       panelLayout->addWidget(label, rowCount, 0, 1, 1);
       panelLayout->addWidget(chooser, rowCount, 1, 1, 1);
       rowCount++;
