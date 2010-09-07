@@ -2072,6 +2072,143 @@
 
     </SourceProxy> <!-- netCDFReaderCore -->
 
+   <SourceProxy name="P3DReaderCore" class="vtkMultiBlockPLOT3DReader">
+     <Documentation
+       short_help="Read PLOT3D files."
+       long_help="Read ASCII or binary PLOT3D files.">
+       PLOT3D is a plotting package developed at NASA. The PLOT3D reader can read both ASCII and binary PLOT3D files. The default file extension for the geometry files is .xyz, and the default file extension for the solution files is .q. The output of this reader is a multi-block dataset containing curvilinear (structured grid) datasets.
+     </Documentation>
+     <StringVectorProperty
+        name="FileName"
+        animateable="0"
+        command="SetFileName"
+        number_of_elements="1">
+        <FileListDomain name="files"/>
+        <Documentation>
+          This property specifies the .xyz (geometry) file name for the PLOT3D reader.
+        </Documentation>
+     </StringVectorProperty>
+
+     <StringVectorProperty
+        name="QFileName"
+        command="SetQFileName"
+        animateable="0"
+        number_of_elements="1">
+       <FileListDomain name="files"/>
+       <Documentation>
+         This property specifies the .q (solution) file name for the PLOT3D reader.
+       </Documentation>
+     </StringVectorProperty>
+
+     <IntVectorProperty
+        name="BinaryFile"
+        command="SetBinaryFile"
+        number_of_elements="1"
+        default_values="1" >
+       <BooleanDomain name="bool"/>
+       <Documentation>
+         This property indicates whether the data files are binary.
+       </Documentation>
+     </IntVectorProperty>
+
+     <IntVectorProperty
+        name="MultiGrid"
+        command="SetMultiGrid"
+        number_of_elements="1"
+        default_values="0" >
+       <BooleanDomain name="bool"/>
+       <Documentation>
+         This property indicates whether these files have multiple-block information.
+       </Documentation>
+     </IntVectorProperty>
+
+     <IntVectorProperty
+        name="HasByteCount"
+        command="SetHasByteCount"
+        number_of_elements="1"
+        default_values="0" >
+       <BooleanDomain name="bool"/>
+       <Documentation>
+         This property indicates whether this file uses Fortran leading-trailing byte counts.
+       </Documentation>
+     </IntVectorProperty>
+
+     <IntVectorProperty
+        name="IBlanking"
+        command="SetIBlanking"
+        number_of_elements="1"
+        default_values="0" >
+       <BooleanDomain name="bool"/>
+       <Documentation>
+         This property indicates whether this dataset has visibility information.
+       </Documentation>
+     </IntVectorProperty>
+
+     <IntVectorProperty
+        name="TwoDimensionalGeometry"
+        command="SetTwoDimensionalGeometry"
+        number_of_elements="1"
+        default_values="0" >
+       <BooleanDomain name="bool"/>
+       <Documentation>
+         This property indicates whether the data is two- or three-dimensional.
+       </Documentation>
+     </IntVectorProperty>
+
+     <IntVectorProperty
+        name="ForceRead"
+        command="SetForceRead"
+        number_of_elements="1"
+        default_values="0" >
+       <BooleanDomain name="bool"/>
+       <Documentation>
+         This property indicates whether to attempt to read the file even if it appears corrupt
+       </Documentation>
+     </IntVectorProperty>
+
+     <IntVectorProperty
+        name="ByteOrder"
+        command="SetByteOrder"
+        number_of_elements="1"
+        default_values="0" >
+       <EnumerationDomain name="enum">
+         <Entry value="0" text="BigEndian"/>
+         <Entry value="1" text="LittleEndian"/>
+       </EnumerationDomain>
+       <Documentation>
+         This property specifies the byte order of any binary file(s).
+       </Documentation>
+     </IntVectorProperty>
+
+     <IntVectorProperty
+        name="Functions"
+        command="AddFunction"
+        clean_command="RemoveAllFunctions"
+        repeat_command="1"
+        number_of_elements_per_command="1">
+       <EnumerationDomain name="array_list">
+         <!-- <Entry value="100" text="Scalar - Density"/> -->
+         <Entry value="110" text="Scalar - Pressure"/>
+         <Entry value="120" text="Scalar - Temperature"/>
+         <Entry value="130" text="Scalar - Enthalpy"/>
+         <Entry value="140" text="Scalar - Internal energy"/>
+         <Entry value="144" text="Scalar - Kinetic energy"/>
+         <Entry value="153" text="Scalar - Velocity magnitude"/>
+         <!-- <Entry value="163" text="Scalar - Stagnation energy"/> -->
+         <Entry value="170" text="Scalar - Entropy"/>
+         <Entry value="184" text="Scalar - Swirl."/>
+         <Entry value="200" text="Vector - Velocity"/>
+         <Entry value="201" text="Vector - Vorticity"/>
+         <!-- <Entry value="202" text="Vector - Momentum"/> -->
+         <Entry value="210" text="Vector - Pressure gradient"/>
+       </EnumerationDomain>
+       <Documentation>
+         This property lists which functions (point-centered arrays) to compute.
+       </Documentation>
+     </IntVectorProperty>
+   <!-- End P3DReaderCore -->
+   </SourceProxy>
+
     <!-- End of "internal_sources" -->
   </ProxyGroup>
 
@@ -3335,149 +3472,6 @@
           file_description="XMol Molecule Files" />
      </Hints>
    <!-- End xyzreader -->
-   </SourceProxy>
-
-   <SourceProxy name="P3DReader" class="vtkMultiBlockPLOT3DReader"
-                label="PLOT3D Reader">
-     <Documentation
-       short_help="Read PLOT3D files."
-       long_help="Read ASCII or binary PLOT3D files.">
-       PLOT3D is a plotting package developed at NASA. The PLOT3D reader can read both ASCII and binary PLOT3D files. The default file extension for the geometry files is .xyz, and the default file extension for the solution files is .q. The output of this reader is a multi-block dataset containing curvilinear (structured grid) datasets.
-     </Documentation>
-     <StringVectorProperty
-        name="FileName"
-        animateable="0"
-        command="SetFileName"
-        number_of_elements="1">
-        <FileListDomain name="files"/>
-        <Documentation>
-          This property specifies the .xyz (geometry) file name for the PLOT3D reader.
-        </Documentation>
-     </StringVectorProperty>
-
-     <StringVectorProperty
-        name="QFileName"
-        command="SetQFileName"
-        animateable="0"
-        number_of_elements="1">
-       <FileListDomain name="files"/>
-       <Documentation>
-         This property specifies the .q (solution) file name for the PLOT3D reader.
-       </Documentation>
-     </StringVectorProperty>
-
-     <IntVectorProperty 
-        name="BinaryFile" 
-        command="SetBinaryFile" 
-        number_of_elements="1"
-        default_values="1" > 
-       <BooleanDomain name="bool"/>
-       <Documentation>
-         This property indicates whether the data files are binary.
-       </Documentation>
-     </IntVectorProperty>
-
-     <IntVectorProperty 
-        name="MultiGrid" 
-        command="SetMultiGrid" 
-        number_of_elements="1"
-        default_values="0" > 
-       <BooleanDomain name="bool"/>
-       <Documentation>
-         This property indicates whether these files have multiple-block information.
-       </Documentation>
-     </IntVectorProperty>
-
-     <IntVectorProperty 
-        name="HasByteCount" 
-        command="SetHasByteCount" 
-        number_of_elements="1"
-        default_values="0" > 
-       <BooleanDomain name="bool"/>
-       <Documentation>
-         This property indicates whether this file uses Fortran leading-trailing byte counts.
-       </Documentation>
-     </IntVectorProperty>
-
-     <IntVectorProperty 
-        name="IBlanking" 
-        command="SetIBlanking" 
-        number_of_elements="1"
-        default_values="0" > 
-       <BooleanDomain name="bool"/>
-       <Documentation>
-         This property indicates whether this dataset has visibility information.
-       </Documentation>
-     </IntVectorProperty>
-
-     <IntVectorProperty 
-        name="TwoDimensionalGeometry" 
-        command="SetTwoDimensionalGeometry" 
-        number_of_elements="1"
-        default_values="0" > 
-       <BooleanDomain name="bool"/>
-       <Documentation>
-         This property indicates whether the data is two- or three-dimensional.
-       </Documentation>
-     </IntVectorProperty>
-
-     <IntVectorProperty 
-        name="ForceRead" 
-        command="SetForceRead" 
-        number_of_elements="1"
-        default_values="0" > 
-       <BooleanDomain name="bool"/>
-       <Documentation>
-         This property indicates whether to attempt to read the file even if it appears corrupt
-       </Documentation>
-     </IntVectorProperty>
-
-     <IntVectorProperty 
-        name="ByteOrder" 
-        command="SetByteOrder" 
-        number_of_elements="1"
-        default_values="0" >
-       <EnumerationDomain name="enum">
-         <Entry value="0" text="BigEndian"/>
-         <Entry value="1" text="LittleEndian"/>
-       </EnumerationDomain>
-       <Documentation>
-         This property specifies the byte order of any binary file(s).
-       </Documentation>
-     </IntVectorProperty>
-
-     <IntVectorProperty 
-        name="Functions" 
-        command="AddFunction"
-        clean_command="RemoveAllFunctions"
-        repeat_command="1"
-        number_of_elements_per_command="1">
-       <EnumerationDomain name="array_list">
-         <!-- <Entry value="100" text="Scalar - Density"/> -->
-         <Entry value="110" text="Scalar - Pressure"/>
-         <Entry value="120" text="Scalar - Temperature"/>
-         <Entry value="130" text="Scalar - Enthalpy"/>
-         <Entry value="140" text="Scalar - Internal energy"/>
-         <Entry value="144" text="Scalar - Kinetic energy"/>
-         <Entry value="153" text="Scalar - Velocity magnitude"/>
-         <!-- <Entry value="163" text="Scalar - Stagnation energy"/> -->
-         <Entry value="170" text="Scalar - Entropy"/>
-         <Entry value="184" text="Scalar - Swirl."/>
-         <Entry value="200" text="Vector - Velocity"/>
-         <Entry value="201" text="Vector - Vorticity"/>
-         <!-- <Entry value="202" text="Vector - Momentum"/> -->
-         <Entry value="210" text="Vector - Pressure gradient"/>
-       </EnumerationDomain>
-       <Documentation>
-         This property lists which functions (point-centered arrays) to compute.
-       </Documentation>
-     </IntVectorProperty>
-
-     <Hints>
-      <ReaderFactory extensions="xyz"
-          file_description="PLOT3D Files" />
-     </Hints>
-   <!-- End P3DReader -->
    </SourceProxy>
 
    <SourceProxy name="PhastaReader" 
@@ -6229,6 +6223,74 @@
 
    </SourceProxy>
    <!-- End MPASReader -->
+
+   <FileSeriesReaderProxy name="P3DReader"
+                          class="vtkFileSeriesReader"
+                          label="PLOT3D Reader"
+                          file_name_method="SetQFileName">
+     <Documentation
+       short_help="Read PLOT3D files."
+       long_help="Read ASCII or binary PLOT3D files.">
+       PLOT3D is a plotting package developed at NASA. The PLOT3D reader can read both ASCII and binary PLOT3D files. The default file extension for the geometry files is .xyz, and the default file extension for the solution files is .q. The output of this reader is a multi-block dataset containing curvilinear (structured grid) datasets.
+     </Documentation>
+     <SubProxy>
+       <Proxy name="Reader"
+              proxygroup="internal_sources" proxyname="P3DReaderCore">
+       </Proxy>
+       <ExposedProperties>
+        <Property name="FileName" />
+        <Property name="BinaryFile" />
+        <Property name="MultiGrid" />
+        <Property name="HasByteCount" />
+        <Property name="IBlanking" />
+        <Property name="TwoDimensionalGeometry" />
+        <Property name="ForceRead" />
+        <Property name="ByteOrder" />
+        <Property name="Functions" />
+       </ExposedProperties>
+     </SubProxy>
+
+     <StringVectorProperty name="FileNameInfo"
+        command="GetCurrentFileName"
+        information_only="1" >
+        <SimpleStringInformationHelper />
+     </StringVectorProperty>
+
+     <StringVectorProperty
+        name="QFileName"
+        clean_command="RemoveAllFileNames"
+        command="AddFileName"
+        animateable="0"
+        number_of_elements="0"
+        repeat_command="1"
+        information_property="FileNameInfo" >
+        <FileListDomain name="files"/>
+        <Documentation>
+          The list of .q (solution) files for the PLOT3D reader. This can be
+          more than 1. If more that 1 file is specified, the reader will switch
+          to file-series mode in which it will pretend that it can support time
+          and provide 1 file per time step.
+       </Documentation>
+     </StringVectorProperty>
+
+     <DoubleVectorProperty
+        name="TimestepValues"
+        repeatable="1"
+        information_only="1">
+        <TimeStepsInformationHelper/>
+        <Documentation>
+          Available timestep values.
+        </Documentation>
+     </DoubleVectorProperty>
+     <Hints>
+      <ReaderFactory extensions="xyz"
+          file_description="PLOT3D Files" />
+      <!-- This hint tells the GUI that the File | Open dialog sets the FileName
+           property -->
+      <DefaultFileNameProperty name="FileName" />
+     </Hints>
+     <!-- End stlreader-->
+   </FileSeriesReaderProxy>
 
   </ProxyGroup>
 </ServerManagerConfiguration>

@@ -543,8 +543,16 @@ int vtkFileSeriesReader::RequestInformation(
   int numFiles = (int)this->GetNumberOfFileNames();
   if (numFiles < 1)
     {
-    vtkErrorMacro("Expecting at least 1 file.  Cannot proceed.");
-    return 0;
+    // This can happen in special cases, like Plot3DReader where the
+    // vtkFileSeriesReader is actually controlling a non-essential file-name
+    // property. In which case, we simply pass the RequestInformation call to
+    // the reader.
+    outInfo->Remove(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
+    outInfo->Remove(vtkStreamingDemandDrivenPipeline::TIME_RANGE());
+    this->RequestInformationForInput(-1, request, outputVector);
+
+    //vtkErrorMacro("Expecting at least 1 file.  Cannot proceed.");
+    return 1;
     }
 
   // Run RequestInformation on the reader for the first file.  Use that info to
@@ -658,9 +666,12 @@ int vtkFileSeriesReader::RequestInformationForInput(
                                              vtkInformation *request,
                                              vtkInformationVector *outputVector)
 {
-  if ((index != this->LastRequestInformationIndex) || (outputVector != NULL))
+  if (index == -1 || (index != this->LastRequestInformationIndex) || (outputVector != NULL))
     {
-    this->SetReaderFileName(this->GetFileName(index));
+    if (index >= 0)
+      {
+      this->SetReaderFileName(this->GetFileName(index));
+      }
     this->LastRequestInformationIndex = index;
     // Need to call RequestInformation on reader to refresh any metadata for the
     // new filename.
