@@ -63,7 +63,7 @@ then
   mv src/ qt-4.6.2/src
 
   cd qt-4.6.2/src/
-  echo yes | ./configure --prefix=${SUPPORT_DIR}/qt-4.6.2/bin/ -opengl -optimized-qmake -release -opensource -phonon
+  echo yes | ./configure --prefix=${SUPPORT_DIR}/qt-4.6.2/bin -opengl -optimized-qmake -release -opensource -phonon -nomake examples -nomake demos
   make -j${CORES}
   make install
 
@@ -439,8 +439,9 @@ rm CMakeCache.txt
 cat >> CMakeCache.txt << EOF
 BUILD_TESTING:BOOL=OFF
 CMAKE_BUILD_TYPE:STRING=Release
+CMAKE_CXX_FLAGS_RELEASE:STRING=-O2 -DNDEBUG
+CMAKE_C_FLAGS_RELEASE:STRING=-O2 -DNDEBUG
 BUILD_SHARED_LIBS:BOOL=ON
-VTK_USE_RPATH:BOOL=OFF
 PARAVIEW_BUILD_QT_GUI:BOOL=ON
 QT_QMAKE_EXECUTABLE:FILEPATH=${SUPPORT_DIR}/qt-4.6.2/bin/bin/qmake
 VTK_USE_QVTK_QTOPENGL:BOOL=ON
@@ -625,7 +626,8 @@ cat >> CMakeCache.txt << EOF
 BUILD_TESTING:BOOL=OFF
 CMAKE_BUILD_TYPE:STRING=Release
 BUILD_SHARED_LIBS:BOOL=ON
-VTK_USE_RPATH:BOOL=OFF
+CMAKE_CXX_FLAGS_RELEASE:STRING=-O2 -DNDEBUG
+CMAKE_C_FLAGS_RELEASE:STRING=-O2 -DNDEBUG
 PARAVIEW_BUILD_QT_GUI:BOOL=ON
 QT_QMAKE_EXECUTABLE:FILEPATH=${SUPPORT_DIR}/qt-4.6.2/bin/bin/qmake
 VTK_USE_QVTK_QTOPENGL:BOOL=ON
