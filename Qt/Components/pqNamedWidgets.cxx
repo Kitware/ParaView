@@ -699,13 +699,6 @@ static void processHints(QGridLayout* panelLayout,
     propertiesToHide.push_back(pname);
     }
 
-  // Skip the filename property.
-  QString filenameProperty = pqObjectBuilder::getFileNamePropertyName(smProxy);
-  if (!filenameProperty.isEmpty())
-    {
-    propertiesToHide.push_back(filenameProperty);
-    }
-
   // Get the hints for this proxy.
   // The hints may contain stuff about property groupping/layout
   // etc etc.
@@ -855,6 +848,16 @@ void pqNamedWidgets::createWidgets(QGridLayout* panelLayout, vtkSMProxy* pxy)
   QStringList propertiesToHide;
   QStringList propertiesToShow;
   processHints(panelLayout, pxy, propertiesToHide, propertiesToShow);
+
+  // Skip the filename property, unless the user has indicated that the filename
+  // should be shown on the property panel.
+  QString filenameProperty = pqObjectBuilder::getFileNamePropertyName(pxy);
+  if (!filenameProperty.isEmpty() &&
+    !propertiesToShow.contains(filenameProperty))
+    {
+    propertiesToHide.push_back(filenameProperty);
+    }
+
   rowCount = panelLayout->rowCount();
   for(iter->Begin(); !iter->IsAtEnd(); iter->Next())
     {
