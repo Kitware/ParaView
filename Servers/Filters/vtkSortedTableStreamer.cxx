@@ -613,7 +613,7 @@ public:
     }
 
   // --------------------------------------------------------------------------
-  int BuildCache(bool sortableArray, int invertOrder)
+  int BuildCache(bool sortableArray, bool invertOrder)
     {
     // We are building the cache so no need to build it next time
     this->NeedToBuildCache = false;
@@ -988,7 +988,7 @@ public:
                                  vtkIdType& nbInLocalBar)
     {
     // Communication buffer
-    vtkIdType bufferHistogramValues[this->NumProcs *  HISTOGRAM_SIZE];
+    vtkIdType* bufferHistogramValues = new vtkIdType[this->NumProcs *  HISTOGRAM_SIZE];
 
     // Local internal working var
     vtkIdType histogramBarIdx = -1;
@@ -1041,6 +1041,7 @@ public:
         _globalHistogram.Values[idx % HISTOGRAM_SIZE] += bufferHistogramValues[idx];
         }
       }
+    delete[] bufferHistogramValues;
     }
 
   // --------------------------------------------------------------------------
@@ -1383,6 +1384,8 @@ int vtkSortedTableStreamer::RequestData( vtkInformation* vtkNotUsed(request),
 
   vtkSmartPointer<vtkTable> input = vtkTable::GetData(inputVector[0]);
 
+  bool orderInverted = this->InvertOrder > 0;
+
   // Convert a composite dataset into a vtkTable input.
   if(!input)
     {
@@ -1503,12 +1506,12 @@ int vtkSortedTableStreamer::RequestData( vtkInformation* vtkNotUsed(request),
       strcmp( "vtkOriginalProcessIds", this->GetColumnToSort()) == 0)
     {
     this->Internal->Extract( input, output,
-                             this->Block, this->BlockSize, this->InvertOrder);
+                             this->Block, this->BlockSize, orderInverted);
     }
   else
     {
     this->Internal->Compute( input, output,
-                             this->Block, this->BlockSize, this->InvertOrder);
+                             this->Block, this->BlockSize, orderInverted);
     }
 
   return 1;
