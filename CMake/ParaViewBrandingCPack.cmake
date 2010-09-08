@@ -169,7 +169,7 @@ FUNCTION(install_qt_libs qtliblist componentname)
           # Install .so and versioned .so.x.y
           GET_FILENAME_COMPONENT(QT_LIB_DIR_tmp ${QT_${qtlib}_LIBRARY_RELEASE} PATH)
           GET_FILENAME_COMPONENT(QT_LIB_NAME_tmp ${QT_${qtlib}_LIBRARY_RELEASE} NAME)
-          INSTALL(DIRECTORY ${QT_LIB_DIR_tmp}/ DESTINATION lib/Qt COMPONENT Runtime
+          INSTALL(DIRECTORY ${QT_LIB_DIR_tmp}/ DESTINATION ${PV_INSTALL_LIB_DIR} COMPONENT Runtime
                 FILES_MATCHING PATTERN "${QT_LIB_NAME_tmp}*"
                 PATTERN "${QT_LIB_NAME_tmp}*.debug" EXCLUDE)
         ELSE (NOT WIN32)
