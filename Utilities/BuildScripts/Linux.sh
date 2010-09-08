@@ -1,16 +1,6 @@
-set -x
 #!/bin/bash
-# Typical usage:
-#  ~/partyd/buildPackage.sh /tmp/partyd/ParaView3/ /tmp/partyd/ParaView3Bin
-#  ~/partyd/buildParaViewPackage.sh <version> <cvstag>
+set -x
 
-#if [ "$#" != "3" ]; then
-#  echo "Usage: $0 <base direcotry> <version> <cvstag>"
-#  exit 1
-#fi
-
-#version=$2
-#cvstag=$3
 
 #sudo apt-get install libglib-dev
 #sudo apt-get install cvs
@@ -33,10 +23,10 @@ export FC=gfortran
 
 cd ../..
 PV_SRC=${PWD}
-PV_BIN=${ROOT_DIR}/build
 cd ..
 ROOT_DIR=${PWD}
 SUPPORT_DIR=${ROOT_DIR}/Support
+PV_BIN=${ROOT_DIR}/build
 CORES=5
 
 if [ ! -d $SUPPORT_DIR ];
@@ -44,7 +34,7 @@ then
   mkdir $SUPPORT_DIR
 fi
 
-cd $SUPPORT_DIR
+cd ${SUPPORT_DIR}
 
 # QT pre
 #sudo apt-get install libpng12-dev
@@ -67,7 +57,7 @@ then
   make -j${CORES}
   make install
 
-  cd ../..
+  cd ${SUPPORT_DIR}
 else
   echo "QT Complete"
 fi
@@ -82,7 +72,7 @@ then
   ./configure --prefix=${SUPPORT_DIR}/python25 --enable-shared
   make -j${CORES}
   make install
-  cd ..
+  cd ${SUPPORT_DIR}
 else
   echo "Python Complete"
 fi
@@ -92,14 +82,14 @@ export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${SUPPORT_DIR}/python25/lib
 
 # sip
 if [ ! -f ${SUPPORT_DIR}/python25/bin/sip ];
-then   
-  wget http://www.riverbankcomputing.co.uk/static/Downloads/sip4/sip-4.10.1.tar.gz
-  tar -zxvf sip-4.10.1.tar.gz
-  cd sip-4.10.1/
+then
+  wget http://www.riverbankcomputing.co.uk/static/Downloads/sip4/sip-4.11.1.tar.gz
+  tar -zxvf sip-4.11.1.tar.gz
+  cd sip-4.11.1/
   ${SUPPORT_DIR}/python25/bin/python configure.py
   make -j${CORES}
   make install
-  cd ..
+  cd ${SUPPORT_DIR}
 else
   echo "SIP Complete"
 fi
@@ -107,13 +97,13 @@ fi
 # PyQt
 if [ ! -f ${SUPPORT_DIR}/python25/lib/python2.5/site-packages/PyQt4/QtCore.so ];
 then
-  wget http://www.riverbankcomputing.co.uk/static/Downloads/PyQt4/PyQt-x11-gpl-4.7.2.tar.gz
-  tar -zxvf PyQt-x11-gpl-4.7.2.tar.gz
-  cd PyQt-x11-gpl-4.7.2/
+  wget http://www.riverbankcomputing.co.uk/static/Downloads/PyQt4/PyQt-x11-gpl-4.7.6.tar.gz
+  tar -zxvf PyQt-x11-gpl-4.7.6.tar.gz
+  cd PyQt-x11-gpl-4.7.6/
   echo yes | ${SUPPORT_DIR}/python25/bin/python configure.py -q ${SUPPORT_DIR}/qt-4.6.2/bin/bin/qmake
   make -j${CORES}
   make install
-  cd ..
+  cd ${SUPPORT_DIR}
 else
   echo "PyQt Complete"
 fi
@@ -140,7 +130,7 @@ then
   LIBS=-lm CFLAGS=-fPIC CXXFLAGS=-fPIC ./configure --prefix=${SUPPORT_DIR}/szip-2.1 --disable-shared
   make -j${CORES}
   make install
-  cd ..
+  cd ${SUPPORT_DIR}/VisIt-1.10.0.X-all
 else
   echo "SZip Complete"
 fi
@@ -153,7 +143,7 @@ then
   LIBS=-lm CFLAGS=-fPIC CXXFLAGS=-fPIC ./configure --prefix=${SUPPORT_DIR}/hdf4-4.2r4 --disable-fortran --with-szlib=${SUPPORT_DIR}/szip-2.1/
   make -j 8
   make install
-  cd ..
+  cd ${SUPPORT_DIR}/VisIt-1.10.0.X-all
 else
   echo "HDF4 Complete"
 fi
@@ -173,7 +163,7 @@ then
   make -j${CORES}
   make install
   ln -s ${SUPPORT_DIR}/szip-2.1/lib/libsz.a ${SUPPORT_DIR}/hdf5-1.6.8_ser/lib/libsz.a
-  cd ..
+  cd ${SUPPORT_DIR}/VisIt-1.10.0.X-all
 else
   echo "HDF5 Complete"
 fi
@@ -236,7 +226,7 @@ EOF
   CXXFLAGS=-fPIC CFLAGS=-fPIC FFLAGS=-fPIC make -j 8
   cp libbox2d.Linux.g++.f77.DEBUG.a ${SUPPORT_DIR}/boxlib/lib/libbox2D.a
   cp *.H ${SUPPORT_DIR}/boxlib/include/2D/
-  cd ../..
+  cd ${SUPPORT_DIR}/VisIt-1.10.0.X-all
 else
   echo "BoxLib Complete"
 fi
@@ -268,7 +258,7 @@ EOF
   make -j${CORES}
   mkdir ${SUPPORT_DIR}/netcdf-3.6.0-p1
   make install 
-  cd ..
+  cd ${SUPPORT_DIR}/VisIt-1.10.0.X-all
 else
   echo "NetCDF Complete"
 fi
@@ -283,7 +273,7 @@ then
   make -j${CORES}
   make install
   ln -s ${SUPPORT_DIR}/silo-4.6.2/lib/libsiloh5.a ${SUPPORT_DIR}/silo-4.6.2/lib/libsilo.a
-  cd ..
+  cd ${SUPPORT_DIR}/VisIt-1.10.0.X-all
 else
   echo "Silo Complete"
 fi
@@ -298,7 +288,7 @@ then
   make -j${CORES}
   mkdir -p ${SUPPORT_DIR}/cgns-2.4/{include,lib}
   make install
-  cd ..
+  cd ${SUPPORT_DIR}/VisIt-1.10.0.X-all
 else
   echo "CGNS Complete"
 fi
@@ -311,7 +301,7 @@ then
   ./configure --prefix=${SUPPORT_DIR}/cfitsio
   make -j${CORES}
   make install
-  cd ..
+  cd ${SUPPORT_DIR}/VisIt-1.10.0.X-all
 else
   echo "CFITSIO Complete"
 fi
@@ -324,7 +314,7 @@ then
   CFLAGS=-fPIC ./configure --prefix=${SUPPORT_DIR}/h5part-1.3.3 --with-hdf5path=${SUPPORT_DIR}/hdf5-1.6.8_ser/
   make -j${CORES}
   make install
-  cd ..
+  cd ${SUPPORT_DIR}/VisIt-1.10.0.X-all
 else
   echo "H5Part Complete"
 fi
@@ -345,7 +335,7 @@ then
   CFLAGS=-fPIC CXXFLAGS=-fPIC ./configure --prefix=${SUPPORT_DIR}/gdal-1.6.0 --enable-static --disable-shared --with-libtiff=internal --with-gif=internal --with-png=internal --with-jpeg=internal --with-libz=internal --with-netcdf=no --without-jasper --without-python
   make -j${CORES}
   make install
-  cd ..
+  cd ${SUPPORT_DIR}/VisIt-1.10.0.X-all
 else
   echo "GDAL Complete"
 fi
@@ -362,7 +352,7 @@ then
   echo yes | ./configure --prefix=${SUPPORT_DIR}/qt-3.3.8
   make -j${CORES}
   make install
-  cd ..
+  cd ${SUPPORT_DIR}/VisIt-1.10.0.X-all
 else
   echo "Qt 3.3.8 Complete"
 fi
@@ -375,7 +365,7 @@ then
   ./configure --prefix=${SUPPORT_DIR}/mpich2-1.0.8/
   make
   make install
-  cd ..
+  cd ${SUPPORT_DIR}/VisIt-1.10.0.X-all
 else
   echo "MPICH Complete"
 fi
@@ -394,7 +384,7 @@ then
   ./configure --disable-vhook --disable-static --disable-network --disable-zlib --disable-ffserver --disable-ffplay --disable-decoders --enable-shared --prefix=${SUPPORT_DIR}/ffmpeg/
   make -j${CORES}
   make install
-  cd ../..
+  cd ${SUPPORT_DIR}
 else
   echo "FFMPEG Complete"
 fi
@@ -406,21 +396,10 @@ fi
 if [ ! -f ${PV_BIN}/bin/paraview ];
 then
 
-if [ ! -d ${PV_BASE} ];
-then
-  mkdir ${PV_BASE}
-fi
-
-cd ${PV_BASE}
-
-## Checkout the version requested.
-#echo "Checking out version: ${cvstag}"
-#cvs -q -d :pserver:anoncvs@www.paraview.org:/cvsroot/ParaView3 co -r ${cvstag} ParaView3
-
 if [ ! -d ${PV_SRC}/Plugins/VisTrails ];
 then
   cd ${PV_SRC}/Plugins
-  hg clone http://blight.kitwarein.com/VisTrails
+  git clone git://kwsource.kitwarein.com/vistrailsplugin/vistrailsplugin.git VisTrails
 fi
 
 # Make the binary directory.
@@ -430,7 +409,7 @@ then
 fi
 
 cd ${PV_BIN}
-echo "Reconfiguring and rebuilding in ${builddir}"
+echo "Reconfiguring and rebuilding in ${PV_BIN}"
 
 export LD_LIBRARY_PATH=${SUPPORT_DIR}/qt-4.6.2/bin/lib:${SUPPORT_DIR}/ffmpeg/lib:${SUPPORT_DIR}/python25/lib
 
@@ -614,7 +593,7 @@ else
 fi
 
 cd ${PV_BIN}
-echo "Reconfiguring and rebuilding in ${builddir}"
+echo "Reconfiguring and rebuilding in ${PV_BIN}"
 
 export LD_LIBRARY_PATH=${SUPPORT_DIR}/qt-4.6.2/bin/lib:${SUPPORT_DIR}/ffmpeg/lib:${SUPPORT_DIR}/python25/lib
 
@@ -676,8 +655,7 @@ lib_dir=${package_name}/lib/${lib_dir_name}
 # Now add some standard libraries that don't get installed using cmake rules to the package.
 cd ${lib_dir}
 ls
-cp /usr/lib/libstdc++.so.6 /lib/libgcc_s.so.1 ${SUPPORT_DIR}/python25/lib/libpython2.5.so.1.0 /usr/lib/libpng12.so.0 /usr/lib/libfreetype.so.6 /usr/lib/libz.so.1 /usr/lib/libexpat.so.1 ./
-rm -f *.debug
+cp /usr/lib/libstdc++.so.6 /lib/libgcc_s.so.1 ${SUPPORT_DIR}/python25/lib/libpython2.5.so.1.0 ./
 cp -r ${SUPPORT_DIR}/python25/lib/ .
 cd ${PV_BIN}
 tar zcf ${package_name}.tar.gz ${package_name}
