@@ -619,7 +619,7 @@ public:
     this->NeedToBuildCache = false;
 
     // Communication buffer
-    vtkIdType bufferHistogramValues[this->NumProcs *  HISTOGRAM_SIZE];
+    vtkIdType* bufferHistogramValues = new vtkIdType[this->NumProcs *  HISTOGRAM_SIZE];
 
     // Is there something to sort ???
     if(!sortableArray)
@@ -670,6 +670,8 @@ public:
         this->GlobalHistogram->Values[idx % HISTOGRAM_SIZE] += bufferHistogramValues[idx];
         }
       }
+
+    delete[] bufferHistogramValues;
     return 1;
     }
 
@@ -1111,7 +1113,7 @@ public:
     if (input->GetFieldData()->GetArray("STRUCTURED_DIMENSIONS"))
       {
       int localDimensions[3] = {0, 0, 0};
-      int dimensions[3 * this->NumProcs];
+      int* dimensions = new int[3 * this->NumProcs];
       vtkIntArray::SafeDownCast(
           input->GetFieldData()->GetArray("STRUCTURED_DIMENSIONS"))->
           GetTupleValue(0, localDimensions);
@@ -1151,6 +1153,7 @@ public:
         output->GetRowData()->AddArray(structuredIndices);
         structuredIndices->FastDelete();
         }
+      delete[] dimensions;
       }
     }
   // --------------------------------------------------------------------------
@@ -1294,7 +1297,7 @@ public:
     {
     if(this->NumProcs == 1)
       return 0;
-    vtkIdType tableSizes[this->NumProcs];
+    vtkIdType* tableSizes = new vtkIdType[this->NumProcs];
     vtkIdType localTableSize = localTable ? localTable->GetNumberOfRows() : 0;
     this->MPI->AllGather(&localTableSize, tableSizes, 1);
     vtkIdType maxSize = 0;
@@ -1307,6 +1310,7 @@ public:
         winner = pid;
         }
       }
+    delete[] tableSizes;
     return winner;
     }
   // --------------------------------------------------------------------------

@@ -27,7 +27,7 @@ class vtkTable;
 class vtkDataArray;
 class vtkMultiProcessController;
 
-class VTK_PARALLEL_EXPORT vtkSortedTableStreamer : public vtkTableAlgorithm
+class VTK_EXPORT vtkSortedTableStreamer : public vtkTableAlgorithm
 {
 private:
   class InternalsBase;
