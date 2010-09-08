@@ -696,7 +696,7 @@ public:
     localResult.TakeReference(NewSubsetTable(input, NULL, 0, blockSize));
 
     // Get the array size of each processes
-    vtkIdType tableSizes[this->NumProcs];
+    vtkIdType* tableSizes = new vtkIdType[this->NumProcs];
     vtkIdType nbElems = input->GetNumberOfRows();
     this->MPI->AllGather(&nbElems, tableSizes, 1);
 
@@ -729,6 +729,9 @@ public:
                                                      localOffset,
                                                      localSize));
       }
+
+    // Free array used for MPI exchange
+    delete[] tableSizes;
 
     // ------------------------------------------------------------------------
     // Find the process that will merge all subset table

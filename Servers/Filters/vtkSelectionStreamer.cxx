@@ -88,7 +88,7 @@ int vtkSelectionStreamer::RequestData(vtkInformation*,
     // broadcast will be a bottle neck. Instead just send the table to only
     // a subset of processes
 
-    vtkIdType tableSizes[this->GetController()->GetNumberOfProcesses()];
+    vtkIdType* tableSizes = new vtkIdType[this->GetController()->GetNumberOfProcesses()];
     vtkIdType localSize = inputBlockTable->GetNumberOfRows();
     this->GetController()->AllGather(&localSize, tableSizes, 1);
     int pidSender = 0;
@@ -101,6 +101,7 @@ int vtkSelectionStreamer::RequestData(vtkInformation*,
         }
       }
     this->GetController()->GetCommunicator()->Broadcast(inputBlockTable, pidSender);
+    delete[] tableSizes;
     }
 
   if (!inputDO->IsA("vtkCompositeDataSet"))
