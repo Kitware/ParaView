@@ -181,10 +181,12 @@ int vtkPVPostFilter::DeterminePointCellConversion(vtkInformation *postArrayInfo,
   const char* name;
   int fieldAssociation = postArrayInfo->Get(vtkDataObject::FIELD_ASSOCIATION());
   vtkDataSet *dsInput = vtkDataSet::SafeDownCast(inputObj);
+
   if (dsInput && fieldAssociation == vtkDataObject::FIELD_ASSOCIATION_POINTS)
     {
     name = postArrayInfo->Get(vtkDataObject::FIELD_NAME());
-    if (dsInput->GetCellData()->HasArray(name))
+    if (!dsInput->GetPointData()->HasArray(name) &&
+      dsInput->GetCellData()->HasArray(name))
       {
       retCode |= CellToPoint;
       if ( dsInput->GetCellData()->GetArray(name)->GetNumberOfTuples() > 1 )
@@ -194,10 +196,11 @@ int vtkPVPostFilter::DeterminePointCellConversion(vtkInformation *postArrayInfo,
       }
 
     }
-  else if (dsInput && fieldAssociation == vtkDataObject::FIELD_ASSOCIATION_POINTS)
+  else if(dsInput&&fieldAssociation == vtkDataObject::FIELD_ASSOCIATION_POINTS)
     {
     name = postArrayInfo->Get(vtkDataObject::FIELD_NAME());
-    if (dsInput->GetPointData()->HasArray(name))
+    if (!dsInput->GetCellData()->HasArray(name) &&
+      dsInput->GetPointData()->HasArray(name))
       {
       retCode |= PointToCell;
       if ( dsInput->GetPointData()->GetArray(name)->GetNumberOfTuples() > 1 )
