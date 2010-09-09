@@ -18,6 +18,7 @@ set (FileSeries_BREAK TRUE)
 set (DisconnectAndSaveAnimation_BREAK TRUE)
 set (LoadStateMultiView_BREAK TRUE)
 set (TestIsoVolume_BREAK TRUE)
+set (RenderNan_BREAK TRUE)
 
 # Set image threshold overrides for the tests.
 SET(SaveLargeScreenshot_THRESHOLD 10000)
