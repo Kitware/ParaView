@@ -17,7 +17,7 @@ echo "Reconfiguring and rebuilding in ${builddir}"
 export CC=gcc-4.0
 export CXX=g++-4.0
 
-rm CMakeCache.txt
+#rm CMakeCache.txt
 
 cat >> CMakeCache.txt << EOF
 CMAKE_BUILD_TYPE:STRING=Release
@@ -47,6 +47,7 @@ VTK_USE_64BIT_IDS:BOOL=OFF
 BUILD_DOCUMENTATION:BOOL=ON
 PARAVIEW_GENERATE_PROXY_DOCUMENTATION:BOOL=ON
 GENERATE_FILTERS_DOCUMENTATION:BOOL=ON
+PARAVIEW_BUILD_PLUGIN_CoProcessingScriptGenerator:BOOL=ON
 EOF
 
 cmake ${srcdir}
