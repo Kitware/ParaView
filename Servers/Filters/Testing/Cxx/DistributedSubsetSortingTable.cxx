@@ -13,15 +13,8 @@
 
 =========================================================================*/
 
-// Test of vtkDistributedDataFilter and supporting classes, covering as much
-// code as possible.  This test requires 4 MPI processes.
-//
-// To cover ghost cell creation, use vtkDataSetSurfaceFilter.
-//
-// To cover clipping code:  SetBoundaryModeToSplitBoundaryCells()
-//
-// To run fast redistribution: SetUseMinimalMemoryOff() (Default)
-// To run memory conserving code instead: SetUseMinimalMemoryOn()
+// Test simple sorting on a distributed wavelet
+// This test requires 4 MPI processes.
 
 #include "vtkTestUtilities.h"
 #include "vtkParallelFactory.h"

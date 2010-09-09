@@ -250,6 +250,7 @@ public:
         {
         scalarRange[0] = this->Min;
         scalarRange[1] = this->Min + this->Delta*this->Size;
+        selectedBarIdx = this->Size - 1;
         return this->TotalValues;
         }
       vtkIdType nbElementsFounds = 0;
@@ -482,11 +483,14 @@ public:
         {
         this->Array[i].OriginalIndex = i;
         double value = 0;
+        double tmp;
         if(selectedComponent < 0)
           {
+          // Compute magnitude
           for(int k=0;k<numComponents;k++)
             {
-            value += dataPtr[k + i*numComponents] * dataPtr[k + i*numComponents];
+            tmp = static_cast<double>(dataPtr[k + i*numComponents]);
+            value +=  tmp*tmp;
             }
           value = sqrt(value);
           this->Array[i].Value = value;
@@ -869,9 +873,6 @@ public:
     // We have to include our searched index (so +1)
     vtkIdType localSize = (upperOffset + nbElementsInBar) - localOffset + 1;
 
-    // We had an extra row to overcome computational bound error
-    localSize++; // FIXME try to know why it happen some time
-
     // ------------------------------------------------------------------------
     // Build local subset table
     // ------------------------------------------------------------------------
@@ -1005,7 +1006,7 @@ public:
     localOffset = 0;
     nbGlobalToSkip = searchedGlobalIndex;
 
-    while(nbGlobalToSkip > 0 && _globalHistogram.CanBeReduced())
+    do
       {
       nbGlobalToSkip -= _globalHistogram.GetNewRange(nbGlobalToSkip,
                                                      histogramBarIdx,
@@ -1041,6 +1042,8 @@ public:
         _globalHistogram.Values[idx % HISTOGRAM_SIZE] += bufferHistogramValues[idx];
         }
       }
+    while(nbGlobalToSkip > 0 && _globalHistogram.CanBeReduced());
+
     delete[] bufferHistogramValues;
     }
 
