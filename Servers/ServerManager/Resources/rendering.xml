@@ -8830,7 +8830,6 @@
           proxygroup="extended_filters" proxyname="SelectionStreamer">
         </SourceProxy>
         <ExposedProperties>
-          <Property name="BlockSize" />
           <Property name="DataInput" />
           <Property name="FieldAssociation" />
         </ExposedProperties>
