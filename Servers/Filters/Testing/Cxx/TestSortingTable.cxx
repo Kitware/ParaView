@@ -19,6 +19,7 @@
 #include "vtkSortedTableStreamer.h"
 #include "vtkTable.h"
 #include "vtkDoubleArray.h"
+#include "vtkUnsignedCharArray.h"
 #include "vtkSmartPointer.h"
 #include "vtkMultiProcessController.h"
 #include "vtkDummyController.h"
@@ -123,6 +124,39 @@ int sortWithEpsilonValues(bool debug)
 }
 
 // ----------------------------------------------------------------------------
+int sortMagnitudeOnUnsignedCharVector(bool debug)
+{
+  vtkSmartPointer<vtkUnsignedCharArray> dataToSort = vtkSmartPointer<vtkUnsignedCharArray>::New();
+  dataToSort->SetNumberOfComponents(3);
+  dataToSort->SetName("data");
+  dataToSort->Allocate(3 * 256 * 256 * 256);
+  for(int r=0;r<256;r++)
+    {
+    for(int g=0;g<256;g++)
+      {
+      for(int b=0;b<256;b++)
+        {
+        dataToSort->InsertNextTuple3(r,g,b);
+        }
+      }
+    }
+
+  vtkSmartPointer<vtkTable> input = vtkSmartPointer<vtkTable>::New();
+  input->AddColumn(dataToSort);;
+  vtkSmartPointer<vtkSortedTableStreamer> sortingfilter = vtkSmartPointer<vtkSortedTableStreamer>::New();
+
+  sortingfilter->SetInput(input.GetPointer());
+  sortingfilter->SetSelectedComponent(-1); // Magnitude
+  sortingfilter->SetColumnNameToSort("data");
+
+  sortingfilter->SetBlock(0);
+  sortingfilter->SetBlockSize(1024);
+  sortingfilter->Update();
+
+  return EXIT_SUCCESS;
+}
+
+// ----------------------------------------------------------------------------
 int main(int argc, char **argv)
 {
   // Create Fake MPI controller
@@ -140,6 +174,10 @@ int main(int argc, char **argv)
        << ((result += sortWithEpsilonValues(debug)) ? "FAILED" :  "SUCCESS")
        << endl;
   // --------------------------------------------------------------------------
+  cout << "Testing sorting with magnitude on unsigned char: "
+       << ((result += sortMagnitudeOnUnsignedCharVector(debug))
+           ? "FAILED" :  "SUCCESS")
+       << endl;
   // --------------------------------------------------------------------------
   // --------------------------------------------------------------------------
 

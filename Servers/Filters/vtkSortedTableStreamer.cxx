@@ -492,8 +492,8 @@ public:
             tmp = static_cast<double>(dataPtr[k + i*numComponents]);
             value +=  tmp*tmp;
             }
-          value = sqrt(value);
-          this->Array[i].Value = value;
+          value = sqrt(value) / sqrt(numComponents);
+          this->Array[i].Value = static_cast<T>(value);
           }
         else
           {
@@ -604,6 +604,14 @@ public:
     // Gather the array range to build a common scale histogram
     this->MPI->AllReduce(&localRange[0], &this->CommonRange[0], 1, vtkCommunicator::MIN_OP);
     this->MPI->AllReduce(&localRange[1], &this->CommonRange[1], 1, vtkCommunicator::MAX_OP);
+
+    // Make sure that the range stay in the original min/max of the type
+    // in case of magnitude.
+    if(this->DataToSort && this->SelectedComponent == -1 && this->DataToSort->GetNumberOfComponents() > 1)
+      {
+      this->CommonRange[0] /= sqrt(this->DataToSort->GetNumberOfComponents());
+      this->CommonRange[1] /= sqrt(this->DataToSort->GetNumberOfComponents());
+      }
 
     double delta = (this->CommonRange[1] - this->CommonRange[0]);
     delta *= delta;
@@ -1333,7 +1341,13 @@ private:
   bool Debug;
 
   const static int VTK_TABLE_EXCHANGE_TAG = 50;
-  const static int HISTOGRAM_SIZE = 1024;
+  // HISTOGRAM_SIZE could be computed dynamically based on the type of the
+  // array to sort but to make sure that unsigned char won't be distributed
+  // correctly we set the histogram size to be their max number of element
+  // type.
+  // Maybe make some test on huge cluster to see which histogram size is
+  // the best.
+  const static int HISTOGRAM_SIZE = 256;
 };
 //****************************************************************************
 vtkStandardNewMacro(vtkSortedTableStreamer);
