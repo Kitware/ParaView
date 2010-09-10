@@ -53,7 +53,7 @@ then
   mv src/ qt-4.6.2/src
 
   cd qt-4.6.2/src/
-  echo yes | ./configure --prefix=${SUPPORT_DIR}/qt-4.6.2/bin -opengl -optimized-qmake -release -opensource -phonon -nomake examples -nomake demos
+  echo yes | ./configure --prefix=${SUPPORT_DIR}/qt-4.6.2/bin -opengl -optimized-qmake -release -opensource -phonon -no-multimedia -no-audio-backend -nomake examples -nomake demos
   make -j${CORES}
   make install
 
