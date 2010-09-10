@@ -129,12 +129,12 @@ int sortMagnitudeOnUnsignedCharVector(bool debug)
   vtkSmartPointer<vtkUnsignedCharArray> dataToSort = vtkSmartPointer<vtkUnsignedCharArray>::New();
   dataToSort->SetNumberOfComponents(3);
   dataToSort->SetName("data");
-  dataToSort->Allocate(3 * 256 * 256 * 256);
-  for(int r=0;r<256;r++)
+  dataToSort->Allocate(3 * 128 * 128 * 128);
+  for(int r=0;r<256;r+=2)
     {
-    for(int g=0;g<256;g++)
+    for(int g=0;g<256;g+=2)
       {
-      for(int b=0;b<256;b++)
+      for(int b=0;b<256;b+=2)
         {
         dataToSort->InsertNextTuple3(r,g,b);
         }

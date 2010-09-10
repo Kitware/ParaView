@@ -188,7 +188,7 @@ public:
         }
       }
 
-    ~Histogram()
+    virtual ~Histogram()
       {
       if(this->Values)
         {
@@ -230,6 +230,12 @@ public:
         {
         this->TotalValues++;
         this->Values[idx]++;
+        }
+      else if(value == static_cast<T>(this->Min))
+        {
+        // Manage type troncature
+        this->TotalValues++;
+        this->Values[0]++;
         }
       else
         {
@@ -442,7 +448,7 @@ public:
         this->Histo = 0;
         }
       }
-    void FillArray(vtkIdType numTuples, int numComponents)
+    void FillArray(vtkIdType numTuples)
       {
       // Clear memory if needed
       this->Clear();
@@ -492,7 +498,7 @@ public:
             tmp = static_cast<double>(dataPtr[k + i*numComponents]);
             value +=  tmp*tmp;
             }
-          value = sqrt(value) / sqrt(numComponents);
+          value = sqrt(value) / sqrt(static_cast<double>(numComponents));
           this->Array[i].Value = static_cast<T>(value);
           }
         else
@@ -583,7 +589,7 @@ public:
     this->GlobalHistogram = new Histogram(HISTOGRAM_SIZE);
     }
 
-  ~Internals()
+  virtual ~Internals()
     {
     if (this->LocalSorter)     delete this->LocalSorter;
     if (this->GlobalHistogram) delete this->GlobalHistogram;
@@ -609,8 +615,10 @@ public:
     // in case of magnitude.
     if(this->DataToSort && this->SelectedComponent == -1 && this->DataToSort->GetNumberOfComponents() > 1)
       {
-      this->CommonRange[0] /= sqrt(this->DataToSort->GetNumberOfComponents());
-      this->CommonRange[1] /= sqrt(this->DataToSort->GetNumberOfComponents());
+      double ratio =
+          sqrt(static_cast<double>(this->DataToSort->GetNumberOfComponents()));
+      this->CommonRange[0] /= ratio;
+      this->CommonRange[1] /= ratio;
       }
 
     double delta = (this->CommonRange[1] - this->CommonRange[0]);
@@ -638,8 +646,9 @@ public:
       {
       // Keep the same order as the local one because all the values are equals
       if(this->DataToSort)
-        this->LocalSorter->FillArray( this->DataToSort->GetNumberOfTuples(),
-                                      this->DataToSort->GetNumberOfComponents());
+        {
+        this->LocalSorter->FillArray( this->DataToSort->GetNumberOfTuples());
+        }
       }
     else
       {
@@ -1397,8 +1406,6 @@ int vtkSortedTableStreamer::RequestData( vtkInformation* vtkNotUsed(request),
 {
   // Manage multiblock dataset by merging data into a single vtkTable
   vtkDataObject* inputDO = vtkDataObject::GetData(inputVector[0], 0);
-  vtkDataObject* outputDO = vtkDataObject::GetData(outputVector, 0);
-
   vtkSmartPointer<vtkTable> input = vtkTable::GetData(inputVector[0]);
 
   bool orderInverted = this->InvertOrder > 0;
