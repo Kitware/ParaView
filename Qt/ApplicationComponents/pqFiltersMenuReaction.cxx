@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -92,6 +92,9 @@ pqFiltersMenuReaction::pqFiltersMenuReaction(
   QObject::connect(pqApplicationCore::instance()->getServerManagerModel(),
     SIGNAL(nameChanged(pqServerManagerModelItem*)),
     &this->Timer, SLOT(start()));
+  QObject::connect(pqApplicationCore::instance(),
+    SIGNAL(forceFilterMenuRefresh()),
+    &this->Timer, SLOT(start()));
   this->updateEnableState();
 }
 
@@ -166,7 +169,7 @@ void pqFiltersMenuReaction::updateEnableState()
       }
 
     // TODO: Handle case where a proxy has multiple input properties.
-    vtkSMInputProperty *input = ::getInputProperty(prototype); 
+    vtkSMInputProperty *input = ::getInputProperty(prototype);
     if (input)
       {
       if(!input->GetMultipleInput() && outputPorts.size() > 1)
@@ -215,7 +218,7 @@ pqPipelineSource* pqFiltersMenuReaction::createFilter(
 {
   pqServer* server = pqActiveObjects::instance().activeServer();
   pqApplicationCore* core = pqApplicationCore::instance();
-  pqObjectBuilder* builder = core->getObjectBuilder();  
+  pqObjectBuilder* builder = core->getObjectBuilder();
 
   vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
   vtkSMProxy* prototype = pxm->GetPrototypeProxy(
@@ -251,8 +254,8 @@ pqPipelineSource* pqFiltersMenuReaction::createFilter(
   QList<const char*> inputPortNames = pqPipelineFilter::getInputPorts(prototype);
   namedInputs[inputPortNames[0]] = selectedOutputPorts;
 
-  // If the filter has more than 1 input ports, we are simply going to ask the 
-  // user to make selection for the inputs for each port. We may change that in 
+  // If the filter has more than 1 input ports, we are simply going to ask the
+  // user to make selection for the inputs for each port. We may change that in
   // future to be smarter.
   if (pqPipelineFilter::getRequiredInputPorts(prototype).size() > 1)
     {
@@ -273,14 +276,14 @@ pqPipelineSource* pqFiltersMenuReaction::createFilter(
       {
       helper.RemoveAllValues();
       // User aborted creation.
-      return 0; 
+      return 0;
       }
     helper.RemoveAllValues();
     namedInputs = dialog.selectedInputs();
     }
 
   BEGIN_UNDO_SET(QString("Create '%1'").arg(xmlname));
-  pqPipelineSource* filter = builder->createFilter("filters", xmlname, 
+  pqPipelineSource* filter = builder->createFilter("filters", xmlname,
     namedInputs, server);
   END_UNDO_SET();
   return filter;
