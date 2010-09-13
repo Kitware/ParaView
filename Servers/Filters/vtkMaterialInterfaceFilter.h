@@ -240,8 +240,8 @@ public:
   // Plane will always pass through the sphere center.
   vtkSetVector3Macro(ClipCenter,double);
   vtkGetVector3Macro(ClipCenter,double);
-  vtkSetMacro(ClipWithSphere, double);
-  vtkGetMacro(ClipWithSphere, double);
+  vtkSetMacro(ClipWithSphere, int);
+  vtkGetMacro(ClipWithSphere, int);
   vtkSetMacro(ClipRadius, double);
   vtkGetMacro(ClipRadius, double);
   vtkSetMacro(ClipWithPlane, int);
