@@ -167,7 +167,6 @@ SET(Kit_SRCS
   vtkSMMaterialLoaderProxy.cxx
   vtkSMMultiProcessRenderView.cxx
   vtkSMNewWidgetRepresentationProxy.cxx
-  vtkSMNullProxy.cxx
   vtkSMOrderedPropertyIterator.cxx
   vtkSMOutlineRepresentationProxy.cxx
   vtkSMNetworkImageSourceProxy.cxx

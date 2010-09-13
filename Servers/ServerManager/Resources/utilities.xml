@@ -216,11 +216,11 @@
   <!-- incremental point locators begin -->
   <ProxyGroup name="incremental_point_locators" >
     
-    <NullProxy name="None">
-    </NullProxy>
+    <Proxy name="None">
+    </Proxy>
 
-    <NullProxy name="Scalar">
-    </NullProxy>
+    <Proxy name="Scalar">
+    </Proxy>
     
     <Proxy name="PointLocator" class="vtkPointLocator">
       <Documentation>
@@ -366,11 +366,11 @@
   <!-- incremental point locators end -->
 
   <ProxyGroup name="implicit_functions">
-    <NullProxy name="None">
-    </NullProxy>
+    <Proxy name="None">
+    </Proxy>
 
-    <NullProxy name="Scalar">
-    </NullProxy>
+    <Proxy name="Scalar">
+    </Proxy>
 
     <Proxy name="Plane" class="vtkPVPlane">
       <InputProperty
