@@ -73,10 +73,17 @@ message ProxyState
     required Variant value = 2;
     }
 
+  message SubProxy
+    {
+    required string name = 1;
+    required uint32 global_id = 2;
+    }
+
   extend Message {
     required string   xml_group = 20;
     required string   xml_name  = 21;
     repeated Property property  = 22;
+    repeated SubProxy subproxy  = 23;
   }
 }
 

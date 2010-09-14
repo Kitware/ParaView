@@ -630,14 +630,19 @@ void vtkSMProxy::CreateVTKObjects()
   message.SetExtension(DefinitionHeader::server_class, this->GetKernelClassName());
   message.SetExtension(ProxyState::xml_group, this->GetXMLGroup());
   message.SetExtension(ProxyState::xml_name, this->GetXMLName());
-  this->PushState(&message);
 
+  // Create sub-proxies first.
   vtkSMProxyInternals::ProxyMap::iterator it2 =
     this->Internals->SubProxies.begin();
   for( ; it2 != this->Internals->SubProxies.end(); it2++)
     {
     it2->second.GetPointer()->CreateVTKObjects();
+    ProxyState_SubProxy *subproxy = message.AddExtension(ProxyState::subproxy);
+    subproxy->set_name(it2->first.c_str());
+    subproxy->set_global_id(it2->second.GetPointer()->GetGlobalID());
     }
+
+  this->PushState(&message);
 }
 
 //---------------------------------------------------------------------------

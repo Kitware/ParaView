@@ -71,6 +71,10 @@ protected:
   ~vtkPMProxy();
 
   // Description:
+  // Returns the subproxy helper for the subproxy with the given name, if any.
+  vtkPMProxy* GetSubProxyHelper(const char* name);
+
+  // Description:
   // Provides access to the vtkSMProxyDefinitionManager held by the session.
   vtkSMProxyDefinitionManager* GetProxyDefinitionManager();
 

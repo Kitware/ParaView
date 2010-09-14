@@ -35,6 +35,10 @@ public:
   typedef vtkstd::map<vtkstd::string, vtkSmartPointer<vtkPMProperty> >
     PropertyHelpersMapType;
   PropertyHelpersMapType PropertyHelpers;
+
+  typedef vtkstd::map<vtkstd::string, vtkSmartPointer<vtkPMProxy> >
+    SubProxyHelpersMapType;
+  SubProxyHelpersMapType SubProxyHelpers;
 };
 
 vtkStandardNewMacro(vtkPMProxy);
@@ -260,6 +264,23 @@ bool vtkPMProxy::CreateVTKObjects(vtkSMMessage* message)
 
   this->SetXMLName(message->GetExtension(ProxyState::xml_group).c_str());
   this->SetXMLGroup(message->GetExtension(ProxyState::xml_name).c_str());
+
+  // Locate sub-proxies.
+  for (int cc=0; cc < message->ExtensionSize(ProxyState::subproxy); cc++)
+    {
+    const ProxyState_SubProxy& subproxyMsg =
+      message->GetExtension(ProxyState::subproxy, cc);
+    vtkPMProxy* subproxy = vtkPMProxy::SafeDownCast(
+      this->GetPMObject(subproxyMsg.global_id()));
+    if (subproxy == NULL)
+      {
+      vtkErrorMacro("Failed to locate subproxy with global-id: " <<
+        subproxyMsg.global_id());
+      return false;
+      }
+    this->Internals->SubProxyHelpers[subproxyMsg.name()] = subproxy;
+    }
+
   this->ObjectsCreated = true;
   return true;
 }
@@ -372,6 +393,12 @@ bool vtkPMProxy::ReadXMLProperty(vtkPVXMLElement* propElement)
 
   this->AddPropertyHelper(name, property);
   return true;
+}
+
+//----------------------------------------------------------------------------
+vtkPMProxy* vtkPMProxy::GetSubProxyHelper(const char* name)
+{
+  return this->Internals->SubProxyHelpers[name];
 }
 
 //----------------------------------------------------------------------------
