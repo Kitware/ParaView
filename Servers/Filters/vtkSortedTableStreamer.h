@@ -41,7 +41,7 @@ public:
   // Return true if everything is OK, false otherwise.
   static bool TestInternalClasses();
   static vtkSortedTableStreamer* New();
-  vtkTypeMacro(vtkSortedTableStreamer, vtkTableAlgorithm)
+  vtkTypeMacro(vtkSortedTableStreamer, vtkTableAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

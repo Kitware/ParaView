@@ -124,7 +124,7 @@ int sortWithEpsilonValues(bool debug)
 }
 
 // ----------------------------------------------------------------------------
-int sortMagnitudeOnUnsignedCharVector(bool debug)
+int sortMagnitudeOnUnsignedCharVector()
 {
   vtkSmartPointer<vtkUnsignedCharArray> dataToSort = vtkSmartPointer<vtkUnsignedCharArray>::New();
   dataToSort->SetNumberOfComponents(3);
@@ -157,7 +157,7 @@ int sortMagnitudeOnUnsignedCharVector(bool debug)
 }
 
 // ----------------------------------------------------------------------------
-int main(int argc, char **argv)
+int main(int vtkNotUsed(argc), char **vtkNotUsed(argv))
 {
   // Create Fake MPI controller
   vtkDummyController* ctrl = vtkDummyController::New();
@@ -175,7 +175,7 @@ int main(int argc, char **argv)
        << endl;
   // --------------------------------------------------------------------------
   cout << "Testing sorting with magnitude on unsigned char: "
-       << ((result += sortMagnitudeOnUnsignedCharVector(debug))
+       << ((result += sortMagnitudeOnUnsignedCharVector())
            ? "FAILED" :  "SUCCESS")
        << endl;
   // --------------------------------------------------------------------------

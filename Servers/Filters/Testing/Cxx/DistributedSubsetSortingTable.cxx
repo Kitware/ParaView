@@ -119,7 +119,7 @@ void MyProcess::Execute()
     //           << data->GetNumberOfTuples() << endl;
     double goal = data->GetRange()[0];
     vtkIdType index = -1;
-    while(goal == data->GetValue(++index));
+    while(goal == data->GetValue(++index)) ;
     cout << "the first "<<index<< " values are the same. The nb proc is " << nbProc << endl;
     this->ReturnValue = ((index % nbProc) == 0);
     if(this->ReturnValue == 1)
