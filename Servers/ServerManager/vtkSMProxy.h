@@ -145,9 +145,21 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
+  // Get/Set the location where the underlying VTK-objects are created. The
+  // value can be contructed by or-ing vtkSMSession::ServerFlags
+  virtual void SetLocation(vtkTypeUInt32);
+
+  // Description:
   // Return the property with the given name. If no property is found
   // NULL is returned.
-  virtual vtkSMProperty* GetProperty(const char* name);
+  virtual vtkSMProperty* GetProperty(const char* name)
+    { return this->GetProperty(name, /*self-only*/ 0); }
+
+  // Description:
+  // Return a property of the given name from self or one of
+  // the sub-proxies. If selfOnly is set, the sub-proxies are
+  // not checked.
+  virtual vtkSMProperty* GetProperty(const char* name, int selfOnly);
 
   // Description:
   // Given a property pointer, returns the name that was used
@@ -425,9 +437,37 @@ protected:
   virtual void SetPropertyModifiedFlag(const char* name, int flag);
 
   // Description:
-  // Remove a property from the list.
-  // If selfOnly is true, this method will not traverse into the subproxies.
-  void RemoveProperty(const char* name);
+  // Add a sub-proxy.
+  // If the overrideOK flag is set, then no warning is printed when a new
+  // subproxy replaces a preexisting one.
+  void AddSubProxy(const char* name, vtkSMProxy* proxy,
+                   int overrideOK=0);
+
+  // Description:
+  // Remove a sub-proxy.
+  void RemoveSubProxy(const char* name);
+
+  // Description:
+  // Returns a sub-proxy. Returns 0 if sub-proxy does not exist.
+  vtkSMProxy* GetSubProxy(const char* name);
+
+  // Description:
+  // Returns a sub-proxy. Returns 0 if sub-proxy does not exist.
+  vtkSMProxy* GetSubProxy(unsigned int index);
+
+  // Description:
+  // Returns the name used to store sub-proxy. Returns 0 if sub-proxy does
+  // not exist.
+  const char* GetSubProxyName(unsigned int index);
+
+  // Description:
+  // Returns the name used to store sub-proxy. Returns 0 is the sub-proxy
+  // does not exist.
+  const char* GetSubProxyName(vtkSMProxy*);
+
+  // Description:
+  // Returns the number of sub-proxies.
+  unsigned int GetNumberOfSubProxies();
 
   // Description:
   // Called by a proxy property, this adds the property,proxy
@@ -475,6 +515,20 @@ protected:
   // Description:
   // Read attributes from an XML element.
   virtual int ReadXMLAttributes(vtkSMProxyManager* pm, vtkPVXMLElement* element);
+  void SetupExposedProperties(const char* subproxy_name, vtkPVXMLElement *element);
+
+  // Description:
+  // Expose a subproxy property from the base proxy. The property with the name
+  // "property_name" on the subproxy with the name "subproxy_name" is exposed
+  // with the name "exposed_name".
+  // If the overrideOK flag is set, then no warning is printed when a new
+  // exposed property replaces a preexisting one.
+  void ExposeSubProxyProperty(const char* subproxy_name,
+    const char* property_name, const char* exposed_name, int overrideOK = 0);
+
+  // Description:
+  // Handle events fired by subproxies.
+  virtual void ExecuteSubProxyEvent(vtkSMProxy* o, unsigned long event, void* data);
 
   virtual int CreateSubProxiesAndProperties(vtkSMProxyManager* pm,
     vtkPVXMLElement *element);
@@ -514,8 +568,7 @@ protected:
 
   // Description:
   // Indicates if any properties are modified.
-  bool ArePropertiesModified()
-    { return this->PropertiesModified; }
+  bool ArePropertiesModified();
 
   void SetHints(vtkPVXMLElement* hints);
   void SetDeprecated(vtkPVXMLElement* deprecated);
@@ -532,7 +585,7 @@ protected:
 
 private:
   vtkSMProxyInternals* Internals;
-
+  vtkSMProxyObserver* SubProxyObserver;
   vtkSMProxy(const vtkSMProxy&); // Not implemented
   void operator=(const vtkSMProxy&); // Not implemented
 //ETX

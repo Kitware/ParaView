@@ -309,9 +309,9 @@ bool vtkPMProxy::ReadXMLAttributes(vtkPVXMLElement* element)
 }
 
 //----------------------------------------------------------------------------
-bool vtkPMProxy::ReadXMLSubProxy(vtkPVXMLElement* subproxy_element)
+bool vtkPMProxy::ReadXMLSubProxy(vtkPVXMLElement* )
 {
-  vtkErrorMacro("Not supported yet.");
+  // vtkErrorMacro("Not supported yet.");
   return true;
 }
 
