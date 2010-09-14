@@ -2,7 +2,7 @@
 # Center to make it easier to visualize finite element simulation results.
 
 SET(PLUGIN_NAME SLACTools)
-SET(PLUGIN_VERSION "1.0")
+SET(PLUGIN_VERSION "1.1")
 
 INCLUDE_DIRECTORIES(
   ${CMAKE_CURRENT_BINARY_DIR}
