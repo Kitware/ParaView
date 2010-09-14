@@ -15,13 +15,13 @@
 #include "vtkSMWriterFactory.h"
 
 #include "vtkObjectFactory.h"
-#include "vtkProcessModule.h"
 #include "vtkPVXMLElement.h"
 #include "vtkPVXMLParser.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMInputProperty.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxyManager.h"
+#include "vtkSMSession.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMWriterProxy.h"
 
@@ -42,11 +42,10 @@ public:
     vtkstd::set<vtkstd::string> Extensions;
     vtkstd::string Description;
 
-    void FillInformation()
+    void FillInformation(vtkSMProxyManager* pxm)
       {
-      vtkSMProxy* prototype =
-        vtkSMProxyManager::GetProxyManager()->GetPrototypeProxy(
-          this->Group.c_str(), this->Name.c_str());
+      vtkSMProxy* prototype = pxm->GetPrototypeProxy(
+        this->Group.c_str(), this->Name.c_str());
       if (!prototype || !prototype->GetHints())
         {
         return;
@@ -72,16 +71,16 @@ public:
     // Returns true is a prototype proxy can be created on the given connection.
     // For now, the connection is totally ignored since ServerManager doesn't
     // support that.
-    bool CanCreatePrototype(vtkIdType vtkNotUsed(cid))
+    bool CanCreatePrototype(vtkSMProxyManager* pxm)
       {
-      return (vtkSMProxyManager::GetProxyManager()->GetPrototypeProxy(
+      return (pxm->GetPrototypeProxy(
         this->Group.c_str(), this->Name.c_str()) != NULL);
       }
 
     // Returns true if the data from the given output port can be written.
-    bool CanWrite(vtkSMSourceProxy* source, unsigned int port)
+    bool CanWrite(vtkSMSourceProxy* source, unsigned int port,
+      vtkSMProxyManager* pxm)
       {
-      vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
       vtkSMProxy* prototype = pxm->GetPrototypeProxy(
         this->Group.c_str(), this->Name.c_str());
       if (!prototype || !source)
@@ -93,8 +92,7 @@ public:
       // always work in parallel.
       if (writer)
         {
-        if (vtkProcessModule::GetProcessModule()->GetNumberOfPartitions(
-            source->GetConnectionID()) > 1)
+        if (source->GetSession()->GetNumberOfProcesses(source->GetLocation()) > 1)
           {
           if (!writer->GetSupportsParallel())
             {
@@ -147,6 +145,7 @@ vtkStandardNewMacro(vtkSMWriterFactory);
 vtkSMWriterFactory::vtkSMWriterFactory()
 {
   this->Internals = new vtkInternals();
+  this->ProxyManager = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -173,7 +172,7 @@ void vtkSMWriterFactory::RegisterPrototype(const char* xmlgroup, const char* xml
   value.Name = xmlname;
   
   // fills extension information etc. from the prototype.
-  value.FillInformation(); 
+  value.FillInformation(this->ProxyManager);
 
   this->Internals->Prototypes.push_front(value);
 }
@@ -192,7 +191,7 @@ void vtkSMWriterFactory::RegisterPrototype(
   value.Name = xmlname;
   
   // fills extension information etc. from the prototype.
-  value.FillInformation(); 
+  value.FillInformation(this->ProxyManager);
   if (description)
     {
     value.Description = description;
@@ -320,14 +319,13 @@ vtkSMProxy* vtkSMWriterFactory::CreateWriter(
   for (iter = this->Internals->Prototypes.begin();
     iter != this->Internals->Prototypes.end(); ++iter)
     {
-    if (iter->CanCreatePrototype(source->GetConnectionID()) &&
+    if (iter->CanCreatePrototype(this->ProxyManager) &&
       iter->ExtensionTest(extension.c_str()) &&
-      iter->CanWrite(source, outputport))
+      iter->CanWrite(source, outputport, this->ProxyManager))
       {
-      vtkSMProxy* proxy = vtkSMProxyManager::GetProxyManager()->NewProxy(
+      vtkSMProxy* proxy = this->ProxyManager->NewProxy(
         iter->Group.c_str(),
         iter->Name.c_str());
-      proxy->SetConnectionID(source->GetConnectionID());
       vtkSMPropertyHelper(proxy, "FileName").Set(filename);
       vtkSMPropertyHelper(proxy, "Input").Set(source, outputport);
       return proxy;
@@ -362,8 +360,8 @@ const char* vtkSMWriterFactory::GetSupportedFileTypes(
   for (iter = this->Internals->Prototypes.begin();
     iter != this->Internals->Prototypes.end(); ++iter)
     {
-    if (iter->CanCreatePrototype(source->GetConnectionID()) &&
-      iter->CanWrite(source, outputport))
+    if (iter->CanCreatePrototype(this->ProxyManager) &&
+      iter->CanWrite(source, outputport, this->ProxyManager))
       {
       if (iter->Extensions.size() > 0)
         {
@@ -400,8 +398,8 @@ bool vtkSMWriterFactory::CanWrite(vtkSMSourceProxy* source, unsigned int outputp
   for (iter = this->Internals->Prototypes.begin();
     iter != this->Internals->Prototypes.end(); ++iter)
     {
-    if (iter->CanCreatePrototype(source->GetConnectionID()) &&
-      iter->CanWrite(source, outputport))
+    if (iter->CanCreatePrototype(this->ProxyManager) &&
+      iter->CanWrite(source, outputport, this->ProxyManager))
       {
       return true;
       }

@@ -161,6 +161,12 @@ void vtkSMSessionCore::OnInterpreterError(vtkObject*, unsigned long,
 }
 
 //----------------------------------------------------------------------------
+int vtkSMSessionCore::GetNumberOfProcesses()
+{
+  return this->ParallelController->GetNumberOfProcesses();
+}
+
+//----------------------------------------------------------------------------
 vtkPMObject* vtkSMSessionCore::GetPMObject(vtkTypeUInt32 globalid)
 {
   return this->Internals->GetPMObject(globalid);
@@ -365,6 +371,12 @@ void vtkSMSessionCore::DeletePMObject(vtkSMMessage* message)
 bool vtkSMSessionCore::GatherInformationInternal(
   vtkPVInformation* information, vtkTypeUInt32 globalid)
 {
+  if (globalid == 0)
+    {
+    information->CopyFromObject(NULL);
+    return true;
+    }
+
   // default is to gather information from VTKObject, if FromPMObject is true,
   // then gather from PMObject.
   vtkPMObject* pmobject = this->GetPMObject(globalid);

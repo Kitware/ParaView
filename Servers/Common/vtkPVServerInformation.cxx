@@ -15,11 +15,12 @@
 #include "vtkPVServerInformation.h"
 
 #include "vtkClientServerStream.h"
+#include "vtkMultiProcessController.h"
+#include "vtkObjectFactory.h"
+#include "vtkProcessModule2.h"
 #include "vtkPVConfig.h"
-#include "vtkProcessModule.h"
 #include "vtkPVServerOptions.h"
 #include "vtkPVServerOptionsInternals.h"
-#include "vtkObjectFactory.h"
 #include "vtkToolkits.h"
 
 vtkStandardNewMacro(vtkPVServerInformation);
@@ -27,6 +28,8 @@ vtkStandardNewMacro(vtkPVServerInformation);
 //----------------------------------------------------------------------------
 vtkPVServerInformation::vtkPVServerInformation()
 {
+  this->NumberOfProcesses =
+    vtkMultiProcessController::GetGlobalController()->GetNumberOfProcesses();
   this->RootOnly = 1;
   this->RemoteRendering = 1;
   this->TileDimensions[0] = this->TileDimensions[1] = 0;
@@ -80,6 +83,7 @@ void vtkPVServerInformation::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "OGVSupport: " << this->OGVSupport << endl;
   os << indent << "AVISupport: " << this->AVISupport << endl;
   os << indent << "Timeout: " << this->Timeout << endl;
+  os << indent << "NumberOfProcesses: " << this->NumberOfProcesses << endl;
 }
 
 //----------------------------------------------------------------------------
@@ -101,18 +105,13 @@ void vtkPVServerInformation::DeepCopy(vtkPVServerInformation *info)
     this->SetLowerRight(idx, info->GetLowerRight(idx));
     this->SetUpperLeft(idx, info->GetUpperLeft(idx));
     }
+  this->NumberOfProcesses = info->NumberOfProcesses;
 }
 
 //----------------------------------------------------------------------------
 void vtkPVServerInformation::CopyFromObject(vtkObject* obj)
 {
-  vtkProcessModule* pm = vtkProcessModule::SafeDownCast(obj);
-  if(!pm)
-    {
-    vtkErrorMacro("Cannot downcast to vtkProcessModule.");
-    return;
-    }
-  
+  vtkProcessModule2* pm = vtkProcessModule2::GetProcessModule();
   vtkPVOptions* options = pm->GetOptions();
   vtkPVServerOptions *serverOptions = vtkPVServerOptions::SafeDownCast(options);
 
@@ -194,6 +193,11 @@ void vtkPVServerInformation::AddInformation(vtkPVInformation* info)
       this->SetLowerRight(idx, serverInfo->GetLowerRight(idx));
       this->SetUpperLeft(idx, serverInfo->GetUpperLeft(idx));
       }
+
+    if (this->NumberOfProcesses < serverInfo->NumberOfProcesses)
+      {
+      this->NumberOfProcesses = serverInfo->NumberOfProcesses;
+      }
     }
 }
 
@@ -211,6 +215,7 @@ void vtkPVServerInformation::CopyToStream(vtkClientServerStream* css)
   *css << this->RenderModuleName;
   *css << this->OGVSupport;
   *css << this->AVISupport;
+  *css << this->NumberOfProcesses;
   *css << this->GetNumberOfMachines();
   unsigned int idx;
   for (idx = 0; idx < this->GetNumberOfMachines(); idx++)
@@ -278,8 +283,16 @@ void vtkPVServerInformation::CopyFromStream(const vtkClientServerStream* css)
     vtkErrorMacro("Error parsing AVISupport flag from message.");
     return;
     }
+  int numProcs;
+  if (!css->GetArgument(0, 11, &numProcs))
+    {
+    vtkErrorMacro("Error parsing number of processes from message.");
+    return;
+    }
+  this->NumberOfProcesses = numProcs;
+
   unsigned int numMachines;
-  if (!css->GetArgument(0, 11, &numMachines))
+  if (!css->GetArgument(0, 12, &numMachines))
     {
     vtkErrorMacro("Error parsing number of machines from message.");
     return;
@@ -289,37 +302,37 @@ void vtkPVServerInformation::CopyFromStream(const vtkClientServerStream* css)
   const char* env;
   for (idx = 0; idx < numMachines; idx++)
     {
-    if (!css->GetArgument(0, 12 + idx*10, &env))
+    if (!css->GetArgument(0, 13 + idx*10, &env))
       {
       vtkErrorMacro("Error parsing display environment from message.");
       return;
       }
     this->MachinesInternals->MachineInformationVector[idx].Environment = env;
-    if (!css->GetArgument(0, 13 + idx*10,
+    if (!css->GetArgument(0, 14 + idx*10,
                           &this->MachinesInternals->MachineInformationVector[idx].LowerLeft[0]) ||
-        !css->GetArgument(0, 14 + idx*10,
-                          &this->MachinesInternals->MachineInformationVector[idx].LowerLeft[1]) ||
         !css->GetArgument(0, 15 + idx*10,
+                          &this->MachinesInternals->MachineInformationVector[idx].LowerLeft[1]) ||
+        !css->GetArgument(0, 16 + idx*10,
                           &this->MachinesInternals->MachineInformationVector[idx].LowerLeft[2]))
       {
       vtkErrorMacro("Error parsing lower left coordinate from message.");
       return;
       }
-    if (!css->GetArgument(0, 16 + idx*10,
+    if (!css->GetArgument(0, 17 + idx*10,
                           &this->MachinesInternals->MachineInformationVector[idx].LowerRight[0]) ||
-        !css->GetArgument(0, 17 + idx*10,
-                          &this->MachinesInternals->MachineInformationVector[idx].LowerRight[1]) ||
         !css->GetArgument(0, 18 + idx*10,
+                          &this->MachinesInternals->MachineInformationVector[idx].LowerRight[1]) ||
+        !css->GetArgument(0, 19 + idx*10,
                           &this->MachinesInternals->MachineInformationVector[idx].LowerRight[2]))
       {
       vtkErrorMacro("Error parsing lower right coordinate from message.");
       return;
       }
-    if (!css->GetArgument(0, 19 + idx*10,
+    if (!css->GetArgument(0, 20 + idx*10,
                           &this->MachinesInternals->MachineInformationVector[idx].UpperLeft[0]) ||
-        !css->GetArgument(0, 20 + idx*10,
-                          &this->MachinesInternals->MachineInformationVector[idx].UpperLeft[1]) ||
         !css->GetArgument(0, 21 + idx*10,
+                          &this->MachinesInternals->MachineInformationVector[idx].UpperLeft[1]) ||
+        !css->GetArgument(0, 22 + idx*10,
                           &this->MachinesInternals->MachineInformationVector[idx].UpperLeft[2]))
       {
       vtkErrorMacro("Error parsing upper left coordinate from message.");

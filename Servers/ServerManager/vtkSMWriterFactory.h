@@ -93,6 +93,13 @@ public:
   const char* GetSupportedFileTypes(vtkSMSourceProxy* source)
     { return this->GetSupportedFileTypes(source, 0); }
 
+  // Description:
+  // Get/Set the proxy manager (not reference counted).
+  void SetProxyManager(vtkSMProxyManager* pxm)
+    { this->ProxyManager = pxm; }
+  vtkSMProxyManager* GetProxyManager()
+    { return this->ProxyManager; }
+
 //BTX
 protected:
   vtkSMWriterFactory();
@@ -104,7 +111,7 @@ protected:
     const char* extensions,
     const char* description);
 
-
+  vtkSMProxyManager* ProxyManager;
 private:
   vtkSMWriterFactory(const vtkSMWriterFactory&); // Not implemented
   void operator=(const vtkSMWriterFactory&); // Not implemented

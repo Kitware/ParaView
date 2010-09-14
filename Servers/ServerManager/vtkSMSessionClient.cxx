@@ -22,7 +22,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule2.h"
 #include "vtkPVConfig.h"
-#include "vtkPVInformation.h"
+#include "vtkPVServerInformation.h"
 #include "vtkSocketCommunicator.h"
 
 #include <vtkstd/string>
@@ -43,6 +43,9 @@ vtkSMSessionClient::vtkSMSessionClient()
   this->RenderServerController = NULL;
   this->DataServerController = NULL;
   this->AbortConnect = false;
+
+  this->DataServerInformation = vtkPVServerInformation::New();
+  this->RenderServerInformation = vtkPVServerInformation::New();
 }
 
 //----------------------------------------------------------------------------
@@ -54,6 +57,8 @@ vtkSMSessionClient::~vtkSMSessionClient()
     }
   this->SetRenderServerController(0);
   this->SetDataServerController(0);
+  this->DataServerInformation->Delete();
+  this->RenderServerInformation->Delete();
 }
 
 //----------------------------------------------------------------------------
@@ -177,6 +182,17 @@ bool vtkSMSessionClient::Connect(const char* url)
     rcontroller->Delete();
     }
 
+  bool success = (this->DataServerController && (!need_rcontroller||
+      this->RenderServerController));
+
+  if (success)
+    {
+    this->GatherInformation(vtkProcessModule2::DATA_SERVER_ROOT,
+      this->DataServerInformation, 0);
+    this->GatherInformation(vtkProcessModule2::RENDER_SERVER_ROOT,
+      this->RenderServerInformation, 0);
+    }
+
   // TODO: test with following expressions.
   // vtkSMSessionClient::Connect("cs://localhost");
   // vtkSMSessionClient::Connect("cs://localhost:2212");
@@ -199,8 +215,7 @@ bool vtkSMSessionClient::Connect(const char* url)
   // Setup the socket connnection between data-server and render-server.
   // this->SetupDataServerRenderServerConnection();
 
-  return (this->DataServerController && (!need_rcontroller||
-      this->RenderServerController));
+  return success;
 }
 
 //----------------------------------------------------------------------------
@@ -208,6 +223,38 @@ bool vtkSMSessionClient::GetIsAlive()
 {
   // TODO: add check to test connection existence.
   return (this->DataServerController != NULL);
+}
+
+namespace
+{
+  template <class T>
+  T vtkMax(const T& a, const T& b) { return (a < b)? b: a; }
+};
+
+//----------------------------------------------------------------------------
+int vtkSMSessionClient::GetNumberOfProcesses(vtkTypeUInt32 servers)
+{
+  int num_procs = 0;
+  if (servers & vtkProcessModule2::CLIENT)
+    {
+    num_procs = vtkMax(num_procs,
+      this->Superclass::GetNumberOfProcesses(servers));
+    }
+  if (servers & vtkProcessModule2::DATA_SERVER ||
+    servers & vtkProcessModule2::DATA_SERVER_ROOT)
+    {
+    num_procs = vtkMax(num_procs,
+      this->DataServerInformation->GetNumberOfProcesses());
+    }
+
+  if (servers & vtkProcessModule2::RENDER_SERVER ||
+    servers & vtkProcessModule2::RENDER_SERVER_ROOT)
+    {
+    num_procs = vtkMax(num_procs,
+      this->RenderServerInformation->GetNumberOfProcesses());
+    }
+
+  return num_procs;
 }
 
 //----------------------------------------------------------------------------

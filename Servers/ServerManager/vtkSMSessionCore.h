@@ -72,6 +72,11 @@ public:
   virtual bool GatherInformation(vtkTypeUInt32 location,
     vtkPVInformation* information, vtkTypeUInt32 globalid);
 
+  // Description:
+  // Returns the number of processes. This simply calls the
+  // GetNumberOfProcesses() on this->ParallelController
+  int GetNumberOfProcesses();
+
 //BTX
   enum MessageTypes
     {

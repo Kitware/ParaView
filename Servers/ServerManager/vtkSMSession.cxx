@@ -93,6 +93,13 @@ bool vtkSMSession::GatherInformation(vtkTypeUInt32 location,
 }
 
 //----------------------------------------------------------------------------
+int vtkSMSession::GetNumberOfProcesses(vtkTypeUInt32 servers)
+{
+  (void)servers;
+  return this->Core->GetNumberOfProcesses();
+}
+
+//----------------------------------------------------------------------------
 void vtkSMSession::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);

@@ -433,12 +433,12 @@ public:
   // Provides access to the reader factory. Before using the reader factory, it
   // is essential that it's configured correctly.
   vtkGetObjectMacro(ReaderFactory, vtkSMReaderFactory);
+#endif
 
   // Description:
   // Provides access to the writer factory. Before using the reader factory, it
   // is essential that it's configured correctly.
   vtkGetObjectMacro(WriterFactory, vtkSMWriterFactory);
-#endif
 //ETX
 
   // Description:

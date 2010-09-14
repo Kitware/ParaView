@@ -24,6 +24,7 @@
 #include "vtkSMSession.h"
 
 class vtkMultiProcessController;
+class vtkPVServerInformation;
 
 class VTK_EXPORT vtkSMSessionClient : public vtkSMSession
 {
@@ -77,6 +78,13 @@ public:
   virtual bool GatherInformation(vtkTypeUInt32 location,
     vtkPVInformation* information, vtkTypeUInt32 globalid);
 
+  // Description:
+  // Returns the number of processes on the given server/s. If more than 1
+  // server is identified, than it returns the maximum number of processes e.g.
+  // is servers = DATA_SERVER | RENDER_SERVER and there are 3 data-server nodes
+  // and 2 render-server nodes, then this method will return 3.
+  virtual int GetNumberOfProcesses(vtkTypeUInt32 servers);
+
 //BTX
   enum {
     PUSH=1,
@@ -98,6 +106,9 @@ protected:
   // Both maybe the same when connected to pvserver.
   vtkMultiProcessController* RenderServerController;
   vtkMultiProcessController* DataServerController;
+
+  vtkPVServerInformation* DataServerInformation;
+  vtkPVServerInformation* RenderServerInformation;
 
   bool AbortConnect;
 private:

@@ -64,6 +64,7 @@ SET (Kit_SRCS
   vtkSMSourceProxy.cxx
   vtkSMStringVectorProperty.cxx
   vtkSMVectorProperty.cxx
+  vtkSMWriterFactory.cxx
   vtkSMWriterProxy.cxx
   )
 
@@ -253,7 +254,6 @@ SET(Kit_SRCS
   vtkSMUpdateSuppressorProxy.cxx
   vtkSMViewProxy.cxx
   vtkSMWidgetRepresentationProxy.cxx
-  vtkSMWriterFactory.cxx
   vtkSMWriterProxy.cxx
   vtkSMXMLPVAnimationWriterProxy.cxx
   vtkSMXYChartRepresentationProxy.cxx

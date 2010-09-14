@@ -121,10 +121,14 @@ public:
   void SetUpperLeft(unsigned int idx, double coord[3]);
   double* GetUpperLeft(unsigned int idx) const;
 
+  // Description:
+  // Get the number of processes.
+  vtkGetMacro(NumberOfProcesses, int);
 protected:
   vtkPVServerInformation();
   ~vtkPVServerInformation();
 
+  int NumberOfProcesses;
   int OGVSupport;
   int AVISupport;
   int RemoteRendering;
