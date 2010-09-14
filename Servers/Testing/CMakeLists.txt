@@ -6,17 +6,17 @@ IF(PYTHON_EXECUTABLE AND VTK_HEADER_TESTING_PY)
       "${PVServer_SOURCE_DIR}/${part}"
       vtkAMRDualContour.h
       vtkAMRDualGridHelper.h
-      vtkCTHFragmentCommBuffer.h
-      vtkCTHFragmentIdList.h
-      vtkCTHFragmentIdListItem.h
-      vtkCTHFragmentPieceLoading.h
-      vtkCTHFragmentPieceTransaction.h
-      vtkCTHFragmentPieceTransactionMatrix.h
-      vtkCTHFragmentProcessLoading.h
-      vtkCTHFragmentProcessRing.h
-      vtkCTHFragmentToProcMap.h
       vtkIceTConstants.h
       vtkInitializationHelper.h
+      vtkMaterialInterfaceCommBuffer.h
+      vtkMaterialInterfaceIdList.h
+      vtkMaterialInterfaceIdListItem.h
+      vtkMaterialInterfacePieceLoading.h
+      vtkMaterialInterfacePieceTransaction.h
+      vtkMaterialInterfacePieceTransactionMatrix.h
+      vtkMaterialInterfaceProcessLoading.h
+      vtkMaterialInterfaceProcessRing.h
+      vtkMaterialInterfaceToProcMap.h
       vtkMemberFunctionCommand.h
       vtkPriorityHelper.h
       vtkProcessModuleConnectionManagerInternals.h

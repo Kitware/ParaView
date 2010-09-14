@@ -65,7 +65,6 @@ using vtkstd::string;
 // other
 #include "vtkMaterialInterfaceUtilities.hxx"
 
-vtkCxxRevisionMacro(vtkIntersectFragments, "$Revision: 2 $");
 vtkStandardNewMacro(vtkIntersectFragments);
 
 //----------------------------------------------------------------------------

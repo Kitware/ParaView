@@ -27,11 +27,11 @@
 #define __vtkMaterialInterfaceFilter_h
 
 #include "vtkMultiBlockDataSetAlgorithm.h"
-#include "vtkstd/vector"//
-#include "vtkstd/string"//
+#include "vtkstd/vector" // needed for vector
+#include "vtkstd/string" // needed for string
 
-#include "vtkSmartPointer.h"
-#include "vtkTimerLog.h"
+#include "vtkSmartPointer.h" // needed for smart pointer
+#include "vtkTimerLog.h" // needed for vtkTimerLog.
 
 class vtkDataSet;
 class vtkImageData;
@@ -59,7 +59,7 @@ class VTK_EXPORT vtkMaterialInterfaceFilter : public vtkMultiBlockDataSetAlgorit
 {
 public:
   static vtkMaterialInterfaceFilter *New();
-  vtkTypeRevisionMacro(vtkMaterialInterfaceFilter,vtkMultiBlockDataSetAlgorithm);
+  vtkTypeMacro(vtkMaterialInterfaceFilter,vtkMultiBlockDataSetAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // PARAVIEW interface stuff
