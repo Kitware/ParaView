@@ -45,12 +45,6 @@ public:
   virtual void UpdatePipeline(double time);
 
   // Description:
-  // Get the error code for the last UpdatePipeline() call. UpdatePipeline()
-  // call writes the file(s) and updates the error status. Error codes are 
-  // defined in vtkErrorCode.h
-  vtkGetMacro(ErrorCode, int);
-
-  // Description:
   // Flag indicating if the writer supports writing in parallel.
   // Not set by default.
   vtkSetMacro(SupportsParallel, int);
@@ -65,27 +59,14 @@ public:
   vtkGetMacro(ParallelOnly, int);
   vtkSetMacro(ParallelOnly, int);
 
-  virtual void AddInput(unsigned int inputPort,
-                        vtkSMSourceProxy* input, 
-                        unsigned int outputPort,
-                        const char* method);
-  virtual void AddInput(vtkSMSourceProxy* input,
-                        const char* method)
-  {
-    this->AddInput(0, input, 0, method);
-  }
-
 protected:
   vtkSMWriterProxy();
   ~vtkSMWriterProxy();
-
-  virtual void CreateVTKObjects();
 
   // Description:
   // Read attributes from an XML element.
   virtual int ReadXMLAttributes(vtkSMProxyManager* pm, vtkPVXMLElement* element);
 
-  int ErrorCode;
   int SupportsParallel;
   int ParallelOnly;
 

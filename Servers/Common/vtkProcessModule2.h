@@ -142,6 +142,12 @@ public:
   // using vtkMultiProcessController::GetGlobalController();
   vtkMultiProcessController* GetGlobalController();
 
+  // Description:
+  // Set/Get whether to report errors from the Interpreter.
+  vtkGetMacro(ReportInterpreterErrors, bool);
+  vtkSetMacro(ReportInterpreterErrors, bool);
+  vtkBooleanMacro(ReportInterpreterErrors, bool);
+
 //BTX
 protected:
   vtkProcessModule2();
@@ -162,6 +168,7 @@ protected:
   // the sessions efficiently.
   friend class vtkSessionIterator;
 
+  bool ReportInterpreterErrors;
 private:
   vtkProcessModule2(const vtkProcessModule2&); // Not implemented.
   void operator=(const vtkProcessModule2&); // Not implemented.

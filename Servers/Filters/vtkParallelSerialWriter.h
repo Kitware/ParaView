@@ -26,6 +26,8 @@
 
 #include "vtkDataObjectAlgorithm.h"
 
+class vtkClientServerInterpreter;
+
 class VTK_EXPORT vtkParallelSerialWriter : public vtkDataObjectAlgorithm
 {
 public:
@@ -94,6 +96,11 @@ public:
   vtkSetMacro(WriteAllTimeSteps, int);
   vtkBooleanMacro(WriteAllTimeSteps, int);
 
+//BTX
+  // Description:
+  // Get/Set the interpreter to use to call methods on the writer.
+  void SetInterpreter(vtkClientServerInterpreter*);
+
 protected:
   vtkParallelSerialWriter();
   ~vtkParallelSerialWriter();
@@ -133,6 +140,9 @@ private:
 
   // The name of the output file.
   char* FileName;
+
+  vtkClientServerInterpreter* Interpreter;
+//ETX
 };
 
 #endif

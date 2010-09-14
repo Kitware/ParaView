@@ -138,11 +138,10 @@ vtkSMSessionCore::~vtkSMSessionCore()
 void vtkSMSessionCore::OnInterpreterError(vtkObject*, unsigned long,
   void* calldata)
 {
-  // Need to add mechanism to ignore errors.
-  // if (!this->ReportInterpreterErrors)
-  //   {
-  //   return;
-  //   }
+  if (!vtkProcessModule2::GetProcessModule()->GetReportInterpreterErrors())
+    {
+    return;
+    }
   const char* errorMessage;
   vtkClientServerInterpreterErrorCallbackInfo* info
     = static_cast<vtkClientServerInterpreterErrorCallbackInfo*>(calldata);

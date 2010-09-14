@@ -35,8 +35,6 @@ protected:
   vtkSMPWriterProxy();
   ~vtkSMPWriterProxy();
 
-  virtual void CreateVTKObjects();
-
 private:
   vtkSMPWriterProxy(const vtkSMPWriterProxy&); // Not implemented.
   void operator=(const vtkSMPWriterProxy&); // Not implemented.

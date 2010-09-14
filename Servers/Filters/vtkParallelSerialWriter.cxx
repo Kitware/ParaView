@@ -23,7 +23,6 @@
 #include "vtkInformationVector.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
-#include "vtkProcessModule.h"
 #include "vtkReductionFilter.h"
 #include "vtkSmartPointer.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
@@ -37,6 +36,8 @@ vtkStandardNewMacro(vtkParallelSerialWriter);
 vtkCxxSetObjectMacro(vtkParallelSerialWriter, Writer, vtkAlgorithm);
 vtkCxxSetObjectMacro(vtkParallelSerialWriter, PreGatherHelper, vtkAlgorithm);
 vtkCxxSetObjectMacro(vtkParallelSerialWriter, PostGatherHelper, vtkAlgorithm);
+vtkCxxSetObjectMacro(vtkParallelSerialWriter, Interpreter,
+  vtkClientServerInterpreter);
 //-----------------------------------------------------------------------------
 vtkParallelSerialWriter::vtkParallelSerialWriter()
 {
@@ -57,6 +58,8 @@ vtkParallelSerialWriter::vtkParallelSerialWriter()
   this->WriteAllTimeSteps = 0;
   this->NumberOfTimeSteps = 0;
   this->CurrentTimeIndex = 0;
+
+  this->Interpreter = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -67,6 +70,7 @@ vtkParallelSerialWriter::~vtkParallelSerialWriter()
   this->SetFileName(0);
   this->SetPreGatherHelper(0);
   this->SetPostGatherHelper(0);
+  this->SetInterpreter(0);
 }
 
 //----------------------------------------------------------------------------
@@ -215,12 +219,12 @@ void vtkParallelSerialWriter::WriteATimestep(vtkDataObject* input)
     }
   
 }
-
+#include "assert.h"
 //----------------------------------------------------------------------------
 void vtkParallelSerialWriter::WriteAFile(const char* filename, vtkDataObject* input)
 {
-  vtkMultiProcessController* controller = 
-    vtkProcessModule::GetProcessModule()->GetController();
+  vtkMultiProcessController* controller =
+    vtkMultiProcessController::GetGlobalController();
   
   vtkSmartPointer<vtkReductionFilter> md = vtkSmartPointer<vtkReductionFilter>::New();
   md->SetController(controller);
@@ -242,7 +246,7 @@ void vtkParallelSerialWriter::WriteAFile(const char* filename, vtkDataObject* in
     vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_GHOST_LEVELS(),
     this->GhostLevel);
   md->Update();
-    
+
   if (controller->GetLocalProcessId() == 0)
     {
     vtkDataObject* output = md->GetOutputDataObject(0);
@@ -252,6 +256,7 @@ void vtkParallelSerialWriter::WriteAFile(const char* filename, vtkDataObject* in
       vtkSmartPointer<vtkDataObject> outputCopy;
       outputCopy.TakeReference(output->NewInstance());
       outputCopy->ShallowCopy(output);
+      outputCopy->Print(cout);
 
       vtksys_ios::ostringstream fname;
       if (this->WriteAllTimeSteps)
@@ -298,18 +303,15 @@ void vtkParallelSerialWriter::WriteInternal()
 {
   if (this->Writer)
     {
-    vtkClientServerID csId = 
-      vtkProcessModule::GetProcessModule()->GetIDFromObject(this->Writer);
+    vtkClientServerID csId = this->Interpreter->GetIDFromObject(this->Writer);
     if (csId.ID && this->FileNameMethod)
       {
-      vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
       // Get the local process interpreter.
-      vtkClientServerInterpreter* interp = pm->GetInterpreter();
       vtkClientServerStream stream;
       stream << vtkClientServerStream::Invoke
              << csId << "Write"
              << vtkClientServerStream::End;
-      interp->ProcessStream(stream);
+      this->Interpreter->ProcessStream(stream);
       }
     }
 }
@@ -319,18 +321,15 @@ void vtkParallelSerialWriter::SetWriterFileName(const char* fname)
 {
   if (this->Writer && this->FileName)
     {
-    vtkClientServerID csId = 
-      vtkProcessModule::GetProcessModule()->GetIDFromObject(this->Writer);
+    vtkClientServerID csId = this->Interpreter->GetIDFromObject(this->Writer);
     if (csId.ID && this->FileNameMethod)
       {
-      vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
       // Get the local process interpreter.
-      vtkClientServerInterpreter* interp = pm->GetInterpreter();
       vtkClientServerStream stream;
       stream << vtkClientServerStream::Invoke
              << csId << this->FileNameMethod << fname
              << vtkClientServerStream::End;
-      interp->ProcessStream(stream);
+      this->Interpreter->ProcessStream(stream);
       }
     }
 }

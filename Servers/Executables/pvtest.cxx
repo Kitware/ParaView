@@ -71,13 +71,20 @@ int main(int argc, char* argv[])
     vtkSMPropertyHelper(proxy, "ThetaResolution").Set(20);
     proxy->UpdateVTKObjects();
 
-
     vtkSMSourceProxy* shrink = vtkSMSourceProxy::SafeDownCast(
       pxm->NewProxy("filters", "ProcessIdScalars"));
     vtkSMPropertyHelper(shrink, "Input").Set(proxy);
     shrink->UpdateVTKObjects();
     shrink->UpdatePipeline();
     shrink->GetDataInformation(0)->Print(cout);
+
+    vtkSMSourceProxy* writer =
+      vtkSMSourceProxy::SafeDownCast(pxm->NewProxy("writers", "PDataSetWriter"));
+    vtkSMPropertyHelper(writer, "Input").Set(shrink);
+    vtkSMPropertyHelper(writer, "FileName").Set("/tmp/foo.vtk");
+    writer->UpdateVTKObjects();
+    writer->UpdatePipeline();
+    writer->Delete();
 
     proxy->Delete();
     shrink->Delete();

@@ -33,51 +33,6 @@ vtkSMPSWriterProxy::~vtkSMPSWriterProxy()
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMPSWriterProxy::CreateVTKObjects()
-{
-  if (this->ObjectsCreated)
-    {
-    return;
-    }
-
-  this->Superclass::CreateVTKObjects();
-
-  if (!this->ObjectsCreated)
-    {
-    return;
-    }
-
-
-  vtkSMProxy* writer = this->GetSubProxy("Writer");
-  if (!writer)
-    {
-    vtkErrorMacro("Missing subproxy: Writer");
-    return;
-    }
-
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  vtkClientServerStream stream;
-  if (this->GetSubProxy("PreGatherHelper"))
-    {
-    stream << vtkClientServerStream::Invoke
-           << this->GetID()
-           << "SetPreGatherHelper"
-           << this->GetSubProxy("PreGatherHelper")->GetID()
-           << vtkClientServerStream::End;
-    }
-
-  if (this->GetSubProxy("PostGatherHelper"))
-    {
-    stream << vtkClientServerStream::Invoke
-           << this->GetID()
-           << "SetPostGatherHelper"
-           << this->GetSubProxy("PostGatherHelper")->GetID()
-           << vtkClientServerStream::End;
-    }
-  pm->SendStream(this->ConnectionID, this->Servers, stream);
-}
-
-//-----------------------------------------------------------------------------
 void vtkSMPSWriterProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);

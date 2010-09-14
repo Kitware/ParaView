@@ -31,6 +31,7 @@ SET (Kit_SRCS
   vtkPMSourceProxy.cxx
   vtkPMStringVectorProperty.cxx
   vtkPMVectorProperty.cxx
+  vtkPMWriterProxy.cxx
   vtkSMCompoundSourceProxy.cxx
   vtkSMCompoundSourceProxyDefinitionBuilder.cxx
   vtkSMDocumentation.cxx
@@ -53,6 +54,8 @@ SET (Kit_SRCS
   vtkSMProxyManager.cxx
   vtkSMProxyProperty.cxx
   vtkSMProxySelectionModel.cxx
+  vtkSMPSWriterProxy.cxx
+  vtkSMPWriterProxy.cxx
   vtkSMRemoteObject.cxx
   vtkSMSessionClient.cxx
   vtkSMSessionCore.cxx
@@ -61,6 +64,7 @@ SET (Kit_SRCS
   vtkSMSourceProxy.cxx
   vtkSMStringVectorProperty.cxx
   vtkSMVectorProperty.cxx
+  vtkSMWriterProxy.cxx
   )
 
 # List all types of domains.
@@ -172,7 +176,6 @@ SET(Kit_SRCS
   vtkSMNetworkImageSourceProxy.cxx
   vtkSMParallelCoordinatesRepresentationProxy.cxx
   vtkSMPQStateLoader.cxx
-  vtkSMPSWriterProxy.cxx
   vtkSMPluginManager.cxx
   vtkSMPluginProxy.cxx
 #  vtkSMPluginInformationHelper.cxx
@@ -192,7 +195,6 @@ SET(Kit_SRCS
   vtkSMPythonTraceObserver.cxx
   vtkSMPVLookupTableProxy.cxx
   vtkSMPVRepresentationProxy.cxx
-  vtkSMPWriterProxy.cxx
   vtkSMRampKeyFrameProxy.cxx
   vtkSMReaderFactory.cxx
   vtkSMRenderViewHelper.cxx

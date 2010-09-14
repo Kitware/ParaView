@@ -191,6 +191,7 @@ vtkProcessModule2::vtkProcessModule2()
   this->Options = 0;
   this->Internals = new vtkInternals();
   this->MaxSessionId = 0;
+  this->ReportInterpreterErrors = true;
 }
 
 //----------------------------------------------------------------------------
