@@ -87,7 +87,6 @@ using vtkstd::string;
 
 class InitializeVolumeFractrionArray;
 
-vtkCxxRevisionMacro(vtkMaterialInterfaceFilter, "$Revision: 1.87 $");
 vtkStandardNewMacro(vtkMaterialInterfaceFilter);
 
 // NOTE:

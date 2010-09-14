@@ -37,7 +37,7 @@ class VTK_EXPORT vtkIntersectFragments : public vtkMultiBlockDataSetAlgorithm
 {
 public:
   static vtkIntersectFragments *New();
-  vtkTypeRevisionMacro(vtkIntersectFragments,vtkMultiBlockDataSetAlgorithm);
+  vtkTypeMacro(vtkIntersectFragments,vtkMultiBlockDataSetAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   /// PARAVIEW interface stuff
