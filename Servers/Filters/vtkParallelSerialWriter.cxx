@@ -219,7 +219,7 @@ void vtkParallelSerialWriter::WriteATimestep(vtkDataObject* input)
     }
   
 }
-#include "assert.h"
+
 //----------------------------------------------------------------------------
 void vtkParallelSerialWriter::WriteAFile(const char* filename, vtkDataObject* input)
 {
@@ -256,7 +256,6 @@ void vtkParallelSerialWriter::WriteAFile(const char* filename, vtkDataObject* in
       vtkSmartPointer<vtkDataObject> outputCopy;
       outputCopy.TakeReference(output->NewInstance());
       outputCopy->ShallowCopy(output);
-      outputCopy->Print(cout);
 
       vtksys_ios::ostringstream fname;
       if (this->WriteAllTimeSteps)
