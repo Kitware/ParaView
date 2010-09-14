@@ -71,7 +71,6 @@ SET(Filters_SRCS
   vtkIntegrateFlowThroughSurface.cxx
   vtkInteractorStyleTransferFunctionEditor.cxx
   vtkIntersectFragments.cxx
-  vtkIsoVolume.cxx
   vtkKdTreeGenerator.cxx
   vtkKdTreeManager.cxx
   vtkMaterialInterfaceCommBuffer.cxx
