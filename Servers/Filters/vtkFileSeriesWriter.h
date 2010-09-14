@@ -22,6 +22,7 @@
 #define __vtkFileSeriesWriter_h
 
 #include "vtkDataObjectAlgorithm.h"
+class vtkClientServerInterpreter;
 
 class VTK_EXPORT vtkFileSeriesWriter : public vtkDataObjectAlgorithm
 {
@@ -67,6 +68,11 @@ public:
   virtual int ProcessRequest(vtkInformation*,
                              vtkInformationVector**,
                              vtkInformationVector*);
+
+  // Description:
+  // Get/Set the interpreter to use to call methods on the writer.
+  void SetInterpreter(vtkClientServerInterpreter* interp)
+    { this->Interpreter = interp; }
   //ETX
 protected:
 //BTX
@@ -100,6 +106,8 @@ private:
 
   // The name of the output file.
   char* FileName;
+
+  vtkClientServerInterpreter* Interpreter;
 //ETX
 };
 

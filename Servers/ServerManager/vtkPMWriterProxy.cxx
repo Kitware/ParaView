@@ -15,6 +15,7 @@
 #include "vtkPMWriterProxy.h"
 
 #include "vtkParallelSerialWriter.h"
+#include "vtkFileSeriesWriter.h"
 #include "vtkClientServerInterpreter.h"
 #include "vtkClientServerStream.h"
 #include "vtkMultiProcessController.h"
@@ -70,6 +71,13 @@ bool vtkPMWriterProxy::CreateVTKObjects(vtkSMMessage* message)
   if (psw)
     {
     psw->SetInterpreter(this->Interpreter);
+    }
+
+  vtkFileSeriesWriter* fsw =
+    vtkFileSeriesWriter::SafeDownCast(this->GetVTKObject());
+  if (fsw)
+    {
+    fsw->SetInterpreter(this->Interpreter);
     }
 
   vtkPMProxy* writerProxy = this->GetSubProxyHelper("Writer");

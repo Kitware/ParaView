@@ -36,8 +36,6 @@ vtkStandardNewMacro(vtkParallelSerialWriter);
 vtkCxxSetObjectMacro(vtkParallelSerialWriter, Writer, vtkAlgorithm);
 vtkCxxSetObjectMacro(vtkParallelSerialWriter, PreGatherHelper, vtkAlgorithm);
 vtkCxxSetObjectMacro(vtkParallelSerialWriter, PostGatherHelper, vtkAlgorithm);
-vtkCxxSetObjectMacro(vtkParallelSerialWriter, Interpreter,
-  vtkClientServerInterpreter);
 //-----------------------------------------------------------------------------
 vtkParallelSerialWriter::vtkParallelSerialWriter()
 {

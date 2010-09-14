@@ -20,7 +20,6 @@
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkObjectFactory.h"
-#include "vtkProcessModule.h"
 #include "vtkSmartPointer.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 
@@ -44,6 +43,7 @@ vtkFileSeriesWriter::vtkFileSeriesWriter()
   this->WriteAllTimeSteps = 0;
   this->NumberOfTimeSteps = 1;
   this->CurrentTimeIndex = 0;
+  this->Interpreter = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -52,6 +52,7 @@ vtkFileSeriesWriter::~vtkFileSeriesWriter()
   this->SetWriter(0);
   this->SetFileNameMethod(0);
   this->SetFileName(0);
+  this->SetInterpreter(0);
 }
 
 //----------------------------------------------------------------------------
@@ -226,18 +227,15 @@ void vtkFileSeriesWriter::WriteInternal()
 {
   if (this->Writer)
     {
-    vtkClientServerID csId = 
-      vtkProcessModule::GetProcessModule()->GetIDFromObject(this->Writer);
+    vtkClientServerID csId = this->Interpreter->GetIDFromObject(this->Writer);
     if (csId.ID && this->FileNameMethod)
       {
-      vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
       // Get the local process interpreter.
-      vtkClientServerInterpreter* interp = pm->GetInterpreter();
       vtkClientServerStream stream;
       stream << vtkClientServerStream::Invoke
              << csId << "Write"
              << vtkClientServerStream::End;
-      interp->ProcessStream(stream);
+      this->Interpreter->ProcessStream(stream);
       }
     }
 }
@@ -247,18 +245,15 @@ void vtkFileSeriesWriter::SetWriterFileName(const char* fname)
 {
   if (this->Writer && this->FileName)
     {
-    vtkClientServerID csId = 
-      vtkProcessModule::GetProcessModule()->GetIDFromObject(this->Writer);
+    vtkClientServerID csId = this->Interpreter->GetIDFromObject(this->Writer);
     if (csId.ID && this->FileNameMethod)
       {
-      vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
       // Get the local process interpreter.
-      vtkClientServerInterpreter* interp = pm->GetInterpreter();
       vtkClientServerStream stream;
       stream << vtkClientServerStream::Invoke
              << csId << this->FileNameMethod << fname
              << vtkClientServerStream::End;
-      interp->ProcessStream(stream);
+      this->Interpreter->ProcessStream(stream);
       }
     }
 }

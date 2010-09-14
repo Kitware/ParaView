@@ -99,7 +99,8 @@ public:
 //BTX
   // Description:
   // Get/Set the interpreter to use to call methods on the writer.
-  void SetInterpreter(vtkClientServerInterpreter*);
+  void SetInterpreter(vtkClientServerInterpreter* interp)
+    { this->Interpreter = interp; }
 
 protected:
   vtkParallelSerialWriter();
