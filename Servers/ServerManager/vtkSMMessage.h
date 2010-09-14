@@ -29,10 +29,10 @@
 # pragma GCC diagnostic warning "-Wsign-compare"
 #endif
 
+#include "vtkClientServerStream.h"
 
 typedef paraview_protobuf::Message           vtkSMMessage;
 typedef paraview_protobuf::MessageCollection vtkSMMessageCollection;
-
 
 namespace pvstream
 {
@@ -99,6 +99,44 @@ namespace pvstream
 
 };
 
+inline vtkClientServerStream& operator << (vtkClientServerStream& stream,
+  const paraview_protobuf::Variant& variant)
+{
+  switch (variant.type())
+    {
+  case paraview_protobuf::Variant::INT:
+    for (int cc=0; cc < variant.integer_size(); cc++)
+      {
+      stream << variant.integer(cc);
+      }
+    break;
+
+  case paraview_protobuf::Variant::FLOAT64:
+    for (int cc=0; cc < variant.float64_size(); cc++)
+      {
+      stream << variant.float64(cc);
+      }
+    break;
+
+  case paraview_protobuf::Variant::IDTYPE:
+    for (int cc=0; cc < variant.idtype_size(); cc++)
+      {
+      stream << variant.idtype(cc);
+      }
+    break;
+
+  case paraview_protobuf::Variant::STRING:
+    for (int cc=0; cc < variant.txt_size(); cc++)
+      {
+      stream << variant.txt(cc).c_str();
+      }
+    break;
+
+  default:
+    break;
+    }
+  return stream;
+}
 
 inline void Test()
 {

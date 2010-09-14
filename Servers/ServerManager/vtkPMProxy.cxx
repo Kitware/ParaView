@@ -99,7 +99,22 @@ void vtkPMProxy::Invoke(vtkSMMessage* message)
     return;
     }
 
-  // TODO handle calling raw-command.
+  vtkstd::string command;
+  const VariantList* arguments;
+  command = message->GetExtension(InvokeRequest::method);
+  arguments = &message->GetExtension(InvokeRequest::arguments);
+
+  vtkClientServerStream stream;
+  stream << vtkClientServerStream::Invoke << this->GetVTKObjectID()
+    << command.c_str();
+  for (int cc=0; cc < arguments->variant_size(); cc++)
+    {
+    stream << arguments->variant(cc);
+    }
+  stream << vtkClientServerStream::End;
+  this->Interpreter->ProcessStream(stream);
+
+  // TODO: send back the result
 }
 
 //----------------------------------------------------------------------------
