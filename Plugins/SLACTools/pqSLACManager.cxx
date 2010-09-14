@@ -37,7 +37,6 @@
 #include "pqActiveView.h"
 #include "pqApplicationCore.h"
 #include "pqDisplayPolicy.h"
-#include "pqXYChartView.h"
 #include "pqObjectBuilder.h"
 #include "pqOutputPort.h"
 #include "pqPipelineRepresentation.h"
@@ -49,7 +48,7 @@
 #include "pqServerManagerModel.h"
 #include "pqSMAdaptor.h"
 #include "pqUndoStack.h"
-#include "pqView.h"
+#include "pqXYChartView.h"
 
 #include <QMainWindow>
 #include <QPointer>
@@ -254,6 +253,11 @@ pqView *pqSLACManager::getMeshView()
                         pqRenderView::renderViewType());
 }
 
+pqRenderView *pqSLACManager::getMeshRenderView()
+{
+  return reinterpret_cast<pqRenderView*>(this->getMeshView());
+}
+
 pqView *pqSLACManager::getPlotView()
 {
   return this->findView(this->getPlotFilter(), 0,
@@ -436,6 +440,12 @@ void pqSLACManager::showField(const char *name)
   pqSMAdaptor::setMultipleElementProperty(lutProxy->GetProperty("RGBPoints"),
                                           RGBPoints);
 
+  // NaN color is a 3-tuple RGB.
+  QList<QVariant> NanColor;
+  NanColor << 0.5 << 0.5 << 0.5;
+  pqSMAdaptor::setMultipleElementProperty(lutProxy->GetProperty("NanColor"),
+                                          NanColor);
+
   // Set up range of scalars to best we know of.
   pqPipelineSource *temporalRanges = this->getTemporalRanges();
   if (temporalRanges)
@@ -611,6 +621,8 @@ void pqSLACManager::showParticles(bool show)
 
   pqDataRepresentation *repr = reader->getRepresentation(view);
   repr->setVisible(show);
+
+  view->render();
 }
 
 //-----------------------------------------------------------------------------
@@ -786,7 +798,7 @@ void pqSLACManager::createPlotOverZ()
 //-----------------------------------------------------------------------------
 void pqSLACManager::toggleBackgroundBW()
 {
-  pqView *view = this->getMeshView();
+  pqRenderView *view = this->getMeshRenderView();
   if (!view) return;
   vtkSMProxy *viewProxy = view->getProxy();
 
@@ -800,6 +812,15 @@ void pqSLACManager::toggleBackgroundBW()
       && (oldBackground[2].toDouble() == 0.0) )
     {
     newBackground << 1.0 << 1.0 << 1.0;
+    }
+  else if (   (oldBackground[0].toDouble() == 1.0)
+           && (oldBackground[1].toDouble() == 1.0)
+           && (oldBackground[2].toDouble() == 1.0) )
+    {
+    const int *defaultBackground = view->defaultBackgroundColor();
+    newBackground << defaultBackground[0]/255.0
+                  << defaultBackground[1]/255.0
+                  << defaultBackground[2]/255.0;
     }
   else
     {
@@ -822,6 +843,7 @@ void pqSLACManager::showStandardViewpoint()
     view->resetViewDirection(1, 0, 0,
                              0, 1, 0);
     }
+  view->render();
 }
 
 //-----------------------------------------------------------------------------
