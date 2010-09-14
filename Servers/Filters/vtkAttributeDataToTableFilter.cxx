@@ -243,7 +243,7 @@ void vtkAttributeDataToTableFilter::Decorate(vtkTable* output,
     {
     // Add an original ids array. I know, this is going to bloat up the memory a
     // bit, but it's much easier to add the array now than later (esp. in
-    // vtkTableStreamer) since it's ending up buggy and hard to track.
+    // vtkSortedTableStreamer) since it's ending up buggy and hard to track.
 
     vtkIdTypeArray* indicesArray = vtkIdTypeArray::New();
     indicesArray->SetName("vtkOriginalIndices");

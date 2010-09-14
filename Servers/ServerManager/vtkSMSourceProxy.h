@@ -250,7 +250,7 @@ protected:
   // Description:
   // Method to set an output port at the given index. Provided for subclasses to
   // add output ports. It replaces the output port at the given index, if any,
-  // The output ports will be resize to fit the specified index.
+  // The output ports will be resized to fit the specified index.
   void SetOutputPort(unsigned int index, const char* name, 
     vtkSMOutputPort* port, vtkSMDocumentation* doc);
   void RemoveAllOutputPorts();

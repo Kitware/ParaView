@@ -151,6 +151,41 @@ class pqFixStateFilenamesDialog::pqInternals : public Ui::FixStateFilenamesDialo
     this->ProxyLabels[proxyid] = proxyXML->GetAttribute("type");
     }
 
+  void processProxyCollection(vtkPVXMLElement* proxyCollectionXML)
+    {
+    Q_ASSERT(strcmp(proxyCollectionXML->GetName(), "ProxyCollection") == 0);
+
+    const char* name = proxyCollectionXML->GetAttribute("name");
+    if (name == NULL)
+      {
+      qWarning("Possibly invalid state file. Proxy Collection doesn't have a name attribute.");
+      return;
+      }
+
+    if (strcmp(name,"sources") != 0)
+      {
+         return;
+      }
+
+    //this->ProxyCollections.push_back(proxyCollectionXML);
+
+    unsigned int num_children = proxyCollectionXML->GetNumberOfNestedElements();
+    for (unsigned int cc=0; cc < num_children; cc++)
+      {
+      vtkPVXMLElement* child = proxyCollectionXML->GetNestedElement(cc);
+      if (child->GetName() != QString("Item"))
+        {
+        continue;
+        }
+      const char* name = child->GetAttribute("name");
+      int helperid;
+      if (!name || !child->GetScalarAttribute("id", &helperid))
+        {
+        continue;
+        }
+      }
+    }
+
 public:
   struct PropertyInfo
     {
@@ -166,7 +201,9 @@ public:
     };
   typedef QMap<int, QMap<QString, PropertyInfo> > PropertiesMapType;
   PropertiesMapType PropertiesMap;
+  PropertiesMapType CollectionsMap;
   QMap<int, QString> ProxyLabels;
+
   vtkSmartPointer<vtkPVXMLElement> XMLRoot;
 
   void process(vtkPVXMLElement* xml)
@@ -184,6 +221,10 @@ public:
         if (child && QString("Proxy") == child->GetName())
           {
           this->processProxy(child);
+          }
+        else if (child && QString("ProxyCollection") == child->GetName())
+          {
+          this->processProxyCollection(child);
           }
         }
       }
@@ -325,5 +366,13 @@ void pqFixStateFilenamesDialog::accept()
         }
       }
     }
+
+  pqInternals::PropertiesMapType::iterator proxyCollectionIter;
+  for(proxyCollectionIter = this->Internals->CollectionsMap.begin();
+      proxyCollectionIter != this->Internals->CollectionsMap.end(); ++iter)
+    {
+
+    }
+  //this->Internals->
   this->Superclass::accept();
 }

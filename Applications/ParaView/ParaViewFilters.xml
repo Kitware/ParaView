@@ -58,6 +58,11 @@
     <Proxy group="filters" name="TimeToTextConvertor" />
   </Category>
 
+  <Category name="Material Analysis" menu_label="&amp;Material Analysis">
+    <Proxy group="filters" name="MaterialInterfaceFilter" />
+    <Proxy group="filters" name="IntersectFragments" />
+  </Category>
+
   <Proxy group="filters" name="AMRDualClip" />
   <Proxy group="filters" name="AMRDualContour" />
   <Proxy group="filters" name="AMRFlashContour" />

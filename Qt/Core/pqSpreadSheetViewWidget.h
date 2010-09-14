@@ -65,6 +65,10 @@ protected slots:
   /// being stretched over the full view for better viewing.
   void onSectionDoubleClicked(int);
 
+  /// called when a header section is clicked in order to be sorted.
+  /// It results in that column being sorted if possible.
+  void onSortIndicatorChanged(int section, Qt::SortOrder order);
+
 protected:
   /// Overridden to tell the pqSpreadSheetViewModel about the active viewport.
   virtual void paintEvent(QPaintEvent* event);

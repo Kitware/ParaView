@@ -456,12 +456,12 @@ const char* vtkQuerySelectionSource::GetUserFriendlyText()
       break;
 
     case IS_LE:
-      stream << "is less than ";
+      stream << "is less equal than ";
       this->Internals->PrintValues(stream, 1);
       break;
-      
+
     case IS_GE:
-      stream << "is greater than ";
+      stream << "is greater equal than ";
       this->Internals->PrintValues(stream, 1);
       break;
       }

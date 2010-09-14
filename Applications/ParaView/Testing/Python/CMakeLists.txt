@@ -22,6 +22,7 @@ set (TestIsoVolume_BREAK TRUE)
 SET (SLACTools_DISABLE_CS TRUE)
 SET (SLACTools_DISABLE_CRS TRUE)
 SET (SLACTools_BREAK TRUE)
+set (RenderNan_BREAK TRUE)
 
 # Set image threshold overrides for the tests.
 SET(SaveLargeScreenshot_THRESHOLD 10000)

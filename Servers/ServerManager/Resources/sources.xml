@@ -1475,7 +1475,7 @@ OS is the output scalar; M represents the maximum value; G represents the Gaussi
         <BooleanDomain name="bool" />
         <Documentation>
           Useful only when FieldType==POINT. This results in selecting the cells
-          that contain the matchting points.
+          that contain the matching points.
         </Documentation>
       </IntVectorProperty>
 

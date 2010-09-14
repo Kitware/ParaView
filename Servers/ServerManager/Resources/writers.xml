@@ -989,6 +989,49 @@
       <!-- End of EnSightWriter -->
     </PWriterProxy>
 
+    <Proxy name="AnimationSceneImageWriter" class="vtkSMAnimationSceneImageWriter">
+      <Documentation>
+        Internal writer to used paraview uses when it disconnects the GUI.
+      </Documentation>
+
+      <IntVectorProperty name="Magnification"
+        command="SetMagnification"
+        number_of_elements="1"
+        default_values="1">
+        <IntRangeDomain name="range" min="1" />
+        <Documentation>
+          The magnification factor to use for the saved animation.
+        </Documentation>
+      </IntVectorProperty>
+
+      <StringVectorProperty name="FileName"
+        command="SetFileName"
+        number_of_elements="1">
+        <Documentation>
+          The name of the file to save the animation into.
+        </Documentation>
+      </StringVectorProperty>
+
+      <DoubleVectorProperty name="FrameRate"
+        command="SetFrameRate"
+        number_of_elements="1"
+        default_values="0">
+        <Documentation>
+          Get/Set the frame rate to use for saving the animation.
+          This frame rate is the frame rate that gets saved in the movie
+          file generated, if applicable. If does not affect the FrameRate
+          set on the animation scene at all. In other words, this is the
+          playback frame rate and not the animation generation frame rate.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <Hints>
+        <Property name="Input" show="0"/>
+        <Property name="FileName" show="0"/>
+      </Hints>
+    <!-- End of AnimationSceneImageWriter -->
+    </Proxy>
+
     <!-- ================================================================= -->
     <XMLPVAnimationWriterProxy name="XMLPVAnimationWriter" class ="vtkXMLPVAnimationWriter">
       <Documentation>

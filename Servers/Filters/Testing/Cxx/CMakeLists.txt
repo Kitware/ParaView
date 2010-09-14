@@ -10,6 +10,7 @@ SET(ServersFilters_SRCS
   TestExtractScatterPlot
   TestMPI
   TestTilesHelper
+  TestSortingTable
   )
 
 IF (VTK_DATA_ROOT)
@@ -107,3 +108,23 @@ TestPVAMRDualClip
     TARGET_LINK_LIBRARIES(${name} vtkPVFilters)
   ENDFOREACH(name)
 ENDIF (VTK_USE_DISPLAY AND VTK_DATA_ROOT AND PARAVIEW_DATA_ROOT)
+
+IF (VTK_USE_MPI)
+    IF (MPI_LIBRARY)
+      SET(MPI_LIBRARIES ${MPI_LIBRARY})
+    ENDIF (MPI_LIBRARY)
+    IF (MPI_EXTRA_LIBRARY)
+      SET(MPI_LIBRARIES ${MPI_LIBRARIES} "${MPI_EXTRA_LIBRARY}")
+    ENDIF (MPI_EXTRA_LIBRARY)
+
+    ADD_EXECUTABLE(DistributedSubsetSortingTable DistributedSubsetSortingTable.cxx)
+    TARGET_LINK_LIBRARIES(DistributedSubsetSortingTable vtkParallel vtkPVFilters)
+
+    ADD_TEST(TestDistributedSubsetSortingTable
+            ${VTK_MPIRUN_EXE} ${VTK_MPI_PRENUMPROC_FLAGS} ${VTK_MPI_NUMPROC_FLAG} 8 ${VTK_MPI_PREFLAGS}
+            ${CXX_TEST_PATH}/\${CTEST_CONFIGURATION_TYPE}/DistributedSubsetSortingTable
+            -D ${VTK_DATA_ROOT}
+            -T ${VTK_BINARY_DIR}/Testing/Temporary
+            ${VTK_MPI_POSTFLAGS})
+
+ENDIF (VTK_USE_MPI)

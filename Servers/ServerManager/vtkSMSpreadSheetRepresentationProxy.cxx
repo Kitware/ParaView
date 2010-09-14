@@ -112,7 +112,8 @@ bool vtkSMSpreadSheetRepresentationProxy::CreatePipeline(
 
   // esProxy port:1 is a index based vtkSelection. That's the one we are
   // interested in.
-  this->Connect(this->PreProcessor, this->SelectionRepresentation, "DataInput", 0);
+  // FIXME switch from this->PreProcesser to this->Streamer
+  this->Connect(this->Streamer, this->SelectionRepresentation, "DataInput", 0);
   this->Connect(esProxy, this->SelectionRepresentation, "Input", 1);
   return true;
 }
@@ -126,7 +127,7 @@ void vtkSMSpreadSheetRepresentationProxy::PassEssentialAttributes()
   // Pass essential properties to the selection representation
   // such as "BlockSize", "CacheSize", "FieldAssociation"
   const char* pnames[] =
-    {"BlockSize", "CacheSize", "FieldAssociation", 0};
+    {"CacheSize", "FieldAssociation", 0}; // removed: "BlockSize",
   for (int cc=0; pnames[cc]; cc++)
     {
     vtkSMProperty* src = this->GetProperty(pnames[cc]);

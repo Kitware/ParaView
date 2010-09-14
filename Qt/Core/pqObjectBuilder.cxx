@@ -794,6 +794,18 @@ void pqObjectBuilder::destroyProxyInternal(pqProxy* proxy)
 //-----------------------------------------------------------------------------
 QString pqObjectBuilder::getFileNamePropertyName(vtkSMProxy* proxy)
 {
+  if (proxy->GetHints())
+    {
+    vtkPVXMLElement* filenameHint =
+      proxy->GetHints()->FindNestedElementByName("DefaultFileNameProperty");
+    if (filenameHint &&
+      filenameHint->GetAttribute("name") &&
+      proxy->GetProperty(filenameHint->GetAttribute("name")))
+      {
+      return filenameHint->GetAttribute("name");
+      }
+    }
+
   // Find the first property that has a vtkSMFileListDomain. Assume that
   // it is the property used to set the filename.
   vtkSmartPointer<vtkSMPropertyIterator> piter;

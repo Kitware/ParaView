@@ -1465,54 +1465,26 @@
 
       <StringVectorProperty 
         name="SelectMaskArray" 
-        command="SetInputArrayToProcess"
-        number_of_elements="5"
-        element_types="0 0 0 0 2"
-        default_values="2"
+        command="SetMaskArray"
+        number_of_elements="1"
+        default_values=""
         label="Mask Array">
-        <ArrayListDomain name="array_list" attribute_type="Scalars" 
-             input_domain_name="input_array_1">
-          <RequiredProperties>
-             <Property name="Input" function="Input"/>
-          </RequiredProperties>
-        </ArrayListDomain>
-        <Documentation>
-        </Documentation>
       </StringVectorProperty>
 
       <StringVectorProperty 
         name="SelectScaleArray" 
-        command="SetInputArrayToProcess"
-        number_of_elements="5"
-        element_types="0 0 0 0 2"
-        default_values="0" 
-        label="Scale"> 
-        <ArrayListDomain name="array_list" attribute_type="Scalars"
-             input_domain_name="input_array_any">
-          <RequiredProperties>
-             <Property name="Input" function="Input"/>
-          </RequiredProperties>
-        </ArrayListDomain>
-        <Documentation>
-        </Documentation>
+        command="SetScaleArray"
+        number_of_elements="1"
+        default_values=""
+        label="Scale" >
       </StringVectorProperty>
 
       <StringVectorProperty 
         name="SelectOrientationVectors" 
-        command="SetInputArrayToProcess"
-        number_of_elements="5"
-        element_types="0 0 0 0 2"
-        default_values="3" 
-        label="Orientation Vectors">  
-          <!-- default value=5 so orientation vectors go to the right place -->
-        <ArrayListDomain name="array_list" attribute_type="Vectors"
-             input_domain_name="input_array_2">
-          <RequiredProperties>
-             <Property name="Input" function="Input"/>
-          </RequiredProperties>
-        </ArrayListDomain>
-        <Documentation>
-        </Documentation>
+        command="SetOrientationArray"
+        number_of_elements="1"
+        default_values=""
+        label="Orientation Vectors">
       </StringVectorProperty>
 
       <IntVectorProperty name="Scaling"
@@ -8757,6 +8729,8 @@
         </Proxy>
         <ExposedProperties>
           <Property name="BlockSize" />
+          <Property name="ColumnToSort" />
+          <Property name="InvertOrder" />
         </ExposedProperties>
       </SubProxy>
 
@@ -8828,7 +8802,6 @@
           proxygroup="extended_filters" proxyname="SelectionStreamer">
         </SourceProxy>
         <ExposedProperties>
-          <Property name="BlockSize" />
           <Property name="DataInput" />
           <Property name="FieldAssociation" />
         </ExposedProperties>
