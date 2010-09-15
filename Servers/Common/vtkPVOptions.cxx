@@ -107,6 +107,7 @@ vtkPVOptions::~vtkPVOptions()
   this->SetStateFileName(0);
   this->SetLogFileName(0);
   this->SetStereoType(0);
+  this->SetParaViewDataName(0);
 }
 
 //----------------------------------------------------------------------------
@@ -326,7 +327,23 @@ int vtkPVOptions::WrongArgument(const char* argument)
     return 0;
     }
 
-  return this->Superclass::WrongArgument(argument);
+  if (this->Superclass::WrongArgument(argument))
+    {
+    return 1;
+    }
+
+  if (this->ParaViewDataName == NULL)
+    {
+    // BUG #11199. Assume it's a data file.
+    this->SetParaViewDataName(argument);
+    if (this->GetUnknownArgument() &&
+      strcmp(this->GetUnknownArgument(), argument) == 0)
+      {
+      this->SetUnknownArgument(0);
+      }
+    return 1;
+    }
+  return 0;
 }
 
 //----------------------------------------------------------------------------
