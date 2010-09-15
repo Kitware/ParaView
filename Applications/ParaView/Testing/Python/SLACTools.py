@@ -132,6 +132,9 @@ QtTesting.playCommand(object6, 'activate', '')
 object7 = 'pqClientMainWindow/VCRToolbar/actionVCRNextFrame'
 QtTesting.playCommand(object7, 'activate', '')
 
+object8 = 'pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/0/MultiViewFrameMenu/CloseAction'
+QtTesting.playCommand(object8, 'activate', '')
+
 #Image compare
-snapshotWidget = 'pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/1/1QVTKWidget0'
+snapshotWidget = 'pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/0/1QVTKWidget0'
 QtTestingImage.compareImage(snapshotWidget, 'SLACToolsPlotOverZ.png', 300, 300);
