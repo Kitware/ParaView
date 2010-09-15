@@ -132,6 +132,23 @@ def OpenDataFile(filename, **extraArgs):
       reader = globals()[xml_name](FileName=filename, **extraArgs)
     return reader
 
+def CreateWriter(filename, proxy=None, **extraArgs):
+    """Creates a writer that can write the data produced by the source proxy in
+       the given file format (identified by the extension). If no source is
+       provided, then the active source is used. This doesn't actually write the
+       data, it simply creates the writer and returns it."""
+    if not filename:
+       raise RuntimeError, "filename must be specified"
+    writer_factory = servermanager.ProxyManager().GetWriterFactory()
+    if writer_factory.GetNumberOfRegisteredPrototypes() == 0:
+        writer_factory.RegisterPrototypes("writers")
+    if not proxy:
+        proxy = GetActiveSource()
+    if not proxy:
+        raise RuntimeError, "Could not locate source to write"
+    writer_proxy = writer_factory.CreateWriter(filename, proxy.SMProxy, proxy.Port)
+    return servermanager._getPyProxy(writer_proxy)
+
 def GetRenderView():
     "Returns the active view if there is one. Else creates and returns a new view."
     view = active_objects.view

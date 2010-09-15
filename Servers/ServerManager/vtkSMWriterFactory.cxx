@@ -22,6 +22,7 @@
 #include "vtkSMInputProperty.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxyManager.h"
+#include "vtkSMProxyDefinitionIterator.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMWriterProxy.h"
 
@@ -159,6 +160,31 @@ vtkSMWriterFactory::~vtkSMWriterFactory()
 void vtkSMWriterFactory::Initialize()
 {
   this->Internals->Prototypes.clear();
+}
+
+//----------------------------------------------------------------------------
+void vtkSMWriterFactory::RegisterPrototypes(const char* xmlgroup)
+{
+  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+  vtkSMProxyDefinitionIterator* iter = vtkSMProxyDefinitionIterator::New();
+  iter->SetModeToOneGroup();
+  for (iter->Begin(xmlgroup); !iter->IsAtEnd(); iter->Next())
+    {
+    vtkPVXMLElement* hints = pxm->GetProxyHints(iter->GetGroup(),
+      iter->GetKey());
+    if (hints &&
+        hints->FindNestedElementByName("WriterFactory"))
+      {
+      this->RegisterPrototype(iter->GetGroup(), iter->GetKey());
+      }
+    }
+  iter->Delete();
+}
+
+//----------------------------------------------------------------------------
+unsigned int vtkSMWriterFactory::GetNumberOfRegisteredPrototypes()
+{
+  return static_cast<unsigned int>(this->Internals->Prototypes.size());
 }
 
 //----------------------------------------------------------------------------
