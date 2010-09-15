@@ -26,6 +26,7 @@ set (RenderNan_BREAK TRUE)
 
 # Set image threshold overrides for the tests.
 SET(SaveLargeScreenshot_THRESHOLD 10000)
+SET(SLACTools_THRESHOLD 20)
 
 add_client_tests(
   TEST_SCRIPTS ${TESTS_WITHOUT_BASELINES}
