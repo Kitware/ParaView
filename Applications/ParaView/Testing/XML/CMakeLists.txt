@@ -138,6 +138,9 @@ SET (XYHistogram_THRESHOLD 60)
 IF (PARAVIEW_USE_MPI)
   SET (XYHistogram_DISABLE_CS TRUE)
   SET (XYHistogram_DISABLE_CRS TRUE)
+
+  SET (SpreadSheet1_DISABLE_CS TRUE)
+  SET (SpreadSheet1_DISABLE_CRS TRUE)
 ENDIF (PARAVIEW_USE_MPI)
 
 # These Xdmf tests have wireframes, hence the increased thresholds.
