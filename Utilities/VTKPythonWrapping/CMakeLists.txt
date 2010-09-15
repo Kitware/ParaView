@@ -75,6 +75,7 @@ IF (PARAVIEW_ENABLE_PYTHON)
   # All files paraview/*.py included in the paraview module.
   SET(PV_PYTHON_FILES
     demos/demo1
+    demos/show_grid_as_background
     vtk/__init__
     vtk/genericfiltering
     vtk/geovis
