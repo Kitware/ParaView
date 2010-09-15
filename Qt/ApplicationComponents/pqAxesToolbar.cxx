@@ -66,13 +66,17 @@ void pqAxesToolbar::constructor()
     SIGNAL(sourceChanged(pqPipelineSource*)),
     this, SLOT(updateEnabledState()));
 
+  QObject::connect(&pqActiveObjects::instance(),
+    SIGNAL(representationChanged(pqRepresentation*)),
+    this, SLOT(updateEnabledState()));
+
   QObject::connect(this->Internals->actionShowOrientationAxes,
     SIGNAL(toggled(bool)), this, SLOT(showOrientationAxes(bool)));
 
   QObject::connect(this->Internals->actionShowCenterAxes, SIGNAL(toggled(bool)),
     this, SLOT(showCenterAxes(bool)));
 
-  QObject::connect(this->Internals->actionShowCenterAxes, SIGNAL(triggered()),
+  QObject::connect(this->Internals->actionResetCenter, SIGNAL(triggered()),
     this, SLOT(resetCenterOfRotationToCenterOfCurrentData()));
 
   QObject::connect(this->Internals->actionPickCenter, SIGNAL(toggled(bool)),
@@ -91,7 +95,7 @@ pqAxesToolbar::~pqAxesToolbar()
 //-----------------------------------------------------------------------------
 void pqAxesToolbar::updateEnabledState()
 {
-  pqRenderView* renderView = 
+  pqRenderView* renderView =
     qobject_cast<pqRenderView*>(pqActiveObjects::instance().activeView());
 
   this->Internals->actionShowOrientationAxes->setEnabled(renderView != NULL);
