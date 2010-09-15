@@ -690,27 +690,32 @@ int vtkPVGeometryFilter::RequestCompositeData(vtkInformation*,
     this->Controller->AllReduce(&count, &reduced_size, 1, vtkCommunicator::MAX_OP);
     assert(reduced_size >= static_cast<int>(non_null_leaves.size()));
     non_null_leaves.resize(reduced_size, 0);
-    vtkstd::vector<unsigned char>reduced_non_null_leaves;
-    reduced_non_null_leaves.resize(reduced_size, 0);
-    this->Controller->AllReduce(
-      &non_null_leaves[0], &reduced_non_null_leaves[0],
-      reduced_size, vtkCommunicator::MAX_OP);
-
-    vtkPolyData* trivalInput = vtkPolyData::New();
-    iter->SkipEmptyNodesOff();
-    iter->VisitOnlyLeavesOff();
-    for (iter->InitTraversal(); !iter->IsDoneWithTraversal();
-      iter->GoToNextItem())
+    // if reduced_size ==0, then all processes have no non-null-leaves, so
+    // nothing special to do here.
+    if (reduced_size != 0)
       {
-      unsigned int index = iter->GetCurrentFlatIndex();
-      if (iter->GetCurrentDataObject() == NULL &&
-        index < static_cast<unsigned int>(reduced_non_null_leaves.size()) &&
-        reduced_non_null_leaves[index] != 0)
+      vtkstd::vector<unsigned char>reduced_non_null_leaves;
+      reduced_non_null_leaves.resize(reduced_size, 0);
+      this->Controller->AllReduce(
+        &non_null_leaves[0], &reduced_non_null_leaves[0],
+        reduced_size, vtkCommunicator::MAX_OP);
+
+      vtkPolyData* trivalInput = vtkPolyData::New();
+      iter->SkipEmptyNodesOff();
+      iter->VisitOnlyLeavesOff();
+      for (iter->InitTraversal(); !iter->IsDoneWithTraversal();
+        iter->GoToNextItem())
         {
-        output->SetDataSet(iter, trivalInput);
+        unsigned int index = iter->GetCurrentFlatIndex();
+        if (iter->GetCurrentDataObject() == NULL &&
+          index < static_cast<unsigned int>(reduced_non_null_leaves.size()) &&
+          reduced_non_null_leaves[index] != 0)
+          {
+          output->SetDataSet(iter, trivalInput);
+          }
         }
+      trivalInput->Delete();
       }
-    trivalInput->Delete();
     }
 
   vtkTimerLog::MarkEndEvent("vtkPVGeometryFilter::RequestCompositeData");
