@@ -20,10 +20,6 @@
 #include "vtkInformationVector.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 
-#ifdef VTK_USE_PARALLEL
-#  include "vtkMultiProcessController.h"
-#endif
-
 #include <vtksys/ios/sstream>
 #include <vtkstd/string>
 #include <vtkstd/map>
@@ -65,49 +61,87 @@ class vtkAdiosReader::Internals
 public:
   Internals()
     {
-    this->File = NULL;
+    this->MeshFile = NULL;
+    this->DataFile = NULL;
     }
   // --------------------------------------------------------------------------
   virtual ~Internals()
     {
-    if(this->File) delete this->File;
+    if(this->MeshFile) delete this->MeshFile;
+    if(this->DataFile) delete this->DataFile;
     }
   // --------------------------------------------------------------------------
   void UpdateFileName(const char* currentFileName)
     {
-    if(!this->File)
+    if(!this->MeshFile)
       {
-      this->File = new AdiosFile(currentFileName);
+      this->MeshFile = new AdiosFile(currentFileName);
 
       // Make sure that file is open and metadata loaded
-      this->File->Open();
+      this->MeshFile->Open();
+      LoadMeshFileIfNeeded();
       }
     else // Check if the filename has changed
       {
-      if(strcmp( currentFileName, this->File->FileName.c_str() ) != 0)
+      if((strcmp( currentFileName, this->MeshFile->FileName.c_str()) != 0) || (this->DataFile && (strcmp( currentFileName, this->DataFile->FileName.c_str()) != 0 )) )
         {
-        delete this->File;
-        this->File = new AdiosFile(currentFileName);
+        delete this->MeshFile;
+        if(this->DataFile)
+          {
+          delete this->DataFile;
+          this->DataFile = NULL;
+          }
+
+        this->MeshFile = new AdiosFile(currentFileName);
 
         // Make sure that file is open and metadata loaded
-        this->File->Open();
+        this->MeshFile->Open();
+        LoadMeshFileIfNeeded();
         }
       }
     }
   // --------------------------------------------------------------------------
-  void FillMultiBlockDataSet(vtkMultiBlockDataSet* output)
+  void LoadMeshFileIfNeeded()
     {
-    // Pixie output
-    // block 0 <=> RectilinearGrid
-    // block 1 <=> StructuredGrid
+    if(this->MeshFile->IsPixieFileType())
+      return;
 
-    vtkDataSet* rectilinearGrid = NULL;
-    vtkDataSet* structuredGrid = NULL;
+    // We are supposed to have load a data file or maybe just the mesh
+    // - if data was loaded, then load the mesh
+    // - if mesh was loaded, then do nothing
+    if(this->MeshFile->FileName.find("xgc.mesh.bp") == vtkstd::string::npos)
+      {
+      // we have the field file
+      vtkstd::string meshFileName = "";
+      vtkstd::string::size_type i0 = this->MeshFile->FileName.rfind("xgc.");
+      vtkstd::string::size_type i1 = this->MeshFile->FileName.rfind(".bp");
 
-    int realTimeStep = (int) this->TimeStep;
+      if (i0 != vtkstd::string::npos && i1 != vtkstd::string::npos)
+        {
+        meshFileName = this->MeshFile->FileName.substr(0,i0+4) + "mesh.bp";
+        this->DataFile = this->MeshFile;
+        this->MeshFile = new AdiosFile(meshFileName.c_str());
+        this->MeshFile->Open();
+        }
+      }
+    }
+  // --------------------------------------------------------------------------
+  void FillOutput(vtkDataObject* output)
+    {
+    vtkMultiBlockDataSet* multiBlock = vtkMultiBlockDataSet::SafeDownCast(output);
+    if(this->MeshFile->IsPixieFileType())
+      {
+      // Pixie output
+      // block 0 <=> RectilinearGrid
+      // block 1 <=> StructuredGrid
+      vtkMultiBlockDataSet* pixieOutput = multiBlock;
+      vtkDataSet* rectilinearGrid = NULL;
+      vtkDataSet* structuredGrid = NULL;
 
-    AdiosVariableMapIterator iter = this->File->Variables.begin();
-    for(; iter != this->File->Variables.end(); iter++)
+      int realTimeStep = (int) this->TimeStep;
+
+      AdiosVariableMapIterator iter = this->MeshFile->Variables.begin();
+      for(; iter != this->MeshFile->Variables.end(); iter++)
       {
       const AdiosVariable *var = &iter->second;
 
@@ -130,17 +164,17 @@ public:
         continue;
 
 
-      vtkDataArray* array = this->File->ReadVariable(var->Name.c_str(), realTimeStep);
-      switch(this->File->GetDataType(var->Name.c_str())) // FIXME method is not correct !!!!!!!!!!!1
+      vtkDataArray* array = this->MeshFile->ReadVariable(var->Name.c_str(), realTimeStep);
+      switch(this->MeshFile->GetDataType(var->Name.c_str())) // FIXME method is not correct !!!!!!!!!!!1
         {
         case VTK_RECTILINEAR_GRID:
           if(!rectilinearGrid)  // Create if needed
-            rectilinearGrid = this->File->GetPixieRectilinearGrid(realTimeStep);
+            rectilinearGrid = this->MeshFile->GetPixieRectilinearGrid(realTimeStep);
           rectilinearGrid->GetCellData()->AddArray(array);
           break;
         case VTK_STRUCTURED_GRID:
           if(!structuredGrid)  // Create if needed
-            structuredGrid = this->File->GetPixieStructuredGrid(var->Name.c_str(), realTimeStep);
+            structuredGrid = this->MeshFile->GetPixieStructuredGrid(var->Name.c_str(), realTimeStep);
           structuredGrid->GetPointData()->AddArray(array);
           break;
         default:
@@ -149,37 +183,54 @@ public:
       array->Delete();
       }
 
-    if(rectilinearGrid)
+      if(rectilinearGrid)
       {
       rectilinearGrid->GetInformation()->Set( vtkDataObject::DATA_TIME_STEPS(),
                                               &this->TimeStep, 1);
-      output->SetBlock(0, rectilinearGrid);
+      pixieOutput->SetBlock(0, rectilinearGrid);
       rectilinearGrid->FastDelete();
       }
-    if(structuredGrid)
+      if(structuredGrid)
       {
       structuredGrid->GetInformation()->Set( vtkDataObject::DATA_TIME_STEPS(),
                                              &this->TimeStep, 1);
-      output->SetBlock(1, structuredGrid);
+      pixieOutput->SetBlock(1, structuredGrid);
       structuredGrid->FastDelete();
       }
-    output->GetInformation()->Set( vtkDataObject::DATA_TIME_STEPS(),
-                                   &this->TimeStep, 1);
-
-    // XGC output
-    // block 0 <=> UnstructuredGrid
-
-    //return this->File->GetPixieRectilinearGrid(realTimeStep);
+      pixieOutput->GetInformation()->Set( vtkDataObject::DATA_TIME_STEPS(),
+                                     &this->TimeStep, 1);
+      }
+    else // We suppose that only XGC file format is the other
+      {
+      // XGC output
+      // block 0 <=> UnstructuredGrid
+      vtkMultiBlockDataSet* xgcOutput = multiBlock;
+      vtkUnstructuredGrid* unstructuredGrid = this->MeshFile->GetXGCMesh();
+      if(this->DataFile) this->DataFile->AddPointDataToXGCMesh(unstructuredGrid);
+      xgcOutput->SetBlock(0, unstructuredGrid);
+      unstructuredGrid->FastDelete();
+      }
     }
   // --------------------------------------------------------------------------
   int GetNumberOfTimeSteps()
     {
-    this->File->GetNumberOfTimeSteps();
+    int nbTime = 0;
+    if(this->DataFile)
+      {
+      nbTime = this->DataFile->GetNumberOfTimeSteps();
+      if(nbTime == -1)
+        return 0;
+      }
+    nbTime = this->MeshFile->GetNumberOfTimeSteps();
+    if(nbTime == -1)
+      return 0;
     }
   // --------------------------------------------------------------------------
   double GetTimeStep(int idx)
     {
-    return this->File->GetRealTimeStep(idx);
+    if(this->GetNumberOfTimeSteps() == 0)
+      return 0;
+    return this->MeshFile->GetRealTimeStep(idx);
     }
   // --------------------------------------------------------------------------
   void SetActiveTimeStep(double value)
@@ -192,8 +243,14 @@ public:
     return this->TimeStep;
     }
   // --------------------------------------------------------------------------
+  bool IsPixieFormat()
+    {
+    return this->MeshFile->IsPixieFileType();
+    }
+  // --------------------------------------------------------------------------
 private:
-  AdiosFile* File;
+  AdiosFile* MeshFile;
+  AdiosFile* DataFile;
   double TimeStep;
 };
 //*****************************************************************************
@@ -244,11 +301,6 @@ int vtkAdiosReader::CanReadFile(const char* name)
 int vtkAdiosReader::RequestDataObject(vtkInformation *, vtkInformationVector**,
                                       vtkInformationVector* outputVector)
 {
-  if (this->GetFileName() == NULL)
-    {
-    vtkWarningMacro( << "FileName must be set");
-    return 0;
-    }
   vtkInformation *info = outputVector->GetInformationObject(0);
 
   switch(this->ReadOutputType())
@@ -292,6 +344,22 @@ int vtkAdiosReader::RequestDataObject(vtkInformation *, vtkInformationVector**,
       else
         {
         vtkRectilinearGrid* output = vtkRectilinearGrid::New();
+        this->GetExecutive()->SetOutputData(0, output);
+        output->Delete();
+        this->GetOutputPortInformation(0)->Set(vtkDataObject::DATA_EXTENT_TYPE(),
+                                               output->GetExtentType());
+        }
+      break;
+
+    case VTK_UNSTRUCTURED_GRID:
+      if (vtkUnstructuredGrid::SafeDownCast(info->Get(vtkDataObject::DATA_OBJECT())))
+        {
+        // The output is already created
+        return 1;
+        }
+      else
+        {
+        vtkUnstructuredGrid* output = vtkUnstructuredGrid::New();
         this->GetExecutive()->SetOutputData(0, output);
         output->Delete();
         this->GetOutputPortInformation(0)->Set(vtkDataObject::DATA_EXTENT_TYPE(),
@@ -356,17 +424,22 @@ int vtkAdiosReader::RequestData(vtkInformation *, vtkInformationVector** vtkNotU
     vtkInformationVector* outputVector)
 {
   vtkInformation *info = outputVector->GetInformationObject(0);
-  vtkMultiBlockDataSet *output =
-      vtkMultiBlockDataSet::SafeDownCast(info->Get(vtkDataObject::DATA_OBJECT()));
-
+  vtkDataObject* output = info->Get(vtkDataObject::DATA_OBJECT());
   this->Internal->UpdateFileName(this->GetFileName());
-  this->Internal->FillMultiBlockDataSet(output);
-
+  this->Internal->FillOutput(output);
+  //output->PrintSelf(cout, vtkIndent(10));
   return 1;
 }
 //----------------------------------------------------------------------------
 int vtkAdiosReader::ReadOutputType()
 {
-  return VTK_MULTIBLOCK_DATA_SET;
+//  if (this->GetFileName() == NULL)
+//    {
+//    vtkWarningMacro( << "FileName must be set");
+//    return 0;
+//    }
+//  this->Internal->UpdateFileName(this->GetFileName());
+//  if(this->Internal->IsPixieFormat())
+    return VTK_MULTIBLOCK_DATA_SET;
+//  return VTK_UNSTRUCTURED_GRID;
 }
-//----------------------------------------------------------------------------
