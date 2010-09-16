@@ -28,6 +28,7 @@
 #include <vtkStructuredGrid.h>
 #include <vtkUnstructuredGrid.h>
 #include <vtkDataSet.h>
+#include <vtkPointData.h>
 
 #include <vtkDataArray.h>
 #include <vtkCharArray.h>
@@ -682,20 +683,23 @@ public:
     return structuredGrid;
     }
   // --------------------------------------------------------------------------
-  vtkDataSet* GetXGCMesh(int timestep)
+  // CAUTION: the GetXGCMesh and AddPointDataToXGCMesh methods can not be called
+  // from the same instance of AdiosFile since the mesh and
+  // the data are in two different files
+  vtkUnstructuredGrid* GetXGCMesh()
     {
     // Retreive mesh for XCG format
     int nbNodes, nbTriangles;
     this->GetIntegerAttribute("/nnodes", nbNodes);
     this->GetIntegerAttribute("/cell_set[0]/nbcells", nbTriangles);
 
-    vtkPoints *points = this->ReadPoints("/coordinates/values", timestep);
+    vtkPoints *points = this->ReadPoints("/coordinates/values", 0);// 0 because there is no timestep...
     vtkUnstructuredGrid *grid = vtkUnstructuredGrid::New();
     grid->SetPoints(points);
     points->Delete();
 
     vtkDataArray *rawData = this->ReadVariable("/cell_set[0]/node_connect_list",
-                                               timestep);
+                                               0); // 0 because there is no timestep...
     if(!rawData)
       {
       cout << "Invalid cell connectivity. No data read." << endl;
@@ -711,25 +715,54 @@ public:
       return NULL;
       }
 
-    int tupleBuffer[3];
     vtkIdType cell[3];
-    grid->Allocate(cells->GetNumberOfTuples()); // FIXME do we need to multiply by 3 ???
-    for(vtkIdType idx = 0; idx < cells->GetNumberOfTuples(); idx++)
+    grid->Allocate(cells->GetNumberOfTuples());
+    for(vtkIdType idx = 0; idx < cells->GetNumberOfTuples(); idx+=3)
       {
-      cells->GetTupleValue(idx, tupleBuffer);
-      cell[0] = tupleBuffer[0];
-      cell[1] = tupleBuffer[1];
-      cell[2] = tupleBuffer[2];
+      cell[0] = cells->GetValue(idx);
+      cell[1] = cells->GetValue(idx + 1);
+      cell[2] = cells->GetValue(idx + 2);
       grid->InsertNextCell(VTK_TRIANGLE, 3, cell);
       }
+    cells->Delete();
     return grid;
+    }
+  // --------------------------------------------------------------------------
+  // CAUTION: the GetXGCMesh and AddPointDataToXGCMesh methods can not be called
+  // from the same instance of AdiosFile since the mesh and
+  // the data are in two different files
+  void AddPointDataToXGCMesh(vtkUnstructuredGrid* mesh)
+    {
+    // Attach point data to the grid
+    int nbPointData = 0;
+    if(this->GetIntegerAttribute("/nnode_data", nbPointData))
+      {
+      for (int i = 0; i < nbPointData; i++)
+        {
+        ostringstream labelKey;
+        labelKey << "/node_data[" << i << "]/labels";
+        vtkstd::string arrayName;
+        if(!this->GetStringAttribute(labelKey.str(), arrayName))
+          continue;
+
+        ostringstream varKey;
+        varKey << "/node_data[" << i << "]/values";
+        vtkDataArray* array = this->ReadVariable(varKey.str().c_str(), 0);
+        if(array)
+          {
+          array->SetName(arrayName.c_str());
+          mesh->GetPointData()->AddArray(array);
+          array->FastDelete();
+          }
+        }
+      }
     }
   // --------------------------------------------------------------------------
   bool GetIntegerAttribute(const vtkstd::string &key, int &value)
     {
     this->Open();
     AdiosDataMapIterator iter = this->Attributes.find(key);
-    if (iter == this->Attributes.end() || !iter->second.IsString())
+    if (iter == this->Attributes.end() || !iter->second.IsInt())
       return false;
     value = iter->second.AsInt();
     return true;

@@ -46,10 +46,6 @@ protected:
   vtkAdiosReader();
   ~vtkAdiosReader();
 
-//  virtual int ProcessRequest(vtkInformation* request,
-//                             vtkInformationVector** inputVector,
-//                             vtkInformationVector* outputVector);
-
   // call 1
   virtual int RequestDataObject(vtkInformation *,
                                 vtkInformationVector** vtkNotUsed(inputVector),
