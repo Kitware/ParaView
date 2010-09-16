@@ -1,0 +1,5 @@
+<ParaViewReaders>
+  <Reader name="adiosreader"
+          extensions="gp"
+          file_description="Adios files" />
+</ParaViewReaders>
