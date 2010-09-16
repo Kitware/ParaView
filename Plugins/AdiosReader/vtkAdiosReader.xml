@@ -1,0 +1,34 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="sources">
+    <SourceProxy name="adiosreader" class="vtkAdiosReader" label="ADIOS Reader">
+      <Documentation
+         short_help="Read Adios Pixie and XGC files."
+         long_help="Load the geometry and data from a bp adios file.">
+      </Documentation>
+      <StringVectorProperty
+          name="FileName"
+          animateable="0"
+          command="SetFileName"
+          number_of_elements="1">
+          <FileListDomain name="files"/>
+          <Documentation>
+            This property specifies the file name for the ADIOS reader.
+          </Documentation>
+      </StringVectorProperty>
+
+      <DoubleVectorProperty
+          name="TimestepValues"
+          repeatable="1"
+          information_only="1">
+          <TimeStepsInformationHelper/>
+          <Documentation>
+            Available timestep values.
+        </Documentation>
+       </DoubleVectorProperty>
+
+       <Hints>
+        <ReaderFactory extensions="bp" file_description="ADIOS Files"/>
+       </Hints>
+   </SourceProxy>
+  </ProxyGroup>
+</ServerManagerConfiguration>
