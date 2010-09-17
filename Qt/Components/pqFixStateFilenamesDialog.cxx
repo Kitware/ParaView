@@ -155,6 +155,8 @@ class pqFixStateFilenamesDialog::pqInternals : public Ui::FixStateFilenamesDialo
     {
     Q_ASSERT(strcmp(proxyCollectionXML->GetName(), "ProxyCollection") == 0);
 
+
+
     const char* name = proxyCollectionXML->GetAttribute("name");
     if (name == NULL)
       {
@@ -169,7 +171,7 @@ class pqFixStateFilenamesDialog::pqInternals : public Ui::FixStateFilenamesDialo
 
     //this->ProxyCollections.push_back(proxyCollectionXML);
 
-    unsigned int num_children = proxyCollectionXML->GetNumberOfNestedElements();
+    /*unsigned int num_children = proxyCollectionXML->GetNumberOfNestedElements();
     for (unsigned int cc=0; cc < num_children; cc++)
       {
       vtkPVXMLElement* child = proxyCollectionXML->GetNestedElement(cc);
@@ -183,7 +185,28 @@ class pqFixStateFilenamesDialog::pqInternals : public Ui::FixStateFilenamesDialo
         {
         continue;
         }
+      }*/
+
+    // iterate over all property xmls in the proxyXML and add those xmls which
+    // are in the filenameProperties set.
+    for (unsigned int cc=0; cc < proxyCollectionXML->GetNumberOfNestedElements(); cc++)
+      {
+      vtkPVXMLElement* itemXML = proxyCollectionXML->GetNestedElement(cc);
+      if (itemXML && itemXML->GetName() && strcmp(itemXML->GetName(),
+          "Item") == 0)
+        {
+        //QString itemName = itemXML->GetAttribute("name");
+        //QStringList filenames;
+        QStringList itemName;
+        itemName << itemXML->GetAttribute("name");
+        int itemId = QString(itemXML->GetAttribute("id")).toInt();
+        PropertyInfo info;
+        info.XMLElement = itemXML;
+        info.Values = itemName;
+        this->CollectionsMap[itemId]["sources"] = info;
+        }
       }
+
     }
 
 public:
@@ -319,6 +342,11 @@ void pqFixStateFilenamesDialog::onFileNamesChanged()
     info.Values = filenames;
     info.Modified = true;
     }
+
+  pqInternals::PropertyInfo& collectionInfo =
+    this->Internals->CollectionsMap[key1]["sources"];
+
+  //if (info.Values
 }
 
 //-----------------------------------------------------------------------------
