@@ -247,7 +247,7 @@ public:
           }
         else if (child && QString("ProxyCollection") == child->GetName())
           {
-          this->processProxyCollection(child);
+          //this->processProxyCollection(child);
           }
         }
       }
@@ -343,8 +343,8 @@ void pqFixStateFilenamesDialog::onFileNamesChanged()
     info.Modified = true;
     }
 
-  pqInternals::PropertyInfo& collectionInfo =
-    this->Internals->CollectionsMap[key1]["sources"];
+  //pqInternals::PropertyInfo& collectionInfo =
+   // this->Internals->CollectionsMap[key1]["sources"];
 
   //if (info.Values
 }
