@@ -851,9 +851,10 @@ void vtkSMRenderViewProxy::ResetCameraClippingRange()
 {
   double bds[6];
   vtkRenderer* ren = this->GetRenderer();
-
+  vtkRenderer* ren2D = this->GetRenderer2D();
   this->ComputeVisiblePropBounds(bds);
   ren->ResetCameraClippingRange(bds);
+  ren2D->ResetCameraClippingRange(bds);
   
   this->Modified();
 }
