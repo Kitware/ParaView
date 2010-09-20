@@ -89,6 +89,9 @@ public slots:
   ///Move to the next mode ( Drawing, Editing, Done )
   void updateMode( );
 
+  ///Toggle the edit mode, which will switch between Edit/Modify mode
+  void toggleEditMode( );
+
   ///Finish editing the contour
   void finishContour( );
 

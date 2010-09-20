@@ -251,7 +251,18 @@ void pqContourWidget::updateMode()
     widget->UpdateVTKObjects();
     }
 }
-
+//-----------------------------------------------------------------------------
+void pqContourWidget::toggleEditMode()
+{
+  if(this->Internals->EditMode->isChecked())
+    {
+    this->Internals->ModifyMode->setChecked(true);
+    }
+  else
+    {
+    this->Internals->EditMode->setChecked(true);
+    }
+}
 //-----------------------------------------------------------------------------
 void pqContourWidget::finishContour( )
 {
