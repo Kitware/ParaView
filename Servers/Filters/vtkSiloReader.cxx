@@ -571,12 +571,12 @@ DBfile *vtkSiloTableOfContents::OpenFile(int index)
   vtkstd::string fullName = this->TOCPath + this->Filenames[index];
   const char * fname = fullName.c_str();
   vtkDebugMacro("Opening silo file: " << fname);
-  
+
   // Open the Silo file. Impose priority order on drivers by first
   // trying PDB, then HDF5, then fall-back to UNKNOWN
   DBfile * dbfile = 0;
-  if (((dbfile = DBOpen(fname, DB_PDB, DB_READ)) == NULL) && 
-      ((dbfile = DBOpen(fname, DB_HDF5, DB_READ)) == NULL) && 
+  if (((dbfile = DBOpen(fname, DB_PDB, DB_READ)) == NULL) &&
+      ((dbfile = DBOpen(fname, DB_HDF5, DB_READ)) == NULL) &&
       ((dbfile = DBOpen(fname, DB_UNKNOWN, DB_READ)) == NULL))
     {
     vtkErrorMacro("Could not open file: " << fname);
@@ -699,7 +699,7 @@ void vtkSiloReader::SetFileName(char * filename)
     }
 
   vtkstd::string fullName(filename);
-  
+
   #ifdef _WIN32
   char slashChar[] = "\\";
   #else
@@ -1148,7 +1148,7 @@ int vtkSiloReader::CreateDataSet(vtkMultiBlockDataSet *output)
         }
 
       // early exit the loop if array is null
-      if (!varArray) 
+      if (!varArray)
         {
         vtkErrorMacro("Error creating data array from variable: " << varName);
         continue;
@@ -1462,13 +1462,13 @@ vtkDataSet * vtkSiloReader::GetQuadMesh(DBfile *dbfile, const char *mn)
     //
     if (qm->base_index[0] == 0 &&
         qm->base_index[1] == 0 &&
-        qm->base_index[2] == 0) 
+        qm->base_index[2] == 0)
     {
         void_ref_ptr vr = cache->GetVoidRef("any_mesh",
                         AUXILIARY_DATA_DOMAIN_BOUNDARY_INFORMATION, -1, -1);
         if (*vr != NULL)
         {
-            avtStructuredDomainBoundaries *dbi = 
+            avtStructuredDomainBoundaries *dbi =
                 (avtStructuredDomainBoundaries*)*vr;
             if (dbi != NULL)
             {
@@ -1476,7 +1476,7 @@ vtkDataSet * vtkSiloReader::GetQuadMesh(DBfile *dbfile, const char *mn)
                 dbi->GetExtents(domain, ext);
                 arr->SetValue(0, ext[0]);
                 arr->SetValue(1, ext[2]);
-                arr->SetValue(2, ext[4]); 
+                arr->SetValue(2, ext[4]);
             }
         }
     }
@@ -1507,7 +1507,7 @@ int vtkSiloReader::VerifyQuadmesh(DBquadmesh *qm, const char *meshname)
         //
         if (qm->nnodes != qm->dims[0]*qm->dims[1]*qm->dims[2])
         {
-            if (qm->dims[0] > 100000 || qm->dims[1] > 100000 
+            if (qm->dims[0] > 100000 || qm->dims[1] > 100000
                 || qm->dims[2] > 100000)
             {
                 int orig[3];
@@ -1526,7 +1526,7 @@ int vtkSiloReader::VerifyQuadmesh(DBquadmesh *qm, const char *meshname)
                     qm->dims[1] = qm->max_index[1];
                     qm->dims[2] = qm->max_index[2];
                 }
-                else if (qm->nnodes == (qm->max_index[0]+1) * 
+                else if (qm->nnodes == (qm->max_index[0]+1) *
                                    (qm->max_index[1]+1) * (qm->max_index[2]+1))
                 {
                     qm->dims[0] = qm->max_index[0]+1;
@@ -1637,7 +1637,7 @@ int vtkSiloReader::VerifyQuadmesh(DBquadmesh *qm, const char *meshname)
                     qm->dims[0] = qm->max_index[0];
                     qm->dims[1] = qm->max_index[1];
                 }
-                else if (qm->nnodes == (qm->max_index[0]+1) * 
+                else if (qm->nnodes == (qm->max_index[0]+1) *
                                        (qm->max_index[1]+1))
                 {
                     qm->dims[0] = qm->max_index[0]+1;
@@ -1708,13 +1708,14 @@ vtkDataSet *vtkSiloReader::CreateRectilinearMesh(DBquadmesh *qm)
 
     int   i, j;
 
-    vtkRectilinearGrid   *rgrid   = vtkRectilinearGrid::New(); 
+    vtkRectilinearGrid   *rgrid   = vtkRectilinearGrid::New();
 
     //
     // Populate the coordinates.  Put in 3D points with z=0 if the mesh is 2D.
     //
     int           dims[3];
     vtkFloatArray   *coords[3];
+    float ** floatCoords = reinterpret_cast<float **>(qm->coords);
     for (i = 0 ; i < 3 ; i++)
     {
         // Default number of components for an array is 1.
@@ -1728,7 +1729,7 @@ vtkDataSet *vtkSiloReader::CreateRectilinearMesh(DBquadmesh *qm)
             for (j = 0 ; j < dims[i] ; j++)
             {
                 //printf("      qm->coords[%d][%d] = %f\n", i,j,qm->coords[i][j]);
-                coords[i]->SetComponent(j, 0, qm->coords[i][j]);
+                coords[i]->SetComponent(j, 0, floatCoords[i][j]);
             }
         }
         else
@@ -1759,7 +1760,7 @@ static void CopyQuadCoordinates(T *dest, int nx, int ny, int nz, int morder,
 
     if (morder == DB_ROWMAJOR)
     {
-        int nxy = nx * ny; 
+        int nxy = nx * ny;
         for (k = 0; k < nz; k++)
         {
             for (j = 0; j < ny; j++)
@@ -1776,7 +1777,7 @@ static void CopyQuadCoordinates(T *dest, int nx, int ny, int nz, int morder,
     }
     else
     {
-        int nyz = ny * nz; 
+        int nyz = ny * nz;
         for (k = 0; k < nz; k++)
         {
             for (j = 0; j < ny; j++)
@@ -1802,7 +1803,7 @@ vtkDataSet *vtkSiloReader::CreateCurvilinearMesh(DBquadmesh *qm)
     //
     // Create the VTK objects and connect them up.
     //
-    vtkStructuredGrid    *sgrid   = vtkStructuredGrid::New(); 
+    vtkStructuredGrid    *sgrid   = vtkStructuredGrid::New();
     vtkPoints            *points  = vtkPoints::New();
     sgrid->SetPoints(points);
     points->Delete();
@@ -1853,7 +1854,7 @@ void vtkSiloReader::GetQuadGhostZones(DBquadmesh *qm, vtkDataSet *ds)
 
   vtkDebugMacro("GetQuadGhostZones");
     //
-    // Find the dimensions of the quad mesh. 
+    // Find the dimensions of the quad mesh.
     //
     int dims[3];
     dims[0] = (qm->dims[0] > 0 ? qm->dims[0] : 1);
@@ -1900,7 +1901,7 @@ void vtkSiloReader::GetQuadGhostZones(DBquadmesh *qm, vtkDataSet *ds)
         // Initialize as all ghost levels
         //
         for (int ii = 0; ii < qm->nnodes; ii++)
-            ghostPoints[ii] = true; 
+            ghostPoints[ii] = true;
 
         //
         // Set real values
@@ -1910,7 +1911,7 @@ void vtkSiloReader::GetQuadGhostZones(DBquadmesh *qm, vtkDataSet *ds)
                 for (int i = first[0]; i <= last[0]; i++)
                 {
                     int index = k*dims[1]*dims[0] + j*dims[0] + i;
-                    ghostPoints[index] = false; 
+                    ghostPoints[index] = false;
                 }
 
         //
@@ -1921,7 +1922,7 @@ void vtkSiloReader::GetQuadGhostZones(DBquadmesh *qm, vtkDataSet *ds)
         unsigned char realVal = 0;
         unsigned char ghostVal = 0;
 
-    //    avtGhostData::AddGhostZoneType(ghostVal, 
+    //    avtGhostData::AddGhostZoneType(ghostVal,
     //                                   DUPLICATED_ZONE_INTERNAL_TO_PROBLEM);
 
 
@@ -1930,7 +1931,7 @@ void vtkSiloReader::GetQuadGhostZones(DBquadmesh *qm, vtkDataSet *ds)
         vtkUnsignedCharArray *ghostCells = vtkUnsignedCharArray::New();
         ghostCells->SetName("avtGhostZones");
         ghostCells->Allocate(ncells);
- 
+
         for (int i = 0; i < ncells; i++)
         {
             ds->GetCellPoints(i, ptIds);
@@ -1942,8 +1943,8 @@ void vtkSiloReader::GetQuadGhostZones(DBquadmesh *qm, vtkDataSet *ds)
                 ghostCells->InsertNextValue(ghostVal);
             else
                 ghostCells->InsertNextValue(realVal);
- 
-        } 
+
+        }
         ds->GetCellData()->AddArray(ghostCells);
         delete [] ghostPoints;
         ghostCells->Delete();
@@ -2003,8 +2004,10 @@ vtkDataSet * vtkSiloReader::GetCurve(DBfile *dbfile, const char *cn)
         vtkFloatArray *farr= vtkFloatArray::New();
         farr->SetNumberOfComponents(3);
         farr->SetNumberOfTuples(cur->npts);
+        float * curX = reinterpret_cast<float *>(cur->x);
+        float * curY = reinterpret_cast<float *>(cur->y);
         for (i = 0 ; i < cur->npts; i++)
-            farr->SetTuple3(i, cur->x[i], cur->y[i], 0.0);
+            farr->SetTuple3(i, curX[i], curY[i], 0.0);
         pts->SetData(farr);
         farr->Delete();
     }
@@ -2199,10 +2202,11 @@ vtkDataArray * vtkSiloReader::GetQuadVectorVar(DBquadvar *qv)
     }
     else
     {
+        float ** qvvals = reinterpret_cast<float **>(qv->vals);
         for (int i = 0 ; i < qv->nels ; i++)
         {
-            float v3 = (qv->nvals == 3 ? qv->vals[2][i] : 0.);
-            vectors->SetTuple3(i, qv->vals[0][i], qv->vals[1][i], v3);
+            float v3 = (qv->nvals == 3 ? qvvals[2][i] : 0.);
+            vectors->SetTuple3(i, qvvals[0][i], qvvals[1][i], v3);
         }
     }
 
@@ -2245,6 +2249,7 @@ vtkDataSet * vtkSiloReader::GetPointMesh(DBfile *dbfile, const char *mn)
     vtkPoints *points  = vtkPoints::New();
     points->SetNumberOfPoints(pm->nels);
     float *pts = (float *) points->GetVoidPointer(0);
+    float ** pmcoords = reinterpret_cast<float **>(pm->coords);
     for (i = 0 ; i < 3 ; i++)
     {
         float *tmp = pts + i;
@@ -2252,7 +2257,7 @@ vtkDataSet * vtkSiloReader::GetPointMesh(DBfile *dbfile, const char *mn)
         {
             for (j = 0 ; j < pm->nels ; j++)
             {
-                *tmp = pm->coords[i][j];
+                *tmp = pmcoords[i][j];
                 tmp += 3;
             }
         }
@@ -2269,7 +2274,7 @@ vtkDataSet * vtkSiloReader::GetPointMesh(DBfile *dbfile, const char *mn)
     //
     // Create the VTK objects and connect them up.
     //
-    vtkUnstructuredGrid    *ugrid   = vtkUnstructuredGrid::New(); 
+    vtkUnstructuredGrid    *ugrid   = vtkUnstructuredGrid::New();
     ugrid->SetPoints(points);
     ugrid->Allocate(pm->nels);
     vtkIdType onevertex[1];
@@ -2300,10 +2305,11 @@ vtkDataArray * vtkSiloReader::GetPointVectorVar(DBmeshvar *mv)
   vtkFloatArray   *vectors = vtkFloatArray::New();
   vectors->SetNumberOfComponents(3);
   vectors->SetNumberOfTuples(mv->nels);
+  float ** mvvals = reinterpret_cast<float **>(mv->vals);
   for (int i = 0 ; i < mv->nels ; i++)
     {
-    float v3 = (mv->nvals == 3 ? mv->vals[2][i] : 0.);
-    vectors->SetTuple3(i, mv->vals[0][i], mv->vals[1][i], v3);
+    float v3 = (mv->nvals == 3 ? mvvals[2][i] : 0.);
+    vectors->SetTuple3(i, mvvals[0][i], mvvals[1][i], v3);
     }
   return vectors;
 }
@@ -2451,7 +2457,7 @@ vtkDataArray *vtkSiloReader::GetUcdScalarVar(DBucdvar * uv)
         avtMixedVariable *mv = new avtMixedVariable(uv->mixvals[0], uv->mixlen,
                                                     tvn);
         void_ref_ptr vr = void_ref_ptr(mv, avtMixedVariable::Destruct);
-        cache->CacheVoidRef(tvn, AUXILIARY_DATA_MIXED_VARIABLE, timestep, 
+        cache->CacheVoidRef(tvn, AUXILIARY_DATA_MIXED_VARIABLE, timestep,
                             domain, vr);
     }
 */
@@ -2478,10 +2484,11 @@ vtkDataArray * vtkSiloReader::GetUcdVectorVar(DBucdvar * uv)
     // understand
     //
     float *vals[3];
-    vals[0] = uv->vals[0];
-    vals[1] = uv->vals[1];
+    float ** uvvals = reinterpret_cast<float **>(uv->vals);
+    vals[0] = uvvals[0];
+    vals[1] = uvvals[1];
     if (uv->nvals == 3)
-       vals[2] = uv->vals[2];
+       vals[2] = uvvals[2];
     int numSkipped = 0;
 
 /*  FIXME - handled skipped zones
@@ -2573,11 +2580,13 @@ vtkDataSet *vtkSiloReader::GetUnstructuredMesh(DBfile *dbfile, const char *mn)
 
     bool dim3 = (um->coords[2] != NULL ? true : false);
     float *tmp = pts;
-    const float *coords0 = um->coords[0];
-    const float *coords1 = um->coords[1];
+
+    float ** umcoords = reinterpret_cast<float **>(um->coords);
+    const float *coords0 = umcoords[0];
+    const float *coords1 = umcoords[1];
     if (dim3)
     {
-        const float *coords2 = um->coords[2];
+        const float *coords2 = umcoords[2];
         for (int i = 0 ; i < nnodes ; i++)
         {
             *tmp++ = *coords0++;
@@ -2610,7 +2619,7 @@ vtkDataSet *vtkSiloReader::GetUnstructuredMesh(DBfile *dbfile, const char *mn)
                              sfl->nshapes, sfl->shapecnt, sfl->shapesize,
                              sfl->zoneno, sfl->origin);
         void_ref_ptr vr = void_ref_ptr(fl, avtFacelist::Destruct);
-        cache->CacheVoidRef(mesh, AUXILIARY_DATA_EXTERNAL_FACELIST, timestep, 
+        cache->CacheVoidRef(mesh, AUXILIARY_DATA_EXTERNAL_FACELIST, timestep,
                             domain, vr);
     */
       }
@@ -2635,7 +2644,7 @@ vtkDataSet *vtkSiloReader::GetUnstructuredMesh(DBfile *dbfile, const char *mn)
         // so that it can be obtained through the GetAuxiliaryData call
         //
         void_ref_ptr vr = void_ref_ptr(arr, avtVariableCache::DestructVTKObject);
-        cache->CacheVoidRef(mesh, AUXILIARY_DATA_GLOBAL_NODE_IDS, timestep, 
+        cache->CacheVoidRef(mesh, AUXILIARY_DATA_GLOBAL_NODE_IDS, timestep,
                             domain, vr);
     }
 */
@@ -2647,7 +2656,7 @@ vtkDataSet *vtkSiloReader::GetUnstructuredMesh(DBfile *dbfile, const char *mn)
     vtkDataSet *rv = NULL;
     if (um->zones != NULL)
     {
-        vtkUnstructuredGrid  *ugrid = vtkUnstructuredGrid::New(); 
+        vtkUnstructuredGrid  *ugrid = vtkUnstructuredGrid::New();
         ugrid->SetPoints(points);
         //vtkstd::vector<int> zoneRangesToSkip;
 
@@ -2686,7 +2695,7 @@ vtkDataSet *vtkSiloReader::GetUnstructuredMesh(DBfile *dbfile, const char *mn)
             // so that it can be obtained through the GetAuxiliaryData call
             //
             void_ref_ptr vr = void_ref_ptr(arr, avtVariableCache::DestructVTKObject);
-            cache->CacheVoidRef(mesh, AUXILIARY_DATA_GLOBAL_ZONE_IDS, timestep, 
+            cache->CacheVoidRef(mesh, AUXILIARY_DATA_GLOBAL_ZONE_IDS, timestep,
                                 domain, vr);
         }*/
 
@@ -2784,7 +2793,7 @@ void vtkSiloReader::ReadInConnectivity(vtkUnstructuredGrid *ugrid, DBzonelist *z
         //
         // Some users store out quads as hexahedrons -- they store quad
         // (a,b,c,d) as hex (a,b,c,d,a,b,c,d).  Unfortunately, we have
-        // to detect this and account for it.  I think it is safe to 
+        // to detect this and account for it.  I think it is safe to
         // assume that if the first hex is that way, they all are.
         // Similarly, if the first hex is not that way, none of them are.
         //
@@ -2825,8 +2834,8 @@ void vtkSiloReader::ReadInConnectivity(vtkUnstructuredGrid *ugrid, DBzonelist *z
                }
                else
                {
-                   minIndexOffset += (zl->min_index - zoneIndex); 
-                   maxIndexOffset += (zl->min_index - zoneIndex); 
+                   minIndexOffset += (zl->min_index - zoneIndex);
+                   maxIndexOffset += (zl->min_index - zoneIndex);
                }
             }
             else if (zoneIndex + shapecnt <= zl->max_index)
@@ -2835,7 +2844,7 @@ void vtkSiloReader::ReadInConnectivity(vtkUnstructuredGrid *ugrid, DBzonelist *z
             }
             else if (zoneIndex + shapecnt > zl->max_index)
             {
-               maxIndexOffset += (zl->max_index - zoneIndex + 1); 
+               maxIndexOffset += (zl->max_index - zoneIndex + 1);
             }
 
             nodelist += shapesize;
@@ -2972,7 +2981,7 @@ void vtkSiloReader::ReadInConnectivity(vtkUnstructuredGrid *ugrid, DBzonelist *z
               << " because min_index & max_index are both zero!");
     }
     else if (first < 0 || first >= numCells ||
-             last  < 0 || last  >= numCells)  
+             last  < 0 || last  >= numCells)
     {
        // bad min or max index
        vtkDebugMacro( << "Invalid min/max index for determining ghost zones:  "
@@ -2986,7 +2995,7 @@ void vtkSiloReader::ReadInConnectivity(vtkUnstructuredGrid *ugrid, DBzonelist *z
         // We now know that ghost zones are present.
         //
         vtkDebugMacro( << "Creating ghost zones, real zones are indexed"
-               << " from " << first << " to " << last 
+               << " from " << first << " to " << last
                << " of " << numCells << " Cells.");
 
         //
@@ -3003,7 +3012,7 @@ void vtkSiloReader::ReadInConnectivity(vtkUnstructuredGrid *ugrid, DBzonelist *z
             //  ghostZones at the begining of the zone list
             //
             unsigned char val = 0;
-           // avtGhostData::AddGhostZoneType(val, 
+           // avtGhostData::AddGhostZoneType(val,
            //                               DUPLICATED_ZONE_INTERNAL_TO_PROBLEM);
             *tmp++ = val;
         }
@@ -3020,7 +3029,7 @@ void vtkSiloReader::ReadInConnectivity(vtkUnstructuredGrid *ugrid, DBzonelist *z
             //  ghostZones at the end of the zone list
             //
             unsigned char val = 0;
-           // avtGhostData::AddGhostZoneType(val, 
+           // avtGhostData::AddGhostZoneType(val,
            //                               DUPLICATED_ZONE_INTERNAL_TO_PROBLEM);
             *tmp++ = val;
         }
@@ -3125,9 +3134,9 @@ void TranslateSiloWedgeToVTKWedge(const int *siloWedge, vtkIdType vtkWedge[6])
 void TranslateSiloPyramidToVTKPyramid(const int *siloPyramid, vtkIdType vtkPyramid[5])
 {
     //
-    // The Silo pyramid stores the four base nodes as 0, 1, 2, 3 in 
-    // opposite order from the VTK wedge. When getting the exact translation, 
-    // it is useful to look at the face lists and edge lists in 
+    // The Silo pyramid stores the four base nodes as 0, 1, 2, 3 in
+    // opposite order from the VTK wedge. When getting the exact translation,
+    // it is useful to look at the face lists and edge lists in
     // vtkPyramid.cxx.
     //
     vtkPyramid[0] = siloPyramid[0];
@@ -3165,7 +3174,7 @@ void TranslateSiloTetrahedronToVTKTetrahedron(const int *siloTetrahedron,
 //----------------------------------------------------------------------------
 
 // ****************************************************************************
-//  Function: TetsAreInverted 
+//  Function: TetsAreInverted
 //
 //  Purpose: Determine if Tets in Silo are inverted from Silo's Normal ordering
 // ****************************************************************************
@@ -3174,7 +3183,7 @@ bool TetsAreInverted(const int *siloTetrahedron, vtkUnstructuredGrid *ugrid)
     //
     // initialize set of 4 points of tet
     //
-    float *pts = (float *) ugrid->GetPoints()->GetVoidPointer(0); 
+    float *pts = (float *) ugrid->GetPoints()->GetVoidPointer(0);
     float p[4][3];
     for (int i = 0; i < 4; i++)
     {
@@ -3190,7 +3199,7 @@ bool TetsAreInverted(const int *siloTetrahedron, vtkUnstructuredGrid *ugrid)
     float n1Xn2[3] = {  n1[1]*n2[2] - n1[2]*n2[1],
                       -(n1[0]*n2[2] - n1[2]*n2[0]),
                         n1[0]*n2[1] - n1[1]*n2[0]};
-    
+
     //
     // Compute a dot-product of normal with a vector to the 4th point.
     // If the tet is specified as Silo normally expects it, this dot
@@ -3484,7 +3493,7 @@ void vtkSiloReader::ReadDir(DBfile *dbfile, const char *dirname)
     }
 
   //
-  // Curves 
+  // Curves
   //
   for (i = 0 ; i < ncurves; i++)
     {
@@ -3828,7 +3837,7 @@ void vtkSiloReader::ReadDir(DBfile *dbfile, const char *dirname)
             meshnum++;
             if (meshnum >= ms->nspec)
             {
-                debug1 << "Invalidating species \"" << multimatspecies_names[i] 
+                debug1 << "Invalidating species \"" << multimatspecies_names[i]
                        << "\" since all its blocks are EMPTY." << endl;
                 valid_var = false;
                 break;
@@ -3923,7 +3932,7 @@ void vtkSiloReader::ReadDir(DBfile *dbfile, const char *dirname)
     }
 */
 
-  // Delete copied TOC 
+  // Delete copied TOC
 
   // Meshes
   for (i = 0 ; i < nmultimesh ; i++)
@@ -4167,7 +4176,7 @@ vtkstd::string vtkSiloReader::DetermineMultiMeshForSubVariable(DBfile *dbfile,
     }
 
   // We weren't able to find a match.
-  vtkDebugMacro( "Was not able to match multivar \"" << name << "\" and its first" 
+  vtkDebugMacro( "Was not able to match multivar \"" << name << "\" and its first"
                  "non-empty submesh \"" << varname[meshnum] << "\" in file "
                  << subMeshWithFile << " to a multi-mesh.");
   return "";
@@ -4415,7 +4424,7 @@ char * GenerateName(const char *dirname, const char *varname)
         // first one), then take out the slash -- since the var would be
         // referred to as "Mesh", not "/Mesh".
         //
-        int offset = (num_slash > 1 ? 0 : 1); 
+        int offset = (num_slash > 1 ? 0 : 1);
         char *rv = new char[strlen(varname)+1];
         strcpy(rv, varname+offset);
         return rv;
