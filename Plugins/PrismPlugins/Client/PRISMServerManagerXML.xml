@@ -639,6 +639,24 @@
      </IntVectorProperty>
 
      <DoubleVectorProperty
+        name="SESAMEVariableConversionValues"
+        command="SetSESAMEVariableConversionValues"
+        set_number_command="SetNumberOfSESAMEVariableConversionValues"
+        number_of_elements="0"
+        repeat_command="1"
+        number_of_elements_per_command="1"
+        use_index="1">
+     </DoubleVectorProperty>
+     <StringVectorProperty
+        name="SESAMEVariableConversionNames"
+        command="AddSESAMEVariableConversionNames"
+        clean_command="RemoveAllSESAMEVariableConversionNames"
+        number_of_elements="0"
+        repeat_command="1"
+        number_of_elements_per_command="1">
+     </StringVectorProperty>
+
+     <DoubleVectorProperty
         name="SESAMEContourValues"
         command="SetSESAMEContourValue"
         label="Isosurfaces"
@@ -694,12 +712,6 @@
        </PrismDoubleRangeDomain>
      </DoubleVectorProperty>
 
-     <DoubleVectorProperty
-        name="SESAMEConversions"
-        command="SetSESAMEConversions"
-        number_of_elements="4"
-        default_values="1.0 1.0 1.0 1.0">
-     </DoubleVectorProperty>
 
      <DoubleVectorProperty
         name="ThresholdSESAMEYBetweenInfo"
@@ -934,6 +946,7 @@
        </DoubleRangeDomain>
      </DoubleVectorProperty>
 
+
      <DoubleVectorProperty
         name="ContourVarRange"
         command="GetContourVarRange"
@@ -955,12 +968,25 @@
         <DoubleArrayInformationHelper/>
      </DoubleVectorProperty>
 
+
      <DoubleVectorProperty
-        name="Conversions"
-        command="SetConversions"
-        number_of_elements="4"
-        default_values="1.0 1.0 1.0 1.0">
+        name="VariableConversionValues"
+        command="SetVariableConversionValues"
+        set_number_command="SetNumberOfVariableConversionValues"
+        number_of_elements="0"
+        repeat_command="1"
+        number_of_elements_per_command="1"
+        use_index="1">
      </DoubleVectorProperty>
+
+     <StringVectorProperty
+        name="VariableConversionNames"
+        command="AddVariableConversionNames"
+        clean_command="RemoveAllVariableConversionNames"
+        number_of_elements="0"
+        repeat_command="1"
+        number_of_elements_per_command="1">
+     </StringVectorProperty>
 
      <DoubleVectorProperty
         name="ThresholdXBetweenInfo"
@@ -1139,6 +1165,24 @@
                         default_values="0">
        <BooleanDomain name="bool"/>
      </IntVectorProperty>
+     <DoubleVectorProperty
+        name="SESAMEVariableConversionValues"
+        command="SetSESAMEVariableConversionValues"
+        set_number_command="SetNumberOfSESAMEVariableConversionValues"
+        number_of_elements="0"
+        repeat_command="1"
+        number_of_elements_per_command="1"
+        use_index="1">
+     </DoubleVectorProperty>
+
+     <StringVectorProperty
+        name="SESAMEVariableConversionNames"
+        command="AddSESAMEVariableConversionNames"
+        clean_command="RemoveAllSESAMEVariableConversionNames"
+        number_of_elements="0"
+        repeat_command="1"
+        number_of_elements_per_command="1">
+     </StringVectorProperty>
 
      <DoubleVectorProperty
         name="SESAMEContourValues"
@@ -1175,13 +1219,6 @@
         command="GetSESAMEYRange"
         information_only="1">
         <DoubleArrayInformationHelper/>
-     </DoubleVectorProperty>
-
-     <DoubleVectorProperty
-        name="SESAMEConversions"
-        command="SetSESAMEConversions"
-        number_of_elements="4"
-        default_values="1.0 1.0 1.0 1.0">
      </DoubleVectorProperty>
 
      <DoubleVectorProperty
@@ -1309,11 +1346,22 @@
      </StringVectorProperty>
 
      <DoubleVectorProperty
-        name="Conversions"
-        command="SetConversions"
-        number_of_elements="4"
-        default_values="1.0 1.0 1.0 1.0">
+        name="VariableConversionValues"
+        command="SetVariableConversionValues"
+        set_number_command="SetNumberOfVariableConversionValues"
+        number_of_elements="0"
+        repeat_command="1"
+        number_of_elements_per_command="1"
+        use_index="1">
      </DoubleVectorProperty>
+     <StringVectorProperty
+        name="VariableConversionNames"
+        command="AddVariableConversionNames"
+        clean_command="RemoveAllVariableConversionNames"
+        number_of_elements="0"
+        repeat_command="1"
+        number_of_elements_per_command="1">
+     </StringVectorProperty>
 
      <DoubleVectorProperty
         name="ThresholdXBetweenInfo"

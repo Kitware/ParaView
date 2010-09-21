@@ -34,8 +34,161 @@
 #include "vtkSMSelectionHelper.h"
 #include "vtkSelection.h"
 #include "vtkSelectionNode.h"
+
+#include <QHeaderView.h>
+#include <QLayout>
+#include "pqTreeWidget.h"
+#include <QComboBox>
 //-----------------------------------------------------------------------------
 static PrismCore* Instance = 0;
+
+
+//-----------------------------------------------------------------------------
+PrismTableWidget::PrismTableWidget(QWidget* p)
+  : QTableWidget(p)
+{
+  QObject::connect(this->model(), SIGNAL(rowsInserted(QModelIndex, int, int)),
+                   this, SLOT(invalidateLayout()));
+  QObject::connect(this->model(), SIGNAL(rowsRemoved(QModelIndex, int, int)),
+                   this, SLOT(invalidateLayout()));
+  QObject::connect(this->model(), SIGNAL(modelReset()),
+                   this, SLOT(invalidateLayout()));
+
+}
+
+//-----------------------------------------------------------------------------
+PrismTableWidget::~PrismTableWidget()
+{
+}
+
+
+
+//-----------------------------------------------------------------------------
+QSize PrismTableWidget::sizeHint() const
+{
+  // lets show X items before we get a scrollbar
+  // probably want to make this a member variable
+  // that a caller has access to
+  int maxItemHint = 10;
+  // for no items, let's give a space of X pixels
+  int minItemHeight = 20;
+
+  int num = this->rowCount() + 1; /* extra room for scroll bar */
+  num = qMin(num, maxItemHint);
+
+  int pix = minItemHeight;
+
+  if (num)
+    {
+    pix = qMax(pix, this->sizeHintForRow(0) * num);
+    }
+
+  int margin[4];
+  this->getContentsMargins(margin, margin+1, margin+2, margin+3);
+  int h = pix + margin[1] + margin[3] + this->horizontalHeader()->frameSize().height();
+  return QSize(156, h);
+}
+
+//-----------------------------------------------------------------------------
+QSize PrismTableWidget::minimumSizeHint() const
+{
+  return this->sizeHint();
+}
+
+//-----------------------------------------------------------------------------
+void PrismTableWidget::invalidateLayout()
+{
+  // sizeHint is dynamic, so we need to invalidate parent layouts
+  // when items are added or removed
+  for(QWidget* w = this->parentWidget();
+      w && w->layout();
+      w = w->parentWidget())
+    {
+    w->layout()->invalidate();
+    }
+  // invalidate() is not enough, we need to reset the cache of the
+  // QWidgetItemV2, so sizeHint() could be recomputed
+  this->updateGeometry();
+}
+
+
+SESAMEComboBoxDelegate::SESAMEComboBoxDelegate(QObject *parent): QItemDelegate(parent)
+{
+
+this->SPanel=NULL;
+this->PPanel=NULL;
+}
+void SESAMEComboBoxDelegate::setPanel(PrismSurfacePanel* panel)
+{
+this->SPanel=panel;
+this->PPanel=NULL;
+}
+void SESAMEComboBoxDelegate::setPanel(PrismPanel* panel)
+{
+this->PPanel=panel;
+this->SPanel=NULL;
+}
+ void SESAMEComboBoxDelegate::setVariableList(QStringList &variables)
+{
+  this->Variables=variables;
+}
+
+QWidget *SESAMEComboBoxDelegate::createEditor(QWidget *parent,
+     const QStyleOptionViewItem &/* option */,
+     const QModelIndex &/* index */) const
+ {
+   QComboBox *editor = new QComboBox(parent);
+   editor->addItems(this->Variables);
+
+
+   if(this->SPanel)
+   {
+    QObject::connect(editor, SIGNAL(currentIndexChanged(int)),
+        this->SPanel, SLOT(onConversionVariableChanged(int)));
+   }
+   else if(this->PPanel)
+   {
+    QObject::connect(editor, SIGNAL(currentIndexChanged(int)),
+        this->PPanel, SLOT(onConversionVariableChanged(int)));
+
+   }
+
+
+   return editor;
+ }
+
+ void SESAMEComboBoxDelegate::setEditorData(QWidget *editor,
+                                     const QModelIndex &index) const
+ {
+   QString value = index.model()->data(index, Qt::DisplayRole).toString();
+
+   QComboBox *comboBox = static_cast<QComboBox*>(editor);
+   comboBox->blockSignals(true);
+   int cbIndex=comboBox->findText(value);
+   comboBox->setCurrentIndex(cbIndex);
+   comboBox->blockSignals(false);
+ }
+
+ void SESAMEComboBoxDelegate::setModelData(QWidget *editor, QAbstractItemModel *model,
+   const QModelIndex &index) const
+ {
+
+   QComboBox *comboBox = static_cast<QComboBox*>(editor);
+   QString value=comboBox->currentText();
+   model->setData(index, value, Qt::EditRole);
+
+
+ }
+
+void SESAMEComboBoxDelegate::updateEditorGeometry(QWidget *editor,
+     const QStyleOptionViewItem &option, const QModelIndex &/* index */) const
+ {
+     editor->setGeometry(option.rect);
+ }
+
+
+
+
 PrismCore::PrismCore(QObject* p)
 :QObject(p)
     {

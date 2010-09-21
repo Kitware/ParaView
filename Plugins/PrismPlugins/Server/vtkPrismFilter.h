@@ -87,12 +87,12 @@ public:
   void SetYAxisVarName( const char *name );
   void SetZAxisVarName( const char *name );
   const char *GetXAxisVarName();
-  const char *GetYAxisVarName(); 
-  const char *GetZAxisVarName(); 
+  const char *GetYAxisVarName();
+  const char *GetZAxisVarName();
 
 
  vtkDoubleArray* GetRanges();
- 
+
 
 
   void SetSESAMEXAxisVarName( const char *name );
@@ -112,12 +112,13 @@ public:
   void SetSimulationDataThreshold(bool);
   bool GetSimulationDataThreshold();
 
-  void SetSESAMEConversions(double,double,double, double);
-  virtual double *GetSESAMEConversions();
-  virtual void GetSESAMEConversions (double &_arg1, double &_arg2,double &_arg3,double &_arg4);
-  virtual void GetSESAMEConversions (double _arg[4]);
+  void SetSESAMEVariableConversionValues(int i, double value);
+  void SetNumberOfSESAMEVariableConversionValues(int);
+  double GetSESAMEVariableConversionValue(int i);
 
-
+  void AddSESAMEVariableConversionNames(char*  value);
+  void RemoveAllSESAMEVariableConversionNames();
+  const char * GetSESAMEVariableConversionName(int i);
 
   vtkDoubleArray* GetSESAMEXRange();
   vtkDoubleArray* GetSESAMEYRange();

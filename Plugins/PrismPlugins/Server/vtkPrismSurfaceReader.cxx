@@ -49,7 +49,21 @@ public:
   // Construct with initial extent (0,100, 0,100, 0,0) (i.e., a k-plane).
   static vtkSESAMEConversionFilter *New();
   void SetConversions(double density,double temperature,double pressure,double energy);
-  vtkGetVector4Macro(Conversions,double);
+
+
+  void SetVariableConversionValues(int i, double value);
+  void SetNumberOfVariableConversionValues(int);
+  double GetVariableConversionValue(int i);
+
+  void AddVariableConversionNames( char*  value);
+  void RemoveAllVariableConversionNames();
+  const char * GetVariableConversionName(int i);
+
+
+
+
+
+
 
 protected:
   vtkSESAMEConversionFilter();
@@ -58,7 +72,10 @@ protected:
   virtual int RequestData(vtkInformation *, vtkInformationVector **, vtkInformationVector *);
  // virtual int FillInputPortInformation(int port, vtkInformation *info);
 
-  double Conversions[4];
+
+
+  vtkSmartPointer<vtkStringArray> VariableConversionNames;
+  vtkSmartPointer<vtkDoubleArray> VariableConversionValues;
 
 private:
   vtkSESAMEConversionFilter(const vtkSESAMEConversionFilter&);  // Not implemented.
@@ -72,23 +89,47 @@ vtkStandardNewMacro(vtkSESAMEConversionFilter);
 vtkSESAMEConversionFilter::vtkSESAMEConversionFilter()
 {
 
-    this->Conversions[0]=1.0;
-    this->Conversions[1]=1.0;
-    this->Conversions[2]=1.0;
-    this->Conversions[3]=1.0;
+
+
+  this->VariableConversionNames = vtkSmartPointer<vtkStringArray>::New();
+  this->VariableConversionValues = vtkSmartPointer<vtkDoubleArray>::New();
+
+
+
 
     this->SetNumberOfInputPorts(1);
     this->SetNumberOfOutputPorts(1);
 }
 
-void vtkSESAMEConversionFilter::SetConversions(double dc,double tc,double pc, double ec)
+void vtkSESAMEConversionFilter::SetVariableConversionValues(int i, double value)
 {
-    this->Conversions[0]=dc;
-    this->Conversions[1]=tc;
-    this->Conversions[2]=pc;
-    this->Conversions[3]=ec;
+  this->VariableConversionValues->SetValue(i,value);
+  this->Modified();
+}
+void vtkSESAMEConversionFilter::SetNumberOfVariableConversionValues(int v)
+{
+  this->VariableConversionValues->SetNumberOfValues(v);
+}
+double vtkSESAMEConversionFilter::GetVariableConversionValue(int i)
+{
+  return this->VariableConversionValues->GetValue(i);
+}
+
+void vtkSESAMEConversionFilter::AddVariableConversionNames(char*  value)
+{
+  this->VariableConversionNames->InsertNextValue(value);
     this->Modified();
 }
+void vtkSESAMEConversionFilter::RemoveAllVariableConversionNames()
+{
+  this->VariableConversionNames->Reset();
+    this->Modified();
+}
+const char * vtkSESAMEConversionFilter::GetVariableConversionName(int i)
+{
+  return this->VariableConversionNames->GetValue(i).c_str();
+}
+
 
 
 //----------------------------------------------------------------------------
@@ -141,27 +182,22 @@ int vtkSESAMEConversionFilter::RequestData(
    vtkIdType numArrays=localOutput->GetPointData()->GetNumberOfArrays();
     vtkSmartPointer<vtkFloatArray> convertArray;
 
-     for(int i=0;i<numArrays;i++)
+    double conversion;
+    for(int i=0;i<numArrays;i++)
     {
-        convertArray= vtkFloatArray::SafeDownCast(localOutput->GetPointData()->GetArray(i)); 
-
-        vtkStdString name=convertArray->GetName();
-        vtkstd::transform(name.begin(),name.end(),name.begin(),tolower);
-        vtkStdString::size_type pos=name.find("pressure");
-        double valueConversion=1.0;
-        if(pos!=vtkStdString::npos)
-        {
-            valueConversion=this->Conversions[2];//For Pressure
-        }
-        else
-        {
-            valueConversion=this->Conversions[3];//For Energy
-        }
-
-        for(ptId=0;ptId<numPts;ptId++)
-        {
-            convertArray->SetValue(ptId,convertArray->GetValue(ptId)*valueConversion);
-        }
+      convertArray= vtkFloatArray::SafeDownCast(localOutput->GetPointData()->GetArray(i));
+      if(i<this->VariableConversionValues->GetNumberOfTuples())
+      {
+        conversion = this->VariableConversionValues->GetValue(i+2);
+      }
+      else
+      {
+        conversion=1.0;
+      }
+          for(ptId=0;ptId<numPts;ptId++)
+          {
+            convertArray->SetValue(ptId,convertArray->GetValue(ptId)*conversion);
+          }
      }
 
 
@@ -203,13 +239,21 @@ int vtkSESAMEConversionFilter::RequestData(
     localOutput->SetPoints(newPts);
 
 
+    double conversionValues[2];
+    conversionValues[0]=1.0;
+    conversionValues[0]=1.0;
+    if(this->VariableConversionValues->GetNumberOfTuples()>=2)
+    {
+      conversionValues[0]=this->VariableConversionValues->GetValue(0);
+      conversionValues[1]=this->VariableConversionValues->GetValue(1);
+    }
     for(ptId=0;ptId<numPts;ptId++)
-        {
-        double coords[3];
-        inPts->GetPoint(ptId,coords);
-        xArray->InsertValue(ptId,coords[0]*this->Conversions[0]);
-        yArray->InsertValue(ptId,coords[1]*this->Conversions[1]);
-        }
+    {
+      double coords[3];
+      inPts->GetPoint(ptId,coords);
+      xArray->InsertValue(ptId,coords[0]*conversionValues[0]);
+      yArray->InsertValue(ptId,coords[1]*conversionValues[1]);
+    }
 
     localOutput->GetPointData()->AddArray(xArray);
     localOutput->GetPointData()->AddArray(yArray);
@@ -467,6 +511,38 @@ void vtkPrismSurfaceReader::GetContourValues(double *contourValues)
 }
 
 
+void vtkPrismSurfaceReader::SetVariableConversionValues(int i, double value)
+{
+  this->Internal->ConversionFilter->SetVariableConversionValues(i,value);
+    this->Modified();
+}
+void vtkPrismSurfaceReader::SetNumberOfVariableConversionValues(int v)
+{
+  this->Internal->ConversionFilter->SetNumberOfVariableConversionValues(v);
+}
+double vtkPrismSurfaceReader::GetVariableConversionValue(int i)
+{
+  return this->Internal->ConversionFilter->GetVariableConversionValue(i);
+}
+
+void vtkPrismSurfaceReader::AddVariableConversionNames(char*  value)
+{
+  this->Internal->ConversionFilter->AddVariableConversionNames(value);
+    this->Modified();
+}
+void vtkPrismSurfaceReader::RemoveAllVariableConversionNames()
+{
+  this->Internal->ConversionFilter->RemoveAllVariableConversionNames();
+    this->Modified();
+}
+const char * vtkPrismSurfaceReader::GetVariableConversionName(int i)
+{
+  return this->Internal->ConversionFilter->GetVariableConversionName(i);
+}
+
+
+
+
 void vtkPrismSurfaceReader::SetXLogScaling(bool b)
     {
     this->Internal->ArrayLogScaling[0]=b;
@@ -495,6 +571,8 @@ bool vtkPrismSurfaceReader::GetZLogScaling()
     {
     return   this->Internal->ArrayLogScaling[2];
     }
+
+/*
 void vtkPrismSurfaceReader::SetConversions(double dc,double tc,double pc, double ec)
 {
    this->Internal->ConversionFilter->SetConversions(dc,tc,pc,ec);
@@ -514,6 +592,7 @@ void vtkPrismSurfaceReader::GetConversions (double _arg[4])
 {
     this->Internal->ConversionFilter->GetConversions(_arg);
 }
+*/
 bool vtkPrismSurfaceReader::GetVariableRange (const char *varName,vtkDoubleArray* rangeArray)
     {
     rangeArray->Initialize();

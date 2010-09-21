@@ -34,7 +34,7 @@ public slots:
   /// reset changes made by this panel
   virtual void accept();
   virtual void reset();
-
+  void onConversionVariableChanged(int);
 protected:
   /// populate widgets with properties from the server manager
   virtual void linkServerManagerProperties();
@@ -87,10 +87,13 @@ protected slots:
 
   void onConversionFileButton();
   void onConversionTypeChanged(int);
-  void onDensityConversionChanged(const QString & text);
-  void onTemperatureConversionChanged(const QString & text);
-  void onPressureConversionChanged(const QString & text);
-  void onEnergyConversionChanged(const QString & text);
+  //void onDensityConversionChanged(const QString & text);
+  //void onTemperatureConversionChanged(const QString & text);
+  //void onPressureConversionChanged(const QString & text);
+  //void onEnergyConversionChanged(const QString & text);
+  void onConversionTreeCellChanged( int , int  );
+ void updateVariableConversions();
+
 
 private:
       bool eventFilter(QObject *object, QEvent *e);

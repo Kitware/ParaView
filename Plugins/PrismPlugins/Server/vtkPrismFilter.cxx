@@ -704,25 +704,33 @@ bool vtkPrismFilter::GetSESAMEZLogScaling()
     return this->Internal->Reader->GetZLogScaling();
 }
 
-
-void vtkPrismFilter::SetSESAMEConversions(double d,double t,double p,double e)
+void vtkPrismFilter::SetSESAMEVariableConversionValues(int i, double value)
 {
-    this->Internal->Reader->SetConversions(d,t,p,e);
+  this->Internal->Reader->SetVariableConversionValues(i,value);
+    this->Modified();
+}
+void vtkPrismFilter::SetNumberOfSESAMEVariableConversionValues(int v)
+{
+  this->Internal->Reader->SetNumberOfVariableConversionValues(v);
+}
+double vtkPrismFilter::GetSESAMEVariableConversionValue(int i)
+{
+  return this->Internal->Reader->GetVariableConversionValue(i);
 }
 
-double* vtkPrismFilter::GetSESAMEConversions()
+void vtkPrismFilter::AddSESAMEVariableConversionNames(char*  value)
 {
-    return this->Internal->Reader->GetConversions();
+  this->Internal->Reader->AddVariableConversionNames(value);
+    this->Modified();
 }
-
-void vtkPrismFilter::GetSESAMEConversions (double &_arg1, double &_arg2,double &_arg3,double &_arg4)
+void vtkPrismFilter::RemoveAllSESAMEVariableConversionNames()
 {
-    return this->Internal->Reader->GetConversions(_arg1,_arg2,_arg3,_arg4);
+  this->Internal->Reader->RemoveAllVariableConversionNames();
+    this->Modified();
 }
-
-void vtkPrismFilter::GetSESAMEConversions (double _arg[4])
+const char * vtkPrismFilter::GetSESAMEVariableConversionName(int i)
 {
-    this->Internal->Reader->GetConversions(_arg);
+  return this->Internal->Reader->GetVariableConversionName(i);
 }
 
 vtkDoubleArray* vtkPrismFilter:: GetSESAMEXRange()

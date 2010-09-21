@@ -9,6 +9,8 @@
 
 #include <QWidget>
 #include <QVariant>
+#include <QItemDelegate>
+#include <QTableWidget>
 #include "pqPipelineRepresentation.h"
 #include "vtkSMProxy.h"
 #include "pqNamedObjectPanel.h"
@@ -34,7 +36,7 @@ public slots:
   /// reset changes made by this panel
   virtual void accept();
   virtual void reset();
-
+  void onConversionVariableChanged(int);
 protected:
   /// populate widgets with properties from the server manager
   virtual void linkServerManagerProperties();
@@ -49,6 +51,7 @@ protected:
   void setupConversions();
   void updateConversionsLabels();
  void updateConversions();
+ void updateVariableConversions();
   void updateYThresholds();
   void setupYThresholds();
 
@@ -83,10 +86,11 @@ protected slots:
   void onScientificNotation(bool);
   void onConversionFileButton();
   void onConversionTypeChanged(int);
-  void onDensityConversionChanged(const QString & text);
-  void onTemperatureConversionChanged(const QString & text);
-  void onPressureConversionChanged(const QString & text);
-  void onEnergyConversionChanged(const QString & text);
+  void onConversionTreeCellChanged( int , int  );
+  //void onDensityConversionChanged(const QString & text);
+  //void onTemperatureConversionChanged(const QString & text);
+  //void onPressureConversionChanged(const QString & text);
+  //void onEnergyConversionChanged(const QString & text);
 
 private:
       bool eventFilter(QObject *object, QEvent *e);
