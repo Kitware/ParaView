@@ -29,12 +29,16 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
+#include <vtkPython.h> // Python first
 #include "pqPythonManager.h"
 #include "pqApplicationCore.h"
 #include "pqCoreUtilities.h"
 #include "pqPythonDialog.h"
 #include "pqPythonMacroSupervisor.h"
 #include "pqPythonToolsWidget.h"
+#include "pqPythonShell.h"
+#include "pqPythonScriptEditor.h"
+#include "pqSettings.h"
 
 // These includes are so that we can listen for server creation/removal
 // and reset the python interpreter when it happens.
@@ -48,6 +52,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QLayout>
 #include <QSplitter>
 
+#include <QFileDialog>
+#include <QFile>
+#include <QDir>
+#include <QTextStream>
+
 //-----------------------------------------------------------------------------
 class pqPythonManager::pqInternal
 {
@@ -56,6 +65,8 @@ public:
   QPointer<pqPythonToolsWidget>       ToolsWidget;
   QPointer<pqPythonMacroSupervisor>   MacroSupervisor;
   QPointer<pqServer>                  ActiveServer;
+  bool                                IsPythonTracing;
+  pqPythonScriptEditor*               Editor;
 };
 
 //-----------------------------------------------------------------------------
@@ -81,6 +92,10 @@ pqPythonManager::pqPythonManager(QObject* parent/*=null*/) :
   this->connect(core->getObjectBuilder(), 
     SIGNAL(finishedAddingServer(pqServer*)),
     this, SLOT(onServerCreationFinished(pqServer*)));
+
+  // Init Python tracing ivar
+  this->Internal->IsPythonTracing = false;
+  this->Internal->Editor          = NULL;
 }
 
 //-----------------------------------------------------------------------------
@@ -92,6 +107,10 @@ pqPythonManager::~pqPythonManager()
   if (this->Internal->PythonDialog && !this->Internal->PythonDialog->parent())
     {
     delete this->Internal->PythonDialog;
+    }
+  if(this->Internal->Editor)
+    {
+    delete this->Internal->Editor;
     }
   delete this->Internal;
 }
@@ -247,5 +266,182 @@ void pqPythonManager::onServerCreationFinished(pqServer* server)
   if (this->interpreterIsInitialized())
     {
     this->initializeParaviewPythonModules();
+    }
+}
+//-----------------------------------------------------------------------------
+bool pqPythonManager::canStartTrace()
+{
+  return !this->Internal->IsPythonTracing;
+}
+//-----------------------------------------------------------------------------
+bool pqPythonManager::canStopTrace()
+{
+  return this->Internal->IsPythonTracing;
+}
+//-----------------------------------------------------------------------------
+void pqPythonManager::startTrace()
+{
+  pqPythonShell* shell = this->pythonShellDialog()->shell();
+
+  if(shell)
+    {
+    QString script = "from paraview import smtrace\nsmtrace.start_trace()\nprint 'Trace started.'\n";
+    shell->executeScript(script);
+
+    // Update internal state
+    this->Internal->IsPythonTracing = true;
+
+    // Emit signals
+    emit startTraceDone();
+    emit canStartTrace(canStartTrace());
+    emit canStopTrace(canStopTrace());
+    }
+}
+//-----------------------------------------------------------------------------
+void pqPythonManager::stopTrace()
+{
+  pqPythonShell* shell = this->pythonShellDialog()->shell();
+
+  if(shell)
+    {
+    QString script = "from paraview import smtrace\nsmtrace.stop_trace()\nprint 'Trace stopped.'\n";
+    shell->executeScript(script);
+
+    // Update internal state
+    this->Internal->IsPythonTracing = false;
+
+    // Emit signals
+    emit stopTraceDone();
+    emit canStartTrace(canStartTrace());
+    emit canStopTrace(canStopTrace());
+    }
+}
+//----------------------------------------------------------------------------
+QString pqPythonManager::getTraceString()
+{
+  QString traceString;
+  pqPythonDialog* pyDiag = this->pythonShellDialog();
+  if (pyDiag)
+    {
+    pyDiag->runString("from paraview import smtrace\n"
+                      "__smtraceString = smtrace.get_trace_string()\n");
+    pyDiag->shell()->makeCurrent();
+    PyObject* main_module = PyImport_AddModule((char*)"__main__");
+    PyObject* global_dict = PyModule_GetDict(main_module);
+    PyObject* string_object = PyDict_GetItemString(
+      global_dict, "__smtraceString");
+    char* string_ptr = string_object ? PyString_AsString(string_object) : 0;
+    if (string_ptr)
+      {
+      traceString = string_ptr;
+      }
+    pyDiag->shell()->releaseControl();
+    }
+  return traceString;
+}
+//-----------------------------------------------------------------------------
+void pqPythonManager::editTrace()
+{
+  // Create the editor if needed and only the first time
+  if(!this->Internal->Editor)
+    {
+    this->Internal->Editor = new pqPythonScriptEditor(pqCoreUtilities::mainWidget());
+    }
+
+  QString traceString = this->getTraceString();
+  this->Internal->Editor->show();
+  this->Internal->Editor->raise();
+  this->Internal->Editor->activateWindow();
+  if (this->Internal->Editor->newFile())
+    {
+    this->Internal->Editor->setText(traceString);
+    }
+
+}
+//----------------------------------------------------------------------------
+QString pqPythonManager::getPVModuleDirectory()
+{
+  QString dirString;
+  pqPythonDialog* pyDiag = this->pythonShellDialog();
+  if (pyDiag)
+    {
+    pyDiag->runString("import os\n"
+                      "__pvModuleDirectory = os.path.dirname(paraview.__file__)\n");
+    pyDiag->shell()->makeCurrent();
+    PyObject* main_module = PyImport_AddModule((char*)"__main__");
+    PyObject* global_dict = PyModule_GetDict(main_module);
+    PyObject* string_object = PyDict_GetItemString(
+      global_dict, "__pvModuleDirectory");
+    char* string_ptr = string_object ? PyString_AsString(string_object) : 0;
+    if (string_ptr)
+      {
+      dirString = string_ptr;
+      }
+    pyDiag->shell()->releaseControl();
+    }
+  return dirString;
+}
+
+//----------------------------------------------------------------------------
+void pqPythonManager::saveTrace()
+{
+  // Get the script directory
+  QString scriptDir;
+  pqSettings* settings = pqApplicationCore::instance()->settings();
+  if (settings->contains("pqPythonToolsWidget/ScriptDirectory"))
+    {
+    scriptDir = pqApplicationCore::instance()->settings()->value(
+      "pqPythonToolsWidget/ScriptDirectory").toString();
+    }
+  else
+    {
+    scriptDir = this->getPVModuleDirectory();
+    if (scriptDir.size())
+      {
+      scriptDir += QDir::separator() + QString("demos");
+      }
+    }
+
+  QString traceString = this->getTraceString();
+  QString fileName = QFileDialog::getSaveFileName(pqCoreUtilities::mainWidget(), tr("Save File"),
+                                                  scriptDir,
+                                                  tr("Python script (*.py)"));
+  if (fileName.isEmpty())
+    {
+    return;
+    }
+  if (!fileName.endsWith(".py"))
+    {
+    fileName.append(".py");
+    }
+
+  QFile file(fileName);
+  if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
+    {
+    qWarning() << "Could not open file:" << fileName;
+    return;
+    }
+
+  QTextStream out(&file);
+  out << traceString;
+}
+//----------------------------------------------------------------------------
+void pqPythonManager::saveTraceState(const QString& fileName)
+{
+  pqPythonDialog* pyDiag = this->pythonShellDialog();
+  if (pyDiag)
+    {
+    pyDiag->runString("from paraview import smstate\n"
+                      "smstate.run()\n");
+    QFile file(fileName);
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
+      {
+      qWarning() << "Could not open file:" << fileName;
+      return;
+      }
+
+    QString traceString = this->getTraceString();
+    QTextStream out(&file);
+    out << traceString;
     }
 }

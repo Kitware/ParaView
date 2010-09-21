@@ -50,6 +50,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCreateCustomFilterReaction.h"
 #include "pqDataQueryReaction.h"
 #include "pqDeleteReaction.h"
+#include "pqEditTraceReaction.h"
 #include "pqExportReaction.h"
 #include "pqFiltersMenuReaction.h"
 #include "pqHelpReaction.h"
@@ -71,6 +72,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSaveDataReaction.h"
 #include "pqSaveScreenshotReaction.h"
 #include "pqSaveStateReaction.h"
+#include "pqSaveTraceReaction.h"
 #include "pqSelectionToolbar.h"
 #include "pqServerConnectReaction.h"
 #include "pqServerDisconnectReaction.h"
@@ -78,6 +80,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSourcesMenuReaction.h"
 #include "pqTestingReaction.h"
 #include "pqTimerLogReaction.h"
+#include "pqTraceReaction.h"
 #include "pqUndoRedoReaction.h"
 #include "pqVCRToolbar.h"
 #include "pqViewMenuManager.h"
@@ -231,6 +234,15 @@ void pqParaViewMenuBuilders::buildToolsMenu(QMenu& menu)
   menu.addSeparator();
   new pqPythonShellReaction(menu.addAction("Python Shell")
     << pqSetName("actionToolsPythonShell"));
+  menu.addSeparator();
+  new pqTraceReaction(menu.addAction("Start Trace")
+                      << pqSetName("actionToolsStartTrace"), true);
+  new pqTraceReaction(menu.addAction("Stop Trace")
+                      << pqSetName("actionToolsStartTrace"), false);
+  new pqEditTraceReaction(menu.addAction("Edit Trace")
+                      << pqSetName("actionToolsEditTrace"));
+  new pqSaveTraceReaction(menu.addAction("Save Trace")
+                          << pqSetName("actionToolsSaveTrace"));
 }
 
 //-----------------------------------------------------------------------------

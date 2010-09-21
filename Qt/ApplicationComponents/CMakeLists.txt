@@ -49,6 +49,7 @@ SET (MOC_HEADERS
   pqDeleteReaction.h
   pqEditCameraReaction.h
   pqEditColorMapReaction.h
+  pqEditTraceReaction.h
   pqExportReaction.h
   pqFiltersMenuReaction.h
   pqFixPathsInStateFilesBehavior.h
@@ -80,6 +81,7 @@ SET (MOC_HEADERS
   pqSaveDataReaction.h
   pqSaveScreenshotReaction.h
   pqSaveStateReaction.h
+  pqSaveTraceReaction.h
   pqScalarBarVisibilityReaction.h
   pqSelectionInspectorWidget.h
   pqSelectionToolbar.h
@@ -91,6 +93,7 @@ SET (MOC_HEADERS
   pqStatusBar.h
   pqTestingReaction.h
   pqTimerLogReaction.h
+  pqTraceReaction.h
   pqUndoRedoBehavior.h
   pqUndoRedoReaction.h
   pqVCRToolbar.h
@@ -171,6 +174,8 @@ SET (SOURCE_FILES
   pqEditCameraReaction.h
   pqEditColorMapReaction.cxx
   pqEditColorMapReaction.h
+  pqEditTraceReaction.cxx
+  pqEditTraceReaction.h
   pqExportReaction.cxx
   pqExportReaction.h
   pqFiltersMenuReaction.cxx
@@ -235,6 +240,8 @@ SET (SOURCE_FILES
   pqSaveScreenshotReaction.h
   pqSaveStateReaction.cxx
   pqSaveStateReaction.h
+  pqSaveTraceReaction.cxx
+  pqSaveTraceReaction.h
   pqScalarBarVisibilityReaction.cxx
   pqScalarBarVisibilityReaction.h
   pqSelectionInspectorWidget.cxx
@@ -257,6 +264,8 @@ SET (SOURCE_FILES
   pqTestingReaction.h
   pqTimerLogReaction.cxx
   pqTimerLogReaction.h
+  pqTraceReaction.cxx
+  pqTraceReaction.h
   pqUndoRedoBehavior.cxx
   pqUndoRedoBehavior.h
   pqUndoRedoReaction.cxx

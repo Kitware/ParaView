@@ -75,9 +75,43 @@ public:
   // of widget.
   void addWidgetForMacros(QWidget* widget);
 
+  // Description:
+  // return true if the python tracing can be started
+  bool canStartTrace();
+  // Description:
+  // return true if the python tracing is already started and therefore can be stoped
+  bool canStopTrace();
+
+  // Description:
+  // start recording the python trace
+  void startTrace();
+
+  // Description:
+  // stop recording the python trace
+  void stopTrace();
+
+  // Description:
+  // Show the python editor with the trace in it
+  void editTrace();
+
+  // Description:
+  // Show a file dialog in order to save the python trace into a file
+  void saveTrace();
+
+  // Description:
+  // Show a file dialog in order to save the python trace into a file
+  void saveTraceState(const QString& filename);
+
 signals:
 
   void paraviewPythonModulesImported();
+  void canStartTrace(bool);
+  void canStopTrace(bool);
+
+  // Fired after start trace.
+  void startTraceDone();
+  // Fired after stop trace.
+  void stopTraceDone();
 
 public slots:
   // Description:
@@ -108,6 +142,9 @@ protected:
   // Executes code in the python interpreter to import paraview modules and
   // create an ActiveConnection object.
   void initializeParaviewPythonModules();
+
+  QString getTraceString();
+  QString getPVModuleDirectory();
 
 private:
   class pqInternal;
