@@ -6060,7 +6060,7 @@
      </IntVectorProperty>
     
     <Hints>
-      <ReaderFactory extensions="ncdf nc"
+      <ReaderFactory extensions="pop.ncdf pop.nc"
           file_description="POP Ocean NetCDF (Rectilinear)" />
     </Hints>
       
