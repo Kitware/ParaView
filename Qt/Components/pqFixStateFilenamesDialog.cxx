@@ -35,7 +35,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqActiveObjects.h"
 #include "pqCollapsedGroup.h"
 #include "pqFileChooserWidget.h"
+#include "vtkFileSequenceParser.h"
 #include "pqSMAdaptor.h"
+#include "vtkPVFileInformation.h"
+#include "vtkPVFileInformationHelper.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMDomain.h"
@@ -54,6 +57,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QMap>
 #include <QSet>
 #include <QStringList>
+#include <QFileInfo>
 
 class pqFixStateFilenamesDialog::pqInternals : public Ui::FixStateFilenamesDialog
 {
@@ -169,24 +173,6 @@ class pqFixStateFilenamesDialog::pqInternals : public Ui::FixStateFilenamesDialo
          return;
       }
 
-    //this->ProxyCollections.push_back(proxyCollectionXML);
-
-    /*unsigned int num_children = proxyCollectionXML->GetNumberOfNestedElements();
-    for (unsigned int cc=0; cc < num_children; cc++)
-      {
-      vtkPVXMLElement* child = proxyCollectionXML->GetNestedElement(cc);
-      if (child->GetName() != QString("Item"))
-        {
-        continue;
-        }
-      const char* name = child->GetAttribute("name");
-      int helperid;
-      if (!name || !child->GetScalarAttribute("id", &helperid))
-        {
-        continue;
-        }
-      }*/
-
     // iterate over all property xmls in the proxyXML and add those xmls which
     // are in the filenameProperties set.
     for (unsigned int cc=0; cc < proxyCollectionXML->GetNumberOfNestedElements(); cc++)
@@ -195,18 +181,10 @@ class pqFixStateFilenamesDialog::pqInternals : public Ui::FixStateFilenamesDialo
       if (itemXML && itemXML->GetName() && strcmp(itemXML->GetName(),
           "Item") == 0)
         {
-        //QString itemName = itemXML->GetAttribute("name");
-        //QStringList filenames;
-        QStringList itemName;
-        itemName << itemXML->GetAttribute("name");
         int itemId = QString(itemXML->GetAttribute("id")).toInt();
-        PropertyInfo info;
-        info.XMLElement = itemXML;
-        info.Values = itemName;
-        this->CollectionsMap[itemId]["sources"] = info;
+        this->CollectionsMap[itemId] = proxyCollectionXML;
         }
       }
-
     }
 
 public:
@@ -218,13 +196,13 @@ public:
     QStringList Values;
     bool Modified;
     vtkSmartPointer<vtkSMProxy> Prototype;
-    PropertyInfo() : XMLElement(0), IsDirectory(false), SupportsMultiple(false)
+    PropertyInfo() : XMLElement(0), IsDirectory(false), SupportsMultiple(false), Modified(false)
       {
       }
     };
   typedef QMap<int, QMap<QString, PropertyInfo> > PropertiesMapType;
   PropertiesMapType PropertiesMap;
-  PropertiesMapType CollectionsMap;
+  QMap<int, vtkPVXMLElement*> CollectionsMap;
   QMap<int, QString> ProxyLabels;
 
   vtkSmartPointer<vtkPVXMLElement> XMLRoot;
@@ -247,7 +225,7 @@ public:
           }
         else if (child && QString("ProxyCollection") == child->GetName())
           {
-          //this->processProxyCollection(child);
+          this->processProxyCollection(child);
           }
         }
       }
@@ -310,11 +288,13 @@ pqFixStateFilenamesDialog::pqFixStateFilenamesDialog(
       gridLayout->addWidget(fileChooser, propnum, 1);
       }
     }
+  this->SequenceParser = vtkFileSequenceParser::New();
 }
 
 //-----------------------------------------------------------------------------
 pqFixStateFilenamesDialog::~pqFixStateFilenamesDialog()
 {
+  this->SequenceParser->Delete();
   delete this->Internals;
 }
 
@@ -342,11 +322,6 @@ void pqFixStateFilenamesDialog::onFileNamesChanged()
     info.Values = filenames;
     info.Modified = true;
     }
-
-  //pqInternals::PropertyInfo& collectionInfo =
-   // this->Internals->CollectionsMap[key1]["sources"];
-
-  //if (info.Values
 }
 
 //-----------------------------------------------------------------------------
@@ -392,15 +367,50 @@ void pqFixStateFilenamesDialog::accept()
         info.XMLElement->AddNestedElement(elementElement);
         elementElement->Delete();
         }
+
+      // Also fix up sources proxy collection
+      int id = iter.key();
+      QMap<int, vtkPVXMLElement*>::iterator proxyCollectionIter
+        = this->Internals->CollectionsMap.begin();
+      vtkPVXMLElement * proxyCollectionXML = proxyCollectionIter.value();
+      for (unsigned int cc=0; cc < proxyCollectionXML->GetNumberOfNestedElements(); cc++)
+        {
+        // locate and remove old element.
+        vtkPVXMLElement* itemXML = proxyCollectionXML->GetNestedElement(cc);
+        int itemId = QString(itemXML->GetAttribute("id")).toInt();
+        if(id == itemId)
+          {
+          proxyCollectionXML->RemoveNestedElement(itemXML);
+
+          // create a new element with new source name
+          vtkPVXMLElement* newItemXML = vtkPVXMLElement::New();
+          newItemXML->SetName("Item");
+          newItemXML->AddAttribute("id", itemId);
+
+
+          newItemXML->AddAttribute("name",
+            this->ConstructPipelineName(info.Values).toAscii().data());
+          proxyCollectionXML->AddNestedElement(newItemXML);
+          newItemXML->Delete();
+          break;
+          }
+        }
       }
     }
 
-  pqInternals::PropertiesMapType::iterator proxyCollectionIter;
-  for(proxyCollectionIter = this->Internals->CollectionsMap.begin();
-      proxyCollectionIter != this->Internals->CollectionsMap.end(); ++iter)
-    {
 
-    }
-  //this->Internals->
   this->Superclass::accept();
+}
+
+
+QString pqFixStateFilenamesDialog::ConstructPipelineName(QStringList files)
+{
+  QFileInfo qFileInfo(files[0]);
+
+  if(this->SequenceParser->ParseFileSequence(qFileInfo.fileName().toAscii().data()))
+    {
+    return this->SequenceParser->GetSequenceName();
+    }
+
+  return qFileInfo.fileName();
 }

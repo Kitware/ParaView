@@ -17,6 +17,7 @@
 #include "vtkClientServerStream.h"
 #include "vtkCollection.h"
 #include "vtkCollectionIterator.h"
+#include "vtkFileSequenceParser.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVFileInformationHelper.h"
 #include "vtkSmartPointer.h"
@@ -370,9 +371,10 @@ vtkPVFileInformation::vtkPVFileInformation()
 {
   this->RootOnly = 1;
   this->Contents = vtkCollection::New();
+  this->SequenceParser = vtkFileSequenceParser::New();
   this->Type = INVALID;
-  this->Name = 0;
-  this->FullPath = 0;
+  this->Name = NULL;
+  this->FullPath = NULL;
   this->FastFileTypeDetection = 0;
   this->Hidden = false;
 }
@@ -381,8 +383,9 @@ vtkPVFileInformation::vtkPVFileInformation()
 vtkPVFileInformation::~vtkPVFileInformation()
 {
   this->Contents->Delete();
-  this->SetName(0);
-  this->SetFullPath(0);
+  this->SequenceParser->Delete();
+  this->SetName(NULL);
+  this->SetFullPath(NULL);
 }
 
 bool vtkPVFileInformation::IsDirectory(int t)
@@ -1011,25 +1014,6 @@ void vtkPVFileInformation::OrganizeCollection(vtkPVFileInformationSet& info_set)
   vtkstd::string prefix = this->FullPath;
   vtkPVFileInformationAddTerminatingSlash(prefix);
 
-  // sequence ending with numbers.
-  vtksys::RegularExpression reg_ex("^(.*)\\.([0-9.]+)$");
-  // sequence ending with extension.
-  vtksys::RegularExpression reg_ex2("^(.*)(\\.|_|-)([0-9.]+)\\.(.*)$");
-
-  // sequence ending with extension, but with no ". or _" before
-  // the series number.
-  vtksys::RegularExpression reg_ex3("^(.*)([a-zA-Z])([0-9.]+)\\.(.*)$");
-  // sequence ending with extension, and starting with series number
-  // followed by ". or _".
-  vtksys::RegularExpression reg_ex4("^([0-9.]+)(\\.|_|-)(.*)\\.(.*)$");
-  // sequence ending with extension, and starting with series number,
-  // but not followed by ". or _".
-  vtksys::RegularExpression reg_ex5("^([0-9.]+)([a-zA-Z])(.*)\\.(.*)$");
-
-  // fallback: any sequence with a number in the middle (taking the last number
-  // if multiple exist).
-  vtksys::RegularExpression reg_ex_last("^(.*[^0-9])([0-9]+)([^0-9]+)$");
-
   for (vtkPVFileInformationSet::iterator iter = info_set.begin();
     iter != info_set.end(); )
     {
@@ -1038,47 +1022,14 @@ void vtkPVFileInformation::OrganizeCollection(vtkPVFileInformationSet& info_set)
     if (obj->Type != FILE_GROUP && !IsDirectory(obj->Type))
       {
       bool match = false;
-      vtkstd::string groupName;
-      int groupIndex = -1;
-      if (reg_ex.find(obj->GetName()))
-        {
-        groupName = reg_ex.match(1);
-        groupIndex = atoi(reg_ex.match(2).c_str());
-        match = true;
-        }
-      else if (reg_ex2.find(obj->GetName()))
-        {
-        groupName = reg_ex2.match(1) + reg_ex2.match(2) + ".." + reg_ex2.match(4);
-        groupIndex = atoi(reg_ex2.match(3).c_str());
-        match = true;
-        }
-      else if (reg_ex3.find(obj->GetName()))
-        {
-        groupName = reg_ex3.match(1) + reg_ex3.match(2) + ".." + reg_ex3.match(4);
-        groupIndex = atoi(reg_ex3.match(3).c_str());
-        match = true;
-        }
-      else if (reg_ex4.find(obj->GetName()))
-        {
-        groupName = ".." + reg_ex4.match(2) + reg_ex4.match(3) + "." + reg_ex4.match(4);
-        groupIndex = atoi(reg_ex4.match(1).c_str());
-        match = true;
-        }
-      else if (reg_ex5.find(obj->GetName()))
-        {
-        groupName = ".." + reg_ex5.match(2) + reg_ex5.match(3) + "." + reg_ex5.match(4);
-        groupIndex = atoi(reg_ex5.match(1).c_str());
-        match = true;
-        }
-      else if (reg_ex_last.find(obj->GetName()))
-        {
-        groupName = reg_ex_last.match(1) + ".." + reg_ex_last.match(3);
-        groupIndex = atoi(reg_ex_last.match(2).c_str());
-        match = true;
-        }
+
+      match = this->SequenceParser->ParseFileSequence(obj->GetName());
 
       if (match)
         {
+        vtkstd::string groupName = this->SequenceParser->GetSequenceName();
+        int groupIndex = this->SequenceParser->GetSequenceIndex();
+
         MapOfStringToInfo::iterator iter2 = fileGroups.find(groupName);
         vtkPVFileInformation* group = 0;
         if (iter2 == fileGroups.end())

@@ -16,7 +16,10 @@
 
 #include "vtkObjectFactory.h"
 
+#include <vtksys/SystemTools.hxx>
 #include <vtksys/RegularExpression.hxx>
+#include <vtkstd/set>
+#include <vtkstd/string>
 
 vtkStandardNewMacro(vtkFileSequenceParser);
 //-----------------------------------------------------------------------------
@@ -36,7 +39,9 @@ vtkFileSequenceParser::vtkFileSequenceParser() :
   reg_ex5( new vtksys::RegularExpression("^([0-9.]+)([a-zA-Z])(.*)\\.(.*)$")),
   // fallback: any sequence with a number in the middle (taking the last number
   // if multiple exist).
-  reg_ex_last( new vtksys::RegularExpression("^(.*[^0-9])([0-9]+)([^0-9]+)$"))
+  reg_ex_last( new vtksys::RegularExpression("^(.*[^0-9])([0-9]+)([^0-9]+)$")),
+  SequenceIndex(-1),
+  SequenceName(NULL)
 {
 }
 
@@ -49,13 +54,51 @@ vtkFileSequenceParser::~vtkFileSequenceParser()
   delete this->reg_ex4;
   delete this->reg_ex5;
   delete this->reg_ex_last;
+
+  this->SetSequenceName(NULL);
 }
 
 
 //-----------------------------------------------------------------------------
-bool vtkFileSequenceParser::ParseFileSequence(vtkStdString file)
+bool vtkFileSequenceParser::ParseFileSequence(char * file)
 {
   bool match = false;
+  if (this->reg_ex->find(file))
+    {
+    this->SetSequenceName(this->reg_ex->match(1).c_str());
+    this->SequenceIndex = atoi(reg_ex->match(2).c_str());
+    match = true;
+    }
+  else if (this->reg_ex2->find(file))
+    {
+    this->SetSequenceName(std::string(this->reg_ex2->match(1) + this->reg_ex2->match(2) + ".." + this->reg_ex2->match(4)).c_str());
+    this->SequenceIndex = atoi(reg_ex2->match(3).c_str());
+    match = true;
+    }
+  else if (this->reg_ex3->find(file))
+    {
+    this->SetSequenceName(std::string(this->reg_ex3->match(1) + this->reg_ex3->match(2) + ".." + this->reg_ex3->match(4)).c_str());
+    this->SequenceIndex = atoi(reg_ex3->match(3).c_str());
+    match = true;
+    }
+  else if (this->reg_ex4->find(file))
+    {
+    this->SetSequenceName(std::string(".." + this->reg_ex4->match(2) + this->reg_ex4->match(3) + "." + this->reg_ex4->match(4)).c_str());
+    this->SequenceIndex = atoi(reg_ex4->match(1).c_str());
+    match = true;
+    }
+  else if (this->reg_ex5->find(file))
+    {
+    this->SetSequenceName(std::string(".." + this->reg_ex5->match(2) + this->reg_ex5->match(3) + "." + this->reg_ex5->match(4)).c_str());
+    this->SequenceIndex = atoi(reg_ex5->match(1).c_str());
+    match = true;
+    }
+  else if (this->reg_ex_last->find(file))
+    {
+    this->SetSequenceName(std::string(this->reg_ex_last->match(1) + ".." + this->reg_ex_last->match(3)).c_str());
+    this->SequenceIndex = atoi(reg_ex_last->match(2).c_str());
+    match = true;
+    }
   return match;
 }
 
