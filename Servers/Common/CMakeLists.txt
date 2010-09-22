@@ -33,6 +33,7 @@ SET(Kit_SRCS
   vtkCellIntegrator.cxx
   vtkClientConnection.cxx
   vtkConnectionIterator.cxx
+  vtkFileSequenceParser.cxx
   vtkMPISelfConnection.cxx
   vtkMultiProcessControllerHelper.cxx
   vtkPriorityHelper.cxx
