@@ -35,7 +35,7 @@
 #include "vtkSelection.h"
 #include "vtkSelectionNode.h"
 
-#include <QHeaderView.h>
+#include <QHeaderView>
 #include <QLayout>
 #include "pqTreeWidget.h"
 #include <QComboBox>
