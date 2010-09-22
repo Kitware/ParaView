@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqComponentsExport.h"
 
 class vtkPVXMLElement;
+class vtkFileSequenceParser;
 
 /// pqFixStateFilenamesDialog can be used to prompt the user with a dialog to
 /// edit the filenames referred to in a state xml. Set the state xml
@@ -62,6 +63,11 @@ public:
   /// Overridden to update xml tree based on user chosen filenames.
   virtual void accept();
 
+protected:
+
+  /// Detect File paterns, constructing the filename to be shown in the pipeline browser.
+  QString ConstructPipelineName(QStringList files);
+
 private slots:
   void onFileNamesChanged();
 
@@ -70,6 +76,7 @@ private:
 
   class pqInternals;
   pqInternals* Internals;
+  vtkFileSequenceParser * SequenceParser;
 };
 
 #endif
