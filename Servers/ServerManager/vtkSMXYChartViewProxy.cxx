@@ -77,6 +77,7 @@ vtkContextView* vtkSMXYChartViewProxy::NewChartView()
 
   // Use the buffer id - performance issues are fixed.
   this->ChartView->GetScene()->SetUseBufferId(true);
+  this->ChartView->GetScene()->SetScaleTiles(false);
 
   return this->ChartView;
 }
