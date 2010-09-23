@@ -112,7 +112,7 @@ void PrismTableWidget::invalidateLayout()
 }
 
 
-SESAMEComboBoxDelegate::SESAMEComboBoxDelegate(QObject *parent): QItemDelegate(parent)
+SESAMEComboBoxDelegate::SESAMEComboBoxDelegate(QObject *par): QItemDelegate(par)
 {
 
 this->SPanel=NULL;
@@ -133,11 +133,11 @@ this->SPanel=NULL;
   this->Variables=variables;
 }
 
-QWidget *SESAMEComboBoxDelegate::createEditor(QWidget *parent,
+QWidget *SESAMEComboBoxDelegate::createEditor(QWidget *par,
      const QStyleOptionViewItem &/* option */,
      const QModelIndex &/* index */) const
  {
-   QComboBox *editor = new QComboBox(parent);
+   QComboBox *editor = new QComboBox(par);
    editor->addItems(this->Variables);
 
 

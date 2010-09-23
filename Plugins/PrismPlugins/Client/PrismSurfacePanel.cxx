@@ -258,7 +258,7 @@ pqNamedObjectPanel(object_proxy, p)
     this,
     SLOT(onConversionFileButton()));
 
-    QDoubleValidator *doubleValid= new QDoubleValidator(this);
+//    QDoubleValidator *doubleValid= new QDoubleValidator(this);
 
 
 
@@ -570,8 +570,8 @@ bool PrismSurfacePanel::pqUI::LoadConversions(QString &fileName)
           for(;vnIter!=tableData.VariableConversions.end();vnIter++)
           {
             SESAMEConversionVariable variableData=*vnIter;
-            QString label=variableData.Name;
-            label.append(" - ");
+            QString lab=variableData.Name;
+            lab.append(" - ");
 
             QString conversionUnits=variableData.SESAMEUnits;
             conversionUnits.append(" to ");
@@ -583,8 +583,8 @@ bool PrismSurfacePanel::pqUI::LoadConversions(QString &fileName)
             {
               conversionUnits.append(variableData.cgsUnits);
             }
-            label.append(conversionUnits);
-            varsList.append(label);
+            lab.append(conversionUnits);
+            varsList.append(lab);
           }
           this->UI->ConversionVariableEditor->setVariableList(varsList);
       }
@@ -617,8 +617,8 @@ bool PrismSurfacePanel::pqUI::LoadConversions(QString &fileName)
             SESAMEConversionVariable variableData=*vIter;
 
 
-            QString data=item->data(Qt::UserRole).toString();
-            if(data==variableData.Name)
+            QString dat=item->data(Qt::UserRole).toString();
+            if(dat==variableData.Name)
             {
               QString conversionValueString="1.0";
               QString conversionUnits=variableData.SESAMEUnits;
@@ -631,12 +631,12 @@ bool PrismSurfacePanel::pqUI::LoadConversions(QString &fileName)
 
                 //this->UI->ConversionTree->setColumnHidden(1,false);
 
-                QString label=variableData.Name;
-                label.append(" - ");
+                QString lab=variableData.Name;
+                lab.append(" - ");
                 conversionUnits.append(variableData.SIUnits);
-                label.append(conversionUnits);
+                lab.append(conversionUnits);
                 item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsEditable);
-                item->setText(label);
+                item->setText(lab);
                 item->setData(Qt::UserRole,variableData.Name);
 
                 item=this->UI->ConversionTree->item(row,2);
@@ -652,12 +652,12 @@ bool PrismSurfacePanel::pqUI::LoadConversions(QString &fileName)
 
                 //this->UI->ConversionTree->setColumnHidden(1,false);
 
-                QString label=variableData.Name;
-                label.append(" - ");
+                QString lab=variableData.Name;
+                lab.append(" - ");
                 conversionUnits.append(variableData.cgsUnits);
-                label.append(conversionUnits);
+                lab.append(conversionUnits);
                 item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsEditable);
-                item->setText(label);
+                item->setText(lab);
                 item->setData(Qt::UserRole,variableData.Name);
 
 
@@ -714,9 +714,9 @@ void PrismSurfacePanel::updateConversionsLabels()
   this->UI->ConversionFile->setText(info.fileName());
   this->UI->ConversionFile->setToolTip(this->UI->ConversionFileName);
 
-  vtkSMProperty* GetNamesProperty =this->proxy()->GetProperty("AxisVarNameInfo");
+  vtkSMProperty* getNamesProperty =this->proxy()->GetProperty("AxisVarNameInfo");
   QList<QVariant> names;
-  names = pqSMAdaptor::getMultipleElementProperty(GetNamesProperty);
+  names = pqSMAdaptor::getMultipleElementProperty(getNamesProperty);
 
 
   QMap<int,SESAMEConversionsForTable>::iterator iter;
@@ -740,8 +740,8 @@ void PrismSurfacePanel::updateConversionsLabels()
       for(;vnIter!=tableData.VariableConversions.end();vnIter++)
       {
         SESAMEConversionVariable variableData=*vnIter;
-        QString label=variableData.Name;
-        label.append(" - ");
+        QString lab=variableData.Name;
+        lab.append(" - ");
 
         QString conversionUnits=variableData.SESAMEUnits;
         conversionUnits.append(" to ");
@@ -753,8 +753,8 @@ void PrismSurfacePanel::updateConversionsLabels()
         {
           conversionUnits.append(variableData.cgsUnits);
         }
-        label.append(conversionUnits);
-        varsList.append(label);
+        lab.append(conversionUnits);
+        varsList.append(lab);
       }
       this->UI->ConversionVariableEditor->setVariableList(varsList);
     }
@@ -811,12 +811,12 @@ void PrismSurfacePanel::updateConversionsLabels()
          // this->UI->ConversionTree->setColumnHidden(1,false);
 
           item=this->UI->ConversionTree->item(w,1);
-          QString label=variableData.Name;
-          label.append(" - ");
+          QString lab=variableData.Name;
+          lab.append(" - ");
           conversionUnits.append(variableData.SIUnits);
-          label.append(conversionUnits);
+          lab.append(conversionUnits);
           item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsEditable);
-          item->setText(label);
+          item->setText(lab);
           item->setData(Qt::UserRole,variableData.Name);
 
 
@@ -831,12 +831,12 @@ void PrismSurfacePanel::updateConversionsLabels()
         //  this->UI->ConversionTree->setColumnHidden(1,false);
 
           item=this->UI->ConversionTree->item(w,1);
-          QString label=variableData.Name;
-          label.append(" - ");
+          QString lab=variableData.Name;
+          lab.append(" - ");
           conversionUnits.append(variableData.cgsUnits);
-          label.append(conversionUnits);
+          lab.append(conversionUnits);
           item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsEditable);
-          item->setText(label);
+          item->setText(lab);
           item->setData(Qt::UserRole,variableData.Name);
 
 
@@ -859,10 +859,6 @@ void PrismSurfacePanel::updateConversionsLabels()
     this->UI->SICheckbox->setEnabled(false);
     this->UI->cgsCheckbox->setEnabled(false);
 
-
-    vtkSMProperty* GetNamesProperty =this->proxy()->GetProperty("AxisVarNameInfo");
-    QList<QVariant> names;
-    names = pqSMAdaptor::getMultipleElementProperty(GetNamesProperty);
 
     int w=0;
     foreach(QVariant v, names)
@@ -1205,8 +1201,8 @@ void PrismSurfacePanel::setupConversions()
           for(;vnIter!=tableData.VariableConversions.end();vnIter++)
           {
             SESAMEConversionVariable variableData=*vnIter;
-            QString label=variableData.Name;
-            label.append(" - ");
+            QString lab=variableData.Name;
+            lab.append(" - ");
 
             QString conversionUnits=variableData.SESAMEUnits;
             conversionUnits.append(" to ");
@@ -1218,8 +1214,8 @@ void PrismSurfacePanel::setupConversions()
             {
               conversionUnits.append(variableData.cgsUnits);
             }
-            label.append(conversionUnits);
-            varsList.append(label);
+            lab.append(conversionUnits);
+            varsList.append(lab);
           }
           this->UI->ConversionVariableEditor->setVariableList(varsList);
       }
@@ -1273,13 +1269,13 @@ void PrismSurfacePanel::setupConversions()
         else if(this->UI->SICheckbox->isChecked())
         {
 
-          QTableWidgetItem* item=this->UI->ConversionTree->item(w,1);
-          QString label=variableData.Name;
-          label.append(" - ");
+          item=this->UI->ConversionTree->item(w,1);
+          QString lab=variableData.Name;
+          lab.append(" - ");
           conversionUnits.append(variableData.SIUnits);
-          label.append(conversionUnits);
+          lab.append(conversionUnits);
           item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsEditable);
-          item->setText(label);
+          item->setText(lab);
           item->setData(Qt::UserRole,variableData.Name);
 
 
@@ -1292,13 +1288,13 @@ void PrismSurfacePanel::setupConversions()
         {
 
 
-          QTableWidgetItem* item=this->UI->ConversionTree->item(w,1);
-          QString label=variableData.Name;
-          label.append(" - ");
+          item=this->UI->ConversionTree->item(w,1);
+          QString lab=variableData.Name;
+          lab.append(" - ");
           conversionUnits.append(variableData.cgsUnits);
-          label.append(conversionUnits);
+          lab.append(conversionUnits);
           item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsEditable);
-          item->setText(label);
+          item->setText(lab);
           item->setData(Qt::UserRole,variableData.Name);
 
 
@@ -1322,12 +1318,7 @@ void PrismSurfacePanel::setupConversions()
     this->UI->SICheckbox->setEnabled(false);
     this->UI->cgsCheckbox->setEnabled(false);
 
-
-    vtkSMProperty* GetNamesProperty =this->proxy()->GetProperty("AxisVarNameInfo");
-    QList<QVariant> names;
-    names = pqSMAdaptor::getMultipleElementProperty(GetNamesProperty);
-
-    //add each xdmf-domain name to the widget and to the paraview-Domain
+   //add each xdmf-domain name to the widget and to the paraview-Domain
     this->UI->ConversionTree->setRowCount(names.count());
     this->UI->ConversionTree->setColumnCount(4);
     int w=0;
