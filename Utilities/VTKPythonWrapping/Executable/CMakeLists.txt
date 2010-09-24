@@ -101,11 +101,7 @@ ENDIF (APPLE)
 # is to reference all the module init functions.  That library may
 # then depend on the modules and vtkPVPythonInterpretor without
 # creating a cycle.
-IF(UNIX)
-  SET(PYTHON_MODULE_PREFIX "lib")
-ELSE(UNIX)
-  SET(PYTHON_MODULE_PREFIX "")
-ENDIF(UNIX)
+SET(PYTHON_MODULE_PREFIX "")
 PYTHON_WRITE_MODULES_HEADER(${CMAKE_CURRENT_BINARY_DIR}/pvpythonmodules.h)
 # The PYTHON_ADD_MODULE macro stores the list of static modules in a global property
 GET_PROPERTY(PY_STATIC_MODULES_LIST GLOBAL PROPERTY PY_STATIC_MODULES_LIST)
