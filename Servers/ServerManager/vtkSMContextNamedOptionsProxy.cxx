@@ -462,7 +462,7 @@ void vtkSMContextNamedOptionsProxy::SetVisibility(const char* name, int visible)
 {
   PlotInfo& plotInfo = this->GetPlotInfo(name);
   plotInfo.Visible = visible;
-  this->SetPlotVisibilityInternal(plotInfo, visible, name);
+  this->SetPlotVisibilityInternal(plotInfo, visible != 0, name);
 }
 
 //----------------------------------------------------------------------------

@@ -26,11 +26,11 @@ int main(int, char*[])
 {
   vtkSmartPointer<vtkSphereSource> sphere = vtkSmartPointer<vtkSphereSource>::New();
   vtkSmartPointer<vtkExtractHistogram> extraction = vtkSmartPointer<vtkExtractHistogram>::New();
-  
+
   const int bin_count = 3;
-  
+
   extraction->SetInputConnection(sphere->GetOutputPort());
-  extraction->SetInputArrayToProcess(0, 0, 0, vtkDataSet::FIELD_ASSOCIATION_POINTS_THEN_CELLS, 
+  extraction->SetInputArrayToProcess(0, 0, 0, vtkDataSet::FIELD_ASSOCIATION_POINTS_THEN_CELLS,
     "Normals");
   extraction->SetComponent(0);
   extraction->SetBinCount(bin_count);
@@ -39,7 +39,8 @@ int main(int, char*[])
   vtkTable* const histogram = extraction->GetOutput();
 
   vtkDoubleArray* const bin_extents = vtkDoubleArray::SafeDownCast(
-    histogram->GetRowData()->GetArray("Normals"));
+    histogram->GetRowData()->GetArray("bin_extents"));
+
   if(!bin_extents)
     {
     vtkGenericWarningMacro("No bin extents found.");
@@ -51,7 +52,7 @@ int main(int, char*[])
     vtkGenericWarningMacro("XCoordinates must be a  1 component array.");
     return 1;
     }
-  
+
   if(bin_extents->GetNumberOfTuples() != bin_count)
     {
     vtkGenericWarningMacro("Incorrect number of  bins.");
