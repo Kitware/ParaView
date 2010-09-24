@@ -33,6 +33,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QMainWindow>
 #include <QApplication>
+#include <QDir>
+#include <QStringList>
+#include <QString>
+#include <QFile>
+#include <QFileInfo>
 
 QPointer<QWidget> pqCoreUtilities::MainWidget = 0;
 
@@ -60,4 +65,90 @@ QWidget* pqCoreUtilities::findMainWindow()
   return NULL;
 }
 
+//-----------------------------------------------------------------------------
+QString pqCoreUtilities::getParaViewUserDirectory()
+  {
+  QString settingsRoot;
+#if defined(Q_OS_WIN)
+  settingsRoot = QString::fromLocal8Bit(getenv("APPDATA"));
+#else
+  settingsRoot = QString::fromLocal8Bit(getenv("HOME")) +
+                 QDir::separator() + QString::fromLocal8Bit(".config");
+#endif
+  QString settingsPath = QString("%2%1%3");
+  settingsPath = settingsPath.arg(QDir::separator());
+  settingsPath = settingsPath.arg(settingsRoot);
+  settingsPath = settingsPath.arg(QApplication::organizationName());
+  return settingsPath;
+  }
 
+//-----------------------------------------------------------------------------
+QString pqCoreUtilities::getParaViewApplicationDirectory()
+  {
+  return QApplication::applicationDirPath();
+  }
+
+//-----------------------------------------------------------------------------
+QStringList pqCoreUtilities::findParaviewPaths(QString directoryOrFileName,
+                                               bool lookupInAppDir,
+                                               bool lookupInUserDir)
+  {
+  QStringList allPossibleDirs;
+  if(lookupInAppDir)
+    {
+    allPossibleDirs.push_back( getParaViewApplicationDirectory()
+                               + QDir::separator() + directoryOrFileName);
+    allPossibleDirs.push_back( getParaViewApplicationDirectory()
+                               + "/../" + directoryOrFileName);
+    // Mac specific begin
+    allPossibleDirs.push_back( getParaViewApplicationDirectory()
+                               + "/../Support/" + directoryOrFileName);
+    allPossibleDirs.push_back( getParaViewApplicationDirectory()
+                               + "/../../../Support/" + directoryOrFileName);
+    // Mac specific end
+    }
+
+  if(lookupInUserDir)
+    {
+    allPossibleDirs.push_back( getParaViewUserDirectory() + QDir::separator()
+                               + directoryOrFileName);
+    }
+
+  // Filter with only existing ones
+  QStringList existingDirs;
+  foreach(QString path, allPossibleDirs)
+    {
+    if(QFile::exists(path))
+      existingDirs.push_back(path);
+    }
+
+  return existingDirs;
+  }
+
+//-----------------------------------------------------------------------------
+QString pqCoreUtilities::getNoneExistingFileName(QString expectedFilePath)
+  {
+  QDir dir  = QFileInfo(expectedFilePath).absoluteDir();
+  QString baseName = QFileInfo(expectedFilePath).fileName();
+
+  // Extract extension
+  QString extension;
+  if(baseName.lastIndexOf(".") != -1)
+    {
+    extension = baseName;
+    extension.remove(0, baseName.lastIndexOf("."));
+    baseName.chop(extension.size());
+    }
+
+  QString fileName = baseName + extension;
+  int index = 1;
+  while(dir.exists(fileName))
+    {
+    fileName = baseName;
+    fileName.append("-").append(QString::number(index)).append(extension);
+    index++;
+    }
+
+  return dir.absolutePath() + QDir::separator() + fileName;
+  }
+//-----------------------------------------------------------------------------

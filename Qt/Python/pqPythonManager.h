@@ -73,17 +73,65 @@ public:
   // Add a widget to be given macro actions.  QActions representing script macros
   // will be added to the widget.  This could be a QToolBar, QMenu, or other type
   // of widget.
-  void addWidgetForMacros(QWidget* widget);
+  void addWidgetForRunMacros(QWidget* widget);
+  void addWidgetForEditMacros(QWidget* widget);
+  void addWidgetForDeleteMacros(QWidget* widget);
+
+  // Description:
+  // return true if the python tracing can be started
+  bool canStartTrace();
+  // Description:
+  // return true if the python tracing is already started and therefore can be stoped
+  bool canStopTrace();
+
+  // Description:
+  // start recording the python trace
+  void startTrace();
+
+  // Description:
+  // stop recording the python trace
+  void stopTrace();
+
+  // Description:
+  // Show the python editor with the trace in it
+  void editTrace();
+
+  // Description:
+  // Show a file dialog in order to save the python trace into a file
+  void saveTrace();
+
+  // Description:
+  // Show a file dialog in order to save the python trace into a file
+  void saveTraceState(const QString& filename);
+
+  // Description:
+  // Save the macro in ParaView configuration and update widget automatically
+  void addMacro(const QString& fileName);
 
 signals:
 
   void paraviewPythonModulesImported();
+  void canStartTrace(bool);
+  void canStopTrace(bool);
+
+  // Fired after start trace.
+  void startTraceDone();
+  // Fired after stop trace.
+  void stopTraceDone();
 
 public slots:
   // Description:
   // Executes the given script.  If the python interpreter hasn't been initialized
   // yet it will be initialized.
   void executeScript(const QString& filename);
+
+  // Description:
+  // Launch python editor to edit the macro
+  void editMacro(const QString& fileName);
+
+  // Description:
+  // Print on the status bar "Python Trace is currently ON" if currently tracing...
+  void updateStatusMessage();
 
 protected slots:
 
@@ -108,6 +156,9 @@ protected:
   // Executes code in the python interpreter to import paraview modules and
   // create an ActiveConnection object.
   void initializeParaviewPythonModules();
+
+  QString getTraceString();
+  QString getPVModuleDirectory();
 
 private:
   class pqInternal;

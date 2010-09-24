@@ -1,14 +1,14 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqSaveDataReaction.h
+   Module:    pqSaveTraceReaction.cxx
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
    under the terms of the ParaView license version 1.2.
-   
+
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
    Kitware Inc.
@@ -29,44 +29,33 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqSaveDataReaction_h 
-#define __pqSaveDataReaction_h
+#include "pqSaveTraceReaction.h"
 
-#include "pqReaction.h"
+#include "pqPVApplicationCore.h"
+#include "pqPythonManager.h"
 
-/// @ingroup Reactions
-/// Reaction to save data files.
-class PQAPPLICATIONCOMPONENTS_EXPORT pqSaveDataReaction : public pqReaction
+//-----------------------------------------------------------------------------
+pqSaveTraceReaction::pqSaveTraceReaction(QAction* parentObject)
+  : Superclass(parentObject)
 {
-  Q_OBJECT
-  typedef pqReaction Superclass;
-public:
-  /// Constructor. Parent cannot be NULL.
-  pqSaveDataReaction(QAction* parent);
+  pqPythonManager *pythonManager = pqPVApplicationCore::instance()->pythonManager();
+  this->enable(pythonManager);
+}
 
-  /// Save data files from active port. Users the vtkSMWriterFactory to decide
-  /// what writes are available. Returns true if the creation is
-  /// successful, otherwise returns false.
-  /// Note that this method is static. Applications can simply use this without
-  /// having to create a reaction instance.
-  static bool saveActiveData(const QString& files);
-  static bool saveActiveData();
+//-----------------------------------------------------------------------------
+void pqSaveTraceReaction::saveTrace()
+{
+  pqPythonManager *pythonManager = pqPVApplicationCore::instance()->pythonManager();
+  if(!pythonManager)
+    {
+    qCritical("No application wide python manager.");
+    return;
+    }
+  pythonManager->saveTrace();
+}
 
-public slots:
-  /// Updates the enabled state. Applications need not explicitly call
-  /// this.
-  void updateEnableState();
-
-protected:
-  /// Called when the action is triggered.
-  virtual void onTriggered()
-    { pqSaveDataReaction::saveActiveData(); }
-
-private:
-  pqSaveDataReaction(const pqSaveDataReaction&); // Not implemented.
-  void operator=(const pqSaveDataReaction&); // Not implemented.
-};
-
-#endif
-
-
+//-----------------------------------------------------------------------------
+void pqSaveTraceReaction::enable(bool canDoAction)
+{
+  this->parentAction()->setEnabled(canDoAction);
+}

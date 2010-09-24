@@ -50,6 +50,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCreateCustomFilterReaction.h"
 #include "pqDataQueryReaction.h"
 #include "pqDeleteReaction.h"
+#include "pqEditTraceReaction.h"
 #include "pqExportReaction.h"
 #include "pqFiltersMenuReaction.h"
 #include "pqHelpReaction.h"
@@ -57,6 +58,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqListNewProxyDefinitionsBehavior.h"
 #include "pqLoadDataReaction.h"
 #include "pqLoadStateReaction.h"
+#include "pqMacroReaction.h"
 #include "pqMainControlsToolbar.h"
 #include "pqManageCustomFiltersReaction.h"
 #include "pqManageLinksReaction.h"
@@ -71,6 +73,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSaveDataReaction.h"
 #include "pqSaveScreenshotReaction.h"
 #include "pqSaveStateReaction.h"
+#include "pqSaveTraceReaction.h"
 #include "pqSelectionToolbar.h"
 #include "pqServerConnectReaction.h"
 #include "pqServerDisconnectReaction.h"
@@ -78,6 +81,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSourcesMenuReaction.h"
 #include "pqTestingReaction.h"
 #include "pqTimerLogReaction.h"
+#include "pqTraceReaction.h"
 #include "pqUndoRedoReaction.h"
 #include "pqVCRToolbar.h"
 #include "pqViewMenuManager.h"
@@ -206,7 +210,8 @@ void pqParaViewMenuBuilders::buildToolsMenu(QMenu& menu)
 #endif
 
 
-  menu.addSeparator();
+  menu.addSeparator(); // --------------------------------------------------
+
   //<addaction name="actionToolsDumpWidgetNames" />
   new pqTestingReaction(menu.addAction("Record Test")
     << pqSetName("actionToolsRecordTest"),
@@ -231,6 +236,17 @@ void pqParaViewMenuBuilders::buildToolsMenu(QMenu& menu)
   menu.addSeparator();
   new pqPythonShellReaction(menu.addAction("Python Shell")
     << pqSetName("actionToolsPythonShell"));
+
+  menu.addSeparator(); // --------------------------------------------------
+
+  new pqTraceReaction( menu.addAction("Start Trace")
+                       << pqSetName("actionToolsStartTrace"), true);
+  new pqTraceReaction(menu.addAction("Stop Trace")
+                      << pqSetName("actionToolsStartTrace"), false);
+  new pqEditTraceReaction(menu.addAction("Edit Trace")
+                      << pqSetName("actionToolsEditTrace"));
+  new pqSaveTraceReaction(menu.addAction("Save Trace")
+                          << pqSetName("actionToolsSaveTrace"));
 }
 
 //-----------------------------------------------------------------------------
@@ -279,7 +295,14 @@ void pqParaViewMenuBuilders::buildMacrosMenu
   pqPythonManager* manager = pqPVApplicationCore::instance()->pythonManager();
   if (manager)
     {
-    manager->addWidgetForMacros(&menu);
+    new pqMacroReaction(menu.addAction("Add new macro")
+                        << pqSetName("actionMacroCreate"));
+    QMenu *editMenu = menu.addMenu("Edit...");
+    QMenu *deleteMenu = menu.addMenu("Delete...");
+    menu.addSeparator();
+    manager->addWidgetForRunMacros(&menu);
+    manager->addWidgetForEditMacros(editMenu);
+    manager->addWidgetForDeleteMacros(deleteMenu);
     }
 #endif
 }
@@ -349,7 +372,7 @@ void pqParaViewMenuBuilders::buildToolbars(QMainWindow& mainWindow)
     {
     QToolBar* macrosToolbar = new QToolBar("Macros Toolbars", &mainWindow)
       << pqSetName("MacrosToolbar");
-    manager->addWidgetForMacros(macrosToolbar);
+    manager->addWidgetForRunMacros(macrosToolbar);
     mainWindow.addToolBar(Qt::TopToolBarArea, macrosToolbar);
     }
 #endif

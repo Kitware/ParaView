@@ -1,14 +1,14 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqSaveDataReaction.h
+   Module:    pqSaveTraceReaction.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
    under the terms of the ParaView license version 1.2.
-   
+
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
    Kitware Inc.
@@ -29,44 +29,35 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqSaveDataReaction_h 
-#define __pqSaveDataReaction_h
+#ifndef __pqSaveTraceReaction_h
+#define __pqSaveTraceReaction_h
 
 #include "pqReaction.h"
 
 /// @ingroup Reactions
-/// Reaction to save data files.
-class PQAPPLICATIONCOMPONENTS_EXPORT pqSaveDataReaction : public pqReaction
+/// Reaction for application python edit trace.
+class PQAPPLICATIONCOMPONENTS_EXPORT pqSaveTraceReaction : public pqReaction
 {
   Q_OBJECT
   typedef pqReaction Superclass;
 public:
-  /// Constructor. Parent cannot be NULL.
-  pqSaveDataReaction(QAction* parent);
+  pqSaveTraceReaction(QAction* parent);
 
-  /// Save data files from active port. Users the vtkSMWriterFactory to decide
-  /// what writes are available. Returns true if the creation is
-  /// successful, otherwise returns false.
-  /// Note that this method is static. Applications can simply use this without
-  /// having to create a reaction instance.
-  static bool saveActiveData(const QString& files);
-  static bool saveActiveData();
+  /// edit python trace.
+  static void saveTrace();
 
-public slots:
-  /// Updates the enabled state. Applications need not explicitly call
-  /// this.
-  void updateEnableState();
+protected slots:
+  void enable(bool);
 
 protected:
   /// Called when the action is triggered.
   virtual void onTriggered()
-    { pqSaveDataReaction::saveActiveData(); }
+    {
+    pqSaveTraceReaction::saveTrace();
+    }
 
 private:
-  pqSaveDataReaction(const pqSaveDataReaction&); // Not implemented.
-  void operator=(const pqSaveDataReaction&); // Not implemented.
+  Q_DISABLE_COPY(pqSaveTraceReaction)
 };
 
 #endif
-
-
