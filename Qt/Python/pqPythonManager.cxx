@@ -39,6 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPythonShell.h"
 #include "pqPythonScriptEditor.h"
 #include "pqSettings.h"
+#include "pqServerStartups.h"
 
 // These includes are so that we can listen for server creation/removal
 // and reset the python interpreter when it happens.
@@ -83,6 +84,12 @@ pqPythonManager::pqPythonManager(QObject* parent/*=null*/) :
     SIGNAL(executeScriptRequested(const QString&)),
     SLOT(executeScript(const QString&)));
 
+  // Listen the signal when a macro wants to be edited
+  QObject::connect(this->Internal->MacroSupervisor,
+    SIGNAL(onEditMacro(const QString&)),
+    this,
+    SLOT(editMacro(const QString&)));
+
   // Listen for signal when server is about to be removed
   this->connect(core->getServerManagerModel(),
       SIGNAL(aboutToRemoveServer(pqServer*)),
@@ -108,7 +115,9 @@ pqPythonManager::~pqPythonManager()
     {
     delete this->Internal->PythonDialog;
     }
-  if(this->Internal->Editor)
+  // Make sure the python editor is cleaned up in case it was never
+  // given a parent.
+  if(this->Internal->Editor && !this->Internal->Editor->parent())
     {
     delete this->Internal->Editor;
     }
@@ -224,9 +233,19 @@ void pqPythonManager::initializeParaviewPythonModules()
 }
 
 //-----------------------------------------------------------------------------
-void pqPythonManager::addWidgetForMacros(QWidget* widget)
+void pqPythonManager::addWidgetForRunMacros(QWidget* widget)
 {
-  this->Internal->MacroSupervisor->addWidgetForMacros(widget);
+  this->Internal->MacroSupervisor->addWidgetForRunMacros(widget);
+}
+//-----------------------------------------------------------------------------
+void pqPythonManager::addWidgetForEditMacros(QWidget* widget)
+{
+  this->Internal->MacroSupervisor->addWidgetForEditMacros(widget);
+}
+//-----------------------------------------------------------------------------
+void pqPythonManager::addWidgetForDeleteMacros(QWidget* widget)
+{
+  this->Internal->MacroSupervisor->addWidgetForDeleteMacros(widget);
 }
 
 //-----------------------------------------------------------------------------
@@ -444,4 +463,51 @@ void pqPythonManager::saveTraceState(const QString& fileName)
     QTextStream out(&file);
     out << traceString;
     }
+}
+//----------------------------------------------------------------------------
+void pqPythonManager::addMacro(const QString& fileName)
+{
+  QString userMacroDir = pqPythonMacroSupervisor::getUserMacroDirectory();
+  QDir dir;
+  dir.setPath(userMacroDir);
+  // Copy macro file to user directory
+  if(!dir.exists(userMacroDir) && !dir.mkpath(userMacroDir))
+    {
+    qWarning() << "Could not create user Macro directory:" << userMacroDir;
+    return;
+    }
+
+  QString baseNewMacroFile = QFileInfo(fileName).fileName().replace(".py","");
+
+  // Make sure the file do not already exist
+  int index = 1;
+  QString newName = baseNewMacroFile;
+  newName += ".py";
+  while(dir.exists(newName))
+    {
+    newName = baseNewMacroFile;
+    newName.append("-").append(QString::number(index)).append(".py");
+    index++;
+    }
+  QString newFilePath = dir.absolutePath() + QDir::separator() + newName;
+
+  QFile::copy(fileName, newFilePath);
+
+  // Register the inner one
+  this->Internal->MacroSupervisor->storeMacro(newFilePath);
+  this->Internal->MacroSupervisor->addMacro(newFilePath);
+}
+//----------------------------------------------------------------------------
+void pqPythonManager::editMacro(const QString& fileName)
+{
+  // Create the editor if needed and only the first time
+  if(!this->Internal->Editor)
+    {
+    this->Internal->Editor = new pqPythonScriptEditor(pqCoreUtilities::mainWidget());
+    }
+
+  this->Internal->Editor->show();
+  this->Internal->Editor->raise();
+  this->Internal->Editor->activateWindow();
+  this->Internal->Editor->open(fileName);
 }

@@ -58,6 +58,7 @@ SET (MOC_HEADERS
   pqListNewProxyDefinitionsBehavior.h
   pqLoadDataReaction.h
   pqLoadStateReaction.h
+  pqMacroReaction.h
   pqMainControlsToolbar.h
   pqManageCustomFiltersReaction.h
   pqManageLinksReaction.h
@@ -192,6 +193,8 @@ SET (SOURCE_FILES
   pqLoadDataReaction.h
   pqLoadStateReaction.cxx
   pqLoadStateReaction.h
+  pqMacroReaction.cxx
+  pqMacroReaction.h
   pqMainControlsToolbar.cxx
   pqMainControlsToolbar.h
   pqManageCustomFiltersReaction.cxx

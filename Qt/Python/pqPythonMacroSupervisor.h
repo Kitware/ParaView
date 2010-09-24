@@ -35,6 +35,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "QtPythonExport.h"
 #include <QObject>
 #include <QMap>
+#include <QPointer>
+#include <QList>
+#include <QString>
 
 class QAction;
 
@@ -49,7 +52,19 @@ public:
   // Add a widget to be given macro actions.  QActions representing script macros
   // will be added to the widget.  This could be a QToolBar, QMenu, or other type
   // of widget.
-  void addWidgetForMacros(QWidget* widget);
+  void addWidgetForRunMacros(QWidget* widget);
+
+  // Description:
+  // Add a widget to be given macro actions.  QActions representing script macros
+  // will be added to the widget.  This could be a QToolBar, QMenu, or other type
+  // of widget.
+  void addWidgetForEditMacros(QWidget* widget);
+
+  // Description:
+  // Add a widget to be given macro actions.  QActions representing script macros
+  // will be added to the widget.  This could be a QToolBar, QMenu, or other type
+  // of widget.
+  void addWidgetForDeleteMacros(QWidget* widget);
 
   // Description:
   // Lookup and return a macro action by filename.
@@ -66,16 +81,31 @@ public:
   // If a macro with the given filename already exists, its name will
   // be updated.
   static void storeMacro(const QString& macroName, const QString& filename);
+  // Description:
+  // store the macro with automatic macro name attibution based on the filename
+  static void storeMacro(const QString& filename);
 
   // Description:
   // Removes a macro with the given filename from pqSettings, if it exists.
   static void removeStoredMacro(const QString& filename);
+
+  // Description:
+  // Get a macro name from the fileName
+  static QString macroNameFromFileName(const QString& filename);
+
+  static QString getUserMacroDirectory();
+  static QString getApplicationMacroDirectory();
+  static QStringList getMacrosFilePaths();
 
 signals:
 
   // Description:
   // Emitted when a macro has been triggered.
   void executeScriptRequested(const QString& filename);
+
+  // Description:
+  // Emitted when a macro has to be edited
+  void onEditMacro(const QString& filename);
 
 public slots:
 
@@ -85,6 +115,7 @@ public slots:
   // one given.  Macro names do not have to be unique.  Note, this does not
   // store the macro in pqSettings, you must still call storeMacro yourself.
   void addMacro(const QString& macroName, const QString& filename);
+  void addMacro(const QString& filename);
 
   // Description:
   // Remove an action with the given filename.  Note, this does not remove
@@ -98,7 +129,23 @@ protected slots:
   // looked up and the signal requestExecuteScript will be emitted.
   void onMacroTriggered();
 
+  // Description:
+  // If the sender is a QAction managed by this class, the filename will be
+  // moved (deleted), and the macro will be removed
+  void onDeleteMacroTriggered();
+
+  // Description:
+  // If the sender is a QAction managed by this class, the macro file will be
+  // open in a python edit
+  void onEditMacroTriggered();
+
 protected:
+
+  // Description:
+  // Add a widget to be given macro actions.  QActions representing script macros
+  // will be added to the widget.  This could be a QToolBar, QMenu, or other type
+  // of widget.
+  void addWidgetForMacros(QWidget* widget, int actionType); // 0:run, 1:edit, 2:delete
 
   // Description:
   // Removes all actions and re-adds actions for each macro stored in pqSettings.

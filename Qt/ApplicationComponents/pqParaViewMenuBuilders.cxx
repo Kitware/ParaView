@@ -58,6 +58,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqListNewProxyDefinitionsBehavior.h"
 #include "pqLoadDataReaction.h"
 #include "pqLoadStateReaction.h"
+#include "pqMacroReaction.h"
 #include "pqMainControlsToolbar.h"
 #include "pqManageCustomFiltersReaction.h"
 #include "pqManageLinksReaction.h"
@@ -291,7 +292,14 @@ void pqParaViewMenuBuilders::buildMacrosMenu
   pqPythonManager* manager = pqPVApplicationCore::instance()->pythonManager();
   if (manager)
     {
-    manager->addWidgetForMacros(&menu);
+    new pqMacroReaction(menu.addAction("Create macro")
+                        << pqSetName("actionMacroCreate"));
+    QMenu *editMenu = menu.addMenu("Edit...");
+    QMenu *deleteMenu = menu.addMenu("Delete...");
+    menu.addSeparator();
+    manager->addWidgetForRunMacros(&menu);
+    manager->addWidgetForEditMacros(editMenu);
+    manager->addWidgetForDeleteMacros(deleteMenu);
     }
 #endif
 }
@@ -361,7 +369,7 @@ void pqParaViewMenuBuilders::buildToolbars(QMainWindow& mainWindow)
     {
     QToolBar* macrosToolbar = new QToolBar("Macros Toolbars", &mainWindow)
       << pqSetName("MacrosToolbar");
-    manager->addWidgetForMacros(macrosToolbar);
+    manager->addWidgetForRunMacros(macrosToolbar);
     mainWindow.addToolBar(Qt::TopToolBarArea, macrosToolbar);
     }
 #endif

@@ -73,7 +73,9 @@ public:
   // Add a widget to be given macro actions.  QActions representing script macros
   // will be added to the widget.  This could be a QToolBar, QMenu, or other type
   // of widget.
-  void addWidgetForMacros(QWidget* widget);
+  void addWidgetForRunMacros(QWidget* widget);
+  void addWidgetForEditMacros(QWidget* widget);
+  void addWidgetForDeleteMacros(QWidget* widget);
 
   // Description:
   // return true if the python tracing can be started
@@ -102,6 +104,10 @@ public:
   // Show a file dialog in order to save the python trace into a file
   void saveTraceState(const QString& filename);
 
+  // Description:
+  // Save the macro in ParaView configuration and update widget automatically
+  void addMacro(const QString& fileName);
+
 signals:
 
   void paraviewPythonModulesImported();
@@ -118,6 +124,10 @@ public slots:
   // Executes the given script.  If the python interpreter hasn't been initialized
   // yet it will be initialized.
   void executeScript(const QString& filename);
+
+  // Description:
+  // Launch python editor to edit the macro
+  void editMacro(const QString& fileName);
 
 protected slots:
 
