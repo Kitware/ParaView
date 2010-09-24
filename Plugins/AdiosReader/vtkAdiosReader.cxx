@@ -63,40 +63,52 @@ public:
     {
     this->MeshFile = NULL;
     this->DataFile = NULL;
+    this->TimeStep = 0;
     }
   // --------------------------------------------------------------------------
   virtual ~Internals()
     {
-    if(this->MeshFile) delete this->MeshFile;
-    if(this->DataFile) delete this->DataFile;
+    if(this->MeshFile)
+      {
+      delete this->MeshFile;
+      this->MeshFile = NULL;
+      }
+    if(this->DataFile)
+      {
+      delete this->DataFile;
+      this->DataFile = NULL;
+      }
     }
   // --------------------------------------------------------------------------
   void UpdateFileName(const char* currentFileName)
     {
+    if(!currentFileName)
+      return;
+
     if(!this->MeshFile)
       {
       this->MeshFile = new AdiosFile(currentFileName);
 
       // Make sure that file is open and metadata loaded
       this->MeshFile->Open();
-      LoadMeshFileIfNeeded();
+      this->LoadMeshFileIfNeeded();
       }
     else // Check if the filename has changed
       {
       if((strcmp( currentFileName, this->MeshFile->FileName.c_str()) != 0) || (this->DataFile && (strcmp( currentFileName, this->DataFile->FileName.c_str()) != 0 )) )
         {
-        delete this->MeshFile;
+        delete this->MeshFile; // not NULL because we are in the else
+        this->MeshFile = new AdiosFile(currentFileName);
+
         if(this->DataFile)
           {
           delete this->DataFile;
           this->DataFile = NULL;
           }
 
-        this->MeshFile = new AdiosFile(currentFileName);
-
         // Make sure that file is open and metadata loaded
         this->MeshFile->Open();
-        LoadMeshFileIfNeeded();
+        this->LoadMeshFileIfNeeded();
         }
       }
     }
@@ -142,63 +154,65 @@ public:
 
       AdiosVariableMapIterator iter = this->MeshFile->Variables.begin();
       for(; iter != this->MeshFile->Variables.end(); iter++)
-      {
-      const AdiosVariable *var = &iter->second;
-
-      // Skip invalid timesteps
-      ostringstream stream;
-      stream << "/Timestep_" << realTimeStep << "/";
-      if(var->Name.find(stream.str().c_str()) == vtkstd::string::npos)
-        continue;
-
-      // Skip invalid nodes coordinates array
-      ostringstream streamNodes;
-      streamNodes << "/Timestep_" << realTimeStep << "/nodes/";
-      if(var->Name.find(streamNodes.str().c_str()) != vtkstd::string::npos)
-        continue;
-
-      // Skip invalid cell coordinates array
-      ostringstream streamCells;
-      streamCells << "/Timestep_" << realTimeStep << "/cells/";
-      if(var->Name.find(streamCells.str().c_str()) != vtkstd::string::npos)
-        continue;
-
-
-      vtkDataArray* array = this->MeshFile->ReadVariable(var->Name.c_str(), realTimeStep);
-      switch(this->MeshFile->GetDataType(var->Name.c_str())) // FIXME method is not correct !!!!!!!!!!!1
         {
-        case VTK_RECTILINEAR_GRID:
-          if(!rectilinearGrid)  // Create if needed
-            rectilinearGrid = this->MeshFile->GetPixieRectilinearGrid(realTimeStep);
-          rectilinearGrid->GetCellData()->AddArray(array);
-          break;
-        case VTK_STRUCTURED_GRID:
-          if(!structuredGrid)  // Create if needed
-            structuredGrid = this->MeshFile->GetPixieStructuredGrid(var->Name.c_str(), realTimeStep);
-          structuredGrid->GetPointData()->AddArray(array);
-          break;
-        default:
-          cout << "Do not know what to put var " << var->Name.c_str() << endl;
+        const AdiosVariable *var = &iter->second;
+
+        // Skip invalid timesteps
+        ostringstream stream;
+        stream << "/Timestep_" << realTimeStep << "/";
+        if(var->Name.find(stream.str().c_str()) == vtkstd::string::npos)
+          continue;
+
+        // Skip invalid nodes coordinates array
+        ostringstream streamNodes;
+        streamNodes << "/Timestep_" << realTimeStep << "/nodes/";
+        if(var->Name.find(streamNodes.str().c_str()) != vtkstd::string::npos)
+          continue;
+
+        // Skip invalid cell coordinates array
+        ostringstream streamCells;
+        streamCells << "/Timestep_" << realTimeStep << "/cells/";
+        if(var->Name.find(streamCells.str().c_str()) != vtkstd::string::npos)
+          continue;
+
+        vtkDataArray* array = this->MeshFile->ReadVariable(var->Name.c_str(), realTimeStep);
+        if(array)
+          {
+          switch(this->MeshFile->GetDataType(var->Name.c_str()))
+            {
+            case VTK_RECTILINEAR_GRID:
+              if(!rectilinearGrid)  // Create if needed
+                rectilinearGrid = this->MeshFile->GetPixieRectilinearGrid(realTimeStep);
+              rectilinearGrid->GetCellData()->AddArray(array);
+              break;
+            case VTK_STRUCTURED_GRID:
+              if(!structuredGrid)  // Create if needed
+                structuredGrid = this->MeshFile->GetPixieStructuredGrid(var->Name.c_str(), realTimeStep);
+              structuredGrid->GetPointData()->AddArray(array);
+              break;
+            default:
+              cout << "Do not know what to put var " << var->Name.c_str() << endl;
+            }
+          array->Delete();
+          }
         }
-      array->Delete();
-      }
 
       if(rectilinearGrid)
-      {
-      rectilinearGrid->GetInformation()->Set( vtkDataObject::DATA_TIME_STEPS(),
-                                              &this->TimeStep, 1);
-      pixieOutput->SetBlock(0, rectilinearGrid);
-      rectilinearGrid->FastDelete();
-      }
+        {
+        rectilinearGrid->GetInformation()->Set( vtkDataObject::DATA_TIME_STEPS(),
+                                                &this->TimeStep, 1);
+        pixieOutput->SetBlock(0, rectilinearGrid);
+        rectilinearGrid->FastDelete();
+        }
       if(structuredGrid)
-      {
-      structuredGrid->GetInformation()->Set( vtkDataObject::DATA_TIME_STEPS(),
-                                             &this->TimeStep, 1);
-      pixieOutput->SetBlock(1, structuredGrid);
-      structuredGrid->FastDelete();
-      }
+        {
+        structuredGrid->GetInformation()->Set( vtkDataObject::DATA_TIME_STEPS(),
+                                               &this->TimeStep, 1);
+        pixieOutput->SetBlock(1, structuredGrid);
+        structuredGrid->FastDelete();
+        }
       pixieOutput->GetInformation()->Set( vtkDataObject::DATA_TIME_STEPS(),
-                                     &this->TimeStep, 1);
+                                          &this->TimeStep, 1);
       }
     else // We suppose that only XGC file format is the other
       {
@@ -224,6 +238,8 @@ public:
     nbTime = this->MeshFile->GetNumberOfTimeSteps();
     if(nbTime == -1)
       return 0;
+
+    return nbTime;
     }
   // --------------------------------------------------------------------------
   double GetTimeStep(int idx)
@@ -386,14 +402,17 @@ int vtkAdiosReader::RequestInformation(vtkInformation *, vtkInformationVector** 
 
   // Create tmp time structure
   int nbTimesteps = this->Internal->GetNumberOfTimeSteps();
-  double* timestepsValues = new double[this->Internal->GetNumberOfTimeSteps()];
-  double timeRange[2];
+  double* timestepsValues = new double[nbTimesteps];
+  double timeRange[2] = {0,1};
   for(int i=0; i < nbTimesteps; i++)
     {
-    timestepsValues[i] = this->Internal->GetTimeStep(i);
+    timeRange[1] = timestepsValues[i] = this->Internal->GetTimeStep(i);
+    if(i == 0)
+      {
+      timeRange[0] = timestepsValues[0];
+      }
     }
-  timeRange[0] = timestepsValues[0];
-  timeRange[1] = timestepsValues[nbTimesteps - 1];
+
 
   // Set information objects
   vtkInformation *info = outputVector->GetInformationObject(0);
@@ -414,8 +433,11 @@ int vtkAdiosReader::RequestUpdateExtent(vtkInformation*,
                         vtkInformationVector* outputVector)
 {
   vtkInformation *info = outputVector->GetInformationObject(0);
-  this->Internal->SetActiveTimeStep(
-      info->Get(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEPS())[0]);
+  if(info->Has(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEPS()))
+    {
+    this->Internal->SetActiveTimeStep(
+        info->Get(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEPS())[0]);
+    }
   return 1;
 }
 //----------------------------------------------------------------------------
