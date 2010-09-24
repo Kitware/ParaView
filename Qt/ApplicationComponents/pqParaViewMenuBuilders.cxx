@@ -210,7 +210,8 @@ void pqParaViewMenuBuilders::buildToolsMenu(QMenu& menu)
 #endif
 
 
-  menu.addSeparator();
+  menu.addSeparator(); // --------------------------------------------------
+
   //<addaction name="actionToolsDumpWidgetNames" />
   new pqTestingReaction(menu.addAction("Record Test")
     << pqSetName("actionToolsRecordTest"),
@@ -235,9 +236,11 @@ void pqParaViewMenuBuilders::buildToolsMenu(QMenu& menu)
   menu.addSeparator();
   new pqPythonShellReaction(menu.addAction("Python Shell")
     << pqSetName("actionToolsPythonShell"));
-  menu.addSeparator();
-  new pqTraceReaction(menu.addAction("Start Trace")
-                      << pqSetName("actionToolsStartTrace"), true);
+
+  menu.addSeparator(); // --------------------------------------------------
+
+  new pqTraceReaction( menu.addAction("Start Trace")
+                       << pqSetName("actionToolsStartTrace"), true);
   new pqTraceReaction(menu.addAction("Stop Trace")
                       << pqSetName("actionToolsStartTrace"), false);
   new pqEditTraceReaction(menu.addAction("Edit Trace")

@@ -129,6 +129,10 @@ public slots:
   // Launch python editor to edit the macro
   void editMacro(const QString& fileName);
 
+  // Description:
+  // Print on the status bar "Python Trace is currently ON" if currently tracing...
+  void updateStatusMessage();
+
 protected slots:
 
   // Description:
