@@ -93,8 +93,6 @@ public:
   // Get a macro name from the fileName
   static QString macroNameFromFileName(const QString& filename);
 
-  static QString getUserMacroDirectory();
-  static QString getApplicationMacroDirectory();
   static QStringList getMacrosFilePaths();
 
 signals:

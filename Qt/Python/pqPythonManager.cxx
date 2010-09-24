@@ -35,7 +35,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCoreUtilities.h"
 #include "pqPythonDialog.h"
 #include "pqPythonMacroSupervisor.h"
-#include "pqPythonToolsWidget.h"
 #include "pqPythonShell.h"
 #include "pqPythonScriptEditor.h"
 #include "pqSettings.h"
@@ -63,7 +62,6 @@ class pqPythonManager::pqInternal
 {
 public:
   QPointer<pqPythonDialog>            PythonDialog;
-  QPointer<pqPythonToolsWidget>       ToolsWidget;
   QPointer<pqPythonMacroSupervisor>   MacroSupervisor;
   QPointer<pqServer>                  ActiveServer;
   bool                                IsPythonTracing;
@@ -151,31 +149,6 @@ pqPythonDialog* pqPythonManager::pythonShellDialog()
     this->connect(this->Internal->PythonDialog,
       SIGNAL(interpreterInitialized()),
       SLOT(onPythonInterpreterInitialized()));
-
-    // Create the python tools widget and embed it in the python dialog.
-    // Due to some buggy layout issues with QSplitter, wrap the tools widget
-    // in a qwidget before placing it in the splitter.
-    QSplitter* splitter = this->Internal->PythonDialog->splitter();
-    QWidget* w = new QWidget(splitter);
-    QVBoxLayout* layout = new QVBoxLayout(w);
-    layout->setSpacing(0);
-    layout->setMargin(0);
-    this->Internal->ToolsWidget = new pqPythonToolsWidget(w);
-    w->layout()->addWidget(this->Internal->ToolsWidget);
-    splitter->addWidget(w);
-    splitter->setStretchFactor(0, 3); // (widget_index, stetch_factor)
-    splitter->setStretchFactor(1, 2);
-    this->Internal->PythonDialog->restoreSplitterState();
-
-    // Connect signals from ToolsWidget to the pqPythonMacroSupervisor
-    QObject::connect(this->Internal->ToolsWidget,
-      SIGNAL(addMacroRequested(const QString&, const QString&)),
-      this->Internal->MacroSupervisor,
-      SLOT(addMacro(const QString&, const QString&)));
-    QObject::connect(this->Internal->ToolsWidget,
-      SIGNAL(removeMacroRequested(const QString&)),
-      this->Internal->MacroSupervisor,
-      SLOT(removeMacro(const QString&)));
 
     QApplication::restoreOverrideCursor();
     }
@@ -467,7 +440,7 @@ void pqPythonManager::saveTraceState(const QString& fileName)
 //----------------------------------------------------------------------------
 void pqPythonManager::addMacro(const QString& fileName)
 {
-  QString userMacroDir = pqPythonMacroSupervisor::getUserMacroDirectory();
+  QString userMacroDir = pqCoreUtilities::getParaViewUserDirectory() + "/Macros";
   QDir dir;
   dir.setPath(userMacroDir);
   // Copy macro file to user directory
@@ -478,24 +451,13 @@ void pqPythonManager::addMacro(const QString& fileName)
     }
 
   QString baseNewMacroFile = QFileInfo(fileName).fileName().replace(".py","");
+  QString expectedFilePath = userMacroDir + "/" + baseNewMacroFile + ".py";
 
-  // Make sure the file do not already exist
-  int index = 1;
-  QString newName = baseNewMacroFile;
-  newName += ".py";
-  while(dir.exists(newName))
-    {
-    newName = baseNewMacroFile;
-    newName.append("-").append(QString::number(index)).append(".py");
-    index++;
-    }
-  QString newFilePath = dir.absolutePath() + QDir::separator() + newName;
-
-  QFile::copy(fileName, newFilePath);
+  QFile::copy(fileName, expectedFilePath);
 
   // Register the inner one
-  this->Internal->MacroSupervisor->storeMacro(newFilePath);
-  this->Internal->MacroSupervisor->addMacro(newFilePath);
+  this->Internal->MacroSupervisor->storeMacro(expectedFilePath);
+  this->Internal->MacroSupervisor->addMacro(expectedFilePath);
 }
 //----------------------------------------------------------------------------
 void pqPythonManager::editMacro(const QString& fileName)

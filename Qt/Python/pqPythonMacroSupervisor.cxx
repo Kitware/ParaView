@@ -34,6 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSettings.h"
 
 #include "pqPythonManager.h"
+#include "pqCoreUtilities.h"
 
 #include <QAction>
 #include <QDebug>
@@ -399,63 +400,24 @@ QString pqPythonMacroSupervisor::macroNameFromFileName(const QString& filename)
     }
   return name;
 }
-//----------------------------------------------------------------------------
-QString pqPythonMacroSupervisor::getUserMacroDirectory()
-{
-  QString settingsRoot;
-#if defined(Q_OS_WIN)
-  settingsRoot = QString::fromLocal8Bit(getenv("APPDATA"));
-#else
-  settingsRoot = QString::fromLocal8Bit(getenv("HOME")) +
-                 QDir::separator() + QString::fromLocal8Bit(".config");
-#endif
-  QString settingsPath = QString("%2%1%3%1%4");
-  settingsPath = settingsPath.arg(QDir::separator());
-  settingsPath = settingsPath.arg(settingsRoot);
-  settingsPath = settingsPath.arg(QApplication::organizationName());
-  settingsPath = settingsPath.arg("Macros");
-  return settingsPath;
-}
-//----------------------------------------------------------------------------
-QString pqPythonMacroSupervisor::getApplicationMacroDirectory()
-{
-  QString settingsRoot;
-#if defined(Q_OS_WIN)
-  settingsRoot = QString::fromLocal8Bit(getenv("COMMON_APPDATA"));
-#else
-  settingsRoot = QString::fromLocal8Bit("/usr/share");
-#endif
-  QString settingsPath = QString("%2%1%3%1%4");
-  settingsPath = settingsPath.arg(QDir::separator());
-  settingsPath = settingsPath.arg(settingsRoot);
-  settingsPath = settingsPath.arg(QApplication::organizationName());
-  settingsPath = settingsPath.arg("Macros");
-  return settingsPath;
-}
+
 //----------------------------------------------------------------------------
 QStringList pqPythonMacroSupervisor::getMacrosFilePaths()
 {
   QStringList macroList;
-
   QDir dir;
   dir.setFilter(QDir::Files);
 
-  QString basePath = getUserMacroDirectory();
-  dir.setPath(basePath);
-  foreach(QString filePath , dir.entryList())
+  foreach(QString dirPath, pqCoreUtilities::findParaviewPaths(QString("Macros"),
+                                                              true, true))
     {
-    if(filePath.startsWith("."))
-      continue;
-    macroList.push_back(basePath + QDir::separator() + filePath);
-    }
-
-  basePath = getApplicationMacroDirectory();
-  dir.setPath(basePath);
-  foreach(QString filePath , dir.entryList())
-    {
-    if(filePath.startsWith("."))
-      continue;
-    macroList.push_back(basePath + QDir::separator() + filePath);
+    dir.setPath(dirPath);
+    foreach(QString filePath , dir.entryList())
+      {
+      if(filePath.startsWith("."))
+        continue;
+      macroList.push_back(dirPath + QDir::separator() + filePath);
+      }
     }
 
   return macroList;

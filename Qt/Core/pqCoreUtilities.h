@@ -36,6 +36,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QPointer>
 #include <QWidget>
+#include <QDir>
+#include <QStringList>
+#include <QString>
+#include <QFile>
+#include <QFileInfo>
 
 /// pqCoreUtilities is a collection of arbitrary utility functions that can be
 /// used by the application.
@@ -58,6 +63,19 @@ public:
       }
     return pqCoreUtilities::MainWidget; 
     }
+
+  /// Return the path of the root ParaView user specific configuration directory
+  static QString getParaViewUserDirectory();
+
+  /// Return the path of the launched application
+  static QString getParaViewApplicationDirectory();
+
+  /// Return the list of full available path that exists inside the shared
+  /// application path and the user specific one
+  static QStringList findParaviewPaths(QString directoryOrFileName,
+                                       bool lookupInAppDir,
+                                       bool lookupInUserDir);
+  static QString getNoneExistingFileName(QString expectedFilePath);
 
 private:
   static QWidget* findMainWindow();

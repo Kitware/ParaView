@@ -48,6 +48,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqAnimationScene.h"
 #include "pqCoreInit.h"
 #include "pqCoreTestUtility.h"
+#include "pqCoreUtilities.h"
 #include "pqDisplayPolicy.h"
 #include "pqEventDispatcher.h"
 #include "pqLinksModel.h"
@@ -688,22 +689,28 @@ void pqApplicationCore::loadDistributedPlugins(const char* filename)
   QString config_file = filename;
   if (!filename)
     {
-    config_file = QApplication::applicationDirPath() +  "/.plugins";
-#if defined(__APPLE__)
-    // for installed applications.
-    config_file = QApplication::applicationDirPath() + "/../Support/.plugins";
-    if (!QFile::exists(config_file))
+    QStringList list = pqCoreUtilities::findParaviewPaths(QString(".plugins"),
+                                                          true, false);
+    if(list.size() > 0)
       {
-      config_file =  QApplication::applicationDirPath() + "/../../../.plugins";
+      config_file = list.at(0);
       }
-#endif
-#if defined(WIN32)
-    if (!QFile::exists(config_file))
-      {
-      // maybe running from the build tree.
-      config_file = QApplication::applicationDirPath() + "/../.plugins";
-      }
-#endif
+//    config_file = QApplication::applicationDirPath() +  "/.plugins";
+//#if defined(__APPLE__)
+//    // for installed applications.
+//    config_file = QApplication::applicationDirPath() + "/../Support/.plugins";
+//    if (!QFile::exists(config_file))
+//      {
+//      config_file =  QApplication::applicationDirPath() + "/../../../.plugins";
+//      }
+//#endif
+//#if defined(WIN32)
+//    if (!QFile::exists(config_file))
+//      {
+//      // maybe running from the build tree.
+//      config_file = QApplication::applicationDirPath() + "/../.plugins";
+//      }
+//#endif
     }
 
   vtkSMApplication::GetApplication()->GetPluginManager()->LoadPluginConfigurationXML(
