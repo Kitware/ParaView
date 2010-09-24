@@ -39,7 +39,7 @@ class vtkSMContextNamedOptionsProxy::PlotInfo
 public:
   vtkWeakPointer<vtkPlot> Plot;
   vtkStdString Label;
-  bool ColorInitialized;
+  bool Initialized;
   int LineThickness;
   int LineStyle;
   int MarkerStyle;
@@ -49,7 +49,7 @@ public:
 
   PlotInfo()
     {
-    ColorInitialized = false;
+    Initialized = false;
     LineThickness = 2;
     LineStyle = 1;
     MarkerStyle = 0;
@@ -60,7 +60,7 @@ public:
 
   PlotInfo(const PlotInfo &p)
     {
-    ColorInitialized = p.ColorInitialized;
+    Initialized = p.Initialized;
     LineThickness = p.LineThickness;
     LineStyle = p.LineStyle;
     MarkerStyle = p.MarkerStyle;
@@ -220,7 +220,7 @@ void SetPlotInfoColor(vtkSMContextNamedOptionsProxy::PlotInfo& plotInfo, vtkColo
   plotInfo.Color[0] = color.GetData()[0]/255.0;
   plotInfo.Color[1] = color.GetData()[1]/255.0;
   plotInfo.Color[2] = color.GetData()[2]/255.0;
-  plotInfo.ColorInitialized = true;
+  plotInfo.Initialized = true;
 }
 }
 
@@ -235,6 +235,12 @@ void vtkSMContextNamedOptionsProxy::RefreshPlots()
 
   PlotMapType newMap;
 
+  int defaultVisible = 1;
+  if (strcmp(this->Internals->XSeriesName.c_str(), "bin_extents") == 0)
+    {
+    defaultVisible = 0;
+    }
+
   // For each series (column in the table)
   const vtkIdType numberOfColumns = this->Internals->Table->GetNumberOfColumns();
   for (vtkIdType i = 0; i < numberOfColumns; ++i)
@@ -248,9 +254,10 @@ void vtkSMContextNamedOptionsProxy::RefreshPlots()
 
     // Get the existing PlotInfo or initialize a new one
     PlotInfo& plotInfo = this->GetPlotInfo(seriesName);
-    if (!plotInfo.ColorInitialized)
+    if (!plotInfo.Initialized)
       {
       SetPlotInfoColor(plotInfo, this->Internals->Colors->GetColorRepeating(i));
+      plotInfo.Visible = defaultVisible;
       }
 
     // Add the PlotInfo to the new collection
@@ -489,7 +496,7 @@ void vtkSMContextNamedOptionsProxy::SetColor(const char* name,
   plotInfo.Color[0] = r;
   plotInfo.Color[1] = g;
   plotInfo.Color[2] = b;
-  plotInfo.ColorInitialized = true;
+  plotInfo.Initialized = true;
   if (plotInfo.Plot)
     {
     plotInfo.Plot->SetColor(r, g, b);
