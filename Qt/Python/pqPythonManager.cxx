@@ -460,8 +460,8 @@ void pqPythonManager::addMacro(const QString& fileName)
     return;
     }
 
-  QString baseNewMacroFile = QFileInfo(fileName).fileName().replace(".py","");
-  QString expectedFilePath = userMacroDir + "/" + baseNewMacroFile + ".py";
+  QString expectedFilePath = userMacroDir + "/" + QFileInfo(fileName).fileName();
+  expectedFilePath = pqCoreUtilities::getNoneExistingFileName(expectedFilePath);
 
   QFile::copy(fileName, expectedFilePath);
 
