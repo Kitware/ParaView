@@ -328,9 +328,9 @@ void vtkSMContextNamedOptionsProxy::UpdatePropertyInformationInternal(
     else if (strcmp(propertyName, "ColorInfo") == 0)
       {
       vtksys_ios::ostringstream string;
-      for (int i = 0; i < 3; ++i)
+      for (int j = 0; j < 3; ++j)
         {
-        string << plotInfo.Color[i];
+        string << plotInfo.Color[j];
         newValues->AddString(string.str().c_str());
         string.str("");
         }
