@@ -950,6 +950,17 @@
         </Documentation>
       </StringVectorProperty>
 
+    <IntVectorProperty name="MergeConsecutiveDelimiters"
+        command="SetMergeConsecutiveDelimiters"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Whether to merge successive delimiters.  Use this if (for example) your fields are separated
+          by spaces but you don't know exactly how many.
+        </Documentation>
+      </IntVectorProperty>
+
       <!-- End of CSVReaderCore -->
    </SourceProxy>
 
@@ -5693,6 +5704,7 @@
           <Property name="UseStringDelimiter" />
           <Property name="HaveHeaders" />
           <Property name="FieldDelimiterCharacters" />
+          <Property name="MergeConsecutiveDelimiters" />
         </ExposedProperties>
       </SubProxy>
 
