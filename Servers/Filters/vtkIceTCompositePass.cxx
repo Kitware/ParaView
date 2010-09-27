@@ -15,6 +15,7 @@
 #include "vtkIceTCompositePass.h"
 
 #include "vtkCamera.h"
+#include "vtkFloatArray.h"
 #include "vtkFrameBufferObject.h"
 #include "vtkIceTContext.h"
 #include "vtkIntArray.h"
@@ -37,7 +38,8 @@
 
 #include <assert.h>
 #include "vtkgl.h"
-#include <GL/ice-t.h>
+#include <IceT.h>
+#include <IceTGL.h>
 
 extern const char *vtkIceTCompositeZPassShader_fs;
 
@@ -81,6 +83,9 @@ vtkIceTCompositePass::vtkIceTCompositePass()
   this->UseOrderedCompositing = false;
   this->DepthOnly=false;
 
+  this->LastRenderedRGBAColors = vtkUnsignedCharArray::New();
+  this->LastRenderedDepths = vtkFloatArray::New();
+
   this->PBO=0;
   this->ZTexture=0;
   this->Program=0;
@@ -110,6 +115,11 @@ vtkIceTCompositePass::~vtkIceTCompositePass()
   this->SetController(0);
   this->IceTContext->Delete();
   this->IceTContext = 0;
+
+  this->LastRenderedRGBAColors->Delete();
+  this->LastRenderedRGBAColors = NULL;
+  this->LastRenderedDepths->Delete();
+  this->LastRenderedDepths = NULL;
 
   if(this->BackgroundTexture!=0)
     {
@@ -172,10 +182,11 @@ void vtkIceTCompositePass::SetupContext(const vtkRenderState* render_state)
      this->KdTree->GetNumberOfRegions() >=
      this->IceTContext->GetController()->GetNumberOfProcesses());
 
-  GLenum flags;
   if(this->DepthOnly)
     {
-    flags=ICET_DEPTH_BUFFER_BIT;
+    icetSetColorFormat(ICET_IMAGE_COLOR_NONE);
+    icetSetDepthFormat(ICET_IMAGE_DEPTH_FLOAT);
+    icetCompositeMode(ICET_COMPOSITE_MODE_Z_BUFFER);
     }
   else
     {
@@ -183,14 +194,18 @@ void vtkIceTCompositePass::SetupContext(const vtkRenderState* render_state)
     // ICET_DEPTH_BUFFER_BIT in  the input-buffer argument.
     if (use_ordered_compositing)
       {
-      flags=ICET_COLOR_BUFFER_BIT;
+      icetSetColorFormat(ICET_IMAGE_COLOR_RGBA_UBYTE);
+      icetSetDepthFormat(ICET_IMAGE_DEPTH_NONE);
+      icetCompositeMode(ICET_COMPOSITE_MODE_BLEND);
       }
     else
       {
-      flags=ICET_COLOR_BUFFER_BIT | ICET_DEPTH_BUFFER_BIT;
+      icetSetColorFormat(ICET_IMAGE_COLOR_RGBA_UBYTE);
+      icetSetDepthFormat(ICET_IMAGE_DEPTH_FLOAT);
+      icetDisable(ICET_COMPOSITE_ONE_BUFFER);
+      icetCompositeMode(ICET_COMPOSITE_MODE_Z_BUFFER);
       }
     }
-  icetInputOutputBuffers(flags,flags);
 
   icetEnable(ICET_FLOATING_VIEWPORT);
   if (use_ordered_compositing)
@@ -198,7 +213,7 @@ void vtkIceTCompositePass::SetupContext(const vtkRenderState* render_state)
     // if ordered compositing is enabled, pass the process order from the kdtree
     // to icet.
 
-    // Setup ICE-T context for correct sorting.
+    // Setup IceT context for correct sorting.
     icetEnable(ICET_ORDERED_COMPOSITE);
 
     // Order all the regions.
@@ -216,14 +231,14 @@ void vtkIceTCompositePass::SetupContext(const vtkRenderState* render_state)
         camera->GetPosition(), orderedProcessIds);
       }
 
-    if (sizeof(int) == sizeof(GLint))
+    if (sizeof(int) == sizeof(IceTInt))
       {
-      icetCompositeOrder((GLint *)orderedProcessIds->GetPointer(0));
+      icetCompositeOrder((IceTInt *)orderedProcessIds->GetPointer(0));
       }
     else
       {
       vtkIdType numprocs = orderedProcessIds->GetNumberOfTuples();
-      GLint *tmparray = new GLint[numprocs];
+      IceTInt *tmparray = new IceTInt[numprocs];
       const int *opiarray = orderedProcessIds->GetPointer(0);
       vtkstd::copy(opiarray, opiarray+numprocs, tmparray);
       icetCompositeOrder(tmparray);
@@ -245,7 +260,7 @@ void vtkIceTCompositePass::SetupContext(const vtkRenderState* render_state)
   if (allBounds[0] > allBounds[1])
     {
     vtkDebugMacro("nothing visible" << endl);
-    float tmp = VTK_LARGE_FLOAT;
+    IceTFloat tmp = VTK_LARGE_FLOAT;
     icetBoundingVertices(1, ICET_FLOAT, 0, 1, &tmp);
     }
   else
@@ -258,14 +273,14 @@ void vtkIceTCompositePass::SetupContext(const vtkRenderState* render_state)
   // correctly.
   if (!this->FixBackground && !this->DepthOnly)
     {
-    icetEnable(ICET_DISPLAY);
-    icetEnable(ICET_DISPLAY_INFLATE);
+    icetEnable(ICET_GL_DISPLAY);
+    icetEnable(ICET_GL_DISPLAY_INFLATE);
     }
   else
     {
     // we'll push the icet composited-buffer to screen at the end.
-    icetDisable(ICET_DISPLAY);
-    icetDisable(ICET_DISPLAY_INFLATE);
+    icetDisable(ICET_GL_DISPLAY);
+    icetDisable(ICET_GL_DISPLAY_INFLATE);
     }
 
   if (this->DataReplicatedOnAllProcesses)
@@ -275,7 +290,7 @@ void vtkIceTCompositePass::SetupContext(const vtkRenderState* render_state)
   else
     {
     icetDataReplicationGroupColor(
-      static_cast<GLint>(this->Controller->GetLocalProcessId()));
+      static_cast<IceTInt>(this->Controller->GetLocalProcessId()));
     }
 
   // capture color buffer
@@ -342,12 +357,39 @@ void vtkIceTCompositePass::Render(const vtkRenderState* render_state)
   this->IceTContext->MakeCurrent();
   this->SetupContext(render_state);
 
-  icetDrawFunc(IceTDrawCallback);
+  icetGLDrawCallback(IceTDrawCallback);
   IceTDrawCallbackHandle = this;
   IceTDrawCallbackState = render_state;
-  icetDrawFrame();
+  IceTImage renderedImage = icetGLDrawFrame();
   IceTDrawCallbackHandle = NULL;
   IceTDrawCallbackState = NULL;
+
+  // Capture image.
+  vtkIdType numPixels = icetImageGetNumPixels(renderedImage);
+  if (icetImageGetColorFormat(renderedImage) != ICET_IMAGE_COLOR_NONE)
+    {
+    this->LastRenderedRGBAColors->SetNumberOfComponents(4);
+    this->LastRenderedRGBAColors->SetNumberOfTuples(numPixels);
+    icetImageCopyColorub(renderedImage,
+                         this->LastRenderedRGBAColors->GetPointer(0),
+                         ICET_IMAGE_COLOR_RGBA_UBYTE);
+    }
+  else
+    {
+    this->LastRenderedRGBAColors->SetNumberOfTuples(0);
+    }
+  if (icetImageGetDepthFormat(renderedImage) != ICET_IMAGE_DEPTH_NONE)
+    {
+    this->LastRenderedDepths->SetNumberOfComponents(1);
+    this->LastRenderedDepths->SetNumberOfTuples(numPixels);
+    icetImageCopyDepthf(renderedImage,
+                        this->LastRenderedDepths->GetPointer(0),
+                        ICET_IMAGE_DEPTH_FLOAT);
+    }
+  else
+    {
+    this->LastRenderedDepths->SetNumberOfTuples(0);
+    }
 
   if(this->DepthOnly)
     {
@@ -497,11 +539,11 @@ void vtkIceTCompositePass::UpdateTileInformation(
       // SYNTAX:
       // icetAddTile(x, y, width, height, display_rank);
       icetAddTile(
-        static_cast<GLint>(tile_viewport[0]/image_reduction_factor),
-        static_cast<GLint>(tile_viewport[1]/image_reduction_factor),
-        static_cast<GLsizei>(
+        static_cast<IceTInt>(tile_viewport[0]/image_reduction_factor),
+        static_cast<IceTInt>(tile_viewport[1]/image_reduction_factor),
+        static_cast<IceTSizeType>(
           (tile_viewport[2] - tile_viewport[0])/image_reduction_factor + 1),
-        static_cast<GLsizei>(
+        static_cast<IceTSizeType>(
           (tile_viewport[3] - tile_viewport[1])/image_reduction_factor + 1),
         cur_rank);
       // setting this should be needed so that the 2d actors work correctly.
@@ -530,22 +572,7 @@ void vtkIceTCompositePass::GetLastRenderedTile(
 {
   tile.MarkInValid();
 
-  if (!this->IceTContext->IsValid())
-    {
-    return;
-    }
-  this->IceTContext->MakeCurrent();
-
-  // get the dimension of the buffer
-  GLint id;
-  icetGetIntegerv(ICET_TILE_DISPLAYED,&id);
-  if (id < 0)
-    {
-    // current processes is not displaying any tile.
-    return;
-    }
-
-  GLint color_format;
+  IceTInt color_format;
   icetGetIntegerv(ICET_COLOR_FORMAT, &color_format);
   int width  = this->LastTileViewport[2] - this->LastTileViewport[0] +1;
   int height = this->LastTileViewport[3] - this->LastTileViewport[1] +1;
@@ -560,34 +587,17 @@ void vtkIceTCompositePass::GetLastRenderedTile(
 
   tile.Resize(width, height, 4);
 
-  // Copy as 4-bytes.  It's faster.
-  GLuint *dest = (GLuint *)tile.GetRawPtr()->GetVoidPointer(0);
-  GLuint *src = (GLuint *)icetGetColorBuffer();
+  if (this->LastRenderedRGBAColors->GetNumberOfTuples() != width*height)
+    {
+    vtkErrorMacro(<< "LastTileViewport size (" << width << "x" << height
+                  << ") does not match"
+                  << " LastRenderedRGBAColors size ("
+                  << this->LastRenderedRGBAColors->GetNumberOfTuples()
+                  << ")");
+    return;
+    }
 
-  if (color_format == GL_RGBA)
-    {
-    memcpy(dest, src, sizeof(GLuint)*width*height);
-    tile.MarkValid();
-    }
-  else if (static_cast<GLenum>(color_format) == vtkgl::BGRA)
-    {
-    for (int j = 0; j < height; j++)
-      {
-      for (int i = 0; i < width; i++)
-        {
-        dest[0] = src[2];
-        dest[1] = src[1];
-        dest[2] = src[0];
-        dest[3] = src[3];
-        dest += 4;  src += 4;
-        }
-      }
-    tile.MarkValid();
-    }
-  else
-    {
-    vtkErrorMacro("ICE-T using unknown image format.");
-    }
+  tile.GetRawPtr()->DeepCopy(this->LastRenderedRGBAColors);
 }
 
 //----------------------------------------------------------------------------
@@ -598,7 +608,7 @@ void vtkIceTCompositePass::PushIceTDepthBufferToScreen(
   // merly the code from vtkCompositeZPass
 
   // get the dimension of the buffer
-  GLint id;
+  IceTInt id;
   icetGetIntegerv(ICET_TILE_DISPLAYED,&id);
   if (id < 0)
     {
@@ -606,20 +616,28 @@ void vtkIceTCompositePass::PushIceTDepthBufferToScreen(
     return;
     }
 
-  GLint ids;
+  IceTInt ids;
   icetGetIntegerv(ICET_NUM_TILES,&ids);
 
-  GLint *vp=new GLint[4*ids];
+  IceTInt *vp=new IceTInt[4*ids];
 
   icetGetIntegerv(ICET_TILE_VIEWPORTS,vp);
 
-  // GLint x=vp[4*id];
-  // GLint y=vp[4*id+1];
-  GLint w=vp[4*id+2];
-  GLint h=vp[4*id+3];
+  // IceTInt x=vp[4*id];
+  // IceTInt y=vp[4*id+1];
+  IceTInt w=vp[4*id+2];
+  IceTInt h=vp[4*id+3];
   delete[] vp;
 
-  GLuint *depthBuffer=icetGetDepthBuffer();
+  if (this->LastRenderedDepths->GetNumberOfTuples() != w*h)
+    {
+    vtkErrorMacro(<< "Tile viewport size (" << w << "x" << h << ") does not"
+                  << " match captured depth image ("
+                  << this->LastRenderedDepths->GetNumberOfTuples() << ")");
+    return;
+    }
+
+  float *depthBuffer=this->LastRenderedDepths->GetPointer(0);
 
   // pbo arguments.
   unsigned int dims[2];
@@ -632,7 +650,7 @@ void vtkIceTCompositePass::PushIceTDepthBufferToScreen(
   continuousInc[2]=0;
 
   vtkOpenGLRenderWindow *context=
-    static_cast<vtkOpenGLRenderWindow *>(
+    vtkOpenGLRenderWindow::SafeDownCast(
       render_state->GetRenderer()->GetRenderWindow());
 
   if(this->PBO==0)
@@ -647,7 +665,7 @@ void vtkIceTCompositePass::PushIceTDepthBufferToScreen(
     }
 
   // client to PBO
-  this->PBO->Upload2D(VTK_UNSIGNED_INT,depthBuffer,dims,1,continuousInc);
+  this->PBO->Upload2D(VTK_FLOAT,depthBuffer,dims,1,continuousInc);
 
   // PBO to TO
   this->ZTexture->CreateDepth(dims[0],dims[1],vtkTextureObject::Native,
@@ -688,7 +706,7 @@ void vtkIceTCompositePass::PushIceTColorBufferToScreen(
   const vtkRenderState* render_state)
 {
   // get the dimension of the buffer
-  GLint id;
+  IceTInt id;
   icetGetIntegerv(ICET_TILE_DISPLAYED,&id);
   if (id < 0)
     {
@@ -696,17 +714,17 @@ void vtkIceTCompositePass::PushIceTColorBufferToScreen(
     return;
     }
 
-  GLint ids;
+  IceTInt ids;
   icetGetIntegerv(ICET_NUM_TILES,&ids);
 
-  GLint *vp=new GLint[4*ids];
+  IceTInt *vp=new GLint[4*ids];
 
   icetGetIntegerv(ICET_TILE_VIEWPORTS,vp);
 
-  // GLint x=vp[4*id];
-  // GLint y=vp[4*id+1];
-  GLint w=vp[4*id+2];
-  GLint h=vp[4*id+3];
+  // IceTInt x=vp[4*id];
+  // IceTInt y=vp[4*id+1];
+  IceTInt w=vp[4*id+2];
+  IceTInt h=vp[4*id+3];
   delete[] vp;
 
   // pbo arguments.
@@ -756,7 +774,7 @@ void vtkIceTCompositePass::PushIceTColorBufferToScreen(
   // Apply (with blending) IceT color buffer on top of background
 
   vtkOpenGLRenderWindow *context=
-    static_cast<vtkOpenGLRenderWindow *>(
+    vtkOpenGLRenderWindow::SafeDownCast(
       render_state->GetRenderer()->GetRenderWindow());
 
   if(this->PBO==0)
@@ -770,7 +788,15 @@ void vtkIceTCompositePass::PushIceTColorBufferToScreen(
     this->IceTTexture->SetContext(context);
     }
 
-  GLubyte *rgbaBuffer=icetGetColorBuffer();
+  if (this->LastRenderedRGBAColors->GetNumberOfTuples() != w*h)
+    {
+    vtkErrorMacro(<< "Tile viewport size (" << w << "x" << h << ") does not"
+                  << " match captured color image ("
+                  << this->LastRenderedRGBAColors->GetNumberOfTuples() << ")");
+    return;
+    }
+
+  unsigned char *rgbaBuffer=this->LastRenderedRGBAColors->GetPointer(0);
 
   // client to PBO
   this->PBO->Upload2D(VTK_UNSIGNED_CHAR,rgbaBuffer,dims,4,continuousInc);
@@ -793,4 +819,23 @@ void vtkIceTCompositePass::PushIceTColorBufferToScreen(
 void vtkIceTCompositePass::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+
+  os << indent << "Controller: " << this->Controller << endl;
+  os << indent << "RenderPass: " << this->RenderPass << endl;
+  os << indent << "TileDimensions: "
+     << this->TileDimensions[0] << ", " << this->TileDimensions[1] << endl;
+  os << indent << "TileMullions: "
+     << this->TileMullions[0] << ", " << this->TileMullions[1] << endl;
+  os << indent << "DataReplicatedOnAllProcesses: "
+     << this->DataReplicatedOnAllProcesses << endl;
+  os << indent << "ImageReductionFactor: "
+     << this->ImageReductionFactor << endl;
+  os << indent << "KdTree: " << this->KdTree << endl;
+  os << indent << "UseOrderedCompositing: "
+     << this->UseOrderedCompositing << endl;
+  os << indent << "DepthOnly: " << this->DepthOnly << endl;
+  os << indent << "FixBackground: " << this->FixBackground << endl;
+  os << indent << "PhysicalViewport: "
+     << this->PhysicalViewport[0] << ", " << this->PhysicalViewport[1]
+     << this->PhysicalViewport[2] << ", " << this->PhysicalViewport[3] << endl;
 }

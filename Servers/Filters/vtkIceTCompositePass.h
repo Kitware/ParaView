@@ -41,6 +41,8 @@ class vtkPixelBufferObject;
 class vtkTextureObject;
 class vtkShaderProgram2;
 class vtkOpenGLRenderWindow;
+class vtkUnsignedCharArray;
+class vtkFloatArray;
 
 class VTK_EXPORT vtkIceTCompositePass : public vtkRenderPass
 {
@@ -201,6 +203,9 @@ protected:
   double PhysicalViewport[4];
 
   int ImageReductionFactor;
+
+  vtkUnsignedCharArray *LastRenderedRGBAColors;
+  vtkFloatArray *LastRenderedDepths;
 
   vtkPixelBufferObject *PBO;
   vtkTextureObject *ZTexture;

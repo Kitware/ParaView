@@ -605,7 +605,7 @@ IF(VTK_USE_MPI)
     ENDIF (PARAVIEW_TEST_COMPOSITING)
   ENDIF (BUILD_TESTING)
   IF(PARAVIEW_USE_ICE_T)
-    SET(ICE_T_INCLUDE_DIR
+    SET(ICET_INCLUDE_DIR
       ${ParaView_SOURCE_DIR}/Utilities/IceT/src/include
       ${ParaView_BINARY_DIR}/Utilities/IceT/src/include
       )

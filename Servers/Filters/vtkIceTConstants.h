@@ -44,12 +44,12 @@ class VTK_EXPORT vtkIceTConstants
 {
 public:
   enum StrategyType {
-    DEFAULT = 0,
-    REDUCE  = 1,
-    VTREE   = 2,
-    SPLIT   = 3,
-    SERIAL  = 4,
-    DIRECT  = 5
+    DEFAULT    = 0,
+    REDUCE     = 1,
+    VTREE      = 2,
+    SPLIT      = 3,
+    SEQUENTIAL = 4,
+    DIRECT     = 5
   };
 
   enum ComposeOperationType {
