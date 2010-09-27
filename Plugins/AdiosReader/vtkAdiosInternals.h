@@ -78,12 +78,12 @@ public:
   AdiosVariable()
     {
     this->NumberOfValues     = 0;
-    this->NumberOfComponents = 0;
+    this->Dimension          = 0;
     this->GroupIndex         = -1;
     this->VarIndex           = -1;
     this->TimeIndexComponent = -1;
 
-    this->Extents[0] = this->Extents[1] = 0.0;
+    this->Range[0] = this->Range[1] = 0.0;
 
     this->Start[0]  = this->Start[1]  = this->Start[2]  = 0;
     this->Count[0]  = this->Count[1]  = this->Count[2]  = 0;
@@ -99,25 +99,25 @@ public:
     this->Type = varInfo->type;
     this->TimeIndexComponent = varInfo->timedim; // -1 if no time steps
     this->VarIndex = varInfo->varid;
-    this->NumberOfComponents = varInfo->ndim - ((varInfo->timedim==-1)?0:1);
+    this->Dimension = varInfo->ndim - ((varInfo->timedim==-1)?0:1);
 
-    this->Extents[0] = this->Extents[1] = 0;
+    this->Range[0] = this->Range[1] = 0;
     if (varInfo->gmin && varInfo->gmax)
       {
       if (this->Type == adios_integer)
         {
-        this->Extents[0] = (double)(*((int*)varInfo->gmin));
-        this->Extents[1] = (double)(*((int*)varInfo->gmax));
+        this->Range[0] = (double)(*((int*)varInfo->gmin));
+        this->Range[1] = (double)(*((int*)varInfo->gmax));
         }
       else if (this->Type == adios_real)
         {
-        this->Extents[0] = (double)(*((float*)varInfo->gmin));
-        this->Extents[1] = (double)(*((float*)varInfo->gmax));
+        this->Range[0] = (double)(*((float*)varInfo->gmin));
+        this->Range[1] = (double)(*((float*)varInfo->gmax));
         }
       else if (this->Type == adios_double)
         {
-        this->Extents[0] = (double)(*((double*)varInfo->gmin));
-        this->Extents[1] = (double)(*((double*)varInfo->gmax));
+        this->Range[0] = (double)(*((double*)varInfo->gmin));
+        this->Range[1] = (double)(*((double*)varInfo->gmax));
         }
       }
 
@@ -196,15 +196,15 @@ public:
       j++;
       }
 
-    this->SwapIndices(this->NumberOfComponents, start);
-    this->SwapIndices(this->NumberOfComponents, count);
+    this->SwapIndices(this->Dimension, start);
+    this->SwapIndices(this->Dimension, count);
     }
   // --------------------------------------------------------------------------
   void SwapIndices()
     {
-    this->SwapIndices(this->NumberOfComponents, this->Start);
-    this->SwapIndices(this->NumberOfComponents, this->Count);
-    this->SwapIndices(this->NumberOfComponents, this->Global);
+    this->SwapIndices(this->Dimension, this->Start);
+    this->SwapIndices(this->Dimension, this->Count);
+    this->SwapIndices(this->Dimension, this->Global);
     }
   // --------------------------------------------------------------------------
   template <class T>
@@ -228,14 +228,14 @@ public:
 public:
   vtkstd::string Name;
   int NumberOfValues;
-  int NumberOfComponents;
+  int Dimension;
   int GroupIndex;
   int VarIndex;
   int TimeIndexComponent;
   uint64_t Start[3]; // We support only tuple size of 1 to 3
   uint64_t Count[3]; // We support only tuple size of 1 to 3
   uint64_t Global[3];// We support only tuple size of 1 to 3
-  double Extents[2];
+  double Range[2];
   ADIOS_DATATYPES Type;
 };
 //*****************************************************************************
@@ -354,10 +354,10 @@ public:
       return true;
 
 #ifdef _NOMPI
-    cout << "NO mpi for the adios reader" << endl;
+    //cout << "NO mpi for the adios reader" << endl;
     this->File = adios_fopen(this->FileName.c_str(), 0);
 #else
-    cout << "Use the mpi communicator for the adios reader" << endl;
+    //cout << "Use the mpi communicator for the adios reader" << endl;
     MPI_Comm *comm = NULL;
     vtkMPICommunicator *mpiComm = vtkMPICommunicator::SafeDownCast(vtkMultiProcessController::GetGlobalController()->GetCommunicator());
     if(mpiComm && mpiComm->GetMPIComm())
@@ -601,8 +601,8 @@ public:
       if(varIter != this->Variables.end())
         {
         // Coord extents are available
-        min = varIter->second.Extents[0];
-        max = varIter->second.Extents[1];
+        min = varIter->second.Range[0];
+        max = varIter->second.Range[1];
 
         gridSize[0] = varIter->second.Global[0] + 1;  // nbCell + 1 <=> nbPoints
         gridSize[1] = varIter->second.Global[1] + 1;  // nbCell + 1 <=> nbPoints
@@ -688,13 +688,11 @@ public:
       }
     else
       {
-      cout << "coord need conversion" << endl;
       // Need data conversion
       for(vtkIdType k=0; k < 3; k++)
         {
         coords[k] = vtkFloatArray::New();
         coords[k]->SetNumberOfComponents(1);
-        cout << "nb tuples: " << rawCoords[k]->GetNumberOfTuples() << endl;
         coords[k]->Allocate(rawCoords[k]->GetNumberOfTuples());
         for(vtkIdType i=0; i < rawCoords[k]->GetNumberOfTuples(); i++)
           {
@@ -846,7 +844,7 @@ public:
 
     AdiosVariable var = iter->second;
     var.GetReadArrays(timestep, start, count, nbTuples);
-    nbTuples /= var.NumberOfComponents;
+    nbTuples /= var.Dimension;
 
     // Create points object
     vtkPoints* points = NULL;
@@ -900,7 +898,7 @@ public:
         // Fill result
         double coord[3] = {0,0,0};
         int bufferIdx = 0;
-        int nbComp = var.NumberOfComponents;
+        int nbComp = var.Dimension;
         int i;
         for(vtkIdType idx=0; idx < points->GetNumberOfPoints(); idx++)
           {
@@ -928,8 +926,6 @@ public:
       }
 
     // Read data info
-//    cout << "ReadVariable: " << name << endl;
-
     AdiosVariable var = varIter->second;
     int nbTuples = -1;
     uint64_t start[4] = {0,0,0,0};
@@ -989,7 +985,6 @@ public:
       return NULL;
 
     array->SetNumberOfComponents(1);
-    //array->Allocate(nbTuples * 3); // ?????????????
     array->SetNumberOfTuples(nbTuples); // Allocate array memory
 
     // Create a nice array name
@@ -1005,10 +1000,10 @@ public:
     int groupIdx = var.GroupIndex;
     this->OpenGroup(groupIdx);
 
-    cout << "start: " << start[0] << " " << start[1] << " " << start[2] << " " << start[3] << endl;
-    cout << "count: " << count[0] << " " << count[1] << " " << count[2] << " " << count[3] << endl;
-    cout << "varIdx: " << var.VarIndex << endl;
-    cout << "array "<< arrayName.c_str() <<" of type: "<< array->GetClassName() << " with size " << array->GetNumberOfTuples() << endl;
+//    cout << "start: " << start[0] << " " << start[1] << " " << start[2] << " " << start[3] << endl;
+//    cout << "count: " << count[0] << " " << count[1] << " " << count[2] << " " << count[3] << endl;
+//    cout << "varIdx: " << var.VarIndex << endl;
+//    cout << "array "<< arrayName.c_str() <<" of type: "<< array->GetClassName() << " with size " << array->GetNumberOfTuples() << endl;
 
     if( array && (adios_read_var_byid(this->Groups[groupIdx],
                                       var.VarIndex, start, count,

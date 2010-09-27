@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   Visualization Toolkit
-  Module:    ShowMetaData.cxx
+  Module:    TestRealData.cxx
 
   Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
   All rights reserved.
@@ -12,14 +12,15 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME Test of ShowMetaData
+// .NAME Test of TestRealData
 // .SECTION Description
-// Print set of meta-data informations
+// Load all 3D variables with our VTK inner object management for the adios lib.
 
 #include "vtkAdiosInternals.h"
 #include <iostream>
 #include "vtkDataArray.h"
 #include "vtkDataSet.h"
+#include <vtkstd/string>
 using namespace std;
 
 int main( int argc, char *argv[] )
@@ -32,28 +33,55 @@ int main( int argc, char *argv[] )
 
  // Read file name.
   if(!fname)
-    fname = "/home/seb/Downloads/pixie3d_3D.bp";
+    {
+    //fname = "/home/seb/Downloads/pixie3d_3D.bp";
+    cerr << "Provide as argument the Adios file to read." << endl;
+    return EXIT_FAILURE;
+    }
 
   // Create the Adios file manager.
   AdiosFile* adiosFile = new AdiosFile(fname);
   adiosFile->Open();
   //adiosFile->PrintInfo();
 
-  const char* varName[6] = {"/Timestep_0/nodes/X",
-                            "/Timestep_0/Car_variables/Bx",
-                            "/Timestep_50/nodes/X",
-                            "/Timestep_50/Car_variables/Bx",
-                            "/Timestep_100/nodes/X",
-                            "/Timestep_100/Car_variables/Bx"};
-  int timestep[6] = {0,0,50,50,100,100};
-  for(int varIndex = 0; varIndex < 6 ; varIndex++)
+  AdiosVariableMapIterator iter = adiosFile->Variables.begin();
+  int ts = -1;
+  for(; iter != adiosFile->Variables.end() ; iter++)
     {
-    vtkDataArray* array = adiosFile->ReadVariable(varName[varIndex],timestep[varIndex]);
-    if(array) array->Delete();
-    }
+    vtkstd::string name = iter->second.Name;
+    cout << name.c_str() << endl;
+    if(name.find("_50/") != vtkstd::string::npos)
+      {
+      if(ts != 50)
+        {
+        adiosFile->GetPixieRectilinearGrid(50)->Delete();
+        }
+      ts = 50;
+      }
+    else if(name.find("_100/") != vtkstd::string::npos)
+      {
+      if(ts != 100)
+        {
+        adiosFile->GetPixieRectilinearGrid(100)->Delete();
+        }
 
-  //vtkDataSet* ds = adiosFile->GetPixieStructuredGrid("/Timestep_0/Car_variables/By", 0);
-  //if(ds) ds->Delete();
+      ts = 100;
+      }
+    else
+      {
+      if(ts != 0)
+        {
+        adiosFile->GetPixieRectilinearGrid(0)->Delete();
+        }
+      ts = 0;
+      }
+    vtkDataArray* array = adiosFile->ReadVariable(name.c_str(),ts);
+    if(array)
+      {
+      array->Delete();
+      cout << "delete ok" << endl;
+      }
+    }
   delete adiosFile;
 
   return EXIT_SUCCESS;
