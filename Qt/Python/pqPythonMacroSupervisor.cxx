@@ -206,21 +206,6 @@ QMap<QString, QString> pqPythonMacroSupervisor::getStoredMacros()
 }
 
 //----------------------------------------------------------------------------
-void pqPythonMacroSupervisor::storeMacro(const QString& filename)
-{
-  pqPythonMacroSupervisor::storeMacro(pqPythonMacroSupervisor::macroNameFromFileName(filename), filename);
-}
-//----------------------------------------------------------------------------
-void pqPythonMacroSupervisor::storeMacro(const QString& macroName, const QString& filename)
-{
-//  QMap<QString, QString> macros = pqPythonMacroSupervisor::getStoredMacros();
-//  macros[filename] = macroName;
-//  pqSettings* settings = pqApplicationCore::instance()->settings();
-//  settings->setValue("PythonMacros/FileNames", QStringList(macros.keys()));
-//  settings->setValue("PythonMacros/Names", QStringList(macros.values()));
-}
-
-//----------------------------------------------------------------------------
 void pqPythonMacroSupervisor::removeStoredMacro(const QString& filename)
 {
   QDir dir  = QFileInfo(filename).absoluteDir();

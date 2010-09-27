@@ -77,15 +77,6 @@ public:
   static QMap<QString, QString> getStoredMacros();
 
   // Description:
-  // Stores a macro with the given name and filename in pqSettings.
-  // If a macro with the given filename already exists, its name will
-  // be updated.
-  static void storeMacro(const QString& macroName, const QString& filename);
-  // Description:
-  // store the macro with automatic macro name attibution based on the filename
-  static void storeMacro(const QString& filename);
-
-  // Description:
   // Removes a macro with the given filename from pqSettings, if it exists.
   static void removeStoredMacro(const QString& filename);
 

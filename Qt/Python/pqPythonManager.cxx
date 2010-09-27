@@ -466,7 +466,6 @@ void pqPythonManager::addMacro(const QString& fileName)
   QFile::copy(fileName, expectedFilePath);
 
   // Register the inner one
-  this->Internal->MacroSupervisor->storeMacro(expectedFilePath);
   this->Internal->MacroSupervisor->addMacro(expectedFilePath);
 }
 //----------------------------------------------------------------------------
