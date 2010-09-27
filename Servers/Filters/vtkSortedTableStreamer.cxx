@@ -1526,8 +1526,8 @@ int vtkSortedTableStreamer::RequestData( vtkInformation* vtkNotUsed(request),
 
 
   // Manage custom case where sorting occur on a virtual array (process id)
-  if( (!this->Internal->IsSortable() || this->GetColumnToSort()) &&
-      (strcmp( "vtkOriginalProcessIds", this->GetColumnToSort()) == 0))
+  if( !this->Internal->IsSortable() || (this->GetColumnToSort() &&
+          (strcmp( "vtkOriginalProcessIds", this->GetColumnToSort()) == 0)))
     {
     this->Internal->Extract( input, output,
                              this->Block, this->BlockSize, orderInverted);
