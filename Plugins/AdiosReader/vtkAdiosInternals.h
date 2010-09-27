@@ -47,10 +47,15 @@
 using vtksys_ios::ostringstream;
 
 // MUST be before adios include
-#ifdef PARAVIEW_USE_MPI
-#include <mpi.h>
-#else
+#ifdef ADIOS_NO_MPI
 #define _NOMPI
+#else
+//#include <mpi.h>
+#include <vtkMultiProcessController.h>
+#include <vtkCommunicator.h>
+#include <vtkMPICommunicator.h>
+#include <vtkMPICommunicator.h>
+#include <vtkMPI.h>
 #endif
 // MUST be before adios include
 
@@ -72,12 +77,13 @@ class AdiosVariable
 public:
   AdiosVariable()
     {
-    this->NumberOfComponents = 0;
+    this->NumberOfValues     = 0;
+    this->Dimension          = 0;
     this->GroupIndex         = -1;
     this->VarIndex           = -1;
-    this->TimeIndexComponent  = -1;
+    this->TimeIndexComponent = -1;
 
-    this->Extents[0] = this->Extents[1] = 0.0;
+    this->Range[0] = this->Range[1] = 0.0;
 
     this->Start[0]  = this->Start[1]  = this->Start[2]  = 0;
     this->Count[0]  = this->Count[1]  = this->Count[2]  = 0;
@@ -93,30 +99,30 @@ public:
     this->Type = varInfo->type;
     this->TimeIndexComponent = varInfo->timedim; // -1 if no time steps
     this->VarIndex = varInfo->varid;
-    this->NumberOfComponents = varInfo->ndim - ((varInfo->timedim==-1)?0:1);
+    this->Dimension = varInfo->ndim - ((varInfo->timedim==-1)?0:1);
 
-    this->Extents[0] = this->Extents[1] = 0;
+    this->Range[0] = this->Range[1] = 0;
     if (varInfo->gmin && varInfo->gmax)
       {
       if (this->Type == adios_integer)
         {
-        this->Extents[0] = (double)(*((int*)varInfo->gmin));
-        this->Extents[1] = (double)(*((int*)varInfo->gmax));
+        this->Range[0] = (double)(*((int*)varInfo->gmin));
+        this->Range[1] = (double)(*((int*)varInfo->gmax));
         }
       else if (this->Type == adios_real)
         {
-        this->Extents[0] = (double)(*((float*)varInfo->gmin));
-        this->Extents[1] = (double)(*((float*)varInfo->gmax));
+        this->Range[0] = (double)(*((float*)varInfo->gmin));
+        this->Range[1] = (double)(*((float*)varInfo->gmax));
         }
       else if (this->Type == adios_double)
         {
-        this->Extents[0] = (double)(*((double*)varInfo->gmin));
-        this->Extents[1] = (double)(*((double*)varInfo->gmax));
+        this->Range[0] = (double)(*((double*)varInfo->gmin));
+        this->Range[1] = (double)(*((double*)varInfo->gmax));
         }
       }
 
     int i = 0; // varInfo's index
-    int j = 0; // vi's index
+    int j = 0; // vtk index
     // 1. process dimensions before the time dimension
     // Note that this is empty loop with current ADIOS/C++ (timedim = 0 or -1)
     for (; i < vtkstd::min(varInfo->timedim,3); i++)
@@ -140,6 +146,15 @@ public:
       if (i < varInfo->ndim)
         this->Count[j] = this->Global[j] = varInfo->dims[i];
       j++;
+      }
+
+    this->NumberOfValues = 1;
+    for(int k=0;k<varInfo->ndim;k++)
+      {
+      if(varInfo->dims[k] != 0)
+        {
+        this->NumberOfValues *= varInfo->dims[k];
+        }
       }
 
     this->SwapIndices();
@@ -181,15 +196,15 @@ public:
       j++;
       }
 
-    this->SwapIndices(this->NumberOfComponents, start);
-    this->SwapIndices(this->NumberOfComponents, count);
+    this->SwapIndices(this->Dimension, start);
+    this->SwapIndices(this->Dimension, count);
     }
   // --------------------------------------------------------------------------
   void SwapIndices()
     {
-    this->SwapIndices(this->NumberOfComponents, this->Start);
-    this->SwapIndices(this->NumberOfComponents, this->Count);
-    this->SwapIndices(this->NumberOfComponents, this->Global);
+    this->SwapIndices(this->Dimension, this->Start);
+    this->SwapIndices(this->Dimension, this->Count);
+    this->SwapIndices(this->Dimension, this->Global);
     }
   // --------------------------------------------------------------------------
   template <class T>
@@ -212,14 +227,15 @@ public:
   // --------------------------------------------------------------------------
 public:
   vtkstd::string Name;
-  int NumberOfComponents;
+  int NumberOfValues;
+  int Dimension;
   int GroupIndex;
   int VarIndex;
   int TimeIndexComponent;
   uint64_t Start[3]; // We support only tuple size of 1 to 3
   uint64_t Count[3]; // We support only tuple size of 1 to 3
   uint64_t Global[3];// We support only tuple size of 1 to 3
-  double Extents[2];
+  double Range[2];
   ADIOS_DATATYPES Type;
 };
 //*****************************************************************************
@@ -337,14 +353,19 @@ public:
     if (this->IsOpen())
       return true;
 
-    MPI_Comm comm = NULL;
-
-#ifdef VTK_USE_MPI
-    // Provide the MPI communicator <<<<<<<<<<<<<<<<<<<<< FIXME <<<<<<<<<<<<<<<
-//    processId = (!vtkMultiProcessController::GetGlobalController()) ? 0 :
-//                vtkMultiProcessController::GetGlobalController()->GetLocalProcessId();
+#ifdef _NOMPI
+    //cout << "NO mpi for the adios reader" << endl;
+    this->File = adios_fopen(this->FileName.c_str(), 0);
+#else
+    //cout << "Use the mpi communicator for the adios reader" << endl;
+    MPI_Comm *comm = NULL;
+    vtkMPICommunicator *mpiComm = vtkMPICommunicator::SafeDownCast(vtkMultiProcessController::GetGlobalController()->GetCommunicator());
+    if(mpiComm && mpiComm->GetMPIComm())
+      {
+      comm = mpiComm->GetMPIComm()->GetHandle();
+      }
+    this->File = adios_fopen(this->FileName.c_str(), (comm) ? *comm : 0);
 #endif
-    this->File = adios_fopen(this->FileName.c_str(), comm);
 
     if (this->File == NULL)
     {
@@ -481,7 +502,10 @@ public:
       {
       for (int groupIdx=0; groupIdx < this->File->groups_count; groupIdx++)
         if (this->Groups[groupIdx] != NULL)
+          {
           adios_gclose(this->Groups[groupIdx]);
+          this->Groups[groupIdx] = NULL;
+          }
       }
 
     if (this->Groups)
@@ -510,6 +534,8 @@ public:
       }
 
     vtkstd::string head = name.substr(0, index);
+    index = head.rfind("/");
+    vtkstd::string head2 = head.substr(0, index);
 
     // Pixie specific coordinate management
     vtkstd::string c1Key = head + "/coords/coord1";
@@ -524,7 +550,28 @@ public:
        this->GetStringAttribute(c2Key, c2Value) &&
        this->GetStringAttribute(c3Key, c3Value) )
       {
-      return VTK_STRUCTURED_GRID;
+      // Caution: This might be wrong, we also have to check the size of
+      //          both arrays
+
+      AdiosVariableMapIterator varIter;
+      varIter = this->Variables.find(vtkstd::string(variableName));
+      if(varIter == this->Variables.end())
+        {
+        cout << "No var with name " << variableName << endl;
+        return VTK_RECTILINEAR_GRID;
+        }
+      AdiosVariable requestedVar = varIter->second;
+      vtkstd::string coordVarName = head2 + c1Value;
+      varIter = this->Variables.find(coordVarName);
+      if(varIter == this->Variables.end())
+        {
+        cout << "No var with name " << coordVarName.c_str() << endl;
+        return VTK_RECTILINEAR_GRID;
+        }
+      AdiosVariable pointCoordVar = varIter->second;
+
+      if(pointCoordVar.NumberOfValues == requestedVar.NumberOfValues)
+        return VTK_STRUCTURED_GRID;
       }
 
     // Get the rectilinear size
@@ -554,8 +601,8 @@ public:
       if(varIter != this->Variables.end())
         {
         // Coord extents are available
-        min = varIter->second.Extents[0];
-        max = varIter->second.Extents[1];
+        min = varIter->second.Range[0];
+        max = varIter->second.Range[1];
 
         gridSize[0] = varIter->second.Global[0] + 1;  // nbCell + 1 <=> nbPoints
         gridSize[1] = varIter->second.Global[1] + 1;  // nbCell + 1 <=> nbPoints
@@ -633,6 +680,7 @@ public:
     vtkFloatArray *coords[3];
     if(vtkFloatArray::SafeDownCast(rawCoords[0]))
       {
+      cout << "coord are float" << endl;
       // We are already the right type
       coords[0] = vtkFloatArray::SafeDownCast(rawCoords[0]);
       coords[1] = vtkFloatArray::SafeDownCast(rawCoords[1]);
@@ -651,6 +699,7 @@ public:
           coords[k]->InsertNextTuple1(rawCoords[k]->GetTuple1(i));
           }
         rawCoords[k]->Delete();
+        rawCoords[k] = NULL;
         }
       }
 
@@ -795,7 +844,7 @@ public:
 
     AdiosVariable var = iter->second;
     var.GetReadArrays(timestep, start, count, nbTuples);
-    nbTuples /= var.NumberOfComponents;
+    nbTuples /= var.Dimension;
 
     // Create points object
     vtkPoints* points = NULL;
@@ -813,9 +862,6 @@ public:
     }
     points->SetNumberOfPoints(nbTuples);
 
-//    // Do we need to pad read coordinate with 0
-//    if(var.NumberOfComponents < 3)
-//      {
       // Allocate buffer used to read data
       void* dataTmpBuffer = NULL;
       if (var.Type == adios_real)
@@ -839,8 +885,9 @@ public:
                                              var.VarIndex, start, count,
                                              dataTmpBuffer );
       this->CloseGroup( var.GroupIndex );
-      if(!retval)
+      if(retval < 0)
         {
+        cout << adios_errmsg() << endl;
         // Error while reading so return NULL
         points->Delete();
         free(dataTmpBuffer);
@@ -851,7 +898,7 @@ public:
         // Fill result
         double coord[3] = {0,0,0};
         int bufferIdx = 0;
-        int nbComp = var.NumberOfComponents;
+        int nbComp = var.Dimension;
         int i;
         for(vtkIdType idx=0; idx < points->GetNumberOfPoints(); idx++)
           {
@@ -865,21 +912,6 @@ public:
         // Free tmp
         free(dataTmpBuffer);
         }
-//      }
-//    else
-//      {
-//      this->OpenGroup( var.GroupIndex );
-//      uint64_t retval = adios_read_var_byid( this->Groups[var.GroupIndex],
-//                                             var.VarIndex, start, count,
-//                                             points->GetVoidPointer(0) );
-//      this->CloseGroup( var.GroupIndex );
-//      if(!retval)
-//        {
-//        // Error while reading so return NULL
-//        points->Delete();
-//        return NULL;
-//        }
-//      }
     return points;
     }
   // --------------------------------------------------------------------------
@@ -894,12 +926,11 @@ public:
       }
 
     // Read data info
+    AdiosVariable var = varIter->second;
     int nbTuples = -1;
     uint64_t start[4] = {0,0,0,0};
     uint64_t count[4] = {0,0,0,0};
-
-    AdiosVariable var = varIter->second;
-    var.GetReadArrays(timestep, start, count, nbTuples);
+    var.GetReadArrays(0, start, count, nbTuples);
 
     // Create data array based on its type
     vtkDataArray *array = NULL;
@@ -949,7 +980,12 @@ public:
       cout << "ERROR: Invalid data type" << endl;
       break;
     }
-    array->SetNumberOfTuples(nbTuples);
+
+    if(!array)
+      return NULL;
+
+    array->SetNumberOfComponents(1);
+    array->SetNumberOfTuples(nbTuples); // Allocate array memory
 
     // Create a nice array name
     vtkstd::string arrayName = name;
@@ -960,12 +996,21 @@ public:
       }
     array->SetName(arrayName.c_str());
 
+
     int groupIdx = var.GroupIndex;
     this->OpenGroup(groupIdx);
-    if( array && !adios_read_var_byid(this->Groups[groupIdx],
-                             var.VarIndex, start, count,
-                             array->GetVoidPointer(0)))
+
+//    cout << "start: " << start[0] << " " << start[1] << " " << start[2] << " " << start[3] << endl;
+//    cout << "count: " << count[0] << " " << count[1] << " " << count[2] << " " << count[3] << endl;
+//    cout << "varIdx: " << var.VarIndex << endl;
+//    cout << "array "<< arrayName.c_str() <<" of type: "<< array->GetClassName() << " with size " << array->GetNumberOfTuples() << endl;
+
+    if( array && (adios_read_var_byid(this->Groups[groupIdx],
+                                      var.VarIndex, start, count,
+                                      array->GetVoidPointer(0)) < 0))
       {
+      cout << "Error while reading data array." << endl;
+      cout << adios_errmsg() << endl;
       array->Delete();
       array = NULL; // Impossible to read so set the output to NULL
       }
@@ -977,7 +1022,8 @@ public:
   int GetNumberOfTimeSteps()
     {
     this->Open();
-    return this->File->ntimesteps;
+    return this->RealTimeSteps.size();
+    //return this->File->ntimesteps;
     }
   // --------------------------------------------------------------------------
   int GetRealTimeStep(int timeStepIndex)
@@ -993,7 +1039,7 @@ public:
     if(!this->Groups)
       return false;
 
-    if(this->Groups[groupIndex] == NULL)
+    if(!this->Groups[groupIndex])
       {
       this->Groups[groupIndex] = adios_gopen_byid(this->File, groupIndex);
       if(this->Groups[groupIndex] == NULL)
@@ -1012,15 +1058,16 @@ public:
     if(!this->Groups)
       return false;
 
-    if(this->Groups[groupIndex] != NULL)
+    if(this->Groups[groupIndex])
       {
-      bool error = (adios_gclose(this->Groups[groupIndex]) != 0);
+      int error = adios_gclose(this->Groups[groupIndex]);
       this->Groups[groupIndex] = NULL;
-      if(error)
+      if(error < 0)
         {
         cout << "Error closing group "
              << this->File->group_namelist[groupIndex]
              << " in file " << this->FileName << endl;
+        cout << adios_errno << " : " << adios_errmsg() << endl;
         }
       return !error;
       }
@@ -1061,9 +1108,12 @@ public:
       }
 
     cout << "Pixie file ? " << (this->IsPixieFileType()) << endl;
-    //vtkDataSet* ds = this->GetPixieMesh("Nothing", 10);
-    //cout << "ds is " << (ds?"not":"") << " null" << endl;
-
+    int nbTime = this->GetNumberOfTimeSteps();
+    cout << "Number of timesteps: " << nbTime << endl;
+    for(int i=0;i<nbTime;i++)
+      {
+      cout << " - " << this->GetRealTimeStep(i) << endl;
+      }
     this->Close();
     }
   // --------------------------------------------------------------------------

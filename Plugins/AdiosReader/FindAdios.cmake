@@ -6,8 +6,6 @@
 # - ADIOS_READ_NO_MPI_LIBRARY
 # =================================================
 
-find_package(MPI)
-
 FIND_PATH(ADIOS_INCLUDE_PATH adios.h
     /usr/include
     /usr/local/include
