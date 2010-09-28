@@ -21,12 +21,12 @@
 //
 // .SECTION Description
 //
-// This is a helper class for vtkIceTRenderManager and vtkIceTRenderer.  Most
-// users will never need this class.
+// This is a helper class for vtkIceTRenderManager and vtkOpenGLIceTRenderer.
+// Most users will never need this class.
 //
 // This class was conceived to pass IceT contexts between vtkIceTRenderManager
-// and vtkIceTRenderer without having to include the IceT header file in either
-// class.  Allong the way, some functionality was added.
+// and vtkOpenGLIceTRenderer without having to include the IceT header file in
+// either class.  Along the way, some functionality was added.
 //
 // .SECTION Bugs
 //

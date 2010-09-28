@@ -25,7 +25,6 @@
 #include "vtkObjectFactory.h"
 
 #include "IceT.h"
-#include "IceTGL.h"
 #include "IceTMPI.h"
 
 //-----------------------------------------------------------------------------
@@ -86,7 +85,6 @@ void vtkIceTContext::SetController(vtkMultiProcessController *controller)
     newContext = new vtkIceTContextOpaqueHandle;
     newContext->Handle = icetCreateContext(icetComm);
     icetDestroyMPICommunicator(icetComm);
-    icetGLInitialize();
 
     if (this->IsValid())
       {
