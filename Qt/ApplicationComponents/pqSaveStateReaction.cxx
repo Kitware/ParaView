@@ -39,7 +39,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServer.h"
 #include "pqServerResource.h"
 #include "pqServerResources.h"
+
+#ifdef PARAVIEW_ENABLE_PYTHON
 #include "pqPythonManager.h"
+#endif
 
 //-----------------------------------------------------------------------------
 pqSaveStateReaction::pqSaveStateReaction(QAction* parentObject)
@@ -63,10 +66,15 @@ void pqSaveStateReaction::updateEnableState()
 //-----------------------------------------------------------------------------
 void pqSaveStateReaction::saveState()
 {
+#ifdef PARAVIEW_ENABLE_PYTHON
+  QString fileExt = tr("ParaView state file (*.pvsm);;Python state file (*.py);;All files (*)");
+#else
+  QString fileExt = tr("ParaView state file (*.pvsm);;All files (*)");
+#endif
   pqFileDialog fileDialog(NULL,
-    pqCoreUtilities::mainWidget(),
-    tr("Save State File"), QString(),
-    tr("ParaView state file (*.pvsm);;Python state file (*.py);;All files (*)"));
+                          pqCoreUtilities::mainWidget(),
+                          tr("Save State File"), QString(), fileExt);
+
   fileDialog.setObjectName("FileSaveServerStateDialog");
   fileDialog.setFileMode(pqFileDialog::AnyFile);
 
@@ -101,6 +109,7 @@ void pqSaveStateReaction::saveState(const QString& filename)
 //-----------------------------------------------------------------------------
 void pqSaveStateReaction::savePythonState(const QString& filename)
 {
+#ifdef PARAVIEW_ENABLE_PYTHON
   pqPythonManager *pythonManager = pqPVApplicationCore::instance()->pythonManager();
   if(!pythonManager)
     {
@@ -108,4 +117,5 @@ void pqSaveStateReaction::savePythonState(const QString& filename)
     return;
     }
   pythonManager->saveTraceState(filename);
+#endif
 }
