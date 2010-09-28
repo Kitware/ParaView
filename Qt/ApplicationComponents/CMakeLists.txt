@@ -49,7 +49,6 @@ SET (MOC_HEADERS
   pqDeleteReaction.h
   pqEditCameraReaction.h
   pqEditColorMapReaction.h
-  pqEditTraceReaction.h
   pqExportReaction.h
   pqFiltersMenuReaction.h
   pqFixPathsInStateFilesBehavior.h
@@ -58,7 +57,6 @@ SET (MOC_HEADERS
   pqListNewProxyDefinitionsBehavior.h
   pqLoadDataReaction.h
   pqLoadStateReaction.h
-  pqMacroReaction.h
   pqMainControlsToolbar.h
   pqManageCustomFiltersReaction.h
   pqManageLinksReaction.h
@@ -82,7 +80,6 @@ SET (MOC_HEADERS
   pqSaveDataReaction.h
   pqSaveScreenshotReaction.h
   pqSaveStateReaction.h
-  pqSaveTraceReaction.h
   pqScalarBarVisibilityReaction.h
   pqSelectionInspectorWidget.h
   pqSelectionToolbar.h
@@ -94,7 +91,6 @@ SET (MOC_HEADERS
   pqStatusBar.h
   pqTestingReaction.h
   pqTimerLogReaction.h
-  pqTraceReaction.h
   pqUndoRedoBehavior.h
   pqUndoRedoReaction.h
   pqVCRToolbar.h
@@ -175,8 +171,6 @@ SET (SOURCE_FILES
   pqEditCameraReaction.h
   pqEditColorMapReaction.cxx
   pqEditColorMapReaction.h
-  pqEditTraceReaction.cxx
-  pqEditTraceReaction.h
   pqExportReaction.cxx
   pqExportReaction.h
   pqFiltersMenuReaction.cxx
@@ -193,8 +187,6 @@ SET (SOURCE_FILES
   pqLoadDataReaction.h
   pqLoadStateReaction.cxx
   pqLoadStateReaction.h
-  pqMacroReaction.cxx
-  pqMacroReaction.h
   pqMainControlsToolbar.cxx
   pqMainControlsToolbar.h
   pqManageCustomFiltersReaction.cxx
@@ -243,8 +235,6 @@ SET (SOURCE_FILES
   pqSaveScreenshotReaction.h
   pqSaveStateReaction.cxx
   pqSaveStateReaction.h
-  pqSaveTraceReaction.cxx
-  pqSaveTraceReaction.h
   pqScalarBarVisibilityReaction.cxx
   pqScalarBarVisibilityReaction.h
   pqSelectionInspectorWidget.cxx
@@ -267,8 +257,6 @@ SET (SOURCE_FILES
   pqTestingReaction.h
   pqTimerLogReaction.cxx
   pqTimerLogReaction.h
-  pqTraceReaction.cxx
-  pqTraceReaction.h
   pqUndoRedoBehavior.cxx
   pqUndoRedoBehavior.h
   pqUndoRedoReaction.cxx
@@ -284,7 +272,27 @@ SET (SOURCE_FILES
   pqViewSettingsReaction.cxx
   pqViewSettingsReaction.h
 )
-
+#---------------------------------------------
+IF(PARAVIEW_ENABLE_PYTHON)
+  SET (MOC_HEADERS
+    ${MOC_HEADERS}
+    pqEditTraceReaction.h
+    pqMacroReaction.h
+    pqSaveTraceReaction.h
+    pqTraceReaction.h
+    )
+  SET (SOURCE_FILES
+    ${SOURCE_FILES}
+    pqEditTraceReaction.cxx
+    pqEditTraceReaction.h
+    pqMacroReaction.cxx
+    pqMacroReaction.h
+    pqSaveTraceReaction.cxx
+    pqSaveTraceReaction.h
+    pqTraceReaction.cxx
+    pqTraceReaction.h
+    )
+ENDIF(PARAVIEW_ENABLE_PYTHON)
 #---------------------------------------------
 CONFIGURE_FILE("${CMAKE_CURRENT_SOURCE_DIR}/pqApplicationComponentsExport.h.in"
                "${CMAKE_CURRENT_BINARY_DIR}/pqApplicationComponentsExport.h")

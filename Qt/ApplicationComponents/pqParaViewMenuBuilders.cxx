@@ -58,7 +58,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqListNewProxyDefinitionsBehavior.h"
 #include "pqLoadDataReaction.h"
 #include "pqLoadStateReaction.h"
-#include "pqMacroReaction.h"
 #include "pqMainControlsToolbar.h"
 #include "pqManageCustomFiltersReaction.h"
 #include "pqManageLinksReaction.h"
@@ -81,14 +80,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSourcesMenuReaction.h"
 #include "pqTestingReaction.h"
 #include "pqTimerLogReaction.h"
-#include "pqTraceReaction.h"
 #include "pqUndoRedoReaction.h"
 #include "pqVCRToolbar.h"
 #include "pqViewMenuManager.h"
 #include "pqViewSettingsReaction.h"
 
 #ifdef PARAVIEW_ENABLE_PYTHON
+#include "pqMacroReaction.h"
 #include "pqPythonManager.h"
+#include "pqTraceReaction.h"
 #endif
 
 #include <QDockWidget>
@@ -233,10 +233,14 @@ void pqParaViewMenuBuilders::buildToolsMenu(QMenu& menu)
   QObject::connect(action, SIGNAL(triggered()),
     pqApplicationCore::instance(),
     SLOT(showOutputWindow()));
-  menu.addSeparator();
+
+
+  menu.addSeparator(); // --------------------------------------------------
+
   new pqPythonShellReaction(menu.addAction("Python Shell")
     << pqSetName("actionToolsPythonShell"));
 
+#ifdef PARAVIEW_ENABLE_PYTHON
   menu.addSeparator(); // --------------------------------------------------
 
   new pqTraceReaction( menu.addAction("Start Trace")
@@ -247,6 +251,7 @@ void pqParaViewMenuBuilders::buildToolsMenu(QMenu& menu)
                       << pqSetName("actionToolsEditTrace"));
   new pqSaveTraceReaction(menu.addAction("Save Trace")
                           << pqSetName("actionToolsSaveTrace"));
+#endif
 }
 
 //-----------------------------------------------------------------------------
