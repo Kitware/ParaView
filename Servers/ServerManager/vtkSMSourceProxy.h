@@ -217,6 +217,10 @@ public:
   // Marks the selection proxies dirty as well as chain to superclass.
   virtual void MarkDirty(vtkSMProxy* modifiedProxy);
 
+  // Description:
+  // set if we are going to create post filter on this proxy
+  virtual void InsertPostFilter( bool insert );
+
 protected:
   vtkSMSourceProxy();
   ~vtkSMSourceProxy();
@@ -251,7 +255,7 @@ protected:
   // Method to set an output port at the given index. Provided for subclasses to
   // add output ports. It replaces the output port at the given index, if any,
   // The output ports will be resized to fit the specified index.
-  void SetOutputPort(unsigned int index, const char* name, 
+  void SetOutputPort(unsigned int index, const char* name,
     vtkSMOutputPort* port, vtkSMDocumentation* doc);
   void RemoveAllOutputPorts();
 
@@ -259,6 +263,7 @@ protected:
   // Overwritten from superclass to invoke
   virtual void PostUpdateData();
 
+  bool DoInsertPostFilter;
   int DoInsertExtractPieces;
   int SelectionProxiesCreated;
 

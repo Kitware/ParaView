@@ -93,6 +93,7 @@ vtkSMSourceProxy::vtkSMSourceProxy()
   this->ExecutiveName = 0;
   this->SetExecutiveName("vtkPVCompositeDataPipeline");
 
+  this->DoInsertPostFilter = true;
   this->DoInsertExtractPieces = 1;
   this->SelectionProxiesCreated = 0;
 
@@ -491,7 +492,8 @@ void vtkSMSourceProxy::CreateOutputPortsInternal(vtkSMProxy* op)
       }
     }
 
-  if ( strcmp("vtkPVCompositeDataPipeline",this->ExecutiveName) == 0 )
+  if ( this->DoInsertPostFilter&&
+       strcmp("vtkPVCompositeDataPipeline",this->ExecutiveName) == 0 )
     {
     //add the post filters to the source proxy
     //so that we can do automatic conversion of properties.
@@ -847,6 +849,15 @@ void vtkSMSourceProxy::SetServers(vtkTypeUInt32 servers)
       {
       it->Port->SetServers(servers);
       }
+    }
+}
+
+//---------------------------------------------------------------------------
+void vtkSMSourceProxy::InsertPostFilter(bool insert)
+{
+  if ( this->DoInsertPostFilter != insert )
+    {
+    this->DoInsertPostFilter = insert;
     }
 }
 
