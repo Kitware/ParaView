@@ -64,6 +64,15 @@ public:
   virtual void MakeCurrent();
 
   // Description:
+  // Turn this on to enable the OpenGL layer in IceT.  By default this is off.
+  // Unless you explicitly plan to use the OpenGL layer, it should probably
+  // remain off to ensure that you don't accidentally use a feature you did not
+  // intend to use.
+  vtkGetMacro(UseOpenGL, int);
+  virtual void SetUseOpenGL(int flag);
+  vtkBooleanMacro(UseOpenGL, int);
+
+  // Description:
   // Copy the state from the given context to this context.
   virtual void CopyState(vtkIceTContext *src);
 
@@ -76,6 +85,8 @@ protected:
   ~vtkIceTContext();
 
   vtkMultiProcessController *Controller;
+
+  int UseOpenGL;
 
 private:
   vtkIceTContext(const vtkIceTContext &);       // Not implemented.

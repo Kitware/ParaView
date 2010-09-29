@@ -65,6 +65,7 @@ vtkCxxSetObjectMacro(vtkIceTCompositePass, Controller,
 vtkIceTCompositePass::vtkIceTCompositePass()
 {
   this->IceTContext = vtkIceTContext::New();
+  this->IceTContext->UseOpenGLOn();
   this->Controller = 0;
   this->RenderPass = 0;
   this->KdTree = 0;

@@ -25,6 +25,7 @@
 #include "vtkObjectFactory.h"
 
 #include "IceT.h"
+#include "IceTGL.h"
 #include "IceTMPI.h"
 
 //-----------------------------------------------------------------------------
@@ -44,6 +45,7 @@ vtkIceTContext::vtkIceTContext()
   // This class establishes a constraint that these are both NULL or both valid.
   this->Controller = NULL;
   this->Context = NULL;
+  this->UseOpenGL = 0;
 }
 
 vtkIceTContext::~vtkIceTContext()
@@ -86,6 +88,11 @@ void vtkIceTContext::SetController(vtkMultiProcessController *controller)
     newContext->Handle = icetCreateContext(icetComm);
     icetDestroyMPICommunicator(icetComm);
 
+    if (this->UseOpenGL)
+      {
+      icetGLInitialize();
+      }
+
     if (this->IsValid())
       {
       icetCopyState(newContext->Handle, this->Context->Handle);
@@ -123,6 +130,25 @@ void vtkIceTContext::MakeCurrent()
     }
 
   icetSetContext(this->Context->Handle);
+}
+
+//-----------------------------------------------------------------------------
+
+void vtkIceTContext::SetUseOpenGL(int flag)
+{
+  if (this->UseOpenGL == flag) return;
+
+  this->UseOpenGL = flag;
+  this->Modified();
+
+  if (this->UseOpenGL && this->IsValid())
+    {
+    this->MakeCurrent();
+    if (!icetGLIsInitialized())
+      {
+      icetGLInitialize();
+      }
+    }
 }
 
 //-----------------------------------------------------------------------------
