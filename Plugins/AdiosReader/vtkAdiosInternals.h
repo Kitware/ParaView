@@ -42,6 +42,9 @@
 #include <vtkFloatArray.h>
 #include <vtkDoubleArray.h>
 #include <vtkPoints.h>
+#include <vtkExtentTranslator.h>
+#include <vtkCellData.h>
+#include <vtkPointData.h>
 
 #include <vtksys/ios/sstream>
 using vtksys_ios::ostringstream;
@@ -77,17 +80,15 @@ class AdiosVariable
 public:
   AdiosVariable()
     {
-    this->NumberOfValues     = 0;
-    this->Dimension          = 0;
+    this->NumberOfElements   = -1;
+    this->Dimension          = -1;
     this->GroupIndex         = -1;
     this->VarIndex           = -1;
     this->TimeIndexComponent = -1;
 
     this->Range[0] = this->Range[1] = 0.0;
-
-    this->Start[0]  = this->Start[1]  = this->Start[2]  = 0;
-    this->Count[0]  = this->Count[1]  = this->Count[2]  = 0;
-    this->Global[0] = this->Global[1] = this->Global[2] = 0;
+    this->Extent[0] = this->Extent[1] = this->Extent[2] = this->Extent[3] = 0;
+    this->Extent[4] = this->Extent[5] = this->Extent[6] = this->Extent[7] = 0;
 
     this->Type = adios_unknown;
     }
@@ -99,9 +100,13 @@ public:
     this->Type = varInfo->type;
     this->TimeIndexComponent = varInfo->timedim; // -1 if no time steps
     this->VarIndex = varInfo->varid;
-    this->Dimension = varInfo->ndim - ((varInfo->timedim==-1)?0:1);
+    this->Dimension = varInfo->ndim - ((varInfo->timedim == -1) ? 0 : 1); // The dimension here do not take the time into account
 
+    // Reset range and extent
     this->Range[0] = this->Range[1] = 0;
+    this->Extent[0] = this->Extent[1] = this->Extent[2] = this->Extent[3] = 0;
+    this->Extent[4] = this->Extent[5] = this->Extent[6] = this->Extent[7] = 0;
+
     if (varInfo->gmin && varInfo->gmax)
       {
       if (this->Type == adios_integer)
@@ -121,120 +126,96 @@ public:
         }
       }
 
-    int i = 0; // varInfo's index
-    int j = 0; // vtk index
-    // 1. process dimensions before the time dimension
-    // Note that this is empty loop with current ADIOS/C++ (timedim = 0 or -1)
-    for (; i < vtkstd::min(varInfo->timedim,3); i++)
+    // CAUTION: We suppose that if the variable has time it MUST BE the last
+    //          component one and the dimension of the array CAN NOT be bigger
+    //          than (3D + time) = 4
+    if(varInfo->ndim > 4 || ((varInfo->timedim != -1) && varInfo->ndim - 1 ))
       {
-      this->Start[j] = 0;
-      this->Count[j] = 1;
-      this->Global[j] = 1;
-      if (i < varInfo->ndim)
-        this->Count[j] = this->Global[j] = varInfo->dims[i];
-      j++;
-      }
-    // 2. skip time dimension if it has one
-    if (varInfo->timedim >= 0)
-        i++;
-    // 3. process dimensions after the time dimension
-    for (; i < (varInfo->timedim == -1 ? 3 : 4); i++)
-      {
-      this->Start[j] = 0;
-      this->Count[j] = 1;
-      this->Global[j] = 1;
-      if (i < varInfo->ndim)
-        this->Count[j] = this->Global[j] = varInfo->dims[i];
-      j++;
+      // Error this case is not supported for now !!!!
+      cerr << "The variable " << name
+           << " do not follow a correct structure type for the current adios Reader."
+           << endl << "The application might CRASH at some point." << endl;
+      return;
       }
 
-    this->NumberOfValues = 1;
-    for(int k=0;k<varInfo->ndim;k++)
+    // Build extent + compute number of elements
+    this->NumberOfElements = 1;
+    for(int i=0; i < varInfo->ndim; i++)
       {
-      if(varInfo->dims[k] != 0)
+      this->Extent[i*2 + 0] = 0;                // Offset
+      this->Extent[i*2 + 1] = varInfo->dims[i]; // Size
+      // Count the total number of elements
+      if(this->Extent[i*2 + 1] != 0)
         {
-        this->NumberOfValues *= varInfo->dims[k];
+        this->NumberOfElements *= this->Extent[i*2 + 1];
         }
       }
+    }
+  // --------------------------------------------------------------------------
+  /// Fill the provided array with the corresponding data size mapped in 3D.
+  /// Remember that it could be a 1D or 2D data. So the missing dimension is
+  /// set to 0.
+  void GetDimension3D(vtkIdType *matrixSize) const
+    {
+    // Reset value
+    matrixSize[0] = matrixSize[1] = matrixSize[2] = 0;
+    int dim = this->Dimension < 3 ? this->Dimension : 3; // 3D max
 
-    this->SwapIndices();
+    // Fill by default the size
+    for(int i=0; i < dim; i++)
+      {
+      matrixSize[i] = this->Extent[i*2 + 1];
+      }
+
+    // Deal with time component (Imagine 2D + time)
+    if(this->TimeIndexComponent > -1 && this->TimeIndexComponent < 3 )
+      {
+      matrixSize[this->TimeIndexComponent] = 0;
+      }
+
+    // Swap size because extent is [z,y,x,t] order
+    // (in fact we do not know for t but we do not allow another way)
+    vtkIdType tmp = matrixSize[0];
+    matrixSize[0] = matrixSize[2];
+    matrixSize[2] = tmp;
+    }
+  // --------------------------------------------------------------------------
+  bool IsTimeDependent()
+    {
+    return this->TimeIndexComponent != -1;
+    }
+  // --------------------------------------------------------------------------
+  int GetNumberOfTimeSteps()
+    {
+    if(!this->IsTimeDependent())
+      return 1;
+    return this->Extent[this->TimeIndexComponent*2 + 1];
     }
   // --------------------------------------------------------------------------
   virtual ~AdiosVariable()
     {
     }
   // --------------------------------------------------------------------------
-  void GetReadArrays(int timestep, uint64_t *start, uint64_t *count, int &nbTuples)
-    {
-    nbTuples = 1;
-
-    int i=0;  // VTK var dimension index
-    int j=0;  // adios var dimension index
-    // timedim=-1 for non-timed variables, 0..n for others
-    // 1. up to time index, or max 3
-    // This loop is empty with current ADIOS/C++ (timedim = -1 or 0)
-    for (; i < vtkstd::min(this->TimeIndexComponent,3); i++)
-      {
-      nbTuples *= (int)this->Count[i];
-      start[j] = this->Start[i];
-      count[j] = this->Count[i];
-      j++;
-      }
-    // 2. handle time index if the variable has time
-    if (this->TimeIndexComponent >= 0)
-      {
-      start[j] = timestep;
-      count[j] = 1;
-      j++;
-      }
-    // 3. the rest of indices (all if no time dimension)
-    for (; i<3; i++)
-      {
-      nbTuples *= (int)this->Count[i];
-      start[j] = this->Start[i];
-      count[j] = this->Count[i];
-      j++;
-      }
-
-    this->SwapIndices(this->Dimension, start);
-    this->SwapIndices(this->Dimension, count);
-    }
-  // --------------------------------------------------------------------------
-  void SwapIndices()
-    {
-    this->SwapIndices(this->Dimension, this->Start);
-    this->SwapIndices(this->Dimension, this->Count);
-    this->SwapIndices(this->Dimension, this->Global);
-    }
-  // --------------------------------------------------------------------------
-  template <class T>
-  void SwapIndices(int size, T* array) // Swap first and last values in the array
-    {
-    if (size <= 1) return;
-    T tmp = array[0];
-    size--;
-    array[0] = array[size];
-    array[size] = tmp;
-    }
-  // --------------------------------------------------------------------------
   void Print() const
     {
     cout << "Var " << this->Name.c_str() << endl
-        << " - Start: " << this->Start[0] << " " << this->Start[1] << " " << this->Start[2] << endl
-        << " - Count: " << this->Count[0] << " " << this->Count[1] << " " << this->Count[2] << endl
-        << " - Global: " << this->Global[0] << " " << this->Global[1] << " " << this->Global[2] << endl;
+         << " - Extent: [ "
+         << this->Extent[0] << ", " << this->Extent[1] << ", "
+         << this->Extent[2] << ", " << this->Extent[3] << ", "
+         << this->Extent[4] << ", " << this->Extent[5] << ", "
+         << this->Extent[6] << ", " << this->Extent[7] << " ]" << endl;
     }
   // --------------------------------------------------------------------------
 public:
   vtkstd::string Name;
-  int NumberOfValues;
-  int Dimension;
   int GroupIndex;
   int VarIndex;
+  int NumberOfElements;
+  int Dimension;
+
+  // Contain extent of the array
+  uint64_t Extent[8]; // [ offsetZ, countZ, offsetY, countY, ox, cx , 0, nbTime]
   int TimeIndexComponent;
-  uint64_t Start[3]; // We support only tuple size of 1 to 3
-  uint64_t Count[3]; // We support only tuple size of 1 to 3
-  uint64_t Global[3];// We support only tuple size of 1 to 3
   double Range[2];
   ADIOS_DATATYPES Type;
 };
@@ -336,13 +317,23 @@ class AdiosFile
 public:
   AdiosFile(const char* fileName)
     {
+    this->ExtentTranslator = NULL;
     this->File = NULL;
     this->Groups = NULL;
     this->FileName = fileName;
+    // Since the whole extent will always be based on offset, it is always 0
+    this->CurrentWholeExtent[0] = 0;
+    this->CurrentWholeExtent[2] = 0;
+    this->CurrentWholeExtent[4] = 0;
     }
   // --------------------------------------------------------------------------
   virtual ~AdiosFile()
     {
+    if(this->ExtentTranslator)
+      {
+      this->ExtentTranslator->Delete();
+      this->ExtentTranslator = NULL;
+      }
     this->Close();
     }
   // --------------------------------------------------------------------------
@@ -356,10 +347,28 @@ public:
 #ifdef _NOMPI
     //cout << "NO mpi for the adios reader" << endl;
     this->File = adios_fopen(this->FileName.c_str(), 0);
+    if(this->ExtentTranslator)
+      {
+      this->ExtentTranslator->Delete();
+      this->ExtentTranslator = NULL;
+      }
 #else
     //cout << "Use the mpi communicator for the adios reader" << endl;
     MPI_Comm *comm = NULL;
-    vtkMPICommunicator *mpiComm = vtkMPICommunicator::SafeDownCast(vtkMultiProcessController::GetGlobalController()->GetCommunicator());
+    vtkMultiProcessController *ctrl =
+        vtkMultiProcessController::GetGlobalController();
+
+    // Handle piece management
+    if(!this->ExtentTranslator)
+      {
+      this->ExtentTranslator = vtkExtentTranslator::New();
+      }
+    this->ExtentTranslator->SetPiece(ctrl->GetLocalProcessId());
+    this->ExtentTranslator->SetNumberOfPieces(ctrl->GetNumberOfProcesses());
+    this->ExtentTranslator->SetGhostLevel(0); // FIXME !!!!
+
+    vtkMPICommunicator *mpiComm =
+        vtkMPICommunicator::SafeDownCast(ctrl->GetCommunicator());
     if(mpiComm && mpiComm->GetMPIComm())
       {
       comm = mpiComm->GetMPIComm()->GetHandle();
@@ -570,7 +579,7 @@ public:
         }
       AdiosVariable pointCoordVar = varIter->second;
 
-      if(pointCoordVar.NumberOfValues == requestedVar.NumberOfValues)
+      if(pointCoordVar.NumberOfElements == requestedVar.NumberOfElements)
         return VTK_STRUCTURED_GRID;
       }
 
@@ -582,6 +591,10 @@ public:
     {
     // Make sure the file is open and metadata loaded
     this->Open();
+
+    // Make sure we are in the Pixie case
+    if(!this->IsPixieFileType())
+      return NULL;
 
     // Retreive Rectilinear mesh for Pixie format
     const char axis[3] = {'X', 'Y', 'Z'};
@@ -604,9 +617,12 @@ public:
         min = varIter->second.Range[0];
         max = varIter->second.Range[1];
 
-        gridSize[0] = varIter->second.Global[0] + 1;  // nbCell + 1 <=> nbPoints
-        gridSize[1] = varIter->second.Global[1] + 1;  // nbCell + 1 <=> nbPoints
-        gridSize[2] = varIter->second.Global[2] + 1;  // nbCell + 1 <=> nbPoints
+        vtkIdType size3D[3];
+        varIter->second.GetDimension3D(size3D);
+
+        gridSize[0] = size3D[0] + 1;  // nbCell + 1 <=> nbPoints
+        gridSize[1] = size3D[1] + 1;  // nbCell + 1 <=> nbPoints
+        gridSize[2] = size3D[2] + 1;  // nbCell + 1 <=> nbPoints
         }
       else
         {
@@ -616,11 +632,41 @@ public:
         max = (float)gridSize[i];
         }
 
+      // Deal with peace management
+      this->CurrentWholeExtent[1] = gridSize[0];
+      this->CurrentWholeExtent[3] = gridSize[1];
+      this->CurrentWholeExtent[5] = gridSize[2];
+
+      if(this->ExtentTranslator)
+        {
+        this->ExtentTranslator->SetWholeExtent(this->CurrentWholeExtent);
+        this->ExtentTranslator->PieceToExtent();
+        this->ExtentTranslator->GetExtent(this->CurrentPieceExtent);
+        // Shift non-zero offset to make geometry continu
+        for(int i = 0; i < 3; i++)
+          {
+          if(this->CurrentPieceExtent[i*2] > 0)
+            {
+            --this->CurrentPieceExtent[i*2];
+            }
+          }
+        }
+      else
+        {
+        // Just copy
+        for(int i=0; i<6; i++)
+          {
+          this->CurrentPieceExtent[i] = this->CurrentWholeExtent[i];
+          }
+        }
+      vtkIdType nbTuples = this->CurrentPieceExtent[i*2 + 1]
+                           - this->CurrentPieceExtent[i*2];
+
       // Compute coordinates based on the size and the extent of the grid
-      coords[i]->SetNumberOfTuples(gridSize[i]);
-      value = min;
-      delta = (max - min) / (float)(coords[i]->GetNumberOfTuples());
-      for(vtkIdType j = 0; j < coords[i]->GetNumberOfTuples(); j++, value += delta)
+      coords[i]->SetNumberOfTuples(nbTuples);
+      delta = (max - min) / (float)(this->CurrentWholeExtent[i*2+1]);
+      value = min + (delta * this->CurrentPieceExtent[i*2]);
+      for(vtkIdType j = 0; j < nbTuples; j++, value += delta)
         {
         coords[i]->SetValue(j, value);
         }
@@ -628,9 +674,9 @@ public:
 
     // Setup the grid
     vtkRectilinearGrid *rectilinearGrid = vtkRectilinearGrid::New();
-    rectilinearGrid->SetDimensions(gridSize[0],
-                                   gridSize[1],
-                                   gridSize[2]);
+    rectilinearGrid->SetDimensions(this->CurrentPieceExtent[1]-this->CurrentPieceExtent[0],
+                                   this->CurrentPieceExtent[3]-this->CurrentPieceExtent[2],
+                                   this->CurrentPieceExtent[5]-this->CurrentPieceExtent[4]);
 
     rectilinearGrid->SetXCoordinates(coords[0]);
     coords[0]->FastDelete();
@@ -641,22 +687,73 @@ public:
     rectilinearGrid->SetZCoordinates(coords[2]);
     coords[2]->FastDelete();
 
+    // Build filter var name
+    ostringstream varHead;
+    varHead << "/Timestep_" << timestep << "/";
+    vtkstd::string timestepFilter = varHead.str();
+    vtkstd::string nodesFilter = varHead.str() + "nodes";
+    vtkstd::string cellsFilter = varHead.str() + "cells";
+
+    // Compute common offset and counts
+    uint64_t offset[4] = { this->CurrentPieceExtent[4],
+                           this->CurrentPieceExtent[2],
+                           this->CurrentPieceExtent[0],
+                           0 };
+    uint64_t count[4] = { rectilinearGrid->GetDimensions()[2]-1,
+                          rectilinearGrid->GetDimensions()[1]-1,
+                          rectilinearGrid->GetDimensions()[0]-1,
+                          0 };
+
+    // Loop over variable to find the ones to load
+    AdiosVariableMapIterator varIter = this->Variables.begin();
+    for(; varIter != this->Variables.end(); varIter++)
+      {
+      if( varIter->second.Name.find(timestepFilter) == 0
+          && varIter->second.Extent[1] == (gridSize[2]-1)
+          && varIter->second.Extent[3] == (gridSize[1]-1)
+          && varIter->second.Extent[5] == (gridSize[0]-1)
+          && varIter->second.Name.find(nodesFilter) == vtkstd::string::npos
+          && varIter->second.Name.find(cellsFilter) == vtkstd::string::npos )
+        {
+        vtkDataArray *array = this->ReadVariable(varIter->second, offset, count);
+        if(array)
+          {
+          rectilinearGrid->GetCellData()->AddArray(array);
+          array->FastDelete();
+          }
+        }
+      }
+
     return rectilinearGrid;
     }
   // --------------------------------------------------------------------------
-  vtkDataSet* GetPixieStructuredGrid(const char* varName, int timestep)
+  vtkDataSet* GetPixieStructuredGrid(int timestep)
     {
-    // Retreive mesh for Pixie format
-    AdiosVariableMapIterator varIter;
-    varIter = this->Variables.find(vtkstd::string(varName));
-    if(varIter == this->Variables.end())
+    // Make sure the file is open and metadata loaded
+    this->Open();
+
+    // Make sure we are in the Pixie case
+    if(!this->IsPixieFileType())
+      return NULL;
+
+    // Find variable that has a structured mesh for Pixie format
+    AdiosVariableMapIterator varIter = this->Variables.begin();
+    vtkstd::string name = "";
+    for(;varIter != this->Variables.end(); varIter++)
       {
-      cout << "No var with name " << varName << endl;
+      if (this->GetDataType(varIter->second.Name.c_str()) == VTK_STRUCTURED_GRID)
+        {
+        name = varIter->second.Name.c_str();
+        break;
+        }
+      }
+    if(name.size() == 0)
+      {
+      cout << "No var with structured data." << endl;
       return NULL;
       }
 
     // Find parent property for coordinates
-    vtkstd::string name = varName;
     vtkstd::string::size_type index = name.rfind("/");
     vtkstd::string head = name.substr(0, index);
     vtkstd::string c1Key = head + "/coords/coord1";
@@ -667,13 +764,59 @@ public:
     this->GetStringAttribute(c2Key, coordName[1]);
     this->GetStringAttribute(c3Key, coordName[2]);
 
+    // Update coord with full path name
+    for(int i=0; i < 3; i++)
+      {
+      ostringstream stream;
+      stream << "/Timestep_" << timestep << coordName[i].c_str();
+      coordName[i] = stream.str();
+      }
+
+    // Deal with peace management
+    vtkIdType size3D[3];
+    this->Variables[coordName[0].c_str()].GetDimension3D(size3D);
+    this->CurrentWholeExtent[1] = size3D[2];
+    this->CurrentWholeExtent[3] = size3D[1];
+    this->CurrentWholeExtent[5] = size3D[0];
+
+    if(this->ExtentTranslator)
+      {
+      this->ExtentTranslator->SetWholeExtent(this->CurrentWholeExtent);
+      this->ExtentTranslator->PieceToExtent();
+      this->ExtentTranslator->GetExtent(this->CurrentPieceExtent);
+      // Shift non-zero offset to make geometry continu
+      for(int i = 0; i < 3; i++)
+        {
+        if(this->CurrentPieceExtent[i*2] > 0)
+          {
+          --this->CurrentPieceExtent[i*2];
+          }
+        }
+      }
+    else
+      {
+      // Just copy
+      for(int i=0; i<6; i++)
+        {
+        this->CurrentPieceExtent[i] = this->CurrentWholeExtent[i];
+        }
+      }
+
+    // Compute common offset and counts
+    uint64_t offset[4] = { this->CurrentPieceExtent[0],
+                           this->CurrentPieceExtent[2],
+                           this->CurrentPieceExtent[4],
+                           0 };
+    uint64_t count[4] = { this->CurrentPieceExtent[1]-this->CurrentPieceExtent[0],
+                          this->CurrentPieceExtent[3]-this->CurrentPieceExtent[2],
+                          this->CurrentPieceExtent[5]-this->CurrentPieceExtent[4],
+                          0 };
+
     // Manage specific data type
     vtkDataArray *rawCoords[3];
     for (int i = 0; i < 3; i++)
       {
-      ostringstream stream;
-      stream << "/Timestep_" << timestep << coordName[i].c_str();
-      rawCoords[i] = this->ReadVariable(stream.str().c_str(), timestep);
+      rawCoords[i] = this->ReadVariable(this->Variables[coordName[i].c_str()], offset, count);
       }
 
     // Make sure to convert coord dataArray into vtkFloatArray
@@ -722,12 +865,38 @@ public:
 
     // Setup the grid
     vtkStructuredGrid *structuredGrid  = vtkStructuredGrid::New();
-    structuredGrid->SetDimensions(varIter->second.Global[0],
-                                  varIter->second.Global[1],
-                                  varIter->second.Global[2]);
+    structuredGrid->SetDimensions(count[2], count[1], count[0]);
 
     structuredGrid->SetPoints(points);
     points->FastDelete();
+
+    // Build filter var name
+    ostringstream varHead;
+    varHead << "/Timestep_" << timestep << "/";
+    vtkstd::string timestepFilter = varHead.str();
+    vtkstd::string nodesFilter = varHead.str() + "nodes";
+    vtkstd::string cellsFilter = varHead.str() + "cells";
+
+    // Loop over variable to find the ones to load
+    varIter = this->Variables.begin();
+    for(; varIter != this->Variables.end(); varIter++)
+      {
+      if( varIter->second.Name.find(timestepFilter) == 0
+          && varIter->second.Extent[1] == size3D[2]
+          && varIter->second.Extent[3] == size3D[1]
+          && varIter->second.Extent[5] == size3D[0]
+          && varIter->second.Name.find(nodesFilter) == vtkstd::string::npos
+          && varIter->second.Name.find(cellsFilter) == vtkstd::string::npos )
+        {
+        vtkDataArray *array = this->ReadVariable(varIter->second, offset, count);
+        if(array)
+          {
+          structuredGrid->GetPointData()->AddArray(array);
+          array->FastDelete();
+          }
+        }
+      }
+
 
     return structuredGrid;
     }
@@ -742,13 +911,12 @@ public:
     this->GetIntegerAttribute("/nnodes", nbNodes);
     this->GetIntegerAttribute("/cell_set[0]/nbcells", nbTriangles);
 
-    vtkPoints *points = this->ReadPoints("/coordinates/values", 0);// 0 because there is no timestep...
+    vtkPoints *points = this->ReadPoints("/coordinates/values");
     vtkUnstructuredGrid *grid = vtkUnstructuredGrid::New();
     grid->SetPoints(points);
     points->Delete();
 
-    vtkDataArray *rawData = this->ReadVariable("/cell_set[0]/node_connect_list",
-                                               0); // 0 because there is no timestep...
+    vtkDataArray *rawData = this->ReadVariable("/cell_set[0]/node_connect_list");
     if(!rawData)
       {
       cout << "Invalid cell connectivity. No data read." << endl;
@@ -796,7 +964,7 @@ public:
 
         ostringstream varKey;
         varKey << "/node_data[" << i << "]/values";
-        vtkDataArray* array = this->ReadVariable(varKey.str().c_str(), 0);
+        vtkDataArray* array = this->ReadVariable(varKey.str().c_str());
         if(array)
           {
           array->SetName(arrayName.c_str());
@@ -827,7 +995,7 @@ public:
     return true;
   }
   // --------------------------------------------------------------------------
-  vtkPoints* ReadPoints(const char* name, int timestep)
+  vtkPoints* ReadPoints(const char* name)
     {
     this->Open();
     AdiosVariableMapIterator iter = this->Variables.find(vtkstd::string(name));
@@ -837,14 +1005,18 @@ public:
       return NULL;
       }
 
-    // Read data info
-    int nbTuples = -1;
-    uint64_t start[4] = {0,0,0,0};
-    uint64_t count[4] = {0,0,0,0};
-
+    // Get var
     AdiosVariable var = iter->second;
-    var.GetReadArrays(timestep, start, count, nbTuples);
-    nbTuples /= var.Dimension;
+
+    // Read data info
+    vtkIdType size3D[3];
+    var.GetDimension3D(size3D);
+    int nbTuples = var.NumberOfElements / var.GetNumberOfTimeSteps() / var.Dimension;
+    uint64_t offsets[4] = { 0,0,0,0 };
+    uint64_t counts[4] = { size3D[2],
+                           size3D[1],
+                           size3D[0],
+                           0 };
 
     // Create points object
     vtkPoints* points = NULL;
@@ -880,9 +1052,12 @@ public:
         }
 
       // Read buffer
+
+      cout << "Point coord dim: " << var.Dimension << endl;
+
       this->OpenGroup( var.GroupIndex );
       uint64_t retval = adios_read_var_byid( this->Groups[var.GroupIndex],
-                                             var.VarIndex, start, count,
+                                             var.VarIndex, offsets, counts,
                                              dataTmpBuffer );
       this->CloseGroup( var.GroupIndex );
       if(retval < 0)
@@ -915,22 +1090,51 @@ public:
     return points;
     }
   // --------------------------------------------------------------------------
-  vtkDataArray* ReadVariable(const char* name, int timestep)
+  vtkDataArray* ReadVariable(const char* name)
     {
     this->Open();
     AdiosVariableMapIterator varIter = this->Variables.find(vtkstd::string(name));
     if( varIter == this->Variables.end() )
       {
       cout << "ERROR in ReadVariable: Variable " << name << " not found !" << endl;
-      return false;
+      return NULL;
       }
 
     // Read data info
     AdiosVariable var = varIter->second;
-    int nbTuples = -1;
-    uint64_t start[4] = {0,0,0,0};
-    uint64_t count[4] = {0,0,0,0};
-    var.GetReadArrays(0, start, count, nbTuples);
+    vtkIdType size3d[3];
+    var.GetDimension3D(size3d);
+    uint64_t offsets[4] = {0,0,0,0};
+    uint64_t counts[4] = { size3d[2],
+                           size3d[1],
+                           size3d[0],
+                           0};
+
+    return this->ReadVariable(var, offsets, counts);
+    }
+  // --------------------------------------------------------------------------
+  vtkDataArray* ReadVariable( const AdiosVariable &var,
+                              uint64_t *offsets, uint64_t *counts)
+    {
+    // Compute the array size
+    int nbTuples = 1;
+    uint64_t delta;
+    for(int i=0; i < 4; i++)
+      {
+      if(counts[i] != -1)
+        {
+        delta = counts[i];
+        }
+      else // Till the end
+        {
+        delta = var.Extent[i*2+1] - offsets[i];
+        }
+
+      if(delta != 0)
+        {
+        nbTuples *= delta;
+        }
+      }
 
     // Create data array based on its type
     vtkDataArray *array = NULL;
@@ -988,7 +1192,7 @@ public:
     array->SetNumberOfTuples(nbTuples); // Allocate array memory
 
     // Create a nice array name
-    vtkstd::string arrayName = name;
+    vtkstd::string arrayName = var.Name;
     vtkstd::string::size_type index = arrayName.rfind("/");
     if(index != vtkstd::string::npos)
       {
@@ -996,17 +1200,16 @@ public:
       }
     array->SetName(arrayName.c_str());
 
-
     int groupIdx = var.GroupIndex;
     this->OpenGroup(groupIdx);
 
-//    cout << "start: " << start[0] << " " << start[1] << " " << start[2] << " " << start[3] << endl;
-//    cout << "count: " << count[0] << " " << count[1] << " " << count[2] << " " << count[3] << endl;
+//    cout << "start: " << offsets[0] << " " << offsets[1] << " " << offsets[2] << " " << offsets[3] << endl;
+//    cout << "count: " << counts[0] << " " << counts[1] << " " << counts[2] << " " << counts[3] << endl;
 //    cout << "varIdx: " << var.VarIndex << endl;
 //    cout << "array "<< arrayName.c_str() <<" of type: "<< array->GetClassName() << " with size " << array->GetNumberOfTuples() << endl;
 
     if( array && (adios_read_var_byid(this->Groups[groupIdx],
-                                      var.VarIndex, start, count,
+                                      var.VarIndex, offsets, counts,
                                       array->GetVoidPointer(0)) < 0))
       {
       cout << "Error while reading data array." << endl;
@@ -1022,8 +1225,7 @@ public:
   int GetNumberOfTimeSteps()
     {
     this->Open();
-    return this->RealTimeSteps.size();
-    //return this->File->ntimesteps;
+    return this->File->ntimesteps;
     }
   // --------------------------------------------------------------------------
   int GetRealTimeStep(int timeStepIndex)
@@ -1126,5 +1328,9 @@ public:
   AdiosDataMap Attributes;
   AdiosVariableMap Variables;
   vtkstd::set<int> RealTimeSteps;
+
+  vtkExtentTranslator *ExtentTranslator;
+  int CurrentWholeExtent[6];
+  int CurrentPieceExtent[6];
 };
 //*****************************************************************************
