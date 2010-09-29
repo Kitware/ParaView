@@ -50,7 +50,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCreateCustomFilterReaction.h"
 #include "pqDataQueryReaction.h"
 #include "pqDeleteReaction.h"
-#include "pqEditTraceReaction.h"
 #include "pqExportReaction.h"
 #include "pqFiltersMenuReaction.h"
 #include "pqHelpReaction.h"
@@ -72,7 +71,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSaveDataReaction.h"
 #include "pqSaveScreenshotReaction.h"
 #include "pqSaveStateReaction.h"
-#include "pqSaveTraceReaction.h"
+
 #include "pqSelectionToolbar.h"
 #include "pqServerConnectReaction.h"
 #include "pqServerDisconnectReaction.h"
@@ -86,8 +85,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqViewSettingsReaction.h"
 
 #ifdef PARAVIEW_ENABLE_PYTHON
+#include "pqEditTraceReaction.h"
 #include "pqMacroReaction.h"
 #include "pqPythonManager.h"
+#include "pqSaveTraceReaction.h"
 #include "pqTraceReaction.h"
 #endif
 
