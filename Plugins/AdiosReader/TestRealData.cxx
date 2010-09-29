@@ -75,7 +75,7 @@ int main( int argc, char *argv[] )
         }
       ts = 0;
       }
-    vtkDataArray* array = adiosFile->ReadVariable(name.c_str(),ts);
+    vtkDataArray* array = adiosFile->ReadVariable(name.c_str());
     if(array)
       {
       array->Delete();

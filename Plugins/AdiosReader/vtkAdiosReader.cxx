@@ -152,51 +152,8 @@ public:
 
       int realTimeStep = (int) this->TimeStep;
 
-      AdiosVariableMapIterator iter = this->MeshFile->Variables.begin();
-      for(; iter != this->MeshFile->Variables.end(); iter++)
-        {
-        const AdiosVariable *var = &iter->second;
-
-        // Skip invalid timesteps
-        ostringstream stream;
-        stream << "/Timestep_" << realTimeStep << "/";
-        if(var->Name.find(stream.str().c_str()) == vtkstd::string::npos)
-          continue;
-
-        // Skip invalid nodes coordinates array
-        ostringstream streamNodes;
-        streamNodes << "/Timestep_" << realTimeStep << "/nodes/";
-        if(var->Name.find(streamNodes.str().c_str()) != vtkstd::string::npos)
-          continue;
-
-        // Skip invalid cell coordinates array
-        ostringstream streamCells;
-        streamCells << "/Timestep_" << realTimeStep << "/cells/";
-        if(var->Name.find(streamCells.str().c_str()) != vtkstd::string::npos)
-          continue;
-
-        vtkDataArray* array = this->MeshFile->ReadVariable(var->Name.c_str(), realTimeStep);
-        if(array)
-          {
-          switch(this->MeshFile->GetDataType(var->Name.c_str()))
-            {
-            case VTK_RECTILINEAR_GRID:
-              if(!rectilinearGrid)  // Create if needed
-                rectilinearGrid = this->MeshFile->GetPixieRectilinearGrid(realTimeStep);
-              rectilinearGrid->GetCellData()->AddArray(array);
-              break;
-            case VTK_STRUCTURED_GRID:
-              if(!structuredGrid)  // Create if needed
-                structuredGrid = this->MeshFile->GetPixieStructuredGrid(var->Name.c_str(), realTimeStep);
-              structuredGrid->GetPointData()->AddArray(array);
-              break;
-            default:
-              cout << "Do not know what to put var " << var->Name.c_str() << endl;
-            }
-          array->Delete();
-          }
-        }
-
+      // Build geometry and read associted data
+      rectilinearGrid = this->MeshFile->GetPixieRectilinearGrid(realTimeStep);
       if(rectilinearGrid)
         {
         rectilinearGrid->GetInformation()->Set( vtkDataObject::DATA_TIME_STEPS(),
@@ -204,6 +161,8 @@ public:
         pixieOutput->SetBlock(0, rectilinearGrid);
         rectilinearGrid->FastDelete();
         }
+
+      structuredGrid = this->MeshFile->GetPixieStructuredGrid(realTimeStep);
       if(structuredGrid)
         {
         structuredGrid->GetInformation()->Set( vtkDataObject::DATA_TIME_STEPS(),
@@ -224,6 +183,10 @@ public:
       xgcOutput->SetBlock(0, unstructuredGrid);
       unstructuredGrid->FastDelete();
       }
+
+    // Close file to release resources
+    if(this->MeshFile) this->MeshFile->Close();
+    if(this->DataFile) this->DataFile->Close();
     }
   // --------------------------------------------------------------------------
   int GetNumberOfTimeSteps()
@@ -413,10 +376,12 @@ int vtkAdiosReader::RequestInformation(vtkInformation *, vtkInformationVector** 
       }
     }
 
+  // Only pixie format support maximum nb of pieces
+  int nbPieces = this->Internal->IsPixieFormat() ? -1 : 1;
 
   // Set information objects
   vtkInformation *info = outputVector->GetInformationObject(0);
-  info->Set(vtkStreamingDemandDrivenPipeline::MAXIMUM_NUMBER_OF_PIECES(), 1);
+  info->Set(vtkStreamingDemandDrivenPipeline::MAXIMUM_NUMBER_OF_PIECES(), nbPieces);
   info->Set(vtkStreamingDemandDrivenPipeline::TIME_STEPS(), timestepsValues,
             nbTimesteps);
   info->Set(vtkStreamingDemandDrivenPipeline::TIME_RANGE(), timeRange, 2);
@@ -449,7 +414,6 @@ int vtkAdiosReader::RequestData(vtkInformation *, vtkInformationVector** vtkNotU
   vtkDataObject* output = info->Get(vtkDataObject::DATA_OBJECT());
   this->Internal->UpdateFileName(this->GetFileName());
   this->Internal->FillOutput(output);
-  //output->PrintSelf(cout, vtkIndent(10));
   return 1;
 }
 //----------------------------------------------------------------------------
