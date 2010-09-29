@@ -256,7 +256,7 @@ void vtkIceTCompositePass::SetupContext(const vtkRenderState* render_state)
   // decisions.
   double allBounds[6];
   render_state->GetRenderer()->ComputeVisiblePropBounds(allBounds);
-  //Try to detect when bounds are empty and try to let ICE-T know that
+  //Try to detect when bounds are empty and try to let IceT know that
   //nothing is in bounds.
   if (allBounds[0] > allBounds[1])
     {

@@ -476,8 +476,8 @@ int vtkSMTestDriver::OutputStringHasError(const char* pname, vtkstd::string& out
 
   const char* nonErrors[] = {
     "Memcheck, a memory error detector",  //valgrind
-    "error in locking authority file",  //Ice-T
-    "WARNING: Far depth failed sanity check, resetting.", //Ice-T
+    "error in locking authority file",  //IceT
+    "WARNING: Far depth failed sanity check, resetting.", //IceT
     0
   };
 
