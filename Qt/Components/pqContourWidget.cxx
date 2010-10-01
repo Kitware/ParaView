@@ -42,6 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QDoubleValidator>
 #include <QShortcut>
 #include <QtDebug>
+#include <QMessageBox>
 
 #include "vtkEventQtSlotConnect.h"
 #include "vtkSmartPointer.h"
@@ -178,11 +179,20 @@ void pqContourWidget::removeAllNodes()
   vtkSMNewWidgetRepresentationProxy* widget = this->getWidgetProxy();
   if (widget)
     {
-    widget->InvokeCommand("ClearAllNodes");
-    widget->InvokeCommand("Initialize");
+    QMessageBox msgBox;
+    msgBox.setText("Delete all contour nodes.");
+    msgBox.setInformativeText("Do you want to delete everything you have drawn?");
+    msgBox.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
+    int ret = msgBox.exec();
+    if (ret == QMessageBox::Ok)
+      {
+      widget->InvokeCommand("ClearAllNodes");
+      widget->InvokeCommand("Initialize");
+      this->setModified();
+      this->render();
+      }
     }
-  this->setModified();
-  this->render();
+
 }
 
 //-----------------------------------------------------------------------------

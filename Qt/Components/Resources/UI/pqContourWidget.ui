@@ -21,14 +21,13 @@
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Helvetica'; font-size:9pt; font-weight:600; color:#ff5500;&quot;&gt;Note:&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Helvetica'; font-size:9pt; font-weight:600; color:#ff5500;&quot;&gt;Edit Mode:&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Helvetica'; font-size:9pt; font-weight:600; font-style:italic;&quot;&gt;1. Left Click &lt;/span&gt;&lt;span style=&quot; font-family:'Helvetica'; font-size:9pt; font-weight:600;&quot;&gt;to add new nodes.&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Helvetica'; font-size:9pt; font-weight:600; font-style:italic;&quot;&gt;2. Delete Key &lt;/span&gt;&lt;span style=&quot; font-family:'Helvetica'; font-size:9pt; font-weight:600;&quot;&gt;to remove last added node.&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Helvetica'; font-size:9pt; font-weight:600; font-style:italic;&quot;&gt;3. Left Click  on First Node &lt;/span&gt;&lt;span style=&quot; font-family:'Helvetica'; font-size:9pt; font-weight:600;&quot;&gt;to close contour&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Helvetica'; font-size:9pt; font-weight:600;&quot;&gt;    and finish drawing, or &lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Helvetica'; font-size:9pt; font-weight:600; font-style:italic;&quot;&gt;    Right Click &lt;/span&gt;&lt;span style=&quot; font-family:'Helvetica'; font-size:9pt; font-weight:600;&quot;&gt;to finish contour drawing.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Helvetica'; font-size:9pt; font-weight:600; font-style:italic;&quot;&gt;3. Left Click  on First Node &lt;/span&gt;&lt;span style=&quot; font-family:'Helvetica'; font-size:9pt; font-weight:600;&quot;&gt;to close contour or press&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Helvetica'; font-size:9pt; font-weight:600; font-style:italic;&quot;&gt;    Modify Mode &lt;/span&gt;&lt;span style=&quot; font-family:'Helvetica'; font-size:9pt; font-weight:600;&quot;&gt;to finish contour drawing and enter &lt;/span&gt;&lt;span style=&quot; font-family:'Helvetica'; font-size:9pt; font-weight:600; font-style:italic;&quot;&gt;Modify Mode&lt;/span&gt;&lt;span style=&quot; font-family:'Helvetica'; font-size:9pt; font-weight:600;&quot;&gt;.&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Helvetica'; font-size:9pt; font-weight:600; font-style:italic;&quot;&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Helvetica'; font-size:9pt; font-weight:600;&quot;&gt;After&lt;/span&gt;&lt;span style=&quot; font-family:'Helvetica'; font-size:9pt; font-weight:600; font-style:italic;&quot;&gt; &lt;/span&gt;&lt;span style=&quot; font-family:'Helvetica'; font-size:9pt; font-weight:600;&quot;&gt;finish contour drawing:&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Helvetica'; font-size:9pt; font-weight:600; color:#ff5500;&quot;&gt;Modify Mode:&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Helvetica'; font-size:9pt; font-weight:600; font-style:italic;&quot;&gt;1. Left Click &lt;/span&gt;&lt;span style=&quot; font-family:'Helvetica'; font-size:9pt; font-weight:600;&quot;&gt;on the line to insert new nodes.&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Helvetica'; font-size:9pt; font-weight:600;&quot;&gt;2.&lt;/span&gt;&lt;span style=&quot; font-family:'Helvetica'; font-size:9pt; font-weight:600; font-style:italic;&quot;&gt; Ctrl+Click&lt;/span&gt;&lt;span style=&quot; font-family:'Helvetica'; font-size:9pt; font-weight:600;&quot;&gt; on a node to label as picked.&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Helvetica'; font-size:9pt; font-weight:600;&quot;&gt;3. Move mouse over a node, the node will&lt;/span&gt;&lt;/p&gt;
@@ -97,6 +96,9 @@ p, li { white-space: pre-wrap; }
         <layout class="QVBoxLayout" name="verticalLayout_2">
          <item>
           <widget class="QRadioButton" name="EditMode">
+           <property name="toolTip">
+            <string>Enter Edit Mode</string>
+           </property>
            <property name="text">
             <string>Edit Mode</string>
            </property>
@@ -107,6 +109,9 @@ p, li { white-space: pre-wrap; }
          </item>
          <item>
           <widget class="QRadioButton" name="ModifyMode">
+           <property name="toolTip">
+            <string>Enter Modify Mode</string>
+           </property>
            <property name="text">
             <string>Modify Mode</string>
            </property>
@@ -118,7 +123,7 @@ p, li { white-space: pre-wrap; }
       <item row="1" column="0">
        <widget class="QToolButton" name="Delete">
         <property name="text">
-         <string>Reset Contour</string>
+         <string>Delete Contour Nodes</string>
         </property>
         <property name="icon">
          <iconset resource="../../../Widgets/Resources/QtWidgets.qrc">
