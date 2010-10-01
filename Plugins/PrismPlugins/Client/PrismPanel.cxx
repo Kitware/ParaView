@@ -1306,7 +1306,7 @@ void PrismPanel::setupConversions()
           for(;vnIter!=tableData.VariableConversions.end();vnIter++)
           {
             SESAMEConversionVariable variableData=*vnIter;
-            QString label=variableData.Name;
+            label=variableData.Name;
             label.append(" - ");
 
             QString conversionUnits=variableData.SESAMEUnits;
