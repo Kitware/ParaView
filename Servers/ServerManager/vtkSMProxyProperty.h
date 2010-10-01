@@ -178,6 +178,12 @@ protected:
   virtual int ReadXMLAttributes(vtkSMProxy* parent, 
                                 vtkPVXMLElement* element);
 
+
+  virtual void SaveStateValues(vtkPVXMLElement* propertyElement);
+  virtual vtkPVXMLElement* AddProxyElementState(vtkPVXMLElement *prop,
+                                                unsigned int idx);
+
+
 private:
   vtkSMProxyProperty(const vtkSMProxyProperty&); // Not implemented
   void operator=(const vtkSMProxyProperty&); // Not implemented

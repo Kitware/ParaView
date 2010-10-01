@@ -155,6 +155,9 @@ protected:
   // value specified in the configuration file.
   virtual void ResetToDefaultInternal();
 
+  // Save concrete property values into the XML state property declaration
+  virtual void SaveStateValues(vtkPVXMLElement* propElement);
+
 private:
   vtkSMIntVectorProperty(const vtkSMIntVectorProperty&); // Not implemented
   void operator=(const vtkSMIntVectorProperty&); // Not implemented

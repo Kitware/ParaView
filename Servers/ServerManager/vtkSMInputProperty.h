@@ -137,6 +137,9 @@ protected:
 
   vtkSMInputPropertyInternals* IPInternals;
 
+  virtual vtkPVXMLElement* AddProxyElementState(vtkPVXMLElement *propertyElement,
+                                                unsigned int idx);
+
 private:
   vtkSMInputProperty(const vtkSMInputProperty&); // Not implemented
   void operator=(const vtkSMInputProperty&); // Not implemented

@@ -1531,3 +1531,44 @@ void vtkSMProxy::PrintSelf(ostream& os, vtkIndent indent)
     iter->Delete();
     }
 }
+//---------------------------------------------------------------------------
+vtkPVXMLElement* vtkSMProxy::SaveState(vtkPVXMLElement* root)
+{
+  vtkPVXMLElement *proxyXml = vtkPVXMLElement::New();
+
+  proxyXml->SetName("Proxy");
+  proxyXml->AddAttribute( "group", this->XMLGroup);
+  proxyXml->AddAttribute( "type", this->XMLName);
+  proxyXml->AddAttribute( "id",
+                          static_cast<unsigned int>(this->GetGlobalID()));
+  proxyXml->AddAttribute( "servers",
+                          static_cast<unsigned int>(this->GetLocation()));
+
+  vtkSMPropertyIterator *iter = this->NewPropertyIterator();
+  for (iter->Begin(); !iter->IsAtEnd(); iter->Next())
+    {
+    if (!iter->GetProperty())
+      {
+      vtkWarningMacro("Missing property with name: " << iter->GetKey()
+                      << " on " << this->GetXMLName());
+      continue;
+      }
+    if (!iter->GetProperty()->GetIsInternal())
+      {
+      vtksys_ios::ostringstream propID;
+      propID << this->GetGlobalID() << "." << iter->GetKey() << ends;
+      iter->GetProperty()->SaveState( proxyXml,
+                                      iter->GetKey(),
+                                      propID.str().c_str());
+      }
+    }
+  iter->Delete();
+
+  if (root)
+    {
+    root->AddNestedElement(proxyXml);
+    proxyXml->FastDelete();
+    }
+
+  return proxyXml;
+}

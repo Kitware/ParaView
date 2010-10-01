@@ -22,6 +22,10 @@
 #include <assert.h>
 #include <vtkstd/vector>
 #include <vtkstd/algorithm>
+#include <vtkstd/string>
+#include <vtksys/ios/sstream>
+#include <vtkPVXMLElement.h>
+
 class vtkSMProperty;
 
 template <class T>
@@ -247,7 +251,26 @@ public:
       this->Property->Modified();
       }
     }
+  //---------------------------------------------------------------------------
+  void SaveStateValues(vtkPVXMLElement* propertyElement)
+    {
+    unsigned int size = this->GetNumberOfElements();
+    if (size > 0)
+      {
+      propertyElement->AddAttribute("number_of_elements", size);
+      }
+    for (unsigned int i=0; i<size; i++)
+      {
+      vtksys_ios::ostringstream valueAsString;
+      valueAsString << this->GetElement(i);
 
-
+      vtkPVXMLElement* elementElement = vtkPVXMLElement::New();
+      elementElement->SetName("Element");
+      elementElement->AddAttribute("index", i);
+      elementElement->AddAttribute("value", valueAsString.str().c_str());
+      propertyElement->AddNestedElement(elementElement);
+      elementElement->Delete();
+      }
+    }
 };
 #endif

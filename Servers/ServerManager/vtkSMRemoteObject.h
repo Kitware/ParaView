@@ -29,6 +29,9 @@ class vtkSMSession;
 
 class VTK_EXPORT vtkSMRemoteObject : public vtkSMObject
 {
+// My friends are...
+  friend class vtkSMStateHelper; // To pull state
+
 public:
   vtkTypeMacro(vtkSMRemoteObject,vtkSMObject);
   void PrintSelf(ostream& os, vtkIndent indent);

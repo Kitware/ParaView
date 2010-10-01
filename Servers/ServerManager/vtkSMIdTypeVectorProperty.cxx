@@ -266,3 +266,8 @@ void vtkSMIdTypeVectorProperty::PrintSelf(ostream& os, vtkIndent indent)
     }
   os << endl;
 }
+//---------------------------------------------------------------------------
+void vtkSMIdTypeVectorProperty::SaveStateValues(vtkPVXMLElement* propElement)
+{
+  this->Internals->SaveStateValues(propElement);
+}

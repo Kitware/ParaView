@@ -191,8 +191,8 @@ void vtkSMProxyManager::InstantiateGroupPrototypes(const char* groupName)
 
   // Find the XML elements from which the proxies can be instantiated and
   // initialized
-  for (iter->InitTraversal(); !iter->IsDoneWithTraversal();
-    iter->GoToNextItem())
+  for ( iter->InitTraversal(); !iter->IsDoneWithTraversal();
+        iter->GoToNextItem())
     {
     const char* xml_name = iter->GetProxyName();
     if (this->GetProxy(newgroupname.str().c_str(), xml_name) == NULL)
@@ -1093,59 +1093,15 @@ void vtkSMProxyManager::SaveState(const char* filename)
 //---------------------------------------------------------------------------
 vtkPVXMLElement* vtkSMProxyManager::SaveState()
 {
-  vtkPVXMLElement* smstate = this->SaveStateInternal(
-    vtkProcessModuleConnectionManager::GetNullConnectionID(), 0, 0);
-
   vtkPVXMLElement* root = vtkPVXMLElement::New();
   root->SetName("GenericParaViewApplication");
-  root->AddNestedElement(smstate);
-  smstate->FastDelete();
+  this->AddInternalState(root);
 
   LoadStateInformation info;
   info.RootElement = root;
   info.ProxyLocator = NULL;
   this->InvokeEvent(vtkCommand::SaveStateEvent, &info);
   return root;
-}
-
-//---------------------------------------------------------------------------
-vtkPVXMLElement* vtkSMProxyManager::SaveState(vtkIdType connectionID)
-{
-  vtkPVXMLElement* smstate = this->SaveStateInternal(connectionID, 0, 0);
-
-  vtkPVXMLElement* root = vtkPVXMLElement::New();
-  root->SetName("GenericParaViewApplication");
-  root->AddNestedElement(smstate);
-  smstate->FastDelete();
-
-  LoadStateInformation info;
-  info.RootElement = root;
-  info.ProxyLocator = NULL;
-  this->InvokeEvent(vtkCommand::SaveStateEvent, &info);
-  return root;
-}
-
-//---------------------------------------------------------------------------
-vtkPVXMLElement* vtkSMProxyManager::SaveState(vtkCollection* proxies,
-  bool save_referred_proxies)
-{
-  vtkSMProxyManagerProxySet setOfProxies;
-  for (int cc=0; cc < proxies->GetNumberOfItems(); ++cc)
-    {
-    vtkSMProxy* proxy = vtkSMProxy::SafeDownCast(proxies->GetItemAsObject(cc));
-    if (proxy)
-      {
-      setOfProxies.insert(proxy);
-      if (save_referred_proxies)
-        {
-        this->CollectReferredProxies(setOfProxies, proxy);
-        }
-      }
-    }
-
-  return this->SaveStateInternal(
-    vtkProcessModuleConnectionManager::GetNullConnectionID(),
-    &setOfProxies, 0);
 }
 
 //---------------------------------------------------------------------------
@@ -1172,14 +1128,8 @@ void vtkSMProxyManager::CollectReferredProxies(
 
 
 //---------------------------------------------------------------------------
-vtkPVXMLElement* vtkSMProxyManager::SaveStateInternal(vtkIdType connectionID,
- vtkSMProxyManagerProxySet* proxySet, int revival)
+vtkPVXMLElement* vtkSMProxyManager::AddInternalState(vtkPVXMLElement *parentElem)
 {
-  (void)proxySet;
-  (void)revival;
-  (void)connectionID;
-  return NULL;
-#ifdef FIXME
   vtkPVXMLElement* rootElement = vtkPVXMLElement::New();
   rootElement->SetName("ServerManagerState");
 
@@ -1190,7 +1140,6 @@ vtkPVXMLElement* vtkSMProxyManager::SaveStateInternal(vtkIdType connectionID,
   rootElement->AddAttribute("version", version_string.str().c_str());
 
 
-  vtkstd::set<vtkstd::string> seen;
   vtkstd::set<vtkSMProxy*> visited_proxies; // set of proxies already added.
 
   // First save the state of all proxies
@@ -1236,23 +1185,8 @@ vtkPVXMLElement* vtkSMProxyManager::SaveStateInternal(vtkIdType connectionID,
           // proxy has been saved.
           continue;
           }
-        if (proxySet && proxySet->find(it3->GetPointer()->Proxy.GetPointer()) == proxySet->end())
-          {
-          // proxy set was specified, and the indicated proxy
-          // does not belong to that set.
-          continue;
-          }
-        if (connectionID == vtkProcessModuleConnectionManager::GetNullConnectionID() ||
-          it3->GetPointer()->Proxy.GetPointer()->GetConnectionID() == connectionID)
-          {
-          vtkPVXMLElement* proxyElement =
-            it3->GetPointer()->Proxy.GetPointer()->SaveState(rootElement);
-          if (revival && proxyElement)
-            {
-            it3->GetPointer()->Proxy.GetPointer()->SaveRevivalState(proxyElement);
-            }
-          visited_proxies.insert(it3->GetPointer()->Proxy.GetPointer());
-          }
+        it3->GetPointer()->Proxy.GetPointer()->SaveState(rootElement);
+        visited_proxies.insert(it3->GetPointer()->Proxy.GetPointer());
         }
       }
     }
@@ -1293,7 +1227,7 @@ vtkPVXMLElement* vtkSMProxyManager::SaveStateInternal(vtkIdType connectionID,
             vtkPVXMLElement* itemElement = vtkPVXMLElement::New();
             itemElement->SetName("Item");
             itemElement->AddAttribute("id",
-              it3->GetPointer()->Proxy.GetPointer()->GetSelfIDAsString());
+              it3->GetPointer()->Proxy->GetGlobalID());
             itemElement->AddAttribute("name", it2->first.c_str());
             collectionElement->AddNestedElement(itemElement);
             itemElement->Delete();
@@ -1318,17 +1252,12 @@ vtkPVXMLElement* vtkSMProxyManager::SaveStateInternal(vtkIdType connectionID,
   rootElement->AddNestedElement(defs);
   defs->Delete();
 
-  // TODO: Save links as per connection ID
-  // TODO: What to do with links when saving state for a
-  // subset of proxies?
-  if (!proxySet)
-    {
-    vtkPVXMLElement* links = vtkPVXMLElement::New();
-    links->SetName("Links");
-    this->SaveRegisteredLinks(links);
-    rootElement->AddNestedElement(links);
-    links->Delete();
-    }
+  // Save links
+  vtkPVXMLElement* links = vtkPVXMLElement::New();
+  links->SetName("Links");
+  this->SaveRegisteredLinks(links);
+  rootElement->AddNestedElement(links);
+  links->Delete();
 
   vtkPVXMLElement* globalProps = vtkPVXMLElement::New();
   globalProps->SetName("GlobalPropertiesManagers");
@@ -1336,8 +1265,13 @@ vtkPVXMLElement* vtkSMProxyManager::SaveStateInternal(vtkIdType connectionID,
   rootElement->AddNestedElement(globalProps);
   globalProps->Delete();
 
+  if(parentElem)
+    {
+    parentElem->AddNestedElement(rootElement);
+    rootElement->FastDelete();
+    }
+
   return rootElement;
-#endif
 }
 
 //---------------------------------------------------------------------------

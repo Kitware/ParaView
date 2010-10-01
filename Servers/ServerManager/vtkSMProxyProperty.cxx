@@ -542,3 +542,33 @@ void vtkSMProxyProperty::PrintSelf(ostream& os, vtkIndent indent)
     }
   os << endl;
 }
+//---------------------------------------------------------------------------
+void vtkSMProxyProperty::SaveStateValues(vtkPVXMLElement* propertyElement)
+{
+  unsigned int size = this->GetNumberOfProxies();
+  if (size > 0)
+    {
+    propertyElement->AddAttribute("number_of_elements", size);
+    }
+  for (unsigned int i=0; i<size; i++)
+    {
+    this->AddProxyElementState(propertyElement, i);
+    }
+}
+//---------------------------------------------------------------------------
+vtkPVXMLElement* vtkSMProxyProperty::AddProxyElementState(vtkPVXMLElement *prop,
+                                                          unsigned int idx)
+{
+  vtkSMProxy* proxy = this->GetProxy(idx);
+  vtkPVXMLElement* proxyElement = 0;
+  if (proxy)
+    {
+    proxyElement = vtkPVXMLElement::New();
+    proxyElement->SetName("Proxy");
+    proxyElement->AddAttribute("value",
+                               static_cast<unsigned int>(proxy->GetGlobalID()));
+    prop->AddNestedElement(proxyElement);
+    proxyElement->FastDelete();
+    }
+  return proxyElement;
+}

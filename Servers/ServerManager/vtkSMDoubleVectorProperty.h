@@ -165,6 +165,10 @@ protected:
   // Subclass may override this if ResetToDefault can reset to default
   // value specified in the configuration file.
   virtual void ResetToDefaultInternal();
+
+  // Save concrete property values into the XML state property declaration
+  virtual void SaveStateValues(vtkPVXMLElement* propElement);
+
 private:
   vtkSMDoubleVectorProperty(const vtkSMDoubleVectorProperty&); // Not implemented
   void operator=(const vtkSMDoubleVectorProperty&); // Not implemented

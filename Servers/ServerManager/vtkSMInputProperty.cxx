@@ -275,3 +275,14 @@ unsigned int vtkSMInputProperty::GetUncheckedOutputPortForConnection(
   return this->IPInternals->UncheckedOutputPorts[idx];
 }
 
+//---------------------------------------------------------------------------
+vtkPVXMLElement* vtkSMInputProperty::AddProxyElementState(vtkPVXMLElement *prop,
+                                                          unsigned int idx)
+{
+  vtkPVXMLElement* proxyElm = this->Superclass::AddProxyElementState(prop, idx);
+  if (proxyElm)
+    {
+    proxyElm->AddAttribute("output_port",this->GetOutputPortForConnection(idx));
+    }
+  return proxyElm;
+}

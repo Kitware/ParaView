@@ -307,6 +307,21 @@ protected:
   // Removes all dependents.
   void RemoveAllDependents();
 
+  // Description:
+  // Save the property state in XML.
+  // This method create the property definition and rely on SaveStateValues
+  // to fill this definition with the concrete property values
+  virtual void SaveState(vtkPVXMLElement* parent, const char* property_name,
+                         const char* uid, int saveDomains=1);
+  // Description:
+  // This method must be overiden by concrete class in order to save the real
+  // property data
+  virtual void SaveStateValues(vtkPVXMLElement* propertyElement);
+
+  // Description:
+  // Save property domain
+  virtual void SaveDomainState(vtkPVXMLElement* propertyElement, const char* uid);
+
   void SetHints(vtkPVXMLElement* hints);
   vtkPVXMLElement* Hints;
 

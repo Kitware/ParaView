@@ -308,7 +308,8 @@ protected:
   //-------------------------------------------------------------------------
   bool IsDoneWithGroupTraversal()
   {
-    return this->GroupNameIterator == this->GroupNames.end();
+    return this->GroupNames.size() == 0
+        || this->GroupNameIterator == this->GroupNames.end();
   }
   //-------------------------------------------------------------------------
   bool IsDoneWithCoreTraversal()
@@ -660,14 +661,14 @@ void vtkSMProxyDefinitionManager::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os, indent);
 }
 //---------------------------------------------------------------------------
-vtkSMProxyDefinitionIterator* vtkSMProxyDefinitionManager::NewSingleGroupIterator(char const* groupName, int scope)
+vtkSMProxyDefinitionIterator* vtkSMProxyDefinitionManager::NewSingleGroupIterator(char const* groupName, int scope = 0)
 {
   vtkInternalDefinitionIterator* iterator = (vtkInternalDefinitionIterator*) NewIterator(scope);
   iterator->AddTraversalGroupName(groupName);
   return iterator;
 }
 //---------------------------------------------------------------------------
-vtkSMProxyDefinitionIterator* vtkSMProxyDefinitionManager::NewIterator(int scope)
+vtkSMProxyDefinitionIterator* vtkSMProxyDefinitionManager::NewIterator(int scope=0)
 {
   vtkInternalDefinitionIterator* iterator = vtkInternalDefinitionIterator::New();
   switch(scope)

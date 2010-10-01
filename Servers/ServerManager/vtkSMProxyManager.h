@@ -282,24 +282,6 @@ public:
   vtkPVXMLElement* SaveState();
 
   // Description:
-  // Saves the state of all proxies registered with the proxy manager
-  // that are on the connection with given \c connectionID
-  // as XML, and returns the vtkPVXMLElement for the root of the state.
-  // If connectionID = NullConnectionID, then state of all registered
-  // proxies will be saved.
-  // Note this this method allocates a new vtkPVXMLElement object,
-  // it's the caller responsibility to free it by calling Delete().
-  vtkPVXMLElement* SaveState(vtkIdType connectionID);
-
-  // Description:
-  // Saves the server manager state for the collection of proxies
-  // mentioned. If \c save_referred_proxies is true, state for
-  // proxies on any proxy property of the proxies in the collection
-  // will also be saved. Note that for the state of any proxy
-  // to be saved, it has to be registered with the proxy manager.
-  vtkPVXMLElement* SaveState(vtkCollection* proxies, bool save_referred_proxies);
-
-  // Description:
   // Given a group name, create prototypes and store them
   // in a instance group called groupName_prototypes.
   // Prototypes have their ConnectionID set to the SelfConnection.
@@ -494,10 +476,10 @@ protected:
 
   // Description:
   // Internal method to save server manager state in an XML
-  // and return a new vtkPVXMLElement for it. The caller has
-  // the responsibility of freeing the vtkPVXMLElement returned.
-  vtkPVXMLElement* SaveStateInternal(vtkIdType connectionID,
-    vtkSMProxyManagerProxySet* setOfProxies, int revival);
+  // and return the created vtkPVXMLElement for it. The caller has
+  // the responsibility of freeing the vtkPVXMLElement returned IF the
+  // parentElement is NULL.
+  vtkPVXMLElement* AddInternalState(vtkPVXMLElement* parentElement);
 
   // Recursively collects all proxies referred by the proxy in the set.
   void CollectReferredProxies(vtkSMProxyManagerProxySet& setOfProxies,

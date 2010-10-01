@@ -342,6 +342,15 @@ public:
   // VTK object.
   bool GatherInformation(vtkPVInformation* information);
 
+  // Description:
+  // Saves the state of the proxy. This state can be reloaded
+  // to create a new proxy that is identical the present state of this proxy.
+  // The resulting proxy's XML hieratchy is returned, in addition if the root
+  // argument is not NULL then it's also inserted as a nested element.
+  // This call saves all a proxy's properties, including exposed properties
+  // and sub-proxies. More control is provided by the following overload.
+  vtkPVXMLElement* SaveState(vtkPVXMLElement* root);
+
 //BTX
 protected:
   vtkSMProxy();

@@ -53,7 +53,7 @@ vtkSMProperty::vtkSMProperty()
   this->Proxy = 0;
   this->InformationOnly = 0;
   this->InformationProperty = 0;
-  this->IsInternal = 1;
+  this->IsInternal = 0;
   this->Documentation = 0;
   this->Repeatable = 0;
   
@@ -453,5 +453,44 @@ void vtkSMProperty::PrintSelf(ostream& os, vtkIndent indent)
   else
     {
     os << "(none)" << endl;
+    }
+}
+
+//---------------------------------------------------------------------------
+void vtkSMProperty::SaveState(vtkPVXMLElement* parent,
+                              const char* property_name, const char* uid,
+                              int saveDomains/*=1*/)
+{
+  vtkPVXMLElement* propertyElement = vtkPVXMLElement::New();
+  propertyElement->SetName("Property");
+  propertyElement->AddAttribute("name", property_name);
+  propertyElement->AddAttribute("id", uid);
+
+  this->SaveStateValues(propertyElement);
+
+  if (saveDomains)
+    {
+    this->SaveDomainState(propertyElement, uid);
+    }
+  parent->AddNestedElement(propertyElement);
+  propertyElement->Delete();
+}
+//---------------------------------------------------------------------------
+void vtkSMProperty::SaveStateValues(vtkPVXMLElement* /*propertyElement*/)
+{
+  // Concreate class should overide it !!!
+}
+//---------------------------------------------------------------------------
+void vtkSMProperty::SaveDomainState(vtkPVXMLElement* propertyElement,
+                                    const char* uid)
+{
+  this->DomainIterator->Begin();
+  while(!this->DomainIterator->IsAtEnd())
+    {
+    vtksys_ios::ostringstream dname;
+    dname << uid << "." << this->DomainIterator->GetKey() << ends;
+    this->DomainIterator->GetDomain()->SaveState(propertyElement,
+                                                 dname.str().c_str());
+    this->DomainIterator->Next();
     }
 }
