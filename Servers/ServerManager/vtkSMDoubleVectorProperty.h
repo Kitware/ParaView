@@ -169,6 +169,9 @@ protected:
   // Save concrete property values into the XML state property declaration
   virtual void SaveStateValues(vtkPVXMLElement* propElement);
 
+  // Used in the LoadState method of VectorProperty
+  virtual int SetElementAsString(int idx, const char* value);
+
 private:
   vtkSMDoubleVectorProperty(const vtkSMDoubleVectorProperty&); // Not implemented
   void operator=(const vtkSMDoubleVectorProperty&); // Not implemented

@@ -546,7 +546,8 @@ void vtkSMPropertyLink::SaveState(const char* linkname, vtkPVXMLElement* parent)
     {
     vtkPVXMLElement* child = vtkPVXMLElement::New();
     child->SetName("Property");
-    child->AddAttribute("id", iter->Proxy.GetPointer()->GetSelfIDAsString());
+    child->AddAttribute("id",
+                        static_cast<unsigned int>(iter->Proxy.GetPointer()->GetGlobalID()));
     child->AddAttribute("name", iter->PropertyName);
     child->AddAttribute("direction", ( (iter->UpdateDirection & INPUT)? 
         "input" : "output"));

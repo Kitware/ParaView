@@ -1018,26 +1018,22 @@ int vtkSMProxyManager::AreProxiesModified()
   return (this->Internals->ModifiedProxies.size() > 0)? 1: 0;
 }
 
-#ifdef FIXME
 //---------------------------------------------------------------------------
-void vtkSMProxyManager::LoadState(const char* filename, vtkIdType id,
-  vtkSMStateLoader* loader/*=NULL*/)
+void vtkSMProxyManager::LoadState( const char* filename,
+                                   vtkSMStateLoader* loader/*=NULL*/)
 {
   vtkPVXMLParser* parser = vtkPVXMLParser::New();
   parser->SetFileName(filename);
   parser->Parse();
 
-  this->LoadState(parser->GetRootElement(), id, loader);
+  this->LoadState(parser->GetRootElement(), loader);
   parser->Delete();
 }
 
 //---------------------------------------------------------------------------
-void vtkSMProxyManager::LoadState(vtkPVXMLElement* rootElement, vtkIdType id,
-  vtkSMStateLoader* loader/*=NULL*/)
+void vtkSMProxyManager::LoadState( vtkPVXMLElement* rootElement,
+                                   vtkSMStateLoader* loader/*=NULL*/)
 {
-  (void)rootElement;
-  (void)id;
-  (void)loader;
   if (!rootElement)
     {
     return;
@@ -1047,12 +1043,12 @@ void vtkSMProxyManager::LoadState(vtkPVXMLElement* rootElement, vtkIdType id,
   if (!loader)
     {
     spLoader = vtkSmartPointer<vtkSMStateLoader>::New();
+    spLoader->SetSession(this->GetSession());
     }
   else
     {
     spLoader = loader;
     }
-  spLoader->GetProxyLocator()->SetConnectionID(id);
   if (spLoader->LoadState(rootElement))
     {
     LoadStateInformation info;
@@ -1061,25 +1057,6 @@ void vtkSMProxyManager::LoadState(vtkPVXMLElement* rootElement, vtkIdType id,
     this->InvokeEvent(vtkCommand::LoadStateEvent, &info);
     }
 }
-
-//---------------------------------------------------------------------------
-void vtkSMProxyManager::LoadState(const char* filename,
-  vtkSMStateLoader* loader/*=NULL*/)
-{
-  this->LoadState(filename,
-    vtkProcessModuleConnectionManager::GetRootServerConnectionID(),
-    loader);
-}
-
-//---------------------------------------------------------------------------
-void vtkSMProxyManager::LoadState(vtkPVXMLElement* rootElement,
-  vtkSMStateLoader* loader/*=NULL*/)
-{
-  this->LoadState(rootElement,
-    vtkProcessModuleConnectionManager::GetRootServerConnectionID(),
-    loader);
-}
-#endif
 
 //---------------------------------------------------------------------------
 void vtkSMProxyManager::SaveState(const char* filename)

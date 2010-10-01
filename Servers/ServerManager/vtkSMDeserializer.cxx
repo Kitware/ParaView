@@ -50,7 +50,7 @@ vtkSMProxy* vtkSMDeserializer::NewProxy(int id, vtkSMProxyLocator* locator)
     }
 
   vtkSMProxy* proxy;
-  proxy = this->CreateProxy(group, type, locator->GetConnectionID());
+  proxy = this->CreateProxy(group, type);
   if (!proxy)
     {
     vtkErrorMacro("Could not create a proxy of group: "
@@ -71,15 +71,11 @@ vtkSMProxy* vtkSMDeserializer::NewProxy(int id, vtkSMProxyLocator* locator)
 }
 
 //----------------------------------------------------------------------------
-vtkSMProxy* vtkSMDeserializer::CreateProxy(
-  const char* xmlgroup, const char* xmlname, vtkIdType connectionId)
+vtkSMProxy* vtkSMDeserializer::CreateProxy(const char* xmlgroup,
+                                           const char* xmlname)
 {
-  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+  vtkSMProxyManager* pxm = this->Session->GetProxyManager();
   vtkSMProxy* proxy = pxm->NewProxy(xmlgroup, xmlname);
-  if (proxy)
-    {
-    proxy->SetConnectionID(connectionId);
-    }
   return proxy;
 }
 

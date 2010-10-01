@@ -46,12 +46,6 @@ public:
   vtkGetObjectMacro(Deserializer, vtkSMDeserializer);
 
   // Description:
-  // Get/Set the connection on which to locate the proxies. A proxy locator can
-  // only deal with one connection at a time.
-  vtkSetMacro(ConnectionID, vtkIdType);
-  vtkGetMacro(ConnectionID, vtkIdType);
-
-  // Description:
   // Clear the locator.
   void Clear();
 
@@ -69,7 +63,6 @@ protected:
   // Deserializer, if any, to create a new proxy.
   virtual vtkSMProxy* NewProxy(int id);
 
-  vtkIdType ConnectionID;
   vtkSMDeserializer* Deserializer;
 
   int ReviveProxies;

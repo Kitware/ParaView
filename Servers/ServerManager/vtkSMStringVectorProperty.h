@@ -135,6 +135,11 @@ protected:
   // Let the property read and set its content from the stream
   virtual void ReadFrom(vtkSMMessage*, int message_offset);
 
+  // Save concrete property values into the XML state property declaration
+  virtual void SaveStateValues(vtkPVXMLElement* propElement);
+
+  // Used in the LoadState method of VectorProperty
+  virtual int SetElementAsString(int idx, const char* value);
 
 private:
   vtkSMStringVectorProperty(const vtkSMStringVectorProperty&); // Not implemented

@@ -33,7 +33,6 @@ vtkCxxSetObjectMacro(vtkSMProxyLocator, Deserializer, vtkSMDeserializer);
 //----------------------------------------------------------------------------
 vtkSMProxyLocator::vtkSMProxyLocator()
 {
-  this->ConnectionID = 0;
   this->Internal = new vtkInternal();
   this->Deserializer = 0;
   this->ReviveProxies = 0;

@@ -322,6 +322,10 @@ protected:
   // Save property domain
   virtual void SaveDomainState(vtkPVXMLElement* propertyElement, const char* uid);
 
+  // Description:
+  // Updates state from an XML element. Returns 0 on failure.
+  virtual int LoadState(vtkPVXMLElement* element, vtkSMProxyLocator* loader);
+
   void SetHints(vtkPVXMLElement* hints);
   vtkPVXMLElement* Hints;
 

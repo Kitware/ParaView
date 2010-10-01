@@ -572,3 +572,70 @@ vtkPVXMLElement* vtkSMProxyProperty::AddProxyElementState(vtkPVXMLElement *prop,
     }
   return proxyElement;
 }
+//---------------------------------------------------------------------------
+// NOTE: This method is duplicated in some way in vtkSMInputProperty
+// Therefore, care must be taken to keep the two in sync.
+int vtkSMProxyProperty::LoadState(vtkPVXMLElement* element,
+                                  vtkSMProxyLocator* loader)
+{
+  if (!loader)
+    {
+    // no loader specified, state remains unchanged.
+    return 1;
+    }
+
+  int prevImUpdate = this->ImmediateUpdate;
+
+  // Wait until all values are set before update (if ImmediateUpdate)
+  this->ImmediateUpdate = 0;
+  this->Superclass::LoadState(element, loader);
+
+  // If "clear" is present and is 0, it implies that the proxy elements
+  // currently in the property should not be cleared before loading
+  // the new state.
+  int clear=1;
+  element->GetScalarAttribute("clear", &clear);
+  if (clear)
+    {
+    this->PPInternals->Proxies.clear();
+    }
+
+  unsigned int numElems = element->GetNumberOfNestedElements();
+  for (unsigned int i=0; i<numElems; i++)
+    {
+    vtkPVXMLElement* currentElement = element->GetNestedElement(i);
+    if (currentElement->GetName() &&
+        (strcmp(currentElement->GetName(), "Element") == 0 ||
+         strcmp(currentElement->GetName(), "Proxy") == 0) )
+      {
+      int id;
+      if (currentElement->GetScalarAttribute("value", &id))
+        {
+        if (id)
+          {
+          vtkSMProxy* proxy = loader->LocateProxy(id);
+          if (proxy)
+            {
+            this->AddProxy(proxy, 0);
+            }
+          else
+            {
+            // It is not an error to have missing proxies in a proxy property.
+            // We simply ignore such proxies.
+            //vtkErrorMacro("Could not create proxy of id: " << id);
+            //return 0;
+            }
+          }
+        else
+          {
+          this->AddProxy(0, 0);
+          }
+        }
+      }
+    }
+
+  // Do not immediately update. Leave it to the loader.
+  this->Modified();
+  this->ImmediateUpdate = prevImUpdate;
+  return 1;
+}

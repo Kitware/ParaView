@@ -286,3 +286,74 @@ vtkPVXMLElement* vtkSMInputProperty::AddProxyElementState(vtkPVXMLElement *prop,
     }
   return proxyElm;
 }
+//---------------------------------------------------------------------------
+int vtkSMInputProperty::LoadState(vtkPVXMLElement* element,
+                                  vtkSMProxyLocator* loader)
+{
+  if (!loader)
+    {
+    // If no loader, leave state unchanged.
+    return 1;
+    }
+
+  // NOTE: This method by-passes LoadState() of vtkSMProxyProperty and
+  // re-implements a lot of it's functionality to add output ports.
+  // Therefore, care must be taken to keep the two in sync.
+
+  int prevImUpdate = this->ImmediateUpdate;
+
+  // Wait until all values are set before update (if ImmediateUpdate)
+  this->ImmediateUpdate = 0;
+  this->vtkSMProperty::LoadState(element, loader);
+
+  // If "clear" is present and is 0, it implies that the proxy elements
+  // currently in the property should not be cleared before loading
+  // the new state.
+  int clear=1;
+  element->GetScalarAttribute("clear", &clear);
+  if (clear)
+    {
+    this->RemoveAllProxies(0);
+    }
+
+  unsigned int numElems = element->GetNumberOfNestedElements();
+  for (unsigned int i=0; i<numElems; i++)
+    {
+    vtkPVXMLElement* currentElement = element->GetNestedElement(i);
+    if (currentElement->GetName() &&
+        (strcmp(currentElement->GetName(), "Element") == 0 ||
+         strcmp(currentElement->GetName(), "Proxy") == 0) )
+      {
+      int id;
+      if (currentElement->GetScalarAttribute("value", &id))
+        {
+        int outputPort = 0;
+        currentElement->GetScalarAttribute("output_port", &outputPort);
+        if (id)
+          {
+          vtkSMProxy* proxy = loader->LocateProxy(id);
+          if (proxy)
+            {
+            this->AddInputConnection(proxy, outputPort, 0);
+            }
+          else
+            {
+            // It is not an error to have missing proxies in a proxy property.
+            // We simply ignore such proxies.
+            //vtkErrorMacro("Could not create proxy of id: " << id);
+            //return 0;
+            }
+          }
+        else
+          {
+          this->AddProxy(0, 0);
+          }
+        }
+      }
+    }
+
+  // Do not immediately update. Leave it to the loader.
+  this->Modified();
+  this->ImmediateUpdate = prevImUpdate;
+  return 1;
+}

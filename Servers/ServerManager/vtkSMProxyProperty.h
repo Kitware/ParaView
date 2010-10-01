@@ -179,9 +179,20 @@ protected:
                                 vtkPVXMLElement* element);
 
 
+  // Description:
+  // Generic method used to generate XML state
   virtual void SaveStateValues(vtkPVXMLElement* propertyElement);
+
+  // Description:
+  // Fill state property/proxy XML element with proxy info.
+  // Return the created proxy XML element that has been added as a child in the
+  // property definition. If prop == NULL, you must Delete yourself the result
+  // otherwise prop is olding a reference to the proxy element
   virtual vtkPVXMLElement* AddProxyElementState(vtkPVXMLElement *prop,
                                                 unsigned int idx);
+  // Description:
+  // Updates state from an XML element. Returns 0 on failure.
+  virtual int LoadState(vtkPVXMLElement* element, vtkSMProxyLocator* loader);
 
 
 private:

@@ -68,8 +68,7 @@ protected:
   // Description:
   // Overridden so that when new views are to be created, we create views
   // suitable for the connection. 
-  virtual vtkSMProxy* CreateProxy(
-    const char* xmlgroup, const char* xmlname, vtkIdType cid);
+  virtual vtkSMProxy* CreateProxy(const char* xmlgroup, const char* xmlname);
 
   virtual int HandleProxyCollection(vtkPVXMLElement* collectionElement);
   virtual void HandleCustomProxyDefinitions(vtkPVXMLElement* element);
@@ -114,7 +113,7 @@ protected:
   // a different configuration eg. "RenderView" in builin mode, 
   // "IceTDesktopRenderView" in remote render mode etc. This method is used to
   // determine what type of view needs to be created for the given class. 
-  const char* GetViewXMLName(int connectionID, const char *xml_name);
+  //const char* GetViewXMLName(int connectionID, const char *xml_name);
 
   vtkPVXMLElement* ServerManagerStateElement;
   vtkSMProxyLocator* ProxyLocator;

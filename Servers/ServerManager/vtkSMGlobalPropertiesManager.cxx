@@ -47,8 +47,7 @@ vtkStandardNewMacro(vtkSMGlobalPropertiesManager);
 vtkSMGlobalPropertiesManager::vtkSMGlobalPropertiesManager()
 {
   this->Internals = new vtkSMGlobalPropertiesManager::vtkInternals();
-  this->SetConnectionID(0);
-  this->SetServers(0);
+  this->SetLocation(0);
 }
 
 //----------------------------------------------------------------------------
@@ -217,7 +216,8 @@ vtkPVXMLElement* vtkSMGlobalPropertiesManager::SaveLinkState(vtkPVXMLElement* ro
         vtkPVXMLElement* linkElem = vtkPVXMLElement::New();
         linkElem->SetName("Link");
         linkElem->AddAttribute("global_name", mapIter->first.c_str());
-        linkElem->AddAttribute("proxy", listIter->Proxy->GetSelfIDAsString());
+        linkElem->AddAttribute( "proxy",
+                                static_cast<unsigned int>(listIter->Proxy->GetGlobalID()));
         linkElem->AddAttribute("property", listIter->PropertyName.c_str());
         elem->AddNestedElement(linkElem);
         linkElem->Delete();

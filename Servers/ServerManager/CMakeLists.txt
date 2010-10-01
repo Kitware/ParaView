@@ -20,6 +20,8 @@ ENDIF(NOT WIN32)
 
 SET (Kit_SRCS
   vtkInitializationHelper.cxx
+  vtkSMCameraLink.cxx
+  vtkSMDeserializer.cxx
   vtkPMDoubleVectorProperty.cxx
   vtkPMIdTypeVectorProperty.cxx
   vtkPMInputProperty.cxx
@@ -38,6 +40,8 @@ SET (Kit_SRCS
   vtkSMDomain.cxx
   vtkSMDomainIterator.cxx
   vtkSMDoubleVectorProperty.cxx
+  vtkSMGlobalPropertiesManager.cxx
+  vtkSMIdBasedProxyLocator.cxx
   vtkSMIdTypeVectorProperty.cxx
   vtkSMInputProperty.cxx
   vtkSMIntVectorProperty.cxx
@@ -47,10 +51,13 @@ SET (Kit_SRCS
   vtkSMProperty.cxx
   vtkSMPropertyHelper.cxx
   vtkSMPropertyIterator.cxx
+  vtkSMPropertyLink.cxx
   vtkSMProxy.cxx
   vtkSMProxyDefinitionIterator.cxx
   vtkSMProxyDefinitionManager.cxx
   vtkSMProxyIterator.cxx
+  vtkSMProxyLink.cxx
+  vtkSMProxyLocator.cxx
   vtkSMProxyManager.cxx
   vtkSMProxyProperty.cxx
   vtkSMProxySelectionModel.cxx
@@ -62,6 +69,9 @@ SET (Kit_SRCS
   vtkSMSession.cxx
   vtkSMSessionServer.cxx
   vtkSMSourceProxy.cxx
+  vtkSMStateLoader.cxx
+  vtkSMStateVersionControllerBase.cxx
+  vtkSMStateVersionController.cxx
   vtkSMStringVectorProperty.cxx
   vtkSMVectorProperty.cxx
   vtkSMWriterFactory.cxx
@@ -116,12 +126,11 @@ SET(Kit_SRCS
   vtkSMBlockDeliveryRepresentationProxy.cxx
   vtkSMBlockDeliveryStrategy.cxx
   vtkSMBooleanKeyFrameProxy.cxx
-
   vtkSMBoxRepresentationProxy.cxx
   vtkSMCameraConfigurationReader.cxx
   vtkSMCameraConfigurationWriter.cxx
   vtkSMCameraKeyFrameProxy.cxx
-  vtkSMCameraLink.cxx
+
   vtkSMCameraManipulatorProxy.cxx
   vtkSMCameraProxy.cxx
   #vtkSMCaveRenderModuleProxy.cxx
@@ -143,20 +152,17 @@ SET(Kit_SRCS
   vtkSMCubeAxesRepresentationProxy.cxx
   vtkSMDataLabelRepresentationProxy.cxx
   vtkSMDataRepresentationProxy.cxx
-  vtkSMDeserializer.cxx
   vtkSMDistanceRepresentation2DProxy.cxx
   vtkSMDoubleArrayInformationHelper.cxx
   vtkSMExponentialKeyFrameProxy.cxx
   vtkSMExporterProxy.cxx
   vtkSMFileSeriesReaderProxy.cxx
-  vtkSMGlobalPropertiesManager.cxx
   vtkSMGlobalPropertiesLinkUndoElement.cxx
   vtkSMGlyph3DMapperRepresentationProxy.cxx
   vtkSMHardwareSelector.cxx
   vtkSMIceTCompositeViewProxy.cxx
   vtkSMIceTDesktopRenderViewProxy.cxx
   vtkSMIceTMultiDisplayRenderViewProxy.cxx
-  vtkSMIdBasedProxyLocator.cxx
   vtkSMImageDataParallelStrategy.cxx
   vtkSMImageSliceRepresentationProxy.cxx
   vtkSMImageTextureProxy.cxx
@@ -182,13 +188,10 @@ SET(Kit_SRCS
 #  vtkSMPluginInformationHelper.cxx
   vtkSMPropertyAdaptor.cxx
   vtkSMNamedPropertyIterator.cxx
-  vtkSMPropertyLink.cxx
   vtkSMPropertyModificationUndoElement.cxx
   vtkSMPropRepresentationProxy.cxx
   vtkSMProxyConfigurationReader.cxx
   vtkSMProxyConfigurationWriter.cxx
-  vtkSMProxyLink.cxx
-  vtkSMProxyLocator.cxx
   vtkSMProxyManagerReviver.cxx
   vtkSMProxyRegisterUndoElement.cxx
   vtkSMProxyStateChangedUndoElement.cxx
@@ -225,9 +228,6 @@ SET(Kit_SRCS
   vtkSMSimpleStringInformationHelper.cxx
   vtkSMSinusoidKeyFrameProxy.cxx
   vtkSMSpreadSheetRepresentationProxy.cxx
-  vtkSMStateLoader.cxx
-  vtkSMStateVersionControllerBase.cxx
-  vtkSMStateVersionController.cxx
   vtkSMStringArrayHelper.cxx
   vtkSMSurfaceRepresentationProxy.cxx
 #  vtkSMTemporalInputDomain.cxx
@@ -285,6 +285,7 @@ SET_SOURCE_FILES_PROPERTIES(
   vtkSMSession.cxx
   vtkSMVectorProperty.cxx
   vtkSMPropertyHelper.cxx
+  vtkSMStateVersionControllerBase.cxx
   ABSTRACT
   )
 

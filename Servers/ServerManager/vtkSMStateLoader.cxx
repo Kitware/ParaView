@@ -29,6 +29,7 @@
 #include "vtkSMSourceProxy.h"
 #include "vtkSMStateVersionController.h"
 #include "vtkSMViewProxy.h"
+#include "vtkSMSession.h"
 
 #include <vtkstd/map>
 #include <vtkstd/string>
@@ -55,6 +56,7 @@ vtkSMStateLoader::vtkSMStateLoader()
 {
   this->Internal = new vtkSMStateLoaderInternals;
   this->ServerManagerStateElement = 0;
+  this->Session = 0;
   this->ProxyLocator = vtkSMProxyLocator::New();
 }
 
@@ -64,39 +66,22 @@ vtkSMStateLoader::~vtkSMStateLoader()
   this->SetProxyLocator(0);
   this->ServerManagerStateElement = 0;
   this->ProxyLocator = 0;
+  if(this->Session)
+    {
+    this->Session->Delete();
+    this->Session = 0;
+    }
   delete this->Internal;
 }
 
-//---------------------------------------------------------------------------
-const char* vtkSMStateLoader::GetViewXMLName (int connectionID,
-  const char *xml_name)
-{
-  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
-  vtkSMViewProxy* prototype = vtkSMViewProxy::SafeDownCast(
-    pxm->GetPrototypeProxy("views", xml_name));
-  if (prototype)
-    {
-    // Generally each view type is different class of view eg. bar char view, line
-    // plot view etc. However in some cases a different view types are indeed the
-    // same class of view the only different being that each one of them works in
-    // a different configuration eg. "RenderView" in builin mode, 
-    // "IceTDesktopRenderView" in remote render mode etc. This method is used to
-    // determine what type of view needs to be created for the given class. 
-    return prototype->GetSuggestedViewType(connectionID);
-    }
-
-  return xml_name;
-}
-
 //-----------------------------------------------------------------------------
-vtkSMProxy* vtkSMStateLoader::CreateProxy(
-  const char* xml_group, const char* xml_name, vtkIdType cid)
+vtkSMProxy* vtkSMStateLoader::CreateProxy( const char* xml_group,
+                                           const char* xml_name)
 {
   // Check if the proxy requested is a view module.
   if (xml_group && xml_name && strcmp(xml_group, "views") == 0)
     {
-    return this->Superclass::CreateProxy(xml_group,
-      this->GetViewXMLName(cid, xml_name), cid);
+    return this->Superclass::CreateProxy( xml_group, xml_name);
     }
 
   //**************************************************************************
@@ -130,7 +115,7 @@ vtkSMProxy* vtkSMStateLoader::CreateProxy(
   else if (xml_group && xml_name && strcmp(xml_group, "misc") == 0 
     && strcmp(xml_name, "TimeKeeper") == 0)
     {
-    vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+    vtkSMProxyManager* pxm = this->Session->GetProxyManager();
     // There is only one time keeper per connection, simply
     // load the state on the timekeeper.
     vtkSMProxy* timekeeper = pxm->GetProxy("timekeeper", "TimeKeeper");
@@ -143,7 +128,7 @@ vtkSMProxy* vtkSMStateLoader::CreateProxy(
   //**************************************************************************
 
   // If all else fails, let the superclass handle it:
-  return this->Superclass::CreateProxy(xml_group, xml_name, cid);
+  return this->Superclass::CreateProxy(xml_group, xml_name);
 }
 
 //---------------------------------------------------------------------------
@@ -181,7 +166,7 @@ void vtkSMStateLoader::RegisterProxy(int id, vtkSMProxy* proxy)
 void vtkSMStateLoader::RegisterProxyInternal(const char* group,
   const char* name, vtkSMProxy* proxy)
 {
-  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+  vtkSMProxyManager* pxm = this->Session->GetProxyManager();
   if (pxm->GetProxyName(group, proxy))
     {
     // Don't re-register a proxy in the same group.
@@ -331,14 +316,14 @@ int vtkSMStateLoader::HandleProxyCollection(vtkPVXMLElement* collectionElement)
 void vtkSMStateLoader::HandleCustomProxyDefinitions(
   vtkPVXMLElement* element)
 {
-  vtkSMProxyManager* pm = this->GetProxyManager();
+  vtkSMProxyManager* pm = this->Session->GetProxyManager();
   pm->LoadCustomProxyDefinitions(element);
 }
 
 //---------------------------------------------------------------------------
 int vtkSMStateLoader::HandleGlobalPropertiesManagers(vtkPVXMLElement* element)
 {
-  vtkSMProxyManager* pxm = this->GetProxyManager();
+  vtkSMProxyManager* pxm = this->Session->GetProxyManager();
   unsigned int numElems = element->GetNumberOfNestedElements();
   for (unsigned int cc=0; cc < numElems; cc++)
     {
@@ -377,7 +362,7 @@ int vtkSMStateLoader::HandleGlobalPropertiesManagers(vtkPVXMLElement* element)
 //---------------------------------------------------------------------------
 int vtkSMStateLoader::HandleLinks(vtkPVXMLElement* element)
 {
-  vtkSMProxyManager* pxm = this->GetProxyManager();
+  vtkSMProxyManager* pxm = this->Session->GetProxyManager();
   
   unsigned int numElems = element->GetNumberOfNestedElements();
   for (unsigned int cc=0; cc < numElems; cc++)
@@ -453,9 +438,9 @@ int vtkSMStateLoader::LoadState(vtkPVXMLElement* elem)
     return 0;
     }
 
-  if (!this->GetProxyManager())
+  if (!this->Session)
     {
-    vtkErrorMacro("Cannot load state without a proxy manager.");
+    vtkErrorMacro("Cannot load state without a session.");
     return 0;
     }
 
@@ -473,7 +458,7 @@ int vtkSMStateLoader::LoadState(vtkPVXMLElement* elem)
   // often override those that the timekeeper painstakingly computed. Here we
   // explicitly trigger the timekeeper so that the scene re-determines the
   // ranges, unless they are locked of course.
-  vtkSMProxy* timekeeper = this->GetProxyManager()->GetProxy("timekeeper", "TimeKeeper");
+  vtkSMProxy* timekeeper = this->Session->GetProxyManager()->GetProxy("timekeeper", "TimeKeeper");
   if (timekeeper)
     {
     timekeeper->GetProperty("TimeRange")->Modified();

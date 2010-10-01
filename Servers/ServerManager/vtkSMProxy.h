@@ -351,6 +351,15 @@ public:
   // and sub-proxies. More control is provided by the following overload.
   vtkPVXMLElement* SaveState(vtkPVXMLElement* root);
 
+  // Description:
+  // Loads the proxy state from the XML element. Returns 0 on failure.
+  // \c locator is used to locate other proxies that may be referred to in the
+  // state XML (which happens in case of properties of type vtkSMProxyProperty
+  // or subclasses). If locator is NULL, then such properties are left
+  // unchanged.
+  virtual int LoadState(vtkPVXMLElement* element, vtkSMProxyLocator* locator);
+
+
 //BTX
 protected:
   vtkSMProxy();

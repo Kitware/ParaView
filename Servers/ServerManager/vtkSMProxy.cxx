@@ -1572,3 +1572,49 @@ vtkPVXMLElement* vtkSMProxy::SaveState(vtkPVXMLElement* root)
 
   return proxyXml;
 }
+//---------------------------------------------------------------------------
+int vtkSMProxy::LoadState( vtkPVXMLElement* proxyElement,
+                           vtkSMProxyLocator* locator)
+{
+  unsigned int numElems = proxyElement->GetNumberOfNestedElements();
+  int servers = 0;
+  if (proxyElement->GetScalarAttribute("servers", &servers))
+    {
+    this->SetLocation(servers);
+    }
+
+  for (unsigned int i=0; i<numElems; i++)
+    {
+    vtkPVXMLElement* currentElement = proxyElement->GetNestedElement(i);
+    const char* name =  currentElement->GetName();
+    if (!name)
+      {
+      continue;
+      }
+    if (strcmp(name, "Property") == 0)
+      {
+      const char* prop_name = currentElement->GetAttribute("name");
+      if (!prop_name)
+        {
+        vtkErrorMacro("Cannot load property without a name.");
+        continue;
+        }
+      vtkSMProperty* property = this->GetProperty(prop_name);
+      if (!property)
+        {
+        vtkDebugMacro("Property " << prop_name<< " does not exist.");
+        continue;
+        }
+      if (property->GetInformationOnly())
+        {
+        // don't load state for information only property.
+        continue;
+        }
+      if (!property->LoadState(currentElement, locator))
+        {
+        return 0;
+        }
+      }
+    }
+  return 1;
+}

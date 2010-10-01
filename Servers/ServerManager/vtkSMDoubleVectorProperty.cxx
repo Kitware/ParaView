@@ -289,3 +289,8 @@ void vtkSMDoubleVectorProperty::SaveStateValues(vtkPVXMLElement* propElement)
 {
   this->Internals->SaveStateValues(propElement);
 }
+//---------------------------------------------------------------------------
+int vtkSMDoubleVectorProperty::SetElementAsString(int idx, const char* value)
+{
+  return this->Internals->SetElementAsString(idx, value);
+}

@@ -494,3 +494,28 @@ void vtkSMProperty::SaveDomainState(vtkPVXMLElement* propertyElement,
     this->DomainIterator->Next();
     }
 }
+//---------------------------------------------------------------------------
+int vtkSMProperty::LoadState(vtkPVXMLElement* propertyElement,
+                             vtkSMProxyLocator* loader)
+{
+  // Process the domains.
+  unsigned int numElems = propertyElement->GetNumberOfNestedElements();
+  for (unsigned int cc=0;  cc < numElems; cc++)
+    {
+    vtkPVXMLElement* child = propertyElement->GetNestedElement(cc);
+    if (!child->GetName())
+      {
+      continue;
+      }
+    if (strcmp(child->GetName(),"Domain") == 0)
+      {
+      const char* name = child->GetAttribute("name");
+      vtkSMDomain* domain = name? this->GetDomain(name) : 0;
+      if (domain)
+        {
+        domain->LoadState(child, loader);
+        }
+      }
+    }
+  return 1;
+}

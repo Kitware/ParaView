@@ -25,6 +25,7 @@
 #include <vtkstd/string>
 #include <vtksys/ios/sstream>
 #include <vtkPVXMLElement.h>
+#include <typeinfo>
 
 class vtkSMProperty;
 
@@ -137,7 +138,20 @@ public:
       }
     this->UncheckedValues[idx] = value;
     }
+  //---------------------------------------------------------------------------
+  int SetElementAsString(unsigned int idx, const char* value)
+    {
+    if(!value) { return 0; }
 
+    // Convert String to T
+    T realValue;
+    vtksys_ios::stringstream vstr;
+    vstr << value << ends;
+    vstr >> realValue;
+
+    // SetElement
+    return this->SetElement(idx, realValue);
+    }
   //---------------------------------------------------------------------------
   int SetElement(unsigned int idx, T value)
     {

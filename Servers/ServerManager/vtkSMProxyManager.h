@@ -251,22 +251,11 @@ public:
   void SaveCustomProxyDefinitions(vtkPVXMLElement* root);
 
   //BTX
-#ifdef FIXME
-
   // Description:
   // Loads the state of the server manager from XML.
   // If loader is not specified, a vtkSMStateLoader instance is used.
   void LoadState(const char* filename, vtkSMStateLoader* loader=NULL);
   void LoadState(vtkPVXMLElement* rootElement, vtkSMStateLoader* loader=NULL);
-
-  // Description:
-  // Load the state for a particular connection.
-  // If loader is not specified, a vtkSMStateLoader instance is used.
-  void LoadState(vtkPVXMLElement* rootElement, vtkIdType id,
-    vtkSMStateLoader* loader=NULL);
-  void LoadState(const char* filename, vtkIdType id,
-    vtkSMStateLoader* loader=NULL);
-#endif
   //ETX
 
   // Description:

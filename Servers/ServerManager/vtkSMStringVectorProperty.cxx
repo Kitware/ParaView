@@ -313,3 +313,13 @@ void vtkSMStringVectorProperty::PrintSelf(ostream& os, vtkIndent indent)
     }
   os << endl;
 }
+//---------------------------------------------------------------------------
+void vtkSMStringVectorProperty::SaveStateValues(vtkPVXMLElement* propElement)
+{
+  this->Internals->SaveStateValues(propElement);
+}
+//---------------------------------------------------------------------------
+int vtkSMStringVectorProperty::SetElementAsString(int idx, const char* value)
+{
+  return this->SetElement(idx, value);
+}

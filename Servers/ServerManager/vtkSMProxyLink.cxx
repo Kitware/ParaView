@@ -273,7 +273,8 @@ void vtkSMProxyLink::SaveState(const char* linkname, vtkPVXMLElement* parent)
     vtkPVXMLElement* child = vtkPVXMLElement::New();
     child->SetName("Proxy");
     child->AddAttribute("direction", (iter->UpdateDirection == INPUT? "input" : "output"));
-    child->AddAttribute("id", iter->Proxy.GetPointer()->GetSelfIDAsString());
+    child->AddAttribute( "id",
+                         static_cast<unsigned int>(iter->Proxy.GetPointer()->GetGlobalID()));
     root->AddNestedElement(child);
     child->Delete();
     }

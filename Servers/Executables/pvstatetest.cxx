@@ -48,6 +48,7 @@ int main(int argc, char* argv[])
     // instance and then they simply listen for the root node to issue requests
     // for actions.
     vtkSMSession* session = vtkSMSession::New();
+    vtkSMSession* session2 = vtkSMSession::New(); // for the load state
     controller->ProcessRMIs();
     session->Delete();
     }
@@ -81,11 +82,22 @@ int main(int argc, char* argv[])
     xmlRootNode.TakeReference(pxm->SaveState());
     xmlRootNode->PrintXML();
 
+    cout << "End of State creation..." << endl;
+
+    vtkSMSession* session2 = vtkSMSession::New();
+    cout << "Loading previous state..." << endl;
+
+    vtkSMProxyManager* pxm2 = session->GetProxyManager();
+    pxm2->LoadState(xmlRootNode);
+    xmlRootNode.TakeReference(pxm2->SaveState());
+    xmlRootNode->PrintXML();
+
 
     proxy->Delete();
     shrink->Delete();
-    cout << "Exiting..." << endl;
     session->Delete();
+    session2->Delete();
+    cout << "Exiting..." << endl;
     }
   vtkInitializationHelper::Finalize();
   options->Delete();

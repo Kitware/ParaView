@@ -22,6 +22,7 @@
 #define __vtkSMDeserializer_h
 
 #include "vtkSMObject.h"
+#include "vtkSMSession.h"
 
 class vtkPVXMLElement;
 class vtkSMProxy;
@@ -33,6 +34,9 @@ public:
   static vtkSMDeserializer* New();
   vtkTypeMacro(vtkSMDeserializer, vtkSMObject);
   void PrintSelf(ostream& os, vtkIndent indent);
+
+  vtkGetObjectMacro(Session, vtkSMSession);
+  vtkSetObjectMacro(Session, vtkSMSession);
 
 //BTX
 protected:
@@ -60,8 +64,7 @@ protected:
   // Description:
   // Create a new proxy of the given group and name. Default implementation
   // simply asks the proxy manager to create a new proxy of the requested type.
-  virtual vtkSMProxy* CreateProxy(
-    const char* xmlgroup, const char* xmlname, vtkIdType connectionId);
+  virtual vtkSMProxy* CreateProxy(const char* xmlgroup, const char* xmlname);
 
   // Description:
   // Called after a new proxy has been created. Gives the subclasses an
@@ -69,6 +72,7 @@ protected:
   // Default implementation is empty.
   virtual void CreatedNewProxy(int id, vtkSMProxy* proxy);
 
+  vtkSMSession* Session;
 private:
   vtkSMDeserializer(const vtkSMDeserializer&); // Not implemented
   void operator=(const vtkSMDeserializer&); // Not implemented

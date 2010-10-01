@@ -137,8 +137,14 @@ protected:
 
   vtkSMInputPropertyInternals* IPInternals;
 
+  // Description:
+  // Fill state property/proxy XML element with output port attribute
   virtual vtkPVXMLElement* AddProxyElementState(vtkPVXMLElement *propertyElement,
                                                 unsigned int idx);
+
+  // Description:
+  // Updates state from an XML element. Returns 0 on failure.
+  virtual int LoadState(vtkPVXMLElement* element, vtkSMProxyLocator* loader);
 
 private:
   vtkSMInputProperty(const vtkSMInputProperty&); // Not implemented
