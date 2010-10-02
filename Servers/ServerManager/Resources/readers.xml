@@ -5163,6 +5163,44 @@
    </SourceProxy>
    <!-- End of FLUENT Reader -->
 
+   <!-- Beginning of ProStar Reader -->
+   <SourceProxy
+      name="ProStarReader"
+      class="vtkProStarReader"
+      label="proSTAR (STARCD) Reader">
+     <Documentation
+        short_help="Reads geometry in proSTAR (STARCD) file format."
+        long_help="Reads geometry in proSTAR (STARCD) file format." >
+       ProStarReader creates an unstructured grid dataset.
+       It reads .cel/.vrt files stored in proSTAR (STARCD) ASCII format.
+     </Documentation>
+     <StringVectorProperty
+        name="FileName"
+        command="SetFileName"
+        animateable="0"
+        number_of_elements="1">
+       <FileListDomain name="files"/>
+       <Documentation>
+         Set the file name for the proSTAR (STARCD) reader.
+       </Documentation>
+     </StringVectorProperty>
+     <DoubleVectorProperty
+        name="ScaleFactor"
+        command="SetScaleFactor"
+        animateable="0"
+        default_values="0"
+        number_of_elements="1">
+       <Documentation>
+         Scaling factor for the points
+       </Documentation>
+      </DoubleVectorProperty>
+     <Hints>
+       <ReaderFactory extensions="cel vrt"
+           file_description="proSTAR Files" />
+     </Hints>
+   </SourceProxy>
+   <!-- End of ProStar Reader -->
+
    <!-- Beginning of LSDyna Reader -->
    <SourceProxy name="LSDynaReader" class="vtkLSDynaReader">
      <Documentation
