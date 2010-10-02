@@ -26,6 +26,7 @@
   <Proxy group="sources" name="netCDFReader" />
   <Proxy group="sources" name="byureader" />
   <Proxy group="sources" name="objreader" />
+  <Proxy group="sources" name="ProStarReader" />
   <Proxy group="sources" name="XdmfReader" />
   <Proxy group="sources" name="pdbreader" />
   <Proxy group="sources" name="xyzreader" />
