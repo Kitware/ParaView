@@ -250,6 +250,7 @@ void PrismCore::createActions(QActionGroup* ag)
         this->PrismViewAction = new QAction("Prism View",ag);
         this->PrismViewAction->setToolTip("Create Prism View");
         this->PrismViewAction->setIcon(QIcon(":/Prism/Icons/PrismSmall.png"));
+        this->PrismViewAction->setEnabled(false);
 
         QObject::connect(this->PrismViewAction, SIGNAL(triggered(bool)), this, SLOT(onCreatePrismView()));
       }

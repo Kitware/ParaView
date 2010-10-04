@@ -30,6 +30,7 @@ Module:    vtkPrismFilter.cxx
 #include "vtkTransform.h"
 #include "vtkExtractGeometry.h"
 #include "vtkBox.h"
+#include "vtkDataObject.h"
 
 #include <math.h>
 
@@ -320,6 +321,209 @@ int vtkPrismFilter::RequestSESAMEData(
 
     return 1;
 }
+
+int vtkPrismFilter::CreateGeometry(vtkDataSet *inputData,
+                                   unsigned int index,
+                                   vtkMultiBlockDataSet *output)
+{
+
+  double weight       = 0.0;
+  double *weights     = NULL;
+  vtkIdType cellId, ptId;
+  vtkIdType numCells, numPts;
+  vtkIdList *cellPts  = NULL;
+  vtkDataArray *inputScalars[3];
+
+
+  vtkSmartPointer<vtkPolyData> polydata = vtkSmartPointer<vtkPolyData>::New();
+
+  vtkPointData  *outPD = polydata->GetPointData();
+  vtkCellData  *outCD = polydata->GetCellData();
+  vtkPointData *inPD  = inputData->GetPointData();
+  vtkCellData  *inCD  = inputData->GetCellData();
+  int maxCellSize     = inputData->GetMaxCellSize();
+
+  vtkDebugMacro( << "Mapping point data to new cell center point..." );
+
+  // construct new points at the centers of the cells
+  vtkPoints *newPoints = vtkPoints::New();
+
+  inputScalars[0] = inCD->GetScalars( this->GetXAxisVarName() );
+  inputScalars[1] = inCD->GetScalars( this->GetYAxisVarName() );
+  inputScalars[2] = inCD->GetScalars( this->GetZAxisVarName() );
+
+  vtkIdType newIDs[1] = {0};
+  if ( (numCells=inputData->GetNumberOfCells()) < 1 )
+  {
+    vtkDebugMacro(<< "No input cells, nothing to do." );
+    return 0;
+  }
+
+  weights = new double[maxCellSize];
+  cellPts = vtkIdList::New();
+  cellPts->Allocate( maxCellSize );
+
+  // Pass cell data (note that this passes current cell data through to the
+  // new points that will be created at the cell centers)
+  outCD->PassData( inCD );
+
+  // create space for the newly interpolated values
+  outPD->CopyAllocate( inPD,numCells );
+
+  int abort=0;
+  //double funcArgs[3]  = { 0.0, 0.0, 0.0 };
+  double newPt[3] = {0.0, 0.0, 0.0};
+  vtkIdType progressInterval=numCells/20 + 1;
+  polydata->Allocate( numCells );
+  for ( cellId=0; cellId < numCells && !abort; cellId++ )
+  {
+    if ( !(cellId % progressInterval) )
+    {
+      this->UpdateProgress( (double)cellId/numCells );
+      abort = GetAbortExecute();
+    }
+
+    inputData->GetCellPoints( cellId, cellPts );
+    numPts = cellPts->GetNumberOfIds();
+    if ( numPts > 0 )
+    {
+      weight = 1.0 / numPts;
+      for (ptId=0; ptId < numPts; ptId++)
+      {
+        weights[ptId] = weight;
+      }
+      outPD->InterpolatePoint(inPD, cellId, cellPts, weights);
+    }
+
+
+    newPt[0] = inputScalars[0]->GetTuple1( cellId );
+    newPt[1] = inputScalars[1]->GetTuple1( cellId );
+    newPt[2] = inputScalars[2]->GetTuple1( cellId );
+    newIDs[0] = newPoints->InsertNextPoint( newPt );
+
+
+    polydata->InsertNextCell( VTK_VERTEX, 1, newIDs );
+  }
+
+  vtkIdType pointId;
+  vtkIdType numberPts = newPoints->GetNumberOfPoints();
+
+
+  for(pointId=0;pointId<numberPts;pointId++)
+  {
+
+    double coords[3];
+
+    newPoints->GetPoint(pointId,coords);
+
+
+    int tID=this->GetTable();
+    if(tID==502 ||
+      tID==503 ||
+      tID==504 ||
+      tID==505 ||
+      tID==601 ||
+      tID==602 ||
+      tID==603 ||
+      tID==604 ||
+      tID==605)
+    {
+      if(!this->GetSESAMEXLogScaling())
+      {
+        coords[0]=pow(10,coords[0]);
+      }
+
+      if(!this->GetSESAMEYLogScaling())
+      {
+        coords[1]=pow(10,coords[1]);
+      }
+
+      if(!this->GetSESAMEZLogScaling())
+      {
+        coords[2]=pow(10,coords[2]);
+      }
+    }
+    else
+    {
+      if(this->GetSESAMEXLogScaling())
+      {
+        if(coords[0]>0)
+        {
+          coords[0]=log(coords[0]);
+        }
+        else
+        {
+          coords[0]=0.0;
+        }
+      }
+
+      if(this->GetSESAMEYLogScaling())
+      {
+        if(coords[1]>0)
+        {
+          coords[1]=log(coords[1]);
+        }
+        else
+        {
+          coords[1]=0.0;
+        }
+      }
+
+      if(this->GetSESAMEZLogScaling())
+      {
+        if(coords[2]>0)
+        {
+          coords[2]=log(coords[2]);
+        }
+        else
+        {
+          coords[2]=0.0;
+        }
+      }
+    }
+
+    newPoints->InsertPoint(pointId,coords);
+
+  }
+
+  polydata->SetPoints( newPoints );
+  newPoints->Delete();
+  polydata->Squeeze();
+  cellPts->Delete();
+  delete [] weights;
+
+
+  if(false)
+    //if(this->Internal->SimulationDataThreshold)
+  {
+    //TODO Using the threshold causes problems with the linked selection.
+    //This feature has been removed from Prism PavaView panel until
+    //a solution can be found.
+    this->Internal->ExtractGeometry->SetInput(polydata);
+    double thresholdBounds[6];
+    this->Internal->Reader->GetActualThresholdBounds(thresholdBounds);
+    this->Internal->Box->SetBounds(thresholdBounds);
+    this->Internal->TransformFilter->SetInput( this->Internal->ExtractGeometry->GetOutput());
+  }
+  else
+  {
+    this->Internal->TransformFilter->SetInput(polydata);
+  }
+
+
+  double scale[3];
+  this->Internal->Reader->GetAspectScale(scale);
+  vtkSmartPointer<vtkTransform> transform= vtkSmartPointer<vtkTransform>::New();
+  transform->Scale(scale);
+  this->Internal->TransformFilter->SetTransform(transform);
+  this->Internal->TransformFilter->Update();
+
+  polydata->ShallowCopy(this->Internal->TransformFilter->GetOutput());
+
+  output->SetBlock(index,polydata);
+
+  return 1;
+}
 int vtkPrismFilter::RequestGeometryData(
                                         vtkInformation *vtkNotUsed(request),
                                         vtkInformationVector **inputVector,
@@ -331,8 +535,6 @@ int vtkPrismFilter::RequestGeometryData(
         return 1;
     }
 
-
-
     vtkInformation *info = outputVector->GetInformationObject(2);
     vtkMultiBlockDataSet *output = vtkMultiBlockDataSet::SafeDownCast(
         info->Get(vtkDataObject::DATA_OBJECT()));
@@ -343,230 +545,43 @@ int vtkPrismFilter::RequestGeometryData(
     }
 
     vtkInformation *inInfo = inputVector[0]->GetInformationObject(0);
-    vtkMultiBlockDataSet *input = vtkMultiBlockDataSet::SafeDownCast(
-        inInfo->Get(vtkDataObject::DATA_OBJECT()));
-    if ( !input ) 
+    vtkMultiBlockDataSet *inputMB = vtkMultiBlockDataSet::SafeDownCast(
+      inInfo->Get(vtkDataObject::DATA_OBJECT()));
+    if (inputMB )
     {
-        vtkDebugMacro( << "No input found." );
-        return 0;
-    }
-
-
-    double weight       = 0.0;
-    double *weights     = NULL;
-    vtkIdType cellId, ptId;
-    vtkIdType numCells, numPts;
-    vtkIdList *cellPts  = NULL;
-    vtkDataArray *inputScalars[3];
-
-    unsigned int j=0;
-    vtkCompositeDataIterator* iter= input->NewIterator();
-    iter->SkipEmptyNodesOn();
-    iter->TraverseSubTreeOn();
-    iter->VisitOnlyLeavesOn();
-    iter->GoToFirstItem();
-    while(!iter->IsDoneWithTraversal())
-    {
+      unsigned int j=0;
+      vtkCompositeDataIterator* iter= inputMB->NewIterator();
+      iter->SkipEmptyNodesOn();
+      iter->TraverseSubTreeOn();
+      iter->VisitOnlyLeavesOn();
+      iter->GoToFirstItem();
+      while(!iter->IsDoneWithTraversal())
+      {
         vtkDataSet *inputData=NULL;
         inputData=vtkDataSet::SafeDownCast(iter->GetCurrentDataObject());
         iter->GoToNextItem();
         if(inputData)
         {
-            vtkSmartPointer<vtkPolyData> polydata = vtkSmartPointer<vtkPolyData>::New(); 
-
-            vtkPointData  *outPD = polydata->GetPointData();
-            vtkCellData  *outCD = polydata->GetCellData();
-            vtkPointData *inPD  = inputData->GetPointData();
-            vtkCellData  *inCD  = inputData->GetCellData();
-            int maxCellSize     = inputData->GetMaxCellSize();
-
-            vtkDebugMacro( << "Mapping point data to new cell center point..." );
-
-            // construct new points at the centers of the cells 
-            vtkPoints *newPoints = vtkPoints::New();
-
-            inputScalars[0] = inCD->GetScalars( this->GetXAxisVarName() );
-            inputScalars[1] = inCD->GetScalars( this->GetYAxisVarName() );
-            inputScalars[2] = inCD->GetScalars( this->GetZAxisVarName() );
-
-            vtkIdType newIDs[1] = {0};
-            if ( (numCells=inputData->GetNumberOfCells()) < 1 )
-            {
-                vtkDebugMacro(<< "No input cells, nothing to do." );
-                return 0;
-            }
-
-            weights = new double[maxCellSize];
-            cellPts = vtkIdList::New();
-            cellPts->Allocate( maxCellSize );
-
-            // Pass cell data (note that this passes current cell data through to the
-            // new points that will be created at the cell centers)
-            outCD->PassData( inCD );
-
-            // create space for the newly interpolated values
-            outPD->CopyAllocate( inPD,numCells );
-
-            int abort=0;
-            //double funcArgs[3]  = { 0.0, 0.0, 0.0 };
-            double newPt[3] = {0.0, 0.0, 0.0};
-            vtkIdType progressInterval=numCells/20 + 1;
-            polydata->Allocate( numCells ); 
-            for ( cellId=0; cellId < numCells && !abort; cellId++ )
-            {
-                if ( !(cellId % progressInterval) )
-                {
-                    this->UpdateProgress( (double)cellId/numCells );
-                    abort = GetAbortExecute();
-                }
-
-                inputData->GetCellPoints( cellId, cellPts );
-                numPts = cellPts->GetNumberOfIds();
-                if ( numPts > 0 )
-                {
-                    weight = 1.0 / numPts;
-                    for (ptId=0; ptId < numPts; ptId++)
-                    {
-                        weights[ptId] = weight;
-                    }
-                    outPD->InterpolatePoint(inPD, cellId, cellPts, weights);
-                }
-
-
-                newPt[0] = inputScalars[0]->GetTuple1( cellId );
-                newPt[1] = inputScalars[1]->GetTuple1( cellId );
-                newPt[2] = inputScalars[2]->GetTuple1( cellId );
-                newIDs[0] = newPoints->InsertNextPoint( newPt );
-
-
-                polydata->InsertNextCell( VTK_VERTEX, 1, newIDs );
-            }
-
-            vtkIdType pointId;
-            vtkIdType numberPts = newPoints->GetNumberOfPoints();
-
-
-            for(pointId=0;pointId<numberPts;pointId++)
-            {
-
-              double coords[3];
-
-              newPoints->GetPoint(pointId,coords);
-
-
-              int tID=this->GetTable();
-              if(tID==502 ||
-                tID==503 ||
-                tID==504 ||
-                tID==505 ||
-                tID==601 ||
-                tID==602 ||
-                tID==603 ||
-                tID==604 ||
-                tID==605)
-                {
-                if(!this->GetSESAMEXLogScaling())
-                  {
-                  coords[0]=pow(10,coords[0]);
-                  }
-
-                if(!this->GetSESAMEYLogScaling())
-                  {
-                  coords[1]=pow(10,coords[1]);
-                  }
-
-                if(!this->GetSESAMEZLogScaling())
-                  {
-                  coords[2]=pow(10,coords[2]);
-                  }
-                }
-              else
-                {
-                if(this->GetSESAMEXLogScaling())
-                  {
-                  if(coords[0]>0)
-                    {
-                    coords[0]=log(coords[0]);
-                    }
-                  else
-                    {
-                    coords[0]=0.0;
-                    }
-                  }
-
-                if(this->GetSESAMEYLogScaling())
-                  {
-                  if(coords[1]>0)
-                    {
-                    coords[1]=log(coords[1]);
-                    }
-                  else
-                    {
-                    coords[1]=0.0;
-                    }
-                  }
-
-                if(this->GetSESAMEZLogScaling())
-                  {
-                  if(coords[2]>0)
-                    {
-                    coords[2]=log(coords[2]);
-                    }
-                  else
-                    {
-                    coords[2]=0.0;
-                    }
-                  }
-                }
-
-              newPoints->InsertPoint(pointId,coords);
-
-            }
-
-            polydata->SetPoints( newPoints );
-            newPoints->Delete();
-            polydata->Squeeze();
-            cellPts->Delete();
-            delete [] weights;
-
-
-            if(false)
-            //if(this->Internal->SimulationDataThreshold)
-              {
-              //TODO Using the threshold causes problems with the linked selection.
-              //This feature has been removed from Prism PavaView panel until
-              //a solution can be found.
-              this->Internal->ExtractGeometry->SetInput(polydata);
-              double thresholdBounds[6];
-              this->Internal->Reader->GetActualThresholdBounds(thresholdBounds);
-              this->Internal->Box->SetBounds(thresholdBounds);
-              this->Internal->TransformFilter->SetInput( this->Internal->ExtractGeometry->GetOutput());
-              }
-            else
-              {
-              this->Internal->TransformFilter->SetInput(polydata);
-              }
-
-
-            double scale[3];
-            this->Internal->Reader->GetAspectScale(scale);
-            vtkSmartPointer<vtkTransform> transform= vtkSmartPointer<vtkTransform>::New();
-            transform->Scale(scale);
-            this->Internal->TransformFilter->SetTransform(transform);
-            this->Internal->TransformFilter->Update();
-
-            polydata->ShallowCopy(this->Internal->TransformFilter->GetOutput());
-
-            output->SetBlock(j,polydata);
-            j++;
-
-
-
+          this->CreateGeometry(inputData,j,output);
+          j++;
         }
+      }
+      iter->Delete();
+      return 1;
     }
 
-    iter->Delete();
-
+    vtkDataSet *inputDS = vtkDataSet::SafeDownCast(
+      inInfo->Get(vtkDataObject::DATA_OBJECT()));
+    if(inputDS)
+    {
+      this->CreateGeometry(inputDS,0,output);
+      return 1;
+    }
+    else
+    {
+        vtkDebugMacro( << "Incorrect input type." );
+        return 0;
+    }
     return 1;
 }
 
@@ -632,7 +647,14 @@ int vtkPrismFilter::FillOutputPortInformation(
     return 1;
 }
 
-
+//----------------------------------------------------------------------------
+int vtkPrismFilter::FillInputPortInformation(
+  int vtkNotUsed(port), vtkInformation* info)
+{
+  // now add our info
+  info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkDataObject");
+  return 1;
+}
 //----------------------------------------------------------------------------
 void vtkPrismFilter::PrintSelf(ostream& os, vtkIndent indent)
 {

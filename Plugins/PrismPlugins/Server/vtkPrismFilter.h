@@ -17,6 +17,7 @@ Module:    vtkPrismFilter.h
 #include "vtkMultiBlockDataSetAlgorithm.h"
 class vtkIntArray;
 class vtkDoubleArray;
+class vtkDataSet;
 
 class VTK_EXPORT vtkPrismFilter : public vtkMultiBlockDataSetAlgorithm 
 {
@@ -183,6 +184,8 @@ protected:
 
   // see algorithm for more info
   virtual int FillOutputPortInformation(int port, vtkInformation* info);
+  virtual int FillInputPortInformation(int port, vtkInformation* info);
+
 private:
  // int CalculateValues( double *x, double *f );
   vtkPrismFilter(const vtkPrismFilter&);  // Not implemented.
@@ -195,6 +198,11 @@ private:
     vtkInformation *vtkNotUsed(request),
     vtkInformationVector **inputVector,
     vtkInformationVector *outputVector);
+
+  int CreateGeometry(vtkDataSet *inputData,
+    unsigned int index,
+    vtkMultiBlockDataSet *output);
+
 };
 
 #endif

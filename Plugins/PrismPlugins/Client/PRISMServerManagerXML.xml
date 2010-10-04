@@ -440,11 +440,11 @@
              <Group name="sources"/>
              <Group name="filters"/>
            </ProxyGroupDomain>
-           <DataTypeDomain name="input_type">
-             <DataType value="vtkDataSet"/>
+           <DataTypeDomain name="input_type" composite_data_supported="1">
+            <DataType value="vtkDataSet"/>
+            <DataType value="vtkCompositeDataSet"/>
            </DataTypeDomain>
            <InputArrayDomain name="input_array" attribute_type="cell"/>
-           <FixedTypeDomain name="fixed_type"/>
       </InputProperty>
      <IntVectorProperty
         name="TableConversion"
