@@ -11,8 +11,8 @@ QtTesting.playCommand(object2, 'activate', '')
 object3 = 'pqClientMainWindow/FileOpenDialog'
 QtTesting.playCommand(object3, 'filesSelected', '$PARAVIEW_DATA_ROOT/Data/SLAC/pic-example/mesh.ncdf')
 object4 = 'pqClientMainWindow/pqSelectReaderDialog/listWidget'
-QtTesting.playCommand(object4, 'mousePress', '1,1,0,66,16,/2:0')
-QtTesting.playCommand(object4, 'mouseRelease', '1,0,0,66,16,/2:0')
+QtTesting.playCommand(object4, 'mousePress', '1,1,0,63,9,/0:0')
+QtTesting.playCommand(object4, 'mouseRelease', '1,0,0,63,9,/0:0')
 object5 = 'pqClientMainWindow/pqSelectReaderDialog/okButton'
 QtTesting.playCommand(object5, 'activate', '')
 object6 = 'pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/ModeFileName/FileButton'
