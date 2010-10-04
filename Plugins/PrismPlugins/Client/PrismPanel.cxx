@@ -782,7 +782,7 @@ void PrismPanel::updateConversionsLabels()
 
 
           item = this->UI->ConversionTree->item(w,2);
-          item->setText(conversionValueString);
+//          item->setText(conversionValueString);
           item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsEditable);
         }
         else if(this->UI->SICheckbox->isChecked())
