@@ -42,7 +42,7 @@ cd ${SUPPORT_DIR}
 
 
 # QT
-if [ ! -f $SUPPORT_DIR/qt-4.6.2/bin/bin/qmake ];
+if [ ! -f ${SUPPORT_DIR}/qt-4.6.2/bin/bin/qmake ];
 then
   wget http://get.qt.nokia.com/qt/source/qt-everywhere-opensource-src-4.6.2.tar.gz
   tar -zxvf qt-everywhere-opensource-src-4.6.2.tar.gz
