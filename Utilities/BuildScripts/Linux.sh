@@ -1,7 +1,6 @@
 #!/bin/bash
 set -x
 
-
 #sudo apt-get install libglib-dev
 #sudo apt-get install cvs
 #sudo apt-get install hg

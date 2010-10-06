@@ -1,16 +1,4 @@
 set -x
-#!/bin/bash
-# Typical usage:
-#  ~/partyd/buildPackage.sh /tmp/partyd/ParaView3/ /tmp/partyd/ParaView3Bin
-#  ~/partyd/buildParaViewPackage.sh <version> <cvstag>
-
-if [ "$#" != "3" ]; then
-  echo "Usage: $0 <base direcotry> <version> <cvstag>"
-  exit 1
-fi
-
-version=$2
-cvstag=$3
 
 #sudo apt-get install libglib-dev
 #sudo apt-get install cvs
@@ -31,20 +19,20 @@ cvstag=$3
 
 export FC=gfortran
 
-BASE_DIR=$1
-SUPPORT_DIR=${BASE_DIR}/Support
+cd ../..
+PV_SRC=${PWD}
+cd ..
+ROOT_DIR=${PWD}
+SUPPORT_DIR=${ROOT_DIR}/Support
+PV_BIN=${ROOT_DIR}/build
 CORES=5
-
-PV_BASE=${BASE_DIR}/ParaView-${version}
-PV_SRC=${PV_BASE}/ParaView
-PV_BIN=${PV_BASE}/ParaViewBin
 
 if [ ! -d $SUPPORT_DIR ];
 then
   mkdir $SUPPORT_DIR
 fi
 
-cd $SUPPORT_DIR
+cd ${SUPPORT_DIR}
 
 # QT pre
 #sudo apt-get install libpng12-dev
@@ -53,7 +41,7 @@ cd $SUPPORT_DIR
 
 
 # QT
-if [ ! -f $SUPPORT_DIR/qt-4.6.2/bin/bin/qmake ];
+if [ ! -f ${SUPPORT_DIR}/qt-4.6.2/bin/bin/qmake ];
 then
   wget http://get.qt.nokia.com/qt/source/qt-everywhere-opensource-src-4.6.2.tar.gz
   tar -zxvf qt-everywhere-opensource-src-4.6.2.tar.gz
