@@ -7,3 +7,6 @@
 [submodule "Xdmf"]
 	path = Utilities/Xdmf2
 	url = git://paraview.org/Xdmf.git
+[submodule "Qt/Testing"]
+	path = Qt/Testing
+	url = git://paraview.org/QtTesting.git
