@@ -50,7 +50,7 @@ int vtkPieceCacheExecutive
                     vtkInformationVector** inInfoVec,
                     vtkInformationVector* outInfoVec)
 {
-  vtkPieceCacheFilter *myPCF = 
+  vtkPieceCacheFilter *myPCF =
     vtkPieceCacheFilter::SafeDownCast(this->GetAlgorithm());
 
   // If no port is specified, check all ports.  This behavior is
@@ -97,17 +97,17 @@ int vtkPieceCacheExecutive
     if (ds)
       {
       dataInfo = ds->GetInformation();
-      // Check the unstructured extent.  
+      // Check the unstructured extent.
       // If the piece we have doesn't match what was requested
       // we need to execute.
       int dataPiece = dataInfo->Get(vtkDataObject::DATA_PIECE_NUMBER());
-      int dataNumberOfPieces = 
+      int dataNumberOfPieces =
         dataInfo->Get(vtkDataObject::DATA_NUMBER_OF_PIECES());
-      int dataGhostLevel = 
+      int dataGhostLevel =
         dataInfo->Get(vtkDataObject::DATA_NUMBER_OF_GHOST_LEVELS());
-      double dataResolution = 
+      double dataResolution =
         dataInfo->Get(vtkDataObject::DATA_RESOLUTION());
-      if (dataInfo->Get(vtkDataObject::DATA_EXTENT_TYPE()) == 
+      if (dataInfo->Get(vtkDataObject::DATA_EXTENT_TYPE()) ==
           VTK_PIECES_EXTENT && dataPiece == updatePiece &&
           dataNumberOfPieces == updateNumberOfPieces &&
           dataGhostLevel == updateGhostLevel &&
@@ -121,14 +121,14 @@ int vtkPieceCacheExecutive
           // Give the cached result to the requester
           dso->ShallowCopy(ds);
           DEBUGPRINT_CACHING(
-          cerr << "PCE(" << this << ") cache hit piece " 
+          cerr << "PCE(" << this << ") cache hit piece "
                << updatePiece << "/"
                << updateNumberOfPieces << "@"
                << updateResolution << " DR=" << dataResolution <<endl;
           );
           //pipeline request can terminate now, yeah!
           return 0;
-          }     
+          }
         }
       else
         {
@@ -169,7 +169,7 @@ int vtkPieceCacheExecutive
       {
       dataInfo = ds->GetInformation();
       dataInfo->Get(vtkDataObject::DATA_EXTENT(), dataExtent);
-      if(dataInfo->Get(vtkDataObject::DATA_EXTENT_TYPE()) == 
+      if(dataInfo->Get(vtkDataObject::DATA_EXTENT_TYPE()) ==
          VTK_3D_EXTENT &&
          !(updateExtent[0] < dataExtent[0] ||
            updateExtent[1] > dataExtent[1] ||
@@ -203,4 +203,3 @@ int vtkPieceCacheExecutive
                      );
   return 1;
 }
-

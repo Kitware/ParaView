@@ -17,13 +17,13 @@
 // This class maintains hierarchical records of scalar ranges for different parts of a file.
 // As information is obtained, it is inserted into the database. Lower resolution records are
 // assumed to be less precise than their higher resolution contents. So when new records are
-// added, old records are updated to reflect their contents. 
+// added, old records are updated to reflect their contents.
 // When ranges are queried, the most precise information for the piece is returned.
 //
 // LIMITATIONS:
-// 1) A binary relationship is used to determine piece parentage, 
+// 1) A binary relationship is used to determine piece parentage,
 // which may not be true if you do not use the default extent translator.
-// 2) I intend to keep geometric metainformation here as well, not just attribute 
+// 2) I intend to keep geometric metainformation here as well, not just attribute
 // metainformation.
 
 #ifndef __vtkMetaInfoDatabase_h
@@ -47,7 +47,7 @@ public:
   //request the scalar range record for piece p/np
   //NOTE:ext is currently ignored
   int Search(int p, int np, int ext[6], double *range);
-  
+
 protected:
   vtkMetaInfoDatabase();
   ~vtkMetaInfoDatabase();
@@ -59,5 +59,3 @@ private:
   void operator=(const vtkMetaInfoDatabase&);  // Not implemented.
 };
 #endif
-
-

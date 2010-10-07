@@ -16,7 +16,7 @@
 // .SECTION Description
 // vtkPieceCacheFilter caches the pieces given to it in its input and then
 // passes the data through to its output. Later requests will then
-// reuse the cached piece data when present. 
+// reuse the cached piece data when present.
 //
 // Additionally, if the data type stored in the cache is vtkPolyData, the cache
 // filter can be asked to agregate all cache results into a single polydata.
@@ -52,7 +52,7 @@ public:
   vtkGetMacro(CacheSize,int);
 
   //Description:
-  //Returns the data set stored in the i'th cache slot. 
+  //Returns the data set stored in the i'th cache slot.
   //Note: There is no SetPiece because Pieces are put into slots
   //during pipeline updates.
   vtkDataSet *GetPiece(int i);
@@ -87,7 +87,7 @@ public:
   }
 
   //Description:
-  //Returns true if a given piece is in the cache and is stored with at 
+  //Returns true if a given piece is in the cache and is stored with at
   //least the requested resolution.
   bool InCache(int piece, int numPieces, double res);
 

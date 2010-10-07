@@ -25,7 +25,7 @@
 
 #include "vtkCompositeDataPipeline.h"
 
-class VTK_EXPORT vtkPieceCacheExecutive : 
+class VTK_EXPORT vtkPieceCacheExecutive :
   public vtkCompositeDataPipeline
 {
 public:

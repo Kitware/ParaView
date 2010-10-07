@@ -12,12 +12,12 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkGridSampler2 - A function that maps data extent and requested 
+// .NAME vtkGridSampler2 - A function that maps data extent and requested
 // resolution and data extent to i,j,k stride choice.
 // .SECTION Description
 // Supply this with a whole extent, then give it a resolution request. It
-// computes stride choices to match that resolution. Resolution of 0.0 is 
-// defined as requesting minimal resolution, resolution of 1.0 is defined 
+// computes stride choices to match that resolution. Resolution of 0.0 is
+// defined as requesting minimal resolution, resolution of 1.0 is defined
 // as a request for full resolution (stride = 1,1,1).
 //
 // TODO: cache results!
@@ -38,7 +38,7 @@ public:
   static vtkGridSampler2 *New();
   vtkTypeMacro(vtkGridSampler2,vtkObject);
   virtual void PrintSelf(ostream& os, vtkIndent indent);
-  
+
   void SetWholeExtent(int *);
   vtkIntArray *GetSplitPath();
 
@@ -76,5 +76,3 @@ private:
   void operator=(const vtkGridSampler2&);
 };
 #endif
-
-

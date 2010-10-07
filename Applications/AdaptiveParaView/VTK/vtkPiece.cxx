@@ -76,4 +76,3 @@ void vtkPiece::UnSerialize(double *buff, double **optr)
 
   *optr = ptr;
 }
-

@@ -70,7 +70,7 @@ void vtkMetaInfoDatabase::PrintSelf(ostream& os, vtkIndent indent)
 }
 
 //----------------------------------------------------------------------------
-void vtkMetaInfoDatabase::Insert(int p, int np, int ext[6], double range[2], 
+void vtkMetaInfoDatabase::Insert(int p, int np, int ext[6], double range[2],
                                  double resolution)
 {
   DEBUGPRINT_METAINFORMATION(
@@ -79,10 +79,10 @@ void vtkMetaInfoDatabase::Insert(int p, int np, int ext[6], double range[2],
                              << p << "/" << np << " "
                              << ext[0] << "," << ext[1] << ","
                              << ext[2] << "," << ext[3] << ","
-                             << ext[4] << "," << ext[5] << "@" 
+                             << ext[4] << "," << ext[5] << "@"
                              << resolution << endl;
                              );
-  
+
   //go through the list and find pieces that entirely contain this piece
   //for all of those, update their information if necessary with the new
   //information from this new piece
@@ -98,7 +98,7 @@ void vtkMetaInfoDatabase::Insert(int p, int np, int ext[6], double range[2],
       //we've just produced (in case a child refined it) so leave it alone
       return;
       }
-    
+
     if (rr->np < np) //potentially an ancestor
       {
       if ((p/(np/rr->np)) == rr->p) //it is an ancestor
@@ -123,7 +123,7 @@ void vtkMetaInfoDatabase::Insert(int p, int np, int ext[6], double range[2],
         }
       }
     }
-  
+
   DEBUGPRINT_METAINFORMATION(
                              cerr << "Inserting new record" << endl;
                              );
@@ -161,7 +161,7 @@ int vtkMetaInfoDatabase::Search(int p, int np, int ext[6], double *range)
       range[1] = rr->range[1];
       return 1;
       }
-    
+
     if (rr->np < np) //potentially an ancestor
       {
       if ((p/(np/rr->np)) == rr->p) //it is an ancestor
@@ -178,9 +178,9 @@ int vtkMetaInfoDatabase::Search(int p, int np, int ext[6], double *range)
           if (rr->np > best->np)
             {
             DEBUGPRINT_METAINFORMATION(
-                                       cerr << rr->p << "/" << rr->np << " is better than " 
+                                       cerr << rr->p << "/" << rr->np << " is better than "
                                        << best->p << "/" << best->np << endl;
-                                       );              
+                                       );
             best = rr;
             }
           else
@@ -199,7 +199,7 @@ int vtkMetaInfoDatabase::Search(int p, int np, int ext[6], double *range)
     range[0] = best->range[0];
     range[1] = best->range[1];
     DEBUGPRINT_METAINFORMATION(
-                               cerr << "found close match of " << best->p << "/" << best->np 
+                               cerr << "found close match of " << best->p << "/" << best->np
                                << " with: " << range[0] << "," << range[1] << endl;
                                );
     return 1;

@@ -73,10 +73,10 @@ void vtkVisibilityPrioritizer::PrintSelf(ostream& os, vtkIndent indent)
 int vtkVisibilityPrioritizer::ProcessRequest(vtkInformation* request,
                                           vtkInformationVector** inputVector,
                                           vtkInformationVector* outputVector)
-{  
+{
   if(request->Has(vtkStreamingDemandDrivenPipeline::
                   REQUEST_UPDATE_EXTENT_INFORMATION()))
-    {    
+    {
     if (vtkAdaptiveOptions::GetUseViewOrdering())
       {
       return this->RequestUpdateExtentInformation(request, inputVector, outputVector);
@@ -94,8 +94,8 @@ int vtkVisibilityPrioritizer::ProcessRequest(vtkInformation* request,
 
 //----------------------------------------------------------------------------
 int vtkVisibilityPrioritizer::RequestUpdateExtentInformation(
-  vtkInformation* vtkNotUsed(request), 
-  vtkInformationVector** inputVector, 
+  vtkInformation* vtkNotUsed(request),
+  vtkInformationVector** inputVector,
   vtkInformationVector* outputVector)
 {
   DEBUGPRINT_PRIORITY(
@@ -107,7 +107,7 @@ int vtkVisibilityPrioritizer::RequestUpdateExtentInformation(
     {
     return 1;
     }
-  
+
   vtkInformation *outInfo = outputVector->GetInformationObject(0);
   if (!outInfo)
     {
@@ -132,7 +132,7 @@ int vtkVisibilityPrioritizer::RequestUpdateExtentInformation(
   vtkExecutive* executive;
   int port;
   vtkExecutive::PRODUCER()->Get(inInfo,executive,port);
-  vtkStreamingDemandDrivenPipeline *sddp = 
+  vtkStreamingDemandDrivenPipeline *sddp =
     vtkStreamingDemandDrivenPipeline::SafeDownCast(
       executive);
   if (sddp)
@@ -146,7 +146,7 @@ int vtkVisibilityPrioritizer::RequestUpdateExtentInformation(
 
     if (pbbox[0] <= pbbox[1] &&
         pbbox[2] <= pbbox[3] &&
-        pbbox[4] <= pbbox[5])        
+        pbbox[4] <= pbbox[5])
       {
       // use the frustum extraction filter to reject pieces that do not intersect the view frustum
       if (!this->FrustumTester->OverallBoundsTest(pbbox))
@@ -156,23 +156,23 @@ int vtkVisibilityPrioritizer::RequestUpdateExtentInformation(
           vtkStreamingDemandDrivenPipeline::UPDATE_PIECE_NUMBER());
         int updatePieces = outInfo->Get(
           vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_PIECES());
-        cerr << "VS(" << this << ") Frustum reject! " 
+        cerr << "VS(" << this << ") Frustum reject! "
         << updatePiece << "/" << updatePieces << " "
-        << pbbox[0] << "," << pbbox[1] << "," << pbbox[2] << "," << pbbox[3] << "," << pbbox[4] << "," << pbbox[5] 
+        << pbbox[0] << "," << pbbox[1] << "," << pbbox[2] << "," << pbbox[3] << "," << pbbox[4] << "," << pbbox[5]
         << endl;
           );
         outPriority = 0.0;
         }
       else
         {
-        //for those that are not rejected, compute a priority from the bounds 
-        //such that pieces nearest to camera eye have highest priority 1 and 
-        //those furthest away have lowest 0. 
+        //for those that are not rejected, compute a priority from the bounds
+        //such that pieces nearest to camera eye have highest priority 1 and
+        //those furthest away have lowest 0.
         //Must do this using only information about current piece.
         vtkBoundingBox box(pbbox);
         double center[3];
         //box.GetCenter(center);
-                                                       
+
         // use the closest corner, not the center for uneven sized pieces
         if(fabs(this->CameraState[0] - pbbox[0]) <
            fabs(this->CameraState[0] - pbbox[1]))
@@ -230,17 +230,17 @@ int vtkVisibilityPrioritizer::RequestUpdateExtentInformation(
           vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_PIECES());
         double updateRes = outInfo->Get(
           vtkStreamingDemandDrivenPipeline::UPDATE_RESOLUTION());
-        cerr << "VS(" << this << ") Center of " 
+        cerr << "VS(" << this << ") Center of "
         << updatePiece << "/" << updatePieces << "@" << updateRes << " is "
         << center[0] << "," << center[1] << "," << center[2] << endl;
         cerr << "VS(" << this << ") Dists " << dbox << "/" << dfar << "=" << dbox/dfar << endl;
-        cerr << "VS(" << this << ") DIST= " << dist << endl;        
+        cerr << "VS(" << this << ") DIST= " << dist << endl;
         );
 
         outPriority = inPriority*dist;
         DEBUGPRINT_PRIORITY(
-        cerr << "VS(" << this 
-               << ") distance metric = " << dist 
+        cerr << "VS(" << this
+               << ") distance metric = " << dist
                << " priority " << inPriority << "->" << outPriority << endl;
                             );
         }
@@ -254,8 +254,8 @@ int vtkVisibilityPrioritizer::RequestUpdateExtentInformation(
 
 //----------------------------------------------------------------------------
 int vtkVisibilityPrioritizer::RequestData(
-  vtkInformation* vtkNotUsed(request), 
-  vtkInformationVector** inputVector, 
+  vtkInformation* vtkNotUsed(request),
+  vtkInformationVector** inputVector,
   vtkInformationVector* outputVector)
 {
   vtkInformation* inInfo = inputVector[0]->GetInformationObject(0);
@@ -270,22 +270,22 @@ int vtkVisibilityPrioritizer::RequestData(
 void vtkVisibilityPrioritizer::SetFrustum(double *frustum)
 {
   int i;
-  for (i=0; i<32; i++) 
-    { 
-    if ( frustum[i] != this->Frustum[i] ) 
-      { 
+  for (i=0; i<32; i++)
+    {
+    if ( frustum[i] != this->Frustum[i] )
+      {
       break;
       }
     }
   if ( i < 32 )
     {
-    for (i=0; i<32; i++) 
-      { 
-      this->Frustum[i] = frustum[i]; 
+    for (i=0; i<32; i++)
+      {
+      this->Frustum[i] = frustum[i];
       }
     DEBUGPRINT_PRIORITY(
     cerr << "FRUST" << endl;
-    for (i=0; i<8; i++) 
+    for (i=0; i<8; i++)
       {
       cerr << this->Frustum[i*4+0] << "," << this->Frustum[i*4+1] << "," << this->Frustum[i*4+2] << endl;
       }
@@ -293,7 +293,7 @@ void vtkVisibilityPrioritizer::SetFrustum(double *frustum)
 
     this->FrustumTester->CreateFrustum(frustum);
 
-    //No! camera changes are low priority, should NOT cause 
+    //No! camera changes are low priority, should NOT cause
     //reexecution of pipeline or invalidate cache filter
     //this->Modified();
     }
@@ -303,18 +303,18 @@ void vtkVisibilityPrioritizer::SetFrustum(double *frustum)
 void vtkVisibilityPrioritizer::SetCameraState(double *cameraState)
 {
   int i;
-  for (i=0; i<9; i++) 
-    { 
-    if ( cameraState[i] != this->CameraState[i] ) 
-      { 
-      break; 
+  for (i=0; i<9; i++)
+    {
+    if ( cameraState[i] != this->CameraState[i] )
+      {
+      break;
       }
     }
   if ( i < 9 )
     {
-    for (i=0; i<9; i++) 
-      { 
-      this->CameraState[i] = cameraState[i]; 
+    for (i=0; i<9; i++)
+      {
+      this->CameraState[i] = cameraState[i];
       }
     DEBUGPRINT_PRIORITY(
     cerr << "EYE" << this->CameraState[0] << "," << this->CameraState[1] << "," << this->CameraState[2] << endl;

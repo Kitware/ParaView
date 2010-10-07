@@ -14,9 +14,9 @@
 =========================================================================*/
 // .NAME vtkPieceList - A Priority Queue of vtkPieces
 // .SECTION Description
-// This implements a collection of vtkPieces. The list can be sorted to 
+// This implements a collection of vtkPieces. The list can be sorted to
 // maintain the list in priority order, so that the next piece popped
-// will always be the piece with the highest priority. PieceLists can 
+// will always be the piece with the highest priority. PieceLists can
 // be merged (draining one to add to another), copied, and serialized.
 
 #ifndef __vtkPieceList_h
@@ -33,7 +33,7 @@ public:
   static vtkPieceList* New();
   vtkTypeMacro(vtkPieceList, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
-  
+
   //Description
   //Add a piece to the list.
   void AddPiece(vtkPiece *Piece);
@@ -75,7 +75,7 @@ public:
   //Description:
   //Moves all entries from other to me.
   //WARNING: This does not do any sorting.
-  void MergePieceList(vtkPieceList *other);  
+  void MergePieceList(vtkPieceList *other);
 
   //Description:
   //Share lists over the network.

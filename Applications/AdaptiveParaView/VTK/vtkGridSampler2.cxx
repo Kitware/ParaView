@@ -103,7 +103,7 @@ void vtkGridSampler2::ComputeSplits(int *pathLen, int **splitPath)
   int axis = 0;
 
   while (axis > -1)
-    {    
+    {
     axis = -1;
 #if OCEAN_TWEAK
     if (*pathLen == 0)
@@ -136,7 +136,7 @@ void vtkGridSampler2::ComputeSplits(int *pathLen, int **splitPath)
       buflen = buflen*2;
       delete[] splits;
       splits = newbuf;
-      }    
+      }
     }
 
   *splitPath = splits;
@@ -149,7 +149,7 @@ double vtkGridSampler2::SuggestSampling(int axis)
   // in the pipeline as far as I can tell
   // also need to specify the branching factor (degree) as well
   int height = vtkAdaptiveOptions::GetHeight();
-  int degree = 
+  int degree =
     (int)log2((double)vtkAdaptiveOptions::GetDegree());  // 2^degree
   int rate = vtkAdaptiveOptions::GetRate();  // should be able to specify the sampling rate
 
@@ -160,12 +160,12 @@ double vtkGridSampler2::SuggestSampling(int axis)
   double sampling = 1.0;
 
   // the last index to check for splits
-  vtkIdType stop = 
+  vtkIdType stop =
     (vtkIdType)(height * degree * (1.0 - this->RequestedResolution) + 0.5);
 
-  stop = stop > this->SplitPath->GetNumberOfTuples() ? 
+  stop = stop > this->SplitPath->GetNumberOfTuples() ?
     this->SplitPath->GetNumberOfTuples() : stop;
-  
+
   // this isn't exactly correct, since the split path is just a linear
   // specification of splits, it could split twice in the same
   // dimension, instead of spliting across two dimensions...
@@ -286,7 +286,7 @@ void vtkGridSampler2::ComputeAtResolution(double r)
   this->Strides[0] = this->SuggestSampling(0);
   this->Strides[1] = this->SuggestSampling(1);
   this->Strides[2] = this->SuggestSampling(2);
-  
+
   /*
   cout << this->Strides[0] << " "
        << this->Strides[1] << " "
@@ -295,28 +295,27 @@ void vtkGridSampler2::ComputeAtResolution(double r)
 
   //given stride result, what is low res whole extent?
   int dim[3];
-  dim[0] = (this->WholeExtent[1] - this->WholeExtent[0] + 1) 
+  dim[0] = (this->WholeExtent[1] - this->WholeExtent[0] + 1)
     / this->Strides[0] +
     ((this->WholeExtent[1] - this->WholeExtent[0] + 1) %
      this->Strides[0] > 0 ? 1 : 0);
-  dim[1] = (this->WholeExtent[3] - this->WholeExtent[2] + 1) 
+  dim[1] = (this->WholeExtent[3] - this->WholeExtent[2] + 1)
     / this->Strides[1] +
     ((this->WholeExtent[3] - this->WholeExtent[2] + 1) %
      this->Strides[1] > 0 ? 1 : 0);
-  dim[2] = (this->WholeExtent[5] - this->WholeExtent[4] + 1) 
-    / this->Strides[2] + 
+  dim[2] = (this->WholeExtent[5] - this->WholeExtent[4] + 1)
+    / this->Strides[2] +
     ((this->WholeExtent[5] - this->WholeExtent[4] + 1) %
      this->Strides[2] > 0 ? 1 : 0);
-  
+
   this->StridedExtent[0] = this->WholeExtent[0];
   this->StridedExtent[2] = this->WholeExtent[2];
   this->StridedExtent[4] = this->WholeExtent[4];
   this->StridedExtent[1] = this->StridedExtent[0] + dim[0] - 1;
   this->StridedExtent[3] = this->StridedExtent[2] + dim[1] - 1;
   this->StridedExtent[5] = this->StridedExtent[4] + dim[2] - 1;
-  
+
   this->StridedSpacing[0] = this->Spacing[0] * this->Strides[0];
   this->StridedSpacing[1] = this->Spacing[1] * this->Strides[1];
   this->StridedSpacing[2] = this->Spacing[2] * this->Strides[2];
 }
-

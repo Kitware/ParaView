@@ -98,7 +98,7 @@ class vtkRSRFileSkimmer1
   float* get_data() {return data_;}
 
   unsigned int get_data_size() {return data_size_;}
-  
+
   void set_buffer_size(unsigned int buffer_size);
   void set_buffer_pointer(float *externalmem);
   void set_uExtents(unsigned int* extents);
@@ -114,7 +114,7 @@ class vtkRSRFileSkimmer1
                          unsigned int stride,
                          unsigned int total_bytes,
                          unsigned int insert_at);
-  
+
   bool SwapEndian_;
   unsigned int uExtents_[6];
   unsigned int stride_[3];
@@ -129,16 +129,16 @@ class vtkRSRFileSkimmer1
 
   bool use_timer_;
   clock_t start;
-  clock_t stop;  
+  clock_t stop;
 };
 
 
 // Default ctor.  Some simple initialization
 vtkRSRFileSkimmer1::vtkRSRFileSkimmer1() :
-  data_(0), 
-  cache_buffer_(NULL), 
-  use_timer_(false), 
-  SwapEndian_(false), 
+  data_(0),
+  cache_buffer_(NULL),
+  use_timer_(false),
+  SwapEndian_(false),
   buffer_pointer_(NULL)
 { }
 
@@ -211,9 +211,9 @@ unsigned int vtkRSRFileSkimmer1::alloc_data()
   unsigned int i_span = uExtents_[1] - uExtents_[0] + 1;
   unsigned int j_span = uExtents_[3] - uExtents_[2] + 1;
   unsigned int k_span = uExtents_[5] - uExtents_[4] + 1;
-  
+
   DEBUGPRINT_STRIDED_READER_DETAILS(
-  cerr << "output dims: " 
+  cerr << "output dims: "
        << i_span << ", " << j_span << ", " << k_span << endl;
                            );
 
@@ -235,7 +235,7 @@ unsigned int vtkRSRFileSkimmer1::alloc_data()
       cerr << "NEW FAILURE" << endl;
       }
     }
-  
+
   if (cache_buffer_ != NULL)
     {
     //cerr << "Free old cache_buffer_" << endl;
@@ -269,7 +269,7 @@ unsigned int vtkRSRFileSkimmer1::read_line(ifstream& file,
   unsigned int vals_in_buffer = buffer_size / sizeof(float);//#bytes to #floats
 
   //adjust buffer down to hold a whole number of floats
-  unsigned int adjusted_buffer_size = buffer_size;  
+  unsigned int adjusted_buffer_size = buffer_size;
   if (vals_in_buffer*sizeof(float) < buffer_size)
     {
     adjusted_buffer_size = vals_in_buffer*sizeof(float);
@@ -277,7 +277,7 @@ unsigned int vtkRSRFileSkimmer1::read_line(ifstream& file,
     cerr << "Round " << buffer_size << " to " << adjusted_buffer_size << endl;
                                       );
     }
-  unsigned int strided_vals_in_buffer = vals_in_buffer/stride; 
+  unsigned int strided_vals_in_buffer = vals_in_buffer/stride;
 
   //check for case when stride is bigger than buffer.
   //In that case adjust truncated fraction from 0 to 1
@@ -286,7 +286,7 @@ unsigned int vtkRSRFileSkimmer1::read_line(ifstream& file,
     DEBUGPRINT_STRIDED_READER_DETAILS(
     cerr << "Floor to " << 1 << endl;
                                       );
-    strided_vals_in_buffer = 1;  
+    strided_vals_in_buffer = 1;
     adjusted_buffer_size = strided_vals_in_buffer*stride*sizeof(float);
     vals_in_buffer = strided_vals_in_buffer*stride;
     }
@@ -295,7 +295,7 @@ unsigned int vtkRSRFileSkimmer1::read_line(ifstream& file,
   //In that case, read only what we want.
   unsigned int sought_vals = (uExtents_[1]-uExtents_[0]+1);
   if (strided_vals_in_buffer > sought_vals)
-    {    
+    {
     DEBUGPRINT_STRIDED_READER_DETAILS(
     cerr << "Ceiling to " << sought_vals << endl;
                                       );
@@ -310,14 +310,14 @@ unsigned int vtkRSRFileSkimmer1::read_line(ifstream& file,
   if (strided_vals_in_buffer == 1)
     {
     DEBUGPRINT_STRIDED_READER_DETAILS(
-    cerr << "single reads " << endl; 
+    cerr << "single reads " << endl;
                                       );
-    //ifstream::pos_type orig = file.tellg();    
+    //ifstream::pos_type orig = file.tellg();
     //unsigned int c=orig;
     while(vals_read < sought_vals)
-      { 
+      {
       DEBUGPRINT_STRIDED_READER_DETAILS(
-      cerr << "READ AT " << file.tellg();     
+      cerr << "READ AT " << file.tellg();
                                         );
       file.read(cache_buffer, adjusted_buffer_size);
       if (file.bad())
@@ -332,7 +332,7 @@ unsigned int vtkRSRFileSkimmer1::read_line(ifstream& file,
                                         );
       insert_at++;
       /*
-      // Seek to the next value we want to read! 
+      // Seek to the next value we want to read!
       c+=stride*sizeof(float);
       DEBUGPRINT_STRIDED_READER_DETAILS(
       cerr << " seek to " << c << endl;
@@ -349,17 +349,17 @@ unsigned int vtkRSRFileSkimmer1::read_line(ifstream& file,
       bytes_read += sizeof(float);
       vals_read++;
       }
-    } 
-  else 
+    }
+  else
     {
     DEBUGPRINT_STRIDED_READER_DETAILS(
-    cerr << "Read " << sought_vals << " values from " 
+    cerr << "Read " << sought_vals << " values from "
          << adjusted_buffer_size << " byte buffers that hold "
          << strided_vals_in_buffer << endl;
                                       );
     //Like above we might have a buffer which doesn't cover a whole line,
     //so we loop, reading buffers until we get all the values for the line.
-    while(vals_read < sought_vals) 
+    while(vals_read < sought_vals)
       {
       //read a buffer
       DEBUGPRINT_STRIDED_READER_DETAILS(
@@ -391,14 +391,14 @@ unsigned int vtkRSRFileSkimmer1::read_line(ifstream& file,
           cerr << "READ FAIL 3" << endl;
           }
         float* float_buffer = cache_buffer_;
-        // Unlike above we now have more than 1 vals in each buffer, 
-        // so we need to step through and extract the values that lie on 
+        // Unlike above we now have more than 1 vals in each buffer,
+        // so we need to step through and extract the values that lie on
         // the stride
         while(read_from < vals_in_buffer)
           {
           data_[insert_at] = float_buffer[read_from];
           DEBUGPRINT_STRIDED_READER_DETAILS(
-                                            cerr << "fbuffer[" << read_from << "]=" 
+                                            cerr << "fbuffer[" << read_from << "]="
                                             << data_[insert_at] << "-> " << insert_at << endl;
                                             );
           insert_at++;
@@ -416,7 +416,7 @@ unsigned int vtkRSRFileSkimmer1::read_line(ifstream& file,
       read_from = read_from % vals_in_buffer;
       }
     }
-  
+
   DEBUGPRINT_STRIDED_READER_DETAILS(
   cerr << "Bytes read " << bytes_read << endl;
                                     );
@@ -433,12 +433,12 @@ unsigned int vtkRSRFileSkimmer1::read_line(ifstream& file,
 int vtkRSRFileSkimmer1::read(ifstream& file,
                  unsigned int* strides)
 {
-  
+
   if(use_timer_)
   {
     start = clock();
   }
-  
+
   for(int i = 0; i < 3; ++i)
   {
     if(strides[i] == 0)
@@ -459,7 +459,7 @@ int vtkRSRFileSkimmer1::read(ifstream& file,
 
   //cerr << "ALLOC T=" << (t1-t0)/CLOCKS_PER_SEC << endl;
   unsigned int insert_index = 0;
-  
+
   // Size in floats!  We have to multiply by sizeof(float) to get the bytes.
   // But that will happen just a little bit later!
   unsigned int plane_size = dims_[1] * dims_[0];
@@ -468,21 +468,21 @@ int vtkRSRFileSkimmer1::read(ifstream& file,
   DEBUGPRINT_STRIDED_READER_DETAILS(
   cerr << "plane size = " << plane_size << " row size = " << row_size << " b2r = " << bytes_to_read << endl;
                            );
-  
+
   for(unsigned int k = uExtents_[4]; k <= uExtents_[5]; k++)
     {
     for(unsigned int j = uExtents_[2]; j <= uExtents_[3]; j++)
       {
       unsigned int i = uExtents_[0];
-      unsigned int offset = 
-        k*strides[2]*plane_size*sizeof(float) + 
-        j*strides[1]*row_size*sizeof(float) + 
+      unsigned int offset =
+        k*strides[2]*plane_size*sizeof(float) +
+        j*strides[1]*row_size*sizeof(float) +
         i*strides[0]*sizeof(float);
-      
+
       DEBUGPRINT_STRIDED_READER_DETAILS(
-        cerr << "read line " 
-        << k << "," << j << "," << i << " " 
-        << "(" << k*strides[2] <<","<<j*strides[1] <<","<<i*strides[0] << ")" 
+        cerr << "read line "
+        << k << "," << j << "," << i << " "
+        << "(" << k*strides[2] <<","<<j*strides[1] <<","<<i*strides[0] << ")"
         << " from " << offset << endl;
                                         );
       // Seek to the beginning of the line we want to extract.
@@ -494,16 +494,16 @@ int vtkRSRFileSkimmer1::read(ifstream& file,
         cerr << "SEEK FAIL" << endl;
         return 0;
         }
-      
+
       // Extract the line.  To do this we need to know the stride
       // and the last extent to grab, as well as the location
       // of the output array and the position to put stuff in there.
-      insert_index = 
-        read_line(file, 
-                  (char*)cache_buffer_, buffer_size_, 
-                  strides[0], 
-                  bytes_to_read, 
-                  insert_index);    
+      insert_index =
+        read_line(file,
+                  (char*)cache_buffer_, buffer_size_,
+                  strides[0],
+                  bytes_to_read,
+                  insert_index);
       }
     //double tn = clock();
     //cerr << "SLICET=" << (tn-t1)/CLOCKS_PER_SEC << endl;
@@ -512,7 +512,7 @@ int vtkRSRFileSkimmer1::read(ifstream& file,
   DEBUGPRINT_STRIDED_READER_DETAILS(
     cerr << "Read " << insert_index << " floats total " << endl;
                                     );
-  
+
   if(use_timer_)
     {
     stop = clock();
@@ -520,7 +520,7 @@ int vtkRSRFileSkimmer1::read(ifstream& file,
     double elapsed = t / CLOCKS_PER_SEC;
     cerr << "Took " << elapsed << " seconds to read." << endl;
     }
-  
+
   if (SwapEndian_)
     {
     vtkByteSwap::SwapVoidRange(data_, insert_index , sizeof(float) );
@@ -587,14 +587,14 @@ void vtkRawStridedReader1::SwapDataByteOrder(int i)
 //----------------------------------------------------------------------------
 //RequestInformation supplies global meta information
 // Global Extents  (integer count range of point count in x,y,z)
-// Global Origin 
+// Global Origin
 // Global Spacing (should be the stride value * original)
 
 int vtkRawStridedReader1::RequestInformation(
   vtkInformation* request,
   vtkInformationVector** inputVector,
   vtkInformationVector* outputVector)
-{ 
+{
   vtkInformation* outInfo = outputVector->GetInformationObject(0);
   outInfo->Set(vtkDataObject::ORIGIN(),this->Origin,3);
 
@@ -675,7 +675,7 @@ int vtkRawStridedReader1::RequestInformation(
 
     outInfo->Set(vtkStreamingDemandDrivenPipeline::WHOLE_EXTENT(), sWholeExtent, 6);
     outInfo->Set(vtkDataObject::SPACING(), sSpacing, 3);
-    
+
     this->Resolution = aRes;
     this->SI = strides[0];
     this->SJ = strides[1];
@@ -706,7 +706,7 @@ int vtkRawStridedReader1::RequestInformation(
 }
 
 //----------------------------------------------------------------------------
-// Here unlike the RequestInformation we getting, not setting 
+// Here unlike the RequestInformation we getting, not setting
 int vtkRawStridedReader1::RequestUpdateExtent(
   vtkInformation* request,
   vtkInformationVector** inputVector,
@@ -714,7 +714,7 @@ int vtkRawStridedReader1::RequestUpdateExtent(
 {
   vtkInformation *outInfo = outputVector->GetInformationObject(0);
   outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_EXTENT(),
-               this->UpdateExtent);  
+               this->UpdateExtent);
   DEBUGPRINT_STRIDED_READER(
   int P = outInfo->Get(
     vtkStreamingDemandDrivenPipeline::UPDATE_PIECE_NUMBER());
@@ -771,7 +771,7 @@ int vtkRawStridedReader1::RequestData(
                        vtkStreamingDemandDrivenPipeline::UPDATE_PIECE_NUMBER());
   int NP = outInfo->Get(
                         vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_PIECES());
-  //cerr << P << "/" << NP << "@" << res 
+  //cerr << P << "/" << NP << "@" << res
   //     << "->" << this->SI << " " << this->SJ << " " << this->SK << endl;
   //}
   //);
@@ -810,7 +810,7 @@ int vtkRawStridedReader1::RequestData(
     this->Skimmer->set_dims((unsigned int*)this->Dimensions);
     this->Skimmer->set_buffer_size((unsigned int)this->BlockReadSize);
     this->Skimmer->set_buffer_pointer(myfloats);
-  
+
     unsigned int stride[3];
     stride[0] = this->SI;
     stride[1] = this->SJ;
@@ -825,7 +825,7 @@ int vtkRawStridedReader1::RequestData(
     }
 
     DEBUGPRINT_STRIDED_READER(
-    unsigned int memsize = this->Skimmer->get_data_size(); 
+    unsigned int memsize = this->Skimmer->get_data_size();
     cerr << "memsize " << memsize << endl;
                              );
     file.close();
@@ -837,7 +837,7 @@ int vtkRawStridedReader1::RequestData(
     opfile.close();
   }
   else
-  {  
+  {
     //cerr << "reading from " << pfilename << " " << endl;
     unsigned int memsize = (uext[1]-uext[0]+1)*(uext[3]-uext[2]+1)*(uext[5]-uext[4]+1);
     pfile.read((char*)myfloats, memsize*sizeof(float));
@@ -847,7 +847,7 @@ int vtkRawStridedReader1::RequestData(
       }
     pfile.close();
   }
-  
+
 //  double c_fileio = clock();
 
   double range[2];
@@ -868,9 +868,9 @@ int vtkRawStridedReader1::RequestData(
   double t_meta = (stop-c_fileio)/CLOCKS_PER_SEC;
   double ttotal = stop - start;
   double elapsed = ttotal / CLOCKS_PER_SEC;
-  cerr 
-    << P << "/" << NP << "=(" << uext[0] << "," << uext[1] << "," << uext[2] << "," << uext[3] << "," << uext[4] << "," << uext[5] << ")" 
-    << "@" << this->Resolution << "=(" << this->SI << "," << this->SJ << "," << this->SK << ")" 
+  cerr
+    << P << "/" << NP << "=(" << uext[0] << "," << uext[1] << "," << uext[2] << "," << uext[3] << "," << uext[4] << "," << uext[5] << ")"
+    << "@" << this->Resolution << "=(" << this->SI << "," << this->SJ << "," << this->SK << ")"
     << " " << talloc << ":" << t_prep << ":" << t_file << ":" << t_meta << " " << elapsed << " seconds" << endl;
 */
 
@@ -930,7 +930,7 @@ int vtkRawStridedReader1::ProcessRequest(vtkInformation *request,
     vtkInformation* outInfo = outputVector->GetInformationObject(0);
     origin = outInfo->Get(vtkDataObject::ORIGIN());
     spacing = outInfo->Get(vtkDataObject::SPACING());
-    ext = outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_EXTENT());    
+    ext = outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_EXTENT());
     int P = outInfo->Get(
       vtkStreamingDemandDrivenPipeline::UPDATE_PIECE_NUMBER());
     int NP = outInfo->Get(
@@ -956,16 +956,16 @@ int vtkRawStridedReader1::ProcessRequest(vtkInformation *request,
     if (this->RangeKeeper->Search(P, NP, ext, range))
       {
       DEBUGPRINT_METAINFORMATION(
-      cerr << "Range for " 
+      cerr << "Range for "
            << P << "/" << NP << " "
            << ext[0] << "," << ext[1] << ","
            << ext[2] << "," << ext[3] << ","
-           << ext[4] << "," << ext[5] << " is " 
+           << ext[4] << "," << ext[5] << " is "
            << range[0] << " .. " << range[1] << endl;
                                  );
-      vtkInformation *fInfo = 
+      vtkInformation *fInfo =
         vtkDataObject::GetActiveFieldInformation
-        (outInfo, vtkDataObject::FIELD_ASSOCIATION_POINTS, 
+        (outInfo, vtkDataObject::FIELD_ASSOCIATION_POINTS,
          vtkDataSetAttributes::SCALARS);
       if (fInfo)
         {
@@ -975,10 +975,10 @@ int vtkRawStridedReader1::ProcessRequest(vtkInformation *request,
     else
       {
       DEBUGPRINT_METAINFORMATION(
-      cerr << "No range for " 
+      cerr << "No range for "
            << ext[0] << "," << ext[1] << ","
            << ext[2] << "," << ext[3] << ","
-           << ext[4] << "," << ext[5] << " yet" << endl;        
+           << ext[4] << "," << ext[5] << " yet" << endl;
                                  );
       }
     }
@@ -987,13 +987,13 @@ int vtkRawStridedReader1::ProcessRequest(vtkInformation *request,
   if(request->Has(vtkDemandDrivenPipeline::REQUEST_DATA()))
     {
     DEBUGPRINT_STRIDED_READER(cerr << "RSR(" << this << ") RD =====================================" << endl;);
-    
+
     vtkInformation* outInfo = outputVector->GetInformationObject(0);
     int updateExtent[6];
     int wholeExtent[6];
-    outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_EXTENT(), 
+    outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_EXTENT(),
       updateExtent);
-    outInfo->Get(vtkStreamingDemandDrivenPipeline::WHOLE_EXTENT(), 
+    outInfo->Get(vtkStreamingDemandDrivenPipeline::WHOLE_EXTENT(),
       wholeExtent);
     double res = 1.0;
     if (outInfo->Has(vtkStreamingDemandDrivenPipeline::UPDATE_RESOLUTION()))

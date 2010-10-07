@@ -12,12 +12,12 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkVisibilityPrioritizer - rejects pieces out of view frustum and sorts by 
+// .NAME vtkVisibilityPrioritizer - rejects pieces out of view frustum and sorts by
 // distance.
 // .SECTION Description
 // This filter responds to most executive requests as a simple pass through.
 // The exception is in the REQUEST_UPDATE_EXTENT_INFORMATION pass, where it can
-// assign a priority based on distance to the camera and inclusion within the 
+// assign a priority based on distance to the camera and inclusion within the
 // viewing frustum.
 //
 
@@ -48,12 +48,12 @@ protected:
     vtkInformation *,
     vtkInformationVector **,
     vtkInformationVector *);
-  
+
   virtual int RequestUpdateExtentInformation(
     vtkInformation *,
     vtkInformationVector **,
     vtkInformationVector *);
-  
+
   virtual int RequestData(
     vtkInformation *,
     vtkInformationVector **,

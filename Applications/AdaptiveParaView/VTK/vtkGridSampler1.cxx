@@ -88,7 +88,7 @@ void vtkGridSampler1::ComputeSplits(int *pathLen, int **splitPath)
   *pathLen = 0;
   int axis = 0;
   while (axis > -1)
-    {    
+    {
     axis = -1;
 #if OCEAN_TWEAK
     if (*pathLen == 0)
@@ -119,7 +119,7 @@ void vtkGridSampler1::ComputeSplits(int *pathLen, int **splitPath)
       buflen = buflen*2;
       delete[] splits;
       splits = newbuf;
-      }    
+      }
     }
 
   *splitPath = splits;
@@ -141,7 +141,7 @@ double vtkGridSampler1::SuggestSampling(int axis)
     }
 
   //minimum split divides by 30, because that looks pretty
-  int iN = 30;  
+  int iN = 30;
   //assume splitting dim in two each time
   //how many splits does it take to get till no more splits are possible?
   int root = 0;
@@ -315,7 +315,7 @@ void vtkGridSampler1::ComputeAtResolution(double r)
   this->SamplingValid = true;
   this->RequestedResolution = r;
 
-  double ires, jres, kres; 
+  double ires, jres, kres;
 
   //pick stride for I, J and K
   this->Strides[0] = this->Strides[1] = this->Strides[2] = 1;
@@ -325,7 +325,7 @@ void vtkGridSampler1::ComputeAtResolution(double r)
 #else
   kres = this->SuggestSampling(2);
 #endif
-  
+
   this->StridedResolution = ires;
   if (jres < this->StridedResolution)
     {
@@ -338,22 +338,21 @@ void vtkGridSampler1::ComputeAtResolution(double r)
     this->StridedResolution = kres;
     }
 #endif
-  
+
   //given stride result, what is low res whole extent?
   int dim[3];
   dim[0] = (this->WholeExtent[1]-this->WholeExtent[0]+1) / this->Strides[0];
   dim[1] = (this->WholeExtent[3]-this->WholeExtent[2]+1) / this->Strides[1];
   dim[2] = (this->WholeExtent[5]-this->WholeExtent[4]+1) / this->Strides[2];
-  
+
   this->StridedExtent[0] = this->WholeExtent[0];
   this->StridedExtent[2] = this->WholeExtent[2];
   this->StridedExtent[4] = this->WholeExtent[4];
   this->StridedExtent[1] = this->StridedExtent[0]+dim[0]-1;
   this->StridedExtent[3] = this->StridedExtent[2]+dim[1]-1;
   this->StridedExtent[5] = this->StridedExtent[4]+dim[2]-1;
-  
+
   this->StridedSpacing[0] = this->Spacing[0] * this->Strides[0];
   this->StridedSpacing[1] = this->Spacing[1] * this->Strides[1];
   this->StridedSpacing[2] = this->Spacing[2] * this->Strides[2];
 }
-

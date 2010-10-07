@@ -21,40 +21,40 @@ Copyright (c) 2007, 2009 Los Alamos National Security, LLC
 
 All rights reserved.
 
-Copyright 2007, 2009. Los Alamos National Security, LLC. 
-This software was produced under U.S. Government contract DE-AC52-06NA25396 
-for Los Alamos National Laboratory (LANL), which is operated by 
-Los Alamos National Security, LLC for the U.S. Department of Energy. 
-The U.S. Government has rights to use, reproduce, and distribute this software. 
+Copyright 2007, 2009. Los Alamos National Security, LLC.
+This software was produced under U.S. Government contract DE-AC52-06NA25396
+for Los Alamos National Laboratory (LANL), which is operated by
+Los Alamos National Security, LLC for the U.S. Department of Energy.
+The U.S. Government has rights to use, reproduce, and distribute this software.
 NEITHER THE GOVERNMENT NOR LOS ALAMOS NATIONAL SECURITY, LLC MAKES ANY WARRANTY,
-EXPRESS OR IMPLIED, OR ASSUMES ANY LIABILITY FOR THE USE OF THIS SOFTWARE.  
-If software is modified to produce derivative works, such modified software 
-should be clearly marked, so as not to confuse it with the version available 
+EXPRESS OR IMPLIED, OR ASSUMES ANY LIABILITY FOR THE USE OF THIS SOFTWARE.
+If software is modified to produce derivative works, such modified software
+should be clearly marked, so as not to confuse it with the version available
 from LANL.
- 
-Additionally, redistribution and use in source and binary forms, with or 
-without modification, are permitted provided that the following conditions 
+
+Additionally, redistribution and use in source and binary forms, with or
+without modification, are permitted provided that the following conditions
 are met:
--   Redistributions of source code must retain the above copyright notice, 
-    this list of conditions and the following disclaimer. 
+-   Redistributions of source code must retain the above copyright notice,
+    this list of conditions and the following disclaimer.
 -   Redistributions in binary form must reproduce the above copyright notice,
     this list of conditions and the following disclaimer in the documentation
-    and/or other materials provided with the distribution. 
+    and/or other materials provided with the distribution.
 -   Neither the name of Los Alamos National Security, LLC, Los Alamos National
     Laboratory, LANL, the U.S. Government, nor the names of its contributors
-    may be used to endorse or promote products derived from this software 
-    without specific prior written permission. 
+    may be used to endorse or promote products derived from this software
+    without specific prior written permission.
 
 THIS SOFTWARE IS PROVIDED BY LOS ALAMOS NATIONAL SECURITY, LLC AND CONTRIBUTORS
-"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, 
-THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
-ARE DISCLAIMED. IN NO EVENT SHALL LOS ALAMOS NATIONAL SECURITY, LLC OR 
-CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, 
-EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, 
-PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; 
-OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, 
-WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR 
-OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF 
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED. IN NO EVENT SHALL LOS ALAMOS NATIONAL SECURITY, LLC OR
+CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
@@ -131,9 +131,9 @@ void vtkACosmoReader::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
 
-  os << indent << "File Name: " 
+  os << indent << "File Name: "
      << (this->FileName ? this->FileName : "(none)") << endl;
-  os << indent << "Byte Order: " 
+  os << indent << "Byte Order: "
      << (this->ByteOrder ? "LITTLE ENDIAN" : "BIG ENDIAN") << endl;
   os << indent << "BoxSize: " << this->BoxSize << endl;
   os << indent << "TagSize: " << (this->TagSize ? "64-bit" : "32-bit")
@@ -177,7 +177,7 @@ int vtkACosmoReader::RequestInformation(
     int totalpieces = (int)
     ((pow((float)this->splits, this->maxlevel + 1) - 1) / (this->splits - 1));
     this->pieceBounds = new float[6 * totalpieces];
-    
+
     // actually read the meta data
     for(int i = 0; i < totalpieces; i = i + 1)
       {
@@ -205,7 +205,7 @@ int vtkACosmoReader::RequestInformation(
       this->pieceBounds[piecenumber + 4] = bounds[4];
       this->pieceBounds[piecenumber + 5] = bounds[5];
       }
-      
+
       delete meta;
     }
 
@@ -231,7 +231,7 @@ int vtkACosmoReader::RequestInformation(
   this->Resolution = 1.0;
   if(outInfo->Has(vtkStreamingDemandDrivenPipeline::UPDATE_RESOLUTION()))
     {
-    this->Resolution = 
+    this->Resolution =
       outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_RESOLUTION());
     }
   this->currentLevel = (vtkIdType)(this->maxlevel * this->Resolution + .5);
@@ -275,17 +275,17 @@ int vtkACosmoReader::RequestData(
 {
   // get the info object
   vtkInformation *outInfo = outputVector->GetInformationObject(0);
-                                                                                
+
   // get the output
   vtkUnstructuredGrid *output = vtkUnstructuredGrid::SafeDownCast(
     outInfo->Get(vtkDataObject::DATA_OBJECT()));
 
   //output->Initialize();
-                 
+
   this->Resolution = 1.0;
   if(outInfo->Has(vtkStreamingDemandDrivenPipeline::UPDATE_RESOLUTION()))
     {
-    this->Resolution = 
+    this->Resolution =
       outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_RESOLUTION());
     }
   this->currentLevel = (vtkIdType)(this->maxlevel * this->Resolution + .5);
@@ -296,7 +296,7 @@ int vtkACosmoReader::RequestData(
     this->PieceNumber =
       outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_PIECE_NUMBER());
     }
-                             
+
   // Read the file into the output unstructured grid
   return this->ReadFile(output);
 }
@@ -307,8 +307,8 @@ int vtkACosmoReader::ReadFile(vtkUnstructuredGrid *output)
   this->SetErrorCode(vtkErrorCode::NoError);
 
   char* fn = new char[255 + strlen(this->FileName)];
-  sprintf(fn, "%s-%lu-%d", 
-          this->FileName, 
+  sprintf(fn, "%s-%lu-%d",
+          this->FileName,
           (long unsigned)this->currentLevel,
           this->PieceNumber);
 
@@ -338,13 +338,13 @@ int vtkACosmoReader::ReadFile(vtkUnstructuredGrid *output)
     {
     tagBytes = sizeof(vtkTypeInt64);
     }
-  else 
+  else
     {
     tagBytes = sizeof(vtkTypeInt32);
     }
 
   // Divide by number of components per record
-  vtkIdType numberOfParticles = 
+  vtkIdType numberOfParticles =
     fileLength / (BYTES_PER_DATA_MINUS_TAG + tagBytes);
 
   // Create the arrays to hold location and field data
@@ -353,9 +353,9 @@ int vtkACosmoReader::ReadFile(vtkUnstructuredGrid *output)
   vtkFloatArray *velocity = vtkFloatArray::New();
   //vtkFloatArray *mass     = vtkFloatArray::New();
   vtkDataArray *tag;
-  if(this->TagSize) 
+  if(this->TagSize)
     {
-    if(sizeof(long) == sizeof(vtkTypeInt64)) 
+    if(sizeof(long) == sizeof(vtkTypeInt64))
       {
       tag = vtkLongArray::New();
       }
@@ -379,7 +379,7 @@ int vtkACosmoReader::ReadFile(vtkUnstructuredGrid *output)
     }
   else
     {
-    if(sizeof(int) == sizeof(vtkTypeInt32)) 
+    if(sizeof(int) == sizeof(vtkTypeInt32))
       {
       tag = vtkIntArray::New();
       }
@@ -393,7 +393,7 @@ int vtkACosmoReader::ReadFile(vtkUnstructuredGrid *output)
       tag = vtkLongLongArray::New();
       }
 #endif
-    else 
+    else
       {
       vtkErrorMacro("Unable to match 32-bit int type to a compiler type. " <<
                     "Going to use int array to store tag data. " <<
@@ -410,12 +410,12 @@ int vtkACosmoReader::ReadFile(vtkUnstructuredGrid *output)
   velocity->SetNumberOfComponents(DIMENSION);
   velocity->SetNumberOfTuples(numberOfParticles);
   output->GetPointData()->AddArray(velocity);
-  
+
   tag->SetName("tag");
   tag->SetNumberOfComponents(1);
   tag->SetNumberOfTuples(numberOfParticles);
   output->GetPointData()->AddArray(tag);
-  
+
   /*
   mass->SetName("mass");
   mass->SetNumberOfComponents(1);
@@ -433,12 +433,12 @@ int vtkACosmoReader::ReadFile(vtkUnstructuredGrid *output)
 
   for (vtkIdType i = 0; i < numberOfParticles; i = i + 1)
     {
-    
+
     /*
     // update progress
-    if (i % chunksize == 0) 
+    if (i % chunksize == 0)
       {
-      double progress = (double)i / (double)(numberOfParticles); 
+      double progress = (double)i / (double)(numberOfParticles);
 
       this->UpdateProgress(progress);
       }
@@ -451,13 +451,13 @@ int vtkACosmoReader::ReadFile(vtkUnstructuredGrid *output)
       */
 
     // Read the floating point part of the data
-    this->FileStream->read((char*)fBlock, 
+    this->FileStream->read((char*)fBlock,
                            NUMBER_OF_FLOATS * sizeof(vtkTypeFloat32));
 
     size_t returnValue = this->FileStream->gcount();
     if (returnValue != NUMBER_OF_FLOATS * sizeof(vtkTypeFloat32))
       {
-      vtkErrorMacro(<< "Only read " 
+      vtkErrorMacro(<< "Only read "
                     << returnValue << " bytes when reading floats.");
       this->SetErrorCode(vtkErrorCode::PrematureEndOfFileError);
       continue;
@@ -468,7 +468,7 @@ int vtkACosmoReader::ReadFile(vtkUnstructuredGrid *output)
     returnValue = this->FileStream->gcount();
     if (returnValue != NUMBER_OF_INTS * tagBytes)
       {
-      vtkErrorMacro(<< "Only read " 
+      vtkErrorMacro(<< "Only read "
                     << returnValue << " bytes when reading ints.");
       this->SetErrorCode(vtkErrorCode::PrematureEndOfFileError);
       continue;
@@ -478,14 +478,14 @@ int vtkACosmoReader::ReadFile(vtkUnstructuredGrid *output)
 #ifdef VTK_WORDS_BIG_ENDIAN
     if(this->ByteOrder == FILE_LITTLE_ENDIAN)
       {
-      vtkByteSwap::SwapVoidRange(fBlock, NUMBER_OF_FLOATS, 
+      vtkByteSwap::SwapVoidRange(fBlock, NUMBER_OF_FLOATS,
                                  (int)sizeof(vtkTypeFloat32));
       vtkByteSwap::SwapVoidRange(iBlock, NUMBER_OF_INTS, (int)tagBytes);
       }
 #else
     if(this->ByteOrder == FILE_BIG_ENDIAN)
       {
-      vtkByteSwap::SwapVoidRange(fBlock, NUMBER_OF_FLOATS, 
+      vtkByteSwap::SwapVoidRange(fBlock, NUMBER_OF_FLOATS,
                                  (int)sizeof(vtkTypeFloat32));
       vtkByteSwap::SwapVoidRange(iBlock, NUMBER_OF_INTS, (int)tagBytes);
       }
@@ -500,7 +500,7 @@ int vtkACosmoReader::ReadFile(vtkUnstructuredGrid *output)
       (fBlock[Z] > this->BoxSize ? fBlock[Z] - this->BoxSize : fBlock[Z]);
 
     // Insert the location into the point array
-    vtkIdType vtkPointID = 
+    vtkIdType vtkPointID =
       points->InsertNextPoint(fBlock[X], fBlock[Y], fBlock[Z]);
     output->InsertNextCell(1, 1, &vtkPointID);
 
@@ -511,7 +511,7 @@ int vtkACosmoReader::ReadFile(vtkUnstructuredGrid *output)
     //mass->SetComponent(vtkPointID, 0, fBlock[MASS]);
 
     double value;
-    if(this->TagSize) 
+    if(this->TagSize)
       {
       value = *((vtkTypeInt64*)iBlock);
       }
@@ -520,7 +520,7 @@ int vtkACosmoReader::ReadFile(vtkUnstructuredGrid *output)
       value = *((vtkTypeInt32*)iBlock);
       }
     tag->SetComponent(vtkPointID, 0, value);
-    
+
     } // end loop over PositionRange
 
   // Clean up internal storage
@@ -530,7 +530,7 @@ int vtkACosmoReader::ReadFile(vtkUnstructuredGrid *output)
   tag->Delete();
   points->Delete();
   output->Squeeze();
- 
+
   // Close the file stream just read
   delete this->FileStream;
   this->FileStream = 0;
@@ -547,7 +547,7 @@ int vtkACosmoReader::ProcessRequest(vtkInformation *request,
   this->Resolution = 1.0;
   if(outInfo->Has(vtkStreamingDemandDrivenPipeline::UPDATE_RESOLUTION()))
     {
-    this->Resolution = 
+    this->Resolution =
       outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_RESOLUTION());
     }
   this->currentLevel = (vtkIdType)(this->maxlevel * this->Resolution + .5);

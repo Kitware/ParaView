@@ -28,7 +28,7 @@ public:
   int BufferSize;
 };
 
-class vtkPieceListByPriority 
+class vtkPieceListByPriority
 {
 public:
   bool operator() (vtkPiece *one, vtkPiece *two)
@@ -91,7 +91,7 @@ void vtkPieceList::Clear()
   for (unsigned int i = 0; i < this->Internals->Pieces.size(); i++)
     {
     this->Internals->Pieces[i]->UnRegister(this);
-    }  
+    }
   this->Internals->Pieces.clear();
 }
 
@@ -142,7 +142,7 @@ void vtkPieceList::Print()
 
 //-------------------------------------------------------------------------
 void vtkPieceList::Serialize()
-{  
+{
   if (this->Internals->SerializeBuffer != NULL)
     {
     delete[] this->Internals->SerializeBuffer;
@@ -240,4 +240,3 @@ void vtkPieceList::CopyInternal(vtkPieceList *other, int merge)
     other->Clear();
     }
 }
-

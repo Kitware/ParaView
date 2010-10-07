@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   Visualization Toolkit
-  Module:    vtkRawStridedReader2.h
+  Module:    vtkRawStridedReader1.h
 
   Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
   All rights reserved.
@@ -12,30 +12,31 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkRawStridedReader2 - reads raw binary files, will optionally subsample
+// .NAME vtkRawStridedReader1 - reads raw binary files, will optionally subsample
 // .SECTION Description
-// vtkRawStridedReader2 is a source object that reads raw binary files. The files are 
-// assumed to contain nothing but floating point numbers. The caller must provide 
+// vtkRawStridedReader is a source object that reads raw binary files. The files are
+// assumed to contain nothing but floating point numbers. The caller must provide
 // the spacing and extent in i, j, and k directions.
-// This stride parameter, which tells the reader to subsample as it reads, 
+// This stride parameter, which tells the reader to subsample as it reads,
 // reading every n'th value (in i, j, and/or k) to speed up file I/O and later
 // processing in the pipeline.
 
-#ifndef __vtkRawStridedReader2_h
-#define __vtkRawStridedReader2_h
+#ifndef __vtkRawStridedReader1_h
+#define __vtkRawStridedReader1_h
 
 #include "vtkImageAlgorithm.h"
 
+class vtkRSRFileSkimmer1;
 class vtkMetaInfoDatabase;
-class vtkGridSampler2;
+class vtkGridSampler1;
 
-class VTK_EXPORT vtkRawStridedReader2 : public vtkImageAlgorithm
+class VTK_EXPORT vtkRawStridedReader1 : public vtkImageAlgorithm
 {
 public:
-  static vtkRawStridedReader2 *New();
-  vtkTypeMacro(vtkRawStridedReader2,vtkImageAlgorithm);
+  static vtkRawStridedReader1 *New();
+  vtkTypeMacro(vtkRawStridedReader1,vtkImageAlgorithm);
   virtual void PrintSelf(ostream& os, vtkIndent indent);
-  
+
   //By default the byte order is not swapped
   virtual void SwapDataByteOrder(int i);
 
@@ -51,15 +52,15 @@ public:
   vtkSetVector3Macro(Spacing, double);
   vtkGetVector3Macro(Spacing, double);
 
-  // Description:
-  // Checks for presence of preprocessed files.
-  int CanReadFile(const char *filename);
+  vtkSetVector3Macro(Stride, int);
+  vtkGetVector3Macro(Stride, int);
+
+  vtkSetMacro(BlockReadSize, int);
+  vtkGetMacro(BlockReadSize, int);
 
 protected:
-  vtkRawStridedReader2();
-  ~vtkRawStridedReader2();
-
-  int Read(float* data, int* uExtents);
+  vtkRawStridedReader1();
+  ~vtkRawStridedReader1();
 
   // Description:
   // Overridden to provide meta info when available and to catch whole extent requests
@@ -69,7 +70,7 @@ protected:
 
   // Description:
   // Reads file and produces requested data.
-  virtual int RequestData(    
+  virtual int RequestData(
     vtkInformation* request,
     vtkInformationVector** inputVector,
     vtkInformationVector* outputVector);
@@ -81,44 +82,45 @@ protected:
     vtkInformationVector** inputVector,
     vtkInformationVector* outputVector);
 
+  // Description:
+  // Overridden for debugging.
+  virtual int RequestUpdateExtent(
+    vtkInformation* request,
+    vtkInformationVector** inputVector,
+    vtkInformationVector* outputVector);
+
   char *Filename;
   int WholeExtent[6];
+  int Dimensions[3];
   double Origin[3];
   double Spacing[3];
-  int SwapBytes;
+
+  //user requested stride
+  int Stride[3];
+  int UpdateExtent[6];
 
   //actual produced resolution
   double Resolution;
-  int sWholeExtent[6];
-  double sSpacing[3];
+
+  //computed stride
+  int SI;
+  int SJ;
+  int SK;
+
+  //buffer size to read off of disk into
+  int BlockReadSize;
+
+  //Does file I/O
+  vtkRSRFileSkimmer1 *Skimmer;
 
   //Stores meta information as it is obtained.
   vtkMetaInfoDatabase *RangeKeeper;
 
   //Does resolution to stride mapping
-  vtkGridSampler2 *GridSampler;
-  
-  // stuff to do memory maps
-  FILE* fp;
-  int fd;
-  char* lastname;
-  vtkIdType lastresolution;
-
-#ifndef _WIN32
-  int chunk;
-  float* map;
-  size_t mapsize;
-  void TearDownMap();
-  void SetupMap(int);  
-#endif
-
-  void SetupFile();
-  void TearDownFile();
+  vtkGridSampler1 *GridSampler;
 
 private:
-  vtkRawStridedReader2(const vtkRawStridedReader2&);  // Not implemented.
-  void operator=(const vtkRawStridedReader2&);  // Not implemented.
+  vtkRawStridedReader1(const vtkRawStridedReader1&);  // Not implemented.
+  void operator=(const vtkRawStridedReader1&);  // Not implemented.
 };
 #endif
-
-

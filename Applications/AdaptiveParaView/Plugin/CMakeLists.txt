@@ -4,36 +4,17 @@ INCLUDE_DIRECTORIES(
 )
 
 SET(ADAPTIVE_SS_SOURCES
-  vtkPiece.cxx 
-  vtkPieceCacheFilter.cxx
-  vtkPieceCacheExecutive.cxx
-  vtkPieceList.cxx
+  vtkAdaptiveFactory.cxx
+  vtkAdaptiveUpdateSuppressor.cxx
   vtkPVSGeometryInformation.cxx
-  vtkRawStridedReader1.cxx
-  vtkGridSampler1.cxx
-  vtkGridSampler2.cxx
-  vtkACosmoReader.cxx
-  vtkMetaInfoDatabase.cxx
-#  vtkSMSImageDataParallelStrategy.cxx
+  vtkSMAdaptiveOptionsProxy.cxx
   vtkSMAdaptiveOutlineRepresentation.cxx 
   vtkSMAdaptiveOutputPort.cxx
   vtkSMAdaptiveRepresentation.cxx 
   vtkSMAdaptiveSerialStrategy.cxx 
-  vtkSMAdaptiveOptionsProxy.cxx
   vtkSMAdaptiveViewHelper.cxx
   vtkSMAdaptiveViewProxy.cxx 
-#  vtkSMSUniformGridParallelStrategy.cxx
-#  vtkSMSUnstructuredDataParallelStrategy.cxx
-#  vtkSMSUnstructuredGridParallelStrategy.cxx
-  vtkAdaptiveFactory.cxx
-  vtkAdaptiveOptions.cxx
-  vtkAdaptiveUpdateSuppressor.cxx
-  vtkVisibilityPrioritizer.cxx
 )
-
-IF(NOT WIN32)
-  SET(ADAPTIVE_SS_SOURCES ${ADAPTIVE_SS_SOURCES} vtkRawStridedReader2.cxx)
-ENDIF(NOT WIN32)
 
 # arguments for the server side pieces of the plugin
 SET(SERVER_ARGS
