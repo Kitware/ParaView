@@ -1,5 +1,4 @@
 # This is where the logic resides for verifying the source tree layout.
-# This is necessary due to the moves made in Titan's source tree.
 
 function(CheckGitDirectory path)
   # Emit a fatal error and inform the user to init their submodules.
@@ -15,7 +14,7 @@ function(CheckGitDirectory path)
   endif()
 endfunction(CheckGitDirectory)
 
-set(ParaView_Submodules VTK Utilities/IceT Utilities/Xdmf2)
+set(ParaView_Submodules VTK Utilities/IceT Utilities/Xdmf2 Qt/Testing)
 
 foreach(submodule ${ParaView_Submodules})
   # If this is a git checkout, then check the submodules were initialized.
