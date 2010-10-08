@@ -27,6 +27,8 @@
 #include "vtkObject.h"
 #include "vtkClientServerID.h" // needed for UniqueID.
 
+#include "vtkProcessModuleAutoMPI.h"
+
 class vtkCacheSizeKeeper;
 class vtkCallbackCommand;
 class vtkClientServerInterpreter;
@@ -70,6 +72,7 @@ public:
     RENDER_SERVER_ROOT = 0x08,
     SERVERS = DATA_SERVER | RENDER_SERVER,
     CLIENT = 0x10,
+    SERVER = 0X100,
     CLIENT_AND_SERVERS = DATA_SERVER | CLIENT | RENDER_SERVER
     };
 
@@ -763,7 +766,9 @@ private:
   friend class vtkProcessModuleCleanup;
   class vtkInterpreterInitializationCallbackVector;
   static vtkInterpreterInitializationCallbackVector* InitializationCallbacks;
-//ETX
+
+  vtkProcessModuleAutoMPI *AutoMPI;
+  //ETX
 };
 
 
