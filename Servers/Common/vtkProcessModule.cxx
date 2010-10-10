@@ -647,7 +647,6 @@ vtkIdType vtkProcessModule::ConnectToSelf()
     {
     this->IsAutoMPI = 1;
     int port = this->AutoMPI->ConnectToRemoteBuiltInSelf();
-    printf("Starting Server in Port: %d",port);
     return this->ConnectionManager->OpenConnection("localhost",port);
     }
   else
