@@ -44,8 +44,8 @@ vtkSMRepresentationStrategy* vtkSMMultiProcessRenderView::NewStrategyInternal(
     return this->NewStrategyHelper->NewStrategyInternal(dataType);
     }
 
-  
- 
+
+
   vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
   vtkSMRepresentationStrategy* strategy = 0;
 
@@ -101,14 +101,14 @@ bool vtkSMMultiProcessRenderView::GetCompositingDecision(
 void vtkSMMultiProcessRenderView::BeginStillRender()
 {
   // When BeginStillRender() is called, none of the representations have been
-  // updated. However, if any of the visible representations need an update, 
+  // updated. However, if any of the visible representations need an update,
   // then when we call GetVisibileFullResDataSize() we are assured that the
   // representations will atleast be partially updated (until before they start
   // moving the data around) to ensure that correct data sizes are obtained.
 
   // Find out whether we are going to render with or without compositing.
   // We use the full res data size for this decision.
-  this->LastCompositingDecision = 
+  this->LastCompositingDecision =
     this->GetCompositingDecision(this->GetVisibileFullResDataSize(), 1);
 
   this->SetUseCompositing(this->LastCompositingDecision);
@@ -127,7 +127,7 @@ void vtkSMMultiProcessRenderView::BeginInteractiveRender()
   // GetVisibleDisplayedDataSize() will update the LOD pipeline (atleast
   // partially) if required to obtain correct data sizes.
 
-  this->LastCompositingDecision = 
+  this->LastCompositingDecision =
     this->GetCompositingDecision(this->GetVisibileFullResDataSize(), 0);
 
   this->SetUseCompositing(this->LastCompositingDecision);
@@ -148,7 +148,11 @@ void vtkSMMultiProcessRenderView::EndCreateVTKObjects()
 
   // Check if it's possible to access display on the server side.
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-
+  if(pm->GetIsAutoMPI())
+    {
+    this->RemoteRenderAvailable = false;
+    return;
+    }
   vtkPVServerInformation* serverInfo = pm->GetServerInformation(this->ConnectionID);
   if (serverInfo && !serverInfo->GetRemoteRendering())
     {
@@ -157,7 +161,7 @@ void vtkSMMultiProcessRenderView::EndCreateVTKObjects()
   else
     {
     vtkPVDisplayInformation* di = vtkPVDisplayInformation::New();
-    pm->GatherInformation(this->ConnectionID, 
+    pm->GatherInformation(this->ConnectionID,
       vtkProcessModule::RENDER_SERVER, di, pm->GetProcessModuleID());
     this->RemoteRenderAvailable = (di->GetCanOpenDisplay() == 1);
     di->Delete();
@@ -185,7 +189,7 @@ const char* vtkSMMultiProcessRenderView::IsSelectVisibleCellsAvailable()
 
 //----------------------------------------------------------------------------
 vtkSelection *vtkSMMultiProcessRenderView::SelectVisibleCells(
-  unsigned int x0, unsigned int y0, 
+  unsigned int x0, unsigned int y0,
   unsigned int x1, unsigned int y1, int ofPoints)
 {
   if (!this->IsSelectionAvailable())
@@ -206,7 +210,7 @@ vtkSelection *vtkSMMultiProcessRenderView::SelectVisibleCells(
     // first server-side render.
     this->StillRender();
     }
-  vtkSelection* reply = 
+  vtkSelection* reply =
     this->Superclass::SelectVisibleCells(x0, y0, x1, y1, ofPoints);
   this->SetRemoteRenderThreshold(compThresh);
   return reply;
@@ -216,9 +220,9 @@ vtkSelection *vtkSMMultiProcessRenderView::SelectVisibleCells(
 void vtkSMMultiProcessRenderView::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  os << indent << "RemoteRenderThreshold: " 
+  os << indent << "RemoteRenderThreshold: "
     << this->RemoteRenderThreshold << endl;
-  os << indent << "RemoteRenderAvailable: " 
+  os << indent << "RemoteRenderAvailable: "
     << this->RemoteRenderAvailable << endl;
 }
 

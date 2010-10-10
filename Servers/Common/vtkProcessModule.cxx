@@ -197,7 +197,7 @@ vtkProcessModule::vtkProcessModule()
   vtkMapper::SetResolveCoincidentTopologyToShiftZBuffer();
   vtkMapper::SetResolveCoincidentTopologyZShift(2.0e-3);
 
-  AutoMPI = new vtkProcessModuleAutoMPI();
+  this->AutoMPI = vtkProcessModuleAutoMPI::New();
 }
 
 //-----------------------------------------------------------------------------
@@ -237,6 +237,7 @@ vtkProcessModule::~vtkProcessModule()
 
   this->CacheSizeKeeper->Delete();
   this->SetLastProgressName(0);
+  this->AutoMPI->Delete();
 }
 
 //-----------------------------------------------------------------------------
@@ -644,12 +645,14 @@ vtkIdType vtkProcessModule::ConnectToSelf()
   // connect to self
   if(this->AutoMPI->isPossible())
     {
+    this->IsAutoMPI = 1;
     int port = this->AutoMPI->ConnectToRemoteBuiltInSelf();
-    printf("Free port is %d",port);
+    printf("Starting Server in Port: %d",port);
     return this->ConnectionManager->OpenConnection("localhost",port);
     }
   else
     {
+    this->IsAutoMPI = 0;
     return this->ConnectionManager->OpenSelfConnection();
     }
 }

@@ -31,34 +31,21 @@ public:
   int getFreePort();
 };
 
-class vtkProcessModuleAutoMPI
+class VTK_EXPORT vtkProcessModuleAutoMPI: public vtkObject
 {
 public:
+  static vtkProcessModuleAutoMPI* New();
+  vtkTypeMacro(vtkProcessModuleAutoMPI, vtkObject);
+  void PrintSelf(ostream& os, vtkIndent indent);
+
   static int UseMulticoreProcessors;
   vtkProcessModuleAutoMPI();
   ~vtkProcessModuleAutoMPI();
 
   int isPossible();
-//     {
-//   if(this->HasMulticoreProcessors && UseMulticoreProcessors)
-//     {
-//     return 1;
-//     }
-//   else
-//     {
-//     return 0;
-//     }
-// }
-
   int ConnectToRemoteBuiltInSelf ();
 
-  // static void setUse(bool usageFlag){
-//     UseMulticoreProcessors = usageFlag;
-//     }
-
 private:
- //  static bool getUse(){return vtkProcessModuleAutoMPI::UseMulticoreProcessors;}
-
   void SeparateArguments(const char* str,
                          vtkstd::vector<vtkstd::string>& flags);
   int StartRemoteBuiltInSelf (const char* servername,int port);
@@ -80,7 +67,7 @@ private:
                           const char* paraView,
                           const char* numProc,
                           int port);
-  void CollectConfiguredOptions ();
+  bool CollectConfiguredOptions ();
 
 private:
   // This specify the preflags and post flags that can be set using:
@@ -95,7 +82,7 @@ private:
   vtkstd::vector<vtkstd::string> MPIServerPostFlags;
 
   int TotalMulticoreProcessors;
-  int HasMulticoreProcessors;
+  //int HasMulticoreProcessors;
   //int UseMulticoreProcessors;
   double TimeOut;
   vtkstd::string ParaView;  // fullpath to paraview executable
