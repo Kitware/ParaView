@@ -68,6 +68,7 @@ private:
                           const char* numProc,
                           int port);
   bool CollectConfiguredOptions ();
+  bool SetMPIRun(vtkstd::string mpiexec);
 
 private:
   // This specify the preflags and post flags that can be set using:

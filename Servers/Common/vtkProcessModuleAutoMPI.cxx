@@ -52,7 +52,9 @@ vtkProcessModuleAutoMPI::~vtkProcessModuleAutoMPI()
  */
 int vtkProcessModuleAutoMPI::isPossible()
 {
-   this->TotalMulticoreProcessors = vtkMultiThreader::GetGlobalDefaultNumberOfThreads();
+   this->TotalMulticoreProcessors =
+     vtkMultiThreader::GetGlobalDefaultNumberOfThreads();
+
 #ifdef VTK_USE_MPI
    if( this->TotalMulticoreProcessors >1
      && UseMulticoreProcessors
@@ -136,6 +138,34 @@ int vtkProcessModuleAutoMPI::StartRemoteBuiltInSelf(const char* servername,int p
 #define PARAVIEW_SERVER "pvserver"
 
 //-----------------------------------------------------------------------method
+/*
+ * Used to set the this->MPIRun variable to the appropriate MPI path
+ *
+ */
+bool vtkProcessModuleAutoMPI::SetMPIRun(vtkstd::string mpiexec)
+{
+  mpiexec = vtksys::SystemTools::GetFilenameName(mpiexec);
+  vtkPVOptions* options = vtkProcessModule::GetProcessModule()->GetOptions();
+  vtkstd::string app_dir = options->GetApplicationPath();
+  app_dir = vtksys::SystemTools::GetProgramPath(app_dir.c_str())+"/"+mpiexec;
+  if(vtksys::SystemTools::FileExists(app_dir.c_str(),true))
+    {
+    this->MPIRun = app_dir;
+    return 1;
+    }
+  else
+    {
+    return 0;
+    }
+}
+
+//-----------------------------------------------------------------------method
+/*
+ * This method collects numerous configuration options which will be
+ * used to compute the MPI execution command to start the AutoMPI
+ *
+ * @return 1 if the configuration options were obtained successfully. 0 if failed
+ */
 bool vtkProcessModuleAutoMPI::CollectConfiguredOptions()
 {
 // set the path to the binary directory
@@ -149,42 +179,15 @@ bool vtkProcessModuleAutoMPI::CollectConfiguredOptions()
   // now find all the mpi information if mpi run is set
 #ifdef VTK_USE_MPI
 #ifdef VTK_MPIRUN_EXE
-  if(vtksys::SystemTools::FileExists(VTK_MPIRUN_EXE,true))
+  if(!SetMPIRun(VTK_MPIRUN_EXE))
     {
     this->MPIRun = VTK_MPIRUN_EXE;
     }
-  else
-    {
-    vtkPVOptions* options = vtkProcessModule::GetProcessModule()->GetOptions();
-    vtkstd::string app_dir = options->GetApplicationPath();
-    app_dir = vtksys::SystemTools::GetProgramPath(app_dir.c_str())+"/mpiexec";
-    if(vtksys::SystemTools::FileExists(app_dir.c_str(),true))
-      {
-      this->MPIRun = app_dir;
-      }
-    else
-      {
-      cerr << "AutoMPI Error: "+ app_dir +" not found"
-           << endl;
-      return 0;
-      }
-    }
 #else
-  vtkPVOptions* options = vtkProcessModule::GetProcessModule()->GetOptions();
-  vtkstd::string app_dir = options->GetApplicationPath();
-  app_dir = vtksys::SystemTools::GetProgramPath(app_dir.c_str())+"/mpiexec";
-  if(vtksys::SystemTools::FileExists(app_dir.c_str(),true))
-    {
-    this->MPIRun = app_dir;
-    }
-  else
-    {
-    cerr << "AutoMPI Error: " << app_dir << " not found" <<endl
-         << "               " << "OR" <<endl
-         << "               " << "VTK_MPIRUN_EXE must be set when VTK_USE_MPI is on."
+    cerr << "AutoMPI Error: "
+         << "VTK_MPIRUN_EXE must be set when VTK_USE_MPI is on."
          << endl;
     return 0;
-    }
 #endif
   if(this->TotalMulticoreProcessors >1)
     {
@@ -221,6 +224,14 @@ bool vtkProcessModuleAutoMPI::CollectConfiguredOptions()
 }
 
 //-----------------------------------------------------------------------method
+/**
+ * The command line to be processed is created by this method
+ *
+ * @param commandLine holds commands which will be processed to start server
+ * @param paraView the location of paraview server
+ * @param numProc the total number of processes for MPI
+ * @param port the port where the server will be listening
+ */
 void
 vtkProcessModuleAutoMPI::CreateCommandLine(vtksys_stl::vector<const char*>& commandLine,
                                            const char* paraView,
@@ -254,10 +265,6 @@ vtkProcessModuleAutoMPI::CreateCommandLine(vtksys_stl::vector<const char*>& comm
   portString+=temp;
   portString+='\0';
   commandLine.push_back(paraView);
-  // for(unsigned int i = 0; i < portString.size(); ++i)
-//     {
-//     commandLine.push_back(portString[i].c_str());
-//     }
   commandLine.push_back(portString.c_str());
 
   for(unsigned int i = 0; i < this->MPIPostFlags.size(); ++i)
@@ -269,8 +276,6 @@ vtkProcessModuleAutoMPI::CreateCommandLine(vtksys_stl::vector<const char*>& comm
     {
     commandLine.push_back(this->MPIServerPostFlags[i].c_str());
     }
-
-  //commandLine.push_back("--use-offscreen-rendering");
   commandLine.push_back(0);
 }
 
