@@ -399,7 +399,7 @@
       <!-- End of PrismCubeAxesActor -->
     </Proxy>
  </ProxyGroup>
- <ProxyGroup name="PrismFilters">
+ <ProxyGroup name="filters">
    <SourceProxy name="PrismFilter"
                 class="vtkPrismFilter">
      <OutputPort name="SESAME Surface" index="0" />

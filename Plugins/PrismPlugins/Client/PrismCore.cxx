@@ -474,7 +474,7 @@ void PrismCore::onCreatePrismView(const QStringList& files)
     QMap<QString,QVariant> defaultProperties;
     defaultProperties["FileName"]=files;
 
-    filter = builder->createFilter("PrismFilters", "PrismFilter", namedInputs, server,defaultProperties);
+    filter = builder->createFilter("filters", "PrismFilter", namedInputs, server,defaultProperties);
 
  //   vtkSMProperty *fileNameProperty=filter->getProxy()->GetProperty("FileName");
 
@@ -777,8 +777,8 @@ void PrismCore::onSelectionChanged()
     pqServerManagerModelItem *item = this->getActiveObject();
     pqPipelineSource *source = dynamic_cast<pqPipelineSource *>(item);
     vtkSMProxyManager *proxyManager = vtkSMProxyManager::GetProxyManager();
-    proxyManager->InstantiateGroupPrototypes("PrismFilters");
-    vtkSMProxy* prismFilter = proxyManager->GetProxy("PrismFilters_prototypes", "PrismFilter");
+    proxyManager->InstantiateGroupPrototypes("filters");
+    vtkSMProxy* prismFilter = proxyManager->GetProxy("filters_prototypes", "PrismFilter");
 
     if (source && prismFilter)
         {

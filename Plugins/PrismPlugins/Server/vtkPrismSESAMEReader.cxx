@@ -553,10 +553,14 @@ void vtkPrismSESAMEReader::ExecuteInformation()
           this->Internal->TableIds.push_back(tableId);
           long loc = ftell(this->Internal->File);
           this->Internal->TableLocations.push_back(loc);
-          }
         }
       }
     }
+
+    this->Internal->TableId=this->Internal->TableIds.at(0);
+
+  }
+
 
   if(this->Internal->TableId != -1 &&
     this->Internal->TableArrays.empty())

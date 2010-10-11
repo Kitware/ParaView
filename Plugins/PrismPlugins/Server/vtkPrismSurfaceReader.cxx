@@ -773,17 +773,22 @@ void vtkPrismSurfaceReader::SetThresholdYBetween(double lower, double upper)
 
 
 vtkStringArray* vtkPrismSurfaceReader::GetAxisVarNames()
-    {
-    this->Internal->ArrayNames->Reset();
-    //this->Internal->ArrayNames->InsertNextValue("Density");
-    //this->Internal->ArrayNames->InsertNextValue("Temperature");
+{
+  this->Internal->ArrayNames->Reset();
+  //this->Internal->ArrayNames->InsertNextValue("Density");
+  //this->Internal->ArrayNames->InsertNextValue("Temperature");
 
+  if(this->Internal->Reader->GetTableXAxisName())
+  {
+    this->Internal->ArrayNames->InsertNextValue(this->Internal->Reader->GetTableXAxisName());
+  }
+  if(this->Internal->Reader->GetTableYAxisName())
+  {
+    this->Internal->ArrayNames->InsertNextValue(this->Internal->Reader->GetTableYAxisName());
+  }
 
-this->Internal->ArrayNames->InsertNextValue(this->Internal->Reader->GetTableXAxisName());
-this->Internal->ArrayNames->InsertNextValue(this->Internal->Reader->GetTableYAxisName());
-
-    int numberArrayNames=this->Internal->Reader->GetNumberOfTableArrayNames();
-    for(int i=0;i<numberArrayNames;i++)
+  int numberArrayNames=this->Internal->Reader->GetNumberOfTableArrayNames();
+  for(int i=0;i<numberArrayNames;i++)
         {
         vtkStdString str=this->Internal->Reader->GetTableArrayName(i);
         vtkStdString::size_type pos=str.find_first_of(":");
@@ -1104,6 +1109,11 @@ int vtkPrismSurfaceReader::RequestData(
             }
         }
 
+    if(!xFound && yFound && zFound)
+    {
+      vtkDebugMacro( << "SESAME arrays not found" );
+      return 0;
+    }
 
     for(ptId=0;ptId<numPts;ptId++)
         {
