@@ -3,7 +3,6 @@ PROJECT(pqApplicationComponents)
 INCLUDE_DIRECTORIES(
   ${pqApplicationComponents_SOURCE_DIR}
   ${pqApplicationComponents_BINARY_DIR}
-  ${pqApplicationComponents_BINARY_DIR}/Resources/UI
   ${pqComponents_BINARY_DIR}
   ${pqComponents_SOURCE_DIR}
   ${pqComponents_BINARY_DIR}/Resources/UI
@@ -14,7 +13,6 @@ INCLUDE_DIRECTORIES(
   ${ParaView_SOURCE_DIR}/VTK/GUISupport/Qt
   ${ParaView_BINARY_DIR}/VTK/GUISupport/Qt
   ${ParaView_SOURCE_DIR}/VTK/GUISupport/Qt/Chart
-  ${ParaView_BINARY_DIR}/VTK/GUISupport/Qt/Chart
   ${QtTesting_SOURCE_DIR}
   ${QtTesting_BINARY_DIR}
   ${QtWidgets_SOURCE_DIR}
