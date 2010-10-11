@@ -83,8 +83,6 @@ private:
   vtkstd::vector<vtkstd::string> MPIServerPostFlags;
 
   int TotalMulticoreProcessors;
-  //int HasMulticoreProcessors;
-  //int UseMulticoreProcessors;
   double TimeOut;
   vtkstd::string ParaView;  // fullpath to paraview executable
   vtkstd::string ParaViewServer;  // fullpath to paraview server executable
