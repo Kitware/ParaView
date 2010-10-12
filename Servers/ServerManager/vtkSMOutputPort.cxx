@@ -565,25 +565,9 @@ void vtkSMOutputPort::InsertPostFilterIfNecessary()
     return;
     }
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  const char* className = this->GetClassNameInformation()->GetVTKClassName();
   vtkClientServerStream stream;
   vtkClientServerID tempPostFilter;
-
-
-  stream << vtkClientServerStream::Invoke
-    << this->GetProducerID() << "UpdateInformation"
-    << vtkClientServerStream::End;
-  pm->SendStream(this->ConnectionID,
-    this->Servers,
-    stream);
   tempPostFilter = pm->NewStreamObject("vtkPVPostFilter", stream);
-
-
-  // If no filter is to be inserted, just return.
-  if(tempPostFilter.ID == 0)
-    {
-    return;
-    }
 
   // Set the right executive
   vtkClientServerID execId = pm->NewStreamObject(
