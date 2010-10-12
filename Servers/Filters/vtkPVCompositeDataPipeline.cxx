@@ -32,6 +32,7 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkObjectFactory.h"
 #include "vtkPVPostFilterExecutive.h"
 
+#include <assert.h>
 
 vtkStandardNewMacro(vtkPVCompositeDataPipeline);
 
@@ -58,22 +59,39 @@ void vtkPVCompositeDataPipeline::CopyDefaultInformation(
 
   if (request->Has(REQUEST_UPDATE_EXTENT()))
     {
-    if (this->GetNumberOfInputPorts() > 0)
+    vtkInformation* algorithmInfo = this->Algorithm->GetInformation();
+
+    // All SetInputArrayToProcess() calls result in updating this algorithmInfo
+    // object.
+    vtkInformationVector *inArrayVec =
+      algorithmInfo->Get(vtkAlgorithm::INPUT_ARRAYS_TO_PROCESS());
+    int num_arrays =
+      inArrayVec? inArrayVec->GetNumberOfInformationObjects(): 0;
+    for (int array_index=0; array_index < num_arrays; array_index++)
       {
-      int index = 0;
-      //TODO:
-      //we need to support multiple inputs
-      //and multiple connections on the first input
-      vtkInformation *inArrayInfo = this->Algorithm->GetInputArrayInformation(index);
-      if (inArrayInfo && inArrayInfo->Has(vtkAlgorithm::INPUT_PORT()))
+      vtkInformation* arrayInfo =
+        this->Algorithm->GetInputArrayInformation(array_index);
+      // currently, we only support conversion for array set using FIELD_NAME().
+      if (arrayInfo->Has(vtkDataObject::FIELD_NAME()) &&
+        arrayInfo->Has(vtkAlgorithm::INPUT_PORT()) &&
+        arrayInfo->Has(vtkAlgorithm::INPUT_CONNECTION()) &&
+        arrayInfo->Has(vtkDataObject::FIELD_ASSOCIATION()))
         {
-        vtkExecutive* e = this->GetInputExecutive(0,0);
-        //make sure the executive is of the correct type
-        vtkPVPostFilterExecutive *pvpfe =
-          vtkPVPostFilterExecutive::SafeDownCast(e);
-        if(pvpfe)
+        int port = arrayInfo->Get(vtkAlgorithm::INPUT_PORT());
+        int connection = arrayInfo->Get(vtkAlgorithm::INPUT_CONNECTION());
+        if (port < 0 || port >= this->GetNumberOfInputPorts() ||
+          connection < 0 || connection >= this->GetNumberOfInputConnections(port))
           {
-          pvpfe->SetPostArrayToProcessInformation(index,inArrayInfo);
+          continue;
+          }
+        vtkExecutive* input_executive = this->GetInputExecutive(port, connection);
+        vtkPVPostFilterExecutive *pvpfe =
+          vtkPVPostFilterExecutive::SafeDownCast(input_executive);
+        if (pvpfe)
+          {
+          assert(this->Algorithm->GetInputConnection(
+              port, connection)->GetIndex() == 0);
+          pvpfe->SetPostArrayToProcessInformation(0, arrayInfo);
           }
         }
       }

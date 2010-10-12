@@ -14,39 +14,44 @@ PURPOSE.  See the above copyright notice for more information.
 =========================================================================*/
 #include "vtkPVPostFilter.h"
 
+#include "vtkArrayIteratorIncludes.h"
+#include "vtkCellData.h"
+#include "vtkCellDataToPointData.h"
 #include "vtkCommand.h"
+#include "vtkCompositeDataIterator.h"
+#include "vtkCompositeDataSet.h"
+#include "vtkDataArray.h"
 #include "vtkDataObject.h"
 #include "vtkDataSet.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkObjectFactory.h"
+#include "vtkPointData.h"
+#include "vtkPointDataToCellData.h"
 #include "vtkPVPostFilterExecutive.h"
 
-#include "vtkDataArray.h"
-#include "vtkCellData.h"
-#include "vtkPointData.h"
-
-#include "vtkCellDataToPointData.h"
-#include "vtkPointDataToCellData.h"
-#include "vtkArrayCalculator.h"
-
-vtkStandardNewMacro(vtkPVPostFilter);
+#include <vtksys/SystemTools.hxx>
+#include <vtkstd/string>
+#include <assert.h>
 
 namespace
 {
-  enum PropertyConversion
+  void DeMangleArrayName(vtkstd::string mangledName, vtkstd::string seperator,
+    vtkstd::string& demangled_name, vtkstd::string& demagled_component_name)
     {
-    PointToCell = 1 << 1,
-    CellToPoint = 1 << 2,
-    AlsoVectorProperty = 1 << 4
-    };
-  enum VectorConversion
-    {
-    Component = 1 << 1,
-    Magnitude = 1 << 2,
-    };
+    size_t found = mangledName.rfind(seperator);
+    if (found == vtkstd::string::npos)
+      {
+      // no vector conversion needed
+      demangled_name = mangledName;
+      return;
+      }
+    demagled_component_name = mangledName.substr(found+1, mangledName.size());
+    demangled_name = mangledName.substr(0, found);
+    }
 }
 
+vtkStandardNewMacro(vtkPVPostFilter);
 //----------------------------------------------------------------------------
 vtkPVPostFilter::vtkPVPostFilter()
 {
@@ -95,12 +100,9 @@ int vtkPVPostFilter::RequestDataObject(
   return 0;
 }
 
-
 //----------------------------------------------------------------------------
-int vtkPVPostFilter::RequestData(
-  vtkInformation *request,
-  vtkInformationVector **inputVector,
-  vtkInformationVector *outputVector)
+int vtkPVPostFilter::RequestData(vtkInformation *,
+  vtkInformationVector **inputVector, vtkInformationVector *outputVector)
 {
 
   //we need to just copy the data, so we can fixup the output as needed
@@ -109,189 +111,234 @@ int vtkPVPostFilter::RequestData(
 
   vtkDataObject* input= inInfo->Get(vtkDataObject::DATA_OBJECT());
   vtkDataObject* output= outInfo->Get(vtkDataObject::DATA_OBJECT());
-
   if (output && input)
     {
     output->ShallowCopy(input);
     if (this->Information->Has(vtkPVPostFilterExecutive::POST_ARRAYS_TO_PROCESS()) )
       {
-      this->DoAnyNeededConversions(request,inputVector,outputVector);
+      this->DoAnyNeededConversions(output);
       }
     }
   return 1;
 }
-//----------------------------------------------------------------------------
-int vtkPVPostFilter::DoAnyNeededConversions(  vtkInformation *request,
-  vtkInformationVector **inputVector,
-  vtkInformationVector *outputVector)
-{
-  int port = 0;
-  vtkInformation *inInfo = inputVector[port]->GetInformationObject(0);
-  vtkInformation *outInfo = outputVector->GetInformationObject(0);
-  vtkDataObject *input = inInfo->Get(vtkDataObject::DATA_OBJECT());
-  vtkDataObject* output = outInfo->Get(vtkDataObject::DATA_OBJECT());
 
+//----------------------------------------------------------------------------
+int vtkPVPostFilter::DoAnyNeededConversions(vtkDataObject* output)
+{
   //get the array to convert info
   vtkInformationVector* postVector =
     this->Information->Get(vtkPVPostFilterExecutive::POST_ARRAYS_TO_PROCESS());
   vtkInformation *postArrayInfo = postVector->GetInformationObject(0);
 
-  int ret = this->DeterminePointCellConversion(postArrayInfo,input);
-  if ( ret & PointToCell )
-    {
-    vtkPointDataToCellData *converter = vtkPointDataToCellData::New();
-    //we need to connect this to our inputs outputport!
-    converter->SetInputConnection(this->GetOutputPort(port));
-    converter->PassPointDataOn();
-    converter->Update();
+  const char* name = postArrayInfo->Get(vtkDataObject::FIELD_NAME());
+  int fieldAssociation = postArrayInfo->Get(vtkDataObject::FIELD_ASSOCIATION());
+  vtkstd::string demangled_name, demagled_component_name;
 
-    output->ShallowCopy(converter->GetOutputDataObject(0));
-    converter->Delete();
-    }
-  else if ( ret & CellToPoint )
-    {
-    vtkCellDataToPointData *converter = vtkCellDataToPointData::New();
-    //we need to connect this to our inputs outputport!
-    converter->SetInputConnection(this->GetOutputPort(port));
-    converter->PassCellDataOn();
-    converter->Update();
+  DeMangleArrayName(name,
+    postArrayInfo->Get(vtkPVPostFilterExecutive::POST_ARRAY_COMPONENT_KEY()),
+    demangled_name, demagled_component_name);
 
-    output->ShallowCopy(converter->GetOutputDataObject(0));
-    converter->Delete();
-    }
-
-  //determine if this a vector to scalar conversion
-  if ( ret == 0 || ret & AlsoVectorProperty )
+  vtkCompositeDataSet* cd = vtkCompositeDataSet::SafeDownCast(output);
+  if (cd)
     {
-    //the current plan is that we are going to have the name
-    //of the property signify what component we should extract
-    //so PROPERTY_COMPONENT NAME
-    ret = this->DoVectorConversion(postArrayInfo,input,output);
+    vtkCompositeDataIterator* iter = cd->NewIterator();
+    for (iter->InitTraversal(); !iter->IsDoneWithTraversal();
+      iter->GoToNextItem())
+      {
+      vtkDataSet* dataset = vtkDataSet::SafeDownCast(iter->GetCurrentDataObject());
+      if (dataset)
+        {
+        this->DoAnyNeededConversions(dataset, name, fieldAssociation,
+          demangled_name.c_str(), demagled_component_name.c_str());
+        }
+      }
+    iter->Delete();
+    return 1;
     }
 
-  return (ret != 0);
+  return this->DoAnyNeededConversions(vtkDataSet::SafeDownCast(output),
+    name, fieldAssociation, demangled_name.c_str(),
+    demagled_component_name.c_str());
 }
 
 //----------------------------------------------------------------------------
-int vtkPVPostFilter::DeterminePointCellConversion(vtkInformation *postArrayInfo,
-                                                 vtkDataObject *inputObj)
+int vtkPVPostFilter::DoAnyNeededConversions(vtkDataSet* output,
+  const char* requested_name, int fieldAssociation,
+  const char* demangled_name, const char* demagled_component_name)
 {
-  //determine if this is a point || cell conversion
-  int retCode = 0;
-  const char* name;
-  int fieldAssociation = postArrayInfo->Get(vtkDataObject::FIELD_ASSOCIATION());
-  vtkDataSet *dsInput = vtkDataSet::SafeDownCast(inputObj);
+  vtkDataSetAttributes* dsa = NULL;
+  vtkDataSetAttributes* pointData = output->GetPointData();
+  vtkDataSetAttributes* cellData = output->GetCellData();
 
-  if (dsInput && fieldAssociation == vtkDataObject::FIELD_ASSOCIATION_POINTS)
+  switch (fieldAssociation)
     {
-    name = postArrayInfo->Get(vtkDataObject::FIELD_NAME());
-    if (!dsInput->GetPointData()->HasArray(name) &&
-      dsInput->GetCellData()->HasArray(name))
-      {
-      retCode |= CellToPoint;
-      if ( dsInput->GetCellData()->GetArray(name)->GetNumberOfTuples() > 1 )
-        {
-        retCode |= AlsoVectorProperty;
-        }
-      }
+  case vtkDataObject::FIELD_ASSOCIATION_POINTS:
+    dsa = pointData;
+    break;
 
-    }
-  else if(dsInput&&fieldAssociation == vtkDataObject::FIELD_ASSOCIATION_POINTS)
-    {
-    name = postArrayInfo->Get(vtkDataObject::FIELD_NAME());
-    if (!dsInput->GetCellData()->HasArray(name) &&
-      dsInput->GetPointData()->HasArray(name))
-      {
-      retCode |= PointToCell;
-      if ( dsInput->GetPointData()->GetArray(name)->GetNumberOfTuples() > 1 )
-        {
-        retCode |= AlsoVectorProperty;
-        }
-      }
-    }
-  return retCode;
-}
+  case vtkDataObject::FIELD_ASSOCIATION_CELLS:
+    dsa = cellData;
+    break;
 
-//----------------------------------------------------------------------------
-int vtkPVPostFilter::DoVectorConversion(vtkInformation *postArrayInfo,
-                                      vtkDataObject *input,vtkDataObject *output)
-{
-  const char *mangledName, *name, *keyName;
-  mangledName = postArrayInfo->Get(vtkDataObject::FIELD_NAME());
-  keyName = postArrayInfo->Get(vtkPVPostFilterExecutive::POST_ARRAY_COMPONENT_KEY());
-  if ( !keyName || !mangledName )
-    {
-    return 0;
-    }
-  std::string key(keyName);
-  std::string tempName(mangledName);
-  size_t found;
-  found = tempName.rfind(key);
-  if (found == std::string::npos)
-    {
-    //no vector conversion needed
+  case vtkDataObject::FIELD_ASSOCIATION_POINTS_THEN_CELLS:
+    vtkWarningMacro("Case not handled");
+
+  default:
     return 0;
     }
 
-  //lets grab the array now
-  std::string compIndex = tempName.substr(found+1,tempName.size());
-  tempName = tempName.substr(0,found);
-  name = tempName.c_str();
-  int fieldAssociation = postArrayInfo->Get(vtkDataObject::FIELD_ASSOCIATION());
-  vtkDataArray *vectorProp = NULL;
-  vtkDataSet *dsInput = vtkDataSet::SafeDownCast(input);
+  if (dsa->GetAbstractArray(requested_name))
+    {
+    // requested array is present. Don't bother doing anything.
+    return 0;
+    }
+
+  if (dsa->GetAbstractArray(demangled_name))
+    {
+    // demangled_name is present, implies that component extraction is needed.
+    return this->ExtractComponent(dsa, requested_name,
+      demangled_name, demagled_component_name);
+    }
+
   if (fieldAssociation == vtkDataObject::FIELD_ASSOCIATION_POINTS)
     {
-    if (dsInput->GetPointData()->HasArray(name))
+    if (cellData->GetAbstractArray(requested_name) ||
+      cellData->GetAbstractArray(demangled_name))
       {
-      vectorProp = dsInput->GetPointData()->GetArray(name);
+      this->CellDataToPointData(output);
       }
     }
-  else if(fieldAssociation == vtkDataObject::FIELD_ASSOCIATION_POINTS)
+  else if (fieldAssociation == vtkDataObject::FIELD_ASSOCIATION_CELLS)
     {
-    if (dsInput->GetCellData()->HasArray(name))
+    if (pointData->GetAbstractArray(requested_name) ||
+      pointData->GetAbstractArray(demangled_name))
       {
-      vectorProp = dsInput->GetCellData()->GetArray(name);
+      this->PointDataToCellData(output);
       }
     }
 
-  if(!vectorProp)
+  if (dsa->GetAbstractArray(requested_name))
     {
-    //we failed to find the property
-    return 0;
+    // after the conversion the requested array is present. Don't bother doing
+    // anything more.
+    return 1;
     }
 
-
-  //convert the component index
-  int cIndex = atoi(compIndex.c_str());
-  //the resulting name will support component names
-  std::string resultName = tempName;
-  const char* cn =  vectorProp->GetComponentName(cIndex);
-  if (cn)
+  if (dsa->GetAbstractArray(demangled_name))
     {
-    resultName += cn;
-    }
-  else
-    {
-    resultName += compIndex;
+    // demangled_name is present, implies that component extraction is needed.
+    return this->ExtractComponent(dsa, requested_name,
+      demangled_name, demagled_component_name);
     }
 
-  vtkArrayCalculator *calc = vtkArrayCalculator::New();
-  calc->SetInputConnection(0,this->GetInputConnection(0,0));
-  if ( fieldAssociation == vtkDataObject::FIELD_ASSOCIATION_POINTS )
-    {
-    calc->SetAttributeModeToUsePointData();
-    }
-  else if ( fieldAssociation == vtkDataObject::FIELD_ASSOCIATION_CELLS )
-    {
-    calc->SetAttributeModeToUseCellData();
-    }
-  calc->AddScalarVariable(mangledName,name,cIndex);
-  calc->SetFunction(mangledName);
-  calc->SetResultArrayName(resultName.c_str());
+  return 0;
+}
 
-  output->ShallowCopy(calc->GetOutputDataObject(0));
-  calc->Delete();
+//----------------------------------------------------------------------------
+void vtkPVPostFilter::CellDataToPointData(vtkDataSet* output)
+{
+  vtkDataObject* clone = output->NewInstance();
+  clone->ShallowCopy(output);
+
+  vtkCellDataToPointData *converter = vtkCellDataToPointData::New();
+  converter->SetInput(clone);
+  converter->PassCellDataOn();
+  converter->Update();
+  output->ShallowCopy(converter->GetOutputDataObject(0));
+  converter->Delete();
+  clone->Delete();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVPostFilter::PointDataToCellData(vtkDataSet* output)
+{
+  vtkDataObject* clone = output->NewInstance();
+  clone->ShallowCopy(output);
+
+  vtkPointDataToCellData *converter = vtkPointDataToCellData::New();
+  converter->SetInput(clone);
+  converter->PassPointDataOn();
+  converter->Update();
+  output->ShallowCopy(converter->GetOutputDataObject(0));
+  converter->Delete();
+  clone->Delete();
+}
+
+//----------------------------------------------------------------------------
+namespace
+{
+  template <class T>
+  void CopyComponent(T* outIter, T* inIter, int compNo)
+    {
+    vtkIdType numTuples = inIter->GetNumberOfTuples();
+    for (vtkIdType cc=0; cc < numTuples; cc++)
+      {
+      outIter->SetValue(cc, inIter->GetTuple(cc)[compNo]);
+      }
+    }
+}
+
+//----------------------------------------------------------------------------
+int vtkPVPostFilter::ExtractComponent(vtkDataSetAttributes* dsa,
+  const char* requested_name, const char* demangled_name,
+  const char* demagled_component_name)
+{
+  vtkAbstractArray* array = dsa->GetAbstractArray(demangled_name);
+  assert(array != NULL && demangled_name && demagled_component_name);
+
+  int cIndex = -1;
+  // demagled_component_name can be a real component name OR
+  // X,Y,Z for the first 3 components or
+  // 0,...N i.e. an integer for the index.
+  // Now to the trick is to decide what way this particular request has been
+  // made.
+  for (int cc=0; cc < array->GetNumberOfComponents(); cc++)
+    {
+    const char* comp_name = array->GetComponentName(cc);
+    if (comp_name && strcmp(comp_name, demagled_component_name) == 0)
+      {
+      cIndex = cc;
+      break;
+      }
+    }
+  if (cIndex == -1)
+    {
+    const char* default_names[3];
+    default_names[0] = "x";
+    default_names[1] = "y";
+    default_names[2] = "z";
+    for (int cc=0; cc < 3; cc++)
+      {
+      if (vtksys::SystemTools::Strucmp(demagled_component_name, default_names[cc]) == 0)
+        {
+        cIndex = cc;
+        break;
+        }
+      }
+    }
+  if (cIndex == -1)
+    {
+    cIndex = atoi(demagled_component_name);
+    }
+
+  vtkAbstractArray* newArray = array->NewInstance();
+  newArray->SetNumberOfComponents(1);
+  newArray->SetNumberOfTuples(array->GetNumberOfTuples());
+  newArray->SetName(requested_name);
+
+  vtkArrayIterator* inIter = array->NewIterator();
+  vtkArrayIterator* outIter = newArray->NewIterator();
+  switch (array->GetDataType())
+    {
+    vtkArrayIteratorTemplateMacro(
+      ::CopyComponent(static_cast<VTK_TT*>(outIter),
+        static_cast<VTK_TT*>(inIter), cIndex);
+    );
+    }
+  inIter->Delete();
+  outIter->Delete();
+  dsa->AddArray(newArray);
+  newArray->FastDelete();
   return 1;
 }
 
