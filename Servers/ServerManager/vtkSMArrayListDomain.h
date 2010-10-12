@@ -195,6 +195,19 @@ protected:
                  vtkPVDataSetAttributesInformation* info, 
                  vtkSMInputArrayDomain* iad,
                  int association);
+
+  // Description:
+  // Adds a new array to the domain. This internally calls add string. If the \c
+  // iad tells us that the number of components required==1 and the array has
+  // more than 1 component and
+  // vtkSMInputArrayDomain::GetAutomaticPropertyConversion() is true, then the
+  // array is spilt into individual component and added (with name mangled using
+  // the component names).
+  // Returns the index for the array. If the array was split into components,
+  // then returns the index of the first component.
+  unsigned int AddArray(vtkPVArrayInformation* arrayinfo, int association,
+    vtkSMInputArrayDomain* iad);
+
   void Update(vtkSMSourceProxy* sp, vtkSMInputArrayDomain* iad, int outputport);
   void Update(vtkSMProxyProperty* pp, vtkSMSourceProxy* sp, int outputport);
   void Update(vtkSMProxyProperty* pp);

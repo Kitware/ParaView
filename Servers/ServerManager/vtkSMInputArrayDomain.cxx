@@ -316,10 +316,26 @@ int vtkSMInputArrayDomain::IsFieldValid(
     return 0;
     }
 
-  if (this->NumberOfComponents > 0 &&
-      this->NumberOfComponents != arrayInfo->GetNumberOfComponents())
+  if (this->AutomaticPropertyConversion)
     {
-    return 0;
+    // when using automatic property conversion, we support automatic extraction
+    // of a single component from multi-component arrays. However, we still
+    // don't support automatic extraction of multiple components, so if the
+    // filter needs more than 1 component, then the number of components must
+    // match.
+    if (this->NumberOfComponents > 1 &&
+      this->NumberOfComponents != arrayInfo->GetNumberOfComponents())
+      {
+      return 0;
+      }
+    }
+  else
+    {
+    if (this->NumberOfComponents > 0 &&
+      this->NumberOfComponents != arrayInfo->GetNumberOfComponents())
+      {
+      return 0;
+      }
     }
   return 1;
 }
