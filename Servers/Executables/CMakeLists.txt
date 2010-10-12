@@ -21,9 +21,10 @@ IF(VTK_WRAP_TCL)
 ENDIF(VTK_WRAP_TCL)
 
 # Add main server executables.
-SET(PV_EXE_LIST pvserver pvtest pvstatetest)
+SET(PV_EXE_LIST
+   pvserver pvrenderserver pvdataserver
+   pvtest pvstatetest pvInformationPropertyTest )
 IF (FIXME)
-SET(PV_EXE_LIST pvserver pvrenderserver pvdataserver)
 ENDIF (FIXME)
 FOREACH(pvexe ${PV_EXE_LIST})
   add_executable_with_forwarding(pv_exe_suffix

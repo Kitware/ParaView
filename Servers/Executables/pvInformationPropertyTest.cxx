@@ -1,7 +1,7 @@
 /*=========================================================================
 
 Program:   ParaView
-Module:    TestSubProxy.cxx
+Module:    pvstatetest.cxx
 
 Copyright (c) Kitware, Inc.
 All rights reserved.
@@ -30,13 +30,9 @@ PURPOSE.  See the above copyright notice for more information.
 int main(int argc, char* argv[])
 {
   vtkPVServerOptions* options = vtkPVServerOptions::New();
-  bool success = true;
-  vtkInitializationHelper::Initialize(argc, argv,
-    vtkProcessModule2::PROCESS_BATCH, options);
-  if (!success)
-    {
-    return -1;
-    }
+  vtkInitializationHelper::Initialize( argc, argv,
+                                       vtkProcessModule2::PROCESS_BATCH,
+                                       options);
 
   vtkSMSession* session = vtkSMSession::New();
   cout << "Starting..." << endl;
@@ -46,7 +42,7 @@ int main(int argc, char* argv[])
   // *******************************************************************
   // Test specific code
   // *******************************************************************
-  double value, valueA, valueB;
+  double value;
   if(options->GetUnknownArgument())
     {
     cout << "Load Proxy definition: " << options->GetUnknownArgument() << endl;
@@ -57,42 +53,26 @@ int main(int argc, char* argv[])
     pxm->LoadConfigurationXML("/home/seb/Kitware/Projects/DOE-Collaboration-SBIR-II/code/git/ParaView4/Servers/ServerManager/Testing/Cxx/TestCustomSubProxyDefinition.xml");
     }
 
-  // Create proxy and change main radius value
+  // Update radius value
+  cout << "Update radius to 20" << endl;
   vtkSMProxy* proxy = pxm->NewProxy("sources", "SphereSource3");
   vtkSMPropertyHelper(proxy, "Radius").Set(20);
   proxy->UpdateVTKObjects();
 
-  // Read radius info
-  vtkSMPropertyHelper(proxy, "Radius").Get(&value);
-  vtkSMPropertyHelper(proxy, "RadiusA").Get(&valueA);
-  vtkSMPropertyHelper(proxy, "RadiusB").Get(&valueB);
-  cout << "Radius: " << value << " A: " << valueA << " B: " << valueB << endl;
+  // Read information property
+  proxy->UpdatePropertyInformation();
+  vtkSMPropertyHelper(proxy, "RadiusReadOnly").Get(&value);
+  cout << "Radius read: " << value << endl;
 
-  // Update radius for sub proxy A
-  cout << "Update radiusA to 123.456" << endl;
-  vtkSMPropertyHelper(proxy, "RadiusA").Set(123.456);
+  // Update radius value
+  cout << "Update radius to 123.456" << endl;
+  vtkSMPropertyHelper(proxy, "Radius").Set(123.456);
   proxy->UpdateVTKObjects();
 
-  // Read radius info
-  vtkSMPropertyHelper(proxy, "Radius").Get(&value);
-  vtkSMPropertyHelper(proxy, "RadiusA").Get(&valueA);
-  vtkSMPropertyHelper(proxy, "RadiusB").Get(&valueB);
-  cout << "Radius: " << value << " A: " << valueA << " B: " << valueB << endl;
-
-  //    vtkSmartPointer<vtkPVXMLElement> root = vtkSmartPointer<vtkPVXMLElement>::New();
-  //    proxy->SaveState(root);
-  //    root->PrintXML();
-
-  // Update radius for sub proxy B
-  cout << "Update radiusB to 654.321" << endl;
-  vtkSMPropertyHelper(proxy, "RadiusB").Set(654.321);
-  proxy->UpdateVTKObjects();
-
-  // Read radius info
-  vtkSMPropertyHelper(proxy, "Radius").Get(&value);
-  vtkSMPropertyHelper(proxy, "RadiusA").Get(&valueA);
-  vtkSMPropertyHelper(proxy, "RadiusB").Get(&valueB);
-  cout << "Radius: " << value << " A: " << valueA << " B: " << valueB << endl;
+  // Read information property
+  proxy->UpdatePropertyInformation();
+  vtkSMPropertyHelper(proxy, "RadiusReadOnly").Get(&value);
+  cout << "Radius read: " << value << endl;
 
   // *******************************************************************
 

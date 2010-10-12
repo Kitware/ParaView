@@ -12,55 +12,27 @@ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
+#include "vtkPVConfig.h" // Required to get build options for paraview
 #include "vtkInitializationHelper.h"
-#include "vtkMultiProcessController.h"
-#include "vtkNetworkAccessManager.h"
-#include "vtkProcessModule2.h"
 #include "vtkPVServerOptions.h"
-#include "vtkSMSessionServer.h"
+#include "vtkSMSession.h"
+
+#include "paraview.h"
 
 //----------------------------------------------------------------------------
 int main(int argc, char* argv[])
 {
+  // Init current process type
   vtkPVServerOptions* options = vtkPVServerOptions::New();
-  bool success = true;
-  vtkInitializationHelper::Initialize(argc, argv,
-    vtkProcessModule2::PROCESS_SERVER, options);
-  if (!success)
-    {
-    return -1;
-    }
+  vtkInitializationHelper::Initialize( argc, argv,
+                                       vtkProcessModule2::PROCESS_SERVER,
+                                       options );
 
-  int ret_value = 0;
+  // Start ParaView processing loop with an automatic session connect call
+  int ret_val = ParaView::RunAndConnect();
 
-  vtkProcessModule2* pm = vtkProcessModule2::GetProcessModule();
-  vtkMultiProcessController* controller = pm->GetGlobalController();
-  if (controller->GetLocalProcessId() > 0)
-    {
-    // satellites never wait for client connections. They simply have 1 session
-    // instance and then they simply listen for the root node to issue requests
-    // for actions.
-    vtkSMSession* session = vtkSMSession::New();
-    controller->ProcessRMIs();
-    session->Delete();
-    }
-  else
-    {
-    vtkNetworkAccessManager* nam = pm->GetNetworkAccessManager();
-    vtkSMSessionServer* session = vtkSMSessionServer::New();
-    cout << "Waiting for client" << endl;
-    if (session->Connect())
-      {
-      // TODO: detect when an error happens in processing events.
-      while (nam->ProcessEvents(0) != -1)
-        {
-        // more
-        }
-      }
-    cout << "Exiting..." << endl;
-    session->Delete();
-    }
+  // Exit application
   vtkInitializationHelper::Finalize();
   options->Delete();
-  return ret_value;
+  return ret_val;
 }

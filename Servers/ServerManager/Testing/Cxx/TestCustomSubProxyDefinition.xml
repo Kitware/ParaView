@@ -23,6 +23,10 @@
         </Documentation>
       </DoubleVectorProperty>
 
+      <DoubleVectorProperty name="RadiusReadOnly"
+        information_only="1" command="GetRadius">
+      </DoubleVectorProperty>
+
       <SubProxy>
          <Proxy name="subA" proxygroup="sources" proxyname="SphereSource">
          </Proxy>
@@ -41,8 +45,6 @@
          </ExposedProperties>
          <ShareProperties subproxy="subA" />
        </SubProxy>
-
-
 
     </SourceProxy>
   </ProxyGroup>

@@ -13,8 +13,6 @@ PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
 #include "vtkInitializationHelper.h"
-#include "vtkMultiProcessController.h"
-#include "vtkNetworkAccessManager.h"
 #include "vtkProcessModule2.h"
 #include "vtkPVFileInformation.h"
 #include "vtkPVServerOptions.h"
@@ -24,38 +22,43 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkSMSourceProxy.h"
 #include "vtkPVDataInformation.h"
 
+#include "paraview.h"
+
+#include "vtkSMSessionClient.h"
+
 //----------------------------------------------------------------------------
 int main(int argc, char* argv[])
 {
+  int return_value = EXIT_SUCCESS;
+
   vtkPVServerOptions* options = vtkPVServerOptions::New();
-  bool success = true;
   vtkInitializationHelper::Initialize(argc, argv,
     vtkProcessModule2::PROCESS_BATCH, options);
-  if (!success)
-    {
-    return -1;
-    }
+  //---------------------------------------------------------------------------
 
-  int ret_value = 0;
-
-  vtkProcessModule2* pm = vtkProcessModule2::GetProcessModule();
-  vtkMultiProcessController* controller = pm->GetGlobalController();
-  if (controller->GetLocalProcessId() > 0)
+  vtkSMSession* session = NULL;
+  vtkSMProxy* proxy = NULL;
+  if(options->GetUnknownArgument())
     {
-    // satellites never wait for client connections. They simply have 1 session
-    // instance and then they simply listen for the root node to issue requests
-    // for actions.
-    vtkSMSession* session = vtkSMSession::New();
-    controller->ProcessRMIs();
-    session->Delete();
+    // We have a remote URL to use
+    session = vtkSMSessionClient::New();
+    vtkSMSessionClient::SafeDownCast(session)->Connect(options->GetUnknownArgument());
     }
   else
     {
-    vtkSMSession* session = vtkSMSession::New();
-    cout << "Starting..." << endl;
+    // We are in built-in mode
+    session = vtkSMSession::New();
+    }
 
-    vtkSMProxyManager* pxm = session->GetProxyManager();
-    vtkSMProxy* proxy = pxm->NewProxy("misc", "FileInformationHelper");
+  cout << "Starting..." << endl;
+
+  vtkSMProxyManager* pxm = session->GetProxyManager();
+
+  for(int i=0;i<100;i++)
+    {
+    cout << " Processing loop: " << i << endl;
+
+    proxy = pxm->NewProxy("misc", "FileInformationHelper");
     vtkSMPropertyHelper(proxy, "Path").Set("/tmp");
     vtkSMPropertyHelper(proxy, "SpecialDirectories").Set(0);
     proxy->UpdateVTKObjects();
@@ -71,15 +74,18 @@ int main(int argc, char* argv[])
     vtkSMPropertyHelper(proxy, "ThetaResolution").Set(20);
     proxy->UpdateVTKObjects();
 
-    vtkSMSourceProxy* shrink = vtkSMSourceProxy::SafeDownCast(
-      pxm->NewProxy("filters", "ProcessIdScalars"));
+    vtkSMSourceProxy* shrink =
+        vtkSMSourceProxy::SafeDownCast(
+            pxm->NewProxy("filters", "ProcessIdScalars"));
     vtkSMPropertyHelper(shrink, "Input").Set(proxy);
     shrink->UpdateVTKObjects();
     shrink->UpdatePipeline();
+
     shrink->GetDataInformation(0)->Print(cout);
 
     vtkSMSourceProxy* writer =
-      vtkSMSourceProxy::SafeDownCast(pxm->NewProxy("writers", "PDataSetWriter"));
+        vtkSMSourceProxy::SafeDownCast(
+            pxm->NewProxy("writers", "PDataSetWriter"));
     vtkSMPropertyHelper(writer, "Input").Set(shrink);
     vtkSMPropertyHelper(writer, "FileName").Set("/tmp/foo.vtk");
     writer->UpdateVTKObjects();
@@ -88,10 +94,13 @@ int main(int argc, char* argv[])
 
     proxy->Delete();
     shrink->Delete();
-    cout << "Exiting..." << endl;
-    session->Delete();
     }
+
+  cout << "Exiting..." << endl;
+  session->Delete();
+
+  //---------------------------------------------------------------------------
   vtkInitializationHelper::Finalize();
   options->Delete();
-  return ret_value;
+  return return_value;
 }

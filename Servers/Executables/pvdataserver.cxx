@@ -12,43 +12,27 @@ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#include "vtkInitializationHelper.h"
-#include "vtkProcessModule.h"
 #include "vtkPVConfig.h" // Required to get build options for paraview
-#include "vtkPVMain.h" // For VTK_USE_MPI
+#include "vtkInitializationHelper.h"
 #include "vtkPVServerOptions.h"
-#include "vtkToolkits.h" // For VTK_USE_MPI
+#include "vtkSMSession.h"
 
-// forward declare the initialize function
-static void ParaViewInitializeInterpreter(vtkProcessModule* pm);
+#include "paraview.h"
 
 //----------------------------------------------------------------------------
 int main(int argc, char* argv[])
 {
-  vtkPVMain::Initialize(&argc, &argv);
-  // First create the correct options for this process
+  // Init current process type
   vtkPVServerOptions* options = vtkPVServerOptions::New();
-  // set the type of process
-  options->SetProcessType(vtkPVOptions::PVDATA_SERVER);
-  // Create a pvmain
-  vtkPVMain* pvmain = vtkPVMain::New();
-  // run the paraview main
-  int ret = pvmain->Initialize(options, 0, ParaViewInitializeInterpreter, 
-    argc, argv);
-  if (!ret)
-    {
-    ret = pvmain->Run(options);
-    }
-  // clean up and return
-  pvmain->Delete();
-  options->Delete();
-  vtkPVMain::Finalize();
-  return ret;
-}
+  vtkInitializationHelper::Initialize( argc, argv,
+                                       vtkProcessModule2::PROCESS_DATA_SERVER,
+                                       options );
 
-//----------------------------------------------------------------------------
-void ParaViewInitializeInterpreter(vtkProcessModule* pm)
-{
-  // Initialize built-in wrapper modules.
-  vtkInitializationHelper::InitializeInterpretor(pm);
+  // Start ParaView processing loop with an automatic session connect call
+  int ret_val = ParaView::RunAndConnect();
+
+  // Exit application
+  vtkInitializationHelper::Finalize();
+  options->Delete();
+  return ret_val;
 }

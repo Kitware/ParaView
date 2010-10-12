@@ -13,8 +13,6 @@ PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
 #include "vtkInitializationHelper.h"
-#include "vtkMultiProcessController.h"
-#include "vtkNetworkAccessManager.h"
 #include "vtkProcessModule2.h"
 #include "vtkPVFileInformation.h"
 #include "vtkPVServerOptions.h"
@@ -26,87 +24,88 @@ PURPOSE.  See the above copyright notice for more information.
 
 #include "vtkPVXMLElement.h"
 
+#include "paraview.h"
+
 //----------------------------------------------------------------------------
 int main(int argc, char* argv[])
 {
   vtkPVServerOptions* options = vtkPVServerOptions::New();
-  bool success = true;
-  vtkInitializationHelper::Initialize(argc, argv,
-    vtkProcessModule2::PROCESS_BATCH, options);
-  if (!success)
-    {
-    return -1;
-    }
+  vtkInitializationHelper::Initialize( argc, argv,
+                                       vtkProcessModule2::PROCESS_BATCH,
+                                       options );
 
-  int ret_value = 0;
+  //---------------------------------------------------------------------------
+  int return_value = EXIT_SUCCESS;
+  vtkSmartPointer<vtkPVXMLElement> xmlRootNodeOrigin;
+  vtkSmartPointer<vtkPVXMLElement> xmlRootNodeLoaded;
+  //---------------------------------------------------------------------------
+  vtkSMSession* session = vtkSMSession::New();
+  cout << "==== Starting ====" << endl;
+  vtkSMProxyManager* pxm = session->GetProxyManager();
 
-  vtkProcessModule2* pm = vtkProcessModule2::GetProcessModule();
-  vtkMultiProcessController* controller = pm->GetGlobalController();
-  if (controller->GetLocalProcessId() > 0)
+  vtkSMProxy* proxy = pxm->NewProxy("sources", "SphereSource");
+  vtkSMPropertyHelper(proxy, "PhiResolution").Set(20);
+  vtkSMPropertyHelper(proxy, "ThetaResolution").Set(20);
+  proxy->UpdateVTKObjects();
+
+  vtkSMSourceProxy* shrink =
+      vtkSMSourceProxy::SafeDownCast(
+          pxm->NewProxy("filters", "ShrinkFilter"));
+
+  vtkSMPropertyHelper(shrink, "Input").Set(proxy);
+  shrink->UpdateVTKObjects();
+  shrink->UpdatePipeline();
+
+  //shrink->GetDataInformation(0)->Print(cout);
+
+  pxm->RegisterProxy("sources", "sphere", proxy);
+  pxm->RegisterProxy("filters", "shrink", shrink);
+
+  // Try to build XML state
+  xmlRootNodeOrigin.TakeReference(pxm->SaveState());
+  xmlRootNodeOrigin->PrintXML();
+
+  cout << "==== End of State creation ===" << endl;
+
+  cout << "==== Clear proxyManager state ===" << endl;
+  pxm->UnRegisterProxies();;
+  proxy->Delete();
+  shrink->Delete();
+
+  cout << "==== Make sure that the state is empty ===" << endl;
+  xmlRootNodeLoaded.TakeReference(pxm->SaveState());
+  //xmlRootNodeLoaded->PrintXML();
+  if( pxm->GetProxy("sources", "sphere") && pxm->GetProxy("filters", "shrink") )
     {
-    // satellites never wait for client connections. They simply have 1 session
-    // instance and then they simply listen for the root node to issue requests
-    // for actions.
-    vtkSMSession* session = vtkSMSession::New();
-    vtkSMSession* session2 = vtkSMSession::New(); // for the load state
-    controller->ProcessRMIs();
-    session->Delete();
+    cout << " - Error in clearing" << endl;
+    return_value = EXIT_FAILURE;
     }
   else
     {
-    vtkSMSession* session = vtkSMSession::New();
-    cout << "Starting..." << endl;
-
-    vtkSMProxyManager* pxm = session->GetProxyManager();
-
-    vtkSMProxy* proxy = pxm->NewProxy("sources", "SphereSource");
-    vtkSMPropertyHelper(proxy, "PhiResolution").Set(20);
-    vtkSMPropertyHelper(proxy, "ThetaResolution").Set(20);
-    proxy->UpdateVTKObjects();
-
-    vtkSMSourceProxy* shrink = vtkSMSourceProxy::SafeDownCast(
-      pxm->NewProxy("filters", "ShrinkFilter"));
-    vtkSMPropertyHelper(shrink, "Input").Set(proxy);
-    shrink->UpdateVTKObjects();
-    shrink->UpdatePipeline();
-
-    //shrink->GetDataInformation(0)->Print(cout);
-
-    //proxy->SaveState(xmlServerManagerNode);
-    //shrink->SaveState(xmlServerManagerNode);
-    pxm->RegisterProxy("sources", "sphere", proxy);
-    pxm->RegisterProxy("filters", "shrink", shrink);
-
-    // Try to build XML state
-    vtkSmartPointer<vtkPVXMLElement> xmlRootNodeOrigin;
-    xmlRootNodeOrigin.TakeReference(pxm->SaveState());
-    xmlRootNodeOrigin->PrintXML();
-
-    cout << "End of State creation..." << endl;
-
-    vtkSMSession* session2 = vtkSMSession::New();
-    cout << "Loading previous state..." << endl;
-
-    vtkSmartPointer<vtkPVXMLElement> xmlRootNodeLoaded;
-    vtkSMProxyManager* pxm2 = session->GetProxyManager();
-    pxm2->LoadState(xmlRootNodeLoaded);
-    xmlRootNodeLoaded.TakeReference(pxm2->SaveState());
-    xmlRootNodeLoaded->PrintXML();
-
-    bool sameState = xmlRootNodeLoaded->Equals(xmlRootNodeOrigin.GetPointer());
-
-    proxy->Delete();
-    shrink->Delete();
-    session->Delete();
-    session2->Delete();
-    cout << "Exiting..." << endl;
-
-    if(sameState)
-      cout << " ### States are equals ###" << endl;
-    else
-      cout << " ### FAILED: States are NOT equals ###" << endl;
+    cout << " - Clearing done" << endl;
     }
+
+  cout << "==== Loading previous state ====" << endl;
+  pxm->LoadState(xmlRootNodeOrigin);
+  xmlRootNodeLoaded.TakeReference(pxm->SaveState());
+  xmlRootNodeLoaded->PrintXML();
+  cout << "==== End of state loading ====" << endl;
+
+  //---------------------------------------------------------------------------
+  if( pxm->GetProxy("sources", "sphere") && pxm->GetProxy("filters", "shrink")
+      && return_value == EXIT_SUCCESS )
+    {
+    cout << endl << " ### SUCESS: States are equals ###" << endl;
+    }
+  else
+    {
+    cout << endl << " ### FAILED: States are NOT equals ###" << endl;
+    return_value = EXIT_FAILURE;
+    }
+  session->Delete();
+
+  //---------------------------------------------------------------------------
   vtkInitializationHelper::Finalize();
   options->Delete();
-  return ret_value;
+  return return_value;
 }

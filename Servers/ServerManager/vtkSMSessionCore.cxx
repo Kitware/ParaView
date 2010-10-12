@@ -100,10 +100,10 @@ vtkSMSessionCore::vtkSMSessionCore()
     vtkClientServerInterpreterInitializer::GetInitializer()->NewInterpreter();
 
   vtkMemberFunctionCommand<vtkSMSessionCore>* observer =
-    vtkMemberFunctionCommand<vtkSMSessionCore>::New();
+      vtkMemberFunctionCommand<vtkSMSessionCore>::New();
   observer->SetCallback(*this, &vtkSMSessionCore::OnInterpreterError);
-  this->Interpreter->AddObserver(vtkCommand::UserEvent,
-    observer);
+  this->Interpreter->AddObserver( vtkCommand::UserEvent,
+                                  observer);
   observer->Delete();
 
   this->Internals = new vtkInternals();
@@ -135,8 +135,8 @@ vtkSMSessionCore::~vtkSMSessionCore()
 }
 
 //----------------------------------------------------------------------------
-void vtkSMSessionCore::OnInterpreterError(vtkObject*, unsigned long,
-  void* calldata)
+void vtkSMSessionCore::OnInterpreterError( vtkObject*, unsigned long,
+                                           void* calldata)
 {
   if (!vtkProcessModule2::GetProcessModule()->GetReportInterpreterErrors())
     {
