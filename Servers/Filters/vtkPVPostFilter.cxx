@@ -270,10 +270,35 @@ namespace
   template <class T>
   void CopyComponent(T* outIter, T* inIter, int compNo)
     {
+    vtkDataArray* inDa = vtkDataArray::SafeDownCast(inIter->GetArray());
     vtkIdType numTuples = inIter->GetNumberOfTuples();
-    for (vtkIdType cc=0; cc < numTuples; cc++)
+
+    if (compNo == -1 && inDa == NULL)
       {
-      outIter->SetValue(cc, inIter->GetTuple(cc)[compNo]);
+      compNo = 0;
+      }
+
+    if (compNo == -1)
+      {
+      vtkDataArray* outDa = vtkDataArray::SafeDownCast(outIter->GetArray());
+      int numcomps = inIter->GetNumberOfComponents();
+      for (vtkIdType cc=0; cc < numTuples; cc++)
+        {
+        double mag=0.0;
+        double* tuple = inDa->GetTuple(cc);
+        for (int comp=0; comp < numcomps; comp++)
+          {
+          mag += tuple[comp]*tuple[comp];
+          }
+        outDa->SetTuple1(cc, sqrt(mag));
+        }
+      }
+    else
+      {
+      for (vtkIdType cc=0; cc < numTuples; cc++)
+        {
+        outIter->SetValue(cc, inIter->GetTuple(cc)[compNo]);
+        }
       }
     }
 }
@@ -288,8 +313,9 @@ int vtkPVPostFilter::ExtractComponent(vtkDataSetAttributes* dsa,
 
   int cIndex = -1;
   // demagled_component_name can be a real component name OR
-  // X,Y,Z for the first 3 components or
-  // 0,...N i.e. an integer for the index.
+  // X,Y,Z for the first 3 components OR
+  // 0,...N i.e. an integer for the index OR
+  // Magnitude to indicate vector magnitude.
   // Now to the trick is to decide what way this particular request has been
   // made.
   for (int cc=0; cc < array->GetNumberOfComponents(); cc++)
@@ -318,7 +344,14 @@ int vtkPVPostFilter::ExtractComponent(vtkDataSetAttributes* dsa,
     }
   if (cIndex == -1)
     {
-    cIndex = atoi(demagled_component_name);
+    if (vtksys::SystemTools::Strucmp(demagled_component_name, "Magnitude") == 0)
+      {
+      // -1 implies magnitude.
+      }
+    else
+      {
+      cIndex = atoi(demagled_component_name);
+      }
     }
 
   vtkAbstractArray* newArray = array->NewInstance();

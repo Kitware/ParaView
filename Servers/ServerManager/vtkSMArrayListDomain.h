@@ -204,7 +204,7 @@ protected:
   // array is spilt into individual component and added (with name mangled using
   // the component names).
   // Returns the index for the array. If the array was split into components,
-  // then returns the index of the first component.
+  // then returns the index of the string for the array magnitude.
   unsigned int AddArray(vtkPVArrayInformation* arrayinfo, int association,
     vtkSMInputArrayDomain* iad);
 
