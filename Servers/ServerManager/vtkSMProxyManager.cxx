@@ -265,8 +265,7 @@ vtkSMProxy* vtkSMProxyManager::NewProxy(
     }
   // Find the XML element from which the proxy can be instantiated and
   // initialized
-  vtkPVXMLElement* element = this->GetProxyElement(groupName,
-    proxyName);
+  vtkPVXMLElement* element = this->GetProxyElement(groupName, proxyName);
   if (element)
     {
     return this->NewProxy(element, groupName, proxyName);
@@ -1290,9 +1289,9 @@ vtkPVXMLElement* vtkSMProxyManager::GetProxyDefinition(
     return 0;
     }
 
+
   assert(this->ProxyDefinitionManager != 0);
-  return this->ProxyDefinitionManager->GetProxyDefinition(
-    group, name, false);
+  return this->ProxyDefinitionManager->GetProxyDefinition(group, name, false);
 }
 
 //---------------------------------------------------------------------------

@@ -534,6 +534,7 @@ protected:
   // Read attributes from an XML element.
   virtual int ReadXMLAttributes(vtkSMProxyManager* pm, vtkPVXMLElement* element);
   void SetupExposedProperties(const char* subproxy_name, vtkPVXMLElement *element);
+  void SetupSharedProperties(vtkSMProxy* subproxy, vtkPVXMLElement *element);
 
   // Description:
   // Expose a subproxy property from the base proxy. The property with the name

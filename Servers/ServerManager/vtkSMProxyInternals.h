@@ -82,6 +82,10 @@ struct vtkSMProxyInternals
   // and the property name in that subproxy.
   typedef vtkstd::map<vtkStdString, ExposedPropertyInfo> ExposedPropertyInfoMap;
   ExposedPropertyInfoMap ExposedProperties;
+
+  // Vector of vtkSMProxyLink for shared properties among subproxies.
+  typedef  vtkstd::vector<vtkSmartPointer<vtkSMProxyLink> > SubProxyLinksType;
+  SubProxyLinksType SubProxyLinks;
 };
 
 #endif

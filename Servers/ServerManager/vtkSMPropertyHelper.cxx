@@ -201,7 +201,7 @@ int vtkSMPropertyHelper::GetAsInt(unsigned int index /*=0*/)
 }
 
 //----------------------------------------------------------------------------
-unsigned int vtkSMPropertyHelper::Get(int *values, unsigned int count)
+unsigned int vtkSMPropertyHelper::Get(int *values, unsigned int count /*=1*/)
 {
   switch (this->Type)
     {
@@ -283,7 +283,7 @@ double vtkSMPropertyHelper::GetAsDouble(unsigned int index /*=0*/)
 }
 
 //----------------------------------------------------------------------------
-unsigned int vtkSMPropertyHelper::Get(double *values, unsigned int count)
+unsigned int vtkSMPropertyHelper::Get(double *values, unsigned int count /*=1*/)
 {
   switch (this->Type)
     {
@@ -373,7 +373,7 @@ void vtkSMPropertyHelper::Set(const vtkIdType* values, unsigned int count)
 }
 
 //----------------------------------------------------------------------------
-unsigned int vtkSMPropertyHelper::Get(vtkIdType* values, unsigned int count)
+unsigned int vtkSMPropertyHelper::Get(vtkIdType* values, unsigned int count /*=1*/)
 {
   switch (this->Type)
     {

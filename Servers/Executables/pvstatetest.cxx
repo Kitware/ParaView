@@ -78,26 +78,33 @@ int main(int argc, char* argv[])
     pxm->RegisterProxy("filters", "shrink", shrink);
 
     // Try to build XML state
-    vtkSmartPointer<vtkPVXMLElement> xmlRootNode;
-    xmlRootNode.TakeReference(pxm->SaveState());
-    xmlRootNode->PrintXML();
+    vtkSmartPointer<vtkPVXMLElement> xmlRootNodeOrigin;
+    xmlRootNodeOrigin.TakeReference(pxm->SaveState());
+    xmlRootNodeOrigin->PrintXML();
 
     cout << "End of State creation..." << endl;
 
     vtkSMSession* session2 = vtkSMSession::New();
     cout << "Loading previous state..." << endl;
 
+    vtkSmartPointer<vtkPVXMLElement> xmlRootNodeLoaded;
     vtkSMProxyManager* pxm2 = session->GetProxyManager();
-    pxm2->LoadState(xmlRootNode);
-    xmlRootNode.TakeReference(pxm2->SaveState());
-    xmlRootNode->PrintXML();
+    pxm2->LoadState(xmlRootNodeLoaded);
+    xmlRootNodeLoaded.TakeReference(pxm2->SaveState());
+    xmlRootNodeLoaded->PrintXML();
 
+    bool sameState = xmlRootNodeLoaded->Equals(xmlRootNodeOrigin.GetPointer());
 
     proxy->Delete();
     shrink->Delete();
     session->Delete();
     session2->Delete();
     cout << "Exiting..." << endl;
+
+    if(sameState)
+      cout << " ### States are equals ###" << endl;
+    else
+      cout << " ### FAILED: States are NOT equals ###" << endl;
     }
   vtkInitializationHelper::Finalize();
   options->Delete();

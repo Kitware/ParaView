@@ -747,13 +747,12 @@ vtkSMProxy* vtkSMProxy::GetSubProxy(const char* name)
 }
 
 //---------------------------------------------------------------------------
-void vtkSMProxy::AddSubProxy(const char* name, vtkSMProxy* proxy,
-  int override)
+void vtkSMProxy::AddSubProxy( const char* name, vtkSMProxy* proxy,
+                              int override)
 {
-  // Check if the proxy already exists. If it does, we will
-  // replace it
+  // Check if the proxy already exists. If it does, we will replace it
   vtkSMProxyInternals::ProxyMap::iterator it =
-    this->Internals->SubProxies.find(name);
+      this->Internals->SubProxies.find(name);
 
   if (it != this->Internals->SubProxies.end())
     {
@@ -767,9 +766,8 @@ void vtkSMProxy::AddSubProxy(const char* name, vtkSMProxy* proxy,
 
   this->Internals->SubProxies[name] = proxy;
 
-  proxy->AddObserver(vtkCommand::PropertyModifiedEvent,
-    this->SubProxyObserver);
-  proxy->AddObserver(vtkCommand::UpdatePropertyEvent, this->SubProxyObserver);
+  proxy->AddObserver(vtkCommand::PropertyModifiedEvent,this->SubProxyObserver);
+  proxy->AddObserver(vtkCommand::UpdatePropertyEvent,  this->SubProxyObserver);
 }
 
 //---------------------------------------------------------------------------
@@ -781,7 +779,7 @@ void vtkSMProxy::RemoveSubProxy(const char* name)
     }
 
   vtkSMProxyInternals::ProxyMap::iterator it =
-    this->Internals->SubProxies.find(name);
+      this->Internals->SubProxies.find(name);
 
   vtkSmartPointer<vtkSMProxy> subProxy;
   if (it != this->Internals->SubProxies.end())
@@ -795,7 +793,7 @@ void vtkSMProxy::RemoveSubProxy(const char* name)
 
   // Now, remove any exposed properties for this subproxy.
   vtkSMProxyInternals::ExposedPropertyInfoMap::iterator iter =
-    this->Internals->ExposedProperties.begin();
+      this->Internals->ExposedProperties.begin();
   while ( iter != this->Internals->ExposedProperties.end())
     {
     if (iter->second.SubProxyName == name)
@@ -807,6 +805,27 @@ void vtkSMProxy::RemoveSubProxy(const char* name)
     else
       {
       iter++;
+      }
+    }
+
+  if (subProxy.GetPointer())
+    {
+    // Now, remove any shared property links for the subproxy.
+    vtkSMProxyInternals::SubProxyLinksType::iterator iter2 =
+      this->Internals->SubProxyLinks.begin();
+    while (iter2 != this->Internals->SubProxyLinks.end())
+      {
+      iter2->GetPointer()->RemoveLinkedProxy(subProxy.GetPointer());
+      if (iter2->GetPointer()->GetNumberOfLinkedProxies() <= 1)
+        {
+        // link is useless, remove it.
+        this->Internals->SubProxyLinks.erase(iter2);
+        iter2 = this->Internals->SubProxyLinks.begin();
+        }
+      else
+        {
+        iter2++;
+        }
       }
     }
 }
@@ -962,7 +981,6 @@ void vtkSMProxy::AddProducer(vtkSMProperty* property, vtkSMProxy* proxy)
     vtkSMProxyInternals::ConnectionInfo info(property, proxy);
     this->Internals->Producers.push_back(info);
     }
-  
 }
 
 //---------------------------------------------------------------------------
@@ -1176,8 +1194,8 @@ vtkSMProperty* vtkSMProxy::NewProperty(const char* name,
 }
 
 //---------------------------------------------------------------------------
-int vtkSMProxy::ReadXMLAttributes(
-  vtkSMProxyManager* pm, vtkPVXMLElement* element)
+int vtkSMProxy::ReadXMLAttributes( vtkSMProxyManager* pm,
+                                   vtkPVXMLElement* element)
 {
   this->SetXMLElement(element);
 
@@ -1302,6 +1320,7 @@ int vtkSMProxy::CreateSubProxiesAndProperties(vtkSMProxyManager* pm,
             return 0;
             }
           this->AddSubProxy(name, subproxy, override);
+          this->SetupSharedProperties(subproxy, propElement);
           this->SetupExposedProperties(name, propElement);
           subproxy->Delete();
           }
@@ -1329,57 +1348,109 @@ void vtkSMProxy::SetupExposedProperties(const char* subproxy_name,
     return;
     }
 
-  for (unsigned int i=0; i < element->GetNumberOfNestedElements(); i++)
+  unsigned int i,j;
+  for ( i = 0; i < element->GetNumberOfNestedElements(); i++)
     {
     vtkPVXMLElement* exposedElement = element->GetNestedElement(i);
     if (strcmp(exposedElement->GetName(), "ExposedProperties")!=0)
       {
       continue;
       }
-     for (unsigned int j=0;
-       j < exposedElement->GetNumberOfNestedElements(); j++)
-       {
-       vtkPVXMLElement* propertyElement = exposedElement->GetNestedElement(j);
-       if (strcmp(propertyElement->GetName(), "Property") != 0)
-         {
-         vtkErrorMacro("<ExposedProperties> can contain <Property> elements alone.");
-         continue;
-         }
-       const char* name = propertyElement->GetAttribute("name");
-       if (!name || !name[0])
-         {
-         vtkErrorMacro("Attribute name is required!");
-         continue;
-         }
-       const char* exposed_name = propertyElement->GetAttribute("exposed_name");
-       if (!exposed_name)
-         {
-         // use the property name as the exposed name.
-         exposed_name = name;
-         }
-       int override = 0;
-       if (!propertyElement->GetScalarAttribute("override", &override))
-         {
-         override = 0;
-         }
+    for ( j = 0; j < exposedElement->GetNumberOfNestedElements(); j++)
+      {
+      vtkPVXMLElement* propertyElement = exposedElement->GetNestedElement(j);
+      if (strcmp(propertyElement->GetName(), "Property") != 0)
+        {
+        vtkErrorMacro("<ExposedProperties> can contain <Property> elements alone.");
+        continue;
+        }
+      const char* name = propertyElement->GetAttribute("name");
+      if (!name || !name[0])
+        {
+        vtkErrorMacro("Attribute name is required!");
+        continue;
+        }
+      const char* exposed_name = propertyElement->GetAttribute("exposed_name");
+      if (!exposed_name)
+        {
+        // use the property name as the exposed name.
+        exposed_name = name;
+        }
+      int override = 0;
+      if (!propertyElement->GetScalarAttribute("override", &override))
+        {
+        override = 0;
+        }
 
-       if (propertyElement->GetAttribute("default_values"))
-         {
-         vtkSMProxy* subproxy = this->GetSubProxy(subproxy_name);
-         vtkSMProperty* prop = subproxy->GetProperty(name);
-         if (!prop)
-           {
-           vtkWarningMacro("Failed to locate property '" << name
-             << "' on subproxy '" << subproxy_name << "'");
-           return;
-           }
-         if (!prop->ReadXMLAttributes(subproxy, propertyElement))
-           {
-           return;
-           }
-         }
-       this->ExposeSubProxyProperty(subproxy_name, name, exposed_name, override);
-       }
+      if (propertyElement->GetAttribute("default_values"))
+        {
+        vtkSMProxy* subproxy = this->GetSubProxy(subproxy_name);
+        vtkSMProperty* prop = subproxy->GetProperty(name);
+        if (!prop)
+          {
+          vtkWarningMacro("Failed to locate property '" << name
+                          << "' on subproxy '" << subproxy_name << "'");
+          return;
+          }
+        if (!prop->ReadXMLAttributes(subproxy, propertyElement))
+          {
+          return;
+          }
+        }
+      this->ExposeSubProxyProperty(subproxy_name, name, exposed_name, override);
+      }
+    }
+}
+//---------------------------------------------------------------------------
+void vtkSMProxy::SetupSharedProperties(vtkSMProxy* subproxy,
+                                       vtkPVXMLElement *element)
+{
+  if (!subproxy || !element)
+    {
+    return;
+    }
+
+  for (unsigned int i=0; i < element->GetNumberOfNestedElements(); i++)
+    {
+    vtkPVXMLElement* propElement = element->GetNestedElement(i);
+    if (strcmp(propElement->GetName(), "ShareProperties")==0)
+      {
+      const char* name = propElement->GetAttribute("subproxy");
+      if (!name || !name[0])
+        {
+        continue;
+        }
+      vtkSMProxy* src_subproxy = this->GetSubProxy(name);
+      if (!src_subproxy)
+        {
+        vtkErrorMacro("Subproxy " << name << " must be defined before "
+          "its properties can be shared with another subproxy.");
+        continue;
+        }
+      vtkSMProxyLink* sharingLink = vtkSMProxyLink::New();
+      sharingLink->PropagateUpdateVTKObjectsOff();
+
+      // Read the exceptions.
+      for (unsigned int j=0; j < propElement->GetNumberOfNestedElements(); j++)
+        {
+        vtkPVXMLElement* exceptionProp = propElement->GetNestedElement(j);
+        if (strcmp(exceptionProp->GetName(), "Exception") != 0)
+          {
+          continue;
+          }
+        const char* exp_name = exceptionProp->GetAttribute("name");
+        if (!exp_name)
+          {
+          vtkErrorMacro("Exception tag must have the attribute 'name'.");
+          continue;
+          }
+        sharingLink->AddException(exp_name);
+        }
+      sharingLink->AddLinkedProxy(src_subproxy, vtkSMLink::INPUT);
+      sharingLink->AddLinkedProxy(subproxy, vtkSMLink::OUTPUT);
+      this->Internals->SubProxyLinks.push_back(sharingLink);
+      sharingLink->Delete();
+      }
     }
 }
 
@@ -1395,14 +1466,14 @@ vtkSMPropertyIterator* vtkSMProxy::NewPropertyIterator()
 void vtkSMProxy::Copy(vtkSMProxy* src)
 {
   this->Copy(src, 0, 
-    vtkSMProxy::COPY_PROXY_PROPERTY_VALUES_BY_REFERENCE);
+             vtkSMProxy::COPY_PROXY_PROPERTY_VALUES_BY_REFERENCE);
 }
 
 //---------------------------------------------------------------------------
 void vtkSMProxy::Copy(vtkSMProxy* src, const char* exceptionClass)
 {
   this->Copy(src, exceptionClass,
-    vtkSMProxy::COPY_PROXY_PROPERTY_VALUES_BY_REFERENCE);
+             vtkSMProxy::COPY_PROXY_PROPERTY_VALUES_BY_REFERENCE);
 }
 
 //---------------------------------------------------------------------------

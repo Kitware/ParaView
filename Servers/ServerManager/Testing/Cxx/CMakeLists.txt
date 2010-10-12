@@ -1,3 +1,22 @@
+INCLUDE_DIRECTORIES(
+  ${ParaView_BINARY_DIR}
+  ${PVSERVERCOMMON_INCLUDE_DIR}
+  ${PVFILTERS_INCLUDE_DIR}
+  ${PVSERVERMANAGER_INCLUDE_DIR}
+  ${VTKCLIENTSERVER_INCLUDE_DIR}
+  ${VTK_INCLUDE_DIR}
+  ${XDMF_INCLUDE_DIRS}
+  ${CMAKE_CURRENT_BINARY_DIR}
+  ${protobuf_SOURCE_DIR}/src
+  )
+
+ADD_EXECUTABLE(TestSubProxy
+  TestSubProxy.cxx)
+
+TARGET_LINK_LIBRARIES(TestSubProxy
+  vtkPVServerCommon vtkPVFilters vtkPVServerManager)
+
+
 IF (FIXME)
 ################################################################################
 SET(ServersServerManager_SRCS
