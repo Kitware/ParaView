@@ -5188,7 +5188,7 @@
         name="ScaleFactor"
         command="SetScaleFactor"
         animateable="0"
-        default_values="0"
+        default_values="1"
         number_of_elements="1">
        <Documentation>
          Scaling factor for the points
