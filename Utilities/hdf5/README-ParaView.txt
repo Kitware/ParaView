@@ -11,7 +11,7 @@ branch, but it is merged into our history.
 Update hdf5 from upstream as follows.  Create a local branch to
 explicitly reference the upstream snapshot branch head:
 
- git branch hdf5-upstream 26b4c996
+ git branch hdf5-upstream 8e37142d
 
 Use a temporary directory to checkout the branch:
 
@@ -24,7 +24,7 @@ Use a temporary directory to checkout the branch:
 Now place the (reduced) hdf5 content in this directory.  See
 instructions shown by
 
- git log 6fb768b6
+ git log 8e37142d
 
 for help extracting the content from the upstream svn repo.  Then run
 the following commands to commit the new version.  Substitute the
@@ -36,7 +36,7 @@ appropriate date and version number:
  GIT_AUTHOR_NAME='HDF Group' \
  GIT_AUTHOR_EMAIL='hdf-forum@hdfgroup.org' \
  GIT_AUTHOR_DATE='2010-08-17 02:34:15 -0400' \
- git commit -m 'hdf5 1.8.5-r19245 (reduced)' &&
+ git commit -m 'hdf5 1.8.5-r19589 (reduced)' &&
  git commit --amend
 
 Edit the commit message to describe the procedure used to obtain the
