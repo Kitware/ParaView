@@ -83,7 +83,7 @@ pqContourWidget::pqContourWidget(
     SIGNAL(toggled(bool)), this, SLOT(closeLoop(bool)));
 
   QObject::connect(this->Internals->Delete, SIGNAL(clicked()),
-    this, SLOT(removeAllNodes()));
+    this, SLOT(deleteAllNodes()));
 
   QObject::connect(this->Internals->EditMode, SIGNAL(toggled(bool)),
     this, SLOT(updateMode()));
@@ -174,23 +174,28 @@ void pqContourWidget::updateWidgetVisibility()
 }
 
 //-----------------------------------------------------------------------------
+void pqContourWidget::deleteAllNodes()
+{
+  QMessageBox msgBox;
+  msgBox.setText("Delete all contour nodes.");
+  msgBox.setInformativeText("Do you want to delete everything you have drawn?");
+  msgBox.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
+  int ret = msgBox.exec();
+  if (ret == QMessageBox::Ok)
+    {
+    this->removeAllNodes();
+    }
+}
+//-----------------------------------------------------------------------------
 void pqContourWidget::removeAllNodes()
 {
   vtkSMNewWidgetRepresentationProxy* widget = this->getWidgetProxy();
   if (widget)
     {
-    QMessageBox msgBox;
-    msgBox.setText("Delete all contour nodes.");
-    msgBox.setInformativeText("Do you want to delete everything you have drawn?");
-    msgBox.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
-    int ret = msgBox.exec();
-    if (ret == QMessageBox::Ok)
-      {
-      widget->InvokeCommand("ClearAllNodes");
-      widget->InvokeCommand("Initialize");
-      this->setModified();
-      this->render();
-      }
+    widget->InvokeCommand("ClearAllNodes");
+    widget->InvokeCommand("Initialize");
+    this->setModified();
+    this->render();
     }
 
 }

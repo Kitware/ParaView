@@ -111,6 +111,10 @@ protected:
 
   /// Internal method to cleanup widget.
   void cleanupWidget();
+
+protected slots:
+  void deleteAllNodes();
+
 private:
   pqContourWidget(const pqContourWidget&); // Not implemented.
   void operator=(const pqContourWidget&); // Not implemented.
