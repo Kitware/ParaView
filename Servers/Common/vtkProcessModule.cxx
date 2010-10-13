@@ -67,13 +67,13 @@ ostream* vtkProcessModule::DebugLogStream = 0;
 class vtkProcessModuleInternals
 {
 public:
-  typedef 
+  typedef
   vtkstd::map<vtkStdString, vtkSmartPointer<vtkDataObject> > DataTypesType;
   typedef vtkstd::map<vtkStdString, vtkStdString> MapStringToString;
-  
+
   DataTypesType DataTypes;
   MapStringToString Paths;
-  
+
   // Flag indicating on which servers the SendPrepareProgress
   // was sent. This is used to determine where to send the
   // CleanupPendingProgress request.
@@ -81,7 +81,7 @@ public:
 };
 
 //*****************************************************************************
-class vtkProcessModule::vtkInterpreterInitializationCallbackVector : 
+class vtkProcessModule::vtkInterpreterInitializationCallbackVector :
   public vtkstd::vector<vtkProcessModule::InterpreterInitializationCallback>
 {
 };
@@ -148,7 +148,7 @@ vtkProcessModule::vtkProcessModule()
   this->Internals = new vtkProcessModuleInternals;
   this->ConnectionManager = 0;
   this->Interpreter = 0;
-  
+
   this->Observer = vtkProcessModuleObserver::New();
   this->Observer->SetProcessModule(this);
 
@@ -171,7 +171,7 @@ vtkProcessModule::vtkProcessModule()
   this->SupportMultipleConnections = 0;
   this->DisableNewConnections = false;
   this->ExceptionRaised = 0;
-  
+
   this->MemoryInformation = vtkKWProcessStatistics::New();
 
   this->ServerInformation = vtkPVServerInformation::New();
@@ -196,6 +196,8 @@ vtkProcessModule::vtkProcessModule()
 
   vtkMapper::SetResolveCoincidentTopologyToShiftZBuffer();
   vtkMapper::SetResolveCoincidentTopologyZShift(2.0e-3);
+
+  this->AutoMPI = vtkProcessModuleAutoMPI::New();
 }
 
 //-----------------------------------------------------------------------------
@@ -235,6 +237,7 @@ vtkProcessModule::~vtkProcessModule()
 
   this->CacheSizeKeeper->Delete();
   this->SetLastProgressName(0);
+  this->AutoMPI->Delete();
 }
 
 //-----------------------------------------------------------------------------
@@ -293,7 +296,7 @@ vtkDataObject* vtkProcessModule::GetDataObjectOfType(const char* classname)
 void vtkProcessModule::GatherInformation(vtkIdType connectionID,
   vtkTypeUInt32 serverFlags, vtkPVInformation* info, vtkClientServerID id)
 {
-  vtkIdType rootId = 
+  vtkIdType rootId =
     vtkProcessModuleConnectionManager::GetRootConnection(connectionID);
   this->ConnectionManager->GatherInformation(rootId, serverFlags, info, id);
 }
@@ -322,7 +325,7 @@ int vtkProcessModule::Start(int argc, char** argv)
 
   int myId;
   // This call blocks on the Satellite nodes (never on root node).
-  if (this->ConnectionManager->Initialize(argc, argv, 
+  if (this->ConnectionManager->Initialize(argc, argv,
       this->Options->GetClientMode(), &myId) != 0)
     {
     return 1;
@@ -339,7 +342,7 @@ int vtkProcessModule::Start(int argc, char** argv)
       }
     }
 
-  if (this->Options->GetClientMode() || 
+  if (this->Options->GetClientMode() ||
     (!this->Options->GetServerMode() && !this->Options->GetRenderServerMode()))
     {
     // Starts the client event loop.
@@ -364,7 +367,7 @@ int vtkProcessModule::StartClient(int argc, char** argv)
     {
     vtkErrorMacro("GUIHelper must be set on the client.");
     return 1;
-    }  
+    }
 
   if (!this->SupportMultipleConnections)
     {
@@ -431,19 +434,19 @@ int vtkProcessModule::StartServer(unsigned long msec)
   else
     {
     // Server in reverse connect mode, connect to the client.
-    // When in reverse connect mode, the server can connect to 
-    // one and only one client. 
+    // When in reverse connect mode, the server can connect to
+    // one and only one client.
     // When the client disconnects, the server terminates.
     if (!this->ConnectToRemote())
       {
-      // failed -- in reverse connect mode, the client must be 
+      // failed -- in reverse connect mode, the client must be
       // up and running before the server tries to connect.
       return 1;
       }
     support_multiple_connections = 0;
     }
 
-  while (!this->ExceptionRaised && 
+  while (!this->ExceptionRaised &&
     (ret = this->ConnectionManager->MonitorConnections(msec)) >= 0)
     {
     if (ret == 2)
@@ -485,7 +488,7 @@ int vtkProcessModule::InitializeConnections()
   case vtkPVOptions::ALLPROCESS:
     return 1; // nothing to do here.
     }
-  
+
   if (this->ShouldWaitForConnection())
     {
     return this->SetupWaitForConnection();
@@ -533,7 +536,7 @@ int vtkProcessModule::SetupWaitForConnection()
         {
         return 0;
         }
-      cout << "Listen on render server port:" << 
+      cout << "Listen on render server port:" <<
         this->Options->GetRenderServerPort() << endl;
       cout << "Listen on data server port:" <<
         this->Options->GetDataServerPort() << endl;
@@ -544,7 +547,7 @@ int vtkProcessModule::SetupWaitForConnection()
       port = this->Options->GetServerPort();
       }
     break;
-    
+
   case vtkPVOptions::PVSERVER:
     port = this->Options->GetServerPort();
     break;
@@ -560,7 +563,7 @@ int vtkProcessModule::SetupWaitForConnection()
   default:
     return 0;
     }
-  
+
   cout << "Listen on port: " << port << endl;
   int ret = this->ConnectionManager->AcceptConnectionsOnPort(
     port, vtkProcessModuleConnectionManager::RENDER_AND_DATA_SERVER);
@@ -579,7 +582,7 @@ int vtkProcessModule::AcceptConnectionsOnPort(int port)
 }
 
 //-----------------------------------------------------------------------------
-void vtkProcessModule::AcceptConnectionsOnPort(int data_server_port, 
+void vtkProcessModule::AcceptConnectionsOnPort(int data_server_port,
   int render_server_port, int &ds_id, int &rs_id)
 {
   ds_id = this->ConnectionManager->AcceptConnectionsOnPort(
@@ -618,7 +621,7 @@ vtkIdType vtkProcessModule::ConnectToRemote(const char* servername, int port)
 }
 
 //-----------------------------------------------------------------------------
-vtkIdType vtkProcessModule::ConnectToRemote(const char* dataserver_host, 
+vtkIdType vtkProcessModule::ConnectToRemote(const char* dataserver_host,
   int dataserver_port, const char* renderserver_host, int renderserver_port)
 {
   if (this->DisableNewConnections)
@@ -638,7 +641,19 @@ vtkIdType vtkProcessModule::ConnectToSelf()
     vtkErrorMacro("Cannot create new connections.");
     return 0;
     }
-  return this->ConnectionManager->OpenSelfConnection();
+  // if there are multiple inputs then start server and connect else
+  // connect to self
+  if(this->AutoMPI->isPossible())
+    {
+    this->IsAutoMPI = 1;
+    int port = this->AutoMPI->ConnectToRemoteBuiltInSelf();
+    return this->ConnectionManager->OpenConnection("localhost",port);
+    }
+  else
+    {
+    this->IsAutoMPI = 0;
+    return this->ConnectionManager->OpenSelfConnection();
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -711,14 +726,14 @@ int vtkProcessModule::ConnectToRemote()
       vtkErrorMacro("Invalid mode!");
       return 0;
       }
-    
+
     if (id)
       {
       // connection successful.
       cout << "Connected to " << message << endl;
       return 1;
       }
-    
+
     if (!this->GUIHelper)
       {
       // Probably a server. Just flag error and exit.
@@ -762,7 +777,7 @@ vtkIdType vtkProcessModule::MonitorConnections(unsigned long msec)
       this->LastConnectionID = -1;
       return connid;
     }
-    
+
   return 0;
 }
 
@@ -771,7 +786,7 @@ vtkIdType vtkProcessModule::MonitorConnections(unsigned long msec)
 // Will establish server connections.
 int vtkProcessModule::ClientWaitForConnection()
 {
-  
+
   cout << "Waiting for server..." << endl;
   this->GUIHelper->PopupDialog("Waiting for server",
     "Waiting for server to connect to this client via the reverse connection.");
@@ -786,7 +801,7 @@ int vtkProcessModule::ClientWaitForConnection()
       {
       this->GUIHelper->ClosePopup();
       }
-    
+
     if (res < 0)
       {
       // Error !
@@ -867,14 +882,14 @@ vtkIdType vtkProcessModule::GetConnectionID(vtkProcessModuleConnection* conn)
 }
 
 //-----------------------------------------------------------------------------
-int vtkProcessModule::SendStream(vtkIdType connectionID, 
+int vtkProcessModule::SendStream(vtkIdType connectionID,
   vtkTypeUInt32 server, vtkClientServerStream& stream, int resetStream/*=1*/)
 {
   if (stream.GetNumberOfMessages() < 1)
     {
     return 0;
     }
-  
+
   if (this->SendStreamToClientOnly)
     {
     server &= vtkProcessModule::CLIENT;
@@ -890,10 +905,10 @@ int vtkProcessModule::SendStream(vtkIdType connectionID,
 
   int ret = this->ConnectionManager->SendStream(connectionID,
     server, stream, resetStream);
- 
+
   // If send failed on a Client, it means that the server connection was closed.
   // So currently, we exit the client.
- 
+
   if (ret != 0 && this->GUIHelper)
     {
     cout << "Connection Error: Server connection closed!" << endl;
@@ -991,19 +1006,19 @@ void vtkProcessModule::InitializeInterpreter()
     // controller is initialized hence we cannot really get the information
     // about number of processes etc.
     this->Interpreter->SetLogFile(logfilename);
-    } 
+    }
 
   // Assign standard IDs.
   vtkClientServerStream css;
   css << vtkClientServerStream::Assign
     << this->GetProcessModuleID() << this
     << vtkClientServerStream::End;
-  this->Interpreter->ProcessStream(css); 
+  this->Interpreter->ProcessStream(css);
 
   // If any initialization callbacks were registered, call them.
   if (this->InitializationCallbacks)
     {
-    vtkInterpreterInitializationCallbackVector& callbacks = 
+    vtkInterpreterInitializationCallbackVector& callbacks =
       (*this->InitializationCallbacks);
    vtkInterpreterInitializationCallbackVector::iterator iter;
    for (iter = callbacks.begin(); iter != callbacks.end(); ++iter)
@@ -1106,7 +1121,7 @@ int vtkProcessModule::GetNumberOfLocalPartitions()
 //-----------------------------------------------------------------------------
 int vtkProcessModule::GetNumberOfPartitions(vtkIdType id)
 {
-  if (this->Options && this->Options->GetClientMode() && 
+  if (this->Options && this->Options->GetClientMode() &&
     id != vtkProcessModuleConnectionManager::GetSelfConnectionID())
     {
     return this->ConnectionManager->GetNumberOfPartitions(id);
@@ -1204,9 +1219,9 @@ void vtkProcessModule::SendPrepareProgress(vtkIdType connectionId,
   if (servers)
     {
     vtkClientServerStream stream;
-    stream << vtkClientServerStream::Invoke 
+    stream << vtkClientServerStream::Invoke
            << this->GetProcessModuleID()
-           << "PrepareProgress" 
+           << "PrepareProgress"
            << vtkClientServerStream::End;
     this->SendStream(connectionId, servers, stream);
     }
@@ -1234,13 +1249,13 @@ void vtkProcessModule::SendCleanupPendingProgress(vtkIdType connectionId)
     return;
     }
   vtkClientServerStream stream;
-    stream << vtkClientServerStream::Invoke 
+    stream << vtkClientServerStream::Invoke
            << this->GetProcessModuleID()
-           << "CleanupPendingProgress" 
+           << "CleanupPendingProgress"
            << vtkClientServerStream::End;
   this->SendStream(connectionId, this->Internals->ProgressServersFlag, stream);
   this->Internals->ProgressServersFlag = 0;
-  
+
   this->GUIHelper->SendCleanupPendingProgress();
 
   if (this->LastProgress < 100 && this->LastProgressName)
@@ -1350,7 +1365,7 @@ void vtkProcessModule::ExecuteEvent(
       const char* data = reinterpret_cast<const char*>(calldata);
       if (data && re.find(data))
         {
-        // We throw an exception instead of calling 
+        // We throw an exception instead of calling
         // this->ExceptionEvent() directly so that the the calls
         // unwind. This makes it possible for the server to exit gracefully
         // (although there might be some leaks). Otherwise, the server most
@@ -1412,7 +1427,7 @@ void vtkProcessModule::CreateLogFile()
     {
     return;
     }
-  
+
   vtksys_ios::ostringstream fileName;
   fileName << prefix << this->GetPartitionId() << ".txt"
     << ends;
@@ -1435,15 +1450,15 @@ int vtkProcessModule::GetDirectoryListing(vtkIdType connectionID,
 {
   // Get the listing from the server.
   vtkClientServerStream stream;
-  vtkClientServerID lid = 
+  vtkClientServerID lid =
     this->NewStreamObject("vtkPVServerFileListing", stream);
   stream << vtkClientServerStream::Invoke
     << lid << "GetFileListing" << dir << save
     << vtkClientServerStream::End;
   this->SendStream(connectionID, vtkProcessModule::DATA_SERVER_ROOT, stream);
-  
+
   vtkClientServerStream result;
-  if(!this->GetLastResult(connectionID, 
+  if(!this->GetLastResult(connectionID,
       vtkProcessModule::DATA_SERVER_ROOT).GetArgument(0, 0, &result))
     {
     vtkErrorMacro("Error getting file list result from server.");
@@ -1516,9 +1531,9 @@ int vtkProcessModule::LoadModule(vtkIdType connectionID,
     << this->GetProcessModuleID()
     << "LoadModuleInternal" << name << directory
     << vtkClientServerStream::End;
-  
+
   this->SendStream(connectionID, serverFlags, stream);
-  
+
   int result = 0;
   if(!this->GetLastResult(connectionID,
       this->GetRootId(serverFlags)).GetArgument(0, 0, &result))
@@ -1545,7 +1560,7 @@ void vtkProcessModule::LogStartEvent(const char* str)
   vtkTimerLog::MarkStartEvent(str);
   this->Timer->StartTimer();
 }
-  
+
 //-----------------------------------------------------------------------------
 void vtkProcessModule::LogEndEvent(const char* str)
 {
@@ -1623,7 +1638,7 @@ void vtkProcessModule::SetEnableLog(int flag)
 }
 
 //----------------------------------------------------------------------------
-void vtkProcessModule::SetLogThreshold(vtkIdType connectionID, 
+void vtkProcessModule::SetLogThreshold(vtkIdType connectionID,
                                        vtkTypeUInt32 servers,
                                        double threshold)
 {
@@ -1639,7 +1654,7 @@ void vtkProcessModule::SetLogThreshold(vtkIdType connectionID,
 //============================================================================
 // Stuff that is a part of render-process module.
 //-----------------------------------------------------------------------------
-const char* vtkProcessModule::GetPath(const char* tag, 
+const char* vtkProcessModule::GetPath(const char* tag,
   const char* relativePath, const char* file)
 {
   if ( !tag || !relativePath || !file )
@@ -1775,7 +1790,7 @@ const char* vtkProcessModule::GetMachineName(unsigned int idx)
 vtkPVServerInformation* vtkProcessModule::GetServerInformation(
   vtkIdType id)
 {
-  vtkPVServerInformation* info = 
+  vtkPVServerInformation* info =
     this->ConnectionManager->GetServerInformation(id);
   return (info)? info : this->ServerInformation;
 }
@@ -1789,8 +1804,8 @@ vtkClientServerID vtkProcessModule::GetMPIMToNSocketConnectionID(
 
 
 //----------------------------------------------------------------------------
-// This method leaks memory.  It is a quick and dirty way to set different 
-// DISPLAY environment variables on the render server.  I think the string 
+// This method leaks memory.  It is a quick and dirty way to set different
+// DISPLAY environment variables on the render server.  I think the string
 // cannot be deleted until paraview exits.  The var should have the form:
 // "DISPLAY=amber1"
 void vtkProcessModule::SetProcessEnvironmentVariable(int processId,
@@ -1833,10 +1848,10 @@ vtkSocketController* vtkProcessModule::GetActiveRenderServerSocketController()
 }
 
 //-----------------------------------------------------------------------------
-void vtkProcessModule::PushUndo(vtkIdType id, const char* label, 
+void vtkProcessModule::PushUndo(vtkIdType id, const char* label,
   vtkPVXMLElement* root)
 {
-  this->ConnectionManager->PushUndo(id, label, root); 
+  this->ConnectionManager->PushUndo(id, label, root);
 }
 
 //-----------------------------------------------------------------------------
@@ -1897,11 +1912,11 @@ void vtkProcessModule::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "SupportMultipleConnections: " << this->SupportMultipleConnections
     << endl;
   os << indent << "UseMPI: " << this->UseMPI << endl;
-  os << indent << "SendStreamToClientOnly: " 
+  os << indent << "SendStreamToClientOnly: "
     << this->SendStreamToClientOnly << endl;
-  os << indent 
+  os << indent
     << (this->LastProgressName? this->LastProgressName : "(none)") << endl;
- 
+
   os << indent << "Interpreter: " ;
   if (this->Interpreter)
     {
@@ -1921,7 +1936,7 @@ void vtkProcessModule::PrintSelf(ostream& os, vtkIndent indent)
     {
     os << "(none)" << endl;
     }
-  
+
   os << indent << "Options: ";
   if (this->Options)
     {
