@@ -24,7 +24,7 @@ Use a temporary directory to checkout the branch:
 Now place the (reduced) hdf5 content in this directory.  See
 instructions shown by
 
- git log 26b4c996
+ git log 6fb768b6
 
 for help extracting the content from the upstream svn repo.  Then run
 the following commands to commit the new version.  Substitute the
