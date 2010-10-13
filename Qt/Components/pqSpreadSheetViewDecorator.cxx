@@ -135,7 +135,8 @@ void pqSpreadSheetViewDecorator::showing(pqDataRepresentation* repr)
       reprProxy, reprProxy->GetProperty("FieldAssociation"));
     this->Internal->Links.addPropertyLink(this->Internal->SelectionOnly,
       "checked", SIGNAL(toggled(bool)),
-      reprProxy, reprProxy->GetProperty("SelectionOnly"));
+      this->Spreadsheet->getProxy(),
+      this->Spreadsheet->getProxy()->GetProperty("SelectionOnly"));
     }
   else
     {

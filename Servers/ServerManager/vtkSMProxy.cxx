@@ -2180,11 +2180,11 @@ int vtkSMProxy::LoadState(
   vtkPVXMLElement* proxyElement, vtkSMProxyLocator* locator)
 {
   unsigned int numElems = proxyElement->GetNumberOfNestedElements();
-  int servers =0;
-  if (proxyElement->GetScalarAttribute("servers", &servers))
-    {
-    this->SetServersSelf(servers);
-    }
+  //int servers =0;
+  //if (proxyElement->GetScalarAttribute("servers", &servers))
+  //  {
+  //  this->SetServersSelf(servers);
+  //  }
 
   for (unsigned int i=0; i<numElems; i++)
     {
@@ -2426,6 +2426,9 @@ void vtkSMProxy::SaveSubProxyState(vtkPVXMLElement* root)
 void vtkSMProxy::LoadSubProxyState(vtkPVXMLElement* subproxyElement, 
   vtkSMProxyLocator* locator)
 {
+  (void) subproxyElement;
+  (void) locator;
+  /* Restoring of proxy location from state is no longer needed.
   const char* name = subproxyElement->GetAttribute("name");
   if (name)
     {
@@ -2445,6 +2448,7 @@ void vtkSMProxy::LoadSubProxyState(vtkPVXMLElement* subproxyElement,
         }
       }
     }
+    */
 }
 
 //---------------------------------------------------------------------------

@@ -46,8 +46,6 @@
 #include "vtkPVArrowSource.h"
 #include "vtkPVClipDataSet.h"
 #include "vtkPVConnectivityFilter.h"
-#include "vtkPVDesktopDeliveryClient.h"
-#include "vtkPVDesktopDeliveryServer.h"
 #include "vtkPVDReader.h"
 #include "vtkPVEnSightMasterServerReader.h"
 #include "vtkPVEnSightMasterServerTranslator.h"
@@ -105,13 +103,8 @@
 # include "vtkBalancedRedistributePolyData.h"
 # include "vtkRedistributePolyData.h"
 # ifdef PARAVIEW_USE_ICE_T
-#  include "vtkCaveRenderManager.h"
-#  include "vtkDesktopDeliveryClient.h"
-#  include "vtkDesktopDeliveryServer.h"
 //#include "vtkExtractCTHPart2.h"
 #  include "vtkIceTContext.h"
-#  include "vtkIceTRenderer.h"
-#  include "vtkIceTRenderManager.h"
 # endif
 # include "vtkRedistributePolyData.h"
 //#include "vtkStructuredCacheFilter.h"
@@ -156,8 +149,6 @@ int main(int , char *[])
   c = vtkPVArrowSource::New(); c->Print(cout); c->Delete();
   c = vtkPVClipDataSet::New(); c->Print(cout); c->Delete();
   c = vtkPVConnectivityFilter::New(); c->Print(cout); c->Delete();
-  c = vtkPVDesktopDeliveryClient::New(); c->Print(cout); c->Delete();
-  c = vtkPVDesktopDeliveryServer::New(); c->Print(cout); c->Delete();
   c = vtkPVDReader::New(); c->Print(cout); c->Delete();
   c = vtkPVEnSightMasterServerReader::New(); c->Print(cout); c->Delete();
   c = vtkPVEnSightMasterServerTranslator::New(); c->Print(cout); c->Delete();
@@ -215,13 +206,10 @@ int main(int , char *[])
   c = vtkBalancedRedistributePolyData::New(); c->Print(cout); c->Delete();
   c = vtkRedistributePolyData::New(); c->Print(cout); c->Delete();
 # ifdef PARAVIEW_USE_ICE_T
-  c = vtkCaveRenderManager::New(); c->Print(cout); c->Delete();
   c = vtkDesktopDeliveryClient::New(); c->Print(cout); c->Delete();
   c = vtkDesktopDeliveryServer::New(); c->Print(cout); c->Delete();
 //  c = vtkExtractCTHPart2::New(); c->Print(cout); c->Delete();
   c = vtkIceTContext::New(); c->Print(cout); c->Delete();
-  c = vtkIceTRenderer::New(); c->Print(cout); c->Delete();
-  c = vtkIceTRenderManager::New(); c->Print(cout); c->Delete();
 # endif
   c = vtkRedistributePolyData::New(); c->Print(cout); c->Delete();
 //  c = vtkStructuredCacheFilter::New(); c->Print(cout); c->Delete();

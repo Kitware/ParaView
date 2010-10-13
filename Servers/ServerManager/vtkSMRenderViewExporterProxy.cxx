@@ -16,8 +16,8 @@
 
 #include "vtkExporter.h"
 #include "vtkObjectFactory.h"
+#include "vtkSMPropertyHelper.h"
 #include "vtkSMRenderViewProxy.h"
-#include "vtkSMMultiProcessRenderView.h"
 
 vtkStandardNewMacro(vtkSMRenderViewExporterProxy);
 //----------------------------------------------------------------------------
@@ -45,23 +45,22 @@ void vtkSMRenderViewExporterProxy::Write()
   vtkSMRenderViewProxy* rv = vtkSMRenderViewProxy::SafeDownCast(this->View);
   if (exporter && rv)
     {
-    vtkSMMultiProcessRenderView* mrv = 
-      vtkSMMultiProcessRenderView::SafeDownCast(rv);
-    double old_threshold = 0.0;
-    if (mrv)
+    int old_threshold = -1;
+    if (rv->GetProperty("RemoteRenderThreshold"))
       {
-      old_threshold = mrv->GetRemoteRenderThreshold();
-      mrv->SetRemoteRenderThreshold(VTK_DOUBLE_MAX);
-      mrv->StillRender();
+      vtkSMPropertyHelper helper(rv, "RemoteRenderThreshold");
+      old_threshold = helper.GetAsInt();
+      helper.Set(VTK_INT_MAX);
+      rv->StillRender();
       }
 
     vtkRenderWindow* renWin = rv->GetRenderWindow();
     exporter->SetRenderWindow(renWin);
     exporter->Write();
     exporter->SetRenderWindow(0);
-    if (mrv)
+    if (rv->GetProperty("RemoteRenderThreshold"))
       {
-      mrv->SetRemoteRenderThreshold(old_threshold);
+      vtkSMPropertyHelper(rv, "RemoteRenderThreshold").Set(old_threshold);
       }
     }
 }

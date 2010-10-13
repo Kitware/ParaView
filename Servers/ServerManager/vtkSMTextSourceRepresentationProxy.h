@@ -14,39 +14,25 @@
 =========================================================================*/
 // .NAME vtkSMTextSourceRepresentationProxy
 // .SECTION Description
-//
+// vtkSMTextSourceRepresentationProxy is the proxy for
+// (representations, TextSourceRepresentation). Merely overrides
+// CreateVTKObjects to ensure that the subproxies are passed to the
+// vtkTextSourceRepresentation correctly.
 
 #ifndef __vtkSMTextSourceRepresentationProxy_h
 #define __vtkSMTextSourceRepresentationProxy_h
 
-#include "vtkSMClientDeliveryRepresentationProxy.h"
+#include "vtkSMRepresentationProxy.h"
 
 class vtkSMTextWidgetRepresentationProxy;
 class vtkSMViewProxy;
 
-class VTK_EXPORT vtkSMTextSourceRepresentationProxy : public vtkSMClientDeliveryRepresentationProxy
+class VTK_EXPORT vtkSMTextSourceRepresentationProxy : public vtkSMRepresentationProxy
 {
 public:
   static vtkSMTextSourceRepresentationProxy* New();
-  vtkTypeMacro(vtkSMTextSourceRepresentationProxy, vtkSMClientDeliveryRepresentationProxy);
+  vtkTypeMacro(vtkSMTextSourceRepresentationProxy, vtkSMRepresentationProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
-
-  // Description:
-  // Set the visibility for the representation.
-  void SetVisibility(int);
-
-  // Description:
-  // Called to update the Display. Default implementation does nothing.
-  // Argument is the view requesting the update. Can be null in the
-  // case when something other than a view is requesting the update.
-  virtual void Update() { this->Update(0); };
-  virtual void Update(vtkSMViewProxy* view);
-
-  // Description:
-  // Get the bounds for the representation.
-  // Overridden to now return any bounds since Text has no bounds.
-  virtual bool GetBounds(double*)
-    { return false; }
 
 // BTX
 protected:
@@ -54,26 +40,7 @@ protected:
   ~vtkSMTextSourceRepresentationProxy();
 
   // Description:
-  // This method is called at the beginning of CreateVTKObjects().
-  // This gives the subclasses an opportunity to set the servers flags
-  // on the subproxies.
-  // If this method returns false, CreateVTKObjects() is aborted.
-  virtual bool BeginCreateVTKObjects();
-  virtual bool EndCreateVTKObjects();
-
-  // Description:
-  // Called when a representation is added to a view. 
-  // Returns true on success.
-  // Currently a representation can be added to only one view.
-  virtual bool AddToView(vtkSMViewProxy* view);
-
-  // Description:
-  // Called to remove a representation from a view.
-  // Returns true on success.
-  // Currently a representation can be added to only one view.
-  virtual bool RemoveFromView(vtkSMViewProxy* view);
-
-  vtkSMTextWidgetRepresentationProxy* TextWidgetProxy;
+  virtual void CreateVTKObjects();
 private:
   vtkSMTextSourceRepresentationProxy(const vtkSMTextSourceRepresentationProxy&); // Not implemented
   void operator=(const vtkSMTextSourceRepresentationProxy&); // Not implemented
@@ -81,4 +48,3 @@ private:
 };
 
 #endif
-

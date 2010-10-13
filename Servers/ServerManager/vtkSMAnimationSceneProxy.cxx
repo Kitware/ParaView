@@ -22,11 +22,10 @@
 #include "vtkProcessModule.h"
 #include "vtkPVAnimationScene.h"
 #include "vtkPVCacheSizeInformation.h"
-#include "vtkPVGenericRenderWindowInteractor.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
-#include "vtkSMRenderViewProxy.h"
+#include "vtkSMViewProxy.h"
 #include "vtkSMTimeKeeperProxy.h"
 
 #include <vtksys/SystemTools.hxx>
@@ -67,7 +66,8 @@ public:
     VectorOfViews::iterator iter = this->ViewModules.begin();
     for (; iter != this->ViewModules.end(); ++iter)
       {
-      (*iter)->SetCacheTime(cachetime);
+      vtkSMPropertyHelper((*iter), "CacheKey").Set(cachetime);
+      iter->GetPointer()->UpdateProperty("CacheKey");
       }
     }
 
@@ -76,7 +76,8 @@ public:
     VectorOfViews::iterator iter = this->ViewModules.begin();
     for (; iter != this->ViewModules.end(); ++iter)
       {
-      (*iter)->SetUseCache(usecache);
+      vtkSMPropertyHelper((*iter), "UseCache").Set(usecache);
+      iter->GetPointer()->UpdateProperty("UseCache");
       }
     }
 };

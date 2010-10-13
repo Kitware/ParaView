@@ -50,7 +50,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPipelineSource.h"
 #include "pqPluginManager.h"
 #include "pqPropertyLinks.h"
-#include "pqScatterPlotDisplayPanel.h"
 #include "pqSpreadSheetDisplayEditor.h"
 #include "pqTextDisplayPropertiesWidget.h"
 #include "pqTextRepresentation.h"
@@ -119,10 +118,12 @@ public:
       {
       return new pqTextDisplayPropertiesWidget(proxy, p);
       }
+#ifdef FIXME
     if (type == "ScatterPlotRepresentation")
       {
       return new pqScatterPlotDisplayPanel(proxy, p);
       }
+#endif
     if (type == QString("ParallelCoordinatesRepresentation"))
       {
       return new pqParallelCoordinatesChartDisplayPanel(proxy, p);

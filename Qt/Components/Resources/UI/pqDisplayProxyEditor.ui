@@ -618,7 +618,7 @@
        </widget>
       </item>
       <item row="8" column="1" colspan="2">
-       <widget class="QComboBox" name="SelectedMapperIndex">
+       <widget class="QComboBox" name="SelectMapper">
         <property name="toolTip">
          <string>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;/head&gt;&lt;body style=&quot; white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;&quot;&gt;&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Choose the mapper to use for volume rendering.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
@@ -1154,7 +1154,7 @@
   <tabstop>StyleLineWidth</tabstop>
   <tabstop>Opacity</tabstop>
   <tabstop>NonlinearSubdivisionLevel</tabstop>
-  <tabstop>SelectedMapperIndex</tabstop>
+  <tabstop>SelectMapper</tabstop>
   <tabstop>EdgeColor</tabstop>
   <tabstop>SpecularIntensity</tabstop>
   <tabstop>SpecularPower</tabstop>

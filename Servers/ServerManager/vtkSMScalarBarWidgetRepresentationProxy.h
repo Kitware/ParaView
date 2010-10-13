@@ -36,11 +36,6 @@ public:
                        vtkSMNewWidgetRepresentationProxy);
   virtual void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Calls set enabled on the WidgetProxy.
-  // Overrridden to not pass the enabled state to WidgetProxy unless the
-  // representation has been added to a view.
-  virtual void SetEnabled(int enable);
 //BTX
 protected:
   vtkSMScalarBarWidgetRepresentationProxy();
@@ -52,25 +47,10 @@ protected:
   virtual void CreateVTKObjects();
 
   // Description:
-  // Called when a representation is added to a view. 
-  // Returns true on success.
-  // Currently a representation can be added to only one view.
-  virtual bool AddToView(vtkSMViewProxy* view);
-
-  // Description:
-  // Called to remove a representation from a view.
-  // Returns true on success.
-  // Currently a representation can be added to only one view.
-  virtual bool RemoveFromView(vtkSMViewProxy* view);
-
-  vtkSMProxy* ActorProxy;
-  vtkSMViewProxy* ViewProxy;
-  int Enabled;
-
-  // Description:
   // Called every time the user interacts with the widget.
   virtual void ExecuteEvent(unsigned long event);
 
+  vtkSMProxy* ActorProxy;
 private:
   vtkSMScalarBarWidgetRepresentationProxy(const vtkSMScalarBarWidgetRepresentationProxy&); // Not implemented
   void operator=(const vtkSMScalarBarWidgetRepresentationProxy&); // Not implemented

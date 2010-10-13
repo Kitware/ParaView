@@ -35,9 +35,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVArrayInformation.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVDataSetAttributesInformation.h"
-#include "vtkSMDataRepresentationProxy.h"
+#include "vtkSMRepresentationProxy.h"
 #include "vtkSMInputProperty.h"
 #include "vtkSMSourceProxy.h"
+#include "vtkDataObject.h"
 
 #include <QtDebug>
 #include <QPointer>
@@ -175,7 +176,7 @@ void pqDataRepresentation::setDefaultPropertyValues()
   // This is safe since setDefaultPropertyValues is called only after having
   // added the display to the render module, which ensures that the
   // update time has been set correctly on the display.
-  proxy->Update();
+  proxy->UpdatePipeline();
   proxy->GetProperty("Input")->UpdateDependentDomains();
   
   this->Superclass::setDefaultPropertyValues();
@@ -197,18 +198,16 @@ pqScalarsToColors* pqDataRepresentation::getLookupTable()
 
   return (lut? smmodel->findItem<pqScalarsToColors*>(lut): 0);
 }
-  
+
 //-----------------------------------------------------------------------------
 unsigned long pqDataRepresentation::getFullResMemorySize()
 {
-  vtkSMRepresentationProxy* repr = vtkSMRepresentationProxy::SafeDownCast(
-    this->getProxy());
-  if (repr)
+  vtkPVDataInformation* info = this->getRepresentedDataInformation(true);
+  if (!info)
     {
-    return repr->GetFullResMemorySize();
+    return 0;
     }
-
-  return 0;
+  return static_cast<unsigned long>(info->GetMemorySize());
 }
 
 //-----------------------------------------------------------------------------
@@ -227,11 +226,11 @@ bool pqDataRepresentation::getDataBounds(double bounds[6])
 vtkPVDataInformation* pqDataRepresentation::getRepresentedDataInformation(
   bool update/*=true*/) const
 {
-  vtkSMDataRepresentationProxy* repr = vtkSMDataRepresentationProxy::SafeDownCast(
+  vtkSMRepresentationProxy* repr = vtkSMRepresentationProxy::SafeDownCast(
     this->getProxy());
   if (repr)
     {
-    return repr->GetRepresentedDataInformation(update);
+    return repr->GetRepresentedDataInformation();
     }
   return NULL;
 }
@@ -281,7 +280,7 @@ pqDataRepresentation* pqDataRepresentation::getRepresentationForUpstreamSource()
 //-----------------------------------------------------------------------------
 int pqDataRepresentation::getProxyScalarMode( )
 {
-  vtkSMDataRepresentationProxy* repr = vtkSMDataRepresentationProxy::SafeDownCast( this->getProxy() );
+  vtkSMRepresentationProxy* repr = vtkSMRepresentationProxy::SafeDownCast( this->getProxy() );
    if (!repr)
     {
     return 0;
@@ -292,14 +291,14 @@ int pqDataRepresentation::getProxyScalarMode( )
 
    if(scalarMode == "CELL_DATA")
       {
-      return vtkSMDataRepresentationProxy::CELL_DATA;
+      return vtkDataObject::FIELD_ASSOCIATION_CELLS;
       }
     else if(scalarMode == "POINT_DATA")
       {
-      return vtkSMDataRepresentationProxy::POINT_DATA;
+      return vtkDataObject::FIELD_ASSOCIATION_POINTS;
       }
 
-   return vtkSMDataRepresentationProxy::FIELD_DATA;
+   return vtkDataObject::FIELD_ASSOCIATION_NONE;
   }
 
 
@@ -309,13 +308,13 @@ vtkPVArrayInformation* pqDataRepresentation::getArrayInformation( const char* ar
  
   vtkPVDataInformation* dataInfo = this->getRepresentedDataInformation(true);
   vtkPVArrayInformation* info = NULL;
-  if(fieldType == vtkSMDataRepresentationProxy::CELL_DATA)
+  if(fieldType == vtkDataObject::FIELD_ASSOCIATION_CELLS)
     {
     vtkPVDataSetAttributesInformation* cellinfo = 
       dataInfo->GetCellDataInformation();
     info = cellinfo->GetArrayInformation(arrayname);
     }
-  else if ( fieldType == vtkSMDataRepresentationProxy::POINT_DATA )
+  else if ( fieldType == vtkDataObject::FIELD_ASSOCIATION_POINTS)
     {
     vtkPVDataSetAttributesInformation* pointinfo = 
       dataInfo->GetPointDataInformation();

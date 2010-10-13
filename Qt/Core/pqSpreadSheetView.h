@@ -84,7 +84,6 @@ signals:
 public slots:
   /// Called when a new repr is added.
   void onAddRepresentation(pqRepresentation*);
-  void onRemoveRepresentation(pqRepresentation*);
 
 protected slots:
   /// Called to ensure that at most 1 repr is visible at a time.
@@ -102,7 +101,7 @@ protected slots:
   void onCreateSelection(vtkSMSourceProxy* selSource);
 
   /// Called when checkbox "Show Only Selected Elements" is updated
-  void onSelectionOnly(int selOnly);
+  void onSelectionOnly();
   
 private:
   pqSpreadSheetView(const pqSpreadSheetView&); // Not implemented.

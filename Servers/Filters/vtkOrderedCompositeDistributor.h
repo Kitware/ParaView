@@ -27,8 +27,8 @@
 // .SECTION Description
 //
 // This class distributes data for use with ordered compositing (i.e. with
-// vtkIceTRenderManager).  The composite distributor takes the same vtkPKdTree
-// that vtkIceTRenderManager and will use that to distribute the data.
+// IceT).  The composite distributor takes the same vtkPKdTree
+// that IceT and will use that to distribute the data.
 //
 // Input poly data will be converted back to poly data on the output.
 //

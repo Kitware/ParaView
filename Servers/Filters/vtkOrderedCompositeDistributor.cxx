@@ -26,13 +26,14 @@
 
 #include "vtkBSPCuts.h"
 #include "vtkCallbackCommand.h"
-#include "vtkDataSet.h"
 #include "vtkDataObjectTypes.h"
+#include "vtkDataSet.h"
 #include "vtkDataSetSurfaceFilter.h"
 #include "vtkDistributedDataFilter.h"
 #include "vtkGarbageCollector.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
+#include "vtkMath.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
 #include "vtkPKdTree.h"
@@ -233,32 +234,25 @@ int vtkOrderedCompositeDistributor::RequestData(
     needUpdate = 1;
     }
 
-  const int COLLECT_NEED_UPDATE = 25234;
-  const int BROADCAST_NEED_UPDATE = 25235;
-  if (this->Controller->GetLocalProcessId() == 0)
-    {
-    int i, numproc;
-    numproc = this->Controller->GetNumberOfProcesses();
-    for (i = 1; i < numproc; i++)
-      {
-      int remoteNeedUpdate;
-      this->Controller->Receive(&remoteNeedUpdate, 1, i, COLLECT_NEED_UPDATE);
-      needUpdate |= remoteNeedUpdate;
-      }
-    for (i = 1; i < numproc; i++)
-      {
-      this->Controller->Send(&needUpdate, 1, i, BROADCAST_NEED_UPDATE);
-      }
-    }
-  else
-    {
-    this->Controller->Send(&needUpdate, 1, 0, COLLECT_NEED_UPDATE);
-    this->Controller->Receive(&needUpdate, 1, 0, BROADCAST_NEED_UPDATE);
-    }
-
-  if (!needUpdate)
+  int reduced_needUpdate = 0;
+  this->Controller->AllReduce(&needUpdate, &reduced_needUpdate, 1,
+    vtkCommunicator::MAX_OP);
+  if (!reduced_needUpdate)
     {
     output->ShallowCopy(this->LastOutput);
+    return 1;
+    }
+
+  // Handle the case where all inputs on all processes are empty.
+  double bounds[6];
+  input->GetBounds(bounds);
+  int valid_bounds = vtkMath::AreBoundsInitialized(bounds);
+  int reduced_valid_bounds = 0;
+  this->Controller->AllReduce(&valid_bounds, &reduced_valid_bounds, 1,
+    vtkCommunicator::MAX_OP);
+  if (!reduced_valid_bounds)
+    {
+    output->ShallowCopy(input);
     return 1;
     }
 

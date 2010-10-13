@@ -664,6 +664,7 @@ int vtkSMSourceProxy::LoadRevivalState(vtkPVXMLElement* revivalElem)
       vtkSmartPointer<vtkSMOutputPort> opPort = vtkSmartPointer<vtkSMOutputPort>::New();
       opPort->SetConnectionID(this->ConnectionID);
       opPort->SetServers(this->Servers);
+      opPort->SetSourceProxy(this);
       if (opPort->LoadRevivalState(curElement->GetNestedElement(0)))
         {
         this->PInternals->EnsureOutputPortsSize(index+1);

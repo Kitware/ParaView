@@ -39,7 +39,7 @@ IF (PARAVIEW_BUILD_QT_GUI)
 
   # server manager
   SET( SM_SOURCES
-    vtkSMSurfaceLICRepresentationProxy.cxx
+    vtkSurfaceLICRepresentation.cxx
     )
 
   SET( SM_XMLS

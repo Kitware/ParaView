@@ -200,7 +200,7 @@ void pqLineWidget::setControlledProperty(const char* function,
 //-----------------------------------------------------------------------------
 void pqLineWidget::pick(double dx, double dy, double dz)
 {
-  vtkSMRepresentationProxy* widget = this->getWidgetProxy();
+  vtkSMProxy* widget = this->getWidgetProxy();
   QList<QVariant> value;
   value << dx << dy << dz;
   if (this->Implementation->PickPoint1)

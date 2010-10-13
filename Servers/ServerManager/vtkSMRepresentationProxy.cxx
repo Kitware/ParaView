@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkSMRepresentationProxy.cxx
+  Module:    $RCSfile$
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -14,25 +14,28 @@
 =========================================================================*/
 #include "vtkSMRepresentationProxy.h"
 
+#include "vtkClientServerStream.h"
+#include "vtkMemberFunctionCommand.h"
 #include "vtkObjectFactory.h"
-#include "vtkSMIntVectorProperty.h"
-#include "vtkSMInputProperty.h"
-#include "vtkInformation.h"
-#include "vtkPVDataInformation.h"
+#include "vtkProcessModule.h"
+#include "vtkPVRepresentedDataInformation.h"
+#include "vtkSMProxyProperty.h"
+#include "vtkTimerLog.h"
 
-vtkCxxSetObjectMacro(vtkSMRepresentationProxy, ViewInformation, vtkInformation);
+vtkStandardNewMacro(vtkSMRepresentationProxy);
 //----------------------------------------------------------------------------
 vtkSMRepresentationProxy::vtkSMRepresentationProxy()
 {
-  this->ViewInformation = 0;
-  this->ViewUpdateTime = 0;
-  this->ViewUpdateTimeInitialized = false;
+  this->SetExecutiveName("vtkPVDataRepresentationPipeline");
+  this->RepresentedDataInformationValid = false;
+  this->RepresentedDataInformation = vtkPVRepresentedDataInformation::New();
+  this->MarkedModified = false;
 }
 
 //----------------------------------------------------------------------------
 vtkSMRepresentationProxy::~vtkSMRepresentationProxy()
 {
-  this->SetViewInformation(0);
+  this->RepresentedDataInformation->Delete();
 }
 
 //----------------------------------------------------------------------------
@@ -43,91 +46,143 @@ void vtkSMRepresentationProxy::CreateVTKObjects()
     return;
     }
 
-  if (!this->BeginCreateVTKObjects())
-    {
-    // BeginCreateVTKObjects() requested an abortion of VTK object creation.
-    return;
-    }
-
   this->Superclass::CreateVTKObjects();
-  this->EndCreateVTKObjects();
+
+  vtkMemberFunctionCommand<vtkSMRepresentationProxy>* observer =
+    vtkMemberFunctionCommand<vtkSMRepresentationProxy>::New();
+  observer->SetCallback(*this, &vtkSMRepresentationProxy::RepresentationUpdated);
+
+  vtkObject::SafeDownCast(this->GetClientSideObject())->AddObserver(
+    vtkCommand::UpdateDataEvent, observer);
+  observer->Delete();
+}
+
+//---------------------------------------------------------------------------
+int vtkSMRepresentationProxy::LoadState(
+  vtkPVXMLElement* proxyElement, vtkSMProxyLocator* locator)
+{
+  vtkTypeUInt32 oldserver = this->Servers;
+  int ret = this->Superclass::LoadState(proxyElement, locator);
+  this->Servers = oldserver;
+  return ret;
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMRepresentationProxy::GetVisibility()
+void vtkSMRepresentationProxy::UpdatePipeline()
 {
-  if (!this->ObjectsCreated)
+  if (!this->NeedsUpdate)
     {
-    return false;
+    return;
     }
 
-  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
-    this->GetProperty("Visibility"));
-  if (ivp && ivp->GetNumberOfElements()== 1 && ivp->GetElement(0))
+  this->UpdatePipelineInternal(0, false);
+  this->Superclass::UpdatePipeline();
+}
+
+//----------------------------------------------------------------------------
+void vtkSMRepresentationProxy::UpdatePipeline(double time)
+{
+  this->UpdatePipelineInternal(time, true);
+  this->Superclass::UpdatePipeline();
+}
+
+//----------------------------------------------------------------------------
+void vtkSMRepresentationProxy::UpdatePipelineInternal(
+  double time, bool doTime)
+{
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  vtkClientServerStream stream;
+  if (doTime)
     {
-    return true;
+    stream << vtkClientServerStream::Invoke
+      << this->GetID() << "SetUpdateTime" << time
+      << vtkClientServerStream::End;
     }
-  return false;
+  stream << vtkClientServerStream::Invoke
+         << this->GetID() << "Update"
+         << vtkClientServerStream::End;
+  pm->SendPrepareProgress(this->ConnectionID);
+  pm->SendStream(this->ConnectionID, this->Servers, stream);
+  pm->SendCleanupPendingProgress(this->ConnectionID);
+}
+
+//----------------------------------------------------------------------------
+void vtkSMRepresentationProxy::MarkDirty(vtkSMProxy* modifiedProxy)
+{
+  if ((modifiedProxy != this) && this->ObjectsCreated)
+    {
+    if (!this->MarkedModified)
+      {
+      //cout << "MarkModified" << endl;
+      this->MarkedModified = true;
+      vtkClientServerStream stream;
+      stream << vtkClientServerStream::Invoke
+        << this->GetID()
+        << "MarkModified"
+        << vtkClientServerStream::End;
+      vtkProcessModule::GetProcessModule()->SendStream(
+        this->ConnectionID, this->Servers, stream);
+      }
+    }
+  this->Superclass::MarkDirty(modifiedProxy);
+}
+
+//----------------------------------------------------------------------------
+void vtkSMRepresentationProxy::RepresentationUpdated()
+{
+  ///cout << "RepresentationUpdated" << endl;
+  this->MarkedModified = false;
+  this->PostUpdateData();
+  // PostUpdateData will call InvalidateDataInformation() which will mark
+  // RepresentedDataInformationValid as false;
+  // this->RepresentedDataInformationValid = false;
+}
+
+//----------------------------------------------------------------------------
+void vtkSMRepresentationProxy::InvalidateDataInformation()
+{
+  this->Superclass::InvalidateDataInformation();
+  this->RepresentedDataInformationValid = false;
+}
+
+//----------------------------------------------------------------------------
+vtkPVDataInformation* vtkSMRepresentationProxy::GetRepresentedDataInformation()
+{
+  if (!this->RepresentedDataInformationValid)
+    {
+    vtkTimerLog::MarkStartEvent(
+      "vtkSMRepresentationProxy::GetRepresentedDataInformation");
+    this->RepresentedDataInformation->Initialize();
+    vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+    pm->GatherInformation(this->ConnectionID, this->Servers,
+      this->RepresentedDataInformation, this->GetID());
+    vtkTimerLog::MarkEndEvent(
+      "vtkSMRepresentationProxy::GetRepresentedDataInformation");
+    this->RepresentedDataInformationValid = true;
+    }
+
+  return this->RepresentedDataInformation;
 }
 
 //-----------------------------------------------------------------------------
-bool vtkSMRepresentationProxy::GetBounds(double bounds[6])
+void vtkSMRepresentationProxy::ViewTimeChanged()
 {
-  vtkPVDataInformation* info = this->GetRepresentedDataInformation(true);
-  if (!info)
-    {
-    return false;
-    }
-  info->GetBounds(bounds);
-  
-  if(bounds[1] < bounds[0])
-    {
-    return false;
-    }
-
-  return true;
-}
-
-//----------------------------------------------------------------------------
-void vtkSMRepresentationProxy::Connect(vtkSMProxy* producer,
-  vtkSMProxy* consumer, const char* propertyname/*="Input"*/,
-  int outputport/*=0*/)
-{
-  if (!propertyname)
-    {
-    vtkErrorMacro("propertyname cannot be NULL.");
-    return;
-    }
-
+  vtkSMProxy* current = this;
   vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
-    consumer->GetProperty(propertyname));
-  vtkSMInputProperty* ip = vtkSMInputProperty::SafeDownCast(pp);
-  if (!pp)
+    current->GetProperty("Input"));
+  while (current && pp && pp->GetNumberOfProxies() > 0)
     {
-    vtkErrorMacro("Failed to locate property " << propertyname
-      << " on the consumer " << consumer->GetXMLName());
-    return;
+    current = pp->GetProxy(0);
+    pp = vtkSMProxyProperty::SafeDownCast(current->GetProperty("Input"));
     }
 
-  if (ip)
+  if (current)
     {
-    ip->RemoveAllProxies();
-    ip->AddInputConnection(producer, outputport);
+    current->MarkModified(current);
     }
-  else
-    {
-    pp->RemoveAllProxies();
-    pp->AddProxy(producer);
-    }
-  consumer->UpdateProperty(propertyname);
 }
-
 //----------------------------------------------------------------------------
 void vtkSMRepresentationProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  os << indent << "ViewUpdateTime: " << this->ViewUpdateTime << endl;
-  os << indent << "ViewInformation: " << this->ViewInformation << endl;
 }
-
-

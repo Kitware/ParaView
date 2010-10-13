@@ -21,12 +21,23 @@ vtkStandardNewMacro(vtkSMPVLookupTableProxy);
 //-----------------------------------------------------------------------------
 vtkSMPVLookupTableProxy::vtkSMPVLookupTableProxy()
 {
-  this->SetServers(vtkProcessModule::RENDER_SERVER|vtkProcessModule::CLIENT);
 }
 
 //-----------------------------------------------------------------------------
 vtkSMPVLookupTableProxy::~vtkSMPVLookupTableProxy()
 {
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMPVLookupTableProxy::CreateVTKObjects()
+{
+  if (this->ObjectsCreated)
+    {
+    return;
+    }
+
+  this->SetServers(vtkProcessModule::CLIENT_AND_SERVERS);
+  this->Superclass::CreateVTKObjects();
 }
 
 //-----------------------------------------------------------------------------

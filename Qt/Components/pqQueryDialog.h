@@ -114,6 +114,9 @@ protected:
   /// windows.
   virtual bool eventFilter(QObject*, QEvent*);
 
+  /// creates the proxies needed for the spreadsheet view.
+  void setupSpreadSheet();
+
   bool ExtractSelectionOverTime;
   bool ExtractSelection;
 private:

@@ -27,43 +27,12 @@ vtkStandardNewMacro(vtkSMScalarBarWidgetRepresentationProxy);
 vtkSMScalarBarWidgetRepresentationProxy::vtkSMScalarBarWidgetRepresentationProxy()
 {
   this->ActorProxy = NULL;
-  this->ViewProxy = NULL;
-  this->Enabled = 0;
 }
 
 //----------------------------------------------------------------------------
 vtkSMScalarBarWidgetRepresentationProxy::~vtkSMScalarBarWidgetRepresentationProxy()
 {
   this->ActorProxy = NULL;
-  this->ViewProxy = NULL;
-}
-
-//----------------------------------------------------------------------------
-bool vtkSMScalarBarWidgetRepresentationProxy::AddToView(vtkSMViewProxy* view)
-{
-  if (!this->Superclass::AddToView(view))
-    {
-    return false;
-    }
-  
-  this->ViewProxy = view;
-  this->SetEnabled(this->Enabled);
-
-  return true;
-}
-
-//----------------------------------------------------------------------------
-bool vtkSMScalarBarWidgetRepresentationProxy::RemoveFromView(
-                                                           vtkSMViewProxy* view)
-{
-  if (!this->Superclass::RemoveFromView(view))
-    {
-    return false;
-    }
-
-  this->ViewProxy = 0;
-
-  return true;
 }
 
 //-----------------------------------------------------------------------------
@@ -103,17 +72,6 @@ void vtkSMScalarBarWidgetRepresentationProxy::CreateVTKObjects()
     {
     return;
     }
-}
-
-//----------------------------------------------------------------------------
-void vtkSMScalarBarWidgetRepresentationProxy::SetEnabled(int enable)
-{
-  if (this->ViewProxy)
-    {
-    this->Superclass::SetEnabled(enable);
-    }
-
-  this->Enabled = enable;
 }
 
 //----------------------------------------------------------------------------

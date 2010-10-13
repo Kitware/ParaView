@@ -47,10 +47,10 @@ class pqServer;
 class vtkPVArrayInformation;
 class vtkPVDataSetAttributesInformation;
 class vtkPVDataSetAttributesInformation;
-class vtkSMPropRepresentationProxy;
+class vtkSMRepresentationProxy;
 
 /// This is PQ representation for a single display. A pqRepresentation represents
-/// a single vtkSMPropRepresentationProxy. The display can be added to
+/// a single vtkSMRepresentationProxy. The display can be added to
 /// only one render module or more (ofcouse on the same server, this class
 /// doesn't worry about that.
 class PQCORE_EXPORT pqPipelineRepresentation : public pqDataRepresentation
@@ -76,7 +76,7 @@ public:
 
 
   // Get the internal display proxy.
-  vtkSMPropRepresentationProxy* getRepresentationProxy() const;
+  vtkSMRepresentationProxy* getRepresentationProxy() const;
 
   // Sets the default color mapping for the display.
   // The rules are:
@@ -215,7 +215,7 @@ protected:
 
   /// Creates a default proxy for volume opacity function.
   vtkSMProxy* createOpacityFunctionProxy(
-    vtkSMPropRepresentationProxy* repr);
+    vtkSMRepresentationProxy* repr);
  
   bool UpdateLUTRangesOnDataUpdate;
 

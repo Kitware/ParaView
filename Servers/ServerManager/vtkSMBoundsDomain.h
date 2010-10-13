@@ -87,6 +87,7 @@ protected:
   ~vtkSMBoundsDomain();
 
   void Update(vtkSMProxyProperty *pp);
+  virtual void UpdateFromInformation(vtkPVDataInformation* information);
   void UpdateOriented();
 
   // Description:

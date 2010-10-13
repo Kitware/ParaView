@@ -123,7 +123,7 @@ void vtkSMInteractionUndoStackBuilder::ExecuteEvent(
 void vtkSMInteractionUndoStackBuilder::StartInteraction()
 {
   // Interaction began -- get camera properties and save them.
-  this->RenderView->SynchronizeCameraProperties();
+  //this->RenderView->SynchronizeCameraProperties();
   this->UndoSet->RemoveAllElements();
 
   this->PropertyModified("CameraPosition");
@@ -145,7 +145,7 @@ void vtkSMInteractionUndoStackBuilder::EndInteraction()
     return;
     }
 
-  this->RenderView->SynchronizeCameraProperties();
+ // this->RenderView->SynchronizeCameraProperties();
   this->PropertyModified("CameraPosition");
   this->PropertyModified("CameraFocalPoint");
   this->PropertyModified("CameraViewUp");

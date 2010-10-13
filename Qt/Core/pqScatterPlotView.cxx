@@ -42,7 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMAnimationSceneImageWriter.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMRenderViewProxy.h"
-#include "vtkSMScatterPlotViewProxy.h"
+#include "vtkSMRenderViewProxy.h"
 #include "vtkSmartPointer.h"
 
 // Qt Includes.
@@ -127,9 +127,9 @@ pqScatterPlotView::~pqScatterPlotView()
 }
 
 //-----------------------------------------------------------------------------
-vtkSMScatterPlotViewProxy* pqScatterPlotView::getScatterPlotViewProxy() const
+vtkSMRenderViewProxy* pqScatterPlotView::getScatterPlotViewProxy() const
 {
-  return vtkSMScatterPlotViewProxy::SafeDownCast(this->getViewProxy());
+  return vtkSMRenderViewProxy::SafeDownCast(this->getViewProxy());
 }
 
 //-----------------------------------------------------------------------------
@@ -138,11 +138,9 @@ vtkSMScatterPlotViewProxy* pqScatterPlotView::getScatterPlotViewProxy() const
 /// action gets pushed on the interaction undo stack.
 void pqScatterPlotView::resetCamera()
 {
-  vtkSMScatterPlotViewProxy* view = vtkSMScatterPlotViewProxy::SafeDownCast(
+  vtkSMRenderViewProxy* view = vtkSMRenderViewProxy::SafeDownCast(
     this->getProxy());
-
-  vtkSMRenderViewProxy* renModule = view->GetRenderView();
-  renModule->ResetCamera();
+  view->InvokeCommand("ResetCamera");
   this->render();
 }
 
@@ -159,14 +157,13 @@ void pqScatterPlotView::initializeWidgets()
 
   this->Internal->InitializedWidgets = true;
 
-  vtkSMScatterPlotViewProxy* view = vtkSMScatterPlotViewProxy::SafeDownCast(
+  vtkSMRenderViewProxy* view = vtkSMRenderViewProxy::SafeDownCast(
     this->getProxy());
 
-  vtkSMRenderViewProxy* renModule = view ? view->GetRenderView() : 0;
   QVTKWidget* vtkwidget = qobject_cast<QVTKWidget*>(this->getWidget());
-  if (vtkwidget && renModule)
+  if (vtkwidget && view)
     {
-    vtkwidget->SetRenderWindow(renModule->GetRenderWindow());
+    vtkwidget->SetRenderWindow(view->GetRenderWindow());
     }
 }
 
@@ -175,11 +172,9 @@ vtkImageData* pqScatterPlotView::captureImage(int magnification)
 {
   if (this->getWidget()->isVisible())
     {
-    vtkSMScatterPlotViewProxy* view = vtkSMScatterPlotViewProxy::SafeDownCast(
+    vtkSMRenderViewProxy* view = vtkSMRenderViewProxy::SafeDownCast(
       this->getProxy());
-
-    vtkSMRenderViewProxy* renModule = view->GetRenderView();
-    return renModule->CaptureWindow(magnification);
+    return view->CaptureWindow(magnification);
     }
 
   // Don't return any image when the view is not visible.

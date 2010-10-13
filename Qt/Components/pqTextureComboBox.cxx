@@ -37,7 +37,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkProcessModule.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVDataSetAttributesInformation.h"
-#include "vtkSMDataRepresentationProxy.h"
 #include "vtkSMProxyIterator.h"
 #include "vtkSMProxyProperty.h"
 #include "vtkSMProxyManager.h"
@@ -201,9 +200,12 @@ void pqTextureComboBox::setRepresentation(pqDataRepresentation* repr)
 
   // When the texture attached to the representation changes, we want to update
   // the combo box.
-  this->Internal->VTKConnect->Connect(
-    this->Internal->Representation->getProxy()->GetProperty("Texture"),
-    vtkCommand::ModifiedEvent, this, SLOT(updateFromProperty()));
+  if (this->Internal->Representation->getProxy()->GetProperty("Texture"))
+    {
+    this->Internal->VTKConnect->Connect(
+      this->Internal->Representation->getProxy()->GetProperty("Texture"),
+      vtkCommand::ModifiedEvent, this, SLOT(updateFromProperty()));
+    }
   this->updateFromProperty();
 
   QTimer::singleShot(0, this, SLOT(updateEnableState()));
@@ -434,8 +436,8 @@ void pqTextureComboBox::updateEnableState()
   if (this->Internal->Representation)
     {
     // Enable only if we have point texture coordinates.
-    vtkPVDataInformation* dataInfo = vtkSMDataRepresentationProxy::SafeDownCast(
-      this->Internal->Representation->getProxy())->GetRepresentedDataInformation(false);
+    vtkPVDataInformation* dataInfo =
+      this->Internal->Representation->getRepresentedDataInformation();
     if (!dataInfo)
       {
       return;

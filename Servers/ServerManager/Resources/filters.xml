@@ -7711,7 +7711,7 @@ Tessellate a higher-order dataset.
     </SourceProxy>
 
    <!-- ==================================================================== -->
-    <UpdateSuppressorProxy name="UpdateSuppressor2" class="vtkPVUpdateSuppressor"
+    <SourceProxy name="UpdateSuppressor2" class="vtkPVUpdateSuppressor"
       executive="vtkUpdateSuppressorPipeline">
 
       <InputProperty
@@ -7750,7 +7750,7 @@ Tessellate a higher-order dataset.
       </DoubleVectorProperty>
 
       <!-- End UpdateSuppressor2 -->
-    </UpdateSuppressorProxy>
+    </SourceProxy>
 
    <!-- ==================================================================== -->
     <SourceProxy name="CacheKeeper" class="vtkPVCacheKeeper"
@@ -7841,7 +7841,8 @@ Tessellate a higher-order dataset.
     </SourceProxy>
 
    <!-- ==================================================================== -->
-    <SourceProxy name="ClientServerMoveData" class="vtkClientServerMoveData">
+    <SourceProxy name="ClientServerMoveData" class="vtkClientServerMoveData"
+      processes="client|dataserver">
       <InputProperty name="Input"
         command="SetInputConnection">
           <ProxyGroupDomain name="groups">
@@ -7859,6 +7860,11 @@ Tessellate a higher-order dataset.
         default_values="0"
         animateable="0">
       </IntVectorProperty>
+      <IntVectorProperty name="WholeExtent"
+        command="SetWholeExtent"
+        number_of_elements="6"
+        default_values="0 -1 0 -1 0 -1">
+      </IntVectorProperty>
     <!-- End ClientServerMoveData -->
     </SourceProxy>
 
@@ -7874,18 +7880,27 @@ Tessellate a higher-order dataset.
             Set the input to the Reduction filter.
           </Documentation>
       </InputProperty>
-      <ProxyProperty name="PreGatherHelper"
-         command="SetPreGatherHelper">
+      <StringVectorProperty name="PreGatherHelperName"
+         command="SetPreGatherHelperName"
+         number_of_elements="1">
          <Documentation>
            Set the algorithm that runs on each node in parallel.
          </Documentation>
-      </ProxyProperty>
-      <ProxyProperty name="PostGatherHelper"
-         command="SetPostGatherHelper">
+      </StringVectorProperty>
+      <StringVectorProperty name="PostGatherHelperName"
+         command="SetPostGatherHelperName"
+         number_of_elements="1">
          <Documentation>
            Set the algorithm that takes multiple inputs and produces a single reduced output.
          </Documentation>
-      </ProxyProperty>
+      </StringVectorProperty>
+
+      <ProxyProperty name="PostGatherHelper"
+        command="SetPostGatherHelper"/>
+
+      <ProxyProperty name="PreGatherHelper"
+        command="SetPreGatherHelper"/>
+
       <IntVectorProperty
          name="PassThrough"
          command="SetPassThrough"
@@ -10709,6 +10724,36 @@ This property controls how the filter works to generate tensor cell data. You ca
      </ProxyProperty>
    <!-- End IntersectFragments -->
    </SourceProxy>
+
+  <!-- ==================================================================== -->
+  <FetchDataProxy name="FetchData" class="vtkPVFetchDataFilter"
+                processes="client|dataserver">
+    <Documentation>
+      This is a filter proxy that makes is possible to deliver data to the
+      client. Simply attach this proxy to a data source, and call
+      UpdatePipeline(). The data will be available as the output on the
+      client-side.
+    </Documentation>
+
+    <InputProperty name="Input" command="SetInputConnection">
+      <ProxyGroupDomain name="groups">
+        <Group name="sources"/>
+        <Group name="filters"/>
+      </ProxyGroupDomain>
+      <DataTypeDomain name="input_type">
+        <DataType value="vtkDataObject"/>
+      </DataTypeDomain>
+      <Documentation>
+        The input to this filter.
+      </Documentation>
+    </InputProperty>
+
+    <StringVectorProperty name="PostGatherHelperName"
+      command="SetPostGatherHelperName"
+      number_of_elements="1"
+      default_values="">
+    </StringVectorProperty>
+  </FetchDataProxy>
 
   </ProxyGroup>
 </ServerManagerConfiguration>

@@ -28,7 +28,6 @@
 #include "vtkSMProxyManager.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMStateVersionController.h"
-#include "vtkSMViewProxy.h"
 
 #include <vtkstd/map>
 #include <vtkstd/string>
@@ -71,19 +70,21 @@ vtkSMStateLoader::~vtkSMStateLoader()
 const char* vtkSMStateLoader::GetViewXMLName (int connectionID,
   const char *xml_name)
 {
-  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
-  vtkSMViewProxy* prototype = vtkSMViewProxy::SafeDownCast(
-    pxm->GetPrototypeProxy("views", xml_name));
-  if (prototype)
-    {
-    // Generally each view type is different class of view eg. bar char view, line
-    // plot view etc. However in some cases a different view types are indeed the
-    // same class of view the only different being that each one of them works in
-    // a different configuration eg. "RenderView" in builin mode, 
-    // "IceTDesktopRenderView" in remote render mode etc. This method is used to
-    // determine what type of view needs to be created for the given class. 
-    return prototype->GetSuggestedViewType(connectionID);
-    }
+  // This is no longer applicable. A view proxy now has to work in all ParaView
+  // configurations by default.
+  //vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+  //vtkSMViewProxy* prototype = vtkSMViewProxy::SafeDownCast(
+  //  pxm->GetPrototypeProxy("views", xml_name));
+  //if (prototype)
+  //  {
+  //  // Generally each view type is different class of view eg. bar char view, line
+  //  // plot view etc. However in some cases a different view types are indeed the
+  //  // same class of view the only different being that each one of them works in
+  //  // a different configuration eg. "RenderView" in builin mode,
+  //  // "IceTDesktopRenderView" in remote render mode etc. This method is used to
+  //  // determine what type of view needs to be created for the given class.
+  //  return prototype->GetSuggestedViewType(connectionID);
+  //  }
 
   return xml_name;
 }

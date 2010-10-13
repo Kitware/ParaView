@@ -44,6 +44,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QApplication>
 #include <QVBoxLayout>
 
+namespace
+{
+  inline bool pqIsColumnInternal(const QString& str)
+    {
+    return (str == "__vtkIsSelected__");
+    }
+}
+
 //-----------------------------------------------------------------------------
 class pqSpreadSheetViewWidget::pqDelegate : public QItemDelegate
 {
@@ -213,6 +221,26 @@ void pqSpreadSheetViewWidget::setModel(QAbstractItemModel* model)
   // if model is non-null, then it must be a pqSpreadSheetViewModel.
   Q_ASSERT(model==NULL || qobject_cast<pqSpreadSheetViewModel*>(model) != NULL);
   this->Superclass::setModel(model);
+  if (model)
+    {
+    QObject::connect(
+      model, SIGNAL(headerDataChanged(Qt::Orientation, int, int)),
+      this, SLOT(onHeaderDataChanged()));
+    QObject::connect(
+      model, SIGNAL(modelReset()),
+      this, SLOT(onHeaderDataChanged()));
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqSpreadSheetViewWidget::onHeaderDataChanged()
+{
+  for (int cc=0; cc < this->model()->columnCount(); cc++)
+    {
+    QString headerTitle =
+      this->model()->headerData(cc, Qt::Horizontal).toString();
+    this->setColumnHidden(cc, pqIsColumnInternal(headerTitle));
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -239,7 +267,7 @@ void pqSpreadSheetViewWidget::paintEvent(QPaintEvent* pevent)
   if (del && smodel)
     {
     del->endPaint();
-    smodel->setActiveBlock(del->Top, del->Bottom);
+    smodel->setActiveRegion(del->Top.row(), del->Bottom.row());
     }
 }
 
@@ -257,8 +285,16 @@ void pqSpreadSheetViewWidget::onSectionDoubleClicked(int logicalindex)
   this->SingleColumnMode = !this->SingleColumnMode;
   for (int cc=0; cc < numcols;cc++)
     {
-    this->setColumnHidden(cc,
-      (this->SingleColumnMode && cc!=logicalindex));
+    QString headerTitle =
+      this->model()->headerData(cc, Qt::Horizontal).toString();
+    if (pqIsColumnInternal(headerTitle))
+      {
+      this->setColumnHidden(cc, true);
+      }
+    else
+      {
+      this->setColumnHidden(cc, (this->SingleColumnMode && cc!=logicalindex));
+      }
     if (this->SingleColumnMode && cc == logicalindex)
       {
       header->setResizeMode(cc, QHeaderView::Stretch);

@@ -110,9 +110,6 @@ void pqSpreadSheetDisplayEditor::setRepresentationInternal(pqRepresentation* rep
   //this->Internal->Links.addPropertyLink(this->Internal->ProcessIDAdaptor,
   //  "value", SIGNAL(valueChanged(int)),
   //  reprProxy, reprProxy->GetProperty("ProcessID"));
-  this->Internal->Links.addPropertyLink(this->Internal->SelectionOnly,
-    "checked", SIGNAL(stateChanged(int)),
-    reprProxy, reprProxy->GetProperty("SelectionOnly"));
   this->Internal->Links.addPropertyLink(this->Internal->CompositeTreeAdaptor,
     "values", SIGNAL(valuesChanged()),
     reprProxy, reprProxy->GetProperty("CompositeDataSetIndex"));
@@ -137,12 +134,9 @@ void pqSpreadSheetDisplayEditor::onAttributeModeChanged(const QString &mode)
     {
     this->Internal->ProcessIDLabel->show();
     this->Internal->ProcessID->show();
-    this->Internal->SelectionOnly->setChecked(false);
-    this->Internal->SelectionOnly->setEnabled(false);
     }
   else
     {
-    this->Internal->SelectionOnly->setEnabled(true);
     this->Internal->ProcessIDLabel->hide();
     this->Internal->ProcessID->hide();
     }

@@ -32,15 +32,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqXYChartDisplayPanel.h"
 #include "ui_pqXYChartDisplayPanel.h"
 
-#include "vtkSMXYChartRepresentationProxy.h"
+#include "vtkChart.h"
 #include "vtkDataArray.h"
 #include "vtkDataObject.h"
 #include "vtkSMArraySelectionDomain.h"
-#include "vtkSMIntVectorProperty.h"
-#include "vtkSMProxy.h"
 #include "vtkSmartPointer.h"
+#include "vtkSMChartRepresentationProxy.h"
+#include "vtkSMIntVectorProperty.h"
+#include "vtkSMPropertyHelper.h"
+#include "vtkSMProxy.h"
 #include "vtkTable.h"
-#include "vtkChart.h"
 
 #include <QColorDialog>
 #include <QHeaderView>
@@ -84,7 +85,7 @@ public:
     delete this->AttributeModeAdaptor;
     }
 
-  vtkWeakPointer<vtkSMXYChartRepresentationProxy> ChartRepresentation;
+  vtkWeakPointer<vtkSMChartRepresentationProxy> ChartRepresentation;
   pqPlotSettingsModel* SettingsModel;
   pqComboBoxDomain* XAxisArrayDomain;
   pqSignalAdaptorComboBox* AttributeModeAdaptor;
@@ -171,8 +172,8 @@ void pqXYChartDisplayPanel::setDisplay(pqRepresentation* disp)
 {
   this->setEnabled(false);
 
-  vtkSMXYChartRepresentationProxy* proxy =
-    vtkSMXYChartRepresentationProxy::SafeDownCast(disp->getProxy());
+  vtkSMChartRepresentationProxy* proxy =
+    vtkSMChartRepresentationProxy::SafeDownCast(disp->getProxy());
   this->Internal->ChartRepresentation = proxy;
   if (!this->Internal->ChartRepresentation)
     {
@@ -183,7 +184,7 @@ void pqXYChartDisplayPanel::setDisplay(pqRepresentation* disp)
 
   // this is essential to ensure that when you undo-redo, the representation is
   // indeed update-to-date, thus ensuring correct domains etc.
-  proxy->Update();
+  proxy->UpdatePipeline();
 
   // The model for the plot settings
   this->Internal->SettingsModel->setRepresentation(
@@ -228,10 +229,10 @@ void pqXYChartDisplayPanel::setDisplay(pqRepresentation* disp)
 //-----------------------------------------------------------------------------
 void pqXYChartDisplayPanel::changeDialog(pqRepresentation* disp)
 {
-  vtkSMXYChartRepresentationProxy* proxy =
-    vtkSMXYChartRepresentationProxy::SafeDownCast(disp->getProxy());
+  vtkSMChartRepresentationProxy* proxy =
+    vtkSMChartRepresentationProxy::SafeDownCast(disp->getProxy());
   bool visible = true;
-  if (proxy->GetChartType() == vtkChart::BAR)
+  if (QString("Bar") == vtkSMPropertyHelper(proxy,"ChartType").GetAsString())
     {
     visible = false;
     }

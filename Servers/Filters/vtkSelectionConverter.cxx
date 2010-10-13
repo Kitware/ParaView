@@ -143,8 +143,7 @@ void vtkSelectionConverter::Convert(
     return;
     }
 
-  if (!inputProperties->Has(vtkSelectionNode::SOURCE_ID()) ||
-    !inputProperties->Has(vtkSelectionSerializer::ORIGINAL_SOURCE_ID()))
+  if (!inputProperties->Has(vtkSelectionNode::SOURCE()))
     {
     return;
     }
@@ -156,11 +155,8 @@ void vtkSelectionConverter::Convert(
     return;
     }
 
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  vtkClientServerID id;
-  id.ID = inputProperties->Get(vtkSelectionNode::SOURCE_ID());
   vtkAlgorithm* geomAlg = vtkAlgorithm::SafeDownCast(
-    pm->GetObjectFromID(id));
+    inputProperties->Get(vtkSelectionNode::SOURCE()));
   if (!geomAlg)
     {
     return;
@@ -289,7 +285,7 @@ void vtkSelectionConverter::Convert(
       outputProperties->Set(vtkSelectionNode::HIERARCHICAL_INDEX(),
         amr_index[1] + piece_offset);
       }
-    else if (inputProperties->Has(vtkSelectionNode::COMPOSITE_INDEX()))
+    else if (inputProperties->Has(vtkSelectionNode::COMPOSITE_INDEX()) && cd)
       {
       outputProperties->Set(vtkSelectionNode::COMPOSITE_INDEX(),
         inputProperties->Get(vtkSelectionNode::COMPOSITE_INDEX()) + piece_offset);

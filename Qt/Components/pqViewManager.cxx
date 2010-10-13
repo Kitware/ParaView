@@ -293,7 +293,7 @@ void pqViewManager::onFrameAdded(pqMultiViewFrame* frame)
 
   // We need to know when the frame is resized, so that we can update view size
   // related properties on the view proxy.
-  frame->installEventFilter(this);
+  //frame->installEventFilter(this);
   frame->MaximizeButton->show();
   frame->CloseButton->show();
   frame->SplitVerticalButton->show();
@@ -375,7 +375,7 @@ void pqViewManager::onFrameRemovedInternal(pqMultiViewFrame* frame)
   QObject::disconnect(frame, SIGNAL(drop(pqMultiViewFrame*,QDropEvent*)),
     this, SLOT(frameDrop(pqMultiViewFrame*,QDropEvent*)));
 
-  frame->removeEventFilter(this);
+  //frame->removeEventFilter(this);
   this->Internal->PendingFrames.removeAll(frame);
   if (!this->Internal->Frames.contains(frame))
     {
@@ -483,6 +483,12 @@ void pqViewManager::connect(pqMultiViewFrame* frame, pqView* view)
   QWidget* viewWidget = view->getWidget();
   if(viewWidget)
     {
+    if (viewWidget->metaObject()->indexOfProperty("positionReference") != -1)
+      {
+      viewWidget->setProperty("positionReference",
+        QVariant::fromValue<QWidget*>(this));
+      }
+
     viewWidget->setParent(frame);
     frame->setMainWidget(viewWidget);
     viewWidget->setMaximumSize(this->Internal->MaxWindowSize);
@@ -547,7 +553,6 @@ void pqViewManager::disconnect(pqMultiViewFrame* frame, pqView* view)
 void pqViewManager::onViewAdded(pqView* view)
 {
   this->assignFrame(view);
-  this->updateViewPositions();
 }
 
 //-----------------------------------------------------------------------------
@@ -821,13 +826,6 @@ bool pqViewManager::eventFilter(QObject* caller, QEvent* e)
         }
       }
     }
-  else if(
-    (qobject_cast<pqMultiViewFrame*>(caller) ||
-     qobject_cast<QVTKWidget*>(caller)) && e->type() == QEvent::Resize)
-    {
-    // Update ViewPosition and GUISize properties on all view modules.
-    this->updateViewPositions();
-    }
 
   return pqMultiView::eventFilter(caller, e);
 }
@@ -843,124 +841,6 @@ void pqViewManager::setMaxViewWindowSize(const QSize& win_size)
     }
 
   emit maxViewWindowSizeSet(!win_size.isEmpty());
-}
-
-//-----------------------------------------------------------------------------
-void pqViewManager::updateViewPositions()
-{
-  // find a rectangle that bounds all views
-  QRect totalBounds;
-
-  foreach(pqView* view, this->Internal->Frames)
-    {
-    if (view->getWidget() && view->getWidget()->isVisible())
-      {
-      QRect bounds = view->getWidget()->rect();
-      bounds.moveTo(view->getWidget()->mapToGlobal(QPoint(0,0)));
-      totalBounds |= bounds;
-      }
-    }
-
-  /// GUISize, ViewSize and ViewPosition properties are managed
-  /// by the GUI, the undo/redo stack should not worry about
-  /// the changes made to them.
-  BEGIN_UNDO_EXCLUDE();
-
-  // Now we loop thorough all view modules and set the GUISize/ViewPosition.
-  foreach(pqView* view, this->Internal->Frames)
-    {
-    // set size containing all views
-    int gui_size[2] = { totalBounds.width(), totalBounds.height() };
-    vtkSMPropertyHelper(view->getProxy(), "GUISize", true).Set(gui_size, 2);
-
-    if (!view->getWidget() || !view->getWidget()->isVisible())
-      {
-      continue;
-      }
-
-    // position relative to the bounds of all views
-    QPoint view_pos = view->getWidget()->mapToGlobal(QPoint(0,0));
-    view_pos -= totalBounds.topLeft();
-    int position[2] = { view_pos.x(), view_pos.y() };
-    vtkSMPropertyHelper(view->getProxy(), "ViewPosition", true).Set(position, 2);
-
-    // size of each view.
-    QRect bounds = view->getWidget()->rect();
-    int view_size[2] = {bounds.width(), bounds.height() };
-    vtkSMPropertyHelper(view->getProxy(), "ViewSize", true).Set(view_size, 2);
-
-    // This is causing problems with tests.
-    // view->getProxy()->UpdateProperty("ViewSize");
-    }
-
-  END_UNDO_EXCLUDE();
-  this->updateCompactViewPositions();
-
-  // Show the overlays displaying the view sizes.
-  // Disabling frame overlays for now.
-  //if (this->isVisible())
-  //  {
-  //  this->showFrameOverlays();
-  //  }
-}
-
-
-//-----------------------------------------------------------------------------
-//
-// This method is called at the end of updateViewPositions().
-// This method tries to set the properties GUISizeCompact,
-// ViewPositionCompact, and ViewSizeCompact.  For now, only the
-// vtkSMIceTMultiDisplayRenderViewProxy has these properties.
-//
-void pqViewManager::updateCompactViewPositions()
-{
-  QMap<pqMultiViewFrame*, QPair<QPoint, QSize> > ViewInfo;
-  this->computeCompactSizes(ViewInfo);
-  QSize totalGUISize = this->getMultiViewWidget()->size();
-
-  /// GUISize, ViewSize and ViewPosition properties are managed
-  /// by the GUI, the undo/redo stack should not worry about
-  /// the changes made to them.
-  BEGIN_UNDO_EXCLUDE();
-
-  // Loop for each view
-  QList<pqMultiViewFrame*> frames = ViewInfo.keys();
-  foreach(pqMultiViewFrame* frame, frames)
-    {
-    pqView * view = this->getView(frame);
-    if (!view)
-      {
-      continue;
-      }
-    vtkSMIntVectorProperty* prop = 0;
-
-    // Set GUISize
-    prop = vtkSMIntVectorProperty::SafeDownCast(
-      view->getProxy()->GetProperty("GUISizeCompact"));
-    if(prop)
-      {
-      prop->SetElements2(totalGUISize.width(), totalGUISize.height());
-      }
-
-    // Set ViewPosition
-    prop = vtkSMIntVectorProperty::SafeDownCast(
-      view->getProxy()->GetProperty("ViewPositionCompact"));
-    if(prop)
-      {
-      QPoint viewPos = ViewInfo[frame].first;
-      prop->SetElements2(viewPos.x(), viewPos.y());
-      }
-
-    // Set ViewSize
-    prop = vtkSMIntVectorProperty::SafeDownCast(
-      view->getProxy()->GetProperty("ViewSizeCompact"));
-    if (prop)
-      {
-      QSize viewSize = ViewInfo[frame].second;
-      prop->SetElements2(viewSize.width(), viewSize.height());
-      }
-    }
-  END_UNDO_EXCLUDE();
 }
 
 //-----------------------------------------------------------------------------
@@ -1190,7 +1070,6 @@ void pqViewManager::frameDrop(pqMultiViewFrame* acceptingFrame,
       originatingIndex=this->indexOf(tempFrame);
       this->replaceView(originatingIndex,acceptingFrame);
 
-      this->updateViewPositions();
       delete tempFrame;
 
       this->show();
@@ -1306,20 +1185,6 @@ vtkImageData* pqViewManager::captureImage(int _width, int _height)
 
   this->finishedCapture();
   return fullImage;
-}
-
-//-----------------------------------------------------------------------------
-void pqViewManager::maximizeWidget(QWidget* wdg)
-{
-  this->Superclass::maximizeWidget(wdg);
-  this->updateViewPositions();
-}
-
-//-----------------------------------------------------------------------------
-void pqViewManager::restoreWidget(QWidget* wdg)
-{
-  this->Superclass::restoreWidget(wdg);
-  this->updateViewPositions();
 }
 
 //-----------------------------------------------------------------------------

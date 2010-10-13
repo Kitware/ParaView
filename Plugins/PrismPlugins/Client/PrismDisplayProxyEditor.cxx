@@ -62,6 +62,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMInputProperty.h"
 #include "vtkSMProxyManager.h"
+#include "vtkSMPropertyHelper.h"
 
 // ParaView widget includes
 #include "pqSignalAdaptors.h"
@@ -220,7 +221,8 @@ PrismDisplayProxyEditor::PrismDisplayProxyEditor(pqPipelineRepresentation* repr,
   if(view)
   {
     vtkSMViewProxy* renv= view->getViewProxy();
-    renv->AddRepresentation(this->CubeAxesActor);
+    vtkSMPropertyHelper(renv, "HiddenRepresentations").Add(this->CubeAxesActor);
+    renv->UpdateVTKObjects();
   }
 
 }
@@ -239,7 +241,8 @@ PrismDisplayProxyEditor::~PrismDisplayProxyEditor()
     if(view)
     {
       vtkSMViewProxy* renv= view->getViewProxy();
-      renv->RemoveRepresentation(this->CubeAxesActor);
+      vtkSMPropertyHelper(renv, "HiddenRepresentations").Remove(this->CubeAxesActor);
+      renv->UpdateVTKObjects();
       view->getProxy()->UpdateVTKObjects();
     }
 
@@ -883,14 +886,13 @@ void PrismDisplayProxyEditor::updateEnableState()
     this->Internal->BackfaceStyleGroupOptions->setEnabled(!backFollowsFront);
     }
 
-  vtkSMDataRepresentationProxy* display =
+  vtkSMRepresentationProxy* display =
     this->Internal->Representation->getRepresentationProxy();
   if (display)
     {
     QVariant scalarMode = pqSMAdaptor::getEnumerationProperty(
       display->GetProperty("ColorAttributeType"));
-    vtkPVDataInformation* geomInfo =
-      display->GetRepresentedDataInformation(/*update=*/false);
+    vtkPVDataInformation* geomInfo = display->GetRepresentedDataInformation();
     if (!geomInfo)
       {
       return;
@@ -954,6 +956,7 @@ void PrismDisplayProxyEditor::zoomToData()
     }
 
   double bounds[6];
+#ifdef MULTIPASS_FIXME
   this->Internal->Representation->getRepresentationProxy()->GetBounds(bounds);
   if (bounds[0]<=bounds[1] && bounds[2]<=bounds[3] && bounds[4]<=bounds[5])
     {
@@ -966,6 +969,8 @@ void PrismDisplayProxyEditor::zoomToData()
       renModule->render();
       }
     }
+#endif
+  cout << "this remains to be supported." << endl;
 }
 
 //-----------------------------------------------------------------------------
@@ -1063,7 +1068,8 @@ void PrismDisplayProxyEditor::updateMaterial(int vtkNotUsed(idx))
 //-----------------------------------------------------------------------------
 void PrismDisplayProxyEditor::cubeAxesVisibilityChanged()
 {
-  this->CubeAxesActor->SetCubeAxesVisibility(this->isCubeAxesVisible());
+  vtkSMPropertyHelper(this->CubeAxesActor, "Visibility").Set(this->isCubeAxesVisible());
+  this->CubeAxesActor->UpdateVTKObjects();
   this->Representation->renderViewEventually();
 
 
@@ -1123,7 +1129,7 @@ void PrismDisplayProxyEditor::volumeBlockSelected()
       this->Internal->CompositeTreeAdaptor->getCurrentFlatIndex(&valid);
     if (valid && selectedIndex > 0)
       {
-      vtkSMDataRepresentationProxy* repr =
+      vtkSMRepresentationProxy* repr =
         this->Internal->Representation->getRepresentationProxy();
       pqSMAdaptor::setElementProperty(
         repr->GetProperty("ExtractedBlockIndex"), selectedIndex);

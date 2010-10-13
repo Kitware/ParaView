@@ -40,12 +40,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSelection.h"
 #include "vtkSelectionNode.h"
 #include "vtkSmartPointer.h"
-#include "vtkSMClientDeliveryRepresentationProxy.h"
 #include "vtkSMCompositeTreeDomain.h"
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMGlobalPropertiesManager.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMNewWidgetRepresentationProxy.h"
+#include "vtkSMPropertyHelper.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMRenderViewProxy.h"
 #include "vtkSMSelectionHelper.h"
@@ -244,7 +244,7 @@ public:
   bool UpdatingGUI;
 
   QList<vtkSmartPointer<vtkSMNewWidgetRepresentationProxy> > LocationWigets;
-  vtkSmartPointer<vtkSMRepresentationProxy> FrustumWidget;
+  vtkSmartPointer<vtkSMProxy> FrustumWidget;
 
   enum
     {
@@ -1577,7 +1577,8 @@ void pqSelectionInspectorPanel::removeWidgetsFromView()
     {
     pqSMAdaptor::setElementProperty(widget->GetProperty("Enabled"), 0);
     widget->UpdateVTKObjects();
-    view->RemoveRepresentation(widget);
+    vtkSMPropertyHelper(view, "HiddenRepresentations").Remove(widget);
+    view->UpdateVTKObjects();
     }
   this->Implementation->ActiveView->render();
 }
@@ -1597,7 +1598,9 @@ void pqSelectionInspectorPanel::addWidgetsToView()
     this->Implementation->LocationWigets)
     {
     // this method avoids duplicate addition if the widget has been already added.
-    view->AddRepresentation(widget);
+    vtkSMPropertyHelper(view, "HiddenRepresentations").Add(widget);
+    view->UpdateVTKObjects();
+
     pqSMAdaptor::setElementProperty(widget->GetProperty("Enabled"), 1);
     widget->UpdateVTKObjects();
     }
@@ -1616,8 +1619,10 @@ void pqSelectionInspectorPanel::allocateWidgets(unsigned int numWidgets)
     if (this->Implementation->ActiveView)
       {
       pqSMAdaptor::setElementProperty(widget->GetProperty("Enabled"), 0);
-      this->Implementation->ActiveView->getRenderViewProxy()->RemoveRepresentation(
+      vtkSMPropertyHelper(
+        this->Implementation->ActiveView->getProxy(), "HiddenRepresentations").Remove(
         widget);
+      this->Implementation->ActiveView->getProxy()->UpdateVTKObjects();
       }
     this->Implementation->VTKConnectSelInput->Disconnect(widget, 0, this, 0);
     factory->free3DWidget(widget);
@@ -1730,8 +1735,11 @@ void pqSelectionInspectorPanel::updateFrustumInternal(bool showFrustum)
       {
       if (this->Implementation->ActiveView)
         {
-        this->Implementation->ActiveView->getRenderViewProxy()->RemoveRepresentation(
+        vtkSMPropertyHelper(
+          this->Implementation->ActiveView->getProxy(),
+          "HiddenProps").Remove(
           this->Implementation->FrustumWidget);
+        this->Implementation->ActiveView->getProxy()->UpdateVTKObjects();
         }
       this->Implementation->FrustumWidget = 0;
       this->updateRepresentationViews();
@@ -1742,27 +1750,17 @@ void pqSelectionInspectorPanel::updateFrustumInternal(bool showFrustum)
   if (!this->Implementation->FrustumWidget)
     {
     vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
-    vtkSMRepresentationProxy* repr = vtkSMRepresentationProxy::SafeDownCast(
-        pxm->NewProxy("representations", "FrustumWidget"));
+    vtkSMProxy* repr = pxm->NewProxy("representations", "FrustumWidget");
     this->Implementation->FrustumWidget.TakeReference(repr);
     repr->SetConnectionID(
       this->Implementation->ActiveView->getServer()->GetConnectionID());
     repr->UpdateVTKObjects();
-    pqSMAdaptor::setEnumerationProperty(
-      repr->GetProperty("Representation"), "Wireframe");
-    pqSMAdaptor::setMultipleElementProperty(
-      repr->GetProperty("Color"), 0, 0.5);
-    pqSMAdaptor::setMultipleElementProperty(
-      repr->GetProperty("Color"), 1, 0.0);
-    pqSMAdaptor::setMultipleElementProperty(
-      repr->GetProperty("Color"), 2, 0.5);
-    pqSMAdaptor::setElementProperty(
-      repr->GetProperty("LineWidth"), 3);
-    repr->UpdateVTKObjects();
     }
 
-  this->Implementation->ActiveView->getRenderViewProxy()->AddRepresentation(
-    this->Implementation->FrustumWidget);
+  vtkSMPropertyHelper(
+    this->Implementation->ActiveView->getProxy(),
+    "HiddenProps").Add(this->Implementation->FrustumWidget);
+  this->Implementation->ActiveView->getProxy()->UpdateVTKObjects();
   QList<QVariant> values32 = pqSMAdaptor::getMultipleElementProperty(
     selSource->GetProperty("Frustum"));
   QList<QVariant> values24;
@@ -1774,7 +1772,7 @@ void pqSelectionInspectorPanel::updateFrustumInternal(bool showFrustum)
       }
     }
   pqSMAdaptor::setMultipleElementProperty(
-    this->Implementation->FrustumWidget->GetProperty("Corners"),
+    this->Implementation->FrustumWidget->GetProperty("Frustum"),
     values24);
   this->Implementation->FrustumWidget->UpdateVTKObjects();
   this->updateRepresentationViews();

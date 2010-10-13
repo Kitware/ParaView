@@ -29,10 +29,10 @@
 
 #include "pqDisplayArrayWidget.h"
 
+#include "vtkDataObject.h"
 #include "vtkEventQtSlotConnect.h"
-#include "vtkSMPVRepresentationProxy.h"
-#include "vtkSMProperty.h"
 #include "vtkSMOutputPort.h"
+#include "vtkSMProperty.h"
 
 #include <QComboBox>
 #include <QHBoxLayout>
@@ -436,13 +436,13 @@ void pqDisplayArrayWidget::reloadGUI()
           {
           arrayName = arrayName.replace(regExpCell, "");
           this->addVariable(VARIABLE_TYPE_CELL, arrayName, display->isPartial(
-              arrayName, vtkSMDataRepresentationProxy::CELL_DATA));
+              arrayName, vtkDataObject::FIELD_ASSOCIATION_CELLS));
           }
         else if (regExpPoint.indexIn(arrayName) != -1)
           {
           arrayName = arrayName.replace(regExpPoint, "");
           this->addVariable(VARIABLE_TYPE_NODE, arrayName, display->isPartial(
-              arrayName, vtkSMDataRepresentationProxy::POINT_DATA));
+              arrayName, vtkDataObject::FIELD_ASSOCIATION_POINTS));
           }
         }
     this->setEnabled(true);

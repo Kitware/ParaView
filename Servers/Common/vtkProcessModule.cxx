@@ -22,6 +22,7 @@
 #include "vtkClientServerInterpreter.h"
 #include "vtkClientServerStream.h"
 #include "vtkCommand.h"
+#include "vtkCompositeDataPipeline.h"
 #include "vtkConnectionIterator.h"
 #include "vtkDataObject.h"
 #include "vtkInstantiator.h"
@@ -155,7 +156,7 @@ vtkProcessModule::vtkProcessModule()
   this->InterpreterObserver = 0;
   this->ReportInterpreterErrors = 1;
 
-  this->UniqueID.ID = 3;
+  this->UniqueID.ID = 100;
 
   this->ProgressRequests = 0;
 
@@ -198,11 +199,16 @@ vtkProcessModule::vtkProcessModule()
   vtkMapper::SetResolveCoincidentTopologyZShift(2.0e-3);
 
   this->AutoMPI = vtkProcessModuleAutoMPI::New();
+
+  vtkCompositeDataPipeline* cddp = vtkCompositeDataPipeline::New();
+  vtkAlgorithm::SetDefaultExecutivePrototype(cddp);
+  cddp->Delete();
 }
 
 //-----------------------------------------------------------------------------
 vtkProcessModule::~vtkProcessModule()
 {
+  vtkAlgorithm::SetDefaultExecutivePrototype(NULL);
   this->SetActiveRemoteConnection(0);
   this->Observer->SetProcessModule(0);
   this->Observer->Delete();
@@ -1797,11 +1803,10 @@ vtkPVServerInformation* vtkProcessModule::GetServerInformation(
 
 //-----------------------------------------------------------------------------
 vtkClientServerID vtkProcessModule::GetMPIMToNSocketConnectionID(
-  vtkIdType id)
+  vtkIdType vtkNotUsed(id))
 {
-  return this->ConnectionManager->GetMPIMToNSocketConnectionID(id);
+  return vtkClientServerID(3);
 }
-
 
 //----------------------------------------------------------------------------
 // This method leaks memory.  It is a quick and dirty way to set different

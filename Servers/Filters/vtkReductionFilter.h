@@ -45,6 +45,7 @@ public:
   // Get/Set the pre-reduction helper. Pre-Reduction helper is an algorithm 
   // that runs on each node's data before it is sent to the root.
   void SetPreGatherHelper(vtkAlgorithm*);
+  void SetPreGatherHelperName(const char*);
   vtkGetObjectMacro(PreGatherHelper, vtkAlgorithm);
 
   // Description:
@@ -53,6 +54,7 @@ public:
   // the reduced output. This is run on the root node to produce a result
   // from the gathered results of each node.
   void SetPostGatherHelper(vtkAlgorithm*);
+  void SetPostGatherHelperName(const char*);
   vtkGetObjectMacro(PostGatherHelper, vtkAlgorithm);
 
   // Description:

@@ -618,20 +618,6 @@ vtkPVServerInformation* vtkProcessModuleConnectionManager::GetServerInformation(
 }
 
 //-----------------------------------------------------------------------------
-vtkClientServerID vtkProcessModuleConnectionManager::GetMPIMToNSocketConnectionID(
-  vtkIdType id)
-{
-  vtkServerConnection* conn = vtkServerConnection::SafeDownCast(
-    this->GetConnectionFromID(id));
-  if (conn)
-    {
-    return conn->GetMPIMToNSocketConnectionID();
-    }
-  vtkClientServerID nullid;
-  return nullid;
-}
-
-//-----------------------------------------------------------------------------
 int vtkProcessModuleConnectionManager::GetRenderClientMode(vtkIdType id)
 {
   vtkServerConnection* conn = vtkServerConnection::SafeDownCast(

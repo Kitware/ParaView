@@ -29,7 +29,6 @@
 #include "vtkSMProxyConfigurationReader.h"
 
 class vtkSMProxy;
-class vtkSMRenderViewProxy;
 class vtkPVXMLElement;
 
 class VTK_EXPORT vtkSMCameraConfigurationReader : public vtkSMProxyConfigurationReader
@@ -41,7 +40,7 @@ public:
 
   // Description:
   // Set the render view proxy to extract camera properties from.
-  void SetRenderViewProxy(vtkSMRenderViewProxy *rvProxy);
+  void SetRenderViewProxy(vtkSMProxy *rvProxy);
 
 
   // Description:

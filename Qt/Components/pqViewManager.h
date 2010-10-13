@@ -174,11 +174,6 @@ protected:
   /// Event filter callback.
   bool eventFilter(QObject* caller, QEvent* e);
 
-  /// Overridden to call updateViewPositions() after a frame has been maximized
-  /// or minimized.
-  virtual void maximizeWidget(QWidget*);
-  virtual void restoreWidget(QWidget*);
-
   /// This method will either assign an empty frame
   /// to the view module or split the active view
   /// (if any, otherwise splits the first view)
@@ -195,15 +190,6 @@ protected:
   /// since it is not aware of the loader which gives us 
   /// the render modules to put in the window.
   virtual void loadState(vtkPVXMLElement* /*root*/) { }
-
-  /// Update the GUISize/WindowPosition properties
-  /// on all view modules.
-  void updateViewPositions();
-
-  /// Update the GUISize/WindowPosition properties
-  /// using compact values to produce gapless multi views
-  /// on the render server.
-  void updateCompactViewPositions();
 
   /// Updates the context menu.
   void updateConversionActions(pqMultiViewFrame* frame);

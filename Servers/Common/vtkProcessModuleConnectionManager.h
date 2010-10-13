@@ -287,10 +287,6 @@ public:
   vtkPVServerInformation* GetServerInformation(vtkIdType id);
 
   // Description:
-  // Get the MPIMToNSocketConnectionID for a given connection.
-  vtkClientServerID GetMPIMToNSocketConnectionID(vtkIdType id);
-
-  // Description:
   // Get the number of processes from a given connection.
   // When SelfConnection, it indicates the number of mpi processes
   // of Self. When vtkServerConnection, implies the number of

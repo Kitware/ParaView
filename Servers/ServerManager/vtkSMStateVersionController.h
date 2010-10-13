@@ -41,6 +41,7 @@ public:
   bool Process_3_2_To_3_4(vtkPVXMLElement* root);
   bool Process_3_4_to_3_6(vtkPVXMLElement* root);
   bool Process_3_6_to_3_8(vtkPVXMLElement* root);
+  bool Process_3_8_to_3_10(vtkPVXMLElement* root);
 
 //BTX
   bool ConvertViewModulesToViews(vtkPVXMLElement* parent);
