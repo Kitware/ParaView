@@ -557,14 +557,14 @@ INSTALL (
 #-----------------------------------------------------------------------------
 # Add Target(s) to CMake Install for import into other projects
 #-----------------------------------------------------------------------------
-INSTALL (
-    EXPORT
-        ${HDF5_EXPORTED_TARGETS}
-    DESTINATION
-        lib
-    FILE
-        HDF5-config.cmake
-)
+#INSTALL (
+#    EXPORT
+#        ${HDF5_EXPORTED_TARGETS}
+#    DESTINATION
+#        lib
+#    FILE
+#        HDF5-config.cmake
+#)
 
 # The install rule below copies compiled module files to the install location
 # using a "code" rule. The code string should not be broken up, it must be on one line
