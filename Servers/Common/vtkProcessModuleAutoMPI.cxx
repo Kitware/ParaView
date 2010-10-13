@@ -24,7 +24,7 @@
 #include <vtksys/SystemTools.hxx>
 #include <vtksys/ios/sstream>
 
-int vtkProcessModuleAutoMPI::UseMulticoreProcessors;
+int vtkProcessModuleAutoMPI::UseMulticoreProcessors = 0;
 
 //------------------------------------------------------------------------macro
 /*
@@ -514,6 +514,11 @@ int vtkGetFreePort::getFreePort()
   this->CloseSocket(this->SocketDescriptor);
 
   return port;
+}
+
+void vtkProcessModuleAutoMPI::setUseMulticoreProcessors(int val)
+{
+  vtkProcessModuleAutoMPI::UseMulticoreProcessors = val;
 }
 
 //-----------------------------------------------------------------------------

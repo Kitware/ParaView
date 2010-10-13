@@ -195,7 +195,8 @@ pqApplicationOptions::pqApplicationOptions(QWidget *widgetParent)
   QObject::connect(paletteMenu, SIGNAL(triggered(QAction*)),
                    this, SLOT(onPalette(QAction*)));
 
-  vtkProcessModuleAutoMPI::UseMulticoreProcessors = this->Internal->AutoMPI->isTristate();
+  vtkProcessModuleAutoMPI::
+    setUseMulticoreProcessors (this->Internal->AutoMPI->isTristate());
 }
 
 //-----------------------------------------------------------------------------
@@ -256,7 +257,7 @@ void pqApplicationOptions::applyChanges()
 
   bool autoMPI = this->Internal->AutoMPI->isChecked();
   settings->setValue("autoMPI",autoMPI);
-  vtkProcessModuleAutoMPI::UseMulticoreProcessors = autoMPI;
+  vtkProcessModuleAutoMPI::setUseMulticoreProcessors(autoMPI);
 
   settings->setValue("GlobalProperties/ForegroundColor",
     this->Internal->ForegroundColor->chosenColor());
@@ -317,7 +318,8 @@ void pqApplicationOptions::resetChanges()
 
   this->Internal->AutoMPI->setChecked(
     settings->value("autoMPI", false).toBool());
-  vtkProcessModuleAutoMPI::UseMulticoreProcessors = this->Internal->AutoMPI->isTristate();
+  vtkProcessModuleAutoMPI::
+    setUseMulticoreProcessors(this->Internal->AutoMPI->isTristate());
 
   this->Internal->ForegroundColor->setChosenColor(
     settings->value("GlobalProperties/ForegroundColor",

@@ -39,6 +39,7 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   static int UseMulticoreProcessors;
+  static void setUseMulticoreProcessors(int val);
   vtkProcessModuleAutoMPI();
   ~vtkProcessModuleAutoMPI();
 
