@@ -1056,7 +1056,7 @@ public:
       cout << "Point coord dim: " << var.Dimension << endl;
 
       this->OpenGroup( var.GroupIndex );
-      uint64_t retval = adios_read_var_byid( this->Groups[var.GroupIndex],
+      int64_t retval = adios_read_var_byid( this->Groups[var.GroupIndex],
                                              var.VarIndex, offsets, counts,
                                              dataTmpBuffer );
       this->CloseGroup( var.GroupIndex );
@@ -1121,15 +1121,7 @@ public:
     uint64_t delta;
     for(int i=0; i < 4; i++)
       {
-      if(counts[i] != -1)
-        {
-        delta = counts[i];
-        }
-      else // Till the end
-        {
-        delta = var.Extent[i*2+1] - offsets[i];
-        }
-
+      delta = counts[i];
       if(delta != 0)
         {
         nbTuples *= delta;
