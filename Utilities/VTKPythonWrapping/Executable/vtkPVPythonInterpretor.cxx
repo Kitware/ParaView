@@ -129,11 +129,16 @@ static void vtkPythonAppInitPrependPath(const char* self_dir)
       "/lib/python/paraview", // UNIX --home
       "/Lib/site-packages/paraview", "/Lib/paraview", // Windows
       "/site-packages/paraview", "/paraview", // Windows
-      PV_PYTHON_PACKAGE_DIR,
       0
     };
+
     vtkstd::string prefix = self_dir;
-    vtkPythonAppInitPrependPythonPath(self_dir);
+    vtkPythonAppInitPrependPythonPath(self_dir); // Propbably not needed any longer.
+    // These two directories should be all that is necessary when running the
+    // python interpreter in a build tree.
+    vtkPythonAppInitPrependPythonPath(PV_PYTHON_PACKAGE_DIR "/site-packages");
+    vtkPythonAppInitPrependPythonPath(VTK_PYTHON_LIBRARY_DIR_BUILD);
+
 #if defined(__APPLE__)
     // On OS X distributions, the libraries are in a different directory
     // than the module. They are in a place relative to the executable.
@@ -156,6 +161,7 @@ static void vtkPythonAppInitPrependPath(const char* self_dir)
         // without the "/vtk" suffix.
         vtkstd::string path_dir =
           vtksys::SystemTools::GetFilenamePath(package_dir);
+        cout << "Appending!" << endl;
         vtkPythonAppInitPrependPythonPath(path_dir.c_str());
         break;
         }
