@@ -1682,7 +1682,7 @@ vtkMaterialInterfaceFilter::vtkMaterialInterfaceFilter()
   this->ClipCenter[2] = 0.0;
   this->ClipWithSphere = 0;
   this->ClipRadius = 1.0;
-  this->ClipWithPlane = 0.0;
+  this->ClipWithPlane = 0;
   this->ClipPlaneVector[0] = 0.0;
   this->ClipPlaneVector[1] = 0.0;
   this->ClipPlaneVector[2] = 1.0;

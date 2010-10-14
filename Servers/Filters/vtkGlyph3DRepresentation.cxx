@@ -193,7 +193,7 @@ void vtkGlyph3DRepresentation::SetOrientationArray(const char* val)
 }
 
 //----------------------------------------------------------------------------
-void vtkGlyph3DRepresentation::SetScaling(int val)
+void vtkGlyph3DRepresentation::SetScaling(bool val)
 {
   this->GlyphMapper->SetScaling(val);
   this->LODGlyphMapper->SetScaling(val);
@@ -214,7 +214,7 @@ void vtkGlyph3DRepresentation::SetScaleFactor(double val)
 }
 
 //----------------------------------------------------------------------------
-void vtkGlyph3DRepresentation::SetOrient(int val)
+void vtkGlyph3DRepresentation::SetOrient(bool val)
 {
   this->GlyphMapper->SetOrient(val);
   this->LODGlyphMapper->SetOrient(val);
@@ -228,7 +228,7 @@ void vtkGlyph3DRepresentation::SetOrientationMode(int val)
 }
 
 //----------------------------------------------------------------------------
-void vtkGlyph3DRepresentation::SetMasking(int val)
+void vtkGlyph3DRepresentation::SetMasking(bool val)
 {
   this->GlyphMapper->SetMasking(val);
   this->LODGlyphMapper->SetMasking(val);

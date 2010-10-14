@@ -96,7 +96,7 @@ int vtkMarkSelectedRows::RequestData(vtkInformation*,
       }
 
     vtkInformation* properties = node->GetProperties();
-    bool has_cid = properties->Has(vtkSelectionNode::COMPOSITE_INDEX());
+    bool has_cid = properties->Has(vtkSelectionNode::COMPOSITE_INDEX()) != 0;
     unsigned int cid = has_cid? properties->Get(vtkSelectionNode::COMPOSITE_INDEX()) : 0;
     bool has_amr = properties->Has(vtkSelectionNode::HIERARCHICAL_INDEX()) &&
       properties->Has(vtkSelectionNode::HIERARCHICAL_LEVEL());

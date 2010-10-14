@@ -240,7 +240,7 @@ void vtkPointSpriteRepresentation::SetRadiusArrayName(const char* val)
 
 //***************************************************************************
 // Forwarded to ScalarsToColorsPainter and LODScalarsToColorsPainter
-void vtkPointSpriteRepresentation::SetEnableOpacity(double val)
+void vtkPointSpriteRepresentation::SetEnableOpacity(int val)
 {
   this->ScalarsToColorsPainter->SetEnableOpacity(val);
   this->LODScalarsToColorsPainter->SetEnableOpacity(val);

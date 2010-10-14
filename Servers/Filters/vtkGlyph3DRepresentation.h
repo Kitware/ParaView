@@ -47,12 +47,12 @@ public:
   void SetMaskArray(const char* val);
   void SetScaleArray(const char* val);
   void SetOrientationArray(const char* val);
-  void SetScaling(int val);
+  void SetScaling(bool val);
   void SetScaleMode(int val);
   void SetScaleFactor(double val);
-  void SetOrient(int val);
+  void SetOrient(bool val);
   void SetOrientationMode(int val);
-  void SetMasking(int val);
+  void SetMasking(bool val);
   double* GetBounds();
 
 //BTX
