@@ -165,10 +165,6 @@ protected:
   pqMultiViewFrame* FillerFrame;
 
   QWidget* getMultiViewWidget() const;
-  void computeCompactSizes(QMap<pqMultiViewFrame*, QPair<QPoint,QSize> >&) const;
-  void computeCompactSizesHelper(QMap<pqMultiViewFrame*, QPair<QPoint,QSize> >&,
-    QSplitter*, int, int, int, int) const;
-
 private:
   void saveSplitter(vtkPVXMLElement *element, QSplitter *splitter, int index);
   void restoreSplitter(QWidget *widget, vtkPVXMLElement *element);

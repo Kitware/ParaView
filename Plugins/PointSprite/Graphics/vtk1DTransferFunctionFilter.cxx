@@ -67,6 +67,12 @@ vtk1DTransferFunctionFilter::~vtk1DTransferFunctionFilter()
   this->SetOutputArrayName(NULL);
 }
 
+int vtk1DTransferFunctionFilter::FillInputPortInformation(int port, vtkInformation* info)
+{
+  info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkDataSet");
+  return 1;
+}
+
 // Description:
 // This is called by the superclass.
 // This is the method you should override.

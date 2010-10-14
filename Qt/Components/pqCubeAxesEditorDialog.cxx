@@ -153,7 +153,9 @@ void pqCubeAxesEditorDialog::setRepresentationProxy(vtkSMProxy* repr)
       PV_GROUPBOX_REGISTER(CubeAxesZCustomBounds, "CustomBoundsActive", 2);
 
       //now they are linked, set them to objects bounds.
+#ifdef FIXME
       pvProxy->GetBounds( pvBounds );
+#endif
       this->setupCustomAxes( pvBounds[0],pvBounds[1],
         !this->Internal->CubeAxesXCustomBounds->isChecked(),
         this->Internal->CubeAxesXCustomBoundsMin,

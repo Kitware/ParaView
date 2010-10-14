@@ -34,7 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqRenderViewBase.h"
 
-class vtkSMScatterPlotViewProxy;
+class vtkSMRenderViewProxy;
 class ManipulatorType;
 
 /// RenderView used for scatter plot visualization
@@ -62,7 +62,7 @@ public:
   virtual ~pqScatterPlotView();
   
   /// Returns the render view proxy associated with this object.
-  virtual vtkSMScatterPlotViewProxy* getScatterPlotViewProxy() const;
+  virtual vtkSMRenderViewProxy* getScatterPlotViewProxy() const;
     
   /// Returns a array of 9 ManipulatorType objects defining
   /// default set of camera manipulators used by this type of view.

@@ -129,16 +129,16 @@ void pqServer::initialize()
   // connection times together.
   this->createTimeKeeper();
 
-  // Create the CoincidentTopologyResolutionProxy.
+  // Create the GlobalMapperPropertiesProxy.
   vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
-  vtkSMProxy* proxy = pxm->NewProxy("misc", "CoincidentTopologyResolution");
+  vtkSMProxy* proxy = pxm->NewProxy("misc", "GlobalMapperProperties");
   proxy->SetConnectionID(this->ConnectionID);
   proxy->UpdateVTKObjects();
-  pxm->RegisterProxy("temp_prototypes", "CoincidentTopologyResolution", proxy);
-  this->CoincidentTopologyResolutionProxy = proxy;
+  pxm->RegisterProxy("temp_prototypes", "GlobalMapperProperties", proxy);
+  this->GlobalMapperPropertiesProxy = proxy;
   proxy->Delete();
 
-  this->updateCoincidentTopologySettings();
+  this->updateGlobalMapperProperties();
 }
 
 //-----------------------------------------------------------------------------
@@ -179,14 +179,7 @@ vtkIdType pqServer::GetConnectionID() const
 //-----------------------------------------------------------------------------
 QString pqServer::getRenderViewXMLName() const
 {
-  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
-  vtkSMRenderViewProxy* prototype = vtkSMRenderViewProxy::SafeDownCast(
-    pxm->GetPrototypeProxy("views","RenderView"));
-  if (prototype)
-    {
-    return prototype->GetSuggestedViewType(this->GetConnectionID());
-    }
-  return QString();
+  return "RenderView";
 }
 
 //-----------------------------------------------------------------------------
@@ -316,35 +309,43 @@ int pqServer::getHeartBeatTimeoutSetting()
 //-----------------------------------------------------------------------------
 void pqServer::setCoincidentTopologyResolutionMode(int mode)
 {
-  vtkSMPropertyHelper(this->CoincidentTopologyResolutionProxy,
+  vtkSMPropertyHelper(this->GlobalMapperPropertiesProxy,
     "Mode").Set(mode);
-  this->CoincidentTopologyResolutionProxy->UpdateVTKObjects();
+  this->GlobalMapperPropertiesProxy->UpdateVTKObjects();
 }
 
 //-----------------------------------------------------------------------------
 void pqServer::setPolygonOffsetParameters(double factor, double units)
 {
-  vtkSMPropertyHelper helper(this->CoincidentTopologyResolutionProxy,
+  vtkSMPropertyHelper helper(this->GlobalMapperPropertiesProxy,
     "PolygonOffsetParameters");
   helper.Set(0, factor);
   helper.Set(1, units);
-  this->CoincidentTopologyResolutionProxy->UpdateVTKObjects();
+  this->GlobalMapperPropertiesProxy->UpdateVTKObjects();
 }
 
 //-----------------------------------------------------------------------------
 void pqServer::setPolygonOffsetFaces(bool offset_faces)
 {
-  vtkSMPropertyHelper(this->CoincidentTopologyResolutionProxy,
+  vtkSMPropertyHelper(this->GlobalMapperPropertiesProxy,
     "PolygonOffsetFaces").Set(offset_faces? 1 : 0);
-  this->CoincidentTopologyResolutionProxy->UpdateVTKObjects();
+  this->GlobalMapperPropertiesProxy->UpdateVTKObjects();
 }
 
 //-----------------------------------------------------------------------------
 void pqServer::setZShift(double shift)
 {
-  vtkSMPropertyHelper(this->CoincidentTopologyResolutionProxy,
+  vtkSMPropertyHelper(this->GlobalMapperPropertiesProxy,
     "ZShift").Set(shift);
-  this->CoincidentTopologyResolutionProxy->UpdateVTKObjects();
+  this->GlobalMapperPropertiesProxy->UpdateVTKObjects();
+}
+
+//-----------------------------------------------------------------------------
+void pqServer::setGlobalImmediateModeRendering(bool val)
+{
+  vtkSMPropertyHelper(this->GlobalMapperPropertiesProxy,
+    "GlobalImmediateModeRendering").Set(val? 1 : 0);
+  this->GlobalMapperPropertiesProxy->UpdateVTKObjects();
 }
 
 //-----------------------------------------------------------------------------
@@ -352,10 +353,10 @@ void pqServer::setCoincidentTopologyResolutionModeSetting(int mode)
 {
   pqApplicationCore* core = pqApplicationCore::instance();
   pqSettings* settings = core->settings();
-  settings->setValue("/server/CoincidentTopologyResolution/Mode", mode);
+  settings->setValue("/server/GlobalMapperProperties/Mode", mode);
 
   // update all existing servers.
-  pqServer::updateCoincidentTopologySettings();
+  pqServer::updateGlobalMapperProperties();
 }
 
 //-----------------------------------------------------------------------------
@@ -363,7 +364,7 @@ int pqServer::coincidentTopologyResolutionModeSetting()
 {
   pqApplicationCore* core = pqApplicationCore::instance();
   pqSettings* settings = core->settings();
-  return settings->value("/server/CoincidentTopologyResolution/Mode",
+  return settings->value("/server/GlobalMapperProperties/Mode",
     VTK_RESOLVE_SHIFT_ZBUFFER).toInt();
 }
 
@@ -372,13 +373,13 @@ void pqServer::setPolygonOffsetParametersSetting(double factor, double units)
 {
   pqApplicationCore* core = pqApplicationCore::instance();
   pqSettings* settings = core->settings();
-  settings->setValue("/server/CoincidentTopologyResolution/PolygonOffsetFactor",
+  settings->setValue("/server/GlobalMapperProperties/PolygonOffsetFactor",
     factor);
-  settings->setValue("/server/CoincidentTopologyResolution/PolygonOffsetUnits",
+  settings->setValue("/server/GlobalMapperProperties/PolygonOffsetUnits",
     units);
 
   // update all existing servers.
-  pqServer::updateCoincidentTopologySettings();
+  pqServer::updateGlobalMapperProperties();
 }
 
 //-----------------------------------------------------------------------------
@@ -386,9 +387,9 @@ void pqServer::polygonOffsetParametersSetting(double &factor, double &units)
 {
   pqApplicationCore* core = pqApplicationCore::instance();
   pqSettings* settings = core->settings();
-  factor = settings->value("/server/CoincidentTopologyResolution/PolygonOffsetFactor",
+  factor = settings->value("/server/GlobalMapperProperties/PolygonOffsetFactor",
     1.0).toDouble();
-  units = settings->value("/server/CoincidentTopologyResolution/PolygonOffsetUnits",
+  units = settings->value("/server/GlobalMapperProperties/PolygonOffsetUnits",
     1.0).toDouble();
 }
 
@@ -397,10 +398,10 @@ void pqServer::setPolygonOffsetFacesSetting(bool value)
 {
   pqApplicationCore* core = pqApplicationCore::instance();
   pqSettings* settings = core->settings();
-  settings->setValue("/server/CoincidentTopologyResolution/OffsetFaces", value);
+  settings->setValue("/server/GlobalMapperProperties/OffsetFaces", value);
 
   // update all existing servers.
-  pqServer::updateCoincidentTopologySettings();
+  pqServer::updateGlobalMapperProperties();
 }
 
 //-----------------------------------------------------------------------------
@@ -408,7 +409,7 @@ bool pqServer::polygonOffsetFacesSetting()
 {
   pqApplicationCore* core = pqApplicationCore::instance();
   pqSettings* settings = core->settings();
-  return settings->value("/server/CoincidentTopologyResolution/OffsetFaces",
+  return settings->value("/server/GlobalMapperProperties/OffsetFaces",
     true).toBool();
 }
 
@@ -417,10 +418,10 @@ void pqServer::setZShiftSetting(double shift)
 {
   pqApplicationCore* core = pqApplicationCore::instance();
   pqSettings* settings = core->settings();
-  settings->setValue("/server/CoincidentTopologyResolution/ZShift", shift);
+  settings->setValue("/server/GlobalMapperProperties/ZShift", shift);
 
   // update all existing servers.
-  pqServer::updateCoincidentTopologySettings();
+  pqServer::updateGlobalMapperProperties();
 
 }
 
@@ -429,12 +430,34 @@ double pqServer::zShiftSetting()
 {
   pqApplicationCore* core = pqApplicationCore::instance();
   pqSettings* settings = core->settings();
-  return settings->value("/server/CoincidentTopologyResolution/ZShift",
+  return settings->value("/server/GlobalMapperProperties/ZShift",
     2.0e-3).toDouble();
 }
 
 //-----------------------------------------------------------------------------
-void pqServer::updateCoincidentTopologySettings()
+void pqServer::setGlobalImmediateModeRenderingSetting(bool val)
+{
+  pqApplicationCore* core = pqApplicationCore::instance();
+  pqSettings* settings = core->settings();
+  settings->setValue(
+    "/server/GlobalMapperProperties/GlobalImmediateModeRendering", val);
+
+  // update all existing servers.
+  pqServer::updateGlobalMapperProperties();
+}
+
+//-----------------------------------------------------------------------------
+bool pqServer::globalImmediateModeRenderingSetting()
+{
+  pqApplicationCore* core = pqApplicationCore::instance();
+  pqSettings* settings = core->settings();
+  return settings->value(
+    "/server/GlobalMapperProperties/GlobalImmediateModeRendering",
+    false).toBool();
+}
+
+//-----------------------------------------------------------------------------
+void pqServer::updateGlobalMapperProperties()
 {
   pqApplicationCore* core = pqApplicationCore::instance();
   pqServerManagerModel* smmodel = core->getServerManagerModel();
@@ -451,5 +474,8 @@ void pqServer::updateCoincidentTopologySettings()
     server->setPolygonOffsetFaces(pqServer::polygonOffsetFacesSetting());
 
     server->setZShift(pqServer::zShiftSetting());
+
+    server->setGlobalImmediateModeRendering(
+      pqServer::globalImmediateModeRenderingSetting());
     }
 }

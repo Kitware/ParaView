@@ -1,6 +1,7 @@
 <ServerManagerConfiguration>
   <ProxyGroup name="lookup_tables">
-    <LookupTableProxy name="LookupTable" class="vtkLookupTable">
+    <LookupTableProxy name="LookupTable" class="vtkLookupTable"
+      processes="dataserver|renderserver|client" >
       <IntVectorProperty
          name="NumberOfTableValues"
          command="SetNumberOfTableValues"
@@ -73,7 +74,8 @@
 
     </LookupTableProxy>
 
-    <PVLookupTableProxy name="PVLookupTable" class="vtkDiscretizableColorTransferFunction">
+    <PVLookupTableProxy name="PVLookupTable" class="vtkDiscretizableColorTransferFunction"
+      processes="dataserver|renderserver|client" >
       <IntVectorProperty
         name="LockScalarRange"
         number_of_elements="1"
@@ -604,208 +606,6 @@
         number_of_elements="1"
         default_values="1" />
     </Proxy>
-  </ProxyGroup>
-  
-  <ProxyGroup name="3d_widgets">
-    <Proxy name="WidgetBase">
-      <Documentation>
-        Base API definition for all 3D widgets.
-      </Documentation>
-
-      <ProxyProperty name="Representation"
-         command="SetRepresentation">
-        <ProxyGroupDomain name="groups">
-          <Group name="props" />
-        </ProxyGroupDomain>
-      </ProxyProperty>
-      <IntVectorProperty name="Enabled"
-                         command="SetEnabled"
-                         number_of_elements="1"
-                         default_values="0">
-        <BooleanDomain/>
-      </IntVectorProperty>
-      <!-- End of WidgetBase -->
-    </Proxy>
-
-    <Proxy name="SliderWidget" class="vtkSliderWidget"
-      base_proxygroup="3d_widgets" base_proxyname="WidgetBase">
-    </Proxy>
-
-    <Proxy name="HandleWidget" class="vtkHandleWidget"
-      base_proxygroup="3d_widgets" base_proxyname="WidgetBase">
-    </Proxy>
-
-    <Proxy name="LineWidget2" class="vtkLineWidget2"
-      base_proxygroup="3d_widgets" base_proxyname="WidgetBase">
-      <IntVectorProperty name="ProcessEvents" 
-                         command="SetProcessEvents"
-                         number_of_elements="1"
-                         default_values="1">
-        <BooleanDomain/>
-      </IntVectorProperty>
-    </Proxy>
-
-    <Proxy name="DistanceWidget" class="vtkDistanceWidget"
-      base_proxygroup="3d_widgets" base_proxyname="WidgetBase">
-      <IntVectorProperty name="ProcessEvents" 
-                         command="SetProcessEvents"
-                         number_of_elements="1"
-                         default_values="1">
-        <BooleanDomain/>
-      </IntVectorProperty>
-    </Proxy>
-
-    <Proxy name="ImplicitPlaneWidget2" class="vtkImplicitPlaneWidget2"
-      base_proxygroup="3d_widgets" base_proxyname="WidgetBase">
-    </Proxy>
-
-    <Proxy name="SplineWidget2" class="vtkSplineWidget2"
-      base_proxygroup="3d_widgets" base_proxyname="WidgetBase">
-    </Proxy>
-    
-    <Proxy name="ContourWidget" class="vtkContourWidget"
-      base_proxygroup="3d_widgets" base_proxyname="WidgetBase">
-      
-      <Property name="CloseLoop" command="CloseLoop" />
-      <Property name="Initialize" command="Initialize" />
-
-      <IntVectorProperty name="WidgetState"
-        command="SetWidgetState"
-        number_of_elements="1"
-        information_property="WidgetStateInfo"
-        default_values="1">
-      </IntVectorProperty>
-
-      <IntVectorProperty name="WidgetStateInfo"
-        command="GetWidgetState"
-        information_only="1" >
-      </IntVectorProperty>
-
-      <IntVectorProperty name="AllowNodePicking"
-        command="SetAllowNodePicking"
-        number_of_elements="1"
-        default_values="1">
-        <BooleanDomain name="bool" />
-      </IntVectorProperty>
-      <IntVectorProperty name="ProcessEvents"
-        command="SetProcessEvents"
-        number_of_elements="1"
-        default_values="1">
-        <BooleanDomain/>
-      </IntVectorProperty>
-
-    </Proxy>
-
-    <Proxy name="ScalarBarWidget" class="vtkScalarBarWidget"
-      base_proxygroup="3d_widgets" base_proxyname="WidgetBase">
-      <IntVectorProperty name="Selectable"
-                         command="SetSelectable"
-                         number_of_elements="1"
-                         default_values="0">
-        <BooleanDomain/>
-      </IntVectorProperty>
-
-      <IntVectorProperty name="Resizable"
-                         command="SetResizable"
-                         number_of_elements="1"
-                         default_values="1"
-                         animateable="0">
-        <BooleanDomain name="bool"/>
-      </IntVectorProperty>
-
-      <IntVectorProperty name="Repositionable"
-                         command="SetRepositionable"
-                         number_of_elements="1"
-                         default_values="1"
-                         animateable="0">
-        <BooleanDomain name="bool"/>
-      </IntVectorProperty>
-
-      <!-- End of ScalarBarWidget -->
-    </Proxy>
-
-    <Proxy name="TextWidget" class="vtkTextWidget"
-      base_proxygroup="3d_widgets" base_proxyname="WidgetBase">
-      
-      <IntVectorProperty name="Selectable"
-                         command="SetSelectable"
-                         number_of_elements="1"
-                         default_values="0">
-        <BooleanDomain/>
-      </IntVectorProperty>
-
-      <IntVectorProperty name="Resizable"
-                         command="SetResizable"
-                         number_of_elements="1"
-                         default_values="0"
-                         animateable="0">
-        <BooleanDomain name="bool"/>
-      </IntVectorProperty>
-
-      <IntVectorProperty name="ProcessEvents"
-                         command="SetProcessEvents"
-                         number_of_elements="1"
-                         default_values="1">
-        <BooleanDomain/>
-      </IntVectorProperty>
-
-
-      <!-- End of TextWidget -->
-    </Proxy>
-
-    <Proxy name="BoxWidget2" class="vtkBoxWidget2"
-      base_proxygroup="3d_widgets" base_proxyname="WidgetBase">
-      <Documentation>
-        Proxy for vtkBoxWidget2.
-      </Documentation>
-    </Proxy>
-
-    <Proxy name="SphereWidget2" class="vtkSphereWidget2"
-      base_proxygroup="3d_widgets" base_proxyname="WidgetBase">
-      <Documentation>
-        Proxy for vtkSphereWidget2.
-      </Documentation>
-    </Proxy>
-
-
-    <Proxy name="AxesWidget" class="vtkPVAxesWidget"
-           processes="client">
-      <Documentation>
-        Orientation widget used by Render View.
-      </Documentation>
-
-      <IntVectorProperty name="Interactivity"
-          command="SetInteractive"
-          number_of_elements="1"
-          default_values="0">
-        <BooleanDomain name="bool" />
-        <Documentation>
-          Set whether to allow this 3D widget to be interactively moved/scaled.
-        </Documentation>
-      </IntVectorProperty>
-
-      <IntVectorProperty name="Visibility"
-          command="SetEnabled"
-          number_of_elements="1"
-          default_values="1">
-        <BooleanDomain name="bool" />
-      </IntVectorProperty>
-
-      <DoubleVectorProperty name="LabelColor"
-          command="SetAxisLabelColor"
-          number_of_elements="3"
-          default_values="1 1 1">
-      </DoubleVectorProperty>
-
-      <DoubleVectorProperty name="OutlineColor"
-          command="SetOutlineColor"
-          number_of_elements="3"
-          default_values="1 1 1">
-      </DoubleVectorProperty>
-      <!-- End of AxesWidget -->
-    </Proxy>
-
-    <!-- End of ProxyGroup 3d_widgets -->
   </ProxyGroup>
 
   <ProxyGroup name="animation">
@@ -1621,7 +1421,7 @@
 
   <ProxyGroup name="piecewise_functions">
     <Proxy name="PiecewiseFunction"  class="vtkPiecewiseFunction"
-           processes="client,renderserver" >
+           processes="client|renderserver|dataserver" >
       <DoubleVectorProperty
         name="Points"
         command="AddPoint"
@@ -1636,7 +1436,8 @@
   </ProxyGroup>
 
   <ProxyGroup name="transfer_functions">
-    <Proxy name="ColorTransferFunction" class="vtkColorTransferFunction">
+    <Proxy name="ColorTransferFunction" class="vtkColorTransferFunction"
+      processes="client|renderserver|dataserver" >
       <DoubleVectorProperty
         name="RGBPoints"
         command="AddRGBPoint"
@@ -2282,245 +2083,6 @@
     </TransformProxy>
   </ProxyGroup>
 
-  <ProxyGroup name="extended_filters">
-    <!-- Group for internal filters -->
-
-    <!-- ==================================================================== -->
-    <SourceProxy name="XYChartRepresentationPreprocessor"
-       class="vtkBlockDeliveryPreprocessor">
-       <Documentation>
-         vtkBlockDeliveryPreprocessor is an internal filter. This is used by
-         XY chart representations to preprocess the table that is delivered to the
-         client.
-       </Documentation>
-
-       <InputProperty name="Input"
-         command="SetInputConnection">
-         <Documentation>
-           This property specifies the input to the Extract Datasets filter.
-         </Documentation>
-       </InputProperty>
-
-       <IntVectorProperty name="FlattenTable"
-         command="SetFlattenTable"
-         number_of_elements="1"
-         default_values="1">
-         <Documentation>
-           Should the table be flattened (multicomponent columns split to single component)?
-         </Documentation>
-         <FieldDataDomain name="enum"
-            enable_field_data="1"
-            disable_update_domain_entries="1" >
-           <RequiredProperties>
-              <Property name="Input" function="Input"/>
-           </RequiredProperties>
-         </FieldDataDomain>
-       </IntVectorProperty>
-
-       <IntVectorProperty name="FieldAssociation"
-         command="SetFieldAssociation"
-         number_of_elements="1"
-         default_values="0">
-         <Documentation>
-           Select the attribute data to pass.
-         </Documentation>
-         <FieldDataDomain name="enum"
-            enable_field_data="1"
-            disable_update_domain_entries="1" >
-           <RequiredProperties>
-              <Property name="Input" function="Input"/>
-           </RequiredProperties>
-         </FieldDataDomain>
-       </IntVectorProperty>
-
-       <IntVectorProperty name="CompositeDataSetIndex"
-         command="SetCompositeDataSetIndex"
-         number_of_elements="1"
-         default_values="0">
-         <Documentation>
-           In case of Composite datasets, set the flat index of the dataset to
-           pass. The flat index must point to a non-empty, non-composite dataset
-           for anything to be passed through. If the input is not a composite
-           dataset, then this index is ignored.
-         </Documentation>
-         <CompositeTreeDomain name="tree" mode="leaves">
-           <RequiredProperties>
-              <Property name="Input" function="Input"/>
-           </RequiredProperties>
-        </CompositeTreeDomain>
-       </IntVectorProperty>
-    <!-- End of XYChartRepresentationPreprocessor -->
-    </SourceProxy>
-
-    <!-- ==================================================================== -->
-    <SourceProxy name="BlockDeliveryPreprocessor"
-       class="vtkBlockDeliveryPreprocessor">
-       <Documentation>
-         vtkBlockDeliveryPreprocessor is an internal filter.
-       </Documentation>
-
-       <InputProperty name="Input"
-         command="SetInputConnection">
-         <Documentation>
-           This property specifies the input to the Extract Datasets filter.
-         </Documentation>
-       </InputProperty>
-
-       <IntVectorProperty name="FieldAssociation"
-         command="SetFieldAssociation"
-         number_of_elements="1"
-         default_values="0">
-         <Documentation>
-           Select the attribute data to pass.
-         </Documentation>
-         <FieldDataDomain name="enum"
-            enable_field_data="1"
-            force_point_cell_data="1">
-           <RequiredProperties>
-              <Property name="Input" function="Input"/>
-           </RequiredProperties>
-         </FieldDataDomain>
-       </IntVectorProperty>
-
-       <IntVectorProperty name="CompositeDataSetIndex"
-         command="SetCompositeDataSetIndex"
-         number_of_elements="1"
-         default_values="0">
-         <Documentation>
-           In case of Composite datasets, set the flat index of the dataset to 
-           pass. The flat index must point to a non-empty, non-composite dataset 
-           for anything to be passed through. If the input is not a composite 
-           dataset, then this index is ignored.
-         </Documentation>
-         <CompositeTreeDomain name="tree" mode="leaves">
-           <RequiredProperties>
-              <Property name="Input" function="Input"/>
-           </RequiredProperties>
-        </CompositeTreeDomain>
-       </IntVectorProperty>
-
-       <IntVectorProperty name="GenerateOriginalIds"
-          command="SetGenerateOriginalIds"
-          number_of_elements="1"
-          default_values="1">
-          <BooleanDomain name="bool" />
-       </IntVectorProperty>
-    <!-- End of BlockDeliveryPreprocessor -->
-    </SourceProxy>
-
-    <!-- ==================================================================== -->
-    <SourceProxy name="TableStreamer" class="vtkSortedTableStreamer">
-       <Documentation>
-         vtkSortedTableStreamer is a block-based vtkTable streaming filter.
-       </Documentation>
-
-       <InputProperty name="Input"
-         command="SetInputConnection">
-         <Documentation>
-           This property specifies the input to the Extract Datasets filter.
-         </Documentation>
-       </InputProperty>
-
-      <StringVectorProperty name="ColumnToSort" command="SetColumnNameToSort"/>
-
-       <IntVectorProperty name="SelectedComponent"
-         command="SetSelectedComponent"
-         number_of_elements="1"
-         default_values="-1"/>
-
-       <IntVectorProperty name="InvertOrder"
-         command="SetInvertOrder"
-         number_of_elements="1"
-         default_values="0"/>
-
-       <IdTypeVectorProperty name="BlockSize"
-         command="SetBlockSize"
-         number_of_elements="1"
-         default_values="1024">
-         <Documentation>
-           Get/Set the number of rows that fit within one block. The output of
-           this filter will have at most BlockSize rows.
-         </Documentation>
-       </IdTypeVectorProperty>
-
-       <IdTypeVectorProperty name="Block"
-         command="SetBlock"
-         number_of_elements="1"
-         default_values="0">
-         <Documentation>
-           Get/Set the block to pass.
-         </Documentation>
-       </IdTypeVectorProperty>
-
-    <!-- End of TableStreamer --> 
-    </SourceProxy>
-
-    <!-- ==================================================================== -->
-    <SourceProxy name="SelectionStreamer" class="vtkSelectionStreamer">
-       <Documentation>
-         vtkSelectionStreamer is a block-based vtkSelection streaming filter.
-         This is designed to be used in conjunction with vtkSortedTableStreamer.
-       </Documentation>
-
-       <InputProperty name="DataInput"
-         command="SetInputConnection"
-         port_index="1" >
-         <Documentation>
-           This property specifies the input to the Extract Datasets filter.
-         </Documentation>
-       </InputProperty>
-
-       <InputProperty name="Input"
-         command="SetInputConnection"
-         port_index="0" >
-         <Documentation>
-           This property specifies the input to the Extract Datasets filter.
-         </Documentation>
-       </InputProperty>
-
-<!--
-       <IdTypeVectorProperty name="BlockSize"
-         command="SetBlockSize"
-         number_of_elements="1"
-         default_values="1024">
-         <Documentation>
-           Get/Set the number of rows that fit within one block. The output of
-           this filter will have at most BlockSize rows.
-         </Documentation>
-       </IdTypeVectorProperty>
-
-       <IdTypeVectorProperty name="Block"
-         command="SetBlock"
-         number_of_elements="1"
-         default_values="0">
-         <Documentation>
-           Get/Set the block to pass.
-         </Documentation>
-       </IdTypeVectorProperty>
--->
-
-       <IntVectorProperty name="FieldAssociation"
-         command="SetFieldAssociation"
-         number_of_elements="1"
-         default_values="0">
-         <Documentation>
-           Select the attribute data to pass.
-         </Documentation>
-         <EnumerationDomain name="enum">
-           <Entry text="Points" value="0" />
-           <Entry text="Cells" value="1" />
-           <Entry text="Field Data" value="2" />
-           <Entry text="Vertices" value="3" />
-           <Entry text="Edges" value="4" />
-           <Entry text="Rows" value="5" />
-         </EnumerationDomain>
-       </IntVectorProperty>
-
-    <!-- End of SelectionStreamer --> 
-    </SourceProxy>
-
-  </ProxyGroup>
-
   <ProxyGroup name="misc">
     <Proxy name="FileInformationHelper" class="vtkPVFileInformationHelper">
 
@@ -2825,12 +2387,12 @@
     <!-- End of GlobalProperties -->
     </Proxy>
 
-    <Proxy name="CoincidentTopologyResolution"
+    <Proxy name="GlobalMapperProperties"
            class="vtkPolyDataMapper"
            processes="client|renderserver">
       <Documentation>
-        This proxy is useful for changing the coincident topology resolution
-        setting on all rendering proceses.
+        This proxy is useful for changing gloabal mapper settings such as
+        the coincident topology resolution setting on all rendering proceses.
       </Documentation>
       <IntVectorProperty name="Mode"
         command="SetResolveCoincidentTopology"
@@ -2878,7 +2440,21 @@
         </Documentation>
       </DoubleVectorProperty>
 
-      <!-- End of CoincidentTopologyResolution -->
+      <IntVectorProperty name="GlobalImmediateModeRendering"
+        command="SetGlobalImmediateModeRendering"
+        number_of_elements="1"
+        default_values="none">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Turn on/off flag to control whether data is rendered using immediate
+          mode or note. Immediate mode rendering tends to be slower but it can
+          handle larger datasets.  The default value is immediate mode off. If
+          you are having problems rendering a large dataset you might want to
+          consider using immediate more rendering.
+        </Documentation>
+      </IntVectorProperty>
+
+      <!-- End of GlobalMapperProperties -->
     </Proxy>
 
     <!-- End of group "misc" -->

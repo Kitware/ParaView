@@ -229,7 +229,7 @@ protected:
 
   // Description:
   // Mark the data information as invalid.
-  void InvalidateDataInformation();
+  virtual void InvalidateDataInformation();
 
   // Description:
   // Call superclass' and then assigns a new executive 

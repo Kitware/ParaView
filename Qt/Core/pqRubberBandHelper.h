@@ -38,6 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class pqRenderView;
 class pqView;
+class vtkObject;
 
 /*! \brief Utility to switch interactor styles in 3D views.
  *
@@ -49,15 +50,10 @@ class pqView;
 class PQCORE_EXPORT pqRubberBandHelper : public QObject
 {
   Q_OBJECT
+  typedef QObject Superclass;
 public:
   pqRubberBandHelper(QObject* parent=NULL);
   virtual ~pqRubberBandHelper();
-
-  static void ReorderBoundingBox(int src[4], int dest[4]);
-
-  //for internal use only, this is how mouse press and release events
-  //are processed internally
-  void processEvents(unsigned long event);
 
   /// Returns the currently selected render view.
   pqRenderView* getRenderView() const;
@@ -80,6 +76,9 @@ public:
   // sets up observer to call "pick" when user clicks.
   //ETX
 
+  /// Used in PICK_ON_CLICK mode to capture click events from the rendering
+  /// widget.
+  virtual bool eventFilter(QObject *watched, QEvent *event);
 
 public slots:
   /// Set active view. If a view has been set previously, this method ensures
@@ -147,10 +146,11 @@ protected:
   int Xs, Ys, Xe, Ye;
   int DisableCount;
 
+  // Called whenever a selection is made in the view.
+  void onSelectionChanged(vtkObject*, unsigned long, void*);
+
 private:
   class pqInternal;
-  class vtkPQSelectionObserver;
-
   pqInternal* Internal;
 };
 

@@ -67,9 +67,6 @@ public:
   /// Deactivates the widget.
   virtual void deselect();
 
-  /// Get the bounds of the representation
-  virtual bool getBounds(double bounds[6]) const;
-
   /// Set the line color
   virtual void setLineColor(const QColor& color);
 

@@ -475,19 +475,19 @@ void pqDisplayProxyEditor::setRepresentation(pqPipelineRepresentation* repr)
         pqSignalAdaptorCompositeTreeWidget::INDEX_MODE_FLAT, false, true);
     }
 
-  if (reprProxy->GetProperty("SelectedMapperIndex"))
+  if (reprProxy->GetProperty("SelectMapper"))
     {
     QList<QVariant> mapperNames =
       pqSMAdaptor::getEnumerationPropertyDomain(
-        reprProxy->GetProperty("SelectedMapperIndex"));
+        reprProxy->GetProperty("SelectMapper"));
     foreach(QVariant item, mapperNames)
       {
-      this->Internal->SelectedMapperIndex->addItem(item.toString());
+      this->Internal->SelectMapper->addItem(item.toString());
       }
     this->Internal->Links->addPropertyLink(
       this->Internal->SelectedMapperAdaptor,
       "currentText", SIGNAL(currentTextChanged(const QString&)),
-      reprProxy, reprProxy->GetProperty("SelectedMapperIndex"));
+      reprProxy, reprProxy->GetProperty("SelectMapper"));
     }
 
   this->Internal->BackfaceStyleRepresentation->clear();
@@ -691,7 +691,7 @@ void pqDisplayProxyEditor::setupGUIConnections()
     this, SLOT(sliceDirectionChanged()), Qt::QueuedConnection);
 
   this->Internal->SelectedMapperAdaptor = new pqSignalAdaptorComboBox(
-    this->Internal->SelectedMapperIndex);
+    this->Internal->SelectMapper);
   QObject::connect(this->Internal->SelectedMapperAdaptor,
     SIGNAL(currentTextChanged(const QString&)),
     this, SLOT(selectedMapperChanged()), Qt::QueuedConnection);
@@ -777,9 +777,9 @@ void pqDisplayProxyEditor::updateEnableState()
    this->Internal->CompositeTreeAdaptor &&
    (reprType == vtkSMPVRepresentationProxy::VOLUME));
 
-  this->Internal->SelectedMapperIndex->setEnabled(
+  this->Internal->SelectMapper->setEnabled(
     reprType == vtkSMPVRepresentationProxy::VOLUME
-    && this->Internal->Representation->getProxy()->GetProperty("SelectedMapperIndex"));
+    && this->Internal->Representation->getProxy()->GetProperty("SelectMapper"));
 
   vtkSMProperty *backfaceRepProperty = this->Internal->Representation
     ->getRepresentationProxy()->GetProperty("BackfaceRepresentation");
@@ -805,14 +805,14 @@ void pqDisplayProxyEditor::updateEnableState()
     this->Internal->BackfaceStyleGroupOptions->setEnabled(!backFollowsFront);
     }
 
-  vtkSMDataRepresentationProxy* display =
+  vtkSMRepresentationProxy* display =
     this->Internal->Representation->getRepresentationProxy();
   if (display)
     {
     QVariant scalarMode = pqSMAdaptor::getEnumerationProperty(
       display->GetProperty("ColorAttributeType"));
     vtkPVDataInformation* geomInfo =
-      display->GetRepresentedDataInformation(/*update=*/false);
+      display->GetRepresentedDataInformation();
     if (!geomInfo)
       {
       return;
@@ -875,18 +875,13 @@ void pqDisplayProxyEditor::zoomToData()
     return;
     }
 
-  double bounds[6];
-  this->Internal->Representation->getRepresentationProxy()->GetBounds(bounds);
-  if (bounds[0]<=bounds[1] && bounds[2]<=bounds[3] && bounds[4]<=bounds[5])
+  pqRenderView* renModule = qobject_cast<pqRenderView*>(
+    this->Internal->Representation->getView());
+  if (renModule)
     {
-    pqRenderView* renModule = qobject_cast<pqRenderView*>(
-      this->Internal->Representation->getView());
-    if (renModule)
-      {
-      vtkSMRenderViewProxy* rm = renModule->getRenderViewProxy();
-      rm->ResetCamera(bounds);
-      renModule->render();
-      }
+    vtkSMRenderViewProxy* rm = renModule->getRenderViewProxy();
+    rm->ZoomTo(this->Internal->Representation->getProxy());
+    renModule->render();
     }
 }
 
@@ -1035,7 +1030,7 @@ void pqDisplayProxyEditor::volumeBlockSelected()
       this->Internal->CompositeTreeAdaptor->getCurrentFlatIndex(&valid);
     if (valid && selectedIndex > 0)
       {
-      vtkSMDataRepresentationProxy* repr =
+      vtkSMRepresentationProxy* repr =
         this->Internal->Representation->getRepresentationProxy();
       pqSMAdaptor::setElementProperty(
         repr->GetProperty("ExtractedBlockIndex"), selectedIndex);
@@ -1090,7 +1085,7 @@ void pqDisplayProxyEditor::setAutoAdjustSampleDistances(bool flag)
 //-----------------------------------------------------------------------------
 void pqDisplayProxyEditor::selectedMapperChanged()
 {
-  if(!this->Internal->SelectedMapperIndex->currentText().compare(
+  if(!this->Internal->SelectMapper->currentText().compare(
       QString("Fixed Point"), Qt::CaseInsensitive))
     {
     // Fixed point does not uses sample distance.
@@ -1098,7 +1093,7 @@ void pqDisplayProxyEditor::selectedMapperChanged()
     this->Internal->SampleDistanceValue->setEnabled(0);
     this->Internal->AutoAdjustSampleDistances->setEnabled(0);
     }
-  else if(!this->Internal->SelectedMapperIndex->currentText().compare(
+  else if(!this->Internal->SelectMapper->currentText().compare(
       QString("GPU"), Qt::CaseInsensitive))
     {
     this->Internal->SampleDistance->setEnabled(1);

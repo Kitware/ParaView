@@ -5,172 +5,224 @@
 
       <PointSpriteRepresentationProxy name="PointSpriteRepresentation"
         base_proxygroup="representations"
-        base_proxyname="SurfaceRepresentation">
+        base_proxyname="SurfaceRepresentationBase"
+        class="vtkPointSpriteRepresentation"
+        processes="client|dataserver|renderserver" >
 
       <Documentation>
         Representation for Particle or Point Data.
       </Documentation>
 
-      <InputProperty name="Input" command="NotUsed">
-        <InputArrayDomain name="input_array"
-          attribute_type="point">
+      <InputProperty name="Input" command="SetInputConnection">
+        <InputArrayDomain name="input_array" attribute_type="point">
         </InputArrayDomain>
       </InputProperty>
 
-      <SubProxy>
-        <Proxy name="GeometryFilter"
-               proxygroup="internal_filters"
-               proxyname="CellPointsFilter"
-               override="1"/>
-      </SubProxy>
+      <IntVectorProperty name="RadiusTransferFunctionEnabled"
+        command="SetRadiusTransferFunctionEnabled"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool"/>
+      </IntVectorProperty>
 
-      <SubProxy>
-        <Proxy name="ArrayToRadiusFilter"
-               proxygroup="internal_filters"
-               proxyname="TransferFunctionFilter"/>
-        <ExposedProperties>
-          <Property name="Enabled" exposed_name="RadiusTransferFunctionEnabled"/>
-          <Property name="InputArrayToProcess" exposed_name="RadiusArray"/>
-        </ExposedProperties>
-      </SubProxy>
+      <StringVectorProperty name="RadiusArray"
+        command="SetRadiusArrayToProcess"
+        number_of_elements="5"
+        element_types="0 0 0 0 2" >
+           <ArrayListDomain name="array_list">
+             <RequiredProperties>
+                <Property name="Input" function="Input"/>
+             </RequiredProperties>
+           </ArrayListDomain>
+           <Documentation>
+             The value of this property contains the name of the array to
+             transform through the transfer function.
+           </Documentation>
+      </StringVectorProperty>
 
-      <SubProxy>
-        <Proxy name="LODArrayToRadiusFilter"
-               proxygroup="internal_filters"
-               proxyname="TransferFunctionFilter"/>
-        <ShareProperties subproxy="ArrayToRadiusFilter" />
-      </SubProxy>
+      <IntVectorProperty name="OpacityTransferFunctionEnabled"
+        command="SetOpacityTransferFunctionEnabled"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool"/>
+      </IntVectorProperty>
 
-      <SubProxy>
-        <Proxy name="ArrayToOpacityFilter"
-               proxygroup="internal_filters"
-               proxyname="TransferFunctionFilter"/>
-        <ExposedProperties>
-          <Property name="Enabled" exposed_name="OpacityTransferFunctionEnabled"/>
-          <Property name="InputArrayToProcess" exposed_name="OpacityArray"/>
-        </ExposedProperties>
-      </SubProxy>
+      <StringVectorProperty name="OpacityArray"
+        command="SetOpacityArrayToProcess"
+        number_of_elements="5"
+        element_types="0 0 0 0 2" >
+           <ArrayListDomain name="array_list">
+             <RequiredProperties>
+                <Property name="Input" function="Input"/>
+             </RequiredProperties>
+           </ArrayListDomain>
+           <Documentation>
+             The value of this property contains the name of the array to
+             transform through the transfer function.
+           </Documentation>
+      </StringVectorProperty>
 
-      <SubProxy>
-        <Proxy name="LODArrayToOpacityFilter"
-               proxygroup="internal_filters"
-               proxyname="TransferFunctionFilter"/>
-        <ShareProperties subproxy="ArrayToOpacityFilter" />
-      </SubProxy>
+      <IntVectorProperty name="RenderMode"
+        command="SetRenderMode"
+        default_values="2"
+        number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry value="2" text="SimplePoint"/>
+          <Entry value="1" text="Texture"/>
+          <Entry value="0" text="Sphere"/>
+        </EnumerationDomain>
+      </IntVectorProperty>
 
-      <SubProxy>
-        <Proxy name="Property"
-               proxygroup="properties"
-               proxyname="PointSpriteProperty"
-               override="1"/>
-        <ExposedProperties>
-          <Property name="RenderMode"/>
-          <Property name="RadiusMode" />
-          <Property name="ConstantRadius" />
-          <Property name="MaxPixelSize" />
-          <Property name="RadiusRange" />
+      <IntVectorProperty name="RadiusMode"
+        command="SetRadiusMode"
+        default_values="0"
+        number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry value="0" text="Constant"/>
+          <Entry value="1" text="Scalar"/>
+        </EnumerationDomain>
+      </IntVectorProperty>
 
-          <Property name="Ambient" />
-          <Property name="AmbientColor" />
-          <Property name="Diffuse"/>
-          <Property name="DiffuseColor"/>
-          <Property name="Opacity"/>
-          <Property name="PointSize"/>
-          <Property name="Representation"/>
-          <Property name="Specular"/>
-          <Property name="SpecularColor"/>
-          <Property name="SpecularPower"/>
-        </ExposedProperties>
-      </SubProxy>
+      <DoubleVectorProperty name="ConstantRadius"
+        command="SetConstantRadius"
+        number_of_elements="1"
+        default_values="1">
+        <CustomBoundsDomain name="range">
+          <RequiredProperties>
+            <Property name="Input" function="Input" />
+          </RequiredProperties>
+        </CustomBoundsDomain>
+      </DoubleVectorProperty>
 
-      <SubProxy>
-        <Proxy name="PointSpriteDefaultPainter"
-          proxygroup="painters" proxyname="PointSpriteDefaultPainter" />
-      </SubProxy>
+      <DoubleVectorProperty name="RadiusRange"
+        command="SetRadiusRange"
+        number_of_elements="2"
+        default_values="0 1"
+        animateable="0">
+        <CustomBoundsDomain name="range">
+          <RequiredProperties>
+            <Property name="Input" function="Input" />
+          </RequiredProperties>
+        </CustomBoundsDomain>
+      </DoubleVectorProperty>
 
-      <SubProxy>
-        <Proxy name="LODPointSpriteDefaultPainter"
-          proxygroup="painters" proxyname="PointSpriteDefaultPainter" />
-      </SubProxy>
+      <DoubleVectorProperty name="MaxPixelSize"
+        command="SetMaxPixelSize"
+        default_values="64"
+        number_of_elements="1"
+        animateable="1">
+        <DoubleRangeDomain name="range" min="1" max="8192"/>
+      </DoubleVectorProperty>
 
-      <SubProxy>
-        <Proxy name="DepthSortPainter"
-          proxygroup="painters" proxyname="DepthSortPainter" />
-      </SubProxy>
+      <StringVectorProperty name="RadiusArrayName"
+        command="SetRadiusArrayName"
+        number_of_elements="1"
+        default_values="">
+      </StringVectorProperty>
 
-      <SubProxy>
-        <Proxy name="LODDepthSortPainter"
-          proxygroup="painters" proxyname="DepthSortPainter" />
-        <ShareProperties subproxy="DepthSortPainter" />
-      </SubProxy>
+      <IntVectorProperty name="OpacityPainterEnabled"
+        command="SetEnableOpacity"
+        default_values="0"
+        number_of_elements="1">
+      </IntVectorProperty>
 
-      <SubProxy>
-        <Proxy name="ScalarsToColorsPainter"
-          proxygroup="painters" proxyname="TwoScalarsToColorsPainter" />
-        <ExposedProperties>
-          <Property name="EnableOpacity" exposed_name="OpacityPainterEnabled"/>
-        </ExposedProperties>
-      </SubProxy>
+      <DoubleVectorProperty name="RadiusScalarRange"
+         command="SetRadiusScalarRange"
+         number_of_elements="2"
+         default_values="0 1">
+      </DoubleVectorProperty>
 
-      <SubProxy>
-        <Proxy name="LODScalarsToColorsPainter"
-          proxygroup="painters" proxyname="TwoScalarsToColorsPainter" />
-        <ShareProperties subproxy="ScalarsToColorsPainter"  />
-      </SubProxy>
+      <IntVectorProperty name="RadiusUseScalarRange"
+         command="SetRadiusUseScalarRange"
+         number_of_elements="1"
+         default_values="1">
+        <BooleanDomain name="bool"/>
+      </IntVectorProperty>
 
-      <SubProxy>
-        <Proxy name="RadiusTransferFunctionChooser"
-            proxygroup="lookup_tables_1D" proxyname="TransferFunctionChooser"/>
-        <ExposedProperties>
-            <Property name="TransferFunctionMode" exposed_name="RadiusTransferFunctionMode"/>
-            <Property name="VectorComponent" exposed_name="RadiusVectorComponent"/>
-            <Property name="Range" exposed_name="RadiusScalarRange"/>
-            <Property name="UseScalarRange" exposed_name="RadiusUseScalarRange"/>
-        </ExposedProperties>
-      </SubProxy>
+       <IntVectorProperty name="RadiusVectorComponent"
+         command="SetRadiusVectorComponent"
+         number_of_elements="1"
+         default_values="0">
+      </IntVectorProperty>
 
-      <SubProxy>
-        <Proxy name="OpacityTransferFunctionChooser"
-            proxygroup="lookup_tables_1D" proxyname="TransferFunctionChooser"/>
-        <ExposedProperties>
-            <Property name="TransferFunctionMode" exposed_name="OpacityTransferFunctionMode"/>
-            <Property name="VectorComponent" exposed_name="OpacityVectorComponent"/>
-            <Property name="Range" exposed_name="OpacityScalarRange"/>
-            <Property name="UseScalarRange" exposed_name="OpacityUseScalarRange"/>
-        </ExposedProperties>
-      </SubProxy>
+      <IntVectorProperty name="RadiusTransferFunctionMode"
+         command="SetRadiusTransferFunctionMode"
+         number_of_elements="1"
+         default_values="0">
+       <EnumerationDomain name="enum">
+          <Entry value="0" text="Table" />
+          <Entry value="1" text="Gaussian" />
+       </EnumerationDomain>
+      </IntVectorProperty>
 
-      <SubProxy>
-        <Proxy name="RadiusTableTransferFunction"
-            proxygroup="lookup_tables_1D" proxyname="LookupTableTransferFunction"/>
-        <ExposedProperties>
-            <Property name="TableValues" exposed_name="RadiusTableValues"/>
-        </ExposedProperties>
-      </SubProxy>
+      <DoubleVectorProperty name="OpacityScalarRange"
+         command="SetOpacityScalarRange"
+         number_of_elements="2"
+         default_values="0 1">
+      </DoubleVectorProperty>
 
-      <SubProxy>
-        <Proxy name="OpacityTableTransferFunction"
-            proxygroup="lookup_tables_1D" proxyname="LookupTableTransferFunction"/>
-        <ExposedProperties>
-            <Property name="TableValues" exposed_name="OpacityTableValues"/>
-        </ExposedProperties>
-      </SubProxy>
+      <IntVectorProperty name="OpacityUseScalarRange"
+         command="SetOpacityUseScalarRange"
+         number_of_elements="1"
+         default_values="1">
+        <BooleanDomain name="bool"/>
+      </IntVectorProperty>
 
-      <SubProxy>
-        <Proxy name="RadiusGaussianTransferFunction"
-            proxygroup="lookup_tables_1D" proxyname="GaussianTransferFunction"/>
-        <ExposedProperties>
-            <Property name="GaussianControlPoints" exposed_name="RadiusGaussianControlPoints"/>
-        </ExposedProperties>
-      </SubProxy>
+       <IntVectorProperty name="OpacityVectorComponent"
+         command="SetOpacityVectorComponent"
+         number_of_elements="1"
+         default_values="0">
+      </IntVectorProperty>
 
-      <SubProxy>
-        <Proxy name="OpacityGaussianTransferFunction"
-            proxygroup="lookup_tables_1D" proxyname="GaussianTransferFunction"/>
-        <ExposedProperties>
-            <Property name="GaussianControlPoints" exposed_name="OpacityGaussianControlPoints"/>
-        </ExposedProperties>
-      </SubProxy>
+      <IntVectorProperty name="OpacityTransferFunctionMode"
+         command="SetOpacityTransferFunctionMode"
+         number_of_elements="1"
+         default_values="0">
+       <EnumerationDomain name="enum">
+          <Entry value="0" text="Table" />
+          <Entry value="1" text="Gaussian" />
+       </EnumerationDomain>
+      </IntVectorProperty>
+
+      <DoubleVectorProperty name="RadiusTableValues"
+        command="SetRadiusTableValues"
+        set_number_command="SetNumberOfRadiusTableValues"
+        number_of_elements="0"
+        repeat_command="1"
+        number_of_elements_per_command="1"
+        clean_command="RemoveAllRadiusTableValues"
+        use_index="1">
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="OpacityTableValues"
+        command="SetOpacityTableValues"
+        set_number_command="SetNumberOfOpacityTableValues"
+        number_of_elements="0"
+        repeat_command="1"
+        number_of_elements_per_command="1"
+        clean_command="RemoveAllOpacityTableValues"
+        use_index="1">
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="RadiusGaussianControlPoints"
+        command="SetRadiusGaussianControlPoints"
+        set_number_command="SetNumberOfRadiusGaussianControlPoints"
+        number_of_elements="0"
+        repeat_command="1"
+        number_of_elements_per_command="5"
+        clean_command="RemoveAllRadiusGaussianControlPoints"
+        use_index="1">
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="OpacityGaussianControlPoints"
+        command="SetOpacityGaussianControlPoints"
+        set_number_command="SetNumberOfOpacityGaussianControlPoints"
+        number_of_elements="0"
+        repeat_command="1"
+        number_of_elements_per_command="5"
+        clean_command="RemoveAllOpacityGaussianControlPoints"
+        use_index="1">
+      </DoubleVectorProperty>
 
       <IntVectorProperty
          name="OpacityIsProportional"
@@ -197,7 +249,7 @@
       </DoubleVectorProperty>
 
        <IntVectorProperty
-         name="RadiusInitialized"
+         name="PointSpriteDefaultsInitialized"
          number_of_elements="1"
          default_values="0">
       </IntVectorProperty>
@@ -226,128 +278,6 @@
         </ExposedProperties>
       </SubProxy>
     </SpriteTextureProxy>
-  </ProxyGroup>
-
-  <ProxyGroup name="properties">
-
-    <Proxy name="PointSpriteProperty" class="vtkPointSpriteProperty" base_proxygroup="properties"
-      base_proxyname="Property">
-      <IntVectorProperty
-        name="RenderMode"
-        command="SetRenderMode"
-        default_values="2"
-        number_of_elements="1"
-        animateable="0">
-        <EnumerationDomain name="enum">
-          <Entry value="2" text="SimplePoint"/>
-          <Entry value="1" text="Texture"/>
-          <Entry value="0" text="Sphere"/>
-        </EnumerationDomain>
-      </IntVectorProperty>
-
-      <IntVectorProperty
-        name="RadiusMode"
-        command="SetRadiusMode"
-        default_values="0"
-        number_of_elements="1"
-        animateable="0">
-        <EnumerationDomain name="enum">
-          <Entry value="0" text="Constant"/>
-          <Entry value="1" text="Scalar"/>
-        </EnumerationDomain>
-      </IntVectorProperty>
-
-      <DoubleVectorProperty
-        name="ConstantRadius"
-        command="SetConstantRadius"
-        default_values="1"
-        number_of_elements="1"
-        animateable="1">
-      </DoubleVectorProperty>
-
-      <DoubleVectorProperty
-        name="RadiusRange"
-        command="SetRadiusRange"
-        number_of_elements="2"
-        default_values="0 1"
-        animateable="0">
-      </DoubleVectorProperty>
-
-      <DoubleVectorProperty
-        name="MaxPixelSize"
-        command="SetMaxPixelSize"
-        default_values="64"
-        number_of_elements="1"
-        animateable="1">
-        <DoubleRangeDomain name="range" min="1" max="8192"/>
-      </DoubleVectorProperty>
-
-      <StringVectorProperty
-        name="RadiusArrayName"
-        command="SetRadiusArrayName"
-        number_of_elements="1"
-        default_values="">
-      </StringVectorProperty>
-
-    </Proxy>
-  </ProxyGroup>
-
-    <!--=======================================-->
-
-  <ProxyGroup name="painters">
-
-    <Proxy name="PointSpriteDefaultPainter" class="vtkPointSpriteDefaultPainter">
-
-      <ProxyProperty name="ScalarsToColorsPainter"
-        command="SetScalarsToColorsPainter">
-      </ProxyProperty>
-
-      <ProxyProperty name="DepthSortPainter"
-        command="SetDepthSortPainter">
-      </ProxyProperty>
-
-    </Proxy>
-
-    <!--=======================================-->
-
-    <Proxy name="DepthSortPainter" class="vtkDepthSortPainter">
-
-      <IntVectorProperty
-        name="DepthSortEnableMode"
-        command="SetDepthSortEnableMode"
-        default_values="1"
-        number_of_elements="1"
-        animateable="0">
-        <EnumerationDomain name="enum">
-          <Entry value="0" text="Always"/>
-          <Entry value="1" text="IfNoDepthPeeling"/>
-          <Entry value="2" text="Never"/>
-        </EnumerationDomain>
-      </IntVectorProperty>
-
-    </Proxy>
-
-    <!--=======================================-->
-
-    <Proxy name="TwoScalarsToColorsPainter" class="vtkTwoScalarsToColorsPainter">
-
-      <IntVectorProperty
-        name="EnableOpacity"
-        command="SetEnableOpacity"
-        default_values="0"
-        number_of_elements="1"
-        animateable="0">
-      </IntVectorProperty>
-
-      <StringVectorProperty
-        name="OpacityArrayName"
-        command="SetOpacityArrayName"
-        number_of_elements="1"
-        default_values="">
-      </StringVectorProperty>
-
-    </Proxy>
-  <!-- End of "painters" -->
   </ProxyGroup>
 
    <!--======================================================================-->

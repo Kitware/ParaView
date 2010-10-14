@@ -251,7 +251,6 @@ void vtkPVGenericRenderWindowInteractor::SetPVRenderView(vtkPVRenderViewProxy *v
     if (this->PVRenderView != NULL)
       {
       this->PVRenderView->Register(this);
-      this->SetRenderWindow(this->PVRenderView->GetRenderWindow());
       }
     }
 }

@@ -18,7 +18,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkStringList.h"
 #include "vtkSMNamedPropertyIterator.h"
-#include "vtkSMRenderViewProxy.h"
+#include "vtkSMProxy.h"
 
 vtkStandardNewMacro(vtkSMCameraConfigurationWriter);
 
@@ -49,7 +49,7 @@ vtkSMCameraConfigurationWriter::~vtkSMCameraConfigurationWriter()
 
 //-----------------------------------------------------------------------------
 void vtkSMCameraConfigurationWriter::SetRenderViewProxy(
-      vtkSMRenderViewProxy *rvProxy)
+      vtkSMProxy *rvProxy)
 {
   this->vtkSMProxyConfigurationWriter::SetProxy(rvProxy);
   this->GetPropertyIterator()->SetProxy(rvProxy);

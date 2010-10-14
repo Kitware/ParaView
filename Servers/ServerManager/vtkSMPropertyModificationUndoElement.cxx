@@ -58,6 +58,7 @@ int vtkSMPropertyModificationUndoElement::Undo()
     {
     ret = property->LoadState(this->XMLElement->GetNestedElement(0),  
       locator, 1);
+    proxy->UpdateProperty(property_name);
     }
   return ret;
 }
@@ -87,6 +88,7 @@ int vtkSMPropertyModificationUndoElement::Redo()
     {
     ret = property->LoadState(this->XMLElement->GetNestedElement(0),  
       locator, 0);
+    proxy->UpdateProperty(property_name);
     }
   return ret;
 }

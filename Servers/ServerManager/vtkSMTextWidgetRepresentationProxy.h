@@ -36,22 +36,8 @@ protected:
   
   virtual void CreateVTKObjects();
 
-  // Description:
-  // Called when a representation is added to a view. 
-  // Returns true on success.
-  // Currently a representation can be added to only one view.
-  virtual bool AddToView(vtkSMViewProxy* view);
-
-  // Description:
-  // Called to remove a representation from a view.
-  // Returns true on success.
-  // Currently a representation can be added to only one view.
-  virtual bool RemoveFromView(vtkSMViewProxy* view);
-
   vtkSMProxy* TextActorProxy;
   vtkSMProxy* TextPropertyProxy;
-  
-  vtkSMViewProxy* ViewProxy;
 
   friend class vtkSMTextSourceRepresentationProxy;
 

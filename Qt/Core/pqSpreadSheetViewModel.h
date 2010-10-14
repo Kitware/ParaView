@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -29,7 +29,7 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqSpreadSheetViewModel_h 
+#ifndef __pqSpreadSheetViewModel_h
 #define __pqSpreadSheetViewModel_h
 
 #include <QAbstractTableModel>
@@ -42,19 +42,21 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /// with vtkSMSpreadSheetRepresentationProxy to fetch blocks of data from the
 /// server and show them. It requires that vtkSMSpreadSheetRepresentationProxy
 /// delivers vtkTable.
-class vtkSMSpreadSheetRepresentationProxy;
-class QItemSelectionModel;
+class pqDataRepresentation;
 class QItemSelection;
+class QItemSelectionModel;
+class vtkObject;
 class vtkSelection;
 class vtkSelectionNode;
-class pqDataRepresentation;
+class vtkSMProxy;
+class vtkSpreadSheetView;
 
 class PQCORE_EXPORT pqSpreadSheetViewModel : public QAbstractTableModel
 {
   Q_OBJECT
   typedef QAbstractTableModel Superclass;
 public:
-  pqSpreadSheetViewModel();
+  pqSpreadSheetViewModel(vtkSMProxy* viewProxy, QObject* parent=NULL);
   ~pqSpreadSheetViewModel();
 
   class vtkIndex
@@ -77,8 +79,8 @@ public:
 
     bool operator==(const vtkIndex& other) const
       {
-      return (this->Tuple[0] == other.Tuple[0] && 
-        this->Tuple[1] == other.Tuple[1] && 
+      return (this->Tuple[0] == other.Tuple[0] &&
+        this->Tuple[1] == other.Tuple[1] &&
         this->Tuple[2] == other.Tuple[2]);
       }
     };
@@ -95,56 +97,54 @@ public:
 
   /// Returns the data for the given role and section in the header with the
   /// specified orientation.
-  QVariant headerData (int section, Qt::Orientation orientation, 
-    int role=Qt::DisplayRole) const; 
+  QVariant headerData (int section, Qt::Orientation orientation,
+    int role=Qt::DisplayRole) const;
 
   /// Make a server request to sort based on a given column with a given order
   void sortSection (int section, Qt::SortOrder order);
 
   /// Return true only if the given column is sortable.
   bool isSortable(int section);
- 
-  /// Set/Get the data representation. This internally calls
-  /// setRepresentationProxy().
-  void setRepresentation(pqDataRepresentation*);
-  pqDataRepresentation* getRepresentation() const;
-
-  /// Set/Get the representation proxy which is currently displayed in this
-  /// model.
-  void setRepresentationProxy(vtkSMSpreadSheetRepresentationProxy*);
-  vtkSMSpreadSheetRepresentationProxy* getRepresentationProxy() const;
-
-  /// resets the model.
-  void forceUpdate();
-
-  /// resets the model if required.
-  void update();
-
-  /// Set the best estimate for the visible block. The model will request data
-  /// (if not available) only for the most recently selected active block.
-  void setActiveBlock(QModelIndex top, QModelIndex bottom);
 
   /// Returns the field type for the data currently shown by this model.
   int getFieldType() const;
 
-  // Returns the vtk indices for the view indices. 
+  // Returns the vtk indices for the view indices.
   QSet<vtkIndex> getVTKIndices(const QModelIndexList& indexes);
 
   /// Resets the composite dataset index on the representation to point to the
   /// first non-empty block.
   void resetCompositeDataSetIndex();
-  
+
   /// Set/Get the decimal precision for float and double type data.
   void setDecimalPrecision(int);
   int getDecimalPrecision();
 
+  /// set the region (in row indices) that is currently being shown in the view.
+  /// the model will provide data-values only for the active-region. For any
+  /// other region it will simply return a "..." text for display (in
+  /// QAbstractTableModel::data(..) callback).
+  void setActiveRegion(int row_top, int row_bottom);
+
+  /// Returns the active representation. Active representation is the
+  /// representation being shown by the view.
+  pqDataRepresentation* activeRepresentation() const;
+  vtkSMProxy* activeRepresentationProxy() const;
+
+public slots:
+  /// resets the model.
+  void forceUpdate();
+
+  /// Sets the active representation. Active representation is the
+  /// representation being shown by the view.
+  void setActiveRepresentation(pqDataRepresentation*);
+
+  /// Sets the active representation. When using this API instead of
+  /// setActiveRepresentation(pqDataRepresentation*), some functionality won't be
+  /// available.
+  void setActiveRepresentationProxy(vtkSMProxy*);
+
 signals:
-  void requestDelayedUpdate() const;
-  
-  /// to inform the associated pqSpreadSheetView of the status of
-  /// checkbox "Show Only Selected Elements" in object inspector
-  void selectionOnly(int selOnly);
-  
   /// Fired whenever the server side selection changes.
   void selectionChanged(const QItemSelection& selection);
 
@@ -152,33 +152,26 @@ private slots:
   /// called to fetch data for all pending blocks.
   void delayedUpdate();
 
-  /// called to fetch selection for all pending blocks.
-  void delayedSelectionUpdate();
+  void triggerSelectionChanged();
 
-  void markDirty();
+  /// Caleld when the vtkSpreadSheetView fetches a new block, we fire
+  /// dataChanged signal.
+  void onDataFetched(vtkObject*, unsigned long, void*, void* call_data);
 
 protected:
-  /// Converts a vtkSelection to a QItemSelection.
-  QItemSelection convertToQtSelection(vtkSelection*);
-
-  /// Updates the selectionModel with the vtk selection provided by the
-  /// representation for the current block. This simply adds to the current Qt
-  /// selection, since representation can never give us the complete state of
-  /// selection. 
-  void updateSelectionForBlock(vtkIdType blocknumber);
-
   /// Given an index into the model, check to see that its row number is
   /// less than the length of the data array associated with its column
   bool isDataValid(const QModelIndex &idx) const;
 
+  vtkSpreadSheetView* GetView() const;
 private:
   pqSpreadSheetViewModel(const pqSpreadSheetViewModel&); // Not implemented.
   void operator=(const pqSpreadSheetViewModel&); // Not implemented.
 
-  QModelIndex indexFor(vtkSelectionNode* node, vtkIdType index);
-
   class pqInternal;
   pqInternal* Internal;
+
+  vtkSMProxy* ViewProxy;
 };
 
 #endif

@@ -102,7 +102,7 @@ public:
   static void setHeartBeatTimeoutSetting(int msec);
   static int getHeartBeatTimeoutSetting();
 
-  // Get/Set the application wide coincident topology resolution settings.
+  /// Get/Set the application wide coincident topology resolution settings.
   static void setCoincidentTopologyResolutionModeSetting(int mode);
   static int coincidentTopologyResolutionModeSetting();
   static void setPolygonOffsetParametersSetting(double factor, double value);
@@ -111,6 +111,10 @@ public:
   static bool polygonOffsetFacesSetting();
   static void setZShiftSetting(double shift);
   static double zShiftSetting();
+
+  /// Get/Set global immediate mode rendering.
+  static void setGlobalImmediateModeRenderingSetting(bool val);
+  static bool globalImmediateModeRenderingSetting();
 
   /// Convenience method to obtain the renderview xml name for the given
   /// connection type. This is deprecated and will soon be removed.
@@ -144,9 +148,10 @@ protected:
   void setPolygonOffsetParameters(double factor, double units);
   void setPolygonOffsetFaces(bool offset_faces);
   void setZShift(double shift);
+  void setGlobalImmediateModeRendering(bool);
 
   // updates all servers with the current settings.
-  static void updateCoincidentTopologySettings();
+  static void updateGlobalMapperProperties();
 
 protected slots:
   /// Called to send a heartbeat to the server.
@@ -158,7 +163,7 @@ private:
 
   pqServerResource Resource;
   vtkIdType ConnectionID;
-  vtkWeakPointer<vtkSMProxy> CoincidentTopologyResolutionProxy;
+  vtkWeakPointer<vtkSMProxy> GlobalMapperPropertiesProxy;
 
   // TODO:
   // Each connection will eventually have a PVOptions object. 

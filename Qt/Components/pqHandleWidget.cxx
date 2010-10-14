@@ -43,6 +43,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <vtkSMDoubleVectorProperty.h>
 #include <vtkSMNewWidgetRepresentationProxy.h>
+#include <vtkSMPropertyHelper.h>
 #include <vtkSMProxyManager.h>
 #include <vtkSmartPointer.h>
 
@@ -124,12 +125,10 @@ pqHandleWidget::~pqHandleWidget()
 //-----------------------------------------------------------------------------
 void pqHandleWidget::pick(double dx, double dy, double dz)
 {
-  vtkSMRepresentationProxy* widget = this->getWidgetProxy();
-  QList<QVariant> value;
-  value << dx << dy << dz;
-  pqSMAdaptor::setMultipleElementProperty(
-    widget->GetProperty("WorldPosition"),
-    value);
+  vtkSMProxy* widget = this->getWidgetProxy();
+  vtkSMPropertyHelper(widget, "WorldPosition").Set(0, dx);
+  vtkSMPropertyHelper(widget, "WorldPosition").Set(1, dy);
+  vtkSMPropertyHelper(widget, "WorldPosition").Set(2, dz);
   widget->UpdateVTKObjects();
   this->setModified();
   this->render();

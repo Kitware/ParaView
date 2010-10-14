@@ -30,13 +30,9 @@ class vtkRenderWindow;
 class VTK_EXPORT vtkSMContextViewProxy : public vtkSMViewProxy
 {
 public:
+  static vtkSMContextViewProxy* New();
   vtkTypeMacro(vtkSMContextViewProxy, vtkSMViewProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
-
-  // Description:
-  // Saves a screenshot of the view to disk.  The writerName argument specifies
-  // the vtkImageWriter subclass to use.
-  int WriteImage(const char* filename, const char* writerName, int magnification);
 
 //BTX
   // Description:
@@ -49,10 +45,6 @@ public:
 //ETX
 
   // Description:
-  // Capture the contents of the window at the specified magnification level.
-  vtkImageData* CaptureWindow(int magnification);
-
-  // Description:
   // Return the render window from which offscreen rendering and interactor can
   // be accessed
   vtkRenderWindow* GetRenderWindow();
@@ -63,30 +55,25 @@ protected:
   ~vtkSMContextViewProxy();
 
   // Description:
-  // Called once in CreateVTKObjects() to create a new chart view.
-  virtual vtkContextView* NewChartView()=0;
+  // Subclasses should override this method to do the actual image capture.
+  virtual vtkImageData* CaptureWindowInternal(int magnification);
 
   // Description:
   virtual void CreateVTKObjects();
 
   // Description:
-  // Performs the actual rendering. This method is called by
-  // both InteractiveRender() and StillRender().
-  // Default implementation is empty.
-  virtual void PerformRender();
-
-  // Description:
   // The context view that is used for all context derived charts.
   vtkContextView* ChartView;
+
+private:
+  vtkSMContextViewProxy(const vtkSMContextViewProxy&); // Not implemented
+  void operator=(const vtkSMContextViewProxy&); // Not implemented
 
   // Description:
   // Private storage object.
   class Private;
   Private *Storage;
 
-private:
-  vtkSMContextViewProxy(const vtkSMContextViewProxy&); // Not implemented
-  void operator=(const vtkSMContextViewProxy&); // Not implemented
 //ETX
 };
 

@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqActiveObjects.h"
 #include "pqView.h"
 #include "vtkImageData.h"
+#include "vtkSMPropertyHelper.h"
 #include "vtkSMViewProxy.h"
 
 #include <QWidget>
@@ -78,7 +79,7 @@ bool pqComponentsTestUtility::CompareView(
   // The returned image will have extents translated to match the view position,
   // we shift them back.
   int viewPos[2];
-  curView->getViewProxy()->GetViewPosition(viewPos);
+  vtkSMPropertyHelper(curView->getViewProxy(), "ViewPosition").Get(viewPos, 2);
   // Update image extents based on ViewPosition
   int extents[6];
   test_image->GetExtent(extents);

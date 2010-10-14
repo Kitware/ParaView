@@ -367,7 +367,8 @@ def Delete(proxy=None):
     servermanager.UnRegister(proxy)
     
     # If this is a representation, remove it from all views.
-    if proxy.SMProxy.IsA("vtkSMRepresentationProxy"):
+    if proxy.SMProxy.IsA("vtkSMRepresentationProxy") or \
+        proxy.SMProxy.IsA("vtkSMNewWidgetRepresentationProxy"):
         for view in GetRenderViews():
             view.Representations.remove(proxy)
     # If this is a source, remove the representation iff it has no consumers

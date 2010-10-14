@@ -165,7 +165,7 @@ void pqParallelCoordinatesChartDisplayPanel::setDisplay(pqRepresentation* disp)
 
   // this is essential to ensure that when you undo-redo, the representation is
   // indeed update-to-date, thus ensuring correct domains etc.
-  proxy->Update();
+  proxy->UpdatePipeline();
 
   // The model for the plot settings
   this->Internal->SettingsModel->setRepresentation(

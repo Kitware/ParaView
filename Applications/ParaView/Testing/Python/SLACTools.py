@@ -136,5 +136,5 @@ object8 = 'pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/Multi
 QtTesting.playCommand(object8, 'activate', '')
 
 #Image compare
-snapshotWidget = 'pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/0/1QVTKWidget0'
+snapshotWidget = 'pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/0/Viewport'
 QtTestingImage.compareImage(snapshotWidget, 'SLACToolsPlotOverZ.png', 300, 300);

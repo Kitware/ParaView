@@ -34,8 +34,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // Server Manager Includes.
 #include "vtkSMProxy.h"
 #include "vtkSMRenderViewProxy.h"
-#include "vtkSMPVRepresentationProxy.h"
-#include "vtkSMScatterPlotRepresentationProxy.h"
+#include "vtkSMRepresentationProxy.h"
+//#include "vtkSMScatterPlotRepresentationProxy.h"
 // Qt Includes.
 #include <QtDebug>
 
@@ -50,7 +50,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqScalarBarRepresentation.h"
 #include "pqScalarsToColors.h"
 #include "pqScalarOpacityFunction.h"
-#include "pqScatterPlotRepresentation.h"
+//#include "pqScatterPlotRepresentation.h"
 #include "pqTimeKeeper.h"
 #include "pqViewModuleInterface.h"
 
@@ -128,18 +128,20 @@ pqProxy* pqStandardServerManagerModelInterface::createPQProxy(
           xml_type, "representations", name, proxy, server, 0);
         }
       }
-    if (proxy->IsA("vtkSMPropRepresentationProxy"))
+//    if (proxy->IsA("vtkSMScatterPlotRepresentationProxy"))
+//      {
+//      return new pqScatterPlotRepresentation(group, name,
+//        vtkSMScatterPlotRepresentationProxy::SafeDownCast(proxy), server, 0);
+//      }
+    if (proxy->IsA("vtkSMRepresentationProxy") && proxy->GetProperty("Input"))
       {
-      return new pqPipelineRepresentation(group, name, 
-        vtkSMPropRepresentationProxy::SafeDownCast(proxy), server, 0);
-      }
-    if (proxy->IsA("vtkSMScatterPlotRepresentationProxy"))
-      {
-      return new pqScatterPlotRepresentation(group, name,
-        vtkSMScatterPlotRepresentationProxy::SafeDownCast(proxy), server, 0);
-      }
-    if (proxy->IsA("vtkSMDataRepresentationProxy"))
-      {
+      if (proxy->IsA("vtkSMPVRepresentationProxy") ||
+        xml_type == "ImageSliceRepresentation")
+        {
+        // pqPipelineRepresentation is a design flaw! We need to get rid of it
+        // and have helper code that manages the crap in that class
+        return new pqPipelineRepresentation(group, name, proxy, server, 0);
+        }
       // If everything fails, simply create a pqDataRepresentation object.
       return new pqDataRepresentation(group, name, proxy, server, 0);
       }

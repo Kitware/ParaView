@@ -19,8 +19,7 @@ if view.GetProperty("RemoteRenderThreshold"):
 repr = servermanager.CreateRepresentation(sphere, view);
 repr.Input.append(sphere)
 
-#view.UseOffscreenRenderingForScreenshotsOff()
-view.ResetCamera()
+# view.UseOffscreenRenderingForScreenshots = 0
 
 # Hackery to ensure that we don't end up with overlapping windows when running
 # this test.
@@ -32,6 +31,8 @@ try:
 except:
     pass
 
+view.StillRender()
+view.ResetCamera()
 view.StillRender()
 
 if not SMPythonTesting.DoRegressionTesting(view.SMProxy):

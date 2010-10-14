@@ -23,7 +23,7 @@
 #ifndef __vtkSMNewWidgetRepresentationProxy_h
 #define __vtkSMNewWidgetRepresentationProxy_h
 
-#include "vtkSMRepresentationProxy.h"
+#include "vtkSMProxy.h"
 class vtkSMViewProxy;
 class vtkSMNewWidgetRepresentationObserver;
 class vtkAbstractWidget;
@@ -31,31 +31,21 @@ class vtkAbstractWidget;
 struct vtkSMNewWidgetRepresentationInternals;
 //ETX
 
-class VTK_EXPORT vtkSMNewWidgetRepresentationProxy : 
-  public vtkSMRepresentationProxy
+class VTK_EXPORT vtkSMNewWidgetRepresentationProxy : public vtkSMProxy
 {
 public:
   static vtkSMNewWidgetRepresentationProxy* New();
-  vtkTypeMacro(vtkSMNewWidgetRepresentationProxy, vtkSMRepresentationProxy);
+  vtkTypeMacro(vtkSMNewWidgetRepresentationProxy, vtkSMProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
  
   // Description:
   // Break reference loop that are due to links.
   virtual void UnRegister(vtkObjectBase* o);
- 
-  // Description:
-  // Calls set/get enabled on the WidgetProxy.
-  virtual void SetEnabled(int enable);
-  vtkGetMacro(Enabled, int);
-  
-  // Description:
-  // Get the bounds for the representation.  Returns true if successful.
-  virtual bool GetBounds(double bounds[6]);
 
   // Description:
   // Get the widget for the representation.
   vtkGetObjectMacro(Widget, vtkAbstractWidget);
-  
+
   // Description:
   // Get Representation Proxy.
   vtkGetObjectMacro(RepresentationProxy, vtkSMProxy);
@@ -70,22 +60,6 @@ protected:
   // EndCreateVTKObjects().
   virtual void CreateVTKObjects();
 
-  // Description:
-  // Called when a representation is added to a view. 
-  // Returns true on success.
-  // Currently a representation can be added to only one view.
-  virtual bool AddToView(vtkSMViewProxy* view);
-
-  // Description:
-  // Called to remove a representation from a view.
-  // Returns true on success.
-  // Currently a representation can be added to only one view.
-  virtual bool RemoveFromView(vtkSMViewProxy* view);
-
-  // Description:
-  // Updates the widget's enabled state.
-  void UpdateEnabled();
-
   vtkSMProxy* RepresentationProxy;
   vtkSMProxy* WidgetProxy;
   vtkAbstractWidget* Widget;
@@ -98,7 +72,6 @@ protected:
   // Called every time the user interacts with the widget.
   virtual void ExecuteEvent(unsigned long event);
 
-  int Enabled;
 private:
 
   vtkSMNewWidgetRepresentationProxy(const vtkSMNewWidgetRepresentationProxy&); // Not implemented

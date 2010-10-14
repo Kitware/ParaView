@@ -34,7 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationCore.h"
 #include "pqSettings.h"
 #include "pqSMAdaptor.h"
-#include "vtkSMDataRepresentationProxy.h"
+#include "vtkSMRepresentationProxy.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxy.h"
 
@@ -73,7 +73,7 @@ void pqChartRepresentation::setDefaultPropertyValues()
   // superclass may have changed some property such as the "composite_index"
   // which requires the representation to be re-updated to get correct data
   // information.
-  proxy->Update();
+  proxy->UpdatePipeline();
   proxy->UpdatePropertyInformation();
 
   // * Determine the x-axis array: are we using index or do we have some array

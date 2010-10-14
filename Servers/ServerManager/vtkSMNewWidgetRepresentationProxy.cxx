@@ -14,8 +14,10 @@
 =========================================================================*/
 #include "vtkSMNewWidgetRepresentationProxy.h"
 
+#include "vtk3DWidgetRepresentation.h"
 #include "vtkAbstractWidget.h"
 #include "vtkClientServerInterpreter.h"
+#include "vtkClientServerStream.h"
 #include "vtkCommand.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
@@ -61,13 +63,13 @@ struct vtkSMNewWidgetRepresentationInternals
 //----------------------------------------------------------------------------
 vtkSMNewWidgetRepresentationProxy::vtkSMNewWidgetRepresentationProxy()
 {
+  this->SetServers(vtkProcessModule::CLIENT_AND_SERVERS);
   this->RepresentationProxy = 0;
   this->WidgetProxy = 0;
   this->Widget = 0;
-  this->Enabled = 0;
   this->Observer = vtkSMNewWidgetRepresentationObserver::New();
   this->Observer->Proxy = this;
-  this->Internal = new vtkSMNewWidgetRepresentationInternals;  
+  this->Internal = new vtkSMNewWidgetRepresentationInternals;
 }
 
 //----------------------------------------------------------------------------
@@ -82,133 +84,6 @@ vtkSMNewWidgetRepresentationProxy::~vtkSMNewWidgetRepresentationProxy()
   if (this->Internal)
     {
     delete this->Internal;
-    }
-}
-
-//----------------------------------------------------------------------------
-bool vtkSMNewWidgetRepresentationProxy::AddToView(vtkSMViewProxy* view)
-{
-  vtkSMRenderViewProxy* renderView = vtkSMRenderViewProxy::SafeDownCast(view);
-  if (!renderView)
-    {
-    vtkErrorMacro("View must be a vtkSMRenderViewProxy.");
-    return false;
-    }
-
-  vtkAbstractWidget* widget = this->Widget;
-  if (widget)
-    {
-    widget->SetInteractor(renderView->GetInteractor());
-    }
-
-  if (this->RepresentationProxy)
-    {
-    vtkSMProxyProperty* rendererProp = 
-      vtkSMProxyProperty::SafeDownCast(
-        this->RepresentationProxy->GetProperty("Renderer"));
-
-    if (rendererProp)
-      {
-      rendererProp->RemoveAllProxies();
-      rendererProp->AddProxy(renderView->GetRendererProxy());
-      this->RepresentationProxy->UpdateProperty("Renderer");
-      }
-
-    if(this->GetSubProxy("Prop"))
-      {
-      renderView->AddPropToRenderer(this->RepresentationProxy);
-      if (widget)
-        {
-        widget->SetCurrentRenderer(renderView->GetRenderer());
-        }
-      }
-    else if(this->GetSubProxy("Prop2D"))
-      {
-      renderView->AddPropToRenderer2D(this->RepresentationProxy);
-      if (widget)
-        {
-        widget->SetCurrentRenderer(renderView->GetRenderer2D());
-        }
-      }
-    }
-
-  this->Internal->ViewProxy = renderView;
-  this->UpdateEnabled();
-  return true;
-}
-
-//----------------------------------------------------------------------------
-bool vtkSMNewWidgetRepresentationProxy::RemoveFromView(vtkSMViewProxy* view)
-{
-  vtkSMRenderViewProxy* renderView = vtkSMRenderViewProxy::SafeDownCast(view);
-  if (!renderView)
-    {
-    vtkErrorMacro("View must be a vtkSMRenderViewProxy.");
-    return false;
-    }
-
-  if (this->Widget)
-    {
-    this->Widget->SetEnabled(0);
-    this->Widget->SetCurrentRenderer(0);
-    this->Widget->SetInteractor(0);
-    }
-
-  if (this->RepresentationProxy)
-    {
-    vtkSMProxyProperty* rendererProp = 
-      vtkSMProxyProperty::SafeDownCast(
-        this->RepresentationProxy->GetProperty("Renderer"));
-    if (rendererProp)
-      {
-      rendererProp->RemoveAllProxies();
-      rendererProp->AddProxy(0);
-      this->RepresentationProxy->UpdateProperty("Renderer");
-      }
-
-    if(this->GetSubProxy("Prop"))
-      {
-      renderView->RemovePropFromRenderer(this->RepresentationProxy);
-      }
-    else if(this->GetSubProxy("Prop2D"))
-      {
-      renderView->RemovePropFromRenderer2D(this->RepresentationProxy);
-      }
-    }
-
-  this->Internal->ViewProxy = 0;
-  return this->Superclass::RemoveFromView(view);
-}
-
-//-----------------------------------------------------------------------------
-void vtkSMNewWidgetRepresentationProxy::SetEnabled(int enable)
-{
-  if (this->Enabled != enable)
-    {
-    this->Enabled = enable;
-    this->UpdateEnabled();
-    }
-}
-
-//-----------------------------------------------------------------------------
-void vtkSMNewWidgetRepresentationProxy::UpdateEnabled()
-{
-  if (this->Internal->ViewProxy && this->Widget)
-    {
-    // Ensure that correct current renderer otherwise the widget may locate the
-    // wrong renderer.
-    if (this->Enabled)
-      {
-      if (this->GetSubProxy("Prop"))
-        {
-        this->Widget->SetCurrentRenderer(this->Internal->ViewProxy->GetRenderer());
-        }
-      else if (this->GetSubProxy("Prop2D"))
-        {
-        this->Widget->SetCurrentRenderer(this->Internal->ViewProxy->GetRenderer2D());
-        }
-      }
-    this->Widget->SetEnabled(this->Enabled);
     }
 }
 
@@ -246,6 +121,8 @@ void vtkSMNewWidgetRepresentationProxy::CreateVTKObjects()
     {
     return;
     }
+
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
     this->WidgetProxy->GetProperty("Representation"));
   if (pp)
@@ -254,7 +131,6 @@ void vtkSMNewWidgetRepresentationProxy::CreateVTKObjects()
     }
   this->WidgetProxy->UpdateVTKObjects();
 
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   this->Widget = vtkAbstractWidget::SafeDownCast(
     pm->GetObjectFromID(this->WidgetProxy->GetID()));
   if (this->Widget)
@@ -266,6 +142,19 @@ void vtkSMNewWidgetRepresentationProxy::CreateVTKObjects()
     this->Widget->AddObserver(
       vtkCommand::InteractionEvent, this->Observer);
     }
+
+  vtk3DWidgetRepresentation* clientObject =
+    vtk3DWidgetRepresentation::SafeDownCast(this->GetClientSideObject());
+  clientObject->SetWidget(this->Widget);
+
+  vtkClientServerStream stream;
+  stream << vtkClientServerStream::Invoke
+         << this->GetID()
+         << "SetRepresentation"
+         << this->RepresentationProxy->GetID()
+         << vtkClientServerStream::End;
+  pm->SendStream(this->ConnectionID,
+    vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER, stream);
 
   // Since links copy values from input to output,
   // we need to make sure that input properties i.e. the info
@@ -384,29 +273,6 @@ void vtkSMNewWidgetRepresentationProxy::UnRegister(vtkObjectBase* obj)
     }
 
   this->Superclass::UnRegister(obj);
-}
-
-//----------------------------------------------------------------------------
-bool vtkSMNewWidgetRepresentationProxy::GetBounds(double bds[6])
-{
-  if (this->RepresentationProxy)
-    {
-    // since the widget representation is also present on the client, we can
-    // directly get its bounds.
-    vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-    vtkWidgetRepresentation* repr = vtkWidgetRepresentation::SafeDownCast(
-      pm->GetObjectFromID(this->RepresentationProxy->GetID()));
-    if (repr)
-      {
-      double *propBds = repr->GetBounds();
-      if (propBds)
-        {
-        memcpy(bds, propBds, 6*sizeof(double));
-        return true;
-        }
-      }
-    }
-  return false;
 }
 
 //----------------------------------------------------------------------------

@@ -51,6 +51,7 @@ vtkCxxSetObjectMacro(vtkReductionFilter, PostGatherHelper, vtkAlgorithm);
 vtkReductionFilter::vtkReductionFilter()
 {
   this->Controller= 0;
+  this->SetController(vtkMultiProcessController::GetGlobalController());
   this->PreGatherHelper = 0;
   this->PostGatherHelper = 0;
   this->PassThrough = -1;
@@ -70,6 +71,22 @@ int vtkReductionFilter::FillInputPortInformation(int idx, vtkInformation *info)
 {
   info->Set(vtkAlgorithm::INPUT_IS_OPTIONAL(), 1);
   return this->Superclass::FillInputPortInformation(idx, info);
+}
+
+//-----------------------------------------------------------------------------
+void vtkReductionFilter::SetPreGatherHelperName(const char* name)
+{
+  vtkSmartPointer<vtkObject> foo;
+  foo.TakeReference(vtkInstantiator::CreateInstance(name));
+  this->SetPreGatherHelper(vtkAlgorithm::SafeDownCast(foo));
+}
+
+//-----------------------------------------------------------------------------
+void vtkReductionFilter::SetPostGatherHelperName(const char* name)
+{
+  vtkSmartPointer<vtkObject> foo;
+  foo.TakeReference(vtkInstantiator::CreateInstance(name));
+  this->SetPostGatherHelper(vtkAlgorithm::SafeDownCast(foo));
 }
 
 //-----------------------------------------------------------------------------

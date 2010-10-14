@@ -16,8 +16,9 @@
 
 #include "vtkObjectFactory.h"
 
-#include "vtkSMXYChartRepresentationProxy.h"
+#include "vtkSMChartRepresentationProxy.h"
 #include "vtkSMStringVectorProperty.h"
+#include "vtkChartRepresentation.h"
 
 vtkStandardNewMacro(vtkSMContextArraysInformationHelper);
 //----------------------------------------------------------------------------
@@ -36,9 +37,8 @@ void vtkSMContextArraysInformationHelper::UpdateProperty(
   int vtkNotUsed(serverIds), vtkClientServerID vtkNotUsed(objectId),
   vtkSMProperty* prop)
 {
-  vtkSMXYChartRepresentationProxy* rep =
-    vtkSMXYChartRepresentationProxy::SafeDownCast(
-      prop->GetParent());
+  vtkSMChartRepresentationProxy* rep =
+    vtkSMChartRepresentationProxy::SafeDownCast(prop->GetParent());
   if (!rep)
     {
     vtkWarningMacro("vtkSMContextArraysInformationHelper can only be used on"
@@ -55,11 +55,12 @@ void vtkSMContextArraysInformationHelper::UpdateProperty(
     return;
     }
 
-  int num_series = rep->GetNumberOfSeries();
+  vtkChartRepresentation* vtk_rep = rep->GetRepresentation();
+  int num_series = vtk_rep->GetNumberOfSeries();
   svp->SetNumberOfElements(num_series);
   for (int i = 0; i < num_series; ++i)
     {
-    svp->SetElement(i, rep->GetSeriesName(i));
+    svp->SetElement(i, vtk_rep->GetSeriesName(i));
     }
 }
 

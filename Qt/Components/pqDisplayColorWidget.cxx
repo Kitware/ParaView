@@ -32,10 +32,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqDisplayColorWidget.h"
 
+#include "vtkDataObject.h"
 #include "vtkEventQtSlotConnect.h"
-#include "vtkSMPVRepresentationProxy.h"
-#include "vtkSMProperty.h"
 #include "vtkSMOutputPort.h"
+#include "vtkSMProperty.h"
+#include "vtkSMPVRepresentationProxy.h"
 
 #include <QComboBox>
 #include <QHBoxLayout>
@@ -256,11 +257,11 @@ void pqDisplayColorWidget::onVariableChanged(pqVariableType type,
       break;
     case VARIABLE_TYPE_NODE:
       display->colorByArray(name.toAscii().data(),
-        vtkSMDataRepresentationProxy::POINT_DATA);
+        vtkDataObject::FIELD_ASSOCIATION_POINTS);
       break;
     case VARIABLE_TYPE_CELL:
       display->colorByArray(name.toAscii().data(), 
-        vtkSMDataRepresentationProxy::CELL_DATA);
+        vtkDataObject::FIELD_ASSOCIATION_CELLS);
       break;
       }
     END_UNDO_SET();
@@ -429,13 +430,13 @@ void pqDisplayColorWidget::reloadGUI()
       {
       arrayName = arrayName.replace(regExpCell, "");
       this->addVariable(VARIABLE_TYPE_CELL, arrayName, 
-        display->isPartial(arrayName, vtkSMDataRepresentationProxy::CELL_DATA));
+        display->isPartial(arrayName, vtkDataObject::FIELD_ASSOCIATION_CELLS));
       }
     else if (regExpPoint.indexIn(arrayName) != -1)
       {
       arrayName = arrayName.replace(regExpPoint, "");
       this->addVariable(VARIABLE_TYPE_NODE, arrayName,
-        display->isPartial(arrayName, vtkSMDataRepresentationProxy::POINT_DATA));
+        display->isPartial(arrayName, vtkDataObject::FIELD_ASSOCIATION_POINTS));
       }
     }
     

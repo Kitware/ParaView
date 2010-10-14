@@ -244,10 +244,6 @@ void pqGlobalRenderViewOptions::init()
                   SIGNAL(toggled(bool)),
                   this, SIGNAL(changesAvailable()));
   
-  QObject::connect(this->Internal->triangleStrips,
-                  SIGNAL(toggled(bool)),
-                  this, SIGNAL(changesAvailable()));
-
   QObject::connect(this->Internal->depthPeeling,
                   SIGNAL(toggled(bool)),
                   this, SIGNAL(changesAvailable()));
@@ -402,6 +398,9 @@ void pqGlobalRenderViewOptions::applyChanges()
   pqPipelineRepresentation::setUnstructuredGridOutlineThreshold(
     this->Internal->outlineThreshold->value()/10.0);
 
+  pqServer::setGlobalImmediateModeRenderingSetting(
+    this->Internal->immediateModeRendering->isChecked());
+
   settings->beginGroup("renderModule");
   
   if (this->Internal->enableLOD->isChecked())
@@ -413,13 +412,7 @@ void pqGlobalRenderViewOptions::applyChanges()
     {
     settings->setValue("LODThreshold", VTK_DOUBLE_MAX);
     }
-
-  settings->setValue("UseImmediateMode",
-    this->Internal->immediateModeRendering->isChecked());
   
-  settings->setValue("UseTriangleStrips",
-    this->Internal->triangleStrips->isChecked());
-
   settings->setValue("DepthPeeling",
     this->Internal->depthPeeling->isChecked());
 
@@ -599,6 +592,9 @@ void pqGlobalRenderViewOptions::resetChanges()
       pqPipelineRepresentation::getUnstructuredGridOutlineThreshold()*10));
   this->Internal->updateOutlineThresholdLabel(this->Internal->outlineThreshold->value());
 
+  this->Internal->immediateModeRendering->setChecked(
+    pqServer::globalImmediateModeRenderingSetting());
+
   settings->beginGroup("renderModule");
   QVariant val = settings->value("LODThreshold", 5);
   if(val.toDouble() >= VTK_LARGE_FLOAT)
@@ -616,12 +612,6 @@ void pqGlobalRenderViewOptions::resetChanges()
   val = settings->value("LODResolution", 50);
   this->Internal->lodResolution->setValue(static_cast<int>(160-val.toDouble() + 10));
   this->Internal->updateLODResolutionLabel(this->Internal->lodResolution->value());
-  
-  val = settings->value("UseImmediateMode", true);
-  this->Internal->immediateModeRendering->setChecked(val.toBool());
-
-  val = settings->value("UseTriangleStrips", false);
-  this->Internal->triangleStrips->setChecked(val.toBool());
 
   val = settings->value("DepthPeeling", true);
   this->Internal->depthPeeling->setChecked(val.toBool());

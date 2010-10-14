@@ -39,86 +39,38 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QPointer>
 #include <QTimer>
 #include <QWidget>
+#include <QMouseEvent>
 
 // ParaView includes.
-#include "vtkCommand.h"
-#include "vtkInteractorObserver.h"
-#include "vtkInteractorStyleRubberBandPick.h"
+#include "vtkPVRenderView.h"
 #include "vtkInteractorStyleRubberBandZoom.h"
 #include "vtkPVGenericRenderWindowInteractor.h"
-#include "vtkRenderWindowInteractor.h"
+#include "vtkMemberFunctionCommand.h"
 #include "vtkSmartPointer.h"
+#include "vtkSMPropertyHelper.h"
 #include "vtkSMRenderViewProxy.h"
 
 #include "zoom.xpm"
 
 //---------------------------------------------------------------------------
-// Observer for the start and end interaction events
-class pqRubberBandHelper::vtkPQSelectionObserver : public vtkCommand
-{
-public:
-  static vtkPQSelectionObserver *New()
-    { return new vtkPQSelectionObserver; }
-
-  virtual void Execute(vtkObject*, unsigned long event, void* )
-    {
-      if (this->RubberBandHelper)
-        {
-        this->RubberBandHelper->processEvents(event);
-        }
-    }
-
-  vtkPQSelectionObserver() : RubberBandHelper(0)
-    {
-    }
-
-  pqRubberBandHelper* RubberBandHelper;
-};
-
-//-----------------------------------------------------------------------------
-void pqRubberBandHelper::ReorderBoundingBox(int src[4], int dest[4])
-{
-  dest[0] = (src[0] < src[2])? src[0] : src[2];
-  dest[1] = (src[1] < src[3])? src[1] : src[3];
-  dest[2] = (src[0] < src[2])? src[2] : src[0];
-  dest[3] = (src[1] < src[3])? src[3] : src[1];
-}
-
-//---------------------------------------------------------------------------
 class pqRubberBandHelper::pqInternal
 {
 public:
-  //the style I use to draw the rubber band
-  vtkSmartPointer<vtkInteractorStyleRubberBandPick> RubberBandStyle;
-
-  // style used for rubber band zoom.
-  vtkSmartPointer<vtkInteractorStyleRubberBandZoom> ZoomStyle;
-
-  // Saved style to return to after rubber band finishes
-  vtkSmartPointer<vtkInteractorObserver> SavedStyle;
-
-  // Observer for mouse clicks.
-  vtkSmartPointer<vtkPQSelectionObserver> SelectionObserver;
-
   // Current render view.
   QPointer<pqRenderView> RenderView;
+  vtkSmartPointer<vtkCommand> Observer;
+  int StartPosition[2];
 
   QCursor ZoomCursor;
 
-  pqInternal(pqRubberBandHelper* parent) :
+  pqInternal(pqRubberBandHelper*) :
     ZoomCursor(QPixmap(zoom_xpm), 11, 11)
     {
-    this->RubberBandStyle =
-      vtkSmartPointer<vtkInteractorStyleRubberBandPick>::New();
-    this->ZoomStyle = vtkSmartPointer<vtkInteractorStyleRubberBandZoom>::New();
-    this->SelectionObserver =
-      vtkSmartPointer<vtkPQSelectionObserver>::New();
-    this->SelectionObserver->RubberBandHelper = parent;
+    this->StartPosition[0] = this->StartPosition[1] = -1000;
     }
 
   ~pqInternal()
     {
-    this->SelectionObserver->RubberBandHelper = 0;
     }
 };
 
@@ -127,6 +79,10 @@ pqRubberBandHelper::pqRubberBandHelper(QObject* _parent/*=null*/)
 : QObject(_parent)
 {
   this->Internal = new pqInternal(this);
+  this->Internal->Observer.TakeReference(
+    vtkMakeMemberFunctionCommand(
+      *this, &pqRubberBandHelper::onSelectionChanged));
+
   this->Mode = INTERACT;
   this->DisableCount = 0;
   QObject::connect(this, SIGNAL(enableSurfaceSelection(bool)),
@@ -156,7 +112,6 @@ void pqRubberBandHelper::DisabledPop()
     }
 }
 
-
 //-----------------------------------------------------------------------------
 void pqRubberBandHelper::emitEnabledSignals()
 {
@@ -175,10 +130,8 @@ void pqRubberBandHelper::emitEnabledSignals()
     {
     vtkSMRenderViewProxy* proxy =
       this->Internal->RenderView->getRenderViewProxy();
-    emit this->enableSurfaceSelection(
-      proxy->IsSelectVisibleCellsAvailable() == NULL);
-    emit this->enableSurfacePointsSelection(
-      proxy->IsSelectVisiblePointsAvailable() == NULL);
+    emit this->enableSurfaceSelection(proxy->IsSelectionAvailable());
+    emit this->enableSurfacePointsSelection(proxy->IsSelectionAvailable());
     emit this->enableFrustumSelection(true);
     emit this->enableFrustumPointSelection(true);
     emit this->enableZoom(true);
@@ -228,34 +181,30 @@ int pqRubberBandHelper::setRubberBandOn(int selectionMode)
     return 0;
     }
 
-  vtkRenderWindowInteractor* rwi = rmp->GetInteractor();
-  if (!rwi)
+  if (selectionMode != PICK_ON_CLICK)
     {
-    qDebug("No interactor specified. Cannot switch to selection");
-    return 0;
+    vtkSMPropertyHelper(rmp, "InteractionMode").Set(
+      vtkPVRenderView::INTERACTION_MODE_SELECTION);
+    rmp->AddObserver(vtkCommand::SelectionChangedEvent, this->Internal->Observer);
+    rmp->UpdateVTKObjects();
+
+    if (selectionMode == ZOOM)
+      {
+      this->Internal->RenderView->getWidget()->setCursor(
+        this->Internal->ZoomCursor);
+      }
+    else if (selectionMode != PICK_ON_CLICK)
+      {
+      this->Internal->RenderView->getWidget()->setCursor(Qt::CrossCursor);
+      }
     }
-
-  //start watching left mouse actions to get a begin and end pixel
-  this->Internal->SavedStyle = rwi->GetInteractorStyle();
-
-  if (selectionMode == ZOOM)
+  else
     {
-    rwi->SetInteractorStyle(this->Internal->ZoomStyle);
-    this->Internal->RenderView->getWidget()->setCursor(
-      this->Internal->ZoomCursor);
+    // we don't use render-window-interactor for picking-on-clicking since we
+    // don't want to change the default interaction style. Instead we install an
+    // event filter to listen to mouse click events.
+    this->Internal->RenderView->getWidget()->installEventFilter(this);
     }
-  else if (selectionMode != PICK_ON_CLICK)
-    {
-    rwi->SetInteractorStyle(this->Internal->RubberBandStyle);
-    this->Internal->RubberBandStyle->StartSelect();
-    this->Internal->RenderView->getWidget()->setCursor(Qt::CrossCursor);
-    }
-
-  rwi->AddObserver(vtkCommand::LeftButtonPressEvent,
-    this->Internal->SelectionObserver);
-  rwi->AddObserver(vtkCommand::LeftButtonReleaseEvent,
-    this->Internal->SelectionObserver);
-
 
   this->Mode = selectionMode;
   emit this->selectionModeChanged(this->Mode);
@@ -280,22 +229,12 @@ int pqRubberBandHelper::setRubberBandOff()
     return 0;
     }
 
-  vtkRenderWindowInteractor* rwi = rmp->GetInteractor();
-  if (!rwi)
-    {
-    qDebug("No interactor specified. Cannot switch to interaction");
-    return 0;
-    }
+  vtkSMPropertyHelper(rmp, "InteractionMode").Set(
+    vtkPVRenderView::INTERACTION_MODE_3D);
+  rmp->UpdateVTKObjects();
+  rmp->RemoveObserver(this->Internal->Observer);
 
-  if (!this->Internal->SavedStyle)
-    {
-    qDebug("No previous style defined. Cannot switch to interaction.");
-    return 0;
-    }
-
-  rwi->SetInteractorStyle(this->Internal->SavedStyle);
-  rwi->RemoveObserver(this->Internal->SelectionObserver);
-  this->Internal->SavedStyle = 0;
+  this->Internal->RenderView->getWidget()->removeEventFilter(this);
 
   // set the interaction cursor
   this->Internal->RenderView->getWidget()->setCursor(QCursor());
@@ -304,6 +243,42 @@ int pqRubberBandHelper::setRubberBandOff()
   emit this->interactionModeChanged(true);
   emit this->stopSelection();
   return 1;
+}
+
+//-----------------------------------------------------------------------------
+bool pqRubberBandHelper::eventFilter(QObject *watched, QEvent *_event)
+{
+  if (this->Mode == PICK_ON_CLICK &&
+    watched == this->Internal->RenderView->getWidget())
+    {
+    if (_event->type() == QEvent::MouseButtonPress)
+      {
+      QMouseEvent& mouseEvent = (*static_cast<QMouseEvent*>(_event));
+      if (mouseEvent.button() == Qt::LeftButton)
+        {
+        this->Internal->StartPosition[0] = mouseEvent.x();
+        this->Internal->StartPosition[1] = mouseEvent.y();
+        }
+      }
+    else if (_event->type() == QEvent::MouseButtonRelease)
+      {
+      QMouseEvent& mouseEvent = (*static_cast<QMouseEvent*>(_event));
+      if (mouseEvent.button() == Qt::LeftButton)
+        {
+        if (this->Internal->StartPosition[0] == mouseEvent.x() &&
+          this->Internal->StartPosition[1] == mouseEvent.y())
+          {
+          int region[4] = {mouseEvent.x(), mouseEvent.y(), mouseEvent.x(),
+            mouseEvent.y()};
+          this->onSelectionChanged(NULL, 0, region);
+          }
+        }
+      this->Internal->StartPosition[0] = -1000;
+      this->Internal->StartPosition[1] = -1000;
+      }
+    }
+
+  return this->Superclass::eventFilter(watched, _event);
 }
 
 //-----------------------------------------------------------------------------
@@ -367,7 +342,9 @@ void pqRubberBandHelper::endSelection()
 }
 
 //-----------------------------------------------------------------------------
-void pqRubberBandHelper::processEvents(unsigned long eventId)
+void pqRubberBandHelper::onSelectionChanged(vtkObject*, unsigned long,
+  void* vregion)
+
 {
   if (!this->Internal->RenderView)
     {
@@ -383,87 +360,46 @@ void pqRubberBandHelper::processEvents(unsigned long eventId)
     return;
     }
 
-  vtkRenderWindowInteractor* rwi = rmp->GetInteractor();
-  if (!rwi)
+  bool ctrl = (rmp->GetInteractor()->GetControlKey() == 1);
+  int* region = reinterpret_cast<int*>(vregion);
+  switch (this->Mode)
     {
-    qDebug("No interactor specified. Cannot switch to selection");
-    return;
+  case SELECT:
+    this->Internal->RenderView->selectOnSurface(region, ctrl);
+    break;
+
+  case SELECT_POINTS:
+    this->Internal->RenderView->selectPointsOnSurface(region, ctrl);
+    break;
+
+  case FRUSTUM:
+    this->Internal->RenderView->selectFrustum(region);
+    break;
+
+  case FRUSTUM_POINTS:
+    this->Internal->RenderView->selectFrustumPoints(region);
+    break;
+
+  case BLOCKS:
+    this->Internal->RenderView->selectBlock(region, ctrl);
+    break;
+
+  case ZOOM:
+    // nothing to do.
+    this->Internal->RenderView->resetCenterOfRotationIfNeeded();
+    break;
+
+  case PICK:
+    this->Internal->RenderView->pick(region);
+    break;
+
+  case PICK_ON_CLICK:
+    if (region[0] == region[2] && region[1] == region[3])
+      {
+      this->Internal->RenderView->pick(region);
+      }
+    break;
     }
-
-  bool ctrl = rwi->GetControlKey();
-  int* eventpos = rwi->GetEventPosition();
-  switch(eventId)
-    {
-    case vtkCommand::LeftButtonPressEvent:
-      this->Xs = eventpos[0];
-      if (this->Xs < 0)
-        {
-        this->Xs = 0;
-        }
-      this->Ys = eventpos[1];
-      if (this->Ys < 0)
-        {
-        this->Ys = 0;
-        }
-      break;
-    case vtkCommand::LeftButtonReleaseEvent:
-      this->Xe = eventpos[0];
-      if (this->Xe < 0)
-        {
-        this->Xe = 0;
-        }
-      this->Ye = eventpos[1];
-      if (this->Ye < 0)
-        {
-        this->Ye = 0;
-        }
-
-      int rect[4] = {this->Xs, this->Ys, this->Xe, this->Ye};
-      int rectOut[4];
-      this->ReorderBoundingBox(rect, rectOut);
-      if (this->Internal->RenderView)
-        {
-        switch (this->Mode)
-          {
-        case SELECT:
-          this->Internal->RenderView->selectOnSurface(rectOut, ctrl);
-          break;
-
-        case SELECT_POINTS:
-          this->Internal->RenderView->selectPointsOnSurface(rectOut, ctrl);
-          break;
-
-        case FRUSTUM:
-          this->Internal->RenderView->selectFrustum(rectOut);
-          break;
-
-        case FRUSTUM_POINTS:
-          this->Internal->RenderView->selectFrustumPoints(rectOut);
-          break;
-
-        case BLOCKS:
-          this->Internal->RenderView->selectBlock(rectOut, ctrl);
-          break;
-
-        case ZOOM:
-          // nothing to do.
-          this->Internal->RenderView->resetCenterOfRotationIfNeeded();
-          break;
-
-        case PICK:
-          this->Internal->RenderView->pick(rect);
-          break;
-
-        case PICK_ON_CLICK:
-          if (rect[0] == rect[2] && rect[1] == rect[3])
-            {
-            this->Internal->RenderView->pick(rect);
-            }
-          break;
-          }
-        }
-      emit this->selectionFinished(rectOut[0], rectOut[1], rectOut[2], rectOut[3]);
-      break;
-    }
+  emit this->selectionFinished(region[0], region[1], region[2], region[3]);
 }
 

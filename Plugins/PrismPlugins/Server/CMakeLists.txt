@@ -8,4 +8,5 @@ INCLUDE_DIRECTORIES(
 
 ADD_PARAVIEW_PLUGIN(PrismServerPlugin "1.1"
   SERVER_MANAGER_SOURCES vtkPrismFilter.cxx vtkPrismSurfaceReader.cxx vtkPrismCubeAxesActor.cxx vtkPrismSESAMEReader.cxx
+  vtkPrismCubeAxesRepresentation.cxx
   REQUIRED_ON_SERVER)

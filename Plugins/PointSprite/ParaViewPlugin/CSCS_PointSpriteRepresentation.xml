@@ -47,7 +47,7 @@
             <Property name="ConstantRadius"/>
             <Property name="RadiusIsProportional"/>
             <Property name="RadiusProportionalFactor"/>
-            <Property name="RadiusInitialized"/>
+            <Property name="PointSpriteDefaultsInitialized"/>
           </ExposedProperties>
       </SubProxy>
 
@@ -100,7 +100,7 @@
             <Property name="ConstantRadius"/>
             <Property name="RadiusIsProportional"/>
             <Property name="RadiusProportionalFactor"/>
-            <Property name="RadiusInitialized"/>
+            <Property name="PointSpriteDefaultsInitialized"/>
           </ExposedProperties>
       </SubProxy>
 
@@ -154,7 +154,7 @@
             <Property name="ConstantRadius"/>
             <Property name="RadiusIsProportional"/>
             <Property name="RadiusProportionalFactor"/>
-            <Property name="RadiusInitialized"/>
+            <Property name="PointSpriteDefaultsInitialized"/>
             
           </ExposedProperties>
       </SubProxy>

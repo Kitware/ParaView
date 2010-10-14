@@ -41,7 +41,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkDoubleArray.h>
 #include <vtkIntArray.h>
 #include <vtkRectilinearGrid.h>
-#include <vtkSMClientDeliveryRepresentationProxy.h>
 #include <vtkSMProxy.h>
 
 #include <QtDebug>
@@ -102,7 +101,7 @@ void pqTableView::forceRender()
     {
     if(!pqRepresentation->isVisible())
       continue;
-      
+#ifdef FIXME
     vtkSMClientDeliveryRepresentationProxy* const display = 
       vtkSMClientDeliveryRepresentationProxy::SafeDownCast(pqRepresentation->getProxy());
       
@@ -123,6 +122,7 @@ void pqTableView::forceRender()
           }
         }
       }
+#endif
 
     return;
     }

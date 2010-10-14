@@ -158,14 +158,6 @@ void vtkIceTCompositePass::ReleaseGraphicsResources(vtkWindow* window)
 //----------------------------------------------------------------------------
 void vtkIceTCompositePass::SetupContext(const vtkRenderState* render_state)
 {
-  this->IceTContext->SetController(this->Controller);
-  if (!this->IceTContext->IsValid())
-    {
-    vtkErrorMacro("Could not initialize IceT context.");
-    return;
-    }
-
-  this->IceTContext->MakeCurrent();
   //icetDiagnostics(ICET_DIAG_DEBUG | ICET_DIAG_ALL_NODES);
 
   // Irrespective of whether we are rendering in tile/display mode or not, we
@@ -347,6 +339,7 @@ void vtkIceTCompositePass::Render(const vtkRenderState* render_state)
     return;
     }
 
+  this->IceTContext->MakeCurrent();
   this->SetupContext(render_state);
 
   icetDrawFunc(IceTDrawCallback);
@@ -463,8 +456,8 @@ void vtkIceTCompositePass::UpdateTileInformation(
     }
   else
     {
-    this->LastTileViewport[0] = this->LastTileViewport[1] =
-      this->LastTileViewport[2] = this->LastTileViewport[3] = 0;
+    this->LastTileViewport[0] = this->LastTileViewport[1] = 0;
+    this->LastTileViewport[2] = this->LastTileViewport[3] = -1;
     this->PhysicalViewport[0] = this->PhysicalViewport[1] =
       this->PhysicalViewport[2] = this->PhysicalViewport[3] = 0.0;
     }
@@ -537,15 +530,30 @@ void vtkIceTCompositePass::GetLastRenderedTile(
 {
   tile.MarkInValid();
 
+  if (!this->IceTContext->IsValid())
+    {
+    return;
+    }
+  this->IceTContext->MakeCurrent();
+
+  // get the dimension of the buffer
+  GLint id;
+  icetGetIntegerv(ICET_TILE_DISPLAYED,&id);
+  if (id < 0)
+    {
+    // current processes is not displaying any tile.
+    return;
+    }
+
   GLint color_format;
   icetGetIntegerv(ICET_COLOR_FORMAT, &color_format);
-  int width  = this->LastTileViewport[2] - this->LastTileViewport[0];
-  int height = this->LastTileViewport[3] - this->LastTileViewport[1];
+  int width  = this->LastTileViewport[2] - this->LastTileViewport[0] +1;
+  int height = this->LastTileViewport[3] - this->LastTileViewport[1] +1;
 
   // FIXME: when image_reduction_factor > 1, we need to scale width and height
   // accordingly.
 
-  if (width < 1 || height < 1)
+  if (width <= 1 || height <= 1)
     {
     return;
     }
