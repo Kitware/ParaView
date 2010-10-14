@@ -105,7 +105,7 @@ void vtkPVView::SetViewTime(double time)
 bool vtkPVView::InTileDisplayMode()
 {
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  vtkPVServerInformation* info = pm->GetServerInformation(NULL);
+  vtkPVServerInformation* info = pm->GetServerInformation(0);
   if (info->GetTileDimensions()[0] > 0 ||
     info->GetTileDimensions()[1] > 0)
     {

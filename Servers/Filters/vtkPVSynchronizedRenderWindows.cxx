@@ -981,7 +981,7 @@ void vtkPVSynchronizedRenderWindows::UpdateWindowLayout()
       // and tile-viewport for the render window. That is required for the camera
       // as well as for the annotations to show correctly.
       vtkPVServerInformation* server_info =
-        vtkProcessModule::GetProcessModule()->GetServerInformation(NULL);
+        vtkProcessModule::GetProcessModule()->GetServerInformation(0);
       int tile_dims[2];
       bool in_tile_display_mode = this->GetTileDisplayParameters(tile_dims); 
       if (in_tile_display_mode)
@@ -1122,7 +1122,7 @@ void vtkPVSynchronizedRenderWindows::ShinkGaps()
 bool vtkPVSynchronizedRenderWindows::GetTileDisplayParameters(int tile_dims[2])
 {
   vtkPVServerInformation* server_info =
-    vtkProcessModule::GetProcessModule()->GetServerInformation(NULL);
+    vtkProcessModule::GetProcessModule()->GetServerInformation(0);
   tile_dims[0] = server_info->GetTileDimensions()[0];
   tile_dims[1] = server_info->GetTileDimensions()[1];
   bool in_tile_display_mode = (tile_dims[0] > 0 || tile_dims[1] > 0);

@@ -61,7 +61,7 @@ public:
 
   //***************************************************************************
   // Forwarded to ScalarsToColorsPainter and LODScalarsToColorsPainter
-  void SetEnableOpacity(double val);
+  void SetEnableOpacity(int val);
 
   //***************************************************************************
   // Forwarded to RadiusTransferFunctionChooser
