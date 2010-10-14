@@ -129,6 +129,7 @@ static void vtkPythonAppInitPrependPath(const char* self_dir)
       "/lib/python/paraview", // UNIX --home
       "/Lib/site-packages/paraview", "/Lib/paraview", // Windows
       "/site-packages/paraview", "/paraview", // Windows
+      PV_PYTHON_PACKAGE_DIR,
       0
     };
     vtkstd::string prefix = self_dir;
