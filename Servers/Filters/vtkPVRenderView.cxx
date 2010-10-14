@@ -1060,13 +1060,13 @@ void vtkPVRenderView::SetBackgroundTexture(vtkTexture* val)
 //----------------------------------------------------------------------------
 void vtkPVRenderView::SetGradientBackground(int val)
 {
-  this->GetRenderer()->SetGradientBackground(val);
+  this->GetRenderer()->SetGradientBackground(val? true : false);
 }
 
 //----------------------------------------------------------------------------
 void vtkPVRenderView::SetTexturedBackground(int val)
 {
-  this->GetRenderer()->SetTexturedBackground(val);
+  this->GetRenderer()->SetTexturedBackground(val? true : false);
 }
 
 //*****************************************************************

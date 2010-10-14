@@ -159,7 +159,7 @@ void vtkPVXYChartView::SetLegendVisibility(int visible)
 {
   if (this->Chart)
     {
-    this->Chart->SetShowLegend(static_cast<bool>(visible));
+    this->Chart->SetShowLegend(visible? true : false);
     }
 }
 

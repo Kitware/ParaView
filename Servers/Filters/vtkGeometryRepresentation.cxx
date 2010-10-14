@@ -187,7 +187,8 @@ int vtkGeometryRepresentation::ProcessViewRequest(
     // render set that up.
     this->DeliveryFilter->ProcessViewRequest(inInfo);
     this->LODDeliveryFilter->ProcessViewRequest(inInfo);
-    bool lod = this->SuppressLOD? false : inInfo->Has(vtkPVRenderView::USE_LOD());
+    bool lod = this->SuppressLOD? false :
+      (inInfo->Has(vtkPVRenderView::USE_LOD()) == 1);
     if (lod)
       {
       if (inInfo->Has(vtkPVRenderView::LOD_RESOLUTION()))
