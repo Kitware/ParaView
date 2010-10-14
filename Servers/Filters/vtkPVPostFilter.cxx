@@ -112,14 +112,33 @@ int vtkPVPostFilter::RequestData(vtkInformation *,
   vtkDataObject* input= inInfo->Get(vtkDataObject::DATA_OBJECT());
   vtkDataObject* output= outInfo->Get(vtkDataObject::DATA_OBJECT());
   if (output && input)
-    {
-    output->ShallowCopy(input);
-    if (this->Information->Has(vtkPVPostFilterExecutive::POST_ARRAYS_TO_PROCESS()) )
       {
-      this->DoAnyNeededConversions(output);
+      vtkCompositeDataSet *csInput = vtkCompositeDataSet::SafeDownCast(input);
+      vtkCompositeDataSet *csOutput = vtkCompositeDataSet::SafeDownCast(output);
+      if (!csInput && !csOutput)
+        {
+        //vtkDataSet
+        output->ShallowCopy(input);
+        }
+      else
+        {
+        csOutput->CopyStructure(csInput);
+        vtkCompositeDataIterator* iter = csInput->NewIterator();
+        for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
+          {
+          vtkDataObject* obj = iter->GetCurrentDataObject()->NewInstance();
+          obj->ShallowCopy(iter->GetCurrentDataObject());
+          csOutput->SetDataSet(iter,obj);
+          obj->FastDelete();
+          }
+        iter->Delete();
+        }
+      if (this->Information->Has(vtkPVPostFilterExecutive::POST_ARRAYS_TO_PROCESS()) )
+        {
+        this->DoAnyNeededConversions(output);
+        }
       }
-    }
-  return 1;
+    return 1;
 }
 
 //----------------------------------------------------------------------------
