@@ -1191,9 +1191,9 @@ public:
     array->SetNumberOfComponents(1);
     array->SetNumberOfTuples(nbTuples); // Allocate array memory
 
-    // Create a nice array name
+    // Create a nice array name (Just remove the xxx part of /xxx/yy/zzz)
     vtkstd::string arrayName = var.Name;
-    vtkstd::string::size_type index = arrayName.rfind("/");
+    vtkstd::string::size_type index = arrayName.find("/", 1);
     if(index != vtkstd::string::npos)
       {
       arrayName = arrayName.substr( index + 1, arrayName.size() - 1 );
