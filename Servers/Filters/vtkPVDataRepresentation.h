@@ -40,10 +40,23 @@ public:
     vtkInformation* inInfo, vtkInformation* outInfo);
 
   // Description:
-  // This needs to be called on all instances of vtkGeometryRepresentation when
-  // the input is modified. This is essential since the geometry filter does not
-  // have any real-input on the client side which messes with the Update
-  // requests.
+  // This is one of the most important functions. In VTK pipelines, it's very
+  // easy for the pipeline to decide when it needs to reexecute.
+  // vtkAlgorithm::Update() can go up the entire pipeline to see if any filters
+  // MTime changed (among other things) and if so, it can rexecute the pipeline.
+  // However in case of representations, the real input connection may only be
+  // present on the data-server nodes. In that case the
+  // vtkPVDataRepresentation::RequestData() will only get called on the
+  // data-server nodes. That means that representations won't be able to any
+  // data-delivery in RequestData(). We'd need some other mechanisms to
+  // synchronize data-delivery among processes. To avoid that conumdrum, the
+  // vtkSMRepresentationProxy calls MarkModified() on all processes whenever any
+  // filter in the pipeline is modified. In this method, the
+  // vtkPVDataRepresentation subclasses should ensure that they mark all
+  // delivery related filters dirty to ensure they execute then next time they
+  // are updated. The vtkPVDataRepresentation also uses a special executive
+  // which avoids updating the representation unless MarkModified() was called
+  // since the last Update(), thus acting as a update-suppressor.
   virtual void MarkModified();
 
   // Description:
