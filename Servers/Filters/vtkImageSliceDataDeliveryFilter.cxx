@@ -50,6 +50,11 @@ vtkImageSliceDataDeliveryFilter::~vtkImageSliceDataDeliveryFilter()
 void vtkImageSliceDataDeliveryFilter::InitializeForCommunication()
 {
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  if (pm == NULL)
+    {
+    vtkWarningMacro("No process module found.");
+    return;
+    }
 
   int process_type = pm->GetOptions()->GetProcessType();
   switch (process_type)

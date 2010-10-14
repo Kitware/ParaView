@@ -45,11 +45,15 @@ vtkKdTreeManager::vtkKdTreeManager()
 {
   vtkMultiProcessController* globalController =
     vtkMultiProcessController::GetGlobalController();
-
+  if (!globalController)
+    {
+    vtkWarningMacro("No global controller");
+    }
   this->Producers = new vtkAlgorithmSet();
   this->StructuredProducer = 0;
   this->KdTree = 0;
-  this->NumberOfPieces = globalController->GetNumberOfProcesses();
+  this->NumberOfPieces = globalController?
+    globalController->GetNumberOfProcesses() : 1;
   this->KdTreeInitialized = false;
 
   vtkPKdTree* tree = vtkPKdTree::New();
