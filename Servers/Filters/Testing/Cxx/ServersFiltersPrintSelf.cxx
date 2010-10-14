@@ -206,8 +206,6 @@ int main(int , char *[])
   c = vtkBalancedRedistributePolyData::New(); c->Print(cout); c->Delete();
   c = vtkRedistributePolyData::New(); c->Print(cout); c->Delete();
 # ifdef PARAVIEW_USE_ICE_T
-  c = vtkDesktopDeliveryClient::New(); c->Print(cout); c->Delete();
-  c = vtkDesktopDeliveryServer::New(); c->Print(cout); c->Delete();
 //  c = vtkExtractCTHPart2::New(); c->Print(cout); c->Delete();
   c = vtkIceTContext::New(); c->Print(cout); c->Delete();
 # endif
