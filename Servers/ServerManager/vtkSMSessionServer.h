@@ -60,6 +60,10 @@ public:
   virtual void PushState(vtkSMMessage* msg);
 
   // Description:
+  // Push the state.
+  virtual void PullState(vtkSMMessage* msg);
+
+  // Description:
   // Gather information about an object referred by the \c globalid.
   // \c location identifies the processes to gather the information from.
   // Overridden to fetch the information from server if needed, otherwise it's

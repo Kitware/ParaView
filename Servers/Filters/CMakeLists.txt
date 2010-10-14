@@ -83,6 +83,7 @@ SET(Filters_SRCS
   vtkPEnSightReader.cxx
   vtkPGenericEnSightReader.cxx
   vtkPhastaReader.cxx
+  vtkPID.cxx
   vtkPlotEdges.cxx
   vtkPointHandleRepresentationSphere.cxx
   vtkPolyLineToRectilinearGridFilter.cxx

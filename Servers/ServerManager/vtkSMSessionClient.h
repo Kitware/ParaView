@@ -55,6 +55,7 @@ public:
   // Description:
   // Push the state.
   virtual void PushState(vtkSMMessage* msg);
+  virtual void PullState(vtkSMMessage* message);
   virtual void Invoke(vtkSMMessage* msg);
 
 //ETX
@@ -93,7 +94,8 @@ public:
     GATHER_INFORMATION=4,
     CLIENT_SERVER_MESSAGE_RMI=55625,
     CLOSE_SESSION=55626,
-    REPLY_GATHER_INFORMATION_TAG=55627
+    REPLY_GATHER_INFORMATION_TAG=55627,
+    REPLY_PULL=55628
     };
 
 protected:

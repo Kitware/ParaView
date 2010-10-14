@@ -193,7 +193,25 @@ bool vtkSMSessionServer::GetIsAlive()
 //----------------------------------------------------------------------------
 void vtkSMSessionServer::PushState(vtkSMMessage* msg)
 {
+  // DEBUG msg->PrintDebugString();
   this->Superclass::PushState(msg);
+}
+
+//----------------------------------------------------------------------------
+void vtkSMSessionServer::PullState(vtkSMMessage* msg)
+{
+  // Only the root node is allowed to do the pull
+  if(vtkProcessModule2::GetProcessModule()->GetGlobalController()->GetLocalProcessId() != 0)
+    return;
+
+  // We are on the root node
+  // DEBUG msg->PrintDebugString();
+  this->Superclass::PullState(msg);
+
+  // Send the result back to client
+  vtkMultiProcessStream css;
+  css << msg->SerializeAsString();
+  this->ClientController->Send( css, 1, vtkSMSessionClient::REPLY_PULL);
 }
 
 //----------------------------------------------------------------------------
@@ -206,15 +224,24 @@ void vtkSMSessionServer::OnClientServerMessageRMI(void* message, int message_len
   stream >> type;
   switch (type)
     {
-  case vtkSMSessionClient::PUSH:
-      {
-      vtkstd::string string;
-      stream >> string;
-      vtkSMMessage msg;
-      msg.ParseFromString(string);
-      this->PushState(&msg);
-      }
-    break;
+    case vtkSMSessionClient::PUSH:
+        {
+        vtkstd::string string;
+        stream >> string;
+        vtkSMMessage msg;
+        msg.ParseFromString(string);
+        this->PushState(&msg);
+        }
+      break;
+    case vtkSMSessionClient::PULL:
+        {
+        vtkstd::string string;
+        stream >> string;
+        vtkSMMessage msg;
+        msg.ParseFromString(string);
+        this->PullState(&msg);
+        }
+      break;
 
   case vtkSMSessionClient::INVOKE:
       {

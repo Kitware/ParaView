@@ -330,6 +330,72 @@ void vtkSMSessionClient::PushState(vtkSMMessage* message)
 }
 
 //----------------------------------------------------------------------------
+void vtkSMSessionClient::PullState(vtkSMMessage* message)
+{
+  if (this->RenderServerController == NULL)
+    {
+    // re-route all render-server messages to data-server.
+    if (message->location() & vtkProcessModule2::RENDER_SERVER)
+      {
+      message->set_location(message->location() | vtkProcessModule2::DATA_SERVER);
+      message->set_location(message->location() & ~vtkProcessModule2::RENDER_SERVER);
+      }
+    if (message->location() & vtkProcessModule2::RENDER_SERVER_ROOT)
+      {
+      message->set_location(message->location() | vtkProcessModule2::DATA_SERVER_ROOT);
+      message->set_location(message->location() & ~vtkProcessModule2::RENDER_SERVER_ROOT);
+      }
+    }
+
+  // We make sure that only ONE location is targeted with a priority order
+  // (1) Client (2) DataServer (3) RenderServer
+  if ( (message->location() & vtkProcessModule2::CLIENT) != 0)
+    {
+    this->Superclass::PullState(message);
+    // Everything is local no communication needed (Send/Reply)
+    }
+  else if ( (message->location() & vtkProcessModule2::DATA_SERVER) != 0 ||
+    (message->location() & vtkProcessModule2::DATA_SERVER_ROOT) != 0)
+    {
+    vtkMultiProcessStream stream;
+    stream << static_cast<int>(PULL);
+    stream << message->SerializeAsString();
+    vtkstd::vector<unsigned char> raw_message;
+    stream.GetRawData(raw_message);
+    this->DataServerController->TriggerRMIOnAllChildren(
+        &raw_message[0], static_cast<int>(raw_message.size()),
+        CLIENT_SERVER_MESSAGE_RMI);
+
+    // Get the reply
+    vtkMultiProcessStream replyStream;
+    this->DataServerController->Receive(replyStream, 1, REPLY_PULL);
+    vtkstd::string string;
+    replyStream >> string;
+    message->ParseFromString(string);
+    }
+  else if (this->RenderServerController != NULL &&
+           ((message->location() & vtkProcessModule2::RENDER_SERVER) != 0 ||
+            (message->location() & vtkProcessModule2::RENDER_SERVER_ROOT) != 0))
+    {
+    vtkMultiProcessStream stream;
+    stream << static_cast<int>(PULL);
+    stream << message->SerializeAsString();
+    vtkstd::vector<unsigned char> raw_message;
+    stream.GetRawData(raw_message);
+    this->RenderServerController->TriggerRMIOnAllChildren(
+      &raw_message[0], static_cast<int>(raw_message.size()),
+      CLIENT_SERVER_MESSAGE_RMI);
+
+    // Get the reply
+    vtkMultiProcessStream replyStream;
+    this->DataServerController->Receive(replyStream, 1, REPLY_PULL);
+    vtkstd::string string;
+    replyStream >> string;
+    message->ParseFromString(string);
+    }
+}
+
+//----------------------------------------------------------------------------
 void vtkSMSessionClient::Invoke(vtkSMMessage* message)
 {
   if (this->RenderServerController == NULL)

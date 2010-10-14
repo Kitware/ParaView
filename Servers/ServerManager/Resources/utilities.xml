@@ -3194,4 +3194,26 @@
     </Proxy>
   </ProxyGroup>
 
+  <ProxyGroup name="utils">
+  <Proxy name="pid" class="vtkPID" label="ProcessId">
+    <IntVectorProperty  name="ProcessId"
+                        command="GetPID" information_only="1"/>
+  </Proxy>
+
+  <Proxy name="clientPID" class="vtkPID" label="ProcessId" processes="client">
+    <IntVectorProperty  name="ProcessId"
+                        command="GetPID" information_only="1"/>
+  </Proxy>
+  <Proxy name="dataserverPID" class="vtkPID" label="ProcessId">
+    <IntVectorProperty  name="ProcessId"
+                        command="GetPID" information_only="1"/>
+  </Proxy>
+  <Proxy name="renderserverPID" class="vtkPID" label="ProcessId" processes="renderserver">
+    <IntVectorProperty  name="ProcessId"
+                        command="GetPID" information_only="1"/>
+  </Proxy>
+
+
+  </ProxyGroup>
+
 </ServerManagerConfiguration>
