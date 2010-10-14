@@ -15,13 +15,13 @@
 #include "vtkBSPCutsGenerator.h"
 
 #include "vtkAlgorithmOutput.h"
-#include "vtkBSPCuts.cxx"
+#include "vtkBSPCuts.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkKdTreeManager.h"
+#include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
 #include "vtkPKdTree.h"
-#include "vtkMultiProcessController.h"
 
 vtkStandardNewMacro(vtkBSPCutsGenerator);
 //----------------------------------------------------------------------------
