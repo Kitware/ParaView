@@ -30,6 +30,7 @@
 #include "vtkSocketController.h"
 #include "vtkTilesHelper.h"
 
+#include <vtksys/SystemTools.hxx>
 #include <vtksys/ios/sstream>
 #include <vtkstd/map>
 #include <vtkstd/vector>
@@ -492,7 +493,7 @@ vtkRenderWindow* vtkPVSynchronizedRenderWindows::NewRenderWindow()
       int not_used[2];
       swap_buffers |= this->GetTileDisplayParameters(not_used);
       window->SetSwapBuffers(swap_buffers? 1 : 0);
-      window->SetSwapBuffers(1); // for debugging FIXME.
+      //window->SetSwapBuffers(1); // for debugging FIXME.
       this->Internals->SharedRenderWindow.TakeReference(window);
       }
     else
@@ -986,9 +987,14 @@ void vtkPVSynchronizedRenderWindows::UpdateWindowLayout()
       bool in_tile_display_mode = this->GetTileDisplayParameters(tile_dims); 
       if (in_tile_display_mode)
         {
-        // FIXME: handle full-screen case
-        this->Internals->SharedRenderWindow->SetSize(400, 400);
-        //this->Internals->SharedRenderWindow->SetFullScreen(1);
+        if (vtksys::SystemTools::GetEnv("PV_ICET_WINDOW_BORDERS"))
+          {
+          this->Internals->SharedRenderWindow->SetSize(400, 400);
+          }
+        else
+          {
+          this->Internals->SharedRenderWindow->SetFullScreen(1);
+          }
 
         // TileScale and TileViewport must be setup on render window correctly
         // so that 2D props show up correctly in tile display mode.
