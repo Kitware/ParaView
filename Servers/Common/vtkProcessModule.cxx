@@ -649,7 +649,7 @@ vtkIdType vtkProcessModule::ConnectToSelf()
     }
   // if there are multiple inputs then start server and connect else
   // connect to self
-  if(this->AutoMPI->isPossible())
+  if(this->AutoMPI->IsPossible())
     {
     this->IsAutoMPI = 1;
     int port = this->AutoMPI->ConnectToRemoteBuiltInSelf();
