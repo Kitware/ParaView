@@ -151,8 +151,7 @@ void vtkSMArrayListDomain::AddArrays(vtkSMSourceProxy* sp,
         {
         if(this->CheckInformationKeys(arrayInfo))
         {
-          unsigned int newidx = this->AddString(arrayInfo->GetName());
-          this->ALDInternals->FieldAssociation[newidx] = association;
+          unsigned int newidx = this->AddArray(arrayInfo, association, iad);
           if (arrayInfo == attrInfo)
             {
             attrIdx = newidx;
@@ -165,9 +164,8 @@ void vtkSMArrayListDomain::AddArrays(vtkSMSourceProxy* sp,
         if (!thisDataType || (arrayInfo->GetDataType() == thisDataType))
           {
           if(this->CheckInformationKeys(arrayInfo))
-          {
-            unsigned int newidx = this->AddString(arrayInfo->GetName());
-            this->ALDInternals->FieldAssociation[newidx] = association;
+            {
+            unsigned int newidx = this->AddArray(arrayInfo, association, iad);
             if (arrayInfo == attrInfo)
               {
               attrIdx = newidx;
@@ -181,6 +179,40 @@ void vtkSMArrayListDomain::AddArrays(vtkSMSourceProxy* sp,
     {
     this->SetDefaultElement(attrIdx);
     this->Association = association;
+    }
+}
+
+//---------------------------------------------------------------------------
+unsigned int vtkSMArrayListDomain::AddArray(
+  vtkPVArrayInformation* arrayInfo, int association, vtkSMInputArrayDomain* iad)
+{
+  if (iad->GetAutomaticPropertyConversion() &&
+    iad->GetNumberOfComponents() == 1 &&
+    arrayInfo->GetNumberOfComponents() > 1)
+    {
+    vtksys_ios::ostringstream stream;
+    // add magnitude only for numeric arrays.
+    unsigned int first_index = -1;
+    if (arrayInfo->GetDataType() != VTK_STRING)
+      {
+      stream << arrayInfo->GetName() << "_Magnitude";
+      first_index = this->AddString(stream.str().c_str());
+      this->ALDInternals->FieldAssociation[first_index] = association;
+      }
+    for (int cc=0; cc < arrayInfo->GetNumberOfComponents(); cc++)
+      {
+      vtksys_ios::ostringstream stream;
+      stream << arrayInfo->GetName() << "_" << arrayInfo->GetComponentName(cc);
+      unsigned int newidx = this->AddString(stream.str().c_str());
+      this->ALDInternals->FieldAssociation[newidx] = association;
+      }
+    return first_index;
+    }
+  else
+    {
+    unsigned int newidx = this->AddString(arrayInfo->GetName());
+    this->ALDInternals->FieldAssociation[newidx] = association;
+    return  newidx;
     }
 }
 

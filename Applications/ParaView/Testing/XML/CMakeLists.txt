@@ -49,6 +49,8 @@ SET (TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/Plot3DReader.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/PlotEdges.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/PlotEdges2.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/PropertyConversion.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/PropertyConversion1.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/PropertyLink.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/ReadXMLPolyDataFileSeries.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/RectilinearFractal.xml
@@ -112,8 +114,10 @@ set (ColorEditor1_BREAK TRUE)
 set (ColorEditor2_BREAK TRUE)
 set (ColorEditor3_BREAK TRUE)
 set (ColorEditor4_BREAK TRUE)
-set (GridConnectivity_BREAK_TRUE)
-set (H5PartReaderPlugin_BREAK_TRUE)
+set (GridConnectivity_BREAK TRUE)
+set (H5PartReaderPlugin_BREAK TRUE)
+SET (PlotEdges2_BREAK TRUE)
+SET (PropertyConversion1_BREAK TRUE)
 set (ReadXMLPolyDataFileSeries_BREAK TRUE)
 set (ExodusXML_BREAK TRUE)
 SET (ComparativeVisPanel_BREAK TRUE)

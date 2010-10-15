@@ -114,6 +114,9 @@ pqApplicationOptions::pqApplicationOptions(QWidget *widgetParent)
   QObject::connect(this->Internal->AutoAccept,
                   SIGNAL(toggled(bool)),
                   this, SIGNAL(changesAvailable()));
+  QObject::connect(this->Internal->AutoConvertProperties,
+                  SIGNAL(toggled(bool)),
+                  this, SIGNAL(changesAvailable()));
   QObject::connect(this->Internal->CrashRecovery,
                   SIGNAL(toggled(bool)),
                   this, SIGNAL(changesAvailable()));
@@ -252,6 +255,9 @@ void pqApplicationOptions::applyChanges()
   settings->setValue("autoAccept", autoAccept);
   pqObjectInspectorWidget::setAutoAccept(autoAccept);
 
+  bool autoConvert = this->Internal->AutoConvertProperties->isChecked();
+  settings->setValue("GlobalProperties/AutoConvertProperties",autoConvert);
+
   bool crashRecovery = this->Internal->CrashRecovery->isChecked();
   settings->setValue("crashRecovery",crashRecovery);
 
@@ -311,7 +317,10 @@ void pqApplicationOptions::resetChanges()
     QString("%1").arg(pqServer::getHeartBeatTimeoutSetting()/(60.0*1000), 0, 'f', 2));
 
   this->Internal->AutoAccept->setChecked(
-    settings->value("autoAccept", false).toBool());
+    settings->value("autoAccept",false).toBool());
+
+  this->Internal->AutoConvertProperties->setChecked(
+    settings->value("GlobalProperties/AutoConvertProperties", false).toBool());
 
   this->Internal->CrashRecovery->setChecked(
     settings->value("crashRecovery", false).toBool());

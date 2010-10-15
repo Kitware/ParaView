@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -67,7 +67,7 @@ class vtkSMProxyLocator;
 /// and manages various managers which are necessary for the ParaView-based
 /// client to work with the ServerManager.
 /// For clients based of the pqCore library,
-/// simply instantiate this pqApplicationCore after QApplication initialization 
+/// simply instantiate this pqApplicationCore after QApplication initialization
 /// and then create your main window etc. like a standard Qt application. You can then
 /// use the facilities provided by pqCore such as the pqObjectBuilder,
 /// pqUndoStack etc. in your application. After that point.
@@ -107,9 +107,9 @@ public:
 
   /// Custom Applications may need use various "managers"
   /// All such manager can be registered with the pqApplicationCore
-  /// so that that can be used by other components of the 
+  /// so that that can be used by other components of the
   /// application. Registering with pqApplicationCore gives easy
-  /// access to these managers from the application code. Note 
+  /// access to these managers from the application code. Note
   /// that custom applications are not required to register managers.
   /// However certain optional components of the pqCore may
   /// expect some managers.
@@ -132,7 +132,7 @@ public:
 
   /// ServerManagerModel is the representation of the ServerManager
   /// using pqServerManagerModelItem subclasses. It makes it possible to
-  /// explore the ServerManager with ease by separating proxies based 
+  /// explore the ServerManager with ease by separating proxies based
   /// on their functionality/type.
   pqServerManagerModel* getServerManagerModel() const
     { return this->ServerManagerModel; }
@@ -277,6 +277,9 @@ signals:
 
   /// Fired on loadConfiguration().
   void loadXML(vtkPVXMLElement*);
+
+  /// Fired when the filter menu state needs to be manually updated
+  void forceFilterMenuRefresh();
 
 protected slots:
   void onStateLoaded(vtkPVXMLElement* root, vtkSMProxyLocator* locator);

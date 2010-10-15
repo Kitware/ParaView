@@ -78,10 +78,20 @@ void vtkSMCompoundSourceProxy::AddProxy(const char* name, vtkSMProxy* proxy)
 
   // If proxy with the name already exists, this->AddSubProxy raises a warning.
   this->AddSubProxy(name, proxy);
+
+  //we want to override the disabling of the post filter on sub proxies
+  //in this use case, since the pipeline this compound proxy represents
+  //might need post filters
+  vtkSMSourceProxy *sproxy = vtkSMSourceProxy::SafeDownCast(proxy);
+  if (sproxy)
+    {
+    sproxy->InsertPostFilter(true);
+    }
+
 }
 
 //----------------------------------------------------------------------------
-void vtkSMCompoundSourceProxy::ExposeProperty(const char* proxyName, 
+void vtkSMCompoundSourceProxy::ExposeProperty(const char* proxyName,
   const char* propertyName, const char* exposedName)
 {
   this->ExposeSubProxyProperty(proxyName, propertyName, exposedName);
@@ -89,7 +99,7 @@ void vtkSMCompoundSourceProxy::ExposeProperty(const char* proxyName,
 
 
 //----------------------------------------------------------------------------
-void vtkSMCompoundSourceProxy::ExposeOutputPort(const char* proxyName, 
+void vtkSMCompoundSourceProxy::ExposeOutputPort(const char* proxyName,
   const char* portName, const char* exposedName)
 {
   vtkInternal::PortInfo info;
@@ -103,7 +113,7 @@ void vtkSMCompoundSourceProxy::ExposeOutputPort(const char* proxyName,
 }
 
 //----------------------------------------------------------------------------
-void vtkSMCompoundSourceProxy::ExposeOutputPort(const char* proxyName, 
+void vtkSMCompoundSourceProxy::ExposeOutputPort(const char* proxyName,
   unsigned int portIndex, const char* exposedName)
 {
   vtkInternal::PortInfo info;
@@ -128,12 +138,12 @@ void vtkSMCompoundSourceProxy::CreateVTKObjects()
   // vtkSMSourceProxy gurantees that the output port size is set up correctly
   // after CreateVTKObjects(). Hence, we ensure that it is set up correctly.
   // We cannot create vtkSMOutputPort proxies right now, since that requires
-  // that the input to this filter is setup correctly. Hence we wait for the 
+  // that the input to this filter is setup correctly. Hence we wait for the
   // CreateOutputPorts() call to create the vtkSMOutputPort proxies.
-  
+
   unsigned int index=0;
   vtkInternal::VectorOfPortInfo::iterator iter;
-  for (iter = this->CSInternal->ExposedPorts.begin(); 
+  for (iter = this->CSInternal->ExposedPorts.begin();
     iter != this->CSInternal->ExposedPorts.end(); ++iter)
     {
     vtkSMSourceProxy* subProxy = vtkSMSourceProxy::SafeDownCast(
@@ -212,7 +222,7 @@ void vtkSMCompoundSourceProxy::CreateOutputPorts()
 
   unsigned int index=0;
   vtkInternal::VectorOfPortInfo::iterator iter;
-  for (iter = this->CSInternal->ExposedPorts.begin(); 
+  for (iter = this->CSInternal->ExposedPorts.begin();
     iter != this->CSInternal->ExposedPorts.end(); ++iter)
     {
     vtkSMSourceProxy* subProxy = vtkSMSourceProxy::SafeDownCast(
@@ -388,7 +398,7 @@ void vtkSMCompoundSourceProxy::HandleExposedProperties(vtkPVXMLElement* element)
 
 
 //----------------------------------------------------------------------------
-// Definition is 
+// Definition is
 // * State i.e. exposed property states (execept those refererring to outside
 // proxies)
 // * Subproxy states.
@@ -400,12 +410,12 @@ vtkPVXMLElement* vtkSMCompoundSourceProxy::SaveDefinition(
   vtkPVXMLElement* defElement = this->SaveState(0);
   defElement->SetName("CompoundSourceProxy");
   defElement->RemoveAllNestedElements();
-  
+
   // * Add subproxy states.
   unsigned int numProxies = this->GetNumberOfSubProxies();
   for (unsigned int cc=0; cc < numProxies; cc++)
     {
-    vtkPVXMLElement* newElem = 
+    vtkPVXMLElement* newElem =
       this->GetSubProxy(cc)->SaveState(defElement);
     const char* compound_name =this->GetSubProxyName(cc);
     newElem->AddAttribute("compound_name", compound_name);
@@ -413,7 +423,7 @@ vtkPVXMLElement* vtkSMCompoundSourceProxy::SaveDefinition(
 
   // * Clean references to any external proxies.
   this->TraverseForProperties(defElement);
-  
+
   // * Add exposed property information.
   vtkPVXMLElement* exposed = vtkPVXMLElement::New();
   exposed->SetName("ExposedProperties");
@@ -439,7 +449,7 @@ vtkPVXMLElement* vtkSMCompoundSourceProxy::SaveDefinition(
   exposed->Delete();
 
   // * Add output port information.
-  vtkInternal::VectorOfPortInfo::iterator iter2 = 
+  vtkInternal::VectorOfPortInfo::iterator iter2 =
     this->CSInternal->ExposedPorts.begin();
   for (;iter2 != this->CSInternal->ExposedPorts.end(); ++iter2, numExposed++)
     {

@@ -80,6 +80,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMApplication.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMGlobalPropertiesManager.h"
+#include "vtkSMInputArrayDomain.h"
 #include "vtkSMPluginManager.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
@@ -367,6 +368,11 @@ void pqApplicationCore::loadGlobalPropertiesFromSettings()
     "GlobalProperties/EdgeColor",
     QColor::fromRgbF(0.0, 0, 0.5),
     "EdgeColor");
+
+  bool convert =_settings->value(
+    "GlobalProperties/AutoConvertProperties",false).toBool();
+  vtkSMInputArrayDomain::SetAutomaticPropertyConversion(convert);
+  emit this->forceFilterMenuRefresh();
 }
 
 //-----------------------------------------------------------------------------

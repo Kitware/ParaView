@@ -57,7 +57,7 @@ struct vtkSMSourceProxyInternals
   typedef vtkstd::vector<vtkSMSourceProxyOutputPort> VectorOfPorts;
   VectorOfPorts OutputPorts;
   vtkstd::vector<vtkSmartPointer<vtkSMSourceProxy> > SelectionProxies;
-  
+
   // Resizes output ports and ensures that Name for each port is initialized to
   // the default.
   void ResizeOutputPorts(unsigned int newsize)
@@ -91,8 +91,9 @@ vtkSMSourceProxy::vtkSMSourceProxy()
   this->OutputPortsCreated = 0;
 
   this->ExecutiveName = 0;
-  this->SetExecutiveName("vtkCompositeDataPipeline");
+  this->SetExecutiveName("vtkPVCompositeDataPipeline");
 
+  this->DoInsertPostFilter = true;
   this->DoInsertExtractPieces = 1;
   this->SelectionProxiesCreated = 0;
 
@@ -154,7 +155,7 @@ const char* vtkSMSourceProxy::GetOutputPortName(unsigned int index)
     {
     return 0;
     }
-  
+
   return this->PInternals->OutputPorts[index].Name.c_str();
 }
 
@@ -184,8 +185,8 @@ void vtkSMSourceProxy::UpdatePipelineInformation()
   if (!this->GetID().IsNull())
     {
     vtkClientServerStream command;
-    command << vtkClientServerStream::Invoke 
-      << this->GetID() << "UpdateInformation" 
+    command << vtkClientServerStream::Invoke
+      << this->GetID() << "UpdateInformation"
       << vtkClientServerStream::End;
 
     vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
@@ -196,10 +197,10 @@ void vtkSMSourceProxy::UpdatePipelineInformation()
   this->Superclass::UpdatePipelineInformation();
 
   this->InvokeEvent(vtkCommand::UpdateInformationEvent);
-  // this->MarkModified(this);  
+  // this->MarkModified(this);
 }
 //---------------------------------------------------------------------------
-int vtkSMSourceProxy::ReadXMLAttributes(vtkSMProxyManager* pm, 
+int vtkSMSourceProxy::ReadXMLAttributes(vtkSMProxyManager* pm,
                                         vtkPVXMLElement* element)
 {
   const char* executiveName = element->GetAttribute("executive");
@@ -228,7 +229,7 @@ int vtkSMSourceProxy::ReadXMLAttributes(vtkSMProxyManager* pm,
   for (unsigned int cc=0; cc < numElems; cc++)
     {
     vtkPVXMLElement* child = element->GetNestedElement(cc);
-    if (child && child->GetName() && 
+    if (child && child->GetName() &&
       strcmp(child->GetName(), "OutputPort")==0)
       {
       // Load output port configuration.
@@ -244,7 +245,7 @@ int vtkSMSourceProxy::ReadXMLAttributes(vtkSMProxyManager* pm,
         vtkErrorMacro("Missing OutputPort attribute 'name'.");
         return 0;
         }
-      this->PInternals->EnsureOutputPortsSize(index+1); 
+      this->PInternals->EnsureOutputPortsSize(index+1);
       this->PInternals->OutputPorts[index].Name = portname;
 
       // Load output port documentation.
@@ -275,7 +276,7 @@ void vtkSMSourceProxy::UpdatePipeline()
     return;
     }
 
-  this->CreateOutputPorts(); 
+  this->CreateOutputPorts();
   int num = this->GetNumberOfOutputPorts();
   for (int i=0; i < num; ++i)
     {
@@ -328,8 +329,8 @@ void vtkSMSourceProxy::CreateVTKObjects()
     {
     vtkClientServerID execId = pm->NewStreamObject(
       this->ExecutiveName, stream);
-    stream << vtkClientServerStream::Invoke 
-           << sourceID << "SetExecutive" << execId 
+    stream << vtkClientServerStream::Invoke
+           << sourceID << "SetExecutive" << execId
            << vtkClientServerStream::End;
     pm->DeleteStreamObject(execId, stream);
     }
@@ -339,21 +340,21 @@ void vtkSMSourceProxy::CreateVTKObjects()
   filterName_with_warning_C4701 << "Execute " << this->VTKClassName
                                 << " id: " << sourceID.ID << ends;
   vtkClientServerStream start;
-  start << vtkClientServerStream::Invoke << pm->GetProcessModuleID() 
+  start << vtkClientServerStream::Invoke << pm->GetProcessModuleID()
         << "LogStartEvent" << filterName_with_warning_C4701.str().c_str()
         << vtkClientServerStream::End;
   vtkClientServerStream end;
-  end << vtkClientServerStream::Invoke << pm->GetProcessModuleID() 
+  end << vtkClientServerStream::Invoke << pm->GetProcessModuleID()
       << "LogEndEvent" << filterName_with_warning_C4701.str().c_str()
       << vtkClientServerStream::End;
-  
-  stream << vtkClientServerStream::Invoke 
+
+  stream << vtkClientServerStream::Invoke
          << sourceID << "AddObserver" << "StartEvent" << start
          << vtkClientServerStream::End;
-  stream << vtkClientServerStream::Invoke 
+  stream << vtkClientServerStream::Invoke
          << sourceID << "AddObserver" << "EndEvent" << end
          << vtkClientServerStream::End;
-  
+
   pm->SendStream(this->ConnectionID, this->Servers, stream);
 
   this->PInternals->ResizeOutputPorts(
@@ -375,7 +376,7 @@ unsigned int vtkSMSourceProxy::GetNumberOfAlgorithmOutputPorts()
 
     // TODO replace this with UpdateInformation and OutputInformation
     // property.
-    vtkSmartPointer<vtkPVAlgorithmPortsInformation> info = 
+    vtkSmartPointer<vtkPVAlgorithmPortsInformation> info =
       vtkSmartPointer<vtkPVAlgorithmPortsInformation>::New();
 
     // Create one output port proxy for each output of the filter
@@ -490,10 +491,25 @@ void vtkSMSourceProxy::CreateOutputPortsInternal(vtkSMProxy* op)
         }
       }
     }
+
+  if ( this->DoInsertPostFilter&&
+       strcmp("vtkPVCompositeDataPipeline",this->ExecutiveName) == 0 )
+    {
+    //add the post filters to the source proxy
+    //so that we can do automatic conversion of properties.
+    for(it=this->PInternals->OutputPorts.begin();
+      it != this->PInternals->OutputPorts.end(); it++)
+        {
+        if ( this->GetNumberOfAlgorithmOutputPorts() > 0 )
+          {
+          it->Port.GetPointer()->InsertPostFilterIfNecessary();
+          }
+        }
+    }
 }
 
 //----------------------------------------------------------------------------
-void vtkSMSourceProxy::SetOutputPort(unsigned int index, const char* name, 
+void vtkSMSourceProxy::SetOutputPort(unsigned int index, const char* name,
   vtkSMOutputPort* port, vtkSMDocumentation* doc)
 {
   this->PInternals->EnsureOutputPortsSize(index+1);
@@ -526,16 +542,16 @@ void vtkSMSourceProxy::CleanInputs(const char* method)
 
   vtkClientServerStream stream;
   vtkClientServerID sourceID = this->GetID();
-  stream << vtkClientServerStream::Invoke 
-         << sourceID << method 
+  stream << vtkClientServerStream::Invoke
+         << sourceID << method
          << vtkClientServerStream::End;
-  
+
   pm->SendStream(this->ConnectionID, this->Servers, stream);
 }
 
 //----------------------------------------------------------------------------
 void vtkSMSourceProxy::AddInput(unsigned int inputPort,
-                                vtkSMSourceProxy *input, 
+                                vtkSMSourceProxy *input,
                                 unsigned int outputPort,
                                 const char* method)
 {
@@ -570,8 +586,8 @@ void vtkSMSourceProxy::AddInput(unsigned int inputPort,
     stream << sourceID << method << opPort->GetID();
     }
   stream << vtkClientServerStream::End;
-  pm->SendStream(this->ConnectionID, 
-                 this->Servers & input->GetServers(), 
+  pm->SendStream(this->ConnectionID,
+                 this->Servers & input->GetServers(),
                  stream);
 }
 
@@ -693,7 +709,7 @@ void vtkSMSourceProxy::CreateSelectionProxies()
 
   vtkClientServerStream stream;
   vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
-  unsigned int numOutputPorts = this->GetNumberOfOutputPorts(); 
+  unsigned int numOutputPorts = this->GetNumberOfOutputPorts();
   for (unsigned int cc=0; cc < numOutputPorts; cc++)
     {
     vtkSmartPointer<vtkSMSourceProxy> esProxy;
@@ -708,15 +724,15 @@ void vtkSMSourceProxy::CreateSelectionProxies()
 
       vtkSMOutputPort* port = this->GetOutputPort(cc);
       // We don't use input property since that leads to reference loop cycles
-      // and I don't feel like doing the garbage collection thing right now. 
+      // and I don't feel like doing the garbage collection thing right now.
       stream << vtkClientServerStream::Invoke
-             << port->GetProducerID() /* we use a crooked means of getting at 
+             << port->GetProducerID() /* we use a crooked means of getting at
                                          the ID so that this code works for
                                          vtkSMCompoundSourceProxy*/
              << "GetOutputPort"
              << port->GetPortIndex()
              << vtkClientServerStream::End;
-      stream << vtkClientServerStream::Invoke             
+      stream << vtkClientServerStream::Invoke
              << esProxy->GetID()
              << "SetInputConnection"
              << vtkClientServerStream::LastResult
@@ -834,6 +850,15 @@ void vtkSMSourceProxy::SetServers(vtkTypeUInt32 servers)
       {
       it->Port->SetServers(servers);
       }
+    }
+}
+
+//---------------------------------------------------------------------------
+void vtkSMSourceProxy::InsertPostFilter(bool insert)
+{
+  if ( this->DoInsertPostFilter != insert )
+    {
+    this->DoInsertPostFilter = insert;
     }
 }
 
