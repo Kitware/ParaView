@@ -23,8 +23,68 @@
 
 #include <vtksys/SystemTools.hxx>
 #include <vtksys/ios/sstream>
+#include "vtkstd/string"
+#include "vtkstd/vector"
+#include "vtksys/Process.h"
+#include "vtksys/stl/string"
+#include "vtksys/stl/vector"
+#include "vtkSocket.h"
 
 int vtkProcessModuleAutoMPI::UseMulticoreProcessors = 0;
+
+class vtkGetFreePort: public vtkSocket
+{
+public:
+  int getFreePort();
+};
+
+class vtkProcessModuleAutoMPIInternals
+{
+public:
+  // This specify the preflags and post flags that can be set using:
+  // VTK_MPI_PRENUMPROC_FLAGS VTK_MPI_PREFLAGS / VTK_MPI_POSTFLAGS at config time
+  vtkstd::vector<vtkstd::string> MPIPreNumProcFlags;
+  vtkstd::vector<vtkstd::string> MPIPreFlags;
+  vtkstd::vector<vtkstd::string> MPIPostFlags;
+
+  // MPIServerFlags allows you to specify flags specific for
+  // the client or the server
+  vtkstd::vector<vtkstd::string> MPIServerPreFlags;
+  vtkstd::vector<vtkstd::string> MPIServerPostFlags;
+
+  int TotalMulticoreProcessors;
+  double TimeOut;
+  vtkstd::string ParaView;  // fullpath to paraview executable
+  vtkstd::string ParaViewServer;  // fullpath to paraview server executable
+  vtkstd::string MPINumProcessFlag;
+  vtkstd::string MPIServerNumProcessFlag;
+  vtkstd::string MPIRun;  // fullpath to mpirun executable
+  vtkstd::string CurrentPrintLineName;
+
+  void SeparateArguments(const char* str,
+                         vtkstd::vector<vtkstd::string>& flags);
+  int StartRemoteBuiltInSelf (const char* servername,int port);
+  void ReportCommand (const char* const* command, const char* name);
+  int StartServer (vtksysProcess* server, const char* name,
+                   vtkstd::vector<char>& out,
+                   vtkstd::vector<char>& err);
+  int WaitForAndPrintLine (const char* pname, vtksysProcess* process,
+                           vtkstd::string& line, double timeout,
+                           vtkstd::vector<char>& out,
+                           vtkstd::vector<char>& err,
+                           int* foundWaiting);
+  int WaitForLine (vtksysProcess* process, vtkstd::string& line,
+                              double timeout,
+                              vtkstd::vector<char>& out,
+                              vtkstd::vector<char>& err);
+  void PrintLine (const char* pname, const char* line);
+  void CreateCommandLine (vtksys_stl::vector<const char*>& commandLine,
+                          const char* paraView,
+                          const char* numProc,
+                          int port);
+  bool CollectConfiguredOptions ();
+  bool SetMPIRun(vtkstd::string mpiexec);
+};
 
 //------------------------------------------------------------------------macro
 /*
@@ -35,30 +95,45 @@ vtkStandardNewMacro(vtkProcessModuleAutoMPI);
 //------------------------------------------------------------------------cnstr
 vtkProcessModuleAutoMPI::vtkProcessModuleAutoMPI()
 {
-  this->TimeOut = 300;
+  this->Internals = new vtkProcessModuleAutoMPIInternals;
+  this->Internals->TimeOut = 300;
   FreePort = new vtkGetFreePort();
 }
 
 //------------------------------------------------------------------------destr
 vtkProcessModuleAutoMPI::~vtkProcessModuleAutoMPI()
 {
+  delete this->Internals;
+  delete this->FreePort;
 }
 
-//-----------------------------------------------------------------------method
+//-----------------------------------------------------------------------static
+void vtkProcessModuleAutoMPI::SetUseMulticoreProcessors(int val)
+{
+  vtkProcessModuleAutoMPI::UseMulticoreProcessors = val;
+}
+
+//-----------------------------------------------------------------------public
+void vtkProcessModuleAutoMPI::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os, indent);
+}
+
+//-----------------------------------------------------------------------public
 /*
  * To determine if it is possible to use multi-cores on the system.
  *
  * @return 1 if possible and 0 if not
  */
-int vtkProcessModuleAutoMPI::isPossible()
+int vtkProcessModuleAutoMPI::IsPossible()
 {
-   this->TotalMulticoreProcessors =
+   this->Internals->TotalMulticoreProcessors =
      vtkMultiThreader::GetGlobalDefaultNumberOfThreads();
 
 #ifdef VTK_USE_MPI
-   if( this->TotalMulticoreProcessors >1
+   if( this->Internals->TotalMulticoreProcessors >1
      && UseMulticoreProcessors
-     && this->CollectConfiguredOptions())
+     && this->Internals->CollectConfiguredOptions())
     {
     return 1;
     }
@@ -71,7 +146,7 @@ int vtkProcessModuleAutoMPI::isPossible()
 #endif //VTK_USE_MPI
 }
 
-//-----------------------------------------------------------------------method
+//-----------------------------------------------------------------------public
 /*
  * This function is called the system running paraview is a multicore
  * and if the user chooses so. This enables a parallel server
@@ -82,7 +157,7 @@ int vtkProcessModuleAutoMPI::isPossible()
 int vtkProcessModuleAutoMPI::ConnectToRemoteBuiltInSelf()
 {
   int port = this->FreePort->getFreePort();
-  this->StartRemoteBuiltInSelf("localhost",port);
+  this->Internals->StartRemoteBuiltInSelf("localhost",port);
   return port;
 }
 
@@ -95,7 +170,7 @@ int vtkProcessModuleAutoMPI::ConnectToRemoteBuiltInSelf()
  * @param servername IN Sending in the server name (usually localhost or 127.0.0.1)
  * @return The port on which the server was started
  */
-int vtkProcessModuleAutoMPI::StartRemoteBuiltInSelf(const char* servername,int port)
+int vtkProcessModuleAutoMPIInternals::StartRemoteBuiltInSelf(const char* servername,int port)
 {
   // Create a new server process structure
   vtksysProcess* server =0;
@@ -113,11 +188,11 @@ int vtkProcessModuleAutoMPI::StartRemoteBuiltInSelf(const char* servername,int p
     {
     const char* serverExe = this->ParaViewServer.c_str();
 
-    this->CreateCommandLine(serverCommand,
-                            serverExe,
-                            this->MPIServerNumProcessFlag.c_str(),
-                            port);
-    this->ReportCommand(&serverCommand[0], "server");
+    CreateCommandLine(serverCommand,
+                      serverExe,
+                      this->MPIServerNumProcessFlag.c_str(),
+                      port);
+    ReportCommand(&serverCommand[0], "server");
     vtksysProcess_SetCommand(server, &serverCommand[0]);
     }
 
@@ -126,10 +201,10 @@ int vtkProcessModuleAutoMPI::StartRemoteBuiltInSelf(const char* servername,int p
   vtkstd::vector<char> ServerStdErr;
 
  // Start the data server if there is one
-  if(!this->StartServer(server, "server",
+  if(!StartServer(server, "server",
                         ServerStdOut, ServerStdErr))
     {
-    cerr << "vtkprocessModuleAutoMPI: Server never started.\n";
+    cerr << "vtkProcessModuleAutoMPIInternals: Server never started.\n";
     vtksysProcess_Delete(server);;
     return -1;
     }
@@ -139,10 +214,10 @@ int vtkProcessModuleAutoMPI::StartRemoteBuiltInSelf(const char* servername,int p
 
 //-----------------------------------------------------------------------method
 /*
- * Used to set the this->MPIRun variable to the appropriate MPI path
+ * Used to set the this->Internals->MPIRun variable to the appropriate MPI path
  *
  */
-bool vtkProcessModuleAutoMPI::SetMPIRun(vtkstd::string mpiexec)
+bool vtkProcessModuleAutoMPIInternals::SetMPIRun(vtkstd::string mpiexec)
 {
   mpiexec = vtksys::SystemTools::GetFilenameName(mpiexec);
   vtkPVOptions* options = vtkProcessModule::GetProcessModule()->GetOptions();
@@ -166,12 +241,12 @@ bool vtkProcessModuleAutoMPI::SetMPIRun(vtkstd::string mpiexec)
  *
  * @return 1 if the configuration options were obtained successfully. 0 if failed
  */
-bool vtkProcessModuleAutoMPI::CollectConfiguredOptions()
+bool vtkProcessModuleAutoMPIInternals::CollectConfiguredOptions()
 {
 // set the path to the binary directory
   this->ParaViewServer = PARAVIEW_BINARY_DIR;
 #ifdef  CMAKE_INTDIR
-  this->ParaViewServer  += "/" CMAKE_INTDIR;
+  this->Internals->ParaViewServer  += "/" CMAKE_INTDIR;
 #endif
   // now set the final execuable names
   this->ParaViewServer += "/" PARAVIEW_SERVER;
@@ -200,7 +275,7 @@ bool vtkProcessModuleAutoMPI::CollectConfiguredOptions()
     return;
 # endif
 #ifdef VTK_MPI_PRENUMPROC_FLAGS
-    this->SeparateArguments(VTK_MPI_PRENUMPROC_FLAGS, this->MPIPreNumProcFlags);
+    this->Internal->SeparateArguments(VTK_MPI_PRENUMPROC_FLAGS, this->MPIPreNumProcFlags);
 #endif
 # ifdef VTK_MPI_PREFLAGS
     this->SeparateArguments(VTK_MPI_PREFLAGS, this->MPIPreFlags);
@@ -233,7 +308,7 @@ bool vtkProcessModuleAutoMPI::CollectConfiguredOptions()
  * @param port the port where the server will be listening
  */
 void
-vtkProcessModuleAutoMPI::CreateCommandLine(vtksys_stl::vector<const char*>& commandLine,
+vtkProcessModuleAutoMPIInternals::CreateCommandLine(vtksys_stl::vector<const char*>& commandLine,
                                            const char* paraView,
                                            const char* numProc,
                                            int port)
@@ -280,7 +355,7 @@ vtkProcessModuleAutoMPI::CreateCommandLine(vtksys_stl::vector<const char*>& comm
 }
 
 //----------------------------------------------------------------------method
-void vtkProcessModuleAutoMPI::SeparateArguments(const char* str,
+void vtkProcessModuleAutoMPIInternals::SeparateArguments(const char* str,
                                      vtkstd::vector<vtkstd::string>& flags)
 {
   vtkstd::string arg = str;
@@ -301,7 +376,7 @@ void vtkProcessModuleAutoMPI::SeparateArguments(const char* str,
 }
 
 //----------------------------------------------------------------------method
-void vtkProcessModuleAutoMPI::PrintLine(const char* pname, const char* line)
+void vtkProcessModuleAutoMPIInternals::PrintLine(const char* pname, const char* line)
 {
   // if the name changed then the line is output from a different process
   if(this->CurrentPrintLineName != pname)
@@ -316,7 +391,7 @@ void vtkProcessModuleAutoMPI::PrintLine(const char* pname, const char* line)
 }
 
 //----------------------------------------------------------------------method
-void vtkProcessModuleAutoMPI::ReportCommand(const char* const* command, const char* name)
+void vtkProcessModuleAutoMPIInternals::ReportCommand(const char* const* command, const char* name)
 {
   cerr << "AutoMPI: " << name << " command is:\n";
   for(const char* const * c = command; *c; ++c)
@@ -337,7 +412,7 @@ void vtkProcessModuleAutoMPI::ReportCommand(const char* const* command, const ch
  * @param err OUT Piped stderr to find the status of the server
  * @return 0 = failure : 1 = success
  */
-int vtkProcessModuleAutoMPI::StartServer(vtksysProcess* server, const char* name,
+int vtkProcessModuleAutoMPIInternals::StartServer(vtksysProcess* server, const char* name,
                               vtkstd::vector<char>& out,
                               vtkstd::vector<char>& err)
 {
@@ -352,7 +427,7 @@ int vtkProcessModuleAutoMPI::StartServer(vtksysProcess* server, const char* name
   vtkstd::string output;
   while(!foundWaiting)
     {
-    int pipe = this->WaitForAndPrintLine(name, server, output, 100.0, out, err,
+    int pipe = WaitForAndPrintLine(name, server, output, 100.0, out, err,
                                          &foundWaiting);
     if(pipe == vtksysProcess_Pipe_None ||
        pipe == vtksysProcess_Pipe_Timeout)
@@ -374,16 +449,16 @@ int vtkProcessModuleAutoMPI::StartServer(vtksysProcess* server, const char* name
 }
 
 //----------------------------------------------------------------------method
-int vtkProcessModuleAutoMPI::WaitForAndPrintLine(const char* pname, vtksysProcess* process,
+int vtkProcessModuleAutoMPIInternals::WaitForAndPrintLine(const char* pname, vtksysProcess* process,
                                       vtkstd::string& line, double timeout,
                                       vtkstd::vector<char>& out,
                                       vtkstd::vector<char>& err,
                                       int* foundWaiting)
 {
-  int pipe = this->WaitForLine(process, line, timeout, out, err);
+  int pipe = WaitForLine(process, line, timeout, out, err);
   if(pipe == vtksysProcess_Pipe_STDOUT || pipe == vtksysProcess_Pipe_STDERR)
     {
-    this->PrintLine(pname, line.c_str());
+    PrintLine(pname, line.c_str());
     if(foundWaiting && (line.find("Waiting") != line.npos))
       {
       *foundWaiting = 1;
@@ -393,7 +468,7 @@ int vtkProcessModuleAutoMPI::WaitForAndPrintLine(const char* pname, vtksysProces
 }
 
 //-----------------------------------------------------------------------method
-int vtkProcessModuleAutoMPI::WaitForLine(vtksysProcess* process, vtkstd::string& line,
+int vtkProcessModuleAutoMPIInternals::WaitForLine(vtksysProcess* process, vtkstd::string& line,
                               double timeout,
                               vtkstd::vector<char>& out,
                               vtkstd::vector<char>& err)
@@ -504,25 +579,14 @@ int vtkGetFreePort::getFreePort()
     return -1;
     }
 
-  if(this->BindSocket(this->SocketDescriptor,0))
+  if(BindSocket(this->SocketDescriptor,0))
     {
     vtkErrorMacro("Failed to bind socket.");
     return -1;
     }
 
-  int port = this->GetPort(this->SocketDescriptor);
-  this->CloseSocket(this->SocketDescriptor);
+  int port = GetPort(this->SocketDescriptor);
+  CloseSocket(this->SocketDescriptor);
 
   return port;
-}
-
-void vtkProcessModuleAutoMPI::setUseMulticoreProcessors(int val)
-{
-  vtkProcessModuleAutoMPI::UseMulticoreProcessors = val;
-}
-
-//-----------------------------------------------------------------------------
-void vtkProcessModuleAutoMPI::PrintSelf(ostream& os, vtkIndent indent)
-{
-  this->Superclass::PrintSelf(os, indent);
 }
