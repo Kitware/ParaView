@@ -160,8 +160,6 @@ SET(Filters_SRCS
   vtkPVRecoverGeometryWireframe.cxx
   vtkPV2DRenderView.cxx
   vtkPVRenderView.cxx
-  vtkPVRenderViewWithShadowMap.cxx
-  vtkPVRenderViewWithSobel.cxx
   vtkPVRenderViewProxy.cxx
   vtkPVRepresentedDataInformation.cxx
   vtkPVScalarBarActor.cxx
