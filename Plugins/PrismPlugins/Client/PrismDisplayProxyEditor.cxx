@@ -955,22 +955,14 @@ void PrismDisplayProxyEditor::zoomToData()
     return;
     }
 
-  double bounds[6];
-#ifdef MULTIPASS_FIXME
-  this->Internal->Representation->getRepresentationProxy()->GetBounds(bounds);
-  if (bounds[0]<=bounds[1] && bounds[2]<=bounds[3] && bounds[4]<=bounds[5])
+  pqRenderView* renModule = qobject_cast<pqRenderView*>(
+    this->Internal->Representation->getView());
+  if (renModule)
     {
-    pqRenderView* renModule = qobject_cast<pqRenderView*>(
-      this->Internal->Representation->getView());
-    if (renModule)
-      {
-      vtkSMRenderViewProxy* rm = renModule->getRenderViewProxy();
-      rm->ResetCamera(bounds);
-      renModule->render();
-      }
+    vtkSMRenderViewProxy* rm = renModule->getRenderViewProxy();
+    rm->ZoomTo(this->Internal->Representation->getProxy());
+    renModule->render();
     }
-#endif
-  cout << "this remains to be supported." << endl;
 }
 
 //-----------------------------------------------------------------------------
