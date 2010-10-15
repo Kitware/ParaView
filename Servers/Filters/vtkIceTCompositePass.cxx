@@ -84,7 +84,7 @@ vtkIceTCompositePass::vtkIceTCompositePass()
   this->UseOrderedCompositing = false;
   this->DepthOnly=false;
 
-  this->LastRenderedRGBAColors = vtkUnsignedCharArray::New();
+  this->LastRenderedRGBAColors = new vtkSynchronizedRenderers::vtkRawImage();
   this->LastRenderedDepths = vtkFloatArray::New();
 
   this->PBO=0;
@@ -117,8 +117,9 @@ vtkIceTCompositePass::~vtkIceTCompositePass()
   this->IceTContext->Delete();
   this->IceTContext = 0;
 
-  this->LastRenderedRGBAColors->Delete();
+  delete this->LastRenderedRGBAColors;
   this->LastRenderedRGBAColors = NULL;
+
   this->LastRenderedDepths->Delete();
   this->LastRenderedDepths = NULL;
 
@@ -369,15 +370,16 @@ void vtkIceTCompositePass::Render(const vtkRenderState* render_state)
   vtkIdType numPixels = icetImageGetNumPixels(renderedImage);
   if (icetImageGetColorFormat(renderedImage) != ICET_IMAGE_COLOR_NONE)
     {
-    this->LastRenderedRGBAColors->SetNumberOfComponents(4);
-    this->LastRenderedRGBAColors->SetNumberOfTuples(numPixels);
+    this->LastRenderedRGBAColors->Resize(icetImageGetWidth(renderedImage),
+      icetImageGetHeight(renderedImage), 4);
     icetImageCopyColorub(renderedImage,
-                         this->LastRenderedRGBAColors->GetPointer(0),
-                         ICET_IMAGE_COLOR_RGBA_UBYTE);
+      this->LastRenderedRGBAColors->GetRawPtr()->GetPointer(0),
+      ICET_IMAGE_COLOR_RGBA_UBYTE);
+    this->LastRenderedRGBAColors->MarkValid();
     }
   else
     {
-    this->LastRenderedRGBAColors->SetNumberOfTuples(0);
+    this->LastRenderedRGBAColors->MarkInValid();
     }
   if (icetImageGetDepthFormat(renderedImage) != ICET_IMAGE_DEPTH_NONE)
     {
@@ -572,33 +574,14 @@ void vtkIceTCompositePass::GetLastRenderedTile(
   vtkSynchronizedRenderers::vtkRawImage& tile)
 {
   tile.MarkInValid();
-
-  IceTInt color_format;
-  icetGetIntegerv(ICET_COLOR_FORMAT, &color_format);
-  int width  = this->LastTileViewport[2] - this->LastTileViewport[0] +1;
-  int height = this->LastTileViewport[3] - this->LastTileViewport[1] +1;
-
-  // FIXME: when image_reduction_factor > 1, we need to scale width and height
-  // accordingly.
-
-  if (width <= 1 || height <= 1)
+  if (!this->LastRenderedRGBAColors->IsValid() ||
+    this->LastRenderedRGBAColors->GetWidth() < 1 ||
+    this->LastRenderedRGBAColors->GetHeight() < 1)
     {
     return;
     }
 
-  tile.Resize(width, height, 4);
-
-  if (this->LastRenderedRGBAColors->GetNumberOfTuples() != width*height)
-    {
-    vtkErrorMacro(<< "LastTileViewport size (" << width << "x" << height
-                  << ") does not match"
-                  << " LastRenderedRGBAColors size ("
-                  << this->LastRenderedRGBAColors->GetNumberOfTuples()
-                  << ")");
-    return;
-    }
-
-  tile.GetRawPtr()->DeepCopy(this->LastRenderedRGBAColors);
+  tile = (*this->LastRenderedRGBAColors);
 }
 
 //----------------------------------------------------------------------------
@@ -789,15 +772,15 @@ void vtkIceTCompositePass::PushIceTColorBufferToScreen(
     this->IceTTexture->SetContext(context);
     }
 
-  if (this->LastRenderedRGBAColors->GetNumberOfTuples() != w*h)
+  if (this->LastRenderedRGBAColors->GetRawPtr()->GetNumberOfTuples() != w*h)
     {
     vtkErrorMacro(<< "Tile viewport size (" << w << "x" << h << ") does not"
-                  << " match captured color image ("
-                  << this->LastRenderedRGBAColors->GetNumberOfTuples() << ")");
+      << " match captured color image ("
+      << this->LastRenderedRGBAColors->GetRawPtr()->GetNumberOfTuples() << ")");
     return;
     }
 
-  unsigned char *rgbaBuffer=this->LastRenderedRGBAColors->GetPointer(0);
+  unsigned char *rgbaBuffer=this->LastRenderedRGBAColors->GetRawPtr()->GetPointer(0);
 
   // client to PBO
   this->PBO->Upload2D(VTK_UNSIGNED_CHAR,rgbaBuffer,dims,4,continuousInc);

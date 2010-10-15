@@ -204,7 +204,7 @@ protected:
 
   int ImageReductionFactor;
 
-  vtkUnsignedCharArray *LastRenderedRGBAColors;
+  vtkSynchronizedRenderers::vtkRawImage* LastRenderedRGBAColors;
   vtkFloatArray *LastRenderedDepths;
 
   vtkPixelBufferObject *PBO;

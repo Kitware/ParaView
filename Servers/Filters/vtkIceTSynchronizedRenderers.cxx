@@ -30,7 +30,8 @@
 
 #include <assert.h>
 #include <vtkgl.h>
-#include <GL/ice-t.h>
+#include <IceT.h>
+#include <IceTGL.h>
 
 #include <vtkstd/map>
 
@@ -146,9 +147,8 @@ public:
     // explicitly if needed. This is required since IceT/Viewport interactions
     // lead to weird results in multi-view configurations. Much easier to simply
     // paste back the image to the correct region after icet has rendered.
-    icetDisable(ICET_DISPLAY);
-    icetDisable(ICET_DISPLAY_INFLATE);
-    icetDisable(ICET_CORRECT_COLORED_BACKGROUND);
+    icetDisable(ICET_GL_DISPLAY);
+    icetDisable(ICET_GL_DISPLAY_INFLATE);
 
     vtkRenderWindow* window = render_state->GetRenderer()->GetRenderWindow();
     int *size = window->GetActualSize();
