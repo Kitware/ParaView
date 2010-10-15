@@ -12,7 +12,6 @@ INCLUDE_DIRECTORIES(
   ${PARAVIEW_INCLUDE_DIRS}
   ${ParaView_SOURCE_DIR}/VTK/GUISupport/Qt
   ${ParaView_BINARY_DIR}/VTK/GUISupport/Qt
-  ${ParaView_SOURCE_DIR}/VTK/GUISupport/Qt/Chart
   ${QtTesting_SOURCE_DIR}
   ${QtTesting_BINARY_DIR}
   ${QtWidgets_SOURCE_DIR}

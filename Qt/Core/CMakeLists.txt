@@ -395,7 +395,6 @@ TARGET_LINK_LIBRARIES(pqCore
   QtTesting
   pqWidgets
   QVTK
-  vtkQtChart
   vtkCharts
   vtkPVServerManager
 )
