@@ -36,7 +36,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqCoreExport.h"
 #include <QSortFilterProxyModel>
-#include <QList>
 #include <QRegExp>
 class pqFileDialogModel;
 
@@ -50,7 +49,7 @@ public:
   ~pqFileDialogFilter();
 
 public slots:
-  void setFilter(const QStringList& wildcards);
+  void setFilter(const QString& filter);
   void setShowHidden( const bool &hidden);
   bool getShowHidden(){return showHidden;};
 
@@ -58,7 +57,7 @@ protected:
   bool filterAcceptsRow(int row_source, const QModelIndex& source_parent) const;
 
   pqFileDialogModel* Model;
-  QList<QRegExp> Wildcards;
+  QRegExp Wildcards;
   bool showHidden;
 };
 

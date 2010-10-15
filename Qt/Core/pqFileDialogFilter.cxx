@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QIcon>
 #include <QFileIconProvider>
+#include <QStringBuilder>
 
 #include "pqFileDialogModel.h"
 
@@ -42,19 +43,38 @@ pqFileDialogFilter::pqFileDialogFilter(pqFileDialogModel* model, QObject* Parent
   : QSortFilterProxyModel(Parent), Model(model), showHidden(false)
 {
   this->setSourceModel(model);
+  this->Wildcards.setPatternSyntax(QRegExp::RegExp2);
+  this->Wildcards.setCaseSensitivity(Qt::CaseSensitive);
 }
 
 pqFileDialogFilter::~pqFileDialogFilter()
 {
 }
 
-void pqFileDialogFilter::setFilter(const QStringList& wildcards)
+void pqFileDialogFilter::setFilter(const QString& filter)
 {
-  Wildcards.clear();
-  foreach(QString p, wildcards)
+  QString f(filter);
+  // if we have (...) in our filter, strip everything out but the contents of ()
+  int start, end;
+  start = filter.indexOf('(');
+  end = filter.lastIndexOf(')');
+  if(start != -1 && end != -1)
     {
-    Wildcards.append(QRegExp(p, Qt::CaseInsensitive, QRegExp::Wildcard));
+    f = f.mid(start+1, end-start-1);
     }
+  QString pattern = ".*";
+  if ( f != "*" )
+    {
+    f.replace(QRegExp("[\\s+;]+"),"|");
+    f.replace("*.","");
+    //use non capturing(?:) for speed
+    QString postExtFileSeries("(?:\\.\\d+)*"); // match file series like: vtk.01
+    pattern = ".*\\.(?:" % f % ")" % postExtFileSeries % "$";
+    //pattern string at the end will look like:
+    //".*\.(?:vtk|vtp|vtu)(?:\\.\\d+)*$"
+    }
+
+  this->Wildcards.setPattern(pattern);
   this->invalidateFilter();
 }
 
@@ -100,12 +120,7 @@ bool pqFileDialogFilter::filterAcceptsRow(int row_source, const QModelIndex& sou
     str = strList.at(0);
     }
 
-  int i, end = this->Wildcards.size();
-  for ( i = 0; i < end && pass == false; i ++ )
-    {
-    pass = this->Wildcards[i].exactMatch(str);
-    }
-
+  pass = this->Wildcards.exactMatch(str);
   return pass;
 }
 
