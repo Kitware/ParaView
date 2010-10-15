@@ -90,6 +90,7 @@ SET (TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/XdmfGridAttributes.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/XYChart.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/XYHistogram.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/ZLibXDMF.xml
   #  ${CMAKE_CURRENT_SOURCE_DIR}/XYBarChart.xml
 )
 
@@ -124,6 +125,8 @@ SET (ComparativeVisPanel_BREAK TRUE)
 SET (SpreadSheet1_BREAK TRUE)
 SET (SPTimeseries_BREAK TRUE)
 SET (XYChart_BREAK TRUE)
+SET (XYHistogram_BREAK TRUE)
+
 
 
 # Add image threshold overrides for tests.
