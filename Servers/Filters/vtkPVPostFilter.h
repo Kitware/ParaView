@@ -44,6 +44,8 @@ protected:
   vtkPVPostFilter();
   ~vtkPVPostFilter();
 
+
+  virtual int FillInputPortInformation( int port, vtkInformation* info);
   virtual int RequestDataObject(vtkInformation *, vtkInformationVector **, vtkInformationVector *);
   virtual int RequestData(vtkInformation *, vtkInformationVector **, vtkInformationVector *);
 
