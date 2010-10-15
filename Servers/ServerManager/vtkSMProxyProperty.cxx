@@ -350,7 +350,7 @@ void vtkSMProxyProperty::WriteTo(vtkSMMessage* message)
 }
 
 //---------------------------------------------------------------------------
-void vtkSMProxyProperty::ReadFrom(vtkSMMessage* message, int message_offset)
+void vtkSMProxyProperty::ReadFrom(const vtkSMMessage* message, int message_offset)
 {
   abort();
   (void)message;

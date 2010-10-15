@@ -121,6 +121,7 @@
 #define __vtkSMProxy_h
 
 #include "vtkSMRemoteObject.h"
+#include "vtkSMMessage.h"
 #include "vtkClientServerID.h" // needed for vtkClientServerID
 
 //BTX
@@ -349,7 +350,7 @@ public:
   // argument is not NULL then it's also inserted as a nested element.
   // This call saves all a proxy's properties, including exposed properties
   // and sub-proxies. More control is provided by the following overload.
-  vtkPVXMLElement* SaveState(vtkPVXMLElement* root);
+  vtkPVXMLElement* SaveXMLState(vtkPVXMLElement* root);
 
   // Description:
   // Loads the proxy state from the XML element. Returns 0 on failure.
@@ -357,10 +358,21 @@ public:
   // state XML (which happens in case of properties of type vtkSMProxyProperty
   // or subclasses). If locator is NULL, then such properties are left
   // unchanged.
-  virtual int LoadState(vtkPVXMLElement* element, vtkSMProxyLocator* locator);
-
+  virtual int LoadXMLState(vtkPVXMLElement* element, vtkSMProxyLocator* locator);
 
 //BTX
+
+  // Description:
+  // This method return the full object state that can be used to create that
+  // object from scratch.
+  // This method will be used to fill the undo stack.
+  // If not overriden this will return NULL.
+  virtual const vtkSMMessage* GetFullState();
+
+  // Description:
+  // This method is used to initialise the object to the given state
+  virtual void LoadState(const vtkSMMessage* msg);
+
 protected:
   vtkSMProxy();
   ~vtkSMProxy();
@@ -598,6 +610,9 @@ protected:
   vtkSMDocumentation* Documentation;
   vtkPVXMLElement* Hints;
   vtkPVXMLElement* Deprecated;
+
+  // Cached version of State
+  vtkSMMessage* State;
 
   // Flag used to break consumer loops.
   int InMarkModified;

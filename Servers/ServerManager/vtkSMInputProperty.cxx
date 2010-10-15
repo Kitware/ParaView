@@ -63,7 +63,7 @@ void vtkSMInputProperty::WriteTo(vtkSMMessage* message)
 }
 
 //---------------------------------------------------------------------------
-void vtkSMInputProperty::ReadFrom(vtkSMMessage* message, int message_offset)
+void vtkSMInputProperty::ReadFrom(const vtkSMMessage* message, int message_offset)
 {
   (void) message;
   (void) message_offset;

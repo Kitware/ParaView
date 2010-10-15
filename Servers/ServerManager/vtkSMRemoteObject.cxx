@@ -80,6 +80,7 @@ void vtkSMRemoteObject::PushState(vtkSMMessage* msg)
     }
   else
     {
+    vtkErrorMacro("No session found");
     // FIXME Throw exception or error feed back : Not PVSession found !
     }
 }

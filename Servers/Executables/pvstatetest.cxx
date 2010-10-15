@@ -1,7 +1,7 @@
 /*=========================================================================
 
 Program:   ParaView
-Module:    pvstatetest.cxx
+Module:    pvserver.cxx
 
 Copyright (c) Kitware, Inc.
 All rights reserved.
@@ -22,86 +22,127 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkSMSourceProxy.h"
 #include "vtkPVDataInformation.h"
 
-#include "vtkPVXMLElement.h"
-
+#include "vtkSMMessage.h"
 #include "paraview.h"
+
+#include "vtkSMSessionClient.h"
 
 //----------------------------------------------------------------------------
 int main(int argc, char* argv[])
 {
-  vtkPVServerOptions* options = vtkPVServerOptions::New();
-  vtkInitializationHelper::Initialize( argc, argv,
-                                       vtkProcessModule2::PROCESS_BATCH,
-                                       options );
-
-  //---------------------------------------------------------------------------
   int return_value = EXIT_SUCCESS;
-  vtkSmartPointer<vtkPVXMLElement> xmlRootNodeOrigin;
-  vtkSmartPointer<vtkPVXMLElement> xmlRootNodeLoaded;
-  //---------------------------------------------------------------------------
-  vtkSMSession* session = vtkSMSession::New();
-  cout << "==== Starting ====" << endl;
-  vtkSMProxyManager* pxm = session->GetProxyManager();
 
-  vtkSMProxy* proxy = pxm->NewProxy("sources", "SphereSource");
-  vtkSMPropertyHelper(proxy, "PhiResolution").Set(20);
-  vtkSMPropertyHelper(proxy, "ThetaResolution").Set(20);
+  vtkPVServerOptions* options = vtkPVServerOptions::New();
+  vtkInitializationHelper::Initialize(argc, argv,
+    vtkProcessModule2::PROCESS_BATCH, options);
+  //---------------------------------------------------------------------------
+
+  vtkSMSession* session = NULL;
+  vtkSMProxy* proxy = NULL;
+  if(options->GetUnknownArgument())
+    {
+    // We have a remote URL to use
+    session = vtkSMSessionClient::New();
+    vtkSMSessionClient::SafeDownCast(session)->Connect(options->GetUnknownArgument());
+    }
+  else
+    {
+    // We are in built-in mode
+    session = vtkSMSession::New();
+    }
+
+  cout << "Starting..." << endl;
+  vtkSMProxyManager* pxm = session->GetProxyManager();
+  vtkSMMessage origin, editA, editB, editC;
+  // ==========================================================================
+
+  proxy = pxm->NewProxy("sources", "SphereSource");
+  if(proxy->GetFullState())
+    {
+    return_value = EXIT_FAILURE;
+    cout << "Error the initial state should be NULL before any UpdateVTKObjects" << endl;
+    }
   proxy->UpdateVTKObjects();
 
-  vtkSMSourceProxy* shrink =
-      vtkSMSourceProxy::SafeDownCast(
-          pxm->NewProxy("filters", "ShrinkFilter"));
+  // Initial values
+  if(!proxy->GetFullState())
+    {
+    return_value = EXIT_FAILURE;
+    cout << "Error after UpdateVTKObjects, the State shouldn't be NULL" << endl;
+    }
+  origin = *proxy->GetFullState();
+  cout << "====== Origin ======" << endl;
+  origin.PrintDebugString();
 
-  vtkSMPropertyHelper(shrink, "Input").Set(proxy);
-  shrink->UpdateVTKObjects();
-  shrink->UpdatePipeline();
+  // Edition A
+  vtkSMPropertyHelper(proxy, "PhiResolution").Set(20);
+  vtkSMPropertyHelper(proxy, "ThetaResolution").Set(30);
+  proxy->UpdateVTKObjects();
+  editA = *proxy->GetFullState();
+  cout << "====== Edition A ======" << endl;
+  editA.PrintDebugString();
 
-  //shrink->GetDataInformation(0)->Print(cout);
+  // Edition B
+  double center[3] = {1,2,3};
+  vtkSMPropertyHelper(proxy, "PhiResolution").Set(40);
+  vtkSMPropertyHelper(proxy, "ThetaResolution").Set(50);
+  vtkSMPropertyHelper(proxy, "Center").Set(center, 3);
+  proxy->UpdateVTKObjects();
+  editB = *proxy->GetFullState();
+  cout << "====== Edition B ======" << endl;
+  editB.PrintDebugString();
 
-  pxm->RegisterProxy("sources", "sphere", proxy);
-  pxm->RegisterProxy("filters", "shrink", shrink);
+  // Load previous state
+  proxy->LoadState(&origin);
+  proxy->UpdateVTKObjects();
+  editC = *proxy->GetFullState();
+  cout << "====== Edition C (Load origin) ======" << endl;
+  if(editC.SerializeAsString() != origin.SerializeAsString())
+    {
+    return_value = EXIT_FAILURE;
+    cout << "Error origin state and state after load origin differ !!!" << endl;
+    editC.PrintDebugString();
+    }
+  else
+    {
+    cout << " - OK" << endl;
+    }
 
-  // Try to build XML state
-  xmlRootNodeOrigin.TakeReference(pxm->SaveState());
-  xmlRootNodeOrigin->PrintXML();
+  // Load previous state
+  proxy->LoadState(&editA);
+  proxy->UpdateVTKObjects();
+  editC = *proxy->GetFullState();
+  cout << "====== Edition C (Load editA) ======" << endl;
+  if(editC.SerializeAsString() != editA.SerializeAsString())
+    {
+    return_value = EXIT_FAILURE;
+    cout << "Error editA state and state after load origin differ !!!" << endl;
+    editC.PrintDebugString();
+    }
+  else
+    {
+    cout << " - OK" << endl;
+    }
 
-  cout << "==== End of State creation ===" << endl;
+  // Load previous state
+  proxy->LoadState(&editB);
+  proxy->UpdateVTKObjects();
+  editC = *proxy->GetFullState();
+  cout << "====== Edition C (Load editB) ======" << endl;
+  if(editC.SerializeAsString() != editB.SerializeAsString())
+    {
+    return_value = EXIT_FAILURE;
+    cout << "Error editB state and state after load origin differ !!!" << endl;
+    editC.PrintDebugString();
+    }
+  else
+    {
+    cout << " - OK" << endl;
+    }
 
-  cout << "==== Clear proxyManager state ===" << endl;
-  pxm->UnRegisterProxies();;
+  // ==========================================================================
   proxy->Delete();
-  shrink->Delete();
-
-  cout << "==== Make sure that the state is empty ===" << endl;
-  xmlRootNodeLoaded.TakeReference(pxm->SaveState());
-  //xmlRootNodeLoaded->PrintXML();
-  if( pxm->GetProxy("sources", "sphere") && pxm->GetProxy("filters", "shrink") )
-    {
-    cout << " - Error in clearing" << endl;
-    return_value = EXIT_FAILURE;
-    }
-  else
-    {
-    cout << " - Clearing done" << endl;
-    }
-
-  cout << "==== Loading previous state ====" << endl;
-  pxm->LoadState(xmlRootNodeOrigin);
-  xmlRootNodeLoaded.TakeReference(pxm->SaveState());
-  xmlRootNodeLoaded->PrintXML();
-  cout << "==== End of state loading ====" << endl;
-
-  //---------------------------------------------------------------------------
-  if( pxm->GetProxy("sources", "sphere") && pxm->GetProxy("filters", "shrink")
-      && return_value == EXIT_SUCCESS )
-    {
-    cout << endl << " ### SUCESS: States are equals ###" << endl;
-    }
-  else
-    {
-    cout << endl << " ### FAILED: States are NOT equals ###" << endl;
-    return_value = EXIT_FAILURE;
-    }
+  cout << "Exiting..." << endl;
   session->Delete();
 
   //---------------------------------------------------------------------------

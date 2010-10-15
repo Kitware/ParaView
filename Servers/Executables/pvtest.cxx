@@ -54,7 +54,7 @@ int main(int argc, char* argv[])
 
   vtkSMProxyManager* pxm = session->GetProxyManager();
 
-  for(int i=0;i<100;i++)
+  for(int i=0;i<10;i++)
     {
     cout << " Processing loop: " << i << endl;
 

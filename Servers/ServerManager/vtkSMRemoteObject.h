@@ -79,6 +79,17 @@ protected:
   void Invoke(vtkSMMessage* msg);
 
   // Description:
+  // This method return the full object state that can be used to create that
+  // object from scratch.
+  // This method will be used to fill the undo stack.
+  // If not overriden this will return NULL.
+  virtual const vtkSMMessage* GetFullState() = 0;
+
+  // Description:
+  // This method is used to initialise the object to the given state
+  virtual void LoadState(const vtkSMMessage* msg) = 0;
+
+  // Description:
   // Destroys the vtkPMObject associated with this->GlobalID.
   void DestroyPMObject();
 

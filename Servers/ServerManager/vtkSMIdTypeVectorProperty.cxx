@@ -61,7 +61,7 @@ void vtkSMIdTypeVectorProperty::WriteTo(vtkSMMessage* msg)
 }
 
 //---------------------------------------------------------------------------
-void vtkSMIdTypeVectorProperty::ReadFrom(vtkSMMessage* msg, int offset)
+void vtkSMIdTypeVectorProperty::ReadFrom(const vtkSMMessage* msg, int offset)
 {
   //cout << ">>>>>>>>>>>>" << endl;
   //msg->PrintDebugString();

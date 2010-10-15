@@ -90,7 +90,7 @@ int vtkSMDeserializer::LoadProxyState(
   vtkPVXMLElement* element, vtkSMProxy* proxy,
   vtkSMProxyLocator* locator)
 {
-  return proxy->LoadState(element, locator);
+  return proxy->LoadXMLState(element, locator);
 }
 
 

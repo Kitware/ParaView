@@ -73,6 +73,7 @@ SET (Kit_SRCS
   vtkSMStateVersionControllerBase.cxx
   vtkSMStateVersionController.cxx
   vtkSMStringVectorProperty.cxx
+  vtkSMUndoElement.cxx
   vtkSMVectorProperty.cxx
   vtkSMWriterFactory.cxx
   vtkSMWriterProxy.cxx
@@ -110,7 +111,7 @@ SET (Kit_SRCS
   ${Domain_SRCS}
 )
 
-IF (FIXME)
+IF (FIXME) #-------------------------------------------------------------- BEGIN
 SET(Kit_SRCS
   vtkSMAnimationCueManipulatorProxy.cxx
   vtkSMAnimationCueProxy.cxx
@@ -240,7 +241,6 @@ SET(Kit_SRCS
   vtkSMTimeStepsInformationHelper.cxx
   vtkSMTransformProxy.cxx
   vtkSMTwoDRenderViewProxy.cxx
-  vtkSMUndoElement.cxx
   vtkSMUndoRedoStateLoader.cxx
   vtkSMUndoStackBuilder.cxx
   vtkSMUndoStack.cxx
@@ -265,7 +265,9 @@ SET( ServerManagerNonWrapped_SRCS
   vtkPVBatchOptions.cxx
   vtkSMXMLParser.cxx
   )
-ENDIF (FIXME)
+ENDIF (FIXME) #------------------------------------------------------------- END
+
+
 SET( ServerManager_SRCS
   ${ServerManagerCS_SRCS}
   ${Kit_SRCS}
@@ -286,6 +288,7 @@ SET_SOURCE_FILES_PROPERTIES(
   vtkSMVectorProperty.cxx
   vtkSMPropertyHelper.cxx
   vtkSMStateVersionControllerBase.cxx
+  vtkSMUndoElement.cxx
   ABSTRACT
   )
 
@@ -293,7 +296,7 @@ SET_SOURCE_FILES_PROPERTIES(
   vtkSMPropertyHelper.cxx
   WRAP_EXCLUDE)
 
-IF (FIXME)
+IF (FIXME) #-------------------------------------------------------------- BEGIN
 SET_SOURCE_FILES_PROPERTIES(
   vtkSMAnimationCueManipulatorProxy.cxx
   vtkSMAnimationSceneWriter.cxx
@@ -308,7 +311,6 @@ SET_SOURCE_FILES_PROPERTIES(
   vtkSMRepresentationStrategy.cxx
   vtkSMStateVersionControllerBase.cxx
   vtkSMStateVersionControllerBase.cxx
-  vtkSMUndoElement.cxx
   vtkSMExporterProxy.cxx
   ABSTRACT
   )
@@ -316,7 +318,7 @@ SET_SOURCE_FILES_PROPERTIES(
 SET_SOURCE_FILES_PROPERTIES(
   vtkSMRenderViewHelper.cxx
   WRAP_EXCLUDE)
-ENDIF (FIXME)
+ENDIF (FIXME) #------------------------------------------------------------- END
 
 INCLUDE_DIRECTORIES(
   ${VTK_INCLUDE_DIR}
@@ -477,7 +479,7 @@ SET(GUI_CONFIG_FILES
   ParaViewWriters
 )
 
-IF (FIXME)
+IF (FIXME) #-------------------------------------------------------------- BEGIN
 
 IF(NOT CMAKE_CROSSCOMPILING)
   add_executable_with_forwarding(PV_EXE_SUFFIX
@@ -515,7 +517,7 @@ ADD_CUSTOM_TARGET(HTMLDocumentation
 SET (HTMLDocumentation_FILES ${HTML_RESULTS} CACHE INTERNAL
   "HTMLDocumentation files generated from ServerManager")
 
-ENDIF (FIXME)
+ENDIF (FIXME) #------------------------------------------------------------- END
 
 SET(PARAVIEW_INCLUDE_MODULES_TO_SMAPPLICATION "")
 FOREACH(rf ${resourceFiles})

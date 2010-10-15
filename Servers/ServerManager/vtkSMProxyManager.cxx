@@ -1161,7 +1161,7 @@ vtkPVXMLElement* vtkSMProxyManager::AddInternalState(vtkPVXMLElement *parentElem
           // proxy has been saved.
           continue;
           }
-        it3->GetPointer()->Proxy.GetPointer()->SaveState(rootElement);
+        it3->GetPointer()->Proxy.GetPointer()->SaveXMLState(rootElement);
         visited_proxies.insert(it3->GetPointer()->Proxy.GetPointer());
         }
       }
@@ -1528,4 +1528,15 @@ void vtkSMProxyManager::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
   os << indent <<  "UpdateInputProxies: " <<  this->UpdateInputProxies << endl;
+}
+//---------------------------------------------------------------------------
+const vtkSMMessage* vtkSMProxyManager::GetFullState()
+{
+  vtkErrorMacro("FIXME should be implemented");
+  return NULL;
+}
+//---------------------------------------------------------------------------
+void vtkSMProxyManager::LoadState(const vtkSMMessage* msg)
+{
+  vtkErrorMacro("FIXME should be implemented");
 }

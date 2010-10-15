@@ -23,7 +23,7 @@ ENDIF(VTK_WRAP_TCL)
 # Add main server executables.
 SET(PV_EXE_LIST
    pvserver pvrenderserver pvdataserver
-   pvtest pvstatetest pvInformationPropertyTest pvlocationtest)
+   pvtest pvxmlstatetest pvstatetest pvInformationPropertyTest pvlocationtest)
 
 IF (FIXME)
 ENDIF (FIXME)

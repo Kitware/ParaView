@@ -31,10 +31,14 @@
 #include "vtkSMProxyManager.h"
 #include "vtkSMSession.h"
 
+#include "vtkSMMessage.h"
+
 #include "vtkSMProxyInternals.h"
+#include "vtkSmartPointer.h"
 
 #include <vtkstd/algorithm>
 #include <vtkstd/string>
+#include <vtkstd/vector>
 #include <vtksys/ios/sstream>
 #include <assert.h>
 
@@ -118,6 +122,8 @@ vtkSMProxy::vtkSMProxy()
 
   this->Hints = 0;
   this->Deprecated = 0;
+
+  this->State = 0;
 }
 
 //---------------------------------------------------------------------------
@@ -143,6 +149,12 @@ vtkSMProxy::~vtkSMProxy()
   this->SetHints(0);
   this->SetDeprecated(0);
   this->SetKernelClassName(0);
+
+  if(this->State)
+    {
+    delete this->State;
+    this->State = 0;
+    }
 }
 
 //---------------------------------------------------------------------------
@@ -517,30 +529,8 @@ void vtkSMProxy::UpdatePropertyInformationInternal(
   // Hmm, this changes message itself. Funky.
   this->PullState(&message);
 
-  for (int i=0; i < message.ExtensionSize(ProxyState::property); ++i)
-    {
-    const ProxyState_Property *prop_message = &message.GetExtension(ProxyState::property, i);
-    const char* pname = prop_message->name().c_str();
-    it = this->Internals->Properties.find(pname);
-    if (it != this->Internals->Properties.end() &&
-      it->second.Property->GetInformationOnly())
-      {
-      it->second.Property->ReadFrom(&message, i);
-      }
-    }
-
-  // Make sure all dependent domains are updated. UpdateInformation()
-  // might have produced new information that invalidates the domains.
-  for (it  = this->Internals->Properties.begin();
-    it != this->Internals->Properties.end();
-    ++it)
-    {
-    vtkSMProperty* prop = it->second.Property.GetPointer();
-    if (prop->GetInformationOnly())
-      {
-      prop->UpdateDependentDomains();
-      }
-    }
+  // Update internal values
+  this->LoadState(&message);
 }
 
 //---------------------------------------------------------------------------
@@ -557,23 +547,46 @@ void vtkSMProxy::UpdateVTKObjects()
     {
     this->InUpdateVTKObjects = 1;
 
+    // Save previous property values and clear the State properties
+    vtkSMMessage oldState;
+    oldState.CopyFrom(*this->State);
+    this->State->ClearExtension(ProxyState::property);
+
     // iterate over all properties and push modified ones.
     vtkSMMessage message;
     vtkSMProxyInternals::PropertyInfoMap::iterator iter;
+    int cc = 0;
     for (iter = this->Internals->Properties.begin();
-      iter != this->Internals->Properties.end(); ++iter)
+         iter != this->Internals->Properties.end(); ++iter)
       {
       vtkSMProperty* property = iter->second.Property;
-      if (property && !property->GetInformationOnly() &&
-        iter->second.ModifiedFlag)
+      if (property && !property->GetInformationOnly())
         {
-        property->WriteTo(&message);
+        // Push only modified properties
+        if(iter->second.ModifiedFlag)
+          {
+          // Write to state
+          property->WriteTo(this->State);
 
-        // Fire event to let everyone know that a property has been updated.
-        // This is currently used by vtkSMLink. Need to see if we can avoid this
-        // as firing these events ain't inexpensive.
-        this->InvokeEvent(vtkCommand::UpdatePropertyEvent,
-          const_cast<char*>(iter->first.c_str()));
+          // Write to Push message
+          ProxyState_Property *prop = message.AddExtension(ProxyState::property);
+          prop->CopyFrom(this->State->GetExtension(ProxyState::property, cc));
+
+          // Fire event to let everyone know that a property has been updated.
+          // This is currently used by vtkSMLink. Need to see if we can avoid this
+          // as firing these events ain't inexpensive.
+          this->InvokeEvent(vtkCommand::UpdatePropertyEvent,
+                            const_cast<char*>(iter->first.c_str()));
+          }
+        else
+          {
+          // Just copy the previous old value to the state
+          ProxyState_Property *prop = this->State->AddExtension(ProxyState::property);
+          prop->CopyFrom(oldState.GetExtension(ProxyState::property, cc));
+          }
+
+        // One more property
+        ++cc;
         }
       }
     this->InUpdateVTKObjects = 0;
@@ -642,7 +655,16 @@ void vtkSMProxy::CreateVTKObjects()
     subproxy->set_global_id(it2->second.GetPointer()->GetGlobalID());
     }
 
+  // Save to state
+  this->State = new vtkSMMessage();
+  this->State->CopyFrom(message);
+
+  // Push the state
   this->PushState(&message);
+
+  // Update assigned id/location while the push
+  this->State->set_global_id(message.global_id());
+  this->State->set_location(message.location());
 }
 
 //---------------------------------------------------------------------------
@@ -1603,7 +1625,7 @@ void vtkSMProxy::PrintSelf(ostream& os, vtkIndent indent)
     }
 }
 //---------------------------------------------------------------------------
-vtkPVXMLElement* vtkSMProxy::SaveState(vtkPVXMLElement* root)
+vtkPVXMLElement* vtkSMProxy::SaveXMLState(vtkPVXMLElement* root)
 {
   vtkPVXMLElement *proxyXml = vtkPVXMLElement::New();
 
@@ -1644,7 +1666,7 @@ vtkPVXMLElement* vtkSMProxy::SaveState(vtkPVXMLElement* root)
   return proxyXml;
 }
 //---------------------------------------------------------------------------
-int vtkSMProxy::LoadState( vtkPVXMLElement* proxyElement,
+int vtkSMProxy::LoadXMLState( vtkPVXMLElement* proxyElement,
                            vtkSMProxyLocator* locator)
 {
   unsigned int numElems = proxyElement->GetNumberOfNestedElements();
@@ -1688,4 +1710,33 @@ int vtkSMProxy::LoadState( vtkPVXMLElement* proxyElement,
       }
     }
   return 1;
+}
+//---------------------------------------------------------------------------
+const vtkSMMessage* vtkSMProxy::GetFullState()
+{
+  return this->State;
+}
+//---------------------------------------------------------------------------
+void vtkSMProxy::LoadState(const vtkSMMessage* message)
+{
+  vtkSMProxyInternals::PropertyInfoMap::iterator it;
+  vtkstd::vector< vtkSmartPointer<vtkSMProperty> > touchedProperties;
+  for (int i=0; i < message->ExtensionSize(ProxyState::property); ++i)
+    {
+    const ProxyState_Property *prop_message = &message->GetExtension(ProxyState::property, i);
+    const char* pname = prop_message->name().c_str();
+    it = this->Internals->Properties.find(pname);
+    if (it != this->Internals->Properties.end())
+      {
+      it->second.Property->ReadFrom(message, i);
+      touchedProperties.push_back(it->second.Property.GetPointer());
+      }
+    }
+
+  // Make sure all dependent domains are updated. UpdateInformation()
+  // might have produced new information that invalidates the domains.
+  for (int i=0, nb=touchedProperties.size(); i < nb; i++)
+    {
+    touchedProperties[i]->UpdateDependentDomains();
+    }
 }

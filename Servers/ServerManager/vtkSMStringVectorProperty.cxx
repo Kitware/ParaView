@@ -88,7 +88,7 @@ void vtkSMStringVectorProperty::WriteTo(vtkSMMessage* msg)
 }
 
 //---------------------------------------------------------------------------
-void vtkSMStringVectorProperty::ReadFrom(vtkSMMessage* msg, int offset)
+void vtkSMStringVectorProperty::ReadFrom(const vtkSMMessage* msg, int offset)
 {
   assert(msg->ExtensionSize(ProxyState::property) > offset);
 

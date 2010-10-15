@@ -62,7 +62,7 @@ void vtkSMDoubleVectorProperty::WriteTo(vtkSMMessage* msg)
 }
 
 //---------------------------------------------------------------------------
-void vtkSMDoubleVectorProperty::ReadFrom(vtkSMMessage* msg, int offset)
+void vtkSMDoubleVectorProperty::ReadFrom(const vtkSMMessage* msg, int offset)
 {
   assert(msg->ExtensionSize(ProxyState::property) > offset);
 
