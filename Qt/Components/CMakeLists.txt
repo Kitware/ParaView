@@ -71,9 +71,6 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqCameraDialog.h
   pqCameraKeyFrameWidget.h
   pqChangeInputDialog.h
-  pqChartOptionsEditor.h
-  pqChartViewContextMenu.h
-  pqChartViewContextMenuHandler.h
   pqClipPanel.h
   pqColorMapModel.h
   pqColorPresetManager.h
@@ -376,16 +373,10 @@ ADD_LIBRARY(pqComponents
   pqCameraKeyFrameWidget.h
   pqChangeInputDialog.cxx
   pqChangeInputDialog.h
-  pqChartOptionsEditor.cxx
-  pqChartOptionsEditor.h
   pqChartPixelScale.cxx
   pqChartPixelScale.h
   pqChartValue.cxx
   pqChartValue.h
-  pqChartViewContextMenu.cxx
-  pqChartViewContextMenu.h
-  pqChartViewContextMenuHandler.cxx
-  pqChartViewContextMenuHandler.h
   pqClipPanel.cxx
   pqClipPanel.h
   pqCloseViewUndoElement.cxx
