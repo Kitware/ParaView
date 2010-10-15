@@ -246,7 +246,7 @@ bool vtkProcessModuleAutoMPIInternals::CollectConfiguredOptions()
 // set the path to the binary directory
   this->ParaViewServer = PARAVIEW_BINARY_DIR;
 #ifdef  CMAKE_INTDIR
-  this->Internals->ParaViewServer  += "/" CMAKE_INTDIR;
+  this->ParaViewServer  += "/" CMAKE_INTDIR;
 #endif
   // now set the final execuable names
   this->ParaViewServer += "/" PARAVIEW_SERVER;
