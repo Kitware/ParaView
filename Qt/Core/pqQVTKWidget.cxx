@@ -75,7 +75,8 @@ void pqQVTKWidget::resizeEvent(QResizeEvent* e)
   view_size[1] = e->size().height();
   vtkSMPropertyHelper(this->ViewProxy, "ViewSize").Set(view_size, 2);
 
-  QPoint view_pos = this->mapTo(this->positionReference(), QPoint(0,0));
+  QPoint view_pos = this->mapTo(this->positionReference(), QPoint(0,0)) -
+    this->mapToParent(QPoint(0, 0));
   int view_position[2];
   view_position[0] = view_pos.x();
   view_position[1] = view_pos.y();;

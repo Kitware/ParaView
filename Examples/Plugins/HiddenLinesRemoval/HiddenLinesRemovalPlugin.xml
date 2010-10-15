@@ -1,56 +1,24 @@
 <ServerManagerConfiguration>
-  <ProxyGroup name="mappers">
-    <SourceProxy name="VisibleLinesPolyDataMapper"
-      class="vtkVisibleLinesPolyDataMapper"
-      base_proxygroup="mappers" base_proxyname="PolyDataMapper">
-      <!-- And any extra properties for this mapper -->
-    </SourceProxy>
-  </ProxyGroup>
-
   <ProxyGroup name="representations">
-    <SurfaceRepresentationProxy name="VisibleLinesRepresentation" 
+    <RepresentationProxy name="VisibleLinesRepresentation"
       base_proxygroup="representations"
-      base_proxyname="SurfaceRepresentation">
+      base_proxyname="SurfaceRepresentationBase"
+      processes="client|dataserver|renderserver"
+      class="vtkGeometryRepresentationWithHiddenLinesRemoval" >
       <Documentation>
         This is the new representation type we are adding. This is identical to
         the SurfaceRepresentation except that we are overriding the mapper with
         our mapper.
       </Documentation>
-      
-      <InputProperty name="Input" 
-        command="NotUsed">
+
+      <InputProperty name="Input" command="SetInputConnection">
         <InputArrayDomain name="input_array_any"
           attribute_type="any">
         </InputArrayDomain>
       </InputProperty>
 
-      <SubProxy>
-        <Proxy name="Mapper" proxygroup="mappers"
-               proxyname="VisibleLinesPolyDataMapper"
-               override="1" />
-        <ExposedProperties>
-          <Property name="LookupTable" />
-          <Property name="MapScalars" />
-          <Property name="ImmediateModeRendering" />
-          <Property name="InterpolateScalarsBeforeMapping" />
-          <Property name="UseLookupTableScalarRange" />
-          <Property name="ClippingPlanes" />
-          <Property name="NumberOfSubPieces" />
-          <Property name="StaticMode" />
-        </ExposedProperties>
-      </SubProxy>
-
-      <SubProxy>
-        <Proxy name="LODMapper" 
-          proxygroup="mappers"
-          proxyname="VisibleLinesPolyDataMapper" override="1"/>
-        <ShareProperties subproxy="Mapper" >
-          <Exception name="Input" />
-        </ShareProperties>
-      </SubProxy>
-
     <!-- End of SurfaceRepresentation -->
-    </SurfaceRepresentationProxy>
+    </RepresentationProxy>
 
     <Extension name="GeometryRepresentation">
       <Documentation>

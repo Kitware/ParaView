@@ -30,6 +30,7 @@ IF(PARAVIEW_BUILD_QT_GUI)
     GUIToolBar
     GUIView
     Reader
+    RenderPassViews
     SourceToolbar
     Writer
     )

@@ -1,0 +1,14 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="views">
+    <RenderViewProxy name="RenderViewWithSobel" class="vtkPVRenderViewWithSobel"
+        processes="client|renderserver|dataserver"
+        base_proxygroup="views" base_proxyname="RenderView">
+    </RenderViewProxy>
+
+    <RenderViewProxy name="RenderViewWithShadowMap"
+        class="vtkPVRenderViewWithShadowMap"
+        processes="client|renderserver|dataserver"
+        base_proxygroup="views" base_proxyname="RenderView" >
+    </RenderViewProxy>
+  </ProxyGroup>
+</ServerManagerConfiguration>
