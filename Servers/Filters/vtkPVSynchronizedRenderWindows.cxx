@@ -1424,7 +1424,8 @@ void vtkPVSynchronizedRenderWindows::TriggerRMI(
       }
     }
 
-  if (parallelController && parallelController->GetNumberOfProcesses() > 1)
+  if (parallelController && parallelController->GetNumberOfProcesses() > 1
+    && parallelController->GetLocalProcessId() == 0)
     {
     parallelController->TriggerRMIOnAllChildren(
       &data[0], static_cast<int>(data.size()), tag);
