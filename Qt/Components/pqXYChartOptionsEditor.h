@@ -38,10 +38,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqComponentsExport.h"
 #include "pqOptionsContainer.h"
-#include "vtkQtChartAxisLayer.h" // Needed for enum
-#include "vtkQtChartAxis.h" // Needed for enum
-#include "vtkQtChartAxisOptions.h" // Needed for enum
-#include "vtkQtChartLegend.h" // Needed for enum
 #include "pqChartValue.h"
 
 class pqXYChartOptionsEditorForm;

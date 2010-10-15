@@ -56,6 +56,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqXYBarChartView.h"
 #include "pqXYChartView.h"
 
+#include "vtkAxis.h"
+
 #include <math.h>
 
 class pqXYChartOptionsEditorForm;
@@ -111,12 +113,12 @@ public:
   ~pqXYChartOptionsEditorForm();
 
   void setCurrentAxis(const QString &name);
-  int getIndexForLocation(vtkQtChartAxis::AxisLocation location) const;
+  int getIndexForLocation(int location) const;
 
   QString CurrentPage;
   QFont TitleFont;
   pqXYChartOptionsEditorAxis *AxisData[4];
-  vtkQtChartAxis::AxisLocation CurrentAxis;
+  int CurrentAxis;
   int AxisIndex;
   pqSampleScalarAddRangeDialog *RangeDialog;
 };
@@ -142,7 +144,7 @@ pqXYChartOptionsEditorAxis::pqXYChartOptionsEditorAxis()
 pqXYChartOptionsEditorForm::pqXYChartOptionsEditorForm()
   : Ui::pqChartOptionsWidget(), CurrentPage(), TitleFont()
 {
-  this->CurrentAxis = vtkQtChartAxis::Left;
+  this->CurrentAxis = vtkAxis::LEFT;
   this->AxisIndex = -1;
   this->RangeDialog = 0;
 
@@ -166,49 +168,48 @@ void pqXYChartOptionsEditorForm::setCurrentAxis(const QString &name)
 {
   if(name == "Left Axis")
     {
-    this->CurrentAxis = vtkQtChartAxis::Left;
+    this->CurrentAxis = vtkAxis::LEFT;
     this->AxisIndex = 0;
     }
   else if(name == "Bottom Axis")
     {
-    this->CurrentAxis = vtkQtChartAxis::Bottom;
+    this->CurrentAxis = vtkAxis::BOTTOM;
     this->AxisIndex = 1;
     }
   else if(name == "Right Axis")
     {
-    this->CurrentAxis = vtkQtChartAxis::Right;
+    this->CurrentAxis = vtkAxis::RIGHT;
     this->AxisIndex = 2;
     }
   else if(name == "Top Axis")
     {
-    this->CurrentAxis = vtkQtChartAxis::Top;
+    this->CurrentAxis = vtkAxis::TOP;
     this->AxisIndex = 3;
     }
   else
     {
-    this->CurrentAxis = vtkQtChartAxis::Left;
+    this->CurrentAxis = vtkAxis::LEFT;
     this->AxisIndex = -1;
     }
 }
 
-int pqXYChartOptionsEditorForm::getIndexForLocation(
-    vtkQtChartAxis::AxisLocation location) const
+int pqXYChartOptionsEditorForm::getIndexForLocation(int location) const
 {
   switch(location)
     {
-    case vtkQtChartAxis::Bottom:
+    case vtkAxis::BOTTOM:
       {
       return 1;
       }
-    case vtkQtChartAxis::Right:
+    case vtkAxis::RIGHT:
       {
       return 2;
       }
-    case vtkQtChartAxis::Top:
+    case vtkAxis::TOP:
       {
       return 3;
       }
-    case vtkQtChartAxis::Left:
+    case vtkAxis::LEFT:
     default:
       {
       return 0;
