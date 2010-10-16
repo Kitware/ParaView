@@ -19,7 +19,6 @@
 #include "vtkObject.h"
 #include "vtkClientServerID.h" // needed for UniqueID.
 
-class vtkGetFreePort;
 class vtkProcessModuleAutoMPIInternals;
 class VTK_EXPORT vtkProcessModuleAutoMPI: public vtkObject
 {
@@ -51,7 +50,6 @@ private:
   vtkProcessModuleAutoMPI(const vtkProcessModuleAutoMPI&); // Not implemented.
   void operator=(const vtkProcessModuleAutoMPI&); // Not implemented.
   vtkProcessModuleAutoMPIInternals *Internals;
-  vtkGetFreePort *FreePort;
 };
 
 
