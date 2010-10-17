@@ -196,7 +196,7 @@ int vtkProcessModuleAutoMPI::ConnectToRemoteBuiltInSelf()
  * port number over which the server is listening.
  *
  * @param servername IN Sending in the server name (usually localhost or 127.0.0.1)
- * @return The port on which the server was started
+ * @return 1 for success 0 otherwise
  */
 int vtkProcessModuleAutoMPIInternals::StartRemoteBuiltInSelf(const char* servername,int port)
 {
@@ -207,7 +207,7 @@ int vtkProcessModuleAutoMPIInternals::StartRemoteBuiltInSelf(const char* servern
     {
     vtksysProcess_Delete(server);
     cerr << "pvTestDriver: Cannot allocate vtksysProcess to run the server.\n";
-    return 1;
+    return 0;
     }
 
   // Construct the Command line that will be executed
@@ -221,7 +221,7 @@ int vtkProcessModuleAutoMPIInternals::StartRemoteBuiltInSelf(const char* servern
                       this->MPIServerNumProcessFlag.c_str(),
                       port);
     ReportCommand(&serverCommand[0], "server");
-    vtksysProcess_SetCommand(server, &serverCommand[0]);
+    return vtksysProcess_SetCommand(server, &serverCommand[0]);
     }
 
 
@@ -234,7 +234,7 @@ int vtkProcessModuleAutoMPIInternals::StartRemoteBuiltInSelf(const char* servern
     {
     cerr << "vtkProcessModuleAutoMPIInternals: Server never started.\n";
     vtksysProcess_Delete(server);;
-    return -1;
+    return 0;
     }
 }
 
