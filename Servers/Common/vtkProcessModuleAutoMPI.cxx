@@ -32,11 +32,38 @@
 
 int vtkProcessModuleAutoMPI::UseMulticoreProcessors = 0;
 
-class vtkGetFreePort: public vtkSocket
+namespace
 {
+  class vtkGetFreePort: public vtkSocket
+  {
 public:
-  int getFreePort();
-};
+  static vtkGetFreePort* New();
+  vtkTypeMacro(vtkGetFreePort, vtkSocket);
+  int GetFreePort()
+    {
+    this->SocketDescriptor = this->CreateSocket();
+    if (!this->SocketDescriptor)
+      {
+      vtkErrorMacro("Failed to create socket.");
+      return -1;
+      }
+
+    if (this->BindSocket(this->SocketDescriptor,0))
+      {
+      vtkErrorMacro("Failed to bind socket.");
+      return -1;
+      }
+
+    int port = this->GetPort(this->SocketDescriptor);
+    this->CloseSocket(this->SocketDescriptor);
+    return port;
+    }
+protected:
+  vtkGetFreePort(){}
+  ~vtkGetFreePort() {}
+  };
+  vtkStandardNewMacro(vtkGetFreePort);
+}
 
 class vtkProcessModuleAutoMPIInternals
 {
@@ -97,14 +124,12 @@ vtkProcessModuleAutoMPI::vtkProcessModuleAutoMPI()
 {
   this->Internals = new vtkProcessModuleAutoMPIInternals;
   this->Internals->TimeOut = 300;
-  FreePort = new vtkGetFreePort();
 }
 
 //------------------------------------------------------------------------destr
 vtkProcessModuleAutoMPI::~vtkProcessModuleAutoMPI()
 {
   delete this->Internals;
-  delete this->FreePort;
 }
 
 //-----------------------------------------------------------------------static
@@ -156,7 +181,10 @@ int vtkProcessModuleAutoMPI::IsPossible()
  */
 int vtkProcessModuleAutoMPI::ConnectToRemoteBuiltInSelf()
 {
-  int port = this->FreePort->getFreePort();
+  vtkGetFreePort* freePort = vtkGetFreePort::New();
+  int port = freePort->GetFreePort();
+  freePort->Delete();
+
   this->Internals->StartRemoteBuiltInSelf("localhost",port);
   return port;
 }
@@ -568,25 +596,4 @@ int vtkProcessModuleAutoMPIInternals::WaitForLine(vtksysProcess* process, vtkstd
         }
       }
     }
-}
-
-int vtkGetFreePort::getFreePort()
-{
-  this->SocketDescriptor = this->CreateSocket();
-  if(!this->SocketDescriptor)
-    {
-    vtkErrorMacro("Failed to create socket.");
-    return -1;
-    }
-
-  if(BindSocket(this->SocketDescriptor,0))
-    {
-    vtkErrorMacro("Failed to bind socket.");
-    return -1;
-    }
-
-  int port = GetPort(this->SocketDescriptor);
-  CloseSocket(this->SocketDescriptor);
-
-  return port;
 }
