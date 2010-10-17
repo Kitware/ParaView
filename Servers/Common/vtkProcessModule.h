@@ -27,8 +27,6 @@
 #include "vtkObject.h"
 #include "vtkClientServerID.h" // needed for UniqueID.
 
-#include "vtkProcessModuleAutoMPI.h"
-
 class vtkCacheSizeKeeper;
 class vtkCallbackCommand;
 class vtkClientServerInterpreter;
@@ -52,6 +50,7 @@ class vtkSocketController;
 class vtkStringList;
 class vtkTimerLog;
 class vtkSocket;
+class vtkProcessModuleAutoMPI;
 
 class VTK_EXPORT vtkProcessModule : public vtkObject
 {

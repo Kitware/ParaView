@@ -48,6 +48,7 @@
 #include "vtkStringList.h"
 #include "vtkTimerLog.h"
 #include "vtkToolkits.h" // For VTK_USE_MPI
+#include "vtkProcessModuleAutoMPI.h"
 
 #ifdef VTK_USE_MPI
 # include "vtkMPIController.h"

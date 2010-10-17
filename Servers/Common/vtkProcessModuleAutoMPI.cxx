@@ -303,7 +303,7 @@ bool vtkProcessModuleAutoMPIInternals::CollectConfiguredOptions()
     return;
 # endif
 #ifdef VTK_MPI_PRENUMPROC_FLAGS
-    this->Internal->SeparateArguments(VTK_MPI_PRENUMPROC_FLAGS, this->MPIPreNumProcFlags);
+    this->SeparateArguments(VTK_MPI_PRENUMPROC_FLAGS, this->MPIPreNumProcFlags);
 #endif
 # ifdef VTK_MPI_PREFLAGS
     this->SeparateArguments(VTK_MPI_PREFLAGS, this->MPIPreFlags);
