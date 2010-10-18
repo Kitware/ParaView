@@ -236,6 +236,7 @@ int vtkProcessModuleAutoMPIInternals::StartRemoteBuiltInSelf(const char* servern
     vtksysProcess_Delete(server);;
     return 0;
     }
+  return 0;
 }
 
 #define PARAVIEW_SERVER "pvserver"
