@@ -5073,7 +5073,8 @@ The Contour filter computes isolines or isosurfaces using a selected point-cente
             <DataType value="vtkDataSet"/>
           </DataTypeDomain>
           <InputArrayDomain name="input_array"
-                            number_of_components="1"/>
+                            number_of_components="1"
+                            attribute_type="point"/>
           <Documentation>
             This property specifies the input dataset to be used by the contour filter.
           </Documentation>
