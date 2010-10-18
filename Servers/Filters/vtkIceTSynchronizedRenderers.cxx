@@ -217,6 +217,15 @@ protected:
         }
       }
     }
+
+  void EraseTile(vtkIceTSynchronizedRenderers* ptr)
+    {
+    TilesMapType::iterator iter = TilesMap.find(ptr);
+    if (iter != TilesMap.end())
+      {
+      TilesMap.erase(iter);
+      }
+    }
 };
 
 vtkStandardNewMacro(vtkIceTSynchronizedRenderers);
@@ -244,6 +253,8 @@ vtkIceTSynchronizedRenderers::vtkIceTSynchronizedRenderers()
 //----------------------------------------------------------------------------
 vtkIceTSynchronizedRenderers::~vtkIceTSynchronizedRenderers()
 {
+  EraseTile(this);
+
   this->ImagePastingPass->Delete();
   this->IceTCompositePass->Delete();
   this->IceTCompositePass = 0;
