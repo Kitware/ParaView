@@ -100,11 +100,14 @@ int vtkPVDataRepresentationPipeline::ProcessRequest(vtkInformation* request,
     {
     vtkPVDataRepresentation* representation =
       vtkPVDataRepresentation::SafeDownCast(this->Algorithm);
-    if (representation && representation->GetUsingCacheForUpdate())
-      {
-      // shunt upstream updates when using cache.
-      return 1;
-      }
+    // This check doesn't make sense. We need to call RequestData() whenever
+    // needed even when using cache. How else the the cache-keeper going to
+    // produce a new timestep? (BUG #11321).
+    //if (representation && representation->GetUsingCacheForUpdate())
+    //  {
+    //  // shunt upstream updates when using cache.
+    //  return 1;
+    //  }
 
     if (representation && !representation->GetNeedUpdate())
       {
