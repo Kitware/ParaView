@@ -418,7 +418,7 @@ void vtkPVRenderView::FinishSelection(vtkSelection* sel)
     if (node->GetProperties()->Has(vtkSelectionNode::PROP_ID()))
       {
       int propid = node->GetProperties()->Get(vtkSelectionNode::PROP_ID());
-      vtkProp* prop = this->Selector->GetProp(propid);
+      vtkProp* prop = this->Selector->GetPropFromID(propid);
       node->SetSelectedProp(prop);
       }
     }
