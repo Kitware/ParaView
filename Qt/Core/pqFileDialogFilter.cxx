@@ -69,9 +69,11 @@ void pqFileDialogFilter::setFilter(const QString& filter)
     f.replace("*.","");
     //use non capturing(?:) for speed
     QString postExtFileSeries("(?:\\.\\d+)*"); // match file series like: vtk.01
-    pattern = ".*\\.(?:" % f % ")" % postExtFileSeries % "$";
+    pattern = ".*\\.?(?:" % f % ")" % postExtFileSeries % "$";
     //pattern string at the end will look like:
-    //".*\.(?:vtk|vtp|vtu)(?:\\.\\d+)*$"
+    //".*\.?(?:vtk|vtp|vtu)(?:\\.\\d+)*$"
+    //note that spcth files are unique. they are named spcth.0,spcth.1,...
+    //therefore the .before the file extension needs to be optional
     }
 
   this->Wildcards.setPattern(pattern);
@@ -102,25 +104,9 @@ bool pqFileDialogFilter::filterAcceptsRow(int row_source, const QModelIndex& sou
     {
     return true;
     }
+
   QString str = this->sourceModel()->data(idx).toString();
-
-  // To fix bug #0008159, grouped files MUST undergo the for-loop below
-  // to check if the extension part really matches the wildcards / filters.
-  bool pass = false;
-
-  // The following if-statement is intended to support the visibility
-  // of grouped 'spcth' files in the file dialog. 'str' is updated below
-  // with the full name of the first 'spcth' file (for a group of 'spcth'
-  // files with digits-based extensions, the FIRST one MUST have '.0'
-  // as the extension) such that 'pass' can be updated with 'true' via
-  // the for-loop. This if-statement is added to fix bug #0008493.
-  if ( this->sourceModel()->hasChildren(idx) == true )
-    {
-    QStringList strList = this->Model->getFilePaths(idx);
-    str = strList.at(0);
-    }
-
-  pass = this->Wildcards.exactMatch(str);
+  bool pass = this->Wildcards.exactMatch(str);
   return pass;
 }
 
