@@ -28,6 +28,7 @@
 #include "vtkPVInformation.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMProxyDefinitionManager.h"
+#include "vtkSMRemoteObject.h"
 
 #include <vtksys/ios/sstream>
 #include <vtkstd/string>
@@ -62,15 +63,24 @@ namespace
 class vtkSMSessionCore::vtkInternals
 {
 public:
-
   //---------------------------------------------------------------------------
   void Delete(vtkTypeUInt32 globalUniqueId)
     {
+    // Remove PM
     PMObjectMapType::iterator iter = this->PMObjectMap.find(globalUniqueId);
     if (iter != this->PMObjectMap.end())
       {
       iter->second.GetPointer()->Finalize();
       this->PMObjectMap.erase(iter);
+      }
+    }
+  //---------------------------------------------------------------------------
+  void DeleteRemoteObject(vtkTypeUInt32 globalUniqueId)
+    {
+    RemoteObjectMapType::iterator iter2 = this->RemoteObjectMap.find(globalUniqueId);
+    if (iter2 != this->RemoteObjectMap.end())
+      {
+      this->RemoteObjectMap.erase(iter2);
       }
     }
 
@@ -86,9 +96,34 @@ public:
     return NULL; // Did not find it
     }
   //---------------------------------------------------------------------------
+  vtkSMRemoteObject* GetRemoteObject(vtkTypeUInt32 globalUniqueId)
+    {
+    RemoteObjectMapType::iterator iter = this->RemoteObjectMap.find(globalUniqueId);
+    if (iter != this->RemoteObjectMap.end())
+      {
+      return iter->second;
+      }
+
+    return NULL; // Did not find it
+    }
+  //---------------------------------------------------------------------------
+  void PrintRemoteMap()
+    {
+    RemoteObjectMapType::iterator iter = this->RemoteObjectMap.begin();
+    while(iter != this->RemoteObjectMap.end())
+      {
+      cout << "RemoteObject map - Id: " << iter->first << endl; //" - RefCount: "
+           //<< iter->second->GetReferenceCount() << endl;
+      iter++;
+      }
+    }
+  //---------------------------------------------------------------------------
   typedef vtkstd::map<vtkTypeUInt32, vtkSmartPointer<vtkPMObject> >
     PMObjectMapType;
+  typedef vtkstd::map<vtkTypeUInt32, vtkWeakPointer<vtkSMRemoteObject> >
+    RemoteObjectMapType;
   PMObjectMapType PMObjectMap;
+  RemoteObjectMapType RemoteObjectMap;
 };
 
 //****************************************************************************/
@@ -170,6 +205,11 @@ int vtkSMSessionCore::GetNumberOfProcesses()
 vtkPMObject* vtkSMSessionCore::GetPMObject(vtkTypeUInt32 globalid)
 {
   return this->Internals->GetPMObject(globalid);
+}
+//----------------------------------------------------------------------------
+vtkSMRemoteObject* vtkSMSessionCore::GetRemoteObject(vtkTypeUInt32 globalid)
+{
+  return this->Internals->GetRemoteObject(globalid);
 }
 
 //----------------------------------------------------------------------------
@@ -537,4 +577,18 @@ bool vtkSMSessionCore::CollectInformation(vtkPVInformation* info)
       }
     }
   return true;
+}
+//----------------------------------------------------------------------------
+void vtkSMSessionCore::RegisterRemoteObject(vtkTypeUInt32 globalid, vtkSMRemoteObject* obj)
+{
+  if(globalid == 0)
+    return;
+  this->Internals->RemoteObjectMap[globalid] = obj;
+}
+//----------------------------------------------------------------------------
+void vtkSMSessionCore::UnRegisterRemoteObject(vtkTypeUInt32 globalid)
+{
+  if(globalid == 0)
+    return;
+  this->Internals->DeleteRemoteObject(globalid);
 }

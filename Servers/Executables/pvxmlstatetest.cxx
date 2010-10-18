@@ -62,7 +62,7 @@ int main(int argc, char* argv[])
   pxm->RegisterProxy("filters", "shrink", shrink);
 
   // Try to build XML state
-  xmlRootNodeOrigin.TakeReference(pxm->SaveState());
+  xmlRootNodeOrigin.TakeReference(pxm->SaveXMLState());
   xmlRootNodeOrigin->PrintXML();
 
   cout << "==== End of State creation ===" << endl;
@@ -73,7 +73,7 @@ int main(int argc, char* argv[])
   shrink->Delete();
 
   cout << "==== Make sure that the state is empty ===" << endl;
-  xmlRootNodeLoaded.TakeReference(pxm->SaveState());
+  xmlRootNodeLoaded.TakeReference(pxm->SaveXMLState());
   //xmlRootNodeLoaded->PrintXML();
   if( pxm->GetProxy("sources", "sphere") && pxm->GetProxy("filters", "shrink") )
     {
@@ -86,8 +86,8 @@ int main(int argc, char* argv[])
     }
 
   cout << "==== Loading previous state ====" << endl;
-  pxm->LoadState(xmlRootNodeOrigin);
-  xmlRootNodeLoaded.TakeReference(pxm->SaveState());
+  pxm->LoadXMLState(xmlRootNodeOrigin);
+  xmlRootNodeLoaded.TakeReference(pxm->SaveXMLState());
   xmlRootNodeLoaded->PrintXML();
   cout << "==== End of state loading ====" << endl;
 

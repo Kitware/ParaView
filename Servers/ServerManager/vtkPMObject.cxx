@@ -68,3 +68,19 @@ vtkClientServerInterpreter* vtkPMObject::GetInterpreter()
 {
   return this->Interpreter;
 }
+//----------------------------------------------------------------------------
+void vtkPMObject::Push(vtkSMMessage* msg)
+{
+  LastPushedMessage.CopyFrom(*msg);
+}
+
+//----------------------------------------------------------------------------
+void vtkPMObject::Pull(vtkSMMessage* msg)
+{
+  msg->CopyFrom(LastPushedMessage);
+}
+//----------------------------------------------------------------------------
+void vtkPMObject::Invoke(vtkSMMessage* msg)
+{
+  // Nothing
+}

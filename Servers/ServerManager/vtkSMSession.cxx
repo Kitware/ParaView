@@ -19,6 +19,8 @@
 #include "vtkSMProxyDefinitionManager.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMSessionCore.h"
+#include "vtkWeakPointer.h"
+#include "vtkSMRemoteObject.h"
 
 vtkStandardNewMacro(vtkSMSession);
 //----------------------------------------------------------------------------
@@ -29,7 +31,10 @@ vtkSMSession::vtkSMSession()
   this->ProxyManager->SetSession(this);
   this->ProxyManager->SetProxyDefinitionManager(
     this->Core->GetProxyDefinitionManager());
-  this->LastGUID = 0;
+
+  // The 10 first ID are reserved
+  //  - 1: vtkSMProxyManager
+  this->LastGUID = 10;
 }
 
 //----------------------------------------------------------------------------
@@ -103,4 +108,20 @@ int vtkSMSession::GetNumberOfProcesses(vtkTypeUInt32 servers)
 void vtkSMSession::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+}
+//----------------------------------------------------------------------------
+vtkSMRemoteObject* vtkSMSession::GetRemoteObject(vtkTypeUInt32 globalid)
+{
+  return this->Core->GetRemoteObject(globalid);
+}
+//----------------------------------------------------------------------------
+void vtkSMSession::RegisterRemoteObject(vtkTypeUInt32 globalid, vtkSMRemoteObject* obj)
+{
+  this->Core->RegisterRemoteObject(globalid, obj);
+}
+
+//----------------------------------------------------------------------------
+void vtkSMSession::UnRegisterRemoteObject(vtkTypeUInt32 globalid)
+{
+  this->Core->UnRegisterRemoteObject(globalid);
 }

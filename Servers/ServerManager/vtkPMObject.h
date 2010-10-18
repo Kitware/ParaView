@@ -43,15 +43,20 @@ public:
 //BTX
   // Description:
   // Push a new state to the underneath implementation
-  virtual void Push(vtkSMMessage* msg) = 0;
+  // The provided implementation just store the message
+  // and return it at the Pull one.
+  virtual void Push(vtkSMMessage* msg);
 
   // Description:
   // Pull the current state of the underneath implementation
-  virtual void Pull(vtkSMMessage* msg) = 0;
+  // The provided implementation update the given message with the one
+  // that has been previously pushed
+  virtual void Pull(vtkSMMessage* msg);
 
   // Description:
   // Invoke a given method on the underneath objects
-  virtual void Invoke(vtkSMMessage* msg) = 0;
+  // The provided implementation is Empty and do nothing
+  virtual void Invoke(vtkSMMessage* msg);
 //ETX
 
   // Description:
@@ -75,6 +80,8 @@ protected:
 
   vtkWeakPointer<vtkClientServerInterpreter> Interpreter;
   vtkWeakPointer<vtkSMSessionCore> SessionCore;
+
+  vtkSMMessage LastPushedMessage;
 
 private:
   vtkPMObject(const vtkPMObject&);    // Not implemented

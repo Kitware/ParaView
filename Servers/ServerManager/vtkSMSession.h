@@ -26,6 +26,7 @@ class vtkSMProxyManager;
 class vtkSMSessionCore;
 class vtkPVInformation;
 class vtkPMObject;
+class vtkSMRemoteObject;
 
 class VTK_EXPORT vtkSMSession : public vtkSession
 {
@@ -62,6 +63,18 @@ public:
   // Description:
   // Returns a vtkPMObject or subclass given its global id, if any.
   vtkPMObject* GetPMObject(vtkTypeUInt32 globalid);
+
+  // Description:
+  // Return a vtkSMRemoteObject given its global id if any otherwise return NULL;
+  vtkSMRemoteObject* GetRemoteObject(vtkTypeUInt32 globalid);
+
+  // Description:
+  // Register a remote object
+  void RegisterRemoteObject(vtkTypeUInt32 globalid, vtkSMRemoteObject* obj);
+
+  // Description:
+  // Unregister a remote object
+  void UnRegisterRemoteObject(vtkTypeUInt32 globalid);
 
   // Description:
   // Provides a unique identifier across processes of that session

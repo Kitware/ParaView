@@ -30,6 +30,10 @@ vtkSMRemoteObject::vtkSMRemoteObject()
 //----------------------------------------------------------------------------
 vtkSMRemoteObject::~vtkSMRemoteObject()
 {
+  if(this->Session && this->GlobalID != 0)
+    {
+    this->Session->UnRegisterRemoteObject(this->GlobalID);
+    }
   this->SetSession(0);
 }
 
@@ -47,6 +51,11 @@ void vtkSMRemoteObject::SetSession(vtkSMSession* session)
     this->Session = session;
     this->Modified();
     }
+  // Register object if possible
+  if(this->Session && this->GlobalID != 0)
+    {
+    this->Session->RegisterRemoteObject(this->GlobalID, this);
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -63,8 +72,29 @@ vtkTypeUInt32 vtkSMRemoteObject::GetGlobalID()
   if (this->Session != NULL && this->GlobalID == 0)
     {
     this->GlobalID = this->GetSession()->GetNextGlobalUniqueIdentifier();
+    // Register object
+    this->Session->RegisterRemoteObject(this->GlobalID, this);
     }
   return this->GlobalID;
+}
+//---------------------------------------------------------------------------
+void vtkSMRemoteObject::SetGlobalID(vtkTypeUInt32 guid)
+{
+  // Unregister current object with previous ID if already registered
+  if(this->GlobalID != 0 && this->Session &&
+     this->Session->GetRemoteObject(this->GlobalID) == this)
+    {
+    this->Session->UnRegisterRemoteObject(this->GlobalID);
+    }
+
+  // Keep new ID
+  this->GlobalID = guid;
+
+  // Register object if possible
+  if(this->Session && this->GlobalID != 0)
+    {
+    this->Session->RegisterRemoteObject(this->GlobalID, this);
+    }
 }
 
 //---------------------------------------------------------------------------

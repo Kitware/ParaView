@@ -95,7 +95,7 @@ protected:
 
   // Description:
   // Set the GlobalUniqueId
-  vtkSetMacro(GlobalID, vtkTypeUInt32);
+  void SetGlobalID(vtkTypeUInt32 guid);
 
   // Global-ID for this vtkSMRemoteObject. This is assigned when needed.
   // Assigned at :

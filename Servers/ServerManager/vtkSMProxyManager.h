@@ -166,10 +166,6 @@ public:
   void UnRegisterProxies();
 
   // Description:
-  // Unregisters all managed proxies on the given connection.
-  void UnRegisterProxies(vtkIdType cid);
-
-  // Description:
   // Calls UpdateVTKObjects() on all managed proxies.
   // If modified_only flag is set, then UpdateVTKObjects will be called
   // only those proxies that have any properties that were modifed i.e.
@@ -254,21 +250,21 @@ public:
   // Description:
   // Loads the state of the server manager from XML.
   // If loader is not specified, a vtkSMStateLoader instance is used.
-  void LoadState(const char* filename, vtkSMStateLoader* loader=NULL);
-  void LoadState(vtkPVXMLElement* rootElement, vtkSMStateLoader* loader=NULL);
+  void LoadXMLState(const char* filename, vtkSMStateLoader* loader=NULL);
+  void LoadXMLState(vtkPVXMLElement* rootElement, vtkSMStateLoader* loader=NULL);
   //ETX
 
   // Description:
   // Save the state of the server manager in XML format in a file.
   // This saves the state of all proxies and properties.
-  void SaveState(const char* filename);
+  void SaveXMLState(const char* filename);
 
   // Description:
   // Saves the state of the server manager as XML, and returns the
   // vtkPVXMLElement for the root of the state.
   // Note this this method allocates a new vtkPVXMLElement object,
   // it's the caller's responsibility to free it by calling Delete().
-  vtkPVXMLElement* SaveState();
+  vtkPVXMLElement* SaveXMLState();
 
   // Description:
   // Given a group name, create prototypes and store them
@@ -487,6 +483,9 @@ protected:
     vtkSMProxy* proxy);
 
   int UpdateInputProxies;
+
+  // State cache used for the GetFullState
+  vtkSMMessage* State;
 
   vtkSMReaderFactory* ReaderFactory;
   vtkSMWriterFactory* WriterFactory;

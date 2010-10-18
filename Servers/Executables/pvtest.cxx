@@ -30,6 +30,7 @@ PURPOSE.  See the above copyright notice for more information.
 int main(int argc, char* argv[])
 {
   int return_value = EXIT_SUCCESS;
+  bool printObject = false;
 
   vtkPVServerOptions* options = vtkPVServerOptions::New();
   vtkInitializationHelper::Initialize(argc, argv,
@@ -65,7 +66,7 @@ int main(int argc, char* argv[])
 
     vtkPVFileInformation* info = vtkPVFileInformation::New();
     proxy->GatherInformation(info);
-    info->Print(cout);
+    if(printObject) info->Print(cout);
     info->Delete();
     proxy->Delete();
 
@@ -81,7 +82,8 @@ int main(int argc, char* argv[])
     shrink->UpdateVTKObjects();
     shrink->UpdatePipeline();
 
-    shrink->GetDataInformation(0)->Print(cout);
+    shrink->GetDataInformation(0);
+    if(printObject) shrink->GetDataInformation(0)->Print(cout);
 
     vtkSMSourceProxy* writer =
         vtkSMSourceProxy::SafeDownCast(
@@ -90,10 +92,69 @@ int main(int argc, char* argv[])
     vtkSMPropertyHelper(writer, "FileName").Set("/tmp/foo.vtk");
     writer->UpdateVTKObjects();
     writer->UpdatePipeline();
-    writer->Delete();
 
+    // Test session proxy/pmobj
+    vtkSMSession *session = proxy->GetSession();
+    vtkTypeUInt32 proxyID = proxy->GetGlobalID();
+    vtkTypeUInt32 shrinkID = shrink->GetGlobalID();
+    vtkTypeUInt32 writerID = writer->GetGlobalID();
+    cout << "Session RemoteObject registration test: " << endl;
+    if(proxy == session->GetRemoteObject(proxyID))
+      {
+      cout << " - proxy registered OK" << endl;
+      }
+    else
+      {
+      cout << " - proxy registered KO ***ERROR***" << endl;
+      }
+    if(shrink == session->GetRemoteObject(shrinkID))
+      {
+      cout << " - shrink registered OK" << endl;
+      }
+    else
+      {
+      cout << " - shrink registered KO ***ERROR***" << endl;
+      }
+    if(writer == session->GetRemoteObject(writerID))
+      {
+      cout << " - writer registered OK" << endl;
+      }
+    else
+      {
+      cout << " - writer registered KO ***ERROR***" << endl;
+      }
+
+    writer->Delete();
     proxy->Delete();
     shrink->Delete();
+
+    // Test session proxy/pmobj unregister
+//    cout << "Session RemoteObject unregistration test: " << endl;
+    cout << " Results: " << proxyID << " " << shrinkID << " "<< writerID << endl;
+    if(0 == session->GetRemoteObject(proxyID))
+      {
+      cout << " - proxy unregistered OK" << endl;
+      }
+    else
+      {
+      cout << " - proxy unregistered KO ***ERROR***" << endl;
+      }
+    if(0 == session->GetRemoteObject(shrinkID))
+      {
+      cout << " - shrink unregistered OK" << endl;
+      }
+    else
+      {
+      cout << " - shrink unregistered KO ***ERROR***" << endl;
+      }
+    if(0 == session->GetRemoteObject(writerID))
+      {
+      cout << " - writer unregistered OK" << endl;
+      }
+    else
+      {
+      cout << " - writer unregistered KO ***ERROR***" << endl;
+      }
     }
 
   cout << "Exiting..." << endl;

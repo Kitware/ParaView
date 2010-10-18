@@ -57,6 +57,7 @@ int main(int argc, char* argv[])
   // ==========================================================================
 
   proxy = pxm->NewProxy("sources", "SphereSource");
+  pxm->RegisterProxy("testing","sphere", proxy);
   if(proxy->GetFullState())
     {
     return_value = EXIT_FAILURE;
@@ -139,6 +140,12 @@ int main(int argc, char* argv[])
     {
     cout << " - OK" << endl;
     }
+
+  cout << "====== ProxyManagerState ======" << endl;
+  pxm->GetFullState()->PrintDebugString();
+  cout << "====== ProxyManagerState (cleared) ======" << endl;
+  pxm->UnRegisterProxies();
+  pxm->GetFullState()->PrintDebugString();
 
   // ==========================================================================
   proxy->Delete();

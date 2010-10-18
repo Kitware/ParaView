@@ -39,6 +39,7 @@
 #include "vtkSMWriterFactory.h"
 #include "vtkStdString.h"
 #include "vtkStringList.h"
+#include "vtkProcessModule2.h"
 
 #include <vtkstd/map>
 #include <vtkstd/set>
@@ -118,6 +119,7 @@ vtkSMProxyManager::vtkSMProxyManager()
 #endif
 
   this->ProxyDefinitionManager = NULL;
+  this->State = NULL;
 
 #ifdef FIXME
   this->ReaderFactory = vtkSMReaderFactory::New();
@@ -145,6 +147,13 @@ vtkSMProxyManager::~vtkSMProxyManager()
   this->WriterFactory = 0;
 
   this->SetProxyDefinitionManager(NULL);
+
+  // Free State cache memory
+  if(this->State)
+    {
+    delete this->State;
+    this->State = NULL;
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -586,6 +595,12 @@ void vtkSMProxyManager::UnRegisterProxies()
     this->Internals->RegisteredProxyMap.begin(),
     this->Internals->RegisteredProxyMap.end());
   this->Internals->ModifiedProxies.clear();
+
+  // Update state
+  if(this->State)
+    {
+    this->State->ClearExtension(ProxyManagerState::registered_proxy);
+    }
 }
 
 //---------------------------------------------------------------------------
@@ -615,6 +630,34 @@ void vtkSMProxyManager::UnRegisterProxy(const char* group, const char* name,
       if (it2->second.size() == 0)
         {
         it->second.erase(it2);
+        }
+      }
+    }
+  // Update state
+  if(this->State)
+    {
+    vtkSMMessage backup;
+    backup.CopyFrom(*this->State);
+
+    int nbRegisteredProxy = this->State->ExtensionSize(ProxyManagerState::registered_proxy);
+    this->State->ClearExtension(ProxyManagerState::registered_proxy);
+
+    vtkstd::string groupString = group;
+    vtkstd::string nameString = name;
+    for(int cc=0; cc < nbRegisteredProxy; ++cc)
+      {
+      const ProxyManagerState_ProxyRegistrationInfo *reg =
+          &backup.GetExtension(ProxyManagerState::registered_proxy, cc);
+
+      if( reg->group() ==  groupString && reg->name() == nameString
+          && reg->global_id() == proxy->GetGlobalID() )
+        {
+        // Do not keep it
+        }
+      else
+        {
+        // Keep it
+        this->State->AddExtension(ProxyManagerState::registered_proxy)->CopyFrom(*reg);
         }
       }
     }
@@ -653,6 +696,32 @@ void vtkSMProxyManager::UnRegisterProxy(const char* group, const char* name)
         }
       }
     }
+  if(this->State)
+    {
+    vtkSMMessage backup;
+    backup.CopyFrom(*this->State);
+
+    int nbRegisteredProxy = this->State->ExtensionSize(ProxyManagerState::registered_proxy);
+    this->State->ClearExtension(ProxyManagerState::registered_proxy);
+
+    vtkstd::string groupString = group;
+    vtkstd::string nameString = name;
+    for(int cc=0; cc < nbRegisteredProxy; ++cc)
+      {
+      const ProxyManagerState_ProxyRegistrationInfo *reg =
+          &backup.GetExtension(ProxyManagerState::registered_proxy, cc);
+
+      if( reg->group() == groupString && reg->name() == nameString )
+        {
+        // Do not keep it
+        }
+      else
+        {
+        // Keep it
+        this->State->AddExtension(ProxyManagerState::registered_proxy)->CopyFrom(*reg);
+        }
+      }
+    }
 }
 
 //---------------------------------------------------------------------------
@@ -670,6 +739,31 @@ void vtkSMProxyManager::UnRegisterProxy(const char* name)
       }
     }
 
+  if(this->State)
+    {
+    vtkSMMessage backup;
+    backup.CopyFrom(*this->State);
+
+    int nbRegisteredProxy = this->State->ExtensionSize(ProxyManagerState::registered_proxy);
+    this->State->ClearExtension(ProxyManagerState::registered_proxy);
+
+    vtkstd::string nameString = name;
+    for(int cc=0; cc < nbRegisteredProxy; ++cc)
+      {
+      const ProxyManagerState_ProxyRegistrationInfo *reg =
+          &backup.GetExtension(ProxyManagerState::registered_proxy, cc);
+
+      if( reg->name() == nameString )
+        {
+        // Do not keep it
+        }
+      else
+        {
+        // Keep it
+        this->State->AddExtension(ProxyManagerState::registered_proxy)->CopyFrom(*reg);
+        }
+      }
+    }
 }
 
 //---------------------------------------------------------------------------
@@ -708,31 +802,30 @@ void vtkSMProxyManager::UnRegisterProxy(vtkSMProxy* proxy)
     this->UnRegisterProxy(vIter->GroupName.c_str(), vIter->ProxyName.c_str(),
       proxy);
     }
-}
 
-//---------------------------------------------------------------------------
-void vtkSMProxyManager::UnRegisterProxies(vtkIdType)
-{
-  vtkstd::vector<vtkSMProxyManagerProxyInformation> toUnRegister;
-  vtkSMProxyIterator* iter = vtkSMProxyIterator::New();
-  iter->SetModeToAll();
-
-  for (iter->Begin(); !iter->IsAtEnd(); iter->Next())
+  if(this->State)
     {
-    vtkSMProxyManagerProxyInformation info;
-    info.GroupName = iter->GetGroup();
-    info.ProxyName = iter->GetKey();
-    info.Proxy = iter->GetProxy();
-    toUnRegister.push_back(info);
-    }
-  iter->Delete();
+    vtkSMMessage backup;
+    backup.CopyFrom(*this->State);
 
-  vtkstd::vector<vtkSMProxyManagerProxyInformation>::iterator vIter =
-    toUnRegister.begin();
-  for (;vIter != toUnRegister.end(); ++vIter)
-    {
-    this->UnRegisterProxy(vIter->GroupName.c_str(), vIter->ProxyName.c_str(),
-      vIter->Proxy);
+    int nbRegisteredProxy = this->State->ExtensionSize(ProxyManagerState::registered_proxy);
+    this->State->ClearExtension(ProxyManagerState::registered_proxy);
+
+    for(int cc=0; cc < nbRegisteredProxy; ++cc)
+      {
+      const ProxyManagerState_ProxyRegistrationInfo *reg =
+          &backup.GetExtension(ProxyManagerState::registered_proxy, cc);
+
+      if( reg->global_id() == proxy->GetGlobalID() )
+        {
+        // Do not keep it
+        }
+      else
+        {
+        // Keep it
+        this->State->AddExtension(ProxyManagerState::registered_proxy)->CopyFrom(*reg);
+        }
+      }
     }
 }
 
@@ -777,6 +870,21 @@ void vtkSMProxyManager::RegisterProxy(const char* groupname,
   info.Type = RegisteredProxyInformation::PROXY;
 
   this->InvokeEvent(vtkCommand::RegisterEvent, &info);
+
+  // Update state
+  proxy->CreateVTKObjects(); // Make sure an ID has been assigned to it
+
+  if(!this->State)
+    {
+    this->State = new vtkSMMessage();
+    this->State->set_global_id(1);
+    this->State->set_location(vtkProcessModule2::PROCESS_DATA_SERVER);
+    }
+  ProxyManagerState_ProxyRegistrationInfo *registration =
+      this->State->AddExtension(ProxyManagerState::registered_proxy);
+  registration->set_group(groupname);
+  registration->set_name(name);
+  registration->set_global_id(proxy->GetGlobalID());
 }
 
 //---------------------------------------------------------------------------
@@ -1018,20 +1126,20 @@ int vtkSMProxyManager::AreProxiesModified()
 }
 
 //---------------------------------------------------------------------------
-void vtkSMProxyManager::LoadState( const char* filename,
-                                   vtkSMStateLoader* loader/*=NULL*/)
+void vtkSMProxyManager::LoadXMLState( const char* filename,
+                                      vtkSMStateLoader* loader/*=NULL*/)
 {
   vtkPVXMLParser* parser = vtkPVXMLParser::New();
   parser->SetFileName(filename);
   parser->Parse();
 
-  this->LoadState(parser->GetRootElement(), loader);
+  this->LoadXMLState(parser->GetRootElement(), loader);
   parser->Delete();
 }
 
 //---------------------------------------------------------------------------
-void vtkSMProxyManager::LoadState( vtkPVXMLElement* rootElement,
-                                   vtkSMStateLoader* loader/*=NULL*/)
+void vtkSMProxyManager::LoadXMLState( vtkPVXMLElement* rootElement,
+                                      vtkSMStateLoader* loader/*=NULL*/)
 {
   if (!rootElement)
     {
@@ -1058,16 +1166,16 @@ void vtkSMProxyManager::LoadState( vtkPVXMLElement* rootElement,
 }
 
 //---------------------------------------------------------------------------
-void vtkSMProxyManager::SaveState(const char* filename)
+void vtkSMProxyManager::SaveXMLState(const char* filename)
 {
-  vtkPVXMLElement* rootElement = this->SaveState();
+  vtkPVXMLElement* rootElement = this->SaveXMLState();
   ofstream os(filename, ios::out);
   rootElement->PrintXML(os, vtkIndent());
   rootElement->Delete();
 }
 
 //---------------------------------------------------------------------------
-vtkPVXMLElement* vtkSMProxyManager::SaveState()
+vtkPVXMLElement* vtkSMProxyManager::SaveXMLState()
 {
   vtkPVXMLElement* root = vtkPVXMLElement::New();
   root->SetName("GenericParaViewApplication");
@@ -1532,11 +1640,10 @@ void vtkSMProxyManager::PrintSelf(ostream& os, vtkIndent indent)
 //---------------------------------------------------------------------------
 const vtkSMMessage* vtkSMProxyManager::GetFullState()
 {
-  vtkErrorMacro("FIXME should be implemented");
-  return NULL;
+  return this->State;
 }
 //---------------------------------------------------------------------------
 void vtkSMProxyManager::LoadState(const vtkSMMessage* msg)
 {
-  vtkErrorMacro("FIXME should be implemented");
+  vtkErrorMacro("FIXME should be implemented for collaboration !!!");
 }
