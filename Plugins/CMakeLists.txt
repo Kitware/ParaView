@@ -5,7 +5,8 @@ MACRO(paraview_build_optional_plugin name comment subdirectory default)
   MARK_AS_ADVANCED(PARAVIEW_BUILD_PLUGIN_${name})
   IF(PARAVIEW_BUILD_PLUGIN_${name})
     MESSAGE(STATUS "Plugin: ${comment} enabled")
-    ADD_SUBDIRECTORY("${subdirectory}")
+    get_filename_component(builddirectory ${subdirectory} NAME_WE)
+    ADD_SUBDIRECTORY("${subdirectory}" "${CMAKE_CURRENT_BINARY_DIR}/${builddirectory}")
   ELSE(PARAVIEW_BUILD_PLUGIN_${name})
     MESSAGE(STATUS "Plugin: ${comment} disabled")
   ENDIF(PARAVIEW_BUILD_PLUGIN_${name})
@@ -59,3 +60,14 @@ paraview_build_optional_plugin(ForceTime "Override time requests" ForceTime OFF)
 IF(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/VisTrails/CMakeLists.txt)
   paraview_build_optional_plugin(VisTrailsPlugin "VisTrailsPlugin" VisTrails ON)
 ENDIF(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/VisTrails/CMakeLists.txt)
+
+#------------------------------------------------------------------------
+# Build any plugins located outside of ParaView.
+SET (PARAVIEW_EXTERNAL_PLUGINS_FILE "" CACHE FILEPATH
+  "Path to a cmake file containing calls to build additional plugins external to ParaView.")
+
+MARK_AS_ADVANCED(PARAVIEW_EXTERNAL_PLUGINS_FILE)
+
+IF (EXISTS "${PARAVIEW_EXTERNAL_PLUGINS_FILE}")
+  INCLUDE("${PARAVIEW_EXTERNAL_PLUGINS_FILE}")
+ENDIF (EXISTS "${PARAVIEW_EXTERNAL_PLUGINS_FILE}")
