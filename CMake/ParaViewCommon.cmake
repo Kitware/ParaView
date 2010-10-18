@@ -454,7 +454,7 @@ ELSE(PARAVIEW_USE_SYSTEM_HDF5)
   SET(HDF5_INSTALL_LIB_DIR ${PV_INSTALL_LIB_DIR})
   SET(HDF5_INSTALL_INCLUDE_DIR ${PV_INSTALL_INCLUDE_DIR})
 
-  SET(HDF5_ENABLE_Z_LIB_SUPPORT ON)
+  SET(HDF5_ENABLE_Z_LIB_SUPPORT CACHE ON "Enable Zlib Filters" FORCE)
 
   # Setup all necessary overrides for zlib so that HDF5 uses our
   # internally compiled zlib rather than any other version
