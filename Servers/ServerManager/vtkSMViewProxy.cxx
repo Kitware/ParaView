@@ -20,6 +20,7 @@
 #include "vtkImageData.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
+#include "vtkPVOptions.h"
 #include "vtkPVView.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSmartPointer.h"
@@ -271,7 +272,12 @@ int vtkSMViewProxy::WriteImage(const char* filename,
 
   vtkSmartPointer<vtkImageData> shot;
   shot.TakeReference(this->CaptureWindow(magnification));
-  return vtkSMUtilities::SaveImageOnProcessZero(shot, filename, writerName);
+
+  if (vtkProcessModule::GetProcessModule()->GetOptions()->GetSymmetricMPIMode())
+    {
+    return vtkSMUtilities::SaveImageOnProcessZero(shot, filename, writerName);
+    }
+  return vtkSMUtilities::SaveImage(shot, filename, writerName);
 }
 
 //----------------------------------------------------------------------------
