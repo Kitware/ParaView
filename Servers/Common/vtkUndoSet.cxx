@@ -62,6 +62,12 @@ void vtkUndoSet::RemoveElement(int index)
 }
 
 //-----------------------------------------------------------------------------
+vtkUndoElement* vtkUndoSet::GetElement(int index)
+{
+  return vtkUndoElement::SafeDownCast(this->Collection->GetItemAsObject(index));
+}
+
+//-----------------------------------------------------------------------------
 void vtkUndoSet::RemoveAllElements()
 {
   this->Collection->RemoveAllItems();
@@ -77,6 +83,7 @@ int vtkUndoSet::GetNumberOfElements()
 int vtkUndoSet::Redo()
 {
   int max = this->Collection->GetNumberOfItems();
+  cout << "Going to redo " << max << " actions" << endl;
   for (int cc=0; cc <max; cc++)
     {
     vtkUndoElement* elem = vtkUndoElement::SafeDownCast(
@@ -101,6 +108,7 @@ int vtkUndoSet::Redo()
 int vtkUndoSet::Undo()
 {
   int max = this->Collection->GetNumberOfItems();
+  cout << "Going to undo " << max << " actions" << endl;
   for (int cc=max-1; cc >=0; --cc)
     {
     vtkUndoElement* elem = vtkUndoElement::SafeDownCast(
@@ -118,45 +126,6 @@ int vtkUndoSet::Undo()
       }
     }
   return 1;
-}
-
-//-----------------------------------------------------------------------------
-vtkPVXMLElement* vtkUndoSet::SaveState(vtkPVXMLElement* root)
-{
-
-  vtkPVXMLElement* elem = vtkPVXMLElement::New();
-  elem->SetName("UndoSet");
-  if (root)
-    {
-    root->AddNestedElement(elem);
-    elem->Delete();
-    }
-  
-  int max = this->Collection->GetNumberOfItems();
-  for (int cc=0; cc <max; cc++)
-    {
-    vtkUndoElement* child_elem = vtkUndoElement::SafeDownCast(
-      this->Collection->GetItemAsObject(cc));
-    child_elem->SaveState(elem);
-    }
-  return elem;
-}
-
-//-----------------------------------------------------------------------------
-void vtkUndoSet::LoadState(vtkPVXMLElement* elem)
-{
-  if (!elem )
-    {
-    vtkErrorMacro("Element must be specified to load state from.");
-    return;
-    }
-  
-  if (!elem->GetName() || strcmp(elem->GetName(), "UndoSet") != 0)
-    {
-    vtkErrorMacro("Invalid element type. <UndoSet /> required.");
-    return;
-    }
-  vtkWarningMacro("State loading is not supported.");
 }
 
 //-----------------------------------------------------------------------------

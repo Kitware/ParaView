@@ -16,48 +16,25 @@
 
 #include "vtkObjectFactory.h"
 #include "vtkProcessModuleConnectionManager.h"
-#include "vtkPVXMLElement.h"
+#include "vtkSMSession.h"
 #include "vtkSMProxyLocator.h"
 
-vtkCxxSetObjectMacro(vtkSMUndoElement, XMLElement, vtkPVXMLElement);
-vtkCxxSetObjectMacro(vtkSMUndoElement, ProxyLocator, vtkSMProxyLocator);
+
 //-----------------------------------------------------------------------------
 vtkSMUndoElement::vtkSMUndoElement()
 {
-  this->ConnectionID  = 
-    vtkProcessModuleConnectionManager::GetNullConnectionID();
-  this->XMLElement = 0;
-  this->ProxyLocator = 0;
+  this->Session = 0;
 }
 
 //-----------------------------------------------------------------------------
 vtkSMUndoElement::~vtkSMUndoElement()
 {
-  this->SetXMLElement(0);
-  this->SetProxyLocator(0);
-}
-
-//-----------------------------------------------------------------------------
-void vtkSMUndoElement::SaveStateInternal(vtkPVXMLElement* root)
-{
-  if (!this->XMLElement)
-    {
-    vtkErrorMacro("No state present to save.");
-    }
-  root->AddNestedElement(this->XMLElement);
-}
-
-//-----------------------------------------------------------------------------
-void vtkSMUndoElement::LoadStateInternal(vtkPVXMLElement* element)
-{
-  this->SetXMLElement(element);
+  this->SetSession(0);
 }
 
 //-----------------------------------------------------------------------------
 void vtkSMUndoElement::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  os << indent << "ConnectionID: " << this->ConnectionID << endl;
-  os << indent << "ProxyLocator: " << this->ProxyLocator << endl;
 }
 

@@ -1647,3 +1647,30 @@ void vtkSMProxyManager::LoadState(const vtkSMMessage* msg)
 {
   vtkErrorMacro("FIXME should be implemented for collaboration !!!");
 }
+//---------------------------------------------------------------------------
+void vtkSMProxyManager::NewProxy( const vtkSMMessage* msg)
+{
+  if( msg && msg->has_global_id() && msg->HasExtension(ProxyState::xml_group) &&
+      msg->HasExtension(ProxyState::xml_name))
+    {
+    vtkSMProxy *proxy =
+        this->NewProxy( msg->GetExtension(ProxyState::xml_group).c_str(),
+                        msg->GetExtension(ProxyState::xml_name).c_str());
+
+    proxy->LoadState(msg);
+    proxy->SetGlobalID(msg->global_id());
+
+    // FIXME in collaboration mode we shouldn't push the state if it already come
+    // from the server side
+    proxy->Modified();
+    proxy->UpdateVTKObjects();
+    }
+  else if(msg)
+    {
+    vtkErrorMacro("Invalid msg while creating a new Proxy: \n" << msg->DebugString());
+    }
+  else
+    {
+    vtkErrorMacro("Invalid msg while creating a new Proxy: NULL");
+    }
+}

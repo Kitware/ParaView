@@ -64,28 +64,16 @@ public:
   void RemoveElement(int index);
 
   // Description:
+  // Get an element at a particular index
+  vtkUndoElement* GetElement(int index);
+
+  // Description:
   // Remove all elemments.
   void RemoveAllElements();
 
   // Description:
   // Get number of elements in the set.
   int GetNumberOfElements();
-
-  // Description:
-  // Saves the state of the element in an xml. 
-  // \arg \c root parent element under which the state xml element for this
-  // object is to be added.
-  // \returns the XMLElement for the set. If root is not specified, then
-  // the caller is responsible to \c Delete the returned element.
-  vtkPVXMLElement* SaveState(vtkPVXMLElement* root);
-
-  // Description:
-  // Loads the state from XML. Subclassess must override NewUndoElement()
-  // to create a undo element of appropriate type to load the state.
-  // This class doesn't actually support loading state. Subclasses
-  // are free to override this method to load state, or use a state loader
-  // (such as vtkSMUndoRedoStateLoader).
-  virtual void LoadState(vtkPVXMLElement* element);
 
 protected:
   vtkUndoSet();

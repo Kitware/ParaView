@@ -31,14 +31,13 @@
 #define __vtkSMUndoStackBuilder_h
 
 #include "vtkSMObject.h"
+#include "vtkSMMessage.h"
 
-class vtkPVXMLElement;
-class vtkSMGlobalPropertiesManager;
 class vtkSMProxy;
 class vtkSMUndoStack;
-class vtkSMUndoStackBuilderObserver;
 class vtkUndoElement;
 class vtkUndoSet;
+class vtkSMSession;
 
 class VTK_EXPORT vtkSMUndoStackBuilder : public vtkSMObject
 {
@@ -46,12 +45,6 @@ public:
   static vtkSMUndoStackBuilder* New();
   vtkTypeMacro(vtkSMUndoStackBuilder, vtkSMObject);
   void PrintSelf(ostream& os, vtkIndent indent);
-
-  // Description:
-  // Get/Set the connection ID. Currently this class records
-  // changes of proxies only on 1 connection at a time. 
-  vtkGetMacro(ConnectionID, vtkIdType);
-  vtkSetMacro(ConnectionID, vtkIdType);
 
   // Description:
   // Begins monitoring of the vtkSMProxyManager for undoable operations.
@@ -114,65 +107,44 @@ public:
   vtkGetMacro(IgnoreAllChanges, bool);
 
 //BTX
+
+  // if newState is NULL it means that the object is supposed to be
+  // deleted otherwise just record the new state in the Undo/Redo stack
+  // if any
+  virtual void OnNewState( vtkSMSession* session,
+                           vtkTypeUInt32 globalId,
+                           const vtkSMMessage* newState);
+
 protected:
   vtkSMUndoStackBuilder();
   ~vtkSMUndoStackBuilder();
 
-  friend class vtkSMUndoStackBuilderObserver;
-
-  // Description:
-  // Event handler.
-  virtual void ExecuteEvent(vtkObject* called, unsigned long eventid, void* data);
-
-  // Description:
-  // Handler for specific vtkSMProxyManager events.
-  virtual void OnRegisterProxy(const char* group, const char* name,
-    vtkSMProxy*);
-  virtual void OnUnRegisterProxy(const char* group, const char* name,
-    vtkSMProxy*);
-  virtual void OnPropertyModified(vtkSMProxy* proxy, const char* propname);
-  virtual void OnProxyStateChanged(vtkSMProxy* proxy, vtkPVXMLElement*
-    stateChange);
-  virtual void OnUpdateInformation(vtkSMProxy* proxy);
-  virtual void OnRegisterLink(const char* name);
-  virtual void OnUnRegisterLink(const char* name);
-  virtual void OnRegisterGlobalPropertiesManager(vtkSMGlobalPropertiesManager*);
-  virtual void OnUnRegisterGlobalPropertiesManager(vtkSMGlobalPropertiesManager*);
-  virtual void GlobalPropertiesLinkAdded( const char* mgrname,
-    const char* globalname, vtkSMProxy* proxy, const char* propname);
-  virtual void GlobalPropertiesLinkRemoved( const char* mgrname,
-    const char* globalname, vtkSMProxy* proxy, const char* propname);
 
   vtkSMUndoStack* UndoStack;
-  vtkIdType ConnectionID;
   vtkUndoSet* UndoSet;
   char* Label;
   vtkSetStringMacro(Label);
 
   // Description
-  // Returns if the Builder is currently monitoring the ProxyManager
-  // changes.
-  vtkGetMacro(EnableMonitoring, int);
-
-  // Description
   // Returns if the event raised by the proxy manager should be
-  // converted to undo eleements.
+  // converted to undo elements.
   virtual bool HandleChangeEvents()
     {
-    return (this->GetEnableMonitoring() > 0);
+    return (this->EnableMonitoring > 0);
     }
 
   void InitializeUndoSet();
 
 private:
-  vtkSMUndoStackBuilderObserver* Observer;
-
-private:
   vtkSMUndoStackBuilder(const vtkSMUndoStackBuilder&); // Not implemented.
   void operator=(const vtkSMUndoStackBuilder&); // Not implemented.
 
+  // used to count Begin/End call to make sure they stay consistent
+  // and make sure that a begin occurs before recording any event
   int EnableMonitoring;
   bool IgnoreAllChanges;
+  class vtkInternals;
+  vtkInternals *Internals;
 //ETX
 };
 

@@ -1,7 +1,7 @@
 /*=========================================================================
 
 Program:   ParaView
-Module:    pvtest.cxx
+Module:    pvundotest.cxx
 
 Copyright (c) Kitware, Inc.
 All rights reserved.
@@ -21,16 +21,18 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkSMSession.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkPVDataInformation.h"
+#include "vtkSMUndoStackBuilder.h"
+#include "vtkSMUndoStack.h"
 
 #include "paraview.h"
 
 #include "vtkSMSessionClient.h"
-
+#include <vtkstd/vector>
 //----------------------------------------------------------------------------
 int main(int argc, char* argv[])
 {
   int return_value = EXIT_SUCCESS;
-  bool printObject = true;
+  bool printObject = false;
 
   vtkPVServerOptions* options = vtkPVServerOptions::New();
   vtkInitializationHelper::Initialize(argc, argv,
@@ -51,12 +53,22 @@ int main(int argc, char* argv[])
     session = vtkSMSession::New();
     }
 
+  // Attach Undo/Redo stack
+  vtkSMUndoStack *undoStack = vtkSMUndoStack::New();
+  vtkSMUndoStackBuilder *undoStackBuilder = vtkSMUndoStackBuilder::New();
+  undoStackBuilder->SetUndoStack(undoStack);
+  session->SetUndoStackBuilder(undoStackBuilder);
+
   cout << "Starting..." << endl;
 
   vtkSMProxyManager* pxm = session->GetProxyManager();
+  vtkstd::vector<vtkTypeUInt32> sphereIds;
 
   for(int i=0;i<10;i++)
     {
+    // Start undo listening
+    undoStackBuilder->Begin("sphere");
+
     cout << " Processing loop: " << i << endl;
 
     proxy = pxm->NewProxy("misc", "FileInformationHelper");
@@ -74,6 +86,13 @@ int main(int argc, char* argv[])
     vtkSMPropertyHelper(proxy, "PhiResolution").Set(20);
     vtkSMPropertyHelper(proxy, "ThetaResolution").Set(20);
     proxy->UpdateVTKObjects();
+    sphereIds.push_back(proxy->GetGlobalID());
+
+    // Undo step
+    undoStackBuilder->End();
+    undoStackBuilder->PushToStack();
+    undoStackBuilder->Begin("shrink");
+
 
     vtkSMSourceProxy* shrink =
         vtkSMSourceProxy::SafeDownCast(
@@ -81,6 +100,11 @@ int main(int argc, char* argv[])
     vtkSMPropertyHelper(shrink, "Input").Set(proxy);
     shrink->UpdateVTKObjects();
     shrink->UpdatePipeline();
+
+    // Undo step
+    undoStackBuilder->End();
+    undoStackBuilder->PushToStack();
+    undoStackBuilder->Begin("writer");
 
     shrink->GetDataInformation(0);
     if(printObject) shrink->GetDataInformation(0)->Print(cout);
@@ -93,77 +117,89 @@ int main(int argc, char* argv[])
     writer->UpdateVTKObjects();
     writer->UpdatePipeline();
 
-    // Test session proxy/pmobj
-    vtkSMSession *session = proxy->GetSession();
-    vtkTypeUInt32 proxyID = proxy->GetGlobalID();
-    vtkTypeUInt32 shrinkID = shrink->GetGlobalID();
-    vtkTypeUInt32 writerID = writer->GetGlobalID();
-    cout << "Session RemoteObject registration test: " << endl;
-    if(proxy == session->GetRemoteObject(proxyID))
-      {
-      cout << " - proxy registered OK" << endl;
-      }
-    else
-      {
-      cout << " - proxy registered KO ***ERROR***" << endl;
-      return_value = EXIT_FAILURE;
-      }
-    if(shrink == session->GetRemoteObject(shrinkID))
-      {
-      cout << " - shrink registered OK" << endl;
-      }
-    else
-      {
-      cout << " - shrink registered KO ***ERROR***" << endl;
-      return_value = EXIT_FAILURE;
-      }
-    if(writer == session->GetRemoteObject(writerID))
-      {
-      cout << " - writer registered OK" << endl;
-      }
-    else
-      {
-      cout << " - writer registered KO ***ERROR***" << endl;
-      return_value = EXIT_FAILURE;
-      }
+    // Undo step
+    undoStackBuilder->End();
+    undoStackBuilder->PushToStack();
+    undoStackBuilder->Begin("edit 1");
+
+    vtkSMPropertyHelper(proxy, "PhiResolution").Set(10);
+    vtkSMPropertyHelper(proxy, "ThetaResolution").Set(20);
+    proxy->UpdateVTKObjects();
+
+    // Undo step
+    undoStackBuilder->End();
+    undoStackBuilder->PushToStack();
+    undoStackBuilder->Begin("edit 2");
+
+    vtkSMPropertyHelper(proxy, "PhiResolution").Set(30);
+    vtkSMPropertyHelper(proxy, "ThetaResolution").Set(40);
+    proxy->UpdateVTKObjects();
+
+    // Undo step
+    undoStackBuilder->End();
+    undoStackBuilder->PushToStack();
+    undoStackBuilder->Begin("edit 3");
+
+    vtkSMPropertyHelper(proxy, "PhiResolution").Set(50);
+    vtkSMPropertyHelper(proxy, "ThetaResolution").Set(60);
+    proxy->UpdateVTKObjects();
+
+    // Undo step
+    undoStackBuilder->End();
+    undoStackBuilder->PushToStack();
+    undoStackBuilder->Begin("delete");
+
+//    cout << "===========" << endl;
+//    session->PrintSelf(cout, vtkIndent());
+//    cout << "===========" << endl;
 
     writer->Delete();
     proxy->Delete();
     shrink->Delete();
 
-    // Test session proxy/pmobj unregister
-    cout << "Session RemoteObject unregistration test: " << endl;
-    if(0 == session->GetRemoteObject(proxyID))
-      {
-      cout << " - proxy unregistered OK" << endl;
-      }
-    else
-      {
-      cout << " - proxy unregistered KO ***ERROR***" << endl;
-      return_value = EXIT_FAILURE;
-      }
-    if(0 == session->GetRemoteObject(shrinkID))
-      {
-      cout << " - shrink unregistered OK" << endl;
-      }
-    else
-      {
-      cout << " - shrink unregistered KO ***ERROR***" << endl;
-      return_value = EXIT_FAILURE;
-      }
-    if(0 == session->GetRemoteObject(writerID))
-      {
-      cout << " - writer unregistered OK" << endl;
-      }
-    else
-      {
-      cout << " - writer unregistered KO ***ERROR***" << endl;
-      return_value = EXIT_FAILURE;
-      }
+    // Save undo listening
+    undoStackBuilder->End();
+    undoStackBuilder->PushToStack();
     }
 
+  // Test stack content
+  undoStackBuilder->SetIgnoreAllChanges(true);
+  cout << "===== Undo previous work =====" << endl;
+  for(int i=0, nb=undoStack->GetNumberOfUndoSets(); i < nb; i++)
+    {
+    cout << "Nb undo: " << undoStack->GetNumberOfUndoSets() << " - Can undo ? " << undoStack->CanUndo() << endl;
+    cout << "Nb redo: " << undoStack->GetNumberOfRedoSets() << " - Can redo ? " << undoStack->CanRedo() << endl;
+    cout << "==" << endl;
+    cout << "undo " << i << ": " << undoStack->Undo() << endl;
+
+    vtkstd::vector<vtkTypeUInt32>::iterator iter = sphereIds.begin();
+    double phi,theta;
+    while(iter != sphereIds.end())
+      {
+      vtkSMProxy *sphere = vtkSMProxy::SafeDownCast(session->GetRemoteObject(*iter));
+      if(sphere)
+        {
+        vtkSMPropertyHelper(sphere, "PhiResolution").Get(&phi);
+        vtkSMPropertyHelper(sphere, "ThetaResolution").Get(&theta);
+        cout << "Sphere " << *iter << " PhiResolution: " << phi
+             <<  " ThetaResolution: " << theta << endl;
+        }
+      iter++;
+      }
+
+
+    //session->PrintSelf(cout, vtkIndent());
+    }
+  cout << "Nb undo: " << undoStack->GetNumberOfUndoSets() << " - Can undo ? " << undoStack->CanUndo() << endl;
+  cout << "Nb redo: " << undoStack->GetNumberOfRedoSets() << " - Can redo ? " << undoStack->CanRedo() << endl;
+
+
+
   cout << "Exiting..." << endl;
+  undoStack->Delete();
+  undoStackBuilder->Delete();
   session->Delete();
+
 
   //---------------------------------------------------------------------------
   vtkInitializationHelper::Finalize();

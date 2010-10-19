@@ -24,8 +24,7 @@
 
 #include "vtkUndoElement.h"
 
-class vtkPVXMLElement;
-class vtkSMProxyLocator;
+#include "vtkSMSession.h"
 
 class VTK_EXPORT vtkSMUndoElement : public vtkUndoElement
 {
@@ -33,38 +32,16 @@ public:
   vtkTypeMacro(vtkSMUndoElement, vtkUndoElement);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Get/Set the connection ID.
-  vtkGetMacro(ConnectionID, vtkIdType);
-  vtkSetMacro(ConnectionID, vtkIdType);
+  // Get/Set the Session.
+  vtkGetObjectMacro(Session, vtkSMSession);
+  vtkSetObjectMacro(Session, vtkSMSession);
 
-  // Description:
-  // Get/Set the proxy locator used to locate proxies referred to in the
-  // undo/redo states.
-  // This must be set before the undo/redo actions are called.
-  // This is only valid within Undo()/Redo() calls.
-  void SetProxyLocator(vtkSMProxyLocator*);
-  vtkGetObjectMacro(ProxyLocator, vtkSMProxyLocator);
 protected:
   vtkSMUndoElement();
   ~vtkSMUndoElement();
 
-  vtkIdType ConnectionID;
+  vtkSMSession* Session;
 
-  // Description:
-  // Access the XML element that is keeps the state 
-  // to undo/redo.
-  vtkPVXMLElement* XMLElement;
-  void SetXMLElement(vtkPVXMLElement*);
-
-  vtkSMProxyLocator* ProxyLocator;
-
-  // Description:
-  // Overridden to save state specific to the class.
-  // \arg \c element <Element /> representing this object.
-  virtual void SaveStateInternal(vtkPVXMLElement* root);
-
-  virtual void LoadStateInternal(vtkPVXMLElement* element);
 private:
   vtkSMUndoElement(const vtkSMUndoElement&); // Not implemented.
   void operator=(const vtkSMUndoElement&); // Not implemented.

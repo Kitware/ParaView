@@ -15,7 +15,6 @@
 #include "vtkUndoElement.h"
 
 #include "vtkObjectFactory.h"
-#include "vtkPVXMLElement.h"
 
 //-----------------------------------------------------------------------------
 vtkUndoElement::vtkUndoElement()
@@ -26,28 +25,6 @@ vtkUndoElement::vtkUndoElement()
 //-----------------------------------------------------------------------------
 vtkUndoElement::~vtkUndoElement()
 {
-}
-
-//-----------------------------------------------------------------------------
-void vtkUndoElement::SaveState(vtkPVXMLElement* root)
-{
-  if (!root)
-    {
-    vtkErrorMacro("Root element must be specified to save the state.");
-    return;
-    }
-  this->SaveStateInternal(root);
-}
-
-//-----------------------------------------------------------------------------
-void vtkUndoElement::LoadState(vtkPVXMLElement* element)
-{
-  if (!element)
-    {
-    vtkErrorMacro("Element must be specified to load the state.");
-    return;
-    }
-  this->LoadStateInternal(element);
 }
 
 //-----------------------------------------------------------------------------

@@ -28,7 +28,11 @@ public:
     Element(const char* label, vtkUndoSet* set)
       {
       this->Label = label;
-      this->UndoSet = set;
+      this->UndoSet = vtkSmartPointer<vtkUndoSet>::New();
+      for(int i=0,nb=set->GetNumberOfElements(); i < nb; i++)
+        {
+        this->UndoSet->AddElement(set->GetElement(i));
+        }
       }
     };
   typedef vtkstd::vector<Element> VectorOfElements;

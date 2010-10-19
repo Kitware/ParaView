@@ -37,7 +37,6 @@
 
 #include "vtkUndoStack.h"
 
-class vtkPVXMLElement;
 class vtkSMUndoRedoStateLoader;
 class vtkSMUndoStackObserver;
 class vtkUndoSet;
@@ -50,10 +49,10 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // It is possible to push any instance of vtkUndoSet on to the server
-  // for a specific connection. Note however that once it is pushed on the server
+  // It is possible to push any instance of vtkUndoSet on to the server.
+  // Note however that once it is pushed on the server
   // every connected client will be able to undo it (evetually atleast).
-  void Push(vtkIdType connectionid, const char* label, vtkUndoSet* set);
+//  void Push(const char* label, vtkUndoSet* set);
 
   // Description:
   // Performs an Undo using the set on the top of the undo stack. The set is poped from
@@ -72,18 +71,12 @@ public:
   virtual int Redo();
 
   // Description:
-  // Set the state loader to be used to load the undo/redo set states.
-  // By default vtkSMUndoRedoStateLoader is used.
-  void SetStateLoader(vtkSMUndoRedoStateLoader*);
-  vtkGetObjectMacro(StateLoader, vtkSMUndoRedoStateLoader);
-
-  // Description:
   // Typically undo stacks have their state saved on the server. This may not 
   // be necessary always. If this flag is set, the undo stack is kept only on
   // the client. Off by default.
-  vtkSetMacro(ClientOnly, int);
-  vtkGetMacro(ClientOnly, int);
-  vtkBooleanMacro(ClientOnly, int);
+//  vtkSetMacro(ClientOnly, int);
+//  vtkGetMacro(ClientOnly, int);
+//  vtkBooleanMacro(ClientOnly, int);
 
 //BTX
 
@@ -93,17 +86,7 @@ protected:
   vtkSMUndoStack();
   ~vtkSMUndoStack();
 
-  // Description:
-  // Don;t call Push directly on this class. Instead use 
-  // BeginOrContinueUndoSet() and EndUndoSet().
-  virtual void Push(const char* , vtkUndoSet* ) 
-    {
-    vtkErrorMacro(
-      "vtkSMUndoStack does not support calling Push without connectionID.");
-    return;
-    }
-
-  // Description:
+   // Description:
   // The method updates the client side stack. Client side stack merely contains the labels
   // for the undo/redo states and which connection they are to be performed on.
   // TODO: Eventually this method will be called as an effect of the PM telling the client
@@ -112,19 +95,14 @@ protected:
   // only the status is updated, the actual undo state is not sent to the client
   // until it requests it. Ofcourse, this part is still not implemnted. For now,
   // multiple clients are not supported.
-  void PushUndoConnection(const char* label, vtkIdType id);
+//  void PushUndoConnection(const char* label, vtkIdType id);
 
-  friend class vtkSMUndoStackUndoSet;
-  int ProcessUndo(vtkIdType id, vtkPVXMLElement* root);
-  int ProcessRedo(vtkIdType id, vtkPVXMLElement* root);
+//  void OnConnectionClosed(vtkIdType cid);
 
-  vtkSMUndoRedoStateLoader* StateLoader;
-  void OnConnectionClosed(vtkIdType cid);
+//  friend class vtkSMUndoStackObserver;
+//  void ExecuteEvent(vtkObject* called, unsigned long eventid, void* data);
 
-  friend class vtkSMUndoStackObserver;
-  void ExecuteEvent(vtkObject* called, unsigned long eventid, void* data);
-
-  int ClientOnly;
+//  int ClientOnly;
 
 private:
   vtkSMUndoStack(const vtkSMUndoStack&); // Not implemented.

@@ -429,8 +429,15 @@ public:
   virtual const vtkSMMessage* GetFullState();
 
   // Description:
-  // This method is used to initialise the object to the given state
+  // This method is used to initialise the ProxyManager to the given state
   virtual void LoadState(const vtkSMMessage* msg);
+
+  // Description:
+  // This metod allow the creation of a proxy based on its full state.
+  // Used in Undo/Redo to bring back a proxy to life or in collaboration mode,
+  // where the message come from the server and the purpose is to create the SM
+  // side when the PM side has already been created.
+  virtual void NewProxy(const vtkSMMessage* msg);
 
 protected:
   vtkSMProxyManager();

@@ -29,8 +29,6 @@
 
 #include "vtkObject.h"
 
-class vtkPVXMLElement;
-
 class VTK_EXPORT vtkUndoElement : public vtkObject
 {
 public:
@@ -46,25 +44,6 @@ public:
   // Redo the operation encaspsulated by this element.
   // \return the status of the operation, 1 on success, 0 otherwise.
   virtual int Redo() = 0;
-
-  // Description:
-  // Returns if this element can load the xml state for the given element.
-  virtual bool CanLoadState(vtkPVXMLElement*) = 0;
-
-  // Description:
-  // Saves the state of the element in an xml. Subclasses must override
-  // SaveStateInternal() to add any subclass specific state information.
-  // This method merely ensure that root is valid.
-  // \arg \c root parent element under which the state xml element for this
-  // object is to be added.
-  void SaveState(vtkPVXMLElement* root);
-
-  // Description:
-  // Loads the state of this element from the XML node.
-  // Subclasses must override LoadStateInternal() to add any subclass specific 
-  // state loading. This method merely ensure that element is valid.
-  // \arg \c element is the XML element for this object. 
-  void LoadState(vtkPVXMLElement* element);
 
   // Description:
   // Returns if this undo element can be merged with other
@@ -89,16 +68,6 @@ public:
 protected:
   vtkUndoElement();
   ~vtkUndoElement();
-
-  // Description:
-  // Overridden by subclasses to save state specific to the class.
-  // \arg \c parent element. 
-  virtual void SaveStateInternal(vtkPVXMLElement* root)=0;
-
-  // Description:
-  // Overridden by subclasses to load state specific to the class.
-  // \arg \c parent element. 
-  virtual void LoadStateInternal(vtkPVXMLElement* element) =0;
 
   // Description:
   // Subclasses must set this flag to enable merging of consecutive elements

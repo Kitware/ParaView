@@ -21,6 +21,7 @@
 
 #include "vtkSession.h"
 #include "vtkSMMessage.h"
+#include "vtkSMUndoStackBuilder.h"
 
 class vtkSMProxyManager;
 class vtkSMSessionCore;
@@ -37,6 +38,12 @@ public:
 
   // Description:
   virtual bool GetIsAlive() { return true; }
+
+  // Description:
+  // Allow the user to bind an UndoStackBuilder with the given session
+  vtkSetObjectMacro(UndoStackBuilder, vtkSMUndoStackBuilder);
+  vtkGetObjectMacro(UndoStackBuilder, vtkSMUndoStackBuilder);
+
 
 //BTX
   // Description:
@@ -111,6 +118,7 @@ protected:
 
   vtkSMSessionCore* Core;
   vtkSMProxyManager* ProxyManager;
+  vtkSMUndoStackBuilder* UndoStackBuilder;
 
   // FIXME should be managed smartly between client and server.
   vtkTypeUInt32 LastGUID;

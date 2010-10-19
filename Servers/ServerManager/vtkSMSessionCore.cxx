@@ -77,6 +77,7 @@ public:
   //---------------------------------------------------------------------------
   void DeleteRemoteObject(vtkTypeUInt32 globalUniqueId)
     {
+    // Remove Remote
     RemoteObjectMapType::iterator iter2 = this->RemoteObjectMap.find(globalUniqueId);
     if (iter2 != this->RemoteObjectMap.end())
       {
@@ -317,6 +318,7 @@ void vtkSMSessionCore::PushStateSatelliteCallback()
 void vtkSMSessionCore::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+  this->Internals->PrintRemoteMap();
 }
 //----------------------------------------------------------------------------
 void vtkSMSessionCore::PullState(vtkSMMessage* message)
