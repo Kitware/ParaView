@@ -42,6 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqFixPathsInStateFilesBehavior.h"
 #include "pqObjectPickingBehavior.h"
 #include "pqPersistentMainWindowStateBehavior.h"
+#include "pqPipelineContextMenuBehavior.h"
 #include "pqPluginActionGroupBehavior.h"
 #include "pqPluginDockWidgetsBehavior.h"
 #include "pqPluginManager.h"
@@ -74,6 +75,7 @@ pqParaViewBehaviors::pqParaViewBehaviors(
   new pqDataTimeStepBehavior(this);
   new pqViewFrameActionsBehavior(this);
   new pqSpreadSheetVisibilityBehavior(this);
+  new pqPipelineContextMenuBehavior(this);
   new pqDefaultViewBehavior(this);
   new pqAlwaysConnectedBehavior(this);
   new pqPVNewSourceBehavior(this);
