@@ -195,12 +195,9 @@ protected:
   typedef vtkstd::map<vtkIceTSynchronizedRenderers*, vtkTile> TilesMapType;
   static TilesMapType TilesMap;
 
-  // Iterates over all valid tiles in the TilesMap and flush the images to the
-  // screen.
-  void FlushTiles(vtkRenderer* renderer)
+  void FlushTile(vtkRenderer* renderer, const TilesMapType::iterator& iter)
     {
-    for (TilesMapType::iterator iter = TilesMap.begin();
-      iter != TilesMap.end(); ++iter)
+    if (iter != TilesMap.end())
       {
       vtkTile& tile = iter->second;
       if (tile.TileImage.IsValid())
@@ -216,6 +213,24 @@ protected:
         renderer->SetViewport(viewport);
         }
       }
+    }
+
+  // Iterates over all valid tiles in the TilesMap and flush the images to the
+  // screen.
+  void FlushTiles(vtkRenderer* renderer, vtkIceTSynchronizedRenderers* current)
+    {
+    for (TilesMapType::iterator iter = TilesMap.begin();
+      iter != TilesMap.end(); ++iter)
+      {
+      if (iter->first != current)
+        {
+        FlushTile(renderer, iter);
+        }
+      }
+    // Render the current tile last, this is done in case where user has
+    // overlapping views. This ensures that active view is always rendered on
+    // top.
+    FlushTile(renderer, TilesMap.find(current));
     }
 
   void EraseTile(vtkIceTSynchronizedRenderers* ptr)
@@ -310,7 +325,7 @@ void vtkIceTSynchronizedRenderers::HandleEndRender()
 
     // Write-back either the freshly rendered tile or what was most recently
     // rendered.
-    ::FlushTiles(this->Renderer);
+    ::FlushTiles(this->Renderer, this);
     }
 }
 
