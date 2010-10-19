@@ -181,11 +181,11 @@ QWidget* pqRenderView::createWidget()
 {
   QWidget* vtkwidget = this->Superclass::createWidget();
 
-  // add a link view menu
-  QAction* act = new QAction("Link Camera...", this);
-  vtkwidget->addAction(act);
-  QObject::connect(act, SIGNAL(triggered(bool)),
-    this, SLOT(linkToOtherView()));
+  //// add a link view menu
+  //QAction* act = new QAction("Link Camera...", this);
+  //vtkwidget->addAction(act);
+  //QObject::connect(act, SIGNAL(triggered(bool)),
+  //  this, SLOT(linkToOtherView()));
   return vtkwidget;
 }
 
