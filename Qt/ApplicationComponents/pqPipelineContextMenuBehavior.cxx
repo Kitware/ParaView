@@ -33,15 +33,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqActiveObjects.h"
 #include "pqApplicationCore.h"
+#include "pqPipelineRepresentation.h"
 #include "pqEditColorMapReaction.h"
-#include "pqServerManagerModel.h"
 #include "pqRenderView.h"
+#include "pqSMAdaptor.h"
+#include "pqServerManagerModel.h"
 
 #include "vtkSMProxy.h"
 
 #include <QWidget>
 #include <QAction>
 #include <QMenu>
+#include <QMouseEvent>
 
 //-----------------------------------------------------------------------------
 pqPipelineContextMenuBehavior::pqPipelineContextMenuBehavior(QObject* parentObject)
@@ -67,43 +70,117 @@ void pqPipelineContextMenuBehavior::onViewAdded(pqView* view)
   if (view && view->getProxy()->IsA("vtkSMRenderViewProxy"))
     {
     // add a link view menu
-    view->getWidget()->parentWidget()->setContextMenuPolicy(
-      Qt::CustomContextMenu);
-    QObject::connect(view->getWidget()->parentWidget(),
-      SIGNAL(customContextMenuRequested(const QPoint&)),
-      this, SLOT(customContextMenuRequested(const QPoint&)),
-      Qt::QueuedConnection);
+    view->getWidget()->installEventFilter(this);
     }
 }
 
 //-----------------------------------------------------------------------------
-void pqPipelineContextMenuBehavior::customContextMenuRequested(const QPoint& point)
+bool pqPipelineContextMenuBehavior::eventFilter(QObject* caller, QEvent* e)
 {
-  pqRenderView* view = qobject_cast<pqRenderView*>(
-    pqActiveObjects::instance().activeView());
-  if (!view)
+  if (e->type() == QEvent::MouseButtonPress)
     {
-    return;
+    QMouseEvent* me = static_cast<QMouseEvent*>(e);
+    if (me->button() & Qt::RightButton)
+      {
+      this->Position = me->pos();
+      }
+    }
+  else if (e->type() == QEvent::MouseButtonRelease)
+    {
+    QMouseEvent* me = static_cast<QMouseEvent*>(e);
+    if (me->button() & Qt::RightButton && !this->Position.isNull())
+      {
+      QPoint newPos = static_cast<QMouseEvent*>(e)->pos();
+      QPoint delta = newPos - this->Position;
+      QWidget* senderWidget = qobject_cast<QWidget*>(caller);
+      if (delta.manhattanLength() < 3 && senderWidget != NULL)
+        {
+        pqRenderView* view = qobject_cast<pqRenderView*>(
+          pqActiveObjects::instance().activeView());
+        if (view)
+          {
+          int pos[2] = { newPos.x(), newPos.y() } ;
+          pqDataRepresentation* picked_repr = view->pick(pos);
+          if (picked_repr)
+            {
+            this->Menu->clear();
+            this->buildMenu(picked_repr);
+            this->Menu->popup(senderWidget->mapToGlobal(newPos));
+            }
+          }
+        }
+      this->Position = QPoint();
+      }
     }
 
-  int pos[2] = { point.x(), point.y() } ;
-  pqDataRepresentation* picked_repr = view->pick(pos);
-  if (!picked_repr)
-    {
-    return;
-    }
-
-  this->Menu->clear();
-  this->buildMenu(picked_repr);
-  QWidget* senderWidget = qobject_cast<QWidget*>(this->sender());
-  this->Menu->popup(senderWidget->mapToGlobal(point));
+  return Superclass::eventFilter(caller, e);
 }
 
 //-----------------------------------------------------------------------------
 void pqPipelineContextMenuBehavior::buildMenu(pqDataRepresentation* repr)
 {
+  pqPipelineRepresentation* pipelineRepr =
+    qobject_cast<pqPipelineRepresentation*>(repr);
+
   QAction* action;
   action = this->Menu->addAction("Hide");
-  action = this->Menu->addAction("Edit ColorMap");
+  QObject::connect(action, SIGNAL(triggered()), this, SLOT(hide()));
+
+  QMenu* reprMenu = this->Menu->addMenu("Representation");
+
+  // populate the representation types menu.
+  QList<QVariant> rTypes = pqSMAdaptor::getEnumerationPropertyDomain(
+    repr->getProxy()->GetProperty("Representation"));
+  QVariant curRType = pqSMAdaptor::getEnumerationProperty(
+    repr->getProxy()->GetProperty("Representation"));
+  foreach (QVariant rtype, rTypes)
+    {
+    QAction* raction = reprMenu->addAction(rtype.toString());
+    raction->setCheckable(true);
+    raction->setChecked(rtype == curRType);
+    }
+  QObject::connect(reprMenu, SIGNAL(triggered(QAction*)),
+    this, SLOT(reprTypeChanged(QAction*)));
+
+  this->Menu->addSeparator();
+  action = this->Menu->addAction("Edit Color");
   new pqEditColorMapReaction(action);
+
+  if (pipelineRepr)
+    {
+    QMenu* colorFieldsMenu = this->Menu->addMenu("Color By");
+    QList<QString> available_fields = pipelineRepr->getColorFields();
+    foreach (QString field, available_fields)
+      {
+      colorFieldsMenu->addAction(field);
+      //raction->setCheckable(true);
+      }
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqPipelineContextMenuBehavior::hide()
+{
+  pqDataRepresentation* repr =
+    pqActiveObjects::instance().activeRepresentation();
+  if (repr)
+    {
+    repr->setVisible(false);
+    repr->renderViewEventually();
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqPipelineContextMenuBehavior::reprTypeChanged(QAction* action)
+{
+  pqDataRepresentation* repr =
+    pqActiveObjects::instance().activeRepresentation();
+  if (repr)
+    {
+    pqSMAdaptor::setEnumerationProperty(
+      repr->getProxy()->GetProperty("Representation"),
+      action->text());
+    repr->getProxy()->UpdateVTKObjects();
+    repr->renderViewEventually();
+    }
 }

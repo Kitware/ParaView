@@ -33,12 +33,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __pqPipelineContextMenuBehavior_h
 
 #include <QObject>
+#include <QPoint> // needed for QPoint.
 #include "pqApplicationComponentsExport.h"
 
-class pqView;
-class QPoint;
-class QMenu;
 class pqDataRepresentation;
+class pqView;
+class QAction;
+class QMenu;
 
 /// @ingroup Behaviors
 ///
@@ -59,13 +60,16 @@ protected slots:
   /// menu if the view is a render-view.
   void onViewAdded(pqView*);
 
-  void customContextMenuRequested(const QPoint&);
+  void hide();
+  void reprTypeChanged(QAction* action);
 
 protected:
   virtual void buildMenu(pqDataRepresentation* repr);
 
-  QMenu* Menu;
+  virtual bool eventFilter(QObject* caller, QEvent* e);
 
+  QMenu* Menu;
+  QPoint Position;
 private:
   Q_DISABLE_COPY(pqPipelineContextMenuBehavior)
 
