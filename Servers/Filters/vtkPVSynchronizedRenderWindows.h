@@ -175,6 +175,12 @@ protected:
   // response on different processes types.
   void UpdateWindowLayout();
 
+  // Description:
+  // Ensures that only the renderer assigned to the given id are enabled, all
+  // others are disabled. This is especially necessary on processes where the
+  // render window is shared.
+  void UpdateRendererDrawStates(unsigned int id);
+
   // These methods are called on all processes as a consequence of corresponding
   // events being called on the render window.
   virtual void HandleStartRender(vtkRenderWindow*);

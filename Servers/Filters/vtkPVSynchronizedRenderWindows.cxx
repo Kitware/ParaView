@@ -636,9 +636,8 @@ const int *vtkPVSynchronizedRenderWindows::GetWindowPosition(unsigned int id)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVSynchronizedRenderWindows::Render(unsigned int id)
+void vtkPVSynchronizedRenderWindows::UpdateRendererDrawStates(unsigned int id)
 {
-  // cout << "Rendering: " << id << endl;
   vtkInternals::RenderWindowsMap::iterator iter =
     this->Internals->RenderWindows.find(id);
   if (iter == this->Internals->RenderWindows.end())
@@ -662,6 +661,18 @@ void vtkPVSynchronizedRenderWindows::Render(unsigned int id)
     iterRen != iter->second.Renderers.end(); ++iterRen)
     {
     iterRen->GetPointer()->DrawOn();
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVSynchronizedRenderWindows::Render(unsigned int id)
+{
+  // cout << "Rendering: " << id << endl;
+  vtkInternals::RenderWindowsMap::iterator iter =
+    this->Internals->RenderWindows.find(id);
+  if (iter == this->Internals->RenderWindows.end())
+    {
+    return;
     }
 
   // FIXME: When root node tries to communicate to the satellites the active
@@ -688,6 +699,7 @@ void vtkPVSynchronizedRenderWindows::HandleStartRender(vtkRenderWindow* renWin)
 
   case RENDER_SERVER:
   case BATCH:
+    this->UpdateRendererDrawStates(this->Internals->ActiveId);
     if (this->ParallelController->GetLocalProcessId() == 0)
       {
       // root node.
