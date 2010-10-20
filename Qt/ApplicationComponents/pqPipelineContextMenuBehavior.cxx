@@ -38,6 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqRenderView.h"
 #include "pqScalarsToColors.h"
 #include "pqServerManagerModel.h"
+#include "pqSetName.h"
 #include "pqSMAdaptor.h"
 #include "pqUndoStack.h"
 #include "vtkSMProxy.h"
@@ -80,6 +81,7 @@ pqPipelineContextMenuBehavior::pqPipelineContextMenuBehavior(QObject* parentObje
     this, SLOT(onViewAdded(pqView*)),
     Qt::QueuedConnection);
   this->Menu = new QMenu();
+  this->Menu << pqSetName("PipelineContextMenu");
 }
 
 //-----------------------------------------------------------------------------
@@ -156,7 +158,8 @@ void pqPipelineContextMenuBehavior::buildMenu(pqDataRepresentation* repr)
   action = this->Menu->addAction("Hide");
   QObject::connect(action, SIGNAL(triggered()), this, SLOT(hide()));
 
-  QMenu* reprMenu = this->Menu->addMenu("Representation");
+  QMenu* reprMenu = this->Menu->addMenu("Representation")
+    << pqSetName("Representation");
 
   // populate the representation types menu.
   QList<QVariant> rTypes = pqSMAdaptor::getEnumerationPropertyDomain(
@@ -175,7 +178,8 @@ void pqPipelineContextMenuBehavior::buildMenu(pqDataRepresentation* repr)
   this->Menu->addSeparator();
   if (pipelineRepr)
     {
-    QMenu* colorFieldsMenu = this->Menu->addMenu("Color By");
+    QMenu* colorFieldsMenu = this->Menu->addMenu("Color By")
+      << pqSetName("ColorBy");
     this->buildColorFieldsMenu(pipelineRepr, colorFieldsMenu);
     }
   action = this->Menu->addAction("Edit Color");
@@ -220,23 +224,28 @@ void pqPipelineContextMenuBehavior::buildColorFieldsMenu(
 
     if (num_components == 1)
       {
-      menu->addAction(cell_data? cellDataIcon: pointDataIcon,
-        arrayname)->setData(colorFieldData(field, -1));
+      QAction* c_action = menu->addAction(cell_data? cellDataIcon: pointDataIcon,
+        arrayname);
+      c_action << pqSetName(field);
+      c_action->setData(colorFieldData(field, -1));
       }
     else if (num_components > 1)
       {
       QMenu* component_menu = menu->addMenu(cell_data?
-        cellDataIcon: pointDataIcon, arrayname);
+        cellDataIcon: pointDataIcon, arrayname) << pqSetName(field);
       QObject::connect(menu, SIGNAL(triggered(QAction*)),
         this, SLOT(colorMenuTriggered(QAction*)), Qt::QueuedConnection);
-      component_menu->addAction("Magnitude")->setData(colorFieldData(field, -1));
+      QAction* c_action = component_menu->addAction("Magnitude");
+      c_action->setData(colorFieldData(field, -1));
+      c_action << pqSetName("-1");
       for (int cc=0; cc < num_components; cc++)
         {
         QString component_name =
           pipelineRepr->getColorFieldComponentName(field, cc);
-        component_menu->addAction(component_name.isEmpty()?
-          QString::number(cc): component_name)->setData(
-          colorFieldData(field, cc));
+        c_action = component_menu->addAction(component_name.isEmpty()?
+          QString::number(cc): component_name);
+        c_action << pqSetName(component_name);
+        c_action->setData(colorFieldData(field, cc));
         }
       }
     }
