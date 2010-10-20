@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationComponentsExport.h"
 
 class pqDataRepresentation;
+class pqPipelineRepresentation;
 class pqView;
 class QAction;
 class QMenu;
@@ -62,9 +63,12 @@ protected slots:
 
   void hide();
   void reprTypeChanged(QAction* action);
+  void colorMenuTriggered(QAction* action);
 
 protected:
   virtual void buildMenu(pqDataRepresentation* repr);
+  virtual void buildColorFieldsMenu(
+    pqPipelineRepresentation* pipelineRepr, QMenu* menu);
 
   virtual bool eventFilter(QObject* caller, QEvent* e);
 

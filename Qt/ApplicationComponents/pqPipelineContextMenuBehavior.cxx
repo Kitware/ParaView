@@ -33,18 +33,42 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqActiveObjects.h"
 #include "pqApplicationCore.h"
-#include "pqPipelineRepresentation.h"
 #include "pqEditColorMapReaction.h"
+#include "pqPipelineRepresentation.h"
 #include "pqRenderView.h"
-#include "pqSMAdaptor.h"
+#include "pqScalarsToColors.h"
 #include "pqServerManagerModel.h"
-
+#include "pqSMAdaptor.h"
+#include "pqUndoStack.h"
 #include "vtkSMProxy.h"
 
 #include <QWidget>
 #include <QAction>
 #include <QMenu>
 #include <QMouseEvent>
+#include <QRegExp>
+
+namespace
+{
+  const QStringList colorFieldData(const QString& field, int component)
+    {
+    QStringList result;
+    result << field << QString::number(component);
+    return result;
+    }
+
+  bool extractColorFieldData(const QVariant& variant, QString& field, int& component)
+    {
+    QStringList list = variant.toStringList();
+    if (list.size() == 2)
+      {
+      field = list[0];
+      component = list[1].toInt();
+      return true;
+      }
+    return false;
+    }
+};
 
 //-----------------------------------------------------------------------------
 pqPipelineContextMenuBehavior::pqPipelineContextMenuBehavior(QObject* parentObject)
@@ -149,24 +173,103 @@ void pqPipelineContextMenuBehavior::buildMenu(pqDataRepresentation* repr)
   if (pipelineRepr)
     {
     QMenu* colorFieldsMenu = this->Menu->addMenu("Color By");
-    QList<QString> available_fields = pipelineRepr->getColorFields();
-    foreach (QString field, available_fields)
+    this->buildColorFieldsMenu(pipelineRepr, colorFieldsMenu);
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqPipelineContextMenuBehavior::buildColorFieldsMenu(
+  pqPipelineRepresentation* pipelineRepr, QMenu* menu)
+{
+  QObject::connect(menu, SIGNAL(triggered(QAction*)),
+    this, SLOT(colorMenuTriggered(QAction*)), Qt::QueuedConnection);
+
+  QIcon cellDataIcon(":/pqWidgets/Icons/pqCellData16.png");
+  QIcon pointDataIcon(":/pqWidgets/Icons/pqPointData16.png");
+  QIcon solidColorIcon(":/pqWidgets/Icons/pqSolidColor16.png");
+
+  QList<QString> available_fields = pipelineRepr->getColorFields();
+  QRegExp regExpCell(" \\(cell\\)\\w*$");
+  QRegExp regExpPoint(" \\(point\\)\\w*$");
+  foreach (QString field, available_fields)
+    {
+    if (field == pqPipelineRepresentation::solidColor())
       {
-      colorFieldsMenu->addAction(field);
-      //raction->setCheckable(true);
+      menu->addAction(solidColorIcon, field)->setData(
+        colorFieldData(field, -1));
+      continue;
+      }
+
+    int num_components = pipelineRepr->getColorFieldNumberOfComponents(field);
+    QString arrayname = field;
+    bool cell_data = false;
+    if (regExpCell.indexIn(field) != -1)
+      {
+      cell_data = true;
+      arrayname.replace(regExpCell, "");
+      }
+    else if (regExpPoint.indexIn(field) != -1)
+      {
+      arrayname.replace(regExpCell, "");
+      }
+
+    if (num_components == 1)
+      {
+      menu->addAction(cell_data? cellDataIcon: pointDataIcon,
+        arrayname)->setData(colorFieldData(field, -1));
+      }
+    else if (num_components > 1)
+      {
+      QMenu* component_menu = menu->addMenu(cell_data?
+        cellDataIcon: pointDataIcon, arrayname);
+      QObject::connect(menu, SIGNAL(triggered(QAction*)),
+        this, SLOT(colorMenuTriggered(QAction*)), Qt::QueuedConnection);
+      component_menu->addAction("Magnitude")->setData(colorFieldData(field, -1));
+      for (int cc=0; cc < num_components; cc++)
+        {
+        QString component_name =
+          pipelineRepr->getColorFieldComponentName(field, cc);
+        component_menu->addAction(component_name.isEmpty()?
+          QString::number(cc): component_name)->setData(
+          colorFieldData(field, cc));
+        }
       }
     }
 }
 
 //-----------------------------------------------------------------------------
-void pqPipelineContextMenuBehavior::hide()
+void pqPipelineContextMenuBehavior::colorMenuTriggered(QAction* action)
 {
-  pqDataRepresentation* repr =
-    pqActiveObjects::instance().activeRepresentation();
+  QString field;
+  int component;
+  if (!extractColorFieldData(action->data(), field, component))
+    {
+    return;
+    }
+
+  pqPipelineRepresentation* repr = qobject_cast<pqPipelineRepresentation*>(
+    pqActiveObjects::instance().activeRepresentation());
   if (repr)
     {
-    repr->setVisible(false);
+    BEGIN_UNDO_SET("Color Changed");
+    repr->setColorField(field);
+    pqScalarsToColors* lut = repr->getLookupTable();
+    if (lut)
+      {
+      if (component == -1)
+        {
+        lut->setVectorMode(pqScalarsToColors::MAGNITUDE, -1);
+        }
+      else
+        {
+        lut->setVectorMode(pqScalarsToColors::COMPONENT, component);
+        lut->updateScalarBarTitles(
+          repr->getColorFieldComponentName(field, component));
+        }
+      repr->resetLookupTableScalarRange();
+      }
     repr->renderViewEventually();
+    END_UNDO_SET();
     }
 }
 
@@ -177,10 +280,26 @@ void pqPipelineContextMenuBehavior::reprTypeChanged(QAction* action)
     pqActiveObjects::instance().activeRepresentation();
   if (repr)
     {
+    BEGIN_UNDO_SET("Representation Type Changed");
     pqSMAdaptor::setEnumerationProperty(
       repr->getProxy()->GetProperty("Representation"),
       action->text());
     repr->getProxy()->UpdateVTKObjects();
     repr->renderViewEventually();
+    END_UNDO_SET();
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqPipelineContextMenuBehavior::hide()
+{
+  pqDataRepresentation* repr =
+    pqActiveObjects::instance().activeRepresentation();
+  if (repr)
+    {
+    BEGIN_UNDO_SET("Visibility Changed");
+    repr->setVisible(false);
+    repr->renderViewEventually();
+    END_UNDO_SET();
     }
 }
