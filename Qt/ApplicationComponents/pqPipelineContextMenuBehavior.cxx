@@ -129,8 +129,14 @@ bool pqPipelineContextMenuBehavior::eventFilter(QObject* caller, QEvent* e)
             {
             this->Menu->clear();
             this->buildMenu(picked_repr);
-            this->Menu->popup(senderWidget->mapToGlobal(newPos));
             }
+          else
+            {
+            this->Menu->clear();
+            this->Menu->addAction("Link Camera...",
+              view, SLOT(linkToOtherView()));
+            }
+          this->Menu->popup(senderWidget->mapToGlobal(newPos));
           }
         }
       this->Position = QPoint();
@@ -167,14 +173,13 @@ void pqPipelineContextMenuBehavior::buildMenu(pqDataRepresentation* repr)
     this, SLOT(reprTypeChanged(QAction*)));
 
   this->Menu->addSeparator();
-  action = this->Menu->addAction("Edit Color");
-  new pqEditColorMapReaction(action);
-
   if (pipelineRepr)
     {
     QMenu* colorFieldsMenu = this->Menu->addMenu("Color By");
     this->buildColorFieldsMenu(pipelineRepr, colorFieldsMenu);
     }
+  action = this->Menu->addAction("Edit Color");
+  new pqEditColorMapReaction(action);
 }
 
 //-----------------------------------------------------------------------------
