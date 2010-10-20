@@ -190,20 +190,19 @@ unsigned int vtkSMArrayListDomain::AddArray(
     iad->GetNumberOfComponents() == 1 &&
     arrayInfo->GetNumberOfComponents() > 1)
     {
-    vtksys_ios::ostringstream stream;
     // add magnitude only for numeric arrays.
     unsigned int first_index = -1;
     if (arrayInfo->GetDataType() != VTK_STRING)
       {
-      stream << arrayInfo->GetName() << "_Magnitude";
-      first_index = this->AddString(stream.str().c_str());
+      vtkStdString name = this->CreateMangledName(arrayInfo,
+        arrayInfo->GetNumberOfComponents());
+      first_index = this->AddString(name.c_str());
       this->ALDInternals->FieldAssociation[first_index] = association;
       }
     for (int cc=0; cc < arrayInfo->GetNumberOfComponents(); cc++)
       {
-      vtksys_ios::ostringstream stream;
-      stream << arrayInfo->GetName() << "_" << arrayInfo->GetComponentName(cc);
-      unsigned int newidx = this->AddString(stream.str().c_str());
+      vtkStdString name = this->CreateMangledName(arrayInfo,cc);
+      unsigned int newidx = this->AddString(name.c_str());
       this->ALDInternals->FieldAssociation[newidx] = association;
       }
     return first_index;
@@ -753,4 +752,61 @@ void vtkSMArrayListDomain::PrintSelf(ostream& os, vtkIndent indent)
       }
     os << endl;
     }
+}
+
+
+//---------------------------------------------------------------------------
+vtkStdString vtkSMArrayListDomain::CreateMangledName(
+  vtkPVArrayInformation *arrayInfo, int component)
+{
+  vtksys_ios::ostringstream stream;
+  if ( component != arrayInfo->GetNumberOfComponents() )
+    {
+    stream << arrayInfo->GetName() << "_" <<
+      arrayInfo->GetComponentName(component);
+    }
+  else
+    {
+    stream << arrayInfo->GetName() << "_Magnitude";
+    }
+  return stream.str();
+}
+
+//---------------------------------------------------------------------------
+vtkStdString vtkSMArrayListDomain::ArrayNameFromMangledName(
+  const char* name)
+{
+  vtkStdString extractedName = name;
+  size_t pos = extractedName.rfind("_");
+  if (pos == vtkStdString::npos)
+    {
+    return vtkStdString("");
+    }
+  return extractedName.substr(0,pos);
+}
+
+//---------------------------------------------------------------------------
+int vtkSMArrayListDomain::ComponentIndexFromMangledName(
+  vtkPVArrayInformation *info, const char* name)
+{
+  vtkStdString extractedName = name;
+  size_t pos = extractedName.rfind("_");
+  if (pos == vtkStdString::npos)
+    {
+    return -1;
+    }
+  vtkStdString compName = extractedName.substr(pos+1,extractedName.length()-pos);
+  int numComps = info->GetNumberOfComponents();
+  if ( compName == "Magnitude" )
+    {
+    return numComps;
+    }
+  for ( int i=0; i < numComps; ++i)
+    {
+    if ( compName == info->GetComponentName(i) )
+      {
+      return i;
+      }
+    }
+  return -1;
 }

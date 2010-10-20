@@ -60,6 +60,7 @@
 #define __vtkSMArrayListDomain_h
 
 #include "vtkSMStringListDomain.h"
+#include "vtkStdString.h"
 
 class vtkPVDataSetAttributesInformation;
 class vtkSMInputArrayDomain;
@@ -179,6 +180,20 @@ public:
   // returns 0 on failure.
   int CheckInformationKeys(vtkPVArrayInformation* arrayInfo);
 
+
+  // Description:
+  // returns the mangled name for the component index that is passed in.
+  //
+  static vtkStdString CreateMangledName(vtkPVArrayInformation *arrayInfo, int component);
+
+  // Description:
+  // returns the mangled name for the component index that is passed in.
+  //
+  static vtkStdString ArrayNameFromMangledName(const char* name);
+  static int ComponentIndexFromMangledName(vtkPVArrayInformation *info, const char* name);
+
+
+
 protected:
   vtkSMArrayListDomain();
   ~vtkSMArrayListDomain();
@@ -190,9 +205,9 @@ protected:
 
   // Description:
   // Utility functions called by Update()
-  void AddArrays(vtkSMSourceProxy* sp, 
+  void AddArrays(vtkSMSourceProxy* sp,
                  int outputport,
-                 vtkPVDataSetAttributesInformation* info, 
+                 vtkPVDataSetAttributesInformation* info,
                  vtkSMInputArrayDomain* iad,
                  int association);
 
