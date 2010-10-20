@@ -62,15 +62,27 @@ protected slots:
   /// menu if the view is a render-view.
   void onViewAdded(pqView*);
 
+  /// called to hide the representation.
   void hide();
+
+  /// called to change the representation type.
   void reprTypeChanged(QAction* action);
+
+  /// called to change the coloring mode.
   void colorMenuTriggered(QAction* action);
 
 protected:
+  /// called to build the context menu for the given representation.
   virtual void buildMenu(pqDataRepresentation* repr);
+
+  /// called to build the color arrays submenu.
   virtual void buildColorFieldsMenu(
     pqPipelineRepresentation* pipelineRepr, QMenu* menu);
 
+  /// event filter to capture the right-click. We don't directly use mechanisms
+  /// from QWidget to popup the context menu since all of those mechanism seem
+  /// to eat away the right button release, leaving the render window in a
+  /// dragging state.
   virtual bool eventFilter(QObject* caller, QEvent* e);
 
   QMenu* Menu;

@@ -135,6 +135,7 @@ bool pqPipelineContextMenuBehavior::eventFilter(QObject* caller, QEvent* e)
             }
           else
             {
+            // when nothing was picked we show the "link camera" menu.
             this->Menu->clear();
             this->Menu->addAction("Link Camera...",
               view, SLOT(linkToOtherView()));
