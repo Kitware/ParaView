@@ -34,6 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QObject>
 #include <QPoint> // needed for QPoint.
+#include <QPointer>
 #include "pqApplicationComponentsExport.h"
 
 class pqDataRepresentation;
@@ -74,6 +75,7 @@ protected:
 
   QMenu* Menu;
   QPoint Position;
+  QPointer<pqDataRepresentation> PickedRepresentation;
 private:
   Q_DISABLE_COPY(pqPipelineContextMenuBehavior)
 

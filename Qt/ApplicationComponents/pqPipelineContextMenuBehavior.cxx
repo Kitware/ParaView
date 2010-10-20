@@ -127,6 +127,7 @@ bool pqPipelineContextMenuBehavior::eventFilter(QObject* caller, QEvent* e)
           {
           int pos[2] = { newPos.x(), newPos.y() } ;
           pqDataRepresentation* picked_repr = view->pick(pos);
+          this->PickedRepresentation = picked_repr;
           if (picked_repr)
             {
             this->Menu->clear();
@@ -262,7 +263,7 @@ void pqPipelineContextMenuBehavior::colorMenuTriggered(QAction* action)
     }
 
   pqPipelineRepresentation* repr = qobject_cast<pqPipelineRepresentation*>(
-    pqActiveObjects::instance().activeRepresentation());
+    this->PickedRepresentation);
   if (repr)
     {
     BEGIN_UNDO_SET("Color Changed");
@@ -290,8 +291,7 @@ void pqPipelineContextMenuBehavior::colorMenuTriggered(QAction* action)
 //-----------------------------------------------------------------------------
 void pqPipelineContextMenuBehavior::reprTypeChanged(QAction* action)
 {
-  pqDataRepresentation* repr =
-    pqActiveObjects::instance().activeRepresentation();
+  pqDataRepresentation* repr = this->PickedRepresentation;
   if (repr)
     {
     BEGIN_UNDO_SET("Representation Type Changed");
@@ -307,8 +307,7 @@ void pqPipelineContextMenuBehavior::reprTypeChanged(QAction* action)
 //-----------------------------------------------------------------------------
 void pqPipelineContextMenuBehavior::hide()
 {
-  pqDataRepresentation* repr =
-    pqActiveObjects::instance().activeRepresentation();
+  pqDataRepresentation* repr = this->PickedRepresentation;
   if (repr)
     {
     BEGIN_UNDO_SET("Visibility Changed");

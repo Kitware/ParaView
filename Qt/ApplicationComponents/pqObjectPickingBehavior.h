@@ -55,9 +55,6 @@ public:
 protected slots:
   void setActiveView(pqView*);
 
-signals:
-  void picked(pqOutputPort*);
-
 protected:
   pqRubberBandHelper* PickHelper;
 private:
