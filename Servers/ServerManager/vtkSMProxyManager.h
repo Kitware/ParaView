@@ -437,7 +437,8 @@ public:
   // Used in Undo/Redo to bring back a proxy to life or in collaboration mode,
   // where the message come from the server and the purpose is to create the SM
   // side when the PM side has already been created.
-  virtual void NewProxy(const vtkSMMessage* msg);
+  // The User MUST delete the provided proxy otherwise it will live forever
+  virtual vtkSMProxy* NewProxy(const vtkSMMessage* msg);
 
 protected:
   vtkSMProxyManager();

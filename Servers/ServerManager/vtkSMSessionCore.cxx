@@ -29,6 +29,7 @@
 #include "vtkSmartPointer.h"
 #include "vtkSMProxyDefinitionManager.h"
 #include "vtkSMRemoteObject.h"
+#include "vtkCollection.h"
 
 #include <vtksys/ios/sstream>
 #include <vtkstd/string>
@@ -106,6 +107,20 @@ public:
       }
 
     return NULL; // Did not find it
+    }
+
+  //---------------------------------------------------------------------------
+  void GetAllRemoteObjects(vtkCollection* collection)
+    {
+    RemoteObjectMapType::iterator iter = this->RemoteObjectMap.begin();
+    while(iter != this->RemoteObjectMap.end())
+      {
+      if(iter->second)
+        {
+        collection->AddItem(iter->second);
+        }
+      iter++;
+      }
     }
   //---------------------------------------------------------------------------
   void PrintRemoteMap()
@@ -216,9 +231,16 @@ vtkSMRemoteObject* vtkSMSessionCore::GetRemoteObject(vtkTypeUInt32 globalid)
 //----------------------------------------------------------------------------
 void vtkSMSessionCore::PushStateInternal(vtkSMMessage* message)
 {
+  vtkTypeUInt32 globalId = message->global_id();
+
+  // FIXME handle this part as well for collaboration
+  // 10 are the reserved area for non proxy object that must be shared
+  if(globalId < 10) return;
+  // FIXME ----------------------------------------------------------
+
   // When the control reaches here, we are assured that the PMObject needs be
   // created/exist on the local process.
-  vtkPMObject* obj = this->Internals->GetPMObject(message->global_id());
+  vtkPMObject* obj = this->Internals->GetPMObject(globalId);
   if (!obj)
     {
     if (!message->HasExtension(DefinitionHeader::server_class))
@@ -593,4 +615,9 @@ void vtkSMSessionCore::UnRegisterRemoteObject(vtkTypeUInt32 globalid)
   if(globalid == 0)
     return;
   this->Internals->DeleteRemoteObject(globalid);
+}
+//----------------------------------------------------------------------------
+void vtkSMSessionCore::GetAllRemoteObjects(vtkCollection* collection)
+{
+  this->Internals->GetAllRemoteObjects(collection);
 }

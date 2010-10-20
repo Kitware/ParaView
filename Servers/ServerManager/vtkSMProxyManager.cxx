@@ -126,6 +126,10 @@ vtkSMProxyManager::vtkSMProxyManager()
 #endif
   this->WriterFactory = vtkSMWriterFactory::New();
   this->WriterFactory->SetProxyManager(this);
+
+  // Init reserved Id for ProxyManager
+  this->SetGlobalID(1);
+  this->SetLocation(vtkProcessModule2::PROCESS_DATA_SERVER);
 }
 
 //---------------------------------------------------------------------------
@@ -600,6 +604,10 @@ void vtkSMProxyManager::UnRegisterProxies()
   if(this->State)
     {
     this->State->ClearExtension(ProxyManagerState::registered_proxy);
+
+    // Push state for undo/redo
+    vtkSMMessage state = *this->GetFullState();
+    this->PushState(&state);
     }
 }
 
@@ -660,6 +668,10 @@ void vtkSMProxyManager::UnRegisterProxy(const char* group, const char* name,
         this->State->AddExtension(ProxyManagerState::registered_proxy)->CopyFrom(*reg);
         }
       }
+
+    // Push state for undo/redo
+    vtkSMMessage state = *this->GetFullState();
+    this->PushState(&state);
     }
 }
 
@@ -721,6 +733,10 @@ void vtkSMProxyManager::UnRegisterProxy(const char* group, const char* name)
         this->State->AddExtension(ProxyManagerState::registered_proxy)->CopyFrom(*reg);
         }
       }
+
+    // Push state for undo/redo
+    vtkSMMessage state = *this->GetFullState();
+    this->PushState(&state);
     }
 }
 
@@ -763,6 +779,10 @@ void vtkSMProxyManager::UnRegisterProxy(const char* name)
         this->State->AddExtension(ProxyManagerState::registered_proxy)->CopyFrom(*reg);
         }
       }
+
+    // Push state for undo/redo
+    vtkSMMessage state = *this->GetFullState();
+    this->PushState(&state);
     }
 }
 
@@ -826,6 +846,10 @@ void vtkSMProxyManager::UnRegisterProxy(vtkSMProxy* proxy)
         this->State->AddExtension(ProxyManagerState::registered_proxy)->CopyFrom(*reg);
         }
       }
+
+    // Push state for undo/redo
+    vtkSMMessage state = *this->GetFullState();
+    this->PushState(&state);
     }
 }
 
@@ -877,14 +901,16 @@ void vtkSMProxyManager::RegisterProxy(const char* groupname,
   if(!this->State)
     {
     this->State = new vtkSMMessage();
-    this->State->set_global_id(1);
-    this->State->set_location(vtkProcessModule2::PROCESS_DATA_SERVER);
     }
   ProxyManagerState_ProxyRegistrationInfo *registration =
       this->State->AddExtension(ProxyManagerState::registered_proxy);
   registration->set_group(groupname);
   registration->set_name(name);
   registration->set_global_id(proxy->GetGlobalID());
+
+  // Push state for undo/redo
+  vtkSMMessage state = *this->GetFullState();
+  this->PushState(&state);
 }
 
 //---------------------------------------------------------------------------
@@ -1640,15 +1666,45 @@ void vtkSMProxyManager::PrintSelf(ostream& os, vtkIndent indent)
 //---------------------------------------------------------------------------
 const vtkSMMessage* vtkSMProxyManager::GetFullState()
 {
+  if(!this->State)
+    {
+    this->State = new vtkSMMessage();
+    this->State->set_global_id(1);
+    this->State->set_location(vtkProcessModule2::PROCESS_DATA_SERVER);
+    }
+
   return this->State;
 }
 //---------------------------------------------------------------------------
 void vtkSMProxyManager::LoadState(const vtkSMMessage* msg)
 {
-  vtkErrorMacro("FIXME should be implemented for collaboration !!!");
+  // Need to compute differences and just call Register/UnRegister for those items
+
+
+
+  this->UnRegisterProxies();
+  //msg->PrintDebugString();
+  int max = msg->ExtensionSize(ProxyManagerState::registered_proxy);
+  for(int cc=0; cc < max; cc++)
+    {
+    ProxyManagerState_ProxyRegistrationInfo reg =
+        msg->GetExtension(ProxyManagerState::registered_proxy, cc);
+
+    vtkSMProxy *proxy =
+        vtkSMProxy::SafeDownCast(this->GetSession()->GetRemoteObject(reg.global_id()));
+    if(proxy)
+      {
+      cout << " - register proxy " << proxy->GetGlobalID() << "("<< proxy->GetReferenceCount()<< ")" << endl;
+      this->RegisterProxy(reg.group().c_str(), reg.name().c_str(), proxy);
+      }
+    else
+      {
+      cout << "Did not find proxy !!!! with id " << reg.global_id() << endl;
+      }
+    }
 }
 //---------------------------------------------------------------------------
-void vtkSMProxyManager::NewProxy( const vtkSMMessage* msg)
+vtkSMProxy* vtkSMProxyManager::NewProxy( const vtkSMMessage* msg)
 {
   if( msg && msg->has_global_id() && msg->HasExtension(ProxyState::xml_group) &&
       msg->HasExtension(ProxyState::xml_name))
@@ -1658,12 +1714,23 @@ void vtkSMProxyManager::NewProxy( const vtkSMMessage* msg)
                         msg->GetExtension(ProxyState::xml_name).c_str());
 
     proxy->LoadState(msg);
+
+    // Update proxy global-ids
     proxy->SetGlobalID(msg->global_id());
+    // sub-proxy global-ids management
+    int nbSubProxy = msg->ExtensionSize(ProxyState::subproxy);
+    for(int idx=0; idx < nbSubProxy; idx++)
+      {
+      const ProxyState_SubProxy *subProxyMsg = &msg->GetExtension(ProxyState::subproxy, idx);
+      vtkSMProxy *subProxy = proxy->GetSubProxy(subProxyMsg->name().c_str());
+      subProxy->SetGlobalID(subProxyMsg->global_id());
+      }
 
     // FIXME in collaboration mode we shouldn't push the state if it already come
     // from the server side
     proxy->Modified();
     proxy->UpdateVTKObjects();
+    return proxy;
     }
   else if(msg)
     {
@@ -1673,4 +1740,5 @@ void vtkSMProxyManager::NewProxy( const vtkSMMessage* msg)
     {
     vtkErrorMacro("Invalid msg while creating a new Proxy: NULL");
     }
+  return NULL;
 }

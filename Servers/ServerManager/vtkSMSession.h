@@ -28,6 +28,7 @@ class vtkSMSessionCore;
 class vtkPVInformation;
 class vtkPMObject;
 class vtkSMRemoteObject;
+class vtkCollection;
 
 class VTK_EXPORT vtkSMSession : public vtkSession
 {
@@ -82,6 +83,12 @@ public:
   // Description:
   // Unregister a remote object
   void UnRegisterRemoteObject(vtkTypeUInt32 globalid);
+
+  // Description:
+  // Allow the user to fill its vtkCollection with all RemoteObject
+  // This could be usefull when you want to hold a reference to them to
+  // prevent any deletion across several method call.
+  virtual void GetAllRemoteObjects(vtkCollection* collection);
 
   // Description:
   // Provides a unique identifier across processes of that session

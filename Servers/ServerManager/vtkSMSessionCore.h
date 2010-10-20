@@ -29,6 +29,7 @@ class vtkPMObject;
 class vtkSMProxyDefinitionManager;
 class vtkPVInformation;
 class vtkSMRemoteObject;
+class vtkCollection;
 
 class VTK_EXPORT vtkSMSessionCore : public vtkObject
 {
@@ -101,6 +102,12 @@ public:
   void PushStateSatelliteCallback();
   void InvokeSatelliteCallback();
   void GatherInformationStatelliteCallback();
+
+  // Description:
+  // Allow the user to fill its vtkCollection with all RemoteObject
+  // This could be usefull when you want to hold a reference to them to
+  // prevent any deletion across several method call.
+  virtual void GetAllRemoteObjects(vtkCollection* collection);
 
 protected:
   vtkSMSessionCore();

@@ -38,6 +38,9 @@ vtkSMSession::vtkSMSession()
   // The 10 first ID are reserved
   //  - 1: vtkSMProxyManager
   this->LastGUID = 10;
+
+  // Reserved Id management
+  this->RegisterRemoteObject(1, this->ProxyManager);
 }
 
 //----------------------------------------------------------------------------
@@ -61,20 +64,23 @@ void vtkSMSession::PushState(vtkSMMessage* msg)
   // Manage Undo/Redo if possible
   if(this->UndoStackBuilder)
     {
-    vtkSMProxy *proxy = vtkSMProxy::SafeDownCast(this->GetRemoteObject(msg->global_id()));
-    if(proxy)
-      {
-      vtkSMMessage fullState = *proxy->GetFullState();
+    vtkTypeUInt32 globalId = msg->global_id();
+    vtkSMRemoteObject *remoteObj = this->GetRemoteObject(globalId);
 
-      // Need to provide id/location as the full state have not them yet
-      fullState.set_global_id(msg->global_id());
+    if(remoteObj)
+      {
+      vtkSMMessage fullState;
+      fullState.CopyFrom(*remoteObj->GetFullState());
+
+      // Need to provide id/location as the full state may not have them yet
+      fullState.set_global_id(globalId);
       fullState.set_location(msg->location());
 
-      this->UndoStackBuilder->OnNewState(this, msg->global_id(), &fullState);
+      this->UndoStackBuilder->OnNewState(this, globalId, &fullState);
       }
     else
       {
-      cout << "Push a state that is not related to a proxt." << endl;
+      cout << "Push a state that is not related to a proxy." << endl;
       }
     }
 
@@ -166,4 +172,9 @@ void vtkSMSession::UnRegisterRemoteObject(vtkTypeUInt32 globalid)
 
   this->Core->UnRegisterRemoteObject(globalid);
   this->DeletePMObject(&deleteMsg);
+}
+//----------------------------------------------------------------------------
+void vtkSMSession::GetAllRemoteObjects(vtkCollection* collection)
+{
+  this->Core->GetAllRemoteObjects(collection);
 }

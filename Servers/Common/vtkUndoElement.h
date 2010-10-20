@@ -28,6 +28,7 @@
 #define __vtkUndoElement_h
 
 #include "vtkObject.h"
+class vtkCollection;
 
 class VTK_EXPORT vtkUndoElement : public vtkObject
 {
@@ -64,6 +65,18 @@ public:
     return false;
     }
 
+  // Set the working context if run inside a UndoSet context, so object
+  // that are cross referenced can leave long enought to be associated
+  // to another object. Otherwise the undo of a Delete will create the object
+  // again but as no-one is holding a reference to that newly created object
+  // it will be automatically deleted. Therefore, we provide a collection
+  // that will hold a reference during an undoset so the object has a chance
+  // to be attached to the ProxyManager or any other object.
+  virtual void SetUndoSetWorkingContext(vtkCollection *workCTX)
+    {
+    this->UndoSetWorkingContext = workCTX;
+    }
+
 //BTX
 protected:
   vtkUndoElement();
@@ -74,6 +87,7 @@ protected:
   // in an UndoSet.
   bool Mergeable;
   vtkSetMacro(Mergeable, bool);
+  vtkCollection *UndoSetWorkingContext;
 
 private:
   vtkUndoElement(const vtkUndoElement&); // Not implemented.

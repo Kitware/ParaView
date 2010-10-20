@@ -19,6 +19,7 @@
 #include "vtkSMMessage.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyManager.h"
+#include "vtkCollection.h"
 
 vtkStandardNewMacro(vtkSMProxyUndoElement);
 //-----------------------------------------------------------------------------
@@ -83,14 +84,33 @@ void vtkSMProxyUndoElement::SetCreationState(const vtkSMMessage* state)
 //-----------------------------------------------------------------------------
 int vtkSMProxyUndoElement::CreateProxy()
 {
-  cout << "Create " << this->State.global_id() << endl;
-  this->Session->GetProxyManager()->NewProxy(&this->State);
-  return 1; // OK
+  vtkTypeUInt32 globalId = this->State.global_id();
+  cout << "Create " << globalId << endl;
+  if(this->Session->GetRemoteObject(globalId))
+    {
+    // A parent proxy already create it, so do nothing
+    return 1;
+    }
+
+  //this->State.PrintDebugString();
+  vtkSMProxy *proxy = this->Session->GetProxyManager()->NewProxy(&this->State);
+  this->UndoSetWorkingContext->AddItem(proxy);
+  cout << " - before delete " << globalId <<" in remote obj ? " << (this->Session->GetRemoteObject(globalId)!=0) << endl;
+  proxy->Delete();
+  cout << " - after delete " << globalId <<" in remote obj ? " << (this->Session->GetRemoteObject(globalId)!=0) << endl;
+  return proxy ? 1 : 0;
 }
 //-----------------------------------------------------------------------------
 int vtkSMProxyUndoElement::DeleteProxy()
 {
-    cout << "Delete " << this->State.global_id() << endl;
+  cout << "Delete " << this->State.global_id() << endl;
   this->Session->DeletePMObject(&this->State);
+  vtkSMRemoteObject *obj = this->Session->GetRemoteObject(this->State.global_id());
+  if(obj)
+    {
+    cout << "ERROR should have deleted Remote object as well "
+         << this->State.global_id() <<  " ref count: " << obj->GetReferenceCount()
+         << endl;
+    }
   return 1; // OK
 }

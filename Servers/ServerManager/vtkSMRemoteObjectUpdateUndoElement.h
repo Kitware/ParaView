@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkSMProxyUpdateUndoElement.h
+  Module:    vtkSMRemoteObjectUpdateUndoElement.h
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -12,22 +12,22 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMProxyUpdateUndoElement - vtkSMProxy undo element.
+// .NAME vtkSMRemoteObjectUpdateUndoElement - vtkSMRemoteObject undo element.
 // .SECTION Description
-// This class keeps the before and after state of the Proxy in the vtkSMMessage
+// This class keeps the before and after state of the RemoteObject in the vtkSMMessage
 // form.
 
-#ifndef __vtkSMProxyUpdateUndoElement_h
-#define __vtkSMProxyUpdateUndoElement_h
+#ifndef __vtkSMRemoteObjectUpdateUndoElement_h
+#define __vtkSMRemoteObjectUpdateUndoElement_h
 
 #include "vtkSMUndoElement.h"
 #include "vtkSMMessage.h"
 
-class VTK_EXPORT vtkSMProxyUpdateUndoElement : public vtkSMUndoElement
+class VTK_EXPORT vtkSMRemoteObjectUpdateUndoElement : public vtkSMUndoElement
 {
 public:
-  static vtkSMProxyUpdateUndoElement* New();
-  vtkTypeMacro(vtkSMProxyUpdateUndoElement, vtkSMUndoElement);
+  static vtkSMRemoteObjectUpdateUndoElement* New();
+  vtkTypeMacro(vtkSMRemoteObjectUpdateUndoElement, vtkSMUndoElement);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
@@ -47,22 +47,22 @@ public:
   virtual void SetUndoRedoState(const vtkSMMessage* before,
                                 const vtkSMMessage* after);
 
-protected:
-  vtkSMProxyUpdateUndoElement();
-  ~vtkSMProxyUpdateUndoElement();
-
-  // Internal method used to update proxy state based on the state info
-  int UpdateProxyState(const vtkSMMessage* state);
-
   // Current full state of the UndoElement
   vtkSMMessage BeforeState;
   vtkSMMessage AfterState;
 
-//ETX
+protected:
+  vtkSMRemoteObjectUpdateUndoElement();
+  ~vtkSMRemoteObjectUpdateUndoElement();
+
+  // Internal method used to update proxy state based on the state info
+  int UpdateState(const vtkSMMessage* state);
 
 private:
-  vtkSMProxyUpdateUndoElement(const vtkSMProxyUpdateUndoElement&); // Not implemented.
-  void operator=(const vtkSMProxyUpdateUndoElement&); // Not implemented.
+  vtkSMRemoteObjectUpdateUndoElement(const vtkSMRemoteObjectUpdateUndoElement&); // Not implemented.
+  void operator=(const vtkSMRemoteObjectUpdateUndoElement&); // Not implemented.
+
+//ETX
 };
 
 #endif

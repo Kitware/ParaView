@@ -25,6 +25,7 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkSMUndoStack.h"
 
 #include "paraview.h"
+#include "vtkCollection.h"
 
 #include "vtkSMSessionClient.h"
 #include <vtkstd/vector>
@@ -55,6 +56,7 @@ int main(int argc, char* argv[])
 
   // Attach Undo/Redo stack
   vtkSMUndoStack *undoStack = vtkSMUndoStack::New();
+  undoStack->SetStackDepth(100);
   vtkSMUndoStackBuilder *undoStackBuilder = vtkSMUndoStackBuilder::New();
   undoStackBuilder->SetUndoStack(undoStack);
   session->SetUndoStackBuilder(undoStackBuilder);
@@ -88,6 +90,8 @@ int main(int argc, char* argv[])
     proxy->UpdateVTKObjects();
     sphereIds.push_back(proxy->GetGlobalID());
 
+    pxm->RegisterProxy("sources", "sphere", proxy);
+
     // Undo step
     undoStackBuilder->End();
     undoStackBuilder->PushToStack();
@@ -100,6 +104,8 @@ int main(int argc, char* argv[])
     vtkSMPropertyHelper(shrink, "Input").Set(proxy);
     shrink->UpdateVTKObjects();
     shrink->UpdatePipeline();
+
+    pxm->RegisterProxy("filters", "shrink", shrink);
 
     // Undo step
     undoStackBuilder->End();
@@ -116,6 +122,8 @@ int main(int argc, char* argv[])
     vtkSMPropertyHelper(writer, "FileName").Set("/tmp/foo.vtk");
     writer->UpdateVTKObjects();
     writer->UpdatePipeline();
+
+    pxm->RegisterProxy("writers", "vtkWriter", writer);
 
     // Undo step
     undoStackBuilder->End();
@@ -153,6 +161,9 @@ int main(int argc, char* argv[])
 //    session->PrintSelf(cout, vtkIndent());
 //    cout << "===========" << endl;
 
+    pxm->UnRegisterProxy(writer);
+    pxm->UnRegisterProxy(proxy);
+    pxm->UnRegisterProxy(shrink);
     writer->Delete();
     proxy->Delete();
     shrink->Delete();
@@ -162,6 +173,16 @@ int main(int argc, char* argv[])
     undoStackBuilder->PushToStack();
     }
 
+
+  vtkstd::vector<vtkTypeUInt32>::iterator iter = sphereIds.begin();
+  cout << "Ids of spheres:";
+  while(iter != sphereIds.end())
+    {
+    cout << " " << *iter;
+    iter++;
+    }
+  cout << endl;
+
   // Test stack content
   undoStackBuilder->SetIgnoreAllChanges(true);
   cout << "===== Undo previous work =====" << endl;
@@ -169,7 +190,7 @@ int main(int argc, char* argv[])
     {
     cout << "Nb undo: " << undoStack->GetNumberOfUndoSets() << " - Can undo ? " << undoStack->CanUndo() << endl;
     cout << "Nb redo: " << undoStack->GetNumberOfRedoSets() << " - Can redo ? " << undoStack->CanRedo() << endl;
-    cout << "==" << endl;
+    cout << "=================================================================" << endl;
     cout << "undo " << i << ": " << undoStack->Undo() << endl;
 
     vtkstd::vector<vtkTypeUInt32>::iterator iter = sphereIds.begin();
@@ -193,6 +214,17 @@ int main(int argc, char* argv[])
   cout << "Nb undo: " << undoStack->GetNumberOfUndoSets() << " - Can undo ? " << undoStack->CanUndo() << endl;
   cout << "Nb redo: " << undoStack->GetNumberOfRedoSets() << " - Can redo ? " << undoStack->CanRedo() << endl;
 
+  cout << "============ Still living RemoteObject ===============" << endl;
+  vtkCollection *remoteObjects = vtkCollection::New();
+  session->GetAllRemoteObjects(remoteObjects);
+  cout << "List of availabe remote objects: ";
+  for(int i=0;i<remoteObjects->GetNumberOfItems();i++)
+    {
+    vtkSMRemoteObject *obj = vtkSMRemoteObject::SafeDownCast(remoteObjects->GetItemAsObject(i));
+    cout << " " << obj->GetGlobalID() << "(" << obj->GetReferenceCount() << ")" ;
+    }
+  cout << endl;
+  remoteObjects->Delete();
 
 
   cout << "Exiting..." << endl;

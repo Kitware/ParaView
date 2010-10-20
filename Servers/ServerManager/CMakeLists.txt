@@ -62,10 +62,10 @@ SET (Kit_SRCS
   vtkSMProxyProperty.cxx
   vtkSMProxySelectionModel.cxx
   vtkSMProxyUndoElement.cxx
-  vtkSMProxyUpdateUndoElement.cxx
   vtkSMPSWriterProxy.cxx
   vtkSMPWriterProxy.cxx
   vtkSMRemoteObject.cxx
+  vtkSMRemoteObjectUpdateUndoElement.cxx
   vtkSMSessionClient.cxx
   vtkSMSessionCore.cxx
   vtkSMSession.cxx

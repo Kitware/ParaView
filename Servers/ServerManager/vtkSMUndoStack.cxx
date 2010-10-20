@@ -23,9 +23,12 @@
 #include "vtkSMProxyManager.h"
 #include "vtkSMUndoRedoStateLoader.h"
 #include "vtkUndoSet.h"
+#include "vtkSMUndoElement.h"
 #include "vtkUndoStackInternal.h"
 
 #include <vtksys/RegularExpression.hxx>
+#include "vtkCollection.h"
+#include <vtkstd/set>
 
 //*****************************************************************************
 //class vtkSMUndoStackObserver : public vtkCommand
@@ -215,6 +218,11 @@ int vtkSMUndoStack::Undo()
     return 0;
     }
 
+  // Hold remote objects refs while the UndoSet is processing
+  vtkSmartPointer<vtkCollection> remoteObjectsCollection;
+  remoteObjectsCollection = vtkSmartPointer<vtkCollection>::New();
+  this->FillWithRemoteObjects(this->GetNextUndoSet(), remoteObjectsCollection.GetPointer());
+
   return this->Superclass::Undo();
 }
 
@@ -227,7 +235,43 @@ int vtkSMUndoStack::Redo()
     return 0;
     }
 
+  // Hold remote objects refs while the UndoSet is processing
+  vtkSmartPointer<vtkCollection> remoteObjectsCollection;
+  remoteObjectsCollection = vtkSmartPointer<vtkCollection>::New();
+  this->FillWithRemoteObjects(this->GetNextRedoSet(), remoteObjectsCollection.GetPointer());
+
   return this->Superclass::Redo();
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMUndoStack::FillWithRemoteObjects( vtkUndoSet *undoSet,
+                                            vtkCollection *collection)
+{
+  if(!undoSet || !collection)
+    return;
+
+  int max = undoSet->GetNumberOfElements();
+  vtkstd::set<vtkSmartPointer<vtkSMSession> > sessions;
+  for (int cc=0; cc < max; ++cc)
+    {
+    vtkSMUndoElement* elem =
+        vtkSMUndoElement::SafeDownCast(undoSet->GetElement(cc));
+    sessions.insert(elem->GetSession());
+    }
+  vtkstd::set<vtkSmartPointer<vtkSMSession> >::iterator iter = sessions.begin();
+  while(iter != sessions.end())
+    {
+    iter->GetPointer()->GetAllRemoteObjects(collection);
+    iter++;
+    }
+  cout << "Keep " << collection->GetNumberOfItems() << " remote obj." << endl;
+  cout << "List of availabe remote objects: ";
+  for(int i=0;i<collection->GetNumberOfItems();i++)
+    {
+    vtkSMRemoteObject *obj = vtkSMRemoteObject::SafeDownCast(collection->GetItemAsObject(i));
+    cout << " " << obj->GetGlobalID();
+    }
+  cout << endl;
 }
 
 //-----------------------------------------------------------------------------

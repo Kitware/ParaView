@@ -80,6 +80,7 @@ protected:
   ~vtkUndoSet();
 
   vtkCollection* Collection;
+  vtkCollection* TmpWorkingCollection;
 private:
   vtkUndoSet(const vtkUndoSet&); // Not implemented.
   void operator=(const vtkUndoSet&); // Not implemented.

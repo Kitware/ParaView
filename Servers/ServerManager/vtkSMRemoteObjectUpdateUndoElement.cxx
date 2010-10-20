@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkSMProxyUpdateUndoElement.cxx
+  Module:    vtkSMRemoteObjectUpdateUndoElement.cxx
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -12,67 +12,79 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#include "vtkSMProxyUpdateUndoElement.h"
+#include "vtkSMRemoteObjectUpdateUndoElement.h"
 
 #include "vtkObjectFactory.h"
 #include "vtkSMSession.h"
 #include "vtkSMMessage.h"
-#include "vtkSMProxy.h"
-#include "vtkSMProxyManager.h"
+#include "vtkSMRemoteObject.h"
+#include "vtkCollection.h"
 
-vtkStandardNewMacro(vtkSMProxyUpdateUndoElement);
+vtkStandardNewMacro(vtkSMRemoteObjectUpdateUndoElement);
 //-----------------------------------------------------------------------------
-vtkSMProxyUpdateUndoElement::vtkSMProxyUpdateUndoElement()
+vtkSMRemoteObjectUpdateUndoElement::vtkSMRemoteObjectUpdateUndoElement()
 {
 }
 
 //-----------------------------------------------------------------------------
-vtkSMProxyUpdateUndoElement::~vtkSMProxyUpdateUndoElement()
+vtkSMRemoteObjectUpdateUndoElement::~vtkSMRemoteObjectUpdateUndoElement()
 {
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMProxyUpdateUndoElement::PrintSelf(ostream& os, vtkIndent indent)
+void vtkSMRemoteObjectUpdateUndoElement::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 }
 //-----------------------------------------------------------------------------
-int vtkSMProxyUpdateUndoElement::Undo()
+int vtkSMRemoteObjectUpdateUndoElement::Undo()
 {
-  cout << "undo..." << endl;
-  return this->UpdateProxyState(&this->BeforeState);
+  return this->UpdateState(&this->BeforeState);
 }
 
 //-----------------------------------------------------------------------------
-int vtkSMProxyUpdateUndoElement::Redo()
+int vtkSMRemoteObjectUpdateUndoElement::Redo()
 {
-  cout << "redo..." << endl;
-  return this->UpdateProxyState(&this->AfterState);
+  return this->UpdateState(&this->AfterState);
 }
 
 //-----------------------------------------------------------------------------
-int vtkSMProxyUpdateUndoElement::UpdateProxyState(const vtkSMMessage* state)
+int vtkSMRemoteObjectUpdateUndoElement::UpdateState(const vtkSMMessage* state)
 {
-  cout << "Update proxy state " << state->global_id() << endl;
+  cout << "Update state of " << state->global_id() << endl;
   if(this->Session && state->has_global_id())
     {
     // Creation or update
-    vtkSMProxy* proxy =
-        vtkSMProxy::SafeDownCast(
-            this->Session->GetRemoteObject(state->global_id()));
-    if(proxy)
+    vtkSMRemoteObject* remoteObj =
+        this->Session->GetRemoteObject(state->global_id());
+    if(remoteObj)
       {
       // Update
-      proxy->LoadState(state);
+      remoteObj->LoadState(state);
       return 1; // OK
+      }
+    else
+      {
+      vtkWarningMacro("Unable to update RemoteObject state since no remote object with id " << state->global_id() << " were found.");
+      vtkCollection *remoteObjects = vtkCollection::New();
+      this->Session->GetAllRemoteObjects(remoteObjects);
+      cout << "List of availabe remote objects: ";
+      for(int i=0;i<remoteObjects->GetNumberOfItems();i++)
+        {
+        cout << " " << vtkSMRemoteObject::SafeDownCast(remoteObjects->GetItemAsObject(i))->GetGlobalID();
+        }
+      cout << endl;
+      state->PrintDebugString();
+
+      remoteObjects->Delete();
       }
     }
   return 0; // ERROR
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMProxyUpdateUndoElement::SetUndoRedoState(const vtkSMMessage* before,
-                                             const vtkSMMessage* after)
+void vtkSMRemoteObjectUpdateUndoElement::SetUndoRedoState(
+    const vtkSMMessage* before, const vtkSMMessage* after)
 {
   this->BeforeState.Clear();
   this->AfterState.Clear();

@@ -27,7 +27,7 @@
 #include "vtkUndoSet.h"
 #include "vtkUndoStackInternal.h"
 #include "vtkSMProxyUndoElement.h"
-#include "vtkSMProxyUpdateUndoElement.h"
+#include "vtkSMRemoteObjectUpdateUndoElement.h"
 #include "vtkSMSession.h"
 
 #include "vtkUndoElement.h"
@@ -189,9 +189,22 @@ void vtkSMUndoStackBuilder::OnNewState( vtkSMSession* session,
         undoElement->SetCreationState( newState );
         this->Add(undoElement);
         }
+      else if(newState->global_id() == 1)
+        {
+        // ServerManager state, just update, never create !!!
+        vtkSMMessage origin;
+        origin.CopyFrom(*newState);
+        origin.ClearExtension(ProxyManagerState::registered_proxy);
+        vtkSMRemoteObjectUpdateUndoElement* undoElement;
+        undoElement = vtkSMRemoteObjectUpdateUndoElement::New();
+        undoElement->SetSession(session);
+        undoElement->SetUndoRedoState( &origin, newState);
+        this->Add(undoElement);
+        }
       else
         {
-        vtkWarningMacro("Try to register Creation Undo event based on a non Proxy object.");
+        vtkWarningMacro("Try to register Creation Undo event based on a non Proxy object.\n"
+                        << newState->DebugString());
         }
       }
     else
@@ -209,7 +222,8 @@ void vtkSMUndoStackBuilder::OnNewState( vtkSMSession* session,
     {
     cout << "OnNewState UPDATE " << globalId << endl;
     // Just update
-    vtkSMProxyUpdateUndoElement* undoElement = vtkSMProxyUpdateUndoElement::New();
+    vtkSMRemoteObjectUpdateUndoElement* undoElement;
+    undoElement = vtkSMRemoteObjectUpdateUndoElement::New();
     undoElement->SetSession(session);
     undoElement->SetUndoRedoState( &oldState, newState);
     this->Add(undoElement);

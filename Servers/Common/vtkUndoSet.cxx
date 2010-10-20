@@ -25,12 +25,14 @@ vtkStandardNewMacro(vtkUndoSet);
 vtkUndoSet::vtkUndoSet()
 {
   this->Collection = vtkCollection::New();
+  this->TmpWorkingCollection = vtkCollection::New();
 }
 
 //-----------------------------------------------------------------------------
 vtkUndoSet::~vtkUndoSet()
 {
   this->Collection->Delete();
+  this->TmpWorkingCollection->Delete();
 }
 
 //-----------------------------------------------------------------------------
@@ -88,18 +90,30 @@ int vtkUndoSet::Redo()
     {
     vtkUndoElement* elem = vtkUndoElement::SafeDownCast(
       this->Collection->GetItemAsObject(cc));
+
+    // Init working context
+    elem->SetUndoSetWorkingContext(this->TmpWorkingCollection);
     if (!elem->Redo())
       {
+      cout << "Failing !!! >>>" << endl;
       // redo failed, undo the half redone operations.
       for (int rr=cc-1; rr >=0; --rr)
         {
         vtkUndoElement* elemU = vtkUndoElement::SafeDownCast(
           this->Collection->GetItemAsObject(rr));
+        elemU->SetUndoSetWorkingContext(this->TmpWorkingCollection); // Init
         elemU->Undo();
+        elemU->SetUndoSetWorkingContext(0); // Clear Working context
         }
+      // Release ref of tmp objects
+      this->TmpWorkingCollection->RemoveAllItems();
+      cout << "<<<< Failing !!!" << endl;
       return 0;
       }
+    elem->SetUndoSetWorkingContext(0); // Clear Working context
     }
+  // Release ref of tmp objects
+  this->TmpWorkingCollection->RemoveAllItems();
   return 1;
   
 }
@@ -113,18 +127,30 @@ int vtkUndoSet::Undo()
     {
     vtkUndoElement* elem = vtkUndoElement::SafeDownCast(
       this->Collection->GetItemAsObject(cc));
+
+    // Init working context
+    elem->SetUndoSetWorkingContext(this->TmpWorkingCollection);
     if (!elem->Undo())
       {
+      cout << "Failing !!! >>>" << endl;
       // undo failed, redo the half undone operations.
       for (int rr=0; rr <cc; ++rr)
         {
         vtkUndoElement* elemR = vtkUndoElement::SafeDownCast(
           this->Collection->GetItemAsObject(rr));
+        elemR->SetUndoSetWorkingContext(this->TmpWorkingCollection); // Init
         elemR->Redo();
+        elemR->SetUndoSetWorkingContext(0); // Clear Working context
         }
+      // Release ref of tmp objects
+      this->TmpWorkingCollection->RemoveAllItems();
+      cout << "<<<< Failing !!!" << endl;
       return 0;
       }
+    elem->SetUndoSetWorkingContext(0); // Clear Working context
     }
+  // Release ref of tmp objects
+  this->TmpWorkingCollection->RemoveAllItems();
   return 1;
 }
 

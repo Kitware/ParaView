@@ -40,6 +40,7 @@
 class vtkSMUndoRedoStateLoader;
 class vtkSMUndoStackObserver;
 class vtkUndoSet;
+class vtkCollection;
 
 class VTK_EXPORT vtkSMUndoStack : public vtkUndoStack
 {
@@ -104,6 +105,8 @@ protected:
 
 //  int ClientOnly;
 
+  void FillWithRemoteObjects( vtkUndoSet *undoSet, vtkCollection *collection);
+
 private:
   vtkSMUndoStack(const vtkSMUndoStack&); // Not implemented.
   void operator=(const vtkSMUndoStack&); // Not implemented.
@@ -114,4 +117,3 @@ private:
 
 
 #endif
-
