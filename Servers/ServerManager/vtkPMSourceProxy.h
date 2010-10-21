@@ -76,6 +76,11 @@ protected:
   void InsertExtractPiecesIfNecessary(vtkAlgorithm* algo, int port);
 
   // Description:
+  // Insert a filter to create the Post Filter
+  // so that filters can request data conversions
+  void InsertPostFilterIfNecessary(vtkAlgorithm* algo, int port);
+
+  // Description:
   // Triggers UpdatePipeline().
   virtual void UpdatePipeline(int port, double time, bool doTime);
 

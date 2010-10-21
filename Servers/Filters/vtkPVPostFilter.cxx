@@ -55,6 +55,10 @@ vtkStandardNewMacro(vtkPVPostFilter);
 //----------------------------------------------------------------------------
 vtkPVPostFilter::vtkPVPostFilter()
 {
+  vtkPVPostFilterExecutive* exec = vtkPVPostFilterExecutive::New();
+  this->SetExecutive(exec);
+  exec->FastDelete();
+
   this->SetNumberOfInputPorts(1);
   this->SetNumberOfOutputPorts(1);
 }
@@ -69,6 +73,7 @@ vtkExecutive* vtkPVPostFilter::CreateDefaultExecutive()
 {
   return vtkPVPostFilterExecutive::New();
 }
+
 //----------------------------------------------------------------------------
 int vtkPVPostFilter::RequestDataObject(
   vtkInformation*,

@@ -34,6 +34,7 @@ class vtkPMSourceProxy::vtkInternals
 public:
   vtkstd::vector<vtkClientServerID> OutputPortIDs;
   vtkstd::vector<vtkClientServerID> ExtractPiecesIDs;
+  vtkstd::vector<vtkClientServerID> PostFilterIDs;
 };
 
 vtkStandardNewMacro(vtkPMSourceProxy);
@@ -41,7 +42,7 @@ vtkStandardNewMacro(vtkPMSourceProxy);
 vtkPMSourceProxy::vtkPMSourceProxy()
 {
   this->ExecutiveName = 0;
-  this->SetExecutiveName("vtkCompositeDataPipeline");
+  this->SetExecutiveName("vtkPVCompositeDataPipeline");
 
   this->Internals = new vtkInternals();
 }
@@ -58,11 +59,20 @@ vtkPMSourceProxy::~vtkPMSourceProxy()
       {
       if (!iter->IsNull())
         {
-        stream << vtkClientServerStream::Delete
-          << *iter
+        stream << vtkClientServerStream::Delete << *iter
           << vtkClientServerStream::End;
         }
       }
+    for (iter = this->Internals->PostFilterIDs.begin();
+      iter != this->Internals->PostFilterIDs.end(); ++iter)
+      {
+      if (!iter->IsNull())
+        {
+        stream << vtkClientServerStream::Delete << *iter
+          << vtkClientServerStream::End;
+        }
+      }
+
     this->Interpreter->ProcessStream(stream);
     }
 
@@ -160,6 +170,7 @@ bool vtkPMSourceProxy::CreateOutputPorts()
   int ports = algo->GetNumberOfOutputPorts();
   this->Internals->OutputPortIDs.resize(ports, vtkClientServerID(0));
   this->Internals->ExtractPiecesIDs.resize(ports, vtkClientServerID(0));
+  this->Internals->PostFilterIDs.resize(ports, vtkClientServerID(0));
 
   for (int cc=0; cc < ports; cc++)
     {
@@ -207,6 +218,13 @@ bool vtkPMSourceProxy::InitializeOutputPort(vtkAlgorithm* algo, int port)
     num_of_required_inputs == 0)
     {
     this->InsertExtractPiecesIfNecessary(algo, port);
+    }
+
+  if (strcmp("vtkPVCompositeDataPipeline", this->ExecutiveName) == 0)
+    {
+    //add the post filters to the source proxy
+    //so that we can do automatic conversion of properties.
+    this->InsertPostFilterIfNecessary(algo, port);
     }
   return true;
 }
@@ -256,6 +274,38 @@ void vtkPMSourceProxy::InsertExtractPiecesIfNecessary(vtkAlgorithm*, int port)
          << vtkClientServerStream::End
          << vtkClientServerStream::Invoke
          << extractID
+         << "GetOutputPort"
+         << 0
+         << vtkClientServerStream::End
+         << vtkClientServerStream::Assign
+         << portID
+         << vtkClientServerStream::LastResult
+         << vtkClientServerStream::End;
+  this->Interpreter->ProcessStream(stream);
+}
+
+//----------------------------------------------------------------------------
+void vtkPMSourceProxy::InsertPostFilterIfNecessary(vtkAlgorithm*, int port)
+{
+  vtkClientServerID portID = this->Internals->OutputPortIDs[port];
+  vtkClientServerID postFilterID = this->Interpreter->GetNextAvailableId();
+
+  this->Internals->PostFilterIDs[port] = postFilterID;
+
+  vtkClientServerStream stream;
+  stream  << vtkClientServerStream::New
+          << "vtkPVPostFilter" << postFilterID
+          << vtkClientServerStream::End;
+  stream  << vtkClientServerStream::Invoke
+          << postFilterID << "SetInputConnection" << portID
+          << vtkClientServerStream::End;
+
+  // Now substitute portID to point to the post-filter.
+  stream << vtkClientServerStream::Delete
+         << portID
+         << vtkClientServerStream::End
+         << vtkClientServerStream::Invoke
+         << postFilterID
          << "GetOutputPort"
          << 0
          << vtkClientServerStream::End

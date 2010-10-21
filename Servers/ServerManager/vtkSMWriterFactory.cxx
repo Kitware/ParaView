@@ -164,6 +164,7 @@ void vtkSMWriterFactory::Initialize()
 //----------------------------------------------------------------------------
 void vtkSMWriterFactory::RegisterPrototypes(const char* xmlgroup)
 {
+#ifdef FIXME_COLLABORATION
   vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
   vtkSMProxyDefinitionIterator* iter = vtkSMProxyDefinitionIterator::New();
   iter->SetModeToOneGroup();
@@ -178,6 +179,7 @@ void vtkSMWriterFactory::RegisterPrototypes(const char* xmlgroup)
       }
     }
   iter->Delete();
+#endif
 }
 
 //----------------------------------------------------------------------------
