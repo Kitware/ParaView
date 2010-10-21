@@ -118,7 +118,7 @@ ParaViewMainWindow::ParaViewMainWindow()
   this->VRPNTimer->start();
 #endif
 
-#if 1
+#if 0
   // VRUI input events.
   this->VRUITimer=new QTimer(this);
   this->VRUITimer->setInterval(40); // in ms
