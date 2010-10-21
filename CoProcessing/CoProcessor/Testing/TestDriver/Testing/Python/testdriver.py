@@ -1,23 +1,24 @@
 # A simple python implementation of the test driver.
 
-import vtk, libvtkCPTestDriverPython
+import vtk
+import vtkCPTestDriverPython
 
-FieldFunction = libvtkCPTestDriverPython.vtkCPLinearScalarFieldFunction()
+FieldFunction = vtkCPTestDriverPython.vtkCPLinearScalarFieldFunction()
 FieldFunction.SetConstant(2)
 FieldFunction.SetTimeMultiplier(.1)
 FieldFunction.SetYMultiplier(23)
 
-FieldBuilder = libvtkCPTestDriverPython.vtkCPNodalFieldBuilder()
+FieldBuilder = vtkCPTestDriverPython.vtkCPNodalFieldBuilder()
 FieldBuilder.SetArrayName("Velocity")
 FieldBuilder.SetTensorFieldFunction(FieldFunction)
 
-GridBuilder = libvtkCPTestDriverPython.vtkCPUniformGridBuilder()
+GridBuilder = vtkCPTestDriverPython.vtkCPUniformGridBuilder()
 GridBuilder.SetDimensions((50, 50, 50))
 GridBuilder.SetSpacing((.2, .3, .3))
 GridBuilder.SetOrigin((10, 20, 300))
 GridBuilder.SetFieldBuilder(FieldBuilder)
 
-TestDriver = libvtkCPTestDriverPython.vtkCPTestDriver()
+TestDriver = vtkCPTestDriverPython.vtkCPTestDriver()
 TestDriver.SetNumberOfTimeSteps(100)
 TestDriver.SetGridBuilder(GridBuilder)
 

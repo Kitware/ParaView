@@ -47,12 +47,8 @@ if not paraview.compatibility.minor:
 if not paraview.compatibility.major:
     paraview.compatibility.minor = 5
 
-if os.name == "posix":
-    from libvtkPVServerCommonPython import *
-    from libvtkPVServerManagerPython import *
-else:
-    from vtkPVServerCommonPython import *
-    from vtkPVServerManagerPython import *
+from vtkPVServerCommonPython import *
+from vtkPVServerManagerPython import *
 
 def _wrap_property(proxy, smproperty):
     """ Internal function.

@@ -1,9 +1,5 @@
-import os
 from paraview import vtk 
-if os.name == "posix":
-    from libvtkPVServerCommonPython import *
-else:
-    from vtkPVServerCommonPython import *
+from vtkPVServerCommonPython import *
 
 def SetOutputWholeExtent(algorithm, extent):
     """
