@@ -129,6 +129,9 @@ vtkSMProxyManager::vtkSMProxyManager()
   // Init reserved Id for ProxyManager
   this->SetGlobalID(1);
   this->SetLocation(vtkProcessModule2::PROCESS_DATA_SERVER);
+
+  // Provide internal object a pointer to us
+  this->Internals->ProxyManager = this;
 }
 
 //---------------------------------------------------------------------------
@@ -1517,28 +1520,29 @@ const vtkSMMessage* vtkSMProxyManager::GetFullState()
 void vtkSMProxyManager::LoadState(const vtkSMMessage* msg)
 {
   // Need to compute differences and just call Register/UnRegister for those items
+  vtkstd::set<vtkSMProxyManagerEntry> tuplesToUnregister;
+  vtkstd::set<vtkSMProxyManagerEntry> tuplesToRegister;
+  vtkstd::set<vtkSMProxyManagerEntry>::iterator iter;
 
+  // Fill delta sets
+  this->Internals->ComputeDelta(msg, tuplesToRegister, tuplesToUnregister);
+  cout << ">>> Register: " << tuplesToRegister.size()
+       << " - Unregister: " << tuplesToUnregister.size() << endl;
 
-
-  this->UnRegisterProxies();
-  //msg->PrintDebugString();
-  int max = msg->ExtensionSize(ProxyManagerState::registered_proxy);
-  for(int cc=0; cc < max; cc++)
+  // Register new ones
+  iter = tuplesToRegister.begin();
+  while( iter != tuplesToRegister.end() )
     {
-    ProxyManagerState_ProxyRegistrationInfo reg =
-        msg->GetExtension(ProxyManagerState::registered_proxy, cc);
+    this->RegisterProxy(iter->Group.c_str(), iter->Name.c_str(), iter->Proxy);
+    iter++;
+    }
 
-    vtkSMProxy *proxy =
-        vtkSMProxy::SafeDownCast(this->GetSession()->GetRemoteObject(reg.global_id()));
-    if(proxy)
-      {
-      cout << " - register proxy " << proxy->GetGlobalID() << "("<< proxy->GetReferenceCount()<< ")" << endl;
-      this->RegisterProxy(reg.group().c_str(), reg.name().c_str(), proxy);
-      }
-    else
-      {
-      cout << "Did not find proxy !!!! with id " << reg.global_id() << endl;
-      }
+  // Unregister old ones
+  iter = tuplesToUnregister.begin();
+  while( iter != tuplesToUnregister.end() )
+    {
+    this->UnRegisterProxy(iter->Group.c_str(), iter->Name.c_str(), iter->Proxy);
+    iter++;
     }
 }
 //---------------------------------------------------------------------------

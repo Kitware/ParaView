@@ -29,6 +29,8 @@
 #include <vtksys/ios/sstream>
 #include "vtkStdString.h"
 #include "vtkSMMessage.h"
+#include "vtkSMProxyManager.h"
+#include "vtkSMSession.h"
 
 // Sub-classed to avoid symbol length explosion.
 class vtkSMProxyManagerProxyInfo : public vtkObjectBase
@@ -216,6 +218,9 @@ struct vtkSMProxyManagerInternals
   // Data structure for storing the fullState
   vtkSMMessage State;
 
+  // Keep ref to the proxyManager to access the session
+  vtkSMProxyManager *ProxyManager;
+
   // Helper methods -----------------------------------------------------------
   void FindProxyTuples(vtkSMProxy* proxy,
                        vtkstd::set<vtkSMProxyManagerEntry> &tuplesFounds)
@@ -230,6 +235,58 @@ struct vtkSMProxyManagerInternals
         }
       iter++;
       }
+    }
+
+  void ComputeDelta(const vtkSMMessage* newState,
+                    vtkstd::set<vtkSMProxyManagerEntry> &toRegister,
+                    vtkstd::set<vtkSMProxyManagerEntry> &toUnregister)
+    {
+    // Fill equivalent temporary data structure
+    vtkstd::set<vtkSMProxyManagerEntry> newStateContent;
+    int max = newState->ExtensionSize(ProxyManagerState::registered_proxy);
+    for(int cc=0; cc < max; cc++)
+      {
+      ProxyManagerState_ProxyRegistrationInfo reg =
+          newState->GetExtension(ProxyManagerState::registered_proxy, cc);
+      vtkSMProxy *proxy =
+          vtkSMProxy::SafeDownCast(this->ProxyManager->GetSession()->GetRemoteObject(reg.global_id()));
+      if(proxy)
+        {
+        newStateContent.insert(vtkSMProxyManagerEntry(reg.group().c_str(), reg.name().c_str(), proxy));
+        }
+      else
+        {
+        cout << "Did not find proxy !!!! with id " << reg.global_id() << endl;
+        }
+      }
+
+    // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    // FIXME there might be a better way to do that
+    // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    // Look for proxy to Register
+    vtkstd::set<vtkSMProxyManagerEntry>::iterator iter;
+    iter = newStateContent.begin();
+    while(iter != newStateContent.end())
+      {
+      if(this->RegisteredProxyTuple.find(*iter) == this->RegisteredProxyTuple.end())
+        {
+        toRegister.insert(*iter);
+        }
+      iter++;
+      }
+
+    // Look for proxy to Unregister
+    iter = this->RegisteredProxyTuple.begin();
+    while(iter != this->RegisteredProxyTuple.end())
+      {
+      if(newStateContent.find(*iter) == newStateContent.end())
+        {
+        toUnregister.insert(*iter);
+        }
+      iter++;
+      }
+
     }
 
   void RemoveTuples( const char* name,
