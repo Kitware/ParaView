@@ -1,5 +1,7 @@
 This document provides some basic details on how to get ParaView-CAVE up and running on your system.
 
+IMPORTANT: Please clone VTK-CAVE. Copy the contents of VTK-CAVE into ParaView/VTK directory. VTK-CAVE contains the changes done in VTK for CAVE support.
+
 1. Required Packages:
   1.1 VRPN (http://www.cs.unc.edu/Research/vrpn/obtaining_vrpn.html as of today Sept 08 2010, we were using master branch of git clone).
   1.2 libxt-dev
