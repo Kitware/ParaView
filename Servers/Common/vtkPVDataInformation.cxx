@@ -586,6 +586,11 @@ void vtkPVDataInformation::CopyFromObject(vtkObject* object)
     vtkAlgorithm* algo = vtkAlgorithm::SafeDownCast(object);
     if (algOutput && algOutput->GetProducer())
       {
+      if (algOutput->GetProducer()->IsA("vtkPVPostFilter"))
+        {
+        algOutput = algOutput->GetProducer()->GetInputConnection(0, 0);
+        }
+
       dobj = algOutput->GetProducer()->GetOutputDataObject(
         algOutput->GetIndex());
       }

@@ -60,6 +60,7 @@
 #define __vtkSMArrayListDomain_h
 
 #include "vtkSMStringListDomain.h"
+#include "vtkStdString.h"
 
 class vtkPVDataSetAttributesInformation;
 class vtkSMInputArrayDomain;
@@ -179,6 +180,20 @@ public:
   // returns 0 on failure.
   int CheckInformationKeys(vtkPVArrayInformation* arrayInfo);
 
+
+  // Description:
+  // returns the mangled name for the component index that is passed in.
+  //
+  static vtkStdString CreateMangledName(vtkPVArrayInformation *arrayInfo, int component);
+
+  // Description:
+  // returns the mangled name for the component index that is passed in.
+  //
+  static vtkStdString ArrayNameFromMangledName(const char* name);
+  static int ComponentIndexFromMangledName(vtkPVArrayInformation *info, const char* name);
+
+
+
 protected:
   vtkSMArrayListDomain();
   ~vtkSMArrayListDomain();
@@ -190,11 +205,24 @@ protected:
 
   // Description:
   // Utility functions called by Update()
-  void AddArrays(vtkSMSourceProxy* sp, 
+  void AddArrays(vtkSMSourceProxy* sp,
                  int outputport,
-                 vtkPVDataSetAttributesInformation* info, 
+                 vtkPVDataSetAttributesInformation* info,
                  vtkSMInputArrayDomain* iad,
                  int association);
+
+  // Description:
+  // Adds a new array to the domain. This internally calls add string. If the \c
+  // iad tells us that the number of components required==1 and the array has
+  // more than 1 component and
+  // vtkSMInputArrayDomain::GetAutomaticPropertyConversion() is true, then the
+  // array is spilt into individual component and added (with name mangled using
+  // the component names).
+  // Returns the index for the array. If the array was split into components,
+  // then returns the index of the string for the array magnitude.
+  unsigned int AddArray(vtkPVArrayInformation* arrayinfo, int association,
+    vtkSMInputArrayDomain* iad);
+
   void Update(vtkSMSourceProxy* sp, vtkSMInputArrayDomain* iad, int outputport);
   void Update(vtkSMProxyProperty* pp, vtkSMSourceProxy* sp, int outputport);
   void Update(vtkSMProxyProperty* pp);

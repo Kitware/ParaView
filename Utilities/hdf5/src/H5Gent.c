@@ -248,8 +248,8 @@ H5G_ent_encode(const H5F_t *f, uint8_t **pp, const H5G_entry_t *ent)
     } /* end else */
 
     /* fill with zero */
-    while(*pp < p_ret)
-        *(*pp)++ = 0;
+    if(*pp < p_ret)
+        HDmemset(*pp, 0, (p_ret - *pp));
     *pp = p_ret;
 
 done:

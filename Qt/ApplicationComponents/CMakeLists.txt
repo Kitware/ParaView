@@ -3,7 +3,6 @@ PROJECT(pqApplicationComponents)
 INCLUDE_DIRECTORIES(
   ${pqApplicationComponents_SOURCE_DIR}
   ${pqApplicationComponents_BINARY_DIR}
-  ${pqApplicationComponents_BINARY_DIR}/Resources/UI
   ${pqComponents_BINARY_DIR}
   ${pqComponents_SOURCE_DIR}
   ${pqComponents_BINARY_DIR}/Resources/UI
@@ -14,7 +13,6 @@ INCLUDE_DIRECTORIES(
   ${ParaView_SOURCE_DIR}/VTK/GUISupport/Qt
   ${ParaView_BINARY_DIR}/VTK/GUISupport/Qt
   ${ParaView_SOURCE_DIR}/VTK/GUISupport/Qt/Chart
-  ${ParaView_BINARY_DIR}/VTK/GUISupport/Qt/Chart
   ${QtTesting_SOURCE_DIR}
   ${QtTesting_BINARY_DIR}
   ${QtWidgets_SOURCE_DIR}
@@ -272,7 +270,27 @@ SET (SOURCE_FILES
   pqViewSettingsReaction.cxx
   pqViewSettingsReaction.h
 )
-
+#---------------------------------------------
+IF(PARAVIEW_ENABLE_PYTHON)
+  SET (MOC_HEADERS
+    ${MOC_HEADERS}
+    pqEditTraceReaction.h
+    pqMacroReaction.h
+    pqSaveTraceReaction.h
+    pqTraceReaction.h
+    )
+  SET (SOURCE_FILES
+    ${SOURCE_FILES}
+    pqEditTraceReaction.cxx
+    pqEditTraceReaction.h
+    pqMacroReaction.cxx
+    pqMacroReaction.h
+    pqSaveTraceReaction.cxx
+    pqSaveTraceReaction.h
+    pqTraceReaction.cxx
+    pqTraceReaction.h
+    )
+ENDIF(PARAVIEW_ENABLE_PYTHON)
 #---------------------------------------------
 CONFIGURE_FILE("${CMAKE_CURRENT_SOURCE_DIR}/pqApplicationComponentsExport.h.in"
                "${CMAKE_CURRENT_BINARY_DIR}/pqApplicationComponentsExport.h")

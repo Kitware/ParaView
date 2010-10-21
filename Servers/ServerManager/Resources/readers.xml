@@ -950,6 +950,17 @@
         </Documentation>
       </StringVectorProperty>
 
+    <IntVectorProperty name="MergeConsecutiveDelimiters"
+        command="SetMergeConsecutiveDelimiters"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Whether to merge successive delimiters.  Use this if (for example) your fields are separated
+          by spaces but you don't know exactly how many.
+        </Documentation>
+      </IntVectorProperty>
+
       <!-- End of CSVReaderCore -->
    </SourceProxy>
 
@@ -1920,6 +1931,293 @@
        </Documentation>
      </DoubleVectorProperty>
 
+   </SourceProxy>
+
+   <SourceProxy name="PNGReaderCore"
+                class="vtkPNGReader"
+                label="PNG Reader">
+     <Documentation
+       short_help="Read a PNG file."
+       long_help="Read a PNG file into an image data.">
+       The PNG reader reads PNG (Portable Network Graphics) files, and the output is a uniform rectilinear (image/volume) dataset. The default file extension is .png.
+     </Documentation>
+     <StringVectorProperty
+        name="FileName"
+        animateable="0"
+        command="SetFileName"
+        number_of_elements="1">
+        <FileListDomain name="files"/>
+        <Documentation>
+          This property specifies the file name for the PNG reader.
+        </Documentation>
+      </StringVectorProperty>
+
+      <Hints>
+        <ReaderFactory extensions="png"
+          file_description="PNG Image Files" />
+      </Hints>
+     <!-- End PNGReader -->
+   </SourceProxy>
+
+    <SourceProxy name="netCDFReaderCore"
+                 class="vtkNetCDFCFReader">
+
+      <StringVectorProperty name="FileName"
+                            command="SetFileName"
+                            animateable="0"
+                            number_of_elements="1">
+        <FileListDomain name="files" />
+        <Documentation>
+          The name of the file to load.
+        </Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="DimensionInfo"
+                            command="GetAllDimensions"
+                            information_only="1">
+        <StringArrayHelper />
+      </StringVectorProperty>
+
+      <StringVectorProperty name="Dimensions"
+                            command="SetDimensions"
+                            number_of_elements="1"
+                            animatelable="0">
+        <StringListDomain name="array_list">
+          <RequiredProperties>
+            <Property name="DimensionInfo" function="ArrayList" />
+          </RequiredProperties>
+        </StringListDomain>
+        <Documentation>
+          Load the grid with the given dimensions.  Any arrays that conform
+          to these dimensions will be loaded.
+        </Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="VariableDimensionInfo"
+                            command="GetVariableDimensions"
+                            information_only="1">
+        <StringArrayHelper />
+      </StringVectorProperty>
+
+      <StringVectorProperty name="VariableArrayInfo"
+                            command="GetAllVariableArrayNames"
+                            information_only="1">
+        <StringArrayHelper />
+      </StringVectorProperty>
+
+      <IntVectorProperty name="SphericalCoordinates"
+                         command="SetSphericalCoordinates"
+                         animateable="0"
+                         number_of_elements="1"
+                         default_values="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          If on, then data with latitude/longitude dimensions will be
+          read in as curvilinear data shaped like spherical coordinates.
+          If false, then the data will always be read in Cartesian
+          coordinates.
+        </Documentation>
+      </IntVectorProperty>
+
+      <DoubleVectorProperty name="VerticalScale"
+                            command="SetVerticalScale"
+                            number_of_elements="1"
+                            default_values="1">
+        <Documentation>
+          The scale of the vertical component of spherical coordinates.  It
+          is common to write the vertical component with respect to
+          something other than the center of the sphere (for example, the
+          surface).  In this case, it might be necessary to scale and/or
+          bias the vertical height.  The height will become height*scale +
+          bias.  Keep in mind that if the positive attribute of the
+          vertical dimension is down, then the height is negated.  The
+          scaling will be adjusted if it results in invalid (negative)
+          vertical values.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="VerticalBias"
+                            command="SetVerticalBias"
+                            number_of_elements="1"
+                            default_values="0">
+        <Documentation>
+          The bias of the vertical component of spherical coordinates.  It
+          is common to write the vertical component with respect to
+          something other than the center of the sphere (for example, the
+          surface).  In this case, it might be necessary to scale and/or
+          bias the vertical height.  The height will become height*scale +
+          bias.  Keep in mind that if the positive attribute of the
+          vertical dimension is down, then the height is negated.  The
+          scaling will be adjusted if it results in invalid (negative)
+          vertical values.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <IntVectorProperty name="ReplaceFillValueWithNan"
+                         command="SetReplaceFillValueWithNan"
+                         number_of_elements="1"
+                         default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          If on, any float or double variable read that has a _FillValue
+          attribute will have that fill value replaced with a not-a-number
+          (NaN) value.  The advantage of setting these to NaN values is
+          that, if implemented properly by the system and careful math
+          operations are used, they can implicitly be ignored by
+          calculations like finding the range of the values.  That said,
+          this option should be used with caution as VTK does not fully
+          support NaN values and therefore odd calculations may occur.
+        </Documentation>
+      </IntVectorProperty>
+
+      <DoubleVectorProperty name="TimestepValues"
+                            repeatable="1"
+                            information_only="1">
+        <TimeStepsInformationHelper />
+        <Documentation>
+          This magic property sends time information to the animation
+          panel.  ParaView will then automatically set up the animation to
+          visit the time steps defined in the file.
+        </Documentation>
+      </DoubleVectorProperty>
+
+    </SourceProxy> <!-- netCDFReaderCore -->
+
+   <SourceProxy name="P3DReaderCore" class="vtkMultiBlockPLOT3DReader">
+     <Documentation
+       short_help="Read PLOT3D files."
+       long_help="Read ASCII or binary PLOT3D files.">
+       PLOT3D is a plotting package developed at NASA. The PLOT3D reader can read both ASCII and binary PLOT3D files. The default file extension for the geometry files is .xyz, and the default file extension for the solution files is .q. The output of this reader is a multi-block dataset containing curvilinear (structured grid) datasets.
+     </Documentation>
+     <StringVectorProperty
+        name="FileName"
+        animateable="0"
+        command="SetFileName"
+        number_of_elements="1">
+        <FileListDomain name="files"/>
+        <Documentation>
+          This property specifies the .xyz (geometry) file name for the PLOT3D reader.
+        </Documentation>
+     </StringVectorProperty>
+
+     <StringVectorProperty
+        name="QFileName"
+        command="SetQFileName"
+        animateable="0"
+        number_of_elements="1">
+       <FileListDomain name="files"/>
+       <Documentation>
+         This property specifies the .q (solution) file name for the PLOT3D reader.
+       </Documentation>
+     </StringVectorProperty>
+
+     <IntVectorProperty
+        name="BinaryFile"
+        command="SetBinaryFile"
+        number_of_elements="1"
+        default_values="1" >
+       <BooleanDomain name="bool"/>
+       <Documentation>
+         This property indicates whether the data files are binary.
+       </Documentation>
+     </IntVectorProperty>
+
+     <IntVectorProperty
+        name="MultiGrid"
+        command="SetMultiGrid"
+        number_of_elements="1"
+        default_values="0" >
+       <BooleanDomain name="bool"/>
+       <Documentation>
+         This property indicates whether these files have multiple-block information.
+       </Documentation>
+     </IntVectorProperty>
+
+     <IntVectorProperty
+        name="HasByteCount"
+        command="SetHasByteCount"
+        number_of_elements="1"
+        default_values="0" >
+       <BooleanDomain name="bool"/>
+       <Documentation>
+         This property indicates whether this file uses Fortran leading-trailing byte counts.
+       </Documentation>
+     </IntVectorProperty>
+
+     <IntVectorProperty
+        name="IBlanking"
+        command="SetIBlanking"
+        number_of_elements="1"
+        default_values="0" >
+       <BooleanDomain name="bool"/>
+       <Documentation>
+         This property indicates whether this dataset has visibility information.
+       </Documentation>
+     </IntVectorProperty>
+
+     <IntVectorProperty
+        name="TwoDimensionalGeometry"
+        command="SetTwoDimensionalGeometry"
+        number_of_elements="1"
+        default_values="0" >
+       <BooleanDomain name="bool"/>
+       <Documentation>
+         This property indicates whether the data is two- or three-dimensional.
+       </Documentation>
+     </IntVectorProperty>
+
+     <IntVectorProperty
+        name="ForceRead"
+        command="SetForceRead"
+        number_of_elements="1"
+        default_values="0" >
+       <BooleanDomain name="bool"/>
+       <Documentation>
+         This property indicates whether to attempt to read the file even if it appears corrupt
+       </Documentation>
+     </IntVectorProperty>
+
+     <IntVectorProperty
+        name="ByteOrder"
+        command="SetByteOrder"
+        number_of_elements="1"
+        default_values="0" >
+       <EnumerationDomain name="enum">
+         <Entry value="0" text="BigEndian"/>
+         <Entry value="1" text="LittleEndian"/>
+       </EnumerationDomain>
+       <Documentation>
+         This property specifies the byte order of any binary file(s).
+       </Documentation>
+     </IntVectorProperty>
+
+     <IntVectorProperty
+        name="Functions"
+        command="AddFunction"
+        clean_command="RemoveAllFunctions"
+        repeat_command="1"
+        number_of_elements_per_command="1">
+       <EnumerationDomain name="array_list">
+         <!-- <Entry value="100" text="Scalar - Density"/> -->
+         <Entry value="110" text="Scalar - Pressure"/>
+         <Entry value="120" text="Scalar - Temperature"/>
+         <Entry value="130" text="Scalar - Enthalpy"/>
+         <Entry value="140" text="Scalar - Internal energy"/>
+         <Entry value="144" text="Scalar - Kinetic energy"/>
+         <Entry value="153" text="Scalar - Velocity magnitude"/>
+         <!-- <Entry value="163" text="Scalar - Stagnation energy"/> -->
+         <Entry value="170" text="Scalar - Entropy"/>
+         <Entry value="184" text="Scalar - Swirl."/>
+         <Entry value="200" text="Vector - Velocity"/>
+         <Entry value="201" text="Vector - Vorticity"/>
+         <!-- <Entry value="202" text="Vector - Momentum"/> -->
+         <Entry value="210" text="Vector - Pressure gradient"/>
+       </EnumerationDomain>
+       <Documentation>
+         This property lists which functions (point-centered arrays) to compute.
+       </Documentation>
+     </IntVectorProperty>
+   <!-- End P3DReaderCore -->
    </SourceProxy>
 
     <!-- End of "internal_sources" -->
@@ -3187,149 +3485,6 @@
    <!-- End xyzreader -->
    </SourceProxy>
 
-   <SourceProxy name="P3DReader" class="vtkMultiBlockPLOT3DReader"
-                label="PLOT3D Reader">
-     <Documentation
-       short_help="Read PLOT3D files."
-       long_help="Read ASCII or binary PLOT3D files.">
-       PLOT3D is a plotting package developed at NASA. The PLOT3D reader can read both ASCII and binary PLOT3D files. The default file extension for the geometry files is .xyz, and the default file extension for the solution files is .q. The output of this reader is a multi-block dataset containing curvilinear (structured grid) datasets.
-     </Documentation>
-     <StringVectorProperty
-        name="FileName"
-        animateable="0"
-        command="SetFileName"
-        number_of_elements="1">
-        <FileListDomain name="files"/>
-        <Documentation>
-          This property specifies the .xyz (geometry) file name for the PLOT3D reader.
-        </Documentation>
-     </StringVectorProperty>
-
-     <StringVectorProperty
-        name="QFileName"
-        command="SetQFileName"
-        animateable="0"
-        number_of_elements="1">
-       <FileListDomain name="files"/>
-       <Documentation>
-         This property specifies the .q (solution) file name for the PLOT3D reader.
-       </Documentation>
-     </StringVectorProperty>
-
-     <IntVectorProperty 
-        name="BinaryFile" 
-        command="SetBinaryFile" 
-        number_of_elements="1"
-        default_values="1" > 
-       <BooleanDomain name="bool"/>
-       <Documentation>
-         This property indicates whether the data files are binary.
-       </Documentation>
-     </IntVectorProperty>
-
-     <IntVectorProperty 
-        name="MultiGrid" 
-        command="SetMultiGrid" 
-        number_of_elements="1"
-        default_values="0" > 
-       <BooleanDomain name="bool"/>
-       <Documentation>
-         This property indicates whether these files have multiple-block information.
-       </Documentation>
-     </IntVectorProperty>
-
-     <IntVectorProperty 
-        name="HasByteCount" 
-        command="SetHasByteCount" 
-        number_of_elements="1"
-        default_values="0" > 
-       <BooleanDomain name="bool"/>
-       <Documentation>
-         This property indicates whether this file uses Fortran leading-trailing byte counts.
-       </Documentation>
-     </IntVectorProperty>
-
-     <IntVectorProperty 
-        name="IBlanking" 
-        command="SetIBlanking" 
-        number_of_elements="1"
-        default_values="0" > 
-       <BooleanDomain name="bool"/>
-       <Documentation>
-         This property indicates whether this dataset has visibility information.
-       </Documentation>
-     </IntVectorProperty>
-
-     <IntVectorProperty 
-        name="TwoDimensionalGeometry" 
-        command="SetTwoDimensionalGeometry" 
-        number_of_elements="1"
-        default_values="0" > 
-       <BooleanDomain name="bool"/>
-       <Documentation>
-         This property indicates whether the data is two- or three-dimensional.
-       </Documentation>
-     </IntVectorProperty>
-
-     <IntVectorProperty 
-        name="ForceRead" 
-        command="SetForceRead" 
-        number_of_elements="1"
-        default_values="0" > 
-       <BooleanDomain name="bool"/>
-       <Documentation>
-         This property indicates whether to attempt to read the file even if it appears corrupt
-       </Documentation>
-     </IntVectorProperty>
-
-     <IntVectorProperty 
-        name="ByteOrder" 
-        command="SetByteOrder" 
-        number_of_elements="1"
-        default_values="0" >
-       <EnumerationDomain name="enum">
-         <Entry value="0" text="BigEndian"/>
-         <Entry value="1" text="LittleEndian"/>
-       </EnumerationDomain>
-       <Documentation>
-         This property specifies the byte order of any binary file(s).
-       </Documentation>
-     </IntVectorProperty>
-
-     <IntVectorProperty 
-        name="Functions" 
-        command="AddFunction"
-        clean_command="RemoveAllFunctions"
-        repeat_command="1"
-        number_of_elements_per_command="1">
-       <EnumerationDomain name="array_list">
-         <!-- <Entry value="100" text="Scalar - Density"/> -->
-         <Entry value="110" text="Scalar - Pressure"/>
-         <Entry value="120" text="Scalar - Temperature"/>
-         <Entry value="130" text="Scalar - Enthalpy"/>
-         <Entry value="140" text="Scalar - Internal energy"/>
-         <Entry value="144" text="Scalar - Kinetic energy"/>
-         <Entry value="153" text="Scalar - Velocity magnitude"/>
-         <!-- <Entry value="163" text="Scalar - Stagnation energy"/> -->
-         <Entry value="170" text="Scalar - Entropy"/>
-         <Entry value="184" text="Scalar - Swirl."/>
-         <Entry value="200" text="Vector - Velocity"/>
-         <Entry value="201" text="Vector - Vorticity"/>
-         <!-- <Entry value="202" text="Vector - Momentum"/> -->
-         <Entry value="210" text="Vector - Pressure gradient"/>
-       </EnumerationDomain>
-       <Documentation>
-         This property lists which functions (point-centered arrays) to compute.
-       </Documentation>
-     </IntVectorProperty>
-
-     <Hints>
-      <ReaderFactory extensions="xyz"
-          file_description="PLOT3D Files" />
-     </Hints>
-   <!-- End P3DReader -->
-   </SourceProxy>
-
    <SourceProxy name="PhastaReader" 
                 class="vtkPPhastaReader"
                 label="Phasta Reader">
@@ -4010,6 +4165,55 @@
 
    </SourceProxy> <!-- NrrdReader -->
 
+   <FileSeriesReaderProxy name="PNGReader"
+                          class="vtkFileSeriesReader"
+                          label="PNG Reader"
+                          file_name_method="SetFileName">
+     <Documentation
+       short_help="Read a PNG file."
+       long_help="Read a PNG file into an image data.">
+       The PNG reader reads PNG (Portable Network Graphics) files, and the output is a uniform rectilinear (image/volume) dataset. The default file extension is .png.
+     </Documentation>
+
+     <StringVectorProperty
+        name="FileNames"
+        clean_command="RemoveAllFileNames"
+        command="AddFileName"
+        animateable="0"
+        number_of_elements="0"
+        repeat_command="1">
+        <FileListDomain name="files"/>
+       <Documentation>
+         The list of files to be read by the reader. If more than 1 file is specified,
+         the reader will switch to file series mode in which it will pretend that it
+         can support time and provide 1 file per time step.
+       </Documentation>
+     </StringVectorProperty>
+
+     <DoubleVectorProperty
+        name="TimestepValues"
+        repeatable="1"
+        information_only="1">
+        <TimeStepsInformationHelper/>
+        <Documentation>
+          Available timestep values.
+        </Documentation>
+     </DoubleVectorProperty>
+
+     <SubProxy>
+        <Proxy name="Reader"
+          proxygroup="internal_sources" proxyname="PNGReaderCore">
+        </Proxy>
+      </SubProxy>
+
+     <Hints>
+        <ReaderFactory extensions="png"
+          file_description="PNG Image Files" />
+     </Hints>
+
+     <!-- End FileSeriesPNGReader -->
+   </FileSeriesReaderProxy>
+
    <SourceProxy name="XdmfReader" 
                 class="vtkXdmfReader"
                 label="XDMF Reader">
@@ -4548,32 +4752,6 @@
    <!-- End Meta Image Reader -->
    </SourceProxy>
 
-   <SourceProxy name="PNGReader" 
-                class="vtkPNGReader"
-                label="PNG Reader">
-     <Documentation
-       short_help="Read a PNG file."
-       long_help="Read a PNG file into an image data.">
-       The PNG reader reads PNG (Portable Network Graphics) files, and the output is a uniform rectilinear (image/volume) dataset. The default file extension is .png.
-     </Documentation>
-     <StringVectorProperty
-        name="FileName"
-        animateable="0"
-        command="SetFileName"
-        number_of_elements="1">
-        <FileListDomain name="files"/>
-        <Documentation>
-          This property specifies the file name for the PNG reader.
-        </Documentation>
-     </StringVectorProperty>
-
-     <Hints>
-      <ReaderFactory extensions="png"
-          file_description="PNG Image Files" />
-     </Hints>
-   <!-- End PNGReader -->
-   </SourceProxy>
-
   <SourceProxy name="TIFFReader" 
                 class="vtkTIFFReader"
                 label="TIFF Reader">
@@ -4985,6 +5163,44 @@
    </SourceProxy>
    <!-- End of FLUENT Reader -->
 
+   <!-- Beginning of ProStar Reader -->
+   <SourceProxy
+      name="ProStarReader"
+      class="vtkProStarReader"
+      label="proSTAR (STARCD) Reader">
+     <Documentation
+        short_help="Reads geometry in proSTAR (STARCD) file format."
+        long_help="Reads geometry in proSTAR (STARCD) file format." >
+       ProStarReader creates an unstructured grid dataset.
+       It reads .cel/.vrt files stored in proSTAR (STARCD) ASCII format.
+     </Documentation>
+     <StringVectorProperty
+        name="FileName"
+        command="SetFileName"
+        animateable="0"
+        number_of_elements="1">
+       <FileListDomain name="files"/>
+       <Documentation>
+         Set the file name for the proSTAR (STARCD) reader.
+       </Documentation>
+     </StringVectorProperty>
+     <DoubleVectorProperty
+        name="ScaleFactor"
+        command="SetScaleFactor"
+        animateable="0"
+        default_values="1"
+        number_of_elements="1">
+       <Documentation>
+         Scaling factor for the points
+       </Documentation>
+      </DoubleVectorProperty>
+     <Hints>
+       <ReaderFactory extensions="cel vrt"
+           file_description="proSTAR Files" />
+     </Hints>
+   </SourceProxy>
+   <!-- End of ProStar Reader -->
+
    <!-- Beginning of LSDyna Reader -->
    <SourceProxy name="LSDynaReader" class="vtkLSDynaReader">
      <Documentation
@@ -5247,9 +5463,10 @@
    </SourceProxy>
    <!-- End of LSDyna Reader -->
 
-    <SourceProxy name="netCDFReader"
-                 class="vtkNetCDFCFReader"
-                 label="NetCDF Reader">
+    <FileSeriesReaderProxy name="netCDFReader"
+                           class="vtkFileSeriesReader"
+                           label="NetCDF Reader"
+                           file_name_method="SetFileName">
       <Documentation short_help="Read regular arrays from netCDF files."
                      long_help="Read regular arrays from netCDF files.  Will also read any topological information specified by the COARDS and CF conventions.">
         Reads arrays from netCDF files into structured VTK data sets.  In
@@ -5264,129 +5481,31 @@
       </Documentation>
 
       <StringVectorProperty name="FileName"
-                            command="SetFileName"
+                            clean_command="RemoveAllFileNames"
+                            command="AddFileName"
                             animateable="0"
-                            number_of_elements="1">
+                            number_of_elements="0"
+                            repeat_command="1">
         <FileListDomain name="files" />
         <Documentation>
-          The name of the file to load.
+          The name of the files to load.
         </Documentation>
       </StringVectorProperty>
 
-      <StringVectorProperty name="DimensionInfo"
-                            command="GetAllDimensions"
-                            information_only="1">
-        <StringArrayHelper />
-      </StringVectorProperty>
-
-      <StringVectorProperty name="Dimensions"
-                            command="SetDimensions"
-                            number_of_elements="1"
-                            animatelable="0">
-        <StringListDomain name="array_list">
-          <RequiredProperties>
-            <Property name="DimensionInfo" function="ArrayList" />
-          </RequiredProperties>
-        </StringListDomain>
-        <Documentation>
-          Load the grid with the given dimensions.  Any arrays that conform
-          to these dimensions will be loaded.
-        </Documentation>
-      </StringVectorProperty>
-
-      <StringVectorProperty name="VariableDimensionInfo"
-                            command="GetVariableDimensions"
-                            information_only="1">
-        <StringArrayHelper />
-      </StringVectorProperty>
-
-      <StringVectorProperty name="VariableArrayInfo"
-                            information_only="1">
-        <ArraySelectionInformationHelper attribute_name="Variable"/>
-      </StringVectorProperty>
-
-      <!-- <StringVectorProperty name="VariableArrayStatus" -->
-      <!--                       command="SetVariableArrayStatus" -->
-      <!--                       number_of_elements="0" -->
-      <!--                       repeat_command="1" -->
-      <!--                       number_of_elements_per_command="2" -->
-      <!--                       element_types="2 0" -->
-      <!--                       information_property="VariableArrayInfo" -->
-      <!--                       label="Variables"> -->
-      <!--   <ArraySelectionDomain name="array_list"> -->
-      <!--     <RequiredProperties> -->
-      <!--       <Property name="VariableArrayInfo" function="ArrayList" /> -->
-      <!--     </RequiredProperties> -->
-      <!--   </ArraySelectionDomain> -->
-      <!--   <Documentation> -->
-      <!--     This property lists which netCDF variables to load. -->
-      <!--   </Documentation> -->
-      <!-- </StringVectorProperty> -->
- 
-      <IntVectorProperty name="SphericalCoordinates"
-                         command="SetSphericalCoordinates"
-                         animateable="0"
-                         number_of_elements="1"
-                         default_values="1">
-        <BooleanDomain name="bool" />
-        <Documentation>
-          If on, then data with latitude/longitude dimensions will be
-          read in as curvilinear data shaped like spherical coordinates.
-          If false, then the data will always be read in Cartesian
-          coordinates.
-        </Documentation>
-      </IntVectorProperty>
-
-      <DoubleVectorProperty name="VerticalScale"
-                            command="SetVerticalScale"
-                            number_of_elements="1"
-                            default_values="1">
-        <Documentation>
-          The scale of the vertical component of spherical coordinates.  It
-          is common to write the vertical component with respect to
-          something other than the center of the sphere (for example, the
-          surface).  In this case, it might be necessary to scale and/or
-          bias the vertical height.  The height will become height*scale +
-          bias.  Keep in mind that if the positive attribute of the
-          vertical dimension is down, then the height is negated.  The
-          scaling will be adjusted if it results in invalid (negative)
-          vertical values.
-        </Documentation>
-      </DoubleVectorProperty>
-
-      <DoubleVectorProperty name="VerticalBias"
-                            command="SetVerticalBias"
-                            number_of_elements="1"
-                            default_values="0">
-        <Documentation>
-          The bias of the vertical component of spherical coordinates.  It
-          is common to write the vertical component with respect to
-          something other than the center of the sphere (for example, the
-          surface).  In this case, it might be necessary to scale and/or
-          bias the vertical height.  The height will become height*scale +
-          bias.  Keep in mind that if the positive attribute of the
-          vertical dimension is down, then the height is negated.  The
-          scaling will be adjusted if it results in invalid (negative)
-          vertical values.
-        </Documentation>
-      </DoubleVectorProperty>
-
-      <IntVectorProperty name="RepalceFillValueWithNan"
-                         command="SetReplaceFillValueWithNan"
-                         number_of_elements="1"
-                         default_values="0">
-        <BooleanDomain name="bool" />
-        <Documentation>
-          If on, any float or double variable read that has a _FillValue
-          attribute will have that fill value replaced with a not-a-number
-          (NaN) value.  The advantage of setting these to NaN values is
-          that, if implemented properly by the system and careful math
-          operations are used, they can implicitly be ignored by
-          calculations like finding the range of the values.  That said,
-          this option should be used with caution as VTK does not fully
-          support NaN values and therefore odd calculations may occur.
-        </Documentation>
-      </IntVectorProperty>
+      <SubProxy>
+        <Proxy name="Reader"
+               proxygroup="internal_sources" proxyname="netCDFReaderCore" />
+        <ExposedProperties>
+          <Property name="DimensionInfo" />
+          <Property name="Dimensions" />
+          <Property name="VariableDimensionInfo" />
+          <Property name="VariableArrayInfo" />
+          <Property name="SphericalCoordinates" />
+          <Property name="VerticalScale" />
+          <Property name="VerticalBias" />
+          <Property name="ReplaceFillValueWithNan" />
+        </ExposedProperties>
+      </SubProxy>
 
       <DoubleVectorProperty name="TimestepValues"
                             repeatable="1"
@@ -5401,10 +5520,10 @@
 
      <Hints>
       <ReaderFactory extensions="ncdf nc"
-          file_description="netCDF Files" />
+          file_description="netCDF files generic and CF conventions" />
      </Hints>
 
-    </SourceProxy> <!-- netCDFReader -->
+    </FileSeriesReaderProxy> <!-- netCDFReader -->
 
     <SourceProxy name="SLACReader"
                  class="vtkPSLACReader"
@@ -5623,6 +5742,7 @@
           <Property name="UseStringDelimiter" />
           <Property name="HaveHeaders" />
           <Property name="FieldDelimiterCharacters" />
+          <Property name="MergeConsecutiveDelimiters" />
         </ExposedProperties>
       </SubProxy>
 
@@ -5936,20 +6056,23 @@
    <!-- End WindBladeReader -->
    <SourceProxy name="NetCDFPOPReader"
               class="vtkNetCDFPOPReader"
-              label="NetCDF reader">
+              label="NetCDF POP reader">
    <Documentation
      short_help="Read raw regular rectilinear grid data from a file."
      long_help="Read raw regular rectilinear grid data from a file. The dimensions and type of the data must be specified.">
      The Image reader reads raw regular rectilinear grid (image/volume) data from a file. Because no metadata is provided, the user must specify information about the size, spacing, dimensionality, etc. about the dataset.
    </Documentation>
-    <StringVectorProperty name="FileName"
-      command="SetFilename"
-      animateable="0" >
-      <FileListDomain name="files"/>
-      <Documentation>
-        This property specifies the file name to read.
-      </Documentation>
-    </StringVectorProperty>
+
+     <StringVectorProperty
+        name="FileName"
+        animateable="0"
+        command="SetFileName"
+        number_of_elements="1">
+        <FileListDomain name="files"/>
+        <Documentation>
+          This property specifies the file name to read.
+        </Documentation>
+     </StringVectorProperty>
 
     <StringVectorProperty name="VariableArrayInfo"
                           information_only="1">
@@ -5972,10 +6095,23 @@
         This property lists which netCDF variables to load.
       </Documentation>
     </StringVectorProperty>
+
+     <IntVectorProperty
+        name="Stride"
+        command="SetStride"
+        number_of_elements="3"
+        default_values="1 1 1"
+        animateable="0">
+        <IntRangeDomain name="range" min="1 1 1" />
+        <Documentation>
+         This property indicate the number of indices per dimension (i,j,k) to skip between each point included
+         in this output.
+        </Documentation>
+     </IntVectorProperty>
     
     <Hints>
       <ReaderFactory extensions="pop.ncdf pop.nc"
-          file_description="Ocean Netcdf Files" />
+          file_description="POP Ocean NetCDF (Rectilinear)" />
     </Hints>
       
    </SourceProxy>
@@ -6131,12 +6267,80 @@
      </DoubleVectorProperty>
 
      <Hints>
-       <ReaderFactory extensions="mpas.ncdf mpas.nc"
-                      file_description="MPAS Netcdf Files" />
+       <ReaderFactory extensions="ncdf nc"
+                      file_description="MPAS NetCDF (Unstructured)" />
      </Hints>
 
    </SourceProxy>
    <!-- End MPASReader -->
+
+   <FileSeriesReaderProxy name="P3DReader"
+                          class="vtkFileSeriesReader"
+                          label="PLOT3D Reader"
+                          file_name_method="SetQFileName">
+     <Documentation
+       short_help="Read PLOT3D files."
+       long_help="Read ASCII or binary PLOT3D files.">
+       PLOT3D is a plotting package developed at NASA. The PLOT3D reader can read both ASCII and binary PLOT3D files. The default file extension for the geometry files is .xyz, and the default file extension for the solution files is .q. The output of this reader is a multi-block dataset containing curvilinear (structured grid) datasets.
+     </Documentation>
+     <SubProxy>
+       <Proxy name="Reader"
+              proxygroup="internal_sources" proxyname="P3DReaderCore">
+       </Proxy>
+       <ExposedProperties>
+        <Property name="FileName" />
+        <Property name="BinaryFile" />
+        <Property name="MultiGrid" />
+        <Property name="HasByteCount" />
+        <Property name="IBlanking" />
+        <Property name="TwoDimensionalGeometry" />
+        <Property name="ForceRead" />
+        <Property name="ByteOrder" />
+        <Property name="Functions" />
+       </ExposedProperties>
+     </SubProxy>
+
+     <StringVectorProperty name="FileNameInfo"
+        command="GetCurrentFileName"
+        information_only="1" >
+        <SimpleStringInformationHelper />
+     </StringVectorProperty>
+
+     <StringVectorProperty
+        name="QFileName"
+        clean_command="RemoveAllFileNames"
+        command="AddFileName"
+        animateable="0"
+        number_of_elements="0"
+        repeat_command="1"
+        information_property="FileNameInfo" >
+        <FileListDomain name="files"/>
+        <Documentation>
+          The list of .q (solution) files for the PLOT3D reader. This can be
+          more than 1. If more that 1 file is specified, the reader will switch
+          to file-series mode in which it will pretend that it can support time
+          and provide 1 file per time step.
+       </Documentation>
+     </StringVectorProperty>
+
+     <DoubleVectorProperty
+        name="TimestepValues"
+        repeatable="1"
+        information_only="1">
+        <TimeStepsInformationHelper/>
+        <Documentation>
+          Available timestep values.
+        </Documentation>
+     </DoubleVectorProperty>
+     <Hints>
+      <ReaderFactory extensions="xyz"
+          file_description="PLOT3D Files" />
+      <!-- This hint tells the GUI that the File | Open dialog sets the FileName
+           property -->
+      <DefaultFileNameProperty name="FileName" />
+     </Hints>
+     <!-- End stlreader-->
+   </FileSeriesReaderProxy>
 
   </ProxyGroup>
 </ServerManagerConfiguration>

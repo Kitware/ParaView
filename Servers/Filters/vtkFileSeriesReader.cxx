@@ -192,6 +192,12 @@ int vtkFileSeriesReaderTimeRanges::GetAggregateTimeInfo(vtkInformation *outInfo)
 int vtkFileSeriesReaderTimeRanges::GetInputTimeInfo(int index,
                                                     vtkInformation *outInfo)
 {
+  if (this->InputLookup.find(index) == this->InputLookup.end())
+    {
+    // if there are no files specified, there's no time information to provide.
+    return 1;
+    }
+
   vtkInformation *storedInfo = this->InputLookup[index];
   outInfo->CopyEntry(storedInfo,vtkStreamingDemandDrivenPipeline::TIME_RANGE());
   if (storedInfo->Has(vtkStreamingDemandDrivenPipeline::TIME_STEPS()))
@@ -543,8 +549,16 @@ int vtkFileSeriesReader::RequestInformation(
   int numFiles = (int)this->GetNumberOfFileNames();
   if (numFiles < 1)
     {
-    vtkErrorMacro("Expecting at least 1 file.  Cannot proceed.");
-    return 0;
+    // This can happen in special cases, like Plot3DReader where the
+    // vtkFileSeriesReader is actually controlling a non-essential file-name
+    // property. In which case, we simply pass the RequestInformation call to
+    // the reader.
+    outInfo->Remove(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
+    outInfo->Remove(vtkStreamingDemandDrivenPipeline::TIME_RANGE());
+    this->RequestInformationForInput(-1, request, outputVector);
+
+    //vtkErrorMacro("Expecting at least 1 file.  Cannot proceed.");
+    return 1;
     }
 
   // Run RequestInformation on the reader for the first file.  Use that info to
@@ -611,6 +625,14 @@ int vtkFileSeriesReader::RequestUpdateExtent(
     }
 
   int index = *(inputs.begin());
+  if (index >= static_cast<int>(this->GetNumberOfFileNames()))
+    {
+    // this happens when there are no files set. That's an acceptable condition
+    // when the file-series is not an essential filename eg. the Q file for
+    // Plot3D reader.
+    index = -1;
+    }
+
   // Make sure that the reader file name is set correctly and that
   // RequestInformation has been called.
   this->RequestInformationForInput(index);
@@ -646,8 +668,11 @@ int vtkFileSeriesReader::RequestData(vtkInformation *request,
 
   int retVal = this->Reader->ProcessRequest(request, inputVector, outputVector);
 
-  // Now restore the information.
-  this->Internal->TimeRanges->GetAggregateTimeInfo(outInfo);
+  if (this->GetNumberOfFileNames() > 0)
+    {
+    // Now restore the information.
+    this->Internal->TimeRanges->GetAggregateTimeInfo(outInfo);
+    }
 
   return retVal;
 }
@@ -658,9 +683,17 @@ int vtkFileSeriesReader::RequestInformationForInput(
                                              vtkInformation *request,
                                              vtkInformationVector *outputVector)
 {
-  if ((index != this->LastRequestInformationIndex) || (outputVector != NULL))
+  if (index == -1 || (index != this->LastRequestInformationIndex) || (outputVector != NULL))
     {
-    this->SetReaderFileName(this->GetFileName(index));
+    if (index >= 0)
+      {
+      this->SetReaderFileName(this->GetFileName(index));
+      }
+    else
+      {
+      this->SetReaderFileName(0);
+      }
+
     this->LastRequestInformationIndex = index;
     // Need to call RequestInformation on reader to refresh any metadata for the
     // new filename.
@@ -693,7 +726,7 @@ int vtkFileSeriesReader::RequestInformationForInput(
 //-----------------------------------------------------------------------------
 void vtkFileSeriesReader::SetReaderFileName(const char* fname)
 {
-  if (this->Reader && fname)
+  if (this->Reader)
     {
     vtkClientServerID csId = 
       vtkProcessModule::GetProcessModule()->GetIDFromObject(this->Reader);

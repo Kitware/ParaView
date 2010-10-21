@@ -41,7 +41,7 @@ enum H5Z_scaleoffset_t {t_bad=0, t_uchar=1, t_ushort, t_uint, t_ulong, t_ulong_l
 
 /* Local function prototypes */
 static double H5Z_scaleoffset_rnd(double val);
-static htri_t H5Z_can_apply_scaleoffset(hid_t dcpl_id, hid_t type_id, hid_t space_id);
+static herr_t H5Z_can_apply_scaleoffset(hid_t dcpl_id, hid_t type_id, hid_t space_id);
 static enum H5Z_scaleoffset_t H5Z_scaleoffset_get_type(unsigned dtype_class,
     unsigned dtype_size, unsigned dtype_sign);
 static herr_t H5Z_scaleoffset_set_parms_fillval(H5P_genplist_t *dcpl_plist,
@@ -611,13 +611,13 @@ H5Z_class2_t H5Z_SCALEOFFSET[1] = {{
  *
  *-------------------------------------------------------------------------
  */
-static htri_t
+static herr_t
 H5Z_can_apply_scaleoffset(hid_t UNUSED dcpl_id, hid_t type_id, hid_t UNUSED space_id)
 {
     const H5T_t	*type;                  /* Datatype */
     H5T_class_t dtype_class;            /* Datatype's class */
     H5T_order_t dtype_order;            /* Datatype's endianness order */
-    htri_t ret_value = TRUE;            /* Return value */
+    herr_t ret_value = TRUE;            /* Return value */
 
     FUNC_ENTER_NOAPI(H5Z_can_apply_scaleoffset, FAIL)
 
@@ -640,9 +640,9 @@ H5Z_can_apply_scaleoffset(hid_t UNUSED dcpl_id, hid_t type_id, hid_t UNUSED spac
 
         /* Range check datatype's endianness order */
         if(dtype_order != H5T_ORDER_LE && dtype_order != H5T_ORDER_BE)
-            HGOTO_ERROR(H5E_PLINE, H5E_BADTYPE, FALSE, "bad datatype endianness order")
+            HGOTO_ERROR(H5E_PLINE, H5E_BADTYPE, FAIL, "bad datatype endianness order")
     } else
-        HGOTO_ERROR(H5E_PLINE, H5E_BADTYPE, FALSE, "datatype class not supported by scaleoffset")
+        HGOTO_ERROR(H5E_PLINE, H5E_BADTYPE, FAIL, "datatype class not supported by scaleoffset")
 
 done:
     FUNC_LEAVE_NOAPI(ret_value)
@@ -805,6 +805,11 @@ H5Z_set_local_scaleoffset(hid_t dcpl_id, hid_t type_id, hid_t space_id)
     /* Get datatype */
     if(NULL == (type = (H5T_t *)H5I_object_verify(type_id, H5I_DATATYPE)))
 	HGOTO_ERROR(H5E_ARGS, H5E_BADTYPE, FAIL, "not a datatype")
+
+#ifdef H5_CLEAR_MEMORY
+    /* Initialize the parameters to a known state */
+    HDmemset(cd_values, 0, sizeof(cd_values));
+#endif /* H5_CLEAR_MEMORY */
 
     /* Get the filter's current parameters */
     if(H5P_get_filter_by_id(dcpl_plist, H5Z_FILTER_SCALEOFFSET, &flags, &cd_nelmts, cd_values, (size_t)0, NULL, NULL) < 0)
@@ -1181,6 +1186,14 @@ H5Z_filter_scaleoffset(unsigned flags, size_t cd_nelmts, const unsigned cd_value
 
         for(i = 0; i < sizeof(unsigned long long); i++)
             ((unsigned char *)outbuf)[5+i] = (unsigned char)((minval & ((unsigned long long)0xff << i*8)) >> i*8);
+
+#ifdef H5_CLEAR_MEMORY
+        /* Zero out remaining, unused bytes */
+        /* (Looks like an error in the original determination of how many
+         *      bytes would be needed for parameters. - QAK, 2010/08/19)
+         */
+        HDmemset(outbuf + 13, 0, (size_t)8);
+#endif /* H5_CLEAR_MEMORY */
 
         /* special case: minbits equal to full precision */
         if(minbits == p.size * 8) {

@@ -375,11 +375,11 @@ LIBH5CPP_HL = $(top_builddir)/hl/c++/src/libhdf5_hl_cpp.la
 # Scripts used to build examples
 # If only shared libraries have been installed, have h5cc build examples with
 # shared libraries instead of static libraries
-H5CC = ${DESTDIR}/$(bindir)/h5cc
-H5CC_PP = ${DESTDIR}/$(bindir)/h5pcc
-H5FC = ${DESTDIR}/$(bindir)/h5fc
-H5FC_PP = ${DESTDIR}/$(bindir)/h5pfc
-H5CPP = ${DESTDIR}/$(bindir)/h5c++
+H5CC = ${DESTDIR}$(bindir)/h5cc
+H5CC_PP = ${DESTDIR}$(bindir)/h5pcc
+H5FC = ${DESTDIR}$(bindir)/h5fc
+H5FC_PP = ${DESTDIR}$(bindir)/h5pfc
+H5CPP = ${DESTDIR}$(bindir)/h5c++
 
 # The trace script; this is used on source files from the C library to
 # insert tracing macros.
@@ -388,7 +388,7 @@ TRACE = perl $(top_srcdir)/bin/trace
 # .chkexe files are used to mark tests that have run successfully.
 # .chklog files are output from those tests.
 # *.clog are from the MPE option.
-CHECK_CLEANFILES = *.chkexe *.chklog *.clog
+CHECK_CLEANFILES = *.chkexe *.chklog *.clog $(TEST_PROG) *.o *.exe
 
 # Add libtool shared library version numbers to the HDF5 library
 # See libtool versioning documentation online.

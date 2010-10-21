@@ -15,6 +15,8 @@
 #include <vtkRectilinearGrid.h>
 #include <vtkstd/vector>
 #include <vtkstd/string>
+#include <vtkstd/algorithm>
+#include <vtksys/ios/sstream>
 #include <vtkStringArray.h>
 #include <vtkSmartPointer.h>
 
@@ -23,6 +25,7 @@ vtkStandardNewMacro(vtkPrismSESAMEReader);
 static const int SESAME_NUM_CHARS = 512;
 static const char* TableLineFormat = "%2i%6i%6i";
 
+
 class vtkPrismSESAMEReader::MyInternal
 {
 public:
@@ -30,13 +33,133 @@ public:
   FILE* File;
   vtkstd::vector<int> TableIds;
   vtkstd::vector<long> TableLocations;
+  vtkIdType NumberTableVariables;
   vtkIdType TableId;
   vtkstd::vector<vtkstd::string> TableArrays;
   vtkstd::vector<int> TableArrayStatus;
   vtkIntArray* TableIdsArray;
+  enum SESAMEFORMAT
+    {
+    LANL,
+    ASC
+    };
+
+  SESAMEFORMAT FileFormat;
 
   vtkstd::string TableXAxisName;
   vtkstd::string TableYAxisName;
+  bool readTableHeader(char* buffer,int *tableId)
+    {
+    int dummy;
+    int internalId;
+    int table;
+
+    // see if the line matches the  " 0 9999 602" format
+    if(sscanf(buffer, TableLineFormat, &dummy, &internalId, &table) == 3)
+      {
+      *tableId=table;
+      this->FileFormat=LANL;
+      return 1;
+      }
+    else
+      {
+      vtkstd::string header=buffer;
+      vtkstd::transform(header.begin(),header.end(),header.begin(),tolower);
+      vtkstd::string::size_type record_pos=header.find("record");
+      vtkstd::string::size_type type_pos=header.find("type");
+      vtkstd::string::size_type index_pos=header.find("index");
+      vtkstd::string::size_type matid_pos=header.find("matid");
+
+
+      if(record_pos!=vtkstd::string::npos && type_pos!=vtkstd::string::npos)
+        {
+        char buffer2[SESAME_NUM_CHARS];
+        if(sscanf(buffer, "%s%s%s%d%s", buffer2,buffer2,buffer2,&table,buffer2 ) == 5)
+          {
+          *tableId=table;
+          this->FileFormat=ASC;
+          return 1;
+          }
+        else
+          {
+          *tableId=-1;
+          return 0;
+          }
+        }
+      else if(index_pos!=vtkstd::string::npos && matid_pos!=vtkstd::string::npos)
+        {
+        *tableId=-1;
+        return 1;
+        }
+      else
+        {
+        *tableId=-1;
+        return 0;
+        }
+      }
+
+    return 0;
+    }
+
+  bool readTableHeader(FILE* f,int *tableId)
+    {
+    if(f)
+      {
+      char buffer[SESAME_NUM_CHARS];
+      int dummy;
+      int internalId;
+      int table;
+
+
+      if(fgets(buffer, SESAME_NUM_CHARS, f)!= NULL)
+        {
+        // see if the line matches the  " 0 9999 602" format
+        if(sscanf(buffer, TableLineFormat, &dummy, &internalId, &table) == 3)
+          {
+          *tableId=table;
+          this->FileFormat=LANL;
+          return 1;
+          }
+        else
+          {
+          vtkstd::string header=buffer;
+          vtkstd::transform(header.begin(),header.end(),header.begin(),tolower);
+          vtkstd::string::size_type record_pos=header.find("record");
+          vtkstd::string::size_type type_pos=header.find("type");
+          vtkstd::string::size_type index_pos=header.find("index");
+          vtkstd::string::size_type matid_pos=header.find("matid");
+
+
+          if(record_pos!=vtkstd::string::npos && type_pos!=vtkstd::string::npos)
+            {
+            char buffer2[SESAME_NUM_CHARS];
+            if(sscanf(buffer, "%s%d%s", buffer2,&table,buffer2 ) == 3)
+              {
+              *tableId=table;
+              this->FileFormat=ASC;
+              return 1;
+              }
+            else
+              {
+              *tableId=-1;
+              return 0;
+              }
+            }
+          else if(index_pos!=vtkstd::string::npos && matid_pos!=vtkstd::string::npos)
+            {
+            *tableId=-1;
+            return 1;
+            }
+          else
+            {
+            *tableId=-1;
+            return 0;
+            }
+          }
+        }
+      }
+    return 0;
+    }
 
   void ClearTables()
     {
@@ -211,6 +334,7 @@ vtkPrismSESAMEReader::~vtkPrismSESAMEReader()
   delete this->Internal;
 }
 
+
 int vtkPrismSESAMEReader::IsValidFile()
 {
   if(this->Internal->FileName.empty())
@@ -226,14 +350,11 @@ int vtkPrismSESAMEReader::IsValidFile()
     }
 
   // check that it is valid
-  int a,b,c;
-  int ret = fscanf(f, TableLineFormat, &a,&b,&c);
+  int a;
+  int ret = this->Internal->readTableHeader(f,&a);
   fclose(f);
-  if(ret != 3)
-    {
-    return 0;
-    }
-  return 1;
+  return ret;
+
 }
 
 void vtkPrismSESAMEReader::SetFileName(const char* file)
@@ -278,16 +399,15 @@ int vtkPrismSESAMEReader::OpenFile()
     }
 
   // check that it is valid
-  int a,b,c;
-  int ret = fscanf(this->Internal->File, TableLineFormat, &a,&b,&c);
-  rewind(this->Internal->File);
-  if(ret != 3)
+  int a;
+  if(!this->Internal->readTableHeader(this->Internal->File,&a))
     {
     vtkErrorMacro(<<this->GetFileName() << " is not a valid SESAME file");
     fclose(this->Internal->File);
     this->Internal->File = NULL;
     return 0;
     }
+  rewind(this->Internal->File);
   return 1;
 }
 
@@ -415,67 +535,132 @@ void vtkPrismSESAMEReader::ExecuteInformation()
   if(this->Internal->TableIds.empty())
     {
     this->Internal->TableLocations.clear();
+    this->Internal->NumberTableVariables=-1;
 
     // get the table ids
 
     char buffer[SESAME_NUM_CHARS];
-    int dummy;
-    int internalId;
     int tableId;
 
-    // read lines from the file the whole file
+
     while( fgets(buffer, SESAME_NUM_CHARS, this->Internal->File) != NULL )
       {
       // see if the line matches the  " 0 9999 602" format
-      if(sscanf(buffer, TableLineFormat, &dummy, &internalId, &tableId) == 3)
+      if(this->Internal->readTableHeader(buffer,&tableId))
         {
         if(TableIndex(tableId) != -1)
           {
           this->Internal->TableIds.push_back(tableId);
           long loc = ftell(this->Internal->File);
           this->Internal->TableLocations.push_back(loc);
-          }
         }
       }
     }
 
-  //if(this->Internal->TableId == -1 &&
-  //   !this->Internal->TableIds.empty())
-  //  {
-  //  this->Internal->TableId = this->Internal->TableIds[0];
-  //  }
+    this->Internal->TableId=this->Internal->TableIds.at(0);
 
-  if(this->Internal->TableId != -1)
-    {
-    JumpToTable(this->Internal->TableId);
-    float v[5] = { 0.0, 0.0, 0.0, 0.0, 0.0 };
-    if ( ReadTableValueLine( &(v[0]), &(v[1]),
-                             &(v[2]), &(v[3]), &(v[4]) ) != 0)
-      {
-      // first two values are dimensions of
-      // grid
-      this->GetOutput()->SetWholeExtent(0, (int)(v[0]) - 1,
-                                        0, (int)(v[1]) - 1, 0, 0 );
-      }
-    }
+  }
+
 
   if(this->Internal->TableId != -1 &&
-     this->Internal->TableArrays.empty())
+    this->Internal->TableArrays.empty())
     {
+
+    float v[5] = { 0.0, 0.0, 0.0, 0.0, 0.0 };
+    int datadims[2] = { 0, 0 };
+    int numRead = 0;
+    int result=0;
+
+    JumpToTable(this->Internal->TableId);
+
+    result=ReadTableValueLine( &(v[0]), &(v[1]), &(v[2]), &(v[3]), &(v[4]) );
+    // get the table header
+    if (result!= 0)
+      {
+      this->GetOutput()->SetWholeExtent(0, (int)(v[0]) - 1,
+        0, (int)(v[1]) - 1, 0, 0 );
+      // dimensions of grid
+      datadims[0] = (int)(v[0]);
+      datadims[1] = (int)(v[1]);
+      }
+    unsigned int scalarIndex = 0;
+    int scalarCount = 0;
+    int readFromTable = 0;
+
+    if (result!= 0)
+      {
+      for (int k=2;k<5;k++)
+        {
+        if ( numRead >= (datadims[0] + datadims[1]) )
+          {
+          scalarCount++;
+          if(scalarCount == datadims[0] * datadims[1])
+            {
+            scalarCount = 1;
+            scalarIndex++;
+            }
+          }
+        numRead++;
+        }
+      }
+
+    while ( (readFromTable = ReadTableValueLine( &(v[0]), &(v[1]), &(v[2]), &(v[3]),
+      &(v[4])  )) != 0)
+      {
+      for (int k=0;k<readFromTable;k++)
+        {
+        if ( numRead >= (datadims[0] + datadims[1]) )
+          {
+          scalarCount++;
+          if(scalarCount == datadims[0] * datadims[1])
+            {
+            scalarCount = 1;
+            scalarIndex++;
+            }
+          }
+        numRead++;
+        }
+      }
+
+    this->Internal->NumberTableVariables=scalarIndex;
+
+
+
     // get the names of the arrays in the table
-    int tableIndex = TableIndex(this->Internal->TableId);
+   int tableIndex = TableIndex(this->Internal->TableId);
 
     this->Internal->TableXAxisName=TableDefs[tableIndex].XAxisName;
     this->Internal->TableYAxisName=TableDefs[tableIndex].YAxisName;
+
+    int numVarNames=0;
     for(int j=0; TableDefs[tableIndex].Arrays[j] != 0; j++)
       {
-      this->Internal->TableArrays.push_back(
-                TableDefs[tableIndex].Arrays[j]);
-      this->Internal->TableArrayStatus.push_back(1);  // all arrays are on
-                                                      // by default
+      numVarNames++;
+      }
+
+    for(int j=0;j<this->Internal->NumberTableVariables; j++)
+      {
+      if(j<numVarNames)
+        {
+        this->Internal->TableArrays.push_back(
+          TableDefs[tableIndex].Arrays[j]);
+        this->Internal->TableArrayStatus.push_back(1);  // all arrays are on
+        // by default
+        }
+      else
+        {
+        vtkstd::stringstream ss;
+        vtkstd::string varID;
+        ss<<j+1;
+        ss>>varID;
+        vtkstd::string varName="Variable ";
+        varName.append(varID);
+        this->Internal->TableArrays.push_back(varName);
+        this->Internal->TableArrayStatus.push_back(1);  // all arrays are on
+        // by default
+        }
       }
     }
-
 }
 
 int vtkPrismSESAMEReader::JumpToTable( int toTable )
@@ -527,12 +712,6 @@ void vtkPrismSESAMEReader::ReadTable()
     yCoords->Allocate( datadims[1] );
     zCoords->Allocate( 1 );
     zCoords->InsertNextTuple1( 0.0 );
-
-    // the first three values are x samples Update: this only works if X has at least 3 values.
-    //xCoords->InsertNextTuple1( v[2] );
-    //xCoords->InsertNextTuple1( v[3] );
-    //xCoords->InsertNextTuple1( v[4] );
-    //numRead = 3;
     }
 
 
@@ -668,29 +847,32 @@ int vtkPrismSESAMEReader::ReadTableValueLine ( float *v1, float *v2,
   float *v3, float *v4, float *v5)
 {
   // by definition, a line of this file is 80 characters long
-  // when we start reading the data values, the end of the line is a tag
+  // when we start reading the data values, for the LANL format the end of the line is a tag
   // (see note below), which we have to ignore in order to read the data
   // properly
+  // The ASC format doens't have the end of line tag.
   //
   char buffer[SESAME_NUM_CHARS + 1];
   buffer[SESAME_NUM_CHARS] = '\0';
   int numRead = 0;
   if ( fgets(buffer, SESAME_NUM_CHARS, this->Internal->File) != NULL )
     {
-    int dummy;
-    int internalId;
     int tableId;
 
     // see if the line matches the  " 0 9999 602" format
-    if(sscanf(buffer, TableLineFormat, &dummy, &internalId, &tableId) == 3)
+
+    if(this->Internal->readTableHeader(buffer,&tableId))
       {
       // this is the start of a new table
       numRead = 0;
       }
     else
       {
-      // ignore the last 5 characters of the line (see notes above)
-      buffer[75] = '\0';
+      if(this->Internal->FileFormat==vtkPrismSESAMEReader::MyInternal::LANL)
+        {
+        //// ignore the last 5 characters of the line (see notes above)
+        buffer[75] = '\0';
+        }
       numRead = sscanf( buffer, "%e%e%e%e%e", v1, v2, v3, v4, v5);
       }
     }

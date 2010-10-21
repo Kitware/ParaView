@@ -116,7 +116,7 @@ signals:
   /// fired after mouse up in selection mode
   void selectionFinished(int xmin, int ymin, int xmax, int ymax);
 
-  /// Fired to indicate whether the selection can be create on the currently set
+  /// Fired to indicate whether the selection can be created on the currently set
   /// view.
   void enableSurfaceSelection(bool enabled);
   void enableSurfacePointsSelection(bool enabled);

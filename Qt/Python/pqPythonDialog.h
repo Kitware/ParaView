@@ -55,14 +55,6 @@ public:
   pqPythonDialog(QWidget* Parent = 0);
   ~pqPythonDialog();
 
-  /// Returns pointer to the splitter that contains the python shell within
-  // this dialog
-  QSplitter* splitter();
-
-  /// Restores the splitter state from the last time it was saved.
-  /// Splitter state is saved whenever the dialog is closed.
-  void restoreSplitterState();
-
 public slots:
   /// Execute a commond in the python shell.
   void runString(const QString& script);

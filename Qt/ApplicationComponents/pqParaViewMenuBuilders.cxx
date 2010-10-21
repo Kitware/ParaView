@@ -71,6 +71,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSaveDataReaction.h"
 #include "pqSaveScreenshotReaction.h"
 #include "pqSaveStateReaction.h"
+
 #include "pqSelectionToolbar.h"
 #include "pqServerConnectReaction.h"
 #include "pqServerDisconnectReaction.h"
@@ -84,7 +85,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqViewSettingsReaction.h"
 
 #ifdef PARAVIEW_ENABLE_PYTHON
+#include "pqEditTraceReaction.h"
+#include "pqMacroReaction.h"
 #include "pqPythonManager.h"
+#include "pqSaveTraceReaction.h"
+#include "pqTraceReaction.h"
 #endif
 
 #include <QDockWidget>
@@ -206,7 +211,8 @@ void pqParaViewMenuBuilders::buildToolsMenu(QMenu& menu)
 #endif
 
 
-  menu.addSeparator();
+  menu.addSeparator(); // --------------------------------------------------
+
   //<addaction name="actionToolsDumpWidgetNames" />
   new pqTestingReaction(menu.addAction("Record Test")
     << pqSetName("actionToolsRecordTest"),
@@ -228,9 +234,25 @@ void pqParaViewMenuBuilders::buildToolsMenu(QMenu& menu)
   QObject::connect(action, SIGNAL(triggered()),
     pqApplicationCore::instance(),
     SLOT(showOutputWindow()));
-  menu.addSeparator();
+
+
+  menu.addSeparator(); // --------------------------------------------------
+
   new pqPythonShellReaction(menu.addAction("Python Shell")
     << pqSetName("actionToolsPythonShell"));
+
+#ifdef PARAVIEW_ENABLE_PYTHON
+  menu.addSeparator(); // --------------------------------------------------
+
+  new pqTraceReaction( menu.addAction("Start Trace")
+                       << pqSetName("actionToolsStartTrace"), true);
+  new pqTraceReaction(menu.addAction("Stop Trace")
+                      << pqSetName("actionToolsStartTrace"), false);
+  new pqEditTraceReaction(menu.addAction("Edit Trace")
+                      << pqSetName("actionToolsEditTrace"));
+  new pqSaveTraceReaction(menu.addAction("Save Trace")
+                          << pqSetName("actionToolsSaveTrace"));
+#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -279,7 +301,14 @@ void pqParaViewMenuBuilders::buildMacrosMenu
   pqPythonManager* manager = pqPVApplicationCore::instance()->pythonManager();
   if (manager)
     {
-    manager->addWidgetForMacros(&menu);
+    new pqMacroReaction(menu.addAction("Add new macro")
+                        << pqSetName("actionMacroCreate"));
+    QMenu *editMenu = menu.addMenu("Edit...");
+    QMenu *deleteMenu = menu.addMenu("Delete...");
+    menu.addSeparator();
+    manager->addWidgetForRunMacros(&menu);
+    manager->addWidgetForEditMacros(editMenu);
+    manager->addWidgetForDeleteMacros(deleteMenu);
     }
 #endif
 }
@@ -349,7 +378,7 @@ void pqParaViewMenuBuilders::buildToolbars(QMainWindow& mainWindow)
     {
     QToolBar* macrosToolbar = new QToolBar("Macros Toolbars", &mainWindow)
       << pqSetName("MacrosToolbar");
-    manager->addWidgetForMacros(macrosToolbar);
+    manager->addWidgetForRunMacros(macrosToolbar);
     mainWindow.addToolBar(Qt::TopToolBarArea, macrosToolbar);
     }
 #endif

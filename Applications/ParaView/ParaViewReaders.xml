@@ -26,6 +26,7 @@
   <Proxy group="sources" name="netCDFReader" />
   <Proxy group="sources" name="byureader" />
   <Proxy group="sources" name="objreader" />
+  <Proxy group="sources" name="ProStarReader" />
   <Proxy group="sources" name="XdmfReader" />
   <Proxy group="sources" name="pdbreader" />
   <Proxy group="sources" name="xyzreader" />
@@ -43,7 +44,7 @@
   <Proxy group="sources" name="MetaImageReader" />
   <Proxy group="sources" name="NrrdReader" />
   <Proxy group="sources" name="Facet Proxy" />
-  <Proxy group="sources" name="PNGReader" />
+  <Proxy group="sources" name="FileSeriesPNGReader" />
   <Proxy group="sources" name="TIFFReader" />
   <Proxy group="sources" name="PhastaReader" />
   <Proxy group="sources" name="EnzoReader" />

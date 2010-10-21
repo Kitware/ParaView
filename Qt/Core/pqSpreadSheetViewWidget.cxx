@@ -196,6 +196,10 @@ pqSpreadSheetViewWidget::pqSpreadSheetViewWidget(QWidget* parentObject)
   QObject::connect(
     this->horizontalHeader(), SIGNAL(sectionDoubleClicked(int)),
     this, SLOT(onSectionDoubleClicked(int)), Qt::QueuedConnection);
+
+  QObject::connect(
+      this->horizontalHeader(), SIGNAL(sortIndicatorChanged(int,Qt::SortOrder)),
+      this, SLOT(onSortIndicatorChanged(int,Qt::SortOrder)));
 }
 
 //-----------------------------------------------------------------------------
@@ -268,5 +272,22 @@ void pqSpreadSheetViewWidget::onSectionDoubleClicked(int logicalindex)
   if (!this->SingleColumnMode)
     {
     this->resizeColumnsToContents();
+    }
+}
+//-----------------------------------------------------------------------------
+/// Called when user clicks on a column header for sorting purpose.
+void pqSpreadSheetViewWidget::onSortIndicatorChanged(int section, Qt::SortOrder order)
+{
+  // Qt side
+  pqSpreadSheetViewModel* internModel =
+      qobject_cast<pqSpreadSheetViewModel*>(this->model());
+  if(internModel->isSortable(section))
+    {
+    internModel->sortSection(section, order);
+    this->horizontalHeader()->setSortIndicatorShown(true);
+    }
+  else
+    {
+    this->horizontalHeader()->setSortIndicatorShown(false);
     }
 }

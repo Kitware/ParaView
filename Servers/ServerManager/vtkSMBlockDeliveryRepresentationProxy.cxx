@@ -230,19 +230,21 @@ void vtkSMBlockDeliveryRepresentationProxy::Update(vtkSMViewProxy* view)
 // Ensure that the block selected by \c block is available on the client.
 void vtkSMBlockDeliveryRepresentationProxy::Fetch(vtkIdType block)
 {
+  // Pass the block number to the Streamer. (needed for the selection)
+  vtkSMIdTypeVectorProperty* ivp = vtkSMIdTypeVectorProperty::SafeDownCast(
+    this->Streamer->GetProperty("Block"));
+  if (ivp)
+    {
+    ivp->SetElement(0, block);
+    this->Streamer->UpdateProperty("Block");
+    }
+
+  // Look in the cache if computation should be done or not
   vtkInternal::CacheType::iterator iter = 
     this->Internal->CachedBlocks.find(block);
   if (iter == this->Internal->CachedBlocks.end())
     {
     // cout << this << " Fetching Block #" << block << endl;
-    // Pass the block number to the Streamer.
-    vtkSMIdTypeVectorProperty* ivp = vtkSMIdTypeVectorProperty::SafeDownCast(
-      this->Streamer->GetProperty("Block"));
-    if (ivp)
-      {
-      ivp->SetElement(0, block);
-      this->Streamer->UpdateProperty("Block");
-      }
     this->DeliveryStrategy->Update();
 
     vtkProcessModule* pm = vtkProcessModule::GetProcessModule();

@@ -5,6 +5,20 @@
 <Variable Name="Pressure" SESAME_Units="GPa" SESAME_SI="1.0e9" SESAME_SI_Units="Pa" SESAME_cgs="1.0e10" SESAME_cgs_Units="dyne/(cm)^2" />
 <Variable Name="Energy" SESAME_Units="MJ/kg" SESAME_SI="1.0e6" SESAME_SI_Units="J/kg" SESAME_cgs="1.0e10" SESAME_cgs_Units="erg/g" />
 </Table>
+<Table Id="300">
+<Variable Name="Entropy" SESAME_Units="MJ/(kg K)" SESAME_SI="1.0e6" SESAME_SI_Units="J/(kg K)" SESAME_cgs="1.0e10" SESAME_cgs_Units="erg/(g K)" />
+</Table>
+<Table Id="500">
+<Variable Name="Rosseland Mean Opacity" SESAME_Units="(cm)^2/g" SESAME_SI="1.0e-1" SESAME_SI_Units="m^2/kg" SESAME_cgs="1.0" SESAME_cgs_Units="(cm)^2/g" />
+<Variable Name="Electron Conductive Opacity 1" SESAME_Units="(cm)^2/g" SESAME_SI="1.0e-1" SESAME_SI_Units="m^2/kg" SESAME_cgs="1.0" SESAME_cgs_Units="(cm)^2/g" />
+<Variable Name="Planck Mean Opacity" SESAME_Units="(cm)^2/g" SESAME_SI="1.0e-1" SESAME_SI_Units="m^2/kg" SESAME_cgs="1.0" SESAME_cgs_Units="(cm)^2/g" />
+</Table>
+<Table Id="600">
+<Variable Name="Electrical Conductivity" SESAME_Units="1/s" SESAME_SI="1.0" SESAME_SI_Units="1/s" SESAME_cgs="1.0" SESAME_cgs_Units="1/s" />
+<Variable Name="Thermal Conductivity" SESAME_Units="1/(cm s)" SESAME_SI="1.0e2" SESAME_SI_Units="1/(m s)" SESAME_cgs="1.0" SESAME_cgs_Units="1/(cm s)" />
+<Variable Name="Thermoelectric Coefficient" SESAME_Units="1/(cm s)" SESAME_SI="1.0e2" SESAME_SI_Units="1/(m s)" SESAME_cgs="1.0" SESAME_cgs_Units="1/(cm s)" />
+<Variable Name="Electron Conductive Opacity 2" SESAME_Units="(cm)^2/g" SESAME_SI="1.0e-1" SESAME_SI_Units="m^2/kg" SESAME_cgs="1.0" SESAME_cgs_Units="(cm)^2/g" />
+</Table>
 </PRISM_Conversions>
 
 

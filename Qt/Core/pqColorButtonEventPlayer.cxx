@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QColor>
 #include <QRegExp>
+
 //----------------------------------------------------------------------------
 pqColorButtonEventPlayer::pqColorButtonEventPlayer(QObject* parentObject)
   : Superclass(parentObject)
@@ -59,7 +60,8 @@ bool pqColorButtonEventPlayer::playEvent(
     }
   
   QRegExp regExp("^(\\d+),(\\d+),(\\d+)$");
-  if (command == "setChosenColor" && regExp.indexIn(arguments) != -1)
+  if (   (command == pqColorButtonEventPlayer::EVENT_NAME())
+      && (regExp.indexIn(arguments) != -1) )
     {
     QColor rgb(regExp.cap(1).toInt(), regExp.cap(2).toInt(),
       regExp.cap(3).toInt());
@@ -69,3 +71,9 @@ bool pqColorButtonEventPlayer::playEvent(
   return false;
 }
 
+//-----------------------------------------------------------------------------
+const QString &pqColorButtonEventPlayer::EVENT_NAME()
+{
+  static const QString eventName("setChosenColor");
+  return eventName;
+}

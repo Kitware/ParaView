@@ -575,7 +575,15 @@ H5O_copy_header_real(const H5O_loc_t *oloc_src, H5O_loc_t *oloc_dst /*out */,
     addr_new = oh_dst->chunk[0].addr;
 
     /* Create memory image for the new chunk */
-    if(NULL == (oh_dst->chunk[0].image = H5FL_BLK_MALLOC(chunk_image, (size_t)dst_oh_size)))
+    /* Note: we use calloc() instead of malloc() here because older versions of
+     *  some messages don't initialize "unused" bytes and because we want to
+     *  write out the same version of the object header and older versions of
+     *  object headers aligned messages.  In both those situations, it's
+     *  complex and error-prone to determine all the proper ways/places to
+     *  clear to zero bytes, so we just set the buffer to zero's here.
+     *  (QAK - 2010/08/17)
+     */
+    if(NULL == (oh_dst->chunk[0].image = H5FL_BLK_CALLOC(chunk_image, (size_t)dst_oh_size)))
         HGOTO_ERROR(H5E_RESOURCE, H5E_NOSPACE, FAIL, "memory allocation failed")
 
     /* Set dest. chunk information */
@@ -728,7 +736,7 @@ H5O_copy_header_real(const H5O_loc_t *oloc_src, H5O_loc_t *oloc_dst /*out */,
     } /* end if */
 
     /* Insert destination object header in cache */
-    if(H5AC_insert_entry(oloc_dst->file, dxpl_id, H5AC_OHDR, oloc_dst->addr, oh_dst, H5AC__NO_FLAGS_SET) < 0)
+    if(H5AC_set(oloc_dst->file, dxpl_id, H5AC_OHDR, oloc_dst->addr, oh_dst, H5AC__NO_FLAGS_SET) < 0)
         HGOTO_ERROR(H5E_OHDR, H5E_CANTINSERT, FAIL, "unable to cache object header")
     oh_dst = NULL;
 

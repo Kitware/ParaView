@@ -1363,7 +1363,7 @@ H5Pset_scaleoffset(hid_t plist_id, H5Z_SO_scale_type_t scale_type, int scale_fac
         HGOTO_ERROR (H5E_ARGS, H5E_BADTYPE, FAIL, "not a dataset creation property list")
 
     if(scale_factor < 0)
-       HGOTO_ERROR(H5E_ARGS, H5E_BADVALUE, FAIL, "scale factor must be >= 0")
+       HGOTO_ERROR(H5E_ARGS, H5E_BADVALUE, FAIL, "scale factor must be > 0")
     if(scale_type!=H5Z_SO_FLOAT_DSCALE && scale_type!=H5Z_SO_FLOAT_ESCALE && scale_type!=H5Z_SO_INT)
        HGOTO_ERROR(H5E_ARGS, H5E_BADTYPE, FAIL, "invalid scale type")
 

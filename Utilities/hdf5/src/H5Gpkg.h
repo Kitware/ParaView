@@ -58,19 +58,6 @@
 #define H5G_TARGET_EXISTS	0x0008
 #define H5G_CRT_INTMD_GROUP	0x0010
 
-/* Size of a symbol table node on disk */
-#define H5G_NODE_SIZE(f)     (                                                \
-    /* General metadata fields */                                             \
-    H5_SIZEOF_MAGIC                                                           \
-    + 1         /* Version */                                                 \
-    + 1         /* Reserved */                                                \
-    + 2         /* Number of symbols */                                       \
-                                                                              \
-    /* Entries */                                                             \
-    + ((2 * H5F_SYM_LEAF_K(f)) * H5G_SIZEOF_ENTRY(f))                         \
-    )
-
-
 /****************************/
 /* Package Private Typedefs */
 /****************************/
@@ -130,9 +117,8 @@ struct H5G_entry_t {
 typedef struct H5G_node_t {
     H5AC_info_t cache_info;     /* Information for H5AC cache functions, _must_ be */
                                 /* first field in structure */
-    size_t node_size;           /* Size of node on disk              */
-    unsigned nsyms;             /* Number of symbols                 */
-    H5G_entry_t *entry;         /* Array of symbol table entries     */
+    unsigned nsyms;             /*number of symbols                  */
+    H5G_entry_t *entry;         /*array of symbol table entries      */
 } H5G_node_t;
 
 /*
@@ -449,6 +435,7 @@ H5_DLL herr_t H5G_ent_debug(const H5G_entry_t *ent, FILE * stream, int indent,
 
 /* Functions that understand symbol table nodes */
 H5_DLL herr_t H5G_node_init(H5F_t *f);
+H5_DLL size_t H5G_node_size_real(const H5F_t *f);
 H5_DLL int H5G_node_iterate(H5F_t *f, hid_t dxpl_id, const void *_lt_key, haddr_t addr,
 		     const void *_rt_key, void *_udata);
 H5_DLL int H5G_node_sumup(H5F_t *f, hid_t dxpl_id, const void *_lt_key, haddr_t addr,

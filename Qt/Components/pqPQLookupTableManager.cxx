@@ -296,6 +296,10 @@ void pqPQLookupTableManager::setLUTDefaultState(vtkSMProxy* lutProxy)
     lutProxy->GetProperty("RGBPoints"), values);
   pqSMAdaptor::setEnumerationProperty(
     lutProxy->GetProperty("ColorSpace"), "Diverging");
+  values.clear();
+  values << 0.25 << 0.0 << 0.0;
+  pqSMAdaptor::setMultipleElementProperty(
+    lutProxy->GetProperty("NanColor"), values);
   pqSMAdaptor::setEnumerationProperty(
     lutProxy->GetProperty("VectorMode"), "Magnitude");
 

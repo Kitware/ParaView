@@ -14,12 +14,15 @@
 =========================================================================*/
 #include "vtkMPIMoveData.h"
 
+#include "vtkAppendCompositeDataLeaves.h"
 #include "vtkAppendFilter.h"
 #include "vtkAppendPolyData.h"
 #include "vtkCellData.h"
 #include "vtkCharArray.h"
+#include "vtkCompositeDataSet.h"
 #include "vtkDataSetReader.h"
-#include "vtkDataSetWriter.h"
+#include "vtkGenericDataObjectWriter.h"
+#include "vtkGenericDataObjectReader.h"
 #include "vtkDirectedGraph.h"
 #include "vtkGraphReader.h"
 #include "vtkGraphWriter.h"
@@ -29,6 +32,7 @@
 #include "vtkInformationVector.h"
 #include "vtkMergeGraphs.h"
 #include "vtkMPIMToNSocketConnection.h"
+#include "vtkMultiBlockDataSet.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
 #include "vtkOutlineFilter.h"
@@ -48,11 +52,106 @@
 
 #ifdef VTK_USE_MPI
 #include "vtkMPICommunicator.h"
-#include "vtkAllToNRedistributePolyData.h"
+#include "vtkAllToNRedistributeCompositePolyData.h"
 #endif
 
+#include <vtkstd/vector>
 
 bool vtkMPIMoveData::UseZLibCompression = false;
+
+namespace
+{
+  static bool vtkMPIMoveDataMerge(vtkstd::vector<vtkSmartPointer<vtkDataObject> >& pieces,
+    vtkDataObject* result)
+    {
+    if (pieces.size() == 0)
+      {
+      return false;
+      }
+
+    if (pieces.size() == 1)
+      {
+      result->ShallowCopy(pieces[0]);
+      vtkImageData* id = vtkImageData::SafeDownCast(pieces[0]);
+      if (id)
+        {
+        result->SetWholeExtent(
+          static_cast<vtkImageData*>(pieces[0].GetPointer())->GetExtent());
+        }
+      return true;
+      }
+
+    // PolyData and Unstructured grid need different append filters.
+    vtkAlgorithm* appender = NULL;
+    if (vtkPolyData::SafeDownCast(result))
+      {
+      appender = vtkAppendPolyData::New();
+      }
+    else if (vtkUnstructuredGrid::SafeDownCast(result))
+      {
+      appender = vtkAppendFilter::New();
+      }
+    else if (vtkImageData::SafeDownCast(result))
+      {
+      vtkImageAppend* ia = vtkImageAppend::New();
+      ia->PreserveExtentsOn();
+      appender = ia;
+      }
+    else if (vtkGraph::SafeDownCast(result))
+      {
+      // graph has to be handled separately because it doesn't have the standard
+      // append-filter API.
+      vtkMergeGraphs* mergegraphs = vtkMergeGraphs::New();
+      mergegraphs->SetInput(0, pieces[0]);
+      vtkstd::vector<vtkSmartPointer<vtkDataObject> >::iterator iter =
+        pieces.begin();
+      iter++;
+      for ( ; iter != pieces.end(); ++iter)
+        {
+        mergegraphs->SetInput(1, iter->GetPointer());
+        mergegraphs->Update();
+
+        vtkGraph* mergeResult = mergegraphs->GetOutput();
+        vtkGraph* clone = mergeResult->NewInstance();
+        clone->ShallowCopy(mergeResult);
+        mergegraphs->SetInput(0, clone);
+        clone->FastDelete();
+        }
+      vtkDataObject* mergeResult = mergegraphs->GetInputDataObject(0, 0);
+      result->ShallowCopy(mergeResult);
+      mergegraphs->Delete();
+      return true;
+      }
+    else if (vtkCompositeDataSet::SafeDownCast(result))
+      {
+      // this only supports composite datasets of polydata and unstructured
+      // grids.
+      appender = vtkAppendCompositeDataLeaves::New();
+      }
+    else
+      {
+      vtkGenericWarningMacro(<< result->GetClassName() << " cannot be merged");
+      result->ShallowCopy(pieces[0]);
+      return false;
+      }
+
+    vtkstd::vector<vtkSmartPointer<vtkDataObject> >::iterator iter;
+    for (iter = pieces.begin(); iter != pieces.end(); ++iter)
+      {
+      vtkDataSet* ds = vtkDataSet::SafeDownCast(iter->GetPointer());
+      if (ds && ds->GetNumberOfPoints() == 0)
+        {
+        // skip empty pieces.
+        continue;
+        }
+      appender->AddInputConnection(0, iter->GetPointer()->GetProducerPort());
+      }
+    appender->Update();
+    result->ShallowCopy(appender->GetOutputDataObject(0));
+    appender->Delete();
+    return true;
+    }
+};
 
 
 vtkStandardNewMacro(vtkMPIMoveData);
@@ -167,6 +266,14 @@ int vtkMPIMoveData::RequestDataObject(vtkInformation*,
       return 1;
       }
     outputCopy = vtkUndirectedGraph::New();
+    }
+  else if (this->OutputDataType == VTK_MULTIBLOCK_DATA_SET)
+    {
+    if (output && output->IsA("vtkMultiBlockDataSet"))
+      {
+      return 1;
+      }
+    outputCopy = vtkMultiBlockDataSet::New();
     }
   else
     {
@@ -470,12 +577,10 @@ int vtkMPIMoveData::RequestData(vtkInformation*,
 //-----------------------------------------------------------------------------
 // Use LANL filter to redistribute the data.
 // We will marshal more than once, but that is OK.
-void vtkMPIMoveData::DataServerAllToN(vtkDataObject* inData,
-                                      vtkDataObject* outData, int n)
+void vtkMPIMoveData::DataServerAllToN(vtkDataObject* input,
+                                      vtkDataObject* output, int n)
 {
   vtkMultiProcessController* controller = this->Controller;
-  vtkPolyData* input = vtkPolyData::SafeDownCast(inData);
-  vtkPolyData* output = vtkPolyData::SafeDownCast(outData);
   int m;
 
   if (controller == 0)
@@ -503,20 +608,16 @@ void vtkMPIMoveData::DataServerAllToN(vtkDataObject* inData,
 
   // Perform the M to N operation.
 #ifdef VTK_USE_MPI
-  vtkPolyData* tmp;
-   vtkAllToNRedistributePolyData* AllToN = NULL;
-   vtkPolyData* inputCopy = vtkPolyData::New();
+   vtkAllToNRedistributeCompositePolyData* AllToN = NULL;
+   vtkDataObject* inputCopy = input->NewInstance();
    inputCopy->ShallowCopy(input);
-   AllToN = vtkAllToNRedistributePolyData::New();
+   AllToN = vtkAllToNRedistributeCompositePolyData::New();
    AllToN->SetController(controller);
    AllToN->SetNumberOfProcesses(n);
    AllToN->SetInput(inputCopy);
    inputCopy->Delete();
-   tmp = AllToN->GetOutput();
-   tmp->SetUpdateNumberOfPieces(this->UpdateNumberOfPieces);
-   tmp->SetUpdatePiece(this->UpdatePiece);
-   tmp->Update();
-   output->ShallowCopy(tmp);
+   AllToN->Update();
+   output->ShallowCopy(AllToN->GetOutputDataObject(0));
    AllToN->Delete();
    AllToN= 0;
 #endif
@@ -949,46 +1050,33 @@ void vtkMPIMoveData::MarshalDataToBuffer(vtkDataObject* data)
   vtkGraph* graph = vtkGraph::SafeDownCast(data);
 
   // Protect from empty data.
-  if ((dataSet && dataSet->GetNumberOfPoints() == 0) || (graph && graph->GetNumberOfVertices() == 0))
+  if ((dataSet && dataSet->GetNumberOfPoints() == 0) ||
+    (graph && graph->GetNumberOfVertices() == 0))
     {
     this->NumberOfBuffers = 0;
     }
 
   // Copy input to isolate reader from the pipeline.
-  vtkDataWriter* writer = 0;
-  if (dataSet)
+  vtkDataWriter* writer = vtkGenericDataObjectWriter::New();
+  vtkDataObject* d = data->NewInstance();
+  d->ShallowCopy(data);
+  writer->SetInput(d);
+  d->Delete();
+  if (imageData)
     {
-    vtkDataSet* d = dataSet->NewInstance();
-    d->CopyStructure(dataSet);
-    d->GetPointData()->PassData(dataSet->GetPointData());
-    d->GetCellData()->PassData(dataSet->GetCellData());
-    writer = vtkDataSetWriter::New();
-    writer->SetInput(d);
-    d->Delete();
-    if (imageData)
-      {
-      // We add the image extents to the header, since the writer doesn't preserve
-      // the extents.
-      int *extent = imageData->GetExtent();
-      double* origin = imageData->GetOrigin();
-      vtksys_ios::ostringstream stream;
-      stream << "EXTENT " << extent[0] << " " <<
-        extent[1] << " " <<
-        extent[2] << " " <<
-        extent[3] << " " <<
-        extent[4] << " " <<
-        extent[5];
-      stream << " ORIGIN: " << origin[0] << " " << origin[1] << " " << origin[2];
-      writer->SetHeader(stream.str().c_str());
-      }
-    }
-  if (graph)
-    {
-    vtkGraph* g = graph->NewInstance();
-    g->ShallowCopy(graph);
-    writer = vtkGraphWriter::New();
-    writer->SetInput(g);
-    g->Delete();
+    // We add the image extents to the header, since the writer doesn't preserve
+    // the extents.
+    int *extent = imageData->GetExtent();
+    double* origin = imageData->GetOrigin();
+    vtksys_ios::ostringstream stream;
+    stream << "EXTENT " << extent[0] << " " <<
+      extent[1] << " " <<
+      extent[2] << " " <<
+      extent[3] << " " <<
+      extent[4] << " " <<
+      extent[5];
+    stream << " ORIGIN: " << origin[0] << " " << origin[1] << " " << origin[2];
+    writer->SetHeader(stream.str().c_str());
     }
   writer->SetFileTypeToBinary();
   writer->WriteToOutputStringOn();
@@ -1044,48 +1132,14 @@ void vtkMPIMoveData::MarshalDataToBuffer(vtkDataObject* data)
 //-----------------------------------------------------------------------------
 void vtkMPIMoveData::ReconstructDataFromBuffer(vtkDataObject* data)
 {
-  vtkDataSet *dataSet = vtkDataSet::SafeDownCast(data);
-  vtkPolyData *polyData = vtkPolyData::SafeDownCast(data);
-  vtkUnstructuredGrid *unstructuredGrid = vtkUnstructuredGrid::SafeDownCast(data);
-  vtkImageData *imageData = vtkImageData::SafeDownCast(data);
-  vtkGraph *graph = vtkGraph::SafeDownCast(data);
-
   if (this->NumberOfBuffers == 0 || this->Buffers == 0)
     {
     data->Initialize();
     return;
     }
 
-  // PolyData and Unstructured grid need different append filters.
-  vtkAppendPolyData* appendPd = NULL;
-  vtkAppendFilter*   appendUg = NULL;
-  vtkImageAppend* appendId = NULL;
-  vtkMergeGraphs* mergeGraphs = NULL;
-  if (this->NumberOfBuffers > 1)
-    {
-    if (polyData)
-      {
-      appendPd = vtkAppendPolyData::New();
-      }
-    else if (unstructuredGrid)
-      {
-      appendUg = vtkAppendFilter::New();
-      }
-    else if (imageData)
-      {
-      appendId = vtkImageAppend::New();
-      appendId->PreserveExtentsOn();
-      }
-    else if (graph)
-      {
-      mergeGraphs = vtkMergeGraphs::New();
-      }
-    else
-      {
-      vtkErrorMacro("This filter only handles unstructured data.");
-      return;
-      }
-    }
+  bool is_image_data = data->IsA("vtkImageData") != 0;
+  vtkstd::vector<vtkSmartPointer<vtkDataObject> > pieces;
 
   for (int idx = 0; idx < this->NumberOfBuffers; ++idx)
     {
@@ -1117,92 +1171,39 @@ void vtkMPIMoveData::ReconstructDataFromBuffer(vtkDataObject* data)
       }
 
     // Setup a reader.
-    vtkDataReader *reader = NULL;
-    if (dataSet)
-      {
-      reader = vtkDataSetReader::New();
-      }
-    else if (graph)
-      {
-      reader = vtkGraphReader::New();
-      }
+    vtkDataReader *reader = vtkGenericDataObjectReader::New();
     reader->ReadFromInputStringOn();
 
-    int extent[6]= {0, 0, 0, 0, 0, 0};
-    float origin[3] = {0, 0, 0};
-    bool extentAvailable = false;
     vtkCharArray* mystring = vtkCharArray::New();
     mystring->SetArray(bufferArray, bufferLength, 1);
     reader->SetInputArray(mystring);
     reader->Modified(); // For append loop
     reader->Update();
 
-    if (imageData)
+    if (is_image_data)
       {
+      // FIXME: EXTENT and ORIGIN in vtkImageData are lost by reader/writer.
+      // The header hack we used isn't going to work for composite datasets. We
+      // need a more intrusive fix in the reader/writer itself.
+      int extent[6]= {0, 0, 0, 0, 0, 0};
+      float origin[3] = {0, 0, 0};
       sscanf(reader->GetHeader(),
         "EXTENT %d %d %d %d %d %d ORIGIN %f %f %f", &extent[0], &extent[1],
         &extent[2], &extent[3], &extent[4], &extent[5],
         &origin[0], &origin[1], &origin[2]);
-      extentAvailable = true;
+      vtkImageData* clone = vtkImageData::SafeDownCast(
+        reader->GetOutputDataObject(0)->NewInstance());
+      clone->ShallowCopy(reader->GetOutputDataObject(0));
+      clone->SetOrigin(origin[0], origin[1], origin[2]);
+      clone->SetExtent(extent);
+      pieces.push_back(clone);
+      clone->Delete();
+      }
+    else
+      {
+      pieces.push_back(reader->GetOutputDataObject(0));
       }
 
-    if (appendPd)
-      {
-      appendPd->AddInput(vtkPolyData::SafeDownCast(reader->GetOutputDataObject(0)));
-      }
-    else if (appendUg)
-      {
-      appendUg->AddInput(vtkUnstructuredGrid::SafeDownCast(reader->GetOutputDataObject(0)));
-      }
-    else if (appendId)
-      {
-      vtkImageData* curInput = vtkImageData::SafeDownCast(
-        reader->GetOutputDataObject(0));
-      if (curInput->GetNumberOfPoints() >0)
-        {
-        if (extentAvailable)
-          {
-          vtkImageData* clone = vtkImageData::New();
-          clone->ShallowCopy(curInput);
-          clone->SetOrigin(origin[0], origin[1], origin[2]);
-          clone->SetExtent(extent);
-          appendId->AddInput(clone);
-          clone->Delete();
-          }
-        else
-          {
-          appendId->AddInput(curInput);
-          }
-        }
-      }
-    else if (mergeGraphs)
-      {
-      if (!mergeGraphs->GetInputDataObject(0, 0))
-        {
-        mergeGraphs->SetInput(0, reader->GetOutputDataObject(0));
-        }
-      else
-        {
-        mergeGraphs->SetInput(1, reader->GetOutputDataObject(0));
-        mergeGraphs->Update();
-        vtkGraph* output = mergeGraphs->GetOutput();
-        vtkGraph* outputCopy = output->NewInstance();
-        outputCopy->ShallowCopy(output);
-        mergeGraphs->SetInput(0, outputCopy);
-        }
-      }
-    else if (dataSet)
-      {
-      vtkDataSet* out = vtkDataSet::SafeDownCast(reader->GetOutputDataObject(0));
-      dataSet->CopyStructure(out);
-      dataSet->GetPointData()->PassData(out->GetPointData());
-      dataSet->GetCellData()->PassData(out->GetCellData());
-      }
-    else if (graph)
-      {
-      vtkGraph* out = vtkGraph::SafeDownCast(reader->GetOutputDataObject(0));
-      graph->ShallowCopy(out);
-      }
     mystring->Delete();
     mystring = 0;
     reader->Delete();
@@ -1211,43 +1212,7 @@ void vtkMPIMoveData::ReconstructDataFromBuffer(vtkDataObject* data)
     realBuffer = 0;
     }
 
-  if (appendPd)
-    {
-    vtkDataSet* out = appendPd->GetOutput();
-    out->Update();
-    polyData->CopyStructure(out);
-    polyData->GetPointData()->PassData(out->GetPointData());
-    polyData->GetCellData()->PassData(out->GetCellData());
-    appendPd->Delete();
-    appendPd = NULL;
-    }
-  if (appendUg)
-    {
-    vtkDataSet* out = appendUg->GetOutput();
-    out->Update();
-    unstructuredGrid->CopyStructure(out);
-    unstructuredGrid->GetPointData()->PassData(out->GetPointData());
-    unstructuredGrid->GetCellData()->PassData(out->GetCellData());
-    appendUg->Delete();
-    appendUg = NULL;
-    }
-  if (appendId)
-    {
-    appendId->Update();
-    vtkDataSet* out = appendId->GetOutput();
-    imageData->CopyStructure(out);
-    imageData->GetPointData()->PassData(out->GetPointData());
-    imageData->GetCellData()->PassData(out->GetCellData());
-    appendId->Delete();
-    appendId = NULL;
-    }
-  if (mergeGraphs)
-    {
-    vtkGraph* out = vtkGraph::SafeDownCast(mergeGraphs->GetInputDataObject(0, 0));
-    graph->ShallowCopy(out);
-    mergeGraphs->Delete();
-    mergeGraphs = NULL;
-    }
+  vtkMPIMoveDataMerge(pieces, data);
 }
 
 //-----------------------------------------------------------------------------

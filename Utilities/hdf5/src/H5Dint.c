@@ -2190,10 +2190,10 @@ H5D_set_extent(H5D_t *dset, const hsize_t *size, hid_t dxpl_id)
          */
         if(shrink && H5D_CHUNKED == dset->shared->layout.type &&
                 (*dset->shared->layout.ops->is_space_alloc)(&dset->shared->layout.storage)) {
-            /* Remove excess chunks */
-            if(H5D_chunk_prune_by_extent(dset, dxpl_id, curr_dims) < 0)
-                HGOTO_ERROR(H5E_DATASET, H5E_WRITEERROR, FAIL, "unable to remove chunks")
-        } /* end if */
+             /* Remove excess chunks */
+             if(H5D_chunk_prune_by_extent(dset, dxpl_id, curr_dims) < 0)
+                 HGOTO_ERROR(H5E_DATASET, H5E_WRITEERROR, FAIL, "unable to remove chunks ")
+         } /* end if */
 
         /* Mark the dataspace as dirty, for later writing to the file */
         dset->shared->space_dirty = TRUE;

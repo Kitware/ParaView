@@ -33,6 +33,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationCore.h"
 #include "pqSettings.h"
 
+#include "pqPythonManager.h"
+#include "pqCoreUtilities.h"
+
 #include <QAction>
 #include <QDebug>
 #include <QFileInfo>
@@ -41,11 +44,30 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QMenu>
 #include <QVariant>
 #include <QWidget>
+#include <QFileInfo>
+#include <QFile>
+#include <QDir>
+#include <QString>
+#include <QStringList>
+#include <QApplication>
+
 
 class pqPythonMacroSupervisor::pqInternal {
 public:
-  QList<QPointer<QWidget> > ActionContainers;
-  QMap<QString, QAction*> ActionMap;
+  // Container widget that have an RunMacro action context
+  QList<QPointer<QWidget> > RunWidgetContainers;
+  // List of action linked to widget/menuItem used to start a macro
+  QMap<QString, QAction*> RunActionMap;
+
+  // Container widget that have an EditMacro action context
+  QList<QPointer<QWidget> > EditWidgetContainers;
+  // List of action linked to widget/menuItem used to edit a macro
+  QMap<QString, QAction*> EditActionMap;
+
+  // Container widget that have an DeleteMacro action context
+  QList<QPointer<QWidget> > DeleteWidgetContainers;
+  // List of action linked to widget/menuItem used to delete a macro
+  QMap<QString, QAction*> DeleteActionMap;
 };
 
 //----------------------------------------------------------------------------
@@ -113,76 +135,128 @@ void removeActionFromWidgets(QAction* action, QList<QPointer<QWidget> >& widgets
 //----------------------------------------------------------------------------
 QAction* pqPythonMacroSupervisor::getMacro(const QString& fileName)
 {
-  if (this->Internal->ActionMap.contains(fileName))
+  if (this->Internal->RunActionMap.contains(fileName))
     {
-    return this->Internal->ActionMap[fileName];
+    return this->Internal->RunActionMap[fileName];
     }
   return NULL;
 }
-
 //----------------------------------------------------------------------------
-void pqPythonMacroSupervisor::addWidgetForMacros(QWidget* widget)
+void pqPythonMacroSupervisor::addWidgetForRunMacros(QWidget* widget)
 {
-  if (widget && !this->Internal->ActionContainers.contains(widget))
+  this->addWidgetForMacros(widget, 0);
+}
+//----------------------------------------------------------------------------
+void pqPythonMacroSupervisor::addWidgetForEditMacros(QWidget* widget)
+{
+  this->addWidgetForMacros(widget, 1);
+}
+//----------------------------------------------------------------------------
+void pqPythonMacroSupervisor::addWidgetForDeleteMacros(QWidget* widget)
+{
+  this->addWidgetForMacros(widget, 2);
+}
+//----------------------------------------------------------------------------
+void pqPythonMacroSupervisor::addWidgetForMacros(QWidget* widget, int actionType)
+{
+  QList<QPointer<QWidget> > *widgetContainers = NULL;
+  switch(actionType)
+    {
+    case 0: // run
+      widgetContainers = &this->Internal->RunWidgetContainers;
+      break;
+    case 1: // edit
+      widgetContainers = &this->Internal->EditWidgetContainers;
+      break;
+    case 2: // delete
+      widgetContainers = &this->Internal->DeleteWidgetContainers;
+      break;
+    }
+
+  if (widget && !widgetContainers->contains(widget))
     {
     addPlaceHolderIfNeeded(widget);
-    this->Internal->ActionContainers.append(widget);
+    widgetContainers->append(widget);
     }
   this->resetActions();
 }
-
 //----------------------------------------------------------------------------
 QMap<QString, QString> pqPythonMacroSupervisor::getStoredMacros()
 {
-  pqSettings* settings = pqApplicationCore::instance()->settings();
-  QStringList fileNames = settings->value("PythonMacros/FileNames").toStringList();
-  QStringList macroNames = settings->value("PythonMacros/Names").toStringList();
+//  pqSettings* settings = pqApplicationCore::instance()->settings();
+//  QStringList fileNames = settings->value("PythonMacros/FileNames").toStringList();
+//  QStringList macroNames = settings->value("PythonMacros/Names").toStringList();
 
-  if (fileNames.size() != macroNames.size())
-    {
-    qWarning() << "Lookup of macro filenames is corrupted.  Stored macros will be reset.";
-    settings->remove("PythonMacros");
-    fileNames.clear();
-    macroNames.clear();
-    }
+//  if (fileNames.size() != macroNames.size())
+//    {
+//    qWarning() << "Lookup of macro filenames is corrupted.  Stored macros will be reset.";
+//    settings->remove("PythonMacros");
+//    fileNames.clear();
+//    macroNames.clear();
+//    }
+
+  QStringList fileNames = getMacrosFilePaths();
 
   QMap<QString, QString> macros;
-  for (int i = 0; i < macroNames.size(); ++i)
+  for (int i = 0; i < fileNames.size(); ++i)
     {
-    macros.insert(fileNames[i], macroNames[i]);
+    macros.insert(fileNames[i], macroNameFromFileName(fileNames[i]));
     }
   return macros;
 }
 
 //----------------------------------------------------------------------------
-void pqPythonMacroSupervisor::storeMacro(const QString& macroName, const QString& filename)
-{
-  QMap<QString, QString> macros = pqPythonMacroSupervisor::getStoredMacros();
-  macros[filename] = macroName;
-  pqSettings* settings = pqApplicationCore::instance()->settings();
-  settings->setValue("PythonMacros/FileNames", QStringList(macros.keys()));
-  settings->setValue("PythonMacros/Names", QStringList(macros.values()));
-}
-
-//----------------------------------------------------------------------------
 void pqPythonMacroSupervisor::removeStoredMacro(const QString& filename)
 {
-  QMap<QString, QString> macros = pqPythonMacroSupervisor::getStoredMacros();
-  macros.remove(filename);
-  pqSettings* settings = pqApplicationCore::instance()->settings();
-  settings->setValue("PythonMacros/FileNames", QStringList(macros.keys()));
-  settings->setValue("PythonMacros/Names", QStringList(macros.values()));
+  QDir dir  = QFileInfo(filename).absoluteDir();
+  QString baseName = ".";
+  baseName += QFileInfo(filename).fileName().replace(".py", "");
+
+  int index = 1;
+  QString newName = baseName;
+  newName += ".py";
+  while(dir.exists(newName))
+    {
+    newName = baseName;
+    newName.append("-").append(QString::number(index)).append(".py");
+    index++;
+    }
+  QString newFilePath = dir.absolutePath() + QDir::separator() + newName;
+  QFile::rename(filename, newFilePath);
+
+//  QMap<QString, QString> macros = pqPythonMacroSupervisor::getStoredMacros();
+//  macros.remove(filename);
+//  pqSettings* settings = pqApplicationCore::instance()->settings();
+//  settings->setValue("PythonMacros/FileNames", QStringList(macros.keys()));
+//  settings->setValue("PythonMacros/Names", QStringList(macros.values()));
+
+
 }
 
 //----------------------------------------------------------------------------
 void pqPythonMacroSupervisor::resetActions()
 {
-  foreach (QAction* action, this->Internal->ActionMap.values())
+  // Delete RUN
+  foreach (QAction* action, this->Internal->RunActionMap.values())
     {
-    removeActionFromWidgets(action, this->Internal->ActionContainers);
+    removeActionFromWidgets(action, this->Internal->RunWidgetContainers);
     delete action;
     }
-  this->Internal->ActionMap.clear();
+  this->Internal->RunActionMap.clear();
+  // Delete EDIT
+  foreach (QAction* action, this->Internal->EditActionMap.values())
+    {
+    removeActionFromWidgets(action, this->Internal->EditWidgetContainers);
+    delete action;
+    }
+  this->Internal->EditActionMap.clear();
+  // Delete DELETE
+  foreach (QAction* action, this->Internal->DeleteActionMap.values())
+    {
+    removeActionFromWidgets(action, this->Internal->DeleteWidgetContainers);
+    delete action;
+    }
+  this->Internal->DeleteActionMap.clear();
 
   // Key is filename, value is macroname
   QMap<QString, QString> macros = pqPythonMacroSupervisor::getStoredMacros();
@@ -193,6 +267,11 @@ void pqPythonMacroSupervisor::resetActions()
     }
 }
 
+//----------------------------------------------------------------------------
+void pqPythonMacroSupervisor::addMacro(const QString& fileName)
+{
+  pqPythonMacroSupervisor::addMacro(pqPythonMacroSupervisor::macroNameFromFileName(fileName), fileName);
+}
 //----------------------------------------------------------------------------
 void pqPythonMacroSupervisor::addMacro(const QString& macroName, const QString& fileName)
 {
@@ -205,13 +284,28 @@ void pqPythonMacroSupervisor::addMacro(const QString& macroName, const QString& 
     return;
     }
   
-  action = new QAction(macroName, this);
-  action->setData(fileName);
-  this->Internal->ActionMap.insert(fileName, action);
-  this->connect(action, SIGNAL(triggered()), SLOT(onMacroTriggered()));
+  // Run action
+  QAction* runAction = new QAction(macroName, this);
+  runAction->setData(fileName);
+  this->Internal->RunActionMap.insert(fileName, runAction);
+  this->connect(runAction, SIGNAL(triggered()), SLOT(onMacroTriggered()));
+
+  // Edit action
+  QAction* editAction = new QAction(macroName, this);
+  editAction->setData(fileName);
+  this->Internal->EditActionMap.insert(fileName, editAction);
+  this->connect(editAction, SIGNAL(triggered()), SLOT(onEditMacroTriggered()));
+
+  // Delete action
+  QAction* deleteAction = new QAction(macroName, this);
+  deleteAction->setData(fileName);
+  this->Internal->DeleteActionMap.insert(fileName, deleteAction);
+  this->connect(deleteAction, SIGNAL(triggered()), SLOT(onDeleteMacroTriggered()));
 
   // Add action to widgets
-  addActionToWidgets(action, this->Internal->ActionContainers);
+  addActionToWidgets(runAction, this->Internal->RunWidgetContainers);
+  addActionToWidgets(editAction, this->Internal->EditWidgetContainers);
+  addActionToWidgets(deleteAction, this->Internal->DeleteWidgetContainers);
 }
 
 //----------------------------------------------------------------------------
@@ -223,8 +317,18 @@ void pqPythonMacroSupervisor::removeMacro(const QString& fileName)
     return;
     }
 
-  removeActionFromWidgets(action, this->Internal->ActionContainers);
-  this->Internal->ActionMap.remove(fileName);
+  removeActionFromWidgets(action, this->Internal->RunWidgetContainers);
+  this->Internal->RunActionMap.remove(fileName);
+  delete action;
+
+  action = this->Internal->EditActionMap[fileName];
+  removeActionFromWidgets(action, this->Internal->EditWidgetContainers);
+  this->Internal->EditActionMap.remove(fileName);
+  delete action;
+
+  action = this->Internal->DeleteActionMap[fileName];
+  removeActionFromWidgets(action, this->Internal->DeleteWidgetContainers);
+  this->Internal->DeleteActionMap.remove(fileName);
   delete action;
 }
 
@@ -232,8 +336,8 @@ void pqPythonMacroSupervisor::removeMacro(const QString& fileName)
 void pqPythonMacroSupervisor::onMacroTriggered()
 {
   QObject* action = this->sender();
-  QMap<QString, QAction*>::const_iterator itr = this->Internal->ActionMap.constBegin();
-  for ( ; itr != this->Internal->ActionMap.constEnd(); ++itr)
+  QMap<QString, QAction*>::const_iterator itr = this->Internal->RunActionMap.constBegin();
+  for ( ; itr != this->Internal->RunActionMap.constEnd(); ++itr)
     {
     if (itr.value() == action)
       {
@@ -241,4 +345,65 @@ void pqPythonMacroSupervisor::onMacroTriggered()
       emit this->executeScriptRequested(filename);
       }
     }
+}
+//----------------------------------------------------------------------------
+void pqPythonMacroSupervisor::onDeleteMacroTriggered()
+{
+  QObject* action = this->sender();
+  QMap<QString, QAction*>::const_iterator itr = this->Internal->DeleteActionMap.constBegin();
+  for ( ; itr != this->Internal->DeleteActionMap.constEnd(); ++itr)
+    {
+    if (itr.value() == action)
+      {
+      QString filename = itr.key();
+      pqPythonMacroSupervisor::removeStoredMacro(filename);
+      pqPythonMacroSupervisor::removeMacro(filename);
+      }
+    }
+}
+//----------------------------------------------------------------------------
+void pqPythonMacroSupervisor::onEditMacroTriggered()
+{
+  QObject* action = this->sender();
+  QMap<QString, QAction*>::const_iterator itr = this->Internal->EditActionMap.constBegin();
+  for ( ; itr != this->Internal->EditActionMap.constEnd(); ++itr)
+    {
+    if (itr.value() == action)
+      {
+      QString filename = itr.key();
+      emit onEditMacro(filename);
+      }
+    }
+}
+//----------------------------------------------------------------------------
+QString pqPythonMacroSupervisor::macroNameFromFileName(const QString& filename)
+{
+  QString name = QFileInfo(filename).fileName().replace(".py", "");
+  if (!name.length())
+    {
+    name = "Unnamed macro";
+    }
+  return name;
+}
+
+//----------------------------------------------------------------------------
+QStringList pqPythonMacroSupervisor::getMacrosFilePaths()
+{
+  QStringList macroList;
+  QDir dir;
+  dir.setFilter(QDir::Files);
+
+  foreach(QString dirPath, pqCoreUtilities::findParaviewPaths(QString("Macros"),
+                                                              true, true))
+    {
+    dir.setPath(dirPath);
+    foreach(QString filePath , dir.entryList())
+      {
+      if(filePath.startsWith("."))
+        continue;
+      macroList.push_back(dirPath + QDir::separator() + filePath);
+      }
+    }
+
+  return macroList;
 }

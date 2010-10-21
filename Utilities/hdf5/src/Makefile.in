@@ -118,8 +118,8 @@ am_libhdf5_la_OBJECTS = H5.lo H5checksum.lo H5dbg.lo H5system.lo \
 	H5HFdtable.lo H5HFhdr.lo H5HFhuge.lo H5HFiblock.lo H5HFiter.lo \
 	H5HFman.lo H5HFsection.lo H5HFspace.lo H5HFstat.lo H5HFtest.lo \
 	H5HFtiny.lo H5HG.lo H5HGcache.lo H5HGdbg.lo H5HL.lo \
-	H5HLcache.lo H5HLdbg.lo H5HLint.lo H5HP.lo H5I.lo H5Itest.lo \
-	H5L.lo H5Lexternal.lo H5lib_settings.lo H5MF.lo H5MFaggr.lo \
+	H5HLcache.lo H5HLdbg.lo H5HLint.lo H5HP.lo H5I.lo H5L.lo \
+	H5Lexternal.lo H5lib_settings.lo H5MF.lo H5MFaggr.lo \
 	H5MFdbg.lo H5MFsection.lo H5MM.lo H5MP.lo H5MPtest.lo H5O.lo \
 	H5Oainfo.lo H5Oalloc.lo H5Oattr.lo H5Oattribute.lo H5Obogus.lo \
 	H5Obtreek.lo H5Ocache.lo H5Ochunk.lo H5Ocont.lo H5Ocopy.lo \
@@ -424,11 +424,11 @@ LIBH5CPP_HL = $(top_builddir)/hl/c++/src/libhdf5_hl_cpp.la
 # Scripts used to build examples
 # If only shared libraries have been installed, have h5cc build examples with
 # shared libraries instead of static libraries
-H5CC = ${DESTDIR}/$(bindir)/h5cc
-H5CC_PP = ${DESTDIR}/$(bindir)/h5pcc
-H5FC = ${DESTDIR}/$(bindir)/h5fc
-H5FC_PP = ${DESTDIR}/$(bindir)/h5pfc
-H5CPP = ${DESTDIR}/$(bindir)/h5c++
+H5CC = ${DESTDIR}$(bindir)/h5cc
+H5CC_PP = ${DESTDIR}$(bindir)/h5pcc
+H5FC = ${DESTDIR}$(bindir)/h5fc
+H5FC_PP = ${DESTDIR}$(bindir)/h5pfc
+H5CPP = ${DESTDIR}$(bindir)/h5c++
 
 # The trace script; this is used on source files from the C library to
 # insert tracing macros.
@@ -437,7 +437,7 @@ TRACE = perl $(top_srcdir)/bin/trace
 # .chkexe files are used to mark tests that have run successfully.
 # .chklog files are output from those tests.
 # *.clog are from the MPE option.
-CHECK_CLEANFILES = *.chkexe *.chklog *.clog
+CHECK_CLEANFILES = *.chkexe *.chklog *.clog $(TEST_PROG) *.o *.exe
 
 # Add libtool shared library version numbers to the HDF5 library
 # See libtool versioning documentation online.
@@ -484,7 +484,7 @@ libhdf5_la_SOURCES = H5.c H5checksum.c H5dbg.c H5system.c H5timer.c H5trace.c \
         H5HFspace.c H5HFstat.c H5HFtest.c H5HFtiny.c \
         H5HG.c H5HGcache.c H5HGdbg.c \
         H5HL.c H5HLcache.c H5HLdbg.c H5HLint.c \
-        H5HP.c H5I.c H5Itest.c H5L.c H5Lexternal.c H5lib_settings.c \
+        H5HP.c H5I.c H5L.c H5Lexternal.c H5lib_settings.c \
         H5MF.c H5MFaggr.c H5MFdbg.c H5MFsection.c \
         H5MM.c H5MP.c H5MPtest.c \
         H5O.c H5Oainfo.c H5Oalloc.c H5Oattr.c \
@@ -775,7 +775,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/H5HLint.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/H5HP.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/H5I.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/H5Itest.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/H5L.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/H5Lexternal.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/H5MF.Plo@am__quote@

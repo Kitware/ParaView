@@ -102,9 +102,6 @@ pqPythonDialog::pqPythonDialog(QWidget* Parent) :
 
 pqPythonDialog::~pqPythonDialog()
 {
-  pqApplicationCore::instance()->settings()->setValue(
-    "PythonDialog/splitter", this->Implementation->Ui.splitter->saveState());
-
   // Only save geometry state if visible.  If not visible, the dialog reports
   // its position to be [0,0].  If not visible, then we have already saved
   // the correct geometry state in closeEvent().
@@ -113,12 +110,6 @@ pqPythonDialog::~pqPythonDialog()
     pqApplicationCore::instance()->settings()->saveState(*this, "PythonDialog");
     }
   delete Implementation;
-}
-
-void pqPythonDialog::restoreSplitterState()
-{
-  this->Implementation->Ui.splitter->restoreState(
-    pqApplicationCore::instance()->settings()->value("PythonDialog/splitter").toByteArray());
 }
 
 void pqPythonDialog::closeEvent(QCloseEvent *event)
@@ -130,11 +121,6 @@ void pqPythonDialog::closeEvent(QCloseEvent *event)
 pqPythonShell* pqPythonDialog::shell()
 {
   return this->Implementation->Ui.shellWidget;
-}
-
-QSplitter* pqPythonDialog::splitter()
-{
-  return this->Implementation->Ui.splitter;
 }
 
 void pqPythonDialog::runScript()

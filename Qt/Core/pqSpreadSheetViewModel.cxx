@@ -64,6 +64,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqOutputPort.h"
 #include "pqPipelineSource.h"
 
+#include "vtkSMProperty.h"
+#include "vtkSMStringVectorProperty.h"
+#include "vtkSMIntVectorProperty.h"
+
 static uint qHash(pqSpreadSheetViewModel::vtkIndex index)
 {
   return qHash(index.Tuple[2]);
@@ -515,6 +519,54 @@ QVariant pqSpreadSheetViewModel::data(
 }
 
 //-----------------------------------------------------------------------------
+void pqSpreadSheetViewModel::sortSection (int section, Qt::SortOrder order)
+{
+  vtkSMSpreadSheetRepresentationProxy* repr = this->Internal->Representation;
+  if(repr)
+    {
+    vtkTable* table = vtkTable::SafeDownCast(repr->GetOutput(this->Internal->ActiveBlockNumber));
+    if (table && table->GetNumberOfColumns() > section)
+      {
+      vtkSMSpreadSheetRepresentationProxy* proxy = getRepresentationProxy();
+
+      vtkSMStringVectorProperty* propColumn =
+          vtkSMStringVectorProperty::SafeDownCast(proxy->GetProperty("ColumnToSort"));
+      propColumn->SetElement(0, table->GetColumnName(section));
+
+      vtkSMIntVectorProperty* propOrder =
+          vtkSMIntVectorProperty::SafeDownCast(proxy->GetProperty("InvertOrder"));
+      switch(order)
+        {
+        case Qt::AscendingOrder:
+        propOrder->SetElement(0, 1);
+        break;
+        case Qt::DescendingOrder:
+        propOrder->SetElement(0, 0);
+        break;
+      }
+
+      proxy->UpdateVTKObjects();
+
+      proxy->CleanCache();
+      this->reset();
+      }
+    }
+}
+//-----------------------------------------------------------------------------
+bool pqSpreadSheetViewModel::isSortable(int section)
+{
+  vtkSMSpreadSheetRepresentationProxy* repr = this->Internal->Representation;
+  if(repr)
+    {
+    vtkTable* table = vtkTable::SafeDownCast(repr->GetOutput(this->Internal->ActiveBlockNumber));
+    if (table && table->GetNumberOfColumns() > section)
+      {
+      return strcmp(table->GetColumnName(section), "Structured Coordinates") != 0;
+      }
+    }
+  return false;
+}
+//-----------------------------------------------------------------------------
 QVariant pqSpreadSheetViewModel::headerData (int section, Qt::Orientation orientation, 
     int role/*=Qt::DisplayRole*/) const 
 {
@@ -709,6 +761,7 @@ QModelIndex pqSpreadSheetViewModel::indexFor(vtkSelectionNode* node, vtkIdType v
     }
 
   ids->Delete();
+
   return idx;
 }
 
@@ -826,7 +879,11 @@ QSet<pqSpreadSheetViewModel::vtkIndex> pqSpreadSheetViewModel::getVTKIndices(
       value.Tuple[2] = static_cast<vtkIdType>(vtkindex.ToLongLong());
       vtkindices.insert(value);
       }
+
     }
+
+
+
   return vtkindices;
 }
 

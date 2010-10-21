@@ -45,11 +45,11 @@
 #ifndef __cplusplus
 #ifdef H5_HAVE_STDINT_H
 #   include <stdint.h>		/*for C9x types				     */
-#endif
+# endif
 #else
-#ifdef H5_HAVE_STDINT_H_CXX
-#   include <stdint.h>		/*for C9x types				     */
-#endif
+# ifdef H5_HAVE_STDINT_H_CXX
+#   include <stdint.h>		/*for C9x types	when include from C++	     */
+# endif
 #endif
 #ifdef H5_HAVE_INTTYPES_H
 #   include <inttypes.h>        /* For uint64_t on some platforms            */
@@ -76,9 +76,9 @@ extern "C" {
 #define H5_VERS_MAJOR	1	/* For major interface/format changes  	     */
 #define H5_VERS_MINOR	8	/* For minor interface/format changes  	     */
 #define H5_VERS_RELEASE	5	/* For tweaks, bug-fixes, or development     */
-#define H5_VERS_SUBRELEASE "snap5"	/* For pre-releases like snap0       */
+#define H5_VERS_SUBRELEASE "post2"	/* For pre-releases like snap0       */
 				/* Empty string for real releases.           */
-#define H5_VERS_INFO    "HDF5 library version: 1.8.5-snap5"      /* Full version string */
+#define H5_VERS_INFO    "HDF5 library version: 1.8.5-post2"      /* Full version string */
 
 #define H5check()	H5check_version(H5_VERS_MAJOR,H5_VERS_MINOR,	      \
 				        H5_VERS_RELEASE)

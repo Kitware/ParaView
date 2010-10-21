@@ -191,6 +191,8 @@ ENDIF (PARAVIEW_ENABLE_PYTHON AND PV_TARGET_SUPPORTS_SHARED_LIBS)
 
 IF (PARAVIEW_ENABLE_PYTHON)
   SET(VTK_WRAP_PYTHON ON CACHE INTERNAL "" FORCE)
+  SET(VTK_WRAP_PYTHON_EXE vtkWrapPython)
+  SET(VTK_WRAP_PYTHON_INIT_EXE vtkWrapPythonInit)
 
   # ParaView python uses NewInterpretor API, which cannot be used with the
   # python's thread support API (PyGIL*). Hence, we disable all thread support.
@@ -199,6 +201,10 @@ IF (PARAVIEW_ENABLE_PYTHON)
 ELSE (PARAVIEW_ENABLE_PYTHON)
   SET(VTK_WRAP_PYTHON OFF CACHE INTERNAL "" FORCE)
 ENDIF (PARAVIEW_ENABLE_PYTHON)
+
+#########################################################################
+# Set the EncodeString executable
+SET(VTK_ENCODESTRING_EXE vtkEncodeString)
 
 #########################################################################
 # Set the ServerManager test data dir,
@@ -268,7 +274,11 @@ SET(PARAVIEW_USE_FILE "${ParaView_SOURCE_DIR}/ParaViewUse.cmake")
 SET(PARAVIEW_VTK_DIR "${ParaView_BINARY_DIR}/VTK")
 
 #SET(PARAVIEW_CMAKE_EXTENSIONS "${ParaView_SOURCE_DIR}/CMake;${ParaView_SOURCE_DIR}/VTK/CMake")
-GET_TARGET_PROPERTY(VTK_WRAP_ClientServer_EXE_CONFIG vtkWrapClientServer LOCATION)
+IF("${CMAKE_CFG_INTDIR}" STREQUAL ".")
+  SET(VTK_WRAP_ClientServer_EXE_CONFIG ${EXECUTABLE_OUTPUT_PATH}/vtkWrapClientServer)
+ELSE("${CMAKE_CFG_INTDIR}" STREQUAL ".")
+  SET(VTK_WRAP_ClientServer_EXE_CONFIG ${EXECUTABLE_OUTPUT_PATH}/${CMAKE_CFG_INTDIR}/vtkWrapClientServer)
+ENDIF("${CMAKE_CFG_INTDIR}" STREQUAL ".")
 
 SET(PARAVIEW_LIBRARY_DIRS 
   ${LIBRARY_OUTPUT_PATH} ${PARAVIEW_EXTRA_LINK_DIRECTORIES})

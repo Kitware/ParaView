@@ -18,7 +18,6 @@ Module:    PrismSurfacePanel.cxx
 #include <QMap>
 #include <QFileInfo>
 #include <QDoubleValidator>
-
 // VTK includes
 
 // ParaView Server Manager includes
@@ -40,6 +39,8 @@ Module:    PrismSurfacePanel.cxx
 #include "pqSettings.h"
 #include "pqApplicationCore.h"
 #include "pqFileDialog.h"
+#include "pqTreeWidget.h"
+#include "PrismCore.h"
 
 namespace
 {
@@ -71,7 +72,16 @@ public:
 };
 
 
-}
+}//end namespace
+
+
+
+
+
+
+
+
+
 SESAMEConversionVariable::SESAMEConversionVariable()
 {
     this->Name="None";
@@ -111,6 +121,10 @@ public:
 
     bool LoadConversions(QString &filename);
 
+    PrismTableWidget *ConversionTree;
+    SESAMEComboBoxDelegate* ConversionVariableEditor;
+    bool WasCustom;
+
 };
 
 //----------------------------------------------------------------------------
@@ -119,6 +133,29 @@ pqNamedObjectPanel(object_proxy, p)
 {
     this->UI = new pqUI(this);
     this->UI->setupUi(this);
+
+    this->UI->ConversionTree = new PrismTableWidget(this);
+    this->UI->ConversionLayout->addWidget(this->UI->ConversionTree);
+    this->UI->ConversionTree->setColumnCount(3);
+    this->UI->ConversionTree->setSortingEnabled(false);
+    QStringList conversionHeader;
+    conversionHeader.append("Variable");
+    conversionHeader.append("Conversion");
+    conversionHeader.append("Factor");
+    this->UI->ConversionTree->setHorizontalHeaderLabels(conversionHeader);
+    this->UI->ConversionTree->verticalHeader()->setVisible(false);
+
+    this->UI->ConversionVariableEditor=new SESAMEComboBoxDelegate(this->UI->ConversionTree);
+    this->UI->ConversionTree->setItemDelegateForColumn(1,this->UI->ConversionVariableEditor);
+    this->UI->ConversionVariableEditor->setPanel(this);
+
+
+    connect(
+    this->UI->ConversionTree,
+    SIGNAL(cellChanged ( int , int  )),
+    this,
+    SLOT(onConversionTreeCellChanged( int , int  )));
+
 
     QObject::connect(this->UI->TableIdWidget, SIGNAL(currentIndexChanged(QString)), 
         this, SLOT(setTableId(QString)));
@@ -221,37 +258,7 @@ pqNamedObjectPanel(object_proxy, p)
     this,
     SLOT(onConversionFileButton()));
 
- connect(
-    this->UI->ConversionVar1,
-    SIGNAL(textChanged(const QString &)),
-    this,
-    SLOT(onDensityConversionChanged(const QString &)));
-
- connect(
-    this->UI->ConversionVar2,
-    SIGNAL(textChanged(const QString &)),
-    this,
-    SLOT(onTemperatureConversionChanged(const QString &)));
-
-  connect(
-    this->UI->ConversionVar3,
-    SIGNAL(textChanged(const QString &)),
-    this,
-    SLOT(onPressureConversionChanged(const QString &)));
-
-   connect(
-    this->UI->ConversionVar4,
-    SIGNAL(textChanged(const QString &)),
-    this,
-    SLOT(onEnergyConversionChanged(const QString &)));
-
-    QDoubleValidator *doubleValid= new QDoubleValidator(this);
-
-    this->UI->ConversionVar1->setValidator(doubleValid);
-    this->UI->ConversionVar2->setValidator(doubleValid);
-    this->UI->ConversionVar3->setValidator(doubleValid);
-    this->UI->ConversionVar4->setValidator(doubleValid);
-
+//    QDoubleValidator *doubleValid= new QDoubleValidator(this);
 
 
 
@@ -272,26 +279,91 @@ PrismSurfacePanel::~PrismSurfacePanel()
 }
 void PrismSurfacePanel::updateConversions()
 {
-        vtkSMDoubleVectorProperty* conversionsVP = vtkSMDoubleVectorProperty::SafeDownCast(
-        this->UI->PanelHelper->GetProperty("Conversions"));
+  vtkSMDoubleVectorProperty* conversionValueVP = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->UI->PanelHelper->GetProperty("VariableConversionValues"));
+  vtkSMStringVectorProperty* conversionNamesVP = vtkSMStringVectorProperty::SafeDownCast(
+    this->UI->PanelHelper->GetProperty("VariableConversionNames"));
 
-        if(conversionsVP)
-        {
-            conversionsVP->SetElement(0,this->UI->ConversionVar1->text().toDouble());
-            conversionsVP->SetElement(1,this->UI->ConversionVar2->text().toDouble());
-            conversionsVP->SetElement(2,this->UI->ConversionVar3->text().toDouble());
-            conversionsVP->SetElement(3,this->UI->ConversionVar4->text().toDouble());
+ if(conversionValueVP && conversionNamesVP)
+  {
+    conversionValueVP->SetNumberOfElements(this->UI->ConversionTree->rowCount());
+    for(int i = 0; i< this->UI->ConversionTree->rowCount(); ++i)
+    {
+      QTableWidgetItem* item= this->UI->ConversionTree->item(i,2);
+      conversionValueVP->SetElement(i, item->text().toDouble());
+    }
 
-            this->UI->PanelHelper->UpdateVTKObjects();
-            this->UI->PanelHelper->UpdatePropertyInformation();
+    conversionNamesVP->SetNumberOfElements(this->UI->ConversionTree->rowCount());
+    for(int i = 0; i< this->UI->ConversionTree->rowCount(); ++i)
+    {
+      QTableWidgetItem* item= this->UI->ConversionTree->item(i,1);
+      conversionNamesVP->SetElement(i, item->text().toAscii());
+    }
 
-        }
 
+    this->UI->PanelHelper->UpdateVTKObjects();
+    this->UI->PanelHelper->UpdatePropertyInformation();
 
+  }
+}
+
+void PrismSurfacePanel::onConversionVariableChanged(int index)
+{
+  this->UI->ConversionTree->blockSignals(true);
+
+  QMap<int,SESAMEConversionsForTable>::iterator iter;
+  iter=this->UI->SESAMEConversions.find(this->UI->TableIdWidget->currentText().toInt());
+  if(iter!=this->UI->SESAMEConversions.end())
+  {
+    SESAMEConversionsForTable tableData=*iter;
+
+    int row=this->UI->ConversionTree->currentRow();
+    QMap<QString,SESAMEConversionVariable>::iterator vIter;
+
+    if(tableData.VariableConversions.count()<index)
+    {
+      return;
+    }
+
+    QTableWidgetItem* item= this->UI->ConversionTree->item(row,1);
+    vIter=tableData.VariableConversions.begin();
+    for(int i=0;i<index;i++)
+    {
+      vIter++;
+    }
+    SESAMEConversionVariable variableData=*vIter;
+    QString conversionValueString="1.0";
+    if(this->UI->SICheckbox->isChecked())
+    {
+      item=this->UI->ConversionTree->item(row,2);
+      item->setFlags(Qt::ItemIsEnabled);
+      conversionValueString.setNum(variableData.SIConversion);
+      item->setText(conversionValueString);
+
+    }
+    else if(this->UI->cgsCheckbox->isChecked())
+    {
+      item=this->UI->ConversionTree->item(row,2);
+      item->setFlags(Qt::ItemIsEnabled);
+      conversionValueString.setNum(variableData.cgsConversion);
+      item->setText(conversionValueString);
+    }
+    this->UI->ConversionTree->resizeColumnToContents(0);
+  }
+  this->UI->ConversionTree->blockSignals(false);
+
+    this->updateConversions();
+    this->updateXThresholds();
+    this->updateYThresholds();
+    this->onRangeChanged();
+
+  this->setModified();
 
 }
-void PrismSurfacePanel::onDensityConversionChanged(const QString & )
+void PrismSurfacePanel::onConversionTreeCellChanged( int , int col)
 {
+  if(col==2)
+  {
 
     this->updateConversions();
     this->updateXThresholds();
@@ -299,54 +371,27 @@ void PrismSurfacePanel::onDensityConversionChanged(const QString & )
     this->onRangeChanged();
 
     this->setModified();
-
-
-
-}
-void PrismSurfacePanel::onTemperatureConversionChanged(const QString & )
-{
-
-    this->updateConversions();
-    this->updateXThresholds();
-    this->updateYThresholds();
-    this->onRangeChanged();
-
-    this->setModified();
-   
-}
-void PrismSurfacePanel::onPressureConversionChanged(const QString & )
-{
-
-    this->updateConversions();
-    this->updateXThresholds();
-    this->updateYThresholds();
-    this->onRangeChanged();
-
-    this->setModified();
-   
-}
-void PrismSurfacePanel::onEnergyConversionChanged(const QString & )
-{
-
-    this->updateConversions();
-    this->updateXThresholds();
-    this->updateYThresholds();
-    this->onRangeChanged();
-
-    this->setModified();
-
+  }
 }
 
-
-
-void PrismSurfacePanel::onConversionTypeChanged(int)
+void PrismSurfacePanel::onConversionTypeChanged(int state)
 {
-    this->updateConversionsLabels();
+  if(state==Qt::Checked)
+  {
+    if(this->UI->WasCustom)
+    {
+      this->updateConversionsLabels();
+    }
+    else
+    {
+      this->updateVariableConversions();
+    }
     this->updateConversions();
     this->updateXThresholds();
     this->updateYThresholds();
     this->onRangeChanged();
     this->setModified();
+  }
 }
 
 void PrismSurfacePanel::onConversionFileButton()
@@ -436,9 +481,6 @@ bool PrismSurfacePanel::pqUI::LoadConversions(QString &fileName)
     }
 
 
-
-   
-
    this->SESAMEConversions.clear();
 
    for(int i=0;i<rootElement->GetNumberOfNestedElements();i++)
@@ -496,256 +538,351 @@ bool PrismSurfacePanel::pqUI::LoadConversions(QString &fileName)
 
     return true;
 }
-void PrismSurfacePanel::updateConversionsLabels()
+
+ void PrismSurfacePanel::updateVariableConversions()
 {
-    this->UI->ConversionVar1->blockSignals(true);
-    this->UI->ConversionVar2->blockSignals(true);
-    this->UI->ConversionVar3->blockSignals(true);
-    this->UI->ConversionVar4->blockSignals(true);
+    this->UI->ConversionTree->blockSignals(true);
 
     QFileInfo info(this->UI->ConversionFileName);
     this->UI->ConversionFile->setText(info.fileName());
     this->UI->ConversionFile->setToolTip(this->UI->ConversionFileName);
 
-
-
     QMap<int,SESAMEConversionsForTable>::iterator iter;
     iter=this->UI->SESAMEConversions.find(this->UI->TableIdWidget->currentText().toInt());
     if(iter!=this->UI->SESAMEConversions.end())
     {
-        QString label="Table: ";
-        label.append(this->UI->TableIdWidget->currentText());
-        this->UI->ConversionTableId->setText(label);
+      QString label="Table: ";
+      label.append(this->UI->TableIdWidget->currentText());
+      this->UI->ConversionTableId->setText(label);
 
-        this->UI->SICheckbox->setEnabled(true);
-        this->UI->cgsCheckbox->setEnabled(true);
+      this->UI->SICheckbox->setEnabled(true);
+      this->UI->cgsCheckbox->setEnabled(true);
 
-        SESAMEConversionsForTable tableData=*iter;
+      SESAMEConversionsForTable tableData=*iter;
 
-        QMap<QString,SESAMEConversionVariable>::iterator vIter;
-        vIter=tableData.VariableConversions.find(QString("Density"));
-        if(vIter!=tableData.VariableConversions.end())
-        {
-            QString conversionValueString="1.0";
-            SESAMEConversionVariable variableData=*vIter;
-            label="Density ";
-            this->UI->ConversionVar1_label->setText(label);
 
-            label="";
-            if(this->UI->CustomCheckbox->isChecked())
+
+      if(!this->UI->CustomCheckbox->isChecked())
+      {
+          QMap<QString,SESAMEConversionVariable>::iterator vnIter;
+          QStringList varsList;
+          vnIter=tableData.VariableConversions.begin();
+          for(;vnIter!=tableData.VariableConversions.end();vnIter++)
+          {
+            SESAMEConversionVariable variableData=*vnIter;
+            QString lab=variableData.Name;
+            lab.append(" - ");
+
+            QString conversionUnits=variableData.SESAMEUnits;
+            conversionUnits.append(" to ");
+            if(this->UI->SICheckbox->isChecked())
             {
-                this->UI->ConversionVar1_label2->setText(label);
-                this->UI->ConversionVar1->setEnabled(true);
+              conversionUnits.append(variableData.SIUnits);
+            }
+            else if(this->UI->cgsCheckbox->isChecked())
+            {
+              conversionUnits.append(variableData.cgsUnits);
+            }
+            lab.append(conversionUnits);
+            varsList.append(lab);
           }
-            else
-            {
-                this->UI->ConversionVar1->setEnabled(false);
-               label.append(variableData.SESAMEUnits);
-                label.append(" to ");
-                if(this->UI->SICheckbox->isChecked())
-                {
-                    label.append(variableData.SIUnits);
-                    conversionValueString.setNum(variableData.SIConversion);
-                }
-                else if(this->UI->cgsCheckbox->isChecked())
-                {
-                    label.append(variableData.cgsUnits);
-                    conversionValueString.setNum(variableData.cgsConversion);
-               }
-                this->UI->ConversionVar1_label2->setText(label);
-
-                this->UI->ConversionVar1->setText(conversionValueString);
-            }  
-        }
-        else
-        {
-            QString conversionValueString="1.0";
-            label="Density ";
-            this->UI->ConversionVar1_label->setText(label);
-            this->UI->ConversionVar1_label2->clear();
-            this->UI->ConversionVar1->setText(conversionValueString);
+          this->UI->ConversionVariableEditor->setVariableList(varsList);
       }
 
-        vIter=tableData.VariableConversions.find(QString("Temperature"));
-        if(vIter!=tableData.VariableConversions.end())
-        {
-            QString conversionValueString="1.0";
-            SESAMEConversionVariable variableData=*vIter;
-             label="Temperature ";
-            this->UI->ConversionVar2_label->setText(label);
-            label="";
-            if(this->UI->CustomCheckbox->isChecked())
-            {
-                this->UI->ConversionVar2_label2->setText(label);
-                this->UI->ConversionVar2->setEnabled(true);
-            }
-            else
-            {
-                this->UI->ConversionVar2->setEnabled(false);
-                label.append(variableData.SESAMEUnits);
-                label.append(" to ");
-                if(this->UI->SICheckbox->isChecked())
-                {
-                    label.append(variableData.SIUnits);
-                    conversionValueString.setNum(variableData.SIConversion);
-                }
-                else if(this->UI->cgsCheckbox->isChecked())
-                {
-                    label.append(variableData.cgsUnits);
-                    conversionValueString.setNum(variableData.cgsConversion);
-               }
-                this->UI->ConversionVar2_label2->setText(label);
 
-                this->UI->ConversionVar2->setText(conversionValueString);
-            }  
+      QMap<QString,SESAMEConversionVariable>::iterator vIter;
+      for(int row=0;row<this->UI->ConversionTree->rowCount();row++)
+      {
+
+        QTableWidgetItem* item= this->UI->ConversionTree->item(row,1);
+        if(this->UI->CustomCheckbox->isChecked())
+        {
+          this->UI->WasCustom=true;
+          //this->UI->ConversionTree->setColumnHidden(1,true);
+
+          item=this->UI->ConversionTree->item(row,1);
+          item->setFlags(Qt::ItemIsEnabled);
+          item->setText("");
+          item->setData(Qt::UserRole,"");
+
+          item=this->UI->ConversionTree->item(row,2);
+          item->setFlags(Qt::ItemIsEditable | Qt::ItemIsEnabled);
+
         }
         else
         {
-            QString conversionValueString="1.0";
-             label="Temperature ";
-
-            this->UI->ConversionVar2_label->setText(label);
-            this->UI->ConversionVar2_label2->clear();
-             this->UI->ConversionVar2->setText(conversionValueString);
-       }
-
-        vIter=tableData.VariableConversions.find(QString("Pressure"));
-        if(vIter!=tableData.VariableConversions.end())
-        {
-            QString conversionValueString="1.0";
+          vIter=tableData.VariableConversions.begin();
+          for(;vIter!=tableData.VariableConversions.end();vIter++)
+          {
             SESAMEConversionVariable variableData=*vIter;
-             label="Pressure ";
-            this->UI->ConversionVar3_label->setText(label);
-            label="";
-            if(this->UI->CustomCheckbox->isChecked())
+
+
+            QString dat=item->data(Qt::UserRole).toString();
+            if(dat==variableData.Name)
             {
-                this->UI->ConversionVar3_label2->setText(label);
-                this->UI->ConversionVar3->setEnabled(true);
+              QString conversionValueString="1.0";
+              QString conversionUnits=variableData.SESAMEUnits;
+              conversionUnits.append(" to ");
+
+              if(this->UI->SICheckbox->isChecked())
+              {
+                item=this->UI->ConversionTree->item(row,1);
+                item->setFlags(Qt::ItemIsEditable | Qt::ItemIsEnabled);
+
+                //this->UI->ConversionTree->setColumnHidden(1,false);
+
+                QString lab=variableData.Name;
+                lab.append(" - ");
+                conversionUnits.append(variableData.SIUnits);
+                lab.append(conversionUnits);
+                item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsEditable);
+                item->setText(lab);
+                item->setData(Qt::UserRole,variableData.Name);
+
+                item=this->UI->ConversionTree->item(row,2);
+                item->setFlags(Qt::ItemIsEnabled);
+                conversionValueString.setNum(variableData.SIConversion);
+                item->setText(conversionValueString);
+
+              }
+              else if(this->UI->cgsCheckbox->isChecked())
+              {
+                item=this->UI->ConversionTree->item(row,1);
+                item->setFlags(Qt::ItemIsEditable | Qt::ItemIsEnabled);
+
+                //this->UI->ConversionTree->setColumnHidden(1,false);
+
+                QString lab=variableData.Name;
+                lab.append(" - ");
+                conversionUnits.append(variableData.cgsUnits);
+                lab.append(conversionUnits);
+                item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsEditable);
+                item->setText(lab);
+                item->setData(Qt::UserRole,variableData.Name);
+
+
+                item=this->UI->ConversionTree->item(row,2);
+                item->setFlags(Qt::ItemIsEnabled);
+                conversionValueString.setNum(variableData.cgsConversion);
+                item->setText(conversionValueString);
+
+              }
             }
-            else
-            {
-                this->UI->ConversionVar3->setEnabled(false);
-                label.append(variableData.SESAMEUnits);
-                label.append(" to ");
-                if(this->UI->SICheckbox->isChecked())
-                {
-                    label.append(variableData.SIUnits);
-                    conversionValueString.setNum(variableData.SIConversion);
-                }
-                else if(this->UI->cgsCheckbox->isChecked())
-                {
-                    label.append(variableData.cgsUnits);
-                    conversionValueString.setNum(variableData.cgsConversion);
-               }
-                this->UI->ConversionVar3_label2->setText(label);
-
-                this->UI->ConversionVar3->setText(conversionValueString);
-            }  
+          }
         }
-        else
-        {
-            QString conversionValueString="1.0";
-             label="Pressure ";
-            this->UI->ConversionVar3_label->setText(label);
-            this->UI->ConversionVar3_label2->clear();
-            this->UI->ConversionVar3->setText(conversionValueString);
-        }
-
-        vIter=tableData.VariableConversions.find(QString("Energy"));
-        if(vIter!=tableData.VariableConversions.end())
-        {
-            QString conversionValueString="1.0";
-            SESAMEConversionVariable variableData=*vIter;
-             label="Energy ";
-            this->UI->ConversionVar4_label->setText(label);
-            label="";
-
-            if(this->UI->CustomCheckbox->isChecked())
-            {
-                this->UI->ConversionVar4_label2->setText(label);
-                this->UI->ConversionVar4->setEnabled(true);
-            }
-            else
-            {
-                this->UI->ConversionVar4->setEnabled(false);
-                label.append(variableData.SESAMEUnits);
-                label.append(" to ");
-                if(this->UI->SICheckbox->isChecked())
-                {
-                    label.append(variableData.SIUnits);
-                    conversionValueString.setNum(variableData.SIConversion);
-                }
-                else if(this->UI->cgsCheckbox->isChecked())
-                {
-                    label.append(variableData.cgsUnits);
-                    conversionValueString.setNum(variableData.cgsConversion);
-               }
-                this->UI->ConversionVar4_label2->setText(label);
-
-                this->UI->ConversionVar4->setText(conversionValueString);
-            }  
-        }
-        else
-        {
-            QString conversionValueString="1.0";
-             label="Energy ";
-            this->UI->ConversionVar4_label->setText(label);
-            this->UI->ConversionVar4_label2->clear();
-            this->UI->ConversionVar4->setText(conversionValueString);
-        }
+      }
+      this->UI->ConversionTree->resizeColumnToContents(0);
     }
     else
     {
-        QString tableIdLable="Table ";
-        tableIdLable.append(this->UI->TableIdWidget->currentText());
-        tableIdLable.append(" Could not be found.");
-        this->UI->ConversionTableId->setText(tableIdLable);
+      this->UI->SICheckbox->setEnabled(false);
+      this->UI->cgsCheckbox->setEnabled(false);
+      this->UI->CustomCheckbox->blockSignals(true);
+      this->UI->CustomCheckbox->setChecked(true);
+      this->UI->CustomCheckbox->blockSignals(false);
+      //this->UI->ConversionTree->setColumnHidden(1,true);
 
-        this->UI->SICheckbox->setEnabled(false);
-        this->UI->cgsCheckbox->setEnabled(false);
-        this->UI->CustomCheckbox->blockSignals(true);
-        this->UI->CustomCheckbox->setChecked(true);
-        this->UI->CustomCheckbox->blockSignals(false);
-
-
-        this->UI->ConversionVar1->setEnabled(true);
-        this->UI->ConversionVar2->setEnabled(true);
-        this->UI->ConversionVar3->setEnabled(true);
-        this->UI->ConversionVar4->setEnabled(true);
-
-
-
+      QString tableIdLable="Table ";
+      tableIdLable.append(this->UI->TableIdWidget->currentText());
+      tableIdLable.append(" Could not be found.");
+      this->UI->ConversionTableId->setText(tableIdLable);
+      for(int row=0;row<this->UI->ConversionTree->rowCount();row++)
+      {
         QString conversionValueString="1.0";
-        QString label="Density ";
-        this->UI->ConversionVar1_label->setText(label);
-        this->UI->ConversionVar1_label2->clear();
-        this->UI->ConversionVar1->setText(conversionValueString);
 
-        conversionValueString="1.0";
-        label="Temperature ";
-        this->UI->ConversionVar2_label->setText(label);
-        this->UI->ConversionVar2_label2->clear();
-        this->UI->ConversionVar2->setText(conversionValueString);
+        QTableWidgetItem* item;
+        item=this->UI->ConversionTree->item(row,1);
+        item->setFlags(Qt::ItemIsEnabled);
+        item->setData(Qt::UserRole,"");
+        item->setText("");
 
-        conversionValueString="1.0";
-        label="Pressure ";
-        this->UI->ConversionVar3_label->setText(label);
-        this->UI->ConversionVar3_label2->clear();
-        this->UI->ConversionVar3->setText(conversionValueString);
+        item=this->UI->ConversionTree->item(row,2);
+        item->setFlags(Qt::ItemIsEditable | Qt::ItemIsEnabled);
+        item->setText(conversionValueString);
+      }
 
-        conversionValueString="1.0";
-        label="Energy ";
-        this->UI->ConversionVar4_label->setText(label);
-        this->UI->ConversionVar4_label2->clear();
-        this->UI->ConversionVar4->setText(conversionValueString);
+    }
+      this->UI->ConversionTree->blockSignals(false);
+}
+
+
+void PrismSurfacePanel::updateConversionsLabels()
+{
+  this->UI->ConversionTree->blockSignals(true);
+
+  QFileInfo info(this->UI->ConversionFileName);
+  this->UI->ConversionFile->setText(info.fileName());
+  this->UI->ConversionFile->setToolTip(this->UI->ConversionFileName);
+
+  vtkSMProperty* getNamesProperty =this->proxy()->GetProperty("AxisVarNameInfo");
+  QList<QVariant> names;
+  names = pqSMAdaptor::getMultipleElementProperty(getNamesProperty);
+
+
+  QMap<int,SESAMEConversionsForTable>::iterator iter;
+  iter=this->UI->SESAMEConversions.find(this->UI->TableIdWidget->currentText().toInt());
+  if(iter!=this->UI->SESAMEConversions.end())
+  {
+    QString label="Table: ";
+    label.append(this->UI->TableIdWidget->currentText());
+    this->UI->ConversionTableId->setText(label);
+
+    this->UI->SICheckbox->setEnabled(true);
+    this->UI->cgsCheckbox->setEnabled(true);
+    SESAMEConversionsForTable tableData=*iter;
+
+
+    if(!this->UI->CustomCheckbox->isChecked())
+    {
+      QMap<QString,SESAMEConversionVariable>::iterator vnIter;
+      QStringList varsList;
+      vnIter=tableData.VariableConversions.begin();
+      for(;vnIter!=tableData.VariableConversions.end();vnIter++)
+      {
+        SESAMEConversionVariable variableData=*vnIter;
+        QString lab=variableData.Name;
+        lab.append(" - ");
+
+        QString conversionUnits=variableData.SESAMEUnits;
+        conversionUnits.append(" to ");
+        if(this->UI->SICheckbox->isChecked())
+        {
+          conversionUnits.append(variableData.SIUnits);
+        }
+        else if(this->UI->cgsCheckbox->isChecked())
+        {
+          conversionUnits.append(variableData.cgsUnits);
+        }
+        lab.append(conversionUnits);
+        varsList.append(lab);
+      }
+      this->UI->ConversionVariableEditor->setVariableList(varsList);
     }
 
-    this->UI->ConversionVar1->blockSignals(false);
-    this->UI->ConversionVar2->blockSignals(false);
-    this->UI->ConversionVar3->blockSignals(false);
-    this->UI->ConversionVar4->blockSignals(false);
+
+    int w=0;
+    foreach(QVariant v, names)
+    {
+      QMap<QString,SESAMEConversionVariable>::iterator vIter;
+      vIter=tableData.VariableConversions.find(v.toString());
+      if(vIter==tableData.VariableConversions.end())
+      {
+        if(v.toString().contains("pressure",Qt::CaseInsensitive))
+        {
+          vIter=tableData.VariableConversions.find("Pressure");
+        }
+        else if(v.toString().contains("energy",Qt::CaseInsensitive))
+        {
+          vIter=tableData.VariableConversions.find("Energy");
+        }
+      }
+
+      if(vIter==tableData.VariableConversions.end())
+      {
+        vIter=tableData.VariableConversions.begin();
+      }
+      if(vIter!=tableData.VariableConversions.end())
+      {
+        QString conversionValueString="1.0";
+        SESAMEConversionVariable variableData=*vIter;
+
+        QString conversionUnits=variableData.SESAMEUnits;
+        conversionUnits.append(" to ");
+
+        QTableWidgetItem* item=this->UI->ConversionTree->item(w,0);
+        item->setFlags(Qt::ItemIsEnabled);
+
+        if(this->UI->CustomCheckbox->isChecked())
+        {
+          this->UI->WasCustom=TRUE;
+         // this->UI->ConversionTree->setColumnHidden(1,true);
+          item = this->UI->ConversionTree->item(w,1);
+          item->setText("");
+          item->setData(Qt::UserRole,"");
 
 
+          item = this->UI->ConversionTree->item(w,2);
+          item->setText(conversionValueString);
+          item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsEditable);
+        }
+        else if(this->UI->SICheckbox->isChecked())
+        {
+          this->UI->WasCustom=FALSE;
+         // this->UI->ConversionTree->setColumnHidden(1,false);
+
+          item=this->UI->ConversionTree->item(w,1);
+          QString lab=variableData.Name;
+          lab.append(" - ");
+          conversionUnits.append(variableData.SIUnits);
+          lab.append(conversionUnits);
+          item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsEditable);
+          item->setText(lab);
+          item->setData(Qt::UserRole,variableData.Name);
+
+
+          conversionValueString.setNum(variableData.SIConversion);
+          item= this->UI->ConversionTree->item(w,2);
+          item->setText(conversionValueString);
+          item->setFlags(Qt::ItemIsEnabled);
+        }
+        else if(this->UI->cgsCheckbox->isChecked())
+        {
+          this->UI->WasCustom=FALSE;
+        //  this->UI->ConversionTree->setColumnHidden(1,false);
+
+          item=this->UI->ConversionTree->item(w,1);
+          QString lab=variableData.Name;
+          lab.append(" - ");
+          conversionUnits.append(variableData.cgsUnits);
+          lab.append(conversionUnits);
+          item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsEditable);
+          item->setText(lab);
+          item->setData(Qt::UserRole,variableData.Name);
+
+
+          conversionValueString.setNum(variableData.cgsConversion);
+          item= this->UI->ConversionTree->item(w,2);
+          item->setText(conversionValueString);
+          item->setFlags(Qt::ItemIsEnabled);
+        }
+      }
+      w++;
+    }
+    this->UI->ConversionTree->resizeColumnToContents(0);
+  }
+  else
+  {
+    QString tableIdLable="Table ";
+    tableIdLable.append(this->UI->TableIdWidget->currentText());
+    tableIdLable.append(" Could not be found.");
+    this->UI->ConversionTableId->setText(tableIdLable);
+    this->UI->SICheckbox->setEnabled(false);
+    this->UI->cgsCheckbox->setEnabled(false);
+
+
+    int w=0;
+    foreach(QVariant v, names)
+    {
+      this->UI->WasCustom=true;
+     // this->UI->ConversionTree->setColumnHidden(1,true);
+
+      QTableWidgetItem* item=this->UI->ConversionTree->item(w,0);
+      item->setFlags(Qt::ItemIsEnabled);
+
+      QString conversionValueString="1.0";
+
+      item=this->UI->ConversionTree->item(w,1);
+      item->setFlags(Qt::ItemIsEnabled);
+      item->setText("");
+      item->setData(Qt::UserRole,"");
+
+
+      item=this->UI->ConversionTree->item(w,2);
+      item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsEditable);
+    }
+  }
+
+  this->UI->ConversionTree->blockSignals(false);
 }
 
 
@@ -804,15 +941,43 @@ void PrismSurfacePanel::accept()
     {
         contourValueVP->SetElement(i, sample_list[i]);
     }
- 
- 
-    pqSMAdaptor::setElementProperty(
-        this->proxy()->GetProperty("SESAMEXLogScaling"), this->UI->XLogScaling->isChecked());
+
+
+
+    vtkSMDoubleVectorProperty* conversionValueVP = vtkSMDoubleVectorProperty::SafeDownCast(
+      this->proxy()->GetProperty("VariableConversionValues"));
+    if(conversionValueVP)
+    {
+      conversionValueVP->SetNumberOfElements(this->UI->ConversionTree->rowCount());
+      for(int i = 0; i< this->UI->ConversionTree->rowCount(); ++i)
+      {
+        QTableWidgetItem* item= this->UI->ConversionTree->item(i,2);
+        conversionValueVP->SetElement(i, item->text().toDouble());
+      }
+    }
+
+    vtkSMStringVectorProperty* conversionNameVP = vtkSMStringVectorProperty::SafeDownCast(
+      this->proxy()->GetProperty("VariableConversionNames"));
+    if(conversionNameVP)
+    {
+      conversionNameVP->SetNumberOfElements(this->UI->ConversionTree->rowCount());
+      for(int i = 0; i< this->UI->ConversionTree->rowCount(); ++i)
+      {
+        QTableWidgetItem* item= this->UI->ConversionTree->item(i,1);
+        conversionNameVP->SetElement(i, item->text().toAscii().data());
+      }
+    }
+
+
+
 
     pqSMAdaptor::setElementProperty(
-        this->proxy()->GetProperty("SESAMEYLogScaling"), this->UI->YLogScaling->isChecked());
+        this->proxy()->GetProperty("XLogScaling"), this->UI->XLogScaling->isChecked());
+
     pqSMAdaptor::setElementProperty(
-        this->proxy()->GetProperty("SESAMEZLogScaling"), this->UI->ZLogScaling->isChecked());
+        this->proxy()->GetProperty("YLogScaling"), this->UI->YLogScaling->isChecked());
+    pqSMAdaptor::setElementProperty(
+        this->proxy()->GetProperty("ZLogScaling"), this->UI->ZLogScaling->isChecked());
     pqSettings* settings = pqApplicationCore::instance()->settings();
     settings->setValue("PrismPlugin/Conversions/SESAMEFileName", this->UI->ConversionFileName);
 
@@ -830,23 +995,6 @@ void PrismSurfacePanel::accept()
         settings->setValue("PrismPlugin/Conversions/SESAMEUnits",QString("Custom"));
     }
     settings->sync();
-
-    
-
-
-    vtkSMDoubleVectorProperty* conversionsVP = vtkSMDoubleVectorProperty::SafeDownCast(
-        this->proxy()->GetProperty("Conversions"));
-      if(conversionsVP)
-        {
-            conversionsVP->SetElement(0,this->UI->ConversionVar1->text().toDouble());
-            conversionsVP->SetElement(1,this->UI->ConversionVar2->text().toDouble());
-            conversionsVP->SetElement(2,this->UI->ConversionVar3->text().toDouble());
-            conversionsVP->SetElement(3,this->UI->ConversionVar4->text().toDouble());
-
-        }
- 
-
-
 
     this->proxy()->UpdateVTKObjects();
     this->proxy()->UpdatePropertyInformation();
@@ -914,10 +1062,7 @@ void PrismSurfacePanel::linkServerManagerProperties()
 }
 void PrismSurfacePanel::setupConversions()
 {
-    this->UI->ConversionVar1->blockSignals(true);
-    this->UI->ConversionVar2->blockSignals(true);
-    this->UI->ConversionVar3->blockSignals(true);
-    this->UI->ConversionVar4->blockSignals(true);
+  this->UI->ConversionTree->blockSignals(true);
 
 
   pqSettings* settings = pqApplicationCore::instance()->settings();
@@ -926,7 +1071,6 @@ void PrismSurfacePanel::setupConversions()
   {
       this->UI->ConversionFileName = settings->value("PrismPlugin/Conversions/SESAMEFileName").toString();
       this->UI->LoadConversions(this->UI->ConversionFileName);
-  
   }
   else
   {
@@ -937,7 +1081,6 @@ void PrismSurfacePanel::setupConversions()
   if ( settings->contains("PrismPlugin/Conversions/SESAMEUnits") )
   {
       units = settings->value("PrismPlugin/Conversions/SESAMEUnits").toString();
-
   }
   else
   {
@@ -950,66 +1093,96 @@ void PrismSurfacePanel::setupConversions()
   this->UI->CustomCheckbox->blockSignals(true);
 
 
-  if(units=="SI")
-  {
-      this->UI->SICheckbox->setChecked(true);
-  }
-  else if(units=="cgs")
-  {
-      this->UI->cgsCheckbox->setChecked(true);
-
-  }
-  else
-  {
-      this->UI->CustomCheckbox->setChecked(true);
-
-
-      vtkSMDoubleVectorProperty* helperConversionVP = vtkSMDoubleVectorProperty::SafeDownCast(
-          this->UI->PanelHelper->GetProperty("Conversions"));
-
-      vtkSMDoubleVectorProperty* conversionsVP = vtkSMDoubleVectorProperty::SafeDownCast(
-          this->proxy()->GetProperty("Conversions"));
-
-      if(conversionsVP && helperConversionVP)
-      {
-        helperConversionVP->SetElement(0,conversionsVP->GetElement(0));
-          helperConversionVP->SetElement(1,conversionsVP->GetElement(1));
-          helperConversionVP->SetElement(2,conversionsVP->GetElement(2));
-          helperConversionVP->SetElement(3,conversionsVP->GetElement(3));
-
-          QString vString;
-          vString.setNum(conversionsVP->GetElement(0),'f',3);
-          this->UI->ConversionVar1->setText(vString);
-
-          vString.setNum(conversionsVP->GetElement(1),'f',3);
-          this->UI->ConversionVar2->setText(vString);
-
-          vString.setNum(conversionsVP->GetElement(2),'f',3);
-          this->UI->ConversionVar3->setText(vString);
-
-          vString.setNum(conversionsVP->GetElement(3),'f',3);
-          this->UI->ConversionVar4->setText(vString);
-      }
-      else
-      {
-      this->UI->ConversionVar1->setText("1.0");
-      this->UI->ConversionVar2->setText("1.0");
-      this->UI->ConversionVar3->setText("1.0");
-      this->UI->ConversionVar4->setText("1.0");
-
-      }
-  }
-
   QFileInfo info(this->UI->ConversionFileName);
   this->UI->ConversionFile->setText(info.fileName());
   this->UI->ConversionFile->setToolTip(this->UI->ConversionFileName);
 
 
+  vtkSMProperty* GetNamesProperty =this->proxy()->GetProperty("AxisVarNameInfo");
+  QList<QVariant> names;
+  names = pqSMAdaptor::getMultipleElementProperty(GetNamesProperty);
 
-  QMap<int,SESAMEConversionsForTable>::iterator iter;
-  iter=this->UI->SESAMEConversions.find(this->UI->TableIdWidget->currentText().toInt());
-  if(iter!=this->UI->SESAMEConversions.end())
+  //add each xdmf-domain name to the widget and to the paraview-Domain
+  this->UI->ConversionTree->setRowCount(names.count());
+  this->UI->ConversionTree->setColumnCount(3);
+
+  for(int row=0;row<names.count();row++)
   {
+    QTableWidgetItem* item= new QTableWidgetItem();
+    item->setText(names.at(row).toString());
+    item->setFlags(Qt::ItemIsEnabled);
+    this->UI->ConversionTree->setItem(row,0,item);
+
+    item= new QTableWidgetItem();
+    item->setFlags(Qt::ItemIsEnabled);
+    this->UI->ConversionTree->setItem(row,1,item);
+
+    item= new QTableWidgetItem();
+    item->setFlags(Qt::ItemIsEnabled);
+    this->UI->ConversionTree->setItem(row,2,item);
+  }
+
+
+  if(units=="SI")
+  {
+    this->UI->WasCustom=FALSE;
+      this->UI->SICheckbox->setChecked(true);
+  }
+  else if(units=="cgs")
+  {
+    this->UI->WasCustom=FALSE;
+      this->UI->cgsCheckbox->setChecked(true);
+  }
+  else
+  {
+    this->UI->WasCustom=TRUE;
+    this->UI->CustomCheckbox->setChecked(true);
+
+
+    vtkSMDoubleVectorProperty* helperConversionVP = vtkSMDoubleVectorProperty::SafeDownCast(
+      this->UI->PanelHelper->GetProperty("VariableConversionValues"));
+
+    vtkSMDoubleVectorProperty* conversionsVP = vtkSMDoubleVectorProperty::SafeDownCast(
+      this->proxy()->GetProperty("VariableConversionValues"));
+
+    if(conversionsVP && helperConversionVP)
+    {
+      for(unsigned int i=0;i<conversionsVP->GetNumberOfElements();i++)
+      {
+        helperConversionVP->SetElement(i,conversionsVP->GetElement(i));
+      }
+      for(unsigned int i=0;i<(unsigned int)names.count();i++)
+      {
+        QString vString("1.0");
+
+        if(i<conversionsVP->GetNumberOfElements())
+        {
+          vString.setNum(conversionsVP->GetElement(i),'f',3);
+        }
+        QTableWidgetItem* item = this->UI->ConversionTree->item(i,2);
+        item->setText(vString);
+      }
+    }
+    else
+    {
+      for(int i=0;i<names.count();i++)
+      {
+        QTableWidgetItem* item = this->UI->ConversionTree->item(i,2);
+        item->setText("1.0");
+      }
+    }
+  }
+
+
+
+
+
+
+
+    QMap<int,SESAMEConversionsForTable>::iterator iter;
+    iter=this->UI->SESAMEConversions.find(this->UI->TableIdWidget->currentText().toInt());
+    if(iter!=this->UI->SESAMEConversions.end())
+    {
       QString label="Table: ";
       label.append(this->UI->TableIdWidget->currentText());
       this->UI->ConversionTableId->setText(label);
@@ -1019,244 +1192,160 @@ void PrismSurfacePanel::setupConversions()
 
       SESAMEConversionsForTable tableData=*iter;
 
+
+       if(!this->UI->CustomCheckbox->isChecked())
+      {
+          QMap<QString,SESAMEConversionVariable>::iterator vnIter;
+          QStringList varsList;
+          vnIter=tableData.VariableConversions.begin();
+          for(;vnIter!=tableData.VariableConversions.end();vnIter++)
+          {
+            SESAMEConversionVariable variableData=*vnIter;
+            QString lab=variableData.Name;
+            lab.append(" - ");
+
+            QString conversionUnits=variableData.SESAMEUnits;
+            conversionUnits.append(" to ");
+            if(this->UI->SICheckbox->isChecked())
+            {
+              conversionUnits.append(variableData.SIUnits);
+            }
+            else if(this->UI->cgsCheckbox->isChecked())
+            {
+              conversionUnits.append(variableData.cgsUnits);
+            }
+            lab.append(conversionUnits);
+            varsList.append(lab);
+          }
+          this->UI->ConversionVariableEditor->setVariableList(varsList);
+      }
+
+
+
+
+    int w=0;
+    foreach(QVariant v, names)
+    {
       QMap<QString,SESAMEConversionVariable>::iterator vIter;
-      vIter=tableData.VariableConversions.find(QString("Density"));
+      vIter=tableData.VariableConversions.find(v.toString());
+      if(vIter==tableData.VariableConversions.end())
+      {
+        if(v.toString().contains("pressure",Qt::CaseInsensitive))
+        {
+          vIter=tableData.VariableConversions.find("Pressure");
+        }
+        else if(v.toString().contains("energy",Qt::CaseInsensitive))
+        {
+          vIter=tableData.VariableConversions.find("Energy");
+        }
+      }
+
+      if(vIter==tableData.VariableConversions.end())
+      {
+        vIter=tableData.VariableConversions.begin();
+      }
       if(vIter!=tableData.VariableConversions.end())
       {
-          QString conversionValueString="1.0";
-          SESAMEConversionVariable variableData=*vIter;
-          label="Density ";
-          this->UI->ConversionVar1_label->setText(label);
 
-          label="";
-          if(this->UI->CustomCheckbox->isChecked())
-          {
-              this->UI->ConversionVar1_label2->setText(label);
-              this->UI->ConversionVar1->setEnabled(true);
+        QString conversionValueString="1.0";
+        SESAMEConversionVariable variableData=*vIter;
 
-          }
-          else
-          {
-              this->UI->ConversionVar1->setEnabled(false);
+        QString conversionUnits=variableData.SESAMEUnits;
+        conversionUnits.append(" to ");
 
-              label.append(variableData.SESAMEUnits);
-              label.append(" to ");
-              if(this->UI->SICheckbox->isChecked())
-              {
-                  label.append(variableData.SIUnits);
-                  conversionValueString.setNum(variableData.SIConversion);
-              }
-              else if(this->UI->cgsCheckbox->isChecked())
-              {
-                  label.append(variableData.cgsUnits);
-                  conversionValueString.setNum(variableData.cgsConversion);
-              }
-              this->UI->ConversionVar1_label2->setText(label);
+        QTableWidgetItem* item=this->UI->ConversionTree->item(w,0);
+        item->setFlags(Qt::ItemIsEnabled);
 
-              this->UI->ConversionVar1->setText(conversionValueString);
-          }  
+        if(this->UI->CustomCheckbox->isChecked())
+        {
+          item = this->UI->ConversionTree->item(w,1);
+          item->setText("");
+          item->setData(Qt::UserRole,"");
+
+
+          item = this->UI->ConversionTree->item(w,2);
+          item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsEditable);
+        }
+        else if(this->UI->SICheckbox->isChecked())
+        {
+
+          item=this->UI->ConversionTree->item(w,1);
+          QString lab=variableData.Name;
+          lab.append(" - ");
+          conversionUnits.append(variableData.SIUnits);
+          lab.append(conversionUnits);
+          item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsEditable);
+          item->setText(lab);
+          item->setData(Qt::UserRole,variableData.Name);
+
+
+          conversionValueString.setNum(variableData.SIConversion);
+          item= this->UI->ConversionTree->item(w,2);
+          item->setText(conversionValueString);
+          item->setFlags(Qt::ItemIsEnabled);
+        }
+        else if(this->UI->cgsCheckbox->isChecked())
+        {
+
+
+          item=this->UI->ConversionTree->item(w,1);
+          QString lab=variableData.Name;
+          lab.append(" - ");
+          conversionUnits.append(variableData.cgsUnits);
+          lab.append(conversionUnits);
+          item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsEditable);
+          item->setText(lab);
+          item->setData(Qt::UserRole,variableData.Name);
+
+
+          conversionValueString.setNum(variableData.cgsConversion);
+          item= this->UI->ConversionTree->item(w,2);
+          item->setText(conversionValueString);
+          item->setFlags(Qt::ItemIsEnabled);
+        }
       }
-      else
-      {
-          QString conversionValueString="1.0";
-          label="Density ";
-          this->UI->ConversionVar1_label->setText(label);
-
-          label="Not Found.";
-          this->UI->ConversionVar1_label2->setText(label);
-
-          this->UI->ConversionVar1->setText(conversionValueString);
-      }
-
-      vIter=tableData.VariableConversions.find(QString("Temperature"));
-      if(vIter!=tableData.VariableConversions.end())
-      {
-          QString conversionValueString="1.0";
-          SESAMEConversionVariable variableData=*vIter;
-          label="Temperature ";
-          this->UI->ConversionVar2_label->setText(label);
-          label="";
-          if(this->UI->CustomCheckbox->isChecked())
-          {
-              this->UI->ConversionVar2_label2->setText(label);
-              this->UI->ConversionVar2->setEnabled(true);
-
-          }
-          else
-          {
-              this->UI->ConversionVar2->setEnabled(false);
-              label.append(variableData.SESAMEUnits);
-              label.append(" to ");
-              if(this->UI->SICheckbox->isChecked())
-              {
-                  label.append(variableData.SIUnits);
-                  conversionValueString.setNum(variableData.SIConversion);
-              }
-              else if(this->UI->cgsCheckbox->isChecked())
-              {
-                  label.append(variableData.cgsUnits);
-                  conversionValueString.setNum(variableData.cgsConversion);
-              }
-              this->UI->ConversionVar2_label2->setText(label);
-
-              this->UI->ConversionVar2->setText(conversionValueString);
-          }  
-      }
-      else
-      {
-          label="Temperature ";
-          QString conversionValueString="1.0";
-          this->UI->ConversionVar2_label->setText(label);
-          label="Not Found.";
-          this->UI->ConversionVar2_label2->setText(label);
-
-          this->UI->ConversionVar2->setText(conversionValueString);
-      }
-
-      vIter=tableData.VariableConversions.find(QString("Pressure"));
-      if(vIter!=tableData.VariableConversions.end())
-      {
-          QString conversionValueString="1.0";
-          SESAMEConversionVariable variableData=*vIter;
-          label="Pressure ";
-          this->UI->ConversionVar3_label->setText(label);
-          label="";
-          if(this->UI->CustomCheckbox->isChecked())
-          {
-              this->UI->ConversionVar3_label2->setText(label);
-              this->UI->ConversionVar3->setEnabled(true);
-
-          }
-          else
-          {
-              this->UI->ConversionVar3->setEnabled(false);
-             label.append(variableData.SESAMEUnits);
-              label.append(" to ");
-              if(this->UI->SICheckbox->isChecked())
-              {
-                  label.append(variableData.SIUnits);
-                  conversionValueString.setNum(variableData.SIConversion);
-              }
-              else if(this->UI->cgsCheckbox->isChecked())
-              {
-                  label.append(variableData.cgsUnits);
-                  conversionValueString.setNum(variableData.cgsConversion);
-              }
-              this->UI->ConversionVar3_label2->setText(label);
-
-              this->UI->ConversionVar3->setText(conversionValueString);
-          }  
-      }
-      else
-      {
-          QString conversionValueString="1.0";
-          label="Pressure ";
-          this->UI->ConversionVar3_label->setText(label);
-          label="Not Found.";
-          this->UI->ConversionVar3_label2->setText(label);
-
-          this->UI->ConversionVar3->setText(conversionValueString);
-      }
-
-      vIter=tableData.VariableConversions.find(QString("Energy"));
-      if(vIter!=tableData.VariableConversions.end())
-      {
-          QString conversionValueString="1.0";
-          SESAMEConversionVariable variableData=*vIter;
-          label="Energy ";
-          this->UI->ConversionVar4_label->setText(label);
-          label="";
-
-          if(this->UI->CustomCheckbox->isChecked())
-          {
-              this->UI->ConversionVar4_label2->setText(label);
-              this->UI->ConversionVar4->setEnabled(true);
-
-          }
-          else
-          {
-              this->UI->ConversionVar4->setEnabled(false);
-              label.append(variableData.SESAMEUnits);
-              label.append(" to ");
-              if(this->UI->SICheckbox->isChecked())
-              {
-                  label.append(variableData.SIUnits);
-                  conversionValueString.setNum(variableData.SIConversion);
-              }
-              else if(this->UI->cgsCheckbox->isChecked())
-              {
-                  label.append(variableData.cgsUnits);
-                  conversionValueString.setNum(variableData.cgsConversion);
-              }
-              this->UI->ConversionVar4_label2->setText(label);
-
-              this->UI->ConversionVar4->setText(conversionValueString);
-          }  
-      }
-      else
-      {
-          QString conversionValueString="1.0";
-          label="Energy ";
-          this->UI->ConversionVar4_label->setText(label);
-          label="Not Found.";
-          this->UI->ConversionVar4_label2->setText(label);
-          this->UI->ConversionVar4->setText(conversionValueString);
-      }
+      w++;
+    }
+    this->UI->ConversionTree->resizeColumnToContents(1);
   }
   else
   {
-      QString tableIdLable="Table ";
-      tableIdLable.append(this->UI->TableIdWidget->currentText());
-      tableIdLable.append(" Could not be found.");
-      this->UI->ConversionTableId->setText(tableIdLable);
-      this->UI->SICheckbox->setEnabled(false);
-      this->UI->cgsCheckbox->setEnabled(false);
+    this->UI->WasCustom=TRUE;
+    QString tableIdLable="Table ";
+    tableIdLable.append(this->UI->TableIdWidget->currentText());
+    tableIdLable.append(" Could not be found.");
+    this->UI->ConversionTableId->setText(tableIdLable);
+    this->UI->SICheckbox->setEnabled(false);
+    this->UI->cgsCheckbox->setEnabled(false);
 
+   //add each xdmf-domain name to the widget and to the paraview-Domain
+    this->UI->ConversionTree->setRowCount(names.count());
+    this->UI->ConversionTree->setColumnCount(4);
+    int w=0;
+    foreach(QVariant v, names)
+    {
+     // this->UI->ConversionTree->setColumnHidden(1,true);
 
-      QString label="Density ";
-      this->UI->ConversionVar1_label->setText(label);
-      this->UI->ConversionVar1_label2->clear();
+      QTableWidgetItem* item=this->UI->ConversionTree->item(w,0);
+      item->setFlags(Qt::ItemIsEnabled);
 
-      label="Temperature ";
-      this->UI->ConversionVar2_label->setText(label);
-      this->UI->ConversionVar2_label2->clear();
+      QString conversionValueString="1.0";
 
-      label="Pressure ";
-      this->UI->ConversionVar3_label->setText(label);
-      this->UI->ConversionVar3_label2->clear();
+      item=this->UI->ConversionTree->item(w,1);
+      item->setFlags(Qt::ItemIsEnabled);
+      item->setText("");
 
-      label="Energy ";
-      this->UI->ConversionVar4_label->setText(label);
-      this->UI->ConversionVar4_label2->clear();
-
-      this->UI->ConversionVar1->setEnabled(true);
-      this->UI->ConversionVar2->setEnabled(true);
-      this->UI->ConversionVar3->setEnabled(true);
-      this->UI->ConversionVar4->setEnabled(true);
-
-
-
-      if(!this->UI->CustomCheckbox->isChecked())
-      {
-          this->UI->CustomCheckbox->setChecked(true);
-          QString conversionValueString="1.0";
-          this->UI->ConversionVar1->setText(conversionValueString);
-
-          this->UI->ConversionVar2->setText(conversionValueString);
-
-          this->UI->ConversionVar3->setText(conversionValueString);
-
-          this->UI->ConversionVar4->setText(conversionValueString);
-      }
+      item=this->UI->ConversionTree->item(w,2);
+      item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsEditable);
+    }
   }
+
+
 
   this->UI->SICheckbox->blockSignals(false);
   this->UI->cgsCheckbox->blockSignals(false);
   this->UI->CustomCheckbox->blockSignals(false);
-  this->UI->ConversionVar1->blockSignals(false);
-  this->UI->ConversionVar2->blockSignals(false);
-  this->UI->ConversionVar3->blockSignals(false);
-  this->UI->ConversionVar4->blockSignals(false);
+  this->UI->ConversionTree->blockSignals(false);
 
 
 }
@@ -1293,6 +1382,41 @@ void PrismSurfacePanel::setupTableWidget()
         pqSMAdaptor::setElementProperty(
             this->UI->PanelHelper->GetProperty("TableId"),
             tableWidget->currentText());
+        int tID=tableWidget->currentText().toInt();
+        if(tID==502 ||
+          tID==503 ||
+          tID==504 ||
+          tID==505 ||
+          tID==601 ||
+          tID==602 ||
+          tID==603 ||
+          tID==604 ||
+          tID==605)
+          {
+          this->UI->XLogScaling->blockSignals(true);
+          this->UI->YLogScaling->blockSignals(true);
+          this->UI->ZLogScaling->blockSignals(true);
+
+          this->UI->XLogScaling->setChecked(true);
+          this->UI->YLogScaling->setChecked(true);
+          this->UI->ZLogScaling->setChecked(true);
+
+          this->UI->XLogScaling->blockSignals(false);
+          this->UI->YLogScaling->blockSignals(false);
+          this->UI->ZLogScaling->blockSignals(false);
+
+          pqSMAdaptor::setElementProperty(
+            this->UI->PanelHelper->GetProperty("XLogScaling"), true);
+          pqSMAdaptor::setElementProperty(
+            this->UI->PanelHelper->GetProperty("YLogScaling"), true);
+          pqSMAdaptor::setElementProperty(
+            this->UI->PanelHelper->GetProperty("ZLogScaling"), true);
+
+          }
+
+
+
+
         this->UI->PanelHelper->UpdateVTKObjects();
         this->UI->PanelHelper->UpdatePropertyInformation();
     }
@@ -1911,6 +2035,42 @@ void PrismSurfacePanel::setTableId(QString newId)
     //get access to the property that lets us pick the domain
     pqSMAdaptor::setElementProperty(
         this->UI->PanelHelper->GetProperty("TableId"), newId);
+
+        int tID=newId.toInt();
+        if(tID==502 ||
+          tID==503 ||
+          tID==504 ||
+          tID==505 ||
+          tID==601 ||
+          tID==602 ||
+          tID==603 ||
+          tID==604 ||
+          tID==605)
+          {
+          this->UI->XLogScaling->blockSignals(true);
+          this->UI->YLogScaling->blockSignals(true);
+          this->UI->ZLogScaling->blockSignals(true);
+
+          this->UI->XLogScaling->setChecked(true);
+          this->UI->YLogScaling->setChecked(true);
+          this->UI->ZLogScaling->setChecked(true);
+
+          this->UI->XLogScaling->blockSignals(false);
+          this->UI->YLogScaling->blockSignals(false);
+          this->UI->ZLogScaling->blockSignals(false);
+
+          pqSMAdaptor::setElementProperty(
+            this->UI->PanelHelper->GetProperty("XLogScaling"), true);
+          pqSMAdaptor::setElementProperty(
+            this->UI->PanelHelper->GetProperty("YLogScaling"), true);
+          pqSMAdaptor::setElementProperty(
+            this->UI->PanelHelper->GetProperty("ZLogScaling"), true);
+
+          }
+
+
+
+
     this->UI->PanelHelper->UpdateVTKObjects();
     this->UI->PanelHelper->UpdatePropertyInformation();
 

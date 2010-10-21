@@ -7,8 +7,8 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
-   
+   under the terms of the ParaView license version 1.2.
+
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
    Kitware Inc.
@@ -45,11 +45,19 @@ public:
   pqSaveStateReaction(QAction* parent);
   ~pqSaveStateReaction() {}
 
+  /// Open File dialog in order to choose the location and the type of
+  /// the state file that should be saved
+  static void saveState();
+
   /// Saves the state file.
   /// Note that this method is static. Applications can simply use this without
   /// having to create a reaction instance.
   static void saveState(const QString& filename);
-  static void saveState();
+
+  /// Saves the state file as a python state.
+  /// Note that this method is static. Applications can simply use this without
+  /// having to create a reaction instance.
+  static void savePythonState(const QString& filename);
 
 public slots:
   /// Updates the enabled state. Applications need not explicitly call

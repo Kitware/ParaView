@@ -19,6 +19,9 @@
   <pqevent object="pqClientMainWindow/variableToolbar/displayColor/Variables" command="set_string" arguments="Pressure" />
   <pqevent object="pqClientMainWindow/PrismToolBarActions0/QAction0" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Data/SESAME301" />
+  <pqevent object="pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/tabWidget/qt_tabwidget_stackedwidget/widget/groupBox/XAxisVarName" command="set_string" arguments="Density" />
+  <pqevent object="pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/tabWidget/qt_tabwidget_stackedwidget/widget/groupBox_2/YAxisVarName" command="set_string" arguments="Temperature" />
+  <pqevent object="pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/tabWidget/qt_tabwidget_stackedwidget/widget/WarpSESAMESurface/ZAxisVarName" command="set_string" arguments="Total EOS (Pressure)" />
   <pqevent object="pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/tabWidget/qt_tabwidget_tabbar" command="set_tab" arguments="1" />
   <pqevent object="pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/tabWidget/qt_tabwidget_stackedwidget/tab_2/AssociateYAxis" command="set_string" arguments="Temperature" />
   <pqevent object="pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/tabWidget/qt_tabwidget_stackedwidget/tab_2/AssociateZAxis" command="set_string" arguments="Pressure" />

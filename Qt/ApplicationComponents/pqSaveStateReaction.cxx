@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -30,14 +30,20 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
 #include "pqSaveStateReaction.h"
+#include "vtkPVConfig.h"
 
 #include "pqActiveObjects.h"
 #include "pqApplicationCore.h"
+#include "pqPVApplicationCore.h"
 #include "pqCoreUtilities.h"
 #include "pqFileDialog.h"
 #include "pqServer.h"
 #include "pqServerResource.h"
 #include "pqServerResources.h"
+
+#ifdef PARAVIEW_ENABLE_PYTHON
+#include "pqPythonManager.h"
+#endif
 
 //-----------------------------------------------------------------------------
 pqSaveStateReaction::pqSaveStateReaction(QAction* parentObject)
@@ -61,16 +67,29 @@ void pqSaveStateReaction::updateEnableState()
 //-----------------------------------------------------------------------------
 void pqSaveStateReaction::saveState()
 {
+#ifdef PARAVIEW_ENABLE_PYTHON
+  QString fileExt = tr("ParaView state file (*.pvsm);;Python state file (*.py);;All files (*)");
+#else
+  QString fileExt = tr("ParaView state file (*.pvsm);;All files (*)");
+#endif
   pqFileDialog fileDialog(NULL,
-    pqCoreUtilities::mainWidget(),
-    tr("Save State File"), QString(),
-    tr("ParaView state file (*.pvsm);;All files (*)"));
+                          pqCoreUtilities::mainWidget(),
+                          tr("Save State File"), QString(), fileExt);
+
   fileDialog.setObjectName("FileSaveServerStateDialog");
   fileDialog.setFileMode(pqFileDialog::AnyFile);
+
   if (fileDialog.exec() == QDialog::Accepted)
     {
     QString selectedFile = fileDialog.getSelectedFiles()[0];
-    pqSaveStateReaction::saveState(selectedFile);
+    if(selectedFile.endsWith(".py"))
+      {
+      pqSaveStateReaction::savePythonState(selectedFile);
+      }
+    else
+      {
+      pqSaveStateReaction::saveState(selectedFile);
+      }
     }
 }
 
@@ -88,4 +107,16 @@ void pqSaveStateReaction::saveState(const QString& filename)
   pqApplicationCore::instance()->serverResources().save(
     *pqApplicationCore::instance()->settings());
 }
-
+//-----------------------------------------------------------------------------
+void pqSaveStateReaction::savePythonState(const QString& filename)
+{
+#ifdef PARAVIEW_ENABLE_PYTHON
+  pqPythonManager *pythonManager = pqPVApplicationCore::instance()->pythonManager();
+  if(!pythonManager)
+    {
+    qCritical("No application wide python manager.");
+    return;
+    }
+  pythonManager->saveTraceState(filename);
+#endif
+}

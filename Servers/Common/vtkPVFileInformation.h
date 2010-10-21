@@ -28,6 +28,7 @@
 
 class vtkCollection;
 class vtkPVFileInformationSet;
+class vtkFileSequenceParser;
 
 class VTK_EXPORT vtkPVFileInformation : public vtkPVInformation
 {
@@ -104,6 +105,7 @@ protected:
   ~vtkPVFileInformation();
 
   vtkCollection* Contents;
+  vtkFileSequenceParser * SequenceParser;
 
   char* Name;     // Name of this file/directory.
   char* FullPath; // Full path for this file/directory.
@@ -112,7 +114,6 @@ protected:
 
   vtkSetStringMacro(Name);
   vtkSetStringMacro(FullPath);
-
 
   void GetWindowsDirectoryListing();
   void GetDirectoryListing();
@@ -133,6 +134,4 @@ private:
 //ETX
 };
 
-
 #endif
-

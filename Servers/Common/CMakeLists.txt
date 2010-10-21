@@ -43,12 +43,14 @@ SET(Kit_SRCS
   vtkCellIntegrator.cxx
   vtkClientConnection.cxx
   vtkConnectionIterator.cxx
+  vtkFileSequenceParser.cxx
   vtkMPISelfConnection.cxx
   vtkMultiProcessControllerHelper.cxx
   vtkPriorityHelper.cxx
   vtkProcessModuleConnection.cxx
   vtkProcessModuleConnectionManager.cxx
   vtkProcessModule.cxx
+  vtkProcessModuleAutoMPI.cxx
   vtkProcessModuleGUIHelper.cxx
   vtkPVAlgorithmPortsInformation.cxx
   vtkPVArrayInformation.cxx
@@ -85,7 +87,6 @@ SET(Kit_SRCS
   vtkPVTestUtilities.cxx
   vtkPVTimerInformation.cxx
   vtkRemoteConnection.cxx
-  vtkSelectionConverter.cxx
   vtkSelectionSerializer.cxx
   vtkSelfConnection.cxx
   vtkServerConnection.cxx
@@ -144,11 +145,13 @@ SET_SOURCE_FILES_PROPERTIES(
 
   vtkCommandOptionsXMLParser.cxx
   vtkConnectionIterator.cxx
-  vtkPVCreateProcessModule
+  vtkProcessModuleAutoMPI.cxx
+  # vtkStringList.cxx
   vtkPVOptionsXMLParser.cxx
   vtkPVPlugin.cxx
   vtkPVServerOptions.cxx
   vtkPVServerSocket.cxx
+  vtkPVCreateProcessModule
   vtkPVTestUtilities.cxx
   vtkPVServerManagerPluginInterface.cxx
   vtkPVPythonPluginInterface.cxx

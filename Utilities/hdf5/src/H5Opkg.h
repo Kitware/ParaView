@@ -374,7 +374,7 @@ typedef struct H5O_chk_cache_ud_t {
     hbool_t decoding;                   /* Whether the object header is being decoded */
     H5O_t *oh;                          /* Object header for this chunk */
     unsigned chunkno;                   /* Index of chunk being brought in (for re-loads) */
-    size_t size;                        /* Size of chunk in the file */
+    size_t chunk_size;			/* Chunk size */
     H5O_common_cache_ud_t common;       /* Common object header cache callback info */
 } H5O_chk_cache_ud_t;
 
@@ -553,9 +553,8 @@ H5_DLL herr_t H5O_chunk_add(H5F_t *f, hid_t dxpl_id, H5O_t *oh, unsigned idx);
 H5_DLL H5O_chunk_proxy_t *H5O_chunk_protect(H5F_t *f, hid_t dxpl_id, H5O_t *oh,
     unsigned idx);
 H5_DLL herr_t H5O_chunk_unprotect(H5F_t *f, hid_t dxpl_id,
-    H5O_chunk_proxy_t *chk_proxy, hbool_t chk_dirtied);
+    H5O_chunk_proxy_t *chk_proxy, unsigned chk_flags);
 H5_DLL herr_t H5O_chunk_update_idx(H5F_t *f, hid_t dxpl_id, H5O_t *oh, unsigned idx);
-H5_DLL herr_t H5O_chunk_resize(H5O_t *oh, H5O_chunk_proxy_t *chk_proxy);
 H5_DLL herr_t H5O_chunk_delete(H5F_t *f, hid_t dxpl_id, H5O_t *oh, unsigned idx);
 
 /* Collect storage info for btree and heap */

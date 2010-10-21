@@ -15,14 +15,16 @@
 #include "vtkSMSimpleParallelStrategy.h"
 
 #include "vtkClientServerStream.h"
+#include "vtkDataObjectTypes.h"
 #include "vtkInformation.h"
 #include "vtkMPIMoveData.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMIceTMultiDisplayRenderViewProxy.h"
-#include "vtkSMSourceProxy.h"
+#include "vtkSMOutputPort.h"
 #include "vtkSMPropertyHelper.h"
+#include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMSimpleParallelStrategy);
 //----------------------------------------------------------------------------
@@ -118,6 +120,12 @@ void vtkSMSimpleParallelStrategy::CreatePipelineInternal(
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   vtkClientServerStream stream;
 
+  input->CreateOutputPorts();
+  const char* data_class_name =
+    input->GetOutputPort(outputport)->GetDataClassName();
+  int data_type_id =
+    vtkDataObjectTypes::GetTypeIdFromClassName(data_class_name);
+
   this->Connect(input, collect, "Input", outputport);
   this->Connect(collect, updatesuppressor);
 
@@ -130,6 +138,11 @@ void vtkSMSimpleParallelStrategy::CreatePipelineInternal(
           << "SetMPIMToNSocketConnection"
           << pm->GetMPIMToNSocketConnectionID(this->ConnectionID)
           << vtkClientServerStream::End;
+  stream << vtkClientServerStream::Invoke
+         << collect->GetID()
+         << "SetOutputDataType"
+         << data_type_id
+         << vtkClientServerStream::End;
   pm->SendStream(this->ConnectionID,
     vtkProcessModule::RENDER_SERVER|vtkProcessModule::DATA_SERVER, stream);
 
@@ -149,6 +162,11 @@ void vtkSMSimpleParallelStrategy::CreatePipelineInternal(
           << collect->GetID()
           << "SetServerToClient"
           << vtkClientServerStream::End;
+  stream << vtkClientServerStream::Invoke
+         << collect->GetID()
+         << "SetOutputDataType"
+         << data_type_id
+         << vtkClientServerStream::End;
   pm->SendStream(this->ConnectionID, vtkProcessModule::CLIENT, stream);
 }
 

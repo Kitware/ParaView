@@ -77,23 +77,60 @@ MACRO(build_paraview_client_cpack_config_init)
       SET(CPACK_SYSTEM_NAME Darwin-${CMAKE_OSX_ARCHITECTURES})
     ENDIF(_length GREATER 1)
   ENDIF(${CPACK_SYSTEM_NAME} MATCHES Darwin AND CMAKE_OSX_ARCHITECTURES)
-  
+
   SET (CPACK_INSTALL_CMAKE_PROJECTS 
     "${ParaView_BINARY_DIR}" "ParaView Runtime Libs" "Runtime" "/"
+    "${ParaView_BINARY_DIR}" "HDF5 Core Library" "libraries" "/"
   )
+
+  IF(HDF5_BUILD_CPP_LIB)
+    LIST(APPEND CPACK_INSTALL_CMAKE_PROJECTS
+      "${ParaView_BINARY_DIR}" "HDF5 C++ Library" "cpplibraries" "/"
+    )
+  ENDIF(HDF5_BUILD_CPP_LIB)
+
+  IF(HDF5_BUILD_HL_LIB)
+    LIST(APPEND CPACK_INSTALL_CMAKE_PROJECTS
+      "${ParaView_BINARY_DIR}" "HDF5 HL Library" "hllibraries" "/"
+    )
+    IF(HDF5_BUILD_CPP_LIB)
+      LIST(APPEND CPACK_INSTALL_CMAKE_PROJECTS
+        "${ParaView_BINARY_DIR}" "HDF5 HL C++ Library" "hlcpplibraries" "/"
+      )
+    ENDIF(HDF5_BUILD_CPP_LIB)
+  ENDIF(HDF5_BUILD_HL_LIB)
 
   # Append in CPACK rule for the Development Component
   IF(NOT PV_INSTALL_NO_DEVELOPMENT)
     LIST(APPEND CPACK_INSTALL_CMAKE_PROJECTS
       "${ParaView_BINARY_DIR}" "ParaView Development Headers, Libs and Tools" "Development" "/"
+      "${ParaView_BINARY_DIR}" "HDF5 Core Headers" "headers" "/"
     )
+
+    IF(HDF5_BUILD_CPP_LIB)
+      LIST(APPEND CPACK_INSTALL_CMAKE_PROJECTS
+        "${ParaView_BINARY_DIR}" "HDF5 C++ Library" "cppheaders" "/"
+      )
+    ENDIF(HDF5_BUILD_CPP_LIB)
+
+    IF(HDF5_BUILD_HL_LIB)
+      LIST(APPEND CPACK_INSTALL_CMAKE_PROJECTS
+        "${ParaView_BINARY_DIR}" "HDF5 HL Library" "hllheaders" "/"
+      )
+
+      IF(HDF5_BUILD_CPP_LIB)
+        LIST(APPEND CPACK_INSTALL_CMAKE_PROJECTS
+          "${ParaView_BINARY_DIR}" "HDF5 HL C++ Library" "hlcppheaders" "/"
+        )
+      ENDIF(HDF5_BUILD_CPP_LIB)
+    ENDIF(HDF5_BUILD_HL_LIB)
   ENDIF(NOT PV_INSTALL_NO_DEVELOPMENT)
 
   LIST(APPEND CPACK_INSTALL_CMAKE_PROJECTS
     "${ParaView_BINARY_DIR}" "VTK Runtime Libs" "RuntimeLibraries" "/"
     "${CMAKE_CURRENT_BINARY_DIR}" "${BCC_PACKAGE_NAME} Components" "BrandedRuntime" "/"
   )
-  
+
   # Override this variable to choose a different component for mac drag-n-drop
   # generator.
   SET (CPACK_INSTALL_CMAKE_PROJECTS_DRAGNDROP
@@ -116,27 +153,31 @@ ENDMACRO(build_paraview_client_cpack_config)
 FUNCTION(install_qt_libs qtliblist componentname)
   IF (NOT APPLE)
     FOREACH(qtlib ${qtliblist})
-      IF (NOT WIN32)
-        IF (QT_${qtlib}_LIBRARY_RELEASE)
+      IF (QT_${qtlib}_LIBRARY_RELEASE)
+        IF (NOT WIN32)
+          #GET_FILENAME_COMPONENT(QT_LIB_DIR_tmp ${QT_${qtlib}_LIBRARY_RELEASE} PATH)
+          #GET_FILENAME_COMPONENT(QT_LIB_NAME_tmp ${QT_${qtlib}_LIBRARY_RELEASE} NAME)
+          #FILE(GLOB QT_LIB_LIST RELATIVE "${QT_LIB_DIR_tmp}" "${QT_${qtlib}_LIBRARY_RELEASE}*")
+          #IF(NOT ${QT_LIB_NAME_tmp} MATCHES "\\.debug$")
+          #  INSTALL(CODE "
+          #    MESSAGE(STATUS \"!!!!Installing \${CMAKE_INSTALL_PREFIX}/${PV_INSTALL_LIB_DIR}/${QT_LIB_NAME_tmp}\")
+          #    EXECUTE_PROCESS (WORKING_DIRECTORY ${QT_LIB_DIR_tmp}
+          #         COMMAND tar c ${QT_LIB_LIST}
+          #         COMMAND tar -xC \${CMAKE_INSTALL_PREFIX}/${PV_INSTALL_LIB_DIR})
+          #         " COMPONENT ${componentname})
+          # ENDIF(NOT ${QT_LIB_NAME_tmp} MATCHES "\\.debug$")
+          # Install .so and versioned .so.x.y
           GET_FILENAME_COMPONENT(QT_LIB_DIR_tmp ${QT_${qtlib}_LIBRARY_RELEASE} PATH)
           GET_FILENAME_COMPONENT(QT_LIB_NAME_tmp ${QT_${qtlib}_LIBRARY_RELEASE} NAME)
-          FILE(GLOB QT_LIB_LIST RELATIVE "${QT_LIB_DIR_tmp}" "${QT_${qtlib}_LIBRARY_RELEASE}*")
-          IF(NOT ${QT_LIB_DIR_tmp} MATCHES "\\.debug$")
-            INSTALL(CODE "
-              MESSAGE(STATUS \"Installing \${CMAKE_INSTALL_PREFIX}/${PV_INSTALL_LIB_DIR}/${QT_LIB_NAME_tmp}\")
-              EXECUTE_PROCESS (WORKING_DIRECTORY ${QT_LIB_DIR_tmp}
-                   COMMAND tar c ${QT_LIB_LIST}
-                   COMMAND tar -xC \${CMAKE_INSTALL_PREFIX}/${PV_INSTALL_LIB_DIR})
-                   " COMPONENT ${componentname})
-           ENDIF(NOT ${QT_LIB_DIR_tmp} MATCHES "\\.debug$")
-        ENDIF (QT_${qtlib}_LIBRARY_RELEASE)
-      ELSE (NOT WIN32)
-        GET_FILENAME_COMPONENT(QT_DLL_PATH_tmp ${QT_QMAKE_EXECUTABLE} PATH)
-        #GET_FILENAME_COMPONENT(QT_DLL_tmp "${QT_${qtlib}_LIBRARY_RELEASE" NAME_WE)
-        INSTALL(FILES ${QT_DLL_PATH_tmp}/${qtlib}4.dll 
-                DESTINATION ${PV_INSTALL_BIN_DIR} 
-                COMPONENT ${componentname})
-      ENDIF (NOT WIN32)
+          INSTALL(DIRECTORY ${QT_LIB_DIR_tmp}/ DESTINATION ${PV_INSTALL_LIB_DIR} COMPONENT Runtime
+                FILES_MATCHING PATTERN "${QT_LIB_NAME_tmp}*"
+                PATTERN "${QT_LIB_NAME_tmp}*.debug" EXCLUDE)
+        ELSE (NOT WIN32)
+          GET_FILENAME_COMPONENT(QT_DLL_PATH_tmp ${QT_QMAKE_EXECUTABLE} PATH)
+          GET_FILENAME_COMPONENT(QT_LIB_NAME_tmp ${QT_${qtlib}_LIBRARY_RELEASE} NAME_WE)
+          INSTALL(FILES ${QT_DLL_PATH_tmp}/${QT_LIB_NAME_tmp}.dll DESTINATION ${PV_INSTALL_BIN_DIR} COMPONENT Runtime)
+        ENDIF (NOT WIN32)
+      ENDIF (QT_${qtlib}_LIBRARY_RELEASE)
     ENDFOREACH(qtlib)
   ENDIF (NOT APPLE)
 ENDFUNCTION(install_qt_libs)

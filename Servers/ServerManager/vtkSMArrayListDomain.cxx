@@ -151,8 +151,7 @@ void vtkSMArrayListDomain::AddArrays(vtkSMSourceProxy* sp,
         {
         if(this->CheckInformationKeys(arrayInfo))
         {
-          unsigned int newidx = this->AddString(arrayInfo->GetName());
-          this->ALDInternals->FieldAssociation[newidx] = association;
+          unsigned int newidx = this->AddArray(arrayInfo, association, iad);
           if (arrayInfo == attrInfo)
             {
             attrIdx = newidx;
@@ -165,9 +164,8 @@ void vtkSMArrayListDomain::AddArrays(vtkSMSourceProxy* sp,
         if (!thisDataType || (arrayInfo->GetDataType() == thisDataType))
           {
           if(this->CheckInformationKeys(arrayInfo))
-          {
-            unsigned int newidx = this->AddString(arrayInfo->GetName());
-            this->ALDInternals->FieldAssociation[newidx] = association;
+            {
+            unsigned int newidx = this->AddArray(arrayInfo, association, iad);
             if (arrayInfo == attrInfo)
               {
               attrIdx = newidx;
@@ -181,6 +179,39 @@ void vtkSMArrayListDomain::AddArrays(vtkSMSourceProxy* sp,
     {
     this->SetDefaultElement(attrIdx);
     this->Association = association;
+    }
+}
+
+//---------------------------------------------------------------------------
+unsigned int vtkSMArrayListDomain::AddArray(
+  vtkPVArrayInformation* arrayInfo, int association, vtkSMInputArrayDomain* iad)
+{
+  if (iad->GetAutomaticPropertyConversion() &&
+    iad->GetNumberOfComponents() == 1 &&
+    arrayInfo->GetNumberOfComponents() > 1)
+    {
+    // add magnitude only for numeric arrays.
+    unsigned int first_index = -1;
+    if (arrayInfo->GetDataType() != VTK_STRING)
+      {
+      vtkStdString name = this->CreateMangledName(arrayInfo,
+        arrayInfo->GetNumberOfComponents());
+      first_index = this->AddString(name.c_str());
+      this->ALDInternals->FieldAssociation[first_index] = association;
+      }
+    for (int cc=0; cc < arrayInfo->GetNumberOfComponents(); cc++)
+      {
+      vtkStdString name = this->CreateMangledName(arrayInfo,cc);
+      unsigned int newidx = this->AddString(name.c_str());
+      this->ALDInternals->FieldAssociation[newidx] = association;
+      }
+    return first_index;
+    }
+  else
+    {
+    unsigned int newidx = this->AddString(arrayInfo->GetName());
+    this->ALDInternals->FieldAssociation[newidx] = association;
+    return  newidx;
     }
 }
 
@@ -721,4 +752,61 @@ void vtkSMArrayListDomain::PrintSelf(ostream& os, vtkIndent indent)
       }
     os << endl;
     }
+}
+
+
+//---------------------------------------------------------------------------
+vtkStdString vtkSMArrayListDomain::CreateMangledName(
+  vtkPVArrayInformation *arrayInfo, int component)
+{
+  vtksys_ios::ostringstream stream;
+  if ( component != arrayInfo->GetNumberOfComponents() )
+    {
+    stream << arrayInfo->GetName() << "_" <<
+      arrayInfo->GetComponentName(component);
+    }
+  else
+    {
+    stream << arrayInfo->GetName() << "_Magnitude";
+    }
+  return stream.str();
+}
+
+//---------------------------------------------------------------------------
+vtkStdString vtkSMArrayListDomain::ArrayNameFromMangledName(
+  const char* name)
+{
+  vtkStdString extractedName = name;
+  size_t pos = extractedName.rfind("_");
+  if (pos == vtkStdString::npos)
+    {
+    return vtkStdString("");
+    }
+  return extractedName.substr(0,pos);
+}
+
+//---------------------------------------------------------------------------
+int vtkSMArrayListDomain::ComponentIndexFromMangledName(
+  vtkPVArrayInformation *info, const char* name)
+{
+  vtkStdString extractedName = name;
+  size_t pos = extractedName.rfind("_");
+  if (pos == vtkStdString::npos)
+    {
+    return -1;
+    }
+  vtkStdString compName = extractedName.substr(pos+1,extractedName.length()-pos);
+  int numComps = info->GetNumberOfComponents();
+  if ( compName == "Magnitude" )
+    {
+    return numComps;
+    }
+  for ( int i=0; i < numComps; ++i)
+    {
+    if ( compName == info->GetComponentName(i) )
+      {
+      return i;
+      }
+    }
+  return -1;
 }

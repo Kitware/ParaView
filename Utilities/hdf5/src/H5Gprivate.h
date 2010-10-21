@@ -196,8 +196,8 @@ H5_DLL herr_t H5G_name_replace(const struct H5O_link_t *lnk, H5G_names_op_t op,
 H5_DLL herr_t H5G_name_reset(H5G_name_t *name);
 H5_DLL herr_t H5G_name_copy(H5G_name_t *dst, const H5G_name_t *src, H5_copy_depth_t depth);
 H5_DLL herr_t H5G_name_free(H5G_name_t *name);
-H5_DLL ssize_t H5G_get_name(const H5G_loc_t *loc, char *name/*out*/, size_t size,
-    hbool_t *cached, hid_t lapl_id, hid_t dxpl_id);
+H5_DLL ssize_t H5G_get_name(hid_t id, char *name/*out*/, size_t size,
+    hid_t lapl_id, hid_t dxpl_id);
 H5_DLL ssize_t H5G_get_name_by_addr(hid_t fid, hid_t lapl_id, hid_t dxpl_id,
     const struct H5O_loc_t *loc, char* name, size_t size);
 

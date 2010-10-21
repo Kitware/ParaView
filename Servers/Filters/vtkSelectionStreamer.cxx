@@ -25,8 +25,11 @@
 #include "vtkUnsignedIntArray.h"
 #include "vtkIdTypeArray.h"
 #include "vtkMultiProcessController.h"
+#include "vtkTable.h"
 
+//----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSelectionStreamer);
+vtkCxxSetObjectMacro(vtkSelectionStreamer, Controller, vtkMultiProcessController);
 //----------------------------------------------------------------------------
 vtkSelectionStreamer::vtkSelectionStreamer()
 {
@@ -34,11 +37,14 @@ vtkSelectionStreamer::vtkSelectionStreamer()
   // port 1 -- vtkDataObject used to detemine what ids constitute a block.
   this->SetNumberOfInputPorts(2);
   this->FieldAssociation = vtkDataObject::FIELD_ASSOCIATION_CELLS;
+  this->Controller = 0;
+  this->SetController(vtkMultiProcessController::GetGlobalController());
 }
 
 //----------------------------------------------------------------------------
 vtkSelectionStreamer::~vtkSelectionStreamer()
 {
+  this->SetController(0);
 }
 
 //----------------------------------------------------------------------------
@@ -73,10 +79,29 @@ int vtkSelectionStreamer::RequestData(vtkInformation*,
   vtkDataObject* inputDO = vtkDataObject::GetData(inputVector[1], 0);
   vtkSelection* output = vtkSelection::GetData(outputVector, 0);
 
-  vtkstd::vector<vtkstd::pair<vtkIdType, vtkIdType> > indices;
-  if (!this->DetermineIndicesToPass(inputDO, indices))
+  vtkTable* inputBlockTable = vtkTable::SafeDownCast(inputDO);
+
+  if(this->GetController() && this->GetController()->GetNumberOfProcesses() > 1)
     {
-    return 0;
+    // CAUTION
+    // if the number of processes is bigger than the block size (1024) the
+    // broadcast will be a bottle neck. Instead just send the table to only
+    // a subset of processes
+
+    vtkIdType* tableSizes = new vtkIdType[this->GetController()->GetNumberOfProcesses()];
+    vtkIdType localSize = inputBlockTable->GetNumberOfRows();
+    this->GetController()->AllGather(&localSize, tableSizes, 1);
+    int pidSender = 0;
+    for(int i=0; i < this->GetController()->GetNumberOfProcesses(); i++)
+      {
+      if(tableSizes[i] > 0)
+        {
+        pidSender = i;
+        break;
+        }
+      }
+    this->GetController()->GetCommunicator()->Broadcast(inputBlockTable, pidSender);
+    delete[] tableSizes;
     }
 
   if (!inputDO->IsA("vtkCompositeDataSet"))
@@ -86,14 +111,13 @@ int vtkSelectionStreamer::RequestData(vtkInformation*,
       {
       vtkSmartPointer<vtkSelectionNode> outputNode =
         vtkSmartPointer<vtkSelectionNode>::New();
-      this->PassBlock(outputNode, inSel,
-        indices[0].first, indices[0].second);
+      this->PassBlock(outputNode, inSel, inputBlockTable);
       output->AddNode(outputNode);
       }
     return 1;
     }
 
-  int myId = this->Controller? this->Controller->GetLocalProcessId()  :0;
+  int myId = this->Controller ? this->Controller->GetLocalProcessId()  :0;
 
   vtkSmartPointer<vtkCompositeDataSet> input =
     vtkCompositeDataSet::SafeDownCast(inputDO);
@@ -105,43 +129,38 @@ int vtkSelectionStreamer::RequestData(vtkInformation*,
   for (iter->InitTraversal(); !iter->IsDoneWithTraversal();
     iter->GoToNextItem(), cc++)
     {
-    vtkIdType curOffset = indices[cc].first;
-    vtkIdType curCount = indices[cc].second;
-    if (curCount > 0)
+    vtkSelectionNode* curSel = this->LocateSelection(iter, inputSel);
+    if (!curSel)
       {
-      vtkSelectionNode* curSel = this->LocateSelection(iter, inputSel);
-      if (!curSel)
-        {
-        continue;
-        }
-      vtkSelectionNode* curOutputSel = vtkSelectionNode::New();
-      curOutputSel->GetProperties()->Copy(curSel->GetProperties());
-      curOutputSel->GetProperties()->Set(vtkSelectionNode::PROCESS_ID(), myId);
-      bool hit = false;
-      if (curSel->GetContentType() == vtkSelectionNode::BLOCKS)
-        {
-        // BLOCK selection, pass if the current block is selected.
-        if (curSel->GetSelectionList()->LookupValue(
-            vtkVariant(iter->GetCurrentFlatIndex())) != -1)
-          {
-          vtkUnsignedIntArray* selList = vtkUnsignedIntArray::New();
-          selList->SetNumberOfTuples(1);
-          selList->SetValue(0, iter->GetCurrentFlatIndex());
-          curOutputSel->SetSelectionList(selList);
-          selList->Delete();
-          hit = true;
-          }
-        }
-      else 
-        {
-        hit |= this->PassBlock(curOutputSel, curSel, curOffset, curCount);
-        }
-      if (hit)
-        {
-        output_nodes.push_back(curOutputSel);
-        }
-      curOutputSel->Delete();
+      continue;
       }
+    vtkSelectionNode* curOutputSel = vtkSelectionNode::New();
+    curOutputSel->GetProperties()->Copy(curSel->GetProperties());
+    curOutputSel->GetProperties()->Set(vtkSelectionNode::PROCESS_ID(), myId);
+    bool hit = false;
+    if (curSel->GetContentType() == vtkSelectionNode::BLOCKS)
+      {
+      // BLOCK selection, pass if the current block is selected.
+      if (curSel->GetSelectionList()->LookupValue(
+          vtkVariant(iter->GetCurrentFlatIndex())) != -1)
+        {
+        vtkUnsignedIntArray* selList = vtkUnsignedIntArray::New();
+        selList->SetNumberOfTuples(1);
+        selList->SetValue(0, iter->GetCurrentFlatIndex());
+        curOutputSel->SetSelectionList(selList);
+        selList->Delete();
+        hit = true;
+        }
+      }
+    else
+      {
+      hit |= this->PassBlock(curOutputSel, curSel, inputBlockTable);
+      }
+    if (hit)
+      {
+      output_nodes.push_back(curOutputSel);
+      }
+    curOutputSel->Delete();
     }
   iter->Delete();
 
@@ -269,22 +288,32 @@ bool vtkSelectionStreamer::LocateSelection(vtkSelectionNode* node)
 }
 
 //----------------------------------------------------------------------------
-bool vtkSelectionStreamer::PassBlock(vtkSelectionNode* output, vtkSelectionNode* input,
-  vtkIdType offset, vtkIdType count)
+bool vtkSelectionStreamer::PassBlock(vtkSelectionNode* output,
+                                     vtkSelectionNode* input,
+                                     vtkTable* currentBlockTable)
 {
+  if (!currentBlockTable)
+    return false;
+
   bool hit = false;
   output->GetProperties()->Copy(input->GetProperties());
   int myId = this->Controller? this->Controller->GetLocalProcessId()  :0;
   output->GetProperties()->Set(vtkSelectionNode::PROCESS_ID(), myId);
-  if (input->GetContentType() == vtkSelectionNode::INDICES)
+
+  vtkIdTypeArray* idsArray =
+      vtkIdTypeArray::SafeDownCast(
+          currentBlockTable->GetColumnByName("vtkOriginalIndices"));
+
+  if (input->GetContentType() == vtkSelectionNode::INDICES && idsArray)
     {
     vtkIdTypeArray* outIds = vtkIdTypeArray::New();
     outIds->SetNumberOfComponents(1);
     output->SetSelectionList(outIds);
     outIds->Delete();
-    for (vtkIdType cc=0; cc < count; cc++)
+
+    for(vtkIdType i=0;i<idsArray->GetNumberOfTuples();++i)
       {
-      vtkIdType curVal = offset + cc;
+      vtkIdType curVal = idsArray->GetValue(i);
       if (input->GetSelectionList()->LookupValue(vtkVariant(curVal)) != -1)
         {
         outIds->InsertNextValue(curVal);
@@ -300,5 +329,3 @@ void vtkSelectionStreamer::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 }
-
-

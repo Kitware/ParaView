@@ -42,6 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QDoubleValidator>
 #include <QShortcut>
 #include <QtDebug>
+#include <QMessageBox>
 
 #include "vtkEventQtSlotConnect.h"
 #include "vtkSmartPointer.h"
@@ -82,7 +83,7 @@ pqContourWidget::pqContourWidget(
     SIGNAL(toggled(bool)), this, SLOT(closeLoop(bool)));
 
   QObject::connect(this->Internals->Delete, SIGNAL(clicked()),
-    this, SLOT(removeAllNodes()));
+    this, SLOT(deleteAllNodes()));
 
   QObject::connect(this->Internals->EditMode, SIGNAL(toggled(bool)),
     this, SLOT(updateMode()));
@@ -173,6 +174,19 @@ void pqContourWidget::updateWidgetVisibility()
 }
 
 //-----------------------------------------------------------------------------
+void pqContourWidget::deleteAllNodes()
+{
+  QMessageBox msgBox;
+  msgBox.setText("Delete all contour nodes.");
+  msgBox.setInformativeText("Do you want to delete everything you have drawn?");
+  msgBox.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
+  int ret = msgBox.exec();
+  if (ret == QMessageBox::Ok)
+    {
+    this->removeAllNodes();
+    }
+}
+//-----------------------------------------------------------------------------
 void pqContourWidget::removeAllNodes()
 {
   vtkSMNewWidgetRepresentationProxy* widget = this->getWidgetProxy();
@@ -180,9 +194,10 @@ void pqContourWidget::removeAllNodes()
     {
     widget->InvokeCommand("ClearAllNodes");
     widget->InvokeCommand("Initialize");
+    this->setModified();
+    this->render();
     }
-  this->setModified();
-  this->render();
+
 }
 
 //-----------------------------------------------------------------------------
@@ -251,7 +266,18 @@ void pqContourWidget::updateMode()
     widget->UpdateVTKObjects();
     }
 }
-
+//-----------------------------------------------------------------------------
+void pqContourWidget::toggleEditMode()
+{
+  if(this->Internals->EditMode->isChecked())
+    {
+    this->Internals->ModifyMode->setChecked(true);
+    }
+  else
+    {
+    this->Internals->EditMode->setChecked(true);
+    }
+}
 //-----------------------------------------------------------------------------
 void pqContourWidget::finishContour( )
 {

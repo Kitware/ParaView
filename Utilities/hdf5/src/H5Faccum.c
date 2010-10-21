@@ -533,6 +533,9 @@ HDmemset(f->shared->accum.buf + clear_size, 0, (f->shared->accum.alloc_size - cl
 
                 /* Note the new buffer size */
                 f->shared->accum.alloc_size = new_size;
+#ifdef H5_CLEAR_MEMORY
+HDmemset(f->shared->accum.buf + size, 0, (f->shared->accum.alloc_size - size));
+#endif /* H5_CLEAR_MEMORY */
             } /* end if */
 
             /* Update the metadata accumulator information */

@@ -17,17 +17,19 @@
 // vtkSMInputArrayDomain requires that the source proxy pointed by the
 // property has an output with one or more arrays of specified type.
 // Current restrictions include whether the array is part of point or
-// cell data and whether it has a given number of components. These
-// are specified in the XML file. Valid XML attributes are:
+// cell data and whether it has a given number of components. The restriction
+// can be overriden for point and cell properties if the global post filter
+// conversion is turned on.
+// These attributes are specified in the XML file. Valid XML attributes are:
 // @verbatim
 // * attribute_type - cell or point
 // * number_of_components
 // @endverbatim
 // The attribute type can also be (optionally) obtained from a required
-// property FieldDataSelection which has a value of 
+// property FieldDataSelection which has a value of
 // vtkDataSet::POINT_DATA_FIELD or  vtkDataSet::CELL_DATA_FIELD.
 // .SECTION See Also
-// vtkSMDomain 
+// vtkSMDomain
 
 #ifndef __vtkSMInputArrayDomain_h
 #define __vtkSMInputArrayDomain_h
@@ -64,17 +66,17 @@ public:
 
   // Description:
   // Returns 1 if the array represented by the array information is
-  // a valid field. The attribute type (point or cell) as well as the 
+  // a valid field. The attribute type (point or cell) as well as the
   // number of components are checked for a match
   int IsFieldValid(vtkSMSourceProxy* proxy, int outputport,
     vtkPVArrayInformation* arrayInfo);
   int IsFieldValid(vtkSMSourceProxy* proxy, int outputport,
     vtkPVArrayInformation* arrayInfo, int bypass);
-  
+
   // Description:
   // Set/get the attribute type. Valid values are: POINT, CELL, ANY.
   // Text representations are: point, cell, any.
-  vtkSetMacro(AttributeType, unsigned char);
+  void SetAttributeType(unsigned char type);
   vtkGetMacro(AttributeType, unsigned char);
   const char* GetAttributeTypeAsString();
   virtual void SetAttributeType(const char* type);
@@ -84,6 +86,12 @@ public:
   // no check.
   vtkSetMacro(NumberOfComponents, int);
   vtkGetMacro(NumberOfComponents, int);
+
+  /// Get/Set the application wide setting for automatic conversion of properties.
+  /// Automatic conversion of properties allows conversion between cell and point
+  /// based properties, and the extraction of vector components as scalar properties
+  static void SetAutomaticPropertyConversion(bool);
+  static bool GetAutomaticPropertyConversion();
 
 //BTX
   enum AttributeTypes
@@ -113,13 +121,14 @@ protected:
   int AttributeInfoContainsArray(vtkSMSourceProxy* proxy,
                                  int outputport,
                                  vtkPVDataSetAttributesInformation* attrInfo);
-  int CheckForArray(vtkPVArrayInformation* arrayInfo, 
+  int CheckForArray(vtkPVArrayInformation* arrayInfo,
                     vtkPVDataSetAttributesInformation* attrInfo);
 
   unsigned char AttributeType;
   int NumberOfComponents;
 
 private:
+  static bool AutomaticPropertyConversion;
   vtkSMInputArrayDomain(const vtkSMInputArrayDomain&); // Not implemented
   void operator=(const vtkSMInputArrayDomain&); // Not implemented
 };

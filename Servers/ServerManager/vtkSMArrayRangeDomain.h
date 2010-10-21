@@ -16,7 +16,7 @@
 // .SECTION Description
 // vtkSMArrayRangeDomain is a sub-class of vtkSMDoubleRangeDomain. In it's
 // Update(), it sets min/max values based on the range of an input array.
-// It requires Input (vtkSMProxyProperty) and ArraySelection 
+// It requires Input (vtkSMProxyProperty) and ArraySelection
 // (vtkSMStringVectorProperty) properties.
 // .SECTION See Also
 // vtkSMDoubleRangeDomain vtkSMProxyProperty vtkSMStringVectorProperty
@@ -40,7 +40,7 @@ public:
 
   // Description:
   // Updates the range based on the scalar range of the currently selected
-  // array. This requires Input (vtkSMProxyProperty) and ArraySelection 
+  // array. This requires Input (vtkSMProxyProperty) and ArraySelection
   // (vtkSMStringVectorProperty) properties. Currently, this uses
   // only the first component of the array.
   virtual void Update(vtkSMProperty* prop);
@@ -61,7 +61,7 @@ protected:
 private:
   void Update(const char* arrayName,
               vtkSMProxyProperty* ip,
-              vtkSMSourceProxy* sp, 
+              vtkSMSourceProxy* sp,
               int outputport);
   void Update(const char* arrayName,
               vtkSMSourceProxy* sp,
@@ -69,6 +69,9 @@ private:
               int outputport);
   void SetArrayRange(vtkPVDataSetAttributesInformation* info,
                      const char* arrayName);
+  void SetArrayRangeForAutoConvertProperty(
+          vtkPVDataSetAttributesInformation* info,
+          const char* arrayName);
 
   vtkSMArrayRangeDomain(const vtkSMArrayRangeDomain&); // Not implemented
   void operator=(const vtkSMArrayRangeDomain&); // Not implemented

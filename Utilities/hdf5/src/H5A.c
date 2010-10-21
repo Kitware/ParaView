@@ -2424,18 +2424,19 @@ H5A_close(H5A_t *attr)
         HGOTO_ERROR(H5E_ATTR, H5E_CANTRELEASE, FAIL, "can't release object header info")
 
     /* Reference count can be 0.  It only happens when H5A_create fails. */
-    if(1 >= attr->shared->nrefs) {
+    if(attr->shared->nrefs <= 1) {
         /* Free dynamicly allocated items */
         if(H5A_free(attr) < 0)
             HGOTO_ERROR(H5E_ATTR, H5E_CANTRELEASE, FAIL, "can't release attribute info")
 
         /* Destroy shared attribute struct */
         attr->shared = H5FL_FREE(H5A_shared_t, attr->shared);
-    } else if(attr->shared->nrefs > 1) {
+    } /* end if */
+    else {
         /* There are other references to the shared part of the attribute.
          * Only decrement the reference count. */
         --attr->shared->nrefs;
-    }
+    } /* end else */
 
     /* Free group hierarchy path */
     if(H5G_name_free(&(attr->path)) < 0)

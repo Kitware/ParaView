@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -48,6 +48,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqAnimationScene.h"
 #include "pqCoreInit.h"
 #include "pqCoreTestUtility.h"
+#include "pqCoreUtilities.h"
 #include "pqDisplayPolicy.h"
 #include "pqEventDispatcher.h"
 #include "pqLinksModel.h"
@@ -79,6 +80,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMApplication.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMGlobalPropertiesManager.h"
+#include "vtkSMInputArrayDomain.h"
 #include "vtkSMPluginManager.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
@@ -87,6 +89,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProxyManager.h"
 #include "vtkSMReaderFactory.h"
 #include "vtkSMWriterFactory.h"
+#include "vtkProcessModuleAutoMPI.h"
 
 //-----------------------------------------------------------------------------
 class pqApplicationCore::pqInternals
@@ -161,7 +164,7 @@ void pqApplicationCore::constructor()
   // * Setup the selection model.
   this->SelectionModel = new pqServerManagerSelectionModel(
     this->ServerManagerModel, this);
-  
+
   this->DisplayPolicy = new pqDisplayPolicy(this);
 
   this->ProgressManager = new pqProgressManager(this);
@@ -221,7 +224,7 @@ pqApplicationCore::~pqApplicationCore()
   delete this->Settings;
   this->Settings = 0;
 
-  
+
   // We don't call delete on these since we have already setup parent on these
   // correctly so they will be deleted. It's possible that the user calls delete
   // on these explicitly in which case we end up with segfaults.
@@ -296,7 +299,7 @@ void pqApplicationCore::setUndoStack(pqUndoStack* stack)
 }
 
 //-----------------------------------------------------------------------------
-void pqApplicationCore::setDisplayPolicy(pqDisplayPolicy* policy) 
+void pqApplicationCore::setDisplayPolicy(pqDisplayPolicy* policy)
 {
   delete this->DisplayPolicy;
   this->DisplayPolicy = policy;
@@ -365,6 +368,11 @@ void pqApplicationCore::loadGlobalPropertiesFromSettings()
     "GlobalProperties/EdgeColor",
     QColor::fromRgbF(0.0, 0, 0.5),
     "EdgeColor");
+
+  bool convert =_settings->value(
+    "GlobalProperties/AutoConvertProperties",false).toBool();
+  vtkSMInputArrayDomain::SetAutomaticPropertyConversion(convert);
+  emit this->forceFilterMenuRefresh();
 }
 
 //-----------------------------------------------------------------------------
@@ -413,13 +421,13 @@ vtkPVXMLElement* pqApplicationCore::getCurrrentPalette()
 }
 
 //-----------------------------------------------------------------------------
-void pqApplicationCore::registerManager(const QString& function, 
+void pqApplicationCore::registerManager(const QString& function,
   QObject* _manager)
 {
   if (this->Internal->RegisteredManagers.contains(function) &&
     this->Internal->RegisteredManagers[function] != 0)
     {
-    qDebug() << "Replacing existing manager for function : " 
+    qDebug() << "Replacing existing manager for function : "
       << function;
     }
   this->Internal->RegisteredManagers[function] = _manager;
@@ -485,7 +493,7 @@ void pqApplicationCore::loadState(
     return ;
     }
 
-  QList<pqView*> current_views = 
+  QList<pqView*> current_views =
     this->ServerManagerModel->findItems<pqView*>(server);
   foreach (pqView* view, current_views)
     {
@@ -512,7 +520,7 @@ void pqApplicationCore::onStateLoaded(
   // This is essential since it's possible that the AnimationTime property on
   // the scenes gets pushed before StartTime and EndTime and as a consequence
   // the scene may not even result in the animation time being set as expected.
-  QList<pqAnimationScene*> scenes = 
+  QList<pqAnimationScene*> scenes =
     this->getServerManagerModel()->findItems<pqAnimationScene*>();
   foreach (pqAnimationScene* scene, scenes)
     {
@@ -542,7 +550,7 @@ pqServerResources& pqApplicationCore::serverResources()
     this->ServerResources = new pqServerResources(this);
     this->ServerResources->load(*this->settings());
     }
-    
+
   return *this->ServerResources;
 }
 
@@ -578,7 +586,7 @@ pqSettings* pqApplicationCore::settings()
       {
       this->Settings = new pqSettings(
         QApplication::organizationName(),
-        QApplication::applicationName() + QApplication::applicationVersion() 
+        QApplication::applicationName() + QApplication::applicationVersion()
         + ".DisabledRegistry", this);
       this->Settings->clear();
       }
@@ -590,13 +598,15 @@ pqSettings* pqApplicationCore::settings()
         this);
       }
     }
+  vtkProcessModuleAutoMPI::
+    setUseMulticoreProcessors(this->Settings->value("autoMPI").toBool());
   return this->Settings;
 }
 
 //-----------------------------------------------------------------------------
 void pqApplicationCore::render()
 {
-  QList<pqView*> list = 
+  QList<pqView*> list =
     this->ServerManagerModel->findItems<pqView*>();
   foreach(pqView* view, list)
     {
@@ -614,11 +624,11 @@ pqServer* pqApplicationCore::getActiveServer() const
 //-----------------------------------------------------------------------------
 void pqApplicationCore::quit()
 {
-  // As tempting as it is to connect this slot to 
+  // As tempting as it is to connect this slot to
   // aboutToQuit() signal, it doesn;t work since that signal is not
   // fired until the event loop exits, which doesn't happen until animation
   // stops playing.
-  QList<pqAnimationScene*> scenes = 
+  QList<pqAnimationScene*> scenes =
     this->getServerManagerModel()->findItems<pqAnimationScene*>();
   foreach (pqAnimationScene* scene, scenes)
     {
@@ -652,7 +662,7 @@ void pqApplicationCore::loadConfiguration(const QString& filename)
     }
 
   QByteArray dat = xml.readAll();
-  vtkSmartPointer<vtkPVXMLParser> parser = 
+  vtkSmartPointer<vtkPVXMLParser> parser =
     vtkSmartPointer<vtkPVXMLParser>::New();
   if (!parser->Parse(dat.data()))
     {
@@ -661,7 +671,7 @@ void pqApplicationCore::loadConfiguration(const QString& filename)
     }
 
   vtkPVXMLElement* root = parser->GetRootElement();
-  
+
   // Load configuration files for server manager components since they don't
   // listen to Qt signals.
   vtkSMProxyManager::GetProxyManager()->GetReaderFactory()->
@@ -688,22 +698,28 @@ void pqApplicationCore::loadDistributedPlugins(const char* filename)
   QString config_file = filename;
   if (!filename)
     {
-    config_file = QApplication::applicationDirPath() +  "/.plugins";
-#if defined(__APPLE__)
-    // for installed applications.
-    config_file = QApplication::applicationDirPath() + "/../Support/.plugins";
-    if (!QFile::exists(config_file))
+    QStringList list = pqCoreUtilities::findParaviewPaths(QString(".plugins"),
+                                                          true, false);
+    if(list.size() > 0)
       {
-      config_file =  QApplication::applicationDirPath() + "/../../../.plugins";
+      config_file = list.at(0);
       }
-#endif
-#if defined(WIN32)
-    if (!QFile::exists(config_file))
-      {
-      // maybe running from the build tree.
-      config_file = QApplication::applicationDirPath() + "/../.plugins";
-      }
-#endif
+//    config_file = QApplication::applicationDirPath() +  "/.plugins";
+//#if defined(__APPLE__)
+//    // for installed applications.
+//    config_file = QApplication::applicationDirPath() + "/../Support/.plugins";
+//    if (!QFile::exists(config_file))
+//      {
+//      config_file =  QApplication::applicationDirPath() + "/../../../.plugins";
+//      }
+//#endif
+//#if defined(WIN32)
+//    if (!QFile::exists(config_file))
+//      {
+//      // maybe running from the build tree.
+//      config_file = QApplication::applicationDirPath() + "/../.plugins";
+//      }
+//#endif
     }
 
   vtkSMApplication::GetApplication()->GetPluginManager()->LoadPluginConfigurationXML(

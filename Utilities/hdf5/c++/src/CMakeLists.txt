@@ -11,7 +11,7 @@ ENDIF (BUILD_SHARED_LIBS)
 #-----------------------------------------------------------------------------
 # Generate configure file
 #-----------------------------------------------------------------------------
-CONFIGURE_FILE (${HDF5_RESOURCES_DIR}/H5cxx_config.h.in
+CONFIGURE_FILE (${HDF5_SOURCE_DIR}/Resources/H5cxx_config.h.in
                 ${HDF5_BINARY_DIR}/H5cxx_pubconf.h
 )
 
@@ -94,8 +94,6 @@ INSTALL (
         ${CPP_HDRS}
     DESTINATION
         include/cpp
-    COMPONENT
-        cppheaders
 )
 
 #-----------------------------------------------------------------------------
@@ -107,9 +105,9 @@ IF (HDF5_EXPORTED_TARGETS)
           ${HDF5_CPP_LIB_TARGET}
       EXPORT
           ${HDF5_EXPORTED_TARGETS}
-      LIBRARY DESTINATION lib COMPONENT cpplibraries
-      ARCHIVE DESTINATION lib COMPONENT cpplibraries
-      RUNTIME DESTINATION bin COMPONENT cpplibraries
+      LIBRARY DESTINATION lib
+      ARCHIVE DESTINATION lib
+      RUNTIME DESTINATION bin
   )
 ENDIF (HDF5_EXPORTED_TARGETS)
 

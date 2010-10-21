@@ -196,7 +196,3 @@ void vtkSMOutputPort::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "PortIndex: " << this->PortIndex << endl;
   os << indent << "SourceProxy: " << this->SourceProxy << endl;
 }
-
-
-
-

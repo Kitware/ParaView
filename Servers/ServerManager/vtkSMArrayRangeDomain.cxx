@@ -19,6 +19,7 @@
 #include "vtkPVDataInformation.h"
 #include "vtkPVDataSetAttributesInformation.h"
 #include "vtkPVXMLElement.h"
+#include "vtkSMArrayListDomain.h"
 #include "vtkSMDomainIterator.h"
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMInputArrayDomain.h"
@@ -66,7 +67,7 @@ void vtkSMArrayRangeDomain::Update(vtkSMProperty*)
     {
     return;
     }
-  
+
   if (array->GetNumberOfUncheckedElements() < 5)
     {
     return;
@@ -92,7 +93,7 @@ void vtkSMArrayRangeDomain::Update(vtkSMProperty*)
   for (i=0; i<numProxs; i++)
     {
     // Use the first input
-    vtkSMSourceProxy* source = 
+    vtkSMSourceProxy* source =
       vtkSMSourceProxy::SafeDownCast(ip->GetUncheckedProxy(i));
     if (source)
       {
@@ -108,7 +109,7 @@ void vtkSMArrayRangeDomain::Update(vtkSMProperty*)
   numProxs = ip->GetNumberOfProxies();
   for (i=0; i<numProxs; i++)
     {
-    vtkSMSourceProxy* source = 
+    vtkSMSourceProxy* source =
       vtkSMSourceProxy::SafeDownCast(ip->GetProxy(i));
     if (source)
       {
@@ -118,7 +119,7 @@ void vtkSMArrayRangeDomain::Update(vtkSMProperty*)
       return;
       }
     }
-  
+
 
 }
 
@@ -145,7 +146,7 @@ void vtkSMArrayRangeDomain::Update(const char* arrayName,
     }
   di->Delete();
 }
-  
+
 //---------------------------------------------------------------------------
 void vtkSMArrayRangeDomain::Update(const char* arrayName,
                                    vtkSMSourceProxy* sp,
@@ -198,6 +199,7 @@ void vtkSMArrayRangeDomain::SetArrayRange(
   vtkPVArrayInformation* ai = info->GetArrayInformation(arrayName);
   if (!ai)
     {
+    this->SetArrayRangeForAutoConvertProperty(info,arrayName);
     return;
     }
 
@@ -217,10 +219,54 @@ void vtkSMArrayRangeDomain::SetArrayRange(
     this->AddMaximum(numArrComp, ai->GetComponentRange(-1)[1]);
     }
 }
+
+//---------------------------------------------------------------------------
+void vtkSMArrayRangeDomain::SetArrayRangeForAutoConvertProperty(
+  vtkPVDataSetAttributesInformation* info, const char* arrayName)
+{
+  vtkStdString name =
+      vtkSMArrayListDomain::ArrayNameFromMangledName(arrayName);
+  if ( name.length() == 0 )
+    {
+    //failed to extract the name from the mangled name
+    return;
+    }
+
+  vtkPVArrayInformation* ai = info->GetArrayInformation(name.c_str());
+  if (!ai)
+    {
+    return;
+    }
+  int numArrComp = ai->GetNumberOfComponents();
+  int comp =
+    vtkSMArrayListDomain::ComponentIndexFromMangledName(ai,arrayName);
+  if ( comp == -1 )
+    {
+    return;
+    }
+
+  // This creates numMinMax entries but leaves them unset (no min or max)
+  this->SetNumberOfEntries(1);
+
+  if ( comp != numArrComp)
+    {
+    this->AddMinimum(0, ai->GetComponentRange(comp)[0]);
+    this->AddMaximum(0, ai->GetComponentRange(comp)[1]);
+    }
+  else
+    {
+    // vector magnitude range
+    this->AddMinimum(0, ai->GetComponentRange(-1)[0]);
+    this->AddMaximum(0, ai->GetComponentRange(-1)[1]);
+    }
+
+  return;
+}
+
 //---------------------------------------------------------------------------
 int vtkSMArrayRangeDomain::SetDefaultValues(vtkSMProperty* prop)
 {
-  vtkSMDoubleVectorProperty* dvp = 
+  vtkSMDoubleVectorProperty* dvp =
     vtkSMDoubleVectorProperty::SafeDownCast(prop);
   if (!dvp)
     {

@@ -183,8 +183,12 @@ public:
   /// This is a convenience method to return the name of the
   /// property on the proxy, if any, which can be used to set the filename.
   /// If no such property exists, this retruns a null string.
+  /// If there are more than 1 properties with FileListDomain, then it looks at
+  /// the Hints for the proxy for the XML of the form
+  /// <DefaultFileNameProperty name="<propertyname>" /> and uses that property
+  /// otherwise simply returns the first one encountered.
   static QString getFileNamePropertyName(vtkSMProxy*);
-  
+
   // HACK: pqSimpleServerStartup needs to fire the
   // finishedAddingServer() signal on successful
   // reverse connection. Server creation and correspoinding

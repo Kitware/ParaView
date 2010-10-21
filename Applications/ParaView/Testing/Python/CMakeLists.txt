@@ -6,7 +6,9 @@ SET (TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/DisconnectAndSaveAnimation.py
   ${CMAKE_CURRENT_SOURCE_DIR}/FileSeries.py
   ${CMAKE_CURRENT_SOURCE_DIR}/LoadStateMultiView.py
+  ${CMAKE_CURRENT_SOURCE_DIR}/RenderNan.py
   ${CMAKE_CURRENT_SOURCE_DIR}/SaveLargeScreenshot.py
+  ${CMAKE_CURRENT_SOURCE_DIR}/SLACTools.py
   ${CMAKE_CURRENT_SOURCE_DIR}/TestIsoVolume.py
   )
 
@@ -17,9 +19,14 @@ set (FileSeries_BREAK TRUE)
 set (DisconnectAndSaveAnimation_BREAK TRUE)
 set (LoadStateMultiView_BREAK TRUE)
 set (TestIsoVolume_BREAK TRUE)
+SET (SLACTools_DISABLE_CS TRUE)
+SET (SLACTools_DISABLE_CRS TRUE)
+SET (SLACTools_BREAK TRUE)
+set (RenderNan_BREAK TRUE)
 
 # Set image threshold overrides for the tests.
 SET(SaveLargeScreenshot_THRESHOLD 10000)
+SET(SLACTools_THRESHOLD 20)
 
 add_client_tests(
   TEST_SCRIPTS ${TESTS_WITHOUT_BASELINES}

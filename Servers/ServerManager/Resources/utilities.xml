@@ -125,6 +125,14 @@
         <BooleanDomain name="bool" />
       </IntVectorProperty>
 
+      <DoubleVectorProperty
+        name="NanColor"
+        command="SetNanColor"
+        number_of_elements="3"
+        default_values="0.5 0 0"
+        animateable="0">
+      </DoubleVectorProperty>
+
       <IntVectorProperty
          name="NumberOfTableValues"
          command="SetNumberOfValues"
@@ -2401,9 +2409,9 @@
     </SourceProxy>
 
     <!-- ==================================================================== -->
-    <SourceProxy name="TableStreamer" class="vtkTableStreamer">
+    <SourceProxy name="TableStreamer" class="vtkSortedTableStreamer">
        <Documentation>
-         vtkTableStreamer is a block-based vtkTable streaming filter. 
+         vtkSortedTableStreamer is a block-based vtkTable streaming filter.
        </Documentation>
 
        <InputProperty name="Input"
@@ -2412,6 +2420,18 @@
            This property specifies the input to the Extract Datasets filter.
          </Documentation>
        </InputProperty>
+
+      <StringVectorProperty name="ColumnToSort" command="SetColumnNameToSort"/>
+
+       <IntVectorProperty name="SelectedComponent"
+         command="SetSelectedComponent"
+         number_of_elements="1"
+         default_values="-1"/>
+
+       <IntVectorProperty name="InvertOrder"
+         command="SetInvertOrder"
+         number_of_elements="1"
+         default_values="0"/>
 
        <IdTypeVectorProperty name="BlockSize"
          command="SetBlockSize"
@@ -2439,7 +2459,7 @@
     <SourceProxy name="SelectionStreamer" class="vtkSelectionStreamer">
        <Documentation>
          vtkSelectionStreamer is a block-based vtkSelection streaming filter.
-         This is designed to be used in conjunction with vtkTableStreamer.
+         This is designed to be used in conjunction with vtkSortedTableStreamer.
        </Documentation>
 
        <InputProperty name="DataInput"
@@ -2458,6 +2478,7 @@
          </Documentation>
        </InputProperty>
 
+<!--
        <IdTypeVectorProperty name="BlockSize"
          command="SetBlockSize"
          number_of_elements="1"
@@ -2476,6 +2497,7 @@
            Get/Set the block to pass.
          </Documentation>
        </IdTypeVectorProperty>
+-->
 
        <IntVectorProperty name="FieldAssociation"
          command="SetFieldAssociation"

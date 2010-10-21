@@ -43,7 +43,7 @@ public:
   // Description:
   // Returns data information. If data information is marked
   // invalid, calls GatherDataInformation.
-  // If data information is gathered then this fires the 
+  // If data information is gathered then this fires the
   // vtkCommand::UpdateInformationEvent event.
   virtual vtkPVDataInformation* GetDataInformation();
 
@@ -119,7 +119,7 @@ private:
 
   friend class vtkSMSourceProxy;
   void UpdatePipeline();
-  
+
   // Update Pipeline with the given timestep request.
   void UpdatePipeline(double time);
 //ETX

@@ -103,7 +103,7 @@ H5_init_library(void)
 {
     herr_t ret_value = SUCCEED;
 
-    FUNC_ENTER_NOAPI(H5_init_library, FAIL);
+    FUNC_ENTER_NOAPI(H5_init_library, FAIL)
     /*
      * Make sure the package information is updated.
      */
@@ -184,7 +184,7 @@ H5_init_library(void)
     H5_debug_mask(HDgetenv("HDF5_DEBUG"));
 
 done:
-    FUNC_LEAVE_NOAPI(ret_value);
+    FUNC_LEAVE_NOAPI(ret_value)
 } /* end H5_init_library() */
 
 

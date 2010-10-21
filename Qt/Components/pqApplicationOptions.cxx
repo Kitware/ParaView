@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -35,6 +35,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProxyManager.h"
 #include "vtkSMProxyDefinitionIterator.h"
 #include "vtkSMPropertyHelper.h"
+#include "vtkProcessModuleAutoMPI.h"
+
 #include "pqAnimationScene.h"
 #include "pqApplicationCore.h"
 #include "pqChartRepresentation.h"
@@ -51,7 +53,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QDoubleValidator>
 #include <QtDebug>
 
-class pqApplicationOptions::pqInternal 
+class pqApplicationOptions::pqInternal
   : public Ui::pqApplicationOptions
 {
 public:
@@ -91,7 +93,7 @@ pqApplicationOptions::pqApplicationOptions(QWidget *widgetParent)
           vi->viewTypeName(*iter), *iter);
         }
       }
-    } 
+    }
 
   // start fresh
   this->resetChanges();
@@ -112,7 +114,13 @@ pqApplicationOptions::pqApplicationOptions(QWidget *widgetParent)
   QObject::connect(this->Internal->AutoAccept,
                   SIGNAL(toggled(bool)),
                   this, SIGNAL(changesAvailable()));
+  QObject::connect(this->Internal->AutoConvertProperties,
+                  SIGNAL(toggled(bool)),
+                  this, SIGNAL(changesAvailable()));
   QObject::connect(this->Internal->CrashRecovery,
+                  SIGNAL(toggled(bool)),
+                  this, SIGNAL(changesAvailable()));
+  QObject::connect(this->Internal->AutoMPI,
                   SIGNAL(toggled(bool)),
                   this, SIGNAL(changesAvailable()));
 
@@ -135,7 +143,7 @@ pqApplicationOptions::pqApplicationOptions(QWidget *widgetParent)
                   SIGNAL(chosenColorChanged(const QColor&)),
                   this, SIGNAL(changesAvailable()));
 
-  QObject::connect(this->Internal->ResetColorsToDefault, 
+  QObject::connect(this->Internal->ResetColorsToDefault,
     SIGNAL(clicked()),
     this, SLOT(resetColorsToDefault()));
 
@@ -188,7 +196,10 @@ pqApplicationOptions::pqApplicationOptions(QWidget *widgetParent)
   iter->Delete();
 
   QObject::connect(paletteMenu, SIGNAL(triggered(QAction*)),
-    this, SLOT(onPalette(QAction*)));
+                   this, SLOT(onPalette(QAction*)));
+
+  vtkProcessModuleAutoMPI::
+    setUseMulticoreProcessors (this->Internal->AutoMPI->isTristate());
 }
 
 //-----------------------------------------------------------------------------
@@ -228,7 +239,7 @@ QStringList pqApplicationOptions::getPageList()
 void pqApplicationOptions::applyChanges()
 {
   pqSettings* settings = pqApplicationCore::instance()->settings();
-  settings->setValue("defaultViewType", 
+  settings->setValue("defaultViewType",
     this->Internal->DefaultViewType->itemData(
       this->Internal->DefaultViewType->currentIndex()));
   pqServer::setHeartBeatTimeoutSetting(static_cast<int>(
@@ -237,27 +248,34 @@ void pqApplicationOptions::applyChanges()
   pqScalarsToColors::setColorRangeScalingMode(
     this->Internal->RescaleDataRangeMode->currentIndex());
 
-  settings->setValue("DefaultTimeStepMode", 
+  settings->setValue("DefaultTimeStepMode",
     this->Internal->DefaultTimeStepMode->currentIndex());
 
   bool autoAccept = this->Internal->AutoAccept->isChecked();
   settings->setValue("autoAccept", autoAccept);
   pqObjectInspectorWidget::setAutoAccept(autoAccept);
 
+  bool autoConvert = this->Internal->AutoConvertProperties->isChecked();
+  settings->setValue("GlobalProperties/AutoConvertProperties",autoConvert);
+
   bool crashRecovery = this->Internal->CrashRecovery->isChecked();
   settings->setValue("crashRecovery",crashRecovery);
 
-  settings->setValue("GlobalProperties/ForegroundColor", 
+  bool autoMPI = this->Internal->AutoMPI->isChecked();
+  settings->setValue("autoMPI",autoMPI);
+  vtkProcessModuleAutoMPI::setUseMulticoreProcessors(autoMPI);
+
+  settings->setValue("GlobalProperties/ForegroundColor",
     this->Internal->ForegroundColor->chosenColor());
-  settings->setValue("GlobalProperties/SurfaceColor", 
+  settings->setValue("GlobalProperties/SurfaceColor",
     this->Internal->SurfaceColor->chosenColor());
-  settings->setValue("GlobalProperties/BackgroundColor", 
+  settings->setValue("GlobalProperties/BackgroundColor",
     this->Internal->BackgroundColor->chosenColor());
-  settings->setValue("GlobalProperties/TextAnnotationColor", 
+  settings->setValue("GlobalProperties/TextAnnotationColor",
     this->Internal->TextAnnotationColor->chosenColor());
-  settings->setValue("GlobalProperties/SelectionColor", 
+  settings->setValue("GlobalProperties/SelectionColor",
     this->Internal->SelectionColor->chosenColor());
-  settings->setValue("GlobalProperties/EdgeColor", 
+  settings->setValue("GlobalProperties/EdgeColor",
     this->Internal->EdgeColor->chosenColor());
 
   pqAnimationScene::setCacheGeometrySetting(
@@ -299,11 +317,19 @@ void pqApplicationOptions::resetChanges()
     QString("%1").arg(pqServer::getHeartBeatTimeoutSetting()/(60.0*1000), 0, 'f', 2));
 
   this->Internal->AutoAccept->setChecked(
-    settings->value("autoAccept", false).toBool());
+    settings->value("autoAccept",false).toBool());
+
+  this->Internal->AutoConvertProperties->setChecked(
+    settings->value("GlobalProperties/AutoConvertProperties", false).toBool());
 
   this->Internal->CrashRecovery->setChecked(
     settings->value("crashRecovery", false).toBool());
-  
+
+  this->Internal->AutoMPI->setChecked(
+    settings->value("autoMPI", false).toBool());
+  vtkProcessModuleAutoMPI::
+    setUseMulticoreProcessors(this->Internal->AutoMPI->isTristate());
+
   this->Internal->ForegroundColor->setChosenColor(
     settings->value("GlobalProperties/ForegroundColor",
       QColor::fromRgbF(1, 1,1)).value<QColor>());
@@ -374,7 +400,7 @@ void pqApplicationOptions::loadPalette(const QString& paletteName)
     qCritical() << "No such palette " << paletteName;
     return;
     }
- 
+
   this->Internal->ForegroundColor->setChosenColor(
     ::getQColor(prototype, "ForegroundColor"));
   this->Internal->BackgroundColor->setChosenColor(

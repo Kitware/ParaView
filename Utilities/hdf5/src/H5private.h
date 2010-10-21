@@ -26,6 +26,14 @@
 #ifndef _H5private_H
 #define _H5private_H
 
+/* Prevent compile errors with GCC 4.3 on Solaris 2.10:
+ * Compilation with -std=c99 sets _STRICT_STDC which in turn causes a big part of
+ * /usr/include/limits.h being skipped, including the definition of PATH_MAX,
+ * realpath etc. */
+#if defined (__SVR4) && defined (__sun) && defined (__GNUC__)
+#   define __EXTENSIONS__
+#endif
+
 #include "H5public.h"		/* Include Public Definitions		*/
 
 /* include the pthread header */
@@ -132,6 +140,16 @@
 #ifdef H5_HAVE_SYS_SYSINFO_H
 #   include <sys/sysinfo.h>
 #endif
+/* Prevent compile errors with GCC 4.3 on Solaris 2.10 */
+#if defined (__SVR4) && defined (__sun)
+/* In file included from /usr/include/sys/klwp.h:19,
+ *                  from /usr/include/sys/thread.h:13,
+ *                  from /usr/include/sys/proc.h:20,
+ *                  from /ParaView3_Git/Utilities/hdf5/src/H5private.h:136,
+ *                  from /ParaView3_Git/Utilities/hdf5/src/H5detect.c:57:
+ * /usr/include/sys/ucontext.h:69: error: expected specifier-qualifier-list before 'stack_t' */
+#   undef H5_HAVE_SYS_PROC_H
+#endif
 #ifdef H5_HAVE_SYS_PROC_H
 #   include <sys/proc.h>
 #endif
@@ -142,11 +160,7 @@
 
 #ifdef _WIN32
 
-#ifdef H5_HAVE_WINSOCK_H
-#include <winsock2.h>
-#endif
-
-#define WIN32_LEAN_AND_MEAN		/*Exclude rarely-used stuff from Windows headers */
+#define VC_EXTRALEAN		/*Exclude rarely-used stuff from Windows headers */
 #include <windows.h>
 #include <direct.h>         /* For _getcwd() */
 
@@ -477,9 +491,8 @@ typedef struct {
  * function (or any other non-HDF5 function) in the source!
  */
 
-/* Put all platform-specific definitions in the following file */
-/* so that the following definitions are platform free. */
-#include "H5win32defs.h"	/* For Windows-specific definitions */
+ /* Use platform-specific versions if necessary */
+#include "H5win32defs.h"
 
 #ifndef HDabort
     #define HDabort()		abort()
@@ -907,14 +920,11 @@ H5_DLL int HDfprintf (FILE *stream, const char *fmt, ...);
 #ifndef HDlongjmp
     #define HDlongjmp(J,N)		longjmp(J,N)
 #endif /* HDlongjmp */
-/* HDlseek and HDoff_t must be defined together for consistency. */
 #ifndef HDlseek
     #ifdef H5_HAVE_LSEEK64
-        #define HDlseek(F,O,W)	lseek64(F,O,W)
-        #define HDoff_t		off64_t
+       #define HDlseek(F,O,W)	lseek64(F,O,W)
     #else
-        #define HDlseek(F,O,W)	lseek(F,O,W)
-	#define HDoff_t		off_t
+       #define HDlseek(F,O,W)	lseek(F,O,W)
     #endif
 #endif /* HDlseek */
 #ifndef HDmalloc
@@ -1704,7 +1714,7 @@ extern hbool_t H5_libinit_g;    /* Has the library been initialized? */
 /* Include required function stack header */
 #include "H5CSprivate.h"
 
-#define H5_PUSH_FUNC(func_name) H5CS_push(#func_name);
+#define H5_PUSH_FUNC(func_name) H5CS_push(#func_name)
 #define H5_POP_FUNC             H5CS_pop();
 #else /* H5_HAVE_CODESTACK */
 #define H5_PUSH_FUNC(func_name) /* void */
@@ -1831,7 +1841,7 @@ static herr_t		H5_INTERFACE_INIT_FUNC(void);
  */
 #define FUNC_ENTER_API_NOINIT(func_name) {{                                   \
     FUNC_ENTER_API_COMMON(func_name)                                          \
-    H5_PUSH_FUNC(func_name)                                                  \
+    H5_PUSH_FUNC(func_name);                                                  \
     BEGIN_MPE_LOG(func_name);                                                 \
     {
 
@@ -1885,7 +1895,7 @@ static herr_t		H5_INTERFACE_INIT_FUNC(void);
  */
 #define FUNC_ENTER_NOAPI_NOINIT(func_name) {                                  \
     FUNC_ENTER_COMMON(func_name, !H5_IS_API(#func_name));                     \
-    H5_PUSH_FUNC(func_name)                                                  \
+    H5_PUSH_FUNC(func_name);                                                  \
     {
 
 /*
@@ -1916,7 +1926,7 @@ static herr_t		H5_INTERFACE_INIT_FUNC(void);
  */
 #define FUNC_ENTER_NOAPI_NOINIT_NOFUNC(func_name) {                           \
     FUNC_ENTER_COMMON_NOFUNC(func_name,!H5_IS_API(#func_name));               \
-    H5_PUSH_FUNC(func_name)                                                  \
+    H5_PUSH_FUNC(func_name);                                                  \
     {
 
 /*
@@ -2027,8 +2037,8 @@ H5_DLL uint32_t H5_hash_string(const char *str);
 H5_DLL herr_t   H5_build_extpath(const char *, char ** /*out*/ );
 
 /* Functions for debugging */
-H5_DLL herr_t H5_buffer_dump(FILE *stream, int indent, uint8_t *buf,
-    uint8_t *marker, size_t buf_offset, size_t buf_size);
+H5_DLL herr_t H5_buffer_dump(FILE *stream, int indent, const uint8_t *buf,
+    const uint8_t *marker, size_t buf_offset, size_t buf_size);
 
 #endif /* _H5private_H */
 

@@ -134,7 +134,7 @@ H5D_compact_fill(H5D_t *dset, hid_t dxpl_id)
 
     /* Initialize the fill value buffer */
     /* (use the compact dataset storage buffer as the fill value buffer) */
-    if(H5D_fill_init(&fb_info, dset->shared->layout.storage.u.compact.buf,
+    if(H5D_fill_init(&fb_info, dset->shared->layout.storage.u.compact.buf, FALSE,
             NULL, NULL, NULL, NULL,
             &dset->shared->dcpl_cache.fill, dset->shared->type,
             dset->shared->type_id, (size_t)0, dset->shared->layout.storage.u.compact.size, dxpl_id) < 0)

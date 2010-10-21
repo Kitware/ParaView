@@ -85,6 +85,7 @@ vtkPythonProgrammableFilter::vtkPythonProgrammableFilter() :
 {
   this->Script = NULL;
   this->InformationScript = NULL;
+  this->UpdateExtentScript = NULL;
   this->PythonPath = 0;
   this->SetExecuteMethod(vtkPythonProgrammableFilter::ExecuteScript, this);
   this->OutputDataSetType = VTK_POLY_DATA;
@@ -95,6 +96,7 @@ vtkPythonProgrammableFilter::~vtkPythonProgrammableFilter()
 {
   this->SetScript(NULL);
   this->SetInformationScript(NULL);
+  this->SetUpdateExtentScript(NULL);
   this->SetPythonPath(0);
 
   delete this->Implementation;
@@ -102,8 +104,8 @@ vtkPythonProgrammableFilter::~vtkPythonProgrammableFilter()
 
 //----------------------------------------------------------------------------
 int vtkPythonProgrammableFilter::RequestDataObject(
-  vtkInformation* vtkNotUsed(request), 
-  vtkInformationVector** inputVector , 
+  vtkInformation* vtkNotUsed(request),
+  vtkInformationVector** inputVector ,
   vtkInformationVector* outputVector)
 {
   if (this->OutputDataSetType == VTK_DATA_SET)
@@ -122,8 +124,8 @@ int vtkPythonProgrammableFilter::RequestDataObject(
         {
         vtkInformation* info = outputVector->GetInformationObject(i);
         vtkDataObject *output = info->Get(vtkDataObject::DATA_OBJECT());
-        
-        if (!output || !output->IsA(input->GetClassName())) 
+
+        if (!output || !output->IsA(input->GetClassName()))
           {
           vtkDataObject* newOutput = input->NewInstance();
           newOutput->SetPipelineInformation(info);
@@ -137,7 +139,7 @@ int vtkPythonProgrammableFilter::RequestDataObject(
     return 0;
     }
 
-  const char *outTypeStr = 
+  const char *outTypeStr =
     vtkDataObjectTypes::GetClassNameFromTypeId(this->OutputDataSetType);
 
   // for each output
@@ -145,9 +147,9 @@ int vtkPythonProgrammableFilter::RequestDataObject(
     {
     vtkInformation* info = outputVector->GetInformationObject(i);
     vtkDataObject *output = info->Get(vtkDataObject::DATA_OBJECT());
-    if (!output || !output->IsA(outTypeStr)) 
+    if (!output || !output->IsA(outTypeStr))
       {
-      vtkDataObject* newOutput = 
+      vtkDataObject* newOutput =
         vtkDataObjectTypes::NewDataObject(this->OutputDataSetType);
       if (!newOutput)
         {
@@ -167,18 +169,18 @@ int vtkPythonProgrammableFilter::RequestDataObject(
 
 //----------------------------------------------------------------------------
 int vtkPythonProgrammableFilter::RequestInformation(
-  vtkInformation*, 
-  vtkInformationVector**, 
+  vtkInformation*,
+  vtkInformationVector**,
   vtkInformationVector* outputVector)
 {
   vtkInformation* outInfo = outputVector->GetInformationObject(0);
 
   // Setup ExtentTranslator so that all downstream piece requests are
   // converted to whole extent update requests, as need by the histogram filter.
-  vtkStreamingDemandDrivenPipeline* sddp = 
+  vtkStreamingDemandDrivenPipeline* sddp =
     vtkStreamingDemandDrivenPipeline::SafeDownCast(this->GetExecutive());
   if (strcmp(
-      sddp->GetExtentTranslator(outInfo)->GetClassName(), 
+      sddp->GetExtentTranslator(outInfo)->GetClassName(),
       "vtkOnePieceExtentTranslator") != 0)
     {
     vtkExtentTranslator* et = vtkOnePieceExtentTranslator::New();
@@ -194,7 +196,23 @@ int vtkPythonProgrammableFilter::RequestInformation(
 }
 
 //----------------------------------------------------------------------------
-void vtkPythonProgrammableFilter::SetParameter(const char *raw_name, 
+int vtkPythonProgrammableFilter::RequestUpdateExtent(
+  vtkInformation*request,
+  vtkInformationVector**inputVector,
+  vtkInformationVector* outputVector)
+{
+  if (this->UpdateExtentScript)
+    {
+    this->Exec(this->UpdateExtentScript, "RequestUpdateExtent");
+    return 1;
+    }
+
+  return this->Superclass::RequestUpdateExtent(request,
+                                              inputVector,outputVector);
+}
+
+//----------------------------------------------------------------------------
+void vtkPythonProgrammableFilter::SetParameter(const char *raw_name,
                                                const char *raw_value)
 {
   const vtkstd::string name = raw_name ? raw_name : "";
@@ -205,7 +223,7 @@ void vtkPythonProgrammableFilter::SetParameter(const char *raw_name,
     vtkErrorMacro(<< "cannot set parameter with empty name");
     return;
     }
-    
+
   this->Implementation->Parameters[name] = value;
   this->Modified();
 }
@@ -219,8 +237,8 @@ void vtkPythonProgrammableFilter::ClearParameters()
 
 //----------------------------------------------------------------------------
 void vtkPythonProgrammableFilter::ExecuteScript(void *arg)
-{  
-  vtkPythonProgrammableFilter *self = 
+{
+  vtkPythonProgrammableFilter *self =
     static_cast<vtkPythonProgrammableFilter*>(arg);
   if (self)
     {
@@ -267,14 +285,14 @@ void vtkPythonProgrammableFilter::Exec(const char* script,
 
   // Set the parameters defined by user.
   fscript += "(self, inputs = None, output = None):\n";
-  for(ParametersT::const_iterator parameter = 
+  for(ParametersT::const_iterator parameter =
         this->Implementation->Parameters.begin();
       parameter != this->Implementation->Parameters.end();
       ++parameter)
     {
     fscript += "  " + parameter->first + " = " + parameter->second + "\n";
-    } 
-  
+    }
+
   // Indent user script
   fscript += "  ";
 
@@ -329,9 +347,9 @@ void vtkPythonProgrammableFilter::Exec(const char* script,
 
   // Set self to point to this
   char addrofthis[1024];
-  sprintf(addrofthis, "%p", this);    
-  char *aplus = addrofthis; 
-  if ((addrofthis[0] == '0') && 
+  sprintf(addrofthis, "%p", this);
+  char *aplus = addrofthis;
+  if ((addrofthis[0] == '0') &&
       ((addrofthis[1] == 'x') || addrofthis[1] == 'X'))
     {
     aplus += 2; //skip over "0x"
@@ -348,7 +366,7 @@ void vtkPythonProgrammableFilter::Exec(const char* script,
   int numinps = this->GetNumberOfInputConnections(0);
   for (int i=0; i<numinps; i++)
     {
-    runscript += 
+    runscript +=
       "  inputs.append(dataset_adapter.WrapDataObject(myarg.GetInputDataObject(0, index)))\n";
     runscript += "  index += 1\n";
     }
@@ -356,7 +374,7 @@ void vtkPythonProgrammableFilter::Exec(const char* script,
   runscript += "else:\n";
   runscript += "  inputs = None\n";
   runscript += "  output = None\n";
-  
+
   // Call the function
   runscript += funcname;
   runscript += "(myarg, inputs, output)\n";
@@ -401,6 +419,6 @@ void vtkPythonProgrammableFilter::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
   os << indent << "OutputDataSetType: " << this->OutputDataSetType << endl;
-  os << indent << "PythonPath: " 
+  os << indent << "PythonPath: "
     << (this->PythonPath? this->PythonPath : "(none)") << endl;
 }
