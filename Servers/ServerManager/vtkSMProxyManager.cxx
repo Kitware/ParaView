@@ -1526,8 +1526,6 @@ void vtkSMProxyManager::LoadState(const vtkSMMessage* msg)
 
   // Fill delta sets
   this->Internals->ComputeDelta(msg, tuplesToRegister, tuplesToUnregister);
-  cout << ">>> Register: " << tuplesToRegister.size()
-       << " - Unregister: " << tuplesToUnregister.size() << endl;
 
   // Register new ones
   iter = tuplesToRegister.begin();

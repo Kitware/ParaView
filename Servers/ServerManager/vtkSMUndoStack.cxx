@@ -264,14 +264,14 @@ void vtkSMUndoStack::FillWithRemoteObjects( vtkUndoSet *undoSet,
     iter->GetPointer()->GetAllRemoteObjects(collection);
     iter++;
     }
-  cout << "Keep " << collection->GetNumberOfItems() << " remote obj." << endl;
-  cout << "List of availabe remote objects: ";
-  for(int i=0;i<collection->GetNumberOfItems();i++)
-    {
-    vtkSMRemoteObject *obj = vtkSMRemoteObject::SafeDownCast(collection->GetItemAsObject(i));
-    cout << " " << obj->GetGlobalID();
-    }
-  cout << endl;
+
+//  cout << "List of availabe remote objects: ";
+//  for(int i=0;i<collection->GetNumberOfItems();i++)
+//    {
+//    vtkSMRemoteObject *obj = vtkSMRemoteObject::SafeDownCast(collection->GetItemAsObject(i));
+//    cout << " " << obj->GetGlobalID();
+//    }
+//  cout << endl;
 }
 
 //-----------------------------------------------------------------------------

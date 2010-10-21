@@ -51,7 +51,6 @@ int vtkSMRemoteObjectUpdateUndoElement::Redo()
 //-----------------------------------------------------------------------------
 int vtkSMRemoteObjectUpdateUndoElement::UpdateState(const vtkSMMessage* state)
 {
-  cout << "Update state of " << state->global_id() << endl;
   if(this->Session && state->has_global_id())
     {
     // Creation or update
@@ -66,6 +65,7 @@ int vtkSMRemoteObjectUpdateUndoElement::UpdateState(const vtkSMMessage* state)
     else
       {
       vtkWarningMacro("Unable to update RemoteObject state since no remote object with id " << state->global_id() << " were found.");
+
       vtkCollection *remoteObjects = vtkCollection::New();
       this->Session->GetAllRemoteObjects(remoteObjects);
       cout << "List of availabe remote objects: ";
