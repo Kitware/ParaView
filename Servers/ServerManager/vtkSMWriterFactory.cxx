@@ -25,6 +25,7 @@
 #include "vtkSMProxyDefinitionIterator.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMWriterProxy.h"
+#include "vtkSMProxyDefinitionManager.h"
 
 #include <vtkstd/list>
 #include <vtkstd/set>
@@ -164,22 +165,19 @@ void vtkSMWriterFactory::Initialize()
 //----------------------------------------------------------------------------
 void vtkSMWriterFactory::RegisterPrototypes(const char* xmlgroup)
 {
-#ifdef FIXME_COLLABORATION
+  vtkSMProxyDefinitionIterator* iter = NULL;
   vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
-  vtkSMProxyDefinitionIterator* iter = vtkSMProxyDefinitionIterator::New();
-  iter->SetModeToOneGroup();
-  for (iter->Begin(xmlgroup); !iter->IsAtEnd(); iter->Next())
+  iter = pxm->GetProxyDefinitionManager()->NewSingleGroupIterator(xmlgroup,0);
+  for (iter->GoToFirstItem(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
     {
-    vtkPVXMLElement* hints = pxm->GetProxyHints(iter->GetGroup(),
-      iter->GetKey());
-    if (hints &&
-        hints->FindNestedElementByName("WriterFactory"))
+    vtkPVXMLElement* hints = pxm->GetProxyHints( iter->GetGroupName(),
+                                                 iter->GetProxyName());
+    if (hints && hints->FindNestedElementByName("WriterFactory"))
       {
-      this->RegisterPrototype(iter->GetGroup(), iter->GetKey());
+      this->RegisterPrototype(iter->GetGroupName(), iter->GetProxyName());
       }
     }
   iter->Delete();
-#endif
 }
 
 //----------------------------------------------------------------------------
