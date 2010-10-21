@@ -46,8 +46,6 @@ vtkSMSession::vtkSMSession()
 //----------------------------------------------------------------------------
 vtkSMSession::~vtkSMSession()
 {
-  this->Core->Delete();
-  this->Core = NULL;
   this->ProxyManager->Delete();
   this->ProxyManager = NULL;
 
@@ -56,6 +54,9 @@ vtkSMSession::~vtkSMSession()
     this->UndoStackBuilder->Delete();
     this->UndoStackBuilder = NULL;
     }
+
+  this->Core->Delete();
+  this->Core = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -122,6 +123,9 @@ void vtkSMSession::DeletePMObject(vtkSMMessage* msg)
 //----------------------------------------------------------------------------
 vtkPMObject* vtkSMSession::GetPMObject(vtkTypeUInt32 globalid)
 {
+  if(!this->Core)
+    return NULL;
+
   this->Core->GetPMObject(globalid);
 }
 

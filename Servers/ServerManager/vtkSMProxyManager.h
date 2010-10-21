@@ -153,7 +153,6 @@ public:
   // Given its name, unregisters a proxy and remove it from the list
   // of managed proxies.
   void UnRegisterProxy(const char* groupname, const char* name, vtkSMProxy*);
-  void UnRegisterProxy(const char* groupname, const char* name);
   void UnRegisterProxy(const char* name);
 
   // Description:
@@ -491,9 +490,6 @@ protected:
     vtkSMProxy* proxy);
 
   int UpdateInputProxies;
-
-  // State cache used for the GetFullState
-  vtkSMMessage* State;
 
   vtkSMReaderFactory* ReaderFactory;
   vtkSMWriterFactory* WriterFactory;

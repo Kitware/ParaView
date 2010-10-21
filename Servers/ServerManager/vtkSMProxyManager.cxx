@@ -119,7 +119,6 @@ vtkSMProxyManager::vtkSMProxyManager()
 #endif
 
   this->ProxyDefinitionManager = NULL;
-  this->State = NULL;
 
 #ifdef FIXME
   this->ReaderFactory = vtkSMReaderFactory::New();
@@ -151,13 +150,6 @@ vtkSMProxyManager::~vtkSMProxyManager()
   this->WriterFactory = 0;
 
   this->SetProxyDefinitionManager(NULL);
-
-  // Free State cache memory
-  if(this->State)
-    {
-    delete this->State;
-    this->State = NULL;
-    }
 }
 
 //----------------------------------------------------------------------------
@@ -595,144 +587,41 @@ const char* vtkSMProxyManager::IsProxyInGroup(vtkSMProxy* proxy,
 //---------------------------------------------------------------------------
 void vtkSMProxyManager::UnRegisterProxies()
 {
+  // Clear internal proxy containers
   this->Internals->RegisteredProxyMap.erase(
     this->Internals->RegisteredProxyMap.begin(),
     this->Internals->RegisteredProxyMap.end());
   this->Internals->ModifiedProxies.clear();
+  this->Internals->RegisteredProxyTuple.clear();
+  this->Internals->State.ClearExtension(ProxyManagerState::registered_proxy);
 
-  // Update state
-  if(this->State)
-    {
-    this->State->ClearExtension(ProxyManagerState::registered_proxy);
+  // FIXME ??? Is it normal that no notification is sent in that case ???
 
-    // Push state for undo/redo
-    vtkSMMessage state = *this->GetFullState();
-    this->PushState(&state);
-    }
+  // Push state for undo/redo
+  vtkSMMessage state = *this->GetFullState();
+  this->PushState(&state);
 }
 
 //---------------------------------------------------------------------------
-void vtkSMProxyManager::UnRegisterProxy(const char* group, const char* name,
-  vtkSMProxy* proxy)
+void vtkSMProxyManager::UnRegisterProxy( const char* group, const char* name,
+                                         vtkSMProxy* proxy)
 {
-  vtkSMProxyManagerInternals::ProxyGroupType::iterator it =
-    this->Internals->RegisteredProxyMap.find(group);
-  if ( it != this->Internals->RegisteredProxyMap.end() )
+  // Just in case a proxy ref is NOT held outside the ProxyManager iteself
+  // Keep one during the full method call so the event could still have a valid
+  // proxy object.
+  vtkSmartPointer<vtkSMProxy> proxyHolder = proxy;
+
+  // Do something only if the given tuple was found
+  if(this->Internals->RemoveTuples(group, name, proxy))
     {
-    vtkSMProxyManagerProxyMapType::iterator it2 = it->second.find(name);
-    if (it2 != it->second.end())
-      {
-      vtkSMProxyManagerProxyListType::iterator it3 = it2->second.Find(proxy);
-      if (it3 != it2->second.end())
-        {
-        RegisteredProxyInformation info;
-        info.Proxy = it3->GetPointer()->Proxy;
-        info.GroupName = it->first.c_str();
-        info.ProxyName = it2->first.c_str();
-        info.Type = RegisteredProxyInformation::PROXY;
+    RegisteredProxyInformation info;
+    info.Proxy = proxy;
+    info.GroupName = group;
+    info.ProxyName = name;
+    info.Type = RegisteredProxyInformation::PROXY;
 
-        this->InvokeEvent(vtkCommand::UnRegisterEvent, &info);
-        this->UnMarkProxyAsModified(info.Proxy);
-        it2->second.erase(it3);
-        }
-      if (it2->second.size() == 0)
-        {
-        it->second.erase(it2);
-        }
-      }
-    }
-  // Update state
-  if(this->State)
-    {
-    vtkSMMessage backup;
-    backup.CopyFrom(*this->State);
-
-    int nbRegisteredProxy = this->State->ExtensionSize(ProxyManagerState::registered_proxy);
-    this->State->ClearExtension(ProxyManagerState::registered_proxy);
-
-    vtkstd::string groupString = group;
-    vtkstd::string nameString = name;
-    for(int cc=0; cc < nbRegisteredProxy; ++cc)
-      {
-      const ProxyManagerState_ProxyRegistrationInfo *reg =
-          &backup.GetExtension(ProxyManagerState::registered_proxy, cc);
-
-      if( reg->group() ==  groupString && reg->name() == nameString
-          && reg->global_id() == proxy->GetGlobalID() )
-        {
-        // Do not keep it
-        }
-      else
-        {
-        // Keep it
-        this->State->AddExtension(ProxyManagerState::registered_proxy)->CopyFrom(*reg);
-        }
-      }
-
-    // Push state for undo/redo
-    vtkSMMessage state = *this->GetFullState();
-    this->PushState(&state);
-    }
-}
-
-//---------------------------------------------------------------------------
-void vtkSMProxyManager::UnRegisterProxy(const char* group, const char* name)
-{
-  // Legacy API, unregister only the first one in that group.
-  vtkSMProxyManagerInternals::ProxyGroupType::iterator it =
-    this->Internals->RegisteredProxyMap.find(group);
-  if ( it != this->Internals->RegisteredProxyMap.end() )
-    {
-    vtkSMProxyManagerProxyMapType::iterator it2 =
-      it->second.find(name);
-    if (it2 != it->second.end())
-      {
-      if (it2->second.size() > 0)
-        {
-        vtkSMProxyManagerProxyListType::iterator it3 =
-          it2->second.begin();
-
-        RegisteredProxyInformation info;
-        info.Proxy = it3->GetPointer()->Proxy;
-        info.GroupName = it->first.c_str();
-        info.ProxyName = it2->first.c_str();
-        info.Type = RegisteredProxyInformation::PROXY;
-
-        this->InvokeEvent(vtkCommand::UnRegisterEvent, &info);
-        this->UnMarkProxyAsModified(info.Proxy);
-        it2->second.erase(it3);
-        }
-      if (it2->second.size() == 0)
-        {
-        it->second.erase(it2);
-        }
-      }
-    }
-  if(this->State)
-    {
-    vtkSMMessage backup;
-    backup.CopyFrom(*this->State);
-
-    int nbRegisteredProxy = this->State->ExtensionSize(ProxyManagerState::registered_proxy);
-    this->State->ClearExtension(ProxyManagerState::registered_proxy);
-
-    vtkstd::string groupString = group;
-    vtkstd::string nameString = name;
-    for(int cc=0; cc < nbRegisteredProxy; ++cc)
-      {
-      const ProxyManagerState_ProxyRegistrationInfo *reg =
-          &backup.GetExtension(ProxyManagerState::registered_proxy, cc);
-
-      if( reg->group() == groupString && reg->name() == nameString )
-        {
-        // Do not keep it
-        }
-      else
-        {
-        // Keep it
-        this->State->AddExtension(ProxyManagerState::registered_proxy)->CopyFrom(*reg);
-        }
-      }
+    this->InvokeEvent(vtkCommand::UnRegisterEvent, &info);
+    this->UnMarkProxyAsModified(info.Proxy);
 
     // Push state for undo/redo
     vtkSMMessage state = *this->GetFullState();
@@ -743,44 +632,30 @@ void vtkSMProxyManager::UnRegisterProxy(const char* group, const char* name)
 //---------------------------------------------------------------------------
 void vtkSMProxyManager::UnRegisterProxy(const char* name)
 {
-  vtkSMProxyManagerInternals::ProxyGroupType::iterator it =
-    this->Internals->RegisteredProxyMap.begin();
-  for (; it != this->Internals->RegisteredProxyMap.end(); it++)
+  // Remove entries and keep them in a set
+  vtkstd::set<vtkSMProxyManagerEntry> entriesToRemove;
+  this->Internals->RemoveTuples(name, entriesToRemove);
+
+  // Notify that some entries have been deleted
+  vtkstd::set<vtkSMProxyManagerEntry>::iterator iter = entriesToRemove.begin();
+  while(iter != entriesToRemove.end())
     {
-    vtkSMProxyManagerProxyMapType::iterator it2 =
-      it->second.find(name);
-    if (it2 != it->second.end())
-      {
-      this->UnRegisterProxy(it->first.c_str(), name);
-      }
+    RegisteredProxyInformation info;
+    info.Proxy = iter->Proxy;
+    info.GroupName = iter->Group.c_str();
+    info.ProxyName = iter->Name.c_str();
+    info.Type = RegisteredProxyInformation::PROXY;
+
+    this->InvokeEvent(vtkCommand::UnRegisterEvent, &info);
+    this->UnMarkProxyAsModified(info.Proxy);
+
+    // Move forward
+    iter++;
     }
 
-  if(this->State)
+  // Push new state only if changed occured
+  if(entriesToRemove.size() > 0)
     {
-    vtkSMMessage backup;
-    backup.CopyFrom(*this->State);
-
-    int nbRegisteredProxy = this->State->ExtensionSize(ProxyManagerState::registered_proxy);
-    this->State->ClearExtension(ProxyManagerState::registered_proxy);
-
-    vtkstd::string nameString = name;
-    for(int cc=0; cc < nbRegisteredProxy; ++cc)
-      {
-      const ProxyManagerState_ProxyRegistrationInfo *reg =
-          &backup.GetExtension(ProxyManagerState::registered_proxy, cc);
-
-      if( reg->name() == nameString )
-        {
-        // Do not keep it
-        }
-      else
-        {
-        // Keep it
-        this->State->AddExtension(ProxyManagerState::registered_proxy)->CopyFrom(*reg);
-        }
-      }
-
-    // Push state for undo/redo
     vtkSMMessage state = *this->GetFullState();
     this->PushState(&state);
     }
@@ -793,61 +668,25 @@ struct vtkSMProxyManagerProxyInformation
   vtkstd::string ProxyName;
   vtkSMProxy* Proxy;
 };
+
 //---------------------------------------------------------------------------
 void vtkSMProxyManager::UnRegisterProxy(vtkSMProxy* proxy)
 {
-  vtkstd::vector<vtkSMProxyManagerProxyInformation> toUnRegister;
+  // Find tuples
+  vtkstd::set<vtkSMProxyManagerEntry> tuplesToRemove;
+  this->Internals->FindProxyTuples(proxy, tuplesToRemove);
 
-  vtkSMProxyManagerInternals::ProxyGroupType::iterator it =
-    this->Internals->RegisteredProxyMap.begin();
-  for (; it != this->Internals->RegisteredProxyMap.end(); it++)
+  // Remove tuples
+  vtkstd::set<vtkSMProxyManagerEntry>::iterator iter = tuplesToRemove.begin();
+  while(iter != tuplesToRemove.end())
     {
-    vtkSMProxyManagerProxyMapType::iterator it2;
-    for (it2 = it->second.begin(); it2 != it->second.end(); ++it2)
-      {
-      if (it2->second.Contains(proxy))
-        {
-        vtkSMProxyManagerProxyInformation info;
-        info.GroupName = it->first;
-        info.ProxyName = it2->first;
-        toUnRegister.push_back(info);
-        }
-      }
+    this->UnRegisterProxy(iter->Group.c_str(), iter->Name.c_str(), iter->Proxy);
+    iter++;
     }
 
-  vtkstd::vector<vtkSMProxyManagerProxyInformation>::iterator vIter =
-    toUnRegister.begin();
-  for (;vIter != toUnRegister.end(); ++vIter)
+  // Push new state only if changed occured
+  if(tuplesToRemove.size() > 0)
     {
-    this->UnRegisterProxy(vIter->GroupName.c_str(), vIter->ProxyName.c_str(),
-      proxy);
-    }
-
-  if(this->State)
-    {
-    vtkSMMessage backup;
-    backup.CopyFrom(*this->State);
-
-    int nbRegisteredProxy = this->State->ExtensionSize(ProxyManagerState::registered_proxy);
-    this->State->ClearExtension(ProxyManagerState::registered_proxy);
-
-    for(int cc=0; cc < nbRegisteredProxy; ++cc)
-      {
-      const ProxyManagerState_ProxyRegistrationInfo *reg =
-          &backup.GetExtension(ProxyManagerState::registered_proxy, cc);
-
-      if( reg->global_id() == proxy->GetGlobalID() )
-        {
-        // Do not keep it
-        }
-      else
-        {
-        // Keep it
-        this->State->AddExtension(ProxyManagerState::registered_proxy)->CopyFrom(*reg);
-        }
-      }
-
-    // Push state for undo/redo
     vtkSMMessage state = *this->GetFullState();
     this->PushState(&state);
     }
@@ -869,6 +708,10 @@ void vtkSMProxyManager::RegisterProxy(const char* groupname,
     {
     return;
     }
+
+  // Add Tuple
+  this->Internals->RegisteredProxyTuple.insert(
+      vtkSMProxyManagerEntry( groupname, name, proxy ));
 
   vtkSMProxyManagerProxyInfo* proxyInfo = vtkSMProxyManagerProxyInfo::New();
   proxy_list.push_back(proxyInfo);
@@ -898,12 +741,8 @@ void vtkSMProxyManager::RegisterProxy(const char* groupname,
   // Update state
   proxy->CreateVTKObjects(); // Make sure an ID has been assigned to it
 
-  if(!this->State)
-    {
-    this->State = new vtkSMMessage();
-    }
   ProxyManagerState_ProxyRegistrationInfo *registration =
-      this->State->AddExtension(ProxyManagerState::registered_proxy);
+      this->Internals->State.AddExtension(ProxyManagerState::registered_proxy);
   registration->set_group(groupname);
   registration->set_name(name);
   registration->set_global_id(proxy->GetGlobalID());
@@ -1666,14 +1505,13 @@ void vtkSMProxyManager::PrintSelf(ostream& os, vtkIndent indent)
 //---------------------------------------------------------------------------
 const vtkSMMessage* vtkSMProxyManager::GetFullState()
 {
-  if(!this->State)
+  if(!this->Internals->State.has_global_id())
     {
-    this->State = new vtkSMMessage();
-    this->State->set_global_id(1);
-    this->State->set_location(vtkProcessModule2::PROCESS_DATA_SERVER);
+    this->Internals->State.set_global_id(1);
+    this->Internals->State.set_location(vtkProcessModule2::PROCESS_DATA_SERVER);
     }
 
-  return this->State;
+  return &this->Internals->State;
 }
 //---------------------------------------------------------------------------
 void vtkSMProxyManager::LoadState(const vtkSMMessage* msg)
