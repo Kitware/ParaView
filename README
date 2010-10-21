@@ -23,8 +23,14 @@ Here are the steps to compile and run the application.
 ----------------------------------------------------------
 1.  Download
   # git clone git@github.com:nixz/ParaView-CAVE.git
+<<<<<<< HEAD
   # cd ParaView-CAVE
   # git submodule update --init
+=======
+  # git clone git@github.com:nixz/VTK-CAVE.git
+  # rmdir ParaView-CAVE/VTK
+  # mv VTK-CAVE/ ParaView-CAVE/VTK
+>>>>>>> updating readme
 
 2. Make a build directory
   # mkdir build
@@ -50,10 +56,14 @@ Once done -> configure (type 'c'). If everything is okay -> generate (option sho
 
 5. Open another terminal to  run the client. (note: this client connects to the server which open up 6 windows according to the config given in cave.pvx)
   # cd path/to/build/bin
+<<<<<<< HEAD
   FOR VRPN do the following
   # PV_ICET_WINDOW_BORDERS=1 ./paraview --stereo --stereo-type=Anaglyph --server=localhost --vrpn --vrpn-address=Tracker0@localhost
   For VRUI do the following
   # PV_ICET_WINDOW_BORDERS=1 ./paraview --stereo --stereo-type=Anaglyph --server=localhost --vrui --vrui-address=localhost
+=======
+  # PV_ICET_WINDOW_BORDERS=1 ./paraview --stereo --stereo-type=Anaglyph --server=localhost
+>>>>>>> updating readme
 
 Note:  PV_ICET_WINDOW_BORDERS=1 disables the full screen and instead opens up a 400x400 window. Remove this environment variable to work in full screen mode
 
