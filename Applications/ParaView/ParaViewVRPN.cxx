@@ -116,11 +116,15 @@ const vrpn_TRACKERCB t)
   if ( ++tData->t_counts[t.sensor] >= tracker_stride )
     {
     tData->t_counts[t.sensor] = 0;
-    printf("Tracker %s, sensor %d:\n        pos (%5.2f, %5.2f, %5.2f); quat (%5.2f, %5.2f, %5.2f, %5.2f)\n",
-    tData->t_name,
-    t.sensor,
-    t.pos[0], t.pos[1], t.pos[2],
-    t.quat[0], t.quat[1], t.quat[2], t.quat[3]);
+    if(t.sensor >0)
+      {
+      return;
+      }
+    // printf("Tracker %s, sensor %d:\n        pos (%5.2f, %5.2f, %5.2f); quat (%5.2f, %5.2f, %5.2f, %5.2f)\n",
+    // tData->t_name,
+    // t.sensor,
+    // t.pos[0], t.pos[1], t.pos[2],
+    // t.quat[0], t.quat[1], t.quat[2], t.quat[3]);
     pqView *view = 0;
     view = pqActiveObjects::instance().activeView();
     if ( view )
