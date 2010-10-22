@@ -24,7 +24,8 @@ SET(ParaView_SOURCE_FILES
 
 #------------------------------------------------------------------------------
 # Add install rules for required system runtimes such as MSVCRxx.dll
-SET (CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS_SKIP 1)
+SET (CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS_SKIP ON)
+SET (CMAKE_INSTALL_DEBUG_LIBRARIES ON)
 INCLUDE(InstallRequiredSystemLibraries)
 IF (CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS)
   INSTALL(FILES ${CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS}
@@ -81,29 +82,14 @@ ENDIF (BUILD_TESTING)
 #########################################################################
 # Add install rules for installing certain dependencies.
 
-#------------------------------------------------------------------------
-# Install Qt 
-SET (qtliblist QTCORE QTGUI QTNETWORK QTXML QTSQL QTHELP QTWEBKIT QTCLUCENE PHONON QTXMLPATTERNS)
+IF (PARAVIEW_INSTALL_THIRD_PARTY_LIBRARIES AND NOT APPLE)
 
-# QTDBUS is Unix only
-IF(NOT WIN32)
-  LIST(APPEND qtliblist QTDBUS)
-ENDIF(NOT WIN32)  
-
-IF (VTK_USE_QVTK_QTOPENGL)
-  LIST(APPEND qtliblist QTOPENGL)
-ENDIF (VTK_USE_QVTK_QTOPENGL)
-
-IF (PARAVIEW_INSTALL_THIRD_PARTY_LIBRARIES)
-   install_qt_libs("${qtliblist}" BrandedRuntime)
-  
   if(WIN32)
     # Now install the plugins for sqldrivers. For use by the help system
     INSTALL(DIRECTORY ${QT_PLUGINS_DIR}/sqldrivers 
             DESTINATION ${PV_INSTALL_BIN_DIR}
             COMPONENT Runtime
             FILES_MATCHING
-              PATTERN "*.so"
               PATTERN "*.dll")
   else(WIN32)
     # Now install the plugins for sqldrivers. For use by the help system
@@ -111,22 +97,49 @@ IF (PARAVIEW_INSTALL_THIRD_PARTY_LIBRARIES)
             DESTINATION ${PV_INSTALL_LIB_DIR}
             COMPONENT Runtime
             FILES_MATCHING
-              PATTERN "*.so"
-              PATTERN "*.dll")
+              PATTERN "*.so")
   endif(WIN32)
 
-  #------------------------------------------------------------------------
-  # Install ffmpeg, if used.
-  IF (VTK_USE_FFMPEG_ENCODER)
-    FOREACH(fmpglib avcodec avformat avutil swscale)
-      IF (FFMPEG_${fmpglib}_LIBRARY)
-        pv_install_library(${FFMPEG_${fmpglib}_LIBRARY}
-          ${PV_INSTALL_LIB_DIR}
-          BrandedRuntime)
-      ENDIF(FFMPEG_${fmpglib}_LIBRARY)
-    ENDFOREACH(fmpglib)
-  ENDIF (VTK_USE_FFMPEG_ENCODER)
-ENDIF(PARAVIEW_INSTALL_THIRD_PARTY_LIBRARIES)
+set(DIRS) # directories to search for prerequisites
+
+IF(PARAVIEW_BUILD_QT_GUI)
+  get_filename_component(QT_BIN_DIR "${QT_QMAKE_EXECUTABLE}" PATH)
+  get_filename_component(QT_LIB_DIR "${QT_QTCORE_LIBRARY_RELEASE}" PATH)
+  list(APPEND DIRS ${QT_BIN_DIR} ${QT_LIB_DIR})
+ENDIF(PARAVIEW_BUILD_QT_GUI)
+
+IF(VTK_USE_FFMPEG_ENCODER)
+  get_filename_component(FFMPEG_DIR "${FFMPEG_avcodec_LIBRARY}" PATH)
+  list(APPEND DIRS ${FFMPEG_DIR})
+ENDIF(VTK_USE_FFMPEG_ENCODER)
+
+IF(PARAVIEW_ENABLE_PYTHON)
+  get_filename_component(PYTHON_BIN_DIR "${PYTHON_EXECUTABLE}" PATH)
+  get_filename_component(PYTHON_LIB_DIR "${PYTHON_LIBRARY}" PATH)
+  list(APPEND DIRS ${PYTHON_BIN_DIR} ${PYTHON_LIB_DIR})
+ENDIF(PARAVIEW_ENABLE_PYTHON)
+
+IF(PARAVIEW_USE_MPI)
+  get_filename_component(MPI_LIB_DIR "${MPI_LIBRARY}" PATH)
+  get_filename_component(MPI_BIN_DIR "${MPIEXEC}" PATH)
+  list(APPEND DIRS ${MPI_LIB_DIR} ${MPI_BIN_DIR})
+ENDIF(PARAVIEW_USE_MPI)
+
+set(_extension)
+set(_dir "${PV_INSTALL_LIB_DIR}")
+IF(WIN32)
+  set(_extension ".exe")
+  set(_dir "bin")
+ENDIF(WIN32)
+
+set(APPS "\${CMAKE_INSTALL_PREFIX}/${_dir}/paraview${_extension}")  # paths to executables
+
+INSTALL(CODE "
+   include(${ParaView_CMAKE_DIR}/BundleUtilities.cmake)
+   fixup_bundle(\"${APPS}\"   \"\"   \"${DIRS}\")
+   " COMPONENT BrandedRuntime)
+
+ENDIF(PARAVIEW_INSTALL_THIRD_PARTY_LIBRARIES AND NOT APPLE)
 
 #------------------------------------------------------------------------
 # Import site specific installation rules file, if any.
