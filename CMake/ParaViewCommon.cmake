@@ -127,6 +127,10 @@ IF(NOT PV_INSTALL_DOC_DIR)
   SET(PV_INSTALL_DOC_DIR doc)
 ENDIF(NOT PV_INSTALL_DOC_DIR)
 
+# Override QtTesting install variables
+SET(QtTesting_INSTALL_BIN_DIR ${PV_INSTALL_BIN_DIR})
+SET(QtTesting_INSTALL_LIB_DIR ${PV_INSTALL_LIB_DIR})
+
 #########################################################################
 # Install no development files by default, but allow the user to get
 # them installed by setting PV_INSTALL_DEVELOPMENT to true.

@@ -104,7 +104,7 @@ set(DIRS) # directories to search for prerequisites
 
 IF(PARAVIEW_BUILD_QT_GUI)
   get_filename_component(QT_BIN_DIR "${QT_QMAKE_EXECUTABLE}" PATH)
-  #get_filename_component(QT_LIB_DIR "${QT_QTCORE_LIBRARY}" PATH)
+  get_filename_component(QT_LIB_DIR "${QT_QTCORE_LIBRARY_RELEASE}" PATH)
   list(APPEND DIRS ${QT_BIN_DIR} ${QT_LIB_DIR})
 ENDIF(PARAVIEW_BUILD_QT_GUI)
 
@@ -125,11 +125,17 @@ IF(PARAVIEW_USE_MPI)
   list(APPEND DIRS ${MPI_LIB_DIR} ${MPI_BIN_DIR})
 ENDIF(PARAVIEW_USE_MPI)
 
+set(_extension)
+set(_dir "${PV_INSTALL_LIB_DIR}")
+IF(WIN32)
+  set(_extension ".exe")
+  set(_dir "bin")
+ENDIF(WIN32)
 
-set(APPS "\${CMAKE_INSTALL_PREFIX}/bin/paraview.exe")  # paths to executables
+set(APPS "\${CMAKE_INSTALL_PREFIX}/${_dir}/paraview${_extension}")  # paths to executables
 
 INSTALL(CODE "
-   include(BundleUtilities)
+   include(${ParaView_CMAKE_DIR}/BundleUtilities.cmake)
    fixup_bundle(\"${APPS}\"   \"\"   \"${DIRS}\")
    " COMPONENT BrandedRuntime)
 
