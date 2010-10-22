@@ -39,6 +39,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVPlugin.h"
 #include "ParaViewVRPN.h"
 #include "ParaViewVRUI.h"
+#include "vtkProcessModule.h"
+#include "vtkPVOptions.h"
 
 
 
@@ -105,32 +107,37 @@ ParaViewMainWindow::ParaViewMainWindow()
   // Setup the help menu.
   pqParaViewMenuBuilders::buildHelpMenu(*this->Internals->menu_Help);
 
-#if 1
-  // VRPN input events.
-  this->VRPNTimer=new QTimer(this);
-  this->VRPNTimer->setInterval(40); // in ms
-  // to define: obj and callback()
-  this->Internals->InputDevice=new ParaViewVRPN;
-  this->Internals->InputDevice->SetName("Tracker0@localhost");
-  this->Internals->InputDevice->Init();
-  connect(this->VRPNTimer,SIGNAL(timeout()),
-          this->Internals->InputDevice,SLOT(callback()));
-  this->VRPNTimer->start();
-#endif
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  vtkPVOptions *options = (vtkPVOptions*)pm->GetOptions();
 
-#if 0
-  // VRUI input events.
-  this->VRUITimer=new QTimer(this);
-  this->VRUITimer->setInterval(40); // in ms
-  // to define: obj and callback()
-  this->Internals->InputDevice2=new ParaViewVRUI;
-  this->Internals->InputDevice2->SetName("localhost");
-  this->Internals->InputDevice2->SetPort(8555);
-  this->Internals->InputDevice2->Init();
-  connect(this->VRUITimer,SIGNAL(timeout()),
-          this->Internals->InputDevice2,SLOT(callback()));
-  this->VRUITimer->start();
-#endif
+  if(options->GetUseVRPN())
+    {
+    // VRPN input events.
+    this->VRPNTimer=new QTimer(this);
+    this->VRPNTimer->setInterval(40); // in ms
+    // to define: obj and callback()
+    this->Internals->InputDevice=new ParaViewVRPN;
+    this->Internals->InputDevice->SetName(options->GetVRPNAddress());
+    this->Internals->InputDevice->Init();
+    connect(this->VRPNTimer,SIGNAL(timeout()),
+            this->Internals->InputDevice,SLOT(callback()));
+    this->VRPNTimer->start();
+    }
+
+  if(options->GetUseVRUI())
+    {
+    // VRUI input events.
+    this->VRUITimer=new QTimer(this);
+    this->VRUITimer->setInterval(40); // in ms
+    // to define: obj and callback()
+    this->Internals->InputDevice2=new ParaViewVRUI;
+    this->Internals->InputDevice2->SetName(options->GetVRUIAddress());
+    this->Internals->InputDevice2->SetPort(8555);
+    this->Internals->InputDevice2->Init();
+    connect(this->VRUITimer,SIGNAL(timeout()),
+            this->Internals->InputDevice2,SLOT(callback()));
+    this->VRUITimer->start();
+    }
 
   // Final step, define application behaviors. Since we want all ParaView
   // behaviors, we use this convenience method.
