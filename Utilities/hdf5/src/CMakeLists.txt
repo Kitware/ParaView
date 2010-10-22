@@ -647,6 +647,7 @@ H5_SET_LIB_OPTIONS (${HDF5_LIB_TARGET} ${HDF5_LIB_NAME} ${LIB_TYPE})
 #-----------------------------------------------------------------------------
 # Add file(s) to CMake Install
 #-----------------------------------------------------------------------------
+IF (NOT PV_INSTALL_NO_DEVELOPMENT)
 INSTALL (
     FILES
         ${H5_PUBLIC_HEADERS}
@@ -654,6 +655,7 @@ INSTALL (
     DESTINATION
         include
 )
+ENDIF (NOT PV_INSTALL_NO_DEVELOPMENT)
 
 #-----------------------------------------------------------------------------
 # Add Target(s) to CMake Install for import into other projects
@@ -664,8 +666,8 @@ IF (HDF5_EXPORTED_TARGETS)
           ${HDF5_LIB_TARGET}
       EXPORT
           ${HDF5_EXPORTED_TARGETS}
-      LIBRARY DESTINATION lib
-      ARCHIVE DESTINATION lib
-      RUNTIME DESTINATION bin
+      RUNTIME DESTINATION ${PV_INSTALL_BIN_DIR} COMPONENT Runtime
+      LIBRARY DESTINATION ${PV_INSTALL_LIB_DIR} COMPONENT Runtime
+      ARCHIVE DESTINATION ${PV_INSTALL_LIB_DIR} COMPONENT Development
   )
 ENDIF (HDF5_EXPORTED_TARGETS)
