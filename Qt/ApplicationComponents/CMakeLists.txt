@@ -273,19 +273,13 @@ SET (SOURCE_FILES
 IF(PARAVIEW_ENABLE_PYTHON)
   SET (MOC_HEADERS
     ${MOC_HEADERS}
-    pqEditTraceReaction.h
     pqMacroReaction.h
-    pqSaveTraceReaction.h
     pqTraceReaction.h
     )
   SET (SOURCE_FILES
     ${SOURCE_FILES}
-    pqEditTraceReaction.cxx
-    pqEditTraceReaction.h
     pqMacroReaction.cxx
     pqMacroReaction.h
-    pqSaveTraceReaction.cxx
-    pqSaveTraceReaction.h
     pqTraceReaction.cxx
     pqTraceReaction.h
     )

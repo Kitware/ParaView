@@ -85,10 +85,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqViewSettingsReaction.h"
 
 #ifdef PARAVIEW_ENABLE_PYTHON
-#include "pqEditTraceReaction.h"
 #include "pqMacroReaction.h"
 #include "pqPythonManager.h"
-#include "pqSaveTraceReaction.h"
 #include "pqTraceReaction.h"
 #endif
 
@@ -248,10 +246,6 @@ void pqParaViewMenuBuilders::buildToolsMenu(QMenu& menu)
                        << pqSetName("actionToolsStartTrace"), true);
   new pqTraceReaction(menu.addAction("Stop Trace")
                       << pqSetName("actionToolsStartTrace"), false);
-  new pqEditTraceReaction(menu.addAction("Edit Trace")
-                      << pqSetName("actionToolsEditTrace"));
-  new pqSaveTraceReaction(menu.addAction("Save Trace")
-                          << pqSetName("actionToolsSaveTrace"));
 #endif
 }
 

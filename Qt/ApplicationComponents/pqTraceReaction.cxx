@@ -85,6 +85,7 @@ void pqTraceReaction::stop()
     return;
     }
   pythonManager->stopTrace();
+  pythonManager->editTrace();
 }
 
 //-----------------------------------------------------------------------------
