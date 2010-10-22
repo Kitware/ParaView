@@ -129,11 +129,20 @@ static void vtkPythonAppInitPrependPath(const char* self_dir)
       "/lib/python/paraview", // UNIX --home
       "/Lib/site-packages/paraview", "/Lib/paraview", // Windows
       "/site-packages/paraview", "/paraview", // Windows
+      "/../lib/paraview-" PARAVIEW_VERSION "/site-packages/paraview",
+      "/../lib/paraview-" PARAVIEW_VERSION "/site-packages",
       0
     };
 
     vtkstd::string prefix = self_dir;
     vtkPythonAppInitPrependPythonPath(self_dir); // Propbably not needed any longer.
+
+#if defined(WIN32)
+    vtkstd::string lib_dir = vtkstd::string(prefix + "/../lib/paraview-" + PARAVIEW_VERSION);
+    lib_dir = vtksys::SystemTools::CollapseFullPath( lib_dir.c_str());
+    vtkPythonAppInitPrependPythonPath(lib_dir.c_str());
+#endif
+
     // These two directories should be all that is necessary when running the
     // python interpreter in a build tree.
     vtkPythonAppInitPrependPythonPath(PV_PYTHON_PACKAGE_DIR "/site-packages");
