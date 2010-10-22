@@ -275,7 +275,7 @@ void ParaViewVRUI::callback()
 {
   if(this->Initialized)
     {
-    std::cout << "callback()" << std::endl;
+    // std::cout << "callback()" << std::endl;
 
     this->Internals->StateMutex->lock();
 
