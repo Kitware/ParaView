@@ -39,6 +39,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QTcpSocket>
 #include <QWaitCondition>
 #include <QMutex>
+#include "vtkMath.h"
+#include "vtkSMCaveRenderViewProxy.h"
+#include "pqActiveObjects.h"
+#include "pqView.h"
+
 
 class ParaViewVRUI::pqInternals
 {
@@ -333,11 +338,26 @@ void ParaViewVRUI::PrintPositionOrientation()
   (*trackers)[0]->GetPosition(pos);
   (*trackers)[0]->GetUnitQuaternion(q);
 
-  cout << "pos=("<< pos[0] << "," << pos[1] << "," << pos[2] << ")" << endl;
-  cout << "q=("<< q[0] << "," << q[1] << "," << q[2] << "," << q[3] << ")"
-       << endl;
+  // cout << "pos=("<< pos[0] << "," << pos[1] << "," << pos[2] << ")" << endl;
+  // cout << "q=("<< q[0] << "," << q[1] << "," << q[2] << "," << q[3] << ")"
+  //      << endl;
 
   vtkstd::vector<bool> *buttons=this->Internals->State->GetButtonStates();
-  cout << "button0=" << (*buttons)[0] << endl;
-
+  // cout << "button0=" << (*buttons)[0] << endl;
+  pqView *view = 0;
+  view = pqActiveObjects::instance().activeView();
+  if ( view )
+    {
+    vtkSMCaveRenderViewProxy *proxy = 0;
+    proxy = vtkSMCaveRenderViewProxy::SafeDownCast( view->getViewProxy() );
+    if ( proxy )
+      {
+      double rotMat[3][3];
+      vtkMath::QuaternionToMatrix3x3((double*)q,rotMat);
+      proxy->SetHeadPose( rotMat[0][0], rotMat[0][1],rotMat[0][2], pos[0]*1,
+                          rotMat[1][0], rotMat[1][1],rotMat[1][2], pos[1]*1,
+                          rotMat[2][0], rotMat[2][1],rotMat[2][2], pos[2]*1,
+                          0.0, 0.0, 0.0, 1.0 );
+      }
+    }
 }

@@ -33,11 +33,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __ParaViewVRPN_h
 
 #include <QObject>
-#include "vtkSMCaveRenderViewProxy.h"
-#include "pqActiveObjects.h"
-#include "pqView.h"
-
-
 
 /// Callback to listen to VRPN events
 class ParaViewVRPN : public QObject

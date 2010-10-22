@@ -37,7 +37,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vrpn_Dial.h>
 #include <vrpn_Text.h>
 #include "vtkMath.h"
-
+#include "vtkSMCaveRenderViewProxy.h"
+#include "pqActiveObjects.h"
+#include "pqView.h"
 
 #include <vtkstd/vector>
 #include <iostream>
@@ -120,11 +122,7 @@ const vrpn_TRACKERCB t)
       {
       return;
       }
-    // printf("Tracker %s, sensor %d:\n        pos (%5.2f, %5.2f, %5.2f); quat (%5.2f, %5.2f, %5.2f, %5.2f)\n",
-    // tData->t_name,
-    // t.sensor,
-    // t.pos[0], t.pos[1], t.pos[2],
-    // t.quat[0], t.quat[1], t.quat[2], t.quat[3]);
+
     pqView *view = 0;
     view = pqActiveObjects::instance().activeView();
     if ( view )
@@ -139,10 +137,6 @@ const vrpn_TRACKERCB t)
         rotMat[1][0], rotMat[1][1],rotMat[1][2], t.pos[1]*1,
         rotMat[2][0], rotMat[2][1],rotMat[2][2], t.pos[2]*1,
         0.0, 0.0, 0.0, 1.0 );
-        // proxy->SetHeadPose( 1.0, 0.0, 0.0, t.pos[0]*1,
-        //                     0.0, 1.0, 0.0, t.pos[2]*-1,
-        //                     0.0, 0.0, 1.0, t.pos[1]*1,
-        //                     0.0, 0.0, 0.0, 1.0 );
         }
       }
     }
