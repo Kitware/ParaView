@@ -39,6 +39,8 @@ class QAction;
 class QMenu;
 class QTextEdit;
 
+class pqPythonManager;
+
 class QTPYTHON_EXPORT pqPythonScriptEditor : public QMainWindow
 {
     Q_OBJECT
@@ -48,6 +50,7 @@ public:
     pqPythonScriptEditor(QWidget* parent = 0);
 
   void setSaveDialogDefaultDirectory(const QString& dir);
+  void setPythonManager(pqPythonManager* manager);
 
 public slots:
 
@@ -69,6 +72,7 @@ private slots:
     void open();
     bool save();
     bool saveAs();
+    bool saveAsMacro();
     void documentWasModified();
 
 private:
@@ -94,10 +98,13 @@ private:
     QAction*  openAct;
     QAction*  saveAct;
     QAction*  saveAsAct;
+    QAction*  saveAsMacroAct;
     QAction*  exitAct;
     QAction*  cutAct;
     QAction*  copyAct;
     QAction*  pasteAct;
+
+    pqPythonManager* pythonManager;
 };
 
 #endif

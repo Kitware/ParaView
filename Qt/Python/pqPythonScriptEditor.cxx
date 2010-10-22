@@ -31,6 +31,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "pqPythonScriptEditor.h"
 #include "pqApplicationCore.h"
+#include "pqCoreUtilities.h"
+#include "pqPythonManager.h"
 #include "pqSettings.h"
 
 #include <QApplication>
@@ -49,6 +51,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //-----------------------------------------------------------------------------
 pqPythonScriptEditor::pqPythonScriptEditor(QWidget* parent) : Superclass(parent)
 {
+  this->pythonManager = NULL;
   this->TextEdit = new QTextEdit;
   this->setCentralWidget(this->TextEdit);
   this->createActions();
@@ -124,6 +127,13 @@ void pqPythonScriptEditor::setSaveDialogDefaultDirectory(const QString& dir)
 }
 
 //-----------------------------------------------------------------------------
+void pqPythonScriptEditor::setPythonManager(pqPythonManager* manager)
+{
+  this->pythonManager = manager;
+  this->saveAsMacroAct->setEnabled(manager);
+}
+
+//-----------------------------------------------------------------------------
 bool pqPythonScriptEditor::save()
 {
   if (this->CurrentFile.isEmpty())
@@ -137,8 +147,34 @@ bool pqPythonScriptEditor::save()
 }
 
 //-----------------------------------------------------------------------------
+bool pqPythonScriptEditor::saveAsMacro()
+{
+  QString userMacroDir = pqCoreUtilities::getParaViewUserDirectory() + "/Macros";
+  QString fileName = QFileDialog::getSaveFileName(this, tr("Save Macro"),
+    userMacroDir, tr("Python script (*.py)"));
+  if (fileName.isEmpty())
+    {
+    return false;
+    }
+  if (!fileName.endsWith(".py"))
+    {
+    fileName.append(".py");
+    }
+  if(this->saveFile(fileName))
+    {
+    if(pythonManager)
+      {
+      pythonManager->updateMacroList();
+      }
+    return true;
+    }
+  return false;
+}
+
+//-----------------------------------------------------------------------------
 bool pqPythonScriptEditor::saveAs()
 {
+
   QString fileName = QFileDialog::getSaveFileName(this, tr("Save File"),
     this->DefaultSaveDirectory, tr("Python script (*.py)"));
   if (fileName.isEmpty())
@@ -180,6 +216,10 @@ void pqPythonScriptEditor::createActions()
   this->saveAsAct->setStatusTip(tr("Save the document under a new name"));
   this->connect(this->saveAsAct, SIGNAL(triggered()), this, SLOT(saveAs()));
 
+  this->saveAsMacroAct = new QAction(tr("Save As &Macro..."), this);
+  this->saveAsMacroAct->setStatusTip(tr("Save the document as a Macro"));
+  this->connect(this->saveAsMacroAct, SIGNAL(triggered()), this, SLOT(saveAsMacro()));
+
   this->exitAct = new QAction(tr("C&lose"), this);
   this->exitAct->setShortcut(tr("Ctrl+W"));
   this->exitAct->setStatusTip(tr("Close the script editor"));
@@ -203,6 +243,7 @@ void pqPythonScriptEditor::createActions()
                             "selection"));
   this->connect(this->pasteAct, SIGNAL(triggered()), this->TextEdit, SLOT(paste()));
 
+  this->saveAsMacroAct->setEnabled(false);
   this->cutAct->setEnabled(false);
   this->copyAct->setEnabled(false);
   this->connect(this->TextEdit, SIGNAL(copyAvailable(bool)),
@@ -219,6 +260,7 @@ void pqPythonScriptEditor::createMenus()
   this->fileMenu->addAction(this->openAct);
   this->fileMenu->addAction(this->saveAct);
   this->fileMenu->addAction(this->saveAsAct);
+  this->fileMenu->addAction(this->saveAsMacroAct);
   this->fileMenu->addSeparator();
   this->fileMenu->addAction(this->exitAct);
 

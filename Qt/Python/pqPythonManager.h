@@ -108,6 +108,11 @@ public:
   // Save the macro in ParaView configuration and update widget automatically
   void addMacro(const QString& fileName);
 
+  // Description:
+  // Invalidate the macro list, so the menu/toolbars are updated according to
+  // the content of the Macros directories...
+  void updateMacroList();
+
 signals:
 
   void paraviewPythonModulesImported();
