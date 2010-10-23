@@ -93,11 +93,13 @@ IF (PARAVIEW_INSTALL_THIRD_PARTY_LIBRARIES AND NOT APPLE)
               PATTERN "*.dll")
 
     # Python Lib dir contains all of the native python modules
-    get_filename_component(_python_base_dir ${PYTHON_EXECUTABLE} PATH)
-    INSTALL(DIRECTORY ${_python_base_dir}/Lib
-            DESTINATION ${PV_INSTALL_BIN_DIR}
-            USE_SOURCE_PERMISSIONS
-            COMPONENT Runtime)
+    IF(PARAVIEW_ENABLE_PYTHON)
+      get_filename_component(_python_base_dir ${PYTHON_EXECUTABLE} PATH)
+      INSTALL(DIRECTORY ${_python_base_dir}/Lib
+              DESTINATION ${PV_INSTALL_BIN_DIR}
+              USE_SOURCE_PERMISSIONS
+              COMPONENT Runtime)
+    ENDIF(PARAVIEW_ENABLE_PYTHON)
   else(WIN32)
     # Now install the plugins for sqldrivers. For use by the help system
     INSTALL(DIRECTORY ${QT_PLUGINS_DIR}/sqldrivers 
@@ -112,7 +114,8 @@ set(DIRS) # directories to search for prerequisites
 IF(PARAVIEW_BUILD_QT_GUI)
   get_filename_component(QT_BIN_DIR "${QT_QMAKE_EXECUTABLE}" PATH)
   get_filename_component(QT_LIB_DIR "${QT_QTCORE_LIBRARY_RELEASE}" PATH)
-  list(APPEND DIRS ${QT_BIN_DIR} ${QT_LIB_DIR})
+  get_filename_component(QT_LIB_DIR_DEBUG "${QT_QTCORE_LIBRARY_DEBUG}" PATH)
+  list(APPEND DIRS ${QT_BIN_DIR} ${QT_LIB_DIR} ${QT_LIB_DIR_DEBUG})
 ENDIF(PARAVIEW_BUILD_QT_GUI)
 
 IF(VTK_USE_FFMPEG_ENCODER)
@@ -142,7 +145,7 @@ ENDIF(WIN32)
 set(APPS "\${CMAKE_INSTALL_PREFIX}/${_dir}/paraview${_extension}")  # paths to executables
 
 INSTALL(CODE "
-   include(${ParaView_CMAKE_DIR}/BundleUtilities.cmake)
+   include("${ParaView_CMAKE_DIR}/BundleUtilities.cmake")
    fixup_bundle(\"${APPS}\"   \"\"   \"${DIRS}\")
    " COMPONENT BrandedRuntime)
 
