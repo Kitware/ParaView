@@ -91,6 +91,13 @@ IF (PARAVIEW_INSTALL_THIRD_PARTY_LIBRARIES AND NOT APPLE)
             COMPONENT Runtime
             FILES_MATCHING
               PATTERN "*.dll")
+
+    # Python Lib dir contains all of the native python modules
+    get_filename_component(_python_base_dir ${PYTHON_EXECUTABLE} PATH)
+    INSTALL(DIRECTORY ${_python_base_dir}/Lib
+            DESTINATION ${PV_INSTALL_BIN_DIR}
+            USE_SOURCE_PERMISSIONS
+            COMPONENT Runtime)
   else(WIN32)
     # Now install the plugins for sqldrivers. For use by the help system
     INSTALL(DIRECTORY ${QT_PLUGINS_DIR}/sqldrivers 
