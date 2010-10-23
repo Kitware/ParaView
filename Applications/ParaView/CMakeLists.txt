@@ -145,7 +145,7 @@ ENDIF(WIN32)
 set(APPS "\${CMAKE_INSTALL_PREFIX}/${_dir}/paraview${_extension}")  # paths to executables
 
 INSTALL(CODE "
-   include("${ParaView_CMAKE_DIR}/BundleUtilities.cmake")
+   include(\"${ParaView_CMAKE_DIR}/BundleUtilities.cmake\")
    fixup_bundle(\"${APPS}\"   \"\"   \"${DIRS}\")
    " COMPONENT BrandedRuntime)
 
