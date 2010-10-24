@@ -1,28 +1,12 @@
 #!/bin/bash
-# Typical usage:
-#  ~/Kitware/buildPackage.sh /tmp/Kitware/ParaView3/ /tmp/Kitware/ParaView3Bin
-#  ~/Kitware/buildParaViewPackage.sh <version> <cvstag>
 
-if [ "$#" != "1" ]; then
-  echo "Usage: $0 <cvstag>"
-  exit 1
-fi
+cd ../..
+srcdir=${PWD}
+cd ..
+rootdir=${PWD}
+builddir=${rootdir}/ParaViewAppBin
 
-
-cvstag=$1
-
-srcdir_prefix=${PWD}
-srcdir=${srcdir_prefix}/ParaView
-builddir=${srcdir_prefix}/ParaViewAppBin
-
-export DYLD_LIBRARY_PATH=/Users/partyd/Dashboards/Support/qt-4.6.2/bin/lib:/Users/partyd/Kitware/Support/ffmpeg-universal/lib:${builddir}/bin
-
-mkdir ${srcdir_prefix}
-cd ${srcdir_prefix}
-
-## Checkout the version requested.
-#echo "Checking out version: ${cvstag}"
-#cvs -q -d :pserver:anoncvs@www.paraview.org:/cvsroot/ParaView3 co -r ${cvstag} ParaView3 
+export DYLD_LIBRARY_PATH=/Users/partyd/Dashboards/Support/qt-4.6.2-10.4/install/lib:/Users/partyd/Kitware/Support/ffmpeg-universal/lib:${builddir}/bin
 
 # Make the binary directory.
 mkdir ${builddir}
@@ -49,7 +33,7 @@ PYTHON_UTIL_LIBRARY:FILEPATH=
 CMAKE_OSX_ARCHITECTURES:STRING=i386;ppc
 CMAKE_OSX_SYSROOT:PATH=/Developer/SDKs/MacOSX10.4u.sdk
 CMAKE_OSX_DEPLOYMENT_TARGET:STRING=10.4
-QT_QMAKE_EXECUTABLE:FILEPATH=/Users/partyd/Dashboards/Support/qt-4.6.2/bin/bin/qmake
+QT_QMAKE_EXECUTABLE:FILEPATH=/Users/partyd/Dashboards/Support/qt-4.6.2-10.4/install/bin/qmake
 VTK_USE_FFMPEG_ENCODER:BOOL=ON
 VTK_USE_QVTK_QTOPENGL:BOOL=ON
 FFMPEG_INCLUDE_DIR:PATH=/Users/partyd/Kitware/Support/ffmpeg-universal/include
@@ -63,10 +47,10 @@ GENERATE_FILTERS_DOCUMENTATION:BOOL=ON
 PARAVIEW_INSTALL_DEVELOPMENT:BOOL=ON
 EOF
 
-cmake ../ParaView
+cmake ${srcdir}
 
 echo "Building Full Package..."
-make -j5
+make -j18
 
 echo "Generating package(s) using CPACK"
 cpack --config ${builddir}/Applications/ParaView/CPackParaView-DevelopmentConfig.cmake -G TGZ
