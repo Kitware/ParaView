@@ -389,17 +389,6 @@ public:
       comm = mpiComm->GetMPIComm()->GetHandle();
       }
 
-    if(this->ApplicationID > 0 && !AdiosFile::AdiosStageInitialised)
-      {
-      globals_adios_set_application_id(this->ApplicationID);
-      adios_set_read_method(this->AdiosReadMethod);
-      if (!adios_read_init(comm))
-        {
-        fprintf (stderr, "%s\n", adios_errmsg());
-        }
-      AdiosFile::AdiosStageInitialised = true;
-      }
-
     this->File = adios_fopen(this->FileName.c_str(), (comm) ? *comm : 0);
 #endif
 
@@ -1471,7 +1460,7 @@ public:
       {
       comm = mpiComm->GetMPIComm()->GetHandle();
       }
-    if (!adios_read_init(comm))
+    if (!adios_read_init(*comm))
       {
       fprintf (stderr, "%s\n", adios_errmsg());
       }
