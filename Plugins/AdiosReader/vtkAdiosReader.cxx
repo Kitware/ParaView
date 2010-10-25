@@ -33,12 +33,10 @@
 #include <vtkMultiBlockDataSet.h>
 #include <vtkStructuredGrid.h>
 #include <vtkDataSet.h>
-#include "vtkConeSource.h"
+#include <vtkConeSource.h>
 
 #include <vtkCellData.h>
-
 #include <vtkPointData.h>
-
 #include <vtkDataArray.h>
 #include <vtkCharArray.h>
 #include <vtkUnsignedCharArray.h>
@@ -64,6 +62,7 @@ public:
     this->MeshFile = NULL;
     this->DataFile = NULL;
     this->TimeStep = 0;
+    this->AdiosInitialized = false;
     }
   // --------------------------------------------------------------------------
   virtual ~Internals()
@@ -78,12 +77,19 @@ public:
       delete this->DataFile;
       this->DataFile = NULL;
       }
+    AdiosGlobal::Finalize();
     }
   // --------------------------------------------------------------------------
   void UpdateFileName(const char* currentFileName)
     {
     if(!currentFileName)
       return;
+
+    if(!this->AdiosInitialized)
+      {
+      this->AdiosInitialized = true;
+      AdiosGlobal::Initialize();
+      }
 
     if(!this->MeshFile)
       {
@@ -231,6 +237,7 @@ private:
   AdiosFile* MeshFile;
   AdiosFile* DataFile;
   double TimeStep;
+  bool AdiosInitialized;
 };
 //*****************************************************************************
 vtkStandardNewMacro(vtkAdiosReader);
@@ -428,4 +435,15 @@ int vtkAdiosReader::ReadOutputType()
 //  if(this->Internal->IsPixieFormat())
     return VTK_MULTIBLOCK_DATA_SET;
 //  return VTK_UNSTRUCTURED_GRID;
+}
+//----------------------------------------------------------------------------
+void vtkAdiosReader::SetReadMethodToBP()
+{
+  AdiosGlobal::SetReadMethodToBP();
+}
+
+//----------------------------------------------------------------------------
+void vtkAdiosReader::SetReadMethodToDART()
+{
+  AdiosGlobal::SetReadMethodToDART();
 }
