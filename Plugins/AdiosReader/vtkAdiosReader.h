@@ -37,6 +37,11 @@ public:
   vtkSetStringMacro(FileName);
   vtkGetStringMacro(FileName);
 
+  // Decription:
+  // Set Read method
+  void SetReadMethodToBP();
+  void SetReadMethodToDART();
+
   // Description:
   // Test whether the file with the given name can be read by this
   // reader.
