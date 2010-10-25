@@ -82,7 +82,6 @@ protected:
   void GetNextPacket();
 
   char *Name;
-  int NameCapacity;
   int Port;
 
   class pqInternals;

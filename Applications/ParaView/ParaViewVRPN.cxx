@@ -147,7 +147,6 @@ ParaViewVRPN::ParaViewVRPN()
 {
   this->Internals=new pqInternals();
   this->Name=0;
-  this->NameCapacity=0;
   this->Initialized=false;
 }
 
@@ -156,14 +155,14 @@ void ParaViewVRPN::SetName(const char *name)
 {
   if(this->Name!=name)
     {
-    int size=strlen(name)+1;
-    if(this->NameCapacity<size)
+    int size=strlen(name) + 1;
+    if(name && size > 1)
       {
       if(this->Name!=0)
         {
         delete[] this->Name;
         }
-      this->Name=new char[this->NameCapacity];
+      this->Name=new char[size];
       }
     strncpy(this->Name,name,size);
     }

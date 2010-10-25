@@ -61,7 +61,6 @@ protected slots:
 
 protected:
   char *Name;
-  int NameCapacity;
 
   class pqInternals;
   pqInternals* Internals;
