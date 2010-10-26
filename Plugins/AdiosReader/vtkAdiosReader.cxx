@@ -472,7 +472,7 @@ void vtkAdiosReader::SetReadMethod(int methodEnum)
 //----------------------------------------------------------------------------
 void vtkAdiosReader::SetAdiosApplicationId(int id)
 {
-  AdiosGlobal::SetAdiosApplicationID(id);
+  AdiosGlobal::SetApplicationId(id);
 }
 
 //----------------------------------------------------------------------------

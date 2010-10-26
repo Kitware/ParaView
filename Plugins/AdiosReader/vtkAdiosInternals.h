@@ -1462,11 +1462,6 @@ public:
 class AdiosGlobal
 {
 public:
-  static void SetAdiosApplicationID(int id)
-    {
-    //globals_adios_set_application_i
-    }
-
   static void SetReadMethodToBP()
     {
     adios_set_read_method(ADIOS_READ_METHOD_BP);
