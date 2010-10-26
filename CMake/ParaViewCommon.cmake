@@ -632,7 +632,7 @@ IF(PARAVIEW_USE_VISITBRIDGE)
   SET(VISITAVTALGORITHMS_INCLUDE_DIRS
     "${ParaView_SOURCE_DIR}/Utilities/VisItBridge/AvtAlgorithms"
     "${ParaView_BINARY_DIR}/Utilities/VisItBridge/AvtAlgorithms"
-  )
+    )
 
   SET(VISITDATABASES_KITS_DIR
     "${ParaView_BINARY_DIR}/Utilities/VisItBridge/databases/Utilities")
@@ -640,7 +640,11 @@ IF(PARAVIEW_USE_VISITBRIDGE)
     ${VISITAVTALGORITHMS_INCLUDE_DIRS}
     "${ParaView_SOURCE_DIR}/Utilities/VisItBridge/databases"
     "${ParaView_BINARY_DIR}/Utilities/VisItBridge/databases"
-  )
+    )
+
+  #needed for plugins to be able to use the VisIt Plugin macros
+  SET(VISITBRIDGE_CMAKE_DIR
+     "${ParaView_SOURCE_DIR}/Utilities/VisItBridge/CMake")
 
 ENDIF(PARAVIEW_USE_VISITBRIDGE)
 
@@ -860,7 +864,7 @@ SET(PARAVIEW_INCLUDE_DIRS
 
 IF(PARAVIEW_USE_VISITBRIDGE)
   SET(PARAVIEW_INCLUDE_DIRS ${PARAVIEW_INCLUDE_DIRS}
-  ${VISITBRIDGE_INCLUDE_DIRS})
+  ${VISITAVTALGORITHMS_INCLUDE_DIRS})
 ENDIF(PARAVIEW_USE_VISITBRIDGE)
 
 CONFIGURE_FILE(${ParaView_SOURCE_DIR}/vtkPVConfig.h.in
