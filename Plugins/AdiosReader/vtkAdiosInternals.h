@@ -66,6 +66,7 @@ extern "C"
 {
 #include <adios_read.h>
 #include <globals.h>
+#include <adios_error.h>
 }
 
 #ifndef __vtkAdiosInternals_h
@@ -391,6 +392,21 @@ public:
       }
 
     this->File = adios_fopen(this->FileName.c_str(), (comm) ? *comm : 0);
+
+    while (this->File == NULL && adios_errno != err_end_of_file)
+      {
+      fprintf (stderr, "Need to wait a bit: %s\n", adios_errmsg());
+      sleep(1);
+      this->File = adios_fopen (this->FileName.c_str(), (comm) ? *comm : 0);
+      }
+
+    if (adios_errno == err_end_of_file)
+      {
+      fprintf (stderr, "No more timesteps available. Exit loop. %s\n", adios_errmsg());
+      // Exit while loop here
+      return false;
+      }
+
 #endif
 
     if (this->File == NULL)
@@ -634,7 +650,7 @@ public:
     this->Open();
 
     // Make sure we are in the Pixie case
-    if(!this->IsPixieFileType())
+    if(this->File == NULL || !this->IsPixieFileType())
       return NULL;
 
     // Retreive Rectilinear mesh for Pixie format
@@ -805,7 +821,7 @@ public:
     this->Open();
 
     // Make sure we are in the Pixie case
-    if(!this->IsPixieFileType())
+    if(this->File == NULL || !this->IsPixieFileType())
       return NULL;
 
     // Get grid size
