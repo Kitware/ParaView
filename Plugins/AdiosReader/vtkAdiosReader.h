@@ -80,12 +80,15 @@ protected:
   // The input file's name.
   char* FileName;
 
+//BTX
+
 private:
   vtkAdiosReader(const vtkAdiosReader&);  // Not implemented.
   void operator=(const vtkAdiosReader&);  // Not implemented.
 
   class Internals;
   Internals* Internal;
+//ETX
 };
 
 #endif
