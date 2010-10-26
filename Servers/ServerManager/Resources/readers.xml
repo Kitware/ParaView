@@ -6341,6 +6341,1014 @@
      </Hints>
      <!-- End stlreader-->
    </FileSeriesReaderProxy>
+#ifdef PARAVIEW_USE_VISITBRIDGE
+  <SourceProxy name="VisItEnzoReader" class="vtkVisItEnzoReader">
+    <StringVectorProperty
+      name="FileName"
+      command="SetFileName"
+      number_of_elements="1">
+      <FileListDomain name="files"/>
+    </StringVectorProperty>
+
+   <StringVectorProperty
+      name="MeshInfo"
+      information_only="1">
+      <ArraySelectionInformationHelper attribute_name="Mesh"/>
+   </StringVectorProperty>
+
+   <StringVectorProperty
+      name="MeshStatus"
+      label="Meshes"
+      command="SetMeshArrayStatus"
+      number_of_elements="2"
+      repeat_command="1"
+      number_of_elements_per_command="2"
+      element_types="2 0"
+      information_property="MeshInfo">
+     <ArraySelectionDomain name="array_list">
+        <RequiredProperties>
+           <Property name="MeshInfo" function="ArrayList"/>
+        </RequiredProperties>
+     </ArraySelectionDomain>
+     <Documentation>
+       Select the meshes to be loaded from the dataset, if any.
+     </Documentation>
+   </StringVectorProperty>
+
+   <StringVectorProperty
+      name="MaterialInfo"
+      information_only="1">
+      <ArraySelectionInformationHelper attribute_name="Material"/>
+   </StringVectorProperty>
+
+   <StringVectorProperty
+      name="MaterialStatus"
+      label="Materials"
+      command="SetMaterialArrayStatus"
+      number_of_elements="2"
+      repeat_command="1"
+      number_of_elements_per_command="2"
+      element_types="2 0"
+      information_property="MaterialInfo">
+     <ArraySelectionDomain name="array_list">
+        <RequiredProperties>
+           <Property name="MaterialInfo" function="ArrayList"/>
+        </RequiredProperties>
+     </ArraySelectionDomain>
+     <Documentation>
+       Select the Materiales to be loaded from the dataset, if any.
+     </Documentation>
+   </StringVectorProperty>
+
+  <StringVectorProperty
+      name="CellArrayInfo"
+      information_only="1">
+      <ArraySelectionInformationHelper attribute_name="Cell"/>
+   </StringVectorProperty>
+
+   <StringVectorProperty
+      name="CellArrayStatus"
+      command="SetCellArrayStatus"
+      number_of_elements="0"
+      repeat_command="1"
+      number_of_elements_per_command="2"
+      element_types="2 0"
+      information_property="CellArrayInfo"
+      label="Cell Arrays">
+     <ArraySelectionDomain name="array_list">
+        <RequiredProperties>
+           <Property name="CellArrayInfo" function="ArrayList"/>
+        </RequiredProperties>
+     </ArraySelectionDomain>
+     <Documentation>
+       This property lists which cell-centered arrays to read.
+     </Documentation>
+   </StringVectorProperty>
+
+   <StringVectorProperty
+      name="PointArrayInfo"
+      information_only="1">
+      <ArraySelectionInformationHelper attribute_name="Point"/>
+   </StringVectorProperty>
+
+   <StringVectorProperty
+      name="PointArrayStatus"
+      command="SetPointArrayStatus"
+      number_of_elements="0"
+      repeat_command="1"
+      number_of_elements_per_command="2"
+      element_types="2 0"
+      information_property="PointArrayInfo"
+      label="Point Arrays">
+     <ArraySelectionDomain name="array_list">
+        <RequiredProperties>
+           <Property name="PointArrayInfo" function="ArrayList"/>
+        </RequiredProperties>
+     </ArraySelectionDomain>
+     <Documentation>
+       This property lists which point-centered arrays to read.
+     </Documentation>
+   </StringVectorProperty>
+
+   <!-- The following two properties magically send time information -->
+   <!-- to the animation panel. -->
+   <DoubleVectorProperty
+       name="TimestepValues"
+       repeatable="1"
+       information_only="1">
+     <TimeStepsInformationHelper/>
+   </DoubleVectorProperty>
+   <DoubleVectorProperty name="TimeRange" information_only="1">
+     <TimeRangeInformationHelper/>
+   </DoubleVectorProperty>
+
+   <Hints>
+     <ReaderFactory extensions="hierarchy boundary"
+                    file_description="VisIt Enzo Reader" />
+   </Hints>
+   </SourceProxy>
+
+  <SourceProxy name="VisItFluentReader" class="vtkVisItFluentReader">
+    <StringVectorProperty
+      name="FileName"
+      command="SetFileName"
+      number_of_elements="1">
+      <FileListDomain name="files"/>
+    </StringVectorProperty>
+
+   <StringVectorProperty
+      name="MeshInfo"
+      information_only="1">
+      <ArraySelectionInformationHelper attribute_name="Mesh"/>
+   </StringVectorProperty>
+
+   <StringVectorProperty
+      name="MeshStatus"
+      label="Meshes"
+      command="SetMeshArrayStatus"
+      number_of_elements="2"
+      repeat_command="1"
+      number_of_elements_per_command="2"
+      element_types="2 0"
+      information_property="MeshInfo">
+     <ArraySelectionDomain name="array_list">
+        <RequiredProperties>
+           <Property name="MeshInfo" function="ArrayList"/>
+        </RequiredProperties>
+     </ArraySelectionDomain>
+     <Documentation>
+       Select the meshes to be loaded from the dataset, if any.
+     </Documentation>
+   </StringVectorProperty>
+
+   <StringVectorProperty
+      name="MaterialInfo"
+      information_only="1">
+      <ArraySelectionInformationHelper attribute_name="Material"/>
+   </StringVectorProperty>
+
+   <StringVectorProperty
+      name="MaterialStatus"
+      label="Materials"
+      command="SetMaterialArrayStatus"
+      number_of_elements="2"
+      repeat_command="1"
+      number_of_elements_per_command="2"
+      element_types="2 0"
+      information_property="MaterialInfo">
+     <ArraySelectionDomain name="array_list">
+        <RequiredProperties>
+           <Property name="MaterialInfo" function="ArrayList"/>
+        </RequiredProperties>
+     </ArraySelectionDomain>
+     <Documentation>
+       Select the Materiales to be loaded from the dataset, if any.
+     </Documentation>
+   </StringVectorProperty>
+
+  <StringVectorProperty
+      name="CellArrayInfo"
+      information_only="1">
+      <ArraySelectionInformationHelper attribute_name="Cell"/>
+   </StringVectorProperty>
+
+   <StringVectorProperty
+      name="CellArrayStatus"
+      command="SetCellArrayStatus"
+      number_of_elements="0"
+      repeat_command="1"
+      number_of_elements_per_command="2"
+      element_types="2 0"
+      information_property="CellArrayInfo"
+      label="Cell Arrays">
+     <ArraySelectionDomain name="array_list">
+        <RequiredProperties>
+           <Property name="CellArrayInfo" function="ArrayList"/>
+        </RequiredProperties>
+     </ArraySelectionDomain>
+     <Documentation>
+       This property lists which cell-centered arrays to read.
+     </Documentation>
+   </StringVectorProperty>
+
+   <StringVectorProperty
+      name="PointArrayInfo"
+      information_only="1">
+      <ArraySelectionInformationHelper attribute_name="Point"/>
+   </StringVectorProperty>
+
+   <StringVectorProperty
+      name="PointArrayStatus"
+      command="SetPointArrayStatus"
+      number_of_elements="0"
+      repeat_command="1"
+      number_of_elements_per_command="2"
+      element_types="2 0"
+      information_property="PointArrayInfo"
+      label="Point Arrays">
+     <ArraySelectionDomain name="array_list">
+        <RequiredProperties>
+           <Property name="PointArrayInfo" function="ArrayList"/>
+        </RequiredProperties>
+     </ArraySelectionDomain>
+     <Documentation>
+       This property lists which point-centered arrays to read.
+     </Documentation>
+   </StringVectorProperty>
+
+   <!-- The following two properties magically send time information -->
+   <!-- to the animation panel. -->
+   <DoubleVectorProperty
+       name="TimestepValues"
+       repeatable="1"
+       information_only="1">
+     <TimeStepsInformationHelper/>
+   </DoubleVectorProperty>
+   <DoubleVectorProperty name="TimeRange" information_only="1">
+     <TimeRangeInformationHelper/>
+   </DoubleVectorProperty>
+
+   <Hints>
+     <ReaderFactory extensions="cas"
+                    file_description="VisIt Fluent Reader" />
+   </Hints>
+   </SourceProxy>
+
+  <SourceProxy name="VisItMirandaReader" class="vtkVisItMirandaReader">
+    <StringVectorProperty
+      name="FileName"
+      command="SetFileName"
+      number_of_elements="1">
+      <FileListDomain name="files"/>
+    </StringVectorProperty>
+
+   <StringVectorProperty
+      name="MeshInfo"
+      information_only="1">
+      <ArraySelectionInformationHelper attribute_name="Mesh"/>
+   </StringVectorProperty>
+
+   <StringVectorProperty
+      name="MeshStatus"
+      label="Meshes"
+      command="SetMeshArrayStatus"
+      number_of_elements="2"
+      repeat_command="1"
+      number_of_elements_per_command="2"
+      element_types="2 0"
+      information_property="MeshInfo">
+     <ArraySelectionDomain name="array_list">
+        <RequiredProperties>
+           <Property name="MeshInfo" function="ArrayList"/>
+        </RequiredProperties>
+     </ArraySelectionDomain>
+     <Documentation>
+       Select the meshes to be loaded from the dataset, if any.
+     </Documentation>
+   </StringVectorProperty>
+
+   <StringVectorProperty
+      name="MaterialInfo"
+      information_only="1">
+      <ArraySelectionInformationHelper attribute_name="Material"/>
+   </StringVectorProperty>
+
+   <StringVectorProperty
+      name="MaterialStatus"
+      label="Materials"
+      command="SetMaterialArrayStatus"
+      number_of_elements="2"
+      repeat_command="1"
+      number_of_elements_per_command="2"
+      element_types="2 0"
+      information_property="MaterialInfo">
+     <ArraySelectionDomain name="array_list">
+        <RequiredProperties>
+           <Property name="MaterialInfo" function="ArrayList"/>
+        </RequiredProperties>
+     </ArraySelectionDomain>
+     <Documentation>
+       Select the Materiales to be loaded from the dataset, if any.
+     </Documentation>
+   </StringVectorProperty>
+
+  <StringVectorProperty
+      name="CellArrayInfo"
+      information_only="1">
+      <ArraySelectionInformationHelper attribute_name="Cell"/>
+   </StringVectorProperty>
+
+   <StringVectorProperty
+      name="CellArrayStatus"
+      command="SetCellArrayStatus"
+      number_of_elements="0"
+      repeat_command="1"
+      number_of_elements_per_command="2"
+      element_types="2 0"
+      information_property="CellArrayInfo"
+      label="Cell Arrays">
+     <ArraySelectionDomain name="array_list">
+        <RequiredProperties>
+           <Property name="CellArrayInfo" function="ArrayList"/>
+        </RequiredProperties>
+     </ArraySelectionDomain>
+     <Documentation>
+       This property lists which cell-centered arrays to read.
+     </Documentation>
+   </StringVectorProperty>
+
+   <StringVectorProperty
+      name="PointArrayInfo"
+      information_only="1">
+      <ArraySelectionInformationHelper attribute_name="Point"/>
+   </StringVectorProperty>
+
+   <StringVectorProperty
+      name="PointArrayStatus"
+      command="SetPointArrayStatus"
+      number_of_elements="0"
+      repeat_command="1"
+      number_of_elements_per_command="2"
+      element_types="2 0"
+      information_property="PointArrayInfo"
+      label="Point Arrays">
+     <ArraySelectionDomain name="array_list">
+        <RequiredProperties>
+           <Property name="PointArrayInfo" function="ArrayList"/>
+        </RequiredProperties>
+     </ArraySelectionDomain>
+     <Documentation>
+       This property lists which point-centered arrays to read.
+     </Documentation>
+   </StringVectorProperty>
+
+   <!-- The following two properties magically send time information -->
+   <!-- to the animation panel. -->
+   <DoubleVectorProperty
+       name="TimestepValues"
+       repeatable="1"
+       information_only="1">
+     <TimeStepsInformationHelper/>
+   </DoubleVectorProperty>
+   <DoubleVectorProperty name="TimeRange" information_only="1">
+     <TimeRangeInformationHelper/>
+   </DoubleVectorProperty>
+
+   <Hints>
+     <ReaderFactory extensions="mir raw"
+                    file_description="VisIt Miranda Reader" />
+   </Hints>
+  </SourceProxy>
+  <SourceProxy name="VisItPixieReader" class="vtkVisItPixieReader">
+    <StringVectorProperty
+      name="FileName"
+      command="SetFileName"
+      number_of_elements="1">
+      <FileListDomain name="files"/>
+    </StringVectorProperty>
+
+   <StringVectorProperty
+      name="MeshInfo"
+      information_only="1">
+      <ArraySelectionInformationHelper attribute_name="Mesh"/>
+   </StringVectorProperty>
+
+   <StringVectorProperty
+      name="MeshStatus"
+      label="Meshes"
+      command="SetMeshArrayStatus"
+      number_of_elements="2"
+      repeat_command="1"
+      number_of_elements_per_command="2"
+      element_types="2 0"
+      information_property="MeshInfo">
+     <ArraySelectionDomain name="array_list">
+        <RequiredProperties>
+           <Property name="MeshInfo" function="ArrayList"/>
+        </RequiredProperties>
+     </ArraySelectionDomain>
+     <Documentation>
+       Select the meshes to be loaded from the dataset, if any.
+     </Documentation>
+   </StringVectorProperty>
+
+   <StringVectorProperty
+      name="MaterialInfo"
+      information_only="1">
+      <ArraySelectionInformationHelper attribute_name="Material"/>
+   </StringVectorProperty>
+
+   <StringVectorProperty
+      name="MaterialStatus"
+      label="Materials"
+      command="SetMaterialArrayStatus"
+      number_of_elements="2"
+      repeat_command="1"
+      number_of_elements_per_command="2"
+      element_types="2 0"
+      information_property="MaterialInfo">
+     <ArraySelectionDomain name="array_list">
+        <RequiredProperties>
+           <Property name="MaterialInfo" function="ArrayList"/>
+        </RequiredProperties>
+     </ArraySelectionDomain>
+     <Documentation>
+       Select the Materiales to be loaded from the dataset, if any.
+     </Documentation>
+   </StringVectorProperty>
+
+  <StringVectorProperty
+      name="CellArrayInfo"
+      information_only="1">
+      <ArraySelectionInformationHelper attribute_name="Cell"/>
+   </StringVectorProperty>
+
+   <StringVectorProperty
+      name="CellArrayStatus"
+      command="SetCellArrayStatus"
+      number_of_elements="0"
+      repeat_command="1"
+      number_of_elements_per_command="2"
+      element_types="2 0"
+      information_property="CellArrayInfo"
+      label="Cell Arrays">
+     <ArraySelectionDomain name="array_list">
+        <RequiredProperties>
+           <Property name="CellArrayInfo" function="ArrayList"/>
+        </RequiredProperties>
+     </ArraySelectionDomain>
+     <Documentation>
+       This property lists which cell-centered arrays to read.
+     </Documentation>
+   </StringVectorProperty>
+
+   <StringVectorProperty
+      name="PointArrayInfo"
+      information_only="1">
+      <ArraySelectionInformationHelper attribute_name="Point"/>
+   </StringVectorProperty>
+
+   <StringVectorProperty
+      name="PointArrayStatus"
+      command="SetPointArrayStatus"
+      number_of_elements="0"
+      repeat_command="1"
+      number_of_elements_per_command="2"
+      element_types="2 0"
+      information_property="PointArrayInfo"
+      label="Point Arrays">
+     <ArraySelectionDomain name="array_list">
+        <RequiredProperties>
+           <Property name="PointArrayInfo" function="ArrayList"/>
+        </RequiredProperties>
+     </ArraySelectionDomain>
+     <Documentation>
+       This property lists which point-centered arrays to read.
+     </Documentation>
+   </StringVectorProperty>
+
+   <!-- The following two properties magically send time information -->
+   <!-- to the animation panel. -->
+   <DoubleVectorProperty
+       name="TimestepValues"
+       repeatable="1"
+       information_only="1">
+     <TimeStepsInformationHelper/>
+   </DoubleVectorProperty>
+   <DoubleVectorProperty name="TimeRange" information_only="1">
+     <TimeRangeInformationHelper/>
+   </DoubleVectorProperty>
+
+   <Hints>
+     <ReaderFactory extensions="h5"
+                    file_description="VisIt Pixie Reader" />
+   </Hints>
+  </SourceProxy>
+  <SourceProxy name="VisItProteinDataBankReader" class="vtkVisItProteinDataBankReader">
+    <StringVectorProperty
+      name="FileName"
+      command="SetFileName"
+      number_of_elements="1">
+      <FileListDomain name="files"/>
+    </StringVectorProperty>
+
+   <StringVectorProperty
+      name="MeshInfo"
+      information_only="1">
+      <ArraySelectionInformationHelper attribute_name="Mesh"/>
+   </StringVectorProperty>
+
+   <StringVectorProperty
+      name="MeshStatus"
+      label="Meshes"
+      command="SetMeshArrayStatus"
+      number_of_elements="2"
+      repeat_command="1"
+      number_of_elements_per_command="2"
+      element_types="2 0"
+      information_property="MeshInfo">
+     <ArraySelectionDomain name="array_list">
+        <RequiredProperties>
+           <Property name="MeshInfo" function="ArrayList"/>
+        </RequiredProperties>
+     </ArraySelectionDomain>
+     <Documentation>
+       Select the meshes to be loaded from the dataset, if any.
+     </Documentation>
+   </StringVectorProperty>
+
+   <StringVectorProperty
+      name="MaterialInfo"
+      information_only="1">
+      <ArraySelectionInformationHelper attribute_name="Material"/>
+   </StringVectorProperty>
+
+   <StringVectorProperty
+      name="MaterialStatus"
+      label="Materials"
+      command="SetMaterialArrayStatus"
+      number_of_elements="2"
+      repeat_command="1"
+      number_of_elements_per_command="2"
+      element_types="2 0"
+      information_property="MaterialInfo">
+     <ArraySelectionDomain name="array_list">
+        <RequiredProperties>
+           <Property name="MaterialInfo" function="ArrayList"/>
+        </RequiredProperties>
+     </ArraySelectionDomain>
+     <Documentation>
+       Select the Materiales to be loaded from the dataset, if any.
+     </Documentation>
+   </StringVectorProperty>
+
+  <StringVectorProperty
+      name="CellArrayInfo"
+      information_only="1">
+      <ArraySelectionInformationHelper attribute_name="Cell"/>
+   </StringVectorProperty>
+
+   <StringVectorProperty
+      name="CellArrayStatus"
+      command="SetCellArrayStatus"
+      number_of_elements="0"
+      repeat_command="1"
+      number_of_elements_per_command="2"
+      element_types="2 0"
+      information_property="CellArrayInfo"
+      label="Cell Arrays">
+     <ArraySelectionDomain name="array_list">
+        <RequiredProperties>
+           <Property name="CellArrayInfo" function="ArrayList"/>
+        </RequiredProperties>
+     </ArraySelectionDomain>
+     <Documentation>
+       This property lists which cell-centered arrays to read.
+     </Documentation>
+   </StringVectorProperty>
+
+   <StringVectorProperty
+      name="PointArrayInfo"
+      information_only="1">
+      <ArraySelectionInformationHelper attribute_name="Point"/>
+   </StringVectorProperty>
+
+   <StringVectorProperty
+      name="PointArrayStatus"
+      command="SetPointArrayStatus"
+      number_of_elements="0"
+      repeat_command="1"
+      number_of_elements_per_command="2"
+      element_types="2 0"
+      information_property="PointArrayInfo"
+      label="Point Arrays">
+     <ArraySelectionDomain name="array_list">
+        <RequiredProperties>
+           <Property name="PointArrayInfo" function="ArrayList"/>
+        </RequiredProperties>
+     </ArraySelectionDomain>
+     <Documentation>
+       This property lists which point-centered arrays to read.
+     </Documentation>
+   </StringVectorProperty>
+
+   <!-- The following two properties magically send time information -->
+   <!-- to the animation panel. -->
+   <DoubleVectorProperty
+       name="TimestepValues"
+       repeatable="1"
+       information_only="1">
+     <TimeStepsInformationHelper/>
+   </DoubleVectorProperty>
+   <DoubleVectorProperty name="TimeRange" information_only="1">
+     <TimeRangeInformationHelper/>
+   </DoubleVectorProperty>
+
+   <Hints>
+     <ReaderFactory extensions="ent pdb"
+                    file_description="VisIt Protein Data Bank Reader" />
+   </Hints>
+  </SourceProxy>
+  <SourceProxy name="VisItSAMRAIReader" class="vtkVisItSAMRAIReader">
+    <StringVectorProperty
+      name="FileName"
+      command="SetFileName"
+      number_of_elements="1">
+      <FileListDomain name="files"/>
+    </StringVectorProperty>
+
+   <StringVectorProperty
+      name="MeshInfo"
+      information_only="1">
+      <ArraySelectionInformationHelper attribute_name="Mesh"/>
+   </StringVectorProperty>
+
+   <StringVectorProperty
+      name="MeshStatus"
+      label="Meshes"
+      command="SetMeshArrayStatus"
+      number_of_elements="2"
+      repeat_command="1"
+      number_of_elements_per_command="2"
+      element_types="2 0"
+      information_property="MeshInfo">
+     <ArraySelectionDomain name="array_list">
+        <RequiredProperties>
+           <Property name="MeshInfo" function="ArrayList"/>
+        </RequiredProperties>
+     </ArraySelectionDomain>
+     <Documentation>
+       Select the meshes to be loaded from the dataset, if any.
+     </Documentation>
+   </StringVectorProperty>
+
+   <StringVectorProperty
+      name="MaterialInfo"
+      information_only="1">
+      <ArraySelectionInformationHelper attribute_name="Material"/>
+   </StringVectorProperty>
+
+   <StringVectorProperty
+      name="MaterialStatus"
+      label="Materials"
+      command="SetMaterialArrayStatus"
+      number_of_elements="2"
+      repeat_command="1"
+      number_of_elements_per_command="2"
+      element_types="2 0"
+      information_property="MaterialInfo">
+     <ArraySelectionDomain name="array_list">
+        <RequiredProperties>
+           <Property name="MaterialInfo" function="ArrayList"/>
+        </RequiredProperties>
+     </ArraySelectionDomain>
+     <Documentation>
+       Select the Materiales to be loaded from the dataset, if any.
+     </Documentation>
+   </StringVectorProperty>
+
+  <StringVectorProperty
+      name="CellArrayInfo"
+      information_only="1">
+      <ArraySelectionInformationHelper attribute_name="Cell"/>
+   </StringVectorProperty>
+
+   <StringVectorProperty
+      name="CellArrayStatus"
+      command="SetCellArrayStatus"
+      number_of_elements="0"
+      repeat_command="1"
+      number_of_elements_per_command="2"
+      element_types="2 0"
+      information_property="CellArrayInfo"
+      label="Cell Arrays">
+     <ArraySelectionDomain name="array_list">
+        <RequiredProperties>
+           <Property name="CellArrayInfo" function="ArrayList"/>
+        </RequiredProperties>
+     </ArraySelectionDomain>
+     <Documentation>
+       This property lists which cell-centered arrays to read.
+     </Documentation>
+   </StringVectorProperty>
+
+   <StringVectorProperty
+      name="PointArrayInfo"
+      information_only="1">
+      <ArraySelectionInformationHelper attribute_name="Point"/>
+   </StringVectorProperty>
+
+   <StringVectorProperty
+      name="PointArrayStatus"
+      command="SetPointArrayStatus"
+      number_of_elements="0"
+      repeat_command="1"
+      number_of_elements_per_command="2"
+      element_types="2 0"
+      information_property="PointArrayInfo"
+      label="Point Arrays">
+     <ArraySelectionDomain name="array_list">
+        <RequiredProperties>
+           <Property name="PointArrayInfo" function="ArrayList"/>
+        </RequiredProperties>
+     </ArraySelectionDomain>
+     <Documentation>
+       This property lists which point-centered arrays to read.
+     </Documentation>
+   </StringVectorProperty>
+
+   <!-- The following two properties magically send time information -->
+   <!-- to the animation panel. -->
+   <DoubleVectorProperty
+       name="TimestepValues"
+       repeatable="1"
+       information_only="1">
+     <TimeStepsInformationHelper/>
+   </DoubleVectorProperty>
+   <DoubleVectorProperty name="TimeRange" information_only="1">
+     <TimeRangeInformationHelper/>
+   </DoubleVectorProperty>
+
+   <Hints>
+     <ReaderFactory extensions="samrai"
+                    file_description="VisIt SAMRAI Reader" />
+   </Hints>
+  </SourceProxy>
+#ifdef PARAVIEW_USE_SILO
+  <SourceProxy name="VisItSiloReader" class="vtkVisItSiloReader">
+    <StringVectorProperty
+      name="FileName"
+      command="SetFileName"
+      number_of_elements="1">
+      <FileListDomain name="files"/>
+    </StringVectorProperty>
+
+   <StringVectorProperty
+      name="MeshInfo"
+      information_only="1">
+      <ArraySelectionInformationHelper attribute_name="Mesh"/>
+   </StringVectorProperty>
+
+   <StringVectorProperty
+      name="MeshStatus"
+      label="Meshes"
+      command="SetMeshArrayStatus"
+      number_of_elements="2"
+      repeat_command="1"
+      number_of_elements_per_command="2"
+      element_types="2 0"
+      information_property="MeshInfo">
+     <ArraySelectionDomain name="array_list">
+        <RequiredProperties>
+           <Property name="MeshInfo" function="ArrayList"/>
+        </RequiredProperties>
+     </ArraySelectionDomain>
+     <Documentation>
+       Select the meshes to be loaded from the dataset, if any.
+     </Documentation>
+   </StringVectorProperty>
+
+   <StringVectorProperty
+      name="MaterialInfo"
+      information_only="1">
+      <ArraySelectionInformationHelper attribute_name="Material"/>
+   </StringVectorProperty>
+
+   <StringVectorProperty
+      name="MaterialStatus"
+      label="Materials"
+      command="SetMaterialArrayStatus"
+      number_of_elements="2"
+      repeat_command="1"
+      number_of_elements_per_command="2"
+      element_types="2 0"
+      information_property="MaterialInfo">
+     <ArraySelectionDomain name="array_list">
+        <RequiredProperties>
+           <Property name="MaterialInfo" function="ArrayList"/>
+        </RequiredProperties>
+     </ArraySelectionDomain>
+     <Documentation>
+       Select the Materiales to be loaded from the dataset, if any.
+     </Documentation>
+   </StringVectorProperty>
+
+  <StringVectorProperty
+      name="CellArrayInfo"
+      information_only="1">
+      <ArraySelectionInformationHelper attribute_name="Cell"/>
+   </StringVectorProperty>
+
+   <StringVectorProperty
+      name="CellArrayStatus"
+      command="SetCellArrayStatus"
+      number_of_elements="0"
+      repeat_command="1"
+      number_of_elements_per_command="2"
+      element_types="2 0"
+      information_property="CellArrayInfo"
+      label="Cell Arrays">
+     <ArraySelectionDomain name="array_list">
+        <RequiredProperties>
+           <Property name="CellArrayInfo" function="ArrayList"/>
+        </RequiredProperties>
+     </ArraySelectionDomain>
+     <Documentation>
+       This property lists which cell-centered arrays to read.
+     </Documentation>
+   </StringVectorProperty>
+
+   <StringVectorProperty
+      name="PointArrayInfo"
+      information_only="1">
+      <ArraySelectionInformationHelper attribute_name="Point"/>
+   </StringVectorProperty>
+
+   <StringVectorProperty
+      name="PointArrayStatus"
+      command="SetPointArrayStatus"
+      number_of_elements="0"
+      repeat_command="1"
+      number_of_elements_per_command="2"
+      element_types="2 0"
+      information_property="PointArrayInfo"
+      label="Point Arrays">
+     <ArraySelectionDomain name="array_list">
+        <RequiredProperties>
+           <Property name="PointArrayInfo" function="ArrayList"/>
+        </RequiredProperties>
+     </ArraySelectionDomain>
+     <Documentation>
+       This property lists which point-centered arrays to read.
+     </Documentation>
+   </StringVectorProperty>
+
+   <!-- The following two properties magically send time information -->
+   <!-- to the animation panel. -->
+   <DoubleVectorProperty
+       name="TimestepValues"
+       repeatable="1"
+       information_only="1">
+     <TimeStepsInformationHelper/>
+   </DoubleVectorProperty>
+   <DoubleVectorProperty name="TimeRange" information_only="1">
+     <TimeRangeInformationHelper/>
+   </DoubleVectorProperty>
+
+   <Hints>
+     <ReaderFactory extensions="silo pdb"
+                    file_description="VisIt Silo Reader" />
+   </Hints>
+  </SourceProxy>
+#endif
+  <SourceProxy name="VisItTetradReader" class="vtkVisItTetradReader">
+    <StringVectorProperty
+      name="FileName"
+      command="SetFileName"
+      number_of_elements="1">
+      <FileListDomain name="files"/>
+    </StringVectorProperty>
+
+   <StringVectorProperty
+      name="MeshInfo"
+      information_only="1">
+      <ArraySelectionInformationHelper attribute_name="Mesh"/>
+   </StringVectorProperty>
+
+   <StringVectorProperty
+      name="MeshStatus"
+      label="Meshes"
+      command="SetMeshArrayStatus"
+      number_of_elements="2"
+      repeat_command="1"
+      number_of_elements_per_command="2"
+      element_types="2 0"
+      information_property="MeshInfo">
+     <ArraySelectionDomain name="array_list">
+        <RequiredProperties>
+           <Property name="MeshInfo" function="ArrayList"/>
+        </RequiredProperties>
+     </ArraySelectionDomain>
+     <Documentation>
+       Select the meshes to be loaded from the dataset, if any.
+     </Documentation>
+   </StringVectorProperty>
+
+   <StringVectorProperty
+      name="MaterialInfo"
+      information_only="1">
+      <ArraySelectionInformationHelper attribute_name="Material"/>
+   </StringVectorProperty>
+
+   <StringVectorProperty
+      name="MaterialStatus"
+      label="Materials"
+      command="SetMaterialArrayStatus"
+      number_of_elements="2"
+      repeat_command="1"
+      number_of_elements_per_command="2"
+      element_types="2 0"
+      information_property="MaterialInfo">
+     <ArraySelectionDomain name="array_list">
+        <RequiredProperties>
+           <Property name="MaterialInfo" function="ArrayList"/>
+        </RequiredProperties>
+     </ArraySelectionDomain>
+     <Documentation>
+       Select the Materiales to be loaded from the dataset, if any.
+     </Documentation>
+   </StringVectorProperty>
+
+  <StringVectorProperty
+      name="CellArrayInfo"
+      information_only="1">
+      <ArraySelectionInformationHelper attribute_name="Cell"/>
+   </StringVectorProperty>
+
+   <StringVectorProperty
+      name="CellArrayStatus"
+      command="SetCellArrayStatus"
+      number_of_elements="0"
+      repeat_command="1"
+      number_of_elements_per_command="2"
+      element_types="2 0"
+      information_property="CellArrayInfo"
+      label="Cell Arrays">
+     <ArraySelectionDomain name="array_list">
+        <RequiredProperties>
+           <Property name="CellArrayInfo" function="ArrayList"/>
+        </RequiredProperties>
+     </ArraySelectionDomain>
+     <Documentation>
+       This property lists which cell-centered arrays to read.
+     </Documentation>
+   </StringVectorProperty>
+
+   <StringVectorProperty
+      name="PointArrayInfo"
+      information_only="1">
+      <ArraySelectionInformationHelper attribute_name="Point"/>
+   </StringVectorProperty>
+
+   <StringVectorProperty
+      name="PointArrayStatus"
+      command="SetPointArrayStatus"
+      number_of_elements="0"
+      repeat_command="1"
+      number_of_elements_per_command="2"
+      element_types="2 0"
+      information_property="PointArrayInfo"
+      label="Point Arrays">
+     <ArraySelectionDomain name="array_list">
+        <RequiredProperties>
+           <Property name="PointArrayInfo" function="ArrayList"/>
+        </RequiredProperties>
+     </ArraySelectionDomain>
+     <Documentation>
+       This property lists which point-centered arrays to read.
+     </Documentation>
+   </StringVectorProperty>
+
+   <!-- The following two properties magically send time information -->
+   <!-- to the animation panel. -->
+   <DoubleVectorProperty
+       name="TimestepValues"
+       repeatable="1"
+       information_only="1">
+     <TimeStepsInformationHelper/>
+   </DoubleVectorProperty>
+   <DoubleVectorProperty name="TimeRange" information_only="1">
+     <TimeRangeInformationHelper/>
+   </DoubleVectorProperty>
+
+   <Hints>
+     <ReaderFactory extensions="hdf5 h5"
+                    file_description="VisIt Tetrad Reader" />
+   </Hints>
+  </SourceProxy>
+#endif
+
+
 
   </ProxyGroup>
 </ServerManagerConfiguration>

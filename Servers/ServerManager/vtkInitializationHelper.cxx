@@ -70,6 +70,11 @@ extern "C" void vtkPVServerCommonCS_Initialize(vtkClientServerInterpreter*);
 extern "C" void vtkPVFiltersCS_Initialize(vtkClientServerInterpreter*);
 extern "C" void vtkXdmfCS_Initialize(vtkClientServerInterpreter *);
 
+#ifdef PARAVIEW_USE_VISITBRIDGE
+extern "C" void vtkVisItAVTAlgorithmsCS_Initialize(vtkClientServerInterpreter *);
+extern "C" void vtkVisItDatabasesCS_Initialize(vtkClientServerInterpreter *);
+#endif
+
 vtkProcessModuleGUIHelper* vtkInitializationHelper::Helper = 0;
 vtkPVMain* vtkInitializationHelper::PVMain = 0;
 vtkPVOptions* vtkInitializationHelper::Options = 0;
@@ -141,9 +146,9 @@ void vtkInitializationHelper::Initialize(int argc, char**argv, vtkPVOptions* opt
 
   // First initialization
   PVMain->Initialize(
-    vtkInitializationHelper::Options, 
+    vtkInitializationHelper::Options,
     vtkInitializationHelper::Helper,
-    vtkInitializationHelperInit, 
+    vtkInitializationHelperInit,
     argc, argv);
 
   vtkInitializationHelper::Application = vtkSMApplication::New();
@@ -211,7 +216,12 @@ void vtkInitializationHelperInit(vtkProcessModule* pm)
   vtkPVServerCommonCS_Initialize(pm->GetInterpreter());
   vtkPVFiltersCS_Initialize(pm->GetInterpreter());
   vtkXdmfCS_Initialize(pm->GetInterpreter());
+#ifdef PARAVIEW_USE_VISITBRIDGE
+  vtkVisItAVTAlgorithmsCS_Initialize(pm->GetInterpreter());
+  vtkVisItDatabasesCS_Initialize(pm->GetInterpreter());
 #endif
+#endif
+
 }
 
 //----------------------------------------------------------------------------
