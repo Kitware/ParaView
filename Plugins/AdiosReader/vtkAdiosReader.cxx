@@ -236,6 +236,11 @@ public:
     {
     return this->MeshFile->IsPixieFileType();
     }
+  // --------------------------------------------------------------------------
+  bool Open()
+    {
+    return this->MeshFile->Open();
+    }
 
 public:
   bool NeedAdiosInitialization;
@@ -473,5 +478,8 @@ void vtkAdiosReader::SetAdiosApplicationId(int id)
 //----------------------------------------------------------------------------
 void vtkAdiosReader::PollForNewTimeSteps()
 {
-  this->Modified();
+  if(this->Internal->Open())
+    {
+    this->Modified();
+    }
 }

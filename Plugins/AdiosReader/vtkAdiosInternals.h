@@ -393,17 +393,16 @@ public:
 
     this->File = adios_fopen(this->FileName.c_str(), (comm) ? *comm : 0);
 
-    while (this->File == NULL && adios_errno != err_end_of_file)
+    if(this->File == NULL)
       {
-      fprintf (stderr, "Need to wait a bit: %s\n", adios_errmsg());
-      sleep(1);
-      this->File = adios_fopen (this->FileName.c_str(), (comm) ? *comm : 0);
-      }
-
-    if (adios_errno == err_end_of_file)
-      {
-      fprintf (stderr, "No more timesteps available. Exit loop. %s\n", adios_errmsg());
-      // Exit while loop here
+      if(adios_errno != err_end_of_file)
+        {
+        cout << "The data is not ready yet." << endl;
+        }
+      else
+        {
+        cout << "We reach the end of the timesteps." << endl;
+        }
       return false;
       }
 
@@ -424,7 +423,7 @@ public:
       return false;  // Throw exception
       }
 
-    if(false)
+    if(true)
       {
       cout << "ADIOS BP file: " << this->FileName.c_str() << endl;
       cout << " - time steps: " << this->File->ntimesteps << " from " << this->File->tidx_start << endl;
@@ -1015,6 +1014,9 @@ public:
   // the data are in two different files
   vtkUnstructuredGrid* GetXGCMesh()
     {
+    if(!this->Open())
+      return NULL;
+
     // Retreive mesh for XCG format
     int nbNodes, nbTriangles;
     this->GetIntegerAttribute("/nnodes", nbNodes);
@@ -1086,7 +1088,9 @@ public:
   // --------------------------------------------------------------------------
   bool GetIntegerAttribute(const vtkstd::string &key, int &value)
     {
-    this->Open();
+    if(!this->Open())
+      return false;
+
     AdiosDataMapIterator iter = this->Attributes.find(key);
     if (iter == this->Attributes.end() || !iter->second.IsInt())
       return false;
@@ -1096,17 +1100,21 @@ public:
   // --------------------------------------------------------------------------
   bool GetStringAttribute(const vtkstd::string &key, vtkstd::string &value)
     {
-    this->Open();
+    if(!this->Open())
+      return false;
+
     AdiosDataMapIterator iter = this->Attributes.find(key);
     if (iter == this->Attributes.end() || !iter->second.IsString())
       return false;
     value = iter->second.AsString();
     return true;
-  }
+    }
   // --------------------------------------------------------------------------
   vtkPoints* ReadPoints(const char* name)
     {
-    this->Open();
+    if(!this->Open())
+      return NULL;
+
     AdiosVariableMapIterator iter = this->Variables.find(vtkstd::string(name));
     if(iter == this->Variables.end())
       {
@@ -1205,7 +1213,9 @@ public:
   // --------------------------------------------------------------------------
   vtkDataArray* ReadVariable(const char* name)
     {
-    this->Open();
+    if(!this->Open())
+      return NULL;
+
     AdiosVariableMapIterator varIter = this->Variables.find(vtkstd::string(name));
     if( varIter == this->Variables.end() )
       {
@@ -1335,7 +1345,8 @@ public:
   // --------------------------------------------------------------------------
   int GetNumberOfTimeSteps()
     {
-    this->Open();
+    if(!this->Open())
+      return 0;
     return this->File->ntimesteps;
     }
   // --------------------------------------------------------------------------
@@ -1399,7 +1410,9 @@ public:
   // --------------------------------------------------------------------------
   void PrintInfo()
     {
-    this->Open();
+    if(!this->Open())
+      return;
+
     cout << "Groups:" << endl;
     for(int i=0;i<this->File->groups_count;i++)
       {
