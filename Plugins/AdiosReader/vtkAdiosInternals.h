@@ -415,6 +415,8 @@ public:
       return false;  // Throw exception
     }
 
+    cout << "===> Adios_fopen Done" << endl;
+
     // Load groups
     this->Groups = (ADIOS_GROUP **) malloc(this->File->groups_count * sizeof(ADIOS_GROUP *));
     if (this->Groups == NULL)
@@ -441,8 +443,11 @@ public:
     this->Scalars.clear();
     for (int groupIdx=0; groupIdx < this->File->groups_count; groupIdx++)
       {
-      //cout <<  "  group " << his->File->group_namelist[groupIdx] << ":" << endl;
+
+      cout << "===> Before Adios_gopen " << groupIdx << endl;
       this->Groups[groupIdx] = adios_gopen_byid(this->File, groupIdx);
+      cout << "===> After Adios_gopen " << groupIdx << endl;
+
       if (this->Groups[groupIdx] == NULL)
         {
         cout << "Error opening group " << this->File->group_namelist[groupIdx]
@@ -454,7 +459,10 @@ public:
       // Load variables metadata
       for (int varIdx=0; varIdx < this->Groups[groupIdx]->vars_count; varIdx++)
         {
+        cout << "=====> Before adios_inq_var_byid " << varIdx << endl;
         ADIOS_VARINFO *varInfo = adios_inq_var_byid(this->Groups[groupIdx], varIdx);
+        cout << "=====> After adios_inq_var_byid " << varIdx << endl;
+
         if (varInfo == NULL)
           {
           cout << "Error opening inquiring variable "
@@ -470,6 +478,7 @@ public:
           if (varInfo->ndim == 0)
             {
             // Scalar
+            cout <<  "=====> adios create scalar " << this->Groups[groupIdx]->var_namelist[varIdx] << endl;
             AdiosData scalar(this->Groups[groupIdx]->var_namelist[varIdx], varInfo);
             this->Scalars[scalar.Name] = scalar;
             }
@@ -477,6 +486,7 @@ public:
             {
             // Variable
             // add variable to map, map id = variable path without the '/' in the beginning
+            cout <<  "=====> adios create variable " << this->Groups[groupIdx]->var_namelist[varIdx] << endl;
             AdiosVariable variable(this->Groups[groupIdx]->var_namelist[varIdx], groupIdx, varInfo);
             this->Variables[variable.Name] = variable;
 
@@ -522,7 +532,10 @@ public:
         }
 
       // Free group
+      cout << "===> Before Adios_gclose " << groupIdx << endl;
       adios_gclose(this->Groups[groupIdx]);
+      cout << "===> After Adios_gclose " << groupIdx << endl;
+
       this->Groups[groupIdx] = NULL;
       }
 
@@ -1473,6 +1486,7 @@ public:
 
   static void SetReadMethod(int methodEnum)
     {
+    cout << "==> AdiosGlobal::SetReadMethod " << methodEnum << endl;
     switch(methodEnum)
       {
       case 0:
@@ -1492,11 +1506,13 @@ public:
 
   static void SetApplicationId(int id)
     {
+    cout << "==> AdiosGlobal::SetApplicationId " << id << endl;
     globals_adios_set_application_id(id);
     }
 
   static void Initialize()
     {
+    cout << "==> AdiosGlobal::Initialize() " << endl;
 #ifdef _NOMPI
     // Nothing to do
 #else
@@ -1518,6 +1534,7 @@ public:
 
   static void Finalize()
     {
+    cout << "==> AdiosGlobal::Finalize() " << endl;
 #ifdef _NOMPI
     // Nothing to do
 #else
