@@ -65,6 +65,7 @@ using vtksys_ios::ostringstream;
 extern "C"
 {
 #include <adios_read.h>
+#include <globals.h>
 }
 
 #ifndef __vtkAdiosInternals_h
@@ -1444,6 +1445,30 @@ public:
   static void SetReadMethodToDART()
     {
     adios_set_read_method(ADIOS_READ_METHOD_DART);
+    }
+
+  static void SetReadMethod(int methodEnum)
+    {
+    switch(methodEnum)
+      {
+      case 0:
+        adios_set_read_method(ADIOS_READ_METHOD_BP);
+        break;
+      case 1:
+        adios_set_read_method(ADIOS_READ_METHOD_HDF5);
+        break;
+      case 2:
+        adios_set_read_method(ADIOS_READ_METHOD_DART);
+        break;
+      case 3:
+        adios_set_read_method(ADIOS_READ_METHOD_DIMES);
+        break;
+      }
+    }
+
+  static void SetApplicationId(int id)
+    {
+    globals_adios_set_application_id(id);
     }
 
   static void Initialize()

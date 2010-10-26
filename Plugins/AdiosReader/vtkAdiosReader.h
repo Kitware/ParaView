@@ -41,6 +41,8 @@ public:
   // Set Read method
   void SetReadMethodToBP();
   void SetReadMethodToDART();
+  void SetReadMethod(int methodEnum);
+  void SetAdiosApplicationId(int id);
 
   // Description:
   // Test whether the file with the given name can be read by this

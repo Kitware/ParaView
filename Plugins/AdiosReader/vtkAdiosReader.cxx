@@ -447,3 +447,15 @@ void vtkAdiosReader::SetReadMethodToDART()
 {
   AdiosGlobal::SetReadMethodToDART();
 }
+
+//----------------------------------------------------------------------------
+void vtkAdiosReader::SetReadMethod(int methodEnum)
+{
+  AdiosGlobal::SetReadMethod(methodEnum);
+}
+
+//----------------------------------------------------------------------------
+void vtkAdiosReader::SetAdiosApplicationId(int id)
+{
+  AdiosGlobal::SetAdiosApplicationID(id);
+}
