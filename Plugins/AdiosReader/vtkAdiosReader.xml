@@ -31,7 +31,7 @@
           command="SetReadMethod"
           number_of_elements="1"
           default_values="0"
-          label="Method type">
+          label="Read Method">
           <EnumerationDomain name="enum">
             <Entry value="0" text="BP File"/>
             <Entry value="1" text="HDF5 File"/>
