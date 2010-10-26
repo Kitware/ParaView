@@ -58,6 +58,10 @@
           </Documentation>
        </IntVectorProperty>
 
+       <Property
+           name="Poll"
+           command="PollForNewTimeSteps" />
+
        <Hints>
         <ReaderFactory extensions="bp" file_description="ADIOS Files"/>
        </Hints>

@@ -63,6 +63,7 @@ public:
     this->DataFile = NULL;
     this->TimeStep = 0;
     this->AdiosInitialized = false;
+    this->NeedAdiosInitialization = false;
     }
   // --------------------------------------------------------------------------
   virtual ~Internals()
@@ -77,7 +78,10 @@ public:
       delete this->DataFile;
       this->DataFile = NULL;
       }
-    AdiosGlobal::Finalize();
+    if(this->AdiosInitialized)
+      {
+      AdiosGlobal::Finalize();
+      }
     }
   // --------------------------------------------------------------------------
   void UpdateFileName(const char* currentFileName)
@@ -85,7 +89,7 @@ public:
     if(!currentFileName)
       return;
 
-    if(!this->AdiosInitialized)
+    if(this->NeedAdiosInitialization && !this->AdiosInitialized)
       {
       this->AdiosInitialized = true;
       AdiosGlobal::Initialize();
@@ -232,7 +236,10 @@ public:
     {
     return this->MeshFile->IsPixieFileType();
     }
-  // --------------------------------------------------------------------------
+
+public:
+  bool NeedAdiosInitialization;
+
 private:
   AdiosFile* MeshFile;
   AdiosFile* DataFile;
@@ -440,22 +447,31 @@ int vtkAdiosReader::ReadOutputType()
 void vtkAdiosReader::SetReadMethodToBP()
 {
   AdiosGlobal::SetReadMethodToBP();
+  this->Internal->NeedAdiosInitialization = false;
 }
 
 //----------------------------------------------------------------------------
 void vtkAdiosReader::SetReadMethodToDART()
 {
   AdiosGlobal::SetReadMethodToDART();
+  this->Internal->NeedAdiosInitialization = true;
 }
 
 //----------------------------------------------------------------------------
 void vtkAdiosReader::SetReadMethod(int methodEnum)
 {
   AdiosGlobal::SetReadMethod(methodEnum);
+  this->Internal->NeedAdiosInitialization = (methodEnum > 1);
 }
 
 //----------------------------------------------------------------------------
 void vtkAdiosReader::SetAdiosApplicationId(int id)
 {
   AdiosGlobal::SetAdiosApplicationID(id);
+}
+
+//----------------------------------------------------------------------------
+void vtkAdiosReader::PollForNewTimeSteps()
+{
+  this->Modified();
 }

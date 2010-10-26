@@ -42,7 +42,15 @@ public:
   void SetReadMethodToBP();
   void SetReadMethodToDART();
   void SetReadMethod(int methodEnum);
+
+  // Description:
+  // Set the stage application ID
   void SetAdiosApplicationId(int id);
+
+  // Description:
+  // Modified the reader to request a new read (from stage), so you can
+  // move forward in time.
+  void PollForNewTimeSteps();
 
   // Description:
   // Test whether the file with the given name can be read by this
