@@ -39,6 +39,7 @@ from paraview.simple import *
 import re
 import paraview
 import copy
+import pickle
 
 # a regular expression to parse filter execution time
 match_filter = re.compile(" *Execute (\w+) id: +(\d+), +(\d*.*\d+) +seconds")
@@ -111,13 +112,28 @@ def maximize_logs () :
     pm.SetLogThreshold(acid, 0x10, 0.0)
 
 
+def dump_logs( filename ) :
+    """
+    This saves off the logs we've gathered.
+    Ot allows you to run a benchmark somewhere, save off all of the details in
+    raw format, then load them somewhere else. You can then do a detailed
+    analysis and you always have the raw data to go back to.
+    """
+    global logs
+    f = open(filename, "w")
+    pickle.dump(logs, f)
+    f.close()
+
 def import_logs( filename ) :
     """
     This is for bringing in a saved log files and parse it after the fact.
+    TODO: add an option to load in raw parview logs in text format
     """
-    #TODO: Fill this in
     global logs
     logs = []
+    f = open(filename, "r")
+    logs = pickle.load(f)
+    f.close()
 
 def get_logs() :
     """
