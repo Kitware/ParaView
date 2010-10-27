@@ -42,6 +42,7 @@ IF(ParaView_FOUND)
         ${CMAKE_MODULE_PATH}
         ${VISIT_CMAKE_DIR})
       MESSAGE(STATUS "Loading ParaView-VisItBridge CMake commands")
+      INCLUDE(${VISITBRIDGE_INCLUDE_FILE})
       INCLUDE(VisItCommon)
   ENDIF(PARAVIEW_USE_VISITBRIDGE)
 

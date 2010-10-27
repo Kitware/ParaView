@@ -645,6 +645,7 @@ IF(PARAVIEW_USE_VISITBRIDGE)
   #needed for plugins to be able to use the VisIt Plugin macros
   SET(VISITBRIDGE_CMAKE_DIR
      "${ParaView_SOURCE_DIR}/Utilities/VisItBridge/CMake")
+  SET(VISITBRIDGE_INCLUDE_FILE "${ParaView_BINARY_DIR}/Utilities/VisItBridge/VisItBridgeUse.cmake")
 
 ENDIF(PARAVIEW_USE_VISITBRIDGE)
 
