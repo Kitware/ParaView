@@ -1,12 +1,12 @@
 """
 This module has utilities to benchmark paraview.
 
-First, when run standalone, this will do a simple rendering benchmark test. This
+First, when run standalone, this will do a simple rendering benchmark test. The
 test renders a sphere with various rendering settings and reports the rendering
 rate achieved in triangles/sec. run() is the entrypoint for that usage.
 
-Second, you can use this arbitrary pipelines and this module helps you obtain,
-interpret and report about information within ParaView's logs.
+Second, you can set up arbitrary pipelines and this module helps you obtain,
+interpret and report the information recorded by ParaView's logs.
 Do that like so:
 1) optionally, call maximize logs first
 2) setup and run your visualization pipeline (via GUI or script as you prefer)
