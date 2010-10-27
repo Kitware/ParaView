@@ -23,12 +23,8 @@ something sensible on the server which has no other end of frame knowledge
 
 TODO: builtin mode shouldn't show server info, it is redundant
 TODO: this doesn't handle split render/data server mode
-
-TODO: the end of frame markers are heuristic, which might be buggy and generally
-could use some improvement
-
-TODO: import_logs should import saved logs from either paraview gui or the ones
-print_logs produces
+TODO: the end of frame markers are heuristic, likely buggy, and have not
+been tried since before 3.9's view restructuring
 """
 
 import time
@@ -469,7 +465,7 @@ def parse_logs(show_parse = False, tabular = False) :
             line = "#framenum, "
             for x in filters:
                 line += filters[x]['name'] + ":" + filters[x]['id']  + ", "
-            print line
+            #print line
             for cnt in xrange(start_frame, len(frames)):
                 line = ""
                 line += str(cnt) + ", "
@@ -482,21 +478,20 @@ def parse_logs(show_parse = False, tabular = False) :
                         if 'id' in record:
                             if record['id'] == id and \
                             record['name'] == name and \
-                            not 'id' in printed:
+                            not id in printed:
                                 found = True
-                                printed['id'] = 1
+                                printed[id] = 1
                                 line += str(record['local_duration']) + ", "
                                 if not id in frecs:
                                     frecs[id] = []
                                 frecs[id].append(record['local_duration'])
                     if not found:
                         line += "0, "
-                print line
-            print
-            print
+                #print line
+            #print
             for x in frecs.keys():
                 v = frecs[x]
-                print x, len(v),
+                print "# ", x, len(v),
                 print numpy.min(v), numpy.mean(v), numpy.max(v),
                 print numpy.std(v)
         else:
@@ -510,8 +505,8 @@ def parse_logs(show_parse = False, tabular = False) :
                         print record['name'], ",",
                         print record['duration'], ",",
                         print record['local_duration']
-        print
-        print
+        #print
+        #print
 
         if not tabular:
             #print out the gathered per filter information
