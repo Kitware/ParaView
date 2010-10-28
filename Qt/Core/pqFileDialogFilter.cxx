@@ -67,15 +67,19 @@ void pqFileDialogFilter::setFilter(const QString& filter)
   QString pattern = ".*";
   if ( f != "*" )
     {
+    f = f.trimmed();
+    //convert all spaces into |
     f.replace(QRegExp("[\\s+;]+"),"|");
+    //remove all "*."
     f.replace("*.","");
+    //escape all periods that exist in the extensions to keep the regexp valid
+    f.replace(".","\\.");
+
     //use non capturing(?:) for speed
-    QString postExtFileSeries("(?:\\.\\d+)*"); // match file series like: vtk.01
-    pattern = ".*\\.?(?:" % f % ")" % postExtFileSeries % "$";
-    //pattern string at the end will look like:
-    //".*\.?(?:vtk|vtp|vtu)(?:\\.\\d+)*$"
-    //note that spcth files are unique. they are named spcth.0,spcth.1,...
-    //therefore the .before the file extension needs to be optional
+    //name.ext or ext.001
+    QString postExtFileSeries("(\\.\\d+)?"); // match the .0001 component
+    QString extGroup = "(?:" % f % ")";
+    pattern = "(.*\\." % extGroup % "|^" % extGroup % postExtFileSeries % ")$";
     }
 
   this->Wildcards.setPattern(pattern);
