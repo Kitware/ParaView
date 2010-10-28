@@ -56,8 +56,10 @@ void pqFileDialogFilter::setFilter(const QString& filter)
   QString f(filter);
   // if we have (...) in our filter, strip everything out but the contents of ()
   int start, end;
-  start = filter.indexOf('(');
   end = filter.lastIndexOf(')');
+  //we need to from the backwards incase the name of the filter is:
+  // File Type (polydata) (*.ft)
+  start = filter.lastIndexOf('(',end);
   if(start != -1 && end != -1)
     {
     f = f.mid(start+1, end-start-1);
