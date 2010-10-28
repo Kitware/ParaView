@@ -6341,7 +6341,7 @@
      </Hints>
      <!-- End stlreader-->
    </FileSeriesReaderProxy>
-#ifdef PARAVIEW_USE_VISITBRIDGE
+
   <SourceProxy name="VisItEnzoReader" class="vtkVisItEnzoReader">
     <StringVectorProperty
       name="FileName"
@@ -7344,9 +7344,6 @@
                     file_description="VisIt Tetrad Reader" />
    </Hints>
   </SourceProxy>
-#endif
-
-
 
   </ProxyGroup>
 </ServerManagerConfiguration>
