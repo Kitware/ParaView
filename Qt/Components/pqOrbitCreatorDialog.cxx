@@ -64,6 +64,12 @@ pqOrbitCreatorDialog::pqOrbitCreatorDialog(QWidget* parentObject)
   QObject::connect(this->Internals->resetBounds, SIGNAL(clicked()),
     this, SLOT(resetBounds()));
 
+  // Reset camera location
+  this->StartCameraLocation[0]
+      = this->StartCameraLocation[1]
+        = this->StartCameraLocation[2]
+          = 0;
+
   this->resetBounds();
 }
 
@@ -79,6 +85,13 @@ void pqOrbitCreatorDialog::setNormal(double xyz[3])
   this->Internals->normal0->setText(QString::number(xyz[0]));
   this->Internals->normal1->setText(QString::number(xyz[1]));
   this->Internals->normal2->setText(QString::number(xyz[2]));
+}
+//-----------------------------------------------------------------------------
+void pqOrbitCreatorDialog::setCenter(double xyz[3])
+{
+  this->Internals->center0->setText(QString::number(xyz[0]));
+  this->Internals->center1->setText(QString::number(xyz[1]));
+  this->Internals->center2->setText(QString::number(xyz[2]));
 }
 
 //-----------------------------------------------------------------------------
@@ -132,7 +145,7 @@ QList<QVariant> pqOrbitCreatorDialog::orbitPoints(int resolution) const
 
   QList<QVariant> points;
   vtkPoints* pts = vtkSMUtilities::CreateOrbit(
-    box_center, normal, radius, resolution);
+    box_center, normal, radius, resolution, this->StartCameraLocation);
   for (vtkIdType cc=0; cc < pts->GetNumberOfPoints(); cc++)
     {
     double coords[3];
@@ -143,4 +156,10 @@ QList<QVariant> pqOrbitCreatorDialog::orbitPoints(int resolution) const
   return points;
 }
 
-
+//-----------------------------------------------------------------------------
+void pqOrbitCreatorDialog::setCameraPosition(double xyz[3])
+{
+  this->StartCameraLocation[0] = xyz[0];
+  this->StartCameraLocation[1] = xyz[1];
+  this->StartCameraLocation[2] = xyz[2];
+}
