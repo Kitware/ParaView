@@ -138,7 +138,6 @@ QList<QVariant> pqOrbitCreatorDialog::orbitPoints(int resolution) const
   double box_center[3];
   double normal[3];
   double origin[3];
-  double radius;
 
   box_center[0] = this->Internals->center0->text().toDouble();
   box_center[1] = this->Internals->center1->text().toDouble();
