@@ -1,72 +1,73 @@
-<ui version="4.0" >
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
  <class>OrbitCreatorDialog</class>
- <widget class="QDialog" name="OrbitCreatorDialog" >
-  <property name="geometry" >
+ <widget class="QDialog" name="OrbitCreatorDialog">
+  <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>300</width>
+    <width>309</width>
     <height>210</height>
    </rect>
   </property>
-  <property name="windowTitle" >
+  <property name="windowTitle">
    <string>Create Orbit</string>
   </property>
-  <layout class="QVBoxLayout" >
+  <layout class="QVBoxLayout">
    <item>
-    <widget class="QGroupBox" name="groupBox" >
-     <property name="title" >
+    <widget class="QGroupBox" name="groupBox">
+     <property name="title">
       <string>Orbit Parameters</string>
      </property>
-     <layout class="QGridLayout" >
-      <item row="0" column="0" >
-       <widget class="QLabel" name="label" >
-        <property name="text" >
+     <layout class="QGridLayout">
+      <item row="0" column="0">
+       <widget class="QLabel" name="label">
+        <property name="text">
          <string>Center</string>
         </property>
        </widget>
       </item>
-      <item row="0" column="1" >
-       <widget class="pqLineEdit" name="center0" />
+      <item row="0" column="1">
+       <widget class="pqLineEdit" name="center0"/>
       </item>
-      <item row="0" column="2" >
-       <widget class="pqLineEdit" name="center1" />
+      <item row="0" column="2">
+       <widget class="pqLineEdit" name="center1"/>
       </item>
-      <item row="0" column="3" >
-       <widget class="pqLineEdit" name="center2" />
+      <item row="0" column="3">
+       <widget class="pqLineEdit" name="center2"/>
       </item>
-      <item row="1" column="0" >
-       <widget class="QLabel" name="normalLabel" >
-        <property name="text" >
+      <item row="1" column="0">
+       <widget class="QLabel" name="normalLabel">
+        <property name="text">
          <string>Normal</string>
         </property>
        </widget>
       </item>
-      <item row="1" column="1" >
-       <widget class="pqLineEdit" name="normal0" />
+      <item row="1" column="1">
+       <widget class="pqLineEdit" name="normal0"/>
       </item>
-      <item row="1" column="2" >
-       <widget class="pqLineEdit" name="normal1" />
+      <item row="1" column="2">
+       <widget class="pqLineEdit" name="normal1"/>
       </item>
-      <item row="1" column="3" >
-       <widget class="pqLineEdit" name="normal2" />
+      <item row="1" column="3">
+       <widget class="pqLineEdit" name="normal2"/>
       </item>
-      <item row="2" column="0" >
-       <widget class="QLabel" name="label_2" >
-        <property name="text" >
-         <string>Radius</string>
+      <item row="2" column="0">
+       <widget class="QLabel" name="label_2">
+        <property name="text">
+         <string>Origin</string>
         </property>
        </widget>
       </item>
-      <item row="2" column="1" >
-       <widget class="pqLineEdit" name="radius" />
+      <item row="2" column="1">
+       <widget class="pqLineEdit" name="origin0"/>
       </item>
-      <item row="3" column="2" >
+      <item row="3" column="2">
        <spacer>
-        <property name="orientation" >
+        <property name="orientation">
          <enum>Qt::Vertical</enum>
         </property>
-        <property name="sizeHint" >
+        <property name="sizeHint" stdset="0">
          <size>
           <width>20</width>
           <height>16</height>
@@ -74,25 +75,31 @@
         </property>
        </spacer>
       </item>
+      <item row="2" column="2">
+       <widget class="QLineEdit" name="origin1"/>
+      </item>
+      <item row="2" column="3">
+       <widget class="QLineEdit" name="origin2"/>
+      </item>
      </layout>
     </widget>
    </item>
    <item>
-    <layout class="QHBoxLayout" >
+    <layout class="QHBoxLayout">
      <item>
-      <widget class="QPushButton" name="resetBounds" >
-       <property name="text" >
+      <widget class="QPushButton" name="resetBounds">
+       <property name="text">
         <string>Reset Bounds</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QDialogButtonBox" name="buttonBox" >
-       <property name="orientation" >
+      <widget class="QDialogButtonBox" name="buttonBox">
+       <property name="orientation">
         <enum>Qt::Horizontal</enum>
        </property>
-       <property name="standardButtons" >
-        <set>QDialogButtonBox::Cancel|QDialogButtonBox::NoButton|QDialogButtonBox::Ok</set>
+       <property name="standardButtons">
+        <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
        </property>
       </widget>
      </item>
@@ -115,11 +122,11 @@
    <receiver>OrbitCreatorDialog</receiver>
    <slot>accept()</slot>
    <hints>
-    <hint type="sourcelabel" >
+    <hint type="sourcelabel">
      <x>248</x>
      <y>254</y>
     </hint>
-    <hint type="destinationlabel" >
+    <hint type="destinationlabel">
      <x>157</x>
      <y>274</y>
     </hint>
@@ -131,11 +138,11 @@
    <receiver>OrbitCreatorDialog</receiver>
    <slot>reject()</slot>
    <hints>
-    <hint type="sourcelabel" >
+    <hint type="sourcelabel">
      <x>316</x>
      <y>260</y>
     </hint>
-    <hint type="destinationlabel" >
+    <hint type="destinationlabel">
      <x>286</x>
      <y>274</y>
     </hint>

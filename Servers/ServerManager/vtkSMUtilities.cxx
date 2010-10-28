@@ -177,13 +177,12 @@ vtkPoints* vtkSMUtilities::CreateOrbit(const double center[3],
     startPoint[i] += center[i];
     }
 
-  return CreateOrbit(center, normal, radius, resolution, startPoint);
+  return CreateOrbit(center, normal, resolution, startPoint);
 }
 
 //----------------------------------------------------------------------------
 vtkPoints* vtkSMUtilities::CreateOrbit(const double center[3],
-  const double in_normal[3], double radius, int resolution,
-  const double startPoint[3])
+  const double in_normal[3], int resolution, const double startPoint[3])
 {
   // Create the step rotation
   double normal[3] = {in_normal[0], in_normal[1], in_normal[2]};
