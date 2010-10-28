@@ -10,3 +10,6 @@
 [submodule "Qt/Testing"]
 	path = Qt/Testing
 	url = git://paraview.org/QtTesting.git
+[submodule "Utilities/VisItBridge"]
+	path = Utilities/VisItBridge
+	url = git://paraview.org/VisItBridge.git

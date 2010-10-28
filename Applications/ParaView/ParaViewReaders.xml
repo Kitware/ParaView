@@ -65,4 +65,12 @@
   <Proxy group="sources" name="WindBladeReader" />
   <Proxy group="sources" name="NetCDFPOPReader" />
   <Proxy group="sources" name="MPASReader" />
+  <Proxy group="sources" name="VisItEnzoReader" />
+  <Proxy group="sources" name="VisItFluentReader" />
+  <Proxy group="sources" name="VisItMirandaReader" />
+  <Proxy group="sources" name="VisItPixieReader" />
+  <Proxy group="sources" name="VisItProteinDataBankReader" />
+  <Proxy group="sources" name="VisItSAMRAIReader" />
+  <Proxy group="sources" name="VisItSiloReader" />
+  <Proxy group="sources" name="VisItTetradReader" />
 </ParaViewReaders>

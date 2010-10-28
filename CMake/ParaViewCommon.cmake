@@ -624,6 +624,36 @@ IF(VTK_USE_MPI)
   ADD_DEFINITIONS("-DMPICH_IGNORE_CXX_SEEK")
 ENDIF(VTK_USE_MPI)
 
+ #########################################################################
+# Configure VisItBridge
+OPTION(PARAVIEW_USE_VISITBRIDGE "Use VisIt Bridge" OFF)
+IF(PARAVIEW_USE_VISITBRIDGE)
+  ADD_SUBDIRECTORY(Utilities/VisItBridge)
+  #these are need for the client server wrappings of the databases
+  #and the avt algorithms
+  SET(VISITAVTALGORITHMS_KITS_DIR
+    "${ParaView_BINARY_DIR}/Utilities/VisItBridge/AvtAlgorithms/Utilities")
+  SET(VISITAVTALGORITHMS_INCLUDE_DIRS
+    "${ParaView_SOURCE_DIR}/Utilities/VisItBridge/AvtAlgorithms"
+    "${ParaView_BINARY_DIR}/Utilities/VisItBridge/AvtAlgorithms"
+    )
+
+  SET(VISITDATABASES_KITS_DIR
+    "${ParaView_BINARY_DIR}/Utilities/VisItBridge/databases/Utilities")
+  SET(VISITDATABASES_INCLUDE_DIRS
+    ${VISITAVTALGORITHMS_INCLUDE_DIRS}
+    "${ParaView_SOURCE_DIR}/Utilities/VisItBridge/databases"
+    "${ParaView_BINARY_DIR}/Utilities/VisItBridge/databases"
+    )
+
+  #needed for plugins to be able to use the VisIt Plugin macros
+  SET(VISITBRIDGE_CMAKE_DIR
+     "${ParaView_SOURCE_DIR}/Utilities/VisItBridge/CMake")
+  SET(VISITBRIDGE_INCLUDE_FILE "${ParaView_BINARY_DIR}/Utilities/VisItBridge/VisItBridgeUse.cmake")
+
+ENDIF(PARAVIEW_USE_VISITBRIDGE)
+
+
 #########################################################################
 # Configure Common
 ADD_SUBDIRECTORY(Common)
@@ -836,6 +866,11 @@ SET(PARAVIEW_INCLUDE_DIRS
   ${XDMF_INCLUDE_DIRS}
   ${HDF5_INCLUDE_DIR}
   )
+
+IF(PARAVIEW_USE_VISITBRIDGE)
+  SET(PARAVIEW_INCLUDE_DIRS ${PARAVIEW_INCLUDE_DIRS}
+  ${VISITAVTALGORITHMS_INCLUDE_DIRS})
+ENDIF(PARAVIEW_USE_VISITBRIDGE)
 
 CONFIGURE_FILE(${ParaView_SOURCE_DIR}/vtkPVConfig.h.in
   ${ParaView_BINARY_DIR}/vtkPVConfig.h
