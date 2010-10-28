@@ -755,7 +755,7 @@
                       file_description="VisIt SAMRAI Reader" />
      </Hints>
     </SourceProxy>
-
+#ifdef PARAVIEW_USE_SILO
     <SourceProxy name="VisItSiloReader" class="vtkVisItSiloReader">
       <StringVectorProperty
         name="FileName"
@@ -881,7 +881,7 @@
                       file_description="VisIt Silo Reader" />
      </Hints>
     </SourceProxy>
-
+#endif
     <SourceProxy name="VisItTetradReader" class="vtkVisItTetradReader">
       <StringVectorProperty
         name="FileName"
