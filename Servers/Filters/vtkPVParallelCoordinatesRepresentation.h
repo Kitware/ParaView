@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkParallelCoordinatesRepresentation.h
+  Module:    vtkPVParallelCoordinatesRepresentation.h
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -12,22 +12,22 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkParallelCoordinatesRepresentation
+// .NAME vtkPVParallelCoordinatesRepresentation
 // .SECTION Description
 //
 
-#ifndef __vtkParallelCoordinatesRepresentation_h
-#define __vtkParallelCoordinatesRepresentation_h
+#ifndef __vtkPVParallelCoordinatesRepresentation_h
+#define __vtkPVParallelCoordinatesRepresentation_h
 
 #include "vtkChartRepresentation.h"
 
 class vtkChartParallelCoordinates;
 
-class VTK_EXPORT vtkParallelCoordinatesRepresentation : public vtkChartRepresentation
+class VTK_EXPORT vtkPVParallelCoordinatesRepresentation : public vtkChartRepresentation
 {
 public:
-  static vtkParallelCoordinatesRepresentation* New();
-  vtkTypeMacro(vtkParallelCoordinatesRepresentation, vtkChartRepresentation);
+  static vtkPVParallelCoordinatesRepresentation* New();
+  vtkTypeMacro(vtkPVParallelCoordinatesRepresentation, vtkChartRepresentation);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
@@ -53,8 +53,8 @@ public:
 
 //BTX
 protected:
-  vtkParallelCoordinatesRepresentation();
-  ~vtkParallelCoordinatesRepresentation();
+  vtkPVParallelCoordinatesRepresentation();
+  ~vtkPVParallelCoordinatesRepresentation();
 
   virtual int RequestData(vtkInformation*,
     vtkInformationVector**, vtkInformationVector*);
@@ -70,9 +70,9 @@ protected:
   //vtkChartRepresentation* SelectionRepresentation;
 
 private:
-  vtkParallelCoordinatesRepresentation(
-      const vtkParallelCoordinatesRepresentation&); // Not implemented
-  void operator=(const vtkParallelCoordinatesRepresentation&); // Not implemented
+  vtkPVParallelCoordinatesRepresentation(
+      const vtkPVParallelCoordinatesRepresentation&); // Not implemented
+  void operator=(const vtkPVParallelCoordinatesRepresentation&); // Not implemented
 //ETX
 };
 

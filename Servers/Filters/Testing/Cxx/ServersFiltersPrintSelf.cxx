@@ -78,7 +78,6 @@
 #include "vtkOutlineRepresentation.h"
 #include "vtkPConvertSelection.h"
 #include "vtkPExtractHistogram.h"
-#include "vtkParallelCoordinatesRepresentation.h"
 #include "vtkParallelSerialWriter.h"
 #include "vtkPEnSightGoldBinaryReader.h"
 #include "vtkPEnSightGoldReader.h"
@@ -132,6 +131,7 @@
 #include "vtkPVMain.h"
 #include "vtkPVMergeTables.h"
 #include "vtkPVNullSource.h"
+#include "vtkPVParallelCoordinatesRepresentation.h"
 #include "vtkPVRecoverGeometryWireframe.h"
 #include "vtkPVRepresentedDataInformation.h"
 #include "vtkPVScalarBarActor.h"
@@ -291,7 +291,6 @@ int main(int , char *[])
   PRINT_SELF(vtkOutlineRepresentation);
   PRINT_SELF(vtkPConvertSelection);
   PRINT_SELF(vtkPExtractHistogram);
-  PRINT_SELF(vtkParallelCoordinatesRepresentation);
   PRINT_SELF(vtkParallelSerialWriter);
   PRINT_SELF(vtkPEnSightGoldBinaryReader);
   PRINT_SELF(vtkPEnSightGoldReader);
@@ -345,6 +344,7 @@ int main(int , char *[])
   PRINT_SELF(vtkPVMain);
   PRINT_SELF(vtkPVMergeTables);
   PRINT_SELF(vtkPVNullSource);
+  PRINT_SELF(vtkPVParallelCoordinatesRepresentation);
   PRINT_SELF(vtkPVRecoverGeometryWireframe);
   PRINT_SELF(vtkPVRepresentedDataInformation);
   PRINT_SELF(vtkPVScalarBarActor);

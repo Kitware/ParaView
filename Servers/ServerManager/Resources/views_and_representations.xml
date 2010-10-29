@@ -3468,7 +3468,7 @@
 
     <!-- =================================================================== -->
     <ParallelCoordinatesRepresentationProxy name="ParallelCoordinatesRepresentation"
-      class="vtkParallelCoordinatesRepresentation"
+      class="vtkPVParallelCoordinatesRepresentation"
       processes="client|dataserver|renderserver" >
       <Documentation>
         Representation used by ParallelCoordinatesChartView.
