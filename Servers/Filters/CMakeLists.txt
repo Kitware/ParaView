@@ -289,13 +289,6 @@ IF(PARAVIEW_ENABLE_PYTHON)
     )
 ENDIF(PARAVIEW_ENABLE_PYTHON)
 
-IF(PARAVIEW_USE_SILO)
-  SET(Filters_SRCS ${Filters_SRCS}
-    vtkSiloReader.cxx
-    )
-  INCLUDE_DIRECTORIES(${SILO_INCLUDE_DIR})
-ENDIF(PARAVIEW_USE_SILO)
-
 IF(VTK_USE_MPI)
   SET(Filters_SRCS ${Filters_SRCS}
     vtkBalancedRedistributePolyData.cxx

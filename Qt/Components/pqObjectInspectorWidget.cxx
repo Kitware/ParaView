@@ -79,9 +79,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqUndoStack.h"
 #include "pqView.h"
 #include "vtkPVConfig.h" // To get PARAVIEW_USE_*
-#ifdef PARAVIEW_USE_SILO
-#include "pqSiloPanel.h"
-#endif
 
 #include "vtkTimerLog.h"
 
@@ -161,12 +158,6 @@ public:
         {
         return new pqNetCDFPanel(proxy, p);
         }
-#ifdef PARAVIEW_USE_SILO
-      if(QString("SiloReader") == proxy->getProxy()->GetXMLName())
-        {
-        return new pqSiloPanel(proxy, p);
-        }
-#endif
       }
     return NULL;
     }
@@ -197,9 +188,6 @@ public:
       {
       if (QString("ExodusIIReader") == proxy->getProxy()->GetXMLName() ||
         QString("ExodusRestartReader") == proxy->getProxy()->GetXMLName() ||
-#ifdef PARAVIEW_USE_SILO
-        QString("SiloReader") == proxy->getProxy()->GetXMLName() ||
-#endif
         QString("netCDFReader") == proxy->getProxy()->GetXMLName()
          )
         {

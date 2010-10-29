@@ -534,14 +534,6 @@ ELSE(PARAVIEW_USE_SYSTEM_HDF5)
 ENDIF(PARAVIEW_USE_SYSTEM_HDF5)
 
 #########################################################################
-# Configure SILO
-OPTION(PARAVIEW_USE_SILO "Use SILO library" OFF)
-MARK_AS_ADVANCED(PARAVIEW_USE_SILO)
-IF(PARAVIEW_USE_SILO)
-  INCLUDE(${ParaView_CMAKE_DIR}/FindSILO.cmake)
-ENDIF(PARAVIEW_USE_SILO)
-
-#########################################################################
 # Configure Xdmf
 
 SET(XDMF_INSTALL_NO_DEVELOPMENT ${PV_INSTALL_NO_DEVELOPMENT})
@@ -627,6 +619,7 @@ ENDIF(VTK_USE_MPI)
  #########################################################################
 # Configure VisItBridge
 OPTION(PARAVIEW_USE_VISITBRIDGE "Use VisIt Bridge" OFF)
+SET(VISITBRIDGE_USE_SILO OFF)
 IF(PARAVIEW_USE_VISITBRIDGE)
   ADD_SUBDIRECTORY(Utilities/VisItBridge)
   #these are need for the client server wrappings of the databases
@@ -650,7 +643,6 @@ IF(PARAVIEW_USE_VISITBRIDGE)
   SET(VISITBRIDGE_CMAKE_DIR
      "${ParaView_SOURCE_DIR}/Utilities/VisItBridge/CMake")
   SET(VISITBRIDGE_INCLUDE_FILE "${ParaView_BINARY_DIR}/Utilities/VisItBridge/VisItBridgeUse.cmake")
-
 ENDIF(PARAVIEW_USE_VISITBRIDGE)
 
 

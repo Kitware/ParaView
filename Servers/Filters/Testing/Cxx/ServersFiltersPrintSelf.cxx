@@ -202,10 +202,6 @@
 #include "vtkPythonProgrammableFilter.h"
 #endif
 
-#ifdef PARAVIEW_USE_SILO
-#include "vtkSiloReader.h"
-#endif
-
 #ifdef VTK_USE_MPI
 # include "vtkBalancedRedistributePolyData.h"
 # include "vtkAllToNRedistributePolyData.h"
@@ -413,10 +409,6 @@ int main(int , char *[])
 #ifdef PARAVIEW_ENABLE_PYTHON
   PRINT_SELF(vtkPythonCalculator);
   PRINT_SELF(vtkPythonProgrammableFilter);
-#endif
-
-#ifdef PARAVIEW_USE_SILO
-  PRINT_SELF(vtkSiloReader);
 #endif
 
 #ifdef VTK_USE_MPI
