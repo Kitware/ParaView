@@ -74,6 +74,31 @@
    <!-- End AVSucdReader -->
    </SourceProxy>
 
+   <SourceProxy name="MetaImageReaderCore"
+                class="vtkMetaImageReader"
+                label="Meta Image reader">
+     <Documentation
+       short_help="Read UNC meta image data."
+       long_help="Read binary UNC meta image data.">
+       The Meta Image Reader reads binary UNC meta image data, and produces uniform rectilinear (image/volume) data. The default file extensions are .mhd and .mha.
+     </Documentation>
+     <StringVectorProperty
+        name="FileName"
+        animateable="0"
+        command="SetFileName"
+        number_of_elements="1">
+        <FileListDomain name="files"/>
+        <Documentation>
+          This property specifies the file name for the Meta Image reader.
+        </Documentation>
+     </StringVectorProperty>
+     <Hints>
+      <ReaderFactory extensions="mhd mha"
+          file_description="Meta Image Data Files" />
+     </Hints>
+   <!-- End Meta Image Reader -->
+   </SourceProxy>
+
    <SourceProxy name="legacyreader" 
                 class="vtkPDataSetReader"
                 label="Legacy VTK Reader">
@@ -2286,6 +2311,61 @@
      </Hints>
    <!-- End PVDReader -->
    </SourceProxy>
+
+   <FileSeriesReaderProxy name="MetaImageReader"
+                          class="vtkFileSeriesReader"
+                          label="Meta File Series Reader"
+                          file_name_method="SetFileName">
+     <Documentation
+       short_help="Read a series of meta images."
+       long_help="Read a series of meta images.">
+       Read a series of meta images. The file extension is .mdh
+     </Documentation>
+
+     <SubProxy>
+       <Proxy name="Reader"
+              proxygroup="internal_sources"
+              proxyname="MetaImageReaderCore">
+       </Proxy>
+     </SubProxy>
+
+      <StringVectorProperty name="FileNameInfo"
+        command="GetCurrentFileName"
+        information_only="1" >
+        <SimpleStringInformationHelper />
+     </StringVectorProperty>
+
+     <StringVectorProperty name="FileNames"
+                           clean_command="RemoveAllFileNames"
+                           command="AddFileName"
+                           animateable="0"
+                           number_of_elements="0"
+                           repeat_command="1">
+       <FileListDomain name="files"/>
+       <Documentation>
+         The list of files to be read by the reader. Each file is expected to be
+         in the meta format. The standard extension is .mdh. If more than 1 file is specified,
+         the reader will switch to file series mode in which it will pretend that it can support
+         time and provide 1 file per time step.
+       </Documentation>
+     </StringVectorProperty>
+
+     <DoubleVectorProperty name="TimestepValues"
+                           repeatable="1"
+                           information_only="1">
+       <TimeStepsInformationHelper/>
+       <Documentation>
+         Available timestep values.
+       </Documentation>
+     </DoubleVectorProperty>
+
+     <Hints>
+      <ReaderFactory extensions="mhd mha"
+          file_description="Meta Image Files" />
+     </Hints>
+
+   <!-- end of MetaFileSeriesReader -->
+   </FileSeriesReaderProxy>
 
    <FileSeriesReaderProxy name="XMLMultiBlockDataReader"
                           class="vtkFileSeriesReader"
@@ -4689,31 +4769,6 @@
           file_description="Facet Polygonal Data Files" />
      </Hints>
    <!-- End Facet Reader -->
-   </SourceProxy>
-
-   <SourceProxy name="MetaImageReader" 
-                class="vtkMetaImageReader"
-                label="Meta Image reader">
-     <Documentation
-       short_help="Read UNC meta image data."
-       long_help="Read binary UNC meta image data.">
-       The Meta Image Reader reads binary UNC meta image data, and produces uniform rectilinear (image/volume) data. The default file extensions are .mhd and .mha.
-     </Documentation>
-     <StringVectorProperty
-        name="FileName"
-        animateable="0"
-        command="SetFileName"
-        number_of_elements="1">
-        <FileListDomain name="files"/>
-        <Documentation>
-          This property specifies the file name for the Meta Image reader.
-        </Documentation>
-     </StringVectorProperty>
-     <Hints>
-      <ReaderFactory extensions="mhd mha"
-          file_description="Meta Image Data Files" />
-     </Hints>
-   <!-- End Meta Image Reader -->
    </SourceProxy>
 
   <SourceProxy name="TIFFReader" 
