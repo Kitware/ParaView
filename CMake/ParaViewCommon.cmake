@@ -620,6 +620,7 @@ ENDIF(VTK_USE_MPI)
 # Configure VisItBridge
 OPTION(PARAVIEW_USE_VISITBRIDGE "Use VisIt Bridge" OFF)
 SET(VISITBRIDGE_USE_SILO OFF)
+SET(VISITBRIDGE_USE_CGNS OFF)
 IF(PARAVIEW_USE_VISITBRIDGE)
   ADD_SUBDIRECTORY(Utilities/VisItBridge)
   #these are need for the client server wrappings of the databases
@@ -638,6 +639,8 @@ IF(PARAVIEW_USE_VISITBRIDGE)
     "${ParaView_SOURCE_DIR}/Utilities/VisItBridge/databases"
     "${ParaView_BINARY_DIR}/Utilities/VisItBridge/databases"
     )
+  SET(VISITBRIDGE_READERS_XML_FILE "${ParaView_SOURCE_DIR}/Utilities/VisItBridge/databases/visit_readers.xml")
+  SET(VISITBRIDGE_READERS_GUI_XML_FILE "${ParaView_SOURCE_DIR}/Utilities/VisItBridge/databases/visit_readers_gui.xml")
 
   #needed for plugins to be able to use the VisIt Plugin macros
   SET(VISITBRIDGE_CMAKE_DIR
@@ -813,6 +816,11 @@ SET(PVSERVERCOMMON_INCLUDE_DIR
   ${ParaView_SOURCE_DIR}/Servers/Common
   ${ParaView_BINARY_DIR}/Servers/Common)
 
+IF(PARAVIEW_USE_VISITBRIDGE)
+  PARAVIEW_INCLUDE_SERVERMANAGER_RESOURCES(${VISITBRIDGE_READERS_XML_FILE})
+  PARAVIEW_INCLUDE_GUI_RESOURCES(${VISITBRIDGE_READERS_GUI_XML_FILE})
+ENDIF(PARAVIEW_USE_VISITBRIDGE)
+
 ADD_SUBDIRECTORY(Servers)
 
 #########################################################################
@@ -849,7 +857,6 @@ SET(PARAVIEW_INCLUDE_DIRS
   ${ParaView_SOURCE_DIR}/Utilities/VTKPythonWrapping/Executable
   ${ParaView_SOURCE_DIR}/VTK/Wrapping
   ${ParaView_BINARY_DIR}/VTK/Wrapping
-#
   ${ParaView_BINARY_DIR}
   ${ParaView_BINARY_DIR}/Utilities/VTKClientServer
   ${ParaView_BINARY_DIR}/Servers/Filters
