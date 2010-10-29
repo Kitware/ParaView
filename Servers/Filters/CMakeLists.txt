@@ -100,7 +100,6 @@ SET(Filters_SRCS
   vtkOutlineRepresentation.cxx
   vtkPConvertSelection.cxx
   vtkPExtractHistogram.cxx
-  vtkParallelCoordinatesRepresentation.cxx
   vtkParallelSerialWriter.cxx
   vtkPEnSightGoldBinaryReader.cxx
   vtkPEnSightGoldReader.cxx
@@ -158,6 +157,7 @@ SET(Filters_SRCS
   vtkPVMain.cxx
   vtkPVMergeTables.cxx
   vtkPVNullSource.cxx
+  vtkPVParallelCoordinatesRepresentation.cxx
   vtkPVPostFilter.cxx
   vtkPVPostFilterExecutive.cxx
   vtkPVRecoverGeometryWireframe.cxx

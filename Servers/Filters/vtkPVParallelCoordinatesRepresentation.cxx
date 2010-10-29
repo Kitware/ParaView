@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkParallelCoordinatesRepresentation.cxx
+  Module:    vtkPVParallelCoordinatesRepresentation.cxx
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -12,7 +12,7 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#include "vtkParallelCoordinatesRepresentation.h"
+#include "vtkPVParallelCoordinatesRepresentation.h"
 
 #include "vtkChartParallelCoordinates.h"
 #include "vtkObjectFactory.h"
@@ -21,25 +21,25 @@
 #include "vtkPVContextView.h"
 #include "vtkTable.h"
 
-vtkStandardNewMacro(vtkParallelCoordinatesRepresentation);
+vtkStandardNewMacro(vtkPVParallelCoordinatesRepresentation);
 //----------------------------------------------------------------------------
-vtkParallelCoordinatesRepresentation::vtkParallelCoordinatesRepresentation()
+vtkPVParallelCoordinatesRepresentation::vtkPVParallelCoordinatesRepresentation()
 {
 }
 
 //----------------------------------------------------------------------------
-vtkParallelCoordinatesRepresentation::~vtkParallelCoordinatesRepresentation()
+vtkPVParallelCoordinatesRepresentation::~vtkPVParallelCoordinatesRepresentation()
 {
 }
 
 //----------------------------------------------------------------------------
-void vtkParallelCoordinatesRepresentation::PrintSelf(ostream& os, vtkIndent indent)
+void vtkPVParallelCoordinatesRepresentation::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 }
 
 //----------------------------------------------------------------------------
-bool vtkParallelCoordinatesRepresentation::AddToView(vtkView* view)
+bool vtkPVParallelCoordinatesRepresentation::AddToView(vtkView* view)
 {
   if (!this->Superclass::AddToView(view))
     {
@@ -57,7 +57,7 @@ bool vtkParallelCoordinatesRepresentation::AddToView(vtkView* view)
 }
 
 //----------------------------------------------------------------------------
-bool vtkParallelCoordinatesRepresentation::RemoveFromView(vtkView* view)
+bool vtkPVParallelCoordinatesRepresentation::RemoveFromView(vtkView* view)
 {
   if (this->GetChart())
     {
@@ -68,7 +68,7 @@ bool vtkParallelCoordinatesRepresentation::RemoveFromView(vtkView* view)
 }
 
 //----------------------------------------------------------------------------
-vtkChartParallelCoordinates* vtkParallelCoordinatesRepresentation::GetChart()
+vtkChartParallelCoordinates* vtkPVParallelCoordinatesRepresentation::GetChart()
 {
   if (this->ContextView)
     {
@@ -80,7 +80,7 @@ vtkChartParallelCoordinates* vtkParallelCoordinatesRepresentation::GetChart()
 }
 
 //----------------------------------------------------------------------------
-void vtkParallelCoordinatesRepresentation::SetVisibility(bool visible)
+void vtkPVParallelCoordinatesRepresentation::SetVisibility(bool visible)
 {
   this->Superclass::SetVisibility(visible);
   if (this->GetChart())
@@ -90,7 +90,7 @@ void vtkParallelCoordinatesRepresentation::SetVisibility(bool visible)
 }
 
 //----------------------------------------------------------------------------
-void vtkParallelCoordinatesRepresentation::SetSeriesVisibility(
+void vtkPVParallelCoordinatesRepresentation::SetSeriesVisibility(
     const char* name, int visible)
 {
   if (this->GetChart())
@@ -100,14 +100,14 @@ void vtkParallelCoordinatesRepresentation::SetSeriesVisibility(
 }
 
 //----------------------------------------------------------------------------
-void vtkParallelCoordinatesRepresentation::SetLabel(const char*,
+void vtkPVParallelCoordinatesRepresentation::SetLabel(const char*,
                                                            const char*)
 {
 
 }
 
 //----------------------------------------------------------------------------
-void vtkParallelCoordinatesRepresentation::SetLineThickness(int value)
+void vtkPVParallelCoordinatesRepresentation::SetLineThickness(int value)
 {
   if (this->GetChart())
     {
@@ -116,7 +116,7 @@ void vtkParallelCoordinatesRepresentation::SetLineThickness(int value)
 }
 
 //----------------------------------------------------------------------------
-void vtkParallelCoordinatesRepresentation::SetLineStyle(int value)
+void vtkPVParallelCoordinatesRepresentation::SetLineStyle(int value)
 {
   if (this->GetChart())
     {
@@ -125,7 +125,7 @@ void vtkParallelCoordinatesRepresentation::SetLineStyle(int value)
 }
 
 //----------------------------------------------------------------------------
-void vtkParallelCoordinatesRepresentation::SetColor(double r, double g,
+void vtkPVParallelCoordinatesRepresentation::SetColor(double r, double g,
                                                            double b)
 {
   if (this->GetChart())
@@ -135,7 +135,7 @@ void vtkParallelCoordinatesRepresentation::SetColor(double r, double g,
 }
 
 //----------------------------------------------------------------------------
-void vtkParallelCoordinatesRepresentation::SetOpacity(double opacity)
+void vtkPVParallelCoordinatesRepresentation::SetOpacity(double opacity)
 {
   if (this->GetChart())
     {
@@ -144,7 +144,7 @@ void vtkParallelCoordinatesRepresentation::SetOpacity(double opacity)
 }
 
 //----------------------------------------------------------------------------
-int vtkParallelCoordinatesRepresentation::RequestData(vtkInformation* request,
+int vtkPVParallelCoordinatesRepresentation::RequestData(vtkInformation* request,
   vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
   if (!this->Superclass::RequestData(request, inputVector, outputVector))
