@@ -104,17 +104,6 @@ protected:
   // Checks the root element for version. If failed, return false.
   virtual bool VerifyXMLVersion(vtkPVXMLElement* rootElement);
 
-  // Description:
-  // Given the xml name for a view, this returns the xmlname for the view if the
-  // view is to be created on the given connection.
-  // Generally each view type is different class of view eg. bar char view, line
-  // plot view etc. However in some cases a different view types are indeed the
-  // same class of view the only different being that each one of them works in
-  // a different configuration eg. "RenderView" in builin mode, 
-  // "IceTDesktopRenderView" in remote render mode etc. This method is used to
-  // determine what type of view needs to be created for the given class. 
-  //const char* GetViewXMLName(int connectionID, const char *xml_name);
-
   vtkPVXMLElement* ServerManagerStateElement;
   vtkSMProxyLocator* ProxyLocator;
 private:

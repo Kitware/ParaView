@@ -16,7 +16,6 @@
 
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
-#include "vtkSMDataRepresentationProxy.h"
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMProxyProperty.h"
@@ -73,6 +72,7 @@ bool vtkSMAnimationSceneGeometryWriter::SaveInitialize()
 
   for (unsigned int cc=0; cc < pp->GetNumberOfProxies(); ++cc)
     {
+#ifdef FIXME
     vtkSMDataRepresentationProxy* repr = 
       vtkSMDataRepresentationProxy::SafeDownCast(
         pp->GetProxy(cc));
@@ -84,6 +84,7 @@ bool vtkSMAnimationSceneGeometryWriter::SaveInitialize()
         gwInput->AddProxy(input);
         }
       }
+#endif
     }
   this->GeometryWriter->UpdateVTKObjects();
   this->GeometryWriter->InvokeCommand("Start");

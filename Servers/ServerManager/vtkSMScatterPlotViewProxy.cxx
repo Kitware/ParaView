@@ -14,139 +14,30 @@
 =========================================================================*/
 #include "vtkSMScatterPlotViewProxy.h"
 
-#include "vtkEventForwarderCommand.h"
 #include "vtkObjectFactory.h"
-#include "vtkProcessModule.h"
-#include "vtkPVServerInformation.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMInputProperty.h"
-#include "vtkSMIntVectorProperty.h"
+#include "vtkSMPropertyHelper.h"
 #include "vtkSMProxyManager.h"
-#include "vtkSMRenderViewProxy.h"
 #include "vtkSMRepresentationProxy.h"
 #include "vtkSMSourceProxy.h"
-
-#include <vtksys/ios/sstream>
-#include "vtkClientServerStream.h"
 
 vtkStandardNewMacro(vtkSMScatterPlotViewProxy);
 //----------------------------------------------------------------------------
 vtkSMScatterPlotViewProxy::vtkSMScatterPlotViewProxy()
 {
-  this->RenderView = 0;
-  this->ForwarderCommand = vtkEventForwarderCommand::New();
-  this->ForwarderCommand->SetTarget(this);
 }
 
 //----------------------------------------------------------------------------
 vtkSMScatterPlotViewProxy::~vtkSMScatterPlotViewProxy()
 {
-  this->ForwarderCommand->Delete();
 }
 
 //----------------------------------------------------------------------------
 void vtkSMScatterPlotViewProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  os << indent << "RenderView: " << this->RenderView << endl;
 }
-
-
-//----------------------------------------------------------------------------
-void vtkSMScatterPlotViewProxy::AddRepresentation(vtkSMRepresentationProxy* repr)
-{
-  if (this->RenderView)
-    {
-    this->RenderView->AddRepresentation(repr);
-    }
-}
-
-//----------------------------------------------------------------------------
-void vtkSMScatterPlotViewProxy::RemoveRepresentation(vtkSMRepresentationProxy* repr)
-{
-  if (this->RenderView)
-    {
-    this->RenderView->RemoveRepresentation(repr);
-    }
-}
-
-//----------------------------------------------------------------------------
-void vtkSMScatterPlotViewProxy::RemoveAllRepresentations()
-{
-  if (this->RenderView)
-    {
-    this->RenderView->RemoveAllRepresentations();
-    }
-}
-
-//----------------------------------------------------------------------------
-void vtkSMScatterPlotViewProxy::SetViewUpdateTime(double time)
-{
-  this->Superclass::SetViewUpdateTime(time);
-  if (this->RenderView)
-    {
-    this->RenderView->SetViewUpdateTime(time);
-    }
-}
-
-//----------------------------------------------------------------------------
-void vtkSMScatterPlotViewProxy::SetCacheTime(double time)
-{
-  this->Superclass::SetCacheTime(time);
-  if (this->RenderView)
-    {
-    this->RenderView->SetCacheTime(time);
-    }
-}
-
-//----------------------------------------------------------------------------
-void vtkSMScatterPlotViewProxy::SetUseCache(int use)
-{
-  this->Superclass::SetUseCache(use);
-  if (this->RenderView)
-    {
-    this->RenderView->SetUseCache(use);
-    }
-}
-
-//----------------------------------------------------------------------------
-void vtkSMScatterPlotViewProxy::SetViewPosition(int x, int y)
-{
-  this->Superclass::SetViewPosition(x, y);
-  if (this->RenderView)
-    {
-    this->RenderView->SetViewPosition(x, y);
-    }
-}
-
-//----------------------------------------------------------------------------
-void vtkSMScatterPlotViewProxy::SetGUISize(int x, int y)
-{
-  this->Superclass::SetGUISize(x, y);
-  if (this->RenderView)
-    {
-    this->RenderView->SetGUISize(x, y);
-    }
-}
-
-//----------------------------------------------------------------------------
-void vtkSMScatterPlotViewProxy::StillRender()
-{
-  if (this->RenderView)
-    {
-    this->RenderView->StillRender();
-    }
-}
-
-//----------------------------------------------------------------------------
-void vtkSMScatterPlotViewProxy::InteractiveRender()
-{
-  if (this->RenderView)
-    {
-    this->RenderView->InteractiveRender();
-    }
-}
-
 
 //----------------------------------------------------------------------------
 vtkSMRepresentationProxy* vtkSMScatterPlotViewProxy::CreateDefaultRepresentation(
@@ -163,7 +54,8 @@ vtkSMRepresentationProxy* vtkSMScatterPlotViewProxy::CreateDefaultRepresentation
   vtkSMSourceProxy* sproxy = vtkSMSourceProxy::SafeDownCast(source);
   if (sproxy)
     {
-    sproxy->UpdatePipeline(this->GetViewUpdateTime());
+    double view_time = vtkSMPropertyHelper(this, "ViewTime").GetAsDouble();
+    sproxy->UpdatePipeline(view_time);
     }
 
   // if the user gave a default representation, use it.
@@ -199,43 +91,4 @@ vtkSMRepresentationProxy* vtkSMScatterPlotViewProxy::CreateDefaultRepresentation
   // Currently only images can be shown 
   vtkErrorMacro("This view only supports dataset representation.");
   return 0;
-}
-
-//----------------------------------------------------------------------------
-bool vtkSMScatterPlotViewProxy::BeginCreateVTKObjects()
-{
-  this->RenderView = vtkSMRenderViewProxy::SafeDownCast(
-    this->GetSubProxy("RenderView"));
-  if (!this->RenderView)
-    {
-    vtkErrorMacro("Missing \"RenderView\" subproxy.");
-    return false;
-    }
-
-  this->RenderView->AddObserver(vtkCommand::ResetCameraEvent, 
-                                this->ForwarderCommand);
-
-  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
-    this->RenderView->GetProperty("CameraParallelProjection"));
-  ivp->SetElement(0, 1);
-  
-  bool res =  this->Superclass::BeginCreateVTKObjects();
-  return res;
-}
-
-
-//----------------------------------------------------------------------------
-const char* vtkSMScatterPlotViewProxy::GetSuggestedViewType(vtkIdType connectionID)
-{
-  vtkSMViewProxy* rootView =
-    vtkSMViewProxy::SafeDownCast(this->GetSubProxy("RenderView"));
-  if (rootView)
-    {
-    vtksys_ios::ostringstream stream;
-    stream << "ScatterPlot" << rootView->GetSuggestedViewType(connectionID);
-    this->SuggestedViewType = stream.str();
-    return this->SuggestedViewType.c_str();
-    }
-
-  return this->Superclass::GetSuggestedViewType(connectionID);
 }

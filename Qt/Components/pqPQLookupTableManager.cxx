@@ -319,7 +319,6 @@ pqScalarsToColors* pqPQLookupTableManager::createLookupTable(pqServer* server,
   vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
   vtkSMProxy* lutProxy =
     pxm->NewProxy("lookup_tables", "PVLookupTable");
-  lutProxy->SetServers(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
   lutProxy->SetConnectionID(server->GetConnectionID());
   QString name = this->Internal->getRegistrationName(
     QString(lutProxy->GetXMLName()),
@@ -392,8 +391,6 @@ pqScalarOpacityFunction* pqPQLookupTableManager::createOpacityFunction(
   vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
   vtkSMProxy* opacityFunction = 
     pxm->NewProxy("piecewise_functions", "PiecewiseFunction");
-  opacityFunction->SetServers(
-    vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
   opacityFunction->SetConnectionID(server->GetConnectionID());
   //opacityFunction->UpdateVTKObjects();
 

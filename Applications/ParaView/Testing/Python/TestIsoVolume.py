@@ -36,6 +36,8 @@ QtTesting.playCommand(object4, 'activate', 'IsoVolume')
 QtTesting.playCommand(object5, 'set_string', '150')
 QtTesting.playCommand(object6, 'set_string', '170')
 QtTesting.playCommand(object3, 'activate', '')
+object9 = 'pqClientMainWindow/variableToolbar/displayColor/Variables'
+QtTesting.playCommand(object9, 'set_string', 'RTData')
 object9 = 'pqClientMainWindow/variableToolbar/actionScalarBarVisibility'
 QtTesting.playCommand(object9, 'set_boolean', 'true')
 object10 = 'pqClientMainWindow/variableToolbar/actionResetRange'

@@ -106,6 +106,15 @@ bool vtkSMStateVersionController::Process(vtkPVXMLElement* root)
     this->UpdateVersion( version, updated_version );
     }
 
+  if ( this->GetMajor( version ) == 3 && this->GetMinor( version ) < 10 )
+    {
+    status = status && this->Process_3_8_to_3_10( root );
+    // Since now the state file has been updated to version 3.10.0, we must update
+    // the version number to reflect that.
+    int updated_version[3] = { 3, 10, 0 };
+    this->UpdateVersion( version, updated_version );
+    }
+
   return status;
 }
 
@@ -834,6 +843,19 @@ bool vtkSMStateVersionController::Process_3_6_to_3_8( vtkPVXMLElement * root )
     this->Select( root, "Proxy", attrs1, &::ConvertStreamTracer, this );
     }
     
+  return true;
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMStateVersionController::Process_3_8_to_3_10( vtkPVXMLElement * root )
+{
+    {
+    // Remove all AxesRepresentation elements.
+    const char* attrs[] = {
+      "group","representations",
+      "type", "AxesRepresentation", 0};
+    this->SelectAndRemove( root, "Proxy",attrs);
+    }
   return true;
 }
 

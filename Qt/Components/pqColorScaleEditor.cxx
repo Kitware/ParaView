@@ -52,7 +52,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqScalarBarRepresentation.h"
 #include "pqScalarOpacityFunction.h"
 #include "pqScalarsToColors.h"
+#ifdef FIXME
 #include "pqScatterPlotRepresentation.h"
+#endif
 #include "pqSignalAdaptors.h"
 #include "pqSMAdaptor.h"
 #include "pqStandardColorLinkAdaptor.h"
@@ -891,8 +893,10 @@ void pqColorScaleEditor::rescaleToDataRange()
       qobject_cast<pqPipelineRepresentation *>(this->Display);
   //pqBarChartRepresentation *histogram =
   //    qobject_cast<pqBarChartRepresentation *>(this->Display);
+#ifdef FIXME
   pqScatterPlotRepresentation* scatterPlot =
     qobject_cast<pqScatterPlotRepresentation *>(this->Display);
+#endif
   if(pipeline)
     {
     pipeline->resetLookupTableScalarRange();
@@ -903,11 +907,13 @@ void pqColorScaleEditor::rescaleToDataRange()
   //  histogram->resetLookupTableScalarRange();
   //  histogram->renderViewEventually();
   //  }
+#ifdef FIXME
   else if(scatterPlot)
     {
     scatterPlot->resetLookupTableScalarRange();
     scatterPlot->renderViewEventually();
     }
+#endif
 }
 
 //-----------------------------------------------------------------------------

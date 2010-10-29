@@ -333,7 +333,11 @@ void pqPickHelper::processEvents(unsigned long eventId)
           double display[3], *world, cameraFP[4];
           display[0] = (double)this->Xe;
           display[1] = (double)this->Ye;
+#ifdef FIXME
           double z = rmp->GetZBufferValue(this->Xe, this->Ye);
+#else
+          double z = 0.0;
+#endif
           if (z >= 0.999999)
             {
             // Missed.

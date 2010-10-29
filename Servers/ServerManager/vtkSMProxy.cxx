@@ -1671,10 +1671,12 @@ int vtkSMProxy::LoadXMLState( vtkPVXMLElement* proxyElement,
 {
   unsigned int numElems = proxyElement->GetNumberOfNestedElements();
   int servers = 0;
-  if (proxyElement->GetScalarAttribute("servers", &servers))
-    {
-    this->SetLocation(servers);
-    }
+  // This overrides the location setup by the configuration when old state files
+  // are loaded causing issues.
+  // if (proxyElement->GetScalarAttribute("servers", &servers))
+  //   {
+  //   this->SetLocation(servers);
+  //   }
 
   for (unsigned int i=0; i<numElems; i++)
     {

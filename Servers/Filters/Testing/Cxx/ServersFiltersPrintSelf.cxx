@@ -14,223 +14,424 @@
 =========================================================================*/
 #include "vtkPVConfig.h"
 
+#include "vtk3DWidgetRepresentation.h"
+#include "vtkAMRDualClip.h"
+#include "vtkAMRDualContour.h"
+#include "vtkAMRDualGridHelper.h"
 #include "vtkAppendRectilinearGrid.h"
+#include "vtkAppendArcLength.h"
 #include "vtkAttributeDataReductionFilter.h"
+#include "vtkAttributeDataToTableFilter.h"
+#include "vtkBlockDeliveryPreprocessor.h"
+#include "vtkBSPCutsGenerator.h"
+#include "vtkCameraInterpolator2.h"
 #include "vtkCameraManipulator.h"
+#include "vtkChartRepresentation.h"
+#include "vtkCleanArrays.h"
 #include "vtkCleanUnstructuredGrid.h"
 #include "vtkClientServerMoveData.h"
 #include "vtkCompleteArrays.h"
+#include "vtkCompositeAnimationPlayer.h"
+#include "vtkCompositeDataToUnstructuredGridFilter.h"
+#include "vtkCompositeRepresentation.h"
+#include "vtkContextNamedOptions.h"
+#include "vtkCSVExporter.h"
 #include "vtkCSVWriter.h"
+#include "vtkCubeAxesRepresentation.h"
+#include "vtkDataLabelRepresentation.h"
+#include "vtkDataSetToRectilinearGrid.h"
+#include "vtkEnzoReader.h"
+#include "vtkEquivalenceSet.h"
+#include "vtkExodusFileSeriesReader.h"
 #include "vtkExtractHistogram.h"
 #include "vtkExtractScatterPlot.h"
+#include "vtkFileSeriesReader.h"
+#include "vtkFileSeriesWriter.h"
+#include "vtkFlashContour.h"
+#include "vtkFlashReader.h"
+#include "vtkGlyph3DRepresentation.h"
 #include "vtkHierarchicalFractal.h"
-#include "vtkImageCompressor.h"
+#include "vtkGeometryRepresentation.h"
+#include "vtkGeometryRepresentationWithFaces.h"
+#include "vtkGridConnectivity.h"
+#include "vtkImageSliceDataDeliveryFilter.h"
+#include "vtkImageSliceMapper.h"
+#include "vtkImageSliceRepresentation.h"
+#include "vtkImageVolumeRepresentation.h"
 #include "vtkIntegrateAttributes.h"
 #include "vtkIntegrateFlowThroughSurface.h"
 #include "vtkInteractorStyleTransferFunctionEditor.h"
+#include "vtkIntersectFragments.h"
+#include "vtkIsoVolume.h"
 #include "vtkKdTreeGenerator.h"
 #include "vtkKdTreeManager.h"
+#include "vtkMarkSelectedRows.h"
+#include "vtkMaterialInterfaceFilter.h"
+#include "vtkMergeArrays.h"
+#include "vtkMergeCompositeDataSet.h"
+#include "vtkMinMax.h"
 #include "vtkMPICompositeManager.h"
 #include "vtkMPIMoveData.h"
-#include "vtkMergeArrays.h"
-#include "vtkMinMax.h"
 #include "vtkMultiViewManager.h"
 #include "vtkNetworkImageSource.h"
 #include "vtkOrderedCompositeDistributor.h"
+#include "vtkOutlineRepresentation.h"
+#include "vtkPConvertSelection.h"
 #include "vtkPExtractHistogram.h"
+#include "vtkParallelCoordinatesRepresentation.h"
+#include "vtkParallelSerialWriter.h"
+#include "vtkPEnSightGoldBinaryReader.h"
+#include "vtkPEnSightGoldReader.h"
+#include "vtkPGenericEnSightReader.h"
 #include "vtkPhastaReader.h"
-#include "vtkPPhastaReader.h"
+#include "vtkPlotEdges.h"
 #include "vtkPointHandleRepresentationSphere.h"
 #include "vtkPolyLineToRectilinearGridFilter.h"
+#include "vtkPPhastaReader.h"
+#include "vtkPSciVizContingencyStats.h"
+#include "vtkPSciVizDescriptiveStats.h"
+#include "vtkPSciVizMultiCorrelativeStats.h"
+#include "vtkPSciVizPCAStats.h"
+#include "vtkPSciVizKMeans.h"
+#include "vtkPVAMRDualClip.h"
 #include "vtkPVAnimationScene.h"
+#include "vtkPVArrayCalculator.h"
 #include "vtkPVArrowSource.h"
+#include "vtkPVAxesActor.h"
+#include "vtkPVAxesWidget.h"
+#include "vtkPVCacheKeeper.h"
+#include "vtkPVCacheKeeperPipeline.h"
+#include "vtkPVCenterAxesActor.h"
+#include "vtkPVClipClosedSurface.h"
 #include "vtkPVClipDataSet.h"
 #include "vtkPVConnectivityFilter.h"
-#include "vtkPVDesktopDeliveryClient.h"
-#include "vtkPVDesktopDeliveryServer.h"
+#include "vtkPVContourFilter.h"
+#include "vtkPVCompositeRepresentation.h"
+#include "vtkPVDataRepresentationPipeline.h"
+#include "vtkPVDefaultPass.h"
 #include "vtkPVDReader.h"
 #include "vtkPVEnSightMasterServerReader.h"
+#include "vtkPVEnSightMasterServerReader2.h"
 #include "vtkPVEnSightMasterServerTranslator.h"
 #include "vtkPVExtentTranslator.h"
+#include "vtkPVExtractSelection.h"
 #include "vtkPVExtractVOI.h"
+#include "vtkPVFrustumActor.h"
 #include "vtkPVGenericRenderWindowInteractor.h"
 #include "vtkPVGeometryFilter.h"
-#include "vtkPVGlyphFilter.h"
 #include "vtkPVGeometryInformation.h"
+#include "vtkPVGlyphFilter.h"
 #include "vtkPVInteractorStyle.h"
+#include "vtkPVJoystickFly.h"
 #include "vtkPVJoystickFlyIn.h"
 #include "vtkPVJoystickFlyOut.h"
+#include "vtkPVLastSelectionInformation.h"
 #include "vtkPVLinearExtrusionFilter.h"
 #include "vtkPVLODActor.h"
 #include "vtkPVLODVolume.h"
 #include "vtkPVMain.h"
-#include "vtkPVRenderViewProxy.h"
+#include "vtkPVMergeTables.h"
+#include "vtkPVNullSource.h"
+#include "vtkPVRecoverGeometryWireframe.h"
+#include "vtkPVRepresentedDataInformation.h"
+#include "vtkPVScalarBarActor.h"
+#include "vtkPVSelectionSource.h"
 #include "vtkPVServerArrayHelper.h"
 #include "vtkPVServerArraySelection.h"
 #include "vtkPVServerFileListing.h"
 #include "vtkPVServerObject.h"
 #include "vtkPVServerSelectTimeSet.h"
 #include "vtkPVServerTimeSteps.h"
+#include "vtkPVStringArrayHelper.h"
 #include "vtkPVTextSource.h"
 #include "vtkPVTrackballMoveActor.h"
+#include "vtkPVTrackballMultiRotate.h"
 #include "vtkPVTrackballPan.h"
 #include "vtkPVTrackballRoll.h"
 #include "vtkPVTrackballRotate.h"
 #include "vtkPVTrackballZoom.h"
 #include "vtkPVUpdateSuppressor.h"
 #include "vtkPVHardwareSelector.h"
-#include "vtkPVXMLElement.h"
-#include "vtkPVXMLParser.h"
+#include "vtkQuerySelectionSource.h"
+#include "vtkRealtimeAnimationPlayer.h"
+#include "vtkRectilinearGridConnectivity.h"
 #include "vtkReductionFilter.h"
+#include "vtkScatterPlotMapper.h"
+#include "vtkScatterPlotPainter.h"
+#include "vtkSelectionConverter.h"
+#include "vtkSelectionDeliveryFilter.h"
+#include "vtkSelectionRepresentation.h"
+#include "vtkSequenceAnimationPlayer.h"
+#include "vtkSortedTableStreamer.h"
+#include "vtkSpreadSheetRepresentation.h"
 #include "vtkSpyPlotReader.h"
 #include "vtkSpyPlotUniReader.h"
 #include "vtkSquirtCompressor.h"
+#include "vtkZlibImageCompressor.h"
 #include "vtkSurfaceVectors.h"
+#include "vtkTextSourceRepresentation.h"
+#include "vtkTilesHelper.h"
+#include "vtkTableFFT.h"
+#include "vtkTexturePainter.h"
+#include "vtkTimestepsAnimationPlayer.h"
 #include "vtkTimeToTextConvertor.h"
+#include "vtkTrackballPan.h"
+#include "vtkTransferFunctionEditorRepresentation1D.h"
+#include "vtkTransferFunctionEditorRepresentation.h"
 #include "vtkTransferFunctionEditorRepresentationShapes1D.h"
 #include "vtkTransferFunctionEditorRepresentationShapes2D.h"
 #include "vtkTransferFunctionEditorRepresentationSimple1D.h"
+#include "vtkTransferFunctionEditorWidget1D.h"
+#include "vtkTransferFunctionEditorWidget.h"
 #include "vtkTransferFunctionEditorWidgetShapes1D.h"
 #include "vtkTransferFunctionEditorWidgetShapes2D.h"
 #include "vtkTransferFunctionEditorWidgetSimple1D.h"
 #include "vtkTransferFunctionViewer.h"
+#include "vtkUnstructuredDataDeliveryFilter.h"
+#include "vtkUnstructuredGridVolumeRepresentation.h"
 #include "vtkUpdateSuppressorPipeline.h"
+#include "vtkVolumeRepresentationPreprocessor.h"
 #include "vtkVRMLSource.h"
 #include "vtkXMLCollectionReader.h"
 #include "vtkXMLPVAnimationWriter.h"
 #include "vtkXMLPVDWriter.h"
-
-#ifdef VTK_USE_MPI
-# include "vtkAllToNRedistributePolyData.h"
-# include "vtkBalancedRedistributePolyData.h"
-# include "vtkRedistributePolyData.h"
-# ifdef PARAVIEW_USE_ICE_T
-#  include "vtkCaveRenderManager.h"
-#  include "vtkDesktopDeliveryClient.h"
-#  include "vtkDesktopDeliveryServer.h"
-//#include "vtkExtractCTHPart2.h"
-#  include "vtkIceTContext.h"
-#  include "vtkIceTRenderer.h"
-#  include "vtkIceTRenderManager.h"
-# endif
-# include "vtkRedistributePolyData.h"
-//#include "vtkStructuredCacheFilter.h"
-# include "vtkWeightedRedistributePolyData.h"
-#endif //VTK_USE_MPI
+#include "vtkXYChartRepresentation.h"
 
 #ifdef PARAVIEW_ENABLE_PYTHON
-# include "vtkPythonProgrammableFilter.h"
-#endif //PARAVIEW_ENABLE_PYTHON
+#include "vtkPythonCalculator.h"
+#include "vtkPythonProgrammableFilter.h"
+#endif
+
+#ifdef PARAVIEW_USE_SILO
+#include "vtkSiloReader.h"
+#endif
+
+#ifdef VTK_USE_MPI
+# include "vtkBalancedRedistributePolyData.h"
+# include "vtkAllToNRedistributePolyData.h"
+# include "vtkAllToNRedistributeCompositePolyData.h"
+# include "vtkRedistributePolyData.h"
+# include "vtkWeightedRedistributePolyData.h"
+# ifdef PARAVIEW_USE_ICE_T
+//vtkCaveRenderManager.h"
+#  include "vtkIceTCompositePass.h"
+#  include "vtkIceTContext.h"
+#  include "vtkIceTSynchronizedRenderers.h"
+# endif
+#endif
+
+#define PRINT_SELF(classname)\
+  c = classname::New(); c->Print(cout); c->Delete();
 
 int main(int , char *[])
 {
   vtkObject *c;
-  c = vtkAppendRectilinearGrid::New(); c->Print(cout); c->Delete();
-  c = vtkAttributeDataReductionFilter::New(); c->Print(cout); c->Delete();
-  c = vtkCameraManipulator::New(); c->Print(cout); c->Delete();
-  c = vtkCleanUnstructuredGrid::New(); c->Print(cout); c->Delete();
-  c = vtkClientServerMoveData::New(); c->Print(cout); c->Delete();
-  c = vtkCompleteArrays::New(); c->Print(cout); c->Delete();
-  c = vtkCSVWriter::New(); c->Print(cout); c->Delete();
-  c = vtkExtractHistogram::New(); c->Print(cout); c->Delete();
-  c = vtkExtractScatterPlot::New(); c->Print(cout); c->Delete();
-  c = vtkHierarchicalFractal::New(); c->Print(cout); c->Delete();
-  c = vtkImageCompressor::New(); c->Print(cout); c->Delete();
-  c = vtkIntegrateAttributes::New(); c->Print(cout); c->Delete();
-  c = vtkIntegrateFlowThroughSurface::New(); c->Print(cout); c->Delete();
-  c = vtkKdTreeGenerator::New(); c->Print(cout); c->Delete();
-  c = vtkKdTreeManager::New(); c->Print(cout); c->Delete();
-  c = vtkMergeArrays::New(); c->Print(cout); c->Delete();
-  c = vtkMinMax::New(); c->Print(cout); c->Delete();
-  c = vtkMPICompositeManager::New(); c->Print(cout); c->Delete();
-  c = vtkMPIMoveData::New(); c->Print(cout); c->Delete();
-  c = vtkMultiViewManager::New(); c->Print(cout); c->Delete();
-  c = vtkNetworkImageSource::New(); c->Print(cout); c->Delete();
-  c = vtkOrderedCompositeDistributor::New(); c->Print(cout); c->Delete();
-  c = vtkPExtractHistogram::New(); c->Print(cout); c->Delete();
-  c = vtkPhastaReader::New(); c->Print(cout); c->Delete();
-  c = vtkPPhastaReader::New(); c->Print(cout); c->Delete();
-  c = vtkPointHandleRepresentationSphere::New(); c->Print(cout); c->Delete();
-  c = vtkPolyLineToRectilinearGridFilter::New(); c->Print(cout); c->Delete();
-  c = vtkPVAnimationScene::New(); c->Print(cout); c->Delete();
-  c = vtkPVArrowSource::New(); c->Print(cout); c->Delete();
-  c = vtkPVClipDataSet::New(); c->Print(cout); c->Delete();
-  c = vtkPVConnectivityFilter::New(); c->Print(cout); c->Delete();
-  c = vtkPVDesktopDeliveryClient::New(); c->Print(cout); c->Delete();
-  c = vtkPVDesktopDeliveryServer::New(); c->Print(cout); c->Delete();
-  c = vtkPVDReader::New(); c->Print(cout); c->Delete();
-  c = vtkPVEnSightMasterServerReader::New(); c->Print(cout); c->Delete();
-  c = vtkPVEnSightMasterServerTranslator::New(); c->Print(cout); c->Delete();
-  c = vtkPVExtentTranslator::New(); c->Print(cout); c->Delete();
-  c = vtkPVExtractVOI::New(); c->Print(cout); c->Delete();
-  c = vtkPVGenericRenderWindowInteractor::New(); c->Print(cout); c->Delete();
-  c = vtkPVGeometryFilter::New(); c->Print(cout); c->Delete();
-  c = vtkPVGlyphFilter::New(); c->Print(cout); c->Delete();
-  c = vtkPVGeometryInformation::New(); c->Print(cout); c->Delete();
-  c = vtkPVInteractorStyle::New(); c->Print(cout); c->Delete();
-  c = vtkPVJoystickFlyIn::New(); c->Print(cout); c->Delete();
-  c = vtkPVJoystickFlyOut::New(); c->Print(cout); c->Delete();
-  c = vtkPVLinearExtrusionFilter::New(); c->Print(cout); c->Delete();
-  c = vtkPVLODActor::New(); c->Print(cout); c->Delete();
-  c = vtkPVLODVolume::New(); c->Print(cout); c->Delete();
-  c = vtkPVMain::New(); c->Print(cout); c->Delete();
-  c = vtkPVRenderViewProxy::New(); c->Print(cout); c->Delete();
-  c = vtkPVServerArrayHelper::New(); c->Print(cout); c->Delete();
-  c = vtkPVServerArraySelection::New(); c->Print(cout); c->Delete();
-  c = vtkPVServerFileListing::New(); c->Print(cout); c->Delete();
-  c = vtkPVServerObject::New(); c->Print(cout); c->Delete();
-  c = vtkPVServerSelectTimeSet::New(); c->Print(cout); c->Delete();
-  c = vtkPVServerTimeSteps::New(); c->Print(cout); c->Delete();
-  c = vtkPVTextSource::New(); c->Print(cout); c->Delete();
-  c = vtkPVTrackballMoveActor::New(); c->Print(cout); c->Delete();
-  c = vtkPVTrackballPan::New(); c->Print(cout); c->Delete();
-  c = vtkPVTrackballRoll::New(); c->Print(cout); c->Delete();
-  c = vtkPVTrackballRotate::New(); c->Print(cout); c->Delete();
-  c = vtkPVTrackballZoom::New(); c->Print(cout); c->Delete();
-  c = vtkPVUpdateSuppressor::New(); c->Print(cout); c->Delete();
-  c = vtkPVHardwareSelector::New(); c->Print(cout); c->Delete();
-  c = vtkPVXMLElement::New(); c->Print(cout); c->Delete();
-  c = vtkPVXMLParser::New(); c->Print(cout); c->Delete();
-  c = vtkReductionFilter::New(); c->Print(cout); c->Delete();
-  c = vtkSpyPlotReader::New(); c->Print(cout); c->Delete();
-  c = vtkSpyPlotUniReader::New(); c->Print(cout); c->Delete();
-  c = vtkSquirtCompressor::New(); c->Print(cout); c->Delete();
-  c = vtkSurfaceVectors::New(); c->Print(cout); c->Delete();
-  c = vtkTimeToTextConvertor::New(); c->Print(cout); c->Delete();
-  c = vtkTransferFunctionEditorRepresentationShapes1D::New(); c->Print(cout); c->Delete();
-  c = vtkTransferFunctionEditorRepresentationShapes2D::New(); c->Print(cout); c->Delete();
-  c = vtkTransferFunctionEditorRepresentationSimple1D::New(); c->Print(cout); c->Delete();
-  c = vtkTransferFunctionEditorWidgetShapes1D::New(); c->Print(cout); c->Delete();
-  c = vtkTransferFunctionEditorWidgetShapes2D::New(); c->Print(cout); c->Delete();
-  c = vtkTransferFunctionEditorWidgetSimple1D::New(); c->Print(cout); c->Delete();
-  c = vtkTransferFunctionViewer::New(); c->Print(cout); c->Delete();
-  c = vtkUpdateSuppressorPipeline::New(); c->Print(cout); c->Delete();
-  c = vtkVRMLSource::New(); c->Print(cout); c->Delete();
-  c = vtkXMLCollectionReader::New(); c->Print(cout); c->Delete();
-  c = vtkXMLPVAnimationWriter::New(); c->Print(cout); c->Delete();
-  c = vtkXMLPVDWriter::New(); c->Print(cout); c->Delete();
 
-#ifdef VTK_USE_MPI
-  c = vtkAllToNRedistributePolyData::New(); c->Print(cout); c->Delete();
-  c = vtkBalancedRedistributePolyData::New(); c->Print(cout); c->Delete();
-  c = vtkRedistributePolyData::New(); c->Print(cout); c->Delete();
-# ifdef PARAVIEW_USE_ICE_T
-  c = vtkCaveRenderManager::New(); c->Print(cout); c->Delete();
-  c = vtkDesktopDeliveryClient::New(); c->Print(cout); c->Delete();
-  c = vtkDesktopDeliveryServer::New(); c->Print(cout); c->Delete();
-//  c = vtkExtractCTHPart2::New(); c->Print(cout); c->Delete();
-  c = vtkIceTContext::New(); c->Print(cout); c->Delete();
-  c = vtkIceTRenderer::New(); c->Print(cout); c->Delete();
-  c = vtkIceTRenderManager::New(); c->Print(cout); c->Delete();
-# endif
-  c = vtkRedistributePolyData::New(); c->Print(cout); c->Delete();
-//  c = vtkStructuredCacheFilter::New(); c->Print(cout); c->Delete();
-  c = vtkWeightedRedistributePolyData::New(); c->Print(cout); c->Delete();
-#endif //VTK_USE_MPI
+  PRINT_SELF(vtk3DWidgetRepresentation);
+  PRINT_SELF(vtkAMRDualClip);
+  PRINT_SELF(vtkAMRDualContour);
+  PRINT_SELF(vtkAMRDualGridHelper);
+  PRINT_SELF(vtkAppendRectilinearGrid);
+  PRINT_SELF(vtkAppendArcLength);
+  PRINT_SELF(vtkAttributeDataReductionFilter);
+  PRINT_SELF(vtkAttributeDataToTableFilter);
+  PRINT_SELF(vtkBlockDeliveryPreprocessor);
+  PRINT_SELF(vtkBSPCutsGenerator);
+  PRINT_SELF(vtkCameraInterpolator2);
+  PRINT_SELF(vtkCameraManipulator);
+  PRINT_SELF(vtkChartRepresentation);
+  PRINT_SELF(vtkCleanArrays);
+  PRINT_SELF(vtkCleanUnstructuredGrid);
+  PRINT_SELF(vtkClientServerMoveData);
+  PRINT_SELF(vtkCompleteArrays);
+  PRINT_SELF(vtkCompositeAnimationPlayer);
+  PRINT_SELF(vtkCompositeDataToUnstructuredGridFilter);
+  PRINT_SELF(vtkCompositeRepresentation);
+  PRINT_SELF(vtkContextNamedOptions);
+  PRINT_SELF(vtkCSVExporter);
+  PRINT_SELF(vtkCSVWriter);
+  PRINT_SELF(vtkCubeAxesRepresentation);
+  PRINT_SELF(vtkDataLabelRepresentation);
+  PRINT_SELF(vtkDataSetToRectilinearGrid);
+  PRINT_SELF(vtkEnzoReader);
+  PRINT_SELF(vtkEquivalenceSet);
+  PRINT_SELF(vtkExodusFileSeriesReader);
+  PRINT_SELF(vtkExtractHistogram);
+  PRINT_SELF(vtkExtractScatterPlot);
+  PRINT_SELF(vtkFileSeriesReader);
+  PRINT_SELF(vtkFileSeriesWriter);
+  PRINT_SELF(vtkFlashContour);
+  PRINT_SELF(vtkFlashReader);
+  PRINT_SELF(vtkGlyph3DRepresentation);
+  PRINT_SELF(vtkHierarchicalFractal);
+  PRINT_SELF(vtkGeometryRepresentation);
+  PRINT_SELF(vtkGeometryRepresentationWithFaces);
+  PRINT_SELF(vtkGridConnectivity);
+  PRINT_SELF(vtkImageSliceDataDeliveryFilter);
+  PRINT_SELF(vtkImageSliceMapper);
+  PRINT_SELF(vtkImageSliceRepresentation);
+  PRINT_SELF(vtkImageVolumeRepresentation);
+  PRINT_SELF(vtkIntegrateAttributes);
+  PRINT_SELF(vtkIntegrateFlowThroughSurface);
+  PRINT_SELF(vtkInteractorStyleTransferFunctionEditor);
+  PRINT_SELF(vtkIntersectFragments);
+  PRINT_SELF(vtkIsoVolume);
+  PRINT_SELF(vtkKdTreeGenerator);
+  PRINT_SELF(vtkKdTreeManager);
+  PRINT_SELF(vtkMarkSelectedRows);
+  PRINT_SELF(vtkMaterialInterfaceFilter);
+  PRINT_SELF(vtkMergeArrays);
+  PRINT_SELF(vtkMergeCompositeDataSet);
+  PRINT_SELF(vtkMinMax);
+  PRINT_SELF(vtkMPICompositeManager);
+  PRINT_SELF(vtkMPIMoveData);
+  PRINT_SELF(vtkMultiViewManager);
+  PRINT_SELF(vtkNetworkImageSource);
+  PRINT_SELF(vtkOrderedCompositeDistributor);
+  PRINT_SELF(vtkOutlineRepresentation);
+  PRINT_SELF(vtkPConvertSelection);
+  PRINT_SELF(vtkPExtractHistogram);
+  PRINT_SELF(vtkParallelCoordinatesRepresentation);
+  PRINT_SELF(vtkParallelSerialWriter);
+  PRINT_SELF(vtkPEnSightGoldBinaryReader);
+  PRINT_SELF(vtkPEnSightGoldReader);
+  PRINT_SELF(vtkPGenericEnSightReader);
+  PRINT_SELF(vtkPhastaReader);
+  PRINT_SELF(vtkPlotEdges);
+  PRINT_SELF(vtkPointHandleRepresentationSphere);
+  PRINT_SELF(vtkPolyLineToRectilinearGridFilter);
+  PRINT_SELF(vtkPPhastaReader);
+  PRINT_SELF(vtkPSciVizContingencyStats);
+  PRINT_SELF(vtkPSciVizDescriptiveStats);
+  PRINT_SELF(vtkPSciVizMultiCorrelativeStats);
+  PRINT_SELF(vtkPSciVizPCAStats);
+  PRINT_SELF(vtkPSciVizKMeans);
+  PRINT_SELF(vtkPVAMRDualClip);
+  PRINT_SELF(vtkPVAnimationScene);
+  PRINT_SELF(vtkPVArrayCalculator);
+  PRINT_SELF(vtkPVArrowSource);
+  PRINT_SELF(vtkPVAxesActor);
+  PRINT_SELF(vtkPVAxesWidget);
+  PRINT_SELF(vtkPVCacheKeeper);
+  PRINT_SELF(vtkPVCacheKeeperPipeline);
+  PRINT_SELF(vtkPVCenterAxesActor);
+  PRINT_SELF(vtkPVClipClosedSurface);
+  PRINT_SELF(vtkPVClipDataSet);
+  PRINT_SELF(vtkPVConnectivityFilter);
+  PRINT_SELF(vtkPVContourFilter);
+  PRINT_SELF(vtkPVCompositeRepresentation);
+  PRINT_SELF(vtkPVDataRepresentationPipeline);
+  PRINT_SELF(vtkPVDefaultPass);
+  PRINT_SELF(vtkPVDReader);
+  PRINT_SELF(vtkPVEnSightMasterServerReader);
+  PRINT_SELF(vtkPVEnSightMasterServerReader2);
+  PRINT_SELF(vtkPVEnSightMasterServerTranslator);
+  PRINT_SELF(vtkPVExtentTranslator);
+  PRINT_SELF(vtkPVExtractSelection);
+  PRINT_SELF(vtkPVExtractVOI);
+  PRINT_SELF(vtkPVFrustumActor);
+  PRINT_SELF(vtkPVGenericRenderWindowInteractor);
+  PRINT_SELF(vtkPVGeometryFilter);
+  PRINT_SELF(vtkPVGeometryInformation);
+  PRINT_SELF(vtkPVGlyphFilter);
+  PRINT_SELF(vtkPVInteractorStyle);
+  PRINT_SELF(vtkPVJoystickFly);
+  PRINT_SELF(vtkPVJoystickFlyIn);
+  PRINT_SELF(vtkPVJoystickFlyOut);
+  PRINT_SELF(vtkPVLastSelectionInformation);
+  PRINT_SELF(vtkPVLinearExtrusionFilter);
+  PRINT_SELF(vtkPVLODActor);
+  PRINT_SELF(vtkPVLODVolume);
+  PRINT_SELF(vtkPVMain);
+  PRINT_SELF(vtkPVMergeTables);
+  PRINT_SELF(vtkPVNullSource);
+  PRINT_SELF(vtkPVRecoverGeometryWireframe);
+  PRINT_SELF(vtkPVRepresentedDataInformation);
+  PRINT_SELF(vtkPVScalarBarActor);
+  PRINT_SELF(vtkPVSelectionSource);
+  PRINT_SELF(vtkPVServerArrayHelper);
+  PRINT_SELF(vtkPVServerArraySelection);
+  PRINT_SELF(vtkPVServerFileListing);
+  PRINT_SELF(vtkPVServerObject);
+  PRINT_SELF(vtkPVServerSelectTimeSet);
+  PRINT_SELF(vtkPVServerTimeSteps);
+  PRINT_SELF(vtkPVStringArrayHelper);
+  PRINT_SELF(vtkPVTextSource);
+  PRINT_SELF(vtkPVTrackballMoveActor);
+  PRINT_SELF(vtkPVTrackballMultiRotate);
+  PRINT_SELF(vtkPVTrackballPan);
+  PRINT_SELF(vtkPVTrackballRoll);
+  PRINT_SELF(vtkPVTrackballRotate);
+  PRINT_SELF(vtkPVTrackballZoom);
+  PRINT_SELF(vtkPVUpdateSuppressor);
+  PRINT_SELF(vtkPVHardwareSelector);
+  PRINT_SELF(vtkQuerySelectionSource);
+  PRINT_SELF(vtkRealtimeAnimationPlayer);
+  PRINT_SELF(vtkRectilinearGridConnectivity);
+  PRINT_SELF(vtkReductionFilter);
+  PRINT_SELF(vtkScatterPlotMapper);
+  PRINT_SELF(vtkScatterPlotPainter);
+  PRINT_SELF(vtkSelectionConverter);
+  PRINT_SELF(vtkSelectionDeliveryFilter);
+  PRINT_SELF(vtkSelectionRepresentation);
+  PRINT_SELF(vtkSequenceAnimationPlayer);
+  PRINT_SELF(vtkSortedTableStreamer);
+  PRINT_SELF(vtkSpreadSheetRepresentation);
+  PRINT_SELF(vtkSpyPlotReader);
+  PRINT_SELF(vtkSpyPlotUniReader);
+  PRINT_SELF(vtkSquirtCompressor);
+  PRINT_SELF(vtkZlibImageCompressor);
+  PRINT_SELF(vtkSurfaceVectors);
+  PRINT_SELF(vtkTextSourceRepresentation);
+  PRINT_SELF(vtkTilesHelper);
+  PRINT_SELF(vtkTableFFT);
+  PRINT_SELF(vtkTexturePainter);
+  PRINT_SELF(vtkTimestepsAnimationPlayer);
+  PRINT_SELF(vtkTimeToTextConvertor);
+  PRINT_SELF(vtkTrackballPan);
+  PRINT_SELF(vtkTransferFunctionEditorRepresentation1D);
+  PRINT_SELF(vtkTransferFunctionEditorRepresentation);
+  PRINT_SELF(vtkTransferFunctionEditorRepresentationShapes1D);
+  PRINT_SELF(vtkTransferFunctionEditorRepresentationShapes2D);
+  PRINT_SELF(vtkTransferFunctionEditorRepresentationSimple1D);
+  PRINT_SELF(vtkTransferFunctionEditorWidget1D);
+  PRINT_SELF(vtkTransferFunctionEditorWidget);
+  PRINT_SELF(vtkTransferFunctionEditorWidgetShapes1D);
+  PRINT_SELF(vtkTransferFunctionEditorWidgetShapes2D);
+  PRINT_SELF(vtkTransferFunctionEditorWidgetSimple1D);
+  PRINT_SELF(vtkTransferFunctionViewer);
+  PRINT_SELF(vtkUnstructuredDataDeliveryFilter);
+  PRINT_SELF(vtkUnstructuredGridVolumeRepresentation);
+  PRINT_SELF(vtkUpdateSuppressorPipeline);
+  PRINT_SELF(vtkVolumeRepresentationPreprocessor);
+  PRINT_SELF(vtkVRMLSource);
+  PRINT_SELF(vtkXMLCollectionReader);
+  PRINT_SELF(vtkXMLPVAnimationWriter);
+  PRINT_SELF(vtkXMLPVDWriter);
+  PRINT_SELF(vtkXYChartRepresentation);
 
 #ifdef PARAVIEW_ENABLE_PYTHON
- c = vtkPythonProgrammableFilter::New(); c->Print(cout); c->Delete();
-#endif //PARAVIEW_ENABLE_PYTHON
+  PRINT_SELF(vtkPythonCalculator);
+  PRINT_SELF(vtkPythonProgrammableFilter);
+#endif
+
+#ifdef PARAVIEW_USE_SILO
+  PRINT_SELF(vtkSiloReader);
+#endif
+
+#ifdef VTK_USE_MPI
+  PRINT_SELF(vtkBalancedRedistributePolyData);
+  PRINT_SELF(vtkAllToNRedistributePolyData);
+  PRINT_SELF(vtkAllToNRedistributeCompositePolyData);
+  PRINT_SELF(vtkRedistributePolyData);
+  PRINT_SELF(vtkWeightedRedistributePolyData);
+# ifdef PARAVIEW_USE_ICE_T
+  //vtkCaveRenderManager);
+  PRINT_SELF(vtkIceTCompositePass);
+  PRINT_SELF(vtkIceTContext);
+  PRINT_SELF(vtkIceTSynchronizedRenderers);
+# endif
+#endif
 
   return 0;
 }

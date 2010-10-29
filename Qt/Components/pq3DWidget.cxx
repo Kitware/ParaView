@@ -41,6 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMInputProperty.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMNewWidgetRepresentationProxy.h"
+#include "vtkSMPropertyHelper.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMProxyProperty.h"
 #include "vtkSMRenderViewProxy.h"
@@ -250,13 +251,15 @@ void pq3DWidget::setView(pqView* pqview)
   bool cur_visbility = this->widgetVisible();
   this->hideWidget();
 
-  vtkSMRepresentationProxy* widget = this->getWidgetProxy();
+  vtkSMProxy* widget = this->getWidgetProxy();
   if (rview && widget)
     {
     // To add/remove the 3D widget display from the view module.
     // we don't use the property. This is so since the 3D widget add/remove 
     // should not get saved in state or undo-redo. 
-    rview->getViewProxy()->RemoveRepresentation(widget);
+    vtkSMPropertyHelper(
+      rview->getProxy(), "HiddenRepresentations").Remove(widget);
+    rview->getProxy()->UpdateVTKObjects();
     }
 
   this->Superclass::setView(pqview);
@@ -277,7 +280,9 @@ void pq3DWidget::setView(pqView* pqview)
     // we don't use the property. This is so since the 3D widget add/remove 
     // should not get saved in state or undo-redo. 
     this->updateWidgetVisibility();
-    rview->getViewProxy()->AddRepresentation(widget);
+    vtkSMPropertyHelper(
+      rview->getProxy(), "HiddenRepresentations").Add(widget);
+    rview->getProxy()->UpdateVTKObjects();
     }
 
   if (cur_visbility)
@@ -315,12 +320,14 @@ void pq3DWidget::setWidgetProxy(vtkSMNewWidgetRepresentationProxy* pxy)
 
     vtkSMNewWidgetRepresentationProxy* widget = this->getWidgetProxy();
   pqRenderViewBase* rview = this->renderView();
+  vtkSMProxy* viewProxy = rview? rview->getProxy() : NULL;
   if (rview && widget)
     {
     // To add/remove the 3D widget display from the view module.
     // we don't use the property. This is so since the 3D widget add/remove 
     // should not get saved in state or undo-redo. 
-    rview->getViewProxy()->RemoveRepresentation(widget);
+    vtkSMPropertyHelper(viewProxy,"HiddenRepresentations").Remove(widget);
+    viewProxy->UpdateVTKObjects();
     rview->render();
     }
 
@@ -344,7 +351,8 @@ void pq3DWidget::setWidgetProxy(vtkSMNewWidgetRepresentationProxy* pxy)
     // we don't use the property. This is so since the 3D widget add/remove 
     // should not get saved in state or undo-redo. 
     this->updateWidgetVisibility();
-    rview->getViewProxy()->AddRepresentation(widget);
+    vtkSMPropertyHelper(viewProxy,"HiddenRepresentations").Add(widget);
+    viewProxy->UpdateVTKObjects();
     rview->render();
     }
 }

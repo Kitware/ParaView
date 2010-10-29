@@ -18,17 +18,19 @@ include_directories(
 )
 
 set(SM_SOURCES
+  vtkSMCustomBoundsDomain.cxx
   vtkSMPointSpriteRepresentationProxy.cxx
   vtkSMSpriteTextureProxy.cxx
+  vtkPointSpriteRepresentation.cxx
   )
 
 set(SM_XMLS_Rendering
-  PointSprite_Rendering.xml
-  PointSpriteRepresentation.xml
+  CSCS_PointSprite_Rendering.xml
+  CSCS_PointSpriteRepresentation.xml
   )
   
 set(SM_XMLS_Graphics
-  PointSprite_Graphics.xml
+  CSCS_PointSprite_Graphics.xml
   )
 
 set(PLUGIN_NAME PointSprite_Plugin)

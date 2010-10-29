@@ -16,6 +16,7 @@
 
 #include "vtkClientServerStream.h"
 #include "vtkCollection.h"
+#include "vtkDataRepresentation.h"
 #include "vtkDoubleArray.h"
 #include "vtkIdTypeArray.h"
 #include "vtkInformationDoubleKey.h"
@@ -36,11 +37,14 @@
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMOutputPort.h"
 #include "vtkSMPropertyHelper.h"
+#include "vtkSMPropertyHelper.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkUnsignedIntArray.h"
+#include "vtkView.h"
 
 #include <vtkstd/vector>
+#include <vtkstd/map>
 #include <vtksys/ios/sstream>
 
 vtkStandardNewMacro(vtkSMSelectionHelper);
@@ -69,81 +73,6 @@ void vtkSMSelectionHelper::SendSelection(vtkSelection* sel, vtkSMProxy* proxy)
   processModule->SendStream(proxy->GetConnectionID(), 
     proxy->GetServers(), 
     stream);
-}
-
-//-----------------------------------------------------------------------------
-void vtkSMSelectionHelper::ConvertSurfaceSelectionToVolumeSelection(
-  vtkIdType connectionID,
-  vtkSelection* input,
-  vtkSelection* output)
-{
-  vtkSMSelectionHelper::ConvertSurfaceSelectionToVolumeSelectionInternal(
-    connectionID, input, output, 0);
-}
-
-//-----------------------------------------------------------------------------
-// Don't think this method is used anymore.
-void vtkSMSelectionHelper::ConvertSurfaceSelectionToGlobalIDVolumeSelection(
-  vtkIdType connectionID,
-  vtkSelection* input, vtkSelection* output)
-{
-  vtkSMSelectionHelper::ConvertSurfaceSelectionToVolumeSelectionInternal(
-    connectionID, input, output, 1);
-}
-
-//-----------------------------------------------------------------------------
-void vtkSMSelectionHelper::ConvertSurfaceSelectionToVolumeSelectionInternal(
-  vtkIdType connectionID,
-  vtkSelection* input,
-  vtkSelection* output,
-  int global_ids)
-{
-  vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
-  vtkProcessModule* processModule = vtkProcessModule::GetProcessModule();
-
-  // Convert the selection of geometry cells to surface cells of the actual
-  // data by:
-
-  // * First sending the selection to the server
-  vtkSMProxy* selectionP = pxm->NewProxy("selection_helpers", "Selection");
-  selectionP->SetServers(vtkProcessModule::DATA_SERVER);
-  selectionP->SetConnectionID(connectionID);
-  selectionP->UpdateVTKObjects();
-  vtkSMSelectionHelper::SendSelection(input, selectionP);
-
-  // * Then converting the selection using a helper
-  vtkSMProxy* volumeSelectionP = 
-    pxm->NewProxy("selection_helpers", "Selection");
-  volumeSelectionP->SetServers(vtkProcessModule::DATA_SERVER);
-  volumeSelectionP->SetConnectionID(connectionID);
-  volumeSelectionP->UpdateVTKObjects();
-  vtkClientServerStream stream;
-  vtkClientServerID converterID =
-    processModule->NewStreamObject("vtkSelectionConverter", stream);
-  stream << vtkClientServerStream::Invoke
-         << converterID 
-         << "Convert" 
-         << selectionP->GetID() 
-         << volumeSelectionP->GetID()
-         << global_ids
-         << vtkClientServerStream::End;
-  processModule->DeleteStreamObject(converterID, stream);
-  processModule->SendStream(connectionID, 
-                            vtkProcessModule::DATA_SERVER, 
-                            stream);
-
-  // * And finally gathering the information back
-  vtkPVSelectionInformation* selInfo = vtkPVSelectionInformation::New();
-  processModule->GatherInformation(connectionID,
-                                   vtkProcessModule::DATA_SERVER, 
-                                   selInfo, 
-                                   volumeSelectionP->GetID());
-
-  output->ShallowCopy(selInfo->GetSelection());
-
-  selInfo->Delete();
-  volumeSelectionP->Delete();
-  selectionP->Delete();
 }
 
 //-----------------------------------------------------------------------------
@@ -689,4 +618,93 @@ bool vtkSMSelectionHelper::MergeSelection(
     }
 
   return false;
+}
+
+
+namespace
+{
+  // Splits \c selection into a collection of selections based on the
+  // SOURCE_ID().
+  void vtkSplitSelection(vtkSelection* selection,
+    vtkstd::map<int, vtkSmartPointer<vtkSelection> >& map_of_selections)
+    {
+    for (unsigned int cc=0; cc < selection->GetNumberOfNodes(); cc++)
+      {
+      vtkSelectionNode* node = selection->GetNode(cc);
+      if (node && node->GetProperties()->Has(vtkSelectionNode::SOURCE_ID()))
+        {
+        int source_id =
+          node->GetProperties()->Get(vtkSelectionNode::SOURCE_ID());
+        vtkSelection* sel = map_of_selections[source_id];
+        if (!sel)
+          {
+          sel = vtkSelection::New();
+          map_of_selections[source_id] = sel;
+          sel->FastDelete();
+          }
+        sel->AddNode(node);
+        }
+      }
+    }
+
+  vtkSMProxy* vtkLocateRepresentation(vtkSMProxy* viewProxy, int id)
+    {
+    vtkView* view = vtkView::SafeDownCast(viewProxy->GetClientSideObject());
+    if (!view)
+      {
+      vtkGenericWarningMacro("View proxy must be a proxy for vtkView.");
+      return NULL;
+      }
+
+    vtkDataRepresentation* repr = view->GetRepresentation(id);
+    // now locate the proxy for this repr.
+    vtkSMPropertyHelper helper(viewProxy, "Representations");
+    for (unsigned int cc=0; cc < helper.GetNumberOfElements(); cc++)
+      {
+      vtkSMProxy* reprProxy = helper.GetAsProxy(cc);
+      if (reprProxy && reprProxy->GetClientSideObject() == repr)
+        {
+        return reprProxy;
+        }
+      }
+    return NULL;
+    }
+};
+
+//----------------------------------------------------------------------------
+void vtkSMSelectionHelper::NewSelectionSourcesFromSelection(
+  vtkSelection* selection, vtkSMProxy* view,
+  vtkCollection* selSources, vtkCollection* selRepresentations)
+{
+  // Now selection can comprise of selection nodes for more than on
+  // representation that was selected. We now need to create selection source
+  // proxies for each representation that was selected separately.
+
+  // This relies on SOURCE_ID() defined on the selection nodes to locate the
+  // representation proxy for the representation that was selected.
+
+  vtkstd::map<int, vtkSmartPointer<vtkSelection> > selections;
+  vtkSplitSelection(selection, selections);
+
+  vtkstd::map<int, vtkSmartPointer<vtkSelection> >::iterator iter;
+  for (iter = selections.begin(); iter != selections.end(); ++iter)
+    {
+    vtkSMProxy* reprProxy = vtkLocateRepresentation(view, iter->first);
+    if (!reprProxy)
+      {
+      continue;
+      }
+
+    vtkSMProxy* selSource =
+      vtkSMSelectionHelper::NewSelectionSourceFromSelection(
+        view->GetConnectionID(), iter->second.GetPointer());
+    if (!selSource)
+      {
+      continue;
+      }
+    // locate representation proxy for this
+    selSources->AddItem(selSource);
+    selRepresentations->AddItem(reprProxy);
+    selSource->FastDelete();
+    }
 }

@@ -39,7 +39,7 @@ public:
   // This method does nothing unless the dimensions have changed, in which case
   // it creates new internal view modules (or destroys extra ones). Note that
   // the it's the responsibility of the application to lay the views out so that
-  // they form a MxN grid. 
+  // they form a MxN grid.
   void Build(int dx, int dy);
 
   // Description:
@@ -51,7 +51,7 @@ public:
   vtkGetVector2Macro(Dimensions, int);
 
   // Description:
-  // Adds a representation proxy to this view. 
+  // Adds a representation proxy to this view.
   virtual void AddRepresentation(vtkSMRepresentationProxy*);
 
   // Description:
@@ -60,13 +60,13 @@ public:
 
   // Description:
   // Removes all added representations from this view.
-  // Simply calls RemoveRepresentation() on all added representations 
+  // Simply calls RemoveRepresentation() on all added representations
   // one by one.
   virtual void RemoveAllRepresentations();
 
   // Description:
   // Updates the data pipelines for all visible representations.
-  virtual void UpdateAllRepresentations();
+  virtual void Update();
 
   // Description:
   // Create a default representation for the given source proxy.
@@ -108,36 +108,15 @@ public:
   // views correctly.
   virtual void SetViewPosition(int x, int y)
     {
-    this->Superclass::SetViewPosition(x, y);
+    this->ViewPosition[0] = x;
+    this->ViewPosition[1] = y;
     this->UpdateViewLayout();
     }
 
   // Description:
-  // ViewSize, ViewPosition need to split up among all the component
-  // views correctly.
-  virtual void SetGUISize(int x, int y)
-    {
-    this->Superclass::SetGUISize(x, y);
-    this->UpdateViewLayout();
-    }
-
-  // Description:
-  // Set spacing between views. 
+  // Set spacing between views.
   vtkSetVector2Macro(Spacing, int);
   vtkGetVector2Macro(Spacing, int);
-
-  // Description:
-  // Generally each view type is different class of view eg. bar char view, line
-  // plot view etc. However in some cases a different view types are indeed the
-  // same class of view the only different being that each one of them works in
-  // a different configuration eg. "RenderView" in builin mode, 
-  // "IceTDesktopRenderView" in remote render mode etc. This method is used to
-  // determine what type of view needs to be created for the given class. When
-  // user requests the creation of a view class, the application can call this
-  // method on a prototype instantaiated for the requested class and the
-  // determine the actual xmlname for the view to create.
-  // Overridden to choose the correct type of render view.
-  virtual const char* GetSuggestedViewType(vtkIdType connectionID);
 
   // Description:
   // Add/Remove parameter cues.
@@ -147,7 +126,12 @@ public:
   // Description:
   // Dirty means this algorithm will execute during next update.
   // This all marks all consumers as dirty.
-  virtual void MarkDirty(vtkSMProxy* modifiedProxy); 
+  virtual void MarkDirty(vtkSMProxy* modifiedProxy);
+
+  // Description:
+  // Get/Set the view time.
+  vtkSetMacro(ViewTime, double);
+  vtkGetMacro(ViewTime, double);
 
   //BTX
 protected:
@@ -155,8 +139,7 @@ protected:
   ~vtkSMComparativeViewProxy();
 
   // Description:
-  // Called at start of CreateVTKObjects().
-  virtual bool BeginCreateVTKObjects();
+  virtual void CreateVTKObjects();
 
   // Description:
   // Creates and appends a new internal view.
@@ -169,8 +152,8 @@ protected:
   void RemoveView(vtkSMViewProxy* remove);
 
   // Description:
-  virtual void EndStillRender();
-  virtual void EndInteractiveRender();
+  // Passes on the render request to the root view.
+  virtual void PostRender(bool interactive);
 
   // Description:
   // Update layout for internal views.
@@ -190,7 +173,9 @@ protected:
 
   int Dimensions[2];
   int ViewSize[2];
+  int ViewPosition[2];
   int Spacing[2];
+  double ViewTime;
 
   bool OverlayAllComparisons;
 

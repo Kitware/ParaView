@@ -17,7 +17,6 @@
 
 #include "vtkObjectFactory.h"
 #include "vtkSMProxy.h"
-#include "vtkSMRenderViewProxy.h"
 
 
 vtkStandardNewMacro(vtkSMCameraConfigurationReader);
@@ -41,7 +40,7 @@ vtkSMCameraConfigurationReader::~vtkSMCameraConfigurationReader()
 
 //-----------------------------------------------------------------------------
 void vtkSMCameraConfigurationReader::SetRenderViewProxy(
-      vtkSMRenderViewProxy *rvProxy)
+      vtkSMProxy *rvProxy)
 {
   this->vtkSMProxyConfigurationReader::SetProxy(rvProxy);
 }

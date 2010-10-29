@@ -26,6 +26,7 @@ class vtkSelection;
 class vtkSelectionNode;
 class vtkSMProxy;
 class vtkSMSourceProxy;
+class vtkCollection;
 
 class VTK_EXPORT vtkSMSelectionHelper : public vtkSMObject
 {
@@ -40,25 +41,6 @@ public:
   static void SendSelection(vtkSelection* sel, vtkSMProxy* proxy);
 
   // Description:
-  // Convert a polydata selection on the surface to an unstructured
-  // selection on the surface. The input selection belongs to the output of
-  // the geometry filter, the output selection belongs to the input of the
-  // geometry filter. 
-  // vtkSelectionConverter requires certain properties to
-  // be set for this to work. See vtkSelectionConverter documentation.
-  // Make sure to specify the connection id for the server on which
-  // the selection was performed.
-  static void ConvertSurfaceSelectionToVolumeSelection(vtkIdType connectionID,
-                                                       vtkSelection* input,
-                                                       vtkSelection* output);
-
-  // Description:
-  // Same as ConvertSurfaceSelectionToVolumeSelection except that the
-  // converted selection is in terms on GlobalIDs.
-  static void ConvertSurfaceSelectionToGlobalIDVolumeSelection(vtkIdType connectionID,
-    vtkSelection* input, vtkSelection* output);
-
-  // Description:
   // Given a selection, returns a proxy for a selection source that has
   // the ids specified by it. This source can then be used as input
   // to a vtkExtractSelection filter.
@@ -69,6 +51,10 @@ public:
   // hence we not adding that code.
   static vtkSMProxy* NewSelectionSourceFromSelection(vtkIdType connectionID,
                                                      vtkSelection* selection);
+
+  static void NewSelectionSourcesFromSelection(
+    vtkSelection* selection, vtkSMProxy* view,
+    vtkCollection* selSources, vtkCollection* selRepresentations);
 
   // Description:
   // Given the ContentType for an output vtkSelection, this create a new source

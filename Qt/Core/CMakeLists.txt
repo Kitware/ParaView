@@ -84,6 +84,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqPropertyLinks.h
   pqPropertyManager.h
   pqProxy.h
+  pqQVTKWidget.h
   pqQVTKWidgetEventTranslator.h
   pqRenderView.h
   pqRenderViewBase.h
@@ -93,7 +94,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqScalarBarVisibilityAdaptor.h
   pqScalarOpacityFunction.h
   pqScalarsToColors.h
-  pqScatterPlotRepresentation.h
+#  pqScatterPlotRepresentation.h
   pqServer.h
   pqServerManagerModel.h
   pqServerManagerModelItem.h
@@ -113,7 +114,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqTextRepresentation.h
   pqTimeKeeper.h
   pqTwoDRenderView.h
-  pqScatterPlotView.h
+#  pqScatterPlotView.h
   pqUndoStack.h
   pqView.h
   pqViewExporterManager.h
@@ -287,6 +288,8 @@ ADD_LIBRARY(pqCore
   pqProxyModifiedStateUndoElement.h
   pqProxyUnRegisterUndoElement.cxx
   pqProxyUnRegisterUndoElement.h
+  pqQVTKWidget.cxx
+  pqQVTKWidget.h
   pqQVTKWidgetEventPlayer.cxx
   pqQVTKWidgetEventPlayer.h
   pqQVTKWidgetEventTranslator.cxx
@@ -309,8 +312,8 @@ ADD_LIBRARY(pqCore
   pqScalarOpacityFunction.h
   pqScalarsToColors.cxx
   pqScalarsToColors.h
-  pqScatterPlotRepresentation.cxx
-  pqScatterPlotRepresentation.h
+#  pqScatterPlotRepresentation.cxx
+#  pqScatterPlotRepresentation.h
   pqServer.cxx
   pqServer.h
   pqServerManagerModel.cxx
@@ -356,8 +359,8 @@ ADD_LIBRARY(pqCore
   pqTreeLayoutStrategyInterface.h
   pqTwoDRenderView.cxx
   pqTwoDRenderView.h
-  pqScatterPlotView.cxx
-  pqScatterPlotView.h
+#  pqScatterPlotView.cxx
+#  pqScatterPlotView.h
   pqUndoStack.cxx
   pqUndoStack.h
   pqView.cxx

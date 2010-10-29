@@ -59,10 +59,10 @@ protected:
   vtkPVSelectionInformation();
   ~vtkPVSelectionInformation();
 
-private:
-  vtkSelection* Selection;
   void Initialize();
+  vtkSelection* Selection;
 
+private:
   vtkPVSelectionInformation(const vtkPVSelectionInformation&); // Not implemented
   void operator=(const vtkPVSelectionInformation&); // Not implemented
 };

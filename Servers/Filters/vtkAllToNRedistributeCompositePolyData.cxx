@@ -88,7 +88,7 @@ int vtkAllToNRedistributeCompositePolyData::RequestDataObject(vtkInformation*,
 }
 
 //----------------------------------------------------------------------------
-int vtkAllToNRedistributeCompositePolyData::RequestData(vtkInformation* request,
+int vtkAllToNRedistributeCompositePolyData::RequestData(vtkInformation*,
   vtkInformationVector** inputVector,
   vtkInformationVector* outputVector)
 {

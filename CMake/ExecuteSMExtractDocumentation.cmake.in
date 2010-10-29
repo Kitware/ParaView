@@ -11,4 +11,3 @@ endif(WIN32)
 execute_process(
   COMMAND "@ParaView_BINARY_DIR@/bin/${OutDir}/vtkSMExtractDocumentation" "@ParaView_BINARY_DIR@/Documentation" "${fullXMLFile}"
   )
-  

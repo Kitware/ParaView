@@ -31,10 +31,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "pqParallelCoordinatesSettingsModel.h"
 
-#include "vtkSMParallelCoordinatesRepresentationProxy.h"
 #include "pqDataRepresentation.h"
-#include "vtkWeakPointer.h"
+#include "vtkChartRepresentation.h"
+#include "vtkSMParallelCoordinatesRepresentationProxy.h"
 #include "vtkSMPropertyHelper.h"
+#include "vtkWeakPointer.h"
 
 #include <QPointer>
 #include <QPixmap>
@@ -48,6 +49,12 @@ public:
 
   vtkWeakPointer<vtkSMParallelCoordinatesRepresentationProxy> RepresentationProxy;
   QPointer<pqDataRepresentation> Representation;
+
+  vtkChartRepresentation* GetVTKRepresentation()
+    {
+    return this->RepresentationProxy?
+      this->RepresentationProxy->GetRepresentation() : NULL;
+    }
 };
 
 pqParallelCoordinatesSettingsModel::pqParallelCoordinatesSettingsModel(QObject* parentObject) :
@@ -92,8 +99,8 @@ pqDataRepresentation* pqParallelCoordinatesSettingsModel::representation() const
 
 int pqParallelCoordinatesSettingsModel::rowCount(const QModelIndex& /*parent*/) const
 {
-  return this->Implementation->RepresentationProxy ?
-      this->Implementation->RepresentationProxy->GetNumberOfSeries() : 0;
+  return this->Implementation->GetVTKRepresentation()?
+      this->Implementation->GetVTKRepresentation()->GetNumberOfSeries() : 0;
 }
 
 int pqParallelCoordinatesSettingsModel::columnCount(const QModelIndex& /*parent*/) const
@@ -220,7 +227,7 @@ void pqParallelCoordinatesSettingsModel::reload()
 //-----------------------------------------------------------------------------
 const char* pqParallelCoordinatesSettingsModel::getSeriesName(int row) const
 {
-  return this->Implementation->RepresentationProxy->GetSeriesName(row);
+  return this->Implementation->GetVTKRepresentation()->GetSeriesName(row);
 }
 
 //-----------------------------------------------------------------------------

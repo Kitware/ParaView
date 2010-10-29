@@ -2,38 +2,30 @@
 
   <!--======================================================================-->
   <ProxyGroup name="representations">
-    <SurfaceLICRepresentationProxy name="SurfaceLICRepresentation"
+    <RepresentationProxy name="SurfaceLICRepresentation"
+      class="vtkSurfaceLICRepresentation"
+      processes="client|dataserver|renderserver"
       base_proxygroup="representations"
-      base_proxyname="SurfaceRepresentationBase">
+      base_proxyname="SurfaceRepresentationBase" >
       <Documentation>
         Representation proxy for Surface LIC.
       </Documentation>
 
-      <InputProperty name="Input" command="NotUsed">
+      <InputProperty name="Input" command="SetInputConnection">
         <InputArrayDomain name="input_vectors"
           number_of_components="3">
           <RequiredProperties>
-            <Property name="SelectInputVectors" 
+            <Property name="SelectInputVectors"
               function="FieldDataSelection"/>
           </RequiredProperties>
         </InputArrayDomain>
       </InputProperty>
 
-      <IntVectorProperty name="UseLICForLOD"
-        command="SetUseLICForLOD"
-        number_of_elements="1"
-        update_self="1"
-        default_values="1">
-        <BooleanDomain name="bool" />
-      </IntVectorProperty>
-
-      <StringVectorProperty 
-        name="SelectInputVectors"
+      <StringVectorProperty name="SelectInputVectors"
         command="SelectInputVectors"
-        update_self="1"
         number_of_elements="5"
         element_types="0 0 0 0 2"
-        label="Vectors"> 
+        label="Vectors">
         <ArrayListDomain name="array_list" attribute_type="Vectors"
           input_domain_name="input_vectors">
           <RequiredProperties>
@@ -52,48 +44,6 @@
           This property specifies the name of the input vector array to process.
         </Documentation>
       </StringVectorProperty>
-
-      <SubProxy>
-        <Proxy name="SurfaceLICPainter" 
-          proxygroup="painters" proxyname="SurfaceLICPainter" />
-        <ExposedProperties>
-          <Property name="NumberOfSteps" />
-          <Property name="StepSize" />
-          <Property name="LICIntensity" />
-          <Property name="EnhancedLIC" />
-        </ExposedProperties>
-      </SubProxy>
-
-      <SubProxy>
-        <Proxy name="SurfaceLICPainterLOD"
-          proxygroup="painters" proxyname="SurfaceLICPainter" />
-        <ShareProperties subproxy="SurfaceLICPainter"  />
-      </SubProxy>
-
-      <SubProxy>
-        <Proxy name="SurfaceLICDefaultPainter" 
-          proxygroup="painters" proxyname="SurfaceLICDefaultPainter" />
-      </SubProxy>
-
-      <SubProxy>
-        <Proxy name="SurfaceLICDefaultPainterLOD" 
-          proxygroup="painters" proxyname="SurfaceLICDefaultPainter" />
-      </SubProxy>
-
-      <!-- End of SurfaceLICRepresentation -->
-    </SurfaceLICRepresentationProxy>
-    <!-- End of "representations" -->
-  </ProxyGroup>
-
-  <!--======================================================================-->
-  <ProxyGroup name="painters">
-    <Proxy name="SurfaceLICPainter" class="vtkSurfaceLICPainter">
-      <IntVectorProperty name="Enable"
-        command="SetEnable"
-        number_of_elements="1"
-        default_values="1">
-        <BooleanDomain name="bool" />
-      </IntVectorProperty>
 
       <IntVectorProperty name="NumberOfSteps"
         command="SetNumberOfSteps"
@@ -115,21 +65,24 @@
         default_values="0.8">
         <DoubleRangeDomain name="range" min="0.0" max="1.0" />
       </DoubleVectorProperty>
-        
+
       <IntVectorProperty name="EnhancedLIC"
         command="SetEnhancedLIC"
         number_of_elements="1"
         default_values="1">
         <BooleanDomain name="bool" />
       </IntVectorProperty>
-    </Proxy>
 
-    <Proxy name="SurfaceLICDefaultPainter" class="vtkSurfaceLICDefaultPainter">
-      <ProxyProperty name="SurfaceLICPainter"
-        command="SetSurfaceLICPainter">
-      </ProxyProperty>
-    </Proxy>
-  <!-- End of "painters" -->
+      <IntVectorProperty name="UseLICForLOD"
+        command="SetUseLICForLOD"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      <!-- End of SurfaceLICRepresentation -->
+    </RepresentationProxy>
+    <!-- End of "representations" -->
   </ProxyGroup>
 
   <!--======================================================================-->

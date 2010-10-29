@@ -26,6 +26,7 @@ vtkStandardNewMacro(vtkSMLookupTableProxy);
 //---------------------------------------------------------------------------
 vtkSMLookupTableProxy::vtkSMLookupTableProxy()
 {
+  this->SetServers(vtkProcessModule::CLIENT_AND_SERVERS);
   this->SetVTKClassName("vtkLookupTable");
   this->ArrayName = 0;
   this->LowOutOfRangeColor[0] = this->LowOutOfRangeColor[1] =
@@ -50,8 +51,6 @@ void vtkSMLookupTableProxy::CreateVTKObjects()
     {
     return;
     }
-  this->SetServers(vtkProcessModule::CLIENT | 
-    vtkProcessModule::RENDER_SERVER);
   this->Superclass::CreateVTKObjects();
 }
 

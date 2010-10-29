@@ -32,7 +32,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqRenderViewBase.h"
 
 // Server Manager Includes.
-#include "QVTKWidget.h"
 #include "vtkErrorCode.h"
 #include "vtkEventQtSlotConnect.h"
 #include "vtkImageData.h"
@@ -57,6 +56,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqImageUtil.h"
 #include "pqOutputPort.h"
 #include "pqPipelineSource.h"
+#include "pqQVTKWidget.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
 #include "pqSettings.h"
@@ -115,9 +115,10 @@ QWidget* pqRenderViewBase::getWidget()
 }
 
 //-----------------------------------------------------------------------------
-QWidget* pqRenderViewBase::createWidget() 
+QWidget* pqRenderViewBase::createWidget()
 {
-  QVTKWidget* vtkwidget = new QVTKWidget();
+  pqQVTKWidget* vtkwidget = new pqQVTKWidget();
+  vtkwidget->setViewProxy(this->getProxy());
 
   // do image caching for performance
   // For now, we are doing this only on Apple because it can render
@@ -310,7 +311,6 @@ vtkSMProxy* pqRenderViewBase::createCameraManipulator(
     return NULL;
     }
   manip->SetConnectionID(cid);
-  manip->SetServers(vtkProcessModule::CLIENT);
   pqSMAdaptor::setElementProperty(manip->GetProperty("Button"), mouse);
   pqSMAdaptor::setElementProperty(manip->GetProperty("Shift"), shift);
   pqSMAdaptor::setElementProperty(manip->GetProperty("Control"), control);
@@ -358,8 +358,6 @@ static const char* pqRenderViewModuleLightSettings [] = {
 static const char* pqGlobalRenderViewModuleMiscSettings [] = {
   "LODThreshold",
   "LODResolution",
-  "UseImmediateMode",
-  "UseTriangleStrips",
   "RenderInterruptsEnabled",
   "RemoteRenderThreshold",
   "TileDisplayCompositeThreshold",

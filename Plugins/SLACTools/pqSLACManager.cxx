@@ -31,7 +31,6 @@
 #include "vtkPVDataInformation.h"
 #include "vtkPVDataSetAttributesInformation.h"
 #include "vtkSMProxyManager.h"
-#include "vtkSMRepresentationStrategy.h"
 #include "vtkSMSourceProxy.h"
 
 #include "pqActiveView.h"
@@ -450,6 +449,13 @@ void pqSLACManager::showField(const char *name)
   pqPipelineSource *temporalRanges = this->getTemporalRanges();
   if (temporalRanges)
     {
+#ifdef AUTO_FIND_TEMPORAL_RANGE
+    // NOTE TO DEVELOPER:
+    // ClientDeliveryStrategy is no longer available. However
+    // pqOutputPort::getTemporalDataInformation() is available to fetch temporal
+    // data information for any pipeline source. This code can then be updated
+    // to use this API.
+
     // Retrieve the ranges of data over all time.
     vtkSMProxyManager *pm = vtkSMObject::GetProxyManager();
     vtkSMRepresentationStrategy *delivery
@@ -479,6 +485,7 @@ void pqSLACManager::showField(const char *name)
 
     // Cleanup.
     delivery->Delete();
+#endif
     }
   else
     {

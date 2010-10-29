@@ -113,6 +113,10 @@ pqPointSpriteDisplayPanelDecorator::pqPointSpriteDisplayPanelDecorator(
     return;
     }
 
+  // This is not advisable, but we do it nonetheless since that's what the old
+  // code was doing. At some point we need to clean this up.
+  vtkSMPointSpriteRepresentationProxy::InitializeDefaultValues(reprProxy);
+
   this->Internals = new pqInternals(this);
   QVBoxLayout* vlayout = dynamic_cast<QVBoxLayout*> (panel->layout());
   if (vlayout)

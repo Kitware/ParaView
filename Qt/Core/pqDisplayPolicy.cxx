@@ -317,11 +317,7 @@ pqDataRepresentation* pqDisplayPolicy::setRepresentationVisibility(
   // (hence the conditional on "visible")
   if(view->getNumberOfVisibleRepresentations()==1 && visible)
     {
-    pqRenderViewBase* ren = qobject_cast<pqRenderViewBase*>(view);
-    if (ren)
-      {
-      ren->resetCamera();
-      }
+    view->resetDisplay();
     }
 
   return repr;

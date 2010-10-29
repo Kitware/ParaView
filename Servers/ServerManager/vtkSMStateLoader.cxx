@@ -28,7 +28,6 @@
 #include "vtkSMProxyManager.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMStateVersionController.h"
-#include "vtkSMViewProxy.h"
 #include "vtkSMSession.h"
 
 #include <vtkstd/map>

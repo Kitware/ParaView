@@ -99,6 +99,8 @@ protected:
   vtk1DTransferFunctionFilter();
   virtual ~vtk1DTransferFunctionFilter();
 
+  virtual int FillInputPortInformation(int port, vtkInformation* info);
+
   // Description:
   // This is called by the superclass.
   // This is the method you should override.

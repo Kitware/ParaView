@@ -28,7 +28,6 @@ vtkSMTextWidgetRepresentationProxy::vtkSMTextWidgetRepresentationProxy()
 {
   this->TextActorProxy = 0;
   this->TextPropertyProxy = 0;
-  this->ViewProxy = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -36,31 +35,6 @@ vtkSMTextWidgetRepresentationProxy::~vtkSMTextWidgetRepresentationProxy()
 {
   this->TextActorProxy = 0;
   this->TextPropertyProxy = 0;
-  this->ViewProxy = 0;
-}
-
-//----------------------------------------------------------------------------
-bool vtkSMTextWidgetRepresentationProxy::AddToView(vtkSMViewProxy* view)
-{
-  if(!this->Superclass::AddToView(view))
-    {
-    return false;
-    }
-  
-  this->ViewProxy = view;
-  return true;
-}
-
-//----------------------------------------------------------------------------
-bool vtkSMTextWidgetRepresentationProxy::RemoveFromView(vtkSMViewProxy* view)
-{
-  if(!this->Superclass::RemoveFromView(view))
-    {
-    return false;
-    }
-  
-  this->ViewProxy = 0;
-  return true;
 }
 
 //----------------------------------------------------------------------------

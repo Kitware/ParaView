@@ -26,6 +26,7 @@
 #include "vtkSMProxyIterator.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMProxyLocator.h"
+#include "vtkPVOptions.h"
 
 #include "vtkPVConfig.h" // for PARAVIEW_USE_ICE_T
 #include "vtkToolkits.h" // for VTK_USE_MPI
@@ -148,6 +149,7 @@ int vtkSMServerProxyManagerReviver::ReviveServerServerManager(
   // are assigned, the ones already used aren't reassigned.
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   pm->ReserveID(id);
+  pm->GetOptions()->SetProcessType(vtkPVOptions::PVBATCH);
   //pm->SendStreamToClientOnlyOn();
   vtkProcessModule::DebugLog("Pre--FilterStateXML");
   this->FilterStateXML(parser->GetRootElement());

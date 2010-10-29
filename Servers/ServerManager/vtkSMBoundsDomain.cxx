@@ -245,17 +245,11 @@ void vtkSMBoundsDomain::Update(vtkSMProxyProperty *pp)
       {
       vtkPVDataInformation *info = sp->GetDataInformation(
         (ip? ip->GetUncheckedOutputPortForConnection(i):0));
-      if (!info)
-        {
-        return;
-        }
-      double bounds[6];
-      info->GetBounds(bounds);
-      this->SetDomainValues(bounds);
+      this->UpdateFromInformation(info);
       return;
       }
     }
-  
+
   // In case there is no valid unchecked proxy, use the actual
   // proxy values
   numProxs = pp->GetNumberOfProxies();
@@ -267,16 +261,22 @@ void vtkSMBoundsDomain::Update(vtkSMProxyProperty *pp)
       {
       vtkPVDataInformation *info = sp->GetDataInformation(
         (ip? ip->GetOutputPortForConnection(i): 0));
-      if (!info)
-        {
-        return;
-        }
-      double bounds[6];
-      info->GetBounds(bounds);
-      this->SetDomainValues(bounds);
+      this->UpdateFromInformation(info);
       return;
       }
     }
+}
+
+//---------------------------------------------------------------------------
+void vtkSMBoundsDomain::UpdateFromInformation(vtkPVDataInformation* info)
+{
+  if (!info)
+    {
+    return;
+    }
+  double bounds[6];
+  info->GetBounds(bounds);
+  this->SetDomainValues(bounds);
 }
 
 //---------------------------------------------------------------------------

@@ -69,6 +69,10 @@ protected slots:
   /// It results in that column being sorted if possible.
   void onSortIndicatorChanged(int section, Qt::SortOrder order);
 
+  /// called when header data changes. We ensure that internal columns stay
+  /// hidden.
+  void onHeaderDataChanged();
+
 protected:
   /// Overridden to tell the pqSpreadSheetViewModel about the active viewport.
   virtual void paintEvent(QPaintEvent* event);

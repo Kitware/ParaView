@@ -31,10 +31,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "pqPlotSettingsModel.h"
 
-#include "vtkSMXYChartRepresentationProxy.h"
 #include "pqDataRepresentation.h"
-#include "vtkWeakPointer.h"
+#include "vtkChartRepresentation.h"
 #include "vtkSMPropertyHelper.h"
+#include "vtkSMChartRepresentationProxy.h"
+#include "vtkWeakPointer.h"
 
 #include <QPointer>
 #include <QPixmap>
@@ -46,8 +47,14 @@ public:
   {
   }
 
-  vtkWeakPointer<vtkSMXYChartRepresentationProxy> RepresentationProxy;
+  vtkWeakPointer<vtkSMChartRepresentationProxy> RepresentationProxy;
   QPointer<pqDataRepresentation> Representation;
+
+  vtkChartRepresentation* GetVTKRepresentation()
+    {
+    return this->RepresentationProxy?
+      this->RepresentationProxy->GetRepresentation() : NULL;
+    }
 };
 
 pqPlotSettingsModel::pqPlotSettingsModel(QObject* parentObject) :
@@ -81,7 +88,7 @@ void pqPlotSettingsModel::setRepresentation(pqDataRepresentation* rep)
     }
 
   this->Implementation->RepresentationProxy =
-    vtkSMXYChartRepresentationProxy::SafeDownCast(rep->getProxy());
+    vtkSMChartRepresentationProxy::SafeDownCast(rep->getProxy());
   this->Implementation->Representation = rep;
 }
 
@@ -92,8 +99,8 @@ pqDataRepresentation* pqPlotSettingsModel::representation() const
 
 int pqPlotSettingsModel::rowCount(const QModelIndex& /*parent*/) const
 {
-  return this->Implementation->RepresentationProxy ?
-      this->Implementation->RepresentationProxy->GetNumberOfSeries() : 0;
+  return this->Implementation->GetVTKRepresentation()?
+      this->Implementation->GetVTKRepresentation()->GetNumberOfSeries() : 0;
 }
 
 int pqPlotSettingsModel::columnCount(const QModelIndex& /*parent*/) const
@@ -229,7 +236,7 @@ void pqPlotSettingsModel::reload()
 //-----------------------------------------------------------------------------
 const char* pqPlotSettingsModel::getSeriesName(int row) const
 {
-  return this->Implementation->RepresentationProxy->GetSeriesName(row);
+  return this->Implementation->GetVTKRepresentation()->GetSeriesName(row);
 }
 
 //-----------------------------------------------------------------------------

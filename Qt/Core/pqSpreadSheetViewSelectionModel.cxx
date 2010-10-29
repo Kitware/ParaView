@@ -204,7 +204,7 @@ void pqSpreadSheetViewSelectionModel::select(const QItemSelection& sel,
 // model, we create a new selection.
 vtkSMSourceProxy* pqSpreadSheetViewSelectionModel::getSelectionSource()
 {
-  pqDataRepresentation* repr = this->Internal->Model->getRepresentation();
+  pqDataRepresentation* repr = this->Internal->Model->activeRepresentation();
   if (!repr)
     {
     return 0;

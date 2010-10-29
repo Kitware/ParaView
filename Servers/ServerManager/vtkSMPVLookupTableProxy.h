@@ -39,6 +39,7 @@ protected:
   vtkSMPVLookupTableProxy();
   ~vtkSMPVLookupTableProxy();
 
+  virtual void CreateVTKObjects();
   virtual void UpdateVTKObjects(vtkClientServerStream& stream);
 private:
   vtkSMPVLookupTableProxy(const vtkSMPVLookupTableProxy&); // Not implemented.

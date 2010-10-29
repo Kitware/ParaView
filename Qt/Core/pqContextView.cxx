@@ -49,7 +49,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkContextView.h"
 #include "vtkSMContextViewProxy.h"
-#include "vtkSMXYChartViewProxy.h"
 #include "vtkChartXY.h"
 #include "vtkAnnotationLink.h"
 #include "vtkSelection.h"
@@ -64,7 +63,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkCommand.h"
 
-#include "QVTKWidget.h"
+#include "pqQVTKWidget.h"
 
 #include <QList>
 #include <QVariant>
@@ -118,7 +117,8 @@ pqContextView::pqContextView(
   this->Internal = new pqContextView::pqInternal();
   viewProxy->GetID(); // this results in calling CreateVTKObjects().
   this->Command = command::New(*this);
-  viewProxy->AddObserver(vtkCommand::SelectionChangedEvent, this->Command);
+  viewProxy->GetClientSideView()->AddObserver(
+    vtkCommand::SelectionChangedEvent, this->Command);
 }
 
 //-----------------------------------------------------------------------------
@@ -131,7 +131,9 @@ pqContextView::~pqContextView()
 //-----------------------------------------------------------------------------
 QWidget* pqContextView::createWidget()
 {
-  QVTKWidget* vtkwidget = new QVTKWidget();
+  pqQVTKWidget* vtkwidget = new pqQVTKWidget();
+  vtkwidget->setViewProxy(this->getProxy());
+  vtkwidget->setObjectName("Viewport");
 
   // do image caching for performance
   // For now, we are doing this only on Apple because it can render
@@ -323,8 +325,7 @@ bool pqContextView::canRedo() const
 /// Resets the zoom level to 100%.
 void pqContextView::resetDisplay()
 {
-  vtkSMXYChartViewProxy *proxy =
-      vtkSMXYChartViewProxy::SafeDownCast(this->getContextViewProxy());
+  vtkSMContextViewProxy *proxy = this->getContextViewProxy();
   if (proxy)
     {
     proxy->GetChart()->RecalculateBounds();

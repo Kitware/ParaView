@@ -96,10 +96,12 @@ void vtkSMCameraManipulatorProxy::UpdateValue(double currenttime,
     camera->Delete();
     renderViewProxy->UpdateVTKObjects();
 
+#ifdef FIXME
     if (vtkSMRenderViewProxy::SafeDownCast(renderViewProxy))
       {
       vtkSMRenderViewProxy::SafeDownCast(renderViewProxy)->ResetCameraClippingRange();
       }
+#endif
     }
   else
     {

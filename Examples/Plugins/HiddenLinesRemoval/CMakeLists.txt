@@ -1,7 +1,8 @@
 # This plugin demonstrates how to add a new representation to ParaView that
 # employs hardware shaders. The shaders are employed by the
 # vtkVisibleLinesPainter which is initialized by the
-# vtkVisibleLinesPolyDataMapper. This plugin add a new representation-type
+# vtkGeometryRepresentationWithHiddenLinesRemoval.
+# This plugin add a new representation-type
 # "Visible Wireframe" when showing polydata in a 3D view.
 
 # Note that this plugin does not work in parallel since it relies on composited
@@ -34,7 +35,7 @@ add_paraview_plugin(
           HiddenLinesRemovalPlugin.xml
 
   SERVER_MANAGER_SOURCES
-          vtkVisibleLinesPolyDataMapper.cxx
+          vtkGeometryRepresentationWithHiddenLinesRemoval.cxx
 
   SOURCES vtkPVColorMaterialHelper.cxx
           vtkPVLightingHelper.cxx

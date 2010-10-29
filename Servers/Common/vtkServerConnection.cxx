@@ -527,8 +527,11 @@ int vtkServerConnection::SetupDataServerRenderServerConnection()
   // Create a vtkMPIMToNSocketConnection object on both the 
   // servers.  This object holds the vtkSocketCommunicator object
   // for each machine and makes the connections
-  vtkClientServerID id = 
-    pm->NewStreamObject("vtkMPIMToNSocketConnection", stream);
+  vtkClientServerID id = pm->GetMPIMToNSocketConnectionID();
+  stream << vtkClientServerStream::New 
+         << "vtkMPIMToNSocketConnection"
+         << id 
+         << vtkClientServerStream::End;
   this->MPIMToNSocketConnectionID = id;
   this->SendStream(
     vtkProcessModule::RENDER_SERVER|vtkProcessModule::DATA_SERVER, stream);

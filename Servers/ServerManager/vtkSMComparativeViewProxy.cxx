@@ -15,6 +15,8 @@
 #include "vtkSMComparativeViewProxy.h"
 
 #include "vtkCollection.h"
+#include "vtkClientServerStream.h"
+#include "vtkProcessModule.h"
 #include "vtkMemberFunctionCommand.h"
 #include "vtkObjectFactory.h"
 #include "vtkSmartPointer.h"
@@ -36,35 +38,65 @@
 #include <assert.h>
 
 //----------------------------------------------------------------------------
-static void vtkCopyClone(vtkSMProxy* source, vtkSMProxy* clone,
-  vtkstd::set<vtkstd::string> *exceptions=0)
+namespace
 {
-  vtkSmartPointer<vtkSMPropertyIterator> iterSource;
-  vtkSmartPointer<vtkSMPropertyIterator> iterDest;
-
-  iterSource.TakeReference(source->NewPropertyIterator());
-  iterDest.TakeReference(clone->NewPropertyIterator());
-
-  // Since source/clone are exact copies, the following is safe.
-  for (; !iterSource->IsAtEnd() && !iterDest->IsAtEnd();
-    iterSource->Next(), iterDest->Next())
+  static void vtkCopyClone(vtkSMProxy* source, vtkSMProxy* clone,
+    vtkstd::set<vtkstd::string> *exceptions=0)
     {
-    // Skip the property if it is in the exceptions list.
-    if (exceptions && 
-      exceptions->find(iterSource->GetKey()) != exceptions->end())
-      {
-      continue;
-      }
-    vtkSMProperty* destProp = iterDest->GetProperty();
+    vtkSmartPointer<vtkSMPropertyIterator> iterSource;
+    vtkSmartPointer<vtkSMPropertyIterator> iterDest;
 
-    // Skip the property if it is information only or is internal.
-    if (destProp->GetInformationOnly())
-      {
-      continue;
-      }
+    iterSource.TakeReference(source->NewPropertyIterator());
+    iterDest.TakeReference(clone->NewPropertyIterator());
 
-    // Copy the property from source to dest
-    destProp->Copy(iterSource->GetProperty());
+    // Since source/clone are exact copies, the following is safe.
+    for (; !iterSource->IsAtEnd() && !iterDest->IsAtEnd();
+      iterSource->Next(), iterDest->Next())
+      {
+      // Skip the property if it is in the exceptions list.
+      if (exceptions &&
+        exceptions->find(iterSource->GetKey()) != exceptions->end())
+        {
+        continue;
+        }
+      vtkSMProperty* destProp = iterDest->GetProperty();
+
+      // Skip the property if it is information only or is internal.
+      if (destProp->GetInformationOnly())
+        {
+        continue;
+        }
+
+      // Copy the property from source to dest
+      destProp->Copy(iterSource->GetProperty());
+      }
+    }
+
+  static void vtkAddRepresentation(vtkSMProxy* view, vtkSMProxy* repr)
+    {
+    // We are always using cache in this view.
+    vtkSMPropertyHelper(repr, "ForceUseCache", true).Set(1);
+    vtkSMPropertyHelper(repr, "ForcedCacheKey", true).Set(1);
+    repr->UpdateVTKObjects();
+
+    vtkClientServerStream stream;
+    stream << vtkClientServerStream::Invoke
+      << view->GetID() << "AddRepresentation" << repr->GetID()
+      << vtkClientServerStream::End;
+    vtkProcessModule::GetProcessModule()->SendStream(
+      view->GetConnectionID(),
+      (view->GetServers() & repr->GetServers()), stream);
+    }
+
+  static void vtkRemoveRepresentation(vtkSMProxy* view, vtkSMProxy* repr)
+    {
+    vtkClientServerStream stream;
+    stream << vtkClientServerStream::Invoke
+      << view->GetID() << "RemoveRepresentation" << repr->GetID()
+      << vtkClientServerStream::End;
+    vtkProcessModule::GetProcessModule()->SendStream(
+      view->GetConnectionID(),
+      (view->GetServers() & repr->GetServers()), stream);
     }
 }
 
@@ -97,10 +129,16 @@ public:
       VectorOfClones::iterator iter;
       for (iter = this->Clones.begin(); iter != this->Clones.end(); ++iter)
         {
-        iter->CloneRepresentation->MarkDirty(NULL);
+        vtkSMRepresentationProxy * repr = iter->CloneRepresentation;
+        vtkSMPropertyHelper helper(repr, "ForceUseCache", true);
+        helper.Set(0);
+        repr->UpdateProperty("ForceUseCache");
+        repr->MarkDirty(NULL);
+        helper.Set(1);
+        repr->UpdateProperty("ForceUseCache");
         }
       }
-  
+
     // Returns the representation clone in the given view.
     VectorOfClones::iterator FindRepresentationClone(vtkSMViewProxy* view)
       {
@@ -164,7 +202,7 @@ public:
     data.Link->AddLinkedProxy(newRepr, vtkSMLink::OUTPUT);
 
     // Add the cloned representation to the view
-    view->AddRepresentation(newRepr);
+    vtkAddRepresentation(view, newRepr);
 
     // Add the cloned representation to the RepresentationData struct
     // The clone is added to a map where its view is the key.
@@ -192,6 +230,9 @@ vtkSMComparativeViewProxy::vtkSMComparativeViewProxy()
   this->Dimensions[1] = 0;
   this->ViewSize[0] = 400;
   this->ViewSize[1] = 400;
+  this->ViewPosition[0] = 0;
+  this->ViewPosition[1] = 0;
+  this->ViewTime = 0.0;
   this->OverlayAllComparisons = false;
   this->Spacing[0] = this->Spacing[1] = 1;
 
@@ -236,14 +277,24 @@ void vtkSMComparativeViewProxy::RemoveCue(vtkSMComparativeAnimationCueProxy* cue
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMComparativeViewProxy::BeginCreateVTKObjects()
+void vtkSMComparativeViewProxy::CreateVTKObjects()
 {
+  if (this->ObjectsCreated)
+    {
+    return;
+    }
+  this->Superclass::CreateVTKObjects();
+  if (!this->ObjectsCreated)
+    {
+    return;
+    }
+
   vtkSMViewProxy* rootView = vtkSMViewProxy::SafeDownCast(
     this->GetSubProxy("RootView"));
   if (!rootView)
     {
     vtkErrorMacro("Subproxy \"Root\" must be defined in the xml configuration.");
-    return false;
+    return;
     }
 
   this->Dimensions[0] = 1;
@@ -263,6 +314,8 @@ bool vtkSMComparativeViewProxy::BeginCreateVTKObjects()
   // layout.
   this->Internal->ViewLink->AddException("ViewSize");
   this->Internal->ViewLink->AddException("ViewTime");
+  this->Internal->ViewLink->AddException("CacheKey");
+  this->Internal->ViewLink->AddException("UseCache");
   this->Internal->ViewLink->AddException("ViewPosition");
 
   this->Internal->ViewLink->AddException("CameraPositionInfo");
@@ -275,8 +328,6 @@ bool vtkSMComparativeViewProxy::BeginCreateVTKObjects()
   this->Internal->ViewLink->AddException("CameraClippingRange");
   this->Internal->ViewLink->AddException("CameraViewAngleInfo");
   this->Internal->ViewLink->AddException("CameraViewAngle");
-
-  return this->Superclass::BeginCreateVTKObjects();
 }
 
 //----------------------------------------------------------------------------
@@ -349,7 +400,7 @@ void vtkSMComparativeViewProxy::Build(int dx, int dy)
           {
           vtkSMRepresentationProxy* root_clone =
             data.Clones[cc].CloneRepresentation;
-          root_view->RemoveRepresentation(root_clone);
+          vtkRemoveRepresentation(root_view, root_clone);
           data.Link->RemoveLinkedProxy(root_clone);
           }
         data.Clones.resize(numReprs);
@@ -364,7 +415,7 @@ void vtkSMComparativeViewProxy::Build(int dx, int dy)
           vtkCopyClone(repr, newRepr); // create a clone
           newRepr->UpdateVTKObjects(); // create objects
           data.Link->AddLinkedProxy(newRepr, vtkSMLink::OUTPUT); // link properties
-          root_view->AddRepresentation(newRepr);  // add representation to view
+          vtkAddRepresentation(root_view,newRepr);  // add representation to view
 
           // Now update data structure to include this view/repr clone.
           data.Clones.push_back(
@@ -386,9 +437,9 @@ void vtkSMComparativeViewProxy::UpdateViewLayout()
 {
   int dx = this->OverlayAllComparisons? 1 : this->Dimensions[0];
   int dy = this->OverlayAllComparisons? 1 : this->Dimensions[1];
-  int width = 
+  int width =
     (this->ViewSize[0] - (dx-1)*this->Spacing[0])/dx;
-  int height = 
+  int height =
     (this->ViewSize[1] - (dy-1)*this->Spacing[1])/dy;
 
   size_t view_index = 0;
@@ -405,9 +456,6 @@ void vtkSMComparativeViewProxy::UpdateViewLayout()
       // Not all view classes have a ViewSize property
       vtkSMPropertyHelper(view, "ViewSize", true).Set(0, width);
       vtkSMPropertyHelper(view, "ViewSize", true).Set(1, height);
-
-      vtkSMPropertyHelper(view, "GUISize").Set(this->GUISize, 2);
-
       view->UpdateVTKObjects();
       }
     }
@@ -448,6 +496,8 @@ void vtkSMComparativeViewProxy::AddNewView()
   vtkstd::set<vtkstd::string> exceptions;
   exceptions.insert("Representations");
   exceptions.insert("ViewSize");
+  exceptions.insert("UseCache");
+  exceptions.insert("CacheKey");
   exceptions.insert("ViewPosition");
   vtkCopyClone(rootView, newView, &exceptions);
 
@@ -490,7 +540,7 @@ void vtkSMComparativeViewProxy::RemoveView(vtkSMViewProxy* view)
     if (cloneIter != data.Clones.end())
       {
       vtkSMRepresentationProxy* clone = cloneIter->CloneRepresentation;
-      view->RemoveRepresentation(clone);
+      vtkRemoveRepresentation(view, clone);
       data.Link->RemoveLinkedProxy(clone);
       data.Clones.erase(cloneIter);
       }
@@ -501,7 +551,7 @@ void vtkSMComparativeViewProxy::RemoveView(vtkSMViewProxy* view)
   this->Internal->ViewCameraLink->RemoveLinkedProxy(view);
 
   vtkInternal::VectorOfViews::iterator iter;
-  for (iter = this->Internal->Views.begin(); 
+  for (iter = this->Internal->Views.begin();
        iter != this->Internal->Views.end(); ++iter)
     {
     if (iter->GetPointer() == view)
@@ -524,7 +574,7 @@ void vtkSMComparativeViewProxy::AddRepresentation(vtkSMRepresentationProxy* repr
 
   // Add representation to the root view
   vtkSMViewProxy* rootView = this->GetRootView();
-  rootView->AddRepresentation(repr);
+  vtkAddRepresentation(rootView, repr);
 
   // Create clones of representation and add them to all other views.
   // We will save information about the clones we create
@@ -537,12 +587,12 @@ void vtkSMComparativeViewProxy::AddRepresentation(vtkSMRepresentationProxy* repr
   vtkSMProxyLink* reprLink = vtkSMProxyLink::New();
   data.Link.TakeReference(reprLink);
   reprLink->AddLinkedProxy(repr, vtkSMLink::INPUT);
-  reprLink->AddException("UpdateTime");
+  reprLink->AddException("ForceUseCache");
+  reprLink->AddException("ForcedCacheKey");
 
   // Add the RepresentationData struct to a map
   // with the original representation as the key
   this->Internal->RepresentationClones[repr] = data;
-
 
   // Now, for all existing sub-views, create representation clones.
   vtkInternal::VectorOfViews::iterator iter = this->Internal->Views.begin();
@@ -550,7 +600,7 @@ void vtkSMComparativeViewProxy::AddRepresentation(vtkSMRepresentationProxy* repr
   for (; iter != this->Internal->Views.end(); ++iter)
     {
     // Create a new representation
-    vtkSMRepresentationProxy* newRepr = 
+    vtkSMRepresentationProxy* newRepr =
       this->Internal->AddRepresentationClone(
         repr, iter->GetPointer());
     (void)newRepr;
@@ -600,7 +650,7 @@ void vtkSMComparativeViewProxy::RemoveRepresentation(vtkSMRepresentationProxy* r
     vtkSMRepresentationProxy* clone = cloneIter->CloneRepresentation;
     if (view && clone)
       {
-      view->RemoveRepresentation(clone);
+      vtkRemoveRepresentation(view, clone);
       // No need to clean the clone from the proxy link since the link object
       // will be destroyed anyways.
       }
@@ -611,7 +661,7 @@ void vtkSMComparativeViewProxy::RemoveRepresentation(vtkSMRepresentationProxy* r
 
   // Remove repr from RootView.
   vtkSMViewProxy* rootView = this->GetRootView();
-  rootView->RemoveRepresentation(repr);
+  vtkRemoveRepresentation(rootView, repr);
 
   // Signal that representations have changed
   this->InvokeEvent(vtkCommand::UserEvent);
@@ -636,42 +686,44 @@ void vtkSMComparativeViewProxy::RemoveAllRepresentations()
 }
 
 //----------------------------------------------------------------------------
-void vtkSMComparativeViewProxy::MarkDirty(vtkSMProxy* modifiedProxy) 
+void vtkSMComparativeViewProxy::MarkDirty(vtkSMProxy* modifiedProxy)
 {
-  // The representation that gets added to this view is a consumer of it's
-  // input. While this view is a consumer of the representation. So, when the
-  // input source is modified, that call eventually leads to
-  // vtkSMComparativeViewProxy::MarkDirty(). When that happens, we need to
-  // ensure that we regenerate the comparison, so we call this->MarkOutdated().
+  if (vtkSMViewProxy::SafeDownCast(modifiedProxy) == NULL)
+    {
+    cout << "vtkSMComparativeViewProxy::MarkDirty == " << modifiedProxy << endl;
+    // The representation that gets added to this view is a consumer of it's
+    // input. While this view is a consumer of the representation. So, when the
+    // input source is modified, that call eventually leads to
+    // vtkSMComparativeViewProxy::MarkDirty(). When that happens, we need to
+    // ensure that we regenerate the comparison, so we call this->MarkOutdated().
 
-  // TODO: We can be even smarter. We may want to try to consider only those
-  // representations that are actually involved in the parameter comparison to
-  // mark this view outdated. This will save on the regeneration of cache when
-  // not needed.
+    // TODO: We can be even smarter. We may want to try to consider only those
+    // representations that are actually involved in the parameter comparison to
+    // mark this view outdated. This will save on the regeneration of cache when
+    // not needed.
 
-  // TODO: Another optimization: we can enable caching only for those
-  // representations that are invovled in parameter comparison, others we don't
-  // even need to cache.
+    // TODO: Another optimization: we can enable caching only for those
+    // representations that are invovled in parameter comparison, others we don't
+    // even need to cache.
 
-  // TODO: Need to update data ranges by collecting ranges from all views.
+    // TODO: Need to update data ranges by collecting ranges from all views.
+    this->MarkOutdated();
+    }
   this->Superclass::MarkDirty(modifiedProxy);
-  this->MarkOutdated();
 }
 
 //----------------------------------------------------------------------------
-void vtkSMComparativeViewProxy::EndStillRender()
+void vtkSMComparativeViewProxy::PostRender(bool interactive)
 {
-  // The StillRender will propagate through the ViewCameraLink to all the other
-  // views.
-  this->GetRootView()->StillRender();
-}
-
-//----------------------------------------------------------------------------
-void vtkSMComparativeViewProxy::EndInteractiveRender()
-{
-  // The InteractiveRender will propagate through the ViewCameraLink to all the 
-  // other views.
-  this->GetRootView()->InteractiveRender();
+  this->Superclass::PostRender(interactive);
+  if (interactive)
+    {
+    this->GetRootView()->InteractiveRender();
+    }
+  else
+    {
+    this->GetRootView()->StillRender();
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -682,7 +734,7 @@ vtkSMRepresentationProxy* vtkSMComparativeViewProxy::CreateDefaultRepresentation
 }
 
 //----------------------------------------------------------------------------
-void vtkSMComparativeViewProxy::UpdateAllRepresentations()
+void vtkSMComparativeViewProxy::Update()
 {
   if (!this->Outdated)
     {
@@ -720,13 +772,13 @@ void vtkSMComparativeViewProxy::UpdateAllRepresentations()
         {
         double value = timeCue->GetValue(
           x, y, this->Dimensions[0], this->Dimensions[1]);
-        view->SetViewUpdateTime(value);
+        vtkSMPropertyHelper(view,"ViewTime").Set(value);
         }
       else
         {
-        view->SetViewUpdateTime(this->GetViewUpdateTime());
+        vtkSMPropertyHelper(view,"ViewTime").Set(this->ViewTime);
         }
-      view->SetCacheTime(0);
+      view->UpdateVTKObjects();
 
       for (vtkInternal::VectorOfCues::iterator iter =
         this->Internal->Cues.begin();
@@ -740,14 +792,14 @@ void vtkSMComparativeViewProxy::UpdateAllRepresentations()
           x, y, this->Dimensions[0], this->Dimensions[1]);
         }
 
-      // Make the view cache the current setup. 
+      // Make the view cache the current setup.
       this->UpdateAllRepresentations(x, y);
-
       index++;
       }
     }
 
   this->Outdated = false;
+  this->NeedsUpdate = false;
 }
 
 //----------------------------------------------------------------------------
@@ -757,37 +809,27 @@ void vtkSMComparativeViewProxy::UpdateAllRepresentations(int x, int y)
     this->Internal->Views[0] :
     this->Internal->Views[y*this->Dimensions[0] + x];
 
-  if (!this->OverlayAllComparisons)
-    {
-    view->UpdateAllRepresentations();
-    return;
-    }
-
   vtkCollection* collection = vtkCollection::New();
   this->GetRepresentations(x, y, collection);
   collection->InitTraversal();
-  while (vtkSMRepresentationProxy* repr = 
+  while (vtkSMRepresentationProxy* repr =
     vtkSMRepresentationProxy::SafeDownCast(
       collection->GetNextItemAsObject()))
     {
-    if (repr->GetVisibility())
+    if (vtkSMPropertyHelper(repr, "Visibility", true).GetAsInt() == 1)
       {
-      repr->Update(view);
+      repr->UpdatePipeline(
+        vtkSMPropertyHelper(view, "ViewTime").GetAsDouble());
       }
     }
+  view->Update();
+
   collection->Delete();
 }
 
 //----------------------------------------------------------------------------
 void vtkSMComparativeViewProxy::ClearDataCaches()
 {
-  vtkInternal::VectorOfViews::iterator viter;
-  for (viter = this->Internal->Views.begin(); 
-    viter != this->Internal->Views.end(); ++viter)
-    {
-    viter->GetPointer()->SetUseCache(false);
-    }
-
   // Mark all representations modified. This clears their caches. It's essential
   // that SetUseCache(false) is called before we do this, otherwise the caches
   // are not cleared.
@@ -797,14 +839,16 @@ void vtkSMComparativeViewProxy::ClearDataCaches()
     repcloneiter != this->Internal->RepresentationClones.end();
     ++repcloneiter)
     {
-    repcloneiter->first->MarkDirty(NULL);
+    vtkSMRepresentationProxy* repr = repcloneiter->first;
+    vtkSMPropertyHelper helper(repr, "ForceUseCache", true);
+    helper.Set(0);
+    repr->UpdateProperty("ForceUseCache");
+    // HACK.
+    repr->ClearMarkedModified();
+    repr->MarkDirty(NULL);
     repcloneiter->second.MarkRepresentationsModified();
-    }
-
-  for (viter = this->Internal->Views.begin(); 
-    viter != this->Internal->Views.end(); ++viter)
-    {
-    viter->GetPointer()->SetUseCache(true);
+    helper.Set(1);
+    repr->UpdateProperty("ForceUseCache");
     }
 }
 
@@ -900,21 +944,6 @@ void vtkSMComparativeViewProxy::GetRepresentations(int x, int y,
       collection->AddItem(data.Clones[index-1].CloneRepresentation);
       }
     }
-}
-
-//----------------------------------------------------------------------------
-const char* vtkSMComparativeViewProxy::GetSuggestedViewType(vtkIdType connectionID)
-{
-  vtkSMViewProxy* rootView = vtkSMViewProxy::SafeDownCast(this->GetSubProxy("RootView"));
-  if (rootView)
-    {
-    vtksys_ios::ostringstream stream;
-    stream << "Comparative" << rootView->GetSuggestedViewType(connectionID);
-    this->Internal->SuggestedViewType = stream.str();
-    return this->Internal->SuggestedViewType.c_str();
-    }
-
-  return this->Superclass::GetSuggestedViewType(connectionID);
 }
 
 //----------------------------------------------------------------------------

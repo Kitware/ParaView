@@ -40,14 +40,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqTableView.h"
 #include "pqTextRepresentation.h"
 #include "pqTwoDRenderView.h"
-#include "pqScatterPlotView.h"
+//#include "pqScatterPlotView.h"
 #include "pqXYChartView.h"
 #include "pqXYBarChartView.h"
 #include "pqComparativeXYChartView.h"
 #include "pqComparativeXYBarChartView.h"
 #include "pqParallelCoordinatesChartView.h"
 #include "vtkSMContextViewProxy.h"
-#include "vtkSMXYChartViewProxy.h"
 #include "vtkSMComparativeViewProxy.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMRenderViewProxy.h"
@@ -70,7 +69,7 @@ QStringList pqStandardViewModules::viewTypes() const
     pqTwoDRenderView::twoDRenderViewType() <<
     pqTableView::tableType() <<
     pqSpreadSheetView::spreadsheetViewType() <<
-    pqScatterPlotView::scatterPlotViewType() <<
+//    pqScatterPlotView::scatterPlotViewType() <<
     pqXYChartView::XYChartViewType() <<
     pqXYBarChartView::XYBarChartViewType() <<
     pqComparativeRenderView::comparativeRenderViewType() <<
@@ -117,10 +116,10 @@ QString pqStandardViewModules::viewTypeName(const QString& type) const
     {
     return pqTwoDRenderView::twoDRenderViewTypeName();
     }
-  else if  (type == pqScatterPlotView::scatterPlotViewType())
-    {
-    return pqScatterPlotView::scatterPlotViewTypeName();
-    }
+//  else if  (type == pqScatterPlotView::scatterPlotViewType())
+//    {
+//    return pqScatterPlotView::scatterPlotViewTypeName();
+//    }
   else if (type == pqXYChartView::XYChartViewType())
     {
     return pqXYChartView::XYChartViewTypeName();
@@ -175,10 +174,10 @@ vtkSMProxy* pqStandardViewModules::createViewProxy(const QString& viewtype,
     {
     root_xmlname = "SpreadSheetView";
     }
-  else if (viewtype == pqScatterPlotView::scatterPlotViewType())
-    {
-    root_xmlname = "ScatterPlotRenderView";
-    }
+//  else if (viewtype == pqScatterPlotView::scatterPlotViewType())
+//    {
+//    root_xmlname = "ScatterPlotRenderView";
+//    }
   else if (viewtype == pqXYChartView::XYChartViewType())
     {
     root_xmlname = "XYChartView";
@@ -194,13 +193,7 @@ vtkSMProxy* pqStandardViewModules::createViewProxy(const QString& viewtype,
 
   if (root_xmlname)
     {
-    vtkSMViewProxy* prototype = vtkSMViewProxy::SafeDownCast(
-      pxm->GetPrototypeProxy("views", root_xmlname));
-    if (prototype)
-      {
-      return pxm->NewProxy("views",
-        prototype->GetSuggestedViewType(server->GetConnectionID()));
-      }
+    return pxm->NewProxy("views", root_xmlname);
     }
 
   return NULL;
@@ -221,6 +214,11 @@ pqView* pqStandardViewModules::createView(const QString& viewtype,
   else if (viewtype == pqSpreadSheetView::spreadsheetViewType())
     {
     return new pqSpreadSheetView(
+      group, viewname, viewmodule, server, p);
+    }
+  else if (viewmodule->IsA("vtkSMTwoDRenderViewProxy"))
+    {
+    return new pqTwoDRenderView(
       group, viewname, viewmodule, server, p);
     }
   else if (viewmodule->IsA("vtkSMRenderViewProxy"))
@@ -247,35 +245,27 @@ pqView* pqStandardViewModules::createView(const QString& viewtype,
     return new pqComparativeRenderView(
       group, viewname, viewmodule, server, p);
     }
-  else if (viewmodule->IsA("vtkSMTwoDRenderViewProxy"))
-    {
-    return new pqTwoDRenderView(
-      group, viewname, viewmodule, server, p);
-    }
-  else if (viewmodule->IsA("vtkSMScatterPlotViewProxy"))
-    {
-    return new pqScatterPlotView(
-      group, viewname, viewmodule, server, p);
-    }
-  else if (viewmodule->IsA("vtkSMXYChartViewProxy") &&
-           viewtype == "XYChartView")
+//  else if (viewmodule->IsA("vtkSMScatterPlotViewProxy"))
+//    {
+//    return new pqScatterPlotView(
+//      group, viewname, viewmodule, server, p);
+//    }
+  else if (viewtype == "XYChartView")
     {
     return new pqXYChartView(group, viewname,
-                            vtkSMXYChartViewProxy::SafeDownCast(viewmodule),
+                            vtkSMContextViewProxy::SafeDownCast(viewmodule),
                             server, p);
     }
-  else if (viewmodule->IsA("vtkSMXYChartViewProxy") &&
-           viewtype == "XYBarChartView")
+  else if (viewtype == "XYBarChartView")
     {
     return new pqXYBarChartView(group, viewname,
-                                vtkSMXYChartViewProxy::SafeDownCast(viewmodule),
+                                vtkSMContextViewProxy::SafeDownCast(viewmodule),
                                 server, p);
     }
-  else if (viewmodule->IsA("vtkSMXYChartViewProxy") &&
-           viewtype == "ParallelCoordinatesChartView")
+  else if (viewtype == "ParallelCoordinatesChartView")
     {
     return new pqParallelCoordinatesChartView(group, viewname,
-                                        vtkSMXYChartViewProxy::SafeDownCast(viewmodule),
+                                        vtkSMContextViewProxy::SafeDownCast(viewmodule),
                                         server, p);
     }
 

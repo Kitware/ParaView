@@ -142,12 +142,6 @@ public:
 
 //BTX
   // Description:
-  // Internal callback. Don't call directly.
-  void SetupContext(const vtkRenderState*);
-  void Draw(const vtkRenderState*);
-  void CleanupContext(const vtkRenderState*);
-
-  // Description:
   // Returns the last rendered tile from this process, if any.
   // Image is invalid if tile is not available on the current process.
   void GetLastRenderedTile(vtkSynchronizedRenderers::vtkRawImage& tile);
@@ -157,9 +151,17 @@ public:
   // last-rendered-tile maps.
   vtkGetVector4Macro(PhysicalViewport, double);
 
+  // Description:
+  // Internal callback. Don't use.
+  virtual void Draw(const vtkRenderState*);
 protected:
   vtkIceTCompositePass();
   ~vtkIceTCompositePass();
+
+  // Description:
+  // Spits the different components for the rendering process.
+  virtual void SetupContext(const vtkRenderState*);
+  virtual void CleanupContext(const vtkRenderState*);
 
   // Description:
   // Create program for texture mapping.

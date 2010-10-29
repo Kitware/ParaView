@@ -2026,11 +2026,9 @@ def _create_view(view_xml_name, connection=None, **extraArgs):
     if not connection:
         raise RuntimeError, "Cannot create view without connection."
     pxm = ProxyManager()
-    prototype = pxm.GetPrototypeProxy("views", view_xml_name)
-    proxy_xml_name = prototype.GetSuggestedViewType(connection.ID)
     view_module = None
-    if proxy_xml_name:
-        view_module = CreateProxy("views", proxy_xml_name, connection)
+    if view_xml_name:
+        view_module = CreateProxy("views", view_xml_name, connection)
     if not view_module:
         return None
     extraArgs['proxy'] = view_module
@@ -2175,50 +2173,53 @@ def Fetch(input, arg1=None, arg2=None, idx=0):
 
     import types
 
-    #create the pipeline that reduces and transmits the data
-    gvd = rendering.ClientDeliveryRepresentationBase()
-    gvd.AddInput(0, input, idx, "DONTCARE")
+    reducer = filters.ReductionFilter(Input=OutputPort(input,idx))
 
+    #create the pipeline that reduces and transmits the data
     if arg1 == None:
         print "getting appended"
 
         cdinfo = input.GetDataInformation(idx).GetCompositeDataInformation()
         if cdinfo.GetDataIsComposite():
             print "use composite data append"
-            gvd.SetReductionType(5)
+            reducer.PostGatherHelperName = "vtkMultiBlockDataGroupFilter"
 
         elif input.GetDataInformation(idx).GetDataClassName() == "vtkPolyData":
             print "use append poly data filter"
-            gvd.SetReductionType(1)
+            reducer.PostGatherHelperName = "vtkAppendPolyData"
 
         elif input.GetDataInformation(idx).GetDataClassName() == "vtkRectilinearGrid":
             print "use append rectilinear grid filter"
-            gvd.SetReductionType(4)
+            reducer.PostGatherHelperName = "vtkAppendRectilinearGrid"
 
         elif input.GetDataInformation(idx).IsA("vtkDataSet"):
             print "use unstructured append filter"
-            gvd.SetReductionType(2)
-
+            reducer.PostGatherHelperName = "vtkAppendFilter"
 
     elif type(arg1) is types.IntType:
         print "getting node %d" % arg1
-        gvd.SetReductionType(3)
-        gvd.SetPreGatherHelper(None)
-        gvd.SetPostGatherHelper(None)
-        gvd.SetPassThrough(arg1)
+        reducer.PassThrough = arg1
 
     else:
         print "applying operation"
-        gvd.SetReductionType(6) # CUSTOM
-        gvd.SetPreGatherHelper(arg1)
-        gvd.SetPostGatherHelper(arg2)
-        gvd.SetPassThrough(-1)
+        reducer.PreGatherHelper = arg1
+        reducer.PostGatherHelper = arg2
 
-    #go!
-    gvd.UpdateVTKObjects()
-    gvd.Update()
-    op = gvd.GetOutput()
-    opc = gvd.GetOutput().NewInstance()
+    # reduce
+    reducer.UpdatePipeline()
+    dataInfo = reducer.GetDataInformation(0)
+    dataType = dataInfo.GetDataSetType()
+    if dataInfo.GetCompositeDataSetType() > 0:
+      dataType = dataInfo.GetCompositeDataSetType()
+
+    fetcher = filters.ClientServerMoveData(Input=reducer)
+    fetcher.OutputDataType = dataType
+    fetcher.WholeExtent = dataInfo.GetExtent()[:]
+    #fetch
+    fetcher.UpdatePipeline()
+
+    op = fetcher.GetClientSideObject().GetOutputDataObject(0)
+    opc = op.NewInstance()
     opc.ShallowCopy(op)
     opc.UnRegister(None)
     return opc

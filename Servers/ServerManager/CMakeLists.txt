@@ -127,9 +127,6 @@ SET(Kit_SRCS
   vtkSMApplication.cxx
   vtkSMArrayListInformationHelper.cxx
   vtkSMArraySelectionInformationHelper.cxx
-  vtkSMAxesRepresentationProxy.cxx
-  vtkSMBlockDeliveryRepresentationProxy.cxx
-  vtkSMBlockDeliveryStrategy.cxx
   vtkSMBooleanKeyFrameProxy.cxx
   vtkSMBoxRepresentationProxy.cxx
   vtkSMCameraConfigurationReader.cxx
@@ -139,11 +136,8 @@ SET(Kit_SRCS
   vtkSMCameraManipulatorProxy.cxx
   vtkSMCameraProxy.cxx
   #vtkSMCaveRenderModuleProxy.cxx
-  vtkSMCaveRenderViewProxy.cxx
-  vtkSMClientDeliveryRepresentationProxy.cxx
-  vtkSMClientDeliveryStrategyProxy.cxx
-  vtkSMClientServerRenderSyncManagerHelper.cxx
-  vtkSMClientServerRenderViewProxy.cxx
+#  vtkSMCaveRenderViewProxy.cxx
+  vtkSMChartRepresentationProxy.cxx
   vtkSMComparativeAnimationCueProxy.cxx
   vtkSMComparativeViewProxy.cxx
   vtkSMCompositeKeyFrameProxy.cxx
@@ -154,22 +148,14 @@ SET(Kit_SRCS
   vtkSMContextNamedOptionsProxy.cxx
   vtkSMContextViewProxy.cxx
   vtkSMCSVExporterProxy.cxx
-  vtkSMCubeAxesRepresentationProxy.cxx
-  vtkSMDataLabelRepresentationProxy.cxx
-  vtkSMDataRepresentationProxy.cxx
   vtkSMDistanceRepresentation2DProxy.cxx
   vtkSMDoubleArrayInformationHelper.cxx
   vtkSMExponentialKeyFrameProxy.cxx
   vtkSMExporterProxy.cxx
   vtkSMFileSeriesReaderProxy.cxx
   vtkSMGlobalPropertiesLinkUndoElement.cxx #--------------------------------
-  vtkSMGlyph3DMapperRepresentationProxy.cxx
   vtkSMHardwareSelector.cxx
-  vtkSMIceTCompositeViewProxy.cxx
-  vtkSMIceTDesktopRenderViewProxy.cxx
-  vtkSMIceTMultiDisplayRenderViewProxy.cxx
-  vtkSMImageDataParallelStrategy.cxx
-  vtkSMImageSliceRepresentationProxy.cxx
+  vtkSMFetchDataProxy.cxx
   vtkSMImageTextureProxy.cxx
   vtkSMImplicitPlaneRepresentationProxy.cxx
   vtkSMInformationHelper.cxx
@@ -181,10 +167,8 @@ SET(Kit_SRCS
   vtkSMLinearAnimationCueManipulatorProxy.cxx
   vtkSMLookupTableProxy.cxx
   vtkSMMaterialLoaderProxy.cxx
-  vtkSMMultiProcessRenderView.cxx
   vtkSMNewWidgetRepresentationProxy.cxx
   vtkSMOrderedPropertyIterator.cxx
-  vtkSMOutlineRepresentationProxy.cxx
   vtkSMNetworkImageSourceProxy.cxx
   vtkSMParallelCoordinatesRepresentationProxy.cxx
   vtkSMPQStateLoader.cxx
@@ -206,18 +190,15 @@ SET(Kit_SRCS
   vtkSMPVRepresentationProxy.cxx
   vtkSMRampKeyFrameProxy.cxx
   vtkSMReaderFactory.cxx
-  vtkSMRenderViewHelper.cxx
   vtkSMRenderViewProxy.cxx
   vtkSMRenderViewExporterProxy.cxx
   vtkSMRepresentationAnimationHelperProxy.cxx
   vtkSMRepresentationProxy.cxx
-  vtkSMRepresentationStrategy.cxx
   vtkSMScalarBarActorProxy.cxx
   vtkSMScalarBarWidgetRepresentationProxy.cxx
-  vtkSMScatterPlotArraysInformationHelper.cxx
-  vtkSMScatterPlotRepresentationProxy.cxx
-  vtkSMScatterPlotViewProxy.cxx
-  vtkSMSelectionDeliveryRepresentationProxy.cxx
+#  vtkSMScatterPlotArraysInformationHelper.cxx
+#  vtkSMScatterPlotViewProxy.cxx
+#  vtkSMSelectionDeliveryRepresentationProxy.cxx
   vtkSMSelectionHelper.cxx
   vtkSMSelectionRepresentationProxy.cxx
   vtkSMServerFileListingProxy.cxx
@@ -228,13 +209,10 @@ SET(Kit_SRCS
   vtkSMSimpleDoubleInformationHelper.cxx
   vtkSMSimpleIdTypeInformationHelper.cxx
   vtkSMSimpleIntInformationHelper.cxx
-  vtkSMSimpleParallelStrategy.cxx
-  vtkSMSimpleStrategy.cxx
   vtkSMSimpleStringInformationHelper.cxx
   vtkSMSinusoidKeyFrameProxy.cxx
   vtkSMSpreadSheetRepresentationProxy.cxx
   vtkSMStringArrayHelper.cxx
-  vtkSMSurfaceRepresentationProxy.cxx
 #  vtkSMTemporalInputDomain.cxx
   vtkSMTesting.cxx
   vtkSMTextSourceRepresentationProxy.cxx
@@ -246,20 +224,14 @@ SET(Kit_SRCS
   vtkSMTransformProxy.cxx
   vtkSMTwoDRenderViewProxy.cxx
   vtkSMUndoRedoStateLoader.cxx#-------------------------------- should be DELETE
-  vtkSMUniformGridParallelStrategy.cxx
   vtkSMUniformGridVolumeRepresentationProxy.cxx
-  vtkSMUnstructuredDataParallelStrategy.cxx
-  vtkSMUnstructuredGridParallelStrategy.cxx
   vtkSMUnstructuredGridVolumeRepresentationProxy.cxx
   vtkSMUtilities.cxx
   vtkSMUpdateInformationUndoElement.cxx#--------------------------------
-  vtkSMUpdateSuppressorProxy.cxx
   vtkSMViewProxy.cxx
   vtkSMWidgetRepresentationProxy.cxx
   vtkSMWriterProxy.cxx
   vtkSMXMLPVAnimationWriterProxy.cxx
-  vtkSMXYChartRepresentationProxy.cxx
-  vtkSMXYChartViewProxy.cxx
   vtkSMDataSourceProxy.cxx
   )
 
@@ -303,14 +275,10 @@ SET_SOURCE_FILES_PROPERTIES(
   vtkSMAnimationCueManipulatorProxy.cxx
   vtkSMAnimationSceneWriter.cxx
   vtkSMClientServerRenderSyncManagerHelper.cxx
-  vtkSMContextViewProxy.cxx
-  vtkSMDataRepresentationProxy.cxx
+  vtkSMDomain.cxx
   vtkSMInformationHelper.cxx
-  vtkSMMultiProcessRenderView.cxx
-  vtkSMMultiProcessRenderView.cxx
+  vtkSMLink.cxx
   vtkSMProxyManagerReviver.cxx
-  vtkSMRepresentationProxy.cxx
-  vtkSMRepresentationStrategy.cxx
   vtkSMStateVersionControllerBase.cxx
   vtkSMStateVersionControllerBase.cxx
   vtkSMExporterProxy.cxx
@@ -318,7 +286,7 @@ SET_SOURCE_FILES_PROPERTIES(
   )
 
 SET_SOURCE_FILES_PROPERTIES(
-  vtkSMRenderViewHelper.cxx
+  vtkSMPropertyHelper.cxx
   WRAP_EXCLUDE)
 ENDIF (FIXME) #------------------------------------------------------------- END
 
@@ -437,6 +405,8 @@ SET(resourceFiles
   ${CMAKE_CURRENT_SOURCE_DIR}/Resources/readers.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/Resources/utilities.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/Resources/rendering.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/Resources/views_and_representations.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/Resources/3d_widgets.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/Resources/internal_writers.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/Resources/writers.xml
   ${PARAVIEW_EXTRA_SERVERMANAGER_RESOURCES}

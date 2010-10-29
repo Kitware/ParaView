@@ -25,6 +25,7 @@ IF(PARAVIEW_ENABLE_PYTHON)
 ENDIF(PARAVIEW_ENABLE_PYTHON)
 
 SET(Filters_SRCS
+  vtk3DWidgetRepresentation.cxx
   vtkAMRDualClip.cxx
   vtkAMRDualContour.cxx
   vtkAMRDualGridHelper.cxx
@@ -34,20 +35,24 @@ SET(Filters_SRCS
   vtkAttributeDataReductionFilter.cxx
   vtkAttributeDataToTableFilter.cxx
   vtkBlockDeliveryPreprocessor.cxx
+  vtkBSPCutsGenerator.cxx
   vtkCameraInterpolator2.cxx
   vtkCameraManipulator.cxx
   vtkCameraManipulatorGUIHelper.cxx
+  vtkChartRepresentation.cxx
   vtkCleanArrays.cxx
   vtkCleanUnstructuredGrid.cxx
   vtkClientServerMoveData.cxx
   vtkCompleteArrays.cxx
   vtkCompositeAnimationPlayer.cxx
   vtkCompositeDataToUnstructuredGridFilter.cxx
+  vtkCompositeRepresentation.cxx
+  vtkContextNamedOptions.cxx
   vtkCSVExporter.cxx
   vtkCSVWriter.cxx
+  vtkCubeAxesRepresentation.cxx
+  vtkDataLabelRepresentation.cxx
   vtkDataSetToRectilinearGrid.cxx
-  vtkDesktopDeliveryClient.cxx
-  vtkDesktopDeliveryServer.cxx
   vtkEnzoReader.cxx
   vtkEquivalenceSet.cxx
   vtkExodusFileSeriesReader.cxx
@@ -57,10 +62,16 @@ SET(Filters_SRCS
   vtkFileSeriesWriter.cxx
   vtkFlashContour.cxx
   vtkFlashReader.cxx
+  vtkGlyph3DRepresentation.cxx
   vtkHierarchicalFractal.cxx
+  vtkGeometryRepresentation.cxx
+  vtkGeometryRepresentationWithFaces.cxx
   vtkGridConnectivity.cxx
   vtkImageCompressor.cxx
+  vtkImageSliceDataDeliveryFilter.cxx
   vtkImageSliceMapper.cxx
+  vtkImageSliceRepresentation.cxx
+  vtkImageVolumeRepresentation.cxx
   vtkIntegrateAttributes.cxx
   vtkIntegrateFlowThroughSurface.cxx
   vtkInteractorStyleTransferFunctionEditor.cxx
@@ -68,6 +79,7 @@ SET(Filters_SRCS
   vtkIsoVolume.cxx
   vtkKdTreeGenerator.cxx
   vtkKdTreeManager.cxx
+  vtkMarkSelectedRows.cxx
   vtkMaterialInterfaceCommBuffer.cxx
   vtkMaterialInterfaceFilter.cxx
   vtkMaterialInterfaceIdList.cxx
@@ -85,8 +97,10 @@ SET(Filters_SRCS
   vtkMultiViewManager.cxx
   vtkNetworkImageSource.cxx
   vtkOrderedCompositeDistributor.cxx
+  vtkOutlineRepresentation.cxx
   vtkPConvertSelection.cxx
   vtkPExtractHistogram.cxx
+  vtkParallelCoordinatesRepresentation.cxx
   vtkParallelSerialWriter.cxx
   vtkPEnSightGoldBinaryReader.cxx
   vtkPEnSightGoldReader.cxx
@@ -112,14 +126,17 @@ SET(Filters_SRCS
   vtkPVBox.cxx
   vtkPVCacheKeeper.cxx
   vtkPVCacheKeeperPipeline.cxx
-  vtkPVClientServerRenderManager.cxx
+  vtkPVCenterAxesActor.cxx
   vtkPVClipClosedSurface.cxx
   vtkPVClipDataSet.cxx
   vtkPVCompositeDataPipeline.cxx
   vtkPVConnectivityFilter.cxx
+  vtkPVContextView.cxx
   vtkPVContourFilter.cxx
-  vtkPVDesktopDeliveryClient.cxx
-  vtkPVDesktopDeliveryServer.cxx
+  vtkPVCompositeRepresentation.cxx
+  vtkPVDataRepresentation.cxx
+  vtkPVDataRepresentationPipeline.cxx
+  vtkPVDefaultPass.cxx
   vtkPVDReader.cxx
   vtkPVEnSightMasterServerReader.cxx
   vtkPVEnSightMasterServerReader2.cxx
@@ -128,15 +145,16 @@ SET(Filters_SRCS
   vtkPVExtractPieces.cxx
   vtkPVExtractSelection.cxx
   vtkPVExtractVOI.cxx
+  vtkPVFrustumActor.cxx
   vtkPVGenericRenderWindowInteractor.cxx
   vtkPVGeometryFilter.cxx
   vtkPVGeometryInformation.cxx
   vtkPVGlyphFilter.cxx
-  vtkPVImageSlicer.cxx
   vtkPVInteractorStyle.cxx
   vtkPVJoystickFly.cxx
   vtkPVJoystickFlyIn.cxx
   vtkPVJoystickFlyOut.cxx
+  vtkPVLastSelectionInformation.cxx
   vtkPVLinearExtrusionFilter.cxx
   vtkPVLODActor.cxx
   vtkPVLODVolume.cxx
@@ -147,7 +165,10 @@ SET(Filters_SRCS
   vtkPVPostFilter.cxx
   vtkPVPostFilterExecutive.cxx
   vtkPVRecoverGeometryWireframe.cxx
+  vtkPV2DRenderView.cxx
+  vtkPVRenderView.cxx
   vtkPVRenderViewProxy.cxx
+  vtkPVRepresentedDataInformation.cxx
   vtkPVScalarBarActor.cxx
   vtkPVSelectionSource.cxx
   vtkPVServerArrayHelper.cxx
@@ -157,6 +178,8 @@ SET(Filters_SRCS
   vtkPVServerSelectTimeSet.cxx
   vtkPVServerTimeSteps.cxx
   vtkPVStringArrayHelper.cxx
+  vtkPVSynchronizedRenderer.cxx
+  vtkPVSynchronizedRenderWindows.cxx
   vtkPVTextSource.cxx
   vtkPVTrackballMoveActor.cxx
   vtkPVTrackballMultiRotate.cxx
@@ -166,6 +189,8 @@ SET(Filters_SRCS
   vtkPVTrackballZoom.cxx
   vtkPVUpdateSuppressor.cxx
   vtkPVHardwareSelector.cxx
+  vtkPVView.cxx
+  vtkPVXYChartView.cxx
   vtkQuerySelectionSource.cxx
   vtkRealtimeAnimationPlayer.cxx
   vtkRectilinearGridConnectivity.cxx
@@ -174,9 +199,12 @@ SET(Filters_SRCS
   vtkScatterPlotPainter.cxx
   vtkSciVizStatistics.cxx
   vtkSelectionConverter.cxx
-  vtkSelectionStreamer.cxx
+  vtkSelectionDeliveryFilter.cxx
+  vtkSelectionRepresentation.cxx
   vtkSequenceAnimationPlayer.cxx
   vtkSortedTableStreamer.cxx
+  vtkSpreadSheetView.cxx
+  vtkSpreadSheetRepresentation.cxx
   vtkSpyPlotBlock.cxx
   vtkSpyPlotBlockIterator.cxx
   vtkSpyPlotIStream.cxx
@@ -186,6 +214,7 @@ SET(Filters_SRCS
   vtkSquirtCompressor.cxx
   vtkZlibImageCompressor.cxx
   vtkSurfaceVectors.cxx
+  vtkTextSourceRepresentation.cxx
   vtkTilesHelper.cxx
   vtkTableFFT.cxx
 #  vtkTemporalCacheFilter.cxx
@@ -206,12 +235,15 @@ SET(Filters_SRCS
   vtkTransferFunctionEditorWidgetShapes2D.cxx
   vtkTransferFunctionEditorWidgetSimple1D.cxx
   vtkTransferFunctionViewer.cxx
+  vtkUnstructuredDataDeliveryFilter.cxx
+  vtkUnstructuredGridVolumeRepresentation.cxx
   vtkUpdateSuppressorPipeline.cxx
   vtkVolumeRepresentationPreprocessor.cxx
   vtkVRMLSource.cxx
   vtkXMLCollectionReader.cxx
   vtkXMLPVAnimationWriter.cxx
   vtkXMLPVDWriter.cxx
+  vtkXYChartRepresentation.cxx
   )
 
 SET_SOURCE_FILES_PROPERTIES(
@@ -237,9 +269,11 @@ SET_SOURCE_FILES_PROPERTIES(
   vtkCameraManipulatorGUIHelper.cxx
   vtkImageCompressor.cxx
   vtkPEnSightReader.cxx
-  vtkPVClientServerRenderManager.cxx
+  vtkPVContextView.cxx
+  vtkPVDataRepresentation.cxx
   vtkPVJoystickFly.cxx
   vtkPVRenderViewProxy.cxx
+  vtkPVView.cxx
   vtkSciVizStatistics.cxx
   vtkTransferFunctionEditorRepresentation1D.cxx
   vtkTransferFunctionEditorRepresentation.cxx
@@ -280,11 +314,10 @@ IF (PARAVIEW_USE_ICE_T)
   IF(VTK_USE_MPI)
     SET(Filters_SRCS
       ${Filters_SRCS}
-      vtkCaveRenderManager.cxx
+      #vtkCaveRenderManager.cxx
       vtkIceTCompositePass.cxx
       vtkIceTContext.cxx
-      vtkIceTRenderer.cxx
-      vtkIceTRenderManager.cxx
+      vtkIceTSynchronizedRenderers.cxx
       )
   ENDIF(VTK_USE_MPI)
 ENDIF (PARAVIEW_USE_ICE_T)
@@ -411,6 +444,8 @@ TARGET_LINK_LIBRARIES(vtkPVFilters
   vtkWidgetsCS
   vtkViews
   vtkViewsCS
+  vtkCharts
+  vtkChartsCS
   KWCommon
   vtksys
   ${OPENGL_gl_LIBRARY}
