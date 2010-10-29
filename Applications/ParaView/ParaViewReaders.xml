@@ -4,10 +4,6 @@
     list i.e. if two readers can read the same extension, then the reader 
     apperaring later will be tried first when reading the file. 
   -->
-  <Proxy group="sources" name="VisItEnzoReader" />
-  <Proxy group="sources" name="VisItMirandaReader" />
-  <Proxy group="sources" name="VisItPixieReader" />
-  <Proxy group="sources" name="VisItTetradReader" />
   <Proxy group="sources" name="LSDynaReader" />
   <Proxy group="sources" name="PVDReader" />
   <Proxy group="sources" name="XMLPolyDataReader"/>
@@ -69,8 +65,4 @@
   <Proxy group="sources" name="WindBladeReader" />
   <Proxy group="sources" name="NetCDFPOPReader" />
   <Proxy group="sources" name="MPASReader" />
-  <Proxy group="sources" name="VisItSAMRAIReader" />
-  <Proxy group="sources" name="VisItFluentReader" />
-  <Proxy group="sources" name="VisItSiloReader" />
-  <Proxy group="sources" name="VisItProteinDataBankReader" />
 </ParaViewReaders>

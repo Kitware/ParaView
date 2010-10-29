@@ -357,12 +357,6 @@ SET(resourceFiles
   ${CMAKE_CURRENT_SOURCE_DIR}/Resources/writers.xml
   ${PARAVIEW_EXTRA_SERVERMANAGER_RESOURCES}
   )
-IF(PARAVIEW_USE_VISITBRIDGE)
-  SET(resourceFiles
-    ${resourceFiles}
-    ${CMAKE_CURRENT_SOURCE_DIR}/Resources/visit_readers.xml
-    )
-ENDIF(PARAVIEW_USE_VISITBRIDGE)
 
 IF(PARAVIEW_ENABLE_PYTHON)
   OPTION(PARAVIEW_ENABLE_PYTHON_FILTERS "Enable Python calculator and programmable filters." ON)
@@ -374,10 +368,13 @@ IF(PARAVIEW_ENABLE_PYTHON)
   ENDIF(PARAVIEW_ENABLE_PYTHON_FILTERS)
 ENDIF(PARAVIEW_ENABLE_PYTHON)
 
+#needs to depend on vtkParaViewIncludeModulesToSMApplication so
+#we can regenerate when python filters or VisItBridge are toggled on/off
 ADD_CUSTOM_COMMAND(
   OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/vtkSMGeneratedModules.h
   DEPENDS ${resourceFiles}
   ${CMD_DEP}
+  "${CMAKE_CURRENT_BINARY_DIR}/vtkParaViewIncludeModulesToSMApplication.h"
   COMMAND ${CMD}
   ARGS ${CMAKE_CURRENT_BINARY_DIR}/vtkSMGeneratedModules.h
   vtkSMDefaultModules Interface GetInterfaces
