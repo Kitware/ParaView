@@ -42,6 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxy.h"
 #include "vtkTable.h"
+#include "vtkWeakPointer.h"
 
 #include <QColorDialog>
 #include <QHeaderView>

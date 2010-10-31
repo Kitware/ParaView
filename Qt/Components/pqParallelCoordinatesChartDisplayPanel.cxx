@@ -41,6 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSmartPointer.h"
 #include "vtkTable.h"
 #include "vtkChart.h"
+#include "vtkWeakPointer.h"
 
 #include <QColorDialog>
 #include <QHeaderView>
