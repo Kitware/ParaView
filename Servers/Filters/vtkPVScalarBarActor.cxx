@@ -322,6 +322,21 @@ int vtkPVScalarBarActor::CreateLabel(double value,
     sprintf(string, this->LabelFormat, value);
     }
 
+  // Extra filter: Used to remove unwanted 0 after e+ or e-
+  // i.e.: 1.23e+009 => 1.23e+9
+  vtkstd::string strToFilter = string;
+  vtkstd::string ePlus = "e+0";
+  vtkstd::string eMinus = "e-0";
+  size_t pos = 0;
+  while( (pos = strToFilter.find(ePlus)) != vtkstd::string::npos ||
+         (pos = strToFilter.find(eMinus)) != vtkstd::string::npos)
+    {
+    strToFilter.erase(pos + 2, 1);
+    }
+  strcpy(string, strToFilter.c_str());
+
+  // Set the txt label
+  //cout << "Value: " << value << " converted to " << string << endl;
   textMapper->SetInput(string);
 
   // Size the font to fit in the targetHeight, which we are using
