@@ -90,6 +90,7 @@ public:
     this->GroupIndex         = -1;
     this->VarIndex           = -1;
     this->TimeIndexComponent = -1;
+    this->TimeStepOffset      = 0;
 
     this->Range[0] = this->Range[1] = 0.0;
     // Extent = [minX, maxX, minY, maxY, minZ, maxZ, minTime, maxTime]
@@ -232,6 +233,7 @@ public:
   int TimeIndexComponent;
   double Range[2];
   ADIOS_DATATYPES Type;
+  int TimeStepOffset;
 };
 //*****************************************************************************
 class AdiosData
@@ -361,6 +363,7 @@ public:
 
     this->HasTimeInformationInVariableNames = false;
 
+    cout << "=> Before Adios_fopen" << endl;
 #ifdef _NOMPI
     //cout << "NO mpi for the adios reader" << endl;
     this->File = adios_fopen(this->FileName.c_str(), 0);
@@ -397,16 +400,18 @@ public:
       {
       if(adios_errno != err_end_of_file)
         {
-        cout << "The data is not ready yet." << endl;
+        cout << "The data is not ready yet. (" << adios_errmsg() << ")" << endl;
         }
       else
         {
         cout << "We reach the end of the timesteps." << endl;
         }
+      cout << "=> EXIT Adios_fopen" << endl;
       return false;
       }
 
 #endif
+    cout << "=> After Adios_fopen" << endl;
 
     if (this->File == NULL)
     {
@@ -414,6 +419,8 @@ public:
            << adios_errmsg() << endl;
       return false;  // Throw exception
     }
+
+    //cout << "===> Adios_fopen OK" << endl;
 
     // Load groups
     this->Groups = (ADIOS_GROUP **) malloc(this->File->groups_count * sizeof(ADIOS_GROUP *));
@@ -441,8 +448,11 @@ public:
     this->Scalars.clear();
     for (int groupIdx=0; groupIdx < this->File->groups_count; groupIdx++)
       {
-      //cout <<  "  group " << his->File->group_namelist[groupIdx] << ":" << endl;
+
+      //cout << "===> Before Adios_gopen " << groupIdx << endl;
       this->Groups[groupIdx] = adios_gopen_byid(this->File, groupIdx);
+      //cout << "===> After Adios_gopen " << groupIdx << endl;
+
       if (this->Groups[groupIdx] == NULL)
         {
         cout << "Error opening group " << this->File->group_namelist[groupIdx]
@@ -454,7 +464,11 @@ public:
       // Load variables metadata
       for (int varIdx=0; varIdx < this->Groups[groupIdx]->vars_count; varIdx++)
         {
+        //cout << "=====> Before adios_inq_var_byid " << varIdx << endl;
         ADIOS_VARINFO *varInfo = adios_inq_var_byid(this->Groups[groupIdx], varIdx);
+        //cout << "=====> After adios_inq_var_byid " << varIdx << endl;
+        //cout << "=====> Adios msg: " << adios_errmsg() << endl;
+
         if (varInfo == NULL)
           {
           cout << "Error opening inquiring variable "
@@ -470,14 +484,18 @@ public:
           if (varInfo->ndim == 0)
             {
             // Scalar
+            //cout <<  "=====> adios create scalar " << this->Groups[groupIdx]->var_namelist[varIdx] << endl;
             AdiosData scalar(this->Groups[groupIdx]->var_namelist[varIdx], varInfo);
             this->Scalars[scalar.Name] = scalar;
+            //cout <<  "=====> adios scalar ok" << endl;
             }
           else
             {
             // Variable
             // add variable to map, map id = variable path without the '/' in the beginning
+            //cout <<  "=====> adios create variable " << this->Groups[groupIdx]->var_namelist[varIdx] << endl;
             AdiosVariable variable(this->Groups[groupIdx]->var_namelist[varIdx], groupIdx, varInfo);
+            variable.TimeStepOffset = this->Groups[groupIdx]->timestep;
             this->Variables[variable.Name] = variable;
 
             // Find out real timestep values
@@ -498,7 +516,10 @@ public:
               << " dimension: " << varInfo->ndim
               << " type: " << adios_type_to_string(varInfo->type) << endl;
           }
-        adios_free_varinfo(varInfo);
+        //cout <<  "=====> adios before adios_free_varinfo" << endl;
+        //adios_free_varinfo(varInfo);
+        free(varInfo);
+        //cout <<  "=====> adios after adios_free_varinfo" << endl;
         }
 
       // Load attributes
@@ -522,7 +543,10 @@ public:
         }
 
       // Free group
+      //cout << "===> Before Adios_gclose " << groupIdx << endl;
       adios_gclose(this->Groups[groupIdx]);
+      //cout << "===> After Adios_gclose " << groupIdx << endl;
+
       this->Groups[groupIdx] = NULL;
       }
 
@@ -784,7 +808,7 @@ public:
         vtkDataArray *array = NULL;
         if(varIter->second.IsTimeDependent())
           {
-          uint64_t offset[4] = { timestep,
+          uint64_t offset[4] = { timestep + varIter->second.TimeStepOffset,
                                  this->CurrentPieceExtent[4],
                                  this->CurrentPieceExtent[2],
                                  this->CurrentPieceExtent[0] };
@@ -798,10 +822,12 @@ public:
           {
           uint64_t offset[4] = { this->CurrentPieceExtent[4],
                                  this->CurrentPieceExtent[2],
-                                 this->CurrentPieceExtent[0] };
+                                 this->CurrentPieceExtent[0],
+                                 0 };
           uint64_t count[4] = { rectilinearGrid->GetDimensions()[2]-1,
                                 rectilinearGrid->GetDimensions()[1]-1,
-                                rectilinearGrid->GetDimensions()[0]-1 };
+                                rectilinearGrid->GetDimensions()[0]-1,
+                                0 };
           array = this->ReadVariable(varIter->second, offset, count);
           }
         if(array)
@@ -875,7 +901,7 @@ public:
       {
       if(this->Variables[coordName[i].c_str()].IsTimeDependent())
         {
-        uint64_t offset[4] = { timestep,
+        uint64_t offset[4] = { timestep + this->Variables[coordName[i].c_str()].TimeStepOffset,
                                this->CurrentPieceExtent[4],
                                this->CurrentPieceExtent[2],
                                this->CurrentPieceExtent[0] };
@@ -977,7 +1003,7 @@ public:
         vtkDataArray *array = NULL;
         if(varIter->second.IsTimeDependent())
           {
-          uint64_t offset[4] = { timestep,
+          uint64_t offset[4] = { timestep + varIter->second.TimeStepOffset,
                                  this->CurrentPieceExtent[4],
                                  this->CurrentPieceExtent[2],
                                  this->CurrentPieceExtent[0] };
@@ -1462,11 +1488,6 @@ public:
 class AdiosGlobal
 {
 public:
-  static void SetAdiosApplicationID(int id)
-    {
-    //globals_adios_set_application_i
-    }
-
   static void SetReadMethodToBP()
     {
     adios_set_read_method(ADIOS_READ_METHOD_BP);
@@ -1478,6 +1499,7 @@ public:
 
   static void SetReadMethod(int methodEnum)
     {
+    cout << "==> AdiosGlobal::SetReadMethod " << methodEnum << endl;
     switch(methodEnum)
       {
       case 0:
@@ -1497,11 +1519,13 @@ public:
 
   static void SetApplicationId(int id)
     {
+    cout << "==> AdiosGlobal::SetApplicationId " << id << endl;
     globals_adios_set_application_id(id);
     }
 
   static void Initialize()
     {
+    cout << "==> AdiosGlobal::Initialize() " << endl;
 #ifdef _NOMPI
     // Nothing to do
 #else
@@ -1523,6 +1547,7 @@ public:
 
   static void Finalize()
     {
+    cout << "==> AdiosGlobal::Finalize() " << endl;
 #ifdef _NOMPI
     // Nothing to do
 #else
