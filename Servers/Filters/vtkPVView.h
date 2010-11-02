@@ -81,7 +81,8 @@ public:
   // otherwise we will have deadlocks.
   // We may make this API generic in future, for now this works.
   bool SynchronizeBounds(double bounds[6]);
-  bool SynchronizeSize(unsigned long &size);
+  bool SynchronizeSize(double &size);
+  bool SynchronizeSize(unsigned int &size);
 
   // Description:
   // Get/Set the time this view is showing. Whenever time is changed, this fires

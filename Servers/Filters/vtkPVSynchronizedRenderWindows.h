@@ -106,7 +106,8 @@ public:
   // otherwise we will have deadlocks.
   // We may make this API generic in future, for now this works.
   bool SynchronizeBounds(double bounds[6]);
-  bool SynchronizeSize(unsigned long &size);
+  bool SynchronizeSize(double &size);
+  bool SynchronizeSize(unsigned int &size);
   bool BroadcastToDataServer(vtkSelection* selection);
 
   // Description:
@@ -233,6 +234,8 @@ private:
   class vtkObserver;
   vtkObserver* Observer;
 
+  template <class T>
+  bool SynchronizeSizeTemplate(T &size);
 //ETX
 };
 

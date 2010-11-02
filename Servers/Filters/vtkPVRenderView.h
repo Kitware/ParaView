@@ -199,11 +199,11 @@ public:
 
   // Description:
   // This threshold is only applicable when in tile-display mode. It is the size
-  // of geometry in kilobytes beyond which the view should not deliver geometry
+  // of geometry in megabytes beyond which the view should not deliver geometry
   // to the client, but only outlines.
   // @CallOnAllProcessess
-  vtkSetMacro(ClientOutlineThreshold, unsigned long);
-  vtkGetMacro(ClientOutlineThreshold, unsigned long);
+  vtkSetMacro(ClientOutlineThreshold, double);
+  vtkGetMacro(ClientOutlineThreshold, double);
 
   // Description:
   // Resets the clipping range. One does not need to call this directly ever. It
@@ -442,11 +442,12 @@ protected:
   int InteractiveRenderImageReductionFactor;
   int InteractionMode;
 
-  unsigned long LocalGeometrySize;
-  unsigned long GeometrySize;
+  // In mega-bytes.
+  double LocalGeometrySize;
+  double GeometrySize;
   double RemoteRenderingThreshold;
   double LODRenderingThreshold;
-  unsigned long ClientOutlineThreshold;
+  double ClientOutlineThreshold;
   double LastComputedBounds[6];
   bool UseOffscreenRendering;
   bool UseOffscreenRenderingForScreenshots;
