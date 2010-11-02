@@ -10,8 +10,9 @@ if [ "x$InstallPrefix" = "x" ]; then
 fi
 
 ParaViewBinaryDir="@ParaView_BINARY_DIR@"
+ParaViewExeOutputDir="@EXECUTABLE_OUTPUT_PATH@"
 ParaViewExeName="@PV_EXE_NAME@"
-ParaView_App="@EXECUTABLE_OUTPUT_PATH@/$ParaViewExeName.app"
+ParaView_App="$ParaViewExeOutputDir/$ParaViewExeName.app"
 
 # Remove the previous app package so we start with a clean bundle
 #
@@ -60,8 +61,8 @@ mkdir -p "$SupportDir"
 #cp -p "${ParaViewBinaryDir}/pqClient.adp"  "$SupportDir/."
 
 # Copy the ".plugins" configuration file.
-echo "Copying $ParaViewBinaryDir/bin/.plugins to $SupportDir"
-cp -p "$ParaViewBinaryDir/bin/.plugins" "$SupportDir/"
+echo "Copying $ParaViewExeOutputDir/.plugins to $SupportDir"
+cp -p "$ParaViewExeOutputDir/.plugins" "$SupportDir/"
 
 # Copy the python scripts into the Python directory
 #
