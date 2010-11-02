@@ -312,7 +312,7 @@ void vtkSpreadSheetView::Update()
   this->SomethingUpdated = false;
   this->Superclass::Update();
 
-  unsigned long num_rows = 0;
+  unsigned int num_rows = 0;
 
   // From the active representation obtain the data/selection producers that
   // need to be streamed to the client.

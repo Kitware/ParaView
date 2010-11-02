@@ -1150,7 +1150,8 @@ bool vtkPVSynchronizedRenderWindows::GetTileDisplayParameters(int tile_dims[2])
 }
 
 //----------------------------------------------------------------------------
-bool vtkPVSynchronizedRenderWindows::SynchronizeSize(unsigned long& size)
+template <class T>
+bool vtkPVSynchronizedRenderWindows::SynchronizeSizeTemplate(T& size)
 {
   // handle trivial case.
   if (this->Mode == BUILTIN || this->Mode == INVALID)
@@ -1173,7 +1174,7 @@ bool vtkPVSynchronizedRenderWindows::SynchronizeSize(unsigned long& size)
   // render-server and data-server.
   if (parallelController)
     {
-    unsigned long result = size;
+    T result = size;
     parallelController->Reduce(&size, &result, 1, vtkCommunicator::SUM_OP, 0);
     size = result;
     }
@@ -1186,13 +1187,13 @@ bool vtkPVSynchronizedRenderWindows::SynchronizeSize(unsigned long& size)
       {
       if (c_ds_controller)
         {
-        unsigned long other_size;
+        T other_size;
         c_ds_controller->Receive(&other_size, 1, 1, 41232);
         size += other_size;
         }
       if (c_rs_controller)
         {
-        unsigned long other_size;
+        T other_size;
         c_rs_controller->Receive(&other_size, 1, 1, 41232);
         size += other_size;
         }
@@ -1233,6 +1234,18 @@ bool vtkPVSynchronizedRenderWindows::SynchronizeSize(unsigned long& size)
     parallelController->Broadcast(&size, 1, 0);
     }
   return true;
+}
+
+//----------------------------------------------------------------------------
+bool vtkPVSynchronizedRenderWindows::SynchronizeSize(double& size)
+{
+  return this->SynchronizeSizeTemplate<double>(size);
+}
+
+//----------------------------------------------------------------------------
+bool vtkPVSynchronizedRenderWindows::SynchronizeSize(unsigned int& size)
+{
+  return this->SynchronizeSizeTemplate<unsigned int>(size);
 }
 
 //----------------------------------------------------------------------------

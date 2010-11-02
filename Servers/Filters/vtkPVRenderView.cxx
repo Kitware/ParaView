@@ -81,7 +81,7 @@ vtkPVRenderView::vtkPVRenderView()
   this->GeometrySize = 0;
   this->RemoteRenderingThreshold = 0;
   this->LODRenderingThreshold = 0;
-  this->ClientOutlineThreshold = 100;
+  this->ClientOutlineThreshold = 5;
   this->LODResolution = 0.5;
   this->UseLightKit = false;
   this->Interactor = 0;
@@ -722,7 +722,7 @@ void vtkPVRenderView::GatherRepresentationInformation()
       }
     if (info->Has(GEOMETRY_SIZE()))
       {
-      this->LocalGeometrySize += info->Get(GEOMETRY_SIZE());
+      this->LocalGeometrySize += (info->Get(GEOMETRY_SIZE())/1024.0);
       }
     }
 
@@ -771,14 +771,14 @@ bool vtkPVRenderView::GetUseDistributedRendering()
     return true;
     }
 
-  return (this->RemoteRenderingThreshold*1024) <= this->GeometrySize;
+  return this->RemoteRenderingThreshold <= this->GeometrySize;
 }
 
 //----------------------------------------------------------------------------
 bool vtkPVRenderView::GetUseLODRendering()
 {
   // return false;
-  return (this->LODRenderingThreshold*1024) <= this->GeometrySize;
+  return this->LODRenderingThreshold <= this->GeometrySize;
 }
 
 //----------------------------------------------------------------------------
