@@ -32,6 +32,18 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
+  // Returns a ServerFlags indicate the nature of the current processes. e.g. if
+  // the current processes acts as a data-server and a render-server, it returns
+  // DATA_SERVER | RENDER_SERVER.
+  // Overridden to return CLIENT since this process only acts as the client.
+  virtual ServerFlags GetProcessRoles();
+
+  // Description:
+  // Returns the controller used to communicate with the process. Value must be
+  // DATA_SERVER_ROOT or RENDER_SERVER_ROOT or CLIENT.
+  virtual vtkMultiProcessController* GetController(ServerFlags processType);
+
+  // Description:
   // Connects a remote server. URL can be of the following format:
   // cs://<pvserver-host>:<pvserver-port>
   // cdsrs://<pvdataserver-host>:<pvdataserver-port>/<pvrenderserver-host>:<pvrenderserver-port>

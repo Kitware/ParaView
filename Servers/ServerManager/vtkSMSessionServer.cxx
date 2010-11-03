@@ -67,6 +67,39 @@ vtkSMSessionServer::~vtkSMSessionServer()
 }
 
 //----------------------------------------------------------------------------
+vtkSMSessionServer::ServerFlags vtkSMSessionServer::GetProcessRoles()
+{
+  switch (vtkProcessModule2::GetProcessType())
+    {
+  case vtkProcessModule2::PROCESS_SERVER:
+    return SERVERS;
+
+  case vtkProcessModule2::PROCESS_DATA_SERVER:
+    return DATA_SERVER;
+
+  case vtkProcessModule2::PROCESS_RENDER_SERVER:
+    return RENDER_SERVER;
+
+  default:
+    return NONE;
+    }
+}
+
+//----------------------------------------------------------------------------
+vtkMultiProcessController* vtkSMSessionServer::GetController(ServerFlags processType)
+{
+  switch (processType)
+    {
+  case CLIENT:
+    return this->ClientController;
+
+  default:
+    vtkWarningMacro("Invalid processtype of GetController(): " << processType);
+    }
+  return NULL;
+}
+
+//----------------------------------------------------------------------------
 void vtkSMSessionServer::SetClientController(
   vtkMultiProcessController* controller)
 {

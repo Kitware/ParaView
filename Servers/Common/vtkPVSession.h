@@ -33,6 +33,7 @@ public:
 
   enum ServerFlags
     {
+    NONE = 0,
     DATA_SERVER = 0x01,
     DATA_SERVER_ROOT = 0x02,
     RENDER_SERVER = 0x04,

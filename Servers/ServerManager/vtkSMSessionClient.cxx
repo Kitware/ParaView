@@ -466,7 +466,7 @@ void vtkSMSessionClient::Invoke(vtkSMMessage* message)
 
   if ( (message->location() & vtkProcessModule2::CLIENT) != 0)
     {
-    this->Superclass::PushState(message);
+    this->Superclass::Invoke(message);
     }
 }
 
