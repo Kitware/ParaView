@@ -117,6 +117,17 @@ bool vtkPMProperty::ProcessMessage(vtkClientServerStream& stream)
 }
 
 //----------------------------------------------------------------------------
+vtkObjectBase* vtkPMProperty::GetVTKObject()
+{
+  if (this->ProxyHelper)
+    {
+    return this->ProxyHelper->GetInterpreter()->GetObjectFromID(
+        this->ProxyHelper->GetVTKObjectID());
+    }
+  return NULL;
+}
+
+//----------------------------------------------------------------------------
 const vtkClientServerStream& vtkPMProperty::GetLastResult()
 {
   if (this->ProxyHelper)

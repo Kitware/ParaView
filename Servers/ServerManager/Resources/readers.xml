@@ -832,9 +832,9 @@
 
      <StringVectorProperty 
         name="PointArrayInfo"
-        information_only="1">
-        <ArraySelectionInformationHelper attribute_name="Point"/>
-     </StringVectorProperty>
+        information_only="1"
+        kernel_class="vtkPMArraySelectionProperty"
+        command="Point" />
 
      <StringVectorProperty
         name="PointArrayStatus"
@@ -1117,9 +1117,7 @@
      <StringVectorProperty 
         name="FilePrefixInfo"
         command="GetFilePrefix"
-        information_only="1">
-        <SimpleStringInformationHelper/>
-     </StringVectorProperty>
+        information_only="1"/>
 
      <StringVectorProperty
         name="FilePrefix"
@@ -1140,9 +1138,7 @@
      <StringVectorProperty 
         name="FilePatternInfo"
         command="GetFilePattern"
-        information_only="1">
-        <SimpleStringInformationHelper/>
-     </StringVectorProperty>
+        information_only="1"/>
 
      <StringVectorProperty
         name="FilePattern"
@@ -1163,9 +1159,7 @@
      <IntVectorProperty 
         name="FileRangeInfo"
         command="GetFileRange"
-        information_only="1">
-        <SimpleIntInformationHelper/>
-     </IntVectorProperty>
+        information_only="1"/>
 
      <IntVectorProperty 
         name="FileRange"
@@ -1187,9 +1181,7 @@
      <StringVectorProperty 
         name="XMLFileNameInfo"
         command="GetXMLFileName"
-        information_only="1">
-        <SimpleStringInformationHelper/>
-     </StringVectorProperty>
+        information_only="1"/>
 
      <StringVectorProperty
         name="XMLFileName"
@@ -1246,12 +1238,11 @@
      <DoubleVectorProperty 
          name="TimestepValues" 
          repeatable="1"
-         information_only="1">
-       <TimeStepsInformationHelper/>
-     </DoubleVectorProperty>
-     <DoubleVectorProperty name="TimeRange" information_only="1">
-       <TimeRangeInformationHelper/>
-     </DoubleVectorProperty>
+         information_only="1"
+         kernel_class="vtkPMTimeStepsProperty" />
+
+     <DoubleVectorProperty name="TimeRange" information_only="1"
+                           kernel_class="vtkPMTimeRangeProperty" />
 
      <IntVectorProperty name="ModeShape"
                         command="SetModeShape"
@@ -1278,9 +1269,9 @@
      
      <StringVectorProperty 
         name="EdgeBlocksInfo"
-        information_only="1">
-        <ArraySelectionInformationHelper attribute_name="EdgeBlock"/>
-     </StringVectorProperty>
+        information_only="1"
+        kernel_class="vtkPMArraySelectionProperty"
+        command="EdgeBlock" />
      
      <StringVectorProperty
         name="EdgeBlocks"
@@ -1299,9 +1290,9 @@
      
      <StringVectorProperty 
         name="FaceBlocksInfo"
-        information_only="1">
-        <ArraySelectionInformationHelper attribute_name="FaceBlock"/>
-     </StringVectorProperty>
+        information_only="1"
+        kernel_class="vtkPMArraySelectionProperty"
+        command="FaceBlock" />
      
      <StringVectorProperty
         name="FaceBlocks"
@@ -1321,7 +1312,6 @@
      <IntVectorProperty name="SILUpdateStamp"
         command="GetSILUpdateStamp"
         information_only="1">
-        <SimpleIntInformationHelper />
         <Documentation>
           Information property indicating the update stamp of the SIL. Every
           time the SIL is rebuild, this time stamp is changed.
@@ -1330,13 +1320,9 @@
 
      <StringVectorProperty 
         name="ElementBlocksInfo"
-        information_only="1">
-        <ArraySelectionInformationHelper attribute_name="GlobalResult"/>
-        <SILInformationHelper
-          timestamp_command="GetSILUpdateStamp"
-          subtree="Blocks">
-        </SILInformationHelper>
-     </StringVectorProperty>
+        information_only="1"
+        kernel_class="vtkPMSILProperty"
+        subtree="Blocks"/>
      
      <StringVectorProperty
         name="ElementBlocks"
@@ -1344,18 +1330,20 @@
         repeat_command="1"
         number_of_elements_per_command="2"
         element_types="2 0" >
-       <SILDomain name="array_list" subtree="Blocks">
+<!--
+        <SILDomain name="array_list" subtree="Blocks">
           <RequiredProperties>
              <Property name="ElementBlocksInfo" function="ArrayList" />
           </RequiredProperties>
        </SILDomain>
+-->
      </StringVectorProperty>
 
      <StringVectorProperty 
         name="GlobalVariablesInfo"
-        information_only="1">
-        <ArraySelectionInformationHelper attribute_name="GlobalResult"/>
-     </StringVectorProperty>
+        information_only="1"
+        kernel_class="vtkPMArraySelectionProperty"
+        command="GlobalResult" />
 
      <StringVectorProperty
         name="GlobalVariables"
@@ -1373,9 +1361,9 @@
      
      <StringVectorProperty 
         name="PointVariablesInfo"
-        information_only="1">
-        <ArraySelectionInformationHelper attribute_name="PointResult"/>
-     </StringVectorProperty>
+        information_only="1"
+        kernel_class="vtkPMArraySelectionProperty"
+        command="PointResult" />
 
      <StringVectorProperty
         name="PointVariables"
@@ -1394,9 +1382,9 @@
      
      <StringVectorProperty 
         name="EdgeVariablesInfo"
-        information_only="1">
-        <ArraySelectionInformationHelper attribute_name="EdgeResult"/>
-     </StringVectorProperty>
+        information_only="1"
+        kernel_class="vtkPMArraySelectionProperty"
+        command="EdgeResult" />
 
      <StringVectorProperty
         name="EdgeVariables"
@@ -1415,9 +1403,9 @@
      
      <StringVectorProperty 
         name="FaceVariablesInfo"
-        information_only="1">
-        <ArraySelectionInformationHelper attribute_name="FaceResult"/>
-     </StringVectorProperty>
+        information_only="1"
+        kernel_class="vtkPMArraySelectionProperty"
+        command="FaceResult" />
 
      <StringVectorProperty
         name="FaceVariables"
@@ -1436,9 +1424,9 @@
      
      <StringVectorProperty 
         name="ElementVariablesInfo"
-        information_only="1">
-        <ArraySelectionInformationHelper attribute_name="ElementResult"/>
-     </StringVectorProperty>
+        information_only="1"
+        kernel_class="vtkPMArraySelectionProperty"
+        command="ElementResult" />
 
      <StringVectorProperty
         name="ElementVariables"
@@ -1457,9 +1445,9 @@
       
      <StringVectorProperty 
         name="NodeMapInfo"
-        information_only="1">
-        <ArraySelectionInformationHelper attribute_name="NodeMap"/>
-     </StringVectorProperty>
+        information_only="1"
+        kernel_class="vtkPMArraySelectionProperty"
+        command="NodeMap" />
 
      <StringVectorProperty
         name="NodeMapArrayStatus"
@@ -1478,9 +1466,9 @@
 
       <StringVectorProperty 
         name="EdgeMapInfo"
-        information_only="1">
-        <ArraySelectionInformationHelper attribute_name="EdgeMap"/>
-     </StringVectorProperty>
+        information_only="1"
+        kernel_class="vtkPMArraySelectionProperty"
+        command="EdgeMap" />
 
      <StringVectorProperty
         name="EdgeMapArrayStatus"
@@ -1499,9 +1487,9 @@
 
       <StringVectorProperty 
         name="FaceMapInfo"
-        information_only="1">
-        <ArraySelectionInformationHelper attribute_name="FaceMap"/>
-     </StringVectorProperty>
+        information_only="1"
+        kernel_class="vtkPMArraySelectionProperty"
+        command="FaceMap" />
 
      <StringVectorProperty
         name="FaceMapArrayStatus"
@@ -1520,9 +1508,9 @@
 
       <StringVectorProperty 
         name="ElementMapInfo"
-        information_only="1">
-        <ArraySelectionInformationHelper attribute_name="ElementMap"/>
-     </StringVectorProperty>
+        information_only="1"
+        kernel_class="vtkPMArraySelectionProperty"
+        command="ElementMap" />
 
      <StringVectorProperty
         name="ElementMapArrayStatus"
@@ -1541,9 +1529,9 @@
       
      <StringVectorProperty 
         name="NodeSetInfo"
-        information_only="1">
-        <ArraySelectionInformationHelper attribute_name="NodeSet"/>
-     </StringVectorProperty>
+        information_only="1"
+        kernel_class="vtkPMArraySelectionProperty"
+        command="NodeSet" />
 
      <StringVectorProperty
         name="NodeSetArrayStatus"
@@ -1562,9 +1550,9 @@
      
      <StringVectorProperty 
         name="SideSetInfo"
-        information_only="1">
-        <ArraySelectionInformationHelper attribute_name="SideSet"/>
-     </StringVectorProperty>
+        information_only="1"
+        kernel_class="vtkPMArraySelectionProperty"
+        command="SideSet" />
 
      <StringVectorProperty
         name="SideSetArrayStatus"
@@ -1583,9 +1571,9 @@
      
      <StringVectorProperty 
         name="FaceSetInfo"
-        information_only="1">
-        <ArraySelectionInformationHelper attribute_name="FaceSet"/>
-     </StringVectorProperty>
+        information_only="1"
+        kernel_class="vtkPMArraySelectionProperty"
+        command="FaceSet" />
 
      <StringVectorProperty
         name="FaceSetArrayStatus"
@@ -1604,9 +1592,9 @@
      
      <StringVectorProperty 
         name="EdgeSetInfo"
-        information_only="1">
-        <ArraySelectionInformationHelper attribute_name="EdgeSet"/>
-     </StringVectorProperty>
+        information_only="1"
+        kernel_class="vtkPMArraySelectionProperty"
+        command="EdgeSet" />
 
      <StringVectorProperty
         name="EdgeSetArrayStatus"
@@ -1625,9 +1613,9 @@
      
      <StringVectorProperty 
         name="ElementSetInfo"
-        information_only="1">
-        <ArraySelectionInformationHelper attribute_name="ElementSet"/>
-     </StringVectorProperty>
+        information_only="1"
+        kernel_class="vtkPMArraySelectionProperty"
+        command="ElementSet" />
 
      <StringVectorProperty
         name="ElementSetArrayStatus"
@@ -1646,9 +1634,9 @@
 
      <StringVectorProperty 
         name="ElementSetResultArrayInfo"
-        information_only="1">
-        <ArraySelectionInformationHelper attribute_name="ElementSetResult"/>
-     </StringVectorProperty>
+        information_only="1"
+        kernel_class="vtkPMArraySelectionProperty"
+        command="ElementSetResult" />
 
      <StringVectorProperty
         name="ElementSetResultArrayStatus"
@@ -1667,9 +1655,9 @@
      
      <StringVectorProperty 
         name="SideSetResultArrayInfo"
-        information_only="1">
-        <ArraySelectionInformationHelper attribute_name="SideSetResult"/>
-     </StringVectorProperty>
+        information_only="1"
+        kernel_class="vtkPMArraySelectionProperty"
+        command="SideSetResult" />
 
      <StringVectorProperty
         name="SideSetResultArrayStatus"
@@ -1688,9 +1676,9 @@
      
      <StringVectorProperty 
         name="FaceSetResultArrayInfo"
-        information_only="1">
-        <ArraySelectionInformationHelper attribute_name="FaceSetResult"/>
-     </StringVectorProperty>
+        information_only="1"
+        kernel_class="vtkPMArraySelectionProperty"
+        command="FaceSetResult" />
 
      <StringVectorProperty
         name="FaceSetResultArrayStatus"
@@ -1709,9 +1697,9 @@
      
      <StringVectorProperty 
         name="EdgeSetResultArrayInfo"
-        information_only="1">
-        <ArraySelectionInformationHelper attribute_name="EdgeSetResult"/>
-     </StringVectorProperty>
+        information_only="1"
+        kernel_class="vtkPMArraySelectionProperty"
+        command="EdgeSetResult" />
 
      <StringVectorProperty
         name="EdgeSetResultArrayStatus"
@@ -1730,9 +1718,9 @@
      
      <StringVectorProperty 
         name="NodeSetResultArrayInfo"
-        information_only="1">
-        <ArraySelectionInformationHelper attribute_name="NodeSetResult"/>
-     </StringVectorProperty>
+        information_only="1"
+        kernel_class="vtkPMArraySelectionProperty"
+        command="NodeSetResult" />
 
      <StringVectorProperty
         name="NodeSetResultArrayStatus"

@@ -20,6 +20,9 @@ ENDIF(NOT WIN32)
 
 SET (Kit_SRCS
   vtkInitializationHelper.cxx
+# --- PM Objects ---
+  vtkPMArraySelectionProperty.cxx
+  vtkPMDataArrayProperty.cxx
   vtkPMDoubleVectorProperty.cxx
   vtkPMIdTypeVectorProperty.cxx
   vtkPMInputProperty.cxx
@@ -28,12 +31,17 @@ SET (Kit_SRCS
   vtkPMProperty.cxx
   vtkPMProxy.cxx
   vtkPMProxyProperty.cxx
+  vtkPMSILProperty.cxx
   vtkPMSourceProxy.cxx
   vtkPMStringVectorProperty.cxx
+  vtkPMTimeRangeProperty.cxx
+  vtkPMTimeStepsProperty.cxx
   vtkPMVectorProperty.cxx
   vtkPMWriterProxy.cxx
+# --- SM Objects ---
   vtkSMCameraLink.cxx
   vtkSMCameraProxy.cxx
+  vtkSMDeserializer.cxx
   vtkSMCompoundSourceProxy.cxx
   vtkSMCompoundSourceProxyDefinitionBuilder.cxx
   vtkSMDeserializer.cxx
@@ -111,7 +119,7 @@ SET (Domain_SRCS
   vtkSMNumberOfGroupsDomain.cxx
   vtkSMProxyGroupDomain.cxx
   vtkSMProxyListDomain.cxx
-#  vtkSMSILDomain.cxx
+  #vtkSMSILDomain.cxx
   vtkSMStringListDomain.cxx
   vtkSMStringListRangeDomain.cxx
 )
@@ -206,8 +214,8 @@ SET(Kit_SRCS
   vtkSMServerFileListingProxy.cxx
   vtkSMServerProxyManagerReviver.cxx
   vtkSMServerSideAnimationPlayer.cxx
-  vtkSMSILInformationHelper.cxx
   vtkSMSILModel.cxx
+  vtkSMSILInformationHelper.cxx
   vtkSMSimpleDoubleInformationHelper.cxx
   vtkSMSimpleIdTypeInformationHelper.cxx
   vtkSMSimpleIntInformationHelper.cxx

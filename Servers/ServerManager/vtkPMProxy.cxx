@@ -361,9 +361,9 @@ bool vtkPMProxy::ReadXMLProperty(vtkPVXMLElement* propElement)
 
   vtkSmartPointer<vtkObject> object;
   vtkstd::string classname;
-  if (propElement->GetAttribute("helper"))
+  if (propElement->GetAttribute("kernel_class"))
     {
-    classname = propElement->GetAttribute("helper");
+    classname = propElement->GetAttribute("kernel_class");
     }
   else
     {

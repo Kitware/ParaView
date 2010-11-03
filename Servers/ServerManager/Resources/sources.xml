@@ -1883,8 +1883,7 @@ OS is the output scalar; M represents the maximum value; G represents the Gaussi
       <DoubleVectorProperty 
           name="TimestepValues"
           repeatable="1"
-          information_only="1">
-        <TimeStepsInformationHelper/>
+          information_only="1" kernel_class="vtkPMTimeStepsProperty">
       </DoubleVectorProperty>
 
      <!-- End of TimeSource -->

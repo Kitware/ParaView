@@ -96,6 +96,7 @@ protected:
   // Interprets the message.
   bool ProcessMessage(vtkClientServerStream& stream);
   const vtkClientServerStream& GetLastResult();
+  vtkObjectBase* GetVTKObject();
 
   vtkSetStringMacro(Command);
   vtkSetStringMacro(XMLName);
