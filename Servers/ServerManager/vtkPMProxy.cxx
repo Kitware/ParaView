@@ -213,7 +213,7 @@ bool vtkPMProxy::CreateVTKObjects(vtkSMMessage* message)
     }
 
   vtkSMProxyDefinitionManager* pdm = this->GetProxyDefinitionManager();
-  vtkPVXMLElement* element = pdm->GetProxyDefinition(
+  vtkPVXMLElement* element = pdm->GetCollapsedProxyDefinition(
     message->GetExtension(ProxyState::xml_group).c_str(),
     message->GetExtension(ProxyState::xml_name).c_str());
   if (!element)

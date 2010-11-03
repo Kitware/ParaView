@@ -359,7 +359,7 @@ vtkPVXMLElement* vtkSMProxyManager::GetProxyElement(const char* groupName,
                                                     const char* proxyName)
 {
   assert(this->ProxyDefinitionManager != 0);
-  return this->ProxyDefinitionManager->GetProxyDefinition(
+  return this->ProxyDefinitionManager->GetCollapsedProxyDefinition(
     groupName, proxyName, true);
 }
 
