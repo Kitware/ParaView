@@ -38,6 +38,18 @@ protected:
   vtkSession();
   ~vtkSession();
 
+  // Description:
+  // Subclasses must call this to mark the session active. This sets the active
+  // session pointer held by the vtkProcessModule, making it easier for filters
+  // etc. that need information about the active session to access it.
+  virtual void Activate();
+
+  // Description:
+  // Subclasses must call this to mark the session inactive. This sets the active
+  // session pointer held by the vtkProcessModule, making it easier for filters
+  // etc. that need information about the active session to access it.
+  virtual void DeActivate();
+
 private:
   vtkSession(const vtkSession&); // Not implemented
   void operator=(const vtkSession&); // Not implemented

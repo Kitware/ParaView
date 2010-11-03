@@ -12,35 +12,34 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#include "vtkSession.h"
+#include "vtkPVSession.h"
 
 #include "vtkObjectFactory.h"
-#include "vtkProcessModule2.h"
 
 //----------------------------------------------------------------------------
-vtkSession::vtkSession()
+vtkPVSession::vtkPVSession()
 {
 }
 
 //----------------------------------------------------------------------------
-vtkSession::~vtkSession()
+vtkPVSession::~vtkPVSession()
 {
 }
 
 //----------------------------------------------------------------------------
-void vtkSession::Activate()
+vtkPVSession::ServerFlags vtkPVSession::GetProcessRoles()
 {
-  vtkProcessModule2::GetProcessModule()->PushActiveSession(this);
+  return CLIENT_AND_SERVERS;
 }
 
 //----------------------------------------------------------------------------
-void vtkSession::DeActivate()
+vtkMultiProcessController* vtkPVSession::GetController(vtkPVSession::ServerFlags)
 {
-  vtkProcessModule2::GetProcessModule()->PopActiveSession(this);
+  return NULL;
 }
 
 //----------------------------------------------------------------------------
-void vtkSession::PrintSelf(ostream& os, vtkIndent indent)
+void vtkPVSession::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 }

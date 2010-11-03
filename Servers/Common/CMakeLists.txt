@@ -36,6 +36,7 @@ SET(Kit_SRCS
   vtkProcessModule2.cxx
   vtkSession.cxx
   vtkSessionIterator.cxx
+  vtkPVSession.cxx
 
 # OLD CLASSES
 
@@ -127,6 +128,7 @@ ENDIF (VTK_USE_MPI)
 SET_SOURCE_FILES_PROPERTIES(
   vtkNetworkAccessManager.cxx
   vtkSession.cxx
+  vtkPVSession.cxx
 
   vtkCellIntegrator.cxx
   vtkProcessModuleConnection

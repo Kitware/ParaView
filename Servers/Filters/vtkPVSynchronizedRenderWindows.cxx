@@ -18,9 +18,10 @@
 #include "vtkCommand.h"
 #include "vtkMultiProcessStream.h"
 #include "vtkObjectFactory.h"
-#include "vtkProcessModule.h"
+#include "vtkProcessModule2.h"
 #include "vtkPVOptions.h"
 #include "vtkPVServerInformation.h"
+#include "vtkPVSession.h"
 #include "vtkRemoteConnection.h"
 #include "vtkRendererCollection.h"
 #include "vtkRenderer.h"
@@ -268,7 +269,7 @@ vtkPVSynchronizedRenderWindows::vtkPVSynchronizedRenderWindows()
   this->RenderEventPropagation = true;
   this->RenderOneViewAtATime = false;
 
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  vtkProcessModule2* pm = vtkProcessModule2::GetProcessModule();
   if (!pm)
     {
     vtkErrorMacro(
@@ -277,43 +278,32 @@ vtkPVSynchronizedRenderWindows::vtkPVSynchronizedRenderWindows()
     abort();
     }
 
-  if (pm->GetOptions()->GetProcessType() == vtkPVOptions::PVBATCH)
+  vtkPVSession* activeSession = vtkPVSession::SafeDownCast(pm->GetActiveSession());
+  int processtype = pm->GetProcessType();
+  switch (processtype)
     {
+  case vtkProcessModule2::PROCESS_BATCH:
+  case vtkProcessModule2::PROCESS_SYMMETRIC_BATCH:
     this->Mode = BATCH;
     this->RenderOneViewAtATime = true;
-    }
-  else if (pm->GetActiveRemoteConnection() == NULL)
-    {
-    this->Mode = BUILTIN;
-    if (pm->GetNumberOfLocalPartitions() > 1)
-      {
-      this->Mode = BATCH;
-      }
-    // It's possible that is this is a satellite node on render-server or
-    // data-server.
-    switch (pm->GetOptions()->GetProcessType())
-      {
-    case vtkPVOptions::PVDATA_SERVER:
-      this->Mode = DATA_SERVER;
-      break;
+    break;
 
-    case vtkPVOptions::PVRENDER_SERVER:
-    case vtkPVOptions::PVSERVER:
-      this->Mode = RENDER_SERVER;
-      break;
-      }
-    }
-  else if (pm->GetActiveRemoteConnection()->IsA("vtkClientConnection"))
-    {
+  case vtkProcessModule2::PROCESS_RENDER_SERVER:
+  case vtkProcessModule2::PROCESS_SERVER:
     this->Mode = RENDER_SERVER;
-    if (pm->GetOptions()->GetProcessType() == vtkPVOptions::PVDATA_SERVER)
+    break;
+
+  case vtkProcessModule2::PROCESS_DATA_SERVER:
+    this->Mode = DATA_SERVER;
+    break;
+
+  case vtkProcessModule2::PROCESS_CLIENT:
+    this->Mode = BUILTIN;
+    if (activeSession->IsA("vtkSMSessionClient"))
       {
-      this->Mode = DATA_SERVER;
+      this->Mode = CLIENT;
       }
-    }
-  else if (pm->GetActiveRemoteConnection()->IsA("vtkServerConnection"))
-    {
-    this->Mode = CLIENT;
+    break;
     }
 
   // Setup the controllers for the communication.
@@ -324,12 +314,13 @@ vtkPVSynchronizedRenderWindows::vtkPVSynchronizedRenderWindows()
     break;
 
   case DATA_SERVER:
-    this->SetClientDataServerController(pm->GetActiveSocketController());
+    this->SetClientDataServerController(
+      activeSession->GetController(vtkPVSession::CLIENT));
     break;
 
   case BATCH:
     this->SetParallelController(vtkMultiProcessController::GetGlobalController());
-    if (pm->GetOptions()->GetSymmetricMPIMode())
+    if (processtype == vtkProcessModule2::PROCESS_SYMMETRIC_BATCH)
       {
       this->RenderEventPropagation = false;
       }
@@ -338,12 +329,15 @@ vtkPVSynchronizedRenderWindows::vtkPVSynchronizedRenderWindows()
   case RENDER_SERVER:
     this->SetParallelController(vtkMultiProcessController::GetGlobalController());
     // this will be NULL on satellites.
-    this->SetClientServerController(pm->GetActiveRenderServerSocketController());
+    this->SetClientServerController(
+      activeSession->GetController(vtkPVSession::CLIENT));
     break;
 
   case CLIENT:
-    this->SetClientServerController(pm->GetActiveRenderServerSocketController());
-    this->SetClientDataServerController(pm->GetActiveSocketController());
+    this->SetClientServerController(
+      activeSession->GetController(vtkPVSession::RENDER_SERVER_ROOT));
+    this->SetClientDataServerController(
+      activeSession->GetController(vtkPVSession::DATA_SERVER_ROOT));
     if (this->ClientDataServerController == this->ClientServerController)
       {
       this->SetClientDataServerController(0);
@@ -993,8 +987,10 @@ void vtkPVSynchronizedRenderWindows::UpdateWindowLayout()
       // If we are in tile-display mode, we should update the tile-scale
       // and tile-viewport for the render window. That is required for the camera
       // as well as for the annotations to show correctly.
-      vtkPVServerInformation* server_info =
+      vtkPVServerInformation* server_info = NULL;
+#ifdef FIXME
         vtkProcessModule::GetProcessModule()->GetServerInformation(0);
+#endif
       int tile_dims[2];
       bool in_tile_display_mode = this->GetTileDisplayParameters(tile_dims); 
       if (in_tile_display_mode)
@@ -1139,6 +1135,7 @@ void vtkPVSynchronizedRenderWindows::ShinkGaps()
 //----------------------------------------------------------------------------
 bool vtkPVSynchronizedRenderWindows::GetTileDisplayParameters(int tile_dims[2])
 {
+#ifdef FIXME
   vtkPVServerInformation* server_info =
     vtkProcessModule::GetProcessModule()->GetServerInformation(0);
   tile_dims[0] = server_info->GetTileDimensions()[0];
@@ -1147,6 +1144,8 @@ bool vtkPVSynchronizedRenderWindows::GetTileDisplayParameters(int tile_dims[2])
   tile_dims[0] = (tile_dims[0] == 0)? 1 : tile_dims[0];
   tile_dims[1] = (tile_dims[1] == 0)? 1 : tile_dims[1];
   return in_tile_display_mode;
+#endif
+  return false;
 }
 
 //----------------------------------------------------------------------------
@@ -1343,8 +1342,8 @@ bool vtkPVSynchronizedRenderWindows::BroadcastToDataServer(vtkSelection* selecti
     return true;
     }
 
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  if (pm->GetOptions()->GetProcessType() == vtkPVOptions::PVRENDER_SERVER)
+  vtkProcessModule2* pm = vtkProcessModule2::GetProcessModule();
+  if (pm->GetProcessType() == vtkProcessModule2::PROCESS_RENDER_SERVER)
     {
     return false;
     }

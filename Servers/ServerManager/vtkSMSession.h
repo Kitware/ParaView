@@ -19,22 +19,22 @@
 #ifndef __vtkSMSession_h
 #define __vtkSMSession_h
 
-#include "vtkSession.h"
+#include "vtkPVSession.h"
 #include "vtkSMMessage.h"
-#include "vtkSMUndoStackBuilder.h"
 
-class vtkSMProxyManager;
-class vtkSMSessionCore;
-class vtkPVInformation;
-class vtkPMObject;
-class vtkSMRemoteObject;
 class vtkCollection;
+class vtkPMObject;
+class vtkPVInformation;
+class vtkSMProxyManager;
+class vtkSMRemoteObject;
+class vtkSMSessionCore;
+class vtkSMUndoStackBuilder;
 
-class VTK_EXPORT vtkSMSession : public vtkSession
+class VTK_EXPORT vtkSMSession : public vtkPVSession
 {
 public:
   static vtkSMSession* New();
-  vtkTypeMacro(vtkSMSession, vtkSession);
+  vtkTypeMacro(vtkSMSession, vtkPVSession);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
@@ -42,7 +42,7 @@ public:
 
   // Description:
   // Allow the user to bind an UndoStackBuilder with the given session
-  vtkSetObjectMacro(UndoStackBuilder, vtkSMUndoStackBuilder);
+  virtual void SetUndoStackBuilder(vtkSMUndoStackBuilder*);
   vtkGetObjectMacro(UndoStackBuilder, vtkSMUndoStackBuilder);
 
 

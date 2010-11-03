@@ -62,6 +62,30 @@ vtkSMSessionClient::~vtkSMSessionClient()
 }
 
 //----------------------------------------------------------------------------
+vtkMultiProcessController* vtkSMSessionClient::GetController(ServerFlags processType)
+{
+  switch (processType)
+    {
+  case CLIENT:
+    return NULL;
+
+  case DATA_SERVER:
+  case DATA_SERVER_ROOT:
+    return this->DataServerController;
+
+  case RENDER_SERVER:
+  case RENDER_SERVER_ROOT:
+    return (this->RenderServerController? this->RenderServerController :
+      this->DataServerController);
+
+  default:
+    vtkWarningMacro("Invalid processtype of GetController(): " << processType);
+    }
+
+  return NULL;
+}
+
+//----------------------------------------------------------------------------
 bool vtkSMSessionClient::Connect(const char* url)
 {
   vtksys::RegularExpression pvserver("^cs://([^:]+)(:([0-9]+))?");

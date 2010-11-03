@@ -264,6 +264,51 @@ vtkMultiProcessController* vtkProcessModule2::GetGlobalController()
 }
 
 //----------------------------------------------------------------------------
+int vtkProcessModule2::GetNumberOfLocalPartitions()
+{
+  return this->GetGlobalController()?
+    this->GetGlobalController()->GetNumberOfProcesses() : 1;
+}
+
+//----------------------------------------------------------------------------
+int vtkProcessModule2::GetPartitionId()
+{
+  return this->GetGlobalController()?
+    this->GetGlobalController()->GetLocalProcessId() : 0;
+}
+
+//----------------------------------------------------------------------------
+void vtkProcessModule2::PushActiveSession(vtkSession* session)
+{
+  assert(session != NULL);
+
+  this->Internals->ActiveSessionStack.push_back(session);
+}
+
+//----------------------------------------------------------------------------
+void vtkProcessModule2::PopActiveSession(vtkSession* session)
+{
+  assert(session != NULL);
+
+  if (this->Internals->ActiveSessionStack.back() != session)
+    {
+    vtkErrorMacro("Mismatch in active-session stack. Aborting for debugging.");
+    abort();
+    }
+  this->Internals->ActiveSessionStack.pop_back();
+}
+
+//----------------------------------------------------------------------------
+vtkSession* vtkProcessModule2::GetActiveSession()
+{
+  if (this->Internals->ActiveSessionStack.size() == 0)
+    {
+    return NULL;
+    }
+  return this->Internals->ActiveSessionStack.back();
+}
+
+//----------------------------------------------------------------------------
 void vtkProcessModule2::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);

@@ -170,15 +170,6 @@
         <DoubleRangeDomain name="range" min="0" />
       </DoubleVectorProperty>
 
-      <IntVectorProperty name="SelectCells"
-        command="SelectCells"
-        number_of_elements="4"
-        is_internal="1"
-        argument_is_array="1"
-        default_values="0 0 200 200">
-        <IntRangeDomain name="range" min="0" />
-      </IntVectorProperty>
-
       <DoubleVectorProperty name="LODResolution"
         command="SetLODResolution"
         number_of_elements="1"

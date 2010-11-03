@@ -19,11 +19,12 @@
 #include "vtkClientServerSynchronizedRenderers.h"
 #include "vtkImageProcessingPass.h"
 #include "vtkObjectFactory.h"
-#include "vtkProcessModule.h"
+#include "vtkProcessModule2.h"
 #include "vtkPVConfig.h"
 #include "vtkPVDefaultPass.h"
 #include "vtkPVOptions.h"
 #include "vtkPVServerInformation.h"
+#include "vtkPVSession.h"
 #include "vtkRemoteConnection.h"
 #include "vtkRenderer.h"
 #include "vtkSocketController.h"
@@ -42,7 +43,7 @@ vtkPVSynchronizedRenderer::vtkPVSynchronizedRenderer()
   this->ImageReductionFactor = 1;
   this->Renderer = 0;
 
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  vtkProcessModule2* pm = vtkProcessModule2::GetProcessModule();
   if (!pm)
     {
     vtkErrorMacro(
@@ -51,31 +52,32 @@ vtkPVSynchronizedRenderer::vtkPVSynchronizedRenderer()
     abort();
     }
 
-  if (pm->GetOptions()->GetProcessType() == vtkPVOptions::PVBATCH)
+  vtkPVSession* activeSession = vtkPVSession::SafeDownCast(pm->GetActiveSession());
+  int processtype = pm->GetProcessType();
+  switch (processtype)
     {
+  case vtkProcessModule2::PROCESS_BATCH:
+  case vtkProcessModule2::PROCESS_SYMMETRIC_BATCH:
     this->Mode = BATCH;
-    }
-  else if (pm->GetActiveRemoteConnection() == NULL)
-    {
-    this->Mode = BUILTIN;
-    if (pm->GetNumberOfLocalPartitions() > 1)
-      {
-      this->Mode = BATCH;
-      }
-    }
-  else if (pm->GetActiveRemoteConnection()->IsA("vtkClientConnection"))
-    {
-    this->Mode = SERVER;
-    if (pm->GetOptions()->GetProcessType() == vtkPVOptions::PVDATA_SERVER)
-      {
-      this->Mode = BUILTIN;
-      }
-    }
-  else if (pm->GetActiveRemoteConnection()->IsA("vtkServerConnection"))
-    {
-    this->Mode = CLIENT;
-    }
+    break;
 
+  case vtkProcessModule2::PROCESS_RENDER_SERVER:
+  case vtkProcessModule2::PROCESS_SERVER:
+    this->Mode = SERVER;
+    break;
+
+  case vtkProcessModule2::PROCESS_DATA_SERVER:
+    this->Mode = BUILTIN;
+    break;
+
+  case vtkProcessModule2::PROCESS_CLIENT:
+    this->Mode = BUILTIN;
+    if (activeSession->IsA("vtkSMSessionClient"))
+      {
+      this->Mode = CLIENT;
+      }
+    break;
+    }
 
   this->CSSynchronizer = 0;
   this->ParallelSynchronizer = 0;
@@ -83,6 +85,7 @@ vtkPVSynchronizedRenderer::vtkPVSynchronizedRenderer()
   bool in_tile_display_mode = false;
   int tile_dims[2] = {0, 0};
   int tile_mullions[2] = {0, 0};
+#ifdef FIXME
   vtkPVServerInformation* server_info = NULL;
   if (pm->GetActiveRemoteConnection() && this->Mode != BATCH)
     {
@@ -96,7 +99,11 @@ vtkPVSynchronizedRenderer::vtkPVSynchronizedRenderer()
     }
   tile_dims[0] = server_info->GetTileDimensions()[0];
   tile_dims[1] = server_info->GetTileDimensions()[1];
+  tile_mullions[0] = server_info->GetTileMullions()[0];
+  tile_mullions[1] = server_info->GetTileMullions()[1];
+#endif
   in_tile_display_mode = (tile_dims[0] > 0 || tile_dims[1] > 0);
+
 
   // we ensure that tile_dims are non-zero. We are passing the tile_dims to
   // vtkIceTSynchronizedRenderers and should be (1, 1) when not in tile-display
@@ -104,8 +111,7 @@ vtkPVSynchronizedRenderer::vtkPVSynchronizedRenderer()
   tile_dims[0] = tile_dims[0] > 0 ? tile_dims[0] : 1;
   tile_dims[1] = tile_dims[1] > 0 ? tile_dims[1] : 1;
 
-  tile_mullions[0] = server_info->GetTileMullions()[0];
-  tile_mullions[1] = server_info->GetTileMullions()[1];
+
 
   switch (this->Mode)
     {
@@ -126,7 +132,7 @@ vtkPVSynchronizedRenderer::vtkPVSynchronizedRenderer()
         }
       this->CSSynchronizer->SetRootProcessId(0);
       this->CSSynchronizer->SetParallelController(
-        pm->GetActiveRenderServerSocketController());
+        activeSession->GetController(vtkPVSession::RENDER_SERVER));
       }
     break;
 
@@ -144,7 +150,7 @@ vtkPVSynchronizedRenderer::vtkPVSynchronizedRenderer()
       this->CSSynchronizer->WriteBackImagesOff();
       this->CSSynchronizer->SetRootProcessId(1);
       this->CSSynchronizer->SetParallelController(
-        pm->GetActiveRenderServerSocketController());
+        activeSession->GetController(vtkPVSession::CLIENT));
       }
 
     // DONT BREAK

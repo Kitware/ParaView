@@ -14,15 +14,15 @@
 =========================================================================*/
 #include "vtkSMViewProxy.h"
 
-#include "vtkClientServerStream.h"
 #include "vtkCommand.h"
 #include "vtkErrorCode.h"
 #include "vtkImageData.h"
 #include "vtkObjectFactory.h"
-#include "vtkProcessModule.h"
+#include "vtkProcessModule2.h"
 #include "vtkPVView.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSmartPointer.h"
+#include "vtkSMMessage.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMRepresentationProxy.h"
@@ -32,7 +32,7 @@ vtkStandardNewMacro(vtkSMViewProxy);
 //----------------------------------------------------------------------------
 vtkSMViewProxy::vtkSMViewProxy()
 {
-  this->SetServers(vtkProcessModule::CLIENT_AND_SERVERS);
+  this->SetLocation(vtkProcessModule2::CLIENT_AND_SERVERS);
   this->DefaultRepresentationName = 0;
 }
 
@@ -45,7 +45,7 @@ vtkSMViewProxy::~vtkSMViewProxy()
 //----------------------------------------------------------------------------
 vtkView* vtkSMViewProxy::GetClientSideView()
 {
-  if (!this->GetID().IsNull())
+  if (this->ObjectsCreated)
     {
     return vtkView::SafeDownCast(this->GetClientSideObject());
     }
@@ -67,22 +67,15 @@ void vtkSMViewProxy::CreateVTKObjects()
     return;
     }
 
-  if (!this->GetID().IsNull())
-    {
-    vtkClientServerStream stream;
-    stream << vtkClientServerStream::Invoke
-      << this->GetID()
-      << "Initialize"
-      << static_cast<unsigned int>(this->GetSelfID().ID)
-      << vtkClientServerStream::End;
-    vtkProcessModule::GetProcessModule()->SendStream(
-      this->ConnectionID,
-      this->Servers, stream);
+  vtkSMMessage message;
+  message << pvstream::InvokeRequest()
+    << "Initialize"
+    << static_cast<int>(this->GetGlobalID());
+  this->Invoke(&message);
 
-    vtkObject::SafeDownCast(this->GetClientSideObject())->AddObserver(
-      vtkPVView::ViewTimeChangedEvent,
-      this, &vtkSMViewProxy::ViewTimeChanged);
-    }
+  vtkObject::SafeDownCast(this->GetClientSideObject())->AddObserver(
+    vtkPVView::ViewTimeChangedEvent,
+    this, &vtkSMViewProxy::ViewTimeChanged);
 }
 
 //----------------------------------------------------------------------------
@@ -116,8 +109,6 @@ void vtkSMViewProxy::StillRender()
 {
   int interactive = 0;
   this->InvokeEvent(vtkCommand::StartEvent, &interactive);
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  vtkClientServerStream stream;
 
   // We call update separately from the render. This is done so that we don't
   // get any synchronization issues with GUI responding to the data-updated
@@ -126,14 +117,13 @@ void vtkSMViewProxy::StillRender()
   // side then we get deadlocks.
   this->Update();
 
-  if (!this->GetID().IsNull())
+  if (this->ObjectsCreated)
     {
-    stream << vtkClientServerStream::Invoke
-      << this->GetID()
-      << "StillRender"
-      << vtkClientServerStream::End;
-    pm->SendStream(this->ConnectionID, this->Servers, stream);
+    vtkSMMessage message;
+    message << pvstream::InvokeRequest() << "StillRender";
+    this->Invoke(&message);
     }
+
   this->PostRender(interactive==1);
   this->InvokeEvent(vtkCommand::EndEvent, &interactive);
 }
@@ -151,15 +141,11 @@ void vtkSMViewProxy::InteractiveRender()
   // side then we get deadlocks.
   this->Update();
 
-  if (!this->GetID().IsNull())
+  if (this->ObjectsCreated)
     {
-    vtkClientServerStream stream;
-    vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-    stream << vtkClientServerStream::Invoke
-      << this->GetID()
-      << "InteractiveRender"
-      << vtkClientServerStream::End;
-    pm->SendStream(this->ConnectionID, this->Servers, stream);
+    vtkSMMessage message;
+    message << pvstream::InvokeRequest() << "InteractiveRender";
+    this->Invoke(&message);
     }
 
   this->PostRender(interactive==1);
@@ -169,15 +155,11 @@ void vtkSMViewProxy::InteractiveRender()
 //----------------------------------------------------------------------------
 void vtkSMViewProxy::Update()
 {
-  if (!this->GetID().IsNull())
+  if (this->ObjectsCreated)
     {
-    vtkClientServerStream stream;
-    vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-    stream << vtkClientServerStream::Invoke
-      << this->GetID()
-      << "Update"
-      << vtkClientServerStream::End;
-    pm->SendStream(this->ConnectionID, this->Servers, stream);
+    vtkSMMessage message;
+    message << pvstream::InvokeRequest() << "Update";
+    this->Invoke(&message);
     }
 }
 
@@ -220,27 +202,20 @@ int vtkSMViewProxy::ReadXMLAttributes(
 //----------------------------------------------------------------------------
 vtkImageData* vtkSMViewProxy::CaptureWindow(int magnification)
 {
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  if (!this->GetID().IsNull())
+  if (this->ObjectsCreated)
     {
-    vtkClientServerStream stream;
-    stream << vtkClientServerStream::Invoke
-      << this->GetID()
-      << "PrepareForScreenshot"
-      << vtkClientServerStream::End;
-    pm->SendStream(this->ConnectionID, this->Servers, stream);
+    vtkSMMessage message;
+    message << pvstream::InvokeRequest() << "PrepareForScreenshot";
+    this->Invoke(&message);
     }
 
   vtkImageData* capture = this->CaptureWindowInternal(magnification);
 
-  if (!this->GetID().IsNull())
+  if (this->ObjectsCreated)
     {
-    vtkClientServerStream stream;
-    stream << vtkClientServerStream::Invoke
-      << this->GetID()
-      << "CleanupAfterScreenshot"
-      << vtkClientServerStream::End;
-    pm->SendStream(this->ConnectionID, this->Servers, stream);
+    vtkSMMessage message;
+    message << pvstream::InvokeRequest() << "CleanupAfterScreenshot";
+    this->Invoke(&message);
     }
 
   if (capture)
@@ -279,5 +254,3 @@ void vtkSMViewProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 }
-
-

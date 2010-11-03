@@ -21,6 +21,7 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkSMSession.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkPVDataInformation.h"
+#include "vtkSMRenderViewProxy.h"
 
 #include "paraview.h"
 
@@ -58,6 +59,11 @@ int main(int argc, char* argv[])
   for(int i=0;i<10;i++)
     {
     cout << " Processing loop: " << i << endl;
+
+    proxy = pxm->NewProxy("views", "RenderView");
+    proxy->UpdateVTKObjects();
+    vtkSMRenderViewProxy::SafeDownCast(proxy)->StillRender();
+
 
     proxy = pxm->NewProxy("misc", "FileInformationHelper");
     vtkSMPropertyHelper(proxy, "Path").Set("/tmp");

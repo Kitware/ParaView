@@ -35,7 +35,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkPHardwareSelector.h"
 #include "vtkPKdTree.h"
-#include "vtkProcessModule.h"
+#include "vtkProcessModule2.h"
 #include "vtkPVAxesWidget.h"
 #include "vtkPVCenterAxesActor.h"
 #include "vtkPVGenericRenderWindowInteractor.h"
@@ -73,7 +73,7 @@ vtkCxxSetObjectMacro(vtkPVRenderView, LastSelection, vtkSelection);
 //----------------------------------------------------------------------------
 vtkPVRenderView::vtkPVRenderView()
 {
-  vtkPVOptions* options = vtkProcessModule::GetProcessModule()->GetOptions();
+  vtkPVOptions* options = vtkProcessModule2::GetProcessModule()->GetOptions();
 
   this->ForceRemoteRendering = false;
   this->StillRenderImageReductionFactor = 1;
@@ -241,7 +241,7 @@ void vtkPVRenderView::SetUseOffscreenRendering(bool use_offscreen)
     return;
     }
 
-  vtkPVOptions* options = vtkProcessModule::GetProcessModule()->GetOptions();
+  vtkPVOptions* options = vtkProcessModule2::GetProcessModule()->GetOptions();
   bool process_use_offscreen = options->GetUseOffscreenRendering() != 0;
 
   this->UseOffscreenRendering = use_offscreen || process_use_offscreen;
@@ -764,8 +764,8 @@ bool vtkPVRenderView::GetUseDistributedRendering()
     return true;
     }
 
-  if (vtkProcessModule::GetProcessModule()->GetOptions()->GetProcessType()
-    == vtkPVOptions::PVBATCH)
+  if (vtkProcessModule2::GetProcessType() == vtkProcessModule2::PROCESS_BATCH ||
+    vtkProcessModule2::GetProcessType() == vtkProcessModule2::PROCESS_SYMMETRIC_BATCH)
     {
     // currently, we only support parallel rendering in batch mode.
     return true;
@@ -791,16 +791,9 @@ bool vtkPVRenderView::GetDeliverOutlineToClient()
 //----------------------------------------------------------------------------
 bool vtkPVRenderView::GetUseOrderedCompositing()
 {
-  vtkPVOptions* options = vtkProcessModule::GetProcessModule()->GetOptions();
-  switch (options->GetProcessType())
+  if (vtkProcessModule2::GetProcessModule()->GetNumberOfLocalPartitions() > 1)
     {
-  case vtkPVOptions::PVSERVER:
-  case vtkPVOptions::PVBATCH:
-  case vtkPVOptions::PVRENDER_SERVER:
-    if (vtkProcessModule::GetProcessModule()->GetNumberOfLocalPartitions() > 1)
-      {
-      return true;
-      }
+    return true;
     }
   return false;
 }

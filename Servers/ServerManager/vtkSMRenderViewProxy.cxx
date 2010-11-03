@@ -15,16 +15,16 @@
 #include "vtkSMRenderViewProxy.h"
 
 #include "vtkBoundingBox.h"
-#include "vtkClientServerStream.h"
+#include "vtkCamera.h"
 #include "vtkCollection.h"
 #include "vtkDataArray.h"
 #include "vtkEventForwarderCommand.h"
 #include "vtkExtractSelectedFrustum.h"
 #include "vtkImageData.h"
 #include "vtkMath.h"
+#include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
 #include "vtkPointData.h"
-#include "vtkProcessModule.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVGenericRenderWindowInteractor.h"
 #include "vtkPVLastSelectionInformation.h"
@@ -41,7 +41,9 @@
 #include "vtkSMPropertyIterator.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMRepresentationProxy.h"
+#ifdef FIXME
 #include "vtkSMSelectionHelper.h"
+#endif
 #include "vtkTransform.h"
 #include "vtkWeakPointer.h"
 #include "vtkWindowToImageFilter.h"
@@ -111,10 +113,12 @@ bool vtkSMRenderViewProxy::IsSelectionAvailable()
 //-----------------------------------------------------------------------------
 const char* vtkSMRenderViewProxy::IsSelectVisibleCellsAvailable()
 {
+#ifdef FIXME
   if (vtkProcessModule::GetProcessModule()->GetRenderClientMode(this->ConnectionID))
     {
     return "Cannot support selection in render-server mode";
     }
+#endif
 
   //check if we don't have enough color depth to do color buffer selection
   //if we don't then disallow selection
@@ -226,18 +230,13 @@ void vtkSMRenderViewProxy::CreateVTKObjects()
     return;
     }
 
-  vtkClientServerStream stream;
-  stream << vtkClientServerStream::Invoke
-         << this->GetID()
-         << "SetActiveCamera"
-         << this->GetSubProxy("ActiveCamera")->GetID()
-         << vtkClientServerStream::End;
-  vtkProcessModule::GetProcessModule()->SendStream(
-    this->ConnectionID,
-    this->Servers, stream);
-
   vtkPVRenderView* rv = vtkPVRenderView::SafeDownCast(
     this->GetClientSideObject());
+
+  vtkCamera* camera = vtkCamera::SafeDownCast(
+    this->GetSubProxy("ActiveCamera")->GetClientSideObject());
+  rv->SetActiveCamera(camera);
+
   if (rv->GetInteractor())
     {
     vtkRenderHelper* helper = vtkRenderHelper::New();
@@ -414,14 +413,12 @@ void vtkSMRenderViewProxy::ResetCamera(double bounds[6])
 {
   this->CreateVTKObjects();
 
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  vtkClientServerStream stream;
-  stream << vtkClientServerStream::Invoke
-    << this->GetID()
+  vtkSMMessage message;
+  message << pvstream::InvokeRequest()
     << "ResetCamera"
-    << vtkClientServerStream::InsertArray(bounds, 6)
-    << vtkClientServerStream::End;
-  pm->SendStream(this->ConnectionID, this->Servers, stream);
+    << bounds[0] << bounds[1] << bounds[2]
+    << bounds[3] << bounds[4] << bounds[5];
+  this->Invoke(&message);
 }
 
 //-----------------------------------------------------------------------------
@@ -457,27 +454,18 @@ bool vtkSMRenderViewProxy::SelectSurfaceCells(int region[4],
     return false;
     }
 
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  vtkClientServerStream stream;
-  stream << vtkClientServerStream::Invoke
-    << this->GetID()
-    << "ForceRemoteRenderingOn"
-    << vtkClientServerStream::End;
-  pm->SendStream(this->ConnectionID, this->Servers, stream);
+  vtkSMMessage message;
+  message << pvstream::InvokeRequest() << "ForceRemoteRenderingOn";
+  this->Invoke(&message);
 
   this->StillRender();
 
-  stream << vtkClientServerStream::Invoke
-    << this->GetID()
-    << "SelectCells"
-    << vtkClientServerStream::InsertArray(region, 4)
-    << vtkClientServerStream::End;
-  stream << vtkClientServerStream::Invoke
-    << this->GetID()
-    << "ForceRemoteRenderingOff"
-    << vtkClientServerStream::End;
-  pm->SendStream(this->ConnectionID, this->Servers, stream);
+  message << pvstream::InvokeRequest() << "SelectCells"
+    << region[0] << region[1] << region[2] << region[3];
+  this->Invoke(&message);
 
+  message << pvstream::InvokeRequest() << "ForceRemoteRenderingOff";
+  this->Invoke(&message);
   return this->FetchLastSelection(selectedRepresentations, selectionSources);
 }
 
@@ -492,26 +480,18 @@ bool vtkSMRenderViewProxy::SelectSurfacePoints(int region[4],
     return false;
     }
 
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  vtkClientServerStream stream;
-  stream << vtkClientServerStream::Invoke
-    << this->GetID()
-    << "ForceRemoteRenderingOn"
-    << vtkClientServerStream::End;
-  pm->SendStream(this->ConnectionID, this->Servers, stream);
+  vtkSMMessage message;
+  message << pvstream::InvokeRequest() << "ForceRemoteRenderingOn";
+  this->Invoke(&message);
 
   this->StillRender();
 
-  stream << vtkClientServerStream::Invoke
-    << this->GetID()
-    << "SelectPoints"
-    << vtkClientServerStream::InsertArray(region, 4)
-    << vtkClientServerStream::End;
-  stream << vtkClientServerStream::Invoke
-    << this->GetID()
-    << "ForceRemoteRenderingOff"
-    << vtkClientServerStream::End;
-  pm->SendStream(this->ConnectionID, this->Servers, stream);
+  message << pvstream::InvokeRequest() << "SelectPoints"
+    << region[0] << region[1] << region[2] << region[3];
+  this->Invoke(&message);
+
+  message << pvstream::InvokeRequest() << "ForceRemoteRenderingOff";
+  this->Invoke(&message);
 
   return this->FetchLastSelection(selectedRepresentations, selectionSources);
 }
@@ -522,15 +502,21 @@ bool vtkSMRenderViewProxy::FetchLastSelection(
 {
   if (selectionSources && selectedRepresentations)
     {
-    vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
     vtkSmartPointer<vtkPVLastSelectionInformation> info =
       vtkSmartPointer<vtkPVLastSelectionInformation>::New();
+#ifdef FIXME
+    // we have no API on vtkSMProxy to tell it to gather information from a
+    // specific server.
+    vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
     pm->GatherInformation(this->ConnectionID,
       vtkProcessModule::DATA_SERVER, info, this->GetID());
+#endif
 
     vtkSelection* selection = info->GetSelection();
+#ifdef FIXME
     vtkSMSelectionHelper::NewSelectionSourcesFromSelection(
       selection, this, selectionSources, selectedRepresentations);
+#endif
     return (selectionSources->GetNumberOfItems() > 0);
     }
   return false;
@@ -616,7 +602,6 @@ bool vtkSMRenderViewProxy::SelectFrustumInternal(int region[4],
 
   vtkSMProxy* selectionSource = this->GetProxyManager()->NewProxy("sources",
     "FrustumSelectionSource");
-  selectionSource->SetConnectionID(this->ConnectionID);
   vtkSMPropertyHelper(selectionSource, "FieldType").Set(fieldAssociation);
   vtkSMPropertyHelper(selectionSource, "Frustum").Set(frustum, 32);
   selectionSource->UpdateVTKObjects();
@@ -702,6 +687,7 @@ vtkImageData* vtkSMRenderViewProxy::CaptureWindowInternal(int magnification)
   w2i->ReadFrontBufferOff();
   w2i->ShouldRerenderOff();
 
+#ifdef FIXME
   // BUG #8715: We go through this indirection since the active connection needs
   // to be set during update since it may request re-renders if magnification >1.
   vtkClientServerStream stream;
@@ -710,6 +696,9 @@ vtkImageData* vtkSMRenderViewProxy::CaptureWindowInternal(int magnification)
          << vtkClientServerStream::End;
   vtkProcessModule::GetProcessModule()->SendStream(
     this->ConnectionID, vtkProcessModule::CLIENT, stream);
+#else
+  w2i->Update();
+#endif
 
   this->GetRenderWindow()->SwapBuffersOn();
 
@@ -722,7 +711,7 @@ vtkImageData* vtkSMRenderViewProxy::CaptureWindowInternal(int magnification)
     // ensure that some image was capture. Due to buggy offscreen rendering
     // support on some drivers, we may end up with black images, in which case
     // we force on-screen rendering.
-    if (vtkProcessModule::GetProcessModule()->GetNumberOfLocalPartitions() == 1)
+    if (vtkMultiProcessController::GetGlobalController()->GetNumberOfProcesses() == 1)
       {
       vtkWarningMacro(
         "Disabling offscreen rendering since empty image was detected.");

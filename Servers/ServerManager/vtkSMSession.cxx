@@ -17,13 +17,15 @@
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule2.h"
 #include "vtkSMProxyDefinitionManager.h"
-#include "vtkSMProxyManager.h"
-#include "vtkSMSessionCore.h"
-#include "vtkWeakPointer.h"
-#include "vtkSMRemoteObject.h"
 #include "vtkSMProxy.h"
+#include "vtkSMProxyManager.h"
+#include "vtkSMRemoteObject.h"
+#include "vtkSMSessionCore.h"
+#include "vtkSMUndoStackBuilder.h"
+#include "vtkWeakPointer.h"
 
 vtkStandardNewMacro(vtkSMSession);
+vtkCxxSetObjectMacro(vtkSMSession, UndoStackBuilder, vtkSMUndoStackBuilder);
 //----------------------------------------------------------------------------
 vtkSMSession::vtkSMSession()
 {
@@ -50,17 +52,14 @@ vtkSMSession::~vtkSMSession()
   this->Core = NULL;
   this->ProxyManager->Delete();
   this->ProxyManager = NULL;
-
-  if(this->UndoStackBuilder)
-    {
-    this->UndoStackBuilder->Delete();
-    this->UndoStackBuilder = NULL;
-    }
+  this->SetUndoStackBuilder(0);
 }
 
 //----------------------------------------------------------------------------
 void vtkSMSession::PushState(vtkSMMessage* msg)
 {
+  this->Activate();
+
   // Manage Undo/Redo if possible
   if(this->UndoStackBuilder)
     {
@@ -87,27 +86,39 @@ void vtkSMSession::PushState(vtkSMMessage* msg)
   // This class does not handle remote sessions, so all messages are directly
   // processes locally.
   this->Core->PushState(msg);
+
+  this->DeActivate();
 }
 
 //----------------------------------------------------------------------------
 void vtkSMSession::PullState(vtkSMMessage* msg)
 {
+  this->Activate();
+
   // This class does not handle remote sessions, so all messages are directly
   // processes locally.
   this->Core->PullState(msg);
+
+  this->DeActivate();
 }
 
 //----------------------------------------------------------------------------
 void vtkSMSession::Invoke(vtkSMMessage* msg)
 {
+  this->Activate();
+
   // This class does not handle remote sessions, so all messages are directly
   // processes locally.
   this->Core->Invoke(msg);
+
+  this->DeActivate();
 }
 
 //----------------------------------------------------------------------------
 void vtkSMSession::DeletePMObject(vtkSMMessage* msg)
 {
+  this->Activate();
+
   // Manage Undo/Redo if possible
   if(this->UndoStackBuilder)
     {
@@ -117,12 +128,14 @@ void vtkSMSession::DeletePMObject(vtkSMMessage* msg)
   // This class does not handle remote sessions, so all messages are directly
   // processes locally.
   this->Core->DeletePMObject(msg);
+
+  this->DeActivate();
 }
 
 //----------------------------------------------------------------------------
 vtkPMObject* vtkSMSession::GetPMObject(vtkTypeUInt32 globalid)
 {
-  this->Core->GetPMObject(globalid);
+  return this->Core->GetPMObject(globalid);
 }
 
 //----------------------------------------------------------------------------

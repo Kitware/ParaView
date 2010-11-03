@@ -115,6 +115,12 @@ public:
   unsigned long AddRMICallback(vtkRMIFunctionType, void* localArg, int tag);
   bool RemoveRMICallback(unsigned long id);
 
+  // Description:
+  // This method should only be called on RENDER_SERVER or BATCH processes.
+  // Returns true if in tile display mode and fills up tile_dims with the tile
+  // dimensions.
+  bool GetTileDisplayParameters(int tile_dims[2]);
+
 //BTX
   enum
     {
@@ -190,12 +196,6 @@ protected:
   virtual void ClientStartRender(vtkRenderWindow*);
   virtual void RootStartRender(vtkRenderWindow*);
   virtual void SatelliteStartRender(vtkRenderWindow*);
-
-  // Description:
-  // This method should only be called on RENDER_SERVER or BATCH processes.
-  // Returns true if in tile display mode and fills up tile_dims with the tile
-  // dimensions.
-  bool GetTileDisplayParameters(int tile_dims[2]);
 
   // Description:
   // Shrinks gaps between views, rather grows the views to reduce gaps. Only

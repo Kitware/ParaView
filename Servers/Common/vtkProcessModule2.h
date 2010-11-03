@@ -109,6 +109,12 @@ public:
   // registered sessions.
   vtkSessionIterator* NewSessionIterator();
 
+  // Description:
+  // Whenever any session is processing some message, it typically marks itself
+  // active with the process module. The active session can be accessed using
+  // this method.
+  vtkSession* GetActiveSession();
+
   //********** ACCESSORS FOR VARIOUS HELPERS *****************************
 
   // Description:
@@ -143,6 +149,14 @@ public:
   vtkMultiProcessController* GetGlobalController();
 
   // Description:
+  // Returns the number of processes in this process group.
+  int GetNumberOfLocalPartitions();
+
+  // Description:
+  // Returns the local process id.
+  int GetPartitionId();
+
+  // Description:
   // Set/Get whether to report errors from the Interpreter.
   vtkGetMacro(ReportInterpreterErrors, bool);
   vtkSetMacro(ReportInterpreterErrors, bool);
@@ -152,6 +166,16 @@ public:
 protected:
   vtkProcessModule2();
   ~vtkProcessModule2();
+
+  // Description:
+  // Push/Pop the active session.
+  void PushActiveSession(vtkSession*);
+  void PopActiveSession(vtkSession*);
+
+  // Description:
+  // Marking vtkSession as friend since it needs access to
+  // PushActiveSession/PopActiveSession.
+  friend class vtkSession;
 
   vtkNetworkAccessManager* NetworkAccessManager;
   vtkPVOptions* Options;

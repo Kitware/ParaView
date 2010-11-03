@@ -15,7 +15,6 @@
 #include "vtkSMCameraProxy.h"
 
 #include "vtkObjectFactory.h"
-#include "vtkProcessModule.h"
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkCamera.h"
 
@@ -38,8 +37,7 @@ void vtkSMCameraProxy::UpdatePropertyInformation()
     return;
     }
 
-  vtkCamera* camera = vtkCamera::SafeDownCast(
-    vtkProcessModule::GetProcessModule()->GetObjectFromID(this->GetID()));
+  vtkCamera* camera = vtkCamera::SafeDownCast(this->GetClientSideObject());
   if (!camera)
     {
     this->Superclass::UpdatePropertyInformation();

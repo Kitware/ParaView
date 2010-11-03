@@ -14,11 +14,10 @@
 =========================================================================*/
 #include "vtkSMRepresentationProxy.h"
 
-#include "vtkClientServerStream.h"
 #include "vtkMemberFunctionCommand.h"
 #include "vtkObjectFactory.h"
-#include "vtkProcessModule.h"
 #include "vtkPVRepresentedDataInformation.h"
+#include "vtkSMMessage.h"
 #include "vtkSMProxyProperty.h"
 #include "vtkTimerLog.h"
 
@@ -58,12 +57,12 @@ void vtkSMRepresentationProxy::CreateVTKObjects()
 }
 
 //---------------------------------------------------------------------------
-int vtkSMRepresentationProxy::LoadState(
+int vtkSMRepresentationProxy::LoadXMLState(
   vtkPVXMLElement* proxyElement, vtkSMProxyLocator* locator)
 {
-  vtkTypeUInt32 oldserver = this->Servers;
-  int ret = this->Superclass::LoadState(proxyElement, locator);
-  this->Servers = oldserver;
+  vtkTypeUInt32 oldserver = this->Location;
+  int ret = this->Superclass::LoadXMLState(proxyElement, locator);
+  this->Location = oldserver;
   return ret;
 }
 
@@ -90,20 +89,18 @@ void vtkSMRepresentationProxy::UpdatePipeline(double time)
 void vtkSMRepresentationProxy::UpdatePipelineInternal(
   double time, bool doTime)
 {
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  vtkClientServerStream stream;
   if (doTime)
     {
-    stream << vtkClientServerStream::Invoke
-      << this->GetID() << "SetUpdateTime" << time
-      << vtkClientServerStream::End;
+    vtkSMMessage message;
+    message << pvstream::InvokeRequest() << "SetUpdateTime" << time;
+    this->Invoke(&message);
     }
-  stream << vtkClientServerStream::Invoke
-         << this->GetID() << "Update"
-         << vtkClientServerStream::End;
-  pm->SendPrepareProgress(this->ConnectionID);
-  pm->SendStream(this->ConnectionID, this->Servers, stream);
-  pm->SendCleanupPendingProgress(this->ConnectionID);
+
+  vtkSMMessage message;
+  message << pvstream::InvokeRequest() << "Update";
+  //pm->SendPrepareProgress(this->ConnectionID);
+  this->Invoke(&message);
+  //pm->SendCleanupPendingProgress(this->ConnectionID);
 }
 
 //----------------------------------------------------------------------------
@@ -115,13 +112,9 @@ void vtkSMRepresentationProxy::MarkDirty(vtkSMProxy* modifiedProxy)
       {
       //cout << "MarkModified" << endl;
       this->MarkedModified = true;
-      vtkClientServerStream stream;
-      stream << vtkClientServerStream::Invoke
-        << this->GetID()
-        << "MarkModified"
-        << vtkClientServerStream::End;
-      vtkProcessModule::GetProcessModule()->SendStream(
-        this->ConnectionID, this->Servers, stream);
+      vtkSMMessage message;
+      message << pvstream::InvokeRequest() << "MarkModified";
+      this->Invoke(&message);
       }
     }
   this->Superclass::MarkDirty(modifiedProxy);
@@ -153,9 +146,7 @@ vtkPVDataInformation* vtkSMRepresentationProxy::GetRepresentedDataInformation()
     vtkTimerLog::MarkStartEvent(
       "vtkSMRepresentationProxy::GetRepresentedDataInformation");
     this->RepresentedDataInformation->Initialize();
-    vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-    pm->GatherInformation(this->ConnectionID, this->Servers,
-      this->RepresentedDataInformation, this->GetID());
+    this->GatherInformation(this->RepresentedDataInformation);
     vtkTimerLog::MarkEndEvent(
       "vtkSMRepresentationProxy::GetRepresentedDataInformation");
     this->RepresentedDataInformationValid = true;

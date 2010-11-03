@@ -562,31 +562,50 @@ void vtkSMProxy::UpdateVTKObjects()
       vtkSMProperty* property = iter->second.Property;
       if (property && !property->GetInformationOnly())
         {
-        // Push only modified properties
-        if(iter->second.ModifiedFlag)
+        if (property->GetIsInternal() ||
+          strcmp(property->GetClassName(), "vtkSMProperty") == 0)
           {
-          // Write to state
-          property->WriteTo(this->State);
+          // Push only modified properties
+          if (iter->second.ModifiedFlag)
+            {
+            // Write to state
+            property->WriteTo(&message);
 
-          // Write to Push message
-          ProxyState_Property *prop = message.AddExtension(ProxyState::property);
-          prop->CopyFrom(this->State->GetExtension(ProxyState::property, cc));
-
-          // Fire event to let everyone know that a property has been updated.
-          // This is currently used by vtkSMLink. Need to see if we can avoid this
-          // as firing these events ain't inexpensive.
-          this->InvokeEvent(vtkCommand::UpdatePropertyEvent,
-                            const_cast<char*>(iter->first.c_str()));
+            // Fire event to let everyone know that a property has been updated.
+            // This is currently used by vtkSMLink. Need to see if we can avoid this
+            // as firing these events ain't inexpensive.
+            this->InvokeEvent(vtkCommand::UpdatePropertyEvent,
+              const_cast<char*>(iter->first.c_str()));
+            }
           }
         else
           {
-          // Just copy the previous old value to the state
-          ProxyState_Property *prop = this->State->AddExtension(ProxyState::property);
-          prop->CopyFrom(oldState.GetExtension(ProxyState::property, cc));
-          }
+          // Push only modified properties
+          if(iter->second.ModifiedFlag)
+            {
+            // Write to state
+            property->WriteTo(this->State);
 
-        // One more property
-        ++cc;
+            // Write to Push message
+            ProxyState_Property *prop = message.AddExtension(ProxyState::property);
+            prop->CopyFrom(this->State->GetExtension(ProxyState::property, cc));
+
+            // Fire event to let everyone know that a property has been updated.
+            // This is currently used by vtkSMLink. Need to see if we can avoid this
+            // as firing these events ain't inexpensive.
+            this->InvokeEvent(vtkCommand::UpdatePropertyEvent,
+              const_cast<char*>(iter->first.c_str()));
+            }
+          else
+            {
+            // Just copy the previous old value to the state
+            ProxyState_Property *prop = this->State->AddExtension(ProxyState::property);
+            prop->CopyFrom(oldState.GetExtension(ProxyState::property, cc));
+            }
+
+          // One more property
+          ++cc;
+          }
         }
       }
     this->InUpdateVTKObjects = 0;

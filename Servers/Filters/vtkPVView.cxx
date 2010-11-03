@@ -18,11 +18,8 @@
 #include "vtkInformationRequestKey.h"
 #include "vtkInformationVector.h"
 #include "vtkObjectFactory.h"
-#include "vtkProcessModule.h"
 #include "vtkPVDataRepresentation.h"
-#include "vtkPVServerInformation.h"
 #include "vtkPVSynchronizedRenderWindows.h"
-#include "vtkRemoteConnection.h"
 
 #include <assert.h>
 
@@ -104,20 +101,8 @@ void vtkPVView::SetViewTime(double time)
 //----------------------------------------------------------------------------
 bool vtkPVView::InTileDisplayMode()
 {
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  vtkPVServerInformation* info = pm->GetServerInformation(0);
-  if (info->GetTileDimensions()[0] > 0 ||
-    info->GetTileDimensions()[1] > 0)
-    {
-    return true;
-    }
-  if (pm->GetActiveRemoteConnection())
-    {
-    info = pm->GetServerInformation(pm->GetConnectionID(
-        pm->GetActiveRemoteConnection()));
-    }
-  return (info->GetTileDimensions()[0] > 0 ||
-    info->GetTileDimensions()[1] > 0);
+  int temp[2];
+  return this->SynchronizedWindows->GetTileDisplayParameters(temp);
 }
 
 //----------------------------------------------------------------------------

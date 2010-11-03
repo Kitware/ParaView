@@ -20,8 +20,6 @@ ENDIF(NOT WIN32)
 
 SET (Kit_SRCS
   vtkInitializationHelper.cxx
-  vtkSMCameraLink.cxx
-  vtkSMDeserializer.cxx
   vtkPMDoubleVectorProperty.cxx
   vtkPMIdTypeVectorProperty.cxx
   vtkPMInputProperty.cxx
@@ -34,8 +32,11 @@ SET (Kit_SRCS
   vtkPMStringVectorProperty.cxx
   vtkPMVectorProperty.cxx
   vtkPMWriterProxy.cxx
+  vtkSMCameraLink.cxx
+  vtkSMCameraProxy.cxx
   vtkSMCompoundSourceProxy.cxx
   vtkSMCompoundSourceProxyDefinitionBuilder.cxx
+  vtkSMDeserializer.cxx
   vtkSMDocumentation.cxx
   vtkSMDomain.cxx
   vtkSMDomainIterator.cxx
@@ -66,6 +67,9 @@ SET (Kit_SRCS
   vtkSMPWriterProxy.cxx
   vtkSMRemoteObject.cxx
   vtkSMRemoteObjectUpdateUndoElement.cxx
+  vtkSMRenderViewProxy.cxx
+  vtkSMRepresentationProxy.cxx
+#  vtkSMSelectionHelper.cxx
   vtkSMSessionClient.cxx
   vtkSMSessionCore.cxx
   vtkSMSession.cxx
@@ -78,7 +82,9 @@ SET (Kit_SRCS
   vtkSMUndoElement.cxx
   vtkSMUndoStackBuilder.cxx
   vtkSMUndoStack.cxx
+  vtkSMUtilities.cxx
   vtkSMVectorProperty.cxx
+  vtkSMViewProxy.cxx
   vtkSMWriterFactory.cxx
   vtkSMWriterProxy.cxx
   )
@@ -134,7 +140,6 @@ SET(Kit_SRCS
   vtkSMCameraKeyFrameProxy.cxx
 
   vtkSMCameraManipulatorProxy.cxx
-  vtkSMCameraProxy.cxx
   #vtkSMCaveRenderModuleProxy.cxx
 #  vtkSMCaveRenderViewProxy.cxx
   vtkSMChartRepresentationProxy.cxx
@@ -190,16 +195,13 @@ SET(Kit_SRCS
   vtkSMPVRepresentationProxy.cxx
   vtkSMRampKeyFrameProxy.cxx
   vtkSMReaderFactory.cxx
-  vtkSMRenderViewProxy.cxx
   vtkSMRenderViewExporterProxy.cxx
   vtkSMRepresentationAnimationHelperProxy.cxx
-  vtkSMRepresentationProxy.cxx
   vtkSMScalarBarActorProxy.cxx
   vtkSMScalarBarWidgetRepresentationProxy.cxx
 #  vtkSMScatterPlotArraysInformationHelper.cxx
 #  vtkSMScatterPlotViewProxy.cxx
 #  vtkSMSelectionDeliveryRepresentationProxy.cxx
-  vtkSMSelectionHelper.cxx
   vtkSMSelectionRepresentationProxy.cxx
   vtkSMServerFileListingProxy.cxx
   vtkSMServerProxyManagerReviver.cxx
@@ -226,9 +228,7 @@ SET(Kit_SRCS
   vtkSMUndoRedoStateLoader.cxx#-------------------------------- should be DELETE
   vtkSMUniformGridVolumeRepresentationProxy.cxx
   vtkSMUnstructuredGridVolumeRepresentationProxy.cxx
-  vtkSMUtilities.cxx
   vtkSMUpdateInformationUndoElement.cxx#--------------------------------
-  vtkSMViewProxy.cxx
   vtkSMWidgetRepresentationProxy.cxx
   vtkSMWriterProxy.cxx
   vtkSMXMLPVAnimationWriterProxy.cxx
