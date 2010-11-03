@@ -58,6 +58,17 @@ vtkSMSession::~vtkSMSession()
 }
 
 //----------------------------------------------------------------------------
+vtkSMSession::ServerFlags vtkSMSession::GetProcessRoles()
+{
+  if (vtkProcessModule2::GetProcessModule() &&
+    vtkProcessModule2::GetProcessModule()->GetPartitionId() > 0)
+    {
+    return SERVERS;
+    }
+  return this->Superclass::GetProcessRoles();
+}
+
+//----------------------------------------------------------------------------
 void vtkSMSession::PushState(vtkSMMessage* msg)
 {
   this->Activate();

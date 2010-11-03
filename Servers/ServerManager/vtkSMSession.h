@@ -41,6 +41,12 @@ public:
   virtual bool GetIsAlive() { return true; }
 
   // Description:
+  // Returns a ServerFlags indicate the nature of the current processes. e.g. if
+  // the current processes acts as a data-server and a render-server, it returns
+  // DATA_SERVER | RENDER_SERVER.
+  virtual ServerFlags GetProcessRoles();
+
+  // Description:
   // Allow the user to bind an UndoStackBuilder with the given session
   virtual void SetUndoStackBuilder(vtkSMUndoStackBuilder*);
   vtkGetObjectMacro(UndoStackBuilder, vtkSMUndoStackBuilder);
