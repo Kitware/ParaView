@@ -59,11 +59,6 @@ public:
   virtual void Invoke(vtkSMMessage* msg);
 //ETX
 
-  // Description:
-  /// Method called when the vtkPMObject should be deleted and should release
-  /// its internal content
-  virtual void Finalize();
-
 //BTX
 
   // Description:

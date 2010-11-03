@@ -262,8 +262,8 @@ bool vtkPMProxy::CreateVTKObjects(vtkSMMessage* message)
     }
 #endif
 
-  this->SetXMLName(message->GetExtension(ProxyState::xml_group).c_str());
-  this->SetXMLGroup(message->GetExtension(ProxyState::xml_name).c_str());
+  this->SetXMLGroup(message->GetExtension(ProxyState::xml_group).c_str());
+  this->SetXMLName(message->GetExtension(ProxyState::xml_name).c_str());
 
   // Locate sub-proxies.
   for (int cc=0; cc < message->ExtensionSize(ProxyState::subproxy); cc++)

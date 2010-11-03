@@ -24,6 +24,8 @@
 #include "vtkSMUndoStackBuilder.h"
 #include "vtkWeakPointer.h"
 
+#include <assert.h>
+
 vtkStandardNewMacro(vtkSMSession);
 vtkCxxSetObjectMacro(vtkSMSession, UndoStackBuilder, vtkSMUndoStackBuilder);
 //----------------------------------------------------------------------------
@@ -42,7 +44,7 @@ vtkSMSession::vtkSMSession()
   this->LastGUID = 10;
 
   // Reserved Id management
-  this->RegisterRemoteObject(1, this->ProxyManager);
+  this->RegisterRemoteObject(this->ProxyManager);
 }
 
 //----------------------------------------------------------------------------
@@ -170,22 +172,26 @@ vtkSMRemoteObject* vtkSMSession::GetRemoteObject(vtkTypeUInt32 globalid)
   return this->Core->GetRemoteObject(globalid);
 }
 //----------------------------------------------------------------------------
-void vtkSMSession::RegisterRemoteObject(vtkTypeUInt32 globalid, vtkSMRemoteObject* obj)
+void vtkSMSession::RegisterRemoteObject(vtkSMRemoteObject* obj)
 {
-  this->Core->RegisterRemoteObject(globalid, obj);
+  assert(obj != NULL);
+
+  this->Core->RegisterRemoteObject(obj);
 }
 
 //----------------------------------------------------------------------------
-void vtkSMSession::UnRegisterRemoteObject(vtkTypeUInt32 globalid)
+void vtkSMSession::UnRegisterRemoteObject(vtkSMRemoteObject* obj)
 {
+  assert(obj != NULL);
+
   // Make sure to delete PMObject as well
   vtkSMMessage deleteMsg;
-  deleteMsg.set_location(this->GetRemoteObject(globalid)->GetLocation());
-  deleteMsg.set_global_id(globalid);
-
-  this->Core->UnRegisterRemoteObject(globalid);
+  deleteMsg.set_location(obj->GetLocation());
+  deleteMsg.set_global_id(obj->GetGlobalID());
+  this->Core->UnRegisterRemoteObject(obj);
   this->DeletePMObject(&deleteMsg);
 }
+
 //----------------------------------------------------------------------------
 void vtkSMSession::GetAllRemoteObjects(vtkCollection* collection)
 {

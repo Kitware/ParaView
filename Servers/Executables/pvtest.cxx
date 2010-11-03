@@ -63,7 +63,7 @@ int main(int argc, char* argv[])
     proxy = pxm->NewProxy("views", "RenderView");
     proxy->UpdateVTKObjects();
     vtkSMRenderViewProxy::SafeDownCast(proxy)->StillRender();
-
+    proxy->Delete();
 
     proxy = pxm->NewProxy("misc", "FileInformationHelper");
     vtkSMPropertyHelper(proxy, "Path").Set("/tmp");

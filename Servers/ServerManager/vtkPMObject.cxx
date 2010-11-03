@@ -47,13 +47,6 @@ void vtkPMObject::Initialize(vtkSMSessionCore* session)
 }
 
 //----------------------------------------------------------------------------
-void vtkPMObject::Finalize()
-{
-  this->Interpreter = NULL;
-  this->SessionCore = NULL;
-}
-
-//----------------------------------------------------------------------------
 vtkPMObject* vtkPMObject::GetPMObject(vtkTypeUInt32 globalid)
 {
   if (this->SessionCore)

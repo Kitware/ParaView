@@ -137,7 +137,10 @@ vtkSMProxyManager::vtkSMProxyManager()
 //---------------------------------------------------------------------------
 vtkSMProxyManager::~vtkSMProxyManager()
 {
-  this->UnRegisterProxies();
+  // This is causing a PushState() when the object is being destroyed. This
+  // causes errors since the ProxyManager is destroyed only when the session is
+  // being deleted, thus the session cannot be valid at this point.
+  //this->UnRegisterProxies();
   delete this->Internals;
 
   this->Observer->SetTarget(0);

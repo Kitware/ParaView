@@ -78,11 +78,11 @@ public:
 
   // Description:
   // Register a remote object
-  void RegisterRemoteObject(vtkTypeUInt32 globalid, vtkSMRemoteObject* obj);
+  void RegisterRemoteObject(vtkSMRemoteObject* obj);
 
   // Description:
   // Unregister a remote object
-  void UnRegisterRemoteObject(vtkTypeUInt32 globalid);
+  void UnRegisterRemoteObject(vtkSMRemoteObject* obj);
 
   // Description:
   // Allow the user to fill its vtkCollection with all RemoteObject

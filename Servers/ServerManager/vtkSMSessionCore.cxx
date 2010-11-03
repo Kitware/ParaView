@@ -71,7 +71,6 @@ public:
     PMObjectMapType::iterator iter = this->PMObjectMap.find(globalUniqueId);
     if (iter != this->PMObjectMap.end())
       {
-      iter->second.GetPointer()->Finalize();
       this->PMObjectMap.erase(iter);
       }
     }
@@ -603,19 +602,20 @@ bool vtkSMSessionCore::CollectInformation(vtkPVInformation* info)
   return true;
 }
 //----------------------------------------------------------------------------
-void vtkSMSessionCore::RegisterRemoteObject(vtkTypeUInt32 globalid, vtkSMRemoteObject* obj)
+void vtkSMSessionCore::RegisterRemoteObject(vtkSMRemoteObject* obj)
 {
-  if(globalid == 0)
-    return;
-  this->Internals->RemoteObjectMap[globalid] = obj;
+  assert (obj != NULL);
+  this->Internals->RemoteObjectMap[obj->GetGlobalID()] = obj;
 }
+
 //----------------------------------------------------------------------------
-void vtkSMSessionCore::UnRegisterRemoteObject(vtkTypeUInt32 globalid)
+void vtkSMSessionCore::UnRegisterRemoteObject(vtkSMRemoteObject* obj)
 {
-  if(globalid == 0)
-    return;
-  this->Internals->DeleteRemoteObject(globalid);
+  assert (obj != NULL);
+
+  this->Internals->DeleteRemoteObject(obj->GetGlobalID());
 }
+
 //----------------------------------------------------------------------------
 void vtkSMSessionCore::GetAllRemoteObjects(vtkCollection* collection)
 {
