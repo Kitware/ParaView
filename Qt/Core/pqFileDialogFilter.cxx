@@ -64,22 +64,24 @@ void pqFileDialogFilter::setFilter(const QString& filter)
     {
     f = f.mid(start+1, end-start-1);
     }
+  // Now 'f' is going to be string like "*.ext1 *.ext2" or "spct* *pattern*"
+  // etc. The following code converts it to a regular expression.
   QString pattern = ".*";
   if ( f != "*" )
     {
     f = f.trimmed();
     //convert all spaces into |
     f.replace(QRegExp("[\\s+;]+"),"|");
-    //remove all "*."
-    f.replace("*.","");
     //escape all periods that exist in the extensions to keep the regexp valid
     f.replace(".","\\.");
+    // replace all *'s by .*
+    f.replace("*",".*");
 
     //use non capturing(?:) for speed
     //name.ext or ext.001
     QString postExtFileSeries("(\\.\\d+)?"); // match the .0001 component
     QString extGroup = "(?:" % f % ")";
-    pattern = "(.*\\." % extGroup % "|^" % extGroup % postExtFileSeries % ")$";
+    pattern = "(" % extGroup % "|^" % extGroup % postExtFileSeries % ")$";
     }
 
   this->Wildcards.setPattern(pattern);
