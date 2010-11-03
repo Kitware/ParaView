@@ -15,6 +15,8 @@
 #include "vtkProcessModule2.h"
 #include "vtkProcessModule2Internals.h"
 
+#include "vtkAlgorithm.h"
+#include "vtkCompositeDataPipeline.h"
 #include "vtkDummyController.h"
 #include "vtkDynamicLoader.h"
 #include "vtkFloatingPointExceptions.h"
@@ -192,6 +194,10 @@ vtkProcessModule2::vtkProcessModule2()
   this->Internals = new vtkInternals();
   this->MaxSessionId = 0;
   this->ReportInterpreterErrors = true;
+
+  vtkCompositeDataPipeline* cddp = vtkCompositeDataPipeline::New();
+  vtkAlgorithm::SetDefaultExecutivePrototype(cddp);
+  cddp->Delete();
 }
 
 //----------------------------------------------------------------------------

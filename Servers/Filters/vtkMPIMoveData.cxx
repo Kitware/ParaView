@@ -157,6 +157,7 @@ namespace
 vtkStandardNewMacro(vtkMPIMoveData);
 
 vtkCxxSetObjectMacro(vtkMPIMoveData,Controller, vtkMultiProcessController);
+vtkCxxSetObjectMacro(vtkMPIMoveData,ClientDataServerSocketController, vtkMultiProcessController);
 vtkCxxSetObjectMacro(vtkMPIMoveData,MPIMToNSocketConnection, vtkMPIMToNSocketConnection);
 //-----------------------------------------------------------------------------
 vtkMPIMoveData::vtkMPIMoveData()
@@ -193,7 +194,7 @@ vtkMPIMoveData::vtkMPIMoveData()
 vtkMPIMoveData::~vtkMPIMoveData()
 {
   this->SetController(0);
-  this->ClientDataServerSocketController = 0;
+  this->SetClientDataServerSocketController(0);
   this->SetMPIMToNSocketConnection(0);
   this->ClearBuffer();
 }
@@ -309,18 +310,6 @@ int vtkMPIMoveData::RequestInformation(vtkInformation*,
 }
 
 //-----------------------------------------------------------------------------
-void vtkMPIMoveData::DetermineClientDataServerController()
-{
-  this->ClientDataServerSocketController = 0;
-  if (this->Server != vtkMPIMoveData::RENDER_SERVER)
-    {
-    vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-    this->ClientDataServerSocketController =
-      pm? pm->GetActiveSocketController() : 0;
-    }
-}
-
-//-----------------------------------------------------------------------------
 // This filter  is going to replace the many variations of collection fitlers.
 // It handles collection and duplication.
 // It handles poly data and unstructured grid.
@@ -354,8 +343,6 @@ int vtkMPIMoveData::RequestData(vtkInformation*,
                                 vtkInformationVector** inputVector,
                                 vtkInformationVector* outputVector)
 {
-  this->DetermineClientDataServerController();
-
   vtkInformation* outInfo = outputVector->GetInformationObject(0);
 
   vtkDataObject* input = 0;

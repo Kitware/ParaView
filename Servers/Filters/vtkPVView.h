@@ -183,6 +183,9 @@ protected:
   double CacheKey;
   bool UseCache;
 
+  int Size[2];
+  int Position[2];
+
 private:
   vtkPVView(const vtkPVView&); // Not implemented
   void operator=(const vtkPVView&); // Not implemented

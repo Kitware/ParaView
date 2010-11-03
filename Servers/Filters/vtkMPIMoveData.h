@@ -51,6 +51,7 @@ public:
   // MPIMToNSocketConnection==1 => Client-DataServer-RenderServer.
   void SetController(vtkMultiProcessController* controller);
   void SetMPIMToNSocketConnection(vtkMPIMToNSocketConnection* sc);
+  void SetClientDataServerSocketController(vtkMultiProcessController*);
   
   // Description:
   // Tell the object on which client/server it resides.
@@ -106,12 +107,6 @@ protected:
   vtkMPIMoveData();
   ~vtkMPIMoveData();
 
-  // Description:
-  // This method is called on each RequestData(). It Initializes the
-  // ClientDataServerSocketController with the socket communicator for the
-  // active connection.
-  void DetermineClientDataServerController();
-
   virtual int RequestDataObject(vtkInformation* request, 
                            vtkInformationVector** inputVector, 
                            vtkInformationVector* outputVector);
@@ -124,7 +119,7 @@ protected:
   virtual int FillInputPortInformation(int port, vtkInformation *info);
 
   vtkMultiProcessController* Controller;
-  vtkSocketController* ClientDataServerSocketController;
+  vtkMultiProcessController* ClientDataServerSocketController;
   vtkMPIMToNSocketConnection* MPIMToNSocketConnection;
 
   void DataServerAllToN(vtkDataObject* inData, vtkDataObject* outData, int n);

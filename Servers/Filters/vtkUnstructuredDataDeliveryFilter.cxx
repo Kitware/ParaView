@@ -114,19 +114,23 @@ void vtkUnstructuredDataDeliveryFilter::InitializeForCommunication()
   if (processRoles & vtkPVSession::RENDER_SERVER)
     {
     this->MoveData->SetServerToRenderServer();
-    this->MoveData->SetController(session->GetController(vtkPVSession::CLIENT));
     }
+
   if (processRoles & vtkPVSession::DATA_SERVER)
     {
     this->MoveData->SetServerToDataServer();
-    this->MoveData->SetController(session->GetController(vtkPVSession::CLIENT));
+    this->MoveData->SetClientDataServerSocketController(
+      session->GetController(vtkPVSession::CLIENT));
     }
+
   if (processRoles & vtkPVSession::CLIENT)
     {
     this->MoveData->SetServerToClient();
-    this->MoveData->SetController(session->GetController(vtkPVSession::DATA_SERVER));
+    this->MoveData->SetClientDataServerSocketController(
+      session->GetController(vtkPVSession::DATA_SERVER));
     }
 
+  this->MoveData->SetController(pm->GetGlobalController());
   this->MoveData->SetMPIMToNSocketConnection(
     session->GetMPIMToNSocketConnection());
 }

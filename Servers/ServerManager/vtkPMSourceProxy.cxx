@@ -112,7 +112,8 @@ bool vtkPMSourceProxy::CreateVTKObjects(vtkSMMessage* message)
     }
 
   vtkClientServerStream stream;
-  if (this->ExecutiveName)
+  if (this->ExecutiveName &&
+    !this->GetVTKObject()->IsA("vtkPVDataRepresentation"))
     {
     vtkClientServerID execId = this->Interpreter->GetNextAvailableId();
     stream << vtkClientServerStream::New

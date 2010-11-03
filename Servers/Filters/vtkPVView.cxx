@@ -51,6 +51,9 @@ vtkPVView::vtkPVView()
   this->ReplyInformationVector = vtkInformationVector::New();
 
   this->LastRenderOneViewAtATime = false;
+
+  this->Size[1] = this->Size[0] = 300;
+  this->Position[0] = this->Position[1] = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -71,20 +74,30 @@ void vtkPVView::Initialize(unsigned int id)
   assert(this->Identifier == 0 && id != 0);
 
   this->Identifier = id;
+  this->SetSize(this->Size[0], this->Size[1]);
+  this->SetPosition(this->Position[0], this->Position[1]);
 }
 
 //----------------------------------------------------------------------------
 void vtkPVView::SetPosition(int x, int y)
 {
-  assert(this->Identifier != 0);
-  this->SynchronizedWindows->SetWindowPosition(this->Identifier, x, y);
+  if (this->Identifier != 0)
+    {
+    this->SynchronizedWindows->SetWindowPosition(this->Identifier, x, y);
+    }
+  this->Position[0] = x;
+  this->Position[1] = y;
 }
 
 //----------------------------------------------------------------------------
 void vtkPVView::SetSize(int x, int y)
 {
-  assert(this->Identifier != 0);
-  this->SynchronizedWindows->SetWindowSize(this->Identifier, x, y);
+  if (this->Identifier != 0)
+    {
+    this->SynchronizedWindows->SetWindowSize(this->Identifier, x, y);
+    }
+  this->Size[0] = x;
+  this->Size[1] = y;
 }
 
 //----------------------------------------------------------------------------

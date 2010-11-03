@@ -23,6 +23,7 @@
 
 #include "vtkSession.h"
 
+class vtkMPIMToNSocketConnection;
 class vtkMultiProcessController;
 
 class VTK_EXPORT vtkPVSession : public vtkSession
@@ -54,6 +55,12 @@ public:
   // DATA_SERVER_ROOT or RENDER_SERVER_ROOT or CLIENT.
   // Default implementation returns NULL.
   virtual vtkMultiProcessController* GetController(ServerFlags processType);
+
+  // Description:
+  // This is socket connection, if any to communicate between the data-server
+  // and render-server nodes.
+  virtual vtkMPIMToNSocketConnection* GetMPIMToNSocketConnection()
+    { return NULL; }
 
 //BTX
 protected:
