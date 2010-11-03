@@ -122,7 +122,6 @@ int vtkUndoSet::Redo()
 int vtkUndoSet::Undo()
 {
   int max = this->Collection->GetNumberOfItems();
-  cout << "Going to undo " << max << " actions" << endl;
   for (int cc=max-1; cc >=0; --cc)
     {
     vtkUndoElement* elem = vtkUndoElement::SafeDownCast(

@@ -126,6 +126,10 @@ public:
   // Description
   // Return a new configured iterator for traversing a set of proxy definition
   // for only one group name
+  // Scope values:
+  // 0 : ALL (default in case)
+  // 1 : CORE_DEFINITIONS
+  // 2 : CUSTOM_DEFINITIONS
   vtkSMProxyDefinitionIterator* NewSingleGroupIterator(const char* groupName,
                                                        int scope);
 
