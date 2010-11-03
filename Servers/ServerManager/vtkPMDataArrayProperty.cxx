@@ -77,71 +77,69 @@ bool vtkPMDataArrayProperty::Pull(vtkSMMessage* msgToFill)
   this->ProcessMessage(str);
 
   // Get the result
-  vtkDataArray* dataArray = NULL;
-  if (!this->GetLastResult().GetArgument(0, 0, (vtkObjectBase**)&dataArray))
+  vtkAbstractArray* abstractArray = NULL;
+  if (!this->GetLastResult().GetArgument(0, 0, (vtkObjectBase**)&abstractArray))
     {
     vtkErrorMacro( "Error getting return value of command: "
                    << this->GetCommand());
     return false;
     }
+  vtkStringArray* stringArray = vtkStringArray::SafeDownCast(abstractArray);
+  vtkDataArray* dataArray = vtkDataArray::SafeDownCast(abstractArray);
 
   // Create property and add it to the message
   ProxyState_Property *prop = msgToFill->AddExtension(ProxyState::property);
   prop->set_name(this->GetXMLName());
+  Variant *var = prop->mutable_value();
 
   // If no values, then just return OK with an empty content
-  if(!dataArray)
+  if(!dataArray && !stringArray)
     {
     return true;
     }
 
-  // Need to fill the property content
-  Variant *var = prop->mutable_value();
-  vtkIdType numValues = dataArray->GetNumberOfComponents()
-                        * dataArray->GetNumberOfTuples();
-  vtkDoubleArray *dataDouble = NULL;
-  vtkIntArray *dataInt = NULL;
-  vtkStringArray *dataString = NULL;
-
-  switch (dataArray->GetDataType())
+  // Need to fill the property content with the proper type
+  // Right now only those types are supported
+  // - vtkDoubleArray
+  // - vtkIntArray
+  // - vtkStringArray
+  vtkIdType numValues = abstractArray->GetNumberOfComponents()
+                        * abstractArray->GetNumberOfTuples();
+  if(dataArray)
     {
-    case VTK_STRING:
-      var->set_type(Variant::STRING);
-      dataString = vtkStringArray::SafeDownCast(dataArray);
-      for (vtkIdType cc=0; cc < numValues; cc++)
-        {
-        var->add_txt(dataString->GetValue(cc));
-        }
-      break;
-    case VTK_DOUBLE:
-      var->set_type(Variant::FLOAT64);
-      dataDouble = vtkDoubleArray::SafeDownCast(dataArray);
-      for (vtkIdType cc=0; cc < numValues; cc++)
-        {
-        var->add_float64(dataDouble->GetValue(cc));
-        }
-      break;
-    case VTK_INT:
-      var->set_type(Variant::INT);
-      dataInt = vtkIntArray::SafeDownCast(dataArray);
-      for (vtkIdType cc=0; cc < numValues; cc++)
-        {
-        var->add_integer(dataInt->GetValue(cc));
-        }
-      break;
-//    case VTK_ID_TYPE:
-//      var->set_type(Variant::IDTYPE);
-//      vtkIdType *dataIdType = vtkIdType::SafeDownCast(dataArray);
-//      for (vtkIdType cc=0; cc < numValues; cc++)
-//        {
-//        var->add_idtype(dataIdType->GetValue(cc));
-//        }
-//      break;
-    default:
-      vtkWarningMacro("The Pull method of vtkPMDataArrayProperty do not support "
-                      << dataArray->GetDataTypeAsString() << " array type.");
-      return false;
+    vtkDoubleArray *dataDouble = NULL;
+    vtkIntArray *dataInt = NULL;
+    switch (dataArray->GetDataType())
+      {
+      case VTK_DOUBLE:
+        var->set_type(Variant::FLOAT64);
+        dataDouble = vtkDoubleArray::SafeDownCast(dataArray);
+        for (vtkIdType cc=0; cc < numValues; cc++)
+          {
+          var->add_float64(dataDouble->GetValue(cc));
+          }
+        break;
+      case VTK_INT:
+        var->set_type(Variant::INT);
+        dataInt = vtkIntArray::SafeDownCast(dataArray);
+        for (vtkIdType cc=0; cc < numValues; cc++)
+          {
+          var->add_integer(dataInt->GetValue(cc));
+          }
+        break;
+      default:
+        vtkWarningMacro("The Pull method of vtkPMDataArrayProperty do not support "
+                        << dataArray->GetDataTypeAsString() << " array type.");
+        return false;
+      }
     }
-
+  else if(stringArray)
+    {
+    var->set_type(Variant::STRING);
+    for (vtkIdType cc=0; cc < numValues; cc++)
+      {
+      var->add_txt(stringArray->GetValue(cc));
+      }
+    }
   return true;
 }
