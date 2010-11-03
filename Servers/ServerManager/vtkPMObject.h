@@ -69,6 +69,11 @@ public:
   // Convenience method to obtain a vtkPMObject subclass given its global id.
   vtkPMObject* GetPMObject(vtkTypeUInt32 globalid);
 
+  // Description:
+  // Get/Set the global id for this object.
+  vtkSetMacro(GlobalID, vtkTypeUInt32);
+  vtkGetMacro(GlobalID, vtkTypeUInt32);
+
 protected:
   vtkPMObject();
   virtual ~vtkPMObject();
@@ -78,6 +83,7 @@ protected:
 
   vtkSMMessage LastPushedMessage;
 
+  vtkTypeUInt32 GlobalID;
 private:
   vtkPMObject(const vtkPMObject&);    // Not implemented
   void operator=(const vtkPMObject&); // Not implemented

@@ -264,8 +264,9 @@ void vtkSMSessionCore::PushStateInternal(vtkSMMessage* message)
         "Aborting for debugging purposes.");
       abort();
       }
+    obj->SetGlobalID(globalId);
     obj->Initialize(this);
-    this->Internals->PMObjectMap[message->global_id()] = obj;
+    this->Internals->PMObjectMap[globalId] = obj;
     }
 
   // Push the message to the PMObject.

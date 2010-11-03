@@ -25,6 +25,7 @@ vtkPMObject::vtkPMObject()
 {
   this->Interpreter = 0;
   this->SessionCore = 0;
+  this->GlobalID = 0;
 }
 
 //----------------------------------------------------------------------------
