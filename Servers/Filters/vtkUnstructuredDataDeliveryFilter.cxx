@@ -22,9 +22,9 @@
 #include "vtkMPIMToNSocketConnection.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
-#include "vtkProcessModule.h"
-#include "vtkPVOptions.h"
+#include "vtkProcessModule2.h"
 #include "vtkPVRenderView.h"
+#include "vtkPVSession.h"
 #include "vtkSmartPointer.h"
 
 vtkStandardNewMacro(vtkUnstructuredDataDeliveryFilter);
@@ -95,41 +95,40 @@ int vtkUnstructuredDataDeliveryFilter::RequestDataObject(
 //----------------------------------------------------------------------------
 void vtkUnstructuredDataDeliveryFilter::InitializeForCommunication()
 {
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  vtkProcessModule2* pm = vtkProcessModule2::GetProcessModule();
   if (pm == NULL)
     {
     vtkWarningMacro("No process module found.");
     return;
     }
 
-  int process_type = pm->GetOptions()->GetProcessType();
-  switch (process_type)
+  vtkPVSession* session = vtkPVSession::SafeDownCast(
+    pm->GetActiveSession());
+  if (!session)
     {
-  case vtkPVOptions::PVSERVER:
-  case vtkPVOptions::PVDATA_SERVER:
-    this->MoveData->SetServerToDataServer();
-    break;
-
-  case vtkPVOptions::PVRENDER_SERVER:
-    this->MoveData->SetServerToRenderServer();
-    break;
-
-  default:
-    if (pm->GetPartitionId() > 0)
-      {
-      this->MoveData->SetServerToDataServer();
-      }
-    else
-      {
-      this->MoveData->SetServerToClient();
-      }
+    vtkWarningMacro("No active vtkPVSession found.");
+    return;
     }
 
-  vtkMPIMToNSocketConnection* render_server_data_server_connector =
-    vtkMPIMToNSocketConnection::SafeDownCast(
-      pm->GetObjectFromID(pm->GetMPIMToNSocketConnectionID(), true));
-  this->MoveData->SetMPIMToNSocketConnection(render_server_data_server_connector);
-  this->MoveData->SetController(pm->GetController());
+  int processRoles = session->GetProcessRoles();
+  if (processRoles & vtkPVSession::RENDER_SERVER)
+    {
+    this->MoveData->SetServerToRenderServer();
+    this->MoveData->SetController(session->GetController(vtkPVSession::CLIENT));
+    }
+  if (processRoles & vtkPVSession::DATA_SERVER)
+    {
+    this->MoveData->SetServerToDataServer();
+    this->MoveData->SetController(session->GetController(vtkPVSession::CLIENT));
+    }
+  if (processRoles & vtkPVSession::CLIENT)
+    {
+    this->MoveData->SetServerToClient();
+    this->MoveData->SetController(session->GetController(vtkPVSession::DATA_SERVER));
+    }
+
+  this->MoveData->SetMPIMToNSocketConnection(
+    session->GetMPIMToNSocketConnection());
 }
 
 //----------------------------------------------------------------------------
