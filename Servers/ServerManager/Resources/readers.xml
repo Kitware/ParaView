@@ -3398,7 +3398,7 @@
      </StringVectorProperty>
 
      <Hints>
-      <ReaderFactory extensions="spcth 0"
+      <ReaderFactory filename_patterns="spct*"
           file_description="SpyPlot CTH dataset" />
      </Hints>
    <!-- End spcthreader-->
