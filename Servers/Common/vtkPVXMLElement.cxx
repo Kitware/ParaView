@@ -685,6 +685,17 @@ void vtkPVXMLElement::Copy(vtkPVXMLElement* other)
 }
 
 //----------------------------------------------------------------------------
+void vtkPVXMLElement::CopyAttributes(vtkPVXMLElement* other)
+{
+  other->SetName(GetName());
+  other->SetId(GetId());
+  other->Internal->AttributeNames = this->Internal->AttributeNames;
+  other->Internal->AttributeValues = this->Internal->AttributeValues;
+  other->AddCharacterData(this->Internal->CharacterData.c_str(),
+                          this->Internal->CharacterData.size());
+}
+
+//----------------------------------------------------------------------------
 bool vtkPVXMLElement::Equals(vtkPVXMLElement* other)
 {
   if (this == other)

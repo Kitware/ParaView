@@ -708,6 +708,7 @@ vtkPVXMLElement* vtkSMProxyDefinitionManager::GetCollapsedProxyDefinition(const 
   // Look for parent hierarchy
   if(originalDefinition)
     {
+    vtkPVXMLElement* realDefinition = originalDefinition;
     const char* base_group = originalDefinition->GetAttribute("base_proxygroup");
     const char* base_name  = originalDefinition->GetAttribute("base_proxyname");
 
@@ -736,11 +737,9 @@ vtkPVXMLElement* vtkSMProxyDefinitionManager::GetCollapsedProxyDefinition(const 
         {
         vtkPVXMLElement* currentElement = classHierarchy.back();
         classHierarchy.pop_back();
-
-        newElement->SetName(currentElement->GetName());
-        newElement->SetAttribute("name",currentElement->GetAttribute("name"));
         MergeProxyDefinition(currentElement, newElement);
         }
+      realDefinition->CopyAttributes(newElement);
 
       // Remove parent declaration
       newElement->RemoveAttribute("base_proxygroup");
