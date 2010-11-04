@@ -439,9 +439,7 @@ The Hierarchical Fractal source is a collection of uniform grids. All have the s
       <IntVectorProperty 
          name="TimeStepRangeInfo"
          command="GetTimeStepRange"
-         information_only="1">
-         <SimpleIntInformationHelper/>
-      </IntVectorProperty>
+         information_only="1" />
       <IntVectorProperty 
          name="TimeStep"
          command="SetTimeStep"
@@ -1481,8 +1479,7 @@ OS is the output scalar; M represents the maximum value; G represents the Gaussi
 
       <StringVectorProperty name="UserFriendlyText"
         information_only="1"
-        command="GetUserFriendlyText">
-        <SimpleStringInformationHelper/>
+        command="GetUserFriendlyText" >
         <Documentation>
           Reconstructs the query as a user friendly text eg. "IDs >= 12".
         </Documentation>

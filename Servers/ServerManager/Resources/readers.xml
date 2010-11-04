@@ -24,9 +24,9 @@
 
      <StringVectorProperty 
         name="CellArrayInfo"
-        information_only="1">
-        <ArraySelectionInformationHelper attribute_name="Cell"/>
-     </StringVectorProperty>
+        information_only="1"
+        kernel_class="vtkPMArraySelectionProperty"
+        command="Cell" />
 
      <StringVectorProperty
         name="CellArrayStatus"
@@ -49,9 +49,9 @@
 
      <StringVectorProperty 
         name="PointArrayInfo"
-        information_only="1">
-        <ArraySelectionInformationHelper attribute_name="Point"/>
-     </StringVectorProperty>
+        information_only="1"
+        kernel_class="vtkPMArraySelectionProperty"
+        command="Point" />
 
      <StringVectorProperty
         name="PointArrayStatus"
@@ -117,8 +117,8 @@
      <DoubleVectorProperty 
         name="TimestepValues"
         repeatable="1"
-        information_only="1">
-        <TimeStepsInformationHelper/>
+        information_only="1"
+        kernel_class="vtkPMTimeStepsProperty">
         <Documentation>
           Available timestep values.
         </Documentation>
@@ -126,9 +126,9 @@
 
      <StringVectorProperty 
         name="CellArrayInfo"
-        information_only="1">
-        <ArraySelectionInformationHelper attribute_name="Cell"/>
-     </StringVectorProperty>
+        information_only="1"
+        kernel_class="vtkPMArraySelectionProperty"
+        command="Cell" />
 
      <StringVectorProperty
         name="CellArrayStatus"
@@ -151,9 +151,9 @@
 
      <StringVectorProperty 
         name="PointArrayInfo"
-        information_only="1">
-        <ArraySelectionInformationHelper attribute_name="Point"/>
-     </StringVectorProperty>
+        information_only="1"
+        kernel_class="vtkPMArraySelectionProperty"
+        command="Point" />
 
      <StringVectorProperty
         name="PointArrayStatus"
@@ -198,8 +198,8 @@
      <DoubleVectorProperty 
         name="TimestepValues"
         repeatable="1"
-        information_only="1">
-        <TimeStepsInformationHelper/>
+        information_only="1"
+        kernel_class="vtkPMTimeStepsProperty">
         <Documentation>
           Available timestep values.
         </Documentation>
@@ -207,9 +207,9 @@
 
      <StringVectorProperty 
         name="CellArrayInfo"
-        information_only="1">
-        <ArraySelectionInformationHelper attribute_name="Cell"/>
-     </StringVectorProperty>
+        information_only="1"
+        kernel_class="vtkPMArraySelectionProperty"
+        command="Cell" />
 
      <StringVectorProperty
         name="CellArrayStatus"
@@ -232,9 +232,9 @@
 
      <StringVectorProperty 
         name="PointArrayInfo"
-        information_only="1">
-        <ArraySelectionInformationHelper attribute_name="Point"/>
-     </StringVectorProperty>
+        information_only="1"
+        kernel_class="vtkPMArraySelectionProperty"
+        command="Point" />
 
      <StringVectorProperty
         name="PointArrayStatus"
@@ -279,8 +279,8 @@
      <DoubleVectorProperty 
         name="TimestepValues"
         repeatable="1"
-        information_only="1">
-        <TimeStepsInformationHelper/>
+        information_only="1"
+        kernel_class="vtkPMTimeStepsProperty">
         <Documentation>
           Available timestep values.
         </Documentation>
@@ -288,9 +288,9 @@
 
      <StringVectorProperty 
         name="CellArrayInfo"
-        information_only="1">
-        <ArraySelectionInformationHelper attribute_name="Cell"/>
-     </StringVectorProperty>
+        information_only="1"
+        kernel_class="vtkPMArraySelectionProperty"
+        command="Cell" />
 
      <StringVectorProperty
         name="CellArrayStatus"
@@ -313,9 +313,9 @@
 
      <StringVectorProperty 
         name="PointArrayInfo"
-        information_only="1">
-        <ArraySelectionInformationHelper attribute_name="Point"/>
-     </StringVectorProperty>
+        information_only="1"
+        kernel_class="vtkPMArraySelectionProperty"
+        command="Point" />
 
      <StringVectorProperty
         name="PointArrayStatus"
@@ -361,8 +361,8 @@
      <DoubleVectorProperty 
         name="TimestepValues"
         repeatable="1"
-        information_only="1">
-        <TimeStepsInformationHelper/>
+        information_only="1"
+        kernel_class="vtkPMTimeStepsProperty">
         <Documentation>
           Available timestep values.
         </Documentation>
@@ -370,9 +370,9 @@
 
      <StringVectorProperty 
         name="CellArrayInfo"
-        information_only="1">
-        <ArraySelectionInformationHelper attribute_name="Cell"/>
-     </StringVectorProperty>
+        information_only="1"
+        kernel_class="vtkPMArraySelectionProperty"
+        command="Cell" />
 
      <StringVectorProperty
         name="CellArrayStatus"
@@ -395,9 +395,9 @@
 
      <StringVectorProperty 
         name="PointArrayInfo"
-        information_only="1">
-        <ArraySelectionInformationHelper attribute_name="Point"/>
-     </StringVectorProperty>
+        information_only="1"
+        kernel_class="vtkPMArraySelectionProperty"
+        command="Point" />
 
      <StringVectorProperty
         name="PointArrayStatus"
@@ -442,8 +442,8 @@
      <DoubleVectorProperty 
         name="TimestepValues"
         repeatable="1"
-        information_only="1">
-        <TimeStepsInformationHelper/>
+        information_only="1"
+        kernel_class="vtkPMTimeStepsProperty">
         <Documentation>
           Available timestep values.
         </Documentation>
@@ -451,9 +451,9 @@
 
      <StringVectorProperty 
         name="CellArrayInfo"
-        information_only="1">
-        <ArraySelectionInformationHelper attribute_name="Cell"/>
-     </StringVectorProperty>
+        information_only="1"
+        kernel_class="vtkPMArraySelectionProperty"
+        command="Cell" />
 
      <StringVectorProperty
         name="CellArrayStatus"
@@ -476,9 +476,9 @@
 
      <StringVectorProperty 
         name="PointArrayInfo"
-        information_only="1">
-        <ArraySelectionInformationHelper attribute_name="Point"/>
-     </StringVectorProperty>
+        information_only="1"
+        kernel_class="vtkPMArraySelectionProperty"
+        command="Point" />
 
      <StringVectorProperty
         name="PointArrayStatus"
@@ -522,9 +522,9 @@
 
      <StringVectorProperty 
         name="CellArrayInfo"
-        information_only="1">
-        <ArraySelectionInformationHelper attribute_name="Cell"/>
-     </StringVectorProperty>
+        information_only="1"
+        kernel_class="vtkPMArraySelectionProperty"
+        command="Cell" />
 
      <StringVectorProperty
         name="CellArrayStatus"
@@ -547,9 +547,9 @@
 
      <StringVectorProperty 
         name="PointArrayInfo"
-        information_only="1">
-        <ArraySelectionInformationHelper attribute_name="Point"/>
-     </StringVectorProperty>
+        information_only="1"
+        kernel_class="vtkPMArraySelectionProperty"
+        command="Point" />
 
      <StringVectorProperty
         name="PointArrayStatus"
@@ -594,9 +594,9 @@
 
      <StringVectorProperty 
         name="CellArrayInfo"
-        information_only="1">
-        <ArraySelectionInformationHelper attribute_name="Cell"/>
-     </StringVectorProperty>
+        information_only="1"
+        kernel_class="vtkPMArraySelectionProperty"
+        command="Cell" />
 
      <StringVectorProperty
         name="CellArrayStatus"
@@ -619,9 +619,9 @@
 
      <StringVectorProperty 
         name="PointArrayInfo"
-        information_only="1">
-        <ArraySelectionInformationHelper attribute_name="Point"/>
-     </StringVectorProperty>
+        information_only="1"
+        kernel_class="vtkPMArraySelectionProperty"
+        command="Point" />
 
      <StringVectorProperty
         name="PointArrayStatus"
@@ -665,9 +665,9 @@
 
      <StringVectorProperty 
         name="CellArrayInfo"
-        information_only="1">
-        <ArraySelectionInformationHelper attribute_name="Cell"/>
-     </StringVectorProperty>
+        information_only="1"
+        kernel_class="vtkPMArraySelectionProperty"
+        command="Cell" />
 
      <StringVectorProperty
         name="CellArrayStatus"
@@ -690,9 +690,9 @@
 
      <StringVectorProperty 
         name="PointArrayInfo"
-        information_only="1">
-        <ArraySelectionInformationHelper attribute_name="Point"/>
-     </StringVectorProperty>
+        information_only="1"
+        kernel_class="vtkPMArraySelectionProperty"
+        command="Point" />
 
      <StringVectorProperty
         name="PointArrayStatus"
@@ -736,9 +736,9 @@
 
      <StringVectorProperty 
         name="CellArrayInfo"
-        information_only="1">
-        <ArraySelectionInformationHelper attribute_name="Cell"/>
-     </StringVectorProperty>
+        information_only="1"
+        kernel_class="vtkPMArraySelectionProperty"
+        command="Cell" />
 
      <StringVectorProperty
         name="CellArrayStatus"
@@ -761,9 +761,9 @@
 
      <StringVectorProperty 
         name="PointArrayInfo"
-        information_only="1">
-        <ArraySelectionInformationHelper attribute_name="Point"/>
-     </StringVectorProperty>
+        information_only="1"
+        kernel_class="vtkPMArraySelectionProperty"
+        command="Point" />
 
      <StringVectorProperty
         name="PointArrayStatus"
@@ -807,9 +807,9 @@
 
      <StringVectorProperty 
         name="CellArrayInfo"
-        information_only="1">
-        <ArraySelectionInformationHelper attribute_name="Cell"/>
-     </StringVectorProperty>
+        information_only="1"
+        kernel_class="vtkPMArraySelectionProperty"
+        command="Cell" />
 
      <StringVectorProperty
         name="CellArrayStatus"
@@ -1841,9 +1841,9 @@
 
      <StringVectorProperty 
         name="DataArrayInfo"
-        information_only="1">
-        <ArraySelectionInformationHelper attribute_name="Data"/>
-     </StringVectorProperty>
+        information_only="1"
+        kernel_class="vtkPMArraySelectionProperty"
+        command="Data" />
 
      <StringVectorProperty
         name="DataArrayStatus"
@@ -1962,9 +1962,8 @@
 
       <StringVectorProperty name="DimensionInfo"
                             command="GetAllDimensions"
-                            information_only="1">
-        <StringArrayHelper />
-      </StringVectorProperty>
+                            information_only="1"
+                            kernel_class="vtkPMDataArrayProperty" />
 
       <StringVectorProperty name="Dimensions"
                             command="SetDimensions"
@@ -1983,15 +1982,13 @@
 
       <StringVectorProperty name="VariableDimensionInfo"
                             command="GetVariableDimensions"
-                            information_only="1">
-        <StringArrayHelper />
-      </StringVectorProperty>
+                            information_only="1"
+                            kernel_class="vtkPMDataArrayProperty" />
 
       <StringVectorProperty name="VariableArrayInfo"
                             command="GetAllVariableArrayNames"
-                            information_only="1">
-        <StringArrayHelper />
-      </StringVectorProperty>
+                            information_only="1"
+                            kernel_class="vtkPMDataArrayProperty" />
 
       <IntVectorProperty name="SphericalCoordinates"
                          command="SetSphericalCoordinates"
@@ -2060,8 +2057,8 @@
 
       <DoubleVectorProperty name="TimestepValues"
                             repeatable="1"
-                            information_only="1">
-        <TimeStepsInformationHelper />
+                            information_only="1"
+                            kernel_class="vtkPMTimeStepsProperty">
         <Documentation>
           This magic property sends time information to the animation
           panel.  ParaView will then automatically set up the animation to
@@ -2261,8 +2258,8 @@
      <DoubleVectorProperty 
         name="TimestepValues"
         repeatable="1"
-        information_only="1">
-        <TimeStepsInformationHelper/>
+        information_only="1"
+        kernel_class="vtkPMTimeStepsProperty">
         <Documentation>
           Available timestep values.
         </Documentation>
@@ -2298,9 +2295,7 @@
 
      <StringVectorProperty name="FileNameInfo"
         command="GetCurrentFileName"
-        information_only="1" >
-        <SimpleStringInformationHelper />
-     </StringVectorProperty>
+        information_only="1" />
 
      <StringVectorProperty name="FileName"
                            clean_command="RemoveAllFileNames"
@@ -2321,8 +2316,8 @@
 
      <DoubleVectorProperty name="TimestepValues"
                            repeatable="1"
-                           information_only="1">
-       <TimeStepsInformationHelper/>
+                           information_only="1"
+                           kernel_class="vtkPMTimeStepsProperty">
        <Documentation>
          Available timestep values.
        </Documentation>
@@ -2357,9 +2352,7 @@
 
      <StringVectorProperty name="FileNameInfo"
         command="GetCurrentFileName"
-        information_only="1" >
-        <SimpleStringInformationHelper />
-     </StringVectorProperty>
+        information_only="1" />
 
      <StringVectorProperty name="FileName"
                            clean_command="RemoveAllFileNames"
@@ -2380,8 +2373,8 @@
 
      <DoubleVectorProperty name="TimestepValues"
                            repeatable="1"
-                           information_only="1">
-       <TimeStepsInformationHelper/>
+                           information_only="1"
+                           kernel_class="vtkPMTimeStepsProperty">
        <Documentation>
          Available timestep values.
        </Documentation>
@@ -2418,9 +2411,7 @@
 
      <StringVectorProperty name="FileNameInfo"
         command="GetCurrentFileName"
-        information_only="1" >
-        <SimpleStringInformationHelper />
-     </StringVectorProperty>
+        information_only="1" />
 
      <StringVectorProperty name="FileName"
                            clean_command="RemoveAllFileNames"
@@ -2437,8 +2428,8 @@
 
      <DoubleVectorProperty name="TimestepValues"
                            repeatable="1"
-                           information_only="1">
-       <TimeStepsInformationHelper/>
+                           information_only="1"
+                           kernel_class="vtkPMTimeStepsProperty">
        <Documentation>
          Available timestep values.
        </Documentation>
@@ -2474,9 +2465,7 @@
 
      <StringVectorProperty name="FileNameInfo"
         command="GetCurrentFileName"
-        information_only="1" >
-        <SimpleStringInformationHelper />
-     </StringVectorProperty>
+        information_only="1" />
 
      <StringVectorProperty name="FileName"
                            clean_command="RemoveAllFileNames"
@@ -2493,8 +2482,8 @@
 
      <DoubleVectorProperty name="TimestepValues"
                            repeatable="1"
-                           information_only="1">
-       <TimeStepsInformationHelper/>
+                           information_only="1"
+                           kernel_class="vtkPMTimeStepsProperty">
        <Documentation>
          Available timestep values.
        </Documentation>
@@ -2531,9 +2520,7 @@
 
      <StringVectorProperty name="FileNameInfo"
         command="GetCurrentFileName"
-        information_only="1" >
-        <SimpleStringInformationHelper />
-     </StringVectorProperty>
+        information_only="1" />
 
      <StringVectorProperty name="FileName"
                            clean_command="RemoveAllFileNames"
@@ -2550,8 +2537,8 @@
 
      <DoubleVectorProperty name="TimestepValues"
                            repeatable="1"
-                           information_only="1">
-       <TimeStepsInformationHelper/>
+                           information_only="1"
+                           kernel_class="vtkPMTimeStepsProperty">
        <Documentation>
          Available timestep values.
        </Documentation>
@@ -2588,9 +2575,7 @@
 
      <StringVectorProperty name="FileNameInfo"
         command="GetCurrentFileName"
-        information_only="1" >
-        <SimpleStringInformationHelper />
-     </StringVectorProperty>
+        information_only="1" />
 
      <StringVectorProperty name="FileName"
                            clean_command="RemoveAllFileNames"
@@ -2607,8 +2592,8 @@
 
      <DoubleVectorProperty name="TimestepValues"
                            repeatable="1"
-                           information_only="1">
-       <TimeStepsInformationHelper/>
+                           information_only="1"
+                           kernel_class="vtkPMTimeStepsProperty">
        <Documentation>
          Available timestep values.
        </Documentation>
@@ -2644,9 +2629,7 @@
 
      <StringVectorProperty name="FileNameInfo"
         command="GetCurrentFileName"
-        information_only="1" >
-        <SimpleStringInformationHelper />
-     </StringVectorProperty>
+        information_only="1" />
 
      <StringVectorProperty name="FileName"
                            clean_command="RemoveAllFileNames"
@@ -2663,8 +2646,8 @@
 
      <DoubleVectorProperty name="TimestepValues"
                            repeatable="1"
-                           information_only="1">
-       <TimeStepsInformationHelper/>
+                           information_only="1"
+                           kernel_class="vtkPMTimeStepsProperty">
        <Documentation>
          Available timestep values.
        </Documentation>
@@ -2699,9 +2682,7 @@
 
      <StringVectorProperty name="FileNameInfo"
         command="GetCurrentFileName"
-        information_only="1" >
-        <SimpleStringInformationHelper />
-     </StringVectorProperty>
+        information_only="1" />
 
      <StringVectorProperty name="FileName"
                            clean_command="RemoveAllFileNames"
@@ -2718,8 +2699,8 @@
 
      <DoubleVectorProperty name="TimestepValues"
                            repeatable="1"
-                           information_only="1">
-       <TimeStepsInformationHelper/>
+                           information_only="1"
+                           kernel_class="vtkPMTimeStepsProperty">
        <Documentation>
          Available timestep values.
        </Documentation>
@@ -2756,9 +2737,7 @@
 
      <StringVectorProperty name="FileNameInfo"
         command="GetCurrentFileName"
-        information_only="1" >
-        <SimpleStringInformationHelper />
-     </StringVectorProperty>
+        information_only="1" />
 
      <StringVectorProperty name="FileName"
                            clean_command="RemoveAllFileNames"
@@ -2775,8 +2754,8 @@
 
      <DoubleVectorProperty name="TimestepValues"
                            repeatable="1"
-                           information_only="1">
-       <TimeStepsInformationHelper/>
+                           information_only="1"
+                           kernel_class="vtkPMTimeStepsProperty">
        <Documentation>
          Available timestep values.
        </Documentation>
@@ -2812,9 +2791,7 @@
 
      <StringVectorProperty name="FileNameInfo"
         command="GetCurrentFileName"
-        information_only="1" >
-        <SimpleStringInformationHelper />
-     </StringVectorProperty>
+        information_only="1" />
 
      <StringVectorProperty name="FileName"
                            clean_command="RemoveAllFileNames"
@@ -2831,8 +2808,8 @@
 
      <DoubleVectorProperty name="TimestepValues"
                            repeatable="1"
-                           information_only="1">
-       <TimeStepsInformationHelper/>
+                           information_only="1"
+                           kernel_class="vtkPMTimeStepsProperty">
        <Documentation>
          Available timestep values.
        </Documentation>
@@ -2869,9 +2846,7 @@
 
      <StringVectorProperty name="FileNameInfo"
         command="GetCurrentFileName"
-        information_only="1" >
-        <SimpleStringInformationHelper />
-     </StringVectorProperty>
+        information_only="1" />
 
      <StringVectorProperty name="FileName"
                            clean_command="RemoveAllFileNames"
@@ -2888,8 +2863,8 @@
 
      <DoubleVectorProperty name="TimestepValues"
                            repeatable="1"
-                           information_only="1">
-       <TimeStepsInformationHelper/>
+                           information_only="1"
+                           kernel_class="vtkPMTimeStepsProperty">
        <Documentation>
          Available timestep values.
        </Documentation>
@@ -2926,9 +2901,7 @@
 
      <StringVectorProperty name="FileNameInfo"
         command="GetCurrentFileName"
-        information_only="1" >
-        <SimpleStringInformationHelper />
-     </StringVectorProperty>
+        information_only="1" />
 
      <StringVectorProperty name="FileName"
                            clean_command="RemoveAllFileNames"
@@ -2945,8 +2918,8 @@
 
      <DoubleVectorProperty name="TimestepValues"
                            repeatable="1"
-                           information_only="1">
-       <TimeStepsInformationHelper/>
+                           information_only="1"
+                           kernel_class="vtkPMTimeStepsProperty">
        <Documentation>
          Available timestep values.
        </Documentation>
@@ -2986,18 +2959,14 @@
         name="NextFileName"
         command="GetNextFileName"
         number_of_elements="1"
-        information_only="1">
-        <SimpleStringInformationHelper/>
-     </StringVectorProperty>
+        information_only="1"/>
 
      <IntVectorProperty
         name="NewDataAvailable"
         command="NewDataAvailable"
         number_of_elements="1"
                     default_values="2" 
-        information_only="1">
-        <SimpleIntInformationHelper/>
-     </IntVectorProperty>
+        information_only="1" />
 
      <Property
         name="UpdateToNextFile"
@@ -3028,9 +2997,7 @@
 
      <StringVectorProperty name="FileNameInfo"
         command="GetCurrentFileName"
-        information_only="1" >
-        <SimpleStringInformationHelper />
-     </StringVectorProperty>
+        information_only="1" />
 
      <StringVectorProperty
         name="FileNames"
@@ -3049,8 +3016,8 @@
      <DoubleVectorProperty 
         name="TimestepValues"
         repeatable="1"
-        information_only="1">
-        <TimeStepsInformationHelper/>
+        information_only="1"
+        kernel_class="vtkPMTimeStepsProperty">
         <Documentation>
           Available timestep values.
         </Documentation>
@@ -3111,8 +3078,8 @@
      <DoubleVectorProperty 
         name="TimestepValues"
         repeatable="1"
-        information_only="1">
-        <TimeStepsInformationHelper/>
+        information_only="1"
+        kernel_class="vtkPMTimeStepsProperty">
         <Documentation>
           Available timestep values.
         </Documentation>
@@ -3120,9 +3087,9 @@
 
      <StringVectorProperty 
         name="CellArrayInfo"
-        information_only="1">
-        <ArraySelectionInformationHelper attribute_name="Cell"/>
-     </StringVectorProperty>
+        information_only="1"
+        kernel_class="vtkPMArraySelectionProperty"
+        command="Cell" />
 
      <StringVectorProperty
         name="CellArrayStatus"
@@ -3145,9 +3112,9 @@
 
      <StringVectorProperty 
         name="PointArrayInfo"
-        information_only="1">
-        <ArraySelectionInformationHelper attribute_name="Point"/>
-     </StringVectorProperty>
+        information_only="1"
+        kernel_class="vtkPMArraySelectionProperty"
+        command="Point" />
 
      <StringVectorProperty
         name="PointArrayStatus"
@@ -3196,8 +3163,8 @@
      <DoubleVectorProperty 
         name="TimestepValues"
         repeatable="1"
-        information_only="1">
-        <TimeStepsInformationHelper/>
+        information_only="1"
+        kernel_class="vtkPMTimeStepsProperty">
         <Documentation>
           Available timestep values.
         </Documentation>
@@ -3282,9 +3249,9 @@
 
      <StringVectorProperty 
         name="CellArrayInfo"
-        information_only="1">
-        <ArraySelectionInformationHelper attribute_name="Cell"/>
-     </StringVectorProperty>
+        information_only="1"
+        kernel_class="vtkPMArraySelectionProperty"
+        command="Cell" />
 
      <StringVectorProperty
         name="CellArrayStatus"
@@ -3355,9 +3322,8 @@
 
     <DoubleVectorProperty name="TimestepValues" 
                           repeatable="1"
-                          information_only="1">
-      <TimeStepsInformationHelper/>
-    </DoubleVectorProperty>
+                          information_only="1"
+                          kernel_class="vtkPMTimeStepsProperty" />
 
     <Hints>
       <!-- This property is here simply to set it. -->
@@ -3495,8 +3461,8 @@
      <DoubleVectorProperty 
          name="TimestepValues"
          repeatable="1"
-         information_only="1">
-        <TimeStepsInformationHelper/>
+         information_only="1"
+         kernel_class="vtkPMTimeStepsProperty">
         <Documentation>
           Available timestep values.
         </Documentation>
@@ -3647,9 +3613,7 @@
 
      <StringVectorProperty name="FileNameInfo"
         command="GetCurrentFileName"
-        information_only="1" >
-        <SimpleStringInformationHelper />
-     </StringVectorProperty>
+        information_only="1" />
 
      
      <StringVectorProperty
@@ -3669,8 +3633,8 @@
      <DoubleVectorProperty 
         name="TimestepValues"
         repeatable="1"
-        information_only="1">
-        <TimeStepsInformationHelper/>
+        information_only="1"
+        kernel_class="vtkPMTimeStepsProperty">
         <Documentation>
           Available timestep values.
         </Documentation>
@@ -3874,8 +3838,8 @@
      <DoubleVectorProperty 
        name="TimestepValues"
        repeatable="1"
-       information_only="1">
-       <TimeStepsInformationHelper/>
+       information_only="1"
+       kernel_class="vtkPMTimeStepsProperty">
        <Documentation>
          Available timestep values.
        </Documentation>
@@ -3895,9 +3859,9 @@
 
      <StringVectorProperty 
        name="CellArrayInfo"
-       information_only="1">
-       <ArraySelectionInformationHelper attribute_name="Cell"/>
-     </StringVectorProperty>
+       information_only="1"
+       kernel_class="vtkPMArraySelectionProperty"
+       command="Cell" />
 
     <StringVectorProperty
         name="CellArrayStatus"
@@ -3920,9 +3884,9 @@
 
      <StringVectorProperty 
         name="PointArrayInfo"
-        information_only="1">
-        <ArraySelectionInformationHelper attribute_name="Point"/>
-     </StringVectorProperty>
+        information_only="1"
+        kernel_class="vtkPMArraySelectionProperty"
+        command="Point" />
 
      <StringVectorProperty
         name="PointArrayStatus"
@@ -4181,8 +4145,8 @@
      <DoubleVectorProperty
         name="TimestepValues"
         repeatable="1"
-        information_only="1">
-        <TimeStepsInformationHelper/>
+        information_only="1"
+        kernel_class="vtkPMTimeStepsProperty">
         <Documentation>
           Available timestep values.
         </Documentation>
@@ -4224,16 +4188,16 @@
         </Documentation>
      </StringVectorProperty>
 
-     <DoubleVectorProperty name="TimestepValues"
-        information_only="1">
-       <TimeStepsInformationHelper/>
-     </DoubleVectorProperty>
+     <DoubleVectorProperty
+        name="TimestepValues"
+        information_only="1"
+        kernel_class="vtkPMTimeStepsProperty" />
 
      <StringVectorProperty 
         name="PointArrayInfo"
-        information_only="1">
-        <ArraySelectionInformationHelper attribute_name="Point"/>
-     </StringVectorProperty>
+        information_only="1"
+        kernel_class="vtkPMArraySelectionProperty"
+        command="Point" />
 
      <StringVectorProperty
         name="PointArrayStatus"
@@ -4257,9 +4221,9 @@
 
      <StringVectorProperty 
         name="CellArrayInfo"
-        information_only="1">
-        <ArraySelectionInformationHelper attribute_name="Cell"/>
-     </StringVectorProperty>
+        information_only="1"
+        kernel_class="vtkPMArraySelectionProperty"
+        command="Cell" />
 
      <StringVectorProperty
         name="CellArrayStatus"
@@ -4283,9 +4247,9 @@
 
      <StringVectorProperty 
         name="SetInfo"
-        information_only="1">
-        <ArraySelectionInformationHelper attribute_name="Set"/>
-     </StringVectorProperty>
+        information_only="1"
+        kernel_class="vtkPMArraySelectionProperty"
+        command="Set" />
 
      <StringVectorProperty
         name="SetStatus"
@@ -4307,12 +4271,10 @@
      </StringVectorProperty>
 
      <StringVectorProperty name="GridInfo"
-        information_only="1">
-        <SILInformationHelper
-          timestamp_command="GetSILUpdateStamp"
-          subtree="Blocks">
-        </SILInformationHelper>
-     </StringVectorProperty>
+        information_only="1"
+        kernel_class="vtkPMSILProperty"
+        subtree="Blocks"
+        timestamp_command="GetSILUpdateStamp" />
      
      <StringVectorProperty
         name="GridStatus"
@@ -4376,7 +4338,6 @@
         <Documentation>
            This property is a string representation of the table of contents.
         </Documentation>
-        <SimpleStringInformationHelper/>
      </StringVectorProperty>
      <Hints>
       <ReaderFactory extensions="silo"
@@ -4465,9 +4426,7 @@
 
      <StringVectorProperty name="FileNameInfo"
                            command="GetCurrentFileName"
-                           information_only="1">
-       <SimpleStringInformationHelper />
-     </StringVectorProperty>
+                           information_only="1"/>
 
      <StringVectorProperty name="FileName"
                            clean_command="RemoveAllFileNames"
@@ -4494,9 +4453,8 @@
 
      <DoubleVectorProperty name="TimestepValues" 
                            repeatable="1"
-                           information_only="1">
-       <TimeStepsInformationHelper/>
-     </DoubleVectorProperty>
+                           information_only="1"
+                           kernel_class="vtkPMTimeStepsProperty" />
 
      <Hints>
        <!-- This property is here simply to set it. -->
@@ -4583,9 +4541,7 @@
 
      <StringVectorProperty name="FileNameInfo"
                            command="GetCurrentFileName"
-                           information_only="1">
-       <SimpleStringInformationHelper />
-     </StringVectorProperty>
+                           information_only="1" />
 
      <StringVectorProperty name="FileName"
                            animateable="0"
@@ -4610,9 +4566,8 @@
 
      <DoubleVectorProperty name="TimestepValues" 
                            repeatable="1"
-                           information_only="1">
-       <TimeStepsInformationHelper/>
-     </DoubleVectorProperty>
+                           information_only="1"
+                           kernel_class="vtkPMTimeStepsProperty" />
 
      <Hints>
        <!-- This property is here simply to set it. -->
@@ -4652,9 +4607,7 @@
 
      <StringVectorProperty name="FileNameInfo"
         command="GetCurrentFileName"
-        information_only="1" >
-        <SimpleStringInformationHelper />
-     </StringVectorProperty>
+        information_only="1" />
 
 
      <StringVectorProperty
@@ -4676,8 +4629,8 @@
      <DoubleVectorProperty 
         name="TimestepValues"
         repeatable="1"
-        information_only="1">
-        <TimeStepsInformationHelper/>
+        information_only="1"
+        kernel_class="vtkPMTimeStepsProperty">
         <Documentation>
           Available timestep values.
         </Documentation>
@@ -4801,14 +4754,13 @@
      <IntVectorProperty
          name="TableIds"
          command="GetTableIdsAsArray"
-         information_only="1">
-         <IntArrayInformationHelper />
-     </IntVectorProperty>
+         information_only="1"
+         kernel_class="vtkPMDataArrayProperty" />
      <StringVectorProperty
          name="TableArrayInfo"
-         information_only="1">
-         <ArraySelectionInformationHelper attribute_name="Table"/>
-     </StringVectorProperty>
+         information_only="1"
+         kernel_class="vtkPMArraySelectionProperty"
+         command="Table" />
 
      <Hints>
       <ReaderFactory extensions="sesame"
@@ -4880,15 +4832,14 @@
       <DoubleVectorProperty
          name="TimestepValues"
          repeatable="1"
-         information_only="1">
-        <TimeStepsInformationHelper/>
-      </DoubleVectorProperty>
+         information_only="1"
+         kernel_class="vtkPMTimeStepsProperty" />
 
       <StringVectorProperty
          name="PatchArrayInfo"
-         information_only="1">
-        <ArraySelectionInformationHelper attribute_name="Patch"/>
-      </StringVectorProperty>
+         information_only="1"
+         kernel_class="vtkPMArraySelectionProperty"
+         command="Patch" />
 
       <StringVectorProperty
          name="MeshRegions"
@@ -4908,9 +4859,9 @@
 
       <StringVectorProperty
          name="CellArrayInfo"
-         information_only="1">
-        <ArraySelectionInformationHelper attribute_name="Cell"/>
-      </StringVectorProperty>
+         information_only="1"
+         kernel_class="vtkPMArraySelectionProperty"
+         command="Cell" />
       <StringVectorProperty
          name="CellArrays"
          command="SetCellArrayStatus"
@@ -4929,9 +4880,9 @@
 
       <StringVectorProperty
          name="PointArrayInfo"
-         information_only="1">
-        <ArraySelectionInformationHelper attribute_name="Point"/>
-      </StringVectorProperty>
+         information_only="1"
+         kernel_class="vtkPMArraySelectionProperty"
+         command="Point" />
       <StringVectorProperty
          name="PointArrays"
          command="SetPointArrayStatus"
@@ -4950,9 +4901,9 @@
 
       <StringVectorProperty
          name="LagrangianArrayInfo"
-         information_only="1">
-        <ArraySelectionInformationHelper attribute_name="Lagrangian"/>
-      </StringVectorProperty>
+         information_only="1"
+         kernel_class="vtkPMArraySelectionProperty"
+         command="Lagrangian" />
       <StringVectorProperty
          name="LagrangianArrays"
          command="SetLagrangianArrayStatus"
@@ -5067,9 +5018,9 @@
       </StringVectorProperty>
 
       <StringVectorProperty name="CellArrayInfo"
-                           information_only="1">
-        <ArraySelectionInformationHelper attribute_name="Cell"/>
-      </StringVectorProperty>
+                           information_only="1"
+                           kernel_class="vtkPMArraySelectionProperty"
+                           command="Cell" />
 
       <StringVectorProperty name="CellArrayStatus"
                             command="SetCellArrayStatus"
@@ -5092,9 +5043,8 @@
       <DoubleVectorProperty 
           name="TimestepValues" 
           repeatable="1"
-          information_only="1">
-       <TimeStepsInformationHelper/>
-      </DoubleVectorProperty>
+          information_only="1"
+          kernel_class="vtkPMTimeStepsProperty" />
 
      <Hints>
       <ReaderFactory extensions="RES"
@@ -5122,9 +5072,9 @@
        </Documentation>
      </StringVectorProperty>
      <StringVectorProperty name="CellArrayInfo"
-                           information_only="1">
-       <ArraySelectionInformationHelper attribute_name="Cell"/>
-     </StringVectorProperty>
+                           information_only="1"
+                           kernel_class="vtkPMArraySelectionProperty"
+                           command="Cell" />
      <StringVectorProperty name="CellArrayStatus"
                            command="SetCellArrayStatus"
                            number_of_elements="0"
@@ -5210,13 +5160,14 @@
      <DoubleVectorProperty 
          name="TimestepValues" 
          repeatable="1"
-         information_only="1">
-       <TimeStepsInformationHelper/>
-     </DoubleVectorProperty>
+         information_only="1"
+         kernel_class="vtkPMTimeStepsProperty" />
 
-     <StringVectorProperty name="SolidArrayInfo" information_only="1">
-        <ArraySelectionInformationHelper attribute_name="Solid"/>
-     </StringVectorProperty>
+     <StringVectorProperty
+         name="SolidArrayInfo"
+         information_only="1"
+         kernel_class="vtkPMArraySelectionProperty"
+         command="Solid" />
 
      <StringVectorProperty name="SolidArrayStatus" 
                            command="SetSolidArrayStatus" 
@@ -5236,9 +5187,11 @@
        </Documentation>
      </StringVectorProperty>
 
-     <StringVectorProperty name="ThickShellArrayInfo" information_only="1">
-        <ArraySelectionInformationHelper attribute_name="ThickShell"/>
-     </StringVectorProperty>
+     <StringVectorProperty
+         name="ThickShellArrayInfo"
+         information_only="1"
+         kernel_class="vtkPMArraySelectionProperty"
+         command="ThickShell" />
 
      <StringVectorProperty name="ThickShellArrayStatus" 
                            command="SetThickShellArrayStatus" 
@@ -5258,9 +5211,11 @@
        </Documentation>
      </StringVectorProperty>
 
-     <StringVectorProperty name="ShellArrayInfo" information_only="1">
-        <ArraySelectionInformationHelper attribute_name="Shell"/>
-     </StringVectorProperty>
+     <StringVectorProperty
+         name="ShellArrayInfo"
+         information_only="1"
+         kernel_class="vtkPMArraySelectionProperty"
+         command="Shell" />
 
      <StringVectorProperty name="ShellArrayStatus" 
                            command="SetShellArrayStatus"
@@ -5280,9 +5235,10 @@
        </Documentation>
      </StringVectorProperty>
 
-     <StringVectorProperty name="RigidBodyArrayInfo" information_only="1">
-        <ArraySelectionInformationHelper attribute_name="RigidBody"/>
-     </StringVectorProperty>
+     <StringVectorProperty name="RigidBodyArrayInfo"
+                           information_only="1"
+                           kernel_class="vtkPMArraySelectionProperty"
+                           command="RigidBody" />
 
      <StringVectorProperty name="RigidBodyArrayStatus" 
                            command="SetRigidBodyArrayStatus" 
@@ -5302,9 +5258,10 @@
        </Documentation>
      </StringVectorProperty>
 
-     <StringVectorProperty name="RoadSurfaceArrayInfo" information_only="1">
-        <ArraySelectionInformationHelper attribute_name="RoadSurface"/>
-     </StringVectorProperty>
+     <StringVectorProperty name="RoadSurfaceArrayInfo"
+                           information_only="1"
+                           kernel_class="vtkPMArraySelectionProperty"
+                           command="RoadSurface" />
 
      <StringVectorProperty name="RoadSurfaceArrayStatus" 
                            command="SetRoadSurfaceArrayStatus" 
@@ -5324,9 +5281,10 @@
        </Documentation>
      </StringVectorProperty>
 
-     <StringVectorProperty name="BeamArrayInfo" information_only="1">
-        <ArraySelectionInformationHelper attribute_name="Beam"/>
-     </StringVectorProperty>
+     <StringVectorProperty name="BeamArrayInfo"
+                           information_only="1"
+                           kernel_class="vtkPMArraySelectionProperty"
+                           command="Beam" />
 
      <StringVectorProperty name="BeamArrayStatus" 
                            command="SetBeamArrayStatus" 
@@ -5346,9 +5304,10 @@
        </Documentation>
      </StringVectorProperty>
 
-     <StringVectorProperty name="ParticleArrayInfo" information_only="1">
-        <ArraySelectionInformationHelper attribute_name="Particle"/>
-     </StringVectorProperty>
+     <StringVectorProperty name="ParticleArrayInfo"
+                           information_only="1"
+                           kernel_class="vtkPMArraySelectionProperty"
+                           command="Particle" />
 
      <StringVectorProperty name="ParticleArrayStatus" 
                            command="SetParticleArrayStatus" 
@@ -5368,9 +5327,10 @@
        </Documentation>
      </StringVectorProperty>
 
-     <StringVectorProperty name="PointArrayInfo" information_only="1">
-        <ArraySelectionInformationHelper attribute_name="Point"/>
-     </StringVectorProperty>
+     <StringVectorProperty name="PointArrayInfo"
+                           information_only="1"
+                           kernel_class="vtkPMArraySelectionProperty"
+                           command="Point" />
 
      <StringVectorProperty name="PointArrayStatus" 
                            command="SetPointArrayStatus" 
@@ -5389,9 +5349,10 @@
        </Documentation>
      </StringVectorProperty>
 
-     <StringVectorProperty name="PartArrayInfo" information_only="1">
-        <ArraySelectionInformationHelper attribute_name="Part"/>
-     </StringVectorProperty>
+     <StringVectorProperty name="PartArrayInfo"
+                           information_only="1"
+                           kernel_class="vtkPMArraySelectionProperty"
+                           command="Part" />
 
      <StringVectorProperty name="PartArrayStatus" 
                            command="SetPartArrayStatus" 
@@ -5497,8 +5458,8 @@
 
       <DoubleVectorProperty name="TimestepValues"
                             repeatable="1"
-                            information_only="1">
-        <TimeStepsInformationHelper />
+                            information_only="1"
+                            kernel_class="vtkPMTimeStepsProperty">
         <Documentation>
           This magic property sends time information to the animation
           panel.  ParaView will then automatically set up the animation to
@@ -5602,8 +5563,8 @@
 
       <DoubleVectorProperty name="TimestepValues"
                             repeatable="1"
-                            information_only="1">
-        <TimeStepsInformationHelper />
+                            information_only="1"
+                            kernel_class="vtkPMTimeStepsProperty">
         <Documentation>
           This magic property sends time information to the animation
           panel.  ParaView will then automatically set up the animation to
@@ -5611,8 +5572,9 @@
         </Documentation>
       </DoubleVectorProperty>
 
-      <DoubleVectorProperty name="TimeRange" information_only="1">
-        <TimeRangeInformationHelper/>
+      <DoubleVectorProperty name="TimeRange"
+                            information_only="1"
+                            kernel_class="vtkPMTimeRangeProperty">
         <Documentation>
           This magic property sends time range information to the animation
           panel.  ParaView uses this information to set the range of time
@@ -5660,8 +5622,8 @@
 
       <DoubleVectorProperty name="TimestepValues"
                             repeatable="1"
-                            information_only="1">
-        <TimeStepsInformationHelper />
+                            information_only="1"
+                            kernel_class="vtkPMTimeStepsProperty">
         <Documentation>
           Available timestep values.
         </Documentation>
@@ -5706,15 +5668,13 @@
 
      <StringVectorProperty name="FileNameInfo"
         command="GetCurrentFileName"
-        information_only="1" >
-        <SimpleStringInformationHelper />
-     </StringVectorProperty>
+        information_only="1" />
 
  
       <DoubleVectorProperty name="TimestepValues"
                             repeatable="1"
-                            information_only="1">
-        <TimeStepsInformationHelper/>
+                            information_only="1"
+                            kernel_class="vtkPMTimeStepsProperty">
         <Documentation>
           Available timestep values.
         </Documentation>
@@ -5774,15 +5734,13 @@
 
       <StringVectorProperty name="FileNameInfo"
         command="GetCurrentFileName"
-        information_only="1" >
-        <SimpleStringInformationHelper />
-      </StringVectorProperty>
+        information_only="1" />
 
  
       <DoubleVectorProperty name="TimestepValues"
                             repeatable="1"
-                            information_only="1">
-        <TimeStepsInformationHelper/>
+                            information_only="1"
+                            kernel_class="vtkPMTimeStepsProperty">
         <Documentation>
           Available timestep values.
         </Documentation>
@@ -5835,15 +5793,13 @@
        
      <StringVectorProperty name="FileNameInfo"
         command="GetCurrentFileName"
-        information_only="1" >
-        <SimpleStringInformationHelper />
-     </StringVectorProperty>
+        information_only="1" />
        
      <DoubleVectorProperty 
         name="TimestepValues"
         repeatable="1"
-        information_only="1">
-        <TimeStepsInformationHelper/>
+        information_only="1"
+        kernel_class="vtkPMTimeStepsProperty">
         <Documentation>
           Available timestep values.
         </Documentation>
@@ -5882,9 +5838,9 @@
 
      <StringVectorProperty
         name="PointArrayInfo"
-        information_only="1">
-        <ArraySelectionInformationHelper attribute_name="Point"/>
-     </StringVectorProperty>
+        information_only="1"
+        kernel_class="vtkPMArraySelectionProperty"
+        command="Point" />
 
      <StringVectorProperty
         name="PointArrayStatus"
@@ -5905,9 +5861,8 @@
      <DoubleVectorProperty
          name="TimestepValues"
          repeatable="1"
-         information_only="1">
-       <TimeStepsInformationHelper/>
-     </DoubleVectorProperty>
+         information_only="1"
+         kernel_class="vtkPMTimeStepsProperty" />
 
      <IntVectorProperty
          name="SetStride"
@@ -5921,23 +5876,17 @@
      <IntVectorProperty
         name="DefaultXExtent"
         command="GetXLayout"
-        information_only="1">
-        <SimpleIntInformationHelper/>
-     </IntVectorProperty>
+        information_only="1" />
 
      <IntVectorProperty
         name="DefaultYExtent"
         command="GetYLayout"
-        information_only="1">
-        <SimpleIntInformationHelper/>
-     </IntVectorProperty>
+        information_only="1" />
 
      <IntVectorProperty
         name="DefaultZExtent"
         command="GetZLayout"
-        information_only="1">
-        <SimpleIntInformationHelper/>
-     </IntVectorProperty>
+        information_only="1" />
 
      <IntVectorProperty
         name="XExtent"
@@ -6008,15 +5957,14 @@
      <DoubleVectorProperty
          name="TimestepValues"
          repeatable="1"
-         information_only="1">
-       <TimeStepsInformationHelper/>
-     </DoubleVectorProperty>
+         information_only="1"
+         kernel_class="vtkPMTimeStepsProperty" />
 
       <StringVectorProperty
         name="PointArrayInfo"
-        information_only="1">
-        <ArraySelectionInformationHelper attribute_name="Point"/>
-      </StringVectorProperty>
+        information_only="1"
+        kernel_class="vtkPMArraySelectionProperty"
+        command="Point" />
 
       <StringVectorProperty
         name="PointArrayStatus"
@@ -6063,9 +6011,10 @@
      </StringVectorProperty>
 
     <StringVectorProperty name="VariableArrayInfo"
-                          information_only="1">
-      <ArraySelectionInformationHelper attribute_name="Variable"/>
-    </StringVectorProperty>
+                          information_only="1"
+                          kernel_class="vtkPMArraySelectionProperty"
+                          command="Variable" />
+
     <StringVectorProperty name="VariableArrayStatus"
                           command="SetVariableArrayStatus"
                           number_of_elements="0"
@@ -6131,9 +6080,7 @@
 
      <StringVectorProperty name="FileNameInfo"
         command="GetCurrentFileName"
-        information_only="1" >
-        <SimpleStringInformationHelper />
-     </StringVectorProperty>
+        information_only="1" />
 
      <StringVectorProperty name="FileName"
                            clean_command="RemoveAllFileNames"
@@ -6150,8 +6097,8 @@
 
      <DoubleVectorProperty name="TimestepValues"
                            repeatable="1"
-                           information_only="1">
-       <TimeStepsInformationHelper/>
+                           information_only="1"
+                           kernel_class="vtkPMTimeStepsProperty">
        <Documentation>
          Available timestep values.
        </Documentation>
@@ -6182,9 +6129,9 @@
 
      <StringVectorProperty
          name="PointArrayInfo"
-         information_only="1">
-       <ArraySelectionInformationHelper attribute_name="Point"/>
-     </StringVectorProperty>
+         information_only="1"
+         kernel_class="vtkPMArraySelectionProperty"
+         command="Point" />
 
      <StringVectorProperty
          name="PointArrayStatus"
@@ -6206,9 +6153,9 @@
 
      <StringVectorProperty
          name="CellArrayInfo"
-         information_only="1">
-       <ArraySelectionInformationHelper attribute_name="Cell"/>
-     </StringVectorProperty>
+         information_only="1"
+         kernel_class="vtkPMArraySelectionProperty"
+         command="Cell" />
 
      <StringVectorProperty
          name="CellArrayStatus"
@@ -6231,9 +6178,7 @@
      <IntVectorProperty
          name="VerticalLevelRangeInfo"
          command="GetVerticalLevelRange"
-         information_only="1">
-       <SimpleIntInformationHelper/>
-     </IntVectorProperty>
+         information_only="1" />
 
      <IntVectorProperty
          name="VerticalLevel"
@@ -6250,9 +6195,8 @@
      <DoubleVectorProperty
          name="TimestepValues"
          repeatable="1"
-         information_only="1">
-       <TimeStepsInformationHelper/>
-     </DoubleVectorProperty>
+         information_only="1"
+         kernel_class="vtkPMTimeStepsProperty" />
 
      <Hints>
        <ReaderFactory extensions="ncdf nc"
@@ -6290,9 +6234,7 @@
 
      <StringVectorProperty name="FileNameInfo"
         command="GetCurrentFileName"
-        information_only="1" >
-        <SimpleStringInformationHelper />
-     </StringVectorProperty>
+        information_only="1" />
 
      <StringVectorProperty
         name="QFileName"
@@ -6314,8 +6256,8 @@
      <DoubleVectorProperty
         name="TimestepValues"
         repeatable="1"
-        information_only="1">
-        <TimeStepsInformationHelper/>
+        information_only="1"
+        kernel_class="vtkPMTimeStepsProperty">
         <Documentation>
           Available timestep values.
         </Documentation>

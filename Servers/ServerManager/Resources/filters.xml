@@ -6226,9 +6226,8 @@ The Stream Tracer filter generates streamlines in a vector field from a collecti
 
       <DoubleVectorProperty
          name="TimestepValues"
-         information_only="1">
-        <TimeStepsInformationHelper/>
-      </DoubleVectorProperty>
+         information_only="1"
+         kernel_class="vtkPMTimeStepsProperty"/>
 
       <!-- End TemporalCache -->
     </SourceProxy>
@@ -6265,14 +6264,12 @@ The Stream Tracer filter generates streamlines in a vector field from a collecti
 
       <DoubleVectorProperty
          name="TimestepValues"
-         information_only="1">
-        <TimeStepsInformationHelper/>
-      </DoubleVectorProperty>
+         information_only="1"
+         kernel_class="vtkPMTimeStepsProperty" />
 
      <DoubleVectorProperty name="TimeRange"
-        information_only="1">
-       <TimeRangeInformationHelper/>
-     </DoubleVectorProperty>
+        information_only="1"
+        kernel_class="vtkPMTimeRangeProperty" />
 
       <!-- End TemporalInterpolator -->
     </SourceProxy>
@@ -6314,9 +6311,8 @@ The Stream Tracer filter generates streamlines in a vector field from a collecti
 
       <DoubleVectorProperty
          name="TimestepValues"
-         information_only="1">
-        <TimeStepsInformationHelper/>
-      </DoubleVectorProperty>
+         information_only="1"
+         kernel_class="vtkPMTimeStepsProperty" />
 
       <!-- End TemporalSnapToTimeStep -->
     </SourceProxy>
@@ -6397,9 +6393,8 @@ The Stream Tracer filter generates streamlines in a vector field from a collecti
 
       <DoubleVectorProperty
          name="TimestepValues"
-         information_only="1">
-        <TimeStepsInformationHelper/>
-      </DoubleVectorProperty>
+         information_only="1"
+         kernel_class="vtkPMTimeStepsProperty" />
 
       <!-- End TemporalShiftScale -->
     </SourceProxy>
@@ -6677,9 +6672,8 @@ This filter operates on any type of data set, provided it has point-centered vec
 
      <DoubleVectorProperty
         name="TimestepValues"
-        information_only="1">
-       <TimeStepsInformationHelper/>
-     </DoubleVectorProperty>
+        information_only="1"
+        kernel_class="vtkPMTimeStepsProperty" />
 
      <IntVectorProperty
         name="StaticSeeds"
@@ -9581,9 +9575,11 @@ This property controls how the filter works to generate tensor cell data. You ca
        </Documentation>
      </InputProperty>
 
-     <StringVectorProperty name="SelectArrayInfo" information_only="1">
-       <ArraySelectionInformationHelper attribute_name="Attribute"/> <!-- attribute_name => GetNumberOf___Arrays -->
-     </StringVectorProperty>
+     <StringVectorProperty
+         name="SelectArrayInfo"
+         information_only="1"
+         kernel_class="vtkPMArraySelectionProperty"
+         command="Attribute" /> <!-- command => GetNumberOf___Arrays -->
 
      <IntVectorProperty name="AttributeMode"
          command="SetAttributeMode"
@@ -9728,9 +9724,11 @@ This property controls how the filter works to generate tensor cell data. You ca
        </Documentation>
      </InputProperty>
 
-     <StringVectorProperty name="SelectArrayInfo" information_only="1">
-       <ArraySelectionInformationHelper attribute_name="Attribute"/> <!-- attribute_name => GetNumberOf___Arrays -->
-     </StringVectorProperty>
+     <StringVectorProperty
+          name="SelectArrayInfo"
+          information_only="1"
+          kernel_class="vtkPMArraySelectionProperty"
+          command="Attribute" />
 
      <IntVectorProperty name="AttributeMode"
          command="SetAttributeMode"
@@ -9901,9 +9899,11 @@ This property controls how the filter works to generate tensor cell data. You ca
        </Documentation>
      </InputProperty>
 
-     <StringVectorProperty name="SelectArrayInfo" information_only="1">
-       <ArraySelectionInformationHelper attribute_name="Attribute"/> <!-- attribute_name => GetNumberOf___Arrays -->
-     </StringVectorProperty>
+     <StringVectorProperty
+         name="SelectArrayInfo"
+         information_only="1"
+         kernel_class="vtkPMArraySelectionProperty"
+         command="Attribute" />
 
      <IntVectorProperty name="AttributeMode"
          command="SetAttributeMode"
@@ -10035,9 +10035,11 @@ This property controls how the filter works to generate tensor cell data. You ca
        </Documentation>
      </InputProperty>
 
-     <StringVectorProperty name="SelectArrayInfo" information_only="1">
-       <ArraySelectionInformationHelper attribute_name="Attribute"/> <!-- attribute_name => GetNumberOf___Arrays -->
-     </StringVectorProperty>
+     <StringVectorProperty
+         name="SelectArrayInfo"
+         information_only="1"
+         kernel_class="vtkPMArraySelectionProperty"
+         command="Attribute" />
 
      <IntVectorProperty name="AttributeMode"
          command="SetAttributeMode"
