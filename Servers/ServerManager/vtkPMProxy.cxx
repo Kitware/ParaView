@@ -153,7 +153,7 @@ void vtkPMProxy::Pull(vtkSMMessage* message)
     if (prop_names.size() == 0 ||
       prop_names.find(iter->first) != prop_names.end())
       {
-      if (!iter->second->Pull(&response))
+      if (!iter->second->GetIsInternal() && !iter->second->Pull(&response))
         {
         vtkErrorMacro("Error pulling property state: " << iter->first);
         return;

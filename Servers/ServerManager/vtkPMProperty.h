@@ -65,6 +65,13 @@ public:
   // for information (for example from python).
   vtkGetMacro(Repeatable, bool);
 
+  // Description:
+  // This ivar is configured when the xml file is read and is mainly useful
+  // to trigger a method call.
+  // Internal properties are not saved in state
+  vtkSetMacro(IsInternal, int);
+  vtkGetMacro(IsInternal, int);
+
 //BTX
 protected:
   vtkPMProperty();
@@ -106,6 +113,7 @@ protected:
   bool UpdateSelf;
   bool InformationOnly;
   bool Repeatable;
+  bool IsInternal;
 
   vtkWeakPointer<vtkPMProxy> ProxyHelper;
 

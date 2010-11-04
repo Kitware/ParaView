@@ -26,6 +26,7 @@ vtkPMProperty::vtkPMProperty()
 {
   this->Command = 0;
   this->XMLName = 0;
+  this->IsInternal = 0;
   this->UpdateSelf = false;
   this->InformationOnly = false;
   this->Repeatable = false;
@@ -82,6 +83,13 @@ bool vtkPMProperty::ReadXMLAttributes(
     {
     this->InformationOnly = (information_only != 0);
     }
+
+  int is_internal;
+  if (element->GetScalarAttribute("is_internal", &is_internal))
+    {
+    this->SetIsInternal(is_internal);
+    }
+
   return true;
 }
 
