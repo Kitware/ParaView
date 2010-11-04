@@ -51,6 +51,8 @@ pqFileDialogFilter::~pqFileDialogFilter()
 {
 }
 
+#include <stdio.h>
+
 void pqFileDialogFilter::setFilter(const QString& filter)
 {
   QString f(filter);
@@ -70,19 +72,56 @@ void pqFileDialogFilter::setFilter(const QString& filter)
   if ( f != "*" )
     {
     f = f.trimmed();
+
     //convert all spaces into |
     f.replace(QRegExp("[\\s+;]+"),"|");
-    //escape all periods that exist in the extensions to keep the regexp valid
-    f.replace(".","\\.");
-    // replace all *'s by .*
-    f.replace("*",".*");
+
+    QStringList strings = f.split("|");
+    QStringList extensions_list, filepatterns_list;
+    foreach (QString string, strings)
+      {
+      if (string.startsWith("*."))
+        {
+        extensions_list.push_back(string.remove(0, 2));
+        }
+      else
+        {
+        filepatterns_list.push_back(string);
+        }
+      }
+
+    QString extensions = extensions_list.join("|");
+    QString filepatterns = filepatterns_list.join("|");
+
+    extensions.replace(".","\\.");
+    extensions.replace("*", ".*");
+
+    filepatterns.replace(".","\\.");
+    filepatterns.replace("*", ".*");
+
+    cout << extensions.toAscii().data() << endl;
+    cout << filepatterns.toAscii().data() << endl;
 
     //use non capturing(?:) for speed
     //name.ext or ext.001
-    QString postExtFileSeries("(\\.\\d+)?"); // match the .0001 component
-    QString extGroup = "(?:" % f % ")";
-    pattern = "(" % extGroup % "|^" % extGroup % postExtFileSeries % ")$";
+    QString postExtFileSeries("(\\.\\d+)?$"); // match the .0001 component
+    QString extGroup = ".*\\.(?:" % extensions % ")" % postExtFileSeries;
+    QString fileGroup = "(?:" % filepatterns % ")" % postExtFileSeries;
+    if (extensions_list.size() > 0 && filepatterns_list.size() > 0)
+      {
+      pattern = "(?:" % fileGroup % "|" % extGroup % ")";
+      }
+    else if (extensions_list.size() > 0)
+      {
+      pattern = extGroup;
+      }
+    else
+      {
+      pattern = fileGroup;
+      }
     }
+
+  cout << pattern.toAscii().data() << endl;
 
   this->Wildcards.setPattern(pattern);
   this->invalidateFilter();
