@@ -12,51 +12,40 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVHardwareSelector - vtkHardwareSelector subclass with logic to work
-// in Parallel.
+// .NAME vtkPVHardwareSelector - vtkPHardwareSelector subclass with paraview
+// sepecific logic to avoid recapturing buffers unless needed.
 // .SECTION Description
-//
+// vtkPHardwareSelector is subclass of vtkPHardwareSelector that adds logic to
+// reuse the captured buffers as much as possible. Thus avoiding repeated
+// selection-rendering of repeated selections or picking.
 
 #ifndef __vtkPVHardwareSelector_h
 #define __vtkPVHardwareSelector_h
 
-#include "vtkHardwareSelector.h"
+#include "vtkPHardwareSelector.h"
 
-class VTK_EXPORT vtkPVHardwareSelector : public vtkHardwareSelector
+class VTK_EXPORT vtkPVHardwareSelector : public vtkPHardwareSelector
 {
 public:
   static vtkPVHardwareSelector* New();
-  vtkTypeMacro(vtkPVHardwareSelector, vtkHardwareSelector);
+  vtkTypeMacro(vtkPVHardwareSelector, vtkPHardwareSelector);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  void BeginSelection()
-    { this->Superclass::BeginSelection(); }
-  void SetCurrentPass(int pass)
-    { this->CurrentPass = pass; }
-  void EndSelection()
-    { this->Superclass::EndSelection(); }
+  // Description:
+  // Overridden to avoid clearing of captured buffers.
+  vtkSelection* Select(int region[4]);
 
-  vtkSetMacro(NumberOfIDs, vtkIdType);
-  vtkGetMacro(NumberOfIDs, vtkIdType);
-
-  vtkSetMacro(NumberOfProcesses, int);
-  vtkGetMacro(NumberOfProcesses, int);
+  // Description:
+  // Returns true when the next call to Select() will result in renders to
+  // capture the selection-buffers.
+  virtual bool NeedToRenderForSelection();
 
 //BTX
 protected:
   vtkPVHardwareSelector();
   ~vtkPVHardwareSelector();
 
-  // Description:
-  // Return a unique ID for the prop.
-  virtual int GetPropID(int idx, vtkProp* prop);
-
-  // Description:
-  // Returns is the pass indicated is needed.
-  virtual bool PassRequired(int pass);
-
-  int NumberOfProcesses;
-  vtkIdType NumberOfIDs;
+  vtkTimeStamp CaptureTime;
 private:
   vtkPVHardwareSelector(const vtkPVHardwareSelector&); // Not implemented
   void operator=(const vtkPVHardwareSelector&); // Not implemented

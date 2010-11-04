@@ -47,7 +47,7 @@ class vtkInformationRequestKey;
 class vtkInteractorStyleRubberBand3D;
 class vtkLight;
 class vtkLightKit;
-class vtkPHardwareSelector;
+class vtkPVHardwareSelector;
 class vtkProp;
 class vtkPVAxesWidget;
 class vtkPVCenterAxesActor;
@@ -435,7 +435,7 @@ protected:
   vtkInteractorStyleRubberBand3D* RubberBandStyle;
   vtkPVCenterAxesActor* CenterAxes;
   vtkPVAxesWidget* OrientationWidget;
-  vtkPHardwareSelector* Selector;
+  vtkPVHardwareSelector* Selector;
   vtkSelection* LastSelection;
 
   int StillRenderImageReductionFactor;

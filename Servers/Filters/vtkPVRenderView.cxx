@@ -33,7 +33,7 @@
 #include "vtkMPIMoveData.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
-#include "vtkPHardwareSelector.h"
+#include "vtkPVHardwareSelector.h"
 #include "vtkPKdTree.h"
 #include "vtkProcessModule.h"
 #include "vtkPVAxesWidget.h"
@@ -97,7 +97,7 @@ vtkPVRenderView::vtkPVRenderView()
   this->UseOffscreenRenderingForScreenshots = false;
   this->UseInteractiveRenderingForSceenshots = false;
   this->UseOffscreenRendering = (options->GetUseOffscreenRendering() != 0);
-  this->Selector = vtkPHardwareSelector::New();
+  this->Selector = vtkPVHardwareSelector::New();
 
   this->LastComputedBounds[0] = this->LastComputedBounds[2] =
     this->LastComputedBounds[4] = -1.0;
@@ -349,6 +349,9 @@ void vtkPVRenderView::SelectCells(int region[4])
 //----------------------------------------------------------------------------
 void vtkPVRenderView::Select(int fieldAssociation, int region[4])
 {
+  // NOTE: selection is only supported in builtin or client-server mode. Not
+  // supported in tile-display or batch modes.
+
   this->SetLastSelection(NULL);
 
   this->Selector->SetRenderer(this->GetRenderer());
@@ -360,22 +363,28 @@ void vtkPVRenderView::Select(int fieldAssociation, int region[4])
     {
     this->Selector->SetProcessIsRoot(false);
     }
-  this->Selector->SetArea(region[0], region[1], region[2], region[3]);
   this->Selector->SetFieldAssociation(fieldAssociation);
   // for now, we always do the process pass. In future, we can be smart about
   // disabling process pass when not needed.
   this->Selector->SetProcessID(
     vtkMultiProcessController::GetGlobalController()?
     vtkMultiProcessController::GetGlobalController()->GetLocalProcessId() : 0);
-  vtkSelection* sel = this->Selector->Select();
-  if (sel)
+
+  // If need_to_rerender is false, then the selector never fires the EndEvent
+  // since it doesn't do any rendering. Thus on satellites (or server) too, we
+  // simply treat as if the selection has been made without waiting for the
+  // event.
+  bool need_to_rerender = this->Selector->NeedToRenderForSelection();
+
+  vtkSmartPointer<vtkSelection> sel;
+  sel.TakeReference(this->Selector->Select(region));
+  if (sel || !need_to_rerender)
     {
     // sel is only generated on the "driver" node. The driver node may not have
     // the actual data (except in built-in mode). So representations on this
     // process may not be able to handle ConvertSelection() if call it right here.
     // Hence we broadcast the selection to all data-server nodes.
     this->FinishSelection(sel);
-    sel->Delete();
     }
   else
     {
