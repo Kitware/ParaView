@@ -316,6 +316,9 @@
         <layout class="QHBoxLayout">
          <item>
           <widget class="QLabel" name="TableSizeLabel">
+           <property name="whatsThis">
+            <string>You can change the color table size by moving the slider.  The largest value is the maximum texture size.  This gives the same result as not using discrete colors.</string>
+           </property>
            <property name="text">
             <string>Resolution</string>
            </property>
@@ -330,7 +333,7 @@
             <number>2</number>
            </property>
            <property name="maximum">
-            <number>256</number>
+            <number>2048</number>
            </property>
            <property name="value">
             <number>256</number>
