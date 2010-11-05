@@ -35,22 +35,15 @@ int main(int argc, char* argv[])
 
   vtkPVServerOptions* options = vtkPVServerOptions::New();
   vtkInitializationHelper::Initialize(argc, argv,
-    vtkProcessModule2::PROCESS_BATCH, options);
+    vtkProcessModule2::PROCESS_CLIENT, options);
   //---------------------------------------------------------------------------
 
   vtkSMSession* session = NULL;
   vtkSMProxy* proxy = NULL;
-  if(options->GetUnknownArgument())
-    {
-    // We have a remote URL to use
-    session = vtkSMSessionClient::New();
-    vtkSMSessionClient::SafeDownCast(session)->Connect(options->GetUnknownArgument());
-    }
-  else
-    {
-    // We are in built-in mode
-    session = vtkSMSession::New();
-    }
+
+  //session = vtkSMSessionClient::New();
+  //vtkSMSessionClient::SafeDownCast(session)->Connect("cs://localhost:11111");
+  session = vtkSMSession::New();
 
   cout << "Starting..." << endl;
 
@@ -60,10 +53,29 @@ int main(int argc, char* argv[])
     {
     cout << " Processing loop: " << i << endl;
 
-    proxy = pxm->NewProxy("views", "RenderView");
-    proxy->UpdateVTKObjects();
-    vtkSMRenderViewProxy::SafeDownCast(proxy)->StillRender();
-    proxy->Delete();
+
+
+    vtkSMProxy* sphere = pxm->NewProxy("sources", "SphereSource");
+    vtkSMPropertyHelper(sphere, "PhiResolution").Set(20);
+    vtkSMPropertyHelper(sphere, "ThetaResolution").Set(20);
+    sphere->UpdateVTKObjects();
+
+    vtkSMProxy* repr = pxm->NewProxy("representations", "GeometryRepresentation");
+    vtkSMPropertyHelper(repr, "Input").Set(sphere);
+    vtkSMPropertyHelper(repr, "Representation").Set("Wireframe");
+    repr->UpdateVTKObjects();
+
+    vtkSMProxy* view = pxm->NewProxy("views", "RenderView");
+    vtkSMPropertyHelper(view, "Representations").Add(repr);
+    view->UpdateVTKObjects();
+
+    vtkSMRenderViewProxy::SafeDownCast(view)->StillRender();
+    vtkSMRenderViewProxy::SafeDownCast(view)->ResetCamera();
+    vtkSMRenderViewProxy::SafeDownCast(view)->StillRender();
+
+    view->Delete();
+    sphere->Delete();
+    repr->Delete();
 
     proxy = pxm->NewProxy("misc", "FileInformationHelper");
     vtkSMPropertyHelper(proxy, "Path").Set("/tmp");
@@ -76,7 +88,7 @@ int main(int argc, char* argv[])
     info->Delete();
     proxy->Delete();
 
-    proxy = pxm->NewProxy("sources", "SphereSource");
+    vtkSMProxy* proxy = pxm->NewProxy("sources", "SphereSource");
     vtkSMPropertyHelper(proxy, "PhiResolution").Set(20);
     vtkSMPropertyHelper(proxy, "ThetaResolution").Set(20);
     proxy->UpdateVTKObjects();

@@ -31,6 +31,7 @@ public:
     vtkSMRepresentationProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
+#ifdef FIXME
   // Description:
   // vtkSpreadSheetRepresentation has three input ports one of the data, and
   // the others for the extracted selections. The data-input is exposed from the
@@ -40,6 +41,7 @@ public:
     vtkSMSourceProxy* input, unsigned int outputPort, const char* method);
   virtual void AddInput(vtkSMSourceProxy* input, const char* method)
     { this->Superclass::AddInput(input, method); }
+#endif
 
 //BTX
 protected:

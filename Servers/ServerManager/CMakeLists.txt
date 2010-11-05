@@ -31,19 +31,25 @@ SET (Kit_SRCS
   vtkPMProperty.cxx
   vtkPMProxy.cxx
   vtkPMProxyProperty.cxx
+  vtkPMPVRepresentationProxy.cxx
+  vtkPMSelectionRepresentationProxy.cxx
   vtkPMSILProperty.cxx
   vtkPMSourceProxy.cxx
   vtkPMStringVectorProperty.cxx
+  vtkPMTextSourceRepresentationProxy.cxx
   vtkPMTimeRangeProperty.cxx
   vtkPMTimeStepsProperty.cxx
+  vtkPMUniformGridVolumeRepresentationProxy.cxx
   vtkPMVectorProperty.cxx
   vtkPMWriterProxy.cxx
 # --- SM Objects ---
   vtkSMCameraLink.cxx
   vtkSMCameraProxy.cxx
-  vtkSMDeserializer.cxx
+  vtkSMChartRepresentationProxy.cxx
   vtkSMCompoundSourceProxy.cxx
   vtkSMCompoundSourceProxyDefinitionBuilder.cxx
+  vtkSMContextViewProxy.cxx
+  vtkSMDeserializer.cxx
   vtkSMDeserializer.cxx
   vtkSMDocumentation.cxx
   vtkSMDomain.cxx
@@ -57,6 +63,7 @@ SET (Kit_SRCS
   vtkSMLink.cxx
   vtkSMObject.cxx
   vtkSMOutputPort.cxx
+  vtkSMParallelCoordinatesRepresentationProxy.cxx
   vtkSMProperty.cxx
   vtkSMPropertyHelper.cxx
   vtkSMPropertyIterator.cxx
@@ -72,6 +79,7 @@ SET (Kit_SRCS
   vtkSMProxySelectionModel.cxx
   vtkSMProxyUndoElement.cxx
   vtkSMPSWriterProxy.cxx
+  vtkSMPVRepresentationProxy.cxx
   vtkSMPWriterProxy.cxx
   vtkSMRemoteObject.cxx
   vtkSMRemoteObjectUpdateUndoElement.cxx
@@ -83,13 +91,16 @@ SET (Kit_SRCS
   vtkSMSession.cxx
   vtkSMSessionServer.cxx
   vtkSMSourceProxy.cxx
+  vtkSMSpreadSheetRepresentationProxy.cxx
   vtkSMStateLoader.cxx
   vtkSMStateVersionControllerBase.cxx
   vtkSMStateVersionController.cxx
   vtkSMStringVectorProperty.cxx
+  vtkSMTwoDRenderViewProxy.cxx
   vtkSMUndoElement.cxx
   vtkSMUndoStackBuilder.cxx
   vtkSMUndoStack.cxx
+  vtkSMUnstructuredGridVolumeRepresentationProxy.cxx
   vtkSMUtilities.cxx
   vtkSMVectorProperty.cxx
   vtkSMViewProxy.cxx
@@ -150,7 +161,6 @@ SET(Kit_SRCS
   vtkSMCameraManipulatorProxy.cxx
   #vtkSMCaveRenderModuleProxy.cxx
 #  vtkSMCaveRenderViewProxy.cxx
-  vtkSMChartRepresentationProxy.cxx
   vtkSMComparativeAnimationCueProxy.cxx
   vtkSMComparativeViewProxy.cxx
   vtkSMCompositeKeyFrameProxy.cxx
@@ -159,7 +169,6 @@ SET(Kit_SRCS
   vtkSMConnectionCleanerProxy.cxx
   vtkSMContextArraysInformationHelper.cxx
   vtkSMContextNamedOptionsProxy.cxx
-  vtkSMContextViewProxy.cxx
   vtkSMCSVExporterProxy.cxx
   vtkSMDistanceRepresentation2DProxy.cxx
   vtkSMDoubleArrayInformationHelper.cxx
@@ -183,7 +192,6 @@ SET(Kit_SRCS
   vtkSMNewWidgetRepresentationProxy.cxx
   vtkSMOrderedPropertyIterator.cxx
   vtkSMNetworkImageSourceProxy.cxx
-  vtkSMParallelCoordinatesRepresentationProxy.cxx
   vtkSMPQStateLoader.cxx
   vtkSMPluginManager.cxx
   vtkSMPluginProxy.cxx
@@ -191,7 +199,6 @@ SET(Kit_SRCS
   vtkSMPropertyAdaptor.cxx
   vtkSMNamedPropertyIterator.cxx
   vtkSMPropertyModificationUndoElement.cxx#--------------------------------
-  vtkSMPropRepresentationProxy.cxx
   vtkSMProxyConfigurationReader.cxx
   vtkSMProxyConfigurationWriter.cxx
   vtkSMProxyManagerReviver.cxx
@@ -200,7 +207,6 @@ SET(Kit_SRCS
   vtkSMProxyUnRegisterUndoElement.cxx#--------------------------------
   vtkSMPythonTraceObserver.cxx
   vtkSMPVLookupTableProxy.cxx
-  vtkSMPVRepresentationProxy.cxx
   vtkSMRampKeyFrameProxy.cxx
   vtkSMReaderFactory.cxx
   vtkSMRenderViewExporterProxy.cxx
@@ -210,7 +216,6 @@ SET(Kit_SRCS
 #  vtkSMScatterPlotArraysInformationHelper.cxx
 #  vtkSMScatterPlotViewProxy.cxx
 #  vtkSMSelectionDeliveryRepresentationProxy.cxx
-  vtkSMSelectionRepresentationProxy.cxx
   vtkSMServerFileListingProxy.cxx
   vtkSMServerProxyManagerReviver.cxx
   vtkSMServerSideAnimationPlayer.cxx
@@ -221,21 +226,16 @@ SET(Kit_SRCS
   vtkSMSimpleIntInformationHelper.cxx
   vtkSMSimpleStringInformationHelper.cxx
   vtkSMSinusoidKeyFrameProxy.cxx
-  vtkSMSpreadSheetRepresentationProxy.cxx
   vtkSMStringArrayHelper.cxx
 #  vtkSMTemporalInputDomain.cxx
   vtkSMTesting.cxx
-  vtkSMTextSourceRepresentationProxy.cxx
   vtkSMTextWidgetRepresentationProxy.cxx
   vtkSMTimeAnimationCueProxy.cxx
   vtkSMTimeKeeperProxy.cxx
   vtkSMTimeRangeInformationHelper.cxx
   vtkSMTimeStepsInformationHelper.cxx
   vtkSMTransformProxy.cxx
-  vtkSMTwoDRenderViewProxy.cxx
   vtkSMUndoRedoStateLoader.cxx#-------------------------------- should be DELETE
-  vtkSMUniformGridVolumeRepresentationProxy.cxx
-  vtkSMUnstructuredGridVolumeRepresentationProxy.cxx
   vtkSMUpdateInformationUndoElement.cxx#--------------------------------
   vtkSMWidgetRepresentationProxy.cxx
   vtkSMWriterProxy.cxx

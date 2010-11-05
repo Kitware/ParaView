@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkSMUniformGridVolumeRepresentationProxy.cxx
+  Module:    vtkPMUniformGridVolumeRepresentationProxy.cxx
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -12,56 +12,56 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#include "vtkSMUniformGridVolumeRepresentationProxy.h"
+#include "vtkPMUniformGridVolumeRepresentationProxy.h"
 
+#include "vtkClientServerInterpreter.h"
 #include "vtkClientServerStream.h"
 #include "vtkObjectFactory.h"
-#include "vtkProcessModule.h"
 
-vtkStandardNewMacro(vtkSMUniformGridVolumeRepresentationProxy);
+vtkStandardNewMacro(vtkPMUniformGridVolumeRepresentationProxy);
 //----------------------------------------------------------------------------
-vtkSMUniformGridVolumeRepresentationProxy::vtkSMUniformGridVolumeRepresentationProxy()
+vtkPMUniformGridVolumeRepresentationProxy::vtkPMUniformGridVolumeRepresentationProxy()
 {
 }
 
 //----------------------------------------------------------------------------
-vtkSMUniformGridVolumeRepresentationProxy::~vtkSMUniformGridVolumeRepresentationProxy()
+vtkPMUniformGridVolumeRepresentationProxy::~vtkPMUniformGridVolumeRepresentationProxy()
 {
 }
 
 //----------------------------------------------------------------------------
-void vtkSMUniformGridVolumeRepresentationProxy::CreateVTKObjects()
+bool vtkPMUniformGridVolumeRepresentationProxy::CreateVTKObjects(
+  vtkSMMessage* message)
 {
   if (this->ObjectsCreated)
     {
-    return;
+    return true;
     }
-  this->Superclass::CreateVTKObjects();
-  if (!this->ObjectsCreated)
+  if (!this->Superclass::CreateVTKObjects(message))
     {
-    return;
+    return false;
     }
 
   vtkClientServerStream stream;
   stream << vtkClientServerStream::Invoke
-         << this->GetID()
+         << this->GetVTKObjectID()
          << "AddVolumeMapper"
          << "Fixed point"
-         << this->GetSubProxy("VolumeFixedPointRayCastMapper")->GetID()
+         << this->GetSubProxyHelper(
+           "VolumeFixedPointRayCastMapper")->GetVTKObjectID()
          << vtkClientServerStream::End;
   stream << vtkClientServerStream::Invoke
-         << this->GetID()
+         << this->GetVTKObjectID()
          << "AddVolumeMapper"
          << "GPU"
-         << this->GetSubProxy("VolumeGPURayCastMapper")->GetID()
+         << this->GetSubProxyHelper("VolumeGPURayCastMapper")->GetVTKObjectID()
          << vtkClientServerStream::End;
-  vtkProcessModule::GetProcessModule()->SendStream(
-    this->ConnectionID, this->Servers, stream);
+  this->Interpreter->ProcessStream(stream);
+  return true;
 }
 
 //----------------------------------------------------------------------------
-void vtkSMUniformGridVolumeRepresentationProxy::PrintSelf(ostream& os, vtkIndent indent)
+void vtkPMUniformGridVolumeRepresentationProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 }
-

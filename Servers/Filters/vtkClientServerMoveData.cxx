@@ -15,7 +15,6 @@
 #include "vtkClientServerMoveData.h"
 
 #include "vtkCharArray.h"
-#include "vtkClientConnection.h"
 #include "vtkDataObject.h"
 #include "vtkDataObjectTypes.h"
 #include "vtkGenericDataObjectReader.h"
@@ -23,26 +22,24 @@
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkMultiBlockDataSet.h"
+#include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
 #include "vtkPolyData.h"
-#include "vtkProcessModule.h"
+#include "vtkProcessModule2.h"
+#include "vtkPVSession.h"
 #include "vtkSelection.h"
 #include "vtkSelectionSerializer.h"
-#include "vtkServerConnection.h"
-#include "vtkSocketController.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkUnstructuredGrid.h"
 
 #include <vtksys/ios/sstream>
 
 vtkStandardNewMacro(vtkClientServerMoveData);
-vtkCxxSetObjectMacro(vtkClientServerMoveData, ProcessModuleConnection, 
-  vtkProcessModuleConnection);
-
+vtkCxxSetObjectMacro(vtkClientServerMoveData, Controller,
+  vtkMultiProcessController);
 //-----------------------------------------------------------------------------
 vtkClientServerMoveData::vtkClientServerMoveData()
 {
-  this->ProcessModuleConnection = 0;
   this->OutputDataType = VTK_POLY_DATA;
   this->WholeExtent[0] =  0;
   this->WholeExtent[1] = -1;
@@ -50,13 +47,14 @@ vtkClientServerMoveData::vtkClientServerMoveData()
   this->WholeExtent[3] = -1;
   this->WholeExtent[4] =  0;
   this->WholeExtent[5] = -1;
+  this->Controller = 0;
   this->ProcessType = AUTO;
 }
 
 //-----------------------------------------------------------------------------
 vtkClientServerMoveData::~vtkClientServerMoveData()
 {
-  this->SetProcessModuleConnection(0);
+  this->SetController(NULL);
 }
 
 //-----------------------------------------------------------------------------
@@ -133,23 +131,40 @@ int vtkClientServerMoveData::RequestData(vtkInformation*,
         vtkDataObject::DATA_OBJECT());
     }
 
-  vtkRemoteConnection* rc = vtkRemoteConnection::SafeDownCast(
-    this->ProcessModuleConnection);
-  if (!rc)
+  vtkMultiProcessController* controller = this->Controller;
+  int processType = this->ProcessType;
+  if (this->ProcessType == AUTO)
     {
-    rc = vtkProcessModule::GetProcessModule()->GetActiveRemoteConnection();
+    vtkPVSession* session = vtkPVSession::SafeDownCast(
+      vtkProcessModule2::GetProcessModule()->GetActiveSession());
+    if (!session)
+      {
+      vtkErrorMacro("No active ParaView session");
+      return 0;
+      }
+    if (vtkProcessModule2::GetProcessType() ==
+      vtkProcessModule2::PROCESS_CLIENT)
+      {
+      controller = session->GetController(vtkPVSession::DATA_SERVER);
+      processType = CLIENT;
+      }
+    else
+      {
+      controller = session->GetController(vtkPVSession::CLIENT);
+      processType = SERVER;
+      }
     }
-  if (rc)
+
+  if (controller)
     {
-    vtkSocketController* controller = rc->GetSocketController();
     bool is_server = this->ProcessType == SERVER;
     bool is_client = this->ProcessType == CLIENT;
-    if (is_server || rc->IsA("vtkClientConnection"))
+    if (is_server)
       {
       vtkDebugMacro("Server Root: Send input data to client.");
       return this->SendData(input, controller);
       }
-    else if (is_client || rc->IsA("vtkServerConnection"))
+    else if (is_client)
       {
       vtkDebugMacro("Client: Get data from server and put it on the output.");
       // This is a client node.
@@ -182,7 +197,7 @@ int vtkClientServerMoveData::RequestData(vtkInformation*,
 
 //-----------------------------------------------------------------------------
 int vtkClientServerMoveData::SendData(vtkDataObject* input,
-  vtkSocketController* controller)
+  vtkMultiProcessController* controller)
 {
   // This is a server root node.
   // If it is a selection, use the XML serializer.
@@ -208,7 +223,7 @@ int vtkClientServerMoveData::SendData(vtkDataObject* input,
 }
 
 //-----------------------------------------------------------------------------
-vtkDataObject* vtkClientServerMoveData::ReceiveData(vtkSocketController* controller)
+vtkDataObject* vtkClientServerMoveData::ReceiveData(vtkMultiProcessController* controller)
 {
   vtkDataObject* data = NULL; 
   if (this->OutputDataType == VTK_SELECTION)
@@ -241,8 +256,6 @@ vtkDataObject* vtkClientServerMoveData::ReceiveData(vtkSocketController* control
 void vtkClientServerMoveData::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  os << indent << "ProcessModuleConnection: " << this->ProcessModuleConnection
-    << endl;
   os << indent << "WholeExtent: " 
     << this->WholeExtent[0] << ", "
     << this->WholeExtent[1] << ", "
@@ -252,4 +265,5 @@ void vtkClientServerMoveData::PrintSelf(ostream& os, vtkIndent indent)
     << this->WholeExtent[5] << endl;
   os << indent << "OutputDataType: " << this->OutputDataType << endl;
   os << indent << "ProcessType: " << this->ProcessType << endl;
+  os << indent << "Controller: " << this->Controller << endl;
 }

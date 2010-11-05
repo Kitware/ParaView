@@ -27,7 +27,7 @@ vtkSMSpreadSheetRepresentationProxy::vtkSMSpreadSheetRepresentationProxy()
 vtkSMSpreadSheetRepresentationProxy::~vtkSMSpreadSheetRepresentationProxy()
 {
 }
-
+#ifdef FIXME
 //----------------------------------------------------------------------------
 void vtkSMSpreadSheetRepresentationProxy::AddInput(unsigned int inputPort,
   vtkSMSourceProxy* input, unsigned int outputPort, const char* method)
@@ -52,6 +52,7 @@ void vtkSMSpreadSheetRepresentationProxy::AddInput(unsigned int inputPort,
     this->UpdateProperty("InternalInput2");
     }
 }
+#endif
 
 //----------------------------------------------------------------------------
 void vtkSMSpreadSheetRepresentationProxy::PrintSelf(ostream& os, vtkIndent indent)

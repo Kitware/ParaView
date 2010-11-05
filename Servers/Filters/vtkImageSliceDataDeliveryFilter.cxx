@@ -18,10 +18,10 @@
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkMPIMoveData.h"
+#include "vtkMPIMoveData.h"
 #include "vtkMPIMToNSocketConnection.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
-#include "vtkProcessModule.h"
 #include "vtkPVOptions.h"
 #include "vtkPVRenderView.h"
 #include "vtkSmartPointer.h"
@@ -49,41 +49,7 @@ vtkImageSliceDataDeliveryFilter::~vtkImageSliceDataDeliveryFilter()
 //----------------------------------------------------------------------------
 void vtkImageSliceDataDeliveryFilter::InitializeForCommunication()
 {
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  if (pm == NULL)
-    {
-    vtkWarningMacro("No process module found.");
-    return;
-    }
-
-  int process_type = pm->GetOptions()->GetProcessType();
-  switch (process_type)
-    {
-  case vtkPVOptions::PVSERVER:
-  case vtkPVOptions::PVDATA_SERVER:
-    this->MoveData->SetServerToDataServer();
-    break;
-
-  case vtkPVOptions::PVRENDER_SERVER:
-    this->MoveData->SetServerToRenderServer();
-    break;
-
-  default:
-    if (pm->GetPartitionId() > 0)
-      {
-      this->MoveData->SetServerToDataServer();
-      }
-    else
-      {
-      this->MoveData->SetServerToClient();
-      }
-    }
-
-  vtkMPIMToNSocketConnection* render_server_data_server_connector =
-    vtkMPIMToNSocketConnection::SafeDownCast(
-      pm->GetObjectFromID(pm->GetMPIMToNSocketConnectionID(), true));
-  this->MoveData->SetMPIMToNSocketConnection(render_server_data_server_connector);
-  this->MoveData->SetController(pm->GetController());
+  this->MoveData->InitializeForCommunicationForParaView();
 }
 
 //----------------------------------------------------------------------------

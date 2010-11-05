@@ -114,6 +114,11 @@ public:
   vtkGetMacro(Representation, int);
 
   // Description:
+  // Overload to set representation type using string. Accepted strings are:
+  // "Points", "Wireframe", "Surface" and "Surface With Edges".
+  virtual void SetRepresentation(const char*);
+
+  // Description:
   // Returns the data object that is rendered from the given input port.
   virtual vtkDataObject* GetRenderedDataObject(int port);
 

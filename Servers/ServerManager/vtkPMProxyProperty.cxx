@@ -89,8 +89,8 @@ bool vtkPMProxyProperty::Push(vtkSMMessage* message, int offset)
     // performance bottleneck if all inputs to a filter are re-set every time
     // one changes.
     // FIXME handle remove command.
-    abort();
-    return false;
+    //abort();
+    //return false;
     }
 
   vtkClientServerStream stream;

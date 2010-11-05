@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkSMTextSourceRepresentationProxy.h
+  Module:    vtkPMTextSourceRepresentationProxy.h
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -12,38 +12,38 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMTextSourceRepresentationProxy
+// .NAME vtkPMTextSourceRepresentationProxy
 // .SECTION Description
-// vtkSMTextSourceRepresentationProxy is the proxy for
+// vtkPMTextSourceRepresentationProxy is the proxy for
 // (representations, TextSourceRepresentation). Merely overrides
 // CreateVTKObjects to ensure that the subproxies are passed to the
 // vtkTextSourceRepresentation correctly.
 
-#ifndef __vtkSMTextSourceRepresentationProxy_h
-#define __vtkSMTextSourceRepresentationProxy_h
+#ifndef __vtkPMTextSourceRepresentationProxy_h
+#define __vtkPMTextSourceRepresentationProxy_h
 
-#include "vtkSMRepresentationProxy.h"
+#include "vtkPMProxy.h"
 
-class vtkSMTextWidgetRepresentationProxy;
 class vtkSMViewProxy;
 
-class VTK_EXPORT vtkSMTextSourceRepresentationProxy : public vtkSMRepresentationProxy
+class VTK_EXPORT vtkPMTextSourceRepresentationProxy : public vtkPMProxy
 {
 public:
-  static vtkSMTextSourceRepresentationProxy* New();
-  vtkTypeMacro(vtkSMTextSourceRepresentationProxy, vtkSMRepresentationProxy);
+  static vtkPMTextSourceRepresentationProxy* New();
+  vtkTypeMacro(vtkPMTextSourceRepresentationProxy, vtkPMProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
 // BTX
 protected:
-  vtkSMTextSourceRepresentationProxy();
-  ~vtkSMTextSourceRepresentationProxy();
+  vtkPMTextSourceRepresentationProxy();
+  ~vtkPMTextSourceRepresentationProxy();
 
   // Description:
-  virtual void CreateVTKObjects();
+  virtual bool CreateVTKObjects(vtkSMMessage* message);
+
 private:
-  vtkSMTextSourceRepresentationProxy(const vtkSMTextSourceRepresentationProxy&); // Not implemented
-  void operator=(const vtkSMTextSourceRepresentationProxy&); // Not implemented
+  vtkPMTextSourceRepresentationProxy(const vtkPMTextSourceRepresentationProxy&); // Not implemented
+  void operator=(const vtkPMTextSourceRepresentationProxy&); // Not implemented
 //ETX
 };
 

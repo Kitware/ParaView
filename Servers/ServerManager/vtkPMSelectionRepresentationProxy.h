@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkSMSelectionRepresentationProxy.h
+  Module:    vtkPMSelectionRepresentationProxy.h
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -12,38 +12,37 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMSelectionRepresentationProxy
+// .NAME vtkPMSelectionRepresentationProxy
 // .SECTION Description
 // Representation use to show selection. This shows only the selection i.e.
 // output of ExtractSelection filter.
 
-#ifndef __vtkSMSelectionRepresentationProxy_h
-#define __vtkSMSelectionRepresentationProxy_h
+#ifndef __vtkPMSelectionRepresentationProxy_h
+#define __vtkPMSelectionRepresentationProxy_h
 
-#include "vtkSMRepresentationProxy.h"
+#include "vtkPMProxy.h"
 
 class vtkSMDataLabelRepresentationProxy;
 
-class VTK_EXPORT vtkSMSelectionRepresentationProxy : public vtkSMRepresentationProxy
+class VTK_EXPORT vtkPMSelectionRepresentationProxy : public vtkPMProxy
 {
 public:
-  static vtkSMSelectionRepresentationProxy* New();
-  vtkTypeMacro(vtkSMSelectionRepresentationProxy, vtkSMRepresentationProxy);
+  static vtkPMSelectionRepresentationProxy* New();
+  vtkTypeMacro(vtkPMSelectionRepresentationProxy, vtkPMProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
 //BTX
 protected:
-  vtkSMSelectionRepresentationProxy();
-  ~vtkSMSelectionRepresentationProxy();
+  vtkPMSelectionRepresentationProxy();
+  ~vtkPMSelectionRepresentationProxy();
 
   // Description:
-  virtual void CreateVTKObjects();
+  virtual bool CreateVTKObjects(vtkSMMessage* message);
 
 private:
-  vtkSMSelectionRepresentationProxy(const vtkSMSelectionRepresentationProxy&); // Not implemented
-  void operator=(const vtkSMSelectionRepresentationProxy&); // Not implemented
+  vtkPMSelectionRepresentationProxy(const vtkPMSelectionRepresentationProxy&); // Not implemented
+  void operator=(const vtkPMSelectionRepresentationProxy&); // Not implemented
 //ETX
 };
 
 #endif
-

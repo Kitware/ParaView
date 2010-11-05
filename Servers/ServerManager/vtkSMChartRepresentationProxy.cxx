@@ -16,6 +16,7 @@
 
 #include "vtkChartRepresentation.h"
 #include "vtkClientServerStream.h"
+#include "vtkContextNamedOptions.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
 #include "vtkSMPropertyHelper.h"
@@ -45,6 +46,7 @@ void vtkSMChartRepresentationProxy::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os, indent);
 }
 
+#ifdef FIXME
 //----------------------------------------------------------------------------
 void vtkSMChartRepresentationProxy::AddInput(unsigned int inputPort,
   vtkSMSourceProxy* input, unsigned int outputPort, const char* method)
@@ -66,6 +68,7 @@ void vtkSMChartRepresentationProxy::AddInput(unsigned int inputPort,
     this->UpdateProperty("InternalInput1");
     }
 }
+#endif
 
 //-----------------------------------------------------------------------------
 void vtkSMChartRepresentationProxy::CreateVTKObjects()
@@ -83,13 +86,10 @@ void vtkSMChartRepresentationProxy::CreateVTKObjects()
   vtkSMProxy* optionsProxy = this->GetSubProxy("PlotOptions");
   if (optionsProxy)
     {
-    vtkClientServerStream stream;
-    stream << vtkClientServerStream::Invoke
-      << this->GetID()
-      << "SetOptions"
-      << optionsProxy->GetID()
-      << vtkClientServerStream::End;
-    vtkProcessModule::GetProcessModule()->SendStream(
-      this->ConnectionID, this->Servers, stream);
+    vtkContextNamedOptions* options = vtkContextNamedOptions::SafeDownCast(
+      optionsProxy->GetClientSideObject());
+    vtkChartRepresentation* repr = vtkChartRepresentation::SafeDownCast(
+      this->GetClientSideObject());
+    repr->SetOptions(options);
     }
 }

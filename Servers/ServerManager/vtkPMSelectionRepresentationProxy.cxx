@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkSMSelectionRepresentationProxy.cxx
+  Module:    vtkPMSelectionRepresentationProxy.cxx
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -12,53 +12,51 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#include "vtkSMSelectionRepresentationProxy.h"
+#include "vtkPMSelectionRepresentationProxy.h"
 
 #include "vtkClientServerStream.h"
 #include "vtkObjectFactory.h"
-#include "vtkProcessModule.h"
+#include "vtkClientServerInterpreter.h"
 
-vtkStandardNewMacro(vtkSMSelectionRepresentationProxy);
+vtkStandardNewMacro(vtkPMSelectionRepresentationProxy);
 //----------------------------------------------------------------------------
-vtkSMSelectionRepresentationProxy::vtkSMSelectionRepresentationProxy()
+vtkPMSelectionRepresentationProxy::vtkPMSelectionRepresentationProxy()
 {
 
 }
 
 //----------------------------------------------------------------------------
-vtkSMSelectionRepresentationProxy::~vtkSMSelectionRepresentationProxy()
+vtkPMSelectionRepresentationProxy::~vtkPMSelectionRepresentationProxy()
 {
 }
 
 //----------------------------------------------------------------------------
-void vtkSMSelectionRepresentationProxy::CreateVTKObjects()
+bool vtkPMSelectionRepresentationProxy::CreateVTKObjects(vtkSMMessage* message)
 {
   if (this->ObjectsCreated)
     {
-    return;
-    }
-  this->Superclass::CreateVTKObjects();
-  if (!this->ObjectsCreated)
-    {
-    return;
+    return true;
     }
 
-  vtkSMProxy* label_repr = this->GetSubProxy("LabelRepresentation");
+  if (!this->Superclass::CreateVTKObjects(message))
+    {
+    return false;
+    }
+
+  vtkPMProxy* label_repr = this->GetSubProxyHelper("LabelRepresentation");
 
   vtkClientServerStream stream;
   stream << vtkClientServerStream::Invoke
-    << this->GetID()
+    << this->GetVTKObjectID()
     << "SetLabelRepresentation"
-    << label_repr->GetID()
+    << label_repr->GetVTKObjectID()
     << vtkClientServerStream::End;
-  vtkProcessModule::GetProcessModule()->SendStream(
-    this->ConnectionID, this->Servers, stream);
+  this->Interpreter->ProcessStream(stream);
+  return true;
 }
 
 //----------------------------------------------------------------------------
-void vtkSMSelectionRepresentationProxy::PrintSelf(ostream& os, vtkIndent indent)
+void vtkPMSelectionRepresentationProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 }
-
-

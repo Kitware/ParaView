@@ -43,6 +43,7 @@ void vtkSMUnstructuredGridVolumeRepresentationProxy::CreateVTKObjects()
     return;
     }
 
+#ifdef FIXME
   vtkClientServerStream stream;
   stream << vtkClientServerStream::Invoke
          << this->GetID()
@@ -70,6 +71,7 @@ void vtkSMUnstructuredGridVolumeRepresentationProxy::CreateVTKObjects()
          << vtkClientServerStream::End;
   vtkProcessModule::GetProcessModule()->SendStream(
     this->ConnectionID, this->Servers, stream);
+#endif
 }
 
 #ifdef FIXME

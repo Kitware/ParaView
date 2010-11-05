@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkSMTextSourceRepresentationProxy.cxx
+  Module:    vtkPMTextSourceRepresentationProxy.cxx
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -12,49 +12,48 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#include "vtkSMTextSourceRepresentationProxy.h"
+#include "vtkPMTextSourceRepresentationProxy.h"
 
-#include "vtkObjectFactory.h"
+#include "vtkClientServerInterpreter.h"
 #include "vtkClientServerStream.h"
-#include "vtkProcessModule.h"
+#include "vtkObjectFactory.h"
 
-vtkStandardNewMacro(vtkSMTextSourceRepresentationProxy);
+vtkStandardNewMacro(vtkPMTextSourceRepresentationProxy);
 //----------------------------------------------------------------------------
-vtkSMTextSourceRepresentationProxy::vtkSMTextSourceRepresentationProxy()
+vtkPMTextSourceRepresentationProxy::vtkPMTextSourceRepresentationProxy()
 {
 }
 
 //----------------------------------------------------------------------------
-vtkSMTextSourceRepresentationProxy::~vtkSMTextSourceRepresentationProxy()
+vtkPMTextSourceRepresentationProxy::~vtkPMTextSourceRepresentationProxy()
 {
 }
 
 
 //----------------------------------------------------------------------------
-void vtkSMTextSourceRepresentationProxy::CreateVTKObjects()
+bool vtkPMTextSourceRepresentationProxy::CreateVTKObjects(vtkSMMessage* message)
 {
   if (this->ObjectsCreated)
     {
-    return;
+    return true;
     }
-  this->Superclass::CreateVTKObjects();
-  if (!this->ObjectsCreated)
+
+  if (!this->Superclass::CreateVTKObjects(message))
     {
-    return;
+    return false;
     }
 
   vtkClientServerStream stream;
   stream << vtkClientServerStream::Invoke
-    << this->GetID() << "SetTextWidgetRepresentation"
-    << this->GetSubProxy("TextWidgetRepresentation")->GetID()
+    << this->GetVTKObjectID() << "SetTextWidgetRepresentation"
+    << this->GetSubProxyHelper("TextWidgetRepresentation")->GetVTKObjectID()
     << vtkClientServerStream::End;
-  vtkProcessModule::GetProcessModule()->SendStream(
-    this->ConnectionID,
-    vtkProcessModule::RENDER_SERVER|vtkProcessModule::CLIENT, stream);
+  this->Interpreter->ProcessStream(stream);
+  return true;
 }
 
 //----------------------------------------------------------------------------
-void vtkSMTextSourceRepresentationProxy::PrintSelf(ostream& os, vtkIndent indent)
+void vtkPMTextSourceRepresentationProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 }

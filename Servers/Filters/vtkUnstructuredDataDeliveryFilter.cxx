@@ -22,9 +22,7 @@
 #include "vtkMPIMToNSocketConnection.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
-#include "vtkProcessModule2.h"
 #include "vtkPVRenderView.h"
-#include "vtkPVSession.h"
 #include "vtkSmartPointer.h"
 
 vtkStandardNewMacro(vtkUnstructuredDataDeliveryFilter);
@@ -95,44 +93,7 @@ int vtkUnstructuredDataDeliveryFilter::RequestDataObject(
 //----------------------------------------------------------------------------
 void vtkUnstructuredDataDeliveryFilter::InitializeForCommunication()
 {
-  vtkProcessModule2* pm = vtkProcessModule2::GetProcessModule();
-  if (pm == NULL)
-    {
-    vtkWarningMacro("No process module found.");
-    return;
-    }
-
-  vtkPVSession* session = vtkPVSession::SafeDownCast(
-    pm->GetActiveSession());
-  if (!session)
-    {
-    vtkWarningMacro("No active vtkPVSession found.");
-    return;
-    }
-
-  int processRoles = session->GetProcessRoles();
-  if (processRoles & vtkPVSession::RENDER_SERVER)
-    {
-    this->MoveData->SetServerToRenderServer();
-    }
-
-  if (processRoles & vtkPVSession::DATA_SERVER)
-    {
-    this->MoveData->SetServerToDataServer();
-    this->MoveData->SetClientDataServerSocketController(
-      session->GetController(vtkPVSession::CLIENT));
-    }
-
-  if (processRoles & vtkPVSession::CLIENT)
-    {
-    this->MoveData->SetServerToClient();
-    this->MoveData->SetClientDataServerSocketController(
-      session->GetController(vtkPVSession::DATA_SERVER));
-    }
-
-  this->MoveData->SetController(pm->GetGlobalController());
-  this->MoveData->SetMPIMToNSocketConnection(
-    session->GetMPIMToNSocketConnection());
+  this->MoveData->InitializeForCommunicationForParaView();
 }
 
 //----------------------------------------------------------------------------

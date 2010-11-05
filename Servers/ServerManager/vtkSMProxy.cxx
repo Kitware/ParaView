@@ -1247,6 +1247,12 @@ int vtkSMProxy::ReadXMLAttributes( vtkSMProxyManager* pm,
     this->SetVTKClassName(className);
     }
 
+  const char* kernelClass = element->GetAttribute("kernel_class");
+  if (kernelClass)
+    {
+    this->SetKernelClassName(kernelClass);
+    }
+
   const char* xmlname = element->GetAttribute("name");
   if(xmlname)
     {

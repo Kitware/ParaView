@@ -37,6 +37,11 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
+  // Use this method to initialize all communicators/sockets using ParaView
+  // defaults.
+  virtual void InitializeForCommunicationForParaView();
+
+  // Description:
   // Objects for communication.
   // The controller is an MPI controller used to communicate
   // between processes within one server (render or data).

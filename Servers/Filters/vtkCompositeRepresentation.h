@@ -31,6 +31,8 @@
 
 #include "vtkPVDataRepresentation.h"
 
+class vtkStringArray;
+
 class VTK_EXPORT vtkCompositeRepresentation : public vtkPVDataRepresentation
 {
 public:
@@ -55,6 +57,7 @@ public:
   // Set the active key. If a valid key is not specified, then none of the
   // representations is treated as active.
   void SetActiveRepresentation(const char* key);
+  const char* GetActiveRepresentationKey();
 
   // Description:
   // Returns the active representation if valid.
@@ -93,6 +96,10 @@ public:
   // Description:
   // Bring this algorithm's outputs up-to-date.
   virtual void Update();
+
+  // Description:
+  // Returns the list of available representation types as a string array.
+  vtkStringArray* GetRepresentationTypes();
 
 //BTX
 protected:

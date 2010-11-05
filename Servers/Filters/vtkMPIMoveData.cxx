@@ -21,9 +21,9 @@
 #include "vtkCharArray.h"
 #include "vtkCompositeDataSet.h"
 #include "vtkDataSetReader.h"
-#include "vtkGenericDataObjectWriter.h"
-#include "vtkGenericDataObjectReader.h"
 #include "vtkDirectedGraph.h"
+#include "vtkGenericDataObjectReader.h"
+#include "vtkGenericDataObjectWriter.h"
 #include "vtkGraphReader.h"
 #include "vtkGraphWriter.h"
 #include "vtkImageAppend.h"
@@ -38,7 +38,8 @@
 #include "vtkOutlineFilter.h"
 #include "vtkPointData.h"
 #include "vtkPolyData.h"
-#include "vtkProcessModule.h"
+#include "vtkProcessModule2.h"
+#include "vtkPVSession.h"
 #include "vtkSmartPointer.h"
 #include "vtkSocketCommunicator.h"
 #include "vtkSocketController.h"
@@ -197,6 +198,49 @@ vtkMPIMoveData::~vtkMPIMoveData()
   this->SetClientDataServerSocketController(0);
   this->SetMPIMToNSocketConnection(0);
   this->ClearBuffer();
+}
+
+//----------------------------------------------------------------------------
+void vtkMPIMoveData::InitializeForCommunicationForParaView()
+{
+  vtkProcessModule2* pm = vtkProcessModule2::GetProcessModule();
+  if (pm == NULL)
+    {
+    vtkWarningMacro("No process module found.");
+    return;
+    }
+
+  vtkPVSession* session = vtkPVSession::SafeDownCast(
+    pm->GetActiveSession());
+  if (!session)
+    {
+    vtkWarningMacro("No active vtkPVSession found.");
+    return;
+    }
+
+  int processRoles = session->GetProcessRoles();
+  if (processRoles & vtkPVSession::RENDER_SERVER)
+    {
+    this->SetServerToRenderServer();
+    }
+
+  if (processRoles & vtkPVSession::DATA_SERVER)
+    {
+    this->SetServerToDataServer();
+    this->SetClientDataServerSocketController(
+      session->GetController(vtkPVSession::CLIENT));
+    }
+
+  if (processRoles & vtkPVSession::CLIENT)
+    {
+    this->SetServerToClient();
+    this->SetClientDataServerSocketController(
+      session->GetController(vtkPVSession::DATA_SERVER));
+    }
+
+  this->SetController(pm->GetGlobalController());
+  this->SetMPIMToNSocketConnection(
+    session->GetMPIMToNSocketConnection());
 }
 
 //----------------------------------------------------------------------------

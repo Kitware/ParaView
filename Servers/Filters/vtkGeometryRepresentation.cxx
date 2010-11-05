@@ -37,6 +37,8 @@
 #include "vtkShadowMapBakerPass.h"
 #include "vtkUnstructuredDataDeliveryFilter.h"
 
+#include <vtksys/SystemTools.hxx>
+
 //*****************************************************************************
 class vtkGeometryRepresentationMultiBlockMaker : public vtkMultiBlockDataSetAlgorithm
 {
@@ -338,6 +340,31 @@ bool vtkGeometryRepresentation::RemoveFromView(vtkView* view)
     return true;
     }
   return false;
+}
+
+//----------------------------------------------------------------------------
+void vtkGeometryRepresentation::SetRepresentation(const char* type)
+{
+  if (vtksys::SystemTools::Strucmp(type, "Points") == 0)
+    {
+    this->SetRepresentation(POINTS);
+    }
+  else if (vtksys::SystemTools::Strucmp(type, "Wireframe") == 0)
+    {
+    this->SetRepresentation(WIREFRAME);
+    }
+  else if (vtksys::SystemTools::Strucmp(type, "Surface") == 0)
+    {
+    this->SetRepresentation(SURFACE);
+    }
+  else if (vtksys::SystemTools::Strucmp(type, "Surface With Edges") == 0)
+    {
+    this->SetRepresentation(SURFACE_WITH_EDGES);
+    }
+  else
+    {
+    vtkErrorMacro("Invalid type: " << type);
+    }
 }
 
 //----------------------------------------------------------------------------

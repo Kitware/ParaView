@@ -24,7 +24,7 @@
 #include "vtkInformation.h"
 #include "vtkObjectFactory.h"
 #include "vtkPointData.h"
-#include "vtkProcessModule.h"
+#include "vtkProcessModule2.h"
 #include "vtkPVGeometryFilter.h"
 #include "vtkSelection.h"
 #include "vtkSelectionNode.h"
@@ -109,7 +109,7 @@ void vtkSelectionConverter::Convert(vtkSelection* input, vtkSelection* output,
     vtkInformation *nodeProps = input->GetNode(i)->GetProperties();
     if (!nodeProps->Has(vtkSelectionNode::PROCESS_ID()) ||
         ( nodeProps->Get(vtkSelectionNode::PROCESS_ID()) ==
-          vtkProcessModule::GetProcessModule()->GetPartitionId() )
+          vtkProcessModule2::GetProcessModule()->GetPartitionId() )
       )
       {
       this->Convert(input->GetNode(i), output, global_ids);

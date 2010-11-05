@@ -212,8 +212,6 @@ vtkSpreadSheetView::vtkSpreadSheetView()
 
   this->DeliveryFilter = vtkClientServerMoveData::New();
   this->DeliveryFilter->SetOutputDataType(VTK_TABLE);
-  this->DeliveryFilter->SetProcessModuleConnection(
-    vtkProcessModule::GetProcessModule()->GetActiveRemoteConnection());
 
   this->TableSelectionMarker->SetInputConnection(
     this->TableStreamer->GetOutputPort());

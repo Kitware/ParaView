@@ -237,13 +237,6 @@ bool vtkPMProxy::CreateVTKObjects(vtkSMMessage* message)
     this->VTKObject = this->Interpreter->GetObjectFromID(this->VTKObjectID);
     }
 
-  if (!this->ReadXMLAttributes(element))
-    {
-    this->DeleteVTKObjects();
-    return false;
-    }
-
-
 #ifdef FIXME
   // ensure that this is happening correctly in PMProxy
   if (this->VTKClassName && this->VTKClassName[0] != '\0')
@@ -279,6 +272,13 @@ bool vtkPMProxy::CreateVTKObjects(vtkSMMessage* message)
       return false;
       }
     this->Internals->SubProxyHelpers[subproxyMsg.name()] = subproxy;
+    }
+
+  // Process the XML and update properties etc.
+  if (!this->ReadXMLAttributes(element))
+    {
+    this->DeleteVTKObjects();
+    return false;
     }
 
   this->ObjectsCreated = true;

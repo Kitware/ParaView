@@ -20,13 +20,13 @@
 #include "vtkCompositeDataPipeline.h"
 #include "vtkDataObject.h"
 #include "vtkDemandDrivenPipeline.h"
-#include "vtkInformation.h"
 #include "vtkInformationDoubleVectorKey.h"
 #include "vtkInformationExecutivePortKey.h"
+#include "vtkInformation.h"
 #include "vtkInformationVector.h"
+#include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
 #include "vtkPolyData.h"
-#include "vtkProcessModule.h"
 #include "vtkSmartPointer.h"
 #include "vtkUnstructuredGrid.h"
 #include "vtkUpdateSuppressorPipeline.h"
@@ -53,12 +53,12 @@ vtkPVUpdateSuppressor::vtkPVUpdateSuppressor()
 
   this->Enabled = 1;
 
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-
-  if (pm)
+  vtkMultiProcessController* controller =
+    vtkMultiProcessController::GetGlobalController();
+  if (controller)
     {
-    this->UpdateNumberOfPieces = pm->GetNumberOfLocalPartitions();
-    this->UpdatePiece = pm->GetPartitionId();
+    this->UpdateNumberOfPieces = controller->GetNumberOfProcesses();
+    this->UpdatePiece = controller->GetLocalProcessId();
     }
 }
 

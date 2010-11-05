@@ -19,6 +19,7 @@
 #include "vtkMemberFunctionCommand.h"
 #include "vtkObjectFactory.h"
 #include "vtkSmartPointer.h"
+#include "vtkStringArray.h"
 #include "vtkView.h"
 #include "vtkWeakPointer.h"
 
@@ -37,6 +38,7 @@ public:
   vtkstd::string ActiveRepresentationKey;
 
   vtkWeakPointer<vtkView> View;
+  vtkSmartPointer<vtkStringArray> RepresentationTypes;
 };
 
 vtkStandardNewMacro(vtkCompositeRepresentation);
@@ -44,6 +46,8 @@ vtkStandardNewMacro(vtkCompositeRepresentation);
 vtkCompositeRepresentation::vtkCompositeRepresentation()
 {
   this->Internals = new vtkInternals();
+  this->Internals->RepresentationTypes = vtkSmartPointer<vtkStringArray>::New();
+  this->Internals->RepresentationTypes->SetNumberOfComponents(1);
   this->Observer = vtkMakeMemberFunctionCommand(*this,
     &vtkCompositeRepresentation::TriggerUpdateDataEvent);
 }
@@ -114,6 +118,35 @@ void vtkCompositeRepresentation::RemoveRepresentation(
       break;
       }
     }
+}
+
+//----------------------------------------------------------------------------
+vtkStringArray* vtkCompositeRepresentation::GetRepresentationTypes()
+{
+  this->Internals->RepresentationTypes->SetNumberOfTuples(
+    static_cast<vtkIdType>(this->Internals->Representations.size()));
+  vtkIdType cc = 0;
+  vtkInternals::RepresentationMap::iterator iter;
+  for (iter = this->Internals->Representations.begin();
+    iter != this->Internals->Representations.end(); ++iter, ++cc)
+    {
+    this->Internals->RepresentationTypes->SetValue(cc, iter->first.c_str());
+    }
+
+  return this->Internals->RepresentationTypes;
+}
+
+//----------------------------------------------------------------------------
+const char* vtkCompositeRepresentation::GetActiveRepresentationKey()
+{
+  vtkInternals::RepresentationMap::iterator iter =
+    this->Internals->Representations.find(this->Internals->ActiveRepresentationKey);
+  if (iter != this->Internals->Representations.end())
+    {
+    return this->Internals->ActiveRepresentationKey.c_str();
+    }
+
+  return NULL;
 }
 
 //----------------------------------------------------------------------------

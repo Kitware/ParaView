@@ -34,6 +34,7 @@ public:
   // Returns client side representation object.
   vtkChartRepresentation* GetRepresentation();
 
+#ifdef FIXME
   // Description:
   // vtkChartRepresentation has two input ports one of the data, and
   // the other for the extracted selections. The data-input is exposed from the
@@ -43,6 +44,7 @@ public:
     vtkSMSourceProxy* input, unsigned int outputPort, const char* method);
   virtual void AddInput(vtkSMSourceProxy* input, const char* method)
     { this->Superclass::AddInput(input, method); }
+#endif
 
 //BTX
 protected:

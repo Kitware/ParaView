@@ -25,8 +25,8 @@
 
 #include "vtkDataObjectAlgorithm.h"
 
-class vtkProcessModuleConnection;
-class vtkSocketController;
+class vtkMultiProcessController;
+class vtkMultiProcessController;
 
 class VTK_EXPORT vtkClientServerMoveData : public vtkDataObjectAlgorithm
 {
@@ -34,10 +34,6 @@ public:
   static vtkClientServerMoveData* New();
   vtkTypeMacro(vtkClientServerMoveData, vtkDataObjectAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
-
-  // Set the connection on which we are moving the data.
-  // If not set, the active remote connection will be used.
-  void SetProcessModuleConnection(vtkProcessModuleConnection*);
 
   // Description:
   // Controls the output type. This is required because processes receiving
@@ -59,12 +55,19 @@ public:
   // output type. Make sure to call this before any pipeline updates occur.
   vtkSetVector6Macro(WholeExtent, int);
   vtkGetVector6Macro(WholeExtent, int);
- 
+
   // Description:
   // Optionally, set the process type. If set to AUTO, then the process type is
   // tried to be determined using the active connection.
   vtkSetMacro(ProcessType, int);
   vtkGetMacro(ProcessType, int);
+
+  // Description:
+  // Get/Set the controller to use. This is optional and needed only when
+  // ProcessType is set to something other than AUTO. If AUTO, then the
+  // controller is obtained from the active session.
+  void SetController(vtkMultiProcessController*);
+  vtkGetObjectMacro(Controller, vtkMultiProcessController);
 //BTX
   enum ProcessTypes
     {
@@ -96,11 +99,9 @@ protected:
                                  vtkInformationVector** inputVector, 
                                  vtkInformationVector* outputVector);
 
-  virtual int SendData(vtkDataObject*, vtkSocketController*);
-  virtual vtkDataObject* ReceiveData(vtkSocketController*);
+  virtual int SendData(vtkDataObject*, vtkMultiProcessController*);
+  virtual vtkDataObject* ReceiveData(vtkMultiProcessController*);
 
-
-  vtkProcessModuleConnection* ProcessModuleConnection;
   enum Tags {
     TRANSMIT_DATA_OBJECT = 23483
   };
@@ -108,6 +109,7 @@ protected:
   int OutputDataType;
   int WholeExtent[6];
   int ProcessType;
+  vtkMultiProcessController* Controller;
 
 private:
   vtkClientServerMoveData(const vtkClientServerMoveData&); // Not implemented.

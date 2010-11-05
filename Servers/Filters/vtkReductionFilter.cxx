@@ -27,7 +27,6 @@
 #include "vtkInstantiator.h"
 #include "vtkObjectFactory.h"
 #include "vtkPointData.h"
-#include "vtkProcessModule.h"
 #include "vtkRectilinearGrid.h"
 #include "vtkRemoteConnection.h"
 #include "vtkSmartPointer.h"

@@ -847,7 +847,7 @@ void vtkSMProxyDefinitionManager::MergeProxyDefinition(vtkPVXMLElement* element,
         // Conflict detected !!!!
         vtkErrorMacro("An exposed property conflict has been found during "
                       << "merging. (" << propName << ")");
-        return;
+        //return;
         }
       else
         {
