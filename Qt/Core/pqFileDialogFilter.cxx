@@ -121,8 +121,6 @@ void pqFileDialogFilter::setFilter(const QString& filter)
       }
     }
 
-  cout << pattern.toAscii().data() << endl;
-
   this->Wildcards.setPattern(pattern);
   this->invalidateFilter();
 }
