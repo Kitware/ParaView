@@ -12,23 +12,23 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVHardwareSelector - vtkPHardwareSelector subclass with paraview
+// .NAME vtkPVHardwareSelector - vtkHardwareSelector subclass with paraview
 // sepecific logic to avoid recapturing buffers unless needed.
 // .SECTION Description
-// vtkPHardwareSelector is subclass of vtkPHardwareSelector that adds logic to
+// vtkHardwareSelector is subclass of vtkHardwareSelector that adds logic to
 // reuse the captured buffers as much as possible. Thus avoiding repeated
 // selection-rendering of repeated selections or picking.
 
 #ifndef __vtkPVHardwareSelector_h
 #define __vtkPVHardwareSelector_h
 
-#include "vtkPHardwareSelector.h"
+#include "vtkHardwareSelector.h"
 
-class VTK_EXPORT vtkPVHardwareSelector : public vtkPHardwareSelector
+class VTK_EXPORT vtkPVHardwareSelector : public vtkHardwareSelector
 {
 public:
   static vtkPVHardwareSelector* New();
-  vtkTypeMacro(vtkPVHardwareSelector, vtkPHardwareSelector);
+  vtkTypeMacro(vtkPVHardwareSelector, vtkHardwareSelector);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

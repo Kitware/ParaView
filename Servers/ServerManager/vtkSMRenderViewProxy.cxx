@@ -461,23 +461,10 @@ bool vtkSMRenderViewProxy::SelectSurfaceCells(int region[4],
   vtkClientServerStream stream;
   stream << vtkClientServerStream::Invoke
     << this->GetID()
-    << "ForceRemoteRenderingOn"
-    << vtkClientServerStream::End;
-  pm->SendStream(this->ConnectionID, this->Servers, stream);
-
-  this->StillRender();
-
-  stream << vtkClientServerStream::Invoke
-    << this->GetID()
     << "SelectCells"
     << vtkClientServerStream::InsertArray(region, 4)
     << vtkClientServerStream::End;
-  stream << vtkClientServerStream::Invoke
-    << this->GetID()
-    << "ForceRemoteRenderingOff"
-    << vtkClientServerStream::End;
   pm->SendStream(this->ConnectionID, this->Servers, stream);
-
   return this->FetchLastSelection(selectedRepresentations, selectionSources);
 }
 
@@ -496,23 +483,10 @@ bool vtkSMRenderViewProxy::SelectSurfacePoints(int region[4],
   vtkClientServerStream stream;
   stream << vtkClientServerStream::Invoke
     << this->GetID()
-    << "ForceRemoteRenderingOn"
-    << vtkClientServerStream::End;
-  pm->SendStream(this->ConnectionID, this->Servers, stream);
-
-  this->StillRender();
-
-  stream << vtkClientServerStream::Invoke
-    << this->GetID()
     << "SelectPoints"
     << vtkClientServerStream::InsertArray(region, 4)
     << vtkClientServerStream::End;
-  stream << vtkClientServerStream::Invoke
-    << this->GetID()
-    << "ForceRemoteRenderingOff"
-    << vtkClientServerStream::End;
   pm->SendStream(this->ConnectionID, this->Servers, stream);
-
   return this->FetchLastSelection(selectedRepresentations, selectionSources);
 }
 

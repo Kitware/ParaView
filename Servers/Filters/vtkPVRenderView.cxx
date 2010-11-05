@@ -75,7 +75,7 @@ vtkPVRenderView::vtkPVRenderView()
 {
   vtkPVOptions* options = vtkProcessModule::GetProcessModule()->GetOptions();
 
-  this->ForceRemoteRendering = false;
+  this->MakingSelection = false;
   this->StillRenderImageReductionFactor = 1;
   this->InteractiveRenderImageReductionFactor = 2;
   this->GeometrySize = 0;
@@ -352,17 +352,26 @@ void vtkPVRenderView::Select(int fieldAssociation, int region[4])
   // NOTE: selection is only supported in builtin or client-server mode. Not
   // supported in tile-display or batch modes.
 
+  if (this->MakingSelection)
+    {
+    vtkErrorMacro("Select was called while making another selection.");
+    return;
+    }
+
+  this->MakingSelection = true;
+
+  bool render_event_propagation =
+    this->SynchronizedWindows->GetRenderEventPropagation();
+  this->SynchronizedWindows->RenderEventPropagationOff();
+  // Make sure that the representations are up-to-date. This is required since
+  // due to delayed-swicth-back-from-lod, the most recent render maybe a LOD
+  // render (or a nonremote render) in which case we need to update the
+  // representation pipelines correctly.
+  this->Render(/*interactive*/false, /*skip-rendering*/false);
+
   this->SetLastSelection(NULL);
 
   this->Selector->SetRenderer(this->GetRenderer());
-  if (this->SynchronizedWindows->GetLocalProcessIsDriver())
-    {
-    this->Selector->SetProcessIsRoot(true);
-    }
-  else
-    {
-    this->Selector->SetProcessIsRoot(false);
-    }
   this->Selector->SetFieldAssociation(fieldAssociation);
   // for now, we always do the process pass. In future, we can be smart about
   // disabling process pass when not needed.
@@ -370,52 +379,29 @@ void vtkPVRenderView::Select(int fieldAssociation, int region[4])
     vtkMultiProcessController::GetGlobalController()?
     vtkMultiProcessController::GetGlobalController()->GetLocalProcessId() : 0);
 
-  // If need_to_rerender is false, then the selector never fires the EndEvent
-  // since it doesn't do any rendering. Thus on satellites (or server) too, we
-  // simply treat as if the selection has been made without waiting for the
-  // event.
-  bool need_to_rerender = this->Selector->NeedToRenderForSelection();
-
-  vtkSmartPointer<vtkSelection> sel;
-  sel.TakeReference(this->Selector->Select(region));
-  if (sel || !need_to_rerender)
+  vtkSelection* sel = this->Selector->Select(region);
+  if (sel)
     {
-    // sel is only generated on the "driver" node. The driver node may not have
+    // A valid sel is only generated on the "driver" node. The driver node may not have
     // the actual data (except in built-in mode). So representations on this
     // process may not be able to handle ConvertSelection() if call it right here.
     // Hence we broadcast the selection to all data-server nodes.
     this->FinishSelection(sel);
+    sel->Delete();
     }
   else
     {
-    vtkMemberFunctionCommand<vtkPVRenderView>* observer =
-      vtkMemberFunctionCommand<vtkPVRenderView>::New();
-    observer->SetCallback(*this, &vtkPVRenderView::FinishSelection);
-    this->Selector->AddObserver(vtkCommand::EndEvent, observer);
-    observer->FastDelete();
+    vtkErrorMacro("Failed to capture selection.");
     }
+  this->SynchronizedWindows->SetRenderEventPropagation(render_event_propagation);
 
-}
-
-//----------------------------------------------------------------------------
-void vtkPVRenderView::FinishSelection()
-{
-  this->FinishSelection(NULL);
+  this->MakingSelection = false;
 }
 
 //----------------------------------------------------------------------------
 void vtkPVRenderView::FinishSelection(vtkSelection* sel)
 {
-  this->Selector->RemoveObservers(vtkCommand::EndEvent);
-
-  if (sel==NULL)
-    {
-    sel = vtkSelection::New();
-    }
-  else
-    {
-    sel->Register(this);
-    }
+  assert(sel != NULL);
   this->SynchronizedWindows->BroadcastToDataServer(sel);
 
   // not sel has PROP_ID() set and not PROP() pointers. We setup the PROP()
@@ -460,10 +446,10 @@ void vtkPVRenderView::FinishSelection(vtkSelection* sel)
       }
     convertedSelection->Delete();
     }
-  sel->Delete();
 
   this->SetLastSelection(converted);
   converted->FastDelete();
+
 }
 
 //----------------------------------------------------------------------------
@@ -767,7 +753,7 @@ void vtkPVRenderView::GatherGeometrySizeInformation()
 //----------------------------------------------------------------------------
 bool vtkPVRenderView::GetUseDistributedRendering()
 {
-  if (this->ForceRemoteRendering)
+  if (this->MakingSelection)
     {
     // force remote rendering when doing a surface selection.
     return true;

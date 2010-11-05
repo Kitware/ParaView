@@ -53,10 +53,9 @@ vtkSelection* vtkPVHardwareSelector::Select(int region[4])
 //----------------------------------------------------------------------------
 bool vtkPVHardwareSelector::NeedToRenderForSelection()
 {
-  cout << "--------" << endl;
-  cout << (this->CaptureTime < this->GetMTime()) << endl;
-  cout << (this->CaptureTime < this->Renderer->GetActiveCamera()->GetMTime()) << endl;
-
+  // I am worried this is not enough. But seems like whenever the data changes,
+  // for some reason the camera is modified and that seems to do the trick for
+  // now. But I am wary, very very wary!
   return this->CaptureTime < this->GetMTime() ||
     (this->Renderer &&
      this->CaptureTime < this->Renderer->GetActiveCamera()->GetMTime());
