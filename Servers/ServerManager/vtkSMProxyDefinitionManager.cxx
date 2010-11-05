@@ -737,7 +737,7 @@ vtkPVXMLElement* vtkSMProxyDefinitionManager::GetCollapsedProxyDefinition(const 
         {
         vtkPVXMLElement* currentElement = classHierarchy.back();
         classHierarchy.pop_back();
-        MergeProxyDefinition(currentElement, newElement);
+        this->MergeProxyDefinition(currentElement, newElement);
         }
       realDefinition->CopyAttributes(newElement);
 
