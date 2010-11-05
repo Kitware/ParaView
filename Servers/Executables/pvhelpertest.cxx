@@ -23,6 +23,7 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkPVDataInformation.h"
 
 #include "vtkSMDoubleVectorProperty.h"
+#include "vtkSMIntVectorProperty.h"
 #include "vtkSMStringVectorProperty.h"
 
 #include "paraview.h"
@@ -84,19 +85,36 @@ int main(int argc, char* argv[])
 
   // ----------------------------------------------------
 
-  vtkSMStringVectorProperty *sliProp =
+  vtkSMStringVectorProperty *silProp =
       vtkSMStringVectorProperty::SafeDownCast(
           proxy->GetProperty("ElementBlocksInfo"));
-  sliProp->PrintSelf(cout, vtkIndent(0));
+  cout << "Nb ElementBlocksInfo: " << silProp->GetNumberOfElements() << endl;
+  for(vtkIdType i=0;i<silProp->GetNumberOfElements();i++)
+    {
+    cout << "  - " << silProp->GetElement(i) << endl;
+    }
 
-  cout << "===========================================" << endl;
   vtkSMStringVectorProperty *arraySelectProp =
       vtkSMStringVectorProperty::SafeDownCast(
-          proxy->GetProperty("FaceBlocksInfo"));
-  arraySelectProp->PrintSelf(cout, vtkIndent(0));
+          proxy->GetProperty("NodeSetInfo"));
+  cout << "Nb NodeSetInfo: " << arraySelectProp->GetNumberOfElements() << endl;
+  for(vtkIdType i=0;i<arraySelectProp->GetNumberOfElements();i+=2)
+    {
+    cout << "  - " << (strcmp("0",arraySelectProp->GetElement(i+1)) == 0 ? "[ ]" : "[X]") << " " << arraySelectProp->GetElement(i) << endl;
+    }
+
+  proxy->Delete();
+  cout << "===========================================" << endl;
+  proxy = pxm->NewProxy("sources", "SESAMEReader");
+  vtkSMPropertyHelper(proxy, "FileName").Set("/home/seb/Kitware/Projects/ParaView3/code/git/ParaViewData/Data/SESAME301");
+  proxy->UpdateVTKObjects();
+  proxy->UpdatePropertyInformation();
+
+  vtkSMIntVectorProperty *tableIdsProps =
+      vtkSMIntVectorProperty::SafeDownCast(proxy->GetProperty("TableIds"));
+  tableIdsProps->PrintSelf(cout, vtkIndent(5));
 
   cout << "Exiting..." << endl;
-  proxy->Delete();
   session->Delete();
 
   //---------------------------------------------------------------------------

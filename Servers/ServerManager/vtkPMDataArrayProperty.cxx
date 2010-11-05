@@ -23,22 +23,6 @@
 #include "vtkIntArray.h"
 #include "vtkIdTypeArray.h"
 
-//*****************************************************************************
-template<class iterT>
-void writeValues(iterT* iter, Variant *var)
-{
-
-
-  vtkIdType numValues = iter->GetNumberOfValues();
-  for (vtkIdType cc=0; cc < numValues; cc++)
-    {
-    var->add_float64(iter->GetValue(cc));
-    }
-}
-
-
-
-//*****************************************************************************
 vtkStandardNewMacro(vtkPMDataArrayProperty);
 //----------------------------------------------------------------------------
 vtkPMDataArrayProperty::vtkPMDataArrayProperty()
