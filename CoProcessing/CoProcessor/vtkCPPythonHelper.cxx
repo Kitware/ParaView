@@ -26,11 +26,9 @@
 #include "vtkSMObject.h"
 #include "vtkSMXMLParser.h"
 
-#include <vtkstd/string>
-using vtkstd::string;
+#include <string>
 #include <vtksys/SystemTools.hxx>
 #include <vtksys/ios/sstream>
-using vtksys_ios::ostringstream;
 
 static void ParaViewInitializeInterpreter(vtkProcessModule* pm)
 {
@@ -92,7 +90,7 @@ vtkCPPythonHelper* vtkCPPythonHelper::New()
     int argc = 0;
     char** argv = new char*[1];
     argv[0] = new char[200];
-    string CWD = vtksys::SystemTools::GetCurrentWorkingDirectory();
+    std::string CWD = vtksys::SystemTools::GetCurrentWorkingDirectory();
 #ifdef COPROCESSOR_WIN32_BUILD
     strcpy_s(argv[0], strlen(CWD.c_str()), CWD.c_str());
 #else
@@ -122,8 +120,8 @@ vtkCPPythonHelper* vtkCPPythonHelper::New()
     ret = vtkCPPythonHelper::Instance->ProcessModuleHelper->Run(
       vtkCPPythonHelper::Instance->PythonOptions);
 
-    ostringstream LoadPythonModules;
-    LoadPythonModules
+    vtksys_ios::ostringstream loadPythonModules;
+    loadPythonModules
       << "import sys\n"
       << "from paraview.simple import *\n"
 #ifndef COPROCESSOR_WIN32_BUILD
@@ -134,7 +132,7 @@ vtkCPPythonHelper* vtkCPPythonHelper::New()
 #endif
 
     vtkCPPythonHelper::Instance->ProcessModuleHelper->GetInterpretor()->
-      RunSimpleString(LoadPythonModules.str().c_str());
+      RunSimpleString(loadPythonModules.str().c_str());
     vtkCPPythonHelper::Instance->ProcessModuleHelper->GetInterpretor()->
       FlushMessages();
     }
