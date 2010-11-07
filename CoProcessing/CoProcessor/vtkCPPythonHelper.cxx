@@ -124,12 +124,7 @@ vtkCPPythonHelper* vtkCPPythonHelper::New()
     loadPythonModules
       << "import sys\n"
       << "from paraview.simple import *\n"
-#ifndef COPROCESSOR_WIN32_BUILD
-      // Not on Windows 
-      << "import libvtkCoProcessorPython\n";
-#else
       << "import vtkCoProcessorPython\n";
-#endif
 
     vtkCPPythonHelper::Instance->ProcessModuleHelper->GetInterpretor()->
       RunSimpleString(loadPythonModules.str().c_str());

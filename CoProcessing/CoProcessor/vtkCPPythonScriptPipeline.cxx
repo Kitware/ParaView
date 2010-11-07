@@ -101,16 +101,9 @@ int vtkCPPythonScriptPipeline::RequestDataDescription(
   vtkStdString dataDescriptionString = this->GetPythonAddress(dataDescription);
 
   vtksys_ios::ostringstream pythonInput;
-#ifndef COPROCESSOR_WIN32_BUILD
-  // Not on Windows.
-  pythonInput << "dataDescription = libvtkCoProcessorPython.vtkCPDataDescription('"
-              << dataDescriptionString << "')\n"
-              << this->PythonScriptName << ".RequestDataDescription(dataDescription)\n";
-#else
   pythonInput << "dataDescription = vtkCoProcessorPython.vtkCPDataDescription('"
               << dataDescriptionString << "')\n"
-              << this->PythonScriptName << ".RequestdataDescription(dataDescription)\n";
-#endif
+              << this->PythonScriptName << ".RequestDataDescription(dataDescription)\n";
 
   this->PythonHelper->GetPythonInterpretor()->RunSimpleString(pythonInput.str().c_str());
   this->PythonHelper->GetPythonInterpretor()->FlushMessages();
@@ -129,13 +122,8 @@ int vtkCPPythonScriptPipeline::CoProcess(
   vtkStdString dataDescriptionString = this->GetPythonAddress(dataDescription);
 
   vtksys_ios::ostringstream pythonInput;
-  pythonInput 
-#ifndef COPROCESSOR_WIN32_BUILD
-    // Not on Windows
-    << "dataDescription = libvtkCoProcessorPython.vtkCPDataDescription('"
-#else
+  pythonInput
     << "dataDescription = vtkCoProcessorPython.vtkCPDataDescription('"
-#endif
     << dataDescriptionString << "')\n"
     << this->PythonScriptName << ".DoCoProcessing(dataDescription)\n";
 
