@@ -31,7 +31,6 @@
 #include <vtkstd/string>
 #include <vtksys/SystemTools.hxx>
 #include <vtksys/ios/sstream>
-using vtksys_ios::ostringstream;
 
 vtkCPPythonHelper* vtkCPPythonScriptPipeline::PythonHelper = 0;
 
@@ -72,13 +71,13 @@ int vtkCPPythonScriptPipeline::Initialize(const char* fileName)
   // for now do not check on filename extension:
   //vtksys::SystemTools::GetFilenameLastExtension(FileName) == ".py" == 0)
 
-  vtkstd::string fileNamePath = vtksys::SystemTools::GetFilenamePath(fileName);
-  vtkstd::string fileNameName = vtksys::SystemTools::GetFilenameWithoutExtension(
+  std::string fileNamePath = vtksys::SystemTools::GetFilenamePath(fileName);
+  std::string fileNameName = vtksys::SystemTools::GetFilenameWithoutExtension(
     vtksys::SystemTools::GetFilenameName(fileName));
   // need to save the script name as it is used as the name of the module
   this->SetPythonScriptName(fileNameName.c_str());
 
-  ostringstream loadPythonModules;
+  vtksys_ios::ostringstream loadPythonModules;
   loadPythonModules
     << "sys.path.append('" << fileNamePath << "')\n"
     << "import " << fileNameName << "\n";
@@ -101,17 +100,10 @@ int vtkCPPythonScriptPipeline::RequestDataDescription(
   // check the script to see if it should be run...
   vtkStdString dataDescriptionString = this->GetPythonAddress(dataDescription);
 
-  ostringstream pythonInput;
-#ifndef COPROCESSOR_WIN32_BUILD
-  // Not on Windows.
-  pythonInput << "dataDescription = libvtkCoProcessorPython.vtkCPDataDescription('"
-              << dataDescriptionString << "')\n"
-              << this->PythonScriptName << ".RequestDataDescription(dataDescription)\n";
-#else
+  vtksys_ios::ostringstream pythonInput;
   pythonInput << "dataDescription = vtkCoProcessorPython.vtkCPDataDescription('"
               << dataDescriptionString << "')\n"
-              << this->PythonScriptName << ".RequestdataDescription(dataDescription)\n";
-#endif
+              << this->PythonScriptName << ".RequestDataDescription(dataDescription)\n";
 
   this->PythonHelper->GetPythonInterpretor()->RunSimpleString(pythonInput.str().c_str());
   this->PythonHelper->GetPythonInterpretor()->FlushMessages();
@@ -129,14 +121,9 @@ int vtkCPPythonScriptPipeline::CoProcess(
     }
   vtkStdString dataDescriptionString = this->GetPythonAddress(dataDescription);
 
-  ostringstream pythonInput;
-  pythonInput 
-#ifndef COPROCESSOR_WIN32_BUILD
-    // Not on Windows
-    << "dataDescription = libvtkCoProcessorPython.vtkCPDataDescription('"
-#else
+  vtksys_ios::ostringstream pythonInput;
+  pythonInput
     << "dataDescription = vtkCoProcessorPython.vtkCPDataDescription('"
-#endif
     << dataDescriptionString << "')\n"
     << this->PythonScriptName << ".DoCoProcessing(dataDescription)\n";
 
@@ -162,7 +149,7 @@ vtkStdString vtkCPPythonScriptPipeline::GetPythonAddress(void* pointer)
     aplus += 2; //skip over "0x"
     }
 
-  vtkstd::string value = aplus;
+  vtkStdString value = aplus;
   return value;
 }
 
