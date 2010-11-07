@@ -166,7 +166,7 @@ void vtkSMWriterFactory::Initialize()
 void vtkSMWriterFactory::RegisterPrototypes(const char* xmlgroup)
 {
   vtkSMProxyDefinitionIterator* iter = NULL;
-  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+  vtkSMProxyManager* pxm = this->GetProxyManager();
   iter = pxm->GetProxyDefinitionManager()->NewSingleGroupIterator(xmlgroup,0);
   for (iter->GoToFirstItem(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
     {

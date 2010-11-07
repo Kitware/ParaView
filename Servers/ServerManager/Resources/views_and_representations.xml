@@ -1011,10 +1011,8 @@
 
       <StringVectorProperty name="RepresentationTypesInfo"
         command="GetRepresentationTypes"
-        information_only="1" >
-        <!-- FIXME
-        <StringArrayHelper />
-        -->
+        information_only="1"
+        kernel_class="vtkPMDataArrayProperty">
         <Documentation>
           Property that lists the available representation types. This is used
           by the domain for "Representation" to setup the list of types

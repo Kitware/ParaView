@@ -115,6 +115,12 @@ public:
   // this method.
   vtkSession* GetActiveSession();
 
+  // Description:
+  // This is a convenience method that either returns the active session, if
+  // present, otherwise the first session. Don't use this for new API. This is
+  // provided for some old api.
+  vtkSession* GetSession();
+
   //********** ACCESSORS FOR VARIOUS HELPERS *****************************
 
   // Description:

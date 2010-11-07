@@ -22,11 +22,12 @@
 
 #include "vtkSMObject.h"
 
+class vtkCollection;
 class vtkSelection;
 class vtkSelectionNode;
 class vtkSMProxy;
+class vtkSMSession;
 class vtkSMSourceProxy;
-class vtkCollection;
 
 class VTK_EXPORT vtkSMSelectionHelper : public vtkSMObject
 {
@@ -34,11 +35,6 @@ public:
   static vtkSMSelectionHelper* New();
   vtkTypeMacro(vtkSMSelectionHelper, vtkSMObject);
   void PrintSelf(ostream& os, vtkIndent indent);
-
-  // Description:
-  // Given a selection object, creates a server side representation which
-  // can be accessed using the given proxy.
-  static void SendSelection(vtkSelection* sel, vtkSMProxy* proxy);
 
   // Description:
   // Given a selection, returns a proxy for a selection source that has
@@ -49,8 +45,8 @@ public:
   // selection FRUSTUM, INDICES and GLOBALIDS. We can easily change this to
   // handle all other types of selection but that's not required currently and
   // hence we not adding that code.
-  static vtkSMProxy* NewSelectionSourceFromSelection(vtkIdType connectionID,
-                                                     vtkSelection* selection);
+  static vtkSMProxy* NewSelectionSourceFromSelection(
+    vtkSMSession* session, vtkSelection* selection);
 
   static void NewSelectionSourcesFromSelection(
     vtkSelection* selection, vtkSMProxy* view,
@@ -86,7 +82,7 @@ private:
   void operator=(const vtkSMSelectionHelper&); // Not implemented.
 
   static vtkSMProxy* NewSelectionSourceFromSelectionInternal(
-    vtkIdType connectionId, vtkSelectionNode* selection, vtkSMProxy* selSource=0);
+    vtkSMSession*, vtkSelectionNode* selection, vtkSMProxy* selSource=0);
 
   static vtkSMProxy* ConvertInternal(
     vtkSMSourceProxy* inSource, vtkSMSourceProxy* dataSource,

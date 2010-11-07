@@ -427,7 +427,7 @@ int vtkSMProxyProperty::ReadXMLAttributes(vtkSMProxy* parent,
 void vtkSMProxyProperty::DeepCopy(vtkSMProperty* src, 
   const char* exceptionClass, int proxyPropertyCopyFlag)
 {
-  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+  vtkSMProxyManager* pxm = this->GetParent()->GetProxyManager();
   vtkSMProxyProperty* dsrc = vtkSMProxyProperty::SafeDownCast(src);
 
   this->RemoveAllProxies();

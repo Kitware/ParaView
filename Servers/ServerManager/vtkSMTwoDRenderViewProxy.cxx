@@ -42,7 +42,7 @@ vtkSMRepresentationProxy* vtkSMTwoDRenderViewProxy::CreateDefaultRepresentation(
     return 0;
     }
 
-  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+  vtkSMProxyManager* pxm = this->GetProxyManager();
 
   // Update with time to avoid domains updating without time later.
   vtkSMSourceProxy* sproxy = vtkSMSourceProxy::SafeDownCast(source);

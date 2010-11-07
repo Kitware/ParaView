@@ -41,9 +41,7 @@
 #include "vtkSMPropertyIterator.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMRepresentationProxy.h"
-#ifdef FIXME
 #include "vtkSMSelectionHelper.h"
-#endif
 #include "vtkTransform.h"
 #include "vtkWeakPointer.h"
 #include "vtkWindowToImageFilter.h"
@@ -261,7 +259,7 @@ vtkSMRepresentationProxy* vtkSMRenderViewProxy::CreateDefaultRepresentation(
     return 0;
     }
 
-  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+  vtkSMProxyManager* pxm = source->GetProxyManager();
 
   // Update with time to avoid domains updating without time later.
   vtkSMSourceProxy* sproxy = vtkSMSourceProxy::SafeDownCast(source);
@@ -513,10 +511,8 @@ bool vtkSMRenderViewProxy::FetchLastSelection(
 #endif
 
     vtkSelection* selection = info->GetSelection();
-#ifdef FIXME
     vtkSMSelectionHelper::NewSelectionSourcesFromSelection(
       selection, this, selectionSources, selectedRepresentations);
-#endif
     return (selectionSources->GetNumberOfItems() > 0);
     }
   return false;

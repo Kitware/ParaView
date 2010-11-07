@@ -59,6 +59,12 @@ void vtkSMRemoteObject::SetSession(vtkSMSession* session)
 }
 
 //----------------------------------------------------------------------------
+vtkSMProxyManager* vtkSMRemoteObject::GetProxyManager()
+{
+  return (this->Session? this->Session->GetProxyManager() : NULL);
+}
+
+//----------------------------------------------------------------------------
 void vtkSMRemoteObject::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);

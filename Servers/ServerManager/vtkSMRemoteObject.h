@@ -53,6 +53,10 @@ public:
   // valid, a new global id will be assigned automatically.
   vtkTypeUInt32 GetGlobalID();
 
+  // Description:
+  // Returns the proxy manager from the session.
+  vtkSMProxyManager* GetProxyManager();
+
 //BTX
 
   // Description:

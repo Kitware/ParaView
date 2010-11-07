@@ -315,6 +315,21 @@ vtkSession* vtkProcessModule2::GetActiveSession()
 }
 
 //----------------------------------------------------------------------------
+vtkSession* vtkProcessModule2::GetSession()
+{
+  vtkSession* activeSession = this->GetActiveSession();
+  if (activeSession)
+    {
+    return activeSession;
+    }
+
+  vtkInternals::MapOfSessions::iterator iter;
+  iter = this->Internals->Sessions.begin();
+  return (iter != this->Internals->Sessions.end()?
+    iter->second.GetPointer() : NULL);
+}
+
+//----------------------------------------------------------------------------
 void vtkProcessModule2::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);

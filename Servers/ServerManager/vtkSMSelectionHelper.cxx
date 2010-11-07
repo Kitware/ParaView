@@ -40,6 +40,7 @@
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMSourceProxy.h"
+#include "vtkSMSession.h"
 #include "vtkUnsignedIntArray.h"
 #include "vtkView.h"
 
@@ -56,28 +57,8 @@ void vtkSMSelectionHelper::PrintSelf(ostream& os, vtkIndent indent)
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMSelectionHelper::SendSelection(vtkSelection* sel, vtkSMProxy* proxy)
-{
-  vtkProcessModule* processModule = vtkProcessModule::GetProcessModule();
-
-  vtksys_ios::ostringstream res;
-  vtkSelectionSerializer::PrintXML(res, vtkIndent(), 1, sel);
-  vtkClientServerStream stream;
-  vtkClientServerID parserID =
-    processModule->NewStreamObject("vtkSelectionSerializer", stream);
-  stream << vtkClientServerStream::Invoke
-         << parserID << "Parse" << res.str().c_str() << proxy->GetID()
-         << vtkClientServerStream::End;
-  processModule->DeleteStreamObject(parserID, stream);
-
-  processModule->SendStream(proxy->GetConnectionID(), 
-    proxy->GetServers(), 
-    stream);
-}
-
-//-----------------------------------------------------------------------------
 vtkSMProxy* vtkSMSelectionHelper::NewSelectionSourceFromSelectionInternal(
-  vtkIdType connectionID, 
+  vtkSMSession* session,
   vtkSelectionNode* selection,
   vtkSMProxy* selSource /*=NULL*/)
 {
@@ -149,10 +130,8 @@ vtkSMProxy* vtkSMSelectionHelper::NewSelectionSourceFromSelectionInternal(
     {
     // If selSource is not present we need to create a new one. The type of
     // proxy we instantiate depends on the type of the vtkSelection.
-    vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
+    vtkSMProxyManager* pxm = session->GetProxyManager();
     selSource = pxm->NewProxy("sources", proxyname);
-    selSource->SetConnectionID(connectionID);
-    selSource->SetServers(vtkProcessModule::DATA_SERVER);
     }
 
 
@@ -297,8 +276,7 @@ vtkSMProxy* vtkSMSelectionHelper::NewSelectionSourceFromSelectionInternal(
 
 //-----------------------------------------------------------------------------
 vtkSMProxy* vtkSMSelectionHelper::NewSelectionSourceFromSelection(
-  vtkIdType connectionID,
-  vtkSelection* selection)
+  vtkSMSession* session, vtkSelection* selection)
 {
   vtkSMProxy* selSource= 0;
   unsigned int numNodes = selection->GetNumberOfNodes(); 
@@ -306,7 +284,7 @@ vtkSMProxy* vtkSMSelectionHelper::NewSelectionSourceFromSelection(
     {
     vtkSelectionNode* node = selection->GetNode(cc);
     selSource = vtkSMSelectionHelper::NewSelectionSourceFromSelectionInternal(
-      connectionID, node, selSource);
+      session, node, selSource);
     }
   if (selSource)
     {
@@ -418,7 +396,7 @@ vtkSMProxy* vtkSMSelectionHelper::ConvertSelection(int outputType,
 
   // Conversion not possible, so simply create a new proxy of the requested
   // output type with some empty defaults.
-  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+  vtkSMProxyManager* pxm = selectionSourceProxy->GetProxyManager();
   vtkSMProxy* outSource = pxm->NewProxy("sources", outproxyname);
   if (!outSource)
     {
@@ -435,9 +413,6 @@ vtkSMProxy* vtkSMSelectionHelper::ConvertSelection(int outputType,
 
   if (selectionSourceProxy)
     {
-    outSource->SetServers(selectionSourceProxy->GetServers());
-    outSource->SetConnectionID(selectionSourceProxy->GetConnectionID());
-
     // try to copy as many properties from the old-source to the new one.
     outSource->GetProperty("ContainingCells")->Copy(
       selectionSourceProxy->GetProperty("ContainingCells"));
@@ -455,8 +430,7 @@ vtkSMProxy* vtkSMSelectionHelper::ConvertInternal(
   vtkSMSourceProxy* inSource, vtkSMSourceProxy* dataSource,
   int dataPort, int outputType)
 {
-  vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  vtkSMProxyManager* pxm = inSource->GetProxyManager();
 
   // * Update all inputs.
   inSource->UpdatePipeline();
@@ -465,8 +439,7 @@ vtkSMProxy* vtkSMSelectionHelper::ConvertInternal(
   // * Filter that converts selections.
   vtkSMSourceProxy* convertor = vtkSMSourceProxy::SafeDownCast(
     pxm->NewProxy("filters", "ConvertSelection"));
-  convertor->SetConnectionID(inSource->GetConnectionID());
-  convertor->SetServers(inSource->GetServers());
+  //convertor->SetServers(inSource->GetServers());
 
   vtkSMInputProperty* ip = vtkSMInputProperty::SafeDownCast(
     convertor->GetProperty("Input"));
@@ -485,20 +458,14 @@ vtkSMProxy* vtkSMSelectionHelper::ConvertInternal(
 
   // * And finally gathering the information back
   vtkPVSelectionInformation* selInfo = vtkPVSelectionInformation::New();
-  pm->GatherInformation(convertor->GetConnectionID(),
-                        convertor->GetServers(),
-                        selInfo,
-                        convertor->GetID());
-
+  convertor->GatherInformation(selInfo);
 
   vtkSMProxy* outSource = vtkSMSelectionHelper::NewSelectionSourceFromSelection(
-    inSource->GetConnectionID(), selInfo->GetSelection());
-
+    inSource->GetSession(), selInfo->GetSelection());
 
   // cleanup.
   convertor->Delete();
   selInfo->Delete();
-
   return outSource;
 }
 
@@ -697,7 +664,7 @@ void vtkSMSelectionHelper::NewSelectionSourcesFromSelection(
 
     vtkSMProxy* selSource =
       vtkSMSelectionHelper::NewSelectionSourceFromSelection(
-        view->GetConnectionID(), iter->second.GetPointer());
+        view->GetSession(), iter->second.GetPointer());
     if (!selSource)
       {
       continue;

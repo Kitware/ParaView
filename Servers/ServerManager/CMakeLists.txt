@@ -85,7 +85,7 @@ SET (Kit_SRCS
   vtkSMRemoteObjectUpdateUndoElement.cxx
   vtkSMRenderViewProxy.cxx
   vtkSMRepresentationProxy.cxx
-#  vtkSMSelectionHelper.cxx
+  vtkSMSelectionHelper.cxx
   vtkSMSessionClient.cxx
   vtkSMSessionCore.cxx
   vtkSMSession.cxx
