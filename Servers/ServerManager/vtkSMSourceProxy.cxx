@@ -56,8 +56,7 @@ struct vtkSMSourceProxyInternals
 {
   typedef vtkstd::vector<vtkSMSourceProxyOutputPort> VectorOfPorts;
   VectorOfPorts OutputPorts;
-  vtkstd::vector<vtkSmartPointer<vtkSMSourceProxy> > SelectionProxies;
-  
+
   // Resizes output ports and ensures that Name for each port is initialized to
   // the default.
   void ResizeOutputPorts(unsigned int newsize)
@@ -96,7 +95,6 @@ vtkSMSourceProxy::vtkSMSourceProxy()
   this->SetExecutiveName("vtkCompositeDataPipeline");
 
   this->DoInsertExtractPieces = 1;
-  this->SelectionProxiesCreated = 0;
 
   this->NumberOfAlgorithmOutputPorts = VTK_UNSIGNED_INT_MAX;
   this->NumberOfAlgorithmRequiredInputPorts = VTK_UNSIGNED_INT_MAX;
@@ -418,23 +416,6 @@ void vtkSMSourceProxy::PostUpdateData()
 }
 
 //----------------------------------------------------------------------------
-void vtkSMSourceProxy::MarkDirty(vtkSMProxy* modifiedProxy)
-{
-  // Mark the extract selection proxies modified as well.
-  // This is needed to be done explicitly since we don't use vtkSMInputProperty
-  // to connect this proxy to the input of the extract selection filter.
-  vtkstd::vector<vtkSmartPointer<vtkSMSourceProxy> >::iterator iter;
-  for (iter = this->PInternals->SelectionProxies.begin();
-    iter != this->PInternals->SelectionProxies.end(); ++iter)
-    {
-    iter->GetPointer()->MarkDirty(modifiedProxy);
-    }
-
-  this->Superclass::MarkDirty(modifiedProxy);
-  // this->InvalidateDataInformation();
-}
-
-//----------------------------------------------------------------------------
 vtkPVDataInformation* vtkSMSourceProxy::GetDataInformation(
   unsigned int idx)
 {
@@ -459,152 +440,6 @@ void vtkSMSourceProxy::InvalidateDataInformation()
       it->Port.GetPointer()->InvalidateDataInformation();
       }
     }
-}
-
-//---------------------------------------------------------------------------
-void vtkSMSourceProxy::CreateSelectionProxies()
-{
-  if (this->SelectionProxiesCreated)
-    {
-    return;
-    }
-  this->CreateOutputPorts();
-
-  // ServerManager2.0:
-  // I am wondering if this should simply move to the server-side. Selection
-  // outputs are only used by representations, never by anything else. So the
-  // representations can ask for the selection port directly. We'll need to
-  // provide mechanism to set the SelectionInput() somehow.
-#ifdef FIXME
-  vtkClientServerStream stream;
-  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
-  unsigned int numOutputPorts = this->GetNumberOfOutputPorts(); 
-  for (unsigned int cc=0; cc < numOutputPorts; cc++)
-    {
-    vtkSmartPointer<vtkSMSourceProxy> esProxy;
-    esProxy.TakeReference(vtkSMSourceProxy::SafeDownCast(
-        pxm->NewProxy("filters", "PVExtractSelection")));
-    if (esProxy)
-      {
-      esProxy->SetServers(this->Servers);
-      esProxy->SetConnectionID(this->ConnectionID);
-      esProxy->SelectionProxiesCreated = 1;
-      esProxy->UpdateVTKObjects();
-
-      vtkSMOutputPort* port = this->GetOutputPort(cc);
-      // We don't use input property since that leads to reference loop cycles
-      // and I don't feel like doing the garbage collection thing right now. 
-      stream << vtkClientServerStream::Invoke
-             << port->GetProducerID() /* we use a crooked means of getting at 
-                                         the ID so that this code works for
-                                         vtkSMCompoundSourceProxy*/
-             << "GetOutputPort"
-             << port->GetPortIndex()
-             << vtkClientServerStream::End;
-      stream << vtkClientServerStream::Invoke             
-             << esProxy->GetID()
-             << "SetInputConnection"
-             << vtkClientServerStream::LastResult
-             << vtkClientServerStream::End;
-      }
-
-    this->PInternals->SelectionProxies.push_back(esProxy);
-    }
-
-  vtkProcessModule::GetProcessModule()->SendStream(
-    this->ConnectionID, this->Servers, stream);
-
-  this->SelectionProxiesCreated = 1;
-#endif
-}
-
-//---------------------------------------------------------------------------
-void vtkSMSourceProxy::SetSelectionInput(unsigned int portIndex,
-  vtkSMSourceProxy* input, unsigned int outputport)
-{
-  this->CreateSelectionProxies();
-
-  if (this->PInternals->SelectionProxies.size() <= portIndex)
-    {
-    return;
-    }
-  vtkSMSourceProxy* esProxy = this->PInternals->SelectionProxies[portIndex];
-  if (esProxy)
-    {
-    vtkSMInputProperty* pp = vtkSMInputProperty::SafeDownCast(
-      esProxy->GetProperty("Selection"));
-    pp->RemoveAllProxies();
-    pp->AddInputConnection(input, outputport);
-    esProxy->UpdateVTKObjects();
-    this->InvokeEvent(vtkCommand::SelectionChangedEvent,&portIndex);
-    }
-}
-
-//---------------------------------------------------------------------------
-vtkSMSourceProxy* vtkSMSourceProxy::GetSelectionInput(unsigned int portIndex)
-{
-  if (this->PInternals->SelectionProxies.size() > portIndex)
-    {
-    vtkSMSourceProxy* esProxy = this->PInternals->SelectionProxies[portIndex];
-    if (esProxy)
-      {
-      vtkSMInputProperty* pp = vtkSMInputProperty::SafeDownCast(
-        esProxy->GetProperty("Selection"));
-      if (pp->GetNumberOfProxies() == 1)
-        {
-        return vtkSMSourceProxy::SafeDownCast(pp->GetProxy(0));
-        }
-      }
-    }
-  return 0;
-}
-
-//---------------------------------------------------------------------------
-unsigned int vtkSMSourceProxy::GetSelectionInputPort(unsigned int portIndex)
-{
-  if (this->PInternals->SelectionProxies.size() > portIndex)
-    {
-    vtkSMSourceProxy* esProxy = this->PInternals->SelectionProxies[portIndex];
-    if (esProxy)
-      {
-      vtkSMInputProperty* pp = vtkSMInputProperty::SafeDownCast(
-        esProxy->GetProperty("Selection"));
-      if (pp->GetNumberOfProxies() == 1)
-        {
-        return pp->GetOutputPortForConnection(portIndex);
-        }
-      }
-    }
-  return 0;
-}
-
-//---------------------------------------------------------------------------
-void vtkSMSourceProxy::CleanSelectionInputs(unsigned int portIndex)
-{
-  if (this->PInternals->SelectionProxies.size() <= portIndex)
-    {
-    return;
-    }
-  vtkSMSourceProxy* esProxy = this->PInternals->SelectionProxies[portIndex];
-  if (esProxy)
-    {
-    vtkSMInputProperty* pp = vtkSMInputProperty::SafeDownCast(
-      esProxy->GetProperty("Selection"));
-    pp->RemoveAllProxies();
-    esProxy->UpdateVTKObjects();
-    this->InvokeEvent(vtkCommand::SelectionChangedEvent,&portIndex);
-    }
-}
-
-//---------------------------------------------------------------------------
-vtkSMSourceProxy* vtkSMSourceProxy::GetSelectionOutput(unsigned int portIndex)
-{
-  if (this->PInternals->SelectionProxies.size() > portIndex)
-    {
-    return this->PInternals->SelectionProxies[portIndex];
-    }
-
-  return 0;
 }
 
 //---------------------------------------------------------------------------
