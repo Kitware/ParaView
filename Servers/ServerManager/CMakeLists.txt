@@ -150,8 +150,6 @@ SET(Kit_SRCS
   vtkSMAnimationSceneProxy.cxx
   vtkSMAnimationSceneWriter.cxx
   vtkSMApplication.cxx
-  vtkSMArrayListInformationHelper.cxx
-  vtkSMArraySelectionInformationHelper.cxx
   vtkSMBooleanKeyFrameProxy.cxx
   vtkSMBoxRepresentationProxy.cxx
   vtkSMCameraConfigurationReader.cxx
@@ -167,11 +165,10 @@ SET(Kit_SRCS
   vtkSMCompoundSourceProxy.cxx
   vtkSMCompoundProxyDefinitionLoader.cxx
   vtkSMConnectionCleanerProxy.cxx
-  vtkSMContextArraysInformationHelper.cxx
+  vtkSMContextArraysInformationHelper.cxx #---- SM Side only, not managed yet...
   vtkSMContextNamedOptionsProxy.cxx
   vtkSMCSVExporterProxy.cxx
   vtkSMDistanceRepresentation2DProxy.cxx
-  vtkSMDoubleArrayInformationHelper.cxx
   vtkSMExponentialKeyFrameProxy.cxx
   vtkSMExporterProxy.cxx
   vtkSMFileSeriesReaderProxy.cxx
@@ -180,9 +177,6 @@ SET(Kit_SRCS
   vtkSMFetchDataProxy.cxx
   vtkSMImageTextureProxy.cxx
   vtkSMImplicitPlaneRepresentationProxy.cxx
-  vtkSMInformationHelper.cxx
-  vtkSMIdTypeArrayInformationHelper.cxx
-  vtkSMIntArrayInformationHelper.cxx
   vtkSMInteractionUndoStackBuilder.cxx#--------------------------------
   vtkSMKeyFrameAnimationCueManipulatorProxy.cxx
   vtkSMKeyFrameProxy.cxx
@@ -220,20 +214,12 @@ SET(Kit_SRCS
   vtkSMServerProxyManagerReviver.cxx
   vtkSMServerSideAnimationPlayer.cxx
   vtkSMSILModel.cxx
-  vtkSMSILInformationHelper.cxx
-  vtkSMSimpleDoubleInformationHelper.cxx
-  vtkSMSimpleIdTypeInformationHelper.cxx
-  vtkSMSimpleIntInformationHelper.cxx
-  vtkSMSimpleStringInformationHelper.cxx
   vtkSMSinusoidKeyFrameProxy.cxx
-  vtkSMStringArrayHelper.cxx
 #  vtkSMTemporalInputDomain.cxx
   vtkSMTesting.cxx
   vtkSMTextWidgetRepresentationProxy.cxx
   vtkSMTimeAnimationCueProxy.cxx
   vtkSMTimeKeeperProxy.cxx
-  vtkSMTimeRangeInformationHelper.cxx
-  vtkSMTimeStepsInformationHelper.cxx
   vtkSMTransformProxy.cxx
   vtkSMUndoRedoStateLoader.cxx#-------------------------------- should be DELETE
   vtkSMUpdateInformationUndoElement.cxx#--------------------------------

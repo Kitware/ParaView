@@ -171,13 +171,10 @@ SET(Filters_SRCS
   vtkPVRepresentedDataInformation.cxx
   vtkPVScalarBarActor.cxx
   vtkPVSelectionSource.cxx
-  vtkPVServerArrayHelper.cxx
   vtkPVServerArraySelection.cxx
   vtkPVServerFileListing.cxx
   vtkPVServerObject.cxx
   vtkPVServerSelectTimeSet.cxx
-  vtkPVServerTimeSteps.cxx
-  vtkPVStringArrayHelper.cxx
   vtkPVSynchronizedRenderer.cxx
   vtkPVSynchronizedRenderWindows.cxx
   vtkPVTextSource.cxx

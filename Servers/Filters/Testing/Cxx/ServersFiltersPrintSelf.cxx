@@ -136,13 +136,10 @@
 #include "vtkPVRepresentedDataInformation.h"
 #include "vtkPVScalarBarActor.h"
 #include "vtkPVSelectionSource.h"
-#include "vtkPVServerArrayHelper.h"
 #include "vtkPVServerArraySelection.h"
 #include "vtkPVServerFileListing.h"
 #include "vtkPVServerObject.h"
 #include "vtkPVServerSelectTimeSet.h"
-#include "vtkPVServerTimeSteps.h"
-#include "vtkPVStringArrayHelper.h"
 #include "vtkPVTextSource.h"
 #include "vtkPVTrackballMoveActor.h"
 #include "vtkPVTrackballMultiRotate.h"
@@ -349,13 +346,10 @@ int main(int , char *[])
   PRINT_SELF(vtkPVRepresentedDataInformation);
   PRINT_SELF(vtkPVScalarBarActor);
   PRINT_SELF(vtkPVSelectionSource);
-  PRINT_SELF(vtkPVServerArrayHelper);
   PRINT_SELF(vtkPVServerArraySelection);
   PRINT_SELF(vtkPVServerFileListing);
   PRINT_SELF(vtkPVServerObject);
   PRINT_SELF(vtkPVServerSelectTimeSet);
-  PRINT_SELF(vtkPVServerTimeSteps);
-  PRINT_SELF(vtkPVStringArrayHelper);
   PRINT_SELF(vtkPVTextSource);
   PRINT_SELF(vtkPVTrackballMoveActor);
   PRINT_SELF(vtkPVTrackballMultiRotate);
