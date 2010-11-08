@@ -99,9 +99,6 @@ void pqFileDialogFilter::setFilter(const QString& filter)
     filepatterns.replace(".","\\.");
     filepatterns.replace("*", ".*");
 
-    cout << extensions.toAscii().data() << endl;
-    cout << filepatterns.toAscii().data() << endl;
-
     //use non capturing(?:) for speed
     //name.ext or ext.001
     QString postExtFileSeries("(\\.\\d+)?$"); // match the .0001 component
