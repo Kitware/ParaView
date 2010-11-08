@@ -44,7 +44,8 @@
   <Proxy group="sources" name="MetaImageReader" />
   <Proxy group="sources" name="NrrdReader" />
   <Proxy group="sources" name="Facet Proxy" />
-  <Proxy group="sources" name="FileSeriesPNGReader" />
+  <Proxy group="sources" name="PNGSeriesReader" />
+  <Proxy group="sources" name="JPEGSeriesReader" />
   <Proxy group="sources" name="TIFFReader" />
   <Proxy group="sources" name="PhastaReader" />
   <Proxy group="sources" name="EnzoReader" />
