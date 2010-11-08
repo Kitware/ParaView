@@ -27,7 +27,9 @@ vtkPVCenterAxesActor::vtkPVCenterAxesActor()
   this->Mapper = vtkPolyDataMapper::New();
   this->Mapper->SetInputConnection(this->Axes->GetOutputPort());
   this->SetMapper(this->Mapper);
-  this->SetUseBounds(0); // don't use bounds of this actor in renderer bounds
+  // We disable this, since it results in the center axes being skipped when
+  // IceT is rendering.
+  // this->SetUseBounds(0); // don't use bounds of this actor in renderer bounds
                          // computations.
 }
 
