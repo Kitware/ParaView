@@ -1958,7 +1958,7 @@
 
    </SourceProxy>
 
-   <SourceProxy name="PNGReaderCore"
+   <SourceProxy name="PNGReader"
                 class="vtkPNGReader"
                 label="PNG Reader">
      <Documentation
@@ -1982,6 +1982,32 @@
           file_description="PNG Image Files" />
       </Hints>
      <!-- End PNGReader -->
+   </SourceProxy>
+
+   <SourceProxy name="JPEGReader"
+                class="vtkJPEGReader"
+                label="JPEG Reader">
+     <Documentation
+       short_help="Read a JPEG file."
+       long_help="Read a JPEG file into an image data.">
+       The JPEG reader reads JPEG files, and the output is a uniform rectilinear (image/volume) dataset. The default file extension is .jpg or .jpeg.
+     </Documentation>
+     <StringVectorProperty
+        name="FileName"
+        animateable="0"
+        command="SetFileName"
+        number_of_elements="1">
+        <FileListDomain name="files"/>
+        <Documentation>
+          This property specifies the file name for the PNG reader.
+        </Documentation>
+      </StringVectorProperty>
+
+      <Hints>
+        <ReaderFactory extensions="jpg jpeg"
+          file_description="JPEG Image Files" />
+      </Hints>
+     <!-- End JPEGReader -->
    </SourceProxy>
 
     <SourceProxy name="netCDFReaderCore"
@@ -2319,7 +2345,7 @@
      <Documentation
        short_help="Read a series of meta images."
        long_help="Read a series of meta images.">
-       Read a series of meta images. The file extension is .mdh
+       Read a series of meta images. The file extension is .mhd
      </Documentation>
 
      <SubProxy>
@@ -2344,7 +2370,7 @@
        <FileListDomain name="files"/>
        <Documentation>
          The list of files to be read by the reader. Each file is expected to be
-         in the meta format. The standard extension is .mdh. If more than 1 file is specified,
+         in the meta format. The standard extension is .mhd. If more than 1 file is specified,
          the reader will switch to file series mode in which it will pretend that it can support
          time and provide 1 file per time step.
        </Documentation>
@@ -4245,9 +4271,9 @@
 
    </SourceProxy> <!-- NrrdReader -->
 
-   <FileSeriesReaderProxy name="PNGReader"
+   <FileSeriesReaderProxy name="PNGSeriesReader"
                           class="vtkFileSeriesReader"
-                          label="PNG Reader"
+                          label="PNG Series Reader"
                           file_name_method="SetFileName">
      <Documentation
        short_help="Read a PNG file."
@@ -4282,7 +4308,7 @@
 
      <SubProxy>
         <Proxy name="Reader"
-          proxygroup="internal_sources" proxyname="PNGReaderCore">
+          proxygroup="internal_sources" proxyname="PNGReader">
         </Proxy>
       </SubProxy>
 
@@ -4291,7 +4317,58 @@
           file_description="PNG Image Files" />
      </Hints>
 
-     <!-- End FileSeriesPNGReader -->
+     <!-- End PNGSeriesReader -->
+   </FileSeriesReaderProxy>
+
+
+   <FileSeriesReaderProxy name="JPEGSeriesReader"
+                          class="vtkFileSeriesReader"
+                          label="JPEG Series Reader"
+                          file_name_method="SetFileName">
+     <Documentation
+       short_help="Read a series of JPEG files."
+       long_help="Read a series of JPEG files into an time sequence of image datas.">
+       The JPEG series reader reads JPEG files. The output is a time sequence of uniform
+       rectilinear (image/volume) dataset. The default file extension is .jpg or .jpeg.
+     </Documentation>
+
+     <StringVectorProperty
+        name="FileNames"
+        clean_command="RemoveAllFileNames"
+        command="AddFileName"
+        animateable="0"
+        number_of_elements="0"
+        repeat_command="1">
+        <FileListDomain name="files"/>
+       <Documentation>
+         The list of files to be read by the reader. If more than 1 file is specified,
+         the reader will switch to file series mode in which it will pretend that it
+         can support time and provide 1 file per time step.
+       </Documentation>
+     </StringVectorProperty>
+
+     <DoubleVectorProperty
+        name="TimestepValues"
+        repeatable="1"
+        information_only="1">
+        <TimeStepsInformationHelper/>
+        <Documentation>
+          Available timestep values.
+        </Documentation>
+     </DoubleVectorProperty>
+
+     <SubProxy>
+        <Proxy name="Reader"
+          proxygroup="internal_sources" proxyname="JPEGReader">
+        </Proxy>
+      </SubProxy>
+
+     <Hints>
+        <ReaderFactory extensions="jpg jpeg"
+          file_description="JPEG Image Files" />
+     </Hints>
+
+     <!-- End JPEGSeriesReader -->
    </FileSeriesReaderProxy>
 
    <SourceProxy name="XdmfReader" 
@@ -4777,7 +4854,7 @@
      <Documentation
        short_help="Read a TIFF file."
        long_help="Read a TIFF file into an image data.">
-       The TIFF reader reads TIFF (Tagged Image File Format) files, and the output is a uniform rectilinear (image/volume) dataset. The default file extension is .png.
+       The TIFF reader reads TIFF (Tagged Image File Format) files, and the output is a uniform rectilinear (image/volume) dataset. The default file extension is .tiff.
      </Documentation>
      <StringVectorProperty
         name="FileName"
