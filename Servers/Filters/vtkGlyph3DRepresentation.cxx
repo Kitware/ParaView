@@ -150,10 +150,9 @@ int vtkGlyph3DRepresentation::RequestData(vtkInformation* request,
     {
     this->DataCollector->RemoveAllInputs();
     this->LODDataCollector->RemoveAllInputs();
+    this->DataCollector->SetInputConnection(this->DummySource->GetOutputPort());
+    this->LODDataCollector->SetInputConnection(this->DummySource->GetOutputPort());
     }
-
-  this->DataCollector->SetInputConnection(this->DummySource->GetOutputPort());
-  this->LODDataCollector->SetInputConnection(this->DummySource->GetOutputPort());
 
   // Since data-deliver mode never changes for this representation, we simply do
   // the data-delivery in RequestData itself to keep things simple.
