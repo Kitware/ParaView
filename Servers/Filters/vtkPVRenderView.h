@@ -47,7 +47,7 @@ class vtkInformationRequestKey;
 class vtkInteractorStyleRubberBand3D;
 class vtkLight;
 class vtkLightKit;
-class vtkPHardwareSelector;
+class vtkPVHardwareSelector;
 class vtkProp;
 class vtkPVAxesWidget;
 class vtkPVCenterAxesActor;
@@ -362,8 +362,6 @@ public:
   void AddManipulator(vtkCameraManipulator* val);
   void RemoveAllManipulators();
 
-  vtkSetMacro(ForceRemoteRendering, bool);
-  vtkBooleanMacro(ForceRemoteRendering, bool);
 //BTX
 protected:
   vtkPVRenderView();
@@ -435,7 +433,7 @@ protected:
   vtkInteractorStyleRubberBand3D* RubberBandStyle;
   vtkPVCenterAxesActor* CenterAxes;
   vtkPVAxesWidget* OrientationWidget;
-  vtkPHardwareSelector* Selector;
+  vtkPVHardwareSelector* Selector;
   vtkSelection* LastSelection;
 
   int StillRenderImageReductionFactor;
@@ -461,9 +459,8 @@ private:
   vtkPVRenderView(const vtkPVRenderView&); // Not implemented
   void operator=(const vtkPVRenderView&); // Not implemented
 
-  bool ForceRemoteRendering;
+  bool MakingSelection;
   void OnSelectionChangedEvent();
-  void FinishSelection();
   void FinishSelection(vtkSelection*);
 //ETX
 };

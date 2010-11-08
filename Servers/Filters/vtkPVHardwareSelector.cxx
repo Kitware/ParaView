@@ -15,20 +15,13 @@
 #include "vtkPVHardwareSelector.h"
 
 #include "vtkObjectFactory.h"
-#include "vtkProcessModule.h"
-#include "vtkProp.h"
+#include "vtkRenderer.h"
+#include "vtkCamera.h"
 
 vtkStandardNewMacro(vtkPVHardwareSelector);
 //----------------------------------------------------------------------------
 vtkPVHardwareSelector::vtkPVHardwareSelector()
 {
-  this->NumberOfProcesses = 1;
-  this->NumberOfIDs = 0;
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  if (pm && pm->GetNumberOfLocalPartitions() > 1)
-    {
-    this->ProcessID = pm->GetPartitionId();
-    }
 }
 
 //----------------------------------------------------------------------------
@@ -37,29 +30,35 @@ vtkPVHardwareSelector::~vtkPVHardwareSelector()
 }
 
 //----------------------------------------------------------------------------
-bool vtkPVHardwareSelector::PassRequired(int pass)
+vtkSelection* vtkPVHardwareSelector::Select(int region[4])
 {
-  switch (pass)
+  vtkSelection* sel = 0;
+  if (this->NeedToRenderForSelection())
     {
-  case PROCESS_PASS:
-    return (this->NumberOfProcesses > 1);
-
-  case ID_MID24:
-    return (this->NumberOfIDs >= 0xffffff);
-
-  case ID_HIGH16:
-    int upper = (0xffffff & (this->NumberOfIDs >> 24));
-    return (upper > 0);
+    int* size = this->Renderer->GetSize();
+    int* origin = this->Renderer->GetOrigin();
+    this->SetArea(origin[0], origin[1], origin[0]+size[0]-1,
+      origin[1]+size[1]-1);
+    if (this->CaptureBuffers() == false)
+      {
+      this->CaptureTime.Modified();
+      return NULL;
+      }
+    this->CaptureTime.Modified();
     }
-  return true;
+
+  return this->GenerateSelection(region[0], region[1], region[2], region[3]);
 }
 
 //----------------------------------------------------------------------------
-int vtkPVHardwareSelector::GetPropID(int vtkNotUsed(idx), vtkProp* prop)
+bool vtkPVHardwareSelector::NeedToRenderForSelection()
 {
-  vtkClientServerID csId = 
-    vtkProcessModule::GetProcessModule()->GetIDFromObject(prop);
-  return static_cast<int>(csId.ID);
+  // I am worried this is not enough. But seems like whenever the data changes,
+  // for some reason the camera is modified and that seems to do the trick for
+  // now. But I am wary, very very wary!
+  return this->CaptureTime < this->GetMTime() ||
+    (this->Renderer &&
+     this->CaptureTime < this->Renderer->GetActiveCamera()->GetMTime());
 }
 
 //----------------------------------------------------------------------------
