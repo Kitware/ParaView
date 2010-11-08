@@ -54,6 +54,7 @@
 #include "vtkSmartPointer.h"
 #include "vtkTimerLog.h"
 #include "vtkWeakPointer.h"
+#include "vtkPVDisplayInformation.h"
 
 #include <assert.h>
 #include <vtkstd/vector>
@@ -74,6 +75,8 @@ vtkCxxSetObjectMacro(vtkPVRenderView, LastSelection, vtkSelection);
 vtkPVRenderView::vtkPVRenderView()
 {
   vtkPVOptions* options = vtkProcessModule::GetProcessModule()->GetOptions();
+
+  this->RemoteRenderingAvailable = false;
 
   this->MakingSelection = false;
   this->StillRenderImageReductionFactor = 1;
@@ -257,6 +260,12 @@ void vtkPVRenderView::Initialize(unsigned int id)
   this->SynchronizedRenderers->SetRenderer(this->RenderView->GetRenderer());
 
   this->Superclass::Initialize(id);
+
+  this->RemoteRenderingAvailable = vtkPVDisplayInformation::CanOpenDisplayLocally();
+  // Synchronize this among all processes involved.
+  unsigned int cannot_render = this->RemoteRenderingAvailable? 0 : 1;
+  this->SynchronizeSize(cannot_render);
+  this->RemoteRenderingAvailable = cannot_render == 0;
 }
 
 //----------------------------------------------------------------------------
@@ -355,6 +364,12 @@ void vtkPVRenderView::Select(int fieldAssociation, int region[4])
   if (this->MakingSelection)
     {
     vtkErrorMacro("Select was called while making another selection.");
+    return;
+    }
+
+  if (!this->GetRemoteRenderingAvailable())
+    {
+    vtkErrorMacro("Cannot make selections since remote rendering is not available.");
     return;
     }
 
@@ -753,6 +768,11 @@ void vtkPVRenderView::GatherGeometrySizeInformation()
 //----------------------------------------------------------------------------
 bool vtkPVRenderView::GetUseDistributedRendering()
 {
+  if (this->GetRemoteRenderingAvailable() == false)
+    {
+    return false;
+    }
+
   if (this->MakingSelection)
     {
     // force remote rendering when doing a surface selection.
