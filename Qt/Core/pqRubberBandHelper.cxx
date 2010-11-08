@@ -32,7 +32,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqRubberBandHelper.h"
 
 // ParaView Server Manager includes.
+#include "pqApplicationCore.h"
+#include "pqDataRepresentation.h"
+#include "pqOutputPort.h"
 #include "pqRenderView.h"
+#include "pqServerManagerSelectionModel.h"
 
 // Qt Includes.
 #include <QCursor>
@@ -390,13 +394,21 @@ void pqRubberBandHelper::onSelectionChanged(vtkObject*, unsigned long,
     break;
 
   case PICK:
-    this->Internal->RenderView->pick(region);
+      {
+      pqDataRepresentation* picked = this->Internal->RenderView->pick(region);
+      pqApplicationCore::instance()->getSelectionModel()->setCurrentItem(
+        picked? picked->getOutputPortFromInput(): NULL,
+        pqServerManagerSelectionModel::ClearAndSelect);
+      }
     break;
 
   case PICK_ON_CLICK:
     if (region[0] == region[2] && region[1] == region[3])
       {
-      this->Internal->RenderView->pick(region);
+      pqDataRepresentation* picked = this->Internal->RenderView->pick(region);
+      pqApplicationCore::instance()->getSelectionModel()->setCurrentItem(
+        picked? picked->getOutputPortFromInput(): NULL,
+        pqServerManagerSelectionModel::ClearAndSelect);
       }
     break;
     }

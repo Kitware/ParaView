@@ -61,6 +61,7 @@ SET (MOC_HEADERS
   pqObjectPickingBehavior.h
   pqParaViewBehaviors.h
   pqPersistentMainWindowStateBehavior.h
+  pqPipelineContextMenuBehavior.h
   pqPluginActionGroupBehavior.h
   pqPluginDockWidgetsBehavior.h
   pqProxyGroupMenuManager.h
@@ -200,6 +201,8 @@ SET (SOURCE_FILES
   pqParaViewMenuBuilders.h
   pqPersistentMainWindowStateBehavior.cxx
   pqPersistentMainWindowStateBehavior.h
+  pqPipelineContextMenuBehavior.cxx
+  pqPipelineContextMenuBehavior.h
   pqPluginActionGroupBehavior.cxx
   pqPluginActionGroupBehavior.h
   pqPluginDockWidgetsBehavior.cxx

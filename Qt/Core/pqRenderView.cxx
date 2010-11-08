@@ -180,12 +180,6 @@ vtkSMRenderViewProxy* pqRenderView::getRenderViewProxy() const
 QWidget* pqRenderView::createWidget() 
 {
   QWidget* vtkwidget = this->Superclass::createWidget();
-
-  // add a link view menu
-  QAction* act = new QAction("Link Camera...", this);
-  vtkwidget->addAction(act);
-  QObject::connect(act, SIGNAL(triggered(bool)),
-    this, SLOT(linkToOtherView()));
   return vtkwidget;
 }
 
@@ -662,19 +656,21 @@ void pqRenderView::emitSelectionSignal(QList<pqOutputPort*> opPorts)
 }
 
 //-----------------------------------------------------------------------------
-void pqRenderView::pick(int pos[2])
+pqDataRepresentation* pqRenderView::pick(int pos[2])
 {
   vtkSMRenderViewProxy* renderView = this->getRenderViewProxy();
   vtkSMRepresentationProxy* repr = renderView->Pick(pos[0], pos[1]);
+  pqDataRepresentation* pq_repr = NULL;
   if (repr)
     {
-    pqDataRepresentation* pq_repr =
+    pq_repr =
       pqApplicationCore::instance()->getServerManagerModel()->findItem<pqDataRepresentation*>(repr);
     if (pq_repr)
       {
       emit this->picked(pq_repr->getOutputPortFromInput());
       }
     }
+  return pq_repr;
 }
 
 //-----------------------------------------------------------------------------

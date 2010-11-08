@@ -42,8 +42,6 @@ pqObjectPickingBehavior::pqObjectPickingBehavior(QObject* parentObject)
   this->PickHelper = new pqRubberBandHelper(this);
   QObject::connect(&pqActiveObjects::instance(),
     SIGNAL(viewChanged(pqView*)), this, SLOT(setActiveView(pqView*)));
-  QObject::connect(this, SIGNAL(picked(pqOutputPort*)),
-    &pqActiveObjects::instance(), SLOT(setActivePort(pqOutputPort*)));
   this->setActiveView(pqActiveObjects::instance().activeView());
 }
 
@@ -62,7 +60,5 @@ void pqObjectPickingBehavior::setActiveView(pqView* view)
   if (view)
     {
     this->PickHelper->beginPickOnClick();
-    QObject::connect(view, SIGNAL(picked(pqOutputPort*)),
-      this, SIGNAL(picked(pqOutputPort*)));
     }
 }
