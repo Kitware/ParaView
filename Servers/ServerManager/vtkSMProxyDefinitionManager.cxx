@@ -148,6 +148,60 @@ public:
     // The result might be NULL if the value was not found
     return elementToReturn;
   }
+
+  static void ExtractMetaInformation(vtkPVXMLElement* proxy,
+                                     vtkstd::map<vtkstd::string, vtkSmartPointer<vtkPVXMLElement> > &subProxyMap,
+                                     vtkstd::map<vtkstd::string, vtkSmartPointer<vtkPVXMLElement> > &propertyMap)
+    {
+    vtkstd::set<vtkstd::string> propertyTypeName;
+    propertyTypeName.insert("DoubleVectorProperty");
+    propertyTypeName.insert("IntVectorProperty");
+    propertyTypeName.insert("ProxyProperty");
+    propertyTypeName.insert("Property");
+
+    unsigned int numChildren = proxy->GetNumberOfNestedElements();
+    unsigned int cc;
+    for (cc=0; cc < numChildren; cc++)
+      {
+      vtkPVXMLElement* child = proxy->GetNestedElement(cc);
+      if (child && child->GetName())
+        {
+        if(strcmp(child->GetName(), "SubProxy") == 0)
+          { // SubProxy
+          if(child->GetAttribute("name"))
+            {
+            subProxyMap[child->GetAttribute("name")] = child;
+            }
+          vtkPVXMLElement* exposedPropElement =
+              child->FindNestedElementByName("ExposedProperties");
+
+          // exposedPropElement can be NULL if only Shared property are used...
+          if(exposedPropElement)
+            {
+            unsigned int ccSub = 0;
+            unsigned int numChildrenSub = exposedPropElement->GetNumberOfNestedElements();
+            for(ccSub = 0; ccSub < numChildrenSub; ccSub++)
+              {
+              vtkPVXMLElement* subProxyChild = exposedPropElement->GetNestedElement(ccSub);
+              if (subProxyChild && subProxyChild->GetName()
+                && propertyTypeName.find(subProxyChild->GetName()) != propertyTypeName.end())
+                  { // Property
+                const char* propName = subProxyChild->GetAttribute("exposed_name");
+                propName = propName ? propName : subProxyChild->GetAttribute("name");
+                propertyMap[propName] = subProxyChild;
+                } // Property end ---------------------
+              }
+            }
+          } // SubProxy end ------------------
+        else if(propertyTypeName.find(child->GetName()) != propertyTypeName.end())
+          { // Property
+          const char* propName = child->GetAttribute("exposed_name");
+          propName = propName ? propName : child->GetAttribute("name");
+          propertyMap[propName] = child;
+          } // Property end ---------------------
+        }
+      }
+    }
 };
 //****************************************************************************/
 class vtkInternalDefinitionIterator : public vtkSMProxyDefinitionIterator
@@ -759,189 +813,78 @@ vtkPVXMLElement* vtkSMProxyDefinitionManager::GetCollapsedProxyDefinition(const 
 void vtkSMProxyDefinitionManager::MergeProxyDefinition(vtkPVXMLElement* element,
                                                        vtkPVXMLElement* elementToFill)
 {
-  // Local vars
-  vtkstd::set<vtkStdString> exposedPropertyNames;
-  vtkstd::set<vtkStdString> subProxyNames;
-  vtkCollection* exposedProperties = vtkCollection::New();
-  vtkCollection* subProxies = vtkCollection::New();
-  vtkstd::set<vtkStdString> subProxiesToOverride;
-  vtkstd::set<vtkStdString> exposedPropertiesToOverride;
+  // Meta-data of elementToFill
+  vtkstd::map<vtkstd::string, vtkSmartPointer<vtkPVXMLElement> > subProxyToFill;
+  vtkstd::map<vtkstd::string, vtkSmartPointer<vtkPVXMLElement> > propertiesToFill;
+  vtkInternals::ExtractMetaInformation( elementToFill,
+                                        subProxyToFill,
+                                        propertiesToFill);
 
-  // Fill existing nested elements
-  elementToFill->GetElementsByName("SubProxy", subProxies);
-  elementToFill->GetElementsByName("DoubleVectorProperty", exposedProperties);
-  elementToFill->GetElementsByName("IntVectorProperty", exposedProperties);
-  elementToFill->GetElementsByName("ProxyProperty", exposedProperties);
-  elementToFill->GetElementsByName("Property", exposedProperties);
+  // Meta-data of element that should be merged into the other
+  vtkstd::map<vtkstd::string, vtkSmartPointer<vtkPVXMLElement> > subProxySrc;
+  vtkstd::map<vtkstd::string, vtkSmartPointer<vtkPVXMLElement> > propertiesSrc;
+  vtkInternals::ExtractMetaInformation( element,
+                                        subProxySrc,
+                                        propertiesSrc);
 
-  // Keep only one documentation node
-  if(element->FindNestedElementByName("Documentation") &&
-     elementToFill->FindNestedElementByName("Documentation"))
+  // Look for conflicting sub-proxy name and remove their definition if override
+  vtkstd::map<vtkstd::string, vtkSmartPointer<vtkPVXMLElement> >::iterator mapIter;
+  mapIter = subProxyToFill.begin();
+  while( mapIter != subProxyToFill.end())
+    {
+    vtkstd::string name = mapIter->first;
+    if( subProxySrc.find(name) != subProxySrc.end() )
+      {
+      if (!subProxySrc[name]->GetAttribute("override"))
+        {
+        cout << "#####################################" << endl;
+        cout << "Find conflict between 2 SubProxy name. ("
+             << name.c_str() << ")" << endl;
+        cout << "#####################################" << endl;
+        return;
+        }
+      else
+        { // Remove the given subProxy of the Element to Fill
+        vtkPVXMLElement *subProxyDefToRemove = subProxyToFill[name].GetPointer();
+        subProxyDefToRemove->GetParent()->RemoveNestedElement(subProxyDefToRemove);
+        }
+      }
+    // Move to next
+    mapIter++;
+    }
+
+  // Look for conflicting property name and remove their definition if override
+  mapIter = propertiesToFill.begin();
+  while( mapIter != propertiesToFill.end())
+    {
+    vtkstd::string name = mapIter->first;
+    if( propertiesSrc.find(name) != propertiesSrc.end())
+      {
+      if (!propertiesSrc[name]->GetAttribute("override") )
+        {
+        cout << "#####################################" << endl;
+        cout << "Find conflict between 2 property name. ("
+            << name.c_str() << ")" << endl;
+        cout << "#####################################" << endl;
+        return;
+        }
+      else
+        { // Remove the given property of the Element to Fill
+        vtkPVXMLElement *subPropDefToRemove = propertiesToFill[name].GetPointer();
+        subPropDefToRemove->GetParent()->RemoveNestedElement(subPropDefToRemove);
+        }
+      }
+    // Move to next
+    mapIter++;
+    }
+
+  // By default alway overide the documentation
+  if( element->FindNestedElementByName("Documentation") &&
+      elementToFill->FindNestedElementByName("Documentation"))
     {
     elementToFill->RemoveNestedElement(
         elementToFill->FindNestedElementByName("Documentation"));
     }
-
-  // Extract properties names
-  vtkCollectionIterator* xmlPropertyIter = exposedProperties->NewIterator();
-  xmlPropertyIter->InitTraversal();
-  while(!xmlPropertyIter->IsDoneWithTraversal())
-    {
-    vtkPVXMLElement* propertyElement =
-        vtkPVXMLElement::SafeDownCast(xmlPropertyIter->GetCurrentObject());
-
-    const char* propName = propertyElement->GetAttribute("exposed_name");
-    if(!propName)
-      {
-      propName = propertyElement->GetAttribute("name");
-      }
-    exposedPropertyNames.insert(propName);
-    //
-    xmlPropertyIter->GoToNextItem();
-    }
-  xmlPropertyIter->Delete();
-
-  // Extract subProxy names
-  vtkCollectionIterator* xmlSubProxyIter = subProxies->NewIterator();
-  xmlSubProxyIter->InitTraversal();
-  while(!xmlSubProxyIter->IsDoneWithTraversal())
-    {
-    vtkPVXMLElement* subProxyElement =
-        vtkPVXMLElement::SafeDownCast(xmlSubProxyIter->GetCurrentObject());
-    vtkPVXMLElement* subProxy = subProxyElement->FindNestedElementByName("Proxy");
-    subProxyNames.insert(subProxy->GetAttribute("name"));
-    //
-    xmlSubProxyIter->GoToNextItem();
-    }
-  xmlSubProxyIter->Delete();
-
-  // Look for the same thing but on the input side
-  exposedProperties->RemoveAllItems();
-  subProxies->RemoveAllItems();
-
-  // Fill nested elements that are available in the source
-  element->GetElementsByName("SubProxy", subProxies);
-  element->GetElementsByName("DoubleVectorProperty", exposedProperties);
-  element->GetElementsByName("IntVectorProperty", exposedProperties);
-  element->GetElementsByName("ProxyProperty", exposedProperties);
-  element->GetElementsByName("Property", exposedProperties);
-
-  // Look for conflict in Property name
-  xmlPropertyIter = exposedProperties->NewIterator();
-  xmlPropertyIter->InitTraversal();
-  while(!xmlPropertyIter->IsDoneWithTraversal())
-    {
-    vtkPVXMLElement* propertyElement =
-        vtkPVXMLElement::SafeDownCast(xmlPropertyIter->GetCurrentObject());
-
-    const char* propName = propertyElement->GetAttribute("exposed_name");
-    if(!propName)
-      {
-      propName = propertyElement->GetAttribute("name");
-      }
-    if(exposedPropertyNames.find(propName) != exposedPropertyNames.end())
-      {
-      // Possible conflict
-      if(!propertyElement->GetAttribute("override"))
-        {
-        // Conflict detected !!!!
-        vtkErrorMacro("An exposed property conflict has been found during "
-                      << "merging. (" << propName << ")");
-        //return;
-        }
-      else
-        {
-        // Need to override a property name
-        exposedPropertiesToOverride.insert(propName);
-        }
-      }
-    //
-    xmlPropertyIter->GoToNextItem();
-    }
-  xmlPropertyIter->Delete();
-
-  // Look for conflict in SubProxyName
-  xmlSubProxyIter = subProxies->NewIterator();
-  xmlSubProxyIter->InitTraversal();
-  while(!xmlSubProxyIter->IsDoneWithTraversal())
-    {
-    vtkPVXMLElement* subProxyElement =
-        vtkPVXMLElement::SafeDownCast(xmlSubProxyIter->GetCurrentObject());
-
-    vtkPVXMLElement* subProxy = subProxyElement->FindNestedElementByName("Proxy");
-    if(subProxyNames.find(subProxy->GetAttribute("name")) != subProxyNames.end())
-      {
-      // Possible conflict
-      if(!subProxy->GetAttribute("override"))
-        {
-        // Conflict detected !!!!
-        vtkErrorMacro("A conflict has been found on subproxy during "
-                      << "merging. (" << subProxy->GetAttribute("name") << ")");
-        return;
-        }
-      else
-        {
-        // Need to override a subproxy
-        subProxiesToOverride.insert(subProxy->GetAttribute("name"));
-        }
-      }
-    //
-    xmlSubProxyIter->GoToNextItem();
-    }
-  xmlSubProxyIter->Delete();
-
-  // Remove overriden destination elements...
-
-  // Remove overriden properties
-  exposedProperties->RemoveAllItems();
-  elementToFill->GetElementsByName("DoubleVectorProperty", exposedProperties);
-  elementToFill->GetElementsByName("IntVectorProperty", exposedProperties);
-  elementToFill->GetElementsByName("ProxyProperty", exposedProperties);
-  elementToFill->GetElementsByName("Property", exposedProperties);
-  xmlPropertyIter = exposedProperties->NewIterator();
-  xmlPropertyIter->InitTraversal();
-  while(!xmlPropertyIter->IsDoneWithTraversal())
-    {
-    vtkPVXMLElement* propertyElement =
-        vtkPVXMLElement::SafeDownCast(xmlPropertyIter->GetCurrentObject());
-
-    const char* propName = propertyElement->GetAttribute("exposed_name");
-    if(!propName)
-      {
-      propName = propertyElement->GetAttribute("name");
-      }
-    if(exposedPropertiesToOverride.find(propName)
-       != exposedPropertiesToOverride.end())
-      {
-      propertyElement->GetParent()->RemoveNestedElement(propertyElement);
-      }
-    //
-    xmlPropertyIter->GoToNextItem();
-    }
-  xmlPropertyIter->Delete();
-
-  // Remove overriden sub-proxy
-  subProxies->RemoveAllItems();
-  elementToFill->GetElementsByName("SubProxy", subProxies);
-  xmlSubProxyIter = subProxies->NewIterator();
-  xmlSubProxyIter->InitTraversal();
-  while(!xmlSubProxyIter->IsDoneWithTraversal())
-    {
-    vtkPVXMLElement* subProxyElement =
-        vtkPVXMLElement::SafeDownCast(xmlSubProxyIter->GetCurrentObject());
-
-    vtkPVXMLElement* subProxyProxy = subProxyElement->FindNestedElementByName("Proxy");
-    if(subProxiesToOverride.find(subProxyProxy->GetAttribute("name"))
-       != subProxiesToOverride.end())
-      {
-      // Remove the current subproxy
-      elementToFill->RemoveNestedElement(subProxyElement);
-      }
-    //
-    xmlSubProxyIter->GoToNextItem();
-    }
-  xmlSubProxyIter->Delete();
-
 
   // Fill the output with all the input elements
   unsigned int numChildren = element->GetNumberOfNestedElements();
@@ -954,8 +897,4 @@ void vtkSMProxyDefinitionManager::MergeProxyDefinition(vtkPVXMLElement* element,
     child->Copy(newElement);
     elementToFill->AddNestedElement(newElement);
     }
-
-  // Free memory
-  exposedProperties->Delete();
-  subProxies->Delete();
 }

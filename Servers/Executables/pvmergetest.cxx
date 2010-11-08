@@ -58,7 +58,9 @@ int main(int argc, char* argv[])
 
   vtkSMProxyManager* pxm = session->GetProxyManager();
 
-  vtkPVXMLElement* def = pxm->GetProxyDefinitionManager()->GetCollapsedProxyDefinition("representations", "GeometryRepresentation");
+  vtkPVXMLElement* def = pxm->GetProxyDefinitionManager()->
+                         GetCollapsedProxyDefinition( "representations",
+                                                      "GeometryRepresentation"); // GeometryRepresentation Glyph3DRepresentation
   def->PrintXML();
 
   cout << "Exiting..." << endl;

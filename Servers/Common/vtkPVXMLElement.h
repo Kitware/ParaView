@@ -109,6 +109,10 @@ public:
   vtkPVXMLElement* FindNestedElementByName(const char* name);
 
   // Description:
+  // Locate a set of nested elements with the given tag name.
+  void FindNestedElementByName(const char* name, vtkCollection* elements);
+
+  // Description:
   // Removes all nested elements.
   void RemoveAllNestedElements();
 
@@ -171,6 +175,8 @@ public:
   // of the sub-tree under this node. The elements are populated
   // in the vtkCollection passed as an argument.
   void GetElementsByName(const char* name, vtkCollection* elements);
+  void GetElementsByName(const char* name, vtkCollection* elements,
+                         bool recursively);
 
   // Description:
   // Encode a string. 

@@ -133,12 +133,6 @@ public:
   vtkSMProxyDefinitionIterator* NewSingleGroupIterator(const char* groupName,
                                                        int scope);
 
-  // Description
-  // Integrate a ProxyDefinition into another ProxyDefinition by merging them.
-  // If properties are overriden is the last property that will last. So when we build
-  // a merged definition hierarchy, we should start from the root and go down.
-  void MergeProxyDefinition(vtkPVXMLElement* element, vtkPVXMLElement* elementToFill);
-
 //BTX
 
 protected:
@@ -150,6 +144,12 @@ protected:
   // can be created. Called during parsing.
   void AddElement(const char* groupName,
                   const char* proxyName, vtkPVXMLElement* element);
+
+  // Description
+  // Integrate a ProxyDefinition into another ProxyDefinition by merging them.
+  // If properties are overriden is the last property that will last. So when we build
+  // a merged definition hierarchy, we should start from the root and go down.
+  void MergeProxyDefinition(vtkPVXMLElement* element, vtkPVXMLElement* elementToFill);
 
   void InvalidateCollapsedDefinition();
 

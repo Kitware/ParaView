@@ -355,6 +355,13 @@ vtkPVXMLElement* vtkPVXMLElement::FindNestedElementByName(const char* name)
 }
 
 //----------------------------------------------------------------------------
+void vtkPVXMLElement::FindNestedElementByName(const char* name, vtkCollection* elements)
+{
+  // No more that the current children depth
+  this->GetElementsByName(name, elements, false);
+}
+
+//----------------------------------------------------------------------------
 vtkPVXMLElement* vtkPVXMLElement::LookupElementInScope(const char* id)
 {
   // Pull off the first qualifier.
@@ -498,6 +505,13 @@ int vtkPVXMLElement::GetCharacterDataAsVector(int length, double* data)
 //----------------------------------------------------------------------------
 void vtkPVXMLElement::GetElementsByName(const char* name, vtkCollection* elements)
 {
+  this->GetElementsByName(name, elements, true); // We go as deep as possible
+}
+
+//----------------------------------------------------------------------------
+void vtkPVXMLElement::GetElementsByName(const char* name, vtkCollection* elements,
+                                        bool recursively)
+{
   if (!elements)
     {
     vtkErrorMacro("elements cannot be NULL.");
@@ -520,12 +534,15 @@ void vtkPVXMLElement::GetElementsByName(const char* name, vtkCollection* element
       }
     }
 
-  for (cc=0; cc < numChildren; cc++)
+  if(recursively)
     {
-    vtkPVXMLElement* child = this->GetNestedElement(cc);
-    if (child)
+    for (cc=0; cc < numChildren; cc++)
       {
-      child->GetElementsByName(name, elements);
+      vtkPVXMLElement* child = this->GetNestedElement(cc);
+      if (child)
+        {
+        child->GetElementsByName(name, elements, recursively);
+        }
       }
     }
 }
