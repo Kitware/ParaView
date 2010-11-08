@@ -22,7 +22,7 @@ else
   git config remote.stage.pushurl git@paraview.org:stage/ParaView.git
 fi
 
-read -ep "Do you have git push access to vtk.org? [y/N]: " access
+read -ep "Do you have git push access to paraview.org? [y/N]: " access
 if test "$access" = "y"; then
   echo "Testing ssh capabilities..."
   git ls-remote git@paraview.org:stage/ParaView.git refs/heads/master || die "ssh test to git@paraview.org failed."
