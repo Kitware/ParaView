@@ -487,10 +487,12 @@ void vtkPVRenderView::GatherBoundsInformation()
   if (this->GetRenderWindow()->GetActualSize()[0] > 0 &&
     this->GetRenderWindow()->GetActualSize()[1] > 0)
     {
+    this->CenterAxes->SetUseBounds(0);
     // if ComputeVisiblePropBounds is called when there's no real window on the
     // local process, all vtkWidgetRepresentations return wacky Z bounds which
     // screws up the renderer and we don't see any images.
     this->GetRenderer()->ComputeVisiblePropBounds(this->LastComputedBounds);
+    this->CenterAxes->SetUseBounds(1);
     }
 
   this->SynchronizedWindows->SynchronizeBounds(this->LastComputedBounds);
