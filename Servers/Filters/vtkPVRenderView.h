@@ -287,6 +287,10 @@ public:
   vtkBooleanMacro(UseOffscreenRendering, bool);
   vtkGetMacro(UseOffscreenRendering, bool);
 
+  // Description:
+  // Returns if remote-rendering is possible on the current group of processes.
+  vtkGetMacro(RemoteRenderingAvailable, bool);
+
 public:
   //*****************************************************************
   // Methods merely exposing methods for internal objects.
@@ -462,6 +466,10 @@ private:
   bool MakingSelection;
   void OnSelectionChangedEvent();
   void FinishSelection(vtkSelection*);
+
+  // This flag is set to false when not all processes cannot render e.g. cannot
+  // open the DISPLAY etc.
+  bool RemoteRenderingAvailable;
 //ETX
 };
 
