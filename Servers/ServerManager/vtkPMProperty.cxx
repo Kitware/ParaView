@@ -152,3 +152,20 @@ void vtkPMProperty::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 }
+//----------------------------------------------------------------------------
+// CAUTION: This method should only be called for Command property only
+//          and not for value property.
+bool vtkPMProperty::Push(vtkSMMessage*, int)
+{
+  if (this->InformationOnly || !this->Command)
+    {
+    return true;
+    }
+
+  vtkClientServerStream stream;
+  vtkClientServerID objectId = this->GetVTKObjectID();
+  stream << vtkClientServerStream::Invoke;
+  stream << objectId << this->Command;
+  stream << vtkClientServerStream::End;
+  return this->ProcessMessage(stream);
+}

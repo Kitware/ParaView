@@ -262,7 +262,11 @@ protected:
 
   // Description:
   // Let the property write its content into the stream
-  virtual void WriteTo(vtkSMMessage*) {};
+  virtual void WriteTo(vtkSMMessage* msg)
+    {
+    ProxyState_Property *prop = msg->AddExtension(ProxyState::property);
+    prop->set_name(this->GetXMLName());
+    };
 
   // Description:
   // Let the property read and set its content from the stream

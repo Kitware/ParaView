@@ -429,6 +429,12 @@ void vtkSMSessionCore::PullState(vtkSMMessage* message)
 //----------------------------------------------------------------------------
 void vtkSMSessionCore::Invoke(vtkSMMessage* message)
 {
+  // Log the communication if needed
+  if(vtkSMSessionCore::WriteDebugLog)
+    {
+    this->Internals->WriteMessage("==== Invoke ====", message);
+    }
+
   // This can only be called on the root node.
   assert(this->ParallelController == NULL ||
     this->ParallelController->GetLocalProcessId() == 0);

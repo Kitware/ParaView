@@ -89,7 +89,7 @@ protected:
 
   // Description:
   // Push a new state to the underneath implementation
-  virtual bool Push(vtkSMMessage*, int) {return true;}
+  virtual bool Push(vtkSMMessage*, int);
 
   // Description:
   // Pull the current state of the underneath implementation
