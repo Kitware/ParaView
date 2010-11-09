@@ -87,6 +87,8 @@ protected:
 private:
   vtkPMProxyProperty(const vtkPMProxyProperty&); // Not implemented
   void operator=(const vtkPMProxyProperty&); // Not implemented
+  class InternalCache;
+  InternalCache *Cache;
 //ETX
 };
 
