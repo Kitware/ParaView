@@ -35,14 +35,28 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqProgressManager.h"
 #include "pqProgressWidget.h"
 
+#include <QHBoxLayout>
+#include <QLabel>
+#include <QFrame>
+#include <QPixmap>
 #include <QToolButton>
 
 //-----------------------------------------------------------------------------
 pqStatusBar::pqStatusBar(QWidget* parentObject)
   : Superclass(parentObject)
 {
-  pqProgressWidget* const progress_bar = new pqProgressWidget(this);
-  this->addPermanentWidget(progress_bar);
+  QFrame* widget = new QFrame(this);
+  widget->setFrameShape(QFrame::NoFrame);
+  QHBoxLayout* hbox = new QHBoxLayout(widget);
+  hbox->setMargin(0);
+  hbox->setSpacing(0);
+  QLabel* interactionWheel = new QLabel(widget);
+  interactionWheel->setPixmap(QPixmap(":pqWidgets/Icons/pqBack16.png"));
+  hbox->addWidget(interactionWheel);
+
+  pqProgressWidget* const progress_bar = new pqProgressWidget(widget);
+  hbox->addWidget(progress_bar);
+  this->addPermanentWidget(widget);
 
   pqProgressManager* progress_manager = 
     pqApplicationCore::instance()->getProgressManager();
