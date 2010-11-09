@@ -14,6 +14,7 @@
 =========================================================================*/
 #include "vtkSMSessionCore.h"
 
+#include "vtkSMSession.h"
 #include "vtkClientServerID.h"
 #include "vtkClientServerInterpreter.h"
 #include "vtkClientServerInterpreterInitializer.h"
@@ -34,6 +35,7 @@
 #include <vtksys/ios/sstream>
 #include <vtkstd/string>
 #include "assert.h"
+#include <fstream>
 
 namespace
 {
@@ -64,6 +66,19 @@ namespace
 class vtkSMSessionCore::vtkInternals
 {
 public:
+  vtkInternals()
+    {
+    this->DebugLogFile = NULL;
+    }
+  ~vtkInternals()
+    {
+    if(this->DebugLogFile)
+      {
+      this->DebugLogFile->close();
+      delete this->DebugLogFile;
+      this->DebugLogFile = NULL;
+      }
+    }
   //---------------------------------------------------------------------------
   void Delete(vtkTypeUInt32 globalUniqueId)
     {
@@ -133,16 +148,62 @@ public:
       }
     }
   //---------------------------------------------------------------------------
+  void WriteMessage(const char* header, vtkSMMessage* messageToWrite)
+    {
+    if(!this->DebugLogFile)
+      {
+      vtkProcessModule2 *processModule = vtkProcessModule2::GetProcessModule();
+      vtkSMSession *session =
+          vtkSMSession::SafeDownCast(processModule->GetActiveSession());
+      vtksys_ios::ostringstream fileName;
+      fileName << "sessionCoreDebug-p";
+      fileName << processModule->GetGlobalController()->GetLocalProcessId();
+      switch(session->GetProcessRoles())
+        {
+        case vtkSMSession::CLIENT:
+          fileName << "-client";
+          break;
+        case vtkSMSession::CLIENT_AND_SERVERS:
+          fileName << "-client-server";
+          break;
+        case vtkSMSession::DATA_SERVER:
+          fileName << "-data-server";
+          break;
+        case vtkSMSession::DATA_SERVER_ROOT:
+          fileName << "-data-server-root";
+          break;
+        case vtkSMSession::RENDER_SERVER:
+          fileName << "-render-server";
+          break;
+        case vtkSMSession::RENDER_SERVER_ROOT:
+          fileName << "-render-server-root";
+          break;
+        case vtkSMSession::SERVERS:
+          fileName << "-servers";
+          break;
+        }
+      fileName << ".log";
+      this->DebugLogFile = new ofstream(fileName.str().c_str(), ofstream::binary);
+      }
+    (*this->DebugLogFile) << header << endl;
+    this->DebugLogFile->write( messageToWrite->DebugString().c_str(),
+                               messageToWrite->DebugString().length());
+
+    }
+  //---------------------------------------------------------------------------
   typedef vtkstd::map<vtkTypeUInt32, vtkSmartPointer<vtkPMObject> >
     PMObjectMapType;
   typedef vtkstd::map<vtkTypeUInt32, vtkWeakPointer<vtkSMRemoteObject> >
     RemoteObjectMapType;
   PMObjectMapType PMObjectMap;
   RemoteObjectMapType RemoteObjectMap;
+  ofstream *DebugLogFile;
 };
 
 //****************************************************************************/
 vtkStandardNewMacro(vtkSMSessionCore);
+//----------------------------------------------------------------------------
+bool vtkSMSessionCore::WriteDebugLog = false;
 //----------------------------------------------------------------------------
 vtkSMSessionCore::vtkSMSessionCore()
 {
@@ -276,6 +337,12 @@ void vtkSMSessionCore::PushStateInternal(vtkSMMessage* message)
 //----------------------------------------------------------------------------
 void vtkSMSessionCore::PushState(vtkSMMessage* message)
 {
+  // Log the communication if needed
+  if(vtkSMSessionCore::WriteDebugLog)
+    {
+    this->Internals->WriteMessage("==== Push ====", message);
+    }
+
   // This can only be called on the root node.
   assert(this->ParallelController == NULL ||
     this->ParallelController->GetLocalProcessId() == 0);
@@ -345,6 +412,12 @@ void vtkSMSessionCore::PrintSelf(ostream& os, vtkIndent indent)
 //----------------------------------------------------------------------------
 void vtkSMSessionCore::PullState(vtkSMMessage* message)
 {
+  // Log the communication if needed
+  if(vtkSMSessionCore::WriteDebugLog)
+    {
+    this->Internals->WriteMessage("==== Pull ====", message);
+    }
+
   vtkPMObject* obj;
   if(true &&  // FIXME make sure that the PMObject should be created here
      (obj = this->Internals->GetPMObject(message->global_id())))

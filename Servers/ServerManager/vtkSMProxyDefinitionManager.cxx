@@ -771,7 +771,6 @@ vtkPVXMLElement* vtkSMProxyDefinitionManager::GetCollapsedProxyDefinition(const 
       vtkstd::vector<vtkPVXMLElement*> classHierarchy;
       while(originalDefinition)
         {
-        std::cout << "Found : " << originalDefinition->GetAttribute("name") << std::endl;
         classHierarchy.push_back(originalDefinition);
         if(base_group && base_name)
           {

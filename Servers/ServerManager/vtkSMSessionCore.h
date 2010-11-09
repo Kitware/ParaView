@@ -34,6 +34,14 @@ class vtkCollection;
 class VTK_EXPORT vtkSMSessionCore : public vtkObject
 {
 public:
+
+  // Description:
+  // Enable or Disable logging into file the message communications
+  static void SetDebugLogging(bool enable)
+    {
+    vtkSMSessionCore::WriteDebugLog = enable;
+    }
+
   static vtkSMSessionCore* New();
   vtkTypeMacro(vtkSMSessionCore, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
@@ -140,6 +148,8 @@ private:
 
   class vtkInternals;
   vtkInternals* Internals;
+
+  static bool WriteDebugLog;
 //ETX
 };
 

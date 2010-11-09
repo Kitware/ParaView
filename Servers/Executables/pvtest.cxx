@@ -22,6 +22,7 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkSMSourceProxy.h"
 #include "vtkPVDataInformation.h"
 #include "vtkSMRenderViewProxy.h"
+#include "vtkSMSessionCore.h"
 
 #include "paraview.h"
 
@@ -38,6 +39,7 @@ int main(int argc, char* argv[])
     vtkProcessModule2::PROCESS_CLIENT, options);
   //---------------------------------------------------------------------------
 
+  vtkSMSessionCore::SetDebugLogging(true);
   vtkSMSession* session = NULL;
   vtkSMProxy* proxy = NULL;
 
