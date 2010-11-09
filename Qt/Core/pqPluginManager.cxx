@@ -542,11 +542,13 @@ QStringList pqPluginManager::pluginPaths(pqServer* server)
       }
 #if defined (Q_OS_MAC)
     //Look in the Application Package "ParaView.app/Contents/plugins
-    pv_plugin_path += QCoreApplication::applicationDirPath() + QDir::separator()
-      + "../Plugins;";
+    QDir appPluginDir(QCoreApplication::applicationDirPath() + QDir::separator()
+                      + "../Plugins;");
+    pv_plugin_path += appPluginDir.absolutePath();
     //Look for a folder called "plugins" at the same level as ParaView.app
-    pv_plugin_path += QCoreApplication::applicationDirPath() + QDir::separator()
-      + "../../../Plugins;";
+    QDir externalPluginDir(QCoreApplication::applicationDirPath() + QDir::separator()
+                           + "../../../Plugins;");
+    pv_plugin_path += externalPluginDir.absolutePath();
 #else
     pv_plugin_path += QCoreApplication::applicationDirPath() + QDir::separator()
       + "plugins";
