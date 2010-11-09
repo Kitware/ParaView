@@ -145,6 +145,11 @@ public:
   // Called before starting render. This is needed in batch mode since all views
   // share the same render window.
   void BeginRender(unsigned int id);
+
+  // Description:
+  // Returns true when in Cave mode.
+  bool GetIsInCave();
+
 protected:
   vtkPVSynchronizedRenderWindows();
   ~vtkPVSynchronizedRenderWindows();

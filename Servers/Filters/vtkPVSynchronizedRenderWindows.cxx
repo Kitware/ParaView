@@ -492,6 +492,7 @@ vtkRenderWindow* vtkPVSynchronizedRenderWindows::NewRenderWindow()
         this->ParallelController->GetLocalProcessId() == 0);
       int not_used[2];
       swap_buffers |= this->GetTileDisplayParameters(not_used);
+      swap_buffers |= this->GetIsInCave();
       window->SetSwapBuffers(swap_buffers? 1 : 0);
       //window->SetSwapBuffers(1); // for debugging FIXME.
       this->Internals->SharedRenderWindow.TakeReference(window);
@@ -996,7 +997,8 @@ void vtkPVSynchronizedRenderWindows::UpdateWindowLayout()
       vtkPVServerInformation* server_info =
         vtkProcessModule::GetProcessModule()->GetServerInformation(0);
       int tile_dims[2];
-      bool in_tile_display_mode = this->GetTileDisplayParameters(tile_dims); 
+      bool in_tile_display_mode = this->GetTileDisplayParameters(tile_dims);
+      bool in_cave_mode = this->GetIsInCave();
       if (in_tile_display_mode)
         {
         if (vtksys::SystemTools::GetEnv("PV_ICET_WINDOW_BORDERS"))
@@ -1021,6 +1023,17 @@ void vtkPVSynchronizedRenderWindows::UpdateWindowLayout()
 
         this->Internals->SharedRenderWindow->SetTileScale(tile_dims);
         this->Internals->SharedRenderWindow->SetTileViewport(tile_viewport);
+        }
+      else if (in_cave_mode)
+        {
+        if (vtksys::SystemTools::GetEnv("PV_ICET_WINDOW_BORDERS"))
+          {
+          this->Internals->SharedRenderWindow->SetSize(400, 400);
+          }
+        else
+          {
+          this->Internals->SharedRenderWindow->SetFullScreen(1);
+          }
         }
       else
         {
@@ -1134,6 +1147,33 @@ void vtkPVSynchronizedRenderWindows::ShinkGaps()
     this->Internals->ExpandRight(iter->first, max_size, size, position);
     this->Internals->ExpandBottom(iter->first, max_size, size, position);
     }
+}
+
+//----------------------------------------------------------------------------
+bool vtkPVSynchronizedRenderWindows::GetIsInCave()
+{
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  vtkPVServerInformation* server_info = NULL;
+  if (pm->GetActiveRemoteConnection() && this->Mode != BATCH)
+    {
+    vtkIdType connectionID = pm->GetConnectionID(
+      pm->GetActiveRemoteConnection());
+    server_info = pm->GetServerInformation(connectionID);
+    }
+  else
+    {
+    server_info = pm->GetServerInformation(0);
+    }
+
+  int tile_dims[2];
+  tile_dims[0] = server_info->GetTileDimensions()[0];
+  tile_dims[1] = server_info->GetTileDimensions()[1];
+  bool in_tile_display_mode = (tile_dims[0] > 0 || tile_dims[1] > 0);
+  if (!in_tile_display_mode)
+    {
+    return server_info->GetNumberOfMachines() > 0;
+    }
+  return false;
 }
 
 //----------------------------------------------------------------------------

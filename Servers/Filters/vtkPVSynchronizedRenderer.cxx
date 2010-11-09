@@ -16,6 +16,7 @@
 
 #include "vtkBoundingBox.h"
 #include "vtkCameraPass.h"
+#include "vtkCaveSynchronizedRenderers.h"
 #include "vtkClientServerSynchronizedRenderers.h"
 #include "vtkImageProcessingPass.h"
 #include "vtkObjectFactory.h"
@@ -81,6 +82,7 @@ vtkPVSynchronizedRenderer::vtkPVSynchronizedRenderer()
   this->ParallelSynchronizer = 0;
 
   bool in_tile_display_mode = false;
+  bool in_cave_mode = false;
   int tile_dims[2] = {0, 0};
   int tile_mullions[2] = {0, 0};
   vtkPVServerInformation* server_info = NULL;
@@ -97,6 +99,11 @@ vtkPVSynchronizedRenderer::vtkPVSynchronizedRenderer()
   tile_dims[0] = server_info->GetTileDimensions()[0];
   tile_dims[1] = server_info->GetTileDimensions()[1];
   in_tile_display_mode = (tile_dims[0] > 0 || tile_dims[1] > 0);
+  if (!in_tile_display_mode)
+    {
+    in_cave_mode = server_info->GetNumberOfMachines();
+      // these are present when a pvx file is specified.
+    }
 
   // we ensure that tile_dims are non-zero. We are passing the tile_dims to
   // vtkIceTSynchronizedRenderers and should be (1, 1) when not in tile-display
@@ -114,7 +121,7 @@ vtkPVSynchronizedRenderer::vtkPVSynchronizedRenderer()
 
   case CLIENT:
       {
-      if (in_tile_display_mode)
+      if (in_tile_display_mode || in_cave_mode)
         {
         this->CSSynchronizer = vtkSynchronizedRenderers::New();
         this->CSSynchronizer->WriteBackImagesOff();
@@ -133,7 +140,7 @@ vtkPVSynchronizedRenderer::vtkPVSynchronizedRenderer()
 
   case SERVER:
       {
-      if (in_tile_display_mode)
+      if (in_tile_display_mode || in_cave_mode)
         {
         this->CSSynchronizer = vtkSynchronizedRenderers::New();
         }
@@ -151,7 +158,14 @@ vtkPVSynchronizedRenderer::vtkPVSynchronizedRenderer()
     // break;
 
   case BATCH:
-    if (pm->GetNumberOfLocalPartitions() > 1)
+    if (in_cave_mode)
+      {
+      this->ParallelSynchronizer = vtkCaveSynchronizedRenderers::New();
+      this->ParallelSynchronizer->SetParallelController(
+        vtkMultiProcessController::GetGlobalController());
+      this->ParallelSynchronizer->WriteBackImagesOn();
+      }
+    else if (pm->GetNumberOfLocalPartitions() > 1)
       {
 #ifdef PARAVIEW_USE_ICE_T
       this->ParallelSynchronizer = vtkIceTSynchronizedRenderers::New();

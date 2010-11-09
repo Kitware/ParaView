@@ -39,6 +39,7 @@ SET(Filters_SRCS
   vtkCameraInterpolator2.cxx
   vtkCameraManipulator.cxx
   vtkCameraManipulatorGUIHelper.cxx
+  vtkCaveSynchronizedRenderers.cxx
   vtkChartRepresentation.cxx
   vtkCleanArrays.cxx
   vtkCleanUnstructuredGrid.cxx

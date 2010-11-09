@@ -571,20 +571,23 @@ void vtkPVRenderView::Render(bool interactive, bool skip_rendering)
   bool use_lod_rendering = interactive? this->GetUseLODRendering() : false;
   this->SetRequestLODRendering(use_lod_rendering);
 
-  // Decide if we are doing remote rendering or local rendering.
-  bool use_distributed_rendering = this->GetUseDistributedRendering();
   // cout << "Using remote rendering: " << use_distributed_rendering << endl;
   bool in_tile_display_mode = this->InTileDisplayMode();
+  bool in_cave_mode = this->SynchronizedWindows->GetIsInCave();
+
+  // Decide if we are doing remote rendering or local rendering.
+  bool use_distributed_rendering = in_cave_mode || this->GetUseDistributedRendering();
 
   // When in tile-display mode, we are always doing shared rendering. However
   // when use_distributed_rendering we tell IceT that geometry is duplicated on
   // all processes.
   this->SynchronizedWindows->SetEnabled(
-    use_distributed_rendering || in_tile_display_mode);
+    use_distributed_rendering || in_tile_display_mode || in_cave_mode);
   this->SynchronizedRenderers->SetEnabled(
-    use_distributed_rendering || in_tile_display_mode);
+    use_distributed_rendering || in_tile_display_mode || in_cave_mode);
   this->SynchronizedRenderers->SetDataReplicatedOnAllProcesses(
-    !use_distributed_rendering && in_tile_display_mode);
+    in_cave_mode ||
+    (!use_distributed_rendering && in_tile_display_mode));
 
   // Build the request for REQUEST_PREPARE_FOR_RENDER().
   this->SetRequestDistributedRendering(use_distributed_rendering);
@@ -601,6 +604,10 @@ void vtkPVRenderView::Render(bool interactive, bool skip_rendering)
       this->RequestInformation->Remove(DELIVER_OUTLINE_TO_CLIENT());
       this->RequestInformation->Set(DELIVER_LOD_TO_CLIENT(), 1);
       }
+    }
+  else if (in_cave_mode)
+    {
+    this->RequestInformation->Set(DELIVER_LOD_TO_CLIENT(), 1);
     }
   else
     {
@@ -673,7 +680,13 @@ void vtkPVRenderView::Render(bool interactive, bool skip_rendering)
 void vtkPVRenderView::SetRequestDistributedRendering(bool enable)
 {
   bool in_tile_display_mode = this->InTileDisplayMode();
-  if (enable)
+  bool in_cave_mode = this->SynchronizedWindows->GetIsInCave();
+  if (in_cave_mode)
+    {
+    this->RequestInformation->Set(DATA_DISTRIBUTION_MODE(),
+      vtkMPIMoveData::CLONE);
+    }
+  else if (enable)
     {
     this->RequestInformation->Set(DATA_DISTRIBUTION_MODE(),
       in_tile_display_mode?
@@ -808,6 +821,11 @@ bool vtkPVRenderView::GetDeliverOutlineToClient()
 //----------------------------------------------------------------------------
 bool vtkPVRenderView::GetUseOrderedCompositing()
 {
+  if (this->SynchronizedWindows->GetIsInCave())
+    {
+    return false;
+    }
+
   vtkPVOptions* options = vtkProcessModule::GetProcessModule()->GetOptions();
   switch (options->GetProcessType())
     {
