@@ -23,18 +23,17 @@
 #include "vtkImageData.h"
 #include "vtkMath.h"
 #include "vtkObjectFactory.h"
-#include "vtkPointData.h"
-#include "vtkProcessModule.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVGenericRenderWindowInteractor.h"
 #include "vtkPVLastSelectionInformation.h"
 #include "vtkPVRenderView.h"
 #include "vtkPVRenderViewProxy.h"
+#include "vtkPVServerInformation.h"
 #include "vtkPVXMLElement.h"
-#include "vtkRenderer.h"
+#include "vtkPointData.h"
+#include "vtkProcessModule.h"
 #include "vtkRenderWindow.h"
-#include "vtkSelectionNode.h"
-#include "vtkSmartPointer.h"
+#include "vtkRenderer.h"
 #include "vtkSMInputProperty.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
@@ -42,6 +41,8 @@
 #include "vtkSMProxyManager.h"
 #include "vtkSMRepresentationProxy.h"
 #include "vtkSMSelectionHelper.h"
+#include "vtkSelectionNode.h"
+#include "vtkSmartPointer.h"
 #include "vtkTransform.h"
 #include "vtkWeakPointer.h"
 #include "vtkWindowToImageFilter.h"
@@ -111,9 +112,16 @@ bool vtkSMRenderViewProxy::IsSelectionAvailable()
 //-----------------------------------------------------------------------------
 const char* vtkSMRenderViewProxy::IsSelectVisibleCellsAvailable()
 {
-  if (vtkProcessModule::GetProcessModule()->GetRenderClientMode(this->ConnectionID))
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  if (pm->GetRenderClientMode(this->ConnectionID))
     {
     return "Cannot support selection in render-server mode";
+    }
+  vtkPVServerInformation* server_info =
+    pm->GetServerInformation(this->ConnectionID);
+  if (server_info && server_info->GetNumberOfMachines() > 0)
+    {
+    return "Cannot support selection in CAVE mode.";
     }
 
   //check if we don't have enough color depth to do color buffer selection
