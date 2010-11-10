@@ -23,17 +23,21 @@
 #include "vtkImageData.h"
 #include "vtkMath.h"
 #include "vtkObjectFactory.h"
+#include "vtkPointData.h"
+#include "vtkProcessModule.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVGenericRenderWindowInteractor.h"
 #include "vtkPVLastSelectionInformation.h"
+#include "vtkPVOptions.h"
 #include "vtkPVRenderView.h"
 #include "vtkPVRenderViewProxy.h"
 #include "vtkPVServerInformation.h"
 #include "vtkPVXMLElement.h"
-#include "vtkPointData.h"
-#include "vtkProcessModule.h"
-#include "vtkRenderWindow.h"
 #include "vtkRenderer.h"
+#include "vtkRenderWindow.h"
+#include "vtkSelectionNode.h"
+#include "vtkSmartPointer.h"
+#include "vtkSMEnumerationDomain.h"
 #include "vtkSMInputProperty.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
@@ -41,11 +45,13 @@
 #include "vtkSMProxyManager.h"
 #include "vtkSMRepresentationProxy.h"
 #include "vtkSMSelectionHelper.h"
-#include "vtkSelectionNode.h"
-#include "vtkSmartPointer.h"
 #include "vtkTransform.h"
 #include "vtkWeakPointer.h"
 #include "vtkWindowToImageFilter.h"
+#include "vtkSelection.h"
+#include "vtkInformation.h"
+
+#include <vtkstd/map>
 
 namespace
 {
@@ -259,6 +265,24 @@ void vtkSMRenderViewProxy::CreateVTKObjects()
   rv->AddObserver(vtkCommand::SelectionChangedEvent, forwarder);
   rv->AddObserver(vtkCommand::ResetCameraEvent, forwarder);
   forwarder->Delete();
+
+  // We'll do this for now. But we need to not do this here. I am leaning
+  // towards not making stereo a command line option as mentioned by a very
+  // not-too-pleased user on the mailing list a while ago.
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  vtkPVOptions* pvoptions = pm->GetOptions();
+  if (pvoptions->GetUseStereoRendering())
+    {
+    vtkSMPropertyHelper(this, "StereoCapableWindow").Set(1);
+    vtkSMPropertyHelper(this, "StereoRender").Set(1);
+    vtkSMEnumerationDomain* domain = vtkSMEnumerationDomain::SafeDownCast(
+      this->GetProperty("StereoType")->GetDomain("enum"));
+    if (domain && domain->HasEntryText(pvoptions->GetStereoType()))
+      {
+      vtkSMPropertyHelper(this, "StereoType").Set(
+        domain->GetEntryValueForText(pvoptions->GetStereoType()));
+      }
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -458,7 +482,7 @@ vtkSMRepresentationProxy* vtkSMRenderViewProxy::Pick(int x, int y)
 bool vtkSMRenderViewProxy::SelectSurfaceCells(int region[4],
   vtkCollection* selectedRepresentations,
   vtkCollection* selectionSources,
-  bool vtkNotUsed(multiple_selections))
+  bool multiple_selections)
 {
   if (!this->IsSelectionAvailable())
     {
@@ -473,14 +497,15 @@ bool vtkSMRenderViewProxy::SelectSurfaceCells(int region[4],
     << vtkClientServerStream::InsertArray(region, 4)
     << vtkClientServerStream::End;
   pm->SendStream(this->ConnectionID, this->Servers, stream);
-  return this->FetchLastSelection(selectedRepresentations, selectionSources);
+  return this->FetchLastSelection(
+    multiple_selections, selectedRepresentations, selectionSources);
 }
 
 //----------------------------------------------------------------------------
 bool vtkSMRenderViewProxy::SelectSurfacePoints(int region[4],
   vtkCollection* selectedRepresentations,
   vtkCollection* selectionSources,
-  bool vtkNotUsed(multiple_selections))
+  bool multiple_selections)
 {
   if (!this->IsSelectionAvailable())
     {
@@ -495,11 +520,63 @@ bool vtkSMRenderViewProxy::SelectSurfacePoints(int region[4],
     << vtkClientServerStream::InsertArray(region, 4)
     << vtkClientServerStream::End;
   pm->SendStream(this->ConnectionID, this->Servers, stream);
-  return this->FetchLastSelection(selectedRepresentations, selectionSources);
+  return this->FetchLastSelection(
+    multiple_selections, selectedRepresentations, selectionSources);
+}
+
+namespace
+{
+  //-----------------------------------------------------------------------------
+  static void vtkShrinkSelection(vtkSelection* sel)
+    {
+    // sel->Print(cout);
+    vtkstd::map<int, int> pixelCounts;
+    unsigned int numNodes = sel->GetNumberOfNodes();
+    int choosen = -1;
+    int maxPixels = -1;
+    for (unsigned int cc=0; cc < numNodes; cc++)
+      {
+      vtkSelectionNode* node = sel->GetNode(cc);
+      vtkInformation* properties = node->GetProperties();
+      if (properties->Has(vtkSelectionNode::PIXEL_COUNT()) &&
+        properties->Has(vtkSelectionNode::SOURCE_ID()))
+        {
+        int numPixels = properties->Get(vtkSelectionNode::PIXEL_COUNT());
+        int source_id = properties->Get(vtkSelectionNode::SOURCE_ID());
+        pixelCounts[source_id] += numPixels;
+        if (pixelCounts[source_id] > maxPixels)
+          {
+          maxPixels = numPixels;
+          choosen = source_id;
+          }
+        }
+      }
+
+    vtkstd::vector<vtkSmartPointer<vtkSelectionNode> > choosenNodes;
+    if (choosen != -1)
+      {
+      for (unsigned int cc=0; cc < numNodes; cc++)
+        {
+        vtkSelectionNode* node = sel->GetNode(cc);
+        vtkInformation* properties = node->GetProperties();
+        if (properties->Has(vtkSelectionNode::SOURCE_ID()) &&
+          properties->Get(vtkSelectionNode::SOURCE_ID()) == choosen)
+          {
+          choosenNodes.push_back(node);
+          }
+        }
+      }
+    sel->RemoveAllNodes();
+    for (unsigned int cc=0; cc <choosenNodes.size(); cc++)
+      {
+      sel->AddNode(choosenNodes[cc]);
+      }
+    }
 }
 
 //----------------------------------------------------------------------------
 bool vtkSMRenderViewProxy::FetchLastSelection(
+  bool multiple_selections,
   vtkCollection* selectedRepresentations, vtkCollection* selectionSources)
 {
   if (selectionSources && selectedRepresentations)
@@ -511,6 +588,11 @@ bool vtkSMRenderViewProxy::FetchLastSelection(
       vtkProcessModule::DATA_SERVER, info, this->GetID());
 
     vtkSelection* selection = info->GetSelection();
+    if (!multiple_selections)
+      {
+      // only pass through selection over a single representation.
+      vtkShrinkSelection(selection);
+      }
     vtkSMSelectionHelper::NewSelectionSourcesFromSelection(
       selection, this, selectionSources, selectedRepresentations);
     return (selectionSources->GetNumberOfItems() > 0);
