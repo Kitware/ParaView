@@ -133,7 +133,8 @@ protected:
   // Description:
   // Fetches the LastSelection from the data-server and then converts it to a
   // selection source proxy and returns that.
-  bool FetchLastSelection(vtkCollection* selectedRepresentations,
+  bool FetchLastSelection(bool multiple_selections,
+    vtkCollection* selectedRepresentations,
     vtkCollection* selectionSources);
 
   // Description:

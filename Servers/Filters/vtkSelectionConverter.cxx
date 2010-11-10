@@ -272,6 +272,13 @@ void vtkSelectionConverter::Convert(
       vtkSelectionNode::SOURCE_ID(),
       inputProperties->Get(vtkSelectionSerializer::ORIGINAL_SOURCE_ID()));
 
+    if (inputProperties->Has(vtkSelectionNode::PIXEL_COUNT()))
+      {
+      outputProperties->Set(
+        vtkSelectionNode::PIXEL_COUNT(),
+        inputProperties->Get(vtkSelectionNode::PIXEL_COUNT()));
+      }
+
     if (inputProperties->Has(vtkSelectionNode::PROCESS_ID()))
       {
       outputProperties->Set(vtkSelectionNode::PROCESS_ID(),
