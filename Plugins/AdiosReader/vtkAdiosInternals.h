@@ -363,7 +363,7 @@ public:
 
     this->HasTimeInformationInVariableNames = false;
 
-    cout << "=> Before Adios_fopen" << endl;
+    //cout << "=> Before Adios_fopen" << endl;
 #ifdef _NOMPI
     //cout << "NO mpi for the adios reader" << endl;
     this->File = adios_fopen(this->FileName.c_str(), 0);
@@ -406,12 +406,12 @@ public:
         {
         cout << "We reach the end of the timesteps." << endl;
         }
-      cout << "=> EXIT Adios_fopen" << endl;
+      //cout << "=> EXIT Adios_fopen" << endl;
       return false;
       }
 
 #endif
-    cout << "=> After Adios_fopen" << endl;
+    //cout << "=> After Adios_fopen" << endl;
 
     if (this->File == NULL)
     {
@@ -1160,10 +1160,6 @@ public:
                            size3D[1],
                            size3D[0],
                            0 };
-    cout << "Count: " << counts[0] << " " << counts[1] << " "
-        << counts[2] << " " << counts[3] << endl;
-    cout << "Extent: " << var.Extent[1] << " " << var.Extent[3] << " "
-        << var.Extent[5] << " " << var.Extent[7] << endl;
 
     // Create points object
     vtkPoints* points = NULL;
@@ -1199,9 +1195,6 @@ public:
         }
 
       // Read buffer
-
-      cout << "Point coord dim: " << var.Dimension << endl;
-
       this->OpenGroup( var.GroupIndex );
       int64_t retval = adios_read_var_byid( this->Groups[var.GroupIndex],
                                              var.VarIndex, offsets, counts,
@@ -1499,7 +1492,7 @@ public:
 
   static void SetReadMethod(int methodEnum)
     {
-    cout << "==> AdiosGlobal::SetReadMethod " << methodEnum << endl;
+    //cout << "==> AdiosGlobal::SetReadMethod " << methodEnum << endl;
     switch(methodEnum)
       {
       case 0:
@@ -1519,13 +1512,13 @@ public:
 
   static void SetApplicationId(int id)
     {
-    cout << "==> AdiosGlobal::SetApplicationId " << id << endl;
+    //cout << "==> AdiosGlobal::SetApplicationId " << id << endl;
     globals_adios_set_application_id(id);
     }
 
   static void Initialize()
     {
-    cout << "==> AdiosGlobal::Initialize() " << endl;
+    //cout << "==> AdiosGlobal::Initialize() " << endl;
 #ifdef _NOMPI
     // Nothing to do
 #else
@@ -1547,7 +1540,7 @@ public:
 
   static void Finalize()
     {
-    cout << "==> AdiosGlobal::Finalize() " << endl;
+    //cout << "==> AdiosGlobal::Finalize() " << endl;
 #ifdef _NOMPI
     // Nothing to do
 #else

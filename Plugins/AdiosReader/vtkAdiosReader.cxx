@@ -208,9 +208,14 @@ public:
       if(nbTime == -1)
         return 0;
       }
-    nbTime = this->MeshFile->GetNumberOfTimeSteps();
-    if(nbTime == -1)
-      return 0;
+    if(this->MeshFile)
+      {
+      nbTime = this->MeshFile->GetNumberOfTimeSteps();
+      if(nbTime == -1)
+        {
+        return 0;
+        }
+      }
 
     return nbTime;
     }
@@ -382,31 +387,31 @@ int vtkAdiosReader::RequestInformation(vtkInformation *, vtkInformationVector** 
     }
   this->Internal->UpdateFileName(this->GetFileName());
 
-  // Create tmp time structure
-  int nbTimesteps = this->Internal->GetNumberOfTimeSteps();
-  double* timestepsValues = new double[nbTimesteps];
-  double timeRange[2] = {0,1};
-  for(int i=0; i < nbTimesteps; i++)
-    {
-    timeRange[1] = timestepsValues[i] = this->Internal->GetTimeStep(i);
-    if(i == 0)
-      {
-      timeRange[0] = timestepsValues[0];
-      }
-    }
-
-  // Only pixie format support maximum nb of pieces
-  int nbPieces = this->Internal->IsPixieFormat() ? -1 : 1;
-
-  // Set information objects
+  // Get information object to fill
   vtkInformation *info = outputVector->GetInformationObject(0);
-  info->Set(vtkStreamingDemandDrivenPipeline::MAXIMUM_NUMBER_OF_PIECES(), nbPieces);
-  info->Set(vtkStreamingDemandDrivenPipeline::TIME_STEPS(), timestepsValues,
-            nbTimesteps);
-  info->Set(vtkStreamingDemandDrivenPipeline::TIME_RANGE(), timeRange, 2);
 
-  // Free tmp time structure
-  delete[] timestepsValues;
+  // Deal with Number of pieces
+  info->Set(vtkStreamingDemandDrivenPipeline::MAXIMUM_NUMBER_OF_PIECES(), -1);
+
+  // Deal with time information if any
+  int nbTimesteps = this->Internal->GetNumberOfTimeSteps();
+  if (nbTimesteps > 0)
+    {
+    double* timestepsValues = new double[nbTimesteps];
+    double timeRange[2] = {0,1};
+    for(int i=0; i < nbTimesteps; i++)
+      {
+      timeRange[1] = timestepsValues[i] = this->Internal->GetTimeStep(i);
+      if(i == 0)
+        {
+        timeRange[0] = timestepsValues[0];
+        }
+      }
+    info->Set(vtkStreamingDemandDrivenPipeline::TIME_STEPS(), timestepsValues,
+              nbTimesteps);
+    info->Set(vtkStreamingDemandDrivenPipeline::TIME_RANGE(), timeRange, 2);
+    delete[] timestepsValues;
+    }
 
   return 1;
 }
