@@ -33,7 +33,6 @@ PURPOSE.  See the above copyright notice for more information.
 int main(int argc, char* argv[])
 {
   int return_value = EXIT_SUCCESS;
-  bool printObject = true;
 
   vtkPVServerOptions* options = vtkPVServerOptions::New();
   vtkInitializationHelper::Initialize(argc, argv,

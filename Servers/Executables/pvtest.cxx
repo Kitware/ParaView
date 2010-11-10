@@ -51,45 +51,71 @@ int main(int argc, char* argv[])
 
   vtkSMProxyManager* pxm = session->GetProxyManager();
 
-  for(int i=0;i<5;i++)
+  //================= View test =======================
+
+  vtkSMProxy* sphere = pxm->NewProxy("sources", "SphereSource");
+  vtkSMPropertyHelper(sphere, "PhiResolution").Set(20);
+  vtkSMPropertyHelper(sphere, "ThetaResolution").Set(20);
+  sphere->UpdateVTKObjects();
+
+  vtkSMProxy* cone = pxm->NewProxy("sources", "ConeSource");
+  vtkSMPropertyHelper(cone, "Resolution").Set(20);
+  cone->UpdateVTKObjects();
+
+  vtkSMProxy* repr = pxm->NewProxy("representations", "GeometryRepresentation");
+  vtkSMPropertyHelper(repr, "Input").Set(sphere);
+  vtkSMPropertyHelper(repr, "Representation").Set("Wireframe");
+  //vtkSMPropertyHelper(repr, "Representation").Set("Surface");
+  repr->UpdateVTKObjects();
+
+  vtkSMProxy* coneRepr = pxm->NewProxy("representations", "GeometryRepresentation");
+  vtkSMPropertyHelper(coneRepr, "Input").Set(cone);
+  vtkSMPropertyHelper(coneRepr, "Representation").Set("Wireframe");
+  //vtkSMPropertyHelper(coneRepr, "Representation").Set("Surface");
+  coneRepr->UpdateVTKObjects();
+
+  vtkSMProxy* view = pxm->NewProxy("views", "RenderView");
+  vtkSMPropertyHelper(view, "Representations").Add(repr);
+  view->UpdateVTKObjects();
+
+  vtkSMRenderViewProxy::SafeDownCast(view)->StillRender();
+  vtkSMRenderViewProxy::SafeDownCast(view)->ResetCamera();
+  vtkSMRenderViewProxy::SafeDownCast(view)->StillRender();
+  sleep(1);
+
+  vtkSMPropertyHelper(view, "Representations").Add(coneRepr);
+  view->UpdateVTKObjects();
+
+  vtkSMRenderViewProxy::SafeDownCast(view)->StillRender();
+  vtkSMRenderViewProxy::SafeDownCast(view)->ResetCamera();
+  vtkSMRenderViewProxy::SafeDownCast(view)->StillRender();
+  sleep(1);
+
+  vtkSMPropertyHelper(view, "Representations").Remove(repr);
+  view->UpdateVTKObjects();
+
+  vtkSMRenderViewProxy::SafeDownCast(view)->StillRender();
+  vtkSMRenderViewProxy::SafeDownCast(view)->ResetCamera();
+  vtkSMRenderViewProxy::SafeDownCast(view)->StillRender();
+  sleep(1);
+
+  vtkSMPropertyHelper(view, "Representations").Remove(coneRepr);
+  view->UpdateVTKObjects();
+
+  vtkSMRenderViewProxy::SafeDownCast(view)->StillRender();
+  vtkSMRenderViewProxy::SafeDownCast(view)->ResetCamera();
+  vtkSMRenderViewProxy::SafeDownCast(view)->StillRender();
+  sleep(1);
+
+  view->Delete();
+  sphere->Delete();
+  repr->Delete();
+
+  // ====== End of view test =======
+
+  for(int i=0;i<10;i++)
     {
     cout << " Processing loop: " << i << endl;
-
-    vtkSMProxy* sphere = pxm->NewProxy("sources", "SphereSource");
-    vtkSMPropertyHelper(sphere, "PhiResolution").Set(20);
-    vtkSMPropertyHelper(sphere, "ThetaResolution").Set(20);
-    sphere->UpdateVTKObjects();
-
-    vtkSMProxy* cone = pxm->NewProxy("sources", "ConeSource");
-    vtkSMPropertyHelper(cone, "Resolution").Set(20);
-    cone->UpdateVTKObjects();
-
-    vtkSMProxy* repr = pxm->NewProxy("representations", "GeometryRepresentation");
-    vtkSMPropertyHelper(repr, "Input").Set(sphere);
-    vtkSMPropertyHelper(repr, "Representation").Set("Wireframe");
-    //vtkSMPropertyHelper(repr, "Representation").Set("Surface");
-    repr->UpdateVTKObjects();
-
-    vtkSMProxy* coneRepr = pxm->NewProxy("representations", "GeometryRepresentation");
-    vtkSMPropertyHelper(coneRepr, "Input").Set(cone);
-    vtkSMPropertyHelper(coneRepr, "Representation").Set("Wireframe");
-    //vtkSMPropertyHelper(coneRepr, "Representation").Set("Surface");
-    coneRepr->UpdateVTKObjects();
-
-    vtkSMProxy* view = pxm->NewProxy("views", "RenderView");
-    vtkSMPropertyHelper(view, "Representations").Add(repr);
-    vtkSMPropertyHelper(view, "Representations").Add(coneRepr);
-    view->UpdateVTKObjects();
-
-    vtkSMRenderViewProxy::SafeDownCast(view)->StillRender();
-    vtkSMRenderViewProxy::SafeDownCast(view)->ResetCamera();
-    vtkSMRenderViewProxy::SafeDownCast(view)->StillRender();
-
-    sleep(1);
-
-    view->Delete();
-    sphere->Delete();
-    repr->Delete();
 
     proxy = pxm->NewProxy("misc", "FileInformationHelper");
     vtkSMPropertyHelper(proxy, "Path").Set("/tmp");
