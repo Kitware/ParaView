@@ -18,7 +18,7 @@
 #include "vtkCommand.h"
 #include "vtkMultiProcessStream.h"
 #include "vtkObjectFactory.h"
-#include "vtkProcessModule2.h"
+#include "vtkProcessModule.h"
 #include "vtkPVOptions.h"
 #include "vtkPVServerInformation.h"
 #include "vtkPVSession.h"
@@ -269,7 +269,7 @@ vtkPVSynchronizedRenderWindows::vtkPVSynchronizedRenderWindows()
   this->RenderEventPropagation = true;
   this->RenderOneViewAtATime = false;
 
-  vtkProcessModule2* pm = vtkProcessModule2::GetProcessModule();
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   if (!pm)
     {
     vtkErrorMacro(
@@ -282,22 +282,22 @@ vtkPVSynchronizedRenderWindows::vtkPVSynchronizedRenderWindows()
   int processtype = pm->GetProcessType();
   switch (processtype)
     {
-  case vtkProcessModule2::PROCESS_BATCH:
-  case vtkProcessModule2::PROCESS_SYMMETRIC_BATCH:
+  case vtkProcessModule::PROCESS_BATCH:
+  case vtkProcessModule::PROCESS_SYMMETRIC_BATCH:
     this->Mode = BATCH;
     this->RenderOneViewAtATime = true;
     break;
 
-  case vtkProcessModule2::PROCESS_RENDER_SERVER:
-  case vtkProcessModule2::PROCESS_SERVER:
+  case vtkProcessModule::PROCESS_RENDER_SERVER:
+  case vtkProcessModule::PROCESS_SERVER:
     this->Mode = RENDER_SERVER;
     break;
 
-  case vtkProcessModule2::PROCESS_DATA_SERVER:
+  case vtkProcessModule::PROCESS_DATA_SERVER:
     this->Mode = DATA_SERVER;
     break;
 
-  case vtkProcessModule2::PROCESS_CLIENT:
+  case vtkProcessModule::PROCESS_CLIENT:
     this->Mode = BUILTIN;
     if (activeSession->IsA("vtkSMSessionClient"))
       {
@@ -320,7 +320,7 @@ vtkPVSynchronizedRenderWindows::vtkPVSynchronizedRenderWindows()
 
   case BATCH:
     this->SetParallelController(vtkMultiProcessController::GetGlobalController());
-    if (processtype == vtkProcessModule2::PROCESS_SYMMETRIC_BATCH)
+    if (processtype == vtkProcessModule::PROCESS_SYMMETRIC_BATCH)
       {
       this->RenderEventPropagation = false;
       }
@@ -1342,8 +1342,8 @@ bool vtkPVSynchronizedRenderWindows::BroadcastToDataServer(vtkSelection* selecti
     return true;
     }
 
-  vtkProcessModule2* pm = vtkProcessModule2::GetProcessModule();
-  if (pm->GetProcessType() == vtkProcessModule2::PROCESS_RENDER_SERVER)
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  if (pm->GetProcessType() == vtkProcessModule::PROCESS_RENDER_SERVER)
     {
     return false;
     }

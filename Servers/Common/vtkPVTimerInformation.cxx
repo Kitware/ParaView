@@ -126,11 +126,13 @@ void vtkPVTimerInformation::CopyFromObject(vtkObject* o)
   vtkProcessModule* pm;
   float threshold = 0.001;
 
+#ifdef FIXME
   pm = vtkProcessModule::SafeDownCast(o);
   if (pm)
     {
     threshold = pm->GetLogThreshold();
     }
+#endif
   
   length = vtkTimerLog::GetNumberOfEvents() * 40;
   if (length > 0)

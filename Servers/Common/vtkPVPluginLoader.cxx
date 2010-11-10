@@ -15,6 +15,7 @@
 #include "vtkPVPluginLoader.h"
 
 #include "vtkClientServerInterpreter.h"
+#include "vtkClientServerInterpreterInitializer.h"
 #include "vtkDynamicLoader.h"
 #include "vtkIntArray.h"
 #include "vtkObjectFactory.h"
@@ -342,7 +343,7 @@ void vtkPVPluginLoader::Load(vtkPVPlugin* plugin)
 
     if (smplugin->GetInitializeInterpreterCallback())
       {
-      vtkProcessModule::InitializeInterpreter(
+      vtkClientServerInterpreterInitializer::GetInitializer()->RegisterCallback(
         smplugin->GetInitializeInterpreterCallback());
       }
     vtkPVPluginLoaderDebugMacro(

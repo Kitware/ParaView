@@ -15,7 +15,7 @@
 #include "vtkSession.h"
 
 #include "vtkObjectFactory.h"
-#include "vtkProcessModule2.h"
+#include "vtkProcessModule.h"
 
 //----------------------------------------------------------------------------
 vtkSession::vtkSession()
@@ -30,13 +30,13 @@ vtkSession::~vtkSession()
 //----------------------------------------------------------------------------
 void vtkSession::Activate()
 {
-  vtkProcessModule2::GetProcessModule()->PushActiveSession(this);
+  vtkProcessModule::GetProcessModule()->PushActiveSession(this);
 }
 
 //----------------------------------------------------------------------------
 void vtkSession::DeActivate()
 {
-  vtkProcessModule2::GetProcessModule()->PopActiveSession(this);
+  vtkProcessModule::GetProcessModule()->PopActiveSession(this);
 }
 
 //----------------------------------------------------------------------------

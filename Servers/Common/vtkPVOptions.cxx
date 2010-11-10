@@ -17,7 +17,7 @@
 #include "vtkPVConfig.h" //For PARAVIEW_ALWAYS_SECURE_CONNECTION option
 #include "vtkPVOptionsXMLParser.h"
 #include "vtkParallelRenderManager.h"
-#include "vtkProcessModule2.h"
+#include "vtkProcessModule.h"
 
 #include <vtksys/CommandLineArguments.hxx>
 #include <vtksys/SystemTools.hxx>
@@ -115,26 +115,26 @@ vtkPVOptions::~vtkPVOptions()
 //----------------------------------------------------------------------------
 void vtkPVOptions::Initialize()
 {
-  switch (vtkProcessModule2::GetProcessType())
+  switch (vtkProcessModule::GetProcessType())
     {
-  case vtkProcessModule2::PROCESS_CLIENT:
+  case vtkProcessModule::PROCESS_CLIENT:
     this->SetProcessType(PVCLIENT);
     break;
 
-  case vtkProcessModule2::PROCESS_SERVER:
+  case vtkProcessModule::PROCESS_SERVER:
     this->SetProcessType(PVSERVER);
     break;
 
-  case vtkProcessModule2::PROCESS_DATA_SERVER:
+  case vtkProcessModule::PROCESS_DATA_SERVER:
     this->SetProcessType(PVDATA_SERVER);
     break;
 
-  case vtkProcessModule2::PROCESS_RENDER_SERVER:
+  case vtkProcessModule::PROCESS_RENDER_SERVER:
     this->SetProcessType(PVRENDER_SERVER);
     break;
 
-  case vtkProcessModule2::PROCESS_BATCH:
-  case vtkProcessModule2::PROCESS_SYMMETRIC_BATCH:
+  case vtkProcessModule::PROCESS_BATCH:
+  case vtkProcessModule::PROCESS_SYMMETRIC_BATCH:
     this->SetProcessType(PVBATCH);
     break;
 

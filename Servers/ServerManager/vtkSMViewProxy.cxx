@@ -18,7 +18,7 @@
 #include "vtkErrorCode.h"
 #include "vtkImageData.h"
 #include "vtkObjectFactory.h"
-#include "vtkProcessModule2.h"
+#include "vtkProcessModule.h"
 #include "vtkPVView.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSmartPointer.h"
@@ -32,7 +32,7 @@ vtkStandardNewMacro(vtkSMViewProxy);
 //----------------------------------------------------------------------------
 vtkSMViewProxy::vtkSMViewProxy()
 {
-  this->SetLocation(vtkProcessModule2::CLIENT_AND_SERVERS);
+  this->SetLocation(vtkProcessModule::CLIENT_AND_SERVERS);
   this->DefaultRepresentationName = 0;
 }
 

@@ -25,7 +25,7 @@
 #include "vtkMultiProcessStream.h"
 #include "vtkObjectFactory.h"
 #include "vtkPMProxy.h"
-#include "vtkProcessModule2.h"
+#include "vtkProcessModule.h"
 #include "vtkPVInformation.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMProxyDefinitionManager.h"
@@ -249,7 +249,7 @@ vtkSMSessionCore::~vtkSMSessionCore()
 void vtkSMSessionCore::OnInterpreterError( vtkObject*, unsigned long,
                                            void* calldata)
 {
-  if (!vtkProcessModule2::GetProcessModule()->GetReportInterpreterErrors())
+  if (!vtkProcessModule::GetProcessModule()->GetReportInterpreterErrors())
     {
     return;
     }
@@ -347,7 +347,7 @@ void vtkSMSessionCore::PushState(vtkSMMessage* message)
   assert(this->ParallelController == NULL ||
     this->ParallelController->GetLocalProcessId() == 0);
 
-  if ( (message->location() & vtkProcessModule2::SERVERS) != 0)
+  if ( (message->location() & vtkProcessModule::SERVERS) != 0)
     {
     // send message to satellites and then start processing.
 
@@ -439,7 +439,7 @@ void vtkSMSessionCore::Invoke(vtkSMMessage* message)
   assert(this->ParallelController == NULL ||
     this->ParallelController->GetLocalProcessId() == 0);
 
-  if ( (message->location() & vtkProcessModule2::SERVERS) != 0)
+  if ( (message->location() & vtkProcessModule::SERVERS) != 0)
     {
     // send message to satellites and then start processing.
 
@@ -556,7 +556,7 @@ bool vtkSMSessionCore::GatherInformation(vtkTypeUInt32 location,
     return false;
     }
 
-  if (information->GetRootOnly() || (location & vtkProcessModule2::SERVERS) == 0)
+  if (information->GetRootOnly() || (location & vtkProcessModule::SERVERS) == 0)
     {
     return true;
     }

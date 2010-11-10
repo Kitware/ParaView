@@ -15,7 +15,7 @@
 #include "vtkSMRemoteObject.h"
 
 #include "vtkObjectFactory.h"
-#include "vtkProcessModule2.h"
+#include "vtkProcessModule.h"
 #include "vtkSMMessage.h"
 #include "vtkSMSession.h"
 

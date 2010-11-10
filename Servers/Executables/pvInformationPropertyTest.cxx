@@ -15,7 +15,7 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkInitializationHelper.h"
 #include "vtkMultiProcessController.h"
 #include "vtkNetworkAccessManager.h"
-#include "vtkProcessModule2.h"
+#include "vtkProcessModule.h"
 #include "vtkPVFileInformation.h"
 #include "vtkPVServerOptions.h"
 #include "vtkSMPropertyHelper.h"
@@ -31,7 +31,7 @@ int main(int argc, char* argv[])
 {
   vtkPVServerOptions* options = vtkPVServerOptions::New();
   vtkInitializationHelper::Initialize( argc, argv,
-                                       vtkProcessModule2::PROCESS_BATCH,
+                                       vtkProcessModule::PROCESS_BATCH,
                                        options);
 
   vtkSMSession* session = vtkSMSession::New();

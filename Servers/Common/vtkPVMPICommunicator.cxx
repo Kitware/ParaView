@@ -39,6 +39,11 @@ int vtkPVMPICommunicator::ReceiveDataInternal(
   vtkMPICommunicatorReceiveDataInfo* info,
   int useCopy, int& senderId)
 {
+#ifndef FIXME
+    return this->Superclass::ReceiveDataInternal(
+      data, length, sizeoftype,
+      remoteProcessId, tag, info, useCopy, senderId);
+#else
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   vtkPVProgressHandler* progressHandler =
     pm? pm->GetActiveProgressHandler() : 0;
@@ -105,6 +110,7 @@ int vtkPVMPICommunicator::ReceiveDataInternal(
     senderId = info->Status.MPI_SOURCE;
     }
   return retVal;
+#endif
 }
 
 

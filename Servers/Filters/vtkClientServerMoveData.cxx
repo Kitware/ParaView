@@ -25,7 +25,7 @@
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
 #include "vtkPolyData.h"
-#include "vtkProcessModule2.h"
+#include "vtkProcessModule.h"
 #include "vtkPVSession.h"
 #include "vtkSelection.h"
 #include "vtkSelectionSerializer.h"
@@ -136,14 +136,14 @@ int vtkClientServerMoveData::RequestData(vtkInformation*,
   if (this->ProcessType == AUTO)
     {
     vtkPVSession* session = vtkPVSession::SafeDownCast(
-      vtkProcessModule2::GetProcessModule()->GetActiveSession());
+      vtkProcessModule::GetProcessModule()->GetActiveSession());
     if (!session)
       {
       vtkErrorMacro("No active ParaView session");
       return 0;
       }
-    if (vtkProcessModule2::GetProcessType() ==
-      vtkProcessModule2::PROCESS_CLIENT)
+    if (vtkProcessModule::GetProcessType() ==
+      vtkProcessModule::PROCESS_CLIENT)
       {
       controller = session->GetController(vtkPVSession::DATA_SERVER);
       processType = CLIENT;

@@ -38,7 +38,7 @@ PURPOSE.  See the above copyright notice for more information.
 
 #include "vtkClientServerInterpreterInitializer.h"
 #include "vtkOutputWindow.h"
-#include "vtkProcessModule2.h"
+#include "vtkProcessModule.h"
 #include "vtkPVOptions.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMProperty.h"
@@ -100,7 +100,7 @@ void vtkInitializationHelper::Initialize(const char* executable,
 void vtkInitializationHelper::Initialize(int argc, char**argv,
   int type, vtkPVOptions* options)
 {
-  if (vtkProcessModule2::GetProcessModule())
+  if (vtkProcessModule::GetProcessModule())
     {
     vtkGenericWarningMacro("Process already initialize. Skipping.");
     return;
@@ -115,8 +115,8 @@ void vtkInitializationHelper::Initialize(int argc, char**argv,
   vtkClientServerInterpreterInitializer::GetInitializer()->
     RegisterCallback(&::vtkInitializationHelperInit);
 
-  vtkProcessModule2::Initialize(
-    static_cast<vtkProcessModule2::ProcessTypes>(type), argc, argv);
+  vtkProcessModule::Initialize(
+    static_cast<vtkProcessModule::ProcessTypes>(type), argc, argv);
 
   vtksys_ios::ostringstream sscerr;
   if (argv && !options->Parse(argc, argv) )
@@ -148,7 +148,7 @@ void vtkInitializationHelper::Initialize(int argc, char**argv,
     // TODO: indicate to the caller that application must quit.
     }
 
-  vtkProcessModule2::GetProcessModule()->SetOptions(options);
+  vtkProcessModule::GetProcessModule()->SetOptions(options);
 
   // FIXME
   // vtkSMProperty::SetCheckDomains(0);
@@ -157,7 +157,7 @@ void vtkInitializationHelper::Initialize(int argc, char**argv,
 //----------------------------------------------------------------------------
 void vtkInitializationHelper::Finalize()
 {
-  vtkProcessModule2::Finalize();
+  vtkProcessModule::Finalize();
 }
 
 //-----------------------------------------------------------------------------

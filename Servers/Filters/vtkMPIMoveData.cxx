@@ -38,7 +38,7 @@
 #include "vtkOutlineFilter.h"
 #include "vtkPointData.h"
 #include "vtkPolyData.h"
-#include "vtkProcessModule2.h"
+#include "vtkProcessModule.h"
 #include "vtkPVSession.h"
 #include "vtkSmartPointer.h"
 #include "vtkSocketCommunicator.h"
@@ -203,7 +203,7 @@ vtkMPIMoveData::~vtkMPIMoveData()
 //----------------------------------------------------------------------------
 void vtkMPIMoveData::InitializeForCommunicationForParaView()
 {
-  vtkProcessModule2* pm = vtkProcessModule2::GetProcessModule();
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   if (pm == NULL)
     {
     vtkWarningMacro("No process module found.");

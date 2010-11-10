@@ -39,7 +39,7 @@
 #include "vtkSMWriterFactory.h"
 #include "vtkStdString.h"
 #include "vtkStringList.h"
-#include "vtkProcessModule2.h"
+#include "vtkProcessModule.h"
 
 #include <vtkstd/map>
 #include <vtkstd/set>
@@ -128,7 +128,7 @@ vtkSMProxyManager::vtkSMProxyManager()
 
   // Init reserved Id for ProxyManager
   this->SetGlobalID(1);
-  this->SetLocation(vtkProcessModule2::PROCESS_DATA_SERVER);
+  this->SetLocation(vtkProcessModule::PROCESS_DATA_SERVER);
 
   // Provide internal object a pointer to us
   this->Internals->ProxyManager = this;
@@ -1514,7 +1514,7 @@ const vtkSMMessage* vtkSMProxyManager::GetFullState()
   if(!this->Internals->State.has_global_id())
     {
     this->Internals->State.set_global_id(1);
-    this->Internals->State.set_location(vtkProcessModule2::PROCESS_DATA_SERVER);
+    this->Internals->State.set_location(vtkProcessModule::PROCESS_DATA_SERVER);
     }
 
   return &this->Internals->State;

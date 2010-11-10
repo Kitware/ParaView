@@ -13,7 +13,7 @@ PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
 #include "vtkInitializationHelper.h"
-#include "vtkProcessModule2.h"
+#include "vtkProcessModule.h"
 #include "vtkPVServerOptions.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxyManager.h"
@@ -28,7 +28,7 @@ int main(int argc, char* argv[])
 {
   vtkPVServerOptions* options = vtkPVServerOptions::New();
   vtkInitializationHelper::Initialize( argc, argv,
-                                       vtkProcessModule2::PROCESS_BATCH,
+                                       vtkProcessModule::PROCESS_BATCH,
                                        options );
 
   //---------------------------------------------------------------------------
@@ -87,9 +87,9 @@ int main(int argc, char* argv[])
 //  dataServer = pxm->NewProxy("utils", "pid");
 //  renderServer = pxm->NewProxy("utils", "pid");
 
-//  client->SetLocation(vtkProcessModule2::PROCESS_BATCH);
-//  dataServer->SetLocation(vtkProcessModule2::PROCESS_DATA_SERVER);
-//  renderServer->SetLocation(vtkProcessModule2::PROCESS_RENDER_SERVER);
+//  client->SetLocation(vtkProcessModule::PROCESS_BATCH);
+//  dataServer->SetLocation(vtkProcessModule::PROCESS_DATA_SERVER);
+//  renderServer->SetLocation(vtkProcessModule::PROCESS_RENDER_SERVER);
 
 //  client->UpdateVTKObjects();
 //  client->UpdatePropertyInformation();

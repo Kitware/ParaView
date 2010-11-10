@@ -19,7 +19,7 @@
 #include "vtkClientServerSynchronizedRenderers.h"
 #include "vtkImageProcessingPass.h"
 #include "vtkObjectFactory.h"
-#include "vtkProcessModule2.h"
+#include "vtkProcessModule.h"
 #include "vtkPVConfig.h"
 #include "vtkPVDefaultPass.h"
 #include "vtkPVOptions.h"
@@ -43,7 +43,7 @@ vtkPVSynchronizedRenderer::vtkPVSynchronizedRenderer()
   this->ImageReductionFactor = 1;
   this->Renderer = 0;
 
-  vtkProcessModule2* pm = vtkProcessModule2::GetProcessModule();
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   if (!pm)
     {
     vtkErrorMacro(
@@ -56,21 +56,21 @@ vtkPVSynchronizedRenderer::vtkPVSynchronizedRenderer()
   int processtype = pm->GetProcessType();
   switch (processtype)
     {
-  case vtkProcessModule2::PROCESS_BATCH:
-  case vtkProcessModule2::PROCESS_SYMMETRIC_BATCH:
+  case vtkProcessModule::PROCESS_BATCH:
+  case vtkProcessModule::PROCESS_SYMMETRIC_BATCH:
     this->Mode = BATCH;
     break;
 
-  case vtkProcessModule2::PROCESS_RENDER_SERVER:
-  case vtkProcessModule2::PROCESS_SERVER:
+  case vtkProcessModule::PROCESS_RENDER_SERVER:
+  case vtkProcessModule::PROCESS_SERVER:
     this->Mode = SERVER;
     break;
 
-  case vtkProcessModule2::PROCESS_DATA_SERVER:
+  case vtkProcessModule::PROCESS_DATA_SERVER:
     this->Mode = BUILTIN;
     break;
 
-  case vtkProcessModule2::PROCESS_CLIENT:
+  case vtkProcessModule::PROCESS_CLIENT:
     this->Mode = BUILTIN;
     if (activeSession->IsA("vtkSMSessionClient"))
       {

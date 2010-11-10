@@ -15,7 +15,7 @@
 #include "vtkSMSession.h"
 
 #include "vtkObjectFactory.h"
-#include "vtkProcessModule2.h"
+#include "vtkProcessModule.h"
 #include "vtkSMProxyDefinitionManager.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyManager.h"
@@ -60,8 +60,8 @@ vtkSMSession::~vtkSMSession()
 //----------------------------------------------------------------------------
 vtkSMSession::ServerFlags vtkSMSession::GetProcessRoles()
 {
-  if (vtkProcessModule2::GetProcessModule() &&
-    vtkProcessModule2::GetProcessModule()->GetPartitionId() > 0)
+  if (vtkProcessModule::GetProcessModule() &&
+    vtkProcessModule::GetProcessModule()->GetPartitionId() > 0)
     {
     return SERVERS;
     }

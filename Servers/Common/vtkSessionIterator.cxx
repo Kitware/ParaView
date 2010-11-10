@@ -15,15 +15,15 @@
 #include "vtkSessionIterator.h"
 
 #include "vtkObjectFactory.h"
-#include "vtkProcessModule2.h"
-#include "vtkProcessModule2Internals.h"
+#include "vtkProcessModule.h"
+#include "vtkProcessModuleInternals.h"
 
 #include <assert.h>
 
 class vtkSessionIterator::vtkInternals
 {
 public:
-  vtkProcessModule2::vtkInternals::MapOfSessions::iterator Iter;
+  vtkProcessModule::vtkInternals::MapOfSessions::iterator Iter;
 };
 
 
@@ -44,34 +44,34 @@ vtkSessionIterator::~vtkSessionIterator()
 //----------------------------------------------------------------------------
 void vtkSessionIterator::InitTraversal()
 {
-  vtkProcessModule2* pm = vtkProcessModule2::GetProcessModule();
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   if (!pm)
     {
     vtkErrorMacro("No ProcessModule found.");
     return;
     }
 
-  vtkProcessModule2::vtkInternals* internals = pm->Internals;
+  vtkProcessModule::vtkInternals* internals = pm->Internals;
   this->Internals->Iter = internals->Sessions.begin();
 }
 
 //----------------------------------------------------------------------------
 bool vtkSessionIterator::IsDoneWithTraversal()
 {
-  vtkProcessModule2* pm = vtkProcessModule2::GetProcessModule();
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   if (!pm)
     {
     vtkErrorMacro("No ProcessModule found.");
     return true;
     }
-  vtkProcessModule2::vtkInternals* internals = pm->Internals;
+  vtkProcessModule::vtkInternals* internals = pm->Internals;
   return (this->Internals->Iter == internals->Sessions.end());
 }
 
 //----------------------------------------------------------------------------
 void vtkSessionIterator::GoToNextItem()
 {
-  vtkProcessModule2* pm = vtkProcessModule2::GetProcessModule();
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   if (!pm)
     {
     vtkErrorMacro("No ProcessModule found.");
@@ -83,7 +83,7 @@ void vtkSessionIterator::GoToNextItem()
 //----------------------------------------------------------------------------
 vtkSession* vtkSessionIterator::GetCurrentSession()
 {
-  vtkProcessModule2* pm = vtkProcessModule2::GetProcessModule();
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   if (!pm)
     {
     vtkErrorMacro("No ProcessModule found.");
@@ -97,7 +97,7 @@ vtkSession* vtkSessionIterator::GetCurrentSession()
 //----------------------------------------------------------------------------
 vtkIdType vtkSessionIterator::GetCurrentSessionId()
 {
-  vtkProcessModule2* pm = vtkProcessModule2::GetProcessModule();
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   if (!pm)
     {
     vtkErrorMacro("No ProcessModule found.");

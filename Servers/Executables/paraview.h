@@ -17,7 +17,7 @@ PURPOSE.  See the above copyright notice for more information.
 
 #include "vtkMultiProcessController.h"
 #include "vtkNetworkAccessManager.h"
-#include "vtkProcessModule2.h"
+#include "vtkProcessModule.h"
 #include "vtkSMSessionServer.h"
 
 namespace ParaView {
@@ -25,7 +25,7 @@ namespace ParaView {
   //---------------------------------------------------------------------------
   vtkSMSessionServer* CreateServerSession()
     {
-    vtkProcessModule2* pm = vtkProcessModule2::GetProcessModule();
+    vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
     vtkMultiProcessController* controller = pm->GetGlobalController();
     if (controller->GetLocalProcessId() > 0)
       {
@@ -52,7 +52,7 @@ namespace ParaView {
     // If the Session is available it means that we are on the ROOT process
     if( session )
       {
-      vtkProcessModule2* pm = vtkProcessModule2::GetProcessModule();
+      vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
       vtkNetworkAccessManager* nam = pm->GetNetworkAccessManager();
       cout << "Waiting for client" << endl;
       if (session->Connect())

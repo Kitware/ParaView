@@ -20,7 +20,7 @@
 #include "vtkMultiProcessStream.h"
 #include "vtkNetworkAccessManager.h"
 #include "vtkObjectFactory.h"
-#include "vtkProcessModule2.h"
+#include "vtkProcessModule.h"
 #include "vtkPVConfig.h"
 #include "vtkPVInformation.h"
 #include "vtkPVOptions.h"
@@ -69,15 +69,15 @@ vtkSMSessionServer::~vtkSMSessionServer()
 //----------------------------------------------------------------------------
 vtkSMSessionServer::ServerFlags vtkSMSessionServer::GetProcessRoles()
 {
-  switch (vtkProcessModule2::GetProcessType())
+  switch (vtkProcessModule::GetProcessType())
     {
-  case vtkProcessModule2::PROCESS_SERVER:
+  case vtkProcessModule::PROCESS_SERVER:
     return SERVERS;
 
-  case vtkProcessModule2::PROCESS_DATA_SERVER:
+  case vtkProcessModule::PROCESS_DATA_SERVER:
     return DATA_SERVER;
 
-  case vtkProcessModule2::PROCESS_RENDER_SERVER:
+  case vtkProcessModule::PROCESS_RENDER_SERVER:
     return RENDER_SERVER;
 
   default:
@@ -135,19 +135,19 @@ bool vtkSMSessionServer::Connect()
 {
   vtksys_ios::ostringstream url;
 
-  vtkProcessModule2* pm = vtkProcessModule2::GetProcessModule();
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   vtkPVOptions* options = pm->GetOptions();
 
   switch (pm->GetProcessType())
     {
-  case vtkProcessModule2::PROCESS_SERVER:
+  case vtkProcessModule::PROCESS_SERVER:
     url << "cs";
     url << ((options->GetReverseConnection())?  "rc://" : "://");
     url << options->GetClientHostName() << ":" << options->GetServerPort();
     break;
 
-  case vtkProcessModule2::PROCESS_RENDER_SERVER:
-  case vtkProcessModule2::PROCESS_DATA_SERVER:
+  case vtkProcessModule::PROCESS_RENDER_SERVER:
+  case vtkProcessModule::PROCESS_DATA_SERVER:
     url << "cdsrs";
     url << ((options->GetReverseConnection())?  "rc://" : "://");
     url << options->GetClientHostName() << ":" << options->GetDataServerPort()
@@ -168,7 +168,7 @@ bool vtkSMSessionServer::Connect()
 bool vtkSMSessionServer::Connect(const char* url)
 {
   vtkNetworkAccessManager* nam =
-    vtkProcessModule2::GetProcessModule()->GetNetworkAccessManager();
+    vtkProcessModule::GetProcessModule()->GetNetworkAccessManager();
 
   vtksys::RegularExpression pvserver("^cs://([^:]+)?(:([0-9]+))?");
   vtksys::RegularExpression pvserver_reverse ("^csrc://([^:]+)(:([0-9]+))?");
@@ -234,7 +234,7 @@ void vtkSMSessionServer::PushState(vtkSMMessage* msg)
 void vtkSMSessionServer::PullState(vtkSMMessage* msg)
 {
   // Only the root node is allowed to do the pull
-  if(vtkProcessModule2::GetProcessModule()->GetGlobalController()->GetLocalProcessId() != 0)
+  if(vtkProcessModule::GetProcessModule()->GetGlobalController()->GetLocalProcessId() != 0)
     return;
 
   // We are on the root node

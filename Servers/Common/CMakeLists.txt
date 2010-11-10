@@ -33,7 +33,7 @@ SET(Kit_SRCS
   vtkClientServerInterpreterInitializer.cxx
   vtkNetworkAccessManager.cxx
   vtkTCPNetworkAccessManager.cxx
-  vtkProcessModule2.cxx
+  vtkProcessModule.cxx
   vtkSession.cxx
   vtkSessionIterator.cxx
   vtkPVSession.cxx
@@ -42,22 +42,15 @@ SET(Kit_SRCS
 
   vtkCacheSizeKeeper.cxx
   vtkCellIntegrator.cxx
-  vtkClientConnection.cxx
-  vtkConnectionIterator.cxx
   vtkFileSequenceParser.cxx
-  vtkMPISelfConnection.cxx
   vtkMultiProcessControllerHelper.cxx
   vtkPriorityHelper.cxx
-  vtkProcessModuleConnection.cxx
-  vtkProcessModuleConnectionManager.cxx
   vtkProcessModule.cxx
   vtkProcessModuleAutoMPI.cxx
-  vtkProcessModuleGUIHelper.cxx
   vtkPVAlgorithmPortsInformation.cxx
   vtkPVArrayInformation.cxx
   vtkPVCacheSizeInformation.cxx
   vtkPVClassNameInformation.cxx
-  vtkPVClientServerIdCollectionInformation.cxx
   vtkPVCompositeDataInformation.cxx
   vtkPVCompositeDataInformationIterator.cxx
   vtkPVDataInformation.cxx
@@ -76,7 +69,7 @@ SET(Kit_SRCS
   vtkPVPlugin.cxx
   vtkPVPluginInformation.cxx
   vtkPVPluginLoader.cxx
-  vtkPVProgressHandler.cxx
+#  vtkPVProgressHandler.cxx
   vtkPVPythonModule.cxx
   vtkPVPythonPluginInterface.cxx
   vtkPVSelectionInformation.cxx
@@ -87,12 +80,8 @@ SET(Kit_SRCS
   vtkPVTemporalDataInformation.cxx
   vtkPVTestUtilities.cxx
   vtkPVTimerInformation.cxx
-  vtkRemoteConnection.cxx
   vtkSelectionSerializer.cxx
-  vtkSelfConnection.cxx
-  vtkServerConnection.cxx
   vtkStringList.cxx  
-  vtkSynchronousMPISelfConnection.cxx
   vtkUndoElement.cxx
   vtkUndoSet.cxx
   vtkUndoStack.cxx
@@ -100,8 +89,7 @@ SET(Kit_SRCS
 # these files seem to be socket related, so for Cray Xt3/Catamount they probably have to 
 # be excluded, e.g. via IF(HAVE_SOCKETS) coming from VTK/Parallel/VTKParallelCMakeTests.cmake, Alex
     vtkMPIMToNSocketConnection.cxx
-    vtkMPIMToNSocketConnectionPortInformation.cxx
-    vtkPVServerSocket.cxx )
+    vtkMPIMToNSocketConnectionPortInformation.cxx)
   
 IF (VTK_USE_N_WAY_ARRAYS)
 
@@ -131,12 +119,8 @@ SET_SOURCE_FILES_PROPERTIES(
   vtkPVSession.cxx
 
   vtkCellIntegrator.cxx
-  vtkProcessModuleConnection
-  vtkProcessModuleGUIHelper
-  vtkPVCreateProcessModule
   vtkPVInformation
   vtkPVPlugin.cxx
-  vtkRemoteConnection
   vtkUndoElement
   vtkPVServerManagerPluginInterface
   vtkPVPythonPluginInterface
@@ -146,14 +130,11 @@ SET_SOURCE_FILES_PROPERTIES(
   vtkClientServerInterpreterInitializer.cxx
 
   vtkCommandOptionsXMLParser.cxx
-  vtkConnectionIterator.cxx
   vtkProcessModuleAutoMPI.cxx
   # vtkStringList.cxx
   vtkPVOptionsXMLParser.cxx
   vtkPVPlugin.cxx
   vtkPVServerOptions.cxx
-  vtkPVServerSocket.cxx
-  vtkPVCreateProcessModule
   vtkPVTestUtilities.cxx
   vtkPVServerManagerPluginInterface.cxx
   vtkPVPythonPluginInterface.cxx

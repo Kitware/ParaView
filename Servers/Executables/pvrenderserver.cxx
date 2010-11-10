@@ -25,7 +25,7 @@ int main(int argc, char* argv[])
   // Init current process type
   vtkPVServerOptions* options = vtkPVServerOptions::New();
   vtkInitializationHelper::Initialize( argc, argv,
-                                       vtkProcessModule2::PROCESS_RENDER_SERVER,
+                                       vtkProcessModule::PROCESS_RENDER_SERVER,
                                        options );
 
   // Start ParaView processing loop with an automatic session connect call

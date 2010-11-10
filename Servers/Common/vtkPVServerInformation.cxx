@@ -17,7 +17,7 @@
 #include "vtkClientServerStream.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
-#include "vtkProcessModule2.h"
+#include "vtkProcessModule.h"
 #include "vtkPVConfig.h"
 #include "vtkPVServerOptions.h"
 #include "vtkPVServerOptionsInternals.h"
@@ -111,7 +111,7 @@ void vtkPVServerInformation::DeepCopy(vtkPVServerInformation *info)
 //----------------------------------------------------------------------------
 void vtkPVServerInformation::CopyFromObject(vtkObject* obj)
 {
-  vtkProcessModule2* pm = vtkProcessModule2::GetProcessModule();
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   vtkPVOptions* options = pm->GetOptions();
   vtkPVServerOptions *serverOptions = vtkPVServerOptions::SafeDownCast(options);
 

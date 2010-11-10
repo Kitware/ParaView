@@ -35,11 +35,13 @@ vtkPVCacheSizeInformation::~vtkPVCacheSizeInformation()
 void vtkPVCacheSizeInformation::CopyFromObject(vtkObject* obj)
 {
   vtkCacheSizeKeeper* csk = vtkCacheSizeKeeper::SafeDownCast(obj);
+#ifdef FIXME
   vtkProcessModule* pm = vtkProcessModule::SafeDownCast(obj);
   if (pm)
     {
     csk = pm->GetCacheSizeKeeper();
     }
+#endif
   if (!csk)
     {
     vtkErrorMacro(

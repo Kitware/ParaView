@@ -15,7 +15,7 @@
 #include "vtkSMObject.h"
 
 #include "vtkObjectFactory.h"
-#include "vtkProcessModule2.h"
+#include "vtkProcessModule.h"
 #include "vtkSMSession.h"
 
 vtkStandardNewMacro(vtkSMObject);
@@ -36,7 +36,7 @@ vtkSMProxyManager* vtkSMObject::GetProxyManager()
   // Locate proxy manager from first SMSession and return it for backwards
   // compatibility.
   vtkSMSession* session = vtkSMSession::SafeDownCast(
-    vtkProcessModule2::GetProcessModule()->GetSession());
+    vtkProcessModule::GetProcessModule()->GetSession());
   return session? session->GetProxyManager() : NULL;
 }
 

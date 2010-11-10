@@ -20,7 +20,7 @@
 #include "vtkMultiProcessStream.h"
 #include "vtkNetworkAccessManager.h"
 #include "vtkObjectFactory.h"
-#include "vtkProcessModule2.h"
+#include "vtkProcessModule.h"
 #include "vtkPVConfig.h"
 #include "vtkPVServerInformation.h"
 #include "vtkSocketCommunicator.h"
@@ -166,7 +166,7 @@ bool vtkSMSessionClient::Connect(const char* url)
 
   bool need_rcontroller = render_server_url.size() > 0;
   vtkNetworkAccessManager* nam =
-    vtkProcessModule2::GetProcessModule()->GetNetworkAccessManager();
+    vtkProcessModule::GetProcessModule()->GetNetworkAccessManager();
   vtkMultiProcessController* dcontroller =
     nam->NewConnection(data_server_url.c_str());
   vtkMultiProcessController* rcontroller = need_rcontroller?
@@ -211,9 +211,9 @@ bool vtkSMSessionClient::Connect(const char* url)
 
   if (success)
     {
-    this->GatherInformation(vtkProcessModule2::DATA_SERVER_ROOT,
+    this->GatherInformation(vtkProcessModule::DATA_SERVER_ROOT,
       this->DataServerInformation, 0);
-    this->GatherInformation(vtkProcessModule2::RENDER_SERVER_ROOT,
+    this->GatherInformation(vtkProcessModule::RENDER_SERVER_ROOT,
       this->RenderServerInformation, 0);
     }
 
@@ -259,20 +259,20 @@ namespace
 int vtkSMSessionClient::GetNumberOfProcesses(vtkTypeUInt32 servers)
 {
   int num_procs = 0;
-  if (servers & vtkProcessModule2::CLIENT)
+  if (servers & vtkProcessModule::CLIENT)
     {
     num_procs = vtkMax(num_procs,
       this->Superclass::GetNumberOfProcesses(servers));
     }
-  if (servers & vtkProcessModule2::DATA_SERVER ||
-    servers & vtkProcessModule2::DATA_SERVER_ROOT)
+  if (servers & vtkProcessModule::DATA_SERVER ||
+    servers & vtkProcessModule::DATA_SERVER_ROOT)
     {
     num_procs = vtkMax(num_procs,
       this->DataServerInformation->GetNumberOfProcesses());
     }
 
-  if (servers & vtkProcessModule2::RENDER_SERVER ||
-    servers & vtkProcessModule2::RENDER_SERVER_ROOT)
+  if (servers & vtkProcessModule::RENDER_SERVER ||
+    servers & vtkProcessModule::RENDER_SERVER_ROOT)
     {
     num_procs = vtkMax(num_procs,
       this->RenderServerInformation->GetNumberOfProcesses());
@@ -308,20 +308,20 @@ void vtkSMSessionClient::PushState(vtkSMMessage* message)
   if (this->RenderServerController == NULL)
     {
     // re-route all render-server messages to data-server.
-    if (message->location() & vtkProcessModule2::RENDER_SERVER)
+    if (message->location() & vtkProcessModule::RENDER_SERVER)
       {
-      message->set_location(message->location() | vtkProcessModule2::DATA_SERVER);
-      message->set_location(message->location() & ~vtkProcessModule2::RENDER_SERVER);
+      message->set_location(message->location() | vtkProcessModule::DATA_SERVER);
+      message->set_location(message->location() & ~vtkProcessModule::RENDER_SERVER);
       }
-    if (message->location() & vtkProcessModule2::RENDER_SERVER_ROOT)
+    if (message->location() & vtkProcessModule::RENDER_SERVER_ROOT)
       {
-      message->set_location(message->location() | vtkProcessModule2::DATA_SERVER_ROOT);
-      message->set_location(message->location() & ~vtkProcessModule2::RENDER_SERVER_ROOT);
+      message->set_location(message->location() | vtkProcessModule::DATA_SERVER_ROOT);
+      message->set_location(message->location() & ~vtkProcessModule::RENDER_SERVER_ROOT);
       }
     }
 
-  if ( (message->location() & vtkProcessModule2::DATA_SERVER) != 0 ||
-    (message->location() & vtkProcessModule2::DATA_SERVER_ROOT) != 0)
+  if ( (message->location() & vtkProcessModule::DATA_SERVER) != 0 ||
+    (message->location() & vtkProcessModule::DATA_SERVER_ROOT) != 0)
     {
     vtkMultiProcessStream stream;
     stream << static_cast<int>(PUSH);
@@ -334,8 +334,8 @@ void vtkSMSessionClient::PushState(vtkSMMessage* message)
     }
 
   if (this->RenderServerController != NULL &&
-    ((message->location() & vtkProcessModule2::RENDER_SERVER) != 0 ||
-    (message->location() & vtkProcessModule2::RENDER_SERVER_ROOT) != 0))
+    ((message->location() & vtkProcessModule::RENDER_SERVER) != 0 ||
+    (message->location() & vtkProcessModule::RENDER_SERVER_ROOT) != 0))
     {
     vtkMultiProcessStream stream;
     stream << static_cast<int>(PUSH);
@@ -347,7 +347,7 @@ void vtkSMSessionClient::PushState(vtkSMMessage* message)
       CLIENT_SERVER_MESSAGE_RMI);
     }
 
-  if ( (message->location() & vtkProcessModule2::CLIENT) != 0)
+  if ( (message->location() & vtkProcessModule::CLIENT) != 0)
     {
     this->Superclass::PushState(message);
     }
@@ -359,27 +359,27 @@ void vtkSMSessionClient::PullState(vtkSMMessage* message)
   if (this->RenderServerController == NULL)
     {
     // re-route all render-server messages to data-server.
-    if (message->location() & vtkProcessModule2::RENDER_SERVER)
+    if (message->location() & vtkProcessModule::RENDER_SERVER)
       {
-      message->set_location(message->location() | vtkProcessModule2::DATA_SERVER);
-      message->set_location(message->location() & ~vtkProcessModule2::RENDER_SERVER);
+      message->set_location(message->location() | vtkProcessModule::DATA_SERVER);
+      message->set_location(message->location() & ~vtkProcessModule::RENDER_SERVER);
       }
-    if (message->location() & vtkProcessModule2::RENDER_SERVER_ROOT)
+    if (message->location() & vtkProcessModule::RENDER_SERVER_ROOT)
       {
-      message->set_location(message->location() | vtkProcessModule2::DATA_SERVER_ROOT);
-      message->set_location(message->location() & ~vtkProcessModule2::RENDER_SERVER_ROOT);
+      message->set_location(message->location() | vtkProcessModule::DATA_SERVER_ROOT);
+      message->set_location(message->location() & ~vtkProcessModule::RENDER_SERVER_ROOT);
       }
     }
 
   // We make sure that only ONE location is targeted with a priority order
   // (1) Client (2) DataServer (3) RenderServer
-  if ( (message->location() & vtkProcessModule2::CLIENT) != 0)
+  if ( (message->location() & vtkProcessModule::CLIENT) != 0)
     {
     this->Superclass::PullState(message);
     // Everything is local no communication needed (Send/Reply)
     }
-  else if ( (message->location() & vtkProcessModule2::DATA_SERVER) != 0 ||
-    (message->location() & vtkProcessModule2::DATA_SERVER_ROOT) != 0)
+  else if ( (message->location() & vtkProcessModule::DATA_SERVER) != 0 ||
+    (message->location() & vtkProcessModule::DATA_SERVER_ROOT) != 0)
     {
     vtkMultiProcessStream stream;
     stream << static_cast<int>(PULL);
@@ -398,8 +398,8 @@ void vtkSMSessionClient::PullState(vtkSMMessage* message)
     message->ParseFromString(string);
     }
   else if (this->RenderServerController != NULL &&
-           ((message->location() & vtkProcessModule2::RENDER_SERVER) != 0 ||
-            (message->location() & vtkProcessModule2::RENDER_SERVER_ROOT) != 0))
+           ((message->location() & vtkProcessModule::RENDER_SERVER) != 0 ||
+            (message->location() & vtkProcessModule::RENDER_SERVER_ROOT) != 0))
     {
     vtkMultiProcessStream stream;
     stream << static_cast<int>(PULL);
@@ -425,20 +425,20 @@ void vtkSMSessionClient::Invoke(vtkSMMessage* message)
   if (this->RenderServerController == NULL)
     {
     // re-route all render-server messages to data-server.
-    if (message->location() & vtkProcessModule2::RENDER_SERVER)
+    if (message->location() & vtkProcessModule::RENDER_SERVER)
       {
-      message->set_location(message->location() | vtkProcessModule2::DATA_SERVER);
-      message->set_location(message->location() & ~vtkProcessModule2::RENDER_SERVER);
+      message->set_location(message->location() | vtkProcessModule::DATA_SERVER);
+      message->set_location(message->location() & ~vtkProcessModule::RENDER_SERVER);
       }
-    if (message->location() & vtkProcessModule2::RENDER_SERVER_ROOT)
+    if (message->location() & vtkProcessModule::RENDER_SERVER_ROOT)
       {
-      message->set_location(message->location() | vtkProcessModule2::DATA_SERVER_ROOT);
-      message->set_location(message->location() & ~vtkProcessModule2::RENDER_SERVER_ROOT);
+      message->set_location(message->location() | vtkProcessModule::DATA_SERVER_ROOT);
+      message->set_location(message->location() & ~vtkProcessModule::RENDER_SERVER_ROOT);
       }
     }
 
-  if ( (message->location() & vtkProcessModule2::DATA_SERVER) != 0 ||
-    (message->location() & vtkProcessModule2::DATA_SERVER_ROOT) != 0)
+  if ( (message->location() & vtkProcessModule::DATA_SERVER) != 0 ||
+    (message->location() & vtkProcessModule::DATA_SERVER_ROOT) != 0)
     {
     vtkMultiProcessStream stream;
     stream << static_cast<int>(INVOKE);
@@ -451,8 +451,8 @@ void vtkSMSessionClient::Invoke(vtkSMMessage* message)
     }
 
   if (this->RenderServerController != NULL &&
-    ((message->location() & vtkProcessModule2::RENDER_SERVER) != 0 ||
-    (message->location() & vtkProcessModule2::RENDER_SERVER_ROOT) != 0))
+    ((message->location() & vtkProcessModule::RENDER_SERVER) != 0 ||
+    (message->location() & vtkProcessModule::RENDER_SERVER_ROOT) != 0))
     {
     vtkMultiProcessStream stream;
     stream << static_cast<int>(INVOKE);
@@ -464,7 +464,7 @@ void vtkSMSessionClient::Invoke(vtkSMMessage* message)
       CLIENT_SERVER_MESSAGE_RMI);
     }
 
-  if ( (message->location() & vtkProcessModule2::CLIENT) != 0)
+  if ( (message->location() & vtkProcessModule::CLIENT) != 0)
     {
     this->Superclass::Invoke(message);
     }
@@ -477,19 +477,19 @@ bool vtkSMSessionClient::GatherInformation(
   if (this->RenderServerController == NULL)
     {
     // re-route all render-server messages to data-server.
-    if (location & vtkProcessModule2::RENDER_SERVER)
+    if (location & vtkProcessModule::RENDER_SERVER)
       {
-      location |= vtkProcessModule2::DATA_SERVER;
-      location &= ~vtkProcessModule2::RENDER_SERVER;
+      location |= vtkProcessModule::DATA_SERVER;
+      location &= ~vtkProcessModule::RENDER_SERVER;
       }
-    if (location & vtkProcessModule2::RENDER_SERVER_ROOT)
+    if (location & vtkProcessModule::RENDER_SERVER_ROOT)
       {
-      location |= vtkProcessModule2::DATA_SERVER_ROOT;
-      location &= ~vtkProcessModule2::RENDER_SERVER_ROOT;
+      location |= vtkProcessModule::DATA_SERVER_ROOT;
+      location &= ~vtkProcessModule::RENDER_SERVER_ROOT;
       }
     }
 
-  if ( (location & vtkProcessModule2::CLIENT) != 0)
+  if ( (location & vtkProcessModule::CLIENT) != 0)
     {
     bool ret_value = this->Superclass::GatherInformation(
       location, information, globalid);
@@ -510,15 +510,15 @@ bool vtkSMSessionClient::GatherInformation(
 
   vtkMultiProcessController* controller = NULL;
 
-  if ( (location & vtkProcessModule2::DATA_SERVER) != 0 ||
-    (location & vtkProcessModule2::DATA_SERVER_ROOT) != 0)
+  if ( (location & vtkProcessModule::DATA_SERVER) != 0 ||
+    (location & vtkProcessModule::DATA_SERVER_ROOT) != 0)
     {
     controller = this->DataServerController;
     }
 
   else if (this->RenderServerController != NULL &&
-    ((location & vtkProcessModule2::RENDER_SERVER) != 0 ||
-    (location & vtkProcessModule2::RENDER_SERVER_ROOT) != 0))
+    ((location & vtkProcessModule::RENDER_SERVER) != 0 ||
+    (location & vtkProcessModule::RENDER_SERVER_ROOT) != 0))
     {
     controller = this->RenderServerController;
     }

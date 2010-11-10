@@ -21,7 +21,7 @@
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
 #include "vtkPMInputProperty.h"
-#include "vtkProcessModule2.h"
+#include "vtkProcessModule.h"
 #include "vtkPVXMLElement.h"
 
 vtkStandardNewMacro(vtkPMWriterProxy);
@@ -123,7 +123,7 @@ bool vtkPMWriterProxy::CreateVTKObjects(vtkSMMessage* message)
     }
 
   // Pass piece/process information to the writer if it needs it.
-  vtkProcessModule2::GetProcessModule()->ReportInterpreterErrorsOff();
+  vtkProcessModule::GetProcessModule()->ReportInterpreterErrorsOff();
   vtkMultiProcessController* controller =
     vtkMultiProcessController::GetGlobalController();
   int numProcs = controller->GetNumberOfProcesses();
@@ -159,7 +159,7 @@ bool vtkPMWriterProxy::CreateVTKObjects(vtkSMMessage* message)
     << procId
     << vtkClientServerStream::End;
   this->Interpreter->ProcessStream(stream);
-  vtkProcessModule2::GetProcessModule()->ReportInterpreterErrorsOn();
+  vtkProcessModule::GetProcessModule()->ReportInterpreterErrorsOn();
   stream.Reset();
 
   return true;

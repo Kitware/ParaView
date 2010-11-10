@@ -13,7 +13,7 @@ PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
 #include "vtkInitializationHelper.h"
-#include "vtkProcessModule2.h"
+#include "vtkProcessModule.h"
 #include "vtkPVFileInformation.h"
 #include "vtkPVServerOptions.h"
 #include "vtkSMPropertyHelper.h"
@@ -36,7 +36,7 @@ int main(int argc, char* argv[])
 
   vtkPVServerOptions* options = vtkPVServerOptions::New();
   vtkInitializationHelper::Initialize(argc, argv,
-    vtkProcessModule2::PROCESS_CLIENT, options);
+    vtkProcessModule::PROCESS_CLIENT, options);
   //---------------------------------------------------------------------------
 
   vtkSMSessionCore::SetDebugLogging(true);

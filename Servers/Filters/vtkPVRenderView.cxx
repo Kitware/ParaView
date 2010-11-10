@@ -35,7 +35,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkPHardwareSelector.h"
 #include "vtkPKdTree.h"
-#include "vtkProcessModule2.h"
+#include "vtkProcessModule.h"
 #include "vtkPVAxesWidget.h"
 #include "vtkPVCenterAxesActor.h"
 #include "vtkPVGenericRenderWindowInteractor.h"
@@ -73,7 +73,7 @@ vtkCxxSetObjectMacro(vtkPVRenderView, LastSelection, vtkSelection);
 //----------------------------------------------------------------------------
 vtkPVRenderView::vtkPVRenderView()
 {
-  vtkPVOptions* options = vtkProcessModule2::GetProcessModule()->GetOptions();
+  vtkPVOptions* options = vtkProcessModule::GetProcessModule()->GetOptions();
 
   this->ForceRemoteRendering = false;
   this->StillRenderImageReductionFactor = 1;
@@ -241,7 +241,7 @@ void vtkPVRenderView::SetUseOffscreenRendering(bool use_offscreen)
     return;
     }
 
-  vtkPVOptions* options = vtkProcessModule2::GetProcessModule()->GetOptions();
+  vtkPVOptions* options = vtkProcessModule::GetProcessModule()->GetOptions();
   bool process_use_offscreen = options->GetUseOffscreenRendering() != 0;
 
   this->UseOffscreenRendering = use_offscreen || process_use_offscreen;
@@ -764,8 +764,8 @@ bool vtkPVRenderView::GetUseDistributedRendering()
     return true;
     }
 
-  if (vtkProcessModule2::GetProcessType() == vtkProcessModule2::PROCESS_BATCH ||
-    vtkProcessModule2::GetProcessType() == vtkProcessModule2::PROCESS_SYMMETRIC_BATCH)
+  if (vtkProcessModule::GetProcessType() == vtkProcessModule::PROCESS_BATCH ||
+    vtkProcessModule::GetProcessType() == vtkProcessModule::PROCESS_SYMMETRIC_BATCH)
     {
     // currently, we only support parallel rendering in batch mode.
     return true;
@@ -791,7 +791,7 @@ bool vtkPVRenderView::GetDeliverOutlineToClient()
 //----------------------------------------------------------------------------
 bool vtkPVRenderView::GetUseOrderedCompositing()
 {
-  if (vtkProcessModule2::GetProcessModule()->GetNumberOfLocalPartitions() > 1)
+  if (vtkProcessModule::GetProcessModule()->GetNumberOfLocalPartitions() > 1)
     {
     return true;
     }

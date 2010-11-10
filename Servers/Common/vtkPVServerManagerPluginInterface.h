@@ -21,7 +21,7 @@
 #ifndef __vtkPVServerManagerPluginInterface_h
 #define __vtkPVServerManagerPluginInterface_h
 
-#include "vtkProcessModule.h"
+#include "vtkClientServerInterpreterInitializer.h"
 #include <vtkstd/vector> // STL Header
 #include <vtkstd/string> // STL Header
 
@@ -38,7 +38,7 @@ public:
   // Returns the callback function to call to initialize the interpretor for the
   // new vtk/server-manager classes added by this plugin. Returning NULL is
   // perfectly valid.
-  virtual vtkProcessModule::InterpreterInitializationCallback 
+  virtual vtkClientServerInterpreterInitializer::InterpreterInitializationCallback
     GetInitializeInterpreterCallback() = 0;
 };
 

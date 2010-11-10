@@ -12,8 +12,8 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#ifndef __vtkProcessModule2Internals_h
-#define __vtkProcessModule2Internals_h
+#ifndef __vtkProcessModuleInternals_h
+#define __vtkProcessModuleInternals_h
 
 #include "vtkWeakPointer.h"
 #include "vtkSmartPointer.h"
@@ -22,7 +22,7 @@
 #include <vtkstd/map>
 #include <vtkstd/vector>
 
-class vtkProcessModule2::vtkInternals
+class vtkProcessModule::vtkInternals
 {
 public:
   typedef vtkstd::map<vtkIdType, vtkSmartPointer<vtkSession> > MapOfSessions;

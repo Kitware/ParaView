@@ -17,7 +17,7 @@
 #include "vtkCommand.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModuleConnectionManager.h"
-#include "vtkProcessModule2.h"
+#include "vtkProcessModule.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSMIdBasedProxyLocator.h"
 #include "vtkSMProxyManager.h"
@@ -74,7 +74,7 @@ vtkSMUndoStack::vtkSMUndoStack()
 //  this->Observer = vtkSMUndoStackObserver::New();
 //  this->Observer->SetTarget(this);
 
-//  vtkProcessModule2* pm = vtkProcessModule2::GetProcessModule();
+//  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
 //  if (pm)
 //    {
 //    pm->AddObserver(vtkCommand::ConnectionClosedEvent, this->Observer);
@@ -84,7 +84,7 @@ vtkSMUndoStack::vtkSMUndoStack()
 //-----------------------------------------------------------------------------
 vtkSMUndoStack::~vtkSMUndoStack()
 {
-//  vtkProcessModule2* pm = vtkProcessModule2::GetProcessModule();
+//  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
 //  if (pm)
 //    {
 //    pm->RemoveObserver(this->Observer);

@@ -20,7 +20,7 @@
 #include "vtkInstantiator.h"
 #include "vtkObjectFactory.h"
 #include "vtkPMProxy.h"
-#include "vtkProcessModule2.h"
+#include "vtkProcessModule.h"
 #include "vtkProcessModuleConnectionManager.h"
 #include "vtkPVOptions.h"
 #include "vtkPVXMLElement.h"
@@ -99,7 +99,7 @@ vtkSMProxy::vtkSMProxy()
   this->SetKernelClassName("vtkPMProxy");
 
   // By default, all objects are created on data server.
-  this->Location = vtkProcessModule2::DATA_SERVER;
+  this->Location = vtkProcessModule::DATA_SERVER;
   this->VTKClassName = 0;
   this->XMLGroup = 0;
   this->XMLName = 0;
@@ -1273,15 +1273,15 @@ int vtkSMProxy::ReadXMLAttributes( vtkSMProxyManager* pm,
     vtkstd::string strprocesses = processes;
     if (strprocesses.find("client") != vtkstd::string::npos)
       {
-      uiprocesses |= vtkProcessModule2::CLIENT;
+      uiprocesses |= vtkProcessModule::CLIENT;
       }
     if (strprocesses.find("renderserver") != vtkstd::string::npos)
       {
-      uiprocesses |= vtkProcessModule2::RENDER_SERVER;
+      uiprocesses |= vtkProcessModule::RENDER_SERVER;
       }
     if (strprocesses.find("dataserver") != vtkstd::string::npos)
       {
-      uiprocesses |= vtkProcessModule2::DATA_SERVER;
+      uiprocesses |= vtkProcessModule::DATA_SERVER;
       }
     this->SetLocation(uiprocesses);
     }
