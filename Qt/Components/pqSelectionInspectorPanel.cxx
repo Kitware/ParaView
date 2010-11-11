@@ -155,7 +155,6 @@ public:
     this->VTKConnectSelInput = vtkEventQtSlotConnect::New();
     this->VTKConnectRep = vtkEventQtSlotConnect::New();
     this->UpdatingGUI = false;
-    this->FromComboBox = false;
 
     this->PointLabelArrayDomain = 0;
     this->CellLabelArrayDomain = 0;
@@ -243,7 +242,6 @@ public:
 
   bool UseProcessID;
   bool UpdatingGUI;
-  bool FromComboBox;
 
   QList<vtkSmartPointer<vtkSMNewWidgetRepresentationProxy> > LocationWigets;
   vtkSmartPointer<vtkSMProxy> FrustumWidget;
@@ -452,7 +450,7 @@ void pqSelectionInspectorPanel::select(pqOutputPort* opport, bool createNew)
   this->updateSelectionTypesAvailable();
 
   bool hasGIDs = this->hasGlobalIDs(opport);
-  if (!this->Implementation->FromComboBox && hasGIDs)
+  if (createNew && hasGIDs)
     {
     this->Implementation->comboSelectionType->setCurrentIndex(
       pqImplementation::GLOBALIDS);
@@ -474,7 +472,7 @@ void pqSelectionInspectorPanel::select(pqOutputPort* opport, bool createNew)
     }
   this->Implementation->selectedObject->setText(selectedObjectLabel);
 
-  if (createNew || !this->Implementation->FromComboBox && hasGIDs)
+  if (createNew)
     {
     this->createNewSelectionSourceIfNeeded();
     }
@@ -1415,13 +1413,11 @@ void pqSelectionInspectorPanel::onSelectionTypeChanged(const QString&)
 
   // create new selection proxy based on the type that the user choose. If
   // possible try to preserve old selection properties.
-  this->Implementation->FromComboBox = true;
   this->select(this->Implementation->InputPort, true);
   if (this->Implementation->InputPort)
     {
     this->Implementation->InputPort->renderAllViews();
     }
-  this->Implementation->FromComboBox = false;
 }
 
 //-----------------------------------------------------------------------------
