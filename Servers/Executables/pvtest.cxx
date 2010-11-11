@@ -85,6 +85,8 @@ int main(int argc, char* argv[])
 
   vtkSMPropertyHelper(view, "Representations").Add(coneRepr);
   view->UpdateVTKObjects();
+  vtkSMPropertyHelper(repr, "Representation").Set("Surface");
+  repr->UpdateVTKObjects();
 
   vtkSMRenderViewProxy::SafeDownCast(view)->StillRender();
   vtkSMRenderViewProxy::SafeDownCast(view)->ResetCamera();

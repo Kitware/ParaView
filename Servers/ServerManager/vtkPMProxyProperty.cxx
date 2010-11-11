@@ -164,7 +164,6 @@ bool vtkPMProxyProperty::Push(vtkSMMessage* message, int offset)
     this->Cache->GetProxyToRemove(proxy_ids);
     for (size_t cc=0; cc < proxy_ids.size(); cc++)
       {
-      cout << "Remove proxy: " << proxy_ids[cc] << endl;
       vtkPMProxy* pmproxy = vtkPMProxy::SafeDownCast(
           this->GetPMObject(proxy_ids[cc]));
       if(pmproxy)
@@ -188,7 +187,6 @@ bool vtkPMProxyProperty::Push(vtkSMMessage* message, int offset)
     {
     vtkPMProxy* pmproxy = vtkPMProxy::SafeDownCast(
         this->GetPMObject(proxy_ids[cc]));
-    cout << "Add proxy: " << proxy_ids[cc] << endl;
     if(pmproxy)
       {
       stream << vtkClientServerStream::Invoke
