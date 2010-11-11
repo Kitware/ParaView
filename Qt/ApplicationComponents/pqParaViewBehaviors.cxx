@@ -52,6 +52,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqStandardViewModules.h"
 #include "pqUndoRedoBehavior.h"
 #include "pqViewFrameActionsBehavior.h"
+#include "pqVerifyRequiredPluginBehavior.h"
 
 #include <QShortcut>
 #include <QMainWindow>
@@ -84,6 +85,7 @@ pqParaViewBehaviors::pqParaViewBehaviors(
   new pqCrashRecoveryBehavior(this);
   new pqAutoLoadPluginXMLBehavior(this);
   new pqPluginDockWidgetsBehavior(mainWindow);
+  new pqVerifyRequiredPluginBehavior(this);
   new pqPluginActionGroupBehavior(mainWindow);
   new pqFixPathsInStateFilesBehavior(this);
   new pqCommandLineOptionsBehavior(this);

@@ -485,6 +485,7 @@ void pqPluginManager::onServerConnected(pqServer* server)
   this->addPluginFromSettings();
   this->loadAutoLoadPlugins(server);
   this->loadExtensions(server);
+  this->verifyRequiredPluginsLoaded(server);
   if(this->Internal->NeedUpdatePluginInfo)
     {
     emit this->pluginInfoUpdated();
@@ -844,6 +845,46 @@ void pqPluginManager::loadAutoLoadPlugins(pqServer* server)
       }
     }
 }
+
+//-----------------------------------------------------------------------------
+void pqPluginManager::verifyRequiredPluginsLoaded(pqServer* server)
+{
+  QList< vtkPVPluginInformation* > remote = this->loadedExtensions(server);
+  QList< vtkPVPluginInformation* > local = this->loadedExtensions(NULL);
+  if ( remote == local )
+    {
+    return;
+    }
+
+  bool pluginFunctional = true;
+  foreach(vtkPVPluginInformation* plInfo, local)
+    {
+    if (plInfo->GetLoaded())
+      {
+      pluginFunctional = this->isPluginFuntional(plInfo,false);
+      if ( !pluginFunctional)
+        {
+        emit requiredPluginsNotLoaded();
+        return;
+        }
+      }
+    }
+
+  foreach(vtkPVPluginInformation* plInfo, remote)
+    {
+    if (plInfo->GetLoaded())
+      {
+      pluginFunctional = this->isPluginFuntional(plInfo,true);
+      if ( !pluginFunctional)
+        {
+        emit requiredPluginsNotLoaded();
+        return;
+        }
+      }
+    }
+  return;
+}
+
 //----------------------------------------------------------------------------
 bool pqPluginManager::areRequiredPluginsFunctional(
   vtkPVPluginInformation* plInfo, bool remote)
