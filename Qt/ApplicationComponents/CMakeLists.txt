@@ -92,6 +92,7 @@ SET (MOC_HEADERS
   pqUndoRedoBehavior.h
   pqUndoRedoReaction.h
   pqVCRToolbar.h
+  pqVerifyRequiredPluginBehavior.h
   pqViewFrameActionsBehavior.h
   pqViewMenuManager.h
   pqViewSettingsManager.h
@@ -263,6 +264,8 @@ SET (SOURCE_FILES
   pqUndoRedoReaction.h
   pqVCRToolbar.cxx
   pqVCRToolbar.h
+  pqVerifyRequiredPluginBehavior.cxx
+  pqVerifyRequiredPluginBehavior.h
   pqViewFrameActionsBehavior.cxx
   pqViewFrameActionsBehavior.h
   pqViewMenuManager.cxx
