@@ -185,6 +185,19 @@ void vtkDataLabelRepresentation::SetPointLabelFontSize(int val)
 }
 
 //----------------------------------------------------------------------------
+void vtkDataLabelRepresentation::SetPointLabelFormat(const char* format)
+{
+  if ( format && strcmp(format,"") != 0 )
+    {
+    this->PointLabelMapper->SetLabelFormat(format);
+    }
+  else
+    {
+    this->PointLabelMapper->SetLabelFormat(NULL);
+    }
+}
+
+//----------------------------------------------------------------------------
 void vtkDataLabelRepresentation::SetCellLabelVisibility(int val)
 {
   this->CellLabelVisibility = val;
@@ -249,6 +262,20 @@ void vtkDataLabelRepresentation::SetCellLabelFontSize(int val)
 {
   this->CellLabelProperty->SetFontSize(val);
 }
+
+//----------------------------------------------------------------------------
+void vtkDataLabelRepresentation::SetCellLabelFormat(const char* format)
+{
+  if ( format && strcmp(format,"") != 0 )
+    {
+    this->CellLabelMapper->SetLabelFormat(format);
+    }
+  else
+    {
+    this->CellLabelMapper->SetLabelFormat(NULL);
+    }
+}
+
 
 //----------------------------------------------------------------------------
 void vtkDataLabelRepresentation::MarkModified()

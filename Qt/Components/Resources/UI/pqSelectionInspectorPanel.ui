@@ -923,15 +923,12 @@
            </widget>
           </item>
           <item row="1" column="0">
-           <widget class="QGroupBox" name="groupBox_CellLabelStyle">
+           <widget class="QFrame" name="frame_CellLabelStyle">
             <property name="enabled">
              <bool>false</bool>
             </property>
-            <property name="title">
-             <string>Style</string>
-            </property>
             <layout class="QGridLayout">
-             <item row="1" column="2" colspan="2">
+             <item row="2" column="2" colspan="2">
               <widget class="QSpinBox" name="spinBoxSize_Cell">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
@@ -963,7 +960,7 @@
                </property>
               </widget>
              </item>
-             <item row="2" column="3">
+             <item row="4" column="3">
               <layout class="QHBoxLayout">
                <property name="spacing">
                 <number>0</number>
@@ -1069,7 +1066,7 @@
                </item>
               </widget>
              </item>
-             <item row="2" column="0">
+             <item row="4" column="0">
               <widget class="QLabel" name="label_cell_font">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
@@ -1082,7 +1079,7 @@
                </property>
               </widget>
              </item>
-             <item row="1" column="0" colspan="2">
+             <item row="2" column="0" colspan="2">
               <widget class="QLabel" name="label_size_2">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
@@ -1095,7 +1092,7 @@
                </property>
               </widget>
              </item>
-             <item row="4" column="0">
+             <item row="6" column="0">
               <widget class="QLabel" name="label_15">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
@@ -1108,7 +1105,7 @@
                </property>
               </widget>
              </item>
-             <item row="4" column="3">
+             <item row="6" column="3">
               <widget class="pqColorChooserButton" name="buttonColor_Cell">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
@@ -1124,7 +1121,7 @@
                </property>
               </widget>
              </item>
-             <item row="4" column="1" colspan="2">
+             <item row="6" column="1" colspan="2">
               <widget class="QDoubleSpinBox" name="spinBoxOpacity_Cell">
                <property name="whatsThis">
                 <string>Used to set the label opacity.</string>
@@ -1140,7 +1137,7 @@
                </property>
               </widget>
              </item>
-             <item row="2" column="1" colspan="2">
+             <item row="4" column="1" colspan="2">
               <widget class="QComboBox" name="comboFontFamily_Cell">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
@@ -1168,7 +1165,7 @@
                </item>
               </widget>
              </item>
-             <item row="3" column="0">
+             <item row="5" column="0">
               <widget class="QLabel" name="label_16">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
@@ -1181,7 +1178,7 @@
                </property>
               </widget>
              </item>
-             <item row="3" column="1" colspan="2">
+             <item row="5" column="1" colspan="2">
               <widget class="QComboBox" name="comboTextAlign_Cell">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
@@ -1212,6 +1209,26 @@
                </item>
               </widget>
              </item>
+             <item row="1" column="0">
+              <widget class="QLabel" name="label_4">
+               <property name="text">
+                <string>Label Format</string>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="2" colspan="2">
+              <widget class="QLineEdit" name="lineEdit_CellFormat">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="toolTip">
+                <string>printf format for label</string>
+               </property>
+              </widget>
+             </item>
             </layout>
            </widget>
           </item>
@@ -1228,16 +1245,20 @@
           <property name="spacing">
            <number>3</number>
           </property>
+          <item row="0" column="0">
+           <widget class="QCheckBox" name="checkBoxLabelPoints">
+            <property name="text">
+             <string>Visible</string>
+            </property>
+           </widget>
+          </item>
           <item row="1" column="0">
-           <widget class="QGroupBox" name="groupBox_PointLabelStyle">
+           <widget class="QFrame" name="frame_PointLabelStyle">
             <property name="enabled">
              <bool>false</bool>
             </property>
-            <property name="title">
-             <string>Style</string>
-            </property>
             <layout class="QGridLayout">
-             <item row="3" column="1" colspan="2">
+             <item row="4" column="1" colspan="2">
               <widget class="QComboBox" name="comboTextAlign_Point">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
@@ -1268,7 +1289,7 @@
                </item>
               </widget>
              </item>
-             <item row="3" column="0">
+             <item row="4" column="0">
               <widget class="QLabel" name="label_17">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
@@ -1281,7 +1302,7 @@
                </property>
               </widget>
              </item>
-             <item row="4" column="3">
+             <item row="5" column="3">
               <widget class="pqColorChooserButton" name="buttonColor_Point">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
@@ -1297,7 +1318,7 @@
                </property>
               </widget>
              </item>
-             <item row="4" column="1" colspan="2">
+             <item row="5" column="1" colspan="2">
               <widget class="QDoubleSpinBox" name="spinBoxOpacity_Point">
                <property name="whatsThis">
                 <string>Used to set the label opacity.</string>
@@ -1313,7 +1334,7 @@
                </property>
               </widget>
              </item>
-             <item row="4" column="0">
+             <item row="5" column="0">
               <widget class="QLabel" name="label_14">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
@@ -1326,7 +1347,7 @@
                </property>
               </widget>
              </item>
-             <item row="2" column="3">
+             <item row="3" column="3">
               <layout class="QHBoxLayout">
                <property name="spacing">
                 <number>0</number>
@@ -1384,7 +1405,7 @@
                </item>
               </layout>
              </item>
-             <item row="2" column="1" colspan="2">
+             <item row="3" column="1" colspan="2">
               <widget class="QComboBox" name="comboFontFamily_Point">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
@@ -1425,7 +1446,7 @@
                </property>
               </widget>
              </item>
-             <item row="1" column="0" colspan="2">
+             <item row="2" column="0" colspan="2">
               <widget class="QLabel" name="label_size">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
@@ -1486,7 +1507,7 @@
                </item>
               </widget>
              </item>
-             <item row="2" column="0">
+             <item row="3" column="0">
               <widget class="QLabel" name="label_point_font">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
@@ -1499,7 +1520,7 @@
                </property>
               </widget>
              </item>
-             <item row="1" column="2" colspan="2">
+             <item row="2" column="2" colspan="2">
               <widget class="QSpinBox" name="spinBoxSize_Point">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
@@ -1518,14 +1539,27 @@
                </property>
               </widget>
              </item>
+             <item row="1" column="0">
+              <widget class="QLabel" name="label_5">
+               <property name="text">
+                <string>Label Format</string>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="2" colspan="2">
+              <widget class="QLineEdit" name="lineEdit_PointFormat">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="toolTip">
+                <string>printf format for label</string>
+               </property>
+              </widget>
+             </item>
             </layout>
-           </widget>
-          </item>
-          <item row="0" column="0">
-           <widget class="QCheckBox" name="checkBoxLabelPoints">
-            <property name="text">
-             <string>Visible</string>
-            </property>
            </widget>
           </item>
          </layout>
@@ -1619,44 +1653,12 @@
    <slot>setCurrentIndex(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>269</x>
-     <y>58</y>
+     <x>443</x>
+     <y>141</y>
     </hint>
     <hint type="destinationlabel">
-     <x>256</x>
-     <y>524</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>checkBoxLabelCells</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>groupBox_CellLabelStyle</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>107</x>
-     <y>444</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>107</x>
-     <y>444</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>checkBoxLabelPoints</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>groupBox_PointLabelStyle</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>84</x>
-     <y>444</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>92</x>
-     <y>444</y>
+     <x>270</x>
+     <y>695</y>
     </hint>
    </hints>
   </connection>
@@ -1667,12 +1669,44 @@
    <slot>setCurrentIndex(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>234</x>
-     <y>131</y>
+     <x>443</x>
+     <y>118</y>
     </hint>
     <hint type="destinationlabel">
      <x>241</x>
      <y>339</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>checkBoxLabelCells</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>frame_CellLabelStyle</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>41</x>
+     <y>625</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>101</x>
+     <y>641</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>checkBoxLabelPoints</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>frame_PointLabelStyle</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>47</x>
+     <y>627</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>77</x>
+     <y>668</y>
     </hint>
    </hints>
   </connection>
