@@ -1184,6 +1184,7 @@
           <Property name="CellLabelColor" exposed_name="SelectionCellLabelColor" />
           <Property name="CellLabelFontFamily" exposed_name="SelectionCellLabelFontFamily" />
           <Property name="CellLabelFontSize" exposed_name="SelectionCellLabelFontSize" />
+          <Property name="CellLabelFormat" exposed_name="SelectionCellLabelFormat" />
           <Property name="CellLabelItalic" exposed_name="SelectionCellLabelItalic" />
           <Property name="CellLabelJustification" exposed_name="SelectionCellLabelJustification" />
           <Property name="CellLabelOpacity" exposed_name="SelectionCellLabelOpacity" />
@@ -1196,6 +1197,7 @@
           <Property name="PointLabelColor" exposed_name="SelectionPointLabelColor" />
           <Property name="PointLabelFontFamily" exposed_name="SelectionPointLabelFontFamily" />
           <Property name="PointLabelFontSize" exposed_name="SelectionPointLabelFontSize" />
+          <Property name="PointLabelFormat" exposed_name="SelectionPointLabelFormat" />
           <Property name="PointLabelItalic" exposed_name="SelectionPointLabelItalic" />
           <Property name="PointLabelJustification" exposed_name="SelectionPointLabelJustification" />
           <Property name="PointLabelOpacity" exposed_name="SelectionPointLabelOpacity" />
@@ -2985,6 +2987,13 @@
         <IntRangeDomain name="range" min="0" />
       </IntVectorProperty>
 
+      <StringVectorProperty
+        name="PointLabelFormat"
+        command="SetPointLabelFormat"
+        number_of_elements="1"
+        default_values="">
+      </StringVectorProperty>
+
       <IntVectorProperty name="PointLabelJustification"
         command="SetPointLabelJustification"
         number_of_elements="1"
@@ -3088,6 +3097,13 @@
         default_values="18">
         <IntRangeDomain name="range" min="0" />
       </IntVectorProperty>
+
+      <StringVectorProperty
+        name="CellLabelFormat"
+        command="SetCellLabelFormat"
+        number_of_elements="1"
+        default_values="">
+      </StringVectorProperty>
 
       <IntVectorProperty name="CellLabelJustification"
         command="SetCellLabelJustification"
@@ -3278,6 +3294,7 @@
           <Property name="PointLabelColor" />
           <Property name="PointLabelFontFamily" />
           <Property name="PointLabelFontSize" />
+          <Property name="PointLabelFormat" />
           <Property name="PointLabelItalic" />
           <Property name="PointLabelJustification" />
           <Property name="PointLabelOpacity" />
@@ -3289,6 +3306,7 @@
           <Property name="CellLabelColor" />
           <Property name="CellLabelFontFamily" />
           <Property name="CellLabelFontSize" />
+          <Property name="CellLabelFormat" />
           <Property name="CellLabelItalic" />
           <Property name="CellLabelJustification" />
           <Property name="CellLabelOpacity" />

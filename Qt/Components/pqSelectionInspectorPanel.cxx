@@ -815,6 +815,10 @@ void pqSelectionInspectorPanel::updateDisplayStyleGUI()
     this->Implementation->spinBoxSize_Point, "value", SIGNAL(valueChanged(int)),
     reprProxy, reprProxy->GetProperty("SelectionPointLabelFontSize"), 1);
 
+  this->Implementation->RepLinks->addPropertyLink(this->Implementation->lineEdit_PointFormat,
+    "text", SIGNAL(textChanged(const QString&)),
+    reprProxy, reprProxy->GetProperty("SelectionPointLabelFormat"));
+
   this->Implementation->RepLinks->addPropertyLink(
     this->Implementation->spinBoxOpacity_Point, "value", SIGNAL(valueChanged(double)),
     reprProxy, reprProxy->GetProperty("SelectionPointLabelOpacity"));
@@ -847,6 +851,10 @@ void pqSelectionInspectorPanel::updateDisplayStyleGUI()
   this->Implementation->RepLinks->addPropertyLink(
     this->Implementation->spinBoxSize_Cell, "value", SIGNAL(valueChanged(int)),
     reprProxy, reprProxy->GetProperty("SelectionCellLabelFontSize"), 1);
+
+  this->Implementation->RepLinks->addPropertyLink(this->Implementation->lineEdit_CellFormat,
+    "text", SIGNAL(textChanged(const QString&)),
+    reprProxy, reprProxy->GetProperty("SelectionCellLabelFormat"));
 
   this->Implementation->RepLinks->addPropertyLink(
     this->Implementation->spinBoxOpacity_Cell, "value", SIGNAL(valueChanged(double)),
@@ -1085,22 +1093,12 @@ void pqSelectionInspectorPanel::updateSelectionLabelEnableState()
   if (this->Implementation->InputPort)
     {
     this->Implementation->groupSelectionLabel->setEnabled(true);
-    if(this->Implementation->checkBoxLabelCells->isChecked())
-      {
-      this->Implementation->groupBox_CellLabelStyle->setEnabled(true);
-      }
-    else
-      {
-      this->Implementation->groupBox_CellLabelStyle->setEnabled(false);
-      }
-    if(this->Implementation->checkBoxLabelPoints->isChecked())
-      {
-      this->Implementation->groupBox_PointLabelStyle->setEnabled(true);
-      }
-    else
-      {
-      this->Implementation->groupBox_PointLabelStyle->setEnabled(false);
-      }
+
+    this->Implementation->frame_CellLabelStyle->setEnabled(
+      this->Implementation->checkBoxLabelCells->isChecked());
+
+    this->Implementation->frame_PointLabelStyle->setEnabled(
+      this->Implementation->checkBoxLabelPoints->isChecked());
     }
   else
     {
