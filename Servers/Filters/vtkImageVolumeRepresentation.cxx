@@ -40,6 +40,7 @@ public:
   typedef vtkstd::map<vtkstd::string, vtkSmartPointer<vtkVolumeMapper> >
     MapOfMappers;
   MapOfMappers Mappers;
+  vtkstd::string ActiveVolumeMapper;
 };
 
 vtkStandardNewMacro(vtkImageVolumeRepresentation);
@@ -60,7 +61,6 @@ vtkImageVolumeRepresentation::vtkImageVolumeRepresentation()
 
   this->ColorArrayName = 0;
   this->ColorAttributeType = POINT_DATA;
-  this->ActiveVolumeMapper = 0;
   this->Cache = vtkImageData::New();
 
   this->CacheKeeper->SetInput(this->Cache);
@@ -84,7 +84,6 @@ vtkImageVolumeRepresentation::~vtkImageVolumeRepresentation()
   this->CacheKeeper->Delete();
 
   this->SetColorArrayName(0);
-  this->SetActiveVolumeMapper(0);
 
   this->Cache->Delete();
 }
@@ -97,12 +96,19 @@ void vtkImageVolumeRepresentation::AddVolumeMapper(
 }
 
 //----------------------------------------------------------------------------
+void vtkImageVolumeRepresentation::SetActiveVolumeMapper(const char* mapper)
+{
+  this->Internals->ActiveVolumeMapper = mapper? mapper : "";
+  this->MarkModified();
+}
+
+//----------------------------------------------------------------------------
 vtkVolumeMapper* vtkImageVolumeRepresentation::GetActiveVolumeMapper()
 {
-  if (this->ActiveVolumeMapper)
+  if (this->Internals->ActiveVolumeMapper != "")
     {
     vtkInternals::MapOfMappers::iterator iter =
-      this->Internals->Mappers.find(this->ActiveVolumeMapper);
+      this->Internals->Mappers.find(this->Internals->ActiveVolumeMapper);
     if (iter != this->Internals->Mappers.end() && iter->second.GetPointer())
       {
       return iter->second.GetPointer();

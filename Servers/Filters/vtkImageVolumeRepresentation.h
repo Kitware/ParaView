@@ -70,7 +70,7 @@ public:
 
   // Description:
   // Set the active volume mapper to use.
-  vtkSetStringMacro(ActiveVolumeMapper);
+  virtual void SetActiveVolumeMapper(const char*);
   vtkVolumeMapper* GetActiveVolumeMapper();
 
   // Description:
@@ -157,7 +157,6 @@ protected:
 
   int ColorAttributeType;
   char* ColorArrayName;
-  char* ActiveVolumeMapper;
 
 private:
   vtkImageVolumeRepresentation(const vtkImageVolumeRepresentation&); // Not implemented

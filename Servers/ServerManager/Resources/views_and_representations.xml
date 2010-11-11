@@ -1763,7 +1763,6 @@
           proxygroup="mappers" proxyname="GPUVolumeRayCastMapper">
         </Proxy>
         <ShareProperties subproxy="VolumeFixedPointRayCastMapper">
-          <Exception name="LockSampleDistanceToInputSpacing" />
         </ShareProperties>
         <ExposedProperties>
           <Property name="AutoAdjustSampleDistances"/>
