@@ -325,13 +325,11 @@ void pqProxyGroupMenuManager::populateMenu()
     }
   _menu->clear();
 
-//#ifdef Q_WS_MAC
-//  _menu->addAction("Search...", this, SLOT(quickLaunch()),
-//    QKeySequence(Qt::Key_Space | Qt::ALT));
-//#else
-//  _menu->addAction("Search...", this, SLOT(quickLaunch()),
-//    QKeySequence(Qt::Key_Space | Qt::CTRL));
-//#endif
+#ifdef Q_WS_MAC
+  _menu->addAction("Quick Launch\tAlt+Space", this, SLOT(quickLaunch()));
+#else
+  _menu->addAction("Quick Launch\tCtrl+Space", this, SLOT(quickLaunch()));
+#endif
 
   if (this->RecentlyUsedMenuSize > 0)
     {
