@@ -18,7 +18,6 @@
 #include "vtkCommand.h"
 #include "vtkInstantiator.h"
 #include "vtkObjectFactory.h"
-#include "vtkProcessModuleConnectionManager.h"
 #include "vtkProcessModule.h"
 #include "vtkPVConfig.h" // for PARAVIEW_VERSION_*
 #include "vtkPVXMLElement.h"
@@ -811,12 +810,13 @@ void vtkSMProxyManager::UpdateRegisteredProxies(int modified_only /*=1*/)
           this->Internals->ModifiedProxies.find(it3->GetPointer()->Proxy.GetPointer())
           != this->Internals->ModifiedProxies.end())
           {
-          vtksys_ios::ostringstream log;
-          log << "Updating Proxy: " << it3->GetPointer()->Proxy.GetPointer() << "--("
-            << it3->GetPointer()->Proxy->GetXMLGroup()
-            << it3->GetPointer()->Proxy->GetXMLName()
-            << ")";
-          vtkProcessModule::DebugLog(log.str().c_str());
+// FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME
+//          vtksys_ios::ostringstream log;
+//          log << "Updating Proxy: " << it3->GetPointer()->Proxy.GetPointer() << "--("
+//            << it3->GetPointer()->Proxy->GetXMLGroup()
+//            << it3->GetPointer()->Proxy->GetXMLName()
+//            << ")";
+//          vtkProcessModule::DebugLog(log.str().c_str());
           it3->GetPointer()->Proxy.GetPointer()->UpdateVTKObjects();
           }
         }

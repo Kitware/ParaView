@@ -51,12 +51,19 @@ vtkPVCacheKeeper::vtkPVCacheKeeper()
   this->CachingEnabled = true; 
   this->CacheSizeKeeper = 0;
 
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  if (pm)
-    {
-    this->SetCacheSizeKeeper(
-      vtkProcessModule::GetProcessModule()->GetCacheSizeKeeper());
-    }
+  // FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME
+  // FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME
+  // FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME
+//  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+//  if (pm)
+//    {
+//    this->SetCacheSizeKeeper(
+//      vtkProcessModule::GetProcessModule()->GetCacheSizeKeeper());
+//    }
+  // FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME
+  // FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME
+  // FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME
+  // FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME
   this->GetInformation()->Set(vtkAlgorithm::PRESERVES_DATASET(), 1);
 }
 

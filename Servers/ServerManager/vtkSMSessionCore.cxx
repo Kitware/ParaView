@@ -152,7 +152,7 @@ public:
     {
     if(!this->DebugLogFile)
       {
-      vtkProcessModule2 *processModule = vtkProcessModule2::GetProcessModule();
+      vtkProcessModule *processModule = vtkProcessModule::GetProcessModule();
       vtkSMSession *session =
           vtkSMSession::SafeDownCast(processModule->GetActiveSession());
       vtksys_ios::ostringstream fileName;
@@ -295,7 +295,10 @@ void vtkSMSessionCore::PushStateInternal(vtkSMMessage* message)
 
   // FIXME handle this part as well for collaboration
   // 10 are the reserved area for non proxy object that must be shared
-  if(globalId < 10) return;
+  if(globalId < 10)
+    {
+    return;
+    }
   // FIXME ----------------------------------------------------------
 
   // When the control reaches here, we are assured that the PMObject needs be

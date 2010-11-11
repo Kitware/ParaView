@@ -158,7 +158,7 @@ SET(Filters_SRCS
   vtkPVLinearExtrusionFilter.cxx
   vtkPVLODActor.cxx
   vtkPVLODVolume.cxx
-  vtkPVMain.cxx
+  #vtkPVMain.cxx ==== Need to move some code from it before deleting the file
   vtkPVMergeTables.cxx
   vtkPVNullSource.cxx
   vtkPVPlane.cxx
@@ -171,7 +171,6 @@ SET(Filters_SRCS
   vtkPVRepresentedDataInformation.cxx
   vtkPVScalarBarActor.cxx
   vtkPVSelectionSource.cxx
-  vtkPVServerArraySelection.cxx
   vtkPVServerFileListing.cxx
   vtkPVServerObject.cxx
   vtkPVServerSelectTimeSet.cxx
@@ -185,7 +184,6 @@ SET(Filters_SRCS
   vtkPVTrackballRotate.cxx
   vtkPVTrackballZoom.cxx
   vtkPVUpdateSuppressor.cxx
-  vtkPVHardwareSelector.cxx
   vtkPVView.cxx
   vtkPVXYChartView.cxx
   vtkQuerySelectionSource.cxx

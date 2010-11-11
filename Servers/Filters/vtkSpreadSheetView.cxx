@@ -31,7 +31,6 @@
 #include "vtkPVOptions.h"
 #include "vtkPVSynchronizedRenderWindows.h"
 #include "vtkReductionFilter.h"
-#include "vtkRemoteConnection.h"
 #include "vtkSmartPointer.h"
 #include "vtkSortedTableStreamer.h"
 #include "vtkSpreadSheetRepresentation.h"

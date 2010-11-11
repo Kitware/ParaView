@@ -56,7 +56,6 @@ SET (Kit_SRCS
   vtkSMDomainIterator.cxx
   vtkSMDoubleVectorProperty.cxx
   vtkSMGlobalPropertiesManager.cxx
-  vtkSMIdBasedProxyLocator.cxx
   vtkSMIdTypeVectorProperty.cxx
   vtkSMInputProperty.cxx
   vtkSMIntVectorProperty.cxx

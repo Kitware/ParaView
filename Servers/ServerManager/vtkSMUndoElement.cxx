@@ -15,7 +15,6 @@
 #include "vtkSMUndoElement.h"
 
 #include "vtkObjectFactory.h"
-#include "vtkProcessModuleConnectionManager.h"
 #include "vtkSMSession.h"
 #include "vtkSMProxyLocator.h"
 

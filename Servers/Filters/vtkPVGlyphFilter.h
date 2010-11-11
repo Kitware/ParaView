@@ -102,6 +102,15 @@ protected:
 private:
   vtkPVGlyphFilter(const vtkPVGlyphFilter&);  // Not implemented.
   void operator=(const vtkPVGlyphFilter&);  // Not implemented.
+
+public:
+//BTX
+  enum CommunicationIds
+   {
+     GlyphNPointsGather=1000,
+     GlyphNPointsScatter
+   };
+//ETX
 };
 
 #endif

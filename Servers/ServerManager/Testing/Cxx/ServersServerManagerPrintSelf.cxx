@@ -13,7 +13,6 @@
 
 =========================================================================*/
 
-#include "vtkDummyProcessModuleHelper.h"
 #include "vtkInitializationHelper.h"
 #include "vtkPVBatchOptions.h"
 #include "vtkSMAnimationCueManipulatorProxy.h"
@@ -28,11 +27,9 @@
 #include "vtkSMArrayListInformationHelper.h"
 #include "vtkSMArrayRangeDomain.h"
 #include "vtkSMArraySelectionDomain.h"
-#include "vtkSMArraySelectionInformationHelper.h"
 #include "vtkSMBooleanDomain.h"
 #include "vtkSMBooleanKeyFrameProxy.h"
 #include "vtkSMBoundsDomain.h"
-#include "vtkSMBoxProxy.h"
 #include "vtkSMBoxRepresentationProxy.h"
 #include "vtkSMCameraConfigurationReader.h"
 #include "vtkSMCameraConfigurationWriter.h"
@@ -60,7 +57,6 @@
 #include "vtkSMDocumentation.h"
 #include "vtkSMDomain.h"
 #include "vtkSMDomainIterator.h"
-#include "vtkSMDoubleArrayInformationHelper.h"
 #include "vtkSMDoubleRangeDomain.h"
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMEnumerationDomain.h"
@@ -75,16 +71,12 @@
 #include "vtkSMGlobalPropertiesLinkUndoElement.h"
 #include "vtkSMGlobalPropertiesManager.h"
 #include "vtkSMHardwareSelector.h"
-#include "vtkSMIdBasedProxyLocator.h"
-#include "vtkSMIdTypeArrayInformationHelper.h"
 #include "vtkSMIdTypeVectorProperty.h"
 #include "vtkSMImageTextureProxy.h"
-#include "vtkSMImplicitPlaneProxy.h"
 #include "vtkSMImplicitPlaneRepresentationProxy.h"
 #include "vtkSMInformationHelper.h"
 #include "vtkSMInputArrayDomain.h"
 #include "vtkSMInputProperty.h"
-#include "vtkSMIntArrayInformationHelper.h"
 #include "vtkSMInteractionUndoStackBuilder.h"
 #include "vtkSMIntRangeDomain.h"
 #include "vtkSMIntVectorProperty.h"
@@ -97,7 +89,6 @@
 #include "vtkSMNamedPropertyIterator.h"
 #include "vtkSMNetworkImageSourceProxy.h"
 #include "vtkSMNewWidgetRepresentationProxy.h"
-#include "vtkSMNullProxy.h"
 #include "vtkSMNumberOfComponentsDomain.h"
 #include "vtkSMNumberOfGroupsDomain.h"
 #include "vtkSMObject.h"
@@ -142,17 +133,11 @@
 #include "vtkSMScalarBarActorProxy.h"
 #include "vtkSMScalarBarWidgetRepresentationProxy.h"
 #include "vtkSMSelectionHelper.h"
-#include "vtkSMSelectionRepresentationProxy.h"
 #include "vtkSMServerFileListingProxy.h"
 #include "vtkSMServerProxyManagerReviver.h"
 #include "vtkSMServerSideAnimationPlayer.h"
 #include "vtkSMSILDomain.h"
-#include "vtkSMSILInformationHelper.h"
 #include "vtkSMSILModel.h"
-#include "vtkSMSimpleDoubleInformationHelper.h"
-#include "vtkSMSimpleIdTypeInformationHelper.h"
-#include "vtkSMSimpleIntInformationHelper.h"
-#include "vtkSMSimpleStringInformationHelper.h"
 #include "vtkSMSinusoidKeyFrameProxy.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMSpreadSheetRepresentationProxy.h"
@@ -163,21 +148,16 @@
 #include "vtkSMStringListDomain.h"
 #include "vtkSMStringListRangeDomain.h"
 #include "vtkSMStringVectorProperty.h"
-#include "vtkSMSubPropertyIterator.h"
 #include "vtkSMTesting.h"
-#include "vtkSMTextSourceRepresentationProxy.h"
 #include "vtkSMTextWidgetRepresentationProxy.h"
 #include "vtkSMTimeAnimationCueProxy.h"
 #include "vtkSMTimeKeeperProxy.h"
-#include "vtkSMTimeRangeInformationHelper.h"
-#include "vtkSMTimeStepsInformationHelper.h"
 #include "vtkSMTransformProxy.h"
 #include "vtkSMTwoDRenderViewProxy.h"
 #include "vtkSMUndoElement.h"
 #include "vtkSMUndoRedoStateLoader.h"
 #include "vtkSMUndoStackBuilder.h"
 #include "vtkSMUndoStack.h"
-#include "vtkSMUniformGridVolumeRepresentationProxy.h"
 #include "vtkSMUnstructuredGridVolumeRepresentationProxy.h"
 #include "vtkSMUpdateInformationUndoElement.h"
 #include "vtkSMUtilities.h"
@@ -195,7 +175,6 @@
 int main(int , char *[])
 {
   vtkObject *c;
-  PRINT_SELF(vtkDummyProcessModuleHelper);
   PRINT_SELF(vtkInitializationHelper);
   PRINT_SELF(vtkPVBatchOptions);
   PRINT_SELF(vtkSMAnimationCueManipulatorProxy);
@@ -210,11 +189,9 @@ int main(int , char *[])
   PRINT_SELF(vtkSMArrayListInformationHelper);
   PRINT_SELF(vtkSMArrayRangeDomain);
   PRINT_SELF(vtkSMArraySelectionDomain);
-  PRINT_SELF(vtkSMArraySelectionInformationHelper);
   PRINT_SELF(vtkSMBooleanDomain);
   PRINT_SELF(vtkSMBooleanKeyFrameProxy);
   PRINT_SELF(vtkSMBoundsDomain);
-  PRINT_SELF(vtkSMBoxProxy);
   PRINT_SELF(vtkSMBoxRepresentationProxy);
   PRINT_SELF(vtkSMCameraConfigurationReader);
   PRINT_SELF(vtkSMCameraConfigurationWriter);
@@ -242,7 +219,6 @@ int main(int , char *[])
   PRINT_SELF(vtkSMDocumentation);
   PRINT_SELF(vtkSMDomain);
   PRINT_SELF(vtkSMDomainIterator);
-  PRINT_SELF(vtkSMDoubleArrayInformationHelper);
   PRINT_SELF(vtkSMDoubleRangeDomain);
   PRINT_SELF(vtkSMDoubleVectorProperty);
   PRINT_SELF(vtkSMEnumerationDomain);
@@ -257,16 +233,12 @@ int main(int , char *[])
   PRINT_SELF(vtkSMGlobalPropertiesLinkUndoElement);
   PRINT_SELF(vtkSMGlobalPropertiesManager);
   PRINT_SELF(vtkSMHardwareSelector);
-  PRINT_SELF(vtkSMIdBasedProxyLocator);
-  PRINT_SELF(vtkSMIdTypeArrayInformationHelper);
   PRINT_SELF(vtkSMIdTypeVectorProperty);
   PRINT_SELF(vtkSMImageTextureProxy);
-  PRINT_SELF(vtkSMImplicitPlaneProxy);
   PRINT_SELF(vtkSMImplicitPlaneRepresentationProxy);
   PRINT_SELF(vtkSMInformationHelper);
   PRINT_SELF(vtkSMInputArrayDomain);
   PRINT_SELF(vtkSMInputProperty);
-  PRINT_SELF(vtkSMIntArrayInformationHelper);
   PRINT_SELF(vtkSMInteractionUndoStackBuilder);
   PRINT_SELF(vtkSMIntRangeDomain);
   PRINT_SELF(vtkSMIntVectorProperty);
@@ -279,7 +251,6 @@ int main(int , char *[])
   PRINT_SELF(vtkSMNamedPropertyIterator);
   PRINT_SELF(vtkSMNetworkImageSourceProxy);
   PRINT_SELF(vtkSMNewWidgetRepresentationProxy);
-  PRINT_SELF(vtkSMNullProxy);
   PRINT_SELF(vtkSMNumberOfComponentsDomain);
   PRINT_SELF(vtkSMNumberOfGroupsDomain);
   PRINT_SELF(vtkSMObject);
@@ -324,17 +295,11 @@ int main(int , char *[])
   PRINT_SELF(vtkSMScalarBarActorProxy);
   PRINT_SELF(vtkSMScalarBarWidgetRepresentationProxy);
   PRINT_SELF(vtkSMSelectionHelper);
-  PRINT_SELF(vtkSMSelectionRepresentationProxy);
   PRINT_SELF(vtkSMServerFileListingProxy);
   PRINT_SELF(vtkSMServerProxyManagerReviver);
   PRINT_SELF(vtkSMServerSideAnimationPlayer);
   PRINT_SELF(vtkSMSILDomain);
-  PRINT_SELF(vtkSMSILInformationHelper);
   PRINT_SELF(vtkSMSILModel);
-  PRINT_SELF(vtkSMSimpleDoubleInformationHelper);
-  PRINT_SELF(vtkSMSimpleIdTypeInformationHelper);
-  PRINT_SELF(vtkSMSimpleIntInformationHelper);
-  PRINT_SELF(vtkSMSimpleStringInformationHelper);
   PRINT_SELF(vtkSMSinusoidKeyFrameProxy);
   PRINT_SELF(vtkSMSourceProxy);
   PRINT_SELF(vtkSMSpreadSheetRepresentationProxy);
@@ -351,15 +316,12 @@ int main(int , char *[])
   PRINT_SELF(vtkSMTextWidgetRepresentationProxy);
   PRINT_SELF(vtkSMTimeAnimationCueProxy);
   PRINT_SELF(vtkSMTimeKeeperProxy);
-  PRINT_SELF(vtkSMTimeRangeInformationHelper);
-  PRINT_SELF(vtkSMTimeStepsInformationHelper);
   PRINT_SELF(vtkSMTransformProxy);
   PRINT_SELF(vtkSMTwoDRenderViewProxy);
   PRINT_SELF(vtkSMUndoElement);
   PRINT_SELF(vtkSMUndoRedoStateLoader);
   PRINT_SELF(vtkSMUndoStackBuilder);
   PRINT_SELF(vtkSMUndoStack);
-  PRINT_SELF(vtkSMUniformGridVolumeRepresentationProxy);
   PRINT_SELF(vtkSMUnstructuredGridVolumeRepresentationProxy);
   PRINT_SELF(vtkSMUpdateInformationUndoElement);
   PRINT_SELF(vtkSMUtilities);

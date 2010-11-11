@@ -22,7 +22,6 @@
 #include "vtkPVOptions.h"
 #include "vtkPVServerInformation.h"
 #include "vtkPVSession.h"
-#include "vtkRemoteConnection.h"
 #include "vtkRendererCollection.h"
 #include "vtkRenderer.h"
 #include "vtkRenderWindow.h"

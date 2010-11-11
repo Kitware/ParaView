@@ -35,7 +35,6 @@
 #include "vtkCleanPolyData.h"
 
 #include "vtkMultiProcessController.h"
-#include "vtkProcessModule.h"
 #include "vtkReductionFilter.h"
 #include "vtkAppendPolyData.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
@@ -649,7 +648,8 @@ void vtkPlotEdges::Process(vtkPolyData* input,
   ReducePolyData(input, inputPolyData);
 
   vtkMultiProcessController* controller =
-    vtkProcessModule::GetProcessModule()->GetController();
+      vtkMultiProcessController::GetGlobalController();
+
   if (controller->GetLocalProcessId() > 0)
     {
     int number_of_blocks=0;
@@ -681,9 +681,7 @@ void vtkPlotEdges::ReducePolyData(vtkPolyData* polyData, vtkPolyData* output)
   vtkSmartPointer<vtkReductionFilter> md =
     vtkSmartPointer<vtkReductionFilter>::New();
 
-  vtkMultiProcessController* controller =
-    vtkProcessModule::GetProcessModule()->GetController();
-  md->SetController(controller);
+  md->SetController(vtkMultiProcessController::GetGlobalController());
 
   vtkSmartPointer<vtkAppendPolyData> as =
     vtkSmartPointer<vtkAppendPolyData>::New();

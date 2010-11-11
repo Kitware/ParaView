@@ -129,14 +129,12 @@
 #include "vtkPVLinearExtrusionFilter.h"
 #include "vtkPVLODActor.h"
 #include "vtkPVLODVolume.h"
-#include "vtkPVMain.h"
 #include "vtkPVMergeTables.h"
 #include "vtkPVNullSource.h"
 #include "vtkPVRecoverGeometryWireframe.h"
 #include "vtkPVRepresentedDataInformation.h"
 #include "vtkPVScalarBarActor.h"
 #include "vtkPVSelectionSource.h"
-#include "vtkPVServerArraySelection.h"
 #include "vtkPVServerFileListing.h"
 #include "vtkPVServerObject.h"
 #include "vtkPVServerSelectTimeSet.h"
@@ -148,7 +146,6 @@
 #include "vtkPVTrackballRotate.h"
 #include "vtkPVTrackballZoom.h"
 #include "vtkPVUpdateSuppressor.h"
-#include "vtkPVHardwareSelector.h"
 #include "vtkQuerySelectionSource.h"
 #include "vtkRealtimeAnimationPlayer.h"
 #include "vtkRectilinearGridConnectivity.h"
@@ -339,14 +336,12 @@ int main(int , char *[])
   PRINT_SELF(vtkPVLinearExtrusionFilter);
   PRINT_SELF(vtkPVLODActor);
   PRINT_SELF(vtkPVLODVolume);
-  PRINT_SELF(vtkPVMain);
   PRINT_SELF(vtkPVMergeTables);
   PRINT_SELF(vtkPVNullSource);
   PRINT_SELF(vtkPVRecoverGeometryWireframe);
   PRINT_SELF(vtkPVRepresentedDataInformation);
   PRINT_SELF(vtkPVScalarBarActor);
   PRINT_SELF(vtkPVSelectionSource);
-  PRINT_SELF(vtkPVServerArraySelection);
   PRINT_SELF(vtkPVServerFileListing);
   PRINT_SELF(vtkPVServerObject);
   PRINT_SELF(vtkPVServerSelectTimeSet);
@@ -358,7 +353,6 @@ int main(int , char *[])
   PRINT_SELF(vtkPVTrackballRotate);
   PRINT_SELF(vtkPVTrackballZoom);
   PRINT_SELF(vtkPVUpdateSuppressor);
-  PRINT_SELF(vtkPVHardwareSelector);
   PRINT_SELF(vtkQuerySelectionSource);
   PRINT_SELF(vtkRealtimeAnimationPlayer);
   PRINT_SELF(vtkRectilinearGridConnectivity);

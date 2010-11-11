@@ -33,7 +33,7 @@
 
 class vtkSMSourceProxy;
 //BTX
-struct vtkSMDataTypeDomainInternals;
+class vtkSMDataTypeDomainInternals;
 //ETX
 
 class VTK_EXPORT vtkSMDataTypeDomain : public vtkSMDomain
@@ -62,6 +62,7 @@ public:
   // Returns a data type.
   const char* GetDataType(unsigned int idx);
 
+//BTX
 protected:
   vtkSMDataTypeDomain();
   ~vtkSMDataTypeDomain();
@@ -77,9 +78,13 @@ protected:
   vtkSetMacro(CompositeDataSupported, int);
   vtkGetMacro(CompositeDataSupported, int);
 
+  class vtkDataObjectInstanceCache;
+  static vtkDataObjectInstanceCache* DataObjectCache;
+
 private:
   vtkSMDataTypeDomain(const vtkSMDataTypeDomain&); // Not implemented
   void operator=(const vtkSMDataTypeDomain&); // Not implemented
+//ETX
 };
 
 #endif

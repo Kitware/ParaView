@@ -25,7 +25,6 @@
 #include "vtkPVOptions.h"
 #include "vtkPVServerInformation.h"
 #include "vtkPVSession.h"
-#include "vtkRemoteConnection.h"
 #include "vtkRenderer.h"
 #include "vtkSocketController.h"
 

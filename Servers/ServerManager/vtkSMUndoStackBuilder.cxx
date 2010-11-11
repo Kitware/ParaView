@@ -16,7 +16,6 @@
 
 #include "vtkCommand.h"
 #include "vtkObjectFactory.h"
-#include "vtkProcessModuleConnectionManager.h"
 #include "vtkProcessModule.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSMGlobalPropertiesManager.h"

@@ -24,6 +24,7 @@
 
 #include "vtkFileSeriesReader.h"
 
+#include "vtkClientServerInterpreterInitializer.h"
 #include "vtkClientServerInterpreter.h"
 #include "vtkClientServerStream.h"
 #include "vtkGenericDataObjectReader.h"
@@ -462,35 +463,28 @@ int vtkFileSeriesReader::CanReadFile(const char* filename)
 //-----------------------------------------------------------------------------
 int vtkFileSeriesReader::CanReadFile(vtkAlgorithm *reader, const char *filename)
 {
-  vtkClientServerID csId = 
-      vtkProcessModule::GetProcessModule()->GetIDFromObject(reader);
-  if (csId.ID)
+  if(reader)
     {
     int canRead = 1;
-    vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-    // Get the local process interpreter.
-    vtkClientServerInterpreter* interp = pm->GetInterpreter();
+    vtkClientServerInterpreter *interpreter =
+        vtkClientServerInterpreterInitializer::GetInitializer()->NewInterpreter();
+
+    // Build stream request
     vtkClientServerStream stream;
-    // Pass the CanReadFile to the internal reader. Turn off
-    // ReportInterpreterErrors in case the internal reader does
-    // not have a CanReadFile
     stream << vtkClientServerStream::Invoke
-           << pm->GetProcessModuleID() << "SetReportInterpreterErrors" << 0
+           << reader
+           << "CanReadFile"
+           << filename
            << vtkClientServerStream::End;
-    stream << vtkClientServerStream::Invoke
-           << csId << "CanReadFile" << filename
-           << vtkClientServerStream::End;
-    interp->ProcessStream(stream);
-    interp->GetLastResult().GetArgument(0, 0, &canRead);
-    stream.Reset();
-    stream << vtkClientServerStream::Invoke
-           << pm->GetProcessModuleID() << "SetReportInterpreterErrors" << 1
-           << vtkClientServerStream::End;
-    interp->ProcessStream(stream);
+
+    // Process stream and get result
+    interpreter->ProcessStream(stream);
+    interpreter->GetLastResult().GetArgument(0, 0, &canRead);
+    interpreter->Delete();
+
     return canRead;
     }
   return 0;
-
 }
 
 //----------------------------------------------------------------------------
@@ -726,27 +720,28 @@ int vtkFileSeriesReader::RequestInformationForInput(
 //-----------------------------------------------------------------------------
 void vtkFileSeriesReader::SetReaderFileName(const char* fname)
 {
-  if (this->Reader)
+  if (this->Reader && this->FileNameMethod)
     {
-    vtkClientServerID csId = 
-      vtkProcessModule::GetProcessModule()->GetIDFromObject(this->Reader);
-    if (csId.ID && this->FileNameMethod)
-      {
-      // We want to suppress the modification time change in the Reader.  See
-      // vtkFileSeriesReader::GetMTime() for details on how this works.
-      this->SavedReaderModification = this->GetMTime();
+    vtkClientServerInterpreter *interpreter =
+        vtkClientServerInterpreterInitializer::GetInitializer()->NewInterpreter();
 
-      vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-      // Get the local process interpreter.
-      vtkClientServerInterpreter* interp = pm->GetInterpreter();
-      vtkClientServerStream stream;
-      stream << vtkClientServerStream::Invoke
-             << csId << this->FileNameMethod << fname
-             << vtkClientServerStream::End;
-      interp->ProcessStream(stream);
+    // We want to suppress the modification time change in the Reader.  See
+    // vtkFileSeriesReader::GetMTime() for details on how this works.
+    this->SavedReaderModification = this->GetMTime();
 
-      this->HiddenReaderModification = this->Reader->GetMTime();
-      }
+    // Build stream request
+    vtkClientServerStream stream;
+    stream << vtkClientServerStream::Invoke
+           << this->Reader
+           << this->FileNameMethod
+           << fname
+           << vtkClientServerStream::End;
+
+    // Process stream and delete interpreter
+    interpreter->ProcessStream(stream);
+    interpreter->Delete();
+
+    this->HiddenReaderModification = this->Reader->GetMTime();
     }
   this->SetCurrentFileName(fname);
 }

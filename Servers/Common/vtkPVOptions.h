@@ -25,7 +25,6 @@
 #include "vtkCommandOptions.h"
 
 class vtkPVOptionsInternal;
-class vtkSelfConnection;
 
 class VTK_EXPORT vtkPVOptions : public vtkCommandOptions
 {
@@ -128,13 +127,6 @@ public:
   // Description:
   // Should this run print the version numbers and exit.
   vtkGetMacro(TellVersion, int);
-
-  // Description:
-  // Called to create the primary self-connection. If NULL is returned then
-  // vtkProcessModuleConnectionManager will do the default thing.
-  // Makes it possible for new paraview-based
-  // applications to provide new primary connection types.
-  virtual vtkSelfConnection* NewSelfConnection();
 
 protected:
 //BTX

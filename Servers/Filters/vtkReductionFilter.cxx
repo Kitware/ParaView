@@ -28,7 +28,6 @@
 #include "vtkObjectFactory.h"
 #include "vtkPointData.h"
 #include "vtkRectilinearGrid.h"
-#include "vtkRemoteConnection.h"
 #include "vtkSmartPointer.h"
 #include "vtkSocketController.h"
 #include "vtkStreamingDemandDrivenPipeline.h"

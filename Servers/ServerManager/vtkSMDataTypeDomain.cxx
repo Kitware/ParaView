@@ -22,17 +22,80 @@
 #include "vtkSMInputProperty.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkStdString.h"
+#include "vtkInstantiator.h"
 
 #include <vtkstd/vector>
+#include <vtkstd/map>
+#include <vtkstd/string>
+#include <vtkSmartPointer.h>
 
 
-vtkStandardNewMacro(vtkSMDataTypeDomain);
-
+//*****************************************************************************
+// Internal classes
+//*****************************************************************************
 struct vtkSMDataTypeDomainInternals
 {
   vtkstd::vector<vtkStdString> DataTypes;
 };
+//*****************************************************************************
+class vtkSMDataTypeDomain::vtkDataObjectInstanceCache
+{
+private:
+  vtkstd::map<vtkstd::string, vtkSmartPointer<vtkDataObject> > DataObjectMap;
 
+public:
+  // Only instanciate classes once and use cache after...
+  vtkDataObject* GetDataObjectOfType(const char* classname)
+    {
+    if (!classname)
+      {
+      return 0;
+      }
+
+    return NULL;
+
+    // Since we can not instantiate these classes, we'll replace
+    // them with a subclass
+    if (strcmp(classname, "vtkDataSet") == 0)
+      {
+      classname = "vtkImageData";
+      }
+    else if (strcmp(classname, "vtkPointSet") == 0)
+      {
+      classname = "vtkPolyData";
+      }
+    else if (strcmp(classname, "vtkCompositeDataSet") == 0)
+      {
+      classname = "vtkHierarchicalDataSet";
+      }
+
+    vtkstd::map<vtkstd::string, vtkSmartPointer<vtkDataObject> >::iterator it;
+    it = this->DataObjectMap.find(classname);
+    if (it != this->DataObjectMap.end())
+      {
+      return it->second.GetPointer();
+      }
+
+    vtkObject* object = vtkInstantiator::CreateInstance(classname);
+    vtkDataObject* dobj = vtkDataObject::SafeDownCast(object);
+    if (!dobj)
+      {
+      if (object)
+        {
+        object->Delete();
+        }
+      return 0;
+      }
+
+    this->DataObjectMap[classname] = dobj;
+    dobj->Delete();
+    return dobj;
+    }
+};
+//*****************************************************************************
+vtkStandardNewMacro(vtkSMDataTypeDomain);
+vtkSMDataTypeDomain::vtkDataObjectInstanceCache*
+    vtkSMDataTypeDomain::DataObjectCache = new vtkDataObjectInstanceCache();
 //---------------------------------------------------------------------------
 vtkSMDataTypeDomain::vtkSMDataTypeDomain()
 {
@@ -120,16 +183,12 @@ int vtkSMDataTypeDomain::IsInDomain(vtkSMSourceProxy* proxy,
     return 0;
     }
 
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  if (!pm)
-    {
-    return 0;
-    }
-
   // Get an actual instance of the same type as the data represented
   // by the information object. This is later used to check match
-  // with IsA. See the vtkProcessModule for more information.
-  vtkDataObject* dobj =  pm->GetDataObjectOfType(info->GetDataClassName());
+  // with IsA.
+  vtkDataObject* dobj =
+      vtkSMDataTypeDomain::DataObjectCache->GetDataObjectOfType(
+          info->GetDataClassName());
   if (!dobj)
     {
     return 0;
@@ -171,7 +230,8 @@ int vtkSMDataTypeDomain::IsInDomain(vtkSMSourceProxy* proxy,
   if (info->GetCompositeDataClassName())
     {
     vtkDataObject* cDobj =  
-      pm->GetDataObjectOfType(info->GetCompositeDataClassName());
+        vtkSMDataTypeDomain::DataObjectCache->GetDataObjectOfType(
+            info->GetCompositeDataClassName());
     for (unsigned int i=0; i<numTypes; i++)
       {
       if (cDobj->IsA(this->GetDataType(i)))

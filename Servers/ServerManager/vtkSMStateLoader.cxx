@@ -15,7 +15,6 @@
 #include "vtkSMStateLoader.h"
 
 #include "vtkObjectFactory.h"
-#include "vtkProcessModuleConnectionManager.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMCameraLink.h"

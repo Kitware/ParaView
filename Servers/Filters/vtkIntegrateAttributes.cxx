@@ -30,7 +30,6 @@
 #include "vtkPointData.h"
 #include "vtkPointData.h"
 #include "vtkPolygon.h"
-#include "vtkProcessModule.h"
 #include "vtkTriangle.h"
 #include "vtkUnstructuredGrid.h"
 
@@ -441,11 +440,11 @@ int vtkIntegrateAttributes::RequestData(vtkInformation*,
         this->Controller->Receive(msg,
                                   5,
                                   id,
-                                  vtkProcessModule::IntegrateAttrInfo);
+                                  vtkIntegrateAttributes::IntegrateAttrInfo);
         vtkUnstructuredGrid* tmp = vtkUnstructuredGrid::New();
         this->Controller->Receive(tmp,
                                   id,
-                                  vtkProcessModule::IntegrateAttrData);
+                                  vtkIntegrateAttributes::IntegrateAttrData);
         if (this->CompareIntegrationDimension(output, (int)(msg[0])))
           {
           this->Sum += msg[1];
@@ -518,8 +517,8 @@ int vtkIntegrateAttributes::RequestData(vtkInformation*,
     msg[2] = this->SumCenter[0];
     msg[3] = this->SumCenter[1];
     msg[4] = this->SumCenter[2];
-    this->Controller->Send(msg, 5, 0, vtkProcessModule::IntegrateAttrInfo);
-    this->Controller->Send(output, 0, vtkProcessModule::IntegrateAttrData);
+    this->Controller->Send(msg, 5, 0, vtkIntegrateAttributes::IntegrateAttrInfo);
+    this->Controller->Send(output, 0, vtkIntegrateAttributes::IntegrateAttrData);
     // Done sending.  Reset output so satellites will have empty data.
     output->Initialize();
     }

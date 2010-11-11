@@ -16,10 +16,8 @@
 
 #include "vtkCommand.h"
 #include "vtkObjectFactory.h"
-#include "vtkProcessModuleConnectionManager.h"
 #include "vtkProcessModule.h"
 #include "vtkPVXMLElement.h"
-#include "vtkSMIdBasedProxyLocator.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMUndoRedoStateLoader.h"
 #include "vtkUndoSet.h"

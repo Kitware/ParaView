@@ -28,7 +28,6 @@
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
 #include "vtkPolyData.h"
-#include "vtkProcessModule.h"
 #include "vtkUniformGrid.h"
 
 vtkStandardNewMacro(vtkPVGlyphFilter);
@@ -133,22 +132,22 @@ vtkIdType vtkPVGlyphFilter::GatherTotalNumberOfPoints(vtkIdType localNumPts)
       // Sum points on all processes.
       for (i = 1; i < controller->GetNumberOfProcesses(); ++i)
         {
-        controller->Receive(&tmp, 1, i, vtkProcessModule::GlyphNPointsGather);
+        controller->Receive(&tmp, 1, i, vtkPVGlyphFilter::GlyphNPointsGather);
         totalNumPts += tmp;
         }
       // Send results back to all processes.
       for (i = 1; i < controller->GetNumberOfProcesses(); ++i)
         {
         controller->Send(&totalNumPts, 1, 
-                         i, vtkProcessModule::GlyphNPointsScatter);
+                         i, vtkPVGlyphFilter::GlyphNPointsScatter);
         }
       }
     else
       {
       controller->Send(&localNumPts, 1, 
-                       0, vtkProcessModule::GlyphNPointsGather);
+                       0, vtkPVGlyphFilter::GlyphNPointsGather);
       controller->Receive(&totalNumPts, 1, 
-                          0, vtkProcessModule::GlyphNPointsScatter);
+                          0, vtkPVGlyphFilter::GlyphNPointsScatter);
       }
     }
 

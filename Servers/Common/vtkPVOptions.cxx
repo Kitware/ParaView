@@ -382,13 +382,6 @@ int vtkPVOptions::DeprecatedArgument(const char* argument)
 }
 
 //----------------------------------------------------------------------------
-vtkSelfConnection* vtkPVOptions::NewSelfConnection()
-{
-  // Let vtkProcessModuleConnectionManager do the default thing.
-  return NULL;
-}
-
-//----------------------------------------------------------------------------
 void vtkPVOptions::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);

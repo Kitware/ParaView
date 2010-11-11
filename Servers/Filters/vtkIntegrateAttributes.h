@@ -140,6 +140,12 @@ private:
                       double k,
                       vtkFieldList& fieldlist,
                       int fieldlist_index);
+public:
+  enum CommunicationIds
+   {
+     IntegrateAttrInfo=2000,
+     IntegrateAttrData
+   };
 //ETX
 };
 
