@@ -84,7 +84,7 @@ protected slots:
   void onSelectionTypeChanged(const QString&);
 
   /// Called when the SelectionManager is changed.
-  void onSelectionManagerChanged(pqOutputPort* opport);
+  void onSelectionManagerChanged(pqOutputPort* opport,bool froaceGlobalIds);
 
   /// Called when "Field Type" combo-box changes. This updates the enabled state
   /// of the "Containing Cells" combo-box, since that combo-box only makes sense
@@ -191,6 +191,7 @@ protected:
   /// Returns true if the port has GlobalIDs
   bool hasGlobalIDs(pqOutputPort*);
 
+  void selectGlobalIdsIfPossible(pqOutputPort* opport, bool forceGlobalIds, bool createNew);
   void setGlobalIDs();
 private:
   struct pqImplementation;

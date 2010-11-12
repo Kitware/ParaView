@@ -70,7 +70,7 @@ pqSelectionInputWidget::pqSelectionInputWidget(QWidget* _parent)
 
   if (selMan)
     {
-    QObject::connect(selMan, SIGNAL(selectionChanged(pqOutputPort*)),
+    QObject::connect(selMan, SIGNAL(selectionChanged(pqOutputPort*,bool)),
                      this, SLOT(onActiveSelectionChanged()));
     }
 

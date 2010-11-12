@@ -432,8 +432,8 @@ void pqSelectionInspectorPanel::setSelectionManager(pqSelectionManager* mgr)
   if (mgr)
     {
     QObject::connect(
-      mgr, SIGNAL(selectionChanged(pqOutputPort*)),
-      this, SLOT(onSelectionManagerChanged(pqOutputPort*)));
+      mgr, SIGNAL(selectionChanged(pqOutputPort*,bool)),
+      this, SLOT(onSelectionManagerChanged(pqOutputPort*,bool)));
     }
 }
 
@@ -448,13 +448,6 @@ void pqSelectionInspectorPanel::select(pqOutputPort* opport, bool createNew)
 
   this->Implementation->InputPort = opport;
   this->updateSelectionTypesAvailable();
-
-  bool hasGIDs = this->hasGlobalIDs(opport);
-  if (createNew && hasGIDs)
-    {
-    this->Implementation->comboSelectionType->setCurrentIndex(
-      pqImplementation::GLOBALIDS);
-    }
 
   QString selectedObjectLabel = "<b>[none]</b>";
   if (opport)
@@ -506,15 +499,6 @@ void pqSelectionInspectorPanel::select(pqOutputPort* opport, bool createNew)
   this->updateThreholdDataArrays();
 
   this->Implementation->UpdatingGUI = false;
-
-  if ( opport && hasGIDs && opport->getSelectionInput() &&
-       opport->getSelectionInput()->GetXMLName() ==
-       QString("CompositeDataIDSelectionSource"))
-       {
-       this->Implementation->comboSelectionType->setCurrentIndex(
-         pqImplementation::GLOBALIDS);
-       return;
-       }
 
   if (createNew)
     {
@@ -1421,9 +1405,10 @@ void pqSelectionInspectorPanel::onSelectionTypeChanged(const QString&)
 }
 
 //-----------------------------------------------------------------------------
-void pqSelectionInspectorPanel::onSelectionManagerChanged(pqOutputPort* opport)
+void pqSelectionInspectorPanel::onSelectionManagerChanged(
+  pqOutputPort* opport, bool forceGlobalIds)
 {
-  this->select(opport, false);
+  this->selectGlobalIdsIfPossible(opport,forceGlobalIds,false);
 }
 
 //-----------------------------------------------------------------------------
@@ -1443,8 +1428,29 @@ void pqSelectionInspectorPanel::createSelectionForCurrentObject()
     this->Implementation->InputPort->setSelectionInput(0, 0);
     }
 
-  this->select(port, true);
+  this->selectGlobalIdsIfPossible(port,true,true);
   port->renderAllViews();
+}
+
+//-----------------------------------------------------------------------------
+void pqSelectionInspectorPanel::selectGlobalIdsIfPossible(
+  pqOutputPort* opport, bool forceGlobalIds, bool createNew)
+{
+  if (forceGlobalIds && this->hasGlobalIDs(opport))
+    {
+    this->Implementation->InputPort = opport;
+    this->updateSelectionTypesAvailable();
+    this->setGlobalIDs();
+    if ( createNew )
+      {
+      this->select(opport, createNew);
+      }
+    }
+  else
+    {
+    this->select(opport, createNew);
+    }
+
 }
 
 //-----------------------------------------------------------------------------
