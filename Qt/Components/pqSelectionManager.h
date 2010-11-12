@@ -94,8 +94,7 @@ public:
 signals:
   /// Fired when the selection changes. Argument is the pqOutputPort (if any)
   /// that was selected. If selection was cleared then the argument is NULL.
-  /// Second argument is to force to gloabal id is on or off
-  void selectionChanged(pqOutputPort*,bool);
+  void selectionChanged(pqOutputPort*);
 
 public slots:
   /// Clear all selections. Note that this does not clear
@@ -107,10 +106,6 @@ public slots:
 
   /// Updates the selected port.
   void select(pqOutputPort*);
-
-  /// Updates the selected port to global ids if possible
-  /// otherwise uses the past in selection type
-  void selectGlobalIdsIfPossible(pqOutputPort*);
 
 private slots:
   /// Called when server manager item is being deleted.

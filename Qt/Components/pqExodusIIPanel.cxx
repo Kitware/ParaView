@@ -184,9 +184,8 @@ pqExodusIIPanel::pqExodusIIPanel(pqProxy* object_proxy, QWidget* p) :
     pqApplicationCore::instance()->manager("SelectionManager"));
   if (selMan)
     {
-    bool valid =QObject::connect(selMan, SIGNAL(selectionChanged(pqOutputPort*,bool)),
+    bool valid =QObject::connect(selMan, SIGNAL(selectionChanged(pqOutputPort*)),
       this, SLOT(onSelectionChanged(pqOutputPort*)));
-    int x = 1;
     }
   QObject::connect(this->UI->checkSelected, SIGNAL(pressed()),
     this, SLOT(setSelectedBlocksCheckState()), Qt::QueuedConnection);

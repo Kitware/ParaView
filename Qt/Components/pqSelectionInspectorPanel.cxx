@@ -432,8 +432,8 @@ void pqSelectionInspectorPanel::setSelectionManager(pqSelectionManager* mgr)
   if (mgr)
     {
     QObject::connect(
-      mgr, SIGNAL(selectionChanged(pqOutputPort*,bool)),
-      this, SLOT(onSelectionManagerChanged(pqOutputPort*,bool)));
+      mgr, SIGNAL(selectionChanged(pqOutputPort*)),
+      this, SLOT(onSelectionManagerChanged(pqOutputPort*)));
     }
 }
 
@@ -1403,10 +1403,9 @@ void pqSelectionInspectorPanel::onSelectionTypeChanged(const QString&)
 }
 
 //-----------------------------------------------------------------------------
-void pqSelectionInspectorPanel::onSelectionManagerChanged(
-  pqOutputPort* opport, bool forceGlobalIds)
+void pqSelectionInspectorPanel::onSelectionManagerChanged(pqOutputPort* opport)
 {
-  this->selectGlobalIdsIfPossible(opport,forceGlobalIds,false);
+  this->selectGlobalIdsIfPossible(opport,false,false);
 }
 
 //-----------------------------------------------------------------------------
