@@ -152,7 +152,7 @@ void pqSelectionManager::setActiveView(pqView* view)
   if (view)
     {
     QObject::connect(view, SIGNAL(selected(pqOutputPort*)), 
-      this, SLOT(select(pqOutputPort*)));
+      this, SLOT(selectGlobalIdsIfPossible(pqOutputPort*)));
     }
 }
 
@@ -181,7 +181,7 @@ void pqSelectionManager::clearSelection()
     this->Implementation->SelectedPort = 0;
     }
 
-  emit this->selectionChanged(static_cast<pqOutputPort*>(0));
+  emit this->selectionChanged(static_cast<pqOutputPort*>(0),false);
 }
 
 //-----------------------------------------------------------------------------
@@ -192,6 +192,18 @@ pqOutputPort* pqSelectionManager::getSelectedPort() const
 
 //-----------------------------------------------------------------------------
 void pqSelectionManager::select(pqOutputPort* selectedPort)
+{
+  this->onSelect(selectedPort,false);
+}
+
+//-----------------------------------------------------------------------------
+void pqSelectionManager::selectGlobalIdsIfPossible(pqOutputPort* selectedPort)
+{
+  this->onSelect(selectedPort,true);
+}
+//-----------------------------------------------------------------------------
+void pqSelectionManager::onSelect(
+                              pqOutputPort* selectedPort, bool forceGlobalIds)
 {
   // The active view is reporting that it made a selection, we update our state.
   if (this->Implementation->SelectedPort != selectedPort)
@@ -216,7 +228,7 @@ void pqSelectionManager::select(pqOutputPort* selectedPort)
       pqServerManagerSelectionModel::ClearAndSelect);
     }
 
-  emit this->selectionChanged(selectedPort);
+  emit this->selectionChanged(selectedPort,forceGlobalIds);
 }
 
 //-----------------------------------------------------------------------------
