@@ -84,7 +84,7 @@ protected slots:
   void onSelectionTypeChanged(const QString&);
 
   /// Called when the SelectionManager is changed.
-  void onSelectionManagerChanged(pqOutputPort* opport,bool froaceGlobalIds);
+  void onSelectionManagerChanged(pqOutputPort* opport);
 
   /// Called when "Field Type" combo-box changes. This updates the enabled state
   /// of the "Containing Cells" combo-box, since that combo-box only makes sense
