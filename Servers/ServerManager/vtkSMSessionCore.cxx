@@ -14,28 +14,35 @@
 =========================================================================*/
 #include "vtkSMSessionCore.h"
 
-#include "vtkSMSession.h"
 #include "vtkClientServerID.h"
 #include "vtkClientServerInterpreter.h"
 #include "vtkClientServerInterpreterInitializer.h"
 #include "vtkClientServerStream.h"
+#include "vtkCollection.h"
 #include "vtkInstantiator.h"
 #include "vtkMemberFunctionCommand.h"
 #include "vtkMultiProcessController.h"
 #include "vtkMultiProcessStream.h"
 #include "vtkObjectFactory.h"
 #include "vtkPMProxy.h"
-#include "vtkProcessModule.h"
 #include "vtkPVInformation.h"
-#include "vtkSmartPointer.h"
+#include "vtkPVOptions.h"
+#include "vtkProcessModule.h"
 #include "vtkSMProxyDefinitionManager.h"
 #include "vtkSMRemoteObject.h"
-#include "vtkCollection.h"
+#include "vtkSMSession.h"
+#include "vtkSmartPointer.h"
 
-#include <vtksys/ios/sstream>
-#include <vtkstd/string>
 #include "assert.h"
 #include <fstream>
+#include <vtkstd/string>
+#include <vtksys/ios/sstream>
+
+#define LOG(x)\
+  if (this->LogStream)\
+    {\
+    (*this->LogStream) << "" x << endl;\
+    }
 
 namespace
 {
@@ -228,11 +235,33 @@ vtkSMSessionCore::vtkSMSessionCore()
     this->ParallelController->AddRMI(&RMICallback, this,
       ROOT_SATELLITE_RMI_TAG);
     }
+
+  this->LogStream = NULL;
+  // Initialize logging, if enabled.
+  vtkPVOptions* options = vtkProcessModule::GetProcessModule()->GetOptions();
+  if (options->GetLogFileName())
+    {
+    vtksys_ios::ostringstream filename;
+    filename  << options->GetLogFileName();
+    if (this->ParallelController->GetNumberOfProcesses() > 1)
+      {
+      filename << this->ParallelController->GetLocalProcessId();
+      }
+    this->LogStream = new ofstream(filename.str().c_str());
+    LOG("Log for " << options->GetArgv0() << " ("
+      << this->ParallelController->GetLocalProcessId() << ")");
+    }
 }
 
 //----------------------------------------------------------------------------
 vtkSMSessionCore::~vtkSMSessionCore()
 {
+  LOG("Closing session");
+  if (this->LogStream)
+    {
+    // this->LogStream->close();
+    delete this->LogStream;
+    }
   this->Interpreter->Delete();
   this->Interpreter = 0;
   if (this->ParallelController &&
@@ -291,6 +320,12 @@ vtkSMRemoteObject* vtkSMSessionCore::GetRemoteObject(vtkTypeUInt32 globalid)
 //----------------------------------------------------------------------------
 void vtkSMSessionCore::PushStateInternal(vtkSMMessage* message)
 {
+  LOG(
+    << "----------------------------------------------------------------\n"
+    << "Push State ( " << message->ByteSize() << " bytes )\n"
+    << "----------------------------------------------------------------\n"
+    << message->DebugString().c_str());
+
   vtkTypeUInt32 globalId = message->global_id();
 
   // FIXME handle this part as well for collaboration
@@ -331,6 +366,10 @@ void vtkSMSessionCore::PushStateInternal(vtkSMMessage* message)
     obj->SetGlobalID(globalId);
     obj->Initialize(this);
     this->Internals->PMObjectMap[globalId] = obj;
+
+    LOG (
+      << "----------------------------------------------------------------\n"
+      << "New " << globalId << " : " << obj->GetClassName() <<"\n");
     }
 
   // Push the message to the PMObject.
@@ -412,9 +451,17 @@ void vtkSMSessionCore::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os, indent);
   this->Internals->PrintRemoteMap();
 }
+
 //----------------------------------------------------------------------------
 void vtkSMSessionCore::PullState(vtkSMMessage* message)
 {
+  LOG(
+    << "----------------------------------------------------------------\n"
+    << "Pull State ( " << message->ByteSize() << " bytes )\n"
+    << "----------------------------------------------------------------\n"
+    << message->DebugString().c_str());
+
+
   // Log the communication if needed
   if(vtkSMSessionCore::WriteDebugLog)
     {
@@ -427,6 +474,12 @@ void vtkSMSessionCore::PullState(vtkSMMessage* message)
     {
     obj->Pull(message);
     }
+
+  LOG(
+    << "----------------------------------------------------------------\n"
+    << "Pull State Reply ( " << message->ByteSize() << " bytes )\n"
+    << "----------------------------------------------------------------\n"
+    << message->DebugString().c_str());
 }
 
 //----------------------------------------------------------------------------
@@ -495,6 +548,12 @@ void vtkSMSessionCore::InvokeSatelliteCallback()
 //----------------------------------------------------------------------------
 void vtkSMSessionCore::InvokeInternal(vtkSMMessage* message)
 {
+  LOG(
+    << "----------------------------------------------------------------\n"
+    << "Invoke ( " << message->ByteSize() << " bytes )\n"
+    << "----------------------------------------------------------------\n"
+    << message->DebugString().c_str());
+
   vtkPMObject* obj = this->Internals->GetPMObject(message->global_id());
   if (obj)
     {
@@ -510,6 +569,11 @@ void vtkSMSessionCore::InvokeInternal(vtkSMMessage* message)
 //----------------------------------------------------------------------------
 void vtkSMSessionCore::DeletePMObject(vtkSMMessage* message)
 {
+  LOG(
+    << "----------------------------------------------------------------\n"
+    << "Delete ( " << message->ByteSize() << " bytes )\n"
+    << "----------------------------------------------------------------\n"
+    << message->DebugString().c_str());
   this->Internals->Delete(message->global_id());
 }
 

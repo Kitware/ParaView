@@ -150,6 +150,8 @@ private:
   vtkInternals* Internals;
 
   static bool WriteDebugLog;
+
+  ostream *LogStream;
 //ETX
 };
 
