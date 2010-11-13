@@ -406,9 +406,14 @@ void pqRubberBandHelper::onSelectionChanged(vtkObject*, unsigned long,
     if (region[0] == region[2] && region[1] == region[3])
       {
       pqDataRepresentation* picked = this->Internal->RenderView->pick(region);
-      pqApplicationCore::instance()->getSelectionModel()->setCurrentItem(
-        picked? picked->getOutputPortFromInput(): NULL,
-        pqServerManagerSelectionModel::ClearAndSelect);
+      // in pick-on-click, we don't change the current item when user clicked on
+      // a blank area. BUG #11428.
+      if (picked)
+        {
+        pqApplicationCore::instance()->getSelectionModel()->setCurrentItem(
+          picked->getOutputPortFromInput(),
+          pqServerManagerSelectionModel::ClearAndSelect);
+        }
       }
     break;
     }
