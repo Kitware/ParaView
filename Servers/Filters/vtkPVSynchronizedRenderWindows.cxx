@@ -1450,6 +1450,51 @@ bool vtkPVSynchronizedRenderWindows::BroadcastToDataServer(vtkSelection* selecti
 }
 
 //----------------------------------------------------------------------------
+bool vtkPVSynchronizedRenderWindows::BroadcastToRenderServer(
+  vtkDataObject* dataObject)
+{
+  // handle trivial case.
+  if (this->Mode == BUILTIN || this->Mode == INVALID)
+    {
+    return true;
+    }
+
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  if (pm->GetOptions()->GetProcessType() == vtkPVOptions::PVDATA_SERVER)
+    {
+    return false;
+    }
+
+  vtkMultiProcessController* parallelController =
+    this->GetParallelController();
+  vtkMultiProcessController* c_rs_controller =
+    this->GetClientServerController();
+
+  if (this->Mode == BATCH &&
+    parallelController->GetNumberOfProcesses() <= 1)
+    {
+    return true;
+    }
+
+  if (this->Mode == CLIENT && c_rs_controller)
+    {
+    c_rs_controller->Send(dataObject, 1, 41234);
+    return true;
+    }
+  else if (c_rs_controller)
+    {
+    c_rs_controller->Receive(dataObject, 1, 41234);
+    }
+
+  if (parallelController && parallelController->GetNumberOfProcesses() > 1)
+    {
+    parallelController->Broadcast(dataObject, 0);
+    }
+
+  return true;
+}
+
+//----------------------------------------------------------------------------
 void vtkPVSynchronizedRenderWindows::TriggerRMI(
   vtkMultiProcessStream& stream, int tag)
 {

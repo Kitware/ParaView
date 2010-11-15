@@ -69,6 +69,9 @@ protected:
   // Actual rendering implementation.
   virtual void Render(bool interactive);
 
+  void SendImageToRenderServers();
+  void ReceiveImageToFromClient();
+
   vtkContextView* ContextView;
   vtkRenderWindow* RenderWindow;
 

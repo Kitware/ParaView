@@ -25,6 +25,7 @@
 #include "vtkRenderState.h"
 #include "vtkRenderWindow.h"
 #include "vtkSmartPointer.h"
+#include "vtkTileDisplayHelper.h"
 #include "vtkTilesHelper.h"
 #include "vtkTimerLog.h"
 
@@ -186,77 +187,6 @@ protected:
     }
   };
   vtkStandardNewMacro(vtkPVIceTCompositePass);
-
-  // We didn't want to have a singleton for vtkIceTSynchronizedRenderers to
-  // manage multi-view configurations. But, in tile-display mode, after each
-  // view is rendered, the tiles end up with the residue of that rendered view
-  // on all tiles. Which is not what is expected -- one would expect the views
-  // that are present on those tiles to be drawn back. That becomes tricky
-  // without a singleton. So we have a internal map that tracks all rendered
-  // tiles.
-  class vtkTile
-    {
-  public:
-    vtkSynchronizedRenderers::vtkRawImage TileImage;
-
-    // PhysicalViewport is the viewport where the TileImage maps into the tile
-    // rendered by this processes i.e. the render window for this process.
-    double PhysicalViewport[4];
-
-    // GlobalViewport is the viewport for this image treating all tiles as a
-    // single large display.
-    double GlobalViewport[4];
-    };
-
-  typedef vtkstd::map<vtkIceTSynchronizedRenderers*, vtkTile> TilesMapType;
-  static TilesMapType TilesMap;
-
-  void FlushTile(vtkRenderer* renderer, const TilesMapType::iterator& iter)
-    {
-    if (iter != TilesMap.end())
-      {
-      vtkTile& tile = iter->second;
-      if (tile.TileImage.IsValid())
-        {
-        double viewport[4];
-        renderer->GetViewport(viewport);
-        renderer->SetViewport(tile.PhysicalViewport);
-        int tile_scale[2];
-        renderer->GetVTKWindow()->GetTileScale(tile_scale);
-        renderer->GetVTKWindow()->SetTileScale(1, 1);
-        tile.TileImage.PushToViewport(renderer);
-        renderer->GetVTKWindow()->SetTileScale(tile_scale);
-        renderer->SetViewport(viewport);
-        }
-      }
-    }
-
-  // Iterates over all valid tiles in the TilesMap and flush the images to the
-  // screen.
-  void FlushTiles(vtkRenderer* renderer, vtkIceTSynchronizedRenderers* current)
-    {
-    for (TilesMapType::iterator iter = TilesMap.begin();
-      iter != TilesMap.end(); ++iter)
-      {
-      if (iter->first != current)
-        {
-        FlushTile(renderer, iter);
-        }
-      }
-    // Render the current tile last, this is done in case where user has
-    // overlapping views. This ensures that active view is always rendered on
-    // top.
-    FlushTile(renderer, TilesMap.find(current));
-    }
-
-  void EraseTile(vtkIceTSynchronizedRenderers* ptr)
-    {
-    TilesMapType::iterator iter = TilesMap.find(ptr);
-    if (iter != TilesMap.end())
-      {
-      TilesMap.erase(iter);
-      }
-    }
 };
 
 vtkStandardNewMacro(vtkIceTSynchronizedRenderers);
@@ -284,7 +214,7 @@ vtkIceTSynchronizedRenderers::vtkIceTSynchronizedRenderers()
 //----------------------------------------------------------------------------
 vtkIceTSynchronizedRenderers::~vtkIceTSynchronizedRenderers()
 {
-  EraseTile(this);
+  vtkTileDisplayHelper::GetInstance()->EraseTile(this);
 
   this->ImagePastingPass->Delete();
   this->IceTCompositePass->Delete();
@@ -359,14 +289,16 @@ void vtkIceTSynchronizedRenderers::HandleEndRender()
       this->CaptureRenderedImage();
     if (lastRenderedImage.IsValid())
       {
-      vtkTile& tile = TilesMap[this];
-      tile.TileImage = lastRenderedImage;
-      this->IceTCompositePass->GetPhysicalViewport(tile.PhysicalViewport);
+      double viewport[4];
+      this->IceTCompositePass->GetPhysicalViewport(viewport);
+      vtkTileDisplayHelper::GetInstance()->SetTile(this,
+        viewport, this->Renderer,
+        lastRenderedImage);
       }
 
     // Write-back either the freshly rendered tile or what was most recently
     // rendered.
-    ::FlushTiles(this->Renderer, this);
+    vtkTileDisplayHelper::GetInstance()->FlushTiles(this);
     }
 }
 

@@ -15,11 +15,19 @@
 #include "vtkPVContextView.h"
 
 #include "vtkContextView.h"
+#include "vtkImageData.h"
 #include "vtkInformation.h"
 #include "vtkObjectFactory.h"
+#include "vtkPointData.h"
+#include "vtkProcessModule.h"
+#include "vtkPVOptions.h"
 #include "vtkPVSynchronizedRenderWindows.h"
-#include "vtkTimerLog.h"
+#include "vtkRenderer.h"
 #include "vtkRenderWindow.h"
+#include "vtkTileDisplayHelper.h"
+#include "vtkTimerLog.h"
+#include "vtkUnsignedCharArray.h"
+#include "vtkWindowToImageFilter.h"
 
 //----------------------------------------------------------------------------
 vtkPVContextView::vtkPVContextView()
@@ -32,6 +40,8 @@ vtkPVContextView::vtkPVContextView()
 //----------------------------------------------------------------------------
 vtkPVContextView::~vtkPVContextView()
 {
+  vtkTileDisplayHelper::GetInstance()->EraseTile(this);
+
   this->RenderWindow->Delete();
   this->ContextView->Delete();
 }
@@ -40,6 +50,7 @@ vtkPVContextView::~vtkPVContextView()
 void vtkPVContextView::Initialize(unsigned int id)
 {
   this->SynchronizedWindows->AddRenderWindow(id, this->RenderWindow);
+  this->SynchronizedWindows->AddRenderer(id, this->ContextView->GetRenderer());
   this->Superclass::Initialize(id);
 }
 
@@ -80,7 +91,45 @@ void vtkPVContextView::Render(bool interactive)
     {
     this->ContextView->Render();
     //this->GetRenderWindow()->Render();
+    if (this->InTileDisplayMode())
+      {
+      this->SendImageToRenderServers();
+      }
     }
+  else if (this->InTileDisplayMode())
+    {
+    this->ReceiveImageToFromClient();
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVContextView::SendImageToRenderServers()
+{
+  vtkWindowToImageFilter* w2i = vtkWindowToImageFilter::New();
+  w2i->SetInput(this->GetRenderWindow());
+  w2i->SetMagnification(/*FIXME:magnification*/ 1 );
+  w2i->ReadFrontBufferOff();
+  w2i->ShouldRerenderOff();
+  w2i->Update();
+
+  this->SynchronizedWindows->BroadcastToRenderServer(w2i->GetOutput());
+}
+
+//----------------------------------------------------------------------------
+void vtkPVContextView::ReceiveImageToFromClient()
+{
+  vtkImageData* image = vtkImageData::New();
+  this->SynchronizedWindows->BroadcastToRenderServer(image);
+
+  vtkSynchronizedRenderers::vtkRawImage tile;
+  tile.Initialize(image->GetDimensions()[0],
+    image->GetDimensions()[1],
+    vtkUnsignedCharArray::SafeDownCast(image->GetPointData()->GetScalars()));
+  double viewport[4];
+  this->ContextView->GetRenderer()->GetViewport(viewport);
+  vtkTileDisplayHelper::GetInstance()->SetTile(this,
+    viewport,
+    this->ContextView->GetRenderer(), tile);
 }
 
 //----------------------------------------------------------------------------

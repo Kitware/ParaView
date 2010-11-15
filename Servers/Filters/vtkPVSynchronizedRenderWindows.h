@@ -32,10 +32,11 @@
 #include "vtkObject.h"
 #include "vtkMultiProcessController.h" // for vtkRMIFunctionType
 
-class vtkRenderWindow;
-class vtkRenderer;
+class vtkDataObject;
 class vtkMultiProcessController;
 class vtkMultiProcessStream;
+class vtkRenderer;
+class vtkRenderWindow;
 class vtkSelection;
 
 class VTK_EXPORT vtkPVSynchronizedRenderWindows : public vtkObject
@@ -109,6 +110,7 @@ public:
   bool SynchronizeSize(double &size);
   bool SynchronizeSize(unsigned int &size);
   bool BroadcastToDataServer(vtkSelection* selection);
+  bool BroadcastToRenderServer(vtkDataObject*);
 
   // Description:
   // Convenience method to trigger an RMI call from the client/root node.
