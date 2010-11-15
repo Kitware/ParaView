@@ -157,6 +157,16 @@ bool pqCheckableHeaderView::eventFilter(QObject *, QEvent *e)
   return false;
 }
 
+//void pqCheckableHeaderView::mousePressEvent(QMouseEvent *event)
+//{
+//  /*if (isOn)
+//    isOn = false;
+//  else
+//    isOn = true;*/
+//  this->update();
+//  QHeaderView::mousePressEvent(event);
+//}
+
 void pqCheckableHeaderView::setModel(QAbstractItemModel *newModel)
 {
   QAbstractItemModel *current = this->model();

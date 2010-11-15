@@ -43,6 +43,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // ParaView Includes.
 #include "pqSILModel.h"
 
+#define PQ_INVALID_INDEX -1947
+
 //-----------------------------------------------------------------------------
 pqProxySILModel::pqProxySILModel(const QString& hierarchyName, QObject* _parent):
   Superclass(_parent)
@@ -99,7 +101,11 @@ QModelIndex pqProxySILModel::mapFromSource(const QModelIndex& sourceIndex) const
 QModelIndex pqProxySILModel::mapToSource(const QModelIndex& proxyIndex) const
 {
   pqSILModel* silModel = qobject_cast<pqSILModel*>(this->sourceModel());
-  if (proxyIndex.isValid())
+  if (!silModel)
+    {
+    return this->createIndex(PQ_INVALID_INDEX, PQ_INVALID_INDEX, static_cast<quint32>(0));
+    }
+  else if (proxyIndex.isValid())
     {
     return silModel->makeIndex(static_cast<vtkIdType>(proxyIndex.internalId()));
     }
