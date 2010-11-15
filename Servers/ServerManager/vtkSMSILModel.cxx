@@ -201,19 +201,22 @@ int vtkSMSILModel::GetNumberOfChildren(vtkIdType vertexId)
   // count children edges (skipping cross edges).
   
   int count = 0;
-  vtkOutEdgeIterator* iter = vtkOutEdgeIterator::New();
-  this->SIL->GetOutEdges(vertexId, iter);
-  vtkDataArray* crossEdgesArray = vtkDataArray::SafeDownCast(
-    this->SIL->GetEdgeData()->GetAbstractArray("CrossEdges"));
-  while (iter->HasNext())
+  if(this->SIL)
     {
-    vtkOutEdgeType edge = iter->Next();
-    if (crossEdgesArray->GetTuple1(edge.Id) == 0)
+    vtkOutEdgeIterator* iter = vtkOutEdgeIterator::New();
+    this->SIL->GetOutEdges(vertexId, iter);
+    vtkDataArray* crossEdgesArray = vtkDataArray::SafeDownCast(
+      this->SIL->GetEdgeData()->GetAbstractArray("CrossEdges"));
+    while (iter->HasNext())
       {
-      count++; 
+      vtkOutEdgeType edge = iter->Next();
+      if (crossEdgesArray->GetTuple1(edge.Id) == 0)
+        {
+        count++;
+        }
       }
+    iter->Delete();
     }
-  iter->Delete();
   return count;
 }
 

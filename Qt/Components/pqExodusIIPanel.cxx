@@ -46,6 +46,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QVector>
 
 // VTK includes
+#include "QFilterTreeProxyModel.h"
 
 // ParaView Server Manager includes
 #include "vtkEventQtSlotConnect.h"
@@ -137,12 +138,20 @@ pqExodusIIPanel::pqExodusIIPanel(pqProxy* object_proxy, QWidget* p) :
     this->referenceProxy()->getProxy(),
     vtkCommand::UpdateInformationEvent,
     this, SLOT(updateSIL()));
-  
+
   pqProxySILModel* proxyModel = new pqProxySILModel("Blocks", &this->UI->SILModel);
   proxyModel->setSourceModel(&this->UI->SILModel);
-  this->UI->Blocks->setModel(proxyModel);
+
+  // filterProxyModel performs sorting.
+  QFilterTreeProxyModel* filterProxyModel = new QFilterTreeProxyModel();
+  filterProxyModel->setSourceModel(proxyModel);
+
+  this->UI->Blocks->setModel(filterProxyModel);
   this->UI->Blocks->header()->setClickable(true);
-  QObject::connect(this->UI->Blocks->header(), SIGNAL(sectionClicked(int)),
+  this->UI->Blocks->header()->setSortIndicator(0, Qt::AscendingOrder);
+  this->UI->Blocks->header()->setSortIndicatorShown(true);
+  this->UI->Blocks->setSortingEnabled(true);
+  QObject::connect(this->UI->Blocks->header(), SIGNAL(checkStateChanged()),
     proxyModel, SLOT(toggleRootCheckState()), Qt::QueuedConnection);
 
   proxyModel = new pqProxySILModel("Assemblies", &this->UI->SILModel);
@@ -294,8 +303,10 @@ void pqExodusIIPanel::addSelectionToTreeWidget(const QString& name,
 void pqExodusIIPanel::linkServerManagerProperties()
 {
 
+  QFilterTreeProxyModel * filter =
+    qobject_cast<QFilterTreeProxyModel *>(this->UI->Blocks->model());
   this->propertyManager()->registerLink(
-    this->UI->Blocks->model(), "values", SIGNAL(valuesChanged()),
+    filter->sourceModel(), "values", SIGNAL(valuesChanged()),
     this->proxy(),
     this->proxy()->GetProperty("ElementBlocks"));
 
