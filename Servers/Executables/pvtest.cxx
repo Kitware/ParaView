@@ -40,7 +40,6 @@ int main(int argc, char* argv[])
     vtkProcessModule::PROCESS_CLIENT, options);
   //---------------------------------------------------------------------------
 
-  vtkSMSessionCore::SetDebugLogging(true);
   vtkSMSession* session = NULL;
   vtkSMProxy* proxy = NULL;
 
