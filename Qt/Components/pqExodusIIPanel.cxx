@@ -151,7 +151,7 @@ pqExodusIIPanel::pqExodusIIPanel(pqProxy* object_proxy, QWidget* p) :
   this->UI->Blocks->header()->setSortIndicator(0, Qt::AscendingOrder);
   this->UI->Blocks->header()->setSortIndicatorShown(true);
   this->UI->Blocks->setSortingEnabled(true);
-  QObject::connect(this->UI->Blocks->header(), SIGNAL(sectionClicked(int)),
+  QObject::connect(this->UI->Blocks->header(), SIGNAL(checkStateChanged()),
     proxyModel, SLOT(toggleRootCheckState()), Qt::QueuedConnection);
 
   proxyModel = new pqProxySILModel("Assemblies", &this->UI->SILModel);
