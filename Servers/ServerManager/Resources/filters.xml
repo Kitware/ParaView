@@ -3874,6 +3874,9 @@ The Triangle Strips filter converts triangles into triangle strips and lines int
    </SourceProxy>
 
    <!-- ==================================================================== -->
+
+<!-- FIXME comment out Compound proxy !!!!
+
    <CompoundSourceProxy name="PlotOnIntersectionCurves" label="Plot On Intersection Curves">
      <Documentation
         short_help="Extracts the edges in a 2D plane and plots them"
@@ -3982,11 +3985,14 @@ The Triangle Strips filter converts triangles into triangle strips and lines int
      </ExposedProperties>
      <OutputPort name="Output" proxy="PlotEdges1" port_index="0"/>
      <Hints>
-       <!-- View can be used to specify the preferred view for the proxy -->
-       <View type="XYChartView" />
+       <View type="XYChartView"
+             help="View can be used to specify the preferred view for the proxy"/>
        <Plotable />
      </Hints>
    </CompoundSourceProxy>
+
+-->
+
    <!-- ==================================================================== -->
    <SourceProxy name="Subdivide" class="vtkLinearSubdivisionFilter">
     <Documentation
@@ -5699,6 +5705,9 @@ The Probe filter samples the data set attributes of the current data set at the 
    </SourceProxy>
 
    <!-- ==================================================================== -->
+
+<!-- FIXME comment out Compound proxy !!!!
+
    <CompoundSourceProxy name="ProbeLine" label="Plot Over Line">
      <Documentation
        long_help="Sample data attributes at the points along a line.  Probed lines will be displayed in a graph of the attributes."
@@ -5726,12 +5735,15 @@ The Probe filter samples the data set attributes of the current data set at the 
      <OutputPort name="Output" proxy="AppendArcLength1" port_index="0"/>
      <Hints>
        <Visibility replace_input="0" />
-       <!-- View can be used to specify the preferred view for the proxy -->
-      <View type="XYChartView" />
+      <View type="XYChartView"
+            help="View can be used to specify the preferred view for the proxy"/>
       <Plotable />
      </Hints>
-    <!-- End ProbeLine -->
    </CompoundSourceProxy>
+
+-->
+
+<!-- End ProbeLine -->
 
    <!-- ==================================================================== -->
    <SourceProxy name="Probe" class="vtkPProbeFilter"
@@ -8838,6 +8850,9 @@ This property controls how the filter works to generate tensor cell data. You ca
     </SourceProxy>
 
    <!-- ==================================================================== -->
+
+<!-- FIXME comment out Compound proxy !!!!
+
     <CompoundSourceProxy name="NormalGlyphs" label="Normal Glyphs">
       <Documentation short_help="Filter computing surface normals."
         long_help="Filter computing surface normals.">
@@ -9057,14 +9072,15 @@ This property controls how the filter works to generate tensor cell data. You ca
       </ExposedProperties>
       <OutputPort name="Output" proxy="Glyph1" port_index="0"/>
       <Hints>
-        <!-- Visibility Element can be used to suggest the GUI about
-             visibility of this filter (or its input) on creation.
-             replace_input="0" implies that the input visibility is not
-             changed on creation of this filter (defaults to "1")
-             -->
-        <Visibility replace_input="0" />
+        <Visibility replace_input="0"
+                    help="Visibility Element can be used to suggest the GUI about
+                    visibility of this filter (or its input) on creation.
+                    replace_input='0' implies that the input visibility is not
+                    changed on creation of this filter (defaults to '1')"/>
       </Hints>
     </CompoundSourceProxy>
+
+-->
 
     <!-- ==================================================================== -->
     <SourceProxy name="TableToPolyData"
@@ -9223,6 +9239,9 @@ This property controls how the filter works to generate tensor cell data. You ca
     </SourceProxy>
 
     <!-- ================================================================== -->
+
+<!-- FIXME comment out Compound proxy !!!!
+
     <CompoundSourceProxy name="FFTSelectionOverTime"
                          label="FFT Of Selection Over Time">
       <Documentation
@@ -9299,11 +9318,14 @@ This property controls how the filter works to generate tensor cell data. You ca
       </ExposedProperties>
       <OutputPort name="Output" proxy="TableFFT1" port_index="0"/>
       <Hints>
-        <!-- View can be used to specify the preferred view for the proxy -->
-        <View type="XYChartView" />
+        <View type="XYChartView"
+              help="View can be used to specify the preferred view for the proxy"/>
         <Plotable />
       </Hints>
-    </CompoundSourceProxy> <!-- FFTSelectionOverTime -->
+    </CompoundSourceProxy>
+
+-->
+    <!-- FFTSelectionOverTime -->
 
     <!-- ================================================================== -->
     <SourceProxy name="AttributeDataToTableFilter"

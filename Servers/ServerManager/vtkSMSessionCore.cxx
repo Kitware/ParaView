@@ -195,7 +195,7 @@ public:
     (*this->DebugLogFile) << header << endl;
     this->DebugLogFile->write( messageToWrite->DebugString().c_str(),
                                messageToWrite->DebugString().length());
-
+    this->DebugLogFile->flush();
     }
   //---------------------------------------------------------------------------
   typedef vtkstd::map<vtkTypeUInt32, vtkSmartPointer<vtkPMObject> >
@@ -210,7 +210,7 @@ public:
 //****************************************************************************/
 vtkStandardNewMacro(vtkSMSessionCore);
 //----------------------------------------------------------------------------
-bool vtkSMSessionCore::WriteDebugLog = false;
+bool vtkSMSessionCore::WriteDebugLog = true; // FIXME
 //----------------------------------------------------------------------------
 vtkSMSessionCore::vtkSMSessionCore()
 {

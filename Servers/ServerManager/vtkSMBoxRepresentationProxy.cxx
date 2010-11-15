@@ -81,8 +81,7 @@ void vtkSMBoxRepresentationProxy::UpdatePropertyInformation()
   vtkBoxRepresentation* repr = vtkBoxRepresentation::SafeDownCast(
     this->GetClientSideObject());
   vtkTransform* transform = vtkTransform::SafeDownCast(
-    vtkProcessModule::GetProcessModule()->GetObjectFromID(
-      this->GetSubProxy("Transform")->GetID()));
+      this->GetSubProxy("Transform")->GetClientSideObject());
   repr->GetTransform(transform);
 
   this->Superclass::UpdatePropertyInformation();

@@ -210,7 +210,10 @@ void vtkSMProxyManager::InstantiateGroupPrototypes(const char* groupName)
       vtkSMProxy* proxy = this->NewProxy(groupName, xml_name);
       if (proxy)
         {
+        cout << "NewPrototype proxy " << groupName << " " << xml_name << endl
+            << " - proxy: " << proxy->GetXMLGroup() << " " << proxy->GetXMLName() << endl;
         proxy->SetSession(NULL);
+        proxy->SetLocation(0);
         this->RegisterProxy(newgroupname.str().c_str(), xml_name, proxy);
         proxy->FastDelete();
         }

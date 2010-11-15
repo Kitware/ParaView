@@ -108,6 +108,11 @@ void vtkSMRemoteObject::SetGlobalID(vtkTypeUInt32 guid)
 //---------------------------------------------------------------------------
 void vtkSMRemoteObject::PushState(vtkSMMessage* msg)
 {
+  if(this->Location == 0)
+    {
+    return; // This object is a prototype and has no location
+    }
+
   // Check if a GUID has been assigned to that object otherwise assign a new one
   vtkTypeUInt32 gid = this->GetGlobalID();
   msg->set_global_id(gid);
@@ -116,7 +121,7 @@ void vtkSMRemoteObject::PushState(vtkSMMessage* msg)
     {
     this->GetSession()->PushState(msg);
     }
-  else
+  else // FIXME this case occurs for prototype...
     {
     vtkErrorMacro("No session found");
     // FIXME Throw exception or error feed back : Not PVSession found !
@@ -126,6 +131,11 @@ void vtkSMRemoteObject::PushState(vtkSMMessage* msg)
 //---------------------------------------------------------------------------
 bool vtkSMRemoteObject::PullState(vtkSMMessage* msg)
 {
+  if(this->Location == 0)
+    {
+    return true; // This object is a prototype and has no location
+    }
+
   msg->set_global_id(this->GlobalID);
   msg->set_location(this->Location);
   if(this->GetSession())

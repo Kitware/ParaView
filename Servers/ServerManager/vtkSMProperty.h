@@ -72,7 +72,6 @@ class vtkSMDomainIterator;
 class vtkSMInformationHelper;
 class vtkSMProxy;
 class vtkSMProxyLocator;
-class vtkSMXMLParser;
 //BTX
 struct vtkSMPropertyInternals;
 //ETX

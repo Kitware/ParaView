@@ -35,7 +35,7 @@ A simple example:
 
 import paraview
 paraview.compatibility.major = 3
-paraview.compatibility.minor = 5
+paraview.compatibility.minor = 9
 import servermanager
 
 def _disconnect():
@@ -78,16 +78,19 @@ def _create_view(view_xml_name):
     active_objects.view = view
     _funcs_internals.view_counter += 1
     
-    tk = servermanager.ProxyManager().GetProxiesInGroup("timekeeper").values()[0]
-    views = tk.Views
-    if not view in views:
-        views.append(view)
-    try:
-        scene = GetAnimationScene()
-        if not view in scene.ViewModules:
-            scene.ViewModules.append(view)
-    except servermanager.MissingProxy:
-        pass
+    # FIXME ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    #tk = servermanager.ProxyManager().GetProxiesInGroup("timekeeper").values()[0]
+    #views = tk.Views
+    #if not view in views:
+    #    views.append(view)
+    #try:
+    #    scene = GetAnimationScene()
+    #    if not view in scene.ViewModules:
+    #        scene.ViewModules.append(view)
+    #except servermanager.MissingProxy:
+    #    pass
+    # FIXME ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
     return view
 
 def CreateRenderView():
@@ -593,12 +596,14 @@ def _create_func(key, module):
             # Register pipeline objects with the time keeper. This is used to extract time values
             # from sources. NOTE: This should really be in the servermanager controller layer.
             if group == "sources":
-                tk = servermanager.ProxyManager().GetProxiesInGroup("timekeeper").values()[0]
-                sources = tk.TimeSources
-                if not px in sources:
-                    sources.append(px)
-
+                # FIXME ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+                #tk = servermanager.ProxyManager().GetProxiesInGroup("timekeeper").values()[0]
+                #sources = tk.TimeSources
+                #if not px in sources:
+                #    sources.append(px)
+                # FIXME ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
                 active_objects.source = px
+
         except servermanager.MissingRegistrationInformation:
             pass
 
@@ -964,5 +969,5 @@ def demo2(fname="/Users/berk/Work/ParaView/ParaViewData/Data/disk_out_ref.ex2"):
 _add_functions(globals())
 active_objects = ActiveObjects()
 
-if not servermanager.ActiveConnection:
+if not servermanager.ActiveSession:
     Connect()

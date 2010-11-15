@@ -2272,10 +2272,11 @@
    <!-- End PVDReader -->
    </SourceProxy>
 
-   <FileSeriesReaderProxy name="XMLMultiBlockDataReader"
-                          class="vtkFileSeriesReader"
-                          label="XML MultiBlock Data Reader"
-                          file_name_method="SetFileName">
+   <SourceProxy kernel_class="vtkPMFileSeriesReaderProxy"
+                name="XMLMultiBlockDataReader"
+                class="vtkFileSeriesReader"
+                label="XML MultiBlock Data Reader"
+                file_name_method="SetFileName">
      <Documentation
        short_help="Read VTK XML multi-block datasets."
        long_help="Read a VTK XML multi-block data file and the serial VTK XML data files to which it points.">
@@ -2329,12 +2330,13 @@
      </Hints>
 
    <!-- end of XMLMultiBlockDataReader -->
-   </FileSeriesReaderProxy>
+   </SourceProxy>
 
-   <FileSeriesReaderProxy name="XMLHierarchicalBoxDataReader"
-                          class="vtkFileSeriesReader"
-                          label="XML Hierarchical Box Data reader"
-                          file_name_method="SetFileName">
+   <SourceProxy kernel_class="vtkPMFileSeriesReaderProxy"
+                name="XMLHierarchicalBoxDataReader"
+                class="vtkFileSeriesReader"
+                label="XML Hierarchical Box Data reader"
+                file_name_method="SetFileName">
      <Documentation
        short_help="Read a VTK data file containing a hierarchical box dataset."
        long_help="Read a VTK XML-based data file containing a hierarchical dataset containing vtkUniformGrids.">
@@ -2386,12 +2388,13 @@
      </Hints>
 
    <!-- end of XMLHierarchicalBoxDataReader -->
-   </FileSeriesReaderProxy>
+   </SourceProxy>
 
-   <FileSeriesReaderProxy name="XMLPolyDataReader"
-                          class="vtkFileSeriesReader"
-                          label="XML PolyData Reader"
-                          file_name_method="SetFileName">
+   <SourceProxy kernel_class="vtkPMFileSeriesReaderProxy"
+                name="XMLPolyDataReader"
+                class="vtkFileSeriesReader"
+                label="XML PolyData Reader"
+                file_name_method="SetFileName">
      <Documentation short_help="Read VTK XML polydata files."
                     long_help="Read serial VTK XML polydata files.">
        The XML Polydata reader reads the VTK XML polydata file format. The standard extension is .vtp.  This reader also supports file series.
@@ -2439,12 +2442,13 @@
       <ReaderFactory extensions="vtp"
           file_description="VTK PolyData Files" />
      </Hints>
-   </FileSeriesReaderProxy> <!-- XMLPolyDataReader -->
+   </SourceProxy> <!-- XMLPolyDataReader -->
 
-   <FileSeriesReaderProxy name="XMLUnstructuredGridReader"
-                          class="vtkFileSeriesReader"
-                          label="XML Unstructured Grid Reader"
-                          file_name_method="SetFileName">
+   <SourceProxy kernel_class="vtkPMFileSeriesReaderProxy"
+                name="XMLUnstructuredGridReader"
+                class="vtkFileSeriesReader"
+                label="XML Unstructured Grid Reader"
+                file_name_method="SetFileName">
      <Documentation short_help="Read VTK XML unstructured grid data files."
                     long_help="Read serial VTK XML unstructured grid data files.">
        The XML Unstructured Grid reader reads the VTK XML unstructured grid data file format. The standard extension is .vtu. This reader also supports file series.
@@ -2494,12 +2498,13 @@
           file_description="VTK UnstructuredGrid Files" />
      </Hints>
 
-   </FileSeriesReaderProxy> <!-- XMLUnstructuredGridReader -->
+   </SourceProxy> <!-- XMLUnstructuredGridReader -->
 
-   <FileSeriesReaderProxy name="XMLImageDataReader"
-                          class="vtkFileSeriesReader"
-                          label="XML Image Data Reader"
-                          file_name_method="SetFileName">
+   <SourceProxy kernel_class="vtkPMFileSeriesReaderProxy"
+                name="XMLImageDataReader"
+                class="vtkFileSeriesReader"
+                label="XML Image Data Reader"
+                file_name_method="SetFileName">
      <Documentation short_help="Read VTK XML image data files."
                     long_help="Read serial VTK XML image data files.">
        The XML Image Data reader reads the VTK XML image data file format. The standard extension is .vti. This reader also supports file series.
@@ -2549,12 +2554,13 @@
           file_description="VTK ImageData Files" />
      </Hints>
 
-   </FileSeriesReaderProxy> <!-- XMLImageDataReader -->
+   </SourceProxy> <!-- XMLImageDataReader -->
 
-   <FileSeriesReaderProxy name="XMLStructuredGridReader"
-                          class="vtkFileSeriesReader"
-                          label="XML Structured Grid Reader"
-                          file_name_method="SetFileName">
+   <SourceProxy kernel_class="vtkPMFileSeriesReaderProxy"
+                name="XMLStructuredGridReader"
+                class="vtkFileSeriesReader"
+                label="XML Structured Grid Reader"
+                file_name_method="SetFileName">
      <Documentation short_help="Read VTK XML structured grid data files."
                     long_help="Read serial VTK XML structured grid data files.">
        The XML Structured Grid reader reads the VTK XML structured grid data file format. The standard extension is .vts. This reader also supports file series.
@@ -2603,12 +2609,13 @@
       <ReaderFactory extensions="vts"
           file_description="VTK StructuredGrid Files" />
      </Hints>
-   </FileSeriesReaderProxy> <!-- XMLStructuredGridReader -->
+   </SourceProxy> <!-- XMLStructuredGridReader -->
 
-   <FileSeriesReaderProxy name="XMLRectilinearGridReader"
-                          class="vtkFileSeriesReader"
-                          label="XML Rectilinear Grid Reader"
-                          file_name_method="SetFileName">
+   <SourceProxy kernel_class="vtkPMFileSeriesReaderProxy"
+                name="XMLRectilinearGridReader"
+                class="vtkFileSeriesReader"
+                label="XML Rectilinear Grid Reader"
+                file_name_method="SetFileName">
      <Documentation short_help="Read VTK XML rectilinear grid data files."
                     long_help="Read serial VTK XML rectilinear grid data files.">
        The XML Rectilinear Grid reader reads the VTK XML rectilinear grid data file format. The standard extension is .vtr. This reader also supports file series.
@@ -2657,12 +2664,13 @@
           file_description="VTK RectilinearGrid Files" />
      </Hints>
 
-   </FileSeriesReaderProxy> <!-- XMLRectilinearGridReader -->
+   </SourceProxy> <!-- XMLRectilinearGridReader -->
 
-   <FileSeriesReaderProxy name="XMLPPolyDataReader"
-                          class="vtkFileSeriesReader"
-                          label="XML Partitioned Polydata Reader"
-                          file_name_method="SetFileName">
+   <SourceProxy kernel_class="vtkPMFileSeriesReaderProxy"
+                name="XMLPPolyDataReader"
+                class="vtkFileSeriesReader"
+                label="XML Partitioned Polydata Reader"
+                file_name_method="SetFileName">
      <Documentation short_help="Read partitioned VTK XML polydata files."
                     long_help="Read the summary file and the assicoated VTK XML polydata files.">
        The XML Partitioned Polydata reader reads the partitioned VTK polydata file format. It reads the partitioned format's summary file and then the associated VTK XML polydata files. The expected file extension is .pvtp.  This reader also supports file series.
@@ -2711,12 +2719,13 @@
           file_description="VTK PolyData Files (partitioned)" />
      </Hints>
 
-   </FileSeriesReaderProxy> <!-- XMLPPolyDataReader -->
+   </SourceProxy> <!-- XMLPPolyDataReader -->
 
-   <FileSeriesReaderProxy name="XMLPUnstructuredGridReader"
-                          class="vtkFileSeriesReader"
-                          label="XML Partitioned Unstructured Grid Reader"
-                          file_name_method="SetFileName">
+   <SourceProxy kernel_class="vtkPMFileSeriesReaderProxy"
+                name="XMLPUnstructuredGridReader"
+                class="vtkFileSeriesReader"
+                label="XML Partitioned Unstructured Grid Reader"
+                file_name_method="SetFileName">
      <Documentation short_help="Read partitioned VTK XML unstructured grid data files."
                     long_help="Read the summary file and the associated VTK XML unstructured grid data files.">
        The XML Partitioned Unstructured Grid reader reads the partitioned VTK unstructured grid data file format. It reads the partitioned format's summary file and then the associated VTK XML unstructured grid data files. The expected file extension is .pvtu. This reader also supports file series.
@@ -2765,12 +2774,13 @@
       <ReaderFactory extensions="pvtu"
           file_description="VTK UnstructuredGrid Files (partitioned)" />
      </Hints>
-   </FileSeriesReaderProxy> <!-- XMLPUnstructuredGridReader -->
+   </SourceProxy> <!-- XMLPUnstructuredGridReader -->
 
-   <FileSeriesReaderProxy name="XMLPImageDataReader"
-                          class="vtkFileSeriesReader"
-                          label="XML Partitioned Image Data Reader"
-                          file_name_method="SetFileName">
+   <SourceProxy kernel_class="vtkPMFileSeriesReaderProxy"
+                name="XMLPImageDataReader"
+                class="vtkFileSeriesReader"
+                label="XML Partitioned Image Data Reader"
+                file_name_method="SetFileName">
      <Documentation short_help="Read partitioned VTK XML image data files."
                     long_help="Read the summary file and the associated VTK XML image data files.">
        The XML Partitioned Image Data reader reads the partitioned VTK image data file format. It reads the partitioned format's summary file and then the associated VTK XML image data files. The expected file extension is .pvti. This reader also supports file series.
@@ -2820,12 +2830,13 @@
           file_description="VTK ImageData Files (partitioned)" />
      </Hints>
 
-   </FileSeriesReaderProxy> <!-- XMLPImageDataReader -->
+   </SourceProxy> <!-- XMLPImageDataReader -->
 
-   <FileSeriesReaderProxy name="XMLPStructuredGridReader"
-                          class="vtkFileSeriesReader"
-                          label="XML Partitioned Structured Grid Reader"
-                          file_name_method="SetFileName">
+   <SourceProxy kernel_class="vtkPMFileSeriesReaderProxy"
+                name="XMLPStructuredGridReader"
+                class="vtkFileSeriesReader"
+                label="XML Partitioned Structured Grid Reader"
+                file_name_method="SetFileName">
      <Documentation short_help="Read partitioned VTK XML structured grid data files."
                     long_help="Read the summary file and the associated VTK XML structured grid data files.">
        The XML Partitioned Structured Grid reader reads the partitioned VTK structured grid data file format. It reads the partitioned format's summary file and then the associated VTK XML structured grid data files. The expected file extension is .pvts. This reader also supports file series.
@@ -2875,12 +2886,13 @@
           file_description="VTK StructuredGrid Files (partitioned)" />
      </Hints>
 
-   </FileSeriesReaderProxy> <!-- XMLPStructuredGridReader -->
+   </SourceProxy> <!-- XMLPStructuredGridReader -->
 
-   <FileSeriesReaderProxy name="XMLPRectilinearGridReader"
-                          class="vtkFileSeriesReader"
-                          label="XML Partitioned Rectilinear Grid Reader"
-                          file_name_method="SetFileName">
+   <SourceProxy kernel_class="vtkPMFileSeriesReaderProxy"
+                name="XMLPRectilinearGridReader"
+                class="vtkFileSeriesReader"
+                label="XML Partitioned Rectilinear Grid Reader"
+                file_name_method="SetFileName">
      <Documentation short_help="Read partitioned VTK XML rectilinear grid data files."
                     long_help="Read the summary file and the associated VTK XML rectilinear grid data files.">
        The XML Partitioned Rectilinear Grid reader reads the partitioned VTK rectilinear grid file format. It reads the partitioned format's summary file and then the associated VTK XML rectilinear grid files. The expected file extension is .pvtr. This reader also supports file series.
@@ -2930,7 +2942,7 @@
           file_description="VTK RectilinearGrid Files (partitioned)" />
      </Hints>
 
-   </FileSeriesReaderProxy> <!-- XMLPRectilinearGridReader -->
+   </SourceProxy> <!-- XMLPRectilinearGridReader -->
 
    <SourceProxy name="RTXMLPolyDataReader"
                 class="vtkRTXMLPolyDataReader">
@@ -2980,10 +2992,11 @@
      <!-- End of RTXMLPolyDataReader -->
    </SourceProxy>
 
-   <FileSeriesReaderProxy name="LegacyVTKFileReader"
-                          class="vtkFileSeriesReader"
-                          label="Legacy VTK Reader"
-                          file_name_method="SetFileName">
+   <SourceProxy kernel_class="vtkPMFileSeriesReaderProxy"
+                name="LegacyVTKFileReader"
+                class="vtkFileSeriesReader"
+                label="Legacy VTK Reader"
+                file_name_method="SetFileName">
      <Documentation
        short_help="Read legacy VTK files."
        long_help="Read files stored in VTK's legacy file format.">
@@ -3028,7 +3041,7 @@
           file_description="Legacy VTK files" />
      </Hints>
      <!-- End LegacyVTKFileReader -->
-   </FileSeriesReaderProxy>
+   </SourceProxy>
 
    <SourceProxy name="pvtkfile" 
                 class="vtkPDataSetReader"
@@ -3279,10 +3292,11 @@
    <!-- End spcthreader-->
    </SourceProxy>
 
-  <FileSeriesReaderProxy name="SPCTHRestartReader"
-                         class="vtkFileSeriesReader"
-                         label="Restarted Sim Spy Plot Reader"
-                         file_name_method="SetFileName">
+  <SourceProxy kernel_class="vtkPMFileSeriesReaderProxy"
+               name="SPCTHRestartReader"
+               class="vtkFileSeriesReader"
+               label="Restarted Sim Spy Plot Reader"
+               file_name_method="SetFileName">
     <Documentation short_help="Read SPCTH files from simulation restarts."
                    long_help="Read collections of SPCTH files from simulations that were restarted.">
       When a CTH simulation is restarted, typically you get a new set of output files.  When you read them in your visualization, you often want to string these file sets together as if it was one continuous dump of files.  This reader allows you to specify a metadata file that will implicitly string the files together.
@@ -3332,7 +3346,7 @@
           file_description="Case file for restarted CTH outputs" />
     </Hints>
     <!-- SPCTHRestartReader -->
-  </FileSeriesReaderProxy>
+  </SourceProxy>
 
 
    <SourceProxy name="vrmlreader" class="vtkVRMLSource" label="VRML Reader">
@@ -3595,10 +3609,11 @@
      </Hints>
    </SourceProxy>
 
-   <FileSeriesReaderProxy name="stlreader"
-                          class="vtkFileSeriesReader"
-                          label="STL Reader"
-                          file_name_method="SetFileName">
+   <SourceProxy kernel_class="vtkPMFileSeriesReaderProxy"
+                name="stlreader"
+                class="vtkFileSeriesReader"
+                label="STL Reader"
+                file_name_method="SetFileName">
      <Documentation
          short_help="Read STL files."
        long_help="Read ASCII or binary stereo lithography (STL) files.">
@@ -3644,7 +3659,7 @@
           file_description="Stereo Lithography" />
      </Hints>
      <!-- End stlreader-->
-   </FileSeriesReaderProxy>
+   </SourceProxy>
 
    <SourceProxy name="byureader" class="vtkBYUReader" label="BYU Reader">
      <Documentation
@@ -4117,10 +4132,11 @@
 
    </SourceProxy> <!-- NrrdReader -->
 
-   <FileSeriesReaderProxy name="PNGReader"
-                          class="vtkFileSeriesReader"
-                          label="PNG Reader"
-                          file_name_method="SetFileName">
+   <SourceProxy kernel_class="vtkPMFileSeriesReaderProxy"
+                name="PNGReader"
+                class="vtkFileSeriesReader"
+                label="PNG Reader"
+                file_name_method="SetFileName">
      <Documentation
        short_help="Read a PNG file."
        long_help="Read a PNG file into an image data.">
@@ -4164,7 +4180,7 @@
      </Hints>
 
      <!-- End FileSeriesPNGReader -->
-   </FileSeriesReaderProxy>
+   </SourceProxy>
 
    <SourceProxy name="XdmfReader" 
                 class="vtkXdmfReader"
@@ -4347,9 +4363,10 @@
    </SourceProxy>
 #endif
 
-   <FileSeriesReaderProxy name="ExodusIIReader"
-                          class="vtkExodusFileSeriesReader"
-                          file_name_method="SetFileName">
+   <SourceProxy kernel_class="vtkPMFileSeriesReaderProxy"
+                name="ExodusIIReader"
+                class="vtkExodusFileSeriesReader"
+                file_name_method="SetFileName">
      <Documentation
        short_help="Read Exodus II files."
        long_help="Read an Exodus II file to produce an unstructured grid.">
@@ -4466,12 +4483,13 @@
           file_description="ExodusII"/>
      </Hints>
      <!-- ExodusIIReader -->
-   </FileSeriesReaderProxy>
+   </SourceProxy>
 
-   <FileSeriesReaderProxy name="ExodusRestartReader"
-                          class="vtkExodusFileSeriesReader"
-                          label="Restarted Sim Exodus Reader"
-                          file_name_method="SetFileName">
+   <SourceProxy kernel_class="vtkPMFileSeriesReaderProxy"
+                name="ExodusRestartReader"
+                class="vtkExodusFileSeriesReader"
+                label="Restarted Sim Exodus Reader"
+                file_name_method="SetFileName">
      <Documentation short_help="Read Exodus files from simulation restarts."
                     long_help="Read collections of Exodus output files from simulations that were restarted.">
        When a simulation that outputs exodus files is restarted, typically you get a new set of output files.  When you read them in your visualization, you often want to string these file sets together as if it was one continuous dump of files.  This reader allows you to specify a metadata file that will implicitly string the files together.
@@ -4579,12 +4597,13 @@
           file_description="Metafile for restarted exodus outputs" />
      </Hints>
      <!-- ExodusRestartReader -->
-   </FileSeriesReaderProxy>
+   </SourceProxy>
 
-   <FileSeriesReaderProxy name="AVSucdSeriesReader"
-                          class="vtkFileSeriesReader"
-                          label="AVS UCD Reader"
-                          file_name_method="SetFileName">
+   <SourceProxy kernel_class="vtkPMFileSeriesReaderProxy"
+                name="AVSucdSeriesReader"
+                class="vtkFileSeriesReader"
+                label="AVS UCD Reader"
+                file_name_method="SetFileName">
      <Documentation
        short_help="Read a dataset in AVS UCD format."
        long_help="Read binary or ASCII files stored in AVS UCD format.">
@@ -4641,7 +4660,7 @@
           file_description="AVS UCD Binary/ASCII Files"/>
      </Hints>
    <!-- End of AVSucdSeriesReader -->
-   </FileSeriesReaderProxy>
+   </SourceProxy>
 
    <SourceProxy name="Facet Reader" 
                 class="vtkFacetReader">
@@ -5412,10 +5431,11 @@
    </SourceProxy>
    <!-- End of LSDyna Reader -->
 
-    <FileSeriesReaderProxy name="netCDFReader"
-                           class="vtkFileSeriesReader"
-                           label="NetCDF Reader"
-                           file_name_method="SetFileName">
+    <SourceProxy kernel_class="vtkPMFileSeriesReaderProxy"
+                 name="netCDFReader"
+                 class="vtkFileSeriesReader"
+                 label="NetCDF Reader"
+                 file_name_method="SetFileName">
       <Documentation short_help="Read regular arrays from netCDF files."
                      long_help="Read regular arrays from netCDF files.  Will also read any topological information specified by the COARDS and CF conventions.">
         Reads arrays from netCDF files into structured VTK data sets.  In
@@ -5472,7 +5492,7 @@
           file_description="netCDF files generic and CF conventions" />
      </Hints>
 
-    </FileSeriesReaderProxy> <!-- netCDFReader -->
+    </SourceProxy> <!-- netCDFReader -->
 
     <SourceProxy name="SLACReader"
                  class="vtkPSLACReader"
@@ -5593,10 +5613,11 @@
      </Hints>
     </SourceProxy> <!-- SLACReader -->
 
-    <FileSeriesReaderProxy name="SLACParticleReader"
-                           class="vtkFileSeriesReader"
-                           label="SLAC Particle Data Reader"
-                           file_name_method="SetFileName">
+    <SourceProxy kernel_class="vtkPMFileSeriesReaderProxy"
+                 name="SLACParticleReader"
+                 class="vtkFileSeriesReader"
+                 label="SLAC Particle Data Reader"
+                 file_name_method="SetFileName">
       <Documentation>
         The SLAC Particle data reader.
       </Documentation>
@@ -5633,12 +5654,13 @@
        <ReaderFactory extensions="ncdf netcdf"
           file_description="SLAC Particle Files" />
      </Hints>
-    </FileSeriesReaderProxy> <!-- SLACParticleReader -->
+    </SourceProxy> <!-- SLACParticleReader -->
 
-   <FileSeriesReaderProxy name="CSVReader"
-                          class="vtkFileSeriesReader"
-                          label="CSV Reader"
-                          file_name_method="SetFileName">
+   <SourceProxy kernel_class="vtkPMFileSeriesReaderProxy"
+                name="CSVReader"
+                class="vtkFileSeriesReader"
+                label="CSV Reader"
+                file_name_method="SetFileName">
       <Documentation
         short_help="Read a comma-separated values file."
         long_help="Read a comma-separated values file into a 1D rectilinear grid.">
@@ -5701,12 +5723,13 @@
           file_description="Comma-separated-values" />
      </Hints>
       <!-- End of CSVReader -->
-   </FileSeriesReaderProxy>
+   </SourceProxy>
 
-   <FileSeriesReaderProxy name="ParticleReader"
-                          class="vtkFileSeriesReader"
-                          label="Particles Reader"
-                          file_name_method="SetFileName">
+   <SourceProxy kernel_class="vtkPMFileSeriesReaderProxy"
+                name="ParticleReader"
+                class="vtkFileSeriesReader"
+                label="Particles Reader"
+                file_name_method="SetFileName">
       <Documentation short_help="Read particle data."
         long_help="Read particle data.">
         vtkParticleReader reads either a binary or a text file of particles.
@@ -5765,12 +5788,13 @@
      </Hints>
 
       <!-- End of CSVReader -->
-   </FileSeriesReaderProxy>
+   </SourceProxy>
       
-   <FileSeriesReaderProxy name="TecplotReader"
-                          class="vtkFileSeriesReader"
-                          label="Tecplot Reader"
-                          file_name_method="SetFileName">
+   <SourceProxy kernel_class="vtkPMFileSeriesReaderProxy"
+                name="TecplotReader"
+                class="vtkFileSeriesReader"
+                label="Tecplot Reader"
+                file_name_method="SetFileName">
      <Documentation
        short_help="Read files in the Tecplot ASCII file format."
        long_help="Read files in the Tecplot ASCII file format.">
@@ -5821,7 +5845,7 @@
      </Hints>
        
    <!-- End TecplotReader -->
-   </FileSeriesReaderProxy>
+   </SourceProxy>
 
    <!-- Start vtkVPICReader -->
    <SourceProxy name="VPICReader" 
@@ -6054,10 +6078,11 @@
    </SourceProxy>
    <!-- End NetCDFPOPReader -->
    
-   <FileSeriesReaderProxy name="CosmoReader"
-                          class="vtkFileSeriesReader"
-                          label="COSMO Reader"
-                          file_name_method="SetFileName">
+   <SourceProxy kernel_class="vtkPMFileSeriesReaderProxy"
+                name="CosmoReader"
+                class="vtkFileSeriesReader"
+                label="COSMO Reader"
+                file_name_method="SetFileName">
      <Documentation
        short_help="Read a cosmology file."
        long_help="Read a cosmology file into a vtkUnstructuredGrid.">
@@ -6107,7 +6132,7 @@
      <Hints>
        <ReaderFactory extensions="cosmo gadget2" file_description="Cosmology files" />
      </Hints>
-   </FileSeriesReaderProxy>
+   </SourceProxy>
 
    <SourceProxy name="MPASReader"
                 class="vtkMPASReader"
@@ -6206,10 +6231,11 @@
    </SourceProxy>
    <!-- End MPASReader -->
 
-   <FileSeriesReaderProxy name="P3DReader"
-                          class="vtkFileSeriesReader"
-                          label="PLOT3D Reader"
-                          file_name_method="SetQFileName">
+   <SourceProxy kernel_class="vtkPMFileSeriesReaderProxy"
+                name="P3DReader"
+                class="vtkFileSeriesReader"
+                label="PLOT3D Reader"
+                file_name_method="SetQFileName">
      <Documentation
        short_help="Read PLOT3D files."
        long_help="Read ASCII or binary PLOT3D files.">
@@ -6270,7 +6296,7 @@
       <DefaultFileNameProperty name="FileName" />
      </Hints>
      <!-- End stlreader-->
-   </FileSeriesReaderProxy>
+   </SourceProxy>
 
   </ProxyGroup>
 </ServerManagerConfiguration>

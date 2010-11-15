@@ -43,7 +43,10 @@ void vtkSMXMLParser::ProcessGroup(
     const char* name = element->GetAttribute("name");
     if(name)
       {
-      manager->AddElement(groupName, name, element);
+      // FIXME // FIXME // FIXME // FIXME // FIXME // FIXME // FIXME // FIXME // FIXME // FIXME // FIXME // FIXME // FIXME // FIXME // FIXME // FIXME // FIXME // FIXME v
+      // FIXME // FIXME // FIXME // FIXME // FIXME // FIXME // FIXME // FIXME // FIXME // FIXME // FIXME // FIXME // FIXME // FIXME // FIXME // FIXME // FIXME // FIXME v
+      // FIXME // FIXME // FIXME // FIXME // FIXME // FIXME // FIXME // FIXME // FIXME // FIXME // FIXME // FIXME // FIXME // FIXME // FIXME // FIXME // FIXME // FIXME v
+      // manager->AddElement(groupName, name, element);
       }
     }
 }

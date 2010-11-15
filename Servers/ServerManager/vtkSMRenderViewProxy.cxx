@@ -223,6 +223,12 @@ void vtkSMRenderViewProxy::CreateVTKObjects()
 
   this->Superclass::CreateVTKObjects();
 
+  // If prototype, no need to go thurther...
+  if(this->Location == 0)
+    {
+    return;
+    }
+
   if (!this->ObjectsCreated)
     {
     return;

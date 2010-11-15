@@ -47,6 +47,12 @@ void vtkSMRepresentationProxy::CreateVTKObjects()
 
   this->Superclass::CreateVTKObjects();
 
+  // If prototype, no need to add listeners...
+  if(this->Location == 0)
+    {
+    return;
+    }
+
   vtkMemberFunctionCommand<vtkSMRepresentationProxy>* observer =
     vtkMemberFunctionCommand<vtkSMRepresentationProxy>::New();
   observer->SetCallback(*this, &vtkSMRepresentationProxy::RepresentationUpdated);

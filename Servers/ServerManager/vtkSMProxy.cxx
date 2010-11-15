@@ -537,7 +537,7 @@ void vtkSMProxy::UpdateVTKObjects()
 {
   this->CreateVTKObjects();
   if (!this->ObjectsCreated || this->InUpdateVTKObjects ||
-    !this->ArePropertiesModified())
+    !this->ArePropertiesModified() || this->Location == 0)
     {
     return;
     }
@@ -655,6 +655,12 @@ void vtkSMProxy::CreateVTKObjects()
     }
   this->ObjectsCreated = 1;
   this->WarnIfDeprecated();
+
+  // If no location, it means no state...
+  if(this->Location == 0)
+    {
+    return;
+    }
 
   vtkSMMessage message;
   message.SetExtension(DefinitionHeader::client_class, this->GetClassName());
@@ -1357,7 +1363,7 @@ int vtkSMProxy::CreateSubProxiesAndProperties(vtkSMProxyManager* pm,
             }
           else
             {
-            subproxy = pm->NewProxy(subElement, 0, 0);
+            subproxy = pm->NewProxy(subElement, "inline-proxy", name); // FIXME !!!!
             }
           if (!subproxy)
             {

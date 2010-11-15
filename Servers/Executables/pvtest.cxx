@@ -23,6 +23,7 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkPVDataInformation.h"
 #include "vtkSMRenderViewProxy.h"
 #include "vtkSMSessionCore.h"
+#include "vtkSMProxyIterator.h"
 
 #include "paraview.h"
 
@@ -50,6 +51,7 @@ int main(int argc, char* argv[])
   cout << "Starting..." << endl;
 
   vtkSMProxyManager* pxm = session->GetProxyManager();
+  vtkProcessModule::GetProcessModule()->RegisterSession(session);
 
   //================= View test =======================
 
@@ -187,6 +189,22 @@ int main(int argc, char* argv[])
       return_value = EXIT_FAILURE;
       }
 
+    pxm->RegisterProxy("test", "source", proxy);
+    pxm->RegisterProxy("test", "shrink", shrink);
+    pxm->RegisterProxy("test", "writer", writer);
+    vtkSMProxyIterator *iter = vtkSMProxyIterator::New();
+    iter->Begin();
+    while(!iter->IsAtEnd())
+      {
+      cout << "Iterate over proxy " << iter->GetGroup() << ":" << iter->GetKey() << endl;
+      iter->Next();
+      }
+    iter->Delete();
+
+    pxm->UnRegisterProxy(proxy);
+    pxm->UnRegisterProxy(shrink);
+    pxm->UnRegisterProxy(writer);
+
     writer->Delete();
     proxy->Delete();
     shrink->Delete();
@@ -221,6 +239,8 @@ int main(int argc, char* argv[])
       return_value = EXIT_FAILURE;
       }
     }
+
+
 
   cout << "Exiting..." << endl;
   session->Delete();

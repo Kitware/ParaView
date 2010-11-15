@@ -62,6 +62,12 @@ void vtkSMViewProxy::CreateVTKObjects()
 
   this->Superclass::CreateVTKObjects();
 
+  // If prototype, no need to go further...
+  if(this->Location == 0)
+    {
+    return;
+    }
+
   if (!this->ObjectsCreated)
     {
     return;

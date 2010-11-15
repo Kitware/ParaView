@@ -24,6 +24,7 @@ SET (Kit_SRCS
   vtkPMArraySelectionProperty.cxx
   vtkPMDataArrayProperty.cxx
   vtkPMDoubleVectorProperty.cxx
+  vtkPMFileSeriesReaderProxy.cxx
   vtkPMIdTypeVectorProperty.cxx
   vtkPMInputProperty.cxx
   vtkPMIntVectorProperty.cxx
@@ -49,12 +50,14 @@ SET (Kit_SRCS
   vtkSMCompoundSourceProxy.cxx
   vtkSMCompoundSourceProxyDefinitionBuilder.cxx
   vtkSMContextViewProxy.cxx
+  vtkSMCSVExporterProxy.cxx
   vtkSMDeserializer.cxx
   vtkSMDeserializer.cxx
   vtkSMDocumentation.cxx
   vtkSMDomain.cxx
   vtkSMDomainIterator.cxx
   vtkSMDoubleVectorProperty.cxx
+  vtkSMExporterProxy.cxx
   vtkSMGlobalPropertiesManager.cxx
   vtkSMIdTypeVectorProperty.cxx
   vtkSMInputProperty.cxx
@@ -149,8 +152,10 @@ SET(Kit_SRCS
   vtkSMAnimationSceneProxy.cxx
   vtkSMAnimationSceneWriter.cxx
   vtkSMApplication.cxx
+
   vtkSMBooleanKeyFrameProxy.cxx
-  vtkSMBoxRepresentationProxy.cxx
+  vtkSMBoxRepresentationProxy.cxx # ---- don't know how to setup transform...
+
   vtkSMCameraConfigurationReader.cxx
   vtkSMCameraConfigurationWriter.cxx
   vtkSMCameraKeyFrameProxy.cxx
@@ -166,31 +171,39 @@ SET(Kit_SRCS
   vtkSMConnectionCleanerProxy.cxx
   vtkSMContextArraysInformationHelper.cxx #---- SM Side only, not managed yet...
   vtkSMContextNamedOptionsProxy.cxx
-  vtkSMCSVExporterProxy.cxx
+
+  vtkSMDataSourceProxy.cxx #---- Who use it ? --- Make a special property type ?
   vtkSMDistanceRepresentation2DProxy.cxx
+
   vtkSMExponentialKeyFrameProxy.cxx
-  vtkSMExporterProxy.cxx
-  vtkSMFileSeriesReaderProxy.cxx
+
   vtkSMGlobalPropertiesLinkUndoElement.cxx #--------------------------------
-  vtkSMHardwareSelector.cxx
+
   vtkSMFetchDataProxy.cxx
+
   vtkSMImageTextureProxy.cxx
   vtkSMImplicitPlaneRepresentationProxy.cxx
   vtkSMInteractionUndoStackBuilder.cxx#--------------------------------
+
   vtkSMKeyFrameAnimationCueManipulatorProxy.cxx
   vtkSMKeyFrameProxy.cxx
+
   vtkSMLinearAnimationCueManipulatorProxy.cxx
   vtkSMLookupTableProxy.cxx
+
   vtkSMMaterialLoaderProxy.cxx
+
+  vtkSMNamedPropertyIterator.cxx
   vtkSMNewWidgetRepresentationProxy.cxx
-  vtkSMOrderedPropertyIterator.cxx
   vtkSMNetworkImageSourceProxy.cxx
+
+  vtkSMOrderedPropertyIterator.cxx
+
   vtkSMPQStateLoader.cxx
   vtkSMPluginManager.cxx
   vtkSMPluginProxy.cxx
 #  vtkSMPluginInformationHelper.cxx
   vtkSMPropertyAdaptor.cxx
-  vtkSMNamedPropertyIterator.cxx
   vtkSMPropertyModificationUndoElement.cxx#--------------------------------
   vtkSMProxyConfigurationReader.cxx
   vtkSMProxyConfigurationWriter.cxx
@@ -200,10 +213,12 @@ SET(Kit_SRCS
   vtkSMProxyUnRegisterUndoElement.cxx#--------------------------------
   vtkSMPythonTraceObserver.cxx
   vtkSMPVLookupTableProxy.cxx
+
   vtkSMRampKeyFrameProxy.cxx
   vtkSMReaderFactory.cxx
   vtkSMRenderViewExporterProxy.cxx
   vtkSMRepresentationAnimationHelperProxy.cxx
+
   vtkSMScalarBarActorProxy.cxx
   vtkSMScalarBarWidgetRepresentationProxy.cxx
 #  vtkSMScatterPlotArraysInformationHelper.cxx
@@ -214,18 +229,21 @@ SET(Kit_SRCS
   vtkSMServerSideAnimationPlayer.cxx
   vtkSMSILModel.cxx
   vtkSMSinusoidKeyFrameProxy.cxx
+
 #  vtkSMTemporalInputDomain.cxx
   vtkSMTesting.cxx
   vtkSMTextWidgetRepresentationProxy.cxx
   vtkSMTimeAnimationCueProxy.cxx
   vtkSMTimeKeeperProxy.cxx
   vtkSMTransformProxy.cxx
+
   vtkSMUndoRedoStateLoader.cxx#-------------------------------- should be DELETE
   vtkSMUpdateInformationUndoElement.cxx#--------------------------------
+
   vtkSMWidgetRepresentationProxy.cxx
   vtkSMWriterProxy.cxx
+
   vtkSMXMLPVAnimationWriterProxy.cxx
-  vtkSMDataSourceProxy.cxx
   )
 
 SET( ServerManagerNonWrapped_SRCS
@@ -256,6 +274,7 @@ SET_SOURCE_FILES_PROPERTIES(
   vtkSMPropertyHelper.cxx
   vtkSMStateVersionControllerBase.cxx
   vtkSMUndoElement.cxx
+  vtkSMExporterProxy.cxx
   ABSTRACT
   )
 
@@ -274,7 +293,6 @@ SET_SOURCE_FILES_PROPERTIES(
   vtkSMProxyManagerReviver.cxx
   vtkSMStateVersionControllerBase.cxx
   vtkSMStateVersionControllerBase.cxx
-  vtkSMExporterProxy.cxx
   ABSTRACT
   )
 
@@ -359,7 +377,6 @@ IF (PARAVIEW_ENABLE_PYTHON)
   SET(Kit_PYTHON_EXTRA_SRCS)
   SET (Kit_SRCS
       ${Kit_SRCS}
-      vtkSMXMLParser.cxx
     )
   SET(KIT_PYTHON_LIBS
     vtkPVServerCommonPythonD vtk${KIT}

@@ -33,7 +33,7 @@ vtkSMDataSourceProxy::~vtkSMDataSourceProxy()
 //----------------------------------------------------------------------------
 void vtkSMDataSourceProxy::CopyData(vtkSMSourceProxy *sourceProxy)
 {
-  if (!sourceProxy || this->Servers != sourceProxy->GetServers())
+  if (!sourceProxy || this->Location != sourceProxy->GetLocation())
     {
     return;
     }

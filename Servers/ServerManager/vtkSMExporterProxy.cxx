@@ -26,7 +26,7 @@ vtkSMExporterProxy::vtkSMExporterProxy()
   this->View = 0;
   this->FileExtension = 0;
   this->SetFileExtension("txt");
-  this->SetServers(vtkProcessModule::CLIENT);
+  this->SetLocation(vtkProcessModule::CLIENT);
 }
 
 //----------------------------------------------------------------------------

@@ -35,8 +35,7 @@ ADD_LIBRARY(vtkPVPythonInterpretor
   vtkPVPythonInteractiveInterpretor.cxx)
 
 ADD_LIBRARY(vtkPVPython
-  vtkPVPythonOptions.cxx
-  vtkPVProcessModulePythonHelper.cxx)
+  vtkPVPythonOptions.cxx)
 
 add_executable_with_forwarding(PV_EXE_SUFFIX
   pvpython
