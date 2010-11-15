@@ -1507,6 +1507,13 @@ public:
       case 3:
         adios_set_read_method(ADIOS_READ_METHOD_DIMES);
         break;
+//      case 4:
+//        adios_set_read_method(ADIOS_READ_METHOD_DATATAP);
+//        break;
+      default:
+        cout << "Adios read method unknown set to " << methodEnum << endl;
+        adios_set_read_method((ADIOS_READ_METHOD)methodEnum);
+        break;
       }
     }
 
@@ -1518,13 +1525,19 @@ public:
 
   static void Initialize()
     {
-    //cout << "==> AdiosGlobal::Initialize() " << endl;
+
 #ifdef _NOMPI
     // Nothing to do
 #else
     MPI_Comm *comm = NULL;
     vtkMultiProcessController *ctrl =
         vtkMultiProcessController::GetGlobalController();
+    if(!ctrl)
+      {
+      cout << "No global controller set" << endl;
+      return;
+      }
+    //cout << "==> AdiosGlobal::Initialize() " << ctrl->GetLocalProcessId() << endl;
     vtkMPICommunicator *mpiComm =
         vtkMPICommunicator::SafeDownCast(ctrl->GetCommunicator());
     if(mpiComm && mpiComm->GetMPIComm())
