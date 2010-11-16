@@ -387,7 +387,7 @@ protected:
   // Description:
   // Synchronizes bounds information on all nodes.
   // @CallOnAllProcessess
-  void GatherBoundsInformation();
+  void GatherBoundsInformation(bool using_remote_rendering);
 
   // Description:
   // Returns true if distributed rendering should be used.
@@ -426,6 +426,11 @@ protected:
   // UpdateCenterAxes().
   // Updates CenterAxes's scale and position.
   void UpdateCenterAxes(double bounds[6]);
+
+  // Description
+  // Returns true if the local process is doing to do actual render or
+  // displaying an image in a viewport.
+  bool GetLocalProcessDoesRendering(bool using_distributed_rendering);
 
   vtkLight* Light;
   vtkLightKit* LightKit;

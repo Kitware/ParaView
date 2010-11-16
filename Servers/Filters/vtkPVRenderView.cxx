@@ -470,6 +470,14 @@ void vtkPVRenderView::FinishSelection(vtkSelection* sel)
 //----------------------------------------------------------------------------
 void vtkPVRenderView::ResetCameraClippingRange()
 {
+  //cout << "Clipping Bounds: "
+  //  << this->LastComputedBounds[0] << ", "
+  //  << this->LastComputedBounds[1] << ", "
+  //  << this->LastComputedBounds[2] << ", "
+  //  << this->LastComputedBounds[3] << ", "
+  //  << this->LastComputedBounds[4] << ", "
+  //  << this->LastComputedBounds[5] << endl;
+
   this->GetRenderer()->ResetCameraClippingRange(this->LastComputedBounds);
   this->GetNonCompositedRenderer()->ResetCameraClippingRange(this->LastComputedBounds);
 }
@@ -478,14 +486,14 @@ void vtkPVRenderView::ResetCameraClippingRange()
   bds[0] << "," << bds[1] << "," << bds[2] << "," << bds[3] << "," << bds[4] << "," << bds[5] << ","
 
 //----------------------------------------------------------------------------
-void vtkPVRenderView::GatherBoundsInformation()
+void vtkPVRenderView::GatherBoundsInformation(
+  bool using_distributed_rendering)
 {
   // FIXME: when doing client-only render, we are wasting our energy computing
   // universal bounds. How can we fix that?
   vtkMath::UninitializeBounds(this->LastComputedBounds);
 
-  if (this->GetRenderWindow()->GetActualSize()[0] > 0 &&
-    this->GetRenderWindow()->GetActualSize()[1] > 0)
+  if (this->GetLocalProcessDoesRendering(using_distributed_rendering))
     {
     this->CenterAxes->SetUseBounds(0);
     // if ComputeVisiblePropBounds is called when there's no real window on the
@@ -494,7 +502,6 @@ void vtkPVRenderView::GatherBoundsInformation()
     this->GetRenderer()->ComputeVisiblePropBounds(this->LastComputedBounds);
     this->CenterAxes->SetUseBounds(1);
     }
-
   this->SynchronizedWindows->SynchronizeBounds(this->LastComputedBounds);
   if (!vtkMath::AreBoundsInitialized(this->LastComputedBounds))
     {
@@ -503,7 +510,32 @@ void vtkPVRenderView::GatherBoundsInformation()
     this->LastComputedBounds[1] = this->LastComputedBounds[3] =
       this->LastComputedBounds[5] = 1.0;
     }
+  //cout << "Bounds: "
+  //  << this->LastComputedBounds[0] << ", "
+  //  << this->LastComputedBounds[1] << ", "
+  //  << this->LastComputedBounds[2] << ", "
+  //  << this->LastComputedBounds[3] << ", "
+  //  << this->LastComputedBounds[4] << ", "
+  //  << this->LastComputedBounds[5] << endl;
+
   this->ResetCameraClippingRange();
+}
+
+//----------------------------------------------------------------------------
+bool vtkPVRenderView::GetLocalProcessDoesRendering(bool using_distributed_rendering)
+{
+  switch (vtkProcessModule::GetProcessModule()->GetOptions()->GetProcessType())
+    {
+  case vtkPVOptions::PVDATA_SERVER:
+    return false;
+
+  case vtkPVOptions::PARAVIEW:
+  case vtkPVOptions::PVCLIENT:
+    return true;
+
+  default:
+    return using_distributed_rendering;
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -650,7 +682,7 @@ void vtkPVRenderView::Render(bool interactive, bool skip_rendering)
     // Keep bounds information up-to-date.
     // FIXME: How can be make this so that we don't have to do parallel
     // communication each time.
-    this->GatherBoundsInformation();
+    this->GatherBoundsInformation(use_distributed_rendering);
     this->UpdateCenterAxes(this->LastComputedBounds);
     }
 
