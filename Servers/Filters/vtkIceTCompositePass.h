@@ -41,6 +41,8 @@ class vtkPixelBufferObject;
 class vtkTextureObject;
 class vtkShaderProgram2;
 class vtkOpenGLRenderWindow;
+class vtkUnsignedCharArray;
+class vtkFloatArray;
 
 class VTK_EXPORT vtkIceTCompositePass : public vtkRenderPass
 {
@@ -133,7 +135,7 @@ public:
   vtkSetMacro(DepthOnly,bool);
 
   // Description:
-  // Ice-T does not deal well with the background, by setting FixBackground to
+  // IceT does not deal well with the background, by setting FixBackground to
   // true, the pass will take care of displaying the correct background at the
   // price of some copy operations.
   // Initial value is false.
@@ -201,6 +203,9 @@ protected:
   double PhysicalViewport[4];
 
   int ImageReductionFactor;
+
+  vtkSynchronizedRenderers::vtkRawImage* LastRenderedRGBAColors;
+  vtkFloatArray *LastRenderedDepths;
 
   vtkPixelBufferObject *PBO;
   vtkTextureObject *ZTexture;

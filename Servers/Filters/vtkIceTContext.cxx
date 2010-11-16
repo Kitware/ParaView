@@ -24,8 +24,9 @@
 #include "vtkMPICommunicator.h"
 #include "vtkObjectFactory.h"
 
-#include "GL/ice-t.h"
-#include "GL/ice-t_mpi.h"
+#include "IceT.h"
+#include "IceTGL.h"
+#include "IceTMPI.h"
 
 //-----------------------------------------------------------------------------
 
@@ -41,16 +42,16 @@ vtkStandardNewMacro(vtkIceTContext);
 
 vtkIceTContext::vtkIceTContext()
 {
+  // This class establishes a constraint that these are both NULL or both valid.
   this->Controller = NULL;
-
-  this->Context = new vtkIceTContextOpaqueHandle;
+  this->Context = NULL;
+  this->UseOpenGL = 0;
 }
 
 vtkIceTContext::~vtkIceTContext()
 {
+  // Class constraint dictates that the context will be deleted as well.
   this->SetController(NULL);
-
-  delete this->Context;
 }
 
 void vtkIceTContext::PrintSelf(ostream &os, vtkIndent indent)
@@ -69,7 +70,7 @@ void vtkIceTContext::SetController(vtkMultiProcessController *controller)
     return;
     }
 
-  IceTContext newContext = (IceTContext)-1;
+  vtkIceTContextOpaqueHandle *newContext = NULL;
 
   if (controller)
     {
@@ -83,23 +84,32 @@ void vtkIceTContext::SetController(vtkMultiProcessController *controller)
 
     MPI_Comm mpiComm = *communicator->GetMPIComm()->GetHandle();
     IceTCommunicator icetComm = icetCreateMPICommunicator(mpiComm);
-    newContext = icetCreateContext(icetComm);
+    newContext = new vtkIceTContextOpaqueHandle;
+    newContext->Handle = icetCreateContext(icetComm);
     icetDestroyMPICommunicator(icetComm);
 
-    if (this->Controller)
+    if (this->UseOpenGL)
       {
-      icetCopyState(newContext, this->Context->Handle);
+      icetGLInitialize();
+      }
+
+    if (this->IsValid())
+      {
+      icetCopyState(newContext->Handle, this->Context->Handle);
       }
     }
 
   if (this->Controller)
     {
     icetDestroyContext(this->Context->Handle);
+    delete this->Context;
+    this->Context = NULL;
     this->Controller->UnRegister(this);
+    this->Controller = NULL;
     }
 
   this->Controller = controller;
-  this->Context->Handle = newContext;
+  this->Context = newContext;
 
   if (this->Controller)
     {
@@ -113,7 +123,7 @@ void vtkIceTContext::SetController(vtkMultiProcessController *controller)
 
 void vtkIceTContext::MakeCurrent()
 {
-  if (!this->Controller)
+  if (!this->IsValid())
     {
     vtkErrorMacro("Must set controller before making an IceT context current.");
     return;
@@ -124,8 +134,38 @@ void vtkIceTContext::MakeCurrent()
 
 //-----------------------------------------------------------------------------
 
+void vtkIceTContext::SetUseOpenGL(int flag)
+{
+  if (this->UseOpenGL == flag) return;
+
+  this->UseOpenGL = flag;
+  this->Modified();
+
+  if (this->UseOpenGL && this->IsValid())
+    {
+    this->MakeCurrent();
+    if (!icetGLIsInitialized())
+      {
+      icetGLInitialize();
+      }
+    }
+}
+
+//-----------------------------------------------------------------------------
+
 void vtkIceTContext::CopyState(vtkIceTContext *src)
 {
+  if (!this->IsValid())
+    {
+    vtkErrorMacro("Must set controller to copy state to context.");
+    return;
+    }
+  if (!src->IsValid())
+    {
+    vtkErrorMacro("Must set controller to copy state from context.");
+    return;
+    }
+
   icetCopyState(this->Context->Handle, src->Context->Handle);
 }
 
@@ -133,5 +173,5 @@ void vtkIceTContext::CopyState(vtkIceTContext *src)
 
 int vtkIceTContext::IsValid()
 {
-  return (this->Controller != NULL);
+  return ((this->Controller != NULL) && (this->Context != NULL));
 }
