@@ -765,6 +765,7 @@ vtkImageData* vtkSMRenderViewProxy::CaptureWindowInternal(int magnification)
   w2i->SetMagnification(magnification);
   w2i->ReadFrontBufferOff();
   w2i->ShouldRerenderOff();
+  w2i->FixBoundaryOn();
 
   // BUG #8715: We go through this indirection since the active connection needs
   // to be set during update since it may request re-renders if magnification >1.
