@@ -100,10 +100,14 @@ protected:
   vtkSetStringMacro(VTKClassName);
   vtkSetStringMacro(XMLGroup);
   vtkSetStringMacro(XMLName);
+  vtkSetStringMacro(PostPush);
+  vtkSetStringMacro(PostCreation);
 
   char* VTKClassName;
   char* XMLGroup;
   char* XMLName;
+  char* PostPush;
+  char* PostCreation;
 
   vtkWeakPointer<vtkObjectBase> VTKObject;
   vtkClientServerID VTKObjectID;

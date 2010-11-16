@@ -1004,8 +1004,9 @@
     </BoxRepresentationProxy>
 
     <!-- ================================================================== -->
-    <DistanceRepresentation2DProxy name="DistanceRepresentation2D"
-      class="vtkDistanceRepresentation2D">
+    <Proxy name="DistanceRepresentation2D"
+           class="vtkDistanceRepresentation2D"
+           post_create="InstantiateHandleRepresentation">
 
      <IntVectorProperty name="Visibility"
         command="SetVisibility"
@@ -1052,7 +1053,7 @@
      </DoubleVectorProperty>
 
      <!-- End of DistanceRepresentation2D -->
-    </DistanceRepresentation2DProxy>
+    </Proxy>
 
     <!-- ================================================================== -->
     <ImplicitPlaneRepresentationProxy name="ImplicitPlaneRepresentation"

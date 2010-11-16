@@ -144,7 +144,7 @@ int vtkSMProxyConfigurationReader::ReadConfiguration(vtkPVXMLElement *configXml)
     }
 
   // Push hierarchy to the proxy.
-  int ok=this->Proxy->LoadState(proxyXml,0);
+  int ok=this->Proxy->LoadXMLState(proxyXml,0);
   if (!ok)
     {
     vtkErrorMacro("Proxy::LoadState failed.");

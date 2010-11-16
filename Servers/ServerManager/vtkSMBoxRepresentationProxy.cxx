@@ -20,6 +20,9 @@
 #include "vtkProcessModule.h"
 #include "vtkTransform.h"
 
+#include "vtkSMSession.h"
+#include "vtkSMMessage.h"
+
 vtkStandardNewMacro(vtkSMBoxRepresentationProxy);
 //----------------------------------------------------------------------------
 vtkSMBoxRepresentationProxy::vtkSMBoxRepresentationProxy()
@@ -41,20 +44,20 @@ void vtkSMBoxRepresentationProxy::CreateVTKObjects()
 
   this->Superclass::CreateVTKObjects();
 
-  vtkClientServerStream stream;
-  stream  << vtkClientServerStream::Invoke
-          << this->GetID()
-          << "SetTransform"
-          << this->GetSubProxy("Transform")->GetID()
-          << vtkClientServerStream::End;
-  vtkProcessModule::GetProcessModule()->SendStream(
-    this->GetConnectionID(),
-    this->GetServers(), 
-    stream);
+  // Set the transform
+  vtkSMMessage msg;
+  msg.set_global_id(this->GlobalID);
+  msg.set_location(this->Location);
+  VariantList *args = msg.MutableExtension(InvokeRequest::arguments);
+  Variant* arg = args->add_variant();
+  arg->set_type(Variant::PROXY);
+  arg->add_proxy_global_id(this->GetSubProxy("Transform")->GetGlobalID());
+  msg.SetExtension(InvokeRequest::method, "SetTransform");
+  this->Session->Invoke(&msg);
 }
 
 //----------------------------------------------------------------------------
-void vtkSMBoxRepresentationProxy::UpdateVTKObjects(vtkClientServerStream& stream)
+void vtkSMBoxRepresentationProxy::UpdateVTKObjects()
 {
   if (this->InUpdateVTKObjects)
     {
@@ -63,15 +66,20 @@ void vtkSMBoxRepresentationProxy::UpdateVTKObjects(vtkClientServerStream& stream
 
   int something_changed = this->ArePropertiesModified();
 
-  this->Superclass::UpdateVTKObjects(stream);
+  this->Superclass::UpdateVTKObjects();
 
   if (something_changed)
     {
-    stream  << vtkClientServerStream::Invoke
-            << this->GetID()
-            << "SetTransform"
-            << this->GetSubProxy("Transform")->GetID()
-            << vtkClientServerStream::End;
+    // Set the transform
+    vtkSMMessage msg;
+    msg.set_global_id(this->GlobalID);
+    msg.set_location(this->Location);
+    VariantList *args = msg.MutableExtension(InvokeRequest::arguments);
+    Variant* arg = args->add_variant();
+    arg->set_type(Variant::PROXY);
+    arg->add_proxy_global_id(this->GetSubProxy("Transform")->GetGlobalID());
+    msg.SetExtension(InvokeRequest::method, "SetTransform");
+    this->Session->Invoke(&msg);
     }
 }
 

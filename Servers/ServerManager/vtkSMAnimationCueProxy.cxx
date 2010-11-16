@@ -23,6 +23,7 @@
 #include "vtkSMDomainIterator.h"
 #include "vtkSMProperty.h"
 #include "vtkSMProxyProperty.h"
+#include "vtkPMProxy.h"
 
 vtkStandardNewMacro(vtkSMAnimationCueProxy);
 
@@ -102,13 +103,11 @@ void vtkSMAnimationCueProxy::CreateVTKObjects()
     }
 
   // Ensure that all vtk objects are created only on the client side.
-  this->SetServers(vtkProcessModule::CLIENT);
+  this->SetLocation(vtkProcessModule::CLIENT);
 
   this->Superclass::CreateVTKObjects();
 
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  this->AnimationCue = vtkAnimationCue::SafeDownCast(
-    pm->GetObjectFromID(this->GetID()));
+  this->AnimationCue = vtkAnimationCue::SafeDownCast(this->GetClientSideObject());
   this->InitializeObservers(this->AnimationCue);
 
   // If Manipulator subproxy is defined, the manipulator is set the xml

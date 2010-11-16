@@ -33,6 +33,10 @@
 #include "vtkWeakPointer.h"
 #include "vtkWidgetRepresentation.h"
 
+#include "vtkSMSession.h"
+#include "vtkPMProxy.h"
+#include "vtkSMMessage.h"
+
 #include <vtkstd/list>
 
 vtkStandardNewMacro(vtkSMNewWidgetRepresentationProxy);
@@ -63,7 +67,7 @@ struct vtkSMNewWidgetRepresentationInternals
 //----------------------------------------------------------------------------
 vtkSMNewWidgetRepresentationProxy::vtkSMNewWidgetRepresentationProxy()
 {
-  this->SetServers(vtkProcessModule::CLIENT_AND_SERVERS);
+  this->SetLocation(vtkProcessModule::CLIENT_AND_SERVERS);
   this->RepresentationProxy = 0;
   this->WidgetProxy = 0;
   this->Widget = 0;
@@ -106,23 +110,27 @@ void vtkSMNewWidgetRepresentationProxy::CreateVTKObjects()
       "A representation proxy must be defined as a Prop (or Prop2D) sub-proxy");
     return;
     }
-  this->RepresentationProxy->SetServers(
+  this->RepresentationProxy->SetLocation(
     vtkProcessModule::RENDER_SERVER | vtkProcessModule::CLIENT);
 
   this->WidgetProxy = this->GetSubProxy("Widget");
   if (this->WidgetProxy)
     {
-    this->WidgetProxy->SetServers(vtkProcessModule::CLIENT);
+    this->WidgetProxy->SetLocation(vtkProcessModule::CLIENT);
     }
 
   this->Superclass::CreateVTKObjects();
 
-  if (!this->WidgetProxy)
+  // Location 0 is for prototype objects !!! No need to send to the server something.
+  if (!this->WidgetProxy || this->Location == 0)
     {
     return;
     }
 
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  vtkSMSession* session = vtkSMSession::SafeDownCast(pm->GetSession());
+
+
   vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
     this->WidgetProxy->GetProperty("Representation"));
   if (pp)
@@ -131,8 +139,13 @@ void vtkSMNewWidgetRepresentationProxy::CreateVTKObjects()
     }
   this->WidgetProxy->UpdateVTKObjects();
 
-  this->Widget = vtkAbstractWidget::SafeDownCast(
-    pm->GetObjectFromID(this->WidgetProxy->GetID()));
+  // Get the local VTK object for that widget
+  this->Widget =
+      vtkAbstractWidget::SafeDownCast(
+          vtkPMProxy::SafeDownCast(
+              session->GetPMObject(this->WidgetProxy->GetGlobalID()))
+          ->GetVTKObject());
+
   if (this->Widget)
     {
     this->Widget->AddObserver(
@@ -147,14 +160,19 @@ void vtkSMNewWidgetRepresentationProxy::CreateVTKObjects()
     vtk3DWidgetRepresentation::SafeDownCast(this->GetClientSideObject());
   clientObject->SetWidget(this->Widget);
 
-  vtkClientServerStream stream;
-  stream << vtkClientServerStream::Invoke
-         << this->GetID()
-         << "SetRepresentation"
-         << this->RepresentationProxy->GetID()
-         << vtkClientServerStream::End;
-  pm->SendStream(this->ConnectionID,
-    vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER, stream);
+
+  // Bind the Widget and the representations on the server side
+  vtkSMMessage msg;
+  msg.set_global_id(this->GlobalID);
+  msg.set_location(vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
+  VariantList *args = msg.MutableExtension(InvokeRequest::arguments);
+  Variant* arg = args->add_variant();
+  arg->set_type(Variant::PROXY);
+  arg->add_proxy_global_id(this->RepresentationProxy->GetGlobalID());
+  msg.SetExtension(InvokeRequest::method, "SetRepresentation");
+
+  // Make the call
+  session->Invoke(&msg);
 
   // Since links copy values from input to output,
   // we need to make sure that input properties i.e. the info
@@ -252,23 +270,20 @@ void vtkSMNewWidgetRepresentationProxy::ExecuteEvent(unsigned long event)
 //----------------------------------------------------------------------------
 void vtkSMNewWidgetRepresentationProxy::UnRegister(vtkObjectBase* obj)
 {
-  if ( this->GetSelfIDInternal().ID != 0 )
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  // If the object is not being deleted by the interpreter and it
+  // has a reference count of 2 (SelfID and the reference that is
+  // being released), delete the internals so that the links
+  // release their references to the proxy
+  if ( pm && this->Internal )
     {
-    vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-    // If the object is not being deleted by the interpreter and it
-    // has a reference count of 2 (SelfID and the reference that is
-    // being released), delete the internals so that the links
-    // release their references to the proxy
-    if ( pm && obj != pm->GetInterpreter() && this->Internal )
+    int size = this->Internal->Links.size();
+    if (size > 0 && this->ReferenceCount == 2 + 2*size)
       {
-      int size = this->Internal->Links.size();
-      if (size > 0 && this->ReferenceCount == 2 + 2*size)
-        {
-        vtkSMNewWidgetRepresentationInternals* aInternal = this->Internal;
-        this->Internal = 0;
-        delete aInternal;
-        aInternal = 0;
-        }
+      vtkSMNewWidgetRepresentationInternals* aInternal = this->Internal;
+      this->Internal = 0;
+      delete aInternal;
+      aInternal = 0;
       }
     }
 

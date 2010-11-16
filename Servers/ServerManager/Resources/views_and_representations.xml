@@ -3836,9 +3836,10 @@
     </SpreadSheetRepresentationProxy>
 
     <!-- =================================================================== -->
-    <TextSourceRepresentationProxy name="TextSourceRepresentation"
-      class="vtkTextSourceRepresentation"
-      processes="client|dataserver|renderserver" >
+    <Proxy name="TextSourceRepresentation"
+           class="vtkTextSourceRepresentation"
+           kernel_class="vtkPMTextSourceRepresentationProxy"
+           processes="client|dataserver|renderserver" >
       <Documentation>
         Representation proxy used to show text.
       </Documentation>
@@ -3926,7 +3927,7 @@
       </SubProxy>
 
       <!-- End of TextSourceRepresentation -->
-    </TextSourceRepresentationProxy>
+    </Proxy>
 
     <Proxy name="FrustumWidget" class="vtkPVFrustumActor"
       processes="client|dataserver|renderserver" >

@@ -1323,6 +1323,12 @@
         information_only="1"
         kernel_class="vtkPMSILProperty"
         subtree="Blocks"/>
+
+    <IdTypeVectorProperty name="SILTimeStamp"
+                          command="GetSILUpdateStamp"
+                          number_of_elements="1"
+                          default_values="0"
+                          information_only="1" />
      
      <StringVectorProperty
         name="ElementBlocks"
@@ -1330,13 +1336,12 @@
         repeat_command="1"
         number_of_elements_per_command="2"
         element_types="2 0" >
-<!--
         <SILDomain name="array_list" subtree="Blocks">
           <RequiredProperties>
              <Property name="ElementBlocksInfo" function="ArrayList" />
+             <Property name="SILTimeStamp" function="TimeStamp" />
           </RequiredProperties>
        </SILDomain>
--->
      </StringVectorProperty>
 
      <StringVectorProperty 
@@ -4289,8 +4294,13 @@
      <StringVectorProperty name="GridInfo"
         information_only="1"
         kernel_class="vtkPMSILProperty"
-        subtree="Blocks"
-        timestamp_command="GetSILUpdateStamp" />
+        subtree="Grids" />
+
+    <IdTypeVectorProperty name="SILTimeStamp"
+                          command="GetSILUpdateStamp"
+                          number_of_elements="1"
+                          default_values="0"
+                          information_only="1" />
      
      <StringVectorProperty
         name="GridStatus"
@@ -4302,6 +4312,7 @@
        <SILDomain name="array_list" subtree="Grids">
           <RequiredProperties>
              <Property name="GridInfo" function="ArrayList" />
+             <Property name="SILTimeStamp" function="TimeStamp" />
           </RequiredProperties>
        </SILDomain>
      </StringVectorProperty>

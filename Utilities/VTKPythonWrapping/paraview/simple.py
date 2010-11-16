@@ -345,7 +345,7 @@ def Delete(proxy=None):
         if listdomain:
             if listdomain.GetClassName() != 'vtkSMProxyListDomain':
                 continue
-            group = "pq_helper_proxies." + proxy.GetSelfIDAsString()
+            group = "pq_helper_proxies.%d" + proxy.GetGlobalID()
             for i in xrange(listdomain.GetNumberOfProxies()):
                 pm = servermanager.ProxyManager()
                 iproxy = listdomain.GetProxy(i)
@@ -702,7 +702,7 @@ def _GetRepresentationAnimationHelper(sourceproxy):
     proxy = servermanager.misc.RepresentationAnimationHelper(
       Source=sourceproxy)
     servermanager.ProxyManager().RegisterProxy(
-      "pq_helper_proxies.%s" % sourceproxy.GetSelfIDAsString(),
+      "pq_helper_proxies.%d" % sourceproxy.GetGlobalID(),
       "RepresentationAnimationHelper", proxy)
     return proxy
 

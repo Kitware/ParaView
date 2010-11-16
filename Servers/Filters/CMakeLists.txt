@@ -183,6 +183,7 @@ SET(Filters_SRCS
   vtkPVTrackballRoll.cxx
   vtkPVTrackballRotate.cxx
   vtkPVTrackballZoom.cxx
+  vtkPVTransform.cxx
   vtkPVUpdateSuppressor.cxx
   vtkPVView.cxx
   vtkPVXYChartView.cxx

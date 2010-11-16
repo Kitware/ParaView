@@ -110,9 +110,6 @@ protected:
   // Create VTK Objects.
   virtual void CreateVTKObjects();
 
-  virtual void UpdateVTKObjects(vtkClientServerStream& stream)
-    { this->Superclass::UpdateVTKObjects(stream); }
-
   // Description:
   // Callbacks for corresponding Cue events. The argument must be 
   // casted to vtkAnimationCue::AnimationCueInfo.

@@ -35,6 +35,7 @@ SET (Kit_SRCS
   vtkPMPVRepresentationProxy.cxx
   vtkPMSelectionRepresentationProxy.cxx
   vtkPMSILProperty.cxx
+  vtkPMScalarBarActorProxy.cxx
   vtkPMSourceProxy.cxx
   vtkPMStringVectorProperty.cxx
   vtkPMTextSourceRepresentationProxy.cxx
@@ -44,8 +45,17 @@ SET (Kit_SRCS
   vtkPMVectorProperty.cxx
   vtkPMWriterProxy.cxx
 # --- SM Objects ---
+  vtkSMAnimationCueManipulatorProxy.cxx
+  vtkSMAnimationCueProxy.cxx
+  vtkSMAnimationPlayerProxy.cxx
+  vtkSMAnimationSceneProxy.cxx
+  vtkSMBooleanKeyFrameProxy.cxx
+  vtkSMBoxRepresentationProxy.cxx
   vtkSMCameraLink.cxx
   vtkSMCameraProxy.cxx
+  vtkSMCameraConfigurationReader.cxx
+  vtkSMCameraConfigurationWriter.cxx
+  vtkSMCameraKeyFrameProxy.cxx
   vtkSMChartRepresentationProxy.cxx
   vtkSMCompoundSourceProxy.cxx
   vtkSMCompoundSourceProxyDefinitionBuilder.cxx
@@ -62,8 +72,13 @@ SET (Kit_SRCS
   vtkSMIdTypeVectorProperty.cxx
   vtkSMInputProperty.cxx
   vtkSMIntVectorProperty.cxx
+  vtkSMKeyFrameAnimationCueManipulatorProxy.cxx
+  vtkSMKeyFrameProxy.cxx
   vtkSMLink.cxx
+  vtkSMNamedPropertyIterator.cxx
+  vtkSMNewWidgetRepresentationProxy.cxx
   vtkSMObject.cxx
+  vtkSMOrderedPropertyIterator.cxx
   vtkSMOutputPort.cxx
   vtkSMParallelCoordinatesRepresentationProxy.cxx
   vtkSMProperty.cxx
@@ -71,6 +86,8 @@ SET (Kit_SRCS
   vtkSMPropertyIterator.cxx
   vtkSMPropertyLink.cxx
   vtkSMProxy.cxx
+  vtkSMProxyConfigurationReader.cxx
+  vtkSMProxyConfigurationWriter.cxx
   vtkSMProxyDefinitionIterator.cxx
   vtkSMProxyDefinitionManager.cxx
   vtkSMProxyIterator.cxx
@@ -87,17 +104,21 @@ SET (Kit_SRCS
   vtkSMRemoteObjectUpdateUndoElement.cxx
   vtkSMRenderViewProxy.cxx
   vtkSMRepresentationProxy.cxx
+  vtkSMScalarBarWidgetRepresentationProxy.cxx
   vtkSMSelectionHelper.cxx
   vtkSMSessionClient.cxx
   vtkSMSessionCore.cxx
   vtkSMSession.cxx
   vtkSMSessionServer.cxx
+  vtkSMSILModel.cxx
   vtkSMSourceProxy.cxx
   vtkSMSpreadSheetRepresentationProxy.cxx
   vtkSMStateLoader.cxx
   vtkSMStateVersionControllerBase.cxx
   vtkSMStateVersionController.cxx
   vtkSMStringVectorProperty.cxx
+  vtkSMTextWidgetRepresentationProxy.cxx
+  vtkSMTimeKeeperProxy.cxx
   vtkSMTwoDRenderViewProxy.cxx
   vtkSMUndoElement.cxx
   vtkSMUndoStackBuilder.cxx
@@ -106,6 +127,7 @@ SET (Kit_SRCS
   vtkSMUtilities.cxx
   vtkSMVectorProperty.cxx
   vtkSMViewProxy.cxx
+  vtkSMWidgetRepresentationProxy.cxx
   vtkSMWriterFactory.cxx
   vtkSMWriterProxy.cxx
   )
@@ -132,7 +154,7 @@ SET (Domain_SRCS
   vtkSMNumberOfGroupsDomain.cxx
   vtkSMProxyGroupDomain.cxx
   vtkSMProxyListDomain.cxx
-  #vtkSMSILDomain.cxx
+  vtkSMSILDomain.cxx
   vtkSMStringListDomain.cxx
   vtkSMStringListRangeDomain.cxx
 )
@@ -144,21 +166,15 @@ SET (Kit_SRCS
 
 IF (FIXME) #-------------------------------------------------------------- BEGIN
 SET(Kit_SRCS
-  vtkSMAnimationCueManipulatorProxy.cxx
-  vtkSMAnimationCueProxy.cxx
-  vtkSMAnimationPlayerProxy.cxx
+
+
   vtkSMAnimationSceneGeometryWriter.cxx
   vtkSMAnimationSceneImageWriter.cxx
-  vtkSMAnimationSceneProxy.cxx
+
   vtkSMAnimationSceneWriter.cxx
   vtkSMApplication.cxx
 
-  vtkSMBooleanKeyFrameProxy.cxx
-  vtkSMBoxRepresentationProxy.cxx # ---- don't know how to setup transform...
 
-  vtkSMCameraConfigurationReader.cxx
-  vtkSMCameraConfigurationWriter.cxx
-  vtkSMCameraKeyFrameProxy.cxx
 
   vtkSMCameraManipulatorProxy.cxx
   #vtkSMCaveRenderModuleProxy.cxx
@@ -172,7 +188,7 @@ SET(Kit_SRCS
   vtkSMContextArraysInformationHelper.cxx #---- SM Side only, not managed yet...
   vtkSMContextNamedOptionsProxy.cxx
 
-  vtkSMDataSourceProxy.cxx #---- Who use it ? --- Make a special property type ?
+  vtkSMDataSourceProxy.cxx #---- Who use it ? --- Make a special property type to copy data ?
   vtkSMDistanceRepresentation2DProxy.cxx
 
   vtkSMExponentialKeyFrameProxy.cxx
@@ -185,19 +201,11 @@ SET(Kit_SRCS
   vtkSMImplicitPlaneRepresentationProxy.cxx
   vtkSMInteractionUndoStackBuilder.cxx#--------------------------------
 
-  vtkSMKeyFrameAnimationCueManipulatorProxy.cxx
-  vtkSMKeyFrameProxy.cxx
+
 
   vtkSMLinearAnimationCueManipulatorProxy.cxx
-  vtkSMLookupTableProxy.cxx
 
-  vtkSMMaterialLoaderProxy.cxx
-
-  vtkSMNamedPropertyIterator.cxx
-  vtkSMNewWidgetRepresentationProxy.cxx
   vtkSMNetworkImageSourceProxy.cxx
-
-  vtkSMOrderedPropertyIterator.cxx
 
   vtkSMPQStateLoader.cxx
   vtkSMPluginManager.cxx
@@ -205,42 +213,35 @@ SET(Kit_SRCS
 #  vtkSMPluginInformationHelper.cxx
   vtkSMPropertyAdaptor.cxx
   vtkSMPropertyModificationUndoElement.cxx#--------------------------------
-  vtkSMProxyConfigurationReader.cxx
-  vtkSMProxyConfigurationWriter.cxx
+
   vtkSMProxyManagerReviver.cxx
   vtkSMProxyRegisterUndoElement.cxx#--------------------------------
   vtkSMProxyStateChangedUndoElement.cxx#--------------------------------
   vtkSMProxyUnRegisterUndoElement.cxx#--------------------------------
   vtkSMPythonTraceObserver.cxx
-  vtkSMPVLookupTableProxy.cxx
+
 
   vtkSMRampKeyFrameProxy.cxx
   vtkSMReaderFactory.cxx
   vtkSMRenderViewExporterProxy.cxx
   vtkSMRepresentationAnimationHelperProxy.cxx
 
-  vtkSMScalarBarActorProxy.cxx
-  vtkSMScalarBarWidgetRepresentationProxy.cxx
 #  vtkSMScatterPlotArraysInformationHelper.cxx
 #  vtkSMScatterPlotViewProxy.cxx
 #  vtkSMSelectionDeliveryRepresentationProxy.cxx
   vtkSMServerFileListingProxy.cxx
   vtkSMServerProxyManagerReviver.cxx
   vtkSMServerSideAnimationPlayer.cxx
-  vtkSMSILModel.cxx
   vtkSMSinusoidKeyFrameProxy.cxx
 
 #  vtkSMTemporalInputDomain.cxx
   vtkSMTesting.cxx
-  vtkSMTextWidgetRepresentationProxy.cxx
   vtkSMTimeAnimationCueProxy.cxx
-  vtkSMTimeKeeperProxy.cxx
-  vtkSMTransformProxy.cxx
 
   vtkSMUndoRedoStateLoader.cxx#-------------------------------- should be DELETE
   vtkSMUpdateInformationUndoElement.cxx#--------------------------------
 
-  vtkSMWidgetRepresentationProxy.cxx
+
   vtkSMWriterProxy.cxx
 
   vtkSMXMLPVAnimationWriterProxy.cxx
@@ -263,6 +264,7 @@ SET( ServerManager_SRCS
 # Abstract and Wrap exclude
 
 SET_SOURCE_FILES_PROPERTIES(
+  vtkSMAnimationCueManipulatorProxy.cxx
   vtkInitializationHelper.cxx
   vtkPMObject.cxx
   vtkPMVectorProperty.cxx
@@ -284,10 +286,8 @@ SET_SOURCE_FILES_PROPERTIES(
 
 IF (FIXME) #-------------------------------------------------------------- BEGIN
 SET_SOURCE_FILES_PROPERTIES(
-  vtkSMAnimationCueManipulatorProxy.cxx
   vtkSMAnimationSceneWriter.cxx
   vtkSMClientServerRenderSyncManagerHelper.cxx
-  vtkSMDomain.cxx
   vtkSMInformationHelper.cxx
   vtkSMLink.cxx
   vtkSMProxyManagerReviver.cxx

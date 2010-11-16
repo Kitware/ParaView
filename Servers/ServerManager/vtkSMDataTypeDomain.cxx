@@ -47,12 +47,10 @@ public:
   // Only instanciate classes once and use cache after...
   vtkDataObject* GetDataObjectOfType(const char* classname)
     {
-    if (!classname)
+    if (classname == NULL)
       {
       return 0;
       }
-
-    return NULL;
 
     // Since we can not instantiate these classes, we'll replace
     // them with a subclass

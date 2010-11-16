@@ -50,8 +50,8 @@ void vtkSMScalarBarWidgetRepresentationProxy::CreateVTKObjects()
     return;
     }
 
-  this->ActorProxy->SetServers(
-                    vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
+  this->ActorProxy->SetLocation( vtkProcessModule::CLIENT |
+                                 vtkProcessModule::RENDER_SERVER);
 
   this->Superclass::CreateVTKObjects();
 

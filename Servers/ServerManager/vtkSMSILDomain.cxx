@@ -16,62 +16,62 @@
 
 #include "vtkObjectFactory.h"
 #include "vtkSMProperty.h"
-#include "vtkSMSILInformationHelper.h"
+#include "vtkPVSILInformation.h"
+#include "vtkSMProxy.h"
+#include "vtkSMIdTypeVectorProperty.h"
+#include "vtkPVXMLElement.h"
+
 
 vtkStandardNewMacro(vtkSMSILDomain);
 //----------------------------------------------------------------------------
 vtkSMSILDomain::vtkSMSILDomain()
 {
+  this->SubTree = 0;
+  this->SILTimeStamp = 0;
+  this->SIL = vtkPVSILInformation::New();
 }
 
 //----------------------------------------------------------------------------
 vtkSMSILDomain::~vtkSMSILDomain()
 {
+  this->SetSubTree(0);
+  this->SIL->Delete();
 }
 
 //----------------------------------------------------------------------------
-const char* vtkSMSILDomain::GetSubtree()
+int vtkSMSILDomain::ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* elem)
 {
-  vtkSMProperty* req_prop = this->GetRequiredProperty("ArrayList");
-  if (!req_prop)
-    {
-    vtkErrorMacro("Required property 'ArrayList' missing."
-      "Cannot fetch the SIL");
-    return 0;
-    }
+  this->Superclass::ReadXMLAttributes(prop,elem);
 
-  vtkSMSILInformationHelper* helper =
-    vtkSMSILInformationHelper::SafeDownCast(req_prop->GetInformationHelper());
-  if (!helper)
-    {
-    vtkErrorMacro("Failed to locate vtkSMSILInformationHelper.");
-    return 0;
-    }
-
-  return helper->GetSubtree();
+  // Keep subtree attribute
+  this->SetSubTree(elem->GetAttribute("subtree"));
 }
-
-
 //----------------------------------------------------------------------------
 vtkGraph* vtkSMSILDomain::GetSIL()
 {
-  vtkSMProperty* req_prop = this->GetRequiredProperty("ArrayList");
-  if (!req_prop)
+  vtkSMIdTypeVectorProperty* timestamp =
+      vtkSMIdTypeVectorProperty::SafeDownCast(
+          this->GetRequiredProperty("TimeStamp"));
+  vtkSMProperty* silProp = this->GetRequiredProperty("ArrayList");
+
+  if (timestamp != NULL)
     {
-    vtkErrorMacro("Required property 'ArrayList' missing."
-      "Cannot fetch the SIL");
-    return 0;
+    // Check timestamp to know if the SIL fecth is needed
+    timestamp->GetParent()->UpdatePropertyInformation(timestamp);
+    vtkIdType time = timestamp->GetElement(0);
+    if( this->SILTimeStamp < time )
+      {
+      this->SILTimeStamp = time;
+      timestamp->GetParent()->GatherInformation(this->SIL);
+      }
+    }
+  else if(silProp != NULL)
+    {
+    // With no timestamp, we simply fecth each time the request is made
+    silProp->GetParent()->GatherInformation(this->SIL);
     }
 
-  vtkSMSILInformationHelper* helper =
-    vtkSMSILInformationHelper::SafeDownCast(req_prop->GetInformationHelper());
-  if (!helper)
-    {
-    vtkErrorMacro("Failed to locate vtkSMSILInformationHelper.");
-    return 0;
-    }
-
-  return helper->GetSIL();
+  return this->SIL->GetSIL();
 }
 
 //----------------------------------------------------------------------------

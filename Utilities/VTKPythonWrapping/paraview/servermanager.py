@@ -179,7 +179,7 @@ class Proxy(object):
         if 'registrationGroup' in args:
             registrationGroup = args['registrationGroup']
             del args['registrationGroup']
-            registrationName = self.SMProxy.GetSelfIDAsString()
+            registrationName = str(self.SMProxy.GetGlobalID())
             if 'registrationName' in args:
                 registrationName = args['registrationName']
                 del args['registrationName']
@@ -968,7 +968,7 @@ class ProxyProperty(Property):
             if listdomain.GetClassName() != 'vtkSMProxyListDomain':
                 raise ValueError, "Found a 'proxy_list' domain on an InputProperty that is not a ProxyListDomain."
             pm = ProxyManager()
-            group = "pq_helper_proxies." + proxy.GetSelfIDAsString()
+            group = "pq_helper_proxies.%d" % proxy.GetGlobalID()
             if listdomain.GetNumberOfProxies() == 0:
                 for i in xrange(listdomain.GetNumberOfProxyTypes()):
                     igroup = listdomain.GetProxyGroup(i)
@@ -1504,7 +1504,7 @@ class ProxyManager(object):
         proxies = {}
         iter = self.NewGroupIterator(groupname)
         for aProxy in iter:
-            proxies[(iter.GetKey(), aProxy.GetSelfIDAsString())] = aProxy
+            proxies[(iter.GetKey(), "%d" % aProxy.GetGlobalID())] = aProxy
         return proxies
 
     def UnRegisterProxy(self, groupname, proxyname, aProxy):

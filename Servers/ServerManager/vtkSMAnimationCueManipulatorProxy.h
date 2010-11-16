@@ -36,20 +36,17 @@
 
 #include "vtkSMProxy.h"
 class vtkSMAnimationCueProxy;
-struct vtkClientServerID;
 
 class VTK_EXPORT vtkSMAnimationCueManipulatorProxy : public vtkSMProxy
 {
 public:
   vtkTypeMacro(vtkSMAnimationCueManipulatorProxy, vtkSMProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
-//BTX
+
   // Description:
-  // Returns the SelfID for this proxy. This method is a residue
-  // from the old days when GetSelfID() was not a public method.
-  // Eventually this should be removed in favour of GetSelfID().
-  vtkClientServerID GetID() {return this->GetSelfID();}
-//ETX
+  // Overridden to call MarkAllPropertiesAsModified().
+  virtual void Copy( vtkSMProxy* src, const char* exceptionClass,
+                     int proxyPropertyCopyFlag);
 
 //BTX
   // Description:
@@ -59,12 +56,7 @@ public:
     {
     StateModifiedEvent = 2000
     };
-//ETX
 
-  // Description:
-  // Overridden to call MarkAllPropertiesAsModified().
-  virtual void Copy(vtkSMProxy* src, const char* exceptionClass, 
-    int proxyPropertyCopyFlag);
 protected:
 
   // Description:
@@ -99,13 +91,12 @@ protected:
 
   vtkSMAnimationCueManipulatorProxy();
   ~vtkSMAnimationCueManipulatorProxy();
-//BTX
   friend class vtkSMAnimationCueProxy;
-//ETX
+
 private:
   vtkSMAnimationCueManipulatorProxy(const vtkSMAnimationCueManipulatorProxy&); // Not implemented.
   void operator=(const vtkSMAnimationCueManipulatorProxy&); // Not implemented.
-  
+//ETX
 };
 
 #endif

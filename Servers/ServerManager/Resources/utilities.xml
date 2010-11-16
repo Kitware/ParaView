@@ -1,7 +1,9 @@
 <ServerManagerConfiguration>
   <ProxyGroup name="lookup_tables">
-    <LookupTableProxy name="LookupTable" class="vtkLookupTable"
-      processes="dataserver|renderserver|client" >
+    <Proxy name="LookupTable"
+           post_push="Build"
+           class="vtkLookupTable"
+           processes="dataserver|renderserver|client" >
       <IntVectorProperty
          name="NumberOfTableValues"
          command="SetNumberOfTableValues"
@@ -72,10 +74,12 @@
         default_values="">
       </StringVectorProperty>
 
-    </LookupTableProxy>
+    </Proxy>
 
-    <PVLookupTableProxy name="PVLookupTable" class="vtkDiscretizableColorTransferFunction"
-      processes="dataserver|renderserver|client" >
+    <Proxy name="PVLookupTable"
+           post_push="Build"
+           class="vtkDiscretizableColorTransferFunction"
+           processes="dataserver|renderserver|client" >
       <IntVectorProperty
         name="LockScalarRange"
         number_of_elements="1"
@@ -185,7 +189,7 @@
       </IntVectorProperty>
 
       <!-- End of PVLookupTable -->
-    </PVLookupTableProxy>
+    </Proxy>
   </ProxyGroup>
 
   <ProxyGroup name="parametric_functions">
@@ -1500,7 +1504,9 @@
       </IntVectorProperty>
     </Proxy>
 
-    <ScalarBarActorProxy name="ScalarBarActor" class="vtkPVScalarBarActor">
+    <Proxy name="ScalarBarActor"
+           class="vtkPVScalarBarActor"
+           kernel_class="vtkPMScalarBarActorProxy">
       <ProxyProperty
         name="LookupTable"
         command="SetLookupTable"
@@ -1616,7 +1622,7 @@
           <Property name="FontSize"   exposed_name="TitleFontSize"  />
         </ExposedProperties>
       </SubProxy>
-    </ScalarBarActorProxy>
+    </Proxy>
     <!-- End of ProxyGroup annotations -->
   </ProxyGroup>
 
@@ -1938,11 +1944,11 @@
     <!-- End PointSource -->
     </SourceProxy>
 
-    <TransformProxy name="Transform2" class="vtkTransform" >
+    <Proxy name="Transform2" class="vtkPVTransform" >
       <!--Transform proxy with unconventional interface, used by BoxWidget -->
       <DoubleVectorProperty
         name="Position"
-        command="SetPosition"
+        command="SetAbsolutePosition"
         number_of_elements="3"
         update_self="1"
         label="Translate"
@@ -1952,14 +1958,14 @@
       </DoubleVectorProperty>
 
       <DoubleVectorProperty name="PositionInfo"
-        command="GetPosition"
+        command="GetAbsolutePosition"
         information_only="1"
         number_of_elements="3"
         default_values="0.0 0.0 0.0" />
 
       <DoubleVectorProperty
         name="Rotation"
-        command="SetRotation"
+        command="SetAbsoluteRotation"
         number_of_elements="3"
         update_self="1"
         information_property="RotationInfo"
@@ -1969,14 +1975,14 @@
       </DoubleVectorProperty>
 
       <DoubleVectorProperty name="RotationInfo"
-        command="GetOrientation"
+        command="GetAbsoluteRotation"
         information_only="1"
         number_of_elements="3"
         default_values="0.0 0.0 0.0" />
 
       <DoubleVectorProperty
         name="Scale"
-        command="SetScale"
+        command="SetAbsoluteScale"
         number_of_elements="3"
         update_self="1"
         label="Scale"
@@ -1986,63 +1992,63 @@
       </DoubleVectorProperty>
 
       <DoubleVectorProperty name="ScaleInfo"
-        command="GetScale"
+        command="GetAbsoluteScale"
         information_only="1"
         number_of_elements="3"
         default_values="1.0 1.0 1.0" />
-    </TransformProxy>
+    </Proxy>
 
-    <TransformProxy name="Transform3" class="vtkTransform" label="Transform">
-      <DoubleVectorProperty
-        name="Position"
-        command="SetPosition"
-        number_of_elements="3"
-        update_self="1"
-        label="Translate"
-        information_property="PositionInfo"
-        default_values="0.0 0.0 0.0" >
-        <DoubleRangeDomain name="range" />
-      </DoubleVectorProperty>
+    <Proxy name="Transform3" class="vtkPVTransform" label="Transform">
+    <DoubleVectorProperty
+      name="Position"
+      command="SetAbsolutePosition"
+      number_of_elements="3"
+      update_self="1"
+      label="Translate"
+      information_property="PositionInfo"
+      default_values="0.0 0.0 0.0" >
+      <DoubleRangeDomain name="range" />
+    </DoubleVectorProperty>
 
-      <DoubleVectorProperty name="PositionInfo"
-        command="GetPosition"
-        information_only="1"
-        number_of_elements="3"
-        default_values="0.0 0.0 0.0" />
+    <DoubleVectorProperty name="PositionInfo"
+      command="GetAbsolutePosition"
+      information_only="1"
+      number_of_elements="3"
+      default_values="0.0 0.0 0.0" />
 
-      <DoubleVectorProperty
-        name="Rotation"
-        command="SetRotation"
-        number_of_elements="3"
-        update_self="1"
-        information_property="RotationInfo"
-        label="Rotate"
-        default_values="0.0 0.0 0.0" >
-        <DoubleRangeDomain name="range" />
-      </DoubleVectorProperty>
+    <DoubleVectorProperty
+      name="Rotation"
+      command="SetAbsoluteRotation"
+      number_of_elements="3"
+      update_self="1"
+      information_property="RotationInfo"
+      label="Rotate"
+      default_values="0.0 0.0 0.0" >
+      <DoubleRangeDomain name="range" />
+    </DoubleVectorProperty>
 
-      <DoubleVectorProperty name="RotationInfo"
-        command="GetOrientation"
-        information_only="1"
-        number_of_elements="3"
-        default_values="0.0 0.0 0.0" />
+    <DoubleVectorProperty name="RotationInfo"
+      command="GetAbsoluteRotation"
+      information_only="1"
+      number_of_elements="3"
+      default_values="0.0 0.0 0.0" />
 
-      <DoubleVectorProperty
-        name="Scale"
-        command="SetScale"
-        number_of_elements="3"
-        update_self="1"
-        label="Scale"
-        information_property="ScaleInfo"
-        default_values="1.0 1.0 1.0" >
-        <DoubleRangeDomain name="range" />
-      </DoubleVectorProperty>
+    <DoubleVectorProperty
+      name="Scale"
+      command="SetAbsoluteScale"
+      number_of_elements="3"
+      update_self="1"
+      label="Scale"
+      information_property="ScaleInfo"
+      default_values="1.0 1.0 1.0" >
+      <DoubleRangeDomain name="range" />
+    </DoubleVectorProperty>
 
-      <DoubleVectorProperty name="ScaleInfo"
-        command="GetScale"
-        information_only="1"
-        number_of_elements="3"
-        default_values="1.0 1.0 1.0" />
+    <DoubleVectorProperty name="ScaleInfo"
+      command="GetAbsoluteScale"
+      information_only="1"
+      number_of_elements="3"
+      default_values="1.0 1.0 1.0" />
 
        <Hints>
         <PropertyGroup type="Box">
@@ -2056,7 +2062,7 @@
          </ProxyList>
          -->
        </Hints>
-    </TransformProxy>
+    </Proxy>
   </ProxyGroup>
 
   <ProxyGroup name="misc">

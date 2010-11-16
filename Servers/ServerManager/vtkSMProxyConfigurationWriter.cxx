@@ -85,7 +85,8 @@ int vtkSMProxyConfigurationWriter::WriteConfiguration(ostream &os)
   state->AddAttribute("description",this->GetFileDescription());
   state->AddAttribute("version",this->GetWriterVersion());
 
-  this->Proxy->SaveState(state, iter, 0);
+  // We don't want Sub-proxy
+  this->Proxy->SaveXMLState(state, iter);
 
   state->PrintXML(os, vtkIndent());
   state->Delete();

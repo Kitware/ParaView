@@ -54,7 +54,7 @@ vtkSMAnimationPlayerProxy::vtkSMAnimationPlayerProxy()
 {
   this->Observer = vtkObserver::New();
   this->Observer->SetTarget(this);
-  this->SetServers(vtkProcessModule::CLIENT);
+  this->SetLocation(vtkProcessModule::CLIENT);
 }
 
 //----------------------------------------------------------------------------
@@ -72,11 +72,10 @@ void vtkSMAnimationPlayerProxy::CreateVTKObjects()
     return;
     }
 
-  this->SetServers(vtkProcessModule::CLIENT);
+  this->SetLocation(vtkProcessModule::CLIENT);
   this->Superclass::CreateVTKObjects();
 
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  vtkObject * obj = vtkObject::SafeDownCast(pm->GetObjectFromID(this->GetID()));
+  vtkObject * obj = vtkObject::SafeDownCast(this->GetClientSideObject());
   obj->AddObserver(vtkCommand::StartEvent, this->Observer);
   obj->AddObserver(vtkCommand::EndEvent, this->Observer);
   obj->AddObserver(vtkCommand::ProgressEvent, this->Observer);
@@ -103,27 +102,34 @@ void vtkSMAnimationPlayerProxy::CreateVTKObjects()
       subproxies.push_back(proxy);
       }
 
+
+
     vtkClientServerStream stream;
     for (unsigned int cc=0; cc < subproxies.size(); ++cc)
       {
       stream << vtkClientServerStream::Invoke
-        << this->GetID()
+        << this->GetClientSideObject()
         << "AddPlayer"
-        << subproxies[cc]->GetID()
+        << subproxies[cc]->GetClientSideObject()
         << vtkClientServerStream::End;
       }
-    pm->SendStream(this->ConnectionID, this->Servers, stream);
+    // TODO execute stream with local interpretor
+    // FIXME ++++++++++
+    // FIXME ++++++++++
+    // FIXME ++++++++++
+    // FIXME ++++++++++
+
+
     }
 }
 
 //----------------------------------------------------------------------------
 int vtkSMAnimationPlayerProxy::IsInPlay()
 {
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  if (this->ObjectsCreated && pm)
+  if (this->ObjectsCreated && this->GetClientSideObject())
     {
     vtkAnimationPlayer* obj = vtkAnimationPlayer::SafeDownCast(
-      pm->GetObjectFromID(this->GetID()));
+        this->GetClientSideObject());
     return obj->IsInPlay();
     }
   return 0;

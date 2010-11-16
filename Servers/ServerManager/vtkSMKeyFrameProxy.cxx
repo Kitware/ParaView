@@ -35,7 +35,7 @@ vtkSMKeyFrameProxy::vtkSMKeyFrameProxy()
 {
   this->KeyTime = -1.0;
   this->Internals = new vtkSMKeyFrameProxyInternals;
-  this->SetServers(vtkProcessModule::CLIENT);
+  this->SetLocation(vtkProcessModule::CLIENT);
 }
 
 //----------------------------------------------------------------------------

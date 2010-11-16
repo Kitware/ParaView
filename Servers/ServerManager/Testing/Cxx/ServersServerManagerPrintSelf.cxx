@@ -66,7 +66,6 @@
 #include "vtkSMFetchDataProxy.h"
 #include "vtkSMFieldDataDomain.h"
 #include "vtkSMFileListDomain.h"
-#include "vtkSMFileSeriesReaderProxy.h"
 #include "vtkSMFixedTypeDomain.h"
 #include "vtkSMGlobalPropertiesLinkUndoElement.h"
 #include "vtkSMGlobalPropertiesManager.h"
@@ -84,8 +83,6 @@
 #include "vtkSMKeyFrameProxy.h"
 #include "vtkSMLinearAnimationCueManipulatorProxy.h"
 #include "vtkSMLink.h"
-#include "vtkSMLookupTableProxy.h"
-#include "vtkSMMaterialLoaderProxy.h"
 #include "vtkSMNamedPropertyIterator.h"
 #include "vtkSMNetworkImageSourceProxy.h"
 #include "vtkSMNewWidgetRepresentationProxy.h"
@@ -120,7 +117,6 @@
 #include "vtkSMProxyStateChangedUndoElement.h"
 #include "vtkSMProxyUnRegisterUndoElement.h"
 #include "vtkSMPSWriterProxy.h"
-#include "vtkSMPVLookupTableProxy.h"
 #include "vtkSMPVRepresentationProxy.h"
 #include "vtkSMPWriterProxy.h"
 #include "vtkSMPythonTraceObserver.h"
@@ -152,7 +148,6 @@
 #include "vtkSMTextWidgetRepresentationProxy.h"
 #include "vtkSMTimeAnimationCueProxy.h"
 #include "vtkSMTimeKeeperProxy.h"
-#include "vtkSMTransformProxy.h"
 #include "vtkSMTwoDRenderViewProxy.h"
 #include "vtkSMUndoElement.h"
 #include "vtkSMUndoRedoStateLoader.h"
@@ -228,7 +223,6 @@ int main(int , char *[])
   PRINT_SELF(vtkSMFetchDataProxy);
   PRINT_SELF(vtkSMFieldDataDomain);
   PRINT_SELF(vtkSMFileListDomain);
-  PRINT_SELF(vtkSMFileSeriesReaderProxy);
   PRINT_SELF(vtkSMFixedTypeDomain);
   PRINT_SELF(vtkSMGlobalPropertiesLinkUndoElement);
   PRINT_SELF(vtkSMGlobalPropertiesManager);
@@ -246,8 +240,6 @@ int main(int , char *[])
   PRINT_SELF(vtkSMKeyFrameProxy);
   PRINT_SELF(vtkSMLinearAnimationCueManipulatorProxy);
   PRINT_SELF(vtkSMLink);
-  PRINT_SELF(vtkSMLookupTableProxy);
-  PRINT_SELF(vtkSMMaterialLoaderProxy);
   PRINT_SELF(vtkSMNamedPropertyIterator);
   PRINT_SELF(vtkSMNetworkImageSourceProxy);
   PRINT_SELF(vtkSMNewWidgetRepresentationProxy);
@@ -282,7 +274,6 @@ int main(int , char *[])
   PRINT_SELF(vtkSMProxyStateChangedUndoElement);
   PRINT_SELF(vtkSMProxyUnRegisterUndoElement);
   PRINT_SELF(vtkSMPSWriterProxy);
-  PRINT_SELF(vtkSMPVLookupTableProxy);
   PRINT_SELF(vtkSMPVRepresentationProxy);
   PRINT_SELF(vtkSMPWriterProxy);
   PRINT_SELF(vtkSMPythonTraceObserver);
@@ -316,7 +307,6 @@ int main(int , char *[])
   PRINT_SELF(vtkSMTextWidgetRepresentationProxy);
   PRINT_SELF(vtkSMTimeAnimationCueProxy);
   PRINT_SELF(vtkSMTimeKeeperProxy);
-  PRINT_SELF(vtkSMTransformProxy);
   PRINT_SELF(vtkSMTwoDRenderViewProxy);
   PRINT_SELF(vtkSMUndoElement);
   PRINT_SELF(vtkSMUndoRedoStateLoader);

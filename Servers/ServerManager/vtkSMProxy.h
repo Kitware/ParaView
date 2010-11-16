@@ -351,6 +351,9 @@ public:
   // This call saves all a proxy's properties, including exposed properties
   // and sub-proxies. More control is provided by the following overload.
   vtkPVXMLElement* SaveXMLState(vtkPVXMLElement* root);
+  // Description:
+  // The iterator is use to filter the property available on the given proxy
+  vtkPVXMLElement* SaveXMLState(vtkPVXMLElement* root, vtkSMPropertyIterator* iter);
 
   // Description:
   // Loads the proxy state from the XML element. Returns 0 on failure.

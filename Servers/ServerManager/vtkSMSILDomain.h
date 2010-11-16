@@ -30,6 +30,7 @@
 #include "vtkSMArraySelectionDomain.h"
 
 class vtkGraph;
+class vtkPVSILInformation;
 
 class VTK_EXPORT vtkSMSILDomain : public vtkSMArraySelectionDomain
 {
@@ -45,12 +46,28 @@ public:
   // requesting the vtkSMSILInformationHelper to fetch the SIL.
   vtkGraph* GetSIL();
 
-  const char* GetSubtree();
+  // Description:
+  // Provide an access to the subtree attribute from the XML definition of
+  // the sub-domaine
+  vtkGetStringMacro(SubTree);
 
 //BTX
 protected:
+
+  // Description:
+  // Set the appropriate ivars from the xml element. Should
+  // be overwritten by subclass if adding ivars.
+  virtual int ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* elem);
+
+  // Internal method used to store the SubTree information from the XML
+  vtkSetStringMacro(SubTree);
+
   vtkSMSILDomain();
   ~vtkSMSILDomain();
+
+  char* SubTree;
+  vtkPVSILInformation* SIL;
+  vtkIdType SILTimeStamp;
 
 private:
   vtkSMSILDomain(const vtkSMSILDomain&); // Not implemented

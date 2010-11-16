@@ -53,6 +53,8 @@ vtkPMProxy::vtkPMProxy()
   this->XMLGroup = 0;
   this->XMLName = 0;
   this->VTKClassName = 0;
+  this->PostPush = 0;
+  this->PostCreation = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -66,6 +68,8 @@ vtkPMProxy::~vtkPMProxy()
   this->SetXMLGroup(0);
   this->SetXMLName(0);
   this->SetVTKClassName(0);
+  this->SetPostPush(0);
+  this->SetPostCreation(0);
 }
 
 //----------------------------------------------------------------------------
@@ -93,6 +97,17 @@ void vtkPMProxy::Push(vtkSMMessage* message)
         }
       }
     }
+
+  // Execute post_push if any
+  if(this->PostPush != NULL)
+    {
+    vtkClientServerStream stream;
+    stream << vtkClientServerStream::Invoke
+           << this->GetVTKObjectID()
+           << this->PostPush
+           << vtkClientServerStream::End;
+    this->Interpreter->ProcessStream(stream);
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -107,13 +122,33 @@ void vtkPMProxy::Invoke(vtkSMMessage* message)
   const VariantList* arguments;
   command = message->GetExtension(InvokeRequest::method);
   arguments = &message->GetExtension(InvokeRequest::arguments);
+  vtkPMProxy* proxy = NULL;
 
   vtkClientServerStream stream;
   stream << vtkClientServerStream::Invoke << this->GetVTKObjectID()
-    << command.c_str();
+         << command.c_str();
   for (int cc=0; cc < arguments->variant_size(); cc++)
     {
-    stream << arguments->variant(cc);
+    const Variant *v = &arguments->variant(cc);
+    switch (v->type())
+      {
+      case Variant::PROXY:
+        proxy =
+            vtkPMProxy::SafeDownCast(
+                this->SessionCore->GetPMObject(v->proxy_global_id(0)));
+        if(proxy == NULL)
+          {
+          vtkErrorMacro("Did not find a PMProxy with id " << v->proxy_global_id(0));
+          }
+        else
+          {
+          stream << proxy->GetVTKObject();
+          }
+        break;
+      default:
+        stream << *v;
+        break;
+      }
     }
   stream << vtkClientServerStream::End;
   this->Interpreter->ProcessStream(stream);
@@ -282,6 +317,18 @@ bool vtkPMProxy::CreateVTKObjects(vtkSMMessage* message)
     }
 
   this->ObjectsCreated = true;
+
+  // Execute post-creation if any
+  if(this->PostCreation != NULL)
+    {
+    vtkClientServerStream stream;
+    stream << vtkClientServerStream::Invoke
+           << this->GetVTKObjectID()
+           << this->PostCreation
+           << vtkClientServerStream::End;
+    this->Interpreter->ProcessStream(stream);
+    }
+
   return true;
 }
 
@@ -314,6 +361,10 @@ vtkObjectBase* vtkPMProxy::GetVTKObject()
 //----------------------------------------------------------------------------
 bool vtkPMProxy::ReadXMLAttributes(vtkPVXMLElement* element)
 {
+  // Add hook for post_push and post_creation
+  this->SetPostPush(element->GetAttribute("post_push"));
+  this->SetPostCreation(element->GetAttribute("post_creation"));
+
   for(unsigned int i=0; i < element->GetNumberOfNestedElements(); ++i)
     {
     vtkPVXMLElement* propElement = element->GetNestedElement(i);

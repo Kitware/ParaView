@@ -58,10 +58,10 @@ void vtkSMTextWidgetRepresentationProxy::CreateVTKObjects()
     return;
     }
 
-  this->TextActorProxy->SetServers(
-    vtkProcessModule::RENDER_SERVER | vtkProcessModule::CLIENT);
-  this->TextPropertyProxy->SetServers(
-    vtkProcessModule::RENDER_SERVER | vtkProcessModule::CLIENT);
+  this->TextActorProxy->SetLocation( vtkProcessModule::RENDER_SERVER |
+                                     vtkProcessModule::CLIENT);
+  this->TextPropertyProxy->SetLocation( vtkProcessModule::RENDER_SERVER |
+                                       vtkProcessModule::CLIENT);
 
   this->Superclass::CreateVTKObjects();
 

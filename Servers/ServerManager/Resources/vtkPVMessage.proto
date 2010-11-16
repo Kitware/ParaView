@@ -19,13 +19,13 @@ message Variant {
     INPUT   = 5; // proxy_global_id + port_number
     }
 
-  required Type   type            = 1;
-  repeated sint64 idtype          = 3;
-  repeated sint32 integer         = 4;
-  repeated double float64         = 5;
-  repeated int64  proxy_global_id = 6;
-  repeated int32  port_number     = 7;
-  repeated string txt             = 8;
+  required Type    type            = 1;
+  repeated sint64  idtype          = 3;
+  repeated sint32  integer         = 4;
+  repeated double  float64         = 5;
+  repeated uint64  proxy_global_id = 6;
+  repeated int32   port_number     = 7;
+  repeated string  txt             = 8;
 }
 
 message VariantList {

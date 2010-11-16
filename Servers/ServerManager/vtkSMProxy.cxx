@@ -1657,6 +1657,20 @@ void vtkSMProxy::PrintSelf(ostream& os, vtkIndent indent)
 //---------------------------------------------------------------------------
 vtkPVXMLElement* vtkSMProxy::SaveXMLState(vtkPVXMLElement* root)
 {
+  vtkSMPropertyIterator *iter = this->NewPropertyIterator();
+  vtkPVXMLElement* result = this->SaveXMLState(root, iter);
+  iter->Delete();
+  return result;
+}
+//---------------------------------------------------------------------------
+vtkPVXMLElement* vtkSMProxy::SaveXMLState(vtkPVXMLElement* root,
+                                          vtkSMPropertyIterator *iter)
+{
+  if( iter == NULL)
+    {
+    return this->SaveXMLState(root);
+    }
+
   vtkPVXMLElement *proxyXml = vtkPVXMLElement::New();
 
   proxyXml->SetName("Proxy");
@@ -1667,7 +1681,6 @@ vtkPVXMLElement* vtkSMProxy::SaveXMLState(vtkPVXMLElement* root)
   proxyXml->AddAttribute( "servers",
                           static_cast<unsigned int>(this->GetLocation()));
 
-  vtkSMPropertyIterator *iter = this->NewPropertyIterator();
   for (iter->Begin(); !iter->IsAtEnd(); iter->Next())
     {
     if (!iter->GetProperty())
@@ -1685,7 +1698,6 @@ vtkPVXMLElement* vtkSMProxy::SaveXMLState(vtkPVXMLElement* root)
                                       propID.str().c_str());
       }
     }
-  iter->Delete();
 
   if (root)
     {
