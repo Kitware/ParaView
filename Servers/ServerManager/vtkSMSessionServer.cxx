@@ -172,7 +172,10 @@ bool vtkSMSessionServer::Connect(const char* url)
 
   vtksys::RegularExpression pvserver("^cs://([^:]+)?(:([0-9]+))?");
   vtksys::RegularExpression pvserver_reverse ("^csrc://([^:]+)(:([0-9]+))?");
-  // TODO: handle render-server/data-server urls
+  vtksys::RegularExpression pvrenderserver(
+    "^cdsrs://([^:]+)(:([0-9]+))?/([^:]+)(:([0-9]+))?");
+  vtksys::RegularExpression pvrenderserver_reverse (
+    "^cdsrsrc://([^:]+)?(:([0-9]+))?/([^:]+)?(:([0-9]+))?");
 
   vtksys_ios::ostringstream handshake;
   handshake << "handshake=paraview." << PARAVIEW_VERSION_FULL;
@@ -192,14 +195,66 @@ bool vtkSMSessionServer::Connect(const char* url)
     }
   else if (pvserver_reverse.find(url))
     {
+    vtkstd::string hostname = pvserver.match(1);
     int port = atoi(pvserver_reverse.match(3).c_str());
     port = (port == 0)? 11111: port;
     vtksys_ios::ostringstream stream;
-    stream << "tcp://localhost:" << port << "?" << handshake.str();
+    stream << "tcp://" << hostname.c_str() << ":" << port << "?" << handshake.str();
     client_url = stream.str();
 
     using_reverse_connect = true;
     }
+  else if (pvrenderserver.find(url))
+    {
+    int dsport = atoi(pvrenderserver.match(3).c_str());
+    dsport = (dsport == 0)? 11111 : dsport;
+
+    int rsport = atoi(pvrenderserver.match(6).c_str());
+    rsport = (rsport == 0)? 22221 : rsport;
+
+    if (vtkProcessModule::GetProcessType() ==
+      vtkProcessModule::PROCESS_RENDER_SERVER)
+      {
+      vtksys_ios::ostringstream stream;
+      stream << "tcp://localhost:" << rsport << "?listen=true&" << handshake.str();
+      client_url = stream.str();
+      }
+    else if (vtkProcessModule::GetProcessType() ==
+      vtkProcessModule::PROCESS_DATA_SERVER)
+      {
+      vtksys_ios::ostringstream stream;
+      stream << "tcp://localhost:" << dsport << "?listen=true&" << handshake.str();
+      client_url = stream.str();
+      }
+    }
+  else if (pvrenderserver_reverse.find(url))
+    {
+    vtkstd::string dataserverhost = pvrenderserver.match(1);
+    int dsport = atoi(pvrenderserver.match(3).c_str());
+    dsport = (dsport == 0)? 11111 : dsport;
+
+    vtkstd::string renderserverhost = pvrenderserver.match(4);
+    int rsport = atoi(pvrenderserver.match(6).c_str());
+    rsport = (rsport == 0)? 22221 : rsport;
+
+    if (vtkProcessModule::GetProcessType() ==
+      vtkProcessModule::PROCESS_RENDER_SERVER)
+      {
+      vtksys_ios::ostringstream stream;
+      stream << "tcp://" << dataserverhost.c_str() << ":" << rsport << "?" << handshake.str();
+      client_url = stream.str();
+      }
+    else if (vtkProcessModule::GetProcessType() ==
+      vtkProcessModule::PROCESS_DATA_SERVER)
+      {
+      vtksys_ios::ostringstream stream;
+      stream << "tcp://" << renderserverhost.c_str() << ":" << dsport << "?" << handshake.str();
+      client_url = stream.str();
+      }
+
+    using_reverse_connect = true;
+    }
+
 
   vtkMultiProcessController* ccontroller =
     nam->NewConnection(client_url.c_str());
@@ -208,10 +263,6 @@ bool vtkSMSessionServer::Connect(const char* url)
     this->SetClientController(ccontroller);
     ccontroller->Delete();
     }
-
-  // TODO:
-  // Setup the socket connnection between data-server and render-server.
-  // this->SetupDataServerRenderServerConnection();
 
   return (this->ClientController != NULL);
 }

@@ -612,6 +612,32 @@
     </Proxy>
   </ProxyGroup>
 
+  <ProxyGroup name="internals">
+    <Proxy name="MPIMToNSocketConnection" class="vtkMPIMToNSocketConnection"
+      processes="dataserver|renderserver">
+      <IntVectorProperty name="WaitingProcess"
+        command="Initialize"
+        number_of_elements="1"
+        default_values="none" is_internal="1">
+        <EnumerationDomain name="enum">
+          <Entry value="2" text="DataServer" />
+          <Entry value="3" text="RenderServer" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+
+      <StringVectorProperty name="Connections"
+        command="SetPortInformation"
+        set_number_command="SetNumberOfConnections"
+        element_types="0 0 2"
+        number_of_elements_per_command="3"
+        repeat_command="1"
+        default_values="" >
+      </StringVectorProperty>
+
+      <Property name="Connect" command="ConnectMtoN" is_internal="1"/>
+    </Proxy>
+  </ProxyGroup>
+
   <ProxyGroup name="animation">
     <Proxy name="AnimationCueBase">
       <Documentation>

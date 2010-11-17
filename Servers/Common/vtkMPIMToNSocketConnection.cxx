@@ -15,12 +15,13 @@
 #include "vtkMPIMToNSocketConnection.h"
 
 #include "vtkClientSocket.h"
-#include "vtkObjectFactory.h"
 #include "vtkMPIMToNSocketConnectionPortInformation.h"
 #include "vtkMultiProcessController.h"
+#include "vtkObjectFactory.h"
+#include "vtkProcessModule.h"
+#include "vtkPVServerOptions.h"
 #include "vtkServerSocket.h"
 #include "vtkSocketCommunicator.h"
-
 
 #include <vtkstd/string>
 #include <vtkstd/vector>
@@ -45,7 +46,6 @@ public:
 
 vtkMPIMToNSocketConnection::vtkMPIMToNSocketConnection()
 {
-  this->MachinesFileName = 0;
   this->Socket = 0;
   this->HostName = 0;
   this->PortNumber = 0;
@@ -55,6 +55,7 @@ vtkMPIMToNSocketConnection::vtkMPIMToNSocketConnection()
   this->SocketCommunicator = 0;
   this->NumberOfConnections = -1;
   this->ServerSocket = 0;
+  this->IsWaiting = false;
 }
 
 vtkMPIMToNSocketConnection::~vtkMPIMToNSocketConnection()
@@ -93,47 +94,45 @@ void vtkMPIMToNSocketConnection::PrintSelf(ostream& os, vtkIndent indent)
     os << i3 << "PortNumber: " << this->Internals->ServerInformation[i].PortNumber << "\n";
     os << i3 << "HostName: " << this->Internals->ServerInformation[i].HostName.c_str() << "\n";
     }
-  os << indent << "MachinesFileName: " << (this->MachinesFileName?this->MachinesFileName:"(none)") << endl;
   os << indent << "PortNumber: " << this->PortNumber << endl;
 }
 
-void vtkMPIMToNSocketConnection::LoadMachinesFile()
+//------------------------------------------------------------------------------
+void vtkMPIMToNSocketConnection::Initialize(int waiting_process_type)
 {
-  if(!this->MachinesFileName)
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  vtkPVServerOptions* options = vtkPVServerOptions::SafeDownCast(
+    pm->GetOptions());
+  if (options)
     {
-    return;
-    }
-
-  vtkWarningMacro("The names of the machines making up this server should "
-                  "be specified in the XML configuration file. The --machines "
-                  "(and -m) command-line arguments have been deprecated and "
-                  "will be removed in the next ParaView release.");
-
-  FILE* file = fopen(this->MachinesFileName, "r");
-  char machinename[1024];
-  if(!file)
-    {
-    vtkErrorMacro("Could not open file : " << this->MachinesFileName);
-    return;
-    }
-  while(!feof(file))
-    {
-    if(fgets(machinename, 1024, file) != 0)
+    for (unsigned int cc=0; cc < options->GetNumberOfMachines(); cc++)
       {
-      int pos = static_cast<int>(strlen(machinename))-1;
-      if(machinename[pos] == '\n')
-        {
-        machinename[pos] = 0;
-        }
-      if(strlen(machinename) > 0)
-        {
-        this->Internals->MachineNames.push_back(machinename);
-        }
+      this->SetMachineName(cc, options->GetMachineName(cc));
       }
     }
-  fclose(file);
+
+  this->IsWaiting = (waiting_process_type == pm->GetProcessType());
+  if (this->IsWaiting)
+    {
+    this->SetupWaitForConnection();
+    }
 }
 
+//------------------------------------------------------------------------------
+void vtkMPIMToNSocketConnection::ConnectMtoN()
+{
+  cout << "ConnectMtoN" << endl;
+  if (this->IsWaiting)
+    {
+    this->WaitForConnection();
+    }
+  else
+    {
+    this->Connect();
+    }
+}
+
+//------------------------------------------------------------------------------
 void vtkMPIMToNSocketConnection::SetMachineName(unsigned int idx,
                                                 const char* name)
 {
@@ -179,7 +178,6 @@ void  vtkMPIMToNSocketConnection::SetupWaitForConnection()
     else
       {
       vtkErrorMacro("Bad configuration file more processes than machines listed."
-                    << " Configfile= " << this->MachinesFileName << "\n"
                     << " process id = " << myId << "\n"
                     << " number of machines in file: " <<  
                     this->Internals->MachineNames.size() << "\n");
@@ -305,7 +303,6 @@ void vtkMPIMToNSocketConnection::GetPortInformation(
   // not call AddInformation for process 0
   if(myId == 0)
     {
-    this->LoadMachinesFile();
     info->SetPortNumber(0, this->PortNumber);
     if(this->Internals->MachineNames.size() &&
        (this->Internals->MachineNames.size() 

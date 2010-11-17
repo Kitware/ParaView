@@ -16,6 +16,7 @@
 
 #include "vtkClientServerStream.h"
 #include "vtkCommand.h"
+#include "vtkMPIMToNSocketConnectionPortInformation.h"
 #include "vtkMultiProcessController.h"
 #include "vtkMultiProcessStream.h"
 #include "vtkNetworkAccessManager.h"
@@ -23,6 +24,9 @@
 #include "vtkProcessModule.h"
 #include "vtkPVConfig.h"
 #include "vtkPVServerInformation.h"
+#include "vtkSMPropertyHelper.h"
+#include "vtkSMProxy.h"
+#include "vtkSMProxyManager.h"
 #include "vtkSocketCommunicator.h"
 
 #include <vtkstd/string>
@@ -92,7 +96,7 @@ bool vtkSMSessionClient::Connect(const char* url)
   vtksys::RegularExpression pvserver_reverse ("^csrc://([^:]+)?(:([0-9]+))?");
 
   vtksys::RegularExpression pvrenderserver(
-    "^cdsrs://([^:]+)(:([0-9]+))?/([^:]+)(:([0-9]+))?");
+    "^cdsrs://([^:]+):([0-9]+)/([^:]+):([0-9]+)");
   vtksys::RegularExpression pvrenderserver_reverse (
     "^cdsrsrc://(([^:]+)?(:([0-9]+))?/([^:]+)?(:([0-9]+))?)?");
 
@@ -128,11 +132,11 @@ bool vtkSMSessionClient::Connect(const char* url)
   else if (pvrenderserver.find(url))
     {
     vtkstd::string dataserverhost = pvrenderserver.match(1);
-    int dsport = atoi(pvrenderserver.match(3).c_str());
+    int dsport = atoi(pvrenderserver.match(2).c_str());
     dsport = (dsport == 0)? 11111 : dsport;
 
-    vtkstd::string renderserverhost = pvrenderserver.match(4);
-    int rsport = atoi(pvrenderserver.match(6).c_str());
+    vtkstd::string renderserverhost = pvrenderserver.match(3);
+    int rsport = atoi(pvrenderserver.match(4).c_str());
     rsport = (rsport == 0)? 22221 : rsport;
 
     vtksys_ios::ostringstream stream;
@@ -140,10 +144,10 @@ bool vtkSMSessionClient::Connect(const char* url)
       << "?" << handshake.str();
     data_server_url = stream.str().c_str();
 
-    stream.clear();
-    stream << "tcp://" << renderserverhost << ":" << rsport
+    vtksys_ios::ostringstream stream2;
+    stream2 << "tcp://" << renderserverhost << ":" << rsport
       << "?" << handshake.str();
-    render_server_url = stream.str();
+    render_server_url = stream2.str();
     }
   else if (pvrenderserver_reverse.find(url))
     {
@@ -237,9 +241,44 @@ bool vtkSMSessionClient::Connect(const char* url)
 
   // TODO:
   // Setup the socket connnection between data-server and render-server.
-  // this->SetupDataServerRenderServerConnection();
-
+  if (success && this->DataServerController && this->RenderServerController)
+    {
+    this->SetupDataServerRenderServerConnection();
+    }
   return success;
+}
+
+//----------------------------------------------------------------------------
+void vtkSMSessionClient::SetupDataServerRenderServerConnection()
+{
+  vtkSMProxy* mpiMToN = this->GetProxyManager()->NewProxy(
+    "internals", "MPIMToNSocketConnection");
+  vtkSMPropertyHelper(mpiMToN, "WaitingProcess").Set(
+    vtkProcessModule::PROCESS_RENDER_SERVER);
+  mpiMToN->UpdateVTKObjects();
+
+  vtkMPIMToNSocketConnectionPortInformation* info =
+    vtkMPIMToNSocketConnectionPortInformation::New();
+  this->GatherInformation(RENDER_SERVER, info, mpiMToN->GetGlobalID());
+
+  vtkSMPropertyHelper helper(mpiMToN, "Connections");
+  for (int cc = 0; cc < info->GetNumberOfConnections(); cc++)
+    {
+    vtksys_ios::ostringstream processNo;
+    processNo << cc;
+    vtksys_ios::ostringstream str;
+    str << info->GetProcessPort(cc);
+    helper.Set(3*cc, processNo.str().c_str());
+    helper.Set(3*cc+1, str.str().c_str());
+    helper.Set(3*cc+2, info->GetProcessHostName(cc));
+    }
+  mpiMToN->UpdateVTKObjects();
+  mpiMToN->InvokeCommand("Connect");
+
+  this->GetProxyManager()->RegisterProxy("__internals__",
+    "m2n_socket",
+    mpiMToN);
+  mpiMToN->Delete();
 }
 
 //----------------------------------------------------------------------------

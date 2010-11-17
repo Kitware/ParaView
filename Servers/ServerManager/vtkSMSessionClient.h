@@ -117,6 +117,8 @@ protected:
   void SetRenderServerController(vtkMultiProcessController*);
   void SetDataServerController(vtkMultiProcessController*);
 
+  void SetupDataServerRenderServerConnection();
+
   // Both maybe the same when connected to pvserver.
   vtkMultiProcessController* RenderServerController;
   vtkMultiProcessController* DataServerController;

@@ -43,26 +43,19 @@ public:
   static vtkMPIMToNSocketConnection* New();
   vtkTypeMacro(vtkMPIMToNSocketConnection,vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
-  
+
+  // Description:
+  void Initialize(int waiting_process_type);
+
+  // Description:
+  // Setup  the connection.
+  void ConnectMtoN();
+
   // Description:
   // Set the number of connections to be made.
   void SetNumberOfConnections(int);
   vtkGetMacro(NumberOfConnections, int);
-  
-  // Description:
-  // Setup the wait for connection, but do not wait yet.
-  // This should determine the network to be used and the port to be used.
-  void SetupWaitForConnection();
 
-  // Description:
-  // SetupStartWaitForConnection must be called first.  This
-  // method will start waiting for a connection to be made to it.
-  void WaitForConnection();
-
-  // Description:
-  // Connect to remote server.
-  void Connect();
-  
   // Description:
   // Set up information about the remote connection.
   void SetPortInformation(unsigned int processNumber, int portNumber, const char* hostName);
@@ -76,20 +69,31 @@ public:
   void GetPortInformation(vtkMPIMToNSocketConnectionPortInformation*);
   
   // Description:
-  // Set the name of the configure file containing the names of the render hosts.
-  vtkSetStringMacro(MachinesFileName);
-  
-  // Description:
   // Set port to use, if the value is 0, then the system will pick the port.
-  vtkSetMacro(PortNumber,int);
   vtkGetMacro(PortNumber,int);
+
+protected:
+  vtkSetMacro(PortNumber,int);
 
   // Description:
   // Add a machine name.
   void SetMachineName(unsigned int idx, const char* name);
 
-protected:
-  void LoadMachinesFile();
+  // Description:
+  // Setup the wait for connection, but do not wait yet.
+  // This should determine the network to be used and the port to be used.
+  void SetupWaitForConnection();
+
+  // Description:
+  // SetupStartWaitForConnection must be called first.  This
+  // method will start waiting for a connection to be made to it.
+  void WaitForConnection();
+
+  // Description:
+  // Connect to remote server.
+  void Connect();
+
+
   virtual void SetController(vtkMultiProcessController*);
   virtual void SetSocketCommunicator(vtkSocketCommunicator*);
   vtkMPIMToNSocketConnection();
@@ -99,7 +103,6 @@ private:
   int Socket;
   vtkServerSocket* ServerSocket;
   char* HostName;
-  char* MachinesFileName;
   vtkSetStringMacro(HostName);
   int NumberOfConnections;
   vtkMPIMToNSocketConnectionInternals* Internals;
@@ -107,6 +110,7 @@ private:
   vtkSocketCommunicator* SocketCommunicator;
   vtkMPIMToNSocketConnection(const vtkMPIMToNSocketConnection&); // Not implemented
   void operator=(const vtkMPIMToNSocketConnection&); // Not implemented
+  bool IsWaiting;
 };
 
 #endif
