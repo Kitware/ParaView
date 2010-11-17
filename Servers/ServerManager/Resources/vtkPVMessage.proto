@@ -70,7 +70,7 @@ message ProxyState
   message Property
     {
     required string  name  = 1;
-    required Variant value = 2;
+    optional Variant value = 2;
     }
 
   message SubProxy
