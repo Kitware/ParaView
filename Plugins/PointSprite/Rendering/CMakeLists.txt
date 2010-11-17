@@ -63,6 +63,10 @@ set(KIT_LIBS
   ${OPENGL_gl_LIBRARY}
   )
 
+if(VTK_OPENGL_HAS_OSMESA AND OSMESA_LIBRARY)
+  set(KIT_LIBS ${KIT_LIBS} ${OSMESA_LIBRARY} )
+endif(VTK_OPENGL_HAS_OSMESA AND OSMESA_LIBRARY)
+
 # -----------------------------------------------------------------------------
 # Create the library
 # -----------------------------------------------------------------------------
