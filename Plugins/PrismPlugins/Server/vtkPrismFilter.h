@@ -110,6 +110,19 @@ public:
   bool GetSESAMEYLogScaling();
   bool GetSESAMEZLogScaling();
 
+
+
+  void SetShowCold(bool);
+  void SetShowVaporization(bool);
+  void SetShowSolidMelt(bool);
+  void SetShowLiquidMelt(bool);
+  bool GetShowCold();
+  bool GetShowVaporization();
+  bool GetShowSolidMelt();
+  bool GetShowLiquidMelt();
+
+
+
   void SetSimulationDataThreshold(bool);
   bool GetSimulationDataThreshold();
 

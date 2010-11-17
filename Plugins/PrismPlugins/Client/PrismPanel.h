@@ -94,6 +94,7 @@ protected slots:
   void onConversionTreeCellChanged( int , int  );
  void updateVariableConversions();
 
+  void showCurve(bool);
 
 private:
       bool eventFilter(QObject *object, QEvent *e);

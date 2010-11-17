@@ -124,6 +124,11 @@ public:
     PrismTableWidget *ConversionTree;
     SESAMEComboBoxDelegate* ConversionVariableEditor;
     bool WasCustom;
+    bool Table306Found;
+    bool Table401Found;
+    bool Table411Found;
+    bool Table412Found;
+
 
 };
 
@@ -133,6 +138,12 @@ pqNamedObjectPanel(object_proxy, p)
 {
     this->UI = new pqUI(this);
     this->UI->setupUi(this);
+
+    this->UI->Table306Found=false;
+    this->UI->Table401Found=false;
+    this->UI->Table411Found=false;
+    this->UI->Table412Found=false;
+
 
     this->UI->ConversionTree = new PrismTableWidget(this);
     this->UI->ConversionLayout->addWidget(this->UI->ConversionTree);
@@ -159,6 +170,16 @@ pqNamedObjectPanel(object_proxy, p)
 
     QObject::connect(this->UI->TableIdWidget, SIGNAL(currentIndexChanged(QString)), 
         this, SLOT(setTableId(QString)));
+
+
+    QObject::connect(this->UI->ColdCurve, SIGNAL(toggled (bool)),
+        this, SLOT(showCurve(bool)));
+    QObject::connect(this->UI->VaporizationCurve, SIGNAL(toggled (bool)),
+        this, SLOT(showCurve(bool)));
+    QObject::connect(this->UI->SolidMeltCurve, SIGNAL(toggled (bool)),
+        this, SLOT(showCurve(bool)));
+    QObject::connect(this->UI->LiquidMeltCurve, SIGNAL(toggled (bool)),
+        this, SLOT(showCurve(bool)));
 
     QObject::connect(this->UI->XLogScaling, SIGNAL(toggled (bool)),
         this, SLOT(useXLogScaling(bool)));
@@ -982,6 +1003,18 @@ void PrismSurfacePanel::accept()
     settings->setValue("PrismPlugin/Conversions/SESAMEFileName", this->UI->ConversionFileName);
 
 
+
+     pqSMAdaptor::setElementProperty(
+        this->proxy()->GetProperty("ShowCold"), this->UI->ColdCurve->isChecked());
+   pqSMAdaptor::setElementProperty(
+        this->proxy()->GetProperty("ShowVaporization"), this->UI->VaporizationCurve->isChecked());
+    pqSMAdaptor::setElementProperty(
+        this->proxy()->GetProperty("ShowSolidMelt"), this->UI->SolidMeltCurve->isChecked());
+    pqSMAdaptor::setElementProperty(
+        this->proxy()->GetProperty("ShowLiquidMelt"), this->UI->LiquidMeltCurve->isChecked());
+
+
+
     if(this->UI->SICheckbox->isChecked())
     {
         settings->setValue("PrismPlugin/Conversions/SESAMEUnits",QString("SI"));
@@ -1362,6 +1395,13 @@ void PrismSurfacePanel::setupTableWidget()
     tableWidget->clear();
     //watch for changes in the widget so that we can tell the proxy
 
+    this->UI->ColdCurve->setVisible(false);
+    this->UI->VaporizationCurve->setVisible(false);
+    this->UI->SolidMeltCurve->setVisible(false);
+    this->UI->LiquidMeltCurve->setVisible(false);
+
+
+
     vtkSMProperty* GetNamesProperty = this->proxy()->GetProperty("TableIds");
     QList<QVariant> names;
     names = pqSMAdaptor::getMultipleElementProperty(GetNamesProperty);
@@ -1369,7 +1409,27 @@ void PrismSurfacePanel::setupTableWidget()
     //add each xdmf-domain name to the widget and to the paraview-Domain
     foreach(QVariant v, names)
     {
-        tableWidget->addItem(v.toString());
+      QString nameStr=v.toString();
+      if(nameStr=="306")
+      {
+        this->UI->Table306Found=true;
+      }
+      else if(nameStr=="401")
+      {
+        this->UI->Table401Found=true;
+      }
+      else if(nameStr=="411")
+      {
+        this->UI->Table411Found=true;
+      }
+      else if(nameStr=="412" )
+      {
+        this->UI->Table412Found=true;
+      }
+      else
+      {
+        tableWidget->addItem(nameStr);
+      }
     }
 
     // get the current value
@@ -1411,11 +1471,27 @@ void PrismSurfacePanel::setupTableWidget()
             this->UI->PanelHelper->GetProperty("YLogScaling"), true);
           pqSMAdaptor::setElementProperty(
             this->UI->PanelHelper->GetProperty("ZLogScaling"), true);
-
           }
 
-
-
+        if(tID==301)
+        {
+          if(this->UI->Table306Found)
+          {
+            this->UI->ColdCurve->setVisible(true);
+          }
+          if(this->UI->Table401Found)
+          {
+            this->UI->VaporizationCurve->setVisible(true);
+          }
+          if(this->UI->Table411Found)
+          {
+            this->UI->SolidMeltCurve->setVisible(true);
+          }
+          if(this->UI->Table412Found)
+          {
+            this->UI->LiquidMeltCurve->setVisible(true);
+          }
+        }
 
         this->UI->PanelHelper->UpdateVTKObjects();
         this->UI->PanelHelper->UpdatePropertyInformation();
@@ -1424,6 +1500,26 @@ void PrismSurfacePanel::setupTableWidget()
     {
         // set the combo box to the current
         tableWidget->setCurrentIndex(tableWidget->findText(str.toString()));
+        int tID=tableWidget->currentText().toInt();
+        if(tID==301)
+        {
+          if(this->UI->Table306Found)
+          {
+            this->UI->ColdCurve->setVisible(true);
+          }
+          if(this->UI->Table401Found)
+          {
+            this->UI->VaporizationCurve->setVisible(true);
+          }
+          if(this->UI->Table411Found)
+          {
+            this->UI->SolidMeltCurve->setVisible(true);
+          }
+          if(this->UI->Table412Found)
+          {
+            this->UI->LiquidMeltCurve->setVisible(true);
+          }
+        }
     }
     tableWidget->blockSignals(false);
 
@@ -2069,7 +2165,25 @@ void PrismSurfacePanel::setTableId(QString newId)
           }
 
 
-
+        if(tID==301)
+        {
+          if(this->UI->Table306Found)
+          {
+            this->UI->ColdCurve->setVisible(true);
+          }
+          if(this->UI->Table401Found)
+          {
+            this->UI->VaporizationCurve->setVisible(true);
+          }
+          if(this->UI->Table411Found)
+          {
+            this->UI->SolidMeltCurve->setVisible(true);
+          }
+          if(this->UI->Table412Found)
+          {
+            this->UI->LiquidMeltCurve->setVisible(true);
+          }
+        }
 
     this->UI->PanelHelper->UpdateVTKObjects();
     this->UI->PanelHelper->UpdatePropertyInformation();
@@ -2238,7 +2352,10 @@ void PrismSurfacePanel::upperYChanged(double val)
     this->UI->PanelHelper->UpdatePropertyInformation();
     this->setModified();
 }
-
+void PrismSurfacePanel::showCurve( bool b)
+{
+    this->setModified();
+}
 void PrismSurfacePanel::useXLogScaling( bool b)
 {
     //get access to the property that lets us pick the domain

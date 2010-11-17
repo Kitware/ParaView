@@ -290,8 +290,9 @@
    <SourceProxy name="PrismFilter"
                 class="vtkPrismFilter">
      <OutputPort name="SESAME Surface" index="0" />
-     <OutputPort name="SESAME Contours" index="1" />
-     <OutputPort name="Simulation Data" index="2" />
+     <OutputPort name="SESAME Curve" index="1" />
+     <OutputPort name="SESAME Contours" index="2" />
+     <OutputPort name="Simulation Data" index="3" />
      <StringVectorProperty
         name="FileName"
         command="SetFileName"
@@ -338,12 +339,11 @@
         command="SetTable"
         number_of_elements="1"
         default_values="0" >
-       <EnumerationDomain name="enum">
-         <Entry value="0" text="None"/>
-         <Entry value="602" text="602: Electrical Conductivity"/>
-         <Entry value="301" text="301: Total EOS"/>
-         <Entry value="304" text="304: Electron EOS"/>
-       </EnumerationDomain>
+         <EnumerationDomain name="enum">
+           <RequiredProperties>
+             <Property name="TableIds" function="Enumeration"/>
+          </RequiredProperties>
+         </EnumerationDomain>
      </IntVectorProperty>
 
       <DoubleVectorProperty name="RangesInfo"
@@ -524,6 +524,30 @@
                         default_values="0">
        <BooleanDomain name="bool"/>
      </IntVectorProperty>
+     <IntVectorProperty name="SESAMEShowCold"
+                        command="SetShowCold"
+                        number_of_elements="1"
+                        default_values="0">
+       <BooleanDomain name="bool"/>
+     </IntVectorProperty>
+     <IntVectorProperty name="SESAMEShowVaporization"
+                        command="SetShowVaporization"
+                        number_of_elements="1"
+                        default_values="0">
+       <BooleanDomain name="bool"/>
+     </IntVectorProperty>
+     <IntVectorProperty name="SESAMEShowSolidMelt"
+                        command="SetShowSolidMelt"
+                        number_of_elements="1"
+                        default_values="0">
+       <BooleanDomain name="bool"/>
+     </IntVectorProperty>
+     <IntVectorProperty name="SESAMEShowLiquidMelt"
+                        command="SetShowLiquidMelt"
+                        number_of_elements="1"
+                        default_values="0">
+       <BooleanDomain name="bool"/>
+     </IntVectorProperty>
 
      <DoubleVectorProperty
         name="SESAMEVariableConversionValues"
@@ -675,7 +699,8 @@
    <SourceProxy name="PrismSurfaceReader"
                 class="vtkPrismSurfaceReader">
      <OutputPort name="SESAME Surface" index="0" />
-     <OutputPort name="SESAME Contours" index="1" />
+     <OutputPort name="SESAME Curves" index="1" />
+     <OutputPort name="SESAME Contours" index="2" />
      <StringVectorProperty
         name="FileName"
         command="SetFileName"
@@ -812,6 +837,30 @@
      </IntVectorProperty>
      <IntVectorProperty name="ZLogScaling"
                         command="SetZLogScaling"
+                        number_of_elements="1"
+                        default_values="0">
+       <BooleanDomain name="bool"/>
+     </IntVectorProperty>
+     <IntVectorProperty name="ShowCold"
+                        command="SetShowCold"
+                        number_of_elements="1"
+                        default_values="0">
+       <BooleanDomain name="bool"/>
+     </IntVectorProperty>
+     <IntVectorProperty name="ShowVaporization"
+                        command="SetShowVaporization"
+                        number_of_elements="1"
+                        default_values="0">
+       <BooleanDomain name="bool"/>
+     </IntVectorProperty>
+     <IntVectorProperty name="ShowSolidMelt"
+                        command="SetShowSolidMelt"
+                        number_of_elements="1"
+                        default_values="0">
+       <BooleanDomain name="bool"/>
+     </IntVectorProperty>
+     <IntVectorProperty name="ShowLiquidMelt"
+                        command="SetShowLiquidMelt"
                         number_of_elements="1"
                         default_values="0">
        <BooleanDomain name="bool"/>
@@ -1048,6 +1097,30 @@
      </IntVectorProperty>
      <IntVectorProperty name="SESAMEZLogScaling"
                         command="SetSESAMEZLogScaling"
+                        number_of_elements="1"
+                        default_values="0">
+       <BooleanDomain name="bool"/>
+     </IntVectorProperty>
+     <IntVectorProperty name="SESAMEShowCold"
+                        command="SetShowCold"
+                        number_of_elements="1"
+                        default_values="0">
+       <BooleanDomain name="bool"/>
+     </IntVectorProperty>
+     <IntVectorProperty name="SESAMEShowVaporization"
+                        command="SetShowVaporization"
+                        number_of_elements="1"
+                        default_values="0">
+       <BooleanDomain name="bool"/>
+     </IntVectorProperty>
+     <IntVectorProperty name="SESAMEShowSolidMelt"
+                        command="SetShowSolidMelt"
+                        number_of_elements="1"
+                        default_values="0">
+       <BooleanDomain name="bool"/>
+     </IntVectorProperty>
+     <IntVectorProperty name="SESAMEShowLiquidMelt"
+                        command="SetShowLiquidMelt"
                         number_of_elements="1"
                         default_values="0">
        <BooleanDomain name="bool"/>
@@ -1321,6 +1394,30 @@
      </IntVectorProperty>
      <IntVectorProperty name="ZLogScaling"
                         command="SetZLogScaling"
+                        number_of_elements="1"
+                        default_values="0">
+       <BooleanDomain name="bool"/>
+     </IntVectorProperty>
+     <IntVectorProperty name="ShowCold"
+                        command="SetShowCold"
+                        number_of_elements="1"
+                        default_values="0">
+       <BooleanDomain name="bool"/>
+     </IntVectorProperty>
+     <IntVectorProperty name="ShowVaporization"
+                        command="SetShowVaporization"
+                        number_of_elements="1"
+                        default_values="0">
+       <BooleanDomain name="bool"/>
+     </IntVectorProperty>
+     <IntVectorProperty name="ShowSolidMelt"
+                        command="SetShowSolidMelt"
+                        number_of_elements="1"
+                        default_values="0">
+       <BooleanDomain name="bool"/>
+     </IntVectorProperty>
+     <IntVectorProperty name="ShowLiquidMelt"
+                        command="SetShowLiquidMelt"
                         number_of_elements="1"
                         default_values="0">
        <BooleanDomain name="bool"/>
