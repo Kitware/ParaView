@@ -118,6 +118,14 @@ public:
   bool GetUsingCacheForUpdate();
 
   vtkGetMacro(NeedUpdate,  bool);
+
+  // Description:
+  // Making these methods public. When constructing composite representations,
+  // we need to call these methods directly on internal representations.
+  virtual bool AddToView(vtkView* view)
+    { return this->Superclass::AddToView(view); }
+  virtual bool RemoveFromView(vtkView* view)
+    { return this->Superclass::RemoveFromView(view); }
 //BTX
 protected:
   vtkPVDataRepresentation();
