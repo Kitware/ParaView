@@ -491,7 +491,7 @@ vtkRenderWindow* vtkPVSynchronizedRenderWindows::NewRenderWindow()
       swap_buffers |= (this->Mode == BATCH &&
         this->ParallelController->GetLocalProcessId() == 0);
       int not_used[2];
-      swap_buffers |= this->GetTileDisplayParameters(not_used);
+      swap_buffers |= this->GetTileDisplayParameters(not_used, not_used);
       swap_buffers |= this->GetIsInCave();
       window->SetSwapBuffers(swap_buffers? 1 : 0);
       //window->SetSwapBuffers(1); // for debugging FIXME.
@@ -994,10 +994,9 @@ void vtkPVSynchronizedRenderWindows::UpdateWindowLayout()
       // If we are in tile-display mode, we should update the tile-scale
       // and tile-viewport for the render window. That is required for the camera
       // as well as for the annotations to show correctly.
-      vtkPVServerInformation* server_info =
-        vtkProcessModule::GetProcessModule()->GetServerInformation(0);
-      int tile_dims[2];
-      bool in_tile_display_mode = this->GetTileDisplayParameters(tile_dims);
+      int tile_dims[2], tile_mullions[2];
+      bool in_tile_display_mode = this->GetTileDisplayParameters(tile_dims,
+        tile_mullions);
       bool in_cave_mode = this->GetIsInCave();
       if (in_tile_display_mode)
         {
@@ -1015,7 +1014,7 @@ void vtkPVSynchronizedRenderWindows::UpdateWindowLayout()
         double tile_viewport[4];
         vtkTilesHelper* helper = vtkTilesHelper::New();
         helper->SetTileDimensions(tile_dims);
-        helper->SetTileMullions(server_info->GetTileMullions());
+        helper->SetTileMullions(tile_mullions);
         helper->SetTileWindowSize(this->Internals->SharedRenderWindow->GetActualSize());
         helper->GetNormalizedTileViewport(NULL,
           this->ParallelController->GetLocalProcessId(), tile_viewport);
@@ -1128,7 +1127,7 @@ void vtkPVSynchronizedRenderWindows::ShinkGaps()
   while (something_expanded);
 
   int temp[2];
-  if (!this->GetTileDisplayParameters(temp))
+  if (!this->GetTileDisplayParameters(temp, temp))
     {
     return;
     }
@@ -1165,27 +1164,37 @@ bool vtkPVSynchronizedRenderWindows::GetIsInCave()
     server_info = pm->GetServerInformation(0);
     }
 
-  int tile_dims[2];
-  tile_dims[0] = server_info->GetTileDimensions()[0];
-  tile_dims[1] = server_info->GetTileDimensions()[1];
-  bool in_tile_display_mode = (tile_dims[0] > 0 || tile_dims[1] > 0);
-  if (!in_tile_display_mode)
+  int temp[2];
+  if (!this->GetTileDisplayParameters(temp, temp))
     {
     return server_info->GetNumberOfMachines() > 0;
     }
+
   return false;
 }
 
 //----------------------------------------------------------------------------
-bool vtkPVSynchronizedRenderWindows::GetTileDisplayParameters(int tile_dims[2])
+bool vtkPVSynchronizedRenderWindows::GetTileDisplayParameters(
+  int tile_dims[2], int tile_mullions[2])
 {
-  vtkPVServerInformation* server_info =
-    vtkProcessModule::GetProcessModule()->GetServerInformation(0);
-  tile_dims[0] = server_info->GetTileDimensions()[0];
-  tile_dims[1] = server_info->GetTileDimensions()[1];
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  vtkPVServerInformation* info = pm->GetServerInformation(0);
+  if (info->GetTileDimensions()[0] > 0 ||
+    info->GetTileDimensions()[1] > 0)
+    {
+    // we are going to use the local server information.
+    }
+  else if (pm->GetActiveRemoteConnection())
+    {
+    info = pm->GetServerInformation(pm->GetConnectionID(
+        pm->GetActiveRemoteConnection()));
+    }
+  tile_dims[0] = info->GetTileDimensions()[0];
+  tile_dims[1] = info->GetTileDimensions()[1];
   bool in_tile_display_mode = (tile_dims[0] > 0 || tile_dims[1] > 0);
   tile_dims[0] = (tile_dims[0] == 0)? 1 : tile_dims[0];
   tile_dims[1] = (tile_dims[1] == 0)? 1 : tile_dims[1];
+  info->GetTileMullions(tile_mullions);
   return in_tile_display_mode;
 }
 
