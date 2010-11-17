@@ -570,6 +570,9 @@ void vtkSMProxy::UpdateVTKObjects()
             // Write to state
             property->WriteTo(&message);
 
+            // the property is no longer dirty.
+            iter->second.ModifiedFlag = 0;
+
             // Fire event to let everyone know that a property has been updated.
             // This is currently used by vtkSMLink. Need to see if we can avoid this
             // as firing these events ain't inexpensive.
@@ -584,6 +587,9 @@ void vtkSMProxy::UpdateVTKObjects()
             {
             // Write to state
             property->WriteTo(this->State);
+
+            // the property is no longer dirty.
+            iter->second.ModifiedFlag = 0;
 
             // Write to Push message
             ProxyState_Property *prop = message.AddExtension(ProxyState::property);
