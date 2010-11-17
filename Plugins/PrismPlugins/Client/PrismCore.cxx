@@ -678,7 +678,7 @@ void PrismCore::onGeometrySelection(vtkObject* caller,
         vtkSMSourceProxy* selSource = sourceP->GetSelectionInput(portIndex);
         if(!selSource)
         {
-          prismP->CleanSelectionInputs(2);
+          prismP->CleanSelectionInputs(3);
           this->ProcessingEvent=false;
           pqPipelineSource* pqPrismP=model->findItem<pqPipelineSource*>(prismP);
           if(pqPrismP)
@@ -754,7 +754,7 @@ void PrismCore::onGeometrySelection(vtkObject* caller,
 
 
         selPrism->UpdateVTKObjects();
-        prismP->SetSelectionInput(2,selPrism,0);
+        prismP->SetSelectionInput(3,selPrism,0);
         selPrism->UnRegister(NULL);
 
 
