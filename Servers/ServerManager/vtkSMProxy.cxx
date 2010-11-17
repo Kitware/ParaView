@@ -1208,7 +1208,8 @@ vtkSMProperty* vtkSMProxy::NewProperty(const char* name,
     // Otherwise, properties like ForceUpdate get pushed and
     // cause problems.
     int is_internal;
-    if (property->GetIsInternal())
+    if (property->GetIsInternal() ||
+      strcmp(property->GetClassName(), "vtkSMProperty") == 0)
       {
       this->DoNotModifyProperty = 1;
       }
