@@ -162,6 +162,14 @@ bool vtkPMStringVectorProperty::Push(const vtkstd::vector<vtkstd::string> &value
   else
     {
     int numCommands = values.size() / this->NumberOfElementsPerCommand;
+    if (this->SetNumberCommand)
+      {
+      stream << vtkClientServerStream::Invoke
+        << objectId
+        << this->SetNumberCommand
+        << numCommands
+        << vtkClientServerStream::End;
+      }
     for (int i=0; i<numCommands; i++)
       {
       stream << vtkClientServerStream::Invoke << objectId << this->Command;
