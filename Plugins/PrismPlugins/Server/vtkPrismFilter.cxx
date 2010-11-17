@@ -89,7 +89,7 @@ vtkPrismFilter::vtkPrismFilter()
     this->Internal = new MyInternal();
 
     this->SetNumberOfInputPorts(1);
-    this->SetNumberOfOutputPorts(3);
+    this->SetNumberOfOutputPorts(4);
 
 }
 vtkPrismFilter::~vtkPrismFilter()
@@ -308,14 +308,19 @@ int vtkPrismFilter::RequestSESAMEData(
     vtkPointSet *input= this->Internal->Reader->GetOutput(0);
     output->ShallowCopy(input);
 
+    vtkInformation *curveOutInfo = outputVector->GetInformationObject(1);
+    vtkPointSet *curveOutput = vtkPointSet::SafeDownCast(
+        curveOutInfo->Get(vtkDataObject::DATA_OBJECT()));
+
+    vtkPointSet *curveInput= this->Internal->Reader->GetOutput(1);
+    curveOutput->ShallowCopy(curveInput);
 
 
-    vtkInformation *contourOutInfo = outputVector->GetInformationObject(1);
+    vtkInformation *contourOutInfo = outputVector->GetInformationObject(2);
     vtkPointSet *contourOutput = vtkPointSet::SafeDownCast(
         contourOutInfo->Get(vtkDataObject::DATA_OBJECT()));
 
-
-    contourOutput->ShallowCopy(this->Internal->Reader->GetOutput(1));
+    contourOutput->ShallowCopy(this->Internal->Reader->GetOutput(2));
 
 
 
@@ -535,7 +540,7 @@ int vtkPrismFilter::RequestGeometryData(
         return 1;
     }
 
-    vtkInformation *info = outputVector->GetInformationObject(2);
+    vtkInformation *info = outputVector->GetInformationObject(3);
     vtkMultiBlockDataSet *output = vtkMultiBlockDataSet::SafeDownCast(
         info->Get(vtkDataObject::DATA_OBJECT()));
     if ( !output ) 
@@ -629,20 +634,25 @@ const char * vtkPrismFilter::GetZAxisVarName()
 int vtkPrismFilter::FillOutputPortInformation(
     int port, vtkInformation* info)
 {
-    if(port==0)
-    {
-        // now add our info
-        info->Set(vtkDataObject::DATA_TYPE_NAME(), "vtkPolyData");
-    }
-       if(port==1)
-    {
-        // now add our info
-        info->Set(vtkDataObject::DATA_TYPE_NAME(), "vtkPolyData");
-    }
-    if(port==2)
-    {
-        info->Set(vtkDataObject::DATA_TYPE_NAME(), "vtkMultiBlockDataSet");
-    }
+  if(port==0)
+  {
+    // now add our info
+    info->Set(vtkDataObject::DATA_TYPE_NAME(), "vtkPolyData");
+  }
+  if(port==1)
+  {
+    // now add our info
+    info->Set(vtkDataObject::DATA_TYPE_NAME(), "vtkPolyData");
+  }
+  if(port==2)
+  {
+    // now add our info
+    info->Set(vtkDataObject::DATA_TYPE_NAME(), "vtkPolyData");
+  }
+  if(port==3)
+  {
+    info->Set(vtkDataObject::DATA_TYPE_NAME(), "vtkMultiBlockDataSet");
+  }
 
     return 1;
 }
@@ -695,6 +705,45 @@ const char* vtkPrismFilter::GetSESAMEZAxisVarName()
     return this->Internal->Reader->GetZAxisVarName();
 }
 
+void vtkPrismFilter::SetShowCold(bool b)
+{
+  this->Internal->Reader->SetShowCold(b);
+  this->Modified();
+
+}
+void vtkPrismFilter::SetShowVaporization(bool b)
+{
+  this->Internal->Reader->SetShowVaporization(b);
+  this->Modified();
+
+}
+void vtkPrismFilter::SetShowSolidMelt(bool b)
+{
+  this->Internal->Reader->SetShowSolidMelt(b);
+  this->Modified();
+}
+void vtkPrismFilter::SetShowLiquidMelt(bool b)
+{
+  this->Internal->Reader->SetShowLiquidMelt(b);
+  this->Modified();
+}
+bool vtkPrismFilter::GetShowCold()
+{
+  return this->Internal->Reader->GetShowCold();
+}
+bool vtkPrismFilter::GetShowVaporization()
+{
+  return this->Internal->Reader->GetShowVaporization();
+}
+bool vtkPrismFilter::GetShowSolidMelt()
+{
+  return this->Internal->Reader->GetShowSolidMelt();
+
+}
+bool vtkPrismFilter::GetShowLiquidMelt()
+{
+  return this->Internal->Reader->GetShowLiquidMelt();
+}
 
 void vtkPrismFilter::SetSESAMEXLogScaling(bool b)
 {
