@@ -39,10 +39,10 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Get/Set the visibility for this representation. When the visibility of
-  // representation of false, all view passes are ignored.
-  // Overridden to propagate to the active representation.
+  // Methods overridden to propagate to the active representation.
   virtual void SetVisibility(bool val);
+  virtual int ProcessViewRequest(vtkInformationRequestKey* request_type,
+    vtkInformation* inInfo, vtkInformation* outInfo);
 
   // Description:
   // Add/Remove representations. \c key is a unique string used to identify

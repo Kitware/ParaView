@@ -69,6 +69,21 @@ void vtkCompositeRepresentation::SetVisibility(bool visible)
 }
 
 //----------------------------------------------------------------------------
+int vtkCompositeRepresentation::ProcessViewRequest(
+  vtkInformationRequestKey* request_type, vtkInformation* inInfo,
+  vtkInformation* outInfo)
+{
+  int ret_val = this->Superclass::ProcessViewRequest(request_type, inInfo, outInfo);
+  vtkPVDataRepresentation* repr = this->GetActiveRepresentation();
+  if (repr && ret_val)
+    {
+    ret_val = repr->ProcessViewRequest(request_type, inInfo, outInfo);
+    }
+  return ret_val;
+}
+
+
+//----------------------------------------------------------------------------
 void vtkCompositeRepresentation::AddRepresentation(
   const char* key, vtkPVDataRepresentation* repr)
 {
@@ -308,7 +323,7 @@ bool vtkCompositeRepresentation::AddToView(vtkView* view)
   vtkPVDataRepresentation* activeRepr = this->GetActiveRepresentation();
   if (activeRepr)
     {
-    view->AddRepresentation(activeRepr);
+    activeRepr->AddToView(view);
     }
   return this->Superclass::AddToView(view);
 }
@@ -319,7 +334,7 @@ bool vtkCompositeRepresentation::RemoveFromView(vtkView* view)
   vtkPVDataRepresentation* activeRepr = this->GetActiveRepresentation();
   if (activeRepr)
     {
-    view->RemoveRepresentation(activeRepr);
+    activeRepr->RemoveFromView(view);
     }
   this->Internals->View = 0;
   return this->Superclass::RemoveFromView(view);
@@ -347,12 +362,12 @@ void vtkCompositeRepresentation::SetActiveRepresentation(const char* key)
     {
     if (curActive && this->Internals->View)
       {
-      this->Internals->View->RemoveRepresentation(curActive);
+      curActive->RemoveFromView(this->Internals->View);
       }
 
     if (newActive && this->Internals->View)
       {
-      this->Internals->View->AddRepresentation(newActive);
+      newActive->AddToView(this->Internals->View);
       }
 
     if (newActive)
