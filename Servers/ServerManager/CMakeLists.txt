@@ -45,11 +45,8 @@ SET (Kit_SRCS
   vtkPMVectorProperty.cxx
   vtkPMWriterProxy.cxx
 # --- SM Objects ---
-  vtkSMAnimationCueManipulatorProxy.cxx
-  vtkSMAnimationCueProxy.cxx
   vtkSMAnimationPlayerProxy.cxx
   vtkSMAnimationSceneProxy.cxx
-  vtkSMBooleanKeyFrameProxy.cxx
   vtkSMBoxRepresentationProxy.cxx
   vtkSMCameraLink.cxx
   vtkSMCameraProxy.cxx
@@ -72,8 +69,6 @@ SET (Kit_SRCS
   vtkSMIdTypeVectorProperty.cxx
   vtkSMInputProperty.cxx
   vtkSMIntVectorProperty.cxx
-  vtkSMKeyFrameAnimationCueManipulatorProxy.cxx
-  vtkSMKeyFrameProxy.cxx
   vtkSMLink.cxx
   vtkSMNamedPropertyIterator.cxx
   vtkSMNewWidgetRepresentationProxy.cxx
@@ -264,7 +259,6 @@ SET( ServerManager_SRCS
 # Abstract and Wrap exclude
 
 SET_SOURCE_FILES_PROPERTIES(
-  vtkSMAnimationCueManipulatorProxy.cxx
   vtkInitializationHelper.cxx
   vtkPMObject.cxx
   vtkPMVectorProperty.cxx

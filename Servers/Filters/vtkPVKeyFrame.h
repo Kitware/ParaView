@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkSMKeyFrameProxy.h
+  Module:    vtkPVKeyFrame.h
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -12,31 +12,31 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMKeyFrameProxy
+// .NAME vtkPVKeyFrame
 // .SECTION Description
 // Base class for key frames.
 // A key frame is responsible to interpolate the curve
 // between it self and a consequent key frame. A new subclass is
-// needed for each type of interpolation available between two 
-// key frames. This class can be instantiated to create a no-action key 
-// frame. 
+// needed for each type of interpolation available between two
+// key frames. This class can be instantiated to create a no-action key
+// frame.
 
-#ifndef __vtkSMKeyFrameProxy_h
-#define __vtkSMKeyFrameProxy_h
+#ifndef __vtkPVKeyFrame_h
+#define __vtkPVKeyFrame_h
 
-#include "vtkSMProxy.h"
+#include "vtkObject.h"
 
-class vtkSMKeyFrameProxyInternals;
-class vtkSMAnimationCueProxy;
+class vtkPVKeyFrameInternals;
+class vtkPVAnimationCue;
 struct vtkClientServerID;
 
-class VTK_EXPORT vtkSMKeyFrameProxy : public vtkSMProxy
+class VTK_EXPORT vtkPVKeyFrame : public vtkObject
 {
 public:
-  vtkTypeMacro(vtkSMKeyFrameProxy, vtkSMProxy);
+  vtkTypeMacro(vtkPVKeyFrame, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
-  static vtkSMKeyFrameProxy* New();
-  
+  static vtkPVKeyFrame* New();
+
   // Description:;
   // Key time is the time at which this key frame is
   // associated. KeyTime ranges from [0,1], where 0 is the
@@ -62,41 +62,24 @@ public:
   // Set/Get the number of key values this key frame currently stores.
   unsigned int GetNumberOfKeyValues();
   void SetNumberOfKeyValues(unsigned int num);
-  
+
   // Description:
   // This method will do the actual interpolation.
   // currenttime is normalized to the time range between
   // this key frame and the next key frame.
   virtual void UpdateValue(double currenttime,
-    vtkSMAnimationCueProxy* cueProxy, vtkSMKeyFrameProxy* next);
-  
-  // Description:
-  // Overridden to call MarkAllPropertiesAsModified().
-  virtual void Copy(vtkSMProxy* src, const char* exceptionClass, 
-    int proxyPropertyCopyFlag);
-  void Copy(vtkSMProxy* src, const char* exceptionClass)
-    { this->Superclass::Copy(src, exceptionClass); }
-protected:
-  vtkSMKeyFrameProxy();
-  ~vtkSMKeyFrameProxy();
+    vtkPVAnimationCue* cue, vtkPVKeyFrame* next);
 
-  // Description:
-  // This method is complementary to CreateVTKObjects() when we want the
-  // proxy to reuse the VTK object ID are defined. When reviving a proxy
-  // on the client, this method creates new client-side objects and reuses
-  // the server side objects.  When reviving a proxy on the server, it
-  // reuses the server objects while creating new "client-only" objects on
-  // the server itself.
-  virtual void ReviveVTKObjects()
-    { this->CreateVTKObjects(); }
+protected:
+  vtkPVKeyFrame();
+  ~vtkPVKeyFrame();
 
   double KeyTime;
-  vtkSMKeyFrameProxyInternals* Internals;
+  vtkPVKeyFrameInternals* Internals;
 
 private:
-  vtkSMKeyFrameProxy(const vtkSMKeyFrameProxy&); // Not implemented.
-  void operator=(const vtkSMKeyFrameProxy&); // Not implemented.
+  vtkPVKeyFrame(const vtkPVKeyFrame&); // Not implemented.
+  void operator=(const vtkPVKeyFrame&); // Not implemented.
 };
 
 #endif
-

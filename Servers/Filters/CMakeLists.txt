@@ -119,10 +119,12 @@ SET(Filters_SRCS
   vtkPSciVizKMeans.cxx
   vtkPVAMRDualClip.cxx
   vtkPVAnimationScene.cxx
+  vtkPVAnimationCue.cxx
   vtkPVArrayCalculator.cxx
   vtkPVArrowSource.cxx
   vtkPVAxesActor.cxx
   vtkPVAxesWidget.cxx
+  vtkPVBooleanKeyFrame.cxx
   vtkPVBox.cxx
   vtkPVCacheKeeper.cxx
   vtkPVCacheKeeperPipeline.cxx
@@ -134,6 +136,7 @@ SET(Filters_SRCS
   vtkPVContextView.cxx
   vtkPVContourFilter.cxx
   vtkPVCompositeRepresentation.cxx
+  vtkPVCueManipulator.cxx
   vtkPVDataRepresentation.cxx
   vtkPVDataRepresentationPipeline.cxx
   vtkPVDefaultPass.cxx
@@ -154,6 +157,8 @@ SET(Filters_SRCS
   vtkPVJoystickFly.cxx
   vtkPVJoystickFlyIn.cxx
   vtkPVJoystickFlyOut.cxx
+  vtkPVKeyFrame.cxx
+  vtkPVKeyFrameCueManipulator.cxx
   vtkPVLastSelectionInformation.cxx
   vtkPVLinearExtrusionFilter.cxx
   vtkPVLODActor.cxx
@@ -265,7 +270,9 @@ SET_SOURCE_FILES_PROPERTIES(
   vtkCameraManipulatorGUIHelper.cxx
   vtkImageCompressor.cxx
   vtkPEnSightReader.cxx
+  vtkPVAnimationCue.cxx
   vtkPVContextView.cxx
+  vtkPVCueManipulator.cxx
   vtkPVDataRepresentation.cxx
   vtkPVJoystickFly.cxx
   vtkPVRenderViewProxy.cxx

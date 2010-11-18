@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkSMBooleanKeyFrameProxy.h
+  Module:    vtkPVBooleanKeyFrame.h
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -12,41 +12,36 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMBooleanKeyFrameProxy
+// .NAME vtkPVBooleanKeyFrame
 // .SECTION Description
 // Empty key frame. Can be used to toggle boolean properties.
 
 #ifndef __vtkSMBooleanKeyFrameProxy_h
 #define __vtkSMBooleanKeyFrameProxy_h
 
-#include "vtkSMKeyFrameProxy.h"
+#include "vtkPVKeyFrame.h"
 
-class VTK_EXPORT vtkSMBooleanKeyFrameProxy: public vtkSMKeyFrameProxy
+class VTK_EXPORT vtkPVBooleanKeyFrame: public vtkPVKeyFrame
 {
 public:
-  vtkTypeMacro(vtkSMBooleanKeyFrameProxy, vtkSMKeyFrameProxy);
+  vtkTypeMacro(vtkPVBooleanKeyFrame, vtkPVKeyFrame);
   void PrintSelf(ostream& os, vtkIndent indent);
-  static vtkSMBooleanKeyFrameProxy* New();
+  static vtkPVBooleanKeyFrame* New();
 
   // Description:
   // This method will do the actual interpolation.
   // currenttime is normalized to the time range between
   // this key frame and the next key frame.
   virtual void UpdateValue(double currenttime,
-    vtkSMAnimationCueProxy* cueProxy, vtkSMKeyFrameProxy* next);
+    vtkPVAnimationCue* cueProxy, vtkPVKeyFrame* next);
 
 protected:
-  vtkSMBooleanKeyFrameProxy();
-  ~vtkSMBooleanKeyFrameProxy();
-  
+  vtkPVBooleanKeyFrame();
+  ~vtkPVBooleanKeyFrame();
+
 private:
-  vtkSMBooleanKeyFrameProxy(const vtkSMBooleanKeyFrameProxy&); // Not implemented.
-  void operator=(const vtkSMBooleanKeyFrameProxy&); // Not implemented.
+  vtkPVBooleanKeyFrame(const vtkPVBooleanKeyFrame&); // Not implemented.
+  void operator=(const vtkPVBooleanKeyFrame&); // Not implemented.
 
 };
-
-
-
-
 #endif
-

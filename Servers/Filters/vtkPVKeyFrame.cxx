@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkSMKeyFrameProxy.cxx
+  Module:    vtkPVKeyFrame.cxx
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -12,15 +12,13 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#include "vtkSMKeyFrameProxy.h"
+#include "vtkPVKeyFrame.h"
 
 #include "vtkObjectFactory.h"
-#include "vtkProcessModule.h"
-#include "vtkSMAnimationCueProxy.h"
 
 #include <vtkstd/vector>
 //----------------------------------------------------------------------------
-class vtkSMKeyFrameProxyInternals 
+class vtkPVKeyFrameInternals
 {
 public:
   typedef vtkstd::vector<double> VectorOfDoubles;
@@ -29,36 +27,35 @@ public:
 //----------------------------------------------------------------------------
 
 
-vtkStandardNewMacro(vtkSMKeyFrameProxy);
+vtkStandardNewMacro(vtkPVKeyFrame);
 //----------------------------------------------------------------------------
-vtkSMKeyFrameProxy::vtkSMKeyFrameProxy()
+vtkPVKeyFrame::vtkPVKeyFrame()
 {
   this->KeyTime = -1.0;
-  this->Internals = new vtkSMKeyFrameProxyInternals;
-  this->SetLocation(vtkProcessModule::CLIENT);
+  this->Internals = new vtkPVKeyFrameInternals;
 }
 
 //----------------------------------------------------------------------------
-vtkSMKeyFrameProxy::~vtkSMKeyFrameProxy()
+vtkPVKeyFrame::~vtkPVKeyFrame()
 {
   delete this->Internals;
 }
 
 //----------------------------------------------------------------------------
-void vtkSMKeyFrameProxy::UpdateValue(double vtkNotUsed(currenttime), 
-  vtkSMAnimationCueProxy* vtkNotUsed(cueProxy), vtkSMKeyFrameProxy* vtkNotUsed(next))
+void vtkPVKeyFrame::UpdateValue(double vtkNotUsed(currenttime),
+  vtkPVAnimationCue* vtkNotUsed(cue), vtkPVKeyFrame* vtkNotUsed(next))
 {
 }
 
 //----------------------------------------------------------------------------
-void vtkSMKeyFrameProxy::RemoveAllKeyValues()
+void vtkPVKeyFrame::RemoveAllKeyValues()
 {
   this->Internals->KeyValues.clear();
   this->Modified();
 }
 
 //----------------------------------------------------------------------------
-void vtkSMKeyFrameProxy::SetKeyValue(unsigned int index, double value)
+void vtkPVKeyFrame::SetKeyValue(unsigned int index, double value)
 {
   if (index >= this->GetNumberOfKeyValues())
     {
@@ -67,16 +64,9 @@ void vtkSMKeyFrameProxy::SetKeyValue(unsigned int index, double value)
   this->Internals->KeyValues[index] = value;
   this->Modified();
 }
-//----------------------------------------------------------------------------
-void vtkSMKeyFrameProxy::Copy(vtkSMProxy* src, const char* exceptionClass, 
-    int proxyPropertyCopyFlag)
-{
-  this->Superclass::Copy(src, exceptionClass, proxyPropertyCopyFlag);
-  this->MarkAllPropertiesAsModified();
-}
 
 //----------------------------------------------------------------------------
-double vtkSMKeyFrameProxy::GetKeyValue(unsigned int index)
+double vtkPVKeyFrame::GetKeyValue(unsigned int index)
 {
   if (index >= this->GetNumberOfKeyValues())
     {
@@ -86,19 +76,19 @@ double vtkSMKeyFrameProxy::GetKeyValue(unsigned int index)
 }
 
 //----------------------------------------------------------------------------
-void vtkSMKeyFrameProxy::SetNumberOfKeyValues(unsigned int num)
+void vtkPVKeyFrame::SetNumberOfKeyValues(unsigned int num)
 {
   this->Internals->KeyValues.resize(num);
 }
 
 //----------------------------------------------------------------------------
-unsigned int vtkSMKeyFrameProxy::GetNumberOfKeyValues()
+unsigned int vtkPVKeyFrame::GetNumberOfKeyValues()
 {
   return this->Internals->KeyValues.size();
 }
 
 //----------------------------------------------------------------------------
-void vtkSMKeyFrameProxy::PrintSelf(ostream& os, vtkIndent indent)
+void vtkPVKeyFrame::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
   os << indent << "KeyTime: " << this->KeyTime << endl;

@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkSMBooleanKeyFrameProxy.cxx
+  Module:    vtkPVBooleanKeyFrame.cxx
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -12,21 +12,20 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#include "vtkSMBooleanKeyFrameProxy.h"
+#include "vtkPVBooleanKeyFrame.h"
+
 #include "vtkObjectFactory.h"
-#include "vtkSMDomain.h"
-#include "vtkSMProxy.h"
-#include "vtkSMVectorProperty.h"
-#include "vtkSMAnimationCueProxy.h"
-vtkStandardNewMacro(vtkSMBooleanKeyFrameProxy);
+#include "vtkPVAnimationCue.h"
+
+vtkStandardNewMacro(vtkPVBooleanKeyFrame);
 
 //----------------------------------------------------------------------------
-vtkSMBooleanKeyFrameProxy::vtkSMBooleanKeyFrameProxy()
+vtkPVBooleanKeyFrame::vtkPVBooleanKeyFrame()
 {
 }
 
 //----------------------------------------------------------------------------
-vtkSMBooleanKeyFrameProxy::~vtkSMBooleanKeyFrameProxy()
+vtkPVBooleanKeyFrame::~vtkPVBooleanKeyFrame()
 {
 }
 
@@ -34,42 +33,28 @@ vtkSMBooleanKeyFrameProxy::~vtkSMBooleanKeyFrameProxy()
 // remeber that currenttime is 0 at the KeyTime of this key frame
 // and 1 and the KeyTime of the next key frame. Hence,
 // currenttime belongs to the interval [0,1).
-void vtkSMBooleanKeyFrameProxy::UpdateValue(double ,
-    vtkSMAnimationCueProxy* cueProxy, vtkSMKeyFrameProxy* )
+void vtkPVBooleanKeyFrame::UpdateValue(
+  double , vtkPVAnimationCue* cue, vtkPVKeyFrame*)
 {
-  vtkSMDomain *domain = cueProxy->GetAnimatedDomain();
-  vtkSMProperty *property = cueProxy->GetAnimatedProperty();
-  vtkSMProxy *proxy = cueProxy->GetAnimatedProxy();
-  int animated_element = cueProxy->GetAnimatedElement();
-
-  if (!proxy || !domain || !property)
-    {
-    vtkErrorMacro("Cue does not have domain or property set!");
-    return;
-    }
- 
+  cue->BeginUpdateAnimationValues();
+  int animated_element = cue->GetAnimatedElement();
   if (animated_element != -1)
     {
-    domain->SetAnimationValue(property, animated_element, this->GetKeyValue());
+    cue->SetAnimationValue(animated_element, this->GetKeyValue());
     }
   else
     {
     unsigned int max = this->GetNumberOfKeyValues();
     for (unsigned int i=0; i < max; i++)
       {
-      domain->SetAnimationValue(property, i, this->GetKeyValue(i));
-      }
-    vtkSMVectorProperty * vp = vtkSMVectorProperty::SafeDownCast(property);
-    if(vp)
-      {
-      vp->SetNumberOfElements(max);
+      cue->SetAnimationValue(i, this->GetKeyValue(i));
       }
     }
-  proxy->UpdateVTKObjects();
+  cue->EndUpdateAnimationValues();
 }
 
 //----------------------------------------------------------------------------
-void vtkSMBooleanKeyFrameProxy::PrintSelf(ostream& os, vtkIndent indent)
+void vtkPVBooleanKeyFrame::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 }
