@@ -56,6 +56,15 @@ vtkPMObject* vtkPMObject::GetPMObject(vtkTypeUInt32 globalid)
     }
   return NULL;
 }
+//----------------------------------------------------------------------------
+vtkSMRemoteObject* vtkPMObject::GetRemoteObject(vtkTypeUInt32 globalid)
+{
+  if (this->SessionCore)
+    {
+    return this->SessionCore->GetRemoteObject(globalid);
+    }
+  return NULL;
+}
 
 //----------------------------------------------------------------------------
 vtkClientServerInterpreter* vtkPMObject::GetInterpreter()

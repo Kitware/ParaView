@@ -27,6 +27,7 @@
 
 class vtkClientServerInterpreter;
 class vtkSMSessionCore;
+class vtkSMRemoteObject;
 
 class VTK_EXPORT vtkPMObject : public vtkSMObject
 {
@@ -68,6 +69,11 @@ public:
   // Description:
   // Convenience method to obtain a vtkPMObject subclass given its global id.
   vtkPMObject* GetPMObject(vtkTypeUInt32 globalid);
+
+  // Description:
+  // Convenience method to obtain a vtkSMRemoteObject subclass given its
+  // global id.
+  vtkSMRemoteObject* GetRemoteObject(vtkTypeUInt32 globalid);
 
   // Description:
   // Get/Set the global id for this object.

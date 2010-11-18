@@ -84,6 +84,20 @@ protected:
   vtkSetMacro(NullOnEmpty, bool);
   int NullOnEmpty;
 
+
+  enum TypeArg {
+    VTK, SMProxy, Kernel
+    };
+
+  // Proxy type: VTK (default), SMProxy, Kernel,
+  // In the XML we expect argument_type="VTK"     (default value if not set)
+  //                      argument_type="SMProxy"
+  //                      argument_type="Kernel"
+  TypeArg ArgumentType;
+
+  // Base on the ArgumentType will return either the VTK object or the SMProxy object
+  vtkObjectBase* GetObject(vtkTypeUInt32 globalId);
+
 private:
   vtkPMProxyProperty(const vtkPMProxyProperty&); // Not implemented
   void operator=(const vtkPMProxyProperty&); // Not implemented

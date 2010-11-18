@@ -20,6 +20,9 @@ ENDIF(NOT WIN32)
 
 SET (Kit_SRCS
   vtkInitializationHelper.cxx
+  vtkInternalSMProxyHandler.cxx
+  vtkInternalProxyAnimationCue.cxx
+  vtkInternalProxyAnimationScene.cxx
 # --- PM Objects ---
   vtkPMArraySelectionProperty.cxx
   vtkPMDataArrayProperty.cxx
@@ -45,8 +48,14 @@ SET (Kit_SRCS
   vtkPMVectorProperty.cxx
   vtkPMWriterProxy.cxx
 # --- SM Objects ---
+<<<<<<< HEAD:Servers/ServerManager/CMakeLists.txt
   vtkSMAnimationPlayerProxy.cxx
   vtkSMAnimationSceneProxy.cxx
+=======
+  vtkSMAnimationCueManipulatorProxy.cxx
+  vtkSMAnimationPlayerProxy.cxx
+  vtkSMBooleanKeyFrameProxy.cxx
+>>>>>>> Support different ProxyProperty type (VTK, SMProxy, Kernel):Servers/ServerManager/CMakeLists.txt
   vtkSMBoxRepresentationProxy.cxx
   vtkSMCameraLink.cxx
   vtkSMCameraProxy.cxx
@@ -108,6 +117,7 @@ SET (Kit_SRCS
   vtkSMSILModel.cxx
   vtkSMSourceProxy.cxx
   vtkSMSpreadSheetRepresentationProxy.cxx
+  vtkSMSubProxyProvider.cxx #--- Generic class that push subproxy to the vtk one
   vtkSMStateLoader.cxx
   vtkSMStateVersionControllerBase.cxx
   vtkSMStateVersionController.cxx

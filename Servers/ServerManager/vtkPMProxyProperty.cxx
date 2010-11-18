@@ -16,8 +16,10 @@
 
 #include "vtkClientServerStream.h"
 #include "vtkObjectFactory.h"
-#include "vtkPMProxy.h"
 #include "vtkPVXMLElement.h"
+
+#include "vtkPMProxy.h"
+#include "vtkSMRemoteObject.h"
 
 #include <assert.h>
 #include <vtkstd/set>
@@ -92,6 +94,7 @@ vtkPMProxyProperty::vtkPMProxyProperty()
   this->Cache = new InternalCache();
   this->CleanCommand = 0;
   this->RemoveCommand = 0;
+  this->ArgumentType = VTK;
   this->NullOnEmpty = false;
 }
 
@@ -117,6 +120,30 @@ bool vtkPMProxyProperty::ReadXMLAttributes(
 
   const char* remove_command = element->GetAttribute("remove_command");
   this->SetRemoveCommand(remove_command);
+
+  // Allow to choose the kind of object to pass as argument based on
+  // its global id.
+  const char* arg_type = element->GetAttribute("argument_type");
+  if(arg_type != NULL && arg_type[0] != 0)
+    {
+    if(strcmp(arg_type, "VTK") == 0)
+      {
+      this->ArgumentType = VTK;
+      }
+    else if(strcmp(arg_type, "SMProxy") == 0)
+      {
+      this->ArgumentType = SMProxy;
+      }
+    else if(strcmp(arg_type, "Kernel") == 0)
+      {
+      this->ArgumentType = Kernel;
+      }
+    }
+  else
+    {
+    // If not set, DEFAULT value
+    this->ArgumentType = VTK;
+    }
 
   int null_on_empty;
   if (element->GetScalarAttribute("null_on_empty", &null_on_empty))
@@ -164,14 +191,13 @@ bool vtkPMProxyProperty::Push(vtkSMMessage* message, int offset)
     this->Cache->GetProxyToRemove(proxy_ids);
     for (size_t cc=0; cc < proxy_ids.size(); cc++)
       {
-      vtkPMProxy* pmproxy = vtkPMProxy::SafeDownCast(
-          this->GetPMObject(proxy_ids[cc]));
-      if(pmproxy)
+      vtkObjectBase* arg = this->GetObject(proxy_ids[cc]);
+      if(arg != NULL)
         {
         stream << vtkClientServerStream::Invoke
                << objectId
                << this->GetRemoveCommand()
-               << pmproxy->GetVTKObjectID()
+               << arg
                << vtkClientServerStream::End;
         }
       else
@@ -185,14 +211,13 @@ bool vtkPMProxyProperty::Push(vtkSMMessage* message, int offset)
   this->Cache->GetProxyToAdd(proxy_ids);
   for (size_t cc=0; cc < proxy_ids.size(); cc++)
     {
-    vtkPMProxy* pmproxy = vtkPMProxy::SafeDownCast(
-        this->GetPMObject(proxy_ids[cc]));
-    if(pmproxy)
+    vtkObjectBase* arg = this->GetObject(proxy_ids[cc]);
+    if(arg != NULL)
       {
       stream << vtkClientServerStream::Invoke
              << objectId
              << this->GetCommand()
-             << pmproxy->GetVTKObjectID()
+             << arg
              << vtkClientServerStream::End;
       }
     else
@@ -228,4 +253,20 @@ bool vtkPMProxyProperty::Pull(vtkSMMessage*)
 void vtkPMProxyProperty::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+}
+//----------------------------------------------------------------------------
+vtkObjectBase* vtkPMProxyProperty::GetObject(vtkTypeUInt32 globalId)
+{
+  vtkPMProxy* pmProxy = NULL;
+  switch(this->ArgumentType)
+    {
+    case VTK:
+      pmProxy = vtkPMProxy::SafeDownCast(this->GetPMObject(globalId));
+      return (pmProxy == NULL) ? NULL : pmProxy->GetVTKObject();
+    case SMProxy:
+      return this->ProxyHelper->GetRemoteObject(globalId);
+    case Kernel:
+      return this->ProxyHelper->GetPMObject(globalId);
+    }
+  return NULL;
 }
