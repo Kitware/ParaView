@@ -87,8 +87,8 @@ public:
 //    while (debug) sleep(5);
     }
   // --------------------------------------------------------------------------
-  static void MergeTable(vtkIdType processId, vtkTable* otherTable, vtkTable* mergedTable,
-                  vtkIdType minSize)
+  static void MergeTable( vtkIdType processId, vtkTable* otherTable,
+                          vtkTable* mergedTable, vtkIdType minSize)
     {
     // Loop on all column of the table
     vtkAbstractArray* otherArray = 0;
@@ -564,8 +564,8 @@ public:
     this->GlobalHistogram = 0;
     }
 
-  Internals(vtkTable* input, vtkDataArray* dataToSort,
-            vtkMultiProcessController* controller)
+  Internals( vtkTable* input, vtkDataArray* dataToSort,
+             vtkMultiProcessController* controller)
     {
     // Default values
     this->SelectedComponent = 0;
@@ -598,6 +598,11 @@ public:
   // --------------------------------------------------------------------------
   bool IsSortable()
     {
+    if(this->DataToSort == NULL)
+      {
+      return false;
+      }
+
     // Communication buffer
     double localRange[2] = {VTK_DOUBLE_MAX, VTK_DOUBLE_MIN};
 
@@ -1083,14 +1088,24 @@ public:
       subArray->SetName(srcArray->GetName());
       subArray->Allocate(size * srcArray->GetNumberOfComponents());
       vtkIdType max = size+offset;
-      if(sorter)
+      if( sorter != NULL && sorter->Array != NULL )
         {
         max = (max > sorter->ArraySize) ? sorter->ArraySize : max;
         for(vtkIdType idx=offset; idx < max; ++idx)
           {
-          if(
-              subArray->InsertNextTuple(sorter->Array[idx].OriginalIndex, srcArray)
-              == -1)
+          if( subArray->InsertNextTuple( sorter->Array[idx].OriginalIndex,
+                                         srcArray) == -1)
+            {
+            cout << "ERROR NewSubsetTable::InsertNextTuple is not working." << endl;
+            }
+          }
+        }
+      else
+        {
+        max=(max>srcTable->GetNumberOfRows())?srcTable->GetNumberOfRows():max;
+        for(vtkIdType idx=offset; idx < max; ++idx)
+          {
+          if( subArray->InsertNextTuple( idx, srcArray) == -1)
             {
             cout << "ERROR NewSubsetTable::InsertNextTuple is not working." << endl;
             }
@@ -1589,7 +1604,6 @@ void vtkSortedTableStreamer::SetInvertOrder(int newValue)
 vtkDataArray* vtkSortedTableStreamer::GetDataArrayToProcess(vtkTable* input)
 {
   // Get a default array to sort just in case
-  vtkDataArray* defaultArray = vtkDataArray::SafeDownCast(input->GetColumn(0));
   vtkDataArray* requestedArray = 0;
   if(this->GetColumnToSort())
     {
@@ -1597,14 +1611,12 @@ vtkDataArray* vtkSortedTableStreamer::GetDataArrayToProcess(vtkTable* input)
         vtkDataArray::SafeDownCast(
             input->GetColumnByName(this->GetColumnToSort()));
     }
-  if(requestedArray)
-    return requestedArray;
-  return defaultArray;
+  return requestedArray;
 }
 
 //----------------------------------------------------------------------------
-void vtkSortedTableStreamer::CreateInternalIfNeeded(vtkTable* input,
-                                                   vtkDataArray* data)
+void vtkSortedTableStreamer::CreateInternalIfNeeded( vtkTable* input,
+                                                     vtkDataArray* data)
 {
   if(!this->Internal)
     {
