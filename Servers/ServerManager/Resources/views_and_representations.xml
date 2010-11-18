@@ -2451,9 +2451,9 @@
           Choose the representation type for the backface.
         </Documentation>
         <EnumerationDomain name="enum">
-          <Entry value="4" text="Follow Frontface" />
-          <Entry value="5" text="Cull Backface" />
-          <Entry value="6" text="Cull Frontface" />
+          <Entry value="400" text="Follow Frontface" />
+          <Entry value="401" text="Cull Backface" />
+          <Entry value="402" text="Cull Frontface" />
           <Entry value="0" text="Points" />
           <Entry value="1" text="Wireframe" />
           <Entry value="2" text="Surface" />
