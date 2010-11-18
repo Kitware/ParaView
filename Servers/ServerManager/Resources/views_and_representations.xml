@@ -919,7 +919,7 @@
        <IdTypeVectorProperty name="BlockSize"
          command="SetBlockSize"
          number_of_elements="1"
-         default_values="20">
+         default_values="1024">
          <Documentation>
            Get/Set the number of rows that fit within one block. The output of
            this filter will have at most BlockSize rows.
