@@ -32,9 +32,9 @@ public:
 
   enum RepresentationTypesEx
     {
-    FOLLOW_FRONTFACE= vtkGeometryRepresentation::SURFACE_WITH_EDGES+1,
-    CULL_BACKFACE,
-    CULL_FRONTFACE
+    FOLLOW_FRONTFACE=400,
+    CULL_BACKFACE=401,
+    CULL_FRONTFACE=402
     };
 
   // Description:
