@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkSMExponentialKeyFrameProxy.h
+  Module:    vtkPVExponentialKeyFrame.h
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -12,28 +12,28 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMExponentialKeyFrameProxy
+// .NAME vtkPVExponentialKeyFrame
 // .SECTION Description
 // Interplates lineraly between consequtive key frames.
 
-#ifndef __vtkSMExponentialKeyFrameProxy_h
-#define __vtkSMExponentialKeyFrameProxy_h
+#ifndef __vtkPVExponentialKeyFrame_h
+#define __vtkPVExponentialKeyFrame_h
 
-#include "vtkSMKeyFrameProxy.h"
+#include "vtkPVKeyFrame.h"
 
-class VTK_EXPORT vtkSMExponentialKeyFrameProxy : public vtkSMKeyFrameProxy
+class VTK_EXPORT vtkPVExponentialKeyFrame : public vtkPVKeyFrame
 {
 public:
-  vtkTypeMacro(vtkSMExponentialKeyFrameProxy, vtkSMKeyFrameProxy);
+  vtkTypeMacro(vtkPVExponentialKeyFrame, vtkPVKeyFrame);
   void PrintSelf(ostream& os, vtkIndent indent);
-  static vtkSMExponentialKeyFrameProxy* New();
+  static vtkPVExponentialKeyFrame* New();
 
   // Description:
   // This method will do the actual interpolation.
   // currenttime is normalized to the time range between
   // this key frame and the next key frame.
-  virtual void UpdateValue(double currenttime,
-    vtkSMAnimationCueProxy* cueProxy, vtkSMKeyFrameProxy* next);
+  virtual void UpdateValue( double currenttime, vtkPVAnimationCue* cue,
+                            vtkPVKeyFrame* next);
 
   // Description:
   // Base to be used for exponential function.
@@ -47,20 +47,17 @@ public:
   vtkGetMacro(EndPower, double);
 
 protected:
-  vtkSMExponentialKeyFrameProxy();
-  ~vtkSMExponentialKeyFrameProxy();
-  
+  vtkPVExponentialKeyFrame();
+  ~vtkPVExponentialKeyFrame();
+
   double Base;
   double StartPower;
   double EndPower;
-  
+
 private:
-  vtkSMExponentialKeyFrameProxy(const vtkSMExponentialKeyFrameProxy&); // Not implemented.
-  void operator=(const vtkSMExponentialKeyFrameProxy&); // Not implemented.
+  vtkPVExponentialKeyFrame(const vtkPVExponentialKeyFrame&); // Not implemented.
+  void operator=(const vtkPVExponentialKeyFrame&); // Not implemented.
 
 };
 
-
 #endif
-
-

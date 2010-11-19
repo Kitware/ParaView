@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkSMSinusoidKeyFrameProxy.h
+  Module:    vtkPVSinusoidKeyFrame.h
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -12,7 +12,7 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMSinusoidKeyFrameProxy
+// .NAME vtkPVSinusoidKeyFrame
 // .SECTION Description
 // Interplates a sinusoid. At any given time \c t, the resultant
 // value obtained from this keyframe is given by :
@@ -21,24 +21,24 @@
 // As is clear from  the equation, the amplitude of the wave
 // is obtained from the value of the keyframe.
 
-#ifndef __vtkSMSinusoidKeyFrameProxy_h
-#define __vtkSMSinusoidKeyFrameProxy_h
+#ifndef __vtkPVSinusoidKeyFrame_h
+#define __vtkPVSinusoidKeyFrame_h
 
-#include "vtkSMKeyFrameProxy.h"
+#include "vtkPVKeyFrame.h"
 
-class VTK_EXPORT vtkSMSinusoidKeyFrameProxy : public vtkSMKeyFrameProxy
+class VTK_EXPORT vtkPVSinusoidKeyFrame : public vtkPVKeyFrame
 {
 public:
-  vtkTypeMacro(vtkSMSinusoidKeyFrameProxy, vtkSMKeyFrameProxy);
+  static vtkPVSinusoidKeyFrame* New();
+  vtkTypeMacro(vtkPVSinusoidKeyFrame, vtkPVKeyFrame);
   void PrintSelf(ostream& os, vtkIndent indent);
-  static vtkSMSinusoidKeyFrameProxy* New();
 
   // Description:
   // This method will do the actual interpolation.
   // currenttime is normalized to the time range between
   // this key frame and the next key frame.
-  virtual void UpdateValue(double currenttime,
-    vtkSMAnimationCueProxy* cueProxy, vtkSMKeyFrameProxy* next);
+  virtual void UpdateValue( double currenttime, vtkPVAnimationCue* cue,
+                            vtkPVKeyFrame* next);
 
   // Description:
   // Get/Set the phase for the sine wave.
@@ -50,25 +50,23 @@ public:
   // for the entire length of this keyframe i.e. until the next key frame.
   vtkSetMacro(Frequency, double);
   vtkGetMacro(Frequency, double);
-  
+
   // Description:
   // Get/Set the Wave offset.
   vtkSetMacro(Offset, double);
   vtkGetMacro(Offset, double);
 
 protected:
-  vtkSMSinusoidKeyFrameProxy();
-  ~vtkSMSinusoidKeyFrameProxy();
-  
+  vtkPVSinusoidKeyFrame();
+  ~vtkPVSinusoidKeyFrame();
+
   double Phase;
   double Frequency;
   double Offset;
 
 private:
-  vtkSMSinusoidKeyFrameProxy(const vtkSMSinusoidKeyFrameProxy&); // Not implemented.
-  void operator=(const vtkSMSinusoidKeyFrameProxy&); // Not implemented.
+  vtkPVSinusoidKeyFrame(const vtkPVSinusoidKeyFrame&); // Not implemented.
+  void operator=(const vtkPVSinusoidKeyFrame&); // Not implemented.
 };
 
 #endif
-
-

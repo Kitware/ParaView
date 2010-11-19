@@ -128,10 +128,12 @@ SET(Filters_SRCS
   vtkPVBox.cxx
   vtkPVCacheKeeper.cxx
   vtkPVCacheKeeperPipeline.cxx
+  vtkPVCameraKeyFrame.cxx
   vtkPVCenterAxesActor.cxx
   vtkPVClipClosedSurface.cxx
   vtkPVClipDataSet.cxx
   vtkPVCompositeDataPipeline.cxx
+  vtkPVCompositeKeyFrame.cxx
   vtkPVConnectivityFilter.cxx
   vtkPVContextView.cxx
   vtkPVContourFilter.cxx
@@ -144,6 +146,7 @@ SET(Filters_SRCS
   vtkPVEnSightMasterServerReader.cxx
   vtkPVEnSightMasterServerReader2.cxx
   vtkPVEnSightMasterServerTranslator.cxx
+  vtkPVExponentialKeyFrame.cxx
   vtkPVExtentTranslator.cxx
   vtkPVExtractPieces.cxx
   vtkPVExtractSelection.cxx
@@ -171,6 +174,7 @@ SET(Filters_SRCS
   vtkPVPostFilterExecutive.cxx
   vtkPVRecoverGeometryWireframe.cxx
   vtkPV2DRenderView.cxx
+  vtkPVRampKeyFrame.cxx
   vtkPVRenderView.cxx
   vtkPVRenderViewProxy.cxx
   vtkPVRepresentedDataInformation.cxx
@@ -179,6 +183,7 @@ SET(Filters_SRCS
   vtkPVServerFileListing.cxx
   vtkPVServerObject.cxx
   vtkPVServerSelectTimeSet.cxx
+  vtkPVSinusoidKeyFrame.cxx
   vtkPVSynchronizedRenderer.cxx
   vtkPVSynchronizedRenderWindows.cxx
   vtkPVTextSource.cxx

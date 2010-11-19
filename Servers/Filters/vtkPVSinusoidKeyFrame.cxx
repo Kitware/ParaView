@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkSMSinusoidKeyFrameProxy.cxx
+  Module:    vtkPVSinusoidKeyFrame.cxx
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -12,19 +12,20 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#include "vtkSMSinusoidKeyFrameProxy.h"
+#include "vtkPVSinusoidKeyFrame.h"
+
 #include "vtkObjectFactory.h"
-#include "vtkSMDomain.h"
-#include "vtkSMProxy.h"
-#include "vtkSMVectorProperty.h"
-#include "vtkSMAnimationCueProxy.h"
+#include "vtkPVAnimationCue.h"
+
+//#include "vtkSMDomain.h"
+//#include "vtkSMProxy.h"
+//#include "vtkSMVectorProperty.h"
 
 #include <math.h>
 
-vtkStandardNewMacro(vtkSMSinusoidKeyFrameProxy);
-
+vtkStandardNewMacro(vtkPVSinusoidKeyFrame);
 //----------------------------------------------------------------------------
-vtkSMSinusoidKeyFrameProxy::vtkSMSinusoidKeyFrameProxy()
+vtkPVSinusoidKeyFrame::vtkPVSinusoidKeyFrame()
 {
   this->Phase = 0;
   this->Frequency = 1;
@@ -32,7 +33,7 @@ vtkSMSinusoidKeyFrameProxy::vtkSMSinusoidKeyFrameProxy()
 }
 
 //----------------------------------------------------------------------------
-vtkSMSinusoidKeyFrameProxy::~vtkSMSinusoidKeyFrameProxy()
+vtkPVSinusoidKeyFrame::~vtkPVSinusoidKeyFrame()
 {
 }
 
@@ -40,65 +41,53 @@ vtkSMSinusoidKeyFrameProxy::~vtkSMSinusoidKeyFrameProxy()
 // remeber that currenttime is 0 at the KeyTime of this key frame
 // and 1 and the KeyTime of the next key frame. Hence,
 // currenttime belongs to the interval [0,1).
-void vtkSMSinusoidKeyFrameProxy::UpdateValue(double currenttime,
-    vtkSMAnimationCueProxy* cueProxy, vtkSMKeyFrameProxy* next)
+void vtkPVSinusoidKeyFrame::UpdateValue( double currenttime,
+                                         vtkPVAnimationCue* cue,
+                                         vtkPVKeyFrame* next)
 {
   if (!next)
     {
     return;
     }
 
-  vtkSMDomain *domain = cueProxy->GetAnimatedDomain();
-  vtkSMProperty *property = cueProxy->GetAnimatedProperty();
-  vtkSMProxy *proxy = cueProxy->GetAnimatedProxy();
-  int animated_element = cueProxy->GetAnimatedElement();
+  // Some computations: start + (end-start)*sin( 2*pi* (freq*t + phase/360) )
+  double t = sin ( 8.0 * atan(static_cast<double>(1.0)) *
+                   (this->Frequency* currenttime + this->Phase/360.0));
 
-  if (!proxy || !domain || !property)
-    {
-    vtkErrorMacro("Cue does not have domain or property set!");
-    return;
-    }
-
-  // ( start + (end-start)*sin( 2*pi* (freq*t + phase/360) ) )
-  double t = sin ( 8.0 * atan(static_cast<double>(1.0)) *  
-    (this->Frequency* currenttime + this->Phase/360.0));
-
+  // Apply changes
+  cue->BeginUpdateAnimationValues();
+  int animated_element = cue->GetAnimatedElement();
   if (animated_element != -1)
     {
     double amplitude = this->GetKeyValue();
     double value = this->Offset + amplitude*t;
-    domain->SetAnimationValue(property, animated_element, value);
+    cue->SetAnimationValue(animated_element, value);
     }
   else
     {
+    unsigned int i;
     unsigned int start_novalues = this->GetNumberOfKeyValues();
     unsigned int end_novalues = next->GetNumberOfKeyValues();
-    unsigned int min = (start_novalues < end_novalues)? start_novalues :
-      end_novalues;
-    unsigned int i;
-    // interpolate comman indices.
+    unsigned int min = (start_novalues < end_novalues)
+                       ? start_novalues : end_novalues;
+    // interpolate common indices.
     for (i=0; i < min; i++)
       {
       double amplitude = this->GetKeyValue(i);
       double value = this->Offset + amplitude*t;
-      domain->SetAnimationValue(property, i, value);
+      cue->SetAnimationValue(i, value);
       }
     // add any additional indices in start key frame.
     for (i = min; i < start_novalues; i++)
       {
-      domain->SetAnimationValue(property, i, this->GetKeyValue(i));
-      }
-    vtkSMVectorProperty * vp = vtkSMVectorProperty::SafeDownCast(property);
-    if(vp)
-      {
-      vp->SetNumberOfElements(start_novalues);
+      cue->SetAnimationValue(i, this->GetKeyValue(i));
       }
     }
-  proxy->UpdateVTKObjects();
+  cue->EndUpdateAnimationValues();
 }
 
 //----------------------------------------------------------------------------
-void vtkSMSinusoidKeyFrameProxy::PrintSelf(ostream& os, vtkIndent indent)
+void vtkPVSinusoidKeyFrame::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
   os << indent << "Frequency: " << this->Frequency << endl;

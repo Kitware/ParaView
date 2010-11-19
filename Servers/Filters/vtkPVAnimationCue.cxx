@@ -91,8 +91,7 @@ void vtkPVAnimationCue::SetManipulator(vtkPVCueManipulator* manipulator)
     // those key frames change. We simply propagate that event out so
     // applications can only listen to vtkPVAnimationCue for modification
     // of the entire track.
-    this->Manipulator->AddObserver(
-      vtkCommand::ModifiedEvent, this->Observer);
+    this->Manipulator->AddObserver(vtkCommand::ModifiedEvent, this->Observer);
     }
 }
 
@@ -108,8 +107,8 @@ void vtkPVAnimationCue::InitializeObservers(vtkAnimationCue* cue)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVAnimationCue::ExecuteEvent(vtkObject* obj, unsigned long event,
-  void* calldata)
+void vtkPVAnimationCue::ExecuteEvent( vtkObject* obj, unsigned long event,
+                                      void* calldata)
 {
   if (!this->Enabled)
     {
@@ -122,22 +121,21 @@ void vtkPVAnimationCue::ExecuteEvent(vtkObject* obj, unsigned long event,
     {
     switch (event)
       {
-    case vtkCommand::StartAnimationCueEvent:
-      this->StartCueInternal(calldata);
-      break;
+      case vtkCommand::StartAnimationCueEvent:
+        this->StartCueInternal(calldata);
+        break;
 
-    case vtkCommand::EndAnimationCueEvent:
-      this->EndCueInternal(calldata);
-      break;
+      case vtkCommand::EndAnimationCueEvent:
+        this->EndCueInternal(calldata);
+        break;
 
-    case vtkCommand::AnimationCueTickEvent:
-      this->TickInternal(calldata);
-      break;
+      case vtkCommand::AnimationCueTickEvent:
+        this->TickInternal(calldata);
+        break;
       }
     }
 
-  vtkPVCueManipulator* manip =
-    vtkPVCueManipulator::SafeDownCast(obj);
+  vtkPVCueManipulator* manip = vtkPVCueManipulator::SafeDownCast(obj);
   if (manip && event == vtkCommand::ModifiedEvent)
     {
     this->Modified();
@@ -146,8 +144,7 @@ void vtkPVAnimationCue::ExecuteEvent(vtkObject* obj, unsigned long event,
 }
 
 //----------------------------------------------------------------------------
-void vtkPVAnimationCue::StartCueInternal(
-  void* info)
+void vtkPVAnimationCue::StartCueInternal(void* info)
 {
   if (this->Manipulator)
     {
@@ -158,8 +155,7 @@ void vtkPVAnimationCue::StartCueInternal(
 }
 
 //----------------------------------------------------------------------------
-void vtkPVAnimationCue::EndCueInternal(
-  void* info)
+void vtkPVAnimationCue::EndCueInternal(void* info)
 {
   if (this->Manipulator)
     {
@@ -170,12 +166,12 @@ void vtkPVAnimationCue::EndCueInternal(
 }
 
 //----------------------------------------------------------------------------
-void vtkPVAnimationCue::TickInternal(
-  void* info)
+void vtkPVAnimationCue::TickInternal(void* info)
 {
   // determine normalized  currenttime.
-  vtkAnimationCue::AnimationCueInfo *cueInfo =
-    reinterpret_cast<vtkAnimationCue::AnimationCueInfo*>(info);
+  vtkAnimationCue::AnimationCueInfo *cueInfo;
+  cueInfo = reinterpret_cast<vtkAnimationCue::AnimationCueInfo*>(info);
+
   if (!cueInfo)
     {
     vtkErrorMacro("Invalid object thrown by Tick event");
@@ -186,7 +182,7 @@ void vtkPVAnimationCue::TickInternal(
   if (cueInfo->StartTime != cueInfo->EndTime)
     {
     ctime = (cueInfo->AnimationTime - cueInfo->StartTime) /
-      (cueInfo->EndTime - cueInfo->StartTime);
+            (cueInfo->EndTime - cueInfo->StartTime);
     }
 
   if (this->Manipulator)
@@ -199,19 +195,19 @@ void vtkPVAnimationCue::TickInternal(
 //----------------------------------------------------------------------------
 double vtkPVAnimationCue::GetAnimationTime()
 {
-  return (this->AnimationCue)? this->AnimationCue->GetAnimationTime() : 0.0;
+  return (this->AnimationCue) ? this->AnimationCue->GetAnimationTime() : 0.0;
 }
 
 //----------------------------------------------------------------------------
 double vtkPVAnimationCue::GetDeltaTime()
 {
-  return (this->AnimationCue)? this->AnimationCue->GetDeltaTime() : 0.0;
+  return (this->AnimationCue) ? this->AnimationCue->GetDeltaTime() : 0.0;
 }
 
 //----------------------------------------------------------------------------
 double vtkPVAnimationCue::GetClockTime()
 {
-  return (this->AnimationCue)? this->AnimationCue->GetClockTime() : 0.0;
+  return (this->AnimationCue) ? this->AnimationCue->GetClockTime() : 0.0;
 }
 
 //----------------------------------------------------------------------------

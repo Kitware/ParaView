@@ -64,7 +64,7 @@ protected:
   // frame we pretend that the current time coincides with that of the last key frame and let
   // it update the properties. This is done only once per Animation cycle. The Initialize method
   // is used to indicate that a new animation cycle has begun.
-  virtual void Initialize(vtkPVAnimationCue*){ }
+  virtual void Initialize(vtkPVAnimationCue*) { }
 
   // Description:
   // This method is called when the AnimationCue's EndAnimationCueEvent is triggerred.
@@ -75,8 +75,7 @@ protected:
   // Description:
   // This updates the values based on currenttime.
   // currenttime is normalized to the time range of the Cue.
-  virtual void UpdateValue(double currenttime,
-    vtkPVAnimationCue* cueproxy)=0;
+  virtual void UpdateValue(double currenttime, vtkPVAnimationCue* cueproxy)=0;
 
   vtkPVCueManipulator();
   ~vtkPVCueManipulator();

@@ -24,7 +24,7 @@
 #ifndef __vtkSMAnimationSceneProxy_h
 #define __vtkSMAnimationSceneProxy_h
 
-#include "vtkSMAnimationCueProxy.h"
+#include "vtkPVAnimationCue.h"
 
 class vtkAnimationScene;
 class vtkSMViewProxy;

@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkSMRampKeyFrameProxy.h
+  Module:    vtkPVRampKeyFrame.h
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -12,40 +12,37 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMRampKeyFrameProxy
+// .NAME vtkPVRampKeyFrame
 // .SECTION Description
 // Interplates lineraly between consequtive key frames.
 
-#ifndef __vtkSMRampKeyFrameProxy_h
-#define __vtkSMRampKeyFrameProxy_h
+#ifndef __vtkPVRampKeyFrame_h
+#define __vtkPVRampKeyFrame_h
 
-#include "vtkSMKeyFrameProxy.h"
+#include "vtkPVKeyFrame.h"
 
-class VTK_EXPORT vtkSMRampKeyFrameProxy : public vtkSMKeyFrameProxy
+class VTK_EXPORT vtkPVRampKeyFrame : public vtkPVKeyFrame
 {
 public:
-  vtkTypeMacro(vtkSMRampKeyFrameProxy, vtkSMKeyFrameProxy);
+  static vtkPVRampKeyFrame* New();
+  vtkTypeMacro(vtkPVRampKeyFrame, vtkPVKeyFrame);
   void PrintSelf(ostream& os, vtkIndent indent);
-  static vtkSMRampKeyFrameProxy* New();
 
   // Description:
   // This method will do the actual interpolation.
   // currenttime is normalized to the time range between
   // this key frame and the next key frame.
   virtual void UpdateValue(double currenttime,
-    vtkSMAnimationCueProxy* cueProxy, vtkSMKeyFrameProxy* next);
+                           vtkPVAnimationCue* cue, vtkPVKeyFrame* next);
 
 protected:
-  vtkSMRampKeyFrameProxy();
-  ~vtkSMRampKeyFrameProxy();
-  
+  vtkPVRampKeyFrame();
+  ~vtkPVRampKeyFrame();
+
 private:
-  vtkSMRampKeyFrameProxy(const vtkSMRampKeyFrameProxy&); // Not implemented.
-  void operator=(const vtkSMRampKeyFrameProxy&); // Not implemented.
+  vtkPVRampKeyFrame(const vtkPVRampKeyFrame&); // Not implemented.
+  void operator=(const vtkPVRampKeyFrame&); // Not implemented.
 
 };
 
-
 #endif
-
-

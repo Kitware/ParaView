@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkSMRampKeyFrameProxy.cxx
+  Module:    vtkPVRampKeyFrame.cxx
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -12,22 +12,19 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#include "vtkSMRampKeyFrameProxy.h"
-#include "vtkObjectFactory.h"
-#include "vtkSMDomain.h"
-#include "vtkSMProxy.h"
-#include "vtkSMVectorProperty.h"
-#include "vtkSMAnimationCueProxy.h"
-#include "vtkSMSourceProxy.h"
-vtkStandardNewMacro(vtkSMRampKeyFrameProxy);
+#include "vtkPVRampKeyFrame.h"
 
+#include "vtkObjectFactory.h"
+#include "vtkPVAnimationCue.h"
+
+vtkStandardNewMacro(vtkPVRampKeyFrame);
 //----------------------------------------------------------------------------
-vtkSMRampKeyFrameProxy::vtkSMRampKeyFrameProxy()
+vtkPVRampKeyFrame::vtkPVRampKeyFrame()
 {
 }
 
 //----------------------------------------------------------------------------
-vtkSMRampKeyFrameProxy::~vtkSMRampKeyFrameProxy()
+vtkPVRampKeyFrame::~vtkPVRampKeyFrame()
 {
 }
 
@@ -35,62 +32,51 @@ vtkSMRampKeyFrameProxy::~vtkSMRampKeyFrameProxy()
 // remeber that currenttime is 0 at the KeyTime of this key frame
 // and 1 and the KeyTime of the next key frame. Hence,
 // currenttime belongs to the interval [0,1).
-void vtkSMRampKeyFrameProxy::UpdateValue(double currenttime,
-    vtkSMAnimationCueProxy* cueProxy, vtkSMKeyFrameProxy* next)
+void vtkPVRampKeyFrame::UpdateValue(double currenttime,
+                                    vtkPVAnimationCue* cue, vtkPVKeyFrame* next)
 {
   if (!next)
     {
     return;
     }
-  vtkSMDomain *domain = cueProxy->GetAnimatedDomain();
-  vtkSMProperty *property = cueProxy->GetAnimatedProperty();
-  vtkSMProxy *proxy = cueProxy->GetAnimatedProxy();
-  int animated_element = cueProxy->GetAnimatedElement();
 
-  if (!proxy || !domain || !property)
-    {
-    vtkErrorMacro("Cue does not have domain or property set!");
-    return;
-    }
-
+  cue->BeginUpdateAnimationValues();
+  int animated_element = cue->GetAnimatedElement();
   if (animated_element != -1)
     {
     double vmax = next->GetKeyValue();
     double vmin = this->GetKeyValue();
     double value = vmin + currenttime * (vmax - vmin);
-    domain->SetAnimationValue(property, animated_element, value);
+    cue->SetAnimationValue(animated_element, value);
     }
   else
     {
+    unsigned int i;
     unsigned int start_novalues = this->GetNumberOfKeyValues();
     unsigned int end_novalues = next->GetNumberOfKeyValues();
-    unsigned int min = (start_novalues < end_novalues)? start_novalues :
-      end_novalues;
-    unsigned int i;
+    unsigned int min = (start_novalues < end_novalues)
+                       ? start_novalues : end_novalues;
+
     // interpolate comman indices.
     for (i=0; i < min; i++)
       {
       double vmax = next->GetKeyValue(i);
       double vmin = this->GetKeyValue(i);
       double value = vmin + currenttime * (vmax - vmin);
-      domain->SetAnimationValue(property, i, value);
+      cue->SetAnimationValue(i, value);
       }
+
     // add any additional indices in start key frame.
     for (i = min; i < start_novalues; i++)
       {
-      domain->SetAnimationValue(property, i, this->GetKeyValue(i));
-      }
-    vtkSMVectorProperty * vp = vtkSMVectorProperty::SafeDownCast(property);
-    if(vp)
-      {
-      vp->SetNumberOfElements(start_novalues);
+      cue->SetAnimationValue(i, this->GetKeyValue(i));
       }
     }
-  proxy->UpdateVTKObjects();
+  cue->EndUpdateAnimationValues();
 }
 
 //----------------------------------------------------------------------------
-void vtkSMRampKeyFrameProxy::PrintSelf(ostream& os, vtkIndent indent)
+void vtkPVRampKeyFrame::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 }

@@ -35,12 +35,10 @@
 #include "vtkSMCameraConfigurationWriter.h"
 #include "vtkSMCameraKeyFrameProxy.h"
 #include "vtkSMCameraLink.h"
-#include "vtkSMCameraManipulatorProxy.h"
 #include "vtkSMCameraProxy.h"
 #include "vtkSMChartRepresentationProxy.h"
 #include "vtkSMComparativeAnimationCueProxy.h"
 #include "vtkSMComparativeViewProxy.h"
-#include "vtkSMCompositeKeyFrameProxy.h"
 #include "vtkSMCompositeTreeDomain.h"
 #include "vtkSMCompoundProxyDefinitionLoader.h"
 #include "vtkSMCompoundSourceProxy.h"
@@ -60,7 +58,6 @@
 #include "vtkSMDoubleRangeDomain.h"
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMEnumerationDomain.h"
-#include "vtkSMExponentialKeyFrameProxy.h"
 #include "vtkSMExporterProxy.h"
 #include "vtkSMExtentDomain.h"
 #include "vtkSMFetchDataProxy.h"
@@ -120,13 +117,11 @@
 #include "vtkSMPVRepresentationProxy.h"
 #include "vtkSMPWriterProxy.h"
 #include "vtkSMPythonTraceObserver.h"
-#include "vtkSMRampKeyFrameProxy.h"
 #include "vtkSMReaderFactory.h"
 #include "vtkSMRenderViewExporterProxy.h"
 #include "vtkSMRenderViewProxy.h"
 #include "vtkSMRepresentationAnimationHelperProxy.h"
 #include "vtkSMRepresentationProxy.h"
-#include "vtkSMScalarBarActorProxy.h"
 #include "vtkSMScalarBarWidgetRepresentationProxy.h"
 #include "vtkSMSelectionHelper.h"
 #include "vtkSMServerFileListingProxy.h"
@@ -134,7 +129,6 @@
 #include "vtkSMServerSideAnimationPlayer.h"
 #include "vtkSMSILDomain.h"
 #include "vtkSMSILModel.h"
-#include "vtkSMSinusoidKeyFrameProxy.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMSpreadSheetRepresentationProxy.h"
 #include "vtkSMStateLoader.h"
@@ -172,7 +166,6 @@ int main(int , char *[])
   vtkObject *c;
   PRINT_SELF(vtkInitializationHelper);
   PRINT_SELF(vtkPVBatchOptions);
-  PRINT_SELF(vtkSMAnimationCueManipulatorProxy);
   PRINT_SELF(vtkSMAnimationCueProxy);
   PRINT_SELF(vtkSMAnimationPlayerProxy);
   PRINT_SELF(vtkSMAnimationSceneGeometryWriter);
@@ -185,19 +178,16 @@ int main(int , char *[])
   PRINT_SELF(vtkSMArrayRangeDomain);
   PRINT_SELF(vtkSMArraySelectionDomain);
   PRINT_SELF(vtkSMBooleanDomain);
-  PRINT_SELF(vtkSMBooleanKeyFrameProxy);
   PRINT_SELF(vtkSMBoundsDomain);
   PRINT_SELF(vtkSMBoxRepresentationProxy);
   PRINT_SELF(vtkSMCameraConfigurationReader);
   PRINT_SELF(vtkSMCameraConfigurationWriter);
   PRINT_SELF(vtkSMCameraKeyFrameProxy);
   PRINT_SELF(vtkSMCameraLink);
-  PRINT_SELF(vtkSMCameraManipulatorProxy);
   PRINT_SELF(vtkSMCameraProxy);
   PRINT_SELF(vtkSMChartRepresentationProxy);
   PRINT_SELF(vtkSMComparativeAnimationCueProxy);
   PRINT_SELF(vtkSMComparativeViewProxy);
-  PRINT_SELF(vtkSMCompositeKeyFrameProxy);
   PRINT_SELF(vtkSMCompositeTreeDomain);
   PRINT_SELF(vtkSMCompoundProxyDefinitionLoader);
   PRINT_SELF(vtkSMCompoundSourceProxy);
@@ -217,7 +207,6 @@ int main(int , char *[])
   PRINT_SELF(vtkSMDoubleRangeDomain);
   PRINT_SELF(vtkSMDoubleVectorProperty);
   PRINT_SELF(vtkSMEnumerationDomain);
-  PRINT_SELF(vtkSMExponentialKeyFrameProxy);
   PRINT_SELF(vtkSMExporterProxy);
   PRINT_SELF(vtkSMExtentDomain);
   PRINT_SELF(vtkSMFetchDataProxy);
@@ -236,8 +225,6 @@ int main(int , char *[])
   PRINT_SELF(vtkSMInteractionUndoStackBuilder);
   PRINT_SELF(vtkSMIntRangeDomain);
   PRINT_SELF(vtkSMIntVectorProperty);
-  PRINT_SELF(vtkSMKeyFrameAnimationCueManipulatorProxy);
-  PRINT_SELF(vtkSMKeyFrameProxy);
   PRINT_SELF(vtkSMLinearAnimationCueManipulatorProxy);
   PRINT_SELF(vtkSMLink);
   PRINT_SELF(vtkSMNamedPropertyIterator);
@@ -277,13 +264,11 @@ int main(int , char *[])
   PRINT_SELF(vtkSMPVRepresentationProxy);
   PRINT_SELF(vtkSMPWriterProxy);
   PRINT_SELF(vtkSMPythonTraceObserver);
-  PRINT_SELF(vtkSMRampKeyFrameProxy);
   PRINT_SELF(vtkSMReaderFactory);
   PRINT_SELF(vtkSMRenderViewExporterProxy);
   PRINT_SELF(vtkSMRenderViewProxy);
   PRINT_SELF(vtkSMRepresentationAnimationHelperProxy);
   PRINT_SELF(vtkSMRepresentationProxy);
-  PRINT_SELF(vtkSMScalarBarActorProxy);
   PRINT_SELF(vtkSMScalarBarWidgetRepresentationProxy);
   PRINT_SELF(vtkSMSelectionHelper);
   PRINT_SELF(vtkSMServerFileListingProxy);
@@ -291,7 +276,6 @@ int main(int , char *[])
   PRINT_SELF(vtkSMServerSideAnimationPlayer);
   PRINT_SELF(vtkSMSILDomain);
   PRINT_SELF(vtkSMSILModel);
-  PRINT_SELF(vtkSMSinusoidKeyFrameProxy);
   PRINT_SELF(vtkSMSourceProxy);
   PRINT_SELF(vtkSMSpreadSheetRepresentationProxy);
   PRINT_SELF(vtkSMStateLoader);

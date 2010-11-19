@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkSMCameraKeyFrameProxy.h
+  Module:    vtkPVCameraKeyFrame.h
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -12,7 +12,7 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMCameraKeyFrameProxy
+// .NAME vtkPVCameraKeyFrame
 // .SECTION Description
 // Special key frame for animating Camera. Unlike typical keyframes,
 // this keyframe interpolates a proxy and not a property of the proxy.
@@ -20,17 +20,21 @@
 // Like all animation proxies, this is a client side only proxy with no
 // VTK objects created on the server side.
 
-#ifndef __vtkSMCameraKeyFrameProxy_h
-#define __vtkSMCameraKeyFrameProxy_h
+#ifndef __vtkPVCameraKeyFrame_h
+#define __vtkPVCameraKeyFrame_h
 
-#include "vtkSMKeyFrameProxy.h"
+#include "vtkPVKeyFrame.h"
 
 class vtkCamera;
-class VTK_EXPORT vtkSMCameraKeyFrameProxy : public vtkSMKeyFrameProxy
+class vtkPVAnimationCue;
+class vtkPVKeyFrame;
+class vtkCameraInterpolator2;
+
+class VTK_EXPORT vtkPVCameraKeyFrame : public vtkPVKeyFrame
 {
 public:
-  static vtkSMCameraKeyFrameProxy* New();
-  vtkTypeMacro(vtkSMCameraKeyFrameProxy, vtkSMKeyFrameProxy);
+  static vtkPVCameraKeyFrame* New();
+  vtkTypeMacro(vtkPVCameraKeyFrame, vtkPVKeyFrame);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
@@ -39,10 +43,9 @@ public:
   // maintained by vtkSMCameraManipulatorProxy itself. However,  in PATH mode,
   // this method is called to allow the key frame to use vtkCameraInterpolator2
   // to do path-based interpolations for the camera.
-  virtual void UpdateValue(double currenttime,
-    vtkSMAnimationCueProxy* cueProxy,
-    vtkSMKeyFrameProxy* next);
- 
+  virtual void UpdateValue( double currenttime, vtkPVAnimationCue* cue,
+                            vtkPVKeyFrame* next);
+
   // Description:
   // Updates the keyframe's current value using the camera.
   // This is a convenience method, it updates the properties on this proxy.
@@ -65,14 +68,15 @@ public:
   void SetParallelScale(double scale);
 
 protected:
-  vtkSMCameraKeyFrameProxy();
-  ~vtkSMCameraKeyFrameProxy();
+  vtkPVCameraKeyFrame();
+  ~vtkPVCameraKeyFrame();
 
   vtkCamera* Camera;
+  vtkCameraInterpolator2* Interpolator;
 
 private:
-  vtkSMCameraKeyFrameProxy(const vtkSMCameraKeyFrameProxy&); // Not implemented.
-  void operator=(const vtkSMCameraKeyFrameProxy&); // Not implemented.
+  vtkPVCameraKeyFrame(const vtkPVCameraKeyFrame&); // Not implemented.
+  void operator=(const vtkPVCameraKeyFrame&); // Not implemented.
 };
 
 

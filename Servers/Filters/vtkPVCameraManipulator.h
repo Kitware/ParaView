@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkSMCameraManipulatorProxy.h
+  Module:    vtkPVCameraManipulator.h
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -16,26 +16,24 @@
 // .SECTION Description
 // This is the manipulator for animating camera.
 // Unlike the base class, interpolation is not done by the Keyframe objects.
-// Instead, this class does the interpolation using the values in 
-// the keyframe objects. All the keyframes added to a 
+// Instead, this class does the interpolation using the values in
+// the keyframe objects. All the keyframes added to a
 // vtkSMCameraManipulatorProxy must be vtkSMCameraKeyFrameProxy.
 // Like all animation proxies, this is a client side only proxy with no
 // VTK objects created on the server side.
 
-#ifndef __vtkSMCameraManipulatorProxy_h
-#define __vtkSMCameraManipulatorProxy_h
+#ifndef __vtkPVCameraManipulator_h
+#define __vtkPVCameraManipulator_h
 
-#include "vtkSMKeyFrameAnimationCueManipulatorProxy.h"
+#include "vtkPVKeyFrameCueManipulator.h"
 
 class vtkCameraInterpolator;
 
-class VTK_EXPORT vtkSMCameraManipulatorProxy : 
-  public vtkSMKeyFrameAnimationCueManipulatorProxy
+class VTK_EXPORT vtkPVCameraManipulator : public vtkPVKeyFrameCueManipulator
 {
 public:
-  static vtkSMCameraManipulatorProxy* New();
-  vtkTypeMacro(vtkSMCameraManipulatorProxy,
-    vtkSMKeyFrameAnimationCueManipulatorProxy);
+  static vtkPVCameraManipulator* New();
+  vtkTypeMacro(vtkPVCameraManipulator, vtkPVKeyFrameCueManipulator);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   //BTX
@@ -59,25 +57,24 @@ public:
   vtkGetMacro(Mode, int);
 
 protected:
-  vtkSMCameraManipulatorProxy();
-  ~vtkSMCameraManipulatorProxy();
+  vtkPVCameraManipulator();
+  ~vtkPVCameraManipulator();
 
   int Mode;
- 
-  virtual void Initialize(vtkSMAnimationCueProxy*);
-  virtual void Finalize(vtkSMAnimationCueProxy*);
+
+  virtual void Initialize(vtkPVAnimationCue*);
+  virtual void Finalize(vtkPVAnimationCue*);
   // Description:
-  // This updates the values based on currenttime. 
+  // This updates the values based on currenttime.
   // currenttime is normalized to the time range of the Cue.
-  virtual void UpdateValue(double currenttime, 
-    vtkSMAnimationCueProxy* cueproxy);
+  virtual void UpdateValue(double currenttime,
+                           vtkPVAnimationCue* cueproxy);
 
   vtkCameraInterpolator* CameraInterpolator;
 private:
-  vtkSMCameraManipulatorProxy(const vtkSMCameraManipulatorProxy&); // Not implemented.
-  void operator=(const vtkSMCameraManipulatorProxy&); // Not implemented.
-  
+  vtkPVCameraManipulator(const vtkPVCameraManipulator&); // Not implemented.
+  void operator=(const vtkPVCameraManipulator&); // Not implemented.
+
 };
 
 #endif
-

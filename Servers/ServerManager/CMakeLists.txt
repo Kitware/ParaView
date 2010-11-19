@@ -20,9 +20,6 @@ ENDIF(NOT WIN32)
 
 SET (Kit_SRCS
   vtkInitializationHelper.cxx
-  vtkInternalSMProxyHandler.cxx
-  vtkInternalProxyAnimationCue.cxx
-  vtkInternalProxyAnimationScene.cxx
 # --- PM Objects ---
   vtkPMArraySelectionProperty.cxx
   vtkPMDataArrayProperty.cxx
@@ -48,20 +45,11 @@ SET (Kit_SRCS
   vtkPMVectorProperty.cxx
   vtkPMWriterProxy.cxx
 # --- SM Objects ---
-<<<<<<< HEAD:Servers/ServerManager/CMakeLists.txt
-  vtkSMAnimationPlayerProxy.cxx
-  vtkSMAnimationSceneProxy.cxx
-=======
-  vtkSMAnimationCueManipulatorProxy.cxx
-  vtkSMAnimationPlayerProxy.cxx
-  vtkSMBooleanKeyFrameProxy.cxx
->>>>>>> Support different ProxyProperty type (VTK, SMProxy, Kernel):Servers/ServerManager/CMakeLists.txt
   vtkSMBoxRepresentationProxy.cxx
   vtkSMCameraLink.cxx
   vtkSMCameraProxy.cxx
   vtkSMCameraConfigurationReader.cxx
   vtkSMCameraConfigurationWriter.cxx
-  vtkSMCameraKeyFrameProxy.cxx
   vtkSMChartRepresentationProxy.cxx
   vtkSMCompoundSourceProxy.cxx
   vtkSMCompoundSourceProxyDefinitionBuilder.cxx
@@ -186,7 +174,6 @@ SET(Kit_SRCS
 #  vtkSMCaveRenderViewProxy.cxx
   vtkSMComparativeAnimationCueProxy.cxx
   vtkSMComparativeViewProxy.cxx
-  vtkSMCompositeKeyFrameProxy.cxx
   vtkSMCompoundSourceProxy.cxx
   vtkSMCompoundProxyDefinitionLoader.cxx
   vtkSMConnectionCleanerProxy.cxx
@@ -196,7 +183,6 @@ SET(Kit_SRCS
   vtkSMDataSourceProxy.cxx #---- Who use it ? --- Make a special property type to copy data ?
   vtkSMDistanceRepresentation2DProxy.cxx
 
-  vtkSMExponentialKeyFrameProxy.cxx
 
   vtkSMGlobalPropertiesLinkUndoElement.cxx #--------------------------------
 
@@ -226,7 +212,6 @@ SET(Kit_SRCS
   vtkSMPythonTraceObserver.cxx
 
 
-  vtkSMRampKeyFrameProxy.cxx
   vtkSMReaderFactory.cxx
   vtkSMRenderViewExporterProxy.cxx
   vtkSMRepresentationAnimationHelperProxy.cxx
@@ -237,7 +222,6 @@ SET(Kit_SRCS
   vtkSMServerFileListingProxy.cxx
   vtkSMServerProxyManagerReviver.cxx
   vtkSMServerSideAnimationPlayer.cxx
-  vtkSMSinusoidKeyFrameProxy.cxx
 
 #  vtkSMTemporalInputDomain.cxx
   vtkSMTesting.cxx

@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkSMCompositeKeyFrameProxy.h
+  Module:    vtkPVCompositeKeyFrame.h
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -12,27 +12,27 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMCompositeKeyFrameProxy - composite keyframe proxy.
+// .NAME vtkPVCompositeKeyFrame - composite keyframe proxy.
 // .SECTION Description
 // There are many different types of keyframes such as
-// vtkSMSinusoidKeyFrameProxy, vtkSMRampKeyFrameProxy etc. 
+// vtkSMSinusoidKeyFrameProxy, vtkSMRampKeyFrameProxy etc.
 // This is keyframe proxy that has all different types of keyframes
 // as subproxies and provides API to choose one of them as the
-// active type. This is helpful in GUIs that allow for switching the 
+// active type. This is helpful in GUIs that allow for switching the
 // type of keyframe on the fly without much effort from the GUI.
 
-#ifndef __vtkSMCompositeKeyFrameProxy_h
-#define __vtkSMCompositeKeyFrameProxy_h
+#ifndef __vtkPVCompositeKeyFrame_h
+#define __vtkPVCompositeKeyFrame_h
 
-#include "vtkSMKeyFrameProxy.h"
+#include "vtkPVKeyFrame.h"
 
 class vtkSMPropertyLink;
 
-class VTK_EXPORT vtkSMCompositeKeyFrameProxy : public vtkSMKeyFrameProxy
+class VTK_EXPORT vtkPVCompositeKeyFrame : public vtkPVKeyFrame
 {
 public:
-  static vtkSMCompositeKeyFrameProxy* New();
-  vtkTypeMacro(vtkSMCompositeKeyFrameProxy, vtkSMKeyFrameProxy);
+  static vtkPVCompositeKeyFrame* New();
+  vtkTypeMacro(vtkPVCompositeKeyFrame, vtkPVKeyFrame);
   void PrintSelf(ostream& os, vtkIndent indent);
   //BTX
   enum
@@ -58,12 +58,12 @@ public:
   // This method will do the actual interpolation.
   // currenttime is normalized to the time range between
   // this key frame and the next key frame.
-  virtual void UpdateValue(double currenttime,
-    vtkSMAnimationCueProxy* cueProxy, vtkSMKeyFrameProxy* next);
+  virtual void UpdateValue( double currenttime,
+                            vtkPVAnimationCue* cue, vtkPVKeyFrame* next);
 
 protected:
-  vtkSMCompositeKeyFrameProxy();
-  ~vtkSMCompositeKeyFrameProxy();
+  vtkPVCompositeKeyFrame();
+  ~vtkPVCompositeKeyFrame();
 
   void InvokeModified()
     {
@@ -77,13 +77,20 @@ protected:
   // the objects on the server(s)
   virtual void CreateVTKObjects();
 
-  vtkSMPropertyLink* TimeLink;
-  vtkSMPropertyLink* ValueLink;
+  // FIXME ++++++++++++++++++++++++++++++++++
+  //vtkSMPropertyLink* TimeLink;
+  //vtkSMPropertyLink* ValueLink;
   int Type;
+
+  vtkPVBooleanKeyFrame* BooleanKeyFrame;
+  vtkPVRampKeyFrame* RampKeyFrame;
+  vtkPVExponentialKeyFrame* ExponentialKeyFrame;
+  vtkPVSinusoidKeyFrame* SinusoidKeyFrame;
+
+
 private:
-  vtkSMCompositeKeyFrameProxy(const vtkSMCompositeKeyFrameProxy&); // Not implemented.
-  void operator=(const vtkSMCompositeKeyFrameProxy&); // Not implemented.
+  vtkPVCompositeKeyFrame(const vtkPVCompositeKeyFrame&); // Not implemented.
+  void operator=(const vtkPVCompositeKeyFrame&); // Not implemented.
 };
 
 #endif
-

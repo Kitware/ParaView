@@ -20,7 +20,6 @@
 
 #include <vtkstd/vector>
 
-vtkStandardNewMacro(vtkPVKeyFrameCueManipulator);
 
 //****************************************************************************
 class vtkPVKeyFrameCueManipulatorObserver : public vtkCommand
@@ -52,17 +51,15 @@ protected:
   vtkPVKeyFrameCueManipulator*
     KeyFrameAnimationCueManipulatorProxy;
 };
-
-
-//****************************************************************************
+//----------------------------------------------------------------------------
 class vtkPVKeyFrameCueManipulatorInternals
 {
 public:
   typedef vtkstd::vector<vtkPVKeyFrame*> KeyFrameVector;
   KeyFrameVector KeyFrames;
 };
-
 //****************************************************************************
+vtkStandardNewMacro(vtkPVKeyFrameCueManipulator);
 //----------------------------------------------------------------------------
 vtkPVKeyFrameCueManipulator::vtkPVKeyFrameCueManipulator()
 {
@@ -113,8 +110,7 @@ int vtkPVKeyFrameCueManipulator::AddKeyFrame(vtkPVKeyFrame* keyframe)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVKeyFrameCueManipulator::RemoveKeyFrame(
-  vtkPVKeyFrame* keyframe)
+void vtkPVKeyFrameCueManipulator::RemoveKeyFrame(vtkPVKeyFrame* keyframe)
 {
   if (this->RemoveKeyFrameInternal(keyframe))
     {
@@ -148,8 +144,7 @@ unsigned int vtkPVKeyFrameCueManipulator::GetNumberOfKeyFrames()
 }
 
 //----------------------------------------------------------------------------
-vtkPVKeyFrame* vtkPVKeyFrameCueManipulator::GetKeyFrame(
-  double time)
+vtkPVKeyFrame* vtkPVKeyFrameCueManipulator::GetKeyFrame(double time)
 {
   vtkPVKeyFrameCueManipulatorInternals::KeyFrameVector::
     iterator iter;
@@ -206,9 +201,9 @@ vtkPVKeyFrame* vtkPVKeyFrameCueManipulator::GetEndKeyFrame(double time)
 
 //----------------------------------------------------------------------------
 void vtkPVKeyFrameCueManipulator::UpdateValue(double currenttime,
-  vtkPVAnimationCue* cueproxy)
+                                              vtkPVAnimationCue* cue)
 {
-  if (!cueproxy)
+  if (!cue)
     {
     vtkErrorMacro("UpdateValue called with invalid arguments");
     return;
@@ -227,7 +222,7 @@ void vtkPVKeyFrameCueManipulator::UpdateValue(double currenttime,
     // This means that we are at a time location before the first keyframe in
     // this cue. In that case, simply duplicate the first key-frame as the
     // chosen one.
-    endKF->UpdateValue(0, cueproxy, endKF);
+    endKF->UpdateValue(0, cue, endKF);
     this->InvokeEvent(vtkPVCueManipulator::StateModifiedEvent);
     }
   if (startKF && endKF)
@@ -241,7 +236,7 @@ void vtkPVKeyFrameCueManipulator::UpdateValue(double currenttime,
       {
       ctime = (currenttime - tmin)/ (tmax-tmin);
       }
-    startKF->UpdateValue(ctime, cueproxy, endKF);
+    startKF->UpdateValue(ctime, cue, endKF);
     this->InvokeEvent(vtkPVCueManipulator::StateModifiedEvent);
     }
   // check to see if the curtime has crossed the last key frame and if
@@ -252,7 +247,7 @@ void vtkPVKeyFrameCueManipulator::UpdateValue(double currenttime,
     vtkPVKeyFrame* lastKF = this->GetKeyFrameAtIndex(num-1);
     if (currenttime >= lastKF->GetKeyTime())
       {
-      lastKF->UpdateValue(0, cueproxy,lastKF);
+      lastKF->UpdateValue(0, cue,lastKF);
       this->SendEndEvent = 0;
       this->InvokeEvent(vtkPVCueManipulator::StateModifiedEvent);
       }
@@ -261,7 +256,7 @@ void vtkPVKeyFrameCueManipulator::UpdateValue(double currenttime,
 
 //----------------------------------------------------------------------------
 vtkPVKeyFrame* vtkPVKeyFrameCueManipulator::GetNextKeyFrame(
-  vtkPVKeyFrame* keyFrame)
+    vtkPVKeyFrame* keyFrame)
 {
   vtkPVKeyFrameCueManipulatorInternals::KeyFrameVector::
     iterator it = this->Internals->KeyFrames.begin();
@@ -282,7 +277,7 @@ vtkPVKeyFrame* vtkPVKeyFrameCueManipulator::GetNextKeyFrame(
 
 //----------------------------------------------------------------------------
 vtkPVKeyFrame* vtkPVKeyFrameCueManipulator::GetPreviousKeyFrame(
-  vtkPVKeyFrame* keyFrame)
+    vtkPVKeyFrame* keyFrame)
 {
   vtkPVKeyFrame* proxy = NULL;
 
@@ -300,8 +295,7 @@ vtkPVKeyFrame* vtkPVKeyFrameCueManipulator::GetPreviousKeyFrame(
 }
 
 //----------------------------------------------------------------------------
-vtkPVKeyFrame* vtkPVKeyFrameCueManipulator::GetKeyFrameAtIndex(
-  int index)
+vtkPVKeyFrame* vtkPVKeyFrameCueManipulator::GetKeyFrameAtIndex(int index)
 {
   if (index < 0 || index >= static_cast<int>(this->GetNumberOfKeyFrames()))
     {
@@ -313,7 +307,7 @@ vtkPVKeyFrame* vtkPVKeyFrameCueManipulator::GetKeyFrameAtIndex(
 
 //----------------------------------------------------------------------------
 void vtkPVKeyFrameCueManipulator::ExecuteEvent(
-  vtkObject* obj, unsigned long event, void* )
+    vtkObject* obj, unsigned long event, void* )
 {
   vtkPVKeyFrame* keyframe = vtkPVKeyFrame::SafeDownCast(obj);
 
@@ -336,8 +330,7 @@ void vtkPVKeyFrameCueManipulator::ExecuteEvent(
 }
 
 //----------------------------------------------------------------------------
-int vtkPVKeyFrameCueManipulator::AddKeyFrameInternal(
-  vtkPVKeyFrame* keyframe)
+int vtkPVKeyFrameCueManipulator::AddKeyFrameInternal(vtkPVKeyFrame* keyframe)
 {
   double time = keyframe->GetKeyTime();
   int index = 0;
@@ -362,8 +355,7 @@ int vtkPVKeyFrameCueManipulator::AddKeyFrameInternal(
 }
 
 //----------------------------------------------------------------------------
-int vtkPVKeyFrameCueManipulator::RemoveKeyFrameInternal(
-  vtkPVKeyFrame* keyframe)
+int vtkPVKeyFrameCueManipulator::RemoveKeyFrameInternal(vtkPVKeyFrame* kf)
 {
   vtkPVKeyFrameCueManipulatorInternals::KeyFrameVector::
     iterator iter;
@@ -371,7 +363,7 @@ int vtkPVKeyFrameCueManipulator::RemoveKeyFrameInternal(
     iter != this->Internals->KeyFrames.end();
     iter++)
     {
-    if ( *iter == keyframe)
+    if ( *iter == kf)
       {
       this->Internals->KeyFrames.erase(iter);
       return 1;
@@ -419,10 +411,9 @@ void vtkPVKeyFrameCueManipulator::UpdateKeyTimeDomains()
 #endif
 
 //----------------------------------------------------------------------------
-void vtkPVKeyFrameCueManipulator::PrintSelf(ostream& os,
-  vtkIndent indent)
+void vtkPVKeyFrameCueManipulator::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
   os << indent << "LastAddedKeyFrameIndex: " << this->LastAddedKeyFrameIndex
-    << endl;
+      << endl;
 }
