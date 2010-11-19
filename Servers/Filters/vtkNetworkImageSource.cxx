@@ -12,23 +12,23 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#include "vtkObjectFactory.h"
+#include "vtkNetworkImageSource.h"
 
-#include "vtkCharArray.h"
-#include "vtkClientServerStream.h"
+#include "vtkBMPReader.h"
+#include "vtkImageData.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
-#include "vtkNetworkImageSource.h"
-#include "vtkStreamingDemandDrivenPipeline.h"
-#include "vtkStructuredPoints.h"
-#include "vtkStructuredPointsReader.h"
 #include "vtkJPEGReader.h"
-#include "vtkBMPReader.h"
-#include "vtkTIFFReader.h"
-#include "vtkPNMReader.h"
+#include "vtkMultiProcessController.h"
+#include "vtkObjectFactory.h"
 #include "vtkPNGReader.h"
+#include "vtkPNMReader.h"
+#include "vtkProcessModule.h"
+#include "vtkPVSession.h"
 #include "vtkSmartPointer.h"
-#include "vtkStructuredPointsWriter.h"
+#include "vtkStreamingDemandDrivenPipeline.h"
+#include "vtkTIFFReader.h"
+
 #include <vtksys/SystemTools.hxx>
 
 
@@ -38,14 +38,70 @@ vtkNetworkImageSource::vtkNetworkImageSource()
 {
   this->SetNumberOfInputPorts(0);
   this->Buffer = vtkImageData::New();
-  this->Reply = new vtkClientServerStream();
+  this->FileName = 0;
 }
 
 //----------------------------------------------------------------------------
 vtkNetworkImageSource::~vtkNetworkImageSource()
 {
-  delete this->Reply;
+  this->SetFileName(0);
   this->Buffer->Delete();
+  this->Buffer = NULL;
+}
+
+//----------------------------------------------------------------------------
+void vtkNetworkImageSource::UpdateImage()
+{
+  if (this->GetMTime() < this->UpdateImageTime)
+    {
+    return;
+    }
+
+  if (this->FileName == NULL || this->FileName[0] == 0)
+    {
+    return;
+    }
+
+  vtkPVSession* session = vtkPVSession::SafeDownCast(
+    vtkProcessModule::GetProcessModule()->GetActiveSession());
+  if (!session)
+    {
+    vtkErrorMacro("Active session must be a vtkPVSession.");
+    return;
+    }
+
+  vtkPVSession::ServerFlags roles = session->GetProcessRoles();
+  if ( (roles & vtkPVSession::CLIENT) != 0)
+    {
+    // We are expected to read the image on this process.
+    this->ReadImageFromFile(this->FileName);
+    vtkMultiProcessController* rs_controller =
+      session->GetController(vtkPVSession::RENDER_SERVER);
+    if (rs_controller)
+      {
+      rs_controller->Send(this->Buffer, 1, 0x287823);
+      }
+    }
+  else if ( (roles & vtkPVSession::RENDER_SERVER) != 0 ||
+    (roles & vtkPVSession::RENDER_SERVER_ROOT) != 0)
+    {
+    // receive the image from the client.
+    vtkMultiProcessController* client_controller =
+      session->GetController(vtkPVSession::CLIENT);
+    if (client_controller)
+      {
+      client_controller->Receive(this->Buffer, 1, 0x287823);
+      }
+    }
+
+  vtkMultiProcessController* globalController =
+    vtkMultiProcessController::GetGlobalController();
+  if (globalController->GetNumberOfProcesses() > 1)
+    {
+    globalController->Broadcast(this->Buffer, 0);
+    }
+
+  this->UpdateImageTime.Modified();
 }
 
 //----------------------------------------------------------------------------
@@ -59,7 +115,7 @@ int vtkNetworkImageSource::ReadImageFromFile(const char* filename)
 
   vtkSmartPointer<vtkImageReader2> reader;
   // determine type of reader to create.
-  vtkstd::string ext = 
+  vtkstd::string ext =
     vtksys::SystemTools::LowerCase(vtksys::SystemTools::GetFilenameLastExtension(filename));
   if (ext == ".bmp")
     {
@@ -95,70 +151,6 @@ int vtkNetworkImageSource::ReadImageFromFile(const char* filename)
   reader->Update();
   this->Buffer->ShallowCopy(reader->GetOutput());
   return 1;
-}
-
-//----------------------------------------------------------------------------
-const vtkClientServerStream& vtkNetworkImageSource::GetImageAsString()
-{
- // Read the texture image locally and write it out to a binary string.
-  vtkStructuredPointsWriter *writer = vtkStructuredPointsWriter::New();
-  writer->SetInput(this->Buffer);
-  writer->SetFileTypeToBinary();
-  writer->WriteToOutputStringOn();
-  writer->Write();
-
-  this->Reply->Reset(); 
-  (*this->Reply)  << vtkClientServerStream::Reply
-                  << vtkClientServerStream::InsertArray(
-                    writer->GetOutputString(), writer->GetOutputStringLength())
-                  << vtkClientServerStream::End;
-  writer->Delete();
-  return (*this->Reply);
-}
-
-//----------------------------------------------------------------------------
-void vtkNetworkImageSource::ClearBuffers()
-{
-  this->Buffer->Initialize();
-  delete this->Reply;
-  this->Reply = new vtkClientServerStream();
-}
-
-//----------------------------------------------------------------------------
-void vtkNetworkImageSource::ReadImageFromString(vtkClientServerStream& css)
-{
-  // Get the length of the string in the vtkClientServerStream.
-  vtkTypeUInt32 len;
-  if (!css.GetArgumentLength(0, 0, &len))
-    {
-    abort();
-    }
-  this->ClearBuffers();
-
-  // Get the string (a .vtk dataset containing a vtkImageData) from the
-  // vtkClientServerStream.
-  char* imageString = new char[len];
-  css.GetArgument(0, 0, imageString, len);
-
-  // Set up a vtkCharArray to hold the string. We do it this way rather than
-  // pass the string directly to the vtkStructuredPointsReader to avoid
-  // duplicating the string in memory.
-  vtkCharArray *inputArray = vtkCharArray::New();
-  inputArray->SetArray(imageString, len, 1);
-
-  // Read the data from the string.
-  vtkStructuredPointsReader *reader = vtkStructuredPointsReader::New();
-  reader->SetInputArray(inputArray);
-  reader->ReadFromInputStringOn();
-  reader->Update();
-
-  // shallow copy the output of the vtkStructuredPointsReader to an
-  // internal buffer
-  this->Buffer->ShallowCopy(reader->GetOutput());
-
-  inputArray->Delete();
-  reader->Delete();
-  delete [] imageString;
 }
 
 //----------------------------------------------------------------------------

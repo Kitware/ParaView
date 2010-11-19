@@ -12,17 +12,12 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkNetworkImageSource - an image source that whose data is encoded in a vtkClientServerStream
+// .NAME vtkNetworkImageSource - an image source that can read an image file on
+// one process and ensure that it's available on some other group of processes.
 // .SECTION Description
-// vtkNetworkImageSource is a subclass of vtkImageAlgorithm that takes a
-// vtkClientServerStream with a message whose only argument is a string
-// containing a .vtk dataset for a vtkImageData. Because the string contains
-// binary (non-ASCII) data, it is not NULL-terminated, and so the method
-// ReadImageFromString was not CSS-wrapped properly if we passed the string
-// directly to this method. Instead we pass in the vtkClientServerStream
-// and unpack it inside this method. Once the CSS has been unpacked, we
-// pass the string to a vtkStructuredPointsReader to read the dataset
-// contained in the string.
+// vtkNetworkImageSource is a vtkImageAlgorithm that can read an image file on
+// on the client process and produce the output image data on a client and
+// render-server processes.
 
 #ifndef __vtkNetworkImageSource_h
 #define __vtkNetworkImageSource_h
@@ -40,30 +35,24 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Read the image from a file.
-  int ReadImageFromFile(const char* filename);
+  // Get/Set the filename.
+  vtkSetStringMacro(FileName);
+  vtkGetStringMacro(FileName);
 
   // Description:
-  // Returns the image data as a string.
-  const vtkClientServerStream& GetImageAsString();
+  // Needs to be called to perform the actual image migration.
+  void UpdateImage();
 
-  // Description:
-  // Pass in a vtkClientServerStream containing a string that is a binary-
-  // encoded .vtk dataset containing a vtkImageData.
-  void ReadImageFromString(vtkClientServerStream &css);
-
-  // Description:
-  // Clears extra internal buffers. Note this invalidates the value returned by
-  // GetImageAsString().
-  void ClearBuffers();
-  
 protected:
   vtkNetworkImageSource();
   ~vtkNetworkImageSource();
 
-  vtkImageData* Buffer;
-  vtkClientServerStream* Reply;
+  vtkTimeStamp UpdateImageTime;
 
+  char* FileName;
+
+  vtkImageData* Buffer;
+  int ReadImageFromFile(const char* filename);
   int RequestData(vtkInformation *request,
                   vtkInformationVector** inputVector,
                   vtkInformationVector* outputVector);

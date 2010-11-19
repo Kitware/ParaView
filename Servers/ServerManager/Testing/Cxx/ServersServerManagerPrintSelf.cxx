@@ -81,7 +81,6 @@
 #include "vtkSMLinearAnimationCueManipulatorProxy.h"
 #include "vtkSMLink.h"
 #include "vtkSMNamedPropertyIterator.h"
-#include "vtkSMNetworkImageSourceProxy.h"
 #include "vtkSMNewWidgetRepresentationProxy.h"
 #include "vtkSMNumberOfComponentsDomain.h"
 #include "vtkSMNumberOfGroupsDomain.h"
@@ -228,7 +227,6 @@ int main(int , char *[])
   PRINT_SELF(vtkSMLinearAnimationCueManipulatorProxy);
   PRINT_SELF(vtkSMLink);
   PRINT_SELF(vtkSMNamedPropertyIterator);
-  PRINT_SELF(vtkSMNetworkImageSourceProxy);
   PRINT_SELF(vtkSMNewWidgetRepresentationProxy);
   PRINT_SELF(vtkSMNumberOfComponentsDomain);
   PRINT_SELF(vtkSMNumberOfGroupsDomain);

@@ -436,7 +436,7 @@
       </InputProperty>
     </SourceProxy>
 
-    <ImageTextureProxy name="ImageTexture" class="vtkTexture">
+    <ImageTextureProxy name="ImageTexture" class="vtkTexture" >
       <Documentation>
         This is a proxy for a vtkTexture which also includes an image file
         reader. This reader can read an image of client/data server or render
@@ -448,7 +448,6 @@
           proxygroup="sources" proxyname="NetworkImageSource" />
         <ExposedProperties>
           <Property name="FileName" />
-          <Property name="SourceProcess" />
         </ExposedProperties>
       </SubProxy>
       <IntVectorProperty
