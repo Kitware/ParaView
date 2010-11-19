@@ -41,13 +41,13 @@ public:
 
   // Description:
   // Get and set the comment character for the file
-  vtkGetMacro(CommentCharacter,char);
-  vtkSetMacro(CommentCharacter,char);
+  vtkSetStringMacro(CommentCharacter);
+  vtkGetStringMacro(CommentCharacter);
 
   // Description:
   // Get and set the delimeter character for the file
-  vtkGetMacro(Delimeter,char);
-  vtkSetMacro(Delimeter,char);
+  vtkSetStringMacro(Delimeter);
+  vtkGetStringMacro(Delimeter);
 
 protected:
   vtkSpyPlotHistoryReader();
@@ -68,8 +68,8 @@ protected:
   void ConstructTableColumns(vtkTable *table);
 
   char *FileName;
-  char CommentCharacter;
-  char Delimeter;
+  char *CommentCharacter;
+  char *Delimeter;
 
   // Description:
   //Private storage of time information

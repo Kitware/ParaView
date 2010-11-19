@@ -60,13 +60,15 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkSpyPlotHistoryReader::vtkSpyPlotHistoryReader():
-Info(new MetaInfo),
-CommentCharacter('%'),
-Delimeter(',')
+Info(new MetaInfo)
 {
   this->SetNumberOfInputPorts(0);
   this->SetNumberOfOutputPorts(1);
   this->FileName = 0;
+  this->CommentCharacter = 0;
+  this->Delimeter = 0;
+  this->SetCommentCharacter("%");
+  this->SetDelimeter(",");
 }
 
 //-----------------------------------------------------------------------------
@@ -100,7 +102,7 @@ int vtkSpyPlotHistoryReader::RequestInformation(vtkInformation *request,
     getline(file_stream,line);
 
     //skip any line that starts with a comment
-    if (line[0] == this->CommentCharacter)
+    if (line[0] == this->CommentCharacter[0])
       {
       continue;
       }
@@ -108,13 +110,13 @@ int vtkSpyPlotHistoryReader::RequestInformation(vtkInformation *request,
       {
       //read the header
       //now find the cycle and time information and store those indexes
-      getMetaHeaderInfo(line,this->Delimeter,this->Info->metaIndexes,
+      getMetaHeaderInfo(line,this->Delimeter[0],this->Info->metaIndexes,
                         this->Info->metaLookUp);
 
       //now convert this line into a table
       //we are going to have to reduce the header collection
       this->Info->header = createTableLayoutFromHeader(
-          line,this->Delimeter,this->Info->headerRowToIndex);
+          line,this->Delimeter[0],this->Info->headerRowToIndex);
 
       //skip the next line it is junk info
       //this needs to be smarter and optional
@@ -124,7 +126,7 @@ int vtkSpyPlotHistoryReader::RequestInformation(vtkInformation *request,
       {
       //normal data
       std::vector<std::string> info = getTimeStepInfo(line,
-                                  this->Delimeter,this->Info->metaLookUp);
+                                  this->Delimeter[0],this->Info->metaLookUp);
       TimeStep step;
       step.file_pos = file_stream.tellg();
       convert(info[this->Info->metaIndexes["time"]],step.time);
@@ -208,7 +210,7 @@ int vtkSpyPlotHistoryReader::RequestData(
   std::vector<std::string> items;
 
   items.reserve(line.size()/2);
-  split(line,this->Delimeter,items);
+  split(line,this->Delimeter[0],items);
 
   int numRows = this->Info->headerRowToIndex.size();
   output->SetNumberOfRows(numRows);
@@ -237,7 +239,7 @@ void vtkSpyPlotHistoryReader::ConstructTableColumns(
   std::vector<std::string> colNames;
   std::vector<std::string>::const_iterator colIt;
   colNames.reserve(this->Info->header.size()/2);
-  split(this->Info->header,this->Delimeter,colNames);
+  split(this->Info->header,this->Delimeter[0],colNames);
 
   for(colIt = colNames.begin();colIt != colNames.end(); ++colIt)
     {
