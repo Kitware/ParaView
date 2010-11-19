@@ -53,11 +53,15 @@ public:
     this->CleanTimer();
     if (timeout > 0)
       {
+      this->Target->InvokeEvent(
+        vtkPVGenericRenderWindowInteractor::BeginDelayNonInteractiveRenderEvent);
       this->TimerId = this->CreateOneShotTimer(timeout);
       }
     if (this->TimerId == 0)
       {
       this->Target->SetForceInteractiveRender(false);
+      this->Target->InvokeEvent(
+        vtkPVGenericRenderWindowInteractor::EndDelayNonInteractiveRenderEvent);
       }
     }
 
@@ -81,6 +85,8 @@ public:
       {
       bool need_render = this->Target->InteractiveRenderHappened;
       this->Target->SetForceInteractiveRender(false);
+      this->Target->InvokeEvent(
+        vtkPVGenericRenderWindowInteractor::EndDelayNonInteractiveRenderEvent);
       if (need_render)
         {
         this->Target->Render();
@@ -310,7 +316,7 @@ void vtkPVGenericRenderWindowInteractor::SetInteractiveRenderEnabled(int val)
   if (val == 0)
     {
     // switch to non-interactive render.
-    this->Timer->Timeout(NonInteractiveRenderDelay);
+    this->Timer->Timeout(this->NonInteractiveRenderDelay);
     }
 }
 
