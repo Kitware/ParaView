@@ -78,6 +78,15 @@ public:
   void SetRenderPass(vtkRenderPass*);
   vtkGetObjectMacro(RenderPass, vtkRenderPass);
 
+  // Description:
+  // Passes the compressor configuration to the client-server synchronizer, if
+  // any. This affects the image compression used to relay images back to the
+  // client.
+  // See vtkPVClientServerSynchronizedRenderers::ConfigureCompressor() for
+  // details.
+  void ConfigureCompressor(const char* configuration);
+  void SetLossLessCompression(bool);
+
 //BTX
 protected:
   vtkPVSynchronizedRenderer();

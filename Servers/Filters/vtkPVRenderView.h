@@ -206,6 +206,15 @@ public:
   vtkGetMacro(ClientOutlineThreshold, double);
 
   // Description:
+  // Passes the compressor configuration to the client-server synchronizer, if
+  // any. This affects the image compression used to relay images back to the
+  // client.
+  // See vtkPVClientServerSynchronizedRenderers::ConfigureCompressor() for
+  // details.
+  // @CallOnAllProcessess
+  void ConfigureCompressor(const char* configuration);
+
+  // Description:
   // Resets the clipping range. One does not need to call this directly ever. It
   // is called periodically by the vtkRenderer to reset the camera range.
   void ResetCameraClippingRange();
