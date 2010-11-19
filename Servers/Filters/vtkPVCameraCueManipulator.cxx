@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkPVCameraManipulator.cxx
+  Module:    vtkPVCameraCueManipulator.cxx
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -12,30 +12,31 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#include "vtkPVCameraManipulator.h"
+#include "vtkPVCameraCueManipulator.h"
 
 #include "vtkCamera.h"
 #include "vtkCameraInterpolator.h"
 #include "vtkObjectFactory.h"
-#include "vtkPVAnimationCue.h"
+#include "vtkPVCameraAnimationCue.h"
 #include "vtkPVCameraKeyFrame.h"
+#include "vtkPVRenderView.h"
 
-vtkStandardNewMacro(vtkPVCameraManipulator);
+vtkStandardNewMacro(vtkPVCameraCueManipulator);
 //------------------------------------------------------------------------------
-vtkPVCameraManipulator::vtkPVCameraManipulator()
+vtkPVCameraCueManipulator::vtkPVCameraCueManipulator()
 {
   this->Mode = PATH;
   this->CameraInterpolator = vtkCameraInterpolator::New();
 }
 
 //------------------------------------------------------------------------------
-vtkPVCameraManipulator::~vtkPVCameraManipulator()
+vtkPVCameraCueManipulator::~vtkPVCameraCueManipulator()
 {
   this->CameraInterpolator->Delete();
 }
 
 //------------------------------------------------------------------------------
-void vtkPVCameraManipulator::Initialize(vtkPVAnimationCue* cue)
+void vtkPVCameraCueManipulator::Initialize(vtkPVAnimationCue* cue)
 {
   this->Superclass::Initialize(cue);
   int nos = this->GetNumberOfKeyFrames();
@@ -70,47 +71,52 @@ void vtkPVCameraManipulator::Initialize(vtkPVAnimationCue* cue)
 }
 
 //------------------------------------------------------------------------------
-void vtkPVCameraManipulator::Finalize(vtkPVAnimationCue* cue)
+void vtkPVCameraCueManipulator::Finalize(vtkPVAnimationCue* cue)
 {
   this->Superclass::Finalize(cue);
 }
 
 //------------------------------------------------------------------------------
-void vtkPVCameraManipulator::UpdateValue(double currenttime,
+void vtkPVCameraCueManipulator::UpdateValue(double currenttime,
                                          vtkPVAnimationCue* cue)
 {
-  // FIXME +++++++++++++++++++++++++++++++++++++++++++++
-//  if (this->Mode == CAMERA)
-//    {
-//    vtkSMProxy* renderViewProxy = cue->GetAnimatedProxy();
-//    vtkCamera* camera = vtkCamera::New();
-//    this->CameraInterpolator->InterpolateCamera(currenttime, camera);
-//    vtkSMPropertyHelper(renderViewProxy, "CameraPosition").Set(camera->GetPosition(), 3);
-//    vtkSMPropertyHelper(renderViewProxy, "CameraFocalPoint").Set(camera->GetFocalPoint(), 3);
-//    vtkSMPropertyHelper(renderViewProxy, "CameraViewUp").Set(camera->GetViewUp(), 3);
-//    vtkSMPropertyHelper(renderViewProxy, "CameraViewAngle").Set(0, camera->GetViewAngle());
-//    vtkSMPropertyHelper(renderViewProxy,
-//      "CameraClippingRange").Set(camera->GetClippingRange(), 2);
-//    vtkSMPropertyHelper(renderViewProxy, "CameraParallelScale").Set(0,
-//      camera->GetParallelScale());
-//    camera->Delete();
-//    renderViewProxy->UpdateVTKObjects();
+  vtkPVCameraAnimationCue* cameraCue =
+    vtkPVCameraAnimationCue::SafeDownCast(cue);
+  if (!cameraCue)
+    {
+    vtkErrorMacro("This manipulator only works with vtkPVCameraAnimationCue.");
+    return;
+    }
 
-//#ifdef FIXME
-//    if (vtkSMRenderViewProxy::SafeDownCast(renderViewProxy))
-//      {
-//      vtkSMRenderViewProxy::SafeDownCast(renderViewProxy)->ResetCameraClippingRange();
-//      }
-//#endif
-//    }
-//  else
-//    {
-//    this->Superclass::UpdateValue(currenttime, cue);
-//    }
+  vtkCamera* animatedCamera = cameraCue->GetCamera();
+  if (!animatedCamera)
+    {
+    vtkErrorMacro("No camera to animate.");
+    return;
+    }
+
+  if (this->Mode == CAMERA)
+    {
+    vtkCamera* camera = vtkCamera::New();
+    this->CameraInterpolator->InterpolateCamera(currenttime, camera);
+
+    animatedCamera->SetPosition(camera->GetPosition());
+    animatedCamera->SetFocalPoint(camera->GetFocalPoint());
+    animatedCamera->SetViewUp(camera->GetViewUp());
+    animatedCamera->SetViewAngle(camera->GetViewAngle());
+    animatedCamera->SetParallelScale(camera->GetParallelScale());
+    camera->Delete();
+
+    cameraCue->GetView()->ResetCameraClippingRange();
+    }
+  else
+    {
+    this->Superclass::UpdateValue(currenttime, cue);
+    }
 }
 
 //------------------------------------------------------------------------------
-void vtkPVCameraManipulator::PrintSelf(ostream& os, vtkIndent indent)
+void vtkPVCameraCueManipulator::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
   os << indent << "Mode:" << this->Mode << endl;

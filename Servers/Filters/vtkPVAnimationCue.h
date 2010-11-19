@@ -93,6 +93,12 @@ public:
   virtual void SetAnimationValue(int index, double value) =0;
   virtual void EndUpdateAnimationValues() = 0;
 
+  // Description:
+  // When set to true, the manipulator is skipped and the key frame value is set
+  // by using the ClockTime directly. false by default.
+  vtkSetMacro(UseAnimationTime, bool);
+  vtkGetMacro(UseAnimationTime, bool);
+
 protected:
   vtkPVAnimationCue();
   ~vtkPVAnimationCue();
@@ -114,6 +120,7 @@ protected:
   friend class vtkSMAnimationSceneProxy;
 //ETX
 
+  bool UseAnimationTime;
   int AnimatedElement;
   int Enabled;
 

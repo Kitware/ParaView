@@ -55,6 +55,7 @@ vtkPVAnimationCue::vtkPVAnimationCue()
   this->AnimatedElement= 0;
   this->Manipulator = 0;
   this->Enabled = true;
+  this->UseAnimationTime = false;
 
   vtkPVAnimationCueObserver* obs = vtkPVAnimationCueObserver::New();
   obs->SetAnimationCueProxy(this);
@@ -185,7 +186,13 @@ void vtkPVAnimationCue::TickInternal(void* info)
             (cueInfo->EndTime - cueInfo->StartTime);
     }
 
-  if (this->Manipulator)
+  if (this->UseAnimationTime)
+    {
+    this->BeginUpdateAnimationValues();
+    this->SetAnimationValue(this->AnimatedElement, this->GetClockTime());
+    this->EndUpdateAnimationValues();
+    }
+  else if (this->Manipulator)
     {
     this->Manipulator->UpdateValue(ctime, this);
     }

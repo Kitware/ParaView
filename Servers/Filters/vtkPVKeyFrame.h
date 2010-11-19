@@ -49,19 +49,19 @@ public:
   // Get/Set the animated value at this key frame.
   // Note that is the number of values is adjusted to fit the index
   // specified in SetKeyValue.
-  void SetKeyValue(double val) { this->SetKeyValue(0, val); }
-  void SetKeyValue(unsigned int index, double val);
+  virtual void SetKeyValue(double val) { this->SetKeyValue(0, val); }
+  virtual void SetKeyValue(unsigned int index, double val);
   double GetKeyValue() { return this->GetKeyValue(0); }
   double GetKeyValue(unsigned int index);
 
   // Description:
   // Removes all key values.
-  void RemoveAllKeyValues();
+  virtual void RemoveAllKeyValues();
 
   // Description:
   // Set/Get the number of key values this key frame currently stores.
   unsigned int GetNumberOfKeyValues();
-  void SetNumberOfKeyValues(unsigned int num);
+  virtual void SetNumberOfKeyValues(unsigned int num);
 
   // Description:
   // This method will do the actual interpolation.

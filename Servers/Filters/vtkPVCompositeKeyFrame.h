@@ -12,12 +12,12 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVCompositeKeyFrame - composite keyframe proxy.
+// .NAME vtkPVCompositeKeyFrame - composite keyframe.
 // .SECTION Description
 // There are many different types of keyframes such as
-// vtkSMSinusoidKeyFrameProxy, vtkSMRampKeyFrameProxy etc.
-// This is keyframe proxy that has all different types of keyframes
-// as subproxies and provides API to choose one of them as the
+// vtkPVSinusoidKeyFrame, vtkPVRampKeyFrame etc.
+// This is keyframe that has all different types of keyframes
+// as internal objects and provides API to choose one of them as the
 // active type. This is helpful in GUIs that allow for switching the
 // type of keyframe on the fly without much effort from the GUI.
 
@@ -26,7 +26,10 @@
 
 #include "vtkPVKeyFrame.h"
 
-class vtkSMPropertyLink;
+class vtkPVBooleanKeyFrame;
+class vtkPVSinusoidKeyFrame;
+class vtkPVExponentialKeyFrame;
+class vtkPVRampKeyFrame;
 
 class VTK_EXPORT vtkPVCompositeKeyFrame : public vtkPVKeyFrame
 {
@@ -44,6 +47,27 @@ public:
     SINUSOID=4
     };
   //ETX
+
+  // Description:
+  // Overridden to pass on to the internal keyframe proxies.
+  virtual void RemoveAllKeyValues();
+  virtual void SetKeyTime(double time);
+  virtual void SetKeyValue(double val)
+    { this->Superclass::SetKeyValue(val); }
+  virtual void SetKeyValue(unsigned int index, double val);
+  virtual void SetNumberOfKeyValues(unsigned int num);
+
+  // Description:
+  // Passed on to the ExponentialKeyFrame.
+  void SetBase(double val);
+  void SetStartPower(double val);
+  void SetEndPower(double val);
+
+  // Description:
+  // Passed on to the SinusoidKeyFrame.
+  void SetPhase(double val);
+  void SetFrequency(double val);
+  void SetOffset(double val);
 
   // Description:
   // Get/Set the type of keyframe to be used as the active type.
@@ -65,29 +89,12 @@ protected:
   vtkPVCompositeKeyFrame();
   ~vtkPVCompositeKeyFrame();
 
-  void InvokeModified()
-    {
-    this->Modified();
-    }
-
-
-  // Description:
-  // Given the number of objects (numObjects), class name (VTKClassName)
-  // and server ids ( this->GetServerIDs()), this methods instantiates
-  // the objects on the server(s)
-  virtual void CreateVTKObjects();
-
-  // FIXME ++++++++++++++++++++++++++++++++++
-  //vtkSMPropertyLink* TimeLink;
-  //vtkSMPropertyLink* ValueLink;
   int Type;
 
   vtkPVBooleanKeyFrame* BooleanKeyFrame;
   vtkPVRampKeyFrame* RampKeyFrame;
   vtkPVExponentialKeyFrame* ExponentialKeyFrame;
   vtkPVSinusoidKeyFrame* SinusoidKeyFrame;
-
-
 private:
   vtkPVCompositeKeyFrame(const vtkPVCompositeKeyFrame&); // Not implemented.
   void operator=(const vtkPVCompositeKeyFrame&); // Not implemented.

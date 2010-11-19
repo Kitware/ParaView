@@ -44,6 +44,7 @@ SET (Kit_SRCS
   vtkPMUniformGridVolumeRepresentationProxy.cxx
   vtkPMVectorProperty.cxx
   vtkPMWriterProxy.cxx
+  vtkPVKeyFrameAnimationCueForProxies.cxx
 # --- SM Objects ---
   vtkSMBoxRepresentationProxy.cxx
   vtkSMCameraLink.cxx
@@ -105,7 +106,6 @@ SET (Kit_SRCS
   vtkSMSILModel.cxx
   vtkSMSourceProxy.cxx
   vtkSMSpreadSheetRepresentationProxy.cxx
-  vtkSMSubProxyProvider.cxx #--- Generic class that push subproxy to the vtk one
   vtkSMStateLoader.cxx
   vtkSMStateVersionControllerBase.cxx
   vtkSMStateVersionController.cxx

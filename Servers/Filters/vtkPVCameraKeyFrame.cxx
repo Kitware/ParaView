@@ -17,8 +17,8 @@
 #include "vtkCamera.h"
 #include "vtkCameraInterpolator2.h"
 #include "vtkObjectFactory.h"
-#include "vtkPVCameraManipulator.h"
-#include "vtkPVAnimationCue.h"
+#include "vtkPVCameraCueManipulator.h"
+#include "vtkPVCameraAnimationCue.h"
 #include "vtkPVKeyFrame.h"
 
 #include <assert.h>
@@ -36,19 +36,6 @@ vtkPVCameraKeyFrame::~vtkPVCameraKeyFrame()
 {
   this->Camera->Delete();
   this->Interpolator->Delete();
-}
-
-//----------------------------------------------------------------------------
-void vtkPVCameraKeyFrame::CopyValue(vtkCamera* camera)
-{
-  if (camera)
-    {
-    this->Camera->SetPosition(camera->GetPosition());
-    this->Camera->SetFocalPoint(camera->GetFocalPoint());
-    this->Camera->SetViewUp(camera->GetViewUp());
-    this->Camera->SetViewAngle(camera->GetViewAngle());
-    this->Camera->SetParallelScale(camera->GetParallelScale());
-    }
 }
 
 //----------------------------------------------------------------------------
@@ -86,14 +73,26 @@ void vtkPVCameraKeyFrame::UpdateValue( double currenttime,
                                        vtkPVAnimationCue* cue,
                                        vtkPVKeyFrame* next)
 {
+  vtkPVCameraAnimationCue* cameraCue =
+    vtkPVCameraAnimationCue::SafeDownCast(cue);
+  if (!cameraCue)
+    {
+    vtkErrorMacro("This keyframe can only be added to "
+      "vtkPVCameraCueManipulator.");
+    return;
+    }
+  if (!cameraCue->GetCamera())
+    {
+    return;
+    }
   if (next == this)
     {
     assert(currenttime == 0.0);
     // Happens for the last keyframe. In PATH based animations, the last
     // keyframe is bogus, we really want to the previous keyframe to handle
     // this. So we do that.
-    vtkPVCameraManipulator* manip;
-    manip = vtkPVCameraManipulator::SafeDownCast(cue->GetManipulator());
+    vtkPVCameraCueManipulator* manip;
+    manip = vtkPVCameraCueManipulator::SafeDownCast(cue->GetManipulator());
 
     if (manip)
       {
@@ -108,25 +107,17 @@ void vtkPVCameraKeyFrame::UpdateValue( double currenttime,
 
   // Local vars
   vtkCamera* camera = vtkCamera::New();
-  // FIXME: Utkarsh, can't we just do a DeepCopy ??? ++++++++++++++++++++++++++++
-  camera->SetPosition(this->Camera->GetPosition());
-  camera->SetFocalPoint(this->Camera->GetFocalPoint());
-  camera->SetViewUp(this->Camera->GetViewUp());
-  camera->SetViewAngle(this->Camera->GetViewAngle());
-  camera->SetParallelScale(this->Camera->GetParallelScale());
+  camera->ShallowCopy(this->Camera);
   this->Interpolator->InterpolateCamera(currenttime, camera);
 
   // Apply changes
   cue->BeginUpdateAnimationValues();
-
-  // FIXME how to set camera property correclty.... ++++++++++++++++++++++++++
-  // cue->SetAnimationValue( ???? , this->GetKeyValue());
-  //  vtkSMPropertyHelper(cameraProxy, "CameraPosition").Set(camera->GetPosition(), 3);
-  //  vtkSMPropertyHelper(cameraProxy, "CameraFocalPoint").Set(camera->GetFocalPoint(), 3);
-  //  vtkSMPropertyHelper(cameraProxy, "CameraViewUp").Set(camera->GetViewUp(), 3);
-  //  vtkSMPropertyHelper(cameraProxy, "CameraViewAngle").Set(0, camera->GetViewAngle());
-  //  vtkSMPropertyHelper(cameraProxy, "CameraParallelScale").Set(0,camera->GetParallelScale());
-
+  vtkCamera* animatedCamera = cameraCue->GetCamera();
+  animatedCamera->SetPosition(camera->GetPosition());
+  animatedCamera->SetFocalPoint(camera->GetFocalPoint());
+  animatedCamera->SetViewUp(camera->GetViewUp());
+  animatedCamera->SetViewAngle(camera->GetViewAngle());
+  animatedCamera->SetParallelScale(camera->GetParallelScale());
   cue->EndUpdateAnimationValues();
   camera->Delete();
 }

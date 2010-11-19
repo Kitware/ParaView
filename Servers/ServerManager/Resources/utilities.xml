@@ -668,28 +668,6 @@
         number_of_elements="1"
         default_values="1">
       </DoubleVectorProperty>
-      
-      <ProxyProperty name="AnimatedProxy"
-        command="SetAnimatedProxy"
-        clean_command="RemoveAnimatedProxy"
-        attribute_type="SMProxy">
-        <ProxyGroupDomain name="groups">
-          <Group name="sources" />
-          <Group name="filters" />
-        </ProxyGroupDomain>
-      </ProxyProperty>
-
-      <StringVectorProperty
-        name="AnimatedPropertyName"
-        command="SetAnimatedPropertyName"
-        number_of_elements="1" >
-      </StringVectorProperty>
-
-      <StringVectorProperty
-        name="AnimatedDomainName"
-        command="SetAnimatedDomainName"
-        number_of_elements="1">
-      </StringVectorProperty>
 
       <IntVectorProperty
         name="AnimatedElement"
@@ -712,79 +690,99 @@
       <!-- End of AnimationCueBase -->
     </Proxy>
 
+    <!-- FIXME
     <ComparativeAnimationCueProxy name="ComparativeAnimationCue" 
       class="vtkAnimationCue"
       base_proxygroup="animation" base_proxyname="AnimationCueBase">
       <Documentation>
         Animation cue used by comparative views.
       </Documentation>
-
-      <!-- No server side objects created. All properties are updateself -->
-      <!-- End of ComparativeAnimationCue -->
     </ComparativeAnimationCueProxy>
+    -->
 
-    <AnimationCueProxy name="AnimationCue"
-      class="vtkPVAnimationCue"
-      processes="client"
-      base_proxygroup="animation" base_proxyname="AnimationCueBase">
-      <Documentation>
-        This is old style animation cue, this must be replaced by
-        KeyFrameAnimationCue or CameraAnimationCue as the case may be.
-        This may be used when using other types of manipulators.
-      </Documentation>
-
-      <!-- No server side objects created. All properties are updateself -->
-      <ProxyProperty name="Manipulator"
-        command="SetManipulator" >
-        <ProxyGroupDomain name="groups">
-          <Group name="animation_manipulators" />
-        </ProxyGroupDomain>
-      </ProxyProperty>
-      <!-- End of AnimationCue -->
-    </AnimationCueProxy>
-
-    <AnimationCueProxy name="KeyFrameAnimationCue" class="vtkPVAnimationCue"
+    <Proxy name="KeyFrameAnimationCue"
+      class="vtkPVKeyFrameAnimationCueForProxies"
       processes="client"
       base_proxygroup="animation" base_proxyname="AnimationCueBase">
       <Documentation>
         Animation cue with keyframes.
       </Documentation>
 
-      <SubProxy>
-        <Proxy name="Manipulator"
-          proxygroup="animation_manipulators"
-          proxyname="KeyFrameAnimationCueManipulator">
-        </Proxy>
-        <ExposedProperties>
-          <Property name="KeyFrames" />
-          <Property name="LastAddedKeyFrameIndex" />
-        </ExposedProperties>
-      </SubProxy>
+      <ProxyProperty name="AnimatedProxy"
+        command="SetAnimatedProxy"
+        clean_command="RemoveAnimatedProxy"
+        attribute_type="SMProxy">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+      </ProxyProperty>
+
+      <StringVectorProperty
+        name="AnimatedPropertyName"
+        command="SetAnimatedPropertyName"
+        number_of_elements="1" >
+      </StringVectorProperty>
+
+      <StringVectorProperty
+        name="AnimatedDomainName"
+        command="SetAnimatedDomainName"
+        number_of_elements="1">
+      </StringVectorProperty>
+
+      <ProxyProperty name="KeyFrames"
+        command="AddKeyFrame"
+        remove_command="RemoveKeyFrame"
+        repeat_command="1">
+        <ProxyGroupDomain name="groups">
+          <Group name="animation_keyframes" />
+        </ProxyGroupDomain>
+      </ProxyProperty>
+
+      <IntVectorProperty name="LastAddedKeyFrameIndex"
+        command="GetLastAddedKeyFrameIndex"
+        information_only="1">
+      </IntVectorProperty>
 
       <!-- End of KeyFrameAnimationCue -->
-    </AnimationCueProxy>
+    </Proxy>
 
-    <AnimationCueProxy name="CameraAnimationCue" class="vtkAnimationCue"
+    <Proxy name="CameraAnimationCue" class="vtkPVCameraAnimationCue"
       base_proxygroup="animation" base_proxyname="AnimationCueBase">
       <Documentation>
         Animation cue which can be used for animating Camera using keyframes.
       </Documentation>
 
-      <SubProxy>
-        <Proxy name="Manipulator"
-          proxygroup="animation_manipulators"
-          proxyname="CameraManipulator">
-        </Proxy>
-        <ExposedProperties>
-          <Property name="KeyFrames" />
-          <Property name="LastAddedKeyFrameIndex" />
-          <Property name="Mode" />
-        </ExposedProperties>
-      </SubProxy>
-      <!-- End of CameraAnimationCue -->
-    </AnimationCueProxy>
+      <IntVectorProperty name="Mode"
+        command="SetMode"
+        number_of_elements="1"
+        default_values="0">
+        <EnumerationDomain name="enum">
+          <Entry text="Interpolate Camera" value="0" />
+          <Entry text="Path-based" value="1" />
+        </EnumerationDomain>
+      </IntVectorProperty>
 
-    <TimeAnimationCueProxy name="TimeAnimationCue" class="vtkAnimationCue"
+      <ProxyProperty name="KeyFrames"
+        command="AddKeyFrame"
+        remove_command="RemoveKeyFrame"
+        repeat_command="1">
+        <ProxyGroupDomain name="groups">
+          <Group name="animation_keyframes" />
+        </ProxyGroupDomain>
+      </ProxyProperty>
+
+      <IntVectorProperty name="LastAddedKeyFrameIndex"
+        command="GetLastAddedKeyFrameIndex"
+        information_only="1">
+      </IntVectorProperty>
+
+      <!-- End of CameraAnimationCue -->
+    </Proxy>
+
+    <Proxy name="TimeAnimationCue"
+      class="vtkPVKeyFrameAnimationCueForProxies"
+      processes="client"
       base_proxygroup="animation" base_proxyname="KeyFrameAnimationCue">
       <Documentation>
         This is same as KeyFrameAnimationCue except that it has a new property 
@@ -795,7 +793,6 @@
       
       <IntVectorProperty name="UseAnimationTime"
         command="SetUseAnimationTime"
-        update_self="1"
         number_of_elements="1"
         default_values="1">
         <BooleanDomain name="bool" />
@@ -1125,72 +1122,8 @@
     <!-- End of "animation_players" -->
   </ProxyGroup>
 
-  <ProxyGroup name="animation_manipulators">
-    <LinearAnimationCueManipulatorProxy name="LinearAnimationCueManipulator">
-      <DoubleVectorProperty
-        name="StartValue"
-        command="SetStartValue"
-        number_of_elements="1"
-        update_self="1"
-        default_values="0.0">
-      </DoubleVectorProperty>
-      
-      <DoubleVectorProperty
-        name="EndValue"
-        command="SetEndValue"
-        number_of_elements="1"
-        update_self="1"
-        default_values="0.0">
-      </DoubleVectorProperty>
-
-    </LinearAnimationCueManipulatorProxy>
-
-    <KeyFrameAnimationCueManipulatorProxy name="KeyFrameAnimationCueManipulator">
-      <ProxyProperty
-        name="KeyFrames"
-        command="AddKeyFrame"
-        remove_command="RemoveKeyFrame"
-        repeat_command="1"
-        update_self="1">
-        <ProxyGroupDomain name="groups">
-          <Group name="animation_keyframes" />
-        </ProxyGroupDomain>
-      </ProxyProperty>  
-      <IntVectorProperty
-        name="LastAddedKeyFrameIndex"
-        command="GetLastAddedKeyFrameIndex"
-        update_self="1"
-        information_only="1" />
-
-      <SubProxy>
-        <Proxy name="CueStarter"
-          proxygroup="animation_keyframes"
-          proxyname="BooleanKeyFrame">
-        </Proxy>
-      </SubProxy>
-
-    </KeyFrameAnimationCueManipulatorProxy>
-
-    <CameraManipulatorProxy name="CameraManipulator"
-      base_proxygroup="animation_manipulators" 
-      base_proxyname="KeyFrameAnimationCueManipulator">
-
-      <IntVectorProperty name="Mode"
-        command="SetMode"
-        update_self="1"
-        number_of_elements="1"
-        default_values="0">
-        <EnumerationDomain name="enum">
-          <Entry text="Interpolate Camera" value="0" />
-          <Entry text="Path-based" value="1" />
-        </EnumerationDomain>
-      </IntVectorProperty>
-    </CameraManipulatorProxy>
-
-  </ProxyGroup>
-
   <ProxyGroup name="animation_keyframes">
-    <KeyFrameProxy name="KeyFrame" class="vtkPVKeyFrame" processes="client">
+    <Proxy name="KeyFrame" class="vtkPVKeyFrame" processes="client">
       <DoubleVectorProperty
         name="KeyTime"
         command="SetKeyTime"
@@ -1209,18 +1142,17 @@
         number_of_elements_per_command="1"
         use_index="1">
       </DoubleVectorProperty>
-    </KeyFrameProxy>
+    </Proxy>
 
-    <CompositeKeyFrameProxy name="CompositeKeyFrame"
+    <Proxy name="CompositeKeyFrame" class="vtkPVCompositeKeyFrame"
+      processes="client"
       base_proxygroup="animation_keyframes" base_proxyname="KeyFrame">
 
-      <IntVectorProperty
-        name="Type"
+      <IntVectorProperty name="Type"
         command="SetType"
         label="Interpolation"
         number_of_elements="1"
-        default_values="2"
-        update_self="1">
+        default_values="2">
         <EnumerationDomain name="enum">
           <Entry value="1" text="Boolean" />
           <Entry value="2" text="Ramp" />
@@ -1229,65 +1161,64 @@
         </EnumerationDomain>
       </IntVectorProperty>
 
-      <SubProxy>
-        <Proxy name="Boolean" 
-               proxygroup="animation_keyframes"
-               proxyname="BooleanKeyFrame">
-        </Proxy>
-      </SubProxy>
+      <DoubleVectorProperty name="Base"
+        command="SetBase"
+        number_of_elements="1"
+        default_values="2.0">
+      </DoubleVectorProperty>
 
-      <SubProxy>
-        <Proxy name="Ramp" 
-               proxygroup="animation_keyframes"
-               proxyname="RampKeyFrame">
-        </Proxy>
-      </SubProxy>
+      <DoubleVectorProperty name="StartPower"
+        command="SetStartPower"
+        number_of_elements="1"
+        default_values="0.0">
+      </DoubleVectorProperty>
 
-      <SubProxy>
-        <Proxy name="Exponential" 
-               proxygroup="animation_keyframes"
-               proxyname="ExponentialKeyFrame">
-        </Proxy>
-        <ExposedProperties>
-          <Property name="Base" />
-          <Property name="StartPower" />
-          <Property name="EndPower" />
-        </ExposedProperties>
-      </SubProxy>
+      <DoubleVectorProperty name="EndPower"
+        command="SetEndPower"
+        number_of_elements="1"
+        default_values="1.0">
+      </DoubleVectorProperty>
 
-      <SubProxy>
-        <Proxy name="Sinusoid" 
-               proxygroup="animation_keyframes"
-               proxyname="SinusoidKeyFrame">
-        </Proxy>
-        <ExposedProperties>
-          <Property name="Phase"/>
-          <Property name="Frequency" />
-          <Property name="Offset" />
-        </ExposedProperties>
-      </SubProxy>
+      <DoubleVectorProperty name="Phase"
+        command="SetPhase"
+        number_of_elements="1"
+        default_values="0.0">
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="Frequency"
+        command="SetFrequency"
+        number_of_elements="1"
+        default_values="1.0">
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="Offset"
+        command="SetOffset"
+        number_of_elements="1"
+        default_values="0.0">
+      </DoubleVectorProperty>
 
     <!-- End of CompositeKeyFrame -->
-    </CompositeKeyFrameProxy>
-      
+    </Proxy>
+
     <Proxy name="BooleanKeyFrame"
            class="vtkPVBooleanKeyFrame"
            processes="client"
            base_proxygroup="animation_keyframes" base_proxyname="KeyFrame">
-    </BooleanKeyFrameProxy>
+    </Proxy>
 
-    
-    <RampKeyFrameProxy name="RampKeyFrame"
+
+    <Proxy name="RampKeyFrame" class="vtkPVRampKeyFrame"
+      processes="client"
       base_proxygroup="animation_keyframes" base_proxyname="KeyFrame">
-    </RampKeyFrameProxy>
+    </Proxy>
 
-    <ExponentialKeyFrameProxy name="ExponentialKeyFrame" 
+    <Proxy name="ExponentialKeyFrame" class="vtkPVExponentialKeyFrame"
+      processes="client"
       base_proxygroup="animation_keyframes" base_proxyname="KeyFrame">
       <DoubleVectorProperty
         name="Base"
         command="SetBase"
         number_of_elements="1"
-        update_self="1"
         default_values="2.0">
       </DoubleVectorProperty>
 
@@ -1295,7 +1226,6 @@
         name="StartPower"
         command="SetStartPower"
         number_of_elements="1"
-        update_self="1"
         default_values="0.0">
       </DoubleVectorProperty>
 
@@ -1303,19 +1233,18 @@
         name="EndPower"
         command="SetEndPower"
         number_of_elements="1"
-        update_self="1"
         default_values="1.0">
       </DoubleVectorProperty>
 
-    </ExponentialKeyFrameProxy>
+    </Proxy>
 
-    <SinusoidKeyFrameProxy name="SinusoidKeyFrame"
+    <Proxy name="SinusoidKeyFrame" class="vtkPVSinusoidKeyFrame"
+      processes="client"
       base_proxygroup="animation_keyframes" base_proxyname="KeyFrame">
       <DoubleVectorProperty
         name="Phase"
         command="SetPhase"
         number_of_elements="1"
-        update_self="1"
         default_values="0.0">
       </DoubleVectorProperty>
 
@@ -1323,7 +1252,6 @@
         name="Frequency"
         command="SetFrequency"
         number_of_elements="1"
-        update_self="1"
         default_values="1.0">
       </DoubleVectorProperty>
 
@@ -1331,11 +1259,10 @@
         name="Offset"
         command="SetOffset"
         number_of_elements="1"
-        update_self="1"
         default_values="0.0">
       </DoubleVectorProperty>
 
-    </SinusoidKeyFrameProxy>
+    </Proxy>
 
     <CameraKeyFrameProxy name="CameraKeyFrame"
       class="vtkCameraInterpolator2"

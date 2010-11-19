@@ -15,10 +15,7 @@
 // .NAME vtkPVCameraKeyFrame
 // .SECTION Description
 // Special key frame for animating Camera. Unlike typical keyframes,
-// this keyframe interpolates a proxy and not a property of the proxy.
-// A vtkSMCameraManipulatorProxy can only take vtkSMCameraKeyFrameProxy.
-// Like all animation proxies, this is a client side only proxy with no
-// VTK objects created on the server side.
+// this keyframe interpolates a camera and not a property on the camera.
 
 #ifndef __vtkPVCameraKeyFrame_h
 #define __vtkPVCameraKeyFrame_h
@@ -26,9 +23,8 @@
 #include "vtkPVKeyFrame.h"
 
 class vtkCamera;
-class vtkPVAnimationCue;
-class vtkPVKeyFrame;
 class vtkCameraInterpolator2;
+class vtkPVAnimationCue;
 
 class VTK_EXPORT vtkPVCameraKeyFrame : public vtkPVKeyFrame
 {
@@ -38,21 +34,17 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // If the vtkSMCameraManipulatorProxy is in CAMERA mode, then this method is
+  // If the vtkPVCameraCueManipulator is in CAMERA mode, then this method is
   // not even called since the interpolation is done by vtkCameraInterpolator
-  // maintained by vtkSMCameraManipulatorProxy itself. However,  in PATH mode,
+  // maintained by vtkPVCameraCueManipulator itself. However,  in PATH mode,
   // this method is called to allow the key frame to use vtkCameraInterpolator2
   // to do path-based interpolations for the camera.
-  virtual void UpdateValue( double currenttime, vtkPVAnimationCue* cue,
-                            vtkPVKeyFrame* next);
-
-  // Description:
-  // Updates the keyframe's current value using the camera.
-  // This is a convenience method, it updates the properties on this proxy.
-  void CopyValue(vtkCamera*);
+  virtual void UpdateValue(
+    double currenttime, vtkPVAnimationCue* cue, vtkPVKeyFrame* next);
 
   // Overridden, since these methods are not supported by this class.
   virtual void SetKeyValue(unsigned int , double ) { }
+  virtual void SetKeyValue(double ) { }
   virtual double GetKeyValue(unsigned int) {return 0;}
 
   // Description:

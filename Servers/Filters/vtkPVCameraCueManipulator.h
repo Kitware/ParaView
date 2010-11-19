@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkPVCameraManipulator.h
+  Module:    vtkPVCameraCueManipulator.h
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -22,18 +22,18 @@
 // Like all animation proxies, this is a client side only proxy with no
 // VTK objects created on the server side.
 
-#ifndef __vtkPVCameraManipulator_h
-#define __vtkPVCameraManipulator_h
+#ifndef __vtkPVCameraCueManipulator_h
+#define __vtkPVCameraCueManipulator_h
 
 #include "vtkPVKeyFrameCueManipulator.h"
 
 class vtkCameraInterpolator;
 
-class VTK_EXPORT vtkPVCameraManipulator : public vtkPVKeyFrameCueManipulator
+class VTK_EXPORT vtkPVCameraCueManipulator : public vtkPVKeyFrameCueManipulator
 {
 public:
-  static vtkPVCameraManipulator* New();
-  vtkTypeMacro(vtkPVCameraManipulator, vtkPVKeyFrameCueManipulator);
+  static vtkPVCameraCueManipulator* New();
+  vtkTypeMacro(vtkPVCameraCueManipulator, vtkPVKeyFrameCueManipulator);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   //BTX
@@ -57,8 +57,8 @@ public:
   vtkGetMacro(Mode, int);
 
 protected:
-  vtkPVCameraManipulator();
-  ~vtkPVCameraManipulator();
+  vtkPVCameraCueManipulator();
+  ~vtkPVCameraCueManipulator();
 
   int Mode;
 
@@ -72,8 +72,8 @@ protected:
 
   vtkCameraInterpolator* CameraInterpolator;
 private:
-  vtkPVCameraManipulator(const vtkPVCameraManipulator&); // Not implemented.
-  void operator=(const vtkPVCameraManipulator&); // Not implemented.
+  vtkPVCameraCueManipulator(const vtkPVCameraCueManipulator&); // Not implemented.
+  void operator=(const vtkPVCameraCueManipulator&); // Not implemented.
 
 };
 
