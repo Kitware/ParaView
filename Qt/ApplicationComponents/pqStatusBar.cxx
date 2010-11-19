@@ -50,36 +50,33 @@ pqStatusBar::pqStatusBar(QWidget* parentObject)
   QHBoxLayout* hbox = new QHBoxLayout(widget);
   hbox->setMargin(0);
   hbox->setSpacing(0);
-  QLabel* interactionWheel = new QLabel(widget);
-  interactionWheel->setPixmap(QPixmap(":pqWidgets/Icons/pqBack16.png"));
-  hbox->addWidget(interactionWheel);
 
-  pqProgressWidget* const progress_bar = new pqProgressWidget(widget);
-  hbox->addWidget(progress_bar);
-  this->addPermanentWidget(widget);
-
-  pqProgressManager* progress_manager = 
+  pqProgressManager* progress_manager =
     pqApplicationCore::instance()->getProgressManager();
 
-  QObject::connect(progress_manager, SIGNAL(enableProgress(bool)),
-    progress_bar, SLOT(enableProgress(bool)));
-
-  QObject::connect(progress_manager, SIGNAL(progress(const QString&, int)),
-    progress_bar, SLOT(setProgress(const QString&, int)));
-
-  QObject::connect(progress_manager, SIGNAL(enableAbort(bool)),
-    progress_bar, SLOT(enableAbort(bool)));
-
-  QObject::connect(progress_bar,     SIGNAL(abortPressed()),
-    progress_manager, SLOT(triggerAbort()));
-
+  // Progress bar/button management
+  pqProgressWidget* const progress_bar = new pqProgressWidget(widget);
   progress_manager->addNonBlockableObject(progress_bar);
   progress_manager->addNonBlockableObject(progress_bar->getAbortButton());
+
+  QObject::connect( progress_manager, SIGNAL(enableProgress(bool)),
+                    progress_bar,     SLOT(enableProgress(bool)));
+
+  QObject::connect( progress_manager, SIGNAL(progress(const QString&, int)),
+                    progress_bar,     SLOT(setProgress(const QString&, int)));
+
+  QObject::connect( progress_manager, SIGNAL(enableAbort(bool)),
+                    progress_bar,     SLOT(enableAbort(bool)));
+
+  QObject::connect( progress_bar,     SIGNAL(abortPressed()),
+                    progress_manager, SLOT(triggerAbort()));
+
+  // Final ui setup
+  hbox->addWidget(progress_bar);
+  this->addPermanentWidget(widget);
 }
 
 //-----------------------------------------------------------------------------
 pqStatusBar::~pqStatusBar()
 {
 }
-
-

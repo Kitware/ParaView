@@ -35,6 +35,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqView.h"
 #include "pqSMProxy.h" //needed for pqSMProxy.
 
+class QTimer;
+
 /// pqRenderViewBase is an abstract base class for all render-view based views.
 /// It encapuslates some of the commonly needed functionality for all such
 /// views.
@@ -137,6 +139,13 @@ protected slots:
   /// don't change any render module properties here.
   virtual void initializeWidgets()=0;
 
+  /// Triggered by DelayNonInteractiveRenderEvent
+  void beginDelayInteractiveRender();
+  void endDelayInteractiveRender();
+
+  /// Triggered by internal timer to update the status bar message
+  void updateStatusMessage();
+
 protected:
   /// Overridden to popup the context menu, if some actions have been added
   /// using addMenuAction.
@@ -184,6 +193,7 @@ private:
 
   class pqInternal;
   pqInternal* Internal;
+  QTimer* InteractiveDelayUpdateTimer;
 };
 
 #endif
