@@ -203,8 +203,9 @@ int vtkSquirtCompressor::Decompress()
     // Get run length count;
     count = *((unsigned char*)&current_color+3);
 
-    // Fixed Alpha
-    *((unsigned char*)&current_color+3) = 0xFF;
+    // Fixed Alpha -- this is not true anymore, ParaView now requires opacity
+    // for images to transmitted correctly for gradient backgrounds to work.
+    // *((unsigned char*)&current_color+3) = 0xFF;
 
     // Set color
     _rawColorBuffer[index++] = current_color;

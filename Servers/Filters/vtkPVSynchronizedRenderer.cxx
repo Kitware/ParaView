@@ -17,7 +17,7 @@
 #include "vtkBoundingBox.h"
 #include "vtkCameraPass.h"
 #include "vtkCaveSynchronizedRenderers.h"
-#include "vtkClientServerSynchronizedRenderers.h"
+#include "vtkPVClientServerSynchronizedRenderers.h"
 #include "vtkImageProcessingPass.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
@@ -128,7 +128,7 @@ vtkPVSynchronizedRenderer::vtkPVSynchronizedRenderer()
         }
       else
         {
-        this->CSSynchronizer = vtkClientServerSynchronizedRenderers::New();
+        this->CSSynchronizer = vtkPVClientServerSynchronizedRenderers::New();
         this->CSSynchronizer->WriteBackImagesOn();
         }
       this->CSSynchronizer->SetRootProcessId(0);
@@ -146,7 +146,7 @@ vtkPVSynchronizedRenderer::vtkPVSynchronizedRenderer()
         }
       else
         {
-        this->CSSynchronizer = vtkClientServerSynchronizedRenderers::New();
+        this->CSSynchronizer = vtkPVClientServerSynchronizedRenderers::New();
         }
       this->CSSynchronizer->WriteBackImagesOff();
       this->CSSynchronizer->SetRootProcessId(1);
@@ -221,6 +221,37 @@ vtkPVSynchronizedRenderer::~vtkPVSynchronizedRenderer()
     }
   this->SetImageProcessingPass(0);
   this->SetRenderPass(0);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVSynchronizedRenderer::SetLossLessCompression(bool val)
+{
+  vtkPVClientServerSynchronizedRenderers* cssync =
+    vtkPVClientServerSynchronizedRenderers::SafeDownCast(this->CSSynchronizer);
+  if (cssync)
+    {
+    cssync->SetLossLessCompression(val);
+    }
+  else
+    {
+    vtkDebugMacro("Not in client-server mode.");
+    }
+}
+
+
+//----------------------------------------------------------------------------
+void vtkPVSynchronizedRenderer::ConfigureCompressor(const char* configuration)
+{
+  vtkPVClientServerSynchronizedRenderers* cssync =
+    vtkPVClientServerSynchronizedRenderers::SafeDownCast(this->CSSynchronizer);
+  if (cssync)
+    {
+    cssync->ConfigureCompressor(configuration);
+    }
+  else
+    {
+    vtkDebugMacro("Not in client-server mode.");
+    }
 }
 
 //----------------------------------------------------------------------------

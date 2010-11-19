@@ -190,6 +190,17 @@
         </Documentation>
       </DoubleVectorProperty>
 
+      <StringVectorProperty
+        name="CompressorConfig"
+        command="ConfigureCompressor"
+        number_of_elements="1"
+        default_values="vtkSquirtCompressor 0 3">
+        <Documentation>
+          Used to configure the image compression used for client-server image
+          transfer when doing interactive renders.
+        </Documentation>
+      </StringVectorProperty>
+
       <IntVectorProperty name="UseLight"
         command="SetUseLightKit"
         number_of_elements="1"

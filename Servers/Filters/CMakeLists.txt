@@ -125,6 +125,7 @@ SET(Filters_SRCS
   vtkPVCacheKeeper.cxx
   vtkPVCacheKeeperPipeline.cxx
   vtkPVCenterAxesActor.cxx
+  vtkPVClientServerSynchronizedRenderers.cxx
   vtkPVClipClosedSurface.cxx
   vtkPVClipDataSet.cxx
   vtkPVCompositeDataPipeline.cxx

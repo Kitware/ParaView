@@ -597,6 +597,9 @@ void vtkPVRenderView::Render(bool interactive, bool skip_rendering)
     this->GatherRepresentationInformation();
     }
 
+  // Use loss-less image compression for client-server for full-res renders.
+  this->SynchronizedRenderers->SetLossLessCompression(!interactive);
+
   // Gather information about geometry sizes from all representations.
   this->GatherGeometrySizeInformation();
 
@@ -956,6 +959,12 @@ void vtkPVRenderView::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "UseLightKit: " << this->UseLightKit << endl;
 }
 
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::ConfigureCompressor(const char* configuration)
+{
+  this->SynchronizedRenderers->ConfigureCompressor(configuration);
+}
 
 //*****************************************************************
 // Forwarded to orientation axes widget.
