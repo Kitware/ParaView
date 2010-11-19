@@ -2457,7 +2457,7 @@
       <IntVectorProperty name="BackfaceRepresentation"
         command="SetBackfaceRepresentation"
         number_of_elements="1"
-        default_values="4">
+        default_values="400">
         <Documentation>
           Choose the representation type for the backface.
         </Documentation>
