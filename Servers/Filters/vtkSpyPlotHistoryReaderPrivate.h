@@ -1,0 +1,217 @@
+/*=========================================================================
+
+  Program:   Visualization Toolkit
+  Module:    vtkContextScenePrivate.h
+
+  Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
+  All rights reserved.
+  See Copyright.txt or http://www.kitware.com/Copyright.htm for details.
+
+     This software is distributed WITHOUT ANY WARRANTY; without even
+     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+     PURPOSE.  See the above copyright notice for more information.
+
+=========================================================================*/
+
+// .NAME vtkSpyPlotHistoryReaderPrivate - Private implementation for
+// spy plot history file reader.
+//
+// .SECTION Description
+// \internal
+
+
+#ifndef __vtkSpyPlotHistoryReaderPrivate_h
+#define __vtkSpyPlotHistoryReaderPrivate_h
+
+#include <vtkstd/map>
+#include <vtkstd/set>
+#include <vtkstd/vector>
+#include <vtkstd/string>
+#include <iostream>
+#include <sstream>
+#include <fstream>
+
+//-----------------------------------------------------------------------------
+namespace SpyPlotHistoryReaderPrivate
+{
+
+//========================================================================
+  class TimeStep
+  {
+  public:
+    double time;
+    std::streampos file_pos;
+  };
+
+  //========================================================================
+  void trim(std::string& string,const std::string& whitespace = " \t\"")
+  {
+      const size_t begin = string.find_first_not_of(whitespace);
+      if (begin == std::string::npos)
+      {
+          // no content
+          return;
+      }
+      const size_t end = string.find_last_not_of(whitespace);
+      const size_t range = end - begin + 1;
+      string = string.substr(begin,range);
+      return;
+  }
+
+  //========================================================================
+  std::string rowFromHeaderCol(const std::string &str)
+  {
+      const size_t begin = str.rfind(".");
+      if (begin == std::string::npos)
+      {
+          // no content
+          return "";
+      }
+      return str.substr(begin);
+  }
+
+  //========================================================================
+  std::string nameFromHeaderCol(const std::string &str)
+  {
+      const size_t begin = str.rfind(".");
+      if (begin == std::string::npos)
+      {
+          // no content
+          return "";
+      }
+      return str.substr(0,begin);
+  }
+
+
+  //========================================================================
+  void split(const std::string &s, const char &delim, std::vector<std::string> &elems)
+  {
+    std::stringstream ss(s);
+    std::string item;
+    while(std::getline(ss, item, delim))
+      {
+      trim(item);
+      elems.push_back(item);
+      }
+    return;
+  }
+
+  //========================================================================
+  void getMetaHeaderInfo(const std::string &s, const char &delim, std::map<std::string,int> &fields, std::map<int,std::string> &lookup)
+  {
+      std::stringstream ss(s);
+      std::string item;
+      size_t count = 0;
+      int index = 0;
+      while(std::getline(ss, item, delim))
+        {
+        trim(item);
+        if (fields.find(item) != fields.end())
+          {
+          ++count;
+          fields[item] = index;
+          lookup[index] = item;
+          }
+        if ( count == fields.size())
+          {
+          return;
+          }
+        ++index;
+        }
+      return;
+  }
+
+  //========================================================================
+  std::vector<std::string> getTimeStepInfo(
+    const std::string &s, const char &delim, std::map<int,std::string> &lookup)
+  {
+      std::vector<std::string> elems;
+      size_t size = lookup.size();
+      elems.resize(size);
+      std::stringstream ss(s);
+      std::string item;
+      int index=0;
+      size_t count = 0;
+      while(std::getline(ss, item, delim))
+        {
+        trim(item);
+        if (lookup.find(index) != lookup.end())
+          {
+          elems[index]=item;
+          ++count;
+          }
+        if (count == size)
+          {
+          break;
+          }
+        ++index;
+        }
+      return elems;
+  }
+
+  //========================================================================
+  template<class T>
+  void convert(const std::string &num, T &t)
+  {
+    std::istringstream i(num);
+    i >> t;
+  }
+
+  //========================================================================
+  std::string createTableLayoutFromHeader(std::string &header, const char& delim, std::map<int,int> &headerRowToIndex)
+  {
+    std::string newHeader;
+    //the single presumption we have is that all the properties for a
+    //point is continous in the header
+    std::vector<std::string> cols;
+    cols.reserve(header.size());
+    split(header,delim,cols);
+    std::vector<std::string>::const_iterator it;
+
+    //find the first "." variable
+    bool foundStart = false;
+    std::string rowNumber;
+    int index=0, row=0;
+
+    for (it = cols.begin(); it != cols.end(); ++it)
+      {
+      if ((*it).find(".") != std::string::npos)
+        {
+        foundStart = true;
+        rowNumber = rowFromHeaderCol(*it);
+        newHeader += nameFromHeaderCol(*it) + ",";
+        headerRowToIndex[row++]=index;
+        break;
+        }
+      ++index;
+      }
+    if (!foundStart)
+      {
+      return newHeader;
+      }
+
+    //now track the number of variables we have,
+    //and the names of each variable. This way we know how
+    //many rows to have in our new table
+    ++it;
+    int numberOfCols = 0;
+    while(rowFromHeaderCol(*it)==rowNumber)
+      {
+      newHeader += nameFromHeaderCol(*it) + ",";
+      ++index;
+      ++it;
+      ++numberOfCols;
+      }
+    newHeader = newHeader.substr(0,newHeader.size()-1);
+    ++it;
+    while(it != cols.end() && rowFromHeaderCol(*it) != "")
+      {
+      headerRowToIndex[row++]=index;
+      index += numberOfCols;
+      it += numberOfCols;
+      }
+    return newHeader;
+  }
+}
+
+#endif

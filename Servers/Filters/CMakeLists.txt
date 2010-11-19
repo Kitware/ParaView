@@ -207,6 +207,7 @@ SET(Filters_SRCS
   vtkSpyPlotBlockIterator.cxx
   vtkSpyPlotIStream.cxx
   vtkSpyPlotReader.cxx
+  vtkSpyPlotHistoryReader.cxx
   vtkSpyPlotReaderMap.cxx
   vtkSpyPlotUniReader.cxx
   vtkSquirtCompressor.cxx
