@@ -959,7 +959,6 @@ void vtkPVRenderView::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "UseLightKit: " << this->UseLightKit << endl;
 }
 
-
 //----------------------------------------------------------------------------
 void vtkPVRenderView::ConfigureCompressor(const char* configuration)
 {
@@ -1010,6 +1009,15 @@ void vtkPVRenderView::SetCenterOfRotation(double x, double y, double z)
   if (this->Interactor)
     {
     this->Interactor->SetCenterOfRotation(x, y, z);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::SetNonInteractiveRenderDelay(unsigned int seconds)
+{
+  if (this->Interactor)
+    {
+    this->Interactor->SetNonInteractiveRenderDelay(seconds*1000);
     }
 }
 

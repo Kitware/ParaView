@@ -267,6 +267,16 @@
         </Documentation>
       </DoubleVectorProperty>
 
+      <IntVectorProperty name="NonInteractiveRenderDelay"
+        command="SetNonInteractiveRenderDelay"
+        number_of_elements="1"
+        default_values="2">
+        <Documentation>
+          Set the delay (in seconds) after an interactive render before
+          switching to a full-rese render.
+        </Documentation>
+      </IntVectorProperty>
+
       <ProxyProperty name="CameraManipulators"
         command="AddManipulator"
         clean_command="RemoveAllManipulators"

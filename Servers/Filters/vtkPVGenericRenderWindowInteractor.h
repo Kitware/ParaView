@@ -97,6 +97,16 @@ public:
     {
     this->SetCenterOfRotation(xyz[0], xyz[1], xyz[2]);
     }
+
+  // Description:
+  // These events are fired to mark the beginning and ending of the wait for the
+  // full-res render after an interactive render is over.
+  enum
+    {
+    BeginDelayNonInteractiveRenderEvent=1001,
+    EndDelayNonInteractiveRenderEvent=1002,
+    };
+
 protected:
   vtkPVGenericRenderWindowInteractor();
   ~vtkPVGenericRenderWindowInteractor();

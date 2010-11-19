@@ -35,37 +35,48 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqProgressManager.h"
 #include "pqProgressWidget.h"
 
+#include <QHBoxLayout>
+#include <QLabel>
+#include <QFrame>
+#include <QPixmap>
 #include <QToolButton>
 
 //-----------------------------------------------------------------------------
 pqStatusBar::pqStatusBar(QWidget* parentObject)
   : Superclass(parentObject)
 {
-  pqProgressWidget* const progress_bar = new pqProgressWidget(this);
-  this->addPermanentWidget(progress_bar);
+  QFrame* widget = new QFrame(this);
+  widget->setFrameShape(QFrame::NoFrame);
+  QHBoxLayout* hbox = new QHBoxLayout(widget);
+  hbox->setMargin(0);
+  hbox->setSpacing(0);
 
-  pqProgressManager* progress_manager = 
+  pqProgressManager* progress_manager =
     pqApplicationCore::instance()->getProgressManager();
 
-  QObject::connect(progress_manager, SIGNAL(enableProgress(bool)),
-    progress_bar, SLOT(enableProgress(bool)));
-
-  QObject::connect(progress_manager, SIGNAL(progress(const QString&, int)),
-    progress_bar, SLOT(setProgress(const QString&, int)));
-
-  QObject::connect(progress_manager, SIGNAL(enableAbort(bool)),
-    progress_bar, SLOT(enableAbort(bool)));
-
-  QObject::connect(progress_bar,     SIGNAL(abortPressed()),
-    progress_manager, SLOT(triggerAbort()));
-
+  // Progress bar/button management
+  pqProgressWidget* const progress_bar = new pqProgressWidget(widget);
   progress_manager->addNonBlockableObject(progress_bar);
   progress_manager->addNonBlockableObject(progress_bar->getAbortButton());
+
+  QObject::connect( progress_manager, SIGNAL(enableProgress(bool)),
+                    progress_bar,     SLOT(enableProgress(bool)));
+
+  QObject::connect( progress_manager, SIGNAL(progress(const QString&, int)),
+                    progress_bar,     SLOT(setProgress(const QString&, int)));
+
+  QObject::connect( progress_manager, SIGNAL(enableAbort(bool)),
+                    progress_bar,     SLOT(enableAbort(bool)));
+
+  QObject::connect( progress_bar,     SIGNAL(abortPressed()),
+                    progress_manager, SLOT(triggerAbort()));
+
+  // Final ui setup
+  hbox->addWidget(progress_bar);
+  this->addPermanentWidget(widget);
 }
 
 //-----------------------------------------------------------------------------
 pqStatusBar::~pqStatusBar()
 {
 }
-
-
