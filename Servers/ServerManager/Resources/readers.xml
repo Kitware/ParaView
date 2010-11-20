@@ -2121,6 +2121,26 @@
         </Documentation>
       </IntVectorProperty>
 
+      <IntVectorProperty name="OutputType"
+                         command="SetOutputType"
+                         number_of_elements="1"
+                         animateable="0"
+                         default_values="-1">
+        <EnumerationDomain name="enum">
+          <Entry value="-1" text="Automatic" />
+          <Entry value="6" text="Image" />
+          <Entry value="3" text="Rectilinear" />
+          <Entry value="2" text="Structured" />
+          <Entry value="4" text="Unstructured" />
+        </EnumerationDomain>
+        <Documentation>
+          Specifies the type of data that the reader creates.  If
+          Automatic, the reader will use the most appropriate grid type for
+          the data read.  Note that not all grid types support all data.  A
+          warning is issued if a mismatch occurs.
+        </Documentation>
+      </IntVectorProperty>
+
       <DoubleVectorProperty name="TimestepValues"
                             repeatable="1"
                             information_only="1">
@@ -5600,6 +5620,7 @@
           <Property name="VerticalScale" />
           <Property name="VerticalBias" />
           <Property name="ReplaceFillValueWithNan" />
+          <Property name="OutputType" />
         </ExposedProperties>
       </SubProxy>
 
