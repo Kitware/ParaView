@@ -161,8 +161,7 @@ vtkSMSessionCore::vtkSMSessionCore()
   vtkMemberFunctionCommand<vtkSMSessionCore>* observer =
       vtkMemberFunctionCommand<vtkSMSessionCore>::New();
   observer->SetCallback(*this, &vtkSMSessionCore::OnInterpreterError);
-  this->Interpreter->AddObserver( vtkCommand::UserEvent,
-                                  observer);
+  this->Interpreter->AddObserver( vtkCommand::UserEvent, observer );
   observer->Delete();
 
   this->Internals = new vtkInternals();

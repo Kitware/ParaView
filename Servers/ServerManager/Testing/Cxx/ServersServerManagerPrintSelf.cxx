@@ -139,7 +139,6 @@
 #include "vtkSMStringVectorProperty.h"
 #include "vtkSMTesting.h"
 #include "vtkSMTextWidgetRepresentationProxy.h"
-#include "vtkSMTimeAnimationCueProxy.h"
 #include "vtkSMTimeKeeperProxy.h"
 #include "vtkSMTwoDRenderViewProxy.h"
 #include "vtkSMUndoElement.h"
@@ -181,7 +180,6 @@ int main(int , char *[])
   PRINT_SELF(vtkSMBoxRepresentationProxy);
   PRINT_SELF(vtkSMCameraConfigurationReader);
   PRINT_SELF(vtkSMCameraConfigurationWriter);
-  PRINT_SELF(vtkSMCameraKeyFrameProxy);
   PRINT_SELF(vtkSMCameraLink);
   PRINT_SELF(vtkSMCameraProxy);
   PRINT_SELF(vtkSMChartRepresentationProxy);
@@ -287,7 +285,6 @@ int main(int , char *[])
   PRINT_SELF(vtkSMTesting);
   PRINT_SELF(vtkSMTextSourceRepresentationProxy);
   PRINT_SELF(vtkSMTextWidgetRepresentationProxy);
-  PRINT_SELF(vtkSMTimeAnimationCueProxy);
   PRINT_SELF(vtkSMTimeKeeperProxy);
   PRINT_SELF(vtkSMTwoDRenderViewProxy);
   PRINT_SELF(vtkSMUndoElement);

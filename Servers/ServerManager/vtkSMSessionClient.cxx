@@ -102,8 +102,8 @@ bool vtkSMSessionClient::Connect(const char* url)
 
   vtksys_ios::ostringstream handshake;
   handshake << "handshake=paraview." << PARAVIEW_VERSION_FULL;
-  // Add connect-id if needed (or maybe we extract that from url as well (just
-  // like vtkNetworkAccessManager).
+  // Add connect-id if needed (or maybe we extract that from url as well
+  // (just like vtkNetworkAccessManager).
 
   vtkstd::string data_server_url;
   vtkstd::string render_server_url;

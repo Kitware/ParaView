@@ -302,8 +302,8 @@ void vtkSMSessionServer::PullState(vtkSMMessage* msg)
 void vtkSMSessionServer::OnClientServerMessageRMI(void* message, int message_length)
 {
   vtkMultiProcessStream stream;
-  stream.SetRawData(reinterpret_cast<const unsigned char*>(message),
-    message_length);
+  stream.SetRawData( reinterpret_cast<const unsigned char*>(message),
+                     message_length);
   int type;
   stream >> type;
   switch (type)

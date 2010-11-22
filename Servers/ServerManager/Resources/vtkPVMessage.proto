@@ -63,7 +63,7 @@ message DefinitionHeader
   }
 }
 
-// Extension ProxyState *********************************************** [20-22]
+// Extension ProxyState *********************************************** [20-23]
 
 message ProxyState
 {
@@ -100,6 +100,16 @@ message ProxyManagerState
 
   extend Message {
     repeated ProxyRegistrationInfo registered_proxy = 30;
+  }
+}
+
+// Extension ProxyDefinitionState ************************************* [31-32]
+
+message ProxyDefinitionState
+{
+  extend Message {
+    repeated string xml_definition_proxy        = 31;
+    repeated string xml_custom_definition_proxy = 32;
   }
 }
 
