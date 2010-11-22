@@ -15,95 +15,73 @@
 #include "vtkCompositeAnimationPlayer.h"
 
 #include "vtkObjectFactory.h"
+#include "vtkRealtimeAnimationPlayer.h"
+#include "vtkSequenceAnimationPlayer.h"
 #include "vtkSmartPointer.h"
-
-#include <vtkstd/vector>
-
-class vtkCompositeAnimationPlayer::vtkInternal
-{
-public:
-  typedef vtkstd::vector<vtkSmartPointer<vtkAnimationPlayer> > VectorOfPlayers;
-  VectorOfPlayers Players;
-  vtkSmartPointer<vtkAnimationPlayer> ActivePlayer;
-};
+#include "vtkTimestepsAnimationPlayer.h"
 
 vtkStandardNewMacro(vtkCompositeAnimationPlayer);
 //----------------------------------------------------------------------------
 vtkCompositeAnimationPlayer::vtkCompositeAnimationPlayer()
 {
-  this->Internal = new vtkInternal();
+  this->PlayMode = SEQUENCE;
+  this->SequenceAnimationPlayer = vtkSequenceAnimationPlayer::New();
+  this->TimestepsAnimationPlayer = vtkTimestepsAnimationPlayer::New();
+  this->RealtimeAnimationPlayer = vtkRealtimeAnimationPlayer::New();
 }
 
 //----------------------------------------------------------------------------
 vtkCompositeAnimationPlayer::~vtkCompositeAnimationPlayer()
 {
-  delete this->Internal;
+  this->SequenceAnimationPlayer->Delete();
+  this->TimestepsAnimationPlayer->Delete();
+  this->RealtimeAnimationPlayer->Delete();
 }
 
 //----------------------------------------------------------------------------
-int vtkCompositeAnimationPlayer::AddPlayer(vtkAnimationPlayer* player)
+vtkAnimationPlayer* vtkCompositeAnimationPlayer::GetActivePlayer()
 {
-  if (!player)
+  switch (this->PlayMode)
     {
-    return -1;
+  case SEQUENCE:
+    return this->SequenceAnimationPlayer;
+
+  case REAL_TIME:
+    return this->RealtimeAnimationPlayer;
+
+  case SNAP_TO_TIMESTEPS:
+    return this->TimestepsAnimationPlayer;
     }
-
-  int index =0;
-  vtkInternal::VectorOfPlayers::iterator iter;
-  for (iter = this->Internal->Players.begin(); 
-    iter != this->Internal->Players.end(); ++iter, ++index)
-    {
-    if (iter->GetPointer() == player)
-      {
-      return index;
-      }
-    }
-
-  this->Internal->Players.push_back(player);
-  return index;
-}
-
-//----------------------------------------------------------------------------
-void vtkCompositeAnimationPlayer::RemoveAllPlayers()
-{
-  this->Internal->Players.clear();
-  this->Internal->ActivePlayer = 0;
-}
-
-//----------------------------------------------------------------------------
-void vtkCompositeAnimationPlayer::SetActive(int index)
-{
-  this->Internal->ActivePlayer = 0;
-  if (index >= 0 && index < static_cast<int>(this->Internal->Players.size()))
-    {
-    this->Internal->ActivePlayer = this->Internal->Players[index];
-    }
+  return NULL;
 }
 
 //----------------------------------------------------------------------------
 void vtkCompositeAnimationPlayer::StartLoop(double starttime, double endtime, double currenttime)
 {
-  if (this->Internal->ActivePlayer)
+  vtkAnimationPlayer* player = this->GetActivePlayer();
+  if (player)
     {
-    this->Internal->ActivePlayer->StartLoop(starttime, endtime, currenttime);
+    player->StartLoop(starttime, endtime, currenttime);
     }
 }
 
 //----------------------------------------------------------------------------
 void vtkCompositeAnimationPlayer::EndLoop()
 {
-  if (this->Internal->ActivePlayer)
+  vtkAnimationPlayer* player = this->GetActivePlayer();
+  if (player)
     {
-    this->Internal->ActivePlayer->EndLoop();
+    player->EndLoop();
     }
 }
 
 //----------------------------------------------------------------------------
 double vtkCompositeAnimationPlayer::GetNextTime(double currentime)
 {
-  if (this->Internal->ActivePlayer)
+  vtkAnimationPlayer* player = this->GetActivePlayer();
+  if (player)
     {
-    return this->Internal->ActivePlayer->GetNextTime(currentime);
+    return player->GetNextTime(currentime);
     }
 
   return VTK_DOUBLE_MAX;
@@ -113,9 +91,10 @@ double vtkCompositeAnimationPlayer::GetNextTime(double currentime)
 double vtkCompositeAnimationPlayer::GoToNext(double start, double end, 
   double currenttime)
 {
-  if (this->Internal->ActivePlayer)
+  vtkAnimationPlayer* player = this->GetActivePlayer();
+  if (player)
     {
-    return this->Internal->ActivePlayer->GoToNext(start, end, currenttime);
+    return player->GoToNext(start, end, currenttime);
     }
 
   return VTK_DOUBLE_MAX;
@@ -125,9 +104,10 @@ double vtkCompositeAnimationPlayer::GoToNext(double start, double end,
 double vtkCompositeAnimationPlayer::GoToPrevious(double start, double end, 
   double currenttime)
 {
-  if (this->Internal->ActivePlayer)
+  vtkAnimationPlayer* player = this->GetActivePlayer();
+  if (player)
     {
-    return this->Internal->ActivePlayer->GoToPrevious(start, end, currenttime);
+    return player->GoToPrevious(start, end, currenttime);
     }
 
   return VTK_DOUBLE_MIN;
@@ -137,5 +117,38 @@ double vtkCompositeAnimationPlayer::GoToPrevious(double start, double end,
 void vtkCompositeAnimationPlayer::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+  os << indent << "PlayMode: " << this->PlayMode << endl;
 }
 
+// Forwarded to vtkSequenceAnimationPlayer
+//----------------------------------------------------------------------------
+void vtkCompositeAnimationPlayer::SetNumberOfFrames(int val)
+{
+  this->SequenceAnimationPlayer->SetNumberOfFrames(val);
+}
+
+// Forwarded to vtkRealtimeAnimationPlayer.
+//----------------------------------------------------------------------------
+void vtkCompositeAnimationPlayer::SetDuration(int val)
+{
+  this->RealtimeAnimationPlayer->SetDuration(val);
+}
+
+// Forwarded to vtkTimestepsAnimationPlayer.
+//----------------------------------------------------------------------------
+void vtkCompositeAnimationPlayer::AddTimeStep(double val)
+{
+  this->TimestepsAnimationPlayer->AddTimeStep(val);
+}
+
+//----------------------------------------------------------------------------
+void vtkCompositeAnimationPlayer::RemoveAllTimeSteps()
+{
+  this->TimestepsAnimationPlayer->RemoveAllTimeSteps();
+}
+
+//----------------------------------------------------------------------------
+void vtkCompositeAnimationPlayer::SetFramesPerTimestep(int val)
+{
+  this->TimestepsAnimationPlayer->SetFramesPerTimestep(val);
+}

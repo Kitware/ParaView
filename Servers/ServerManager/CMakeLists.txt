@@ -196,8 +196,6 @@ SET(Kit_SRCS
 
   vtkSMLinearAnimationCueManipulatorProxy.cxx
 
-  vtkSMNetworkImageSourceProxy.cxx
-
   vtkSMPQStateLoader.cxx
   vtkSMPluginManager.cxx
   vtkSMPluginProxy.cxx

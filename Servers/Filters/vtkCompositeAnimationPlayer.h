@@ -23,6 +23,10 @@
 
 #include "vtkAnimationPlayer.h"
 
+class vtkSequenceAnimationPlayer;
+class vtkRealtimeAnimationPlayer;
+class vtkTimestepsAnimationPlayer;
+
 class VTK_EXPORT vtkCompositeAnimationPlayer : public vtkAnimationPlayer
 {
 public:
@@ -30,17 +34,31 @@ public:
   vtkTypeMacro(vtkCompositeAnimationPlayer, vtkAnimationPlayer);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Add an animation player. returns the index for the animation player.
-  int AddPlayer(vtkAnimationPlayer*);
+  enum Modes
+    {
+    SEQUENCE=0,
+    REAL_TIME=1,
+    SNAP_TO_TIMESTEPS=2
+    };
 
   // Description:
-  // Removes all players.
-  void RemoveAllPlayers();
+  // Get/Set the play mode
+  vtkSetMacro(PlayMode, int);
+  vtkGetMacro(PlayMode, int);
 
   // Description:
-  // Set the animation player at the given index as the active player.
-  void SetActive(int index);
+  // Forwarded to vtkSequenceAnimationPlayer
+  void SetNumberOfFrames(int val);
+
+  // Description:
+  // Forwarded to vtkRealtimeAnimationPlayer.
+  void SetDuration(int val);
+
+  // Description:
+  // Forwarded to vtkTimestepsAnimationPlayer.
+  void AddTimeStep(double val);
+  void RemoveAllTimeSteps();
+  void SetFramesPerTimestep(int val);
 
 //BTX
 protected:
@@ -53,9 +71,16 @@ protected:
   virtual void EndLoop();
   virtual double GetNextTime(double currentime);
 
-
   virtual double GoToNext(double start, double end, double currenttime);
   virtual double GoToPrevious(double start, double end, double currenttime);
+
+  vtkAnimationPlayer* GetActivePlayer();
+
+  vtkSequenceAnimationPlayer* SequenceAnimationPlayer;
+  vtkRealtimeAnimationPlayer* RealtimeAnimationPlayer;
+  vtkTimestepsAnimationPlayer* TimestepsAnimationPlayer;
+
+  int PlayMode;
 
 private:
   vtkCompositeAnimationPlayer(const vtkCompositeAnimationPlayer&); // Not implemented

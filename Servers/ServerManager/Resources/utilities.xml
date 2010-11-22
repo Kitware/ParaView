@@ -966,9 +966,11 @@
     <!-- 
     Group for animation players which are used to play an animation scene
     -->
-    <Proxy name="AnimationPlayerBase">
+    <Proxy name="AnimationPlayer" class="vtkCompositeAnimationPlayer"
+      processes="client">
       <Documentation>
-        base interface for all animation players.
+        Composite player that combines 3 animation players: sequence, realtime
+        and timesteps.
       </Documentation>
 
       <ProxyProperty name="AnimationScene"
@@ -995,88 +997,6 @@
       <Property name="GoToFirst" command="GoToFirst" is_internal="0"/>
       <Property name="GoToLast" command="GoToLast" is_internal="0"/>
 
-      <!-- End of AnimationPlayerBase -->
-    </Proxy>
-
-    <AnimationPlayerProxy name="SequenceAnimationPlayer" class="vtkSequenceAnimationPlayer"
-      base_proxygroup="animation_players" base_proxyname="AnimationPlayerBase">
-      <Documentation>
-        Plays the animation in a fixed number of frames. The time is evenly
-        distributed among all the frames.
-      </Documentation>
-     
-      <IntVectorProperty  name="NumberOfFrames"
-        command="SetNumberOfFrames"
-        number_of_elements="1"
-        default_values="10">
-        <IntRangeDomain name="range" min="1" />
-        <Documentation>
-          Set the number of frames in which to play the animation.
-        </Documentation>
-      </IntVectorProperty>
-
-      <!-- End of SequenceAnimationPlayer -->
-    </AnimationPlayerProxy>
-
-    <AnimationPlayerProxy name="RealtimeAnimationPlayer" class="vtkRealtimeAnimationPlayer"
-      base_proxygroup="animation_players" base_proxyname="AnimationPlayerBase">
-      <Documentation>
-        Realtime animation player which plays the animation in real time i.e. in
-        a fixed number of seconds.
-      </Documentation>
-
-      <IntVectorProperty name="Duration"
-        command="SetDuration"
-        number_of_elements="1"
-        default_values="10">
-        <Documentation>
-          Set the duration for playing the animation in seconds.
-        </Documentation>
-      </IntVectorProperty>
-
-      <!-- End of RealtimeAnimationPlayer -->
-    </AnimationPlayerProxy>
-
-    <AnimationPlayerProxy name="TimestepsAnimationPlayer" class="vtkTimestepsAnimationPlayer"
-      base_proxygroup="animation_players" base_proxyname="AnimationPlayerBase">
-      <Documentation>
-        Player to play an animation scene through a discrete set of time values.
-        FramesPerTimestep controls how many frames are generated for each time value.
-      </Documentation>
-
-      <DoubleVectorProperty name="TimeSteps"
-        command="AddTimeStep"
-        repeat_command="1"
-        number_of_elements_per_command="1"
-        clean_command="RemoveAllTimeSteps">
-        <Documentation>
-          The discrete timesteps to play the animation in. Irrespective of order
-          of the time values in this property, the player always plays in the
-          animation in sorted order of the time step values.
-        </Documentation>
-      </DoubleVectorProperty>
-      
-      <IntVectorProperty name="FramesPerTimestep"
-        command="SetFramesPerTimestep"
-        number_of_elements="1"
-        default_values="1">
-        <IntRangeDomain name="range" min="1" />
-        <Documentation>
-          The number of frames per timestep. 
-        </Documentation>
-      </IntVectorProperty>
-
-      <!-- End of TimestepsAnimationPlayer -->
-    </AnimationPlayerProxy>
-
-    <AnimationPlayerProxy 
-      name="AnimationPlayer" class="vtkCompositeAnimationPlayer"
-      base_proxygroup="animation_players" base_proxyname="AnimationPlayerBase">
-      <Documentation>
-        Composite player that combines 3 animation players: sequence, realtime
-        and timesteps.
-      </Documentation>
-
       <IntVectorProperty
         name="PlayMode"
         command="SetActive"
@@ -1089,35 +1009,48 @@
         </EnumerationDomain>
       </IntVectorProperty>
 
-      <SubProxy>
-        <Proxy name="SequenceAnimationPlayer" 
-          proxygroup="animation_players" proxyname="SequenceAnimationPlayer">
-        </Proxy>
-        <ExposedProperties>
-          <Property name="NumberOfFrames" />
-        </ExposedProperties>
-      </SubProxy>
+      <IntVectorProperty  name="NumberOfFrames"
+        command="SetNumberOfFrames"
+        number_of_elements="1"
+        default_values="10">
+        <IntRangeDomain name="range" min="1" />
+        <Documentation>
+          Set the number of frames in which to play the animation.
+        </Documentation>
+      </IntVectorProperty>
 
-      <SubProxy>
-        <Proxy name="RealtimeAnimationPlayer" 
-          proxygroup="animation_players" proxyname="RealtimeAnimationPlayer">
-        </Proxy>
-        <ExposedProperties>
-          <Property name="Duration" />
-        </ExposedProperties>
-      </SubProxy>
+      <IntVectorProperty name="Duration"
+        command="SetDuration"
+        number_of_elements="1"
+        default_values="10">
+        <Documentation>
+          Set the duration for playing the animation in seconds.
+        </Documentation>
+      </IntVectorProperty>
 
-      <SubProxy>
-        <Proxy name="TimestepsAnimationPlayer"
-          proxygroup="animation_players" proxyname="TimestepsAnimationPlayer">
-        </Proxy>
-        <ExposedProperties>
-          <Property name="TimeSteps" />
-          <Property name="FramesPerTimestep" />
-        </ExposedProperties>
-      </SubProxy>
+      <DoubleVectorProperty name="TimeSteps"
+        command="AddTimeStep"
+        repeat_command="1"
+        number_of_elements_per_command="1"
+        clean_command="RemoveAllTimeSteps">
+        <Documentation>
+          The discrete timesteps to play the animation in. Irrespective of order
+          of the time values in this property, the player always plays in the
+          animation in sorted order of the time step values.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <IntVectorProperty name="FramesPerTimestep"
+        command="SetFramesPerTimestep"
+        number_of_elements="1"
+        default_values="1">
+        <IntRangeDomain name="range" min="1" />
+        <Documentation>
+          The number of frames per timestep.
+        </Documentation>
+      </IntVectorProperty>
       <!-- End of AnimationPlayer -->
-    </AnimationPlayerProxy>
+    </Proxy>
 
     <!-- End of "animation_players" -->
   </ProxyGroup>
