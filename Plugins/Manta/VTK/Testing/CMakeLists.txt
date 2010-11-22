@@ -45,8 +45,8 @@ ADD_TEST( MarchingCubeTiming ${EXECUTABLE_OUTPUT_PATH}/marching.timing 2
           -V ${PROJECT_SOURCE_DIR}/examples/Baseline/MarchingCubeTiming.png )
 
 IF (VTK_USE_MPI)
-  ADD_EXECUTABLE( TaskParallelism TaskParallelism )
-  TARGET_LINK_LIBRARIES ( TaskParallelism vtkManta vtkRendering vtkParallel )
+#  ADD_EXECUTABLE( TaskParallelism TaskParallelism )
+#  TARGET_LINK_LIBRARIES ( TaskParallelism vtkManta vtkRendering vtkParallel )
 #Disable this test because it isn't finishing on the dashboard.
 #  ADD_TEST( ParallelImageCompositing mpirun -np 2 
 #            ${EXECUTABLE_OUTPUT_PATH}/TaskParallelism
@@ -54,8 +54,8 @@ IF (VTK_USE_MPI)
 #            -V ${PROJECT_SOURCE_DIR}/examples/Baseline/ParallelImageCompositing.png )
 
 
-  ADD_EXECUTABLE( MantaBenchmark MantaBenchmark.cxx )
-  TARGET_LINK_LIBRARIES ( MantaBenchmark vtkManta vtkRendering vtkParallel )
+#  ADD_EXECUTABLE( MantaBenchmark MantaBenchmark.cxx )
+#  TARGET_LINK_LIBRARIES ( MantaBenchmark vtkManta vtkRendering vtkParallel )
 
 ENDIF(VTK_USE_MPI)
 

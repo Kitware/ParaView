@@ -1,10 +1,11 @@
 #include "vtkCylinderSource.h"
-#include "vtkPolyDataMapper.h"
-#include "vtkProperty.h"
+#include "vtkMantaPolyDataMapper.h"
+#include "vtkMantaProperty.h"
 #include "vtkRenderWindow.h"
-#include "vtkCamera.h"
-#include "vtkActor.h"
 #include "vtkRenderer.h"
+#include "vtkMantaCamera.h"
+#include "vtkMantaActor.h"
+#include "vtkMantaRenderer.h"
 #include "vtkRenderWindowInteractor.h"
 
 double lamp_black[]     = {0.1800, 0.2800, 0.2300};
@@ -29,7 +30,7 @@ int main()
     // vtkPolyDataMapper to map the polygonal data into graphics primitives. We
     // connect the output of the Cylinder souece to the input of this mapper.
     //
-    vtkPolyDataMapper *CylinderMapper = vtkPolyDataMapper::New();
+    vtkMantaPolyDataMapper *CylinderMapper = vtkMantaPolyDataMapper::New();
     CylinderMapper->SetInputConnection(Cylinder->GetOutputPort());
 
     //
@@ -39,7 +40,7 @@ int main()
     // matrix. We set this actor's mapper to be CylinderMapper which we created
     // above.
     //
-    vtkActor *CylinderActor = vtkActor::New();
+    vtkMantaActor *CylinderActor = vtkMantaActor::New();
     CylinderActor->SetMapper(CylinderMapper);
 
     vtkProperty *CylinderProperty = CylinderActor->GetProperty();
@@ -56,22 +57,29 @@ int main()
     // responsible for drawing the actors it has.  We also set the background
     // color here.
     //
-    vtkRenderer *renderer= vtkRenderer::New();
+
+    vtkRenderer *glrenderer= vtkRenderer::New();
+    glrenderer->SetBackground(0.0, 0.0, 0.0);
+    glrenderer->SetLayer(0);
+
+    vtkMantaRenderer *renderer= vtkMantaRenderer::New();
     renderer->AddActor(CylinderActor);
     renderer->SetBackground(0.1, 0.2, 0.4);
+    renderer->SetLayer(1);
 
-    vtkCamera *camera = vtkCamera::New();
+    vtkMantaCamera *camera = vtkMantaCamera::New();
     renderer->SetActiveCamera(camera);
     renderer->ResetCamera();
 
     //
     // Finally we create the render window which will show up on the screen.
     // We put our renderer into the render window using AddRenderer. We also
-    // set the size to be 300 pixels by 300.
+    // set the size to be 300 pixels by 300.`
     //
     vtkRenderWindow *renWin = vtkRenderWindow::New();
-    //vtkRenderWindow *renWin = vtkRenderWindow::New();
-    renWin->AddRenderer(static_cast<vtkRenderer*>(renderer));
+    renWin->SetNumberOfLayers(2);
+    renWin->AddRenderer(glrenderer);
+    renWin->AddRenderer(renderer);
     renWin->SetSize(480, 480);
 
     vtkRenderWindowInteractor *iren = vtkRenderWindowInteractor::New();

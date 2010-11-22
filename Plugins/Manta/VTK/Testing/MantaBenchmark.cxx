@@ -42,7 +42,6 @@
 #include "vtkPLYWriter.h"
 
 #include "vtkMantaRenderer.h"
-#include "vtkMantaRenderWindow.h"
 #include "vtkMantaActor.h"
 #include "vtkMantaPolyDataMapper.h"
 
@@ -315,16 +314,7 @@ void MyProcess::Execute()
 
   vtkRenderWindowInteractor *iren=NULL;
   vtkRenderWindow *renWin = NULL;
-  vtkMantaRenderWindow *mRenWin = NULL;
-  if (useGL)
-    {
-    renWin = vtkRenderWindow::New();
-    }
-  else
-    {
-    mRenWin = vtkMantaRenderWindow::New();
-    renWin = mRenWin;
-    }
+  vtkRenderWindow *mRenWin = vtkRenderWindow::New();
   renWin->SetMultiSamples(0);
   if(me==0)
     {

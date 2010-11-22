@@ -4,7 +4,6 @@
 #include "vtkMantaActor.h"
 #include "vtkMantaPolyDataMapper.h"
 #include "vtkMantaRenderer.h"
-#include "vtkMantaRenderWindow.h"
 #include "vtkPolyDataMapper.h"
 #include "vtkRenderer.h"
 #include "vtkRenderWindow.h"
@@ -55,14 +54,7 @@ vtkRenderer *makeRenderer()
 
 vtkRenderWindow *makeRenderWindow()
 {
-  if (useGL)
-    {
-    return vtkRenderWindow::New();
-    }
-  else
-    {
-    return vtkMantaRenderWindow::New();
-    }
+  return vtkRenderWindow::New();
 }
 
 //----------------------------------------------------------------------------
