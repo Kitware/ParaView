@@ -92,6 +92,11 @@ int vtkSpyPlotHistoryReader::RequestInformation(vtkInformation *request,
   vtkInformation *info=outputVector->GetInformationObject(0);
   info->Set(vtkStreamingDemandDrivenPipeline::MAXIMUM_NUMBER_OF_PIECES(),-1);
 
+  std::map<std::string,std::string> timeInfo;
+
+  //we need to know the file position of the line before it is read in
+  //not after
+  std::streampos tellgValue;
 
   // Open the file and get the number time steps
   std::string line;
@@ -99,11 +104,18 @@ int vtkSpyPlotHistoryReader::RequestInformation(vtkInformation *request,
   int row=0;
   while(file_stream.good())
     {
+    tellgValue = file_stream.tellg();
     getline(file_stream,line);
 
     //skip any line that starts with a comment
     if (line[0] == this->CommentCharacter[0])
       {
+      std::cout << "skip line" << std::endl;
+      continue;
+      }
+    if ( line.size() <= 1)
+      {
+      std::cout << "skipping empty line" << std::endl;
       continue;
       }
     if (row==0)
@@ -125,11 +137,10 @@ int vtkSpyPlotHistoryReader::RequestInformation(vtkInformation *request,
     else
       {
       //normal data
-      std::vector<std::string> info = getTimeStepInfo(line,
-                                  this->Delimeter[0],this->Info->metaLookUp);
+      getTimeStepInfo(line,this->Delimeter[0],this->Info->metaLookUp,timeInfo);
       TimeStep step;
-      step.file_pos = file_stream.tellg();
-      convert(info[this->Info->metaIndexes["time"]],step.time);
+      step.file_pos = tellgValue;
+      convert(timeInfo["time"],step.time);
       this->Info->timeSteps.push_back(step);
       }
     ++row;
@@ -144,9 +155,11 @@ int vtkSpyPlotHistoryReader::RequestInformation(vtkInformation *request,
     for (int i=0; i < size; ++i)
       {
       times[i] = this->Info->timeSteps[i].time;
+      std::cout << "row: " << i << ":-:" << this->Info->timeSteps[i].time << std::endl;
       }
 
     //set the time range
+
     double timeRange[3];
     timeRange[0] = this->Info->timeSteps[0].time;
     timeRange[1] = this->Info->timeSteps[size-1].time;

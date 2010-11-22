@@ -121,33 +121,32 @@ namespace SpyPlotHistoryReaderPrivate
       return;
   }
 
-  //========================================================================
-  std::vector<std::string> getTimeStepInfo(
-    const std::string &s, const char &delim, std::map<int,std::string> &lookup)
-  {
-      std::vector<std::string> elems;
-      size_t size = lookup.size();
-      elems.resize(size);
-      std::stringstream ss(s);
-      std::string item;
-      int index=0;
-      size_t count = 0;
-      while(std::getline(ss, item, delim))
-        {
-        trim(item);
-        if (lookup.find(index) != lookup.end())
-          {
-          elems[index]=item;
-          ++count;
-          }
-        if (count == size)
-          {
-          break;
-          }
-        ++index;
-        }
-      return elems;
-  }
+//========================================================================
+void getTimeStepInfo(const std::string &s, const char &delim,
+            std::map<int,std::string> &lookup, std::map<std::string,std::string> &info)
+{
+  std::stringstream ss(s);
+  std::string item;
+  int index=0;
+  size_t count = 0;
+  while(std::getline(ss, item, delim))
+    {
+    trim(item);
+    if (lookup.find(index) != lookup.end())
+      {
+      //map the header name to this rows value
+      // ie time is col 3, so map info[time] to this rows 3rd col
+      info[lookup[index]]=item;
+      ++count;
+      }
+    if (count == lookup.size())
+      {
+      break;
+      }
+    ++index;
+    }
+  return;
+}
 
   //========================================================================
   template<class T>
