@@ -389,9 +389,7 @@ class SourceProxy(Proxy):
             self.SMProxy.UpdatePipeline()
         # This is here to cause a receive
         # on the client side so that progress works properly.
-        # FIXME +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-        #if ActiveSession and ActiveConnection.IsRemote():
-        #    self.SMProxy.GetDataInformation()
+        self.SMProxy.GetDataInformation()
 
     def FileNameChanged(self):
         "Called when the filename of a source proxy is changed."
@@ -636,8 +634,6 @@ class VectorProperty(Property):
         a iterable object."""
         if not hasattr(values, "__iter__"):
             values = (values,)
-        iup = self.SMProperty.GetImmediateUpdate()
-        self.SMProperty.SetImmediateUpdate(False)
         if not self.GetRepeatable() and len(values) != self.GetNumberOfElements():
             raise RuntimeError("This property requires %d values." % self.GetNumberOfElements())
         if self.GetRepeatable():
@@ -647,7 +643,6 @@ class VectorProperty(Property):
         for val in values:
             self.SMProperty.SetElement(idx, self.ConvertValue(val))
             idx += 1
-        self.SMProperty.SetImmediateUpdate(iup)
         self._UpdateProperty()
 
     def Clear(self):
@@ -1777,6 +1772,7 @@ def Connect(ds_host=None, ds_port=11111, rs_host=None, rs_port=22221):
         ActiveSession.Connect("cdsrs://" + ds_host + ":" + ds_port + "/" + rs_host + ":" + rs_port)
 
     vtkProcessModule.GetProcessModule().RegisterSession(ActiveSession)
+    __InitAfterConnect__()
     return ActiveSession
 
 def ReverseConnect(port=11111):
@@ -1796,22 +1792,22 @@ def ReverseConnect(port=11111):
         raise RuntimeError, "Cannot create a connection through python. Use the GUI to setup the connection."
     session = vtkSMClientSession()
     session.Connect("csrc://hostname:" + port)
-    if not ActiveConnection:
-        ActiveConnection = session
+    if not ActiveSession:
+        ActiveSession = session
     return session
 
 def Disconnect(session=None):
     """Disconnects the connection. Make sure to clear the proxy manager
     first."""
-    global ActiveConnection
+    global ActiveSession
     global fromGUI
     if fromGUI:
         raise RuntimeError, "Cannot disconnect through python. Use the GUI to disconnect."
-    if not session or session == ActiveConnection:
-        session = ActiveConnection
-        ActiveConnection = None
+    if not session or session == ActiveSession:
+        session = ActiveSession
+        ActiveSession = None
     if session:
-        session.CloseSession()
+      vtkProcessModule.GetProcessModule().UnRegisterSession(session)
     return
 
 def CreateProxy(xml_group, xml_name, session=None):
@@ -2346,9 +2342,7 @@ def createModule(groupName, mdl=None):
     global ActiveSession
 
     if not ActiveSession:
-       session = vtkSMSession()
-       vtkProcessModule.GetProcessModule().RegisterSession(session)
-       ActiveSession = session
+      raise "Please connect to a server using \"Connect\""
 
     pxm = ActiveSession.GetProxyManager()
     # Use prototypes to find all proxy types.
@@ -2785,7 +2779,8 @@ ToggleProgressPrinting()
 _pyproxies = {}
 
 # Create needed sub-modules
-_createModules()
+# We can no longer create modules, unless we have connected to a server.
+# _createModules()
 
 # Set up our custom importer (if possible)
 loader = _ModuleLoader()
@@ -2817,11 +2812,18 @@ class __DefinitionUpdater(object):
         if vtkSMObject.GetProxyManager():
             vtkSMObject.GetProxyManager().RemoveObserver(self.Tag)
 
-if not paraview.fromFilter:
-    # fromFilter is set when this module is imported from the programmable
-    # filter
-    global _defUpdater
-    _defUpdater = __DefinitionUpdater()
+def __InitAfterConnect__():
+    """
+    This function is called everytime after a server connection is made.
+    Since the ProxyManager and all proxy definitions are changed every time a
+    new connection is made, we re-create all the modules
+    """
+    _createModules()
+    if not paraview.fromFilter:
+        # fromFilter is set when this module is imported from the programmable
+        # filter
+        global _defUpdater
+        _defUpdater = __DefinitionUpdater()
 
 if hasattr(sys, "ps1"):
     # session is interactive.

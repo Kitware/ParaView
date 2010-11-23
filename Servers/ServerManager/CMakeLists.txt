@@ -114,6 +114,7 @@ SET (Kit_SRCS
   vtkSMStateVersionController.cxx
   vtkSMStringVectorProperty.cxx
   vtkSMTextWidgetRepresentationProxy.cxx
+  vtkSMTimeKeeper.cxx
   vtkSMTimeKeeperProxy.cxx
   vtkSMTwoDRenderViewProxy.cxx
   vtkSMUndoElement.cxx

@@ -39,12 +39,13 @@ paraview.compatibility.minor = 9
 import servermanager
 
 def _disconnect():
-    servermanager.ProxyManager().UnRegisterProxies()
-    active_objects.view = None
-    active_objects.source = None
-    import gc
-    gc.collect()
-    servermanager.Disconnect()
+    if servermanager.ActiveSession:
+        servermanager.ProxyManager().UnRegisterProxies()
+        active_objects.view = None
+        active_objects.source = None
+        import gc
+        gc.collect()
+        servermanager.Disconnect()
 
 def Connect(ds_host=None, ds_port=11111, rs_host=None, rs_port=11111):
     """Creates a connection to a server. Example usage:
@@ -53,6 +54,8 @@ def Connect(ds_host=None, ds_port=11111, rs_host=None, rs_port=11111):
     > Connect("amber", 11111, "vis_cluster", 11111) # connect to data server, render server pair"""
     _disconnect()
     session = servermanager.Connect(ds_host, ds_port, rs_host, rs_port)
+    _add_functions(globals())
+
     tk =  servermanager.misc.TimeKeeper()
     servermanager.ProxyManager().RegisterProxy("timekeeper", "tk", tk)
     scene = AnimationScene()
@@ -77,20 +80,17 @@ def _create_view(view_xml_name):
       "my_view%d" % _funcs_internals.view_counter, view)
     active_objects.view = view
     _funcs_internals.view_counter += 1
-    
-    # FIXME ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-    #tk = servermanager.ProxyManager().GetProxiesInGroup("timekeeper").values()[0]
-    #views = tk.Views
-    #if not view in views:
-    #    views.append(view)
-    #try:
-    #    scene = GetAnimationScene()
-    #    if not view in scene.ViewModules:
-    #        scene.ViewModules.append(view)
-    #except servermanager.MissingProxy:
-    #    pass
-    # FIXME ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+    tk = servermanager.ProxyManager().GetProxiesInGroup("timekeeper").values()[0]
+    views = tk.Views
+    if not view in views:
+        views.append(view)
+    try:
+        scene = GetAnimationScene()
+        if not view in scene.ViewModules:
+            scene.ViewModules.append(view)
+    except servermanager.MissingProxy:
+        pass
     return view
 
 def CreateRenderView():
@@ -596,12 +596,10 @@ def _create_func(key, module):
             # Register pipeline objects with the time keeper. This is used to extract time values
             # from sources. NOTE: This should really be in the servermanager controller layer.
             if group == "sources":
-                # FIXME ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-                #tk = servermanager.ProxyManager().GetProxiesInGroup("timekeeper").values()[0]
-                #sources = tk.TimeSources
-                #if not px in sources:
-                #    sources.append(px)
-                # FIXME ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+                tk = servermanager.ProxyManager().GetProxiesInGroup("timekeeper").values()[0]
+                sources = tk.TimeSources
+                if not px in sources:
+                    sources.append(px)
                 active_objects.source = px
 
         except servermanager.MissingRegistrationInformation:
@@ -966,8 +964,7 @@ def demo2(fname="/Users/berk/Work/ParaView/ParaViewData/Data/disk_out_ref.ex2"):
     SetDisplayProperties(ColorArrayName = "Pres")
     Render()
 
-_add_functions(globals())
-active_objects = ActiveObjects()
-
 if not servermanager.ActiveSession:
     Connect()
+
+active_objects = ActiveObjects()

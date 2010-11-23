@@ -251,9 +251,18 @@ bool vtkProcessModule::UnRegisterSession(vtkIdType sessionID)
 //----------------------------------------------------------------------------
 bool vtkProcessModule::UnRegisterSession(vtkSession* session)
 {
- // not implemented yet.
-  abort();
-//  return this->UnRegisterSession(session->GetSessionId());
+  vtkInternals::MapOfSessions::iterator iter;
+  for (iter = this->Internals->Sessions.begin();
+    iter != this->Internals->Sessions.end(); ++iter)
+    {
+    if (iter->second == session)
+      {
+      this->Internals->Sessions.erase(iter);
+      return true;
+      }
+    }
+  vtkErrorMacro("Session has not been registered. Cannot unregister : " <<
+    session);
   return false;
 }
 

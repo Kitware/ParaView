@@ -711,7 +711,7 @@
       <ProxyProperty name="AnimatedProxy"
         command="SetAnimatedProxy"
         clean_command="RemoveAnimatedProxy"
-        attribute_type="SMProxy">
+        argument_type="SMProxy">
         <ProxyGroupDomain name="groups">
           <Group name="sources" />
           <Group name="filters" />
@@ -816,7 +816,7 @@
         command="AddViewProxy"
         clean_command="RemoveAllViewProxies"
         repeat_command="1"
-        attribute_type="SMProxy" >
+        argument_type="SMProxy" >
         <ProxyGroupDomain name="groups">
           <Group name="views" />
         </ProxyGroupDomain>
@@ -914,7 +914,7 @@
 
       <ProxyProperty name="TimeKeeper"
         command="SetTimeKeeper"
-        attribute_type="SMProxy">
+        argument_type="SMProxy">
         <Documentation>
           Set the time keeper. Time keeper is used to obtain the information
           about timesteps. This is required to play animation in "Snap To
@@ -1935,7 +1935,8 @@
     <!-- End of FileInformationHelper -->
     </Proxy>
 
-    <TimeKeeperProxy name="TimeKeeper" class="">
+    <TimeKeeperProxy name="TimeKeeper" class="vtkSMTimeKeeper"
+      processes="client">
       <Documentation>
         TimeKeeper is used to keep the pipeline time for the application.
         All views added to the timekeeper show the same time as that on the time
@@ -1945,8 +1946,6 @@
       <DoubleVectorProperty
         name="Time"
         command="SetTime"
-        update_self="1"
-        immediate_update="1" 
         number_of_elements="1"
         precision="16"
         default_values="0">
@@ -1980,7 +1979,7 @@
         name="Views"
         command="AddView"
         remove_command="RemoveView"
-        update_self="1"
+        argument_type="SMProxy"
         repeatable="1">
         <Documentation>
           Views with their view time linked with this time keeper.
@@ -1991,7 +1990,7 @@
         name="TimeSources"
         command="AddTimeSource"
         remove_command="RemoveTimeSource"
-        update_self="1"
+        argument_type="SMProxy"
         repeatable="1">
         <Documentation>
           List of proxies that provide time. TimestepValues property has
