@@ -26,6 +26,7 @@ SET (Kit_SRCS
   vtkPMDoubleVectorProperty.cxx
   vtkPMFileSeriesReaderProxy.cxx
   vtkPMIdTypeVectorProperty.cxx
+  vtkPMImageTextureProxy.cxx
   vtkPMInputProperty.cxx
   vtkPMIntVectorProperty.cxx
   vtkPMObject.cxx
@@ -66,8 +67,10 @@ SET (Kit_SRCS
   vtkSMDomainIterator.cxx
   vtkSMDoubleVectorProperty.cxx
   vtkSMExporterProxy.cxx
+  vtkSMFetchDataProxy.cxx
   vtkSMGlobalPropertiesManager.cxx
   vtkSMIdTypeVectorProperty.cxx
+  vtkSMImplicitPlaneRepresentationProxy.cxx
   vtkSMInputProperty.cxx
   vtkSMIntVectorProperty.cxx
   vtkSMLink.cxx
@@ -187,10 +190,7 @@ SET(Kit_SRCS
 
   vtkSMGlobalPropertiesLinkUndoElement.cxx #--------------------------------
 
-  vtkSMFetchDataProxy.cxx
 
-  vtkSMImageTextureProxy.cxx
-  vtkSMImplicitPlaneRepresentationProxy.cxx
   vtkSMInteractionUndoStackBuilder.cxx#--------------------------------
 
 

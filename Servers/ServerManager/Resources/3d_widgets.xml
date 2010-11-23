@@ -1057,7 +1057,7 @@
 
     <!-- ================================================================== -->
     <ImplicitPlaneRepresentationProxy name="ImplicitPlaneRepresentation"
-      class="vtkImplicitPlaneRepresentation">
+      class="vtkPVImplicitPlaneRepresentation">
       <IntVectorProperty name="Visibility"
          command="SetVisibility"
          number_of_elements="1"

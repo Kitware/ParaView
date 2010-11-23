@@ -35,9 +35,6 @@ protected:
 
   virtual void SendRepresentation();
 
-  // This method is overridden to change the default appearance.
-  virtual void CreateVTKObjects();
-
 private:
   vtkSMImplicitPlaneRepresentationProxy(const vtkSMImplicitPlaneRepresentationProxy&); // Not implemented
   void operator=(const vtkSMImplicitPlaneRepresentationProxy&); // Not implemented

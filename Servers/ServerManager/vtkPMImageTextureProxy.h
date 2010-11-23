@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkSMImageTextureProxy.h
+  Module:    vtkPMImageTextureProxy.h
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -12,42 +12,40 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMImageTextureProxy - proxy for a vtkTexture.
+// .NAME vtkPMImageTextureProxy - proxy for a vtkTexture.
 // .SECTION Description
 // Combines vtkTexture and vtkNetworkImageSource. This makes it simple for
 // applications to create textures from image files where the image file is
 // present on only one process, say client, but is needed for rendering on the
 // render server and the data server.
-#ifndef __vtkSMImageTextureProxy_h
-#define __vtkSMImageTextureProxy_h
+#ifndef __vtkPMImageTextureProxy_h
+#define __vtkPMImageTextureProxy_h
 
-#include "vtkSMSourceProxy.h"
+#include "vtkPMSourceProxy.h"
+#include "vtkSMMessage.h"
 
 class vtkImageData;
 
-class VTK_EXPORT vtkSMImageTextureProxy : public vtkSMSourceProxy
+class VTK_EXPORT vtkPMImageTextureProxy : public vtkPMSourceProxy
 {
 public:
-  static vtkSMImageTextureProxy* New();
-  vtkTypeMacro(vtkSMImageTextureProxy, vtkSMSourceProxy);
+  static vtkPMImageTextureProxy* New();
+  vtkTypeMacro(vtkPMImageTextureProxy, vtkPMSourceProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
-
-  // Description:
-  // Returns the client side image if one has been loaded successfully.
-  vtkImageData* GetLoadedImage();
 
 //BTX
 protected:
-  vtkSMImageTextureProxy();
-  ~vtkSMImageTextureProxy();
+  vtkPMImageTextureProxy();
+  ~vtkPMImageTextureProxy();
 
-  virtual void CreateVTKObjects();
+  // Description:
+  // Creates the VTKObjects. Overridden to add post-filters to the pipeline.
+  virtual bool CreateVTKObjects(vtkSMMessage* message);
 
 private:
-  vtkSMImageTextureProxy(const vtkSMImageTextureProxy&); // Not implemented
-  void operator=(const vtkSMImageTextureProxy&); // Not implemented
+  vtkPMImageTextureProxy(const vtkPMImageTextureProxy&); // Not implemented
+  void operator=(const vtkPMImageTextureProxy&); // Not implemented
 //ETX
 };
 
 #endif
-

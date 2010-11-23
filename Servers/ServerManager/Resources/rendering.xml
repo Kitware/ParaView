@@ -436,7 +436,9 @@
       </InputProperty>
     </SourceProxy>
 
-    <ImageTextureProxy name="ImageTexture" class="vtkTexture" >
+    <Proxy name="ImageTexture"
+           class="vtkTexture"
+           kernel_class="vtkPMImageTextureProxy">
       <Documentation>
         This is a proxy for a vtkTexture which also includes an image file
         reader. This reader can read an image of client/data server or render
@@ -458,7 +460,7 @@
         animateable="1">
         <BooleanDomain name="bool" />
       </IntVectorProperty>
-    </ImageTextureProxy>
+    </Proxy>
   </ProxyGroup>
 
   <ProxyGroup name="props">

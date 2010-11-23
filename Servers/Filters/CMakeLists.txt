@@ -158,6 +158,7 @@ SET(Filters_SRCS
   vtkPVGeometryFilter.cxx
   vtkPVGeometryInformation.cxx
   vtkPVGlyphFilter.cxx
+  vtkPVImplicitPlaneRepresentation.cxx
   vtkPVInteractorStyle.cxx
   vtkPVJoystickFly.cxx
   vtkPVJoystickFlyIn.cxx

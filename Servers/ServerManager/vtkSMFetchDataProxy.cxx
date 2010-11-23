@@ -15,11 +15,10 @@
 #include "vtkSMFetchDataProxy.h"
 
 #include "vtkAlgorithm.h"
-#include "vtkClientServerStream.h"
 #include "vtkObjectFactory.h"
-#include "vtkProcessModule.h"
 #include "vtkPVDataInformation.h"
 #include "vtkSMPropertyHelper.h"
+#include "vtkSMMessage.h"
 
 vtkStandardNewMacro(vtkSMFetchDataProxy);
 //----------------------------------------------------------------------------
@@ -79,25 +78,22 @@ void vtkSMFetchDataProxy::PassMetaData(double time, bool use_time)
     dataType = cDataType;
     }
 
-  vtkClientServerStream stream;
-  stream << vtkClientServerStream::Invoke
-         << this->GetID() << "SetOutputDataType" << dataType
-         << vtkClientServerStream::End;
+  vtkSMMessage msg;
+  msg << pvstream::InvokeRequest() << "SetOutputDataType" << dataType;
+  this->Invoke(&msg);
+
   if (dataType == VTK_STRUCTURED_POINTS ||
       dataType == VTK_STRUCTURED_GRID   ||
       dataType == VTK_RECTILINEAR_GRID  ||
       dataType == VTK_IMAGE_DATA)
     {
     const int* extent = inputInfo->GetExtent();
-    stream << vtkClientServerStream::Invoke
-           << this->GetID()
-           << "SetWholeExtent"
-           << vtkClientServerStream::InsertArray(extent, 6)
-           << vtkClientServerStream::End;
+    msg.Clear();
+    msg << pvstream::InvokeRequest() << "SetWholeExtent"
+        << extent[0] << extent[1] << extent[2]
+        << extent[3] << extent[4] << extent[5];
+    this->Invoke(&msg);
     }
-
-  vtkProcessModule::GetProcessModule()->SendStream(
-    this->ConnectionID, this->GetServers(), stream);
 }
 
 //----------------------------------------------------------------------------
