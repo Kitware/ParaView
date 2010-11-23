@@ -257,12 +257,12 @@ int vtkSpyPlotHistoryReader::RequestData(
              this->Info->FieldIndexesToNames.end())
       {
       //we have field data
-      vtkVariantArray *fieldData = vtkVariantArray::New();
+      vtkDoubleArray *fieldData = vtkDoubleArray::New();
       fieldData->SetName(
           (this->Info->FieldIndexesToNames[index]).c_str());
-      fieldData->SetNumberOfTuples(1);
-      cout << this->Info->FieldIndexesToNames[index] << "value should be: " << *it << std::endl;
-      fieldData->SetValue(0,vtkVariant(*it));
+      double t;
+      convert(*it,t);
+      fieldData->InsertNextValue(t);
       output->GetFieldData()->AddArray(fieldData);
       fieldData->FastDelete();
       }
@@ -282,7 +282,7 @@ void vtkSpyPlotHistoryReader::ConstructTableColumns(
 
   for(hIt = this->Info->header.begin();hIt != this->Info->header.end(); ++hIt)
     {
-    vtkStringArray *col = vtkStringArray::New();
+    vtkDoubleArray *col = vtkDoubleArray::New();
     col->SetName((*hIt).c_str());
     table->AddColumn(col);
     col->FastDelete();

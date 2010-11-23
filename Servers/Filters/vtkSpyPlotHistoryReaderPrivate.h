@@ -77,9 +77,11 @@ namespace SpyPlotHistoryReaderPrivate
       if (begin == std::string::npos)
       {
           // no content
-          return "";
+          return str;
       }
-      return str.substr(0,begin);
+      std::string t(str.substr(0,begin));
+      trim(t);
+      return t;
   }
 
 
@@ -159,7 +161,7 @@ void getTimeStepInfo(const std::string &s, const char &delim,
   //========================================================================
   std::vector<std::string> createTableLayoutFromHeader(std::string &header,
                     const char& delim, std::map<int,int> &headerRowToIndex,
-                    std::map<int,std::string> fieldCols)
+                    std::map<int,std::string> &fieldCols)
   {
     //the single presumption we have is that all the properties points
     //are continous in the header
@@ -221,7 +223,7 @@ void getTimeStepInfo(const std::string &s, const char &delim,
     while(it != cols.end())
       {
       //this is a field property
-      fieldCols[index]=nameFromHeaderCol(*it);
+      fieldCols[index]= nameFromHeaderCol(*it);;
       ++it;
       ++index;
       }
