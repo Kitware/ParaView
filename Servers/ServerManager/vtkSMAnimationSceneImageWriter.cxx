@@ -23,7 +23,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkObjectFactory.h"
 #include "vtkPNGWriter.h"
-#include "vtkSMAnimationSceneProxy.h"
+#include "vtkSMAnimationScene.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMPropertyHelper.h"
@@ -121,11 +121,11 @@ bool vtkSMAnimationSceneImageWriter::SaveInitialize()
 #if !defined(__APPLE__)
   // Iterate over all views and enable offscreen rendering. This avoid toggling
   // of the offscreen rendering flag on every frame.
-  unsigned int num_modules = this->AnimationScene->GetNumberOfViewModules();
+  unsigned int num_modules = this->AnimationScene->GetNumberOfViewProxies();
   for (unsigned int cc=0; cc < num_modules; cc++)
     {
     vtkSMRenderViewProxy* rmview = vtkSMRenderViewProxy::SafeDownCast(
-      this->AnimationScene->GetViewModule(cc));
+      this->AnimationScene->GetViewProxy(cc));
     if (rmview)
       {
       if (vtkSMPropertyHelper(rmview,
@@ -228,13 +228,13 @@ void vtkSMAnimationSceneImageWriter::Merge(vtkImageData* dest, vtkImageData* src
 bool vtkSMAnimationSceneImageWriter::SaveFrame(double vtkNotUsed(time))
 {
   vtkSmartPointer<vtkImageData> combinedImage;
-  unsigned int num_modules = this->AnimationScene->GetNumberOfViewModules();
+  unsigned int num_modules = this->AnimationScene->GetNumberOfViewProxies();
   if (num_modules > 1)
     {
     combinedImage.TakeReference(this->NewFrame());
     for (unsigned int cc=0; cc < num_modules; cc++)
       {
-      vtkSMViewProxy* view = this->AnimationScene->GetViewModule(cc);
+      vtkSMViewProxy* view = this->AnimationScene->GetViewProxy(cc);
       vtkImageData* capture = this->CaptureViewImage(view, this->Magnification);
       if (capture)
         {
@@ -247,7 +247,7 @@ bool vtkSMAnimationSceneImageWriter::SaveFrame(double vtkNotUsed(time))
     {
     // If only one view, we speed things up slightly by using the
     // captured image directly.
-    vtkSMViewProxy* view = this->AnimationScene->GetViewModule(0);
+    vtkSMViewProxy* view = this->AnimationScene->GetViewProxy(0);
     vtkImageData* capture = this->CaptureViewImage(view, this->Magnification);
     if (!capture)
       {
@@ -327,11 +327,11 @@ bool vtkSMAnimationSceneImageWriter::SaveFinalize()
 
 #if !defined(__APPLE__)
   // restore offscreen rendering state.
-  unsigned int num_modules = this->AnimationScene->GetNumberOfViewModules();
+  unsigned int num_modules = this->AnimationScene->GetNumberOfViewProxies();
   for (unsigned int cc=0; cc < num_modules; cc++)
     {
     vtkSMRenderViewProxy* rmview = vtkSMRenderViewProxy::SafeDownCast(
-      this->AnimationScene->GetViewModule(cc));
+      this->AnimationScene->GetViewProxy(cc));
     if (rmview)
       {
       vtkSMPropertyHelper(rmview, "UseOffscreenRendering").Set(0);
@@ -439,11 +439,11 @@ bool vtkSMAnimationSceneImageWriter::CreateWriter()
 //-----------------------------------------------------------------------------
 void vtkSMAnimationSceneImageWriter::UpdateImageSize()
 {
-  unsigned int num_modules = this->AnimationScene->GetNumberOfViewModules();
+  unsigned int num_modules = this->AnimationScene->GetNumberOfViewProxies();
   int gui_size[2] = {1, 1};
   for (unsigned int cc=0; cc < num_modules; cc++)
     {
-    vtkSMViewProxy* view = this->AnimationScene->GetViewModule(cc);
+    vtkSMViewProxy* view = this->AnimationScene->GetViewProxy(cc);
     if (!view)
       {
       continue;

@@ -25,24 +25,17 @@
 #ifndef __vtkPVAnimationCue_h
 #define __vtkPVAnimationCue_h
 
-#include "vtkObject.h"
+#include "vtkAnimationCue.h"
 
 class vtkAnimationCue;
 class vtkCommand;
 class vtkPVCueManipulator;
-class vtkPVAnimationCueObserver;
 
-class VTK_EXPORT vtkPVAnimationCue : public vtkObject
+class VTK_EXPORT vtkPVAnimationCue : public vtkAnimationCue
 {
 public:
-  vtkTypeMacro(vtkPVAnimationCue, vtkObject);
+  vtkTypeMacro(vtkPVAnimationCue, vtkAnimationCue);
   void PrintSelf(ostream& os, vtkIndent indent);
-
-  // Description:
-  // Forwarded to the internal vtkAnimationCue
-  void SetTimeMode(int mode);
-  void SetStartTime(double val);
-  void SetEndTime(double val);
 
   // Description:
   // The index of the element of the property this cue animates.
@@ -58,25 +51,6 @@ public:
   // to the extents of this cue.
   void SetManipulator(vtkPVCueManipulator*);
   vtkGetObjectMacro(Manipulator, vtkPVCueManipulator);
-
-  // Description:
-  // This is valid only in a AnimationCueTickEvent handler.
-  // Before firing the event the animation cue sets the AnimationTime to
-  // the time of the tick.
-  double GetAnimationTime();
-
-  // Description:
-  // This is valid only in a AnimationCueTickEvent handler.
-  // Before firing the event the animation cue sets the DeltaTime
-  // to the difference in time between the current tick and the last tick.
-  double GetDeltaTime();
-
-  // Description:
-  // This is valid only in a AnimationCueTickEvent handler.
-  // Before firing the event the animation cue sets the ClockTime to
-  // the time of the tick. ClockTime is directly the time from the animation
-  // scene neither normalized nor offsetted to the start of the scene.
-  double GetClockTime();
 
   // Description:
   // Enable/Disable this cue.
@@ -103,23 +77,17 @@ protected:
   vtkPVAnimationCue();
   ~vtkPVAnimationCue();
 
-  virtual void InitializeObservers(vtkAnimationCue* cue);
-
-  virtual void ExecuteEvent(vtkObject* wdg, unsigned long event, void* calldata);
-
   // Description:
-  // Callbacks for corresponding Cue events. The argument must be
-  // casted to vtkAnimationCue::AnimationCueInfo.
-  virtual void StartCueInternal(void* info);
-  virtual void TickInternal(void* info);
-  virtual void EndCueInternal(void* info);
+  virtual void StartCueInternal();
+  virtual void TickInternal(double currenttime, double deltatime,
+    double clocktime);
+  virtual void EndCueInternal();
 
 //BTX
-  vtkCommand* Observer;
-  friend class vtkPVAnimationCueObserver;
   friend class vtkSMAnimationSceneProxy;
 //ETX
 
+  unsigned long ObserverID;
   bool UseAnimationTime;
   int AnimatedElement;
   int Enabled;

@@ -42,6 +42,11 @@ public:
   void RemoveViewProxy(vtkSMViewProxy* proxy);
   void RemoveAllViewProxies();
 
+  // Description;
+  // Access the view proxies.
+  unsigned int GetNumberOfViewProxies();
+  vtkSMViewProxy* GetViewProxy(unsigned int cc);
+
   // Description:
   // Set if caching is enabled.
   // This method synchronizes the cahcing flag on every cue.
@@ -71,6 +76,7 @@ public:
   // Description:
   // Forwarded to vtkCompositeAnimationPlayer.
   void SetLoop(int val);
+  int GetLoop();
   void Play();
   void Stop();
   void GoToNext();

@@ -294,6 +294,14 @@ int vtkSMProperty::ReadXMLAttributes(vtkSMProxy* vtkNotUsed(proxy),
     { 
     this->Repeatable = repeatable;
     }
+  else
+    {
+    int retVal = element->GetScalarAttribute("repeat_command", &repeatable);
+    if(retVal)
+      {
+      this->Repeatable = repeatable;
+      }
+    }
 
   const char* information_property = 
     element->GetAttribute("information_property");

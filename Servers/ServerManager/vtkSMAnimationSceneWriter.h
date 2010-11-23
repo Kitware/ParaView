@@ -23,8 +23,8 @@
 
 #include "vtkSMObject.h"
 
-class vtkSMAnimationSceneProxy;
-class vtkSMAnimationSceneWriterObserver;
+class vtkSMAnimationScene;
+class vtkSMProxy;
 
 class VTK_EXPORT vtkSMAnimationSceneWriter : public vtkSMObject
 {
@@ -33,10 +33,13 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Get/Set the animation scene that this writer will write.
-  virtual void SetAnimationScene(vtkSMAnimationSceneProxy*);
-  vtkGetObjectMacro(AnimationScene, vtkSMAnimationSceneProxy);
+  // Convenience method to set the proxy.
+  virtual void SetAnimationScene(vtkSMProxy*);
 
+  // Description:
+  // Get/Set the animation scene that this writer will write.
+  virtual void SetAnimationScene(vtkSMAnimationScene*);
+  vtkGetObjectMacro(AnimationScene, vtkSMAnimationScene);
 
   // Description:
   // Begin the saving. This will result in playing of the animation.
@@ -52,8 +55,8 @@ protected:
   vtkSMAnimationSceneWriter();
   ~vtkSMAnimationSceneWriter();
 
-  vtkSMAnimationSceneProxy* AnimationScene;
-  vtkSMAnimationSceneWriterObserver* Observer;
+  unsigned long ObserverID;
+  vtkSMAnimationScene* AnimationScene;
 
   // Description:
   // Subclasses should override this method.
@@ -70,11 +73,7 @@ protected:
   // Called to finalize saving.
   virtual bool SaveFinalize() = 0;
 
-  //BTX
-  friend class vtkSMAnimationSceneWriterObserver;
   void ExecuteEvent(vtkObject* caller, unsigned long eventid, void* calldata);
-  //ETX
-
 
   // Flag indicating if we are currently saving.
   // Set on entering Save() and cleared before leaving Save().

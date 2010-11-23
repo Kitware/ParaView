@@ -192,6 +192,23 @@ void vtkSMAnimationScene::RemoveAllViewProxies()
 }
 
 //----------------------------------------------------------------------------
+unsigned int vtkSMAnimationScene::GetNumberOfViewProxies()
+{
+  return static_cast<unsigned int>(this->Internals->ViewModules.size());
+}
+
+//----------------------------------------------------------------------------
+vtkSMViewProxy* vtkSMAnimationScene::GetViewProxy(unsigned int cc)
+{
+  if (cc < this->GetNumberOfViewProxies())
+    {
+    return this->Internals->ViewModules[cc];
+    }
+
+  return NULL;
+}
+
+//----------------------------------------------------------------------------
 void vtkSMAnimationScene::TickInternal(
   double currenttime, double deltatime, double clocktime)
 {
@@ -221,6 +238,12 @@ void vtkSMAnimationScene::PrintSelf(ostream& os, vtkIndent indent)
 void vtkSMAnimationScene::SetLoop(int val)
 {
   this->AnimationPlayer->SetLoop(val);
+}
+
+//----------------------------------------------------------------------------
+int vtkSMAnimationScene::GetLoop()
+{
+  return this->AnimationPlayer->GetLoop();
 }
 
 //----------------------------------------------------------------------------

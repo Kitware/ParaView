@@ -47,11 +47,13 @@ SET (Kit_SRCS
   vtkPVKeyFrameAnimationCueForProxies.cxx
 # --- SM Objects ---
   vtkSMAnimationScene.cxx
+  vtkSMAnimationSceneImageWriter.cxx
+  vtkSMAnimationSceneWriter.cxx
   vtkSMBoxRepresentationProxy.cxx
-  vtkSMCameraLink.cxx
-  vtkSMCameraProxy.cxx
   vtkSMCameraConfigurationReader.cxx
   vtkSMCameraConfigurationWriter.cxx
+  vtkSMCameraLink.cxx
+  vtkSMCameraProxy.cxx
   vtkSMChartRepresentationProxy.cxx
   vtkSMCompoundSourceProxy.cxx
   vtkSMCompoundSourceProxyDefinitionBuilder.cxx
@@ -167,11 +169,6 @@ SET(Kit_SRCS
   #vtkSMApplication.cxx ----- Get the configuration parsing stuff -----
 
   vtkSMAnimationSceneGeometryWriter.cxx
-  vtkSMAnimationSceneImageWriter.cxx
-
-  vtkSMAnimationSceneWriter.cxx
-
-
 
   vtkSMCameraManipulatorProxy.cxx
   #vtkSMCaveRenderModuleProxy.cxx
@@ -256,15 +253,16 @@ SET_SOURCE_FILES_PROPERTIES(
   vtkInitializationHelper.cxx
   vtkPMObject.cxx
   vtkPMVectorProperty.cxx
+  vtkSMAnimationSceneWriter.cxx
   vtkSMDomain.cxx
+  vtkSMExporterProxy.cxx
   vtkSMLink.cxx
+  vtkSMPropertyHelper.cxx
   vtkSMRemoteObject.cxx
   vtkSMSession.cxx
-  vtkSMVectorProperty.cxx
-  vtkSMPropertyHelper.cxx
   vtkSMStateVersionControllerBase.cxx
   vtkSMUndoElement.cxx
-  vtkSMExporterProxy.cxx
+  vtkSMVectorProperty.cxx
   ABSTRACT
   )
 
@@ -274,13 +272,8 @@ SET_SOURCE_FILES_PROPERTIES(
 
 IF (FIXME) #-------------------------------------------------------------- BEGIN
 SET_SOURCE_FILES_PROPERTIES(
-  vtkSMAnimationSceneWriter.cxx
   vtkSMClientServerRenderSyncManagerHelper.cxx
-  vtkSMInformationHelper.cxx
-  vtkSMLink.cxx
   vtkSMProxyManagerReviver.cxx
-  vtkSMStateVersionControllerBase.cxx
-  vtkSMStateVersionControllerBase.cxx
   ABSTRACT
   )
 
