@@ -16,14 +16,15 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkSpyPlotHistoryReaderPrivate.h"
 
 #include "vtkDoubleArray.h"
-#include "vtkObjectFactory.h"
-#include "vtkStringArray.h"
-#include "vtkSmartPointer.h"
+#include "vtkFieldData.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
+#include "vtkObjectFactory.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
+#include "vtkStringArray.h"
 #include "vtkTable.h"
 #include "vtkVariant.h"
+#include "vtkVariantArray.h"
 
 #include <vtkstd/map>
 #include <vtkstd/vector>
@@ -49,13 +50,25 @@ public:
   ~MetaInfo()
     {
     }
+
+  //rough bidirectional map of header index for time
   std::map<std::string,int> metaIndexes;
   std::map<int,std::string> metaLookUp;
+
+  //maps col index to which row it starts
   std::map<int,int> headerRowToIndex;
 
-  std::vector<TimeStep> timeSteps;
-  std::string header;
+  //maps the names for each col in the header
+  //presumption is that all points are continous
+  //and the properties are in the same order for each point
+  std::vector<std::string> header;
 
+  //maps col index to field property names
+  std::map<int,std::string> FieldIndexesToNames;
+
+
+  //lookup table of time info to file position
+  std::vector<TimeStep> timeSteps;
 };
 
 //-----------------------------------------------------------------------------
@@ -108,14 +121,8 @@ int vtkSpyPlotHistoryReader::RequestInformation(vtkInformation *request,
     getline(file_stream,line);
 
     //skip any line that starts with a comment
-    if (line[0] == this->CommentCharacter[0])
+    if (line[0] == this->CommentCharacter[0] || line.size() <= 1)
       {
-      std::cout << "skip line" << std::endl;
-      continue;
-      }
-    if ( line.size() <= 1)
-      {
-      std::cout << "skipping empty line" << std::endl;
       continue;
       }
     if (row==0)
@@ -128,7 +135,8 @@ int vtkSpyPlotHistoryReader::RequestInformation(vtkInformation *request,
       //now convert this line into a table
       //we are going to have to reduce the header collection
       this->Info->header = createTableLayoutFromHeader(
-          line,this->Delimeter[0],this->Info->headerRowToIndex);
+          line,this->Delimeter[0],this->Info->headerRowToIndex,
+          this->Info->FieldIndexesToNames);
 
       //skip the next line it is junk info
       //this needs to be smarter and optional
@@ -155,7 +163,6 @@ int vtkSpyPlotHistoryReader::RequestInformation(vtkInformation *request,
     for (int i=0; i < size; ++i)
       {
       times[i] = this->Info->timeSteps[i].time;
-      std::cout << "row: " << i << ":-:" << this->Info->timeSteps[i].time << std::endl;
       }
 
     //set the time range
@@ -175,7 +182,7 @@ int vtkSpyPlotHistoryReader::RequestInformation(vtkInformation *request,
 }
 
 
-//-----------------------------------------------------------------------------
+//-------- ---------------------------------------------------------------------
 int vtkSpyPlotHistoryReader::RequestData(
   vtkInformation *request,
   vtkInformationVector **vtkNotUsed(inputVector),
@@ -188,7 +195,6 @@ int vtkSpyPlotHistoryReader::RequestData(
   double* steps =
     outInfo->Get(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
 
-  double TimeStepValue = 0;
   unsigned int TimeIndex = 0;
   // Check if a particular time was requested by the pipeline.
   // This overrides the ivar.
@@ -230,15 +236,38 @@ int vtkSpyPlotHistoryReader::RequestData(
 
   int numCols = output->GetNumberOfColumns();
   std::vector<std::string>::const_iterator it(items.begin());
-  it += this->Info->headerRowToIndex[0];
 
-  for (size_t i= 0; i < numRows; ++i)
+  //add all field properties before points
+  int index = 0;
+  size_t i=0,j=0;
+  while(it != items.end())
     {
-    for(size_t j=0; j < numCols; ++j)
+    if (index == this->Info->headerRowToIndex[i])
       {
-      output->SetValue(i,j,vtkVariant(*it));
-      ++it;
+      for(j=0; j < numCols; ++j)
+        {
+        output->SetValue(i,j,vtkVariant(*it));
+        ++it;
+        ++index;
+        }
+      ++i;
+      std::cout << this->Info->headerRowToIndex[i] << ", " << index << std::endl;
+      continue;
       }
+    else if (this->Info->FieldIndexesToNames.find(index) !=
+             this->Info->FieldIndexesToNames.end())
+      {
+      //we have field data
+      vtkVariantArray *fieldData = vtkVariantArray::New();
+      fieldData->SetName(
+          (this->Info->FieldIndexesToNames[index]).c_str());
+      fieldData->SetNumberOfTuples(1);
+      fieldData->SetValue(0,vtkVariant(*it));
+      output->GetFieldData()->AddArray(fieldData);
+      fieldData->FastDelete();
+      }
+    ++it;
+    ++index;
     }
 
   file_stream.close();
@@ -249,15 +278,12 @@ int vtkSpyPlotHistoryReader::RequestData(
 void vtkSpyPlotHistoryReader::ConstructTableColumns(
   vtkTable *table)
 {
-  std::vector<std::string> colNames;
-  std::vector<std::string>::const_iterator colIt;
-  colNames.reserve(this->Info->header.size()/2);
-  split(this->Info->header,this->Delimeter[0],colNames);
+  std::vector<std::string>::const_iterator hIt;
 
-  for(colIt = colNames.begin();colIt != colNames.end(); ++colIt)
+  for(hIt = this->Info->header.begin();hIt != this->Info->header.end(); ++hIt)
     {
     vtkStringArray *col = vtkStringArray::New();
-    col->SetName((*colIt).c_str());
+    col->SetName((*hIt).c_str());
     table->AddColumn(col);
     col->FastDelete();
     }

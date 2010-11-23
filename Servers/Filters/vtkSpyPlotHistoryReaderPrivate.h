@@ -157,15 +157,20 @@ void getTimeStepInfo(const std::string &s, const char &delim,
   }
 
   //========================================================================
-  std::string createTableLayoutFromHeader(std::string &header, const char& delim, std::map<int,int> &headerRowToIndex)
+  std::vector<std::string> createTableLayoutFromHeader(std::string &header,
+                    const char& delim, std::map<int,int> &headerRowToIndex,
+                    std::map<int,std::string> fieldCols)
   {
-    std::string newHeader;
-    //the single presumption we have is that all the properties for a
-    //point is continous in the header
+    //the single presumption we have is that all the properties points
+    //are continous in the header
     std::vector<std::string> cols;
     cols.reserve(header.size());
     split(header,delim,cols);
     std::vector<std::string>::const_iterator it;
+
+    //setup the size of the new header
+    std::vector<std::string> newHeader;
+    newHeader.reserve(cols.size());
 
     //find the first "." variable
     bool foundStart = false;
@@ -178,9 +183,15 @@ void getTimeStepInfo(const std::string &s, const char &delim,
         {
         foundStart = true;
         rowNumber = rowFromHeaderCol(*it);
-        newHeader += nameFromHeaderCol(*it) + ",";
-        headerRowToIndex[row++]=index;
+        newHeader.push_back(nameFromHeaderCol(*it));
+        std::cout << "first row starts at " << index << std::endl;
+        headerRowToIndex[row++]=index++;
         break;
+        }
+      else
+        {
+        //this is a field property
+        fieldCols[index]=nameFromHeaderCol(*it);
         }
       ++index;
       }
@@ -193,21 +204,29 @@ void getTimeStepInfo(const std::string &s, const char &delim,
     //and the names of each variable. This way we know how
     //many rows to have in our new table
     ++it;
+    ++index;
     int numberOfCols = 0;
     while(rowFromHeaderCol(*it)==rowNumber)
       {
-      newHeader += nameFromHeaderCol(*it) + ",";
+      newHeader.push_back(nameFromHeaderCol(*it));
       ++index;
       ++it;
       ++numberOfCols;
       }
-    newHeader = newHeader.substr(0,newHeader.size()-1);
-    ++it;
+    std::cout << "numberOfCols " << numberOfCols << std::endl;
     while(it != cols.end() && rowFromHeaderCol(*it) != "")
       {
+      std::cout << row+1 << " row starts at " << index << std::endl;
       headerRowToIndex[row++]=index;
       index += numberOfCols;
       it += numberOfCols;
+      }
+    while(it != cols.end())
+      {
+      //this is a field property
+      fieldCols[index]=nameFromHeaderCol(*it);
+      ++it;
+      ++index;
       }
     return newHeader;
   }
