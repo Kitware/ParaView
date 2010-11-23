@@ -46,6 +46,7 @@ SET (Kit_SRCS
   vtkPMWriterProxy.cxx
   vtkPVKeyFrameAnimationCueForProxies.cxx
 # --- SM Objects ---
+  vtkSMAnimationScene.cxx
   vtkSMBoxRepresentationProxy.cxx
   vtkSMCameraLink.cxx
   vtkSMCameraProxy.cxx

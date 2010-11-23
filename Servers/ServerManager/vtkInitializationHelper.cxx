@@ -65,6 +65,7 @@ extern "C" void vtkWidgetsCS_Initialize(vtkClientServerInterpreter*);
 extern "C" void vtkParallelCS_Initialize(vtkClientServerInterpreter*);
 extern "C" void vtkPVServerCommonCS_Initialize(vtkClientServerInterpreter*);
 extern "C" void vtkPVFiltersCS_Initialize(vtkClientServerInterpreter*);
+extern "C" void vtkPVServerManager_Initialize(vtkClientServerInterpreter*);
 extern "C" void vtkXdmfCS_Initialize(vtkClientServerInterpreter *);
 
 //----------------------------------------------------------------------------
@@ -190,5 +191,6 @@ void vtkInitializationHelperInit(vtkClientServerInterpreter* interp)
   vtkPVServerCommonCS_Initialize(interp);
   vtkPVFiltersCS_Initialize(interp);
   vtkXdmfCS_Initialize(interp);
+  vtkPVServerManager_Initialize(interp);
 #endif
 }
