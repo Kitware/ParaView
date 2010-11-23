@@ -52,6 +52,15 @@ public:
   // Set the interactivity.
   void SetInteractivity(bool);
 
+  // Description:
+  // vtkAlgorithm::ProcessRequest() equivalent for rendering passes. This is
+  // typically called by the vtkView to request meta-data from the
+  // representations or ask them to perform certain tasks e.g.
+  // PrepareForRendering.
+  int ProcessViewRequest(
+    vtkInformationRequestKey* request_type,
+    vtkInformation* inInfo, vtkInformation* outInfo);
+
 //BTX
 protected:
   vtkTextSourceRepresentation();
