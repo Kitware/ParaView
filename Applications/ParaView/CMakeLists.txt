@@ -1,17 +1,7 @@
-# VRPN
-find_path(VRPN_INCLUDE_DIR vrpn_Tracker.h)
-find_library(VRPN_LIBRARY vrpm)
-
-message("VRPN_INCLUDE_DIR=${VRPN_INCLUDE_DIR}")
-message("VRPN_LIBRARY=${VRPN_LIBRARY}")
-
 #------------------------------------------------------------------------------
 # Add extra library containing custom code for the client.
 QT4_WRAP_CPP(MOC_BUILT_SOURCES
-  ParaViewMainWindow.h
-  ParaViewVRPN.h
-  ParaViewVRUI.h
-  vruiThread.h)
+  ParaViewMainWindow.h)
 
 QT4_WRAP_UI(UI_BUILT_SOURCES
   ParaViewMainWindow.ui
@@ -27,24 +17,11 @@ INCLUDE(${QT_USE_FILE})
 
 INCLUDE_DIRECTORIES(
   ${CMAKE_CURRENT_BINARY_DIR}
-  ${CMAKE_CURRENT_BINARY_DIR}
-  ${VRPN_INCLUDE_DIR})
+  ${CMAKE_CURRENT_BINARY_DIR})
 
 SET(ParaView_SOURCE_FILES
   ParaViewMainWindow.cxx
   ParaViewMainWindow.h
-  ParaViewVRPN.cxx
-  ParaViewVRPN.h
-  ParaViewVRUI.cxx
-  ParaViewVRUI.h
-  vruiPipe.cxx
-  vruiPipe.h
-  vruiServerState.cxx
-  vruiServerState.h
-  vruiThread.cxx
-  vruiThread.h
-  vruiTrackerState.cxx
-  vruiTrackerState.h
   ${MOC_BUILT_SOURCES}
   ${UI_BUILT_SOURCES})
 
@@ -91,9 +68,7 @@ build_paraview_client(paraview
     COMPRESSED_HELP_FILE "${ParaView_BINARY_DIR}/Documentation/paraview.qch"
     SOURCES ${ParaView_SOURCE_FILES}
     INSTALL_BIN_DIR "${PV_INSTALL_BIN_DIR}"
-    INSTALL_LIB_DIR "${PV_INSTALL_LIB_DIR}"
-    EXTRA_DEPENDENCIES "${VRPN_LIBRARY}"
-)
+    INSTALL_LIB_DIR "${PV_INSTALL_LIB_DIR}")
 
 # Configure the ".plugins" configuration xml for making paraview aware of the
 # distributed plugins.
