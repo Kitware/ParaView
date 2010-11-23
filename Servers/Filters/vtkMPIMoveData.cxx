@@ -896,15 +896,15 @@ void vtkMPIMoveData::DataServerSendToClient(vtkDataObject* output)
     if (this->DeliverOutlineToClient)
       {
       // reduce data using outline filter.
-      if (output->IsA("vtkPolyData"))
+      if (output->IsA("vtkPolyData") || output->IsA("vtkMultiBlockDataSet"))
         {
-        vtkDataSet* clone = vtkPolyData::SafeDownCast(output)->NewInstance();
+        vtkDataObject* clone = output->NewInstance();
         clone->ShallowCopy(output);
 
         vtkOutlineFilter* filter = vtkOutlineFilter::New();
         filter->SetInput(clone);
         filter->Update();
-        tosend = filter->GetOutput();
+        tosend = filter->GetOutputDataObject(0);
         filter->Delete();
         clone->Delete();
         }
