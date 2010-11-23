@@ -184,8 +184,7 @@ void getTimeStepInfo(const std::string &s, const char &delim,
         foundStart = true;
         rowNumber = rowFromHeaderCol(*it);
         newHeader.push_back(nameFromHeaderCol(*it));
-        std::cout << "first row starts at " << index << std::endl;
-        headerRowToIndex[row++]=index++;
+        headerRowToIndex[row++]=index;
         break;
         }
       else
@@ -203,9 +202,9 @@ void getTimeStepInfo(const std::string &s, const char &delim,
     //now track the number of variables we have,
     //and the names of each variable. This way we know how
     //many rows to have in our new table
-    ++it;
     ++index;
-    int numberOfCols = 0;
+    ++it;
+    int numberOfCols = 1;
     while(rowFromHeaderCol(*it)==rowNumber)
       {
       newHeader.push_back(nameFromHeaderCol(*it));
@@ -213,10 +212,8 @@ void getTimeStepInfo(const std::string &s, const char &delim,
       ++it;
       ++numberOfCols;
       }
-    std::cout << "numberOfCols " << numberOfCols << std::endl;
     while(it != cols.end() && rowFromHeaderCol(*it) != "")
       {
-      std::cout << row+1 << " row starts at " << index << std::endl;
       headerRowToIndex[row++]=index;
       index += numberOfCols;
       it += numberOfCols;

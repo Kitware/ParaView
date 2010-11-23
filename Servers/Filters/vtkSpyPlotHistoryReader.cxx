@@ -251,7 +251,6 @@ int vtkSpyPlotHistoryReader::RequestData(
         ++index;
         }
       ++i;
-      std::cout << this->Info->headerRowToIndex[i] << ", " << index << std::endl;
       continue;
       }
     else if (this->Info->FieldIndexesToNames.find(index) !=
@@ -262,6 +261,7 @@ int vtkSpyPlotHistoryReader::RequestData(
       fieldData->SetName(
           (this->Info->FieldIndexesToNames[index]).c_str());
       fieldData->SetNumberOfTuples(1);
+      cout << this->Info->FieldIndexesToNames[index] << "value should be: " << *it << std::endl;
       fieldData->SetValue(0,vtkVariant(*it));
       output->GetFieldData()->AddArray(fieldData);
       fieldData->FastDelete();
