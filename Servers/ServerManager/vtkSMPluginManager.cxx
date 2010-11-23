@@ -32,6 +32,7 @@
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyManager.h"
+#include "vtkSMProxyDefinitionManager.h"
 #include "vtkSMStringVectorProperty.h"
 #include "vtkSMXMLParser.h"
 #include "vtkStringArray.h"
@@ -474,7 +475,8 @@ void vtkSMPluginManager::ProcessPluginSMXML(vtkStringArray* smXMLArray)
    
   for(vtkIdType i = 0; i < smXMLArray->GetNumberOfTuples(); i++)
     {
-    vtkSMObject::GetProxyManager()->LoadConfigurationXML(smXMLArray->GetValue(i).c_str());
+    vtkSMObject::GetProxyManager()->GetProxyDefinitionManager()
+        ->LoadConfigurationXMLFromString(smXMLArray->GetValue(i).c_str());
     }
 }
 

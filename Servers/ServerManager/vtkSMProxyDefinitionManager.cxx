@@ -690,6 +690,23 @@ bool vtkSMProxyDefinitionManager::LoadConfigurationXML(const char* filename)
     }
 }
 //---------------------------------------------------------------------------
+bool vtkSMProxyDefinitionManager::LoadConfigurationXMLFromString(const char* xmlContent)
+{
+  vtkPVXMLParser* parser = vtkPVXMLParser::New();
+  if(parser->Parse(xmlContent))
+    {
+    this->LoadConfigurationXML(parser->GetRootElement());
+    parser->Delete();
+    return true;
+    }
+  else
+    {
+    parser->Delete();
+    return false;
+    }
+}
+
+//---------------------------------------------------------------------------
 bool vtkSMProxyDefinitionManager::LoadConfigurationXML(vtkPVXMLElement* root)
 {
     if(!root)

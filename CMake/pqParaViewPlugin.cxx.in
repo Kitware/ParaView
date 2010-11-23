@@ -36,7 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //-----------------------------------------------------------------------------
 #ifdef plugin_type_servermanager
 # ifdef INITIALIZE_WRAPPING
-#  include "vtkProcessModule.h"
+#  include "vtkClientServerInterpreterInitializer.h"
 #  include "vtkClientServerInterpreter.h"
 
 extern "C" void @PLUGIN_NAME@_Initialize(vtkClientServerInterpreter *arlu);
@@ -57,7 +57,7 @@ extern "C" void @PLUGIN_NAME@_Initialize(vtkClientServerInterpreter *arlu);
 
 //-----------------------------------------------------------------------------
 #ifdef plugin_type_servermanager
-vtkProcessModule::InterpreterInitializationCallback 
+vtkClientServerInterpreterInitializer::InterpreterInitializationCallback
 @PLUGIN_NAME@_Plugin::GetInitializeInterpreterCallback()
 {
 # ifdef INITIALIZE_WRAPPING

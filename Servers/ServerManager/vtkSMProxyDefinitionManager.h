@@ -113,6 +113,7 @@ public:
   // Loads server-manager configuration xml.
   bool LoadConfigurationXML(const char* filename);
   bool LoadConfigurationXML(vtkPVXMLElement* root);
+  bool LoadConfigurationXMLFromString(const char* xmlContent);
 
   // Description
   // Return a new configured iterator for traversing a set of proxy definition

@@ -1,4 +1,8 @@
 --------------------------------------------------------------------------------
+Plugin that use SMProxy have to be linked with the Protobuf library
+
+
+--------------------------------------------------------------------------------
 virtual vtkSMObject* vtkSMOutputPort::GetDataObjectProxy(int recheck) is no
 longer available. Do we need it?
 

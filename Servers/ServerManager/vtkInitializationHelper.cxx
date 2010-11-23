@@ -22,7 +22,7 @@ PURPOSE.  See the above copyright notice for more information.
  */
 
 #include "vtkCommonInstantiator.h"
-#include "vtkFilteringInstantiator.h" // MANDATORY gives rutime problems otherwise
+#include "vtkFilteringInstantiator.h" // MANDATORY gives runtime problems otherwise
 #include "vtkGenericFilteringInstantiator.h"
 #include "vtkIOInstantiator.h"
 #include "vtkImagingInstantiator.h"

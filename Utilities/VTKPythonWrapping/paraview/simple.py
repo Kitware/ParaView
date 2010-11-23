@@ -52,23 +52,23 @@ def Connect(ds_host=None, ds_port=11111, rs_host=None, rs_port=11111):
     > Connect("amber", 12345) # Connect to a single server at port 12345
     > Connect("amber", 11111, "vis_cluster", 11111) # connect to data server, render server pair"""
     _disconnect()
-    cid = servermanager.Connect(ds_host, ds_port, rs_host, rs_port)
+    session = servermanager.Connect(ds_host, ds_port, rs_host, rs_port)
     tk =  servermanager.misc.TimeKeeper()
     servermanager.ProxyManager().RegisterProxy("timekeeper", "tk", tk)
     scene = AnimationScene()
     scene.TimeKeeper = tk
-    return cid
+    return session
 
 def ReverseConnect(port=11111):
     """Create a reverse connection to a server.  Listens on port and waits for
     an incoming connection from the server."""
     _disconnect()
-    cid = servermanager.ReverseConnect(port)
+    session = servermanager.ReverseConnect(port)
     tk =  servermanager.misc.TimeKeeper()
     servermanager.ProxyManager().RegisterProxy("timekeeper", "tk", tk)
     scene = AnimationScene()
     scene.TimeKeeper = tk
-    return cid
+    return session
 
 def _create_view(view_xml_name):
     "Creates and returns a 3D render view."
