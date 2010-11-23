@@ -107,9 +107,16 @@ message ProxyManagerState
 
 message ProxyDefinitionState
 {
+  message ProxyXMLDefinition
+    {
+    required string group = 1;
+    required string name  = 2;
+    required string xml   = 3;
+    }
+
   extend Message {
-    repeated string xml_definition_proxy        = 31;
-    repeated string xml_custom_definition_proxy = 32;
+    repeated ProxyXMLDefinition xml_definition_proxy        = 31;
+    repeated ProxyXMLDefinition xml_custom_definition_proxy = 32;
   }
 }
 

@@ -34,6 +34,10 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
+  // Return the url used to connect the current session to a server
+  virtual const char* GetURI() {return this->URI;};
+
+  // Description:
   // Connects a remote server. URL can be of the following format:
   // cs://<pvserver-host>:<pvserver-port>
   // cdsrs://<pvdataserver-host>:<pvdataserver-port>/<pvrenderserver-host>:<pvrenderserver-port>
@@ -126,7 +130,10 @@ protected:
   vtkPVServerInformation* DataServerInformation;
   vtkPVServerInformation* RenderServerInformation;
 
+  vtkSetStringMacro(URI);
+
   bool AbortConnect;
+  char* URI;
 private:
   vtkSMSessionClient(const vtkSMSessionClient&); // Not implemented
   void operator=(const vtkSMSessionClient&); // Not implemented

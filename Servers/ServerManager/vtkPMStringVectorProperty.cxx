@@ -47,7 +47,7 @@ bool vtkPMStringVectorProperty::Push(vtkSMMessage* message, int offset)
   values.resize(num_elems);
   for (int cc=0; cc < num_elems; cc++)
     {
-    values[cc] = variant->txt(cc);
+    values[cc] = variant->txt(cc).c_str();
     }
   return this->Push(values);
 }
@@ -198,6 +198,7 @@ bool vtkPMStringVectorProperty::Push(const vtkstd::vector<vtkstd::string> &value
       stream << vtkClientServerStream::End;
       }
     }
+
   return this->ProcessMessage(stream);
 }
 

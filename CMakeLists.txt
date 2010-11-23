@@ -325,9 +325,7 @@ SET(PARAVIEW_SMTESTDRIVER_EXECUTABLE  ${EXECUTABLE_OUTPUT_PATH}/smTestDriver${PV
 # release/debug configuration gets considered.
 GET_TARGET_PROPERTY(PARAVIEW_PROCESS_XML_EXECUTABLE kwProcessXML LOCATION)
 
-IF (FIXME)
 ADD_SUBDIRECTORY(Plugins)
-ENDIF (FIXME)
 
 #########################################################################
 IF (PARAVIEW_BUILD_QT_GUI)

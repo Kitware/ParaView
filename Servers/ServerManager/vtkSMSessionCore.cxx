@@ -267,6 +267,13 @@ void vtkSMSessionCore::PushStateInternal(vtkSMMessage* message)
   // 10 are the reserved area for non proxy object that must be shared
   if(globalId < 10)
     {
+    // Special ParaView specific main components
+    switch(globalId)
+      {
+      case 1: // ProxyManager
+        // TODO - FIXME: Forward registration proxy to other clients...
+        break;
+      }
     return;
     }
   // FIXME ----------------------------------------------------------
@@ -391,9 +398,21 @@ void vtkSMSessionCore::PullState(vtkSMMessage* message)
     << message->DebugString().c_str());
 
   vtkPMObject* obj;
-  if(true &&  // FIXME make sure that the PMObject should be created here
-     (obj = this->Internals->GetPMObject(message->global_id())))
+
+  if(message->global_id() < 10)
     {
+    // Special ParaView specific main components
+    switch(message->global_id())
+      {
+      case 1: // ProxyManager
+        this->GetProxyDefinitionManager()->GetXMLDefinitionState(message);
+        break;
+      }
+    }
+  else if(true &&  // FIXME make sure that the PMObject should be created here
+          (obj = this->Internals->GetPMObject(message->global_id())))
+    {
+    // Generic PMObject
     obj->Pull(message);
     }
 

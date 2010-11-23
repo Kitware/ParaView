@@ -28,6 +28,9 @@
 #include "vtkStdString.h"
 #include "vtkStringList.h"
 
+#include "vtkSMMessage.h"
+#include "vtkProcessModule.h"
+
 // #include "vtkSMProxyManager.h" // FIXME <===========================================================================
 #include <vtkstd/map>
 #include <vtkstd/set>
@@ -53,6 +56,12 @@ public:
   StrToStrToXmlMap CoreDefinitions;
   // Keep track of custom definition
   StrToStrToXmlMap CustomsDefinitions;
+  //-------------------------------------------------------------------------
+  void Clear()
+    {
+    this->CoreDefinitions.clear();
+    this->CustomsDefinitions.clear();
+    }
   //-------------------------------------------------------------------------
   bool HasCoreDefinition( const char* groupName, const char* proxyName)
   {
@@ -202,6 +211,7 @@ public:
         }
       }
     }
+
 };
 //****************************************************************************/
 class vtkInternalDefinitionIterator : public vtkSMProxyDefinitionIterator
@@ -895,5 +905,85 @@ void vtkSMProxyDefinitionManager::MergeProxyDefinition(vtkPVXMLElement* element,
         vtkSmartPointer<vtkPVXMLElement>::New();
     child->Copy(newElement);
     elementToFill->AddNestedElement(newElement);
+    }
+}
+
+//---------------------------------------------------------------------------
+void vtkSMProxyDefinitionManager::GetXMLDefinitionState(vtkSMMessage* msg)
+{
+  // Setup required message header
+  msg->Clear();
+  msg->set_global_id(1);
+  msg->set_location(vtkProcessModule::DATA_SERVER);
+
+  // FIXME: This is made in a naive way, but we are sure that at each request
+  // we have the correct and latest definition available.
+  // This is not the most efficient way to do it. But optimistation should come
+  // after. And for now, it is the less intrusive way to deal with server
+  // XML definition centralisation state.
+  ProxyDefinitionState_ProxyXMLDefinition *xmlDef;
+  vtkSMProxyDefinitionIterator* iter;
+
+  // Core Definition
+  iter = this->NewIterator(1);
+  iter->GoToFirstItem();
+  while( !iter->IsDoneWithTraversal() )
+    {
+    vtkstd::ostringstream xmlContent;
+    iter->GetProxyDefinition()->PrintXML(xmlContent, vtkIndent());
+
+    xmlDef = msg->AddExtension(ProxyDefinitionState::xml_definition_proxy);
+    xmlDef->set_group(iter->GetGroupName());
+    xmlDef->set_name(iter->GetProxyName());
+    xmlDef->set_xml(xmlContent.str());
+
+    iter->GoToNextItem();
+    }
+  iter->Delete();
+
+  // Custome Definition
+  iter = this->NewIterator(2);
+  iter->GoToFirstItem();
+  while( !iter->IsDoneWithTraversal() )
+    {
+    vtkstd::ostringstream xmlContent;
+    iter->GetProxyDefinition()->PrintXML(xmlContent, vtkIndent());
+
+    xmlDef = msg->AddExtension(ProxyDefinitionState::xml_custom_definition_proxy);
+    xmlDef->set_group(iter->GetGroupName());
+    xmlDef->set_name(iter->GetProxyName());
+    xmlDef->set_xml(xmlContent.str());
+
+    iter->GoToNextItem();
+    }
+  iter->Delete();
+}
+//---------------------------------------------------------------------------
+void vtkSMProxyDefinitionManager::LoadXMLDefinitionState(vtkSMMessage* msg)
+{
+  // Init and local vars
+  this->Internals->Clear();
+  this->InternalsFlatten->Clear();
+  vtkPVXMLParser *parser = vtkPVXMLParser::New();
+
+  // Fill the definition with the content of the state
+  int size = msg->ExtensionSize(ProxyDefinitionState::xml_definition_proxy);
+  const ProxyDefinitionState_ProxyXMLDefinition *xmlDef;
+  for(int i=0; i < size; i++)
+    {
+    xmlDef = &msg->GetExtension(ProxyDefinitionState::xml_definition_proxy, i);
+    parser->Parse(xmlDef->xml().c_str());
+    this->AddElement( xmlDef->group().c_str(), xmlDef->name().c_str(),
+                      parser->GetRootElement());
+    }
+
+  // Manage custom ones
+  size = msg->ExtensionSize(ProxyDefinitionState::xml_custom_definition_proxy);
+  for(int i=0; i < size; i++)
+    {
+    xmlDef = &msg->GetExtension(ProxyDefinitionState::xml_custom_definition_proxy, i);
+    parser->Parse(xmlDef->xml().c_str());
+    this->AddCustomProxyDefinition( xmlDef->group().c_str(), xmlDef->name().c_str(),
+                                    parser->GetRootElement());
     }
 }

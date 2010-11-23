@@ -74,6 +74,8 @@ SET (Kit_SRCS
   vtkSMOrderedPropertyIterator.cxx
   vtkSMOutputPort.cxx
   vtkSMParallelCoordinatesRepresentationProxy.cxx
+  vtkSMPluginManager.cxx
+  vtkSMPluginProxy.cxx
   vtkSMProperty.cxx
   vtkSMPropertyHelper.cxx
   vtkSMPropertyIterator.cxx
@@ -160,12 +162,12 @@ SET (Kit_SRCS
 IF (FIXME) #-------------------------------------------------------------- BEGIN
 SET(Kit_SRCS
 
+  #vtkSMApplication.cxx ----- Get the configuration parsing stuff -----
 
   vtkSMAnimationSceneGeometryWriter.cxx
   vtkSMAnimationSceneImageWriter.cxx
 
   vtkSMAnimationSceneWriter.cxx
-  vtkSMApplication.cxx
 
 
 
@@ -196,10 +198,8 @@ SET(Kit_SRCS
 
   vtkSMLinearAnimationCueManipulatorProxy.cxx
 
-  vtkSMPQStateLoader.cxx
-  vtkSMPluginManager.cxx
-  vtkSMPluginProxy.cxx
-#  vtkSMPluginInformationHelper.cxx
+  # vtkSMPQStateLoader.cxx ---- Should be removed deprecated ----
+  # vtkSMPluginInformationHelper.cxx
   vtkSMPropertyAdaptor.cxx
   vtkSMPropertyModificationUndoElement.cxx#--------------------------------
 

@@ -24,6 +24,7 @@
 #define __vtkSMProxyDefinitionManager_h
 
 #include "vtkSMObject.h"
+#include "vtkSMMessage.h"
 
 class vtkPVXMLElement;
 class vtkSMProxyDefinitionIterator;
@@ -134,6 +135,9 @@ public:
                                                        int scope);
 
 //BTX
+
+  void GetXMLDefinitionState(vtkSMMessage* msg);
+  void LoadXMLDefinitionState(vtkSMMessage* msg);
 
 protected:
   vtkSMProxyDefinitionManager();

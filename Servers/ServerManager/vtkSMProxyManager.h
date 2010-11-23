@@ -62,6 +62,14 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
+  // This method will trigger a request on the server to fetch the XML proxy
+  // definition and load it localy so the client proxy will always have the
+  // exact same proxy definition as the server. This will be usefull for plugins
+  // to prevent specific client side loading even if no plugin client side code
+  // exist.
+  void LoadXMLDefinitionFromServer();
+
+  // Description:
   // Given a group and proxy name, create and return a proxy instance.
   // The user has to delete the proxy when done.
   // NOTE: If this method is called from a scripting language, it may

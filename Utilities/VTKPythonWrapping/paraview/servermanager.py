@@ -1554,10 +1554,11 @@ class ProxyManager(object):
         """Returns an iterator that can be used to iterate over
            all groups and types of proxies that the proxy manager
            can create."""
-        iter = ProxyDefinitionIterator()
+        iter = None
         if groupname != None:
-            iter.SetModeToOneGroup()
-            iter.Begin(groupname)
+            iter = ProxyDefinitionIterator(self.SMProxyManager.GetDefinitionManager().NewIterator(0))
+        else:
+            iter = ProxyDefinitionIterator(self.SMProxyManager.GetDefinitionManager().NewIterator(groupname, 0))
         return iter
 
     def __ConvertArgumentsAndCall(self, *args):
@@ -1641,8 +1642,8 @@ class ProxyDefinitionIterator(object):
        the python iterator protocol.
        See the doxygen documentation of the vtkSMProxyDefinitionIterator
        C++ class for more information."""
-    def __init__(self):
-        self.SMIterator = vtkSMProxyDefinitionIterator()
+    def __init__(self, iter):
+        self.SMIterator = iter
         self.Group = None
         self.Key = None
 
@@ -1654,9 +1655,9 @@ class ProxyDefinitionIterator(object):
             self.Group = None
             self.Key = None
             raise StopIteration
-        self.Group = self.SMIterator.GetGroup()
-        self.Key = self.SMIterator.GetKey()
-        self.SMIterator.Next()
+        self.Group = self.SMIterator.GetGroupName()
+        self.Key = self.SMIterator.GetProxyName()
+        self.SMIterator.GoToNextItem()
         return {"group": self.Group, "key":self.Key }
 
     def GetKey(self):
@@ -1722,57 +1723,6 @@ class ProxyIterator(object):
         return getattr(self.SMIterator, name)
 
 
-### These are methods to create a new connection.
-### One can connect to a server, (data-server,render-server)
-### or simply create a built-in connection.
-### Note: these are internal methods. Use Connect() instead.
-#def _connectServer(host, port, rc=False):
-#    """Connect to a host:port. Returns the connection object if successfully
-#    connected with the server. Internal method, use Connect() instead."""
-#    pm =  vtkProcessModule.GetProcessModule()
-#    if not rc:
-#        cid = pm.ConnectToRemote(host, port)
-#        if not cid:
-#            return None
-#        conn = Connection(cid)
-#    else:
-#        pm.AcceptConnectionsOnPort(port)
-#        print "Waiting for connection..."
-#        while True:
-#            cid = pm.MonitorConnections(10)
-#            if cid > 0:
-#                conn = Connection(cid)
-#                break
-#        pm.StopAcceptingAllConnections()
-#    conn.SetHost(host, port, None, None, rc)
-#    return conn
-
-#def _connectDsRs(ds_host, ds_port, rs_host, rs_port):
-#    """Connect to a dataserver at (ds_host:ds_port) and to a render server
-#    at (rs_host:rs_port).
-#    Returns the connection object if successfully connected
-#    with the server. Internal method, use Connect() instead."""
-#    pm =  vtkProcessModule.GetProcessModule()
-#    cid = pm.ConnectToRemote(ds_host, ds_port, rs_host, rs_port)
-#    if not cid:
-#        return None
-#    conn = Connection(cid)
-#    conn.SetHost(ds_host, ds_port, rs_host, rs_port)
-#    return conn
-
-#def _connectSelf():
-#    """Creates a new self connection.Internal method, use Connect() instead."""
-#    pm =  vtkProcessModule.GetProcessModule()
-#    pmOptions = pm.GetOptions()
-#    if pmOptions.GetProcessType() == 0x40: # PVBATCH
-#        return Connection(vtkProcessModuleConnectionManager.GetRootServerConnectionID())
-#    cid = pm.ConnectToSelf()
-#    if not cid:
-#        return None
-#    conn = Connection(cid)
-#    conn.SetHost("builtin", cid)
-#    return conn
-
 def SaveState(filename):
     """Given a state filename, saves the state of objects registered
     with the proxy manager."""
@@ -1798,7 +1748,7 @@ def LoadState(filename, session=None):
             view.GetRenderWindow().SetSize(view.ViewSize[0], \
                                            view.ViewSize[1])
 
-def Connect(ds_host=None, ds_port=11111, rs_host=None, rs_port=11111):
+def Connect(ds_host=None, ds_port=11111, rs_host=None, rs_port=22221):
     """
     Use this function call to create a new session. On success,
     it returns a vtkSMSession object that abstracts the connection.
@@ -1820,47 +1770,49 @@ def Connect(ds_host=None, ds_port=11111, rs_host=None, rs_port=11111):
     if ds_host == None:
         ActiveSession = vtkSMSession()
     elif rs_host == None:
-        ActiveSession = _connectServer(ds_host, ds_port)
+        ActiveSession = vtkSMClientSession()
+        ActiveSession.Connect("cs://" + ds_host + ":" + ds_port)
     else:
-        ActiveSession = _connectDsRs(ds_host, ds_port, rs_host, rs_port)
+        ActiveSession = vtkSMClientSession()
+        ActiveSession.Connect("cdsrs://" + ds_host + ":" + ds_port + "/" + rs_host + ":" + rs_port)
 
     vtkProcessModule.GetProcessModule().RegisterSession(ActiveSession)
     return ActiveSession
 
-#def ReverseConnect(port=11111):
-#    """
-#    Use this function call to create a new connection. On success,
-#    it returns a Connection object that abstracts the connection.
-#    Otherwise, it returns None.
-#    In reverse connection mode, the client waits for a connection
-#    from the server (client has to be started first). The server
-#    then connects to the client (run pvserver with -rc and -ch
-#    option).
-#    The optional port specified the port to listen to.
-#    """
-#    global ActiveConnection
-#    global fromGUI
-#    if fromGUI:
-#        raise RuntimeError, "Cannot create a connection through python. Use the GUI to setup the connection."
-#    connectionId = _connectServer("Reverse connection", port, True)
-#    if not ActiveConnection:
-#        ActiveConnection = connectionId
-#    return connectionId
+def ReverseConnect(port=11111):
+    """
+    Use this function call to create a new session. On success,
+    it returns a Session object that abstracts the connection.
+    Otherwise, it returns None.
+    In reverse connection mode, the client waits for a connection
+    from the server (client has to be started first). The server
+    then connects to the client (run pvserver with -rc and -ch
+    option).
+    The optional port specified the port to listen to.
+    """
+    global ActiveSession
+    global fromGUI
+    if fromGUI:
+        raise RuntimeError, "Cannot create a connection through python. Use the GUI to setup the connection."
+    session = vtkSMClientSession()
+    session.Connect("csrc://hostname:" + port)
+    if not ActiveConnection:
+        ActiveConnection = session
+    return session
 
-#def Disconnect(connection=None):
-#    """Disconnects the connection. Make sure to clear the proxy manager
-#    first."""
-#    global ActiveConnection
-#    global fromGUI
-#    if fromGUI:
-#        raise RuntimeError, "Cannot disconnect through python. Use the GUI to disconnect."
-#    if not connection or connection == ActiveConnection:
-#        connection = ActiveConnection
-#        ActiveConnection = None
-#    if connection:
-#        pm =  vtkProcessModule.GetProcessModule()
-#        pm.Disconnect(connection.ID)
-#    return
+def Disconnect(session=None):
+    """Disconnects the connection. Make sure to clear the proxy manager
+    first."""
+    global ActiveConnection
+    global fromGUI
+    if fromGUI:
+        raise RuntimeError, "Cannot disconnect through python. Use the GUI to disconnect."
+    if not session or session == ActiveConnection:
+        session = ActiveConnection
+        ActiveConnection = None
+    if session:
+        session.CloseSession()
+    return
 
 def CreateProxy(xml_group, xml_name, session=None):
     """Creates a proxy. If session is set, the proxy's session is
@@ -1884,20 +1836,18 @@ def GetRenderView(session=None):
     if not session:
         session = ActiveSession
     render_module = None
-    # FIXME ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-    #for aProxy in session.GetProxyManager().NewConnectionIterator(connection):
-    #    if aProxy.IsA("vtkSMRenderViewProxy"):
-    #        render_module = aProxy
-    #        break
+    for aProxy in session.GetProxyManager():
+        if aProxy.IsA("vtkSMRenderViewProxy"):
+            render_module = aProxy
+            break
     return render_module
 
 def GetRenderViews(session=None):
     """Returns the set of all render views."""
-    # FIXME +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     if not session:
         session = ActiveSession
     render_modules = []
-    for aProxy in ProxyManager().NewConnectionIterator(connection):
+    for aProxy in ProxyManager():
         if aProxy.IsA("vtkSMRenderViewProxy"):
             render_modules.append(aProxy)
     return render_modules
@@ -1967,9 +1917,6 @@ def CreateRepresentation(aProxy, view, **extraArgs):
         display.UnRegister(None)
     if not display:
         return None
-    # FIXME +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-    #display.SetConnectionID(aProxy.GetConnectionID())
-    # FIXME +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     extraArgs['proxy'] = display
     proxy = rendering.__dict__[display.GetXMLName()](**extraArgs)
     proxy.Input = aProxy
@@ -1999,45 +1946,44 @@ class _ModuleLoader(object):
 
 def LoadXML(xmlstring):
     """Given a server manager XML as a string, parse and process it."""
-    parser = vtkPVParser()
+    parser = vtkPVXMLParser()
     if not parser.Parse(xmlstring):
         raise RuntimeError, "Problem parsing XML string."
-    self.SMProxyManager.GetProxyDefinitionManager().LoadConfigurationXML(parser.GetRootElement())
+    ProxyManager().GetProxyDefinitionManager().LoadConfigurationXML(parser.GetRootElement())
     # Update the modules
     updateModules()
 
 
-# FIXME +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-#def LoadPlugin(filename,  remote=True, session=None):
-#    """ Given a filename and a session (optional, otherwise uses
-#    ActiveSession), loads a plugin. It then updates the sources,
-#    filters and rendering modules."""
-#
-#    if not session:
-#        session = ActiveSession
-#    if not session:
-#        raise RuntimeError, "Cannot load a plugin without a session."
-#
-#    pxm=ProxyManager()
-#    plm=pxm.GetApplication().GetPluginManager()
-#
-#    """ Load the plugin on server. """
-#    if remote:
-#      serverURI = connection.GetURI()
-#    else:
-#      serverURI = "builtin:"
-#
-#    plinfo = plm.LoadPlugin(filename, connection.ID, serverURI, remote)
-#
-#    if not plinfo or not plinfo.GetLoaded():
-#        # Assume that it is an xml file
-#        f = open(filename, 'r')
-#        try:
-#            LoadXML(f.read())
-#        except RuntimeError:
-#            raise RuntimeError, "Problem loading plugin %s: %s" % (filename, pld.GetProperty("Error").GetElement(0))
-#    else:
-#        updateModules()
+def LoadPlugin(filename,  remote=True, session=None):
+    """ Given a filename and a session (optional, otherwise uses
+    ActiveSession), loads a plugin. It then updates the sources,
+    filters and rendering modules."""
+    global PluginManager
+
+    if not session:
+        session = ActiveSession
+    if not session:
+        raise RuntimeError, "Cannot load a plugin without a session."
+    if not PluginManager:
+        PluginManager = vtkSMPluginManager()
+
+    """ Load the plugin on server. """
+    if remote:
+      serverURI = ActiveSession.GetURI()
+    else:
+      serverURI = "builtin:"
+
+    plinfo = PluginManager.LoadPlugin(filename, serverURI, remote)
+
+    if not plinfo or not plinfo.GetLoaded():
+        # Assume that it is an xml file
+        f = open(filename, 'r')
+        try:
+            LoadXML(f.read())
+        except RuntimeError:
+            raise RuntimeError, "Problem loading plugin %s: %s" % (filename, PluginManager.GetProperty("Error").GetElement(0))
+    else:
+        updateModules()
 
 
 def Fetch(input, arg1=None, arg2=None, idx=0):
@@ -2414,7 +2360,6 @@ def createModule(groupName, mdl=None):
         debug = True
         mdl = PVModule()
     numProxies = pxdm.GetNumberOfXMLProxies(groupName)
-    print "Number of proxies: ", numProxies
     for i in range(numProxies):
         proxyName = pxdm.GetXMLProxyName(groupName, i)
         proto = pxm.GetPrototypeProxy(groupName, proxyName)
@@ -2814,6 +2759,9 @@ ASSOCIATIONS = { 'POINTS' : 0, 'CELLS' : 1, 'VERTICES' : 4, 'EDGES' : 5, 'ROWS' 
 # Users can set the active session which will be used by API
 # to create proxies etc when no session argument is passed.
 ActiveSession = None
+
+# Users can access the plugin Manager
+PluginManager = None
 
 # Needs to be called when paraview module is loaded from python instead
 # of pvpython, pvbatch or GUI.

@@ -803,7 +803,7 @@
       </IntVectorProperty>
         
       <!-- end of TimeAnimationCue -->
-    </TimeAnimationCueProxy>
+    </Proxy>
 
     <!--Scene -->
     <AnimationSceneProxy name="AnimationScene" class="vtkPVAnimationScene">

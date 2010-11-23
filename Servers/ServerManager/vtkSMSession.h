@@ -41,6 +41,12 @@ public:
   virtual bool GetIsAlive() { return true; }
 
   // Description:
+  // Return the URL that define where the session is connected to.
+  // This can be used to id two remote sessions running in the same application
+  // But NOT the builtin ones.
+  virtual const char* GetURI() { return "builtin:"; }
+
+  // Description:
   // Returns a ServerFlags indicate the nature of the current processes. e.g. if
   // the current processes acts as a data-server and a render-server, it returns
   // DATA_SERVER | RENDER_SERVER.

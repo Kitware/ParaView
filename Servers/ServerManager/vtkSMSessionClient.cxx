@@ -46,6 +46,7 @@ vtkSMSessionClient::vtkSMSessionClient()
   // This session can only be created on the client.
   this->RenderServerController = NULL;
   this->DataServerController = NULL;
+  this->URI = NULL;
   this->AbortConnect = false;
 
   this->DataServerInformation = vtkPVServerInformation::New();
@@ -63,6 +64,7 @@ vtkSMSessionClient::~vtkSMSessionClient()
   this->SetDataServerController(0);
   this->DataServerInformation->Delete();
   this->RenderServerInformation->Delete();
+  this->SetURI(0);
 }
 
 //----------------------------------------------------------------------------
@@ -92,6 +94,7 @@ vtkMultiProcessController* vtkSMSessionClient::GetController(ServerFlags process
 //----------------------------------------------------------------------------
 bool vtkSMSessionClient::Connect(const char* url)
 {
+  this->SetURI(url);
   vtksys::RegularExpression pvserver("^cs://([^:]+)(:([0-9]+))?");
   vtksys::RegularExpression pvserver_reverse ("^csrc://([^:]+)?(:([0-9]+))?");
 
@@ -245,6 +248,13 @@ bool vtkSMSessionClient::Connect(const char* url)
     {
     this->SetupDataServerRenderServerConnection();
     }
+
+  // Make sure that the client as the server XML definition
+  if(success)
+    {
+    this->GetProxyManager()->LoadXMLDefinitionFromServer();
+    }
+
   return success;
 }
 

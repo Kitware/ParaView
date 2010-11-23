@@ -19,6 +19,7 @@
 #include "vtkProcessModule.h"
 #include "vtkPVPluginInformation.h"
 #include "vtkSMIntVectorProperty.h"
+#include "vtkSMStringVectorProperty.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMPluginProxy);
@@ -39,29 +40,22 @@ vtkSMPluginProxy::~vtkSMPluginProxy()
 //----------------------------------------------------------------------------
 vtkPVPluginInformation* vtkSMPluginProxy::Load(const char* filename)
 {
-  vtkSMIntVectorProperty* loadedProperty = 
-    vtkSMIntVectorProperty::SafeDownCast(
-      this->GetProperty("Loaded"));
-  if(!loadedProperty)
+  if(!this->GetProperty("Loaded"))
     {
     vtkErrorMacro("The plugin proxy don't have Loaded property!");
     return 0;
     }
-  vtkClientServerStream stream;
-  stream  << vtkClientServerStream::Invoke
-          << this->GetID()
-          << "SetFileName"
-          << filename
-          << vtkClientServerStream::End;
-          
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  pm->SendStream(this->ConnectionID, this->Servers, stream);
 
+  // Set Plugin filename
+  vtkSMStringVectorProperty* filenameProperty;
+  filenameProperty = vtkSMStringVectorProperty::SafeDownCast(this->GetProperty("FileName"));
+  filenameProperty->SetElement(0, filename);
+
+  // Make the network communication
+  this->UpdateVTKObjects();
   this->UpdatePropertyInformation();
+  this->GatherInformation(this->PluginInfo);
 
-  pm->GatherInformation(this->GetConnectionID(), this->Servers, 
-    this->PluginInfo, this->GetID());
-  
   return this->PluginInfo;
 }
 

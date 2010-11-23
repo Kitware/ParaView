@@ -51,15 +51,14 @@ public:
   // Method to load a plugin in server manager.
   // filename, the full path to the plugin; if only filename is passed in,
   //           we assume the server as "builtin" server.
-  // connectionId, the connection ID of the connection to the server
   // serverURI, the server URI in the format of "scheme://host:port"
   //            for buildin server, it will be "builtin:"
   // loadRemote, optional flag to specify whether this is to load plugin 
   //             on client side or on server side. 
   // Return a vtkPVPluginInformation object, if sucess; NULL, otherwise
-  vtkPVPluginInformation* LoadPlugin(
-    const char* filename, vtkIdType connectionId, const char* serverURI,
-    bool loadRemote = true );
+  vtkPVPluginInformation* LoadPlugin( const char* filename,
+                                      const char* serverURI,
+                                      bool loadRemote = true );
   vtkPVPluginInformation* LoadLocalPlugin(const char* filename);
   
   // Description:
@@ -69,7 +68,7 @@ public:
   
   // Description:
   // Get the plugin path that specified through some environmental varaibles.
-  const char* GetPluginPath(vtkIdType connectionId, const char* serverURI);    
+  const char* GetPluginPath(const char* serverURI);
   
   // Description:
   // Process the plugin information if it is loaded.

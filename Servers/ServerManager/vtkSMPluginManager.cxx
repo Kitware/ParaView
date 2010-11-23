@@ -244,15 +244,15 @@ vtkPVPluginInformation* vtkSMPluginManager::LoadLocalPlugin(const char* filename
 }
 
 //-----------------------------------------------------------------------------
-vtkPVPluginInformation* vtkSMPluginManager::LoadPlugin(
-  const char* filename, vtkIdType connectionId, const char* serverURI,
-  bool loadRemote)
+vtkPVPluginInformation* vtkSMPluginManager::LoadPlugin( const char* filename,
+                                                        const char* serverURI,
+                                                        bool loadRemote)
 { 
   if(!serverURI || !(*serverURI) || !filename || !(*filename))
     {
     return NULL;
     }
-    
+
   vtkPVPluginInformation* pluginInfo = this->FindPluginByFileName(
     serverURI, filename);
   if(pluginInfo && pluginInfo->GetLoaded())
@@ -262,19 +262,18 @@ vtkPVPluginInformation* vtkSMPluginManager::LoadPlugin(
     }
     
   vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
-  vtkSMPluginProxy* pxy = vtkSMPluginProxy::SafeDownCast(
-    pxm->NewProxy("misc", "PluginLoader"));
+  vtkSMPluginProxy* pxy =
+      vtkSMPluginProxy::SafeDownCast(pxm->NewProxy("misc", "PluginLoader"));
   if(pxy && filename && filename[0] != '\0')
     {
-    pxy->SetConnectionID(connectionId);
     // data & render servers
     if(loadRemote)
       {
-      pxy->SetServers(vtkProcessModule::SERVERS);
+      pxy->SetLocation(vtkProcessModule::SERVERS);
       }
     else
       {
-      pxy->SetServers(vtkProcessModule::CLIENT);
+      pxy->SetLocation(vtkProcessModule::CLIENT);
       }
     pluginInfo = pxy->Load(filename);
     vtkPVPluginInformation* localInfo = vtkPVPluginInformation::New();
@@ -352,11 +351,10 @@ void vtkSMPluginManager::UpdatePluginMap(
 }
 
 //---------------------------------------------------------------------------
-const char* vtkSMPluginManager::GetPluginPath(
-  vtkIdType connectionId, const char* serverURI)
+const char* vtkSMPluginManager::GetPluginPath(const char* serverURI)
 {
   vtkSMPluginManagerInternals::ServerSearchPathsMap::iterator it = 
-    this->Internal->Server2SearchPathsMap.find(serverURI);
+      this->Internal->Server2SearchPathsMap.find(serverURI);
   if(it != this->Internal->Server2SearchPathsMap.end())
     {
     return it->second.c_str();
@@ -365,14 +363,12 @@ const char* vtkSMPluginManager::GetPluginPath(
     {
     vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
     vtkSMProxy* pxy = pxm->NewProxy("misc", "PluginLoader");
-    pxy->SetConnectionID(connectionId);
     pxy->UpdateVTKObjects();
     pxy->UpdatePropertyInformation();
     vtkSMStringVectorProperty* svp = NULL;
     if(pxy->GetProperty("SearchPaths"))
       {
-      svp = vtkSMStringVectorProperty::SafeDownCast(
-        pxy->GetProperty("SearchPaths"));
+      svp = vtkSMStringVectorProperty::SafeDownCast(pxy->GetProperty("SearchPaths"));
       if(svp)
         {
         this->Internal->Server2SearchPathsMap[serverURI] = svp->GetElement(0);

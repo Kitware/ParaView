@@ -210,8 +210,6 @@ void vtkSMProxyManager::InstantiateGroupPrototypes(const char* groupName)
       vtkSMProxy* proxy = this->NewProxy(groupName, xml_name);
       if (proxy)
         {
-        cout << "NewPrototype proxy " << groupName << " " << xml_name << endl
-            << " - proxy: " << proxy->GetXMLGroup() << " " << proxy->GetXMLName() << endl;
         proxy->SetSession(NULL);
         proxy->SetLocation(0);
         this->RegisterProxy(newgroupname.str().c_str(), xml_name, proxy);
@@ -1587,4 +1585,13 @@ vtkSMProxy* vtkSMProxyManager::NewProxy( const vtkSMMessage* msg)
     vtkErrorMacro("Invalid msg while creating a new Proxy: NULL");
     }
   return NULL;
+}
+//---------------------------------------------------------------------------
+void vtkSMProxyManager::LoadXMLDefinitionFromServer()
+{
+  vtkSMMessage msg;
+  msg.set_global_id(1);
+  msg.set_location(vtkProcessModule::DATA_SERVER); // We want to request data server
+  this->Session->PullState(&msg);
+  this->ProxyDefinitionManager->LoadXMLDefinitionState(&msg);
 }
