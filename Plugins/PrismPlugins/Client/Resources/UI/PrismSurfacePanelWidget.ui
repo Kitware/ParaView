@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>301</width>
+    <width>345</width>
     <height>937</height>
    </rect>
   </property>
@@ -374,10 +374,10 @@
       <item row="5" column="2">
        <widget class="QPushButton" name="NewRange">
         <property name="toolTip">
-         <string>Add a single value to the current set</string>
+         <string>Add a range of values to the current set</string>
         </property>
         <property name="statusTip">
-         <string>Add a single value to the current set.</string>
+         <string>Add a range of values to the current set.</string>
         </property>
         <property name="text">
          <string>New Range</string>
