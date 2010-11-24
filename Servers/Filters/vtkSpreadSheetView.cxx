@@ -311,6 +311,16 @@ void vtkSpreadSheetView::Update()
 
   this->SomethingUpdated = false;
   this->Superclass::Update();
+}
+
+//----------------------------------------------------------------------------
+int vtkSpreadSheetView::StreamToClient()
+{
+  vtkSpreadSheetRepresentation* cur = this->Internals->ActiveRepresentation;
+  if (cur == NULL)
+    {
+    return 0;
+    }
 
   unsigned int num_rows = 0;
 
@@ -347,6 +357,8 @@ void vtkSpreadSheetView::Update()
     {
     this->InvokeEvent(vtkCommand::UpdateDataEvent);
     }
+  return 1;
+
 }
 
 //----------------------------------------------------------------------------
