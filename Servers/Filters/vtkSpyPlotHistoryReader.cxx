@@ -21,12 +21,11 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkInformationVector.h"
 #include "vtkObjectFactory.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
-#include "vtkStringArray.h"
 #include "vtkTable.h"
 #include "vtkVariant.h"
-#include "vtkVariantArray.h"
 
 #include <vtkstd/map>
+#include <vtkstd/set>
 #include <vtkstd/vector>
 #include <vtkstd/string>
 #include <iostream>
@@ -55,8 +54,8 @@ public:
   std::map<std::string,int> metaIndexes;
   std::map<int,std::string> metaLookUp;
 
-  //maps col index to which row it starts
-  std::map<int,int> headerRowToIndex;
+  //maps col index to if they start a rows
+  std::set<int> headerRowIndexes;
 
   //maps the names for each col in the header
   //presumption is that all points are continous
@@ -103,7 +102,6 @@ int vtkSpyPlotHistoryReader::RequestInformation(vtkInformation *request,
                                          vtkInformationVector *outputVector)
 {
   vtkInformation *info=outputVector->GetInformationObject(0);
-  info->Set(vtkStreamingDemandDrivenPipeline::MAXIMUM_NUMBER_OF_PIECES(),-1);
 
   std::map<std::string,std::string> timeInfo;
 
@@ -135,7 +133,7 @@ int vtkSpyPlotHistoryReader::RequestInformation(vtkInformation *request,
       //now convert this line into a table
       //we are going to have to reduce the header collection
       this->Info->header = createTableLayoutFromHeader(
-          line,this->Delimeter[0],this->Info->headerRowToIndex,
+          line,this->Delimeter[0],this->Info->headerRowIndexes,
           this->Info->FieldIndexesToNames);
 
       //skip the next line it is junk info
@@ -189,6 +187,14 @@ int vtkSpyPlotHistoryReader::RequestData(
   vtkInformationVector *outputVector)
 {
   vtkInformation* outInfo = outputVector->GetInformationObject(0);
+  vtkTable *output = vtkTable::SafeDownCast(
+    outInfo->Get(vtkDataObject::DATA_OBJECT()));
+
+  if(outInfo->Has(vtkStreamingDemandDrivenPipeline::UPDATE_PIECE_NUMBER()) &&
+    outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_PIECE_NUMBER()) > 0)
+    {
+    return 1;
+    }
 
   int tsLength =
     outInfo->Length(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
@@ -218,31 +224,28 @@ int vtkSpyPlotHistoryReader::RequestData(
   file_stream.seekg(this->Info->timeSteps[TimeIndex].file_pos);
   getline(file_stream,line);
 
-  //convert the line into the table.
-  vtkTable *output = vtkTable::SafeDownCast(
-    outInfo->Get(vtkDataObject::DATA_OBJECT()));
-
-  //setup the cols
+  //construct the table
   this->ConstructTableColumns(output);
 
-  //fill the table
+  //split the line into the items we want to add into the table
   std::vector<std::string> items;
-
   items.reserve(line.size()/2);
   split(line,this->Delimeter[0],items);
 
-  int numRows = this->Info->headerRowToIndex.size();
+  //determine the number of rows our table will have
+  int numRows = this->Info->headerRowIndexes.size();
   output->SetNumberOfRows(numRows);
 
+  //setup variables we need in the while loop
+  vtkFieldData *fa = output->GetFieldData();
   int numCols = output->GetNumberOfColumns();
   std::vector<std::string>::const_iterator it(items.begin());
-
-  //add all field properties before points
   int index = 0;
+  double tempValue=0;
   size_t i=0,j=0;
   while(it != items.end())
     {
-    if (index == this->Info->headerRowToIndex[i])
+    if (this->Info->headerRowIndexes.count(index))
       {
       for(j=0; j < numCols; ++j)
         {
@@ -260,10 +263,10 @@ int vtkSpyPlotHistoryReader::RequestData(
       vtkDoubleArray *fieldData = vtkDoubleArray::New();
       fieldData->SetName(
           (this->Info->FieldIndexesToNames[index]).c_str());
-      double t;
-      convert(*it,t);
-      fieldData->InsertNextValue(t);
-      output->GetFieldData()->AddArray(fieldData);
+      fieldData->SetNumberOfValues(1);
+      convert(*it,tempValue);
+      fieldData->InsertValue(0,tempValue);
+      fa->AddArray(fieldData);
       fieldData->FastDelete();
       }
     ++it;

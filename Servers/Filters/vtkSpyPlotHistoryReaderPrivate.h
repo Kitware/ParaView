@@ -160,7 +160,7 @@ void getTimeStepInfo(const std::string &s, const char &delim,
 
   //========================================================================
   std::vector<std::string> createTableLayoutFromHeader(std::string &header,
-                    const char& delim, std::map<int,int> &headerRowToIndex,
+                    const char& delim, std::set<int> &headerRowIndexes,
                     std::map<int,std::string> &fieldCols)
   {
     //the single presumption we have is that all the properties points
@@ -186,7 +186,7 @@ void getTimeStepInfo(const std::string &s, const char &delim,
         foundStart = true;
         rowNumber = rowFromHeaderCol(*it);
         newHeader.push_back(nameFromHeaderCol(*it));
-        headerRowToIndex[row++]=index;
+        headerRowIndexes.insert(index);
         break;
         }
       else
@@ -216,7 +216,7 @@ void getTimeStepInfo(const std::string &s, const char &delim,
       }
     while(it != cols.end() && rowFromHeaderCol(*it) != "")
       {
-      headerRowToIndex[row++]=index;
+      headerRowIndexes.insert(index);
       index += numberOfCols;
       it += numberOfCols;
       }
