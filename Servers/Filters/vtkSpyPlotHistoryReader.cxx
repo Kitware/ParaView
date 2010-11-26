@@ -136,9 +136,16 @@ int vtkSpyPlotHistoryReader::RequestInformation(vtkInformation *request,
           line,this->Delimeter[0],this->Info->headerRowIndexes,
           this->Info->FieldIndexesToNames);
 
-      //skip the next line it is junk info
-      //this needs to be smarter and optional
+      //skip the next line if it contains the property types
       getline(file_stream,line);
+      getTimeStepInfo(line,this->Delimeter[0],this->Info->metaLookUp,timeInfo);
+      double time = -1;
+      bool valid = convert(timeInfo["time"],time);
+      if (!valid)
+        {
+        file_stream.seekg(tellgValue);
+        }
+
       }
     else
       {

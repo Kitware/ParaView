@@ -152,10 +152,11 @@ void getTimeStepInfo(const std::string &s, const char &delim,
 
   //========================================================================
   template<class T>
-  void convert(const std::string &num, T &t)
+  bool convert(const std::string &num, T &t)
   {
     std::istringstream i(num);
     i >> t;
+    return !i.fail();
   }
 
   //========================================================================
