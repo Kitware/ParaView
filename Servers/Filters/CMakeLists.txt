@@ -537,5 +537,5 @@ ENDIF (NOT PV_INSTALL_NO_DEVELOPMENT)
 # Tests
 #-------------------------------------------------------------------------------------------------
 IF(BUILD_TESTING)
-  SUBDIRS(Testing)
+  ADD_SUBDIRECTORY(Testing)
 ENDIF(BUILD_TESTING)
