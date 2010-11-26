@@ -27,10 +27,10 @@ SET (PYTHON_SMSTATE_FILES
 
 ###############################################################################
 
-SUBDIRS(Cxx)
+ADD_SUBDIRECTORY(Cxx)
 
 IF (PARAVIEW_ENABLE_PYTHON)
-  SUBDIRS(Python)
+  ADD_SUBDIRECTORY(Python)
 ENDIF (PARAVIEW_ENABLE_PYTHON)
 
 

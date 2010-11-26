@@ -11,8 +11,8 @@ IF(NOT ParaView_BINARY_DIR)
   FIND_PACKAGE(ParaView REQUIRED)
   INCLUDE(${PARAVIEW_USE_FILE})
 
-  SUBDIRS(Plugins)
-  SUBDIRS(CustomApplications)
+  ADD_SUBDIRECTORY(Plugins)
+  ADD_SUBDIRECTORY(CustomApplications)
 
 ELSE(NOT ParaView_BINARY_DIR)
 
