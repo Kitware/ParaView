@@ -122,14 +122,13 @@ set(suffix "@CMAKE_SHARED_LIBRARY_SUFFIX@")
 file(GLOB_RECURSE candidates
   "${bundle}/Contents/Plugins/*${suffix}"
   "${bundle}/Contents/Libraries/*Python.so"
+  "${bundle}/Contents/Libraries/sqldrivers/*${suffix}"
   )
 foreach(lib ${candidates})
   if(NOT lib MATCHES "(_debug|d[0-9])${suffix}$")
     set(libs ${libs} "${lib}")
   endif()
 endforeach()
-
-list(APPEND libs "@QT_PLUGINS_DIR@/sqldrivers/libqsqlite.dylib")
 
 message("libs=${libs}")
 
