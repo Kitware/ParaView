@@ -44,13 +44,24 @@ public:
   static vtkMyImagePasterPass* New();
   vtkTypeMacro(vtkMyImagePasterPass, vtkRenderPass);
 
-  virtual void Render(const vtkRenderState*)
+  vtkIceTCompositePass* IceTCompositePass;
+  vtkRenderPass* DelegatePass;
+  virtual void Render(const vtkRenderState* render_state)
     {
+    if (this->DelegatePass)
+      {
+      this->DelegatePass->Render(render_state);
+      }
+    if (this->IceTCompositePass)
+      {
+      this->IceTCompositePass->GetLastRenderedTile(this->Image);
+      }
     if (this->Image.IsValid())
       {
       glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
       this->Image.PushToFrameBuffer();
       }
+    glFinish();
     }
 
   void SetImage(const vtkSynchronizedRenderers::vtkRawImage& image)
@@ -61,6 +72,8 @@ public:
 protected:
   vtkMyImagePasterPass()
     {
+    this->DelegatePass = NULL;
+    this->IceTCompositePass = NULL;
     }
   ~vtkMyImagePasterPass()
     {
@@ -150,9 +163,12 @@ public:
     icetDisable(ICET_GL_DISPLAY);
     icetDisable(ICET_GL_DISPLAY_INFLATE);
 
-    vtkRenderWindow* window = render_state->GetRenderer()->GetRenderWindow();
-    int *size = window->GetActualSize();
-    glViewport(0, 0, size[0], size[1]);
+    if (render_state->GetFrameBuffer() == NULL)
+      {
+      vtkRenderWindow* window = render_state->GetRenderer()->GetRenderWindow();
+      int *size = window->GetActualSize();
+      glViewport(0, 0, size[0], size[1]);
+      }
     glDisable(GL_SCISSOR_TEST);
     glClearColor(0, 0, 0, 0);
     }
@@ -244,7 +260,7 @@ protected:
 };
 
 vtkStandardNewMacro(vtkIceTSynchronizedRenderers);
-vtkCxxSetObjectMacro(vtkIceTSynchronizedRenderers, ImageProcessingPass, vtkImageProcessingPass);
+//vtkCxxSetObjectMacro(vtkIceTSynchronizedRenderers, ImageProcessingPass, vtkImageProcessingPass);
 //----------------------------------------------------------------------------
 vtkIceTSynchronizedRenderers::vtkIceTSynchronizedRenderers()
 {
@@ -277,6 +293,31 @@ vtkIceTSynchronizedRenderers::~vtkIceTSynchronizedRenderers()
   this->CameraRenderPass = 0;
   this->SetImageProcessingPass(0);
   this->SetRenderPass(0);
+}
+
+//----------------------------------------------------------------------------
+void vtkIceTSynchronizedRenderers::SetImageProcessingPass(
+  vtkImageProcessingPass* pass)
+{
+  vtkSetObjectBodyMacro(ImageProcessingPass, vtkImageProcessingPass, pass);
+  if (pass && this->Renderer)
+    {
+    int tile_dims[2];
+    this->IceTCompositePass->GetTileDimensions(tile_dims);
+    if (tile_dims[0] >= 1 && tile_dims[1] >= 1)
+      {
+      this->CameraRenderPass->SetAspectRatioOverride(tile_dims[0]*1.0/tile_dims[1]);
+      }
+    this->ImagePastingPass->DelegatePass = this->CameraRenderPass;
+    this->ImagePastingPass->IceTCompositePass = this->IceTCompositePass;
+    pass->SetDelegatePass(this->ImagePastingPass);
+    this->Renderer->SetPass(pass);
+    }
+  else if (this->Renderer && this->CameraRenderPass)
+    {
+    this->CameraRenderPass->SetAspectRatioOverride(1.0);
+    this->Renderer->SetPass(this->CameraRenderPass);
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -344,7 +385,6 @@ void vtkIceTSynchronizedRenderers::SetRenderer(vtkRenderer* ren)
     // applied in vtkRenderer inself. vtkPVIceTCompositePass will cull out-of-frustum
     // props using icet-model-view matrix later.
     ren->GetCullers()->RemoveAllItems();
-
     }
 }
 
@@ -371,53 +411,12 @@ vtkIceTSynchronizedRenderers::CaptureRenderedImage()
   if (!rawImage.IsValid())
     {
     this->IceTCompositePass->GetLastRenderedTile(rawImage);
-    if (!rawImage.IsValid())
+    if (rawImage.IsValid() && this->ImageProcessingPass)
       {
-      // cout << "no image captured " << endl;
-      //vtkErrorMacro("IceT couldn't provide a tile on this process.");
-      }
-    else if (this->ImageProcessingPass)
-      {
-      // process the rendered image using the image-processing pass.
-      this->ImageProcessingPass->SetDelegatePass(this->ImagePastingPass);
-      this->ImagePastingPass->SetImage(rawImage);
-
-      double viewport[4];
-      this->Renderer->GetViewport(viewport);
-      int tile_scale[2];
-      double tile_viewport[4];
-      this->Renderer->GetVTKWindow()->GetTileScale(tile_scale);
-      this->Renderer->GetVTKWindow()->GetTileViewport(tile_viewport);
-
-      double physical_viewport[4];
-      this->IceTCompositePass->GetPhysicalViewport(physical_viewport);
-
-      physical_viewport[2]-=physical_viewport[0];
-      physical_viewport[3]-=physical_viewport[1];
-      physical_viewport[0] = physical_viewport[1] = 0;
-      this->Renderer->SetViewport(physical_viewport);
-      this->Renderer->GetVTKWindow()->SetTileScale(1, 1);
-      this->Renderer->GetVTKWindow()->SetTileViewport(0,0, 1, 1);
-
-      // update the glViewport and glScissor settings based on newly set
-      // viewport.
-      this->Renderer->GetActiveCamera()->UpdateViewport(this->Renderer);
-
-      vtkRenderState state(this->Renderer);
-      state.SetPropArrayAndCount(NULL, 0);
-      state.SetFrameBuffer(0);
-      glPushAttrib(GL_ENABLE_BIT);
-      this->ImageProcessingPass->Render(&state);
-      this->ImageProcessingPass->ReleaseGraphicsResources(
-        this->Renderer->GetRenderWindow());
-      glPopAttrib();
-
-      // capture the framebuffer from the image processes pass and return that.
+      // When using an image processing pass, we simply capture the result from
+      // the active buffer. However, we do that, only when IceT produced some
+      // valid result on this process.
       rawImage.Capture(this->Renderer);
-
-      this->Renderer->GetVTKWindow()->SetTileScale(tile_scale);
-      this->Renderer->GetVTKWindow()->SetTileViewport(tile_viewport);
-      this->Renderer->SetViewport(viewport);
       }
     }
   return rawImage;
