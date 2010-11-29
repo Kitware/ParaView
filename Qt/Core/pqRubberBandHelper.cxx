@@ -136,10 +136,10 @@ void pqRubberBandHelper::emitEnabledSignals()
       this->Internal->RenderView->getRenderViewProxy();
     emit this->enableSurfaceSelection(proxy->IsSelectionAvailable());
     emit this->enableSurfacePointsSelection(proxy->IsSelectionAvailable());
+    emit this->enablePick(proxy->IsSelectionAvailable());
     emit this->enableFrustumSelection(true);
     emit this->enableFrustumPointSelection(true);
     emit this->enableZoom(true);
-    emit this->enablePick(true);
     }
 }
 

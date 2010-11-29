@@ -133,6 +133,10 @@ bool vtkSMRenderViewProxy::IsSelectionAvailable()
 const char* vtkSMRenderViewProxy::IsSelectVisibleCellsAvailable()
 {
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  if (pm->GetIsAutoMPI())
+    {
+    return "Cannot support selection in auto-mpi mode";
+    }
   if (pm->GetRenderClientMode(this->ConnectionID))
     {
     return "Cannot support selection in render-server mode";
