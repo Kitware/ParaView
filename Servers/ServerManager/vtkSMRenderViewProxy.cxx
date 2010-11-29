@@ -85,6 +85,12 @@ public:
     {
     this->Proxy->InteractiveRender();
     }
+  // Description:
+  // Returns true if the most recent render indeed employed low-res rendering.
+  virtual bool LastRenderWasInteractive()
+    {
+    return this->Proxy->LastRenderWasInteractive();
+    }
 
   vtkWeakPointer<vtkSMRenderViewProxy> Proxy;
   };
@@ -100,6 +106,14 @@ vtkSMRenderViewProxy::vtkSMRenderViewProxy()
 //----------------------------------------------------------------------------
 vtkSMRenderViewProxy::~vtkSMRenderViewProxy()
 {
+}
+
+//-----------------------------------------------------------------------------
+bool vtkSMRenderViewProxy::LastRenderWasInteractive()
+{
+  vtkPVRenderView* rv = vtkPVRenderView::SafeDownCast(
+    this->GetClientSideObject());
+  return rv? rv->GetUsedLODForLastRender() : false;
 }
 
 //-----------------------------------------------------------------------------

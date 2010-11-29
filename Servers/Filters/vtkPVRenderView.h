@@ -300,6 +300,10 @@ public:
   // Returns if remote-rendering is possible on the current group of processes.
   vtkGetMacro(RemoteRenderingAvailable, bool);
 
+  // Description:
+  // Returns true if the most recent render used LOD.
+  vtkGetMacro(UsedLODForLastRender, bool);
+
 public:
   //*****************************************************************
   // Methods merely exposing methods for internal objects.
@@ -472,6 +476,8 @@ protected:
 
   double LODResolution;
   bool UseLightKit;
+
+  bool UsedLODForLastRender;
 
   vtkBSPCutsGenerator* OrderedCompositingBSPCutsSource;
 private:
