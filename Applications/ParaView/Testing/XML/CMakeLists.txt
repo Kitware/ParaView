@@ -37,7 +37,6 @@ SET (TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/Fractal2D.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/GlobalProperties.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/GridConnectivity.xml
-  ${CMAKE_CURRENT_SOURCE_DIR}/LinePlot.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/H5PartReaderPlugin.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/LoadPlugins.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/LoadSaveStateAnimation.xml
