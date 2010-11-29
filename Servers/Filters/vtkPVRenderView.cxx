@@ -265,6 +265,11 @@ void vtkPVRenderView::Initialize(unsigned int id)
   this->RemoteRenderingAvailable = vtkPVDisplayInformation::CanOpenDisplayLocally();
   // Synchronize this among all processes involved.
   unsigned int cannot_render = this->RemoteRenderingAvailable? 0 : 1;
+  if (vtkProcessModule::GetProcessModule()->GetIsAutoMPI())
+    {
+    // disable remote-rendering when auto-mpi is employed.
+    cannot_render = 1;
+    }
   this->SynchronizeSize(cannot_render);
   this->RemoteRenderingAvailable = cannot_render == 0;
 }
