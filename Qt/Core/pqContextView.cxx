@@ -329,7 +329,7 @@ void pqContextView::resetDisplay()
   if (proxy)
     {
     proxy->GetChart()->RecalculateBounds();
-    this->getWidget()->update();
+    proxy->GetChartView()->Render();
     }
 }
 
