@@ -78,6 +78,7 @@ vtkPVRenderView::vtkPVRenderView()
 
   this->RemoteRenderingAvailable = false;
 
+  this->UsedLODForLastRender = false;
   this->MakingSelection = false;
   this->StillRenderImageReductionFactor = 1;
   this->InteractiveRenderImageReductionFactor = 2;
@@ -605,6 +606,7 @@ void vtkPVRenderView::Render(bool interactive, bool skip_rendering)
 
   bool use_lod_rendering = interactive? this->GetUseLODRendering() : false;
   this->SetRequestLODRendering(use_lod_rendering);
+  this->UsedLODForLastRender = use_lod_rendering;
 
   // cout << "Using remote rendering: " << use_distributed_rendering << endl;
   bool in_tile_display_mode = this->InTileDisplayMode();

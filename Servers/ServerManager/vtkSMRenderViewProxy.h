@@ -113,6 +113,10 @@ public:
   // way as other properties.
   void SynchronizeCameraProperties();
 
+  // Description:
+  // Returns true if the most recent render indeed employed low-res rendering.
+  virtual bool LastRenderWasInteractive();
+
 //BTX
 protected:
   vtkSMRenderViewProxy();
