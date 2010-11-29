@@ -60,7 +60,7 @@
 #define __vtkSMArrayListDomain_h
 
 #include "vtkSMStringListDomain.h"
-#include "vtkStdString.h"
+#include "vtkStdString.h" // needed for vtkStdString.
 
 class vtkPVDataSetAttributesInformation;
 class vtkSMInputArrayDomain;
