@@ -92,11 +92,11 @@ void vtkPVContextView::Render(bool interactive)
   // batch mode).
   if (this->SynchronizedWindows->GetLocalProcessIsDriver())
     {
-    this->ContextView->Render();
     if (this->InTileDisplayMode())
       {
       this->SendImageToRenderServers();
       }
+    this->ContextView->Render();
     }
   else if (this->InTileDisplayMode())
     {
@@ -105,6 +105,7 @@ void vtkPVContextView::Render(bool interactive)
     this->ContextView->GetRenderer()->EraseOff();
     this->ReceiveImageToFromClient();
     vtkTileDisplayHelper::GetInstance()->FlushTiles(this);
+    this->GetRenderWindow()->Frame();
     }
 }
 
@@ -138,16 +139,24 @@ void vtkPVContextView::SendImageToRenderServers()
 
   int magnification = ComputeMagnification(size, actual_size);
   this->RenderWindow->SetSize(actual_size);
+
+  this->ContextView->Render();
+
   vtkWindowToImageFilter* w2i = vtkWindowToImageFilter::New();
   w2i->SetInput(this->GetRenderWindow());
   w2i->SetMagnification(magnification);
   w2i->ReadFrontBufferOff();
   w2i->ShouldRerenderOff();
-  this->RenderWindow->SwapBuffersOff();
   w2i->Update();
-  this->RenderWindow->SwapBuffersOn();
-  this->RenderWindow->SetSize(prev_size);
+
   this->SynchronizedWindows->BroadcastToRenderServer(w2i->GetOutput());
+  //vtkPNGWriter* writer = vtkPNGWriter::New();
+  //writer->SetFileName("/tmp/client.png");
+  //writer->SetInput(w2i->GetOutput());
+  //writer->Write();
+  //writer->Delete();
+
+  this->RenderWindow->SetSize(prev_size);
   w2i->Delete();
 }
 
@@ -171,6 +180,11 @@ void vtkPVContextView::ReceiveImageToFromClient()
 
   vtkImageData* image = vtkImageData::New();
   this->SynchronizedWindows->BroadcastToRenderServer(image);
+  //vtkPNGWriter* writer = vtkPNGWriter::New();
+  //writer->SetFileName("/tmp/server.1.png");
+  //writer->SetInput(image);
+  //writer->Write();
+  //writer->Delete();
 
   int tile_dims[2], tile_mullions[2];
   this->SynchronizedWindows->GetTileDisplayParameters(tile_dims, tile_mullions);
@@ -186,14 +200,24 @@ void vtkPVContextView::ReceiveImageToFromClient()
   vtkExtractVOI* voi = vtkExtractVOI::New();
   voi->SetInput(image);
   voi->SetVOI(
-    MIN(1.0, (tile_viewport[0]-viewport[0]) / (viewport[2] - viewport[0]))*image_dims[0],
-    MIN(1.0, (tile_viewport[2]-viewport[0]) / (viewport[2] - viewport[0]))*image_dims[0],
-    MIN(1.0, (tile_viewport[1]-viewport[1]) / (viewport[3] - viewport[1]))*image_dims[1],
-    MIN(1.0, (tile_viewport[3]-viewport[1]) / (viewport[3] - viewport[1]))*image_dims[1],
+    MIN(1.0, (tile_viewport[0]-viewport[0]) / (viewport[2] -
+        viewport[0]))*(image_dims[0]-1),
+    MIN(1.0, (tile_viewport[2]-viewport[0]) / (viewport[2] -
+        viewport[0]))*(image_dims[0]-1),
+    MIN(1.0, (tile_viewport[1]-viewport[1]) / (viewport[3] -
+        viewport[1]))*(image_dims[1]-1),
+    MIN(1.0, (tile_viewport[3]-viewport[1]) / (viewport[3] -
+        viewport[1]))*(image_dims[1]-1),
     0, 0);
   voi->Update();
   image->ShallowCopy(voi->GetOutput());
   voi->Delete();
+
+  //writer = vtkPNGWriter::New();
+  //writer->SetFileName("/tmp/server.1a.png");
+  //writer->SetInput(image);
+  //writer->Write();
+  //writer->Delete();
 
   double physical_viewport[4];
   vtkSmartPointer<vtkTilesHelper> tilesHelper = vtkSmartPointer<vtkTilesHelper>::New();
@@ -208,6 +232,8 @@ void vtkPVContextView::ReceiveImageToFromClient()
   tile.Initialize(image->GetDimensions()[0],
     image->GetDimensions()[1],
     vtkUnsignedCharArray::SafeDownCast(image->GetPointData()->GetScalars()));
+  tile.MarkValid();
+
   vtkTileDisplayHelper::GetInstance()->SetTile(this,
     physical_viewport,
     this->ContextView->GetRenderer(), tile);
