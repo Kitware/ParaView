@@ -22,6 +22,7 @@ SET (Kit_SRCS
   vtkInitializationHelper.cxx
 # --- PM Objects ---
   vtkPMArraySelectionProperty.cxx
+  vtkPMCompoundSourceProxy.cxx
   vtkPMDataArrayProperty.cxx
   vtkPMDoubleVectorProperty.cxx
   vtkPMFileSeriesReaderProxy.cxx
@@ -56,6 +57,7 @@ SET (Kit_SRCS
   vtkSMCameraLink.cxx
   vtkSMCameraProxy.cxx
   vtkSMChartRepresentationProxy.cxx
+  vtkSMCompoundProxyDefinitionLoader.cxx
   vtkSMCompoundSourceProxy.cxx
   vtkSMCompoundSourceProxyDefinitionBuilder.cxx
   vtkSMContextViewProxy.cxx
@@ -101,6 +103,7 @@ SET (Kit_SRCS
   vtkSMPSWriterProxy.cxx
   vtkSMPVRepresentationProxy.cxx
   vtkSMPWriterProxy.cxx
+  vtkSMPythonTraceObserver.cxx
   vtkSMRemoteObject.cxx
   vtkSMRemoteObjectUpdateUndoElement.cxx
   vtkSMRenderViewProxy.cxx
@@ -178,8 +181,8 @@ SET(Kit_SRCS
 #  vtkSMCaveRenderViewProxy.cxx
   vtkSMComparativeAnimationCueProxy.cxx
   vtkSMComparativeViewProxy.cxx
-  vtkSMCompoundSourceProxy.cxx
-  vtkSMCompoundProxyDefinitionLoader.cxx
+
+
   vtkSMConnectionCleanerProxy.cxx
   vtkSMContextArraysInformationHelper.cxx #---- SM Side only, not managed yet...
   vtkSMContextNamedOptionsProxy.cxx
@@ -206,7 +209,6 @@ SET(Kit_SRCS
   vtkSMProxyRegisterUndoElement.cxx#--------------------------------
   vtkSMProxyStateChangedUndoElement.cxx#--------------------------------
   vtkSMProxyUnRegisterUndoElement.cxx#--------------------------------
-  vtkSMPythonTraceObserver.cxx
 
 
   vtkSMReaderFactory.cxx

@@ -25,11 +25,13 @@ vtkStandardNewMacro(vtkSMDeserializer);
 //----------------------------------------------------------------------------
 vtkSMDeserializer::vtkSMDeserializer()
 {
+  this->Session = 0;
 }
 
 //----------------------------------------------------------------------------
 vtkSMDeserializer::~vtkSMDeserializer()
 {
+  this->SetSession(0);
 }
 
 //----------------------------------------------------------------------------

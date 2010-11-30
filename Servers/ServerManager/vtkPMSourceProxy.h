@@ -36,7 +36,7 @@ public:
 
   // Description:
   // Returns the vtkClientServerID for an output port, if valid.
-  vtkClientServerID GetOutputPortID(int port);
+  virtual vtkClientServerID GetOutputPortID(int port);
 
 //BTX
   // Description:

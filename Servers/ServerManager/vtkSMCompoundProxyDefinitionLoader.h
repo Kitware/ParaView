@@ -26,7 +26,7 @@
 
 #include "vtkSMDeserializer.h"
 
-class vtkSMCompoundSourceProxy;
+class vtkPVXMLElement;
 
 class VTK_EXPORT vtkSMCompoundProxyDefinitionLoader : public vtkSMDeserializer
 {
@@ -35,16 +35,11 @@ public:
   vtkTypeMacro(vtkSMCompoundProxyDefinitionLoader, vtkSMDeserializer);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Load a compound proxy definition from an xml element.
-  // Returns the created compound proxy or NULL (on failure)
-  vtkSMCompoundSourceProxy* LoadDefinition(vtkPVXMLElement* rootElement);
+  virtual void SetRootElement(vtkPVXMLElement*);
 
 protected:
   vtkSMCompoundProxyDefinitionLoader();
   ~vtkSMCompoundProxyDefinitionLoader();
-
-  vtkSMCompoundSourceProxy* HandleDefinition(vtkPVXMLElement* rootElement);
 
   // Description:
   // Locate the XML for the proxy with the given id.

@@ -29,6 +29,7 @@
 
 #include <assert.h>
 
+//*****************************************************************************
 class vtkPMSourceProxy::vtkInternals
 {
 public:
@@ -36,7 +37,7 @@ public:
   vtkstd::vector<vtkClientServerID> ExtractPiecesIDs;
   vtkstd::vector<vtkClientServerID> PostFilterIDs;
 };
-
+//*****************************************************************************
 vtkStandardNewMacro(vtkPMSourceProxy);
 //----------------------------------------------------------------------------
 vtkPMSourceProxy::vtkPMSourceProxy()

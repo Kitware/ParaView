@@ -34,6 +34,10 @@
 
 #include "vtkSMSourceProxy.h"
 
+class vtkSMProxyLocator;
+class vtkPVXMLElement;
+class vtkSMProxyManager;
+
 class VTK_EXPORT vtkSMCompoundSourceProxy : public vtkSMSourceProxy
 {
 public:
@@ -41,14 +45,38 @@ public:
   vtkTypeMacro(vtkSMCompoundSourceProxy, vtkSMSourceProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
+  // Description:
+  // Creates the output port proxiess for this filter.
+  // Each output port proxy corresponds to an actual output port on the
+  // algorithm.
+  virtual void CreateOutputPorts();
+
+  // Description:
+  // Update the VTK object on the server by pushing the values of
+  // all modifed properties (un-modified properties are ignored).
+  // If the object has not been created, it will be created first.
+  virtual void UpdateVTKObjects();
+
 //BTX
 protected:
   vtkSMCompoundSourceProxy();
   ~vtkSMCompoundSourceProxy();
 
+  // Description:
+  // Read attributes from an XML element.
+  virtual int ReadXMLAttributes(vtkSMProxyManager* pm, vtkPVXMLElement* element);
+
+  // Description:
+  // Call superclass' and then assigns a new executive
+  // (vtkCompositeDataPipeline)
+  virtual void CreateVTKObjects();
+
 private:
   vtkSMCompoundSourceProxy(const vtkSMCompoundSourceProxy&); // Not implemented
   void operator=(const vtkSMCompoundSourceProxy&); // Not implemented
+
+  class vtkInternals;
+  vtkInternals* Internals;
 //ETX
 };
 

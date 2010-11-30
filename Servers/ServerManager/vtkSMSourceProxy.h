@@ -68,18 +68,18 @@ public:
 
   // Description:
   // Return the number of output ports.
-  unsigned int GetNumberOfOutputPorts();
+  virtual unsigned int GetNumberOfOutputPorts();
 
   // Description:
   // Return an output port.
-  vtkSMOutputPort* GetOutputPort(unsigned int idx);
+  virtual vtkSMOutputPort* GetOutputPort(unsigned int idx);
 
   // Description:
   // Return an output port, given the name for the port.
   // Each output port is assigned a unique name (either using the xml
   // configuration or automatically). The automatically assigned names are of
   // the type Output0, Output1 etc.
-  vtkSMOutputPort* GetOutputPort(const char* portname);
+  virtual vtkSMOutputPort* GetOutputPort(const char* portname);
 
   // Description:
   // Returns the port index, given the name of an output port.
@@ -88,14 +88,14 @@ public:
   // the type Output0, Output1 etc.
   // Returns VTK_UNSIGNED_INT_MAX (i.e. ~0u) when a port with given port name
   // does not exist.
-  unsigned int GetOutputPortIndex(const char* portname);
+  virtual unsigned int GetOutputPortIndex(const char* portname);
 
   // Description:
   // Returns the output port name given its index.
   // Each output port is assigned an unique name (either using the xml
   // configuration or automatically). The automatically assigned names are of
   // the type Output-0, Output-1 etc.
-  const char* GetOutputPortName(unsigned int index);
+  virtual const char* GetOutputPortName(unsigned int index);
 
   // Description:
   // It is possible to provide some documentation for each output port in the
@@ -106,7 +106,7 @@ public:
   vtkSMDocumentation* GetOutputPortDocumentation(const char* portname);
 
   // Description:
-  // Creates the output port proxiess for this filter. 
+  // Creates the output port proxies for this filter.
   // Each output port proxy corresponds to an actual output port on the
   // algorithm.
   virtual void CreateOutputPorts();

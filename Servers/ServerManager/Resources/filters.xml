@@ -3875,8 +3875,6 @@ The Triangle Strips filter converts triangles into triangle strips and lines int
 
    <!-- ==================================================================== -->
 
-<!-- FIXME comment out Compound proxy !!!!
-
    <CompoundSourceProxy name="PlotOnIntersectionCurves" label="Plot On Intersection Curves">
      <Documentation
         short_help="Extracts the edges in a 2D plane and plots them"
@@ -3990,8 +3988,6 @@ The Triangle Strips filter converts triangles into triangle strips and lines int
        <Plotable />
      </Hints>
    </CompoundSourceProxy>
-
--->
 
    <!-- ==================================================================== -->
    <SourceProxy name="Subdivide" class="vtkLinearSubdivisionFilter">
@@ -5706,8 +5702,6 @@ The Probe filter samples the data set attributes of the current data set at the 
 
    <!-- ==================================================================== -->
 
-<!-- FIXME comment out Compound proxy !!!!
-
    <CompoundSourceProxy name="ProbeLine" label="Plot Over Line">
      <Documentation
        long_help="Sample data attributes at the points along a line.  Probed lines will be displayed in a graph of the attributes."
@@ -5740,8 +5734,6 @@ The Probe filter samples the data set attributes of the current data set at the 
       <Plotable />
      </Hints>
    </CompoundSourceProxy>
-
--->
 
 <!-- End ProbeLine -->
 
@@ -8851,8 +8843,6 @@ This property controls how the filter works to generate tensor cell data. You ca
 
    <!-- ==================================================================== -->
 
-<!-- FIXME comment out Compound proxy !!!!
-
     <CompoundSourceProxy name="NormalGlyphs" label="Normal Glyphs">
       <Documentation short_help="Filter computing surface normals."
         long_help="Filter computing surface normals.">
@@ -9080,8 +9070,6 @@ This property controls how the filter works to generate tensor cell data. You ca
       </Hints>
     </CompoundSourceProxy>
 
--->
-
     <!-- ==================================================================== -->
     <SourceProxy name="TableToPolyData"
                 class="vtkTableToPolyData"
@@ -9240,8 +9228,6 @@ This property controls how the filter works to generate tensor cell data. You ca
 
     <!-- ================================================================== -->
 
-<!-- FIXME comment out Compound proxy !!!!
-
     <CompoundSourceProxy name="FFTSelectionOverTime"
                          label="FFT Of Selection Over Time">
       <Documentation
@@ -9323,8 +9309,6 @@ This property controls how the filter works to generate tensor cell data. You ca
         <Plotable />
       </Hints>
     </CompoundSourceProxy>
-
--->
     <!-- FFTSelectionOverTime -->
 
     <!-- ================================================================== -->

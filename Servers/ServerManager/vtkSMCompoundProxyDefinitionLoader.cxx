@@ -21,7 +21,7 @@
 #include "vtkSMProxyManager.h"
 
 vtkStandardNewMacro(vtkSMCompoundProxyDefinitionLoader);
-
+vtkCxxSetObjectMacro(vtkSMCompoundProxyDefinitionLoader, RootElement, vtkPVXMLElement);
 //---------------------------------------------------------------------------
 vtkSMCompoundProxyDefinitionLoader::vtkSMCompoundProxyDefinitionLoader()
 {
@@ -35,34 +35,12 @@ vtkSMCompoundProxyDefinitionLoader::~vtkSMCompoundProxyDefinitionLoader()
 }
 
 //---------------------------------------------------------------------------
-vtkSMCompoundSourceProxy* vtkSMCompoundProxyDefinitionLoader::HandleDefinition(
-  vtkPVXMLElement* rootElement)
-{
-  vtkSMCompoundSourceProxy* result = vtkSMCompoundSourceProxy::New();
-
-  this->RootElement = rootElement;
-  vtkSMProxyLocator* locator = vtkSMProxyLocator::New();
-  locator->SetDeserializer(this);
-  int retVal = result->LoadDefinition(rootElement, locator);
-  locator->SetDeserializer(0);
-  locator->Delete();
-  this->RootElement = 0;
-
-  if (retVal)
-    {
-    return result;
-    }
-  result->Delete();
-  return 0;
-}
-
-//---------------------------------------------------------------------------
 vtkPVXMLElement* vtkSMCompoundProxyDefinitionLoader::LocateProxyElement(int id)
 {
   if (!this->RootElement)
     {
     vtkErrorMacro("No root is defined. Cannot locate proxy element with id " 
-      << id);
+                  << id);
     return 0;
     }
 
@@ -88,33 +66,6 @@ vtkPVXMLElement* vtkSMCompoundProxyDefinitionLoader::LocateProxyElement(int id)
       }
     }
   return 0;
-}
-
-//---------------------------------------------------------------------------
-vtkSMCompoundSourceProxy* vtkSMCompoundProxyDefinitionLoader::LoadDefinition(
-  vtkPVXMLElement* rootElement)
-{
-  vtkSMCompoundSourceProxy* result = 0;
-  if (!rootElement)
-    {
-    vtkErrorMacro("Cannot load state from (null) root element.");
-    return result;
-    }
-
-  vtkSMProxyManager* pm = this->GetProxyManager();
-  if (!pm)
-    {
-    vtkErrorMacro("Cannot load state without a proxy manager.");
-    return result;
-    }
-
-  if (rootElement->GetName() &&
-      strcmp(rootElement->GetName(), "CompoundSourceProxy") == 0)
-    {
-    result = this->HandleDefinition(rootElement);
-    }
-
-  return result;
 }
 
 //---------------------------------------------------------------------------

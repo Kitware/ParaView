@@ -16,6 +16,8 @@
 #include "vtkSMProxyManager.h"
 #include "vtkCommand.h"
 #include "vtkObjectFactory.h"
+#include "vtkProcessModule.h"
+#include "vtkSMSession.h"
 
 //-----------------------------------------------------------------------------
 class vtkSMPythonTraceObserverCommandHelper : public vtkCommand
@@ -68,15 +70,19 @@ vtkSMPythonTraceObserver::vtkSMPythonTraceObserver()
   this->Observer = vtkSMPythonTraceObserverCommandHelper::New();
   this->Observer->SetTarget(this);
 
-  // Get the proxy manager
-  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
-  if (!pxm)
+  // Get the session to get access to the proxy manager
+  vtkSMSession* session =
+      vtkSMSession::SafeDownCast(
+          vtkProcessModule::GetProcessModule()->GetSession());
+
+  if (!session)
     {
     vtkErrorMacro("vtkSMPythonTraceObserver must be created only"
        << " after the ProxyManager has been created.");
     }
   else
     {
+    vtkSMProxyManager* pxm = session->GetProxyManager();
     // Add observer for certain proxy manager events.
     // Use a high priority for the RegisterEvent so that the trace
     // observer is notified before other observers.  Other observers
@@ -93,7 +99,10 @@ vtkSMPythonTraceObserver::vtkSMPythonTraceObserver()
 //-----------------------------------------------------------------------------
 vtkSMPythonTraceObserver::~vtkSMPythonTraceObserver()
 {
-  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+  vtkSMSession* session =
+      vtkSMSession::SafeDownCast(
+          vtkProcessModule::GetProcessModule()->GetSession());
+  vtkSMProxyManager* pxm = session->GetProxyManager();
   if (pxm)
     {
     pxm->RemoveObserver(this->Observer);

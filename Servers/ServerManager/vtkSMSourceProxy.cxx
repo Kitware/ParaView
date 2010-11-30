@@ -309,7 +309,6 @@ void vtkSMSourceProxy::CreateVTKObjects()
     {
     return;
     }
-
   this->Superclass::CreateVTKObjects();
 
   // We are going to fix the ports such that we don't have to update the
@@ -396,7 +395,7 @@ void vtkSMSourceProxy::SetOutputPort(unsigned int index, const char* name,
   this->PInternals->OutputPorts[index].Name = name;
   this->PInternals->OutputPorts[index].Port = port;
   this->PInternals->OutputPorts[index].Documentation = doc;
-  if (port)
+  if (port && port->GetSourceProxy() == NULL)
     {
     port->SetSourceProxy(this);
     }
