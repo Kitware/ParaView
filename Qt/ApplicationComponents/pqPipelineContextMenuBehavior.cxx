@@ -78,8 +78,7 @@ pqPipelineContextMenuBehavior::pqPipelineContextMenuBehavior(QObject* parentObje
   QObject::connect(
     pqApplicationCore::instance()->getServerManagerModel(),
     SIGNAL(viewAdded(pqView*)),
-    this, SLOT(onViewAdded(pqView*)),
-    Qt::QueuedConnection);
+    this, SLOT(onViewAdded(pqView*)));
   this->Menu = new QMenu();
   this->Menu << pqSetName("PipelineContextMenu");
 }
