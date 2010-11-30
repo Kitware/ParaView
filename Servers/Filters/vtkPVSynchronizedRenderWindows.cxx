@@ -192,6 +192,8 @@ public:
     { return this->ExpandTowardMax(me, max, my_size, my_pos, 1); }
 
   vtkSmartPointer<vtkRenderWindow> SharedRenderWindow;
+  unsigned long SharedWindowStartRenderTag;
+  unsigned long SharedWindowEndRenderTag;
   unsigned int ActiveId;
 };
 
@@ -262,6 +264,8 @@ vtkPVSynchronizedRenderWindows::vtkPVSynchronizedRenderWindows()
   this->ParallelRMITag = 0;
   this->Internals = new vtkInternals();
   this->Internals->ActiveId = 0;
+  this->Internals->SharedWindowStartRenderTag = 0;
+  this->Internals->SharedWindowEndRenderTag = 0;
   this->Observer = vtkObserver::New();
   this->Observer->Target = this;
   this->Enabled = true;
@@ -363,6 +367,19 @@ vtkPVSynchronizedRenderWindows::~vtkPVSynchronizedRenderWindows()
   this->SetClientDataServerController(0);
   this->SetParallelController(0);
 
+  if (this->Internals->SharedRenderWindow)
+    {
+    if (this->Internals->SharedWindowStartRenderTag)
+      {
+      this->Internals->SharedRenderWindow->RemoveObserver(
+        this->Internals->SharedWindowStartRenderTag);
+      }
+    if (this->Internals->SharedWindowEndRenderTag)
+      {
+      this->Internals->SharedRenderWindow->RemoveObserver(
+        this->Internals->SharedWindowEndRenderTag);
+      }
+    }
   delete this->Internals;
   this->Internals = 0;
 
@@ -526,15 +543,30 @@ void vtkPVSynchronizedRenderWindows::AddRenderWindow(
     }
 
   this->Internals->RenderWindows[id].RenderWindow = renWin;
+  unsigned long start_tag = 0, end_tag = 0;
   if (!renWin->HasObserver(vtkCommand::StartEvent, this->Observer))
     {
-    this->Internals->RenderWindows[id].StartRenderTag =
-      renWin->AddObserver(vtkCommand::StartEvent, this->Observer);
+    start_tag = renWin->AddObserver(vtkCommand::StartEvent, this->Observer);
     }
   if (!renWin->HasObserver(vtkCommand::EndEvent, this->Observer))
     {
-    this->Internals->RenderWindows[id].EndRenderTag =
-      renWin->AddObserver(vtkCommand::EndEvent, this->Observer);
+    end_tag = renWin->AddObserver(vtkCommand::EndEvent, this->Observer);
+    }
+  if (renWin == this->Internals->SharedRenderWindow)
+    {
+    if (start_tag)
+      {
+      this->Internals->SharedWindowStartRenderTag = start_tag;
+      }
+    if (end_tag)
+      {
+      this->Internals->SharedWindowStartRenderTag = end_tag;
+      }
+    }
+  else
+    {
+    this->Internals->RenderWindows[id].StartRenderTag = start_tag;
+    this->Internals->RenderWindows[id].EndRenderTag = end_tag;
     }
 }
 
@@ -682,7 +714,7 @@ void vtkPVSynchronizedRenderWindows::Render(unsigned int id)
   this->Internals->ActiveId = id;
   iter->second.RenderWindow->Render();
   this->Internals->ActiveId = 0;
-  //cout << "Done Rendering: " << id << endl;
+  // cout << "Done Rendering: " << id << endl;
 }
 
 //----------------------------------------------------------------------------
