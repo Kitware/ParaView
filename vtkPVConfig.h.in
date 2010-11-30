@@ -77,4 +77,8 @@
 
 #cmakedefine BUILD_SHARED_LIBS
 
+// The default prevision value for conversion for string to double
+// and double to string
+#define DEFAULT_DOUBLE_PRECISION_VALUE 16
+
 #endif
