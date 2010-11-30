@@ -63,7 +63,7 @@ vtkCaveSynchronizedRenderers::vtkCaveSynchronizedRenderers()
   else
     {
     this->SetNumberOfDisplays(options->GetNumberOfMachines());
-    for (unsigned int cc=0; cc < this->NumberOfDisplays; cc++)
+    for (int cc=0; cc < this->NumberOfDisplays; cc++)
       {
       this->DefineDisplay(cc, options->GetLowerLeft(cc),
         options->GetLowerRight(cc), options->GetUpperLeft(cc));

@@ -160,7 +160,13 @@ void vtkPVContextView::SendImageToRenderServers()
   w2i->Delete();
 }
 
-#define MIN(x,y) (x < y? x : y)
+namespace
+{
+  int vtkMinInt(double x, double y)
+    {
+    return static_cast<int>(x < y? x : y);
+    }
+}
 //----------------------------------------------------------------------------
 void vtkPVContextView::ReceiveImageToFromClient()
 {
@@ -200,13 +206,13 @@ void vtkPVContextView::ReceiveImageToFromClient()
   vtkExtractVOI* voi = vtkExtractVOI::New();
   voi->SetInput(image);
   voi->SetVOI(
-    MIN(1.0, (tile_viewport[0]-viewport[0]) / (viewport[2] -
+    vtkMinInt(1.0, (tile_viewport[0]-viewport[0]) / (viewport[2] -
         viewport[0]))*(image_dims[0]-1),
-    MIN(1.0, (tile_viewport[2]-viewport[0]) / (viewport[2] -
+    vtkMinInt(1.0, (tile_viewport[2]-viewport[0]) / (viewport[2] -
         viewport[0]))*(image_dims[0]-1),
-    MIN(1.0, (tile_viewport[1]-viewport[1]) / (viewport[3] -
+    vtkMinInt(1.0, (tile_viewport[1]-viewport[1]) / (viewport[3] -
         viewport[1]))*(image_dims[1]-1),
-    MIN(1.0, (tile_viewport[3]-viewport[1]) / (viewport[3] -
+    vtkMinInt(1.0, (tile_viewport[3]-viewport[1]) / (viewport[3] -
         viewport[1]))*(image_dims[1]-1),
     0, 0);
   voi->Update();

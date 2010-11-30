@@ -101,7 +101,7 @@ vtkPVSynchronizedRenderer::vtkPVSynchronizedRenderer()
   in_tile_display_mode = (tile_dims[0] > 0 || tile_dims[1] > 0);
   if (!in_tile_display_mode)
     {
-    in_cave_mode = server_info->GetNumberOfMachines();
+    in_cave_mode = server_info->GetNumberOfMachines() > 0;
       // these are present when a pvx file is specified.
     }
 
