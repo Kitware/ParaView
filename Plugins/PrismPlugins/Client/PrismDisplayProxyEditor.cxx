@@ -86,6 +86,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqObjectBuilder.h"
 #include "PrismCubeAxesEditorDialog.h"
 
+#include "PrismCore.h"
 class PrismDisplayProxyEditorInternal : public Ui::PrismDisplayProxyEditor
 {
 public:
@@ -154,105 +155,47 @@ PrismDisplayProxyEditor::PrismDisplayProxyEditor(pqPipelineRepresentation* repr,
     this, SLOT(volumeBlockSelected()));
 
   this->DisableSpecularOnScalarColoring = true;
-
-
-
-  this->CubeAxesActor = NULL;
   this->Representation= repr;
 
-  pqApplicationCore* core = pqApplicationCore::instance();
-  pqObjectBuilder* builder = core->getObjectBuilder();
-  pqServer* server = this->getActiveServer();
-  if(!server)
+  this->CubeAxesActor=NULL;
+  PrismCore* core=PrismCore::instance();
+
+  QMap<pqDataRepresentation*,vtkSMPrismCubeAxesRepresentationProxy*>::iterator iter;
+  iter=core->CubeAxesRepMap.find(repr);
+  if(iter!=core->CubeAxesRepMap.end())
   {
-    qCritical() << "Cannot create reader without an active server.";
-    return ;
-  }
 
-  this->CubeAxesActor=vtkSMPrismCubeAxesRepresentationProxy::SafeDownCast(builder->createProxy("props",
-    "PrismCubeAxesRepresentation", server,
-    "props"));
+    this->CubeAxesActor =iter.value();
 
 
-  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
-    this->CubeAxesActor->GetProperty("Input"));
-  vtkSMInputProperty* ip = vtkSMInputProperty::SafeDownCast(pp);
-  if (!pp)
-  {
-    vtkErrorWithObjectMacro(this->CubeAxesActor,"Failed to locate property " << "Input"
-      << " on the consumer " <<  (this->CubeAxesActor->GetXMLName()));
-    return;
-  }
 
-  if (ip)
-  {
-    ip->RemoveAllProxies();
-    ip->AddInputConnection(repr->getInput()->getProxy(),repr->getOutputPortFromInput()->getPortNumber() );
-  }
-  else
-  {
-    pp->RemoveAllProxies();
-    pp->AddProxy(repr->getInput()->getProxy());
-  }
-  this->CubeAxesActor->UpdateProperty("Input");
+    vtkSMProperty* prop = 0;
 
 
-  vtkSMProperty* prop = 0;
-
-
-  if ((prop = this->CubeAxesActor->GetProperty("Visibility")) != 0)
+    if ((prop = this->CubeAxesActor->GetProperty("Visibility")) != 0)
     {
-     QObject::connect(this->Internal->ShowCubeAxes, SIGNAL(toggled(bool)),
-       this, SLOT(cubeAxesVisibilityChanged()));
+      QObject::connect(this->Internal->ShowCubeAxes, SIGNAL(toggled(bool)),
+        this, SLOT(cubeAxesVisibilityChanged()));
 
-     //needed so the undo / redo properly activate the checkbox
-     this->Internal->Links->addPropertyLink(this->Internal->ShowCubeAxes,
-    "checked", SIGNAL(stateChanged(int)),
-    this->CubeAxesActor,  this->CubeAxesActor->GetProperty("Visibility"));
-    this->Internal->AnnotationGroup->show();
+      //needed so the undo / redo properly activate the checkbox
+      this->Internal->Links->addPropertyLink(this->Internal->ShowCubeAxes,
+        "checked", SIGNAL(stateChanged(int)),
+        this->CubeAxesActor,  this->CubeAxesActor->GetProperty("Visibility"));
+      this->Internal->AnnotationGroup->show();
     }
-  else
+    else
     {
-    this->Internal->AnnotationGroup->hide();
+      this->Internal->AnnotationGroup->hide();
     }
 
 
-  pqRenderView * view= qobject_cast<pqRenderView*>(this->Representation->getView());
-  if(view)
-  {
-    vtkSMViewProxy* renv= view->getViewProxy();
-    vtkSMPropertyHelper(renv, "HiddenRepresentations").Add(this->CubeAxesActor);
-    renv->UpdateVTKObjects();
   }
-
 }
 
 //-----------------------------------------------------------------------------
 /// destructor
 PrismDisplayProxyEditor::~PrismDisplayProxyEditor()
 {
-
-
-
-  if (this->CubeAxesActor)
-  {
-
-    pqRenderView * view= qobject_cast<pqRenderView*>(this->Representation->getView());
-    if(view)
-    {
-      vtkSMViewProxy* renv= view->getViewProxy();
-      vtkSMPropertyHelper(renv, "HiddenRepresentations").Remove(this->CubeAxesActor);
-      renv->UpdateVTKObjects();
-      view->getProxy()->UpdateVTKObjects();
-    }
-
-
-
-    vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
-    pxm->UnRegisterProxy(this->CubeAxesActor->GetXMLGroup(),this->CubeAxesActor->GetClassName(),this->CubeAxesActor);
-  }
-
-
   delete this->Internal;
 }
 
@@ -1063,6 +1006,7 @@ void PrismDisplayProxyEditor::cubeAxesVisibilityChanged()
   vtkSMPropertyHelper(this->CubeAxesActor, "Visibility").Set(this->isCubeAxesVisible());
   this->CubeAxesActor->UpdateVTKObjects();
   this->Representation->renderViewEventually();
+//this->updateAllViews();
 
 
   //vtkSMProxy* reprProxy = (this->Internal->Representation)? this->Internal->Representation->getProxy() : NULL;

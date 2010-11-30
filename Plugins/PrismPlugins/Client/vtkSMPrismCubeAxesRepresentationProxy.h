@@ -35,6 +35,7 @@ protected:
   ~vtkSMPrismCubeAxesRepresentationProxy();
 
   virtual void RepresentationUpdated();
+  bool initializePrismAxes;
 
 private:
   vtkSMPrismCubeAxesRepresentationProxy(const vtkSMPrismCubeAxesRepresentationProxy&); // Not implemented
