@@ -1,7 +1,7 @@
 <ServerManagerConfiguration>
 
   <ProxyGroup name="internal_sources">
-   <SourceProxy name="AVSucdReader" 
+   <SourceProxy name="AVSucdReader"
                 class="vtkAVSucdReader"
                 label="AVS UCD Reader">
      <Documentation
@@ -22,7 +22,7 @@
         </Documentation>
      </StringVectorProperty>
 
-     <StringVectorProperty 
+     <StringVectorProperty
         name="CellArrayInfo"
         information_only="1">
         <ArraySelectionInformationHelper attribute_name="Cell"/>
@@ -31,10 +31,10 @@
      <StringVectorProperty
         name="CellArrayStatus"
         command="SetCellArrayStatus"
-        number_of_elements="2" 
+        number_of_elements="2"
         repeat_command="1"
         number_of_elements_per_command="2"
-        element_types="2 0" 
+        element_types="2 0"
         information_property="CellArrayInfo"
         label="Cell Arrays">
        <ArraySelectionDomain name="array_list">
@@ -47,7 +47,7 @@
        </Documentation>
      </StringVectorProperty>
 
-     <StringVectorProperty 
+     <StringVectorProperty
         name="PointArrayInfo"
         information_only="1">
         <ArraySelectionInformationHelper attribute_name="Point"/>
@@ -56,10 +56,10 @@
      <StringVectorProperty
         name="PointArrayStatus"
         command="SetPointArrayStatus"
-        number_of_elements="2" 
+        number_of_elements="2"
         repeat_command="1"
         number_of_elements_per_command="2"
-        element_types="2 0" 
+        element_types="2 0"
         information_property="PointArrayInfo"
         label="Point Arrays">
        <ArraySelectionDomain name="array_list">
@@ -99,7 +99,7 @@
    <!-- End Meta Image Reader -->
    </SourceProxy>
 
-   <SourceProxy name="legacyreader" 
+   <SourceProxy name="legacyreader"
                 class="vtkPDataSetReader"
                 label="Legacy VTK Reader">
      <Documentation
@@ -120,7 +120,7 @@
    <!-- End legacyreader -->
    </SourceProxy>
 
-   <SourceProxy name="XMLPolyDataReaderCore" 
+   <SourceProxy name="XMLPolyDataReaderCore"
                 class="vtkXMLPolyDataReader"
                 label="XML PolyData Reader">
      <Documentation
@@ -139,7 +139,7 @@
         </Documentation>
      </StringVectorProperty>
 
-     <DoubleVectorProperty 
+     <DoubleVectorProperty
         name="TimestepValues"
         repeatable="1"
         information_only="1">
@@ -149,7 +149,7 @@
         </Documentation>
      </DoubleVectorProperty>
 
-     <StringVectorProperty 
+     <StringVectorProperty
         name="CellArrayInfo"
         information_only="1">
         <ArraySelectionInformationHelper attribute_name="Cell"/>
@@ -158,7 +158,7 @@
      <StringVectorProperty
         name="CellArrayStatus"
         command="SetCellArrayStatus"
-        number_of_elements="0" 
+        number_of_elements="0"
         repeat_command="1"
         number_of_elements_per_command="2"
         element_types="2 0"
@@ -174,7 +174,7 @@
        </Documentation>
      </StringVectorProperty>
 
-     <StringVectorProperty 
+     <StringVectorProperty
         name="PointArrayInfo"
         information_only="1">
         <ArraySelectionInformationHelper attribute_name="Point"/>
@@ -183,10 +183,10 @@
      <StringVectorProperty
         name="PointArrayStatus"
         command="SetPointArrayStatus"
-        number_of_elements="0" 
+        number_of_elements="0"
         repeat_command="1"
         number_of_elements_per_command="2"
-        element_types="2 0" 
+        element_types="2 0"
         information_property="PointArrayInfo"
         label="Point Arrays">
        <ArraySelectionDomain name="array_list">
@@ -201,7 +201,7 @@
    <!-- End XMLPolyDataReaderCore -->
    </SourceProxy>
 
-   <SourceProxy name="XMLUnstructuredGridReaderCore" 
+   <SourceProxy name="XMLUnstructuredGridReaderCore"
                 class="vtkXMLUnstructuredGridReader"
                 label="XML Unstructured Grid reader">
      <Documentation
@@ -220,7 +220,7 @@
         </Documentation>
      </StringVectorProperty>
 
-     <DoubleVectorProperty 
+     <DoubleVectorProperty
         name="TimestepValues"
         repeatable="1"
         information_only="1">
@@ -230,7 +230,7 @@
         </Documentation>
      </DoubleVectorProperty>
 
-     <StringVectorProperty 
+     <StringVectorProperty
         name="CellArrayInfo"
         information_only="1">
         <ArraySelectionInformationHelper attribute_name="Cell"/>
@@ -239,10 +239,10 @@
      <StringVectorProperty
         name="CellArrayStatus"
         command="SetCellArrayStatus"
-        number_of_elements="0" 
+        number_of_elements="0"
         repeat_command="1"
         number_of_elements_per_command="2"
-        element_types="2 0" 
+        element_types="2 0"
         information_property="CellArrayInfo"
         label="Cell Arrays">
        <ArraySelectionDomain name="array_list">
@@ -255,7 +255,7 @@
        </Documentation>
      </StringVectorProperty>
 
-     <StringVectorProperty 
+     <StringVectorProperty
         name="PointArrayInfo"
         information_only="1">
         <ArraySelectionInformationHelper attribute_name="Point"/>
@@ -264,10 +264,10 @@
      <StringVectorProperty
         name="PointArrayStatus"
         command="SetPointArrayStatus"
-        number_of_elements="0" 
+        number_of_elements="0"
         repeat_command="1"
         number_of_elements_per_command="2"
-        element_types="2 0" 
+        element_types="2 0"
         information_property="PointArrayInfo"
         label="Point Arrays">
        <ArraySelectionDomain name="array_list">
@@ -282,7 +282,7 @@
    <!-- End XMLUnstructuredGridReaderCore -->
    </SourceProxy>
 
-   <SourceProxy name="XMLImageDataReaderCore" 
+   <SourceProxy name="XMLImageDataReaderCore"
                 class="vtkXMLImageDataReader"
                 label="XML Image Data Reader">
      <Documentation
@@ -301,7 +301,7 @@
         </Documentation>
      </StringVectorProperty>
 
-     <DoubleVectorProperty 
+     <DoubleVectorProperty
         name="TimestepValues"
         repeatable="1"
         information_only="1">
@@ -311,7 +311,7 @@
         </Documentation>
      </DoubleVectorProperty>
 
-     <StringVectorProperty 
+     <StringVectorProperty
         name="CellArrayInfo"
         information_only="1">
         <ArraySelectionInformationHelper attribute_name="Cell"/>
@@ -320,10 +320,10 @@
      <StringVectorProperty
         name="CellArrayStatus"
         command="SetCellArrayStatus"
-        number_of_elements="0" 
+        number_of_elements="0"
         repeat_command="1"
         number_of_elements_per_command="2"
-        element_types="2 0" 
+        element_types="2 0"
         information_property="CellArrayInfo"
         label="Cell Arrays">
        <ArraySelectionDomain name="array_list">
@@ -336,7 +336,7 @@
        </Documentation>
      </StringVectorProperty>
 
-     <StringVectorProperty 
+     <StringVectorProperty
         name="PointArrayInfo"
         information_only="1">
         <ArraySelectionInformationHelper attribute_name="Point"/>
@@ -345,7 +345,7 @@
      <StringVectorProperty
         name="PointArrayStatus"
         command="SetPointArrayStatus"
-        number_of_elements="0" 
+        number_of_elements="0"
         repeat_command="1"
         number_of_elements_per_command="2"
         element_types="2 0"
@@ -364,7 +364,7 @@
    <!-- End XMLImageDataReaderCore -->
    </SourceProxy>
 
-   <SourceProxy name="XMLStructuredGridReaderCore" 
+   <SourceProxy name="XMLStructuredGridReaderCore"
                 class="vtkXMLStructuredGridReader"
                 label="XML Structured Grid Reader">
      <Documentation
@@ -383,7 +383,7 @@
         </Documentation>
      </StringVectorProperty>
 
-     <DoubleVectorProperty 
+     <DoubleVectorProperty
         name="TimestepValues"
         repeatable="1"
         information_only="1">
@@ -393,7 +393,7 @@
         </Documentation>
      </DoubleVectorProperty>
 
-     <StringVectorProperty 
+     <StringVectorProperty
         name="CellArrayInfo"
         information_only="1">
         <ArraySelectionInformationHelper attribute_name="Cell"/>
@@ -402,10 +402,10 @@
      <StringVectorProperty
         name="CellArrayStatus"
         command="SetCellArrayStatus"
-        number_of_elements="0" 
+        number_of_elements="0"
         repeat_command="1"
         number_of_elements_per_command="2"
-        element_types="2 0" 
+        element_types="2 0"
         information_property="CellArrayInfo"
         label="Cell Arrays">
        <ArraySelectionDomain name="array_list">
@@ -418,7 +418,7 @@
        </Documentation>
      </StringVectorProperty>
 
-     <StringVectorProperty 
+     <StringVectorProperty
         name="PointArrayInfo"
         information_only="1">
         <ArraySelectionInformationHelper attribute_name="Point"/>
@@ -427,7 +427,7 @@
      <StringVectorProperty
         name="PointArrayStatus"
         command="SetPointArrayStatus"
-        number_of_elements="0" 
+        number_of_elements="0"
         repeat_command="1"
         number_of_elements_per_command="2"
         element_types="2 0"
@@ -445,7 +445,7 @@
    <!-- End XMLStructuredGridReaderCore -->
    </SourceProxy>
 
-   <SourceProxy name="XMLRectilinearGridReaderCore" 
+   <SourceProxy name="XMLRectilinearGridReaderCore"
                 class="vtkXMLRectilinearGridReader"
                 label="XML Rectilinear Grid Reader">
      <Documentation
@@ -464,7 +464,7 @@
         </Documentation>
      </StringVectorProperty>
 
-     <DoubleVectorProperty 
+     <DoubleVectorProperty
         name="TimestepValues"
         repeatable="1"
         information_only="1">
@@ -474,7 +474,7 @@
         </Documentation>
      </DoubleVectorProperty>
 
-     <StringVectorProperty 
+     <StringVectorProperty
         name="CellArrayInfo"
         information_only="1">
         <ArraySelectionInformationHelper attribute_name="Cell"/>
@@ -483,10 +483,10 @@
      <StringVectorProperty
         name="CellArrayStatus"
         command="SetCellArrayStatus"
-        number_of_elements="0" 
+        number_of_elements="0"
         repeat_command="1"
         number_of_elements_per_command="2"
-        element_types="2 0" 
+        element_types="2 0"
         information_property="CellArrayInfo"
         label="Cell Arrays">
        <ArraySelectionDomain name="array_list">
@@ -499,7 +499,7 @@
        </Documentation>
      </StringVectorProperty>
 
-     <StringVectorProperty 
+     <StringVectorProperty
         name="PointArrayInfo"
         information_only="1">
         <ArraySelectionInformationHelper attribute_name="Point"/>
@@ -508,7 +508,7 @@
      <StringVectorProperty
         name="PointArrayStatus"
         command="SetPointArrayStatus"
-        number_of_elements="0" 
+        number_of_elements="0"
         repeat_command="1"
         number_of_elements_per_command="2"
         element_types="2 0"
@@ -526,7 +526,7 @@
    <!-- End XMLRectilinearGridReaderCore -->
    </SourceProxy>
 
-   <SourceProxy name="XMLPPolyDataReaderCore" 
+   <SourceProxy name="XMLPPolyDataReaderCore"
                 class="vtkXMLPPolyDataReader"
                 label="XML Partitioned Polydata Reader">
      <Documentation
@@ -545,7 +545,7 @@
         </Documentation>
      </StringVectorProperty>
 
-     <StringVectorProperty 
+     <StringVectorProperty
         name="CellArrayInfo"
         information_only="1">
         <ArraySelectionInformationHelper attribute_name="Cell"/>
@@ -554,10 +554,10 @@
      <StringVectorProperty
         name="CellArrayStatus"
         command="SetCellArrayStatus"
-        number_of_elements="0" 
+        number_of_elements="0"
         repeat_command="1"
         number_of_elements_per_command="2"
-        element_types="2 0" 
+        element_types="2 0"
         information_property="CellArrayInfo"
         label="Cell Arrays">
        <ArraySelectionDomain name="array_list">
@@ -570,7 +570,7 @@
        </Documentation>
      </StringVectorProperty>
 
-     <StringVectorProperty 
+     <StringVectorProperty
         name="PointArrayInfo"
         information_only="1">
         <ArraySelectionInformationHelper attribute_name="Point"/>
@@ -579,7 +579,7 @@
      <StringVectorProperty
         name="PointArrayStatus"
         command="SetPointArrayStatus"
-        number_of_elements="0" 
+        number_of_elements="0"
         repeat_command="1"
         number_of_elements_per_command="2"
         element_types="2 0"
@@ -598,7 +598,7 @@
    <!-- End XMLPPolyDataReaderCore -->
    </SourceProxy>
 
-   <SourceProxy name="XMLPUnstructuredGridReaderCore" 
+   <SourceProxy name="XMLPUnstructuredGridReaderCore"
                 class="vtkXMLPUnstructuredGridReader"
                 label="XML Partitioned Unstructured Grid Reader">
      <Documentation
@@ -617,7 +617,7 @@
         </Documentation>
      </StringVectorProperty>
 
-     <StringVectorProperty 
+     <StringVectorProperty
         name="CellArrayInfo"
         information_only="1">
         <ArraySelectionInformationHelper attribute_name="Cell"/>
@@ -626,10 +626,10 @@
      <StringVectorProperty
         name="CellArrayStatus"
         command="SetCellArrayStatus"
-        number_of_elements="0" 
+        number_of_elements="0"
         repeat_command="1"
         number_of_elements_per_command="2"
-        element_types="2 0" 
+        element_types="2 0"
         information_property="CellArrayInfo"
         label="Cell Arrays">
        <ArraySelectionDomain name="array_list">
@@ -642,7 +642,7 @@
        </Documentation>
      </StringVectorProperty>
 
-     <StringVectorProperty 
+     <StringVectorProperty
         name="PointArrayInfo"
         information_only="1">
         <ArraySelectionInformationHelper attribute_name="Point"/>
@@ -651,10 +651,10 @@
      <StringVectorProperty
         name="PointArrayStatus"
         command="SetPointArrayStatus"
-        number_of_elements="0" 
+        number_of_elements="0"
         repeat_command="1"
         number_of_elements_per_command="2"
-        element_types="2 0" 
+        element_types="2 0"
         information_property="PointArrayInfo"
         label="Point Arrays">
        <ArraySelectionDomain name="array_list">
@@ -669,7 +669,7 @@
    <!-- End XMLPUnstructuredGridReaderCore -->
    </SourceProxy>
 
-   <SourceProxy name="XMLPImageDataReaderCore" 
+   <SourceProxy name="XMLPImageDataReaderCore"
                 class="vtkXMLPImageDataReader"
                 label="XML Partitioned Image Data Reader">
      <Documentation
@@ -688,7 +688,7 @@
         </Documentation>
      </StringVectorProperty>
 
-     <StringVectorProperty 
+     <StringVectorProperty
         name="CellArrayInfo"
         information_only="1">
         <ArraySelectionInformationHelper attribute_name="Cell"/>
@@ -697,10 +697,10 @@
      <StringVectorProperty
         name="CellArrayStatus"
         command="SetCellArrayStatus"
-        number_of_elements="0" 
+        number_of_elements="0"
         repeat_command="1"
         number_of_elements_per_command="2"
-        element_types="2 0" 
+        element_types="2 0"
         information_property="CellArrayInfo"
         label="Cell Arrays">
        <ArraySelectionDomain name="array_list">
@@ -713,7 +713,7 @@
        </Documentation>
      </StringVectorProperty>
 
-     <StringVectorProperty 
+     <StringVectorProperty
         name="PointArrayInfo"
         information_only="1">
         <ArraySelectionInformationHelper attribute_name="Point"/>
@@ -722,10 +722,10 @@
      <StringVectorProperty
         name="PointArrayStatus"
         command="SetPointArrayStatus"
-        number_of_elements="0" 
+        number_of_elements="0"
         repeat_command="1"
         number_of_elements_per_command="2"
-        element_types="2 0" 
+        element_types="2 0"
         information_property="PointArrayInfo"
         label="Point Arrays">
        <ArraySelectionDomain name="array_list">
@@ -740,7 +740,7 @@
    <!-- End XMLPImageDataReaderCore -->
    </SourceProxy>
 
-   <SourceProxy name="XMLPStructuredGridReaderCore" 
+   <SourceProxy name="XMLPStructuredGridReaderCore"
                 class="vtkXMLPStructuredGridReader"
                 label="XML Partitioned Structured Grid Reader">
      <Documentation
@@ -759,7 +759,7 @@
         </Documentation>
      </StringVectorProperty>
 
-     <StringVectorProperty 
+     <StringVectorProperty
         name="CellArrayInfo"
         information_only="1">
         <ArraySelectionInformationHelper attribute_name="Cell"/>
@@ -768,10 +768,10 @@
      <StringVectorProperty
         name="CellArrayStatus"
         command="SetCellArrayStatus"
-        number_of_elements="0" 
+        number_of_elements="0"
         repeat_command="1"
         number_of_elements_per_command="2"
-        element_types="2 0" 
+        element_types="2 0"
         information_property="CellArrayInfo"
         label="Cell Arrays">
        <ArraySelectionDomain name="array_list">
@@ -784,7 +784,7 @@
        </Documentation>
      </StringVectorProperty>
 
-     <StringVectorProperty 
+     <StringVectorProperty
         name="PointArrayInfo"
         information_only="1">
         <ArraySelectionInformationHelper attribute_name="Point"/>
@@ -793,10 +793,10 @@
      <StringVectorProperty
         name="PointArrayStatus"
         command="SetPointArrayStatus"
-        number_of_elements="0" 
+        number_of_elements="0"
         repeat_command="1"
         number_of_elements_per_command="2"
-        element_types="2 0" 
+        element_types="2 0"
         information_property="PointArrayInfo"
         label="Point Arrays">
        <ArraySelectionDomain name="array_list">
@@ -811,7 +811,7 @@
    <!-- End XMLPStructuredGridReaderCore -->
    </SourceProxy>
 
-   <SourceProxy name="XMLPRectilinearGridReaderCore" 
+   <SourceProxy name="XMLPRectilinearGridReaderCore"
                 class="vtkXMLPRectilinearGridReader"
                 label="XML Partitioned Rectilinear Grid Reader">
      <Documentation
@@ -830,7 +830,7 @@
         </Documentation>
      </StringVectorProperty>
 
-     <StringVectorProperty 
+     <StringVectorProperty
         name="CellArrayInfo"
         information_only="1">
         <ArraySelectionInformationHelper attribute_name="Cell"/>
@@ -839,10 +839,10 @@
      <StringVectorProperty
         name="CellArrayStatus"
         command="SetCellArrayStatus"
-        number_of_elements="0" 
+        number_of_elements="0"
         repeat_command="1"
         number_of_elements_per_command="2"
-        element_types="2 0" 
+        element_types="2 0"
         information_property="CellArrayInfo"
         label="Cell Arrays">
        <ArraySelectionDomain name="array_list">
@@ -855,7 +855,7 @@
        </Documentation>
      </StringVectorProperty>
 
-     <StringVectorProperty 
+     <StringVectorProperty
         name="PointArrayInfo"
         information_only="1">
         <ArraySelectionInformationHelper attribute_name="Point"/>
@@ -864,10 +864,10 @@
      <StringVectorProperty
         name="PointArrayStatus"
         command="SetPointArrayStatus"
-        number_of_elements="0" 
+        number_of_elements="0"
         repeat_command="1"
         number_of_elements_per_command="2"
-        element_types="2 0" 
+        element_types="2 0"
         information_property="PointArrayInfo"
         label="Point Arrays">
        <ArraySelectionDomain name="array_list">
@@ -989,7 +989,7 @@
       <!-- End of CSVReaderCore -->
    </SourceProxy>
 
-   <SourceProxy name="XMLMultiBlockDataReaderCore" 
+   <SourceProxy name="XMLMultiBlockDataReaderCore"
                 class="vtkXMLMultiBlockDataReader"
                 label="XML Multi-Block Data reader">
      <Documentation>
@@ -1009,7 +1009,7 @@
    <!-- End MultiBlockDataReader -->
    </SourceProxy>
 
-   <SourceProxy name="XMLHierarchicalBoxDataReaderCore" 
+   <SourceProxy name="XMLHierarchicalBoxDataReaderCore"
                 class="vtkXMLHierarchicalBoxDataReader"
                 label="XML Hierarchical Box Data reader">
 
@@ -1120,14 +1120,14 @@
       <!-- ParticleReaderCore -->
     </SourceProxy>
 
-   <SourceProxy name="ExodusIIReaderCore" 
+   <SourceProxy name="ExodusIIReaderCore"
                 class="vtkPExodusIIReader">
      <Documentation
        short_help="Read Exodus II files."
        long_help="Read an Exodus II file to produce an unstructured grid.">
         The Exodus reader loads Exodus II files and produces an unstructured grid output. The default file extensions are .g, .e, .ex2, .ex2v2, .exo, .gen, .exoII, .exii, .0, .00, .000, and .0000 .
      </Documentation>
-     
+
      <StringVectorProperty
         name="FileName"
         command="SetFileName"
@@ -1139,7 +1139,7 @@
         </Documentation>
      </StringVectorProperty>
 
-     <StringVectorProperty 
+     <StringVectorProperty
         name="FilePrefixInfo"
         command="GetFilePrefix"
         information_only="1">
@@ -1162,7 +1162,7 @@
         </Documentation>
      </StringVectorProperty>
 
-     <StringVectorProperty 
+     <StringVectorProperty
         name="FilePatternInfo"
         command="GetFilePattern"
         information_only="1">
@@ -1185,17 +1185,17 @@
        </Documentation>
      </StringVectorProperty>
 
-     <IntVectorProperty 
+     <IntVectorProperty
         name="FileRangeInfo"
         command="GetFileRange"
         information_only="1">
         <SimpleIntInformationHelper/>
      </IntVectorProperty>
 
-     <IntVectorProperty 
+     <IntVectorProperty
         name="FileRange"
         command="SetFileRange"
-        number_of_elements="2" 
+        number_of_elements="2"
         default_values="-1 -1"
         animateable="0"
         information_property="FileRangeInfo" >
@@ -1209,7 +1209,7 @@
        </Documentation>
      </IntVectorProperty>
 
-     <StringVectorProperty 
+     <StringVectorProperty
         name="XMLFileNameInfo"
         command="GetXMLFileName"
         information_only="1">
@@ -1268,8 +1268,8 @@
      <!-- for discrete time, the latter for continuous time), but changing -->
      <!-- the HasModeShapes ivar switches between discrete and continuous -->
      <!-- time. -->
-     <DoubleVectorProperty 
-         name="TimestepValues" 
+     <DoubleVectorProperty
+         name="TimestepValues"
          repeatable="1"
          information_only="1">
        <TimeStepsInformationHelper/>
@@ -1300,42 +1300,42 @@
           Read in more time information if its available. Useful while running a simulation.
        </Documentation>
      </Property>
-     
-     <StringVectorProperty 
+
+     <StringVectorProperty
         name="EdgeBlocksInfo"
         information_only="1">
         <ArraySelectionInformationHelper attribute_name="EdgeBlock"/>
      </StringVectorProperty>
-     
+
      <StringVectorProperty
         name="EdgeBlocks"
         command="SetEdgeBlockArrayStatus"
-        number_of_elements="2" 
+        number_of_elements="2"
         repeat_command="1"
         number_of_elements_per_command="2"
-        element_types="2 0" 
-        information_property="EdgeBlockArrayInfo"> 
+        element_types="2 0"
+        information_property="EdgeBlockArrayInfo">
        <ArraySelectionDomain name="array_list">
           <RequiredProperties>
              <Property name="EdgeBlocksInfo" function="ArrayList"/>
           </RequiredProperties>
        </ArraySelectionDomain>
      </StringVectorProperty>
-     
-     <StringVectorProperty 
+
+     <StringVectorProperty
         name="FaceBlocksInfo"
         information_only="1">
         <ArraySelectionInformationHelper attribute_name="FaceBlock"/>
      </StringVectorProperty>
-     
+
      <StringVectorProperty
         name="FaceBlocks"
         command="SetFaceBlockArrayStatus"
-        number_of_elements="2" 
+        number_of_elements="2"
         repeat_command="1"
         number_of_elements_per_command="2"
-        element_types="2 0" 
-        information_property="FaceBlockArrayInfo"> 
+        element_types="2 0"
+        information_property="FaceBlockArrayInfo">
        <ArraySelectionDomain name="array_list">
           <RequiredProperties>
              <Property name="FaceBlocksInfo" function="ArrayList"/>
@@ -1353,7 +1353,7 @@
         </Documentation>
      </IntVectorProperty>
 
-     <StringVectorProperty 
+     <StringVectorProperty
         name="ElementBlocksInfo"
         information_only="1">
         <ArraySelectionInformationHelper attribute_name="GlobalResult"/>
@@ -1362,7 +1362,7 @@
           subtree="Blocks">
         </SILInformationHelper>
      </StringVectorProperty>
-     
+
      <StringVectorProperty
         name="ElementBlocks"
         command="SetElementBlockArrayStatus"
@@ -1376,7 +1376,7 @@
        </SILDomain>
      </StringVectorProperty>
 
-     <StringVectorProperty 
+     <StringVectorProperty
         name="GlobalVariablesInfo"
         information_only="1">
         <ArraySelectionInformationHelper attribute_name="GlobalResult"/>
@@ -1388,15 +1388,15 @@
         repeat_command="1"
         number_of_elements_per_command="2"
         element_types="2 0"
-        information_property="GlobalVariablesInfo"> 
+        information_property="GlobalVariablesInfo">
        <ArraySelectionDomain name="array_list">
           <RequiredProperties>
              <Property name="GlobalVariablesInfo" function="ArrayList"/>
           </RequiredProperties>
        </ArraySelectionDomain>
      </StringVectorProperty>
-     
-     <StringVectorProperty 
+
+     <StringVectorProperty
         name="PointVariablesInfo"
         information_only="1">
         <ArraySelectionInformationHelper attribute_name="PointResult"/>
@@ -1405,19 +1405,19 @@
      <StringVectorProperty
         name="PointVariables"
         command="SetPointResultArrayStatus"
-        number_of_elements="2" 
+        number_of_elements="2"
         repeat_command="1"
         number_of_elements_per_command="2"
         element_types="2 0"
-        information_property="PointVariablesInfo"> 
+        information_property="PointVariablesInfo">
        <ArraySelectionDomain name="array_list">
           <RequiredProperties>
              <Property name="PointVariablesInfo" function="ArrayList"/>
           </RequiredProperties>
        </ArraySelectionDomain>
      </StringVectorProperty>
-     
-     <StringVectorProperty 
+
+     <StringVectorProperty
         name="EdgeVariablesInfo"
         information_only="1">
         <ArraySelectionInformationHelper attribute_name="EdgeResult"/>
@@ -1426,19 +1426,19 @@
      <StringVectorProperty
         name="EdgeVariables"
         command="SetEdgeResultArrayStatus"
-        number_of_elements="2" 
+        number_of_elements="2"
         repeat_command="1"
         number_of_elements_per_command="2"
         element_types="2 0"
-        information_property="EdgeVariablesInfo"> 
+        information_property="EdgeVariablesInfo">
        <ArraySelectionDomain name="array_list">
           <RequiredProperties>
              <Property name="EdgeVariablesInfo" function="ArrayList"/>
           </RequiredProperties>
        </ArraySelectionDomain>
      </StringVectorProperty>
-     
-     <StringVectorProperty 
+
+     <StringVectorProperty
         name="FaceVariablesInfo"
         information_only="1">
         <ArraySelectionInformationHelper attribute_name="FaceResult"/>
@@ -1447,19 +1447,19 @@
      <StringVectorProperty
         name="FaceVariables"
         command="SetFaceResultArrayStatus"
-        number_of_elements="2" 
+        number_of_elements="2"
         repeat_command="1"
         number_of_elements_per_command="2"
         element_types="2 0"
-        information_property="FaceVariablesInfo"> 
+        information_property="FaceVariablesInfo">
        <ArraySelectionDomain name="array_list">
           <RequiredProperties>
              <Property name="FaceVariablesInfo" function="ArrayList"/>
           </RequiredProperties>
        </ArraySelectionDomain>
      </StringVectorProperty>
-     
-     <StringVectorProperty 
+
+     <StringVectorProperty
         name="ElementVariablesInfo"
         information_only="1">
         <ArraySelectionInformationHelper attribute_name="ElementResult"/>
@@ -1468,19 +1468,19 @@
      <StringVectorProperty
         name="ElementVariables"
         command="SetElementResultArrayStatus"
-        number_of_elements="2" 
+        number_of_elements="2"
         repeat_command="1"
         number_of_elements_per_command="2"
-        element_types="2 0" 
-        information_property="ElementVariablesInfo"> 
+        element_types="2 0"
+        information_property="ElementVariablesInfo">
        <ArraySelectionDomain name="array_list">
           <RequiredProperties>
              <Property name="ElementVariablesInfo" function="ArrayList"/>
           </RequiredProperties>
        </ArraySelectionDomain>
      </StringVectorProperty>
-      
-     <StringVectorProperty 
+
+     <StringVectorProperty
         name="NodeMapInfo"
         information_only="1">
         <ArraySelectionInformationHelper attribute_name="NodeMap"/>
@@ -1489,11 +1489,11 @@
      <StringVectorProperty
         name="NodeMapArrayStatus"
         command="SetNodeMapArrayStatus"
-        number_of_elements="2" 
+        number_of_elements="2"
         repeat_command="1"
         number_of_elements_per_command="2"
         element_types="2 0"
-        information_property="NodeMapInfo"> 
+        information_property="NodeMapInfo">
        <ArraySelectionDomain name="array_list">
           <RequiredProperties>
              <Property name="NodeMapInfo" function="ArrayList"/>
@@ -1501,7 +1501,7 @@
        </ArraySelectionDomain>
      </StringVectorProperty>
 
-      <StringVectorProperty 
+      <StringVectorProperty
         name="EdgeMapInfo"
         information_only="1">
         <ArraySelectionInformationHelper attribute_name="EdgeMap"/>
@@ -1510,11 +1510,11 @@
      <StringVectorProperty
         name="EdgeMapArrayStatus"
         command="SetEdgeMapArrayStatus"
-        number_of_elements="2" 
+        number_of_elements="2"
         repeat_command="1"
         number_of_elements_per_command="2"
         element_types="2 0"
-        information_property="EdgeMapInfo"> 
+        information_property="EdgeMapInfo">
        <ArraySelectionDomain name="array_list">
           <RequiredProperties>
              <Property name="EdgeMapInfo" function="ArrayList"/>
@@ -1522,7 +1522,7 @@
        </ArraySelectionDomain>
      </StringVectorProperty>
 
-      <StringVectorProperty 
+      <StringVectorProperty
         name="FaceMapInfo"
         information_only="1">
         <ArraySelectionInformationHelper attribute_name="FaceMap"/>
@@ -1531,11 +1531,11 @@
      <StringVectorProperty
         name="FaceMapArrayStatus"
         command="SetFaceMapArrayStatus"
-        number_of_elements="2" 
+        number_of_elements="2"
         repeat_command="1"
         number_of_elements_per_command="2"
         element_types="2 0"
-        information_property="FaceMapInfo"> 
+        information_property="FaceMapInfo">
        <ArraySelectionDomain name="array_list">
           <RequiredProperties>
              <Property name="FaceMapInfo" function="ArrayList"/>
@@ -1543,7 +1543,7 @@
        </ArraySelectionDomain>
      </StringVectorProperty>
 
-      <StringVectorProperty 
+      <StringVectorProperty
         name="ElementMapInfo"
         information_only="1">
         <ArraySelectionInformationHelper attribute_name="ElementMap"/>
@@ -1552,19 +1552,19 @@
      <StringVectorProperty
         name="ElementMapArrayStatus"
         command="SetElementMapArrayStatus"
-        number_of_elements="2" 
+        number_of_elements="2"
         repeat_command="1"
         number_of_elements_per_command="2"
         element_types="2 0"
-        information_property="ElementMapInfo"> 
+        information_property="ElementMapInfo">
        <ArraySelectionDomain name="array_list">
           <RequiredProperties>
              <Property name="ElementMapInfo" function="ArrayList"/>
           </RequiredProperties>
        </ArraySelectionDomain>
      </StringVectorProperty>
-      
-     <StringVectorProperty 
+
+     <StringVectorProperty
         name="NodeSetInfo"
         information_only="1">
         <ArraySelectionInformationHelper attribute_name="NodeSet"/>
@@ -1573,19 +1573,19 @@
      <StringVectorProperty
         name="NodeSetArrayStatus"
         command="SetNodeSetArrayStatus"
-        number_of_elements="2" 
+        number_of_elements="2"
         repeat_command="1"
         number_of_elements_per_command="2"
         element_types="2 0"
-        information_property="NodeSetInfo"> 
+        information_property="NodeSetInfo">
        <ArraySelectionDomain name="array_list">
           <RequiredProperties>
              <Property name="NodeSetInfo" function="ArrayList"/>
           </RequiredProperties>
        </ArraySelectionDomain>
      </StringVectorProperty>
-     
-     <StringVectorProperty 
+
+     <StringVectorProperty
         name="SideSetInfo"
         information_only="1">
         <ArraySelectionInformationHelper attribute_name="SideSet"/>
@@ -1594,19 +1594,19 @@
      <StringVectorProperty
         name="SideSetArrayStatus"
         command="SetSideSetArrayStatus"
-        number_of_elements="2" 
+        number_of_elements="2"
         repeat_command="1"
         number_of_elements_per_command="2"
         element_types="2 0"
-        information_property="SideSetInfo"> 
+        information_property="SideSetInfo">
        <ArraySelectionDomain name="array_list">
           <RequiredProperties>
              <Property name="SideSetInfo" function="ArrayList"/>
           </RequiredProperties>
        </ArraySelectionDomain>
      </StringVectorProperty>
-     
-     <StringVectorProperty 
+
+     <StringVectorProperty
         name="FaceSetInfo"
         information_only="1">
         <ArraySelectionInformationHelper attribute_name="FaceSet"/>
@@ -1615,19 +1615,19 @@
      <StringVectorProperty
         name="FaceSetArrayStatus"
         command="SetFaceSetArrayStatus"
-        number_of_elements="2" 
+        number_of_elements="2"
         repeat_command="1"
         number_of_elements_per_command="2"
         element_types="2 0"
-        information_property="FaceSetInfo"> 
+        information_property="FaceSetInfo">
        <ArraySelectionDomain name="array_list">
           <RequiredProperties>
              <Property name="FaceSetInfo" function="ArrayList"/>
           </RequiredProperties>
        </ArraySelectionDomain>
      </StringVectorProperty>
-     
-     <StringVectorProperty 
+
+     <StringVectorProperty
         name="EdgeSetInfo"
         information_only="1">
         <ArraySelectionInformationHelper attribute_name="EdgeSet"/>
@@ -1636,19 +1636,19 @@
      <StringVectorProperty
         name="EdgeSetArrayStatus"
         command="SetEdgeSetArrayStatus"
-        number_of_elements="2" 
+        number_of_elements="2"
         repeat_command="1"
         number_of_elements_per_command="2"
         element_types="2 0"
-        information_property="EdgeSetInfo"> 
+        information_property="EdgeSetInfo">
        <ArraySelectionDomain name="array_list">
           <RequiredProperties>
              <Property name="EdgeSetInfo" function="ArrayList"/>
           </RequiredProperties>
        </ArraySelectionDomain>
      </StringVectorProperty>
-     
-     <StringVectorProperty 
+
+     <StringVectorProperty
         name="ElementSetInfo"
         information_only="1">
         <ArraySelectionInformationHelper attribute_name="ElementSet"/>
@@ -1657,11 +1657,11 @@
      <StringVectorProperty
         name="ElementSetArrayStatus"
         command="SetElementSetArrayStatus"
-        number_of_elements="2" 
+        number_of_elements="2"
         repeat_command="1"
         number_of_elements_per_command="2"
         element_types="2 0"
-        information_property="ElementSetInfo"> 
+        information_property="ElementSetInfo">
        <ArraySelectionDomain name="array_list">
           <RequiredProperties>
              <Property name="ElementSetInfo" function="ArrayList"/>
@@ -1669,7 +1669,7 @@
        </ArraySelectionDomain>
      </StringVectorProperty>
 
-     <StringVectorProperty 
+     <StringVectorProperty
         name="ElementSetResultArrayInfo"
         information_only="1">
         <ArraySelectionInformationHelper attribute_name="ElementSetResult"/>
@@ -1678,19 +1678,19 @@
      <StringVectorProperty
         name="ElementSetResultArrayStatus"
         command="SetElementSetResultArrayStatus"
-        number_of_elements="2" 
+        number_of_elements="2"
         repeat_command="1"
         number_of_elements_per_command="2"
         element_types="2 0"
-        information_property="ElementSetResultArrayInfo"> 
+        information_property="ElementSetResultArrayInfo">
        <ArraySelectionDomain name="array_list">
           <RequiredProperties>
              <Property name="ElementSetResultArrayInfo" function="ArrayList"/>
           </RequiredProperties>
        </ArraySelectionDomain>
      </StringVectorProperty>
-     
-     <StringVectorProperty 
+
+     <StringVectorProperty
         name="SideSetResultArrayInfo"
         information_only="1">
         <ArraySelectionInformationHelper attribute_name="SideSetResult"/>
@@ -1699,19 +1699,19 @@
      <StringVectorProperty
         name="SideSetResultArrayStatus"
         command="SetSideSetResultArrayStatus"
-        number_of_elements="2" 
+        number_of_elements="2"
         repeat_command="1"
         number_of_elements_per_command="2"
         element_types="2 0"
-        information_property="SideSetResultArrayInfo"> 
+        information_property="SideSetResultArrayInfo">
        <ArraySelectionDomain name="array_list">
           <RequiredProperties>
              <Property name="SideSetResultArrayInfo" function="ArrayList"/>
           </RequiredProperties>
        </ArraySelectionDomain>
      </StringVectorProperty>
-     
-     <StringVectorProperty 
+
+     <StringVectorProperty
         name="FaceSetResultArrayInfo"
         information_only="1">
         <ArraySelectionInformationHelper attribute_name="FaceSetResult"/>
@@ -1720,19 +1720,19 @@
      <StringVectorProperty
         name="FaceSetResultArrayStatus"
         command="SetFaceSetResultArrayStatus"
-        number_of_elements="2" 
+        number_of_elements="2"
         repeat_command="1"
         number_of_elements_per_command="2"
         element_types="2 0"
-        information_property="FaceSetResultArrayInfo"> 
+        information_property="FaceSetResultArrayInfo">
        <ArraySelectionDomain name="array_list">
           <RequiredProperties>
              <Property name="FaceSetResultArrayInfo" function="ArrayList"/>
           </RequiredProperties>
        </ArraySelectionDomain>
      </StringVectorProperty>
-     
-     <StringVectorProperty 
+
+     <StringVectorProperty
         name="EdgeSetResultArrayInfo"
         information_only="1">
         <ArraySelectionInformationHelper attribute_name="EdgeSetResult"/>
@@ -1741,19 +1741,19 @@
      <StringVectorProperty
         name="EdgeSetResultArrayStatus"
         command="SetEdgeSetResultArrayStatus"
-        number_of_elements="2" 
+        number_of_elements="2"
         repeat_command="1"
         number_of_elements_per_command="2"
         element_types="2 0"
-        information_property="EdgeSetResultArrayInfo"> 
+        information_property="EdgeSetResultArrayInfo">
        <ArraySelectionDomain name="array_list">
           <RequiredProperties>
              <Property name="EdgeSetResultArrayInfo" function="ArrayList"/>
           </RequiredProperties>
        </ArraySelectionDomain>
      </StringVectorProperty>
-     
-     <StringVectorProperty 
+
+     <StringVectorProperty
         name="NodeSetResultArrayInfo"
         information_only="1">
         <ArraySelectionInformationHelper attribute_name="NodeSetResult"/>
@@ -1762,11 +1762,11 @@
      <StringVectorProperty
         name="NodeSetResultArrayStatus"
         command="SetNodeSetResultArrayStatus"
-        number_of_elements="2" 
+        number_of_elements="2"
         repeat_command="1"
         number_of_elements_per_command="2"
         element_types="2 0"
-        information_property="NodeSetResultArrayInfo"> 
+        information_property="NodeSetResultArrayInfo">
        <ArraySelectionDomain name="array_list">
           <RequiredProperties>
              <Property name="NodeSetResultArrayInfo" function="ArrayList"/>
@@ -1774,81 +1774,81 @@
        </ArraySelectionDomain>
      </StringVectorProperty>
 
-     <IntVectorProperty 
-        name="ApplyDisplacements" 
-        command="SetApplyDisplacements" 
+     <IntVectorProperty
+        name="ApplyDisplacements"
+        command="SetApplyDisplacements"
         number_of_elements="1"
-        default_values="1" > 
+        default_values="1" >
        <BooleanDomain name="bool"/>
        <Documentation>
          Geometric locations can include displacements. When this option is on, the nodal positions are 'displaced' by the standard exodus displacement vector. If displacements are turned 'off', the user can explicitly add them by applying a warp filter.
        </Documentation>
      </IntVectorProperty>
 
-     <DoubleVectorProperty 
-        name="DisplacementMagnitude" 
-        command="SetDisplacementMagnitude" 
+     <DoubleVectorProperty
+        name="DisplacementMagnitude"
+        command="SetDisplacementMagnitude"
         number_of_elements="1"
-        default_values="1" > 
+        default_values="1" >
        <DoubleRangeDomain name="range"/>
        <Documentation>
          When displacements are being applied, they are scaled by this amount.  Set to 1 for no scaling.
        </Documentation>
      </DoubleVectorProperty>
-     
-     <IntVectorProperty 
-        name="GenerateObjectIdCellArray" 
-        command="SetGenerateObjectIdCellArray" 
+
+     <IntVectorProperty
+        name="GenerateObjectIdCellArray"
+        command="SetGenerateObjectIdCellArray"
         number_of_elements="1"
-        default_values="1" > 
+        default_values="1" >
        <BooleanDomain name="bool"/>
      </IntVectorProperty>
 
-     <IntVectorProperty 
-        name="GenerateGlobalNodeIdArray" 
-        command="SetGenerateGlobalNodeIdArray" 
+     <IntVectorProperty
+        name="GenerateGlobalNodeIdArray"
+        command="SetGenerateGlobalNodeIdArray"
         number_of_elements="1"
-        default_values="1" > 
-       <BooleanDomain name="bool"/>
-     </IntVectorProperty>
-     
-     <IntVectorProperty 
-        name="GenerateGlobalElementIdArray" 
-        command="SetGenerateGlobalElementIdArray" 
-        number_of_elements="1"
-        default_values="1" > 
+        default_values="1" >
        <BooleanDomain name="bool"/>
      </IntVectorProperty>
 
-     <IntVectorProperty 
-        name="GenerateImplicitNodeIdArray" 
-        command="SetGenerateImplicitNodeIdArray" 
+     <IntVectorProperty
+        name="GenerateGlobalElementIdArray"
+        command="SetGenerateGlobalElementIdArray"
         number_of_elements="1"
-        default_values="0" > 
-       <BooleanDomain name="bool"/>
-     </IntVectorProperty>
-     
-     <IntVectorProperty 
-        name="GenerateImplicitElementIdArray" 
-        command="SetGenerateImplicitElementIdArray" 
-        number_of_elements="1"
-        default_values="0" > 
+        default_values="1" >
        <BooleanDomain name="bool"/>
      </IntVectorProperty>
 
-     <IntVectorProperty 
-        name="GenerateFileIdArray" 
-        command="SetGenerateFileIdArray" 
+     <IntVectorProperty
+        name="GenerateImplicitNodeIdArray"
+        command="SetGenerateImplicitNodeIdArray"
         number_of_elements="1"
-        default_values="0" > 
+        default_values="0" >
        <BooleanDomain name="bool"/>
      </IntVectorProperty>
 
-     <IntVectorProperty 
-        name="ExodusModelMetadata" 
-        command="SetExodusModelMetadata" 
+     <IntVectorProperty
+        name="GenerateImplicitElementIdArray"
+        command="SetGenerateImplicitElementIdArray"
         number_of_elements="1"
-        default_values="0" > 
+        default_values="0" >
+       <BooleanDomain name="bool"/>
+     </IntVectorProperty>
+
+     <IntVectorProperty
+        name="GenerateFileIdArray"
+        command="SetGenerateFileIdArray"
+        number_of_elements="1"
+        default_values="0" >
+       <BooleanDomain name="bool"/>
+     </IntVectorProperty>
+
+     <IntVectorProperty
+        name="ExodusModelMetadata"
+        command="SetExodusModelMetadata"
+        number_of_elements="1"
+        default_values="0" >
        <BooleanDomain name="bool"/>
      </IntVectorProperty>
 
@@ -1858,14 +1858,14 @@
 
    <!-- End ExodusIIReaderCore -->
    </SourceProxy>
-      
-   <SourceProxy name="TecplotReaderCore" 
+
+   <SourceProxy name="TecplotReaderCore"
                 class="vtkTecplotReader"
                 label="VTK Tecplot Reader">
        <Documentation>
           Core for TecplotReader
        </Documentation>
-      
+
      <StringVectorProperty
         name="FileName"
         command="SetFileName"
@@ -1876,7 +1876,7 @@
         </Documentation>
      </StringVectorProperty>
 
-     <StringVectorProperty 
+     <StringVectorProperty
         name="DataArrayInfo"
         information_only="1">
         <ArraySelectionInformationHelper attribute_name="Data"/>
@@ -1885,27 +1885,27 @@
      <StringVectorProperty
         name="DataArrayStatus"
         command="SetDataArrayStatus"
-        number_of_elements="0" 
+        number_of_elements="0"
         repeat_command="1"
         number_of_elements_per_command="2"
         element_types="2 0"
         information_property="DataArrayInfo"
         label="Data Arrays">
-      
+
        <ArraySelectionDomain name="array_list">
           <RequiredProperties>
              <Property name="DataArrayInfo" function="ArrayList"/>
           </RequiredProperties>
        </ArraySelectionDomain>
-       
+
        <Documentation>
          This property lists what dataset attribute arrays (point data and cell data) to read.
        </Documentation>
      </StringVectorProperty>
      <!-- End TecplotReaderCore-->
    </SourceProxy>
-   
-   <SourceProxy name="CosmoReaderCore" 
+
+   <SourceProxy name="CosmoReaderCore"
                 class="vtkPCosmoReader"
                 label="COSMO Reader">
 
@@ -2296,7 +2296,7 @@
 
   <ProxyGroup name="sources">
 
-   <SourceProxy name="DEMReader" 
+   <SourceProxy name="DEMReader"
                 class="vtkDEMReader"
                 label="DEM Reader">
      <Documentation
@@ -2323,7 +2323,7 @@
    <!-- End DEMReader -->
    </SourceProxy>
 
-   <SourceProxy name="PVDReader" 
+   <SourceProxy name="PVDReader"
                 class="vtkPVDReader"
                 label="PVD Reader">
      <Documentation
@@ -2341,7 +2341,7 @@
           This property specifies the file name for the PVD reader.
         </Documentation>
      </StringVectorProperty>
-     <DoubleVectorProperty 
+     <DoubleVectorProperty
         name="TimestepValues"
         repeatable="1"
         information_only="1">
@@ -2352,7 +2352,7 @@
      </DoubleVectorProperty>
 
      <Hints>
-        <ReaderFactory extensions="pvd" 
+        <ReaderFactory extensions="pvd"
           file_description="ParaView Data Files"/>
      </Hints>
    <!-- End PVDReader -->
@@ -2620,7 +2620,7 @@
                            clean_command="RemoveAllFileNames"
                            command="AddFileName"
                            animateable="0"
-                           number_of_elements="0" 
+                           number_of_elements="0"
                            information_property="FileNameInfo"
                            repeat_command="1">
        <FileListDomain name="files"/>
@@ -2677,7 +2677,7 @@
                            clean_command="RemoveAllFileNames"
                            command="AddFileName"
                            animateable="0"
-                           number_of_elements="0" 
+                           number_of_elements="0"
                            repeat_command="1"
                            information_property="FileNameInfo" >
        <FileListDomain name="files"/>
@@ -2734,7 +2734,7 @@
                            clean_command="RemoveAllFileNames"
                            command="AddFileName"
                            animateable="0"
-                           number_of_elements="0" 
+                           number_of_elements="0"
                            repeat_command="1"
                            information_property="FileNameInfo">
        <FileListDomain name="files"/>
@@ -2790,7 +2790,7 @@
                            clean_command="RemoveAllFileNames"
                            command="AddFileName"
                            animateable="0"
-                           number_of_elements="0" 
+                           number_of_elements="0"
                            repeat_command="1"
                            information_property="FileNameInfo">
        <FileListDomain name="files"/>
@@ -2845,7 +2845,7 @@
                            clean_command="RemoveAllFileNames"
                            command="AddFileName"
                            animateable="0"
-                           number_of_elements="0" 
+                           number_of_elements="0"
                            repeat_command="1"
                            information_property="FileNameInfo">
        <FileListDomain name="files"/>
@@ -2902,7 +2902,7 @@
                            clean_command="RemoveAllFileNames"
                            command="AddFileName"
                            animateable="0"
-                           number_of_elements="0" 
+                           number_of_elements="0"
                            repeat_command="1"
                            information_property="FileNameInfo">
        <FileListDomain name="files"/>
@@ -2958,7 +2958,7 @@
                            clean_command="RemoveAllFileNames"
                            command="AddFileName"
                            animateable="0"
-                           number_of_elements="0" 
+                           number_of_elements="0"
                            repeat_command="1"
                            information_property="FileNameInfo">
        <FileListDomain name="files"/>
@@ -3015,7 +3015,7 @@
                            clean_command="RemoveAllFileNames"
                            command="AddFileName"
                            animateable="0"
-                           number_of_elements="0" 
+                           number_of_elements="0"
                            repeat_command="1"
                            information_property="FileNameInfo">
        <FileListDomain name="files"/>
@@ -3072,7 +3072,7 @@
                            clean_command="RemoveAllFileNames"
                            command="AddFileName"
                            animateable="0"
-                           number_of_elements="0" 
+                           number_of_elements="0"
                            repeat_command="1"
                            information_property="FileNameInfo">
        <FileListDomain name="files"/>
@@ -3132,7 +3132,7 @@
         name="NewDataAvailable"
         command="NewDataAvailable"
         number_of_elements="1"
-                    default_values="2" 
+                    default_values="2"
         information_only="1">
         <SimpleIntInformationHelper/>
      </IntVectorProperty>
@@ -3175,7 +3175,7 @@
         clean_command="RemoveAllFileNames"
         command="AddFileName"
         animateable="0"
-        number_of_elements="0" 
+        number_of_elements="0"
         repeat_command="1"
         information_property="FileNameInfo" >
         <FileListDomain name="files"/>
@@ -3184,7 +3184,7 @@
        </Documentation>
      </StringVectorProperty>
 
-     <DoubleVectorProperty 
+     <DoubleVectorProperty
         name="TimestepValues"
         repeatable="1"
         information_only="1">
@@ -3201,7 +3201,7 @@
      <!-- End LegacyVTKFileReader -->
    </FileSeriesReaderProxy>
 
-   <SourceProxy name="pvtkfile" 
+   <SourceProxy name="pvtkfile"
                 class="vtkPDataSetReader"
                 label="Partitioned Legacy VTK Reader">
      <Documentation
@@ -3227,7 +3227,7 @@
    <!-- End pvtkfile -->
    </SourceProxy>
 
-   <SourceProxy name="ensight" 
+   <SourceProxy name="ensight"
                 class="vtkPGenericEnSightReader"
                 label="EnSight Reader">
      <Documentation
@@ -3246,7 +3246,7 @@
         </Documentation>
      </StringVectorProperty>
 
-     <DoubleVectorProperty 
+     <DoubleVectorProperty
         name="TimestepValues"
         repeatable="1"
         information_only="1">
@@ -3256,7 +3256,7 @@
         </Documentation>
      </DoubleVectorProperty>
 
-     <StringVectorProperty 
+     <StringVectorProperty
         name="CellArrayInfo"
         information_only="1">
         <ArraySelectionInformationHelper attribute_name="Cell"/>
@@ -3265,7 +3265,7 @@
      <StringVectorProperty
         name="CellArrayStatus"
         command="SetCellArrayStatus"
-        number_of_elements="0" 
+        number_of_elements="0"
         repeat_command="1"
         number_of_elements_per_command="2"
         element_types="2 0"
@@ -3281,7 +3281,7 @@
        </Documentation>
      </StringVectorProperty>
 
-     <StringVectorProperty 
+     <StringVectorProperty
         name="PointArrayInfo"
         information_only="1">
         <ArraySelectionInformationHelper attribute_name="Point"/>
@@ -3290,10 +3290,10 @@
      <StringVectorProperty
         name="PointArrayStatus"
         command="SetPointArrayStatus"
-        number_of_elements="0" 
+        number_of_elements="0"
         repeat_command="1"
         number_of_elements_per_command="2"
-        element_types="2 0" 
+        element_types="2 0"
         information_property="PointArrayInfo"
         label="Point Arrays">
        <ArraySelectionDomain name="array_list">
@@ -3331,7 +3331,7 @@
         </Documentation>
      </StringVectorProperty>
 
-     <DoubleVectorProperty 
+     <DoubleVectorProperty
         name="TimestepValues"
         repeatable="1"
         information_only="1">
@@ -3341,66 +3341,66 @@
         </Documentation>
      </DoubleVectorProperty>
 
-     <IntVectorProperty 
-        name="DownConvertVolumeFraction" 
-        command="SetDownConvertVolumeFraction" 
+     <IntVectorProperty
+        name="DownConvertVolumeFraction"
+        command="SetDownConvertVolumeFraction"
         number_of_elements="1"
-        default_values="1" > 
+        default_values="1" >
        <BooleanDomain name="bool"/>
        <Documentation>
          If this property is set to 0, the type of the volume fraction is float; is set to 1, the type is unsigned char.
        </Documentation>
      </IntVectorProperty>
 
-     <IntVectorProperty 
-        name="DistributeFiles" 
-        command="SetDistributeFiles" 
+     <IntVectorProperty
+        name="DistributeFiles"
+        command="SetDistributeFiles"
         number_of_elements="1"
-        default_values="1" > 
+        default_values="1" >
        <BooleanDomain name="bool"/>
        <Documentation>
          In parallel mode, if this property is set to 1, the reader will distribute files or blocks.
        </Documentation>
      </IntVectorProperty>
 
-     <IntVectorProperty 
-        name="GenerateLevelArray" 
-        command="SetGenerateLevelArray" 
+     <IntVectorProperty
+        name="GenerateLevelArray"
+        command="SetGenerateLevelArray"
         number_of_elements="1"
-        default_values="0" > 
+        default_values="0" >
        <BooleanDomain name="bool"/>
        <Documentation>
          If this property is set to 1, a cell array will be generated that stores the level of each block.
        </Documentation>
      </IntVectorProperty>
 
-     <IntVectorProperty 
-        name="GenerateActiveBlockArray" 
-        command="SetGenerateActiveBlockArray" 
+     <IntVectorProperty
+        name="GenerateActiveBlockArray"
+        command="SetGenerateActiveBlockArray"
         number_of_elements="1"
-        default_values="0" > 
+        default_values="0" >
        <BooleanDomain name="bool"/>
        <Documentation>
          If this property is set to 1, a cell array will be generated that stores the active status of a block.
        </Documentation>
      </IntVectorProperty>
 
-     <IntVectorProperty 
-        name="GenerateTracerArray" 
-        command="SetGenerateTracerArray" 
+     <IntVectorProperty
+        name="GenerateTracerArray"
+        command="SetGenerateTracerArray"
         number_of_elements="1"
-        default_values="0" > 
+        default_values="0" >
        <BooleanDomain name="bool"/>
        <Documentation>
          If this property is set to 1, a cell array will be generated that stores the coordinates of any tracers.
        </Documentation>
      </IntVectorProperty>
 
-     <IntVectorProperty 
-        name="GenerateBlockIdArray" 
-        command="SetGenerateBlockIdArray" 
+     <IntVectorProperty
+        name="GenerateBlockIdArray"
+        command="SetGenerateBlockIdArray"
         number_of_elements="1"
-        default_values="0" > 
+        default_values="0" >
        <BooleanDomain name="bool"/>
        <Documentation>
          If this property is set to 1, a cell array will be generated that stores a unique blockId for each block.
@@ -3418,7 +3418,7 @@
        </Documentation>
      </IntVectorProperty>
 
-     <StringVectorProperty 
+     <StringVectorProperty
         name="CellArrayInfo"
         information_only="1">
         <ArraySelectionInformationHelper attribute_name="Cell"/>
@@ -3427,7 +3427,7 @@
      <StringVectorProperty
         name="CellArrayStatus"
         command="SetCellArrayStatus"
-        number_of_elements="0" 
+        number_of_elements="0"
         repeat_command="1"
         number_of_elements_per_command="2"
         element_types="2 0"
@@ -3491,7 +3491,7 @@
       </Documentation>
     </IntVectorProperty>
 
-    <DoubleVectorProperty name="TimestepValues" 
+    <DoubleVectorProperty name="TimestepValues"
                           repeatable="1"
                           information_only="1">
       <TimeStepsInformationHelper/>
@@ -3505,6 +3505,57 @@
     </Hints>
     <!-- SPCTHRestartReader -->
   </FileSeriesReaderProxy>
+
+
+   <SourceProxy name="spcthhistoryreader" class="vtkSpyPlotHistoryReader"
+   label="spcth history reader">
+      <Documentation
+        short_help="Read a comma-separated spctch history file."
+        long_help="Read a spcth history file where each row translates into a single time step
+        and the columns are points, materials and properties.">
+      </Documentation>
+      <StringVectorProperty name="FileName"
+        command="SetFileName"
+        animateable="0" >
+        <FileListDomain name="files"/>
+      </StringVectorProperty>
+
+
+      <StringVectorProperty name="CommentCharacter"
+        command="SetCommentCharacter"
+        number_of_elements="1"
+        default_values="%">
+        <Documentation>
+          This property lists the characters that is used as the first character on comment lines
+        </Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="Delimeter"
+        command="SetDelimeter"
+        number_of_elements="1"
+        default_values=",">
+        <Documentation>
+          Character that is used as the delimeter.
+        </Documentation>
+      </StringVectorProperty>
+
+     <DoubleVectorProperty
+        name="TimestepValues"
+        repeatable="1"
+        information_only="1">
+        <TimeStepsInformationHelper/>
+        <Documentation>
+          Available timestep values.
+        </Documentation>
+     </DoubleVectorProperty>
+
+      <Hints>
+       <ReaderFactory extensions="csv"
+           file_description="SpyPlot CTH history" />
+      </Hints>
+
+      <!-- End of SPCTHHistoryReader -->
+   </SourceProxy>
 
 
    <SourceProxy name="vrmlreader" class="vtkVRMLSource" label="VRML Reader">
@@ -3611,7 +3662,7 @@
    <!-- End xyzreader -->
    </SourceProxy>
 
-   <SourceProxy name="PhastaReader" 
+   <SourceProxy name="PhastaReader"
                 class="vtkPPhastaReader"
                 label="Phasta Reader">
      <Documentation
@@ -3630,7 +3681,7 @@
         </Documentation>
      </StringVectorProperty>
 
-     <DoubleVectorProperty 
+     <DoubleVectorProperty
          name="TimestepValues"
          repeatable="1"
          information_only="1">
@@ -3645,8 +3696,8 @@
           file_description="Phasta Files" />
      </Hints>
    </SourceProxy>
-      
-   <SourceProxy name="EnzoReader" 
+
+   <SourceProxy name="EnzoReader"
                 class="vtkEnzoReader"
                 label="Enzo Reader">
      <Documentation
@@ -3664,9 +3715,9 @@
             This property specifies the file name for the Enzo reader.
         </Documentation>
      </StringVectorProperty>
-       
-     <IntVectorProperty 
-       name="BlockOutputType" 
+
+     <IntVectorProperty
+       name="BlockOutputType"
        command="SetBlockOutputType"
        number_of_elements="1"
        default_values="0"
@@ -3680,11 +3731,11 @@
        </Documentation>
      </IntVectorProperty>
 
-     <IntVectorProperty 
-       name="MaxLevel" 
-       command="SetMaxLevel" 
+     <IntVectorProperty
+       name="MaxLevel"
+       command="SetMaxLevel"
        number_of_elements="1"
-       default_values="100" > 
+       default_values="100" >
        <IntRangeDomain name="range"/>
        <Documentation>
          Do not blocks above this level.
@@ -3706,8 +3757,8 @@
           file_description="Enzo Files" />
      </Hints>
    </SourceProxy>
-      
-   <SourceProxy name="FlashReader" 
+
+   <SourceProxy name="FlashReader"
                 class="vtkFlashReader"
                 label="Flash Reader">
      <Documentation
@@ -3725,9 +3776,9 @@
             This property specifies the file name for the Flash reader.
         </Documentation>
      </StringVectorProperty>
-       
-     <IntVectorProperty 
-       name="BlockOutputType" 
+
+     <IntVectorProperty
+       name="BlockOutputType"
        command="SetBlockOutputType"
        number_of_elements="1"
        default_values="0"
@@ -3789,13 +3840,13 @@
         <SimpleStringInformationHelper />
      </StringVectorProperty>
 
-     
+
      <StringVectorProperty
         name="FileNames"
         clean_command="RemoveAllFileNames"
         command="AddFileName"
         animateable="0"
-        number_of_elements="0" 
+        number_of_elements="0"
         repeat_command="1"
         information_property="FileNameInfo" >
         <FileListDomain name="files"/>
@@ -3804,7 +3855,7 @@
        </Documentation>
      </StringVectorProperty>
 
-     <DoubleVectorProperty 
+     <DoubleVectorProperty
         name="TimestepValues"
         repeatable="1"
         information_only="1">
@@ -3923,7 +3974,7 @@
      <Documentation
        short_help="Read POP data files."
        long_help="Read data files from the Parallel Ocean Program (POP).">
-       The POP reader reads data files from the Parallel Ocean Program (POP). The expected file extension is .pop. The output of this reader is a structured grid dataset. 
+       The POP reader reads data files from the Parallel Ocean Program (POP). The expected file extension is .pop. The output of this reader is a structured grid dataset.
      </Documentation>
      <StringVectorProperty
         name="FileName"
@@ -3947,22 +3998,22 @@
         </Documentation>
       </DoubleVectorProperty>
 
-     <IntVectorProperty 
-        name="ClipExtent" 
-        command="SetClipExtent" 
+     <IntVectorProperty
+        name="ClipExtent"
+        command="SetClipExtent"
         number_of_elements="6"
-        default_values="-2147483647 2147483647 -2147483647 2147483647 -2147483647 2147483647" > 
+        default_values="-2147483647 2147483647 -2147483647 2147483647 -2147483647 2147483647" >
        <IntRangeDomain name="range"/>
        <Documentation>
          This property indicates the minimum and maximum extent in each dimension of the dataset (X, Y, and Z) to read.
        </Documentation>
      </IntVectorProperty>
 
-     <IntVectorProperty 
-        name="NumberOfGhostLevels" 
-        command="SetNumberOfGhostLevels" 
+     <IntVectorProperty
+        name="NumberOfGhostLevels"
+        command="SetNumberOfGhostLevels"
         number_of_elements="1"
-        default_values="1" > 
+        default_values="1" >
        <IntRangeDomain name="range"/>
        <Documentation>
          This property indicates the number of ghost levels to generate.
@@ -3976,7 +4027,7 @@
    <!-- End popreader -->
    </SourceProxy>
 
-   <SourceProxy name="ensightMS" 
+   <SourceProxy name="ensightMS"
                 class="vtkPVEnSightMasterServerReader2"
                 label="EnSight Master Server Reader">
      <Documentation
@@ -3995,9 +4046,9 @@
         </Documentation>
      </StringVectorProperty>
 
-     <IntVectorProperty 
-       name="ByteOrder" 
-       command="SetByteOrder" 
+     <IntVectorProperty
+       name="ByteOrder"
+       command="SetByteOrder"
        number_of_elements="1"
        default_values="0" >
        <EnumerationDomain name="enum">
@@ -4007,9 +4058,9 @@
        <Documentation>
          This property indicates the byte order of the binary file(s).
        </Documentation>
-     </IntVectorProperty>  
-       
-     <DoubleVectorProperty 
+     </IntVectorProperty>
+
+     <DoubleVectorProperty
        name="TimestepValues"
        repeatable="1"
        information_only="1">
@@ -4023,7 +4074,7 @@
        name="SetTimeValue"
        command="SetTimeValue"
        number_of_elements="1"
-       default_values="0.0" 
+       default_values="0.0"
        animateable="1">
        <DoubleRangeDomain name="range"/>
        <Documentation>
@@ -4031,7 +4082,7 @@
        </Documentation>
      </DoubleVectorProperty>
 
-     <StringVectorProperty 
+     <StringVectorProperty
        name="CellArrayInfo"
        information_only="1">
        <ArraySelectionInformationHelper attribute_name="Cell"/>
@@ -4040,10 +4091,10 @@
     <StringVectorProperty
         name="CellArrayStatus"
         command="SetCellArrayStatus"
-        number_of_elements="0" 
+        number_of_elements="0"
         repeat_command="1"
         number_of_elements_per_command="2"
-        element_types="2 0" 
+        element_types="2 0"
         information_property="CellArrayInfo"
         label="Cell Arrays">
        <ArraySelectionDomain name="array_list">
@@ -4056,7 +4107,7 @@
        </Documentation>
      </StringVectorProperty>
 
-     <StringVectorProperty 
+     <StringVectorProperty
         name="PointArrayInfo"
         information_only="1">
         <ArraySelectionInformationHelper attribute_name="Point"/>
@@ -4065,10 +4116,10 @@
      <StringVectorProperty
         name="PointArrayStatus"
         command="SetPointArrayStatus"
-        number_of_elements="0" 
+        number_of_elements="0"
         repeat_command="1"
         number_of_elements_per_command="2"
-        element_types="2 0" 
+        element_types="2 0"
         information_property="PointArrayInfo"
         label="Point Arrays">
        <ArraySelectionDomain name="array_list">
@@ -4088,11 +4139,11 @@
    <!-- End ensightMS -->
    </SourceProxy>
 
-   <SourceProxy name="ImageReader" 
+   <SourceProxy name="ImageReader"
                 class="vtkMPIImageReader"
                 label="Image Reader">
      <Documentation
-       short_help="Read raw regular rectilinear grid data from a file." 
+       short_help="Read raw regular rectilinear grid data from a file."
        long_help="Read raw regular rectilinear grid data from a file. The dimensions and type of the data must be specified.">
        The Image reader reads raw regular rectilinear grid (image/volume) data from a file. Because no metadata is provided, the user must specify information about the size, spacing, dimensionality, etc. about the dataset.
      </Documentation>
@@ -4119,16 +4170,16 @@
      <StringVectorProperty
         name="FilePattern"
         command="SetFilePattern"
-        number_of_elements="1" 
+        number_of_elements="1"
         default_values="%s">
         <Documentation>
           The text string contained in the property specifies the format string to determine the file names necessary for reading this dataset. In creating the filenames, %s will be replaced by the prefix and %d by a digit which represents the slice number in Z. The format string is the same as that used by printf.
         </Documentation>
      </StringVectorProperty>
 
-     <IntVectorProperty 
-        name="DataScalarType" 
-        command="SetDataScalarType" 
+     <IntVectorProperty
+        name="DataScalarType"
+        command="SetDataScalarType"
         number_of_elements="1"
         default_values="4" >
        <EnumerationDomain name="enum">
@@ -4148,9 +4199,9 @@
        </Documentation>
      </IntVectorProperty>
 
-     <IntVectorProperty 
-        name="DataByteOrder" 
-        command="SetDataByteOrder" 
+     <IntVectorProperty
+        name="DataByteOrder"
+        command="SetDataByteOrder"
         number_of_elements="1"
         default_values="0" >
        <EnumerationDomain name="enum">
@@ -4162,10 +4213,10 @@
        </Documentation>
      </IntVectorProperty>
 
-     <IntVectorProperty 
+     <IntVectorProperty
         name="FileDimensionality"
         command="SetFileDimensionality"
-        number_of_elements="1" 
+        number_of_elements="1"
         default_values="3">
        <EnumerationDomain name="enum">
          <Entry value="2" text="2"/>
@@ -4198,10 +4249,10 @@
         </Documentation>
       </DoubleVectorProperty>
 
-     <IntVectorProperty 
+     <IntVectorProperty
         name="DataExtent"
         command="SetDataExtent"
-        number_of_elements="6" 
+        number_of_elements="6"
         default_values="0 0 0 0 0 0" >
        <IntRangeDomain name="range"/>
        <Documentation>
@@ -4209,10 +4260,10 @@
        </Documentation>
      </IntVectorProperty>
 
-     <IntVectorProperty 
+     <IntVectorProperty
         name="NumberOfScalarComponents"
         command="SetNumberOfScalarComponents"
-        number_of_elements="1" 
+        number_of_elements="1"
         default_values="1" >
        <IntRangeDomain name="range"/>
        <Documentation>
@@ -4223,7 +4274,7 @@
      <StringVectorProperty
         name="ScalarArrayName"
         command="SetScalarArrayName"
-        number_of_elements="1" 
+        number_of_elements="1"
         default_values="ImageFile">
         <Documentation>
           This property contains a text string listing a name to assign to the point-centered data array read.
@@ -4391,7 +4442,7 @@
      <!-- End JPEGSeriesReader -->
    </FileSeriesReaderProxy>
 
-   <SourceProxy name="XdmfReader" 
+   <SourceProxy name="XdmfReader"
                 class="vtkXdmfReader"
                 label="XDMF Reader">
      <Documentation
@@ -4418,7 +4469,7 @@
        <TimeStepsInformationHelper/>
      </DoubleVectorProperty>
 
-     <StringVectorProperty 
+     <StringVectorProperty
         name="PointArrayInfo"
         information_only="1">
         <ArraySelectionInformationHelper attribute_name="Point"/>
@@ -4427,7 +4478,7 @@
      <StringVectorProperty
         name="PointArrayStatus"
         command="SetPointArrayStatus"
-        number_of_elements="0" 
+        number_of_elements="0"
         repeat_command="1"
         number_of_elements_per_command="2"
         element_types="2 0"
@@ -4444,7 +4495,7 @@
        </Documentation>
      </StringVectorProperty>
 
-     <StringVectorProperty 
+     <StringVectorProperty
         name="CellArrayInfo"
         information_only="1">
         <ArraySelectionInformationHelper attribute_name="Cell"/>
@@ -4453,7 +4504,7 @@
      <StringVectorProperty
         name="CellArrayStatus"
         command="SetCellArrayStatus"
-        number_of_elements="0" 
+        number_of_elements="0"
         repeat_command="1"
         number_of_elements_per_command="2"
         element_types="2 0"
@@ -4470,7 +4521,7 @@
        </Documentation>
      </StringVectorProperty>
 
-     <StringVectorProperty 
+     <StringVectorProperty
         name="SetInfo"
         information_only="1">
         <ArraySelectionInformationHelper attribute_name="Set"/>
@@ -4480,11 +4531,11 @@
         name="SetStatus"
         label="Sets"
         command="SetSetStatus"
-        number_of_elements="2" 
+        number_of_elements="2"
         repeat_command="1"
         number_of_elements_per_command="2"
         element_types="2 0"
-        information_property="SetInfo"> 
+        information_property="SetInfo">
        <ArraySelectionDomain name="array_list">
           <RequiredProperties>
              <Property name="SetInfo" function="ArrayList"/>
@@ -4502,7 +4553,7 @@
           subtree="Blocks">
         </SILInformationHelper>
      </StringVectorProperty>
-     
+
      <StringVectorProperty
         name="GridStatus"
         label="Grids"
@@ -4521,7 +4572,7 @@
         name="Stride"
         command="SetStride"
         number_of_elements="3"
-        default_values="1 1 1" 
+        default_values="1 1 1"
         animateable="0">
         <IntRangeDomain name="range" min="1 1 1" />
         <Documentation>
@@ -4645,7 +4696,7 @@
        </Documentation>
      </IntVectorProperty>
 
-     <DoubleVectorProperty name="TimestepValues" 
+     <DoubleVectorProperty name="TimestepValues"
                            repeatable="1"
                            information_only="1">
        <TimeStepsInformationHelper/>
@@ -4656,7 +4707,7 @@
        <Property name="UseMetaFile" show="0" />
        <!-- This is for special GUI control. -->
        <Property name="Refresh" show="0"/>
-       <ReaderFactory 
+       <ReaderFactory
           extensions="g e ex2 ex2v2 exo gen exoII 0 00 000 0000 exii"
           file_description="ExodusII"/>
      </Hints>
@@ -4761,7 +4812,7 @@
        </Documentation>
      </IntVectorProperty>
 
-     <DoubleVectorProperty name="TimestepValues" 
+     <DoubleVectorProperty name="TimestepValues"
                            repeatable="1"
                            information_only="1">
        <TimeStepsInformationHelper/>
@@ -4815,7 +4866,7 @@
         clean_command="RemoveAllFileNames"
         command="AddFileName"
         animateable="0"
-        number_of_elements="0" 
+        number_of_elements="0"
         repeat_command="1"
         information_property="FileNameInfo" >
         <FileListDomain name="files"/>
@@ -4826,7 +4877,7 @@
        </Documentation>
      </StringVectorProperty>
 
-     <DoubleVectorProperty 
+     <DoubleVectorProperty
         name="TimestepValues"
         repeatable="1"
         information_only="1">
@@ -4843,7 +4894,7 @@
    <!-- End of AVSucdSeriesReader -->
    </FileSeriesReaderProxy>
 
-   <SourceProxy name="Facet Reader" 
+   <SourceProxy name="Facet Reader"
                 class="vtkFacetReader">
      <Documentation
        short_help="Read a dataset in Facet format."
@@ -4868,7 +4919,7 @@
    <!-- End Facet Reader -->
    </SourceProxy>
 
-  <SourceProxy name="TIFFReader" 
+  <SourceProxy name="TIFFReader"
                 class="vtkTIFFReader"
                 label="TIFF Reader">
      <Documentation
@@ -4964,8 +5015,8 @@
         </Documentation>
       </Property>
 
-      <IntVectorProperty 
-         name="CaseType" 
+      <IntVectorProperty
+         name="CaseType"
          command="SetCaseType"
          number_of_elements="1"
          default_values="1"
@@ -5178,15 +5229,15 @@
         short_help="Reads a dataset in MFIX file format."
         long_help="Reads a dataset in MFIX file format." >
         vtkMFIXReader creates an unstructured grid dataset. It reads a restart
-        file and a set of sp files.  The restart file contains the mesh 
-        information.  MFIX meshes are either cylindrical or rectilinear, but 
-        this reader will convert them to an unstructured grid.  The sp files 
-        contain transient data for the cells.  Each sp file has one or more 
+        file and a set of sp files.  The restart file contains the mesh
+        information.  MFIX meshes are either cylindrical or rectilinear, but
+        this reader will convert them to an unstructured grid.  The sp files
+        contain transient data for the cells.  Each sp file has one or more
         variables stored inside it.
       </Documentation>
-      <StringVectorProperty name="FileName" 
-                            command="SetFileName" 
-                            animateable="0" 
+      <StringVectorProperty name="FileName"
+                            command="SetFileName"
+                            animateable="0"
                             number_of_elements="1">
         <FileListDomain name="files"/>
         <Documentation>
@@ -5202,7 +5253,7 @@
       <StringVectorProperty name="CellArrayStatus"
                             command="SetCellArrayStatus"
                             number_of_elements="0"
-                            repeat_command="1" 
+                            repeat_command="1"
                             number_of_elements_per_command="2"
                             element_types="2 0"
                             information_property="CellArrayInfo"
@@ -5217,8 +5268,8 @@
         </Documentation>
       </StringVectorProperty>
 
-      <DoubleVectorProperty 
-          name="TimestepValues" 
+      <DoubleVectorProperty
+          name="TimestepValues"
           repeatable="1"
           information_only="1">
        <TimeStepsInformationHelper/>
@@ -5256,7 +5307,7 @@
      <StringVectorProperty name="CellArrayStatus"
                            command="SetCellArrayStatus"
                            number_of_elements="0"
-                           repeat_command="1" 
+                           repeat_command="1"
                            number_of_elements_per_command="2"
                            element_types="2 0"
                            information_property="CellArrayInfo"
@@ -5325,8 +5376,8 @@
       This reader reads LS-Dyna databases.
      </Documentation>
 
-     <StringVectorProperty name="FileName" 
-                           command="SetFileName" 
+     <StringVectorProperty name="FileName"
+                           command="SetFileName"
                            animateable="0"
                            number_of_elements="1">
         <FileListDomain name="files"/>
@@ -5335,8 +5386,8 @@
         </Documentation>
      </StringVectorProperty>
 
-     <DoubleVectorProperty 
-         name="TimestepValues" 
+     <DoubleVectorProperty
+         name="TimestepValues"
          repeatable="1"
          information_only="1">
        <TimeStepsInformationHelper/>
@@ -5346,12 +5397,12 @@
         <ArraySelectionInformationHelper attribute_name="Solid"/>
      </StringVectorProperty>
 
-     <StringVectorProperty name="SolidArrayStatus" 
-                           command="SetSolidArrayStatus" 
-                           number_of_elements="2" 
+     <StringVectorProperty name="SolidArrayStatus"
+                           command="SetSolidArrayStatus"
+                           number_of_elements="2"
                            repeat_command="1"
-                           number_of_elements_per_command="2" 
-                           element_types="2 0" 
+                           number_of_elements_per_command="2"
+                           element_types="2 0"
                            information_property="SolidArrayInfo"
                            label="Solid Arrays">
        <ArraySelectionDomain name="array_list">
@@ -5368,12 +5419,12 @@
         <ArraySelectionInformationHelper attribute_name="ThickShell"/>
      </StringVectorProperty>
 
-     <StringVectorProperty name="ThickShellArrayStatus" 
-                           command="SetThickShellArrayStatus" 
-                           number_of_elements="2" 
+     <StringVectorProperty name="ThickShellArrayStatus"
+                           command="SetThickShellArrayStatus"
+                           number_of_elements="2"
                            repeat_command="1"
-                           number_of_elements_per_command="2" 
-                           element_types="2 0" 
+                           number_of_elements_per_command="2"
+                           element_types="2 0"
                            information_property="ThickShellArrayInfo"
                            label="Thick Shell Arrays">
        <ArraySelectionDomain name="array_list">
@@ -5390,12 +5441,12 @@
         <ArraySelectionInformationHelper attribute_name="Shell"/>
      </StringVectorProperty>
 
-     <StringVectorProperty name="ShellArrayStatus" 
+     <StringVectorProperty name="ShellArrayStatus"
                            command="SetShellArrayStatus"
-                           number_of_elements="2" 
+                           number_of_elements="2"
                            repeat_command="1"
-                           number_of_elements_per_command="2" 
-                           element_types="2 0" 
+                           number_of_elements_per_command="2"
+                           element_types="2 0"
                            information_property="ShellArrayInfo"
                            label="Shell Arrays">
        <ArraySelectionDomain name="array_list">
@@ -5412,12 +5463,12 @@
         <ArraySelectionInformationHelper attribute_name="RigidBody"/>
      </StringVectorProperty>
 
-     <StringVectorProperty name="RigidBodyArrayStatus" 
-                           command="SetRigidBodyArrayStatus" 
-                           number_of_elements="2" 
+     <StringVectorProperty name="RigidBodyArrayStatus"
+                           command="SetRigidBodyArrayStatus"
+                           number_of_elements="2"
                            repeat_command="1"
-                           number_of_elements_per_command="2" 
-                           element_types="2 0" 
+                           number_of_elements_per_command="2"
+                           element_types="2 0"
                            information_property="RigidBodyArrayInfo"
                            label="Rigid Body Arrays">
        <ArraySelectionDomain name="array_list">
@@ -5434,12 +5485,12 @@
         <ArraySelectionInformationHelper attribute_name="RoadSurface"/>
      </StringVectorProperty>
 
-     <StringVectorProperty name="RoadSurfaceArrayStatus" 
-                           command="SetRoadSurfaceArrayStatus" 
-                           number_of_elements="2" 
+     <StringVectorProperty name="RoadSurfaceArrayStatus"
+                           command="SetRoadSurfaceArrayStatus"
+                           number_of_elements="2"
                            repeat_command="1"
                            number_of_elements_per_command="2"
-                           element_types="2 0" 
+                           element_types="2 0"
                            information_property="RoadSurfaceArrayInfo"
                            label="Road Surface Arrays">
        <ArraySelectionDomain name="array_list">
@@ -5456,12 +5507,12 @@
         <ArraySelectionInformationHelper attribute_name="Beam"/>
      </StringVectorProperty>
 
-     <StringVectorProperty name="BeamArrayStatus" 
-                           command="SetBeamArrayStatus" 
-                           number_of_elements="2" 
+     <StringVectorProperty name="BeamArrayStatus"
+                           command="SetBeamArrayStatus"
+                           number_of_elements="2"
                            repeat_command="1"
-                           number_of_elements_per_command="2" 
-                           element_types="2 0" 
+                           number_of_elements_per_command="2"
+                           element_types="2 0"
                            information_property="BeamArrayInfo"
                            label="Beam Arrays">
        <ArraySelectionDomain name="array_list">
@@ -5478,12 +5529,12 @@
         <ArraySelectionInformationHelper attribute_name="Particle"/>
      </StringVectorProperty>
 
-     <StringVectorProperty name="ParticleArrayStatus" 
-                           command="SetParticleArrayStatus" 
-                           number_of_elements="2" 
+     <StringVectorProperty name="ParticleArrayStatus"
+                           command="SetParticleArrayStatus"
+                           number_of_elements="2"
                            repeat_command="1"
-                           number_of_elements_per_command="2" 
-                           element_types="2 0" 
+                           number_of_elements_per_command="2"
+                           element_types="2 0"
                            information_property="ParticleArrayInfo"
                            label="Particle Arrays">
        <ArraySelectionDomain name="array_list">
@@ -5500,11 +5551,11 @@
         <ArraySelectionInformationHelper attribute_name="Point"/>
      </StringVectorProperty>
 
-     <StringVectorProperty name="PointArrayStatus" 
-                           command="SetPointArrayStatus" 
+     <StringVectorProperty name="PointArrayStatus"
+                           command="SetPointArrayStatus"
                            number_of_elements="2" repeat_command="1"
-                           number_of_elements_per_command="2" 
-                           element_types="2 0" 
+                           number_of_elements_per_command="2"
+                           element_types="2 0"
                            information_property="PointArrayInfo"
                            label="Point Arrays">
        <ArraySelectionDomain name="array_list">
@@ -5521,12 +5572,12 @@
         <ArraySelectionInformationHelper attribute_name="Part"/>
      </StringVectorProperty>
 
-     <StringVectorProperty name="PartArrayStatus" 
-                           command="SetPartArrayStatus" 
-                           number_of_elements="2" 
+     <StringVectorProperty name="PartArrayStatus"
+                           command="SetPartArrayStatus"
+                           number_of_elements="2"
                            repeat_command="1"
-                           number_of_elements_per_command="2" 
-                           element_types="2 0" 
+                           number_of_elements_per_command="2"
+                           element_types="2 0"
                            information_property="PartArrayInfo"
                            label="Part Arrays">
        <ArraySelectionDomain name="array_list">
@@ -5539,9 +5590,9 @@
        </Documentation>
      </StringVectorProperty>
 
-     <IntVectorProperty name="DeformedMesh" 
-                        command="SetDeformedMesh" 
-                        number_of_elements="1" 
+     <IntVectorProperty name="DeformedMesh"
+                        command="SetDeformedMesh"
+                        number_of_elements="1"
                         default_values="1" >
        <BooleanDomain name="bool"/>
        <Documentation>
@@ -5549,9 +5600,9 @@
        </Documentation>
      </IntVectorProperty>
 
-     <IntVectorProperty name="RemoveDeletedCells" 
-                        command="SetRemoveDeletedCells" 
-                        number_of_elements="1" 
+     <IntVectorProperty name="RemoveDeletedCells"
+                        command="SetRemoveDeletedCells"
+                        number_of_elements="1"
                         default_values="1" >
        <BooleanDomain name="bool"/>
        <Documentation>
@@ -5559,9 +5610,9 @@
        </Documentation>
      </IntVectorProperty>
 
-     <IntVectorProperty name="SplitByMaterialId" 
+     <IntVectorProperty name="SplitByMaterialId"
                         command="SetSplitByMaterialId"
-                        number_of_elements="1" 
+                        number_of_elements="1"
                         default_values="0"
                         label="Split by Material Id">
        <BooleanDomain name="bool"/>
@@ -5821,7 +5872,7 @@
                             clean_command="RemoveAllFileNames"
                             command="AddFileName"
                             animateable="0"
-                            number_of_elements="0" 
+                            number_of_elements="0"
                             repeat_command="1"
                             information_property="FileNameInfo">
         <FileListDomain name="files"/>
@@ -5839,7 +5890,7 @@
         <SimpleStringInformationHelper />
      </StringVectorProperty>
 
- 
+
       <DoubleVectorProperty name="TimestepValues"
                             repeatable="1"
                             information_only="1">
@@ -5892,7 +5943,7 @@
                             clean_command="RemoveAllFileNames"
                             command="AddFileName"
                             animateable="0"
-                            number_of_elements="0" 
+                            number_of_elements="0"
                             repeat_command="1"
                             information_property="FileNameInfo">
         <FileListDomain name="files"/>
@@ -5907,7 +5958,7 @@
         <SimpleStringInformationHelper />
       </StringVectorProperty>
 
- 
+
       <DoubleVectorProperty name="TimestepValues"
                             repeatable="1"
                             information_only="1">
@@ -5937,7 +5988,7 @@
 
       <!-- End of CSVReader -->
    </FileSeriesReaderProxy>
-      
+
    <FileSeriesReaderProxy name="TecplotReader"
                           class="vtkFileSeriesReader"
                           label="Tecplot Reader"
@@ -5947,13 +5998,13 @@
        long_help="Read files in the Tecplot ASCII file format.">
        The Tecplot reader extracts multiple zones (blocks) of data from a Tecplot ASCII file, in which a zone is stored in either point packing mode (i.e., tuple-based, with only point data supported) or block packing mode (i.e., component-based, with point data and cell data supported). The output of the reader is a vtkMultiBlockDataset, of which each block is either a vtkStructuredGrid or a vtkUnstructuredGrid. This supports reading a file series.
      </Documentation>
-       
+
      <StringVectorProperty
         name="FileNames"
         clean_command="RemoveAllFileNames"
         command="AddFileName"
         animateable="0"
-        number_of_elements="0" 
+        number_of_elements="0"
         repeat_command="1"
         information_property="FileNameInfo" >
         <FileListDomain name="files"/>
@@ -5961,14 +6012,14 @@
            The list of files to be read by the reader.
        </Documentation>
      </StringVectorProperty>
-       
+
      <StringVectorProperty name="FileNameInfo"
         command="GetCurrentFileName"
         information_only="1" >
         <SimpleStringInformationHelper />
      </StringVectorProperty>
-       
-     <DoubleVectorProperty 
+
+     <DoubleVectorProperty
         name="TimestepValues"
         repeatable="1"
         information_only="1">
@@ -5992,12 +6043,12 @@
         <ReaderFactory extensions="tec TEC Tec tp TP"
           file_description="Tecplot Files" />
      </Hints>
-       
+
    <!-- End TecplotReader -->
    </FileSeriesReaderProxy>
 
    <!-- Start vtkVPICReader -->
-   <SourceProxy name="VPICReader" 
+   <SourceProxy name="VPICReader"
                 class="vtkVPICReader"
                 label="VPIC Reader">
 
@@ -6022,7 +6073,7 @@
         repeat_command="1"
         number_of_elements_per_command="2"
         element_types="2 0"
-        information_property="PointArrayInfo" 
+        information_property="PointArrayInfo"
         label="Point Arrays">
         <ArraySelectionDomain name="array_list" >
           <RequiredProperties>
@@ -6109,7 +6160,7 @@
              </RequiredProperties>
         </IntRangeDomain>
      </IntVectorProperty>
-     
+
      <Hints>
         <ReaderFactory extensions="vpc"
           file_description="VPIC Files" />
@@ -6117,7 +6168,7 @@
 
    </SourceProxy>
    <!-- End vtkVPICReader -->
-   
+
    <!-- Start WindBladeReader -->
 
    <SourceProxy name="WindBladeReader"
@@ -6154,7 +6205,7 @@
         repeat_command="1"
         number_of_elements_per_command="2"
         element_types="2 0"
-        information_property="PointArrayInfo" 
+        information_property="PointArrayInfo"
         label="Point Arrays">
         <ArraySelectionDomain name="array_list" >
           <RequiredProperties>
@@ -6169,7 +6220,7 @@
       </Hints>
 
    </SourceProxy>
-   
+
    <!-- End WindBladeReader -->
    <SourceProxy name="NetCDFPOPReader"
               class="vtkNetCDFPOPReader"
@@ -6225,15 +6276,15 @@
          in this output.
         </Documentation>
      </IntVectorProperty>
-    
+
     <Hints>
       <ReaderFactory extensions="pop.ncdf pop.nc"
           file_description="POP Ocean NetCDF (Rectilinear)" />
     </Hints>
-      
+
    </SourceProxy>
    <!-- End NetCDFPOPReader -->
-   
+
    <FileSeriesReaderProxy name="CosmoReader"
                           class="vtkFileSeriesReader"
                           label="COSMO Reader"
@@ -6241,8 +6292,8 @@
      <Documentation
        short_help="Read a cosmology file."
        long_help="Read a cosmology file into a vtkUnstructuredGrid.">
-       The Cosmology reader reads a binary file of particle location, 
-       velocity, and id creating a vtkUnstructuredGrid. The default 
+       The Cosmology reader reads a binary file of particle location,
+       velocity, and id creating a vtkUnstructuredGrid. The default
        file extension is .cosmo.  Reads LANL Cosmo format or Gadget format.
      </Documentation>
 
@@ -6268,7 +6319,7 @@
                            clean_command="RemoveAllFileNames"
                            command="AddFileName"
                            animateable="0"
-                           number_of_elements="0" 
+                           number_of_elements="0"
                            repeat_command="1"
                            information_property="FileNameInfo" >
        <FileListDomain name="files"/>
@@ -6390,6 +6441,8 @@
 
    </SourceProxy>
    <!-- End MPASReader -->
+
+
 
     <FileSeriesReaderProxy name="P3DReader"
                         class="vtkFileSeriesReader"
