@@ -26,6 +26,7 @@
 #include "vtkInformationRequestKey.h"
 #include "vtkInformationVector.h"
 #include "vtkInteractorStyleRubberBand3D.h"
+#include "vtkInteractorStyleRubberBandZoom.h"
 #include "vtkLight.h"
 #include "vtkLightKit.h"
 #include "vtkMath.h"
@@ -90,6 +91,7 @@ vtkPVRenderView::vtkPVRenderView()
   this->Interactor = 0;
   this->InteractorStyle = 0;
   this->RubberBandStyle = 0;
+  this->RubberBandZoom = 0;
   this->CenterAxes = vtkPVCenterAxesActor::New();
   this->CenterAxes->SetComputeNormals(0);
   this->CenterAxes->SetPickable(0);
@@ -184,6 +186,7 @@ vtkPVRenderView::vtkPVRenderView()
       observer);
     observer->Delete();
 
+    this->RubberBandZoom = vtkInteractorStyleRubberBandZoom::New();
     }
 
   this->OrientationWidget->SetParentRenderer(this->GetRenderer());
@@ -230,6 +233,11 @@ vtkPVRenderView::~vtkPVRenderView()
     {
     this->RubberBandStyle->Delete();
     this->RubberBandStyle = 0;
+    }
+  if (this->RubberBandZoom)
+    {
+    this->RubberBandZoom->Delete();
+    this->RubberBandZoom = 0;
     }
 
   this->OrderedCompositingBSPCutsSource->Delete();
@@ -317,6 +325,8 @@ void vtkPVRenderView::SetInteractionMode(int mode)
       this->Interactor->SetInteractorStyle(this->RubberBandStyle);
       break;
 
+    case INTERACTION_MODE_ZOOM:
+      this->Interactor->SetInteractorStyle(this->RubberBandZoom);
       break;
       }
     }

@@ -45,6 +45,7 @@ class vtkInformationIntegerKey;
 class vtkInformationObjectBaseKey;
 class vtkInformationRequestKey;
 class vtkInteractorStyleRubberBand3D;
+class vtkInteractorStyleRubberBandZoom;
 class vtkLight;
 class vtkLightKit;
 class vtkPVHardwareSelector;
@@ -72,7 +73,8 @@ public:
     {
     INTERACTION_MODE_3D=0,
     INTERACTION_MODE_2D, // not implemented yet.
-    INTERACTION_MODE_SELECTION
+    INTERACTION_MODE_SELECTION,
+    INTERACTION_MODE_ZOOM
     };
 
   // Description:
@@ -444,6 +446,7 @@ protected:
   vtkPVGenericRenderWindowInteractor* Interactor;
   vtkPVInteractorStyle* InteractorStyle;
   vtkInteractorStyleRubberBand3D* RubberBandStyle;
+  vtkInteractorStyleRubberBandZoom* RubberBandZoom;
   vtkPVCenterAxesActor* CenterAxes;
   vtkPVAxesWidget* OrientationWidget;
   vtkPVHardwareSelector* Selector;
