@@ -63,7 +63,7 @@ cp -p "$ParaViewExeOutputDir/.plugins" "$SupportDir/"
 echo "Copy python scripts"
 cp -Rp "${ParaViewBinaryDir}/Utilities/VTKPythonWrapping/site-packages/paraview" "$PythonDir/"
 
-pushd $ParaViewExeOutputDir
+pushd "$ParaViewExeOutputDir"
 cp -p *Python.so "$LibrariesDir/"
 popd
 
