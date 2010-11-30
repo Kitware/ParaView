@@ -85,6 +85,7 @@ SET (Kit_SRCS
   vtkSMPluginManager.cxx
   vtkSMPluginProxy.cxx
   vtkSMProperty.cxx
+  vtkSMPropertyAdaptor.cxx
   vtkSMPropertyHelper.cxx
   vtkSMPropertyIterator.cxx
   vtkSMPropertyLink.cxx
@@ -104,8 +105,10 @@ SET (Kit_SRCS
   vtkSMPVRepresentationProxy.cxx
   vtkSMPWriterProxy.cxx
   vtkSMPythonTraceObserver.cxx
+  vtkSMReaderFactory.cxx
   vtkSMRemoteObject.cxx
   vtkSMRemoteObjectUpdateUndoElement.cxx
+  vtkSMRenderViewExporterProxy.cxx
   vtkSMRenderViewProxy.cxx
   vtkSMRepresentationProxy.cxx
   vtkSMScalarBarWidgetRepresentationProxy.cxx
@@ -121,6 +124,7 @@ SET (Kit_SRCS
   vtkSMStateVersionControllerBase.cxx
   vtkSMStateVersionController.cxx
   vtkSMStringVectorProperty.cxx
+  vtkSMTesting.cxx
   vtkSMTextWidgetRepresentationProxy.cxx
   vtkSMTimeKeeper.cxx
   vtkSMTimeKeeperProxy.cxx
@@ -173,71 +177,34 @@ IF (FIXME) #-------------------------------------------------------------- BEGIN
 SET(Kit_SRCS
 
   #vtkSMApplication.cxx ----- Get the configuration parsing stuff -----
-
-  vtkSMAnimationSceneGeometryWriter.cxx
-
-  vtkSMCameraManipulatorProxy.cxx
   #vtkSMCaveRenderModuleProxy.cxx
-#  vtkSMCaveRenderViewProxy.cxx
+  #vtkSMCaveRenderViewProxy.cxx
+  vtkSMDataSourceProxy.cxx #---- Who use it ? --- Make a special property type to copy data ?
+#  vtkSMSelectionDeliveryRepresentationProxy.cxx
+
+  ## Animation part +++++++++++
+  vtkSMAnimationSceneGeometryWriter.cxx
+  vtkSMCameraManipulatorProxy.cxx
+  vtkSMLinearAnimationCueManipulatorProxy.cxx
+  vtkSMRepresentationAnimationHelperProxy.cxx
+  vtkSMServerSideAnimationPlayer.cxx
+  vtkSMTimeAnimationCueProxy.cxx
+  vtkSMXMLPVAnimationWriterProxy.cxx
+
+  ## Comparative view +++++++++
   vtkSMComparativeAnimationCueProxy.cxx
   vtkSMComparativeViewProxy.cxx
 
-
-  vtkSMConnectionCleanerProxy.cxx
+  ## Charts stuff +++++++++++++
   vtkSMContextArraysInformationHelper.cxx #---- SM Side only, not managed yet...
-  vtkSMContextNamedOptionsProxy.cxx
+  vtkSMContextNamedOptionsProxy.cxx #----------- Get stuff on local VTK object
 
-  vtkSMDataSourceProxy.cxx #---- Who use it ? --- Make a special property type to copy data ?
-  vtkSMDistanceRepresentation2DProxy.cxx
-
-
-  vtkSMGlobalPropertiesLinkUndoElement.cxx #--------------------------------
-
-
-  vtkSMInteractionUndoStackBuilder.cxx#--------------------------------
-
-
-
-  vtkSMLinearAnimationCueManipulatorProxy.cxx
-
-  # vtkSMPQStateLoader.cxx ---- Should be removed deprecated ----
-  # vtkSMPluginInformationHelper.cxx
-  vtkSMPropertyAdaptor.cxx
-  vtkSMPropertyModificationUndoElement.cxx#--------------------------------
-
-  vtkSMProxyManagerReviver.cxx
-  vtkSMProxyRegisterUndoElement.cxx#--------------------------------
-  vtkSMProxyStateChangedUndoElement.cxx#--------------------------------
-  vtkSMProxyUnRegisterUndoElement.cxx#--------------------------------
-
-
-  vtkSMReaderFactory.cxx
-  vtkSMRenderViewExporterProxy.cxx
-  vtkSMRepresentationAnimationHelperProxy.cxx
-
-#  vtkSMScatterPlotArraysInformationHelper.cxx
-#  vtkSMScatterPlotViewProxy.cxx
-#  vtkSMSelectionDeliveryRepresentationProxy.cxx
-  vtkSMServerFileListingProxy.cxx
-  vtkSMServerProxyManagerReviver.cxx
-  vtkSMServerSideAnimationPlayer.cxx
-
-#  vtkSMTemporalInputDomain.cxx
-  vtkSMTesting.cxx
-  vtkSMTimeAnimationCueProxy.cxx
-
-  vtkSMUndoRedoStateLoader.cxx#-------------------------------- should be DELETE
-  vtkSMUpdateInformationUndoElement.cxx#--------------------------------
-
-
+  ## Reader/Writer factory +++++++++++
   vtkSMWriterProxy.cxx
-
-  vtkSMXMLPVAnimationWriterProxy.cxx
   )
 
 SET( ServerManagerNonWrapped_SRCS
   vtkPVBatchOptions.cxx
-  vtkSMXMLParser.cxx
   )
 ENDIF (FIXME) #------------------------------------------------------------- END
 
@@ -271,18 +238,6 @@ SET_SOURCE_FILES_PROPERTIES(
 SET_SOURCE_FILES_PROPERTIES(
   vtkSMPropertyHelper.cxx
   WRAP_EXCLUDE)
-
-IF (FIXME) #-------------------------------------------------------------- BEGIN
-SET_SOURCE_FILES_PROPERTIES(
-  vtkSMClientServerRenderSyncManagerHelper.cxx
-  vtkSMProxyManagerReviver.cxx
-  ABSTRACT
-  )
-
-SET_SOURCE_FILES_PROPERTIES(
-  vtkSMPropertyHelper.cxx
-  WRAP_EXCLUDE)
-ENDIF (FIXME) #------------------------------------------------------------- END
 
 INCLUDE_DIRECTORIES(
   ${VTK_INCLUDE_DIR}

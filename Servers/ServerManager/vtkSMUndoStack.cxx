@@ -19,7 +19,6 @@
 #include "vtkProcessModule.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSMProxyManager.h"
-#include "vtkSMUndoRedoStateLoader.h"
 #include "vtkUndoSet.h"
 #include "vtkSMUndoElement.h"
 #include "vtkUndoStackInternal.h"

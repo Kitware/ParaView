@@ -122,7 +122,12 @@ void vtkPMProxy::Invoke(vtkSMMessage* message)
   const VariantList* arguments;
   command = message->GetExtension(InvokeRequest::method);
   arguments = &message->GetExtension(InvokeRequest::arguments);
+  bool disableError = message->GetExtension(InvokeRequest::no_error);
   vtkPMProxy* proxy = NULL;
+
+  // Manage warning message
+  int previousWarningValue = this->Interpreter->GetGlobalWarningDisplay();
+  this->Interpreter->SetGlobalWarningDisplay( disableError ? 0 : 1);
 
   vtkClientServerStream stream;
   stream << vtkClientServerStream::Invoke << this->GetVTKObjectID()
@@ -153,7 +158,15 @@ void vtkPMProxy::Invoke(vtkSMMessage* message)
   stream << vtkClientServerStream::End;
   this->Interpreter->ProcessStream(stream);
 
-  // TODO: send back the result
+  // Manage warning message (put back the previous value)
+  this->Interpreter->SetGlobalWarningDisplay( previousWarningValue );
+
+  // send back the result
+  const vtkClientServerStream result = this->Interpreter->GetLastResult();
+  result.Print(cout, vtkIndent());
+
+  // FIXME TODO...
+
 }
 
 //----------------------------------------------------------------------------

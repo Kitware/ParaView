@@ -30,12 +30,6 @@
 #include "vtkSMSession.h"
 
 #include "vtkUndoElement.h"
-#include "vtkSMGlobalPropertiesLinkUndoElement.h"
-#include "vtkSMPropertyModificationUndoElement.h"
-#include "vtkSMUpdateInformationUndoElement.h"
-#include "vtkSMProxyRegisterUndoElement.h"
-#include "vtkSMProxyStateChangedUndoElement.h"
-#include "vtkSMProxyUnRegisterUndoElement.h"
 
 #include <vtksys/RegularExpression.hxx>
 #include <vtkstd/map>

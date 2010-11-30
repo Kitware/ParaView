@@ -34,7 +34,6 @@
 #include "vtkSMProxyManager.h"
 #include "vtkSMProxyDefinitionManager.h"
 #include "vtkSMStringVectorProperty.h"
-#include "vtkSMXMLParser.h"
 #include "vtkStringArray.h"
 
 #include <vtksys/SystemTools.hxx>

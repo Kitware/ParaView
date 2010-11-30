@@ -22,8 +22,10 @@
 #include "vtkSmartPointer.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxyDefinitionIterator.h"
+#include "vtkSMProxyDefinitionManager.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyManager.h"
+#include "vtkSMSession.h"
 #include "vtkStringList.h"
 
 #include <vtkstd/list>
@@ -56,11 +58,23 @@ public:
     vtkstd::vector<vtkstd::string> FilenamePatterns;
     vtkstd::string Description;
 
+    vtkSMProxyManager* GetProxyManager()
+      {
+      vtkProcessModule *pm = vtkProcessModule::GetProcessModule();
+      vtkSMSession* session = vtkSMSession::SafeDownCast(pm->GetSession());
+      return session->GetProxyManager();
+      }
+
+    vtkSMProxy* GetPrototypeProxy(const char* groupName, const char* proxyName)
+      {
+      return this->GetProxyManager()->GetPrototypeProxy(groupName, proxyName);
+      }
+
     void FillInformation()
       {
-      vtkSMProxy* prototype =
-        vtkSMProxyManager::GetProxyManager()->GetPrototypeProxy(
-          this->Group.c_str(), this->Name.c_str());
+
+      vtkSMProxy* prototype = this->GetPrototypeProxy(this->Group.c_str(),
+                                                      this->Name.c_str());
       if (!prototype || !prototype->GetHints())
         {
         return;
@@ -102,8 +116,8 @@ public:
     // support that.
     bool CanCreatePrototype(vtkIdType vtkNotUsed(cid))
       {
-      return (vtkSMProxyManager::GetProxyManager()->GetPrototypeProxy(
-        this->Group.c_str(), this->Name.c_str()) != NULL);
+      return (this->GetPrototypeProxy(this->Group.c_str(), this->Name.c_str())
+              != NULL);
       }
 
     // Returns true if the reader can read the file. More correctly, it returns
@@ -119,6 +133,13 @@ public:
     // Tests if the FilenameRegEx matches the filename.
     bool FilenameRegExTest(const char* filename);
     };
+
+  vtkSMProxyManager* GetProxyManager()
+    {
+    vtkProcessModule *pm = vtkProcessModule::GetProcessModule();
+    vtkSMSession* session = vtkSMSession::SafeDownCast(pm->GetSession());
+    return session->GetProxyManager();
+    }
 
   void BuildExtensions(
     const char* filename, vtkstd::vector<vtkstd::string>& extensions)
@@ -220,9 +241,9 @@ bool vtkSMReaderFactory::vtkInternals::vtkValue::CanReadFile(
   vtkIdType cid,
   bool skip_filename_test/*=false*/)
 {
-  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
-  vtkSMProxy* prototype = pxm->GetPrototypeProxy(
-    this->Group.c_str(), this->Name.c_str());
+  vtkSMProxyManager* pxm = this->GetProxyManager();
+  vtkSMProxy* prototype = this->GetPrototypeProxy( this->Group.c_str(),
+                                                   this->Name.c_str() );
   if (!prototype)
     {
     return false;
@@ -244,8 +265,7 @@ bool vtkSMReaderFactory::vtkInternals::vtkValue::CanReadFile(
     }
 
   vtkSMProxy* proxy = pxm->NewProxy(this->Group.c_str(), this->Name.c_str());
-  proxy->SetConnectionID(cid);
-  proxy->SetServers(vtkProcessModule::DATA_SERVER_ROOT);
+  proxy->SetLocation(vtkProcessModule::DATA_SERVER_ROOT);
   proxy->UpdateVTKObjects();
   bool canRead = vtkSMReaderFactory::CanReadFile(filename, proxy);
   proxy->Delete();
@@ -281,17 +301,16 @@ void vtkSMReaderFactory::Initialize()
 //----------------------------------------------------------------------------
 void vtkSMReaderFactory::RegisterPrototypes(const char* xmlgroup)
 {
-  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
-  vtkSMProxyDefinitionIterator* iter = vtkSMProxyDefinitionIterator::New();
-  iter->SetModeToOneGroup();
-  for (iter->Begin(xmlgroup); !iter->IsAtEnd(); iter->Next())
+  vtkSMProxyManager* pxm = this->Internals->GetProxyManager();
+  vtkSMProxyDefinitionIterator* iter;
+  iter = pxm->GetProxyDefinitionManager()->NewSingleGroupIterator(xmlgroup, 0);
+  for (iter->GoToFirstItem(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
     {
-    vtkPVXMLElement* hints = pxm->GetProxyHints(iter->GetGroup(),
-      iter->GetKey());
-    if (hints &&
-        hints->FindNestedElementByName("ReaderFactory"))
+    vtkPVXMLElement* hints = pxm->GetProxyHints( iter->GetGroupName(),
+                                                 iter->GetProxyName());
+    if (hints && hints->FindNestedElementByName("ReaderFactory"))
       {
-      this->RegisterPrototype(iter->GetGroup(), iter->GetKey());
+      this->RegisterPrototype(iter->GetGroupName(), iter->GetProxyName());
       }
     }
   iter->Delete();
@@ -598,7 +617,9 @@ const char* vtkSMReaderFactory::GetSupportedFileTypes(vtkIdType cid)
 //----------------------------------------------------------------------------
 bool vtkSMReaderFactory::TestFileReadability(const char* filename, vtkIdType cid)
 {
-  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+  vtkProcessModule *pm = vtkProcessModule::GetProcessModule();
+  vtkSMSession* session = vtkSMSession::SafeDownCast(pm->GetSession());
+  vtkSMProxyManager* pxm = session->GetProxyManager();
   vtkSmartPointer<vtkSMProxy> proxy;
   proxy.TakeReference(pxm->NewProxy("file_listing", "ServerFileListing"));
   if (!proxy)
@@ -607,8 +628,7 @@ bool vtkSMReaderFactory::TestFileReadability(const char* filename, vtkIdType cid
     return false;
     }
 
-  proxy->SetConnectionID(cid);
-  proxy->SetServers(vtkProcessModule::DATA_SERVER_ROOT);
+  proxy->SetLocation(vtkProcessModule::DATA_SERVER_ROOT);
   vtkSMPropertyHelper(proxy, "ActiveFileName").Set(filename);
   proxy->UpdateVTKObjects();
   proxy->UpdatePropertyInformation();
@@ -627,26 +647,32 @@ bool vtkSMReaderFactory::CanReadFile(const char* filename, vtkSMProxy* proxy)
   // Assume that it can read the file if CanReadFile does not exist.
   int canRead = 1;
 
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  // FIXME +++++++++++++++++++++++++++++++
+  // Use property instead...
 
-  vtkClientServerStream stream;
-  stream << vtkClientServerStream::Invoke
-         << pm->GetProcessModuleID()
-         << "SetReportInterpreterErrors" << 0
-         << vtkClientServerStream::End;
-  stream << vtkClientServerStream::Invoke
-         << proxy->GetID() << "CanReadFile" << filename
-         << vtkClientServerStream::End;
-  pm->SendStream(proxy->GetConnectionID(),
-    vtkProcessModule::GetRootId(proxy->GetServers()), stream);
-  pm->GetLastResult(proxy->GetConnectionID(),
-    vtkProcessModule::GetRootId(proxy->GetServers())).GetArgument(0, 0, &canRead);
-  stream << vtkClientServerStream::Invoke
-         << pm->GetProcessModuleID()
-         << "SetReportInterpreterErrors" << 1
-         << vtkClientServerStream::End;
-  pm->SendStream(proxy->GetConnectionID(),
-    vtkProcessModule::GetRootId(proxy->GetServers()), stream);
+
+
+
+//  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+
+//  vtkClientServerStream stream;
+//  stream << vtkClientServerStream::Invoke
+//         << pm->GetProcessModuleID()
+//         << "SetReportInterpreterErrors" << 0
+//         << vtkClientServerStream::End;
+//  stream << vtkClientServerStream::Invoke
+//         << proxy->GetID() << "CanReadFile" << filename
+//         << vtkClientServerStream::End;
+//  pm->SendStream(proxy->GetConnectionID(),
+//    vtkProcessModule::GetRootId(proxy->GetServers()), stream);
+//  pm->GetLastResult(proxy->GetConnectionID(),
+//    vtkProcessModule::GetRootId(proxy->GetServers())).GetArgument(0, 0, &canRead);
+//  stream << vtkClientServerStream::Invoke
+//         << pm->GetProcessModuleID()
+//         << "SetReportInterpreterErrors" << 1
+//         << vtkClientServerStream::End;
+//  pm->SendStream(proxy->GetConnectionID(),
+//    vtkProcessModule::GetRootId(proxy->GetServers()), stream);
   return (canRead != 0);
 }
 
@@ -654,14 +680,15 @@ bool vtkSMReaderFactory::CanReadFile(const char* filename, vtkSMProxy* proxy)
 bool vtkSMReaderFactory::CanReadFile(const char* filename,
   const char* readerxmlgroup, const char* readerxmlname, vtkIdType cid)
 {
-  vtkSMProxy* proxy = vtkSMProxyManager::GetProxyManager()->NewProxy(
-    readerxmlgroup, readerxmlname);
+  vtkProcessModule *pm = vtkProcessModule::GetProcessModule();
+  vtkSMSession* session = vtkSMSession::SafeDownCast(pm->GetSession());
+  vtkSMProxyManager* pxm = session->GetProxyManager();
+  vtkSMProxy* proxy = pxm->NewProxy( readerxmlgroup, readerxmlname );
   if (!proxy)
     {
     return false;
     }
-  proxy->SetConnectionID(cid);
-  proxy->SetServers(vtkProcessModule::DATA_SERVER_ROOT);
+  proxy->SetLocation(vtkProcessModule::DATA_SERVER_ROOT);
   proxy->UpdateVTKObjects();
   bool canRead = vtkSMReaderFactory::CanReadFile(filename, proxy);
   proxy->Delete();

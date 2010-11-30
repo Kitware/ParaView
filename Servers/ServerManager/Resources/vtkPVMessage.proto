@@ -128,12 +128,13 @@ message PullRequest {
   }
 }
 
-// Extension InvokeRequest ******************************************** [50-51]
+// Extension InvokeRequest ******************************************** [50-52]
 
 message InvokeRequest {
   extend Message {
-    required string method = 50;
+    required string      method    = 50;
     required VariantList arguments = 51;
+    optional bool        no_error  = 52 [default = false];
   }
 }
 
