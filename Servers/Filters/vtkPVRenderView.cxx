@@ -611,13 +611,13 @@ void vtkPVRenderView::Render(bool interactive, bool skip_rendering)
 
     // Do the vtkView::REQUEST_INFORMATION() pass.
     this->GatherRepresentationInformation();
+
+    // Gather information about geometry sizes from all representations.
+    this->GatherGeometrySizeInformation();
     }
 
   // Use loss-less image compression for client-server for full-res renders.
   this->SynchronizedRenderers->SetLossLessCompression(!interactive);
-
-  // Gather information about geometry sizes from all representations.
-  this->GatherGeometrySizeInformation();
 
   bool use_lod_rendering = interactive? this->GetUseLODRendering() : false;
   this->SetRequestLODRendering(use_lod_rendering);
