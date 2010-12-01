@@ -31,6 +31,7 @@ vtkStandardNewMacro(vtkSMPrismCubeAxesRepresentationProxy);
 //----------------------------------------------------------------------------
 vtkSMPrismCubeAxesRepresentationProxy::vtkSMPrismCubeAxesRepresentationProxy()
 {
+  initializePrismAxes=false;
 }
 
 //----------------------------------------------------------------------------
@@ -46,8 +47,9 @@ vtkSMPrismCubeAxesRepresentationProxy::~vtkSMPrismCubeAxesRepresentationProxy()
 void vtkSMPrismCubeAxesRepresentationProxy::RepresentationUpdated()
 {
   this->Superclass::RepresentationUpdated();
-    if (vtkSMPropertyHelper(this, "Visibility").GetAsInt() != 0)
+    if (!initializePrismAxes || vtkSMPropertyHelper(this, "Visibility").GetAsInt() != 0)
     {
+      initializePrismAxes=true;
         // Get bounds and set on the actor.
         //  vtkSMSourceProxy* output = this->Strategy->GetOutput();
         // this->Strategy->UpdateVTKObjects();
@@ -90,6 +92,7 @@ void vtkSMPrismCubeAxesRepresentationProxy::RepresentationUpdated()
                 {
                     vtkSMProperty* xVariableProperty = output->GetProperty("XAxisVariableName");
                     QVariant str = pqSMAdaptor::getEnumerationProperty(xVariableProperty);
+                    QString strtemp=str.toString();
 
                     pqSMAdaptor::setElementProperty(
                         this->GetProperty("XTitle"),
