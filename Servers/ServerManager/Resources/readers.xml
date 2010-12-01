@@ -3550,7 +3550,7 @@
      </DoubleVectorProperty>
 
       <Hints>
-       <ReaderFactory extensions="csv"
+       <ReaderFactory extensions="hscth"
            file_description="SpyPlot CTH history" />
       </Hints>
 
