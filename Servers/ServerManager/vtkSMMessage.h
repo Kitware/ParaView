@@ -38,6 +38,7 @@ namespace pvstream
 {
   // **** Operators to simplify construction of a InvokeRequest message ****/
   struct InvokeRequest { };
+  struct InvokeRequestNoWarning { };
   struct _InvokeRequest { vtkSMMessage* _message; };
   struct _InvokeRequestArgs { paraview_protobuf::VariantList* _arguments; };
   inline _InvokeRequest
@@ -45,6 +46,15 @@ namespace pvstream
     {
     _InvokeRequest r;
     r._message = &message;
+    return r;
+    };
+
+  inline _InvokeRequest
+    operator << (vtkSMMessage& message, const InvokeRequestNoWarning &)
+    {
+    _InvokeRequest r;
+    r._message = &message;
+    message.SetExtension(paraview_protobuf::InvokeRequest::no_error, true);
     return r;
     };
 
@@ -96,7 +106,124 @@ namespace pvstream
       return req;
       }
 #endif
+  // **** Operators to simplify construction of a InvokeResponse message ****/
+  struct InvokeResponse { };
+  struct _InvokeResponse { vtkSMMessage* _message;};
+  struct _InvokeResponseEnd { };
+  inline _InvokeResponse
+    operator << (vtkSMMessage& message, const InvokeResponse &)
+    {
+    _InvokeResponse r;
+    r._message = &message;
 
+    ::google::protobuf::uint32 location = r._message->location();
+    ::google::protobuf::uint64 id = r._message->global_id();
+    r._message->Clear();
+    r._message->set_global_id(id);
+    r._message->set_location(location);
+
+    return r;
+    };
+  inline _InvokeResponseEnd operator << (const _InvokeResponse& resp,
+    const vtkClientServerStream& stream)
+  {
+    vtkTypeUInt32 arrayLength;
+    paraview_protobuf::Variant* variant;
+    paraview_protobuf::VariantList* args;
+    double* dArray;
+    double dValue;
+    int iValue;
+    int* iArray;
+    char* txt;
+
+    switch(stream.GetCommand(0))
+      {
+      case vtkClientServerStream::Reply:
+        args =
+            resp._message->MutableExtension(
+                paraview_protobuf::InvokeResponse::arguments);
+        for(int i=0; i < stream.GetNumberOfArguments(0); i++)
+          {
+          variant = args->add_variant();
+          switch(stream.GetArgumentType(0, i))
+            {
+            case vtkClientServerStream::float32_value:
+            case vtkClientServerStream::float64_value:
+              variant->set_type(paraview_protobuf::Variant::FLOAT64);
+              dValue = 0;
+              stream.GetArgument(0, i, &dValue);
+              variant->add_float64(dValue);
+              break;
+
+            case vtkClientServerStream::float64_array:
+            case vtkClientServerStream::float32_array:
+              variant->set_type(paraview_protobuf::Variant::FLOAT64);
+              stream.GetArgumentLength(0, i, &arrayLength);
+              dArray = new double[arrayLength];
+              stream.GetArgument(0, i, dArray, arrayLength);
+              for(vtkTypeUInt32 j=0; j < arrayLength; j++)
+                {
+                variant->add_float64(static_cast<double>(dArray[j]));
+                }
+              delete[] dArray;
+              break;
+
+            case vtkClientServerStream::int16_value:
+            case vtkClientServerStream::int8_value:
+            case vtkClientServerStream::uint8_value:
+            case vtkClientServerStream::uint16_value:
+            case vtkClientServerStream::int32_value:
+              variant->set_type(paraview_protobuf::Variant::INT);
+              iValue = 0;
+              stream.GetArgument(0, i, &iValue);
+              variant->add_integer(iValue);
+              break;
+
+            case vtkClientServerStream::int8_array:
+            case vtkClientServerStream::uint8_array:
+            case vtkClientServerStream::uint16_array:
+            case vtkClientServerStream::int16_array:
+            case vtkClientServerStream::stream_value:
+            case vtkClientServerStream::int32_array:
+              variant->set_type(paraview_protobuf::Variant::INT);
+              stream.GetArgumentLength(0, i, &arrayLength);
+              iArray = new int[arrayLength];
+              stream.GetArgument(0, i, iArray, arrayLength);
+              for(vtkTypeUInt32 j=0; j < arrayLength; j++)
+                {
+                variant->add_integer(static_cast<int>(iArray[j]));
+                }
+              delete[] iArray;
+              break;
+
+            case vtkClientServerStream::string_value:
+               variant->set_type(paraview_protobuf::Variant::STRING);
+               stream.GetArgumentLength(0, i, &arrayLength);
+               txt = new char[arrayLength];
+               stream.GetArgument(0, i, txt, arrayLength);
+               variant->add_txt(txt, arrayLength);
+               delete[] txt;
+               break;
+
+            case vtkClientServerStream::id_value:
+            case vtkClientServerStream::uint32_value:
+            case vtkClientServerStream::uint64_value:
+            case vtkClientServerStream::int64_value:
+            case vtkClientServerStream::uint32_array:
+            case vtkClientServerStream::uint64_array:
+            case vtkClientServerStream::int64_array:
+               cout << "Type not managed yet !!!" << endl;
+               break;
+            }
+          }
+        break;
+      case vtkClientServerStream::Error:
+        resp._message->SetExtension(paraview_protobuf::InvokeResponse::error, true);
+        break;
+      }
+    _InvokeResponseEnd r;
+    return r;
+  }
 };
 
 inline vtkClientServerStream& operator << (vtkClientServerStream& stream,

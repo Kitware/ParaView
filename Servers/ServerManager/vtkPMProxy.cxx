@@ -162,11 +162,8 @@ void vtkPMProxy::Invoke(vtkSMMessage* message)
   this->Interpreter->SetGlobalWarningDisplay( previousWarningValue );
 
   // send back the result
-  const vtkClientServerStream result = this->Interpreter->GetLastResult();
-  result.Print(cout, vtkIndent());
-
-  // FIXME TODO...
-
+  (*message) << pvstream::InvokeResponse()
+             << this->Interpreter->GetLastResult();
 }
 
 //----------------------------------------------------------------------------

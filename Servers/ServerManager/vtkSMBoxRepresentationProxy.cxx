@@ -48,11 +48,10 @@ void vtkSMBoxRepresentationProxy::CreateVTKObjects()
   vtkSMMessage msg;
   msg.set_global_id(this->GlobalID);
   msg.set_location(this->Location);
-  VariantList *args = msg.MutableExtension(InvokeRequest::arguments);
+  VariantList *args = (msg << pvstream::InvokeRequest() << "SetTransform")._arguments;
   Variant* arg = args->add_variant();
   arg->set_type(Variant::PROXY);
   arg->add_proxy_global_id(this->GetSubProxy("Transform")->GetGlobalID());
-  msg.SetExtension(InvokeRequest::method, "SetTransform");
   this->Session->Invoke(&msg);
 }
 
@@ -74,11 +73,10 @@ void vtkSMBoxRepresentationProxy::UpdateVTKObjects()
     vtkSMMessage msg;
     msg.set_global_id(this->GlobalID);
     msg.set_location(this->Location);
-    VariantList *args = msg.MutableExtension(InvokeRequest::arguments);
+    VariantList *args = (msg << pvstream::InvokeRequest() << "SetTransform")._arguments;
     Variant* arg = args->add_variant();
     arg->set_type(Variant::PROXY);
     arg->add_proxy_global_id(this->GetSubProxy("Transform")->GetGlobalID());
-    msg.SetExtension(InvokeRequest::method, "SetTransform");
     this->Session->Invoke(&msg);
     }
 }

@@ -28,6 +28,8 @@
 #include "vtkSMSession.h"
 #include "vtkStringList.h"
 
+#include "vtkSMMessage.h"
+
 #include <vtkstd/list>
 #include <vtkstd/set>
 #include <vtkstd/string>
@@ -646,33 +648,21 @@ bool vtkSMReaderFactory::CanReadFile(const char* filename, vtkSMProxy* proxy)
 {
   // Assume that it can read the file if CanReadFile does not exist.
   int canRead = 1;
+  vtkSMSession* session =
+      vtkSMSession::SafeDownCast(
+          vtkProcessModule::GetProcessModule()->GetSession());
 
-  // FIXME +++++++++++++++++++++++++++++++
-  // Use property instead...
+  vtkSMMessage msg;
+  msg.set_global_id(proxy->GetGlobalID());
+  msg.set_location(proxy->GetLocation());
+  msg << pvstream::InvokeRequestNoWarning() << "CanReadFile" << filename;
+  session->Invoke(&msg);
 
+  if(!msg.GetExtension(InvokeResponse::error))
+    {
+    canRead = msg.GetExtension(InvokeResponse::arguments).variant(0).integer(0);
+    }
 
-
-
-//  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-
-//  vtkClientServerStream stream;
-//  stream << vtkClientServerStream::Invoke
-//         << pm->GetProcessModuleID()
-//         << "SetReportInterpreterErrors" << 0
-//         << vtkClientServerStream::End;
-//  stream << vtkClientServerStream::Invoke
-//         << proxy->GetID() << "CanReadFile" << filename
-//         << vtkClientServerStream::End;
-//  pm->SendStream(proxy->GetConnectionID(),
-//    vtkProcessModule::GetRootId(proxy->GetServers()), stream);
-//  pm->GetLastResult(proxy->GetConnectionID(),
-//    vtkProcessModule::GetRootId(proxy->GetServers())).GetArgument(0, 0, &canRead);
-//  stream << vtkClientServerStream::Invoke
-//         << pm->GetProcessModuleID()
-//         << "SetReportInterpreterErrors" << 1
-//         << vtkClientServerStream::End;
-//  pm->SendStream(proxy->GetConnectionID(),
-//    vtkProcessModule::GetRootId(proxy->GetServers()), stream);
   return (canRead != 0);
 }
 

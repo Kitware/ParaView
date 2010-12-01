@@ -223,7 +223,7 @@ void vtkSMSessionCore::OnInterpreterError( vtkObject*, unsigned long,
   const vtkClientServerStream& last = this->Interpreter->GetLastResult();
   if(last.GetNumberOfMessages() > 0 &&
     (last.GetCommand(0) == vtkClientServerStream::Error) &&
-    last.GetArgument(0, 0, &errorMessage))
+    last.GetArgument(0, 0, &errorMessage) && this->Interpreter->GetGlobalWarningDisplay())
     {
     vtksys_ios::ostringstream error;
     error << "\nwhile processing\n";

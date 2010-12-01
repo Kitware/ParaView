@@ -138,11 +138,12 @@ message InvokeRequest {
   }
 }
 
-// Extension InvokeResponse ********************************************** [60]
+// Extension InvokeResponse ******************************************* [60-61]
 
 message InvokeResponse {
   extend Message {
-    optional Variant arguments = 60;
+    optional VariantList arguments = 60;
+    optional bool        error     = 61 [default = false];
   }
 }
 
