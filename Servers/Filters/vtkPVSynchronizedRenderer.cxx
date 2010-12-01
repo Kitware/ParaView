@@ -165,7 +165,7 @@ vtkPVSynchronizedRenderer::vtkPVSynchronizedRenderer()
         vtkMultiProcessController::GetGlobalController());
       this->ParallelSynchronizer->WriteBackImagesOn();
       }
-    else if (pm->GetNumberOfLocalPartitions() > 0)
+    else if (pm->GetNumberOfLocalPartitions() > 1)
       {
 #ifdef PARAVIEW_USE_ICE_T
       this->ParallelSynchronizer = vtkIceTSynchronizedRenderers::New();
