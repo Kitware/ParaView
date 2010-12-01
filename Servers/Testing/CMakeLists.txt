@@ -36,6 +36,7 @@ IF(PYTHON_EXECUTABLE AND VTK_HEADER_TESTING_PY)
       vtkSMRepresentationStrategyVector.h
       vtkSpyPlotBlock.h
       vtkSpyPlotBlockIterator.h
+      vtkSpyPlotHistoryReaderPrivate.h
       vtkSpyPlotIStream.h
       vtkSpyPlotReaderMap.h
       vtkSpyPlotUniReader.h
