@@ -56,7 +56,6 @@ private slots:
  void onPreRepresentationRemoved(pqRepresentation*);
 
 private:
-  pqServerManagerModelItem *getActiveObject() const;
   pqPipelineSource *getActiveSource() const;
   pqServer* getActiveServer() const;
  QAction *SesameViewAction;

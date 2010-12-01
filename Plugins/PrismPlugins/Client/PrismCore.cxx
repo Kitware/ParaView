@@ -44,6 +44,7 @@
 #include "pqTreeWidget.h"
 #include <QComboBox>
 #include <QList>
+#include "vtkSMOutputPort.h"
 //-----------------------------------------------------------------------------
 static PrismCore* Instance = 0;
 
@@ -955,53 +956,63 @@ void PrismCore::onGeometrySelection(vtkObject* caller,
 }
 void PrismCore::onSelectionChanged()
 {
-  pqServerManagerModelItem *item = this->getActiveObject();
-  pqPipelineSource *source = dynamic_cast<pqPipelineSource *>(item);
-  vtkSMProxyManager *proxyManager = vtkSMProxyManager::GetProxyManager();
-  proxyManager->InstantiateGroupPrototypes("filters");
-  vtkSMProxy* prismFilter = proxyManager->GetProxy("filters_prototypes", "PrismFilter");
-
-  if (source && prismFilter)
+  pqServerManagerSelectionModel *selection =
+    pqApplicationCore::instance()->getSelectionModel();
+  pqServerManagerModelItem *item = selection->currentItem();
+  if(item)
   {
-    vtkSMProperty *input = prismFilter->GetProperty("Input");
-    if(input)
+    pqOutputPort* port = qobject_cast<pqOutputPort*>(item);
+    pqPipelineSource *source = NULL;
+    vtkSMProxy* proxy=NULL;
+    int portNumber=0;
+    if(port)
     {
-      pqSMAdaptor::setUncheckedProxyProperty(input, source->getProxy());
-      if(input->IsInDomains())
-      {
-        if(this->PrismViewAction)
-        {
-          this->PrismViewAction->setEnabled(true);
-        }
-                return;
-                }
-            }
-      }
-
-    if(this->PrismViewAction)
-      {
-      this->PrismViewAction->setEnabled(false);
-      }
-}
-
-pqServerManagerModelItem *PrismCore::getActiveObject() const
-    {
-    pqServerManagerModelItem *item = 0;
-    pqServerManagerSelectionModel *selection =
-        pqApplicationCore::instance()->getSelectionModel();
-    const pqServerManagerSelection *sels = selection->selectedItems();
-    if(sels->size() == 1)
-        {
-        item = sels->first();
-        }
-    else if(sels->size() > 1)
-        {
-        item = selection->currentItem();
-        if(item && !selection->isSelected(item))
-            {
-            item = 0;
-            }
-        }
-
-    return item;
+      source=port->getSource();
+      portNumber=port->getPortNumber();
     }
+    if(!source)
+    {
+      source= qobject_cast<pqPipelineSource *>(item);
+    }
+
+    if(source)
+    {
+      vtkSMProxyManager *proxyManager = vtkSMProxyManager::GetProxyManager();
+      proxyManager->InstantiateGroupPrototypes("filters");
+      vtkSMProxy* prismFilter = proxyManager->GetProxy("filters_prototypes", "PrismFilter");
+
+      if (source && prismFilter)
+      {
+        vtkSMProperty *inputP = prismFilter->GetProperty("Input");
+        vtkSMInputProperty* input = vtkSMInputProperty::SafeDownCast(inputP);
+
+        if (input)
+        {
+          if (input->GetNumberOfProxies() == 1)
+          {
+            input->SetUncheckedInputConnection(0, source->getProxy(), portNumber);
+          }
+          else
+          {
+            input->RemoveAllUncheckedProxies();
+            input->AddUncheckedInputConnection(source->getProxy(), portNumber);
+          }
+
+          if(input->IsInDomains())
+          {
+            if(this->PrismViewAction)
+            {
+              this->PrismViewAction->setEnabled(true);
+            }
+            return;
+          }
+        }
+      }
+    }
+  }
+
+  if(this->PrismViewAction)
+  {
+    this->PrismViewAction->setEnabled(false);
+  }
+}
