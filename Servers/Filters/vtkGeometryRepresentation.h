@@ -26,6 +26,7 @@
 #include "vtkProperty.h" // needed for VTK_POINTS etc.
 
 class vtkCompositePolyDataMapper2;
+class vtkMapper;
 class vtkOrderedCompositeDistributor;
 class vtkPVCacheKeeper;
 class vtkPVGeometryFilter;
@@ -213,8 +214,8 @@ protected:
   vtkAlgorithm* MultiBlockMaker;
   vtkPVCacheKeeper* CacheKeeper;
   vtkQuadricClustering* Decimator;
-  vtkCompositePolyDataMapper2* Mapper;
-  vtkCompositePolyDataMapper2* LODMapper;
+  vtkMapper* Mapper;
+  vtkMapper* LODMapper;
   vtkPVLODActor* Actor;
   vtkProperty* Property;
   vtkUnstructuredDataDeliveryFilter* DeliveryFilter;

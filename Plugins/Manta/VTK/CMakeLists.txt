@@ -172,7 +172,10 @@ SET ( MANTA_CLASSES
 
 IF (BUILD_AGAINST_PARAVIEW)
   # paraview uses its own LOD actor, put it in here
-  SET ( MANTA_CLASSES ${MANTA_CLASSES} vtkMantaLODActor.cxx)
+  SET ( MANTA_CLASSES ${MANTA_CLASSES}
+    vtkMantaLODActor.cxx
+    vtkPVMantaRepresentation.cxx
+    vtkMantaCompositeMapper.cxx)
 ENDIF (BUILD_AGAINST_PARAVIEW)
 
 SET ( MANTA_SRCS

@@ -358,6 +358,9 @@ void vtkPVRenderView::SelectCells(int region[4])
 //----------------------------------------------------------------------------
 void vtkPVRenderView::Select(int fieldAssociation, int region[4])
 {
+  //DDM manta doesn't support selection
+  return;
+
   // NOTE: selection is only supported in builtin or client-server mode. Not
   // supported in tile-display or batch modes.
 
