@@ -143,6 +143,10 @@ IF (PARAVIEW_USE_MPI)
   SET (SpreadSheet1_DISABLE_CRS TRUE)
 ENDIF (PARAVIEW_USE_MPI)
 
+# Clip test has object picking which is not supported in client-render-server
+# mode.
+SET (Clip_DISABLE_CRS TRUE)
+
 # These Xdmf tests have wireframes, hence the increased thresholds.
 SET (XdmfReadImageData_THRESHOLD 20)
 SET (XdmfReadRectilinearGrid_THRESHOLD 20)
