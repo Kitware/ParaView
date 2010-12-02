@@ -17,6 +17,7 @@ PURPOSE.  See the above copyright notice for more information.
 
 #include "vtkDoubleArray.h"
 #include "vtkFieldData.h"
+#include "vtkIdTypeArray.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkObjectFactory.h"
@@ -43,31 +44,31 @@ class vtkSpyPlotHistoryReader::MetaInfo
 public:
   MetaInfo()
     {
-    timeSteps.reserve(1024);
-    metaIndexes["time"]=-1;
+    TimeSteps.reserve(1024);
+    MetaIndexes["time"]=-1;
     }
   ~MetaInfo()
     {
     }
 
   //rough bidirectional map of header index for time
-  std::map<std::string,int> metaIndexes;
-  std::map<int,std::string> metaLookUp;
+  std::map<std::string,int> MetaIndexes;
+  std::map<int,std::string> MetaLookUp;
 
-  //maps col index to if they start a rows
-  std::set<int> headerRowIndexes;
+  //maps the column index to the row/point/tracer id that the row represents
+  std::map<int,int> ColumnIndexToTracerId;
 
   //maps the names for each col in the header
   //presumption is that all points are continous
   //and the properties are in the same order for each point
-  std::vector<std::string> header;
+  std::vector<std::string> Header;
 
   //maps col index to field property names
   std::map<int,std::string> FieldIndexesToNames;
 
 
   //lookup table of time info to file position
-  std::vector<TimeStep> timeSteps;
+  std::vector<TimeStep> TimeSteps;
 };
 
 //-----------------------------------------------------------------------------
@@ -119,26 +120,31 @@ int vtkSpyPlotHistoryReader::RequestInformation(vtkInformation *request,
     getline(file_stream,line);
 
     //skip any line that starts with a comment
-    if (line[0] == this->CommentCharacter[0] || line.size() <= 1)
+    if (line.size() <= 1)
       {
       continue;
       }
+    else if (line[0] == this->CommentCharacter[0])
+      {
+      continue;
+      }
+
     if (row==0)
       {
       //read the header
       //now find the cycle and time information and store those indexes
-      getMetaHeaderInfo(line,this->Delimeter[0],this->Info->metaIndexes,
-                        this->Info->metaLookUp);
+      getMetaHeaderInfo(line,this->Delimeter[0],this->Info->MetaIndexes,
+                        this->Info->MetaLookUp);
 
       //now convert this line into a table
       //we are going to have to reduce the header collection
-      this->Info->header = createTableLayoutFromHeader(
-          line,this->Delimeter[0],this->Info->headerRowIndexes,
+      this->Info->Header = createTableLayoutFromHeader(
+          line,this->Delimeter[0],this->Info->ColumnIndexToTracerId,
           this->Info->FieldIndexesToNames);
 
       //skip the next line if it contains the property types
       getline(file_stream,line);
-      getTimeStepInfo(line,this->Delimeter[0],this->Info->metaLookUp,timeInfo);
+      getTimeStepInfo(line,this->Delimeter[0],this->Info->MetaLookUp,timeInfo);
       double time = -1;
       bool valid = convert(timeInfo["time"],time);
       if (!valid)
@@ -150,31 +156,31 @@ int vtkSpyPlotHistoryReader::RequestInformation(vtkInformation *request,
     else
       {
       //normal data
-      getTimeStepInfo(line,this->Delimeter[0],this->Info->metaLookUp,timeInfo);
+      getTimeStepInfo(line,this->Delimeter[0],this->Info->MetaLookUp,timeInfo);
       TimeStep step;
       step.file_pos = tellgValue;
       convert(timeInfo["time"],step.time);
-      this->Info->timeSteps.push_back(step);
+      this->Info->TimeSteps.push_back(step);
       }
     ++row;
     }
 
   if(request->Has(vtkDemandDrivenPipeline::REQUEST_INFORMATION()))
     {
-    int size = static_cast<int>(this->Info->timeSteps.size());
+    int size = static_cast<int>(this->Info->TimeSteps.size());
 
     //set the values at all the time steps
     double *times = new double[size];
     for (int i=0; i < size; ++i)
       {
-      times[i] = this->Info->timeSteps[i].time;
+      times[i] = this->Info->TimeSteps[i].time;
       }
 
     //set the time range
 
     double timeRange[3];
-    timeRange[0] = this->Info->timeSteps[0].time;
-    timeRange[1] = this->Info->timeSteps[size-1].time;
+    timeRange[0] = this->Info->TimeSteps[0].time;
+    timeRange[1] = this->Info->TimeSteps[size-1].time;
 
     info->Set(vtkStreamingDemandDrivenPipeline::TIME_STEPS(),
                  times,size);
@@ -228,7 +234,7 @@ int vtkSpyPlotHistoryReader::RequestData(
 
   std::string line;
   std::ifstream file_stream ( this->FileName , std::ifstream::in );
-  file_stream.seekg(this->Info->timeSteps[TimeIndex].file_pos);
+  file_stream.seekg(this->Info->TimeSteps[TimeIndex].file_pos);
   getline(file_stream,line);
 
   //construct the table
@@ -240,7 +246,7 @@ int vtkSpyPlotHistoryReader::RequestData(
   split(line,this->Delimeter[0],items);
 
   //determine the number of rows our table will have
-  int numRows = this->Info->headerRowIndexes.size();
+  int numRows = this->Info->ColumnIndexToTracerId.size();
   output->SetNumberOfRows(numRows);
 
   //setup variables we need in the while loop
@@ -252,9 +258,11 @@ int vtkSpyPlotHistoryReader::RequestData(
   size_t i=0,j=0;
   while(it != items.end())
     {
-    if (this->Info->headerRowIndexes.count(index))
+    if (this->Info->ColumnIndexToTracerId.count(index))
       {
-      for(j=0; j < numCols; ++j)
+      //add in the tracer id first
+      output->SetValue(i,0,vtkVariant(this->Info->ColumnIndexToTracerId[index]));
+      for(j=1; j < numCols; ++j)
         {
         output->SetValue(i,j,vtkVariant(*it));
         ++it;
@@ -290,7 +298,13 @@ void vtkSpyPlotHistoryReader::ConstructTableColumns(
 {
   std::vector<std::string>::const_iterator hIt;
 
-  for(hIt = this->Info->header.begin();hIt != this->Info->header.end(); ++hIt)
+  //add in the tracer_id coloumn
+  vtkIdTypeArray *tracerIdCol = vtkIdTypeArray::New();
+  tracerIdCol->SetName("TracerID");
+  table->AddColumn(tracerIdCol);
+  tracerIdCol->FastDelete();
+
+  for(hIt = this->Info->Header.begin();hIt != this->Info->Header.end(); ++hIt)
     {
     vtkDoubleArray *col = vtkDoubleArray::New();
     col->SetName((*hIt).c_str());
