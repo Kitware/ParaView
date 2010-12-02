@@ -17,6 +17,7 @@ PURPOSE.  See the above copyright notice for more information.
 
 #include "vtkDoubleArray.h"
 #include "vtkFieldData.h"
+#include "vtkIdTypeArray.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkObjectFactory.h"
@@ -54,8 +55,8 @@ public:
   std::map<std::string,int> MetaIndexes;
   std::map<int,std::string> MetaLookUp;
 
-  //maps col index to if they start a rows
-  std::set<int> HeaderRowIndexes;
+  //maps the column index to the row/point/tracer id that the row represents
+  std::map<int,int> ColumnIndexToTracerId;
 
   //maps the names for each col in the header
   //presumption is that all points are continous
@@ -119,10 +120,15 @@ int vtkSpyPlotHistoryReader::RequestInformation(vtkInformation *request,
     getline(file_stream,line);
 
     //skip any line that starts with a comment
-    if (line[0] == this->CommentCharacter[0] || line.size() <= 1)
+    if (line.size() <= 1)
       {
       continue;
       }
+    else if (line[0] == this->CommentCharacter[0])
+      {
+      continue;
+      }
+
     if (row==0)
       {
       //read the header
@@ -133,7 +139,7 @@ int vtkSpyPlotHistoryReader::RequestInformation(vtkInformation *request,
       //now convert this line into a table
       //we are going to have to reduce the header collection
       this->Info->Header = createTableLayoutFromHeader(
-          line,this->Delimeter[0],this->Info->HeaderRowIndexes,
+          line,this->Delimeter[0],this->Info->ColumnIndexToTracerId,
           this->Info->FieldIndexesToNames);
 
       //skip the next line if it contains the property types
@@ -240,7 +246,7 @@ int vtkSpyPlotHistoryReader::RequestData(
   split(line,this->Delimeter[0],items);
 
   //determine the number of rows our table will have
-  int numRows = this->Info->HeaderRowIndexes.size();
+  int numRows = this->Info->ColumnIndexToTracerId.size();
   output->SetNumberOfRows(numRows);
 
   //setup variables we need in the while loop
@@ -252,9 +258,11 @@ int vtkSpyPlotHistoryReader::RequestData(
   size_t i=0,j=0;
   while(it != items.end())
     {
-    if (this->Info->HeaderRowIndexes.count(index))
+    if (this->Info->ColumnIndexToTracerId.count(index))
       {
-      for(j=0; j < numCols; ++j)
+      //add in the tracer id first
+      output->SetValue(i,0,vtkVariant(this->Info->ColumnIndexToTracerId[index]));
+      for(j=1; j < numCols; ++j)
         {
         output->SetValue(i,j,vtkVariant(*it));
         ++it;
@@ -289,6 +297,12 @@ void vtkSpyPlotHistoryReader::ConstructTableColumns(
   vtkTable *table)
 {
   std::vector<std::string>::const_iterator hIt;
+
+  //add in the tracer_id coloumn
+  vtkIdTypeArray *tracerIdCol = vtkIdTypeArray::New();
+  tracerIdCol->SetName("TracerID");
+  table->AddColumn(tracerIdCol);
+  tracerIdCol->FastDelete();
 
   for(hIt = this->Info->Header.begin();hIt != this->Info->Header.end(); ++hIt)
     {
