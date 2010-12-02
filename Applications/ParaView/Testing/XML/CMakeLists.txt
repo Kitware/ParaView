@@ -3,8 +3,16 @@ SET (TESTS_WITHOUT_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/OpenHelp.xml
 )
 
+SET (TESTS_WITH_BASELINES)
+IF(NOT PARAVIEW_USE_VISITBRIDGE)
+  # Analyze reader test was conflicting with the reader from VisIt. So
+  # disabling it.
+  SET (TESTS_WITH_BASELINES ${TESTS_WITH_BASELINES}
+    ${CMAKE_CURRENT_SOURCE_DIR}/AnalyzeReaderWriterPlugin.xml)
+ENDIF(NOT PARAVIEW_USE_VISITBRIDGE)
+
 SET (TESTS_WITH_BASELINES
-  ${CMAKE_CURRENT_SOURCE_DIR}/AnalyzeReaderWriterPlugin.xml
+  ${TESTS_WITH_BASELINES}
   ${CMAKE_CURRENT_SOURCE_DIR}/AnimatePipelineTime.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/3DWidgetInCustomFilter.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/CalcParens.xml
