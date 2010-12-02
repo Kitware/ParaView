@@ -1039,15 +1039,13 @@
         parts of the current source to the file with pieces spread across the
         server processes.
       </Documentation>
+
       <InputProperty
-        name="Input" 
-        command="AddInputConnection"
-        clean_command="RemoveAllInputs"
-        multiple_input="1">
-        <ProxyGroupDomain name="groups">
-          <Group name="sources"/>
-          <Group name="filters"/>
-        </ProxyGroupDomain>
+        name="Representations"
+        command="AddRepresentation"
+        clean_command="RemoveAllRepresentations"
+        immediate_update="0"
+        repeat_command="1">
         <Documentation>
           The input filter/source whose output dataset is to written to the
           file.

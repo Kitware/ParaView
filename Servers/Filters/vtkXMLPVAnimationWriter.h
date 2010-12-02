@@ -30,23 +30,12 @@ public:
   static vtkXMLPVAnimationWriter* New();
   vtkTypeMacro(vtkXMLPVAnimationWriter,vtkXMLPVDWriter);
   void PrintSelf(ostream& os, vtkIndent indent);  
-  
+
   // Description:
-  // Add an input corresponding to a named group.  Multiple inputs
-  // with the same group name will be considered multiple parts of the
-  // same group.  If no name is given, the empty string is assumed.
-  void AddInput(vtkDataSet*, const char* group);
-  void AddInput(vtkDataSet*);
-  void AddInputConnection(vtkAlgorithmOutput* ao, const char* group);
-  void AddInputConnection(vtkAlgorithmOutput* ao)
-    {
-      this->AddInputConnection(0, ao);
-    }
-  void AddInputConnection(int port, vtkAlgorithmOutput* ao)
-    {
-      this->Superclass::AddInputConnection(port, ao);
-    }
-  
+  // Add/Remove representations.
+  void AddRepresentation(vtkAlgorithm*, const char* groupname);
+  void RemoveAllRepresentations();
+
   // Description:
   // Start a new animation with the current set of inputs.
   void Start();
@@ -62,11 +51,7 @@ public:
 protected:
   vtkXMLPVAnimationWriter();
   ~vtkXMLPVAnimationWriter();  
-  
-  // Override vtkProcessObject's AddInput method to prevent compiler
-  // warnings.
-  virtual void AddInput(vtkDataObject*);
-  
+
   // Replace vtkXMLWriter's writing driver method.
   virtual int WriteInternal();
   
