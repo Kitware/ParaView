@@ -101,6 +101,7 @@ vtkStandardNewMacro(vtkSMRenderViewProxy);
 //----------------------------------------------------------------------------
 vtkSMRenderViewProxy::vtkSMRenderViewProxy()
 {
+  this->IsSelectionCached = false;
 }
 
 //----------------------------------------------------------------------------
@@ -475,6 +476,23 @@ void vtkSMRenderViewProxy::ResetCamera(double bounds[6])
 }
 
 //-----------------------------------------------------------------------------
+void vtkSMRenderViewProxy::MarkDirty(vtkSMProxy* modifiedProxy)
+{
+  if (this->IsSelectionCached)
+    {
+    this->IsSelectionCached = false;
+    // cout << "InvalidateCachedSelection" << endl;
+    vtkClientServerStream stream;
+    stream << vtkClientServerStream::Invoke
+      << this->GetID()
+      << "InvalidateCachedSelection"
+      << vtkClientServerStream::End;
+    vtkProcessModule::GetProcessModule()->SendStream(
+      this->ConnectionID, this->Servers, stream);
+    }
+}
+
+//-----------------------------------------------------------------------------
 vtkSMRepresentationProxy* vtkSMRenderViewProxy::Pick(int x, int y)
 {
   // 1) Create surface selection.
@@ -507,6 +525,7 @@ bool vtkSMRenderViewProxy::SelectSurfaceCells(int region[4],
     return false;
     }
 
+  this->IsSelectionCached = true;
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   vtkClientServerStream stream;
   stream << vtkClientServerStream::Invoke
@@ -530,6 +549,7 @@ bool vtkSMRenderViewProxy::SelectSurfacePoints(int region[4],
     return false;
     }
 
+  this->IsSelectionCached = true;
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   vtkClientServerStream stream;
   stream << vtkClientServerStream::Invoke

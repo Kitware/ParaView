@@ -982,6 +982,12 @@ void vtkPVRenderView::ConfigureCompressor(const char* configuration)
   this->SynchronizedRenderers->ConfigureCompressor(configuration);
 }
 
+//----------------------------------------------------------------------------
+void vtkPVRenderView::InvalidateCachedSelection()
+{
+  this->Selector->Modified();
+}
+
 //*****************************************************************
 // Forwarded to orientation axes widget.
 
