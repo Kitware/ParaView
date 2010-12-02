@@ -125,6 +125,9 @@ bool pqPipelineContextMenuBehavior::eventFilter(QObject* caller, QEvent* e)
         if (view)
           {
           int pos[2] = { newPos.x(), newPos.y() } ;
+          // we need to flip Y.
+          int height = senderWidget->size().height();
+          pos[1] = height - pos[1];
           pqDataRepresentation* picked_repr = view->pick(pos);
           this->PickedRepresentation = picked_repr;
           if (picked_repr)

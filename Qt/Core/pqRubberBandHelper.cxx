@@ -272,8 +272,10 @@ bool pqRubberBandHelper::eventFilter(QObject *watched, QEvent *_event)
         if (this->Internal->StartPosition[0] == mouseEvent.x() &&
           this->Internal->StartPosition[1] == mouseEvent.y())
           {
-          int region[4] = {mouseEvent.x(), mouseEvent.y(), mouseEvent.x(),
-            mouseEvent.y()};
+          // we need to flip Y.
+          int height = this->Internal->RenderView->getWidget()->size().height();
+          int region[4] = {mouseEvent.x(), height - mouseEvent.y(),
+            mouseEvent.x(), height - mouseEvent.y()};
           this->onSelectionChanged(NULL, 0, region);
           }
         }

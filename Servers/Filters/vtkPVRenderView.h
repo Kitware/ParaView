@@ -306,6 +306,12 @@ public:
   // Returns true if the most recent render used LOD.
   vtkGetMacro(UsedLODForLastRender, bool);
 
+  // Description:
+  // Invalidates cached selection. Called explicitly when view proxy thinks the
+  // cache may have become obsolete.
+  // @CallOnAllProcessess
+  void InvalidateCachedSelection();
+
 public:
   //*****************************************************************
   // Methods merely exposing methods for internal objects.
