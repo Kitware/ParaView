@@ -31,6 +31,7 @@
 #include "vtkXMLImageDataWriter.h"
 #include "vtkXMLPDataWriter.h"
 #include "vtkXMLPImageDataWriter.h"
+#include "vtkXMLPMultiBlockDataWriter.h"
 #include "vtkXMLPolyDataWriter.h"
 #include "vtkXMLPPolyDataWriter.h"
 #include "vtkXMLPRectilinearGridWriter.h"
@@ -480,6 +481,19 @@ void vtkXMLPVDWriter::CreateWriters()
           vtkXMLRectilinearGridWriter::SafeDownCast(
             this->Internal->Writers[i].GetPointer())->SetInput(exec->GetInputData(0, i));
           }
+        break;
+
+      case VTK_MULTIBLOCK_DATA_SET:
+        if(!this->Internal->Writers[i].GetPointer() ||
+          (strcmp(this->Internal->Writers[i]->GetClassName(),
+                  "vtkXMLPMultiBlockDataWriter") != 0))
+          {
+          vtkXMLPMultiBlockDataWriter* w = vtkXMLPMultiBlockDataWriter::New();
+          this->Internal->Writers[i] = w;
+          w->Delete();
+          }
+        vtkXMLPMultiBlockDataWriter::SafeDownCast(
+          this->Internal->Writers[i].GetPointer())->SetInput(exec->GetInputData(0, i));
         break;
       }
     

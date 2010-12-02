@@ -19,6 +19,8 @@
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMProxyProperty.h"
+#include "vtkSMRepresentationProxy.h"
+#include "vtkSMPropertyHelper.h"
 #include "vtkSMStringVectorProperty.h"
 #include "vtkSMXMLPVAnimationWriterProxy.h"
 
@@ -67,24 +69,18 @@ bool vtkSMAnimationSceneGeometryWriter::SaveInitialize()
     this->ViewModule->GetProperty("Representations"));
 
   vtkSMProxyProperty* gwInput = vtkSMProxyProperty::SafeDownCast(
-    this->GeometryWriter->GetProperty("Input"));
+    this->GeometryWriter->GetProperty("Representations"));
   gwInput->RemoveAllProxies();
 
   for (unsigned int cc=0; cc < pp->GetNumberOfProxies(); ++cc)
     {
-#ifdef FIXME
-    vtkSMDataRepresentationProxy* repr = 
-      vtkSMDataRepresentationProxy::SafeDownCast(
+    vtkSMRepresentationProxy* repr =
+      vtkSMRepresentationProxy::SafeDownCast(
         pp->GetProxy(cc));
-    if (repr && repr->GetVisibility())
+    if (repr && vtkSMPropertyHelper(repr,"Visibility", true).GetAsInt() != 0)
       {
-      vtkSMProxy* input =  repr->GetProcessedConsumer();
-      if (input)
-        {
-        gwInput->AddProxy(input);
-        }
+      gwInput->AddProxy(repr);
       }
-#endif
     }
   this->GeometryWriter->UpdateVTKObjects();
   this->GeometryWriter->InvokeCommand("Start");
