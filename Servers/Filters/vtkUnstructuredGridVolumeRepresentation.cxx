@@ -176,10 +176,6 @@ int vtkUnstructuredGridVolumeRepresentation::RequestData(vtkInformation* request
     this->Preprocessor->SetInputConnection(
       this->GetInternalOutputPort());
     this->Preprocessor->Update();
-
-    this->GetActiveVolumeMapper()->SetInputConnection(
-      this->Distributor->GetOutputPort());
-
     this->DeliveryFilter->SetInputConnection(
       this->CacheKeeper->GetOutputPort());
     this->LODDeliveryFilter->SetInputConnection(
@@ -294,6 +290,8 @@ bool vtkUnstructuredGridVolumeRepresentation::RemoveFromView(vtkView* view)
 void vtkUnstructuredGridVolumeRepresentation::UpdateMapperParameters()
 {
   vtkUnstructuredGridVolumeMapper* activeMapper = this->GetActiveVolumeMapper();
+
+  activeMapper->SetInputConnection(this->Distributor->GetOutputPort());
   activeMapper->SelectScalarArray(this->ColorArrayName);
 
   if (this->ColorArrayName && this->ColorArrayName[0])

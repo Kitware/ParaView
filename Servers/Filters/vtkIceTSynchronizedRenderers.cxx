@@ -171,7 +171,15 @@ public:
       glViewport(0, 0, size[0], size[1]);
       }
     glDisable(GL_SCISSOR_TEST);
-    glClearColor(0, 0, 0, 0);
+    double background[3];
+    render_state->GetRenderer()->GetBackground(background);
+    // gradient background is not going to work correctly when using volume
+    // rendering or translucent geometry, but otherwise if should work fine. We
+    // set the background color so that solid background works correctly for
+    // these two cases.
+    glClearColor((GLclampf)background[0], (GLclampf)background[1],
+      (GLclampf)background[2], 0.0f);
+    icetEnable(ICET_CORRECT_COLORED_BACKGROUND);
     }
 protected:
 
