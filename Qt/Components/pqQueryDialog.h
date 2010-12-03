@@ -40,6 +40,7 @@ class pqQueryClauseWidget;
 class vtkPVDataSetAttributesInformation;
 class vtkSMProxy;
 class pqView;
+class pqRepresentation;
 
 /// pqQueryDialog is the dialog that allows the user to query/search for
 /// cells/points satisfying a particular criteria.
@@ -70,7 +71,7 @@ signals:
 
 protected slots:
   /// Must be triggered before server disconnect to release all SMProxy links
-  void freeSMProxyAndClose();
+  void freeSMProxy();
 
   /// Triggered when the data to process has changed
   void onSelectionChange(pqOutputPort*);

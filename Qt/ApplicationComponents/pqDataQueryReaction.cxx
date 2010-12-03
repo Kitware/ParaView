@@ -44,24 +44,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 pqDataQueryReaction::pqDataQueryReaction(QAction* parentObject)
   : Superclass(parentObject)
 {
-  pqActiveObjects* activeObjects = &pqActiveObjects::instance();
-  QObject::connect(activeObjects, SIGNAL(portChanged(pqOutputPort*)),
-    this, SLOT(updateEnableState()));
-  this->updateEnableState();
 }
 
 //-----------------------------------------------------------------------------
 pqDataQueryReaction::~pqDataQueryReaction()
 {
-}
-
-//-----------------------------------------------------------------------------
-void pqDataQueryReaction::updateEnableState()
-{
-  pqActiveObjects& activeObjects = pqActiveObjects::instance();
-  pqOutputPort* port = activeObjects.activePort();
-  bool enable_state = (port != NULL);
-  this->parentAction()->setEnabled(enable_state);
 }
 
 //-----------------------------------------------------------------------------
@@ -103,8 +90,6 @@ void pqDataQueryReaction::showQueryDialog()
                    this,    SLOT(onExtractSelection()));
   QObject::connect(&dialog, SIGNAL(extractSelectionOverTime()),
                    this,    SLOT(onExtractSelectionOverTime()));
-  QObject::connect(serverManagerModel, SIGNAL(aboutToRemoveServer(pqServer*)),
-                   &dialog,            SLOT(freeSMProxyAndClose()));
   loop.exec();
 }
 
