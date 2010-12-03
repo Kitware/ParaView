@@ -50,10 +50,6 @@ public:
   void showQueryDialog();
 
 public slots:
-  /// Updates the enabled state. Applications need not explicitly call
-  /// this.
-  void updateEnableState();
-
   void onExtractSelection();
   void onExtractSelectionOverTime();
 
