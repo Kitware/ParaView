@@ -112,3 +112,87 @@ void vtkPVMantaRepresentation::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 }
+
+//----------------------------------------------------------------------------
+void vtkPVMantaRepresentation::SetMaterialType(char *newval)
+{
+  vtkMantaProperty *mantaProperty = vtkMantaProperty::SafeDownCast(this->Property);
+  mantaProperty->SetMaterialType(newval);
+}
+
+//----------------------------------------------------------------------------
+char * vtkPVMantaRepresentation::GetMaterialType()
+{
+  vtkMantaProperty *mantaProperty = vtkMantaProperty::SafeDownCast(this->Property);
+  return mantaProperty->GetMaterialType();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVMantaRepresentation::SetReflectance(double newval)
+{
+  vtkMantaProperty *mantaProperty = vtkMantaProperty::SafeDownCast(this->Property);
+  mantaProperty->SetReflectance(newval);
+}
+
+//----------------------------------------------------------------------------
+double vtkPVMantaRepresentation::GetReflectance()
+{
+  vtkMantaProperty *mantaProperty = vtkMantaProperty::SafeDownCast(this->Property);
+  return mantaProperty->GetReflectance();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVMantaRepresentation::SetThickness(double newval)
+{
+  vtkMantaProperty *mantaProperty = vtkMantaProperty::SafeDownCast(this->Property);
+  mantaProperty->SetThickness(newval);
+}
+
+//----------------------------------------------------------------------------
+double vtkPVMantaRepresentation::GetThickness()
+{
+  vtkMantaProperty *mantaProperty = vtkMantaProperty::SafeDownCast(this->Property);
+  return mantaProperty->GetThickness();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVMantaRepresentation::SetEta(double newval)
+{
+  vtkMantaProperty *mantaProperty = vtkMantaProperty::SafeDownCast(this->Property);
+  mantaProperty->SetEta(newval);
+}
+
+//----------------------------------------------------------------------------
+double vtkPVMantaRepresentation::GetEta()
+{
+  vtkMantaProperty *mantaProperty = vtkMantaProperty::SafeDownCast(this->Property);
+  return mantaProperty->GetEta();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVMantaRepresentation::SetN(double newval)
+{
+  vtkMantaProperty *mantaProperty = vtkMantaProperty::SafeDownCast(this->Property);
+  mantaProperty->SetN(newval);
+}
+
+//----------------------------------------------------------------------------
+double vtkPVMantaRepresentation::GetN()
+{
+  vtkMantaProperty *mantaProperty = vtkMantaProperty::SafeDownCast(this->Property);
+  return mantaProperty->GetN();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVMantaRepresentation::SetNt(double newval)
+{
+  vtkMantaProperty *mantaProperty = vtkMantaProperty::SafeDownCast(this->Property);
+  mantaProperty->SetNt(newval);
+}
+
+//----------------------------------------------------------------------------
+double vtkPVMantaRepresentation::GetNt()
+{
+  vtkMantaProperty *mantaProperty = vtkMantaProperty::SafeDownCast(this->Property);
+  return mantaProperty->GetNt();
+}

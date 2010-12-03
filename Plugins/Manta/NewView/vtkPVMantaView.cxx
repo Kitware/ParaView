@@ -96,3 +96,55 @@ void vtkPVMantaView::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 }
+
+//-----------------------------------------------------------------------------
+void vtkPVMantaView::SetThreads(int newval)
+{
+  if (newval == this->Threads)
+    {
+    return;
+    }
+  this->Threads = newval;
+  vtkMantaRenderer *mantaRenderer = vtkMantaRenderer::SafeDownCast
+    (this->RenderView->GetRenderer());
+  mantaRenderer->SetNumberOfWorkers(this->Threads);
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVMantaView::SetEnableShadows(int newval)
+{
+  if (newval == this->EnableShadows)
+    {
+    return;
+    }
+  this->EnableShadows = newval;
+  vtkMantaRenderer *mantaRenderer = vtkMantaRenderer::SafeDownCast
+    (this->RenderView->GetRenderer());
+  mantaRenderer->SetEnableShadows(this->EnableShadows);
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVMantaView::SetSamples(int newval)
+{
+  if (newval == this->Samples)
+    {
+    return;
+    }
+  this->Samples = newval;
+  vtkMantaRenderer *mantaRenderer = vtkMantaRenderer::SafeDownCast
+    (this->RenderView->GetRenderer());
+  mantaRenderer->SetSamples(this->Samples);
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVMantaView::SetMaxDepth(int newval)
+{
+  if (newval == this->EnableShadows)
+    {
+    return;
+    }
+  this->MaxDepth = newval;
+  vtkMantaRenderer *mantaRenderer = vtkMantaRenderer::SafeDownCast
+    (this->RenderView->GetRenderer());
+  mantaRenderer->SetMaxDepth(this->MaxDepth);
+}

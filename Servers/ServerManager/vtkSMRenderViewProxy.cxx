@@ -240,9 +240,6 @@ void vtkSMRenderViewProxy::CreateVTKObjects()
     return;
     }
 
-/*
-  //DDM disabling this since it replaces the mantacamera with a GL one
-  //which makes manta render nothing
   vtkClientServerStream stream;
   stream << vtkClientServerStream::Invoke
          << this->GetID()
@@ -252,7 +249,7 @@ void vtkSMRenderViewProxy::CreateVTKObjects()
   vtkProcessModule::GetProcessModule()->SendStream(
     this->ConnectionID,
     this->Servers, stream);
-*/
+
   vtkPVRenderView* rv = vtkPVRenderView::SafeDownCast(
     this->GetClientSideObject());
   if (rv->GetInteractor())
@@ -738,7 +735,6 @@ bool vtkSMRenderViewProxy::SelectFrustumInternal(int region[4],
 //----------------------------------------------------------------------------
 vtkImageData* vtkSMRenderViewProxy::CaptureWindowInternal(int magnification)
 {
-  vtkRenderWindow* window = this->GetRenderWindow();
   vtkPVRenderView* view =
     vtkPVRenderView::SafeDownCast(this->GetClientSideObject());
 

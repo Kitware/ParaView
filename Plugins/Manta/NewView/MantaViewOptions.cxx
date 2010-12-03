@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -95,12 +95,13 @@ QStringList MantaViewOptions::getPageList()
 void MantaViewOptions::applyChanges()
 {
   pqView* view = pqActiveView::instance().current();
-  this->View = qobject_cast<pqMantaView*>(view);
+  pqRenderView *View = qobject_cast<pqRenderView*>(view);
+/*
   if(!this->View)
     {
     return;
     }
-
+*/
   //TODO:These should be saved across sessions
   //pqSettings* settings = pqApplicationCore::instance()->settings();
   //settings->beginGroup("MantaView");
@@ -108,12 +109,12 @@ void MantaViewOptions::applyChanges()
   int intSetting;
   bool boolSetting;
 
-  vtkSMRenderViewProxy *proxy = this->View->getRenderViewProxy();
+  vtkSMRenderViewProxy *proxy = View->getRenderViewProxy();
   intSetting = this->Internal->ui.threads->value();
   vtkSMPropertyHelper(proxy, "Threads").Set(intSetting);
 
   boolSetting = this->Internal->ui.shadows->isChecked();
-  vtkSMPropertyHelper(proxy, "EnableShadows").Set(intSetting);
+  vtkSMPropertyHelper(proxy, "EnableShadows").Set(boolSetting);
 
   intSetting = this->Internal->ui.samples->value();
   vtkSMPropertyHelper(proxy, "Samples").Set(intSetting);
@@ -126,4 +127,3 @@ void MantaViewOptions::applyChanges()
 void MantaViewOptions::resetChanges()
 {
 }
-

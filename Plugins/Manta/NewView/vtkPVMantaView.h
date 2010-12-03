@@ -36,10 +36,30 @@ public:
   // @CallOnAllProcessess
   virtual void Initialize(unsigned int id);
 
+  // Description:
+  //Controls number of render threads.
+  virtual void SetThreads(int val);
+  vtkGetMacro(Threads, int);
+
+  // Description:
+  // Parameters that controls ray tracing quality
+  // Defaults are for minimal quality and maximal speed.
+  virtual void SetEnableShadows(int val);
+  vtkGetMacro(EnableShadows, int);
+  virtual void SetSamples(int val);
+  vtkGetMacro(Samples, int);
+  virtual void SetMaxDepth(int val);
+  vtkGetMacro(MaxDepth, int);
+
 //BTX
 protected:
   vtkPVMantaView();
   ~vtkPVMantaView();
+
+  int EnableShadows;
+  int Threads;
+  int Samples;
+  int MaxDepth;
 
 private:
   vtkPVMantaView(const vtkPVMantaView&); // Not implemented

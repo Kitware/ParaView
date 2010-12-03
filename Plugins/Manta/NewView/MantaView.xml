@@ -1,8 +1,81 @@
 <ServerManagerConfiguration>
+  <ProxyGroup name="camera">
+    <CameraProxy name="MantaCamera" class="vtkMantaCamera"
+      processes="client|dataserver|renderserver"
+      base_proxygroup="camera" base_proxyname="Camera">
+    </CameraProxy>
+  </ProxyGroup>
+
   <ProxyGroup name="views">
     <MantaViewProxy name="MantaView" class="vtkPVMantaView"
         processes="client|renderserver|dataserver"
         base_proxygroup="views" base_proxyname="RenderView">
+
+     <SubProxy>
+       <Proxy name="ActiveCamera" proxyname="MantaCamera" proxygroup="camera"
+              override="1">
+       </Proxy>
+       <ExposedProperties>
+         <Property name="CameraPositionInfo" />
+         <Property name="CameraPosition" />
+         <Property name="CameraFocalPointInfo" />
+         <Property name="CameraFocalPoint" />
+         <Property name="CameraViewUpInfo" />
+         <Property name="CameraViewUp" />
+         <Property name="CameraViewAngle" />
+         <Property name="CameraClippingRangeInfo" />
+         <Property name="CameraClippingRange" />
+         <Property name="CameraParallelScale" />
+         <Property name="CameraParallelScaleInfo" />
+         <Property name="CameraParallelProjection" />
+         <Property name="EyeAngle" />
+       </ExposedProperties>
+     </SubProxy>
+
+      <IntVectorProperty name="Threads"
+        command="SetThreads"
+        immediate_update="1"
+        number_of_elements="1"
+        default_values="1">
+        <IntRangeDomain name="range" min="1" />
+        <Documentation>
+          Controls number of render threads.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="EnableShadows"
+        command="SetEnableShadows"
+        immediate_update="1"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Turns on shadow.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="Samples"
+        command="SetSamples"
+        immediate_update="1"
+        number_of_elements="1"
+        default_values="1">
+        <IntRangeDomain name="range" min="1" />
+        <Documentation>
+          Controls multisampling.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="MaxDepth"
+        command="SetMaxDepth"
+        immediate_update="1"
+        number_of_elements="1"
+        default_values="5">
+        <IntRangeDomain name="range" min="1" />
+        <Documentation>
+          Controls maximum number of ray bounces.
+        </Documentation>
+      </IntVectorProperty>
+
     </MantaViewProxy>
   </ProxyGroup>
 
@@ -14,6 +87,52 @@
                          base_proxygroup="representations"
                          base_proxyname="SurfaceRepresentation">
     <!-- proxy that sets up manta display pipeline at vtk level -->
+
+      <StringVectorProperty name="MaterialType"
+        command="SetMaterialType"
+        number_of_elements="1"
+        default_values="default" >
+        <StringListDomain name="material">
+          <String value="default"/>
+          <String value="lambertian"/>
+          <String value="phong"/>
+          <String value="transparent"/>
+          <String value="thindielectric"/>
+          <String value="dielectric"/>
+          <String value="metal"/>
+          <String value="orennayer"/>
+        </StringListDomain>
+      </StringVectorProperty>
+
+      <DoubleVectorProperty name="Reflectance"
+        command="SetReflectance"
+        number_of_elements="1"
+        default_values="0.0">
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="Thickness"
+        command="SetThickness"
+        number_of_elements="1"
+        default_values="1.0">
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="Eta"
+        command="SetEta"
+        number_of_elements="1"
+        default_values="1.52">
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="N"
+        command="SetN"
+        number_of_elements="1"
+        default_values="1.0">
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="Nt"
+        command="SetNt"
+        number_of_elements="1"
+        default_values="1.2">
+      </DoubleVectorProperty>
 
     </RepresentationProxy>
 
@@ -187,6 +306,13 @@
           <Property name="StaticMode" />
           <Property name="SuppressLOD" />
           <Property name="Texture" />
+          <!-- manta specific properties -->
+          <Property name="MaterialType" />
+          <Property name="Reflectance" />
+          <Property name="Thickness" />
+          <Property name="Eta" />
+          <Property name="N" />
+          <Property name="Nt" />
         </ExposedProperties>
       </SubProxy>
 

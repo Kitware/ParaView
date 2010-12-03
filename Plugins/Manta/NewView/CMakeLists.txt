@@ -16,7 +16,15 @@ IF(PARAVIEW_BUILD_QT_GUI)
     ${PARAVIEW_GUI_INCLUDE_DIRS}
     )
   INCLUDE(${QT_USE_FILE})
-  QT4_WRAP_CPP(MOC_SRCS RegisterMantaView.h pqMantaView.h)
+  QT4_WRAP_CPP(MOC_SRCS
+    pqMantaView.h
+    MantaDisplay.h
+    MantaViewOptions.h)
+
+  QT4_WRAP_UI(UI_SRCS
+    MantaDisplay.ui
+    MantaViewOptions.ui
+    )
 
   ADD_PARAVIEW_VIEW_MODULE(
     VIEW_IFACE VIEW_IFACE_SRCS
@@ -25,6 +33,17 @@ IF(PARAVIEW_BUILD_QT_GUI)
     VIEW_XML_GROUP views
     VIEW_XML_NAME Manta
     )
+
+  ADD_PARAVIEW_VIEW_OPTIONS(
+    OPTIONS_IFACE OPTIONS_IFACE_SRCS
+    VIEW_TYPE pqMantaView
+    GLOBAL_VIEW_OPTIONS MantaViewOptions
+    )
+
+  ADD_PARAVIEW_DISPLAY_PANEL_DECORATOR(
+    DISPLAY_IFACE DISPLAY_IFACE_SRCS
+    CLASS_NAME MantaDisplay
+    PANEL_TYPES pqDisplayProxyEditor)
 
 ENDIF()
 
@@ -37,16 +56,17 @@ add_paraview_plugin(
   SERVER_MANAGER_SOURCES
     vtkPVMantaView.cxx
     vtkServerSideFactory.cxx
-#   vtkSMMantaRepresentationProxy.cxx
     vtkSMMantaViewProxy.cxx
   SERVER_MANAGER_XML
     MantaView.xml
   GUI_INTERFACES
-    ${IFACES} ${VIEW_IFACE}
+    ${VIEW_IFACE} ${OPTIONS_IFACE} ${DISPLAY_IFACE}
   GUI_SOURCES
-    ${IFACE_SRCS} ${VIEW_IFACE_SRCS}
+    ${VIEW_IFACE_SRCS} ${OPTIONS_IFACE_SRCS} ${DISPLAY_IFACE_SRCS} ${UI_SRCS}
     ${MOC_SRCS}
-    RegisterMantaView.cxx pqMantaView.cxx
+    pqMantaView.cxx
+    MantaDisplay.cxx
+    MantaViewOptions.cxx
 )
 
 TARGET_LINK_LIBRARIES ( MantaView vtkMantaCS )

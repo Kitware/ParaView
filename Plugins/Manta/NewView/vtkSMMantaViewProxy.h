@@ -85,6 +85,10 @@ public:
   virtual vtkSMRepresentationProxy* CreateDefaultRepresentation(
     vtkSMProxy*, int opport);
 
+  // Description:
+  virtual bool IsSelectionAvailable() { return false; }
+
+
 //BTX
 protected:
   vtkSMMantaViewProxy();

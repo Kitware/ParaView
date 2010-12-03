@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    RegisterMantaView.h
+   Module:    MantaDisplay.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,26 +29,28 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __RegisterMantaView_h
-#define __RegisterMantaView_h
+#ifndef __MantaDisplay_h
+#define __MantaDisplay_h
 
 #include <QObject>
 
-class RegisterMantaView : public QObject
+class pqDisplayPanel;
+
+class MantaDisplay : public QObject
 {
   Q_OBJECT
   typedef QObject Superclass;
+
 public:
-  RegisterMantaView(QObject* p=0);
-  ~RegisterMantaView();
+  MantaDisplay(pqDisplayPanel* parent);
+  ~MantaDisplay();
 
-  // Callback for shutdown.
-  void startup();
-
-  // Callback for startup.
-  void shutdown();
 private:
-  RegisterMantaView(const RegisterMantaView&); // Not implemented.
-  void operator=(const RegisterMantaView&); // Not implemented.
+  MantaDisplay(const MantaDisplay&); // Not implemented.
+  void operator=(const MantaDisplay&); // Not implemented.
+
+  class pqInternal;
+  pqInternal *Internal;
 };
+
 #endif

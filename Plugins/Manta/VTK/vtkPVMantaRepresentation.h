@@ -77,6 +77,21 @@ public:
   vtkTypeMacro(vtkPVMantaRepresentation, vtkGeometryRepresentationWithFaces);
   void PrintSelf(ostream& os, vtkIndent indent);
 
+  // Description:
+  // control that ray traced rendering characteristics of this object
+  void SetMaterialType(char *);
+  char *GetMaterialType();
+  void SetReflectance(double );
+  double GetReflectance();
+  void SetThickness(double );
+  double GetThickness();
+  void SetEta(double);
+  double GetEta();
+  void SetN(double);
+  double GetN();
+  void SetNt(double);
+  double GetNt();
+
 //BTX
 protected:
   vtkPVMantaRepresentation();

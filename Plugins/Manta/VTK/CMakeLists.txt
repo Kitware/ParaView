@@ -180,7 +180,7 @@ ENDIF (BUILD_AGAINST_PARAVIEW)
 
 SET ( MANTA_SRCS
   ${MANTA_CLASSES}
-#  vtkMantaObjectFactory.cxx
+  vtkMantaObjectFactory.cxx
   )
 
 # Create vtkManta libraries
