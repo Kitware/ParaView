@@ -75,6 +75,7 @@ SET (TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/SpreadSheet1.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/SpreadSheet2.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/SPTimeseries.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/SpyPlotHistoryReader.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/StreamTracerUpdates.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/TemporalInterpolator.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/TemporalShiftScale.xml

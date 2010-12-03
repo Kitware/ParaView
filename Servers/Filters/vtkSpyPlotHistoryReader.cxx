@@ -143,15 +143,15 @@ int vtkSpyPlotHistoryReader::RequestInformation(vtkInformation *request,
           this->Info->FieldIndexesToNames);
 
       //skip the next line if it contains the property types
+      std::streampos peakLineG = file_stream.tellg();
       getline(file_stream,line);
       getTimeStepInfo(line,this->Delimeter[0],this->Info->MetaLookUp,timeInfo);
       double time = -1;
       bool valid = convert(timeInfo["time"],time);
-      if (!valid)
+      if (valid)
         {
-        file_stream.seekg(tellgValue);
+        file_stream.seekg(peakLineG);
         }
-
       }
     else
       {
