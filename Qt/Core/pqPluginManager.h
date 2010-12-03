@@ -117,13 +117,16 @@ public:
   void addPluginFromSettings();
   // save plugin settings
   void savePluginSettings(bool clearFirst = true);
-  // check whether the plugin is ready to run.
-  bool isPluginFuntional(vtkPVPluginInformation* plInfo, bool remote);
+
   // exclude an extension from being saved with settings.
   void removePlugin(pqServer* server, const QString& lib, 
     bool remote=true);
  
   void loadGUIPlugin(vtkPVGUIPluginInterface*);
+public slots:
+  // check whether the plugin is ready to run.
+  bool isPluginFuntional(vtkPVPluginInformation* plInfo, bool remote);
+
 signals:
   /// signal for when an interface is loaded
   void guiInterfaceLoaded(QObject* iface);
@@ -138,6 +141,9 @@ signals:
 
   /// notification when plugin information is updated
   void pluginInfoUpdated();
+
+  /// notification that a new plugin has been loaded
+  void pluginLoaded(vtkPVPluginInformation* plugin, bool remote);
 
   /// notification that the plugins on the client and
   /// server are mismatched.

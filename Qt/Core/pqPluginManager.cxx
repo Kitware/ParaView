@@ -156,6 +156,9 @@ pqPluginManager::pqPluginManager(QObject* p)
   QObject::connect(pqApplicationCore::instance()->getServerManagerModel(), 
     SIGNAL(serverRemoved(pqServer*)),
     this, SLOT(onServerDisconnected(pqServer*)));
+
+  QObject::connect(this,SIGNAL(pluginLoaded(vtkPVPluginInformation*,bool)),
+    this,SLOT(isPluginFuntional(vtkPVPluginInformation*,bool)));
  
   vtkPVPlugin::RegisterPluginManagerCallback(::pqPluginManagerImportPlugin,
     this);
@@ -207,6 +210,7 @@ pqPluginManager::LoadStatus pqPluginManager::loadServerExtension(
     success = LOADED;
     }
 
+  emit this->pluginLoaded(pluginInfo,remote);
   return success;
 }
 
@@ -936,8 +940,8 @@ bool pqPluginManager::isPluginFuntional(
     if(remote && plInfo->GetRequiredOnClient())
       {
       vtkPVPluginInformation* clientPlugin = 
-        this->getExistingExtensionByFileName(
-          NULL, QString(plInfo->GetFileName()));
+        this->getExistingExtensionByPluginName(
+        NULL, QString(plInfo->GetPluginName()));
       if(!clientPlugin || !clientPlugin->GetLoaded())
         {
         plInfo->SetError("warning: it is also required on client! \n Note for developers: If this plugin is only required on server, add REQUIRED_ON_SERVER as an argument when calling ADD_PARAVIEW_PLUGIN in CMakelist.txt");
@@ -947,9 +951,9 @@ bool pqPluginManager::isPluginFuntional(
     if(!remote && plInfo->GetRequiredOnServer())
       {
       vtkPVPluginInformation* serverPlugin = 
-        this->getExistingExtensionByFileName(
+        this->getExistingExtensionByPluginName(
           pqApplicationCore::instance()->getActiveServer(), 
-          QString(plInfo->GetFileName()));
+          QString(plInfo->GetPluginName()));
       if(!serverPlugin || !serverPlugin->GetLoaded())
         {
         plInfo->SetError("warning: it is also required on server! \n Note for developers: If this plugin is only required on client, add REQUIRED_ON_CLIENT as an argument when calling ADD_PARAVIEW_PLUGIN in CMakelist.txt");
