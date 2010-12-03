@@ -48,7 +48,8 @@ namespace
 {
   inline bool pqIsColumnInternal(const QString& str)
     {
-    return (str == "__vtkIsSelected__");
+    return false;
+//    return (str == "__vtkIsSelected__");
     }
 }
 
