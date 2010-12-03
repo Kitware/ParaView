@@ -158,7 +158,7 @@ pqPluginManager::pqPluginManager(QObject* p)
     this, SLOT(onServerDisconnected(pqServer*)));
 
   QObject::connect(this,SIGNAL(pluginLoaded(vtkPVPluginInformation*,bool)),
-    this,SLOT(isPluginFuntional(vtkPVPluginInformation*,bool)));
+    this,SLOT(isPluginFunctional(vtkPVPluginInformation*,bool)));
  
   vtkPVPlugin::RegisterPluginManagerCallback(::pqPluginManagerImportPlugin,
     this);
@@ -865,7 +865,7 @@ void pqPluginManager::verifyRequiredPluginsLoaded(pqServer* server)
     {
     if (plInfo->GetLoaded())
       {
-      pluginFunctional = this->isPluginFuntional(plInfo,false);
+      pluginFunctional = this->isPluginFunctional(plInfo,false);
       if ( !pluginFunctional)
         {
         emit requiredPluginsNotLoaded();
@@ -878,7 +878,7 @@ void pqPluginManager::verifyRequiredPluginsLoaded(pqServer* server)
     {
     if (plInfo->GetLoaded())
       {
-      pluginFunctional = this->isPluginFuntional(plInfo,true);
+      pluginFunctional = this->isPluginFunctional(plInfo,true);
       if ( !pluginFunctional)
         {
         emit requiredPluginsNotLoaded();
@@ -918,7 +918,7 @@ bool pqPluginManager::areRequiredPluginsFunctional(
       pluginInfo = this->getExistingExtensionByPluginName(
         pqApplicationCore::instance()->getActiveServer(), pluginName);
       }
-    if(!this->isPluginFuntional(pluginInfo, remote))
+    if(!this->isPluginFunctional(pluginInfo, remote))
       {
       return false;
       }
@@ -927,7 +927,7 @@ bool pqPluginManager::areRequiredPluginsFunctional(
 }
 
 //----------------------------------------------------------------------------
-bool pqPluginManager::isPluginFuntional(
+bool pqPluginManager::isPluginFunctional(
   vtkPVPluginInformation* plInfo, bool remote)
 {
   if(!plInfo || !plInfo->GetLoaded())

@@ -125,7 +125,7 @@ public:
   void loadGUIPlugin(vtkPVGUIPluginInterface*);
 public slots:
   // check whether the plugin is ready to run.
-  bool isPluginFuntional(vtkPVPluginInformation* plInfo, bool remote);
+  bool isPluginFunctional(vtkPVPluginInformation* plInfo, bool remote);
 
 signals:
   /// signal for when an interface is loaded
