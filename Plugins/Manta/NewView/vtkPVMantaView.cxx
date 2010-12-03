@@ -22,19 +22,20 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVAxesWidget.h"
 #include "vtkPVGenericRenderWindowInteractor.h"
+#include "vtkPVSynchronizedRenderer.h"
 #include "vtkRenderViewBase.h"
 
 vtkStandardNewMacro(vtkPVMantaView);
 //----------------------------------------------------------------------------
 vtkPVMantaView::vtkPVMantaView()
 {
+  this->SynchronizedRenderers->SetDisableIceT(true);
+
   vtkMantaRenderer *mantaRenderer = vtkMantaRenderer::New();
   this->RenderView->SetRenderer(mantaRenderer);
 
   vtkMantaCamera *mantaCamera = vtkMantaCamera::New();
   mantaRenderer->SetActiveCamera(mantaCamera);
-  this->NonCompositedRenderer->SetActiveCamera(
-    mantaCamera);
   mantaCamera->ParallelProjectionOff();
 
 /*
@@ -79,6 +80,13 @@ vtkPVMantaView::vtkPVMantaView()
 //----------------------------------------------------------------------------
 vtkPVMantaView::~vtkPVMantaView()
 {
+}
+
+//----------------------------------------------------------------------------
+void vtkPVMantaView::SetActiveCamera(vtkCamera* camera)
+{
+  this->GetRenderer()->SetActiveCamera(camera);
+//  this->GetNonCompositedRenderer()->SetActiveCamera(camera);
 }
 
 //----------------------------------------------------------------------------

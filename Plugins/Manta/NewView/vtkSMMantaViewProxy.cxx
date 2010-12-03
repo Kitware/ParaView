@@ -115,7 +115,7 @@ void vtkSMMantaViewProxy::CreateVTKObjects()
          << vtkClientServerStream::End;
   pm->DeleteStreamObject(id, stream);
   pm->SendStream(this->GetConnectionID(),
-                 vtkProcessModule::RENDER_SERVER,
+                 vtkProcessModule::CLIENT_AND_SERVERS,
                  stream);
 
   this->Superclass::CreateVTKObjects();

@@ -79,6 +79,13 @@
     </MantaViewProxy>
   </ProxyGroup>
 
+  <ProxyGroup name="camera">
+    <CameraProxy name="MantaCamera" class="vtkMantaCamera"
+      processes="client|dataserver|renderserver"
+      base_proxygroup="camera" base_proxyname="Camera" >
+    </CameraProxy>
+  </ProxyGroup>
+
   <ProxyGroup name="representations">
 
     <RepresentationProxy name="MantaSurfaceRepresentation"

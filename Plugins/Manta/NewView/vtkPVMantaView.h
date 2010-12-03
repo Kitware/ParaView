@@ -51,6 +51,10 @@ public:
   virtual void SetMaxDepth(int val);
   vtkGetMacro(MaxDepth, int);
 
+  // Overridden to ensure that we always use an vtkOpenGLCamera of the 2D
+  // renderer.
+  virtual void SetActiveCamera(vtkCamera*);
+
 //BTX
 protected:
   vtkPVMantaView();
