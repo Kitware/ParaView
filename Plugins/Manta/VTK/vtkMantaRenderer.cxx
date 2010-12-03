@@ -460,40 +460,22 @@ void vtkMantaRenderer::LayerRender()
                          = ( depthValue - clipValues[0] ) * depthScale;
       }
     }
-  vtkImageData* img = vtkImageData::New();
-  img->SetScalarTypeToUnsignedChar();
-  img->SetNumberOfScalarComponents(4);
-  img->SetDimensions(minWidth, minHeight, 1);
-  img->AllocateScalars();
-  memcpy(img->GetScalarPointer(), this->ColorBuffer, size*4);
-  vtkPNGWriter* writer =vtkPNGWriter::New();
-  writer->SetFileName("/tmp/foo.png");
-  writer->SetInput(img);
-  writer->Write();
-  writer->Delete();
-  img->Delete();
-
 
   // let layer #0 initialize GL depth buffer
   if ( this->GetLayer() == 0 )
     {
-    /*
-     DDM TODO: overlay of GL on top of manta doesn't work with this,
-     but depth compositing won't work without it, so the overlay
-     needs to be fixed
-    */
-      this->GetRenderWindow()->
-          SetZbufferData( renderPos0[0],  renderPos0[1],
-                          renderPos0[0] + renderSize[0] - 1,
-                          renderPos0[1] + renderSize[1] - 1,
-                          this->DepthBuffer );
+    this->GetRenderWindow()->
+      SetZbufferData( renderPos0[0],  renderPos0[1],
+                      renderPos0[0] + renderSize[0] - 1,
+                      renderPos0[1] + renderSize[1] - 1,
+                      this->DepthBuffer );
 
     this->GetRenderWindow()->
       SetRGBACharPixelData( renderPos0[0],  renderPos0[1],
                             renderPos0[0] + renderSize[0] - 1,
                             renderPos0[1] + renderSize[1] - 1,
                             (unsigned char*)this->ColorBuffer, 0, 0 );
-      glFinish();
+    glFinish();
     }
   else
     {
