@@ -3,7 +3,34 @@
     <MantaViewProxy name="MantaView" class="vtkPVMantaView"
         processes="client|renderserver|dataserver"
         base_proxygroup="views" base_proxyname="RenderView">
+      <SubProxy>
+        <Proxy name="ActiveCamera" proxyname="MantaCamera" proxygroup="camera"
+          override="1" >
+        </Proxy>
+        <ExposedProperties>
+          <Property name="CameraPositionInfo" />
+          <Property name="CameraPosition" />
+          <Property name="CameraFocalPointInfo" />
+          <Property name="CameraFocalPoint" />
+          <Property name="CameraViewUpInfo" />
+          <Property name="CameraViewUp" />
+          <Property name="CameraViewAngle" />
+          <Property name="CameraClippingRangeInfo" />
+          <Property name="CameraClippingRange" />
+          <Property name="CameraParallelScale" />
+          <Property name="CameraParallelScaleInfo" />
+          <Property name="CameraParallelProjection" />
+          <Property name="EyeAngle" />
+        </ExposedProperties>
+      </SubProxy>
     </MantaViewProxy>
+  </ProxyGroup>
+
+  <ProxyGroup name="camera">
+    <CameraProxy name="MantaCamera" class="vtkMantaCamera"
+      processes="client|dataserver|renderserver"
+      base_proxygroup="camera" base_proxyname="Camera" >
+    </CameraProxy>
   </ProxyGroup>
 
   <ProxyGroup name="representations">

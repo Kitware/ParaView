@@ -107,8 +107,6 @@ void vtkSMMantaViewProxy::PrintSelf(ostream& os, vtkIndent indent)
 //------------------------------------------------------------------------------
 void vtkSMMantaViewProxy::CreateVTKObjects()
 {
-  this->Superclass::CreateVTKObjects();
-
   vtkProcessModule *pm = vtkProcessModule::GetProcessModule();
   vtkClientServerStream stream;
   vtkClientServerID id = pm->NewStreamObject("vtkServerSideFactory", stream);
@@ -117,8 +115,10 @@ void vtkSMMantaViewProxy::CreateVTKObjects()
          << vtkClientServerStream::End;
   pm->DeleteStreamObject(id, stream);
   pm->SendStream(this->GetConnectionID(),
-                 vtkProcessModule::RENDER_SERVER,
+                 vtkProcessModule::CLIENT_AND_SERVERS,
                  stream);
+
+  this->Superclass::CreateVTKObjects();
 }
 
 //-----------------------------------------------------------------------------

@@ -36,6 +36,10 @@ public:
   // @CallOnAllProcessess
   virtual void Initialize(unsigned int id);
 
+  // Overridden to ensure that we always use an vtkOpenGLCamera of the 2D
+  // renderer.
+  virtual void SetActiveCamera(vtkCamera*);
+
 //BTX
 protected:
   vtkPVMantaView();
