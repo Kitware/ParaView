@@ -460,24 +460,37 @@ void vtkIceTCompositePass::UpdateTileInformation(
   double image_reduction_factor = this->ImageReductionFactor > 0?
     this->ImageReductionFactor : 1.0;
 
+  int actual_size[2];
   int tile_size[2];
+  int tile_mullions[2];
+  this->GetTileMullions(tile_mullions);
+
+  // NOTE: GetActualSize() does not include the TileScale.
+  vtkWindow* window = render_state->GetRenderer()->GetVTKWindow();
+  actual_size[0] = window->GetActualSize()[0];
+  actual_size[1] = window->GetActualSize()[1];
+
   double viewport[4] = {0, 0, 1, 1};
   if (render_state->GetFrameBuffer())
     {
+    // When  frame buffer is present, we assume that this pass is used as a
+    // delegate to some image-processing like pass. In which case the processing
+    // pass maybe needing some extra padding of pixels. We compute an estimate
+    // of those extra pixels by comparing with the actual window size.
     render_state->GetFrameBuffer()->GetLastSize(tile_size);
+    tile_mullions[0] -= (tile_size[0] - actual_size[0]);
+    tile_mullions[1] -= (tile_size[1] - actual_size[1]);
     }
   else
     {
-    vtkWindow* window = render_state->GetRenderer()->GetVTKWindow();
-    // NOTE: GetActualSize() does not include the TileScale.
-    tile_size[0] = window->GetActualSize()[0];
-    tile_size[1] = window->GetActualSize()[1];
+    tile_size[0] = actual_size[0];
+    tile_size[1] = actual_size[1];
     render_state->GetRenderer()->GetViewport(viewport);
     }
 
   vtkSmartPointer<vtkTilesHelper> tilesHelper = vtkSmartPointer<vtkTilesHelper>::New();
   tilesHelper->SetTileDimensions(this->TileDimensions);
-  tilesHelper->SetTileMullions(this->TileMullions);
+  tilesHelper->SetTileMullions(tile_mullions);
   tilesHelper->SetTileWindowSize(tile_size);
 
   int rank = this->Controller->GetLocalProcessId();
@@ -495,9 +508,23 @@ void vtkIceTCompositePass::UpdateTileInformation(
     this->LastTileViewport[3] = static_cast<int>(
       my_tile_viewport[3]/image_reduction_factor);
 
+
     // PhysicalViewport is the viewport in the current render-window where the
     // renderer maps.
-    tilesHelper->GetPhysicalViewport(viewport, rank, this->PhysicalViewport);
+    if (render_state->GetFrameBuffer())
+      {
+      double physical_viewport[4];
+      render_state->GetRenderer()->GetViewport(physical_viewport);
+      tilesHelper->SetTileMullions(this->TileMullions);
+      tilesHelper->SetTileWindowSize(actual_size);
+      tilesHelper->GetPhysicalViewport(physical_viewport, rank, this->PhysicalViewport);
+      tilesHelper->SetTileMullions(tile_mullions);
+      tilesHelper->SetTileWindowSize(tile_size);
+      }
+    else
+      {
+      tilesHelper->GetPhysicalViewport(viewport, rank, this->PhysicalViewport);
+      }
     }
   else
     {
@@ -512,8 +539,8 @@ void vtkIceTCompositePass::UpdateTileInformation(
     << this->PhysicalViewport[2] << ", "
     << this->PhysicalViewport[3]);
 
-  if (this->LastTileMullions[0] == this->TileMullions[0] &&
-    this->LastTileMullions[1] == this->TileMullions[1] &&
+  if (this->LastTileMullions[0] == tile_mullions[0] &&
+    this->LastTileMullions[1] == tile_mullions[1] &&
     this->LastTileDimensions[0] == this->TileDimensions[0] &&
     this->LastTileDimensions[1] == this->TileDimensions[1])
     {
@@ -521,6 +548,7 @@ void vtkIceTCompositePass::UpdateTileInformation(
     //return;
     }
 
+  //cout << "icetResetTiles" << endl;
   icetResetTiles();
   for (int x=0; x < this->TileDimensions[0]; x++)
     {
@@ -549,6 +577,15 @@ void vtkIceTCompositePass::UpdateTileInformation(
         static_cast<IceTSizeType>(
           (tile_viewport[3] - tile_viewport[1])/image_reduction_factor + 1),
         cur_rank);
+      ///cout << "icetAddTile: " <<
+      ///  static_cast<IceTInt>(tile_viewport[0]/image_reduction_factor) << ", " <<
+      ///  static_cast<IceTInt>(tile_viewport[1]/image_reduction_factor) << ", " <<
+      ///  static_cast<IceTSizeType>(
+      ///    (tile_viewport[2] - tile_viewport[0])/image_reduction_factor + 1) << ", " <<
+      ///  static_cast<IceTSizeType>(
+      ///    (tile_viewport[3] - tile_viewport[1])/image_reduction_factor + 1) << ", " <<
+      ///  cur_rank << endl;
+
       // setting this should be needed so that the 2d actors work correctly.
       // However that messes up the tile-displays with tdy > 0
       // if (cur_rank == rank)
@@ -563,8 +600,8 @@ void vtkIceTCompositePass::UpdateTileInformation(
       }
     }
 
-  this->LastTileMullions[0] = this->TileMullions[0];
-  this->LastTileMullions[1] = this->TileMullions[1];
+  this->LastTileMullions[0] = tile_mullions[0];
+  this->LastTileMullions[1] = tile_mullions[1];
   this->LastTileDimensions[0] = this->TileDimensions[0];
   this->LastTileDimensions[1] = this->TileDimensions[1];
 }

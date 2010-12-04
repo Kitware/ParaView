@@ -30,6 +30,7 @@
 #include "vtkSynchronizedRenderers.h"
 #include "vtkIceTCompositePass.h" // needed for inline methods.
 
+class vtkCameraPass;
 class vtkImageProcessingPass;
 class vtkMyImagePasterPass;
 
@@ -121,7 +122,7 @@ protected:
   virtual vtkRawImage& CaptureRenderedImage();
 
   // We use vtkIceTCompositePass internally.
-  vtkRenderPass* CameraRenderPass;
+  vtkCameraPass* CameraRenderPass;
   vtkIceTCompositePass* IceTCompositePass;
   vtkMyImagePasterPass* ImagePastingPass;
 

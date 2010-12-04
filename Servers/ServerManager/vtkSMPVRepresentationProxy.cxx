@@ -108,6 +108,9 @@ void vtkSMPVRepresentationProxy::CreateVTKObjects()
     this->Internals->RepresentationProxies.begin();
   for (; iter != this->Internals->RepresentationProxies.end(); ++iter)
     {
+    vtkSMPropertyHelper(iter->second.Representation, "Visibility").Set(0);
+    iter->second.Representation->UpdateVTKObjects();
+
     stream << vtkClientServerStream::Invoke
       << this->GetID() << "AddRepresentation"
       << iter->second.Text.c_str()

@@ -209,13 +209,13 @@ MARK_AS_ADVANCED(KWCommon_BUILD_TESTING)
 IF(BUILD_TESTING AND KWCommon_BUILD_TESTING)
   #SET(BUILDNAME "${PROJECT_NAME}-${BUILDNAME}")
   ENABLE_TESTING()
-  SUBDIRS(Testing)
+  ADD_SUBDIRECTORY(Testing)
 ENDIF(BUILD_TESTING AND KWCommon_BUILD_TESTING)
 
 # --------------------------------------------------------------------------
 # Configure the export configuration
 
-SUBDIRS(CMake/ExportConfiguration)
+ADD_SUBDIRECTORY(CMake/ExportConfiguration)
 
 # --------------------------------------------------------------------------
 # ProcessXML (is it still being used ?)

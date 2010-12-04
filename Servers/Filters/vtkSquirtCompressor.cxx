@@ -96,10 +96,14 @@ int vtkSquirtCompressor::Compress()
       index++;
 
       // Compute Run
-      while((index<end_index) && (count<255) && 
+      while((index<end_index) && (count<0x7F) &&
         ((current_color&compress_mask) == (_rawColorBuffer[index]&compress_mask)))
         { 
         index++; count++;   
+        }
+      if (*(((unsigned char*)&current_color)+3) > 0)
+        {
+        count |= 0x80;
         }
 
       // Record Run length
@@ -203,8 +207,15 @@ int vtkSquirtCompressor::Decompress()
     // Get run length count;
     count = *((unsigned char*)&current_color+3);
 
-    // Fixed Alpha
-    *((unsigned char*)&current_color+3) = 0xFF;
+    if (out->GetNumberOfComponents() == 4)
+      {
+      *((unsigned char*)&current_color+3) = (count & 0x80) != 0? 0xff : 0;
+      count &= 0x7f;
+      }
+    else
+      {
+      *((unsigned char*)&current_color+3) = 0xff;
+      }
 
     // Set color
     _rawColorBuffer[index++] = current_color;

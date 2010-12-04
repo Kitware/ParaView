@@ -85,6 +85,12 @@ public:
     {
     this->Proxy->InteractiveRender();
     }
+  // Description:
+  // Returns true if the most recent render indeed employed low-res rendering.
+  virtual bool LastRenderWasInteractive()
+    {
+    return this->Proxy->LastRenderWasInteractive();
+    }
 
   vtkWeakPointer<vtkSMRenderViewProxy> Proxy;
   };
@@ -95,11 +101,20 @@ vtkStandardNewMacro(vtkSMRenderViewProxy);
 //----------------------------------------------------------------------------
 vtkSMRenderViewProxy::vtkSMRenderViewProxy()
 {
+  this->IsSelectionCached = false;
 }
 
 //----------------------------------------------------------------------------
 vtkSMRenderViewProxy::~vtkSMRenderViewProxy()
 {
+}
+
+//-----------------------------------------------------------------------------
+bool vtkSMRenderViewProxy::LastRenderWasInteractive()
+{
+  vtkPVRenderView* rv = vtkPVRenderView::SafeDownCast(
+    this->GetClientSideObject());
+  return rv? rv->GetUsedLODForLastRender() : false;
 }
 
 //-----------------------------------------------------------------------------
@@ -119,6 +134,10 @@ bool vtkSMRenderViewProxy::IsSelectionAvailable()
 const char* vtkSMRenderViewProxy::IsSelectVisibleCellsAvailable()
 {
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  if (pm->GetIsAutoMPI())
+    {
+    return "Cannot support selection in auto-mpi mode";
+    }
   if (pm->GetRenderClientMode(this->ConnectionID))
     {
     return "Cannot support selection in render-server mode";
@@ -457,6 +476,23 @@ void vtkSMRenderViewProxy::ResetCamera(double bounds[6])
 }
 
 //-----------------------------------------------------------------------------
+void vtkSMRenderViewProxy::MarkDirty(vtkSMProxy* modifiedProxy)
+{
+  if (this->IsSelectionCached)
+    {
+    this->IsSelectionCached = false;
+    // cout << "InvalidateCachedSelection" << endl;
+    vtkClientServerStream stream;
+    stream << vtkClientServerStream::Invoke
+      << this->GetID()
+      << "InvalidateCachedSelection"
+      << vtkClientServerStream::End;
+    vtkProcessModule::GetProcessModule()->SendStream(
+      this->ConnectionID, this->Servers, stream);
+    }
+}
+
+//-----------------------------------------------------------------------------
 vtkSMRepresentationProxy* vtkSMRenderViewProxy::Pick(int x, int y)
 {
   // 1) Create surface selection.
@@ -489,6 +525,7 @@ bool vtkSMRenderViewProxy::SelectSurfaceCells(int region[4],
     return false;
     }
 
+  this->IsSelectionCached = true;
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   vtkClientServerStream stream;
   stream << vtkClientServerStream::Invoke
@@ -512,6 +549,7 @@ bool vtkSMRenderViewProxy::SelectSurfacePoints(int region[4],
     return false;
     }
 
+  this->IsSelectionCached = true;
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   vtkClientServerStream stream;
   stream << vtkClientServerStream::Invoke

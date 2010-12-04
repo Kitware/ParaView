@@ -18,6 +18,8 @@ class vtkEventQtSlotConnect;
 class pqDataRepresentation;
 class QAction;
 class QActionGroup;
+class vtkSMPrismCubeAxesRepresentationProxy;
+class pqRenderView;
 
 class PrismCore : public QObject
 {
@@ -29,6 +31,8 @@ public:
    static PrismCore* instance();
 
   void  createActions(QActionGroup*);
+  QMap<pqDataRepresentation*,vtkSMPrismCubeAxesRepresentationProxy*> CubeAxesRepMap;
+  QMap<vtkSMPrismCubeAxesRepresentationProxy*,pqRenderView*> CubeAxesViewMap;
 
 public slots:
   void onSESAMEFileOpen();
@@ -41,11 +45,17 @@ private slots:
   void onGeometrySelection(vtkObject* caller, unsigned long vtk_event, void* client_data, void* call_data);
   void onPrismSelection(vtkObject* caller, unsigned long vtk_event, void* client_data, void* call_data);
   void onPrismRepresentationAdded(pqPipelineSource* source,pqDataRepresentation* repr, int srcOutputPort);
-  void onConnectionAdded(pqPipelineSource* source,pqPipelineSource* consumer);
 
+ void onConnectionAdded(pqPipelineSource* source,pqPipelineSource* consumer);
+
+ void onViewAdded(pqView* view);
+ void onViewRemoved(pqView* view);
+ void onViewRepresentationAdded(pqRepresentation*);
+ void onViewRepresentationRemoved(pqRepresentation*);
+
+ void onPreRepresentationRemoved(pqRepresentation*);
 
 private:
-  pqServerManagerModelItem *getActiveObject() const;
   pqPipelineSource *getActiveSource() const;
   pqServer* getActiveServer() const;
  QAction *SesameViewAction;
@@ -53,7 +63,6 @@ private:
 
  vtkSmartPointer<vtkEventQtSlotConnect> VTKConnections;
  bool ProcessingEvent;
-
 
 };
 

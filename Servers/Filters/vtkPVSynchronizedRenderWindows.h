@@ -32,10 +32,11 @@
 #include "vtkObject.h"
 #include "vtkMultiProcessController.h" // for vtkRMIFunctionType
 
-class vtkRenderWindow;
-class vtkRenderer;
+class vtkDataObject;
 class vtkMultiProcessController;
 class vtkMultiProcessStream;
+class vtkRenderer;
+class vtkRenderWindow;
 class vtkSelection;
 
 class VTK_EXPORT vtkPVSynchronizedRenderWindows : public vtkObject
@@ -109,6 +110,7 @@ public:
   bool SynchronizeSize(double &size);
   bool SynchronizeSize(unsigned int &size);
   bool BroadcastToDataServer(vtkSelection* selection);
+  bool BroadcastToRenderServer(vtkDataObject*);
 
   // Description:
   // Convenience method to trigger an RMI call from the client/root node.
@@ -149,6 +151,12 @@ public:
   // Description:
   // Returns true when in Cave mode.
   bool GetIsInCave();
+
+  // Description:
+  // This method should only be called on RENDER_SERVER or BATCH processes.
+  // Returns true if in tile display mode and fills up tile_dims with the tile
+  // dimensions.
+  static bool GetTileDisplayParameters(int tile_dims[2], int tile_mullions[2]);
 
 protected:
   vtkPVSynchronizedRenderWindows();
@@ -196,12 +204,6 @@ protected:
   virtual void ClientStartRender(vtkRenderWindow*);
   virtual void RootStartRender(vtkRenderWindow*);
   virtual void SatelliteStartRender(vtkRenderWindow*);
-
-  // Description:
-  // This method should only be called on RENDER_SERVER or BATCH processes.
-  // Returns true if in tile display mode and fills up tile_dims with the tile
-  // dimensions.
-  bool GetTileDisplayParameters(int tile_dims[2]);
 
   // Description:
   // Shrinks gaps between views, rather grows the views to reduce gaps. Only

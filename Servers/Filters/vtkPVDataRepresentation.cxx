@@ -117,18 +117,21 @@ int vtkPVDataRepresentation::RequestUpdateExtent(vtkInformation* request,
   // REQUEST_UPDATE(), include view-time.
   vtkMultiProcessController* controller =
     vtkMultiProcessController::GetGlobalController();
-  if (controller && inputVector[0]->GetNumberOfInformationObjects() == 1)
+  for (int cc=0; cc < this->GetNumberOfInputPorts() && controller != NULL; cc++)
     {
-    vtkStreamingDemandDrivenPipeline* sddp =
-      vtkStreamingDemandDrivenPipeline::SafeDownCast(this->GetExecutive());
-    sddp->SetUpdateExtent(inputVector[0]->GetInformationObject(0),
-      controller->GetLocalProcessId(),
-      controller->GetNumberOfProcesses(), 0);
-    if (this->UpdateTimeValid)
+    for (int kk=0; kk < inputVector[cc]->GetNumberOfInformationObjects(); kk++)
       {
-      sddp->SetUpdateTimeSteps(
-        inputVector[0]->GetInformationObject(0),
-        &this->UpdateTime, 1);
+      vtkStreamingDemandDrivenPipeline* sddp =
+        vtkStreamingDemandDrivenPipeline::SafeDownCast(this->GetExecutive());
+      sddp->SetUpdateExtent(inputVector[cc]->GetInformationObject(kk),
+        controller->GetLocalProcessId(),
+        controller->GetNumberOfProcesses(), /*ghost-levels*/ 0);
+      if (this->UpdateTimeValid)
+        {
+        sddp->SetUpdateTimeSteps(
+          inputVector[cc]->GetInformationObject(kk),
+          &this->UpdateTime, 1);
+        }
       }
     }
 

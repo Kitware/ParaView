@@ -17,7 +17,7 @@
       <IntVectorProperty name="Visibility"
         command="SetVisibility"
         number_of_elements="1"
-        default_values="1">
+        default_values="0">
         <BooleanDomain name="bool" />
       </IntVectorProperty>
 
@@ -324,10 +324,6 @@
      <InputProperty
         name="Input"
         command="SetInputConnection">
-           <ProxyGroupDomain name="groups">
-             <Group name="sources"/>
-             <Group name="filters"/>
-           </ProxyGroupDomain>
            <DataTypeDomain name="input_type" composite_data_supported="1">
             <DataType value="vtkDataSet"/>
             <DataType value="vtkCompositeDataSet"/>

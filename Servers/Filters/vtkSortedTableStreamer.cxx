@@ -59,6 +59,8 @@
 #include <vtksys/ios/sstream>
 using vtksys_ios::ostringstream;
 
+#define MAX(a,b)		(((a)>(b)) ? (a) : (b))
+#define MIN(a,b)		(((a)<(b)) ? (a) : (b))
 //****************************************************************************
 class vtkSortedTableStreamer::InternalsBase
 {
@@ -76,8 +78,8 @@ public:
   virtual bool TestInternalClasses() = 0;
 
   // --------------------------------------------------------------------------
-  static void WaitForGDB()
-    {
+//  static void WaitForGDB()
+//    {
 //    bool debug = true;
 //    cout << "Waiting GDB for process "
 //         << vtkMultiProcessController::GetGlobalController()->GetLocalProcessId()
@@ -85,10 +87,10 @@ public:
 //         << " - Go up till you are in the while loop (sleep)." << endl
 //         << " - Type: set var debug = false" << endl;
 //    while (debug) sleep(5);
-    }
+//    }
   // --------------------------------------------------------------------------
-  static void MergeTable(vtkIdType processId, vtkTable* otherTable, vtkTable* mergedTable,
-                  vtkIdType minSize)
+  static void MergeTable( vtkIdType processId, vtkTable* otherTable,
+                          vtkTable* mergedTable, vtkIdType minSize)
     {
     // Loop on all column of the table
     vtkAbstractArray* otherArray = 0;
@@ -242,7 +244,6 @@ public:
         cout << "Try to add value out of the histogran range: "
             << value << " Range: [" << this->Min << ", "
             << (this->Min + this->Delta*this->Size) << "]" << endl;
-        WaitForGDB();
         }
       }
 
@@ -323,6 +324,20 @@ public:
           << " - Min: " << this->Min << endl
           << " - Delta: " << this->Delta << endl
           << " - Size: " << this->Size << endl;
+      double min = this->Min;
+      for(int i=0; i < this->Size; i++)
+        {
+        if(this->Values[i] > 0)
+          {
+          cout << " - [" << min << ", ";
+          min += this->Delta;
+          cout << min << "]: " << this->Values[i] << endl;
+          }
+        else
+          {
+          min += this->Delta;
+          }
+        }
       }
 
     void CopyTo(Histogram& other)
@@ -562,10 +577,11 @@ public:
     // Only used for testing
     this->LocalSorter = 0;
     this->GlobalHistogram = 0;
+    this->Debug = false;
     }
 
-  Internals(vtkTable* input, vtkDataArray* dataToSort,
-            vtkMultiProcessController* controller)
+  Internals( vtkTable* input, vtkDataArray* dataToSort,
+             vtkMultiProcessController* controller)
     {
     // Default values
     this->SelectedComponent = 0;
@@ -598,6 +614,16 @@ public:
   // --------------------------------------------------------------------------
   bool IsSortable()
     {
+    // See if one process is able to sort the table,
+    // if not then just say NOT sortable
+    int localCanSort = (this->DataToSort == NULL) ? 0 : 1;
+    int globalCanSort;
+    this->MPI->AllReduce(&localCanSort, &globalCanSort, 1, vtkCommunicator::MAX_OP);
+    if(globalCanSort == 0)
+      {
+      return false;
+      }
+
     // Communication buffer
     double localRange[2] = {VTK_DOUBLE_MAX, VTK_DOUBLE_MIN};
 
@@ -613,13 +639,30 @@ public:
 
     // Make sure that the range stay in the original min/max of the type
     // in case of magnitude.
-    if(this->DataToSort && this->SelectedComponent == -1 && this->DataToSort->GetNumberOfComponents() > 1)
+    // CAUTION: As some process may not have DataToSort due to block
+    //          distribution, we MUST globaly agree on a ratio.
+    // 3 case:
+    //    - scalar    => no ratio (=1)
+    //    - magniture => ratio    (>0)
+    //    - no data   => ratio ? MUST be overriden by other
+
+    double localRatio = 1;
+    double globalRatio;
+    if( this->DataToSort && this->SelectedComponent == -1
+        && this->DataToSort->GetNumberOfComponents() > 1)
       {
-      double ratio =
+      localRatio =
           sqrt(static_cast<double>(this->DataToSort->GetNumberOfComponents()));
-      this->CommonRange[0] /= ratio;
-      this->CommonRange[1] /= ratio;
       }
+    else if(this->DataToSort == NULL)
+      {
+      localRatio = 0;
+      }
+    this->MPI->AllReduce(&localRatio, &globalRatio, 1, vtkCommunicator::MAX_OP);
+
+    // Apply the common ratio
+    this->CommonRange[0] /= globalRatio;
+    this->CommonRange[1] /= globalRatio;
 
     double delta = (this->CommonRange[1] - this->CommonRange[0]);
     delta *= delta;
@@ -701,8 +744,6 @@ public:
   int Extract(vtkTable* input, vtkTable* output,
               vtkIdType block, vtkIdType blockSize, bool revertOrder)
     {
-    WaitForGDB();
-
     // ------------------------------------------------------------------------
     // Make sure that the Cache is builded
     //    This will sort the local array, that's why we don't want to do it
@@ -739,19 +780,28 @@ public:
         localOffset -= tableSizes[i];
         }
       }
-    localOffset = (localOffset < 0) ? 0 : localOffset;
 
-    // Fill the table only if it is possible
-    if(localOffset < tableSizes[this->Me])
+
+    // Extract the subset
+    vtkIdType localSize = MIN(tableSizes[this->Me], blockSize);
+    if(localOffset < 0)
       {
-      // This process has to send some of its data
-      vtkIdType localSize = tableSizes[this->Me] - localOffset;
-      localSize = (localSize > blockSize) ? blockSize : localSize;
-      localResult.TakeReference(this->NewSubsetTable(input,
-                                                     this->LocalSorter,
-                                                     localOffset,
-                                                     localSize));
+      localSize = MAX( 0,
+                       MIN(
+                           localOffset + MAX(tableSizes[this->Me], blockSize),
+                           blockSize));
+      localOffset = 0;
       }
+    else if (localOffset >= tableSizes[this->Me])
+      {
+      localOffset = 0;
+      localSize = 0;
+      }
+
+    localResult.TakeReference(this->NewSubsetTable(input,
+                                                   this->LocalSorter,
+                                                   localOffset,
+                                                   localSize));
 
     // Free array used for MPI exchange
     delete[] tableSizes;
@@ -828,10 +878,10 @@ public:
       }
     else
       {
-      // Send to process 0
+      // Send to process mergePid
       this->MPI->Send(localResult.GetPointer(), mergePid, VTK_TABLE_EXCHANGE_TAG);
 
-      // Send meta data to  0
+      // Add meta data of mergePid
       this->DecorateTable(input, 0, mergePid);
       }
     return 1;
@@ -840,11 +890,6 @@ public:
   int Compute(vtkTable* input, vtkTable* output,
               vtkIdType block, vtkIdType blockSize, bool revertOrder)
     {
-    if(/*this->Me == 0 &&*/ this->Debug)
-      {
-      WaitForGDB();
-      }
-
     // ------------------------------------------------------------------------
     // Make sure that the Cache is builded
     //    This will sort the local array, that's why we don't want to do it
@@ -886,6 +931,7 @@ public:
                                      globalUpperOffset,
                                      upperOffset,
                                      nbElementsInBar );
+
 
     // We have to include our searched index (so +1)
     vtkIdType localSize = (upperOffset + nbElementsInBar) - localOffset + 1;
@@ -1083,14 +1129,24 @@ public:
       subArray->SetName(srcArray->GetName());
       subArray->Allocate(size * srcArray->GetNumberOfComponents());
       vtkIdType max = size+offset;
-      if(sorter)
+      if( sorter != NULL && sorter->Array != NULL )
         {
         max = (max > sorter->ArraySize) ? sorter->ArraySize : max;
         for(vtkIdType idx=offset; idx < max; ++idx)
           {
-          if(
-              subArray->InsertNextTuple(sorter->Array[idx].OriginalIndex, srcArray)
-              == -1)
+          if( subArray->InsertNextTuple( sorter->Array[idx].OriginalIndex,
+                                         srcArray) == -1)
+            {
+            cout << "ERROR NewSubsetTable::InsertNextTuple is not working." << endl;
+            }
+          }
+        }
+      else
+        {
+        max=(max>srcTable->GetNumberOfRows())?srcTable->GetNumberOfRows():max;
+        for(vtkIdType idx=offset; idx < max; ++idx)
+          {
+          if( subArray->InsertNextTuple( idx, srcArray) == -1)
             {
             cout << "ERROR NewSubsetTable::InsertNextTuple is not working." << endl;
             }
@@ -1502,6 +1558,7 @@ int vtkSortedTableStreamer::RequestData( vtkInformation* vtkNotUsed(request),
   // Get input data
   vtkInformation* outInfo = outputVector->GetInformationObject(0);
   vtkTable* output = vtkTable::SafeDownCast(outInfo->Get(vtkDataObject::DATA_OBJECT()));
+
   vtkDataArray* arrayToProcess = this->GetDataArrayToProcess(input);
 
   // --------------------------------------------------------------------------
@@ -1589,22 +1646,20 @@ void vtkSortedTableStreamer::SetInvertOrder(int newValue)
 vtkDataArray* vtkSortedTableStreamer::GetDataArrayToProcess(vtkTable* input)
 {
   // Get a default array to sort just in case
-  vtkDataArray* defaultArray = vtkDataArray::SafeDownCast(input->GetColumn(0));
   vtkDataArray* requestedArray = 0;
+
   if(this->GetColumnToSort())
     {
     requestedArray =
         vtkDataArray::SafeDownCast(
             input->GetColumnByName(this->GetColumnToSort()));
     }
-  if(requestedArray)
-    return requestedArray;
-  return defaultArray;
+  return requestedArray;
 }
 
 //----------------------------------------------------------------------------
-void vtkSortedTableStreamer::CreateInternalIfNeeded(vtkTable* input,
-                                                   vtkDataArray* data)
+void vtkSortedTableStreamer::CreateInternalIfNeeded( vtkTable* input,
+                                                     vtkDataArray* data)
 {
   if(!this->Internal)
     {

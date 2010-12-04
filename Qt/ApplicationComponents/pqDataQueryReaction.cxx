@@ -37,16 +37,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPVApplicationCore.h"
 #include "pqQueryDialog.h"
 #include "pqSelectionManager.h"
+#include "pqServerManagerModel.h"
 
 #include <QEventLoop>
 //-----------------------------------------------------------------------------
 pqDataQueryReaction::pqDataQueryReaction(QAction* parentObject)
   : Superclass(parentObject)
 {
-  pqActiveObjects* activeObjects = &pqActiveObjects::instance();
-  QObject::connect(activeObjects, SIGNAL(portChanged(pqOutputPort*)),
-    this, SLOT(updateEnableState()));
-  this->updateEnableState();
 }
 
 //-----------------------------------------------------------------------------
@@ -55,12 +52,15 @@ pqDataQueryReaction::~pqDataQueryReaction()
 }
 
 //-----------------------------------------------------------------------------
-void pqDataQueryReaction::updateEnableState()
+void pqDataQueryReaction::onExtractSelection()
 {
-  pqActiveObjects& activeObjects = pqActiveObjects::instance();
-  pqOutputPort* port = activeObjects.activePort();
-  bool enable_state = (port != NULL);
-  this->parentAction()->setEnabled(enable_state);
+  pqFiltersMenuReaction::createFilter("filters", "ExtractSelection");
+}
+
+//-----------------------------------------------------------------------------
+void pqDataQueryReaction::onExtractSelectionOverTime()
+{
+  pqFiltersMenuReaction::createFilter("filters", "ExtractSelectionOverTime");
 }
 
 //-----------------------------------------------------------------------------
@@ -75,6 +75,8 @@ void pqDataQueryReaction::showQueryDialog()
   // realizes a new selection has been made.
   pqSelectionManager* selManager =
     pqPVApplicationCore::instance()->selectionManager();
+  pqServerManagerModel* serverManagerModel =
+      pqPVApplicationCore::instance()->getServerManagerModel();
   if (selManager)
     {
     QObject::connect(&dialog, SIGNAL(selected(pqOutputPort*)),
@@ -83,15 +85,11 @@ void pqDataQueryReaction::showQueryDialog()
   dialog.show();
   QEventLoop loop;
   QObject::connect(&dialog, SIGNAL(finished(int)),
-    &loop, SLOT(quit()));
+                   &loop,   SLOT(quit()));
+  QObject::connect(&dialog, SIGNAL(extractSelection()),
+                   this,    SLOT(onExtractSelection()));
+  QObject::connect(&dialog, SIGNAL(extractSelectionOverTime()),
+                   this,    SLOT(onExtractSelectionOverTime()));
   loop.exec();
-  if (dialog.extractSelection())
-    {
-    pqFiltersMenuReaction::createFilter("filters", "ExtractSelection");
-    }
-  else if (dialog.extractSelectionOverTime())
-    {
-    pqFiltersMenuReaction::createFilter("filters", "ExtractSelectionOverTime");
-    }
 }
 

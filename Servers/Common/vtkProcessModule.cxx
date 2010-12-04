@@ -188,6 +188,7 @@ vtkProcessModule::vtkProcessModule()
   this->LastProgress = -1;
   this->LastProgressName = 0;
 
+
 #ifdef VTK_USE_MPI
 # ifdef PARAVIEW_USE_MPI_SSEND
   // ParaView uses Ssend for all Trigger RMI calls. This helps in overcoming
@@ -200,6 +201,7 @@ vtkProcessModule::vtkProcessModule()
   vtkMapper::SetResolveCoincidentTopologyZShift(2.0e-3);
 
   this->AutoMPI = vtkProcessModuleAutoMPI::New();
+  this->IsAutoMPI = 0;
 
   vtkCompositeDataPipeline* cddp = vtkCompositeDataPipeline::New();
   vtkAlgorithm::SetDefaultExecutivePrototype(cddp);
@@ -624,6 +626,7 @@ vtkIdType vtkProcessModule::ConnectToRemote(const char* servername, int port)
     vtkErrorMacro("Cannot create new connections.");
     return 0;
     }
+  this->IsAutoMPI = 0;
   return this->ConnectionManager->OpenConnection(servername, port);
 }
 
@@ -636,6 +639,7 @@ vtkIdType vtkProcessModule::ConnectToRemote(const char* dataserver_host,
     vtkErrorMacro("Cannot create new connections.");
     return 0;
     }
+  this->IsAutoMPI = 0;
   return this->ConnectionManager->OpenConnection(
     dataserver_host, dataserver_port, renderserver_host, renderserver_port);
 }
@@ -685,6 +689,7 @@ void vtkProcessModule::RemoveManagedSocket(vtkSocket* soc)
 //-----------------------------------------------------------------------------
 int vtkProcessModule::ConnectToRemote()
 {
+  this->IsAutoMPI = 0;
   const char* message = "client";
   while (1)
     {

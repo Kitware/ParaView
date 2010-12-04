@@ -512,10 +512,10 @@ pqDataRepresentation* pqObjectBuilder::createDataRepresentation(
     findItem<pqDataRepresentation*>(reprProxy);
   if (repr)
     {
-    repr->setDefaultPropertyValues();
-
     // inherit properties from the representation for the input if applicable.
     this->initializeInheritedProperties(repr);
+
+    repr->setDefaultPropertyValues();
 
     emit this->dataRepresentationCreated(repr);
     emit this->proxyCreated(repr);
@@ -945,36 +945,35 @@ void pqObjectBuilder::destroy(pqAnimationCue* cue)
 //-----------------------------------------------------------------------------
 void pqObjectBuilder::initializeInheritedProperties(pqDataRepresentation* repr)
 {
- vtkPVXMLElement* hints = repr->getProxy()->GetHints();
- hints = hints? hints->FindNestedElementByName("InheritRepresentationProperties") : 0;
- if (hints == 0)
-   {
-   return;
-   }
-
- pqDataRepresentation* input_repr = 
-   repr->getRepresentationForUpstreamSource();
- if (!input_repr)
-   {
-   return;
-   }
-
- vtkSMProxy* reprProxy = repr->getProxy();
- vtkSMProxy* inputReprProxy = input_repr->getProxy();
-  unsigned int num_children = hints->GetNumberOfNestedElements();
-  for (unsigned int cc=0; cc < num_children; cc++)
+  pqDataRepresentation* input_repr =
+    repr->getRepresentationForUpstreamSource();
+  if (!input_repr)
     {
-    vtkPVXMLElement* child = hints->GetNestedElement(cc);
-    if (child && child->GetName() && strcmp(child->GetName(), "Property") == 0)
+    return;
+    }
+
+  QSet<QString> exceptions;
+  exceptions.insert("Representation");
+
+  vtkSMProxy* reprProxy = repr->getProxy();
+  vtkSMProxy* inputReprProxy = input_repr->getProxy();
+  vtkSMPropertyIterator* iter = inputReprProxy->NewPropertyIterator();
+  for (iter->Begin(); !iter->IsAtEnd(); iter->Next())
+    {
+    const char* pname = iter->GetKey();
+    if (exceptions.contains(pname))
       {
-      const char* propname = child->GetAttribute("name");
-      if (propname && reprProxy->GetProperty(propname) &&
-        inputReprProxy->GetProperty(propname))
-        {
-        reprProxy->GetProperty(propname)->Copy(
-          inputReprProxy->GetProperty(propname));
-        }
+      continue;
+      }
+    vtkSMProperty* dest = reprProxy->GetProperty(pname);
+    vtkSMProperty* source = iter->GetProperty();
+    if (dest && source &&
+      strcmp(dest->GetClassName(), source->GetClassName())==0 &&
+      !dest->IsA("vtkSMProxyProperty"))
+      {
+      dest->Copy(source);
       }
     }
+  iter->Delete();
   reprProxy->UpdateVTKObjects();
 }

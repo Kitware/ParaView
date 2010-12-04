@@ -1246,8 +1246,83 @@ int vtkPrismSurfaceReader::RequestData(
 
   }
 
+  double bounds[6];
+  localOutput->GetBounds(bounds);
+
+  if(!this->Internal->WarpSurface)
+  {
+    bounds[4]=-10;
+    bounds[5]=10;
+  }
+
+  if(this->GetXLogScaling())
+  {
+    if(this->XThresholdBetween[0]>0)
+    {
+      this->ActualThresholdBounds[0]=log(this->XThresholdBetween[0]);
+    }
+    else
+    {
+      this->ActualThresholdBounds[0]=0.0;
+    }
+    if(this->XThresholdBetween[1]>0)
+    {
+      this->ActualThresholdBounds[1]=log(this->XThresholdBetween[1]);
+    }
+    else
+    {
+      this->ActualThresholdBounds[1]=0.0;
+    }
+  }
+  else
+  {
+    this->ActualThresholdBounds[0]=this->XThresholdBetween[0];
+    this->ActualThresholdBounds[1]=this->XThresholdBetween[1];
+  }
+  if(this->GetYLogScaling())
+  {
+    if(this->YThresholdBetween[0]>0)
+    {
+      this->ActualThresholdBounds[2]=log(this->YThresholdBetween[0]);
+    }
+    else
+    {
+      this->ActualThresholdBounds[2]=0.0;
+    }
+    if(this->YThresholdBetween[1]>0)
+    {
+      this->ActualThresholdBounds[3]=log(this->YThresholdBetween[1]);
+    }
+    else
+    {
+      this->ActualThresholdBounds[3]=0.0;
+    }
+  }
+  else
+  {
+    this->ActualThresholdBounds[2]=this->YThresholdBetween[0];
+    this->ActualThresholdBounds[3]=this->YThresholdBetween[1];
+  }
+  this->ActualThresholdBounds[4]=bounds[4];
+  this->ActualThresholdBounds[5]=bounds[5];
+
+
+  this->Internal->ExtractGeometry->SetInput(localOutput);
+  this->Internal->Box->SetBounds(this->ActualThresholdBounds);
+
+  this->Internal->CleanPolyData->SetInput( this->Internal->ExtractGeometry->GetOutput());
+
+  this->Internal->CleanPolyData->Update();
+
+  vtkSmartPointer<vtkFloatArray> newXArray= vtkFloatArray::SafeDownCast(this->Internal->CleanPolyData->GetOutput()->GetPointData()->GetArray(xArray->GetName()));
+  vtkSmartPointer<vtkFloatArray> newYArray= vtkFloatArray::SafeDownCast(this->Internal->CleanPolyData->GetOutput()->GetPointData()->GetArray(yArray->GetName()));
+  vtkSmartPointer<vtkFloatArray> newZArray;
+  if(this->Internal->WarpSurface)
+  {
+    newZArray= vtkFloatArray::SafeDownCast(this->Internal->CleanPolyData->GetOutput()->GetPointData()->GetArray(zArray->GetName()));
+  }
   double scaleBounds[6];
-  localOutput->GetBounds(scaleBounds);
+  this->Internal->CleanPolyData->GetOutput()->GetPoints()->GetBounds(scaleBounds);
 
   double delta[3] = {
     scaleBounds[1] - scaleBounds[0],
@@ -1275,91 +1350,10 @@ int vtkPrismSurfaceReader::RequestData(
   vtkSmartPointer<vtkTransform> transform= vtkSmartPointer<vtkTransform>::New();
   transform->Scale(this->AspectScale[0],this->AspectScale[1],this->AspectScale[2]);
 
-  this->Internal->ScaleTransform->SetInput(localOutput);
+  this->Internal->ScaleTransform->SetInput(this->Internal->CleanPolyData->GetOutput());
   this->Internal->ScaleTransform->SetTransform(transform);
   this->Internal->ScaleTransform->Update();
-
-
-  double bounds[6];
-  this->Internal->ScaleTransform->GetOutput()->GetBounds(bounds);
-
-  if(!this->Internal->WarpSurface)
-  {
-    bounds[4]=-10;
-    bounds[5]=10;
-  }
-
-  if(this->GetXLogScaling())
-  {
-    if(this->XThresholdBetween[0]>0)
-    {
-      this->ActualThresholdBounds[0]=log(this->XThresholdBetween[0]*this->AspectScale[0]);
-    }
-    else
-    {
-      this->ActualThresholdBounds[0]=0.0;
-    }
-    if(this->XThresholdBetween[1]>0)
-    {
-      this->ActualThresholdBounds[1]=log(this->XThresholdBetween[1]*this->AspectScale[0]);
-    }
-    else
-    {
-      this->ActualThresholdBounds[1]=0.0;
-    }
-  }
-  else
-  {
-    this->ActualThresholdBounds[0]=this->XThresholdBetween[0]*this->AspectScale[0];
-    this->ActualThresholdBounds[1]=this->XThresholdBetween[1]*this->AspectScale[0];
-  }
-  if(this->GetYLogScaling())
-  {
-    if(this->YThresholdBetween[0]>0)
-    {
-      this->ActualThresholdBounds[2]=log(this->YThresholdBetween[0]*this->AspectScale[1]);
-    }
-    else
-    {
-      this->ActualThresholdBounds[2]=0.0;
-    }
-    if(this->YThresholdBetween[1]>0)
-    {
-      this->ActualThresholdBounds[3]=log(this->YThresholdBetween[1]*this->AspectScale[1]);
-    }
-    else
-    {
-      this->ActualThresholdBounds[3]=0.0;
-    }
-  }
-  else
-  {
-    this->ActualThresholdBounds[2]=this->YThresholdBetween[0]*this->AspectScale[1];
-    this->ActualThresholdBounds[3]=this->YThresholdBetween[1]*this->AspectScale[1];
-  }
-  this->ActualThresholdBounds[4]=bounds[4];
-  this->ActualThresholdBounds[5]=bounds[5];
-
-
-  this->Internal->ExtractGeometry->SetInput(this->Internal->ScaleTransform->GetOutput());
-  this->Internal->Box->SetBounds(this->ActualThresholdBounds);
-
-  this->Internal->CleanPolyData->SetInput( this->Internal->ExtractGeometry->GetOutput());
-
-  this->Internal->CleanPolyData->Update();
-
-  vtkSmartPointer<vtkFloatArray> newXArray= vtkFloatArray::SafeDownCast(this->Internal->CleanPolyData->GetOutput()->GetPointData()->GetArray(xArray->GetName()));
-  vtkSmartPointer<vtkFloatArray> newYArray= vtkFloatArray::SafeDownCast(this->Internal->CleanPolyData->GetOutput()->GetPointData()->GetArray(yArray->GetName()));
-  vtkSmartPointer<vtkFloatArray> newZArray;
-  if(this->Internal->WarpSurface)
-  {
-    newZArray= vtkFloatArray::SafeDownCast(this->Internal->CleanPolyData->GetOutput()->GetPointData()->GetArray(zArray->GetName()));
-  }
-
-
-  surfaceOutput->ShallowCopy(this->Internal->CleanPolyData->GetOutput());
-
-
+  surfaceOutput->ShallowCopy(this->Internal->ScaleTransform->GetOutput());
 
   if(newXArray)
   {
@@ -1424,8 +1418,11 @@ int vtkPrismSurfaceReader::RequestData(
       this->Internal->ContourFilter->SetInputArrayToProcess(
         0,0,0,vtkDataObject::FIELD_ASSOCIATION_POINTS,cArray->GetName());
       this->Internal->ContourFilter->Update();
+      this->Internal->ContourScaleTransform->SetInput(this->Internal->ContourFilter->GetOutput());
+      this->Internal->ContourScaleTransform->SetTransform(transform);
+      this->Internal->ContourScaleTransform->Update();
+      contourOutput->ShallowCopy(this->Internal->ContourScaleTransform->GetOutput());
 
-      contourOutput->ShallowCopy(this->Internal->ContourFilter->GetOutput());
     }
 
   }
@@ -1502,8 +1499,8 @@ int vtkPrismSurfaceReader::RequestCurveData(  vtkPointSet *curveOutput)
       vtkstd::vector<int> indexes;
       indexes.resize(2);
       //Density
-      indexes[0]=2;//Vapor Density
-      indexes[1]=3;//Density of Liquid
+      indexes[0]=2;//Vapor Density on Coexistence Line
+      indexes[1]=3;//Density of Liquid or Solid on Coexistence Line
       tableMap[this->Internal->Reader->GetTableArrayName(0)]=indexes;
       //Temperature
       indexes[0]=1;//Temperature
@@ -1511,7 +1508,7 @@ int vtkPrismSurfaceReader::RequestCurveData(  vtkPointSet *curveOutput)
       tableMap[this->Internal->Reader->GetTableArrayName(1)]=indexes;
       //Pressure
       indexes[0]=0;//Vapor Pressure
-      indexes[1]=-1;
+      indexes[1]=0;
       tableMap[this->Internal->Reader->GetTableArrayName(2)]=indexes;
       //Energy
       indexes[0]=4;//Internal Energy of Vapor
@@ -1662,47 +1659,49 @@ int vtkPrismSurfaceReader::RequestCurveData(  vtkPointSet *curveOutput)
         }
 
 
-        this->Internal->ScaleTransform->SetInput(localOutput);
+        this->Internal->ExtractGeometry->SetInput(localOutput);
+        this->Internal->CleanPolyData->SetInput( this->Internal->ExtractGeometry->GetOutput());
+//        this->Internal->CleanPolyData->Update();
+
+        this->Internal->ScaleTransform->SetInput(this->Internal->CleanPolyData->GetOutput());
         this->Internal->ScaleTransform->Update();
 
 
 
-        this->Internal->ExtractGeometry->SetInput(this->Internal->ScaleTransform->GetOutput());
-        this->Internal->CleanPolyData->SetInput( this->Internal->ExtractGeometry->GetOutput());
-        this->Internal->CleanPolyData->Update();
-
         vtkSmartPointer<vtkPolyData> output= vtkSmartPointer<vtkPolyData>::New();
-        output->DeepCopy( this->Internal->CleanPolyData->GetOutput());
+        output->DeepCopy( this->Internal->ScaleTransform->GetOutput());
         resultPd[v]=output;
 
 
        vtkSmartPointer<vtkIntArray> curveNumber=vtkSmartPointer<vtkIntArray>::New();
         curveNumber->SetName("Curve Number");
+        curveNumber->SetNumberOfValues(output->GetNumberOfCells());
         output->GetCellData()->AddArray(curveNumber);
         if(v==0)
         {
-          curveNumber->InsertNextValue(0);
+          curveNumber->FillComponent(0,0);
         }
         else
         {
-          curveNumber->InsertNextValue(1);
+          curveNumber->FillComponent(0,1);
         }
        vtkSmartPointer<vtkIntArray> curveType=vtkSmartPointer<vtkIntArray>::New();
+       curveType->SetNumberOfValues(output->GetNumberOfCells());
         curveType->SetName("Table Number");
         output->GetCellData()->AddArray(curveType);
-        curveType->InsertNextValue(401);
+        curveType->FillComponent(0,401);
 
-       vtkSmartPointer<vtkStringArray> tableName=vtkSmartPointer<vtkStringArray>::New();
-        tableName->SetName("Table Name");
-        output->GetCellData()->AddArray(tableName);
-        if(v==0)
-        {
-          tableName->InsertNextValue("Vaporization - Vapor");
-        }
-        else
-        {
-          tableName->InsertNextValue("Vaporization - Liquid or Solid");
-        }
+       //vtkSmartPointer<vtkStringArray> tableName=vtkSmartPointer<vtkStringArray>::New();
+       // tableName->SetName("Table Name");
+       // output->GetCellData()->AddArray(tableName);
+       // if(v==0)
+       // {
+       //   tableName->InsertNextValue("Vaporization - Vapor");
+       // }
+       // else
+       // {
+       //   tableName->InsertNextValue("Vaporization - Liquid or Solid");
+       // }
 
 
       }
@@ -1878,33 +1877,49 @@ int vtkPrismSurfaceReader::RequestCurveData(  vtkPointSet *curveOutput)
       }
 
 
-      this->Internal->ScaleTransform->SetInput(localOutput);
+
+
+      this->Internal->ExtractGeometry->SetInput(localOutput);
+      this->Internal->CleanPolyData->SetInput( this->Internal->ExtractGeometry->GetOutput());
+   //   this->Internal->CleanPolyData->Update();
+
+      this->Internal->ScaleTransform->SetInput(this->Internal->CleanPolyData->GetOutput());
       this->Internal->ScaleTransform->Update();
 
 
-
-      this->Internal->ExtractGeometry->SetInput(this->Internal->ScaleTransform->GetOutput());
-      this->Internal->CleanPolyData->SetInput( this->Internal->ExtractGeometry->GetOutput());
-      this->Internal->CleanPolyData->Update();
-
       vtkSmartPointer<vtkPolyData> output= vtkSmartPointer<vtkPolyData>::New();
-      output->DeepCopy( this->Internal->CleanPolyData->GetOutput());
+      output->DeepCopy( this->Internal->ScaleTransform->GetOutput());
       resultPd[2]=output;
 
-       vtkSmartPointer<vtkIntArray> curveNumber=vtkSmartPointer<vtkIntArray>::New();
-        curveNumber->SetName("Curve Number");
-        output->GetCellData()->AddArray(curveNumber);
-       curveNumber->InsertNextValue(2);
+
+
+      vtkSmartPointer<vtkIntArray> curveNumber=vtkSmartPointer<vtkIntArray>::New();
+      curveNumber->SetNumberOfValues(output->GetNumberOfCells());
+      curveNumber->SetName("Curve Number");
+      curveNumber->FillComponent(0,2);
+      output->GetCellData()->AddArray(curveNumber);
 
       vtkSmartPointer<vtkIntArray> curveType=vtkSmartPointer<vtkIntArray>::New();
+      curveType->SetNumberOfValues(output->GetNumberOfCells());
       curveType->SetName("Table Number");
+      curveType->FillComponent(0,306);
       output->GetCellData()->AddArray(curveType);
-      curveType->InsertNextValue(306);
 
-       vtkSmartPointer<vtkStringArray> tableName=vtkSmartPointer<vtkStringArray>::New();
-        tableName->SetName("Table Name");
-        output->GetCellData()->AddArray(tableName);
-        tableName->InsertNextValue("Cold Curve (No Zero Point)");
+
+      //vtkSmartPointer<vtkIntArray> curveNumber=vtkSmartPointer<vtkIntArray>::New();
+      //curveNumber->SetName("Curve Number");
+      //output->GetCellData()->AddArray(curveNumber);
+      //curveNumber->InsertNextValue(2);
+
+      //vtkSmartPointer<vtkIntArray> curveType=vtkSmartPointer<vtkIntArray>::New();
+      //curveType->SetName("Table Number");
+      //output->GetCellData()->AddArray(curveType);
+      //curveType->InsertNextValue(306);
+
+      //vtkSmartPointer<vtkStringArray> tableName=vtkSmartPointer<vtkStringArray>::New();
+      //tableName->SetName("Table Name");
+      //output->GetCellData()->AddArray(tableName);
+      //tableName->InsertNextValue("Cold Curve (No Zero Point)");
 
     }
   }
@@ -2084,33 +2099,34 @@ int vtkPrismSurfaceReader::RequestCurveData(  vtkPointSet *curveOutput)
       }
 
 
-      this->Internal->ScaleTransform->SetInput(localOutput);
+      this->Internal->ExtractGeometry->SetInput(localOutput);
+      this->Internal->CleanPolyData->SetInput( this->Internal->ExtractGeometry->GetOutput());
+   //   this->Internal->CleanPolyData->Update();
+
+      this->Internal->ScaleTransform->SetInput(this->Internal->CleanPolyData->GetOutput());
       this->Internal->ScaleTransform->Update();
 
 
-
-      this->Internal->ExtractGeometry->SetInput(this->Internal->ScaleTransform->GetOutput());
-      this->Internal->CleanPolyData->SetInput( this->Internal->ExtractGeometry->GetOutput());
-      this->Internal->CleanPolyData->Update();
-
       vtkSmartPointer<vtkPolyData> output= vtkSmartPointer<vtkPolyData>::New();
-      output->DeepCopy( this->Internal->CleanPolyData->GetOutput());
+      output->DeepCopy( this->Internal->ScaleTransform->GetOutput());
       resultPd[3]=output;
 
-       vtkSmartPointer<vtkIntArray> curveNumber=vtkSmartPointer<vtkIntArray>::New();
-        curveNumber->SetName("Curve Number");
-        output->GetCellData()->AddArray(curveNumber);
-       curveNumber->InsertNextValue(3);
+      vtkSmartPointer<vtkIntArray> curveNumber=vtkSmartPointer<vtkIntArray>::New();
+      curveNumber->SetNumberOfValues(output->GetNumberOfCells());
+      curveNumber->SetName("Curve Number");
+      curveNumber->FillComponent(0,3);
+      output->GetCellData()->AddArray(curveNumber);
 
       vtkSmartPointer<vtkIntArray> curveType=vtkSmartPointer<vtkIntArray>::New();
+      curveType->SetNumberOfValues(output->GetNumberOfCells());
       curveType->SetName("Table Number");
+      curveType->FillComponent(0,411);
       output->GetCellData()->AddArray(curveType);
-      curveType->InsertNextValue(411);
 
-       vtkSmartPointer<vtkStringArray> tableName=vtkSmartPointer<vtkStringArray>::New();
-        tableName->SetName("Table Name");
-        output->GetCellData()->AddArray(tableName);
-        tableName->InsertNextValue("Solid Melt");
+      //vtkSmartPointer<vtkStringArray> tableName=vtkSmartPointer<vtkStringArray>::New();
+      //tableName->SetName("Table Name");
+      //output->GetCellData()->AddArray(tableName);
+      //tableName->InsertNextValue("Solid Melt");
 
     }
   }
@@ -2287,33 +2303,45 @@ int vtkPrismSurfaceReader::RequestCurveData(  vtkPointSet *curveOutput)
         newPts->InsertPoint(ptId,coords);
       }
 
+      this->Internal->ExtractGeometry->SetInput(localOutput);
+      this->Internal->CleanPolyData->SetInput( this->Internal->ExtractGeometry->GetOutput());
+  //    this->Internal->CleanPolyData->Update();
 
-      this->Internal->ScaleTransform->SetInput(localOutput);
+      this->Internal->ScaleTransform->SetInput(this->Internal->CleanPolyData->GetOutput());
       this->Internal->ScaleTransform->Update();
 
-
-
-      this->Internal->ExtractGeometry->SetInput(this->Internal->ScaleTransform->GetOutput());
-      this->Internal->CleanPolyData->SetInput( this->Internal->ExtractGeometry->GetOutput());
-      this->Internal->CleanPolyData->Update();
-
       vtkSmartPointer<vtkPolyData> output= vtkSmartPointer<vtkPolyData>::New();
-      output->DeepCopy( this->Internal->CleanPolyData->GetOutput());
+      output->DeepCopy( this->Internal->ScaleTransform->GetOutput());
       resultPd[4]=output;
 
-       vtkSmartPointer<vtkIntArray> curveNumber=vtkSmartPointer<vtkIntArray>::New();
-        curveNumber->SetName("Curve Number");
-        output->GetCellData()->AddArray(curveNumber);
-       curveNumber->InsertNextValue(4);
+
+
+      vtkSmartPointer<vtkIntArray> curveNumber=vtkSmartPointer<vtkIntArray>::New();
+      curveNumber->SetNumberOfValues(output->GetNumberOfCells());
+      curveNumber->SetName("Curve Number");
+      curveNumber->FillComponent(0,4);
+      output->GetCellData()->AddArray(curveNumber);
+
+      vtkSmartPointer<vtkIntArray> curveType=vtkSmartPointer<vtkIntArray>::New();
+      curveType->SetNumberOfValues(output->GetNumberOfCells());
+      curveType->SetName("Table Number");
+      curveType->FillComponent(0,412);
+      output->GetCellData()->AddArray(curveType);
+
+
+ /*     vtkSmartPointer<vtkIntArray> curveNumber=vtkSmartPointer<vtkIntArray>::New();
+      curveNumber->SetName("Curve Number");
+      output->GetCellData()->AddArray(curveNumber);
+      curveNumber->InsertNextValue(4);
       vtkSmartPointer<vtkIntArray> curveType=vtkSmartPointer<vtkIntArray>::New();
       curveType->SetName("Table Number");
       output->GetCellData()->AddArray(curveType);
       curveType->InsertNextValue(412);
 
-       vtkSmartPointer<vtkStringArray> tableName=vtkSmartPointer<vtkStringArray>::New();
-        tableName->SetName("Table Name");
-        output->GetCellData()->AddArray(tableName);
-        tableName->InsertNextValue("Liquid Melt");
+      vtkSmartPointer<vtkStringArray> tableName=vtkSmartPointer<vtkStringArray>::New();
+      tableName->SetName("Table Name");
+      output->GetCellData()->AddArray(tableName);
+      tableName->InsertNextValue("Liquid Melt");*/
 
     }
   }

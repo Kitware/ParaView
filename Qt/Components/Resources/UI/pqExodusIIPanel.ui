@@ -143,7 +143,7 @@
      </widget>
      <widget class="QWidget" name="tab">
       <attribute name="title">
-       <string>Hierarchy</string>
+       <string>Assemblies</string>
       </attribute>
       <layout class="QGridLayout">
        <property name="margin">

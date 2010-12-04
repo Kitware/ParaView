@@ -32,6 +32,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqDoubleRangeWidget.h"
 
+#include "vtkPVConfig.h"
+
 // Qt includes
 #include <QLineEdit>
 #include <QSlider>
@@ -111,7 +113,8 @@ void pqDoubleRangeWidget::setValue(double val)
 
     // set the text
     this->BlockUpdate = true;
-    this->LineEdit->setText(QString().setNum(val));
+    this->LineEdit->setText(QString().setNum(
+      val,'g',DEFAULT_DOUBLE_PRECISION_VALUE));
     this->BlockUpdate = false;
     }
 

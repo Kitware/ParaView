@@ -75,7 +75,7 @@ ADD_DEPENDENCIES(${paraview_client_real_exe_name}
   ParaViewOnlineHelp)
 
 IF (BUILD_TESTING)
-  SUBDIRS(Testing)
+  add_subdirectory(Testing)
 ENDIF (BUILD_TESTING)
 
 

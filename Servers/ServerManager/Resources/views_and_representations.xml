@@ -135,6 +135,18 @@
         </Documentation>
       </IntVectorProperty>
 
+      <DoubleVectorProperty name="CollectGeometryThreshold"
+        command="SetClientOutlineThreshold"
+        number_of_elements="1"
+        default_values="100.0">
+        <Documentation>
+          Select the threshold under which any geometry is collected on the
+          client.  When the data size exceeds the threshold, the client shows
+          outlines instead of actual data. Size is in kilobytes.
+        </Documentation>
+        <DoubleRangeDomain name="range" min="0"/>
+      </DoubleVectorProperty>
+
       <IntVectorProperty
         name="ImageReductionFactor"
         command="SetInteractiveRenderImageReductionFactor"
@@ -189,6 +201,17 @@
           implies maximum level of detail.
         </Documentation>
       </DoubleVectorProperty>
+
+      <StringVectorProperty
+        name="CompressorConfig"
+        command="ConfigureCompressor"
+        number_of_elements="1"
+        default_values="vtkSquirtCompressor 0 3">
+        <Documentation>
+          Used to configure the image compression used for client-server image
+          transfer when doing interactive renders.
+        </Documentation>
+      </StringVectorProperty>
 
       <IntVectorProperty name="UseLight"
         command="SetUseLightKit"
@@ -255,6 +278,16 @@
           Center of rotation for the interactor.
         </Documentation>
       </DoubleVectorProperty>
+
+      <IntVectorProperty name="NonInteractiveRenderDelay"
+        command="SetNonInteractiveRenderDelay"
+        number_of_elements="1"
+        default_values="2">
+        <Documentation>
+          Set the delay (in seconds) after an interactive render before
+          switching to a full-rese render.
+        </Documentation>
+      </IntVectorProperty>
 
       <ProxyProperty name="CameraManipulators"
         command="AddManipulator"
@@ -919,7 +952,7 @@
        <IdTypeVectorProperty name="BlockSize"
          command="SetBlockSize"
          number_of_elements="1"
-         default_values="20">
+         default_values="1024">
          <Documentation>
            Get/Set the number of rows that fit within one block. The output of
            this filter will have at most BlockSize rows.
@@ -2446,14 +2479,14 @@
       <IntVectorProperty name="BackfaceRepresentation"
         command="SetBackfaceRepresentation"
         number_of_elements="1"
-        default_values="4">
+        default_values="400">
         <Documentation>
           Choose the representation type for the backface.
         </Documentation>
         <EnumerationDomain name="enum">
-          <Entry value="4" text="Follow Frontface" />
-          <Entry value="5" text="Cull Backface" />
-          <Entry value="6" text="Cull Frontface" />
+          <Entry value="400" text="Follow Frontface" />
+          <Entry value="401" text="Cull Backface" />
+          <Entry value="402" text="Cull Frontface" />
           <Entry value="0" text="Points" />
           <Entry value="1" text="Wireframe" />
           <Entry value="2" text="Surface" />

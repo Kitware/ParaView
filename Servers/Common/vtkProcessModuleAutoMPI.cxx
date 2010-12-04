@@ -62,6 +62,17 @@ public:
   ~vtkGetFreePort() {}
   };
   vtkStandardNewMacro(vtkGetFreePort);
+
+  void vtkCopy(vtksys_stl::vector<const char*>& dest,
+    const vtksys_stl::vector<vtkstd::string>& src)
+    {
+    dest.resize(src.size());
+    for (size_t cc=0; cc < src.size(); cc++)
+      {
+      dest[cc] = src[cc].c_str();
+      }
+    dest.push_back(NULL);
+    }
 }
 
 class vtkProcessModuleAutoMPIInternals
@@ -104,7 +115,7 @@ public:
                               vtkstd::vector<char>& out,
                               vtkstd::vector<char>& err);
   void PrintLine (const char* pname, const char* line);
-  void CreateCommandLine (vtksys_stl::vector<const char*>& commandLine,
+  void CreateCommandLine (vtksys_stl::vector<vtkstd::string>& commandLine,
                           const char* paraView,
                           const char* numProc,
                           int port);
@@ -209,16 +220,18 @@ int vtkProcessModuleAutoMPIInternals::StartRemoteBuiltInSelf(const char* servern
     return 0;
     }
 
-  // Construct the Command line that will be executed
-  vtksys_stl::vector<const char*> serverCommand;
   if(server)
     {
+    // Construct the Command line that will be executed
+    vtksys_stl::vector<vtkstd::string> serverCommandStr;
+    vtksys_stl::vector<const char*> serverCommand;
     const char* serverExe = this->ParaViewServer.c_str();
 
-    this->CreateCommandLine(serverCommand,
+    this->CreateCommandLine(serverCommandStr,
                       serverExe,
                       this->MPIServerNumProcessFlag.c_str(),
                       port);
+    vtkCopy(serverCommand, serverCommandStr);
 
     if(vtksysProcess_SetCommand(server, &serverCommand[0]))
       {
@@ -342,11 +355,11 @@ bool vtkProcessModuleAutoMPIInternals::CollectConfiguredOptions()
  * @param port the port where the server will be listening
  */
 void
-vtkProcessModuleAutoMPIInternals::CreateCommandLine(vtksys_stl::vector<const char*>& commandLine,
-                                           const char* paraView,
-                                           const char* numProc,
-                                           int port)
-
+vtkProcessModuleAutoMPIInternals::CreateCommandLine(
+  vtksys_stl::vector<vtkstd::string>& commandLine,
+  const char* paraView,
+  const char* numProc,
+  int port)
 {
   if(this->MPIRun.size())
     {
@@ -385,7 +398,6 @@ vtkProcessModuleAutoMPIInternals::CreateCommandLine(vtksys_stl::vector<const cha
     {
     commandLine.push_back(this->MPIServerPostFlags[i].c_str());
     }
-  commandLine.push_back(0);
 }
 
 //--------------------------------------------------------------------internal

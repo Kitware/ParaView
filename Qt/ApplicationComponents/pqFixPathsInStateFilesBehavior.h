@@ -53,11 +53,18 @@ public:
   /// Prompts for fixing filenames in state xml.
   static void fixFileNames(vtkPVXMLElement*);
 
+  /// Description:
+  /// Provides a mechanism to block the dialog temporarily. Returns the current
+  /// value of the ivar.
+  static bool blockDialog(bool);
+
 protected slots:
   void onLoadState(vtkPVXMLElement* stateXML);
 
 private:
   Q_DISABLE_COPY(pqFixPathsInStateFilesBehavior)
+
+  static bool BlockDialog;
 };
 
 #endif

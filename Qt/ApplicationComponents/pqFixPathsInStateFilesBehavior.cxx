@@ -36,6 +36,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqFixStateFilenamesDialog.h"
 #include "vtkPVXMLElement.h"
 
+bool pqFixPathsInStateFilesBehavior::BlockDialog = false;
+
 //-----------------------------------------------------------------------------
 pqFixPathsInStateFilesBehavior::pqFixPathsInStateFilesBehavior(QObject* parentObject)
   : Superclass(parentObject)
@@ -48,6 +50,14 @@ pqFixPathsInStateFilesBehavior::pqFixPathsInStateFilesBehavior(QObject* parentOb
 //-----------------------------------------------------------------------------
 pqFixPathsInStateFilesBehavior::~pqFixPathsInStateFilesBehavior()
 {
+}
+
+//-----------------------------------------------------------------------------
+bool pqFixPathsInStateFilesBehavior::blockDialog(bool val)
+{
+  bool cur_val = pqFixPathsInStateFilesBehavior::BlockDialog;
+  pqFixPathsInStateFilesBehavior::BlockDialog = val;
+  return cur_val;
 }
 
 //-----------------------------------------------------------------------------
@@ -65,5 +75,8 @@ void pqFixPathsInStateFilesBehavior::fixFileNames(vtkPVXMLElement* xml)
 void pqFixPathsInStateFilesBehavior::onLoadState(vtkPVXMLElement* xml)
 {
   Q_ASSERT(xml != NULL);
-  pqFixPathsInStateFilesBehavior::fixFileNames(xml);
+  if (pqFixPathsInStateFilesBehavior::BlockDialog == false)
+    {
+    pqFixPathsInStateFilesBehavior::fixFileNames(xml);
+    }
 }

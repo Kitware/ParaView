@@ -42,13 +42,13 @@ public:
   // Description:
   // Triggers a high-resolution render.
   // @CallOnAllProcessess
-  virtual void StillRender() { this->Update(); }
+  virtual void StillRender() { this->StreamToClient(); }
 
   // Description:
   // Triggers a interactive render. Based on the settings on the view, this may
   // result in a low-resolution rendering or a simplified geometry rendering.
   // @CallOnAllProcessess
-  virtual void InteractiveRender() { this->Update(); }
+  virtual void InteractiveRender() { this->StreamToClient(); }
 
   // Description:
   // Overridden to identify and locate the active-representation.
@@ -127,6 +127,14 @@ public:
 protected:
   vtkSpreadSheetView();
   ~vtkSpreadSheetView();
+
+
+  // Description:
+  // On render streams all the data from the processes to the client.
+  // Returns 0 on failure.
+  // Note: Was removed from update because you can't call update()
+  // while in an update
+  int StreamToClient();
 
   void OnRepresentationUpdated();
 

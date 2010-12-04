@@ -162,30 +162,50 @@ int vtkTextSourceRepresentation::RequestData(
     this->DataCollector->RemoveAllInputs();
     }
 
-  // Since data-deliver mode never changes for this representation, we simply do
-  // the data-delivery in RequestData itself to keep things simple.
-  this->DataCollector->Update();
-
-  vtkstd::string text;
-
-  vtkFieldData* fieldData =
-    this->DataCollector->GetOutputDataObject(0)->GetFieldData();
-  vtkAbstractArray* array = fieldData->GetAbstractArray(0);
-  if (array && array->GetNumberOfTuples() > 0)
-    {
-    text = array->GetVariantValue(0).ToString();
-    }
-
-  vtkTextRepresentation* repr = vtkTextRepresentation::SafeDownCast(
-    this->TextWidgetRepresentation?
-    this->TextWidgetRepresentation->GetRepresentation() : NULL);
-  if (repr)
-    {
-    repr->SetText(text.c_str());
-    }
-
+  // It is tempting to try to do the data delivery in RequestData() itself.
+  // However, whenever a representation updates, ParaView GUI may have some
+  // GatherInformation() requests that happen. That messes up with any
+  // data-delivery code placed here. So we leave the data delivery to the
+  // REQUEST_PREPARE_FOR_RENDER() pass.
   return this->Superclass::RequestData(request, inputVector, outputVector);
 }
+
+//----------------------------------------------------------------------------
+int vtkTextSourceRepresentation::ProcessViewRequest(
+  vtkInformationRequestKey* request_type,
+  vtkInformation* inInfo, vtkInformation* outInfo)
+{
+  if (!this->GetVisibility())
+    {
+    return false;
+    }
+
+  if (request_type == vtkPVView::REQUEST_PREPARE_FOR_RENDER())
+    {
+    this->DataCollector->Update();
+
+    vtkstd::string text;
+
+    vtkFieldData* fieldData =
+      this->DataCollector->GetOutputDataObject(0)->GetFieldData();
+    vtkAbstractArray* array = fieldData->GetAbstractArray(0);
+    if (array && array->GetNumberOfTuples() > 0)
+      {
+      text = array->GetVariantValue(0).ToString();
+      }
+
+    vtkTextRepresentation* repr = vtkTextRepresentation::SafeDownCast(
+      this->TextWidgetRepresentation?
+      this->TextWidgetRepresentation->GetRepresentation() : NULL);
+    if (repr)
+      {
+      repr->SetText(text.c_str());
+      }
+    }
+
+  return this->Superclass::ProcessViewRequest(request_type, inInfo, outInfo);
+}
+
 
 //----------------------------------------------------------------------------
 void vtkTextSourceRepresentation::PrintSelf(ostream& os, vtkIndent indent)

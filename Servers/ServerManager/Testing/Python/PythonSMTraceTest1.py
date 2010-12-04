@@ -31,58 +31,64 @@ smtrace.start_trace(CaptureAllProperties=True, UseGuiName=True)
 
 ########################################################
 # Begin build pipeline
-fractal = OctreeFractal(guiName="Octree Fractal")
-APPLY()
-
-fractalRep = Show()
-
-lut = CreateLookupTable(RGBPoints=[2.2222592830657959, 0.23000000000000001, 0.29899999999999999, 0.754, 100.0, 0.70599999999999996, 0.016, 0.14999999999999999], VectorMode='Magnitude', ColorSpace='Diverging')
-fractalRep.ColorArrayName = 'FractalIterations'
-fractalRep.LookupTable = lut
-
-fractal.Dimension = 3
-lut.RGBPoints = [1.1045577526092529, 0.23000000000000001, 0.29899999999999999, 0.754, 100.0, 0.70599999999999996, 0.016, 0.14999999999999999]
+wavelet = Wavelet(guiName="My Wavelet")
 
 APPLY()
 
-contour = Contour(guiName="Contour")
-contour.ContourBy = ['POINTS', 'FractalIterations']
-contour.Isosurfaces = [50.552278876304626]
+ren = GetRenderView()
+waveletRep = Show()
+
+contour = Contour(guiName="My Contour")
+contour.PointMergeMethod = "Uniform Binning"
+contour.ContourBy = ['POINTS', 'RTData']
+contour.Isosurfaces = [157.09096527099609]
 
 APPLY()
 
 contourRep = Show()
-fractalRep.Visibility = 0
+waveletRep.Visibility = 0
 
-SetActiveSource(fractal)
-extract = ExtractCellsByRegion( IntersectWith="Plane", guiName="Extract Cells By Region" )
-extract.IntersectWith.Origin = [-0.5, 0.0, 1.0]
-extract.IntersectWith = "Plane"
-
-APPLY()
-
-extractRep = Show()
-
-extractRep.ColorArrayName = 'FractalIterations'
-extractRep.ColorAttributeType = 'POINT_DATA'
-extractRep.LookupTable = lut
-
-ren.CameraViewUp = [0.020491480527326099, -0.99935907640320587, -0.029351927301794135]
-ren.CameraPosition = [-4.1551704083097531, 0.051380834701542075, -4.3011743474296438]
-ren.CameraClippingRange = [1.5266102810152136, 11.791585857626885]
-ren.CameraFocalPoint = [-0.49999999999999978, 1.4589157341685681e-17, -1.1307471589527126e-16]
-
-extract.IntersectWith.Origin = [-0.52722651942313892, 0.034258501654010676, 0.41162920375900314]
-extract.IntersectWith.Normal = [-0.046146966413950434, 0.058065663871685436, -0.99724562479357626]
+SetActiveSource(wavelet)
+clip = Clip(guiName="My Clip", ClipType="Plane" )
+clip.Scalars = ['POINTS', 'RTData']
+clip.ClipType = "Plane"
 
 APPLY()
 
-bar = CreateScalarBar()
-bar.LookupTable = lut
-ren.Representations.append(bar)
-bar.Title='FractalIterations'
-bar.Position2=[0.18306122448979578, 0.68654434250764518]
-bar.Position=[0.80673469387755092, 0.20718654434250777]
+clipRep = Show()
+
+a1_RTData_PVLookupTable = GetLookupTableForArray( "RTData", 1, NanColor=[0.5, 0.5, 0.5], RGBPoints=[37.4, 1.0, 0.0, 0.0, 276.8, 0.0, 0.0, 1.0], VectorMode='Magnitude', ColorSpace='HSV', ScalarRangeInitialized=1.0 )
+
+a1_RTData_PiecewiseFunction = CreatePiecewiseFunction()
+
+clipRep.ScalarOpacityFunction = a1_RTData_PiecewiseFunction
+clipRep.ColorArrayName = 'RTData'
+clipRep.ScalarOpacityUnitDistance = 1.8307836667054274
+clipRep.LookupTable = a1_RTData_PVLookupTable
+
+APPLY()
+
+contour.ComputeScalars = 1
+
+APPLY()
+
+contourRep.ColorArrayName = 'RTData'
+contourRep.LookupTable = a1_RTData_PVLookupTable
+
+clip.ClipType.Normal = [0.0, 0.0, 1.0]
+
+APPLY()
+
+bar = CreateScalarBar( Orientation='Horizontal', Title='RTData', Position2=[0.6, 0.2], Enabled=1, LabelFontSize=12, LookupTable=a1_RTData_PVLookupTable, TitleFontSize=20, Position=[0.2, 0.0] )
+GetRenderView().Representations.append(bar)
+
+APPLY()
+
+ren.CameraFocalPoint = [1.1645689199943594, -3.5914371885980554, 0.54379903964477228]
+ren.CameraClippingRange = [31.266692271900439, 107.69973132887634]
+ren.CameraViewUp = [-0.14069051476636268, 0.84334441613242261, 0.51862932315193999]
+ren.CameraPosition = [26.064234130736576, 31.908865377615712, -50.428704912804747]
+
 APPLY()
 
 # End build pipeline
@@ -96,9 +102,9 @@ trace_string = smtrace.get_trace_string()
 #smtrace.save_trace(tempDir + "/PythonSMTraceTest1.py")
 
 # Clear all the sources
-Delete(extract)
+Delete(clip)
 Delete(contour)
-Delete(fractal)
+Delete(wavelet)
 Delete(bar)
 
 # Confirm that all the representations have been removed from the view
@@ -106,18 +112,18 @@ if len(ren.Representations):
     print "View should not have any representations."
     sys.exit(1)
 
-# Confirm that the extract cells filter has been removed
-if FindSource("Extract Cells By Region"):
-    print "Extract Cells filter should have been cleaned up."
+# Confirm that the clip filter has been removed
+if FindSource("My Clip"):
+    print "Clip filter should have been cleaned up."
     sys.exit(1)
 
 # Compile the trace code and run it
 code = compile(trace_string, "<string>", "exec")
 exec(code)
 
-# Confirm that the extract cells filter has been recreated
-if not FindSource("Extract Cells By Region"):
-    print "After replaying trace, could not find Extract Cells filter."
+# Confirm that the clip filter has been recreated
+if not FindSource("My Clip"):
+    print "After replaying trace, could not find Clip filter."
     sys.exit(1)
 
 # Do a screenshot regression test

@@ -125,6 +125,7 @@ SET(Filters_SRCS
   vtkPVCacheKeeper.cxx
   vtkPVCacheKeeperPipeline.cxx
   vtkPVCenterAxesActor.cxx
+  vtkPVClientServerSynchronizedRenderers.cxx
   vtkPVClipClosedSurface.cxx
   vtkPVClipDataSet.cxx
   vtkPVCompositeDataPipeline.cxx
@@ -206,12 +207,14 @@ SET(Filters_SRCS
   vtkSpyPlotBlockIterator.cxx
   vtkSpyPlotIStream.cxx
   vtkSpyPlotReader.cxx
+  vtkSpyPlotHistoryReader.cxx
   vtkSpyPlotReaderMap.cxx
   vtkSpyPlotUniReader.cxx
   vtkSquirtCompressor.cxx
   vtkZlibImageCompressor.cxx
   vtkSurfaceVectors.cxx
   vtkTextSourceRepresentation.cxx
+  vtkTileDisplayHelper.cxx
   vtkTilesHelper.cxx
   vtkTableFFT.cxx
 #  vtkTemporalCacheFilter.cxx
@@ -272,6 +275,7 @@ SET_SOURCE_FILES_PROPERTIES(
   vtkPVRenderViewProxy.cxx
   vtkPVView.cxx
   vtkSciVizStatistics.cxx
+  vtkTileDisplayHelper.cxx
   vtkTransferFunctionEditorRepresentation1D.cxx
   vtkTransferFunctionEditorRepresentation.cxx
   vtkTransferFunctionEditorWidget1D.cxx
@@ -536,5 +540,5 @@ ENDIF (NOT PV_INSTALL_NO_DEVELOPMENT)
 # Tests
 #-------------------------------------------------------------------------------------------------
 IF(BUILD_TESTING)
-  SUBDIRS(Testing)
+  ADD_SUBDIRECTORY(Testing)
 ENDIF(BUILD_TESTING)

@@ -45,6 +45,7 @@ class vtkInformationIntegerKey;
 class vtkInformationObjectBaseKey;
 class vtkInformationRequestKey;
 class vtkInteractorStyleRubberBand3D;
+class vtkInteractorStyleRubberBandZoom;
 class vtkLight;
 class vtkLightKit;
 class vtkPVHardwareSelector;
@@ -72,7 +73,8 @@ public:
     {
     INTERACTION_MODE_3D=0,
     INTERACTION_MODE_2D, // not implemented yet.
-    INTERACTION_MODE_SELECTION
+    INTERACTION_MODE_SELECTION,
+    INTERACTION_MODE_ZOOM
     };
 
   // Description:
@@ -206,6 +208,15 @@ public:
   vtkGetMacro(ClientOutlineThreshold, double);
 
   // Description:
+  // Passes the compressor configuration to the client-server synchronizer, if
+  // any. This affects the image compression used to relay images back to the
+  // client.
+  // See vtkPVClientServerSynchronizedRenderers::ConfigureCompressor() for
+  // details.
+  // @CallOnAllProcessess
+  void ConfigureCompressor(const char* configuration);
+
+  // Description:
   // Resets the clipping range. One does not need to call this directly ever. It
   // is called periodically by the vtkRenderer to reset the camera range.
   void ResetCameraClippingRange();
@@ -291,6 +302,16 @@ public:
   // Returns if remote-rendering is possible on the current group of processes.
   vtkGetMacro(RemoteRenderingAvailable, bool);
 
+  // Description:
+  // Returns true if the most recent render used LOD.
+  vtkGetMacro(UsedLODForLastRender, bool);
+
+  // Description:
+  // Invalidates cached selection. Called explicitly when view proxy thinks the
+  // cache may have become obsolete.
+  // @CallOnAllProcessess
+  void InvalidateCachedSelection();
+
 public:
   //*****************************************************************
   // Methods merely exposing methods for internal objects.
@@ -315,6 +336,7 @@ public:
   //*****************************************************************
   // Forward to vtkPVGenericRenderWindowInteractor.
   void SetCenterOfRotation(double x, double y, double z);
+  void SetNonInteractiveRenderDelay(unsigned int seconds);
 
   //*****************************************************************
   // Forward to vtkLightKit.
@@ -440,6 +462,7 @@ protected:
   vtkPVGenericRenderWindowInteractor* Interactor;
   vtkPVInteractorStyle* InteractorStyle;
   vtkInteractorStyleRubberBand3D* RubberBandStyle;
+  vtkInteractorStyleRubberBandZoom* RubberBandZoom;
   vtkPVCenterAxesActor* CenterAxes;
   vtkPVAxesWidget* OrientationWidget;
   vtkPVHardwareSelector* Selector;
@@ -462,6 +485,8 @@ protected:
 
   double LODResolution;
   bool UseLightKit;
+
+  bool UsedLODForLastRender;
 
   vtkBSPCutsGenerator* OrderedCompositingBSPCutsSource;
 private:

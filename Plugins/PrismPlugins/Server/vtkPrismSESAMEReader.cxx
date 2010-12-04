@@ -1180,7 +1180,7 @@ void vtkPrismSESAMEReader::ReadCurveFromTable()
   {
     for (int k=2;k<5;k++)
     {
-      if(numRead == numberDensities+1)
+      if(numRead == numberDensities)
       {
       }
       else
@@ -1197,32 +1197,6 @@ void vtkPrismSESAMEReader::ReadCurveFromTable()
           scalars[scalarIndex]->InsertNextTuple1(v[k]);
         }
       }
-
-      //if ( numRead < numberDensities )
-      //{
-      //  xCoords->InsertNextTuple1(  v[k] );
-      //}
-      //else if ( numRead < (numberDensities + 1) )
-      //{
-      //}
-      //else if( numRead < (numberDensities + numberDensities + 1 ))
-      //{
-      //  yCoords->InsertNextTuple1(  v[k] );
-      //}
-      //else
-      //{
-      //  scalarCount++;
-      //  if(scalarCount > numberDensities)
-      //  {
-      //    scalarCount = 1;
-      //    scalarIndex++;
-      //  }
-      //  if(this->Internal->TableArrayStatus.size() > scalarIndex &&
-      //    this->Internal->TableArrayStatus[scalarIndex])
-      //  {
-      //    scalars[scalarIndex]->InsertNextTuple1(v[k]);
-      //  }
-      //}
       numRead++;
     }
   }
@@ -1233,7 +1207,7 @@ void vtkPrismSESAMEReader::ReadCurveFromTable()
     {
       for (int k=0;k<readFromTable;k++)
       {
-        if(numRead == numberDensities+1)
+        if(numRead == numberDensities)
         {
         }
         else
@@ -1250,31 +1224,6 @@ void vtkPrismSESAMEReader::ReadCurveFromTable()
             scalars[scalarIndex]->InsertNextTuple1(v[k]);
           }
         }
-      //  if ( numRead < numberDensities )
-      //  {
-      //    xCoords->InsertNextTuple1(  v[k] );
-      //  }
-      //  else if ( numRead < numberDensities + 1 )
-      //  {
-      //  }
-      //  else if( numRead < (numberDensities + numberDensities + 1 ))
-      //  {
-      //    yCoords->InsertNextTuple1(  v[k] );
-      //  }
-      //else
-      //  {
-      //  scalarCount++;
-      //  if(scalarCount > numberDensities)
-      //    {
-      //    scalarCount = 1;
-      //    scalarIndex++;
-      //    }
-      //  if(this->Internal->TableArrayStatus.size() > scalarIndex &&
-      //     this->Internal->TableArrayStatus[scalarIndex])
-      //    {
-      //    scalars[scalarIndex]->InsertNextTuple1(v[k]);
-      //    }
-      //  }
       numRead++;
       }
     }
@@ -1308,16 +1257,25 @@ void vtkPrismSESAMEReader::ReadCurveFromTable()
     {
 
       double coords[3];
-      vtkSmartPointer<vtkIdList> idList= vtkSmartPointer<vtkIdList>::New();
+   //   vtkSmartPointer<vtkIdList> idList= vtkSmartPointer<vtkIdList>::New();
+      vtkIdType lineId[2];
+      lineId[0]=-1;
+      lineId[1]=-1;
+
       for(int j=0;j<numberDensities;j++)
       {
         coords[0]=xArray->GetValue(j);
         coords[1]=yArray->GetValue(j);
         coords[2]=zArray->GetValue(j);
-        vtkIdType id=points->InsertNextPoint(coords);
-        idList->InsertNextId(id);
+        lineId[1]=points->InsertNextPoint(coords);
+        if(lineId[0]!=-1)
+        {
+         output->InsertNextCell(VTK_LINE,2,lineId);
+        }
+        lineId[0]=lineId[1];
+        //idList->InsertNextId(id);
       }
-      output->InsertNextCell(VTK_POLY_LINE,idList);
+     // output->InsertNextCell(VTK_POLY_LINE,idList);
 
       for(i=0; i<scalars.size(); i++)
       {
@@ -1497,16 +1455,26 @@ void vtkPrismSESAMEReader::ReadVaporization401Table()
     {
 
       double coords[3];
-      vtkSmartPointer<vtkIdList> idList= vtkSmartPointer<vtkIdList>::New();
+    //  vtkSmartPointer<vtkIdList> idList= vtkSmartPointer<vtkIdList>::New();
+      vtkIdType lineId[2];
+      lineId[0]=-1;
+      lineId[1]=-1;
+
+
       for(int j=0;j<numberTemperatures;j++)
       {
         coords[0]=xArray->GetValue(j);
         coords[1]=yArray->GetValue(j);
         coords[2]=zArray->GetValue(j);
-        vtkIdType id=points->InsertNextPoint(coords);
-        idList->InsertNextId(id);
+        lineId[1]=points->InsertNextPoint(coords);
+        if(lineId[0]!=-1)
+        {
+         output->InsertNextCell(VTK_LINE,2,lineId);
+        }
+        lineId[0]=lineId[1];
+//        idList->InsertNextId(id);
       }
-      output->InsertNextCell(VTK_POLY_LINE,idList);
+//      output->InsertNextCell(VTK_POLY_LINE,idList);
 
       for( i=0; i<scalars.size(); i++)
       {

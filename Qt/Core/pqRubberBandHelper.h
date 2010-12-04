@@ -138,6 +138,10 @@ signals:
 
 protected slots:
   void emitEnabledSignals();
+  void delayedSelectionChanged()
+    {
+    this->onSelectionChanged(NULL, 0, NULL);
+    }
 
 protected:
   int setRubberBandOn(int mode);

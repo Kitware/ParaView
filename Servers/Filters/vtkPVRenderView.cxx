@@ -26,6 +26,7 @@
 #include "vtkInformationRequestKey.h"
 #include "vtkInformationVector.h"
 #include "vtkInteractorStyleRubberBand3D.h"
+#include "vtkInteractorStyleRubberBandZoom.h"
 #include "vtkLight.h"
 #include "vtkLightKit.h"
 #include "vtkMath.h"
@@ -78,6 +79,7 @@ vtkPVRenderView::vtkPVRenderView()
 
   this->RemoteRenderingAvailable = false;
 
+  this->UsedLODForLastRender = false;
   this->MakingSelection = false;
   this->StillRenderImageReductionFactor = 1;
   this->InteractiveRenderImageReductionFactor = 2;
@@ -90,6 +92,7 @@ vtkPVRenderView::vtkPVRenderView()
   this->Interactor = 0;
   this->InteractorStyle = 0;
   this->RubberBandStyle = 0;
+  this->RubberBandZoom = 0;
   this->CenterAxes = vtkPVCenterAxesActor::New();
   this->CenterAxes->SetComputeNormals(0);
   this->CenterAxes->SetPickable(0);
@@ -184,6 +187,7 @@ vtkPVRenderView::vtkPVRenderView()
       observer);
     observer->Delete();
 
+    this->RubberBandZoom = vtkInteractorStyleRubberBandZoom::New();
     }
 
   this->OrientationWidget->SetParentRenderer(this->GetRenderer());
@@ -231,6 +235,11 @@ vtkPVRenderView::~vtkPVRenderView()
     this->RubberBandStyle->Delete();
     this->RubberBandStyle = 0;
     }
+  if (this->RubberBandZoom)
+    {
+    this->RubberBandZoom->Delete();
+    this->RubberBandZoom = 0;
+    }
 
   this->OrderedCompositingBSPCutsSource->Delete();
   this->OrderedCompositingBSPCutsSource = NULL;
@@ -264,6 +273,11 @@ void vtkPVRenderView::Initialize(unsigned int id)
   this->RemoteRenderingAvailable = vtkPVDisplayInformation::CanOpenDisplayLocally();
   // Synchronize this among all processes involved.
   unsigned int cannot_render = this->RemoteRenderingAvailable? 0 : 1;
+  if (vtkProcessModule::GetProcessModule()->GetIsAutoMPI())
+    {
+    // disable remote-rendering when auto-mpi is employed.
+    cannot_render = 1;
+    }
   this->SynchronizeSize(cannot_render);
   this->RemoteRenderingAvailable = cannot_render == 0;
 }
@@ -317,6 +331,8 @@ void vtkPVRenderView::SetInteractionMode(int mode)
       this->Interactor->SetInteractorStyle(this->RubberBandStyle);
       break;
 
+    case INTERACTION_MODE_ZOOM:
+      this->Interactor->SetInteractorStyle(this->RubberBandZoom);
       break;
       }
     }
@@ -595,13 +611,17 @@ void vtkPVRenderView::Render(bool interactive, bool skip_rendering)
 
     // Do the vtkView::REQUEST_INFORMATION() pass.
     this->GatherRepresentationInformation();
+
+    // Gather information about geometry sizes from all representations.
+    this->GatherGeometrySizeInformation();
     }
 
-  // Gather information about geometry sizes from all representations.
-  this->GatherGeometrySizeInformation();
+  // Use loss-less image compression for client-server for full-res renders.
+  this->SynchronizedRenderers->SetLossLessCompression(!interactive);
 
   bool use_lod_rendering = interactive? this->GetUseLODRendering() : false;
   this->SetRequestLODRendering(use_lod_rendering);
+  this->UsedLODForLastRender = use_lod_rendering;
 
   // cout << "Using remote rendering: " << use_distributed_rendering << endl;
   bool in_tile_display_mode = this->InTileDisplayMode();
@@ -956,6 +976,17 @@ void vtkPVRenderView::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "UseLightKit: " << this->UseLightKit << endl;
 }
 
+//----------------------------------------------------------------------------
+void vtkPVRenderView::ConfigureCompressor(const char* configuration)
+{
+  this->SynchronizedRenderers->ConfigureCompressor(configuration);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::InvalidateCachedSelection()
+{
+  this->Selector->Modified();
+}
 
 //*****************************************************************
 // Forwarded to orientation axes widget.
@@ -1001,6 +1032,15 @@ void vtkPVRenderView::SetCenterOfRotation(double x, double y, double z)
   if (this->Interactor)
     {
     this->Interactor->SetCenterOfRotation(x, y, z);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::SetNonInteractiveRenderDelay(unsigned int seconds)
+{
+  if (this->Interactor)
+    {
+    this->Interactor->SetNonInteractiveRenderDelay(seconds*1000);
     }
 }
 

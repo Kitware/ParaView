@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSelectionInspectorWidget.h"
 
 #include "pqPVApplicationCore.h"
+#include "pqActiveObjects.h"
 
 //-----------------------------------------------------------------------------
 pqSelectionInspectorWidget::pqSelectionInspectorWidget(
@@ -39,5 +40,8 @@ pqSelectionInspectorWidget::pqSelectionInspectorWidget(
 {
   this->setSelectionManager(
     pqPVApplicationCore::instance()->selectionManager());
+  QObject::connect( &pqActiveObjects::instance(),
+                    SIGNAL(serverChanged(pqServer*)),
+                    this, SLOT(setServer(pqServer*)));
 }
 
