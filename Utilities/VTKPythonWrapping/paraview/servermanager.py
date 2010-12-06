@@ -40,7 +40,7 @@ A simple example:
 #     PURPOSE.  See the above copyright notice for more information.
 #
 #==============================================================================
-import paraview, re, os, new, sys, vtk
+import paraview, re, os, os.path, new, sys, vtk
 
 if not paraview.compatibility.minor:
     paraview.compatibility.major = 3
@@ -2125,12 +2125,15 @@ def LoadPlugin(filename,  remote=True, connection=None):
     plinfo = plm.LoadPlugin(filename, connection.ID, serverURI, remote)
     
     if not plinfo or not plinfo.GetLoaded():
-        # Assume that it is an xml file
-        f = open(filename, 'r')
-        try:
-            LoadXML(f.read())
-        except RuntimeError:
-            raise RuntimeError, "Problem loading plugin %s: %s" % (filename, pld.GetProperty("Error").GetElement(0))
+        if os.path.splitext(filename)[1].lower() == ".xml":
+            # Assume that it is an xml file
+            f = open(filename, 'r')
+            try:
+                LoadXML(f.read())
+            except RuntimeError:
+                raise RuntimeError, "Problem loading plugin %s" % (filename)
+        else:
+            raise RuntimeError, "Problem loading plugin %s" % (filename)
     else:
         updateModules()
 
