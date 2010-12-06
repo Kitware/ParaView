@@ -31,14 +31,20 @@ vtkSurfaceLICRepresentation::vtkSurfaceLICRepresentation()
 
   vtkSurfaceLICDefaultPainter* painter = vtkSurfaceLICDefaultPainter::New();
   painter->SetSurfaceLICPainter(this->Painter);
-  painter->SetDelegatePainter(this->Mapper->GetPainter()->GetDelegatePainter());
-  this->Mapper->SetPainter(painter);
+  vtkCompositePolyDataMapper2* compositeMapper =
+    vtkCompositePolyDataMapper2::SafeDownCast(this->Mapper);
+  painter->SetDelegatePainter
+    (compositeMapper->GetPainter()->GetDelegatePainter());
+  compositeMapper->SetPainter(painter);
   painter->Delete();
 
   painter = vtkSurfaceLICDefaultPainter::New();
   painter->SetSurfaceLICPainter(this->LODPainter);
-  painter->SetDelegatePainter(this->LODMapper->GetPainter()->GetDelegatePainter());
-  this->LODMapper->SetPainter(painter);
+  compositeMapper = vtkCompositePolyDataMapper2::SafeDownCast
+    (this->LODMapper);
+  painter->SetDelegatePainter
+    (compositeMapper->GetPainter()->GetDelegatePainter());
+  compositeMapper->SetPainter(painter);
   painter->Delete();
 }
 
