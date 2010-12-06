@@ -8579,7 +8579,7 @@ This filter extracts a list of datasets from hierarchical datasets.
      label="Compute Derivatives">
      <Documentation
         long_help="This filter computes derivatives of scalars and vectors."
-        short_help="Shrink each input cell.">
+        short_help="Computes derivatives of scalars/vectors.">
 CellDerivatives is a filter that computes derivatives of scalars and vectors at the center of cells. You can choose to generate different output including the scalar gradient (a vector), computed tensor vorticity (a vector), gradient of input vectors (a tensor), and strain matrix of the input vectors (a tensor); or you may choose to pass data through to the output.
      </Documentation>
      <InputProperty
