@@ -105,6 +105,9 @@ QStringList pqCoreUtilities::findParaviewPaths(QString directoryOrFileName,
                                + "/../Support/" + directoryOrFileName);
     allPossibleDirs.push_back( getParaViewApplicationDirectory()
                                + "/../../../Support/" + directoryOrFileName);
+    // This one's for when running from the build directory.
+    allPossibleDirs.push_back( getParaViewApplicationDirectory()
+                               + "/../../../" + directoryOrFileName);
     // Mac specific end
     }
 
