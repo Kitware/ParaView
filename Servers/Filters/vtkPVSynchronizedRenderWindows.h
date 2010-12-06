@@ -122,10 +122,12 @@ public:
   enum
     {
     SYNC_MULTI_RENDER_WINDOW_TAG = 15002,
+    GET_ZBUFFER_VALUE_TAG = 15003
     };
 
   // Internal-callback-method
   void Render(unsigned int);
+  void OnGetZBufferValue(unsigned int, int, int);
 
   // Description:
   vtkGetObjectMacro(ParallelController, vtkMultiProcessController);
@@ -157,6 +159,12 @@ public:
   // Returns true if in tile display mode and fills up tile_dims with the tile
   // dimensions.
   static bool GetTileDisplayParameters(int tile_dims[2], int tile_mullions[2]);
+
+  // Description:
+  // Returns the z-buffer value at the given location. \c id is the view id
+  // used in AddRenderWindow()/AddRenderer() etc.
+  // @CallOnClientOnly
+  double GetZbufferDataAtPoint(int x, int y, unsigned int id);
 
 protected:
   vtkPVSynchronizedRenderWindows();
@@ -226,6 +234,7 @@ protected:
   vtkMultiProcessController* ClientServerController;
   vtkMultiProcessController* ClientDataServerController;
   unsigned long ClientServerRMITag;
+  unsigned long ClientServerGetZBufferValueRMITag;
   unsigned long ParallelRMITag;
   bool Enabled;
   bool RenderEventPropagation;

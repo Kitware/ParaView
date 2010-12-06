@@ -842,6 +842,14 @@ vtkImageData* vtkSMRenderViewProxy::CaptureWindowInternal(int magnification)
 }
 
 //----------------------------------------------------------------------------
+double vtkSMRenderViewProxy::GetZBufferValue(int x, int y)
+{
+  vtkPVRenderView* rv = vtkPVRenderView::SafeDownCast(
+    this->GetClientSideObject());
+  return rv? rv->GetZbufferDataAtPoint(x, y) : 1.0;
+}
+
+//----------------------------------------------------------------------------
 void vtkSMRenderViewProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);

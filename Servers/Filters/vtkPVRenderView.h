@@ -312,6 +312,11 @@ public:
   // @CallOnAllProcessess
   void InvalidateCachedSelection();
 
+  // Description:
+  // Returns the z-buffer value at the given location.
+  // @CallOnClientOnly
+  double GetZbufferDataAtPoint(int x, int y);
+
 public:
   //*****************************************************************
   // Methods merely exposing methods for internal objects.

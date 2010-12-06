@@ -248,6 +248,20 @@ namespace
       reinterpret_cast<vtkPVSynchronizedRenderWindows*>(localArg);
     self->Render(id);
     }
+
+  void GetZBufferValue(void *localArg,
+    void *remoteArg, int remoteArgLength, int vtkNotUsed(remoteProcessId))
+    {
+   vtkMultiProcessStream stream;
+    stream.SetRawData(reinterpret_cast<unsigned char*>(remoteArg),
+      remoteArgLength);
+    unsigned int id = 0;
+    int x, y;
+    stream >> id >> x >> y;
+    vtkPVSynchronizedRenderWindows* self =
+      reinterpret_cast<vtkPVSynchronizedRenderWindows*>(localArg);
+    self->OnGetZBufferValue(id, x, y);
+    }
 };
 
 vtkStandardNewMacro(vtkPVSynchronizedRenderWindows);
@@ -261,6 +275,7 @@ vtkPVSynchronizedRenderWindows::vtkPVSynchronizedRenderWindows()
   this->ClientDataServerController = 0;
   this->ParallelController = 0;
   this->ClientServerRMITag = 0;
+  this->ClientServerGetZBufferValueRMITag = 0;
   this->ParallelRMITag = 0;
   this->Internals = new vtkInternals();
   this->Internals->ActiveId = 0;
@@ -428,10 +443,16 @@ void vtkPVSynchronizedRenderWindows::SetClientServerController(
     {
     this->ClientServerController->RemoveRMICallback(this->ClientServerRMITag);
     }
+  if (this->ClientServerController && this->ClientServerGetZBufferValueRMITag)
+    {
+    this->ClientServerController->RemoveRMICallback(
+      this->ClientServerGetZBufferValueRMITag);
+    }
 
   vtkSetObjectBodyMacro(
     ClientServerController, vtkMultiProcessController, controller);
   this->ClientServerRMITag = 0;
+  this->ClientServerGetZBufferValueRMITag = 0;
 
   // Only the RENDER_SERVER processes needs to listen to SYNC_MULTI_RENDER_WINDOW_TAG
   // triggers from the client.
@@ -439,6 +460,8 @@ void vtkPVSynchronizedRenderWindows::SetClientServerController(
     {
     this->ClientServerRMITag =
       controller->AddRMICallback(::RenderRMI, this, SYNC_MULTI_RENDER_WINDOW_TAG);
+    this->ClientServerGetZBufferValueRMITag =
+      controller->AddRMICallback(::GetZBufferValue, this, GET_ZBUFFER_VALUE_TAG);
     }
 }
 
@@ -1649,6 +1672,43 @@ bool vtkPVSynchronizedRenderWindows::RemoveRMICallback(unsigned long id)
     return true;
     }
   return false;
+}
+
+//----------------------------------------------------------------------------
+double vtkPVSynchronizedRenderWindows::GetZbufferDataAtPoint(int x, int y,
+  unsigned int id)
+{
+  vtkRenderWindow* window = this->GetRenderWindow(id);
+  if (!this->Enabled || !this->Mode != CLIENT || window == NULL)
+    {
+    return window? window->GetZbufferDataAtPoint(x, y) : 1.0;
+    }
+
+  assert(this->Mode == CLIENT && window != NULL);
+  if (this->ClientServerController)
+    {
+    vtkMultiProcessStream stream;
+    stream << id << x << y;
+
+    vtkstd::vector<unsigned char> data;
+    stream.GetRawData(data);
+    this->ClientServerController->TriggerRMIOnAllChildren(
+      &data[0], static_cast<int>(data.size()), GET_ZBUFFER_VALUE_TAG);
+    double value = 1.0;
+    this->ClientServerController->Receive(&value, 1, 1, GET_ZBUFFER_VALUE_TAG);
+    return value;
+    }
+
+  return 1.0;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVSynchronizedRenderWindows::OnGetZBufferValue(
+  unsigned int id, int x, int y)
+{
+  double value = this->GetZbufferDataAtPoint(x, y, id);
+  // FIXME: need to get the value from IceT.
+  this->ClientServerController->Send(&value, 1, 1, GET_ZBUFFER_VALUE_TAG);
 }
 
 //----------------------------------------------------------------------------
