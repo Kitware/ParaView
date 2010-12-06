@@ -126,13 +126,17 @@ vtkPointSpriteRepresentation::vtkPointSpriteRepresentation()
   this->LODPointSpriteDefaultPainter->SetDepthSortPainter(
     this->LODDepthSortPainter);
 
+  vtkCompositePolyDataMapper2* compositeMapper =
+    vtkCompositePolyDataMapper2::SafeDownCast(this->Mapper);
   this->PointSpriteDefaultPainter->SetDelegatePainter(
-    this->Mapper->GetPainter()->GetDelegatePainter());
-  this->Mapper->SetPainter(this->PointSpriteDefaultPainter);
+    compositeMapper->GetPainter()->GetDelegatePainter());
+  compositeMapper->SetPainter(this->PointSpriteDefaultPainter);
 
+  compositeMapper = vtkCompositePolyDataMapper2::SafeDownCast
+    (this->LODMapper);
   this->LODPointSpriteDefaultPainter->SetDelegatePainter(
-    this->LODMapper->GetPainter()->GetDelegatePainter());
-  this->LODMapper->SetPainter(this->LODPointSpriteDefaultPainter);
+    compositeMapper->GetPainter()->GetDelegatePainter());
+  compositeMapper->SetPainter(this->LODPointSpriteDefaultPainter);
 
   // change the pipeline setup by the superclass to insert our filters in it.
   //this->ArrayToRadiusFilter->SetInputConnection(

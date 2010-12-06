@@ -92,6 +92,9 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <Model/Groups/Group.h>
 #include <Model/Lights/HeadLight.h>
 
+#include "vtkImageData.h"
+#include "vtkPNGWriter.h"
+
 
 #include <vtkstd/string>
 
@@ -162,7 +165,7 @@ vtkMantaRenderer::vtkMantaRenderer() :
 //----------------------------------------------------------------------------
 vtkMantaRenderer::~vtkMantaRenderer()
 {
-  //cerr << "MR(" << this << ") DESTROY " << this->MantaManager << " " 
+  //cerr << "MR(" << this << ") DESTROY " << this->MantaManager << " "
   //     << this->MantaManager->GetReferenceCount() << endl;
 
   if (this->DefaultLight && this->MantaLightSet)
@@ -187,7 +190,7 @@ vtkMantaRenderer::~vtkMantaRenderer()
 //----------------------------------------------------------------------------
 void vtkMantaRenderer::InitEngine()
 {
-  //cerr << "MR(" << this << ")#" << this->GetLayer() << " INIT " 
+  //cerr << "MR(" << this << ")#" << this->GetLayer() << " INIT "
   //     << this->MantaManager << endl;
   this->MantaManager->StartEngine(this->MaxDepth,
                                   this->GetBackground(),
@@ -216,7 +219,7 @@ void vtkMantaRenderer::SetBackground(double r, double g, double b)
   this->MantaEngine->addTransaction
     ( "set background",
       Manta::Callback::create(this, &vtkMantaRenderer::InternalSetBackground));
-  }; 
+  };
 }
 
 //----------------------------------------------------------------------------
@@ -272,15 +275,16 @@ int vtkMantaRenderer::UpdateLights()
       noneOn = false;
       }
     //manta lights set intensity to 0.0 if switched off, so render regardless
-    vLight->Render( this, 0 /* not used */ ); 
+    vLight->Render( this, 0 /* not used */ );
     }
-    
+
   if (noneOn)
     {
     if (this->MantaLightSet->numLights()==0 )
       {
       // there is no VTK light nor MantaLight defined, create a Manta headlight
-      cerr << "No light defined, creating a headlight at camera position" << endl;      
+      cerr
+        << "No light defined, creating a headlight at camera position" << endl;
       this->DefaultLight =
         new Manta::HeadLight( 0, Manta::Color( Manta::RGBColor( 1, 1, 1 ) ) );
       this->MantaEngine->addTransaction
@@ -311,6 +315,7 @@ vtkCamera* vtkMantaRenderer::MakeCamera()
 //----------------------------------------------------------------------------
 void vtkMantaRenderer::DeviceRender()
 {
+  //cerr << "MR(" << this << ") DeviceRender" << endl;
 
   // In ParaView, we are wasting time in rendering the "sync layer" with
   // empty background image just to be dropped in LayerRender(). We just
@@ -329,6 +334,8 @@ void vtkMantaRenderer::DeviceRender()
     }
 
   vtkTimerLog::MarkStartEvent("Geometry");
+
+  this->Clear();
 
   // call camera::Render()
   this->UpdateCamera();
@@ -403,15 +410,16 @@ void vtkMantaRenderer::LayerRender()
   hRenderDiff = renderSize[1] - minHeight;
   if (hMantaDiff != 0 || hRenderDiff != 0)
     {
-/*
-    cerr << "MR(" << this << ") " 
-         << "Layer: " << this->GetLayer() << ", "
-         << "Props: " << this->NumberOfPropsRendered << endl
-         << "  MantaSize: " << mantaSize[0] << ", " << mantaSize[1] << ", "
-         << "  renWinSize: " << renWinSize[0] << ", " << renWinSize[1] << ", "
-         << "  renderSize: " << renderSize[0] << ", " << renderSize[1] << endl;
-*/
+    /*
+    cerr << "MR(" << this << ") "
+       << "Layer: " << this->GetLayer() << ", "
+       << "Props: " << this->NumberOfPropsRendered << endl
+       << "  MantaSize: " << mantaSize[0] << ", " << mantaSize[1] << ", "
+       << "  renWinSize: " << renWinSize[0] << ", " << renWinSize[1] << ", "
+       << "  renderSize: " << renderSize[0] << ", " << renderSize[1] << endl;
+    */
     }
+
 
   // memory allocation and acess to the Manta image
   int size = renderSize[0]*renderSize[1];
@@ -431,8 +439,6 @@ void vtkMantaRenderer::LayerRender()
   double depthScale  = 1.0f / ( clipValues[1] - clipValues[0] );
 
   vtkTimerLog::MarkStartEvent("Image Conversion");
-  // This double for loop costs about 0.01 seconds per frames on the
-  // 8 cores machine. This can be fixed with RGBA8ZFloatP
   for ( j = 0; j < minHeight; j ++ )
     {
     // there are two floats in each pixel in Manta buffer
@@ -453,6 +459,67 @@ void vtkMantaRenderer::LayerRender()
       this->DepthBuffer[ tupleIndex + i ]
                          = ( depthValue - clipValues[0] ) * depthScale;
       }
+    }
+
+  // let layer #0 initialize GL depth buffer
+  if ( this->GetLayer() == 0 )
+    {
+    this->GetRenderWindow()->
+      SetZbufferData( renderPos0[0],  renderPos0[1],
+                      renderPos0[0] + renderSize[0] - 1,
+                      renderPos0[1] + renderSize[1] - 1,
+                      this->DepthBuffer );
+
+    this->GetRenderWindow()->
+      SetRGBACharPixelData( renderPos0[0],  renderPos0[1],
+                            renderPos0[0] + renderSize[0] - 1,
+                            renderPos0[1] + renderSize[1] - 1,
+                            (unsigned char*)this->ColorBuffer, 0, 0 );
+    glFinish();
+    }
+  else
+    {
+    //layers on top add the colors of their non background pixels
+    unsigned char*  GLbakBuffer = NULL;
+    GLbakBuffer = this->GetRenderWindow()->
+      GetRGBACharPixelData( renderPos0[0],  renderPos0[1],
+                            renderPos0[0] + renderSize[0] - 1,
+                            renderPos0[1] + renderSize[1] - 1, 0 );
+
+    bool anyhit = false;
+    unsigned char *optr = GLbakBuffer;
+    unsigned char *iptr = (unsigned char*)this->ColorBuffer;
+    float *zptr = this->DepthBuffer;
+    for ( j = 0; j < renderSize[1]; j++)
+    {
+      for ( i = 0; i < renderSize[0]; i++)
+        {
+        const float z = *zptr;
+        if (z > 0 && z < 1.0)
+          {
+          anyhit = true;
+          *(optr+0) = *(iptr+0);
+          *(optr+1) = *(iptr+1);
+          *(optr+2) = *(iptr+2);
+          *(optr+3) = *(iptr+3);
+          }
+        optr+=4;
+        iptr+=4;
+        zptr++;
+        }
+    }
+
+    if (anyhit)
+      {
+      // submit the modified RGB colors to GL BACK buffer
+      this->GetRenderWindow()->
+        SetRGBACharPixelData( renderPos0[0],  renderPos0[1],
+          renderPos0[0] + renderSize[0] - 1,
+          renderPos0[1] + renderSize[1] - 1,
+          GLbakBuffer, 0, 0 );
+      }
+
+    delete [] GLbakBuffer;
     }
 
   //cerr << "MR(" << this << ") release" << endl;
@@ -476,7 +543,8 @@ void vtkMantaRenderer::SetNumberOfWorkers( int newval )
   this->NumberOfWorkers = newval;
   this->MantaEngine->addTransaction
     ( "set max depth",
-      Manta::Callback::create(this, &vtkMantaRenderer::InternalSetNumberOfWorkers));
+      Manta::Callback::create
+      (this, &vtkMantaRenderer::InternalSetNumberOfWorkers));
   this->Modified();
 }
 
@@ -566,4 +634,3 @@ void vtkMantaRenderer::InternalSetMaxDepth()
 {
   this->MantaScene->getRenderParameters().setMaxDepth( this->MaxDepth );
 }
-

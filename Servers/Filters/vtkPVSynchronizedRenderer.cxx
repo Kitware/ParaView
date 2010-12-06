@@ -17,10 +17,11 @@
 #include "vtkBoundingBox.h"
 #include "vtkCameraPass.h"
 #include "vtkCaveSynchronizedRenderers.h"
-#include "vtkPVClientServerSynchronizedRenderers.h"
+#include "vtkCompositedSynchronizedRenderers.h"
 #include "vtkImageProcessingPass.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
+#include "vtkPVClientServerSynchronizedRenderers.h"
 #include "vtkPVConfig.h"
 #include "vtkPVDefaultPass.h"
 #include "vtkPVOptions.h"
@@ -33,6 +34,8 @@
 # include "vtkIceTSynchronizedRenderers.h"
 #endif
 
+#include <assert.h>
+
 vtkStandardNewMacro(vtkPVSynchronizedRenderer);
 //----------------------------------------------------------------------------
 vtkPVSynchronizedRenderer::vtkPVSynchronizedRenderer()
@@ -42,7 +45,16 @@ vtkPVSynchronizedRenderer::vtkPVSynchronizedRenderer()
   this->Enabled = true;
   this->ImageReductionFactor = 1;
   this->Renderer = 0;
+  this->Mode = INVALID;
+  this->CSSynchronizer = 0;
+  this->ParallelSynchronizer = 0;
+  this->DisableIceT = false;
+}
 
+//----------------------------------------------------------------------------
+void vtkPVSynchronizedRenderer::Initialize()
+{
+  assert(this->Mode == INVALID);
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   if (!pm)
     {
@@ -76,10 +88,6 @@ vtkPVSynchronizedRenderer::vtkPVSynchronizedRenderer()
     {
     this->Mode = CLIENT;
     }
-
-
-  this->CSSynchronizer = 0;
-  this->ParallelSynchronizer = 0;
 
   bool in_tile_display_mode = false;
   bool in_cave_mode = false;
@@ -168,14 +176,21 @@ vtkPVSynchronizedRenderer::vtkPVSynchronizedRenderer()
     else if (pm->GetNumberOfLocalPartitions() > 1)
       {
 #ifdef PARAVIEW_USE_ICE_T
-      this->ParallelSynchronizer = vtkIceTSynchronizedRenderers::New();
-      static_cast<vtkIceTSynchronizedRenderers*>(this->ParallelSynchronizer)->SetTileDimensions(
-        tile_dims[0], tile_dims[1]);
-      static_cast<vtkIceTSynchronizedRenderers*>(this->ParallelSynchronizer)->SetTileMullions(
-        tile_mullions[0], tile_mullions[1]);
+      if (this->DisableIceT)
+        {
+        this->ParallelSynchronizer = vtkCompositedSynchronizedRenderers::New();
+        }
+      else
+        {
+        this->ParallelSynchronizer = vtkIceTSynchronizedRenderers::New();
+        static_cast<vtkIceTSynchronizedRenderers*>(this->ParallelSynchronizer)->SetTileDimensions(
+          tile_dims[0], tile_dims[1]);
+        static_cast<vtkIceTSynchronizedRenderers*>(this->ParallelSynchronizer)->SetTileMullions(
+          tile_mullions[0], tile_mullions[1]);
+        }
 #else
       // FIXME: need to add support for compositing when not using IceT
-      this->ParallelSynchronizer = vtkSynchronizedRenderers::New();
+      this->ParallelSynchronizer = vtkCompositedSynchronizedRenderers::New();
 #endif
       this->ParallelSynchronizer->SetParallelController(
         vtkMultiProcessController::GetGlobalController());

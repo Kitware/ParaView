@@ -773,7 +773,6 @@ bool vtkSMRenderViewProxy::SelectFrustumInternal(int region[4],
 //----------------------------------------------------------------------------
 vtkImageData* vtkSMRenderViewProxy::CaptureWindowInternal(int magnification)
 {
-  vtkRenderWindow* window = this->GetRenderWindow();
   vtkPVRenderView* view =
     vtkPVRenderView::SafeDownCast(this->GetClientSideObject());
 
