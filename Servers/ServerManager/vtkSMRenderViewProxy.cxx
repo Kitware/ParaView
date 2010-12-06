@@ -779,6 +779,7 @@ vtkImageData* vtkSMRenderViewProxy::CaptureWindowInternal(int magnification)
   // Offscreen rendering is not functioning properly on the mac.
   // Do not use it.
 #if !defined(__APPLE__)
+  vtkRenderWindow* window = this->GetRenderWindow();
   int prevOffscreen = window->GetOffScreenRendering();
   bool use_offscreen = view->GetUseOffscreenRendering() ||
     view->GetUseOffscreenRenderingForScreenshots();
