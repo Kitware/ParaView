@@ -117,6 +117,10 @@ public:
   // Returns true if the most recent render indeed employed low-res rendering.
   virtual bool LastRenderWasInteractive();
 
+  // Description:
+  // Returns the Z-buffer value at the given location in this view.
+  double GetZBufferValue(int x, int y);
+
 //BTX
 protected:
   vtkSMRenderViewProxy();

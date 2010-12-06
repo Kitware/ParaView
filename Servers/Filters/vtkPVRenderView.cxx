@@ -972,6 +972,23 @@ void vtkPVRenderView::UpdateCenterAxes(double bounds[6])
 }
 
 //----------------------------------------------------------------------------
+double vtkPVRenderView::GetZbufferDataAtPoint(int x, int y)
+{
+  bool in_tile_display_mode = this->InTileDisplayMode();
+  bool in_cave_mode = this->SynchronizedWindows->GetIsInCave();
+  if (in_tile_display_mode || in_cave_mode)
+    {
+    return this->GetRenderWindow()->GetZbufferDataAtPoint(x, y);
+    }
+
+  // Note, this relies on the fact that the most-recent render must have updated
+  // the enabled state on  the vtkPVSynchronizedRenderWindows correctly based on
+  // whether remote rendering was needed or not.
+  return this->SynchronizedWindows->GetZbufferDataAtPoint(x, y,
+    this->GetIdentifier());
+}
+
+//----------------------------------------------------------------------------
 void vtkPVRenderView::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
