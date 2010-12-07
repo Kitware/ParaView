@@ -2286,7 +2286,9 @@ void vtkFlashReader::PrintSelf( ostream & os, vtkIndent indent )
 {
   this->Superclass::PrintSelf( os, indent );
   
-  os << indent << "FileName: "        << this->FileName        << "\n";
+
+  os << indent << "FileName: "
+     << (this->FileName?this->FileName:"(none)") << endl;
   os << indent << "BlockOutputType: " << this->BlockOutputType << "\n";
   if ( this->CellDataArraySelection )
     {

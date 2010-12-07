@@ -1602,7 +1602,8 @@ int vtkSortedTableStreamer::RequestData( vtkInformation* vtkNotUsed(request),
 void vtkSortedTableStreamer::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  os << indent << "Sorting column: " << this->ColumnToSort << endl;
+  os << indent << "Sorting column: "
+     << (this->ColumnToSort?this->ColumnToSort:"(none)") << endl;
 }
 
 //----------------------------------------------------------------------------
