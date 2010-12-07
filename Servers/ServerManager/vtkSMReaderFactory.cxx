@@ -40,7 +40,7 @@ static void string_replace(vtkstd::string& string, char c, vtkstd::string str)
   while (cc < vtkstd::string::npos)
     {
     string = string.replace(cc, 1, str);
-    cc = string.find(c, cc);
+    cc = string.find(c, cc + str.size());
     }
 }
 
