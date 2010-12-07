@@ -37,6 +37,19 @@
     <string>Delete</string>
    </property>
   </action>
+  <action name="actionPBCopy">
+   <property name="icon">
+    <iconset>
+     <normaloff/>
+    </iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Copy Properties</string>
+   </property>
+   <property name="statusTip">
+    <string>Copy properties</string>
+   </property>
+  </action>
   <action name="actionPBIgnoreTime">
    <property name="checkable">
     <bool>true</bool>
@@ -78,6 +91,7 @@
    </property>
   </action>
   <addaction name="actionPBOpen"/>
+  <addaction name="actionPBCopy"/>
   <addaction name="actionPBCreateCustomFilter"/>
   <addaction name="actionPBChangeInput"/>
   <addaction name="actionPBIgnoreTime"/>

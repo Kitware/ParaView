@@ -36,6 +36,7 @@ SET (MOC_HEADERS
   pqChangePipelineInputReaction.h
   pqColorToolbar.h
   pqCommandLineOptionsBehavior.h
+  pqCopyReaction.h
   pqCrashRecoveryBehavior.h
   pqCreateCustomFilterReaction.h
   pqDataTimeStepBehavior.h
@@ -104,6 +105,7 @@ SET (UI_FILES
   Resources/UI/pqAxesToolbar.ui
   Resources/UI/pqCameraToolbar.ui
   Resources/UI/pqColorToolbar.ui
+  Resources/UI/pqCopyReactionDialog.ui
   Resources/UI/pqDefaultMainWindow.ui
   Resources/UI/pqEditMenuBuilder.ui
   Resources/UI/pqFileMenuBuilder.ui
@@ -150,6 +152,8 @@ SET (SOURCE_FILES
   pqColorToolbar.h
   pqCommandLineOptionsBehavior.cxx
   pqCommandLineOptionsBehavior.h
+  pqCopyReaction.cxx
+  pqCopyReaction.h
   pqCrashRecoveryBehavior.cxx
   pqCrashRecoveryBehavior.h
   pqCreateCustomFilterReaction.cxx

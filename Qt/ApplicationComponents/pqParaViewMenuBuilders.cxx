@@ -47,6 +47,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCategoryToolbarsBehavior.h"
 #include "pqChangePipelineInputReaction.h"
 #include "pqColorToolbar.h"
+#include "pqCopyReaction.h"
 #include "pqCreateCustomFilterReaction.h"
 #include "pqDataQueryReaction.h"
 #include "pqDeleteReaction.h"
@@ -143,6 +144,7 @@ void pqParaViewMenuBuilders::buildEditMenu(QMenu& menu)
   new pqIgnoreSourceTimeReaction(ui.actionIgnoreTime);
   new pqDeleteReaction(ui.actionDelete);
   new pqDeleteReaction(ui.actionDelete_All, true);
+  new pqCopyReaction(ui.actionCopy);
   new pqApplicationSettingsReaction(ui.actionEditSettings);
   new pqViewSettingsReaction(ui.actionEditViewSettings);
   new pqDataQueryReaction(ui.actionQuery);
@@ -280,6 +282,7 @@ void pqParaViewMenuBuilders::buildPipelineBrowserContextMenu(QWidget& widget)
   new pqCreateCustomFilterReaction(ui.actionPBCreateCustomFilter);
   new pqIgnoreSourceTimeReaction(ui.actionPBIgnoreTime);
   new pqDeleteReaction(ui.actionPBDelete);
+  new pqCopyReaction(ui.actionPBCopy);
 }
 
 //-----------------------------------------------------------------------------
