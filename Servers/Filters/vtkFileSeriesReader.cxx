@@ -856,7 +856,8 @@ void vtkFileSeriesReader::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 
-  os << indent << "MetaFileName: " << this->MetaFileName << endl;
+  os << indent << "MetaFileName: "
+     << (this->MetaFileName?this->MetaFileName:"(none)") << endl;
   os << indent << "UseMetaFile: " << this->UseMetaFile << endl;
   os << indent << "IgnoreReaderTime: " << this->IgnoreReaderTime << endl;
 }
