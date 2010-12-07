@@ -14,8 +14,8 @@
 =========================================================================*/
 // .NAME vtkSMContextViewProxy - abstract base class for all Chart Views.
 // .SECTION Description
-// vtkSMContextViewProxy is an abstract base class for all vtkQtChartView
-// subclasses. These are the Qt-based charting views.
+// vtkSMContextViewProxy is an abstract base class for all vtkContextView
+// subclasses.
 
 #ifndef __vtkSMContextViewProxy_h
 #define __vtkSMContextViewProxy_h
