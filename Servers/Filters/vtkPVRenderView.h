@@ -200,7 +200,7 @@ public:
   vtkGetMacro(LODResolution, double);
 
   // Description:
-  // This threshold is only applicable when in tile-display mode. It is the size
+  // This threshold is only applicable when in client-server mode. It is the size
   // of geometry in megabytes beyond which the view should not deliver geometry
   // to the client, but only outlines.
   // @CallOnAllProcessess
