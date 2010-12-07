@@ -646,27 +646,26 @@ void vtkPVRenderView::Render(bool interactive, bool skip_rendering)
   // Build the request for REQUEST_PREPARE_FOR_RENDER().
   this->SetRequestDistributedRendering(use_distributed_rendering);
 
-  if (in_tile_display_mode)
+  if ( (in_tile_display_mode || interactive) &&
+    this->GetDeliverOutlineToClient())
     {
-    if (this->GetDeliverOutlineToClient())
-      {
-      this->RequestInformation->Remove(DELIVER_LOD_TO_CLIENT());
-      this->RequestInformation->Set(DELIVER_OUTLINE_TO_CLIENT(), 1);
-      }
-    else
-      {
-      this->RequestInformation->Remove(DELIVER_OUTLINE_TO_CLIENT());
-      this->RequestInformation->Set(DELIVER_LOD_TO_CLIENT(), 1);
-      }
+    this->RequestInformation->Remove(DELIVER_LOD_TO_CLIENT());
+    this->RequestInformation->Set(DELIVER_OUTLINE_TO_CLIENT(), 1);
     }
-  else if (in_cave_mode)
+  else
     {
+    this->RequestInformation->Remove(DELIVER_OUTLINE_TO_CLIENT());
+    this->RequestInformation->Set(DELIVER_LOD_TO_CLIENT(), 1);
+    }
+
+  if (in_cave_mode)
+    {
+    // FIXME: This isn't supported currently.
     this->RequestInformation->Set(DELIVER_LOD_TO_CLIENT(), 1);
     }
   else
     {
     this->RequestInformation->Remove(DELIVER_LOD_TO_CLIENT());
-    this->RequestInformation->Remove(DELIVER_OUTLINE_TO_CLIENT());
     }
 
   // In REQUEST_PREPARE_FOR_RENDER, this view expects all representations to
