@@ -16,6 +16,7 @@
 
 #include "vtkAlgorithmOutput.h"
 #include "vtkCommand.h"
+#include "vtkCompositeDataPipeline.h"
 #include "vtkDataObject.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
@@ -168,6 +169,11 @@ vtkAlgorithmOutput* vtkPVDataRepresentation::GetInternalOutputPort(int port,
   vtkDataObject* dobj = prevOutput->GetProducer()->GetOutputDataObject(0);
 
   vtkPVTrivialProducer* tprod = vtkPVTrivialProducer::New();
+  vtkCompositeDataPipeline* exec = vtkCompositeDataPipeline::New();
+  tprod->SetExecutive(exec);
+  vtkInformation* portInfo = tprod->GetOutputPortInformation(0);
+  portInfo->Set(vtkDataObject::DATA_TYPE_NAME(), dobj->GetClassName());
+  exec->UnRegister(0);
   tprod->SetOutput(dobj);
   tprod->UnRegister(0);
 
