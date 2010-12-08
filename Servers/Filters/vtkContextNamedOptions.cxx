@@ -140,6 +140,12 @@ void vtkContextNamedOptions::SetChart(vtkChart* chart)
 }
 
 //----------------------------------------------------------------------------
+vtkChart * vtkContextNamedOptions::GetChart()
+{
+  return this->Internals->Chart;
+}
+
+//----------------------------------------------------------------------------
 vtkTable* vtkContextNamedOptions::GetTable()
 {
   return this->Internals->Table;
@@ -310,7 +316,8 @@ void vtkContextNamedOptions::RemovePlotsFromChart()
 
 //----------------------------------------------------------------------------
 void vtkContextNamedOptions::SetPlotVisibilityInternal(PlotInfo& plotInfo,
-                                          bool visible, const char* seriesName)
+                                                       bool visible,
+                                                       const char* seriesName)
 {
   if (plotInfo.Plot)
     {
@@ -339,12 +346,6 @@ void vtkContextNamedOptions::SetPlotVisibilityInternal(PlotInfo& plotInfo,
                       this->Internals->XSeriesName.c_str(),
                       seriesName);
       }
-    }
-
-  // Recalculate the bounds if a plot was made visible
-  if (this->Internals->Chart && visible)
-    {
-    this->Internals->Chart->RecalculateBounds();
     }
 }
 

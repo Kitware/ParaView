@@ -256,6 +256,16 @@ int vtkChartRepresentation::GetNumberOfSeries()
 }
 
 //----------------------------------------------------------------------------
+void vtkChartRepresentation::RescaleChart()
+{
+  vtkChart *chart = this->Options->GetChart();
+  if (chart)
+    {
+    chart->RecalculateBounds();
+    }
+}
+
+//----------------------------------------------------------------------------
 const char* vtkChartRepresentation::GetSeriesName(int col)
 {
   vtkTable *table = this->GetLocalOutput();
