@@ -38,7 +38,7 @@ class VTK_EXPORT vtkPVTrivialProducer : public vtkTrivialProducer
 {
 public:
   static vtkPVTrivialProducer* New();
-  vtkTypeRevisionMacro(vtkPVTrivialProducer, vtkTrivialProducer);
+  vtkTypeMacro(vtkPVTrivialProducer, vtkTrivialProducer);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
