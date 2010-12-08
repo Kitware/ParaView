@@ -24,7 +24,6 @@
 #include "vtkStreamingDemandDrivenPipeline.h"
 
 vtkStandardNewMacro(vtkPVTrivialProducer);
-vtkCxxRevisionMacro(vtkPVTrivialProducer, "$Revision: 1.1 $");
 //----------------------------------------------------------------------------
 vtkPVTrivialProducer::vtkPVTrivialProducer()
 {
