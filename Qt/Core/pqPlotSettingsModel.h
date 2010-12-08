@@ -123,6 +123,7 @@ public slots:
 
 signals:
   void redrawChart();
+  void rescaleChart();
 
 private:
   class pqImplementation;
