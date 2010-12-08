@@ -179,6 +179,46 @@ public:
   void SetAxisTitleColor(int index, double red, double green, double blue);
 
   // Description:
+  // Set the number of labels for the supplied axis.
+  void SetAxisLabelsNumber(int axis, int number);
+
+  // Description:
+  // Set the axis label positions for the supplied axis at the given index.
+  void SetAxisLabels(int axis, int index, double value);
+
+  // Description:
+  // Set the number of axis labels for the left axis.
+  void SetAxisLabelsLeftNumber(int number);
+
+  // Description:
+  // Set the label positions for the left axis.
+  void SetAxisLabelsLeft(int index, double value);
+
+  // Description:
+  // Set the number of labels for the bottom axis.
+  void SetAxisLabelsBottomNumber(int number);
+
+  // Description:
+  // Set the label positions for the bottom axis.
+  void SetAxisLabelsBottom(int index, double value);
+
+  // Description:
+  // Set the number of labels for the right axis.
+  void SetAxisLabelsRightNumber(int number);
+
+  // Description:
+  // Set the label positions for the right axis.
+  void SetAxisLabelsRight(int index, double value);
+
+  // Description:
+  // Set the number of labels for the top axis.
+  void SetAxisLabelsTopNumber(int number);
+
+  // Description:
+  // Set the label positions for the top axis.
+  void SetAxisLabelsTop(int index, double value);
+
+  // Description:
   // Provides access to the chart view.
   virtual vtkChart* GetChart();
 
