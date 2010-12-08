@@ -849,6 +849,38 @@
         <DoubleRangeDomain name="range" min="0" max="1" />
       </DoubleVectorProperty>
 
+      <DoubleVectorProperty
+        name="AxisLabelsLeft"
+        command="SetAxisLabelsLeft"
+        repeat_command="1"
+        set_number_command="SetAxisLabelsLeftNumber"
+        use_index="1">
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+        name="AxisLabelsBottom"
+        command="SetAxisLabelsBottom"
+        repeat_command="1"
+        set_number_command="SetAxisLabelsBottomNumber"
+        use_index="1">
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+        name="AxisLabelsRight"
+        command="SetAxisLabelsRight"
+        repeat_command="1"
+        set_number_command="SetAxisLabelsRightNumber"
+        use_index="1">
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+        name="AxisLabelsTop"
+        command="SetAxisLabelsTop"
+        repeat_command="1"
+        set_number_command="SetAxisLabelsTopNumber"
+        use_index="1">
+      </DoubleVectorProperty>
+
     </ContextViewProxy>
 
     <!-- ================================================================== -->
