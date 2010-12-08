@@ -14,12 +14,15 @@
 =========================================================================*/
 #include "vtkPVDataRepresentation.h"
 
+#include "vtkAlgorithmOutput.h"
 #include "vtkCommand.h"
+#include "vtkDataObject.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVDataRepresentationPipeline.h"
+#include "vtkPVTrivialProducer.h"
 #include "vtkPVView.h"
 
 #include <assert.h>
@@ -133,6 +136,8 @@ int vtkPVDataRepresentation::RequestUpdateExtent(vtkInformation* request,
           &this->UpdateTime, 1);
         }
       }
+    inputVector[0]->GetInformationObject(0)->Set(
+      vtkStreamingDemandDrivenPipeline::EXACT_EXTENT(), 1);
     }
 
   return 1;
@@ -147,6 +152,26 @@ bool vtkPVDataRepresentation::GetUsingCacheForUpdate()
     }
 
   return false;
+}
+
+//----------------------------------------------------------------------------
+vtkAlgorithmOutput* vtkPVDataRepresentation::GetInternalOutputPort(int port,
+                                                                   int conn)
+{
+  vtkAlgorithmOutput* prevOutput = this->Superclass::GetInternalOutputPort(
+    port, conn);
+  if (prevOutput->GetProducer()->IsA("vtkPVTrivialProducer"))
+    {
+    return prevOutput;
+    }
+
+  vtkDataObject* dobj = prevOutput->GetProducer()->GetOutputDataObject(0);
+
+  vtkPVTrivialProducer* tprod = vtkPVTrivialProducer::New();
+  tprod->SetOutput(dobj);
+  tprod->UnRegister(0);
+
+  return dobj->GetProducerPort();
 }
 
 //----------------------------------------------------------------------------

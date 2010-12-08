@@ -14,6 +14,7 @@
 =========================================================================*/
 #include "vtkGeometryRepresentation.h"
 
+#include "vtkAlgorithmOutput.h"
 #include "vtkCommand.h"
 #include "vtkCompositePolyDataMapper2.h"
 #include "vtkInformation.h"
@@ -29,12 +30,14 @@
 #include "vtkPVGeometryFilter.h"
 #include "vtkPVLODActor.h"
 #include "vtkPVRenderView.h"
+#include "vtkPVTrivialProducer.h"
 #include "vtkQuadricClustering.h"
 #include "vtkRenderer.h"
 #include "vtkSelectionConverter.h"
 #include "vtkSelection.h"
 #include "vtkSelectionNode.h"
 #include "vtkShadowMapBakerPass.h"
+#include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkUnstructuredDataDeliveryFilter.h"
 
 //*****************************************************************************
@@ -242,6 +245,20 @@ int vtkGeometryRepresentation::RequestData(vtkInformation* request,
 
   if (inputVector[0]->GetNumberOfInformationObjects()==1)
     {
+    vtkInformation* inInfo =
+      inputVector[0]->GetInformationObject(0);
+    if (inInfo->Has(vtkStreamingDemandDrivenPipeline::WHOLE_EXTENT()))
+      {
+      vtkAlgorithmOutput* aout =
+        this->GetInternalOutputPort();
+      vtkPVTrivialProducer* prod = vtkPVTrivialProducer::SafeDownCast(
+        aout->GetProducer());
+      if (prod)
+        {
+        prod->SetWholeExtent(inInfo->Get(
+                               vtkStreamingDemandDrivenPipeline::WHOLE_EXTENT()));
+        }
+      }
     this->GeometryFilter->SetInputConnection(
       this->GetInternalOutputPort());
     this->CacheKeeper->Update();

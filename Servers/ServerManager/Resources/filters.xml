@@ -596,6 +596,18 @@ The Cell Data to Point Data filter averages the values of the cell attributes of
          If this property is set to 1, then the input cell data is passed through to the output; otherwise, only the generated point data will be available in the output.
        </Documentation>
      </IntVectorProperty>
+
+     <IntVectorProperty
+        name="PieceInvariant"
+        command="SetPieceInvariant"
+        number_of_elements="1"
+        default_values="0" >
+       <BooleanDomain name="bool"/>
+       <Documentation>
+         If the value of this property is set to 1, this filter will request ghost levels so that the values at boundary points match across processes. NOTE: Enabling this option might cause multiple executions of the data source because more information is needed to remove internal surfaces.
+       </Documentation>
+     </IntVectorProperty>
+
    <!-- End CellDataToPointData -->
    </SourceProxy>
 
