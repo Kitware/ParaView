@@ -23,6 +23,7 @@
 #include "vtkPen.h"
 #include "vtkTextProperty.h"
 #include "vtkDoubleArray.h"
+#include "vtkStringArray.h"
 
 #include "vtkstd/string"
 #include "vtksys/ios/sstream"
