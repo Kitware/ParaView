@@ -1135,6 +1135,13 @@ void pqXYChartOptionsEditor::applyAxisOptions()
   pqSMAdaptor::setMultipleElementProperty(
       proxy->GetProperty("AxisLabelsTop"), values);
 
+  // Force the update of these properties, assume they are always dirty as the
+  // axis does not retain this list when they render other label schemes.
+  proxy->UpdateProperty("AxisLabelsLeft", 1);
+  proxy->UpdateProperty("AxisLabelsBottom", 1);
+  proxy->UpdateProperty("AxisLabelsRight", 1);
+  proxy->UpdateProperty("AxisLabelsTop", 1);
+
   // Axis range
   values.clear();
   for(int i = 0; i < 4; ++i)
