@@ -129,6 +129,8 @@ int vtkPVDataRepresentation::RequestUpdateExtent(vtkInformation* request,
       sddp->SetUpdateExtent(inputVector[cc]->GetInformationObject(kk),
         controller->GetLocalProcessId(),
         controller->GetNumberOfProcesses(), /*ghost-levels*/ 0);
+      inputVector[cc]->GetInformationObject(kk)->Set(
+        vtkStreamingDemandDrivenPipeline::EXACT_EXTENT(), 1);
       if (this->UpdateTimeValid)
         {
         sddp->SetUpdateTimeSteps(
@@ -136,8 +138,6 @@ int vtkPVDataRepresentation::RequestUpdateExtent(vtkInformation* request,
           &this->UpdateTime, 1);
         }
       }
-    inputVector[0]->GetInformationObject(0)->Set(
-      vtkStreamingDemandDrivenPipeline::EXACT_EXTENT(), 1);
     }
 
   return 1;
