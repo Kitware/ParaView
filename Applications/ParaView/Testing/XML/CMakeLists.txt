@@ -42,6 +42,7 @@ SET (TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/ExTimeseries2.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/ExtractBlock.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/ExtractLevel.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/EyeDomeLighting.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/FindDataDialog.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/FFTOverTime.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/Flow.xml
@@ -133,6 +134,7 @@ SET (PlotEdges2_BREAK TRUE)
 SET (PropertyConversion1_BREAK TRUE)
 set (ReadXMLPolyDataFileSeries_BREAK TRUE)
 set (ExodusXML_BREAK TRUE)
+set (EyeDomeLighting_BREAK TRUE)
 SET (ComparativeVisPanel_BREAK TRUE)
 SET (SpreadSheet1_BREAK TRUE)
 SET (SPTimeseries_BREAK TRUE)

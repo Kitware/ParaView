@@ -4519,7 +4519,7 @@
      <!-- End TIFFSeriesReader -->
    </FileSeriesReaderProxy>
 
-   <SourceProxy name="XdmfReader" 
+   <SourceProxy name="XdmfReader"
                 class="vtkXdmfReader"
                 label="XDMF Reader">
      <Documentation

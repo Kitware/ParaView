@@ -1,0 +1,8 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="views">
+    <RenderViewProxy name="RenderViewWithEDL" class="vtkPVRenderViewWithEDL"
+        processes="client|renderserver|dataserver"
+        base_proxygroup="views" base_proxyname="RenderView">
+    </RenderViewProxy>
+  </ProxyGroup>
+</ServerManagerConfiguration>

@@ -149,6 +149,16 @@ public:
   void GetLastRenderedTile(vtkSynchronizedRenderers::vtkRawImage& tile);
 
   // Description:
+  // Obtains the composited depth-buffer from IceT and pushes it to the screen.
+  // This is only done when DepthOnly is true.
+  void PushIceTDepthBufferToScreen(const vtkRenderState* render_state);
+
+  // Description:
+  // Obtains the composited color-buffer from IceT and pushes it to the screen.
+  // This is only done when FixBackground is true.
+  void PushIceTColorBufferToScreen(const vtkRenderState* render_state);
+
+  // Description:
   // PhysicalViewport is the viewport in the current render-window where the
   // last-rendered-tile maps.
   vtkGetVector4Macro(PhysicalViewport, double);
@@ -175,16 +185,6 @@ protected:
   // Description:
   // Updates the IceT tile information during each render.
   void UpdateTileInformation(const vtkRenderState*);
-
-  // Description:
-  // Obtains the composited depth-buffer from IceT and pushes it to the screen.
-  // This is only done when DepthOnly is true.
-  void PushIceTDepthBufferToScreen(const vtkRenderState* render_state);
-
-  // Description:
-  // Obtains the composited color-buffer from IceT and pushes it to the screen.
-  // This is only done when FixBackground is true.
-  void PushIceTColorBufferToScreen(const vtkRenderState* render_state);
 
   vtkMultiProcessController *Controller;
   vtkPKdTree *KdTree;

@@ -45,6 +45,7 @@ vtkPVSynchronizedRenderer::vtkPVSynchronizedRenderer()
   this->Enabled = true;
   this->ImageReductionFactor = 1;
   this->Renderer = 0;
+  this->UseDepthBuffer = false;
   this->Mode = INVALID;
   this->CSSynchronizer = 0;
   this->ParallelSynchronizer = 0;
@@ -292,6 +293,22 @@ void vtkPVSynchronizedRenderer::SetRenderPass(vtkRenderPass* pass)
 
   vtkSetObjectBodyMacro(RenderPass, vtkRenderPass, pass);
   this->SetupPasses();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVSynchronizedRenderer::SetUseDepthBuffer(bool useDB)
+{
+  if (this->ParallelSynchronizer == 0)
+    {
+    return;
+    }
+
+  if (this->ParallelSynchronizer->IsA("vtkIceTSynchronizedRenderers") == 1)
+    {
+    vtkIceTSynchronizedRenderers *aux =
+                 (vtkIceTSynchronizedRenderers*)this->ParallelSynchronizer;
+    aux->SetUseDepthBuffer(useDB);
+    }
 }
 
 //----------------------------------------------------------------------------

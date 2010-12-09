@@ -47,6 +47,7 @@ public:
 
   vtkIceTCompositePass* IceTCompositePass;
   vtkRenderPass* DelegatePass;
+  bool UseDepthBuffer;
   virtual void Render(const vtkRenderState* render_state)
     {
     if (this->DelegatePass)
@@ -61,6 +62,10 @@ public:
       {
       glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
       this->Image.PushToFrameBuffer();
+      if (this->UseDepthBuffer)
+        {
+        this->IceTCompositePass->PushIceTDepthBufferToScreen(render_state);
+        }
       }
     glFinish();
     }
@@ -70,11 +75,17 @@ public:
     this->Image = image;
     }
 
+  void SetUseDepthBuffer(bool useDB)
+    {
+    this->UseDepthBuffer = useDB;
+    }
+
 protected:
   vtkMyImagePasterPass()
     {
     this->DelegatePass = NULL;
     this->IceTCompositePass = NULL;
+    this->UseDepthBuffer = false;
     }
   ~vtkMyImagePasterPass()
     {
@@ -256,6 +267,12 @@ void vtkIceTSynchronizedRenderers::SetImageProcessingPass(
     this->CameraRenderPass->SetAspectRatioOverride(1.0);
     this->Renderer->SetPass(this->CameraRenderPass);
     }
+}
+
+//----------------------------------------------------------------------------
+void vtkIceTSynchronizedRenderers::SetUseDepthBuffer(bool useDB)
+{
+  this->ImagePastingPass->SetUseDepthBuffer(useDB);
 }
 
 //----------------------------------------------------------------------------
