@@ -87,6 +87,10 @@ public:
   void ConfigureCompressor(const char* configuration);
   void SetLossLessCompression(bool);
 
+  // Description:
+  // Activates or de-activated the use of Depth Buffer in an ImageProcessingPass
+  void SetUseDepthBuffer(bool);
+
 //BTX
 protected:
   vtkPVSynchronizedRenderer();
@@ -116,6 +120,8 @@ protected:
   bool Enabled;
   int ImageReductionFactor;
   vtkRenderer* Renderer;
+
+  bool UseDepthBuffer;
 private:
   vtkPVSynchronizedRenderer(const vtkPVSynchronizedRenderer&); // Not implemented
   void operator=(const vtkPVSynchronizedRenderer&); // Not implemented
