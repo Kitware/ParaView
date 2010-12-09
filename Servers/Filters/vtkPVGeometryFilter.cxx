@@ -1104,6 +1104,10 @@ void vtkPVGeometryFilter::UnstructuredGridExecute(
 
     vtkSmartPointer<vtkIdTypeArray> facePtIds2OriginalPtIds;
 
+    VTK_CREATE(vtkUnstructuredGrid, inputClone);
+    inputClone->ShallowCopy(input);
+    input = inputClone;
+
     if (handleSubdivision)
       {
       // Use the vtkUnstructuredGridGeometryFilter to extract 2D surface cells
@@ -1111,9 +1115,7 @@ void vtkPVGeometryFilter::UnstructuredGridExecute(
       // wireframe in vtkPVRecoverGeometryWireframe.  Also, at the time of this
       // writing vtkDataSetSurfaceFilter only properly subdivides 2D cells past
       // level 1.
-      VTK_CREATE(vtkUnstructuredGrid, inputClone);
-      inputClone->ShallowCopy(input);
-      this->UnstructuredGridGeometryFilter->SetInput(inputClone);
+      this->UnstructuredGridGeometryFilter->SetInput(input);
 
       // Let the vtkUnstructuredGridGeometryFilter record from which point and
       // cell each face comes from in the standard vtkOriginalCellIds array.
@@ -1140,7 +1142,7 @@ void vtkPVGeometryFilter::UnstructuredGridExecute(
 
       // Keep a handle to the vtkOriginalPointIds array.  We might need it.
       facePtIds2OriginalPtIds = vtkIdTypeArray::SafeDownCast(
-                        input->GetPointData()->GetArray("vtkOriginalPointIds"));
+        input->GetPointData()->GetArray("vtkOriginalPointIds"));
 
       // Flag the data set surface filter to record original cell ids, but do it
       // in a specially named array that vtkPVRecoverGeometryWireframe will
