@@ -447,13 +447,21 @@ int vtkPVGeometryFilter::RequestData(vtkInformation* request,
   vtkPolyData *output = vtkPolyData::GetData(outputVector, 0);
   assert(output != NULL);
 
+  int procid = 0;
+  int numProcs = 1;
+  if (this->Controller )
+    {
+    procid = this->Controller->GetLocalProcessId();
+    numProcs = this->Controller->GetNumberOfProcesses();
+    }
+
   vtkInformation* outInfo = outputVector->GetInformationObject(0);
   this->ExecuteBlock(
     input,
     output,
     1,
-    this->Controller->GetLocalProcessId(),
-    this->Controller->GetNumberOfProcesses(),
+    procid,
+    numProcs,
     0);
   this->ExecuteCellNormals(output, 1);
   this->RemoveGhostCells(output);
