@@ -88,14 +88,15 @@ pqQueryDialog::pqQueryDialog(
   this->Internals->setupUi(this);
 
   this->Producer = NULL;
-  // Producer cannot be NULL.
-  Q_ASSERT(_producer != NULL);
 
   // Update the GUI
   this->Internals->source->setAutoUpdateIndex(false);
   this->Internals->source->fillExistingPorts();
-  this->Internals->source->setCurrentPort(_producer);
-  this->populateSelectionType();
+  if(_producer != NULL)
+    {
+    this->Internals->source->setCurrentPort(_producer);
+    this->populateSelectionType();
+    }
 
   // Ensure that there's only 1 clause
   this->resetClauses();
@@ -114,7 +115,7 @@ pqQueryDialog::pqQueryDialog(
     SIGNAL(clicked()), this, SLOT(runQuery()));
 
   // Setup the spreadsheet view.
-  this->setupSpreadSheet();
+  this->Internals->spreadsheet->setModel(NULL);
 
   // Link the selection color to the global selection color so that it will
   // affect all views, otherwise user may be get confused ;).
@@ -155,7 +156,6 @@ pqQueryDialog::pqQueryDialog(
     SIGNAL(changed(pqView*)),
     this, SLOT(onActiveViewChanged(pqView*)));
 
-  this->updateLabels();
   this->onSelectionChange(_producer);
 }
 
@@ -164,6 +164,7 @@ pqQueryDialog::~pqQueryDialog()
 {
   if(this->Internals)
     {
+    this->freeSMProxy();
     delete this->Internals;
     }
   this->Internals = 0;
@@ -306,6 +307,9 @@ void pqQueryDialog::runQuery()
     }
 
   selSource->UpdateVTKObjects();
+
+  this->setupSpreadSheet();
+
   this->Internals->source->currentPort()->setSelectionInput(
       vtkSMSourceProxy::SafeDownCast(selSource), 0);
   selSource->Delete();
@@ -505,9 +509,10 @@ void pqQueryDialog::linkLabelColorWidget( vtkSMProxy* proxy,
 //-----------------------------------------------------------------------------
 void pqQueryDialog::onSelectionChange(pqOutputPort* newSelectedPort)
 {
+
   // Reset the spreadsheet view
   this->resetClauses();
-  this->setupSpreadSheet();
+  this->freeSMProxy();
 
   if(this->Producer != NULL)
     {
@@ -543,7 +548,7 @@ void pqQueryDialog::onSelectionChange(pqOutputPort* newSelectedPort)
   else
     {
     // As no more datasource is available make sure that we free the ressources
-    this->freeSMProxyAndClose();
+    this->freeSMProxy();
     }
 }
 
@@ -637,18 +642,12 @@ void pqQueryDialog::onActiveViewChanged(pqView* view)
     }
 }
 //-----------------------------------------------------------------------------
-void pqQueryDialog::freeSMProxyAndClose()
+void pqQueryDialog::freeSMProxy()
 {
-  if (this->isVisible())
-    {
-    this->hide();
-
-    this->Internals->DataModel = NULL;
-    this->Internals->Links.removeAllPropertyLinks();
-    this->Internals->LabelColorLinks.removeAllPropertyLinks();
-    this->Internals->ViewProxy = NULL;
-    this->Internals->RepresentationProxy = NULL;
-
-    emit finished(1);
-    }
+  this->Internals->DataModel = NULL;
+  this->Internals->Links.removeAllPropertyLinks();
+  this->Internals->LabelColorLinks.removeAllPropertyLinks();
+  this->Internals->ViewProxy = NULL;
+  this->Internals->RepresentationProxy = NULL;
+  this->Internals->spreadsheet->setModel(NULL);
 }

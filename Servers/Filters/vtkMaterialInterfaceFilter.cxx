@@ -85,9 +85,14 @@ using vtkstd::string;
 // other
 #include "vtkMaterialInterfaceUtilities.hxx"
 
+//for paraview cliping
+#include "vtkPlane.h"
+#include "vtkSphere.h"
+
 class InitializeVolumeFractrionArray;
 
 vtkStandardNewMacro(vtkMaterialInterfaceFilter);
+vtkCxxSetObjectMacro(vtkMaterialInterfaceFilter,ClipFunction,vtkImplicitFunction);
 
 // NOTE:
 // The filter could be improved by folding in ResolveIntegratedAttributes method into
@@ -1677,6 +1682,7 @@ vtkMaterialInterfaceFilter::vtkMaterialInterfaceFilter()
   this->ProgressResolutionInc=0.0;
 
   // Crater extraction variables.
+  this->ClipFunction = 0;
   this->ClipCenter[0] = 0.0;
   this->ClipCenter[1] = 0.0;
   this->ClipCenter[2] = 0.0;
@@ -1703,6 +1709,8 @@ vtkMaterialInterfaceFilter::~vtkMaterialInterfaceFilter()
   this->FragmentVolume = 0.0;
   this->ClipDepthMax = 0.0;
   this->ClipDepthMin = VTK_LARGE_FLOAT;
+
+  this->SetClipFunction(0);
 
   CheckAndReleaseVtkPointer(this->ClipDepthMaximums);
   CheckAndReleaseVtkPointer(this->ClipDepthMinimums);
@@ -1752,6 +1760,23 @@ vtkMaterialInterfaceFilter::~vtkMaterialInterfaceFilter()
   this->ProgressMaterialInc=0.0;
   this->ProgressBlockInc=0.0;
   this->ProgressResolutionInc=0.0;
+}
+
+//----------------------------------------------------------------------------
+// Overload standard modified time function. If Clip functions is modified,
+// then this object is modified as well.
+unsigned long vtkMaterialInterfaceFilter::GetMTime()
+{
+  unsigned long mTime=this->Superclass::GetMTime();
+  unsigned long time;
+
+  if ( this->ClipFunction != NULL )
+    {
+    time = this->ClipFunction->GetMTime();
+    mTime = ( time > mTime ? time : mTime );
+    }
+
+  return mTime;
 }
 
 //----------------------------------------------------------------------------
@@ -1863,15 +1888,22 @@ int vtkMaterialInterfaceFilter::InitializeBlocks(
   this->InitializeBlocksTimer->StartTimer();
 #endif
 
+  //leaving this logic alone rather than moving it into the
+  //this->ClipFunction conditional because I don't know enought of the class to
+  //know how important the Clip* ivars are ( Robert Maynard, dec 1 2010).
   if (this->ClipWithPlane || this->ClipWithSphere)
     {
     sphere = new vtkMaterialInterfaceFilterHalfSphere;
     // Set up the implicit function for clipping.
-    this->GetClipCenter(sphere->Center);
+    sphere->Center[0] = this->ClipCenter[0];
+    sphere->Center[1] = this->ClipCenter[1];
+    sphere->Center[2] = this->ClipCenter[2];
     sphere->ClipWithSphere = this->ClipWithSphere;
     sphere->SphereRadius = this->ClipRadius;
     sphere->ClipWithPlane = this->ClipWithPlane;
-    this->GetClipPlaneVector(sphere->PlaneNormal);
+    sphere->PlaneNormal[0] = this->ClipPlaneVector[0];
+    sphere->PlaneNormal[1] = this->ClipPlaneVector[1];
+    sphere->PlaneNormal[2] = this->ClipPlaneVector[2];
     vtkMath::Normalize(sphere->PlaneNormal);
     }
 
@@ -3278,12 +3310,31 @@ int vtkMaterialInterfaceFilter::RequestData(
   this->NumberOfGhostBlocks = 0;
 #endif
 
-  if (this->ClipWithPlane)
-    { // For computing depth.
-    this->ClipPlaneNormal[0] = this->ClipPlaneVector[0];
-    this->ClipPlaneNormal[1] = this->ClipPlaneVector[1];
-    this->ClipPlaneNormal[2] = this->ClipPlaneVector[2];
-    vtkMath::Normalize(this->ClipPlaneNormal);
+ if (this->ClipFunction)
+    {
+    vtkSphere *s = vtkSphere::SafeDownCast(this->ClipFunction);
+    vtkPlane *p = vtkPlane::SafeDownCast(this->ClipFunction);
+    if ( s )
+      {
+      this->ClipWithSphere = 1;
+      this->ClipWithPlane = 0;
+      s->GetCenter(this->ClipCenter);
+      this->ClipRadius = s->GetRadius();
+      }
+    else if (p)
+      {
+      this->ClipWithSphere = 0;
+      this->ClipWithPlane = 1;
+      this->ClipRadius = 1;
+      p->GetOrigin(this->ClipCenter);
+      p->GetNormal(this->ClipPlaneVector);
+      p->GetNormal(this->ClipPlaneNormal);
+      vtkMath::Normalize(this->ClipPlaneNormal);
+      }
+    else
+      {
+      vtkErrorMacro("Only Sphere and Plane clip function currently supported.");
+      }
     }
 
   #ifdef vtkMaterialInterfaceFilterDEBUG
@@ -8247,7 +8298,7 @@ void vtkMaterialInterfaceFilter::PrepareForResolveEquivalences()
   // volume
   this->FragmentVolumes->Squeeze();
   // Clip depth
-  if (this->ClipWithPlane)
+  if (this->ClipWithPlane && this->ClipDepthMaximums)
     {
     this->ClipDepthMaximums->Squeeze();
     this->ClipDepthMinimums->Squeeze();

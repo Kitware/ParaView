@@ -2010,6 +2010,33 @@
      <!-- End JPEGReader -->
    </SourceProxy>
 
+
+  <SourceProxy name="TIFFReader"
+                class="vtkTIFFReader"
+                label="TIFF Reader">
+     <Documentation
+       short_help="Read a TIFF file."
+       long_help="Read a TIFF file into an image data.">
+       The TIFF reader reads TIFF (Tagged Image File Format) files, and the output is a uniform rectilinear (image/volume) dataset. The default file extension is .tiff.
+     </Documentation>
+     <StringVectorProperty
+        name="FileName"
+        animateable="0"
+        command="SetFileName"
+        number_of_elements="1">
+        <FileListDomain name="files"/>
+        <Documentation>
+          This property specifies the file name for the TIFF reader.
+        </Documentation>
+     </StringVectorProperty>
+
+     <Hints>
+      <ReaderFactory extensions="tif tiff"
+          file_description="TIFF Image Files"/>
+     </Hints>
+   <!-- End TIFFReader -->
+   </SourceProxy>
+
     <SourceProxy name="netCDFReaderCore"
                  class="vtkNetCDFCFReader">
 
@@ -3550,7 +3577,7 @@
      </DoubleVectorProperty>
 
       <Hints>
-       <ReaderFactory extensions="csv"
+       <ReaderFactory extensions="hscth"
            file_description="SpyPlot CTH history" />
       </Hints>
 
@@ -4442,6 +4469,56 @@
      <!-- End JPEGSeriesReader -->
    </FileSeriesReaderProxy>
 
+   <FileSeriesReaderProxy name="TIFFSeriesReader"
+                          class="vtkFileSeriesReader"
+                          label="TIFF Series Reader"
+                          file_name_method="SetFileName">
+     <Documentation
+       short_help="Read a series of TIFF files."
+       long_help="Read a series of TIFF files into an time sequence of image datas.">
+       The TIFF series reader reads TIFF files. The output is a time sequence of uniform
+       rectilinear (image/volume) dataset. The default file extension is .tif or .tiff.
+     </Documentation>
+
+     <StringVectorProperty
+        name="FileNames"
+        clean_command="RemoveAllFileNames"
+        command="AddFileName"
+        animateable="0"
+        number_of_elements="0"
+        repeat_command="1">
+        <FileListDomain name="files"/>
+       <Documentation>
+         The list of files to be read by the reader. If more than 1 file is specified,
+         the reader will switch to file series mode in which it will pretend that it
+         can support time and provide 1 file per time step.
+       </Documentation>
+     </StringVectorProperty>
+
+     <DoubleVectorProperty
+        name="TimestepValues"
+        repeatable="1"
+        information_only="1">
+        <TimeStepsInformationHelper/>
+        <Documentation>
+          Available timestep values.
+        </Documentation>
+     </DoubleVectorProperty>
+
+     <SubProxy>
+        <Proxy name="Reader"
+          proxygroup="internal_sources" proxyname="TIFFReader">
+        </Proxy>
+      </SubProxy>
+
+     <Hints>
+        <ReaderFactory extensions="tif tiff"
+          file_description="TIFF Image Files" />
+     </Hints>
+
+     <!-- End TIFFSeriesReader -->
+   </FileSeriesReaderProxy>
+
    <SourceProxy name="XdmfReader"
                 class="vtkXdmfReader"
                 label="XDMF Reader">
@@ -4709,6 +4786,7 @@
        <Property name="Refresh" show="0"/>
        <ReaderFactory
           extensions="g e ex2 ex2v2 exo gen exoII 0 00 000 0000 exii"
+          filename_patterns="*.e-s.*"
           file_description="ExodusII"/>
      </Hints>
      <!-- ExodusIIReader -->

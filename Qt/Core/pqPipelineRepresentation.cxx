@@ -383,6 +383,24 @@ void pqPipelineRepresentation::setDefaultPropertyValues()
         "Outline");
       }
     }
+  // Locate input display.
+  pqPipelineRepresentation* upstreamDisplay =
+    qobject_cast<pqPipelineRepresentation*>(
+      this->getRepresentationForUpstreamSource());
+  if (upstreamDisplay &&
+    vtkSMPropertyHelper(repr, "Representation").GetAsInt() == vtkSMPVRepresentationProxy::OUTLINE)
+    {
+    // try to preserve the upstream representation type (except for volume
+    // rendering).
+    int reprType = upstreamDisplay->getRepresentationType();
+    if (reprType != vtkSMPVRepresentationProxy::VOLUME)
+      {
+      pqSMAdaptor::setElementProperty(repr->GetProperty("Representation"),
+        reprType);
+      }
+    }
+
+
   if (repr->GetProperty("ScalarOpacityUnitDistance"))
     {
     double bounds[6];
@@ -419,11 +437,6 @@ void pqPipelineRepresentation::setDefaultPropertyValues()
   // update the input using the current application time.
   this->getInput()->updatePipeline();
   geomInfo = this->getInputDataInformation();
-
-  // Locate input display.
-  pqPipelineRepresentation* upstreamDisplay = 
-    qobject_cast<pqPipelineRepresentation*>(
-      this->getRepresentationForUpstreamSource());
   if (upstreamDisplay)
     {
     inGeomInfo = upstreamDisplay->getInputDataInformation();

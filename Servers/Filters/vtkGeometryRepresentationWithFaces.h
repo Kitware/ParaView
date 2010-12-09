@@ -78,8 +78,8 @@ protected:
   // Passes on parameters to vtkProperty and vtkMapper
   virtual void UpdateColoringParameters();
 
-  vtkCompositePolyDataMapper2* BackfaceMapper;
-  vtkCompositePolyDataMapper2* LODBackfaceMapper;
+  vtkMapper* BackfaceMapper;
+  vtkMapper* LODBackfaceMapper;
   vtkPVLODActor* BackfaceActor;
   vtkProperty* BackfaceProperty;
   int BackfaceRepresentation;

@@ -101,6 +101,12 @@ protected slots:
   void setAxisTitleColor(const QColor& color);
   void setAxisTitle(const QString& title);
 
+  void addAxisLabel();
+  void removeSelectedLabels();
+  void updateAxisLabels();
+  void showRangeDialog();
+  void generateAxisLabels();
+
   void pickTitleFont();
 
 private:

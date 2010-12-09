@@ -76,6 +76,19 @@
     <string>Change a Filter's Input</string>
    </property>
   </action>
+  <action name="actionCopy">
+   <property name="icon">
+    <iconset>
+     <normaloff/>
+    </iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Copy Properties</string>
+   </property>
+   <property name="statusTip">
+    <string>Copy properties</string>
+   </property>
+  </action>
   <action name="actionDelete">
    <property name="icon">
     <iconset>
@@ -146,6 +159,7 @@
   <addaction name="separator"/>
   <addaction name="actionQuery" />
   <addaction name="actionChangeInput"/>
+  <addaction name="actionCopy"/>
   <addaction name="actionIgnoreTime"/>
   <addaction name="actionDelete"/>
   <addaction name="actionDelete_All"/>

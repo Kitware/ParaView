@@ -596,6 +596,18 @@ The Cell Data to Point Data filter averages the values of the cell attributes of
          If this property is set to 1, then the input cell data is passed through to the output; otherwise, only the generated point data will be available in the output.
        </Documentation>
      </IntVectorProperty>
+
+     <IntVectorProperty
+        name="PieceInvariant"
+        command="SetPieceInvariant"
+        number_of_elements="1"
+        default_values="0" >
+       <BooleanDomain name="bool"/>
+       <Documentation>
+         If the value of this property is set to 1, this filter will request ghost levels so that the values at boundary points match across processes. NOTE: Enabling this option might cause multiple executions of the data source because more information is needed to remove internal surfaces.
+       </Documentation>
+     </IntVectorProperty>
+
    <!-- End CellDataToPointData -->
    </SourceProxy>
 
@@ -10404,68 +10416,21 @@ This property controls how the filter works to generate tensor cell data. You ca
        </Documentation>
      </IntVectorProperty>
 
-     <!-- Clip with a plane -->
-     <IntVectorProperty
-        name="ClipWithPlane"
-        command="SetClipWithPlane"
-        number_of_elements="1"
-        default_values="0" >
-       <BooleanDomain name="bool"/>
-       <Documentation>
-         This option masks all material on on side of a plane.  It is useful for
-         finding the properties of a crater.
-       </Documentation>
-     </IntVectorProperty>
-
-     <!-- Clip with a sphere -->
-     <IntVectorProperty
-        name="ClipWithSphere"
-        command="SetClipWithSphere"
-        number_of_elements="1"
-        default_values="0" >
-       <BooleanDomain name="bool"/>
-       <Documentation>
-         This option masks all material outside of a sphere.
-       </Documentation>
-     </IntVectorProperty>
-
-     <!-- Center of clipping sphere and plane -->
-     <DoubleVectorProperty
-        name="ClipCenter"
-        command="SetClipCenter"
-        number_of_elements="3"
-        animateable="1"
-        default_values="0.0 0.0 0.0" >
-       <DoubleRangeDomain name="range"/>
-       <Documentation>
-         This property specifies center of the clipping plane or sphere.
-       </Documentation>
-     </DoubleVectorProperty>
-
-     <!-- Sphere radius -->
-     <DoubleVectorProperty
-        name="ClipRadius"
-        command="SetClipRadius"
-        number_of_elements="1"
-        default_values="1.0" >
-       <DoubleRangeDomain name="range" min="0" />
-       <Documentation>
-         This property specifies the radius of the clipping sphere.
-       </Documentation>
-     </DoubleVectorProperty>
-
-     <!-- Clip plane vector -->
-     <DoubleVectorProperty
-        name="ClipPlaneVector"
-        command="SetClipPlaneVector"
-        number_of_elements="3"
-        animateable="1"
-        default_values="0.0 0.0 1.0" >
-       <DoubleRangeDomain name="range"/>
-       <Documentation>
-         This property specifies the normal of the clipping plane.
-       </Documentation>
-     </DoubleVectorProperty>
+     <ProxyProperty name="ClipFunction" command="SetClipFunction"
+        label="Clip Type">
+           <ProxyGroupDomain name="groups">
+              <Group name="implicit_functions"/>
+           </ProxyGroupDomain>
+           <ProxyListDomain name="proxy_list">
+              <Proxy group="implicit_functions" name="None" />
+              <Proxy group="implicit_functions" name="Plane" />
+              <Proxy group="implicit_functions" name="Sphere" />
+           </ProxyListDomain>
+           <Documentation>
+             This property sets the type of clip geometry, and
+             associated parameters.
+           </Documentation>
+     </ProxyProperty>
 
      <!-- Mass Array-->
      <StringVectorProperty

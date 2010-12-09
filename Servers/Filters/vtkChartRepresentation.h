@@ -66,6 +66,10 @@ public:
   virtual const char* GetSeriesName(int series);
 
   // Description:
+  // Force the chaty to rescale its axes.
+  virtual void RescaleChart();
+
+  // Description:
   // This needs to be called on all instances of vtkGeometryRepresentation when
   // the input is modified. This is essential since the geometry filter does not
   // have any real-input on the client side which messes with the Update

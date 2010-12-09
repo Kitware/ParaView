@@ -200,7 +200,6 @@ void vtkKdTreeManager::Update()
   this->KdTree->BuildLocator();
   //this->KdTree->PrintTree();
   this->UpdateTime.Modified();
-  this->KdTree->PrintTree();
 }
 
 //-----------------------------------------------------------------------------

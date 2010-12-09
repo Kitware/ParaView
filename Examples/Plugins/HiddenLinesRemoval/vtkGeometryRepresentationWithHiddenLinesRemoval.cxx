@@ -27,9 +27,13 @@ vtkGeometryRepresentationWithHiddenLinesRemoval::vtkGeometryRepresentationWithHi
     {
     // Replace the representation painter to the vtkVisibleLinesPainter,
     // so when rendering as wireframe, we remove the hidden lines.
+
+    vtkCompositePolyDataMapper2* compositeMapper =
+      vtkCompositePolyDataMapper2::SafeDownCast(this->Mapper);
+
     vtkVisibleLinesPainter* painter = vtkVisibleLinesPainter::New();
     vtkDefaultPainter* dfPainter = vtkDefaultPainter::SafeDownCast(
-      this->Mapper->GetPainter());
+      compositeMapper->GetPainter());
     dfPainter->SetRepresentationPainter(painter);
     painter->Delete();
 
@@ -42,9 +46,13 @@ vtkGeometryRepresentationWithHiddenLinesRemoval::vtkGeometryRepresentationWithHi
     {
     // Replace the representation painter to the vtkVisibleLinesPainter,
     // so when rendering as wireframe, we remove the hidden lines.
+
+    vtkCompositePolyDataMapper2* compositeMapper =
+      vtkCompositePolyDataMapper2::SafeDownCast(this->LODMapper);
+
     vtkVisibleLinesPainter* painter = vtkVisibleLinesPainter::New();
     vtkDefaultPainter* dfPainter = vtkDefaultPainter::SafeDownCast(
-      this->LODMapper->GetPainter());
+      compositeMapper->GetPainter());
     dfPainter->SetRepresentationPainter(painter);
     painter->Delete();
 

@@ -126,6 +126,18 @@ public:
     { return this->Superclass::AddToView(view); }
   virtual bool RemoveFromView(vtkView* view)
     { return this->Superclass::RemoveFromView(view); }
+
+  // Description:
+  // Retrieves an output port for the input data object at the specified port
+  // and connection index. This may be connected to the representation's
+  // internal pipeline.
+  // Overridden to use vtkPVTrivialProducer instead of vtkTrivialProducer
+  virtual vtkAlgorithmOutput* GetInternalOutputPort()
+    { return this->GetInternalOutputPort(0); }
+  virtual vtkAlgorithmOutput* GetInternalOutputPort(int port)
+    { return this->GetInternalOutputPort(port, 0); }
+  virtual vtkAlgorithmOutput* GetInternalOutputPort(int port, int conn);
+
 //BTX
 protected:
   vtkPVDataRepresentation();

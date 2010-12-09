@@ -14,11 +14,13 @@
 =========================================================================*/
 #include "vtkXMLPVAnimationWriter.h"
 
+#include "vtkCompleteArrays.h"
 #include "vtkDataSet.h"
 #include "vtkErrorCode.h"
 #include "vtkExecutive.h"
 #include "vtkInformation.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVDataRepresentation.h"
 #include "vtkSmartPointer.h"
 #include "vtkXMLWriter.h"
 
@@ -127,32 +129,25 @@ void vtkXMLPVAnimationWriter::AddInputInternal(const char* group)
 }
 
 //----------------------------------------------------------------------------
-void vtkXMLPVAnimationWriter::AddInputConnection(vtkAlgorithmOutput* ao, 
-                                                 const char* group)
+void vtkXMLPVAnimationWriter::AddRepresentation(vtkAlgorithm* repr,
+  const char* groupname)
 {
-  this->Superclass::AddInputConnection(ao);
-  this->AddInputInternal(group);
+  vtkPVDataRepresentation* pvrepr = vtkPVDataRepresentation::SafeDownCast(repr);
+  if (repr)
+    {
+    vtkCompleteArrays* complete_arrays = vtkCompleteArrays::New();
+    complete_arrays->SetInputConnection(
+      pvrepr->GetRenderedDataObject(0)->GetProducerPort());
+    this->AddInputConnection(complete_arrays->GetOutputPort());
+    this->AddInputInternal(groupname);
+    complete_arrays->Delete();
+    }
 }
 
 //----------------------------------------------------------------------------
-void vtkXMLPVAnimationWriter::AddInput(vtkDataSet* pd, const char* group)
+void vtkXMLPVAnimationWriter::RemoveAllRepresentations()
 {
-  // Add the input to the pipeline structure.
-  this->Superclass::AddInput(pd);
-  
-  this->AddInputInternal(group);
-}
-
-//----------------------------------------------------------------------------
-void vtkXMLPVAnimationWriter::AddInput(vtkDataSet* ds)
-{
-  this->AddInput(ds, "");
-}
-
-//----------------------------------------------------------------------------
-void vtkXMLPVAnimationWriter::AddInput(vtkDataObject* d)
-{
-  this->Superclass::AddInput(d);
+  this->RemoveAllInputs();
 }
 
 //----------------------------------------------------------------------------

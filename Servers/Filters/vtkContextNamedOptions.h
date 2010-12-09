@@ -78,6 +78,7 @@ public:
   // Description:
   // Sets the internal chart object whose options will be manipulated.
   void SetChart(vtkChart* chart);
+  vtkChart * GetChart();
 //ETX
 
 
@@ -85,7 +86,6 @@ public:
   // Sets the internal table object that can be plotted.
   void SetTable(vtkTable* table);
   vtkTable* GetTable();
-
 
   void RemovePlotsFromChart();
 

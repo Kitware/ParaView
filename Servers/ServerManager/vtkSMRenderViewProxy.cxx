@@ -101,6 +101,7 @@ vtkStandardNewMacro(vtkSMRenderViewProxy);
 //----------------------------------------------------------------------------
 vtkSMRenderViewProxy::vtkSMRenderViewProxy()
 {
+  this->IsSelectionCached = false;
 }
 
 //----------------------------------------------------------------------------
@@ -475,6 +476,23 @@ void vtkSMRenderViewProxy::ResetCamera(double bounds[6])
 }
 
 //-----------------------------------------------------------------------------
+void vtkSMRenderViewProxy::MarkDirty(vtkSMProxy* modifiedProxy)
+{
+  if (this->IsSelectionCached)
+    {
+    this->IsSelectionCached = false;
+    // cout << "InvalidateCachedSelection" << endl;
+    vtkClientServerStream stream;
+    stream << vtkClientServerStream::Invoke
+      << this->GetID()
+      << "InvalidateCachedSelection"
+      << vtkClientServerStream::End;
+    vtkProcessModule::GetProcessModule()->SendStream(
+      this->ConnectionID, this->Servers, stream);
+    }
+}
+
+//-----------------------------------------------------------------------------
 vtkSMRepresentationProxy* vtkSMRenderViewProxy::Pick(int x, int y)
 {
   // 1) Create surface selection.
@@ -507,6 +525,7 @@ bool vtkSMRenderViewProxy::SelectSurfaceCells(int region[4],
     return false;
     }
 
+  this->IsSelectionCached = true;
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   vtkClientServerStream stream;
   stream << vtkClientServerStream::Invoke
@@ -530,6 +549,7 @@ bool vtkSMRenderViewProxy::SelectSurfacePoints(int region[4],
     return false;
     }
 
+  this->IsSelectionCached = true;
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   vtkClientServerStream stream;
   stream << vtkClientServerStream::Invoke
@@ -753,13 +773,13 @@ bool vtkSMRenderViewProxy::SelectFrustumInternal(int region[4],
 //----------------------------------------------------------------------------
 vtkImageData* vtkSMRenderViewProxy::CaptureWindowInternal(int magnification)
 {
-  vtkRenderWindow* window = this->GetRenderWindow();
   vtkPVRenderView* view =
     vtkPVRenderView::SafeDownCast(this->GetClientSideObject());
 
   // Offscreen rendering is not functioning properly on the mac.
   // Do not use it.
 #if !defined(__APPLE__)
+  vtkRenderWindow* window = this->GetRenderWindow();
   int prevOffscreen = window->GetOffScreenRendering();
   bool use_offscreen = view->GetUseOffscreenRendering() ||
     view->GetUseOffscreenRenderingForScreenshots();
@@ -819,6 +839,14 @@ vtkImageData* vtkSMRenderViewProxy::CaptureWindowInternal(int magnification)
   capture->ShallowCopy(w2i->GetOutput());
   this->GetRenderWindow()->Frame();
   return capture;
+}
+
+//----------------------------------------------------------------------------
+double vtkSMRenderViewProxy::GetZBufferValue(int x, int y)
+{
+  vtkPVRenderView* rv = vtkPVRenderView::SafeDownCast(
+    this->GetClientSideObject());
+  return rv? rv->GetZbufferDataAtPoint(x, y) : 1.0;
 }
 
 //----------------------------------------------------------------------------

@@ -62,6 +62,7 @@ public:
       this->Target->SetForceInteractiveRender(false);
       this->Target->InvokeEvent(
         vtkPVGenericRenderWindowInteractor::EndDelayNonInteractiveRenderEvent);
+      this->Target->Render();
       }
     }
 

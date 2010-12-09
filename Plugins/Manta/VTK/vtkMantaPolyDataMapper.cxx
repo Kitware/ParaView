@@ -428,7 +428,7 @@ void vtkMantaPolyDataMapper::DrawPolygons(vtkPolyData *polys,
         }
       }
     //cerr << "polygons: # of triangles = " << total_triangles << endl;
-    
+
     // TODO: memory leak, wald_triangle is not deleted
     Manta::WaldTriangle *wald_triangle = new Manta::WaldTriangle[total_triangles];
     for ( int i = 0; i < total_triangles; i ++ )
@@ -841,7 +841,7 @@ void vtkMantaPolyDataMapper::Draw(vtkRenderer *renderer, vtkActor *actor)
     double coord[3];
     vtkIdType cell;
     Manta::Vector noTC(0.0,0.0,0.0);
-    while (cell = ca->GetNextCell(npts, pts))
+    while ((cell = ca->GetNextCell(npts, pts)))
       {
       //TODO: Make option to scale pointsize by scalar
       
@@ -870,7 +870,7 @@ void vtkMantaPolyDataMapper::Draw(vtkRenderer *renderer, vtkActor *actor)
     double coord1[3];
     vtkIdType cell;
     Manta::Vector noTC(0.0,0.0,0.0);
-    while (cell = ca->GetNextCell(npts, pts))
+    while ((cell = ca->GetNextCell(npts, pts)))
       {
       ptarray->GetPoint(pts[0], coord0);
       for (vtkIdType i = 1; i < npts; i++)

@@ -37,6 +37,16 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
+  // Set this flag to true before calling Initialize() to disable using
+  // vtkIceTSynchronizedRenderers for parallel rendering.
+  vtkSetMacro(DisableIceT, bool);
+  vtkGetMacro(DisableIceT, bool);
+
+  // Description:
+  // Must be called once to initialize the class.
+  void Initialize();
+
+  // Description:
   // kd tree that gives processes ordering. Initial value is a NULL pointer.
   // This is used only when UseOrderedCompositing is true.
   void SetKdTree(vtkPKdTree *kdtree);
@@ -118,6 +128,7 @@ protected:
 
   ModeEnum Mode;
   bool Enabled;
+  bool DisableIceT;
   int ImageReductionFactor;
   vtkRenderer* Renderer;
 

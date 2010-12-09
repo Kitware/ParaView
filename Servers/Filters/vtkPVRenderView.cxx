@@ -266,6 +266,8 @@ void vtkPVRenderView::Initialize(unsigned int id)
   this->SynchronizedWindows->AddRenderWindow(id, this->RenderView->GetRenderWindow());
   this->SynchronizedWindows->AddRenderer(id, this->RenderView->GetRenderer());
   this->SynchronizedWindows->AddRenderer(id, this->GetNonCompositedRenderer());
+
+  this->SynchronizedRenderers->Initialize();
   this->SynchronizedRenderers->SetRenderer(this->RenderView->GetRenderer());
 
   this->Superclass::Initialize(id);
@@ -611,13 +613,13 @@ void vtkPVRenderView::Render(bool interactive, bool skip_rendering)
 
     // Do the vtkView::REQUEST_INFORMATION() pass.
     this->GatherRepresentationInformation();
+
+    // Gather information about geometry sizes from all representations.
+    this->GatherGeometrySizeInformation();
     }
 
   // Use loss-less image compression for client-server for full-res renders.
   this->SynchronizedRenderers->SetLossLessCompression(!interactive);
-
-  // Gather information about geometry sizes from all representations.
-  this->GatherGeometrySizeInformation();
 
   bool use_lod_rendering = interactive? this->GetUseLODRendering() : false;
   this->SetRequestLODRendering(use_lod_rendering);
@@ -644,27 +646,26 @@ void vtkPVRenderView::Render(bool interactive, bool skip_rendering)
   // Build the request for REQUEST_PREPARE_FOR_RENDER().
   this->SetRequestDistributedRendering(use_distributed_rendering);
 
-  if (in_tile_display_mode)
+  if ( (in_tile_display_mode || interactive) &&
+    this->GetDeliverOutlineToClient())
     {
-    if (this->GetDeliverOutlineToClient())
-      {
-      this->RequestInformation->Remove(DELIVER_LOD_TO_CLIENT());
-      this->RequestInformation->Set(DELIVER_OUTLINE_TO_CLIENT(), 1);
-      }
-    else
-      {
-      this->RequestInformation->Remove(DELIVER_OUTLINE_TO_CLIENT());
-      this->RequestInformation->Set(DELIVER_LOD_TO_CLIENT(), 1);
-      }
+    this->RequestInformation->Remove(DELIVER_LOD_TO_CLIENT());
+    this->RequestInformation->Set(DELIVER_OUTLINE_TO_CLIENT(), 1);
     }
-  else if (in_cave_mode)
+  else
     {
+    this->RequestInformation->Remove(DELIVER_OUTLINE_TO_CLIENT());
+    this->RequestInformation->Set(DELIVER_LOD_TO_CLIENT(), 1);
+    }
+
+  if (in_cave_mode)
+    {
+    // FIXME: This isn't supported currently.
     this->RequestInformation->Set(DELIVER_LOD_TO_CLIENT(), 1);
     }
   else
     {
     this->RequestInformation->Remove(DELIVER_LOD_TO_CLIENT());
-    this->RequestInformation->Remove(DELIVER_OUTLINE_TO_CLIENT());
     }
 
   // In REQUEST_PREPARE_FOR_RENDER, this view expects all representations to
@@ -970,6 +971,23 @@ void vtkPVRenderView::UpdateCenterAxes(double bounds[6])
 }
 
 //----------------------------------------------------------------------------
+double vtkPVRenderView::GetZbufferDataAtPoint(int x, int y)
+{
+  bool in_tile_display_mode = this->InTileDisplayMode();
+  bool in_cave_mode = this->SynchronizedWindows->GetIsInCave();
+  if (in_tile_display_mode || in_cave_mode)
+    {
+    return this->GetRenderWindow()->GetZbufferDataAtPoint(x, y);
+    }
+
+  // Note, this relies on the fact that the most-recent render must have updated
+  // the enabled state on  the vtkPVSynchronizedRenderWindows correctly based on
+  // whether remote rendering was needed or not.
+  return this->SynchronizedWindows->GetZbufferDataAtPoint(x, y,
+    this->GetIdentifier());
+}
+
+//----------------------------------------------------------------------------
 void vtkPVRenderView::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
@@ -980,6 +998,12 @@ void vtkPVRenderView::PrintSelf(ostream& os, vtkIndent indent)
 void vtkPVRenderView::ConfigureCompressor(const char* configuration)
 {
   this->SynchronizedRenderers->ConfigureCompressor(configuration);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::InvalidateCachedSelection()
+{
+  this->Selector->Modified();
 }
 
 //*****************************************************************

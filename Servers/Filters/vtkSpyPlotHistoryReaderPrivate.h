@@ -23,13 +23,11 @@
 #ifndef __vtkSpyPlotHistoryReaderPrivate_h
 #define __vtkSpyPlotHistoryReaderPrivate_h
 
-#include <vtkstd/map>
-#include <vtkstd/set>
-#include <vtkstd/vector>
-#include <vtkstd/string>
-#include <iostream>
-#include <sstream>
-#include <fstream>
+#include <vtkstd/map> // Needed for STL map.
+#include <vtkstd/set> // Needed for STL set.
+#include <vtkstd/vector> // Needed for STL vector.
+#include <vtkstd/string> // Needed for STL string.
+#include <sstream> // Needed for STL sstream.
 
 //-----------------------------------------------------------------------------
 namespace SpyPlotHistoryReaderPrivate
@@ -42,6 +40,15 @@ namespace SpyPlotHistoryReaderPrivate
     double time;
     std::streampos file_pos;
   };
+
+  //========================================================================
+  template<class T>
+  bool convert(const std::string &num, T &t)
+  {
+    std::istringstream i(num);
+    i >> t;
+    return !i.fail();
+  }
 
   //========================================================================
   void trim(std::string& string,const std::string& whitespace = " \t\"")
@@ -59,15 +66,17 @@ namespace SpyPlotHistoryReaderPrivate
   }
 
   //========================================================================
-  std::string rowFromHeaderCol(const std::string &str)
+  int rowFromHeaderCol(const std::string &str)
   {
       const size_t begin = str.rfind(".");
       if (begin == std::string::npos)
       {
-          // no content
-          return "";
+          // no content, so invalid row Id
+          return -1;
       }
-      return str.substr(begin);
+      int row = -1;
+      bool valid = convert(str.substr(begin+1),row);
+      return (valid)?row:-1;
   }
 
   //========================================================================
@@ -151,17 +160,8 @@ void getTimeStepInfo(const std::string &s, const char &delim,
 }
 
   //========================================================================
-  template<class T>
-  bool convert(const std::string &num, T &t)
-  {
-    std::istringstream i(num);
-    i >> t;
-    return !i.fail();
-  }
-
-  //========================================================================
   std::vector<std::string> createTableLayoutFromHeader(std::string &header,
-                    const char& delim, std::set<int> &headerRowIndexes,
+                    const char& delim, std::map<int,int> &columnIndexToRowId,
                     std::map<int,std::string> &fieldCols)
   {
     //the single presumption we have is that all the properties points
@@ -177,7 +177,7 @@ void getTimeStepInfo(const std::string &s, const char &delim,
 
     //find the first "." variable
     bool foundStart = false;
-    std::string rowNumber;
+    int rowNumber = -1;
     int index=0, row=0;
 
     for (it = cols.begin(); it != cols.end(); ++it)
@@ -187,7 +187,7 @@ void getTimeStepInfo(const std::string &s, const char &delim,
         foundStart = true;
         rowNumber = rowFromHeaderCol(*it);
         newHeader.push_back(nameFromHeaderCol(*it));
-        headerRowIndexes.insert(index);
+        columnIndexToRowId.insert(std::pair<int,int>(index,rowNumber));
         break;
         }
       else
@@ -215,9 +215,9 @@ void getTimeStepInfo(const std::string &s, const char &delim,
       ++it;
       ++numberOfCols;
       }
-    while(it != cols.end() && rowFromHeaderCol(*it) != "")
+    while(it != cols.end() && (rowNumber=rowFromHeaderCol(*it)) != -1)
       {
-      headerRowIndexes.insert(index);
+      columnIndexToRowId.insert(std::pair<int,int>(index,rowNumber));
       index += numberOfCols;
       it += numberOfCols;
       }

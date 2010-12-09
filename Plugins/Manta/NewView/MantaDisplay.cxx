@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -39,7 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqDisplayPanel.h"
 #include "pqPropertyLinks.h"
 
-#include "vtkSMMantaRepresentation.h"
+#include "vtkSMPVRepresentationProxy.h"
 #include "pqMantaView.h"
 #include "pqSignalAdaptors.h"
 
@@ -48,7 +48,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 using namespace std;
 
 class MantaDisplay::pqInternal
-{  
+{
 public:
   Ui::MantaDisplay ui;
   pqPropertyLinks links;
@@ -67,7 +67,7 @@ MantaDisplay::MantaDisplay(pqDisplayPanel* panel)
   l->addWidget(frame);
 
   pqRepresentation *rep = panel->getRepresentation();
-  vtkSMMantaRepresentation *mrep = vtkSMMantaRepresentation::SafeDownCast
+  vtkSMPVRepresentationProxy *mrep = vtkSMPVRepresentationProxy::SafeDownCast
     (rep->getProxy());
   if (!mrep)
     {
@@ -75,53 +75,53 @@ MantaDisplay::MantaDisplay(pqDisplayPanel* panel)
     }
   vtkSMProperty *prop = mrep->GetProperty("MaterialType");
   //have to use a helper class because pqPropertyLinks won't map directly
-  this->Internal->strAdapt = 
+  this->Internal->strAdapt =
     new pqSignalAdaptorComboBox(this->Internal->ui.material);
   this->Internal->links.addPropertyLink(
-    this->Internal->strAdapt, 
+    this->Internal->strAdapt,
     "currentText",
     SIGNAL(currentTextChanged(const QString&)),
-    mrep, 
+    mrep,
     prop);
 
   prop = mrep->GetProperty("Reflectance");
   this->Internal->links.addPropertyLink(
-    this->Internal->ui.reflectance, 
+    this->Internal->ui.reflectance,
     "value",
     SIGNAL(valueChanged(double)),
-    mrep, 
+    mrep,
     prop);
 
   prop = mrep->GetProperty("Thickness");
   this->Internal->links.addPropertyLink(
-    this->Internal->ui.thickness, 
+    this->Internal->ui.thickness,
     "value",
     SIGNAL(valueChanged(double)),
-    mrep, 
+    mrep,
     prop);
 
   prop = mrep->GetProperty("Eta");
   this->Internal->links.addPropertyLink(
-    this->Internal->ui.eta, 
+    this->Internal->ui.eta,
     "value",
     SIGNAL(valueChanged(double)),
-    mrep, 
+    mrep,
     prop);
 
   prop = mrep->GetProperty("N");
   this->Internal->links.addPropertyLink(
-    this->Internal->ui.n, 
+    this->Internal->ui.n,
     "value",
     SIGNAL(valueChanged(double)),
-    mrep, 
+    mrep,
     prop);
 
   prop = mrep->GetProperty("Nt");
   this->Internal->links.addPropertyLink(
-    this->Internal->ui.nt, 
+    this->Internal->ui.nt,
     "value",
     SIGNAL(valueChanged(double)),
-    mrep, 
+    mrep,
     prop);
 }
 
@@ -131,5 +131,3 @@ MantaDisplay::~MantaDisplay()
   delete this->Internal->strAdapt;
   delete this->Internal;
 }
-
-

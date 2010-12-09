@@ -1,95 +1,103 @@
 #include "vtkCylinderSource.h"
-#include "vtkPolyDataMapper.h"
-#include "vtkProperty.h"
+#include "vtkMantaPolyDataMapper.h"
+#include "vtkMantaProperty.h"
 #include "vtkRenderWindow.h"
-#include "vtkCamera.h"
-#include "vtkActor.h"
 #include "vtkRenderer.h"
+#include "vtkMantaCamera.h"
+#include "vtkMantaActor.h"
+#include "vtkMantaRenderer.h"
 #include "vtkRenderWindowInteractor.h"
 
 double lamp_black[]     = {0.1800, 0.2800, 0.2300};
 
 int main()
 {
-    //
-    // Next we create an instance of vtkCylinderSource and set some of its
-    // properties. The instance of vtkCylinderSource "Cylinder" is part of a
-    // visualization pipeline (it is a source process object); it produces data
-    // (output type is vtkPolyData) which other filters may process.
-    //
-    vtkCylinderSource *Cylinder = vtkCylinderSource::New();
-    Cylinder->SetHeight(3.0);
-    Cylinder->SetRadius(1.0);
-    Cylinder->SetResolution(5);
 
-    //
-    // In this example we terminate the pipeline with a mapper process object.
-    // (Intermediate filters such as vtkShrinkPolyData could be inserted in
-    // between the source and the mapper.)  We create an instance of
-    // vtkPolyDataMapper to map the polygonal data into graphics primitives. We
-    // connect the output of the Cylinder souece to the input of this mapper.
-    //
-    vtkPolyDataMapper *CylinderMapper = vtkPolyDataMapper::New();
-    CylinderMapper->SetInputConnection(Cylinder->GetOutputPort());
+  vtkCylinderSource *source1 = vtkCylinderSource::New();
+  source1->SetHeight(3.0);
+  source1->SetRadius(1.0);
+  source1->SetCenter(1,1,1);
+  source1->SetResolution(5);
 
-    //
-    // Create an actor to represent the Cylinder. The actor orchestrates rendering
-    // of the mapper's graphics primitives. An actor also refers to properties
-    // via a vtkProperty instance, and includes an internal transformation
-    // matrix. We set this actor's mapper to be CylinderMapper which we created
-    // above.
-    //
-    vtkActor *CylinderActor = vtkActor::New();
-    CylinderActor->SetMapper(CylinderMapper);
+  vtkPolyDataMapper *mapper1 = vtkPolyDataMapper::New();
+  mapper1->SetInputConnection(source1->GetOutputPort());
 
-    vtkProperty *CylinderProperty = CylinderActor->GetProperty();
-    CylinderProperty->SetColor(1.0, 0.3882, 0.2784);
-    CylinderProperty->SetDiffuse(0.7);
-    CylinderProperty->SetSpecular(0.4);
-    CylinderProperty->SetSpecularPower(20);
-    CylinderProperty->SetInterpolationToFlat();
-    CylinderActor->SetProperty(CylinderProperty);
+  vtkActor *actor1 = vtkActor::New();
+  actor1->SetMapper(mapper1);
 
-    //
-    // Create the Renderer and assign actors to it. A renderer is like a
-    // viewport. It is part or all of a window on the screen and it is
-    // responsible for drawing the actors it has.  We also set the background
-    // color here.
-    //
-    vtkRenderer *renderer= vtkRenderer::New();
-    renderer->AddActor(CylinderActor);
-    renderer->SetBackground(0.1, 0.2, 0.4);
+  vtkProperty *property1 = actor1->GetProperty();
+  property1->SetColor(0.0, 1.0, 0.0);
+  property1->SetDiffuse(0.7);
+  property1->SetSpecular(0.4);
+  property1->SetSpecularPower(20);
+  property1->SetInterpolationToFlat();
+  actor1->SetProperty(property1);
 
-    vtkCamera *camera = vtkCamera::New();
-    renderer->SetActiveCamera(camera);
-    renderer->ResetCamera();
+  vtkRenderer *glrenderer= vtkRenderer::New();
+  glrenderer->SetBackground(0.0, 0.0, 0.0);
+  //glrenderer->EraseOff();
+  glrenderer->AddActor(actor1);
 
-    //
-    // Finally we create the render window which will show up on the screen.
-    // We put our renderer into the render window using AddRenderer. We also
-    // set the size to be 300 pixels by 300.
-    //
-    vtkRenderWindow *renWin = vtkRenderWindow::New();
-    //vtkRenderWindow *renWin = vtkRenderWindow::New();
-    renWin->AddRenderer(static_cast<vtkRenderer*>(renderer));
-    renWin->SetSize(480, 480);
+  vtkCylinderSource *source2 = vtkCylinderSource::New();
+  source2->SetHeight(3.0);
+  source2->SetRadius(1.0);
+  source2->SetResolution(5);
 
-    vtkRenderWindowInteractor *iren = vtkRenderWindowInteractor::New();
-    //vtkRenderWindowInteractor *iren = vtkRenderWindowInteractor::New();
-    iren->SetRenderWindow(renWin);
+  vtkMantaPolyDataMapper *mapper2 = vtkMantaPolyDataMapper::New();
+  mapper2->SetInputConnection(source2->GetOutputPort());
 
-    renWin->Render();
+  vtkMantaActor *actor2 = vtkMantaActor::New();
+  actor2->SetMapper(mapper2);
 
-    iren->Start();
+  vtkProperty *property2 = actor2->GetProperty();
+  property2->SetColor(1.0, 0.3882, 0.2784);
+  property2->SetDiffuse(0.7);
+  property2->SetSpecular(0.4);
+  property2->SetSpecularPower(20);
+  property2->SetInterpolationToFlat();
+  actor2->SetProperty(property2);
 
-    // clean up
-    Cylinder->Delete();
-    CylinderMapper->Delete();
-    CylinderActor->Delete();
-    camera->Delete();
-    renderer->Delete();
-    renWin->Delete();
-    iren->Delete();
+  vtkMantaRenderer *mantarenderer= vtkMantaRenderer::New();
+  mantarenderer->AddActor(actor2);
+  mantarenderer->SetBackground(0.1, 0.2, 0.4);
 
-    return 0;
+  vtkMantaCamera *camera = vtkMantaCamera::New();
+/*
+  mantarenderer->SetActiveCamera(camera);
+  mantarenderer->ResetCamera();
+*/
+
+  vtkRenderWindow *renWin = vtkRenderWindow::New();
+  renWin->SetSize(480, 480);
+
+  renWin->SetNumberOfLayers(2);
+
+  renWin->AddRenderer(mantarenderer);
+  mantarenderer->SetLayer(0);
+  mantarenderer->SetViewport(0,0,0.5,0.5);
+
+  renWin->AddRenderer(glrenderer);
+  glrenderer->SetLayer(1);
+  glrenderer->SetViewport(0.1,0.1,1.0,1.0);
+
+  vtkRenderWindowInteractor *iren = vtkRenderWindowInteractor::New();
+  iren->SetRenderWindow(renWin);
+
+  renWin->Render();
+
+  iren->Start();
+
+  source1->Delete();
+  source2->Delete();
+  mapper1->Delete();
+  mapper2->Delete();
+  actor1->Delete();
+  actor2->Delete();
+  camera->Delete();
+  glrenderer->Delete();
+  mantarenderer->Delete();
+  renWin->Delete();
+  iren->Delete();
+
+  return 0;
 }

@@ -215,10 +215,8 @@ vtkSpreadSheetView::vtkSpreadSheetView()
   this->DeliveryFilter->SetProcessModuleConnection(
     vtkProcessModule::GetProcessModule()->GetActiveRemoteConnection());
 
-  this->TableSelectionMarker->SetInputConnection(
-    this->TableStreamer->GetOutputPort());
   this->ReductionFilter->SetInputConnection(
-    this->TableSelectionMarker->GetOutputPort());
+    this->TableStreamer->GetOutputPort());
 
   this->Internals = new vtkInternals();
   this->Internals->MostRecentlyAccessedBlock = -1;
@@ -329,8 +327,10 @@ int vtkSpreadSheetView::StreamToClient()
   vtkAlgorithmOutput* dataPort = vtkGetDataProducer(this, cur);
   vtkAlgorithmOutput* selectionPort = vtkGetSelectionProducer(this, cur);
 
-  this->TableStreamer->SetInputConnection(dataPort);
+  this->TableSelectionMarker->SetInputConnection(0, dataPort);
   this->TableSelectionMarker->SetInputConnection(1, selectionPort);
+  this->TableStreamer->SetInputConnection(
+      this->TableSelectionMarker->GetOutputPort());
   if (dataPort)
     {
     dataPort->GetProducer()->Update();

@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkSMMantaBatchViewProxy.h
+  Module:    vtkSMMantaViewProxy.h
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -15,7 +15,7 @@
 /*=========================================================================
 
   Program:   VTK/ParaView Los Alamos National Laboratory Modules (PVLANL)
-  Module:    vtkSMMantaBatchViewProxy.h
+  Module:    vtkSMMantaViewProxy.h
 
 Copyright (c) 2007, Los Alamos National Security, LLC
 
@@ -58,40 +58,26 @@ OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-// .NAME vtkMantaBatchViewProxy - batch view setup for vtkManta
+// .NAME vtkMantaViewProxy - view setup for vtkManta
 // .SECTION Description
-// A Composite View that sets up the batch display pipeline so that it
-// works with manta. It differs from vtkSMMantaParallelViewProxy in that it
-// lacks any client server delivery so that it can be used by pvbatch.
+// A  View that sets up the display pipeline so that it works with manta.
+// This class causes manta specific representations to be created and
+// also initializes the client server wrapped vtkManta library for
+// paraview.
 
-#ifndef __vtkSMMantaBatchViewProxy_h
-#define __vtkSMMantaBatchViewProxy_h
+#ifndef __vtkSMMantaViewProxy_h
+#define __vtkSMMantaViewProxy_h
 
-#include "vtkSMIceTCompositeViewProxy.h"
+#include "vtkSMRenderViewProxy.h"
 
 class vtkSMRepresentationProxy;
 
-class vtkSMMantaBatchViewProxy : public vtkSMIceTCompositeViewProxy
+class VTK_EXPORT vtkSMMantaViewProxy : public vtkSMRenderViewProxy
 {
 public:
-  static vtkSMMantaBatchViewProxy* New();
-  vtkTypeMacro(vtkSMMantaBatchViewProxy, vtkSMIceTCompositeViewProxy);
+  static vtkSMMantaViewProxy* New();
+  vtkTypeMacro(vtkSMMantaViewProxy, vtkSMRenderViewProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
-
-  // Description:
-  //Controls number of render threads.
-  virtual void SetThreads(int val);
-  vtkGetMacro(Threads, int);
-
-  // Description:
-  // Parameters that controls ray tracing quality
-  // Defaults are for minimal quality and maximal speed.
-  virtual void SetEnableShadows(int val);
-  vtkGetMacro(EnableShadows, int);
-  virtual void SetSamples(int val);
-  vtkGetMacro(Samples, int);
-  virtual void SetMaxDepth(int val);
-  vtkGetMacro(MaxDepth, int);
 
   // Description:
   // Create a default representation for the given output port of source proxy.
@@ -100,59 +86,20 @@ public:
     vtkSMProxy*, int opport);
 
   // Description:
-  // Checks if color depth is sufficient to support selection.
-  // If not, will return 0 and any calls to SelectVisibleCells will
-  // quietly return an empty selection.
-  virtual bool IsSelectionAvailable() { return false;}
+  virtual bool IsSelectionAvailable() { return false; }
 
-  // Description:
-  // Overridden to prevent client side rendering, which isn't ray traced yet, and
-  // because switching back and forth has issues.
-  virtual void SetRemoteRenderThreshold(double )
-  {
-    this->RemoteRenderThreshold = 0.0;
-  }
 
-  // Description:
-  // Overridden to prevent LOD, since that causes rebuilds of the accel structure
-  // on every frame.
-  virtual void SetLODThreshold(double)
-  {
-    this->LODThreshold = 100000.0;
-  }
 //BTX
-
-  // Description:
-  // Overridden to choose the correct class for the render view in different
-  // configurations.
-  const char* GetSuggestedViewType(vtkIdType connectionID);
-
-  // Description:
-  // Set the view size.
-  virtual void SetViewSize(int width, int height);
-
 protected:
-  vtkSMMantaBatchViewProxy();
-  ~vtkSMMantaBatchViewProxy();
+  vtkSMMantaViewProxy();
+  ~vtkSMMantaViewProxy();
 
-  // Description:
-  // Called at the start of CreateVTKObjects().
-  virtual bool BeginCreateVTKObjects();
-  virtual void EndCreateVTKObjects();
-
-  // Description:
-  // Overridden to prevent screen space downsampling until it works with manta.
-  virtual void SetImageReductionFactorInternal(int factor) { return; }
-
-  int EnableShadows;
-  int Threads;
-  int Samples;
-  int MaxDepth;
+  virtual void CreateVTKObjects();
 
 private:
 
-  vtkSMMantaBatchViewProxy(const vtkSMMantaBatchViewProxy&); // Not implemented.
-  void operator=(const vtkSMMantaBatchViewProxy&); // Not implemented.
+  vtkSMMantaViewProxy(const vtkSMMantaViewProxy&); // Not implemented.
+  void operator=(const vtkSMMantaViewProxy&); // Not implemented.
 
 //ETX
 };

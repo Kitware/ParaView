@@ -59,15 +59,17 @@ int vtkMarkSelectedRows::RequestData(vtkInformation*,
   vtkTable* output = vtkTable::GetData(outputVector, 0);
   output->ShallowCopy(input);
 
-  if (!inputSelection)
-    {
-    return 1;
-    }
-
   vtkCharArray* selected = vtkCharArray::New();
   selected->SetName("__vtkIsSelected__");
   selected->SetNumberOfTuples(output->GetNumberOfRows());
   selected->FillComponent(0, 0);
+  output->AddColumn(selected);
+  selected->Delete();
+
+  if (!inputSelection)
+    {
+    return 1;
+    }
 
   bool something_selected = false;
   // Locate the selection node that may be applicable to the input.
@@ -136,11 +138,6 @@ int vtkMarkSelectedRows::RequestData(vtkInformation*,
       }
     }
 
-  if (something_selected)
-    {
-    output->AddColumn(selected);
-    }
-  selected->Delete();
   return 1;
 }
 

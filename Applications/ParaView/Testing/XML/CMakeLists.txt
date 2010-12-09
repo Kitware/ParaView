@@ -3,8 +3,20 @@ SET (TESTS_WITHOUT_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/OpenHelp.xml
 )
 
+SET (TESTS_WITH_BASELINES)
+IF(NOT PARAVIEW_USE_VISITBRIDGE)
+  # Analyze reader test was conflicting with the reader from VisIt. So
+  # disabling it.
+  SET (TESTS_WITH_BASELINES ${TESTS_WITH_BASELINES}
+    ${CMAKE_CURRENT_SOURCE_DIR}/AnalyzeReaderWriterPlugin.xml)
+ELSE(NOT PARAVIEW_USE_VISITBRIDGE)
+  SET (TESTS_WITH_BASELINES ${TESTS_WITH_BASELINES}
+    ${CMAKE_CURRENT_SOURCE_DIR}/VisItBridge.xml)
+ENDIF(NOT PARAVIEW_USE_VISITBRIDGE)
+
+
 SET (TESTS_WITH_BASELINES
-  ${CMAKE_CURRENT_SOURCE_DIR}/AnalyzeReaderWriterPlugin.xml
+  ${TESTS_WITH_BASELINES}
   ${CMAKE_CURRENT_SOURCE_DIR}/AnimatePipelineTime.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/3DWidgetInCustomFilter.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/CalcParens.xml
@@ -64,6 +76,7 @@ SET (TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/SpreadSheet1.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/SpreadSheet2.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/SPTimeseries.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/SpyPlotHistoryReader.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/StreamTracerUpdates.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/TemporalInterpolator.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/TemporalShiftScale.xml
@@ -150,6 +163,10 @@ IF (PARAVIEW_USE_MPI)
   SET (SpreadSheet1_DISABLE_CS TRUE)
   SET (SpreadSheet1_DISABLE_CRS TRUE)
 ENDIF (PARAVIEW_USE_MPI)
+
+# Clip test has object picking which is not supported in client-render-server
+# mode.
+SET (Clip_DISABLE_CRS TRUE)
 
 # These Xdmf tests have wireframes, hence the increased thresholds.
 SET (XdmfReadImageData_THRESHOLD 20)
