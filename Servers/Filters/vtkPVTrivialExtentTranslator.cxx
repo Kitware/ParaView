@@ -21,7 +21,6 @@
 #include "vtkGarbageCollector.h"
 
 vtkStandardNewMacro(vtkPVTrivialExtentTranslator);
-vtkCxxRevisionMacro(vtkPVTrivialExtentTranslator, "$Revision: 1.2 $");
 vtkCxxSetObjectMacro(vtkPVTrivialExtentTranslator, DataSet, vtkDataSet);
 
 //----------------------------------------------------------------------------
