@@ -31,7 +31,7 @@ class VTK_EXPORT vtkPVTrivialExtentTranslator : public vtkExtentTranslator
 {
 public:
   static vtkPVTrivialExtentTranslator* New();
-  vtkTypeRevisionMacro(vtkPVTrivialExtentTranslator, vtkExtentTranslator);
+  vtkTypeMacro(vtkPVTrivialExtentTranslator, vtkExtentTranslator);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   virtual void Register(vtkObjectBase* o)
