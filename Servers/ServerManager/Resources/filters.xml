@@ -10271,7 +10271,7 @@ This property controls how the filter works to generate tensor cell data. You ca
         command="SetRL"
         label="rL (physical box side length)"
         number_of_elements="1"
-        default_values="90.140846" >
+        default_values="100" >
      <DoubleRangeDomain name="range" min="0" />
        <Documentation>
        The box side length used to wrap particles around if they exceed rL (or less than 0) in any dimension (only positive positions are allowed in the input, or the are wrapped around).
@@ -10295,7 +10295,7 @@ This property controls how the filter works to generate tensor cell data. You ca
         command="SetPMin"
         label="pmin (minimum particle threshold for a halo)"
         number_of_elements="1"
-        default_values="10" >
+        default_values="100" >
      <IntRangeDomain name="range" min="1" />
        <Documentation>
          Minimum number of particles (threshold) needed before a group is called a halo.

@@ -1937,7 +1937,7 @@
         command="SetRL"
         label="rL (physical box side length)"
         number_of_elements="1"
-        default_values="90.140846" >
+        default_values="100" >
      <DoubleRangeDomain name="range" min="0" />
        <Documentation>
        The box side length used to wrap particles around if they exceed rL (or less than 0) in any dimension.
