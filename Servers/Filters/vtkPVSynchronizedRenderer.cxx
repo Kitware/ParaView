@@ -190,7 +190,7 @@ void vtkPVSynchronizedRenderer::Initialize()
         }
 #else
       // FIXME: need to add support for compositing when not using IceT
-      this->ParallelSynchronizer = vtkCompositedSynchronizedRenderers::New();
+      this->ParallelSynchronizer = vtkPVClientServerSynchronizedRenderers::New();
 #endif
       this->ParallelSynchronizer->SetParallelController(
         vtkMultiProcessController::GetGlobalController());
@@ -301,13 +301,14 @@ void vtkPVSynchronizedRenderer::SetUseDepthBuffer(bool useDB)
     {
     return;
     }
-
+#ifdef PARAVIEW_USE_ICE_T
   if (this->ParallelSynchronizer->IsA("vtkIceTSynchronizedRenderers") == 1)
     {
     vtkIceTSynchronizedRenderers *aux =
                  (vtkIceTSynchronizedRenderers*)this->ParallelSynchronizer;
     aux->SetUseDepthBuffer(useDB);
     }
+#endif
 }
 
 //----------------------------------------------------------------------------
