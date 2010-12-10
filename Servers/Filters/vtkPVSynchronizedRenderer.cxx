@@ -17,7 +17,6 @@
 #include "vtkBoundingBox.h"
 #include "vtkCameraPass.h"
 #include "vtkCaveSynchronizedRenderers.h"
-#include "vtkCompositedSynchronizedRenderers.h"
 #include "vtkImageProcessingPass.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
@@ -179,7 +178,7 @@ void vtkPVSynchronizedRenderer::Initialize()
 #ifdef PARAVIEW_USE_ICE_T
       if (this->DisableIceT)
         {
-        this->ParallelSynchronizer = vtkCompositedSynchronizedRenderers::New();
+        this->ParallelSynchronizer = vtkPVClientServerSynchronizedRenderers::New();
         }
       else
         {
