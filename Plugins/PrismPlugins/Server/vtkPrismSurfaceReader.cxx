@@ -1348,7 +1348,8 @@ int vtkPrismSurfaceReader::RequestData(
   this->AspectScale[2]=100/delta[2];
 
   vtkSmartPointer<vtkTransform> transform= vtkSmartPointer<vtkTransform>::New();
-  transform->Scale(this->AspectScale[0],this->AspectScale[1],this->AspectScale[2]);
+//  transform->Scale(this->AspectScale[0],this->AspectScale[1],this->AspectScale[2]);
+  transform->Scale(1.0,1.0,1.0);
 
   this->Internal->ScaleTransform->SetInput(this->Internal->CleanPolyData->GetOutput());
   this->Internal->ScaleTransform->SetTransform(transform);
@@ -1424,7 +1425,11 @@ int vtkPrismSurfaceReader::RequestData(
       contourOutput->ShallowCopy(this->Internal->ContourScaleTransform->GetOutput());
 
     }
-
+  }
+  else
+  {
+    vtkSmartPointer<vtkPoints> newContourPts = vtkSmartPointer<vtkPoints>::New();
+    contourOutput->SetPoints(newContourPts);
   }
 
   if(tID==301)
@@ -1432,6 +1437,12 @@ int vtkPrismSurfaceReader::RequestData(
 
     return this->RequestCurveData(curveOutput);
   }
+  else
+  {
+    vtkSmartPointer<vtkPoints> newCurvePts = vtkSmartPointer<vtkPoints>::New();
+    curveOutput->SetPoints(newCurvePts);
+  }
+
 
   return 1;
 
@@ -2361,7 +2372,14 @@ int vtkPrismSurfaceReader::RequestCurveData(  vtkPointSet *curveOutput)
     appendPD->Update();
 
     curveOutput->ShallowCopy(appendPD->GetOutput());
-  }  return 1;
+  }
+  else
+  {
+
+    vtkSmartPointer<vtkPoints> newCurvePts = vtkSmartPointer<vtkPoints>::New();
+    curveOutput->SetPoints(newCurvePts);
+  }
+ return 1;
 }
 
 

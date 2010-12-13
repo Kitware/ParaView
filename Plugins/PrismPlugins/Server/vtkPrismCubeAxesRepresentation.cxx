@@ -29,41 +29,35 @@
 #include "vtkRenderer.h"
 #include "vtkSmartPointer.h"
 #include "vtkTransform.h"
+#include "vtkCubeAxesActor.h"
 
 vtkStandardNewMacro(vtkPrismCubeAxesRepresentation);
 //----------------------------------------------------------------------------
 vtkPrismCubeAxesRepresentation::vtkPrismCubeAxesRepresentation()
 {
-  this->CubeAxesActor = vtkPrismCubeAxesActor::New();
-  this->CubeAxesActor->SetPickable(0);
+  this->PrismCubeAxesActor = vtkPrismCubeAxesActor::New();
+  this->PrismCubeAxesActor->SetPickable(0);
 
-  this->Position[0] = this->Position[1] = this->Position[2] = 0.0;
-  this->Orientation[0] = this->Orientation[1] = this->Orientation[2] = 0.0;
-  this->Scale[0] = this->Scale[1] = this->Scale[2] = 1.0;
-  this->CustomBounds[0] = this->CustomBounds[2] = this->CustomBounds[4] = 0.0;
-  this->CustomBounds[1] = this->CustomBounds[3] = this->CustomBounds[5] = 1.0;
-  this->CustomBoundsActive[0] = 0;
-  this->CustomBoundsActive[1] = 0;
-  this->CustomBoundsActive[2] = 0;
 }
 
 //----------------------------------------------------------------------------
 vtkPrismCubeAxesRepresentation::~vtkPrismCubeAxesRepresentation()
 {
-  this->CubeAxesActor->Delete();
+  this->PrismCubeAxesActor->Delete();
 }
 
 //----------------------------------------------------------------------------
 void vtkPrismCubeAxesRepresentation::SetVisibility(bool val)
 {
-  this->Superclass::SetVisibility(val);
-  this->CubeAxesActor->SetVisibility(val? 1 : 0);
+  this->vtkPVDataRepresentation::SetVisibility(val);
+  this->CubeAxesActor->SetVisibility(0);
+  this->PrismCubeAxesActor->SetVisibility(val? 1 : 0);
 }
 
 //----------------------------------------------------------------------------
 void vtkPrismCubeAxesRepresentation::SetColor(double r, double g, double b)
 {
-  this->CubeAxesActor->GetProperty()->SetColor(r, g, b);
+  this->PrismCubeAxesActor->GetProperty()->SetColor(r, g, b);
 }
 
 //----------------------------------------------------------------------------
@@ -72,8 +66,8 @@ bool vtkPrismCubeAxesRepresentation::AddToView(vtkView* view)
   vtkPVRenderView* pvview = vtkPVRenderView::SafeDownCast(view);
   if (pvview)
     {
-    pvview->GetRenderer()->AddActor(this->CubeAxesActor);
-    this->CubeAxesActor->SetCamera(pvview->GetActiveCamera());
+    pvview->GetRenderer()->AddActor(this->PrismCubeAxesActor);
+    this->PrismCubeAxesActor->SetCamera(pvview->GetActiveCamera());
     this->View = pvview;
     return true;
     }
@@ -86,8 +80,8 @@ bool vtkPrismCubeAxesRepresentation::RemoveFromView(vtkView* view)
   vtkPVRenderView* pvview = vtkPVRenderView::SafeDownCast(view);
   if (pvview)
     {
-    pvview->GetRenderer()->RemoveActor(this->CubeAxesActor);
-    this->CubeAxesActor->SetCamera(NULL);
+    pvview->GetRenderer()->RemoveActor(this->PrismCubeAxesActor);
+    this->PrismCubeAxesActor->SetCamera(NULL);
     this->View = NULL;
     return true;
     }
@@ -95,78 +89,6 @@ bool vtkPrismCubeAxesRepresentation::RemoveFromView(vtkView* view)
   return false;
 }
 
-//----------------------------------------------------------------------------
-int vtkPrismCubeAxesRepresentation::FillInputPortInformation(
-  int vtkNotUsed(port), vtkInformation* info)
-{
-  info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkDataSet");
-  info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkCompositeDataSet");
-  info->Set(vtkAlgorithm::INPUT_IS_OPTIONAL(), 1);
-  return 1;
-}
-
-//----------------------------------------------------------------------------
-int vtkPrismCubeAxesRepresentation::ProcessViewRequest(
-  vtkInformationRequestKey* request_type, vtkInformation* inInfo,
-  vtkInformation* outInfo)
-{
-  if (!this->Superclass::ProcessViewRequest(request_type, inInfo, outInfo))
-    {
-    return 0;
-    }
-
-  if (request_type == vtkPVView::REQUEST_PREPARE_FOR_RENDER())
-    {
-    this->UpdateBounds();
-    }
-
-  return 1;
-}
-
-//----------------------------------------------------------------------------
-int vtkPrismCubeAxesRepresentation::RequestData(vtkInformation*,
-  vtkInformationVector** inputVector, vtkInformationVector*)
-{
-  vtkMath::UninitializeBounds(this->DataBounds);
-  if (inputVector[0]->GetNumberOfInformationObjects()==1)
-    {
-    vtkDataObject* input = vtkDataObject::GetData(inputVector[0], 0);
-    vtkDataSet* ds = vtkDataSet::SafeDownCast(input);
-    vtkCompositeDataSet* cd = vtkCompositeDataSet::SafeDownCast(input);
-    if (ds)
-      {
-      ds->GetBounds(this->DataBounds);
-      }
-    else
-      {
-      vtkCompositeDataIterator* iter = cd->NewIterator();
-      vtkBoundingBox bbox;
-      for (iter->InitTraversal(); !iter->IsDoneWithTraversal();
-        iter->GoToNextItem())
-        {
-        ds = vtkDataSet::SafeDownCast(iter->GetCurrentDataObject());
-        if (ds)
-          {
-          double bds[6];
-          ds->GetBounds(bds);
-          if (vtkMath::AreBoundsInitialized(bds))
-            {
-            bbox.AddBounds(bds);
-            }
-          }
-        }
-      iter->Delete();
-      bbox.GetBounds(this->DataBounds);
-      }
-    }
-
-  // We fire UpdateDataEvent to notify the representation proxy that the
-  // representation was updated. The representation proxty will then call
-  // PostUpdateData(). We do this since now representations are not updated at
-  // the proxy level.
-  this->InvokeEvent(vtkCommand::UpdateDataEvent);
-  return 1;
-}
 
 //----------------------------------------------------------------------------
 void vtkPrismCubeAxesRepresentation::UpdateBounds()
@@ -232,7 +154,7 @@ void vtkPrismCubeAxesRepresentation::UpdateBounds()
       bds[pos+1]=this->CustomBounds[pos+1];
       }
     }
-  this->CubeAxesActor->SetBounds(bds);
+  this->PrismCubeAxesActor->SetBounds(bds);
 }
 
 //----------------------------------------------------------------------------
@@ -247,119 +169,119 @@ void vtkPrismCubeAxesRepresentation::PrintSelf(ostream& os, vtkIndent indent)
 void vtkPrismCubeAxesRepresentation::SetLabelRanges(
   double a, double b, double c, double d, double e, double f)
 {
-  this->CubeAxesActor->SetLabelRanges(a, b, c, d, e, f);
+  this->PrismCubeAxesActor->SetLabelRanges(a, b, c, d, e, f);
 }
 
 //----------------------------------------------------------------------------
 void vtkPrismCubeAxesRepresentation::SetFlyMode(int val)
 {
-  this->CubeAxesActor->SetFlyMode(val);
+  this->PrismCubeAxesActor->SetFlyMode(val);
 }
 
 //----------------------------------------------------------------------------
 void vtkPrismCubeAxesRepresentation::SetInertia(int val)
 {
-  this->CubeAxesActor->SetInertia(val);
+  this->PrismCubeAxesActor->SetInertia(val);
 }
 
 //----------------------------------------------------------------------------
 void vtkPrismCubeAxesRepresentation::SetCornerOffset(double val)
 {
-  this->CubeAxesActor->SetCornerOffset(val);
+  this->PrismCubeAxesActor->SetCornerOffset(val);
 }
 
 //----------------------------------------------------------------------------
 void vtkPrismCubeAxesRepresentation::SetTickLocation(int val)
 {
-  this->CubeAxesActor->SetTickLocation(val);
+  this->PrismCubeAxesActor->SetTickLocation(val);
 }
 
 //----------------------------------------------------------------------------
 void vtkPrismCubeAxesRepresentation::SetXTitle(const char* val)
 {
-  this->CubeAxesActor->SetXTitle(val);
+  this->PrismCubeAxesActor->SetXTitle(val);
 }
 
 //----------------------------------------------------------------------------
 void vtkPrismCubeAxesRepresentation::SetXAxisVisibility(int val)
 {
-  this->CubeAxesActor->SetXAxisVisibility(val);
+  this->PrismCubeAxesActor->SetXAxisVisibility(val);
 }
 
 //----------------------------------------------------------------------------
 void vtkPrismCubeAxesRepresentation::SetXAxisTickVisibility(int val)
 {
-  this->CubeAxesActor->SetXAxisTickVisibility(val);
+  this->PrismCubeAxesActor->SetXAxisTickVisibility(val);
 }
 
 //----------------------------------------------------------------------------
 void vtkPrismCubeAxesRepresentation::SetXAxisMinorTickVisibility(int val)
 {
-  this->CubeAxesActor->SetXAxisMinorTickVisibility(val);
+  this->PrismCubeAxesActor->SetXAxisMinorTickVisibility(val);
 }
 
 //----------------------------------------------------------------------------
 void vtkPrismCubeAxesRepresentation::SetDrawXGridlines(int val)
 {
-  this->CubeAxesActor->SetDrawXGridlines(val);
+  this->PrismCubeAxesActor->SetDrawXGridlines(val);
 }
 
 //----------------------------------------------------------------------------
 void vtkPrismCubeAxesRepresentation::SetYTitle(const char* val)
 {
-  this->CubeAxesActor->SetYTitle(val);
+  this->PrismCubeAxesActor->SetYTitle(val);
 }
 
 //----------------------------------------------------------------------------
 void vtkPrismCubeAxesRepresentation::SetYAxisVisibility(int val)
 {
-  this->CubeAxesActor->SetYAxisVisibility(val);
+  this->PrismCubeAxesActor->SetYAxisVisibility(val);
 }
 
 //----------------------------------------------------------------------------
 void vtkPrismCubeAxesRepresentation::SetYAxisTickVisibility(int val)
 {
-  this->CubeAxesActor->SetYAxisTickVisibility(val);
+  this->PrismCubeAxesActor->SetYAxisTickVisibility(val);
 }
 
 //----------------------------------------------------------------------------
 void vtkPrismCubeAxesRepresentation::SetYAxisMinorTickVisibility(int val)
 {
-  this->CubeAxesActor->SetYAxisMinorTickVisibility(val);
+  this->PrismCubeAxesActor->SetYAxisMinorTickVisibility(val);
 }
 
 //----------------------------------------------------------------------------
 void vtkPrismCubeAxesRepresentation::SetDrawYGridlines(int val)
 {
-  this->CubeAxesActor->SetDrawYGridlines(val);
+  this->PrismCubeAxesActor->SetDrawYGridlines(val);
 }
 
 //----------------------------------------------------------------------------
 void vtkPrismCubeAxesRepresentation::SetZTitle(const char* val)
 {
-  this->CubeAxesActor->SetZTitle(val);
+  this->PrismCubeAxesActor->SetZTitle(val);
 }
 
 //----------------------------------------------------------------------------
 void vtkPrismCubeAxesRepresentation::SetZAxisVisibility(int val)
 {
-  this->CubeAxesActor->SetZAxisVisibility(val);
+  this->PrismCubeAxesActor->SetZAxisVisibility(val);
 }
 
 //----------------------------------------------------------------------------
 void vtkPrismCubeAxesRepresentation::SetZAxisTickVisibility(int val)
 {
-  this->CubeAxesActor->SetZAxisTickVisibility(val);
+  this->PrismCubeAxesActor->SetZAxisTickVisibility(val);
 }
 
 //----------------------------------------------------------------------------
 void vtkPrismCubeAxesRepresentation::SetZAxisMinorTickVisibility(int val)
 {
-  this->CubeAxesActor->SetZAxisMinorTickVisibility(val);
+  this->PrismCubeAxesActor->SetZAxisMinorTickVisibility(val);
 }
 
 //----------------------------------------------------------------------------
 void vtkPrismCubeAxesRepresentation::SetDrawZGridlines(int val)
 {
-  this->CubeAxesActor->SetDrawZGridlines(val);
+  this->PrismCubeAxesActor->SetDrawZGridlines(val);
 }

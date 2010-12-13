@@ -210,13 +210,13 @@ PrismCore::PrismCore(QObject* p)
 
     this->connect(model, SIGNAL(connectionAdded(pqPipelineSource*,pqPipelineSource*, int)),
         this, SLOT(onConnectionAdded(pqPipelineSource*,pqPipelineSource*)));
-    this->connect(model, SIGNAL(viewAdded(pqView*)),
-        this, SLOT(onViewAdded(pqView*)));
-    this->connect(model, SIGNAL(preViewRemoved(pqView*)),
-        this, SLOT(onViewRemoved(pqView*)));
+    //this->connect(model, SIGNAL(viewAdded(pqView*)),
+    //    this, SLOT(onViewAdded(pqView*)));
+    //this->connect(model, SIGNAL(preViewRemoved(pqView*)),
+    //    this, SLOT(onViewRemoved(pqView*)));
 
-    this->connect(model, SIGNAL(preRepresentationRemoved(pqRepresentation*)),
-        this, SLOT(onPreRepresentationRemoved(pqRepresentation*)));
+    //this->connect(model, SIGNAL(preRepresentationRemoved(pqRepresentation*)),
+    //    this, SLOT(onPreRepresentationRemoved(pqRepresentation*)));
 
     QList<pqView*> views=model->findItems<pqView*>();
 
@@ -248,14 +248,14 @@ PrismCore::PrismCore(QObject* p)
 
 PrismCore::~PrismCore()
     {
-      QMap<vtkSMPrismCubeAxesRepresentationProxy*,pqRenderView*>::iterator viter;
-      for(viter=this->CubeAxesViewMap.begin();viter!=this->CubeAxesViewMap.end();viter++)
-      {
-        pqRenderView* view=viter.value();
-        vtkSMViewProxy* renv= view->getViewProxy();
-        vtkSMPropertyHelper(renv, "HiddenRepresentations").Remove(viter.key());
-      }
-      this->CubeAxesViewMap.clear();
+      //QMap<vtkSMPrismCubeAxesRepresentationProxy*,pqRenderView*>::iterator viter;
+      //for(viter=this->CubeAxesViewMap.begin();viter!=this->CubeAxesViewMap.end();viter++)
+      //{
+      //  pqRenderView* view=viter.value();
+      //  vtkSMViewProxy* renv= view->getViewProxy();
+      //  vtkSMPropertyHelper(renv, "HiddenRepresentations").Remove(viter.key());
+      //}
+//      this->CubeAxesViewMap.clear();
 
       QMap<pqDataRepresentation*,vtkSMPrismCubeAxesRepresentationProxy*>::iterator iter;
       for(iter=this->CubeAxesRepMap.begin();iter!=this->CubeAxesRepMap.end();iter++)
@@ -395,6 +395,9 @@ void PrismCore::onSESAMEFileOpen(const QStringList& files)
         return ;
         }
 
+    builder->createView("PrismView",server);
+
+
     pqUndoStack *stack=core->getUndoStack();
     if(stack)
         {
@@ -489,8 +492,8 @@ void PrismCore::onCreatePrismView(const QStringList& files)
         {
         qDebug() << "No active server selected.";
         }
-    builder->createView("RenderView",server);
- 
+    builder->createView("PrismView",server);
+
     inputs.push_back(source->getOutputPort(0));
 
     QMap<QString, QList<pqOutputPort*> > namedInputs;
@@ -563,7 +566,6 @@ void PrismCore::onConnectionAdded(pqPipelineSource* source,
 void PrismCore::onViewAdded(pqView* view)
 {
   //For 3D Views we need to listen for repr added.
-
   if(view->getViewType()=="RenderView")
   {
     this->connect(view, SIGNAL(representationAdded(pqRepresentation*)),
@@ -696,7 +698,7 @@ void PrismCore::onPrismRepresentationAdded(pqPipelineSource* source,
                                            pqDataRepresentation* repr,
                                            int srcOutputPort)
 {
-
+/*
   pqApplicationCore* core = pqApplicationCore::instance();
   pqObjectBuilder* builder = core->getObjectBuilder();
   pqServer* server = 0;
@@ -735,7 +737,7 @@ void PrismCore::onPrismRepresentationAdded(pqPipelineSource* source,
   }
   cubeAxesActor->UpdateProperty("Input");
 
-
+*/
   if(srcOutputPort==0)
   {
     pqSMAdaptor::setElementProperty(repr->getProxy()->GetProperty("Pickable"),0);

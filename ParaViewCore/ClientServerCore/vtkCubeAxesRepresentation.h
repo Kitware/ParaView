@@ -66,8 +66,8 @@ public:
 
   // Description:
   // Set the actor color.
-  void SetColor(double r, double g, double b);
-  void SetColor(double rgb[3])
+  virtual void SetColor(double r, double g, double b);
+  virtual void SetColor(double rgb[3])
     { this->SetColor(rgb[0], rgb[1], rgb[2]); }
 
   // Description:
@@ -90,30 +90,28 @@ public:
 
   //***************************************************************************
   // Forwarded to internal vtkCubeAxesActor
-  void SetFlyMode(int val);
-  void SetInertia(int val);
-  void SetCornerOffset(double val);
-  void SetTickLocation(int val);
+  virtual void SetFlyMode(int val);
+  virtual void SetInertia(int val);
+  virtual void SetCornerOffset(double val);
+  virtual void SetTickLocation(int val);
 
-  void SetXTitle(const char* val);
-  void SetXAxisVisibility(int val);
-  void SetXAxisTickVisibility(int val);
-  void SetXAxisMinorTickVisibility(int val);
-  void SetDrawXGridlines(int val);
+  virtual void SetXTitle(const char* val);
+  virtual void SetXAxisVisibility(int val);
+  virtual void SetXAxisTickVisibility(int val);
+  virtual void SetXAxisMinorTickVisibility(int val);
+  virtual void SetDrawXGridlines(int val);
 
-  void SetYAxisVisibility(int val);
-  void SetYTitle(const char* val);
-  void SetYAxisTickVisibility(int val);
-  void SetYAxisMinorTickVisibility(int val);
-  void SetDrawYGridlines(int val);
+  virtual void SetYAxisVisibility(int val);
+  virtual void SetYTitle(const char* val);
+  virtual void SetYAxisTickVisibility(int val);
+  virtual void SetYAxisMinorTickVisibility(int val);
+  virtual void SetDrawYGridlines(int val);
 
-  void SetZAxisVisibility(int val);
-  void SetZTitle(const char* val);
-  void SetZAxisTickVisibility(int val);
-  void SetZAxisMinorTickVisibility(int val);
-  void SetDrawZGridlines(int val);
-
-  void UpdateBounds();
+  virtual void SetZAxisVisibility(int val);
+  virtual void SetZTitle(const char* val);
+  virtual void SetZAxisTickVisibility(int val);
+  virtual void SetZAxisMinorTickVisibility(int val);
+  virtual void SetDrawZGridlines(int val);
 //BTX
 protected:
   vtkCubeAxesRepresentation();
@@ -122,6 +120,8 @@ protected:
   virtual int FillInputPortInformation(int port, vtkInformation* info);
   int RequestData(vtkInformation*,
     vtkInformationVector** inputVector, vtkInformationVector*);
+
+  virtual void UpdateBounds();
 
   // Description:
   // Adds the representation to the view.  This is called from
