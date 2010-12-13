@@ -87,7 +87,7 @@ pqGlyphPanel::pqGlyphPanel(pqProxy* object_proxy, QWidget* _parent)
   lockButton->setTristate(false);
   lockButton->setText("Edit");
   lockButton->setToolTip(tr("<html>Edit the scale factor. "
-      "Otherwise, the scale factor will be computed automatically when the scale mode"
+      "Otherwise, the scale factor will be computed automatically when the scale mode "
       "changes.</html>")); 
   this->LockScaleFactor = lockButton;
 
