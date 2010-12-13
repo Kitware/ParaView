@@ -170,7 +170,6 @@ static void vtkPythonAppInitPrependPath(const char* self_dir)
         // without the "/vtk" suffix.
         vtkstd::string path_dir =
           vtksys::SystemTools::GetFilenamePath(package_dir);
-        cout << "Appending!" << endl;
         vtkPythonAppInitPrependPythonPath(path_dir.c_str());
         break;
         }
