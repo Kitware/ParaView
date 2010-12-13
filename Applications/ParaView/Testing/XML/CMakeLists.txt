@@ -28,6 +28,7 @@ SET (TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/ColorEditor3.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/ColorEditor4.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/ComparativeVisPanel.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/CompositeSurfaceSelection.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/Contour.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/ContourRange.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/CustomFilter.xml
