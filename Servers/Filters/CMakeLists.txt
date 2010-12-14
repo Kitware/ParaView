@@ -428,7 +428,7 @@ VTK_MAKE_INSTANTIATOR3(vtkPVFiltersInstantiator FiltersInst_SRCS
   "${PVFilters_BINARY_DIR}" "")
 
 # Create filters library.
-ADD_LIBRARY(vtkPVFilters ${Filters_SRCS} ${FiltersInst_SRCS}
+VTK_ADD_LIBRARY(vtkPVFilters ${Filters_SRCS} ${FiltersInst_SRCS}
   ${ExtraParaViewServer_SRCS} ${ExtraParaViewServerNonWrapped_SRCS})
 TARGET_LINK_LIBRARIES(vtkPVFilters
   vtkPVServerCommon
@@ -522,7 +522,8 @@ ENDIF (PARAVIEW_ENABLE_PYTHON)
 #-------------------------------------------------------------------------------------------------
 # Libraries
 IF(NOT PV_INSTALL_NO_LIBRARIES)
-    INSTALL(TARGETS vtkPVFiltersCS vtkPVFilters
+    INSTALL(TARGETS vtkPVFilters
+      EXPORT ${PV_INSTALL_EXPORT_NAME}
       RUNTIME DESTINATION ${PV_INSTALL_BIN_DIR} COMPONENT Runtime
       LIBRARY DESTINATION ${PV_INSTALL_LIB_DIR} COMPONENT Runtime
       ARCHIVE DESTINATION ${PV_INSTALL_LIB_DIR} COMPONENT Development)

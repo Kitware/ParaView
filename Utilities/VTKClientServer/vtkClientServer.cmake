@@ -35,7 +35,7 @@ ENDMACRO(PV_PRE_WRAP_VTK_CS kit ukit deps)
 MACRO(PV_WRAP_VTK_CS kit ukit deps)
   SET(KIT_CS_DEPS)
   PV_PRE_WRAP_VTK_CS("vtk${kit}CS" "${kit}" "${ukit}" "${deps}")
-  ADD_LIBRARY(vtk${kit}CS ${vtk${kit}CS_SRCS})
+  VTK_ADD_LIBRARY(vtk${kit}CS ${vtk${kit}CS_SRCS})
   TARGET_LINK_LIBRARIES(vtk${kit}CS vtkClientServer vtk${kit})
   FOREACH(dep ${deps})
     #MESSAGE("Link vtk${kit}CS to vtk${dep}CS")
@@ -45,6 +45,7 @@ MACRO(PV_WRAP_VTK_CS kit ukit deps)
     IF(BUILD_SHARED_LIBS)
       IF(NOT PV_INSTALL_NO_LIBRARIES)
         INSTALL(TARGETS vtk${kit}CS
+          EXPORT ${PV_INSTALL_EXPORT_NAME}
           RUNTIME DESTINATION ${PV_INSTALL_BIN_DIR} COMPONENT Runtime
           LIBRARY DESTINATION ${PV_INSTALL_LIB_DIR} COMPONENT Runtime
           ARCHIVE DESTINATION ${PV_INSTALL_LIB_DIR} COMPONENT Development)
