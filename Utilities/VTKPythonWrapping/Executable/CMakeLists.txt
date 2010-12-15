@@ -30,11 +30,11 @@ INCLUDE_DIRECTORIES(
 CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/vtkPythonAppInitConfigure.h.in
   ${CMAKE_CURRENT_BINARY_DIR}/vtkPythonAppInitConfigure.h)
 
-ADD_LIBRARY(vtkPVPythonInterpretor
+VTK_ADD_LIBRARY(vtkPVPythonInterpretor
   vtkPVPythonInterpretor.cxx
   vtkPVPythonInteractiveInterpretor.cxx)
 
-ADD_LIBRARY(vtkPVPython
+VTK_ADD_LIBRARY(vtkPVPython
   vtkPVPythonOptions.cxx
   vtkPVProcessModulePythonHelper.cxx)
 
@@ -145,6 +145,7 @@ ENDIF(BORLAND)
 
 # Install vtkPVPythonInterpretor and vtkPVPython library.
 INSTALL(TARGETS vtkPVPythonInterpretor vtkPVPython
+  EXPORT ${PV_INSTALL_EXPORT_NAME}
   RUNTIME DESTINATION ${PV_INSTALL_BIN_DIR} COMPONENT Runtime
   LIBRARY DESTINATION ${PV_INSTALL_LIB_DIR} COMPONENT Runtime
   ARCHIVE DESTINATION ${PV_INSTALL_LIB_DIR} COMPONENT Development)

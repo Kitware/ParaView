@@ -510,11 +510,14 @@ pqDataRepresentation* pqObjectBuilder::createDataRepresentation(
   pqApplicationCore* core= pqApplicationCore::instance();
   pqDataRepresentation* repr = core->getServerManagerModel()->
     findItem<pqDataRepresentation*>(reprProxy);
-  if (repr)
+  if (repr )
     {
-    // inherit properties from the representation for the input if applicable.
-    this->initializeInheritedProperties(repr);
-
+    //hack for text representations
+    if (strcmp(repr->metaObject()->className(),"pqTextRepresentation") != 0 )
+      {
+      // inherit properties from the representation for the input if applicable.
+      this->initializeInheritedProperties(repr);
+      }
     repr->setDefaultPropertyValues();
 
     emit this->dataRepresentationCreated(repr);

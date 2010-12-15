@@ -38,7 +38,7 @@ class vtkAMRDualGridHelperSeed;
 
 //============================================================================
 // Helper object for getting information from AMR datasets.
-// API: 
+// API:
 // Have a block object as part of the API? Yes; Level? No.
 // Initialize helper with a CTH dataset.
 // Get GlobalOrigin, RootSpacing, NumberOfLevels
@@ -172,7 +172,7 @@ vtkAMRDualGridHelperBlock* vtkAMRDualGridHelperLevel::GetGridBlock(
 }
 
 //----------------------------------------------------------------------------
-// This method is meant to be called after all the blocks are created and 
+// This method is meant to be called after all the blocks are created and
 // in their level grids.  It shoud also be called after FindExistingFaces
 // is called for this level, but before FindExisitngFaces is called for
 // higher levels.
@@ -188,7 +188,7 @@ void vtkAMRDualGridHelperLevel::CreateBlockFaces(
     {
     return;
     }
-  
+
   /*
   vtkAMRDualGridHelperBlock* neighborBlock;
   if (block == 0)
@@ -376,8 +376,8 @@ void vtkAMRDualGridHelperAddBackGhostValues(T *inPtr, int inDim[3],
   inExt[1] = inExt[0] + inDim[0] - 1;
   inExt[3] = inExt[2] + inDim[1] - 1;
   inExt[5] = inExt[4] + inDim[2] - 1;
-  
-  
+
+
   inPtrZ = inPtr;
   for (zz = outExt[4]; zz <= outExt[5]; ++zz)
     {
@@ -419,8 +419,8 @@ void vtkAMRDualGridHelperBlock::AddBackGhostLevels(int standardBlockDimensions[3
   this->Image->GetDimensions(outDim);
   double origin[3];
   this->Image->GetOrigin(origin);
-  double *spacing = this->Image->GetSpacing(); 
-  
+  double *spacing = this->Image->GetSpacing();
+
   // Note.  I as assume that origin index is the index of the first pixel
   // not the index of 0.
 
@@ -434,7 +434,7 @@ void vtkAMRDualGridHelperBlock::AddBackGhostLevels(int standardBlockDimensions[3
     --inDim[ii];
     --outDim[ii];
 
-    // Check negative axis.  
+    // Check negative axis.
     nCheck[ii] = this->OriginIndex[ii] % standardBlockDimensions[ii];
     // Check positive axis
     pCheck[ii] = (this->OriginIndex[ii]+inDim[ii]) % standardBlockDimensions[ii];
@@ -453,7 +453,7 @@ void vtkAMRDualGridHelperBlock::AddBackGhostLevels(int standardBlockDimensions[3
       needToCopy = 1;
       }
     }
-    
+
   if ( ! needToCopy)
     {
     return;
@@ -476,7 +476,7 @@ void vtkAMRDualGridHelperBlock::AddBackGhostLevels(int standardBlockDimensions[3
     copyArray->SetName(da->GetName());
     switch (da->GetDataType())
       {
-      vtkTemplateMacro(vtkAMRDualGridHelperAddBackGhostValues( 
+      vtkTemplateMacro(vtkAMRDualGridHelperAddBackGhostValues(
            static_cast<VTK_TT *>(da->GetVoidPointer(0)), inDim,
            static_cast<VTK_TT *>(copyArray->GetVoidPointer(0)), outDim,
            offset));
@@ -581,7 +581,7 @@ void vtkAMRDualGridHelperFace::Unregister()
     }
 }
 //----------------------------------------------------------------------------
-void vtkAMRDualGridHelperFace::AddFragmentSeed(int level, int x, int y, int z, 
+void vtkAMRDualGridHelperFace::AddFragmentSeed(int level, int x, int y, int z,
                                               int fragmentId)
 {
   //double pt[3];
@@ -614,7 +614,7 @@ void vtkAMRDualGridHelperFace::AddFragmentSeed(int level, int x, int y, int z,
 vtkAMRDualGridHelper::vtkAMRDualGridHelper()
 {
   int ii;
-  
+
   this->SkipGhostCopy = 0;
 
   this->DataTypeSize = 8;
@@ -655,7 +655,7 @@ vtkAMRDualGridHelper::~vtkAMRDualGridHelper()
     this->MessageBuffer  = 0;
     this->MessageBufferLength  = 0;
     }
-    
+
   this->DegenerateRegionQueue.clear();
 }
 //----------------------------------------------------------------------------
@@ -734,14 +734,14 @@ void vtkAMRDualGridHelper::AddBlock(int level, vtkImageData* volume)
   blockSize[2] = (this->RootSpacing[2]*this->StandardBlockDimensions[2]) / (1 << level);
   double *bounds = volume->GetBounds();
   double center[3];
-  
+
   center[0] = (bounds[0]+bounds[1]) * 0.5;
   center[1] = (bounds[2]+bounds[3]) * 0.5;
   center[2] = (bounds[4]+bounds[5]) * 0.5;
   int x = (int)((center[0]-this->GlobalOrigin[0])/blockSize[0]);
   int y = (int)((center[1]-this->GlobalOrigin[1])/blockSize[1]);
   int z = (int)((center[2]-this->GlobalOrigin[2])/blockSize[2]);
-  vtkAMRDualGridHelperBlock* block = 
+  vtkAMRDualGridHelperBlock* block =
     this->Levels[level]->AddGridBlock(x, y, z, volume);
 
   // We need to set this ivar here because we need to compute the index 
@@ -763,7 +763,7 @@ void vtkAMRDualGridHelper::AddBlock(int level, vtkImageData* volume)
   block->OriginIndex[0] = (int)(0.5 + origin[0] * (double)(1<<level) / (this->RootSpacing[0]));
   block->OriginIndex[1] = (int)(0.5 + origin[1] * (double)(1<<level) / (this->RootSpacing[1]));
   block->OriginIndex[2] = (int)(0.5 + origin[2] * (double)(1<<level) / (this->RootSpacing[2]));
-  
+
   // This assumes 1 ghost layer (blocks are not completed yet so ....
   //block->OriginIndex[0] = this->StandardBlockDimensions[0] * x - 1;
   //block->OriginIndex[1] = this->StandardBlockDimensions[1] * y - 1;
@@ -775,7 +775,7 @@ void vtkAMRDualGridHelper::AddBlock(int level, vtkImageData* volume)
 
 //----------------------------------------------------------------------------
 vtkAMRDualGridHelperBlock* vtkAMRDualGridHelperLevel::AddGridBlock(
-  int x, int y, int z, 
+  int x, int y, int z,
   vtkImageData* volume)
 {
   // Expand the grid array if necessary.
@@ -865,7 +865,7 @@ void vtkAMRDualGridHelper::FindExistingFaces(
     {
     return;
     }
-    
+
   vtkAMRDualGridHelperBlock* block2;
   int ii, jj, kk;
   int lowerLevel;
@@ -876,7 +876,7 @@ void vtkAMRDualGridHelper::FindExistingFaces(
   ext[0] = x; ext[1] = x+1;
   ext[2] = y; ext[3] = y+1;
   ext[4] = z; ext[5] = z+1;
-  
+
   // We only really need to check one level lower.
   // anything else is not allowed.
   // But what about edges and corners?
@@ -946,7 +946,7 @@ void vtkAMRDualGridHelper::FindExistingFaces(
 
 
 //----------------------------------------------------------------------------
-// Negotiate which blocks will be responsible for generating which shared 
+// Negotiate which blocks will be responsible for generating which shared
 // regions.  Higher levels dominate lower levels.  We also set the
 // neighbor bits which indicate which cells/points become degenerate.
 void vtkAMRDualGridHelper::AssignSharedRegions()
@@ -1008,7 +1008,7 @@ void vtkAMRDualGridHelper::AssignBlockSharedRegions(
               { // Extreme level difference.
               vtkGenericWarningMacro("Could not encode level difference.");
               }
-            block->RegionBits[rx+1][ry+1][rz+1] 
+            block->RegionBits[rx+1][ry+1][rz+1]
               = vtkAMRRegionBitOwner + (vtkAMRRegionBitsDegenerateMask & levelDiff);
             }
           }
@@ -1020,7 +1020,7 @@ void vtkAMRDualGridHelper::AssignBlockSharedRegions(
 // projected to.  This will cause these cells to become degenerate
 // (Pyramids wedges ...) and nicely transition between levels.
 int vtkAMRDualGridHelper::ClaimBlockSharedRegion(
-  vtkAMRDualGridHelperBlock* block, 
+  vtkAMRDualGridHelperBlock* block,
   int blockX,  int blockY,  int blockZ,
   int regionX, int regionY, int regionZ)
 {
@@ -1069,7 +1069,7 @@ int vtkAMRDualGridHelper::ClaimBlockSharedRegion(
         (regionZ == -1 && ext3[4] == ext1[4]) || (regionZ == 1 && ext3[5] == ext1[5]))
       { // This face/edge/corner is on a grid boundary and may have a neighbor in this level.
       // Loop over the blocks that share this region. Faces have 2, edges 4 and corner 8.
-      // This was a real pain.  I could not have a loop that would increment 
+      // This was a real pain.  I could not have a loop that would increment
       // up or down (depending on sign of regionX,regionY,regionZ).
       // Sort start and end to have loop always increment up.
       startX = startY = startZ = 0;
@@ -1134,7 +1134,7 @@ int vtkAMRDualGridHelper::ClaimBlockSharedRegion(
                   {
                   // Now remove the neighbors owner bit for this region.
                   // How do we find the region in the neighbor?
-                  // Remove assignment for this region from neighbor 
+                  // Remove assignment for this region from neighbor
                   neighborBlock->RegionBits[regionX-ix-ix+1][regionY-iy-iy+1][regionZ-iz-iz+1] = 0;
                   tx=regionX-ix;    ty=regionY-iy;    tz=regionZ-iz; // all should be in [-1,1]
                   dist = tx*tx + ty*ty + tz*tz;
@@ -1154,7 +1154,7 @@ int vtkAMRDualGridHelper::ClaimBlockSharedRegion(
     }
 
   // If the region is degenerate and points have to be moved 
-  // to a lower level grid, tehn we have to copy the 
+  // to a lower level grid, tehn we have to copy the
   // volume fractions from the lower level grid too.
   if (this->EnableDegenerateCells && bestLevel < blockLevel)
     {
@@ -1162,7 +1162,7 @@ int vtkAMRDualGridHelper::ClaimBlockSharedRegion(
       { // Deal with remote blocks later.
       // Add the pair of blocks to a queue to copy when we get the data.
       vtkDataArray* bestBlockArray = 0;
-      vtkDataArray* blockArray = 0;      
+      vtkDataArray* blockArray = 0;
       if (block->Image)
         {
         blockArray = block->Image->GetCellData()->GetArray(this->ArrayName);
@@ -1171,9 +1171,18 @@ int vtkAMRDualGridHelper::ClaimBlockSharedRegion(
         {
         bestBlockArray = bestBlock->Image->GetCellData()->GetArray(this->ArrayName);
         }
-      this->QueueRegionRemoteCopy(regionX, regionY, regionZ,
-                                  bestBlock, bestBlockArray,
-                                  block, blockArray);
+      // We will skip the transfer when blocks are in the same level because
+      // the volume fraction ghost values will be correct.
+      // I used to have this check inside, but we do need to copy
+      // the level diffs when the neighbors are in the same level.
+      // The level diffs also use this communication channel.
+      // Level diffs cause the internal simplification.
+      if (bestBlock->Level != block->Level)
+        {
+        this->QueueRegionRemoteCopy(regionX, regionY, regionZ,
+                                    bestBlock, bestBlockArray,
+                                    block, blockArray);
+        }
       }
     else
       {
@@ -1186,11 +1195,11 @@ int vtkAMRDualGridHelper::ClaimBlockSharedRegion(
         block->Image = copy;
         block->CopyFlag = 1;
         }
-      vtkDataArray *blockDataArray = block->Image->GetCellData()->GetArray(this->ArrayName);  
-      vtkDataArray *bestBlockDataArray = bestBlock->Image->GetCellData()->GetArray(this->ArrayName);  
+      vtkDataArray *blockDataArray = block->Image->GetCellData()->GetArray(this->ArrayName);
+      vtkDataArray *bestBlockDataArray = bestBlock->Image->GetCellData()->GetArray(this->ArrayName);
       if (blockDataArray && bestBlockDataArray)
         {
-        this->CopyDegenerateRegionBlockToBlock(regionX,regionY,regionZ, 
+        this->CopyDegenerateRegionBlockToBlock(regionX,regionY,regionZ,
                 bestBlock,bestBlockDataArray,
                 block,blockDataArray);
         }
@@ -1306,7 +1315,7 @@ void vtkAMRDualGridHelper::CopyDegenerateRegionBlockToBlock(
   ext[1] = this->StandardBlockDimensions[0] + 1; // Add ghost layers back in.
   ext[3] = this->StandardBlockDimensions[1] + 1; // Add ghost layers back in.
   ext[5] = this->StandardBlockDimensions[2] + 1; // Add ghost layers back in.
-  
+
   // Test an assumption used in this method.
   if (ext[0] != 0 || ext[2] != 0 || ext[4] != 0)
     {
@@ -1365,7 +1374,7 @@ void vtkAMRDualGridHelper::CopyDegenerateRegionBlockToBlock(
 // to match corresponding values in low res-blocks.
 // This method copies low-res values to high-res ghost blocks.
 template <class T>
-void* vtkDualGridHelperCopyBlockToMessage(T* messagePtr, T* lowerPtr, 
+void* vtkDualGridHelperCopyBlockToMessage(T* messagePtr, T* lowerPtr,
                                           int ext[6], int yInc, int zInc)
 {
   // Loop over regions values (cells/dual points) and
@@ -1385,7 +1394,7 @@ void* vtkDualGridHelperCopyBlockToMessage(T* messagePtr, T* lowerPtr,
 void* vtkAMRDualGridHelper::CopyDegenerateRegionBlockToMessage(
   vtkAMRDualGridHelperDegenerateRegion* region,
   void* messagePtr)
-{    
+{
   int regionX = region->ReceivingRegion[0];
   int regionY = region->ReceivingRegion[1];
   int regionZ = region->ReceivingRegion[2];
@@ -1393,10 +1402,6 @@ void* vtkAMRDualGridHelper::CopyDegenerateRegionBlockToMessage(
   vtkAMRDualGridHelperBlock* highResBlock = region->ReceivingBlock;
 
   int levelDiff = highResBlock->Level - lowResBlock->Level;
-  if (levelDiff == 0)
-    { // double check.
-    return messagePtr;
-    }
   if (levelDiff < 0)
     { // We added the levels in the wrong order.
     vtkGenericWarningMacro("Reverse level change.");
@@ -1525,10 +1530,6 @@ void* vtkAMRDualGridHelper::CopyDegenerateRegionMessageToBlock(
   vtkAMRDualGridHelperBlock* highResBlock = region->ReceivingBlock;
 
   int levelDiff = highResBlock->Level - lowResBlock->Level;
-  if (levelDiff == 0)  // I am not sure this is right!  Can't levels be the same when copying?
-    { // double check.
-    return messagePtr;
-    }
   if (levelDiff < 0)
     { // We added the levels in the wrong order.
     vtkGenericWarningMacro("Reverse level change.");
@@ -1547,7 +1548,7 @@ void* vtkAMRDualGridHelper::CopyDegenerateRegionMessageToBlock(
   ext[1] = this->StandardBlockDimensions[0] + 1; // Add ghost layers back in.
   ext[3] = this->StandardBlockDimensions[1] + 1; // Add ghost layers back in.
   ext[5] = this->StandardBlockDimensions[2] + 1; // Add ghost layers back in.
-  
+
   // Test an assumption used in this method.
   if (ext[0] != 0 || ext[2] != 0 || ext[4] != 0)
     {
@@ -1556,7 +1557,7 @@ void* vtkAMRDualGridHelper::CopyDegenerateRegionMessageToBlock(
     }
   int yInc = ext[1]-ext[0]+1;
   int zInc = yInc*(ext[5]-ext[4]+1);
-  
+
   switch (regionX)
     {
     case -1:
@@ -1625,7 +1626,7 @@ void vtkAMRDualGridHelper::ProcessRegionRemoteCopyQueue(bool hackLevelFlag)
   int numProcs = this->Controller->GetNumberOfProcesses();
   int myProc = this->Controller->GetLocalProcessId();
   int procIdx;
-  
+
   for (procIdx = 0; procIdx < numProcs; ++procIdx)
     {
     // To avoid blocking.
@@ -1670,21 +1671,18 @@ void vtkAMRDualGridHelper::SendDegenerateRegionsFromQueue(int remoteProc, int lo
       // The extra memory is no big deal, but it is a pain to marshal integers
       // into a single message.
       int regionSize = 1;
+      int levelDiff = region->ReceivingBlock->Level - region->SourceBlock->Level;
       if (region->ReceivingRegion[0] == 0)
         {
-        // Note:  In rare cases, level difference can be larger than 1.
-        // This will reserve to much memory with no real harm done.
-        // Half the root dimensions, ghost layers not included.
-        // Ghost layers are handled by separate edge and corner regions.
-        regionSize *= (this->StandardBlockDimensions[0] >> 1);
+        regionSize *= (this->StandardBlockDimensions[0] >> levelDiff);
         }
       if (region->ReceivingRegion[1] == 0)
         {
-        regionSize *= (this->StandardBlockDimensions[1] >> 1);
+        regionSize *= (this->StandardBlockDimensions[1] >> levelDiff);
         }
       if (region->ReceivingRegion[2] == 0)
         {
-        regionSize *= (this->StandardBlockDimensions[2] >> 1);
+        regionSize *= (this->StandardBlockDimensions[2] >> levelDiff);
         }
       messageLength += regionSize * this->DataTypeSize;
       }
@@ -1722,7 +1720,7 @@ void vtkAMRDualGridHelper::ReceiveDegenerateRegionsFromQueue(int remoteProc, int
   int messageLength = 0;
   int queueLength = (int)(this->DegenerateRegionQueue.size());
   int queueIdx;
-  
+
   // Each region is actually either 1/4 of a face, 1/2 of and edge or a corner.
 
   // Note: In order to minimize communication, I am rellying heavily on the fact 
@@ -1736,23 +1734,21 @@ void vtkAMRDualGridHelper::ReceiveDegenerateRegionsFromQueue(int remoteProc, int
     if ( region->ReceivingBlock->ProcessId == localProc &&
          region->SourceBlock->ProcessId == remoteProc)
       { // We are assuming that the queue is ordered consistently on all processes.
-      // This avoids having to send the block indexes along with the data.
-      // The extra memory is no big deal, but it is a pain to marshal integers
-      // into a single message.
       int regionSize = 1;
+      int levelDiff = region->ReceivingBlock->Level - region->SourceBlock->Level;
       if (region->ReceivingRegion[0] == 0)
         {
         // Half the root dimensions, ghost layers not included.
         // Ghost layers are handled by separate edge and corner regions.
-        regionSize *= (this->StandardBlockDimensions[0] >> 1);
+        regionSize *= (this->StandardBlockDimensions[0] >> levelDiff);
         }
       if (region->ReceivingRegion[1] == 0)
         {
-        regionSize *= (this->StandardBlockDimensions[1] >> 1);
+        regionSize *= (this->StandardBlockDimensions[1] >> levelDiff);
         }
       if (region->ReceivingRegion[2] == 0)
         {
-        regionSize *= (this->StandardBlockDimensions[2] >> 1);
+        regionSize *= (this->StandardBlockDimensions[2] >> levelDiff);
         }
       messageLength += regionSize * this->DataTypeSize;
       }
@@ -1766,7 +1762,7 @@ void vtkAMRDualGridHelper::ReceiveDegenerateRegionsFromQueue(int remoteProc, int
   this->AllocateMessageBuffer(messageLength * sizeof(unsigned char));
   unsigned char* message = this->MessageBuffer;
   this->Controller->Receive(message, messageLength, remoteProc, 879015);
-  
+
   // Now copy the regions in the message into thelocal blocks.
   void* messagePtr = (void*)(this->MessageBuffer);
   for (queueIdx = 0; queueIdx < queueLength; ++queueIdx)
@@ -1782,6 +1778,7 @@ void vtkAMRDualGridHelper::ReceiveDegenerateRegionsFromQueue(int remoteProc, int
         region->ReceivingBlock->Image = copy;
         region->ReceivingBlock->CopyFlag = 1;
         }
+
       messagePtr = this->CopyDegenerateRegionMessageToBlock(
                         region,
                         messagePtr,
@@ -1813,7 +1810,7 @@ void vtkAMRDualGridHelper::ReceiveDegenerateRegionsFromQueue(int remoteProc, int
 // The array name is the cell array that is being processed by the filter.
 // Ghost values have to be modified at level changes.  It could be extended to
 // process multiple arrays.
-int vtkAMRDualGridHelper::Initialize(vtkHierarchicalBoxDataSet* input, 
+int vtkAMRDualGridHelper::Initialize(vtkHierarchicalBoxDataSet* input,
                                      const char* arrayName)
 {
   int blockId, numBlocks;
@@ -1849,7 +1846,7 @@ int vtkAMRDualGridHelper::Initialize(vtkHierarchicalBoxDataSet* input,
     }
   // All processes will have all blocks (but not image data).
   this->ShareBlocks();
-  
+
   // Plan for meshing between blocks.
   this->AssignSharedRegions();
   
@@ -1858,10 +1855,10 @@ int vtkAMRDualGridHelper::Initialize(vtkHierarchicalBoxDataSet* input,
   
   // Setup faces for seeding connectivity between blocks.
   //this->CreateFaces();
-  
+
   return VTK_OK;
 }
-void vtkAMRDualGridHelper::ClearRegionRemoteCopyQueue() 
+void vtkAMRDualGridHelper::ClearRegionRemoteCopyQueue()
 {
   this->DegenerateRegionQueue.clear();
 }
@@ -1936,7 +1933,7 @@ void vtkAMRDualGridHelper::ReceiveBlocks(int remoteProc)
         }
       vtkAMRDualGridHelperBlock* block = level->AddGridBlock(x,y,z, 0);
       block->ProcessId = blockProc;
-      
+
       block->OriginIndex[0] = this->StandardBlockDimensions[0] * x - 1;
       block->OriginIndex[1] = this->StandardBlockDimensions[1] * y - 1;
       block->OriginIndex[2] = this->StandardBlockDimensions[2] * z - 1;      
@@ -2039,7 +2036,7 @@ void vtkAMRDualGridHelper::ComputeGlobalMetaData(vtkHierarchicalBoxDataSet* inpu
   double largestSpacing[3];
   int    largestDims[3];
   int    largestNumCells;
-  
+
   double globalBounds[6];
 
   // Temporary variables.
@@ -2107,7 +2104,7 @@ void vtkAMRDualGridHelper::ComputeGlobalMetaData(vtkHierarchicalBoxDataSet* inpu
   // Send the results to process 0 that will choose the origin ...
   int numProcs = 1;
   int myId = 0;
-  
+
   double dMsg[18];
   int    iMsg[9];
   vtkMultiProcessController* controller = this->Controller;
@@ -2195,15 +2192,15 @@ void vtkAMRDualGridHelper::ComputeGlobalMetaData(vtkHierarchicalBoxDataSet* inpu
     if (this->StandardBlockDimensions[2] < 1)
       {
       this->StandardBlockDimensions[2] = 1;
-      }        
+      }
     this->RootSpacing[0] = lowestSpacing[0] * (1 << (lowestLevel));
     this->RootSpacing[1] = lowestSpacing[1] * (1 << (lowestLevel));
     this->RootSpacing[2] = lowestSpacing[2] * (1 << (lowestLevel));
-    
+
 //    DebuggingRootSpacing[0] = this->RootSpacing[0];
 //    DebuggingRootSpacing[1] = this->RootSpacing[1];
 //    DebuggingRootSpacing[2] = this->RootSpacing[2];
-    
+
     // Find the grid for the largest block.  We assume this block has the
     // extra ghost layers.
     largestOrigin[0] = largestOrigin[0] + largestSpacing[0];
@@ -2229,7 +2226,7 @@ void vtkAMRDualGridHelper::ComputeGlobalMetaData(vtkHierarchicalBoxDataSet* inpu
     lowestSpacing[0] *= this->StandardBlockDimensions[0];
     lowestSpacing[1] *= this->StandardBlockDimensions[1];
     lowestSpacing[2] *= this->StandardBlockDimensions[2];
-    
+
     // Change the origin so that all indexes will be positive.
     idx[0] = (int)(floor((globalBounds[0]-lowestOrigin[0]) / lowestSpacing[0]));
     idx[1] = (int)(floor((globalBounds[2]-lowestOrigin[1]) / lowestSpacing[1]));
@@ -2237,11 +2234,11 @@ void vtkAMRDualGridHelper::ComputeGlobalMetaData(vtkHierarchicalBoxDataSet* inpu
     this->GlobalOrigin[0] = lowestOrigin[0] + (double)(idx[0])*lowestSpacing[0];
     this->GlobalOrigin[1] = lowestOrigin[1] + (double)(idx[1])*lowestSpacing[1];
     this->GlobalOrigin[2] = lowestOrigin[2] + (double)(idx[2])*lowestSpacing[2];
-    
+
 //    DebuggingGlobalOrigin[0] = this->GlobalOrigin[0];
 //    DebuggingGlobalOrigin[1] = this->GlobalOrigin[1];
 //    DebuggingGlobalOrigin[2] = this->GlobalOrigin[2];
-    
+
     // Now send these to all the other processes and we are done!
     if (this->Controller)
       {
@@ -2268,5 +2265,3 @@ void vtkAMRDualGridHelper::ComputeGlobalMetaData(vtkHierarchicalBoxDataSet* inpu
       }
     }
 }
-
-

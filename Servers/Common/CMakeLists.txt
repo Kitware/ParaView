@@ -24,7 +24,7 @@ SET (PVCommandOptions_SRCS
   vtkPVXMLElement.cxx
 )
 
-ADD_LIBRARY(vtkPVCommandOptions ${PVCommandOptions_SRCS})
+VTK_ADD_LIBRARY(vtkPVCommandOptions ${PVCommandOptions_SRCS})
 TARGET_LINK_LIBRARIES(vtkPVCommandOptions
   vtkIO)
 
@@ -196,7 +196,7 @@ SET(VTK_KITS_DIR "${CMAKE_CURRENT_BINARY_DIR}/Utilities")
 PV_WRAP_VTK_CS("${KIT}" "${KIT_UPCASE}" "${KIT_WRAP_DEPS}")
 
 # Create the library.
-ADD_LIBRARY(vtk${KIT}
+VTK_ADD_LIBRARY(vtk${KIT}
   ${Kit_SRCS}
   ${KitInstantiator_SRCS}
   )
@@ -250,16 +250,11 @@ ENDIF (PARAVIEW_ENABLE_PYTHON)
 
 IF(NOT PV_INSTALL_NO_LIBRARIES)
   SET(temp_TO_INSTALL
-    vtk${KIT}CS
     vtk${KIT}
     vtkPVCommandOptions)
-  IF (PARAVIEW_ENABLE_PYTHON)
-    SET (temp_TO_INSTALL 
-      ${temp_TO_INSTALL}
-      vtk${KIT}Python)
-  ENDIF (PARAVIEW_ENABLE_PYTHON)
 
   INSTALL(TARGETS ${temp_TO_INSTALL}
+    EXPORT ${PV_INSTALL_EXPORT_NAME}
     RUNTIME DESTINATION ${PV_INSTALL_BIN_DIR} COMPONENT Runtime
     LIBRARY DESTINATION ${PV_INSTALL_LIB_DIR} COMPONENT Runtime
     ARCHIVE DESTINATION ${PV_INSTALL_LIB_DIR} COMPONENT Development)

@@ -36,6 +36,9 @@ ENDMACRO(GLOB_INSTALL_DEVELOPMENT)
 # Common settings
 SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${ParaView_SOURCE_DIR}/VTK/CMake")
 
+set(PV_INSTALL_EXPORT_NAME ParaViewTargets)
+set(VTK_INSTALL_EXPORT_NAME ${PV_INSTALL_EXPORT_NAME})
+
 # Configure VTK library versions to be paraview-specific.
 SET(VTK_NO_LIBRARY_VERSION 1)
 SET(VTK_LIBRARY_PROPERTIES VERSION "pv${PARAVIEW_VERSION}")
@@ -199,6 +202,7 @@ SET(XDMF_INSTALL_LIB_DIR ${PV_INSTALL_LIB_DIR})
 SET(XDMF_INSTALL_BIN_DIR ${PV_INSTALL_BIN_DIR})
 SET(XDMF_INSTALL_INCLUDE_DIR "${PV_INSTALL_INCLUDE_DIR}/Xdmf")
 SET(XDMF_INSTALL_INCLUDE_VTK_DIR "${PV_INSTALL_INCLUDE_DIR}/Xdmf")
+SET(XDMF_INSTALL_EXPORT_NAME ${PV_INSTALL_EXPORT_NAME})
 
 #########################################################################
 # The client server wrapper macro needs this name for
@@ -447,7 +451,7 @@ ELSE(PARAVIEW_USE_SYSTEM_HDF5)
   # Avoid duplicating names of installed libraries
   #SET(HDF5_EXTERNAL_LIB_PREFIX "vtk")
   # Export configuration to this export variable
-  SET(HDF5_EXPORTED_TARGETS "paraview-targets")
+  SET(HDF5_EXPORTED_TARGETS ${PV_INSTALL_EXPORT_NAME})
 
   # Silence HDF5's warnings. We'll let them get fixed upstream
   # and merge in updates as necessary.
@@ -591,6 +595,7 @@ SET(ICET_INSTALL_BIN_DIR ${PV_INSTALL_BIN_DIR})
 SET(ICET_INSTALL_LIB_DIR ${PV_INSTALL_LIB_DIR})
 SET(ICET_INSTALL_INCLUDE_DIR ${PV_INSTALL_INCLUDE_DIR})
 SET(ICET_INSTALL_NO_DEVELOPMENT ${PV_INSTALL_NO_DEVELOPMENT})
+SET(ICET_INSTALL_EXPORT_NAME ${PV_INSTALL_EXPORT_NAME})
 MARK_AS_ADVANCED(CLEAR VTK_USE_MPI)
 IF(VTK_USE_MPI)
   OPTION(PARAVIEW_USE_ICE_T "Use IceT multi display manager" ON)
@@ -605,11 +610,16 @@ IF(VTK_USE_MPI)
     ENDIF (PARAVIEW_TEST_COMPOSITING)
   ENDIF (BUILD_TESTING)
   IF(PARAVIEW_USE_ICE_T)
+
+    # Export IceT's Targets
+    SET_PROPERTY(GLOBAL APPEND PROPERTY VTK_TARGETS IceTCore IceTMPI IceTGL)
+
     SET(ICET_INCLUDE_DIR
       ${ParaView_SOURCE_DIR}/Utilities/IceT/src/include
       ${ParaView_BINARY_DIR}/Utilities/IceT/src/include
       )
     ADD_SUBDIRECTORY(Utilities/IceT)
+
   ENDIF(PARAVIEW_USE_ICE_T)
 
   # Needed for mpich 2
