@@ -10188,7 +10188,7 @@ This property controls how the filter works to generate tensor cell data. You ca
 
    </SourceProxy> <!-- PCAStatistics -->
 
-   <SourceProxy name="HaloFinder" class="vtkPCosmoHaloFinder" label="Cosmology FOF Halo Finder">
+   <SourceProxy name="HaloFinder" class="vtkPCosmoHaloFinder" label="FOF/SOD Halo Finder">
      <InputProperty
         name="Input"
         command="SetInputConnection">
@@ -10201,58 +10201,29 @@ This property controls how the filter works to generate tensor cell data. You ca
           </DataTypeDomain>
      </InputProperty>
 
-     <IntVectorProperty
-        name="HaloPositionType"
-        command="SetHaloPositionType"
-        label="Halo position for 3D visualization"
+     <DoubleVectorProperty
+        name="RL"
+        command="SetRL"
+        label="rL (physical box side length)"
         number_of_elements="1"
-        default_values="0" >
-       <EnumerationDomain name="enum">
-         <Entry value="0" text="Average"/>
-         <Entry value="1" text="Center of Mass"/>
-         <Entry value="2" text="Most Bound Particle"/>
-         <Entry value="3" text="Most Connected Particle"/>
-       </EnumerationDomain>
+        default_values="100" >
+     <DoubleRangeDomain name="range" min="0" />
        <Documentation>
-       This sets the position for the halo catalog particles (second output) in 3D space for visualization.  Input particle positions (first output) will be unaltered by this.  MBP and MCP for particle positions can potentially take a very long time to calculate.
+       The box side length used to wrap particles around if they exceed rL (or less than 0) in any dimension (only positive positions are allowed in the input, or they are wrapped around).
        </Documentation>
-     </IntVectorProperty>
+     </DoubleVectorProperty>
 
-     <IntVectorProperty
-        name="CopyHaloDataToParticles"
-        command="SetCopyHaloDataToParticles"
-        label="Copy halo catalog information to original particles"
+     <DoubleVectorProperty
+        name="Overlap"
+        command="SetOverlap"
+        label="overlap (shared point/ghost cell gap distance)"
         number_of_elements="1"
-        default_values="1" >
-     <BooleanDomain name="bool" />
+        default_values="5" >
+     <DoubleRangeDomain name="range" min="0" />
        <Documentation>
-       If checked, the halo catalog information will be copied to the original particles as well. 
+       The space (in rL units) to extend processor particle ownership for ghost particles/cells.  Needed for correct halo calculation when halos cross processor boundaries in parallel computation.
        </Documentation>
-     </IntVectorProperty>
-
-     <IntVectorProperty
-        name="ComputeMostBoundParticle"
-        command="SetComputeMostBoundParticle"
-        label="Compute the most bound particle for halos"
-        number_of_elements="1"
-        default_values="0" >
-     <BooleanDomain name="bool" />
-       <Documentation>
-       If checked, the most bound particle will be calculated.  This can be very slow.
-       </Documentation>
-     </IntVectorProperty>
-
-     <IntVectorProperty
-        name="ComputeMostConnectedParticle"
-        command="SetComputeMostConnectedParticle"
-        label="Compute the most connected particle for halos"
-        number_of_elements="1"
-        default_values="0" >
-     <BooleanDomain name="bool" />
-       <Documentation>
-       If checked, the most connected particle will be calculated.  This can be very slow.
-       </Documentation>
-     </IntVectorProperty>
+     </DoubleVectorProperty>
 
      <IntVectorProperty
         name="NP"
@@ -10267,50 +10238,115 @@ This property controls how the filter works to generate tensor cell data. You ca
      </IntVectorProperty>
 
      <DoubleVectorProperty
-        name="RL"
-        command="SetRL"
-        label="rL (physical box side length)"
+        name="BB"
+        command="SetBB"
+        label="bb (linking length)"
         number_of_elements="1"
-        default_values="100" >
+        default_values="0.20" >
      <DoubleRangeDomain name="range" min="0" />
        <Documentation>
-       The box side length used to wrap particles around if they exceed rL (or less than 0) in any dimension (only positive positions are allowed in the input, or the are wrapped around).
-       </Documentation>
-     </DoubleVectorProperty>
-
-     <DoubleVectorProperty
-        name="Overlap"
-        command="SetOverlap"
-        label="overlap (shared point/ghost cell gap distance)"
-        number_of_elements="1"
-        default_values="5" >
-     <DoubleRangeDomain name="range" min="0" />
-       <Documentation>
-       The space in rL units to extend processor particle ownership for ghost particles/cells.  Needed for correct halo calculation when halos cross processor boundaries in parallel computation.
+         Linking length measured in units of interparticle spacing and is dimensionless.  Used to link particles into halos for the friends-of-friends (FOF) algorithm.
        </Documentation>
      </DoubleVectorProperty>
 
      <IntVectorProperty
         name="PMin"
         command="SetPMin"
-        label="pmin (minimum particle threshold for a halo)"
+        label="pmin (minimum particle threshold for an FOF halo)"
         number_of_elements="1"
         default_values="100" >
      <IntRangeDomain name="range" min="1" />
        <Documentation>
-         Minimum number of particles (threshold) needed before a group is called a halo.
+         Minimum number of particles (threshold) needed before a group is called a friends-of-friends (FOF) halo.
+       </Documentation>
+     </IntVectorProperty>
+
+     <IntVectorProperty
+        name="CopyHaloDataToParticles"
+        command="SetCopyHaloDataToParticles"
+        label="Copy FOF halo catalog to original particles"
+        number_of_elements="1"
+        default_values="0" >
+     <BooleanDomain name="bool" />
+       <Documentation>
+       If checked, the friends-of-friends (FOF) halo catalog information will be copied to the original particles as well.
+       </Documentation>
+     </IntVectorProperty>
+
+     <IntVectorProperty
+        name="ComputeMostBoundParticle"
+        command="SetComputeMostBoundParticle"
+        label="Compute the most bound particle"
+        number_of_elements="1"
+        default_values="0" >
+     <BooleanDomain name="bool" />
+       <Documentation>
+       If checked, the most bound particle for an FOF halo will be calculated.  WARNING: This can be very slow.
+       </Documentation>
+     </IntVectorProperty>
+
+     <IntVectorProperty
+        name="ComputeMostConnectedParticle"
+        command="SetComputeMostConnectedParticle"
+        label="Compute the most connected particle"
+        number_of_elements="1"
+        default_values="0" >
+     <BooleanDomain name="bool" />
+       <Documentation>
+       If checked, the most connected particle for an FOF halo will be calculated.  WARNING: This can be very slow.
+       </Documentation>
+     </IntVectorProperty>
+
+     <IntVectorProperty
+        name="ComputeSOD"
+        command="SetComputeSOD"
+        label="Compute spherical overdensity (SOD) halos"
+        number_of_elements="1"
+        default_values="0" >
+     <BooleanDomain name="bool" />
+       <Documentation>
+       If checked, spherical overdensity (SOD) halos will be calculated in addition to friends-of-friends (FOF) halos.
+       </Documentation>
+     </IntVectorProperty>
+
+     <IntVectorProperty
+         name="SODCenterType"
+         command="SetSODCenterType"
+         label="initial SOD center"
+         number_of_elements="1"
+         default_values="0">
+       <EnumerationDomain name="sod_center_type">
+         <Entry value="0" text="Center of mass"/>
+         <Entry value="1" text="Average position"/>
+         <Entry value="2" text="Most bound particle"/>
+         <Entry value="3" text="Most connected particle"/>
+       </EnumerationDomain>
+       <Documentation>
+       The initial friends-of-friends (FOF) center used for calculating a spherical overdensity (SOD) halo.  WARNING: Using MBP or MCP can be very slow.
        </Documentation>
      </IntVectorProperty>
 
      <DoubleVectorProperty
-        name="BB"
-        command="SetBB"
-        label="bb (linking length/distance)"
+        name="RhoCScale"
+        command="SetRhoCScale"
+        label="scale factor for rho_c"
         number_of_elements="1"
-        default_values="0.20" >
-     <DoubleRangeDomain name="range" min="0" />
+        default_values="1.0" >
+     <DoubleRangeDomain name="range" />
        <Documentation>
-         Linking length measured in units of interparticle spacing and is dimensionless.  Used to link particles into halos for the friend-of-a-friend algorithm.
+       Scale factor for rho_c in SOD halo finding such that rho_c' = rho_c * scale factor.  Initial rho_c is 2.77536627e11 (M_sun/h) / (Mpc/h)^3.
+       </Documentation>
+     </DoubleVectorProperty>
+
+     <DoubleVectorProperty
+        name="SODMassScale"
+        command="SetSODMassScale"
+        label="scale factor for initial SOD mass"
+        number_of_elements="1"
+        default_values="1.0" >
+     <DoubleRangeDomain name="range" />
+       <Documentation>
+       Scale factor for the initial SOD mass such that mass' = mass * scale factor.  Initial SOD mass is 1.0e14 (M_sun/h).
        </Documentation>
      </DoubleVectorProperty>
 

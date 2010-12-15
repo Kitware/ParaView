@@ -1952,7 +1952,7 @@
         default_values="5" >
      <DoubleRangeDomain name="range" min="0" />
        <Documentation>
-       The space in rL units to extend processor particle ownership for ghost particles/cells.  Needed for correct halo calculation when halos cross processor boundaries in parallel computation.
+       The space (in rL units) to extend processor particle ownership for ghost particles/cells.  Needed for correct halo calculation when halos cross processor boundaries in parallel computation.
        </Documentation>
      </DoubleVectorProperty>
 
