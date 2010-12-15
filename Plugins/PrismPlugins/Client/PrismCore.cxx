@@ -587,7 +587,6 @@ void PrismCore::onViewRemoved(pqView* view)
       iter=this->CubeAxesRepMap.find(dataRepr);
       if(iter!=this->CubeAxesRepMap.end())
       {
-        vtkSMPrismCubeAxesRepresentationProxy* cubeAxes=iter.value();
         vtkSMViewProxy* renv= view->getViewProxy();
         vtkSMPropertyHelper(renv, "HiddenRepresentations").Remove(iter.value());
         this->CubeAxesViewMap.remove(iter.value());
@@ -992,7 +991,6 @@ void PrismCore::onSelectionChanged()
   {
     pqOutputPort* port = qobject_cast<pqOutputPort*>(item);
     pqPipelineSource *source = NULL;
-    vtkSMProxy* proxy=NULL;
     int portNumber=0;
     if(port)
     {
