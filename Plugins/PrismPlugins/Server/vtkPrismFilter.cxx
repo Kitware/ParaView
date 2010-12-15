@@ -341,6 +341,9 @@ int vtkPrismFilter::CreateGeometry(vtkDataSet *inputData,
 
 
   vtkSmartPointer<vtkPolyData> polydata = vtkSmartPointer<vtkPolyData>::New();
+  // construct new points at the centers of the cells
+  vtkPoints *newPoints = vtkPoints::New();
+
 
   vtkPointData  *outPD = polydata->GetPointData();
   vtkCellData  *outCD = polydata->GetCellData();
@@ -350,12 +353,36 @@ int vtkPrismFilter::CreateGeometry(vtkDataSet *inputData,
 
   vtkDebugMacro( << "Mapping point data to new cell center point..." );
 
-  // construct new points at the centers of the cells
-  vtkPoints *newPoints = vtkPoints::New();
+  bool isCellData[3]={true,true,true};
+
 
   inputScalars[0] = inCD->GetScalars( this->GetXAxisVarName() );
+  if(!inputScalars[0])
+  {
+    inputScalars[0] = inPD->GetScalars( this->GetXAxisVarName() );
+    if(inputScalars[0])
+    {
+      isCellData[0]=false;
+    }
+  }
   inputScalars[1] = inCD->GetScalars( this->GetYAxisVarName() );
+  if(!inputScalars[1])
+  {
+    inputScalars[1] = inPD->GetScalars( this->GetYAxisVarName() );
+    if(inputScalars[1])
+    {
+      isCellData[1]=false;
+    }
+  }
   inputScalars[2] = inCD->GetScalars( this->GetZAxisVarName() );
+  if(!inputScalars[2])
+  {
+    inputScalars[2] = inPD->GetScalars( this->GetZAxisVarName() );
+    if(inputScalars[2])
+    {
+      isCellData[2]=false;
+    }
+  }
 
   vtkIdType newIDs[1] = {0};
   if ( (numCells=inputData->GetNumberOfCells()) < 1 )
@@ -364,50 +391,116 @@ int vtkPrismFilter::CreateGeometry(vtkDataSet *inputData,
     return 0;
   }
 
-  weights = new double[maxCellSize];
-  cellPts = vtkIdList::New();
-  cellPts->Allocate( maxCellSize );
-
-  // Pass cell data (note that this passes current cell data through to the
-  // new points that will be created at the cell centers)
-  outCD->PassData( inCD );
-
-  // create space for the newly interpolated values
-  outPD->CopyAllocate( inPD,numCells );
-
-  int abort=0;
-  //double funcArgs[3]  = { 0.0, 0.0, 0.0 };
-  double newPt[3] = {0.0, 0.0, 0.0};
-  vtkIdType progressInterval=numCells/20 + 1;
-  polydata->Allocate( numCells );
-  for ( cellId=0; cellId < numCells && !abort; cellId++ )
+  if(!isCellData[0] && !isCellData[1] && !isCellData[2])
   {
-    if ( !(cellId % progressInterval) )
-    {
-      this->UpdateProgress( (double)cellId/numCells );
-      abort = GetAbortExecute();
-    }
+    //All Point Data.
+    weights = new double[maxCellSize];
+    cellPts = vtkIdList::New();
+    cellPts->Allocate( maxCellSize );
 
-    inputData->GetCellPoints( cellId, cellPts );
-    numPts = cellPts->GetNumberOfIds();
-    if ( numPts > 0 )
+    // Pass cell data (note that this passes current cell data through to the
+    // new points that will be created at the cell centers)
+    outCD->PassData( inCD );
+
+    // create space for the newly interpolated values
+    outPD->CopyAllocate( inPD,numCells );
+
+    int abort=0;
+    //double funcArgs[3]  = { 0.0, 0.0, 0.0 };
+    double newPt[3] = {0.0, 0.0, 0.0};
+    vtkIdType progressInterval=numCells/20 + 1;
+    polydata->Allocate( numCells );
+    for ( cellId=0; cellId < numCells && !abort; cellId++ )
     {
-      weight = 1.0 / numPts;
-      for (ptId=0; ptId < numPts; ptId++)
+      if ( !(cellId % progressInterval) )
       {
-        weights[ptId] = weight;
+        this->UpdateProgress( (double)cellId/numCells );
+        abort = GetAbortExecute();
       }
-      outPD->InterpolatePoint(inPD, cellId, cellPts, weights);
+
+      inputData->GetCellPoints( cellId, cellPts );
+      numPts = cellPts->GetNumberOfIds();
+      if ( numPts > 0 )
+      {
+        weight = 1.0 / numPts;
+        for (ptId=0; ptId < numPts; ptId++)
+        {
+          weights[ptId] = weight;
+        }
+        outPD->InterpolatePoint(inPD, cellId, cellPts, weights);
+      }
+
+      inputScalars[0] = outPD->GetScalars( this->GetXAxisVarName() );
+      inputScalars[1] = outPD->GetScalars( this->GetYAxisVarName() );
+      inputScalars[2] = outPD->GetScalars( this->GetZAxisVarName() );
+
+
+      newPt[0] = inputScalars[0]->GetTuple1( cellId );
+      newPt[1] = inputScalars[1]->GetTuple1( cellId );
+      newPt[2] = inputScalars[2]->GetTuple1( cellId );
+      newIDs[0] = newPoints->InsertNextPoint( newPt );
+
+
+      polydata->InsertNextCell( VTK_VERTEX, 1, newIDs );
+    }
+  }
+  else if(isCellData[0] && isCellData[1] && isCellData[2])
+  {
+    //All Cell Data.
+
+    weights = new double[maxCellSize];
+    cellPts = vtkIdList::New();
+    cellPts->Allocate( maxCellSize );
+
+    // Pass cell data (note that this passes current cell data through to the
+    // new points that will be created at the cell centers)
+    outCD->PassData( inCD );
+
+    // create space for the newly interpolated values
+    outPD->CopyAllocate( inPD,numCells );
+
+    int abort=0;
+    //double funcArgs[3]  = { 0.0, 0.0, 0.0 };
+    double newPt[3] = {0.0, 0.0, 0.0};
+    vtkIdType progressInterval=numCells/20 + 1;
+    polydata->Allocate( numCells );
+    for ( cellId=0; cellId < numCells && !abort; cellId++ )
+    {
+      if ( !(cellId % progressInterval) )
+      {
+        this->UpdateProgress( (double)cellId/numCells );
+        abort = GetAbortExecute();
+      }
+
+      inputData->GetCellPoints( cellId, cellPts );
+      numPts = cellPts->GetNumberOfIds();
+      if ( numPts > 0 )
+      {
+        weight = 1.0 / numPts;
+        for (ptId=0; ptId < numPts; ptId++)
+        {
+          weights[ptId] = weight;
+        }
+        outPD->InterpolatePoint(inPD, cellId, cellPts, weights);
+      }
+
+
+      newPt[0] = inputScalars[0]->GetTuple1( cellId );
+      newPt[1] = inputScalars[1]->GetTuple1( cellId );
+      newPt[2] = inputScalars[2]->GetTuple1( cellId );
+      newIDs[0] = newPoints->InsertNextPoint( newPt );
+
+
+      polydata->InsertNextCell( VTK_VERTEX, 1, newIDs );
     }
 
+  }
+  else
+  {
+    //Mixed input array types between cell and point. We can't handle this right now.
+    vtkDebugMacro(<< "Error: Prism can't handle mixed cell and point data" );
+    return 0;
 
-    newPt[0] = inputScalars[0]->GetTuple1( cellId );
-    newPt[1] = inputScalars[1]->GetTuple1( cellId );
-    newPt[2] = inputScalars[2]->GetTuple1( cellId );
-    newIDs[0] = newPoints->InsertNextPoint( newPt );
-
-
-    polydata->InsertNextCell( VTK_VERTEX, 1, newIDs );
   }
 
   vtkIdType pointId;
@@ -498,22 +591,8 @@ int vtkPrismFilter::CreateGeometry(vtkDataSet *inputData,
   delete [] weights;
 
 
-  if(false)
-    //if(this->Internal->SimulationDataThreshold)
-  {
-    //TODO Using the threshold causes problems with the linked selection.
-    //This feature has been removed from Prism PavaView panel until
-    //a solution can be found.
-    this->Internal->ExtractGeometry->SetInput(polydata);
-    double thresholdBounds[6];
-    this->Internal->Reader->GetActualThresholdBounds(thresholdBounds);
-    this->Internal->Box->SetBounds(thresholdBounds);
-    this->Internal->TransformFilter->SetInput( this->Internal->ExtractGeometry->GetOutput());
-  }
-  else
-  {
-    this->Internal->TransformFilter->SetInput(polydata);
-  }
+  this->Internal->TransformFilter->SetInput(polydata);
+
 
 
   double scale[3];

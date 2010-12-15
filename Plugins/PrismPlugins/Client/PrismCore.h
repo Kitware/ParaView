@@ -31,6 +31,7 @@ public:
    static PrismCore* instance();
 
   void  createActions(QActionGroup*);
+  void createMenuActions(QActionGroup*);
   QMap<pqDataRepresentation*,vtkSMPrismCubeAxesRepresentationProxy*> CubeAxesRepMap;
   QMap<vtkSMPrismCubeAxesRepresentationProxy*,pqRenderView*> CubeAxesViewMap;
 
@@ -60,6 +61,8 @@ private:
   pqServer* getActiveServer() const;
  QAction *SesameViewAction;
  QAction *PrismViewAction;
+ QAction *MenuSesameViewAction;
+ QAction *MenuPrismViewAction;
 
  vtkSmartPointer<vtkEventQtSlotConnect> VTKConnections;
  bool ProcessingEvent;

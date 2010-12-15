@@ -202,6 +202,8 @@ PrismCore::PrismCore(QObject* p)
     this->VTKConnections = NULL;
     this->PrismViewAction=NULL;
     this->SesameViewAction=NULL;
+    this->MenuPrismViewAction=NULL;
+    this->MenuSesameViewAction=NULL;
 
 
     pqServerManagerModel* model=pqApplicationCore::instance()->getServerManagerModel();
@@ -280,7 +282,26 @@ PrismCore* PrismCore::instance()
         }
     return Instance;
     }
+void PrismCore::createMenuActions(QActionGroup* ag)
+    {
+      if(!this->MenuPrismViewAction)
+      {
+        this->MenuPrismViewAction = new QAction("Prism View",ag);
+        this->MenuPrismViewAction->setToolTip("Create Prism View");
+        this->MenuPrismViewAction->setIcon(QIcon(":/Prism/Icons/PrismSmall.png"));
+        this->MenuPrismViewAction->setEnabled(false);
 
+        QObject::connect(this->MenuPrismViewAction, SIGNAL(triggered(bool)), this, SLOT(onCreatePrismView()));
+      }
+      if(!this->MenuSesameViewAction)
+      {
+        this->MenuSesameViewAction = new QAction("SESAME Surface",ag);
+        this->MenuSesameViewAction->setToolTip("Open SESAME Surface");
+        this->MenuSesameViewAction->setIcon(QIcon(":/Prism/Icons/CreateSESAME.png"));
+
+        QObject::connect(this->MenuSesameViewAction, SIGNAL(triggered(bool)), this, SLOT(onSESAMEFileOpen()));
+      }
+    }
 
 
 void PrismCore::createActions(QActionGroup* ag)
@@ -765,10 +786,11 @@ void PrismCore::onPrismSelection(vtkObject* caller,
 
 
 
-    if (strcmp(selPrism->GetXMLName(), "FrustumSelectionSource") == 0 ||
-      strcmp(selPrism->GetXMLName(), "ThresholdSelectionSource") == 0)
+
+    vtkSMSourceProxy* newSource=NULL;
+    if (strcmp(selPrism->GetXMLName(), "GlobalIDSelectionSource") != 0)
     {
-      vtkSMSourceProxy* newSource = vtkSMSourceProxy::SafeDownCast(
+      newSource = vtkSMSourceProxy::SafeDownCast(
         vtkSMSelectionHelper::ConvertSelection(vtkSelectionNode::GLOBALIDS,
         selPrism,
         prismP,
@@ -779,7 +801,7 @@ void PrismCore::onPrismSelection(vtkObject* caller,
         return;
       }
       newSource->UpdateVTKObjects();
-      prismP->SetSelectionInput(portIndex,newSource, 0);
+   //   prismP->SetSelectionInput(portIndex,newSource, 0);
       selPrism=newSource;
     }
 
@@ -824,8 +846,13 @@ void PrismCore::onPrismSelection(vtkObject* caller,
 
     selSource->UpdateVTKObjects();
     sourceP->SetSelectionInput(0,selSource,0);
-    selSource->UnRegister(NULL);
 
+    selSource->Delete();
+
+    if(newSource)
+    {
+      newSource->Delete();
+    }
 
 
     pqPipelineSource* pqPrismSourceP=model->findItem<pqPipelineSource*>(sourceP);
@@ -884,10 +911,10 @@ void PrismCore::onGeometrySelection(vtkObject* caller,
 
 
 
-    if (strcmp(selSource->GetXMLName(), "FrustumSelectionSource") == 0 ||
-      strcmp(selSource->GetXMLName(), "ThresholdSelectionSource") == 0)
+    vtkSMSourceProxy* newSource=NULL;
+    if (strcmp(selSource->GetXMLName(), "GlobalIDSelectionSource") != 0)
     {
-      vtkSMSourceProxy* newSource = vtkSMSourceProxy::SafeDownCast(
+      newSource = vtkSMSourceProxy::SafeDownCast(
         vtkSMSelectionHelper::ConvertSelection(vtkSelectionNode::GLOBALIDS,
         selSource,
         sourceP,
@@ -898,7 +925,7 @@ void PrismCore::onGeometrySelection(vtkObject* caller,
         return;
       }
       newSource->UpdateVTKObjects();
-      sourceP->SetSelectionInput(portIndex,newSource, 0);
+   //   sourceP->SetSelectionInput(portIndex,newSource, 0);
       selSource=newSource;
     }
 
@@ -911,7 +938,6 @@ void PrismCore::onGeometrySelection(vtkObject* caller,
 
     pxm->UnRegisterLink(prismP->GetSelfIDAsString());//TODO we need a unique id that represents the connection.
     //Otherwise we geometry in multiple SESAME views and vise versa.
-
 
 
 
@@ -937,8 +963,11 @@ void PrismCore::onGeometrySelection(vtkObject* caller,
 
     selPrism->UpdateVTKObjects();
     prismP->SetSelectionInput(3,selPrism,0);
-    selPrism->UnRegister(NULL);
-
+    selPrism->Delete();
+    if(newSource)
+    {
+      newSource->Delete();
+    }
 
 
 
@@ -1004,6 +1033,10 @@ void PrismCore::onSelectionChanged()
             {
               this->PrismViewAction->setEnabled(true);
             }
+            if(this->MenuPrismViewAction)
+            {
+              this->MenuPrismViewAction->setEnabled(true);
+            }
             return;
           }
         }
@@ -1014,5 +1047,9 @@ void PrismCore::onSelectionChanged()
   if(this->PrismViewAction)
   {
     this->PrismViewAction->setEnabled(false);
+  }
+  if(this->MenuPrismViewAction)
+  {
+    this->MenuPrismViewAction->setEnabled(false);
   }
 }
