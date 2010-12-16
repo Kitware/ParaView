@@ -49,6 +49,10 @@ public:
   vtkGetVector3Macro(Scale, double);
 
   // Description:
+  // Get/Set the bounds of the data.
+  vtkGetVector6Macro(DataBounds, double);
+
+  // Description:
   // Get/Set custom bounds to use. When corresponding CustomBoundsActive is
   // true, the data bounds will be ignored for that direction and CustomBounds
   // will be used instead.
@@ -108,6 +112,8 @@ public:
   void SetZAxisTickVisibility(int val);
   void SetZAxisMinorTickVisibility(int val);
   void SetDrawZGridlines(int val);
+
+  void UpdateBounds();
 //BTX
 protected:
   vtkCubeAxesRepresentation();
@@ -116,8 +122,6 @@ protected:
   virtual int FillInputPortInformation(int port, vtkInformation* info);
   int RequestData(vtkInformation*,
     vtkInformationVector** inputVector, vtkInformationVector*);
-
-  void UpdateBounds();
 
   // Description:
   // Adds the representation to the view.  This is called from
