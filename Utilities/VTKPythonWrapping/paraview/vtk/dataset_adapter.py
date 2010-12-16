@@ -220,6 +220,25 @@ class CompositeDataIterator(object):
         """Returns attributes from the vtkCompositeDataIterator."""
         return getattr(self.Iterator, name)
 
+class MultiCompositeDataIterator(CompositeDataIterator):
+    def __init__(self, cds):
+        CompositeDataIterator.__init__(self, cds[0])
+        self.Datasets = cds
+
+    def next(self):
+        if not self.Iterator:
+            raise StopIteration
+
+        if self.Iterator.IsDoneWithTraversal():
+            raise StopIteration
+        retVal = []
+        retVal.append(WrapDataObject(self.Iterator.GetCurrentDataObject()))
+        if len(self.Datasets) > 1:
+            for cd in self.Datasets[1:]:
+                retVal.append(WrapDataObject(cd.GetDataSet(self.Iterator)))
+        self.Iterator.GoToNextItem()
+        return retVal
+
 class CompositeDataSet(VTKObjectWrapper):
 
     def __iter__(self):
