@@ -140,6 +140,7 @@ pqRenderViewBase::pqRenderViewBase(
 {
   this->Internal = new pqRenderViewBase::pqInternal();
   this->InteractiveDelayUpdateTimer = new QTimer(this);
+  this->AllowCaching = true;
 }
 
 //-----------------------------------------------------------------------------
@@ -174,13 +175,17 @@ QWidget* pqRenderViewBase::createWidget()
   // For now, we are doing this only on Apple because it can render
   // and capture a frame buffer even when it is obstructred by a
   // window. This does not work as well on other platforms.
-#if defined(__APPLE__)
-  vtkwidget->setAutomaticImageCacheEnabled(true);
 
-  // help the QVTKWidget know when to clear the cache
-  this->getConnector()->Connect(
-    this->getProxy(), vtkCommand::ModifiedEvent,
-    vtkwidget, SLOT(markCachedImageAsDirty()));
+#if 1//defined(__APPLE__)
+  if (this->AllowCaching)
+    {
+    vtkwidget->setAutomaticImageCacheEnabled(true);
+
+    // help the QVTKWidget know when to clear the cache
+    this->getConnector()->Connect(
+      this->getProxy(), vtkCommand::ModifiedEvent,
+      vtkwidget, SLOT(markCachedImageAsDirty()));
+    }
 #endif
 
   return vtkwidget;

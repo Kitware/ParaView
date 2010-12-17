@@ -1,3 +1,18 @@
+/*=========================================================================
+
+  Program:   Visualization Toolkit
+  Module:    vtkPriorityHelper.cxx
+
+  Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
+  All rights reserved.
+  See Copyright.txt or http://www.kitware.com/Copyright.htm for details.
+
+     This software is distributed WITHOUT ANY WARRANTY; without even
+     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+     PURPOSE.  See the above copyright notice for more information.
+
+=========================================================================*/
+
 #include "vtkPriorityHelper.h"
 #include "vtkObjectFactory.h"
 
@@ -7,40 +22,16 @@
 
 vtkStandardNewMacro(vtkPriorityHelper);
 
-#define DEBUGPRINT_PRIORITY(arg)\
-  if (this->EnableStreamMessages)                       \
-    {                                                   \
-    arg;                                                \
-    }
-
 //-----------------------------------------------------------------------------
 vtkPriorityHelper::vtkPriorityHelper()
 {
   this->Input = NULL;
   this->Port = 0;
-  this->Piece = 0;
-  this->Offset = 0;
-  this->NumPieces = 0;
-  this->NumPasses = 0;
-  this->EnableCulling = 1;
-  this->EnableStreamMessages = 0;
 }
 
 //-----------------------------------------------------------------------------
 vtkPriorityHelper::~vtkPriorityHelper()
 {
-}
-
-//-----------------------------------------------------------------------------
-double vtkPriorityHelper::ComputePriority()
-{ 
-  //find priority for currently active piece
-  if (this->Input && this->EnableCulling)
-    {
-    double ret = this->Input->ComputePriority();
-    return ret;
-    }
-  return 1.0;
 }
 
 //-----------------------------------------------------------------------------
@@ -54,102 +45,50 @@ void vtkPriorityHelper::SetInputConnection(vtkAlgorithmOutput *port)
 }
 
 //-----------------------------------------------------------------------------
-int vtkPriorityHelper::SetSplitUpdateExtent(int port, 
-                                            int piece, int offset,
-                                            int numPieces, 
-                                            int numPasses,
-                                            int vtkNotUsed(ghostLevel),
-                                            int save)
+int vtkPriorityHelper::SetSplitUpdateExtent
+  (int port,
+   int processor,
+   int numProcessors,
+   int pass,
+   int numPasses,
+   double resolution
+   )
 {
+  this->Port = port;
   //set currently active piece, remember settings to reuse internally
   if (this->Input)
     {
-    vtkStreamingDemandDrivenPipeline *sddp = 
+    vtkStreamingDemandDrivenPipeline *sddp =
       vtkStreamingDemandDrivenPipeline::SafeDownCast(
         this->Input->GetExecutive());
     if (sddp)
       {
-      if (save)
-        {
-        this->Port = port;
-        this->Piece = piece;
-        this->Offset = offset;
-        this->NumPieces = numPieces;
-        this->NumPasses = numPasses;
-        }
-      DEBUGPRINT_PRIORITY(
-        cerr << "PHelper(" << this << ") SetSplitUE " 
-             << piece*numPasses+offset << "/" << numPieces*numPasses << endl;
-                          );
-      int ret = sddp->SetSplitUpdateExtent(port, piece*numPasses, 
-                                           offset, 
-                                           numPieces*numPasses, 0);      
-      return ret;
+      sddp->SetUpdateExtent(this->Port,
+                            processor*numProcessors + pass,
+                            numProcessors*numPasses,
+                            0); //ghost level
+      sddp->SetUpdateResolution(this->Port, resolution);
+      return 1;
       }
     }
   return 0;
 }
 
 //-----------------------------------------------------------------------------
-vtkDataObject *vtkPriorityHelper::InternalUpdate(bool ReturnObject)
+vtkDataObject *vtkPriorityHelper::GetDataObject()
 {
-  //run through available pieces
-  //look for first one (if any) with nonzero priority and get that
   if (this->Input)
     {
-    double ret = 0.0;
-    int i = 0;
-    while (ret == 0.0 && i < this->NumPasses)
-      {
-      ret = this->ComputePriority();
-      DEBUGPRINT_PRIORITY(
-                          cerr << "PHelper(" << this << ") Priority on " 
-                          << (this->Piece*this->NumPasses + i) << " was " << ret << endl;
-                          );
-      i++;
-      if (ret == 0.0) //not useful, move along to next one
-        {
-        DEBUGPRINT_PRIORITY(
-                            cerr << "PHelper(" << this << ") Skipping " 
-                            << (this->Piece*this->NumPasses + (i-1)) << endl;
-                            );
-        this->SetSplitUpdateExtent(this->Port, this->Piece, i, 
-                                   this->NumPieces, this->NumPasses, 0, 0);
-        }
-      }
-    if (ret > 0.0)
-      {
-      if (ReturnObject)
-        {       
-        return this->Input->GetOutputDataObject(this->Port);
-        }
-      else
-        {
-        this->Input->Update();      
-        return NULL;
-        }
-      }
-    else
-      {
-      this->SetSplitUpdateExtent(this->Port, this->Piece, 0, 
-                                 this->NumPieces, this->NumPasses, 0, 0);
-      DEBUGPRINT_PRIORITY(
-                          cerr << "PHelper(" << this << ") Nothing worth updating for." << endl;
-                          );
-      }
+    return this->Input->GetOutputDataObject(this->Port);
     }
   return NULL;
 }
 
 //-----------------------------------------------------------------------------
-vtkDataObject *vtkPriorityHelper::ConditionallyGetDataObject()
+void vtkPriorityHelper::Update()
 {
-  return this->InternalUpdate(true);
+  if (this->Input)
+    {
+    this->Input->Update();
+    }
 }
-
-//-----------------------------------------------------------------------------
-void vtkPriorityHelper::ConditionallyUpdate()
-{
-  this->InternalUpdate(false);
-}
-

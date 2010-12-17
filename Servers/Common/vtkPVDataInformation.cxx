@@ -578,7 +578,7 @@ void vtkPVDataInformation::CopyFromObject(vtkObject* object)
       vtkPriorityHelper *helper = vtkPriorityHelper::SafeDownCast(object);
       if (helper)
         {
-        dobj = helper->ConditionallyGetDataObject();
+        dobj = helper->GetDataObject();
         if (!dobj)
           {
           return;
