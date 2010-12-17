@@ -122,6 +122,16 @@
         default_values="2.0">
         <DoubleRangeDomain name="range" min="0" />
       </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+         name="HeadPose"
+         command="SetHeadPose"
+         number_of_elements="16"
+         default_values="1.0 0.0 0.0 0.0
+			 0.0 1.0 0.0 0.0
+			 0.0 0.0 1.0 0.0
+			 0.0 0.0 0.0 1.0" >
+      </DoubleVectorProperty>
     </CameraProxy> <!-- end of Camera Proxy -->
   </ProxyGroup>
 

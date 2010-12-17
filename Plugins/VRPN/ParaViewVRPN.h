@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    ParaViewMainWindow.h
+   Module:    ParaViewVRPN.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,31 +29,47 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __ParaViewMainWindow_h
-#define __ParaViewMainWindow_h
+#ifndef __ParaViewVRPN_h
+#define __ParaViewVRPN_h
 
-#include <QMainWindow>
+#include <QObject>
 
-/// MainWindow for the default ParaView application.
-class ParaViewMainWindow : public QMainWindow
+/// Callback to listen to VRPN events
+class ParaViewVRPN : public QObject
 {
   Q_OBJECT
-  typedef QMainWindow Superclass;
 public:
-  ParaViewMainWindow();
-  ~ParaViewMainWindow();
+  ParaViewVRPN();
+  ~ParaViewVRPN();
+
+  // Description:
+  // Name of the device. For example, "Tracker0@localhost"
+  // Initial value is a NULL pointer.
+  void SetName(const char *name);
+  const char *GetName() const;
+
+  // Description:
+  // Initialize the device with the name.
+  void Init();
+
+  // Description:
+  // Tell if Init() was called succesfully
+  bool GetInitialized() const;
 
 protected slots:
-  void showHelpForProxy(const QString& proxyname);
+  void callback();
 
-private:
-  ParaViewMainWindow(const ParaViewMainWindow&); // Not implemented.
-  void operator=(const ParaViewMainWindow&); // Not implemented.
+protected:
+  char *Name;
 
   class pqInternals;
   pqInternals* Internals;
+
+  bool Initialized;
+
+private:
+  ParaViewVRPN(const ParaViewVRPN&); // Not implemented.
+  void operator=(const ParaViewVRPN&); // Not implemented.
 };
 
 #endif
-
-

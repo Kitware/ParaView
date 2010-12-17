@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    ParaViewMainWindow.h
+   Module:    pqVRPNStarter.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,31 +29,37 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __ParaViewMainWindow_h
-#define __ParaViewMainWindow_h
+#ifndef __pqVRPNStarter_h
+#define __pqVRPNStarter_h
 
-#include <QMainWindow>
+#include <QObject>
 
-/// MainWindow for the default ParaView application.
-class ParaViewMainWindow : public QMainWindow
+class QTimer;
+class ParaViewVRPN;
+
+class pqVRPNStarter : public QObject
 {
   Q_OBJECT
-  typedef QMainWindow Superclass;
+  typedef QObject Superclass;
 public:
-  ParaViewMainWindow();
-  ~ParaViewMainWindow();
+  pqVRPNStarter(QObject* p=0);
+  ~pqVRPNStarter();
 
-protected slots:
-  void showHelpForProxy(const QString& proxyname);
+  // Callback for shutdown.
+  void onShutdown();
+
+  // Callback for startup.
+  void onStartup();
+
+protected:
+    QTimer *VRPNTimer;
+    ParaViewVRPN *InputDevice;
 
 private:
-  ParaViewMainWindow(const ParaViewMainWindow&); // Not implemented.
-  void operator=(const ParaViewMainWindow&); // Not implemented.
+  pqVRPNStarter(const pqVRPNStarter&); // Not implemented.
+  void operator=(const pqVRPNStarter&); // Not implemented.
 
-  class pqInternals;
-  pqInternals* Internals;
+
 };
 
 #endif
-
-

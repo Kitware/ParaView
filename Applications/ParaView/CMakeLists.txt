@@ -12,6 +12,9 @@ SOURCE_GROUP("Generated" FILES
   ${UI_BUILT_SOURCES}
 )
 
+SET (QT_USE_QTNETWORK TRUE)
+INCLUDE(${QT_USE_FILE})
+
 INCLUDE_DIRECTORIES(
   ${CMAKE_CURRENT_BINARY_DIR}
   ${CMAKE_CURRENT_BINARY_DIR})
@@ -65,8 +68,7 @@ build_paraview_client(paraview
     COMPRESSED_HELP_FILE "${ParaView_BINARY_DIR}/Documentation/paraview.qch"
     SOURCES ${ParaView_SOURCE_FILES}
     INSTALL_BIN_DIR "${PV_INSTALL_BIN_DIR}"
-    INSTALL_LIB_DIR "${PV_INSTALL_LIB_DIR}"
-)
+    INSTALL_LIB_DIR "${PV_INSTALL_LIB_DIR}")
 
 write_plugins_file()
 
