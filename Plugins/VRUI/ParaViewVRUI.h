@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    ParaViewMainWindow.h
+   Module:    ParaViewVRUI.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,31 +29,69 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __ParaViewMainWindow_h
-#define __ParaViewMainWindow_h
+#ifndef __ParaViewVRUI_h
+#define __ParaViewVRUI_h
 
-#include <QMainWindow>
+#include <QObject>
 
-/// MainWindow for the default ParaView application.
-class ParaViewMainWindow : public QMainWindow
+/// VRUI client
+class ParaViewVRUI : public QObject
 {
   Q_OBJECT
-  typedef QMainWindow Superclass;
 public:
-  ParaViewMainWindow();
-  ~ParaViewMainWindow();
+  ParaViewVRUI();
+  ~ParaViewVRUI();
+
+  // Description:
+  // Name of the VRUI server. For example, "localhost"
+  // Initial value is a NULL pointer.
+  void SetName(const char *name);
+  const char *GetName() const;
+
+  // Description:
+  // Port number of the VRUI server.
+  // Initial value is 8555.
+  void SetPort(int port);
+  int GetPort() const;
+
+  // Description:
+  // Initialize the device with the name.
+  void Init();
+
+  // Description:
+  // Tell if Init() was called succesfully
+  bool GetInitialized() const;
+
+  // Description:
+  void Activate();
+
+  // Description:
+  void Deactivate();
+
+  // Description:
+  void StartStream();
+
+  // Description:
+  void StopStream();
 
 protected slots:
-  void showHelpForProxy(const QString& proxyname);
+  void callback();
 
-private:
-  ParaViewMainWindow(const ParaViewMainWindow&); // Not implemented.
-  void operator=(const ParaViewMainWindow&); // Not implemented.
+protected:
+  void PrintPositionOrientation();
+  void GetNextPacket();
+
+  char *Name;
+  int Port;
 
   class pqInternals;
   pqInternals* Internals;
+
+  bool Initialized;
+
+private:
+  ParaViewVRUI(const ParaViewVRUI&); // Not implemented.
+  void operator=(const ParaViewVRUI&); // Not implemented.
 };
 
 #endif
-
-

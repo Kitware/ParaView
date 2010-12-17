@@ -38,7 +38,7 @@ vtkPVOptions::vtkPVOptions()
   this->GroupFileName = 0;
   this->ParaViewDataName = 0;
   this->StateFileName = 0;
-  
+
   this->ClientRenderServer = 0;
   this->ConnectRenderToData = 0;
   this->ConnectDataToRender = 0;
@@ -55,7 +55,7 @@ vtkPVOptions::vtkPVOptions()
 
   this->TellVersion = 0;
 
-  // initialize host names 
+  // initialize host names
   this->ServerHostName = 0;
   this->SetServerHostName("localhost");
   this->DataServerHostName = 0;
@@ -69,17 +69,23 @@ vtkPVOptions::vtkPVOptions()
   this->DataServerPort = 11111;
   this->RenderServerPort = 22221;
   this->RenderNodePort = 0;  // this means pick a random port
-  
+
   this->ReverseConnection = 0;
   this->UseSoftwareRendering = 0;
   this->UseSatelliteSoftwareRendering = 0;
   this->UseStereoRendering = 0;
+  this->UseVRPN = 0;
+  this->UseVRUI = 0;
   this->UseOffscreenRendering = 0;
   this->DisableComposite = 0;
   this->ConnectID = 0;
   this->LogFileName = 0;
   this->StereoType = 0;
-  this->SetStereoType("Red-Blue");
+  this->SetStereoType("Anaglyph");
+  this->VRPNAddress = 0;
+  this->SetVRPNAddress("Tracker0@localhost");
+  this->VRUIAddress = 0;
+  this->SetVRUIAddress("localhost");
 
   this->Timeout = 0;
 
@@ -108,6 +114,8 @@ vtkPVOptions::~vtkPVOptions()
   this->SetLogFileName(0);
   this->SetStereoType(0);
   this->SetParaViewDataName(0);
+  this->SetVRPNAddress(0);
+  this->SetVRUIAddress(0);
 }
 
 //----------------------------------------------------------------------------
@@ -135,12 +143,12 @@ void vtkPVOptions::Initialize()
                            "Run ParaView as a client to a data and render server."
                            " The render server will wait for the data server.",
                            vtkPVOptions::PVCLIENT);
-  this->AddArgument("--render-server-host", "-rsh", &this->RenderServerHostName, 
-                    "Tell the client the host name of the render server (default: localhost).", 
+  this->AddArgument("--render-server-host", "-rsh", &this->RenderServerHostName,
+                    "Tell the client the host name of the render server (default: localhost).",
                     vtkPVOptions::PVCLIENT);
   this->AddArgument("--render-module", 0, &this->RenderModuleName,
                     "User specified rendering module.",
-                    vtkPVOptions::PVCLIENT| vtkPVOptions::PVRENDER_SERVER 
+                    vtkPVOptions::PVCLIENT| vtkPVOptions::PVRENDER_SERVER
                     | vtkPVOptions::PVSERVER | vtkPVOptions::PARAVIEW);
   */
 
@@ -163,15 +171,32 @@ void vtkPVOptions::Initialize()
                            "\"Crystal Eyes\", \"Red-Blue\", \"Interlaced\", "
                            "\"Dresden\", \"Anaglyph\", \"Checkerboard\"",
                            vtkPVOptions::PVCLIENT | vtkPVOptions::PARAVIEW);
+  this->AddBooleanArgument("--vrpn", 0, &this->UseVRPN,
+                           "Tell the application to use VRPN for head tracking",
+                           vtkPVOptions::PVCLIENT | vtkPVOptions::PARAVIEW);
+  this->AddArgument("--vrpn-address", 0, &this->VRPNAddress,
+                    "Specify the VRPN tracker name. This valid only when "
+                    "--vrpn is specified. Examples: "
+                    "\"Tracker0@localhost\", \"Head0@localhost\""
+                    "Please check VRPN configuration file",
+                    vtkPVOptions::PVCLIENT | vtkPVOptions::PARAVIEW);
+  this->AddBooleanArgument("--vrui", 0, &this->UseVRUI,
+                           "Tell the application to use VRUI for head tracking",
+                           vtkPVOptions::PVCLIENT | vtkPVOptions::PARAVIEW);
+  this->AddArgument("--vrui-address", 0, &this->VRUIAddress,
+                    "Specify the VRUI host name.",
+                    vtkPVOptions::PVCLIENT | vtkPVOptions::PARAVIEW);
+
+
   /*
   this->AddArgument("--server-host", "-sh", &this->ServerHostName,
                     "Tell the client the host name of the data server.",
                     vtkPVOptions::PVCLIENT);
   this->AddArgument("--data-server-host", "-dsh", &this->DataServerHostName,
-                    "Tell the client the host name of the data server.", 
+                    "Tell the client the host name of the data server.",
                     vtkPVOptions::PVCLIENT);
   this->AddArgument("--render-server-host", "-rsh", &this->RenderServerHostName,
-                    "Tell the client the host name of the render server.", 
+                    "Tell the client the host name of the render server.",
                     vtkPVOptions::PVCLIENT);
   */
   this->AddArgument("--client-host", "-ch", &this->ClientHostName,
@@ -179,37 +204,37 @@ void vtkPVOptions::Initialize()
                     vtkPVOptions::PVRENDER_SERVER | vtkPVOptions::PVDATA_SERVER |
                     vtkPVOptions::PVSERVER);
   this->AddArgument("--data-server-port", "-dsp", &this->DataServerPort,
-                    "What port data server use to connect to the client. (default 11111).", 
+                    "What port data server use to connect to the client. (default 11111).",
                     /*vtkPVOptions::PVCLIENT | */vtkPVOptions::PVDATA_SERVER);
   this->AddArgument("--render-server-port", "-rsp", &this->RenderServerPort,
-                    "What port should the render server use to connect to the client. (default 22221).", 
+                    "What port should the render server use to connect to the client. (default 22221).",
                     /*vtkPVOptions::PVCLIENT |*/ vtkPVOptions::PVRENDER_SERVER);
   this->AddArgument("--server-port", "-sp", &this->ServerPort,
-                    "What port should the combined server use to connect to the client. (default 11111).", 
+                    "What port should the combined server use to connect to the client. (default 11111).",
                     /*vtkPVOptions::PVCLIENT |*/ vtkPVOptions::PVSERVER);
 
-  this->AddArgument("--render-node-port", 0, &this->RenderNodePort, 
+  this->AddArgument("--render-node-port", 0, &this->RenderNodePort,
                     "Specify the port to be used by each render node (--render-node-port=22222)."
                     "  Client and render servers ports must match.",
                     vtkPVOptions::XMLONLY);
-  this->AddBooleanArgument("--disable-composite", "-dc", &this->DisableComposite, 
-                           "Use this option when rendering resources are not available on the server.", 
+  this->AddBooleanArgument("--disable-composite", "-dc", &this->DisableComposite,
+                           "Use this option when rendering resources are not available on the server.",
                            vtkPVOptions::PVSERVER);
-  this->AddBooleanArgument("--reverse-connection", "-rc", &this->ReverseConnection, 
+  this->AddBooleanArgument("--reverse-connection", "-rc", &this->ReverseConnection,
                            "Have the server connect to the client.",
                            vtkPVOptions::PVRENDER_SERVER | vtkPVOptions::PVDATA_SERVER |
                            vtkPVOptions::PVSERVER);
 
-  this->AddArgument("--tile-dimensions-x", "-tdx", this->TileDimensions, 
+  this->AddArgument("--tile-dimensions-x", "-tdx", this->TileDimensions,
                     "Size of tile display in the number of displays in each row of the display.",
                     vtkPVOptions::PVRENDER_SERVER|vtkPVOptions::PVSERVER);
-  this->AddArgument("--tile-dimensions-y", "-tdy", this->TileDimensions+1, 
+  this->AddArgument("--tile-dimensions-y", "-tdy", this->TileDimensions+1,
                     "Size of tile display in the number of displays in each column of the display.",
                     vtkPVOptions::PVRENDER_SERVER|vtkPVOptions::PVSERVER);
-  this->AddArgument("--tile-mullion-x", "-tmx", this->TileMullions, 
+  this->AddArgument("--tile-mullion-x", "-tmx", this->TileMullions,
                     "Size of the gap between columns in the tile display, in Pixels.",
                     vtkPVOptions::PVRENDER_SERVER|vtkPVOptions::PVSERVER);
-  this->AddArgument("--tile-mullion-y", "-tmy", this->TileMullions+1, 
+  this->AddArgument("--tile-mullion-y", "-tmy", this->TileMullions+1,
                     "Size of the gap between rows in the tile display, in Pixels.",
                     vtkPVOptions::PVRENDER_SERVER|vtkPVOptions::PVSERVER);
 
@@ -218,15 +243,15 @@ void vtkPVOptions::Initialize()
                     "after which the server may timeout. The client typically shows warning "
                     "messages before the server times out.",
                     vtkPVOptions::PVDATA_SERVER|vtkPVOptions::PVSERVER);
- 
+
   // Disabling for now since we don't support Cave anymore.
   // this->AddArgument("--cave-configuration", "-cc", &this->CaveConfigurationFileName,
   // "Specify the file that defines the displays for a cave. It is used only with CaveRenderModule.");
 
-  this->AddArgument("--machines", "-m", &this->MachinesFileName, 
+  this->AddArgument("--machines", "-m", &this->MachinesFileName,
                     "Specify the network configurations file for the render server.");
 
-  this->AddBooleanArgument("--version", "-V", &this->TellVersion, 
+  this->AddBooleanArgument("--version", "-V", &this->TellVersion,
                            "Give the version number and exit.");
 
   // add new Command Option for loading StateFile (Bug #5711)
@@ -261,7 +286,7 @@ int vtkPVOptions::PostProcess(int, const char* const*)
     case vtkPVOptions::ALLPROCESS:
       break;
     }
-  
+
   if ( this->UseSatelliteSoftwareRendering )
     {
     this->UseSoftwareRendering = 1;
@@ -435,7 +460,7 @@ void vtkPVOptions::PrintSelf(ostream& os, vtkIndent indent)
 
   os << indent << "Tiled Display: " << (this->TileDimensions[0]?"Enabled":"Disabled") << endl;
   if (this->TileDimensions[0])
-    { 
+    {
     os << indent << "With Tile Dimensions: " << this->TileDimensions[0]
        << ", " << this->TileDimensions[1] << endl;
     os << indent << "And Tile Mullions: " << this->TileMullions[0]
@@ -456,10 +481,10 @@ void vtkPVOptions::PrintSelf(ostream& os, vtkIndent indent)
     {
     os << indent << "Running to display software version.\n";
     }
-  
+
   os << indent << "StateFileName: "
     << (this->StateFileName?this->StateFileName:"(none)") << endl;
   os << indent << "LogFileName: "
-    << (this->LogFileName? this->LogFileName : "(none)") << endl; 
+    << (this->LogFileName? this->LogFileName : "(none)") << endl;
   os << indent << "SymmetricMPIMode: " << this->SymmetricMPIMode << endl;
 }
