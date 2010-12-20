@@ -181,6 +181,8 @@ SET (VTK_INSTALL_NO_VTKPYTHON 1)
 SET (VTK_INSTALL_PYTHON_USING_CMAKE 1)
 SET (VTK_INSTALL_NO_QT_PLUGIN 1)
 
+SET(VTK_HDF5_LIBRARIES)
+
 # KWCommon config
 #TODO move this stuff into /ParaView3/Common/CMakeLists.txt
 SET(PV_INSTALL_HAS_CMAKE_24 1)
@@ -404,6 +406,19 @@ ELSE(VTK_USE_SYSTEM_ZLIB)
     )
 ENDIF(VTK_USE_SYSTEM_ZLIB)
 
+#########################################################################
+# Configure HDF5
+IF(VTK_USE_SYSTEM_HDF5)
+ELSE()
+  SET(HDF5_CONFIG ${ParaView_BINARY_DIR}/VTK/Utilities/vtkhdf5/vtkHDF5Config.cmake)
+  INCLUDE("${HDF5_CONFIG}")
+
+  # Xdmf uses HDF5_INCLUDE_DIR (singular)
+  SET(HDF5_INCLUDE_DIR ${HDF5_INCLUDE_DIRS})
+  SET(PARAVIEW_HDF5_LIBRARIES ${HDF5_LIB_NAME})
+ENDIF()
+
+
 IF (VTK_USE_QT AND VTK_USE_GUISUPPORT)
   SET(VTK_INCLUDE_DIR ${VTK_INCLUDE_DIR}
     ${VTK_SOURCE_DIR}/GUISupport/Qt)
@@ -434,108 +449,7 @@ IF(PARAVIEW_ENABLE_PYTHON AND PARAVIEW_USE_MPI)
   ADD_SUBDIRECTORY(Utilities/mpi4py)
 ENDIF(PARAVIEW_ENABLE_PYTHON AND PARAVIEW_USE_MPI)
 
-#########################################################################
-# Configure HDF5
-OPTION(PARAVIEW_USE_SYSTEM_HDF5 "Use system installed HDF5" OFF)
-MARK_AS_ADVANCED(PARAVIEW_USE_SYSTEM_HDF5)
-IF(PARAVIEW_USE_SYSTEM_HDF5)
 
-  INCLUDE(${ParaView_CMAKE_DIR}/FindHDF5.cmake)
-  INCLUDE(${ParaView_CMAKE_DIR}/FindZLIB.cmake)
-  SET(PARAVIEW_HDF5_LIBRARIES ${HDF5_LIBRARIES})
-
-ELSE(PARAVIEW_USE_SYSTEM_HDF5)
-
-  # Tell hdf5 that we are manually overriding certain settings
-  SET(HDF5_EXTERNALLY_CONFIGURED 1)
-  # Avoid duplicating names of installed libraries
-  #SET(HDF5_EXTERNAL_LIB_PREFIX "vtk")
-  # Export configuration to this export variable
-  SET(HDF5_EXPORTED_TARGETS ${PV_INSTALL_EXPORT_NAME})
-
-  # Silence HDF5's warnings. We'll let them get fixed upstream
-  # and merge in updates as necessary.
-  SET(HDF5_DISABLE_COMPILER_WARNINGS ON)
-
-  SET(HDF5_INSTALL_NO_DEVELOPMENT ${PV_INSTALL_NO_DEVELOPMENT})
-  SET(HDF5_INSTALL_BIN_DIR ${PV_INSTALL_BIN_DIR})
-  SET(HDF5_INSTALL_LIB_DIR ${PV_INSTALL_LIB_DIR})
-  SET(HDF5_INSTALL_INCLUDE_DIR ${PV_INSTALL_INCLUDE_DIR})
-
-  SET(HDF5_ENABLE_Z_LIB_SUPPORT ON CACHE BOOL "Enable Zlib Filters" FORCE)
-
-  # Setup all necessary overrides for zlib so that HDF5 uses our
-  # internally compiled zlib rather than any other version
-  IF(HDF5_ENABLE_Z_LIB_SUPPORT)
-    # We must tell the main HDF5 library that it depends on our zlib
-    SET(HDF5_LIB_DEPENDENCIES vtkzlib)
-    # Override the zlib header file
-    IF(VTK_USE_SYSTEM_ZLIB)
-      SET(H5_ZLIB_HEADER "zlib.h")
-    ELSE(VTK_USE_SYSTEM_ZLIB)
-      SET(H5_ZLIB_HEADER "vtk_zlib.h")
-      # Set vars that FindZlib would have set if used in sub project
-      SET(ZLIB_INCLUDE_DIRS "${VTK_ZLIB_INCLUDE_DIRS}")
-      SET(ZLIB_LIBRARIES vtkzlib)
-    ENDIF(VTK_USE_SYSTEM_ZLIB)
-  ENDIF(HDF5_ENABLE_Z_LIB_SUPPORT)
-
-  # we don't want to build HDF5's tests.
-  SET (__pv_build_testing ${BUILD_TESTING})
-  SET (BUILD_TESTING OFF)
-
-  # Add the sub project
-  ADD_SUBDIRECTORY(Utilities/hdf5)
-
-  # restore BUILD_TESTING
-  SET (BUILD_TESTING ${__pv_build_testing})
-
-  # Some other modules use these vars to get the hdf5 lib name(s)
-  SET(PARAVIEW_HDF5_LIBRARIES hdf5)
-  SET(HDF5_LIBRARIES ${PARAVIEW_HDF5_LIBRARIES})
-
-  # Add the HDF5 dirs to our include path
-  SET(HDF5_INCLUDE_DIR
-    ${ParaView_SOURCE_DIR}/Utilities/hdf5/src
-    ${ParaView_BINARY_DIR}/Utilities/hdf5)
-
-  MARK_AS_ADVANCED(
-    H5_SET_LIB_OPTIONS
-    H5_LEGACY_NAMING
-    HDF5_ENABLE_COVERAGE
-    HDF5_DISABLE_COMPILER_WARNINGS
-    HDF5_ENABLE_PARALLEL
-    HDF5_USE_16_API_DEFAULT
-    HDF5_USE_FILTER_FLETCHER32
-    HDF5_USE_FILTER_NBIT
-    HDF5_USE_FILTER_SCALEOFFSET
-    HDF5_USE_FILTER_SHUFFLE
-    HDF5_ENABLE_Z_LIB_SUPPORT
-    HDF5_ENABLE_SZIP_SUPPORT
-    HDF5_ENABLE_SZIP_ENCODING
-    HDF5_ENABLE_THREADSAFE
-    HDF5_ENABLE_TRACE
-    HDF5_USE_H5DUMP_PACKED_BITS
-    HDF5_BUILD_FORTRAN
-    HDF5_BUILD_EXAMPLES
-    HDF5_BUILD_CPP_LIB
-    HDF5_BUILD_TOOLS
-    HDF5_BUILD_HL_LIB
-    HDF5_Enable_Clear_File_Buffers
-    HDF5_Enable_Instrument
-    HDF5_STRICT_FORMAT_CHECKS
-    HDF5_METADATA_TRACE_FILE
-    HDF5_WANT_DATA_ACCURACY
-    HDF5_WANT_DCONV_EXCEPTION
-    HDF5_ENABLE_LARGE_FILE
-    HDF5_STREAM_VFD
-    HDF5_ENABLE_HSIZET
-    H5_SET_LIB_OPTIONS
-    HDF5_BUILD_WITH_INSTALL_NAME
-    HDF5_PACKAGE_EXTLIBS
-    )
-
-ENDIF(PARAVIEW_USE_SYSTEM_HDF5)
 
 #########################################################################
 # Configure Xdmf
