@@ -135,6 +135,9 @@ pqListNewProxyDefinitionsBehavior::pqListNewProxyDefinitionsBehavior(
   QObject::connect(pqApplicationCore::instance()->getServerManagerObserver(),
     SIGNAL(compoundProxyDefinitionRegistered(QString)),
     this, SLOT(update()));
+  QObject::connect(pqApplicationCore::instance()->getServerManagerObserver(),
+    SIGNAL(compoundProxyDefinitionUnRegistered(QString)),
+    this, SLOT(remove(QString)));
   this->update();
 }
 
@@ -169,5 +172,23 @@ void pqListNewProxyDefinitionsBehavior::update()
     {
     this->MenuManager->populateMenu();
     }
+}
+
+//-----------------------------------------------------------------------------
+void pqListNewProxyDefinitionsBehavior::remove(QString name)
+{
+  vtkSMProxyDefinitionIterator* iter = vtkSMProxyDefinitionIterator::New();
+  for (iter->Begin(this->XMLGroup.toAscii().data()); !iter->IsAtEnd();
+    iter->Next())
+    {
+    QString key = iter->GetKey();
+    if ( key == name )
+      {
+      this->AlreadySeenSet.remove(key);
+      this->MenuManager->removeProxy(this->XMLGroup,key);
+      this->MenuManager->populateMenu();
+      }
+    }
+  iter->Delete();
 }
 

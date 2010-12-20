@@ -46,6 +46,9 @@ class pqProxyGroupMenuManager;
 /// specified group(or groups) automatically.
 /// This also ensures that user-defined custom-filters are always shown in the
 /// menu.
+/// This also now ensures that user-defined custom-filter are removed when unloaded
+/// from the application.
+/// Note: We should think about renaming to pqUpdateProxyDefinitionsBehavior
 /// I am leaning towards not automatically added new filters/sources since large
 /// plugins can bring in a plethora of filters, many of which may be internal.
 class PQAPPLICATIONCOMPONENTS_EXPORT pqListNewProxyDefinitionsBehavior : public QObject
@@ -68,6 +71,9 @@ protected slots:
   /// This slot is called after plugins are loaded or after custom-filter
   /// definitions are added.
   void update();
+
+  /// This slot is called after custom-filter definitions are removed.
+  void remove(QString name);
 
 protected:
   pqProxyGroupMenuManager* MenuManager;
