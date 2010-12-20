@@ -1,13 +1,13 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqListNewProxyDefinitionsBehavior.cxx
+   Module:    pqUpdateProxyDefinitionsBehavior.cxx
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -29,7 +29,7 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#include "pqListNewProxyDefinitionsBehavior.h"
+#include "pqUpdateProxyDefinitionsBehavior.h"
 
 #include "pqApplicationCore.h"
 #include "pqObjectBuilder.h"
@@ -117,8 +117,8 @@ static bool IsReader(const char* xmlgroup, const char* xmlname)
 }
 
 //-----------------------------------------------------------------------------
-pqListNewProxyDefinitionsBehavior::pqListNewProxyDefinitionsBehavior(
-  pqListNewProxyDefinitionsBehavior::eMode mode,
+pqUpdateProxyDefinitionsBehavior::pqUpdateProxyDefinitionsBehavior(
+  pqUpdateProxyDefinitionsBehavior::eMode mode,
   const QString& xmlgroup,
   pqProxyGroupMenuManager* menuManager):
   Superclass(menuManager)
@@ -142,7 +142,7 @@ pqListNewProxyDefinitionsBehavior::pqListNewProxyDefinitionsBehavior(
 }
 
 //-----------------------------------------------------------------------------
-void pqListNewProxyDefinitionsBehavior::update()
+void pqUpdateProxyDefinitionsBehavior::update()
 {
   bool something_added = false;
   bool add_new = (this->AlreadySeenSet.size() != 0);
@@ -155,7 +155,7 @@ void pqListNewProxyDefinitionsBehavior::update()
     if ( (add_new || is_custom_filter) && !this->AlreadySeenSet.contains(key) )
       {
       bool has_input = ::HasInput(iter->GetGroup(), iter->GetKey());
-      if ( (this->Mode == SOURCES && !has_input && 
+      if ( (this->Mode == SOURCES && !has_input &&
           (!::IsReader(iter->GetGroup(), iter->GetKey()) ||
            ::HasShowHint(iter->GetGroup(), iter->GetKey()))) ||
         (this->Mode == FILTERS && has_input) ||
@@ -175,7 +175,7 @@ void pqListNewProxyDefinitionsBehavior::update()
 }
 
 //-----------------------------------------------------------------------------
-void pqListNewProxyDefinitionsBehavior::remove(QString name)
+void pqUpdateProxyDefinitionsBehavior::remove(QString name)
 {
   vtkSMProxyDefinitionIterator* iter = vtkSMProxyDefinitionIterator::New();
   for (iter->Begin(this->XMLGroup.toAscii().data()); !iter->IsAtEnd();
@@ -191,4 +191,3 @@ void pqListNewProxyDefinitionsBehavior::remove(QString name)
     }
   iter->Delete();
 }
-
