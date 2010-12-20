@@ -1,14 +1,14 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqListNewProxyDefinitionsBehavior.h
+   Module:    pqUpdateProxyDefinitionsBehavior.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
-   
+   under the terms of the ParaView license version 1.2.
+
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
    Kitware Inc.
@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqListNewProxyDefinitionsBehavior_h 
-#define __pqListNewProxyDefinitionsBehavior_h
+#ifndef __pqUpdateProxyDefinitionsBehavior_h
+#define __pqUpdateProxyDefinitionsBehavior_h
 
 #include <QObject>
 #include <QSet>
@@ -40,15 +40,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqProxyGroupMenuManager;
 
 /// @ingroup Behaviors
-/// pqListNewProxyDefinitionsBehavior is associated with a
+/// pqUpdateProxyDefinitionsBehavior is associated with a
 /// pqProxyGroupMenuManager. When created, it populates the
 /// pqProxyGroupMenuManager with new proxy definitions that get added to a
 /// specified group(or groups) automatically.
 /// This also ensures that user-defined custom-filters are always shown in the
 /// menu.
+/// This also now ensures that user-defined custom-filter are removed when unloaded
+/// from the application.
+/// Note: We should think about renaming to pqUpdateProxyDefinitionsBehavior
 /// I am leaning towards not automatically added new filters/sources since large
 /// plugins can bring in a plethora of filters, many of which may be internal.
-class PQAPPLICATIONCOMPONENTS_EXPORT pqListNewProxyDefinitionsBehavior : public QObject
+class PQAPPLICATIONCOMPONENTS_EXPORT pqUpdateProxyDefinitionsBehavior : public QObject
 {
   Q_OBJECT
   typedef QObject Superclass;
@@ -61,13 +64,16 @@ public:
     };
 
   /// menuManager cannnot be NULL.
-  pqListNewProxyDefinitionsBehavior(eMode mode, const QString& xmlgroup,
+  pqUpdateProxyDefinitionsBehavior(eMode mode, const QString& xmlgroup,
     pqProxyGroupMenuManager* menuManager);
 
 protected slots:
   /// This slot is called after plugins are loaded or after custom-filter
   /// definitions are added.
   void update();
+
+  /// This slot is called after custom-filter definitions are removed.
+  void remove(QString name);
 
 protected:
   pqProxyGroupMenuManager* MenuManager;
@@ -76,9 +82,8 @@ protected:
   eMode Mode;
 
 private:
-  Q_DISABLE_COPY(pqListNewProxyDefinitionsBehavior)
+  Q_DISABLE_COPY(pqUpdateProxyDefinitionsBehavior)
 
 };
 
 #endif
-
