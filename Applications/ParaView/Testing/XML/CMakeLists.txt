@@ -165,9 +165,14 @@ IF (PARAVIEW_USE_MPI)
   SET (SpreadSheet1_DISABLE_CRS TRUE)
 ENDIF (PARAVIEW_USE_MPI)
 
+# Composite Surface Selection is currently broken in everything but bultin
+SET (CompositeSurfaceSelection_DISABLE_CS TRUE)
+SET (CompositeSurfaceSelection_DISABLE_CRS TRUE)
+
 # Clip test has object picking which is not supported in client-render-server
 # mode.
 SET (Clip_DISABLE_CRS TRUE)
+
 
 # These Xdmf tests have wireframes, hence the increased thresholds.
 SET (XdmfReadImageData_THRESHOLD 20)
