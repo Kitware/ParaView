@@ -37,7 +37,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vrpn_Dial.h>
 #include <vrpn_Text.h>
 #include "vtkMath.h"
-#include "vtkSMCaveRenderViewProxy.h"
+#include "vtkSMRenderViewProxy.h"
+#include "vtkSMDoubleVectorProperty.h"
 #include "pqActiveObjects.h"
 #include "pqView.h"
 
@@ -127,16 +128,39 @@ const vrpn_TRACKERCB t)
     view = pqActiveObjects::instance().activeView();
     if ( view )
       {
-      vtkSMCaveRenderViewProxy *proxy = 0;
-      proxy = vtkSMCaveRenderViewProxy::SafeDownCast( view->getViewProxy() );
+      vtkSMRenderViewProxy *proxy = 0;
+      proxy = vtkSMRenderViewProxy::SafeDownCast( view->getViewProxy() );
       if ( proxy )
         {
         double rotMat[3][3];
         vtkMath::QuaternionToMatrix3x3(t.quat,rotMat);
-        proxy->SetHeadPose( rotMat[0][0], rotMat[0][1],rotMat[0][2], t.pos[0]*1,
-        rotMat[1][0], rotMat[1][1],rotMat[1][2], t.pos[1]*1,
-        rotMat[2][0], rotMat[2][1],rotMat[2][2], t.pos[2]*1,
-        0.0, 0.0, 0.0, 1.0 );
+        vtkSMDoubleVectorProperty *prop = 0;
+        prop = vtkSMDoubleVectorProperty::SafeDownCast( proxy->GetProperty( "HeadPose" ) );
+        if ( prop )
+          {
+          prop->SetElement( 0,  rotMat[0][0] );
+          prop->SetElement( 1,  rotMat[0][1] );
+          prop->SetElement( 2,  rotMat[0][2] );
+          prop->SetElement( 3,  pos [0]*1  );
+
+          prop->SetElement( 4,  rotMat[1][0] );
+          prop->SetElement( 5,  rotMat[1][1] );
+          prop->SetElement( 6,  rotMat[1][2] );
+          prop->SetElement( 7,  pos [1]*1  );
+
+          prop->SetElement( 8,  rotMat[2][0] );
+          prop->SetElement( 9,  rotMat[2][1] );
+          prop->SetElement( 10, rotMat[2][2] );
+          prop->SetElement( 11, pos [2]*1  );
+
+          prop->SetElement( 12, 0.0 );
+          prop->SetElement( 13, 0.0 );
+          prop->SetElement( 14, 0.0 );
+          prop->SetElement( 15, 1.0 );
+
+          proxy->UpdateVTKObjects();
+          proxy->StillRender();
+          }
         }
       }
     }
