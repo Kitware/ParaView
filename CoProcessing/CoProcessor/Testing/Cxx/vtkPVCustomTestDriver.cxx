@@ -24,8 +24,7 @@
 #include "vtkDataObject.h"
 #include "vtkObjectFactory.h"
 
-#include <vtkstd/string>
-using vtkstd::string;
+#include <string>
 
 #ifdef COPROCESSOR_USE_MPI
 #include "vtkMPICommunicator.h"
@@ -126,6 +125,33 @@ int vtkPVCustomTestDriver::Initialize(const char* fileName)
   int success = pipeline->Initialize(fileName);
   this->Processor->AddPipeline(pipeline);
   pipeline->Delete();
+
+  // test adding a second pipeline and then deleting it
+  vtkCPPythonScriptPipeline* tempPipeline = vtkCPPythonScriptPipeline::New();
+  this->Processor->AddPipeline(tempPipeline);
+  tempPipeline->Delete();
+  if(this->Processor->GetNumberOfPipelines() != 2)
+    {
+    vtkErrorMacro("Wrong amount of pipelines.");
+    success = 0;
+    }
+  else if(this->Processor->GetPipeline(0) != pipeline ||
+          this->Processor->GetPipeline(1) != tempPipeline)
+    {
+    vtkErrorMacro("Bad ordering of the processor's pipeline.");
+    success = 0;
+    }
+  this->Processor->RemovePipeline(tempPipeline);
+  if(this->Processor->GetNumberOfPipelines() != 1)
+    {
+    vtkErrorMacro("Wrong amount of pipelines.");
+    success = 0;
+    }
+  else if(this->Processor->GetPipeline(0) != pipeline)
+    {
+    vtkErrorMacro("Bad ordering of the processor's pipeline.");
+    success = 0;
+    }
 
   this->Processor->Initialize();
   return success;
