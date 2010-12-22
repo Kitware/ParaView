@@ -159,7 +159,6 @@ void vtkCaveSynchronizedRenderers::DefineDisplay(
   this->Modified();
 }
 
-#define NEW_CAVE 1
 //-------------------------------------------------------------------------
 // Room camera is a camera in room coordinates that points at the display.
 // Client camera is the camera on the client.  The out camera is the
@@ -167,7 +166,9 @@ void vtkCaveSynchronizedRenderers::DefineDisplay(
 // It is the room camera transformed by the world camera.
 void vtkCaveSynchronizedRenderers::ComputeCamera(vtkCamera* cam)
 {
-#if NEW_CAVE
+  if ( cam->GetLeftEye() == 1 )
+    return;
+
   this->SetDisplayConfig();
   cam->SetHeadTracked( true );
 
@@ -180,95 +181,6 @@ void vtkCaveSynchronizedRenderers::ComputeCamera(vtkCamera* cam)
   cam->SetConfigParams( O2Screen, O2Right, O2Left,O2Top, O2Bottom,
                         0.065, 1.0,
                         this->SurfaceRot);
-
-#else
-  int idx;
-  // pos is the user position
-  double pos[4];
-  //cam->GetPosition(pos);
-  pos[0] = 0.;
-  pos[1] = 0.;
-  pos[2] = 0.;
-  pos[3] = 1.;
-
-  // Use the camera here  tempoarily to get the client view transform.
- // Create a transform from the client camera.
-  vtkTransform* trans = cam->GetViewTransformObject();
-  // The displays are defined in camera coordinates.
-  // We want to convert them to world coordinates.
-  trans->Inverse();
-
-  // Apply the transform on the local display info.
-  double p[4];
-  double o[4];
-  double x[4];
-  double y[4];
-  trans->MultiplyPoint(pos, p);
-  trans->MultiplyPoint(this->DisplayOrigin, o);
-  trans->MultiplyPoint(this->DisplayX, x);
-  trans->MultiplyPoint(this->DisplayY, y);
-  // Handle homogeneous coordinates.
-  for (idx = 0; idx < 3; ++idx)
-    {
-    p[idx] = p[idx] / p[3];
-    o[idx] = o[idx] / o[3];
-    x[idx] = x[idx] / x[3];
-    y[idx] = y[idx] / y[3];
-    }
-
-  // Now compute the camera.
-  float vn[3];
-  float ox[3];
-  float oy[3];
-  float cp[3];
-  float center[3];
-  float offset[3];
-  float xOffset, yOffset;
-  float dist;
-  float height;
-  float width;
-  float viewAngle;
-  float tmp;
-
-  // Compute the view plane normal.
-  for ( idx = 0; idx < 3; ++idx)
-    {
-    ox[idx] = x[idx] - o[idx];
-    oy[idx] = y[idx] - o[idx];
-    center[idx] = o[idx] + 0.5*(ox[idx] + oy[idx]);
-    cp[idx] = p[idx] - center[idx];
-    }
-  vtkMath::Cross(ox, oy, vn);
-  vtkMath::Normalize(vn);
-  // Compute distance to plane.
-  dist = vtkMath::Dot(vn,cp);
-  // Compute width and height of the window.
-  width = sqrt(ox[0]*ox[0] + ox[1]*ox[1] + ox[2]*ox[2]);
-  height = sqrt(oy[0]*oy[0] + oy[1]*oy[1] + oy[2]*oy[2]);
-
-  // Point the camera orthogonal toward the plane.
-  cam->SetPosition(p[0], p[1], p[2]);
-  cam->SetFocalPoint(p[0]-vn[0], p[1]-vn[1], p[2]-vn[2]);
-  cam->SetViewUp(oy[0], oy[1], oy[2]);
-
-  // Compute view angle.
-  viewAngle = atan(height/(2.0*dist)) * 360.0 / 3.1415926;
-  cam->SetViewAngle(viewAngle);
-
-  // Compute the shear/offset vector (focal point to window center).
-  offset[0] = center[0] - (p[0]-dist*vn[0]);
-  offset[1] = center[1] - (p[1]-dist*vn[1]);
-  offset[2] = center[2] - (p[2]-dist*vn[2]);
-
-  // Compute the normalized x and y components of shear offset.
-  tmp = sqrt(ox[0]*ox[0] + ox[1]*ox[1] + ox[2]*ox[2]);
-  xOffset = vtkMath::Dot(offset, ox) / (tmp * tmp);
-  tmp = sqrt(oy[0]*oy[0] + oy[1]*oy[1] + oy[2]*oy[2]);
-  yOffset = vtkMath::Dot(offset, oy) / (tmp * tmp);
-
-  // Off angle positioning of window.
-  cam->SetWindowCenter(2*xOffset, 2*yOffset);
-#endif
 }
 
 //------------------------------------------------------------------HeadTracked

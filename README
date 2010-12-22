@@ -1,0 +1,84 @@
+This document provides some basic details on how to get ParaView-CAVE up and running on your system.
+
+1. Required Packages:
+  1.1 VRPN (http://www.cs.unc.edu/Research/vrpn/obtaining_vrpn.html as of today Sept 08 2010, we were using master branch of git clone).
+  1.2 libxt-dev
+  1.3 g++ (4.4.3 or newer)
+  1.4 libstdc++-dev
+  1.5 QT 4.6.2 or 4.6.3 (earlier or later versions won't work as of now).
+  1.6 Install mpich2 (from your distribution repository).
+
+2. Dowload the the source code:
+
+3. Instruction when compiling with cmake:
+  3.1 Provide path to VRPN include
+  3.2 Provide path for libvrpn.a including the name itself.
+
+
+Here are the steps to compile and run the application.
+
+( Prerequisites: MPI, VRPN Server, Qt, CMake)
+----------------------------------------------------------
+1.  Download
+  # git clone git@github.com:nixz/ParaView-CAVE.git
+<<<<<<< HEAD
+<<<<<<< HEAD
+  # cd ParaView-CAVE
+  # git submodule update --init
+=======
+  # git clone git@github.com:nixz/VTK-CAVE.git
+  # rmdir ParaView-CAVE/VTK
+  # mv VTK-CAVE/ ParaView-CAVE/VTK
+>>>>>>> updating readme
+=======
+  # cd ParaView-CAVE
+  # git submodule update --init
+>>>>>>> Updating README with new instructions
+
+2. Make a build directory
+  # mkdir build
+  # cd build
+
+3. Build with cmake
+  # ccmake ../ParaView-CAVE
+
+Configuration Steps:
+-> enable BUILD_SHARED_LIB
+-> enable PARAVIEW_USE_MPI
+-> set include dir path in VRPN_INCLUDE_DIR
+-> set the library name in VRPN_LIBRARY (note: if library is not in standard paths then provide /complete/path/libvrpn.a)
+
+Once done -> configure (type 'c'). If everything is okay -> generate (option shows up , type 'g' to generate)
+
+  # make -j 8
+
+4. Run the server  (6 processes each driving one display in the cave. Change the number of process according to the number of displays)
+   note ParaView-CAVE/cave.pvx is the configuration file
+  # cd bin
+  # mpiexec -np 6 ./pvserver  ../../ParaView-CAVE/cave.pvx
+
+5. Open another terminal to  run the client. (note: this client connects to the server which open up 6 windows according to the config given in cave.pvx)
+  # cd path/to/build/bin
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> VRUI client functional
+  FOR VRPN do the following
+  # PV_ICET_WINDOW_BORDERS=1 ./paraview --stereo --stereo-type=Anaglyph --server=localhost --vrpn --vrpn-address=Tracker0@localhost
+  For VRUI do the following
+  # PV_ICET_WINDOW_BORDERS=1 ./paraview --stereo --stereo-type=Anaglyph --server=localhost --vrui --vrui-address=localhost
+<<<<<<< HEAD
+=======
+  # PV_ICET_WINDOW_BORDERS=1 ./paraview --stereo --stereo-type=Anaglyph --server=localhost
+>>>>>>> updating readme
+=======
+  # PV_ICET_WINDOW_BORDERS=1 ./paraview --stereo --stereo-type=Anaglyph --server=localhost --vrpn --vrpn-address=Tracker0@localhost
+>>>>>>> updating readme
+=======
+>>>>>>> VRUI client functional
+
+Note:  PV_ICET_WINDOW_BORDERS=1 disables the full screen and instead opens up a 400x400 window. Remove this environment variable to work in full screen mode
+
+6. To get more stereo options see
+ # ./paraview --help

@@ -70,6 +70,15 @@ build_paraview_client(paraview
     INSTALL_BIN_DIR "${PV_INSTALL_BIN_DIR}"
     INSTALL_LIB_DIR "${PV_INSTALL_LIB_DIR}")
 
+# Configure the ".plugins" configuration xml for making paraview aware of the
+# distributed plugins.
+SET (plugins_ini "<?xml version=\"1.0\"?>\n<Plugins>\n")
+FOREACH(pluginname ${PARAVIEW_PLUGINLIST})
+  set (plugins_ini "${plugins_ini}  <Plugin name=\"${pluginname}\" auto_load=\"0\"/>\n")
+ENDFOREACH(pluginname ${PARAVIEW_PLUGINLIST})
+set (plugins_ini "${plugins_ini}</Plugins>\n")
+
+
 write_plugins_file()
 
 # This ensure that the paraview.qch file is generated.
