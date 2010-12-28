@@ -21,7 +21,6 @@
 #define __vtkCaveRenderManager_h
 
 #include "vtkParallelRenderManager.h"
-#include "vtkMatrix4x4.h"
 
 class vtkIceTRenderer;
 class vtkIntArray;
@@ -29,6 +28,7 @@ class vtkPerspectiveTransform;
 class vtkPKdTree;
 class vtkFloatArray;
 class vtkCamera;
+class vtkMatrix4x4;
 
 class VTK_EXPORT vtkCaveRenderManager : public vtkParallelRenderManager
 {
