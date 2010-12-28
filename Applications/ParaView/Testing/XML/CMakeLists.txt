@@ -217,6 +217,10 @@ SET (H5PartReaderPlugin_DISABLE_CRS TRUE)
 SET (LoadPlugins_DISABLE_CRS TRUE)
 SET (NiftiReaderWriterPlugin_DISABLE_CRS TRUE)
 
+IF(NOT PARAVIEW_BUILD_PLUGIN_EyeDomeLighting)
+  SET(EyeDomeLighting_DISABLE_C TRUE)
+ENDIF()
+
 # Make these tests use reverse connection.
 SET (CutMulti_REVERSE_CONNECT TRUE)
 
