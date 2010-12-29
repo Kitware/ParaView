@@ -21,8 +21,8 @@ configure_file(
 
 set(NUMPY_CONFIGURE_COMMAND ${CMAKE_COMMAND}
     -DCONFIG_TYPE=${CMAKE_CFG_INTDIR} -P ${CMAKE_CURRENT_BINARY_DIR}/NUMPY_configure_step.cmake)
-set(NUMPY_BUILD_COMMAND ${${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/NUMPY_make_step.cmake)
-set(NUMPY_INSTALL_COMMAND ${${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/NUMPY_install_step.cmake)
+set(NUMPY_BUILD_COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/NUMPY_make_step.cmake)
+set(NUMPY_INSTALL_COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/NUMPY_install_step.cmake)
 
 # create an external project to download numpy,
 # and configure and build it
