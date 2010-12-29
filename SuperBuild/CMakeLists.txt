@@ -45,7 +45,7 @@ if(QT_FOUND)
   #  message(FATAL_ERROR "error: Slicer requires Qt >= ${minimum_required_qt_version} -- you cannot use Qt ${QT_VERSION_MAJOR}.${QT_VERSION_MINOR}.${QT_VERSION_PATCH}.")
   #ENDIF()
 else()
-  message(FATAL_ERROR "error: Qt4 was not found on your system. You probably need to set the QT_QMAKE_EXECUTABLE variable")
+  message(FATAL_ERROR "error: Qt4 was not found on your system. Please set QT_QMAKE_EXECUTABLE")
 endif()
 
 # ---------------------------------------------------------------------------
@@ -75,10 +75,6 @@ string(REPLACE "/W4" "/W0" pv_compiler_args "${pv_compiler_args}")
 # Attempt to detect if we have a Fortran Compiler available.
 include(CheckFortran)
 
-if(CMAKE_Fortran_COMPILER)
-  enable_language(Fortran)
-endif(CMAKE_Fortran_COMPILER)
-
 #------------------------------------------------------------------------------
 # Establish Target Dependencies based on Selected Options
 #------------------------------------------------------------------------------
@@ -98,13 +94,18 @@ include(PackageVersions)
 
 if(NOT APPLE)
   include(External_Python)
-  include(External_CLAPACK)
+
+  if(CMAKE_Fortran_COMPILER)
+    include(External_CLAPACK)
+  else()
+    include(External_LAPACK)
+  endif()
+
 endif()
 include(External_NUMPY)
 include(External_OpenMPI)
 include(External_Manta)
 
-#include(External_Manta)
 
 #-----------------------------------------------------------------------------
 # Configure and build ParaView
