@@ -67,10 +67,17 @@ set(pv_compiler_args
   -DCMAKE_SHARED_LINKER_FLAGS:STRING=${CMAKE_SHARED_LINKER_FLAGS}
 )
 
+set(pv_tpl_cxx_flags ${CMAKE_CXX_FLAGS})
+set(pv_tpl_c_flags ${CMAKE_C_FLAGS})
+set(pv_cxx_flags ${CMAKE_CXX_FLAGS})
+set(pv_c_flags ${CMAKE_C_FLAGS})
+
 # We aren't interested in seeing third party compiler warnings.
 set(pv_tpl_compiler_args ${pv_compiler_args})
-string(REPLACE "/W3" "/W0" pv_compiler_args "${pv_compiler_args}")
-string(REPLACE "/W4" "/W0" pv_compiler_args "${pv_compiler_args}")
+string(REPLACE "/W3" "/W0" pv_tpl_cxx_flags "${pv_tpl_cxx_flags}")
+string(REPLACE "/W4" "/W0" pv_tpl_cxx_flags "${pv_tpl_cxx_flags}")
+string(REPLACE "/W3" "/W0" pv_tpl_c_flags "${pv_tpl_c_flags}")
+string(REPLACE "/W4" "/W0" pv_tpl_c_flags "${pv_tpl_c_flags}")
 
 # Attempt to detect if we have a Fortran Compiler available.
 include(CheckFortran)
@@ -81,7 +88,7 @@ include(CheckFortran)
 
 set(python_dependencies)
 set(CLAPACK_dependencies)
-set(NUMPY_DEPENDENCIES CLAPACK python)
+set(NUMPY_dependencies python)
 set(Manta_dependencies)
 set(OpenMPI_dependencies)
 
@@ -96,9 +103,11 @@ if(NOT APPLE)
   include(External_Python)
 
   if(CMAKE_Fortran_COMPILER)
-    include(External_CLAPACK)
-  else()
     include(External_LAPACK)
+    list(APPEND NUMPY_dependencies LAPACK)
+  else()
+    include(External_CLAPACK)
+    list(APPEND NUMPY_dependencies CLAPACK)
   endif()
 
 endif()
