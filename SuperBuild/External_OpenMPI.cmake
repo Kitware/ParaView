@@ -40,4 +40,8 @@ else()
 endif()
 
 set(OpenMPI_DIR "${OpenMPI_binary}" CACHE PATH "OpenMPI binary directory" FORCE)
+set(MPIEXEC ${OpenMPI_install}/bin/mpiexec)
+set(MPI_INCLUDE_PATH ${OpenMPI_install}/include)
+set(MPI_LIBRARY ${OpenMPI_install}//lib/libmpi)
+set(MPI_EXTRA_LIBRARY ${OpenMPI_install}/lib/libmpi_cxx)
 mark_as_advanced(OpenMPI_DIR)
