@@ -8,7 +8,7 @@ project(ParaViewSuperBuild)
 set(ParaViewSuperBuild_CMAKE_SOURCE_DIR ${ParaViewSuperBuild_SOURCE_DIR})
 set(ParaViewSuperBuild_CMAKE_BINARY_DIR ${ParaViewSuperBuild_BINARY_DIR})
 
-#-----------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 # Update CMake module path
 #------------------------------------------------------------------------------
 
@@ -48,7 +48,7 @@ else()
   message(FATAL_ERROR "error: Qt4 was not found on your system. Please set QT_QMAKE_EXECUTABLE")
 endif()
 
-# ---------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
 # generic compiler args (compiler and cflags) to pass to subprojects
 #-----------------------------------------------------------------------------
 
@@ -92,7 +92,7 @@ set(NUMPY_dependencies python)
 set(Manta_dependencies)
 set(OpenMPI_dependencies)
 
-set(ParaView_dependencies python CLAPACK NUMPY OpenMPI)
+set(ParaView_dependencies python NUMPY OpenMPI Manta)
 
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------
@@ -105,9 +105,11 @@ if(NOT APPLE)
   if(CMAKE_Fortran_COMPILER)
     include(External_LAPACK)
     list(APPEND NUMPY_dependencies LAPACK)
+    list(APPEND ParaView_dependencies LAPACK)
   else()
     include(External_CLAPACK)
     list(APPEND NUMPY_dependencies CLAPACK)
+    list(APPEND ParaView_dependencies CLAPACK)
   endif()
 
 endif()
@@ -125,29 +127,39 @@ if(NOT WIN32)
 endif()
 
 
-#-----------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 # Configure and build ParaView
 #------------------------------------------------------------------------------
 
-#set(proj ParaView)
-#ExternalProject_Add(${proj}
-#  DEPENDS ${ParaView_dependencies}
-#  DOWNLOAD_COMMAND ""
-#  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/..
-#  BINARY_DIR ParaView-build
-#  CMAKE_GENERATOR ${gen}
-#  CMAKE_ARGS
-#    ${slicer_superbuild_boolean_args}
-#    -DBUILD_SHARED_LIBS:BOOL=${BUILD_SHARED_LIBS}
-#    -DCMAKE_CXX_FLAGS:STRING=${CMAKE_CXX_FLAGS}
-#    -DCMAKE_C_FLAGS:STRING=${CMAKE_C_FLAGS}
-#    -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
-    # Python
-#    -DSlicer_USE_SYSTEM_PYTHON:BOOL=OFF
-#    -DPYTHON_EXECUTABLE:FILEPATH=${PYTHON_EXECUTABLE}
-#    -DPYTHON_INCLUDE_DIR:PATH=${PYTHON_INCLUDE}
-#    -DPYTHON_LIBRARY:FILEPATH=${PYTHON_LIBRARY}
-    # Qt
-#    -DQT_QMAKE_EXECUTABLE:PATH=${QT_QMAKE_EXECUTABLE}
-#  INSTALL_COMMAND ""
-#  )
+set(proj ParaView)
+ExternalProject_Add(${proj}
+  DEPENDS ${ParaView_dependencies}
+  DOWNLOAD_COMMAND ""
+  SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/..
+  BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}/ParaView-build
+  CMAKE_CACHE_ARGS
+   -DBUILD_SHARED_LIBS:BOOL=${BUILD_SHARED_LIBS}
+   -DCMAKE_CXX_FLAGS:STRING=${CMAKE_CXX_FLAGS}
+   -DCMAKE_C_FLAGS:STRING=${CMAKE_C_FLAGS}
+   -DCMAKE_BUILD_TYPE:STRING=${CMAKE_CFG_INTDIR}
+   # Python
+   -DPARAVIEW_ENABLE_PYTHON:BOOL=ON
+   -DPYTHON_EXECUTABLE:FILEPATH=${PYTHON_EXECUTABLE}
+   -DPYTHON_INCLUDE_DIR:PATH=${PYTHON_INCLUDE}
+   -DPYTHON_LIBRARY:FILEPATH=${PYTHON_LIBRARY}
+   # Qt
+   -DQT_QMAKE_EXECUTABLE:PATH=${QT_QMAKE_EXECUTABLE}
+   # MPI
+   -DPARAVIEW_USE_MPI:BOOL=ON
+   -DMPIEXEC:FILEPATH=${MPIEXEC}
+   -DMPI_INCLUDE_PATH:PATH=${MPI_INCLUDE_PATH}
+   -DMPI_LIBRARY:FILEPATH=${MPI_LIBRARY}
+   -DMPI_EXTRA_LIBRARY:FILEPATH=${MPI_EXTRA_LIBRARY}
+   # Manta
+   -DPARAVIEW_BUILD_PLUGIN_Manta:BOOL=ON
+   -DMANTA_BUILD:PATH=${Manta_binary}
+   -DMANTA_SOURCE:PATH=${Manta_source}
+   # EyeDome
+   -DPARAVIEW_BUILD_PLUGIN_EyeDome:BOOL=ON
+  INSTALL_COMMAND ""
+  )
