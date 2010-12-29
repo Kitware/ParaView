@@ -1,0 +1,22 @@
+
+# The CLAPACK external project for ParaView
+set(CLAPACK_source "${CMAKE_CURRENT_BINARY_DIR}/CLAPACK")
+set(CLAPACK_binary "${CMAKE_CURRENT_BINARY_DIR}/CLAPACK-build")
+
+ExternalProject_Add(CLAPACK
+  DOWNLOAD_DIR ${CMAKE_CURRENT_BINARY_DIR}
+  SOURCE_DIR ${CLAPACK_source}
+  BINARY_DIR ${CLAPACK_binary}
+  URL ${CLAPACK_URL}/${CLAPACK_GZ}
+  URL_MD5 ${CLAPACK_MD5}
+  CMAKE_CACHE_ARGS
+    -DCMAKE_BUILD_TYPE:STRING=${CMAKE_CFG_INTDIR}
+    -DBUILD_SHARED_LIBS:BOOL=OFF
+    ${pv_tpl_compiler_args}
+    ${CLAPACK_EXTRA_ARGS}
+  INSTALL_COMMAND ""
+  )
+
+set(CLAPACK_DIR "${CLAPACK_binary}" CACHE PATH
+  "CLAPACK binary directory" FORCE)
+mark_as_advanced(CLAPACK_DIR)
