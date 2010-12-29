@@ -25,6 +25,5 @@ ExternalProject_Add(Manta
   INSTALL_COMMAND ""
   )
 
-set(Manta_DIR "${Manta_binary}" CACHE PATH
-  "Manta binary directory" FORCE)
+set(Manta_DIR "${Manta_binary}" CACHE PATH "Manta binary directory" FORCE)
 mark_as_advanced(Manta_DIR)
