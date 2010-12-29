@@ -82,7 +82,7 @@ namespace Manta {
 class vtkRenderWindow;
 class vtkMantaManager;
 
-class vtkMantaTexture : public vtkTexture
+class VTK_vtkManta_EXPORT vtkMantaTexture : public vtkTexture
 {
 public:
   static vtkMantaTexture *New();
