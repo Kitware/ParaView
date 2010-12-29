@@ -89,19 +89,19 @@ if(WIN32)
 elseif(UNIX)
   set(python_SOURCE_DIR python)
 
-  configure_file(${cdat_CMAKE_SOURCE_DIR}/python_patch_step.cmake.in
+  configure_file(${ParaViewSuperBuild_CMAKE_SOURCE_DIR}/python_patch_step.cmake.in
     ${CMAKE_CURRENT_BINARY_DIR}/python_patch_step.cmake
     @ONLY)
 
-  configure_file(${cdat_CMAKE_SOURCE_DIR}/python_configure_step.cmake.in
+  configure_file(${ParaViewSuperBuild_CMAKE_SOURCE_DIR}/python_configure_step.cmake.in
     ${CMAKE_CURRENT_BINARY_DIR}/python_configure_step.cmake
     @ONLY)
 
-  configure_file(${cdat_CMAKE_SOURCE_DIR}/python_make_step.cmake.in
+  configure_file(${ParaViewSuperBuild_CMAKE_SOURCE_DIR}/python_make_step.cmake.in
     ${CMAKE_CURRENT_BINARY_DIR}/python_make_step.cmake
     @ONLY)
 
-  configure_file(${cdat_CMAKE_SOURCE_DIR}/python_install_step.cmake.in
+  configure_file(${ParaViewSuperBuild_CMAKE_SOURCE_DIR}/python_install_step.cmake.in
     ${CMAKE_CURRENT_BINARY_DIR}/python_install_step.cmake
     @ONLY)
 
