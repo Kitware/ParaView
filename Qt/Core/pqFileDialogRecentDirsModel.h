@@ -71,7 +71,7 @@ public:
   QVariant headerData(int section, Qt::Orientation, int role) const;
 
 public slots:
-  void setChosenFiles(const QStringList &files);
+  void setChosenFiles(const QList<QStringList>& files);
 
 protected:
   QStringList Directories;

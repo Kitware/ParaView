@@ -135,7 +135,7 @@ public:
   QCompleter *Completer;
   FileMode Mode;
   Ui::pqFileDialog Ui;
-  QStringList SelectedFiles;
+  QList<QStringList> SelectedFiles;
   QStringList Filters;
   bool SupressOverwriteWarning;
 
@@ -153,8 +153,8 @@ public:
     Mode(ExistingFile),
     SupressOverwriteWarning(false)
   {
-  QObject::connect(p, SIGNAL(filesSelected(const QStringList&)),
-    this->RecentModel, SLOT(setChosenFiles(const QStringList&)));
+  QObject::connect(p, SIGNAL(filesSelected(const QList<QStringList> &)),
+    this->RecentModel, SLOT(setChosenFiles(const QList<QStringList> &)));
   }
 
   ~pqImplementation()
@@ -508,31 +508,20 @@ void pqFileDialog::onContextMenuRequested(const QPoint &menuPos)
 void pqFileDialog::setFileMode(pqFileDialog::FileMode mode)
 {
   this->Implementation->Mode = mode;
-
+  QAbstractItemView::SelectionMode selectionMode;
   switch(this->Implementation->Mode)
     {
     case AnyFile:
     case ExistingFile:
     case Directory:
-        {
-        this->Implementation->Ui.Files->setSelectionMode(
-             QAbstractItemView::SingleSelection);
-        this->Implementation->Ui.Favorites->setSelectionMode(
-             QAbstractItemView::SingleSelection);
-        }
+      selectionMode=QAbstractItemView::SingleSelection;
       break;
     case ExistingFiles:
-        {
-        // Currently, we can only support limited series files,
-        // so SingleSelection mode is used here, and when a *group*
-        // file is selected, we internally get all series files in
-        // this group, and pass them along.
-        this->Implementation->Ui.Files->setSelectionMode(
-          QAbstractItemView::SingleSelection);
-        this->Implementation->Ui.Favorites->setSelectionMode(
-          QAbstractItemView::ExtendedSelection);
-        }
+      selectionMode=QAbstractItemView::ExtendedSelection;
+      break;
     }
+  this->Implementation->Ui.Files->setSelectionMode(selectionMode);
+  this->Implementation->Ui.Favorites->setSelectionMode(selectionMode);
 }
 
 //-----------------------------------------------------------------------------
@@ -556,69 +545,145 @@ void pqFileDialog::setRecentlyUsedExtension(const QString& fileExtension)
 }
 
 //-----------------------------------------------------------------------------
-void pqFileDialog::emitFilesSelected(const QStringList& files)
+void pqFileDialog::addToFilesSelected(const QStringList& files)
 {
   // Ensure that we are hidden before broadcasting the selection,
   // so we don't get caught by screen-captures
   this->setVisible(false);
-  this->Implementation->SelectedFiles = files;
+  this->Implementation->SelectedFiles.append(files);
+  }
+
+//-----------------------------------------------------------------------------
+void pqFileDialog::emitFilesSelectionDone( )
+{
   emit filesSelected(this->Implementation->SelectedFiles);
+  if (this->Implementation->Mode != this->ExistingFiles
+    && this->Implementation->SelectedFiles.size() > 0)
+    {
+    emit filesSelected(this->Implementation->SelectedFiles[0]);
+    }
   this->done(QDialog::Accepted);
 }
 
 //-----------------------------------------------------------------------------
-QStringList pqFileDialog::getSelectedFiles()
+int pqFileDialog::getSelectedFilesSize()
 {
-  return this->Implementation->SelectedFiles;
+  return this->Implementation->SelectedFiles.size();
+}
+
+//-----------------------------------------------------------------------------
+QStringList pqFileDialog::getSelectedFiles(int index)
+{
+  if ( index < 0 || index >= this->Implementation->SelectedFiles.size())
+    {
+    return QStringList();
+    }
+  return this->Implementation->SelectedFiles[index];
 }
 
 //-----------------------------------------------------------------------------
 void pqFileDialog::accept()
 {
-  /* TODO:  handle pqFileDialog::ExistingFiles mode */
+  bool loadedFile = false;
+  switch(this->Implementation->Mode)
+  {
+  case AnyFile:
+    loadedFile = this->acceptAnyFile();
+    break;
+  case ExistingFiles:
+    loadedFile = this->acceptExistingFiles();
+    break;
+  case Directory:
+  case ExistingFile:
+    loadedFile = this->acceptDefault();
+    break;
+  }
+  if (loadedFile)
+    {
+    emit this->emitFilesSelectionDone();
+    }
+}
+
+//-----------------------------------------------------------------------------
+bool pqFileDialog::acceptExistingFiles()
+{
+  const QModelIndexList selection =
+    this->Implementation->Ui.Files->selectionModel()->selectedIndexes();
+  QModelIndex index;
+  QString filename, fullFilePath;
+  bool loadedFiles = false;
+  for(int i = 0; i < selection.size(); ++i)
+      {
+      index = selection[i];
+      filename =
+        this->Implementation->FileFilter.data(index).toString().trimmed();
+      fullFilePath = this->Implementation->Model->absoluteFilePath(filename);
+      emit this->fileAccepted(fullFilePath);
+      //stay true even if it fails to load a subsection of the selection
+      loadedFiles = (this->acceptInternal(this->buildFileGroup(filename),false)
+        || loadedFiles);
+    }
+  return loadedFiles;
+}
+
+//-----------------------------------------------------------------------------
+bool pqFileDialog::acceptAnyFile()
+{
   QString filename = this->Implementation->Ui.FileName->text();
   filename = filename.trimmed();
 
   QString fullFilePath = this->Implementation->Model->absoluteFilePath(filename);
   emit this->fileAccepted(fullFilePath);
 
+  QStringList files(fullFilePath);
+  return this->acceptInternal(files,false);
+
+}
+
+//-----------------------------------------------------------------------------
+bool pqFileDialog::acceptDefault()
+{
+  QString filename = this->Implementation->Ui.FileName->text();
+  filename = filename.trimmed();
+
+  QString fullFilePath = this->Implementation->Model->absoluteFilePath(filename);
+  emit this->fileAccepted(fullFilePath);
+  return this->acceptInternal(this->buildFileGroup(filename),false);
+}
+
+//-----------------------------------------------------------------------------
+QStringList pqFileDialog::buildFileGroup(const QString &filename)
+{
   QStringList files;
-  if(this->Implementation->Mode != pqFileDialog::AnyFile)
+
+  // if we find the file passed in is the parent of a group,
+  // add the entire group to the return QList
+  QAbstractProxyModel* m = &this->Implementation->FileFilter;
+  int numrows = m->rowCount(QModelIndex());
+  for(int i=0; i<numrows; i++)
     {
-    // if we got a group, let's expand it.
-    QAbstractProxyModel* m = &this->Implementation->FileFilter;
-    int numrows = m->rowCount(QModelIndex());
-    for(int i=0; i<numrows; i++)
+    QModelIndex idx = m->index(i, 0, QModelIndex());
+    QString cmp = m->data(idx, Qt::DisplayRole).toString();
+    if(filename == cmp)
       {
-      QModelIndex idx = m->index(i, 0, QModelIndex());
-      QString cmp = m->data(idx, Qt::DisplayRole).toString();
-      if(filename == cmp)
+      QModelIndex sidx = m->mapToSource(idx);
+      QStringList sel_files = this->Implementation->Model->getFilePaths(sidx);
+
+      //if the mode of the dialog is existing file we only want to read the first
+      //item in the file series
+      int count = (this->Implementation->Mode == pqFileDialog::ExistingFile)?
+        1 : sel_files.count();
+      for(int j=0; j < count; ++j)
         {
-        QModelIndex sidx = m->mapToSource(idx);
-        QStringList sel_files = this->Implementation->Model->getFilePaths(sidx);
-        for(int j=0; j<sel_files.count();j++)
-          {
-          files.push_back(sel_files.at(j));
-          if(this->Implementation->Mode == pqFileDialog::ExistingFile)
-            {
-            break;
-            }
-          }
+        files.push_back(sel_files.at(j));
         }
       }
     }
-  else
-    {
-    files.push_back(fullFilePath);
-    }
-
   if(files.empty())
     {
-    filename = this->Implementation->Model->absoluteFilePath(filename);
-    files.append(filename);
+    files.append(this->Implementation->Model->absoluteFilePath(filename));
     }
-
-  this->acceptInternal(files,false);
+  return files;
 }
 
 //-----------------------------------------------------------------------------
@@ -877,11 +942,11 @@ QString pqFileDialog::fixFileExtension(
 }
 
 //-----------------------------------------------------------------------------
-void pqFileDialog::acceptInternal(QStringList& selected_files, const bool &doubleclicked)
+bool pqFileDialog::acceptInternal(QStringList& selected_files, const bool &doubleclicked)
 {
   if(selected_files.empty())
     {
-    return;
+    return false;
     }
 
   QString file = selected_files[0];
@@ -893,9 +958,9 @@ void pqFileDialog::acceptInternal(QStringList& selected_files, const bool &doubl
       case Directory:
         if ( !doubleclicked )
           {
-          this->emitFilesSelected(QStringList(file));
+          this->addToFilesSelected(QStringList(file));
           this->onNavigate(file);
-          break;
+          return true;
           }
       case ExistingFile:
       case ExistingFiles:
@@ -904,7 +969,7 @@ void pqFileDialog::acceptInternal(QStringList& selected_files, const bool &doubl
         this->Implementation->Ui.FileName->clear();
         break;
       }
-    return;
+    return false;
     }
 
   // User choose and existing file or a brand new filename.
@@ -921,7 +986,7 @@ void pqFileDialog::acceptInternal(QStringList& selected_files, const bool &doubl
       {
       this->onNavigate(file);
       this->Implementation->Ui.FileName->clear();
-      return;
+      return false;
       }
     }
 
@@ -933,17 +998,11 @@ void pqFileDialog::acceptInternal(QStringList& selected_files, const bool &doubl
       case Directory:
         // User chose a file in directory mode, do nothing
         this->Implementation->Ui.FileName->clear();
-        return;
+        break;
       case ExistingFile:
       case ExistingFiles:
-        {
-        // TODO: we need to verify that all selected files are indeed
-        // "existing".
-        // User chose an existing file-or-files, we're done
-        QStringList files(selected_files);
-        this->emitFilesSelected(files);
-        }
-        return;
+        this->addToFilesSelected(selected_files);
+        break;
       case AnyFile:
         // User chose an existing file, prompt before overwrite
         if(!this->Implementation->SupressOverwriteWarning)
@@ -955,12 +1014,13 @@ void pqFileDialog::acceptInternal(QStringList& selected_files, const bool &doubl
             QMessageBox::Yes,
             QMessageBox::No))
             {
-            return;
+            return false;
             }
           }
-        this->emitFilesSelected(QStringList(file));
-        return;
+        this->addToFilesSelected(QStringList(file));
+        break;
       }
+    return true;
     }
   else // User choose non-existent file.
     {
@@ -970,13 +1030,14 @@ void pqFileDialog::acceptInternal(QStringList& selected_files, const bool &doubl
     case ExistingFile:
     case ExistingFiles:
       this->Implementation->Ui.FileName->selectAll();
-      return;
+      return false;
 
     case AnyFile:
-      this->emitFilesSelected(QStringList(file));
-      return;
+      this->addToFilesSelected(QStringList(file));
+      return true;
       }
     }
+  return false;
 }
 
 //-----------------------------------------------------------------------------

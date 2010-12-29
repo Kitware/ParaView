@@ -34,6 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqFileDialog_h
 
 #include "pqCoreExport.h"
+#include <QStringList>
 #include <QDialog>
 
 class QModelIndex;
@@ -112,8 +113,12 @@ public:
   /// set the most recently used file extension
   void setRecentlyUsedExtension(const QString& fileExtension);
 
-  /// Returns the set of files
-  QStringList getSelectedFiles();
+  /// Returns the number of groups of files that where selected
+  /// Only ExistingFiles mode will return greater than 1.
+  int getSelectedFilesSize();
+
+  /// Returns the group of files for the given index
+  QStringList getSelectedFiles(int index=0);
 
   /// accept this dialog
   void accept();
@@ -129,13 +134,23 @@ public:
 
 signals:
   /// Signal emitted when the user has chosen a set of files
-  /// and accepted the dialog
-  void filesSelected(const QStringList&);
+  void filesSelected(const QList<QStringList> &);
+
+  /// Signal emitted when the user has chosen a set of files
+  /// The mode has to be not ExistingFiles for this signal to be emitted
+  void filesSelected(const QStringList &);
 
   /// signal emitted when user has chosen a set of files and accepted the
   /// dialog.  This signal includes only the path and file string as is
   /// This is to support test recording
   void fileAccepted(const QString&);
+
+protected:
+  bool acceptExistingFiles();
+  bool acceptAnyFile();
+  bool acceptDefault();
+
+  QStringList buildFileGroup(const QString &filename);
 
 private slots:
   void onModelReset();
@@ -167,8 +182,11 @@ private slots:
   // Called when the user requests to create a new directory in the cwd
   void onCreateNewFolder();
 
+  /// Adds this grouping of files to the files selected list
+  void addToFilesSelected(const QStringList&);
+
   /// Emits the filesSelected() signal and closes the dialog,
-  void emitFilesSelected(const QStringList&);
+  void emitFilesSelectionDone();
 
 private:
   pqFileDialog(const pqFileDialog&);
@@ -177,7 +195,8 @@ private:
   class pqImplementation;
   pqImplementation* const Implementation;
 
-  void acceptInternal(QStringList& selected_files, const bool &doubleclicked);
+  //returns if true if files are loaded
+  bool acceptInternal(QStringList& selected_files, const bool &doubleclicked);
   QString fixFileExtension(const QString& filename, const QString& filter);
 };
 
