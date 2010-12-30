@@ -33,6 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __pqLoadDataReaction_h
 
 #include "pqReaction.h"
+#include <QList>
 
 class QStringList;
 class pqPipelineSource;
@@ -53,7 +54,7 @@ public:
   /// Note that this method is static. Applications can simply use this without
   /// having to create a reaction instance.
   static pqPipelineSource* loadData(const QStringList& files);
-  static pqPipelineSource* loadData();
+  static QList<pqPipelineSource*> loadData();
 
 public slots:
   /// Updates the enabled state. Applications need not explicitly call
@@ -68,8 +69,9 @@ protected:
   /// Called when the action is triggered.
   virtual void onTriggered()
     {
-    pqPipelineSource* source = pqLoadDataReaction::loadData();
-    if (source)
+    QList<pqPipelineSource*> sources = pqLoadDataReaction::loadData();
+    pqPipelineSource *source;
+    foreach(source,sources)
       {
       emit this->loadedData(source);
       }
