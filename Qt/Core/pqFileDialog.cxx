@@ -569,13 +569,7 @@ void pqFileDialog::emitFilesSelectionDone( )
 }
 
 //-----------------------------------------------------------------------------
-int pqFileDialog::getSelectedFilesSize()
-{
-  return this->Implementation->SelectedFiles.size();
-}
-
-//-----------------------------------------------------------------------------
-QList<QStringList> pqFileDialog::getSelectedFiles()
+QList<QStringList> pqFileDialog::getAllSelectedFiles()
 {
   return this->Implementation->SelectedFiles;
 }
