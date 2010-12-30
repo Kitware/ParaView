@@ -425,7 +425,7 @@ void PrismSurfacePanel::onConversionFileButton()
         QString(),
         "(*.xml);;All Files (*)");
 
-    fileDialog.setFileMode(pqFileDialog::ExistingFiles);
+    fileDialog.setFileMode(pqFileDialog::ExistingFile);
 
 
     QString fileName;
