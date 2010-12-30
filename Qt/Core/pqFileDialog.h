@@ -93,6 +93,7 @@ public:
   /// ExistingFile: The name of a single existing file.
   ///   Typically used by "Open..."
   /// ExistingFiles: The names of zero or more existing files.
+  ///   Typically used by "Open..." when you want multiple file selection
   /// Directory: The name of a directory.
   enum FileMode { AnyFile, ExistingFile, ExistingFiles, Directory };
 
@@ -147,8 +148,7 @@ signals:
 
 protected:
   bool acceptExistingFiles();
-  bool acceptAnyFile();
-  bool acceptDefault();
+  bool acceptDefault(const bool &checkForGrouping);
 
   QStringList buildFileGroup(const QString &filename);
 
@@ -196,7 +196,7 @@ private:
   pqImplementation* const Implementation;
 
   //returns if true if files are loaded
-  bool acceptInternal(QStringList& selected_files, const bool &doubleclicked);
+  bool acceptInternal(const QStringList& selected_files, const bool &doubleclicked);
   QString fixFileExtension(const QString& filename, const QString& filter);
 };
 

@@ -70,7 +70,7 @@ void pqLoadDataReaction::updateEnableState()
 }
 
 //-----------------------------------------------------------------------------
-pqPipelineSource* pqLoadDataReaction::loadData()
+QList<pqPipelineSource*> pqLoadDataReaction::loadData()
 {
   pqServer* server = pqActiveObjects::instance().activeServer();
   vtkSMReaderFactory* readerFactory =
@@ -87,11 +87,16 @@ pqPipelineSource* pqLoadDataReaction::loadData()
     tr("Open File:"), QString(), filters);
   fileDialog.setObjectName("FileOpenDialog");
   fileDialog.setFileMode(pqFileDialog::ExistingFiles);
+  QList<pqPipelineSource*> sources;
   if (fileDialog.exec() == QDialog::Accepted)
     {
-    return pqLoadDataReaction::loadData(fileDialog.getSelectedFiles());
+    for (int i=0; i < fileDialog.getSelectedFilesSize(); ++i)
+      {
+      sources.append(
+        pqLoadDataReaction::loadData(fileDialog.getSelectedFiles(i)));
+      }
     }
-  return NULL;
+  return sources;
 }
 
 //-----------------------------------------------------------------------------
