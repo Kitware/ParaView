@@ -37,7 +37,7 @@ public:
 public slots:
   void record();
   void openFileDialog();
-  void emittedFiles(const QStringList& files);
+  void emittedFiles(const QList<QStringList>& files);
 
 protected:
   QComboBox*   FileMode;
