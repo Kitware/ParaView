@@ -36,5 +36,5 @@ ExternalProject_Add(NUMPY
   UPDATE_COMMAND ""
   INSTALL_COMMAND ${NUMPY_INSTALL_COMMAND}
   DEPENDS
-    ${NUMPY_DEPENDENCIES}
+    ${NUMPY_dependencies}
   )

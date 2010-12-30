@@ -15,6 +15,8 @@ ExternalProject_Add(Manta
   URL ${MANTA_URL}/${MANTA_GZ}
   URL_MD5 ${MANTA_MD5}
   CMAKE_CACHE_ARGS
+    -DCMAKE_CXX_FLAGS:STRING=${pv_tpl_cxx_flags}
+    -DCMAKE_C_FLAGS:STRING=${pv_tpl_c_flags}
     -DCMAKE_BUILD_TYPE:STRING=${CMAKE_CFG_INTDIR}
     -DBUILD_SHARED_LIBS:BOOL=${Manta_build_shared}
     -DBUILD_TESTING:BOOL=OFF
@@ -23,6 +25,5 @@ ExternalProject_Add(Manta
   INSTALL_COMMAND ""
   )
 
-set(Manta_DIR "${Manta_binary}" CACHE PATH
-  "Manta binary directory" FORCE)
+set(Manta_DIR "${Manta_binary}" CACHE PATH "Manta binary directory" FORCE)
 mark_as_advanced(Manta_DIR)
