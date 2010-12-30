@@ -63,7 +63,6 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkMantaManager.h"
 #include "vtkMantaRenderer.h"
 #include "vtkMantaTexture.h"
-#include "vtkMantaRenderWindow.h"
 
 #include "vtkHomogeneousTransform.h"
 #include "vtkImageData.h"

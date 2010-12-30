@@ -119,12 +119,12 @@ ELSEIF(VTK_OPENGL_HAS_OSMESA)
 ELSE()
   SET(RenderWindowType "vtkWin32OpenGLRenderWindow")
 ENDIF()
-configure_file(
-  "${CMAKE_CURRENT_SOURCE_DIR}/vtkMantaRenderWindow.h.in"
-  "${CMAKE_CURRENT_BINARY_DIR}/vtkMantaRenderWindow.h"
-  @ONLY
-  IMMEDIATE
-  )
+#configure_file(
+#  "${CMAKE_CURRENT_SOURCE_DIR}/vtkMantaRenderWindow.h.in"
+#  "${CMAKE_CURRENT_BINARY_DIR}/vtkMantaRenderWindow.h"
+#  @ONLY
+#  IMMEDIATE
+#  )
 
 # Set VTKMANTA_BUILD_SHARED_LIBS to 1 or 0 for safe keeping in 
 #vtkMantaConfigure.h
@@ -165,14 +165,17 @@ SET ( MANTA_CLASSES
   vtkMantaPolyDataMapper.cxx
   vtkMantaProperty.cxx
   vtkMantaRenderer.cxx
-  vtkMantaRenderWindow.cxx
+#  vtkMantaRenderWindow.cxx
   vtkMantaTestSource.cxx
   vtkMantaTexture.cxx
   )
 
 IF (BUILD_AGAINST_PARAVIEW)
   # paraview uses its own LOD actor, put it in here
-  SET ( MANTA_CLASSES ${MANTA_CLASSES} vtkMantaLODActor.cxx)
+  SET ( MANTA_CLASSES ${MANTA_CLASSES}
+    vtkMantaLODActor.cxx
+    vtkPVMantaRepresentation.cxx
+    vtkMantaCompositeMapper.cxx)
 ENDIF (BUILD_AGAINST_PARAVIEW)
 
 SET ( MANTA_SRCS
@@ -186,6 +189,10 @@ SET ( MANTA_SRCS
 ADD_LIBRARY ( ${PROJECT_NAME} ${MANTA_SRCS})
 TARGET_LINK_LIBRARIES ( ${PROJECT_NAME} 
   ${VTK_LINK_LIBRARIES} ${MANTA_LINK_LIBRARIES} )
+# Manta_Core uses MMTime which is in it's own special library.
+if(WIN32)
+  TARGET_LINK_LIBRARIES(${PROJECT_NAME} Winmm)
+endif()
 IF (PV_INSTALL_PLUGIN_DIR)
  INSTALL(TARGETS ${PROJECT_NAME}
    DESTINATION "${PV_INSTALL_PLUGIN_DIR}"

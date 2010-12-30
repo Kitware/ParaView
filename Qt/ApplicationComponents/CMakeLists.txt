@@ -12,7 +12,6 @@ INCLUDE_DIRECTORIES(
   ${PARAVIEW_INCLUDE_DIRS}
   ${ParaView_SOURCE_DIR}/VTK/GUISupport/Qt
   ${ParaView_BINARY_DIR}/VTK/GUISupport/Qt
-  ${ParaView_SOURCE_DIR}/VTK/GUISupport/Qt/Chart
   ${QtTesting_SOURCE_DIR}
   ${QtTesting_BINARY_DIR}
   ${QtWidgets_SOURCE_DIR}
@@ -37,6 +36,7 @@ SET (MOC_HEADERS
   pqChangePipelineInputReaction.h
   pqColorToolbar.h
   pqCommandLineOptionsBehavior.h
+  pqCopyReaction.h
   pqCrashRecoveryBehavior.h
   pqCreateCustomFilterReaction.h
   pqDataTimeStepBehavior.h
@@ -52,7 +52,7 @@ SET (MOC_HEADERS
   pqFixPathsInStateFilesBehavior.h
   pqHelpReaction.h
   pqIgnoreSourceTimeReaction.h
-  pqListNewProxyDefinitionsBehavior.h
+  pqUpdateProxyDefinitionsBehavior.h
   pqLoadDataReaction.h
   pqLoadStateReaction.h
   pqMainControlsToolbar.h
@@ -62,6 +62,7 @@ SET (MOC_HEADERS
   pqObjectPickingBehavior.h
   pqParaViewBehaviors.h
   pqPersistentMainWindowStateBehavior.h
+  pqPipelineContextMenuBehavior.h
   pqPluginActionGroupBehavior.h
   pqPluginDockWidgetsBehavior.h
   pqProxyGroupMenuManager.h
@@ -92,6 +93,7 @@ SET (MOC_HEADERS
   pqUndoRedoBehavior.h
   pqUndoRedoReaction.h
   pqVCRToolbar.h
+  pqVerifyRequiredPluginBehavior.h
   pqViewFrameActionsBehavior.h
   pqViewMenuManager.h
   pqViewSettingsManager.h
@@ -103,6 +105,7 @@ SET (UI_FILES
   Resources/UI/pqAxesToolbar.ui
   Resources/UI/pqCameraToolbar.ui
   Resources/UI/pqColorToolbar.ui
+  Resources/UI/pqCopyReactionDialog.ui
   Resources/UI/pqDefaultMainWindow.ui
   Resources/UI/pqEditMenuBuilder.ui
   Resources/UI/pqFileMenuBuilder.ui
@@ -149,6 +152,8 @@ SET (SOURCE_FILES
   pqColorToolbar.h
   pqCommandLineOptionsBehavior.cxx
   pqCommandLineOptionsBehavior.h
+  pqCopyReaction.cxx
+  pqCopyReaction.h
   pqCrashRecoveryBehavior.cxx
   pqCrashRecoveryBehavior.h
   pqCreateCustomFilterReaction.cxx
@@ -179,8 +184,8 @@ SET (SOURCE_FILES
   pqHelpReaction.h
   pqIgnoreSourceTimeReaction.cxx
   pqIgnoreSourceTimeReaction.h
-  pqListNewProxyDefinitionsBehavior.cxx
-  pqListNewProxyDefinitionsBehavior.h
+  pqUpdateProxyDefinitionsBehavior.cxx
+  pqUpdateProxyDefinitionsBehavior.h
   pqLoadDataReaction.cxx
   pqLoadDataReaction.h
   pqLoadStateReaction.cxx
@@ -201,6 +206,8 @@ SET (SOURCE_FILES
   pqParaViewMenuBuilders.h
   pqPersistentMainWindowStateBehavior.cxx
   pqPersistentMainWindowStateBehavior.h
+  pqPipelineContextMenuBehavior.cxx
+  pqPipelineContextMenuBehavior.h
   pqPluginActionGroupBehavior.cxx
   pqPluginActionGroupBehavior.h
   pqPluginDockWidgetsBehavior.cxx
@@ -261,6 +268,8 @@ SET (SOURCE_FILES
   pqUndoRedoReaction.h
   pqVCRToolbar.cxx
   pqVCRToolbar.h
+  pqVerifyRequiredPluginBehavior.cxx
+  pqVerifyRequiredPluginBehavior.h
   pqViewFrameActionsBehavior.cxx
   pqViewFrameActionsBehavior.h
   pqViewMenuManager.cxx
@@ -274,19 +283,13 @@ SET (SOURCE_FILES
 IF(PARAVIEW_ENABLE_PYTHON)
   SET (MOC_HEADERS
     ${MOC_HEADERS}
-    pqEditTraceReaction.h
     pqMacroReaction.h
-    pqSaveTraceReaction.h
     pqTraceReaction.h
     )
   SET (SOURCE_FILES
     ${SOURCE_FILES}
-    pqEditTraceReaction.cxx
-    pqEditTraceReaction.h
     pqMacroReaction.cxx
     pqMacroReaction.h
-    pqSaveTraceReaction.cxx
-    pqSaveTraceReaction.h
     pqTraceReaction.cxx
     pqTraceReaction.h
     )

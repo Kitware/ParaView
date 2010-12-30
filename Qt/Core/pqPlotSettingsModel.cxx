@@ -253,6 +253,7 @@ void pqPlotSettingsModel::setSeriesEnabled(int row, bool enabled)
     QModelIndex idx = this->createIndex(row, 0);
     emit this->dataChanged(idx, idx);
     emit this->redrawChart();
+    emit this->rescaleChart();
     this->updateCheckState(0, Qt::Horizontal);
     }
 }

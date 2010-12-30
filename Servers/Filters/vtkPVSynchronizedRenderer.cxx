@@ -16,10 +16,11 @@
 
 #include "vtkBoundingBox.h"
 #include "vtkCameraPass.h"
-#include "vtkClientServerSynchronizedRenderers.h"
+#include "vtkCaveSynchronizedRenderers.h"
 #include "vtkImageProcessingPass.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
+#include "vtkPVClientServerSynchronizedRenderers.h"
 #include "vtkPVConfig.h"
 #include "vtkPVDefaultPass.h"
 #include "vtkPVOptions.h"
@@ -32,6 +33,8 @@
 # include "vtkIceTSynchronizedRenderers.h"
 #endif
 
+#include <assert.h>
+
 vtkStandardNewMacro(vtkPVSynchronizedRenderer);
 //----------------------------------------------------------------------------
 vtkPVSynchronizedRenderer::vtkPVSynchronizedRenderer()
@@ -41,7 +44,17 @@ vtkPVSynchronizedRenderer::vtkPVSynchronizedRenderer()
   this->Enabled = true;
   this->ImageReductionFactor = 1;
   this->Renderer = 0;
+  this->UseDepthBuffer = false;
+  this->Mode = INVALID;
+  this->CSSynchronizer = 0;
+  this->ParallelSynchronizer = 0;
+  this->DisableIceT = false;
+}
 
+//----------------------------------------------------------------------------
+void vtkPVSynchronizedRenderer::Initialize()
+{
+  assert(this->Mode == INVALID);
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   if (!pm)
     {
@@ -82,9 +95,10 @@ vtkPVSynchronizedRenderer::vtkPVSynchronizedRenderer()
   this->ParallelSynchronizer = 0;
 
   bool in_tile_display_mode = false;
+  bool in_cave_mode = false;
   int tile_dims[2] = {0, 0};
   int tile_mullions[2] = {0, 0};
-#ifdef FIXME
+#ifdef FIXME_COLLABORATION
   vtkPVServerInformation* server_info = NULL;
   if (pm->GetActiveRemoteConnection() && this->Mode != BATCH)
     {
@@ -100,8 +114,13 @@ vtkPVSynchronizedRenderer::vtkPVSynchronizedRenderer()
   tile_dims[1] = server_info->GetTileDimensions()[1];
   tile_mullions[0] = server_info->GetTileMullions()[0];
   tile_mullions[1] = server_info->GetTileMullions()[1];
-#endif
   in_tile_display_mode = (tile_dims[0] > 0 || tile_dims[1] > 0);
+  if (!in_tile_display_mode)
+    {
+    in_cave_mode = server_info->GetNumberOfMachines() > 0;
+      // these are present when a pvx file is specified.
+    }
+#endif
 
 
   // we ensure that tile_dims are non-zero. We are passing the tile_dims to
@@ -119,14 +138,14 @@ vtkPVSynchronizedRenderer::vtkPVSynchronizedRenderer()
 
   case CLIENT:
       {
-      if (in_tile_display_mode)
+      if (in_tile_display_mode || in_cave_mode)
         {
         this->CSSynchronizer = vtkSynchronizedRenderers::New();
         this->CSSynchronizer->WriteBackImagesOff();
         }
       else
         {
-        this->CSSynchronizer = vtkClientServerSynchronizedRenderers::New();
+        this->CSSynchronizer = vtkPVClientServerSynchronizedRenderers::New();
         this->CSSynchronizer->WriteBackImagesOn();
         }
       this->CSSynchronizer->SetRootProcessId(0);
@@ -138,13 +157,13 @@ vtkPVSynchronizedRenderer::vtkPVSynchronizedRenderer()
 
   case SERVER:
       {
-      if (in_tile_display_mode)
+      if (in_tile_display_mode || in_cave_mode)
         {
         this->CSSynchronizer = vtkSynchronizedRenderers::New();
         }
       else
         {
-        this->CSSynchronizer = vtkClientServerSynchronizedRenderers::New();
+        this->CSSynchronizer = vtkPVClientServerSynchronizedRenderers::New();
         }
       this->CSSynchronizer->WriteBackImagesOff();
       this->CSSynchronizer->SetRootProcessId(1);
@@ -156,17 +175,31 @@ vtkPVSynchronizedRenderer::vtkPVSynchronizedRenderer()
     // break;
 
   case BATCH:
-    if (pm->GetNumberOfLocalPartitions() > 1)
+    if (in_cave_mode)
+      {
+      this->ParallelSynchronizer = vtkCaveSynchronizedRenderers::New();
+      this->ParallelSynchronizer->SetParallelController(
+        vtkMultiProcessController::GetGlobalController());
+      this->ParallelSynchronizer->WriteBackImagesOn();
+      }
+    else if (pm->GetNumberOfLocalPartitions() > 1)
       {
 #ifdef PARAVIEW_USE_ICE_T
-      this->ParallelSynchronizer = vtkIceTSynchronizedRenderers::New();
-      static_cast<vtkIceTSynchronizedRenderers*>(this->ParallelSynchronizer)->SetTileDimensions(
-        tile_dims[0], tile_dims[1]);
-      static_cast<vtkIceTSynchronizedRenderers*>(this->ParallelSynchronizer)->SetTileMullions(
-        tile_mullions[0], tile_mullions[1]);
+      if (this->DisableIceT)
+        {
+        this->ParallelSynchronizer = vtkPVClientServerSynchronizedRenderers::New();
+        }
+      else
+        {
+        this->ParallelSynchronizer = vtkIceTSynchronizedRenderers::New();
+        static_cast<vtkIceTSynchronizedRenderers*>(this->ParallelSynchronizer)->SetTileDimensions(
+          tile_dims[0], tile_dims[1]);
+        static_cast<vtkIceTSynchronizedRenderers*>(this->ParallelSynchronizer)->SetTileMullions(
+          tile_mullions[0], tile_mullions[1]);
+        }
 #else
       // FIXME: need to add support for compositing when not using IceT
-      this->ParallelSynchronizer = vtkSynchronizedRenderers::New();
+      this->ParallelSynchronizer = vtkPVClientServerSynchronizedRenderers::New();
 #endif
       this->ParallelSynchronizer->SetParallelController(
         vtkMultiProcessController::GetGlobalController());
@@ -215,6 +248,37 @@ vtkPVSynchronizedRenderer::~vtkPVSynchronizedRenderer()
 }
 
 //----------------------------------------------------------------------------
+void vtkPVSynchronizedRenderer::SetLossLessCompression(bool val)
+{
+  vtkPVClientServerSynchronizedRenderers* cssync =
+    vtkPVClientServerSynchronizedRenderers::SafeDownCast(this->CSSynchronizer);
+  if (cssync)
+    {
+    cssync->SetLossLessCompression(val);
+    }
+  else
+    {
+    vtkDebugMacro("Not in client-server mode.");
+    }
+}
+
+
+//----------------------------------------------------------------------------
+void vtkPVSynchronizedRenderer::ConfigureCompressor(const char* configuration)
+{
+  vtkPVClientServerSynchronizedRenderers* cssync =
+    vtkPVClientServerSynchronizedRenderers::SafeDownCast(this->CSSynchronizer);
+  if (cssync)
+    {
+    cssync->ConfigureCompressor(configuration);
+    }
+  else
+    {
+    vtkDebugMacro("Not in client-server mode.");
+    }
+}
+
+//----------------------------------------------------------------------------
 void vtkPVSynchronizedRenderer::SetImageProcessingPass(
   vtkImageProcessingPass* pass)
 {
@@ -237,6 +301,23 @@ void vtkPVSynchronizedRenderer::SetRenderPass(vtkRenderPass* pass)
 
   vtkSetObjectBodyMacro(RenderPass, vtkRenderPass, pass);
   this->SetupPasses();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVSynchronizedRenderer::SetUseDepthBuffer(bool useDB)
+{
+  if (this->ParallelSynchronizer == 0)
+    {
+    return;
+    }
+#ifdef PARAVIEW_USE_ICE_T
+  if (this->ParallelSynchronizer->IsA("vtkIceTSynchronizedRenderers") == 1)
+    {
+    vtkIceTSynchronizedRenderers *aux =
+                 (vtkIceTSynchronizedRenderers*)this->ParallelSynchronizer;
+    aux->SetUseDepthBuffer(useDB);
+    }
+#endif
 }
 
 //----------------------------------------------------------------------------

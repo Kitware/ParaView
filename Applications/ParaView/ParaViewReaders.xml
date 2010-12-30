@@ -1,8 +1,8 @@
 <ParaViewReaders>
-  <!-- 
+  <!--
     NOTE: Readers are tried in reverse order that they are present in this
-    list i.e. if two readers can read the same extension, then the reader 
-    apperaring later will be tried first when reading the file. 
+    list i.e. if two readers can read the same extension, then the reader
+    apperaring later will be tried first when reading the file.
   -->
   <Proxy group="sources" name="LSDynaReader" />
   <Proxy group="sources" name="PVDReader" />
@@ -33,6 +33,7 @@
   <Proxy group="sources" name="P3DReader" />
   <Proxy group="sources" name="spcthreader" />
   <Proxy group="sources" name="SPCTHRestartReader" />
+  <Proxy group="sources" name="spcthhistoryreader" />
   <Proxy group="sources" name="DEMReader" />
   <Proxy group="sources" name="vrmlreader" />
   <Proxy group="sources" name="plyreader" />
@@ -44,8 +45,9 @@
   <Proxy group="sources" name="MetaImageReader" />
   <Proxy group="sources" name="NrrdReader" />
   <Proxy group="sources" name="Facet Proxy" />
-  <Proxy group="sources" name="FileSeriesPNGReader" />
-  <Proxy group="sources" name="TIFFReader" />
+  <Proxy group="sources" name="PNGSeriesReader" />
+  <Proxy group="sources" name="JPEGSeriesReader" />
+  <Proxy group="sources" name="TIFFSeriesReader" />
   <Proxy group="sources" name="PhastaReader" />
   <Proxy group="sources" name="EnzoReader" />
   <Proxy group="sources" name="FlashReader" />

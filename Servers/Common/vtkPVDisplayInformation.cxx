@@ -46,34 +46,33 @@ void vtkPVDisplayInformation::PrintSelf(ostream& os, vtkIndent indent)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVDisplayInformation::CopyFromObject(vtkObject* obj)
+bool vtkPVDisplayInformation::CanOpenDisplayLocally()
 {
-  // to remove warnings
-  obj = obj;
-
 #if defined(VTK_USE_X)
 # if defined(VTK_OPENGL_HAS_OSMESA)
-  vtkProcessModule* pm = vtkProcessModule::SafeDownCast(obj);
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   if (pm->GetOptions()->GetUseOffscreenRendering())
     {
-    this->CanOpenDisplay = 1;
-    return;
+    return true;
     }
 # endif
 
-  Display* dId = XOpenDisplay((char *)NULL); 
+  Display* dId = XOpenDisplay((char *)NULL);
   if (dId)
     {
     XCloseDisplay(dId);
-    this->CanOpenDisplay = 1;
+    return true;
     }
-  else
-    {
-    this->CanOpenDisplay = 0;
-    }
+  return false;
 #else
-  this->CanOpenDisplay = 1;
+  return true;
 #endif
+}
+
+//----------------------------------------------------------------------------
+void vtkPVDisplayInformation::CopyFromObject(vtkObject*)
+{
+  this->CanOpenDisplay = vtkPVDisplayInformation::CanOpenDisplayLocally()?1:0;
 }
 
 //----------------------------------------------------------------------------

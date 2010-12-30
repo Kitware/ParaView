@@ -449,13 +449,6 @@ void pqSelectionInspectorPanel::select(pqOutputPort* opport, bool createNew)
   this->Implementation->InputPort = opport;
   this->updateSelectionTypesAvailable();
 
-  bool hasGIDs = this->hasGlobalIDs(opport);
-  if (createNew && hasGIDs)
-    {
-    this->Implementation->comboSelectionType->setCurrentIndex(
-      pqImplementation::GLOBALIDS);
-    }
-
   QString selectedObjectLabel = "<b>[none]</b>";
   if (opport)
     {
@@ -506,15 +499,6 @@ void pqSelectionInspectorPanel::select(pqOutputPort* opport, bool createNew)
   this->updateThreholdDataArrays();
 
   this->Implementation->UpdatingGUI = false;
-
-  if ( opport && hasGIDs && opport->getSelectionInput() &&
-       opport->getSelectionInput()->GetXMLName() ==
-       QString("CompositeDataIDSelectionSource"))
-       {
-       this->Implementation->comboSelectionType->setCurrentIndex(
-         pqImplementation::GLOBALIDS);
-       return;
-       }
 
   if (createNew)
     {
@@ -813,6 +797,10 @@ void pqSelectionInspectorPanel::updateDisplayStyleGUI()
     this->Implementation->spinBoxSize_Point, "value", SIGNAL(valueChanged(int)),
     reprProxy, reprProxy->GetProperty("SelectionPointLabelFontSize"), 1);
 
+  this->Implementation->RepLinks->addPropertyLink(this->Implementation->lineEdit_PointFormat,
+    "text", SIGNAL(textChanged(const QString&)),
+    reprProxy, reprProxy->GetProperty("SelectionPointLabelFormat"));
+
   this->Implementation->RepLinks->addPropertyLink(
     this->Implementation->spinBoxOpacity_Point, "value", SIGNAL(valueChanged(double)),
     reprProxy, reprProxy->GetProperty("SelectionPointLabelOpacity"));
@@ -845,6 +833,10 @@ void pqSelectionInspectorPanel::updateDisplayStyleGUI()
   this->Implementation->RepLinks->addPropertyLink(
     this->Implementation->spinBoxSize_Cell, "value", SIGNAL(valueChanged(int)),
     reprProxy, reprProxy->GetProperty("SelectionCellLabelFontSize"), 1);
+
+  this->Implementation->RepLinks->addPropertyLink(this->Implementation->lineEdit_CellFormat,
+    "text", SIGNAL(textChanged(const QString&)),
+    reprProxy, reprProxy->GetProperty("SelectionCellLabelFormat"));
 
   this->Implementation->RepLinks->addPropertyLink(
     this->Implementation->spinBoxOpacity_Cell, "value", SIGNAL(valueChanged(double)),
@@ -1083,22 +1075,12 @@ void pqSelectionInspectorPanel::updateSelectionLabelEnableState()
   if (this->Implementation->InputPort)
     {
     this->Implementation->groupSelectionLabel->setEnabled(true);
-    if(this->Implementation->checkBoxLabelCells->isChecked())
-      {
-      this->Implementation->groupBox_CellLabelStyle->setEnabled(true);
-      }
-    else
-      {
-      this->Implementation->groupBox_CellLabelStyle->setEnabled(false);
-      }
-    if(this->Implementation->checkBoxLabelPoints->isChecked())
-      {
-      this->Implementation->groupBox_PointLabelStyle->setEnabled(true);
-      }
-    else
-      {
-      this->Implementation->groupBox_PointLabelStyle->setEnabled(false);
-      }
+
+    this->Implementation->frame_CellLabelStyle->setEnabled(
+      this->Implementation->checkBoxLabelCells->isChecked());
+
+    this->Implementation->frame_PointLabelStyle->setEnabled(
+      this->Implementation->checkBoxLabelPoints->isChecked());
     }
   else
     {
@@ -1423,7 +1405,7 @@ void pqSelectionInspectorPanel::onSelectionTypeChanged(const QString&)
 //-----------------------------------------------------------------------------
 void pqSelectionInspectorPanel::onSelectionManagerChanged(pqOutputPort* opport)
 {
-  this->select(opport, false);
+  this->selectGlobalIdsIfPossible(opport,false,false);
 }
 
 //-----------------------------------------------------------------------------
@@ -1443,8 +1425,29 @@ void pqSelectionInspectorPanel::createSelectionForCurrentObject()
     this->Implementation->InputPort->setSelectionInput(0, 0);
     }
 
-  this->select(port, true);
+  this->selectGlobalIdsIfPossible(port,true,true);
   port->renderAllViews();
+}
+
+//-----------------------------------------------------------------------------
+void pqSelectionInspectorPanel::selectGlobalIdsIfPossible(
+  pqOutputPort* opport, bool forceGlobalIds, bool createNew)
+{
+  if (forceGlobalIds && this->hasGlobalIDs(opport))
+    {
+    this->Implementation->InputPort = opport;
+    this->updateSelectionTypesAvailable();
+    this->setGlobalIDs();
+    if ( createNew )
+      {
+      this->select(opport, createNew);
+      }
+    }
+  else
+    {
+    this->select(opport, createNew);
+    }
+
 }
 
 //-----------------------------------------------------------------------------

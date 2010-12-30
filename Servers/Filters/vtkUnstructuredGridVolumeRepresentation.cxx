@@ -43,6 +43,7 @@ public:
   typedef vtkstd::map<vtkstd::string,
           vtkSmartPointer<vtkUnstructuredGridVolumeMapper> > MapOfMappers;
   MapOfMappers Mappers;
+  vtkstd::string ActiveVolumeMapper;
 };
 
 
@@ -83,7 +84,6 @@ vtkUnstructuredGridVolumeRepresentation::vtkUnstructuredGridVolumeRepresentation
 
   this->ColorArrayName = 0;
   this->ColorAttributeType = POINT_DATA;
-  this->ActiveVolumeMapper = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -102,7 +102,6 @@ vtkUnstructuredGridVolumeRepresentation::~vtkUnstructuredGridVolumeRepresentatio
   this->LODDeliveryFilter->Delete();
 
   this->SetColorArrayName(0);
-  this->SetActiveVolumeMapper(0);
 
   delete this->Internals;
   this->Internals = 0;
@@ -116,13 +115,21 @@ void vtkUnstructuredGridVolumeRepresentation::AddVolumeMapper(
 }
 
 //----------------------------------------------------------------------------
+void vtkUnstructuredGridVolumeRepresentation::SetActiveVolumeMapper(
+  const char* mapper)
+{
+  this->Internals->ActiveVolumeMapper = mapper? mapper : "";
+  this->MarkModified();
+}
+
+//----------------------------------------------------------------------------
 vtkUnstructuredGridVolumeMapper*
 vtkUnstructuredGridVolumeRepresentation::GetActiveVolumeMapper()
 {
-  if (this->ActiveVolumeMapper)
+  if (this->Internals->ActiveVolumeMapper != "")
     {
     vtkInternals::MapOfMappers::iterator iter =
-      this->Internals->Mappers.find(this->ActiveVolumeMapper);
+      this->Internals->Mappers.find(this->Internals->ActiveVolumeMapper);
     if (iter != this->Internals->Mappers.end() && iter->second.GetPointer())
       {
       return iter->second.GetPointer();
@@ -169,10 +176,6 @@ int vtkUnstructuredGridVolumeRepresentation::RequestData(vtkInformation* request
     this->Preprocessor->SetInputConnection(
       this->GetInternalOutputPort());
     this->Preprocessor->Update();
-
-    this->GetActiveVolumeMapper()->SetInputConnection(
-      this->Distributor->GetOutputPort());
-
     this->DeliveryFilter->SetInputConnection(
       this->CacheKeeper->GetOutputPort());
     this->LODDeliveryFilter->SetInputConnection(
@@ -287,6 +290,8 @@ bool vtkUnstructuredGridVolumeRepresentation::RemoveFromView(vtkView* view)
 void vtkUnstructuredGridVolumeRepresentation::UpdateMapperParameters()
 {
   vtkUnstructuredGridVolumeMapper* activeMapper = this->GetActiveVolumeMapper();
+
+  activeMapper->SetInputConnection(this->Distributor->GetOutputPort());
   activeMapper->SelectScalarArray(this->ColorArrayName);
 
   if (this->ColorArrayName && this->ColorArrayName[0])

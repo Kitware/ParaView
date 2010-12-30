@@ -25,15 +25,15 @@
 #ifndef __vtkPrismSESAMEReader_h
 #define __vtkPrismSESAMEReader_h
 
-#include <vtkRectilinearGridSource.h>
+#include <vtkPolyDataSource.h>
 
 class vtkIntArray;
 
-class VTK_EXPORT vtkPrismSESAMEReader : public vtkRectilinearGridSource
+class VTK_EXPORT vtkPrismSESAMEReader : public vtkPolyDataSource
 {
 public:
   static vtkPrismSESAMEReader *New();
-  vtkTypeMacro(vtkPrismSESAMEReader, vtkRectilinearGridSource);
+  vtkTypeMacro(vtkPrismSESAMEReader, vtkPolyDataSource);
 
   void PrintSelf(ostream& os, vtkIndent indent);
 
@@ -107,7 +107,8 @@ protected:
   int JumpToTable( int tableID );
 
   void ReadTable();
-
+  void ReadVaporization401Table();
+  void ReadCurveFromTable();
 private:
   vtkPrismSESAMEReader(const vtkPrismSESAMEReader&);  // Not implemented.
   void operator=(const vtkPrismSESAMEReader&);  // Not implemented.

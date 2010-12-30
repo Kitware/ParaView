@@ -10,6 +10,12 @@
   <pqevent object="pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/MultiViewSplitter:1/1/1QWidget0/1QScrollArea0/qt_scrollarea_viewport/EmptyView/ConvertActionsFrame/1QPushButton2" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/MultiViewSplitter:1/1/pqSpreadSheetContainer/pqSpreadSheetViewDecorator/Attribute" command="set_string" arguments="Cell Data" />
   <pqevent object="pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/MultiViewSplitter:1/1/pqSpreadSheetContainer/pqSpreadSheetViewDecorator/Attribute" command="set_string" arguments="Point Data" />
+  <!-- begin sort by RTData -->
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/MultiViewSplitter:1/1/pqSpreadSheetContainer/1pqSpreadSheetViewWidget0/1QHeaderView1" command="mousePress" arguments="1,1,0,0,0,0" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/MultiViewSplitter:1/1/pqSpreadSheetContainer/1pqSpreadSheetViewWidget0/1QHeaderView1" command="mouseRelease" arguments="1,0,0,0,0,0" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/MultiViewSplitter:1/1/pqSpreadSheetContainer/1pqSpreadSheetViewWidget0/1QHeaderView1" command="mousePress" arguments="1,1,0,0,0,0" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/MultiViewSplitter:1/1/pqSpreadSheetContainer/1pqSpreadSheetViewWidget0/1QHeaderView1" command="mouseRelease" arguments="1,0,0,0,0,0" />
+  <!-- end sort by RTData -->
   <pqevent object="pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/MultiViewSplitter:1/1/pqSpreadSheetContainer/1pqSpreadSheetViewWidget0" command="mousePress" arguments="1,1,0,51,14,/0:0" />
   <pqevent object="pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/MultiViewSplitter:1/1/pqSpreadSheetContainer/1pqSpreadSheetViewWidget0" command="mouseRelease" arguments="1,0,0,51,14,/0:0" />
   <pqevent object="pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/MultiViewSplitter:1/1/pqSpreadSheetContainer/1pqSpreadSheetViewWidget0" command="keyEvent" arguments="6,16777248,33554432,,0,1" />

@@ -163,5 +163,11 @@ SET(CTEST_CUSTOM_COVERAGE_EXCLUDE
   "qrc_[^\\.]+.cxx"
   "Utilities.hdf5.*"
   "Utilities.Xdmf2.libsrc.*"
+  "Utilities.VisItBridge.avt"
+  "Utilities.VisItBridge.CMake"
+  "Utilities.VisItBridge.common"
+  "Utilities.VisItBridge.databases"
+  "Utilities.VisItBridge.include"
+  "Utilities.VisItBridge.visit_vtk"
   )
 

@@ -852,8 +852,8 @@ void pqAnimationViewWidget::createTrack()
   // orbit.
   if (ren && mode == "orbit")
     {
-    creator.setNormal(
-      ren->GetActiveCamera()->GetViewUp());
+    creator.setNormal( ren->GetActiveCamera()->GetViewUp() );
+    creator.setOrigin( ren->GetActiveCamera()->GetPosition() );
     if (creator.exec() != QDialog::Accepted)
       {
       return;

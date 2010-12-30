@@ -20,11 +20,6 @@ ENDIF(PARAVIEW_ENABLE_PYTHON)
 
 INCLUDE(${QT_USE_FILE})
 
-IF(PARAVIEW_USE_SILO)
-  SET(EXTRA_PQ_COMPONENT_MOC_SOURCES pqSiloPanel.h)
-  SET(EXTRA_PQ_COMPONENT_SOURCES pqSiloPanel.cxx)
-ENDIF(PARAVIEW_USE_SILO)
-
 INCLUDE_DIRECTORIES(
   ${QtPython_BINARY_DIR}
   ${QtPython_SOURCE_DIR}
@@ -71,9 +66,6 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqCameraDialog.h
   pqCameraKeyFrameWidget.h
   pqChangeInputDialog.h
-  pqChartOptionsEditor.h
-  pqChartViewContextMenu.h
-  pqChartViewContextMenuHandler.h
   pqClipPanel.h
   pqColorMapModel.h
   pqColorPresetManager.h
@@ -376,16 +368,10 @@ ADD_LIBRARY(pqComponents
   pqCameraKeyFrameWidget.h
   pqChangeInputDialog.cxx
   pqChangeInputDialog.h
-  pqChartOptionsEditor.cxx
-  pqChartOptionsEditor.h
   pqChartPixelScale.cxx
   pqChartPixelScale.h
   pqChartValue.cxx
   pqChartValue.h
-  pqChartViewContextMenu.cxx
-  pqChartViewContextMenu.h
-  pqChartViewContextMenuHandler.cxx
-  pqChartViewContextMenuHandler.h
   pqClipPanel.cxx
   pqClipPanel.h
   pqCloseViewUndoElement.cxx

@@ -69,7 +69,7 @@ public:
 
   // Description:
   // Set the active volume mapper to use.
-  vtkSetStringMacro(ActiveVolumeMapper);
+  virtual void SetActiveVolumeMapper(const char*);
   vtkUnstructuredGridVolumeMapper* GetActiveVolumeMapper();
 
   // Description:
@@ -163,7 +163,6 @@ protected:
 
   int ColorAttributeType;
   char* ColorArrayName;
-  char* ActiveVolumeMapper;
 
 private:
   vtkUnstructuredGridVolumeRepresentation(const vtkUnstructuredGridVolumeRepresentation&); // Not implemented

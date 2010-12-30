@@ -38,10 +38,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqComponentsExport.h"
 #include "pqOptionsContainer.h"
-#include "vtkQtChartAxisLayer.h" // Needed for enum
-#include "vtkQtChartAxis.h" // Needed for enum
-#include "vtkQtChartAxisOptions.h" // Needed for enum
-#include "vtkQtChartLegend.h" // Needed for enum
 #include "pqChartValue.h"
 
 class pqXYChartOptionsEditorForm;
@@ -104,6 +100,12 @@ protected slots:
   void pickAxisTitleFont();
   void setAxisTitleColor(const QColor& color);
   void setAxisTitle(const QString& title);
+
+  void addAxisLabel();
+  void removeSelectedLabels();
+  void updateAxisLabels();
+  void showRangeDialog();
+  void generateAxisLabels();
 
   void pickTitleFont();
 

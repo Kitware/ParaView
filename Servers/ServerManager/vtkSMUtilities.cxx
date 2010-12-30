@@ -148,46 +148,68 @@ int vtkSMUtilities::SaveImageOnProcessZero(vtkImageData* image,
 vtkPoints* vtkSMUtilities::CreateOrbit(const double center[3],
   const double in_normal[3], double radius, int resolution)
 {
-  vtkPoints* pts = vtkPoints::New(VTK_DOUBLE);
-  pts->SetNumberOfPoints(resolution);
-  vtkTransform * transform = vtkTransform::New();
-  transform->Identity();
-
-
   double normal[3] = {in_normal[0], in_normal[1], in_normal[2]};
   vtkMath::Normalize(normal);
-  if (normal[0] == 0.0 && normal[1] == 0.0 && normal[2] == 1.0)
+  double x_axis[3] = {1,0,0};
+  double y_axis[3] = {1,0,0};
+  double startPoint[3];
+
+  // Is X not colinear to the normal ?
+  if(vtkMath::Dot(x_axis, normal) < 0.999)
     {
-    // no need to do any rotations.
+    // Do with X axis
+    vtkMath::Cross(x_axis, normal, startPoint);
+    vtkMath::Normalize(startPoint);
     }
   else
     {
-    double z_axis[3] = {0,0,1};
-    double rotation_axis[3];
-    vtkMath::Cross(z_axis, normal, rotation_axis);
-    transform->RotateWXYZ(
-      acos(vtkMath::Dot(z_axis, normal))*180/3.141592,
-      rotation_axis);
+    // Do with Y axis
+    vtkMath::Cross(y_axis, normal, startPoint);
+    vtkMath::Normalize(startPoint);
     }
 
+  // Fix start point
+  for(int i=0;i<3;i++)
+    {
+    // Scale start point to have a given radius
+    startPoint[i] *= radius;
+    // Translate regarding the center
+    startPoint[i] += center[i];
+    }
+
+  return CreateOrbit(center, normal, resolution, startPoint);
+}
+
+//----------------------------------------------------------------------------
+vtkPoints* vtkSMUtilities::CreateOrbit(const double center[3],
+  const double in_normal[3], int resolution, const double startPoint[3])
+{
+  // Create the step rotation
+  double normal[3] = {in_normal[0], in_normal[1], in_normal[2]};
+  vtkMath::Normalize(normal);
+  vtkTransform * transform = vtkTransform::New();
+  transform->Identity();
+  transform->RotateWXYZ(360/resolution, normal);
+
+  // Setup initial point location
+  double point[3];
+  point[0] = startPoint[0] - center[0];
+  point[1] = startPoint[1] - center[1];
+  point[2] = startPoint[2] - center[2];
+
+  // Fill the result
+  vtkPoints* pts = vtkPoints::New(VTK_DOUBLE);
+  pts->SetNumberOfPoints(resolution);
   for (int i=0; i < resolution; i++)
     {
-    double a = radius*cos(i*2*3.141592/resolution);
-    double b = radius*sin(i*2*3.141592/resolution);
-    double point[3];
-    point[0] = a;
-    point[1] = b;
-    point[2] = 0.0;
-
-    // Now this point is in the XY plane (with normal (0, 0, 1). We need to
-    // rotate it to match the normal.
-    transform->TransformPoint(point, point); 
-    point[0] += center[0];
-    point[1] += center[1];
-    point[2] += center[2];
-    pts->SetPoint(i, point);
+    pts->SetPoint( i,
+                   point[0] + center[0],
+                   point[1] + center[1],
+                   point[2] + center[2]);
+    transform->TransformPoint(point, point);
     }
   transform->Delete();
+
   return pts;
 }
 

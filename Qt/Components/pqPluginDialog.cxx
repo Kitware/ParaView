@@ -312,7 +312,7 @@ void pqPluginDialog::addInfoNodes(
   
   // set icon hint
   pqPluginManager* pm = pqApplicationCore::instance()->getPluginManager(); 
-  if(pm->isPluginFuntional(plInfo, remote))
+  if(pm->isPluginFunctional(plInfo, remote))
     {
     //pluginNode->setIcon(ValueCol, QIcon(":/pqWidgets/Icons/PluginGreen.png"));
     pluginNode->setText(ValueCol, "Loaded");

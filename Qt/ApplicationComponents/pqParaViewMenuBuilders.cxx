@@ -47,6 +47,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCategoryToolbarsBehavior.h"
 #include "pqChangePipelineInputReaction.h"
 #include "pqColorToolbar.h"
+#include "pqCopyReaction.h"
 #include "pqCreateCustomFilterReaction.h"
 #include "pqDataQueryReaction.h"
 #include "pqDeleteReaction.h"
@@ -54,7 +55,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqFiltersMenuReaction.h"
 #include "pqHelpReaction.h"
 #include "pqIgnoreSourceTimeReaction.h"
-#include "pqListNewProxyDefinitionsBehavior.h"
+#include "pqUpdateProxyDefinitionsBehavior.h"
 #include "pqLoadDataReaction.h"
 #include "pqLoadStateReaction.h"
 #include "pqMainControlsToolbar.h"
@@ -85,10 +86,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqViewSettingsReaction.h"
 
 #ifdef PARAVIEW_ENABLE_PYTHON
-#include "pqEditTraceReaction.h"
 #include "pqMacroReaction.h"
 #include "pqPythonManager.h"
-#include "pqSaveTraceReaction.h"
 #include "pqTraceReaction.h"
 #endif
 
@@ -145,6 +144,7 @@ void pqParaViewMenuBuilders::buildEditMenu(QMenu& menu)
   new pqIgnoreSourceTimeReaction(ui.actionIgnoreTime);
   new pqDeleteReaction(ui.actionDelete);
   new pqDeleteReaction(ui.actionDelete_All, true);
+  new pqCopyReaction(ui.actionCopy);
   new pqApplicationSettingsReaction(ui.actionEditSettings);
   new pqViewSettingsReaction(ui.actionEditViewSettings);
   new pqDataQueryReaction(ui.actionQuery);
@@ -156,8 +156,8 @@ void pqParaViewMenuBuilders::buildSourcesMenu(QMenu&  menu,
 {
   pqProxyGroupMenuManager* mgr = new pqProxyGroupMenuManager(&menu, "ParaViewSources");
   new pqSourcesMenuReaction(mgr);
-  new pqListNewProxyDefinitionsBehavior(
-    pqListNewProxyDefinitionsBehavior::SOURCES, "sources", mgr);
+  new pqUpdateProxyDefinitionsBehavior(
+    pqUpdateProxyDefinitionsBehavior::SOURCES, "sources", mgr);
   pqPVApplicationCore::instance()->registerForQuicklaunch(&menu);
   if (mainWindow)
     {
@@ -174,8 +174,8 @@ void pqParaViewMenuBuilders::buildFiltersMenu(QMenu& menu,
     new pqProxyGroupMenuManager(&menu, "ParaViewFilters");
   mgr->setRecentlyUsedMenuSize(10);
   new pqFiltersMenuReaction(mgr);
-  new pqListNewProxyDefinitionsBehavior(
-    pqListNewProxyDefinitionsBehavior::FILTERS, "filters", mgr);
+  new pqUpdateProxyDefinitionsBehavior(
+    pqUpdateProxyDefinitionsBehavior::FILTERS, "filters", mgr);
   pqPVApplicationCore::instance()->registerForQuicklaunch(&menu);
 
   if (mainWindow)
@@ -248,10 +248,6 @@ void pqParaViewMenuBuilders::buildToolsMenu(QMenu& menu)
                        << pqSetName("actionToolsStartTrace"), true);
   new pqTraceReaction(menu.addAction("Stop Trace")
                       << pqSetName("actionToolsStartTrace"), false);
-  new pqEditTraceReaction(menu.addAction("Edit Trace")
-                      << pqSetName("actionToolsEditTrace"));
-  new pqSaveTraceReaction(menu.addAction("Save Trace")
-                          << pqSetName("actionToolsSaveTrace"));
 #endif
 }
 
@@ -286,6 +282,7 @@ void pqParaViewMenuBuilders::buildPipelineBrowserContextMenu(QWidget& widget)
   new pqCreateCustomFilterReaction(ui.actionPBCreateCustomFilter);
   new pqIgnoreSourceTimeReaction(ui.actionPBIgnoreTime);
   new pqDeleteReaction(ui.actionPBDelete);
+  new pqCopyReaction(ui.actionPBCopy);
 }
 
 //-----------------------------------------------------------------------------

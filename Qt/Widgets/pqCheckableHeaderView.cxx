@@ -40,6 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QApplication>
 #include <QEvent>
 #include <QList>
+#include <QMouseEvent>
 #include <QPainter>
 #include <QPixmap>
 #include <QStyle>
@@ -116,8 +117,6 @@ pqCheckableHeaderView::pqCheckableHeaderView(Qt::Orientation orient,
   this->Internal->CheckBoxPixMaps = new pqCheckBoxPixMaps(this);
 
   // Listen for user clicks.
-  this->connect(this, SIGNAL(sectionClicked(int)),
-      this, SLOT(toggleCheckState(int)), Qt::QueuedConnection);
   if(widgetParent)
     {
     // Listen for focus change events.
@@ -155,6 +154,42 @@ bool pqCheckableHeaderView::eventFilter(QObject *, QEvent *e)
     }
 
   return false;
+}
+
+void pqCheckableHeaderView::mousePressEvent(QMouseEvent *event)
+{
+  QAbstractItemModel *current = this->model();
+
+  if(current)
+    {
+    bool active = true;
+    if(this->parentWidget())
+      {
+      active = this->parentWidget()->hasFocus();
+      }
+
+    bool checkable = false;
+    int cs = current->headerData(
+      0, this->orientation(), Qt::CheckStateRole).toInt(&checkable);
+
+    QPixmap icon = this->Internal->CheckBoxPixMaps->getPixmap(cs, active);
+
+    int buttonMargin =
+      this->style()->pixelMetric(QStyle::PM_ButtonMargin, NULL, this);
+
+    // Capture mouse clicks on the checkbox icon and emit checkStateChanged signals.
+    // Assuming left/bottom aligned checkbox
+    if(event->x() <= (icon.width() + buttonMargin - 1) &&
+       event->x() >= (buttonMargin - 1) &&
+       event->y() <= (icon.height() + buttonMargin - 1) &&
+       event->y() >= (buttonMargin - 1))
+      {
+        emit checkStateChanged();
+        return;
+      }
+    }
+  this->update();
+  QHeaderView::mousePressEvent(event);
 }
 
 void pqCheckableHeaderView::setModel(QAbstractItemModel *newModel)

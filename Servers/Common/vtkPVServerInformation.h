@@ -70,7 +70,7 @@ public:
   vtkGetMacro(UseOffscreenRendering, int);
 
   // Description:
-  // Returns 1 if ICE-T is available.
+  // Returns 1 if IceT is available.
   vtkSetMacro(UseIceT, int);
   vtkGetMacro(UseIceT, int);
 

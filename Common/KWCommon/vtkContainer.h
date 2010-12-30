@@ -18,7 +18,7 @@
 // templated, but it provides a set of method that can be used on all
 // containers. It also provide a simple reference counting scheme.
 
-// .SECTION Caveates
+// .SECTION Caveats
 // Since vtkContainer and vtkAbstractList provide some pure virtual
 // methods, each object of type container will have v-tabe.
 //

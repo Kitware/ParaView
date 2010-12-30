@@ -39,6 +39,8 @@ class pqOutputPort;
 class pqQueryClauseWidget;
 class vtkPVDataSetAttributesInformation;
 class vtkSMProxy;
+class pqView;
+class pqRepresentation;
 
 /// pqQueryDialog is the dialog that allows the user to query/search for
 /// cells/points satisfying a particular criteria.
@@ -58,21 +60,25 @@ public:
   pqOutputPort* producer() const
     { return this->Producer; }
 
-  /// Test this value after exec() finishes to determine if the user closed the
-  /// dialog by clicking the "Extract Over Time" button.
-  bool extractSelectionOverTime() const
-    { return this->ExtractSelectionOverTime; }
-
-  /// Test this value after exec() finishes to determine if the user closed the
-  /// dialog by clicking the "Extract" button.
-  bool extractSelection() const
-    { return this->ExtractSelection; }
-
 signals:
   /// fired every time user submits a query.
   void selected(pqOutputPort*);
 
+  /// fired everytime the user click on the ExtractSelection button
+  void extractSelection();
+  /// fired everytime the user click on the ExtractSelectionOverTime button
+  void extractSelectionOverTime();
+
 protected slots:
+  /// Must be triggered before server disconnect to release all SMProxy links
+  void freeSMProxy();
+
+  /// Triggered when the data to process has changed
+  void onSelectionChange(pqOutputPort*);
+
+  /// Triggerd when the active view has changed
+  void onActiveViewChanged(pqView*);
+
   /// Based on the data type produced by the producer, this will update the
   /// options in the selection type combo-box.
   void populateSelectionType();
@@ -94,12 +100,12 @@ protected slots:
 
   void onExtractSelection()
     { 
-    this->ExtractSelection = true;
+    this->extractSelection();
     this->accept();
     }
   void onExtractSelectionOverTime()
     {
-    this->ExtractSelectionOverTime=true;
+    this->extractSelectionOverTime();
     this->accept();
     }
 
@@ -108,17 +114,11 @@ protected:
   void updateLabels();
 
   /// link the label-color widget with the active label-color property.
-  void linkLabelColorWidet(vtkSMProxy*, const QString& propname);
-
-  /// helps in simulating modal behavior but allowing interaction with render
-  /// windows.
-  virtual bool eventFilter(QObject*, QEvent*);
+  void linkLabelColorWidget(vtkSMProxy*, const QString& propname);
 
   /// creates the proxies needed for the spreadsheet view.
   void setupSpreadSheet();
 
-  bool ExtractSelectionOverTime;
-  bool ExtractSelection;
 private:
   Q_DISABLE_COPY(pqQueryDialog)
   class pqInternals;

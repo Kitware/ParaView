@@ -1,5 +1,5 @@
 /*=========================================================================
-  
+
   Program:   ParaView
   Module:    vtkPVOptions.h
 
@@ -15,7 +15,7 @@
 // .NAME vtkPVOptions - ParaView options storage
 // .SECTION Description
 // An object of this class represents a storage for ParaView options
-// 
+//
 // These options can be retrieved during run-time, set using configuration file
 // or using Command Line Arguments.
 
@@ -42,7 +42,7 @@ public:
       PVDATA_SERVER | PVBATCH
   };
 //ETX
-  
+
   static vtkPVOptions* New();
   vtkTypeMacro(vtkPVOptions,vtkCommandOptions);
   void PrintSelf(ostream& os, vtkIndent indent);
@@ -53,6 +53,12 @@ public:
   vtkGetMacro(UseOffscreenRendering, int);
   vtkGetMacro(UseStereoRendering, int);
   vtkGetStringMacro(StereoType);
+  vtkGetMacro(UseVRPN, int);
+  vtkGetStringMacro(VRPNAddress);
+  vtkGetMacro(UseVRUI, int);
+  vtkGetStringMacro(VRUIAddress);
+
+
   vtkGetMacro(ClientMode, int);
   // Description:
   // Get Various ports.
@@ -60,7 +66,7 @@ public:
   vtkGetMacro(DataServerPort, int);
   vtkGetMacro(RenderServerPort, int);
   vtkGetMacro(RenderNodePort, int);
-  
+
   vtkGetMacro(DisableComposite, int);
   vtkGetMacro(UseSoftwareRendering, int);
   vtkGetMacro(UseSatelliteSoftwareRendering, int);
@@ -90,7 +96,7 @@ public:
   vtkSetMacro(ConnectID, int);
 
   // Description:
-  // Get the various types of host names. 
+  // Get the various types of host names.
   vtkGetStringMacro(ServerHostName);
   vtkGetStringMacro(DataServerHostName);
   vtkGetStringMacro(RenderServerHostName);
@@ -197,6 +203,8 @@ private:
   int ConnectID;
   int UseOffscreenRendering;
   int UseStereoRendering;
+  int UseVRPN;
+  int UseVRUI;
   int DisableComposite;
   int UseSoftwareRendering;
   int UseSatelliteSoftwareRendering;
@@ -206,7 +214,7 @@ private:
   int UseRenderingGroup;
   int Timeout;
 
-  
+
   char* RenderModuleName;
 
   vtkSetStringMacro(CaveConfigurationFileName);
@@ -223,6 +231,13 @@ private:
 
   vtkSetStringMacro(StereoType);
   char* StereoType;
+
+  vtkSetStringMacro(VRPNAddress);
+  char* VRPNAddress;
+
+  vtkSetStringMacro(VRUIAddress);
+  char* VRUIAddress;
+
 //ETX
 private:
   vtkPVOptions(const vtkPVOptions&); // Not implemented

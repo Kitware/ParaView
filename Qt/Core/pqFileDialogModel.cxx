@@ -437,12 +437,23 @@ public:
 
   bool isHidden(const QModelIndex& Index)
     {
-    if(Index.row() >= this->FileList.size())
+    const int size = this->FileList.size();
+    if(Index.row() >= size)
       return false;
 
-    pqFileDialogModelFileInfo& file = this->FileList[Index.row()];
-    return file.isHidden();
+    QModelIndex p = Index.parent();
+    if ( p.isValid() && p.row() < size)
+      {
+      pqFileDialogModelFileInfo& file = this->FileList[p.row()];
+      const QList<pqFileDialogModelFileInfo>& grp = file.group();
+      if(Index.row() < grp.size())
+        {
+        return grp[Index.row()].isHidden();
+        }
+      }
+    return this->FileList[Index.row()].isHidden();
     }
+
   bool isDir(const QModelIndex& Index)
     {
     if(Index.row() >= this->FileList.size())

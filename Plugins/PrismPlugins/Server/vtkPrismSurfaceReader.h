@@ -113,6 +113,14 @@ public:
   bool GetYLogScaling();
   bool GetZLogScaling();
 
+  void SetShowCold(bool);
+  void SetShowVaporization(bool);
+  void SetShowSolidMelt(bool);
+  void SetShowLiquidMelt(bool);
+  bool GetShowCold();
+  bool GetShowVaporization();
+  bool GetShowSolidMelt();
+  bool GetShowLiquidMelt();
 
  
   vtkDoubleArray* GetXRange();
@@ -178,7 +186,7 @@ protected:
   virtual int RequestData(vtkInformation *, vtkInformationVector **, vtkInformationVector *);
   int RequestInformation(vtkInformation *, vtkInformationVector **, vtkInformationVector *);
   //int FillOutputPortInformation(int port, vtkInformation* info);
-
+  int RequestCurveData(vtkPointSet *curveOutput);
 private:
   vtkPrismSurfaceReader(const vtkPrismSurfaceReader&);  // Not implemented.
   void operator=(const vtkPrismSurfaceReader&);  // Not implemented.

@@ -70,6 +70,7 @@ public:
   void SetPointLabelShadow(int);
   void SetPointLabelJustification(int);
   void SetPointLabelFontSize(int);
+  void SetPointLabelFormat(const char*);
 
   void SetCellLabelVisibility(int);
   void SetCellFieldDataArrayName(const char*);
@@ -82,6 +83,7 @@ public:
   void SetCellLabelShadow(int);
   void SetCellLabelJustification(int);
   void SetCellLabelFontSize(int);
+  void SetCellLabelFormat(const char*);
 
   // Description:
   // Used to build the internal transform.

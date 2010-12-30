@@ -69,6 +69,7 @@ vtkPVAxesWidget::vtkPVAxesWidget()
   this->Renderer = vtkRenderer::New();
   this->Renderer->SetViewport(0.0, 0.0, 0.2, 0.2);
   this->Renderer->SetLayer(1);
+  this->Renderer->EraseOff();
   this->Renderer->InteractiveOff();
   this->Priority = 0.55;
   this->AxesActor = vtkPVAxesActor::New();

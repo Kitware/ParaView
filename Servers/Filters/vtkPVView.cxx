@@ -115,7 +115,7 @@ void vtkPVView::SetViewTime(double time)
 bool vtkPVView::InTileDisplayMode()
 {
   int temp[2];
-  return this->SynchronizedWindows->GetTileDisplayParameters(temp);
+  return vtkPVSynchronizedRenderWindows::GetTileDisplayParameters(temp, temp);
 }
 
 //----------------------------------------------------------------------------
@@ -125,7 +125,13 @@ bool vtkPVView::SynchronizeBounds(double bounds[6])
 }
 
 //----------------------------------------------------------------------------
-bool vtkPVView::SynchronizeSize(unsigned long &size)
+bool vtkPVView::SynchronizeSize(double &size)
+{
+  return this->SynchronizedWindows->SynchronizeSize(size);
+}
+
+//----------------------------------------------------------------------------
+bool vtkPVView::SynchronizeSize(unsigned int &size)
 {
   return this->SynchronizedWindows->SynchronizeSize(size);
 }

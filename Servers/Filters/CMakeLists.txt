@@ -39,6 +39,7 @@ SET(Filters_SRCS
   vtkCameraInterpolator2.cxx
   vtkCameraManipulator.cxx
   vtkCameraManipulatorGUIHelper.cxx
+  vtkCaveSynchronizedRenderers.cxx
   vtkChartRepresentation.cxx
   vtkCleanArrays.cxx
   vtkCleanUnstructuredGrid.cxx
@@ -100,7 +101,6 @@ SET(Filters_SRCS
   vtkOutlineRepresentation.cxx
   vtkPConvertSelection.cxx
   vtkPExtractHistogram.cxx
-  vtkParallelCoordinatesRepresentation.cxx
   vtkParallelSerialWriter.cxx
   vtkPEnSightGoldBinaryReader.cxx
   vtkPEnSightGoldReader.cxx
@@ -132,6 +132,7 @@ SET(Filters_SRCS
   vtkPVCameraAnimationCue.cxx
   vtkPVCameraCueManipulator.cxx
   vtkPVCenterAxesActor.cxx
+  vtkPVClientServerSynchronizedRenderers.cxx
   vtkPVClipClosedSurface.cxx
   vtkPVClipDataSet.cxx
   vtkPVCompositeDataPipeline.cxx
@@ -174,6 +175,7 @@ SET(Filters_SRCS
   vtkPVMergeTables.cxx
   vtkPVNullSource.cxx
   vtkPVPlane.cxx
+  vtkPVParallelCoordinatesRepresentation.cxx
   vtkPVPostFilter.cxx
   vtkPVPostFilterExecutive.cxx
   vtkPVRecoverGeometryWireframe.cxx
@@ -198,7 +200,10 @@ SET(Filters_SRCS
   vtkPVTrackballRotate.cxx
   vtkPVTrackballZoom.cxx
   vtkPVTransform.cxx
+  vtkPVTrivialExtentTranslator.cxx
+  vtkPVTrivialProducer.cxx
   vtkPVUpdateSuppressor.cxx
+  vtkPVHardwareSelector.cxx
   vtkPVView.cxx
   vtkPVXYChartView.cxx
   vtkQuerySelectionSource.cxx
@@ -219,12 +224,14 @@ SET(Filters_SRCS
   vtkSpyPlotBlockIterator.cxx
   vtkSpyPlotIStream.cxx
   vtkSpyPlotReader.cxx
+  vtkSpyPlotHistoryReader.cxx
   vtkSpyPlotReaderMap.cxx
   vtkSpyPlotUniReader.cxx
   vtkSquirtCompressor.cxx
   vtkZlibImageCompressor.cxx
   vtkSurfaceVectors.cxx
   vtkTextSourceRepresentation.cxx
+  vtkTileDisplayHelper.cxx
   vtkTilesHelper.cxx
   vtkTableFFT.cxx
 #  vtkTemporalCacheFilter.cxx
@@ -287,6 +294,7 @@ SET_SOURCE_FILES_PROPERTIES(
   vtkPVRenderViewProxy.cxx
   vtkPVView.cxx
   vtkSciVizStatistics.cxx
+  vtkTileDisplayHelper.cxx
   vtkTransferFunctionEditorRepresentation1D.cxx
   vtkTransferFunctionEditorRepresentation.cxx
   vtkTransferFunctionEditorWidget1D.cxx
@@ -304,13 +312,6 @@ IF(PARAVIEW_ENABLE_PYTHON)
     vtkPythonProgrammableFilter.cxx
     )
 ENDIF(PARAVIEW_ENABLE_PYTHON)
-
-IF(PARAVIEW_USE_SILO)
-  SET(Filters_SRCS ${Filters_SRCS}
-    vtkSiloReader.cxx
-    )
-  INCLUDE_DIRECTORIES(${SILO_INCLUDE_DIR})
-ENDIF(PARAVIEW_USE_SILO)
 
 IF(VTK_USE_MPI)
   SET(Filters_SRCS ${Filters_SRCS}
@@ -363,9 +364,9 @@ INCLUDE_DIRECTORIES(
 # The following was copy/paste from vtkIncludeDirectories.cmake
 # OpenGL include directories.
 IF(APPLE)
-  IF(VTK_USE_X)
+  IF(VTK_USE_X OR VTK_OPENGL_HAS_OSMESA)
     INCLUDE_DIRECTORIES(${OPENGL_INCLUDE_DIR})
-  ENDIF(VTK_USE_X)
+  ENDIF(VTK_USE_X OR VTK_OPENGL_HAS_OSMESA)
 ELSE(APPLE)
   INCLUDE_DIRECTORIES(${OPENGL_INCLUDE_DIR})
 ENDIF(APPLE)
@@ -444,7 +445,7 @@ VTK_MAKE_INSTANTIATOR3(vtkPVFiltersInstantiator FiltersInst_SRCS
   "${PVFilters_BINARY_DIR}" "")
 
 # Create filters library.
-ADD_LIBRARY(vtkPVFilters ${Filters_SRCS} ${FiltersInst_SRCS}
+VTK_ADD_LIBRARY(vtkPVFilters ${Filters_SRCS} ${FiltersInst_SRCS}
   ${ExtraParaViewServer_SRCS} ${ExtraParaViewServerNonWrapped_SRCS})
 TARGET_LINK_LIBRARIES(vtkPVFilters
   vtkPVServerCommon
@@ -464,6 +465,10 @@ TARGET_LINK_LIBRARIES(vtkPVFilters
   ${PARAVIEW_ADDITIONAL_LIBRARIES}
   )
 
+IF (VTK_OPENGL_HAS_OSMESA AND OSMESA_LIBRARY)
+  TARGET_LINK_LIBRARIES(vtkPVFilters ${OSMESA_LIBRARY} )
+ENDIF (VTK_OPENGL_HAS_OSMESA AND OSMESA_LIBRARY)
+
 IF(PARAVIEW_ENABLE_PYTHON)
   TARGET_LINK_LIBRARIES(vtkPVFilters
     ${PYTHON_LIBRARIES}
@@ -479,8 +484,8 @@ TARGET_LINK_LIBRARIES(vtkPVFilters ${PARAVIEW_HDF5_LIBRARIES} ${SPCTH_LIBRARIES}
 TARGET_LINK_LIBRARIES(vtkPVFilters vtkClientServer)
 
 IF(VTK_USE_MPI AND PARAVIEW_USE_ICE_T)
-  TARGET_LINK_LIBRARIES(vtkPVFilters icet icet_mpi icet_strategies)
-  INCLUDE_DIRECTORIES(${ICE_T_INCLUDE_DIR})
+  TARGET_LINK_LIBRARIES(vtkPVFilters IceTCore IceTMPI IceTGL)
+  INCLUDE_DIRECTORIES(${ICET_INCLUDE_DIR})
 ENDIF(VTK_USE_MPI AND PARAVIEW_USE_ICE_T)
 
 IF (PARAVIEW_ADAPTOR_LIBRARY)
@@ -534,7 +539,8 @@ ENDIF (PARAVIEW_ENABLE_PYTHON)
 #-------------------------------------------------------------------------------------------------
 # Libraries
 IF(NOT PV_INSTALL_NO_LIBRARIES)
-    INSTALL(TARGETS vtkPVFiltersCS vtkPVFilters
+    INSTALL(TARGETS vtkPVFilters
+      EXPORT ${PV_INSTALL_EXPORT_NAME}
       RUNTIME DESTINATION ${PV_INSTALL_BIN_DIR} COMPONENT Runtime
       LIBRARY DESTINATION ${PV_INSTALL_LIB_DIR} COMPONENT Runtime
       ARCHIVE DESTINATION ${PV_INSTALL_LIB_DIR} COMPONENT Development)
@@ -554,5 +560,5 @@ ENDIF (NOT PV_INSTALL_NO_DEVELOPMENT)
 # Tests
 #-------------------------------------------------------------------------------------------------
 IF(BUILD_TESTING)
-  SUBDIRS(Testing)
+  ADD_SUBDIRECTORY(Testing)
 ENDIF(BUILD_TESTING)

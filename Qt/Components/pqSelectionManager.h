@@ -111,6 +111,9 @@ private slots:
   /// Called when server manager item is being deleted.
   void onItemRemoved(pqServerManagerModelItem* item);
 
+protected:
+  void onSelect(pqOutputPort*,bool forceGlobalIds);
+
 private:
   pqSelectionManagerImplementation* Implementation;
 

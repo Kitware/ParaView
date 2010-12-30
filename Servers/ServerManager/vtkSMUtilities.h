@@ -59,8 +59,12 @@ public:
   // number of points returned is equal to \c resolution.
   // Returns a new instance of vtkPoints. The caller is responsible for freeing
   // the allocated memory.
-  static vtkPoints* CreateOrbit(const double center[3],
-    const double normal[3], double radius, int resolution);
+  static vtkPoints* CreateOrbit(const double center[3], const double normal[3],
+                                int resolution, const double startPoint[3]);
+
+  // Will pick an arbitrary starting point
+  static vtkPoints* CreateOrbit(const double center[3], const double normal[3],
+                                double radius, int resolution);
 
 //BTX
 protected:

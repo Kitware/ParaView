@@ -21,7 +21,9 @@
 
 // This will turn on validation and debug i/o of the filter.
 //#define vtkMaterialInterfaceFilterDEBUG
-#define vtkMaterialInterfaceFilterPROFILE
+
+// This will turn on profiling of how long each part of the filter takes
+//#define vtkMaterialInterfaceFilterPROFILE
 
 #ifndef __vtkMaterialInterfaceFilter_h
 #define __vtkMaterialInterfaceFilter_h
@@ -45,6 +47,8 @@ class vtkIntArray;
 class vtkMultiProcessController;
 class vtkDataArraySelection;
 class vtkCallbackCommand;
+class vtkImplicitFunction;
+
 // specific to us
 class vtkMaterialInterfaceLevel;
 class vtkMaterialInterfaceFilterBlock;
@@ -236,18 +240,9 @@ public:
                                          void* );
 
   // Description:
-  // Modify volume fraction to clip with either a plane and/or a sphere.
-  // Plane will always pass through the sphere center.
-  vtkSetVector3Macro(ClipCenter,double);
-  vtkGetVector3Macro(ClipCenter,double);
-  vtkSetMacro(ClipWithSphere, int);
-  vtkGetMacro(ClipWithSphere, int);
-  vtkSetMacro(ClipRadius, double);
-  vtkGetMacro(ClipRadius, double);
-  vtkSetMacro(ClipWithPlane, int);
-  vtkGetMacro(ClipWithPlane, int);
-  vtkSetVector3Macro(ClipPlaneVector,double);
-  vtkGetVector3Macro(ClipPlaneVector,double);
+  // Set the clip function which can be a plane or a sphere
+  void SetClipFunction(vtkImplicitFunction *clipFunction);
+  vtkGetObjectMacro(ClipFunction,vtkImplicitFunction);
 
   // Description:
   // Invert the volume fraction to extract the negative space.
@@ -255,6 +250,9 @@ public:
   vtkSetMacro(InvertVolumeFraction,int);
   vtkGetMacro(InvertVolumeFraction,int);
 
+  // Description:
+  // Return the mtime also considering the locator and clip function.
+  unsigned long GetMTime();
 
 protected:
   vtkMaterialInterfaceFilter();
@@ -688,6 +686,8 @@ protected:
   #ifdef vtkMaterialInterfaceFilterDEBUG
   int MyPid;
   #endif
+
+  vtkImplicitFunction *ClipFunction;
 
   // Variables that setup clipping with a sphere and a plane.
   double ClipCenter[3];

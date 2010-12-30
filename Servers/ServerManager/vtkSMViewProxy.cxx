@@ -19,6 +19,7 @@
 #include "vtkImageData.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
+#include "vtkPVOptions.h"
 #include "vtkPVView.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSmartPointer.h"
@@ -140,12 +141,11 @@ void vtkSMViewProxy::InteractiveRender()
   int interactive = 1;
   this->InvokeEvent(vtkCommand::StartEvent, &interactive);
 
-  // We call update separately from the render. This is done so that we don't
-  // get any synchronization issues with GUI responding to the data-updated
-  // event by making some data information requests(for example). If those
-  // happen while StillRender/InteractiveRender is being executed on the server
-  // side then we get deadlocks.
-  this->Update();
+  // Interactive render will not call Update() at all. It's expected that you
+  // must have either called a StillRender() or an Update() before triggering an
+  // interactive render. This is critical to keep interactive rates fast when
+  // working over a slow client-server connection.
+  // this->Update();
 
   if (this->ObjectsCreated)
     {
@@ -252,7 +252,12 @@ int vtkSMViewProxy::WriteImage(const char* filename,
 
   vtkSmartPointer<vtkImageData> shot;
   shot.TakeReference(this->CaptureWindow(magnification));
-  return vtkSMUtilities::SaveImageOnProcessZero(shot, filename, writerName);
+
+  if (vtkProcessModule::GetProcessModule()->GetOptions()->GetSymmetricMPIMode())
+    {
+    return vtkSMUtilities::SaveImageOnProcessZero(shot, filename, writerName);
+    }
+  return vtkSMUtilities::SaveImage(shot, filename, writerName);
 }
 
 //----------------------------------------------------------------------------

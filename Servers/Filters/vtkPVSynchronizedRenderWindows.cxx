@@ -192,6 +192,8 @@ public:
     { return this->ExpandTowardMax(me, max, my_size, my_pos, 1); }
 
   vtkSmartPointer<vtkRenderWindow> SharedRenderWindow;
+  unsigned long SharedWindowStartRenderTag;
+  unsigned long SharedWindowEndRenderTag;
   unsigned int ActiveId;
 };
 
@@ -246,6 +248,20 @@ namespace
       reinterpret_cast<vtkPVSynchronizedRenderWindows*>(localArg);
     self->Render(id);
     }
+
+  void GetZBufferValue(void *localArg,
+    void *remoteArg, int remoteArgLength, int vtkNotUsed(remoteProcessId))
+    {
+   vtkMultiProcessStream stream;
+    stream.SetRawData(reinterpret_cast<unsigned char*>(remoteArg),
+      remoteArgLength);
+    unsigned int id = 0;
+    int x, y;
+    stream >> id >> x >> y;
+    vtkPVSynchronizedRenderWindows* self =
+      reinterpret_cast<vtkPVSynchronizedRenderWindows*>(localArg);
+    self->OnGetZBufferValue(id, x, y);
+    }
 };
 
 vtkStandardNewMacro(vtkPVSynchronizedRenderWindows);
@@ -259,9 +275,12 @@ vtkPVSynchronizedRenderWindows::vtkPVSynchronizedRenderWindows()
   this->ClientDataServerController = 0;
   this->ParallelController = 0;
   this->ClientServerRMITag = 0;
+  this->ClientServerGetZBufferValueRMITag = 0;
   this->ParallelRMITag = 0;
   this->Internals = new vtkInternals();
   this->Internals->ActiveId = 0;
+  this->Internals->SharedWindowStartRenderTag = 0;
+  this->Internals->SharedWindowEndRenderTag = 0;
   this->Observer = vtkObserver::New();
   this->Observer->Target = this;
   this->Enabled = true;
@@ -356,6 +375,19 @@ vtkPVSynchronizedRenderWindows::~vtkPVSynchronizedRenderWindows()
   this->SetClientDataServerController(0);
   this->SetParallelController(0);
 
+  if (this->Internals->SharedRenderWindow)
+    {
+    if (this->Internals->SharedWindowStartRenderTag)
+      {
+      this->Internals->SharedRenderWindow->RemoveObserver(
+        this->Internals->SharedWindowStartRenderTag);
+      }
+    if (this->Internals->SharedWindowEndRenderTag)
+      {
+      this->Internals->SharedRenderWindow->RemoveObserver(
+        this->Internals->SharedWindowEndRenderTag);
+      }
+    }
   delete this->Internals;
   this->Internals = 0;
 
@@ -404,10 +436,16 @@ void vtkPVSynchronizedRenderWindows::SetClientServerController(
     {
     this->ClientServerController->RemoveRMICallback(this->ClientServerRMITag);
     }
+  if (this->ClientServerController && this->ClientServerGetZBufferValueRMITag)
+    {
+    this->ClientServerController->RemoveRMICallback(
+      this->ClientServerGetZBufferValueRMITag);
+    }
 
   vtkSetObjectBodyMacro(
     ClientServerController, vtkMultiProcessController, controller);
   this->ClientServerRMITag = 0;
+  this->ClientServerGetZBufferValueRMITag = 0;
 
   // Only the RENDER_SERVER processes needs to listen to SYNC_MULTI_RENDER_WINDOW_TAG
   // triggers from the client.
@@ -415,6 +453,8 @@ void vtkPVSynchronizedRenderWindows::SetClientServerController(
     {
     this->ClientServerRMITag =
       controller->AddRMICallback(::RenderRMI, this, SYNC_MULTI_RENDER_WINDOW_TAG);
+    this->ClientServerGetZBufferValueRMITag =
+      controller->AddRMICallback(::GetZBufferValue, this, GET_ZBUFFER_VALUE_TAG);
     }
 }
 
@@ -484,7 +524,8 @@ vtkRenderWindow* vtkPVSynchronizedRenderWindows::NewRenderWindow()
       swap_buffers |= (this->Mode == BATCH &&
         this->ParallelController->GetLocalProcessId() == 0);
       int not_used[2];
-      swap_buffers |= this->GetTileDisplayParameters(not_used);
+      swap_buffers |= this->GetTileDisplayParameters(not_used, not_used);
+      swap_buffers |= this->GetIsInCave();
       window->SetSwapBuffers(swap_buffers? 1 : 0);
       //window->SetSwapBuffers(1); // for debugging FIXME.
       this->Internals->SharedRenderWindow.TakeReference(window);
@@ -518,15 +559,30 @@ void vtkPVSynchronizedRenderWindows::AddRenderWindow(
     }
 
   this->Internals->RenderWindows[id].RenderWindow = renWin;
+  unsigned long start_tag = 0, end_tag = 0;
   if (!renWin->HasObserver(vtkCommand::StartEvent, this->Observer))
     {
-    this->Internals->RenderWindows[id].StartRenderTag =
-      renWin->AddObserver(vtkCommand::StartEvent, this->Observer);
+    start_tag = renWin->AddObserver(vtkCommand::StartEvent, this->Observer);
     }
   if (!renWin->HasObserver(vtkCommand::EndEvent, this->Observer))
     {
-    this->Internals->RenderWindows[id].EndRenderTag =
-      renWin->AddObserver(vtkCommand::EndEvent, this->Observer);
+    end_tag = renWin->AddObserver(vtkCommand::EndEvent, this->Observer);
+    }
+  if (renWin == this->Internals->SharedRenderWindow)
+    {
+    if (start_tag)
+      {
+      this->Internals->SharedWindowStartRenderTag = start_tag;
+      }
+    if (end_tag)
+      {
+      this->Internals->SharedWindowStartRenderTag = end_tag;
+      }
+    }
+  else
+    {
+    this->Internals->RenderWindows[id].StartRenderTag = start_tag;
+    this->Internals->RenderWindows[id].EndRenderTag = end_tag;
     }
 }
 
@@ -674,7 +730,7 @@ void vtkPVSynchronizedRenderWindows::Render(unsigned int id)
   this->Internals->ActiveId = id;
   iter->second.RenderWindow->Render();
   this->Internals->ActiveId = 0;
-  //cout << "Done Rendering: " << id << endl;
+  // cout << "Done Rendering: " << id << endl;
 }
 
 //----------------------------------------------------------------------------
@@ -986,12 +1042,10 @@ void vtkPVSynchronizedRenderWindows::UpdateWindowLayout()
       // If we are in tile-display mode, we should update the tile-scale
       // and tile-viewport for the render window. That is required for the camera
       // as well as for the annotations to show correctly.
-      vtkPVServerInformation* server_info = NULL;
-#ifdef FIXME
-        vtkProcessModule::GetProcessModule()->GetServerInformation(0);
-#endif
-      int tile_dims[2];
-      bool in_tile_display_mode = this->GetTileDisplayParameters(tile_dims); 
+      int tile_dims[2], tile_mullions[2];
+      bool in_tile_display_mode = this->GetTileDisplayParameters(tile_dims,
+        tile_mullions);
+      bool in_cave_mode = this->GetIsInCave();
       if (in_tile_display_mode)
         {
         if (vtksys::SystemTools::GetEnv("PV_ICET_WINDOW_BORDERS"))
@@ -1008,7 +1062,7 @@ void vtkPVSynchronizedRenderWindows::UpdateWindowLayout()
         double tile_viewport[4];
         vtkTilesHelper* helper = vtkTilesHelper::New();
         helper->SetTileDimensions(tile_dims);
-        helper->SetTileMullions(server_info->GetTileMullions());
+        helper->SetTileMullions(tile_mullions);
         helper->SetTileWindowSize(this->Internals->SharedRenderWindow->GetActualSize());
         helper->GetNormalizedTileViewport(NULL,
           this->ParallelController->GetLocalProcessId(), tile_viewport);
@@ -1016,6 +1070,17 @@ void vtkPVSynchronizedRenderWindows::UpdateWindowLayout()
 
         this->Internals->SharedRenderWindow->SetTileScale(tile_dims);
         this->Internals->SharedRenderWindow->SetTileViewport(tile_viewport);
+        }
+      else if (in_cave_mode)
+        {
+        if (vtksys::SystemTools::GetEnv("PV_ICET_WINDOW_BORDERS"))
+          {
+          this->Internals->SharedRenderWindow->SetSize(400, 400);
+          }
+        else
+          {
+          this->Internals->SharedRenderWindow->SetFullScreen(1);
+          }
         }
       else
         {
@@ -1110,7 +1175,7 @@ void vtkPVSynchronizedRenderWindows::ShinkGaps()
   while (something_expanded);
 
   int temp[2];
-  if (!this->GetTileDisplayParameters(temp))
+  if (!this->GetTileDisplayParameters(temp, temp))
     {
     return;
     }
@@ -1132,23 +1197,64 @@ void vtkPVSynchronizedRenderWindows::ShinkGaps()
 }
 
 //----------------------------------------------------------------------------
-bool vtkPVSynchronizedRenderWindows::GetTileDisplayParameters(int tile_dims[2])
+bool vtkPVSynchronizedRenderWindows::GetIsInCave()
+{
+#ifdef FIXME_COLLABORATION
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  vtkPVServerInformation* server_info = NULL;
+  if (pm->GetActiveRemoteConnection() && this->Mode != BATCH)
+    {
+    vtkIdType connectionID = pm->GetConnectionID(
+      pm->GetActiveRemoteConnection());
+    server_info = pm->GetServerInformation(connectionID);
+    }
+  else
+    {
+    server_info = pm->GetServerInformation(0);
+    }
+
+  int temp[2];
+  if (!this->GetTileDisplayParameters(temp, temp))
+    {
+    return server_info->GetNumberOfMachines() > 0;
+    }
+#endif
+
+  return false;
+}
+
+//----------------------------------------------------------------------------
+bool vtkPVSynchronizedRenderWindows::GetTileDisplayParameters(
+  int tile_dims[2], int tile_mullions[2])
 {
 #ifdef FIXME
-  vtkPVServerInformation* server_info =
-    vtkProcessModule::GetProcessModule()->GetServerInformation(0);
-  tile_dims[0] = server_info->GetTileDimensions()[0];
-  tile_dims[1] = server_info->GetTileDimensions()[1];
+  //  we need to decide how to get access to server-information.
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  vtkPVServerInformation* info = pm->GetServerInformation(0);
+  if (info->GetTileDimensions()[0] > 0 ||
+    info->GetTileDimensions()[1] > 0)
+    {
+    // we are going to use the local server information.
+    }
+  else if (pm->GetActiveRemoteConnection())
+    {
+    info = pm->GetServerInformation(pm->GetConnectionID(
+        pm->GetActiveRemoteConnection()));
+    }
+  tile_dims[0] = info->GetTileDimensions()[0];
+  tile_dims[1] = info->GetTileDimensions()[1];
   bool in_tile_display_mode = (tile_dims[0] > 0 || tile_dims[1] > 0);
   tile_dims[0] = (tile_dims[0] == 0)? 1 : tile_dims[0];
   tile_dims[1] = (tile_dims[1] == 0)? 1 : tile_dims[1];
+  info->GetTileMullions(tile_mullions);
   return in_tile_display_mode;
 #endif
   return false;
 }
 
 //----------------------------------------------------------------------------
-bool vtkPVSynchronizedRenderWindows::SynchronizeSize(unsigned long& size)
+template <class T>
+bool vtkPVSynchronizedRenderWindows::SynchronizeSizeTemplate(T& size)
 {
   // handle trivial case.
   if (this->Mode == BUILTIN || this->Mode == INVALID)
@@ -1171,7 +1277,7 @@ bool vtkPVSynchronizedRenderWindows::SynchronizeSize(unsigned long& size)
   // render-server and data-server.
   if (parallelController)
     {
-    unsigned long result = size;
+    T result = size;
     parallelController->Reduce(&size, &result, 1, vtkCommunicator::SUM_OP, 0);
     size = result;
     }
@@ -1184,13 +1290,13 @@ bool vtkPVSynchronizedRenderWindows::SynchronizeSize(unsigned long& size)
       {
       if (c_ds_controller)
         {
-        unsigned long other_size;
+        T other_size;
         c_ds_controller->Receive(&other_size, 1, 1, 41232);
         size += other_size;
         }
       if (c_rs_controller)
         {
-        unsigned long other_size;
+        T other_size;
         c_rs_controller->Receive(&other_size, 1, 1, 41232);
         size += other_size;
         }
@@ -1231,6 +1337,18 @@ bool vtkPVSynchronizedRenderWindows::SynchronizeSize(unsigned long& size)
     parallelController->Broadcast(&size, 1, 0);
     }
   return true;
+}
+
+//----------------------------------------------------------------------------
+bool vtkPVSynchronizedRenderWindows::SynchronizeSize(double& size)
+{
+  return this->SynchronizeSizeTemplate<double>(size);
+}
+
+//----------------------------------------------------------------------------
+bool vtkPVSynchronizedRenderWindows::SynchronizeSize(unsigned int& size)
+{
+  return this->SynchronizeSizeTemplate<unsigned int>(size);
 }
 
 //----------------------------------------------------------------------------
@@ -1395,6 +1513,51 @@ bool vtkPVSynchronizedRenderWindows::BroadcastToDataServer(vtkSelection* selecti
 }
 
 //----------------------------------------------------------------------------
+bool vtkPVSynchronizedRenderWindows::BroadcastToRenderServer(
+  vtkDataObject* dataObject)
+{
+  // handle trivial case.
+  if (this->Mode == BUILTIN || this->Mode == INVALID)
+    {
+    return true;
+    }
+
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  if (pm->GetOptions()->GetProcessType() == vtkPVOptions::PVDATA_SERVER)
+    {
+    return false;
+    }
+
+  vtkMultiProcessController* parallelController =
+    this->GetParallelController();
+  vtkMultiProcessController* c_rs_controller =
+    this->GetClientServerController();
+
+  if (this->Mode == BATCH &&
+    parallelController->GetNumberOfProcesses() <= 1)
+    {
+    return true;
+    }
+
+  if (this->Mode == CLIENT && c_rs_controller)
+    {
+    c_rs_controller->Send(dataObject, 1, 41234);
+    return true;
+    }
+  else if (c_rs_controller)
+    {
+    c_rs_controller->Receive(dataObject, 1, 41234);
+    }
+
+  if (parallelController && parallelController->GetNumberOfProcesses() > 1)
+    {
+    parallelController->Broadcast(dataObject, 0);
+    }
+
+  return true;
+}
+
+//----------------------------------------------------------------------------
 void vtkPVSynchronizedRenderWindows::TriggerRMI(
   vtkMultiProcessStream& stream, int tag)
 {
@@ -1508,6 +1671,43 @@ bool vtkPVSynchronizedRenderWindows::RemoveRMICallback(unsigned long id)
     return true;
     }
   return false;
+}
+
+//----------------------------------------------------------------------------
+double vtkPVSynchronizedRenderWindows::GetZbufferDataAtPoint(int x, int y,
+  unsigned int id)
+{
+  vtkRenderWindow* window = this->GetRenderWindow(id);
+  if (!this->Enabled || !this->Mode != CLIENT || window == NULL)
+    {
+    return window? window->GetZbufferDataAtPoint(x, y) : 1.0;
+    }
+
+  assert(this->Mode == CLIENT && window != NULL);
+  if (this->ClientServerController)
+    {
+    vtkMultiProcessStream stream;
+    stream << id << x << y;
+
+    vtkstd::vector<unsigned char> data;
+    stream.GetRawData(data);
+    this->ClientServerController->TriggerRMIOnAllChildren(
+      &data[0], static_cast<int>(data.size()), GET_ZBUFFER_VALUE_TAG);
+    double value = 1.0;
+    this->ClientServerController->Receive(&value, 1, 1, GET_ZBUFFER_VALUE_TAG);
+    return value;
+    }
+
+  return 1.0;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVSynchronizedRenderWindows::OnGetZBufferValue(
+  unsigned int id, int x, int y)
+{
+  double value = this->GetZbufferDataAtPoint(x, y, id);
+  // FIXME: need to get the value from IceT.
+  this->ClientServerController->Send(&value, 1, 1, GET_ZBUFFER_VALUE_TAG);
 }
 
 //----------------------------------------------------------------------------

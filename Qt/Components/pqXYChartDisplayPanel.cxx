@@ -38,10 +38,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMArraySelectionDomain.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMChartRepresentationProxy.h"
+#include "vtkChartRepresentation.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxy.h"
 #include "vtkTable.h"
+#include "vtkWeakPointer.h"
 
 #include <QColorDialog>
 #include <QHeaderView>
@@ -128,6 +130,8 @@ pqXYChartDisplayPanel::pqXYChartDisplayPanel(
     this, SLOT(updateAllViews()));
   QObject::connect(this->Internal->XAxisArray, SIGNAL(currentIndexChanged(int)),
     this, SLOT(updateAllViews()));
+  QObject::connect(this->Internal->SettingsModel, SIGNAL(rescaleChart()),
+    this, SLOT(rescaleChart()));
 
   QObject::connect(this->Internal->UseArrayIndex, SIGNAL(toggled(bool)),
     this, SLOT(useArrayIndexToggled(bool)));
@@ -165,6 +169,16 @@ void pqXYChartDisplayPanel::reloadSeries()
 {
   this->updateAllViews();
   this->updateOptionsWidgets();
+}
+
+//-----------------------------------------------------------------------------
+void pqXYChartDisplayPanel::rescaleChart()
+{
+  vtkSMChartRepresentationProxy* proxy = this->Internal->ChartRepresentation;
+  if (proxy)
+    {
+    proxy->GetRepresentation()->RescaleChart();
+    }
 }
 
 //-----------------------------------------------------------------------------

@@ -46,6 +46,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QVector>
 
 // VTK includes
+#include "QFilterTreeProxyModel.h"
 
 // ParaView Server Manager includes
 #include "vtkEventQtSlotConnect.h"
@@ -137,13 +138,25 @@ pqExodusIIPanel::pqExodusIIPanel(pqProxy* object_proxy, QWidget* p) :
     this->referenceProxy()->getProxy(),
     vtkCommand::UpdateInformationEvent,
     this, SLOT(updateSIL()));
-  
+
+  // Blocks
+
   pqProxySILModel* proxyModel = new pqProxySILModel("Blocks", &this->UI->SILModel);
   proxyModel->setSourceModel(&this->UI->SILModel);
-  this->UI->Blocks->setModel(proxyModel);
+
+  // filterProxyModel performs sorting.
+  QFilterTreeProxyModel* filterProxyModel = new QFilterTreeProxyModel();
+  filterProxyModel->setSourceModel(proxyModel);
+
+  this->UI->Blocks->setModel(filterProxyModel);
   this->UI->Blocks->header()->setClickable(true);
-  QObject::connect(this->UI->Blocks->header(), SIGNAL(sectionClicked(int)),
+  this->UI->Blocks->header()->setSortIndicator(0, Qt::AscendingOrder);
+  this->UI->Blocks->header()->setSortIndicatorShown(true);
+  this->UI->Blocks->setSortingEnabled(true);
+  QObject::connect(this->UI->Blocks->header(), SIGNAL(checkStateChanged()),
     proxyModel, SLOT(toggleRootCheckState()), Qt::QueuedConnection);
+
+  // Assemblies
 
   proxyModel = new pqProxySILModel("Assemblies", &this->UI->SILModel);
   proxyModel->setSourceModel(&this->UI->SILModel);
@@ -152,11 +165,20 @@ pqExodusIIPanel::pqExodusIIPanel(pqProxy* object_proxy, QWidget* p) :
   QObject::connect(this->UI->Assemblies->header(), SIGNAL(sectionClicked(int)),
     proxyModel, SLOT(toggleRootCheckState()), Qt::QueuedConnection);
 
+  // Materials
+
   proxyModel = new pqProxySILModel("Materials", &this->UI->SILModel);
   proxyModel->setSourceModel(&this->UI->SILModel);
-  this->UI->Materials->setModel(proxyModel);
+
+  filterProxyModel = new QFilterTreeProxyModel();
+  filterProxyModel->setSourceModel(proxyModel);
+
+  this->UI->Materials->setModel(filterProxyModel);
   this->UI->Materials->header()->setClickable(true);
-  QObject::connect(this->UI->Materials->header(), SIGNAL(sectionClicked(int)),
+  this->UI->Materials->header()->setSortIndicator(0, Qt::AscendingOrder);
+  this->UI->Materials->header()->setSortIndicatorShown(true);
+  this->UI->Materials->setSortingEnabled(true);
+  QObject::connect(this->UI->Materials->header(), SIGNAL(checkStateChanged()),
     proxyModel, SLOT(toggleRootCheckState()), Qt::QueuedConnection);
 
   this->updateSIL();
@@ -184,7 +206,7 @@ pqExodusIIPanel::pqExodusIIPanel(pqProxy* object_proxy, QWidget* p) :
     pqApplicationCore::instance()->manager("SelectionManager"));
   if (selMan)
     {
-    QObject::connect(selMan, SIGNAL(selectionChanged(pqOutputPort*)),
+    bool valid =QObject::connect(selMan, SIGNAL(selectionChanged(pqOutputPort*)),
       this, SLOT(onSelectionChanged(pqOutputPort*)));
     }
   QObject::connect(this->UI->checkSelected, SIGNAL(pressed()),
@@ -294,8 +316,10 @@ void pqExodusIIPanel::addSelectionToTreeWidget(const QString& name,
 void pqExodusIIPanel::linkServerManagerProperties()
 {
 
+  QFilterTreeProxyModel * filter =
+    qobject_cast<QFilterTreeProxyModel *>(this->UI->Blocks->model());
   this->propertyManager()->registerLink(
-    this->UI->Blocks->model(), "values", SIGNAL(valuesChanged()),
+    filter->sourceModel(), "values", SIGNAL(valuesChanged()),
     this->proxy(),
     this->proxy()->GetProperty("ElementBlocks"));
 

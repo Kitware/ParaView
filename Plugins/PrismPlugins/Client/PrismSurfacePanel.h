@@ -73,6 +73,10 @@ protected slots:
   void useYLogScaling(bool);
   void useZLogScaling(bool);
 
+
+  void showCurve(bool);
+
+
   void onSamplesChanged();
 
   void onSelectionChanged(const QItemSelection&, const QItemSelection&);

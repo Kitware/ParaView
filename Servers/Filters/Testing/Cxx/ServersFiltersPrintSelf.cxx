@@ -78,7 +78,6 @@
 #include "vtkOutlineRepresentation.h"
 #include "vtkPConvertSelection.h"
 #include "vtkPExtractHistogram.h"
-#include "vtkParallelCoordinatesRepresentation.h"
 #include "vtkParallelSerialWriter.h"
 #include "vtkPEnSightGoldBinaryReader.h"
 #include "vtkPEnSightGoldReader.h"
@@ -131,6 +130,7 @@
 #include "vtkPVLODVolume.h"
 #include "vtkPVMergeTables.h"
 #include "vtkPVNullSource.h"
+#include "vtkPVParallelCoordinatesRepresentation.h"
 #include "vtkPVRecoverGeometryWireframe.h"
 #include "vtkPVRepresentedDataInformation.h"
 #include "vtkPVScalarBarActor.h"
@@ -194,10 +194,6 @@
 #ifdef PARAVIEW_ENABLE_PYTHON
 #include "vtkPythonCalculator.h"
 #include "vtkPythonProgrammableFilter.h"
-#endif
-
-#ifdef PARAVIEW_USE_SILO
-#include "vtkSiloReader.h"
 #endif
 
 #ifdef VTK_USE_MPI
@@ -285,7 +281,6 @@ int main(int , char *[])
   PRINT_SELF(vtkOutlineRepresentation);
   PRINT_SELF(vtkPConvertSelection);
   PRINT_SELF(vtkPExtractHistogram);
-  PRINT_SELF(vtkParallelCoordinatesRepresentation);
   PRINT_SELF(vtkParallelSerialWriter);
   PRINT_SELF(vtkPEnSightGoldBinaryReader);
   PRINT_SELF(vtkPEnSightGoldReader);
@@ -338,6 +333,7 @@ int main(int , char *[])
   PRINT_SELF(vtkPVLODVolume);
   PRINT_SELF(vtkPVMergeTables);
   PRINT_SELF(vtkPVNullSource);
+  PRINT_SELF(vtkPVParallelCoordinatesRepresentation);
   PRINT_SELF(vtkPVRecoverGeometryWireframe);
   PRINT_SELF(vtkPVRepresentedDataInformation);
   PRINT_SELF(vtkPVScalarBarActor);
@@ -401,10 +397,6 @@ int main(int , char *[])
 #ifdef PARAVIEW_ENABLE_PYTHON
   PRINT_SELF(vtkPythonCalculator);
   PRINT_SELF(vtkPythonProgrammableFilter);
-#endif
-
-#ifdef PARAVIEW_USE_SILO
-  PRINT_SELF(vtkSiloReader);
 #endif
 
 #ifdef VTK_USE_MPI

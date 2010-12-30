@@ -1,5 +1,4 @@
 PROJECT(ParaViewExamples)
-#INCLUDE_REGULAR_EXPRESSION("^.*$")
 
 # VTK examples now require CMake 2.6 or higher.
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6.3)
@@ -9,31 +8,29 @@ IF(NOT ParaView_BINARY_DIR)
   INCLUDE(${PARAVIEW_USE_FILE})
 ENDIF(NOT ParaView_BINARY_DIR)
 
-IF(NOT QT_QMAKE_EXECUTABLE)
-  FIND_PACKAGE(Qt4 REQUIRED)
-ENDIF(NOT QT_QMAKE_EXECUTABLE)
+ADD_SUBDIRECTORY(Filter)
+ADD_SUBDIRECTORY(ParametricSource)
+ADD_SUBDIRECTORY(SMProxy)
+ADD_SUBDIRECTORY(Representation)
+ADD_SUBDIRECTORY(HiddenLinesRemoval)
 
-SUBDIRS (
-  Filter
-  ParametricSource
-  SMProxy
-  Representation
-  HiddenLinesRemoval
-)
+IF(PARAVIEW_USE_VISITBRIDGE)
+  ADD_SUBDIRECTORY(
+  VisItReader
+  )
+ENDIF(PARAVIEW_USE_VISITBRIDGE)
 
 IF(PARAVIEW_BUILD_QT_GUI)
-  SUBDIRS(
-    Autostart
-    DisplayPanelDecorator
-    DockWidget
-    GUIObjectPanel
-    GUIToolBar
-    GUIView
-    Reader
-    RenderPassViews
-    SourceToolbar
-    Writer
-    )
+  ADD_SUBDIRECTORY(Autostart)
+  ADD_SUBDIRECTORY(DisplayPanelDecorator)
+  ADD_SUBDIRECTORY(DockWidget)
+  ADD_SUBDIRECTORY(GUIObjectPanel)
+  ADD_SUBDIRECTORY(GUIToolBar)
+  ADD_SUBDIRECTORY(GUIView)
+  ADD_SUBDIRECTORY(Reader)
+  ADD_SUBDIRECTORY(RenderPassViews)
+  ADD_SUBDIRECTORY(SourceToolbar)
+  ADD_SUBDIRECTORY(Writer)
 ENDIF(PARAVIEW_BUILD_QT_GUI)
 
 

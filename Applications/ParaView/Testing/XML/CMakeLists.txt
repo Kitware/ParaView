@@ -3,8 +3,20 @@ SET (TESTS_WITHOUT_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/OpenHelp.xml
 )
 
+SET (TESTS_WITH_BASELINES)
+IF(NOT PARAVIEW_USE_VISITBRIDGE)
+  # Analyze reader test was conflicting with the reader from VisIt. So
+  # disabling it.
+  SET (TESTS_WITH_BASELINES ${TESTS_WITH_BASELINES}
+    ${CMAKE_CURRENT_SOURCE_DIR}/AnalyzeReaderWriterPlugin.xml)
+ELSE(NOT PARAVIEW_USE_VISITBRIDGE)
+  SET (TESTS_WITH_BASELINES ${TESTS_WITH_BASELINES}
+    ${CMAKE_CURRENT_SOURCE_DIR}/VisItBridge.xml)
+ENDIF(NOT PARAVIEW_USE_VISITBRIDGE)
+
+
 SET (TESTS_WITH_BASELINES
-  ${CMAKE_CURRENT_SOURCE_DIR}/AnalyzeReaderWriterPlugin.xml
+  ${TESTS_WITH_BASELINES}
   ${CMAKE_CURRENT_SOURCE_DIR}/AnimatePipelineTime.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/3DWidgetInCustomFilter.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/CalcParens.xml
@@ -16,6 +28,7 @@ SET (TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/ColorEditor3.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/ColorEditor4.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/ComparativeVisPanel.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/CompositeSurfaceSelection.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/Contour.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/ContourRange.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/CustomFilter.xml
@@ -30,6 +43,7 @@ SET (TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/ExTimeseries2.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/ExtractBlock.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/ExtractLevel.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/EyeDomeLighting.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/FindDataDialog.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/FFTOverTime.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/Flow.xml
@@ -37,7 +51,6 @@ SET (TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/Fractal2D.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/GlobalProperties.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/GridConnectivity.xml
-  ${CMAKE_CURRENT_SOURCE_DIR}/LinePlot.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/H5PartReaderPlugin.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/LoadPlugins.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/LoadSaveStateAnimation.xml
@@ -64,6 +77,7 @@ SET (TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/SpreadSheet1.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/SpreadSheet2.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/SPTimeseries.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/SpyPlotHistoryReader.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/StreamTracerUpdates.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/TemporalInterpolator.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/TemporalShiftScale.xml
@@ -90,6 +104,7 @@ SET (TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/XdmfGridAttributes.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/XYChart.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/XYHistogram.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/ZLibXDMF.xml
   #  ${CMAKE_CURRENT_SOURCE_DIR}/XYBarChart.xml
 )
 
@@ -120,10 +135,13 @@ SET (PlotEdges2_BREAK TRUE)
 SET (PropertyConversion1_BREAK TRUE)
 set (ReadXMLPolyDataFileSeries_BREAK TRUE)
 set (ExodusXML_BREAK TRUE)
+set (EyeDomeLighting_BREAK TRUE)
 SET (ComparativeVisPanel_BREAK TRUE)
 SET (SpreadSheet1_BREAK TRUE)
 SET (SPTimeseries_BREAK TRUE)
 SET (XYChart_BREAK TRUE)
+SET (XYHistogram_BREAK TRUE)
+
 
 
 # Add image threshold overrides for tests.
@@ -146,6 +164,15 @@ IF (PARAVIEW_USE_MPI)
   SET (SpreadSheet1_DISABLE_CS TRUE)
   SET (SpreadSheet1_DISABLE_CRS TRUE)
 ENDIF (PARAVIEW_USE_MPI)
+
+# Composite Surface Selection is currently broken in everything but bultin
+SET (CompositeSurfaceSelection_DISABLE_CS TRUE)
+SET (CompositeSurfaceSelection_DISABLE_CRS TRUE)
+
+# Clip test has object picking which is not supported in client-render-server
+# mode.
+SET (Clip_DISABLE_CRS TRUE)
+
 
 # These Xdmf tests have wireframes, hence the increased thresholds.
 SET (XdmfReadImageData_THRESHOLD 20)
@@ -185,13 +212,19 @@ IF (NOT BUILD_SHARED_LIBS)
 ENDIF (NOT BUILD_SHARED_LIBS)
 # There should be a client server specific version of this test.
 SET (AnalyzeReaderWriterPlugin_DISABLE_CS TRUE)
+SET (EyeDomeLighting_DISABLE_CS TRUE)
 SET (H5PartReaderPlugin_DISABLE_CS TRUE)
 SET (LoadPlugins_DISABLE_CS TRUE)
 SET (NiftiReaderWriterPlugin_DISABLE_CS TRUE)
 SET (AnalyzeReaderWriterPlugin_DISABLE_CRS TRUE)
+SET (EyeDomeLighting_DISABLE_CRS TRUE)
 SET (H5PartReaderPlugin_DISABLE_CRS TRUE)
 SET (LoadPlugins_DISABLE_CRS TRUE)
 SET (NiftiReaderWriterPlugin_DISABLE_CRS TRUE)
+
+IF(NOT PARAVIEW_BUILD_PLUGIN_EyeDomeLighting)
+  SET(EyeDomeLighting_DISABLE_C TRUE)
+ENDIF()
 
 # Make these tests use reverse connection.
 SET (CutMulti_REVERSE_CONNECT TRUE)

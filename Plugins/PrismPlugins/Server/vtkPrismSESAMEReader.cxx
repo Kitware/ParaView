@@ -19,6 +19,8 @@
 #include <vtksys/ios/sstream>
 #include <vtkStringArray.h>
 #include <vtkSmartPointer.h>
+#include <vtkIdList.h>
+#include "vtkRectilinearGridGeometryFilter.h"
 
 vtkStandardNewMacro(vtkPrismSESAMEReader);
 
@@ -38,6 +40,11 @@ public:
   vtkstd::vector<vtkstd::string> TableArrays;
   vtkstd::vector<int> TableArrayStatus;
   vtkIntArray* TableIdsArray;
+
+  vtkSmartPointer<vtkRectilinearGridGeometryFilter> RectGridGeometry;
+
+
+
   enum SESAMEFORMAT
     {
     LANL,
@@ -180,6 +187,9 @@ public:
     this->File = NULL;
     this->TableId = -1;
     this->TableIdsArray = vtkIntArray::New();
+    this->RectGridGeometry =  vtkSmartPointer<vtkRectilinearGridGeometryFilter>::New();
+
+
     }
   ~MyInternal()
     {
@@ -192,118 +202,147 @@ static const int MaxTableArrays = 10;
 struct vtkPrismSESAMETableDef
 {
   int TableId;
-  const char* XAxisName;
-  const char* YAxisName;
   const char* Arrays[MaxTableArrays];
 };
 
 static const vtkPrismSESAMETableDef TableDefs[] =
 {
     {301,
-       "Density",
+      {"Density",
        "Temperature",
-      {"301: Total EOS (Pressure)",
-       "301: Total EOS (Energy)",
-       "301: Total EOS (Free Energy)",
+       "Total EOS (Pressure)",
+       "Total EOS (Energy)",
+       "Total EOS (Free Energy)",
       0}  // keep 0 last
     },
 
     {303,
-       "Density",
+      {"Density",
        "Temperature",
-      {"303: Total EOS (Pressure)",
-       "303: Total EOS (Energy)",
-       "303: Total EOS (Free Energy)",
+       "Total EOS (Pressure)",
+       "Total EOS (Energy)",
+       "Total EOS (Free Energy)",
       0}  // keep 0 last
     },
 
     {304,
-       "Density",
+      {"Density",
        "Temperature",
-      {"304: Electron EOS (Pressure)",
-       "304: Electron EOS (Energy)",
-       "304: Electron EOS (Free Energy)",
+       "Electron EOS (Pressure)",
+       "Electron EOS (Energy)",
+       "Electron EOS (Free Energy)",
        0}  // keep 0 last
     },
 
     {305,
-       "Density",
+      {"Density",
        "Temperature",
-      {"305: Total EOS (Pressure)",
-       "305: Total EOS (Energy)",
-       "305: Total EOS (Free Energy)",
+       "Total EOS (Pressure)",
+       "Total EOS (Energy)",
+       "Total EOS (Free Energy)",
       0}  // keep 0 last
     },
 
     {306,
-       "Density",
+      {"Density",
+       "Total EOS (Pressure)",
+       "Total EOS (Energy)",
+       "Total EOS (Free Energy)",
+      0}  // keep 0 last
+    },
+
+    {401,
+      {"Vapor Pressure",
        "Temperature",
-      {"306: Total EOS (Pressure)",
-       "306: Total EOS (Energy)",
-       "306: Total EOS (Free Energy)",
+       "Vapor Density",
+       "Density of Liquid or Solid",
+       "Internal Energy of Vapor",
+       "Internal Energy of Liquid or Solid",
+       "Free Energy of Vapor",
+       "Free Energy of Liquid or Solid",
+      0}  // keep 0 last
+    },
+
+
+    {411,
+      {"Density of Solid on Melt",
+       "Melt Temperature",
+       "Melt Pressure",
+       "Internal Energy of Solid",
+       "Free Energy of Solid",
+      0}  // keep 0 last
+    },
+
+
+    {412,
+       {"Density of Solid on Melt",
+       "Melt Temperature",
+       "Melt Pressure",
+       "Internal Energy of Liquid",
+       "Free Energy of Liquid",
       0}  // keep 0 last
     },
 
     {502,
-       "Density",
+       {"Density",
        "Temperature",
-      {"502: Rosseland Mean Opacity",
+       "Rosseland Mean Opacity",
        0}  // keep 0 last
     },
 
     {503,
-       "Density",
+       {"Density",
        "Temperature",
-      {"503: Electron Conductive Opacity1",
+       "Electron Conductive Opacity1",
        0}  // keep 0 last
     },
 
     {504,
-       "Density",
+      {"Density",
        "Temperature",
-      {"504: Mean Ion Charge1",
+       "Mean Ion Charge1",
        0}  // keep 0 last
     },
 
     {505,
-       "Density",
+      {"Density",
        "Temperature",
-      {"505: Planck Mean Opacity",
+       "Planck Mean Opacity",
        0}  // keep 0 last
     },
 
     {601,
-       "Density",
+      {"Density",
        "Temperature",
-      {"601: Mean Ion Charge2",
+       "Mean Ion Charge2",
        0}  // keep 0 last
     },
 
     {602,
-       "Density",
+      {"Density",
        "Temperature",
-      {"602: Electrical Conductivity",
+       "Electrical Conductivity",
        0}  // keep 0 last
     },
 
     {603,
-       "Density",
+      {"Density",
        "Temperature",
-      {"603: Thermal Conductivity",
+       "Thermal Conductivity",
        0}  // keep 0 last
     },
 
     {604,
-       "Density",
+      {"Density",
        "Temperature",
-      {"604: Thermoelectric Coefficient",
+       "Thermoelectric Coefficient",
        0}  // keep 0 last
     },
 
     {605,
-       "Density",
+      {"Density",
        "Temperature",
-    {"605: Electron Conductive Opacity2",
+       "Electron Conductive Opacity2",
     0}  // keep 0 last
     }
 
@@ -323,7 +362,7 @@ static int TableIndex(int tableId)
 }
 
 
-vtkPrismSESAMEReader::vtkPrismSESAMEReader() : vtkRectilinearGridSource()
+vtkPrismSESAMEReader::vtkPrismSESAMEReader() : vtkPolyDataSource()
 {
   this->Internal = new MyInternal();
 }
@@ -561,10 +600,197 @@ void vtkPrismSESAMEReader::ExecuteInformation()
 
   }
 
+  if(this->Internal->TableId ==401 && this->Internal->TableArrays.empty())
+  {
+    float v[5] = { 0.0, 0.0, 0.0, 0.0, 0.0 };
+    int numberTemperature = 0;
+    int result=0;
 
-  if(this->Internal->TableId != -1 &&
-    this->Internal->TableArrays.empty())
+    JumpToTable(this->Internal->TableId);
+
+    result=ReadTableValueLine( &(v[0]), &(v[1]), &(v[2]), &(v[3]), &(v[4]) );
+    // get the table header
+    if (result!= 0)
     {
+      //this->GetOutput()->SetWholeExtent(0, (int)(v[0]) - 1,
+      //  0, (int)(v[0]) - 1, 0, 0 );
+      //// dimensions of grid
+      numberTemperature = (int)(v[0]);
+    }
+    unsigned int scalarIndex = 0;
+    int scalarCount = 0;
+    int readFromTable = 0;
+
+    if (result!= 0)
+    {
+      for (int k=1 ;k<5;k++)
+      {
+          scalarCount++;
+          if(scalarCount == numberTemperature)
+          {
+            scalarCount = 1;
+            scalarIndex++;
+          }
+      }
+    }
+
+    while ( (readFromTable = ReadTableValueLine( &(v[0]), &(v[1]), &(v[2]), &(v[3]),
+      &(v[4])  )) != 0)
+    {
+      for (int k=0;k<readFromTable;k++)
+      {
+        scalarCount++;
+        if(scalarCount == numberTemperature)
+        {
+          scalarCount = 1;
+          scalarIndex++;
+        }
+      }
+    }
+
+    this->Internal->NumberTableVariables=scalarIndex;
+
+
+
+    // get the names of the arrays in the table
+    int tableIndex = TableIndex(this->Internal->TableId);
+
+
+    int numVarNames=0;
+    for(int j=0; TableDefs[tableIndex].Arrays[j] != 0; j++)
+    {
+      numVarNames++;
+    }
+
+    for(int j=0;j<this->Internal->NumberTableVariables; j++)
+    {
+      if(j<numVarNames)
+      {
+        this->Internal->TableArrays.push_back(
+          TableDefs[tableIndex].Arrays[j]);
+        this->Internal->TableArrayStatus.push_back(1);  // all arrays are on
+        // by default
+      }
+      else
+      {
+        vtkstd::stringstream ss;
+        vtkstd::string varID;
+        ss<<j+1;
+        ss>>varID;
+        vtkstd::string varName="Variable ";
+        varName.append(varID);
+        this->Internal->TableArrays.push_back(varName);
+        this->Internal->TableArrayStatus.push_back(1);  // all arrays are on
+        // by default
+      }
+    }
+  }
+else if((this->Internal->TableId == 306 ||
+         this->Internal->TableId == 411 ||
+         this->Internal->TableId == 412) &&
+    this->Internal->TableArrays.empty())
+  {
+
+    float v[5] = { 0.0, 0.0, 0.0, 0.0, 0.0 };
+    int numberDensities = 0;
+    int numRead = 0;
+    int result=0;
+
+    JumpToTable(this->Internal->TableId);
+
+    result=ReadTableValueLine( &(v[0]), &(v[1]), &(v[2]), &(v[3]), &(v[4]) );
+    // get the table header
+    if (result!= 0)
+    {
+      //this->GetOutput()->SetWholeExtent(0, (int)(v[0]) - 1,
+      //  0, (int)(v[1]) - 1, 0, 0 );
+      //// dimensions of grid
+      numberDensities = (int)(v[0]);
+    }
+    unsigned int scalarIndex = 0;
+    int scalarCount = 0;
+    int readFromTable = 0;
+
+    if (result!= 0)
+    {
+      for (int k=2;k<5;k++)
+      {
+        if ( numRead == (numberDensities +1) )
+        {
+        }
+        else
+        {
+          scalarCount++;
+          if(scalarCount == numberDensities)
+          {
+            scalarCount = 1;
+            scalarIndex++;
+          }
+        }
+        numRead++;
+      }
+    }
+
+    while ( (readFromTable = ReadTableValueLine( &(v[0]), &(v[1]), &(v[2]), &(v[3]),
+      &(v[4])  )) != 0)
+    {
+      for (int k=0;k<readFromTable;k++)
+      {
+        if ( numRead == (numberDensities +1) )
+        {
+        }
+        else
+        {
+          scalarCount++;
+          if(scalarCount == numberDensities)
+          {
+            scalarCount = 1;
+            scalarIndex++;
+          }
+        }
+        numRead++;
+      }
+    }
+
+    this->Internal->NumberTableVariables=scalarIndex;
+
+
+
+    // get the names of the arrays in the table
+    int tableIndex = TableIndex(this->Internal->TableId);
+
+    int numVarNames=0;
+    for(int j=0; TableDefs[tableIndex].Arrays[j] != 0; j++)
+    {
+      numVarNames++;
+    }
+
+    for(int j=0;j<this->Internal->NumberTableVariables; j++)
+    {
+      if(j<numVarNames)
+      {
+        this->Internal->TableArrays.push_back(
+          TableDefs[tableIndex].Arrays[j]);
+        this->Internal->TableArrayStatus.push_back(1);  // all arrays are on
+        // by default
+      }
+      else
+      {
+        vtkstd::stringstream ss;
+        vtkstd::string varID;
+        ss<<j+1;
+        ss>>varID;
+        vtkstd::string varName="Variable ";
+        varName.append(varID);
+        this->Internal->TableArrays.push_back(varName);
+        this->Internal->TableArrayStatus.push_back(1);  // all arrays are on
+        // by default
+      }
+    }
+  }
+  else if(this->Internal->TableId != -1 &&
+    this->Internal->TableArrays.empty())
+  {
 
     float v[5] = { 0.0, 0.0, 0.0, 0.0, 0.0 };
     int datadims[2] = { 0, 0 };
@@ -576,79 +802,76 @@ void vtkPrismSESAMEReader::ExecuteInformation()
     result=ReadTableValueLine( &(v[0]), &(v[1]), &(v[2]), &(v[3]), &(v[4]) );
     // get the table header
     if (result!= 0)
-      {
-      this->GetOutput()->SetWholeExtent(0, (int)(v[0]) - 1,
-        0, (int)(v[1]) - 1, 0, 0 );
-      // dimensions of grid
+    {
+      //this->GetOutput()->SetWholeExtent(0, (int)(v[0]) - 1,
+      //  0, (int)(v[1]) - 1, 0, 0 );
+      //// dimensions of grid
       datadims[0] = (int)(v[0]);
       datadims[1] = (int)(v[1]);
-      }
+    }
     unsigned int scalarIndex = 0;
     int scalarCount = 0;
     int readFromTable = 0;
 
     if (result!= 0)
-      {
+    {
       for (int k=2;k<5;k++)
-        {
+      {
         if ( numRead >= (datadims[0] + datadims[1]) )
-          {
+        {
           scalarCount++;
           if(scalarCount == datadims[0] * datadims[1])
-            {
+          {
             scalarCount = 1;
             scalarIndex++;
-            }
           }
-        numRead++;
         }
+        numRead++;
       }
+    }
 
     while ( (readFromTable = ReadTableValueLine( &(v[0]), &(v[1]), &(v[2]), &(v[3]),
       &(v[4])  )) != 0)
-      {
+    {
       for (int k=0;k<readFromTable;k++)
-        {
+      {
         if ( numRead >= (datadims[0] + datadims[1]) )
-          {
+        {
           scalarCount++;
           if(scalarCount == datadims[0] * datadims[1])
-            {
+          {
             scalarCount = 1;
             scalarIndex++;
-            }
           }
-        numRead++;
         }
+        numRead++;
       }
+    }
 
     this->Internal->NumberTableVariables=scalarIndex;
 
 
 
     // get the names of the arrays in the table
-   int tableIndex = TableIndex(this->Internal->TableId);
-
-    this->Internal->TableXAxisName=TableDefs[tableIndex].XAxisName;
-    this->Internal->TableYAxisName=TableDefs[tableIndex].YAxisName;
+    int tableIndex = TableIndex(this->Internal->TableId);
 
     int numVarNames=0;
     for(int j=0; TableDefs[tableIndex].Arrays[j] != 0; j++)
-      {
+    {
       numVarNames++;
-      }
+    }
 
-    for(int j=0;j<this->Internal->NumberTableVariables; j++)
-      {
+    for(int j=0;j<this->Internal->NumberTableVariables+2; j++)
+    {
       if(j<numVarNames)
-        {
+      {
         this->Internal->TableArrays.push_back(
           TableDefs[tableIndex].Arrays[j]);
         this->Internal->TableArrayStatus.push_back(1);  // all arrays are on
         // by default
-        }
+      }
       else
-        {
+      {
         vtkstd::stringstream ss;
         vtkstd::string varID;
         ss<<j+1;
@@ -658,9 +881,11 @@ void vtkPrismSESAMEReader::ExecuteInformation()
         this->Internal->TableArrays.push_back(varName);
         this->Internal->TableArrayStatus.push_back(1);  // all arrays are on
         // by default
-        }
       }
     }
+  }
+
+
 }
 
 int vtkPrismSESAMEReader::JumpToTable( int toTable )
@@ -682,7 +907,20 @@ void vtkPrismSESAMEReader::Execute()
 {
   // read the file
   JumpToTable(this->Internal->TableId);
-  this->ReadTable();
+  if(this->Internal->TableId==401)
+  {
+    this->ReadVaporization401Table();
+  }
+  else if(this->Internal->TableId==411 ||
+    this->Internal->TableId==412 ||
+    this->Internal->TableId==306)
+  {
+    this->ReadCurveFromTable();
+  }
+  else
+  {
+    this->ReadTable();
+  }
 }
 
 void vtkPrismSESAMEReader::ReadTable()
@@ -691,7 +929,10 @@ void vtkPrismSESAMEReader::ReadTable()
   vtkFloatArray *yCoords = vtkFloatArray::New();
   vtkFloatArray *zCoords = vtkFloatArray::New();
 
-  vtkRectilinearGrid *output = this->GetOutput();
+  vtkPolyData *output = this->GetOutput();
+
+  vtkSmartPointer<vtkRectilinearGrid> rGrid= vtkSmartPointer<vtkRectilinearGrid>::New();
+
 
   float v[5] = { 0.0, 0.0, 0.0, 0.0, 0.0 };
   int datadims[2] = { 0, 0 };
@@ -705,7 +946,7 @@ void vtkPrismSESAMEReader::ReadTable()
     // dimensions of grid
     datadims[0] = (int)(v[0]);
     datadims[1] = (int)(v[1]);
-    output->SetDimensions( datadims[0], datadims[1], 1 );
+    rGrid->SetDimensions( datadims[0], datadims[1], 1 );
 
     // allocate space
     xCoords->Allocate( datadims[0] );
@@ -713,16 +954,6 @@ void vtkPrismSESAMEReader::ReadTable()
     zCoords->Allocate( 1 );
     zCoords->InsertNextTuple1( 0.0 );
     }
-
-
-
-
-  vtkSmartPointer<vtkStringArray> xName=vtkSmartPointer<vtkStringArray>::New();
-  xName->SetName("XAxisName");
-  xName->InsertNextValue(this->Internal->TableXAxisName);
-  vtkSmartPointer<vtkStringArray> yName=vtkSmartPointer<vtkStringArray>::New();
-  yName->SetName("YAxisName");
-  yName->InsertNextValue(this->Internal->TableYAxisName);
 
   unsigned int i;
   vtkstd::vector<vtkFloatArray*> scalars;
@@ -738,7 +969,7 @@ void vtkPrismSESAMEReader::ReadTable()
       }
     }
 
-  unsigned int scalarIndex = 0;
+  unsigned int scalarIndex = 2;
   int scalarCount = 0;
   int readFromTable = 0;
 
@@ -816,32 +1047,423 @@ void vtkPrismSESAMEReader::ReadTable()
       }
     }
 
-  output->SetXCoordinates( xCoords );
-  output->SetYCoordinates( yCoords );
-  output->SetZCoordinates( zCoords );
-  output->GetFieldData()->AddArray(xName);
-  output->GetFieldData()->AddArray(yName);
+  rGrid->SetXCoordinates( xCoords );
+  rGrid->SetYCoordinates( yCoords );
+  rGrid->SetZCoordinates( zCoords );
 
-  output->GetPointData()->Reset();
+  rGrid->GetPointData()->Reset();
+
+
+  for(int t=0;t<datadims[0] * datadims[1];t++)
+  {
+    if(this->Internal->TableArrayStatus.size()>0)
+    {
+      scalars[0]->InsertNextTuple1(0);
+    }
+    if(this->Internal->TableArrayStatus.size()>1)
+    {
+      scalars[1]->InsertNextTuple1(0);
+    }
+  }
+
+
 
   for(i=0; i<scalars.size(); i++)
-    {
+  {
     if(scalars[i])
-      {
-      if(scalars[i]->GetNumberOfTuples())
-        {
-        output->GetPointData()->AddArray(scalars[i]);
-        }
+    {
+
+      rGrid->GetPointData()->AddArray(scalars[i]);
+
       scalars[i]->Delete();
-      }
     }
+  }
 
   xCoords->Delete();
   yCoords->Delete();
   zCoords->Delete();
 
-  output->Squeeze();
+  rGrid->Squeeze();
+
+
+  this->Internal->RectGridGeometry->SetInput(rGrid);
+  this->Internal->RectGridGeometry->Update();
+
+
+  vtkSmartPointer<vtkPolyData> localOutput= vtkSmartPointer<vtkPolyData>::New();
+
+
+  vtkPoints *inPts;
+  vtkPointData *pd;
+
+  vtkIdType ptId, numPts;
+
+  localOutput->ShallowCopy(this->Internal->RectGridGeometry->GetOutput());
+  localOutput->GetPointData()->DeepCopy(this->Internal->RectGridGeometry->GetOutput()->GetPointData());
+
+  inPts = localOutput->GetPoints();
+  pd = localOutput->GetPointData();
+
+
+  numPts = inPts->GetNumberOfPoints();
+
+  vtkSmartPointer<vtkFloatArray> xArray= vtkFloatArray::SafeDownCast(pd->GetArray(0));
+  vtkSmartPointer<vtkFloatArray> yArray=vtkFloatArray::SafeDownCast(pd->GetArray(1));
+
+    for(ptId=0;ptId<numPts;ptId++)
+    {
+      double coords[3];
+      inPts->GetPoint(ptId,coords);
+      xArray->InsertValue(ptId,coords[0]);
+      yArray->InsertValue(ptId,coords[1]);
+    }
+
+    pd->AddArray(xArray);
+    pd->AddArray(yArray);
+
+
+
+
+  output->ShallowCopy(localOutput);
+
+
+
+
 }
+void vtkPrismSESAMEReader::ReadCurveFromTable()
+{
+
+  vtkPolyData *output = this->GetOutput();
+
+  float v[5] = { 0.0, 0.0, 0.0, 0.0, 0.0 };
+  int numberDensities = 0;
+  int numRead = 0;
+  int result=0;
+
+  result=ReadTableValueLine( &(v[0]), &(v[1]), &(v[2]), &(v[3]), &(v[4]) );
+  // get the table header
+  if (result!= 0)
+    {
+    // dimensions of grid
+    numberDensities = (int)(v[0]);
+    output->Allocate(1);
+    }
+
+
+  vtkSmartPointer<vtkStringArray> xName=vtkSmartPointer<vtkStringArray>::New();
+  xName->SetName("XAxisName");
+  xName->InsertNextValue(this->Internal->TableXAxisName);
+  vtkSmartPointer<vtkStringArray> yName=vtkSmartPointer<vtkStringArray>::New();
+  yName->SetName("YAxisName");
+  yName->InsertNextValue(this->Internal->TableYAxisName);
+
+  unsigned int i;
+  vtkstd::vector<vtkFloatArray*> scalars;
+  for(i=0; i<this->Internal->TableArrayStatus.size(); i++)
+    {
+    vtkFloatArray* newArray = this->Internal->TableArrayStatus[i] ?
+                      vtkFloatArray::New() : NULL;
+    scalars.push_back(newArray);
+    if(newArray)
+      {
+      newArray->Allocate(numberDensities);
+      newArray->SetName(this->Internal->TableArrays[i].c_str());
+      }
+    }
+
+  unsigned int scalarIndex = 0;
+  int scalarCount = 0;
+  int readFromTable = 0;
+
+  if (result!= 0)
+  {
+    for (int k=2;k<5;k++)
+    {
+      if(numRead == numberDensities)
+      {
+      }
+      else
+      {
+        scalarCount++;
+        if(scalarCount > numberDensities)
+        {
+          scalarCount = 1;
+          scalarIndex++;
+        }
+        if(this->Internal->TableArrayStatus.size() > scalarIndex &&
+          this->Internal->TableArrayStatus[scalarIndex])
+        {
+          scalars[scalarIndex]->InsertNextTuple1(v[k]);
+        }
+      }
+      numRead++;
+    }
+  }
+
+
+  while ( (readFromTable = ReadTableValueLine( &(v[0]), &(v[1]), &(v[2]), &(v[3]),
+      &(v[4])  )) != 0)
+    {
+      for (int k=0;k<readFromTable;k++)
+      {
+        if(numRead == numberDensities)
+        {
+        }
+        else
+        {
+          scalarCount++;
+          if(scalarCount > numberDensities)
+          {
+            scalarCount = 1;
+            scalarIndex++;
+          }
+          if(this->Internal->TableArrayStatus.size() > scalarIndex &&
+            this->Internal->TableArrayStatus[scalarIndex])
+          {
+            scalars[scalarIndex]->InsertNextTuple1(v[k]);
+          }
+        }
+      numRead++;
+      }
+    }
+
+  for(i=scalarIndex+1;
+      i<this->Internal->TableArrayStatus.size();
+      i++)
+  {
+    // fill in the empty scalars with zeros
+    int max = numberDensities;
+    for(int j=0; j<max; j++)
+    {
+      scalars[i]->InsertNextTuple1(0.0);
+    }
+  }
+
+
+  vtkSmartPointer<vtkPoints> points= vtkSmartPointer<vtkPoints>::New();
+  output->SetPoints(points);
+
+  if(scalars.size()>3)
+  {
+
+    vtkFloatArray* xArray=scalars[0];
+    vtkFloatArray* yArray=scalars[1];
+    vtkFloatArray* zArray=scalars[2];
+
+    if(xArray->GetSize()==numberDensities &&
+      yArray->GetSize()==numberDensities &&
+      zArray->GetSize()==numberDensities)
+    {
+
+      double coords[3];
+   //   vtkSmartPointer<vtkIdList> idList= vtkSmartPointer<vtkIdList>::New();
+      vtkIdType lineId[2];
+      lineId[0]=-1;
+      lineId[1]=-1;
+
+      for(int j=0;j<numberDensities;j++)
+      {
+        coords[0]=xArray->GetValue(j);
+        coords[1]=yArray->GetValue(j);
+        coords[2]=zArray->GetValue(j);
+        lineId[1]=points->InsertNextPoint(coords);
+        if(lineId[0]!=-1)
+        {
+         output->InsertNextCell(VTK_LINE,2,lineId);
+        }
+        lineId[0]=lineId[1];
+        //idList->InsertNextId(id);
+      }
+     // output->InsertNextCell(VTK_POLY_LINE,idList);
+
+      for(i=0; i<scalars.size(); i++)
+      {
+        if(scalars[i])
+        {
+          if(scalars[i]->GetNumberOfTuples())
+          {
+            output->GetPointData()->AddArray(scalars[i]);
+          }
+          scalars[i]->Delete();
+        }
+      }
+    }
+  }
+}
+void vtkPrismSESAMEReader::ReadVaporization401Table()
+{
+  vtkPolyData *output = this->GetOutput();
+
+  float v[5] = { 0.0, 0.0, 0.0, 0.0, 0.0 };
+  int numberTemperatures=0;
+  int result=0;
+
+  result=ReadTableValueLine( &(v[0]), &(v[1]), &(v[2]), &(v[3]), &(v[4]) );
+  // get the table header
+  if (result!= 0)
+    {
+    numberTemperatures = (int)(v[0]);
+    output->Allocate(1);
+   }
+
+  vtkSmartPointer<vtkStringArray> xName=vtkSmartPointer<vtkStringArray>::New();
+  xName->SetName("XAxisName");
+  xName->InsertNextValue(this->Internal->TableXAxisName);
+  vtkSmartPointer<vtkStringArray> yName=vtkSmartPointer<vtkStringArray>::New();
+  yName->SetName("YAxisName");
+  yName->InsertNextValue(this->Internal->TableYAxisName);
+
+  unsigned int i;
+  vtkstd::vector<vtkFloatArray*> scalars;
+  for(i=0; i<this->Internal->TableArrayStatus.size(); i++)
+    {
+    vtkFloatArray* newArray = this->Internal->TableArrayStatus[i] ?
+                      vtkFloatArray::New() : NULL;
+    scalars.push_back(newArray);
+    if(newArray)
+      {
+      newArray->Allocate(numberTemperatures);
+      newArray->SetName(this->Internal->TableArrays[i].c_str());
+      }
+    }
+
+  unsigned int scalarIndex = 0;
+  int scalarCount = 0;
+  int readFromTable = 0;
+
+  if (result!= 0)
+  {
+    for (int k=1;k<5;k++)
+    {
+      scalarCount++;
+      if(scalarCount > numberTemperatures)
+      {
+        scalarCount = 1;
+        scalarIndex++;
+      }
+      if(this->Internal->TableArrayStatus.size() > scalarIndex &&
+        this->Internal->TableArrayStatus[scalarIndex])
+      {
+        scalars[scalarIndex]->InsertNextTuple1(v[k]);
+      }
+    }
+  }
+
+
+  while ( (readFromTable = ReadTableValueLine( &(v[0]), &(v[1]), &(v[2]), &(v[3]),
+    &(v[4])  )) != 0)
+  {
+    for (int k=0;k<readFromTable;k++)
+    {
+        scalarCount++;
+        if(scalarCount > numberTemperatures)
+        {
+          scalarCount = 1;
+          scalarIndex++;
+        }
+        if(this->Internal->TableArrayStatus.size() > scalarIndex &&
+          this->Internal->TableArrayStatus[scalarIndex])
+        {
+          scalars[scalarIndex]->InsertNextTuple1(v[k]);
+        }
+      }
+
+
+      /*
+      if ( numRead <numberTemperatures )
+      {
+      xCoords->InsertNextTuple1(  v[k] );
+      }
+      else if ( numRead < (numberTemperatures + numberTemperatures))
+      {
+      yCoords->InsertNextTuple1(  v[k] );
+      }
+      else
+      {
+      scalarCount++;
+      if(scalarCount > numberTemperatures)
+      {
+      scalarCount = 1;
+      scalarIndex++;
+      }
+      if(this->Internal->TableArrayStatus.size() > scalarIndex &&
+      this->Internal->TableArrayStatus[scalarIndex])
+      {
+      scalars[scalarIndex]->InsertNextTuple1(v[k]);
+      }
+      }
+      numRead++;
+      */
+  }
+
+  for(i=scalarIndex+1;
+    i<this->Internal->TableArrayStatus.size();
+    i++)
+  {
+    // fill in the empty scalars with zeros
+    int max = numberTemperatures;
+    for(int j=0; j<max; j++)
+    {
+      scalars[i]->InsertNextTuple1(0.0);
+    }
+  }
+
+
+  vtkSmartPointer<vtkPoints> points= vtkSmartPointer<vtkPoints>::New();
+  output->SetPoints(points);
+
+  if(scalars.size()>3)
+  {
+
+    vtkFloatArray* xArray=scalars[0];
+    vtkFloatArray* yArray=scalars[1];
+    vtkFloatArray* zArray=scalars[2];
+
+    if(xArray->GetSize()==numberTemperatures &&
+      yArray->GetSize()==numberTemperatures &&
+      zArray->GetSize()==numberTemperatures)
+    {
+
+      double coords[3];
+    //  vtkSmartPointer<vtkIdList> idList= vtkSmartPointer<vtkIdList>::New();
+      vtkIdType lineId[2];
+      lineId[0]=-1;
+      lineId[1]=-1;
+
+
+      for(int j=0;j<numberTemperatures;j++)
+      {
+        coords[0]=xArray->GetValue(j);
+        coords[1]=yArray->GetValue(j);
+        coords[2]=zArray->GetValue(j);
+        lineId[1]=points->InsertNextPoint(coords);
+        if(lineId[0]!=-1)
+        {
+         output->InsertNextCell(VTK_LINE,2,lineId);
+        }
+        lineId[0]=lineId[1];
+//        idList->InsertNextId(id);
+      }
+//      output->InsertNextCell(VTK_POLY_LINE,idList);
+
+      for( i=0; i<scalars.size(); i++)
+      {
+        if(scalars[i])
+        {
+          if(scalars[i]->GetNumberOfTuples())
+          {
+            output->GetPointData()->AddArray(scalars[i]);
+          }
+          scalars[i]->Delete();
+        }
+      }
+    }
+  }
+
+
+
+}
+
 
 int vtkPrismSESAMEReader::ReadTableValueLine ( float *v1, float *v2,
   float *v3, float *v4, float *v5)

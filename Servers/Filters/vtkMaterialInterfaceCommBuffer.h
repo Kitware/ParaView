@@ -15,7 +15,8 @@
 #ifndef __vtkMaterialInterfaceCommBuffer_h
 #define __vtkMaterialInterfaceCommBuffer_h
 
-//#include<iostream>
+#include "vtkSystemIncludes.h"
+
 #include<vtkstd/vector>
 #include<vtkType.h>
 

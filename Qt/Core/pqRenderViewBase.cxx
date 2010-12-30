@@ -37,10 +37,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkImageData.h"
 #include "vtkProcessModule.h"
 #include "vtkPVDataInformation.h"
+#include "vtkPVGenericRenderWindowInteractor.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSMGlobalPropertiesManager.h"
 #include "vtkSMProperty.h"
+#include "vtkSMIntVectorProperty.h"
 #include "vtkSMProxyManager.h"
+#include "vtkSMRenderViewProxy.h"
 #include "vtkSMSourceProxy.h"
 
 // Qt Includes.
@@ -50,9 +53,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QPoint>
 #include <QPointer>
 #include <QtDebug>
+#include <QTimer>
+#include <QMainWindow>
+#include <QStatusBar>
 
 // ParaView Includes.
 #include "pqApplicationCore.h"
+#include "pqCoreUtilities.h"
 #include "pqImageUtil.h"
 #include "pqOutputPort.h"
 #include "pqPipelineSource.h"
@@ -68,6 +75,8 @@ public:
   QPointer<QWidget> Viewport;
   QPoint MouseOrigin;
   bool InitializedAfterObjectsCreated;
+  bool IsInteractiveDelayActive;
+  double TimeLeftBeforeFullResolution;
 
   pqInternal()
     {
@@ -77,6 +86,46 @@ public:
     {
     delete this->Viewport;
     }
+
+  void writeToStatusBar(const char* txt)
+    {
+    QMainWindow *mainWindow = qobject_cast<QMainWindow *>(pqCoreUtilities::mainWidget());
+    if(mainWindow)
+      {
+      mainWindow->statusBar()->showMessage(txt);
+      }
+    }
+
+  void startInteractiveRenderDelay(double timeLeft)
+    {
+    this->IsInteractiveDelayActive = true;
+    this->TimeLeftBeforeFullResolution = timeLeft;
+    tick();
+    }
+
+  //-----------------------------------------------------------------------------
+  void interactiveRenderDelayTimeOut()
+  {
+    this->IsInteractiveDelayActive = false;
+    tick();
+  }
+
+  //-----------------------------------------------------------------------------
+  void tick()
+  {
+    if(this->IsInteractiveDelayActive)
+      {
+      QString txt = "Full resolution render in: ";
+      txt += QString::number(this->TimeLeftBeforeFullResolution);
+      txt += " s";
+      this->writeToStatusBar( txt.toAscii().data() );
+      this->TimeLeftBeforeFullResolution -= 0.1;
+      }
+    else
+      {
+      this->writeToStatusBar("");
+      }
+  }
 };
 
 //-----------------------------------------------------------------------------
@@ -90,6 +139,7 @@ pqRenderViewBase::pqRenderViewBase(
   Superclass(type, group, name, renViewProxy, server, _parent)
 {
   this->Internal = new pqRenderViewBase::pqInternal();
+  this->InteractiveDelayUpdateTimer = new QTimer(this);
 }
 
 //-----------------------------------------------------------------------------
@@ -175,8 +225,35 @@ void pqRenderViewBase::initializeAfterObjectsCreated()
     this->initializeInteractors();
     this->restoreSettings(/*only_global=*/true);
     }
-}
 
+  // Attach Qt Signal to VTK interactor Delay event
+  vtkSMRenderViewProxy* renderViewProxy;
+  renderViewProxy = vtkSMRenderViewProxy::SafeDownCast(this->getProxy());
+  if( renderViewProxy != NULL )
+    {
+    pqProgressManager* progressManager;
+    progressManager = pqApplicationCore::instance()->getProgressManager();
+    // Generate Signals when interaction event occurs ??? Here ???
+    this->getConnector()->Connect(
+        renderViewProxy->GetInteractor(),
+        vtkPVGenericRenderWindowInteractor::EndDelayNonInteractiveRenderEvent,
+        this, SLOT(endDelayInteractiveRender()));
+    this->getConnector()->Connect( renderViewProxy->GetInteractor(),
+                                   vtkCommand::StartInteractionEvent,
+                                   this,
+                                   SLOT(endDelayInteractiveRender()));
+    this->getConnector()->Connect( renderViewProxy->GetInteractor(),
+                                   vtkPVGenericRenderWindowInteractor::BeginDelayNonInteractiveRenderEvent,
+                                   this,
+                                   SLOT(beginDelayInteractiveRender()));
+
+    this->InteractiveDelayUpdateTimer->setSingleShot(false);
+    QObject::connect( this->InteractiveDelayUpdateTimer,
+                      SIGNAL(timeout()),
+                      this,
+                      SLOT(updateStatusMessage()));
+    }
+}
 //-----------------------------------------------------------------------------
 // Sets default values for the underlying proxy.  This is during the 
 // initialization stage of the pqProxy for proxies created by the GUI itself 
@@ -247,6 +324,7 @@ bool pqRenderViewBase::setCameraManipulators(const QList<pqSMProxy>& manipulator
     }
 
   vtkSMProxy* viewproxy = this->getProxy();
+
   pqSMAdaptor::setProxyListProperty(
     viewproxy->GetProperty("CameraManipulators"),
     manipulators);
@@ -334,41 +412,42 @@ void pqRenderViewBase::resetDisplay()
 
 //-----------------------------------------------------------------------------
 static const char* pqRenderViewModuleLightSettings [] = {
-  "LightSwitch",
-  "LightIntensity",
-  "UseLight",
-  "KeyLightWarmth",
-  "KeyLightIntensity",
-  "KeyLightElevation",
-  "KeyLightAzimuth",
-  "FillLightWarmth",
-  "FillLightK:F Ratio",
-  "FillLightElevation",
-  "FillLightAzimuth",
-  "BackLightWarmth",
-  "BackLightK:B Ratio",
-  "BackLightElevation",
   "BackLightAzimuth",
-  "HeadLightWarmth",
+  "BackLightElevation",
+  "BackLightK:B Ratio",
+  "BackLightWarmth",
+  "FillLightAzimuth",
+  "FillLightElevation",
+  "FillLightK:F Ratio",
+  "FillLightWarmth",
   "HeadLightK:H Ratio",
+  "HeadLightWarmth",
+  "KeyLightAzimuth",
+  "KeyLightElevation",
+  "KeyLightIntensity",
+  "KeyLightWarmth",
+  "LightIntensity",
+  "LightSwitch",
   "MaintainLuminance",
+  "UseLight",
   NULL
   };
 
 static const char* pqGlobalRenderViewModuleMiscSettings [] = {
-  "LODThreshold",
-  "LODResolution",
-  "RenderInterruptsEnabled",
-  "RemoteRenderThreshold",
-  "TileDisplayCompositeThreshold",
-  "ImageReductionFactor",
-  "CompressorConfig",
-  "CompressionEnabled",
-  "OrderedCompositing",
-  "StillRenderImageReductionFactor",
   "CollectGeometryThreshold",
+  "CompressionEnabled",
+  "CompressorConfig",
   "DepthPeeling",
+  "ImageReductionFactor",
+  "LODResolution",
+  "LODThreshold",
   "MaximumNumberOfPeels",
+  "NonInteractiveRenderDelay",
+  "OrderedCompositing",
+  "RemoteRenderThreshold",
+  "RenderInterruptsEnabled",
+  "StillRenderImageReductionFactor",
+  "TileDisplayCompositeThreshold",
   "UseOffscreenRenderingForScreenshots",
   NULL
   };
@@ -724,4 +803,25 @@ void pqRenderViewBase::setStereo(int mode)
       }
     viewProxy->UpdateVTKObjects();
     }
+}
+//-----------------------------------------------------------------------------
+void pqRenderViewBase::beginDelayInteractiveRender()
+{
+  vtkSMIntVectorProperty *prop =
+      vtkSMIntVectorProperty::SafeDownCast(
+          this->getProxy()->GetProperty("NonInteractiveRenderDelay"));
+  double value = prop ? static_cast<double>(prop->GetElement(0)) : 2;
+  this->Internal->startInteractiveRenderDelay(value);
+  this->InteractiveDelayUpdateTimer->start(100);
+}
+//-----------------------------------------------------------------------------
+void pqRenderViewBase::endDelayInteractiveRender()
+{
+  this->Internal->interactiveRenderDelayTimeOut();
+  this->InteractiveDelayUpdateTimer->stop();
+}
+//-----------------------------------------------------------------------------
+void pqRenderViewBase::updateStatusMessage()
+{
+  this->Internal->tick();
 }

@@ -74,6 +74,10 @@ vtkCaveRenderManager::vtkCaveRenderManager()
   this->DisplayY[1] = 0.0;
   this->DisplayY[2] = 0.0;
   this->DisplayY[3] = 1.0;
+
+  // Screen surface rotation matrix
+  SurfaceRot = vtkMatrix4x4::New();
+
   // Reload the controller so that we make an ICE-T context.
   this->Superclass::SetController(NULL);
   this->SetController(vtkMultiProcessController::GetGlobalController());
@@ -85,10 +89,12 @@ vtkCaveRenderManager::~vtkCaveRenderManager()
 {
   this->SetController(NULL);
   this->SetNumberOfDisplays(0);
+  this->SurfaceRot->Delete();
 }
+
 //-------------------------------------------------------------------------
 // Room camera is a camera in room coordinates that points at the display.
-// Client camera is the camera on the client.  The out camera is the 
+// Client camera is the camera on the client.  The out camera is the
 // combination of the two used for the final cave display.
 // It is the room camera transformed by the world camera.
 void vtkCaveRenderManager::ComputeCamera(vtkCamera* cam)
@@ -98,7 +104,7 @@ void vtkCaveRenderManager::ComputeCamera(vtkCamera* cam)
   double pos[4];
   //cam->GetPosition(pos);
   pos[0] = 0.;
-  pos[1] = 0.; 
+  pos[1] = 0.;
   pos[2] = 0.;
   pos[3] = 1.;
 
@@ -161,7 +167,7 @@ void vtkCaveRenderManager::ComputeCamera(vtkCamera* cam)
   cam->SetPosition(p[0], p[1], p[2]);
   cam->SetFocalPoint(p[0]-vn[0], p[1]-vn[1], p[2]-vn[2]);
   cam->SetViewUp(oy[0], oy[1], oy[2]);
-  
+
   // Compute view angle.
   viewAngle = atan(height/(2.0*dist)) * 360.0 / 3.1415926;
   cam->SetViewAngle(viewAngle);
@@ -173,16 +179,15 @@ void vtkCaveRenderManager::ComputeCamera(vtkCamera* cam)
 
   // Compute the normalized x and y components of shear offset.
   tmp = sqrt(ox[0]*ox[0] + ox[1]*ox[1] + ox[2]*ox[2]);
-  xOffset = vtkMath::Dot(offset, ox) / (tmp * tmp); 
+  xOffset = vtkMath::Dot(offset, ox) / (tmp * tmp);
   tmp = sqrt(oy[0]*oy[0] + oy[1]*oy[1] + oy[2]*oy[2]);
-  yOffset = vtkMath::Dot(offset, oy) / (tmp * tmp); 
+  yOffset = vtkMath::Dot(offset, oy) / (tmp * tmp);
 
   // Off angle positioning of window.
   cam->SetWindowCenter(2*xOffset, 2*yOffset);
 }
 
 //-------------------------------------------------------------------------
-
 vtkRenderer *vtkCaveRenderManager::MakeRenderer()
 {
   return vtkIceTRenderer::New();
@@ -255,7 +260,7 @@ void vtkCaveRenderManager::SetNumberOfDisplays(int numberOfDisplays)
         newDisplays[i][5] = -1.0;
         newDisplays[i][6] = -1.0;
         newDisplays[i][7] = 1.0;
-        
+
         newDisplays[i][8] = -1.0;
         newDisplays[i][9] = 1.0;
         newDisplays[i][10] = -1.0;
@@ -275,7 +280,7 @@ void vtkCaveRenderManager::SetNumberOfDisplays(int numberOfDisplays)
 }
 
 //-----------------------------------------------------------------------------
-void vtkCaveRenderManager::SetDisplay(double idx, double origin0, double origin1, double origin2, 
+void vtkCaveRenderManager::SetDisplay(double idx, double origin0, double origin1, double origin2,
                               double x0, double x1, double x2,
                               double y0, double y1, double y2)
 {
@@ -315,6 +320,113 @@ void vtkCaveRenderManager::DefineDisplay(int idx, double origin[3],
   // this->Displays will be synchronized with the others processes in processWindow
   this->Modified();
 }
+
+//--------------------------------------------------------------HeadTracked
+// Room camera is a camera in room coordinates that points at the display.
+// Client camera is the camera on the client.  The out camera is the
+// combination of the two used for the final cave display.
+// It is the room camera transformed by the world camera.
+void vtkCaveRenderManager::ComputeCameraNew(vtkCamera* cam)
+{
+  this->SetDisplayConfig();
+}
+
+//------------------------------------------------------------------HeadTracked
+// This enables the display config for head tracking
+void vtkCaveRenderManager::SetDisplayConfig()
+{
+  // The room coordinates
+  double xRoom[3]={1.0, 0.0, 0.0 };
+  double yRoom[3]={0.0, 1.0, 0.0 };
+  double zRoom[3]={0.0, 0.0, 1.0 };
+
+  // Base coordinates of the screen
+  double xBase[3], yBase[3], zBase[3];
+  for (int i = 0; i < 3; ++i)
+    {
+    xBase[i] = this->DisplayX[i]-this->DisplayOrigin[i];
+    yBase[i] = this->DisplayY[i]-this->DisplayX[i];
+    }
+  vtkMath::Cross( xBase, yBase, zBase );
+
+  this->SetSurfaceRotation( xBase, yBase, zBase, xRoom, yRoom, zRoom );
+
+  // Get the new DisplayOrigin, DisplayX and DisplayY after transfromation
+  this->SurfaceRot->MultiplyPoint( this->DisplayOrigin, this->DisplayOrigin );
+  this->SurfaceRot->MultiplyPoint( this->DisplayX, this->DisplayX );
+  this->SurfaceRot->MultiplyPoint( this->DisplayY, this->DisplayY );
+
+  // Set O2Screen, O2Right, O2Left, O2Bottom, O2Top
+  double O2Screen = - this->DisplayOrigin[2];
+  double O2Right  =   this->DisplayX[0];
+  double O2Left   = - this->DisplayOrigin[0];
+  double O2Top    =   this->DisplayY[1];
+  double O2Bottom = - this->DisplayX[1];
+
+  // Get the active camera and set the config params
+  vtkRendererCollection* rens = this->RenderWindow->GetRenderers();
+  rens->InitTraversal();
+  vtkRenderer* ren = rens->GetNextItem();
+  vtkCamera * cam = 0;
+  while ( ren )
+    {
+    if ( ren->GetLayer() == 0 )
+      {
+      break;
+      }
+    ren = rens->GetNextItem();
+    }
+  if (ren == NULL)
+    {
+    vtkErrorMacro("Renderer mismatch.");
+    }
+  else
+    {
+    assert( ren->IsA( "vtkIceTRenderer" ) );
+    cam = ren->GetActiveCamera();
+    cam->SetConfigParams( O2Screen, O2Right, O2Left,O2Top, O2Bottom,
+                          0.065, 1.0,
+                          this->SurfaceRot);
+    }
+}
+
+//------------------------------------------------------------------HeadTracked
+// Set Surface2Base transform based on the screen basis and room basis
+void vtkCaveRenderManager::SetSurfaceRotation(
+  double xBase[3], double yBase[3], double zBase[3],
+  double xRoom[3], double yRoom[3], double zRoom[3] )
+{
+  vtkMath::Normalize( xBase );
+  vtkMath::Normalize( yBase );
+  vtkMath::Normalize( zBase );
+
+  SurfaceRot->SetElement( 0, 0, xBase[0] );
+  SurfaceRot->SetElement( 0, 1, xBase[1] );
+  SurfaceRot->SetElement( 0, 2, xBase[2] );
+
+  SurfaceRot->SetElement( 1, 0, yBase[0] );
+  SurfaceRot->SetElement( 1, 1, yBase[1] );
+  SurfaceRot->SetElement( 1, 2, yBase[2] );
+
+  SurfaceRot->SetElement( 2, 0, zBase[0]);
+  SurfaceRot->SetElement( 2, 1, zBase[1]);
+  SurfaceRot->SetElement( 2, 2, zBase[2]);
+
+  // // Calculate directional cosine matrix to get surface rotation
+  // SurfaceRot->SetElement( 0, 0, vtkMath::Dot( xBase, xRoom ) );
+  // SurfaceRot->SetElement( 0, 1, vtkMath::Dot( yBase, xRoom ) );
+  // SurfaceRot->SetElement( 0, 2, vtkMath::Dot( zBase, xRoom ) );
+
+  // SurfaceRot->SetElement( 1, 0, vtkMath::Dot( xBase, yRoom ) );
+  // SurfaceRot->SetElement( 1, 1, vtkMath::Dot( yBase, yRoom ) );
+  // SurfaceRot->SetElement( 1, 2, vtkMath::Dot( zBase, yRoom ) );
+
+  // SurfaceRot->SetElement( 2, 0, vtkMath::Dot( xBase, zRoom ) );
+  // SurfaceRot->SetElement( 2, 1, vtkMath::Dot( yBase, zRoom ) );
+  // SurfaceRot->SetElement( 2, 2, vtkMath::Dot( zBase, zRoom ) );
+}
+
+
 //-----------------------------------------------------------------------------
 void vtkCaveRenderManager::CollectWindowInformation(vtkMultiProcessStream& stream)
 {
@@ -332,7 +444,7 @@ void vtkCaveRenderManager::CollectWindowInformation(vtkMultiProcessStream& strea
       {
       stream << this->Displays[x][i];
       }
-    }  
+    }
   stream << vtkProcessModule::IceTWinInfo;
 }
 
@@ -411,7 +523,7 @@ bool vtkCaveRenderManager::ProcessRendererInformation(vtkRenderer *_ren,
     }
 
   vtkIceTRenderer *ren = vtkIceTRenderer::SafeDownCast(_ren);
-  if (ren) 
+  if (ren)
     {
     int strategy;
     int compose_operation;
@@ -436,19 +548,24 @@ void vtkCaveRenderManager::PreRenderProcessing()
   //if (this->Controller)
   if (this->UseBackBuffer)
     {
-    renWin->SwapBuffersOff();  
+    renWin->SwapBuffersOff();
     }
 
   // Synchronize
   rens = renWin->GetRenderers();
   rens->InitTraversal();
-  // NOTE:  We are now receiving first!!!!!  
+  // NOTE:  We are now receiving first!!!!!
   // This will probably cause a bug based on the following comment
   // about getting the active camera.
   // "We put this before receive because we want the pipeline to be
   // updated the first time if the camera does not exist and we want
   // it to happen before we block in receive"
   ren = rens->GetNextItem();
+  vtkIceTRenderer* iceTRen = vtkIceTRenderer::SafeDownCast(ren);
+  if (iceTRen)
+    {
+    iceTRen->SetDisableIceT(true);
+    }
   if (ren == NULL)
     {
     vtkErrorMacro("Renderer mismatch.");
@@ -460,7 +577,7 @@ void vtkCaveRenderManager::PreRenderProcessing()
     //light = lc->GetNextItem();
     // Setup tile independent stuff
     cam = ren->GetActiveCamera();
-    this->ComputeCamera(cam);
+    this->ComputeCameraNew(cam);
     /*
     if (light)
       {
@@ -498,7 +615,7 @@ void vtkCaveRenderManager::PostRenderProcessing()
 void vtkCaveRenderManager::PrintSelf(ostream &os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  os << indent << "NumberOfDisplays: " 
+  os << indent << "NumberOfDisplays: "
     << this->NumberOfDisplays << endl;
   vtkIndent rankIndent = indent.GetNextIndent();
   for (int i = 0; i < this->NumberOfDisplays; ++i)
@@ -510,17 +627,17 @@ void vtkCaveRenderManager::PrintSelf(ostream &os, vtkIndent indent)
       }
     os << endl;
     }
-  os << indent << "Origin: " 
+  os << indent << "Origin: "
      << this->DisplayOrigin[0] << " "
      << this->DisplayOrigin[1] << " "
      << this->DisplayOrigin[2] << " "
      << this->DisplayOrigin[3] << endl;
-  os << indent << "X: " 
+  os << indent << "X: "
      << this->DisplayX[0] << " "
      << this->DisplayX[1] << " "
      << this->DisplayX[2] << " "
      << this->DisplayX[3] << endl;
-  os << indent << "Y: " 
+  os << indent << "Y: "
      << this->DisplayY[0] << " "
      << this->DisplayY[1] << " "
      << this->DisplayY[2] << " "

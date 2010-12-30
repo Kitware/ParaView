@@ -160,7 +160,7 @@ INCLUDE_DIRECTORIES(
 # --------------------------------------------------------------------------
 # Build the library
 
-ADD_LIBRARY(KWCommon ${KWCommon_SRCS})
+VTK_ADD_LIBRARY(KWCommon ${KWCommon_SRCS})
 
 TARGET_LINK_LIBRARIES(KWCommon
   vtkCommon
@@ -170,6 +170,7 @@ TARGET_LINK_LIBRARIES(KWCommon
 IF(NOT KWCommon_INSTALL_NO_LIBRARIES)
   IF(PV_INSTALL_HAS_CMAKE_24)
     INSTALL(TARGETS ${KWCommon_LIBRARIES}
+EXPORT ${PV_INSTALL_EXPORT_NAME}
       RUNTIME DESTINATION ${PV_INSTALL_BIN_DIR_CM24} COMPONENT Runtime
       LIBRARY DESTINATION ${PV_INSTALL_LIB_DIR_CM24} COMPONENT Runtime
       ARCHIVE DESTINATION ${PV_INSTALL_LIB_DIR_CM24} COMPONENT Development)
@@ -209,13 +210,13 @@ MARK_AS_ADVANCED(KWCommon_BUILD_TESTING)
 IF(BUILD_TESTING AND KWCommon_BUILD_TESTING)
   #SET(BUILDNAME "${PROJECT_NAME}-${BUILDNAME}")
   ENABLE_TESTING()
-  SUBDIRS(Testing)
+  ADD_SUBDIRECTORY(Testing)
 ENDIF(BUILD_TESTING AND KWCommon_BUILD_TESTING)
 
 # --------------------------------------------------------------------------
 # Configure the export configuration
 
-SUBDIRS(CMake/ExportConfiguration)
+ADD_SUBDIRECTORY(CMake/ExportConfiguration)
 
 # --------------------------------------------------------------------------
 # ProcessXML (is it still being used ?)

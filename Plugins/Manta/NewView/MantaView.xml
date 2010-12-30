@@ -1,0 +1,456 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="camera">
+    <CameraProxy name="MantaCamera" class="vtkMantaCamera"
+      processes="client|dataserver|renderserver"
+      base_proxygroup="camera" base_proxyname="Camera">
+    </CameraProxy>
+  </ProxyGroup>
+
+  <ProxyGroup name="views">
+    <MantaViewProxy name="MantaView" class="vtkPVMantaView"
+        processes="client|renderserver|dataserver"
+        base_proxygroup="views" base_proxyname="RenderView">
+
+     <SubProxy>
+       <Proxy name="ActiveCamera" proxyname="MantaCamera" proxygroup="camera"
+              override="1">
+       </Proxy>
+       <ExposedProperties>
+         <Property name="CameraPositionInfo" />
+         <Property name="CameraPosition" />
+         <Property name="CameraFocalPointInfo" />
+         <Property name="CameraFocalPoint" />
+         <Property name="CameraViewUpInfo" />
+         <Property name="CameraViewUp" />
+         <Property name="CameraViewAngle" />
+         <Property name="CameraClippingRangeInfo" />
+         <Property name="CameraClippingRange" />
+         <Property name="CameraParallelScale" />
+         <Property name="CameraParallelScaleInfo" />
+         <Property name="CameraParallelProjection" />
+         <Property name="EyeAngle" />
+       </ExposedProperties>
+     </SubProxy>
+
+      <IntVectorProperty name="Threads"
+        command="SetThreads"
+        immediate_update="1"
+        number_of_elements="1"
+        default_values="1">
+        <IntRangeDomain name="range" min="1" />
+        <Documentation>
+          Controls number of render threads.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="EnableShadows"
+        command="SetEnableShadows"
+        immediate_update="1"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Turns on shadow.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="Samples"
+        command="SetSamples"
+        immediate_update="1"
+        number_of_elements="1"
+        default_values="1">
+        <IntRangeDomain name="range" min="1" />
+        <Documentation>
+          Controls multisampling.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="MaxDepth"
+        command="SetMaxDepth"
+        immediate_update="1"
+        number_of_elements="1"
+        default_values="5">
+        <IntRangeDomain name="range" min="1" />
+        <Documentation>
+          Controls maximum number of ray bounces.
+        </Documentation>
+      </IntVectorProperty>
+
+    </MantaViewProxy>
+  </ProxyGroup>
+
+  <ProxyGroup name="camera">
+    <CameraProxy name="MantaCamera" class="vtkMantaCamera"
+      processes="client|dataserver|renderserver"
+      base_proxygroup="camera" base_proxyname="Camera" >
+    </CameraProxy>
+  </ProxyGroup>
+
+  <ProxyGroup name="representations">
+
+    <RepresentationProxy name="MantaSurfaceRepresentation"
+                         class="vtkPVMantaRepresentation"
+                         processes="client|renderserver|dataserver"
+                         base_proxygroup="representations"
+                         base_proxyname="SurfaceRepresentation">
+    <!-- proxy that sets up manta display pipeline at vtk level -->
+
+      <StringVectorProperty name="MaterialType"
+        command="SetMaterialType"
+        number_of_elements="1"
+        default_values="default" >
+        <StringListDomain name="material">
+          <String value="default"/>
+          <String value="lambertian"/>
+          <String value="phong"/>
+          <String value="transparent"/>
+          <String value="thindielectric"/>
+          <String value="dielectric"/>
+          <String value="metal"/>
+          <String value="orennayer"/>
+        </StringListDomain>
+      </StringVectorProperty>
+
+      <DoubleVectorProperty name="Reflectance"
+        command="SetReflectance"
+        number_of_elements="1"
+        default_values="0.0">
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="Thickness"
+        command="SetThickness"
+        number_of_elements="1"
+        default_values="1.0">
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="Eta"
+        command="SetEta"
+        number_of_elements="1"
+        default_values="1.52">
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="N"
+        command="SetN"
+        number_of_elements="1"
+        default_values="1.0">
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="Nt"
+        command="SetNt"
+        number_of_elements="1"
+        default_values="1.2">
+      </DoubleVectorProperty>
+
+    </RepresentationProxy>
+
+    <PVRepresentationProxy name="MantaGeometryRepresentation"
+                           class="vtkPVCompositeRepresentation"
+                           processes="client|renderserver|dataserver">
+
+
+      <!--
+      This is all a copy of representations/GeometryRepresentation (and its parent).
+      All I do differently is instantiate the above manta surface representation.
+      The hack is necessary since xml overrides didn't work
+      (shared properties I think), and because at the C++
+      level it is too late to change them by the time the subclass is created.
+      -->
+
+      <Documentation>
+        Top level representation for objects shown in a manta view.
+      </Documentation>
+
+      <IntVectorProperty name="Visibility"
+        command="SetVisibility"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Set the visibility for this representation.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="ForceUseCache"
+        command="SetForceUseCache"
+        is_internal="1"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Typically UseCache and CacheKey are updated by the View and
+          representations cache based on what the view tells it. However in some
+          cases we may want to force a representation to cache irrespective of
+          the view (e.g. comparative views). In which case these ivars can up
+          set. If ForcedCacheKey is true, it overrides UseCache and CacheKey.
+          Instead, ForcedCacheKey is used.
+        </Documentation>
+      </IntVectorProperty>
+
+      <DoubleVectorProperty name="ForcedCacheKey"
+        command="SetForcedCacheKey"
+        is_internal="1"
+        number_of_elements="1"
+        default_values="none">
+        <DoubleRangeDomain name="range" />
+        <Documentation>
+          Typically UseCache and CacheKey are updated by the View and
+          representations cache based on what the view tells it. However in some
+          cases we may want to force a representation to cache irrespective of
+          the view (e.g. comparative views). In which case these ivars can up
+          set. If ForcedCacheKey is true, it overrides UseCache and CacheKey.
+          Instead, ForcedCacheKey is used.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <IntVectorProperty name="SelectionVisibility"
+        command="SetSelectionVisibility"
+        number_of_elements="1"
+        default_values="1" >
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Set the visibility for the selection, if any.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="CubeAxesVisibility"
+        command="SetCubeAxesVisibility"
+        number_of_elements="1"
+        default_values="0" >
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Set the visibility for the cube axes.
+        </Documentation>
+      </IntVectorProperty>
+
+      <RepresentationType
+        subproxy="OutlineRepresentation" text="Outline"/>
+      <RepresentationType
+        subproxy="SurfaceRepresentation" text="Points" subtype="0" />
+      <RepresentationType
+        subproxy="SurfaceRepresentation" text="Wireframe" subtype="1" />
+      <RepresentationType
+        subproxy="SurfaceRepresentation" text="Surface" subtype="2" />
+      <RepresentationType
+        subproxy="SurfaceRepresentation" text="Surface With Edges" subtype="3" />
+      <RepresentationType
+        subproxy="Glyph3DRepresentation" text="3D Glyphs" subtype="2" />
+
+      <IntVectorProperty
+        name="Representation"
+        command="SetRepresentation"
+        number_of_elements="1"
+        default_values="2"
+        update_self="1">
+        <Documentation>
+          Choose the type for the representation.
+        </Documentation>
+        <EnumerationDomain name="enum">
+          <!-- this domain is automatically populated using RepresentationType
+               elements in the definition for this proxy.
+          <Entry value="3" text="Outline" />
+          <Entry value="0" text="Points" />
+          <Entry value="1" text="Wireframe" />
+          <Entry value="2" text="Surface" />
+          <Entry value="3" text="Surface With Edges" />
+          -->
+        </EnumerationDomain>
+      </IntVectorProperty>
+
+      <StringVectorProperty name="SelectionCellFieldDataArrayName"
+        command="SetCellFieldDataArrayName"
+        number_of_elements="1"
+        default_values="vtkOriginalCellIds" >
+        <ArrayListDomain name="array_list" input_domain_name="input_array_cell">
+          <RequiredProperties>
+             <Property name="Input" function="Input"/>
+          </RequiredProperties>
+        </ArrayListDomain>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="SelectionPointFieldDataArrayName"
+        command="SetPointFieldDataArrayName"
+        number_of_elements="1"
+        default_values="vtkOriginalPointIds" >
+        <ArrayListDomain name="array_list" input_domain_name="input_array_point">
+          <RequiredProperties>
+             <Property name="Input" function="Input"/>
+          </RequiredProperties>
+        </ArrayListDomain>
+      </StringVectorProperty>
+
+      <SubProxy>
+        <Proxy name="SurfaceRepresentation"
+          proxygroup="representations"
+          proxyname="MantaSurfaceRepresentation"> <!-- this is the only thing different -->
+        </Proxy>
+        <ExposedProperties>
+          <Property name="Ambient" />
+          <Property name="AmbientColor" />
+          <Property name="BackfaceAmbientColor" />
+          <Property name="BackfaceDiffuseColor" />
+          <Property name="BackfaceOpacity" />
+          <Property name="BackfaceRepresentation" />
+          <Property name="ColorArrayName" />
+          <Property name="ColorAttributeType" />
+          <Property name="Diffuse" />
+          <Property name="DiffuseColor" />
+          <Property name="EdgeColor" />
+          <Property name="InterpolateScalarsBeforeMapping" />
+          <Property name="Interpolation" />
+          <Property name="LineWidth" />
+          <Property name="LookupTable" />
+          <Property name="MapScalars" />
+          <Property name="Opacity" />
+          <Property name="Orientation" />
+          <Property name="Origin" />
+          <Property name="Pickable" />
+          <Property name="PointSize" />
+          <Property name="Position" />
+          <Property name="Scale" />
+          <Property name="Specular" />
+          <Property name="SpecularColor" />
+          <Property name="SpecularPower" />
+          <Property name="StaticMode" />
+          <Property name="SuppressLOD" />
+          <Property name="Texture" />
+          <!-- manta specific properties -->
+          <Property name="MaterialType" />
+          <Property name="Reflectance" />
+          <Property name="Thickness" />
+          <Property name="Eta" />
+          <Property name="N" />
+          <Property name="Nt" />
+        </ExposedProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="OutlineRepresentation"
+          proxygroup="representations"
+          proxyname="OutlineRepresentation">
+        </Proxy>
+        <ShareProperties subproxy="SurfaceRepresentation">
+          <Exception name="Input" />
+          <Exception name="Visibility" />
+        </ShareProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="Glyph3DRepresentation"
+          proxygroup="representations" proxyname="Glyph3DRepresentation">
+        </Proxy>
+        <ExposedProperties>
+          <Property name="Masking" />
+          <Property name="MeshVisibility" />
+          <Property name="Orient" />
+          <Property name="OrientationMode" />
+          <Property name="ScaleFactor" />
+          <Property name="ScaleMode" />
+          <Property name="Scaling" />
+          <Property name="SelectMaskArray" />
+          <Property name="SelectOrientationVectors" />
+          <Property name="SelectScaleArray" />
+          <Property name="Source" />
+        </ExposedProperties>
+        <ShareProperties subproxy="SurfaceRepresentation">
+          <Exception name="Input" />
+          <Exception name="Visibility" />
+        </ShareProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="CubeAxesRepresentation"
+          proxygroup="representations"
+          proxyname="CubeAxesRepresentation">
+        </Proxy>
+        <ExposedProperties>
+          <Property exposed_name="CubeAxesColor" name="Color" />
+          <Property exposed_name="CubeAxesCornerOffset" name="CornerOffset" />
+          <Property exposed_name="CubeAxesFlyMode" name="FlyMode" />
+          <Property exposed_name="CubeAxesInertia" name="Inertia" />
+          <Property exposed_name="CubeAxesTickLocation" name="TickLocation" />
+          <Property exposed_name="CubeAxesXAxisMinorTickVisibility" name="XAxisMinorTickVisibility" />
+          <Property exposed_name="CubeAxesXAxisTickVisibility" name="XAxisTickVisibility" />
+          <Property exposed_name="CubeAxesXAxisVisibility" name="XAxisVisibility" />
+          <Property exposed_name="CubeAxesXGridLines" name="XGridLines" />
+          <Property exposed_name="CubeAxesXTitle" name="XTitle" />
+          <Property exposed_name="CubeAxesYAxisMinorTickVisibility" name="YAxisMinorTickVisibility" />
+          <Property exposed_name="CubeAxesYAxisTickVisibility" name="YAxisTickVisibility" />
+          <Property exposed_name="CubeAxesYAxisVisibility" name="YAxisVisibility" />
+          <Property exposed_name="CubeAxesYGridLines" name="YGridLines" />
+          <Property exposed_name="CubeAxesYTitle" name="YTitle" />
+          <Property exposed_name="CubeAxesZAxisMinorTickVisibility" name="ZAxisMinorTickVisibility" />
+          <Property exposed_name="CubeAxesZAxisTickVisibility" name="ZAxisTickVisibility" />
+          <Property exposed_name="CubeAxesZAxisVisibility" name="ZAxisVisibility" />
+          <Property exposed_name="CubeAxesZGridLines" name="ZGridLines" />
+          <Property exposed_name="CubeAxesZTitle" name="ZTitle" />
+          <Property name="CustomBounds"/>
+          <Property name="CustomBoundsActive"/>
+        </ExposedProperties>
+        <ShareProperties subproxy="SurfaceRepresentation">
+          <Exception name="Input" />
+          <Exception name="Visibility" />
+        </ShareProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="SelectionRepresentation"
+          proxygroup="representations"
+          proxyname="SelectionRepresentation" />
+        <ShareProperties subproxy="SurfaceRepresentation">
+          <Exception name="Input" />
+          <Exception name="Visibility" />
+          <Exception name="Representation" />
+          <Exception name="Color" />
+          <Exception name="LineWidth" />
+          <Exception name="Opacity" />
+          <Exception name="PointSize" />
+        </ShareProperties>
+        <ExposedProperties>
+          <Property name="CellLabelBold" exposed_name="SelectionCellLabelBold" />
+          <Property name="CellLabelColor" exposed_name="SelectionCellLabelColor" />
+          <Property name="CellLabelFontFamily" exposed_name="SelectionCellLabelFontFamily" />
+          <Property name="CellLabelFontSize" exposed_name="SelectionCellLabelFontSize" />
+          <Property name="CellLabelFormat" exposed_name="SelectionCellLabelFormat" />
+          <Property name="CellLabelItalic" exposed_name="SelectionCellLabelItalic" />
+          <Property name="CellLabelJustification" exposed_name="SelectionCellLabelJustification" />
+          <Property name="CellLabelOpacity" exposed_name="SelectionCellLabelOpacity" />
+          <Property name="CellLabelShadow" exposed_name="SelectionCellLabelShadow" />
+          <Property name="CellLabelVisibility" exposed_name="SelectionCellLabelVisibility" />
+          <Property name="Color" exposed_name="SelectionColor" />
+          <Property name="LineWidth" exposed_name="SelectionLineWidth" />
+          <Property name="Opacity" exposed_name="SelectionOpacity" />
+          <Property name="PointLabelBold" exposed_name="SelectionPointLabelBold" />
+          <Property name="PointLabelColor" exposed_name="SelectionPointLabelColor" />
+          <Property name="PointLabelFontFamily" exposed_name="SelectionPointLabelFontFamily" />
+          <Property name="PointLabelFontSize" exposed_name="SelectionPointLabelFontSize" />
+          <Property name="PointLabelFormat" exposed_name="SelectionPointLabelFormat" />
+          <Property name="PointLabelItalic" exposed_name="SelectionPointLabelItalic" />
+          <Property name="PointLabelJustification" exposed_name="SelectionPointLabelJustification" />
+          <Property name="PointLabelOpacity" exposed_name="SelectionPointLabelOpacity" />
+          <Property name="PointLabelShadow" exposed_name="SelectionPointLabelShadow" />
+          <Property name="PointLabelVisibility" exposed_name="SelectionPointLabelVisibility" />
+          <Property name="PointSize" exposed_name="SelectionPointSize" />
+          <Property name="Representation" exposed_name="SelectionRepresentation" />
+          <Property name="UseOutline" exposed_name="SelectionUseOutline"/>
+        </ExposedProperties>
+      </SubProxy>
+
+      <InputProperty name="Input" command="SetInputConnection">
+        <DataTypeDomain name="input_type" composite_data_supported="1">
+          <DataType value="vtkDataSet"/>
+        </DataTypeDomain>
+        <InputArrayDomain name="input_array_cell" attribute_type="cell"
+          optional="1">
+        </InputArrayDomain>
+        <InputArrayDomain name="input_array_point" attribute_type="point"
+          optional="1">
+        </InputArrayDomain>
+        <Documentation>
+          Set the input to the representation.
+        </Documentation>
+      </InputProperty>
+
+    </PVRepresentationProxy>
+  </ProxyGroup>
+
+</ServerManagerConfiguration>

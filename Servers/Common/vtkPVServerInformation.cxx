@@ -181,7 +181,7 @@ void vtkPVServerInformation::AddInformation(vtkPVInformation* info)
       this->AVISupport = 0;
       }
 
-    // ICE-T either is there or is not.
+    // IceT either is there or is not.
     this->UseIceT = serverInfo->GetUseIceT();
     this->SetRenderModuleName(serverInfo->GetRenderModuleName());
     this->SetNumberOfMachines(serverInfo->GetNumberOfMachines());
@@ -263,7 +263,7 @@ void vtkPVServerInformation::CopyFromStream(const vtkClientServerStream* css)
     }
   if (!css->GetArgument(0, 7, &this->UseIceT))
     {
-    vtkErrorMacro("Error parsing ICE-T flag from message.");
+    vtkErrorMacro("Error parsing IceT flag from message.");
     return;
     }
   const char *rmName;

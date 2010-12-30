@@ -53,7 +53,7 @@ But when reloading a state file (.pvsm), the textures seems to be loaded after t
 
 Depth Sorting : 
   when using a texture with alpha component that is always fully transparent or fully opaque (0 or 255), the vtkDepthSortPainter understand that it does not actually need to sort particles. This code should go in the vtkActor::HasTranslucentGeometry.
-  teh vtkDepthSortPainter also look at the alpha component in the color array (the result is cached so that it is not recomputed at each frame if nothing changed), beacaus an alpha component might have been created int he vtkTwoScalarsToColorsPainter if the opacity editor is used.
+  the vtkDepthSortPainter also look at the alpha component in the color array (the result is cached so that it is not recomputed at each frame if nothing changed), beacaus an alpha component might have been created int he vtkTwoScalarsToColorsPainter if the opacity editor is used.
 
 Opacity transfer function : when the user activates the opacity transfer function, if the global opacity is 1, it is set the 1 - 0.0001 so that the actor knows that it will be translucent. The opacity is restored when disabling the opacity transfer function.
 

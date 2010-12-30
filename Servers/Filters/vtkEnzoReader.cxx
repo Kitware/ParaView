@@ -1638,7 +1638,8 @@ void vtkEnzoReader::PrintSelf( ostream & os, vtkIndent indent )
 {
   this->Superclass::PrintSelf( os, indent );
   
-  os << indent << "FileName: "        << this->FileName        << "\n";
+  os << indent << "FileName: "
+     << (this->FileName?this->FileName:"(none)") << endl;
   os << indent << "MaxLevel: "        << this->MaxLevel        << "\n";
   os << indent << "LoadParticles: "   << this->LoadParticles   << "\n";
   os << indent << "BlockOutputType: " << this->BlockOutputType << "\n";

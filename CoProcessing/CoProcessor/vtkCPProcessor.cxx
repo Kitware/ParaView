@@ -17,19 +17,16 @@
 #include "vtkCPDataDescription.h"
 #include "vtkCPPipeline.h"
 #include "vtkCPPythonScriptPipeline.h"
-#include "vtkDataObject.h"
-#include "vtkFieldData.h"
 #include "vtkObjectFactory.h"
 #include "vtkSmartPointer.h"
-#include "vtkSMProxyManager.h"
 
-#include <vtkstd/set>
+#include <list>
 
 struct vtkCPProcessorInternals
 {
-  typedef vtkstd::set<vtkSmartPointer<vtkCPPipeline> > PipelineSet;
-  typedef PipelineSet::iterator PipelineSetIterator;
-  PipelineSet Pipelines;
+  typedef std::list<vtkSmartPointer<vtkCPPipeline> > PipelineList;
+  typedef PipelineList::iterator PipelineListIterator;
+  PipelineList Pipelines;
 };
 
 vtkStandardNewMacro(vtkCPProcessor);
@@ -43,19 +40,63 @@ vtkCPProcessor::vtkCPProcessor()
 //----------------------------------------------------------------------------
 vtkCPProcessor::~vtkCPProcessor()
 {
-  delete this->Internal;
+  if(this->Internal)
+    {
+    delete this->Internal;
+    this->Internal = NULL;
+    }
 }
 
 //----------------------------------------------------------------------------
-int vtkCPProcessor::AddPipeline(vtkCPPipeline* Pipeline)
+int vtkCPProcessor::AddPipeline(vtkCPPipeline* pipeline)
 {
-  if(!Pipeline)
+  if(!pipeline)
     {
     vtkErrorMacro("Pipeline is NULL.");
     return 0;
     }
-  this->Internal->Pipelines.insert(Pipeline);
+  this->Internal->Pipelines.push_back(pipeline);
   return 1;
+}
+
+//----------------------------------------------------------------------------
+int vtkCPProcessor::GetNumberOfPipelines()
+{
+  return static_cast<int>(this->Internal->Pipelines.size());
+}
+
+//----------------------------------------------------------------------------
+vtkCPPipeline* vtkCPProcessor::GetPipeline(int which)
+{
+  if(which < 0 || which >= this->GetNumberOfPipelines())
+    {
+    return NULL;
+    }
+  int counter=0;
+  vtkCPProcessorInternals::PipelineListIterator iter =
+    this->Internal->Pipelines.begin();
+  while(counter <= which)
+    {
+    if(counter == which)
+      {
+      return *iter;
+      }
+    counter++;
+    iter++;
+    }
+  return NULL;
+}
+
+//----------------------------------------------------------------------------
+void vtkCPProcessor::RemovePipeline(vtkCPPipeline* pipeline)
+{
+  this->Internal->Pipelines.remove(pipeline);
+}
+
+//----------------------------------------------------------------------------
+void vtkCPProcessor::RemoveAllPipelines()
+{
+  this->Internal->Pipelines.clear();
 }
 
 //----------------------------------------------------------------------------
@@ -66,53 +107,53 @@ int vtkCPProcessor::Initialize()
 
 //----------------------------------------------------------------------------
 int vtkCPProcessor::RequestDataDescription(
-  vtkCPDataDescription* DataDescription)
+  vtkCPDataDescription* dataDescription)
 {
-  if(!DataDescription)
+  if(!dataDescription)
     {
     vtkWarningMacro("DataDescription is NULL.");
     return 0;
     }
-  int DoCoProcessing = 0;
-  DataDescription->Reset();
-  for(vtkCPProcessorInternals::PipelineSetIterator iter = 
+  int doCoProcessing = 0;
+  dataDescription->Reset();
+  for(vtkCPProcessorInternals::PipelineListIterator iter =
         this->Internal->Pipelines.begin();
       iter!=this->Internal->Pipelines.end();iter++)
     {
-    if(iter->GetPointer()->RequestDataDescription(DataDescription))
+    if(iter->GetPointer()->RequestDataDescription(dataDescription))
       {
-      DoCoProcessing = 1;
+      doCoProcessing = 1;
       }
     }
-  return DoCoProcessing;
+  return doCoProcessing;
 }
 
 //----------------------------------------------------------------------------
-int vtkCPProcessor::CoProcess(vtkCPDataDescription* DataDescription)
+int vtkCPProcessor::CoProcess(vtkCPDataDescription* dataDescription)
 {
-  if(!DataDescription)
+  if(!dataDescription)
     {
     vtkWarningMacro("DataDescription is NULL.");
     return 0;
     }
-  int Success = 1;
-  DataDescription->Reset();
-  for(vtkCPProcessorInternals::PipelineSetIterator iter = 
+  int success = 1;
+  dataDescription->Reset();
+  for(vtkCPProcessorInternals::PipelineListIterator iter =
         this->Internal->Pipelines.begin();
       iter!=this->Internal->Pipelines.end();iter++)
     {
-    if(!iter->GetPointer()->CoProcess(DataDescription))
+    if(!iter->GetPointer()->CoProcess(dataDescription))
       {
-      Success = 0;
+      success = 0;
       }
     }
-  return Success;
+  return success;
 }
 
 //----------------------------------------------------------------------------
 int vtkCPProcessor::Finalize()
 {
-  this->Internal->Pipelines.clear();
+  this->RemoveAllPipelines();
   return 1;
 }
 

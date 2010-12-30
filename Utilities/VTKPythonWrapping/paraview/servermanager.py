@@ -40,19 +40,15 @@ A simple example:
 #     PURPOSE.  See the above copyright notice for more information.
 #
 #==============================================================================
-import paraview, re, os, new, sys, vtk
+import paraview, re, os, os.path, new, sys, vtk
 
 if not paraview.compatibility.minor:
     paraview.compatibility.major = 3
 if not paraview.compatibility.major:
     paraview.compatibility.minor = 9
 
-if os.name == "posix":
-    from libvtkPVServerCommonPython import *
-    from libvtkPVServerManagerPython import *
-else:
-    from vtkPVServerCommonPython import *
-    from vtkPVServerManagerPython import *
+from vtkPVServerCommonPython import *
+from vtkPVServerManagerPython import *
 
 def _wrap_property(proxy, smproperty):
     """ Internal function.
@@ -1972,12 +1968,15 @@ def LoadPlugin(filename,  remote=True, session=None):
     plinfo = PluginManager.LoadPlugin(filename, serverURI, remote)
 
     if not plinfo or not plinfo.GetLoaded():
-        # Assume that it is an xml file
-        f = open(filename, 'r')
-        try:
-            LoadXML(f.read())
-        except RuntimeError:
-            raise RuntimeError, "Problem loading plugin %s: %s" % (filename, PluginManager.GetProperty("Error").GetElement(0))
+        if os.path.splitext(filename)[1].lower() == ".xml":
+            # Assume that it is an xml file
+            f = open(filename, 'r')
+            try:
+                LoadXML(f.read())
+            except RuntimeError:
+                raise RuntimeError, "Problem loading plugin %s" % (filename)
+        else:
+            raise RuntimeError, "Problem loading plugin %s" % (filename)
     else:
         updateModules()
 

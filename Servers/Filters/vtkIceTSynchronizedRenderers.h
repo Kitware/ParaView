@@ -30,6 +30,7 @@
 #include "vtkSynchronizedRenderers.h"
 #include "vtkIceTCompositePass.h" // needed for inline methods.
 
+class vtkCameraPass;
 class vtkImageProcessingPass;
 class vtkMyImagePasterPass;
 
@@ -101,6 +102,10 @@ public:
   vtkGetObjectMacro(ImageProcessingPass, vtkImageProcessingPass);
 
   // Description:
+  // Activates or de-activated the use of Depth Buffer
+  void SetUseDepthBuffer(bool);
+
+  // Description:
   // Get/Set geometry rendering pass. This pass is used to render the geometry.
   // If none specified then default rendering pipeline is used. This is
   // typically the render-pass pipeline after the CameraPass. The CameraPass is
@@ -121,7 +126,7 @@ protected:
   virtual vtkRawImage& CaptureRenderedImage();
 
   // We use vtkIceTCompositePass internally.
-  vtkRenderPass* CameraRenderPass;
+  vtkCameraPass* CameraRenderPass;
   vtkIceTCompositePass* IceTCompositePass;
   vtkMyImagePasterPass* ImagePastingPass;
 

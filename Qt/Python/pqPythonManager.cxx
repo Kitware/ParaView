@@ -348,6 +348,7 @@ void pqPythonManager::editTrace()
   if(!this->Internal->Editor)
     {
     this->Internal->Editor = new pqPythonScriptEditor(pqCoreUtilities::mainWidget());
+    this->Internal->Editor->setPythonManager(this);
     }
 
   QString traceString = this->getTraceString();
@@ -448,6 +449,12 @@ void pqPythonManager::saveTraceState(const QString& fileName)
     }
 }
 //----------------------------------------------------------------------------
+void pqPythonManager::updateMacroList()
+{
+  this->Internal->MacroSupervisor->updateMacroList();
+}
+
+//----------------------------------------------------------------------------
 void pqPythonManager::addMacro(const QString& fileName)
 {
   QString userMacroDir = pqCoreUtilities::getParaViewUserDirectory() + "/Macros";
@@ -475,6 +482,7 @@ void pqPythonManager::editMacro(const QString& fileName)
   if(!this->Internal->Editor)
     {
     this->Internal->Editor = new pqPythonScriptEditor(pqCoreUtilities::mainWidget());
+    this->Internal->Editor->setPythonManager(this);
     }
 
   this->Internal->Editor->show();

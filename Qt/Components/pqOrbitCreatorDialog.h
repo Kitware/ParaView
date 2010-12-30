@@ -56,6 +56,8 @@ public:
   QList<QVariant> center() const;
 
   void setNormal(double xyz[3]);
+  void setCenter(double xyz[3]);
+  void setOrigin(double xyz[3]);
 
 protected slots:
   void resetBounds();

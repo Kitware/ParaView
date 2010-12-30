@@ -93,7 +93,7 @@ public:
   /// return all the plugins loaded on a server, or locally if NULL is passed in
   QList< vtkPVPluginInformation* > loadedExtensions(pqServer*);
   QList< vtkPVPluginInformation* > loadedExtensions(QString extensionKey);
- 
+
   /// add an extra interface.
   /// these interfaces are appended to the ones loaded from plugins
   void addInterface(QObject* iface);
@@ -117,13 +117,16 @@ public:
   void addPluginFromSettings();
   // save plugin settings
   void savePluginSettings(bool clearFirst = true);
-  // check whether the plugin is ready to run.
-  bool isPluginFuntional(vtkPVPluginInformation* plInfo, bool remote);
+
   // exclude an extension from being saved with settings.
   void removePlugin(pqServer* server, const QString& lib, 
     bool remote=true);
  
   void loadGUIPlugin(vtkPVGUIPluginInterface*);
+public slots:
+  // check whether the plugin is ready to run.
+  bool isPluginFunctional(vtkPVPluginInformation* plInfo, bool remote);
+
 signals:
   /// signal for when an interface is loaded
   void guiInterfaceLoaded(QObject* iface);
@@ -138,6 +141,13 @@ signals:
 
   /// notification when plugin information is updated
   void pluginInfoUpdated();
+
+  /// notification that a new plugin has been loaded
+  void pluginLoaded(vtkPVPluginInformation* plugin, bool remote);
+
+  /// notification that the plugins on the client and
+  /// server are mismatched.
+  void requiredPluginsNotLoaded();
 
 protected:
   LoadStatus loadServerExtension(pqServer* server, const QString& lib, 
@@ -172,7 +182,11 @@ private:
   QString getPluginSettingsKey(vtkPVPluginInformation*);
   void processPluginSettings(QString& plSettingKey);
   // load the Auto Load plugins on that server
-  void loadAutoLoadPlugins(pqServer* server);    
+  void loadAutoLoadPlugins(pqServer* server);
+
+  //verify the plugins that are required to be on the server and
+  //client are loaded
+  void verifyRequiredPluginsLoaded(pqServer* server);
   
   QObjectList Interfaces;
   QObjectList ExtraInterfaces;

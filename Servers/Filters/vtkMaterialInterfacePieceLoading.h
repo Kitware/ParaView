@@ -20,6 +20,8 @@
 #ifndef __vtkMaterialInterfacePieceLoading_h
 #define __vtkMaterialInterfacePieceLoading_h
 
+#include "vtkSystemIncludes.h"
+
 #include <cassert>
 #include "vtkType.h"
 #include "vtkstd/vector"

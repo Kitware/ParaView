@@ -11,6 +11,7 @@ class ArrayAssociation :
     POINT = 1
     CELL  = 2
     FIELD = 3
+    ROW = 4
 
 class VTKObjectWrapper(object):
     "Superclass for classes that wrap VTK objects with Python objects."
@@ -220,16 +221,50 @@ class CompositeDataIterator(object):
         """Returns attributes from the vtkCompositeDataIterator."""
         return getattr(self.Iterator, name)
 
-class CompositeDataSet(VTKObjectWrapper):
+class MultiCompositeDataIterator(CompositeDataIterator):
+    def __init__(self, cds):
+        CompositeDataIterator.__init__(self, cds[0])
+        self.Datasets = cds
 
+    def next(self):
+        if not self.Iterator:
+            raise StopIteration
+
+        if self.Iterator.IsDoneWithTraversal():
+            raise StopIteration
+        retVal = []
+        retVal.append(WrapDataObject(self.Iterator.GetCurrentDataObject()))
+        if len(self.Datasets) > 1:
+            for cd in self.Datasets[1:]:
+                retVal.append(WrapDataObject(cd.GetDataSet(self.Iterator)))
+        self.Iterator.GoToNextItem()
+        return retVal
+
+class DataObject(VTKObjectWrapper):
+    def GetFieldData(self):
+        "Returns the field data as a DataSetAttributes instance."
+        return DataSetAttributes(self.VTKObject.GetFieldData(), self, ArrayAssociation.FIELD)
+
+    FieldData = property(GetFieldData, None, None, "This property returns \
+        the field data of a data object.")
+
+class Table(DataObject):
+    def GetRowData(self):
+        "Returns the row data as a DataSetAttributes instance."
+        return DataSetAttributes(self.VTKObject.GetRowData(), self, ArrayAssociation.ROW)
+
+    RowData = property(GetRowData, None, None, "This property returns \
+        the row data of the table.")
+
+class CompositeDataSet(DataObject):
     def __iter__(self):
         "Creates an iterator for the contained datasets."
         return CompositeDataIterator(self)
-    
-class DataSet(VTKObjectWrapper):
+
+class DataSet(DataObject):
     """This is a python friendly wrapper of a vtkDataSet that defines
     a few useful properties."""
-    
+
     def GetPointData(self):
         "Returns the point data as a DataSetAttributes instance."
         return DataSetAttributes(self.VTKObject.GetPointData(), self, ArrayAssociation.POINT)
@@ -238,16 +273,10 @@ class DataSet(VTKObjectWrapper):
         "Returns the cell data as a DataSetAttributes instance."
         return DataSetAttributes(self.VTKObject.GetCellData(), self, ArrayAssociation.CELL)
 
-    def GetFieldData(self):
-        "Returns the field data as a DataSetAttributes instance."
-        return DataSetAttributes(self.VTKObject.GetFieldData(), self, ArrayAssociation.FIELD)
-
     PointData = property(GetPointData, None, None, "This property returns \
         the point data of the dataset.")
     CellData = property(GetCellData, None, None, "This property returns \
         the cell data of a dataset.")
-    FieldData = property(GetFieldData, None, None, "This property returns \
-        the field data of a dataset.")
 
 class PointSet(DataSet):
     def GetPoints(self):
@@ -282,4 +311,6 @@ def WrapDataObject(ds):
         return DataSet(ds)
     elif ds.IsA("vtkCompositeDataSet"):
         return CompositeDataSet(ds)
-        
+    elif ds.IsA("vtkTable"):
+        return Table(ds)
+

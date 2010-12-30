@@ -295,7 +295,7 @@ IF(PARAVIEW_MINIMAL_BUILD)
 ENDIF(PARAVIEW_MINIMAL_BUILD)
 
 # Create the library.
-ADD_LIBRARY(vtk${KIT}
+VTK_ADD_LIBRARY(vtk${KIT}
   ${ServerManager_SRCS}
   ${MIN_INIT_SRC}
   ${CMInstantiator_SRCS}
@@ -310,6 +310,13 @@ TARGET_LINK_LIBRARIES(vtk${KIT}
   ${KWCommon_LIBRARIES}
   vtkCharts
   vtkXdmfCS vtkXdmf)
+
+IF(PARAVIEW_USE_VISITBRIDGE)
+  TARGET_LINK_LIBRARIES(vtk${KIT}
+  vtkVisItDatabasesCS
+  vtkVisItDatabases
+  )
+ENDIF(PARAVIEW_USE_VISITBRIDGE)
 
 IF (PARAVIEW_ENABLE_PYTHON)
   SET(Kit_PYTHON_EXTRA_SRCS)
@@ -361,6 +368,7 @@ SET(resourceFiles
   ${CMAKE_CURRENT_SOURCE_DIR}/Resources/writers.xml
   ${PARAVIEW_EXTRA_SERVERMANAGER_RESOURCES}
   )
+
 IF(PARAVIEW_ENABLE_PYTHON)
   OPTION(PARAVIEW_ENABLE_PYTHON_FILTERS "Enable Python calculator and programmable filters." ON)
   IF(PARAVIEW_ENABLE_PYTHON_FILTERS)
@@ -371,10 +379,13 @@ IF(PARAVIEW_ENABLE_PYTHON)
   ENDIF(PARAVIEW_ENABLE_PYTHON_FILTERS)
 ENDIF(PARAVIEW_ENABLE_PYTHON)
 
+#needs to depend on vtkParaViewIncludeModulesToSMApplication so
+#we can regenerate when python filters or VisItBridge are toggled on/off
 ADD_CUSTOM_COMMAND(
   OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/vtkSMGeneratedModules.h
   DEPENDS ${resourceFiles}
   ${CMD_DEP}
+  "${CMAKE_CURRENT_BINARY_DIR}/vtkParaViewIncludeModulesToSMApplication.h"
   COMMAND ${CMD}
   ARGS ${CMAKE_CURRENT_BINARY_DIR}/vtkSMGeneratedModules.h
   vtkSMDefaultModules Interface GetInterfaces
@@ -476,12 +487,8 @@ SET_SOURCE_FILES_PROPERTIES(vtkSMProxyDefinitionManager.cxx PROPERTIES OBJECT_DE
 IF(NOT PV_INSTALL_NO_LIBRARIES)
   SET (targets_to_install)
 
-  IF(PARAVIEW_ENABLE_PYTHON)
-    SET (targets_to_install ${targets_to_install}
-      vtk${KIT}Python)
-  ENDIF(PARAVIEW_ENABLE_PYTHON)
-
   INSTALL(TARGETS vtk${KIT} ${targets_to_install}
+      EXPORT ${PV_INSTALL_EXPORT_NAME}
       RUNTIME DESTINATION ${PV_INSTALL_BIN_DIR} COMPONENT Runtime
       LIBRARY DESTINATION ${PV_INSTALL_LIB_DIR} COMPONENT Runtime
       ARCHIVE DESTINATION ${PV_INSTALL_LIB_DIR} COMPONENT Development)
@@ -509,7 +516,7 @@ ENDIF (NOT PV_INSTALL_NO_DEVELOPMENT)
 # Testing
 #----------------------------------------------------------------------------------------------------
 IF(BUILD_TESTING)
-  SUBDIRS(Testing)
+  ADD_SUBDIRECTORY(Testing)
 ENDIF(BUILD_TESTING)
 
 

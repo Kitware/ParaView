@@ -32,10 +32,11 @@
 #include "vtkObject.h"
 #include "vtkMultiProcessController.h" // for vtkRMIFunctionType
 
-class vtkRenderWindow;
-class vtkRenderer;
+class vtkDataObject;
 class vtkMultiProcessController;
 class vtkMultiProcessStream;
+class vtkRenderer;
+class vtkRenderWindow;
 class vtkSelection;
 
 class VTK_EXPORT vtkPVSynchronizedRenderWindows : public vtkObject
@@ -106,8 +107,10 @@ public:
   // otherwise we will have deadlocks.
   // We may make this API generic in future, for now this works.
   bool SynchronizeBounds(double bounds[6]);
-  bool SynchronizeSize(unsigned long &size);
+  bool SynchronizeSize(double &size);
+  bool SynchronizeSize(unsigned int &size);
   bool BroadcastToDataServer(vtkSelection* selection);
+  bool BroadcastToRenderServer(vtkDataObject*);
 
   // Description:
   // Convenience method to trigger an RMI call from the client/root node.
@@ -115,20 +118,16 @@ public:
   unsigned long AddRMICallback(vtkRMIFunctionType, void* localArg, int tag);
   bool RemoveRMICallback(unsigned long id);
 
-  // Description:
-  // This method should only be called on RENDER_SERVER or BATCH processes.
-  // Returns true if in tile display mode and fills up tile_dims with the tile
-  // dimensions.
-  bool GetTileDisplayParameters(int tile_dims[2]);
-
 //BTX
   enum
     {
     SYNC_MULTI_RENDER_WINDOW_TAG = 15002,
+    GET_ZBUFFER_VALUE_TAG = 15003
     };
 
   // Internal-callback-method
   void Render(unsigned int);
+  void OnGetZBufferValue(unsigned int, int, int);
 
   // Description:
   vtkGetObjectMacro(ParallelController, vtkMultiProcessController);
@@ -150,6 +149,23 @@ public:
   // Called before starting render. This is needed in batch mode since all views
   // share the same render window.
   void BeginRender(unsigned int id);
+
+  // Description:
+  // Returns true when in Cave mode.
+  bool GetIsInCave();
+
+  // Description:
+  // This method should only be called on RENDER_SERVER or BATCH processes.
+  // Returns true if in tile display mode and fills up tile_dims with the tile
+  // dimensions.
+  static bool GetTileDisplayParameters(int tile_dims[2], int tile_mullions[2]);
+
+  // Description:
+  // Returns the z-buffer value at the given location. \c id is the view id
+  // used in AddRenderWindow()/AddRenderer() etc.
+  // @CallOnClientOnly
+  double GetZbufferDataAtPoint(int x, int y, unsigned int id);
+
 protected:
   vtkPVSynchronizedRenderWindows();
   ~vtkPVSynchronizedRenderWindows();
@@ -218,6 +234,7 @@ protected:
   vtkMultiProcessController* ClientServerController;
   vtkMultiProcessController* ClientDataServerController;
   unsigned long ClientServerRMITag;
+  unsigned long ClientServerGetZBufferValueRMITag;
   unsigned long ParallelRMITag;
   bool Enabled;
   bool RenderEventPropagation;
@@ -233,6 +250,8 @@ private:
   class vtkObserver;
   vtkObserver* Observer;
 
+  template <class T>
+  bool SynchronizeSizeTemplate(T &size);
 //ETX
 };
 

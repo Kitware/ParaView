@@ -35,7 +35,7 @@ public:
 protected:
   vtkSMCaveRenderModuleProxy();
   ~vtkSMCaveRenderModuleProxy();
-  
+
   // Description:
   // Subclasses must decide what type of RenderSyncManagerProxy they need.
   // This method is called to make that decision. Subclasses are expected to

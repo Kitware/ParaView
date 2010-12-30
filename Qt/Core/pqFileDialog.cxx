@@ -713,10 +713,8 @@ void pqFileDialog::onNavigateForward()
 //-----------------------------------------------------------------------------
 void pqFileDialog::onFilterChange(const QString& filter)
 {
-  QStringList fs = GetWildCardsFromFilter(filter);
-
   // set filter on proxy
-  this->Implementation->FileFilter.setFilter(fs);
+  this->Implementation->FileFilter.setFilter(filter);
 
   // update view
   this->Implementation->FileFilter.clear();

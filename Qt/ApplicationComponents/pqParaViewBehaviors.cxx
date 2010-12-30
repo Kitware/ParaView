@@ -42,6 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqFixPathsInStateFilesBehavior.h"
 #include "pqObjectPickingBehavior.h"
 #include "pqPersistentMainWindowStateBehavior.h"
+#include "pqPipelineContextMenuBehavior.h"
 #include "pqPluginActionGroupBehavior.h"
 #include "pqPluginDockWidgetsBehavior.h"
 #include "pqPluginManager.h"
@@ -51,6 +52,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqStandardViewModules.h"
 #include "pqUndoRedoBehavior.h"
 #include "pqViewFrameActionsBehavior.h"
+#include "pqVerifyRequiredPluginBehavior.h"
 
 #include <QShortcut>
 #include <QMainWindow>
@@ -74,6 +76,7 @@ pqParaViewBehaviors::pqParaViewBehaviors(
   new pqDataTimeStepBehavior(this);
   new pqViewFrameActionsBehavior(this);
   new pqSpreadSheetVisibilityBehavior(this);
+  new pqPipelineContextMenuBehavior(this);
   new pqDefaultViewBehavior(this);
   new pqAlwaysConnectedBehavior(this);
   new pqPVNewSourceBehavior(this);
@@ -82,6 +85,7 @@ pqParaViewBehaviors::pqParaViewBehaviors(
   new pqCrashRecoveryBehavior(this);
   new pqAutoLoadPluginXMLBehavior(this);
   new pqPluginDockWidgetsBehavior(mainWindow);
+  new pqVerifyRequiredPluginBehavior(this);
   new pqPluginActionGroupBehavior(mainWindow);
   new pqFixPathsInStateFilesBehavior(this);
   new pqCommandLineOptionsBehavior(this);

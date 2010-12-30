@@ -75,6 +75,22 @@ vtkExecutive* vtkPVPostFilter::CreateDefaultExecutive()
 }
 
 //----------------------------------------------------------------------------
+int vtkPVPostFilter::FillInputPortInformation(
+  int vtkNotUsed(port), vtkInformation* info)
+{
+  // We want to exclude vtkTemporalDataSet from being accepted as an input,
+  // everything else is acceptable.
+  info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkDataSet");
+  info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkGenericDataSet");
+  info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkGraph");
+  info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkHierarchicalBoxDataSet");
+  info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkMultiBlockDataSet");
+  info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkSelection");
+  info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkTable");
+  return 1;
+}
+
+//----------------------------------------------------------------------------
 int vtkPVPostFilter::RequestDataObject(
   vtkInformation*,
   vtkInformationVector** inputVector ,

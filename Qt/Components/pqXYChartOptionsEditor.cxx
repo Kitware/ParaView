@@ -56,6 +56,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqXYBarChartView.h"
 #include "pqXYChartView.h"
 
+#include "vtkAxis.h"
+
 #include <math.h>
 
 class pqXYChartOptionsEditorForm;
@@ -111,12 +113,12 @@ public:
   ~pqXYChartOptionsEditorForm();
 
   void setCurrentAxis(const QString &name);
-  int getIndexForLocation(vtkQtChartAxis::AxisLocation location) const;
+  int getIndexForLocation(int location) const;
 
   QString CurrentPage;
   QFont TitleFont;
   pqXYChartOptionsEditorAxis *AxisData[4];
-  vtkQtChartAxis::AxisLocation CurrentAxis;
+  int CurrentAxis;
   int AxisIndex;
   pqSampleScalarAddRangeDialog *RangeDialog;
 };
@@ -142,7 +144,7 @@ pqXYChartOptionsEditorAxis::pqXYChartOptionsEditorAxis()
 pqXYChartOptionsEditorForm::pqXYChartOptionsEditorForm()
   : Ui::pqChartOptionsWidget(), CurrentPage(), TitleFont()
 {
-  this->CurrentAxis = vtkQtChartAxis::Left;
+  this->CurrentAxis = vtkAxis::LEFT;
   this->AxisIndex = -1;
   this->RangeDialog = 0;
 
@@ -166,49 +168,48 @@ void pqXYChartOptionsEditorForm::setCurrentAxis(const QString &name)
 {
   if(name == "Left Axis")
     {
-    this->CurrentAxis = vtkQtChartAxis::Left;
+    this->CurrentAxis = vtkAxis::LEFT;
     this->AxisIndex = 0;
     }
   else if(name == "Bottom Axis")
     {
-    this->CurrentAxis = vtkQtChartAxis::Bottom;
+    this->CurrentAxis = vtkAxis::BOTTOM;
     this->AxisIndex = 1;
     }
   else if(name == "Right Axis")
     {
-    this->CurrentAxis = vtkQtChartAxis::Right;
+    this->CurrentAxis = vtkAxis::RIGHT;
     this->AxisIndex = 2;
     }
   else if(name == "Top Axis")
     {
-    this->CurrentAxis = vtkQtChartAxis::Top;
+    this->CurrentAxis = vtkAxis::TOP;
     this->AxisIndex = 3;
     }
   else
     {
-    this->CurrentAxis = vtkQtChartAxis::Left;
+    this->CurrentAxis = vtkAxis::LEFT;
     this->AxisIndex = -1;
     }
 }
 
-int pqXYChartOptionsEditorForm::getIndexForLocation(
-    vtkQtChartAxis::AxisLocation location) const
+int pqXYChartOptionsEditorForm::getIndexForLocation(int location) const
 {
   switch(location)
     {
-    case vtkQtChartAxis::Bottom:
+    case vtkAxis::BOTTOM:
       {
       return 1;
       }
-    case vtkQtChartAxis::Right:
+    case vtkAxis::RIGHT:
       {
       return 2;
       }
-    case vtkQtChartAxis::Top:
+    case vtkAxis::TOP:
       {
       return 3;
       }
-    case vtkQtChartAxis::Left:
+    case vtkAxis::LEFT:
     default:
       {
       return 0;
@@ -233,7 +234,7 @@ pqXYChartOptionsEditor::pqXYChartOptionsEditor(QWidget *widgetParent)
   this->Internal->Form->LabelNotation->addItem("Mixed");
   this->Internal->Form->LabelNotation->addItem("Scientific");
   this->Internal->Form->LabelNotation->addItem("Fixed");
-  this->Internal->Form->UseFixedInterval->setHidden(true);
+  //this->Internal->Form->UseFixedInterval->setHidden(true);
   this->Internal->Form->label_12->setHidden(true);
   this->Internal->Form->AxisTitleAlignment->setHidden(true);
 
@@ -290,6 +291,17 @@ pqXYChartOptionsEditor::pqXYChartOptionsEditor(QWidget *widgetParent)
   QObject::connect(this->Internal->Form->AxisTitleColor,
                    SIGNAL(chosenColorChanged(QColor)),
                    this, SLOT(setAxisTitleColor(QColor)));
+
+  // Axis labels
+  QObject::connect(this->Internal->Form->AddButton, SIGNAL(clicked()),
+                   this, SLOT(addAxisLabel()));
+  QObject::connect(this->Internal->Form->RemoveButton, SIGNAL(clicked()),
+                   this, SLOT(removeSelectedLabels()));
+  QObject::connect(this->Internal->Form->GenerateButton, SIGNAL(clicked()),
+                   this, SLOT(showRangeDialog()));
+  QAbstractItemDelegate *delegate = this->Internal->Form->LabelList->itemDelegate();
+  QObject::connect(delegate, SIGNAL(closeEditor(QWidget*)),
+                   this, SLOT(updateAxisLabels()));
 
   // Connect up some signals and slots for the property links
   QObject::connect(&this->Internal->Links, SIGNAL(modified()),
@@ -617,6 +629,170 @@ void pqXYChartOptionsEditor::setAxisTitle(const QString& text)
     }
 }
 
+void pqXYChartOptionsEditor::addAxisLabel()
+{
+  if (this->Internal->Form->AxisIndex != -1)
+    {
+    pqXYChartOptionsEditorAxis *axis =
+        this->Internal->Form->AxisData[this->Internal->Form->AxisIndex];
+    int row = axis->Labels.rowCount();
+    if (axis->Labels.insertRow(row))
+      {
+      QModelIndex index = axis->Labels.index(row, 0);
+      this->Internal->Form->LabelList->setCurrentIndex(index);
+      this->Internal->Form->LabelList->edit(index);
+      }
+    }
+}
+
+void pqXYChartOptionsEditor::removeSelectedLabels()
+{
+  if (this->Internal->Form->AxisIndex != -1)
+    {
+    pqXYChartOptionsEditorAxis *axis =
+        this->Internal->Form->AxisData[this->Internal->Form->AxisIndex];
+    QItemSelectionModel *model = this->Internal->Form->LabelList->selectionModel();
+    QModelIndexList indexes = model->selectedIndexes();
+    if (indexes.size() > 0)
+      {
+      QList<QPersistentModelIndex> labels;
+      for (QModelIndexList::Iterator it = indexes.begin();
+           it != indexes.end(); ++it)
+        {
+        labels.append(*it);
+        }
+      for (QList<QPersistentModelIndex>::Iterator it = labels.begin();
+           it != labels.end(); ++it)
+        {
+        axis->Labels.removeRow(it->row());
+        }
+      this->Internal->Form->RemoveButton->setEnabled(false);
+      this->changesAvailable();
+      }
+    }
+}
+
+void pqXYChartOptionsEditor::updateAxisLabels()
+{
+  if (this->Internal->Form->AxisIndex != -1)
+    {
+    pqXYChartOptionsEditorAxis *axis =
+        this->Internal->Form->AxisData[this->Internal->Form->AxisIndex];
+    QModelIndex index = this->Internal->Form->LabelList->currentIndex();
+    QString label = axis->Labels.data(index, Qt::DisplayRole).toString();
+    if (label.isEmpty())
+      {
+      axis->Labels.removeRow(index.row());
+      }
+    else
+      {
+      int row = 0;
+      double current = label.toDouble();
+      QStringList labels = axis->Labels.stringList();
+      QStringList::Iterator it = labels.begin();
+      for ( ; it != labels.end(); ++it, ++row)
+        {
+        if (row == index.row())
+          {
+          continue;
+          }
+        double value = it->toDouble();
+        if (current < value)
+          {
+          break;
+          }
+        }
+      if (row != index.row() + 1)
+        {
+        if (row > index.row())
+          {
+          // The row will be moved to the head of the list
+          row = -1;
+          }
+        axis->Labels.removeRow(index.row());
+        axis->Labels.insertRow(row);
+        index = axis->Labels.index(row, 0);
+        axis->Labels.setData(index, label, Qt::DisplayRole);
+        this->Internal->Form->LabelList->setCurrentIndex(index);
+        }
+      }
+    this->changesAvailable();
+    }
+}
+
+void pqXYChartOptionsEditor::showRangeDialog()
+{
+  if (this->Internal->Form->AxisIndex != -1)
+    {
+    pqXYChartOptionsEditorAxis *axis =
+        this->Internal->Form->AxisData[this->Internal->Form->AxisIndex];
+    if (this->Internal->Form->RangeDialog)
+      {
+      this->Internal->Form->RangeDialog->setResult(0);
+      this->Internal->Form->RangeDialog->setLogarithmic(axis->UseLogScale);
+      }
+    else
+      {
+      this->Internal->Form->RangeDialog = new pqSampleScalarAddRangeDialog(
+            0.0, 1.0, 10, axis->UseLogScale, this);
+      this->Internal->Form->RangeDialog->setLogRangeStrict(true);
+      this->Internal->Form->RangeDialog->setWindowTitle("Generate Axis Labels");
+      this->connect(this->Internal->Form->RangeDialog, SIGNAL(accepted()),
+                    this, SLOT(generateAxisLabels()));
+      }
+    this->Internal->Form->RangeDialog->show();
+    }
+}
+
+void pqXYChartOptionsEditor::generateAxisLabels()
+{
+  if (this->Internal->Form->AxisIndex != -1 && this->Internal->Form->RangeDialog)
+    {
+    pqSampleScalarAddRangeDialog *dialog = this->Internal->Form->RangeDialog;
+    double minimum = dialog->from();
+    double maximum = dialog->to();
+    if(minimum != maximum)
+      {
+      QStringList list;
+      unsigned long total = dialog->steps();
+      double interval = 0.0;
+      double exponent = 0.0;
+      bool useLog = dialog->logarithmic();
+      if(useLog)
+        {
+        exponent = log10(minimum);
+        double maxExp = log10(maximum);
+        interval = (maxExp - exponent) / total;
+        }
+      else
+        {
+        interval = (maximum - minimum) / total;
+        }
+
+      pqXYChartOptionsEditorAxis *axis =
+          this->Internal->Form->AxisData[this->Internal->Form->AxisIndex];
+      list.append(QString::number(minimum, 'f', axis->Precision));
+      for(unsigned long i = 1; i < total; ++i)
+        {
+        if(useLog)
+          {
+          exponent += interval;
+          minimum = pow(10.0, exponent);
+          }
+        else
+          {
+          minimum += interval;
+          }
+
+        list.append(QString::number(minimum, 'f', axis->Precision));
+        }
+
+      list.append(QString::number(maximum, 'f', axis->Precision));
+      axis->Labels.setStringList(list);
+      }
+    }
+}
+
 void pqXYChartOptionsEditor::updateOptions()
 {
   // Use the server properties to update the options on the charts
@@ -921,6 +1097,51 @@ void pqXYChartOptionsEditor::applyAxisOptions()
   pqSMAdaptor::setMultipleElementProperty(
       proxy->GetProperty("AxisBehavior"), values);
 
+  // Custom axis labels for the bottom axis
+  values.clear();
+  QStringList labels =
+      this->Internal->Form->AxisData[vtkAxis::LEFT]->Labels.stringList();
+  for(QStringList::Iterator it = labels.begin(); it != labels.end(); ++it)
+    {
+    values.append(it->toDouble());
+    }
+  pqSMAdaptor::setMultipleElementProperty(
+      proxy->GetProperty("AxisLabelsLeft"), values);
+
+  values.clear();
+  labels = this->Internal->Form->AxisData[vtkAxis::BOTTOM]->Labels.stringList();
+  for(QStringList::Iterator it = labels.begin(); it != labels.end(); ++it)
+    {
+    values.append(it->toDouble());
+    }
+  pqSMAdaptor::setMultipleElementProperty(
+      proxy->GetProperty("AxisLabelsBottom"), values);
+
+  values.clear();
+  labels = this->Internal->Form->AxisData[vtkAxis::RIGHT]->Labels.stringList();
+  for(QStringList::Iterator it = labels.begin(); it != labels.end(); ++it)
+    {
+    values.append(it->toDouble());
+    }
+  pqSMAdaptor::setMultipleElementProperty(
+      proxy->GetProperty("AxisLabelsRight"), values);
+
+  values.clear();
+  labels = this->Internal->Form->AxisData[vtkAxis::TOP]->Labels.stringList();
+  for(QStringList::Iterator it = labels.begin(); it != labels.end(); ++it)
+    {
+    values.append(it->toDouble());
+    }
+  pqSMAdaptor::setMultipleElementProperty(
+      proxy->GetProperty("AxisLabelsTop"), values);
+
+  // Force the update of these properties, assume they are always dirty as the
+  // axis does not retain this list when they render other label schemes.
+  proxy->UpdateProperty("AxisLabelsLeft", 1);
+  proxy->UpdateProperty("AxisLabelsBottom", 1);
+  proxy->UpdateProperty("AxisLabelsRight", 1);
+  proxy->UpdateProperty("AxisLabelsTop", 1);
+
   // Axis range
   values.clear();
   for(int i = 0; i < 4; ++i)
@@ -1022,7 +1243,8 @@ void pqXYChartOptionsEditor::loadAxisLayoutPage()
 
   this->Internal->Form->LabelList->setModel(&axis->Labels);
   this->connect(this->Internal->Form->LabelList->selectionModel(),
-                SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)),
+                SIGNAL(selectionChanged(const QItemSelection &,
+                                        const QItemSelection &)),
                 this, SLOT(updateRemoveButton()));
   this->updateRemoveButton();
   this->blockSignals(false);
@@ -1051,19 +1273,19 @@ void pqXYChartOptionsEditor::changeLayoutPage(bool checked)
       {
       this->Internal->Form->AxisLayoutPages->setCurrentWidget(
               this->Internal->Form->RangePage);
-      axis->AxisLayout = 1;
+      axis->AxisLayout = vtkAxis::FIXED;
       }
     else if(this->Internal->Form->UseFixedInterval->isChecked())
       {
       this->Internal->Form->AxisLayoutPages->setCurrentWidget(
               this->Internal->Form->ListPage);
-      axis->AxisLayout = 2;
+      axis->AxisLayout = vtkAxis::CUSTOM;
       }
     else
       {
       this->Internal->Form->AxisLayoutPages->setCurrentWidget(
               this->Internal->Form->BlankPage);
-      axis->AxisLayout = 0;
+      axis->AxisLayout = vtkAxis::AUTO;
       }
     this->changesAvailable();
     }

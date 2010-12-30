@@ -40,6 +40,10 @@ public:
   virtual vtkRenderWindow* GetRenderWindow() = 0;
   virtual void Render() = 0;
 
+  // Description:
+  // Returns true if the most recent render indeed employed low-res rendering.
+  virtual bool LastRenderWasInteractive()=0;
+
 protected:
   vtkPVRenderViewProxy() {};
   ~vtkPVRenderViewProxy() {};

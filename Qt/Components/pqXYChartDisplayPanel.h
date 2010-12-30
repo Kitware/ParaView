@@ -50,6 +50,9 @@ public slots:
   /// Reloads the series list from the display.
   void reloadSeries();
 
+  /// Rescale the chart
+  void rescaleChart();
+
 protected slots:
   /// Slot to listen to clicks for changing color.
   void activateItem(const QModelIndex &index);

@@ -299,7 +299,22 @@ int vtkPVScalarBarActor::CreateLabel(double value,
       char string2[1024];
       sprintf(format, "%%-0.%dg", i);
       sprintf(string2, format, value);
+
+      //we want the reduced size used so that we can get better fitting
+      // Extra filter: Used to remove unwanted 0 after e+ or e-
+      // i.e.: 1.23e+009 => 1.23e+9
+      vtkstd::string strToFilter = string2;
+      vtkstd::string ePlus = "e+0";
+      vtkstd::string eMinus = "e-0";
+      size_t pos = 0;
+      while( (pos = strToFilter.find(ePlus)) != vtkstd::string::npos ||
+             (pos = strToFilter.find(eMinus)) != vtkstd::string::npos)
+        {
+        strToFilter.erase(pos + 2, 1);
+        }
+      strcpy(string2, strToFilter.c_str());
       textMapper->SetInput(string2);
+
       textMapper->SetConstrainedFontSize(viewport, VTK_INT_MAX, targetHeight);
       int actualWidth = textMapper->GetWidth(viewport);
       if (actualWidth < targetWidth)
@@ -322,6 +337,8 @@ int vtkPVScalarBarActor::CreateLabel(double value,
     sprintf(string, this->LabelFormat, value);
     }
 
+  // Set the txt label
+  //cout << "Value: " << value << " converted to " << string << endl;
   textMapper->SetInput(string);
 
   // Size the font to fit in the targetHeight, which we are using

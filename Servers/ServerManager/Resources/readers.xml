@@ -74,6 +74,31 @@
    <!-- End AVSucdReader -->
    </SourceProxy>
 
+   <SourceProxy name="MetaImageReaderCore"
+                class="vtkMetaImageReader"
+                label="Meta Image reader">
+     <Documentation
+       short_help="Read UNC meta image data."
+       long_help="Read binary UNC meta image data.">
+       The Meta Image Reader reads binary UNC meta image data, and produces uniform rectilinear (image/volume) data. The default file extensions are .mhd and .mha.
+     </Documentation>
+     <StringVectorProperty
+        name="FileName"
+        animateable="0"
+        command="SetFileName"
+        number_of_elements="1">
+        <FileListDomain name="files"/>
+        <Documentation>
+          This property specifies the file name for the Meta Image reader.
+        </Documentation>
+     </StringVectorProperty>
+     <Hints>
+      <ReaderFactory extensions="mhd mha"
+          file_description="Meta Image Data Files" />
+     </Hints>
+   <!-- End Meta Image Reader -->
+   </SourceProxy>
+
    <SourceProxy name="legacyreader" 
                 class="vtkPDataSetReader"
                 label="Legacy VTK Reader">
@@ -1952,6 +1977,59 @@
      <!-- End PNGReader -->
    </SourceProxy>
 
+   <SourceProxy name="JPEGReader"
+                class="vtkJPEGReader"
+                label="JPEG Reader">
+     <Documentation
+       short_help="Read a JPEG file."
+       long_help="Read a JPEG file into an image data.">
+       The JPEG reader reads JPEG files, and the output is a uniform rectilinear (image/volume) dataset. The default file extension is .jpg or .jpeg.
+     </Documentation>
+     <StringVectorProperty
+        name="FileName"
+        animateable="0"
+        command="SetFileName"
+        number_of_elements="1">
+        <FileListDomain name="files"/>
+        <Documentation>
+          This property specifies the file name for the PNG reader.
+        </Documentation>
+      </StringVectorProperty>
+
+      <Hints>
+        <ReaderFactory extensions="jpg jpeg"
+          file_description="JPEG Image Files" />
+      </Hints>
+     <!-- End JPEGReader -->
+   </SourceProxy>
+
+
+  <SourceProxy name="TIFFReader"
+                class="vtkTIFFReader"
+                label="TIFF Reader">
+     <Documentation
+       short_help="Read a TIFF file."
+       long_help="Read a TIFF file into an image data.">
+       The TIFF reader reads TIFF (Tagged Image File Format) files, and the output is a uniform rectilinear (image/volume) dataset. The default file extension is .tiff.
+     </Documentation>
+     <StringVectorProperty
+        name="FileName"
+        animateable="0"
+        command="SetFileName"
+        number_of_elements="1">
+        <FileListDomain name="files"/>
+        <Documentation>
+          This property specifies the file name for the TIFF reader.
+        </Documentation>
+     </StringVectorProperty>
+
+     <Hints>
+      <ReaderFactory extensions="tif tiff"
+          file_description="TIFF Image Files"/>
+     </Hints>
+   <!-- End TIFFReader -->
+   </SourceProxy>
+
     <SourceProxy name="netCDFReaderCore"
                  class="vtkNetCDFCFReader">
 
@@ -2057,6 +2135,26 @@
           calculations like finding the range of the values.  That said,
           this option should be used with caution as VTK does not fully
           support NaN values and therefore odd calculations may occur.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="OutputType"
+                         command="SetOutputType"
+                         number_of_elements="1"
+                         animateable="0"
+                         default_values="-1">
+        <EnumerationDomain name="enum">
+          <Entry value="-1" text="Automatic" />
+          <Entry value="6" text="Image" />
+          <Entry value="3" text="Rectilinear" />
+          <Entry value="2" text="Structured" />
+          <Entry value="4" text="Unstructured" />
+        </EnumerationDomain>
+        <Documentation>
+          Specifies the type of data that the reader creates.  If
+          Automatic, the reader will use the most appropriate grid type for
+          the data read.  Note that not all grid types support all data.  A
+          warning is issued if a mismatch occurs.
         </Documentation>
       </IntVectorProperty>
 
@@ -2277,11 +2375,67 @@
    <!-- End PVDReader -->
    </SourceProxy>
 
-   <SourceProxy kernel_class="vtkPMFileSeriesReaderProxy"
-                name="XMLMultiBlockDataReader"
+   <SourceProxy name="MetaImageReader"
+                class="vtkFileSeriesReader"
+                label="Meta File Series Reader"
+                file_name_method="SetFileName"
+                kernel_class="vtkPMFileSeriesReaderProxy" >
+     <Documentation
+       short_help="Read a series of meta images."
+       long_help="Read a series of meta images.">
+       Read a series of meta images. The file extension is .mhd
+     </Documentation>
+
+     <SubProxy>
+       <Proxy name="Reader"
+              proxygroup="internal_sources"
+              proxyname="MetaImageReaderCore">
+       </Proxy>
+     </SubProxy>
+
+      <StringVectorProperty name="FileNameInfo"
+        command="GetCurrentFileName"
+        information_only="1" >
+        <SimpleStringInformationHelper />
+     </StringVectorProperty>
+
+     <StringVectorProperty name="FileNames"
+                           clean_command="RemoveAllFileNames"
+                           command="AddFileName"
+                           animateable="0"
+                           number_of_elements="0"
+                           repeat_command="1">
+       <FileListDomain name="files"/>
+       <Documentation>
+         The list of files to be read by the reader. Each file is expected to be
+         in the meta format. The standard extension is .mhd. If more than 1 file is specified,
+         the reader will switch to file series mode in which it will pretend that it can support
+         time and provide 1 file per time step.
+       </Documentation>
+     </StringVectorProperty>
+
+     <DoubleVectorProperty name="TimestepValues"
+                           repeatable="1"
+                           information_only="1"
+                           kernel_class="vtkPMTimeStepsProperty">
+       <Documentation>
+         Available timestep values.
+       </Documentation>
+     </DoubleVectorProperty>
+
+     <Hints>
+      <ReaderFactory extensions="mhd mha"
+          file_description="Meta Image Files" />
+     </Hints>
+
+   <!-- end of MetaFileSeriesReader -->
+   </SourceProxy>
+
+   <SourceProxy name="XMLMultiBlockDataReader"
                 class="vtkFileSeriesReader"
                 label="XML MultiBlock Data Reader"
-                file_name_method="SetFileName">
+                file_name_method="SetFileName"
+                kernel_class="vtkPMFileSeriesReaderProxy" >
      <Documentation
        short_help="Read VTK XML multi-block datasets."
        long_help="Read a VTK XML multi-block data file and the serial VTK XML data files to which it points.">
@@ -3354,6 +3508,57 @@
   </SourceProxy>
 
 
+   <SourceProxy name="spcthhistoryreader" class="vtkSpyPlotHistoryReader"
+   label="spcth history reader">
+      <Documentation
+        short_help="Read a comma-separated spctch history file."
+        long_help="Read a spcth history file where each row translates into a single time step
+        and the columns are points, materials and properties.">
+      </Documentation>
+      <StringVectorProperty name="FileName"
+        command="SetFileName"
+        animateable="0" >
+        <FileListDomain name="files"/>
+      </StringVectorProperty>
+
+
+      <StringVectorProperty name="CommentCharacter"
+        command="SetCommentCharacter"
+        number_of_elements="1"
+        default_values="%">
+        <Documentation>
+          This property lists the characters that is used as the first character on comment lines
+        </Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="Delimeter"
+        command="SetDelimeter"
+        number_of_elements="1"
+        default_values=",">
+        <Documentation>
+          Character that is used as the delimeter.
+        </Documentation>
+      </StringVectorProperty>
+
+     <DoubleVectorProperty
+        name="TimestepValues"
+        repeatable="1"
+        information_only="1">
+        <TimeStepsInformationHelper/>
+        <Documentation>
+          Available timestep values.
+        </Documentation>
+     </DoubleVectorProperty>
+
+      <Hints>
+       <ReaderFactory extensions="hscth"
+           file_description="SpyPlot CTH history" />
+      </Hints>
+
+      <!-- End of SPCTHHistoryReader -->
+  </SourceProxy>
+
+
    <SourceProxy name="vrmlreader" class="vtkVRMLSource" label="VRML Reader">
      <Documentation
        short_help="Read VRML 2.0 files."
@@ -4184,7 +4389,110 @@
           file_description="PNG Image Files" />
      </Hints>
 
-     <!-- End FileSeriesPNGReader -->
+     <!-- End PNGSeriesReader -->
+   </SourceProxy>
+
+
+   <SourceProxy name="JPEGSeriesReader"
+                class="vtkFileSeriesReader"
+                label="JPEG Series Reader"
+                file_name_method="SetFileName"
+                kernel_class="vtkPMFileSeriesReaderProxy" >
+     <Documentation
+       short_help="Read a series of JPEG files."
+       long_help="Read a series of JPEG files into an time sequence of image datas.">
+       The JPEG series reader reads JPEG files. The output is a time sequence of uniform
+       rectilinear (image/volume) dataset. The default file extension is .jpg or .jpeg.
+     </Documentation>
+
+     <StringVectorProperty
+        name="FileNames"
+        clean_command="RemoveAllFileNames"
+        command="AddFileName"
+        animateable="0"
+        number_of_elements="0"
+        repeat_command="1">
+        <FileListDomain name="files"/>
+       <Documentation>
+         The list of files to be read by the reader. If more than 1 file is specified,
+         the reader will switch to file series mode in which it will pretend that it
+         can support time and provide 1 file per time step.
+       </Documentation>
+     </StringVectorProperty>
+
+     <DoubleVectorProperty
+        name="TimestepValues"
+        repeatable="1"
+        information_only="1">
+        <TimeStepsInformationHelper/>
+        <Documentation>
+          Available timestep values.
+        </Documentation>
+     </DoubleVectorProperty>
+
+     <SubProxy>
+        <Proxy name="Reader"
+          proxygroup="internal_sources" proxyname="JPEGReader">
+        </Proxy>
+      </SubProxy>
+
+     <Hints>
+        <ReaderFactory extensions="jpg jpeg"
+          file_description="JPEG Image Files" />
+     </Hints>
+
+     <!-- End JPEGSeriesReader -->
+   </SourceProxy>
+
+   <SourceProxy name="TIFFSeriesReader"
+                class="vtkFileSeriesReader"
+                label="TIFF Series Reader"
+                file_name_method="SetFileName"
+                kernel_class="vtkPMFileSeriesReaderProxy" >
+     <Documentation
+       short_help="Read a series of TIFF files."
+       long_help="Read a series of TIFF files into an time sequence of image datas.">
+       The TIFF series reader reads TIFF files. The output is a time sequence of uniform
+       rectilinear (image/volume) dataset. The default file extension is .tif or .tiff.
+     </Documentation>
+
+     <StringVectorProperty
+        name="FileNames"
+        clean_command="RemoveAllFileNames"
+        command="AddFileName"
+        animateable="0"
+        number_of_elements="0"
+        repeat_command="1">
+        <FileListDomain name="files"/>
+       <Documentation>
+         The list of files to be read by the reader. If more than 1 file is specified,
+         the reader will switch to file series mode in which it will pretend that it
+         can support time and provide 1 file per time step.
+       </Documentation>
+     </StringVectorProperty>
+
+     <DoubleVectorProperty
+        name="TimestepValues"
+        repeatable="1"
+        information_only="1">
+        <TimeStepsInformationHelper/>
+        <Documentation>
+          Available timestep values.
+        </Documentation>
+     </DoubleVectorProperty>
+
+     <SubProxy>
+        <Proxy name="Reader"
+          proxygroup="internal_sources" proxyname="TIFFReader">
+        </Proxy>
+      </SubProxy>
+
+     <Hints>
+        <ReaderFactory extensions="tif tiff"
+          file_description="TIFF Image Files" />
+     </Hints>
+
+     <!-- End TIFFSeriesReader -->
    </SourceProxy>
 
    <SourceProxy name="XdmfReader" 
@@ -4339,41 +4647,6 @@
      <!-- End of XdmfReader -->
    </SourceProxy>
 
-#ifdef PARAVIEW_USE_SILO
-   <SourceProxy name="SiloReader" 
-                class="vtkSiloReader"
-                label="Silo Reader">
-     <Documentation
-        short_help="Read a Silo data file."
-        long_help="Reads a Silo data file and generates multi block dataset.">
-        The Silo reader loads Silo files and produces multi block data set output.  The default file extension is .silo.
-     </Documentation>
-     <StringVectorProperty
-         name="FileName"
-         animateable="0"
-         command="SetFileName"
-         number_of_elements="1">
-        <FileListDomain name="files"/>
-        <Documentation>
-           This property specifies the file name for the Silo reader.
-        </Documentation>
-     </StringVectorProperty>
-     <StringVectorProperty
-         name="TOCString"
-         command="GetTOCString"
-         information_only="1">
-        <Documentation>
-           This property is a string representation of the table of contents.
-        </Documentation>
-     </StringVectorProperty>
-     <Hints>
-      <ReaderFactory extensions="silo"
-          file_description="Silo Files" />
-     </Hints>
-   <!-- End SiloReader -->
-   </SourceProxy>
-#endif
-
    <SourceProxy kernel_class="vtkPMFileSeriesReaderProxy"
                 name="ExodusIIReader"
                 class="vtkExodusFileSeriesReader"
@@ -4491,6 +4764,7 @@
        <Property name="Refresh" show="0"/>
        <ReaderFactory 
           extensions="g e ex2 ex2v2 exo gen exoII 0 00 000 0000 exii"
+          filename_patterns="*.e-s.*"
           file_description="ExodusII"/>
      </Hints>
      <!-- ExodusIIReader -->
@@ -4698,38 +4972,13 @@
    <!-- End Facet Reader -->
    </SourceProxy>
 
-   <SourceProxy name="MetaImageReader" 
-                class="vtkMetaImageReader"
-                label="Meta Image reader">
-     <Documentation
-       short_help="Read UNC meta image data."
-       long_help="Read binary UNC meta image data.">
-       The Meta Image Reader reads binary UNC meta image data, and produces uniform rectilinear (image/volume) data. The default file extensions are .mhd and .mha.
-     </Documentation>
-     <StringVectorProperty
-        name="FileName"
-        animateable="0"
-        command="SetFileName"
-        number_of_elements="1">
-        <FileListDomain name="files"/>
-        <Documentation>
-          This property specifies the file name for the Meta Image reader.
-        </Documentation>
-     </StringVectorProperty>
-     <Hints>
-      <ReaderFactory extensions="mhd mha"
-          file_description="Meta Image Data Files" />
-     </Hints>
-   <!-- End Meta Image Reader -->
-   </SourceProxy>
-
   <SourceProxy name="TIFFReader" 
                 class="vtkTIFFReader"
                 label="TIFF Reader">
      <Documentation
        short_help="Read a TIFF file."
        long_help="Read a TIFF file into an image data.">
-       The TIFF reader reads TIFF (Tagged Image File Format) files, and the output is a uniform rectilinear (image/volume) dataset. The default file extension is .png.
+       The TIFF reader reads TIFF (Tagged Image File Format) files, and the output is a uniform rectilinear (image/volume) dataset. The default file extension is .tiff.
      </Documentation>
      <StringVectorProperty
         name="FileName"
@@ -5484,6 +5733,7 @@
           <Property name="VerticalScale" />
           <Property name="VerticalBias" />
           <Property name="ReplaceFillValueWithNan" />
+          <Property name="OutputType" />
         </ExposedProperties>
       </SubProxy>
 

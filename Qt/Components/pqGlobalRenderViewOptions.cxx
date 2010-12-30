@@ -305,6 +305,10 @@ void pqGlobalRenderViewOptions::init()
                   SIGNAL(toggled(bool)),
                   this, SIGNAL(changesAvailable()));
 
+  QObject::connect(this->Internal->stillRenderDelay,
+                  SIGNAL(valueChanged(int)),
+                  this, SIGNAL(changesAvailable()));
+
   for ( int cc = 0; cc < this->Internal->CameraControl3DComboBoxList.size(); cc++ )
     {
     QObject::connect(this->Internal->CameraControl3DComboBoxList[cc],
@@ -492,6 +496,8 @@ void pqGlobalRenderViewOptions::applyChanges()
   settings->setValue("ZlibCompressionLevel",this->Internal->zlibCompressionLevel->value());
   settings->setValue("ZlibColorSpace",this->Internal->zlibColorspaceSlider->value());
   settings->setValue("ZlibStripAlpha",this->Internal->zlibStripAlpha->isChecked());
+  settings->setValue("NonInteractiveRenderDelay",
+    this->Internal->stillRenderDelay->value());
 
   if (this->Internal->enableStillRenderSubsampleRate->checkState() == Qt::Checked)
     {
@@ -704,6 +710,9 @@ void pqGlobalRenderViewOptions::resetChanges()
   this->Internal->zlibStripAlpha->setChecked(val.toInt());
   val = settings->value("CompressionEnabled",1);
   this->Internal->CompressorGroup->setChecked(val.toInt());
+
+  val = settings->value("NonInteractiveRenderDelay", 2);
+  this->Internal->stillRenderDelay->setValue(val.toInt());
 
   val = settings->value("StillRenderImageReductionFactor", 1);
   if (val.toInt() == 1)

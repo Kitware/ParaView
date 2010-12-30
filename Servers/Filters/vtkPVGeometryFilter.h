@@ -153,7 +153,10 @@ protected:
 
   void ExecuteBlock(vtkDataObject* input,
                     vtkPolyData* output,
-                    int doCommunicate);
+                    int doCommunicate,
+                    int updatePiece,
+                    int updateNumPieces,
+                    int updateGhosts);
 
   void DataSetExecute(vtkDataSet* input, vtkPolyData* output,
                       int doCommunicate);
@@ -161,16 +164,34 @@ protected:
                              int doCommunicate);
   void ImageDataExecute(vtkImageData* input,
                         vtkPolyData* output,
-                        int doCommunicate);
-  void StructuredGridExecute(vtkStructuredGrid* input, vtkPolyData* output);
-  void RectilinearGridExecute(vtkRectilinearGrid* input, vtkPolyData* output);
+                        int doCommunicate,
+                        int updatePiece);
+
+  void StructuredGridExecute(
+    vtkStructuredGrid* input,
+    vtkPolyData* output,
+    int updatePiece,
+    int updateNumPieces,
+    int updateGhosts);
+
+  void RectilinearGridExecute(
+    vtkRectilinearGrid* input,
+    vtkPolyData* output,
+    int updatePiece,
+    int updateNumPieces,
+    int updateGhosts);
+
   void UnstructuredGridExecute(
     vtkUnstructuredGrid* input, vtkPolyData* output, int doCommunicate);
+
   void PolyDataExecute(
     vtkPolyData* input, vtkPolyData* output, int doCommunicate);
+
   void OctreeExecute(
     vtkHyperOctree* input, vtkPolyData* output, int doCommunicate);
+
   void ExecuteCellNormals(vtkPolyData* output, int doCommunicate);
+
   void ChangeUseStripsInternal(int val, int force);
 
   int OutlineFlag;

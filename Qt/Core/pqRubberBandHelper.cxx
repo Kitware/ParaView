@@ -32,7 +32,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqRubberBandHelper.h"
 
 // ParaView Server Manager includes.
+#include "pqApplicationCore.h"
+#include "pqDataRepresentation.h"
+#include "pqOutputPort.h"
 #include "pqRenderView.h"
+#include "pqServerManagerSelectionModel.h"
 
 // Qt Includes.
 #include <QCursor>
@@ -132,10 +136,10 @@ void pqRubberBandHelper::emitEnabledSignals()
       this->Internal->RenderView->getRenderViewProxy();
     emit this->enableSurfaceSelection(proxy->IsSelectionAvailable());
     emit this->enableSurfacePointsSelection(proxy->IsSelectionAvailable());
+    emit this->enablePick(proxy->IsSelectionAvailable());
     emit this->enableFrustumSelection(true);
     emit this->enableFrustumPointSelection(true);
     emit this->enableZoom(true);
-    emit this->enablePick(true);
     }
 }
 
@@ -181,29 +185,29 @@ int pqRubberBandHelper::setRubberBandOn(int selectionMode)
     return 0;
     }
 
-  if (selectionMode != PICK_ON_CLICK)
+  if (selectionMode == ZOOM)
     {
     vtkSMPropertyHelper(rmp, "InteractionMode").Set(
-      vtkPVRenderView::INTERACTION_MODE_SELECTION);
-    rmp->AddObserver(vtkCommand::SelectionChangedEvent, this->Internal->Observer);
+      vtkPVRenderView::INTERACTION_MODE_ZOOM);
     rmp->UpdateVTKObjects();
-
-    if (selectionMode == ZOOM)
-      {
-      this->Internal->RenderView->getWidget()->setCursor(
-        this->Internal->ZoomCursor);
-      }
-    else if (selectionMode != PICK_ON_CLICK)
-      {
-      this->Internal->RenderView->getWidget()->setCursor(Qt::CrossCursor);
-      }
+    this->Internal->RenderView->getWidget()->setCursor(
+      this->Internal->ZoomCursor);
+    this->Internal->RenderView->getWidget()->installEventFilter(this);
     }
-  else
+  else if (selectionMode == PICK_ON_CLICK)
     {
     // we don't use render-window-interactor for picking-on-clicking since we
     // don't want to change the default interaction style. Instead we install an
     // event filter to listen to mouse click events.
     this->Internal->RenderView->getWidget()->installEventFilter(this);
+    }
+  else
+    {
+    vtkSMPropertyHelper(rmp, "InteractionMode").Set(
+      vtkPVRenderView::INTERACTION_MODE_SELECTION);
+    rmp->AddObserver(vtkCommand::SelectionChangedEvent, this->Internal->Observer);
+    rmp->UpdateVTKObjects();
+    this->Internal->RenderView->getWidget()->setCursor(Qt::CrossCursor);
     }
 
   this->Mode = selectionMode;
@@ -268,13 +272,27 @@ bool pqRubberBandHelper::eventFilter(QObject *watched, QEvent *_event)
         if (this->Internal->StartPosition[0] == mouseEvent.x() &&
           this->Internal->StartPosition[1] == mouseEvent.y())
           {
-          int region[4] = {mouseEvent.x(), mouseEvent.y(), mouseEvent.x(),
-            mouseEvent.y()};
+          // we need to flip Y.
+          int height = this->Internal->RenderView->getWidget()->size().height();
+          int region[4] = {mouseEvent.x(), height - mouseEvent.y(),
+            mouseEvent.x(), height - mouseEvent.y()};
           this->onSelectionChanged(NULL, 0, region);
           }
         }
       this->Internal->StartPosition[0] = -1000;
       this->Internal->StartPosition[1] = -1000;
+      }
+    }
+  else if (this->Mode == ZOOM &&
+    watched == this->Internal->RenderView->getWidget())
+    {
+    if (_event->type() == QEvent::MouseButtonRelease)
+      {
+      QMouseEvent& mouseEvent = (*static_cast<QMouseEvent*>(_event));
+      if (mouseEvent.button() == Qt::LeftButton)
+        {
+        QTimer::singleShot(0, this, SLOT(delayedSelectionChanged()));
+        }
       }
     }
 
@@ -386,20 +404,37 @@ void pqRubberBandHelper::onSelectionChanged(vtkObject*, unsigned long,
 
   case ZOOM:
     // nothing to do.
+    this->setRubberBandOff();
     this->Internal->RenderView->resetCenterOfRotationIfNeeded();
     break;
 
   case PICK:
-    this->Internal->RenderView->pick(region);
+      {
+      pqDataRepresentation* picked = this->Internal->RenderView->pick(region);
+      pqApplicationCore::instance()->getSelectionModel()->setCurrentItem(
+        picked? picked->getOutputPortFromInput(): NULL,
+        pqServerManagerSelectionModel::ClearAndSelect);
+      }
     break;
 
   case PICK_ON_CLICK:
     if (region[0] == region[2] && region[1] == region[3])
       {
-      this->Internal->RenderView->pick(region);
+      pqDataRepresentation* picked = this->Internal->RenderView->pick(region);
+      // in pick-on-click, we don't change the current item when user clicked on
+      // a blank area. BUG #11428.
+      if (picked)
+        {
+        pqApplicationCore::instance()->getSelectionModel()->setCurrentItem(
+          picked->getOutputPortFromInput(),
+          pqServerManagerSelectionModel::ClearAndSelect);
+        }
       }
     break;
     }
-  emit this->selectionFinished(region[0], region[1], region[2], region[3]);
+  if (region)
+    {
+    emit this->selectionFinished(region[0], region[1], region[2], region[3]);
+    }
 }
 

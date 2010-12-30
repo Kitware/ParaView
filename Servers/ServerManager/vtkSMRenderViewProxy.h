@@ -113,10 +113,23 @@ public:
   // way as other properties.
   void SynchronizeCameraProperties();
 
+  // Description:
+  // Returns true if the most recent render indeed employed low-res rendering.
+  virtual bool LastRenderWasInteractive();
+
+  // Description:
+  // Returns the Z-buffer value at the given location in this view.
+  double GetZBufferValue(int x, int y);
+
 //BTX
 protected:
   vtkSMRenderViewProxy();
   ~vtkSMRenderViewProxy();
+
+  // Description:
+  // Overridden to ensure that we clean up the selection cache on the server
+  // side.
+  virtual void MarkDirty(vtkSMProxy* modifiedProxy);
 
   // Description:
   // Subclasses should override this method to do the actual image capture.
@@ -133,13 +146,15 @@ protected:
   // Description:
   // Fetches the LastSelection from the data-server and then converts it to a
   // selection source proxy and returns that.
-  bool FetchLastSelection(vtkCollection* selectedRepresentations,
+  bool FetchLastSelection(bool multiple_selections,
+    vtkCollection* selectedRepresentations,
     vtkCollection* selectionSources);
 
   // Description:
   // Called at the end of CreateVTKObjects().
   virtual void CreateVTKObjects();
 
+  bool IsSelectionCached;
 private:
   vtkSMRenderViewProxy(const vtkSMRenderViewProxy&); // Not implemented
   void operator=(const vtkSMRenderViewProxy&); // Not implemented

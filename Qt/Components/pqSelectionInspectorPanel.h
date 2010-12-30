@@ -191,6 +191,7 @@ protected:
   /// Returns true if the port has GlobalIDs
   bool hasGlobalIDs(pqOutputPort*);
 
+  void selectGlobalIdsIfPossible(pqOutputPort* opport, bool forceGlobalIds, bool createNew);
   void setGlobalIDs();
 private:
   struct pqImplementation;

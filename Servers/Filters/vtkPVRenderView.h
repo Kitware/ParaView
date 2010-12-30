@@ -45,9 +45,10 @@ class vtkInformationIntegerKey;
 class vtkInformationObjectBaseKey;
 class vtkInformationRequestKey;
 class vtkInteractorStyleRubberBand3D;
+class vtkInteractorStyleRubberBandZoom;
 class vtkLight;
 class vtkLightKit;
-class vtkPHardwareSelector;
+class vtkPVHardwareSelector;
 class vtkProp;
 class vtkPVAxesWidget;
 class vtkPVCenterAxesActor;
@@ -72,7 +73,8 @@ public:
     {
     INTERACTION_MODE_3D=0,
     INTERACTION_MODE_2D, // not implemented yet.
-    INTERACTION_MODE_SELECTION
+    INTERACTION_MODE_SELECTION,
+    INTERACTION_MODE_ZOOM
     };
 
   // Description:
@@ -198,12 +200,21 @@ public:
   vtkGetMacro(LODResolution, double);
 
   // Description:
-  // This threshold is only applicable when in tile-display mode. It is the size
-  // of geometry in kilobytes beyond which the view should not deliver geometry
+  // This threshold is only applicable when in client-server mode. It is the size
+  // of geometry in megabytes beyond which the view should not deliver geometry
   // to the client, but only outlines.
   // @CallOnAllProcessess
-  vtkSetMacro(ClientOutlineThreshold, unsigned long);
-  vtkGetMacro(ClientOutlineThreshold, unsigned long);
+  vtkSetMacro(ClientOutlineThreshold, double);
+  vtkGetMacro(ClientOutlineThreshold, double);
+
+  // Description:
+  // Passes the compressor configuration to the client-server synchronizer, if
+  // any. This affects the image compression used to relay images back to the
+  // client.
+  // See vtkPVClientServerSynchronizedRenderers::ConfigureCompressor() for
+  // details.
+  // @CallOnAllProcessess
+  void ConfigureCompressor(const char* configuration);
 
   // Description:
   // Resets the clipping range. One does not need to call this directly ever. It
@@ -287,6 +298,25 @@ public:
   vtkBooleanMacro(UseOffscreenRendering, bool);
   vtkGetMacro(UseOffscreenRendering, bool);
 
+  // Description:
+  // Returns if remote-rendering is possible on the current group of processes.
+  vtkGetMacro(RemoteRenderingAvailable, bool);
+
+  // Description:
+  // Returns true if the most recent render used LOD.
+  vtkGetMacro(UsedLODForLastRender, bool);
+
+  // Description:
+  // Invalidates cached selection. Called explicitly when view proxy thinks the
+  // cache may have become obsolete.
+  // @CallOnAllProcessess
+  void InvalidateCachedSelection();
+
+  // Description:
+  // Returns the z-buffer value at the given location.
+  // @CallOnClientOnly
+  double GetZbufferDataAtPoint(int x, int y);
+
 public:
   //*****************************************************************
   // Methods merely exposing methods for internal objects.
@@ -311,6 +341,7 @@ public:
   //*****************************************************************
   // Forward to vtkPVGenericRenderWindowInteractor.
   void SetCenterOfRotation(double x, double y, double z);
+  void SetNonInteractiveRenderDelay(unsigned int seconds);
 
   //*****************************************************************
   // Forward to vtkLightKit.
@@ -362,8 +393,6 @@ public:
   void AddManipulator(vtkCameraManipulator* val);
   void RemoveAllManipulators();
 
-  vtkSetMacro(ForceRemoteRendering, bool);
-  vtkBooleanMacro(ForceRemoteRendering, bool);
 //BTX
 protected:
   vtkPVRenderView();
@@ -385,7 +414,7 @@ protected:
   // Description:
   // Synchronizes bounds information on all nodes.
   // @CallOnAllProcessess
-  void GatherBoundsInformation();
+  void GatherBoundsInformation(bool using_remote_rendering);
 
   // Description:
   // Returns true if distributed rendering should be used.
@@ -425,6 +454,11 @@ protected:
   // Updates CenterAxes's scale and position.
   void UpdateCenterAxes(double bounds[6]);
 
+  // Description
+  // Returns true if the local process is doing to do actual render or
+  // displaying an image in a viewport.
+  bool GetLocalProcessDoesRendering(bool using_distributed_rendering);
+
   vtkLight* Light;
   vtkLightKit* LightKit;
   vtkRenderViewBase* RenderView;
@@ -433,20 +467,22 @@ protected:
   vtkPVGenericRenderWindowInteractor* Interactor;
   vtkPVInteractorStyle* InteractorStyle;
   vtkInteractorStyleRubberBand3D* RubberBandStyle;
+  vtkInteractorStyleRubberBandZoom* RubberBandZoom;
   vtkPVCenterAxesActor* CenterAxes;
   vtkPVAxesWidget* OrientationWidget;
-  vtkPHardwareSelector* Selector;
+  vtkPVHardwareSelector* Selector;
   vtkSelection* LastSelection;
 
   int StillRenderImageReductionFactor;
   int InteractiveRenderImageReductionFactor;
   int InteractionMode;
 
-  unsigned long LocalGeometrySize;
-  unsigned long GeometrySize;
+  // In mega-bytes.
+  double LocalGeometrySize;
+  double GeometrySize;
   double RemoteRenderingThreshold;
   double LODRenderingThreshold;
-  unsigned long ClientOutlineThreshold;
+  double ClientOutlineThreshold;
   double LastComputedBounds[6];
   bool UseOffscreenRendering;
   bool UseOffscreenRenderingForScreenshots;
@@ -455,15 +491,20 @@ protected:
   double LODResolution;
   bool UseLightKit;
 
+  bool UsedLODForLastRender;
+
   vtkBSPCutsGenerator* OrderedCompositingBSPCutsSource;
 private:
   vtkPVRenderView(const vtkPVRenderView&); // Not implemented
   void operator=(const vtkPVRenderView&); // Not implemented
 
-  bool ForceRemoteRendering;
+  bool MakingSelection;
   void OnSelectionChangedEvent();
-  void FinishSelection();
   void FinishSelection(vtkSelection*);
+
+  // This flag is set to false when not all processes cannot render e.g. cannot
+  // open the DISPLAY etc.
+  bool RemoteRenderingAvailable;
 //ETX
 };
 

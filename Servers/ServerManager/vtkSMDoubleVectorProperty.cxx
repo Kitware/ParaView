@@ -14,6 +14,8 @@
 =========================================================================*/
 #include "vtkSMDoubleVectorProperty.h"
 
+#include "vtkPVConfig.h"
+
 #include "vtkClientServerStream.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
@@ -37,7 +39,7 @@ vtkSMDoubleVectorProperty::vtkSMDoubleVectorProperty()
 {
   this->Internals = new vtkInternals(this);
   this->ArgumentIsArray = 0;
-  this->Precision = 0;
+  this->Precision = DEFAULT_DOUBLE_PRECISION_VALUE;
 }
 
 //---------------------------------------------------------------------------

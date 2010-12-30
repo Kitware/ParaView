@@ -22,6 +22,8 @@
 #include "vtkAxis.h"
 #include "vtkPen.h"
 #include "vtkTextProperty.h"
+#include "vtkDoubleArray.h"
+#include "vtkStringArray.h"
 
 #include "vtkstd/string"
 #include "vtksys/ios/sstream"
@@ -50,6 +52,7 @@ public:
 };
 
 vtkStandardNewMacro(vtkPVXYChartView);
+
 //----------------------------------------------------------------------------
 vtkPVXYChartView::vtkPVXYChartView()
 {
@@ -60,7 +63,6 @@ vtkPVXYChartView::vtkPVXYChartView()
   // Use the buffer id - performance issues are fixed.
   this->ContextView->GetScene()->SetUseBufferId(true);
   this->ContextView->GetScene()->SetScaleTiles(false);
-
 }
 
 //----------------------------------------------------------------------------
@@ -319,6 +321,83 @@ void vtkPVXYChartView::SetAxisTitleColor(int index, double red,
     this->Chart->GetAxis(index)->GetTitleProperties()->SetColor(red, green,
                                                                 blue);
     }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVXYChartView::SetAxisLabelsNumber(int axis, int n)
+{
+  if (this->Chart && this->Chart->GetAxis(axis))
+    {
+    this->Chart->GetAxis(axis)->GetTickPositions()->SetNumberOfTuples(n);
+    this->Chart->GetAxis(axis)->GetTickLabels()->SetNumberOfTuples(0);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVXYChartView::SetAxisLabels(int axisIndex, int i, double value)
+{
+  if (this->Chart && this->Chart->GetAxis(axisIndex))
+    {
+    vtkAxis *axis = this->Chart->GetAxis(axisIndex);
+    axis->GetTickPositions()->SetTuple1(i, value);
+    if (i == 0)
+      {
+      axis->SetMinimum(value);
+      }
+    else if (i == axis->GetTickPositions()->GetNumberOfTuples() - 1)
+      {
+      axis->SetMaximum(value);
+      this->Chart->RecalculateBounds();
+      }
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVXYChartView::SetAxisLabelsLeftNumber(int n)
+{
+  this->SetAxisLabelsNumber(vtkAxis::LEFT, n);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVXYChartView::SetAxisLabelsLeft(int i, double value)
+{
+  this->SetAxisLabels(vtkAxis::LEFT, i, value);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVXYChartView::SetAxisLabelsBottomNumber(int n)
+{
+  this->SetAxisLabelsNumber(vtkAxis::BOTTOM, n);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVXYChartView::SetAxisLabelsBottom(int i, double value)
+{
+  this->SetAxisLabels(vtkAxis::BOTTOM, i, value);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVXYChartView::SetAxisLabelsRightNumber(int n)
+{
+  this->SetAxisLabelsNumber(vtkAxis::RIGHT, n);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVXYChartView::SetAxisLabelsRight(int i, double value)
+{
+  this->SetAxisLabels(vtkAxis::RIGHT, i, value);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVXYChartView::SetAxisLabelsTopNumber(int n)
+{
+  this->SetAxisLabelsNumber(vtkAxis::TOP, n);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVXYChartView::SetAxisLabelsTop(int i, double value)
+{
+  this->SetAxisLabels(vtkAxis::TOP, i, value);
 }
 
 //----------------------------------------------------------------------------

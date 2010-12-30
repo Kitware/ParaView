@@ -19,7 +19,9 @@
 #cmakedefine PARAVIEW_LINK_XDMF
 #cmakedefine PARAVIEW_USE_ICE_T
 #cmakedefine PARAVIEW_USE_SYSTEM_HDF5
-#cmakedefine PARAVIEW_USE_SILO
+#cmakedefine PARAVIEW_USE_VISITBRIDGE
+#cmakedefine VISITBRIDGE_USE_SILO
+#cmakedefine VISITBRIDGE_USE_CGNS
 #cmakedefine XDMF_SYSTEM_HDF5
 #cmakedefine PARAVIEW_BUILD_DEVELOPMENT
 #cmakedefine PARAVIEW_BLT_LIBRARY
@@ -74,5 +76,9 @@
 #cmakedefine PARAVIEW_OGGTHEORA_USE_SUBSAMPLING
 
 #cmakedefine BUILD_SHARED_LIBS
+
+// The default prevision value for conversion for string to double
+// and double to string
+#define DEFAULT_DOUBLE_PRECISION_VALUE 16
 
 #endif

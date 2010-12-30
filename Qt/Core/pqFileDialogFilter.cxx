@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QIcon>
 #include <QFileIconProvider>
+#include <QStringBuilder>
 
 #include "pqFileDialogModel.h"
 
@@ -42,19 +43,82 @@ pqFileDialogFilter::pqFileDialogFilter(pqFileDialogModel* model, QObject* Parent
   : QSortFilterProxyModel(Parent), Model(model), showHidden(false)
 {
   this->setSourceModel(model);
+  this->Wildcards.setPatternSyntax(QRegExp::RegExp2);
+  this->Wildcards.setCaseSensitivity(Qt::CaseSensitive);
 }
 
 pqFileDialogFilter::~pqFileDialogFilter()
 {
 }
 
-void pqFileDialogFilter::setFilter(const QStringList& wildcards)
+#include <stdio.h>
+
+void pqFileDialogFilter::setFilter(const QString& filter)
 {
-  Wildcards.clear();
-  foreach(QString p, wildcards)
+  QString f(filter);
+  // if we have (...) in our filter, strip everything out but the contents of ()
+  int start, end;
+  end = filter.lastIndexOf(')');
+  //we need to from the backwards incase the name of the filter is:
+  // File Type (polydata) (*.ft)
+  start = filter.lastIndexOf('(',end);
+  if(start != -1 && end != -1)
     {
-    Wildcards.append(QRegExp(p, Qt::CaseInsensitive, QRegExp::Wildcard));
+    f = f.mid(start+1, end-start-1);
     }
+  // Now 'f' is going to be string like "*.ext1 *.ext2" or "spct* *pattern*"
+  // etc. The following code converts it to a regular expression.
+  QString pattern = ".*";
+  if ( f != "*" )
+    {
+    f = f.trimmed();
+
+    //convert all spaces into |
+    f.replace(QRegExp("[\\s+;]+"),"|");
+
+    QStringList strings = f.split("|");
+    QStringList extensions_list, filepatterns_list;
+    foreach (QString string, strings)
+      {
+      if (string.startsWith("*."))
+        {
+        extensions_list.push_back(string.remove(0, 2));
+        }
+      else
+        {
+        filepatterns_list.push_back(string);
+        }
+      }
+
+    QString extensions = extensions_list.join("|");
+    QString filepatterns = filepatterns_list.join("|");
+
+    extensions.replace(".","\\.");
+    extensions.replace("*", ".*");
+
+    filepatterns.replace(".","\\.");
+    filepatterns.replace("*", ".*");
+
+    //use non capturing(?:) for speed
+    //name.ext or ext.001 or .ext-s01.3.0 (for bug #10101)
+    QString postExtFileSeries("((\\.|-s)\\d+)*$"); // match the .0001 component
+    QString extGroup = ".*\\.(?:" % extensions % ")" % postExtFileSeries;
+    QString fileGroup = "(?:" % filepatterns % ")" % postExtFileSeries;
+    if (extensions_list.size() > 0 && filepatterns_list.size() > 0)
+      {
+      pattern = "(?:" % fileGroup % "|" % extGroup % ")";
+      }
+    else if (extensions_list.size() > 0)
+      {
+      pattern = extGroup;
+      }
+    else
+      {
+      pattern = fileGroup;
+      }
+    }
+
+  this->Wildcards.setPattern(pattern);
   this->invalidateFilter();
 }
 
@@ -82,30 +146,9 @@ bool pqFileDialogFilter::filterAcceptsRow(int row_source, const QModelIndex& sou
     {
     return true;
     }
+
   QString str = this->sourceModel()->data(idx).toString();
-
-  // To fix bug #0008159, grouped files MUST undergo the for-loop below
-  // to check if the extension part really matches the wildcards / filters.
-  bool pass = false;
-
-  // The following if-statement is intended to support the visibility
-  // of grouped 'spcth' files in the file dialog. 'str' is updated below
-  // with the full name of the first 'spcth' file (for a group of 'spcth'
-  // files with digits-based extensions, the FIRST one MUST have '.0'
-  // as the extension) such that 'pass' can be updated with 'true' via
-  // the for-loop. This if-statement is added to fix bug #0008493.
-  if ( this->sourceModel()->hasChildren(idx) == true )
-    {
-    QStringList strList = this->Model->getFilePaths(idx);
-    str = strList.at(0);
-    }
-
-  int i, end = this->Wildcards.size();
-  for ( i = 0; i < end && pass == false; i ++ )
-    {
-    pass = this->Wildcards[i].exactMatch(str);
-    }
-
+  bool pass = this->Wildcards.exactMatch(str);
   return pass;
 }
 

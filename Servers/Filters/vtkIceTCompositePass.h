@@ -41,6 +41,8 @@ class vtkPixelBufferObject;
 class vtkTextureObject;
 class vtkShaderProgram2;
 class vtkOpenGLRenderWindow;
+class vtkUnsignedCharArray;
+class vtkFloatArray;
 
 class VTK_EXPORT vtkIceTCompositePass : public vtkRenderPass
 {
@@ -133,7 +135,7 @@ public:
   vtkSetMacro(DepthOnly,bool);
 
   // Description:
-  // Ice-T does not deal well with the background, by setting FixBackground to
+  // IceT does not deal well with the background, by setting FixBackground to
   // true, the pass will take care of displaying the correct background at the
   // price of some copy operations.
   // Initial value is false.
@@ -145,6 +147,16 @@ public:
   // Returns the last rendered tile from this process, if any.
   // Image is invalid if tile is not available on the current process.
   void GetLastRenderedTile(vtkSynchronizedRenderers::vtkRawImage& tile);
+
+  // Description:
+  // Obtains the composited depth-buffer from IceT and pushes it to the screen.
+  // This is only done when DepthOnly is true.
+  void PushIceTDepthBufferToScreen(const vtkRenderState* render_state);
+
+  // Description:
+  // Obtains the composited color-buffer from IceT and pushes it to the screen.
+  // This is only done when FixBackground is true.
+  void PushIceTColorBufferToScreen(const vtkRenderState* render_state);
 
   // Description:
   // PhysicalViewport is the viewport in the current render-window where the
@@ -174,16 +186,6 @@ protected:
   // Updates the IceT tile information during each render.
   void UpdateTileInformation(const vtkRenderState*);
 
-  // Description:
-  // Obtains the composited depth-buffer from IceT and pushes it to the screen.
-  // This is only done when DepthOnly is true.
-  void PushIceTDepthBufferToScreen(const vtkRenderState* render_state);
-
-  // Description:
-  // Obtains the composited color-buffer from IceT and pushes it to the screen.
-  // This is only done when FixBackground is true.
-  void PushIceTColorBufferToScreen(const vtkRenderState* render_state);
-
   vtkMultiProcessController *Controller;
   vtkPKdTree *KdTree;
   vtkRenderPass* RenderPass;
@@ -201,6 +203,9 @@ protected:
   double PhysicalViewport[4];
 
   int ImageReductionFactor;
+
+  vtkSynchronizedRenderers::vtkRawImage* LastRenderedRGBAColors;
+  vtkFloatArray *LastRenderedDepths;
 
   vtkPixelBufferObject *PBO;
   vtkTextureObject *ZTexture;

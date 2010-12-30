@@ -90,12 +90,11 @@ void vtkSMXMLPVAnimationWriterProxy::CreateVTKObjects()
 //-----------------------------------------------------------------------------
 void vtkSMXMLPVAnimationWriterProxy::AddInput(unsigned int,
                                               vtkSMSourceProxy* input,
-                                              unsigned int outputPort,
+                                              unsigned int vtkNotUsed(outputPort),
                                               const char* method)
 {
 
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  int numPartitions = pm->GetNumberOfPartitions(this->ConnectionID);
   vtkClientServerStream stream;
  
   this->CreateVTKObjects();
@@ -103,39 +102,9 @@ void vtkSMXMLPVAnimationWriterProxy::AddInput(unsigned int,
   // Assign unique group name for each source.
   vtksys_ios::ostringstream groupname_str;
   groupname_str << "source" << input->GetSelfIDAsString() << ends;
-
-  // when numPartitions > 1, for the vtkXMLPVAnimationWriter to treat the
-  // different parts as multiple parts of the same input, we
-  // have to specify the same group name.
-  if (numPartitions > 1)
-    {
-    vtkClientServerID ca_id = pm->NewStreamObject("vtkCompleteArrays", stream);
-    this->Internals->IDs.push_back(ca_id);
-
-    stream << vtkClientServerStream::Invoke
-           << input->GetID() << "GetOutputPort" << outputPort
-           << vtkClientServerStream::End;
-    stream << vtkClientServerStream::Invoke
-           << ca_id << "SetInputConnection" 
-           << vtkClientServerStream::LastResult
-           << vtkClientServerStream::End;
-    
-    stream << vtkClientServerStream::Invoke
-           << ca_id << "GetOutputPort"
-           << vtkClientServerStream::End;
-    stream << vtkClientServerStream::Invoke
-           << this->GetID() << method << vtkClientServerStream::LastResult
-           << groupname_str.str().c_str() << vtkClientServerStream::End;
-    }
-  else
-    {
-    stream << vtkClientServerStream::Invoke
-           << input->GetID() << "GetOutputPort" << outputPort 
-           << vtkClientServerStream::End;
-    stream << vtkClientServerStream::Invoke
-           << this->GetID() << method << vtkClientServerStream::LastResult
-           << groupname_str.str().c_str() << vtkClientServerStream::End;
-    }
+  stream << vtkClientServerStream::Invoke
+    << this->GetID() << method << input->GetID()
+    << groupname_str.str().c_str() << vtkClientServerStream::End;
   pm->SendStream(this->ConnectionID, this->Servers, stream);
 }
 

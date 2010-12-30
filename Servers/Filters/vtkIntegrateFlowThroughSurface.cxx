@@ -127,8 +127,11 @@ int vtkIntegrateFlowThroughSurface::RequestData(
       if (ds)
         {
         vtkDataSet* intermData = this->GenerateSurfaceVectors(ds);
-        hds->SetBlock(hds->GetNumberOfBlocks(), intermData);
-        intermData->Delete();
+        if (intermData)
+          {
+          hds->SetBlock(hds->GetNumberOfBlocks(), intermData);
+          intermData->Delete();
+          }
         }
       iter->GoToNextItem();
       }

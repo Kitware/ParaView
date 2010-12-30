@@ -14,12 +14,16 @@
 =========================================================================*/
 #include "vtkPVDataRepresentation.h"
 
+#include "vtkAlgorithmOutput.h"
 #include "vtkCommand.h"
+#include "vtkCompositeDataPipeline.h"
+#include "vtkDataObject.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVDataRepresentationPipeline.h"
+#include "vtkPVTrivialProducer.h"
 #include "vtkPVView.h"
 
 #include <assert.h>
@@ -117,18 +121,23 @@ int vtkPVDataRepresentation::RequestUpdateExtent(vtkInformation* request,
   // REQUEST_UPDATE(), include view-time.
   vtkMultiProcessController* controller =
     vtkMultiProcessController::GetGlobalController();
-  if (controller && inputVector[0]->GetNumberOfInformationObjects() == 1)
+  for (int cc=0; cc < this->GetNumberOfInputPorts() && controller != NULL; cc++)
     {
-    vtkStreamingDemandDrivenPipeline* sddp =
-      vtkStreamingDemandDrivenPipeline::SafeDownCast(this->GetExecutive());
-    sddp->SetUpdateExtent(inputVector[0]->GetInformationObject(0),
-      controller->GetLocalProcessId(),
-      controller->GetNumberOfProcesses(), 0);
-    if (this->UpdateTimeValid)
+    for (int kk=0; kk < inputVector[cc]->GetNumberOfInformationObjects(); kk++)
       {
-      sddp->SetUpdateTimeSteps(
-        inputVector[0]->GetInformationObject(0),
-        &this->UpdateTime, 1);
+      vtkStreamingDemandDrivenPipeline* sddp =
+        vtkStreamingDemandDrivenPipeline::SafeDownCast(this->GetExecutive());
+      sddp->SetUpdateExtent(inputVector[cc]->GetInformationObject(kk),
+        controller->GetLocalProcessId(),
+        controller->GetNumberOfProcesses(), /*ghost-levels*/ 0);
+      inputVector[cc]->GetInformationObject(kk)->Set(
+        vtkStreamingDemandDrivenPipeline::EXACT_EXTENT(), 1);
+      if (this->UpdateTimeValid)
+        {
+        sddp->SetUpdateTimeSteps(
+          inputVector[cc]->GetInformationObject(kk),
+          &this->UpdateTime, 1);
+        }
       }
     }
 
@@ -144,6 +153,31 @@ bool vtkPVDataRepresentation::GetUsingCacheForUpdate()
     }
 
   return false;
+}
+
+//----------------------------------------------------------------------------
+vtkAlgorithmOutput* vtkPVDataRepresentation::GetInternalOutputPort(int port,
+                                                                   int conn)
+{
+  vtkAlgorithmOutput* prevOutput = this->Superclass::GetInternalOutputPort(
+    port, conn);
+  if (prevOutput->GetProducer()->IsA("vtkPVTrivialProducer"))
+    {
+    return prevOutput;
+    }
+
+  vtkDataObject* dobj = prevOutput->GetProducer()->GetOutputDataObject(0);
+
+  vtkPVTrivialProducer* tprod = vtkPVTrivialProducer::New();
+  vtkCompositeDataPipeline* exec = vtkCompositeDataPipeline::New();
+  tprod->SetExecutive(exec);
+  vtkInformation* portInfo = tprod->GetOutputPortInformation(0);
+  portInfo->Set(vtkDataObject::DATA_TYPE_NAME(), dobj->GetClassName());
+  exec->UnRegister(0);
+  tprod->SetOutput(dobj);
+  tprod->UnRegister(0);
+
+  return dobj->GetProducerPort();
 }
 
 //----------------------------------------------------------------------------

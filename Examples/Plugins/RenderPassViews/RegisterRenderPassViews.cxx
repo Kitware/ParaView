@@ -41,7 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace
 {
   /// interface class for plugins that create view modules
-  class PQCORE_EXPORT RenderPassViewsInterface : public pqStandardViewModules
+  class VTK_EXPORT RenderPassViewsInterface : public pqStandardViewModules
   {
 public:
   RenderPassViewsInterface(QObject* o) : pqStandardViewModules(o) { }

@@ -68,6 +68,11 @@ extern "C" void vtkPVFiltersCS_Initialize(vtkClientServerInterpreter*);
 extern "C" void vtkPVServerManager_Initialize(vtkClientServerInterpreter*);
 extern "C" void vtkXdmfCS_Initialize(vtkClientServerInterpreter *);
 
+#ifdef PARAVIEW_USE_VISITBRIDGE
+extern "C" void vtkVisItAVTAlgorithmsCS_Initialize(vtkClientServerInterpreter *);
+extern "C" void vtkVisItDatabasesCS_Initialize(vtkClientServerInterpreter *);
+#endif
+
 //----------------------------------------------------------------------------
 void vtkInitializationHelper::Initialize(const char* executable, int type)
 {
@@ -192,5 +197,11 @@ void vtkInitializationHelperInit(vtkClientServerInterpreter* interp)
   vtkPVFiltersCS_Initialize(interp);
   vtkXdmfCS_Initialize(interp);
   vtkPVServerManager_Initialize(interp);
+
+# ifdef PARAVIEW_USE_VISITBRIDGE
+  vtkVisItAVTAlgorithmsCS_Initialize(pm->GetInterpreter());
+  vtkVisItDatabasesCS_Initialize(pm->GetInterpreter());
+# endif
 #endif
+
 }

@@ -1467,6 +1467,7 @@ vtkAMRDualClip::DoRequestData(vtkHierarchicalBoxDataSet* hbdsInput,
   vtkMultiPieceDataSet *mpds=vtkMultiPieceDataSet::New();
   mbdsOutput0->SetBlock(0,mpds);
 
+  int myProcessId = this->Controller->GetLocalProcessId(); // Just for debugging.
   mpds->SetNumberOfPieces(0);
 
   if(this->Helper)
@@ -2244,6 +2245,7 @@ void vtkAMRDualClip::DistributeLevelMasks()
     for (blockId = 0; blockId < numBlocks; ++blockId)
       {
       block = this->Helper->GetBlock(level, blockId);
+
       // Any blocks sending to this block from lower levels?
       // Lets look by region.
       for (int rz = -1; rz < 2; ++rz)
@@ -2536,4 +2538,3 @@ void vtkAMRDualClip::AddGlyph(double x, double y, double z)
     }
 }
 */
-

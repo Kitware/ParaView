@@ -26,6 +26,8 @@
 #ifndef __vtkMaterialInterfacePieceTransaction_h
 #define __vtkMaterialInterfacePieceTransaction_h
 
+#include "vtkSystemIncludes.h"
+
 #include "vtksys/ios/iostream"
 
 class vtkMaterialInterfacePieceTransaction

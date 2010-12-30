@@ -17,7 +17,7 @@
       <IntVectorProperty name="Visibility"
         command="SetVisibility"
         number_of_elements="1"
-        default_values="1">
+        default_values="0">
         <BooleanDomain name="bool" />
       </IntVectorProperty>
 
@@ -287,11 +287,76 @@
     </PrismCubeAxesRepresentationProxy>
  </ProxyGroup>
  <ProxyGroup name="filters">
+    <SourceProxy name="PrismTableToPolyData"
+                class="vtkPrismTableToPolyData"
+                label="Prism:Table To Points" >
+      <Documentation short_help="Converts table to set of points."
+        long_help="Converts table to set of points." >
+        The TableToPolyData filter converts a vtkTable to points in a
+        vtkPolyData. One must specifies the columns in the input table to use as
+        the X, Y and Z coordinates for the points in the output.One must also spcify the column in the input table to use as the GobalElementId array.
+      </Documentation>
+      <InputProperty name="Input"
+         command="SetInputConnection">
+            <ProxyGroupDomain name="groups">
+              <Group name="sources"/>
+              <Group name="filters"/>
+            </ProxyGroupDomain>
+            <InputArrayDomain name="input_array"
+              attribute_type="row"
+              number_of_components="1" />
+            <DataTypeDomain name="input_type">
+              <DataType value="vtkTable"/>
+            </DataTypeDomain>
+            <Documentation>
+              This property specifies the input..
+            </Documentation>
+      </InputProperty>
+
+      <StringVectorProperty name="XColumn"
+        command="SetXColumn"
+        number_of_elements="1">
+          <ArrayListDomain name="array_list">
+            <RequiredProperties>
+              <Property name="Input" function="Input"/>
+            </RequiredProperties>
+          </ArrayListDomain>
+      </StringVectorProperty>
+      <StringVectorProperty name="YColumn"
+        command="SetYColumn"
+        number_of_elements="1">
+          <ArrayListDomain name="array_list" >
+            <RequiredProperties>
+              <Property name="Input" function="Input"/>
+            </RequiredProperties>
+          </ArrayListDomain>
+      </StringVectorProperty>
+      <StringVectorProperty name="ZColumn"
+        command="SetZColumn"
+        number_of_elements="1">
+          <ArrayListDomain name="array_list" >
+            <RequiredProperties>
+              <Property name="Input" function="Input"/>
+            </RequiredProperties>
+          </ArrayListDomain>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="GobalElementIdColumn"
+        command="SetGobalElementIdColumn"
+        number_of_elements="1">
+          <ArrayListDomain name="array_list" >
+            <RequiredProperties>
+              <Property name="Input" function="Input"/>
+            </RequiredProperties>
+          </ArrayListDomain>
+      </StringVectorProperty>
+    </SourceProxy>
    <SourceProxy name="PrismFilter"
                 class="vtkPrismFilter">
      <OutputPort name="SESAME Surface" index="0" />
-     <OutputPort name="SESAME Contours" index="1" />
-     <OutputPort name="Simulation Data" index="2" />
+     <OutputPort name="SESAME Curve" index="1" />
+     <OutputPort name="SESAME Contours" index="2" />
+     <OutputPort name="Simulation Data" index="3" />
      <StringVectorProperty
         name="FileName"
         command="SetFileName"
@@ -323,27 +388,22 @@
      <InputProperty
         name="Input"
         command="SetInputConnection">
-           <ProxyGroupDomain name="groups">
-             <Group name="sources"/>
-             <Group name="filters"/>
-           </ProxyGroupDomain>
            <DataTypeDomain name="input_type" composite_data_supported="1">
             <DataType value="vtkDataSet"/>
             <DataType value="vtkCompositeDataSet"/>
            </DataTypeDomain>
-           <InputArrayDomain name="input_array" attribute_type="cell"/>
+           <InputArrayDomain name="input_array"/>
       </InputProperty>
      <IntVectorProperty
         name="TableConversion"
         command="SetTable"
         number_of_elements="1"
         default_values="0" >
-       <EnumerationDomain name="enum">
-         <Entry value="0" text="None"/>
-         <Entry value="602" text="602: Electrical Conductivity"/>
-         <Entry value="301" text="301: Total EOS"/>
-         <Entry value="304" text="304: Electron EOS"/>
-       </EnumerationDomain>
+         <EnumerationDomain name="enum">
+           <RequiredProperties>
+             <Property name="TableIds" function="Enumeration"/>
+          </RequiredProperties>
+         </EnumerationDomain>
      </IntVectorProperty>
 
       <DoubleVectorProperty name="RangesInfo"
@@ -524,6 +584,30 @@
                         default_values="0">
        <BooleanDomain name="bool"/>
      </IntVectorProperty>
+     <IntVectorProperty name="SESAMEShowCold"
+                        command="SetShowCold"
+                        number_of_elements="1"
+                        default_values="0">
+       <BooleanDomain name="bool"/>
+     </IntVectorProperty>
+     <IntVectorProperty name="SESAMEShowVaporization"
+                        command="SetShowVaporization"
+                        number_of_elements="1"
+                        default_values="0">
+       <BooleanDomain name="bool"/>
+     </IntVectorProperty>
+     <IntVectorProperty name="SESAMEShowSolidMelt"
+                        command="SetShowSolidMelt"
+                        number_of_elements="1"
+                        default_values="0">
+       <BooleanDomain name="bool"/>
+     </IntVectorProperty>
+     <IntVectorProperty name="SESAMEShowLiquidMelt"
+                        command="SetShowLiquidMelt"
+                        number_of_elements="1"
+                        default_values="0">
+       <BooleanDomain name="bool"/>
+     </IntVectorProperty>
 
      <DoubleVectorProperty
         name="SESAMEVariableConversionValues"
@@ -675,7 +759,8 @@
    <SourceProxy name="PrismSurfaceReader"
                 class="vtkPrismSurfaceReader">
      <OutputPort name="SESAME Surface" index="0" />
-     <OutputPort name="SESAME Contours" index="1" />
+     <OutputPort name="SESAME Curves" index="1" />
+     <OutputPort name="SESAME Contours" index="2" />
      <StringVectorProperty
         name="FileName"
         command="SetFileName"
@@ -812,6 +897,30 @@
      </IntVectorProperty>
      <IntVectorProperty name="ZLogScaling"
                         command="SetZLogScaling"
+                        number_of_elements="1"
+                        default_values="0">
+       <BooleanDomain name="bool"/>
+     </IntVectorProperty>
+     <IntVectorProperty name="ShowCold"
+                        command="SetShowCold"
+                        number_of_elements="1"
+                        default_values="0">
+       <BooleanDomain name="bool"/>
+     </IntVectorProperty>
+     <IntVectorProperty name="ShowVaporization"
+                        command="SetShowVaporization"
+                        number_of_elements="1"
+                        default_values="0">
+       <BooleanDomain name="bool"/>
+     </IntVectorProperty>
+     <IntVectorProperty name="ShowSolidMelt"
+                        command="SetShowSolidMelt"
+                        number_of_elements="1"
+                        default_values="0">
+       <BooleanDomain name="bool"/>
+     </IntVectorProperty>
+     <IntVectorProperty name="ShowLiquidMelt"
+                        command="SetShowLiquidMelt"
                         number_of_elements="1"
                         default_values="0">
        <BooleanDomain name="bool"/>
@@ -1048,6 +1157,30 @@
      </IntVectorProperty>
      <IntVectorProperty name="SESAMEZLogScaling"
                         command="SetSESAMEZLogScaling"
+                        number_of_elements="1"
+                        default_values="0">
+       <BooleanDomain name="bool"/>
+     </IntVectorProperty>
+     <IntVectorProperty name="SESAMEShowCold"
+                        command="SetShowCold"
+                        number_of_elements="1"
+                        default_values="0">
+       <BooleanDomain name="bool"/>
+     </IntVectorProperty>
+     <IntVectorProperty name="SESAMEShowVaporization"
+                        command="SetShowVaporization"
+                        number_of_elements="1"
+                        default_values="0">
+       <BooleanDomain name="bool"/>
+     </IntVectorProperty>
+     <IntVectorProperty name="SESAMEShowSolidMelt"
+                        command="SetShowSolidMelt"
+                        number_of_elements="1"
+                        default_values="0">
+       <BooleanDomain name="bool"/>
+     </IntVectorProperty>
+     <IntVectorProperty name="SESAMEShowLiquidMelt"
+                        command="SetShowLiquidMelt"
                         number_of_elements="1"
                         default_values="0">
        <BooleanDomain name="bool"/>
@@ -1321,6 +1454,30 @@
      </IntVectorProperty>
      <IntVectorProperty name="ZLogScaling"
                         command="SetZLogScaling"
+                        number_of_elements="1"
+                        default_values="0">
+       <BooleanDomain name="bool"/>
+     </IntVectorProperty>
+     <IntVectorProperty name="ShowCold"
+                        command="SetShowCold"
+                        number_of_elements="1"
+                        default_values="0">
+       <BooleanDomain name="bool"/>
+     </IntVectorProperty>
+     <IntVectorProperty name="ShowVaporization"
+                        command="SetShowVaporization"
+                        number_of_elements="1"
+                        default_values="0">
+       <BooleanDomain name="bool"/>
+     </IntVectorProperty>
+     <IntVectorProperty name="ShowSolidMelt"
+                        command="SetShowSolidMelt"
+                        number_of_elements="1"
+                        default_values="0">
+       <BooleanDomain name="bool"/>
+     </IntVectorProperty>
+     <IntVectorProperty name="ShowLiquidMelt"
+                        command="SetShowLiquidMelt"
                         number_of_elements="1"
                         default_values="0">
        <BooleanDomain name="bool"/>

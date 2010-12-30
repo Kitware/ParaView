@@ -1,12 +1,10 @@
 IF(PARAVIEW_BUILD_QT_GUI)
-  SUBDIRS(
-    ParticlesViewer
-    Spreadsheet
-    Demo0
-    Demo1
-    Clone1
-    Clone2
-    )
+  ADD_SUBDIRECTORY(ParticlesViewer)
+  ADD_SUBDIRECTORY(Spreadsheet)
+  ADD_SUBDIRECTORY(Demo0)
+  ADD_SUBDIRECTORY(Demo1)
+  ADD_SUBDIRECTORY(Clone1)
+  ADD_SUBDIRECTORY(Clone2)
 ENDIF(PARAVIEW_BUILD_QT_GUI)
 
 

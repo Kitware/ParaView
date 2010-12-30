@@ -1,5 +1,3 @@
-include(FindAdios.cmake)
-
 #--------------------------------------------------
 # Find and Use ParaView
 #--------------------------------------------------
@@ -15,8 +13,27 @@ ELSE (ParaView_SOURCE_DIR)
   INCLUDE(${PARAVIEW_USE_FILE})
 ENDIF (ParaView_SOURCE_DIR)
 
-INCLUDE(${QT_USE_FILE})
+IF(PARAVIEW_BUILD_QT_GUI)
+  INCLUDE(${QT_USE_FILE})
+ENDIF(PARAVIEW_BUILD_QT_GUI)
 
+#--------------------------------------------------
+if(WIN32)
+  # Adios is not made for windows, so just build client only plugins
+  ADD_PARAVIEW_PLUGIN(AdiosReaderPlugin "1.0"
+      SERVER_MANAGER_XML vtkAdiosReader.xml
+      GUI_RESOURCE_FILES vtkAdiosReaderGUI.xml)
+
+  ADD_PARAVIEW_PLUGIN(AdiosReaderPluginMPI "1.0"
+      SERVER_MANAGER_XML vtkAdiosReader.xml
+      GUI_RESOURCE_FILES vtkAdiosReaderGUI.xml)
+else(WIN32)
+  include(FindAdios.cmake)
+endif(WIN32)
+
+#--------------------------------------------------
+# Real plugin management
+#--------------------------------------------------
 IF(ADIOS_INCLUDE_PATH)
 
   INCLUDE_DIRECTORIES(

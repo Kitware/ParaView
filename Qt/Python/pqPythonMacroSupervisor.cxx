@@ -232,6 +232,11 @@ void pqPythonMacroSupervisor::removeStoredMacro(const QString& filename)
 
 
 }
+//----------------------------------------------------------------------------
+void pqPythonMacroSupervisor::updateMacroList()
+{
+  this->resetActions();
+}
 
 //----------------------------------------------------------------------------
 void pqPythonMacroSupervisor::resetActions()

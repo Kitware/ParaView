@@ -10,8 +10,9 @@ if [ "x$InstallPrefix" = "x" ]; then
 fi
 
 ParaViewBinaryDir="@ParaView_BINARY_DIR@"
+ParaViewExeOutputDir="@EXECUTABLE_OUTPUT_PATH@"
 ParaViewExeName="@PV_EXE_NAME@"
-ParaView_App="@EXECUTABLE_OUTPUT_PATH@/$ParaViewExeName.app"
+ParaView_App="$ParaViewExeOutputDir/$ParaViewExeName.app"
 
 # Remove the previous app package so we start with a clean bundle
 #
@@ -49,54 +50,39 @@ SupportDir="$ParaView_App/Contents/Support"
 mkdir -p "$FrameworksDir"
 mkdir -p "$LibrariesDir"
 mkdir -p "$PluginsDir"
+mkdir -p "$PluginsDir/sqldrivers"
 mkdir -p "$PythonDir"
 mkdir -p "$SupportDir"
 
-
-# Copy the documentation into the Support directory
-# Documentation is no longer distributed as such.
-#echo "Copy documentation"
-#cp -Rp "${ParaViewBinaryDir}/Documentation" "$SupportDir/"
-#cp -p "${ParaViewBinaryDir}/pqClient.adp"  "$SupportDir/."
-
 # Copy the ".plugins" configuration file.
-echo "Copying $ParaViewBinaryDir/bin/.plugins to $SupportDir"
-cp -p "$ParaViewBinaryDir/bin/.plugins" "$SupportDir/"
+echo "Copying $ParaViewExeOutputDir/.plugins to $SupportDir"
+cp -p "$ParaViewExeOutputDir/.plugins" "$SupportDir/"
 
 # Copy the python scripts into the Python directory
 #
 echo "Copy python scripts"
 cp -Rp "${ParaViewBinaryDir}/Utilities/VTKPythonWrapping/site-packages/paraview" "$PythonDir/"
 
+pushd "$ParaViewExeOutputDir"
+cp -p *Python.so "$LibrariesDir/"
+popd
+
 # Create an empty qt.conf so that we don't try to load Qt plugins.
 touch "$ParaView_App/Contents/Resources/qt.conf"
 
-# Assistant is no longer needed.
-## Copy the Qt Assistant application into the Support directory
-##
-#echo "Embed copy of the QtAssistant in bundle"
-#cp -RpL "@QT_ASSISTANT_DOTAPP_BUNDLE@" "$SupportDir/"
-#
-## Create an empty qt.conf file in the Assistant_adp app package
-## to stop plugin loading by Assistant.
-##
-#touch "$SupportDir/@QT_ASSISTANT_DOTAPP_BUNDLE_NAME@/Contents/Resources/qt.conf"
-#
-## Create symlinks so that the Assistant.app bundle can use the same
-## copy of Qt Frameworks/Libraries as the paraview executable, yet still
-## refer to them via a string like "@executable_path/../Frameworks"...
-##
-#pushd "$SupportDir/@QT_ASSISTANT_DOTAPP_BUNDLE_NAME@/Contents"
-#ln -s "../../../Libraries" "Libraries"
-#ln -s "../../../Frameworks" "Frameworks"
-#popd
+# Copy in the Plugins
+packaged_plugin_names="@distributed_plugins@"
+IFS="\;"
+for plugin in $packaged_plugin_names; do
+  echo "Copying lib${plugin}.dylib into $PluginsDir/"
+  cp -p "@EXECUTABLE_OUTPUT_PATH@/lib${plugin}.dylib" $PluginsDir/
+done
+
+# Copy sqlite qt plugin
+cp -p "@QT_PLUGINS_DIR@/sqldrivers/libqsqlite.dylib" $PluginsDir/sqldrivers/
 
 
 # Remove unneeded build-byproduct files that were copied by the
 # above recursive directory copies:
 #
 rm -rf "$PythonDir/paraview/pv_compile_complete"
-#rm -rf "$SupportDir/Documentation/CMakeFiles"
-#rm -rf "$SupportDir/Documentation/cmake_install.cmake"
-#rm -rf "$SupportDir/Documentation/CTestTestfile.cmake"
-#rm -rf "$SupportDir/Documentation/Makefile"

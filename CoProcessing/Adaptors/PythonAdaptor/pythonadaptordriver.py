@@ -23,14 +23,14 @@ endtime = 1.
 timestep = (endtime-starttime)/numtimesteps
 
 # importing the coprocessing libraries needed for the adaptor
-import libvtkCoProcessorPython # on windows do import vtkCoProcessorPython
+import vtkCoProcessorPython
 
 # this is the actual coprocessing script created from the ParaView plugin
 import cp_pythonadaptorscript
 
 for step in range(numtimesteps):
     currenttime = step*timestep
-    datadescription = libvtkCoProcessorPython.vtkCPDataDescription()
+    datadescription = vtkCoProcessorPython.vtkCPDataDescription()
     datadescription.SetTimeData(currenttime, step)
     datadescription.AddInput("input")
 

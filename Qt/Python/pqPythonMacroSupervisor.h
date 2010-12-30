@@ -111,6 +111,10 @@ public slots:
   // the macro from pqSettings, you must call removeStoredMacro yourself.
   void removeMacro(const QString& filename);
 
+  // Description:
+  // Update Macro list widgets and actions...
+  void updateMacroList();
+
 protected slots:
 
   // Description:
@@ -137,7 +141,7 @@ protected:
   void addWidgetForMacros(QWidget* widget, int actionType); // 0:run, 1:edit, 2:delete
 
   // Description:
-  // Removes all actions and re-adds actions for each macro stored in pqSettings.
+  // Removes all actions and re-adds actions for each macro stored.
   void resetActions();
 
 private:

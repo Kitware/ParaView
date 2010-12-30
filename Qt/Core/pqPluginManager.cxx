@@ -156,6 +156,9 @@ pqPluginManager::pqPluginManager(QObject* p)
   QObject::connect(pqApplicationCore::instance()->getServerManagerModel(), 
     SIGNAL(serverRemoved(pqServer*)),
     this, SLOT(onServerDisconnected(pqServer*)));
+
+  QObject::connect(this,SIGNAL(pluginLoaded(vtkPVPluginInformation*,bool)),
+    this,SLOT(isPluginFunctional(vtkPVPluginInformation*,bool)));
  
   vtkPVPlugin::RegisterPluginManagerCallback(::pqPluginManagerImportPlugin,
     this);
@@ -207,6 +210,7 @@ pqPluginManager::LoadStatus pqPluginManager::loadServerExtension(
     success = LOADED;
     }
 
+  emit this->pluginLoaded(pluginInfo,remote);
   return success;
 }
 
@@ -485,6 +489,7 @@ void pqPluginManager::onServerConnected(pqServer* server)
   this->addPluginFromSettings();
   this->loadAutoLoadPlugins(server);
   this->loadExtensions(server);
+  this->verifyRequiredPluginsLoaded(server);
   if(this->Internal->NeedUpdatePluginInfo)
     {
     emit this->pluginInfoUpdated();
@@ -542,11 +547,13 @@ QStringList pqPluginManager::pluginPaths(pqServer* server)
       }
 #if defined (Q_OS_MAC)
     //Look in the Application Package "ParaView.app/Contents/plugins
-    pv_plugin_path += QCoreApplication::applicationDirPath() + QDir::separator()
-      + "../Plugins;";
+    QDir appPluginDir(QCoreApplication::applicationDirPath() + QDir::separator()
+                      + "../Plugins;");
+    pv_plugin_path += appPluginDir.absolutePath();
     //Look for a folder called "plugins" at the same level as ParaView.app
-    pv_plugin_path += QCoreApplication::applicationDirPath() + QDir::separator()
-      + "../../../Plugins;";
+    QDir externalPluginDir(QCoreApplication::applicationDirPath() + QDir::separator()
+                           + "../../../Plugins;");
+    pv_plugin_path += externalPluginDir.absolutePath();
 #else
     pv_plugin_path += QCoreApplication::applicationDirPath() + QDir::separator()
       + "plugins";
@@ -842,6 +849,46 @@ void pqPluginManager::loadAutoLoadPlugins(pqServer* server)
       }
     }
 }
+
+//-----------------------------------------------------------------------------
+void pqPluginManager::verifyRequiredPluginsLoaded(pqServer* server)
+{
+  QList< vtkPVPluginInformation* > remote = this->loadedExtensions(server);
+  QList< vtkPVPluginInformation* > local = this->loadedExtensions(NULL);
+  if ( remote == local )
+    {
+    return;
+    }
+
+  bool pluginFunctional = true;
+  foreach(vtkPVPluginInformation* plInfo, local)
+    {
+    if (plInfo->GetLoaded())
+      {
+      pluginFunctional = this->isPluginFunctional(plInfo,false);
+      if ( !pluginFunctional)
+        {
+        emit requiredPluginsNotLoaded();
+        return;
+        }
+      }
+    }
+
+  foreach(vtkPVPluginInformation* plInfo, remote)
+    {
+    if (plInfo->GetLoaded())
+      {
+      pluginFunctional = this->isPluginFunctional(plInfo,true);
+      if ( !pluginFunctional)
+        {
+        emit requiredPluginsNotLoaded();
+        return;
+        }
+      }
+    }
+  return;
+}
+
 //----------------------------------------------------------------------------
 bool pqPluginManager::areRequiredPluginsFunctional(
   vtkPVPluginInformation* plInfo, bool remote)
@@ -871,7 +918,7 @@ bool pqPluginManager::areRequiredPluginsFunctional(
       pluginInfo = this->getExistingExtensionByPluginName(
         pqApplicationCore::instance()->getActiveServer(), pluginName);
       }
-    if(!this->isPluginFuntional(pluginInfo, remote))
+    if(!this->isPluginFunctional(pluginInfo, remote))
       {
       return false;
       }
@@ -880,7 +927,7 @@ bool pqPluginManager::areRequiredPluginsFunctional(
 }
 
 //----------------------------------------------------------------------------
-bool pqPluginManager::isPluginFuntional(
+bool pqPluginManager::isPluginFunctional(
   vtkPVPluginInformation* plInfo, bool remote)
 {
   if(!plInfo || !plInfo->GetLoaded())
@@ -893,8 +940,8 @@ bool pqPluginManager::isPluginFuntional(
     if(remote && plInfo->GetRequiredOnClient())
       {
       vtkPVPluginInformation* clientPlugin = 
-        this->getExistingExtensionByFileName(
-          NULL, QString(plInfo->GetFileName()));
+        this->getExistingExtensionByPluginName(
+        NULL, QString(plInfo->GetPluginName()));
       if(!clientPlugin || !clientPlugin->GetLoaded())
         {
         plInfo->SetError("warning: it is also required on client! \n Note for developers: If this plugin is only required on server, add REQUIRED_ON_SERVER as an argument when calling ADD_PARAVIEW_PLUGIN in CMakelist.txt");
@@ -904,9 +951,9 @@ bool pqPluginManager::isPluginFuntional(
     if(!remote && plInfo->GetRequiredOnServer())
       {
       vtkPVPluginInformation* serverPlugin = 
-        this->getExistingExtensionByFileName(
+        this->getExistingExtensionByPluginName(
           pqApplicationCore::instance()->getActiveServer(), 
-          QString(plInfo->GetFileName()));
+          QString(plInfo->GetPluginName()));
       if(!serverPlugin || !serverPlugin->GetLoaded())
         {
         plInfo->SetError("warning: it is also required on server! \n Note for developers: If this plugin is only required on client, add REQUIRED_ON_CLIENT as an argument when calling ADD_PARAVIEW_PLUGIN in CMakelist.txt");

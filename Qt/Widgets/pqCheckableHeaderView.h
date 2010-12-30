@@ -59,8 +59,13 @@ public:
   ///   True if the event should be filtered out.
   virtual bool eventFilter(QObject *object, QEvent *e);
 
+  virtual void mousePressEvent(QMouseEvent *event);
+
   virtual void setModel(QAbstractItemModel *model);
   virtual void setRootIndex(const QModelIndex &index);
+
+signals:
+  void checkStateChanged();
 
 public slots:
   void toggleCheckState(int section);

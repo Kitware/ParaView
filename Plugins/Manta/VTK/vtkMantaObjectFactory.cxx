@@ -77,7 +77,6 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkMantaPolyDataMapper.h"
 #include "vtkMantaProperty.h"
 #include "vtkMantaRenderer.h"
-#include "vtkMantaRenderWindow.h"
 #include "vtkMantaTexture.h"
 
 #ifdef VTKMANTA_FOR_PARAVIEW
@@ -99,7 +98,6 @@ VTK_CREATE_CREATE_FUNCTION(vtkMantaLight);
 VTK_CREATE_CREATE_FUNCTION(vtkMantaPolyDataMapper);
 VTK_CREATE_CREATE_FUNCTION(vtkMantaProperty);
 VTK_CREATE_CREATE_FUNCTION(vtkMantaRenderer);
-VTK_CREATE_CREATE_FUNCTION(vtkMantaRenderWindow);
 VTK_CREATE_CREATE_FUNCTION(vtkMantaTexture);
 #ifdef VTKMANTA_FOR_PARAVIEW
 VTK_CREATE_CREATE_FUNCTION(vtkMantaLODActor);
@@ -145,11 +143,6 @@ vtkMantaObjectFactory::vtkMantaObjectFactory()
                          "Manta",
                          1,
                          vtkObjectFactoryCreatevtkMantaRenderer);
-  this->RegisterOverride("vtkRenderWindow",
-                         "vtkMantaRenderWindow",
-                         "Manta",
-                         1,
-                         vtkObjectFactoryCreatevtkMantaRenderWindow);
   this->RegisterOverride("vtkTexture",
                          "vtkMantaTexture",
                          "Manta",

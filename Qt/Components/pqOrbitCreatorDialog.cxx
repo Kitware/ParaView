@@ -59,7 +59,10 @@ pqOrbitCreatorDialog::pqOrbitCreatorDialog(QWidget* parentObject)
   this->Internals->normal0->setValidator(new QDoubleValidator(this));
   this->Internals->normal1->setValidator(new QDoubleValidator(this));
   this->Internals->normal2->setValidator(new QDoubleValidator(this));
-  this->Internals->radius->setValidator(new QDoubleValidator(this));
+
+  this->Internals->origin0->setValidator(new QDoubleValidator(this));
+  this->Internals->origin1->setValidator(new QDoubleValidator(this));
+  this->Internals->origin2->setValidator(new QDoubleValidator(this));
 
   QObject::connect(this->Internals->resetBounds, SIGNAL(clicked()),
     this, SLOT(resetBounds()));
@@ -80,6 +83,20 @@ void pqOrbitCreatorDialog::setNormal(double xyz[3])
   this->Internals->normal1->setText(QString::number(xyz[1]));
   this->Internals->normal2->setText(QString::number(xyz[2]));
 }
+//-----------------------------------------------------------------------------
+void pqOrbitCreatorDialog::setOrigin(double xyz[3])
+{
+  this->Internals->origin0->setText(QString::number(xyz[0]));
+  this->Internals->origin1->setText(QString::number(xyz[1]));
+  this->Internals->origin2->setText(QString::number(xyz[2]));
+}
+//-----------------------------------------------------------------------------
+void pqOrbitCreatorDialog::setCenter(double xyz[3])
+{
+  this->Internals->center0->setText(QString::number(xyz[0]));
+  this->Internals->center1->setText(QString::number(xyz[1]));
+  this->Internals->center2->setText(QString::number(xyz[2]));
+}
 
 //-----------------------------------------------------------------------------
 void pqOrbitCreatorDialog::resetBounds()
@@ -99,7 +116,9 @@ void pqOrbitCreatorDialog::resetBounds()
     this->Internals->normal0->setText("0");
     this->Internals->normal1->setText("1");
     this->Internals->normal2->setText("0");
-    this->Internals->radius->setText(QString::number(box.GetMaxLength()/2.0));
+    this->Internals->origin0->setText("0");
+    this->Internals->origin1->setText("0");
+    this->Internals->origin2->setText("10");
     }
 }
 
@@ -118,7 +137,7 @@ QList<QVariant> pqOrbitCreatorDialog::orbitPoints(int resolution) const
 {
   double box_center[3];
   double normal[3];
-  double radius;
+  double origin[3];
 
   box_center[0] = this->Internals->center0->text().toDouble();
   box_center[1] = this->Internals->center1->text().toDouble();
@@ -128,11 +147,13 @@ QList<QVariant> pqOrbitCreatorDialog::orbitPoints(int resolution) const
   normal[1] = this->Internals->normal1->text().toDouble();
   normal[2] = this->Internals->normal2->text().toDouble();
 
-  radius = this->Internals->radius->text().toDouble();
+  origin[0] = this->Internals->origin0->text().toDouble();
+  origin[1] = this->Internals->origin1->text().toDouble();
+  origin[2] = this->Internals->origin2->text().toDouble();
 
   QList<QVariant> points;
   vtkPoints* pts = vtkSMUtilities::CreateOrbit(
-    box_center, normal, radius, resolution);
+    box_center, normal, resolution, origin);
   for (vtkIdType cc=0; cc < pts->GetNumberOfPoints(); cc++)
     {
     double coords[3];
@@ -142,5 +163,3 @@ QList<QVariant> pqOrbitCreatorDialog::orbitPoints(int resolution) const
   pts->Delete();
   return points;
 }
-
-

@@ -355,6 +355,19 @@
    <header>pqColorChooserButton.h</header>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>CompositeIndex</tabstop>
+  <tabstop>AttributeMode</tabstop>
+  <tabstop>UseArrayIndex</tabstop>
+  <tabstop>UseDataArray</tabstop>
+  <tabstop>XAxisArray</tabstop>
+  <tabstop>SeriesList</tabstop>
+  <tabstop>ColorButton</tabstop>
+  <tabstop>Thickness</tabstop>
+  <tabstop>StyleList</tabstop>
+  <tabstop>MarkerStyleList</tabstop>
+  <tabstop>AxisList</tabstop>
+ </tabstops>
  <resources>
   <include location="../pqComponents.qrc"/>
  </resources>

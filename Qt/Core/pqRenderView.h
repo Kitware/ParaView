@@ -36,10 +36,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqRenderViewBase.h"
 #include <QColor> // needed for return type.
 
+class pqDataRepresentation;
 class QAction;
 class QVTKWidget;
-class vtkSMRenderViewProxy;
 class vtkCollection;
+class vtkSMRenderViewProxy;
 
 // This is a PQ abstraction of a render view.
 class PQCORE_EXPORT pqRenderView : public pqRenderViewBase
@@ -178,7 +179,7 @@ public:
   /// Picks the representation at the given position.
   /// This will result in firing the picked(pqOutputPort*) signal on successful
   /// pick.
-  void pick(int pos[2]);
+  pqDataRepresentation* pick(int pos[2]);
 
   /// Creates a new frustum selection given the rectangle in display
   /// coordinates.

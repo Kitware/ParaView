@@ -47,12 +47,11 @@ public:
   virtual ~pqDataQueryReaction();
 
   /// Show the query dialog for querying the data from the active source.
-  static void showQueryDialog();
+  void showQueryDialog();
 
 public slots:
-  /// Updates the enabled state. Applications need not explicitly call
-  /// this.
-  void updateEnableState();
+  void onExtractSelection();
+  void onExtractSelectionOverTime();
 
 protected:
   /// Called when the action is triggered.

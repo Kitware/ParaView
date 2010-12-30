@@ -27,6 +27,10 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
+  // Returns if the display can be opened up on the current processes.
+  static bool CanOpenDisplayLocally();
+
+  // Description:
   // Transfer information about a single object into this object.
   virtual void CopyFromObject(vtkObject*);
 
