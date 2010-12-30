@@ -575,6 +575,12 @@ int pqFileDialog::getSelectedFilesSize()
 }
 
 //-----------------------------------------------------------------------------
+QList<QStringList> pqFileDialog::getSelectedFiles()
+{
+  return this->Implementation->SelectedFiles;
+}
+
+//-----------------------------------------------------------------------------
 QStringList pqFileDialog::getSelectedFiles(int index)
 {
   if ( index < 0 || index >= this->Implementation->SelectedFiles.size())

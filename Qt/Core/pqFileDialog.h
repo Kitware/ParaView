@@ -58,9 +58,9 @@ class pqServer;
 
   QObject::connect(
     dialog,
-    SIGNAL(filesSelected(const QStringList&)),
+    SIGNAL(filesSelected(const QList<QStringList>&)),
     this,
-    SLOT(onOpenSessionFile(const QStringList&)));
+    SLOT(onOpenSessionFile(const QList<QStringList>&)));
 
   dialog->show();
   /endcode
@@ -73,7 +73,8 @@ class pqServer;
   pqFileDialog dialog(NULL, this);
   if(Qt::Accepted == dialog.exec())
     {
-    QStringList files = dialog.getSelectedFiles();
+    //each string list holds a list of files that represent a file-series
+    QList<QStringList> files = dialog.getAllSelectedFiles();
     }
   /endcode
 
@@ -114,12 +115,11 @@ public:
   /// set the most recently used file extension
   void setRecentlyUsedExtension(const QString& fileExtension);
 
-  /// Returns the number of groups of files that where selected
-  /// Only ExistingFiles mode will return greater than 1.
-  int getSelectedFilesSize();
-
   /// Returns the group of files for the given index
   QStringList getSelectedFiles(int index=0);
+
+  /// Returns all the file groups
+  QList<QStringList> getAllSelectedFiles();
 
   /// accept this dialog
   void accept();
@@ -138,7 +138,10 @@ signals:
   void filesSelected(const QList<QStringList> &);
 
   /// Signal emitted when the user has chosen a set of files
-  /// The mode has to be not ExistingFiles for this signal to be emitted
+  /// NOTE:
+  /// The mode has to be not ExistingFiles for this signal to be emitted!
+  /// This signal is deprecated and should not be used anymore. Instead
+  /// use the fileSelected(const QList<QStringList> &)
   void filesSelected(const QStringList &);
 
   /// signal emitted when user has chosen a set of files and accepted the

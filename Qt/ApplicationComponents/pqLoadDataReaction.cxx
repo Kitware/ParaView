@@ -90,10 +90,12 @@ QList<pqPipelineSource*> pqLoadDataReaction::loadData()
   QList<pqPipelineSource*> sources;
   if (fileDialog.exec() == QDialog::Accepted)
     {
-    for (int i=0; i < fileDialog.getSelectedFilesSize(); ++i)
+    QList<QStringList> files = fileDialog.getAllSelectedFiles();
+    QStringList file;
+    foreach(file,files)
       {
       sources.append(
-        pqLoadDataReaction::loadData(fileDialog.getSelectedFiles(i)));
+        pqLoadDataReaction::loadData(file));
       }
     }
   return sources;
