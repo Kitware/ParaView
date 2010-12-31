@@ -51,6 +51,7 @@ vtkSMSessionClient::vtkSMSessionClient()
 
   this->DataServerInformation = vtkPVServerInformation::New();
   this->RenderServerInformation = vtkPVServerInformation::New();
+  this->ServerInformation = vtkPVServerInformation::New();
 }
 
 //----------------------------------------------------------------------------
@@ -64,6 +65,7 @@ vtkSMSessionClient::~vtkSMSessionClient()
   this->SetDataServerController(0);
   this->DataServerInformation->Delete();
   this->RenderServerInformation->Delete();
+  this->ServerInformation->Delete();
   this->SetURI(0);
 }
 
@@ -222,6 +224,11 @@ bool vtkSMSessionClient::Connect(const char* url)
       this->DataServerInformation, 0);
     this->GatherInformation(vtkProcessModule::RENDER_SERVER_ROOT,
       this->RenderServerInformation, 0);
+
+    // Keep the combined server information to return when
+    // GetServerInformation() is called.
+    this->ServerInformation->AddInformation(this->RenderServerInformation);
+    this->ServerInformation->AddInformation(this->DataServerInformation);
     }
 
   // TODO: test with following expressions.
@@ -289,6 +296,20 @@ void vtkSMSessionClient::SetupDataServerRenderServerConnection()
     "m2n_socket",
     mpiMToN);
   mpiMToN->Delete();
+
+  // Now let the server-side sessions know what's the vtkMPIMToNSocketConnection
+  // instance to use for data-server to render-server connection.
+  vtkMultiProcessStream stream;
+  stream << static_cast<int>(REGISTER_MTON_SOCKET_CONNECTION)
+         << mpiMToN->GetGlobalID();
+  vtkstd::vector<unsigned char> raw_message;
+  stream.GetRawData(raw_message);
+  this->DataServerController->TriggerRMIOnAllChildren(
+    &raw_message[0], static_cast<int>(raw_message.size()),
+    CLIENT_SERVER_MESSAGE_RMI);
+  this->RenderServerController->TriggerRMIOnAllChildren(
+    &raw_message[0], static_cast<int>(raw_message.size()),
+    CLIENT_SERVER_MESSAGE_RMI);
 }
 
 //----------------------------------------------------------------------------

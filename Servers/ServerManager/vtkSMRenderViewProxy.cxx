@@ -48,9 +48,11 @@
 #include "vtkSMProxyManager.h"
 #include "vtkSMRepresentationProxy.h"
 #include "vtkSMSelectionHelper.h"
+#include "vtkSMSession.h"
 #include "vtkTransform.h"
 #include "vtkWeakPointer.h"
 #include "vtkWindowToImageFilter.h"
+
 #include <vtkstd/map>
 
 namespace
@@ -133,23 +135,28 @@ bool vtkSMRenderViewProxy::IsSelectionAvailable()
 //-----------------------------------------------------------------------------
 const char* vtkSMRenderViewProxy::IsSelectVisibleCellsAvailable()
 {
+  vtkSMSession* session = this->GetSession();
+
 #ifdef FIXME_COLLABORATION
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   if (pm->GetIsAutoMPI())
     {
     return "Cannot support selection in auto-mpi mode";
     }
-  if (pm->GetRenderClientMode(this->ConnectionID))
+#endif
+  if (session->GetController(vtkPVSession::DATA_SERVER_ROOT) !=
+    session->GetController(vtkPVSession::RENDER_SERVER_ROOT))
     {
+    // when the two controller are different, we have a separate render-server
+    // and data-server session.
     return "Cannot support selection in render-server mode";
     }
-  vtkPVServerInformation* server_info =
-    pm->GetServerInformation(this->ConnectionID);
+
+  vtkPVServerInformation* server_info = session->GetServerInformation();
   if (server_info && server_info->GetNumberOfMachines() > 0)
     {
     return "Cannot support selection in CAVE mode.";
     }
-#endif
 
   //check if we don't have enough color depth to do color buffer selection
   //if we don't then disallow selection

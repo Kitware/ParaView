@@ -25,6 +25,7 @@
 
 class vtkMPIMToNSocketConnection;
 class vtkMultiProcessController;
+class vtkPVServerInformation;
 
 class VTK_EXPORT vtkPVSession : public vtkSession
 {
@@ -61,6 +62,16 @@ public:
   // and render-server nodes.
   virtual vtkMPIMToNSocketConnection* GetMPIMToNSocketConnection()
     { return NULL; }
+
+  // Description:
+  // vtkPVServerInformation is an information-object that provides information
+  // about the server processes. These include server-side capabilities as well
+  // as server-side command line arguments e.g. tile-display parameters. Use
+  // this method to obtain the server-side information.
+  // NOTE: For now, we are not bothering to provide separate informations from
+  // data-server and render-server (as was the case earlier). We can easily add
+  // API for the same if needed.
+  virtual vtkPVServerInformation* GetServerInformation()=0;
 
 //BTX
 protected:

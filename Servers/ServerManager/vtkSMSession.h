@@ -53,6 +53,15 @@ public:
   virtual ServerFlags GetProcessRoles();
 
   // Description:
+  // vtkPVServerInformation is an information-object that provides information
+  // about the server processes. These include server-side capabilities as well
+  // as server-side command line arguments e.g. tile-display parameters. Use
+  // this method to obtain the server-side information.
+  // Overridden to provide support for non-remote-server case. We simply read
+  // the local process information and return it.
+  virtual vtkPVServerInformation* GetServerInformation();
+
+  // Description:
   // Allow the user to bind an UndoStackBuilder with the given session
   virtual void SetUndoStackBuilder(vtkSMUndoStackBuilder*);
   vtkGetObjectMacro(UndoStackBuilder, vtkSMUndoStackBuilder);
@@ -145,6 +154,8 @@ protected:
 private:
   vtkSMSession(const vtkSMSession&); // Not implemented
   void operator=(const vtkSMSession&); // Not implemented
+
+  vtkPVServerInformation* LocalServerInformation;
 //ETX
 };
 

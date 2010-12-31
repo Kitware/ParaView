@@ -44,6 +44,12 @@ public:
   virtual vtkMultiProcessController* GetController(ServerFlags processType);
 
   // Description:
+  // This is socket connection, if any to communicate between the data-server
+  // and render-server nodes.
+  virtual vtkMPIMToNSocketConnection* GetMPIMToNSocketConnection()
+    { return this->MPIMToNSocketConnection; }
+
+  // Description:
   // Connects a remote server. URL can be of the following format:
   // cs://<pvserver-host>:<pvserver-port>
   // cdsrs://<pvdataserver-host>:<pvdataserver-port>/<pvrenderserver-host>:<pvrenderserver-port>
@@ -103,6 +109,7 @@ protected:
   void SetClientController(vtkMultiProcessController*);
 
   vtkMultiProcessController* ClientController;
+  vtkMPIMToNSocketConnection* MPIMToNSocketConnection;
 private:
   vtkSMSessionServer(const vtkSMSessionServer&); // Not implemented
   void operator=(const vtkSMSessionServer&); // Not implemented

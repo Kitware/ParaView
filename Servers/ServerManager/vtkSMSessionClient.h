@@ -67,6 +67,16 @@ public:
   // DATA_SERVER_ROOT or RENDER_SERVER_ROOT or CLIENT.
   virtual vtkMultiProcessController* GetController(ServerFlags processType);
 
+  // Description:
+  // vtkPVServerInformation is an information-object that provides information
+  // about the server processes. These include server-side capabilities as well
+  // as server-side command line arguments e.g. tile-display parameters. Use
+  // this method to obtain the server-side information.
+  // Overridden to provide return the information gathered from data-server and
+  // render-server.
+  virtual vtkPVServerInformation* GetServerInformation()
+    { return this->ServerInformation; }
+
 //BTX
   // Description:
   // Push the state.
@@ -108,6 +118,7 @@ public:
     INVOKE=2,
     PULL=3,
     GATHER_INFORMATION=4,
+    REGISTER_MTON_SOCKET_CONNECTION=5,
     CLIENT_SERVER_MESSAGE_RMI=55625,
     CLOSE_SESSION=55626,
     REPLY_GATHER_INFORMATION_TAG=55627,
@@ -129,6 +140,7 @@ protected:
 
   vtkPVServerInformation* DataServerInformation;
   vtkPVServerInformation* RenderServerInformation;
+  vtkPVServerInformation* ServerInformation;
 
   vtkSetStringMacro(URI);
 

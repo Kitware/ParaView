@@ -1199,27 +1199,19 @@ void vtkPVSynchronizedRenderWindows::ShinkGaps()
 //----------------------------------------------------------------------------
 bool vtkPVSynchronizedRenderWindows::GetIsInCave()
 {
-#ifdef FIXME_COLLABORATION
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  vtkPVServerInformation* server_info = NULL;
-  if (pm->GetActiveRemoteConnection() && this->Mode != BATCH)
-    {
-    vtkIdType connectionID = pm->GetConnectionID(
-      pm->GetActiveRemoteConnection());
-    server_info = pm->GetServerInformation(connectionID);
-    }
-  else
-    {
-    server_info = pm->GetServerInformation(0);
-    }
+  vtkPVSession* activeSession = vtkPVSession::SafeDownCast(pm->GetActiveSession());
+
+  // active session must be a paraview-session.
+  assert(activeSession != NULL);
+
+  vtkPVServerInformation* server_info = activeSession->GetServerInformation();
 
   int temp[2];
   if (!this->GetTileDisplayParameters(temp, temp))
     {
     return server_info->GetNumberOfMachines() > 0;
     }
-#endif
-
   return false;
 }
 
@@ -1227,20 +1219,14 @@ bool vtkPVSynchronizedRenderWindows::GetIsInCave()
 bool vtkPVSynchronizedRenderWindows::GetTileDisplayParameters(
   int tile_dims[2], int tile_mullions[2])
 {
-#ifdef FIXME
-  //  we need to decide how to get access to server-information.
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  vtkPVServerInformation* info = pm->GetServerInformation(0);
-  if (info->GetTileDimensions()[0] > 0 ||
-    info->GetTileDimensions()[1] > 0)
-    {
-    // we are going to use the local server information.
-    }
-  else if (pm->GetActiveRemoteConnection())
-    {
-    info = pm->GetServerInformation(pm->GetConnectionID(
-        pm->GetActiveRemoteConnection()));
-    }
+  vtkPVSession* activeSession = vtkPVSession::SafeDownCast(pm->GetActiveSession());
+
+  // active session must be a paraview-session.
+  assert(activeSession != NULL);
+
+  vtkPVServerInformation* info = activeSession->GetServerInformation();
+
   tile_dims[0] = info->GetTileDimensions()[0];
   tile_dims[1] = info->GetTileDimensions()[1];
   bool in_tile_display_mode = (tile_dims[0] > 0 || tile_dims[1] > 0);
@@ -1248,8 +1234,6 @@ bool vtkPVSynchronizedRenderWindows::GetTileDisplayParameters(
   tile_dims[1] = (tile_dims[1] == 0)? 1 : tile_dims[1];
   info->GetTileMullions(tile_mullions);
   return in_tile_display_mode;
-#endif
-  return false;
 }
 
 //----------------------------------------------------------------------------

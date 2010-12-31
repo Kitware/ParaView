@@ -16,6 +16,7 @@
 
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
+#include "vtkPVServerInformation.h"
 #include "vtkSMProxyDefinitionManager.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyManager.h"
@@ -45,6 +46,9 @@ vtkSMSession::vtkSMSession()
 
   // Reserved Id management
   this->RegisterRemoteObject(this->ProxyManager);
+
+  this->LocalServerInformation = vtkPVServerInformation::New();
+  this->LocalServerInformation->CopyFromObject(NULL);
 }
 
 //----------------------------------------------------------------------------
@@ -55,6 +59,9 @@ vtkSMSession::~vtkSMSession()
   this->SetUndoStackBuilder(0);
   this->Core->Delete();
   this->Core = NULL;
+
+  this->LocalServerInformation->Delete();
+  this->LocalServerInformation = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -66,6 +73,12 @@ vtkSMSession::ServerFlags vtkSMSession::GetProcessRoles()
     return SERVERS;
     }
   return this->Superclass::GetProcessRoles();
+}
+
+//----------------------------------------------------------------------------
+vtkPVServerInformation* vtkSMSession::GetServerInformation()
+{
+  return this->LocalServerInformation;
 }
 
 //----------------------------------------------------------------------------
