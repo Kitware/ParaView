@@ -282,13 +282,6 @@
         <DoubleRangeDomain name="range" min="1" max="8192"/>
       </DoubleVectorProperty>
 
-      <StringVectorProperty
-        name="RadiusArrayName"
-        command="SetRadiusArrayName"
-        number_of_elements="1"
-        default_values="">
-      </StringVectorProperty>
-
     </Proxy>
   </ProxyGroup>
 
