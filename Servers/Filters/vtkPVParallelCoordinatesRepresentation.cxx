@@ -20,6 +20,7 @@
 #include "vtkPlot.h"
 #include "vtkPVContextView.h"
 #include "vtkTable.h"
+#include "vtkStdString.h"
 
 vtkStandardNewMacro(vtkPVParallelCoordinatesRepresentation);
 //----------------------------------------------------------------------------
