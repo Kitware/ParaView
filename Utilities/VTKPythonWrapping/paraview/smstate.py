@@ -132,7 +132,7 @@ def _trace_state():
     order so that no traced proxy refers to a proxy that is yet to be traced."""
 
     # Start trace
-    smtrace.start_trace(CaptureAllProperties=True, UseGuiName=True)
+    smtrace.start_trace(CaptureAllProperties=False, UseGuiName=True)
 
     # Get proxy lists ordered by group
     proxy_lists = get_proxy_lists_ordered_by_group()
