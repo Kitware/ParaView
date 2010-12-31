@@ -25,6 +25,7 @@
 #include "vtkPVDataInformation.h"
 #include "vtkPVTemporalDataInformation.h"
 #include "vtkPVXMLElement.h"
+#include "vtkSMMessage.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkTimerLog.h"
 

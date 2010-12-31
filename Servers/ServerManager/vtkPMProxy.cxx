@@ -21,6 +21,7 @@
 #include "vtkPMProperty.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSmartPointer.h"
+#include "vtkSMMessage.h"
 #include "vtkSMProxyDefinitionManager.h"
 #include "vtkSMSessionCore.h"
 

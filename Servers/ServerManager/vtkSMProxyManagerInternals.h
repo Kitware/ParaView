@@ -16,21 +16,21 @@
 #ifndef __vtkSMProxyManagerInternals_h
 #define __vtkSMProxyManagerInternals_h
 
+#include "vtkCollection.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMGlobalPropertiesManager.h"
 #include "vtkSMLink.h"
+#include "vtkSMMessage.h"
 #include "vtkSMProxy.h"
+#include "vtkSMProxyManager.h"
 #include "vtkSMProxySelectionModel.h"
-#include "vtkCollection.h"
+#include "vtkSMSession.h"
+#include "vtkStdString.h"
 
 #include <vtkstd/map>
 #include <vtkstd/set>
 #include <vtkstd/vector>
 #include <vtksys/ios/sstream>
-#include "vtkStdString.h"
-#include "vtkSMMessage.h"
-#include "vtkSMProxyManager.h"
-#include "vtkSMSession.h"
 
 // Sub-classed to avoid symbol length explosion.
 class vtkSMProxyManagerProxyInfo : public vtkObjectBase

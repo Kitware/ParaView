@@ -17,12 +17,14 @@
 #include "vtkClientServerStream.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
-#include "vtkSMDomainIterator.h"
-#include "vtkSMProxy.h"
-#include "vtkSMProxyGroupDomain.h"
-#include "vtkSMProxyManager.h"
-#include "vtkSMProxyLocator.h"
 #include "vtkSmartPointer.h"
+#include "vtkSMDomainIterator.h"
+#include "vtkSMMessage.h"
+#include "vtkSMProxyGroupDomain.h"
+#include "vtkSMProxy.h"
+#include "vtkSMProxyLocator.h"
+#include "vtkSMProxyManager.h"
+#include "vtkStdString.h"
 
 #include <vtkstd/algorithm>
 #include <vtkstd/map>
@@ -30,7 +32,7 @@
 #include <vtkstd/vector>
 #include <vtkstd/iterator>
 
-#include "vtkStdString.h"
+#include <assert.h>
 
 vtkStandardNewMacro(vtkSMProxyProperty);
 

@@ -20,6 +20,8 @@
 #ifndef __vtkSMMessage_h
 #define __vtkSMMessage_h
 
+#include "vtkSMMessageMinimal.h"
+
 #include <string>
 #if __GNUC__
 # pragma GCC diagnostic ignored "-Wsign-compare"
@@ -30,9 +32,6 @@
 #endif
 
 #include "vtkClientServerStream.h"
-
-typedef paraview_protobuf::Message           vtkSMMessage;
-typedef paraview_protobuf::MessageCollection vtkSMMessageCollection;
 
 namespace pvstream
 {

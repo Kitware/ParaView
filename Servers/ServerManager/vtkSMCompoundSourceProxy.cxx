@@ -15,11 +15,11 @@
 #include "vtkSMCompoundSourceProxy.h"
 
 #include "vtkObjectFactory.h"
-#include "vtkSMProxyManager.h"
 #include "vtkPVXMLElement.h"
-#include "vtkSMProxyLocator.h"
 #include "vtkSMCompoundProxyDefinitionLoader.h"
 #include "vtkSMMessage.h"
+#include "vtkSMProxyLocator.h"
+#include "vtkSMProxyManager.h"
 
 #include <vtkSmartPointer.h>
 

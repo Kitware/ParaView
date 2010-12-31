@@ -27,6 +27,7 @@
 #include "vtkPVInformation.h"
 #include "vtkPVOptions.h"
 #include "vtkSmartPointer.h"
+#include "vtkSMMessage.h"
 #include "vtkSMSessionClient.h"
 #include "vtkSocketCommunicator.h"
 

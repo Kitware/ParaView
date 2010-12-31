@@ -18,10 +18,9 @@
 #include "vtkClientServerStream.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
-#include "vtkTransform.h"
-
-#include "vtkSMSession.h"
 #include "vtkSMMessage.h"
+#include "vtkSMSession.h"
+#include "vtkTransform.h"
 
 vtkStandardNewMacro(vtkSMBoxRepresentationProxy);
 //----------------------------------------------------------------------------

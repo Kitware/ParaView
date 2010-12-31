@@ -24,7 +24,7 @@
 #define __vtkSMProxyDefinitionManager_h
 
 #include "vtkSMObject.h"
-#include "vtkSMMessage.h"
+#include "vtkSMMessageMinimal.h" // needed for vtkSMMessage
 
 class vtkPVXMLElement;
 class vtkSMProxyDefinitionIterator;

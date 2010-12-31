@@ -17,6 +17,7 @@
 #include "vtkClientServerStream.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
+#include "vtkSMMessage.h"
 #include "vtkSMVectorPropertyTemplate.h"
 
 

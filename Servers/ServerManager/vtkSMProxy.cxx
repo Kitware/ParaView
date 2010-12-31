@@ -13,6 +13,7 @@
 
 =========================================================================*/
 #include "vtkSMProxy.h"
+#include "vtkSMProxyInternals.h"
 
 #include "vtkCommand.h"
 #include "vtkDebugLeaks.h"
@@ -23,17 +24,14 @@
 #include "vtkProcessModule.h"
 #include "vtkPVOptions.h"
 #include "vtkPVXMLElement.h"
+#include "vtkSmartPointer.h"
 #include "vtkSMDocumentation.h"
 #include "vtkSMInputProperty.h"
+#include "vtkSMMessage.h"
 #include "vtkSMPropertyIterator.h"
 #include "vtkSMProxyLocator.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMSession.h"
-
-#include "vtkSMMessage.h"
-
-#include "vtkSMProxyInternals.h"
-#include "vtkSmartPointer.h"
 
 #include <vtkstd/algorithm>
 #include <vtkstd/string>

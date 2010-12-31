@@ -18,6 +18,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkPMSourceProxy.h"
 #include "vtkPVXMLElement.h"
+#include "vtkSMMessage.h"
 
 #include <assert.h>
 

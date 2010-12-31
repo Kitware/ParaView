@@ -121,7 +121,6 @@
 #define __vtkSMProxy_h
 
 #include "vtkSMRemoteObject.h"
-#include "vtkSMMessage.h"
 #include "vtkClientServerID.h" // needed for vtkClientServerID
 
 //BTX

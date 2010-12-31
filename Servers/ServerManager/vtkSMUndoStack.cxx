@@ -14,17 +14,19 @@
 =========================================================================*/
 #include "vtkSMUndoStack.h"
 
+#include "vtkCollection.h"
 #include "vtkCommand.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
 #include "vtkPVXMLElement.h"
+#include "vtkSMMessage.h"
 #include "vtkSMProxyManager.h"
-#include "vtkUndoSet.h"
+#include "vtkSMSession.h"
 #include "vtkSMUndoElement.h"
+#include "vtkUndoSet.h"
 #include "vtkUndoStackInternal.h"
 
 #include <vtksys/RegularExpression.hxx>
-#include "vtkCollection.h"
 #include <vtkstd/set>
 
 //*****************************************************************************

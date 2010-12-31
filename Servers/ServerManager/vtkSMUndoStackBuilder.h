@@ -31,7 +31,7 @@
 #define __vtkSMUndoStackBuilder_h
 
 #include "vtkSMObject.h"
-#include "vtkSMMessage.h"
+#include "vtkSMMessageMinimal.h" // needed for vtkSMMessage
 
 class vtkSMProxy;
 class vtkSMUndoStack;

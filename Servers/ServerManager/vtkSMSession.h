@@ -20,7 +20,7 @@
 #define __vtkSMSession_h
 
 #include "vtkPVSession.h"
-#include "vtkSMMessage.h"
+#include "vtkSMMessageMinimal.h" // needed for vtkSMMessage
 
 class vtkCollection;
 class vtkPMObject;

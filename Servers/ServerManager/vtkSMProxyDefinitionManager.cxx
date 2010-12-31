@@ -19,17 +19,16 @@
 #include "vtkCommand.h"
 #include "vtkInstantiator.h"
 #include "vtkObjectFactory.h"
+#include "vtkProcessModule.h"
 #include "vtkPVConfig.h"
 #include "vtkPVXMLElement.h"
 #include "vtkPVXMLParser.h"
-#include "vtkSMGeneratedModules.h"
-#include "vtkSMProxyDefinitionIterator.h"
 #include "vtkSmartPointer.h"
+#include "vtkSMGeneratedModules.h"
+#include "vtkSMMessage.h"
+#include "vtkSMProxyDefinitionIterator.h"
 #include "vtkStdString.h"
 #include "vtkStringList.h"
-
-#include "vtkSMMessage.h"
-#include "vtkProcessModule.h"
 
 // #include "vtkSMProxyManager.h" // FIXME <===========================================================================
 #include <vtkstd/map>

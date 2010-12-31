@@ -14,9 +14,10 @@
 =========================================================================*/
 #include "vtkPMVectorPropertyTemplate.h"
 
+#include "vtkClientServerStream.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
-#include "vtkClientServerStream.h"
+#include "vtkSMMessage.h"
 
 #include <vtkstd/vector>
 #include <assert.h>

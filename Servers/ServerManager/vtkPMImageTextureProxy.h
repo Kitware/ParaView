@@ -22,7 +22,6 @@
 #define __vtkPMImageTextureProxy_h
 
 #include "vtkPMSourceProxy.h"
-#include "vtkSMMessage.h"
 
 class vtkImageData;
 

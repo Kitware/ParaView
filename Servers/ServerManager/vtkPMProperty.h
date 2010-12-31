@@ -19,10 +19,10 @@
 #ifndef __vtkPMProperty_h
 #define __vtkPMProperty_h
 
-#include "vtkClientServerID.h"
-#include "vtkSMMessage.h"
 #include "vtkSMObject.h"
-#include "vtkWeakPointer.h"
+#include "vtkClientServerID.h" // needed for vtkClientServerID
+#include "vtkSMMessageMinimal.h" // needed for vtkSMMessage
+#include "vtkWeakPointer.h" // needed for vtkWeakPointer.
 
 class vtkClientServerStream;
 class vtkPMObject;

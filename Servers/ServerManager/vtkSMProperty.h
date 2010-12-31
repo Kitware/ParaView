@@ -63,7 +63,8 @@
 #define __vtkSMProperty_h
 
 #include "vtkSMObject.h"
-#include "vtkSMMessage.h"
+#include "vtkSMMessageMinimal.h" // needed for vtkSMMessage
+
 class vtkClientServerStream;
 class vtkPVXMLElement;
 class vtkSMDocumentation;
@@ -261,11 +262,7 @@ protected:
 
   // Description:
   // Let the property write its content into the stream
-  virtual void WriteTo(vtkSMMessage* msg)
-    {
-    ProxyState_Property *prop = msg->AddExtension(ProxyState::property);
-    prop->set_name(this->GetXMLName());
-    };
+  virtual void WriteTo(vtkSMMessage* msg);
 
   // Description:
   // Let the property read and set its content from the stream

@@ -13,15 +13,17 @@
 
 =========================================================================*/
 #include "vtkPMArraySelectionProperty.h"
-#include "vtkPMProperty.h"
-#include "vtkObjectFactory.h"
-#include "vtkDataArray.h"
+
 #include "vtkArrayIterator.h"
-#include "vtkStringArray.h"
+#include "vtkDataArray.h"
 #include "vtkDoubleArray.h"
 #include "vtkFloatArray.h"
-#include "vtkIntArray.h"
 #include "vtkIdTypeArray.h"
+#include "vtkIntArray.h"
+#include "vtkObjectFactory.h"
+#include "vtkPMProperty.h"
+#include "vtkSMMessage.h"
+#include "vtkStringArray.h"
 
 #include <vtkstd/string>
 #include <vtksys/ios/sstream>

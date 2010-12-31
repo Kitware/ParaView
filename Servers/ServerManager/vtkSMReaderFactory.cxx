@@ -20,6 +20,7 @@
 #include "vtkPVXMLElement.h"
 #include "vtkPVXMLParser.h"
 #include "vtkSmartPointer.h"
+#include "vtkSMMessage.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxyDefinitionIterator.h"
 #include "vtkSMProxyDefinitionManager.h"
@@ -27,8 +28,6 @@
 #include "vtkSMProxyManager.h"
 #include "vtkSMSession.h"
 #include "vtkStringList.h"
-
-#include "vtkSMMessage.h"
 
 #include <vtkstd/list>
 #include <vtkstd/set>

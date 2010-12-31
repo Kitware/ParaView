@@ -19,6 +19,7 @@
 #include "vtkSMProxyLocator.h"
 
 
+vtkCxxSetObjectMacro(vtkSMUndoElement, Session, vtkSMSession);
 //-----------------------------------------------------------------------------
 vtkSMUndoElement::vtkSMUndoElement()
 {

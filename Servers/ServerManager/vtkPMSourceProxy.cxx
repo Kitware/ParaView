@@ -22,6 +22,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVExtentTranslator.h"
 #include "vtkPVXMLElement.h"
+#include "vtkSMMessage.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 
 #include <vtkstd/vector>

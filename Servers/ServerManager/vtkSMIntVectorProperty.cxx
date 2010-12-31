@@ -16,8 +16,8 @@
 
 #include "vtkClientServerStream.h"
 #include "vtkObjectFactory.h"
-#include "vtkProcessModule.h"
 #include "vtkPVXMLElement.h"
+#include "vtkSMMessage.h"
 #include "vtkSMVectorPropertyTemplate.h"
 
 vtkStandardNewMacro(vtkSMIntVectorProperty);

@@ -17,9 +17,10 @@
 #include "vtkClientServerStream.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
-#include "vtkStringList.h"
+#include "vtkSMMessage.h"
 #include "vtkSMVectorPropertyTemplate.h"
 #include "vtkStdString.h"
+#include "vtkStringList.h"
 
 #include <vtksys/ios/sstream>
 

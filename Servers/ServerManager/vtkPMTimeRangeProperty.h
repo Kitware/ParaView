@@ -20,7 +20,6 @@
 #define __vtkPMTimeRangeProperty_h
 
 #include "vtkPMProperty.h"
-#include "vtkSMMessage.h"
 
 class VTK_EXPORT vtkPMTimeRangeProperty : public vtkPMProperty
 {

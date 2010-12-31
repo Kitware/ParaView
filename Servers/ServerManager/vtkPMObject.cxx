@@ -16,6 +16,7 @@
 
 #include "vtkClientServerInterpreter.h"
 #include "vtkObjectFactory.h"
+#include "vtkSMMessage.h"
 #include "vtkSMSessionCore.h"
 
 #include <assert.h>
@@ -26,11 +27,14 @@ vtkPMObject::vtkPMObject()
   this->Interpreter = 0;
   this->SessionCore = 0;
   this->GlobalID = 0;
+  this->LastPushedMessage = new vtkSMMessage();
 }
 
 //----------------------------------------------------------------------------
 vtkPMObject::~vtkPMObject()
 {
+  delete this->LastPushedMessage;
+  this->LastPushedMessage = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -74,13 +78,13 @@ vtkClientServerInterpreter* vtkPMObject::GetInterpreter()
 //----------------------------------------------------------------------------
 void vtkPMObject::Push(vtkSMMessage* msg)
 {
-  LastPushedMessage.CopyFrom(*msg);
+  this->LastPushedMessage->CopyFrom(*msg);
 }
 
 //----------------------------------------------------------------------------
 void vtkPMObject::Pull(vtkSMMessage* msg)
 {
-  msg->CopyFrom(LastPushedMessage);
+  msg->CopyFrom(*this->LastPushedMessage);
 }
 //----------------------------------------------------------------------------
 void vtkPMObject::Invoke(vtkSMMessage* msg)

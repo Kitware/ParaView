@@ -22,8 +22,8 @@
 #define __vtkSMRemoteObject_h
 
 #include "vtkSMObject.h"
-#include "vtkSMMessage.h"
-#include "vtkWeakPointer.h"
+#include "vtkSMMessageMinimal.h" // needed for vtkSMMessage
+#include "vtkWeakPointer.h" // needed for vtkWeakPointer
 
 class vtkSMSession;
 

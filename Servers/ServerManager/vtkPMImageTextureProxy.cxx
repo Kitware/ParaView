@@ -14,14 +14,9 @@
 =========================================================================*/
 #include "vtkPMImageTextureProxy.h"
 
-#include "vtkAlgorithm.h"
 #include "vtkClientServerInterpreter.h"
 #include "vtkClientServerStream.h"
 #include "vtkObjectFactory.h"
-#include "vtkProcessModule.h"
-#include "vtkPMSourceProxy.h"
-#include "vtkImageData.h"
-#include "vtkSMMessage.h"
 
 vtkStandardNewMacro(vtkPMImageTextureProxy);
 //----------------------------------------------------------------------------

@@ -26,11 +26,14 @@ vtkStandardNewMacro(vtkSMProxyUndoElement);
 vtkSMProxyUndoElement::vtkSMProxyUndoElement()
 {
   this->CreateElement = true;
+  this->State = new vtkSMMessage();
 }
 
 //-----------------------------------------------------------------------------
 vtkSMProxyUndoElement::~vtkSMProxyUndoElement()
 {
+  delete this->State;
+  this->State = NULL;
 }
 
 //-----------------------------------------------------------------------------
@@ -71,20 +74,20 @@ int vtkSMProxyUndoElement::Redo()
 //-----------------------------------------------------------------------------
 void vtkSMProxyUndoElement::SetCreationState(const vtkSMMessage* state)
 {
-  this->State.Clear();
+  this->State->Clear();
   if(!state)
     {
     vtkErrorMacro("No state provided in SetCreationState");
     }
   else
     {
-    this->State.CopyFrom(*state);
+    this->State->CopyFrom(*state);
     }
 }
 //-----------------------------------------------------------------------------
 int vtkSMProxyUndoElement::CreateProxy()
 {
-  vtkTypeUInt32 globalId = this->State.global_id();
+  vtkTypeUInt32 globalId = this->State->global_id();
   if(this->Session->GetRemoteObject(globalId))
     {
     // A parent proxy already create it, so do nothing
@@ -92,7 +95,7 @@ int vtkSMProxyUndoElement::CreateProxy()
     }
 
   //this->State.PrintDebugString();
-  vtkSMProxy *proxy = this->Session->GetProxyManager()->NewProxy(&this->State);
+  vtkSMProxy *proxy = this->Session->GetProxyManager()->NewProxy(this->State);
   this->UndoSetWorkingContext->AddItem(proxy);
   proxy->Delete();
   return proxy ? 1 : 0;
@@ -100,7 +103,7 @@ int vtkSMProxyUndoElement::CreateProxy()
 //-----------------------------------------------------------------------------
 int vtkSMProxyUndoElement::DeleteProxy()
 {
-  this->Session->DeletePMObject(&this->State);
+  this->Session->DeletePMObject(this->State);
   //vtkSMRemoteObject *obj = this->Session->GetRemoteObject(this->State.global_id());
 //  // 1 because all remoteObject refs are kept during the UndoSet processing
 //  if(obj && obj->GetReferenceCount() > 1)

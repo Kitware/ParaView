@@ -25,13 +25,14 @@
 #include "vtkMultiProcessStream.h"
 #include "vtkObjectFactory.h"
 #include "vtkPMProxy.h"
+#include "vtkProcessModule.h"
 #include "vtkPVInformation.h"
 #include "vtkPVOptions.h"
-#include "vtkProcessModule.h"
+#include "vtkSmartPointer.h"
+#include "vtkSMMessage.h"
 #include "vtkSMProxyDefinitionManager.h"
 #include "vtkSMRemoteObject.h"
 #include "vtkSMSession.h"
-#include "vtkSmartPointer.h"
 
 #include "assert.h"
 #include <fstream>

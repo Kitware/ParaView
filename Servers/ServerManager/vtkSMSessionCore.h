@@ -21,7 +21,7 @@
 #define __vtkSMSessionCore_h
 
 #include "vtkObject.h"
-#include "vtkSMMessage.h"
+#include "vtkSMMessageMinimal.h"
 
 class vtkClientServerInterpreter;
 class vtkMultiProcessController;

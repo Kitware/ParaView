@@ -20,7 +20,7 @@
 #define __vtkSMProxyUndoElement_h
 
 #include "vtkSMUndoElement.h"
-#include "vtkSMMessage.h"
+#include "vtkSMMessageMinimal.h" // needed for vtkSMMessage
 
 class VTK_EXPORT vtkSMProxyUndoElement : public vtkSMUndoElement
 {
@@ -62,7 +62,7 @@ protected:
   int DeleteProxy();
 
   // Current full state for the creation
-  vtkSMMessage State;
+  vtkSMMessage *State;
 
   // Undo type.
   bool CreateElement;

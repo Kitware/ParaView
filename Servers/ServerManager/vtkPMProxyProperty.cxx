@@ -16,9 +16,9 @@
 
 #include "vtkClientServerStream.h"
 #include "vtkObjectFactory.h"
-#include "vtkPVXMLElement.h"
-
 #include "vtkPMProxy.h"
+#include "vtkPVXMLElement.h"
+#include "vtkSMMessage.h"
 #include "vtkSMRemoteObject.h"
 
 #include <assert.h>

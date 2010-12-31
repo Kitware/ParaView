@@ -20,7 +20,6 @@
 #define __vtkPMDataArrayProperty_h
 
 #include "vtkPMProperty.h"
-#include "vtkSMMessage.h"
 
 class VTK_EXPORT vtkPMDataArrayProperty : public vtkPMProperty
 {

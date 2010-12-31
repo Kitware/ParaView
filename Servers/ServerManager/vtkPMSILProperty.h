@@ -20,8 +20,6 @@
 #define __vtkPMSILProperty_h
 
 #include "vtkPMProperty.h"
-#include "vtkSMMessage.h"
-#include <vtkstd/set>
 
 class vtkGraph;
 
@@ -51,8 +49,9 @@ protected:
 
   vtkSetStringMacro(SubTree);
 
+  class vtkIdTypeSet;
   static void GetLeaves( vtkGraph *sil, vtkIdType vertexid,
-                         vtkstd::set<vtkIdType>& list,
+                         vtkIdTypeSet& list,
                          bool traverse_cross_edges);
 
 private:
@@ -61,6 +60,7 @@ private:
 
   char* SubTree;
   int OutputPort;
+
 //ETX
 };
 

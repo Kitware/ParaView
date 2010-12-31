@@ -13,29 +13,30 @@
 
 =========================================================================*/
 #include "vtkPMSILProperty.h"
-#include "vtkPMProperty.h"
-#include "vtkObjectFactory.h"
-#include "vtkPVXMLElement.h"
-#include "vtkPMProxy.h"
 
 #include "vtkAdjacentVertexIterator.h"
+#include "vtkAlgorithm.h"
 #include "vtkDataArray.h"
 #include "vtkDataSetAttributes.h"
+#include "vtkExecutive.h"
 #include "vtkGraph.h"
 #include "vtkInEdgeIterator.h"
-#include "vtkMemberFunctionCommand.h"
+#include "vtkInformation.h"
+#include "vtkObjectFactory.h"
 #include "vtkOutEdgeIterator.h"
+#include "vtkPMProxy.h"
+#include "vtkPVXMLElement.h"
 #include "vtkSmartPointer.h"
+#include "vtkSMMessage.h"
 #include "vtkStdString.h"
 #include "vtkStringArray.h"
-#include "vtkAlgorithm.h"
-#include "vtkExecutive.h"
-#include "vtkInformation.h"
 
 #include <vtkstd/map>
 #include <vtkstd/set>
 #include <vtkstd/string>
 #include <vtkstd/vector>
+
+class vtkPMSILProperty::vtkIdTypeSet : public vtkstd::set<vtkIdType> {};
 
 vtkStandardNewMacro(vtkPMSILProperty);
 //----------------------------------------------------------------------------
@@ -127,7 +128,7 @@ bool vtkPMSILProperty::Pull(vtkSMMessage* msgToFill)
     }
 
   // Fill the leaves
-  vtkstd::set<vtkIdType> leaves;
+  vtkIdTypeSet leaves;
   vtkPMSILProperty::GetLeaves(graphSIL.GetPointer(), subTreeVertexId, leaves, false);
 
   // Build property
@@ -137,7 +138,7 @@ bool vtkPMSILProperty::Pull(vtkSMMessage* msgToFill)
   var->set_type(Variant::STRING);
 
   // Fill property
-  vtkstd::set<vtkIdType>::iterator iter;
+  vtkIdTypeSet::iterator iter;
   for (iter = leaves.begin(); iter != leaves.end(); ++iter)
     {
     if((*iter) >= 0 && (*iter) < numVertices)
@@ -154,7 +155,7 @@ bool vtkPMSILProperty::Pull(vtkSMMessage* msgToFill)
 }
 //----------------------------------------------------------------------------
 void vtkPMSILProperty::GetLeaves( vtkGraph *sil, vtkIdType vertexid,
-                                  vtkstd::set<vtkIdType>& list,
+                                  vtkIdTypeSet& list,
                                   bool traverse_cross_edges)
 {
   vtkDataArray* crossEdgesArray =

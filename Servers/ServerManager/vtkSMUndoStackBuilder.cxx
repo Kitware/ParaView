@@ -19,22 +19,21 @@
 #include "vtkProcessModule.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSMGlobalPropertiesManager.h"
+#include "vtkSMMessage.h"
 #include "vtkSMProperty.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyManager.h"
-#include "vtkSMUndoStack.h"
-#include "vtkUndoSet.h"
-#include "vtkUndoStackInternal.h"
 #include "vtkSMProxyUndoElement.h"
 #include "vtkSMRemoteObjectUpdateUndoElement.h"
 #include "vtkSMSession.h"
-
+#include "vtkSMUndoStack.h"
 #include "vtkUndoElement.h"
+#include "vtkUndoSet.h"
+#include "vtkUndoStackInternal.h"
 
 #include <vtksys/RegularExpression.hxx>
 #include <vtkstd/map>
 
-#include "vtkSMMessage.h"
 
 class vtkSMUndoStackBuilder::vtkInternals
 {

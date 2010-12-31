@@ -21,7 +21,7 @@
 #define __vtkSMRemoteObjectUpdateUndoElement_h
 
 #include "vtkSMUndoElement.h"
-#include "vtkSMMessage.h"
+#include "vtkSMMessageMinimal.h" // needed for vtkSMMessage
 
 class VTK_EXPORT vtkSMRemoteObjectUpdateUndoElement : public vtkSMUndoElement
 {
@@ -48,8 +48,8 @@ public:
                                 const vtkSMMessage* after);
 
   // Current full state of the UndoElement
-  vtkSMMessage BeforeState;
-  vtkSMMessage AfterState;
+  vtkSMMessage* BeforeState;
+  vtkSMMessage* AfterState;
 
 protected:
   vtkSMRemoteObjectUpdateUndoElement();

@@ -22,8 +22,8 @@
 #define __vtkPMObject_h
 
 #include "vtkSMObject.h"
-#include "vtkWeakPointer.h"
-#include "vtkSMMessage.h"
+#include "vtkSMMessageMinimal.h" // needed for vtkSMMessage
+#include "vtkWeakPointer.h" // needed for vtkWeakPointer
 
 class vtkClientServerInterpreter;
 class vtkSMSessionCore;
@@ -87,7 +87,7 @@ protected:
   vtkWeakPointer<vtkClientServerInterpreter> Interpreter;
   vtkWeakPointer<vtkSMSessionCore> SessionCore;
 
-  vtkSMMessage LastPushedMessage;
+  vtkSMMessage* LastPushedMessage;
 
   vtkTypeUInt32 GlobalID;
 private:

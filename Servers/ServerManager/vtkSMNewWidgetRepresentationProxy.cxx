@@ -20,22 +20,21 @@
 #include "vtkClientServerStream.h"
 #include "vtkCommand.h"
 #include "vtkObjectFactory.h"
+#include "vtkPMProxy.h"
 #include "vtkProcessModule.h"
 #include "vtkPVGenericRenderWindowInteractor.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMIntVectorProperty.h"
+#include "vtkSMMessage.h"
 #include "vtkSMPropertyIterator.h"
 #include "vtkSMPropertyLink.h"
 #include "vtkSMProxyProperty.h"
 #include "vtkSMRenderViewProxy.h"
+#include "vtkSMSession.h"
 #include "vtkSMViewProxy.h"
 #include "vtkWeakPointer.h"
 #include "vtkWidgetRepresentation.h"
-
-#include "vtkSMSession.h"
-#include "vtkPMProxy.h"
-#include "vtkSMMessage.h"
 
 #include <vtkstd/list>
 

@@ -24,7 +24,7 @@
 
 #include "vtkUndoElement.h"
 
-#include "vtkSMSession.h"
+class vtkSMSession;
 
 class VTK_EXPORT vtkSMUndoElement : public vtkUndoElement
 {
@@ -34,7 +34,7 @@ public:
 
   // Get/Set the Session.
   vtkGetObjectMacro(Session, vtkSMSession);
-  vtkSetObjectMacro(Session, vtkSMSession);
+  virtual void SetSession(vtkSMSession*);
 
 protected:
   vtkSMUndoElement();

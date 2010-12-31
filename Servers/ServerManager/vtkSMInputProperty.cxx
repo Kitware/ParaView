@@ -17,9 +17,8 @@
 #include "vtkClientServerStream.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
-#include "vtkSMPropertyIterator.h"
+#include "vtkSMMessage.h"
 #include "vtkSMProxy.h"
-#include "vtkSMProxyIterator.h"
 #include "vtkSMProxyLocator.h"
 
 #include <vtkstd/vector>

@@ -17,6 +17,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
 #include "vtkPVServerInformation.h"
+#include "vtkSMMessage.h"
 #include "vtkSMProxyDefinitionManager.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyManager.h"

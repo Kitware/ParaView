@@ -20,7 +20,6 @@
 #define __vtkPMTimeStepsProperty_h
 
 #include "vtkPMProperty.h"
-#include "vtkSMMessage.h"
 
 class VTK_EXPORT vtkPMTimeStepsProperty : public vtkPMProperty
 {

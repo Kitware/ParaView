@@ -15,13 +15,14 @@
 #include "vtkSMProperty.h"
 
 #include "vtkClientServerStream.h"
-#include "vtkObjectFactory.h"
 #include "vtkInstantiator.h"
+#include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMDocumentation.h"
 #include "vtkSMDomain.h"
 #include "vtkSMDomainIterator.h"
+#include "vtkSMMessage.h"
 #include "vtkSMProperty.h"
 #include "vtkSMProxy.h"
 
@@ -416,6 +417,13 @@ int vtkSMProperty::GetCheckDomains()
 //---------------------------------------------------------------------------
 void vtkSMProperty::Copy(vtkSMProperty* )
 {
+}
+
+//---------------------------------------------------------------------------
+void vtkSMProperty::WriteTo(vtkSMMessage* msg)
+{
+  ProxyState_Property *prop = msg->AddExtension(ProxyState::property);
+  prop->set_name(this->GetXMLName());
 }
 
 //---------------------------------------------------------------------------

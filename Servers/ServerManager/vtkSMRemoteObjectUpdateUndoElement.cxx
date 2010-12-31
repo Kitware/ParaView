@@ -14,21 +14,27 @@
 =========================================================================*/
 #include "vtkSMRemoteObjectUpdateUndoElement.h"
 
+#include "vtkCollection.h"
 #include "vtkObjectFactory.h"
-#include "vtkSMSession.h"
 #include "vtkSMMessage.h"
 #include "vtkSMRemoteObject.h"
-#include "vtkCollection.h"
+#include "vtkSMSession.h"
 
 vtkStandardNewMacro(vtkSMRemoteObjectUpdateUndoElement);
 //-----------------------------------------------------------------------------
 vtkSMRemoteObjectUpdateUndoElement::vtkSMRemoteObjectUpdateUndoElement()
 {
+  this->AfterState = new vtkSMMessage();
+  this->BeforeState = new vtkSMMessage();
 }
 
 //-----------------------------------------------------------------------------
 vtkSMRemoteObjectUpdateUndoElement::~vtkSMRemoteObjectUpdateUndoElement()
 {
+  delete this->AfterState;
+  delete this->BeforeState;
+  this->AfterState = NULL;
+  this->BeforeState = NULL;
 }
 
 //-----------------------------------------------------------------------------
@@ -39,13 +45,13 @@ void vtkSMRemoteObjectUpdateUndoElement::PrintSelf(ostream& os, vtkIndent indent
 //-----------------------------------------------------------------------------
 int vtkSMRemoteObjectUpdateUndoElement::Undo()
 {
-  return this->UpdateState(&this->BeforeState);
+  return this->UpdateState(this->BeforeState);
 }
 
 //-----------------------------------------------------------------------------
 int vtkSMRemoteObjectUpdateUndoElement::Redo()
 {
-  return this->UpdateState(&this->AfterState);
+  return this->UpdateState(this->AfterState);
 }
 
 //-----------------------------------------------------------------------------
@@ -86,12 +92,12 @@ int vtkSMRemoteObjectUpdateUndoElement::UpdateState(const vtkSMMessage* state)
 void vtkSMRemoteObjectUpdateUndoElement::SetUndoRedoState(
     const vtkSMMessage* before, const vtkSMMessage* after)
 {
-  this->BeforeState.Clear();
-  this->AfterState.Clear();
+  this->BeforeState->Clear();
+  this->AfterState->Clear();
   if(before && after)
     {
-    this->BeforeState.CopyFrom(*before);
-    this->AfterState.CopyFrom(*after);
+    this->BeforeState->CopyFrom(*before);
+    this->AfterState->CopyFrom(*after);
     }
   else
     {
