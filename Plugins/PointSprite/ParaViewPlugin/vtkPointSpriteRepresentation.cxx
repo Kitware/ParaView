@@ -135,18 +135,18 @@ vtkPointSpriteRepresentation::vtkPointSpriteRepresentation()
   this->LODMapper->SetPainter(this->LODPointSpriteDefaultPainter);
 
   // change the pipeline setup by the superclass to insert our filters in it.
-  //this->ArrayToRadiusFilter->SetInputConnection(
-  //  this->Mapper->GetInputConnection(0, 0));
-  //this->ArrayToOpacityFilter->SetInputConnection(
-  //  this->ArrayToRadiusFilter->GetOutputPort());
-  //this->Mapper->SetInputConnection(this->ArrayToOpacityFilter->GetOutputPort());
+  this->ArrayToRadiusFilter->SetInputConnection(
+    this->Mapper->GetInputConnection(0, 0));
+  this->ArrayToOpacityFilter->SetInputConnection(
+    this->ArrayToRadiusFilter->GetOutputPort());
+  this->Mapper->SetInputConnection(this->ArrayToOpacityFilter->GetOutputPort());
 
-  //this->LODArrayToRadiusFilter->SetInputConnection(
-  //  this->LODMapper->GetInputConnection(0, 0));
-  //this->LODArrayToOpacityFilter->SetInputConnection(
-  //  this->LODArrayToRadiusFilter->GetOutputPort());
-  //this->LODMapper->SetInputConnection(
-  //  this->LODArrayToOpacityFilter->GetOutputPort());
+  this->LODArrayToRadiusFilter->SetInputConnection(
+    this->LODMapper->GetInputConnection(0, 0));
+  this->LODArrayToOpacityFilter->SetInputConnection(
+    this->LODArrayToRadiusFilter->GetOutputPort());
+  this->LODMapper->SetInputConnection(
+    this->LODArrayToOpacityFilter->GetOutputPort());
 }
 
 //----------------------------------------------------------------------------
@@ -231,11 +231,6 @@ void vtkPointSpriteRepresentation::SetRadiusRange(double val0, double val1)
 void vtkPointSpriteRepresentation::SetMaxPixelSize(double val)
 {
   this->PSProperty->SetMaxPixelSize(val);
-}
-
-void vtkPointSpriteRepresentation::SetRadiusArrayName(const char* val)
-{
-  this->PSProperty->SetRadiusArrayName(val);
 }
 
 //***************************************************************************
