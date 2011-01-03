@@ -12,23 +12,21 @@ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
+#include "paraview.h"
 #include "vtkInitializationHelper.h"
 #include "vtkProcessModule.h"
+#include "vtkPVDataInformation.h"
 #include "vtkPVFileInformation.h"
 #include "vtkPVServerOptions.h"
-#include "vtkSMPropertyHelper.h"
-#include "vtkSMProxyManager.h"
-#include "vtkSMSession.h"
-#include "vtkSMSourceProxy.h"
-#include "vtkPVDataInformation.h"
-
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMIntVectorProperty.h"
-#include "vtkSMStringVectorProperty.h"
-
-#include "paraview.h"
-
+#include "vtkSMMessage.h"
+#include "vtkSMPropertyHelper.h"
+#include "vtkSMProxyManager.h"
 #include "vtkSMSessionClient.h"
+#include "vtkSMSession.h"
+#include "vtkSMSourceProxy.h"
+#include "vtkSMStringVectorProperty.h"
 
 //----------------------------------------------------------------------------
 int main(int argc, char* argv[])
