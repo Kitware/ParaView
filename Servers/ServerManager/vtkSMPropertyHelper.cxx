@@ -432,6 +432,11 @@ void vtkSMPropertyHelper::Set(unsigned int index, const char* value)
       this->Property);
     svp->SetElement(index, value);
     }
+  else if (this->Type == vtkSMPropertyHelper::INT)
+    {
+    // enumeration domain
+    vtkSMPropertyHelperWarningMacro("FIXME");
+    }
   else
     {
     vtkSMPropertyHelperWarningMacro("Call not supported for the current property type.");
@@ -446,6 +451,11 @@ const char* vtkSMPropertyHelper::GetAsString(unsigned int index /*=0*/)
     vtkSMStringVectorProperty* svp = static_cast<vtkSMStringVectorProperty*>(
       this->Property);
     return svp->GetElement(index);
+    }
+  else if (this->Type == vtkSMPropertyHelper::INT)
+    {
+    // enumeration domain
+    vtkSMPropertyHelperWarningMacro("FIXME");
     }
 
   vtkSMPropertyHelperWarningMacro("Call not supported for the current property type.");

@@ -139,6 +139,9 @@ public:
   // Description:
   // Set/Get methods for vtkSMStringVectorProperty. Calling these methods on any
   // other type of property will raise errors.
+  // These overloads can be used for vtkSMIntVectorProperty with an enumeration
+  // domain as well, in which case the string-to-int (and vice-versa)
+  // translations are done internally.
   void Set(const char* value)
     { this->Set(0, value); }
   void Set(unsigned int index, const char* value);
