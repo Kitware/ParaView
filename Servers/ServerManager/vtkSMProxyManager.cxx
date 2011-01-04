@@ -409,6 +409,7 @@ vtkSMProxy* vtkSMProxyManager::GetPrototypeProxy(const char* groupname,
     return 0;
     }
   proxy->SetSession(NULL);
+  proxy->SetLocation(0);
   // register the proxy as a prototype.
   this->RegisterProxy(protype_group.c_str(), name, proxy);
   proxy->Delete();
