@@ -229,7 +229,7 @@ void vtkSMSession::GetAllRemoteObjects(vtkCollection* collection)
 vtkIdType vtkSMSession::ConnectToSelf()
 {
   vtkSMSession* session = vtkSMSession::New();
-  vtkProcessModule* pm = vtkProcessModule::New();
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   vtkIdType sid = pm->RegisterSession(session);
   session->Delete();
   return sid;
@@ -244,7 +244,7 @@ vtkIdType vtkSMSession::ConnectToRemote(const char* hostname, int port)
   vtkIdType sid = 0;
   if (session->Connect(sname.str().c_str()))
     {
-    vtkProcessModule* pm = vtkProcessModule::New();
+    vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
     vtkIdType sid = pm->RegisterSession(session);
     }
   session->Delete();
@@ -262,7 +262,7 @@ vtkIdType vtkSMSession::ConnectToRemote(const char* dshost, int dsport,
   vtkIdType sid = 0;
   if (session->Connect(sname.str().c_str()))
     {
-    vtkProcessModule* pm = vtkProcessModule::New();
+    vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
     vtkIdType sid = pm->RegisterSession(session);
     }
   session->Delete();
