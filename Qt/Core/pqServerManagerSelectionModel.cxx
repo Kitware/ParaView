@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVDataInformation.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMOutputPort.h"
+#include "vtkSMProxy.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMProxySelectionModel.h"
 
@@ -46,6 +47,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqOutputPort.h"
 #include "pqPipelineSource.h"
 #include "pqProxy.h"
+#include "pqServer.h"
 #include "pqServerManagerModel.h"
 
 // register meta type for pqSMProxy
@@ -57,6 +59,7 @@ class pqServerManagerSelectionModelInternal
 {
 public:
   QPointer<pqServerManagerModel> Model;
+  QPointer<pqServer> Server; // current server.
 
   // Both the \c Selection and \c Current are kept synchronized with those
   // maintained by vtkSMProxySelectionModel.
@@ -74,7 +77,24 @@ pqServerManagerSelectionModel::pqServerManagerSelectionModel(
   this->Internal = new pqServerManagerSelectionModelInternal;
   this->Internal->Model = _model;
 
-  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+  QObject::connect(_model, SIGNAL(serverAdded(pqServer*)),
+    this, SLOT(onSessionCreated(pqServer*)));
+  QObject::connect(_model, SIGNAL(preSourceRemoved(pqServer*)),
+    this, SLOT(onSessionClosed(pqServer*)));
+
+}
+
+//-----------------------------------------------------------------------------
+pqServerManagerSelectionModel::~pqServerManagerSelectionModel()
+{
+  delete this->Internal;
+}
+
+//-----------------------------------------------------------------------------
+void pqServerManagerSelectionModel::onSessionCreated(pqServer* server)
+{
+  this->Internal->Server = server;
+  vtkSMProxyManager* pxm = server->proxyManager();
   vtkSMProxySelectionModel* selmodel = pxm->GetSelectionModel("ActiveSources");
   if (!selmodel)
     {
@@ -84,7 +104,6 @@ pqServerManagerSelectionModel::pqServerManagerSelectionModel(
     }
 
   this->Internal->ActiveSources = selmodel;
-  
   this->Internal->VTKConnect =
     vtkSmartPointer<vtkEventQtSlotConnect>::New();
   this->Internal->VTKConnect->Connect(selmodel, vtkCommand::CurrentChangedEvent,
@@ -94,9 +113,12 @@ pqServerManagerSelectionModel::pqServerManagerSelectionModel(
 }
 
 //-----------------------------------------------------------------------------
-pqServerManagerSelectionModel::~pqServerManagerSelectionModel()
+void pqServerManagerSelectionModel::onSessionClosed(pqServer* server)
 {
-  delete this->Internal;
+  Q_ASSERT(server == this->Internal->Server);
+  this->Internal->Server = NULL;
+  this->Internal->ActiveSources = NULL;
+  this->Internal->VTKConnect->Disconnect();
 }
 
 //-----------------------------------------------------------------------------
@@ -248,11 +270,13 @@ int pqServerManagerSelectionModel::getCommand(
 vtkSMProxy*
 pqServerManagerSelectionModel::getProxy(pqServerManagerModelItem* item)
 {
+#ifdef FIXME_COLLABORATION
   pqOutputPort* opport = qobject_cast<pqOutputPort*>(item);
   if (opport)
     {
     return opport->getOutputPortProxy();
     }
+#endif
 
   pqProxy* source = qobject_cast<pqProxy*>(item);
   if (source)

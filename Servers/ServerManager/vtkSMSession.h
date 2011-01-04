@@ -139,6 +139,29 @@ public:
   // and 2 render-server nodes, then this method will return 3.
   virtual int GetNumberOfProcesses(vtkTypeUInt32 servers);
 
+  // Description:
+  // These are static helper methods that help create standard ParaView
+  // sessions. They register the session with the process module and return the
+  // session id. Returns 0 on failure.
+  // This overload is used to create a built-in session.
+  static vtkIdType ConnectToSelf();
+
+  // Description:
+  // These are static helper methods that help create standard ParaView
+  // sessions. They register the session with the process module and return the
+  // session id. Returns 0 on failure.
+  // This overload is used to create a client-server session on client.
+  static vtkIdType ConnectToRemote(const char* hostname, int port);
+
+  // Description:
+  // These are static helper methods that help create standard ParaView
+  // sessions. They register the session with the process module and return the
+  // session id. Returns 0 on failure.
+  // This overload is used to create a client-dataserver-renderserver session on
+  // client.
+  static vtkIdType ConnectToRemote(const char* dshost, int dsport,
+    const char* rshost, int rsport);
+
 //BTX
 protected:
   vtkSMSession();

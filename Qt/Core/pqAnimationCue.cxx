@@ -98,18 +98,17 @@ pqAnimationCue::~pqAnimationCue()
 //-----------------------------------------------------------------------------
 void pqAnimationCue::addKeyFrameInternal(vtkSMProxy* keyframe)
 {
-  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
-  pxm->RegisterProxy("animation",
-    QString("KeyFrame%1").arg(keyframe->GetSelfIDAsString()).toAscii().data(),
+  this->proxyManager()->RegisterProxy("animation",
+    QString("KeyFrame%1").arg(keyframe->GetGlobalIDAsString()).toAscii().data(),
     keyframe);
 }
 
 //-----------------------------------------------------------------------------
 void pqAnimationCue::removeKeyFrameInternal(vtkSMProxy* keyframe)
 {
-  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+  vtkSMProxyManager* pxm = this->proxyManager();
   pxm->UnRegisterProxy("animation",
-      pxm->GetProxyName("animation", keyframe), keyframe);
+    pxm->GetProxyName("animation", keyframe), keyframe);
 }
 
 //-----------------------------------------------------------------------------
@@ -158,12 +157,10 @@ void pqAnimationCue::setDefaultPropertyValues()
   vtkSMProxy* proxy = this->getProxy();
   if (!this->Internal->Manipulator)
     {
-    vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+    vtkSMProxyManager* pxm = this->proxyManager();
     vtkSMProxy* manip = 
       pxm->NewProxy("animation_manipulators", 
         this->ManipulatorType.toAscii().data());
-    manip->SetConnectionID(this->getServer()->GetConnectionID());
-    manip->SetServers(vtkProcessModule::CLIENT);
     this->addHelperProxy("Manipulator", manip);
     manip->Delete();
     pqSMAdaptor::setProxyProperty(proxy->GetProperty("Manipulator"),
@@ -320,7 +317,7 @@ vtkSMProxy* pqAnimationCue::insertKeyFrame(int index)
     return 0;
     }
 
-  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+  vtkSMProxyManager* pxm = this->proxyManager();
 
   // Get the current keyframes.
   QList<vtkSMProxy*> keyframes = this->getKeyFrames();
@@ -332,8 +329,6 @@ vtkSMProxy* pqAnimationCue::insertKeyFrame(int index)
     qDebug() << "Could not create new proxy " << this->KeyFrameType;
     return 0;
     }
-  kf->SetConnectionID(this->getServer()->GetConnectionID());
-  kf->SetServers(vtkProcessModule::CLIENT);
 
   keyframes.insert(index, kf);
   double keyTime;

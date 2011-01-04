@@ -578,6 +578,7 @@ bool pqSpreadSheetViewModel::isDataValid( const QModelIndex &idx) const
 //-----------------------------------------------------------------------------
 void pqSpreadSheetViewModel::resetCompositeDataSetIndex()
 {
+#ifdef FIXME_COLLABORATION
   if (!this->activeRepresentation())
     {
     return;
@@ -629,6 +630,7 @@ void pqSpreadSheetViewModel::resetCompositeDataSetIndex()
 
   vtkSMPropertyHelper(reprProxy, "CompositeDataSetIndex").Set(cur_index);
   reprProxy->UpdateVTKObjects();
+#endif
 }
 
 //-----------------------------------------------------------------------------

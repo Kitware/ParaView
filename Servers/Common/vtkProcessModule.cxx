@@ -16,6 +16,7 @@
 #include "vtkProcessModuleInternals.h"
 
 #include "vtkAlgorithm.h"
+#include "vtkCommand.h"
 #include "vtkCompositeDataPipeline.h"
 #include "vtkDummyController.h"
 #include "vtkDynamicLoader.h"
@@ -230,6 +231,7 @@ vtkIdType vtkProcessModule::RegisterSession(vtkSession* session)
   assert(session != NULL);
   this->MaxSessionId++;
   this->Internals->Sessions[this->MaxSessionId] = session;
+  this->InvokeEvent(vtkCommand::ConnectionCreatedEvent, &this->MaxSessionId);
   return this->MaxSessionId;
 }
 
@@ -240,6 +242,8 @@ bool vtkProcessModule::UnRegisterSession(vtkIdType sessionID)
     this->Internals->Sessions.find(sessionID);
   if (iter != this->Internals->Sessions.end())
     {
+    this->InvokeEvent(vtkCommand::ConnectionClosedEvent,
+      &sessionID);
     this->Internals->Sessions.erase(iter);
     return true;
     }
@@ -257,6 +261,8 @@ bool vtkProcessModule::UnRegisterSession(vtkSession* session)
     {
     if (iter->second == session)
       {
+      vtkIdType sessionID = iter->first;
+      this->InvokeEvent(vtkCommand::ConnectionClosedEvent, &sessionID);
       this->Internals->Sessions.erase(iter);
       return true;
       }
@@ -277,6 +283,21 @@ vtkSession* vtkProcessModule::GetSession(vtkIdType sessionID)
     }
 
   return NULL;
+}
+
+//----------------------------------------------------------------------------
+vtkIdType vtkProcessModule::GetSessionID(vtkSession* session)
+{
+  vtkInternals::MapOfSessions::iterator iter;
+  for (iter = this->Internals->Sessions.begin();
+    iter != this->Internals->Sessions.end(); ++iter)
+    {
+    if (iter->second == session)
+      {
+      return iter->first;
+      }
+    }
+  return 0;
 }
 
 //----------------------------------------------------------------------------

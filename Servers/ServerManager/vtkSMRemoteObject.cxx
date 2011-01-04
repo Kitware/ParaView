@@ -19,10 +19,14 @@
 #include "vtkSMMessage.h"
 #include "vtkSMSession.h"
 
+#include <vtksys/SystemTools.hxx>
+#include <vtksys/ios/sstream>
+
 //----------------------------------------------------------------------------
 vtkSMRemoteObject::vtkSMRemoteObject()
 {
   this->GlobalID = 0;
+  this->GlobalIDString = NULL;
   this->Location = 0;
   this->Session = NULL;
 }
@@ -35,6 +39,8 @@ vtkSMRemoteObject::~vtkSMRemoteObject()
     this->Session->UnRegisterRemoteObject(this);
     }
   this->SetSession(0);
+  delete [] this->GlobalIDString;
+  this->GlobalIDString = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -80,9 +86,27 @@ vtkTypeUInt32 vtkSMRemoteObject::GetGlobalID()
     this->GlobalID = this->GetSession()->GetNextGlobalUniqueIdentifier();
     // Register object
     this->Session->RegisterRemoteObject(this);
+
+    vtksys_ios::ostringstream cname;
+    cname << this->GlobalID;
+
+    delete [] this->GlobalIDString;
+    this->GlobalIDString = vtksys::SystemTools::DuplicateString(
+      cname.str().c_str());
     }
 
   return this->GlobalID;
+}
+
+//---------------------------------------------------------------------------
+const char* vtkSMRemoteObject::GetGlobalIDAsString()
+{
+  if (!this->GlobalIDString)
+    {
+    this->GetGlobalID();
+    }
+
+  return this->GlobalIDString;
 }
 
 //---------------------------------------------------------------------------

@@ -29,38 +29,39 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-
 #include "pqServer.h"
 
-#include "vtkClientServerStream.h"
-#include "vtkMapper.h"
-#include "vtkObjectFactory.h"
-#include "vtkProcessModuleConnectionManager.h"
-#include "vtkProcessModuleGUIHelper.h"
-#include "vtkProcessModule.h"
-#include "vtkPVOptions.h"
-#include "vtkPVServerInformation.h"
-#include "vtkSMPropertyHelper.h"
-#include "vtkSMProxyManager.h"
-#include "vtkSMRenderViewProxy.h"
-#include "vtkToolkits.h"
-
-// Qt includes.
-#include <QCoreApplication>
-#include <QtDebug>
-#include <QTimer>
-
-// ParaView includes.
 #include "pqApplicationCore.h"
 #include "pqOptions.h"
 #include "pqServerManagerModel.h"
 #include "pqSettings.h"
 #include "pqTimeKeeper.h"
+#include "vtkClientServerStream.h"
+#include "vtkMapper.h"
+#include "vtkObjectFactory.h"
+#include "vtkProcessModule.h"
+#include "vtkPVOptions.h"
+#include "vtkPVServerInformation.h"
+#include "vtkSMGlobalPropertiesManager.h"
+#include "vtkSMProperty.h"
+#include "vtkSMPropertyHelper.h"
+#include "vtkSMPropertyIterator.h"
+#include "vtkSMProxy.h"
+#include "vtkSMProxyManager.h"
+#include "vtkSMSession.h"
+#include "vtkToolkits.h"
+
+// Qt includes.
+#include <QColor>
+#include <QCoreApplication>
+#include <QtDebug>
+#include <QTimer>
 
 class pqServer::pqInternals
 {
 public:
   QPointer<pqTimeKeeper> TimeKeeper;
+  vtkSmartPointer<vtkSMGlobalPropertiesManager> GlobalPropertiesManager;
   // Used to send an heart beat message to the server to avoid 
   // inactivity timeouts.
   QTimer HeartbeatTimer;
@@ -77,6 +78,8 @@ pqServer::pqServer(vtkIdType connectionID, vtkPVOptions* options, QObject* _pare
 
   this->ConnectionID = connectionID;
   this->Options = options;
+  this->Session = vtkSMSession::SafeDownCast(
+    vtkProcessModule::GetProcessModule()->GetSession(connectionID));
 
   vtkPVServerInformation* serverInfo = this->getServerInformation();
   if (this->isRemote() && serverInfo && serverInfo->GetTimeout() > 0)
@@ -116,7 +119,8 @@ pqServer::~pqServer()
     vtkProcessModule::GetProcessModule()->Disconnect(this->ConnectionID);
     }
     */
-  this->ConnectionID = vtkProcessModuleConnectionManager::GetNullConnectionID();
+  this->ConnectionID = 0;
+  this->Session = NULL;
   delete this->Internals;
 }
 
@@ -130,9 +134,8 @@ void pqServer::initialize()
   this->createTimeKeeper();
 
   // Create the GlobalMapperPropertiesProxy.
-  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+  vtkSMProxyManager* pxm = this->Session->GetProxyManager();
   vtkSMProxy* proxy = pxm->NewProxy("misc", "GlobalMapperProperties");
-  proxy->SetConnectionID(this->ConnectionID);
   proxy->UpdateVTKObjects();
   pxm->RegisterProxy("temp_prototypes", "GlobalMapperProperties", proxy);
   this->GlobalMapperPropertiesProxy = proxy;
@@ -151,10 +154,8 @@ pqTimeKeeper* pqServer::getTimeKeeper() const
 void pqServer::createTimeKeeper()
 {
   // Set Global Time keeper.
-  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+  vtkSMProxyManager* pxm = this->Session->GetProxyManager();
   vtkSMProxy* proxy = pxm->NewProxy("misc","TimeKeeper");
-  proxy->SetConnectionID(this->ConnectionID);
-  proxy->SetServers(vtkProcessModule::CLIENT);
   proxy->UpdateVTKObjects();
   pxm->RegisterProxy("timekeeper", "TimeKeeper", proxy);
   proxy->Delete();
@@ -177,23 +178,16 @@ vtkIdType pqServer::GetConnectionID() const
 }
 
 //-----------------------------------------------------------------------------
-QString pqServer::getRenderViewXMLName() const
-{
-  return "RenderView";
-}
-
-//-----------------------------------------------------------------------------
 int pqServer::getNumberOfPartitions()
 {
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  return pm->GetNumberOfPartitions(this->ConnectionID);
+  return this->Session->GetNumberOfProcesses(
+    vtkPVSession::DATA_SERVER | vtkPVSession::RENDER_SERVER);
 }
 
 //-----------------------------------------------------------------------------
 bool pqServer::isRemote() const
 {
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  return pm->IsRemote(this->ConnectionID);
+  return this->Session->IsA("vtkSMSessionClient");
 }
 
 //-----------------------------------------------------------------------------
@@ -201,24 +195,6 @@ void pqServer::setResource(const pqServerResource &server_resource)
 {
   this->Resource = server_resource;
   emit this->nameChanged(this);
-}
-
-//-----------------------------------------------------------------------------
-void pqServer::getSupportedProxies(const QString& xmlgroup, QList<QString>& names)
-{
-  names.clear();
-  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
-  unsigned int numProxies = pxm->GetNumberOfXMLProxies(
-    xmlgroup.toAscii().data());
-  for (unsigned int cc=0; cc <numProxies; cc++)
-    {
-    const char* name = pxm->GetXMLProxyName(xmlgroup.toAscii().data(),
-      cc);
-    if (name)
-      {
-      names.push_back(name);
-      }
-    }
 }
 
 //-----------------------------------------------------------------------------
@@ -230,8 +206,7 @@ vtkPVOptions* pqServer::getOptions() const
 //-----------------------------------------------------------------------------
 vtkPVServerInformation* pqServer::getServerInformation() const
 {
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  return pm->GetServerInformation(this->GetConnectionID());
+  return this->Session->GetServerInformation();
 }
 
 //-----------------------------------------------------------------------------
@@ -255,13 +230,17 @@ void pqServer::setHeartBeatTimeout(int msec)
 //-----------------------------------------------------------------------------
 void pqServer::heartBeat()
 {
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  vtkClientServerStream stream;
-  stream << vtkClientServerStream::Invoke
-         << pm->GetProcessModuleID()
-         << "GetProcessModule"
-         << vtkClientServerStream::End;
-  pm->SendStream(this->ConnectionID, vtkProcessModule::SERVERS, stream);
+  abort();
+#ifdef FIXME_COLLABORATION
+  // Need a API on vtkSMSession for heart-beats.
+  //vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  //vtkClientServerStream stream;
+  //stream << vtkClientServerStream::Invoke
+  //       << pm->GetProcessModuleID()
+  //       << "GetProcessModule"
+  //       << vtkClientServerStream::End;
+  //pm->SendStream(this->ConnectionID, vtkProcessModule::SERVERS, stream);
+#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -478,4 +457,125 @@ void pqServer::updateGlobalMapperProperties()
     server->setGlobalImmediateModeRendering(
       pqServer::globalImmediateModeRenderingSetting());
     }
+}
+
+//-----------------------------------------------------------------------------
+vtkSMProxyManager* pqServer::proxyManager() const
+{
+  return this->Session->GetProxyManager();
+}
+
+//-----------------------------------------------------------------------------
+vtkSMGlobalPropertiesManager* pqServer::getGlobalPropertiesManager()
+{
+  if (!this->Internals->GlobalPropertiesManager)
+    {
+    // Setup the application's "GlobalProperties" proxy.
+    // This is used to keep track of foreground color etc.
+    this->Internals->GlobalPropertiesManager =
+      vtkSmartPointer<vtkSMGlobalPropertiesManager>::New();
+    this->Internals->GlobalPropertiesManager->InitializeProperties("misc",
+      "GlobalProperties");
+    vtkSMProxyManager* pxm = this->proxyManager();
+    pxm->SetGlobalPropertiesManager("ParaViewProperties",
+      this->Internals->GlobalPropertiesManager);
+
+    // load settings.
+    this->loadGlobalPropertiesFromSettings();
+    }
+  return this->Internals->GlobalPropertiesManager;
+}
+
+#define SET_COLOR_MACRO(settingkey, defaultvalue, propertyname)\
+  color = _settings->value(settingkey, defaultvalue).value<QColor>();\
+  rgb[0] = color.redF();\
+  rgb[1] = color.greenF();\
+  rgb[2] = color.blueF();\
+  vtkSMPropertyHelper(mgr, propertyname).Set(rgb, 3);
+
+//-----------------------------------------------------------------------------
+void pqServer::loadGlobalPropertiesFromSettings()
+{
+  vtkSMGlobalPropertiesManager* mgr = this->getGlobalPropertiesManager();
+  QColor color;
+  double rgb[3];
+  pqSettings* _settings = pqApplicationCore::instance()->settings();
+  SET_COLOR_MACRO(
+    "GlobalProperties/ForegroundColor",
+    QColor::fromRgbF(1, 1, 1),
+    "ForegroundColor");
+  SET_COLOR_MACRO(
+    "GlobalProperties/SurfaceColor",
+    QColor::fromRgbF(1, 1, 1),
+    "SurfaceColor");
+  SET_COLOR_MACRO(
+    "GlobalProperties/BackgroundColor",
+    QColor::fromRgbF(0.32, 0.34, 0.43),
+    "BackgroundColor");
+  SET_COLOR_MACRO(
+    "GlobalProperties/TextAnnotationColor",
+    QColor::fromRgbF(1, 1, 1),
+    "TextAnnotationColor");
+  SET_COLOR_MACRO(
+    "GlobalProperties/SelectionColor",
+    QColor::fromRgbF(1, 0, 1),
+    "SelectionColor");
+  SET_COLOR_MACRO(
+    "GlobalProperties/EdgeColor",
+    QColor::fromRgbF(0.0, 0, 0.5),
+    "EdgeColor");
+
+#ifdef FIXME_COLLABORATION
+  // auto-convert properties is not a global-property, so we should move it to
+  // pqApplicationCore.
+  bool convert =_settings->value(
+    "GlobalProperties/AutoConvertProperties",false).toBool();
+  vtkSMInputArrayDomain::SetAutomaticPropertyConversion(convert);
+  emit this->forceFilterMenuRefresh();
+#endif
+}
+
+//-----------------------------------------------------------------------------
+/// loads palette i.e. global property values given the name of the palette.
+void pqServer::loadPalette(const QString& paletteName)
+{
+  vtkSMProxyManager* pxm = this->proxyManager();
+  vtkSMProxy* prototype = pxm->GetPrototypeProxy("palettes",
+    paletteName.toAscii().data());
+  if (!prototype)
+    {
+    qCritical() << "No such palette " << paletteName;
+    return;
+    }
+
+  vtkSMGlobalPropertiesManager* mgr = this->getGlobalPropertiesManager();
+  vtkSMPropertyIterator * iter = mgr->NewPropertyIterator();
+  for (iter->Begin(); !iter->IsAtEnd(); iter->Next())
+    {
+    if (prototype->GetProperty(iter->GetKey()))
+      {
+      iter->GetProperty()->Copy(
+        prototype->GetProperty(iter->GetKey()));
+      }
+    }
+  iter->Delete();
+}
+
+//-----------------------------------------------------------------------------
+/// loads palette i.e. global property values given the name XML state for a
+/// palette.
+void pqServer::loadPalette(vtkPVXMLElement* xml)
+{
+  vtkSMGlobalPropertiesManager* mgr = this->getGlobalPropertiesManager();
+  mgr->LoadXMLState(xml, NULL);
+}
+
+//-----------------------------------------------------------------------------
+/// save the current palette as XML. A new reference is returned, so the
+/// caller is responsible for releasing memory i.e. call Delete() on the
+/// returned value.
+vtkPVXMLElement* pqServer::getCurrrentPalette()
+{
+  vtkSMGlobalPropertiesManager* mgr = this->getGlobalPropertiesManager();
+  return mgr->SaveXMLState(NULL);
 }

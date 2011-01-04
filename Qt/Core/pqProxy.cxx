@@ -29,7 +29,6 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-
 #include "pqProxy.h"
 
 #include "vtkEventQtSlotConnect.h"
@@ -91,10 +90,10 @@ void pqProxy::addHelperProxy(const QString& key, vtkSMProxy* proxy)
   if (!already_added)
     {
     QString groupname = QString("pq_helper_proxies.%1").arg(
-      this->getProxy()->GetSelfIDAsString());
+      this->getProxy()->GetGlobalIDAsString());
 
     this->Internal->ProxyLists[key].push_back(proxy);
-    vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+    vtkSMProxyManager* pxm = proxy->GetProxyManager();
     pxm->RegisterProxy(groupname.toAscii().data(), 
       key.toAscii().data(), proxy);
     }
@@ -115,8 +114,8 @@ void pqProxy::removeHelperProxy(const QString& key, vtkSMProxy* proxy)
 
 
     QString groupname = QString("pq_helper_proxies.%1").arg(
-      this->getProxy()->GetSelfIDAsString());
-    vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+      this->getProxy()->GetGlobalIDAsString());
+    vtkSMProxyManager* pxm = proxy->GetProxyManager();
     const char* name = pxm->GetProxyName(groupname.toAscii().data(), proxy);
     if (name)
       {
@@ -129,7 +128,7 @@ void pqProxy::removeHelperProxy(const QString& key, vtkSMProxy* proxy)
 void pqProxy::updateHelperProxies() const
 {
   QString groupname = QString("pq_helper_proxies.%1").arg(
-    this->getProxy()->GetSelfIDAsString());
+    this->getProxy()->GetGlobalIDAsString());
   vtkSMProxyIterator* iter = vtkSMProxyIterator::New();
   iter->SetModeToOneGroup();
   for (iter->Begin(groupname.toAscii().data()); !iter->IsAtEnd(); iter->Next())
@@ -147,11 +146,11 @@ void pqProxy::updateHelperProxies() const
 //-----------------------------------------------------------------------------
 void pqProxy::clearHelperProxies()
 {
-  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+  vtkSMProxyManager* pxm = this->getProxy()->GetProxyManager();
   if (pxm)
     {
     QString groupname = QString("pq_helper_proxies.%1").arg(
-      this->getProxy()->GetSelfIDAsString());
+      this->getProxy()->GetGlobalIDAsString());
 
     pqProxyInternal::ProxyListsType::iterator iter
       = this->Internal->ProxyLists.begin();
@@ -221,7 +220,7 @@ void pqProxy::rename(const QString& newname)
 {
   if(newname != this->SMName)
     {
-    vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+    vtkSMProxyManager* pxm = this->getProxy()->GetProxyManager();
     pxm->RegisterProxy(this->getSMGroup().toAscii().data(),
       newname.toAscii().data(), this->getProxy());
     pxm->UnRegisterProxy(this->getSMGroup().toAscii().data(),
@@ -333,6 +332,8 @@ void pqProxy::setDefaultPropertyValues()
 }
 
 //-----------------------------------------------------------------------------
-
-
-
+vtkSMProxyManager* pqProxy::proxyManager() const
+{
+  return this->Internal->Proxy ?
+    this->Internal->Proxy->GetProxyManager() : NULL;
+}

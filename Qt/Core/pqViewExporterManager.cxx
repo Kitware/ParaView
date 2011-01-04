@@ -45,6 +45,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // ParaView Includes.
 #include "pqApplicationCore.h"
 #include "pqPluginManager.h"
+#include "pqServerManagerModel.h"
 #include "pqSMAdaptor.h"
 #include "pqView.h"
 
@@ -52,10 +53,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 pqViewExporterManager::pqViewExporterManager(QObject* _parent):
   Superclass(_parent)
 {
-  this->refresh();
+  QObject::connect(pqApplicationCore::instance()->getServerManagerModel(),
+    SIGNAL(serverAdded(pqServer*)),
+    this, SLOT(refresh()));
   QObject::connect(pqApplicationCore::instance()->getPluginManager(),
     SIGNAL(serverManagerExtensionLoaded()),
     this, SLOT(refresh()));
+  this->refresh();
 }
 
 //-----------------------------------------------------------------------------
@@ -66,7 +70,6 @@ pqViewExporterManager::~pqViewExporterManager()
 //-----------------------------------------------------------------------------
 void pqViewExporterManager::refresh()
 {
-  vtkSMProxyManager::GetProxyManager()->InstantiateGroupPrototypes("exporters");
   this->setView(this->View);
 }
 
@@ -80,12 +83,18 @@ void pqViewExporterManager::setView(pqView* view)
     return;
     }
 
+  // ensure the proxy-manager has instantiated the prototypes.
+  if (this->View)
+    {
+    this->View->getProxy()->GetProxyManager()->InstantiateGroupPrototypes("exporters");
+    }
+
   bool can_export = false;
 
   vtkSMProxy* proxy = view->getProxy();
-  vtkSMProxyIterator* iter = vtkSMProxyIterator::New();
+  vtkSMProxyIterator* iter = proxy->GetProxyManager()->NewIterator();
   iter->SetModeToOneGroup();
-  for (iter->Begin("exporters_prototypes"); 
+  for (iter->Begin("exporters_prototypes");
     !can_export && !iter->IsAtEnd(); iter->Next())
     {
     vtkSMExporterProxy* prototype = vtkSMExporterProxy::SafeDownCast(
@@ -111,7 +120,7 @@ QString pqViewExporterManager::getSupportedFileTypes() const
   vtkSMProxy* proxy = this->View->getProxy();
 
   bool first = true;
-  vtkSMProxyIterator* iter = vtkSMProxyIterator::New();
+  vtkSMProxyIterator* iter = proxy->GetProxyManager()->NewIterator();
   iter->SetModeToOneGroup();
   for (iter->Begin("exporters_prototypes"); !iter->IsAtEnd(); iter->Next())
     {
@@ -155,8 +164,9 @@ bool pqViewExporterManager::write(const QString& filename)
 
   vtkSMProxy* exporter = 0;
   vtkSMProxy* proxy = this->View->getProxy();
+  vtkSMProxyManager* pxm = proxy->GetProxyManager();
+  vtkSMProxyIterator* iter = pxm->NewIterator();
 
-  vtkSMProxyIterator* iter = vtkSMProxyIterator::New();
   iter->SetModeToOneGroup();
   for (iter->Begin("exporters_prototypes"); !iter->IsAtEnd(); iter->Next())
     {
@@ -166,10 +176,8 @@ bool pqViewExporterManager::write(const QString& filename)
       prototype->CanExport(proxy) && 
       extension == prototype->GetFileExtension())
       {
-      exporter = vtkSMProxyManager::GetProxyManager()->NewProxy(
+      exporter = pxm->NewProxy(
         prototype->GetXMLGroup(), prototype->GetXMLName());
-      exporter->SetConnectionID(proxy->GetConnectionID());
-      exporter->SetServers(vtkProcessModule::CLIENT);
       exporter->UpdateVTKObjects();
       break;
       }

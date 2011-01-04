@@ -99,7 +99,7 @@ pqPipelineSource::pqPipelineSource(const QString& name, vtkSMProxy* proxy,
     // Number of output ports is valid even if the output port proxies haven't
     // been created (so long as CreateVTKObjects() has been called on the
     // proxy).
-    source->GetID(); // causes CreateVTKObjects() to be called.
+    source->UpdateVTKObjects(); // causes CreateVTKObjects() to be called.
     int numports = source->GetNumberOfOutputPorts();
 
     for (int cc=0; cc < numports; cc++)
@@ -236,8 +236,8 @@ void pqPipelineSource::addHelperProxy(const QString& key, vtkSMProxy* helper)
 //-----------------------------------------------------------------------------
 void pqPipelineSource::createProxiesForProxyListDomains()
 {
-  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
   vtkSMProxy* proxy = this->getProxy();
+  vtkSMProxyManager* pxm = proxy->GetProxyManager();
   vtkSMPropertyIterator* iter = proxy->NewPropertyIterator();
   for (iter->Begin(); !iter->IsAtEnd(); iter->Next())
     {
@@ -288,7 +288,6 @@ void pqPipelineSource::createProxiesForProxyListDomains()
           " indicated the proxy list domain.";
         continue;
         }
-      new_proxy->SetConnectionID(proxy->GetConnectionID());
       domainProxies.push_back(new_proxy);
       }
 
@@ -384,6 +383,7 @@ void pqPipelineSource::setDefaultPropertyValues()
 
   this->createAnimationHelpersIfNeeded();
 
+#ifdef FIXME_COLLABORATION
   // This is sort-of-a-hack to ensure that when this operation is undo, all the
   // helper proxies are discovered correctly. This needs to happen only after
   // all helper proxies have been created.
@@ -392,6 +392,7 @@ void pqPipelineSource::setDefaultPropertyValues()
   elem->RegisterHelperProxies(this);
   ADD_UNDO_ELEM(elem);
   elem->Delete();
+#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -401,13 +402,11 @@ void pqPipelineSource::createAnimationHelpersIfNeeded()
   if (helpers.size() == 0)
     {
     // Create animation helper which assists in animating display properties.
-    vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+    vtkSMProxyManager* pxm = this->getProxy()->GetProxyManager();
     int numPorts = this->getNumberOfOutputPorts();
     for (int cc=0; cc < numPorts; cc++)
       {
       vtkSMProxy* helper = pxm->NewProxy("misc", "RepresentationAnimationHelper");
-      helper->SetConnectionID(this->getProxy()->GetConnectionID());
-      helper->UpdateVTKObjects();
       vtkSMPropertyHelper(helper, "Source").Add(this->getProxy());
       helper->UpdateVTKObjects();
       this->addHelperProxy("RepresentationAnimationHelper", helper);

@@ -37,7 +37,16 @@ Fix AutoMPI
 vtkPVTimerInformation::CopyFromObject
 
 --------------------------------------------------------------------------------
+Interaction undo stacks in pqRenderView -- these are silly. Do we need to
+support them?
 
+--------------------------------------------------------------------------------
+Fix PluginManager (both SM and Qt).
+
+--------------------------------------------------------------------------------
+pqServerManagerSelectionModel::getProxy
+--------------------------------------------------------------------------------
+pqProgressManager
 
 
 ************** FIXED ***********************************************************

@@ -89,6 +89,9 @@ public:
   // Registers a new session. A new ID is assigned for the session and
   // that ID is returned. The ID can be used in future to access this
   // session.
+  // Fires vtkCommand::ConnectionCreatedEvent every time a session is
+  // registered. The event-data for this event is a vtkIdType whose value is the
+  // session id.
   vtkIdType RegisterSession(vtkSession*);
 
   // Description:
@@ -97,12 +100,20 @@ public:
   // unregistered. Unregistering a session implies that the ProcessModule
   // will no longer monitor communication on the sockets, if any, in the
   // session.
+  // Fires vtkCommand::ConnectionClosedEvent every time a session is
+  // unregistered. The event-data for this event is a vtkIdType whose value is the
+  // session id.
   bool UnRegisterSession(vtkIdType sessionID);
   bool UnRegisterSession(vtkSession* session);
 
   // Description:
   // Returns the session associated with a given ID.
   vtkSession* GetSession(vtkIdType);
+
+  // Description:
+  // Returns the session id for the session, if any. Return 0 is the session has
+  // not been registered with the process module.
+  vtkIdType GetSessionID(vtkSession*);
 
   // Description:
   // Returns a new session iterator that can be used to iterate over the

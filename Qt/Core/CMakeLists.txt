@@ -47,10 +47,10 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqColorButtonEventPlayer.h
   pqColorButtonEventTranslator.h
   pqCommandServerStartup.h
-  pqComparativeContextView.h
-  pqComparativeRenderView.h
-  pqComparativeXYBarChartView.h
-  pqComparativeXYChartView.h
+# pqComparativeContextView.h
+# pqComparativeRenderView.h
+# pqComparativeXYBarChartView.h
+# pqComparativeXYChartView.h
   pqCoreTestUtility.h
   pqDataRepresentation.h
   pqDisplayPolicy.h
@@ -115,10 +115,9 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqTimeKeeper.h
   pqTwoDRenderView.h
 #  pqScatterPlotView.h
-  pqUndoStack.h
+#pqUndoStack.h
   pqView.h
   pqViewExporterManager.h
-  pqWriterFactory.h
   pqXMLEventObserver.h
   pqXMLEventSource.h
   pqXYBarChartView.h
@@ -185,22 +184,14 @@ ADD_LIBRARY(pqCore
   pqBrandPluginsLoader.h
   pqChartRepresentation.cxx
   pqChartRepresentation.h
-  pqContextView.cxx
-  pqContextView.h
   pqColorButtonEventPlayer.cxx
   pqColorButtonEventPlayer.h
   pqColorButtonEventTranslator.cxx
   pqColorButtonEventTranslator.h
   pqCommandServerStartup.cxx
   pqCommandServerStartup.h
-  pqComparativeContextView.cxx
-  pqComparativeContextView.h
-  pqComparativeRenderView.cxx
-  pqComparativeRenderView.h
-  pqComparativeXYBarChartView.cxx
-  pqComparativeXYBarChartView.h
-  pqComparativeXYChartView.cxx
-  pqComparativeXYChartView.h
+  pqContextView.cxx
+  pqContextView.h
   pqCoreExport.h
   pqCoreInit.cxx
   pqCoreInit.h
@@ -213,7 +204,6 @@ ADD_LIBRARY(pqCore
   pqDisplayPolicy.cxx
   pqDisplayPolicy.h
   pqFileDialog.cxx
-  pqFileDialog.h
   pqFileDialogEventPlayer.cxx
   pqFileDialogEventPlayer.h
   pqFileDialogEventTranslator.cxx
@@ -222,6 +212,7 @@ ADD_LIBRARY(pqCore
   pqFileDialogFavoriteModel.h
   pqFileDialogFilter.cxx
   pqFileDialogFilter.h
+  pqFileDialog.h
   pqFileDialogModel.cxx
   pqFileDialogModel.h
   pqFileDialogRecentDirsModel.cxx
@@ -232,8 +223,6 @@ ADD_LIBRARY(pqCore
   pqFlatTreeViewEventTranslator.h
   pqFormBuilder.cxx
   pqFormBuilder.h
-  pqHelperProxyRegisterUndoElement.cxx
-  pqHelperProxyRegisterUndoElement.h
   pqHelperProxyStateLoader.cxx
   pqHelperProxyStateLoader.h
   pqHistogramTableModel.cxx
@@ -250,28 +239,28 @@ ADD_LIBRARY(pqCore
   pqManualServerStartup.h
   pqNameCount.cxx
   pqNameCount.h
-  pqOptions.cxx
-  pqOptions.h
   pqObjectBuilder.cxx
   pqObjectBuilder.h
-  pqOutputWindow.cxx
-  pqOutputWindow.h
-  pqOutputWindowAdapter.cxx
-  pqOutputWindowAdapter.h
+  pqOptions.cxx
+  pqOptions.h
   pqOutputPort.cxx
   pqOutputPort.h
-  pqParallelCoordinatesSettingsModel.cxx
-  pqParallelCoordinatesSettingsModel.h
+  pqOutputWindowAdapter.cxx
+  pqOutputWindowAdapter.h
+  pqOutputWindow.cxx
+  pqOutputWindow.h
   pqParallelCoordinatesChartView.cxx
   pqParallelCoordinatesChartView.h
+  pqParallelCoordinatesSettingsModel.cxx
+  pqParallelCoordinatesSettingsModel.h
   pqPickHelper.cxx
   pqPickHelper.h
   pqPipelineFilter.cxx
   pqPipelineFilter.h
-  pqPipelineSource.cxx
-  pqPipelineSource.h
   pqPipelineRepresentation.cxx
   pqPipelineRepresentation.h
+  pqPipelineSource.cxx
+  pqPipelineSource.h
   pqPlotSettingsModel.cxx
   pqPlotSettingsModel.h
   pqPluginManager.cxx
@@ -284,36 +273,28 @@ ADD_LIBRARY(pqCore
   pqPropertyManager.h
   pqProxy.cxx
   pqProxy.h
-  pqProxyModifiedStateUndoElement.cxx
-  pqProxyModifiedStateUndoElement.h
-  pqProxyUnRegisterUndoElement.cxx
-  pqProxyUnRegisterUndoElement.h
   pqQVTKWidget.cxx
-  pqQVTKWidget.h
   pqQVTKWidgetEventPlayer.cxx
   pqQVTKWidgetEventPlayer.h
   pqQVTKWidgetEventTranslator.cxx
   pqQVTKWidgetEventTranslator.h
-  pqRenderView.cxx
-  pqRenderView.h
+  pqQVTKWidget.h
   pqRenderViewBase.cxx
   pqRenderViewBase.h
+  pqRenderView.cxx
+  pqRenderView.h
   pqRepresentation.cxx
   pqRepresentation.h
   pqRubberBandHelper.cxx
   pqRubberBandHelper.h
-  pqSMAdaptor.cxx
-  pqSMAdaptor.h
-  pqSMProxy.cxx
-  pqSMProxy.h
+  pqScalarBarRepresentation.cxx
+  pqScalarBarRepresentation.h
   pqScalarBarVisibilityAdaptor.cxx
   pqScalarBarVisibilityAdaptor.h
   pqScalarOpacityFunction.cxx
   pqScalarOpacityFunction.h
   pqScalarsToColors.cxx
   pqScalarsToColors.h
-#  pqScatterPlotRepresentation.cxx
-#  pqScatterPlotRepresentation.h
   pqServer.cxx
   pqServer.h
   pqServerManagerModel.cxx
@@ -335,8 +316,10 @@ ADD_LIBRARY(pqCore
   pqServerStartups.h
   pqSettings.cxx
   pqSettings.h
-  pqScalarBarRepresentation.cxx
-  pqScalarBarRepresentation.h
+  pqSMAdaptor.cxx
+  pqSMAdaptor.h
+  pqSMProxy.cxx
+  pqSMProxy.h
   pqSpreadSheetView.cxx
   pqSpreadSheetView.h
   pqSpreadSheetViewModel.cxx
@@ -359,18 +342,14 @@ ADD_LIBRARY(pqCore
   pqTreeLayoutStrategyInterface.h
   pqTwoDRenderView.cxx
   pqTwoDRenderView.h
-#  pqScatterPlotView.cxx
-#  pqScatterPlotView.h
-  pqUndoStack.cxx
-  pqUndoStack.h
+# pqUndoStack.cxx
+# pqUndoStack.h
   pqView.cxx
-  pqView.h
   pqViewExporterManager.cxx
   pqViewExporterManager.h
+  pqView.h
   pqViewModuleInterface.cxx
   pqViewModuleInterface.h
-  pqWriterFactory.cxx
-  pqWriterFactory.h
   pqXMLEventObserver.cxx
   pqXMLEventObserver.h
   pqXMLEventSource.cxx
@@ -389,6 +368,30 @@ ADD_LIBRARY(pqCore
   ${PYTHON_CORE_SRCS}
   vtkPVGUIPluginInterface.cxx
   vtkPVGUIPluginInterface.h
+)
+
+ADD_LIBRARY(pqCore_old
+  pqComparativeContextView.cxx
+  pqComparativeContextView.h
+  pqComparativeRenderView.cxx
+  pqComparativeRenderView.h
+  pqComparativeXYBarChartView.cxx
+  pqComparativeXYBarChartView.h
+  pqComparativeXYChartView.cxx
+  pqComparativeXYChartView.h
+
+  pqHelperProxyRegisterUndoElement.cxx
+  pqHelperProxyRegisterUndoElement.h
+
+  pqProxyModifiedStateUndoElement.cxx
+  pqProxyModifiedStateUndoElement.h
+  pqProxyUnRegisterUndoElement.cxx
+  pqProxyUnRegisterUndoElement.h
+#  pqScatterPlotRepresentation.cxx
+#  pqScatterPlotRepresentation.h
+#  pqScatterPlotView.cxx
+#  pqScatterPlotView.h
+
 )
 
 TARGET_LINK_LIBRARIES(pqCore

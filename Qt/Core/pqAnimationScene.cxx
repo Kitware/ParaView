@@ -37,7 +37,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkEventQtSlotConnect.h"
 #include "vtkPoints.h"
 #include "vtkProcessModule.h"
-#include "vtkSMAnimationSceneProxy.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMPropertyLink.h"
@@ -126,12 +125,6 @@ pqAnimationScene::pqAnimationScene(const QString& group, const QString& name,
 pqAnimationScene::~pqAnimationScene()
 {
   delete this->Internals;
-}
-
-//-----------------------------------------------------------------------------
-vtkSMAnimationSceneProxy* pqAnimationScene::getAnimationSceneProxy() const
-{
-  return vtkSMAnimationSceneProxy::SafeDownCast(this->getProxy());
 }
 
 //-----------------------------------------------------------------------------
@@ -475,7 +468,6 @@ pqAnimationCue* pqAnimationScene::createCueInternal(const QString& cuetype,
   pqObjectBuilder* builder = core->getObjectBuilder();
   vtkSMProxy* cueProxy = builder->createProxy(
     "animation", cuetype.toAscii().data(), this->getServer(), "animation");
-  cueProxy->SetServers(vtkProcessModule::CLIENT);
   pqAnimationCue* cue = smmodel->findItem<pqAnimationCue*>(cueProxy);
   if (!cue)
     {
@@ -616,7 +608,7 @@ void pqAnimationScene::onTick(vtkObject*, unsigned long, void*, void* info)
 //-----------------------------------------------------------------------------
 void pqAnimationScene::updateApplicationSettings()
 {
-  vtkSMAnimationSceneProxy *sceneProxy = this->getAnimationSceneProxy();
+  vtkSMProxy* sceneProxy = this->getProxy();
   pqSMAdaptor::setElementProperty(sceneProxy->GetProperty("Caching"),
                                   this->getCacheGeometrySetting());
   pqSMAdaptor::setElementProperty(sceneProxy->GetProperty("CacheLimit"),

@@ -31,10 +31,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "pqTextRepresentation.h"
 
-#include "vtkSMProxy.h"
-#include "pqSMAdaptor.h"
 #include "pqApplicationCore.h"
+#include "pqServer.h"
+#include "pqSMAdaptor.h"
 #include "vtkSMGlobalPropertiesManager.h"
+#include "vtkSMProxy.h"
 
 //-----------------------------------------------------------------------------
 pqTextRepresentation::pqTextRepresentation(const QString& group, 
@@ -66,7 +67,7 @@ void pqTextRepresentation::setDefaultPropertyValues()
     proxy->GetProperty("Enabled"),1);
 
   vtkSMGlobalPropertiesManager* globalPropertiesManager =
-    pqApplicationCore::instance()->getGlobalPropertiesManager();
+    this->getServer()->getGlobalPropertiesManager();
   globalPropertiesManager->SetGlobalPropertyLink(
     "TextAnnotationColor", proxy, "Color");
   proxy->UpdateVTKObjects();

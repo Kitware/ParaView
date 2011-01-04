@@ -474,6 +474,7 @@ void pqPipelineFilter::hideInputIfRequired(pqView* view)
           {
           // Conditionally turn off the input. The input should be turned
           // off if the representation is surface and the opacity is 1.
+#ifdef FIXME_COLLABORATION
           int reprType = sourceDisp->getRepresentationType();
           if ((reprType != vtkSMPVRepresentationProxy::SURFACE &&
               reprType != vtkSMPVRepresentationProxy::SURFACE_WITH_EDGES) ||
@@ -481,6 +482,7 @@ void pqPipelineFilter::hideInputIfRequired(pqView* view)
             {
             continue;
             }
+#endif
           }
         inputRepr->setVisible(false);
         }

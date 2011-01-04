@@ -31,21 +31,31 @@ struct vtkSMProxyIteratorInternals
 vtkSMProxyIterator::vtkSMProxyIterator()
 {
   this->Internals = new vtkSMProxyIteratorInternals;
-
+  this->ProxyManager = NULL;
   this->Mode = vtkSMProxyIterator::ALL;
-  this->Begin();
 }
 
 //---------------------------------------------------------------------------
 vtkSMProxyIterator::~vtkSMProxyIterator()
 {
   delete this->Internals;
+  this->SetProxyManager(NULL);
+}
+
+//---------------------------------------------------------------------------
+void vtkSMProxyIterator::SetProxyManager(vtkSMProxyManager* pxm)
+{
+  vtkSetObjectBodyMacro(ProxyManager, vtkSMProxyManager, pxm);
+  if (pxm)
+    {
+    this->Begin();
+    }
 }
 
 //---------------------------------------------------------------------------
 void vtkSMProxyIterator::Begin(const char* groupName)
 {
-  vtkSMProxyManager* pm = vtkSMObject::GetProxyManager();
+  vtkSMProxyManager* pm = this->ProxyManager;
   if (!pm)
     {
     vtkErrorMacro("ProxyManager is not set. Can not perform operation: Begin()");
@@ -69,7 +79,7 @@ void vtkSMProxyIterator::Begin(const char* groupName)
 //---------------------------------------------------------------------------
 void vtkSMProxyIterator::Begin()
 {
-  vtkSMProxyManager* pm = vtkSMObject::GetProxyManager();
+  vtkSMProxyManager* pm = this->ProxyManager;
   if (!pm)
     {
     vtkErrorMacro("ProxyManager is not set. Can not perform operation: Begin()");
@@ -104,7 +114,7 @@ void vtkSMProxyIterator::Begin()
 //---------------------------------------------------------------------------
 int vtkSMProxyIterator::IsAtEnd()
 {
-  vtkSMProxyManager* pm = vtkSMObject::GetProxyManager();
+  vtkSMProxyManager* pm = this->ProxyManager;
   if (!pm)
     {
     vtkErrorMacro("ProxyManager is not set. Can not perform operation: IsAtEnd()");
@@ -133,7 +143,7 @@ void vtkSMProxyIterator::Next()
 //---------------------------------------------------------------------------
 void vtkSMProxyIterator::NextInternal()
 {
-  vtkSMProxyManager* pm = vtkSMObject::GetProxyManager();
+  vtkSMProxyManager* pm = this->ProxyManager;
   if (!pm)
     {
     vtkErrorMacro("ProxyManager is not set. Can not perform operation: Next()");
@@ -236,7 +246,7 @@ void vtkSMProxyIterator::NextInternal()
 //---------------------------------------------------------------------------
 const char* vtkSMProxyIterator::GetGroup()
 {
-  vtkSMProxyManager* pm = vtkSMObject::GetProxyManager();
+  vtkSMProxyManager* pm = this->ProxyManager;
   if (!pm)
     {
     vtkErrorMacro("ProxyManager is not set. Can not perform operation: GetGroup()");
@@ -254,7 +264,7 @@ const char* vtkSMProxyIterator::GetGroup()
 //---------------------------------------------------------------------------
 const char* vtkSMProxyIterator::GetKey()
 {
-  vtkSMProxyManager* pm = vtkSMObject::GetProxyManager();
+  vtkSMProxyManager* pm = this->ProxyManager;
   if (!pm)
     {
     vtkErrorMacro("ProxyManager is not set. Can not perform operation: GetKey()");
@@ -276,7 +286,7 @@ const char* vtkSMProxyIterator::GetKey()
 //---------------------------------------------------------------------------
 vtkSMProxy* vtkSMProxyIterator::GetProxy()
 {
-  vtkSMProxyManager* pm = vtkSMObject::GetProxyManager();
+  vtkSMProxyManager* pm = this->ProxyManager;
   if (!pm)
     {
     vtkErrorMacro("ProxyManager is not set. Can not perform operation: GetProxy()");

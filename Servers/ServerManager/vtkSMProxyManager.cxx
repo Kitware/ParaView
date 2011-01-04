@@ -1589,6 +1589,7 @@ vtkSMProxy* vtkSMProxyManager::NewProxy( const vtkSMMessage* msg)
     }
   return NULL;
 }
+
 //---------------------------------------------------------------------------
 void vtkSMProxyManager::LoadXMLDefinitionFromServer()
 {
@@ -1597,4 +1598,12 @@ void vtkSMProxyManager::LoadXMLDefinitionFromServer()
   msg.set_location(vtkProcessModule::DATA_SERVER); // We want to request data server
   this->Session->PullState(&msg);
   this->ProxyDefinitionManager->LoadXMLDefinitionState(&msg);
+}
+
+//---------------------------------------------------------------------------
+vtkSMProxyIterator* vtkSMProxyManager::NewIterator()
+{
+  vtkSMProxyIterator* iter =vtkSMProxyIterator::New();
+  iter->SetProxyManager(this);
+  return iter;
 }

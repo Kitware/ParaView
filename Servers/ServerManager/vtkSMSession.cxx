@@ -22,10 +22,12 @@
 #include "vtkSMProxy.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMRemoteObject.h"
+#include "vtkSMSessionClient.h"
 #include "vtkSMSessionCore.h"
 #include "vtkSMUndoStackBuilder.h"
 #include "vtkWeakPointer.h"
 
+#include <vtksys/ios/sstream>
 #include <assert.h>
 
 vtkStandardNewMacro(vtkSMSession);
@@ -221,4 +223,48 @@ void vtkSMSession::UnRegisterRemoteObject(vtkSMRemoteObject* obj)
 void vtkSMSession::GetAllRemoteObjects(vtkCollection* collection)
 {
   this->Core->GetAllRemoteObjects(collection);
+}
+
+//----------------------------------------------------------------------------
+vtkIdType vtkSMSession::ConnectToSelf()
+{
+  vtkSMSession* session = vtkSMSession::New();
+  vtkProcessModule* pm = vtkProcessModule::New();
+  vtkIdType sid = pm->RegisterSession(session);
+  session->Delete();
+  return sid;
+}
+
+//----------------------------------------------------------------------------
+vtkIdType vtkSMSession::ConnectToRemote(const char* hostname, int port)
+{
+  vtksys_ios::ostringstream sname;
+  sname << "cs://" << hostname << ":" << port;
+  vtkSMSessionClient* session = vtkSMSessionClient::New();
+  vtkIdType sid = 0;
+  if (session->Connect(sname.str().c_str()))
+    {
+    vtkProcessModule* pm = vtkProcessModule::New();
+    vtkIdType sid = pm->RegisterSession(session);
+    }
+  session->Delete();
+  return sid;
+}
+
+//----------------------------------------------------------------------------
+vtkIdType vtkSMSession::ConnectToRemote(const char* dshost, int dsport,
+  const char* rshost, int rsport)
+{
+  vtksys_ios::ostringstream sname;
+  sname << "cdsrs://" << dshost << ":" << dsport << "/"
+    << rshost << ":" << rsport;
+  vtkSMSessionClient* session = vtkSMSessionClient::New();
+  vtkIdType sid = 0;
+  if (session->Connect(sname.str().c_str()))
+    {
+    vtkProcessModule* pm = vtkProcessModule::New();
+    vtkIdType sid = pm->RegisterSession(session);
+    }
+  session->Delete();
+  return sid;
 }

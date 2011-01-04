@@ -39,6 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class pqProxy;
 class pqRenderView;
+class pqServer;
 class pqServerManagerModelItem;
 class vtkSMLink;
 class vtkSMProxy;
@@ -131,6 +132,10 @@ public:
   /// this domain is used to get internal linkable proxies
   static vtkSMProxyListDomain* proxyListDomain(vtkSMProxy* proxy);
 
+protected slots:
+  void onSessionCreated(pqServer*);
+  void onSessionRemoved(pqServer*);
+
 private:
   ItemType getLinkType(vtkSMLink* link) const;
   vtkSMProxy* getProxyFromIndex(const QModelIndex& idx, int dir) const;
@@ -145,7 +150,7 @@ class pqLinksModelObject : public QObject
 {
   Q_OBJECT
 public:
-  pqLinksModelObject(QString name, pqLinksModel* p);
+  pqLinksModelObject(QString name, pqLinksModel* p, pqServer*);
   ~pqLinksModelObject();
 
   QString name() const;

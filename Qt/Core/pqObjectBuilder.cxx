@@ -31,7 +31,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqObjectBuilder.h"
 
-#include "vtkProcessModuleConnectionManager.h"
 #include "vtkProcessModule.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSmartPointer.h"
@@ -42,6 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProxyManager.h"
 #include "vtkSMRenderViewProxy.h"
 #include "vtkSMRepresentationProxy.h"
+#include "vtkSMSession.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMStringVectorProperty.h"
 
@@ -106,12 +106,13 @@ pqPipelineSource* pqObjectBuilder::createSource(const QString& sm_group,
     source->setDefaultPropertyValues();
     source->setModifiedState(pqProxy::UNINITIALIZED);
 
+#ifdef FIXME_COLLABORATION
     pqProxyModifiedStateUndoElement* elem =
       pqProxyModifiedStateUndoElement::New();
     elem->MadeUninitialized(source);
     ADD_UNDO_ELEM(elem);
     elem->Delete();
-
+#endif
     emit this->sourceCreated(source);
     emit this->proxyCreated(source);
     return source;
@@ -291,11 +292,13 @@ pqPipelineSource* pqObjectBuilder::createReader(const QString& sm_group,
   reader->setDefaultPropertyValues();
   reader->setModifiedState(pqProxy::UNINITIALIZED);
 
+#ifdef FIXME_COLLABORATION
   pqProxyModifiedStateUndoElement* elem =
     pqProxyModifiedStateUndoElement::New();
   elem->MadeUninitialized(reader);
   ADD_UNDO_ELEM(elem);
   elem->Delete();
+#endif
 
   emit this->readerCreated(reader, files[0]);
   emit this->readerCreated(reader, files);
@@ -362,7 +365,7 @@ pqView* pqObjectBuilder::createView(const QString& type,
     return NULL;
     }
 
-  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+  vtkSMProxyManager* pxm = server->proxyManager();
   vtkSMProxy* proxy= 0;
 
   QObjectList ifaces =
@@ -384,7 +387,6 @@ pqView* pqObjectBuilder::createView(const QString& type,
     return NULL;
     }
 
-  proxy->SetConnectionID(server->GetConnectionID());
   proxy->UpdateVTKObjects();
 
   QString name = ::pqObjectBuilderGetName(proxy, this->NameGenerator);
@@ -459,12 +461,13 @@ pqDataRepresentation* pqObjectBuilder::createDataRepresentation(
   vtkSMProxy* reprProxy = 0; 
 
   pqPipelineSource* source = opPort->getSource();
+  vtkSMProxyManager* pxm = source->getProxy()->GetProxyManager();
 
   // HACK to create correct representation for text sources/filters.
   QString srcProxyName = source->getProxy()->GetXMLName();
   if (representationType != "")
     {
-    reprProxy = vtkSMObject::GetProxyManager()->NewProxy(
+    reprProxy = pxm->NewProxy(
       "representations", representationType.toAscii().data());
     }
   else
@@ -479,11 +482,7 @@ pqDataRepresentation* pqObjectBuilder::createDataRepresentation(
     return NULL;
     }
 
-  reprProxy->SetConnectionID(view->getServer()->GetConnectionID());
-  
   // (for undo/redo to work).
-  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
-
   QString name = QString("DataRepresentation%1").arg(
     this->NameGenerator->GetCountAndIncrement("DataRepresentation"));
   pxm->RegisterProxy("representations", name.toAscii().data(), reprProxy);
@@ -614,7 +613,6 @@ pqAnimationScene* pqObjectBuilder::createAnimationScene(pqServer* server)
       "animation", QString(), QMap<QString,QVariant>());
   if (proxy)
     {
-    proxy->SetServers(vtkProcessModule::CLIENT);
     proxy->UpdateVTKObjects();
 
     pqAnimationScene* scene = pqApplicationCore::instance()->
@@ -712,8 +710,7 @@ void pqObjectBuilder::destroyAllProxies(pqServer* server)
     return;
     }
 
-  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
-  pxm->UnRegisterProxies(server->GetConnectionID());
+  server->proxyManager()->UnRegisterProxies();
 }
 
 //-----------------------------------------------------------------------------
@@ -733,7 +730,7 @@ vtkSMProxy* pqObjectBuilder::createProxyInternal(const QString& sm_group,
     return 0;
     }
 
-  vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
+  vtkSMProxyManager* pxm = server->proxyManager();
   vtkSmartPointer<vtkSMProxy> proxy;
   proxy.TakeReference(
     pxm->NewProxy(sm_group.toAscii().data(), sm_name.toAscii().data()));
@@ -743,7 +740,6 @@ vtkSMProxy* pqObjectBuilder::createProxyInternal(const QString& sm_group,
     qCritical() << "Failed to create proxy: " << sm_group << ", " << sm_name;
     return 0;
     }
-  proxy->SetConnectionID(server->GetConnectionID());
 
   QString actual_regname = reg_name;
   if (reg_name.isEmpty())
@@ -788,7 +784,7 @@ void pqObjectBuilder::destroyProxyInternal(pqProxy* proxy)
 {
   if (proxy)
     {
-    vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+    vtkSMProxyManager* pxm = proxy->getProxy()->GetProxyManager();
     pxm->UnRegisterProxy(proxy->getSMGroup().toAscii().data(), 
       proxy->getSMName().toAscii().data(), proxy->getProxy());
     }
@@ -864,15 +860,14 @@ pqServer* pqObjectBuilder::createServer(const pqServerResource& resource)
       }
 
     // Based on the server resource, create the correct type of server ...
-    vtkProcessModule *pm = vtkProcessModule::GetProcessModule();
-    vtkIdType id = vtkProcessModuleConnectionManager::GetNullConnectionID();
-    if(server_resource.scheme() == "builtin")
+    vtkIdType id = 0;
+    if (server_resource.scheme() == "builtin")
       {
-      id = pm->ConnectToSelf();
+      id = vtkSMSession::ConnectToSelf();
       }
     else if(server_resource.scheme() == "cs")
       {
-      id = pm->ConnectToRemote(
+      id = vtkSMSession::ConnectToRemote(
         resource.host().toAscii().data(),
         resource.port(11111));
       }
@@ -882,7 +877,7 @@ pqServer* pqObjectBuilder::createServer(const pqServerResource& resource)
       }
     else if(server_resource.scheme() == "cdsrs")
       {
-      id = pm->ConnectToRemote(
+      id = vtkSMSession::ConnectToRemote(
         server_resource.dataServerHost().toAscii().data(),
         server_resource.dataServerPort(11111),
         server_resource.renderServerHost().toAscii().data(),
@@ -897,7 +892,7 @@ pqServer* pqObjectBuilder::createServer(const pqServerResource& resource)
       qCritical() << "Unknown server type: " << server_resource.scheme() << "\n";
       }
 
-    if(id != vtkProcessModuleConnectionManager::GetNullConnectionID())
+    if (id != 0)
       {
       server = smModel->findServer(id);
       server->setResource(server_resource);
@@ -920,8 +915,7 @@ void pqObjectBuilder::removeServer(pqServer* server)
   pqApplicationCore* core = pqApplicationCore::instance();
   core->getServerManagerModel()->beginRemoveServer(server);
   this->destroyAllProxies(server);
-  vtkProcessModule::GetProcessModule()->Disconnect(
-    server->GetConnectionID());
+  vtkProcessModule::GetProcessModule()->UnRegisterSession(server->session());
   core->getServerManagerModel()->endRemoveServer();
 }
 
@@ -933,7 +927,7 @@ void pqObjectBuilder::destroy(pqAnimationCue* cue)
     return;
     }
 
-  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+  vtkSMProxyManager* pxm = cue->getProxy()->GetProxyManager();
 
   QList<vtkSMProxy*> keyframes = cue->getKeyFrames();
   // unregister all the keyframes.

@@ -202,6 +202,7 @@ void pqProgressManager::onEndProgress()
 //-----------------------------------------------------------------------------
 void pqProgressManager::onProgress()
 {
+#ifdef FIXME_COLLABORATION
   int oldProgress = vtkProcessModule::GetProcessModule()->GetLastProgress();
   QString text = vtkProcessModule::GetProcessModule()->GetLastProgressName();
 
@@ -247,4 +248,5 @@ void pqProgressManager::onProgress()
     text = text.mid(3);
     }
   this->setProgress(text, oldProgress);
+#endif
 }

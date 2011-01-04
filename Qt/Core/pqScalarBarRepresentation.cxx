@@ -35,7 +35,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkEventQtSlotConnect.h"
 #include "vtkSMGlobalPropertiesManager.h"
 #include "vtkSMProperty.h"
+#ifdef FIXME_COLLABORATION
 #include "vtkSMPropertyModificationUndoElement.h"
+#endif
 #include "vtkSMProxy.h"
 #include "vtkSMUndoElement.h"
 
@@ -47,6 +49,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPipelineRepresentation.h"
 #include "pqProxy.h"
 #include "pqScalarsToColors.h"
+#include "pqServer.h"
 #include "pqServerManagerModel.h"
 #include "pqSMAdaptor.h"
 #include "pqUndoStack.h"
@@ -84,6 +87,7 @@ pqScalarBarRepresentation::pqScalarBarRepresentation(const QString& group,
   // load default values.
   this->onLookupTableModified();
 
+#ifdef FIXME_COLLABORATION
   pqUndoStack* stack = pqApplicationCore::instance()->getUndoStack();
   if (stack)
     {
@@ -94,6 +98,7 @@ pqScalarBarRepresentation::pqScalarBarRepresentation(const QString& group,
     QObject::connect(this, SIGNAL(end()),
       stack, SLOT(endUndoSet()));
     }
+#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -201,7 +206,7 @@ void pqScalarBarRepresentation::setDefaultPropertyValues()
   // setup global property link. By default, color is linked with
   // TextAnnotationColor.
   vtkSMGlobalPropertiesManager* globalPropertiesManager =
-    pqApplicationCore::instance()->getGlobalPropertiesManager();
+    this->getServer()->getGlobalPropertiesManager();
   globalPropertiesManager->SetGlobalPropertyLink(
     "TextAnnotationColor", proxy, "TitleColor");
   globalPropertiesManager->SetGlobalPropertyLink(
@@ -224,21 +229,24 @@ void pqScalarBarRepresentation::setDefaultPropertyValues()
 void pqScalarBarRepresentation::startInteraction()
 {
   emit this->begin("Move Color Legend");
-  
+
+#ifdef FIXME_COLLABORATION
   vtkSMProxy* proxy = this->getProxy();
   PUSH_PROPERTY("Position");
   PUSH_PROPERTY("Position2");
   PUSH_PROPERTY("Orientation");
+#endif
 }
 
 //-----------------------------------------------------------------------------
 void pqScalarBarRepresentation::endInteraction()
 {
+#ifdef FIXME_COLLABORATION
   vtkSMProxy* proxy = this->getProxy();
   PUSH_PROPERTY("Position");
   PUSH_PROPERTY("Position2");
   PUSH_PROPERTY("Orientation");
-
+#endif
   emit this->end();
 }
 

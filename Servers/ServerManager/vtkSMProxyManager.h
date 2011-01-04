@@ -39,6 +39,8 @@ class vtkSMGlobalPropertiesManager;
 class vtkSMLink;
 class vtkSMProperty;
 class vtkSMProxy;
+class vtkSMProxyDefinitionManager;
+class vtkSMProxyIterator;
 class vtkSMProxyLocator;
 class vtkSMProxyManagerObserver;
 class vtkSMProxyManagerProxySet;
@@ -47,7 +49,6 @@ class vtkSMReaderFactory;
 class vtkSMStateLoader;
 class vtkSMWriterFactory;
 class vtkStringList;
-class vtkSMProxyDefinitionManager;
 
 //BTX
 struct vtkSMProxyManagerInternals;
@@ -446,6 +447,11 @@ public:
   // side when the PM side has already been created.
   // The User MUST delete the provided proxy otherwise it will live forever
   virtual vtkSMProxy* NewProxy(const vtkSMMessage* msg);
+
+  // Description:
+  // Returns a new instance of vtkSMProxyIterator used to iterate over
+  // registered proxies.
+  vtkSMProxyIterator* NewIterator();
 
 protected:
   vtkSMProxyManager();

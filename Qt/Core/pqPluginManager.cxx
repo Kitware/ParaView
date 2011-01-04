@@ -141,14 +141,17 @@ pqPluginManager::pqPluginManager(QObject* p)
   : QObject(p)
 {
   this->Internal = new pqPluginManagerInternal();
+#ifdef FIXME_COLLABORATION
   this->Internal->SMPluginMananger = 
     vtkSMObject::GetApplication()->GetPluginManager();
+#endif
   this->Internal->SMPluginManangerConnect = vtkEventQtSlotConnect::New();
+#ifdef FIXME_COLLABORATION
   this->Internal->SMPluginManangerConnect->Connect(
       this->Internal->SMPluginMananger, vtkSMPluginManager::LoadPluginInvoked,
       this, 
       SLOT(onSMLoadPluginInvoked(vtkObject*, unsigned long, void*, void*)));
-  
+#endif
   QObject::connect(pqApplicationCore::instance()->getObjectBuilder(), 
     SIGNAL(finishedAddingServer(pqServer*)),
     this, SLOT(onServerConnected(pqServer*)));
@@ -187,6 +190,7 @@ pqPluginManager::LoadStatus pqPluginManager::loadServerExtension(
   vtkPVPluginInformation* pluginInfo, bool remote)
 {
   pqPluginManager::LoadStatus success = NOTLOADED;
+#ifdef FIXME_COLLABORATION
   vtkPVPluginInformation* smPluginInfo = NULL;
   if(server)
     {
@@ -211,6 +215,7 @@ pqPluginManager::LoadStatus pqPluginManager::loadServerExtension(
     }
 
   emit this->pluginLoaded(pluginInfo,remote);
+#endif
   return success;
 }
 
@@ -242,9 +247,11 @@ pqPluginManager::LoadStatus pqPluginManager::loadClientExtension(
     if(f.open(QIODevice::ReadOnly))
       {
       QByteArray dat = f.readAll();
-  
+
+#ifdef FIXME_COLLABORATION
       vtkSMProxyManager::GetProxyManager()->LoadConfigurationXML(
         dat.data());
+#endif
       //        pluginInfo->SetFileName(lib.toAscii().constData());
       pluginInfo->SetLoaded(1);
       this->addExtension(NULL, pluginInfo);
@@ -432,6 +439,7 @@ pqPluginManager::LoadStatus pqPluginManager::loadExtension(
 void pqPluginManager::removePlugin(
   pqServer* server, const QString& lib, bool remote)
 {
+#ifdef FIXME_COLLABORATION
   vtkPVPluginInformation* existingPlugin = 
   this->getExistingExtensionByFileName(remote ? server : NULL, lib);
   if(existingPlugin)
@@ -442,6 +450,7 @@ void pqPluginManager::removePlugin(
       existingPlugin->GetServerURI(), existingPlugin->GetFileName());
     existingPlugin->Delete();
     }
+#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -500,6 +509,7 @@ void pqPluginManager::onServerConnected(pqServer* server)
 //-----------------------------------------------------------------------------
 void pqPluginManager::onServerDisconnected(pqServer* server)
 {
+#ifdef FIXME_COLLABORATION
   // remove referenced plugins
   // this->Internal->Extensions.remove(server);
   // 
@@ -514,6 +524,7 @@ void pqPluginManager::onServerDisconnected(pqServer* server)
         this->getServerURIKey(server).toAscii().constData(), 0);
       }
     }
+#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -561,9 +572,11 @@ QStringList pqPluginManager::pluginPaths(pqServer* server)
     }
   else
     {
+#ifdef FIXME_COLLABORATION
     pv_plugin_path = this->Internal->SMPluginMananger->GetPluginPath(
       server->GetConnectionID(),
       this->getServerURIKey(server).toAscii().constData());
+#endif
     }
 
     // add $APPDATA/<organization>/<appname>/Plugins  or
@@ -572,7 +585,9 @@ QStringList pqPluginManager::pluginPaths(pqServer* server)
   QString settingsRoot;
   if(server && this->Internal->IsCurrentServerRemote)
     {
+#ifdef FIXME_COLLABORATION
     settingsRoot = vtkSMObject::GetApplication()->GetSettingsRoot(server->GetConnectionID());
+#endif
     }
   else
     {

@@ -42,6 +42,7 @@ class pqProxyInternal;
 class pqServer;
 class vtkPVXMLElement;
 class vtkSMProxy;
+class vtkSMProxyManager;
 
 /// This class represents any registered Server Manager proxy.
 /// It keeps essential information to locate the proxy as well as
@@ -156,6 +157,9 @@ protected:
   // underlying vtkSMProxy. This needs to be done only once,
   // after the object has been created. 
   virtual void initialize() { };
+
+  /// Returns the proxy manager by calling this->getProxy()->GetProxyManager();
+  vtkSMProxyManager* proxyManager() const;
 
 private:
   pqServer *Server;           ///< Stores the parent server.

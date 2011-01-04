@@ -147,9 +147,11 @@ QString pqOutputPort::getPortName() const
 /// Called to set the selection input.
 void pqOutputPort::setSelectionInput(vtkSMSourceProxy* selSrc, int port)
 {
+#ifdef FIXME_COLLABORATION
   vtkSMSourceProxy* src = vtkSMSourceProxy::SafeDownCast(
     this->getSource()->getProxy());
   src->SetSelectionInput(this->getPortNumber(), selSrc, port);
+#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -157,9 +159,13 @@ void pqOutputPort::setSelectionInput(vtkSMSourceProxy* selSrc, int port)
 /// proxy.
 vtkSMSourceProxy* pqOutputPort::getSelectionInput()
 {
+#ifdef FIXME_COLLABORATION
   vtkSMSourceProxy* src = vtkSMSourceProxy::SafeDownCast(
     this->getSource()->getProxy());
   return src->GetSelectionInput(this->getPortNumber());
+#else
+  return NULL;
+#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -167,9 +173,13 @@ vtkSMSourceProxy* pqOutputPort::getSelectionInput()
 /// proxy.
 unsigned int pqOutputPort::getSelectionInputPort()
 {
+#ifdef FIXME_COLLABORATION
   vtkSMSourceProxy* src = vtkSMSourceProxy::SafeDownCast(
     this->getSource()->getProxy());
   return src->GetSelectionInputPort(this->getPortNumber());
+#else
+  return 0;
+#endif
 }
 
 

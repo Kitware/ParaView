@@ -35,18 +35,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServer.h"
 #include "pqXMLUtil.h"
 
-#include "vtkObject.h"
 #include "vtkCommand.h"
 #include "vtkEventQtSlotConnect.h"
+#include "vtkObject.h"
 #include "vtkProcessModule.h"
-#include "vtkPVXMLElement.h"
 #include "vtkSmartPointer.h"
-#include "vtkSMInputProperty.h"
-#include "vtkSMProxy.h"
 #include "vtkSMProxyManager.h"
-#include "vtkSMProxyProperty.h"
-#include "vtkSMViewProxy.h"
-#include "vtkSMSourceProxy.h"
+#include "vtkSMSession.h"
 
 #include <QList>
 #include <QMap>
@@ -69,32 +64,71 @@ pqServerManagerObserver::pqServerManagerObserver(QObject* p) : QObject(p)
 {
   this->Internal = new pqServerManagerObserverInternal();
 
+  // Listen to interesting events from the process module. Since proxy manager
+  // is created on per-session basis, we wait to handle the proxy manager events
+  // until after a session is created.
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  vtkSMProxyManager *proxyManager = vtkSMProxyManager::GetProxyManager();
-  
-  /// Listen to interesting events from the proxy manager and process module.
-  this->Internal->VTKConnect->Connect(proxyManager, vtkCommand::RegisterEvent, this,
-    SLOT(proxyRegistered(vtkObject*, unsigned long, void*, void*, vtkCommand*)),
-    NULL, 1.0);
-
-  this->Internal->VTKConnect->Connect(proxyManager, vtkCommand::UnRegisterEvent, this,
-    SLOT(proxyUnRegistered(vtkObject*, unsigned long, void*, void*, vtkCommand*)),
-    NULL, 1.0);
-
   this->Internal->VTKConnect->Connect(pm, vtkCommand::ConnectionCreatedEvent,
     this, SLOT(connectionCreated(vtkObject*, unsigned long, void*, void*)));
   this->Internal->VTKConnect->Connect(pm, vtkCommand::ConnectionClosedEvent,
     this, SLOT(connectionClosed(vtkObject*, unsigned long, void*, void*)));
-  this->Internal->VTKConnect->Connect(proxyManager, vtkCommand::LoadStateEvent,
-    this, SLOT(stateLoaded(vtkObject*, unsigned long, void*, void*)));
-  this->Internal->VTKConnect->Connect(proxyManager, vtkCommand::SaveStateEvent,
-    this, SLOT(stateSaved(vtkObject*, unsigned long, void*, void*)));
 }
 
 //-----------------------------------------------------------------------------
 pqServerManagerObserver::~pqServerManagerObserver()
 {
   delete this->Internal;
+}
+
+//-----------------------------------------------------------------------------
+void pqServerManagerObserver::connectionCreated(vtkObject*, unsigned long, void*,
+  void* callData)
+{
+  vtkIdType sessionId = *reinterpret_cast<vtkIdType*>(callData);
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  vtkSMSession* session = vtkSMSession::SafeDownCast(pm->GetSession(sessionId));
+  if (!session)
+    {
+    // ignore all non-server-manager sessions.
+    return;
+    }
+
+  // Listen to interesting events from the proxy manager. Every time a new
+  // session is created, a new proxy manager is created. So we need to do this
+  // initialization of observing event every time.
+  vtkSMProxyManager *proxyManager = session->GetProxyManager();
+  this->Internal->VTKConnect->Connect(proxyManager, vtkCommand::RegisterEvent, this,
+    SLOT(proxyRegistered(vtkObject*, unsigned long, void*, void*, vtkCommand*)),
+    NULL, 1.0);
+  this->Internal->VTKConnect->Connect(proxyManager, vtkCommand::UnRegisterEvent, this,
+    SLOT(proxyUnRegistered(vtkObject*, unsigned long, void*, void*, vtkCommand*)),
+    NULL, 1.0);
+  this->Internal->VTKConnect->Connect(proxyManager, vtkCommand::LoadStateEvent,
+    this, SLOT(stateLoaded(vtkObject*, unsigned long, void*, void*)));
+  this->Internal->VTKConnect->Connect(proxyManager, vtkCommand::SaveStateEvent,
+    this, SLOT(stateSaved(vtkObject*, unsigned long, void*, void*)));
+  emit this->connectionCreated(sessionId);
+}
+
+//-----------------------------------------------------------------------------
+void pqServerManagerObserver::connectionClosed(vtkObject*, unsigned long, void*,
+  void* callData)
+{
+  vtkIdType sessionId = *reinterpret_cast<vtkIdType*>(callData);
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  vtkSMSession* session = vtkSMSession::SafeDownCast(pm->GetSession(sessionId));
+  if (!session)
+    {
+    // ignore all non-server-manager sessions.
+    return;
+    }
+
+  emit this->connectionClosed(sessionId);
+
+  vtkSMProxyManager *proxyManager = session->GetProxyManager();
+  // disconnect all signals from the proxyManager since the proxy manager is
+  // going to be destroyed once the session closes.
+  this->Internal->VTKConnect->Disconnect(proxyManager);
 }
 
 //-----------------------------------------------------------------------------
@@ -146,20 +180,6 @@ void pqServerManagerObserver::proxyUnRegistered(vtkObject*, unsigned long, void*
     emit this->proxyUnRegistered(info->GroupName, info->ProxyName,
       info->Proxy);
     }
-}
-
-//-----------------------------------------------------------------------------
-void pqServerManagerObserver::connectionCreated(vtkObject*, unsigned long, void*, 
-  void* callData)
-{
-  emit this->connectionCreated(*reinterpret_cast<vtkIdType*>(callData));
-}
-
-//-----------------------------------------------------------------------------
-void pqServerManagerObserver::connectionClosed(vtkObject*, unsigned long, void*, 
-  void* callData)
-{
-  emit this->connectionClosed(*reinterpret_cast<vtkIdType*>(callData));
 }
 
 //-----------------------------------------------------------------------------

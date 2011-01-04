@@ -245,12 +245,10 @@ public:
     // if we are doing remote browsing
     if(server)
       {
-      vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
+      vtkSMProxyManager* pxm = server->proxyManager();
 
       vtkSMProxy* helper = pxm->NewProxy("misc", "FileInformationHelper");
       this->FileInformationHelperProxy = helper;
-      helper->SetConnectionID(server->GetConnectionID());
-      helper->SetServers(vtkProcessModule::DATA_SERVER_ROOT);
       helper->Delete();
       helper->UpdateVTKObjects();
       helper->UpdatePropertyInformation();
@@ -315,11 +313,8 @@ public:
 
       // get data from server
       this->FileInformation->Initialize();
-      vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-      pm->GatherInformation(this->FileInformationHelperProxy->GetConnectionID(),
-        vtkProcessModule::DATA_SERVER,
-        this->FileInformation,
-        this->FileInformationHelperProxy->GetID());
+      this->FileInformationHelperProxy->GatherInformation(
+        this->FileInformation);
       }
     else
       {
@@ -615,6 +610,7 @@ bool pqFileDialogModel::mkdir(const QString& dirName)
   if (this->Implementation->isRemote())
     {
     // File system is on remote server.
+#ifdef FIXME_COLLABORATION
     vtkIdType conn = this->Implementation->getServer()->GetConnectionID();
     vtkTypeUInt32 servers = this->Implementation->isRemote() ?
                               vtkProcessModule::DATA_SERVER :
@@ -642,6 +638,7 @@ bool pqFileDialogModel::mkdir(const QString& dirName)
 
     pm->DeleteStreamObject(dirID, stream);
     pm->SendStream(conn, servers, stream);
+#endif
     }
   else
     {
@@ -672,6 +669,7 @@ bool pqFileDialogModel::rmdir(const QString& dirName)
 
   if (this->Implementation->isRemote())
     {
+#ifdef FIXME_COLLABORATION
     vtkIdType conn = this->Implementation->getServer()->GetConnectionID();
     vtkTypeUInt32 servers = this->Implementation->isRemote() ?
                            vtkProcessModule::DATA_SERVER :
@@ -699,6 +697,7 @@ bool pqFileDialogModel::rmdir(const QString& dirName)
 
     pm->DeleteStreamObject(dirID, stream);
     pm->SendStream(conn, servers, stream);
+#endif
     }
   else
     {
@@ -751,6 +750,7 @@ bool pqFileDialogModel::rename(const QString& oldname, const QString& newname)
 
   if (this->Implementation->isRemote())
     {
+#ifdef FIXME_COLLABORATION
     vtkIdType conn = this->Implementation->getServer()->GetConnectionID();
     vtkTypeUInt32 servers = this->Implementation->isRemote() ?
                               vtkProcessModule::DATA_SERVER :
@@ -779,6 +779,7 @@ bool pqFileDialogModel::rename(const QString& oldname, const QString& newname)
 
     pm->DeleteStreamObject(dirID, stream);
     pm->SendStream(conn, servers, stream);
+#endif
     }
   else
     {
