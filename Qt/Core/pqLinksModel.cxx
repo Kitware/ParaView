@@ -129,11 +129,11 @@ pqLinksModel::pqLinksModel(QObject *p)
   this->Internal = pqInternal::New();
   this->Internal->Model = this;
 
-  QObject::connect(pqApplicationCore::instance(),
-    SIGNAL(serverAdded(pqServer*)),
+  pqServerManagerModel* smmodel =
+    pqApplicationCore::instance()->getServerManagerModel();
+  QObject::connect(smmodel, SIGNAL(serverAdded(pqServer*)),
     this, SLOT(onSessionCreated(pqServer*)));
-  QObject::connect(pqApplicationCore::instance(),
-    SIGNAL(serverRemoved(pqServer*)),
+  QObject::connect(smmodel, SIGNAL(serverRemoved(pqServer*)),
     this, SLOT(onSessionRemoved(pqServer*)));
 }
 

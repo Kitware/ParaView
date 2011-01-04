@@ -472,11 +472,12 @@ vtkSMGlobalPropertiesManager* pqServer::getGlobalPropertiesManager()
     {
     // Setup the application's "GlobalProperties" proxy.
     // This is used to keep track of foreground color etc.
+    vtkSMProxyManager* pxm = this->proxyManager();
     this->Internals->GlobalPropertiesManager =
       vtkSmartPointer<vtkSMGlobalPropertiesManager>::New();
+    this->Internals->GlobalPropertiesManager->SetSession(this->session());
     this->Internals->GlobalPropertiesManager->InitializeProperties("misc",
       "GlobalProperties");
-    vtkSMProxyManager* pxm = this->proxyManager();
     pxm->SetGlobalPropertiesManager("ParaViewProperties",
       this->Internals->GlobalPropertiesManager);
 

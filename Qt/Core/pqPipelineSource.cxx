@@ -398,6 +398,9 @@ void pqPipelineSource::setDefaultPropertyValues()
 //-----------------------------------------------------------------------------
 void pqPipelineSource::createAnimationHelpersIfNeeded()
 {
+#ifdef FIXME_COLLABORATION
+  // Haven't converted the vtkSMRepresentationAnimationHelperProxy to new style
+  // yet.
   QList<vtkSMProxy*> helpers = this->getHelperProxies("RepresentationAnimationHelper");
   if (helpers.size() == 0)
     {
@@ -413,6 +416,7 @@ void pqPipelineSource::createAnimationHelpersIfNeeded()
       helper->Delete();
       }
     }
+#endif
 }
 
 //-----------------------------------------------------------------------------

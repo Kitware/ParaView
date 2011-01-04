@@ -79,7 +79,7 @@ pqServerManagerSelectionModel::pqServerManagerSelectionModel(
 
   QObject::connect(_model, SIGNAL(serverAdded(pqServer*)),
     this, SLOT(onSessionCreated(pqServer*)));
-  QObject::connect(_model, SIGNAL(preSourceRemoved(pqServer*)),
+  QObject::connect(_model, SIGNAL(preServerRemoved(pqServer*)),
     this, SLOT(onSessionClosed(pqServer*)));
 
 }
