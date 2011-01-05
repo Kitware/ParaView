@@ -113,8 +113,16 @@ if(NOT APPLE)
 endif()
 include(External_NUMPY)
 include(External_OpenMPI)
-include(External_Silo)
-#include(External_Manta)
+
+if(NOT WIN32)
+  include(External_Silo)
+  list(APPEND ParaView_dependencies Silo)
+endif()
+
+if(NOT WIN32)
+  include(External_Manta)
+  list(APPEND ParaView_dependencies Manta)
+endif()
 
 
 #-----------------------------------------------------------------------------
