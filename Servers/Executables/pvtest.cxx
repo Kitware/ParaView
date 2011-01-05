@@ -113,6 +113,8 @@ int main(int argc, char* argv[])
   view->Delete();
   sphere->Delete();
   repr->Delete();
+  cone->Delete();
+  coneRepr->Delete();
 
   // ====== End of view test =======
 

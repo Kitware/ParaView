@@ -17,7 +17,7 @@
 #include "vtkCommand.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSMProperty.h"
-#include "vtkSmartPointer.h"
+#include "vtkWeakPointer.h"
 
 #include <vtkstd/map>
 #include "vtkStdString.h"
@@ -25,8 +25,12 @@
 
 struct vtkSMDomainInternals
 {
+  // This used to be a vtkSmartPointer. Converting this to vtkWeakPointer.
+  // There's no reason why a domain should have a hard reference to the required
+  // property since both the domain and the required property belong to the same
+  // proxy, so they will be deleted only when the proxy disappears.
   typedef 
-  vtkstd::map<vtkStdString, vtkSmartPointer<vtkSMProperty> > PropertyMap;
+  vtkstd::map<vtkStdString, vtkWeakPointer<vtkSMProperty> > PropertyMap;
   PropertyMap RequiredProperties;
 };
 

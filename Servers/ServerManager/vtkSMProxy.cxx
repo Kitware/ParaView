@@ -1155,7 +1155,6 @@ vtkSMProperty* vtkSMProxy::NewProperty(const char* name)
   vtkSMProperty* property = this->GetProperty(name);
   if (property)
     {
-    property->Register(this);
     return property;
     }
 
