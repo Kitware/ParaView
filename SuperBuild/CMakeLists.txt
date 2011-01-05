@@ -92,7 +92,7 @@ set(NUMPY_dependencies python)
 set(Manta_dependencies)
 set(OpenMPI_dependencies)
 
-set(ParaView_dependencies python NUMPY OpenMPI Manta)
+set(ParaView_dependencies python NUMPY OpenMPI)
 
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------
