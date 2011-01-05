@@ -100,8 +100,8 @@ void pqFileDialogFilter::setFilter(const QString& filter)
     filepatterns.replace("*", ".*");
 
     //use non capturing(?:) for speed
-    //name.ext or ext.001 or .ext-s01.3.0 (for bug #10101)
-    QString postExtFileSeries("((\\.|-s)\\d+)*$"); // match the .0001 component
+    //name.ext or ext.001 or name.ext001 (for bug #10101)
+    QString postExtFileSeries("(\\.?\\d+)?$"); // match the .0001 component
     QString extGroup = ".*\\.(?:" % extensions % ")" % postExtFileSeries;
     QString fileGroup = "(?:" % filepatterns % ")" % postExtFileSeries;
     if (extensions_list.size() > 0 && filepatterns_list.size() > 0)
