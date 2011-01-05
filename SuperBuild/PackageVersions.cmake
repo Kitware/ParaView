@@ -64,10 +64,15 @@ set(QT_URL http://get.qt.nokia.com/qt/source)
 set(QT_GZ qt-everywhere-opensource-src-${QT_VERSION}.tar.gz)
 set(QT_MD5 6f88d96507c84e9fea5bf3a71ebeb6d7)
 
+
+set(CGNS_GZ http://sourceforge.net/projects/cgns/files/cgnslib_2.5/Release%204/cgnslib_2.5-4.tar.gz/download)
+
 set(SILO_MAJOR 4)
 set(SILO_MINOR 8)
 set(SILO_PATCH 0)
 set(SILO_VERSION ${SILO_MAJOR}.${SILO_MINOR}.${SILO_PATCH})
-set(SILO_URL https://wci.llnl.gov/codes/silo/silo-${SILO_MAJOR}.${SILO_MINOR})
+set(SILO_URL http://paraview.org/files/misc)
 set(SILO_GZ silo-${SILO_MAJOR}.${SILO_MINOR}-bsd.tar.gz)
 set(SILO_MD5)
+
+set(HDF5_MAJOR 1)
