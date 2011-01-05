@@ -28,7 +28,6 @@ SET(ParaView_SOURCE_FILES
 #------------------------------------------------------------------------------
 # Add install rules for required system runtimes such as MSVCRxx.dll
 SET (CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS_SKIP ON)
-SET (CMAKE_INSTALL_DEBUG_LIBRARIES ON)
 INCLUDE(InstallRequiredSystemLibraries)
 IF (CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS)
   INSTALL(FILES ${CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS}
