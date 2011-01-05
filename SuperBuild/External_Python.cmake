@@ -70,7 +70,7 @@ if(WIN32)
     )
 
   ExternalProject_Add_Step(${proj} CopyPythonDll
-    COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/python-build/PCbuild/python${PYVER_SHORT}.dll ${CMAKE_BINARY_DIR}/Slicer-build/bin/${CMAKE_CFG_INTDIR}/python${PYVER_SHORT}.dll
+    COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/python-build/PCbuild/python${PYVER_SHORT}.dll ${CMAKE_BINARY_DIR}/python-build/bin/${CMAKE_CFG_INTDIR}/python${PYVER_SHORT}.dll
     DEPENDEES install
     )
 
@@ -78,13 +78,6 @@ if(WIN32)
     COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/python-build/PC/pyconfig.h ${CMAKE_BINARY_DIR}/python-build/Include/pyconfig.h
     DEPENDEES install
     )
-
-  if(Slicer_USE_KWWIDGETS OR Slicer_USE_PYTHONQT_WITH_TCL)
-    ExternalProject_Add_Step(${proj} Copy_tkinterPyd
-      COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/python-build/PCbuild/_tkinter.pyd ${CMAKE_BINARY_DIR}/python-build/Lib/_tkinter.pyd
-      DEPENDEES install
-      )
-  endif()
 
 elseif(UNIX)
   set(python_SOURCE_DIR python)
@@ -128,7 +121,7 @@ elseif(UNIX)
 endif()
 
 #-----------------------------------------------------------------------------
-# Set slicer_PYTHON_INCLUDE and slicer_PYTHON_LIBRARY variables
+# Set PYTHON_INCLUDE and PYTHON_LIBRARY variables
 #
 
 set(PYTHON_INCLUDE)
