@@ -92,7 +92,7 @@ set(NUMPY_dependencies python)
 set(Manta_dependencies)
 set(OpenMPI_dependencies)
 
-set(ParaView_dependencies python CLAPACK NUMPY OpenMPI Manta)
+set(ParaView_dependencies python CLAPACK NUMPY OpenMPI)
 
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------
@@ -113,7 +113,8 @@ if(NOT APPLE)
 endif()
 include(External_NUMPY)
 include(External_OpenMPI)
-include(External_Manta)
+include(External_Silo)
+#include(External_Manta)
 
 
 #-----------------------------------------------------------------------------
