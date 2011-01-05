@@ -67,8 +67,10 @@ SET(Kit_SRCS
   vtkPVOptions.cxx
   vtkPVOptionsXMLParser.cxx
   vtkPVPlugin.cxx
+  vtkPVPluginTracker.cxx
   vtkPVPluginInformation.cxx
   vtkPVPluginLoader.cxx
+  vtkPVPluginsInformation.cxx
 #  vtkPVProgressHandler.cxx
   vtkPVPythonModule.cxx
   vtkPVPythonPluginInterface.cxx
@@ -114,16 +116,16 @@ ENDIF (VTK_USE_MPI)
 
 # Abstract and Wrap exclude
 SET_SOURCE_FILES_PROPERTIES(
-  vtkNetworkAccessManager.cxx
-  vtkSession.cxx
-  vtkPVSession.cxx
-
   vtkCellIntegrator.cxx
+  vtkNetworkAccessManager.cxx
   vtkPVInformation
   vtkPVPlugin.cxx
-  vtkUndoElement
-  vtkPVServerManagerPluginInterface
+  vtkPVPluginTracker
   vtkPVPythonPluginInterface
+  vtkPVServerManagerPluginInterface
+  vtkPVSession.cxx
+  vtkSession.cxx
+  vtkUndoElement
   ABSTRACT
   )
 SET_SOURCE_FILES_PROPERTIES(

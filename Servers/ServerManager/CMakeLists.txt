@@ -83,7 +83,7 @@ SET (Kit_SRCS
   vtkSMOutputPort.cxx
   vtkSMParallelCoordinatesRepresentationProxy.cxx
   vtkSMPluginManager.cxx
-  vtkSMPluginProxy.cxx
+  vtkSMPluginLoaderProxy.cxx
   vtkSMProperty.cxx
   vtkSMPropertyAdaptor.cxx
   vtkSMPropertyHelper.cxx

@@ -12,10 +12,14 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVPluginLoader - Object that can
-// be used to load plugins in the server manager.
+// .NAME vtkPVPluginLoader - Used to load ParaView plugins.
 // .SECTION Description
-// vtkPVPluginLoader can be used to load plugins into the server manager.
+// vtkPVPluginLoader can be used to load plugins for ParaView. vtkPVPluginLoader
+// loads the plugin on the local process. For verbose details during the process
+// of loading the plugin, try setting the environment variable PV_PLUGIN_DEBUG.
+// This class only needed when loading plugins from shared libraries
+// dynamically. For statically importing plugins, one directly uses
+// PV_PLUGIN_IMPORT() macro defined in vtkPVPlugin.h.
 
 #ifndef __vtkPVPluginLoader_h
 #define __vtkPVPluginLoader_h
@@ -35,78 +39,56 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // set/get the filename and load the plugin
-  void SetFileName(const char* file);
-  const char* GetFileName();
-
-//BTX
-  // Description:
-  // Loads the paraview plugin.
-  void Load(vtkPVPlugin*);
-//ETX
-  
-  // Description:
-  // Get the Server Manager PluginInformation object
-  vtkGetObjectMacro(PluginInfo, vtkPVPluginInformation);
-  
-  // Description:
-  // Get the Server Manager XML from a loaded plugin
-  // the string array contains chunks of XML to process
-  vtkGetObjectMacro(ServerManagerXML, vtkStringArray);
+  // Tries to the load the plugin given the path to the plugin file.
+  bool LoadPlugin(const char* filename);
 
   // Description:
-  // Get a list of Python modules from a loaded plugin.  The string array
-  // contains full names of Python modules.
-  vtkGetObjectMacro(PythonModuleNames, vtkStringArray);
+  // Returns the full filename for the plugin attempted to load most recently
+  // using LoadPlugin().
+  vtkGetStringMacro(FileName);
 
   // Description:
-  // Get the Python source for the Python modules in a loaded plugin.  The
-  // string array contains the Python source for a given module.  The entries in
-  // this array correspond to the entries of the same index in the
-  // PythonModuleNames array.
-  vtkGetObjectMacro(PythonModuleSources, vtkStringArray);
+  // Get the plugin name. This returns a valid name only after the plugin has
+  // been loaded.
+  vtkGetStringMacro(PluginName);
 
   // Description:
-  // Get a list of flags specifying whether a given module is really a package.
-  // A 1 for package, 0 for module.  The entries in this array correspond to the
-  // entries of the same index in the PythonModuleNames and PythonModuleSources
-  // arrays.
-  vtkGetObjectMacro(PythonPackageFlags, vtkIntArray);
-    
+  // Get the plugin version string. This returns a valid version string only
+  // after the plugin has been loaded.
+  vtkGetStringMacro(PluginVersion);
+
   // Description:
-  // Get the plugin name string
-  const char* GetPluginName();
-    
-  // Description:
-  // Get the plugin version string
-  const char* GetPluginVersion();
-  
-  // Description:
-  // Get whether the plugin is loaded
-  int GetLoaded(); 
-   
-  // Description:
-  // Get the error string if the plugin failed to load
-  const char* GetError();
-  
+  // Get the error string if the plugin failed to load. Returns NULL if the
+  // plugin was loaded successfully.
+  vtkGetStringMacro(ErrorString);
+
   // Description:
   // Get a string of standard search paths (path1;path2;path3)
   // search paths are based on PV_PLUGIN_PATH,
   // plugin dir relative to executable.
-  const char* GetSearchPaths();
+  vtkGetStringMacro(SearchPaths);
+
+  // Description:
+  // Returns the status of most recent LoadPlugin call.
+  vtkGetMacro(Loaded, bool);
 
 protected:
   vtkPVPluginLoader();
   ~vtkPVPluginLoader();
-  
-  vtkPVPluginInformation* PluginInfo;
 
-  vtkStringArray* ServerManagerXML;
-  vtkStringArray* PythonModuleNames;
-  vtkStringArray* PythonModuleSources;
-  vtkIntArray*    PythonPackageFlags;
+  vtkSetStringMacro(ErrorString);
+  vtkSetStringMacro(PluginName);
+  vtkSetStringMacro(PluginVersion);
+  vtkSetStringMacro(FileName);
+  vtkSetStringMacro(SearchPaths);
+
+  char* ErrorString;
+  char* PluginName;
+  char* PluginVersion;
+  char* FileName;
+  char* SearchPaths;
   bool DebugPlugin;
-
+  bool Loaded;
 private:
   vtkPVPluginLoader(const vtkPVPluginLoader&); // Not implemented.
   void operator=(const vtkPVPluginLoader&); // Not implemented.

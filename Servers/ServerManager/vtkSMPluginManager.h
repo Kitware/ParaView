@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkSMPluginManager.h
+  Module:    $RCSfile$
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -12,23 +12,18 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMPluginManager - Responsible for managing server manager plugins.
+// .NAME vtkSMPluginManager
 // .SECTION Description
-// vtkSMPluginManager is a class that loads and manages server manager plugins.
-// .SECTION See Also
+// vtkSMPluginManager is used to load plugins as well as discover information
+// about currently loaded plugins.
 
 #ifndef __vtkSMPluginManager_h
 #define __vtkSMPluginManager_h
 
 #include "vtkSMObject.h"
-#include "vtkStdString.h" // needed for vtkStdString;
 
-class vtkSMPluginProxy;
-class vtkPVPluginInformation;
-class vtkPVPluginLoader;
-class vtkStringArray;
-class vtkIntArray;
-class vtkStdString;
+class vtkPVPluginsInformation;
+class vtkSMSession;
 
 class VTK_EXPORT vtkSMPluginManager : public vtkSMObject
 {
@@ -38,79 +33,42 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Called to load application-specific configuration xml.
-  void LoadPluginConfigurationXML(const char* filename);
+  // Set the session whose plugin state this manager reflects.
+  // Note this is not reference counted.
+  void SetSession(vtkSMSession*);
 
   // Description:
-  // Given the name for a plugin, tries to locate the shared library for it in
-  // the standard locations. Returns NULL on failure, otherwise the full path to
-  // the shared library is returned.
-  vtkStdString LocatePlugin(const char* pluginname);
-  
-  // Description:
-  // Method to load a plugin in server manager.
-  // filename, the full path to the plugin; if only filename is passed in,
-  //           we assume the server as "builtin" server.
-  // serverURI, the server URI in the format of "scheme://host:port"
-  //            for buildin server, it will be "builtin:"
-  // loadRemote, optional flag to specify whether this is to load plugin 
-  //             on client side or on server side. 
-  // Return a vtkPVPluginInformation object, if sucess; NULL, otherwise
-  vtkPVPluginInformation* LoadPlugin( const char* filename,
-                                      const char* serverURI,
-                                      bool loadRemote = true );
-  vtkPVPluginInformation* LoadLocalPlugin(const char* filename);
-  
-  // Description:
-  // Method to remove a plugin from server manager. This is only removing
-  // the plugin from an internal list, not unloading the plugin
-  void RemovePlugin(const char* serverURI, const char* filename);
-  
-  // Description:
-  // Get the plugin path that specified through some environmental varaibles.
-  const char* GetPluginPath(const char* serverURI);
-  
-  // Description:
-  // Process the plugin information if it is loaded.
-  void ProcessPluginInfo(vtkSMPluginProxy* pluginProxy);  
-  void ProcessPluginInfo(vtkPVPluginLoader* pluginLoader);  
+  // Initializes the plugin manager with information about client and server
+  // side plugins on the session.
+  void Initialize();
 
   // Description:
-  // Update the "Loaded" info of the plugin
-  void UpdatePluginLoadInfo(const char* filename, 
-    const char* serverURI, int loaded);
-    
-//BTX
+  // API to iterate over local and remote plugin information objects.
+  vtkGetObjectMacro(LocalInformation, vtkPVPluginsInformation);
+  vtkGetObjectMacro(RemoteInformation, vtkPVPluginsInformation);
+
   // Description:
-  // Events invoked when LoadPlugin() is called.
+  // Loads the plugin either locally or remotely.
+  bool LoadRemotePlugin(const char* filename);
+  bool LoadLocalPlugin(const char* filename);
+
   enum
     {
-    LoadPluginInvoked = 10000,
+    PluginLoadedEvent = 100000
     };
-//ETX
-  
 //BTX
 protected:
   vtkSMPluginManager();
   ~vtkSMPluginManager();
 
-  // Description:
-  // Check if the plugin is already loaded, given the file name 
-  virtual vtkPVPluginInformation* FindPluginByFileName(
-    const char* filename, const char* serverURI);
-  void UpdatePluginMap(
-    const char* serverURI, vtkPVPluginInformation* localInfo);    
-  
+  vtkPVPluginsInformation* LocalInformation;
+  vtkPVPluginsInformation* RemoteInformation;
 private:
   vtkSMPluginManager(const vtkSMPluginManager&); // Not implemented
   void operator=(const vtkSMPluginManager&); // Not implemented
-  
-  class vtkSMPluginManagerInternals;
-  vtkSMPluginManagerInternals* Internal;
 
-  void ProcessPluginSMXML(vtkStringArray* smXMLArray);
-  void ProcessPluginPythonInfo(vtkStringArray* pyNames,
-    vtkStringArray* pySources, vtkIntArray* pyFlags);
+  class vtkInternals;
+  vtkInternals* Internals;
 //ETX
 };
 

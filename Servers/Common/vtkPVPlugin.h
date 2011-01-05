@@ -42,6 +42,7 @@
 class VTK_EXPORT vtkPVPlugin
 {
 public:
+  vtkPVPlugin();
   virtual ~vtkPVPlugin();
 
   // Description:
@@ -70,9 +71,6 @@ public:
   // specifically, all plugin managers have been created and they have
   // registered their callbacks.
   static void ImportPlugin(vtkPVPlugin* plugin);
-
-  typedef void (*Callback)(vtkPVPlugin*, void* calldata);
-  static void RegisterPluginManagerCallback(Callback callback, void* calldata);
 };
 
 typedef const char* (C_DECL *pv_plugin_query_verification_data_fptr)();

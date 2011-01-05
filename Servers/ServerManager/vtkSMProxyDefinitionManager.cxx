@@ -21,6 +21,9 @@
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
 #include "vtkPVConfig.h"
+#include "vtkPVPlugin.h"
+#include "vtkPVPluginTracker.h"
+#include "vtkPVServerManagerPluginInterface.h"
 #include "vtkPVXMLElement.h"
 #include "vtkPVXMLParser.h"
 #include "vtkSmartPointer.h"
@@ -443,6 +446,17 @@ vtkSMProxyDefinitionManager::vtkSMProxyDefinitionManager()
   // Load the generated modules
 # include "vtkParaViewIncludeModulesToSMApplication.h"
 
+  // Now register with the plugin tracker, so that when new plugins are loaded,
+  // we parse the XML if provided and automatically add it to the proxy
+  // definitions.
+  vtkPVPluginTracker* tracker = vtkPVPluginTracker::GetInstance();
+  tracker->AddObserver(vtkCommand::RegisterEvent, this,
+    &vtkSMProxyDefinitionManager::OnPluginLoaded);
+  // process any already loaded plugins.
+  for (unsigned int cc=0; cc < tracker->GetNumberOfPlugins(); cc++)
+    {
+    this->HandlePlugin(tracker->GetPlugin(cc));
+    }
 }
 
 //---------------------------------------------------------------------------
@@ -1001,5 +1015,29 @@ void vtkSMProxyDefinitionManager::LoadXMLDefinitionState(vtkSMMessage* msg)
     parser->Parse(xmlDef->xml().c_str());
     this->AddCustomProxyDefinition( xmlDef->group().c_str(), xmlDef->name().c_str(),
                                     parser->GetRootElement());
+    }
+}
+
+//---------------------------------------------------------------------------
+void vtkSMProxyDefinitionManager::OnPluginLoaded(
+  vtkObject*, unsigned long, void* calldata)
+{
+  vtkPVPlugin* plugin = reinterpret_cast<vtkPVPlugin*>(calldata);
+  this->HandlePlugin(plugin);
+}
+
+//---------------------------------------------------------------------------
+void vtkSMProxyDefinitionManager::HandlePlugin(vtkPVPlugin* plugin)
+{
+  vtkPVServerManagerPluginInterface* smplugin =
+    dynamic_cast<vtkPVServerManagerPluginInterface*>(plugin);
+  if (smplugin)
+    {
+    vtkstd::vector<vtkstd::string> xmls;
+    smplugin->GetXMLs(xmls);
+    for (size_t cc=0; cc < xmls.size(); cc++)
+      {
+      this->LoadConfigurationXMLFromString(xmls[cc].c_str());
+      }
     }
 }

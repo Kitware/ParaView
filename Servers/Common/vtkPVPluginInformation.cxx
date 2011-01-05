@@ -125,8 +125,9 @@ void vtkPVPluginInformation::CopyFromObject(vtkObject* obj)
     vtkErrorMacro("Cannot downcast to vtkPVPluginLoader.");
     return;
     }
-  
+#ifdef FIXME_COLLABORATION
   this->DeepCopy(pluginLoader->GetPluginInfo());
+#endif
 }
 
 //----------------------------------------------------------------------------

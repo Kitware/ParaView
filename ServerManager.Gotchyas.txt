@@ -43,6 +43,8 @@ support them?
 --------------------------------------------------------------------------------
 Fix PluginManager (both SM and Qt).
 
+Need to fix loading of server-side XML when a remote plugin is loaded.
+
 --------------------------------------------------------------------------------
 pqServerManagerSelectionModel::getProxy
 --------------------------------------------------------------------------------

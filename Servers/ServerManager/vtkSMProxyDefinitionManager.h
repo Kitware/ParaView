@@ -26,6 +26,7 @@
 #include "vtkSMObject.h"
 #include "vtkSMMessageMinimal.h" // needed for vtkSMMessage
 
+class vtkPVPlugin;
 class vtkPVXMLElement;
 class vtkSMProxyDefinitionIterator;
 
@@ -143,6 +144,11 @@ public:
 protected:
   vtkSMProxyDefinitionManager();
   ~vtkSMProxyDefinitionManager();
+
+  // Description:
+  // Callback called when a plugin is loaded.
+  void OnPluginLoaded(vtkObject* caller, unsigned long event, void* calldata);
+  void HandlePlugin(vtkPVPlugin*);
 
   // Description:
   // Called by the XML parser to add an element from which a proxy

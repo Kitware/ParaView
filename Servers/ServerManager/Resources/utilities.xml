@@ -2002,57 +2002,31 @@
       <!-- End of TimeKeeper -->
     </TimeKeeperProxy>
     
-    <PluginProxy name="PluginLoader" class="vtkPVPluginLoader">
-      <StringVectorProperty
-        name="FileName"
-        command="SetFileName"
-        number_of_elements="1">
-        <FileListDomain name="files"/>
-      </StringVectorProperty>
-      
-      <IntVectorProperty
-        name="Loaded"
+    <PluginLoaderProxy name="PluginLoader"
+                       class="vtkPVPluginLoader"
+                       processes="dataserver|renderserver" >
+      <Documentation>
+        Use this proxy to load a plugin remotely.
+      </Documentation>
+
+      <IntVectorProperty name="Loaded"
         command="GetLoaded"
-        number_of_elements="1"
-        information_only="1"
-        default_values="0" />
-      
-      <StringVectorProperty
-        name="Error"
-        command="GetError"
-        number_of_elements="1"
-        information_only="1" />
-      
-      <StringVectorProperty
-        name="SearchPaths"
+        information_only="1">
+      </IntVectorProperty>
+
+      <StringVectorProperty name="ErrorString"
+        command="GetErrorString"
+        information_only="1">
+      </StringVectorProperty>
+
+      <StringVectorProperty name="SearchPaths"
         command="GetSearchPaths"
-        number_of_elements="1"
-        information_only="1" />
-      
-      <StringVectorProperty
-        name="ServerManagerXML"
-        command="GetServerManagerXML"
-        information_only="1"
-        kernel_class="vtkPMDataArrayProperty" />
-
-      <StringVectorProperty name="PythonModuleNames"
-                            command="GetPythonModuleNames"
-                            information_only="1"
-                            kernel_class="vtkPMDataArrayProperty" />
-
-      <StringVectorProperty name="PythonModuleSources"
-                            command="GetPythonModuleSources"
-                            information_only="1"
-                            kernel_class="vtkPMDataArrayProperty" />
-
-      <IntVectorProperty name="PythonPackageFlags"
-                         command="GetPythonPackageFlags"
-                         information_only="1"
-                         kernel_class="vtkPMDataArrayProperty" />
+        information_only="1">
+      </StringVectorProperty>
 
       <!-- End of PluginLoader -->
-    </PluginProxy>
-    
+    </PluginLoaderProxy>
+
     <Proxy name="KdTreeManager" class="vtkKdTreeManager">
       <ProxyProperty  
         name="KdTree"

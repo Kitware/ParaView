@@ -14,37 +14,23 @@
 =========================================================================*/
 #include "vtkPVPlugin.h"
 
-#include "vtkObjectFactory.h"
-
-#include <vtkstd/vector>
-
-class vtkPVPluginInternals
-{
-public:
-  vtkstd::vector<vtkPVPlugin::Callback> Callbacks;
-  vtkstd::vector<void*> CallDatas;
-};
-
-static vtkPVPluginInternals PVPluginInternals;
-
-//-----------------------------------------------------------------------------
-void vtkPVPlugin::RegisterPluginManagerCallback(
-  vtkPVPlugin::Callback callback, void* calldata)
-{
-  ::PVPluginInternals.Callbacks.push_back(callback);
-  ::PVPluginInternals.CallDatas.push_back(calldata);
-}
+#include "vtkPVPluginTracker.h"
 
 //-----------------------------------------------------------------------------
 void vtkPVPlugin::ImportPlugin(vtkPVPlugin* plugin)
 {
-  for (size_t cc=0; cc < PVPluginInternals.Callbacks.size(); cc++)
-    {
-    PVPluginInternals.Callbacks[cc](plugin,
-      PVPluginInternals.CallDatas[cc]);
-    }
+  // Register the plugin with the plugin manager on the current process. That
+  // will kick in the code to process the plugin e.g. initialize CSInterpreter,
+  // load XML etc.
+  vtkPVPluginTracker::GetInstance()->RegisterPlugin(plugin);
 }
 
+//-----------------------------------------------------------------------------
+vtkPVPlugin::vtkPVPlugin()
+{
+}
+
+//-----------------------------------------------------------------------------
 vtkPVPlugin::~vtkPVPlugin()
 {
 

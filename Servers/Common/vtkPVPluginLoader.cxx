@@ -14,19 +14,13 @@
 =========================================================================*/
 #include "vtkPVPluginLoader.h"
 
-#include "vtkClientServerInterpreter.h"
-#include "vtkClientServerInterpreterInitializer.h"
 #include "vtkDynamicLoader.h"
-#include "vtkIntArray.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
 #include "vtkPVOptions.h"
 #include "vtkPVPlugin.h"
-#include "vtkPVPluginInformation.h"
 #include "vtkPVPythonPluginInterface.h"
 #include "vtkPVServerManagerPluginInterface.h"
-#include "vtkSmartPointer.h"
-#include "vtkStringArray.h"
 
 #include <vtkstd/string>
 #include <vtksys/SystemTools.hxx>
@@ -71,12 +65,14 @@ vtkStandardNewMacro(vtkPVPluginLoader);
 //-----------------------------------------------------------------------------
 vtkPVPluginLoader::vtkPVPluginLoader()
 {
-  this->PluginInfo = vtkPVPluginInformation::New();
-  this->ServerManagerXML = vtkStringArray::New();
-  this->PythonModuleNames = vtkStringArray::New();
-  this->PythonModuleSources = vtkStringArray::New();
-  this->PythonPackageFlags = vtkIntArray::New();
   this->DebugPlugin = vtksys::SystemTools::GetEnv("PV_PLUGIN_DEBUG") != NULL;
+  this->ErrorString = NULL;
+  this->PluginName = NULL;
+  this->PluginVersion = NULL;
+  this->FileName = NULL;
+  this->SearchPaths = NULL;
+  this->Loaded = false;
+  this->SetErrorString("No plugin loaded yet.");
 
   vtksys::String paths;
   const char* env = vtksys::SystemTools::GetEnv("PV_PLUGIN_PATH");
@@ -103,60 +99,43 @@ vtkPVPluginLoader::vtkPVPluginLoader()
       }
     }
 
-  this->PluginInfo->SetSearchPaths(paths.c_str());
+  this->SetSearchPaths(paths.c_str());
 }
 
 //-----------------------------------------------------------------------------
 vtkPVPluginLoader::~vtkPVPluginLoader()
 {
-  if(this->ServerManagerXML)
-    {
-    this->ServerManagerXML->Delete();
-    }
-  if(this->PythonModuleNames)
-    {
-    this->PythonModuleNames->Delete();
-    }
-  if(this->PythonModuleSources)
-    {
-    this->PythonModuleSources->Delete();
-    }
-  if(this->PythonPackageFlags)
-    {
-    this->PythonPackageFlags->Delete();
-    }
-
-  this->PluginInfo->Delete();
+  this->SetErrorString(0);
+  this->SetPluginName(0);
+  this->SetPluginVersion(0);
+  this->SetFileName(0);
+  this->SetSearchPaths(0);
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVPluginLoader::SetFileName(const char* file)
+bool vtkPVPluginLoader::LoadPlugin(const char* file)
 {
+  this->Loaded = false;
   vtkPVPluginLoaderDebugMacro(
     "\n***************************************************\n"
     "Attempting to load " << file);
-  if (this->PluginInfo->GetLoaded())
-    {
-    vtkPVPluginLoaderDebugMacro("Already loaded! Nothing to do.");
-    return;
-    }
-
   if (!file || file[0] == '\0')
     {
     vtkErrorMacro("Invalid filename");
-    return;
+    this->SetErrorString("Invalid filename");
+    return false;
     }
 
-  this->PluginInfo->SetFileName(file);
+  this->SetFileName(file);
   vtkstd::string defaultname = vtksys::SystemTools::GetFilenameWithoutExtension(file);
-  this->PluginInfo->SetPluginName(defaultname.c_str());
+  this->SetPluginName(defaultname.c_str());
   vtkLibHandle lib = vtkDynamicLoader::OpenLibrary(file);
   if (!lib)
     {
     vtkPVPluginLoaderDebugMacro("Failed to load the shared library.");
-    this->PluginInfo->SetError(vtkDynamicLoader::LastError());
-    vtkPVPluginLoaderDebugMacro(this->PluginInfo->GetError());
-    return;
+    this->SetErrorString(vtkDynamicLoader::LastError());
+    vtkPVPluginLoaderDebugMacro(this->GetErrorString());
+    return false;
     }
 
   // So that the lib is closed when the application quits.
@@ -180,13 +159,10 @@ void vtkPVPluginLoader::SetFileName(const char* file)
       "\"pv_plugin_query_verification_data\" which is required to test the "
       "plugin signature. This may not be a ParaView plugin dll or maybe "
       "from a older version of ParaView when this function was not required.");
-    this->PluginInfo->SetError(
+    this->SetErrorString(
       "Not a ParaView Plugin since could not locate the plugin-verification function");
-    //vtkErrorMacro(
-    //  "Not a ParaView Plugin since could not locate the plugin-verification "
-    //  "function");
     vtkDynamicLoader::CloseLibrary(lib);
-    return;
+    return false;
     }
 
   vtkstd::string pv_verfication_data = pv_plugin_query_verification_data();
@@ -203,13 +179,13 @@ void vtkPVPluginLoader::SetFileName(const char* file)
       "ParaView Signature: " << __PV_PLUGIN_VERIFICATION_STRING__ << "\n"
       "Plugin Signature: " << pv_verfication_data.c_str();
     vtkErrorMacro(<< error.str().c_str());
-    this->PluginInfo->SetError(error.str().c_str());
+    this->SetErrorString(error.str().c_str());
     vtkDynamicLoader::CloseLibrary(lib);
     vtkPVPluginLoaderDebugMacro(
       "Mismatch in versions signifies that the plugin was built for "
       "a different version of ParaView or with a different compilter. "
       "Look at the signatures to determine what caused the mismatch.");
-    return;
+    return false;
     }
 
   // If we succeeded so far, then obtain the instace of vtkPVPlugin for this
@@ -225,14 +201,14 @@ void vtkPVPluginLoader::SetFileName(const char* file)
       "global function \"pv_plugin_instance\" which is required to locate the "
       "instance of the vtkPVPlugin class. Possibly the plugin shared library was "
       "not compiled properly.");
-    this->PluginInfo->SetError(
+    this->SetErrorString(
       "Not a ParaView Plugin since could not locate the plugin-instance "
       "function.");
     vtkErrorMacro(
       "Not a ParaView Plugin since could not locate the plugin-instance "
       "function.");
     vtkDynamicLoader::CloseLibrary(lib);
-    return;
+    return false;
     }
 
   vtkPVPluginLoaderDebugMacro("Plugin signature verification successful. "
@@ -286,12 +262,57 @@ void vtkPVPluginLoader::SetFileName(const char* file)
     }
 
   vtkPVPlugin* plugin = pv_plugin_query_instance();
-  this->Load(plugin);
+  this->SetPluginName(plugin->GetPluginName());
+  this->SetPluginVersion(plugin->GetPluginVersionString());
+
+  // Print some debug information about the plugin, if needed.
+  vtkPVPluginLoaderDebugMacro("Plugin instance located successfully. "
+    "Now loading components from the plugin instance based on the interfaces it "
+    "implements.");
+  vtkPVPluginLoaderDebugMacro(
+    "----------------------------------------------------------------\n"
+    "Plugin Information: \n"
+    "  Name        : " << plugin->GetPluginName() << "\n"
+    "  Version     : " << plugin->GetPluginVersionString() << "\n"
+    "  ReqOnServer : " << plugin->GetRequiredOnServer() << "\n"
+    "  ReqOnClient : " << plugin->GetRequiredOnClient() << "\n"
+    "  ReqPlugins  : " << plugin->GetRequiredPlugins());
+  vtkPVServerManagerPluginInterface* smplugin =
+    dynamic_cast<vtkPVServerManagerPluginInterface*>(plugin);
+  if (smplugin)
+    {
+    vtkPVPluginLoaderDebugMacro("  ServerManager Plugin : Yes");
+    }
+  else
+    {
+    vtkPVPluginLoaderDebugMacro("  ServerManager Plugin : No");
+    }
+
+  vtkPVPythonPluginInterface *pyplugin =
+    dynamic_cast<vtkPVPythonPluginInterface*>(plugin);
+  if (pyplugin)
+    {
+    vtkPVPluginLoaderDebugMacro("  Python Plugin : Yes");
+    }
+  else
+    {
+    vtkPVPluginLoaderDebugMacro("  Python Plugin : No");
+    }
+
+  // From this point onwards the vtkPVPlugin travels the same path as a
+  // statically imported plugin.
+  vtkPVPlugin::ImportPlugin(plugin);
+  this->Loaded = true;
+  return true;
 }
 
 //-----------------------------------------------------------------------------
+#ifdef FIXME_COLLABORATION
 void vtkPVPluginLoader::Load(vtkPVPlugin* plugin)
 {
+  // This code should move somewhere else. I don't like the way static and
+  // dynamic loading of plugins differs and we are trying to consolidate that
+  // now.
   if (!plugin)
     {
     vtkErrorMacro("Cannot load NULL plugin.");
@@ -381,57 +402,19 @@ void vtkPVPluginLoader::Load(vtkPVPlugin* plugin)
     }
   this->Modified();
 }
-
-//-----------------------------------------------------------------------------
-const char* vtkPVPluginLoader::GetFileName()
-{
-  return this->GetPluginInfo()->GetFileName();
-}
-
-//-----------------------------------------------------------------------------
-const char* vtkPVPluginLoader::GetPluginName()
-{
-  return this->GetPluginInfo()->GetPluginName();
-}
-
-//-----------------------------------------------------------------------------
-const char* vtkPVPluginLoader::GetPluginVersion()
-{
-  return this->GetPluginInfo()->GetPluginVersion();
-}
-
-//-----------------------------------------------------------------------------
-int vtkPVPluginLoader::GetLoaded()
-{
-  return this->GetPluginInfo()->GetLoaded();
-}
-
-//-----------------------------------------------------------------------------
-const char* vtkPVPluginLoader::GetError()
-{
-  return this->GetPluginInfo()->GetError();
-}
-
-//-----------------------------------------------------------------------------
-const char* vtkPVPluginLoader::GetSearchPaths()
-{
-  return this->GetPluginInfo()->GetSearchPaths();
-}
+#endif
 
 //-----------------------------------------------------------------------------
 void vtkPVPluginLoader::PrintSelf(ostream& os, vtkIndent indent)
 {
-  vtkIndent i2 = indent.GetNextIndent();
   this->Superclass::PrintSelf(os, indent);
-  os << indent << "ServerManagerXML: "
-    << (this->ServerManagerXML ? "(exists)" : "(none)") << endl;
-  os << indent << "PythonModuleNames: "
-    << (this->PythonModuleNames ? "(exists)" : "(none)") << endl;
-  os << indent << "PythonModuleSources: "
-    << (this->PythonModuleSources ? "(exists)" : "(none)") << endl;
-  os << indent << "PythonPackageFlags: "
-    << (this->PythonPackageFlags ? "(exists)" : "(none)") << endl;
-  os << indent << "PluginInfo: "  << endl;
-  this->PluginInfo->PrintSelf(os, i2);
+  os << indent << "DebugPlugin: " << this->DebugPlugin << endl;
+  os << indent << "PluginName: " <<
+    (this->PluginName? this->PluginName : "(none)") << endl;
+  os << indent << "PluginVersion: " <<
+    (this->PluginVersion? this->PluginVersion : "(none)") << endl;
+  os << indent << "FileName: " <<
+    (this->FileName ? this->FileName : "(none)") << endl;
+  os << indent << "SearchPaths: " <<
+    (this->SearchPaths ? this->SearchPaths : "(none)") << endl;
 }
-
