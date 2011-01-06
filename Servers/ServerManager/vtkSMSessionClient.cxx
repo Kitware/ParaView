@@ -257,12 +257,6 @@ bool vtkSMSessionClient::Connect(const char* url)
     this->SetupDataServerRenderServerConnection();
     }
 
-  // Make sure that the client as the server XML definition
-  if(success)
-    {
-    this->GetProxyManager()->LoadXMLDefinitionFromServer();
-    }
-
   return success;
 }
 

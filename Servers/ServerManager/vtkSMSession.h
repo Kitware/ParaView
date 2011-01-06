@@ -25,6 +25,7 @@
 class vtkCollection;
 class vtkPMObject;
 class vtkPVInformation;
+class vtkSMPluginManager;
 class vtkSMProxyManager;
 class vtkSMRemoteObject;
 class vtkSMSessionCore;
@@ -66,6 +67,11 @@ public:
   virtual void SetUndoStackBuilder(vtkSMUndoStackBuilder*);
   vtkGetObjectMacro(UndoStackBuilder, vtkSMUndoStackBuilder);
 
+
+  // Description:
+  // Called to do any initializations after a successful session has been
+  // established.
+  virtual void Initialize();
 
 //BTX
   // Description:
@@ -124,7 +130,11 @@ public:
   // ProxyManager may not be active on every process e.g. in client-server
   // configurations, the proxy manager is active only on the client. Using the
   // proxy-manager on the server in such a session can have unexpected results.
-  virtual vtkSMProxyManager* GetProxyManager();
+  vtkGetObjectMacro(ProxyManager, vtkSMProxyManager);
+
+  // Description:
+  // Returns the vtkSMPluginManager attached to this session.
+  vtkGetObjectMacro(PluginManager, vtkSMPluginManager);
 
   // Description:
   // Gather information about an object referred by the \c globalid.
@@ -170,6 +180,7 @@ protected:
   vtkSMSessionCore* Core;
   vtkSMProxyManager* ProxyManager;
   vtkSMUndoStackBuilder* UndoStackBuilder;
+  vtkSMPluginManager* PluginManager;
 
   // FIXME should be managed smartly between client and server.
   vtkTypeUInt32 LastGUID;

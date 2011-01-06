@@ -12,10 +12,10 @@
 
 #include "pqApplicationCore.h"
 #include "pqCoreTestUtility.h"
+#include "pqInterfaceTracker.h"
 #include "pqObjectBuilder.h"
 #include "pqOptions.h"
 #include "pqPipelineSource.h"
-#include "pqPluginManager.h"
 #include "pqServer.h"
 #include "pqStandardViewModules.h"
 #include "vtkProcessModule.h"
@@ -28,7 +28,7 @@ MainWindow::MainWindow()
   pqServer* server = ob->createServer(pqServerResource("builtin:"));
 
   // Register ParaView interfaces.
-  pqPluginManager* pgm = pqApplicationCore::instance()->getPluginManager();
+  pqInterfaceTracker* pgm = pqApplicationCore::instance()->interfaceTracker();
 
   // * adds support for standard paraview views.
   pgm->addInterface(new pqStandardViewModules(pgm));

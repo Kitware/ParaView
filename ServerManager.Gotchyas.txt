@@ -45,6 +45,8 @@ Fix PluginManager (both SM and Qt).
 
 Need to fix loading of server-side XML when a remote plugin is loaded.
 
+Add support to load xml plugins in vtkPVPluginLoader::LoadPlugin.
+
 --------------------------------------------------------------------------------
 pqServerManagerSelectionModel::getProxy
 --------------------------------------------------------------------------------

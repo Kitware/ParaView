@@ -161,7 +161,33 @@ void vtkPVPluginTracker::LoadPluginConfigurationXML(const char* filename)
     return;
     }
 
-  vtkPVXMLElement* root = parser->GetRootElement();
+  this->LoadPluginConfigurationXML(parser->GetRootElement());
+}
+
+//----------------------------------------------------------------------------
+void vtkPVPluginTracker::LoadPluginConfigurationXMLFromString(const char* xmlcontents)
+{
+  bool debug_plugin = vtksys::SystemTools::GetEnv("PV_PLUGIN_DEBUG") != NULL;
+  vtkSmartPointer<vtkPVXMLParser> parser = vtkSmartPointer<vtkPVXMLParser>::New();
+  parser->SuppressErrorMessagesOn();
+  if (!parser->Parse(xmlcontents))
+    {
+    vtkPVPluginTrackerDebugMacro("Configuration file not a valid xml.");
+    return;
+    }
+
+  this->LoadPluginConfigurationXML(parser->GetRootElement());
+}
+
+//----------------------------------------------------------------------------
+void vtkPVPluginTracker::LoadPluginConfigurationXML(vtkPVXMLElement* root)
+{
+  if (root == NULL)
+    {
+    return;
+    }
+
+  bool debug_plugin = vtksys::SystemTools::GetEnv("PV_PLUGIN_DEBUG") != NULL;
   if (strcmp(root->GetName(), "Plugins") != 0)
     {
     vtkPVPluginTrackerDebugMacro("Root element in the xml must be <Plugins/>. "
@@ -203,6 +229,8 @@ void vtkPVPluginTracker::LoadPluginConfigurationXML(const char* filename)
       this->RegisterAvailablePlugin(plugin_filename.c_str());
       if (auto_load)
         {
+        // FIXME: this will right now reload already loaded plugins, need to fix
+        // that.
         // load the plugin.
         vtkPVPluginLoader* loader = vtkPVPluginLoader::New();
         loader->LoadPlugin(plugin_filename.c_str());
@@ -216,6 +244,26 @@ void vtkPVPluginTracker::LoadPluginConfigurationXML(const char* filename)
 unsigned int vtkPVPluginTracker::GetNumberOfPlugins()
 {
   return static_cast<unsigned int>(this->PluginsList->size());
+}
+
+//----------------------------------------------------------------------------
+void vtkPVPluginTracker::RegisterAvailablePlugin(const char* filename)
+{
+  vtkstd::string defaultname =
+    vtksys::SystemTools::GetFilenameWithoutExtension(filename);
+  vtkPluginsList::iterator iter =
+    this->PluginsList->Locate(defaultname.c_str());
+  if (iter == this->PluginsList->end())
+    {
+    vtkItem item;
+    item.FileName = filename;
+    item.PluginName = defaultname;
+    this->PluginsList->push_back(item);
+    }
+  else
+    {
+    iter->FileName = filename;
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -265,7 +313,8 @@ void vtkPVPluginTracker::RegisterPlugin(vtkPVPlugin* plugin)
     vtkstd::vector<vtkstd::string> modules, sources;
     vtkstd::vector<int> package_flags;
     pythonplugin->GetPythonSourceList(modules, sources, package_flags);
-    assert(modules.size() == sources.size() == package_flags.size());
+    assert(modules.size() == sources.size() &&
+      sources.size() == package_flags.size());
     for (size_t cc=0; cc < modules.size(); cc++)
       {
       vtkPVPythonModule* module = vtkPVPythonModule::New();

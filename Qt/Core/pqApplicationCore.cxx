@@ -51,6 +51,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCoreUtilities.h"
 #include "pqDisplayPolicy.h"
 #include "pqEventDispatcher.h"
+#include "pqInterfaceTracker.h"
 #include "pqLinksModel.h"
 #include "pqLookupTableManager.h"
 #include "pqObjectBuilder.h"
@@ -76,13 +77,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif
 #include "pqXMLUtil.h"
 #include "vtkInitializationHelper.h"
+#include "vtkProcessModuleAutoMPI.h"
 #include "vtkProcessModule.h"
+#include "vtkPVPluginTracker.h"
 #include "vtkPVXMLElement.h"
 #include "vtkPVXMLParser.h"
 #include "vtkSMApplication.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMInputArrayDomain.h"
-#include "vtkSMPluginManager.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMPropertyIterator.h"
@@ -90,7 +92,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProxyManager.h"
 #include "vtkSMReaderFactory.h"
 #include "vtkSMWriterFactory.h"
-#include "vtkProcessModuleAutoMPI.h"
 
 //-----------------------------------------------------------------------------
 class pqApplicationCore::pqInternals
@@ -157,6 +158,8 @@ void pqApplicationCore::constructor()
   // *  Create the pqObjectBuilder. This is used to create pipeline objects.
   this->ObjectBuilder = new pqObjectBuilder(this);
 
+  this->InterfaceTracker = new pqInterfaceTracker(this);
+
   this->PluginManager = new pqPluginManager(this);
 
   // * Create various factories.
@@ -171,8 +174,8 @@ void pqApplicationCore::constructor()
   this->ProgressManager = new pqProgressManager(this);
 
   // add standard server manager model interface
-  this->PluginManager->addInterface(
-    new pqStandardServerManagerModelInterface(this->PluginManager));
+  this->InterfaceTracker->addInterface(
+    new pqStandardServerManagerModelInterface(this->InterfaceTracker));
 
   this->LinksModel = new pqLinksModel(this);
 
@@ -191,6 +194,9 @@ pqApplicationCore::~pqApplicationCore()
   // Ensure that startup plugins get a chance to cleanup before pqApplicationCore is gone.
   delete this->PluginManager;
   this->PluginManager = 0;
+
+  delete this->InterfaceTracker;
+  this->InterfaceTracker = 0;
 
   // give chance to save before pqApplicationCore is gone
   delete this->ServerStartups;
@@ -619,9 +625,6 @@ void pqApplicationCore::loadDistributedPlugins(const char* filename)
 //#endif
     }
 
-#ifdef FIXME_COLLABORATION
-  // need to fix the whole plugin management
-  vtkSMApplication::GetApplication()->GetPluginManager()->LoadPluginConfigurationXML(
+  vtkPVPluginTracker::GetInstance()->LoadPluginConfigurationXML(
     config_file.toStdString().c_str());
-#endif
 }

@@ -43,9 +43,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqAnimationCue.h"
 #include "pqAnimationScene.h"
 #include "pqApplicationCore.h"
+#include "pqInterfaceTracker.h"
 #include "pqPipelineFilter.h"
 #include "pqPipelineRepresentation.h"
-#include "pqPluginManager.h"
 #include "pqRenderView.h"
 #include "pqScalarBarRepresentation.h"
 #include "pqScalarsToColors.h"
@@ -71,7 +71,8 @@ pqProxy* pqStandardServerManagerModelInterface::createPQProxy(
 {
   QString xml_type = proxy->GetXMLName();
 
-  pqPluginManager* pluginMgr = pqApplicationCore::instance()->getPluginManager();
+  pqInterfaceTracker* pluginMgr =
+    pqApplicationCore::instance()->interfaceTracker();
   if (group == "views")
     {
     QObjectList ifaces = pluginMgr->interfaces();

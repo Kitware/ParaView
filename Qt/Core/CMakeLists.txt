@@ -64,6 +64,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqFormBuilder.h
   pqHelperProxyStateLoader.h
   pqHistogramTableModel.h
+  pqInterfaceTracker.h
   pqLinksModel.h
   pqLinkViewWidget.h
   pqLookupTableManager.h
@@ -229,6 +230,8 @@ ADD_LIBRARY(pqCore
   pqHistogramTableModel.h
   pqImageUtil.cxx
   pqImageUtil.h
+  pqInterfaceTracker.cxx
+  pqInterfaceTracker.h
   pqLinksModel.cxx
   pqLinksModel.h
   pqLinkViewWidget.cxx

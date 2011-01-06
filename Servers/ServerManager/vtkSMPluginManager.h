@@ -15,7 +15,7 @@
 // .NAME vtkSMPluginManager
 // .SECTION Description
 // vtkSMPluginManager is used to load plugins as well as discover information
-// about currently loaded plugins.
+// about currently loaded and available plugins.
 
 #ifndef __vtkSMPluginManager_h
 #define __vtkSMPluginManager_h
@@ -48,6 +48,10 @@ public:
   vtkGetObjectMacro(RemoteInformation, vtkPVPluginsInformation);
 
   // Description:
+  // Returns the plugin search paths used either locally or remotely.
+  const char* GetPluginSearchPaths(bool remote);
+
+  // Description:
   // Loads the plugin either locally or remotely.
   bool LoadRemotePlugin(const char* filename);
   bool LoadLocalPlugin(const char* filename);
@@ -60,6 +64,8 @@ public:
 protected:
   vtkSMPluginManager();
   ~vtkSMPluginManager();
+
+  char* PluginSearchPaths;
 
   vtkPVPluginsInformation* LocalInformation;
   vtkPVPluginsInformation* RemoteInformation;

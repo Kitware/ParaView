@@ -111,6 +111,13 @@ bool vtkSMPluginManager::LoadRemotePlugin(const char* filename)
 }
 
 //----------------------------------------------------------------------------
+const char* vtkSMPluginManager::GetPluginSearchPaths(bool remote)
+{
+  return remote? this->RemoteInformation->GetSearchPaths() :
+    this->LocalInformation->GetSearchPaths();
+}
+
+//----------------------------------------------------------------------------
 void vtkSMPluginManager::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);

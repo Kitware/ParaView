@@ -38,6 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class pq3DWidgetFactory;
 class pqDisplayPolicy;
+class pqInterfaceTracker;
 class pqLinksModel;
 class pqLookupTableManager;
 class pqObjectBuilder;
@@ -73,6 +74,7 @@ class vtkSMProxyLocator;
 class PQCORE_EXPORT pqApplicationCore : public QObject
 {
   Q_OBJECT
+  typedef QObject Superclass;
 public:
   // Get the global instace for the pqApplicationCore.
   static pqApplicationCore* instance();
@@ -140,6 +142,12 @@ public:
 
   pq3DWidgetFactory* get3DWidgetFactory() const
     { return this->WidgetFactory; }
+
+  /// Locates the interface tracker for the application. pqInterfaceTracker is
+  /// used to locate all interface implementations typically loaded from
+  /// plugins.
+  pqInterfaceTracker* interfaceTracker() const
+    { return this->InterfaceTracker; }
 
   /// pqLinksModel is the model used to keep track of proxy/property links
   /// maintained by vtkSMProxyManager.
@@ -278,6 +286,7 @@ protected:
   pqLinksModel* LinksModel;
   pqLookupTableManager* LookupTableManager;
   pqObjectBuilder* ObjectBuilder;
+  pqInterfaceTracker* InterfaceTracker;
   pqPluginManager* PluginManager;
   pqProgressManager* ProgressManager;
   pqServerManagerModel* ServerManagerModel;

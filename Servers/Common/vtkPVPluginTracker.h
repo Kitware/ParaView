@@ -30,6 +30,7 @@
 #include "vtkSmartPointer.h" // needed  for vtkSmartPointer;
 
 class vtkPVPlugin;
+class vtkPVXMLElement;
 
 class VTK_EXPORT  vtkPVPluginTracker : public vtkObject
 {
@@ -73,6 +74,8 @@ public:
   // either load the plugin or call RegisterAvailablePlugin based on the status
   // of the auto_load flag.
   void LoadPluginConfigurationXML(const char* filename);
+  void LoadPluginConfigurationXML(vtkPVXMLElement*);
+  void LoadPluginConfigurationXMLFromString(const char* xmlcontents);
 
   // Description:
   // Methods to iterate over registered plugins.

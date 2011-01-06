@@ -40,6 +40,7 @@ public:
 
   // Description:
   // Tries to the load the plugin given the path to the plugin file.
+  // FIXME: Add support to load an XML.
   bool LoadPlugin(const char* filename);
 
   // Description:

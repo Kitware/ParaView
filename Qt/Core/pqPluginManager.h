@@ -35,20 +35,25 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QObject>
 #include <QStringList>
-#include "vtkSmartPointer.h"
 #include "pqCoreExport.h"
 
-class pqPluginManagerInternal;
 class pqServer;
-class vtkObject;
-class vtkPVGUIPluginInterface;
-class vtkPVPluginInformation;
+class vtkSMPluginManager;
+class vtkPVPluginsInformation;
 
-/// extension manager takes care of loading plugins, xml files, and binary qrc files
-/// the plugins may also contain xml files and qrc files
+/// pqPluginManager works with vtkSMPluginManager to keep track for plugins
+/// loaded/available. It also ensures that when a new session is created, the
+/// default plugin-configuration-xmls are parsed on all processes invovled to
+/// ensure that auto-load plugins are loaded. It preserves the information about
+/// plugins loaded across ParaView sessions in settings so that users can easily
+/// load previously loaded plugins.
+///
+/// In addition, pqPluginManager also provides support to load non-standard Qt
+/// plugins such as bqrc resource files.
 class PQCORE_EXPORT pqPluginManager : public QObject
 {
   Q_OBJECT
+  typedef QObject Superclass;
 public:
   pqPluginManager(QObject* p = 0);
   ~pqPluginManager();
@@ -62,7 +67,7 @@ public:
   /// message is put in the errorMsg string
   LoadStatus loadExtension(pqServer* server, const QString& lib, 
     QString* errorMsg=0, bool remote=true);
-  
+
   /// attempt to load all available plugins on a server, 
   /// or client plugins if NULL
   void loadExtensions(pqServer*);
@@ -71,127 +76,36 @@ public:
   /// \c path. If server is 0, it loads client plugins, else it loads server
   /// plugins
   void loadExtensions(const QString& path, pqServer* server);
-  
-  /// return all GUI interfaces that have been loaded
-  QObjectList interfaces() const;
-
-  template <class T>
-    QList<T> findInterfaces() const
-      {
-      QList<T> list;
-      QObjectList objList = this->interfaces();
-      foreach (QObject* object, objList)
-        {
-        if (object && qobject_cast<T>(object))
-          {
-          list.push_back(qobject_cast<T>(object));
-          }
-        }
-      return list;
-      }
 
   /// return all the plugins loaded on a server, or locally if NULL is passed in
-  QList< vtkPVPluginInformation* > loadedExtensions(pqServer*);
-  QList< vtkPVPluginInformation* > loadedExtensions(QString extensionKey);
-
-  /// add an extra interface.
-  /// these interfaces are appended to the ones loaded from plugins
-  void addInterface(QObject* iface);
-  
-  /// remove an extra interface
-  void removeInterface(QObject* iface);
+  vtkPVPluginsInformation* loadedExtensions(bool remote);
 
   /// Return all the paths that plugins will be searched for.
   QStringList pluginPaths(pqServer*);
 
-  /// Get the pluginInfo that may already exist in this manager by the file name or plugin name.
-  vtkPVPluginInformation* getExistingExtensionByFileName(pqServer*, const QString& lib);
-  vtkPVPluginInformation* getExistingExtensionByFileName(QString extensionKey, const QString& lib);
-  vtkPVPluginInformation* getExistingExtensionByPluginName(pqServer*, const QString& name);
-  vtkPVPluginInformation* getExistingExtensionByPluginName(QString extensionKey, const QString& name);
-  
-  /// Update the plugin AutoLoad state.
-  void updatePluginAutoLoadState(vtkPVPluginInformation* plInfo, int autoLoad);
-
-  // load plugin settings
-  void addPluginFromSettings();
-  // save plugin settings
-  void savePluginSettings(bool clearFirst = true);
-
-  // exclude an extension from being saved with settings.
-  void removePlugin(pqServer* server, const QString& lib, 
-    bool remote=true);
- 
-  void loadGUIPlugin(vtkPVGUIPluginInterface*);
-public slots:
-  // check whether the plugin is ready to run.
-  bool isPluginFunctional(vtkPVPluginInformation* plInfo, bool remote);
+  /// exclude an extension from being remembered. This does not actually unload
+  /// the plugin, just forgets about it.
+  void removePlugin(const QString& lib, bool remote=true);
 
 signals:
-  /// signal for when an interface is loaded
-  void guiInterfaceLoaded(QObject* iface);
-  
-  /// signal for when a gui extension is loaded.  This can come from loading a
-  /// gui plugin or a qrc file
-  void guiExtensionLoaded();
-
-  /// notification that new xml was added to the server manager, which could
-  /// come from a plugin or an xml file
-  void serverManagerExtensionLoaded();
-
-  /// notification when plugin information is updated
-  void pluginInfoUpdated();
-
-  /// notification that a new plugin has been loaded
-  void pluginLoaded(vtkPVPluginInformation* plugin, bool remote);
+  /// notification when plugin has been loaded.
+  void pluginsUpdated();
 
   /// notification that the plugins on the client and
   /// server are mismatched.
   void requiredPluginsNotLoaded();
 
 protected:
-  LoadStatus loadServerExtension(pqServer* server, const QString& lib, 
-    vtkPVPluginInformation* pluginInfo, bool remote);
-  LoadStatus loadClientExtension(const QString& lib,
-    vtkPVPluginInformation* pluginInfo);
+  void initialize(vtkSMPluginManager*);
 
-  // add to the list if it isn't already there
-  void addExtension(pqServer* server, vtkPVPluginInformation* pluginInfo);
-  void addExtension(QString extensionKey, vtkPVPluginInformation* pluginInfo);
-  
-  /// Handles pqAutoStartInterface plugins.
-  void handleAutoStartPlugins(QObject* iface, bool startup);
-  
-  // check whether the required plugins are functional.
-  bool areRequiredPluginsFunctional(vtkPVPluginInformation* plInfo, bool remote);
-  
 protected slots:
   void onServerConnected(pqServer*);
   void onServerDisconnected(pqServer*);
-  void onSMLoadPluginInvoked(vtkObject* caller, unsigned long vtk_event, void* client_data, void* call_data);
-  
+  void updatePluginLists();
+
 private:
-  
-  pqPluginManagerInternal* Internal;
-  // return the extension key for identifying the server, 
-  // used for mapping from server to plugins.
-  QString getServerURIKey(pqServer* server);
-  // return the settings key for the plugin, 
-  // used for saving the plugin settings ,
-  // "[serverURI]###[filename]###[AutoLoad]"
-  QString getPluginSettingsKey(vtkPVPluginInformation*);
-  void processPluginSettings(QString& plSettingKey);
-  // load the Auto Load plugins on that server
-  void loadAutoLoadPlugins(pqServer* server);
-
-  //verify the plugins that are required to be on the server and
-  //client are loaded
-  void verifyRequiredPluginsLoaded(pqServer* server);
-  
-  QObjectList Interfaces;
-  QObjectList ExtraInterfaces;
-
+  class pqInternals;
+  pqInternals* Internals;
 };
 
 #endif
-

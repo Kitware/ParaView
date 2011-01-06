@@ -57,7 +57,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqOutputPort.h"
 #include "pqPipelineFilter.h"
 #include "pqPipelineSource.h"
-#include "pqPluginManager.h"
+#include "pqInterfaceTracker.h"
 #include "pqProxyModifiedStateUndoElement.h"
 #include "pqRenderView.h"
 #include "pqScalarBarRepresentation.h"
@@ -368,12 +368,11 @@ pqView* pqObjectBuilder::createView(const QString& type,
   vtkSMProxyManager* pxm = server->proxyManager();
   vtkSMProxy* proxy= 0;
 
-  QObjectList ifaces =
-    pqApplicationCore::instance()->getPluginManager()->interfaces();
-  foreach(QObject* iface, ifaces)
+  QList<pqViewModuleInterface*> ifaces =
+    pqApplicationCore::instance()->interfaceTracker()->interfaces<pqViewModuleInterface*>();
+  foreach(pqViewModuleInterface* vmi, ifaces)
     {
-    pqViewModuleInterface* vmi = qobject_cast<pqViewModuleInterface*>(iface);
-    if(vmi && vmi->viewTypes().contains(type))
+    if (vmi && vmi->viewTypes().contains(type))
       {
       proxy = vmi->createViewProxy(type, server);
       break;

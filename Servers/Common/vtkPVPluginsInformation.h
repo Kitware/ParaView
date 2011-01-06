@@ -34,6 +34,7 @@ public:
   // API to iterate over the information collected for each plugin.
   unsigned int GetNumberOfPlugins();
   const char* GetPluginName(unsigned int);
+  const char* GetPluginFileName(unsigned int);
   const char* GetPluginVersion(unsigned int);
   bool GetPluginLoaded(unsigned int);
   const char* GetRequiredPlugins(unsigned int);
@@ -56,10 +57,16 @@ public:
   virtual void CopyFromStream(const vtkClientServerStream*);
   //ETX
 
+  // Description:
+  // Get the plugin search path.
+  vtkGetStringMacro(SearchPaths);
 //BTX
 protected:
   vtkPVPluginsInformation();
   ~vtkPVPluginsInformation();
+
+  char* SearchPaths;
+  vtkSetStringMacro(SearchPaths);
 
 private:
   vtkPVPluginsInformation(const vtkPVPluginsInformation&); // Not implemented

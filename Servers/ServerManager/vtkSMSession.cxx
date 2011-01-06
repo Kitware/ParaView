@@ -18,6 +18,7 @@
 #include "vtkProcessModule.h"
 #include "vtkPVServerInformation.h"
 #include "vtkSMMessage.h"
+#include "vtkSMPluginManager.h"
 #include "vtkSMProxyDefinitionManager.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyManager.h"
@@ -40,6 +41,8 @@ vtkSMSession::vtkSMSession()
   this->ProxyManager->SetSession(this);
   this->ProxyManager->SetProxyDefinitionManager(
       this->Core->GetProxyDefinitionManager());
+  this->PluginManager = vtkSMPluginManager::New();
+  this->PluginManager->SetSession(this);
 
   this->UndoStackBuilder = NULL;
 
@@ -57,6 +60,8 @@ vtkSMSession::vtkSMSession()
 //----------------------------------------------------------------------------
 vtkSMSession::~vtkSMSession()
 {
+  this->PluginManager->Delete();
+  this->PluginManager = NULL;
   this->ProxyManager->Delete();
   this->ProxyManager = NULL;
   this->SetUndoStackBuilder(0);
@@ -168,9 +173,12 @@ vtkPMObject* vtkSMSession::GetPMObject(vtkTypeUInt32 globalid)
 }
 
 //----------------------------------------------------------------------------
-vtkSMProxyManager* vtkSMSession::GetProxyManager()
+void vtkSMSession::Initialize()
 {
-  return this->ProxyManager;
+  // Make sure that the client as the server XML definition
+  this->GetProxyManager()->LoadXMLDefinitionFromServer();
+  this->PluginManager->SetSession(this);
+  this->PluginManager->Initialize();
 }
 
 //----------------------------------------------------------------------------
@@ -230,6 +238,7 @@ vtkIdType vtkSMSession::ConnectToSelf()
 {
   vtkSMSession* session = vtkSMSession::New();
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  session->Initialize();
   vtkIdType sid = pm->RegisterSession(session);
   session->Delete();
   return sid;
@@ -244,6 +253,7 @@ vtkIdType vtkSMSession::ConnectToRemote(const char* hostname, int port)
   vtkIdType sid = 0;
   if (session->Connect(sname.str().c_str()))
     {
+    session->Initialize();
     vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
     vtkIdType sid = pm->RegisterSession(session);
     }
@@ -262,6 +272,7 @@ vtkIdType vtkSMSession::ConnectToRemote(const char* dshost, int dsport,
   vtkIdType sid = 0;
   if (session->Connect(sname.str().c_str()))
     {
+    session->Initialize();
     vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
     vtkIdType sid = pm->RegisterSession(session);
     }

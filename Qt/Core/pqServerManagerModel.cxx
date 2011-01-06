@@ -33,9 +33,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqApplicationCore.h"
 #include "pqHelperProxyStateLoader.h"
+#include "pqInterfaceTracker.h"
 #include "pqOutputPort.h"
 #include "pqPipelineSource.h"
-#include "pqPluginManager.h"
 #include "pqProxy.h"
 #include "pqRepresentation.h"
 #include "pqServer.h"
@@ -273,7 +273,7 @@ void pqServerManagerModel::onProxyRegistered(const QString& group,
   pqProxy* item = 0;
 
   QObjectList ifaces =
-    pqApplicationCore::instance()->getPluginManager()->interfaces();
+    pqApplicationCore::instance()->interfaceTracker()->interfaces();
   foreach(QObject* iface, ifaces)
     {
     pqServerManagerModelInterface* smi = 

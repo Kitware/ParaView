@@ -1016,6 +1016,7 @@ void vtkSMProxyDefinitionManager::LoadXMLDefinitionState(vtkSMMessage* msg)
     this->AddCustomProxyDefinition( xmlDef->group().c_str(), xmlDef->name().c_str(),
                                     parser->GetRootElement());
     }
+  parser->Delete();
 }
 
 //---------------------------------------------------------------------------

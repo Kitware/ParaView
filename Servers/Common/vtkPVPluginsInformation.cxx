@@ -16,6 +16,7 @@
 
 #include "vtkObjectFactory.h"
 #include "vtkPVPlugin.h"
+#include "vtkPVPluginLoader.h"
 #include "vtkPVPluginTracker.h"
 #include "vtkClientServerStream.h"
 
@@ -107,6 +108,7 @@ vtkStandardNewMacro(vtkPVPluginsInformation);
 vtkPVPluginsInformation::vtkPVPluginsInformation()
 {
   this->RootOnly = 1;
+  this->SearchPaths = NULL;
   this->Internals = new vtkInternals();
 }
 
@@ -115,6 +117,7 @@ vtkPVPluginsInformation::~vtkPVPluginsInformation()
 {
   delete this->Internals;
   this->Internals = NULL;
+  this->SetSearchPaths(0);
 }
 
 //----------------------------------------------------------------------------
@@ -131,6 +134,7 @@ void vtkPVPluginsInformation::AddInformation(vtkPVInformation* other)
   if (pvother)
     {
     (*this->Internals) = (*pvother->Internals);
+    this->SetSearchPaths(pvother->SearchPaths);
     }
 }
 
@@ -139,6 +143,7 @@ void vtkPVPluginsInformation::CopyToStream(vtkClientServerStream* stream)
 {
   stream->Reset();
   *stream << vtkClientServerStream::Reply
+    << this->SearchPaths
     << this->GetNumberOfPlugins();
   for (unsigned int cc=0; cc < this->GetNumberOfPlugins(); cc++)
     {
@@ -151,6 +156,12 @@ void vtkPVPluginsInformation::CopyToStream(vtkClientServerStream* stream)
 void vtkPVPluginsInformation::CopyFromStream(const vtkClientServerStream* stream)
 {
   int offset=0;
+  if (!stream->GetArgument(0, offset++, &this->SearchPaths))
+    {
+    vtkErrorMacro("Error parsing SearchPaths.");
+    return;
+    }
+
   unsigned int count;
   if (!stream->GetArgument(0, offset++, &count))
     {
@@ -169,6 +180,10 @@ void vtkPVPluginsInformation::CopyFromStream(const vtkClientServerStream* stream
 void vtkPVPluginsInformation::CopyFromObject(vtkObject*)
 {
   this->Internals->clear();
+  vtkPVPluginLoader* loader = vtkPVPluginLoader::New();
+  this->SetSearchPaths(loader->GetSearchPaths());
+  loader->Delete();
+
   vtkPVPluginTracker* tracker = vtkPVPluginTracker::GetInstance();
   for (unsigned int cc=0; cc < tracker->GetNumberOfPlugins(); cc++)
     {
@@ -205,6 +220,16 @@ const char* vtkPVPluginsInformation::GetPluginName(unsigned int cc)
   if (this->GetNumberOfPlugins() < cc)
     {
     return (*this->Internals)[cc].Name.c_str();
+    }
+  return NULL;
+}
+
+//----------------------------------------------------------------------------
+const char* vtkPVPluginsInformation::GetPluginFileName(unsigned int cc)
+{
+  if (this->GetNumberOfPlugins() < cc)
+    {
+    return (*this->Internals)[cc].FileName.c_str();
     }
   return NULL;
 }
