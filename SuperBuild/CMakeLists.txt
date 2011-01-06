@@ -92,7 +92,7 @@ set(NUMPY_dependencies python)
 set(Manta_dependencies)
 set(OpenMPI_dependencies)
 
-set(ParaView_dependencies python NUMPY OpenMPI Manta)
+set(ParaView_dependencies python NUMPY OpenMPI)
 
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------
@@ -115,8 +115,16 @@ if(NOT APPLE)
 endif()
 include(External_NUMPY)
 include(External_OpenMPI)
-include(External_Manta)
 
+
+if(NOT WIN32)
+  #include(External_Silo)
+  #list(APPEND ParaView_dependencies Silo)
+  include(External_Manta)
+  list(APPEND ParaView_dependencies Manta)
+  include(External_FFMPEG)
+  list(APPEND ParaView_dependencies FFMPEG)
+endif()
 
 #------------------------------------------------------------------------------
 # Configure and build ParaView
