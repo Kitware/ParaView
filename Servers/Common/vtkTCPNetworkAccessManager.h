@@ -74,6 +74,10 @@ public:
   // Process any network activity.
   virtual int ProcessEvents(unsigned long timeout_msecs);
 
+  // Description:
+  // Returns true is the manager is currently waiting for any connections.
+  virtual bool GetPendingConnectionsPresent();
+
 //BTX
 protected:
   vtkTCPNetworkAccessManager();

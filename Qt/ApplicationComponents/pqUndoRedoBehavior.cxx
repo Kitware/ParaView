@@ -45,6 +45,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 pqUndoRedoBehavior::pqUndoRedoBehavior(QObject* parentObject)
   : Superclass(parentObject)
 {
+#ifdef FIXME_COLLABORATION
   pqApplicationCore* core = pqApplicationCore::instance();
   if (core->getUndoStack())
     {
@@ -93,6 +94,7 @@ pqUndoRedoBehavior::pqUndoRedoBehavior(QObject* parentObject)
   // FIXME   this->Implementation->UndoStack, SLOT(endNonUndoableChanges()));
 
   core->setUndoStack(stack);
+#endif
 }
 
 

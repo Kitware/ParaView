@@ -40,19 +40,19 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqDefaultViewBehavior.h"
 #include "pqDeleteBehavior.h"
 #include "pqFixPathsInStateFilesBehavior.h"
+#include "pqInterfaceTracker.h"
 #include "pqObjectPickingBehavior.h"
 #include "pqPersistentMainWindowStateBehavior.h"
 #include "pqPipelineContextMenuBehavior.h"
 #include "pqPluginActionGroupBehavior.h"
 #include "pqPluginDockWidgetsBehavior.h"
-#include "pqPluginManager.h"
 #include "pqPVNewSourceBehavior.h"
 #include "pqQtMessageHandlerBehavior.h"
 #include "pqSpreadSheetVisibilityBehavior.h"
 #include "pqStandardViewModules.h"
 #include "pqUndoRedoBehavior.h"
-#include "pqViewFrameActionsBehavior.h"
 #include "pqVerifyRequiredPluginBehavior.h"
+#include "pqViewFrameActionsBehavior.h"
 
 #include <QShortcut>
 #include <QMainWindow>
@@ -63,7 +63,7 @@ pqParaViewBehaviors::pqParaViewBehaviors(
   : Superclass(parentObject)
 {
   // Register ParaView interfaces.
-  pqPluginManager* pgm = pqApplicationCore::instance()->getPluginManager();
+  pqInterfaceTracker* pgm = pqApplicationCore::instance()->interfaceTracker();
 
   // * adds support for standard paraview views.
   pgm->addInterface(new pqStandardViewModules(pgm));

@@ -39,7 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqComparativeRenderView.h"
 #include "pqComparativeXYBarChartView.h"
 #include "pqComparativeXYChartView.h"
-#include "pqPluginManager.h"
+#include "pqInterfaceTracker.h"
 #include "pqTwoDRenderView.h"
 #include "pqViewOptionsInterface.h"
 #include "pqXYBarChartView.h"
@@ -69,13 +69,13 @@ pqViewSettingsManager::pqViewSettingsManager(QObject* parentObject)
   this->registerOptions(pqTwoDRenderView::twoDRenderViewType(), twoDOptions);
 
   /// Add panes as plugins are loaded.
-  QObject::connect(pqApplicationCore::instance()->getPluginManager(),
-    SIGNAL(guiInterfaceLoaded(QObject*)),
+  QObject::connect(pqApplicationCore::instance()->interfaceTracker(),
+    SIGNAL(interfaceRegistered(QObject*)),
     this, SLOT(pluginLoaded(QObject*)));
 
   // Load panes from already loaded plugins.
   foreach (QObject* plugin_interface,
-    pqApplicationCore::instance()->getPluginManager()->interfaces())
+    pqApplicationCore::instance()->interfaceTracker()->interfaces())
     {
     this->pluginLoaded(plugin_interface);
     }

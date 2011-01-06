@@ -41,6 +41,7 @@ pqUndoRedoReaction::pqUndoRedoReaction(QAction* parentObject, bool _undo)
   this->Undo = _undo;
   this->enable(false);
 
+#ifdef FIXME_COLLABORATION
   pqUndoStack* stack = pqApplicationCore::instance()->getUndoStack();
   if (!stack)
     {
@@ -52,11 +53,13 @@ pqUndoRedoReaction::pqUndoRedoReaction(QAction* parentObject, bool _undo)
     {
     this->setUndoStack(stack);
     }
+#endif
 }
 
 //-----------------------------------------------------------------------------
 void pqUndoRedoReaction::setUndoStack(pqUndoStack* stack)
 {
+#ifdef FIXME_COLLABORATION
   if (this->Undo)
     {
     QObject::connect(stack, SIGNAL(canUndoChanged(bool)),
@@ -71,11 +74,13 @@ void pqUndoRedoReaction::setUndoStack(pqUndoStack* stack)
     QObject::connect(stack, SIGNAL(redoLabelChanged(const QString&)),
       this, SLOT(setLabel(const QString&)));
     }
+#endif
 }
 
 //-----------------------------------------------------------------------------
 void pqUndoRedoReaction::undo()
 {
+#ifdef FIXME_COLLABORATION
   pqUndoStack* stack = pqApplicationCore::instance()->getUndoStack();
   if (!stack)
     {
@@ -83,11 +88,13 @@ void pqUndoRedoReaction::undo()
     return;
     }
   stack->undo();
+#endif
 }
 
 //-----------------------------------------------------------------------------
 void pqUndoRedoReaction::redo()
 {
+#ifdef FIXME_COLLABORATION
   pqUndoStack* stack = pqApplicationCore::instance()->getUndoStack();
   if (!stack)
     {
@@ -95,6 +102,7 @@ void pqUndoRedoReaction::redo()
     return;
     }
   stack->redo();
+#endif
 }
 
 //-----------------------------------------------------------------------------

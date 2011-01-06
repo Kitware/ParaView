@@ -202,8 +202,8 @@ public:
   pqSettings* settings();
 
   /// Save the ServerManager state.
-  vtkPVXMLElement* saveState(pqServer*);
-  void saveState(const QString& filename, pqServer*);
+  vtkPVXMLElement* saveState();
+  void saveState(const QString& filename);
 
   /// Loads the ServerManager state. Emits the signal
   /// stateLoaded() on loading state successfully.

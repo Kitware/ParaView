@@ -118,6 +118,14 @@ void vtkTCPNetworkAccessManager::AbortPendingConnection()
   this->AbortPendingConnectionFlag = true;
 }
 
+
+//----------------------------------------------------------------------------
+bool vtkTCPNetworkAccessManager::GetPendingConnectionsPresent()
+{
+  vtkWarningMacro("Need to fix this to report real pending connectios");
+  return false;
+}
+
 #define MAX_SOCKETS 256
 //----------------------------------------------------------------------------
 int vtkTCPNetworkAccessManager::ProcessEvents(unsigned long timeout_msecs)

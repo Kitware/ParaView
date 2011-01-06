@@ -120,9 +120,7 @@ vtkSMProxyManager::vtkSMProxyManager()
 
   this->ProxyDefinitionManager = NULL;
 
-#ifdef FIXME
   this->ReaderFactory = vtkSMReaderFactory::New();
-#endif
   this->WriterFactory = vtkSMWriterFactory::New();
   this->WriterFactory->SetProxyManager(this);
 
@@ -142,10 +140,8 @@ vtkSMProxyManager::~vtkSMProxyManager()
   this->Observer->SetTarget(0);
   this->Observer->Delete();
 
-#ifdef FIXME
   this->ReaderFactory->Delete();
   this->ReaderFactory = 0;
-#endif
 
   this->WriterFactory->SetProxyManager(0);
   this->WriterFactory->Delete();

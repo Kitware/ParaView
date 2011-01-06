@@ -39,6 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSmartPointer.h"
 #include "vtkSMInputProperty.h"
 #include "vtkSMPropertyIterator.h"
+#include "vtkSMProxyDefinitionManager.h"
 #include "vtkSMProxyDefinitionIterator.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyManager.h"
@@ -144,20 +145,29 @@ pqUpdateProxyDefinitionsBehavior::pqUpdateProxyDefinitionsBehavior(
 //-----------------------------------------------------------------------------
 void pqUpdateProxyDefinitionsBehavior::update()
 {
+  vtkSMProxyDefinitionManager* mgr =
+    vtkSMObject::GetProxyManager()->GetProxyDefinitionManager();
+  if (!mgr)
+    {
+    return;
+    }
+
   bool something_added = false;
   bool add_new = (this->AlreadySeenSet.size() != 0);
-  vtkSMProxyDefinitionIterator* iter = vtkSMProxyDefinitionIterator::New();
-  for (iter->Begin(this->XMLGroup.toAscii().data()); !iter->IsAtEnd();
-    iter->Next())
+
+  vtkSMProxyDefinitionIterator* iter = mgr->NewSingleGroupIterator(
+    this->XMLGroup.toAscii().data());
+  for (iter->InitTraversal(); !iter->IsDoneWithTraversal();
+    iter->GoToNextItem())
     {
-    QString key = iter->GetKey();
+    QString key = iter->GetProxyName();
     bool is_custom_filter = iter->IsCustom();
     if ( (add_new || is_custom_filter) && !this->AlreadySeenSet.contains(key) )
       {
-      bool has_input = ::HasInput(iter->GetGroup(), iter->GetKey());
+      bool has_input = ::HasInput(iter->GetGroupName(), key.toAscii().data());
       if ( (this->Mode == SOURCES && !has_input &&
-          (!::IsReader(iter->GetGroup(), iter->GetKey()) ||
-           ::HasShowHint(iter->GetGroup(), iter->GetKey()))) ||
+          (!::IsReader(iter->GetGroupName(), iter->GetProxyName()) ||
+           ::HasShowHint(iter->GetGroupName(), iter->GetProxyName()))) ||
         (this->Mode == FILTERS && has_input) ||
         this->Mode == ANY)
         {
@@ -177,11 +187,19 @@ void pqUpdateProxyDefinitionsBehavior::update()
 //-----------------------------------------------------------------------------
 void pqUpdateProxyDefinitionsBehavior::remove(QString name)
 {
-  vtkSMProxyDefinitionIterator* iter = vtkSMProxyDefinitionIterator::New();
-  for (iter->Begin(this->XMLGroup.toAscii().data()); !iter->IsAtEnd();
-    iter->Next())
+  vtkSMProxyDefinitionManager* mgr =
+    vtkSMObject::GetProxyManager()->GetProxyDefinitionManager();
+  if (!mgr)
     {
-    QString key = iter->GetKey();
+    return;
+    }
+
+  vtkSMProxyDefinitionIterator* iter = mgr->NewSingleGroupIterator(
+    this->XMLGroup.toAscii().data());
+  for (iter->InitTraversal(); !iter->IsDoneWithTraversal();
+    iter->GoToNextItem())
+    {
+    QString key = iter->GetProxyName();
     if ( key == name )
       {
       this->AlreadySeenSet.remove(key);

@@ -350,17 +350,17 @@ QObject* pqApplicationCore::manager(const QString& function)
 }
 
 //-----------------------------------------------------------------------------
-void pqApplicationCore::saveState(const QString& filename, pqServer* server)
+void pqApplicationCore::saveState(const QString& filename)
 {
   // * Save the Proxy Manager state.
-  server->proxyManager()->SaveXMLState(filename.toAscii().data());
+  vtkSMObject::GetProxyManager()->SaveXMLState(filename.toAscii().data());
 }
 
 //-----------------------------------------------------------------------------
-vtkPVXMLElement* pqApplicationCore::saveState(pqServer* server)
+vtkPVXMLElement* pqApplicationCore::saveState()
 {
   // * Save the Proxy Manager state.
-  vtkSMProxyManager* pxm = server->proxyManager();
+  vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
 
   // Eventually proxy manager will save state for each connection separately.
   // For now, we only have one connection, so simply save it.
