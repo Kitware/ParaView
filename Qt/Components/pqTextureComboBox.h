@@ -52,17 +52,6 @@ public:
   pqTextureComboBox(QWidget* parent=0);
   virtual ~pqTextureComboBox();
 
-signals:
-  /// Fired just before the texture is changed on the underlying proxy.
-  /// This must be hooked to an undo stack to record the
-  /// changes in a undo set.
-  void begin(const QString&);
-
-  /// Fired just after the texture is changed on the underlying proxy.
-  /// This must be hooked to an undo stack to record the
-  /// changes in a undo set.
-  void end();
-
 public slots:
   /// Set the representation. We need the representation, since we need to
   /// update the enable state of the widget depending on whether texture

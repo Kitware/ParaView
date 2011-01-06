@@ -73,8 +73,8 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqColorScaleEditor.h
   pqColorScaleToolbar.h
   pqComboBoxDomain.h
-  pqComparativeCueWidget.h
-  pqComparativeVisPanel.h
+#  pqComparativeCueWidget.h
+#  pqComparativeVisPanel.h
   pqContourPanel.h
   pqContourWidget.h
   pqCreateServerStartupDialog.h
@@ -374,8 +374,8 @@ ADD_LIBRARY(pqComponents
   pqChartValue.h
   pqClipPanel.cxx
   pqClipPanel.h
-  pqCloseViewUndoElement.cxx
-  pqCloseViewUndoElement.h
+#  pqCloseViewUndoElement.cxx
+#  pqCloseViewUndoElement.h
   pqColorMapModel.cxx
   pqColorMapModel.h
   pqColorPresetManager.cxx
@@ -388,10 +388,10 @@ ADD_LIBRARY(pqComponents
   pqColorScaleToolbar.h
   pqComboBoxDomain.cxx
   pqComboBoxDomain.h
-  pqComparativeCueWidget.cxx
-  pqComparativeCueWidget.h
-  pqComparativeVisPanel.cxx
-  pqComparativeVisPanel.h
+#  pqComparativeCueWidget.cxx
+#  pqComparativeCueWidget.h
+#  pqComparativeVisPanel.cxx
+#  pqComparativeVisPanel.h
   pqComponentsExport.h
   pqComponentsTestUtility.cxx
   pqComponentsTestUtility.h
@@ -600,8 +600,8 @@ ADD_LIBRARY(pqComponents
   pqSphereWidget.h
   pqSplineWidget.cxx
   pqSplineWidget.h
-  pqSplitViewUndoElement.cxx
-  pqSplitViewUndoElement.h
+#  pqSplitViewUndoElement.cxx
+#  pqSplitViewUndoElement.h
   pqSpreadSheetDisplayEditor.cxx
   pqSpreadSheetDisplayEditor.h
   pqSpreadSheetViewDecorator.cxx

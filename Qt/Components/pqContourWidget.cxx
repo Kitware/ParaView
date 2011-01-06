@@ -95,7 +95,7 @@ pqContourWidget::pqContourWidget(
 
   pqServerManagerModel* smmodel =
     pqApplicationCore::instance()->getServerManagerModel();
-  this->createWidget(smmodel->findServer(_smproxy->GetConnectionID()));
+  this->createWidget(smmodel->findServer(_smproxy->GetSession()));
 }
 
 //-----------------------------------------------------------------------------

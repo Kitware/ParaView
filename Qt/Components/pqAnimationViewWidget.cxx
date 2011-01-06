@@ -69,8 +69,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSMAdaptor.h"
 #include "pqUndoStack.h"
 #include "vtkCamera.h"
-#include "vtkSMAnimationSceneProxy.h"
 #include "vtkSMProperty.h"
+#include "vtkSMPropertyHelper.h"
 #include "vtkSMProxy.h"
 #include "vtkSMRenderViewProxy.h"
 
@@ -562,7 +562,9 @@ void pqAnimationViewWidget::updateSceneTime()
 
 void pqAnimationViewWidget::setCurrentTime(double t)
 {
-  this->Internal->Scene->getAnimationSceneProxy()->SetAnimationTime(t);
+  vtkSMPropertyHelper(
+    this->Internal->Scene->getProxy(), "AnimationTime").Set(t);
+  this->Internal->Scene->getProxy()->UpdateVTKObjects();
 }
   
 void pqAnimationViewWidget::setKeyFrameTime(pqAnimationTrack* track, 
@@ -731,16 +733,9 @@ void pqAnimationViewWidget::toggleTrackEnabled(pqAnimationTrack* track)
     {
     return;
     }
-  pqUndoStack* undo = pqApplicationCore::instance()->getUndoStack();
-  if(undo)
-    {
-    undo->beginUndoSet("Toggle Animation Track");
-    }
+  BEGIN_UNDO_SET("Toggle Animation Track");
   cue->setEnabled(!track->isEnabled());
-  if(undo)
-    {
-    undo->endUndoSet();
-    }
+  END_UNDO_SET();
 }
 
 //-----------------------------------------------------------------------------
@@ -751,16 +746,9 @@ void pqAnimationViewWidget::deleteTrack(pqAnimationTrack* track)
     {
     return;
     }
-  pqUndoStack* undo = pqApplicationCore::instance()->getUndoStack();
-  if(undo)
-    {
-    undo->beginUndoSet("Remove Animation Track");
-    }
+  BEGIN_UNDO_SET("Remove Animation Track");
   this->Internal->Scene->removeCue(cue);
-  if(undo)
-    {
-    undo->endUndoSet();
-    }
+  END_UNDO_SET();
 }
 
 void pqAnimationViewWidget::setActiveView(pqView* view)
@@ -860,11 +848,7 @@ void pqAnimationViewWidget::createTrack()
       }
     }
 
-  pqUndoStack* undo = pqApplicationCore::instance()->getUndoStack();
-  if(undo)
-    {
-    undo->beginUndoSet("Add Animation Track");
-    }
+  BEGIN_UNDO_SET("Add Animation Track");
 
   // This will create the cue and initialize it with default keyframes.
   pqAnimationCue* cue = this->Internal->Scene->createCue(curProxy,
@@ -903,9 +887,5 @@ void pqAnimationViewWidget::createTrack()
       }
     }
 
-  if (undo)
-    {
-    undo->endUndoSet();
-    }
+  END_UNDO_SET();
 }
-

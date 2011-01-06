@@ -76,7 +76,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqMultiViewFrame.h"
 #include "pqObjectBuilder.h"
 #include "pqOptions.h"
-#include "pqPluginManager.h"
+#include "pqInterfaceTracker.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
 #include "pqSplitViewUndoElement.h"
@@ -228,7 +228,7 @@ void pqViewManager::buildConvertMenu()
 
   // Create actions for converting view types.
   QObjectList ifaces =
-    pqApplicationCore::instance()->getPluginManager()->interfaces();
+    pqApplicationCore::instance()->interfaceTracker()->interfaces();
   foreach(QObject* iface, ifaces)
     {
     pqViewModuleInterface* vi = qobject_cast<pqViewModuleInterface*>(iface);
@@ -501,7 +501,7 @@ void pqViewManager::connect(pqMultiViewFrame* frame, pqView* view)
   // Search for view frame action group plugins and allow them to decide whether
   // to add their actions to this view type's frame or not.
   QObjectList ifaces =
-    pqApplicationCore::instance()->getPluginManager()->interfaces();
+    pqApplicationCore::instance()->interfaceTracker()->interfaces();
   foreach(QObject* iface, ifaces)
     {
     pqViewFrameActionGroupInterface* agi = qobject_cast<pqViewFrameActionGroupInterface*>(iface);
@@ -535,7 +535,7 @@ void pqViewManager::disconnect(pqMultiViewFrame* frame, pqView* view)
   // Search for view frame action group plugins and have them remove their
   // actions for this view's frame if need be.
   QObjectList ifaces =
-    pqApplicationCore::instance()->getPluginManager()->interfaces();
+    pqApplicationCore::instance()->interfaceTracker()->interfaces();
   foreach(QObject* iface, ifaces)
     {
     pqViewFrameActionGroupInterface* agi =
@@ -563,6 +563,7 @@ void pqViewManager::assignFrame(pqView* view)
     {
     // Create a new frame.
 
+#ifdef FIXME_COLLABORATION
     pqUndoStack* undoStack = pqApplicationCore::instance()->getUndoStack();
     if (undoStack && (undoStack->getInUndo() ||
       undoStack->getInRedo()))
@@ -573,6 +574,7 @@ void pqViewManager::assignFrame(pqView* view)
       this->Internal->PendingViews.push_back(view);
       return;
       }
+#endif
 
     // Locate frame to split.
     // If there is an active view, use it.
@@ -866,7 +868,7 @@ void pqViewManager::saveState(vtkPVXMLElement* root)
     vtkPVXMLElement* frameElem = vtkPVXMLElement::New();
     frameElem->SetName("Frame");
     frameElem->AddAttribute("index", index.getString().toAscii().data());
-    frameElem->AddAttribute("view_module", view->getProxy()->GetSelfIDAsString());
+    frameElem->AddAttribute("view_module", view->getProxy()->GetGlobalIDAsString());
     rwRoot->AddNestedElement(frameElem);
     frameElem->Delete();
     }

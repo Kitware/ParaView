@@ -755,14 +755,14 @@ void vtkSMProxyDefinitionManager::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os, indent);
 }
 //---------------------------------------------------------------------------
-vtkSMProxyDefinitionIterator* vtkSMProxyDefinitionManager::NewSingleGroupIterator(char const* groupName, int scope = 0)
+vtkSMProxyDefinitionIterator* vtkSMProxyDefinitionManager::NewSingleGroupIterator(char const* groupName, int scope)
 {
   vtkInternalDefinitionIterator* iterator = (vtkInternalDefinitionIterator*) NewIterator(scope);
   iterator->AddTraversalGroupName(groupName);
   return iterator;
 }
 //---------------------------------------------------------------------------
-vtkSMProxyDefinitionIterator* vtkSMProxyDefinitionManager::NewIterator(int scope=0)
+vtkSMProxyDefinitionIterator* vtkSMProxyDefinitionManager::NewIterator(int scope)
 {
   vtkInternalDefinitionIterator* iterator = vtkInternalDefinitionIterator::New();
   switch(scope)

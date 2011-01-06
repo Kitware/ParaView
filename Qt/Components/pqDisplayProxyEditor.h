@@ -82,6 +82,8 @@ protected slots:
   void setBackfaceSolidColor(const QColor& color);
   void setAutoAdjustSampleDistances(bool flag);
 
+  void beginUndoSet(const QString&);
+  void endUndoSet();
 protected:
 
   /// Set the display whose properties we want to edit.

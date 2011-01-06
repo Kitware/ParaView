@@ -135,11 +135,7 @@ void pqPipelineTimeKeyFrameEditor::readKeyFrameData()
 //-----------------------------------------------------------------------------
 void pqPipelineTimeKeyFrameEditor::writeKeyFrameData()
 {
-  pqUndoStack* stack = pqApplicationCore::instance()->getUndoStack();
-  if(stack)
-    {
-    stack->beginUndoSet("Edit Keyframes");
-    }
+  BEGIN_UNDO_SET("Edit Keyframes");
 
   if(this->Internal->Ui.variableRadio->isChecked())
     {
@@ -192,11 +188,8 @@ void pqPipelineTimeKeyFrameEditor::writeKeyFrameData()
       this->Internal->Cue->getProxy()->GetProperty("UseAnimationTime");
     pqSMAdaptor::setElementProperty(prop, 1);
     }
-  
-  if(stack)
-    {
-    stack->endUndoSet();
-    }
+
+  END_UNDO_SET();
 }
 
 //-----------------------------------------------------------------------------

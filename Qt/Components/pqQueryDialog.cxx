@@ -117,6 +117,7 @@ pqQueryDialog::pqQueryDialog(
   // Setup the spreadsheet view.
   this->Internals->spreadsheet->setModel(NULL);
 
+#ifdef FIXME_COLLABORATION
   // Link the selection color to the global selection color so that it will
   // affect all views, otherwise user may be get confused ;).
   vtkSMGlobalPropertiesManager* globalPropertiesManager =
@@ -130,6 +131,7 @@ pqQueryDialog::pqQueryDialog(
     "color", SIGNAL(colorChanged(const QVariant&)),
     globalPropertiesManager,
     globalPropertiesManager->GetProperty("SelectionColor"));
+#endif
 
   this->Internals->LabelColorAdaptor = new pqSignalAdaptorColor(
     this->Internals->labelColor, 
@@ -183,7 +185,6 @@ void pqQueryDialog::setupSpreadSheet()
   vtkIdType cid = this->Internals->source->currentPort()->getServer()->GetConnectionID();
 
   vtkSMProxy* repr = pxm->NewProxy("representations", "SpreadSheetRepresentation");
-  repr->SetConnectionID(cid);
   // we always want to show all the blocks in the dataset, since we don't have a
   // block chooser widget in this dialog.
   vtkSMPropertyHelper(repr, "CompositeDataSetIndex").Set(0);
@@ -194,7 +195,6 @@ void pqQueryDialog::setupSpreadSheet()
 
   vtkSMViewProxy* view = vtkSMViewProxy::SafeDownCast(
     pxm->NewProxy("views", "SpreadSheetView"));
-  view->SetConnectionID(cid);
   vtkSMPropertyHelper(view, "SelectionOnly").Set(1);
   vtkSMPropertyHelper(view, "Representations").Set(repr);
   vtkSMPropertyHelper(view, "ViewSize").Set(0, 1);

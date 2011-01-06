@@ -457,11 +457,6 @@ public:
   // The User MUST delete the provided proxy otherwise it will live forever
   virtual vtkSMProxy* NewProxy(const vtkSMMessage* msg);
 
-  // Description:
-  // Returns a new instance of vtkSMProxyIterator used to iterate over
-  // registered proxies.
-  vtkSMProxyIterator* NewIterator();
-
 protected:
   vtkSMProxyManager();
   ~vtkSMProxyManager();

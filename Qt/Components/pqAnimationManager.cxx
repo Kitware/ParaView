@@ -37,11 +37,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkProcessModule.h"
 #include "vtkPVServerInformation.h"
 #include "vtkRenderWindow.h"
-#include "vtkSMAnimationSceneGeometryWriter.h"
-#include "vtkSMAnimationSceneProxy.h"
 #include "vtkSmartPointer.h"
+#include "vtkSMProxy.h"
 #include "vtkSMProxyManager.h"
+#include "vtkSMSession.h"
+
+#ifdef FIXME_COLLABORATION
 #include "vtkSMServerProxyManagerReviver.h"
+#include "vtkSMAnimationSceneGeometryWriter.h"
+#endif
 
 #include <QIntValidator>
 #include <QFileInfo>
@@ -136,7 +140,7 @@ void pqAnimationManager::updateViewModules()
 
   emit this->beginNonUndoableChanges();
 
-  vtkSMAnimationSceneProxy* sceneProxy = scene->getAnimationSceneProxy();
+  vtkSMProxy* sceneProxy = scene->getProxy();
   pqSMAdaptor::setProxyListProperty(sceneProxy->GetProperty("ViewModules"),
     viewList);
   sceneProxy->UpdateProperty("ViewModules");
@@ -358,7 +362,7 @@ bool pqAnimationManager::saveAnimation()
     }
   // Ensure that GUI is up-to-date so that we get correct sizes.
   pqEventDispatcher::processEventsAndWait(1);
-  vtkSMAnimationSceneProxy* sceneProxy = scene->getAnimationSceneProxy();
+  vtkSMProxy* sceneProxy = scene->getProxy();
 
   QDialog dialog;
   Ui::pqAnimationSettingsDialog dialogUI;
@@ -506,8 +510,7 @@ bool pqAnimationManager::saveAnimation()
   vtkSmartPointer<vtkPVServerInformation> serverInfo;
   if (disconnect_and_save)
     {
-    serverInfo = vtkProcessModule::GetProcessModule()->GetServerInformation(
-      scene->getServer()->GetConnectionID());
+    serverInfo = sceneProxy->GetSession()->GetServerInformation();
     if (!serverInfo)
       {
       qWarning() << "Failed to locate server information about AVI support.";
@@ -609,10 +612,9 @@ bool pqAnimationManager::saveAnimation()
   if (disconnect_and_save)
     {
     pqServer* server = this->Internals->ActiveServer;
-    vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+    vtkSMProxyManager* pxm = server->proxyManager();
 
     vtkSMProxy* writer = pxm->NewProxy("writers", "AnimationSceneImageWriter");
-    writer->SetConnectionID(server->GetConnectionID());
     pxm->RegisterProxy("animation", "writer", writer);
     writer->Delete();
 
@@ -627,13 +629,13 @@ bool pqAnimationManager::saveAnimation()
     // We save the animation offline.
     vtkSMProxy* cleaner = 
       pxm->NewProxy("connection_cleaners", "AnimationPlayer");
-    cleaner->SetConnectionID(server->GetConnectionID());
     pxm->RegisterProxy("animation","cleaner",cleaner);
     cleaner->Delete();
 
     pqSMAdaptor::setProxyProperty(cleaner->GetProperty("Writer"), writer);
     cleaner->UpdateVTKObjects();
 
+#ifdef FIXME_COLLABORATION
     vtkSMServerProxyManagerReviver* reviver = 
       vtkSMServerProxyManagerReviver::New();
     int status = reviver->ReviveRemoteServerManager(server->GetConnectionID());
@@ -646,6 +648,9 @@ bool pqAnimationManager::saveAnimation()
       }
     emit this->disconnectServer();
     return status;
+#else
+    return false;
+#endif
     }
 
   vtkSMAnimationSceneImageWriter* writer = pqAnimationSceneImageWriter::New();
@@ -721,8 +726,8 @@ bool pqAnimationManager::saveGeometry(const QString& filename,
     {
     return false;
     }
-  vtkSMAnimationSceneProxy* sceneProxy = scene->getAnimationSceneProxy();
-
+#ifdef FIXME_COLLABORATION
+  vtkSMProxy* sceneProxy = scene->getProxy();
   vtkSMAnimationSceneGeometryWriter* writer = vtkSMAnimationSceneGeometryWriter::New();
   writer->SetFileName(filename.toAscii().data());
   writer->SetAnimationScene(sceneProxy);
@@ -730,6 +735,8 @@ bool pqAnimationManager::saveGeometry(const QString& filename,
   bool status = writer->Save();
   writer->Delete();
   return status;
+#endif
+  return false;
 }
 
 //-----------------------------------------------------------------------------

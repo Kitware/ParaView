@@ -109,6 +109,13 @@ pqServer* pqServerManagerModel::findServer(vtkSession* session) const
 }
 
 //-----------------------------------------------------------------------------
+pqServer* pqServerManagerModel::findServer(vtkSMSession* session) const
+{
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  return this->findServer(pm->GetSessionID(session));
+}
+
+//-----------------------------------------------------------------------------
 pqServer* pqServerManagerModel::findServer(vtkIdType cid) const
 {
   pqInternal::ServerMap::iterator iter = this->Internal->Servers.find(cid);

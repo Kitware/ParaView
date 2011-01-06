@@ -148,7 +148,7 @@ pqImplicitPlaneWidget::pqImplicitPlaneWidget(vtkSMProxy* o, vtkSMProxy* pxy, QWi
 
   pqServerManagerModel* smmodel =
     pqApplicationCore::instance()->getServerManagerModel();
-  this->createWidget(smmodel->findServer(o->GetConnectionID()));
+  this->createWidget(smmodel->findServer(o->GetSession()));
 }
 
 pqImplicitPlaneWidget::~pqImplicitPlaneWidget()

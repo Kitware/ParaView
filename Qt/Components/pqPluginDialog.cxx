@@ -63,6 +63,7 @@ pqPluginDialog::pqPluginDialog(pqServer* server, QWidget* p)
   : QDialog(p), Server(server)
 {
   this->setupUi(this);
+#ifdef FIXME_COLLABORATION
   this->setupTreeWidget(this->remotePlugins);
   this->setupTreeWidget(this->localPlugins);
   
@@ -114,37 +115,42 @@ pqPluginDialog::pqPluginDialog(pqServer* server, QWidget* p)
   
   this->LoadingMultiplePlugins = false;
   this->refresh();
+#endif
 }
 
 //----------------------------------------------------------------------------
 pqPluginDialog::~pqPluginDialog()
 {
-  pqApplicationCore::instance()->getPluginManager()->savePluginSettings(false);
 }
 
 //----------------------------------------------------------------------------
 void pqPluginDialog::loadRemotePlugin()
 {
+#ifdef FIXME_COLLABORATION
   QString plugin = this->loadPlugin(this->Server, true);
   if(!plugin.isEmpty())
     {
     this->refresh();
     }
+#endif
 }
 
 //----------------------------------------------------------------------------
 void pqPluginDialog::loadLocalPlugin()
 {
+#ifdef FIXME_COLLABORATION
   QString plugin = this->loadPlugin(this->Server, false);
   if(!plugin.isEmpty())
     {
     this->refresh();
     }
+#endif
 }
 
 //----------------------------------------------------------------------------
 QString pqPluginDialog::loadPlugin(pqServer* server, bool remote)
 {
+#ifdef FIXME_COLLABORATION
   pqFileDialog fd(remote? server: NULL,
                   this, "Load Plugin", QString(), 
                   "Plugins (*.so;*.dylib;*.dll;*.sl)\n"
@@ -158,12 +164,14 @@ QString pqPluginDialog::loadPlugin(pqServer* server, bool remote)
     plugin = this->loadPlugin(server, plugin, remote);
     }
   return plugin;
+#endif
 }
 
 //----------------------------------------------------------------------------
 QString pqPluginDialog::loadPlugin(pqServer* server, 
   const QString& plugin, bool remote)
 {
+#ifdef FIXME_COLLABORATION
   QString error;
   QString ret = plugin;
   // now pass it off to the plugin manager to load everything that this 
@@ -182,44 +190,54 @@ QString pqPluginDialog::loadPlugin(pqServer* server,
     ret = QString();
     }
   return ret;
+#endif
 }
 
 //----------------------------------------------------------------------------
 void pqPluginDialog::removePlugin(pqServer* server, 
                                   const QString& plugin, bool remote)
 {
+#ifdef FIXME_COLLABORATION
   pqPluginManager* pm = pqApplicationCore::instance()->getPluginManager();
   pm->removePlugin(server, plugin, remote);
+#endif
 }
 
 //----------------------------------------------------------------------------
 void pqPluginDialog::onRefresh()
 {
+#ifdef FIXME_COLLABORATION
   if(!this->LoadingMultiplePlugins)
     {
     this->refresh();
     }
+#endif
 }
 
 //----------------------------------------------------------------------------
 void pqPluginDialog::refresh()
 {
+#ifdef FIXME_COLLABORATION
   this->refreshLocal();
   this->refreshRemote();
+#endif
 }
 
 //----------------------------------------------------------------------------
 void pqPluginDialog::refreshLocal()
 {
+#ifdef FIXME_COLLABORATION
   pqPluginManager* pm = pqApplicationCore::instance()->getPluginManager();
   QList< vtkPVPluginInformation* > extensions = pm->loadedExtensions(NULL);
   this->populatePluginTree(this->localPlugins, extensions, false);
   this->localPlugins->resizeColumnToContents(ValueCol);  
+#endif
 }
 
 //----------------------------------------------------------------------------
 void pqPluginDialog::refreshRemote()
 {
+#ifdef FIXME_COLLABORATION
   if(this->Server && this->Server->isRemote())
     {
     pqPluginManager* pm = pqApplicationCore::instance()->getPluginManager();
@@ -228,11 +246,13 @@ void pqPluginDialog::refreshRemote()
       extensions, true);
     this->remotePlugins->resizeColumnToContents(ValueCol);  
     }
+#endif
 }
 
 //----------------------------------------------------------------------------
 void pqPluginDialog::setupTreeWidget(QTreeWidget* pluginTree)
 {
+#ifdef FIXME_COLLABORATION
 //  pluginTree->setHeaderItem(0);
   pluginTree->setColumnCount(2);
   pluginTree->header()->setResizeMode(NameCol, QHeaderView::ResizeToContents);
@@ -248,12 +268,14 @@ void pqPluginDialog::setupTreeWidget(QTreeWidget* pluginTree)
     this, SLOT(resizeColumn(QTreeWidgetItem*))/*, Qt::QueuedConnection*/);
   QObject::connect(pluginTree, SIGNAL(itemCollapsed(QTreeWidgetItem*)),
     this, SLOT(resizeColumn(QTreeWidgetItem*))/*, Qt::QueuedConnection*/);
+#endif
 }
 
 //----------------------------------------------------------------------------
 void pqPluginDialog::populatePluginTree(QTreeWidget* pluginTree,
   QList< vtkPVPluginInformation* >& pluginList, bool remote)
 {
+#ifdef FIXME_COLLABORATION
   pluginTree->blockSignals(true);
   pluginTree->clear();
   foreach(vtkPVPluginInformation* plInfo, pluginList)
@@ -261,12 +283,14 @@ void pqPluginDialog::populatePluginTree(QTreeWidget* pluginTree,
     this->createPluginNode(pluginTree, plInfo, remote);
     }
   pluginTree->blockSignals(false);
+#endif
 }
 
 //----------------------------------------------------------------------------
 void pqPluginDialog::createPluginNode(
   QTreeWidget* pluginTree, vtkPVPluginInformation* pluginInfo, bool remote)
 {
+#ifdef FIXME_COLLABORATION
   QTreeWidgetItem* mNode = new QTreeWidgetItem(
     pluginTree, QTreeWidgetItem::UserType);
   
@@ -274,20 +298,24 @@ void pqPluginDialog::createPluginNode(
   vdata.setValue((void*)pluginInfo);
   mNode->setData(NameCol, Qt::UserRole, vdata);
   this->addPluginInfo(mNode, remote);
+#endif
 }
 
 //----------------------------------------------------------------------------
 vtkPVPluginInformation* pqPluginDialog::getPluginInfo(
   QTreeWidgetItem* pluginNode)
 {
+#ifdef FIXME_COLLABORATION
   return (pluginNode && pluginNode->type() == QTreeWidgetItem::UserType) ? 
     static_cast<vtkPVPluginInformation*>(
     pluginNode->data(NameCol,Qt::UserRole).value<void *>()) : NULL;
+#endif
 }
 
 //----------------------------------------------------------------------------
 void pqPluginDialog::addPluginInfo(QTreeWidgetItem* pluginNode, bool remote)
 {
+#ifdef FIXME_COLLABORATION
   vtkPVPluginInformation* plInfo = this->getPluginInfo(pluginNode);
   if(!plInfo)
     {
@@ -302,12 +330,14 @@ void pqPluginDialog::addPluginInfo(QTreeWidgetItem* pluginNode, bool remote)
     QTreeWidgetItem::DontShowIndicatorWhenChildless);
   
   this->addInfoNodes(pluginNode, plInfo, remote);  
+#endif
 }
 
 //----------------------------------------------------------------------------
 void pqPluginDialog::addInfoNodes(
   QTreeWidgetItem* pluginNode, vtkPVPluginInformation* plInfo, bool remote)
 {
+#ifdef FIXME_COLLABORATION
   Qt::ItemFlags infoFlags(Qt::ItemIsEnabled);
   
   // set icon hint
@@ -376,11 +406,13 @@ void pqPluginDialog::addInfoNodes(
   infoNode = new QTreeWidgetItem(pluginNode, infoText);
   infoNode->setFlags(infoFlags | Qt::ItemIsUserCheckable);
   infoNode->setCheckState(ValueCol, plInfo->GetAutoLoad() ? Qt::Checked : Qt::Unchecked);
+#endif
 }
 
 //----------------------------------------------------------------------------
 void pqPluginDialog::onPluginItemChanged(QTreeWidgetItem* item, int col)
 {
+#ifdef FIXME_COLLABORATION
   if(item && col == ValueCol)
     {
     vtkPVPluginInformation* plInfo = this->getPluginInfo(
@@ -392,12 +424,14 @@ void pqPluginDialog::onPluginItemChanged(QTreeWidgetItem* item, int col)
       pm->updatePluginAutoLoadState(plInfo, autoLoad);
       }
     }
+#endif
 }
 
 //----------------------------------------------------------------------------
 void pqPluginDialog::loadSelectedPlugins(QList<QTreeWidgetItem*> selItems,
   pqServer* server, bool remote)
 {
+#ifdef FIXME_COLLABORATION
   this->LoadingMultiplePlugins = true;
   for (int i=0;i<selItems.count();i++)
     {
@@ -409,28 +443,34 @@ void pqPluginDialog::loadSelectedPlugins(QList<QTreeWidgetItem*> selItems,
     }
   this->LoadingMultiplePlugins = false;
   this->refresh();
+#endif
 }
 
 //----------------------------------------------------------------------------
 void pqPluginDialog::onLoadSelectedRemotePlugin()
 {
+#ifdef FIXME_COLLABORATION
   this->loadSelectedPlugins(this->remotePlugins->selectedItems(), 
     this->Server, true);
   this->refresh();
+#endif
 }
 
 //----------------------------------------------------------------------------
 void pqPluginDialog::onLoadSelectedLocalPlugin()
 {
+#ifdef FIXME_COLLABORATION
   this->loadSelectedPlugins(this->localPlugins->selectedItems(), 
     this->Server, false);
   this->refresh();
+#endif
 }
 
 //----------------------------------------------------------------------------
 void pqPluginDialog::removeSelectedPlugins(QList<QTreeWidgetItem*> selItems,
                                          pqServer* server, bool remote)
 {
+#ifdef FIXME_COLLABORATION
   for (int i=0;i<selItems.count();i++)
     {
     vtkPVPluginInformation* plInfo = this->getPluginInfo(selItems.value(i));
@@ -440,40 +480,50 @@ void pqPluginDialog::removeSelectedPlugins(QList<QTreeWidgetItem*> selItems,
       }     
     }
   this->refresh();
+#endif
 }
 
 //----------------------------------------------------------------------------
 void pqPluginDialog::onRemoveSelectedRemotePlugin()
 {
+#ifdef FIXME_COLLABORATION
   this->removeSelectedPlugins(this->remotePlugins->selectedItems(), 
     this->Server, true);
   this->onRemoteSelectionChanged();
+#endif
 }
 
 //----------------------------------------------------------------------------
 void pqPluginDialog::onRemoveSelectedLocalPlugin()
 {
+#ifdef FIXME_COLLABORATION
   this->removeSelectedPlugins(this->localPlugins->selectedItems(), 
     this->Server, false);
   this->onLocalSelectionChanged();
+#endif
 }
   
 //----------------------------------------------------------------------------
 void pqPluginDialog::onRemoteSelectionChanged()
 {
+#ifdef FIXME_COLLABORATION
   this->updateEnableState(this->remotePlugins,
     this->removeRemote, this->loadSelected_Remote);
+#endif
 }
 //----------------------------------------------------------------------------
 void pqPluginDialog::onLocalSelectionChanged()
 {
+#ifdef FIXME_COLLABORATION
   this->updateEnableState(this->localPlugins, 
     this->removeLocal, this->loadSelected_Local);
+#endif
 }
 //----------------------------------------------------------------------------
 void pqPluginDialog::updateEnableState(
   QTreeWidget* pluginTree, QPushButton* removeButton, QPushButton* loadButton)
 {
+#ifdef FIXME_COLLABORATION
   bool shouldEnableLoad = false;
   int num = pluginTree->selectedItems().count();
   for (int i=0;i<num;i++)
@@ -489,17 +539,21 @@ void pqPluginDialog::updateEnableState(
 
   loadButton->setEnabled(shouldEnableLoad); 
   removeButton->setEnabled(num>0 ? 1 : 0);
+#endif
 }
 
 //----------------------------------------------------------------------------
 void pqPluginDialog::resizeColumn(QTreeWidgetItem* item)
 {
+#ifdef FIXME_COLLABORATION
   item->treeWidget()->resizeColumnToContents(ValueCol);
+#endif
 }
 
 //----------------------------------------------------------------------------
 QString pqPluginDialog::getStatusText(vtkPVPluginInformation* plInfo)
 {
+#ifdef FIXME_COLLABORATION
   QString text;
   if(plInfo->GetError())
     {
@@ -511,4 +565,5 @@ QString pqPluginDialog::getStatusText(vtkPVPluginInformation* plInfo)
     text = plInfo->GetLoaded() ? "Loaded" : "Not Loaded";
     }
   return text;
+#endif
 }

@@ -37,13 +37,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServer.h"
 #include "pqSplineWidget.h"
 #include "vtkCamera.h"
-#include "vtkProcessModule.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMProperty.h"
+#include "vtkPVSession.h"
 
 #include <QPointer>
 #include <QVBoxLayout>
@@ -182,8 +182,8 @@ pqCameraKeyFrameWidget::pqCameraKeyFrameWidget(QWidget* parentObject)
 
   this->Internal->PSplineProxy.TakeReference(
     pxm->NewProxy("parametric_functions", "Spline"));
-  this->Internal->PSplineProxy->SetConnectionID(server->GetConnectionID());
-  this->Internal->PSplineProxy->SetServers(vtkProcessModule::CLIENT);
+  this->Internal->PSplineProxy->SetLocation(
+    vtkPVSession::CLIENT);
   this->Internal->PSplineProxy->UpdateVTKObjects();
 
   this->Internal->PSplineWidget = new pqSplineWidget(
@@ -205,8 +205,7 @@ pqCameraKeyFrameWidget::pqCameraKeyFrameWidget(QWidget* parentObject)
 
   this->Internal->FSplineProxy.TakeReference(
     pxm->NewProxy("parametric_functions", "Spline"));
-  this->Internal->FSplineProxy->SetConnectionID(server->GetConnectionID());
-  this->Internal->FSplineProxy->SetServers(vtkProcessModule::CLIENT);
+  this->Internal->PSplineProxy->SetLocation(vtkPVSession::CLIENT);
   this->Internal->FSplineProxy->UpdateVTKObjects();
 
   this->Internal->FSplineWidget = new pqSplineWidget(

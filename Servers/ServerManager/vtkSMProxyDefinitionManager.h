@@ -124,7 +124,14 @@ public:
   // 1 : CORE_DEFINITIONS
   // 2 : CUSTOM_DEFINITIONS
 
-  vtkSMProxyDefinitionIterator* NewIterator(int scope);
+  enum
+    {
+    ALL_DEFINITIONS=0,
+    CORE_DEFINITIONS=1,
+    CUSTOM_DEFINITIONS=2
+    };
+
+  vtkSMProxyDefinitionIterator* NewIterator(int scope=ALL_DEFINITIONS);
 
   // Description
   // Return a new configured iterator for traversing a set of proxy definition
@@ -134,7 +141,7 @@ public:
   // 1 : CORE_DEFINITIONS
   // 2 : CUSTOM_DEFINITIONS
   vtkSMProxyDefinitionIterator* NewSingleGroupIterator(const char* groupName,
-                                                       int scope);
+    int scope=ALL_DEFINITIONS);
 
 //BTX
 

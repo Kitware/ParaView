@@ -71,12 +71,14 @@ pqStandardColorButton::pqStandardColorButton(QWidget* _parent) :
   this->updateMenu();
 
   pqApplicationCore* core = pqApplicationCore::instance();
+#ifdef FIXME_COLLABORATION
   vtkSMProxy* globalProps = core->getGlobalPropertiesManager();
 
   this->VTKConnect = vtkEventQtSlotConnect::New();
   this->VTKConnect->Connect(
     globalProps, vtkCommand::PropertyModifiedEvent,
     this, SLOT(updateMenu()));
+#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -131,6 +133,7 @@ void pqStandardColorButton::updateMenu()
   QObject::connect(popupMenu, SIGNAL(triggered(QAction*)),
     this, SLOT(actionTriggered(QAction*)));
 
+#ifdef FIXME_COLLABORATION
   int icon_size = qRound(this->height() * 0.5);
   pqApplicationCore* core = pqApplicationCore::instance();
   vtkSMProxy* globalProps = core->getGlobalPropertiesManager();
@@ -150,6 +153,7 @@ void pqStandardColorButton::updateMenu()
       }
     }
   iter->Delete();
+#endif
   this->setStandardColor(current_standard_color);
 }
 
@@ -157,6 +161,7 @@ void pqStandardColorButton::updateMenu()
 void pqStandardColorButton::actionTriggered(QAction* action)
 {
   QString prop_name = action->data().toString();
+#ifdef FIXME_COLLABORATION
   pqApplicationCore* core = pqApplicationCore::instance();
   vtkSMProxy* globalProps = core->getGlobalPropertiesManager();
   vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
@@ -167,6 +172,7 @@ void pqStandardColorButton::actionTriggered(QAction* action)
   this->setChosenColor(color);
   emit this->standardColorChanged(this->standardColor());
   emit this->endUndo();
+#endif
 }
 
 //-----------------------------------------------------------------------------

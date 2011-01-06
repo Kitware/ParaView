@@ -43,7 +43,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtksys/ios/sstream>
 #include <vtksys/RegularExpression.hxx>
 
+#ifdef FIXME_COLLABORATION
 #include "pqProxyUnRegisterUndoElement.h"
+#endif
 
 vtkStandardNewMacro(pqUndoStackBuilder);
 //-----------------------------------------------------------------------------
@@ -115,6 +117,7 @@ void pqUndoStackBuilder::SetUndoStack(vtkSMUndoStack* stack)
 void pqUndoStackBuilder::ExecuteEvent(vtkObject* caller, unsigned long eventid, 
   void* data)
 {
+#ifdef FIXME_COLLABORATION
   if (this->GetIgnoreAllChanges() || this->HandleChangeEvents() || 
     eventid != vtkCommand::PropertyModifiedEvent)
     {
@@ -131,6 +134,7 @@ void pqUndoStackBuilder::ExecuteEvent(vtkObject* caller, unsigned long eventid,
       vtkSMProxyManager::ModifiedPropertyInformation*>(data)); 
     this->OnPropertyModified(info.Proxy, info.PropertyName);
     }
+#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -146,13 +150,14 @@ void pqUndoStackBuilder::OnUnRegisterProxy(const char* group,
     return;
     }
 
+#ifdef FIXME_COLLABORATION
   vtkSMProxyUnRegisterUndoElement* elem =
     pqProxyUnRegisterUndoElement::New();
   elem->SetConnectionID(this->ConnectionID);
   elem->ProxyToUnRegister(group, name, proxy);
   this->UndoSet->AddElement(elem);
   elem->Delete();
-
+#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -211,6 +216,7 @@ void pqUndoStackBuilder::OnPropertyModified(vtkSMProxy* proxy,
     return;
     }
 
+#ifdef FIXME_COLLABORATION
   bool auto_element = this->GetEnableMonitoring()==0 && 
     !this->IgnoreIsolatedChanges && !this->UndoRedoing;
 
@@ -254,6 +260,7 @@ void pqUndoStackBuilder::OnPropertyModified(vtkSMProxy* proxy,
       this->PushToStack();
       }
     }
+#endif
 }
 
 //-----------------------------------------------------------------------------

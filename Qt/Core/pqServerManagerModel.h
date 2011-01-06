@@ -49,6 +49,7 @@ class vtkPVXMLElement;
 class vtkSession;
 class vtkSMProxy;
 class vtkSMProxyLocator;
+class vtkSMSession;
 
 //BTX
 class pqServerManagerModel;
@@ -94,6 +95,7 @@ public:
   /// Given a vtkSession*, returns the pqServer instance for that session, if
   /// any.
   pqServer* findServer(vtkSession*) const;
+  pqServer* findServer(vtkSMSession*) const;
 
   /// Given a server resource, locates the pqServer instance for it, if any.
   pqServer* findServer(const pqServerResource& resource) const;

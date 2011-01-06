@@ -32,22 +32,24 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationOptions.h"
 #include "ui_pqApplicationOptions.h"
 
-#include "vtkSMProxyManager.h"
-#include "vtkSMProxyDefinitionIterator.h"
-#include "vtkSMPropertyHelper.h"
-#include "vtkProcessModuleAutoMPI.h"
-
+#include "pqActiveObjects.h"
 #include "pqAnimationScene.h"
 #include "pqApplicationCore.h"
 #include "pqChartRepresentation.h"
+#include "pqInterfaceTracker.h"
 #include "pqObjectInspectorWidget.h"
 #include "pqPluginManager.h"
 #include "pqRenderView.h"
+#include "pqScalarsToColors.h"
 #include "pqServer.h"
 #include "pqSetName.h"
 #include "pqSettings.h"
 #include "pqViewModuleInterface.h"
-#include "pqScalarsToColors.h"
+#include "vtkProcessModuleAutoMPI.h"
+#include "vtkSMPropertyHelper.h"
+#include "vtkSMProxyDefinitionManager.h"
+#include "vtkSMProxyDefinitionIterator.h"
+#include "vtkSMProxyManager.h"
 
 #include <QMenu>
 #include <QDoubleValidator>
@@ -73,7 +75,7 @@ pqApplicationOptions::pqApplicationOptions(QWidget *widgetParent)
   this->Internal->DefaultViewType->addItem("None", "None");
   // Get available view types.
   QObjectList ifaces =
-    pqApplicationCore::instance()->getPluginManager()->interfaces();
+    pqApplicationCore::instance()->interfaceTracker()->interfaces();
   foreach(QObject* iface, ifaces)
     {
     pqViewModuleInterface* vi = qobject_cast<pqViewModuleInterface*>(iface);
@@ -177,16 +179,43 @@ pqApplicationOptions::pqApplicationOptions(QWidget *widgetParent)
                    SIGNAL(clicked(bool)),
                    this, SLOT(onChartResetHiddenSeries()));
 
+  QObject::connect(&pqActiveObjects::instance(),
+    SIGNAL(serverChanged(pqServer*)),
+    this, SLOT(updatePalettes()));
+  vtkProcessModuleAutoMPI::
+    SetUseMulticoreProcessors (this->Internal->AutoMPI->isTristate());
+
+  this->updatePalettes();
+}
+
+//-----------------------------------------------------------------------------
+pqApplicationOptions::~pqApplicationOptions()
+{
+  delete this->Internal;
+}
+
+//-----------------------------------------------------------------------------
+void pqApplicationOptions::updatePalettes()
+{
+  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+  if (pxm->GetSession() == NULL)
+    {
+    // cannot update the definitions since no valid session is present.
+    return;
+    }
+
+  delete this->Internal->Palette->menu();
   QMenu* paletteMenu = new QMenu(this->Internal->Palette)
     << pqSetName("paletteMenu");
   this->Internal->Palette->setMenu(paletteMenu);
 
-  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
-  vtkSMProxyDefinitionIterator* iter = vtkSMProxyDefinitionIterator::New();
-  iter->SetModeToOneGroup();
-  for (iter->Begin("palettes"); !iter->IsAtEnd(); iter->Next())
+  vtkSMProxyDefinitionIterator* iter =
+    pxm->GetProxyDefinitionManager()->NewSingleGroupIterator("palettes",
+      vtkSMProxyDefinitionManager::ALL_DEFINITIONS);
+  for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
     {
-    vtkSMProxy* prototype = pxm->GetPrototypeProxy("palettes", iter->GetKey());
+    vtkSMProxy* prototype = pxm->GetPrototypeProxy("palettes",
+      iter->GetProxyName());
     if (prototype)
       {
       paletteMenu->addAction(prototype->GetXMLLabel())
@@ -194,18 +223,8 @@ pqApplicationOptions::pqApplicationOptions(QWidget *widgetParent)
       }
     }
   iter->Delete();
-
   QObject::connect(paletteMenu, SIGNAL(triggered(QAction*)),
-                   this, SLOT(onPalette(QAction*)));
-
-  vtkProcessModuleAutoMPI::
-    SetUseMulticoreProcessors (this->Internal->AutoMPI->isTristate());
-}
-
-//-----------------------------------------------------------------------------
-pqApplicationOptions::~pqApplicationOptions()
-{
-  delete this->Internal;
+    this, SLOT(onPalette(QAction*)));
 }
 
 //-----------------------------------------------------------------------------
@@ -290,7 +309,10 @@ void pqApplicationOptions::applyChanges()
     }
   pqChartRepresentation::setHiddenSeriesSetting(hidden);
 
-  pqApplicationCore::instance()->loadGlobalPropertiesFromSettings();
+  if (pqActiveObjects::instance().activeServer())
+    {
+    pqActiveObjects::instance().activeServer()->loadGlobalPropertiesFromSettings();
+    }
 
   // render all views.
   pqApplicationCore::instance()->render();

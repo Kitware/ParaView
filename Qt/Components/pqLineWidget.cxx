@@ -142,7 +142,7 @@ pqLineWidget::pqLineWidget(vtkSMProxy* o, vtkSMProxy* pxy, QWidget* p,
   pqServerManagerModel* smmodel =
     pqApplicationCore::instance()->getServerManagerModel();
   
-  this->createWidget(smmodel->findServer(o->GetConnectionID()), xmlname);
+  this->createWidget(smmodel->findServer(o->GetSession()), xmlname);
   QObject::connect(&this->Implementation->Links, SIGNAL(qtWidgetChanged()),
     this, SLOT(setModified()));
 }

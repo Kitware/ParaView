@@ -50,7 +50,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <pqSettings.h>
 
 #include <vtkProcessModule.h>
-#include <vtkProcessModuleConnectionManager.h>
 #include <vtkMath.h>
 #include <vtkTimerLog.h>
 #include <vtkPVXMLElement.h>
@@ -99,7 +98,7 @@ public:
 
     delete this->StartupDialog;
     this->StartupDialog = 0;
-    
+#ifdef FIXME_COLLABORATION
     if(this->PortID)
       {
       vtkProcessModule::GetProcessModule()->StopAcceptingConnections(
@@ -118,7 +117,7 @@ public:
         this->RenderServerPortID);
       this->RenderServerPortID = 0;
       }
-    
+#endif
     this->Options.clear();
     this->Server = pqServerResource();
   }
@@ -856,6 +855,7 @@ void pqSimpleServerStartup::startReverseConnection()
     this,
     SLOT(finishReverseConnection(pqServer*)));
   
+#ifdef FIXME_COLLABORATION
   if(this->Implementation->Server.scheme() == "csrc")
     {
     this->Implementation->PortID = process_module->AcceptConnectionsOnPort(
@@ -869,7 +869,7 @@ void pqSimpleServerStartup::startReverseConnection()
       this->Implementation->DataServerPortID,
       this->Implementation->RenderServerPortID);
     }
-    
+#endif
   this->Implementation->StartupDialog =
     new pqServerStartupDialog(this->Implementation->Server, true);
   this->Implementation->StartupDialog->show();
@@ -930,12 +930,14 @@ void pqSimpleServerStartup::startReverseConnection()
 void pqSimpleServerStartup::monitorReverseConnections()
 {
   vtkProcessModule* const process_module = vtkProcessModule::GetProcessModule();
+#ifdef FIXME_COLLABORATION
   if(-1 == process_module->MonitorConnections(10))
     {
     this->Implementation->Timer.stop();
     this->Implementation->StartupDialog->hide();
     this->failed();
     }
+#endif
 }
 
 //-----------------------------------------------------------------------------

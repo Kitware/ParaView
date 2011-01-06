@@ -77,23 +77,27 @@ public:
 
   void clearSelection()
     {
+#ifdef FIXME_COLLABORATION
     if (this->SelectedPort)
       {
       vtkSMSourceProxy* src = vtkSMSourceProxy::SafeDownCast(
         this->SelectedPort->getSource()->getProxy());
       src->CleanSelectionInputs(this->SelectedPort->getPortNumber());
       }
+#endif
     this->SelectedPort = 0;
     }
 
   vtkSMProxy* getSelectionSourceProxy()
     {
+#ifdef FIXME_COLLABORATION
     if (this->SelectedPort)
       {
       vtkSMSourceProxy* src = vtkSMSourceProxy::SafeDownCast(
         this->SelectedPort->getSource()->getProxy());
       return src->GetSelectionInput(this->SelectedPort->getPortNumber());
       }
+#endif
     return 0;
     }
 
@@ -297,7 +301,6 @@ QList<vtkIdType> pqSelectionManager::getGlobalIDs(vtkSMProxy* selectionSource,pq
   // Filter that converts selections.
   vtkSMSourceProxy* convertor = vtkSMSourceProxy::SafeDownCast(
     pxm->NewProxy("filters", "ConvertSelection"));
-  convertor->SetConnectionID(selectionSource->GetConnectionID());
   pqSMAdaptor::setInputProperty(convertor->GetProperty("Input"),
     selectionSource, selectionPort);
   pqSMAdaptor::setInputProperty(convertor->GetProperty("DataInput"),
@@ -310,7 +313,6 @@ QList<vtkIdType> pqSelectionManager::getGlobalIDs(vtkSMProxy* selectionSource,pq
   // Now deliver the selection to the client.
   vtkSMFetchDataProxy* fetcher =
     vtkSMFetchDataProxy::SafeDownCast(pxm->NewProxy("filters", "FetchData"));
-  fetcher->SetConnectionID(convertor->GetConnectionID());
   vtkSMPropertyHelper(fetcher, "Input").Set(convertor);
   vtkSMPropertyHelper(fetcher, "PostGatherHelperName").Set("vtkAppendSelection");
   fetcher->UpdateVTKObjects();
@@ -364,7 +366,6 @@ QList<QPair<int, vtkIdType> > pqSelectionManager::getIndices(
   // Filter that converts selections.
   vtkSMSourceProxy* convertor = vtkSMSourceProxy::SafeDownCast(
     pxm->NewProxy("filters", "ConvertSelection"));
-  convertor->SetConnectionID(selectionSource->GetConnectionID());
   pqSMAdaptor::setInputProperty(convertor->GetProperty("Input"),
     selectionSource, selectionPort);
   pqSMAdaptor::setInputProperty(convertor->GetProperty("DataInput"),
@@ -377,7 +378,6 @@ QList<QPair<int, vtkIdType> > pqSelectionManager::getIndices(
   // Now deliver the selection to the client.
   vtkSMFetchDataProxy* fetcher =
     vtkSMFetchDataProxy::SafeDownCast(pxm->NewProxy("filters", "FetchData"));
-  fetcher->SetConnectionID(convertor->GetConnectionID());
   vtkSMPropertyHelper(fetcher, "Input").Set(convertor);
   vtkSMPropertyHelper(fetcher, "PostGatherHelperName").Set("vtkAppendSelection");
   fetcher->UpdateVTKObjects();
@@ -397,7 +397,6 @@ vtkSMSourceProxy* pqSelectionManager::createSelectionSource(vtkSelection* sel, v
   vtkSMProxyManager* pm = vtkSMProxyManager::GetProxyManager();
   vtkSMSourceProxy* selectionSource = vtkSMSourceProxy::SafeDownCast(
     pm->NewProxy("sources", "PedigreeIDSelectionSource"));
-  selectionSource->SetConnectionID(connId);
 
   // Fill the selection source with the selection
   vtkSMStringVectorProperty* p = vtkSMStringVectorProperty::SafeDownCast(

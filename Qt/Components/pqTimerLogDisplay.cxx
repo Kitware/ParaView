@@ -38,7 +38,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkClientServerStream.h"
 #include "vtkProcessModule.h"
-#include "vtkProcessModuleConnectionManager.h"
 #include "vtkPVTimerInformation.h"
 #include "vtkSmartPointer.h"
 
@@ -127,6 +126,7 @@ void pqTimerLogDisplay::refresh()
 {
   this->ui->log->clear();
 
+#ifdef FIXME_COLLABORATION
   vtkProcessModule *pm = vtkProcessModule::GetProcessModule();
 
   vtkSmartPointer<vtkPVTimerInformation> timerInfo
@@ -163,6 +163,7 @@ void pqTimerLogDisplay::refresh()
       this->addToLog("Data Server", timerInfo);
       }
     }
+#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -190,6 +191,7 @@ void pqTimerLogDisplay::addToLog(const QString &source,
 //-----------------------------------------------------------------------------
 void pqTimerLogDisplay::clear()
 {
+#ifdef FIXME_COLLABORATION
   vtkProcessModule *pm = vtkProcessModule::GetProcessModule();
   vtkClientServerStream stream;
   stream << vtkClientServerStream::Invoke
@@ -199,6 +201,7 @@ void pqTimerLogDisplay::clear()
   pm->SendStream(vtkProcessModuleConnectionManager::GetRootServerConnectionID(),
                  vtkProcessModule::CLIENT_AND_SERVERS, stream);
   this->refresh();
+#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -223,6 +226,7 @@ void pqTimerLogDisplay::setTimeThreshold(float value)
 void pqTimerLogDisplay::setTimeThresholdById(int id)
 {
 
+#ifdef FIXME_COLLABORATION
   this->ui->timeThreshold->setCurrentIndex(id);
 
   vtkProcessModule *pm = vtkProcessModule::GetProcessModule();
@@ -236,6 +240,7 @@ void pqTimerLogDisplay::setTimeThresholdById(int id)
                  vtkProcessModule::CLIENT_AND_SERVERS, stream);
 
   this->refresh();
+#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -259,6 +264,7 @@ void pqTimerLogDisplay::setBufferLength(int value)
 
 void pqTimerLogDisplay::setBufferLengthById(int id)
 {
+#ifdef FIXME_COLLABORATION
   this->ui->bufferLength->setCurrentIndex(id);
 
   vtkProcessModule *pm = vtkProcessModule::GetProcessModule();
@@ -270,6 +276,7 @@ void pqTimerLogDisplay::setBufferLengthById(int id)
   // TODO: Set value on all servers
   pm->SendStream(vtkProcessModuleConnectionManager::GetRootServerConnectionID(),
                  vtkProcessModule::CLIENT_AND_SERVERS, stream);
+#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -280,6 +287,7 @@ bool pqTimerLogDisplay::isEnabled() const
 
 void pqTimerLogDisplay::setEnable(bool state)
 {
+#ifdef FIXME_COLLABORATION
   this->ui->enable->setChecked(state);
 
   vtkProcessModule *pm = vtkProcessModule::GetProcessModule();
@@ -290,6 +298,7 @@ void pqTimerLogDisplay::setEnable(bool state)
   // TODO: Set value on all servers
   pm->SendStream(vtkProcessModuleConnectionManager::GetRootServerConnectionID(),
                  vtkProcessModule::CLIENT_AND_SERVERS, stream);
+#endif
 }
 
 //-----------------------------------------------------------------------------

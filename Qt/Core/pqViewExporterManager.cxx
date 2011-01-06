@@ -92,7 +92,7 @@ void pqViewExporterManager::setView(pqView* view)
   bool can_export = false;
 
   vtkSMProxy* proxy = view->getProxy();
-  vtkSMProxyIterator* iter = proxy->GetProxyManager()->NewIterator();
+  vtkSMProxyIterator* iter = vtkSMProxyIterator::New();
   iter->SetModeToOneGroup();
   for (iter->Begin("exporters_prototypes");
     !can_export && !iter->IsAtEnd(); iter->Next())
@@ -120,7 +120,7 @@ QString pqViewExporterManager::getSupportedFileTypes() const
   vtkSMProxy* proxy = this->View->getProxy();
 
   bool first = true;
-  vtkSMProxyIterator* iter = proxy->GetProxyManager()->NewIterator();
+  vtkSMProxyIterator* iter = vtkSMProxyIterator::New();
   iter->SetModeToOneGroup();
   for (iter->Begin("exporters_prototypes"); !iter->IsAtEnd(); iter->Next())
     {
@@ -165,7 +165,7 @@ bool pqViewExporterManager::write(const QString& filename)
   vtkSMProxy* exporter = 0;
   vtkSMProxy* proxy = this->View->getProxy();
   vtkSMProxyManager* pxm = proxy->GetProxyManager();
-  vtkSMProxyIterator* iter = pxm->NewIterator();
+  vtkSMProxyIterator* iter = vtkSMProxyIterator::New();
 
   iter->SetModeToOneGroup();
   for (iter->Begin("exporters_prototypes"); !iter->IsAtEnd(); iter->Next())

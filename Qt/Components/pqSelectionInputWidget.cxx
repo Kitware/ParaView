@@ -280,7 +280,6 @@ void pqSelectionInputWidget::copyActiveSelection()
   vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
   vtkSMProxy* newSource = pxm->NewProxy(activeSelection->GetXMLGroup(),
                                         activeSelection->GetXMLName());
-  newSource->SetConnectionID(activeSelection->GetConnectionID());
   newSource->Copy(activeSelection, 0,
                   vtkSMProxy::COPY_PROXY_PROPERTY_VALUES_BY_CLONING);
   newSource->UpdateVTKObjects();
@@ -344,7 +343,7 @@ void pqSelectionInputWidget::preAccept()
     if (!pxm->GetProxyName("selection_sources", sel_source))
       {
       vtkstd::string key = vtkstd::string("selection_source.") +
-        sel_source->GetSelfIDAsString();
+        sel_source->GetGlobalIDAsString();
       pxm->RegisterProxy("selection_sources", key.c_str(), sel_source);
       }
     }

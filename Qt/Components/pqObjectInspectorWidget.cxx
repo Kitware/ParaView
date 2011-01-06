@@ -59,6 +59,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqExodusIIPanel.h"
 #include "pqExtractCTHPartsPanel.h"
 #include "pqGlyphPanel.h"
+#include "pqInterfaceTracker.h"
 #include "pqIsoVolumePanel.h"
 #include "pqLoadedFormObjectPanel.h"
 #include "pqNetCDFPanel.h"
@@ -67,7 +68,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqParticleTracerPanel.h"
 #include "pqPipelineFilter.h"
 #include "pqPipelineSource.h"
-#include "pqPluginManager.h"
 #include "pqPropertyManager.h"
 #include "pqProxyModifiedStateUndoElement.h"
 #include "pqSelectThroughPanel.h"
@@ -413,7 +413,7 @@ void pqObjectInspectorWidget::setProxy(pqProxy *proxy)
     const QString xml_name = proxy->getProxy()->GetXMLName();
 
     // search custom panels
-    pqPluginManager* pm = pqApplicationCore::instance()->getPluginManager();
+    pqInterfaceTracker* pm = pqApplicationCore::instance()->interfaceTracker();
     QObjectList ifaces = pm->interfaces();
     foreach(QObject* iface, ifaces)
       {

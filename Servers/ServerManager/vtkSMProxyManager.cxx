@@ -1629,11 +1629,3 @@ void vtkSMProxyManager::LoadXMLDefinitionFromServer()
   this->Session->PullState(&msg);
   this->ProxyDefinitionManager->LoadXMLDefinitionState(&msg);
 }
-
-//---------------------------------------------------------------------------
-vtkSMProxyIterator* vtkSMProxyManager::NewIterator()
-{
-  vtkSMProxyIterator* iter =vtkSMProxyIterator::New();
-  iter->SetProxyManager(this);
-  return iter;
-}

@@ -1338,7 +1338,7 @@ void pqNamedWidgets::createWidgets(QGridLayout* panelLayout, vtkSMProxy* pxy)
 
       pqServerManagerModel* m =
         pqApplicationCore::instance()->getServerManagerModel();
-      chooser->setServer(m->findServer(pxy->GetConnectionID()));
+      chooser->setServer(m->findServer(pxy->GetSession()));
       chooser->setObjectName(propertyName);
       QLabel* label = createPanelLabel(panelLayout->parentWidget(),
                                        propertyLabel,
@@ -1382,6 +1382,7 @@ void pqNamedWidgets::createWidgets(QGridLayout* panelLayout, vtkSMProxy* pxy)
       }
     else if (pt == pqSMAdaptor::SIL)
       {
+#ifdef FIXME_COLLABORATION
       vtkSMSILDomain* silDomain = vtkSMSILDomain::SafeDownCast(
         SMProperty->GetDomain("array_list"));
 
@@ -1399,6 +1400,7 @@ void pqNamedWidgets::createWidgets(QGridLayout* panelLayout, vtkSMProxy* pxy)
       panelLayout->setRowStretch(rowCount, 1);
       row_streched = true;
       rowCount++;
+#endif
       }
     }
   iter->Delete();

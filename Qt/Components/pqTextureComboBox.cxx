@@ -101,15 +101,6 @@ pqTextureComboBox::pqTextureComboBox(QWidget* _parent):Superclass(_parent)
     this,
     SLOT(proxyUnRegistered(const QString&, const QString&, vtkSMProxy*)));
   this->updateTextures();
-
-  pqUndoStack* stack = pqApplicationCore::instance()->getUndoStack();
-  if (stack)
-    {
-    QObject::connect(this, SIGNAL(begin(const QString&)),
-      stack, SLOT(beginUndoSet(const QString&)));
-    QObject::connect(this, SIGNAL(end()),
-      stack, SLOT(endUndoSet()));
-    }
 }
 
 //-----------------------------------------------------------------------------
@@ -229,7 +220,7 @@ void pqTextureComboBox::updateFromProperty()
   this->setCurrentIndex(0);
   if (texture)
     {
-    int index = this->findData(texture->GetSelfID().ID);
+    int index = this->findData(texture->GetGlobalID());
     if (index != -1)
       {
       this->setCurrentIndex(index);
@@ -265,11 +256,11 @@ void pqTextureComboBox::reload()
     if (this->Internal->TextureIcons.contains(texture))
       {
       this->addItem(this->Internal->TextureIcons[texture].Icon,
-        name, proxyIter->GetProxy()->GetSelfID().ID);
+        name, proxyIter->GetProxy()->GetGlobalID());
       }
     else
       {
-      this->addItem(name, proxyIter->GetProxy()->GetSelfID().ID);
+      this->addItem(name, proxyIter->GetProxy()->GetGlobalID());
       }
     }
   proxyIter->Delete();
@@ -304,7 +295,7 @@ void pqTextureComboBox::onActivated(int index)
 
   if (_data.toString() == "NONE")
     {
-    emit this->begin("Texture Change");
+    BEGIN_UNDO_SET("Texture Change");
     vtkSMProxyProperty::SafeDownCast(textureProperty)->RemoveAllProxies();
     proxy->UpdateVTKObjects();
     if(this->Internal->Representation)
@@ -315,14 +306,14 @@ void pqTextureComboBox::onActivated(int index)
       {
       this->Internal->RenderView->render();
       }
-    emit this->end();
+    END_UNDO_SET();
     }
   else if (_data.toString() == "LOAD")
     {
-    emit this->begin("Texture Change");
+    BEGIN_UNDO_SET("Texture Change");
     // Popup load texture dialog.
     this->loadTexture();
-    emit this->end();
+    END_UNDO_SET();
     }
   else
     {
@@ -334,10 +325,10 @@ void pqTextureComboBox::onActivated(int index)
         << this->itemText(index);
       return;
       }
-    emit this->begin("Texture Change");
+    BEGIN_UNDO_SET("Texture Change");
     pqSMAdaptor::setProxyProperty(textureProperty, textureProxy);
     proxy->UpdateVTKObjects();
-    emit this->end();
+    END_UNDO_SET();
 
     if(this->Internal->Representation)
       {
@@ -390,19 +381,7 @@ bool pqTextureComboBox::loadTexture(const QString& filename)
 
   vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
   vtkSMProxy* texture = pxm->NewProxy("textures", "ImageTexture");
-
-  if(this->Internal->Representation)
-    {
-    texture->SetConnectionID(
-      this->Internal->Representation->getProxy()->GetConnectionID());
-    }
-  else
-    {
-    texture->SetConnectionID(
-      this->Internal->RenderView->getProxy()->GetConnectionID());
-    }
-
-  texture->SetServers(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
+  //texture->SetServers(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
   pqSMAdaptor::setElementProperty(texture->GetProperty("FileName"), filename);
   pqSMAdaptor::setEnumerationProperty(texture->GetProperty("SourceProcess"),
     "Client");
@@ -412,7 +391,7 @@ bool pqTextureComboBox::loadTexture(const QString& filename)
     texture);
   texture->Delete();
 
-  int index = this->findData(QVariant(texture->GetSelfID().ID));
+  int index = this->findData(QVariant(texture->GetGlobalID()));
   if (index != -1)
     {
     this->setCurrentIndex(index);
@@ -424,9 +403,11 @@ bool pqTextureComboBox::loadTexture(const QString& filename)
 //-----------------------------------------------------------------------------
 vtkSMProxy* pqTextureComboBox::getTextureProxy(const QVariant& _data) const
 {
+#ifdef FIXME_COLLABORATION
   vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
   vtkClientServerID proxyID (_data.value<vtkTypeUInt32>());
-  return pxm->GetProxy(TEXTURESGROUP, proxyID);
+  return pxm->GetProxy(proxyID);
+#endif
 }
 
 //-----------------------------------------------------------------------------
