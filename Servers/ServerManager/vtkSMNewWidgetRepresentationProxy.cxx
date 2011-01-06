@@ -117,12 +117,21 @@ void vtkSMNewWidgetRepresentationProxy::CreateVTKObjects()
 
   this->Superclass::CreateVTKObjects();
 
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  vtkClientServerStream stream;
+  stream << vtkClientServerStream::Invoke
+         << this->GetID()
+         << "SetRepresentation"
+         << this->RepresentationProxy->GetID()
+         << vtkClientServerStream::End;
+  pm->SendStream(this->ConnectionID,
+    vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER, stream);
+
   if (!this->WidgetProxy)
     {
     return;
     }
 
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
     this->WidgetProxy->GetProperty("Representation"));
   if (pp)
@@ -146,15 +155,6 @@ void vtkSMNewWidgetRepresentationProxy::CreateVTKObjects()
   vtk3DWidgetRepresentation* clientObject =
     vtk3DWidgetRepresentation::SafeDownCast(this->GetClientSideObject());
   clientObject->SetWidget(this->Widget);
-
-  vtkClientServerStream stream;
-  stream << vtkClientServerStream::Invoke
-         << this->GetID()
-         << "SetRepresentation"
-         << this->RepresentationProxy->GetID()
-         << vtkClientServerStream::End;
-  pm->SendStream(this->ConnectionID,
-    vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER, stream);
 
   // Since links copy values from input to output,
   // we need to make sure that input properties i.e. the info

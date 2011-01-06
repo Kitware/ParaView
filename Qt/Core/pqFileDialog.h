@@ -34,6 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqFileDialog_h
 
 #include "pqCoreExport.h"
+#include <QStringList>
 #include <QDialog>
 
 class QModelIndex;
@@ -57,9 +58,9 @@ class pqServer;
 
   QObject::connect(
     dialog,
-    SIGNAL(filesSelected(const QStringList&)),
+    SIGNAL(filesSelected(const QList<QStringList>&)),
     this,
-    SLOT(onOpenSessionFile(const QStringList&)));
+    SLOT(onOpenSessionFile(const QList<QStringList>&)));
 
   dialog->show();
   /endcode
@@ -72,7 +73,8 @@ class pqServer;
   pqFileDialog dialog(NULL, this);
   if(Qt::Accepted == dialog.exec())
     {
-    QStringList files = dialog.getSelectedFiles();
+    //each string list holds a list of files that represent a file-series
+    QList<QStringList> files = dialog.getAllSelectedFiles();
     }
   /endcode
 
@@ -92,6 +94,7 @@ public:
   /// ExistingFile: The name of a single existing file.
   ///   Typically used by "Open..."
   /// ExistingFiles: The names of zero or more existing files.
+  ///   Typically used by "Open..." when you want multiple file selection
   /// Directory: The name of a directory.
   enum FileMode { AnyFile, ExistingFile, ExistingFiles, Directory };
 
@@ -112,8 +115,11 @@ public:
   /// set the most recently used file extension
   void setRecentlyUsedExtension(const QString& fileExtension);
 
-  /// Returns the set of files
-  QStringList getSelectedFiles();
+  /// Returns the group of files for the given index
+  QStringList getSelectedFiles(int index=0);
+
+  /// Returns all the file groups
+  QList<QStringList> getAllSelectedFiles();
 
   /// accept this dialog
   void accept();
@@ -129,13 +135,25 @@ public:
 
 signals:
   /// Signal emitted when the user has chosen a set of files
-  /// and accepted the dialog
-  void filesSelected(const QStringList&);
+  void filesSelected(const QList<QStringList> &);
+
+  /// Signal emitted when the user has chosen a set of files
+  /// NOTE:
+  /// The mode has to be not ExistingFiles for this signal to be emitted!
+  /// This signal is deprecated and should not be used anymore. Instead
+  /// use the fileSelected(const QList<QStringList> &)
+  void filesSelected(const QStringList &);
 
   /// signal emitted when user has chosen a set of files and accepted the
   /// dialog.  This signal includes only the path and file string as is
   /// This is to support test recording
   void fileAccepted(const QString&);
+
+protected:
+  bool acceptExistingFiles();
+  bool acceptDefault(const bool &checkForGrouping);
+
+  QStringList buildFileGroup(const QString &filename);
 
 private slots:
   void onModelReset();
@@ -167,8 +185,11 @@ private slots:
   // Called when the user requests to create a new directory in the cwd
   void onCreateNewFolder();
 
+  /// Adds this grouping of files to the files selected list
+  void addToFilesSelected(const QStringList&);
+
   /// Emits the filesSelected() signal and closes the dialog,
-  void emitFilesSelected(const QStringList&);
+  void emitFilesSelectionDone();
 
 private:
   pqFileDialog(const pqFileDialog&);
@@ -177,7 +198,8 @@ private:
   class pqImplementation;
   pqImplementation* const Implementation;
 
-  void acceptInternal(QStringList& selected_files, const bool &doubleclicked);
+  //returns if true if files are loaded
+  bool acceptInternal(const QStringList& selected_files, const bool &doubleclicked);
   QString fixFileExtension(const QString& filename, const QString& filter);
 };
 

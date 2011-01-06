@@ -405,6 +405,7 @@ void pqPointSpriteDisplayPanelDecorator::onRadiusArrayChanged(
   svp->SetElement(4, name.toAscii().data()); //name
 
   this->Internals->TransferFunctionDialog->radiusEditor()->needReloadGUI();
+  this->Internals->ScaleBy->reloadGUI();
 
   reprProxy->UpdateVTKObjects();
   this->updateAllViews();
@@ -454,6 +455,7 @@ void pqPointSpriteDisplayPanelDecorator::onOpacityArrayChanged(
   svp->SetElement(4, name.toAscii().data()); //name
 
   this->Internals->TransferFunctionDialog->opacityEditor()->needReloadGUI();
+  this->Internals->OpacityBy->reloadGUI();
 
   reprProxy->UpdateVTKObjects();
   this->updateAllViews();

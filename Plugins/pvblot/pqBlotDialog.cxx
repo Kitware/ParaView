@@ -105,7 +105,7 @@ void pqBlotDialog::runScript()
                                                 QString(), filters);
 
   dialog->setObjectName("BLOTShellRunScriptDialog");
-  dialog->setFileMode(pqFileDialog::ExistingFiles);
+  dialog->setFileMode(pqFileDialog::ExistingFile);
   QObject::connect(dialog, SIGNAL(filesSelected(const QStringList &)),
                    this, SLOT(runScript(const QStringList &)));
   dialog->show();

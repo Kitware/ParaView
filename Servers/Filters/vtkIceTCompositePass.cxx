@@ -334,10 +334,19 @@ void vtkIceTCompositePass::SetupContext(const vtkRenderState* render_state)
   //int *size = render_state->GetRenderer()->GetVTKWindow()->GetActualSize();
   //glViewport(0, 0, size[0], size[1]);
   //glDisable(GL_SCISSOR_TEST);
-  glClearColor((GLclampf)(0.0), (GLclampf)(0.0),
-    (GLclampf)(0.0), (GLclampf)(0.0));
-  glClearDepth(static_cast<GLclampf>(1.0));
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  GLbitfield clear_mask = 0;
+  if (!render_state->GetRenderer()->Transparent())
+    {
+    glClearColor((GLclampf)(0.0), (GLclampf)(0.0),
+      (GLclampf)(0.0), (GLclampf)(0.0));
+    clear_mask |= GL_COLOR_BUFFER_BIT;
+    }
+  if (!render_state->GetRenderer()->GetPreserveDepthBuffer())
+    {
+    glClearDepth(static_cast<GLclampf>(1.0));
+    clear_mask |= GL_DEPTH_BUFFER_BIT;
+    }
+  glClear(clear_mask);
   //icetEnable(ICET_CORRECT_COLORED_BACKGROUND);
 }
 
@@ -434,15 +443,27 @@ void vtkIceTCompositePass::CreateProgram(vtkOpenGLRenderWindow *context)
 //----------------------------------------------------------------------------
 void vtkIceTCompositePass::Draw(const vtkRenderState* render_state)
 {
-  if(!this->DepthOnly)
+  GLbitfield clear_mask = 0;
+  if (!this->DepthOnly)
     {
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    if (!render_state->GetRenderer()->Transparent())
+      {
+      clear_mask |= GL_COLOR_BUFFER_BIT;
+      }
+    if (!render_state->GetRenderer()->GetPreserveDepthBuffer())
+      {
+      clear_mask |= GL_DEPTH_BUFFER_BIT;
+      }
     }
   else
     {
-    glClear(GL_DEPTH_BUFFER_BIT);
+    if (!render_state->GetRenderer()->GetPreserveDepthBuffer())
+      {
+      clear_mask |= GL_DEPTH_BUFFER_BIT;
+      }
     glColorMask(GL_FALSE,GL_FALSE,GL_FALSE,GL_FALSE);
     }
+  glClear(clear_mask);
   if (this->RenderPass)
     {
     this->RenderPass->Render(render_state);

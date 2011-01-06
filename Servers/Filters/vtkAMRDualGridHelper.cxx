@@ -1264,7 +1264,7 @@ void vtkDualGridHelperCopyBlockToBlock(T* ptr, T* lowerPtr, int ext[6], int leve
         // Lets see if our assumption about ghost values is correct.
         if (vtkDualGridHelperCheckAssumption && vtkDualGridHelperSkipGhostCopy && *xPtr != val)
           {
-          vtkGenericWarningMacro("Ghost assumption incorrect.  Seams may result.");
+          //vtkGenericWarningMacro("Ghost assumption incorrect.  Seams may result.");
           // Report issue once per execution.
           vtkDualGridHelperCheckAssumption = 0;
           }

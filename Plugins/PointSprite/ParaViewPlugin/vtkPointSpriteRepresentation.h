@@ -57,7 +57,6 @@ public:
   void SetConstantRadius(double val);
   void SetRadiusRange(double val0, double val1);
   void SetMaxPixelSize(double val);
-  void SetRadiusArrayName(const char* val);
 
   //***************************************************************************
   // Forwarded to ScalarsToColorsPainter and LODScalarsToColorsPainter

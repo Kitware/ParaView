@@ -180,14 +180,13 @@ void pqFileDialogRecentDirsModel::setChosenDir(const QString& dir)
 }
 
 //-----------------------------------------------------------------------------
-void pqFileDialogRecentDirsModel::setChosenFiles(const QStringList &files)
+void pqFileDialogRecentDirsModel::setChosenFiles(const QList<QStringList> &files)
 {
   if (files.size() <= 0)
     {
     return;
     }
-
-  QString filename = files[0];
+  QString filename = files[0][0];
 
   // We don't use QFileInfo here since it messes the paths up if the client and
   // the server are heterogeneous systems.
