@@ -13,11 +13,11 @@
 
 =========================================================================*/
 #include "vtkSMPythonTraceObserver.h"
+
 #include "vtkSMProxyManager.h"
 #include "vtkCommand.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
-#include "vtkSMSession.h"
 
 //-----------------------------------------------------------------------------
 class vtkSMPythonTraceObserverCommandHelper : public vtkCommand
@@ -70,39 +70,23 @@ vtkSMPythonTraceObserver::vtkSMPythonTraceObserver()
   this->Observer = vtkSMPythonTraceObserverCommandHelper::New();
   this->Observer->SetTarget(this);
 
-  // Get the session to get access to the proxy manager
-  vtkSMSession* session =
-      vtkSMSession::SafeDownCast(
-          vtkProcessModule::GetProcessModule()->GetSession());
-
-  if (!session)
-    {
-    vtkErrorMacro("vtkSMPythonTraceObserver must be created only"
-       << " after the ProxyManager has been created.");
-    }
-  else
-    {
-    vtkSMProxyManager* pxm = session->GetProxyManager();
-    // Add observer for certain proxy manager events.
-    // Use a high priority for the RegisterEvent so that the trace
-    // observer is notified before other observers.  Other observers
-    // may modify properties on the newly registered proxy during their
-    // RegisterEvent handlers.  We don't want the trace observer to see
-    // the property modifications before it has seen the RegisterEvent.
-    pxm->AddObserver(vtkCommand::RegisterEvent, this->Observer, 100);
-    pxm->AddObserver(vtkCommand::UnRegisterEvent, this->Observer);
-    pxm->AddObserver(vtkCommand::PropertyModifiedEvent, this->Observer);
-    pxm->AddObserver(vtkCommand::UpdateInformationEvent, this->Observer);
-    }
+  vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
+  // Add observer for certain proxy manager events.
+  // Use a high priority for the RegisterEvent so that the trace
+  // observer is notified before other observers.  Other observers
+  // may modify properties on the newly registered proxy during their
+  // RegisterEvent handlers.  We don't want the trace observer to see
+  // the property modifications before it has seen the RegisterEvent.
+  pxm->AddObserver(vtkCommand::RegisterEvent, this->Observer, 100);
+  pxm->AddObserver(vtkCommand::UnRegisterEvent, this->Observer);
+  pxm->AddObserver(vtkCommand::PropertyModifiedEvent, this->Observer);
+  pxm->AddObserver(vtkCommand::UpdateInformationEvent, this->Observer);
 }
 
 //-----------------------------------------------------------------------------
 vtkSMPythonTraceObserver::~vtkSMPythonTraceObserver()
 {
-  vtkSMSession* session =
-      vtkSMSession::SafeDownCast(
-          vtkProcessModule::GetProcessModule()->GetSession());
-  vtkSMProxyManager* pxm = session->GetProxyManager();
+  vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
   if (pxm)
     {
     pxm->RemoveObserver(this->Observer);

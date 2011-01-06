@@ -76,7 +76,7 @@ vtkSMProxy* vtkSMDeserializer::NewProxy(int id, vtkSMProxyLocator* locator)
 vtkSMProxy* vtkSMDeserializer::CreateProxy(const char* xmlgroup,
                                            const char* xmlname)
 {
-  vtkSMProxyManager* pxm = this->Session->GetProxyManager();
+  vtkSMProxyManager* pxm = this->GetProxyManager();
   vtkSMProxy* proxy = pxm->NewProxy(xmlgroup, xmlname);
   return proxy;
 }

@@ -37,10 +37,6 @@ vtkCxxSetObjectMacro(vtkSMSession, UndoStackBuilder, vtkSMUndoStackBuilder);
 vtkSMSession::vtkSMSession()
 {
   this->Core = vtkSMSessionCore::New();
-  this->ProxyManager = vtkSMProxyManager::New();
-  this->ProxyManager->SetSession(this);
-  this->ProxyManager->SetProxyDefinitionManager(
-      this->Core->GetProxyDefinitionManager());
   this->PluginManager = vtkSMPluginManager::New();
   this->PluginManager->SetSession(this);
 
@@ -50,9 +46,6 @@ vtkSMSession::vtkSMSession()
   //  - 1: vtkSMProxyManager
   this->LastGUID = 10;
 
-  // Reserved Id management
-  this->RegisterRemoteObject(this->ProxyManager);
-
   this->LocalServerInformation = vtkPVServerInformation::New();
   this->LocalServerInformation->CopyFromObject(NULL);
 }
@@ -60,16 +53,25 @@ vtkSMSession::vtkSMSession()
 //----------------------------------------------------------------------------
 vtkSMSession::~vtkSMSession()
 {
+  if (vtkSMObject::GetProxyManager())
+    {
+    vtkSMObject::GetProxyManager()->SetSession(NULL);
+    }
+
   this->PluginManager->Delete();
   this->PluginManager = NULL;
-  this->ProxyManager->Delete();
-  this->ProxyManager = NULL;
   this->SetUndoStackBuilder(0);
   this->Core->Delete();
   this->Core = NULL;
 
   this->LocalServerInformation->Delete();
   this->LocalServerInformation = 0;
+}
+
+//----------------------------------------------------------------------------
+vtkSMProxyDefinitionManager* vtkSMSession::GetProxyDefinitionManager()
+{
+  return this->Core->GetProxyDefinitionManager();
 }
 
 //----------------------------------------------------------------------------
@@ -176,7 +178,8 @@ vtkPMObject* vtkSMSession::GetPMObject(vtkTypeUInt32 globalid)
 void vtkSMSession::Initialize()
 {
   // Make sure that the client as the server XML definition
-  this->GetProxyManager()->LoadXMLDefinitionFromServer();
+  vtkSMObject::GetProxyManager()->SetSession(this);
+
   this->PluginManager->SetSession(this);
   this->PluginManager->Initialize();
 }

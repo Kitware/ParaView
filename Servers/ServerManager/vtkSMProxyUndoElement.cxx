@@ -95,7 +95,7 @@ int vtkSMProxyUndoElement::CreateProxy()
     }
 
   //this->State.PrintDebugString();
-  vtkSMProxy *proxy = this->Session->GetProxyManager()->NewProxy(this->State);
+  vtkSMProxy *proxy = vtkSMObject::GetProxyManager()->NewProxy(this->State);
   this->UndoSetWorkingContext->AddItem(proxy);
   proxy->Delete();
   return proxy ? 1 : 0;

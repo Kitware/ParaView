@@ -263,7 +263,11 @@ bool vtkSMSessionClient::Connect(const char* url)
 //----------------------------------------------------------------------------
 void vtkSMSessionClient::SetupDataServerRenderServerConnection()
 {
-  vtkSMProxy* mpiMToN = this->GetProxyManager()->NewProxy(
+  abort();
+
+  // FIXME: Crap! This cannot work since proxy manager is not initialized until
+  // afterwords.
+  vtkSMProxy* mpiMToN = vtkSMObject::GetProxyManager()->NewProxy(
     "internals", "MPIMToNSocketConnection");
   vtkSMPropertyHelper(mpiMToN, "WaitingProcess").Set(
     vtkProcessModule::PROCESS_RENDER_SERVER);
@@ -287,7 +291,7 @@ void vtkSMSessionClient::SetupDataServerRenderServerConnection()
   mpiMToN->UpdateVTKObjects();
   mpiMToN->InvokeCommand("Connect");
 
-  this->GetProxyManager()->RegisterProxy("__internals__",
+  vtkSMObject::GetProxyManager()->RegisterProxy("__internals__",
     "m2n_socket",
     mpiMToN);
   mpiMToN->Delete();

@@ -54,10 +54,6 @@ public:
   vtkTypeUInt32 GetGlobalID();
   const char* GetGlobalIDAsString();
 
-  // Description:
-  // Returns the proxy manager from the session.
-  vtkSMProxyManager* GetProxyManager();
-
 //BTX
 
   // Description:

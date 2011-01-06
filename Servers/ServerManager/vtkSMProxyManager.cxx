@@ -107,6 +107,7 @@ vtkCxxSetObjectMacro(vtkSMProxyManager, ProxyDefinitionManager,
 //---------------------------------------------------------------------------
 vtkSMProxyManager::vtkSMProxyManager()
 {
+  this->Session = NULL;
   this->UpdateInputProxies = 0;
   this->Internals = new vtkSMProxyManagerInternals;
   this->Observer = vtkSMProxyManagerObserver::New();
@@ -124,10 +125,6 @@ vtkSMProxyManager::vtkSMProxyManager()
 #endif
   this->WriterFactory = vtkSMWriterFactory::New();
   this->WriterFactory->SetProxyManager(this);
-
-  // Init reserved Id for ProxyManager
-  this->SetGlobalID(1);
-  this->SetLocation(vtkProcessModule::PROCESS_DATA_SERVER);
 
   // Provide internal object a pointer to us
   this->Internals->ProxyManager = this;
@@ -179,6 +176,28 @@ int vtkSMProxyManager::GetVersionMinor()
 int vtkSMProxyManager::GetVersionPatch()
 {
   return PARAVIEW_VERSION_PATCH;
+}
+
+//----------------------------------------------------------------------------
+void vtkSMProxyManager::SetSession(vtkSMSession* session)
+{
+  if (this->Session == session)
+    {
+    return;
+    }
+  if (this->Session)
+    {
+    this->UnRegisterAllLinks();
+    this->UnRegisterProxies();
+    this->SetProxyDefinitionManager(NULL);
+    }
+
+  this->Session = session;
+
+  if (this->Session)
+    {
+    this->SetProxyDefinitionManager(session->GetProxyDefinitionManager());
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -604,9 +623,11 @@ void vtkSMProxyManager::UnRegisterProxies()
 
   // FIXME ??? Is it normal that no notification is sent in that case ???
 
+#ifdef FIXME_COLLABORATION
   // Push state for undo/redo
   vtkSMMessage state = *this->GetFullState();
   this->PushState(&state);
+#endif
 }
 
 //---------------------------------------------------------------------------
@@ -630,9 +651,11 @@ void vtkSMProxyManager::UnRegisterProxy( const char* group, const char* name,
     this->InvokeEvent(vtkCommand::UnRegisterEvent, &info);
     this->UnMarkProxyAsModified(info.Proxy);
 
+#ifdef FIXME_COLLABORATION
     // Push state for undo/redo
     vtkSMMessage state = *this->GetFullState();
     this->PushState(&state);
+#endif
     }
 }
 
@@ -663,8 +686,10 @@ void vtkSMProxyManager::UnRegisterProxy(const char* name)
   // Push new state only if changed occured
   if(entriesToRemove.size() > 0)
     {
+#ifdef FIXME_COLLABORATION
     vtkSMMessage state = *this->GetFullState();
     this->PushState(&state);
+#endif
     }
 }
 
@@ -694,8 +719,10 @@ void vtkSMProxyManager::UnRegisterProxy(vtkSMProxy* proxy)
   // Push new state only if changed occured
   if(tuplesToRemove.size() > 0)
     {
+#ifdef FIXME_COLLABORATION
     vtkSMMessage state = *this->GetFullState();
     this->PushState(&state);
+#endif
     }
 }
 
@@ -757,8 +784,10 @@ void vtkSMProxyManager::RegisterProxy(const char* groupname,
     registration->set_global_id(proxy->GetGlobalID());
 
     // Push state for undo/redo
+#ifdef FIXME_COLLABORATION
     vtkSMMessage state = *this->GetFullState();
     this->PushState(&state);
+#endif
     }
 }
 

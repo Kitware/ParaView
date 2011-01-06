@@ -26,7 +26,7 @@ class vtkCollection;
 class vtkPMObject;
 class vtkPVInformation;
 class vtkSMPluginManager;
-class vtkSMProxyManager;
+class vtkSMProxyDefinitionManager;
 class vtkSMRemoteObject;
 class vtkSMSessionCore;
 class vtkSMUndoStackBuilder;
@@ -67,6 +67,9 @@ public:
   virtual void SetUndoStackBuilder(vtkSMUndoStackBuilder*);
   vtkGetObjectMacro(UndoStackBuilder, vtkSMUndoStackBuilder);
 
+  // Description:
+  // Get the ProxyDefinitionManager.
+  vtkSMProxyDefinitionManager* GetProxyDefinitionManager();
 
   // Description:
   // Called to do any initializations after a successful session has been
@@ -126,13 +129,6 @@ public:
     }
 
   // Description:
-  // Returns the vtkSMProxyManager attached to that session. Note that the
-  // ProxyManager may not be active on every process e.g. in client-server
-  // configurations, the proxy manager is active only on the client. Using the
-  // proxy-manager on the server in such a session can have unexpected results.
-  vtkGetObjectMacro(ProxyManager, vtkSMProxyManager);
-
-  // Description:
   // Returns the vtkSMPluginManager attached to this session.
   vtkGetObjectMacro(PluginManager, vtkSMPluginManager);
 
@@ -178,7 +174,6 @@ protected:
   ~vtkSMSession();
 
   vtkSMSessionCore* Core;
-  vtkSMProxyManager* ProxyManager;
   vtkSMUndoStackBuilder* UndoStackBuilder;
   vtkSMPluginManager* PluginManager;
 

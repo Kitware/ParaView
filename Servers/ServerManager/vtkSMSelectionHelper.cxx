@@ -130,7 +130,7 @@ vtkSMProxy* vtkSMSelectionHelper::NewSelectionSourceFromSelectionInternal(
     {
     // If selSource is not present we need to create a new one. The type of
     // proxy we instantiate depends on the type of the vtkSelection.
-    vtkSMProxyManager* pxm = session->GetProxyManager();
+    vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
     selSource = pxm->NewProxy("sources", proxyname);
     }
 
@@ -396,7 +396,7 @@ vtkSMProxy* vtkSMSelectionHelper::ConvertSelection(int outputType,
 
   // Conversion not possible, so simply create a new proxy of the requested
   // output type with some empty defaults.
-  vtkSMProxyManager* pxm = selectionSourceProxy->GetProxyManager();
+  vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
   vtkSMProxy* outSource = pxm->NewProxy("sources", outproxyname);
   if (!outSource)
     {
@@ -430,7 +430,7 @@ vtkSMProxy* vtkSMSelectionHelper::ConvertInternal(
   vtkSMSourceProxy* inSource, vtkSMSourceProxy* dataSource,
   int dataPort, int outputType)
 {
-  vtkSMProxyManager* pxm = inSource->GetProxyManager();
+  vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
 
   // * Update all inputs.
   inSource->UpdatePipeline();

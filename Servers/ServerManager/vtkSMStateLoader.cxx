@@ -113,7 +113,7 @@ vtkSMProxy* vtkSMStateLoader::CreateProxy( const char* xml_group,
   else if (xml_group && xml_name && strcmp(xml_group, "misc") == 0 
     && strcmp(xml_name, "TimeKeeper") == 0)
     {
-    vtkSMProxyManager* pxm = this->Session->GetProxyManager();
+    vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
     // There is only one time keeper per connection, simply
     // load the state on the timekeeper.
     vtkSMProxy* timekeeper = pxm->GetProxy("timekeeper", "TimeKeeper");
@@ -164,7 +164,7 @@ void vtkSMStateLoader::RegisterProxy(int id, vtkSMProxy* proxy)
 void vtkSMStateLoader::RegisterProxyInternal(const char* group,
   const char* name, vtkSMProxy* proxy)
 {
-  vtkSMProxyManager* pxm = this->Session->GetProxyManager();
+  vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
   if (pxm->GetProxyName(group, proxy))
     {
     // Don't re-register a proxy in the same group.
@@ -314,14 +314,14 @@ int vtkSMStateLoader::HandleProxyCollection(vtkPVXMLElement* collectionElement)
 void vtkSMStateLoader::HandleCustomProxyDefinitions(
   vtkPVXMLElement* element)
 {
-  vtkSMProxyManager* pm = this->Session->GetProxyManager();
+  vtkSMProxyManager* pm = vtkSMObject::GetProxyManager();
   pm->LoadCustomProxyDefinitions(element);
 }
 
 //---------------------------------------------------------------------------
 int vtkSMStateLoader::HandleGlobalPropertiesManagers(vtkPVXMLElement* element)
 {
-  vtkSMProxyManager* pxm = this->Session->GetProxyManager();
+  vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
   unsigned int numElems = element->GetNumberOfNestedElements();
   for (unsigned int cc=0; cc < numElems; cc++)
     {
@@ -360,7 +360,7 @@ int vtkSMStateLoader::HandleGlobalPropertiesManagers(vtkPVXMLElement* element)
 //---------------------------------------------------------------------------
 int vtkSMStateLoader::HandleLinks(vtkPVXMLElement* element)
 {
-  vtkSMProxyManager* pxm = this->Session->GetProxyManager();
+  vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
   
   unsigned int numElems = element->GetNumberOfNestedElements();
   for (unsigned int cc=0; cc < numElems; cc++)
@@ -456,7 +456,7 @@ int vtkSMStateLoader::LoadState(vtkPVXMLElement* elem)
   // often override those that the timekeeper painstakingly computed. Here we
   // explicitly trigger the timekeeper so that the scene re-determines the
   // ranges, unless they are locked of course.
-  vtkSMProxy* timekeeper = this->Session->GetProxyManager()->GetProxy("timekeeper", "TimeKeeper");
+  vtkSMProxy* timekeeper = vtkSMObject::GetProxyManager()->GetProxy("timekeeper", "TimeKeeper");
   if (timekeeper)
     {
     timekeeper->GetProperty("TimeRange")->Modified();

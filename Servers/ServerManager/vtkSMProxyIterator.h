@@ -28,7 +28,6 @@
 struct vtkSMProxyIteratorInternals;
 //ETX
 
-class vtkSMProxyManager;
 class vtkSMProxy;
 
 class VTK_EXPORT vtkSMProxyIterator : public vtkSMObject
@@ -37,13 +36,6 @@ public:
   static vtkSMProxyIterator* New();
   vtkTypeMacro(vtkSMProxyIterator, vtkSMObject);
   void PrintSelf(ostream& os, vtkIndent indent);
-
-  // Description:
-  // Get/Set the proxy manager to iterate over. Typically one uses
-  // vtkSMProxyManager::NewIterator() API to instantiate a vtkSMProxyIterator in
-  // which case the proxy-manager instance is already initialized.
-  void SetProxyManager(vtkSMProxyManager*);
-  vtkGetObjectMacro(ProxyManager, vtkSMProxyManager);
 
   // Description:
   // Go to the beginning of the collection.
@@ -97,7 +89,6 @@ protected:
   vtkSMProxyIterator();
   ~vtkSMProxyIterator();
 
-  vtkSMProxyManager* ProxyManager;
   int Mode;
   void NextInternal();
 

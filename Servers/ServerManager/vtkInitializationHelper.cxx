@@ -42,6 +42,7 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkPVOptions.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMProperty.h"
+#include "vtkSMProxyManager.h"
 
 #include <vtkstd/string>
 #include <vtksys/ios/sstream>
@@ -156,6 +157,10 @@ void vtkInitializationHelper::Initialize(int argc, char**argv,
 
   vtkProcessModule::GetProcessModule()->SetOptions(options);
 
+  vtkSMProxyManager* pxm = vtkSMProxyManager::New();
+  vtkSMObject::SetProxyManager(pxm);
+  pxm->Delete();
+
   // FIXME
   // vtkSMProperty::SetCheckDomains(0);
 }
@@ -163,6 +168,7 @@ void vtkInitializationHelper::Initialize(int argc, char**argv,
 //----------------------------------------------------------------------------
 void vtkInitializationHelper::Finalize()
 {
+  vtkSMObject::SetProxyManager(NULL);
   vtkProcessModule::Finalize();
 }
 

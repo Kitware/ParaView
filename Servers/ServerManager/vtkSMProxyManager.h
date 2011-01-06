@@ -21,15 +21,18 @@
 // the proxy manager. For latter, pass the control of the proxy to the
 // manager with RegisterProxy() and unregister it. At destruction, proxy
 // manager deletes all managed proxies.
-// Every proxy has a ConnectionID associated with it which indicates the
-// Server connection on which the proxy exists. Changing the ConnectionID
-// must be done immediately after the proxy is instantiated.
+//
+// vtkSMProxyManager is designed to work with one active session at a time. When
+// a session closes, it cleans up the proxy manager that releases known
+// definitions as well as registered proxies. When a new session is established
+// it updates the definitions and is the ready to create new proxies.
 // .SECTION See Also
 // vtkSMProxyDefinitionManager
 #ifndef __vtkSMProxyManager_h
 #define __vtkSMProxyManager_h
 
-#include "vtkSMRemoteObject.h"
+#include "vtkSMObject.h"
+#include "vtkSMMessageMinimal.h" // needed for vtkSMMessage.
 
 class vtkCollection;
 class vtkPVXMLElement;
@@ -46,6 +49,7 @@ class vtkSMProxyManagerObserver;
 class vtkSMProxyManagerProxySet;
 class vtkSMProxySelectionModel;
 class vtkSMReaderFactory;
+class vtkSMSession;
 class vtkSMStateLoader;
 class vtkSMWriterFactory;
 class vtkStringList;
@@ -55,12 +59,18 @@ struct vtkSMProxyManagerInternals;
 struct vtkClientServerID;
 //ETX
 
-class VTK_EXPORT vtkSMProxyManager : public vtkSMRemoteObject
+class VTK_EXPORT vtkSMProxyManager : public vtkSMObject
 {
 public:
   static vtkSMProxyManager* New();
-  vtkTypeMacro(vtkSMProxyManager, vtkSMRemoteObject);
+  vtkTypeMacro(vtkSMProxyManager, vtkSMObject);
   void PrintSelf(ostream& os, vtkIndent indent);
+
+  // Description:
+  // Get/Set the session on which this proxymanager is working.
+  // Note that session is not reference counted.
+  void SetSession(vtkSMSession*);
+  vtkGetObjectMacro(Session, vtkSMSession);
 
   // Description:
   // This method will trigger a request on the server to fetch the XML proxy
@@ -421,10 +431,9 @@ public:
   bool LoadConfigurationXML(const char* xmlcontents);
 
   // Description:
-  // Get/Set the proxy definition manager.
+  // Get the proxy definition manager.
   // Proxy definition manager maintains all the information about proxy
   // definitions.
-  void SetProxyDefinitionManager(vtkSMProxyDefinitionManager*);
   vtkGetObjectMacro(ProxyDefinitionManager, vtkSMProxyDefinitionManager);
 
 //BTX
@@ -462,6 +471,12 @@ protected:
   friend class vtkSMProxyDefinitionIterator;
   friend class vtkSMProxyIterator;
   friend class vtkSMProxyManagerObserver;
+
+  // Description:
+  // Set the proxy definition manager.
+  // Proxy definition manager maintains all the information about proxy
+  // definitions.
+  void SetProxyDefinitionManager(vtkSMProxyDefinitionManager*);
 
   // Description:
   // Given an XML element and group name create a proxy
@@ -508,6 +523,7 @@ protected:
   vtkSMReaderFactory* ReaderFactory;
   vtkSMWriterFactory* WriterFactory;
   vtkSMProxyDefinitionManager* ProxyDefinitionManager;
+  vtkSMSession* Session;
 private:
   vtkSMProxyManagerInternals* Internals;
   vtkSMProxyManagerObserver* Observer;

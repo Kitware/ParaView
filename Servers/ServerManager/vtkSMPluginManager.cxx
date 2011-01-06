@@ -89,8 +89,7 @@ bool vtkSMPluginManager::LoadLocalPlugin(const char* filename)
 bool vtkSMPluginManager::LoadRemotePlugin(const char* filename)
 {
   vtkSMPluginLoaderProxy* proxy = vtkSMPluginLoaderProxy::SafeDownCast(
-    this->Internals->Session->GetProxyManager()->NewProxy("misc",
-      "PluginLoader"));
+    vtkSMProxyManager::GetProxyManager()->NewProxy("misc", "PluginLoader"));
   proxy->UpdateVTKObjects();
   bool status = proxy->LoadPlugin(filename);
   if (!status)

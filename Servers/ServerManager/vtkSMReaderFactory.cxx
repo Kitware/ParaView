@@ -61,9 +61,7 @@ public:
 
     vtkSMProxyManager* GetProxyManager()
       {
-      vtkProcessModule *pm = vtkProcessModule::GetProcessModule();
-      vtkSMSession* session = vtkSMSession::SafeDownCast(pm->GetSession());
-      return session->GetProxyManager();
+      return vtkSMProxyManager::GetProxyManager();
       }
 
     vtkSMProxy* GetPrototypeProxy(const char* groupName, const char* proxyName)
@@ -137,9 +135,7 @@ public:
 
   vtkSMProxyManager* GetProxyManager()
     {
-    vtkProcessModule *pm = vtkProcessModule::GetProcessModule();
-    vtkSMSession* session = vtkSMSession::SafeDownCast(pm->GetSession());
-    return session->GetProxyManager();
+    return vtkSMObject::GetProxyManager();
     }
 
   void BuildExtensions(
@@ -618,9 +614,7 @@ const char* vtkSMReaderFactory::GetSupportedFileTypes(vtkIdType cid)
 //----------------------------------------------------------------------------
 bool vtkSMReaderFactory::TestFileReadability(const char* filename, vtkIdType cid)
 {
-  vtkProcessModule *pm = vtkProcessModule::GetProcessModule();
-  vtkSMSession* session = vtkSMSession::SafeDownCast(pm->GetSession());
-  vtkSMProxyManager* pxm = session->GetProxyManager();
+  vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
   vtkSmartPointer<vtkSMProxy> proxy;
   proxy.TakeReference(pxm->NewProxy("file_listing", "ServerFileListing"));
   if (!proxy)
@@ -669,9 +663,7 @@ bool vtkSMReaderFactory::CanReadFile(const char* filename, vtkSMProxy* proxy)
 bool vtkSMReaderFactory::CanReadFile(const char* filename,
   const char* readerxmlgroup, const char* readerxmlname, vtkIdType cid)
 {
-  vtkProcessModule *pm = vtkProcessModule::GetProcessModule();
-  vtkSMSession* session = vtkSMSession::SafeDownCast(pm->GetSession());
-  vtkSMProxyManager* pxm = session->GetProxyManager();
+  vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
   vtkSMProxy* proxy = pxm->NewProxy( readerxmlgroup, readerxmlname );
   if (!proxy)
     {

@@ -36,6 +36,7 @@ public:
   // Description:
   // Proxy manager singleton stores all proxy groups and instances.
   static vtkSMProxyManager* GetProxyManager();
+  static void SetProxyManager(vtkSMProxyManager* pm);
 
   //// Description:
   //// Application singleton is used to initialize server manager
@@ -45,6 +46,8 @@ public:
 protected:
   vtkSMObject();
   ~vtkSMObject();
+
+  static vtkSMProxyManager* ProxyManager;
 
 private:
   vtkSMObject(const vtkSMObject&); // Not implemented

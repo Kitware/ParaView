@@ -46,10 +46,10 @@ int main(int argc, char* argv[])
   //session = vtkSMSessionClient::New();
   //vtkSMSessionClient::SafeDownCast(session)->Connect("cs://localhost:11111");
   session = vtkSMSession::New();
-
+  session->Initialize();
   cout << "Starting..." << endl;
 
-  vtkSMProxyManager* pxm = session->GetProxyManager();
+  vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
   vtkProcessModule::GetProcessModule()->RegisterSession(session);
 
   //================= View test =======================
