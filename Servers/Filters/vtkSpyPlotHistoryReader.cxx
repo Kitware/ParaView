@@ -214,7 +214,7 @@ int vtkSpyPlotHistoryReader::RequestData(
   double* steps =
     outInfo->Get(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
 
-  unsigned int TimeIndex = 0;
+  int TimeIndex = 0;
   // Check if a particular time was requested by the pipeline.
   // This overrides the ivar.
   if(outInfo->Has(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEPS()) && tsLength>0)
@@ -246,16 +246,16 @@ int vtkSpyPlotHistoryReader::RequestData(
   split(line,this->Delimeter[0],items);
 
   //determine the number of rows our table will have
-  int numRows = this->Info->ColumnIndexToTracerId.size();
+  vtkIdType numRows = static_cast<vtkIdType>(this->Info->ColumnIndexToTracerId.size());
   output->SetNumberOfRows(numRows);
 
   //setup variables we need in the while loop
   vtkFieldData *fa = output->GetFieldData();
-  int numCols = output->GetNumberOfColumns();
+  vtkIdType numCols = output->GetNumberOfColumns();
   std::vector<std::string>::const_iterator it(items.begin());
   int index = 0;
   double tempValue=0;
-  size_t i=0,j=0;
+  vtkIdType i=0,j=0;
   while(it != items.end())
     {
     if (this->Info->ColumnIndexToTracerId.count(index))
