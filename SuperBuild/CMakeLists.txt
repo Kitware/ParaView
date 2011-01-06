@@ -116,14 +116,14 @@ endif()
 include(External_NUMPY)
 include(External_OpenMPI)
 
-if(NOT WIN32)
-  include(External_Silo)
-  list(APPEND ParaView_dependencies Silo)
-endif()
 
 if(NOT WIN32)
+  #include(External_Silo)
+  #list(APPEND ParaView_dependencies Silo)
   include(External_Manta)
   list(APPEND ParaView_dependencies Manta)
+  include(External_FFMPEG)
+  list(APPEND ParaView_dependencies FFMPEG)
 endif()
 
 
