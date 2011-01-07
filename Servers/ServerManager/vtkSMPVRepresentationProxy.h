@@ -38,6 +38,11 @@ protected:
   vtkSMPVRepresentationProxy();
   ~vtkSMPVRepresentationProxy();
 
+  // Description:
+  // Overridden to ensure that the RepresentationTypesInfo and
+  // Representations's domain are up-to-date.
+  virtual void CreateVTKObjects();
+
 private:
   vtkSMPVRepresentationProxy(const vtkSMPVRepresentationProxy&); // Not implemented
   void operator=(const vtkSMPVRepresentationProxy&); // Not implemented

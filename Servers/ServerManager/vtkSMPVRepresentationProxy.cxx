@@ -41,6 +41,26 @@ vtkSMPVRepresentationProxy::~vtkSMPVRepresentationProxy()
 }
 
 //----------------------------------------------------------------------------
+void vtkSMPVRepresentationProxy::CreateVTKObjects()
+{
+  if (this->ObjectsCreated)
+    {
+    return;
+    }
+  this->Superclass::CreateVTKObjects();
+  if (!this->ObjectsCreated)
+    {
+    return;
+    }
+
+  // Ensure that we update the RepresentationTypesInfo property and the domain
+  // for "Representations" property before CreateVTKObjects() is finished. This
+  // ensure that all representations have valid Representations domain.
+  this->UpdatePropertyInformation();
+  this->GetProperty("RepresentationTypesInfo")->UpdateDependentDomains();
+}
+
+//----------------------------------------------------------------------------
 void vtkSMPVRepresentationProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
