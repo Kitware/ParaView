@@ -1047,10 +1047,10 @@ void output_InitFunction(FILE *fp, NewClassInfo *data)
           "//-------------------------------------------------------------------------auto\n"
           "void VTK_EXPORT %s_Init(vtkClientServerInterpreter* csi)\n"
           "{\n"
-          "  static bool once;\n"
-          "  if(!once)\n"
+          "  static vtkClientServerInterpreter* last = NULL;\n"
+          "  if(last != csi)\n"
           "    {\n"
-          "    once = true;\n", data->ClassName);
+          "    last = csi;\n", data->ClassName);
   for (i=0; i < totalClasses; ++i)
     fprintf(fp,"    %s_Init(csi);\n",classes[i]);
   if(!data->IsAbstract)
