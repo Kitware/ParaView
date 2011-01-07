@@ -20,6 +20,7 @@ if(WIN32)
       -DCMAKE_BUILD_TYPE:STRING=${CMAKE_CFG_INTDIR}
       ${pv_tpl_compiler_args}
       ${OpenMPI_EXTRA_ARGS}
+    CMAKE_ARGS
       -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>
   )
 
