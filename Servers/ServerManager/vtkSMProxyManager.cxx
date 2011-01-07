@@ -430,6 +430,11 @@ unsigned int vtkSMProxyManager::GetNumberOfProxies(const char* group)
 vtkSMProxy* vtkSMProxyManager::GetPrototypeProxy(const char* groupname,
   const char* name)
 {
+  if (!this->ProxyDefinitionManager)
+    {
+    return NULL;
+    }
+
   vtkstd::string protype_group = groupname;
   protype_group += "_prototypes";
   vtkSMProxy* proxy = this->GetProxy(protype_group.c_str(), name);
@@ -438,7 +443,11 @@ vtkSMProxy* vtkSMProxyManager::GetPrototypeProxy(const char* groupname,
     return proxy;
     }
 
-  if (!this->GetProxyElement(groupname, name))
+  // silently ask for the definition. If not found return NULL.
+  vtkPVXMLElement* xmlElement =
+    this->ProxyDefinitionManager->GetCollapsedProxyDefinition(
+      groupname, name, false);
+  if (xmlElement == NULL)
     {
     // No definition was located for the requested proxy.
     // Cannot create the prototype.
