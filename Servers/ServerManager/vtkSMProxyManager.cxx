@@ -642,13 +642,42 @@ const char* vtkSMProxyManager::IsProxyInGroup(vtkSMProxy* proxy,
   return 0;
 }
 
+namespace
+{
+  struct vtkSMProxyManagerProxyInformation
+    {
+    vtkstd::string GroupName;
+    vtkstd::string ProxyName;
+    vtkSMProxy* Proxy;
+    };
+}
+
 //---------------------------------------------------------------------------
 void vtkSMProxyManager::UnRegisterProxies()
 {
+
   // Clear internal proxy containers
-  this->Internals->RegisteredProxyMap.erase(
-    this->Internals->RegisteredProxyMap.begin(),
-    this->Internals->RegisteredProxyMap.end());
+  vtkstd::vector<vtkSMProxyManagerProxyInformation> toUnRegister;
+  vtkSMProxyIterator* iter = vtkSMProxyIterator::New();
+  iter->SetModeToAll();
+  for (iter->Begin(); !iter->IsAtEnd(); iter->Next())
+    {
+    vtkSMProxyManagerProxyInformation info;
+    info.GroupName = iter->GetGroup();
+    info.ProxyName = iter->GetKey();
+    info.Proxy = iter->GetProxy();
+    toUnRegister.push_back(info);
+    }
+  iter->Delete();
+
+  vtkstd::vector<vtkSMProxyManagerProxyInformation>::iterator vIter =
+    toUnRegister.begin();
+  for (;vIter != toUnRegister.end(); ++vIter)
+    {
+    this->UnRegisterProxy(vIter->GroupName.c_str(), vIter->ProxyName.c_str(),
+      vIter->Proxy);
+    }
+
   this->Internals->ModifiedProxies.clear();
   this->Internals->RegisteredProxyTuple.clear();
   this->Internals->State.ClearExtension(ProxyManagerState::registered_proxy);
@@ -724,14 +753,6 @@ void vtkSMProxyManager::UnRegisterProxy(const char* name)
 #endif
     }
 }
-
-//---------------------------------------------------------------------------
-struct vtkSMProxyManagerProxyInformation
-{
-  vtkstd::string GroupName;
-  vtkstd::string ProxyName;
-  vtkSMProxy* Proxy;
-};
 
 //---------------------------------------------------------------------------
 void vtkSMProxyManager::UnRegisterProxy(vtkSMProxy* proxy)
@@ -980,6 +1001,7 @@ void vtkSMProxyManager::UnRegisterLink(const char* name)
 //---------------------------------------------------------------------------
 void vtkSMProxyManager::UnRegisterAllLinks()
 {
+  // FIXME: need to fire unregister events!!!
   this->Internals->RegisteredLinkMap.clear();
 }
 

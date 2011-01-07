@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCustomFilterManager.h"
 #include "pqCustomFilterManagerModel.h"
 #include "pqServerManagerObserver.h"
+#include "pqServerManagerModel.h"
 #include "pqCoreUtilities.h"
 
 //-----------------------------------------------------------------------------
@@ -50,8 +51,13 @@ pqManageCustomFiltersReaction::pqManageCustomFiltersReaction(QAction* parentObje
       this->Model, SLOT(addCustomFilter(QString)));
   this->connect(observer, SIGNAL(compoundProxyDefinitionUnRegistered(QString)),
       this->Model, SLOT(removeCustomFilter(QString)));
-  QObject::connect(observer, SIGNAL(connectionCreated(vtkIdType)),
+
+  pqServerManagerModel* smmodel =
+    pqApplicationCore::instance()->getServerManagerModel();
+  QObject::connect(smmodel, SIGNAL(serverAdded(pqServer*)),
     this->Model, SLOT(importCustomFiltersFromSettings()));
+  QObject::connect(smmodel, SIGNAL(aboutToRemoveServer(pqServer*)),
+    this->Model, SLOT(exportCustomFiltersToSettings()));
 }
 
 //-----------------------------------------------------------------------------

@@ -139,10 +139,10 @@ void vtkSMRemoteObject::PushState(vtkSMMessage* msg)
     {
     this->GetSession()->PushState(msg);
     }
-  else // FIXME this case occurs for prototype...
+  else
     {
-    vtkErrorMacro("No session found");
-    // FIXME Throw exception or error feed back : Not PVSession found !
+    vtkErrorMacro("Attempting to PushState() on a " << this->GetClassName()
+      << " after the session has been destroyed.");
     }
 }
 
@@ -162,8 +162,8 @@ bool vtkSMRemoteObject::PullState(vtkSMMessage* msg)
     }
   else
     {
-    vtkErrorMacro("No session found");
-    // FIXME Throw exception or error feed back : Not PVSession found !
+    vtkErrorMacro("Attempting to PullState() on a " << this->GetClassName()
+      << " after the session has been destroyed.");
     return false;
     }
   return true; // Successful call
@@ -180,7 +180,8 @@ void vtkSMRemoteObject::Invoke(vtkSMMessage* msg)
     }
   else
     {
-    vtkErrorMacro("No session found");
+    vtkErrorMacro("Attempting to call Invoke() on a " << this->GetClassName()
+      << " after the session has been destroyed.");
     }
 }
 
