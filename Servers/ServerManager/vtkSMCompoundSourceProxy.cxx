@@ -218,7 +218,8 @@ int vtkSMCompoundSourceProxy::ReadXMLAttributes( vtkSMProxyManager* pm,
   // Initialise exposed properties --------------------------------------------
   vtkPVXMLElement* exposedProperties = NULL;
   exposedProperties = element->FindNestedElementByName("ExposedProperties");
-  numElems = exposedProperties->GetNumberOfNestedElements();
+  numElems =
+    exposedProperties? exposedProperties->GetNumberOfNestedElements() : 0;
   for (unsigned int i=0; i < numElems; i++)
     {
     vtkPVXMLElement* currentElement = exposedProperties->GetNestedElement(i);
