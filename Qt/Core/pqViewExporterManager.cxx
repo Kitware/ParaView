@@ -57,7 +57,7 @@ pqViewExporterManager::pqViewExporterManager(QObject* _parent):
     SIGNAL(serverAdded(pqServer*)),
     this, SLOT(refresh()));
   QObject::connect(pqApplicationCore::instance()->getPluginManager(),
-    SIGNAL(serverManagerExtensionLoaded()),
+    SIGNAL(pluginsUpdated()),
     this, SLOT(refresh()));
   this->refresh();
 }

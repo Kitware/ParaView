@@ -77,10 +77,6 @@ public:
   /// Provides mechanism to explicitly remove a proxy to the menu.
   void removeProxy(const QString& xmlgroup, const QString& xmlname);
 
-  /// Forces a re-population of the menu. Any need to call this only after
-  /// addProxy() has been used to explicitly add entries.
-  void populateMenu();
-
   /// Returns a list of categories that have the "show_in_toolbar" attribute set
   /// to 1.
   QStringList getToolbarCategories() const;
@@ -97,6 +93,10 @@ public slots:
 
   /// Enable/disable the menu and the actions.
   void setEnabled(bool enable);
+
+  /// Forces a re-population of the menu. Any need to call this only after
+  /// addProxy() has been used to explicitly add entries.
+  void populateMenu();
 
 signals:
   void triggered(const QString& group, const QString& name);
