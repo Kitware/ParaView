@@ -116,11 +116,15 @@ endif()
 include(External_NUMPY)
 include(External_OpenMPI)
 
-
+set(MANTA_ARGS)
 if(NOT WIN32)
   #include(External_Silo)
   #list(APPEND ParaView_dependencies Silo)
   include(External_Manta)
+  set(MANTA_ARGS
+   -DPARAVIEW_BUILD_PLUGIN_Manta:BOOL=ON
+   -DMANTA_BUILD:PATH=${Manta_binary}
+   -DMANTA_SOURCE:PATH=${Manta_source})
   list(APPEND ParaView_dependencies Manta)
   include(External_FFMPEG)
   list(APPEND ParaView_dependencies FFMPEG)
@@ -155,9 +159,7 @@ ExternalProject_Add(${proj}
    -DMPI_LIBRARY:FILEPATH=${MPI_LIBRARY}
    -DMPI_EXTRA_LIBRARY:FILEPATH=${MPI_EXTRA_LIBRARY}
    # Manta
-   -DPARAVIEW_BUILD_PLUGIN_Manta:BOOL=ON
-   -DMANTA_BUILD:PATH=${Manta_binary}
-   -DMANTA_SOURCE:PATH=${Manta_source}
+   ${MANTA_ARGS}
    # EyeDome
    -DPARAVIEW_BUILD_PLUGIN_EyeDome:BOOL=ON
   INSTALL_COMMAND ""
