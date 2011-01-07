@@ -35,6 +35,7 @@
 #include "vtkSMMessageMinimal.h" // needed for vtkSMMessage.
 
 class vtkCollection;
+class vtkEventForwarderCommand;
 class vtkPVXMLElement;
 class vtkSMCompoundSourceProxy;
 class vtkSMDocumentation;
@@ -517,6 +518,7 @@ protected:
   vtkSMWriterFactory* WriterFactory;
   vtkSMProxyDefinitionManager* ProxyDefinitionManager;
   vtkSMSession* Session;
+  vtkEventForwarderCommand* Forwarder;
 private:
   vtkSMProxyManagerInternals* Internals;
   vtkSMProxyManagerObserver* Observer;

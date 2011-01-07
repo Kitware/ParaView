@@ -542,17 +542,12 @@ void vtkSMProxyDefinitionManager::ClearCustomProxyDefinition()
 void vtkSMProxyDefinitionManager::RemoveCustomProxyDefinition(
   const char* groupName, const char* proxyName)
 {
-  if(ProxyElementExists(groupName, proxyName))
+  if (this->ProxyElementExists(groupName, proxyName))
     {
-    // FIXME see what should be done for event management  // FIXME <===========================================================================
-//    vtkSMProxyManager::RegisteredProxyInformation info;
-//    info.Proxy = 0;
-//    info.GroupName = groupName;
-//    info.ProxyName = proxyName;
-//    info.Type = vtkSMProxyManager::RegisteredProxyInformation::COMPOUND_PROXY_DEFINITION;
-//    this->InvokeEvent(vtkCommand::UnRegisterEvent, &info);
-
     this->Internals->CustomsDefinitions[groupName].erase(proxyName);
+
+    // Let the world know that definitions may have changed.
+    this->InvokeEvent(vtkSMProxyDefinitionManager::CompoundProxyDefinitionsUpdated);
     }
 }
 
@@ -583,13 +578,8 @@ void vtkSMProxyDefinitionManager::AddCustomProxyDefinition(
     {
     this->Internals->CustomsDefinitions[groupName][proxyName] = top;
 
-    // FIXME see what should be done for event management
-//    vtkSMProxyManager::RegisteredProxyInformation info; // FIXME <===========================================================================
-//    info.Proxy = 0;
-//    info.GroupName = groupName;
-//    info.ProxyName = proxyName;
-//    info.Type = vtkSMProxyManager::RegisteredProxyInformation::COMPOUND_PROXY_DEFINITION;
-//    this->GetProxyManager()->InvokeEvent(vtkCommand::RegisterEvent, &info);
+    // Let the world know that definitions may have changed.
+    this->InvokeEvent(vtkSMProxyDefinitionManager::CompoundProxyDefinitionsUpdated);
     }
 }
 
@@ -722,31 +712,31 @@ bool vtkSMProxyDefinitionManager::LoadConfigurationXMLFromString(const char* xml
 //---------------------------------------------------------------------------
 bool vtkSMProxyDefinitionManager::LoadConfigurationXML(vtkPVXMLElement* root)
 {
-    if(!root)
-      {
-      vtkErrorMacro("Must parse a configuration before storing it.");
-      return false;
-      }
+  if (!root)
+    {
+    vtkErrorMacro("Must parse a configuration before storing it.");
+    return false;
+    }
+
+  // Loop over the top-level elements.
+  for (unsigned int i=0; i < root->GetNumberOfNestedElements(); ++i)
+    {
+    vtkPVXMLElement* group = root->GetNestedElement(i);
+    const char* groupName = group->GetAttribute("name");
 
     // Loop over the top-level elements.
-    unsigned int i;
-    for(i=0; i < root->GetNumberOfNestedElements(); ++i)
+    for(unsigned int cc=0; cc < group->GetNumberOfNestedElements(); ++cc)
       {
-      vtkPVXMLElement* group = root->GetNestedElement(i);
-      const char* groupName = group->GetAttribute("name");
-
-      // Loop over the top-level elements.
-      for(unsigned int i=0; i < group->GetNumberOfNestedElements(); ++i)
+      vtkPVXMLElement* proxy = group->GetNestedElement(cc);
+      const char* proxyName = proxy->GetAttribute("name");
+      if (proxyName)
         {
-        vtkPVXMLElement* proxy = group->GetNestedElement(i);
-        const char* proxyName = proxy->GetAttribute("name");
-        if(proxyName)
-          {
-          AddElement(groupName, proxyName, proxy);
-          }
+        this->AddElement(groupName, proxyName, proxy);
         }
       }
-    return true;
+    }
+  this->InvokeEvent(vtkSMProxyDefinitionManager::ProxyDefinitionsUpdated);
+  return true;
 }
 
 //---------------------------------------------------------------------------

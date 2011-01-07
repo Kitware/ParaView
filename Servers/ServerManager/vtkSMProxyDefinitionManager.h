@@ -16,7 +16,13 @@
 // .SECTION Description
 // vtkSMProxyDefinitionManager is a class that manages XML proxies definition.
 // It maintains a map of XML elements (populated by the XML parser) from
-// which it can extract Hint, Documentation, Properties, Domains definition...
+// which it can extract Hint, Documentation, Properties, Domains definition.
+//
+// Whenever the proxy definitions are updated, this class fires
+// vtkSMProxyDefinitionManager::ProxyDefinitionsUpdated,
+// vtkSMProxyDefinitionManager::CompoundProxyDefinitionsUpdated events. Note
+// when a compound proxy is registered, on CompoundProxyDefinitionsUpdated event
+// is fired.
 // .SECTION See Also
 // vtkSMXMLParser
 
@@ -115,6 +121,12 @@ public:
   bool LoadConfigurationXML(const char* filename);
   bool LoadConfigurationXML(vtkPVXMLElement* root);
   bool LoadConfigurationXMLFromString(const char* xmlContent);
+
+  enum Events
+    {
+    ProxyDefinitionsUpdated=2000,
+    CompoundProxyDefinitionsUpdated=2001
+    };
 
   // Description
   // Return a new configured iterator for traversing a set of proxy definition

@@ -15,7 +15,7 @@
 #include "vtkSMProxyManager.h"
 
 #include "vtkCollection.h"
-#include "vtkCommand.h"
+#include "vtkEventForwarderCommand.h"
 #include "vtkInstantiator.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
@@ -23,7 +23,6 @@
 #include "vtkPVXMLElement.h"
 #include "vtkPVXMLParser.h"
 #include "vtkSmartPointer.h"
-#include "vtkSMCompoundProxyDefinitionLoader.h"
 #include "vtkSMDocumentation.h"
 #include "vtkSMPropertyIterator.h"
 #include "vtkSMProxyDefinitionIterator.h"
@@ -102,8 +101,6 @@ protected:
 
 //*****************************************************************************
 vtkStandardNewMacro(vtkSMProxyManager);
-vtkCxxSetObjectMacro(vtkSMProxyManager, ProxyDefinitionManager,
-  vtkSMProxyDefinitionManager);
 //---------------------------------------------------------------------------
 vtkSMProxyManager::vtkSMProxyManager()
 {
@@ -126,11 +123,18 @@ vtkSMProxyManager::vtkSMProxyManager()
 
   // Provide internal object a pointer to us
   this->Internals->ProxyManager = this;
+
+  this->Forwarder = vtkEventForwarderCommand::New();
+  this->Forwarder->SetTarget(this);
 }
 
 //---------------------------------------------------------------------------
 vtkSMProxyManager::~vtkSMProxyManager()
 {
+  this->Forwarder->SetTarget(NULL);
+  this->Forwarder->Delete();
+  this->Forwarder = NULL;
+
   // This is causing a PushState() when the object is being destroyed. This
   // causes errors since the ProxyManager is destroyed only when the session is
   // being deleted, thus the session cannot be valid at this point.
@@ -148,6 +152,29 @@ vtkSMProxyManager::~vtkSMProxyManager()
   this->WriterFactory = 0;
 
   this->SetProxyDefinitionManager(NULL);
+}
+
+//----------------------------------------------------------------------------
+void vtkSMProxyManager::SetProxyDefinitionManager(
+  vtkSMProxyDefinitionManager* mgr)
+{
+  if (this->ProxyDefinitionManager == mgr)
+    {
+    return;
+    }
+  if (this->ProxyDefinitionManager)
+    {
+    this->ProxyDefinitionManager->RemoveObserver(this->Forwarder);
+    }
+  vtkSetObjectBodyMacro(
+    ProxyDefinitionManager, vtkSMProxyDefinitionManager, mgr);
+  if (this->ProxyDefinitionManager)
+    {
+    this->ProxyDefinitionManager->AddObserver(
+      vtkSMProxyDefinitionManager::ProxyDefinitionsUpdated, this->Forwarder);
+    this->ProxyDefinitionManager->AddObserver(
+      vtkSMProxyDefinitionManager::CompoundProxyDefinitionsUpdated, this->Forwarder);
+    }
 }
 
 //----------------------------------------------------------------------------
