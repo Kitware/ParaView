@@ -35,6 +35,7 @@ class vtkPVXMLElement;
 class VTK_EXPORT  vtkPVPluginTracker : public vtkObject
 {
 public:
+  static vtkPVPluginTracker* New();
   vtkTypeMacro(vtkPVPluginTracker, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 

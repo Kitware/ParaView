@@ -48,6 +48,10 @@ namespace
     vtkstd::string FileName;
     vtkstd::string PluginName;
     vtkPVPlugin* Plugin;
+    vtkItem()
+      {
+      this->Plugin = NULL;
+      }
     };
 
   vtkstd::string vtkLocatePlugin(const char* plugin)
@@ -108,6 +112,7 @@ public:
 };
 
 vtkSmartPointer<vtkPVPluginTracker> vtkPVPluginTracker::Instance;
+vtkStandardNewMacro(vtkPVPluginTracker);
 //----------------------------------------------------------------------------
 vtkPVPluginTracker::vtkPVPluginTracker()
 {
@@ -126,7 +131,7 @@ vtkPVPluginTracker* vtkPVPluginTracker::GetInstance()
 {
   if (vtkPVPluginTracker::Instance.GetPointer() == NULL)
     {
-    vtkPVPluginTracker* mgr = new vtkPVPluginTracker;
+    vtkPVPluginTracker* mgr = vtkPVPluginTracker::New();
     vtkPVPluginTracker::Instance = mgr;
     mgr->FastDelete();
     }
