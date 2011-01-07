@@ -826,10 +826,11 @@ void vtkSMProxyManager::RegisterProxy(const char* groupname,
   this->InvokeEvent(vtkCommand::RegisterEvent, &info);
 
   // Update state
-  proxy->CreateVTKObjects(); // Make sure an ID has been assigned to it
 
   if(proxy->GetLocation() != 0) // Not a prototype !!!
     {
+    proxy->CreateVTKObjects(); // Make sure an ID has been assigned to it
+
     ProxyManagerState_ProxyRegistrationInfo *registration =
         this->Internals->State.AddExtension(ProxyManagerState::registered_proxy);
     registration->set_group(groupname);
