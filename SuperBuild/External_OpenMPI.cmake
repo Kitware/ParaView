@@ -20,7 +20,6 @@ if(WIN32)
       -DCMAKE_BUILD_TYPE:STRING=${CMAKE_CFG_INTDIR}
       ${pv_tpl_compiler_args}
       ${OpenMPI_EXTRA_ARGS}
-    CMAKE_ARGS
       -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>
   )
 
@@ -42,6 +41,6 @@ endif()
 set(OpenMPI_DIR "${OpenMPI_binary}" CACHE PATH "OpenMPI binary directory" FORCE)
 set(MPIEXEC ${OpenMPI_install}/bin/mpiexec${CMAKE_EXECUTABLE_SUFFIX})
 set(MPI_INCLUDE_PATH ${OpenMPI_install}/include)
-set(MPI_LIBRARY ${OpenMPI_install}/lib/libmpi${CMAKE_SHARED_LIBRARY_SUFFIX})
-set(MPI_EXTRA_LIBRARY ${OpenMPI_install}/lib/libmpi_cxx${CMAKE_SHARED_LIBRARY_SUFFIX})
+set(MPI_LIBRARY ${OpenMPI_install}/lib/libmpi${CMAKE_LINK_LIBRARY_SUFFIX})
+set(MPI_EXTRA_LIBRARY ${OpenMPI_install}/lib/libmpi_cxx${CMAKE_LINK_LIBRARY_SUFFIX})
 mark_as_advanced(OpenMPI_DIR)
