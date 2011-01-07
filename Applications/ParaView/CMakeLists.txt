@@ -104,8 +104,12 @@ IF (PARAVIEW_INSTALL_THIRD_PARTY_LIBRARIES AND NOT APPLE)
 
     # Python Lib dir contains all of the native python modules
     IF(PARAVIEW_ENABLE_PYTHON)
-      get_filename_component(_python_base_dir ${PYTHON_EXECUTABLE} PATH)
-      INSTALL(DIRECTORY ${_python_base_dir}/Lib
+
+      execute_process(COMMAND ${PYTHON_EXECUTABLE} -c "from distutils.sysconfig import get_python_lib; print get_python_lib(standard_lib=1)"
+                      OUTPUT_VARIABLE PYTHON_LIBS_DIR
+                      OUTPUT_STRIP_TRAILING_WHITESPACE)
+      file(TO_CMAKE_PATH ${PYTHON_LIBS_DIR} PYTHON_LIBS_DIR)
+      INSTALL(DIRECTORY ${PYTHON_LIBS_DIR}
               DESTINATION ${PV_INSTALL_BIN_DIR}
               USE_SOURCE_PERMISSIONS
               COMPONENT Runtime)
@@ -140,6 +144,13 @@ IF(PARAVIEW_USE_MPI)
   get_filename_component(MPI_LIB_DIR "${MPI_LIBRARY}" PATH)
   get_filename_component(MPI_BIN_DIR "${MPIEXEC}" PATH)
   list(APPEND DIRS ${MPI_LIB_DIR} ${MPI_BIN_DIR})
+  option(PARAVIEW_INSTALL_MPIEXEC "Include the MPI executable in an installation." OFF)
+  mark_as_advanced(PARAVIEW_INSTALL_MPIEXEC)
+  if(PARAVIEW_INSTALL_MPIEXEC)
+    install(PROGRAMS ${MPIEXEC}
+      DESTINATION ${PV_INSTALL_BIN_DIR}
+      COMPONENT Runtime)
+  endif(PARAVIEW_INSTALL_MPIEXEC)
 ENDIF(PARAVIEW_USE_MPI)
 
 set(_extension)
