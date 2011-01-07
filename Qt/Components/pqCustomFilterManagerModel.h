@@ -117,10 +117,6 @@ public:
   QModelIndex getIndexFor(const QString &filter) const;
   //@}
 
-  // Save/Load custom filters from pqSettings
-  void importCustomFiltersFromSettings();
-  void exportCustomFiltersToSettings();
-
 public slots:
   /// \brief
   ///   Adds a new custom filter definition to the model.
@@ -131,6 +127,10 @@ public slots:
   ///   Removes a custom filter definition from the model.
   /// \param name The name of the custom filter definition.
   void removeCustomFilter(QString name);
+
+  /// Save/Load custom filters from pqSettings
+  void importCustomFiltersFromSettings();
+  void exportCustomFiltersToSettings();
 
 signals:
   /// \brief

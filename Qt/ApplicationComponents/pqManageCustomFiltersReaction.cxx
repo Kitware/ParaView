@@ -50,8 +50,8 @@ pqManageCustomFiltersReaction::pqManageCustomFiltersReaction(QAction* parentObje
       this->Model, SLOT(addCustomFilter(QString)));
   this->connect(observer, SIGNAL(compoundProxyDefinitionUnRegistered(QString)),
       this->Model, SLOT(removeCustomFilter(QString)));
-
-  this->Model->importCustomFiltersFromSettings();
+  QObject::connect(observer, SIGNAL(connectionCreated(vtkIdType)),
+    this->Model, SLOT(importCustomFiltersFromSettings()));
 }
 
 //-----------------------------------------------------------------------------

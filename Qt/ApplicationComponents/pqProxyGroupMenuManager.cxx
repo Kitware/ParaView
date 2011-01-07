@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqProxyGroupMenuManager.h"
 
 #include "pqPVApplicationCore.h"
+#include "pqServerManagerModel.h"
 #include "pqSetData.h"
 #include "pqSetName.h"
 #include "pqSettings.h"
@@ -113,6 +114,10 @@ pqProxyGroupMenuManager::pqProxyGroupMenuManager(
   QObject::connect(pqApplicationCore::instance(),
     SIGNAL(loadXML(vtkPVXMLElement*)),
     this, SLOT(loadConfiguration(vtkPVXMLElement*)));
+
+  QObject::connect(pqApplicationCore::instance()->getServerManagerModel(),
+    SIGNAL(serverAdded(pqServer*)),
+    this, SLOT(populateMenu()));
 }
 
 //-----------------------------------------------------------------------------

@@ -130,16 +130,24 @@ pqUpdateProxyDefinitionsBehavior::pqUpdateProxyDefinitionsBehavior(
   this->XMLGroup = xmlgroup;
   this->MenuManager = menuManager;
 
-  QObject::connect(pqApplicationCore::instance()->getPluginManager(),
-    SIGNAL(serverManagerExtensionLoaded()),
-    this, SLOT(update()));
-  QObject::connect(pqApplicationCore::instance()->getServerManagerObserver(),
-    SIGNAL(compoundProxyDefinitionRegistered(QString)),
-    this, SLOT(update()));
-  QObject::connect(pqApplicationCore::instance()->getServerManagerObserver(),
-    SIGNAL(compoundProxyDefinitionUnRegistered(QString)),
-    this, SLOT(remove(QString)));
+  this->CallbackID0 = vtkSMProxyManager::GetProxyManager()->AddObserver(
+    vtkSMProxyDefinitionManager::ProxyDefinitionsUpdated,
+    this, &pqUpdateProxyDefinitionsBehavior::update);
+  this->CallbackID1 = vtkSMProxyManager::GetProxyManager()->AddObserver(
+    vtkSMProxyDefinitionManager::CompoundProxyDefinitionsUpdated,
+    this, &pqUpdateProxyDefinitionsBehavior::update);
   this->update();
+}
+
+//-----------------------------------------------------------------------------
+pqUpdateProxyDefinitionsBehavior::~pqUpdateProxyDefinitionsBehavior()
+{
+  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+  if (pxm)
+    {
+    pxm->RemoveObserver(this->CallbackID0);
+    pxm->RemoveObserver(this->CallbackID1);
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -151,6 +159,9 @@ void pqUpdateProxyDefinitionsBehavior::update()
     {
     return;
     }
+#ifdef FIXME_COLLABORATION
+  // Need to fix removing of old definitions.
+#endif
 
   bool something_added = false;
   bool add_new = (this->AlreadySeenSet.size() != 0);

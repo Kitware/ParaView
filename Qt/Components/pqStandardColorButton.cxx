@@ -67,6 +67,7 @@ inline QIcon getIcon(double rgb[3], int icon_size)
 pqStandardColorButton::pqStandardColorButton(QWidget* _parent) :
   Superclass(_parent)
 {
+  this->VTKConnect = vtkEventQtSlotConnect::New();
   this->setPopupMode(QToolButton::MenuButtonPopup);
   this->updateMenu();
 
@@ -74,7 +75,6 @@ pqStandardColorButton::pqStandardColorButton(QWidget* _parent) :
 #ifdef FIXME_COLLABORATION
   vtkSMProxy* globalProps = core->getGlobalPropertiesManager();
 
-  this->VTKConnect = vtkEventQtSlotConnect::New();
   this->VTKConnect->Connect(
     globalProps, vtkCommand::PropertyModifiedEvent,
     this, SLOT(updateMenu()));

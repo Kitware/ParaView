@@ -69,7 +69,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // ParaView includes.
 #include "pqActiveObjects.h"
 #include "pqApplicationCore.h"
+#ifdef FIXME_COLLABORATION
 #include "pqCloseViewUndoElement.h"
+#endif
 #include "pqComparativeRenderView.h"
 #include "pqEventDispatcher.h"
 #include "pqImageUtil.h"
@@ -79,7 +81,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqInterfaceTracker.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
+#ifdef FIXME_COLLABORATION
 #include "pqSplitViewUndoElement.h"
+#endif
 #include "pqUndoStack.h"
 #include "pqViewFrameActionGroupInterface.h"
 #include "pqViewModuleInterface.h"
@@ -408,13 +412,14 @@ void pqViewManager::onFrameRemovedInternal(pqMultiViewFrame* frame)
 void pqViewManager::onFrameRemoved(pqMultiViewFrame* frame)
 {
   this->onFrameRemovedInternal(frame);
-
+#ifdef FIXME_COLLABORATION
   if (this->Internal->CloseFrameUndoElement)
     {
     ADD_UNDO_ELEM(this->Internal->CloseFrameUndoElement);
     this->Internal->CloseFrameUndoElement = 0;
     END_UNDO_SET();
     }
+#endif
 
   // Now activate some frame, so that we have an active view.
   if (this->Internal->Frames.size() > 0)
@@ -437,16 +442,17 @@ void pqViewManager::onPreFrameRemoved(pqMultiViewFrame* frame)
 {
   BEGIN_UNDO_SET("Close View");
 
+#ifdef FIXME_COLLABORATION
   vtkPVXMLElement* state = vtkPVXMLElement::New();
   this->saveState(state);
 
   pqMultiView::Index index = this->indexOf(frame);
-
   pqCloseViewUndoElement* elem = pqCloseViewUndoElement::New();
   elem->CloseView(index, state->GetNestedElement(0));
   this->Internal->CloseFrameUndoElement = elem;
   elem->Delete();
   state->Delete();
+#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -1089,11 +1095,12 @@ void pqViewManager::onSplittingView(const Index& index,
   Qt::Orientation orientation, float fraction, const Index& childIndex)
 {
   BEGIN_UNDO_SET("Split View");
-
+#ifdef FIXME_COLLABORATION
   pqSplitViewUndoElement* elem = pqSplitViewUndoElement::New();
   elem->SplitView(index, orientation, fraction, childIndex);
   ADD_UNDO_ELEM(elem);
   elem->Delete();
+#endif
 
   END_UNDO_SET();
 }

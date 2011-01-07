@@ -568,7 +568,6 @@ void pqApplicationCore::loadConfiguration(const QString& filename)
     return;
     }
 
-#ifdef FIXME_COLLABORATION
   // Now, the reader/writer factories cannot be initialized until after a
   // session has been created. So what do we do? Do we save the xml for
   // processing everytime the session startsup?
@@ -582,7 +581,6 @@ void pqApplicationCore::loadConfiguration(const QString& filename)
     LoadConfiguration(root);
 
   emit this->loadXML(root);
-#endif
 }
 
 //-----------------------------------------------------------------------------

@@ -73,8 +73,8 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqColorScaleEditor.h
   pqColorScaleToolbar.h
   pqComboBoxDomain.h
-#  pqComparativeCueWidget.h
-#  pqComparativeVisPanel.h
+  pqComparativeCueWidget.h
+  pqComparativeVisPanel.h
   pqContourPanel.h
   pqContourWidget.h
   pqCreateServerStartupDialog.h
@@ -388,10 +388,10 @@ ADD_LIBRARY(pqComponents
   pqColorScaleToolbar.h
   pqComboBoxDomain.cxx
   pqComboBoxDomain.h
-#  pqComparativeCueWidget.cxx
-#  pqComparativeCueWidget.h
-#  pqComparativeVisPanel.cxx
-#  pqComparativeVisPanel.h
+  pqComparativeCueWidget.cxx
+  pqComparativeCueWidget.h
+  pqComparativeVisPanel.cxx
+  pqComparativeVisPanel.h
   pqComponentsExport.h
   pqComponentsTestUtility.cxx
   pqComponentsTestUtility.h

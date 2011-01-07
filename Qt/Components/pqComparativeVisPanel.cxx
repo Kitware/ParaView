@@ -35,10 +35,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // Server Manager Includes.
 #include "vtkEventQtSlotConnect.h"
 #include "vtkProcessModule.h"
-#include "vtkSMAnimationCueProxy.h"
 #include "vtkSmartPointer.h"
+#ifdef FIXME_COLLABORATION
 #include "vtkSMComparativeAnimationCueProxy.h"
 #include "vtkSMComparativeViewProxy.h"
+#endif
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMVectorProperty.h"
@@ -143,7 +144,6 @@ namespace pqComparativeVisPanelNS
 
     // Create a new cueProxy.
     vtkSMProxy* cueProxy = pxm->NewProxy("animation", "ComparativeAnimationCue");
-    cueProxy->SetConnectionID(activeServer->GetConnectionID());
 
     vtkSMPropertyHelper(cueProxy, "AnimatedPropertyName").Set(pname);
     vtkSMPropertyHelper(cueProxy, "AnimatedElement").Set(index);
@@ -174,8 +174,10 @@ namespace pqComparativeVisPanelNS
         {
         maxValue = domain[1].toDouble();
         }
+#ifdef FIXME_COLLABORATION
       vtkSMComparativeAnimationCueProxy::SafeDownCast(
         cueProxy)->UpdateWholeRange(minValue, maxValue);
+#endif
       }
     if (!proxy)
       {
@@ -183,11 +185,14 @@ namespace pqComparativeVisPanelNS
       QPair<double, double> range = timekeeper->getTimeRange();
       // this is a "Time" animation cue. Use the range provided by the time
       // keeper.
+#ifdef FIXME_COLLABORATION
       vtkSMComparativeAnimationCueProxy::SafeDownCast(
         cueProxy)->UpdateWholeRange(range.first, range.second);
+#endif
       }
     cueProxy->UpdateVTKObjects();
-    pxm->RegisterProxy("comparative_cues", cueProxy->GetSelfIDAsString(), cueProxy);
+    pxm->RegisterProxy("comparative_cues",
+      cueProxy->GetGlobalIDAsString(), cueProxy);
     return cueProxy;
     }
 };
@@ -265,6 +270,7 @@ void pqComparativeVisPanel::setView(pqView* _view)
   this->Internal->View = _view;
   this->Internal->activeParameters->clearContents();
 
+#ifdef FIXME_COLLABORATION
   vtkSMComparativeViewProxy* viewProxy = _view?
     vtkSMComparativeViewProxy::SafeDownCast(_view->getProxy()) : NULL;
 
@@ -303,6 +309,7 @@ void pqComparativeVisPanel::setView(pqView* _view)
     this, SLOT(updateParametersList()));
 
   this->updateParametersList();
+#endif
 }
 
 //-----------------------------------------------------------------------------

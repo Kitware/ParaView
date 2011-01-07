@@ -36,7 +36,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqUndoStack.h"
 #include "vtkEventQtSlotConnect.h"
+#ifdef FIXME_COLLABORATION
 #include "vtkSMComparativeAnimationCueProxy.h"
+#endif
 #include "vtkSMPropertyHelper.h"
 
 #include <vtkstd/vector>
@@ -101,6 +103,7 @@ pqComparativeCueWidget::~pqComparativeCueWidget()
 //-----------------------------------------------------------------------------
 void pqComparativeCueWidget::setCue(vtkSMProxy* _cue)
 {
+#ifdef FIXME_COLLABORATION
   if (this->Cue.GetPointer() == _cue)
     {
     return;
@@ -116,23 +119,29 @@ void pqComparativeCueWidget::setCue(vtkSMProxy* _cue)
     }
   this->updateGUI();
   this->setEnabled(this->Cue != NULL);
+#endif
 }
 
 //-----------------------------------------------------------------------------
 vtkSMComparativeAnimationCueProxy* pqComparativeCueWidget::cue() const
 {
+#ifdef FIXME_COLLABORATION
   return this->Cue;
+#endif
 }
 
 //-----------------------------------------------------------------------------
 bool pqComparativeCueWidget::acceptsMultipleValues() const
 {
+#ifdef FIXME_COLLABORATION
   return (this->Cue && this->Cue->GetAnimatedElement() == -1);
+#endif
 }
 
 //-----------------------------------------------------------------------------
 void pqComparativeCueWidget::updateGUI()
 {
+#ifdef FIXME_COLLABORATION
   pqLock lock(&this->InUpdateGUI, true);
 
   this->clear();
@@ -188,11 +197,13 @@ void pqComparativeCueWidget::updateGUI()
       this->setItem(rowno, colno, tableitem);
       }
     }
+#endif
 }
 
 //-----------------------------------------------------------------------------
 void pqComparativeCueWidget::onCellChanged(int rowno, int colno)
 {
+#ifdef FIXME_COLLABORATION
   if (this->InUpdateGUI)
     {
     return;
@@ -223,6 +234,7 @@ void pqComparativeCueWidget::onCellChanged(int rowno, int colno)
   END_UNDO_SET();
 
   emit this->valuesChanged();
+#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -238,6 +250,7 @@ void pqComparativeCueWidget::mouseReleaseEvent(QMouseEvent* evt)
 //-----------------------------------------------------------------------------
 void pqComparativeCueWidget::editRange()
 {
+#ifdef FIXME_COLLABORATION
   QList<QTableWidgetSelectionRange> ranges = this->selectedRanges();
   if (ranges.size() != 1 ||
     (ranges[0].columnCount() <= 1 && 
@@ -371,4 +384,5 @@ void pqComparativeCueWidget::editRange()
   emit this->valuesChanged();
 
   this->updateGUIOnIdle();
+#endif
 }

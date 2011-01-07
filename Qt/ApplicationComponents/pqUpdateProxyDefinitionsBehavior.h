@@ -66,6 +66,7 @@ public:
   /// menuManager cannnot be NULL.
   pqUpdateProxyDefinitionsBehavior(eMode mode, const QString& xmlgroup,
     pqProxyGroupMenuManager* menuManager);
+  virtual ~pqUpdateProxyDefinitionsBehavior();
 
 protected slots:
   /// This slot is called after plugins are loaded or after custom-filter
@@ -80,6 +81,8 @@ protected:
   QSet<QString> AlreadySeenSet;
   QString XMLGroup;
   eMode Mode;
+  unsigned long CallbackID0;
+  unsigned long CallbackID1;
 
 private:
   Q_DISABLE_COPY(pqUpdateProxyDefinitionsBehavior)

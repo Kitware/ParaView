@@ -149,11 +149,12 @@ pqProxy* pqStandardServerManagerModelInterface::createPQProxy(
     }
   else if (group == "animation")
     {
-    if (proxy->IsA("vtkSMAnimationSceneProxy"))
+    if (xml_type == "AnimationScene")
       {
       return new pqAnimationScene(group, name, proxy, server, 0);
       }
-    else if (proxy->IsA("vtkSMAnimationCueProxy"))
+    else if (xml_type == "KeyFrameAnimationCue" ||
+      xml_type == "CameraAnimationCue")
       {
       return new pqAnimationCue(group, name, proxy, server, 0);
       }

@@ -523,11 +523,13 @@ void pqObjectInspectorWidget::accept()
     if (source)
       {
       this->show(source);
+#ifdef FIXME_COLLABORATION
       pqProxyModifiedStateUndoElement* elem =
         pqProxyModifiedStateUndoElement::New();
       elem->MadeUnmodified(source);
       ADD_UNDO_ELEM(elem);
       elem->Delete();
+#endif
       }
     }
 
