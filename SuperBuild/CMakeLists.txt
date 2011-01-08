@@ -116,16 +116,17 @@ endif()
 include(External_NUMPY)
 include(External_OpenMPI)
 
-set(MANTA_ARGS)
+include(External_Manta)
+set(MANTA_ARGS
+ -DPARAVIEW_BUILD_PLUGIN_Manta:BOOL=ON
+ -DMANTA_BUILD:PATH=${Manta_binary}
+ -DMANTA_SOURCE:PATH=${Manta_source})
+list(APPEND ParaView_dependencies Manta)
+
 if(NOT WIN32)
   #include(External_Silo)
   #list(APPEND ParaView_dependencies Silo)
-  include(External_Manta)
-  set(MANTA_ARGS
-   -DPARAVIEW_BUILD_PLUGIN_Manta:BOOL=ON
-   -DMANTA_BUILD:PATH=${Manta_binary}
-   -DMANTA_SOURCE:PATH=${Manta_source})
-  list(APPEND ParaView_dependencies Manta)
+
   include(External_FFMPEG)
   list(APPEND ParaView_dependencies FFMPEG)
 endif()
@@ -142,6 +143,9 @@ ExternalProject_Add(${proj}
   BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}/ParaView-build
   CMAKE_CACHE_ARGS
    -DBUILD_SHARED_LIBS:BOOL=${BUILD_SHARED_LIBS}
+   -DBUILD_TESTING:BOOL=OFF
+   -DPARAVIEW_DISABLE_VTK_TESTING:BOOL=ON
+   -DPARAVIEW_TESTING_WITH_PYTHON:BOOL=OFF
    -DCMAKE_CXX_FLAGS:STRING=${CMAKE_CXX_FLAGS}
    -DCMAKE_C_FLAGS:STRING=${CMAKE_C_FLAGS}
    -DCMAKE_BUILD_TYPE:STRING=${CMAKE_CFG_INTDIR}

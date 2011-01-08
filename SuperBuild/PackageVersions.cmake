@@ -43,7 +43,7 @@ set(FFMPEG_URL http://ffmpeg.org/releases)
 set(FFMPEG_GZ ffmpeg-${FFMPEG_MAJOR}.${FFMPEG_MINOR}.${FFMPEG_PATCH}.tar.gz)
 set(FFMPEG_MD5)
 
-set(MANTA_REVISION 2439)
+set(MANTA_REVISION 2478)
 set(MANTA_URL http://paraview.org/files/misc)
 set(MANTA_GZ manta-r${MANTA_REVISION}.tar.gz)
 set(MANTA_MD5)
