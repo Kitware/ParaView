@@ -88,11 +88,11 @@ include(CheckFortran)
 
 set(python_dependencies)
 set(CLAPACK_dependencies)
-set(NUMPY_dependencies python)
+set(NUMPY_dependencies)
 set(Manta_dependencies)
 set(OpenMPI_dependencies)
 
-set(ParaView_dependencies python NUMPY OpenMPI)
+set(ParaView_dependencies)
 
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------
@@ -100,7 +100,12 @@ set(ParaView_dependencies python NUMPY OpenMPI)
 include(PackageVersions)
 
 if(NOT APPLE)
+  include(External_OpenMPI)
+  list(APPEND ParaView_dependencies OpenMPI)
+
   include(External_Python)
+  list(APPEND ParaView_depenencies Python)
+  set(NUMPY_dependencies python)
 
   if(CMAKE_Fortran_COMPILER)
     include(External_LAPACK)
@@ -112,9 +117,21 @@ if(NOT APPLE)
     list(APPEND ParaView_dependencies CLAPACK)
   endif()
 
+  include(External_NUMPY)
+else()
+
+  #find_package(LAPACK)
+  find_package(PythonInterp)
+  find_package(PythonLibs)
+  find_package(MPI)
+
+  include(External_NUMPY)
 endif()
-include(External_NUMPY)
-include(External_OpenMPI)
+
+
+
+
+
 
 include(External_Manta)
 set(MANTA_ARGS
@@ -127,8 +144,8 @@ if(NOT WIN32)
   #include(External_Silo)
   #list(APPEND ParaView_dependencies Silo)
 
-  include(External_FFMPEG)
-  list(APPEND ParaView_dependencies FFMPEG)
+  #include(External_FFMPEG)
+  #list(APPEND ParaView_dependencies FFMPEG)
 endif()
 
 #------------------------------------------------------------------------------
