@@ -565,7 +565,7 @@ void vtkSMProxy::UpdateVTKObjects()
           // Push only modified properties
           if (iter->second.ModifiedFlag)
             {
-            // Write to state
+            // Write to message because vtkSMProperty do not have state
             property->WriteTo(&message);
 
             // the property is no longer dirty.
@@ -697,6 +697,27 @@ void vtkSMProxy::CreateVTKObjects()
   // Save to state
   this->State = new vtkSMMessage();
   this->State->CopyFrom(message);
+
+  // Add Empty property into state to keep track of index later on
+  vtkSMProxyInternals::PropertyInfoMap::iterator iter;
+  for (iter = this->Internals->Properties.begin();
+       iter != this->Internals->Properties.end(); ++iter)
+    {
+    vtkSMProperty* property = iter->second.Property;
+    if (property && !property->GetInformationOnly())
+      {
+      if (property->GetIsInternal() ||
+        strcmp(property->GetClassName(), "vtkSMProperty") == 0)
+        {
+        // No state for vtkSMProperty
+        }
+      else
+        {
+        // Write empty property inside state
+        property->WriteTo(this->State);
+        }
+      }
+    }
 
   // Push the state
   this->PushState(&message);
