@@ -14,6 +14,7 @@
 =========================================================================*/
 #include "vtkSMSessionServer.h"
 
+#include "vtkCommand.h"
 #include "vtkClientServerStream.h"
 #include "vtkInstantiator.h"
 #include "vtkMPIMToNSocketConnection.h"
@@ -62,6 +63,8 @@ vtkSMSessionServer::vtkSMSessionServer()
 {
   this->ClientController = 0;
   this->MPIMToNSocketConnection = NULL;
+  this->ActivateObserverId = 0;
+  this->DeActivateObserverId = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -118,6 +121,10 @@ void vtkSMSessionServer::SetClientController(
       vtkSMSessionClient::CLIENT_SERVER_MESSAGE_RMI);
     this->ClientController->RemoveAllRMICallbacks(
       vtkSMSessionClient::CLOSE_SESSION);
+    this->ClientController->RemoveObserver(this->ActivateObserverId);
+    this->ClientController->RemoveObserver(this->DeActivateObserverId);
+    this->ActivateObserverId = 0;
+    this->DeActivateObserverId = 0;
     }
 
   vtkSetObjectBodyMacro(
@@ -131,6 +138,10 @@ void vtkSMSessionServer::SetClientController(
     this->ClientController->AddRMICallback(
       &CloseSessionCallback, this,
       vtkSMSessionClient::CLOSE_SESSION);
+    this->ActivateObserverId = this->ClientController->AddObserver(
+      vtkCommand::StartEvent, this, &vtkSMSessionServer::Activate);
+    this->DeActivateObserverId = this->ClientController->AddObserver(
+      vtkCommand::EndEvent, this, &vtkSMSessionServer::DeActivate);
     }
 }
 

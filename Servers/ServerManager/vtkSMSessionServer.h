@@ -110,6 +110,9 @@ protected:
 
   vtkMultiProcessController* ClientController;
   vtkMPIMToNSocketConnection* MPIMToNSocketConnection;
+
+  unsigned long ActivateObserverId;
+  unsigned long DeActivateObserverId;
 private:
   vtkSMSessionServer(const vtkSMSessionServer&); // Not implemented
   void operator=(const vtkSMSessionServer&); // Not implemented
