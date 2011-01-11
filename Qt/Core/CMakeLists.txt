@@ -373,29 +373,29 @@ ADD_LIBRARY(pqCore
   vtkPVGUIPluginInterface.h
 )
 
-ADD_LIBRARY(pqCore_old
-  pqComparativeContextView.cxx
-  pqComparativeContextView.h
-  pqComparativeRenderView.cxx
-  pqComparativeRenderView.h
-  pqComparativeXYBarChartView.cxx
-  pqComparativeXYBarChartView.h
-  pqComparativeXYChartView.cxx
-  pqComparativeXYChartView.h
-
-  pqHelperProxyRegisterUndoElement.cxx
-  pqHelperProxyRegisterUndoElement.h
-
-  pqProxyModifiedStateUndoElement.cxx
-  pqProxyModifiedStateUndoElement.h
-  pqProxyUnRegisterUndoElement.cxx
-  pqProxyUnRegisterUndoElement.h
-#  pqScatterPlotRepresentation.cxx
-#  pqScatterPlotRepresentation.h
-#  pqScatterPlotView.cxx
-#  pqScatterPlotView.h
-
-)
+#ADD_LIBRARY(pqCore_old
+#  pqComparativeContextView.cxx
+#  pqComparativeContextView.h
+#  pqComparativeRenderView.cxx
+#  pqComparativeRenderView.h
+#  pqComparativeXYBarChartView.cxx
+#  pqComparativeXYBarChartView.h
+#  pqComparativeXYChartView.cxx
+#  pqComparativeXYChartView.h
+#
+#  pqHelperProxyRegisterUndoElement.cxx
+#  pqHelperProxyRegisterUndoElement.h
+#
+#  pqProxyModifiedStateUndoElement.cxx
+#  pqProxyModifiedStateUndoElement.h
+#  pqProxyUnRegisterUndoElement.cxx
+#  pqProxyUnRegisterUndoElement.h
+##  pqScatterPlotRepresentation.cxx
+##  pqScatterPlotRepresentation.h
+##  pqScatterPlotView.cxx
+##  pqScatterPlotView.h
+#
+#)
 
 TARGET_LINK_LIBRARIES(pqCore
   QtTesting
