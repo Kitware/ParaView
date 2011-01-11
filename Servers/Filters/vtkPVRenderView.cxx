@@ -181,11 +181,11 @@ vtkPVRenderView::vtkPVRenderView()
 
     this->RubberBandStyle = vtkInteractorStyleRubberBand3D::New();
     this->RubberBandStyle->RenderOnMouseMoveOff();
-    vtkCommand* observer = vtkMakeMemberFunctionCommand(*this,
+    vtkCommand* observer2 = vtkMakeMemberFunctionCommand(*this,
       &vtkPVRenderView::OnSelectionChangedEvent);
     this->RubberBandStyle->AddObserver(vtkCommand::SelectionChangedEvent,
-      observer);
-    observer->Delete();
+      observer2);
+    observer2->Delete();
 
     this->RubberBandZoom = vtkInteractorStyleRubberBandZoom::New();
     }

@@ -1,6 +1,0 @@
-<ParaViewReaders>
-
-  <Proxy group="sources" name="XMLImageDataReader"/>
-  <Proxy group="sources" name="StridedReader"/>
-
-</ParaViewReaders>

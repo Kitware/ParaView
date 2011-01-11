@@ -953,7 +953,7 @@ The Sphere source can be used to add a polygonal sphere to the 3D scene. The out
          command="SetThetaResolution"
          number_of_elements="1"
          default_values="8" >
-        <IntRangeDomain name="range" min="3" max="1024" />
+        <IntRangeDomain name="range" min="3" />
         <Documentation>
           The value of this property represents the number of divisions between Start Theta and End Theta around the sphere. (See the Start Theta and End Theta properties.) The theta divisions are similar to longitude lines on the earth. The higher the resolution, the closer the approximation will come to a sphere, and the more polygons there will be.
         </Documentation>
@@ -988,7 +988,7 @@ The Sphere source can be used to add a polygonal sphere to the 3D scene. The out
          command="SetPhiResolution"
          number_of_elements="1"
          default_values="8" >
-        <IntRangeDomain name="range" min="3" max="1024" />
+        <IntRangeDomain name="range" min="3" />
         <Documentation>
           The value of this property represents the number of divisions between Start Phi and End Phi on the sphere. (See the Start Phi and End Phi properties.) The phi divisions are similar to latitude lines on the earth.
         </Documentation>

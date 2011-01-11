@@ -12,12 +12,11 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPriorityHelper - updates input conditionally
+// .NAME vtkPriorityHelper - partially updates the input
 // .SECTION Description
-// During info gathering, Streaming paraview adds this to the end of the 
-// pipeline so that it can check each piece's priority before updating the 
-// piece. If a piece has a priority of 0, it is skipped and the rest tested 
-// in sequence.
+// When the servermanager drives the data processing pipeline, for example,
+// when filling in the information tab, the streaming View plugin
+// adds this to pipeline so that it can prevent whole data updates.
 
 #ifndef __vtkPriorityHelper_h
 #define __vtkPriorityHelper_h
@@ -33,38 +32,35 @@ class VTK_EXPORT vtkPriorityHelper : public vtkObject
 public:
   static vtkPriorityHelper* New();
   vtkTypeMacro(vtkPriorityHelper, vtkObject);
-  
+
+  // Descrition:
+  // Tell it what filter you want to control.
   void SetInputConnection(vtkAlgorithmOutput *input);
 
-  int SetSplitUpdateExtent(int port, 
-                           int piece, int offset,
-                           int numPieces, 
-                           int nPasses,
-                           int ghostLevel,
-                           int save);
-  
-  virtual double ComputePriority();
+  // Description:
+  // Tell it what piece you want to get out of that filter.
+  int SetSplitUpdateExtent(int port, //input filter's n'th output port
+                           int processors, //parallel rank
+                           int numProcessors, //parallel number of processes
+                           int pass, //streaming pass
+                           int numPasses, //streaming number of passes
+                           double resolution); //streaming resolution
 
-  vtkDataObject *ConditionallyGetDataObject();
-  void ConditionallyUpdate();
+  // Description:
+  // Get the data produced.
+  vtkDataObject *GetDataObject();
 
-  void EnableStreamMessagesOn() { this->EnableStreamMessages = 1;}
-  void EnableCullingOff() { this->EnableCulling = 0;}
+  // Description:
+  // Update the pipeline.
+  void Update();
+
 protected:
   vtkPriorityHelper();
   ~vtkPriorityHelper();
 
-  vtkDataObject *InternalUpdate(bool ReturnObject);
-
   vtkAlgorithm *Input;
   int Port;
-  int Piece;
-  int Offset;
-  int NumPieces;
-  int NumPasses;
 
-  int EnableCulling;
-  int EnableStreamMessages;
 private:
   vtkPriorityHelper(const vtkPriorityHelper&); // Not implemented
   void operator=(const vtkPriorityHelper&); // Not implemented
