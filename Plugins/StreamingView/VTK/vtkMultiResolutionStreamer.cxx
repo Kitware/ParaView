@@ -200,7 +200,6 @@ void vtkMultiResolutionStreamer::PrepareFirstPass()
 
     if ((this->ProgressionMode == MANUAL && manualCommand == COARSEN))
       {
-      cerr << "COARSENING " << harness << endl;
       this->Coarsen(harness);
       }
     harness->SetNoneToRefine(true);
