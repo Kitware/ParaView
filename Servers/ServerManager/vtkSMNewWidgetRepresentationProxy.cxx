@@ -33,6 +33,7 @@
 #include "vtkSMRenderViewProxy.h"
 #include "vtkSMSession.h"
 #include "vtkSMViewProxy.h"
+#include "vtkSMWidgetRepresentationProxy.h"
 #include "vtkWeakPointer.h"
 #include "vtkWidgetRepresentation.h"
 
@@ -183,12 +184,14 @@ void vtkSMNewWidgetRepresentationProxy::CreateVTKObjects()
       info->Copy(prop);
       
       vtkSMPropertyLink* link = vtkSMPropertyLink::New();
-      link->AddLinkedProperty(this, 
+
+      link->AddLinkedProperty(this,
                               piter->GetKey(), 
                               vtkSMLink::OUTPUT);
-      link->AddLinkedProperty(this, 
+      link->AddLinkedProperty(this,
                               this->GetPropertyName(info),
                               vtkSMLink::INPUT);
+
       this->Internal->Links.push_back(link);
       link->Delete();
       }
@@ -202,21 +205,21 @@ void vtkSMNewWidgetRepresentationProxy::ExecuteEvent(unsigned long event)
 {
   this->InvokeEvent(event);
 
+  vtkSMWidgetRepresentationProxy* widgetRepresentation =
+      vtkSMWidgetRepresentationProxy::SafeDownCast(this->RepresentationProxy);
+
   if (event == vtkCommand::StartInteractionEvent)
     {
     vtkPVGenericRenderWindowInteractor* inter =
-      vtkPVGenericRenderWindowInteractor::SafeDownCast(
-        this->Widget->GetInteractor());
+        vtkPVGenericRenderWindowInteractor::SafeDownCast(
+            this->Widget->GetInteractor());
     if (inter)
       {
       inter->InteractiveRenderEnabledOn();
       }
-    vtkSMProperty* startInt = 
-      this->RepresentationProxy->GetProperty("OnStartInteraction");
-    if (startInt)
+    if(widgetRepresentation)
       {
-      startInt->Modified();
-      this->RepresentationProxy->UpdateProperty("OnStartInteraction");
+      widgetRepresentation->OnStartInteraction();
       }
     }
   else if (event == vtkCommand::InteractionEvent)
@@ -224,36 +227,30 @@ void vtkSMNewWidgetRepresentationProxy::ExecuteEvent(unsigned long event)
     this->RepresentationProxy->UpdatePropertyInformation();
     this->UpdateVTKObjects();
 
-    vtkSMProperty* interaction = 
-      this->RepresentationProxy->GetProperty("OnInteraction");
-    if (interaction)
+    if(widgetRepresentation)
       {
-      interaction->Modified();
-      this->RepresentationProxy->UpdateProperty("OnInteraction");
+      widgetRepresentation->OnInteraction();
       }
     }
   else if (event == vtkCommand::EndInteractionEvent)
     {
     vtkPVGenericRenderWindowInteractor* inter =
-      vtkPVGenericRenderWindowInteractor::SafeDownCast(
-        this->Widget->GetInteractor());
+        vtkPVGenericRenderWindowInteractor::SafeDownCast(
+            this->Widget->GetInteractor());
     if (inter)
       {
       inter->InteractiveRenderEnabledOff();
       }
-    vtkSMProperty* sizeHandles = 
-      this->RepresentationProxy->GetProperty("SizeHandles");
+    vtkSMProperty* sizeHandles =
+        this->RepresentationProxy->GetProperty("SizeHandles");
     if (sizeHandles)
       {
       sizeHandles->Modified();
       this->RepresentationProxy->UpdateProperty("SizeHandles");
       }
-    vtkSMProperty* endInt = 
-      this->RepresentationProxy->GetProperty("OnEndInteraction");
-    if (endInt)
+    if(widgetRepresentation)
       {
-      endInt->Modified();
-      this->RepresentationProxy->UpdateProperty("OnEndInteraction");
+      widgetRepresentation->OnEndInteraction();
       }
     }
 }

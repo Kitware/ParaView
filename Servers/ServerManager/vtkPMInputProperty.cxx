@@ -54,6 +54,13 @@ bool vtkPMInputProperty::ReadXMLAttributes(
 //----------------------------------------------------------------------------
 bool vtkPMInputProperty::Push(vtkSMMessage* message, int offset)
 {
+  if(!this->GetCommand())
+    {
+    // It is fine to have a property without command but then we do nothing
+    // here at the server side...
+    return true;
+    }
+
   assert(message->ExtensionSize(ProxyState::property) > offset);
   const ProxyState_Property *prop = &message->GetExtension(ProxyState::property,
     offset);

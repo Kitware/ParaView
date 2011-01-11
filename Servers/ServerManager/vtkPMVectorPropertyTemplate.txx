@@ -291,7 +291,10 @@ bool vtkPMVectorPropertyTemplate<T, force_idtype>::Pull(vtkSMMessage* message)
 
   if (!this->GetCommand())
     {
-    return false;
+    // I would say that we should return false since an InformationOnly property
+    // as no meaning if no command is set, but for some legacy reason we just
+    // skip the processing if no command is provided.
+    return true;
     }
 
   // Invoke property's method on the root node of the server

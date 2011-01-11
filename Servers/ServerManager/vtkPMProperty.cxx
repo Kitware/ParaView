@@ -157,7 +157,7 @@ void vtkPMProperty::PrintSelf(ostream& os, vtkIndent indent)
 //          and not for value property.
 bool vtkPMProperty::Push(vtkSMMessage*, int)
 {
-  if (this->InformationOnly || !this->Command)
+  if (this->InformationOnly || !this->Command || this->UpdateSelf)
     {
     return true;
     }
