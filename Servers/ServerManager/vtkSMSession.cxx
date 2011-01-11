@@ -258,7 +258,7 @@ vtkIdType vtkSMSession::ConnectToRemote(const char* hostname, int port)
     {
     session->Initialize();
     vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-    vtkIdType sid = pm->RegisterSession(session);
+    sid = pm->RegisterSession(session);
     }
   session->Delete();
   return sid;
@@ -277,7 +277,7 @@ vtkIdType vtkSMSession::ConnectToRemote(const char* dshost, int dsport,
     {
     session->Initialize();
     vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-    vtkIdType sid = pm->RegisterSession(session);
+    sid = pm->RegisterSession(session);
     }
   session->Delete();
   return sid;
