@@ -230,7 +230,6 @@ void pqServer::setHeartBeatTimeout(int msec)
 //-----------------------------------------------------------------------------
 void pqServer::heartBeat()
 {
-  abort();
 #ifdef FIXME_COLLABORATION
   // Need a API on vtkSMSession for heart-beats.
   //vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
