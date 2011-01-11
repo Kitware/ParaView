@@ -175,7 +175,8 @@ int vtkACosmoReader::RequestInformation(
       }
 
     int totalpieces = (int)
-    ((pow((float)this->splits, this->maxlevel + 1) - 1) / (this->splits - 1));
+      ((pow((float)this->splits, (int)(this->maxlevel + 1)) - 1) /
+       (this->splits - 1));
     this->pieceBounds = new float[6 * totalpieces];
 
     // actually read the meta data
@@ -195,7 +196,7 @@ int vtkACosmoReader::RequestInformation(
       *meta >> bounds[5];
 
       piecelevel = (int)
-        ((pow((float)this->splits, piecelevel) - 1) / (this->splits - 1));
+        ((pow((float)this->splits, (int)piecelevel) - 1) / (this->splits - 1));
       piecenumber = (piecelevel + piecenumber) * 6;
 
       this->pieceBounds[piecenumber + 0] = bounds[0];
@@ -244,7 +245,8 @@ int vtkACosmoReader::RequestInformation(
     }
 
   int index = (int)
-    ((pow((float)this->splits, this->currentLevel) - 1) / (this->splits - 1));
+    ((pow((float)this->splits, (int)this->currentLevel) - 1) /
+     (this->splits - 1));
   index = (index + this->PieceNumber) * 6;
 
   bounds[0] = this->pieceBounds[index + 0];
@@ -560,7 +562,8 @@ int vtkACosmoReader::ProcessRequest(vtkInformation *request,
     }
 
   int index = (int)
-    ((pow((float)this->splits, this->currentLevel) - 1) / (this->splits - 1));
+    ((pow((float)this->splits, (int)this->currentLevel) - 1) /
+     (this->splits - 1));
   index = (index + this->PieceNumber) * 6;
 
   double bounds[6];
