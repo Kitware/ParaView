@@ -167,6 +167,7 @@ namespace pvstream
               delete[] dArray;
               break;
 
+            case vtkClientServerStream::bool_value:
             case vtkClientServerStream::int16_value:
             case vtkClientServerStream::int8_value:
             case vtkClientServerStream::uint8_value:
@@ -211,6 +212,9 @@ namespace pvstream
             case vtkClientServerStream::uint32_array:
             case vtkClientServerStream::uint64_array:
             case vtkClientServerStream::int64_array:
+            case vtkClientServerStream::vtk_object_pointer:
+            case vtkClientServerStream::LastResult:
+            case vtkClientServerStream::End:
                cout << "Type not managed yet !!!" << endl;
                break;
             }
@@ -218,6 +222,8 @@ namespace pvstream
         break;
       case vtkClientServerStream::Error:
         resp._message->SetExtension(paraview_protobuf::InvokeResponse::error, true);
+        break;
+      default:
         break;
       }
     _InvokeResponseEnd r;
