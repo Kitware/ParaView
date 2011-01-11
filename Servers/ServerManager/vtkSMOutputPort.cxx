@@ -844,12 +844,9 @@ void vtkSMOutputPort::SetUseStreaming(bool value)
 };
 
 //----------------------------------------------------------------------------
-void vtkSMOutputPort::SetDefaultPiece(int dp, int dnp, int dr)
+void vtkSMOutputPort::SetDefaultPiece(int dp, int dnp, double dr)
 {
   vtkSMOutputPort::DefaultPass = dp;
   vtkSMOutputPort::DefaultNumPasses = dnp;
   vtkSMOutputPort::DefaultResolution = dr;
 };
-
-
-

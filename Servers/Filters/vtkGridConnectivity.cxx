@@ -474,7 +474,7 @@ vtkGridConnectivity::vtkGridConnectivity()
   this->FaceHash = 0;
   this->Controller = vtkMultiProcessController::GetGlobalController();
   this->ProcessId = this->Controller?
-    this->Controller->GetLocalProcessId() : NULL;
+    this->Controller->GetLocalProcessId() : 0;
 }
 
 //-----------------------------------------------------------------------------

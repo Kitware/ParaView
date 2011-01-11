@@ -1,3 +1,4 @@
+
 /*=========================================================================
 
   Program:   Visualization Toolkit
@@ -283,9 +284,9 @@ void vtkGridSampler2::ComputeAtResolution(double r)
   this->SamplingValid = true;
   this->RequestedResolution = r;
 
-  this->Strides[0] = this->SuggestSampling(0);
-  this->Strides[1] = this->SuggestSampling(1);
-  this->Strides[2] = this->SuggestSampling(2);
+  this->Strides[0] = (int)this->SuggestSampling(0);
+  this->Strides[1] = (int)this->SuggestSampling(1);
+  this->Strides[2] = (int)this->SuggestSampling(2);
 
   /*
   cout << this->Strides[0] << " "
