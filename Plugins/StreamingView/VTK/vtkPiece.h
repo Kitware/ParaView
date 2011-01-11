@@ -124,7 +124,7 @@ public:
   // Description:
   // A hack to help multires.
   void SetReapedFlag(bool nv) { this->ReapedFlag = nv; }
-  int GetReapedFlag() { return this->ReapedFlag; }
+  bool GetReapedFlag() { return this->ReapedFlag; }
 
 protected:
 
