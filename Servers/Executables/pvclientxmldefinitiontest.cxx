@@ -47,7 +47,7 @@ int main(int argc, char* argv[])
 
   cout << "Starting..." << endl;
 
-  vtkSMProxyManager* pxm = session->GetProxyManager();
+  vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
   vtkProcessModule::GetProcessModule()->RegisterSession(session);
 
   //================= Get ProxyDefinition from server =====================

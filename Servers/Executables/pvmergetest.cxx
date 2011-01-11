@@ -54,7 +54,7 @@ int main(int argc, char* argv[])
 
   cout << "Starting..." << endl;
 
-  vtkSMProxyManager* pxm = session->GetProxyManager();
+  vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
 
   vtkPVXMLElement* def = pxm->GetProxyDefinitionManager()->
                          GetCollapsedProxyDefinition( "representations",

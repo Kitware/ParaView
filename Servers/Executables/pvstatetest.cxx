@@ -52,7 +52,7 @@ int main(int argc, char* argv[])
     }
 
   cout << "Starting..." << endl;
-  vtkSMProxyManager* pxm = session->GetProxyManager();
+  vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
   vtkSMMessage origin, editA, editB, editC;
   // ==========================================================================
 

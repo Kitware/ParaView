@@ -37,7 +37,7 @@ int main(int argc, char* argv[])
   vtkSMSession* session = vtkSMSession::New();
   cout << "Starting..." << endl;
 
-  vtkSMProxyManager* pxm = session->GetProxyManager();
+  vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
 
   // *******************************************************************
   // Test specific code

@@ -48,7 +48,7 @@ int main(int argc, char* argv[])
     }
 
   cout << "==== Starting ====" << endl;
-  vtkSMProxyManager* pxm = session->GetProxyManager();
+  vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
 
   // location 1
   vtkSMProxy* client = pxm->NewProxy("utils", "clientPID");

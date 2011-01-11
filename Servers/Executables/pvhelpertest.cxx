@@ -55,7 +55,7 @@ int main(int argc, char* argv[])
 
   cout << "Starting..." << endl;
 
-  vtkSMProxyManager* pxm = session->GetProxyManager();
+  vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
 
   proxy = pxm->NewProxy("internal_sources", "ExodusIIReaderCore");
   vtkSMPropertyHelper(proxy, "FileName").Set("/home/seb/Kitware/Projects/ParaView3/code/git/ParaViewData/Data/can.ex2");

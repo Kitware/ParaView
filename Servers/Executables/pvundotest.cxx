@@ -63,7 +63,7 @@ int main(int argc, char* argv[])
 
   cout << "Starting..." << endl;
 
-  vtkSMProxyManager* pxm = session->GetProxyManager();
+  vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
   vtkstd::vector<vtkTypeUInt32> sphereIds;
 
   for(int i=0;i<10;i++)
