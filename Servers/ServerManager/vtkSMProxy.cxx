@@ -51,7 +51,7 @@ public:
     {
     if (this->Proxy)
       {
-      if (this->PropertyName.c_str())
+      if (!this->PropertyName.empty())
         {
         // This is observing a property.
         this->Proxy->SetPropertyModifiedFlag(this->PropertyName.c_str(), 1);
