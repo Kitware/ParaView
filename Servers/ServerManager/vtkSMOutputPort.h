@@ -121,7 +121,7 @@ public:
   // Description:
   // Streaming plugin uses this to specify the prototypical piece to update
   // the get information from.
-  static void SetDefaultPiece(int dp, int dnp, int dr);
+  static void SetDefaultPiece(int dp, int dnp, double dr);
 
 protected:
   vtkSMOutputPort();
