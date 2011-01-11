@@ -364,6 +364,13 @@ int vtkSMProperty::ReadXMLAttributes(vtkSMProxy* vtkNotUsed(proxy),
       this->SetHints(domainEl);
       continue;
       }
+    else if ( vtkstd::string(domainEl->GetName()).find("InformationHelper") !=
+              vtkstd::string::npos)
+      {
+      // InformationHelper are used to extract information from VTK object
+      // therefore they are not used on the proxy side (SM).
+      continue;
+      }
 
     // Everything else is assumed to be a domain element.
     vtkObject* object = 0;

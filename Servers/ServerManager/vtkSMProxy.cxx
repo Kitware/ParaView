@@ -499,7 +499,7 @@ void vtkSMProxy::UpdatePropertyInformationInternal(
     {
     if (single_property->GetInformationOnly())
       {
-      var->add_txt(it->first.c_str());
+      var->add_txt(single_property->GetXMLName());
       some_thing_to_fetch = true;
       }
     }

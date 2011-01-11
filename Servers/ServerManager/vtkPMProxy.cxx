@@ -412,6 +412,71 @@ bool vtkPMProxy::ReadXMLSubProxy(vtkPVXMLElement* )
   // vtkErrorMacro("Not supported yet.");
   return true;
 }
+//----------------------------------------------------------------------------
+// FIXME COLLABORATION : For now we dynamically convert InformationHelper
+// into the correct kernel_class and attribute sets.
+// THIS CODE MUST BE REMOVED once InformationHelper have been removed from
+// legacy XML
+void vtkPMProxy::PatchXMLProperty(vtkPVXMLElement* propElement)
+{
+  vtkPVXMLElement* informationHelper = NULL;
+
+  // Search InformationHelper XML element
+  for(unsigned int i=0; i < propElement->GetNumberOfNestedElements(); ++i)
+    {
+    vtkPVXMLElement* currentElement = propElement->GetNestedElement(i);
+    if ( vtkstd::string(currentElement->GetName()).find("InformationHelper") !=
+         vtkstd::string::npos)
+      {
+      informationHelper = currentElement;
+      break;
+      }
+    }
+
+  // Process InformationHelper
+  if(informationHelper)
+    {
+    if(strcmp(informationHelper->GetName(),"StringArrayHelper") == 0
+       || strcmp(informationHelper->GetName(),"DoubleArrayInformationHelper") == 0
+       || strcmp(informationHelper->GetName(),"IntArrayInformationHelper") == 0 )
+      {
+      propElement->SetAttribute("kernel_class", "vtkPMDataArrayProperty");
+      }
+    else if (strcmp(informationHelper->GetName(),"TimeStepsInformationHelper") == 0)
+      {
+      propElement->SetAttribute("kernel_class", "vtkPMTimeStepsProperty");
+      }
+    else if (strcmp(informationHelper->GetName(),"TimeRangeInformationHelper") == 0)
+      {
+      propElement->SetAttribute("kernel_class", "vtkPMTimeRangeProperty");
+      }
+    else if (strcmp(informationHelper->GetName(),"SILInformationHelper") == 0)
+      {
+      propElement->SetAttribute("kernel_class", "vtkPMSILProperty");
+      propElement->SetAttribute("subtree", informationHelper->GetAttribute("subtree"));
+      }
+    else if (strcmp(informationHelper->GetName(),"ArraySelectionInformationHelper") == 0)
+      {
+      propElement->SetAttribute("kernel_class", "vtkPMArraySelectionProperty");
+      propElement->SetAttribute("command", informationHelper->GetAttribute("attribute_name"));
+      }
+    else if(strcmp(informationHelper->GetName(),"SimpleDoubleInformationHelper") == 0
+            || strcmp(informationHelper->GetName(),"SimpleIntInformationHelper") == 0
+            || strcmp(informationHelper->GetName(),"SimpleIdTypeInformationHelper") == 0 )
+      {
+      // Nothing to do, just remove them
+      }
+    else
+      {
+      vtkWarningMacro(
+          << "No PMProperty for the following information helper: "
+          << informationHelper->GetName() );
+      }
+
+    // Remove InformationHelper from XML
+    propElement->RemoveNestedElement(informationHelper);
+    }
+}
 
 //----------------------------------------------------------------------------
 bool vtkPMProxy::ReadXMLProperty(vtkPVXMLElement* propElement)
@@ -420,6 +485,9 @@ bool vtkPMProxy::ReadXMLProperty(vtkPVXMLElement* propElement)
   // properties.
   const char* name = propElement->GetAttribute("name");
   assert(name && this->GetPropertyHelper(name) == NULL);
+
+  // Patch XML to remove InformationHelper and set right kernel_class
+  this->PatchXMLProperty(propElement);
 
   vtkSmartPointer<vtkObject> object;
   vtkstd::string classname;
