@@ -1774,7 +1774,6 @@
         name="Position"
         command="SetAbsolutePosition"
         number_of_elements="3"
-        update_self="1"
         label="Translate"
         information_property="PositionInfo"
         default_values="0.0 0.0 0.0" >
@@ -1782,7 +1781,7 @@
       </DoubleVectorProperty>
 
       <DoubleVectorProperty name="PositionInfo"
-        command="GetAbsolutePosition"
+        command="GetPosition"
         information_only="1"
         number_of_elements="3"
         default_values="0.0 0.0 0.0" />
@@ -1791,7 +1790,6 @@
         name="Rotation"
         command="SetAbsoluteRotation"
         number_of_elements="3"
-        update_self="1"
         information_property="RotationInfo"
         label="Rotate"
         default_values="0.0 0.0 0.0" >
@@ -1799,7 +1797,7 @@
       </DoubleVectorProperty>
 
       <DoubleVectorProperty name="RotationInfo"
-        command="GetAbsoluteRotation"
+        command="GetOrientation"
         information_only="1"
         number_of_elements="3"
         default_values="0.0 0.0 0.0" />
@@ -1808,7 +1806,6 @@
         name="Scale"
         command="SetAbsoluteScale"
         number_of_elements="3"
-        update_self="1"
         label="Scale"
         information_property="ScaleInfo"
         default_values="1.0 1.0 1.0" >
@@ -1816,7 +1813,7 @@
       </DoubleVectorProperty>
 
       <DoubleVectorProperty name="ScaleInfo"
-        command="GetAbsoluteScale"
+        command="GetScale"
         information_only="1"
         number_of_elements="3"
         default_values="1.0 1.0 1.0" />
