@@ -154,7 +154,8 @@ pqProxy* pqStandardServerManagerModelInterface::createPQProxy(
       return new pqAnimationScene(group, name, proxy, server, 0);
       }
     else if (xml_type == "KeyFrameAnimationCue" ||
-      xml_type == "CameraAnimationCue")
+      xml_type == "CameraAnimationCue" ||
+      xml_type == "TimeAnimationCue")
       {
       return new pqAnimationCue(group, name, proxy, server, 0);
       }
@@ -162,6 +163,7 @@ pqProxy* pqStandardServerManagerModelInterface::createPQProxy(
 
   if (proxy->IsA("vtkSMAnimationCueProxy"))
     {
+    // FIXME_COLLABORATION
     // pqAnimationCue is created for all cues (even internal ones that get
     // created for comparative vis).
     return new pqAnimationCue(group, name, proxy, server, 0);
