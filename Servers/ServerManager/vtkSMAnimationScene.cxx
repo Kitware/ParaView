@@ -72,8 +72,7 @@ vtkSMAnimationScene::vtkSMAnimationScene()
   this->TimeRangeObserverID = 0;
   this->TimestepValuesObserverID = 0;
   this->AnimationPlayer = vtkCompositeAnimationPlayer::New();
-  // this needs to not be reference counted, we are causing a reference-loop
-  // here.
+  // vtkAnimationPlayer::SetAnimationScene() is not reference counted.
   this->AnimationPlayer->SetAnimationScene(this);
   this->Internals = new vtkInternals();
 }
@@ -82,6 +81,10 @@ vtkSMAnimationScene::vtkSMAnimationScene()
 vtkSMAnimationScene::~vtkSMAnimationScene()
 {
   this->SetTimeKeeper(NULL);
+
+  this->AnimationPlayer->Delete();
+  this->AnimationPlayer = NULL;
+
   delete this->Internals;
   this->Internals = NULL;
 }

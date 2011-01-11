@@ -20,6 +20,7 @@
 #define __vtkAnimationPlayer_h
 
 #include "vtkObject.h"
+#include "vtkWeakPointer.h" // needed for vtkWeakPointer.
 
 class vtkPVAnimationScene;
 class VTK_EXPORT vtkAnimationPlayer : public vtkObject
@@ -30,8 +31,9 @@ public:
 
   // Description:
   // Set the animation scene that is to be played by this player.
-  void SetAnimationScene(vtkPVAnimationScene*);
-  vtkGetObjectMacro(AnimationScene, vtkPVAnimationScene);
+  // Note that the animation scene is not reference counted to avoid loops.
+  virtual void SetAnimationScene(vtkPVAnimationScene*);
+  vtkPVAnimationScene* GetAnimationScene();
 
   // Description:
   // Start playing the animation.
@@ -88,7 +90,7 @@ private:
   vtkAnimationPlayer(const vtkAnimationPlayer&); // Not implemented
   void operator=(const vtkAnimationPlayer&); // Not implemented
 
-  vtkPVAnimationScene* AnimationScene;
+  vtkWeakPointer<vtkPVAnimationScene> AnimationScene;
   bool InPlay;
   bool StopPlay;
   bool Loop;

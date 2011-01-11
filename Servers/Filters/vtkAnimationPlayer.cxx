@@ -18,7 +18,6 @@
 #include "vtkCommand.h"
 #include "vtkObjectFactory.h"
 
-vtkCxxSetObjectMacro(vtkAnimationPlayer, AnimationScene, vtkPVAnimationScene);
 //----------------------------------------------------------------------------
 vtkAnimationPlayer::vtkAnimationPlayer()
 {
@@ -33,6 +32,22 @@ vtkAnimationPlayer::vtkAnimationPlayer()
 vtkAnimationPlayer::~vtkAnimationPlayer()
 {
   this->SetAnimationScene(0);
+}
+
+//----------------------------------------------------------------------------
+void vtkAnimationPlayer::SetAnimationScene(vtkPVAnimationScene* scene)
+{
+  if (this->AnimationScene != scene)
+    {
+    this->AnimationScene = scene;
+    this->Modified();
+    }
+}
+
+//----------------------------------------------------------------------------
+vtkPVAnimationScene* vtkAnimationPlayer::GetAnimationScene()
+{
+  return this->AnimationScene;
 }
 
 //----------------------------------------------------------------------------
