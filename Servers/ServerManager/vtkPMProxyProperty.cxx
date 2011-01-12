@@ -212,18 +212,12 @@ bool vtkPMProxyProperty::Push(vtkSMMessage* message, int offset)
   for (size_t cc=0; cc < proxy_ids.size(); cc++)
     {
     vtkObjectBase* arg = this->GetObject(proxy_ids[cc]);
-    if(arg != NULL)
-      {
-      stream << vtkClientServerStream::Invoke
-             << objectId
-             << this->GetCommand()
-             << arg
-             << vtkClientServerStream::End;
-      }
-    else
-      {
-      vtkWarningMacro("Try to ADD a Proxy to a ProxyProperty but the proxy was not found");
-      }
+    // Args can be NULL, but it's a wanted behaviour that is use to reset the value
+    stream << vtkClientServerStream::Invoke
+           << objectId
+           << this->GetCommand()
+           << arg
+           << vtkClientServerStream::End;
     }
 
   // Take care of the Empty case

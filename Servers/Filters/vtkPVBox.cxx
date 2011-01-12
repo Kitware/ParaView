@@ -65,6 +65,7 @@ void vtkPVBox::UpdateTransform()
   trans->RotateX(this->Rotation[0]);
   trans->RotateY(this->Rotation[1]);
   trans->Scale(this->Scale);
+  trans->Inverse();
   this->SetTransform(trans);
   trans->Delete();
 }
