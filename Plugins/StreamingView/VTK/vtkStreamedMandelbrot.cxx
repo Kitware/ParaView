@@ -185,10 +185,11 @@ int vtkStreamedMandelbrot::RequestInformation (
 }
 
 //----------------------------------------------------------------------------
-int vtkStreamedMandelbrot::RequestData(
-  vtkInformation* request,
-  vtkInformationVector** inputVector,
-  vtkInformationVector* outputVector)
+int vtkStreamedMandelbrot::RequestData
+(
+ vtkInformation* vtkNotUsed(request),
+ vtkInformationVector** vtkNotUsed(inputVector),
+ vtkInformationVector* outputVector)
 {
   // get the output
   vtkInformation *outInfo = outputVector->GetInformationObject(0);

@@ -85,7 +85,7 @@ int vtkPieceCacheExecutive
 
   // See if the cached data is invalid.
   unsigned long pmt = this->GetPipelineMTime();
-  if (myPCF->GetMTime(index) < pmt)
+  if (myPCF->GetPieceMTime(index) < pmt)
     {
     myPCF->DeletePiece(index);
     return 1;

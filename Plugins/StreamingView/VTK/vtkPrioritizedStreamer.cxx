@@ -115,7 +115,7 @@ void vtkPrioritizedStreamer::ResetEveryone()
       double priority = 1.0;
       if (this->PipelinePrioritization)
         {
-        priority = harness->ComputePriority(i,max,1.0);
+        priority = harness->ComputePiecePriority(i,max,1.0);
         }
       DEBUGPRINT_PRIORITY
         (
@@ -132,7 +132,7 @@ void vtkPrioritizedStreamer::ResetEveryone()
       double aMin = 1.0;
       double aMax = -1.0;
       double aConf = 1.0;
-      harness->ComputeMetaInformation
+      harness->ComputePieceMetaInformation
         (i, max, 1.0,
          pbbox, gConf, aMin, aMax, aConf);
       double gPri = 1.0;

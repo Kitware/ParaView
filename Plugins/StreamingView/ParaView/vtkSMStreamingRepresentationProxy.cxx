@@ -133,6 +133,6 @@ void vtkSMStreamingRepresentationProxy::AddInput
                    stream);
     }
 
-  this->PieceCache->AddInput(0, input, outputPort, method);
+  this->PieceCache->AddInput(inputPort, input, outputPort, method);
   this->Superclass::AddInput(0, this->Harness, 0, "SetInputConnection");
 }

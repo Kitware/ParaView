@@ -117,10 +117,11 @@ int vtkStreamingHarness::ProcessRequest(
 }
 
 //----------------------------------------------------------------------------
-int vtkStreamingHarness::RequestUpdateExtent(
-  vtkInformation* request,
-  vtkInformationVector** inputVector,
-  vtkInformationVector* outputVector)
+int vtkStreamingHarness::RequestUpdateExtent
+(
+ vtkInformation* vtkNotUsed(request),
+ vtkInformationVector** inputVector,
+ vtkInformationVector* outputVector)
 {
   if (!this->ForOther)
     {
@@ -160,10 +161,11 @@ int vtkStreamingHarness::RequestUpdateExtent(
 
 
 //----------------------------------------------------------------------------
-int vtkStreamingHarness::RequestData(
-  vtkInformation* request,
-  vtkInformationVector** inputVector,
-  vtkInformationVector* outputVector)
+int vtkStreamingHarness::RequestData
+(
+ vtkInformation* vtkNotUsed(request),
+ vtkInformationVector** inputVector,
+ vtkInformationVector* outputVector)
 {
   vtkInformation* inInfo = inputVector[0]->GetInformationObject(0);
   vtkInformation* outInfo = outputVector->GetInformationObject(0);
@@ -178,7 +180,7 @@ int vtkStreamingHarness::RequestData(
 }
 
 //----------------------------------------------------------------------------
-double vtkStreamingHarness::ComputePriority(
+double vtkStreamingHarness::ComputePiecePriority(
   int piece, int NumPieces, double resolution)
 {
   //TODO: Can I do this without changing the pipeline's state and setting
@@ -216,7 +218,7 @@ double vtkStreamingHarness::ComputePriority(
 }
 
 //----------------------------------------------------------------------------
-void vtkStreamingHarness::ComputeMetaInformation(
+void vtkStreamingHarness::ComputePieceMetaInformation(
   int piece, int NumPieces, double resolution,
   double bounds[6], double &gconfidence,
   double &min, double &max, double &aconfidence)

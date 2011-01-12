@@ -112,7 +112,7 @@ vtkDataSet * vtkPieceCacheFilter::GetPiece(int pieceNum )
 }
 
 //----------------------------------------------------------------------------
-unsigned long vtkPieceCacheFilter::GetMTime(int pieceNum)
+unsigned long vtkPieceCacheFilter::GetPieceMTime(int pieceNum)
 {
   CacheType::iterator pos = this->Cache.find(pieceNum);
   if (pos != this->Cache.end())

@@ -228,7 +228,7 @@ void vtkMultiResolutionStreamer::PrepareFirstPass()
       double priority = 1.0;
       if (this->PipelinePrioritization)
         {
-        priority = harness->ComputePriority(p, np, res);
+        priority = harness->ComputePiecePriority(p, np, res);
         }
       DEBUGPRINT_PRIORITY
         (
@@ -245,7 +245,7 @@ void vtkMultiResolutionStreamer::PrepareFirstPass()
       double aMin = 1.0;
       double aMax = -1.0;
       double aConf = 1.0;
-      harness->ComputeMetaInformation
+      harness->ComputePieceMetaInformation
         (p, np, res,
          pbbox, gConf, aMin, aMax, aConf);
       double gPri = 1.0;
@@ -320,8 +320,8 @@ void vtkMultiResolutionStreamer::ChooseNextPieces()
       //TODO:
       //This should not be necessary, but the PieceCacheFilter is silently
       //producing the stale (lower res?) results without it.
-      harness->ComputePriority(p.GetPiece(), p.GetNumPieces(),
-                               p.GetResolution());
+      harness->ComputePiecePriority(p.GetPiece(), p.GetNumPieces(),
+                                    p.GetResolution());
       }
     }
 
