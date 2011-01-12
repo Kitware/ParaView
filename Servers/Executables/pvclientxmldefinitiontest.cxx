@@ -43,6 +43,7 @@ int main(int argc, char* argv[])
   vtkSMProxy* proxy = NULL;
 
   session = vtkSMSessionClient::New();
+  session->Initialize();
   vtkSMSessionClient::SafeDownCast(session)->Connect("cs://localhost:11111");
 
   cout << "Starting..." << endl;

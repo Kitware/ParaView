@@ -40,6 +40,7 @@ int main(int argc, char* argv[])
   vtkSmartPointer<vtkPVXMLElement> xmlRootNodeLoaded;
   //---------------------------------------------------------------------------
   vtkSMSession* session = vtkSMSession::New();
+  session->Initialize();
   cout << "==== Starting ====" << endl;
   vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
 

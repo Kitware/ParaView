@@ -45,12 +45,14 @@ int main(int argc, char* argv[])
     {
     // We have a remote URL to use
     session = vtkSMSessionClient::New();
+    session->Initialize();
     vtkSMSessionClient::SafeDownCast(session)->Connect(options->GetUnknownArgument());
     }
   else
     {
     // We are in built-in mode
     session = vtkSMSession::New();
+    session->Initialize();
     }
 
   cout << "Starting..." << endl;
