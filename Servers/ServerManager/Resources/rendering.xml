@@ -200,7 +200,6 @@
     <Proxy name="DummyVolumeMapper">
       <IntVectorProperty
         name="ScalarMode"
-        command="SetScalarMode"
         default_values="3"
         number_of_elements="1"
         animateable="0">
@@ -214,7 +213,6 @@
       </IntVectorProperty>
       <StringVectorProperty
         name="SelectScalarArray"
-        command="SelectScalarArray"
         number_of_elements="1"
         animateable="0">
         <ArrayListDomain name="array_list" attribute_type="Scalars">
@@ -466,7 +464,6 @@
           proxygroup="sources" proxyname="NetworkImageSource" />
         <ExposedProperties>
           <Property name="FileName" />
-          <Property name="SourceProcess" />
         </ExposedProperties>
       </SubProxy>
       <IntVectorProperty
