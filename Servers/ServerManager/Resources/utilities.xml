@@ -874,11 +874,15 @@
 
       <DoubleVectorProperty name="StartTimeInfo"
         command="GetStartTime"
-        information_only="1" />
+        information_only="1" >
+        <SimpleDoubleInformationHelper />
+      </DoubleVectorProperty>
 
       <DoubleVectorProperty name="EndTimeInfo"
         command="GetEndTime"
-        information_only="1" />
+        information_only="1" >
+        <SimpleDoubleInformationHelper />
+      </DoubleVectorProperty>
 
       <IntVectorProperty name="LockStartTime"
         command="SetLockStartTime"
@@ -1459,14 +1463,18 @@
         number_of_elements="1"
         information_only="1"
         update_self="1"
-        default_values="0" />
+        default_values="0">
+        <SimpleIntInformationHelper />
+      </IntVectorProperty>
       <IntVectorProperty
         name="ActiveFileIsReadable"
         command="GetActiveFileIsReadable"
         number_of_elements="1"
         information_only="1"
         update_self="1"
-        default_values="0" />
+        default_values="0">
+        <SimpleIntInformationHelper />
+      </IntVectorProperty>
 
       <StringVectorProperty
         name="ActiveFileName"
@@ -1479,7 +1487,9 @@
         name="CurrentWorkingDirectory"
         command="GetCurrentWorkingDirectory"
         number_of_elements="1"
-        information_only="1" />
+        information_only="1">
+        <SimpleStringInformationHelper />
+      </StringVectorProperty>
     </ServerFileListingProxy>
   </ProxyGroup>
 
@@ -1784,7 +1794,9 @@
         command="GetPosition"
         information_only="1"
         number_of_elements="3"
-        default_values="0.0 0.0 0.0" />
+        default_values="0.0 0.0 0.0">
+        <SimpleDoubleInformationHelper />
+      </DoubleVectorProperty>
 
       <DoubleVectorProperty
         name="Rotation"
@@ -1800,7 +1812,9 @@
         command="GetOrientation"
         information_only="1"
         number_of_elements="3"
-        default_values="0.0 0.0 0.0" />
+        default_values="0.0 0.0 0.0">
+        <SimpleDoubleInformationHelper />
+      </DoubleVectorProperty>
 
       <DoubleVectorProperty
         name="Scale"
@@ -1912,6 +1926,7 @@
         command="GetPathSeparator"
         information_only="1"
         number_of_elements="1" >
+        <SimpleStringInformationHelper />
       </StringVectorProperty>
 
       <StringVectorProperty 

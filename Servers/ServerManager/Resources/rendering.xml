@@ -8,6 +8,7 @@
         number_of_elements="3"
         information_only="1"
         default_values="0 0 1">
+        <SimpleDoubleInformationHelper/>
       </DoubleVectorProperty>
 
       <DoubleVectorProperty
@@ -25,6 +26,7 @@
         number_of_elements="3"
         information_only="1"
         default_values="0 0 0">
+        <SimpleDoubleInformationHelper/>
       </DoubleVectorProperty>
 
       <DoubleVectorProperty
@@ -42,6 +44,7 @@
         number_of_elements="3"
         information_only="1"
         default_values="0 1 0">
+        <SimpleDoubleInformationHelper/>
       </DoubleVectorProperty>
 
       <DoubleVectorProperty
@@ -57,6 +60,7 @@
         name="CameraViewAngleInfo"
         command="GetViewAngle"
         information_only="1">
+        <SimpleDoubleInformationHelper />
       </DoubleVectorProperty>
 
       <DoubleVectorProperty
@@ -74,6 +78,7 @@
         number_of_elements="2"
         information_only="1"
         default_values="0.01 1000.01">
+        <SimpleDoubleInformationHelper/>
       </DoubleVectorProperty>
 
       <DoubleVectorProperty
@@ -99,6 +104,7 @@
         number_of_elements="1"
         information_only="1"
         default_values="1.0" >
+        <SimpleDoubleInformationHelper/>
       </DoubleVectorProperty>
 
       <IntVectorProperty
@@ -194,6 +200,7 @@
     <Proxy name="DummyVolumeMapper">
       <IntVectorProperty
         name="ScalarMode"
+        command="SetScalarMode"
         default_values="3"
         number_of_elements="1"
         animateable="0">
@@ -207,6 +214,7 @@
       </IntVectorProperty>
       <StringVectorProperty
         name="SelectScalarArray"
+        command="SelectScalarArray"
         number_of_elements="1"
         animateable="0">
         <ArrayListDomain name="array_list" attribute_type="Scalars">
@@ -458,6 +466,7 @@
           proxygroup="sources" proxyname="NetworkImageSource" />
         <ExposedProperties>
           <Property name="FileName" />
+          <Property name="SourceProcess" />
         </ExposedProperties>
       </SubProxy>
       <IntVectorProperty

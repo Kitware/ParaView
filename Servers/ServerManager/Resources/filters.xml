@@ -3886,7 +3886,6 @@ The Triangle Strips filter converts triangles into triangle strips and lines int
    </SourceProxy>
 
    <!-- ==================================================================== -->
-
    <CompoundSourceProxy name="PlotOnIntersectionCurves" label="Plot On Intersection Curves">
      <Documentation
         short_help="Extracts the edges in a 2D plane and plots them"
@@ -3995,12 +3994,11 @@ The Triangle Strips filter converts triangles into triangle strips and lines int
      </ExposedProperties>
      <OutputPort name="Output" proxy="PlotEdges1" port_index="0"/>
      <Hints>
-       <View type="XYChartView"
-             help="View can be used to specify the preferred view for the proxy"/>
+       <!-- View can be used to specify the preferred view for the proxy -->
+       <View type="XYChartView" />
        <Plotable />
      </Hints>
    </CompoundSourceProxy>
-
    <!-- ==================================================================== -->
    <SourceProxy name="Subdivide" class="vtkLinearSubdivisionFilter">
     <Documentation
@@ -5713,7 +5711,6 @@ The Probe filter samples the data set attributes of the current data set at the 
    </SourceProxy>
 
    <!-- ==================================================================== -->
-
    <CompoundSourceProxy name="ProbeLine" label="Plot Over Line">
      <Documentation
        long_help="Sample data attributes at the points along a line.  Probed lines will be displayed in a graph of the attributes."
@@ -5741,13 +5738,12 @@ The Probe filter samples the data set attributes of the current data set at the 
      <OutputPort name="Output" proxy="AppendArcLength1" port_index="0"/>
      <Hints>
        <Visibility replace_input="0" />
-      <View type="XYChartView"
-            help="View can be used to specify the preferred view for the proxy"/>
+       <!-- View can be used to specify the preferred view for the proxy -->
+      <View type="XYChartView" />
       <Plotable />
      </Hints>
+    <!-- End ProbeLine -->
    </CompoundSourceProxy>
-
-<!-- End ProbeLine -->
 
    <!-- ==================================================================== -->
    <SourceProxy name="Probe" class="vtkPProbeFilter"
@@ -6242,8 +6238,9 @@ The Stream Tracer filter generates streamlines in a vector field from a collecti
 
       <DoubleVectorProperty
          name="TimestepValues"
-         information_only="1"
-         kernel_class="vtkPMTimeStepsProperty"/>
+         information_only="1">
+        <TimeStepsInformationHelper/>
+      </DoubleVectorProperty>
 
       <!-- End TemporalCache -->
     </SourceProxy>
@@ -6280,12 +6277,14 @@ The Stream Tracer filter generates streamlines in a vector field from a collecti
 
       <DoubleVectorProperty
          name="TimestepValues"
-         information_only="1"
-         kernel_class="vtkPMTimeStepsProperty" />
+         information_only="1">
+        <TimeStepsInformationHelper/>
+      </DoubleVectorProperty>
 
      <DoubleVectorProperty name="TimeRange"
-        information_only="1"
-        kernel_class="vtkPMTimeRangeProperty" />
+        information_only="1">
+       <TimeRangeInformationHelper/>
+     </DoubleVectorProperty>
 
       <!-- End TemporalInterpolator -->
     </SourceProxy>
@@ -6327,8 +6326,9 @@ The Stream Tracer filter generates streamlines in a vector field from a collecti
 
       <DoubleVectorProperty
          name="TimestepValues"
-         information_only="1"
-         kernel_class="vtkPMTimeStepsProperty" />
+         information_only="1">
+        <TimeStepsInformationHelper/>
+      </DoubleVectorProperty>
 
       <!-- End TemporalSnapToTimeStep -->
     </SourceProxy>
@@ -6409,8 +6409,9 @@ The Stream Tracer filter generates streamlines in a vector field from a collecti
 
       <DoubleVectorProperty
          name="TimestepValues"
-         information_only="1"
-         kernel_class="vtkPMTimeStepsProperty" />
+         information_only="1">
+        <TimeStepsInformationHelper/>
+      </DoubleVectorProperty>
 
       <!-- End TemporalShiftScale -->
     </SourceProxy>
@@ -6688,8 +6689,9 @@ This filter operates on any type of data set, provided it has point-centered vec
 
      <DoubleVectorProperty
         name="TimestepValues"
-        information_only="1"
-        kernel_class="vtkPMTimeStepsProperty" />
+        information_only="1">
+       <TimeStepsInformationHelper/>
+     </DoubleVectorProperty>
 
      <IntVectorProperty
         name="StaticSeeds"
@@ -8854,7 +8856,6 @@ This property controls how the filter works to generate tensor cell data. You ca
     </SourceProxy>
 
    <!-- ==================================================================== -->
-
     <CompoundSourceProxy name="NormalGlyphs" label="Normal Glyphs">
       <Documentation short_help="Filter computing surface normals."
         long_help="Filter computing surface normals.">
@@ -9074,11 +9075,12 @@ This property controls how the filter works to generate tensor cell data. You ca
       </ExposedProperties>
       <OutputPort name="Output" proxy="Glyph1" port_index="0"/>
       <Hints>
-        <Visibility replace_input="0"
-                    help="Visibility Element can be used to suggest the GUI about
-                    visibility of this filter (or its input) on creation.
-                    replace_input='0' implies that the input visibility is not
-                    changed on creation of this filter (defaults to '1')"/>
+        <!-- Visibility Element can be used to suggest the GUI about
+             visibility of this filter (or its input) on creation.
+             replace_input="0" implies that the input visibility is not
+             changed on creation of this filter (defaults to "1")
+             -->
+        <Visibility replace_input="0" />
       </Hints>
     </CompoundSourceProxy>
 
@@ -9239,7 +9241,6 @@ This property controls how the filter works to generate tensor cell data. You ca
     </SourceProxy>
 
     <!-- ================================================================== -->
-
     <CompoundSourceProxy name="FFTSelectionOverTime"
                          label="FFT Of Selection Over Time">
       <Documentation
@@ -9316,12 +9317,11 @@ This property controls how the filter works to generate tensor cell data. You ca
       </ExposedProperties>
       <OutputPort name="Output" proxy="TableFFT1" port_index="0"/>
       <Hints>
-        <View type="XYChartView"
-              help="View can be used to specify the preferred view for the proxy"/>
+        <!-- View can be used to specify the preferred view for the proxy -->
+        <View type="XYChartView" />
         <Plotable />
       </Hints>
-    </CompoundSourceProxy>
-    <!-- FFTSelectionOverTime -->
+    </CompoundSourceProxy> <!-- FFTSelectionOverTime -->
 
     <!-- ================================================================== -->
     <SourceProxy name="AttributeDataToTableFilter"
@@ -9593,11 +9593,9 @@ This property controls how the filter works to generate tensor cell data. You ca
        </Documentation>
      </InputProperty>
 
-     <StringVectorProperty
-         name="SelectArrayInfo"
-         information_only="1"
-         kernel_class="vtkPMArraySelectionProperty"
-         command="Attribute" /> <!-- command => GetNumberOf___Arrays -->
+     <StringVectorProperty name="SelectArrayInfo" information_only="1">
+       <ArraySelectionInformationHelper attribute_name="Attribute"/> <!-- attribute_name => GetNumberOf___Arrays -->
+     </StringVectorProperty>
 
      <IntVectorProperty name="AttributeMode"
          command="SetAttributeMode"
@@ -9742,11 +9740,9 @@ This property controls how the filter works to generate tensor cell data. You ca
        </Documentation>
      </InputProperty>
 
-     <StringVectorProperty
-          name="SelectArrayInfo"
-          information_only="1"
-          kernel_class="vtkPMArraySelectionProperty"
-          command="Attribute" />
+     <StringVectorProperty name="SelectArrayInfo" information_only="1">
+       <ArraySelectionInformationHelper attribute_name="Attribute"/> <!-- attribute_name => GetNumberOf___Arrays -->
+     </StringVectorProperty>
 
      <IntVectorProperty name="AttributeMode"
          command="SetAttributeMode"
@@ -9917,11 +9913,9 @@ This property controls how the filter works to generate tensor cell data. You ca
        </Documentation>
      </InputProperty>
 
-     <StringVectorProperty
-         name="SelectArrayInfo"
-         information_only="1"
-         kernel_class="vtkPMArraySelectionProperty"
-         command="Attribute" />
+     <StringVectorProperty name="SelectArrayInfo" information_only="1">
+       <ArraySelectionInformationHelper attribute_name="Attribute"/> <!-- attribute_name => GetNumberOf___Arrays -->
+     </StringVectorProperty>
 
      <IntVectorProperty name="AttributeMode"
          command="SetAttributeMode"
@@ -10053,11 +10047,9 @@ This property controls how the filter works to generate tensor cell data. You ca
        </Documentation>
      </InputProperty>
 
-     <StringVectorProperty
-         name="SelectArrayInfo"
-         information_only="1"
-         kernel_class="vtkPMArraySelectionProperty"
-         command="Attribute" />
+     <StringVectorProperty name="SelectArrayInfo" information_only="1">
+       <ArraySelectionInformationHelper attribute_name="Attribute"/> <!-- attribute_name => GetNumberOf___Arrays -->
+     </StringVectorProperty>
 
      <IntVectorProperty name="AttributeMode"
          command="SetAttributeMode"

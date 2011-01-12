@@ -1653,9 +1653,9 @@
 
     <!-- ================================================================== -->
     <RepresentationProxy name="UniformGridVolumeRepresentation"
-                         class="vtkImageVolumeRepresentation"
-                         processes="client|renderserver|dataserver"
-                         kernel_class="vtkPMUniformGridVolumeRepresentationProxy" >
+                          class="vtkImageVolumeRepresentation"
+                          kernel_class="vtkPMUniformGridVolumeRepresentationProxy"
+                          processes="client|renderserver|dataserver">
       <Documentation>
         Representation for rendering a vtkImageData as volume.
       </Documentation>
@@ -3229,8 +3229,8 @@
     <!-- ================================================================== -->
     <RepresentationProxy name="SelectionRepresentation"
       class="vtkSelectionRepresentation"
-      processes="client|renderserver|dataserver"
-      kernel_class="vtkPMSelectionRepresentationProxy">
+      kernel_class="vtkPMSelectionRepresentationProxy"
+      processes="client|renderserver|dataserver">
       <Documentation>
         Proxy to show a selection as geometry.
       </Documentation>
@@ -3930,9 +3930,9 @@
 
     <!-- =================================================================== -->
     <Proxy name="TextSourceRepresentation"
-           class="vtkTextSourceRepresentation"
-           kernel_class="vtkPMTextSourceRepresentationProxy"
-           processes="client|dataserver|renderserver" >
+      class="vtkTextSourceRepresentation"
+      kernel_class="vtkPMTextSourceRepresentationProxy"
+      processes="client|dataserver|renderserver" >
       <Documentation>
         Representation proxy used to show text.
       </Documentation>

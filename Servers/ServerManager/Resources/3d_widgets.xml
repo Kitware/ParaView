@@ -635,7 +635,9 @@
          command="GetClosedLoop"
          number_of_elements="1"
          information_only="1"
-         default_values="0" />
+         default_values="0">
+        <SimpleIntInformationHelper/>
+      </IntVectorProperty>
 
       <ProxyProperty
         name="PointPlacer"
@@ -741,8 +743,9 @@
 
       <DoubleVectorProperty name="HandlePositionsInfo"
         command="GetHandlePositions"
-        information_only="1"
-        kernel_class="vtkPMDataArrayProperty" />
+        information_only="1">
+        <DoubleArrayInformationHelper />
+      </DoubleVectorProperty>
 
       <IntVectorProperty name="Closed"
         command="SetClosed"
@@ -785,7 +788,9 @@
      <DoubleVectorProperty
         name="ValueInfo"
         command="GetValue"
-        information_only="1" />
+        information_only="1">
+        <SimpleDoubleInformationHelper/>
+     </DoubleVectorProperty>
 
       <DoubleVectorProperty
         name="Point1"
@@ -883,7 +888,9 @@
 
       <DoubleVectorProperty name="CenterInfo"
         command="GetCenter"
-        information_only="1" />
+        information_only="1" >
+        <SimpleDoubleInformationHelper />
+      </DoubleVectorProperty>
 
       <DoubleVectorProperty name="Radius"
         command="SetRadius"
@@ -899,7 +906,9 @@
 
       <DoubleVectorProperty name="RadiusInfo"
         command="GetRadius"
-        information_only="1" />
+        information_only="1" >
+        <SimpleDoubleInformationHelper />
+      </DoubleVectorProperty>
 
       <IntVectorProperty name="HandleVisibility"
         command="SetHandleVisibility"
@@ -1027,7 +1036,9 @@
 
      <DoubleVectorProperty name="Point1WorldPositionInfo"
         command="GetPoint1WorldPosition"
-        information_only="1" />
+        information_only="1">
+        <SimpleDoubleInformationHelper/>
+     </DoubleVectorProperty>
 
      <DoubleVectorProperty name="Point2WorldPosition"
         command="SetPoint2WorldPosition"
@@ -1040,7 +1051,9 @@
 
      <DoubleVectorProperty name="Point2WorldPositionInfo"
         command="GetPoint2WorldPosition"
-        information_only="1" />
+        information_only="1">
+        <SimpleDoubleInformationHelper/>
+     </DoubleVectorProperty>
 
      <DoubleVectorProperty
         name="PlaceWidget"
@@ -1084,7 +1097,9 @@
 
       <DoubleVectorProperty name="OriginInfo"
          command="GetOrigin"
-         information_only="1" />
+         information_only="1">
+         <SimpleDoubleInformationHelper/>
+      </DoubleVectorProperty>
 
       <DoubleVectorProperty name="Normal"
          command="SetNormal"
@@ -1096,7 +1111,9 @@
 
       <DoubleVectorProperty name="NormalInfo"
          command="GetNormal"
-         information_only="1" />
+         information_only="1">
+         <SimpleDoubleInformationHelper/>
+      </DoubleVectorProperty>
 
       <DoubleVectorProperty name="PlaceWidget"
          is_internal="1"
@@ -1147,7 +1164,9 @@
 
      <DoubleVectorProperty name="Point1WorldPositionInfo"
         command="GetPoint1WorldPosition"
-        information_only="1" />
+        information_only="1">
+        <SimpleDoubleInformationHelper/>
+     </DoubleVectorProperty>
 
      <DoubleVectorProperty name="Point2WorldPosition"
         command="SetPoint2WorldPosition"
@@ -1160,7 +1179,9 @@
 
      <DoubleVectorProperty name="Point2WorldPositionInfo"
         command="GetPoint2WorldPosition"
-        information_only="1" />
+        information_only="1">
+        <SimpleDoubleInformationHelper/>
+     </DoubleVectorProperty>
 
      <DoubleVectorProperty name="Point1DisplayPosition"
         command="SetPoint1DisplayPosition"
@@ -1173,7 +1194,9 @@
 
      <DoubleVectorProperty name="Point1DisplayPositionInfo"
         command="GetPoint1DisplayPosition"
-        information_only="1" />
+        information_only="1">
+        <SimpleDoubleInformationHelper/>
+     </DoubleVectorProperty>
 
      <DoubleVectorProperty name="Point2DisplayPosition"
         command="SetPoint2DisplayPosition"
@@ -1186,7 +1209,9 @@
 
      <DoubleVectorProperty name="Point2DisplayPositionInfo"
         command="GetPoint2DisplayPosition"
-        information_only="1" />
+        information_only="1">
+        <SimpleDoubleInformationHelper/>
+     </DoubleVectorProperty>
 
      <DoubleVectorProperty name="PlaceWidget"
         is_internal="1"
@@ -1230,7 +1255,9 @@
      <DoubleVectorProperty
         name="WorldPositionInfo"
         command="GetWorldPosition"
-        information_only="1" />
+        information_only="1">
+        <SimpleDoubleInformationHelper/>
+     </DoubleVectorProperty>
     </Proxy>
 
     <!-- ================================================================== -->
@@ -1254,7 +1281,9 @@
 
       <DoubleVectorProperty name="PositionInfo"
          command="GetPosition"
-         information_only="1" />
+         information_only="1">
+         <SimpleDoubleInformationHelper/>
+      </DoubleVectorProperty>
 
       <DoubleVectorProperty name="Position2"
          command="SetPosition2"
@@ -1266,7 +1295,9 @@
 
       <DoubleVectorProperty name="Position2Info"
          command="GetPosition2"
-         information_only="1" />
+         information_only="1">
+         <SimpleDoubleInformationHelper/>
+      </DoubleVectorProperty>
 
       <IntVectorProperty name="Orientation"
         command="SetOrientation"
@@ -1281,7 +1312,9 @@
 
       <IntVectorProperty name="OrientationInfo"
         command="GetOrientation"
-        information_only="1" />
+        information_only="1" >
+        <SimpleIntInformationHelper />
+      </IntVectorProperty>
 
       <ProxyProperty name="ScalarBarActor" command="SetScalarBarActor">
         <ProxyGroupDomain name="groups">
@@ -1311,7 +1344,9 @@
 
       <DoubleVectorProperty name="PositionInfo"
          command="GetPosition"
-         information_only="1" />
+         information_only="1">
+         <SimpleDoubleInformationHelper/>
+      </DoubleVectorProperty>
 
       <DoubleVectorProperty name="Position2"
          command="SetPosition2"
@@ -1323,7 +1358,9 @@
 
       <DoubleVectorProperty name="Position2Info"
          command="GetPosition2"
-         information_only="1" />
+         information_only="1">
+         <SimpleDoubleInformationHelper/>
+      </DoubleVectorProperty>
 
       <StringVectorProperty name="Text"
          command="SetText"
