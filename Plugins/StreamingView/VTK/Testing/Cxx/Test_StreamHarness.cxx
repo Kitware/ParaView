@@ -32,7 +32,7 @@
 #include "vtksys/SystemTools.hxx"
 
 //---------------------------------------------------------------------------
-int main(int argc, char *argv[])
+int main(int , char **)
 {
   vtkSmartPointer<vtkRenderer> renderer = vtkSmartPointer<vtkRenderer>::New();
   vtkSmartPointer<vtkRenderWindow> renWin =
@@ -73,10 +73,10 @@ int main(int argc, char *argv[])
   harness->SetPiece(0);
   harness->SetResolution(0.0);
 
-  //cerr << "PRIORITY IS" << harness->ComputePriority(0, 4, 0) << endl;
+  //cerr << "PRIORITY IS" << harness->ComputePiecePriority(0, 4, 0) << endl;
   harness->Update();
 
-  //cerr << "PRIORITY NOW" << harness->ComputePriority(0, 4, 0) << endl;
+  //cerr << "PRIORITY NOW" << harness->ComputePiecePriority(0, 4, 0) << endl;
   contour->SetValue(0,50.0);
 
   double bounds[6];
@@ -85,9 +85,9 @@ int main(int argc, char *argv[])
   double max;
   double aconf;
 
-  harness->ComputeMetaInformation(0,16,0.0,
-                                  bounds, gconf,
-                                  min, max, aconf);
+  harness->ComputePieceMetaInformation(0,16,0.0,
+                                       bounds, gconf,
+                                       min, max, aconf);
   cerr << "META INFO IS ";
   for (int i = 0; i < 6; i++)
     {
@@ -95,9 +95,9 @@ int main(int argc, char *argv[])
     }
   cerr << gconf << "\n " << min << " to " << max << " " << aconf << endl;
 
-  harness->ComputeMetaInformation(0,16,1.0,
-                                  bounds, gconf,
-                                  min, max, aconf);
+  harness->ComputePieceMetaInformation(0,16,1.0,
+                                       bounds, gconf,
+                                       min, max, aconf);
   cerr << "META INFO IS ";
   for (int i = 0; i < 6; i++)
     {
@@ -105,9 +105,9 @@ int main(int argc, char *argv[])
     }
   cerr << gconf << "\n " << min << " to " << max << " " << aconf << endl;
 
-  harness->ComputeMetaInformation(0,4,0.5,
-                                  bounds, gconf,
-                                  min, max, aconf);
+  harness->ComputePieceMetaInformation(0,4,0.5,
+                                       bounds, gconf,
+                                       min, max, aconf);
   cerr << "META INFO IS ";
   for (int i = 0; i < 6; i++)
     {
@@ -115,9 +115,9 @@ int main(int argc, char *argv[])
     }
   cerr << gconf << "\n" << min << " to " << max << " " << aconf << endl;
 
-  harness->ComputeMetaInformation(1,4,0.5,
-                                  bounds, gconf,
-                                  min, max, aconf);
+  harness->ComputePieceMetaInformation(1,4,0.5,
+                                       bounds, gconf,
+                                       min, max, aconf);
   cerr << "META INFO IS ";
   for (int i = 0; i < 6; i++)
     {
@@ -130,9 +130,9 @@ int main(int argc, char *argv[])
   harness->SetResolution(0.5);
   harness->Update();
 
-  harness->ComputeMetaInformation(0,4,0.5,
-                                  bounds, gconf,
-                                  min, max, aconf);
+  harness->ComputePieceMetaInformation(0,4,0.5,
+                                       bounds, gconf,
+                                       min, max, aconf);
   cerr << "META INFO IS ";
   for (int i = 0; i < 6; i++)
     {
@@ -140,9 +140,9 @@ int main(int argc, char *argv[])
     }
   cerr << gconf << "\n" << min << " to " << max << " " << aconf << endl;
 
-  harness->ComputeMetaInformation(1,4,0.5,
-                                  bounds, gconf,
-                                  min, max, aconf);
+  harness->ComputePieceMetaInformation(1,4,0.5,
+                                       bounds, gconf,
+                                       min, max, aconf);
   cerr << "META INFO IS ";
   for (int i = 0; i < 6; i++)
     {

@@ -102,11 +102,11 @@ class vtkRSRFileSkimmer1
 
 // Default ctor.  Some simple initialization
 vtkRSRFileSkimmer1::vtkRSRFileSkimmer1() :
-  data_(0),
-  cache_buffer_(NULL),
-  use_timer_(false),
   SwapEndian_(false),
-  buffer_pointer_(NULL)
+  cache_buffer_(NULL),
+  data_(0),
+  buffer_pointer_(NULL),
+  use_timer_(false)
 { }
 
 // dtor - handles data cleanup
@@ -222,7 +222,7 @@ unsigned int vtkRSRFileSkimmer1::read_line(ifstream& file,
                               char* cache_buffer,
                               unsigned int buffer_size,
                               unsigned int stride,
-                              unsigned int bytes_to_read,
+                              unsigned int vtkNotUsed(bytes_to_read),
                               unsigned int insert_at)
 {
   DEBUGPRINT_STRIDED_READER_DETAILS(
@@ -558,8 +558,8 @@ void vtkRawStridedReader1::SwapDataByteOrder(int i)
 // Global Spacing (should be the stride value * original)
 
 int vtkRawStridedReader1::RequestInformation(
-  vtkInformation* request,
-  vtkInformationVector** inputVector,
+  vtkInformation* vtkNotUsed(request),
+  vtkInformationVector** vtkNotUsed(inputVector),
   vtkInformationVector* outputVector)
 {
   vtkInformation* outInfo = outputVector->GetInformationObject(0);
@@ -675,8 +675,8 @@ int vtkRawStridedReader1::RequestInformation(
 //----------------------------------------------------------------------------
 // Here unlike the RequestInformation we getting, not setting
 int vtkRawStridedReader1::RequestUpdateExtent(
-  vtkInformation* request,
-  vtkInformationVector** inputVector,
+  vtkInformation* vtkNotUsed(request),
+  vtkInformationVector** vtkNotUsed(inputVector),
   vtkInformationVector* outputVector)
 {
   vtkInformation *outInfo = outputVector->GetInformationObject(0);

@@ -145,7 +145,8 @@ void vtkMetaInfoDatabase::Insert(int p, int np, int ext[6], double range[2],
 }
 
 //------------------------------------------------------------------------------
-int vtkMetaInfoDatabase::Search(int p, int np, int ext[6], double *range)
+int vtkMetaInfoDatabase::Search(int p, int np, int vtkNotUsed(ext)[6],
+                                double *range)
 {
   DEBUGPRINT_METAINFORMATION(cerr << "Search " <<p << "/" << np << endl;);
   //go through list and use the ranges of all my ancestors

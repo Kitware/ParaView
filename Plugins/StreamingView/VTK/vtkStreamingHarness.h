@@ -66,14 +66,14 @@ public:
   //Description:
   //compute the priority for a particular piece.
   //internal Piece, NumberOfPieces, Resolution are not affected or used
-  double ComputePriority(int Pieces, int NumPieces, double Resolution);
+  double ComputePiecePriority(int Pieces, int NumPieces, double Resolution);
 
   //Description:
   //compute the meta information for a particular piece.
   //internal Piece, NumberOfPieces, Resolution are not affected or used
   //TODO: need a general struct for meta info with type correct bounds,
   //and room for all arrays not just active scalars
-  void ComputeMetaInformation
+  void ComputePieceMetaInformation
     (int Piece, int NumPieces, double Resolution,
      double bounds[6], double &geometric_confidence,
      double &min, double &max, double &attribute_confidence);

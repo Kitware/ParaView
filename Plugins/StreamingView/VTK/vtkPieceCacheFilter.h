@@ -60,7 +60,7 @@ public:
   //Description:
   //Returns the time that dataset stored in the i'th cache slot
   //was created.
-  unsigned long GetMTime(int i);
+  unsigned long GetPieceMTime(int i);
 
   //Description:
   //Deletes the data set stored in the i'th cache slot.

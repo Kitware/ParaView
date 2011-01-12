@@ -15,7 +15,6 @@
 
 #include "vtkVisibilityPrioritizer.h"
 
-#include "vtkAdaptiveOptions.h"
 #include "vtkDataObject.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
@@ -28,11 +27,7 @@
 
 vtkStandardNewMacro(vtkVisibilityPrioritizer);
 
-#define DEBUGPRINT_PRIORITY(arg)\
-  if (vtkAdaptiveOptions::GetEnableStreamMessages())\
-    { \
-      arg;\
-    }
+#define DEBUGPRINT_PRIORITY(arg) ;
 
 //----------------------------------------------------------------------------
 vtkVisibilityPrioritizer::vtkVisibilityPrioritizer()
@@ -77,17 +72,8 @@ int vtkVisibilityPrioritizer::ProcessRequest(vtkInformation* request,
   if(request->Has(vtkStreamingDemandDrivenPipeline::
                   REQUEST_UPDATE_EXTENT_INFORMATION()))
     {
-    if (vtkAdaptiveOptions::GetUseViewOrdering())
-      {
-      return this->RequestUpdateExtentInformation
-        (request, inputVector, outputVector);
-      }
-    else
-      {
-      DEBUGPRINT_PRIORITY(
-      cerr << "VS(" << this << ") Vis Priority Ignored" << endl;
-      );
-      }
+    return this->RequestUpdateExtentInformation
+      (request, inputVector, outputVector);
     }
   return this->Superclass::ProcessRequest(request, inputVector,
                                           outputVector);
@@ -99,9 +85,10 @@ int vtkVisibilityPrioritizer::RequestUpdateExtentInformation(
   vtkInformationVector** inputVector,
   vtkInformationVector* outputVector)
 {
-  DEBUGPRINT_PRIORITY(
-  cerr << "VS(" << this << ") RUEI" << endl;
-                      );
+  DEBUGPRINT_PRIORITY
+    (
+     cerr << "VS(" << this << ") RUEI" << endl;
+     );
 
   vtkInformation *inInfo = inputVector[0]->GetInformationObject(0);
   if (!inInfo)
@@ -141,9 +128,8 @@ int vtkVisibilityPrioritizer::RequestUpdateExtentInformation(
     {
     //get bounding box of current piece in world coordinates
 
-    DEBUGPRINT_PRIORITY(
-    cerr << "VS(" << this << ") Asking for bounds " << endl;
-                        );
+    DEBUGPRINT_PRIORITY
+      (cerr << "VS(" << this << ") Asking for bounds " << endl;);
     sddp->GetPieceBoundingBox(port, pbbox);
 
     double viewPriority = this->CalculatePriority(pbbox);
@@ -269,15 +255,16 @@ void vtkVisibilityPrioritizer::SetFrustum(double *frustum)
       {
       this->Frustum[i] = frustum[i];
       }
-    DEBUGPRINT_PRIORITY(
-    cerr << "FRUST" << endl;
-    for (i=0; i<8; i++)
-      {
-      cerr << this->Frustum[i*4+0] << ","
-           << this->Frustum[i*4+1] << ","
-           << this->Frustum[i*4+2] << endl;
-      }
-    );
+    DEBUGPRINT_PRIORITY
+      (
+       cerr << "FRUST" << endl;
+       for (i=0; i<8; i++)
+         {
+         cerr << this->Frustum[i*4+0] << ","
+              << this->Frustum[i*4+1] << ","
+              << this->Frustum[i*4+2] << endl;
+         }
+       );
 
     this->FrustumTester->CreateFrustum(frustum);
 
@@ -304,12 +291,13 @@ void vtkVisibilityPrioritizer::SetCameraState(double *cameraState)
       {
       this->CameraState[i] = cameraState[i];
       }
-    DEBUGPRINT_PRIORITY(
-    cerr
-    << "EYE" << this->CameraState[0]
-    << "," << this->CameraState[1]
-    << "," << this->CameraState[2]
-    << endl;
-                        );
+    DEBUGPRINT_PRIORITY
+      (
+       cerr
+       << "EYE" << this->CameraState[0]
+       << "," << this->CameraState[1]
+       << "," << this->CameraState[2]
+       << endl;
+       );
     }
 }
