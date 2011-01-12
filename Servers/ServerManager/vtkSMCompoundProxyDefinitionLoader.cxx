@@ -31,7 +31,7 @@ vtkSMCompoundProxyDefinitionLoader::vtkSMCompoundProxyDefinitionLoader()
 //---------------------------------------------------------------------------
 vtkSMCompoundProxyDefinitionLoader::~vtkSMCompoundProxyDefinitionLoader()
 {
-  this->RootElement = 0;
+  this->SetRootElement(0);
 }
 
 //---------------------------------------------------------------------------
