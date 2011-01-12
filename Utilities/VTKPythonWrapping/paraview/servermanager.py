@@ -1446,8 +1446,8 @@ class ProxyManager(object):
 
     def __init__(self):
         """Constructor. Assigned self.SMProxyManager to
-        vtkSMObject.GetPropertyManager()."""
-        self.SMProxyManager = ActiveSession.GetProxyManager()
+        vtkSMObject.GetProxyManager()."""
+        self.SMProxyManager = vtkSMObject.GetProxyManager()
 
     def RegisterProxy(self, group, name, aProxy):
         """Registers a proxy (either SMProxy or proxy) with the
@@ -1760,11 +1760,14 @@ def Connect(ds_host=None, ds_port=11111, rs_host=None, rs_port=22221):
         raise RuntimeError, "Cannot create a session through python. Use the GUI to setup the connection."
     if ds_host == None:
         ActiveSession = vtkSMSession()
+        ActiveSession.Initialize()
     elif rs_host == None:
         ActiveSession = vtkSMClientSession()
+        ActiveSession.Initialize()
         ActiveSession.Connect("cs://" + ds_host + ":" + ds_port)
     else:
         ActiveSession = vtkSMClientSession()
+        ActiveSession.Initialize()
         ActiveSession.Connect("cdsrs://" + ds_host + ":" + ds_port + "/" + rs_host + ":" + rs_port)
 
     vtkProcessModule.GetProcessModule().RegisterSession(ActiveSession)
@@ -1815,7 +1818,7 @@ def CreateProxy(xml_group, xml_name, session=None):
 
     if not session:
         session = ActiveSession
-    pxm = session.GetProxyManager()
+    pxm = vtkSMObject.GetProxyManager()
     aProxy = pxm.NewProxy(xml_group, xml_name)
     if not aProxy:
         return None
@@ -1828,7 +1831,7 @@ def GetRenderView(session=None):
     if not session:
         session = ActiveSession
     render_module = None
-    for aProxy in session.GetProxyManager():
+    for aProxy in vtkSMObject.GetProxyManager():
         if aProxy.IsA("vtkSMRenderViewProxy"):
             render_module = aProxy
             break
@@ -2343,7 +2346,7 @@ def createModule(groupName, mdl=None):
     if not ActiveSession:
       raise "Please connect to a server using \"Connect\""
 
-    pxm = ActiveSession.GetProxyManager()
+    pxm = vtkSMObject.GetProxyManager()
     # Use prototypes to find all proxy types.
     pxm.InstantiateGroupPrototypes(groupName)
     pxdm = pxm.GetProxyDefinitionManager()

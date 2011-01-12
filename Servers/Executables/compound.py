@@ -2,7 +2,7 @@ from paraview.simple import *
 import time
 
 session = servermanager.ActiveSession
-pxm = session.GetProxyManager()
+pxm = servermanager.ProxyManager()
 
 sphere = Sphere()
 sphere.UpdateVTKObjects();
