@@ -124,6 +124,12 @@ vtkPVPluginsInformation::~vtkPVPluginsInformation()
 void vtkPVPluginsInformation::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+  os << indent << "NumberOfPlugins: " << this->GetNumberOfPlugins() << endl;
+  for (unsigned int cc=0; cc < this->GetNumberOfPlugins(); cc++)
+    {
+    os << indent << this->GetPluginName(cc) << ": " << endl;
+    }
+
 }
 
 //----------------------------------------------------------------------------
@@ -219,7 +225,7 @@ unsigned int vtkPVPluginsInformation::GetNumberOfPlugins()
 //----------------------------------------------------------------------------
 const char* vtkPVPluginsInformation::GetPluginName(unsigned int cc)
 {
-  if (this->GetNumberOfPlugins() < cc)
+  if (cc < this->GetNumberOfPlugins())
     {
     return (*this->Internals)[cc].Name.c_str();
     }
@@ -229,7 +235,7 @@ const char* vtkPVPluginsInformation::GetPluginName(unsigned int cc)
 //----------------------------------------------------------------------------
 const char* vtkPVPluginsInformation::GetPluginFileName(unsigned int cc)
 {
-  if (this->GetNumberOfPlugins() < cc)
+  if (cc < this->GetNumberOfPlugins())
     {
     return (*this->Internals)[cc].FileName.c_str();
     }
@@ -239,7 +245,7 @@ const char* vtkPVPluginsInformation::GetPluginFileName(unsigned int cc)
 //----------------------------------------------------------------------------
 const char* vtkPVPluginsInformation::GetPluginVersion(unsigned int cc)
 {
-  if (this->GetNumberOfPlugins() < cc)
+  if (cc < this->GetNumberOfPlugins())
     {
     return (*this->Internals)[cc].Version.c_str();
     }
@@ -249,7 +255,7 @@ const char* vtkPVPluginsInformation::GetPluginVersion(unsigned int cc)
 //----------------------------------------------------------------------------
 bool vtkPVPluginsInformation::GetPluginLoaded(unsigned int cc)
 {
-  if (this->GetNumberOfPlugins() < cc)
+  if (cc < this->GetNumberOfPlugins())
     {
     return (*this->Internals)[cc].Version.c_str();
     }
@@ -259,7 +265,7 @@ bool vtkPVPluginsInformation::GetPluginLoaded(unsigned int cc)
 //----------------------------------------------------------------------------
 const char* vtkPVPluginsInformation::GetRequiredPlugins(unsigned int cc)
 {
-  if (this->GetNumberOfPlugins() < cc)
+  if (cc < this->GetNumberOfPlugins())
     {
     return (*this->Internals)[cc].RequiredPlugins.c_str();
     }
@@ -269,7 +275,7 @@ const char* vtkPVPluginsInformation::GetRequiredPlugins(unsigned int cc)
 //----------------------------------------------------------------------------
 bool vtkPVPluginsInformation::GetRequiredOnServer(unsigned int cc)
 {
-  if (this->GetNumberOfPlugins() < cc)
+  if (cc < this->GetNumberOfPlugins())
     {
     return (*this->Internals)[cc].RequiredOnServer;
     }
@@ -279,7 +285,7 @@ bool vtkPVPluginsInformation::GetRequiredOnServer(unsigned int cc)
 //----------------------------------------------------------------------------
 bool vtkPVPluginsInformation::GetRequiredOnClient(unsigned int cc)
 {
-  if (this->GetNumberOfPlugins() < cc)
+  if (cc < this->GetNumberOfPlugins())
     {
     return (*this->Internals)[cc].RequiredOnClient;
     }
@@ -289,7 +295,7 @@ bool vtkPVPluginsInformation::GetRequiredOnClient(unsigned int cc)
 //----------------------------------------------------------------------------
 bool vtkPVPluginsInformation::GetAutoLoad(unsigned int cc)
 {
-  if (this->GetNumberOfPlugins() < cc)
+  if (cc < this->GetNumberOfPlugins())
     {
     return (*this->Internals)[cc].AutoLoad;
     }
