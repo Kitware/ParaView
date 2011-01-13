@@ -156,11 +156,13 @@ void vtkPVPluginsInformation::CopyToStream(vtkClientServerStream* stream)
 void vtkPVPluginsInformation::CopyFromStream(const vtkClientServerStream* stream)
 {
   int offset=0;
-  if (!stream->GetArgument(0, offset++, &this->SearchPaths))
+  const char* search_paths=NULL;
+  if (!stream->GetArgument(0, offset++, &search_paths))
     {
     vtkErrorMacro("Error parsing SearchPaths.");
     return;
     }
+  this->SetSearchPaths(search_paths);
 
   unsigned int count;
   if (!stream->GetArgument(0, offset++, &count))
