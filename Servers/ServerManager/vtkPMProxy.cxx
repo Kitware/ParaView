@@ -462,6 +462,7 @@ void vtkPMProxy::PatchXMLProperty(vtkPVXMLElement* propElement)
       }
     else if(strcmp(informationHelper->GetName(),"SimpleDoubleInformationHelper") == 0
             || strcmp(informationHelper->GetName(),"SimpleIntInformationHelper") == 0
+            || strcmp(informationHelper->GetName(),"SimpleStringInformationHelper") == 0
             || strcmp(informationHelper->GetName(),"SimpleIdTypeInformationHelper") == 0 )
       {
       // Nothing to do, just remove them
