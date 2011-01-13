@@ -142,7 +142,6 @@ void vtkStreamingDriver::SetRenderWindow(vtkRenderWindow *rw)
       (iren->GetInteractorStyle());
     if (istyle)
       {
-      //cerr << "SET OFF" << endl;
       istyle->AutoAdjustCameraClippingRangeOff();
       }
     }
@@ -204,6 +203,7 @@ void vtkStreamingDriver::AddHarness(vtkStreamingHarness *harness)
     {
     return;
     }
+  this->AddHarnessInternal(harness);
   this->Internal->Harnesses->AddItem(harness);
 }
 
@@ -263,7 +263,6 @@ bool vtkStreamingDriver::HasCameraMoved()
   unsigned long mtime = cam->GetMTime();
   if (mtime > this->Internal->CameraTime)
     {
-    //cerr << "CAM MOVED" << endl;
     this->Internal->CameraTime = mtime;
 
     double camState[9];

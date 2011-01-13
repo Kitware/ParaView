@@ -73,6 +73,10 @@ protected:
   virtual void AdvanceEveryone();
   virtual bool IsEveryoneDone();
 
+  // Description:
+  // Overridden to set up initial number of passes.
+  virtual void AddHarnessInternal(vtkStreamingHarness *);
+
   int NumberOfPasses;
   int LastPass;
   int PipelinePrioritization;

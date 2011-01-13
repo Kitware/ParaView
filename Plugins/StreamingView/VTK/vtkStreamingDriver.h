@@ -110,8 +110,13 @@ protected:
   double CalculateViewPriority(double *bbox);
 
   // Description:
-  // For diagnostic mode rendering, copies renwins back buffer to its front
+  // Copies renwin's back buffer to its front to make what we've drawn visible.
   void CopyBackBufferToFront();
+
+  // Description:
+  // Gives driver a chance to setup a new harness as the driver wants it
+  // to be.
+  virtual void AddHarnessInternal(vtkStreamingHarness *) = 0;
 
   bool ManualStart;
   bool ManualFinish;

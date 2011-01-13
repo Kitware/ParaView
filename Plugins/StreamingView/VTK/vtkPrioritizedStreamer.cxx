@@ -17,14 +17,15 @@
 #include "vtkCollection.h"
 #include "vtkCollectionIterator.h"
 #include "vtkObjectFactory.h"
+#include "vtkPieceCacheFilter.h"
 #include "vtkPieceList.h"
 #include "vtkRenderer.h"
 #include "vtkRenderWindow.h"
 #include "vtkStreamingDriver.h"
 #include "vtkStreamingHarness.h"
 
-#define DEBUGPRINT_PASSES( arg ) ;
-#define DEBUGPRINT_PRIORITY( arg ) ;
+#define DEBUGPRINT_PASSES( arg ) arg;
+#define DEBUGPRINT_PRIORITY( arg ) arg;
 
 vtkStandardNewMacro(vtkPrioritizedStreamer);
 
@@ -68,6 +69,17 @@ vtkPrioritizedStreamer::~vtkPrioritizedStreamer()
 void vtkPrioritizedStreamer::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
+}
+
+//----------------------------------------------------------------------------
+void vtkPrioritizedStreamer::AddHarnessInternal(vtkStreamingHarness *harness)
+{
+  vtkPieceCacheFilter *pcf = harness->GetCacheFilter();
+  if (pcf)
+    {
+    pcf->SetCacheSize(this->CacheSize);
+    }
+  harness->SetNumberOfPieces(this->NumberOfPasses);
 }
 
 //----------------------------------------------------------------------------
@@ -217,52 +229,6 @@ void vtkPrioritizedStreamer::AdvanceEveryone()
 }
 
 //----------------------------------------------------------------------------
-bool vtkPrioritizedStreamer::IsEveryoneDone()
-{
-  vtkCollection *harnesses = this->GetHarnesses();
-  if (!harnesses)
-    {
-    return true;
-    }
-
-  bool everyone_done = true;
-  vtkCollectionIterator *iter = harnesses->NewIterator();
-  iter->InitTraversal();
-  while(!iter->IsDoneWithTraversal())
-    {
-    vtkStreamingHarness *next = vtkStreamingHarness::SafeDownCast
-      (iter->GetCurrentObject());
-    iter->GoToNextItem();
-
-    //check if anyone hasn't drawn the last necessary pass
-    int passNow = next->GetPass();
-    int maxPass = next->GetNumberOfPieces();
-    if (this->LastPass < maxPass)
-      {
-      maxPass = this->LastPass;
-      }
-    if (passNow <= maxPass-2)
-      {
-      vtkPieceList *pl = next->GetPieceList1();
-      if (pl)
-        {
-        double priority = pl->GetPiece(passNow+1).GetPriority();
-        if (priority == 0.0)
-          {
-          //if this object finished early, don't keep going just for it's sake
-          continue;
-          }
-        }
-      everyone_done = false;
-      break;
-      }
-    }
-  iter->Delete();
-
-  return everyone_done;
-}
-
-//----------------------------------------------------------------------------
 void vtkPrioritizedStreamer::StartRenderEvent()
 {
   DEBUGPRINT_PASSES
@@ -309,6 +275,52 @@ void vtkPrioritizedStreamer::StartRenderEvent()
 
   //assume that we are not done covering all the domains
   this->Internal->StartOver = false;
+}
+
+//----------------------------------------------------------------------------
+bool vtkPrioritizedStreamer::IsEveryoneDone()
+{
+  vtkCollection *harnesses = this->GetHarnesses();
+  if (!harnesses)
+    {
+    return true;
+    }
+
+  bool everyone_done = true;
+  vtkCollectionIterator *iter = harnesses->NewIterator();
+  iter->InitTraversal();
+  while(!iter->IsDoneWithTraversal())
+    {
+    vtkStreamingHarness *next = vtkStreamingHarness::SafeDownCast
+      (iter->GetCurrentObject());
+    iter->GoToNextItem();
+
+    //check if anyone hasn't drawn the last necessary pass
+    int passNow = next->GetPass();
+    int maxPass = next->GetNumberOfPieces();
+    if (this->LastPass < maxPass)
+      {
+      maxPass = this->LastPass;
+      }
+    if (passNow <= maxPass-2)
+      {
+      vtkPieceList *pl = next->GetPieceList1();
+      if (pl)
+        {
+        double priority = pl->GetPiece(passNow+1).GetPriority();
+        if (priority == 0.0)
+          {
+          //if this object finished early, don't keep going just for it's sake
+          continue;
+          }
+        }
+      everyone_done = false;
+      break;
+      }
+    }
+  iter->Delete();
+
+  return everyone_done;
 }
 
 //----------------------------------------------------------------------------
