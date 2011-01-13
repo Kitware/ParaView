@@ -2,11 +2,11 @@
 
 # Run this script to set up development with git.
 die() {
-        echo 'Failure during git development setup' 1>&2
-        echo '------------------------------------' 1>&2
-        echo '' 1>&2
-        echo "$@" 1>&2
-        exit 1
+  echo 'Failure during git development setup' 1>&2
+  echo '------------------------------------' 1>&2
+  echo '' 1>&2
+  echo "$@" 1>&2
+  exit 1
 }
 
 # Make sure we are inside the repository.
@@ -23,8 +23,15 @@ git config remote.origin.pushurl git@paraview.org:ParaView.git
 
 echo "Initializing and updating git submodules..."
 git submodule update --init --recursive
+# Rebase master by default
+git config rebase.stat true
+git config branch.master.rebase true
 
 cd Utilities/Scripts
+
+echo "Checking basic user information..."
+./SetupUser.sh || exit 1
+echo
 
 echo "Setting up git hooks..."
 ./SetupHooks.sh || exit 1
