@@ -78,6 +78,7 @@ SET (Kit_SRCS
   vtkSMLink.cxx
   vtkSMNamedPropertyIterator.cxx
   vtkSMNewWidgetRepresentationProxy.cxx
+  vtkSMNullProxy.cxx
   vtkSMObject.cxx
   vtkSMOrderedPropertyIterator.cxx
   vtkSMOutputPort.cxx
