@@ -249,24 +249,24 @@ bool vtkSMSessionClient::Connect(const char* url)
   // vtkSMSessionClient::Connect("cdsrsrc://localhost:2212/:23332");
   // vtkSMSessionClient::Connect("cdsrsrc://:2212/:23332");
   // vtkSMSessionClient::Connect("cdsrsrc:///:23332");
+  return success;
+}
 
-  // TODO:
+//----------------------------------------------------------------------------
+void vtkSMSessionClient::Initialize()
+{
+  this->Superclass::Initialize();
+
   // Setup the socket connnection between data-server and render-server.
-  if (success && this->DataServerController && this->RenderServerController)
+  if (this->DataServerController && this->RenderServerController)
     {
     this->SetupDataServerRenderServerConnection();
     }
-
-  return success;
 }
 
 //----------------------------------------------------------------------------
 void vtkSMSessionClient::SetupDataServerRenderServerConnection()
 {
-  abort();
-
-  // FIXME: Crap! This cannot work since proxy manager is not initialized until
-  // afterwords.
   vtkSMProxy* mpiMToN = vtkSMObject::GetProxyManager()->NewProxy(
     "internals", "MPIMToNSocketConnection");
   vtkSMPropertyHelper(mpiMToN, "WaitingProcess").Set(

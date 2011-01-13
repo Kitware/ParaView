@@ -77,6 +77,12 @@ public:
   virtual vtkPVServerInformation* GetServerInformation()
     { return this->ServerInformation; }
 
+  // Description:
+  // Called to do any initializations after a successful session has been
+  // established. Initialize the data-server-render-server connection, if
+  // applicable.
+  virtual void Initialize();
+
 //BTX
   // Description:
   // Push the state.
