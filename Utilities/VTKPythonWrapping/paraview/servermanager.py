@@ -1762,13 +1762,13 @@ def Connect(ds_host=None, ds_port=11111, rs_host=None, rs_port=22221):
         ActiveSession = vtkSMSession()
         ActiveSession.Initialize()
     elif rs_host == None:
-        ActiveSession = vtkSMClientSession()
+        ActiveSession = vtkSMSessionClient()
         ActiveSession.Initialize()
-        ActiveSession.Connect("cs://" + ds_host + ":" + ds_port)
+        ActiveSession.Connect("cs://%s:%d" % (ds_host, ds_port))
     else:
-        ActiveSession = vtkSMClientSession()
+        ActiveSession = vtkSMSessionClient()
         ActiveSession.Initialize()
-        ActiveSession.Connect("cdsrs://" + ds_host + ":" + ds_port + "/" + rs_host + ":" + rs_port)
+        ActiveSession.Connect("cdsrs://%s:%d/%s:%d" % (ds_host, ds_port, rs_host, rs_port))
 
     vtkProcessModule.GetProcessModule().RegisterSession(ActiveSession)
     __InitAfterConnect__()
