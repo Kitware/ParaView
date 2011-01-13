@@ -257,7 +257,7 @@ bool vtkPVPluginsInformation::GetPluginLoaded(unsigned int cc)
 {
   if (cc < this->GetNumberOfPlugins())
     {
-    return (*this->Internals)[cc].Version.c_str();
+    return (*this->Internals)[cc].Loaded;
     }
   return NULL;
 }

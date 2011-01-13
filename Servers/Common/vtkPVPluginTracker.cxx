@@ -92,6 +92,18 @@ namespace
       }
     return vtkstd::string();
     }
+
+  vtkstd::string vtkGetPluginNameFromFileName(const vtkstd::string& filename)
+    {
+    vtkstd::string defaultname =
+      vtksys::SystemTools::GetFilenameWithoutExtension(filename);
+    if (defaultname.size() > 3 &&
+      strncasecmp(defaultname.c_str(), "lib", 3) == 0)
+      {
+      defaultname.erase(0, 3);
+      }
+    return defaultname;
+    }
 }
 
 class vtkPVPluginTracker::vtkPluginsList :
@@ -254,8 +266,7 @@ unsigned int vtkPVPluginTracker::GetNumberOfPlugins()
 //----------------------------------------------------------------------------
 void vtkPVPluginTracker::RegisterAvailablePlugin(const char* filename)
 {
-  vtkstd::string defaultname =
-    vtksys::SystemTools::GetFilenameWithoutExtension(filename);
+  vtkstd::string defaultname = vtkGetPluginNameFromFileName(filename);
   vtkPluginsList::iterator iter =
     this->PluginsList->Locate(defaultname.c_str());
   if (iter == this->PluginsList->end())
