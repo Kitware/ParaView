@@ -299,6 +299,10 @@ bool vtkPVPluginLoader::LoadPlugin(const char* file)
     vtkPVPluginLoaderDebugMacro("  Python Plugin : No");
     }
 
+  // Set the filename so the vtkPVPluginTracker knows what file this plugin was
+  // loaded from.
+  plugin->SetFileName(file);
+
   // From this point onwards the vtkPVPlugin travels the same path as a
   // statically imported plugin.
   vtkPVPlugin::ImportPlugin(plugin);

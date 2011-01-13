@@ -43,12 +43,21 @@ public:
   bool GetAutoLoad(unsigned int);
 
   // Description:
+  // API to change auto-load status.
+  void SetAutoLoad(unsigned int cc, bool);
+
+  // Description:
   // Transfer information about a single object into this object.
   virtual void CopyFromObject(vtkObject*);
 
   // Description:
   // Merge another information object.
   virtual void AddInformation(vtkPVInformation*);
+
+  // Description:
+  // Updates the local information with elements from other without overriding
+  // auto-load state.
+  void Update(vtkPVPluginsInformation* other);
 
   //BTX
   // Description:

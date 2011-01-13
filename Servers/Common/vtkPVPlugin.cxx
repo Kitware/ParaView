@@ -15,6 +15,7 @@
 #include "vtkPVPlugin.h"
 
 #include "vtkPVPluginTracker.h"
+#include <vtksys/SystemTools.hxx>
 
 //-----------------------------------------------------------------------------
 void vtkPVPlugin::ImportPlugin(vtkPVPlugin* plugin)
@@ -28,10 +29,20 @@ void vtkPVPlugin::ImportPlugin(vtkPVPlugin* plugin)
 //-----------------------------------------------------------------------------
 vtkPVPlugin::vtkPVPlugin()
 {
+  this->FileName = NULL;
 }
 
 //-----------------------------------------------------------------------------
 vtkPVPlugin::~vtkPVPlugin()
 {
+  delete [] this->FileName;
+  this->FileName = NULL;
+}
 
+//-----------------------------------------------------------------------------
+void vtkPVPlugin::SetFileName(const char* filename)
+{
+  delete [] this->FileName;
+  this->FileName = NULL;
+  this->FileName = vtksys::SystemTools::DuplicateString(filename);
 }

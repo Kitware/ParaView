@@ -198,7 +198,7 @@ void vtkPVPluginsInformation::CopyFromObject(vtkObject*)
     vtkItem item;
     item.Name = tracker->GetPluginName(cc);
     item.FileName = tracker->GetPluginFileName(cc);
-    item.AutoLoad = false; // FIXME
+    item.AutoLoad = tracker->GetPluginAutoLoad(cc);
 
     vtkPVPlugin* plugin = tracker->GetPlugin(cc);
     item.Loaded = plugin != NULL;
@@ -214,6 +214,35 @@ void vtkPVPluginsInformation::CopyFromObject(vtkObject*)
       item.RequiredOnServer = false;
       }
     this->Internals->push_back(item);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVPluginsInformation::Update(vtkPVPluginsInformation* other)
+{
+  // This is N^2, but we don't expect to have hundreds of plugins to cause
+  // serious issues.
+  vtkInternals::iterator other_iter;
+  for (other_iter = other->Internals->begin();
+    other_iter != other->Internals->end(); ++other_iter)
+    {
+    vtkInternals::iterator self_iter;
+    for (self_iter = this->Internals->begin();
+      self_iter != this->Internals->end(); ++self_iter)
+      {
+      if (other_iter->Name == self_iter->Name ||
+        other_iter->FileName == self_iter->FileName)
+        {
+        bool prev_autoload = self_iter->AutoLoad;
+        (*self_iter) = (*other_iter);
+        self_iter->AutoLoad = prev_autoload;
+        break;
+        }
+      }
+    if (self_iter == this->Internals->end())
+      {
+      this->Internals->push_back(*other_iter);
+      }
     }
 }
 
@@ -290,6 +319,19 @@ bool vtkPVPluginsInformation::GetRequiredOnClient(unsigned int cc)
     return (*this->Internals)[cc].RequiredOnClient;
     }
   return false;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVPluginsInformation::SetAutoLoad(unsigned int cc, bool val)
+{
+  if (cc < this->GetNumberOfPlugins())
+    {
+    (*this->Internals)[cc].AutoLoad = val;
+    }
+  else
+    {
+    vtkWarningMacro("Invalid index: " << cc);
+    }
 }
 
 //----------------------------------------------------------------------------

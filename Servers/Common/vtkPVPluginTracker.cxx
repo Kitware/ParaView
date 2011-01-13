@@ -48,9 +48,11 @@ namespace
     vtkstd::string FileName;
     vtkstd::string PluginName;
     vtkPVPlugin* Plugin;
+    bool AutoLoad;
     vtkItem()
       {
       this->Plugin = NULL;
+      this->AutoLoad = false;
       }
     };
 
@@ -110,11 +112,23 @@ class vtkPVPluginTracker::vtkPluginsList :
   public vtkstd::vector<vtkItem>
 {
 public:
-  iterator Locate(const char* pluginname)
+  iterator LocateUsingPluginName(const char* pluginname)
     {
     for (iterator iter = this->begin(); iter != this->end(); ++iter)
       {
       if (iter->PluginName == pluginname)
+        {
+        return iter;
+        }
+      }
+    return this->end();
+    }
+
+  iterator LocateUsingFileName(const char* filename)
+    {
+    for (iterator iter = this->begin(); iter != this->end(); ++iter)
+      {
+      if (iter->FileName == filename)
         {
         return iter;
         }
@@ -243,16 +257,15 @@ void vtkPVPluginTracker::LoadPluginConfigurationXML(vtkPVXMLElement* root)
         continue;
         }
       vtkPVPluginTrackerDebugMacro("--- Found " << plugin_filename);
-      this->RegisterAvailablePlugin(plugin_filename.c_str());
-      if (auto_load)
+      unsigned int index = this->RegisterAvailablePlugin(plugin_filename.c_str());
+      if (auto_load && !this->GetPluginLoaded(index))
         {
-        // FIXME: this will right now reload already loaded plugins, need to fix
-        // that.
         // load the plugin.
         vtkPVPluginLoader* loader = vtkPVPluginLoader::New();
         loader->LoadPlugin(plugin_filename.c_str());
         loader->Delete();
         }
+      (*this->PluginsList)[index].AutoLoad = auto_load;
       }
     }
 }
@@ -264,21 +277,27 @@ unsigned int vtkPVPluginTracker::GetNumberOfPlugins()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVPluginTracker::RegisterAvailablePlugin(const char* filename)
+unsigned int vtkPVPluginTracker::RegisterAvailablePlugin(const char* filename)
 {
   vtkstd::string defaultname = vtkGetPluginNameFromFileName(filename);
   vtkPluginsList::iterator iter =
-    this->PluginsList->Locate(defaultname.c_str());
+    this->PluginsList->LocateUsingFileName(filename);
+  if (iter == this->PluginsList->end())
+    {
+    iter = this->PluginsList->LocateUsingPluginName(defaultname.c_str());
+    }
   if (iter == this->PluginsList->end())
     {
     vtkItem item;
     item.FileName = filename;
     item.PluginName = defaultname;
     this->PluginsList->push_back(item);
+    return static_cast<unsigned int>(this->PluginsList->size()-1);
     }
   else
     {
     iter->FileName = filename;
+    return static_cast<unsigned int>(iter - this->PluginsList->begin());
     }
 }
 
@@ -287,12 +306,18 @@ void vtkPVPluginTracker::RegisterPlugin(vtkPVPlugin* plugin)
 {
   assert(plugin != NULL);
 
-  vtkPluginsList::iterator iter = this->PluginsList->Locate(
+  vtkPluginsList::iterator iter = this->PluginsList->LocateUsingPluginName(
     plugin->GetPluginName());
+  // use filename for matching is present, that's a better test.
+  if (plugin->GetFileName())
+    {
+    iter = this->PluginsList->LocateUsingFileName(plugin->GetFileName());
+    }
   if (iter == this->PluginsList->end())
     {
     vtkItem item;
-    item.FileName = "unknown";
+    item.FileName = plugin->GetFileName()? plugin->GetFileName() :
+      "linked-in";
     item.PluginName = plugin->GetPluginName();
     item.Plugin = plugin;
     this->PluginsList->push_back(item);
@@ -300,6 +325,10 @@ void vtkPVPluginTracker::RegisterPlugin(vtkPVPlugin* plugin)
   else
     {
     iter->Plugin = plugin;
+    if (plugin->GetFileName())
+      {
+      iter->FileName = plugin->GetFileName();
+      }
     }
 
   // Do some basic processing of the plugin here itself.
@@ -387,4 +416,15 @@ if (index >= this->GetNumberOfPlugins())
     return NULL;
     }
   return (*this->PluginsList)[index].Plugin != NULL;
+}
+
+//----------------------------------------------------------------------------
+bool vtkPVPluginTracker::GetPluginAutoLoad(unsigned int index)
+{
+  if (index >= this->GetNumberOfPlugins())
+    {
+    vtkWarningMacro("Invalid index: " << index);
+    return NULL;
+    }
+  return (*this->PluginsList)[index].AutoLoad;
 }

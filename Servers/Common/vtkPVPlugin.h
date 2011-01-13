@@ -41,9 +41,15 @@
 
 class VTK_EXPORT vtkPVPlugin
 {
+  char* FileName;
+  void SetFileName(const char* filename);
+  friend class vtkPVPluginLoader;
 public:
   vtkPVPlugin();
   virtual ~vtkPVPlugin();
+
+  const char* GetFileName()
+    { return this->FileName; }
 
   // Description:
   // Returns the name for this plugin.

@@ -60,7 +60,7 @@ public:
   // Description:
   // This API is used to register available plugins without actually loading
   // them.
-  void RegisterAvailablePlugin(const char* filename);
+  unsigned int RegisterAvailablePlugin(const char* filename);
 
   // Description:
   // Called to load application-specific configuration xml. The xml is of the
@@ -96,6 +96,7 @@ public:
   const char* GetPluginName(unsigned int index);
   const char* GetPluginFileName(unsigned int index);
   bool GetPluginLoaded(unsigned int index);
+  bool GetPluginAutoLoad(unsigned int index);
 
 //BTX
 protected:

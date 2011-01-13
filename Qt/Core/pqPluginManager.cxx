@@ -37,7 +37,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSettings.h"
 #include "vtkPVPluginsInformation.h"
 #include "vtkPVPluginTracker.h"
+#include "vtkSmartPointer.h"
+#include "vtkSMPluginLoaderProxy.h"
 #include "vtkSMPluginManager.h"
+#include "vtkSMPropertyHelper.h"
+#include "vtkSMProxyManager.h"
 #include "vtkSMSession.h"
 #include "vtkWeakPointer.h"
 
@@ -61,6 +65,7 @@ public:
         << " auto_load=\"" << (info->GetAutoLoad(cc)? 1 : 0) << "\" />\n";
       }
     stream << "</Plugins>\n";
+    //cout << stream.str().c_str() << endl;
     return QString(stream.str().c_str());
     }
 };
@@ -92,6 +97,10 @@ pqPluginManager::pqPluginManager(QObject* parentObject)
 //-----------------------------------------------------------------------------
 pqPluginManager::~pqPluginManager()
 {
+  if (this->Internals->ActiveServer)
+    {
+    this->onServerDisconnected(this->Internals->ActiveServer);
+    }
   delete this->Internals;
 }
 
@@ -168,8 +177,9 @@ void pqPluginManager::removePlugin(const QString& lib, bool remote)
 //-----------------------------------------------------------------------------
 vtkPVPluginsInformation* pqPluginManager::loadedExtensions(bool remote)
 {
-  return remote? this->Internals->SMPluginManager->GetLocalInformation() :
-    this->Internals->SMPluginManager->GetRemoteInformation();
+  return remote?
+    this->Internals->SMPluginManager->GetRemoteInformation():
+    this->Internals->SMPluginManager->GetLocalInformation();
 }
 
 //-----------------------------------------------------------------------------
@@ -182,5 +192,24 @@ void pqPluginManager::loadExtensions(const QString& path, pqServer* server)
 pqPluginManager::LoadStatus pqPluginManager::loadExtension(
   pqServer* server, const QString& lib, QString* errorMsg, bool remote)
 {
-  return NOTLOADED;
+  bool ret_val;
+  if (remote && server->isRemote())
+    {
+    ret_val = this->Internals->SMPluginManager->LoadRemotePlugin(
+      lib.toAscii().data());
+    }
+  else
+    {
+    ret_val = this->Internals->SMPluginManager->LoadLocalPlugin(
+      lib.toAscii().data());
+    }
+
+  return ret_val? LOADED : NOTLOADED;
+}
+
+//-----------------------------------------------------------------------------
+QStringList pqPluginManager::pluginPaths(pqServer*)
+{
+  // FIXME_COLLABORATION
+  return QStringList();
 }

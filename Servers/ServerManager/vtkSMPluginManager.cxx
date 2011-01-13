@@ -78,8 +78,12 @@ bool vtkSMPluginManager::LoadLocalPlugin(const char* filename)
   if (ret_val)
     {
     // Update local-plugin information.
+    vtkPVPluginsInformation* temp = vtkPVPluginsInformation::New();
     this->Internals->Session->GatherInformation(
-      vtkPVSession::CLIENT, this->LocalInformation, 0);
+      vtkPVSession::CLIENT, temp, 0);
+    this->LocalInformation->Update(temp);
+    temp->Delete();
+
     this->InvokeEvent(vtkSMPluginManager::PluginLoadedEvent);
     }
   return ret_val;
@@ -102,8 +106,11 @@ bool vtkSMPluginManager::LoadRemotePlugin(const char* filename)
   if (status)
     {
     // Refresh the remote plugin information
+    vtkPVPluginsInformation* temp = vtkPVPluginsInformation::New();
     this->Internals->Session->GatherInformation(
-      vtkPVSession::DATA_SERVER_ROOT, this->RemoteInformation, 0);
+      vtkPVSession::DATA_SERVER_ROOT, temp, 0);
+    this->RemoteInformation->Update(temp);
+    temp->Delete();
     this->InvokeEvent(vtkSMPluginManager::PluginLoadedEvent);
     }
   return status;

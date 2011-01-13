@@ -43,6 +43,7 @@ class QTreeWidgetItem;
 class QPushButton;
 class pqServer;
 class vtkPVPluginInformation;
+class vtkPVPluginsInformation;
 
 class PQCOMPONENTS_EXPORT pqPluginDialog :
   public QDialog, private Ui::pqPluginDialog
@@ -74,25 +75,24 @@ protected slots:
 protected:
   void refreshLocal();
   void refreshRemote();
-  QString loadPlugin(pqServer* server, bool remote);
-  QString loadPlugin(pqServer* server, const QString& file, bool remote);
+  void loadPlugin(pqServer* server, bool remote);
+  void loadPlugin(pqServer* server, const QString& file, bool remote);
   void removePlugin(pqServer* server, const QString& file, bool remote);
   
   void setupTreeWidget(QTreeWidget* pluginTree);
   void populatePluginTree(QTreeWidget* pluginTree,
-    QList< vtkPVPluginInformation* >& pluginList, bool remote);
-  void createPluginNode(QTreeWidget* pluginTree,
-    vtkPVPluginInformation* pluginInfo, bool remote);
-  void addPluginInfo(QTreeWidgetItem* pluginNode, bool remote);
+    vtkPVPluginsInformation* pluginList, bool remote);
   void addInfoNodes(
-    QTreeWidgetItem* pluginNode, vtkPVPluginInformation* plInfo, bool remote);
-  vtkPVPluginInformation* getPluginInfo(QTreeWidgetItem* pluginNode)    ;
+    QTreeWidgetItem* pluginNode, vtkPVPluginsInformation* plInfo,
+    unsigned int index, bool remote);
+  vtkPVPluginsInformation* getPluginInfo(QTreeWidgetItem* pluginNode,
+    unsigned int &index);
   void updateEnableState(QTreeWidget*, QPushButton* removeButton, QPushButton* loadButton);
   void loadSelectedPlugins(QList<QTreeWidgetItem*> selItems,
     pqServer* server, bool remote);
   void removeSelectedPlugins(QList<QTreeWidgetItem*> selItems,
     pqServer* server, bool remote);
-  QString getStatusText(vtkPVPluginInformation* plInfo);
+  QString getStatusText(vtkPVPluginsInformation* plInfo, unsigned int cc);
 
 private:      
   
