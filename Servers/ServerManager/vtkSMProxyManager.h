@@ -54,6 +54,7 @@ class vtkSMSession;
 class vtkSMStateLoader;
 class vtkSMWriterFactory;
 class vtkStringList;
+class vtkSMPipelineState;
 
 //BTX
 struct vtkSMProxyManagerInternals;
@@ -519,6 +520,7 @@ protected:
   vtkSMProxyDefinitionManager* ProxyDefinitionManager;
   vtkSMSession* Session;
   vtkEventForwarderCommand* Forwarder;
+  vtkSMPipelineState* PipelineState;
 private:
   vtkSMProxyManagerInternals* Internals;
   vtkSMProxyManagerObserver* Observer;

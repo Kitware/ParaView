@@ -24,6 +24,7 @@
 #include "vtkPVXMLParser.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMDocumentation.h"
+#include "vtkSMPipelineState.h"
 #include "vtkSMPropertyIterator.h"
 #include "vtkSMProxyDefinitionIterator.h"
 #include "vtkSMProxyDefinitionManager.h"
@@ -105,6 +106,7 @@ vtkStandardNewMacro(vtkSMProxyManager);
 vtkSMProxyManager::vtkSMProxyManager()
 {
   this->Session = NULL;
+  this->PipelineState = vtkSMPipelineState::New();
   this->UpdateInputProxies = 0;
   this->Internals = new vtkSMProxyManagerInternals;
   this->Observer = vtkSMProxyManagerObserver::New();
@@ -152,6 +154,7 @@ vtkSMProxyManager::~vtkSMProxyManager()
   this->WriterFactory = 0;
 
   this->SetProxyDefinitionManager(NULL);
+  this->PipelineState->Delete();
 }
 
 //----------------------------------------------------------------------------
@@ -216,6 +219,9 @@ void vtkSMProxyManager::SetSession(vtkSMSession* session)
     }
 
   this->Session = session;
+
+  // This will also register the RemoteObject to the Session
+  this->PipelineState->SetSession(this->Session);
 
   if (this->Session)
     {
@@ -682,13 +688,10 @@ void vtkSMProxyManager::UnRegisterProxies()
   this->Internals->RegisteredProxyTuple.clear();
   this->Internals->State.ClearExtension(ProxyManagerState::registered_proxy);
 
-  // FIXME ??? Is it normal that no notification is sent in that case ???
+  // FIXME_COLLABORATION ??? Is it normal that no notification is sent in that case ???
 
-#ifdef FIXME_COLLABORATION
   // Push state for undo/redo
-  vtkSMMessage state = *this->GetFullState();
-  this->PushState(&state);
-#endif
+  this->PipelineState->ValidateState();
 }
 
 //---------------------------------------------------------------------------
@@ -712,11 +715,8 @@ void vtkSMProxyManager::UnRegisterProxy( const char* group, const char* name,
     this->InvokeEvent(vtkCommand::UnRegisterEvent, &info);
     this->UnMarkProxyAsModified(info.Proxy);
 
-#ifdef FIXME_COLLABORATION
     // Push state for undo/redo
-    vtkSMMessage state = *this->GetFullState();
-    this->PushState(&state);
-#endif
+    this->PipelineState->ValidateState();
     }
 }
 
@@ -747,10 +747,7 @@ void vtkSMProxyManager::UnRegisterProxy(const char* name)
   // Push new state only if changed occured
   if(entriesToRemove.size() > 0)
     {
-#ifdef FIXME_COLLABORATION
-    vtkSMMessage state = *this->GetFullState();
-    this->PushState(&state);
-#endif
+    this->PipelineState->ValidateState();
     }
 }
 
@@ -772,10 +769,7 @@ void vtkSMProxyManager::UnRegisterProxy(vtkSMProxy* proxy)
   // Push new state only if changed occured
   if(tuplesToRemove.size() > 0)
     {
-#ifdef FIXME_COLLABORATION
-    vtkSMMessage state = *this->GetFullState();
-    this->PushState(&state);
-#endif
+    this->PipelineState->ValidateState();
     }
 }
 
@@ -838,10 +832,7 @@ void vtkSMProxyManager::RegisterProxy(const char* groupname,
     registration->set_global_id(proxy->GetGlobalID());
 
     // Push state for undo/redo
-#ifdef FIXME_COLLABORATION
-    vtkSMMessage state = *this->GetFullState();
-    this->PushState(&state);
-#endif
+    this->PipelineState->ValidateState();
     }
 }
 
@@ -893,7 +884,7 @@ void vtkSMProxyManager::UpdateRegisteredProxies(int modified_only /*=1*/)
       vtkSMProxyManagerProxyListType::iterator it3 = it2->second.begin();
       for (; it3 != it2->second.end(); ++it3)
         {
-        // Check is proxy is in the modified set.
+        // Check if proxy is in the modified set.
         if (!modified_only ||
           this->Internals->ModifiedProxies.find(it3->GetPointer()->Proxy.GetPointer())
           != this->Internals->ModifiedProxies.end())

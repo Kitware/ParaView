@@ -70,14 +70,18 @@ int vtkSMRemoteObjectUpdateUndoElement::UpdateState(const vtkSMMessage* state)
       }
     else
       {
-      vtkWarningMacro("Unable to update RemoteObject state since no remote object with id " << state->global_id() << " were found.");
+      vtkWarningMacro(
+          "Unable to update RemoteObject state since no remote object with id "
+          << state->global_id() << " were found.");
 
       vtkCollection *remoteObjects = vtkCollection::New();
       this->Session->GetAllRemoteObjects(remoteObjects);
       cout << "List of availabe remote objects: ";
       for(int i=0;i<remoteObjects->GetNumberOfItems();i++)
         {
-        cout << " " << vtkSMRemoteObject::SafeDownCast(remoteObjects->GetItemAsObject(i))->GetGlobalID();
+        cout << " "
+             << vtkSMRemoteObject::SafeDownCast(
+                 remoteObjects->GetItemAsObject(i))->GetGlobalID();
         }
       cout << endl;
       state->PrintDebugString();
@@ -101,6 +105,7 @@ void vtkSMRemoteObjectUpdateUndoElement::SetUndoRedoState(
     }
   else
     {
-    vtkErrorMacro("Invalid SetUndoRedoState. At least one of the provided states is NULL.");
+    vtkErrorMacro( "Invalid SetUndoRedoState. "
+                   << "At least one of the provided states is NULL.");
     }
 }
