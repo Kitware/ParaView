@@ -26,6 +26,7 @@
 #include "vtkExtentTranslator.h"
 
 class vtkDataSet;
+class vtkPVTrivialExtentTranslatorInternals;
 
 class VTK_EXPORT vtkPVTrivialExtentTranslator : public vtkExtentTranslator
 {
@@ -46,6 +47,12 @@ public:
   void SetDataSet(vtkDataSet*);
   vtkGetObjectMacro(DataSet, vtkDataSet);
 
+  // Description:
+  // If DataSet is topologically regular, each process will only know
+  // about its own subextent.  This function does an allreduce to make sure
+  // that each process knows the subextent of every process.
+  void GatherExtents();
+
 //BTX
 protected:
   vtkPVTrivialExtentTranslator();
@@ -62,6 +69,8 @@ protected:
 private:
   vtkPVTrivialExtentTranslator(const vtkPVTrivialExtentTranslator&); // Not implemented
   void operator=(const vtkPVTrivialExtentTranslator&); // Not implemented
+
+  vtkPVTrivialExtentTranslatorInternals* Internals;
 //ETX
 };
 

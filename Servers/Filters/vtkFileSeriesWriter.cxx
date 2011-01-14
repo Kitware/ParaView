@@ -21,6 +21,7 @@
 #include "vtkInformationVector.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
+#include "vtkPVTrivialProducer.h"
 #include "vtkSmartPointer.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 
@@ -156,7 +157,7 @@ int vtkFileSeriesWriter::RequestData(
 
   vtkInformation* inInfo = inputVector[0]->GetInformationObject(0);
   vtkDataObject* input = inInfo->Get(vtkDataObject::DATA_OBJECT());
-  this->WriteATimestep(input);
+  this->WriteATimestep(input, inInfo);
 
   if (this->WriteAllTimeSteps)
     {
@@ -171,8 +172,9 @@ int vtkFileSeriesWriter::RequestData(
   
   return 1;
 }
- //----------------------------------------------------------------------------
-void vtkFileSeriesWriter::WriteATimestep(vtkDataObject* input)
+//----------------------------------------------------------------------------
+void vtkFileSeriesWriter::WriteATimestep(vtkDataObject* input,
+                                         vtkInformation* inInfo)
 {
   vtksys_ios::ostringstream fname;
   if (this->WriteAllTimeSteps && this->NumberOfTimeSteps > 1)
@@ -195,6 +197,27 @@ void vtkFileSeriesWriter::WriteATimestep(vtkDataObject* input)
   vtkSmartPointer<vtkDataObject> clone;
   clone.TakeReference(input->NewInstance());
   clone->ShallowCopy(input);
+  //if(inInfo->Get(vtkDataObject::DATA_EXTENT_TYPE()) == VTK_3D_EXTENT &&
+  if(inInfo->Has(vtkStreamingDemandDrivenPipeline::WHOLE_EXTENT()))
+    {
+    cerr << "in vtkfsw::whole extent\n";
+    vtkPVTrivialProducer* trivialProducer =
+      vtkPVTrivialProducer::New();
+    trivialProducer->SetOutput(clone);
+    trivialProducer->FastDelete();
+    int extent[6];
+    inInfo->Get(vtkStreamingDemandDrivenPipeline::WHOLE_EXTENT(), extent);
+    trivialProducer->SetWholeExtent(extent);
+    trivialProducer->GatherExtents();
+
+    cout << "::" << extent[4] << " " << extent[5] << " " << getpid() << endl;
+    clone->GetInformation()->Set(
+      vtkStreamingDemandDrivenPipeline::WHOLE_EXTENT(), extent, 6);
+    }
+  else
+    {
+    cerr << "COULD NOT FIND WHOLE EXTENT in input for file series writer\n";
+    }
   this->Writer->SetInputConnection(clone->GetProducerPort());
   this->SetWriterFileName(fname.str().c_str());
   this->WriteInternal();

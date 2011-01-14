@@ -88,7 +88,7 @@ private:
   void operator=(const vtkFileSeriesWriter&); // Not implemented.
   
   void SetWriterFileName(const char* fname);
-  void WriteATimestep(vtkDataObject*);
+  void WriteATimestep(vtkDataObject*, vtkInformation* inInfo);
   void WriteInternal();
 
   vtkAlgorithm* Writer;

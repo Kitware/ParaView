@@ -20,36 +20,43 @@
 #include "vtkDataSet.h"
 #include "vtkObjectFactory.h"
 #include "vtkPointData.h"
+#include <vtkTableExtentTranslator.h>
 
-#include <vtkstd/vector>
-#include <vtkstd/string>
-#include <vtkstd/algorithm>
+#include <vector>
+#include <string>
+#include <algorithm>
 
 class vtkCPInputDataDescription::vtkInternals
 {
 public:
-  typedef vtkstd::vector<vtkstd::string> FieldType;
+  typedef std::vector<std::string> FieldType;
   FieldType PointFields;
   FieldType CellFields;
 };
 
 vtkStandardNewMacro(vtkCPInputDataDescription);
 vtkCxxSetObjectMacro(vtkCPInputDataDescription, Grid, vtkDataObject);
+vtkCxxSetObjectMacro(vtkCPInputDataDescription, ExtentTranslator, vtkTableExtentTranslator);
 //----------------------------------------------------------------------------
 vtkCPInputDataDescription::vtkCPInputDataDescription()
 {
-  this->Grid = 0;
+  this->Grid = NULL;
   this->GenerateMesh = false;
   this->AllFields = false;
-  this->Internals = new vtkInternals();
+  this->ExtentTranslator = NULL;
+  this->Internals = new vtkCPInputDataDescription::vtkInternals();
 }
 
 //----------------------------------------------------------------------------
 vtkCPInputDataDescription::~vtkCPInputDataDescription()
 {
   this->SetGrid(0);
-  delete this->Internals;
-  this->Internals = 0;
+  this->SetExtentTranslator(0);
+  if(this->Internals)
+    {
+    delete this->Internals;
+    this->Internals = NULL;
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -113,14 +120,14 @@ bool vtkCPInputDataDescription::IsFieldNeeded(const char* fieldName)
     return true;
     }
 
-  if (vtkstd::find(this->Internals->PointFields.begin(),
+  if (std::find(this->Internals->PointFields.begin(),
     this->Internals->PointFields.end(),
     fieldName) != this->Internals->PointFields.end())
     {
     return true;
     }
 
-  if (vtkstd::find(this->Internals->CellFields.begin(),
+  if (std::find(this->Internals->CellFields.begin(),
     this->Internals->CellFields.end(),
     fieldName) != this->Internals->CellFields.end())
     {
@@ -133,7 +140,7 @@ bool vtkCPInputDataDescription::IsFieldNeeded(const char* fieldName)
 //----------------------------------------------------------------------------
 bool vtkCPInputDataDescription::IsFieldPointData(const char* fieldName)
 {
-  if (vtkstd::find(this->Internals->PointFields.begin(),
+  if (std::find(this->Internals->PointFields.begin(),
     this->Internals->PointFields.end(),
     fieldName) != this->Internals->PointFields.end())
     {
@@ -144,12 +151,6 @@ bool vtkCPInputDataDescription::IsFieldPointData(const char* fieldName)
 }
 
 //----------------------------------------------------------------------------
-vtkDataObject* vtkCPInputDataDescription::GetGrid()
-{
-  return this->Grid;
-}
-
-//----------------------------------------------------------------------------
 bool vtkCPInputDataDescription::IsInputSufficient()
 {
   if (this->Grid == 0)
@@ -157,32 +158,32 @@ bool vtkCPInputDataDescription::IsInputSufficient()
     return false;
     }
 
-  vtkDataSet* DataSet = vtkDataSet::SafeDownCast(this->Grid);
-  if(DataSet)
+  vtkDataSet* dataSet = vtkDataSet::SafeDownCast(this->Grid);
+  if(dataSet)
     {
-    return this->DoesGridContainNeededFields(DataSet);
+    return this->DoesGridContainNeededFields(dataSet);
     }
-  vtkCompositeDataSet* Composite = 
+  vtkCompositeDataSet* composite =
     vtkCompositeDataSet::SafeDownCast(this->Grid);
-  if(Composite)
+  if(composite)
     {
-    vtkCompositeDataIterator* Iter = Composite->NewIterator();
-    Iter->VisitOnlyLeavesOn();
-    Iter->TraverseSubTreeOn();
-    Iter->SkipEmptyNodesOn();
-    for(Iter->GoToFirstItem();!Iter->IsDoneWithTraversal();Iter->GoToNextItem())
+    vtkCompositeDataIterator* iter = composite->NewIterator();
+    iter->VisitOnlyLeavesOn();
+    iter->TraverseSubTreeOn();
+    iter->SkipEmptyNodesOn();
+    for(iter->GoToFirstItem();!iter->IsDoneWithTraversal();iter->GoToNextItem())
       {
-      DataSet = vtkDataSet::SafeDownCast(Iter->GetDataSet());
-      if(DataSet)
+      dataSet = vtkDataSet::SafeDownCast(iter->GetDataSet());
+      if(dataSet)
         {
-        if(!this->DoesGridContainNeededFields(DataSet))
+        if(!this->DoesGridContainNeededFields(dataSet))
           {
-          Iter->Delete();
+          iter->Delete();
           return false;
           }
         }
       }
-    Iter->Delete();
+    iter->Delete();
     return true;
     }
   
@@ -197,7 +198,7 @@ bool vtkCPInputDataDescription::DoesGridContainNeededFields(vtkDataSet* dataSet)
     iter != this->Internals->PointFields.end();
     ++iter)
     {
-    vtkstd::string fieldName = *iter;
+    std::string fieldName = *iter;
     if (dataSet->GetPointData()->GetArray(fieldName.c_str()) == 0)
       {
       return false;
@@ -208,7 +209,7 @@ bool vtkCPInputDataDescription::DoesGridContainNeededFields(vtkDataSet* dataSet)
     iter != this->Internals->CellFields.end();
     ++iter)
     {
-    vtkstd::string fieldName = *iter;
+    std::string fieldName = *iter;
     if (dataSet->GetCellData()->GetArray(fieldName.c_str()) == 0)
       {
       return false;
@@ -231,6 +232,21 @@ void vtkCPInputDataDescription::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os, indent);
   os << indent << "AllFields: " << this->AllFields << "\n";
   os << indent << "GenerateMesh: " << this->GenerateMesh << "\n";
-  os << indent << "Grid: " << this->Grid << "\n";
+  if(this->Grid)
+    {
+    os << indent << "Grid: " << this->Grid << "\n";
+    }
+  else
+    {
+    os << indent << "Grid: (NULL)\n";
+    }
+  if(this->ExtentTranslator)
+    {
+    os << indent << "ExtentTranslator: " << this->ExtentTranslator << "\n";
+    }
+  else
+    {
+    os << indent << "ExtentTranslator: (NULL)\n";
+    }
 }
 
