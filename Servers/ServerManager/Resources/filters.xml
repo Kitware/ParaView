@@ -10725,35 +10725,5 @@ This property controls how the filter works to generate tensor cell data. You ca
    <!-- End IntersectFragments -->
    </SourceProxy>
 
-  <!-- ==================================================================== -->
-  <FetchDataProxy name="FetchData" class="vtkPVFetchDataFilter"
-                processes="client|dataserver">
-    <Documentation>
-      This is a filter proxy that makes is possible to deliver data to the
-      client. Simply attach this proxy to a data source, and call
-      UpdatePipeline(). The data will be available as the output on the
-      client-side.
-    </Documentation>
-
-    <InputProperty name="Input" command="SetInputConnection">
-      <ProxyGroupDomain name="groups">
-        <Group name="sources"/>
-        <Group name="filters"/>
-      </ProxyGroupDomain>
-      <DataTypeDomain name="input_type">
-        <DataType value="vtkDataObject"/>
-      </DataTypeDomain>
-      <Documentation>
-        The input to this filter.
-      </Documentation>
-    </InputProperty>
-
-    <StringVectorProperty name="PostGatherHelperName"
-      command="SetPostGatherHelperName"
-      number_of_elements="1"
-      default_values="">
-    </StringVectorProperty>
-  </FetchDataProxy>
-
   </ProxyGroup>
 </ServerManagerConfiguration>
