@@ -117,11 +117,11 @@ vtkPMObject* vtkPMProperty::GetPMObject(vtkTypeUInt32 globalid)
 //----------------------------------------------------------------------------
 bool vtkPMProperty::ProcessMessage(vtkClientServerStream& stream)
 {
-  if (this->ProxyHelper)
+  if (this->ProxyHelper && this->ProxyHelper->GetVTKObject())
     {
     return this->ProxyHelper->GetInterpreter()->ProcessStream(stream) != 0;
     }
-  return false;
+  return this->ProxyHelper ? true : false;
 }
 
 //----------------------------------------------------------------------------
@@ -157,7 +157,8 @@ void vtkPMProperty::PrintSelf(ostream& os, vtkIndent indent)
 //          and not for value property.
 bool vtkPMProperty::Push(vtkSMMessage*, int)
 {
-  if (this->InformationOnly || !this->Command || this->UpdateSelf)
+  if ( this->InformationOnly || !this->Command || this->UpdateSelf ||
+       this->GetVTKObjectID().IsNull() )
     {
     return true;
     }
