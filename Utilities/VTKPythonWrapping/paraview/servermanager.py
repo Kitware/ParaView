@@ -1739,6 +1739,18 @@ def LoadState(filename, session=None):
             view.GetRenderWindow().SetSize(view.ViewSize[0], \
                                            view.ViewSize[1])
 
+def InitFromGUI():
+    """
+    Method used to initialize the Python Shell from the ParaView GUI.
+    """
+    global ActiveSession
+    global fromGUI
+    fromGUI = True
+    # ToggleProgressPrinting() ### FIXME COLLABORATION
+    ActiveSession = ProxyManager().GetSession()
+    __InitAfterConnect__()
+
+
 def Connect(ds_host=None, ds_port=11111, rs_host=None, rs_port=22221):
     """
     Use this function call to create a new session. On success,
@@ -1831,7 +1843,7 @@ def GetRenderView(session=None):
     if not session:
         session = ActiveSession
     render_module = None
-    for aProxy in vtkSMObject.GetProxyManager():
+    for aProxy in ProxyManager():
         if aProxy.IsA("vtkSMRenderViewProxy"):
             render_module = aProxy
             break
