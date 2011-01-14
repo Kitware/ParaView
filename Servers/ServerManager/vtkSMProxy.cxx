@@ -1346,10 +1346,15 @@ int vtkSMProxy::ReadXMLAttributes( vtkSMProxyManager* pm,
     }
 
   // Create all properties
+  int old_value = this->DoNotModifyProperty;  // FIXME COLLAB: Prevent sending default values
+  this->DoNotModifyProperty = 1;              // FIXME COLLAB: Prevent sending default values
+
   if (!this->CreateSubProxiesAndProperties(pm, element))
     {
     return 0;
     }
+
+  this->DoNotModifyProperty = old_value;      // FIXME COLLAB: Prevent sending default values
 
   this->SetXMLElement(0);
   return 1;
