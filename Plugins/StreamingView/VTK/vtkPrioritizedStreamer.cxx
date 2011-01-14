@@ -24,8 +24,8 @@
 #include "vtkStreamingDriver.h"
 #include "vtkStreamingHarness.h"
 
-#define DEBUGPRINT_PASSES( arg ) arg;
-#define DEBUGPRINT_PRIORITY( arg ) arg;
+#define DEBUGPRINT_PASSES( arg ) ;
+#define DEBUGPRINT_PRIORITY( arg ) ;
 
 vtkStandardNewMacro(vtkPrioritizedStreamer);
 

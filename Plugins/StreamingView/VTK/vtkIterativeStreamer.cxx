@@ -17,15 +17,16 @@
 #include "vtkCollection.h"
 #include "vtkCollectionIterator.h"
 #include "vtkObjectFactory.h"
+#include "vtkParallelStreamHelper.h"
 #include "vtkPieceCacheFilter.h"
 #include "vtkRenderer.h"
 #include "vtkRenderWindow.h"
 #include "vtkStreamingDriver.h"
 #include "vtkStreamingHarness.h"
 
-#define DEBUGPRINT_PASSES( arg ) \
-  cerr << getpid() << " " << this << " ";\
-  arg;
+#define DEBUGPRINT_PASSES( arg ) ;
+//  cerr << getpid() << " " << this << " ";     \
+//  arg;
 
 vtkStandardNewMacro(vtkIterativeStreamer);
 
@@ -161,7 +162,12 @@ void vtkIterativeStreamer::PrepareNextPass()
 void vtkIterativeStreamer::StartRenderEvent()
 {
   DEBUGPRINT_PASSES(cerr << "SRE" << endl;);
-  if (this->IsFirstPass())
+  bool firstPass = this->IsFirstPass();
+  if (this->GetParallelHelper())
+    {
+    this->GetParallelHelper()->Reduce(firstPass);
+    }
+  if (firstPass)
     {
     this->PrepareFirstPass();
     }
@@ -218,8 +224,12 @@ void vtkIterativeStreamer::EndRenderEvent()
     rw->EraseOff();
     }
 
-  bool everyoneDone = this->IsEveryoneDone();
-  if (everyoneDone || this->StopNow)
+  bool everyoneDone = (this->IsEveryoneDone() || this->StopNow);
+  if (this->GetParallelHelper())
+    {
+    this->GetParallelHelper()->Reduce(everyoneDone);
+    }
+  if (everyoneDone )
     {
     DEBUGPRINT_PASSES(cerr << "ALLDONE SHOW" << endl;);
 
@@ -239,7 +249,6 @@ void vtkIterativeStreamer::EndRenderEvent()
 
     //we haven't finished yet so schedule the next pass
     DEBUGPRINT_PASSES(cerr << "RENDER EVENTUALLY" << endl;);
-
     this->RenderEventually();
     }
 }

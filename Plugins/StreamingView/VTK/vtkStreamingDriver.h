@@ -28,6 +28,7 @@
 
 class vtkCallbackCommand;
 class vtkCollection;
+class vtkParallelStreamHelper;
 class vtkRenderer;
 class vtkRenderWindow;
 class vtkStreamingHarness;
@@ -67,6 +68,11 @@ public:
   // to take over and drive the progression yourself.
   vtkSetMacro(ManualStart, bool);
   vtkSetMacro(ManualFinish, bool);
+
+  // Description:
+  // Assign a helper class that we use to keep parallel instances in synch.
+  void SetParallelHelper(vtkParallelStreamHelper *);
+  vtkParallelStreamHelper* GetParallelHelper();
 
   //Description:
   //Controls if the display is updated when fully drawn (0), or

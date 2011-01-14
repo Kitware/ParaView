@@ -19,6 +19,7 @@ SET(vtkStreaming_SOURCES
   vtkIterativeStreamer.cxx
   vtkMetaInfoDatabase.cxx
   vtkMultiResolutionStreamer.cxx
+  vtkParallelStreamHelper.cxx
   vtkPiece.cxx
   vtkPieceCacheExecutive.cxx
   vtkPieceCacheFilter.cxx
@@ -50,17 +51,18 @@ IF (BUILD_AGAINST_PARAVIEW)
   SET(REALSRCS)
   SET(INST_SRCS)
   FOREACH(SRC
-      vtkACosmoReader.cxx
-      vtkIterativeStreamer.cxx
-      vtkMultiResolutionStreamer.cxx
-      vtkPrioritizedStreamer.cxx
-      vtkPieceCacheExecutive.cxx
-      vtkPieceCacheFilter.cxx
-      vtkPieceList.cxx
+      vtkACosmoReader
+      vtkIterativeStreamer
+      vtkMultiResolutionStreamer
+      vtkParallelStreamHelper
+      vtkPrioritizedStreamer
+      vtkPieceCacheExecutive
+      vtkPieceCacheFilter
+      vtkPieceList
       vtkRawStridedReader1
-      vtkStreamedMandelbrot.cxx
-      vtkStreamingDriver.cxx
-      vtkStreamingHarness.cxx
+      vtkStreamedMandelbrot
+      vtkStreamingDriver
+      vtkStreamingHarness
       )
     GET_FILENAME_COMPONENT(src_name "${SRC}" NAME_WE)
     GET_FILENAME_COMPONENT(src_path "${SRC}" ABSOLUTE)

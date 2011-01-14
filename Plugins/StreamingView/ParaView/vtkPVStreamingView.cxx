@@ -63,6 +63,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkMath.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVStreamingParallelHelper.h"
 #include "vtkPVStreamingRepresentation.h"
 #include "vtkRenderer.h"
 #include "vtkStreamingDriver.h"
@@ -117,6 +118,11 @@ void vtkPVStreamingView::SetStreamDriver(vtkStreamingDriver *nd)
     this->StreamDriver->SetRenderer(this->GetRenderer());
     this->StreamDriver->AssignRenderLaterFunction
       (vtkPVStreamingViewRenderLaterFunction, this);
+
+    vtkPVStreamingParallelHelper *helper = vtkPVStreamingParallelHelper::New();
+    helper->SetSynchronizedWindows(this->SynchronizedWindows);
+    this->StreamDriver->SetParallelHelper(helper);
+    helper->Delete();
     }
 }
 
@@ -144,7 +150,11 @@ void vtkPVStreamingView::Render(bool interactive, bool skip_rendering)
       }
     }
 
+  //static int cnt = 0;
+  //cerr << "REN >>>" << cnt << endl;
   this->Superclass::Render(interactive, skip_rendering);
+  //cerr << "<<< REN " << cnt << endl;
+  //cnt ++;
 
   if (this->StreamDriver)
     {

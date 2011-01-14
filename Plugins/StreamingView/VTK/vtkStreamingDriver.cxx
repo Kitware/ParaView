@@ -20,6 +20,7 @@
 #include "vtkCollectionIterator.h"
 #include "vtkInteractorStyle.h"
 #include "vtkObjectFactory.h"
+#include "vtkParallelStreamHelper.h"
 #include "vtkPieceCacheFilter.h"
 #include "vtkRenderer.h"
 #include "vtkRenderWindow.h"
@@ -44,21 +45,26 @@ public:
     this->ViewSorter = vtkVisibilityPrioritizer::New();
     this->CameraTime = 0;
     this->PixelArray = NULL;
+    this->ParallelHelper = NULL;
   }
   ~Internals()
   {
-  this->Owner->SetRenderer(NULL);
-  this->Owner->SetRenderWindow(NULL);
-  if (this->WindowWatcher)
-    {
-    this->WindowWatcher->Delete();
-    }
-  this->Harnesses->Delete();
-  this->ViewSorter->Delete();
-  if (this->PixelArray)
-    {
-    this->PixelArray->Delete();
-    }
+    this->Owner->SetRenderer(NULL);
+    this->Owner->SetRenderWindow(NULL);
+    if (this->WindowWatcher)
+      {
+      this->WindowWatcher->Delete();
+      }
+    this->Harnesses->Delete();
+    this->ViewSorter->Delete();
+    if (this->PixelArray)
+      {
+      this->PixelArray->Delete();
+      }
+    if (this->ParallelHelper)
+      {
+      this->ParallelHelper->Delete();
+      }
   }
 
   vtkStreamingDriver *Owner;
@@ -69,7 +75,7 @@ public:
   void (*RenderLaterFunction) (void *);
   void *RenderLaterArgument;
   vtkUnsignedCharArray *PixelArray;
-
+  vtkParallelStreamHelper *ParallelHelper;
   //auxilliary functionality, that help view sorting sublasses
   vtkVisibilityPrioritizer *ViewSorter;
   unsigned long CameraTime;
@@ -243,6 +249,28 @@ void vtkStreamingDriver::RenderEventually()
     {
     this->Internal->RenderWindow->Render();
     }
+}
+
+//----------------------------------------------------------------------------
+vtkParallelStreamHelper *vtkStreamingDriver::GetParallelHelper()
+{
+  return this->Internal->ParallelHelper;
+}
+
+//----------------------------------------------------------------------------
+void vtkStreamingDriver::SetParallelHelper(vtkParallelStreamHelper *hlp)
+{
+  if (this->Internal->ParallelHelper)
+    {
+    this->Internal->ParallelHelper->Delete();
+    }
+  if (!hlp)
+    {
+    return;
+    }
+
+  hlp->Register(this);
+  this->Internal->ParallelHelper = hlp;
 }
 
 //----------------------------------------------------------------------------
