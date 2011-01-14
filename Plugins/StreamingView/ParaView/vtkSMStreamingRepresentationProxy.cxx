@@ -79,20 +79,46 @@ vtkSMStreamingRepresentationProxy::vtkSMStreamingRepresentationProxy()
 //-----------------------------------------------------------------------------
 vtkSMStreamingRepresentationProxy::~vtkSMStreamingRepresentationProxy()
 {
-  if (this->PieceCache)
-    {
-    this->PieceCache->Delete();
-    }
-  if (this->Harness)
-    {
-    this->Harness->Delete();
-    }
 }
 
 //-----------------------------------------------------------------------------
 void vtkSMStreamingRepresentationProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+}
+
+//------------------------------------------------------------------------------
+void vtkSMStreamingRepresentationProxy::CreateVTKObjects()
+{
+  if (this->ObjectsCreated)
+    {
+    return;
+    }
+
+  this->Superclass::CreateVTKObjects();
+
+  this->PieceCache =
+    vtkSMSourceProxy::SafeDownCast(this->GetSubProxy("PieceCache"));
+
+  this->Harness =
+    vtkSMSourceProxy::SafeDownCast(this->GetSubProxy("Harness"));
+
+  vtkProcessModule *pm = vtkProcessModule::GetProcessModule();
+  vtkClientServerStream stream;
+  stream
+    << vtkClientServerStream::Invoke
+    << this->GetID()
+    << "SetPieceCache"
+    << this->PieceCache->GetID()
+    << vtkClientServerStream::End
+    << vtkClientServerStream::Invoke
+    << this->GetID()
+    << "SetHarness"
+    << this->Harness->GetID()
+    << vtkClientServerStream::End;
+  pm->SendStream(this->GetConnectionID(),
+                 vtkProcessModule::SERVERS,
+                 stream);
 }
 
 //------------------------------------------------------------------------------
@@ -104,35 +130,9 @@ void vtkSMStreamingRepresentationProxy::AddInput
 {
   if (!this->ObjectsCreated)
     {
-    this->PieceCache =
-      vtkSMSourceProxy::SafeDownCast(this->GetSubProxy("PieceCache"));
-    this->PieceCache->Register(this);
-
-    //Get hold of the pipeline control filter proxy
-    this->Harness =
-      vtkSMSourceProxy::SafeDownCast(this->GetSubProxy("Harness"));
-    this->Harness->Register(this);
-
-    this->Harness->AddInput(0, this->PieceCache, 0, "SetInputConnection");
-
-    vtkProcessModule *pm = vtkProcessModule::GetProcessModule();
-    vtkClientServerStream stream;
-    stream
-      << vtkClientServerStream::Invoke
-      << this->GetID()
-      << "SetPieceCache"
-      << this->PieceCache->GetID()
-      << vtkClientServerStream::End
-      << vtkClientServerStream::Invoke
-      << this->GetID()
-      << "SetHarness"
-      << this->Harness->GetID()
-      << vtkClientServerStream::End;
-    pm->SendStream(this->GetConnectionID(),
-                   vtkProcessModule::SERVERS,
-                   stream);
+    this->CreateVTKObjects();
     }
-
   this->PieceCache->AddInput(inputPort, input, outputPort, method);
+  this->Harness->AddInput(0, this->PieceCache, 0, "SetInputConnection");
   this->Superclass::AddInput(0, this->Harness, 0, "SetInputConnection");
 }

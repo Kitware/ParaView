@@ -93,10 +93,10 @@ public:
   // them modified so that the next render executes their pipelines fully.
   bool IsDisplayDone();
 
-  // TODO:
+  // Description:
   // Allow direct access to the driver proxy to avoid messy exposed
-  // properties in the XML. Problem is this is assigned only after something is shown.
-  //vtkSMProxy *GetDriver() { return this->Driver; };
+  // properties in the XML.
+  vtkSMProxy *GetDriver() { return this->Driver; };
 
 //BTX
 protected:
@@ -104,7 +104,8 @@ protected:
   ~vtkSMStreamingViewProxy();
 
   // Description:
-  // Overridded to initialized the CS wrapped VTK streaming library.
+  // Overridden to initialize the CS wrapped VTK streaming library and
+  // expose the streaming driver proxy.
   virtual void CreateVTKObjects();
 
   // Description:
