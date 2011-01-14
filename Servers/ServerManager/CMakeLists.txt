@@ -73,7 +73,6 @@ SET(Kit_SRCS
   vtkSMExponentialKeyFrameProxy.cxx
   vtkSMExporterProxy.cxx
   vtkSMExtentDomain.cxx
-  vtkSMFetchDataProxy.cxx
   vtkSMFieldDataDomain.cxx
   vtkSMFileListDomain.cxx
   vtkSMFileSeriesReaderProxy.cxx
