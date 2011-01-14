@@ -17,6 +17,7 @@
 #include "vtkCollection.h"
 #include "vtkCollectionIterator.h"
 #include "vtkObjectFactory.h"
+#include "vtkParallelStreamHelper.h"
 #include "vtkPieceCacheFilter.h"
 #include "vtkPieceList.h"
 #include "vtkRenderer.h"
@@ -629,8 +630,12 @@ void vtkMultiResolutionStreamer::StartRenderEvent()
     return;
     }
 
-  this->Internal->CameraMoved = this->HasCameraMoved();
-  if (this->Internal->CameraMoved || this->Internal->WendDone)
+  this->Internal->CameraMoved = this->HasCameraMoved() || this->Internal->WendDone;
+  if (this->GetParallelHelper())
+    {
+    this->GetParallelHelper()->Reduce(this->Internal->CameraMoved);
+    }
+  if (this->Internal->CameraMoved)
     {
     DEBUGPRINT_PASSES
       (
@@ -752,7 +757,12 @@ void vtkMultiResolutionStreamer::EndRenderEvent()
   ren->EraseOff();
   rw->EraseOff();
 
-  if (this->IsCompletelyDone() || this->Internal->StopNow)
+  bool allDone = this->IsCompletelyDone() || this->Internal->StopNow;
+  if (this->GetParallelHelper())
+    {
+    this->GetParallelHelper()->Reduce(allDone);
+    }
+  if (allDone)
     {
     this->Internal->StopNow = false;
 
@@ -769,7 +779,12 @@ void vtkMultiResolutionStreamer::EndRenderEvent()
     }
   else
     {
-    if (this->IsWendDone())
+    bool wendDone = this->IsWendDone();
+    if (this->GetParallelHelper())
+      {
+      this->GetParallelHelper()->Reduce(wendDone);
+      }
+    if (wendDone)
       {
       DEBUGPRINT_PASSES
         (

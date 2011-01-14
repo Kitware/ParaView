@@ -17,6 +17,7 @@
 #include "vtkCollection.h"
 #include "vtkCollectionIterator.h"
 #include "vtkObjectFactory.h"
+#include "vtkParallelStreamHelper.h"
 #include "vtkPieceCacheFilter.h"
 #include "vtkPieceList.h"
 #include "vtkRenderer.h"
@@ -243,7 +244,12 @@ void vtkPrioritizedStreamer::StartRenderEvent()
     return;
     }
 
-  if (this->HasCameraMoved() || this->Internal->StartOver)
+  bool startOver = this->HasCameraMoved() || this->Internal->StartOver;
+  if (this->GetParallelHelper())
+    {
+    this->GetParallelHelper()->Reduce(startOver);
+    }
+  if (startOver)
     {
     DEBUGPRINT_PASSES
       (
@@ -343,7 +349,12 @@ void vtkPrioritizedStreamer::EndRenderEvent()
   ren->EraseOff();
   rw->EraseOff();
 
-  if (this->IsEveryoneDone()||this->Internal->StopNow)
+  bool allDone = this->IsEveryoneDone()||this->Internal->StopNow;
+  if (this->GetParallelHelper())
+    {
+    this->GetParallelHelper()->Reduce(allDone);
+    }
+  if (allDone)
     {
     this->Internal->StopNow = false;
     DEBUGPRINT_PASSES

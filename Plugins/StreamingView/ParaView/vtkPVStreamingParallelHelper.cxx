@@ -18,8 +18,6 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVSynchronizedRenderWindows.h"
 
-//#include <unistd.h>
-
 vtkStandardNewMacro(vtkPVStreamingParallelHelper);
 
 //----------------------------------------------------------------------------
@@ -63,9 +61,6 @@ void vtkPVStreamingParallelHelper::SetSynchronizedWindows
 //----------------------------------------------------------------------------
 void vtkPVStreamingParallelHelper::Reduce(bool &flag)
 {
-//  static int cnt = 0;
-//  cerr << getpid() << " " << this << " " << cnt
-//       << " SReduce < " << (flag?"TRUE":"FALSE") << endl;
   if (this->SynchronizedWindows)
     {
     unsigned int value = (unsigned int)flag;
@@ -79,7 +74,7 @@ void vtkPVStreamingParallelHelper::Reduce(bool &flag)
       case vtkPVSynchronizedRenderWindows::CLIENT:
         c_ds_controller =
           this->SynchronizedWindows->GetClientServerController();
-        c_ds_controller->Receive(&value, 1, 0, 99999);
+        c_ds_controller->Receive(&value, 1, 1, 99999);
         break;
       default:
         c_ds_controller =
@@ -88,7 +83,4 @@ void vtkPVStreamingParallelHelper::Reduce(bool &flag)
       }
     flag = (bool)value;
     }
-//  cerr << getpid() << " " << this << " " << cnt
-//       << " EReduce > " << (flag?"TRUE":"FALSE") << endl;
-//  cnt++;
 }

@@ -65,6 +65,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 #include "vtkPVStreamingParallelHelper.h"
 #include "vtkPVStreamingRepresentation.h"
+#include "vtkPVSynchronizedRenderWindows.h"
 #include "vtkRenderer.h"
 #include "vtkStreamingDriver.h"
 
@@ -129,7 +130,13 @@ void vtkPVStreamingView::SetStreamDriver(vtkStreamingDriver *nd)
 //----------------------------------------------------------------------------
 void vtkPVStreamingView::Render(bool interactive, bool skip_rendering)
 {
+  //set flag that gui watches to schedule more renders,
+  //assume we are done, and correct later if needed
   this->IsDisplayDone = 1;
+
+  bool render_event_propagation =
+    this->SynchronizedWindows->GetRenderEventPropagation();
+  this->SynchronizedWindows->RenderEventPropagationOff();
 
   if (this->StreamDriver)
     {
@@ -150,22 +157,22 @@ void vtkPVStreamingView::Render(bool interactive, bool skip_rendering)
       }
     }
 
-  //static int cnt = 0;
-  //cerr << "REN >>>" << cnt << endl;
   this->Superclass::Render(interactive, skip_rendering);
-  //cerr << "<<< REN " << cnt << endl;
-  //cnt ++;
 
   if (this->StreamDriver)
     {
     //figure out what to do next
     this->StreamDriver->EndRenderEvent();
     }
+
+  this->SynchronizedWindows->SetRenderEventPropagation
+    (render_event_propagation);
 }
 
 //----------------------------------------------------------------------------
 void vtkPVStreamingView::RenderSchedule()
 {
+  //let GUI know that we are not done yet
   this->IsDisplayDone = 0;
 }
 
@@ -195,5 +202,6 @@ void vtkPVStreamingView::ResetCameraClippingRange()
     }
 
   this->GetRenderer()->ResetCameraClippingRange(this->LastComputedBounds);
-  this->GetNonCompositedRenderer()->ResetCameraClippingRange(this->LastComputedBounds);
+  this->GetNonCompositedRenderer()->ResetCameraClippingRange
+    (this->LastComputedBounds);
 }
