@@ -607,6 +607,15 @@ void vtkPVDataInformation::CopyFromObject(vtkObject* object)
       }
     else if (algo)
       {
+      // We don't use vtkAlgorithm::GetOutputDataObject() since that call a
+      // UpdateDataObject() pass, which may raise errors if the algo is not
+      // fully setup yet.
+      vtkInformation* info = algo->GetExecutive()->GetOutputInformation(
+        this->PortNumber);
+      if (!info || vtkDataObject::GetData(info) == NULL)
+        {
+        return;
+        }
       dobj = algo->GetOutputDataObject(this->PortNumber);
       }
     }
