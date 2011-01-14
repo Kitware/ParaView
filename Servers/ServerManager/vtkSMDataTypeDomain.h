@@ -78,9 +78,6 @@ protected:
   vtkSetMacro(CompositeDataSupported, int);
   vtkGetMacro(CompositeDataSupported, int);
 
-  class vtkDataObjectInstanceCache;
-  static vtkDataObjectInstanceCache* DataObjectCache;
-
 private:
   vtkSMDataTypeDomain(const vtkSMDataTypeDomain&); // Not implemented
   void operator=(const vtkSMDataTypeDomain&); // Not implemented

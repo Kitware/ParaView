@@ -38,14 +38,12 @@ struct vtkSMDataTypeDomainInternals
   vtkstd::vector<vtkStdString> DataTypes;
 };
 //*****************************************************************************
-class vtkSMDataTypeDomain::vtkDataObjectInstanceCache
+namespace vtkSMDataTypeDomainCache
 {
-private:
-  vtkstd::map<vtkstd::string, vtkSmartPointer<vtkDataObject> > DataObjectMap;
+  static vtkstd::map<vtkstd::string, vtkSmartPointer<vtkDataObject> > DataObjectMap;
 
-public:
   // Only instanciate classes once and use cache after...
-  vtkDataObject* GetDataObjectOfType(const char* classname)
+  static vtkDataObject* GetDataObjectOfType(const char* classname)
     {
     if (classname == NULL)
       {
@@ -68,8 +66,8 @@ public:
       }
 
     vtkstd::map<vtkstd::string, vtkSmartPointer<vtkDataObject> >::iterator it;
-    it = this->DataObjectMap.find(classname);
-    if (it != this->DataObjectMap.end())
+    it = DataObjectMap.find(classname);
+    if (it != DataObjectMap.end())
       {
       return it->second.GetPointer();
       }
@@ -85,15 +83,14 @@ public:
       return 0;
       }
 
-    this->DataObjectMap[classname] = dobj;
+    DataObjectMap[classname] = dobj;
     dobj->Delete();
     return dobj;
     }
-};
+}
+
 //*****************************************************************************
 vtkStandardNewMacro(vtkSMDataTypeDomain);
-vtkSMDataTypeDomain::vtkDataObjectInstanceCache*
-    vtkSMDataTypeDomain::DataObjectCache = new vtkDataObjectInstanceCache();
 //---------------------------------------------------------------------------
 vtkSMDataTypeDomain::vtkSMDataTypeDomain()
 {
@@ -185,8 +182,7 @@ int vtkSMDataTypeDomain::IsInDomain(vtkSMSourceProxy* proxy,
   // by the information object. This is later used to check match
   // with IsA.
   vtkDataObject* dobj =
-      vtkSMDataTypeDomain::DataObjectCache->GetDataObjectOfType(
-          info->GetDataClassName());
+    vtkSMDataTypeDomainCache::GetDataObjectOfType(info->GetDataClassName());
   if (!dobj)
     {
     return 0;
@@ -227,9 +223,8 @@ int vtkSMDataTypeDomain::IsInDomain(vtkSMSourceProxy* proxy,
 
   if (info->GetCompositeDataClassName())
     {
-    vtkDataObject* cDobj =  
-        vtkSMDataTypeDomain::DataObjectCache->GetDataObjectOfType(
-            info->GetCompositeDataClassName());
+    vtkDataObject* cDobj = vtkSMDataTypeDomainCache::GetDataObjectOfType(
+      info->GetCompositeDataClassName());
     for (unsigned int i=0; i<numTypes; i++)
       {
       if (cDobj->IsA(this->GetDataType(i)))
