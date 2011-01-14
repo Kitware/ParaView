@@ -18,7 +18,6 @@
 class vtkDataObject;
 class vtkDataSet;
 class vtkFieldData;
-class vtkTableExtentTranslator;
 
 #include "vtkObject.h"
 #include "CPWin32Header.h" // For windows import/export of shared libraries
@@ -93,8 +92,8 @@ public:
   // Set/get the extents for a partitioned topologically regular grid
   // (i.e. vtkUniformGrid, vtkImageData, vtkRectilinearGrid, and
   // vtkStructuredGrid).
-  vtkGetObjectMacro(ExtentTranslator, vtkTableExtentTranslator);
-  void SetExtentTranslator(vtkTableExtentTranslator*);
+  vtkSetVector6Macro(WholeExtent, int);
+  vtkGetVector6Macro(WholeExtent, int);
 
 //BTX
 protected:
@@ -123,17 +122,13 @@ protected:
   // The grid for coprocessing. The grid is not owned by the object.
   vtkDataObject* Grid;
 
-  // Description:
-  // The extent translator for topologically regular grids that are
-  // partitioned across processes.
-  vtkTableExtentTranslator* ExtentTranslator;
-
 private:
   vtkCPInputDataDescription(const vtkCPInputDataDescription&); // Not implemented.
   void operator=(const vtkCPInputDataDescription&); // Not implemented.
 
   class vtkInternals;
   vtkInternals* Internals;
+  int WholeExtent[6];
 //ETX
 };
 

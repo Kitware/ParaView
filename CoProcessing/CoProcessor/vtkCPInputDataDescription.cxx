@@ -20,7 +20,6 @@
 #include "vtkDataSet.h"
 #include "vtkObjectFactory.h"
 #include "vtkPointData.h"
-#include <vtkTableExtentTranslator.h>
 
 #include <vector>
 #include <string>
@@ -36,22 +35,21 @@ public:
 
 vtkStandardNewMacro(vtkCPInputDataDescription);
 vtkCxxSetObjectMacro(vtkCPInputDataDescription, Grid, vtkDataObject);
-vtkCxxSetObjectMacro(vtkCPInputDataDescription, ExtentTranslator, vtkTableExtentTranslator);
 //----------------------------------------------------------------------------
 vtkCPInputDataDescription::vtkCPInputDataDescription()
 {
   this->Grid = NULL;
   this->GenerateMesh = false;
   this->AllFields = false;
-  this->ExtentTranslator = NULL;
   this->Internals = new vtkCPInputDataDescription::vtkInternals();
+  this->WholeExtent[0] = this->WholeExtent[2] = this->WholeExtent[4] = 0;
+  this->WholeExtent[1] = this->WholeExtent[3] = this->WholeExtent[5] = -1;
 }
 
 //----------------------------------------------------------------------------
 vtkCPInputDataDescription::~vtkCPInputDataDescription()
 {
   this->SetGrid(0);
-  this->SetExtentTranslator(0);
   if(this->Internals)
     {
     delete this->Internals;
@@ -240,13 +238,9 @@ void vtkCPInputDataDescription::PrintSelf(ostream& os, vtkIndent indent)
     {
     os << indent << "Grid: (NULL)\n";
     }
-  if(this->ExtentTranslator)
-    {
-    os << indent << "ExtentTranslator: " << this->ExtentTranslator << "\n";
-    }
-  else
-    {
-    os << indent << "ExtentTranslator: (NULL)\n";
-    }
+  os << indent << "ExtentTranslator: " << this->WholeExtent[0] << " "
+     << this->WholeExtent[1] << " " << this->WholeExtent[2] << " "
+     << this->WholeExtent[3] << " " << this->WholeExtent[4] << " "
+     << this->WholeExtent[5] << "\n";
 }
 
