@@ -35,7 +35,7 @@ A simple example:
 
 import paraview
 paraview.compatibility.major = 3
-paraview.compatibility.minor = 9
+paraview.compatibility.minor = 5
 import servermanager
 
 def _disconnect():
@@ -600,8 +600,8 @@ def _create_func(key, module):
                 sources = tk.TimeSources
                 if not px in sources:
                     sources.append(px)
-                active_objects.source = px
 
+                active_objects.source = px
         except servermanager.MissingRegistrationInformation:
             pass
 

@@ -45,7 +45,7 @@ import paraview, re, os, os.path, new, sys, vtk
 if not paraview.compatibility.minor:
     paraview.compatibility.major = 3
 if not paraview.compatibility.major:
-    paraview.compatibility.minor = 9
+    paraview.compatibility.minor = 5
 
 from vtkPVServerCommonPython import *
 from vtkPVServerManagerPython import *
@@ -1828,20 +1828,16 @@ def CreateProxy(xml_group, xml_name, session=None):
     appropriate class from the appropriate module, for example:
     sph = servermanager.sources.SphereSource()"""
 
-    if not session:
-        session = ActiveSession
     pxm = vtkSMObject.GetProxyManager()
     aProxy = pxm.NewProxy(xml_group, xml_name)
     if not aProxy:
         return None
     return aProxy
 
-def GetRenderView(session=None):
+def GetRenderView():
     """Return the render view in use.  If more than one render view is in
     use, return the first one."""
 
-    if not session:
-        session = ActiveSession
     render_module = None
     for aProxy in ProxyManager():
         if aProxy.IsA("vtkSMRenderViewProxy"):
@@ -1849,10 +1845,8 @@ def GetRenderView(session=None):
             break
     return render_module
 
-def GetRenderViews(session=None):
+def GetRenderViews():
     """Returns the set of all render views."""
-    if not session:
-        session = ActiveSession
     render_modules = []
     for aProxy in ProxyManager():
         if aProxy.IsA("vtkSMRenderViewProxy"):
