@@ -81,11 +81,16 @@ public:
   vtkPVPluginsInformation* loadedExtensions(bool remote);
 
   /// Return all the paths that plugins will be searched for.
-  QStringList pluginPaths(pqServer*);
+  QStringList pluginPaths(bool remote);
 
   /// exclude an extension from being remembered. This does not actually unload
   /// the plugin, just forgets about it.
   void removePlugin(const QString& lib, bool remote=true);
+
+  /// simply adds the plugin to the ignore list, so when this class tries to
+  /// serialize the plugin information, it skips the indicated plugin.
+  void hidePlugin(const QString& lib, bool remote);
+  bool isHidden(const QString& lib, bool remote);
 
 signals:
   /// notification when plugin has been loaded.

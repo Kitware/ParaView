@@ -42,7 +42,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QTreeWidgetItem>
 
 // SM
-#include "vtkPVPluginInformation.h"
 #include "vtkPVPluginsInformation.h"
 
 // pqCore
@@ -84,16 +83,16 @@ pqPluginDialog::pqPluginDialog(pqServer* server, QWidget* p)
     {
     this->remoteGroup->setEnabled(false);
     helpText = "Local plugins are automatically searched for in %1.";
-    QStringList serverPaths = pm->pluginPaths(NULL);
+    QStringList serverPaths = pm->pluginPaths(false);
     helpText = helpText.arg(serverPaths.join(", "));
     }
   else
     {
     helpText = "Remote plugins are automatically searched for in %1.\n"
                "Local plugins are automatically searched for in %2.";
-    QStringList serverPaths = pm->pluginPaths(server);
+    QStringList serverPaths = pm->pluginPaths(true);
     helpText = helpText.arg(serverPaths.join(", "));
-    QStringList localPaths = pm->pluginPaths(NULL);
+    QStringList localPaths = pm->pluginPaths(false);
     helpText = helpText.arg(localPaths.join(", "));
     }
 
@@ -173,13 +172,11 @@ void pqPluginDialog::loadPlugin(
 }
 
 //----------------------------------------------------------------------------
-void pqPluginDialog::removePlugin(pqServer* server, 
+void pqPluginDialog::removePlugin(pqServer*,
                                   const QString& plugin, bool remote)
 {
-#ifdef FIXME_COLLABORATION
   pqPluginManager* pm = pqApplicationCore::instance()->getPluginManager();
-  pm->removePlugin(server, plugin, remote);
-#endif
+  pm->hidePlugin(plugin, remote);
 }
 
 //----------------------------------------------------------------------------
@@ -243,10 +240,15 @@ void pqPluginDialog::setupTreeWidget(QTreeWidget* pluginTree)
 void pqPluginDialog::populatePluginTree(QTreeWidget* pluginTree,
   vtkPVPluginsInformation* pluginList, bool remote)
 {
+  pqPluginManager* pm = pqApplicationCore::instance()->getPluginManager();
   pluginTree->blockSignals(true);
   pluginTree->clear();
   for (unsigned int cc=0; cc < pluginList->GetNumberOfPlugins(); ++cc)
     {
+    if (pm->isHidden(pluginList->GetPluginFileName(cc), remote))
+      {
+      continue;
+      }
     QTreeWidgetItem* mNode = new QTreeWidgetItem(
       pluginTree, QTreeWidgetItem::UserType);
     QVariant vdata;
@@ -423,17 +425,18 @@ void pqPluginDialog::onLoadSelectedLocalPlugin()
 void pqPluginDialog::removeSelectedPlugins(QList<QTreeWidgetItem*> selItems,
                                          pqServer* server, bool remote)
 {
-#ifdef FIXME_COLLABORATION
   for (int i=0;i<selItems.count();i++)
     {
-    vtkPVPluginInformation* plInfo = this->getPluginInfo(selItems.value(i));
-    if(plInfo && plInfo->GetFileName())
+    unsigned int index=0;
+    vtkPVPluginsInformation* plInfo = this->getPluginInfo(
+      selItems.value(i), index);
+    if (plInfo && plInfo->GetPluginFileName(index))
       {
-      this->removePlugin(server, QString(plInfo->GetFileName()), remote);
-      }     
+      this->removePlugin(
+        server, QString(plInfo->GetPluginFileName(index)), remote);
+      }
     }
   this->refresh();
-#endif
 }
 
 //----------------------------------------------------------------------------

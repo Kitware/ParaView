@@ -241,8 +241,16 @@ void vtkPVPluginTracker::LoadPluginConfigurationXML(vtkPVXMLElement* root)
         }
       vtkPVPluginTrackerDebugMacro("Trying to locate plugin with name: "
         << name);
-      vtkstd::string plugin_filename = vtkLocatePlugin(name);
-      if (plugin_filename == "")
+      vtkstd::string plugin_filename;
+      if (child->GetAttribute("filename"))
+        {
+        plugin_filename = child->GetAttribute("filename");
+        }
+      else
+        {
+        plugin_filename = vtkLocatePlugin(name);
+        }
+      if (plugin_filename.empty())
         {
         int required = 0;
         child->GetScalarAttribute("required", &required);

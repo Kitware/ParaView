@@ -46,6 +46,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkWeakPointer.h"
 
 #include <QtDebug>
+#include <QSet>
 
 #include <vtksys/ios/sstream>
 class pqPluginManager::pqInternals
@@ -53,13 +54,25 @@ class pqPluginManager::pqInternals
 public:
   QPointer<pqServer> ActiveServer;
   vtkWeakPointer<vtkSMPluginManager> SMPluginManager;
-  static QString getXML(vtkPVPluginsInformation* info)
+
+  QSet<QString> LocalHiddenPlugins;
+  QSet<QString> RemoteHiddenPlugins;
+
+  QString getXML(vtkPVPluginsInformation* info, bool remote)
     {
     vtksys_ios::ostringstream stream;
     stream << "<?xml version=\"1.0\" ?>\n";
     stream << "<Plugins>\n";
     for (unsigned int cc=0; cc < info->GetNumberOfPlugins(); cc++)
       {
+      if ((remote &&
+          this->RemoteHiddenPlugins.contains(info->GetPluginFileName(cc))) ||
+        (!remote &&
+         this->LocalHiddenPlugins.contains(info->GetPluginFileName(cc))))
+        {
+        continue;
+        }
+
       stream << "  <Plugin name=\"" << info->GetPluginName(cc) << "\""
         << " filename=\"" << info->GetPluginFileName(cc) << "\""
         << " auto_load=\"" << (info->GetAutoLoad(cc)? 1 : 0) << "\" />\n";
@@ -142,10 +155,10 @@ void pqPluginManager::onServerDisconnected(pqServer* server)
     QString uri = server->getResource().schemeHostsPorts().toURI();
     QString key = QString("/PluginsList/%1").arg(uri);
     settings->setValue(key,
-      pqInternals::getXML(this->loadedExtensions(true)));
+      this->Internals->getXML(this->loadedExtensions(true), true));
     }
   settings->setValue("/PluginsList/Local",
-    pqInternals::getXML(this->loadedExtensions(false)));
+    this->Internals->getXML(this->loadedExtensions(false), false));
 
   this->Internals->ActiveServer = NULL;
   this->Internals->SMPluginManager = NULL;
@@ -208,8 +221,29 @@ pqPluginManager::LoadStatus pqPluginManager::loadExtension(
 }
 
 //-----------------------------------------------------------------------------
-QStringList pqPluginManager::pluginPaths(pqServer*)
+QStringList pqPluginManager::pluginPaths(bool remote)
 {
-  // FIXME_COLLABORATION
-  return QStringList();
+  QString paths = this->Internals->SMPluginManager->GetPluginSearchPaths(remote);
+  return paths.split(';', QString::SkipEmptyParts);
+}
+
+//-----------------------------------------------------------------------------
+void pqPluginManager::hidePlugin(const QString& lib, bool remote)
+{
+  if (remote)
+    {
+    this->Internals->RemoteHiddenPlugins.insert(lib);
+    }
+  else
+    {
+    this->Internals->LocalHiddenPlugins.insert(lib);
+    }
+}
+
+//-----------------------------------------------------------------------------
+bool pqPluginManager::isHidden(const QString& lib, bool remote)
+{
+  return remote?
+    this->Internals->RemoteHiddenPlugins.contains(lib) :
+    this->Internals->LocalHiddenPlugins.contains(lib);
 }
