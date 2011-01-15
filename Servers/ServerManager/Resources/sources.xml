@@ -1985,6 +1985,20 @@ is refined.
    <SourceProxy name="TrivialProducer" 
                 class="vtkTrivialProducer">
    </SourceProxy>
+   <!-- ==================================================================== -->
+   <SourceProxy name="PVTrivialProducer"
+                class="vtkPVTrivialProducer">
+     <IntVectorProperty
+        name="WholeExtent"
+        command="SetWholeExtent"
+        number_of_elements="6"
+        default_values="0 -1 0 -1 0 -1" >
+       <Documentation>
+         The values of this property specify the whole extent of the topologically regular grid.
+       </Documentation>
+     </IntVectorProperty>
+
+   </SourceProxy>
 
   </ProxyGroup>
 </ServerManagerConfiguration>

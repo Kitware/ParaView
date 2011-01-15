@@ -60,6 +60,15 @@ void vtkPVTrivialProducer::SetOutput(vtkDataObject* output)
 }
 
 //----------------------------------------------------------------------------
+void vtkPVTrivialProducer::GatherExtents()
+{
+  if(this->PVExtentTranslator)
+    {
+    this->PVExtentTranslator->GatherExtents();
+    }
+}
+
+//----------------------------------------------------------------------------
 int
 vtkPVTrivialProducer::ProcessRequest(vtkInformation* request,
                                    vtkInformationVector** inputVector,

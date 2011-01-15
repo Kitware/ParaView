@@ -53,6 +53,14 @@ public:
   vtkGetVector6Macro(WholeExtent, int);
 
   // Description:
+  // If the output of the filter is topologically regular and
+  // this filter is used in parallel with the grid using partitioned
+  // subextents then each process will only know about its own
+  // subextent.  This function does an allreduce to make sure
+  // that each process knows the subextent of every process.
+  void GatherExtents();
+
+  // Description:
   // Process upstream/downstream requests trivially.  The associated
   // output data object is never modified, but it is queried to
   // fulfill requests.
