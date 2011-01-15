@@ -200,7 +200,6 @@ void vtkFileSeriesWriter::WriteATimestep(vtkDataObject* input,
   //if(inInfo->Get(vtkDataObject::DATA_EXTENT_TYPE()) == VTK_3D_EXTENT &&
   if(inInfo->Has(vtkStreamingDemandDrivenPipeline::WHOLE_EXTENT()))
     {
-    cerr << "in vtkfsw::whole extent\n";
     vtkPVTrivialProducer* trivialProducer =
       vtkPVTrivialProducer::New();
     trivialProducer->SetOutput(clone);
@@ -210,7 +209,6 @@ void vtkFileSeriesWriter::WriteATimestep(vtkDataObject* input,
     trivialProducer->SetWholeExtent(extent);
     trivialProducer->GatherExtents();
 
-    cout << "::" << extent[4] << " " << extent[5] << " " << getpid() << endl;
     clone->GetInformation()->Set(
       vtkStreamingDemandDrivenPipeline::WHOLE_EXTENT(), extent, 6);
     }

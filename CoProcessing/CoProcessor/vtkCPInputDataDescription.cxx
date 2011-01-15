@@ -238,7 +238,7 @@ void vtkCPInputDataDescription::PrintSelf(ostream& os, vtkIndent indent)
     {
     os << indent << "Grid: (NULL)\n";
     }
-  os << indent << "ExtentTranslator: " << this->WholeExtent[0] << " "
+  os << indent << "WholeExtent: " << this->WholeExtent[0] << " "
      << this->WholeExtent[1] << " " << this->WholeExtent[2] << " "
      << this->WholeExtent[3] << " " << this->WholeExtent[4] << " "
      << this->WholeExtent[5] << "\n";
