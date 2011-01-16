@@ -98,6 +98,10 @@ protected:
   vtkSMStreamingRepresentationProxy();
   ~vtkSMStreamingRepresentationProxy();
 
+  // Description:
+  // Overridden to get access to the PCF and harness proxies.
+  virtual void CreateVTKObjects();
+
   vtkSMSourceProxy *PieceCache;
   vtkSMSourceProxy *Harness;
 

@@ -63,7 +63,9 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkMath.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVStreamingParallelHelper.h"
 #include "vtkPVStreamingRepresentation.h"
+#include "vtkPVSynchronizedRenderWindows.h"
 #include "vtkRenderer.h"
 #include "vtkStreamingDriver.h"
 
@@ -117,13 +119,24 @@ void vtkPVStreamingView::SetStreamDriver(vtkStreamingDriver *nd)
     this->StreamDriver->SetRenderer(this->GetRenderer());
     this->StreamDriver->AssignRenderLaterFunction
       (vtkPVStreamingViewRenderLaterFunction, this);
+
+    vtkPVStreamingParallelHelper *helper = vtkPVStreamingParallelHelper::New();
+    helper->SetSynchronizedWindows(this->SynchronizedWindows);
+    this->StreamDriver->SetParallelHelper(helper);
+    helper->Delete();
     }
 }
 
 //----------------------------------------------------------------------------
 void vtkPVStreamingView::Render(bool interactive, bool skip_rendering)
 {
+  //set flag that gui watches to schedule more renders,
+  //assume we are done, and correct later if needed
   this->IsDisplayDone = 1;
+
+  bool render_event_propagation =
+    this->SynchronizedWindows->GetRenderEventPropagation();
+  this->SynchronizedWindows->RenderEventPropagationOff();
 
   if (this->StreamDriver)
     {
@@ -151,11 +164,15 @@ void vtkPVStreamingView::Render(bool interactive, bool skip_rendering)
     //figure out what to do next
     this->StreamDriver->EndRenderEvent();
     }
+
+  this->SynchronizedWindows->SetRenderEventPropagation
+    (render_event_propagation);
 }
 
 //----------------------------------------------------------------------------
 void vtkPVStreamingView::RenderSchedule()
 {
+  //let GUI know that we are not done yet
   this->IsDisplayDone = 0;
 }
 
@@ -185,5 +202,6 @@ void vtkPVStreamingView::ResetCameraClippingRange()
     }
 
   this->GetRenderer()->ResetCameraClippingRange(this->LastComputedBounds);
-  this->GetNonCompositedRenderer()->ResetCameraClippingRange(this->LastComputedBounds);
+  this->GetNonCompositedRenderer()->ResetCameraClippingRange
+    (this->LastComputedBounds);
 }

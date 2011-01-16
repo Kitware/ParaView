@@ -491,20 +491,13 @@
         processes="client|renderserver|dataserver"
         base_proxygroup="views"
         base_proxyname="StreamingViewBase">
+
       <SubProxy>
         <Proxy
             name="StreamingDriver"
             proxygroup="utilities"
             proxyname="IteratingDriver">
         </Proxy>
-        <ExposedProperties>
-          <!-- TODO I don't like the need for this, but can't access driver directly -->
-          <Property name="StopStreaming"/>
-          <Property name="ShowWhen"/>
-          <Property name="CacheSize"/>
-          <Property name="NumberOfPasses"/>
-          <Property name="LastPass"/>
-        </ExposedProperties>
       </SubProxy>
     </StreamingViewProxy>
 
@@ -514,22 +507,13 @@
         processes="client|renderserver|dataserver"
         base_proxygroup="views"
         base_proxyname="StreamingViewBase">
+
       <SubProxy>
         <Proxy
             name="StreamingDriver"
             proxygroup="utilities"
             proxyname="PrioritizingDriver">
         </Proxy>
-        <ExposedProperties>
-          <!-- TODO I don't like the need for this, but can't access driver directly -->
-          <Property name="StopStreaming"/>
-          <Property name="ShowWhen"/>
-          <Property name="CacheSize"/>
-          <Property name="NumberOfPasses"/>
-          <Property name="LastPass"/>
-          <Property name="PipelinePrioritization"/>
-          <Property name="ViewPrioritization"/>
-        </ExposedProperties>
       </SubProxy>
     </StreamingViewProxy>
 
@@ -539,27 +523,13 @@
         processes="client|renderserver|dataserver"
         base_proxygroup="views"
         base_proxyname="StreamingViewBase">
+
       <SubProxy>
         <Proxy
             name="StreamingDriver"
             proxygroup="utilities"
             proxyname="MultiResolutionDriver">
         </Proxy>
-
-        <ExposedProperties>
-          <!-- TODO I don't like the need for this, but can't access driver directly -->
-          <Property name="StopStreaming"/>
-          <Property name="ShowWhen"/>
-          <Property name="CacheSize"/>
-          <Property name="PipelinePrioritization"/>
-          <Property name="ViewPrioritization"/>
-          <Property name="ProgressionMode"/>
-          <Property name="RefinementDepth"/>
-          <Property name="DepthLimit"/>
-          <Property name="MaxSplits"/>
-          <Property name="Refine"/>
-          <Property name="Coarsen"/>
-        </ExposedProperties>
       </SubProxy>
     </StreamingViewProxy>
   </ProxyGroup>

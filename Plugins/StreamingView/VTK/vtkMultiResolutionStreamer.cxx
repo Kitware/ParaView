@@ -17,6 +17,7 @@
 #include "vtkCollection.h"
 #include "vtkCollectionIterator.h"
 #include "vtkObjectFactory.h"
+#include "vtkParallelStreamHelper.h"
 #include "vtkPieceCacheFilter.h"
 #include "vtkPieceList.h"
 #include "vtkRenderer.h"
@@ -80,70 +81,17 @@ void vtkMultiResolutionStreamer::PrintSelf(ostream& os, vtkIndent indent)
 }
 
 //----------------------------------------------------------------------------
-bool vtkMultiResolutionStreamer::IsWendDone()
+void vtkMultiResolutionStreamer::AddHarnessInternal(vtkStreamingHarness *harness)
 {
-  vtkCollection *harnesses = this->GetHarnesses();
-  if (!harnesses)
+  vtkPieceCacheFilter *pcf = harness->GetCacheFilter();
+  if (pcf)
     {
-    return true;
+    pcf->SetCacheSize(this->CacheSize);
     }
-
-  bool everyone_finished_wend = true;
-  vtkCollectionIterator *iter = harnesses->NewIterator();
-  iter->InitTraversal();
-  while(!iter->IsDoneWithTraversal())
-    {
-    vtkStreamingHarness *harness = vtkStreamingHarness::SafeDownCast
-      (iter->GetCurrentObject());
-    iter->GoToNextItem();
-
-    //check if anyone hasn't reached the end of the visible domain
-    vtkPieceList *ToDo = harness->GetPieceList1();
-    if (ToDo->GetNumberNonZeroPriority() > 0)
-      {
-      everyone_finished_wend = false;
-      break;
-      }
-    }
-  iter->Delete();
-
-  return everyone_finished_wend;
-}
-
-//----------------------------------------------------------------------------
-bool vtkMultiResolutionStreamer::IsCompletelyDone()
-{
-  vtkCollection *harnesses = this->GetHarnesses();
-  if (!harnesses)
-    {
-    return true;
-    }
-
-  bool everyone_completely_done = true;
-  vtkCollectionIterator *iter = harnesses->NewIterator();
-  iter->InitTraversal();
-  while(!iter->IsDoneWithTraversal())
-    {
-    vtkStreamingHarness *harness = vtkStreamingHarness::SafeDownCast
-      (iter->GetCurrentObject());
-    iter->GoToNextItem();
-
-    vtkPieceList *ToDo = harness->GetPieceList1();
-    if (ToDo->GetNumberNonZeroPriority() > 0)
-      {
-      everyone_completely_done = false;
-      break;
-      }
-
-    if (harness->GetNoneToRefine() == false)
-      {
-      everyone_completely_done = false;
-      break;
-      }
-    }
-  iter->Delete();
-
-  return everyone_completely_done;
+  harness->SetPass(0);
+  harness->SetNumberOfPieces(1);
+  harness->SetPiece(0);
+  harness->SetResolution(0.0);
 }
 
 //----------------------------------------------------------------------------
@@ -276,53 +224,6 @@ void vtkMultiResolutionStreamer::PrepareFirstPass()
 
     //sort them
     ToDo->SortPriorities();
-    }
-
-  iter->Delete();
-}
-
-//----------------------------------------------------------------------------
-void vtkMultiResolutionStreamer::ChooseNextPieces()
-{
-  vtkCollection *harnesses = this->GetHarnesses();
-  if (!harnesses)
-    {
-    return;
-    }
-
-  vtkCollectionIterator *iter = harnesses->NewIterator();
-  iter->InitTraversal();
-  while(!iter->IsDoneWithTraversal())
-    {
-    vtkStreamingHarness *harness = vtkStreamingHarness::SafeDownCast
-      (iter->GetCurrentObject());
-    iter->GoToNextItem();
-
-    vtkPieceList *ToDo = harness->GetPieceList1();
-    vtkPieceList *NextFrame = harness->GetPieceList2();
-    if (ToDo->GetNumberNonZeroPriority() > 0)
-      {
-      vtkPiece p = ToDo->PopPiece();
-      NextFrame->AddPiece(p);
-      //adjust pipeline to draw the chosen piece
-      /*
-        DEBUGPRINT_PRIORITY
-        (
-        cerr << "CHOSE "
-        << p.GetPiece() << "/" << p.GetNumPieces()
-        << "@" << p.GetResolution() << endl;
-        );
-      */
-      harness->SetPiece(p.GetPiece());
-      harness->SetNumberOfPieces(p.GetNumPieces());
-      harness->SetResolution(p.GetResolution());
-
-      //TODO:
-      //This should not be necessary, but the PieceCacheFilter is silently
-      //producing the stale (lower res?) results without it.
-      harness->ComputePiecePriority(p.GetPiece(), p.GetNumPieces(),
-                                    p.GetResolution());
-      }
     }
 
   iter->Delete();
@@ -668,6 +569,53 @@ void vtkMultiResolutionStreamer::Reap(vtkStreamingHarness *harness)
 }
 
 //----------------------------------------------------------------------------
+void vtkMultiResolutionStreamer::ChooseNextPieces()
+{
+  vtkCollection *harnesses = this->GetHarnesses();
+  if (!harnesses)
+    {
+    return;
+    }
+
+  vtkCollectionIterator *iter = harnesses->NewIterator();
+  iter->InitTraversal();
+  while(!iter->IsDoneWithTraversal())
+    {
+    vtkStreamingHarness *harness = vtkStreamingHarness::SafeDownCast
+      (iter->GetCurrentObject());
+    iter->GoToNextItem();
+
+    vtkPieceList *ToDo = harness->GetPieceList1();
+    vtkPieceList *NextFrame = harness->GetPieceList2();
+    if (ToDo->GetNumberNonZeroPriority() > 0)
+      {
+      vtkPiece p = ToDo->PopPiece();
+      NextFrame->AddPiece(p);
+      //adjust pipeline to draw the chosen piece
+      /*
+        DEBUGPRINT_PRIORITY
+        (
+        cerr << "CHOSE "
+        << p.GetPiece() << "/" << p.GetNumPieces()
+        << "@" << p.GetResolution() << endl;
+        );
+      */
+      harness->SetPiece(p.GetPiece());
+      harness->SetNumberOfPieces(p.GetNumPieces());
+      harness->SetResolution(p.GetResolution());
+
+      //TODO:
+      //This should not be necessary, but the PieceCacheFilter is silently
+      //producing the stale (lower res?) results without it.
+      harness->ComputePiecePriority(p.GetPiece(), p.GetNumPieces(),
+                                    p.GetResolution());
+      }
+    }
+
+  iter->Delete();
+}
+
+//----------------------------------------------------------------------------
 void vtkMultiResolutionStreamer::StartRenderEvent()
 {
   DEBUGPRINT_PASSES
@@ -682,8 +630,12 @@ void vtkMultiResolutionStreamer::StartRenderEvent()
     return;
     }
 
-  this->Internal->CameraMoved = this->HasCameraMoved();
-  if (this->Internal->CameraMoved || this->Internal->WendDone)
+  this->Internal->CameraMoved = this->HasCameraMoved() || this->Internal->WendDone;
+  if (this->GetParallelHelper())
+    {
+    this->GetParallelHelper()->Reduce(this->Internal->CameraMoved);
+    }
+  if (this->Internal->CameraMoved)
     {
     DEBUGPRINT_PASSES
       (
@@ -718,6 +670,73 @@ void vtkMultiResolutionStreamer::StartRenderEvent()
 }
 
 //----------------------------------------------------------------------------
+bool vtkMultiResolutionStreamer::IsCompletelyDone()
+{
+  vtkCollection *harnesses = this->GetHarnesses();
+  if (!harnesses)
+    {
+    return true;
+    }
+
+  bool everyone_completely_done = true;
+  vtkCollectionIterator *iter = harnesses->NewIterator();
+  iter->InitTraversal();
+  while(!iter->IsDoneWithTraversal())
+    {
+    vtkStreamingHarness *harness = vtkStreamingHarness::SafeDownCast
+      (iter->GetCurrentObject());
+    iter->GoToNextItem();
+
+    vtkPieceList *ToDo = harness->GetPieceList1();
+    if (ToDo->GetNumberNonZeroPriority() > 0)
+      {
+      everyone_completely_done = false;
+      break;
+      }
+
+    if (harness->GetNoneToRefine() == false)
+      {
+      everyone_completely_done = false;
+      break;
+      }
+    }
+  iter->Delete();
+
+  return everyone_completely_done;
+}
+
+//----------------------------------------------------------------------------
+bool vtkMultiResolutionStreamer::IsWendDone()
+{
+  vtkCollection *harnesses = this->GetHarnesses();
+  if (!harnesses)
+    {
+    return true;
+    }
+
+  bool everyone_finished_wend = true;
+  vtkCollectionIterator *iter = harnesses->NewIterator();
+  iter->InitTraversal();
+  while(!iter->IsDoneWithTraversal())
+    {
+    vtkStreamingHarness *harness = vtkStreamingHarness::SafeDownCast
+      (iter->GetCurrentObject());
+    iter->GoToNextItem();
+
+    //check if anyone hasn't reached the end of the visible domain
+    vtkPieceList *ToDo = harness->GetPieceList1();
+    if (ToDo->GetNumberNonZeroPriority() > 0)
+      {
+      everyone_finished_wend = false;
+      break;
+      }
+    }
+  iter->Delete();
+
+  return everyone_finished_wend;
+}
+
+//----------------------------------------------------------------------------
 void vtkMultiResolutionStreamer::EndRenderEvent()
 {
   DEBUGPRINT_PASSES
@@ -738,7 +757,12 @@ void vtkMultiResolutionStreamer::EndRenderEvent()
   ren->EraseOff();
   rw->EraseOff();
 
-  if (this->IsCompletelyDone() || this->Internal->StopNow)
+  bool allDone = this->IsCompletelyDone() || this->Internal->StopNow;
+  if (this->GetParallelHelper())
+    {
+    this->GetParallelHelper()->Reduce(allDone);
+    }
+  if (allDone)
     {
     this->Internal->StopNow = false;
 
@@ -755,7 +779,12 @@ void vtkMultiResolutionStreamer::EndRenderEvent()
     }
   else
     {
-    if (this->IsWendDone())
+    bool wendDone = this->IsWendDone();
+    if (this->GetParallelHelper())
+      {
+      this->GetParallelHelper()->Reduce(wendDone);
+      }
+    if (wendDone)
       {
       DEBUGPRINT_PASSES
         (

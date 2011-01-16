@@ -102,6 +102,10 @@ protected:
   virtual int Coarsen(vtkStreamingHarness *);
   virtual void Reap(vtkStreamingHarness *);
 
+  // Description:
+  // Overridden to set up initial number of passes.
+  virtual void AddHarnessInternal(vtkStreamingHarness *);
+
   enum {COARSEN, STAY, ADVANCE};
 
   int PipelinePrioritization;

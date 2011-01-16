@@ -185,7 +185,7 @@ void pqStreamingControls::updateTrackedView()
 
   vtkSMStreamingViewProxy *svp =
     vtkSMStreamingViewProxy::SafeDownCast(sView->getProxy());
-  vtkSMProxy *driver = svp;//svp->GetDriver();
+  vtkSMProxy *driver = svp->GetDriver();
   //TODO change to this when driver exists early in the SMSVP
   if (!driver)
     {
@@ -355,7 +355,7 @@ void pqStreamingControls::onStop()
     }
   vtkSMStreamingViewProxy *svp =
     vtkSMStreamingViewProxy::SafeDownCast(this->currentView->getProxy());
-  vtkSMProxy *driver = svp;//svp->GetDriver();
+  vtkSMProxy *driver = svp->GetDriver();
   driver->InvokeCommand("StopStreaming");
 }
 
@@ -369,7 +369,7 @@ void pqStreamingControls::onRefine()
     }
   vtkSMStreamingViewProxy *svp =
     vtkSMStreamingViewProxy::SafeDownCast(this->currentView->getProxy());
-  vtkSMProxy *driver = svp;//svp->GetDriver();
+  vtkSMProxy *driver = svp->GetDriver();
   driver->InvokeCommand("Refine");
   rView->render();
 }
@@ -384,7 +384,7 @@ void pqStreamingControls::onCoarsen()
     }
   vtkSMStreamingViewProxy *svp =
     vtkSMStreamingViewProxy::SafeDownCast(this->currentView->getProxy());
-  vtkSMProxy *driver = svp;//svp->GetDriver();
+  vtkSMProxy *driver = svp->GetDriver();
   driver->InvokeCommand("Coarsen");
   rView->render();
 }

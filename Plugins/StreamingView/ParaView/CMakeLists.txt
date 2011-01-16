@@ -63,6 +63,7 @@ add_paraview_plugin(
   SERVER_MANAGER_SOURCES
     vtkPVStreamingRepresentation.cxx
     vtkPVStreamingView.cxx
+    vtkPVStreamingParallelHelper.cxx
     vtkSMStreamingRepresentationProxy.cxx
     vtkSMStreamingViewProxy.cxx
     vtkStreamLibraryWrapper.cxx

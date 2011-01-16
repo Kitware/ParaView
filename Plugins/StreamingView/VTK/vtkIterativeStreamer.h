@@ -59,10 +59,16 @@ protected:
   //After each render advanced to next pass. If last pass do last pass work.
   virtual void EndRenderEvent();
 
-  //Description:
-  //Helper to watch for camera motion and restart to first pass.
-  bool CameraMoved;
+  // Description:
+  // Overridden to set up initial number of passes.
+  virtual void AddHarnessInternal(vtkStreamingHarness *);
 
+  bool IsFirstPass();
+  void PrepareFirstPass();
+  void PrepareNextPass();
+  bool IsEveryoneDone();
+
+  bool StartOver;
   int NumberOfPasses;
   int LastPass;
   bool StopNow;

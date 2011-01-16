@@ -84,10 +84,6 @@ vtkSMStreamingViewProxy::vtkSMStreamingViewProxy()
 //-----------------------------------------------------------------------------
 vtkSMStreamingViewProxy::~vtkSMStreamingViewProxy()
 {
-  if (this->Driver)
-    {
-    this->Driver->Delete();
-    }
 }
 
 //-----------------------------------------------------------------------------
@@ -99,6 +95,11 @@ void vtkSMStreamingViewProxy::PrintSelf(ostream& os, vtkIndent indent)
 //------------------------------------------------------------------------------
 void vtkSMStreamingViewProxy::CreateVTKObjects()
 {
+  if (this->ObjectsCreated)
+    {
+    return;
+    }
+
   vtkProcessModule *pm = vtkProcessModule::GetProcessModule();
   vtkClientServerStream stream;
   vtkClientServerID id = pm->NewStreamObject("vtkStreamLibraryWrapper", stream);
@@ -111,6 +112,16 @@ void vtkSMStreamingViewProxy::CreateVTKObjects()
                  stream);
 
   this->Superclass::CreateVTKObjects();
+
+  this->Driver = this->GetSubProxy("StreamingDriver");
+  stream << vtkClientServerStream::Invoke
+         << this->GetID()
+         << "SetStreamDriver"
+         << this->Driver->GetID()
+         << vtkClientServerStream::End;
+  pm->SendStream(this->GetConnectionID(),
+                 vtkProcessModule::CLIENT_AND_SERVERS,
+                 stream);
 }
 
 //-----------------------------------------------------------------------------
@@ -120,24 +131,6 @@ vtkSMRepresentationProxy* vtkSMStreamingViewProxy::CreateDefaultRepresentation(
   if (!source)
     {
     return 0;
-    }
-
-  if (!this->Driver)
-    {
-    vtkProcessModule *pm = vtkProcessModule::GetProcessModule();
-    vtkClientServerStream stream;
-
-    this->Driver = this->GetSubProxy("StreamingDriver");
-    this->Driver->Register(this);
-
-    stream << vtkClientServerStream::Invoke
-           << this->GetID()
-           << "SetStreamDriver"
-           << this->Driver->GetID()
-           << vtkClientServerStream::End;
-    pm->SendStream(this->GetConnectionID(),
-                   vtkProcessModule::CLIENT_AND_SERVERS,
-                   stream);
     }
 
   vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();

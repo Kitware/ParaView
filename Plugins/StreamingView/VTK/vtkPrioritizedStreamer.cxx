@@ -17,6 +17,8 @@
 #include "vtkCollection.h"
 #include "vtkCollectionIterator.h"
 #include "vtkObjectFactory.h"
+#include "vtkParallelStreamHelper.h"
+#include "vtkPieceCacheFilter.h"
 #include "vtkPieceList.h"
 #include "vtkRenderer.h"
 #include "vtkRenderWindow.h"
@@ -68,6 +70,17 @@ vtkPrioritizedStreamer::~vtkPrioritizedStreamer()
 void vtkPrioritizedStreamer::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
+}
+
+//----------------------------------------------------------------------------
+void vtkPrioritizedStreamer::AddHarnessInternal(vtkStreamingHarness *harness)
+{
+  vtkPieceCacheFilter *pcf = harness->GetCacheFilter();
+  if (pcf)
+    {
+    pcf->SetCacheSize(this->CacheSize);
+    }
+  harness->SetNumberOfPieces(this->NumberOfPasses);
 }
 
 //----------------------------------------------------------------------------
@@ -217,6 +230,60 @@ void vtkPrioritizedStreamer::AdvanceEveryone()
 }
 
 //----------------------------------------------------------------------------
+void vtkPrioritizedStreamer::StartRenderEvent()
+{
+  DEBUGPRINT_PASSES
+    (
+     cerr << "SR " << this->Internal->DebugPass << endl;
+     );
+
+  vtkRenderer *ren = this->GetRenderer();
+  vtkRenderWindow *rw = this->GetRenderWindow();
+  if (!ren || !rw)
+    {
+    return;
+    }
+
+  bool startOver = this->HasCameraMoved() || this->Internal->StartOver;
+  if (this->GetParallelHelper())
+    {
+    this->GetParallelHelper()->Reduce(startOver);
+    }
+  if (startOver)
+    {
+    DEBUGPRINT_PASSES
+      (
+       cerr << "RESTART" << endl;
+       this->Internal->DebugPass = 0;
+       );
+
+    //show whatever we partially drew before the camera moved
+    this->CopyBackBufferToFront();
+
+    //start off initial pass by clearing the screen
+    ren->EraseOn();
+    rw->EraseOn();
+    rw->Frame();
+
+    //compute priority of subsequent passes
+    //set pipeline to show the most important one this pass
+    this->ResetEveryone();
+    }
+  else
+    {
+    //subsequent passes pick next less important piece each pass
+    this->AdvanceEveryone();
+    }
+
+  //don't swap back to front automatically
+  //only update the screen once the last piece is drawn
+  rw->SwapBuffersOff();
+
+  //assume that we are not done covering all the domains
+  this->Internal->StartOver = false;
+}
+
+//----------------------------------------------------------------------------
 bool vtkPrioritizedStreamer::IsEveryoneDone()
 {
   vtkCollection *harnesses = this->GetHarnesses();
@@ -263,55 +330,6 @@ bool vtkPrioritizedStreamer::IsEveryoneDone()
 }
 
 //----------------------------------------------------------------------------
-void vtkPrioritizedStreamer::StartRenderEvent()
-{
-  DEBUGPRINT_PASSES
-    (
-     cerr << "SR " << this->Internal->DebugPass << endl;
-     );
-
-  vtkRenderer *ren = this->GetRenderer();
-  vtkRenderWindow *rw = this->GetRenderWindow();
-  if (!ren || !rw)
-    {
-    return;
-    }
-
-  if (this->HasCameraMoved() || this->Internal->StartOver)
-    {
-    DEBUGPRINT_PASSES
-      (
-       cerr << "RESTART" << endl;
-       this->Internal->DebugPass = 0;
-       );
-
-    //show whatever we partially drew before the camera moved
-    this->CopyBackBufferToFront();
-
-    //start off initial pass by clearing the screen
-    ren->EraseOn();
-    rw->EraseOn();
-    rw->Frame();
-
-    //compute priority of subsequent passes
-    //set pipeline to show the most important one this pass
-    this->ResetEveryone();
-    }
-  else
-    {
-    //subsequent passes pick next less important piece each pass
-    this->AdvanceEveryone();
-    }
-
-  //don't swap back to front automatically
-  //only update the screen once the last piece is drawn
-  rw->SwapBuffersOff();
-
-  //assume that we are not done covering all the domains
-  this->Internal->StartOver = false;
-}
-
-//----------------------------------------------------------------------------
 void vtkPrioritizedStreamer::EndRenderEvent()
 {
   DEBUGPRINT_PASSES
@@ -331,7 +349,12 @@ void vtkPrioritizedStreamer::EndRenderEvent()
   ren->EraseOff();
   rw->EraseOff();
 
-  if (this->IsEveryoneDone()||this->Internal->StopNow)
+  bool allDone = this->IsEveryoneDone()||this->Internal->StopNow;
+  if (this->GetParallelHelper())
+    {
+    this->GetParallelHelper()->Reduce(allDone);
+    }
+  if (allDone)
     {
     this->Internal->StopNow = false;
     DEBUGPRINT_PASSES
