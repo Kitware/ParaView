@@ -370,10 +370,11 @@ void vtkStreamingDriver::SetCacheSize(int nv)
 void vtkStreamingDriver::CopyBackBufferToFront()
 {
   vtkRenderWindow *rw = this->GetRenderWindow();
-  if (!rw)
+  if (!rw || rw->GetNeverRendered())
     {
     return;
     }
+
   //allocate pixel storage
   int *size = rw->GetSize();
   if (!this->Internal->PixelArray)
