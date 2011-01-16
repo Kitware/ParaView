@@ -263,7 +263,10 @@ void vtkPrioritizedStreamer::StartRenderEvent()
     //start off initial pass by clearing the screen
     ren->EraseOn();
     rw->EraseOn();
-    rw->Frame();
+    if (!rw->GetNeverRendered())
+      {
+      rw->Frame();
+      }
 
     //compute priority of subsequent passes
     //set pipeline to show the most important one this pass

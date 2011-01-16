@@ -100,7 +100,10 @@ void vtkIterativeStreamer::PrepareFirstPass()
   //first pass has to clear to start off
   ren->EraseOn();
   rw->EraseOn();
-  rw->Frame();
+  if (!rw->GetNeverRendered())
+    {
+    rw->Frame();
+    }
 
   //we manage back to front swapping
   rw->SwapBuffersOff();
