@@ -50,6 +50,11 @@ protected:
   ~vtkPVStreamingParallelHelper();
 
   vtkPVSynchronizedRenderWindows *SynchronizedWindows;
+
+  enum {
+    STREAMING_REDUCE_TAG = 838666
+  };
+
 private:
   vtkPVStreamingParallelHelper(const vtkPVStreamingParallelHelper&);  // Not implemented.
   void operator=(const vtkPVStreamingParallelHelper&);  // Not implemented.

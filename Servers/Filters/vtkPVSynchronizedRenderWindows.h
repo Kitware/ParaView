@@ -179,7 +179,7 @@ public:
   // Description:
   // Streaming uses this class as a conduit for messaging.
   // Need mode to use it correctly.
-  int GetMode() { return this->Mode; };
+  ModeEnum GetMode() { return this->Mode; };
 
 protected:
   vtkPVSynchronizedRenderWindows();

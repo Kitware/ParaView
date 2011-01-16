@@ -61,26 +61,48 @@ void vtkPVStreamingParallelHelper::SetSynchronizedWindows
 //----------------------------------------------------------------------------
 void vtkPVStreamingParallelHelper::Reduce(bool &flag)
 {
-  if (this->SynchronizedWindows)
+  if (!this->SynchronizedWindows)
     {
-    unsigned int value = (unsigned int)flag;
-    int mode = this->SynchronizedWindows->GetMode();
-    vtkMultiProcessController* c_ds_controller = NULL;
-    switch (mode)
-      {
-      case vtkPVSynchronizedRenderWindows::INVALID:
-      case vtkPVSynchronizedRenderWindows::BUILTIN:
-        return;
-      case vtkPVSynchronizedRenderWindows::CLIENT:
-        c_ds_controller =
-          this->SynchronizedWindows->GetClientServerController();
-        c_ds_controller->Receive(&value, 1, 1, 99999);
-        break;
-      default:
-        c_ds_controller =
-          this->SynchronizedWindows->GetClientServerController();
-        c_ds_controller->Send(&value, 1, 1, 99999);
-      }
-    flag = (bool)value;
+    return;
     }
+
+  vtkPVSynchronizedRenderWindows::ModeEnum mode =
+    this->SynchronizedWindows->GetMode();
+  if (mode == vtkPVSynchronizedRenderWindows::INVALID ||
+      mode == vtkPVSynchronizedRenderWindows::BUILTIN)
+    return;
+
+  vtkMultiProcessController* parallelController =
+    this->SynchronizedWindows->GetParallelController();
+  if (mode == vtkPVSynchronizedRenderWindows::BATCH &&
+      parallelController->GetNumberOfProcesses() <= 1)
+    {
+    return;
+    }
+  int value = (int)flag;
+  if (parallelController)
+    {
+    //server nodes all continue if any needs to
+    parallelController->AllReduce(&value, &value, 1,
+                                  vtkCommunicator::LOGICAL_OR_OP);
+    }
+
+  vtkMultiProcessController* c_s_controller =
+    this->SynchronizedWindows->GetClientServerController();
+  switch (mode)
+    {
+    case vtkPVSynchronizedRenderWindows::CLIENT:
+      //client just obeys what the server tells it
+      c_s_controller->Receive(&value, 1, 1, STREAMING_REDUCE_TAG);
+      break;
+    default:
+      //server tells client what to do
+      //TODO: handle split ds/rs/client mode.
+      if (c_s_controller)
+        {
+        c_s_controller->Send(&value, 1, 1, STREAMING_REDUCE_TAG);
+        }
+    }
+
+  flag = value!=0; //convert back to bool without annoying msvc
 }
