@@ -382,6 +382,7 @@ void MyProcess::Execute()
   renderer->AddObserver(vtkCommand::ResetCameraClippingRangeEvent, observer);
   observer->Delete();
 
+  vtkSynchronizedRenderers *syncRenderers2=0;
   if (this->DepthOnly)
     {
     vtkRenderer *renderer2=vtkRenderer::New();
@@ -417,7 +418,7 @@ void MyProcess::Execute()
 
     if (this->ServerMode)
       {
-      vtkSynchronizedRenderWindows* syncWindows2 =
+      syncWindows2 =
         vtkSynchronizedRenderWindows::New();
       syncWindows2->SetRenderWindow(renWin);
       syncWindows2->SetParallelController(this->SocketController);
