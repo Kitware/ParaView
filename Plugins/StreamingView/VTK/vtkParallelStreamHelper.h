@@ -35,7 +35,7 @@ public:
   //Description:
   //A command that is called in parallel to make all processors agree on
   //the value of flag.
-  virtual void Reduce(bool & vtkNotUsed(flag)) {};
+  virtual void Reduce(bool &vtkNotUsed(flag)) {};
 
 //BTX
 protected:
