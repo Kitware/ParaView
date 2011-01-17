@@ -587,7 +587,7 @@ void vtkMultiResolutionStreamer::ChooseNextPieces()
 
     vtkPieceList *ToDo = harness->GetPieceList1();
     vtkPieceList *NextFrame = harness->GetPieceList2();
-    if (ToDo->GetNumberNonZeroPriority() > 0)
+    if (ToDo && NextFrame && (ToDo->GetNumberNonZeroPriority() > 0))
       {
       vtkPiece p = ToDo->PopPiece();
       NextFrame->AddPiece(p);
@@ -691,7 +691,7 @@ bool vtkMultiResolutionStreamer::IsCompletelyDone()
     iter->GoToNextItem();
 
     vtkPieceList *ToDo = harness->GetPieceList1();
-    if (ToDo->GetNumberNonZeroPriority() > 0)
+    if (ToDo && ToDo->GetNumberNonZeroPriority() > 0)
       {
       everyone_completely_done = false;
       break;
@@ -728,7 +728,7 @@ bool vtkMultiResolutionStreamer::IsWendDone()
 
     //check if anyone hasn't reached the end of the visible domain
     vtkPieceList *ToDo = harness->GetPieceList1();
-    if (ToDo->GetNumberNonZeroPriority() > 0)
+    if (ToDo && ToDo->GetNumberNonZeroPriority() > 0)
       {
       everyone_finished_wend = false;
       break;
