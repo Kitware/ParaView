@@ -192,6 +192,8 @@ void pqPythonManager::initializeParaviewPythonModules()
       
     QString initStr = QString(
       "import paraview\n"
+      "paraview.compatibility.major = 3\n"
+      "paraview.compatibility.minor = 5\n"
       "from paraview import servermanager\n"
       "servermanager.InitFromGUI()\n"
       "from paraview.simple import *\n"
