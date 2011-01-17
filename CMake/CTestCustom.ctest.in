@@ -133,6 +133,9 @@ SET(CTEST_CUSTOM_WARNING_EXCEPTION
   # disable any warning coming from Qt headers.
   "[Qq]t.*/include/qt.*"
 
+  # Suppress warning caused when QT 'foreach' loops are combined
+  ".*warning: declaration of '_container_' shadows a previous local"
+
   # disable warnings from UI files.
   "ui_.*"
   )
