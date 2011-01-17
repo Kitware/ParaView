@@ -25,8 +25,6 @@
 #include "vtkStreamingHarness.h"
 
 #define DEBUGPRINT_PASSES( arg ) ;
-//  cerr << getpid() << " " << this << " ";     \
-//  arg;
 
 vtkStandardNewMacro(vtkIterativeStreamer);
 
