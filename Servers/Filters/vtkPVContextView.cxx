@@ -115,7 +115,8 @@ int ComputeMagnification(const int full_size[2], int window_size[2])
   int magnification = 1;
 
   // If fullsize > viewsize, then magnification is involved.
-  int temp = ceil(full_size[0]/static_cast<double>(window_size[0]));
+  int temp = static_cast<int>(ceil(
+      static_cast<double>(full_size[0])/static_cast<double>(window_size[0])));
   magnification = (temp> magnification)? temp: magnification;
 
   temp = ceil(full_size[1]/static_cast<double>(window_size[1]));
@@ -176,8 +177,8 @@ void vtkPVContextView::ReceiveImageToFromClient()
   int size[2];
   size[0] = this->GetRenderWindow()->GetSize()[0];
   size[1] = this->GetRenderWindow()->GetSize()[1];
-  size[0] *= (viewport[2]-viewport[0]);
-  size[1] *= (viewport[3]-viewport[1]);
+  size[0] *= static_cast<int>(viewport[2]-viewport[0]);
+  size[1] *= static_cast<int>(viewport[3]-viewport[1]);
   if (this->SynchronizedWindows->GetClientServerController())
     {
     this->SynchronizedWindows->GetClientServerController()->Send(
