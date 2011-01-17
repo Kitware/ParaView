@@ -75,8 +75,6 @@ void pqDataQueryReaction::showQueryDialog()
   // realizes a new selection has been made.
   pqSelectionManager* selManager =
     pqPVApplicationCore::instance()->selectionManager();
-  pqServerManagerModel* serverManagerModel =
-      pqPVApplicationCore::instance()->getServerManagerModel();
   if (selManager)
     {
     QObject::connect(&dialog, SIGNAL(selected(pqOutputPort*)),
