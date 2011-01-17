@@ -66,6 +66,10 @@ public:
   // Provides access to the property helper.
   vtkPMProperty* GetPropertyHelper(const char* name);
 
+  // Description:
+  // Returns the VTKClassName.
+  vtkGetStringMacro(VTKClassName);
+
 protected:
   vtkPMProxy();
   ~vtkPMProxy();

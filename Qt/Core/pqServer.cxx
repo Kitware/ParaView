@@ -189,6 +189,17 @@ bool pqServer::isRemote() const
 }
 
 //-----------------------------------------------------------------------------
+bool pqServer::isRenderServerSeparate()
+{
+  if (this->isRemote())
+    {
+    return this->Session->GetController(vtkPVSession::DATA_SERVER_ROOT) !=
+      this->Session->GetController(vtkPVSession::RENDER_SERVER_ROOT);
+    }
+  return false;
+}
+
+//-----------------------------------------------------------------------------
 void pqServer::setResource(const pqServerResource &server_resource)
 {
   this->Resource = server_resource;

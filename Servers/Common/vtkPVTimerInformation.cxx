@@ -13,14 +13,16 @@
 
 =========================================================================*/
 #include "vtkPVTimerInformation.h"
-#include "vtkObjectFactory.h"
-#include "vtkDataObject.h"
-#include "vtkQuadricClustering.h"
+
 #include "vtkByteSwap.h"
-#include "vtkTimerLog.h"
-#include "vtkProcessModule.h"
 #include "vtkClientServerStream.h"
-#include "vtksys/ios/sstream"
+#include "vtkDataObject.h"
+#include "vtkMultiProcessStream.h"
+#include "vtkObjectFactory.h"
+#include "vtkQuadricClustering.h"
+#include "vtkTimerLog.h"
+
+#include <vtksys/ios/sstream>
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVTimerInformation);
@@ -32,8 +34,8 @@ vtkPVTimerInformation::vtkPVTimerInformation()
 {
   this->NumberOfLogs = 0;
   this->Logs = NULL;
+  this->LogThreshold = 0;
 }
-
 
 //----------------------------------------------------------------------------
 vtkPVTimerInformation::~vtkPVTimerInformation()
@@ -57,6 +59,22 @@ vtkPVTimerInformation::~vtkPVTimerInformation()
   this->NumberOfLogs = 0;
 }
 
+//----------------------------------------------------------------------------
+void vtkPVTimerInformation::CopyParametersToStream(vtkMultiProcessStream& str)
+{
+  str << 828793 << this->LogThreshold ;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVTimerInformation::CopyParametersFromStream(vtkMultiProcessStream& str)
+{
+  int magic_number;
+  str >> magic_number >> this->LogThreshold;
+  if (magic_number != 828793)
+    {
+    vtkErrorMacro("Magic number mismatch.");
+    }
+}
 
 //----------------------------------------------------------------------------
 void vtkPVTimerInformation::InsertLog(int id, const char* log)
@@ -120,20 +138,11 @@ void vtkPVTimerInformation::Reallocate(int num)
 
 //----------------------------------------------------------------------------
 // This ignores the object, and gets the log from the timer.
-void vtkPVTimerInformation::CopyFromObject(vtkObject* o)
+void vtkPVTimerInformation::CopyFromObject(vtkObject*)
 {
   int length;
-  vtkProcessModule* pm;
-  float threshold = 0.001;
+  float threshold = this->LogThreshold;
 
-#ifdef FIXME
-  pm = vtkProcessModule::SafeDownCast(o);
-  if (pm)
-    {
-    threshold = pm->GetLogThreshold();
-    }
-#endif
-  
   length = vtkTimerLog::GetNumberOfEvents() * 40;
   if (length > 0)
     {

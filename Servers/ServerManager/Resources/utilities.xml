@@ -2240,6 +2240,39 @@
       <!-- End of GlobalMapperProperties -->
     </Proxy>
 
+    <Proxy name="TimerLog" class="vtkTimerLog"
+           processes="client|dataserver|renderserver">
+      <Documentation>
+        This is a proxy used to control the timer log parameters on all
+        processes. Note that since vtkTimerLog has loads of static ivar,
+        most properties will affect all timer log instances.
+      </Documentation>
+
+      <Property name="ResetLog" command="ResetLog">
+        <Documentation>
+          Resets the log on all processes.
+        </Documentation>
+      </Property>
+
+      <IntVectorProperty name="Enable"
+        command="SetLogging"
+        default_values="none">
+        <EnumerationDomain name="enum" />
+        <Documentation>
+          Enables the timer-log on all processes.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="MaxEntries"
+        command="SetMaxEntries"
+        default_values="none">
+        <Documentation>
+          Set the maximum length for the log on all processes.
+        </Documentation>
+      </IntVectorProperty>
+      <!-- End of TimerLog -->
+    </Proxy>
+
     <!-- End of group "misc" -->
   </ProxyGroup>
 

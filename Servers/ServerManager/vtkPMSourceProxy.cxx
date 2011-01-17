@@ -17,6 +17,7 @@
 #include "vtkAlgorithm.h"
 #include "vtkClientServerInterpreter.h"
 #include "vtkClientServerStream.h"
+#include "vtkCommand.h"
 #include "vtkInformation.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
@@ -24,6 +25,7 @@
 #include "vtkPVXMLElement.h"
 #include "vtkSMMessage.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
+#include "vtkTimerLog.h"
 
 #include <vtkstd/vector>
 #include <vtksys/ios/sstream>
@@ -132,27 +134,13 @@ bool vtkPMSourceProxy::CreateVTKObjects(vtkSMMessage* message)
            << vtkClientServerStream::End;
     }
 
-#ifdef FIXME
-  // Keep track of how long each filter takes to execute.
-  vtksys_ios::ostringstream filterName_with_warning_C4701;
-  filterName_with_warning_C4701 << "Execute " << this->VTKClassName
-                                << " id: " << sourceID.ID << ends;
-  vtkClientServerStream start;
-  start << vtkClientServerStream::Invoke << pm->GetProcessModuleID()
-        << "LogStartEvent" << filterName_with_warning_C4701.str().c_str()
-        << vtkClientServerStream::End;
-  vtkClientServerStream end;
-  end << vtkClientServerStream::Invoke << pm->GetProcessModuleID()
-      << "LogEndEvent" << filterName_with_warning_C4701.str().c_str()
-      << vtkClientServerStream::End;
+  // Register observer to record the execution time for each algorithm in the
+  // local timer-log.
+  vtkObject::SafeDownCast(this->GetVTKObject())->AddObserver(
+    vtkCommand::StartEvent, this, &vtkPMSourceProxy::MarkStartEvent);
+  vtkObject::SafeDownCast(this->GetVTKObject())->AddObserver(
+    vtkCommand::EndEvent, this, &vtkPMSourceProxy::MarkEndEvent);
 
-  stream << vtkClientServerStream::Invoke
-         << sourceID << "AddObserver" << "StartEvent" << start
-         << vtkClientServerStream::End;
-  stream << vtkClientServerStream::Invoke
-         << sourceID << "AddObserver" << "EndEvent" << end
-         << vtkClientServerStream::End;
-#endif
   if (!this->Interpreter->ProcessStream(stream))
     {
     return false;
@@ -393,6 +381,28 @@ void vtkPMSourceProxy::UpdatePipeline(int port, double time, bool doTime)
     sddp->SetUpdateTimeStep(port, time);
     }
   sddp->Update(port);
+}
+
+//----------------------------------------------------------------------------
+void vtkPMSourceProxy::MarkStartEvent()
+{
+  vtksys_ios::ostringstream filterName;
+  filterName
+    << "Execute "
+    << (this->GetVTKClassName()?  this->GetVTKClassName() : this->GetClassName())
+    << " id: " << this->GetGlobalID();
+  vtkTimerLog::MarkStartEvent(filterName.str().c_str());
+}
+
+//----------------------------------------------------------------------------
+void vtkPMSourceProxy::MarkEndEvent()
+{
+  vtksys_ios::ostringstream filterName;
+  filterName
+    << "Execute "
+    << (this->GetVTKClassName()?  this->GetVTKClassName() : this->GetClassName())
+    << " id: " << this->GetGlobalID();
+  vtkTimerLog::MarkEndEvent(filterName.str().c_str());
 }
 
 //----------------------------------------------------------------------------

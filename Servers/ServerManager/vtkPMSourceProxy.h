@@ -88,6 +88,11 @@ protected:
   // Triggers UpdateInformation().
   virtual void UpdateInformation();
 
+  // Description:
+  // Callbacks to add start/end events to the timer log.
+  void MarkStartEvent();
+  void MarkEndEvent();
+
   char *ExecutiveName;
   vtkSetStringMacro(ExecutiveName);
 
