@@ -176,7 +176,7 @@ QWidget* pqRenderViewBase::createWidget()
   // and capture a frame buffer even when it is obstructred by a
   // window. This does not work as well on other platforms.
 
-#if 1//defined(__APPLE__)
+#if defined(__APPLE__)
   if (this->AllowCaching)
     {
     vtkwidget->setAutomaticImageCacheEnabled(true);
