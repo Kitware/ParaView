@@ -116,9 +116,11 @@ SET (UI_FILES
 )
 
 # List qrc files
-SET (UI_RESOURCES
-  Resources/pqApplicationComponents.qrc
-)
+# DP - the resource file is empty at the moment
+# comment this back in when we have some resources
+#SET (UI_RESOURCES
+#  Resources/pqApplicationComponents.qrc
+#)
 
 # List all source files.
 SET (SOURCE_FILES
