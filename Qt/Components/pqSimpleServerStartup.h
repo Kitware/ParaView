@@ -109,9 +109,7 @@ private slots:
   void failed();
   void started(pqServer*);
 
-  void forwardConnectServer();
-  void monitorReverseConnections();
-  void finishReverseConnection(pqServer*);
+  void connectServer();
 
 private:
   class pqImplementation;
@@ -120,8 +118,7 @@ private:
   bool IgnoreConnectIfAlreadyConnected;
   bool promptRuntimeArguments();
   void startBuiltinConnection();
-  void startForwardConnection();
-  void startReverseConnection();
+  void startConnection();
 
   // disconnects from any already existing servers.
   void disconnectAllServers();

@@ -186,7 +186,7 @@ bool vtkSMSessionClient::Connect(const char* url)
   while (!this->AbortConnect &&
     (dcontroller == NULL || (need_rcontroller && rcontroller == NULL)))
     {
-    int result = nam->ProcessEvents(1000);
+    int result = nam->ProcessEvents(100);
     if (result == 1) // some activity
       {
       dcontroller = dcontroller? dcontroller :

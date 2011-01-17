@@ -45,8 +45,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMSourceProxy.h"
 #include "vtkSMStringVectorProperty.h"
 
-#include <QtDebug>
+#include <QApplication>
 #include <QFileInfo>
+#include <QtDebug>
 
 #include "pqAnimationCue.h"
 #include "pqAnimationScene.h"
@@ -77,6 +78,16 @@ inline QString pqObjectBuilderGetName(vtkSMProxy* proxy,
   label.remove(' ');
   return QString("%1%2").arg(label).arg(
     nameGenerator->GetCountAndIncrement(label));
+}
+
+namespace pqObjectBuilderNS
+{
+  static bool ContinueWaiting = true;
+  static bool processEvents()
+    {
+    QApplication::processEvents();
+    return ContinueWaiting;
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -837,9 +848,14 @@ QString pqObjectBuilder::getFileNamePropertyName(vtkSMProxy* proxy)
 }
 
 //-----------------------------------------------------------------------------
+void pqObjectBuilder::abortPendingConnections()
+{
+  pqObjectBuilderNS::ContinueWaiting = false;
+}
+
+//-----------------------------------------------------------------------------
 pqServer* pqObjectBuilder::createServer(const pqServerResource& resource)
 {
-
   // TODO: we should have code to make all kinds of server connections in one
   // place.  Right now its split between here and pqComponents.
 
@@ -872,7 +888,9 @@ pqServer* pqObjectBuilder::createServer(const pqServerResource& resource)
       }
     else if(server_resource.scheme() == "csrc")
       {
-      qWarning() << "Server reverse connections not supported yet\n";
+      pqObjectBuilderNS::ContinueWaiting = true;
+      id = vtkSMSession::ReverseConnectToRemote(server_resource.port(11111),
+        &pqObjectBuilderNS::processEvents);
       }
     else if(server_resource.scheme() == "cdsrs")
       {
@@ -884,7 +902,11 @@ pqServer* pqObjectBuilder::createServer(const pqServerResource& resource)
       }
     else if(server_resource.scheme() == "cdsrsrc")
       {
-      qWarning() << "Data server/render server reverse connections not supported yet\n";
+      pqObjectBuilderNS::ContinueWaiting = true;
+      id = vtkSMSession::ReverseConnectToRemote(
+        server_resource.dataServerPort(11111),
+        server_resource.renderServerPort(22221),
+        &pqObjectBuilderNS::processEvents);
       }
     else
       {

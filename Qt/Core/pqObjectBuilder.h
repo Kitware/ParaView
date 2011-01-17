@@ -76,6 +76,9 @@ public:
   
   /// Create a server connection give a server resource
   pqServer* createServer(const pqServerResource& resource);
+
+  /// Closes any open connections for reverse-connection.
+  void abortPendingConnections();
  
   /// Destroy a server connection 
   void removeServer(pqServer *server);

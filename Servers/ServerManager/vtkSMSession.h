@@ -160,6 +160,17 @@ public:
   static vtkIdType ConnectToRemote(const char* hostname, int port);
 
   // Description:
+  // Same as ConnectToRemote() except that it waits for a reverse connection.
+  // This is a blocking call. One can optionally provide a callback that can be
+  // called periodically while this call is blocked.
+  // The callback should return true, if the connection should continue waiting,
+  // else return false to abort the wait.
+  static vtkIdType ReverseConnectToRemote(int port)
+    { return vtkSMSession::ReverseConnectToRemote(
+      port, (bool (*)()) NULL); }
+  static vtkIdType ReverseConnectToRemote(int port, bool (*callback)());
+
+  // Description:
   // These are static helper methods that help create standard ParaView
   // sessions. They register the session with the process module and return the
   // session id. Returns 0 on failure.
@@ -167,6 +178,16 @@ public:
   // client.
   static vtkIdType ConnectToRemote(const char* dshost, int dsport,
     const char* rshost, int rsport);
+
+  // Description:
+  // Same as ConnectToRemote() except that it waits for a reverse connection.
+  // This is a blocking call. One can optionally provide a callback that can be
+  // called periodically while this call is blocked.
+  // The callback should return true, if the connection should continue waiting,
+  // else return false to abort the wait.
+  static vtkIdType ReverseConnectToRemote(int dsport, int rsport)
+    { return vtkSMSession::ReverseConnectToRemote(dsport, rsport, NULL); }
+  static vtkIdType ReverseConnectToRemote(int dsport, int rsport, bool (*callback)());
 
 //BTX
 protected:

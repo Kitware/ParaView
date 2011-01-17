@@ -293,3 +293,69 @@ vtkIdType vtkSMSession::ConnectToRemote(const char* dshost, int dsport,
   session->Delete();
   return sid;
 }
+
+namespace
+{
+  class vtkTemp
+    {
+  public:
+    bool (*Callback) ();
+    vtkSMSessionClient* Session;
+    vtkTemp()
+      {
+      this->Callback = NULL;
+      this->Session = NULL;
+      }
+    void OnEvent()
+      {
+      if (this->Callback != NULL)
+        {
+        bool continue_waiting = (*this->Callback)();
+        if (!continue_waiting && this->Session )
+          {
+          this->Session->SetAbortConnect(true);
+          }
+        }
+      }
+    };
+}
+
+//----------------------------------------------------------------------------
+vtkIdType vtkSMSession::ReverseConnectToRemote(int port, bool (*callback)())
+{
+  return vtkSMSession::ReverseConnectToRemote(port, -1, callback);
+}
+
+//----------------------------------------------------------------------------
+vtkIdType vtkSMSession::ReverseConnectToRemote(
+  int dsport, int rsport, bool (*callback)())
+{
+  vtkTemp temp;
+  temp.Callback = callback;
+
+  vtksys_ios::ostringstream sname;
+  if (rsport <= -1)
+    {
+    sname << "csrc://localhost:" << dsport;
+    }
+  else
+    {
+    sname << "cdsrsrc://localhost:" << dsport << "/localhost:"<< rsport;
+    }
+
+  vtkSMSessionClient* session = vtkSMSessionClient::New();
+  temp.Session = session;
+  unsigned long id = session->AddObserver(vtkCommand::ProgressEvent,
+    &temp, &vtkTemp::OnEvent);
+
+  vtkIdType sid = 0;
+  if (session->Connect(sname.str().c_str()))
+    {
+    session->Initialize();
+    vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+    sid = pm->RegisterSession(session);
+    }
+  session->RemoveObserver(id);
+  session->Delete();
+  return sid;
+}

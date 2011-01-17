@@ -210,7 +210,7 @@ bool vtkSMSessionServer::Connect(const char* url)
     }
   else if (pvserver_reverse.find(url))
     {
-    vtkstd::string hostname = pvserver.match(1);
+    vtkstd::string hostname = pvserver_reverse.match(1);
     int port = atoi(pvserver_reverse.match(3).c_str());
     port = (port == 0)? 11111: port;
     vtksys_ios::ostringstream stream;
