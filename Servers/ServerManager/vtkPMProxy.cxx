@@ -533,6 +533,33 @@ vtkPMProxy* vtkPMProxy::GetSubProxyHelper(const char* name)
 }
 
 //----------------------------------------------------------------------------
+unsigned int vtkPMProxy::GetNumberOfSubProxyHelpers()
+{
+  return static_cast<unsigned int>(this->Internals->SubProxyHelpers.size());
+}
+//----------------------------------------------------------------------------
+vtkPMProxy* vtkPMProxy::GetSubProxyHelper(unsigned int cc)
+{
+  if (cc >= this->GetNumberOfSubProxyHelpers())
+    {
+    return NULL;
+    }
+
+  unsigned int index=0;
+  vtkInternals::SubProxyHelpersMapType::iterator iter;
+  for (iter = this->Internals->SubProxyHelpers.begin();
+    iter != this->Internals->SubProxyHelpers.end();
+    ++iter, ++index)
+    {
+    if (index == cc)
+      {
+      return iter->second;
+      }
+    }
+  return NULL;
+}
+
+//----------------------------------------------------------------------------
 void vtkPMProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);

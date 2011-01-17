@@ -75,6 +75,11 @@ protected:
   vtkPMProxy* GetSubProxyHelper(const char* name);
 
   // Description:
+  // API to iterate over subproxy helpers.
+  unsigned int GetNumberOfSubProxyHelpers();
+  vtkPMProxy* GetSubProxyHelper(unsigned int cc);
+
+  // Description:
   // Provides access to the vtkSMProxyDefinitionManager held by the session.
   vtkSMProxyDefinitionManager* GetProxyDefinitionManager();
 

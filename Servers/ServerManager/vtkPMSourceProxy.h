@@ -90,6 +90,8 @@ protected:
 
   char *ExecutiveName;
   vtkSetStringMacro(ExecutiveName);
+
+  friend class vtkPMCompoundSourceProxy;
 private:
   vtkPMSourceProxy(const vtkPMSourceProxy&); // Not implemented
   void operator=(const vtkPMSourceProxy&); // Not implemented
