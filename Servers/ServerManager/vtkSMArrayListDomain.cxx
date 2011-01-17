@@ -191,7 +191,7 @@ unsigned int vtkSMArrayListDomain::AddArray(
     arrayInfo->GetNumberOfComponents() > 1)
     {
     // add magnitude only for numeric arrays.
-    unsigned int first_index = -1;
+    unsigned int first_index = VTK_UNSIGNED_INT_MAX;
     if (arrayInfo->GetDataType() != VTK_STRING)
       {
       vtkStdString name = this->CreateMangledName(arrayInfo,
@@ -203,6 +203,10 @@ unsigned int vtkSMArrayListDomain::AddArray(
       {
       vtkStdString name = this->CreateMangledName(arrayInfo,cc);
       unsigned int newidx = this->AddString(name.c_str());
+      if (first_index == VTK_UNSIGNED_INT_MAX)
+        {
+        first_index = newidx;
+        }
       this->ALDInternals->FieldAssociation[newidx] = association;
       }
     return first_index;
