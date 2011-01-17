@@ -690,8 +690,11 @@ void vtkSMProxyManager::UnRegisterProxies()
 
   // FIXME_COLLABORATION ??? Is it normal that no notification is sent in that case ???
 
-  // Push state for undo/redo
-  this->PipelineState->ValidateState();
+  // Push state for undo/redo BUT only if it is not a clean up before deletion.
+  if(this->PipelineState->GetSession())
+    {
+    this->PipelineState->ValidateState();
+    }
 }
 
 //---------------------------------------------------------------------------
