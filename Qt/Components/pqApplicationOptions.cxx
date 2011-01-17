@@ -309,10 +309,7 @@ void pqApplicationOptions::applyChanges()
     }
   pqChartRepresentation::setHiddenSeriesSetting(hidden);
 
-  if (pqActiveObjects::instance().activeServer())
-    {
-    pqActiveObjects::instance().activeServer()->loadGlobalPropertiesFromSettings();
-    }
+  pqApplicationCore::instance()->loadGlobalPropertiesFromSettings();
 
   // render all views.
   pqApplicationCore::instance()->render();

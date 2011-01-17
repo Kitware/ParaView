@@ -52,14 +52,12 @@ pqStandardColorLinkAdaptor::pqStandardColorLinkAdaptor(
 
   QObject::connect(button, SIGNAL(standardColorChanged(const QString&)),
     this, SLOT(onStandardColorChanged(const QString&)));
-#ifdef FIXME_COLLABORATION
   this->VTKConnect->Connect(
     pqApplicationCore::instance()->getGlobalPropertiesManager(),
     vtkCommand::ModifiedEvent,
     this, SLOT(onGlobalPropertiesChanged()));
 
   this->onGlobalPropertiesChanged();
-#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -75,19 +73,16 @@ void pqStandardColorLinkAdaptor::onGlobalPropertiesChanged()
     {
     return;
     }
-#ifdef FIXME_COLLABORATION
   vtkSMGlobalPropertiesManager* mgr =
     pqApplicationCore::instance()->getGlobalPropertiesManager();
   const char* name = mgr->GetGlobalPropertyName(this->Proxy,
     this->PropertyName.toAscii().data());
   qobject_cast<pqStandardColorButton*>(this->parent())->setStandardColor(name);
-#endif
 }
 
 //-----------------------------------------------------------------------------
 void pqStandardColorLinkAdaptor::breakLink(vtkSMProxy* proxy, const char* pname)
 {
-#ifdef FIXME_COLLABORATION
   vtkSMGlobalPropertiesManager* mgr =
     pqApplicationCore::instance()->getGlobalPropertiesManager();
   const char* oldname = mgr->GetGlobalPropertyName(proxy, pname);
@@ -95,14 +90,12 @@ void pqStandardColorLinkAdaptor::breakLink(vtkSMProxy* proxy, const char* pname)
     {
     mgr->RemoveGlobalPropertyLink(oldname, proxy, pname);
     }
-#endif
 }
 
 //-----------------------------------------------------------------------------
 void pqStandardColorLinkAdaptor::onStandardColorChanged(const QString& name)
 {
   this->IgnoreModifiedEvents = true;
-#ifdef FIXME_COLLABORATION
   vtkSMGlobalPropertiesManager* mgr =
     pqApplicationCore::instance()->getGlobalPropertiesManager();
   if (name.isEmpty())
@@ -117,7 +110,6 @@ void pqStandardColorLinkAdaptor::onStandardColorChanged(const QString& name)
       this->Proxy,
       this->PropertyName.toStdString().c_str());
     }
-#endif
   this->IgnoreModifiedEvents = false;
 }
 

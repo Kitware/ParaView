@@ -282,7 +282,7 @@ void pqRenderViewBase::setDefaultPropertyValues()
     }
 
   vtkSMGlobalPropertiesManager* globalPropertiesManager =
-    this->getServer()->getGlobalPropertiesManager();
+    pqApplicationCore::instance()->getGlobalPropertiesManager();
   globalPropertiesManager->SetGlobalPropertyLink(
     "BackgroundColor", proxy, "Background");
   proxy->UpdateVTKObjects();

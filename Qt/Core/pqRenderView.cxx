@@ -212,7 +212,7 @@ void pqRenderView::initializeWidgets()
 
   // Set up some global property links by default.
   vtkSMGlobalPropertiesManager* globalPropertiesManager =
-    this->getServer()->getGlobalPropertiesManager();
+    pqApplicationCore::instance()->getGlobalPropertiesManager();
   this->getConnector()->Connect(
     globalPropertiesManager->GetProperty("TextAnnotationColor"),
     vtkCommand::ModifiedEvent, this, SLOT(textAnnotationColorChanged()));
@@ -883,7 +883,7 @@ void pqRenderView::textAnnotationColorChanged()
 {
   // Set up some global property links by default.
   vtkSMGlobalPropertiesManager* globalPropertiesManager =
-    this->getServer()->getGlobalPropertiesManager();
+    pqApplicationCore::instance()->getGlobalPropertiesManager();
   double value[3];
   vtkSMPropertyHelper(globalPropertiesManager, "TextAnnotationColor").Get(
     value, 3);

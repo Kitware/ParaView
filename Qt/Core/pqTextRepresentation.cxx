@@ -67,7 +67,7 @@ void pqTextRepresentation::setDefaultPropertyValues()
     proxy->GetProperty("Enabled"),1);
 
   vtkSMGlobalPropertiesManager* globalPropertiesManager =
-    this->getServer()->getGlobalPropertiesManager();
+    pqApplicationCore::instance()->getGlobalPropertiesManager();
   globalPropertiesManager->SetGlobalPropertyLink(
     "TextAnnotationColor", proxy, "Color");
   proxy->UpdateVTKObjects();

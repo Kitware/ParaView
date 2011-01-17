@@ -291,7 +291,7 @@ void pqPipelineRepresentation::setDefaultPropertyValues()
 
   // Set up some global property links by default.
   vtkSMGlobalPropertiesManager* globalPropertiesManager =
-    this->getServer()->getGlobalPropertiesManager();
+      pqApplicationCore::instance()->getGlobalPropertiesManager();
   // Note that the representation created for the 2D view doesn't even have
   // these properties.
   globalPropertiesManager->SetGlobalPropertyLink(

@@ -38,7 +38,6 @@ class vtkPVOptions;
 class vtkPVServerInformation;
 class vtkPVXMLElement;
 class vtkSMApplication;
-class vtkSMGlobalPropertiesManager;
 class vtkSMProxy;
 class vtkSMProxyManager;
 class vtkSMRenderViewProxy;
@@ -117,25 +116,6 @@ public:
   static void setGlobalImmediateModeRenderingSetting(bool val);
   static bool globalImmediateModeRenderingSetting();
 
-  /// Returns the manager for the global properties such as ForegroundColor etc.
-  vtkSMGlobalPropertiesManager* getGlobalPropertiesManager();
-
-  /// Loads global properties values from settings.
-  /// HACK: Need more graceful way of dealing with changes to settings and
-  /// updating items that depend on it.
-  void loadGlobalPropertiesFromSettings();
-
-  /// loads palette i.e. global property values given the name of the palette.
-  void loadPalette(const QString& name);
-
-  /// loads palette i.e. global property values given the name XML state for a
-  /// palette.
-  void loadPalette(vtkPVXMLElement* xml);
-
-  /// save the current palette as XML. A new reference is returned, so the
-  /// caller is responsible for releasing memory i.e. call Delete() on the
-  /// returned value.
-  vtkPVXMLElement* getCurrrentPalette();
 
 signals:
   /// Fired when the name of the proxy is changed.

@@ -206,7 +206,7 @@ void pqScalarBarRepresentation::setDefaultPropertyValues()
   // setup global property link. By default, color is linked with
   // TextAnnotationColor.
   vtkSMGlobalPropertiesManager* globalPropertiesManager =
-    this->getServer()->getGlobalPropertiesManager();
+    pqApplicationCore::instance()->getGlobalPropertiesManager();
   globalPropertiesManager->SetGlobalPropertyLink(
     "TextAnnotationColor", proxy, "TitleColor");
   globalPropertiesManager->SetGlobalPropertyLink(
