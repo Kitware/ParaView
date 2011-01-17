@@ -157,8 +157,6 @@ int vtkPrismTableToPolyData::RequestData(vtkInformation* vtkNotUsed(request),
 
   if(gobalElementIdArray)
   {
-
-    int type=gobalElementIdArray->GetDataType();
     vtkDataArray* newArray= vtkDataArray::CreateDataArray(VTK_ID_TYPE);
     newArray->DeepCopy(gobalElementIdArray);
     newArray->SetName("GobalElementId");
