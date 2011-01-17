@@ -514,9 +514,11 @@ void vtkSMComparativeViewProxy::AddNewView()
     {
     vtkSMProxy* repr = reprIter->first;
 
+#ifndef NDEBUG
     vtkSMProxy* clone =
       this->Internal->AddRepresentationClone(repr, newView);
     assert(clone != NULL);
+#endif
     }
 }
 
