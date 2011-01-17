@@ -43,6 +43,10 @@ protected:
   // Representations's domain are up-to-date.
   virtual void CreateVTKObjects();
 
+  // Whenever the "Representation" property is modified, we ensure that the
+  // this->InvalidateDataInformation() is called.
+  void OnPropertyUpdated(vtkObject*, unsigned long, void* calldata);
+
 private:
   vtkSMPVRepresentationProxy(const vtkSMPVRepresentationProxy&); // Not implemented
   void operator=(const vtkSMPVRepresentationProxy&); // Not implemented

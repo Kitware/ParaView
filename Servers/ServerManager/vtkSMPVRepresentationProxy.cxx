@@ -16,6 +16,7 @@
 
 #include "vtkClientServerStream.h"
 #include "vtkCollection.h"
+#include "vtkCommand.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
 #include "vtkPVXMLElement.h"
@@ -58,6 +59,22 @@ void vtkSMPVRepresentationProxy::CreateVTKObjects()
   // ensure that all representations have valid Representations domain.
   this->UpdatePropertyInformation();
   this->GetProperty("RepresentationTypesInfo")->UpdateDependentDomains();
+
+  // Whenever the "Representation" property is modified, we ensure that the
+  // this->InvalidateDataInformation() is called.
+  this->AddObserver(vtkCommand::UpdatePropertyEvent,
+    this, &vtkSMPVRepresentationProxy::OnPropertyUpdated);
+}
+
+//----------------------------------------------------------------------------
+void vtkSMPVRepresentationProxy::OnPropertyUpdated(vtkObject*,
+  unsigned long, void* calldata)
+{
+  const char* pname = reinterpret_cast<const char*>(calldata);
+  if (pname && strcmp(pname, "Representation") == 0)
+    {
+    this->InvalidateDataInformation();
+    }
 }
 
 //----------------------------------------------------------------------------
