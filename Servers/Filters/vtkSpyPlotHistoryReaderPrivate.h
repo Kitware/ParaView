@@ -178,7 +178,7 @@ void getTimeStepInfo(const std::string &s, const char &delim,
     //find the first "." variable
     bool foundStart = false;
     int rowNumber = -1;
-    int index=0, row=0;
+    int index=0;
 
     for (it = cols.begin(); it != cols.end(); ++it)
       {
