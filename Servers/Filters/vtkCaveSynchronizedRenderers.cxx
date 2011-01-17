@@ -212,9 +212,9 @@ void vtkCaveSynchronizedRenderers::SetDisplayConfig()
 void vtkCaveSynchronizedRenderers::SetSurfaceRotation( double xBase[3],
                                                        double yBase[3],
                                                        double zBase[3],
-                                                       double xRoom[3],
-                                                       double yRoom[3],
-                                                       double zRoom[3] )
+                                                       double vtkNotUsed(xRoom)[3],
+                                                       double vtkNotUsed(yRoom)[3],
+                                                       double vtkNotUsed(zRoom)[3])
 {
   vtkMath::Normalize( xBase );
   vtkMath::Normalize( yBase );
