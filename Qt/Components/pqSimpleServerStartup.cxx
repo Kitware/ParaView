@@ -801,7 +801,6 @@ void pqSimpleServerStartup::connectServer()
   if(server)
     {
     this->started(server);
-    this->Implementation->StartupDialog->hide();
     }
   else
     {
