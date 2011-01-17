@@ -422,7 +422,7 @@ p, li { white-space: pre-wrap; }
           <number>2</number>
          </property>
          <item row="0" column="0" colspan="2">
-          <widget class="QLabel" name="label_6">
+          <widget class="QLabel" name="HidenSeriesLabel">
            <property name="text">
             <string>Hidden Series</string>
            </property>
