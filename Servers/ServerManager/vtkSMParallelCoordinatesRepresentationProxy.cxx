@@ -46,7 +46,7 @@ void vtkSMParallelCoordinatesRepresentationProxy::PrintSelf(ostream& os, vtkInde
 
 //----------------------------------------------------------------------------
 void vtkSMParallelCoordinatesRepresentationProxy::UpdatePropertyInformationInternal(
-  vtkSMProperty* prop)
+  vtkSMProperty* vtkNotUsed(prop))
 {
 #ifdef FIXME
   vtkSMStringVectorProperty* svp = vtkSMStringVectorProperty::SafeDownCast(prop);

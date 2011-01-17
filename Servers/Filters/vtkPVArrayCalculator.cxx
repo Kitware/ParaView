@@ -42,7 +42,6 @@ void vtkPVArrayCalculator::UpdateArrayAndVariableNames
    ( vtkDataObject * vtkNotUsed(theInputObj), vtkDataSetAttributes * inDataAttrs )
 { 
   static  char   stringSufix[3][3] = { "_X", "_Y", "_Z" };
-  unsigned long mtime = this->GetMTime();
 
   // Look at the data-arrays available in the input and register them as
   // variables with the superclass.

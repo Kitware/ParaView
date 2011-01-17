@@ -67,7 +67,7 @@ vtkSMStateLoader::~vtkSMStateLoader()
 }
 
 //---------------------------------------------------------------------------
-const char* vtkSMStateLoader::GetViewXMLName (int connectionID,
+const char* vtkSMStateLoader::GetViewXMLName (int vtkNotUsed(connectionID),
   const char *xml_name)
 {
   // This is no longer applicable. A view proxy now has to work in all ParaView

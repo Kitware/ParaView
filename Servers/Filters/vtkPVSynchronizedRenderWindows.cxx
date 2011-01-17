@@ -1679,7 +1679,9 @@ double vtkPVSynchronizedRenderWindows::GetZbufferDataAtPoint(int x, int y,
   unsigned int id)
 {
   vtkRenderWindow* window = this->GetRenderWindow(id);
-  if (!this->Enabled || !this->Mode != CLIENT || window == NULL)
+  if (!this->Enabled ||
+      (this->Mode != vtkPVSynchronizedRenderWindows::CLIENT) ||
+      window == NULL)
     {
     return window? window->GetZbufferDataAtPoint(x, y) : 1.0;
     }

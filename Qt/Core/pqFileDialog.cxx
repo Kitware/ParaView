@@ -517,6 +517,7 @@ void pqFileDialog::setFileMode(pqFileDialog::FileMode mode)
     case AnyFile:
     case ExistingFile:
     case Directory:
+    default:
       selectionMode=QAbstractItemView::SingleSelection;
       break;
     case ExistingFiles:

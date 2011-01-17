@@ -142,7 +142,7 @@ bool pqStandardViewModules::canCreateView(const QString& viewtype) const
 }
 
 vtkSMProxy* pqStandardViewModules::createViewProxy(const QString& viewtype,
-                                                   pqServer *server)
+                                                   pqServer *vtkNotUsed(server))
 {
   vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
   const char* root_xmlname = 0;

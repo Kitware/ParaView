@@ -208,7 +208,8 @@ int vtkProcessModuleAutoMPI::ConnectToRemoteBuiltInSelf()
  * @param servername IN Sending in the server name (usually localhost or 127.0.0.1)
  * @return 1 for success 0 otherwise
  */
-int vtkProcessModuleAutoMPIInternals::StartRemoteBuiltInSelf(const char* servername,int port)
+int vtkProcessModuleAutoMPIInternals::
+  StartRemoteBuiltInSelf(const char* vtkNotUsed(servername),int port)
 {
   // Create a new server process structure
   vtksysProcess* server =0;

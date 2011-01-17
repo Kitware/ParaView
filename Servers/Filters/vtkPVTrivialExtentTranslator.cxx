@@ -76,7 +76,7 @@ int vtkPVTrivialExtentTranslatorPieceToExtentThreadSafe(
 
 //-----------------------------------------------------------------------------
 int vtkPVTrivialExtentTranslator::PieceToExtentThreadSafe(
-  int piece, int numPieces, int vtkNotUsed(ghostLevel), int *wholeExtent,
+  int piece, int vtkNotUsed(numPieces), int vtkNotUsed(ghostLevel), int *wholeExtent,
   int *resultExtent, int vtkNotUsed(splitMode), int vtkNotUsed(byPoints))
 {
   if(this->Internals->AllProcessExtents.size() > 6)
