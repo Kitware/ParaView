@@ -44,6 +44,12 @@ public:
   bool LoadPlugin(const char* filename);
 
   // Description:
+  // Simply forwards the call to
+  // vtkPVPluginLoader::LoadPluginConfigurationXMLFromString to load
+  // configuration xml.
+  void LoadPluginConfigurationXMLFromString(const char* xmlcontents);
+
+  // Description:
   // Returns the full filename for the plugin attempted to load most recently
   // using LoadPlugin().
   vtkGetStringMacro(FileName);

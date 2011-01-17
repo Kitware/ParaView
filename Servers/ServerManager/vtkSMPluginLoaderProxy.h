@@ -36,6 +36,12 @@ public:
   // ErrorString property.
   bool LoadPlugin(const char* filename);
 
+  // Description:
+  // Loads the configuration xml contents. Look at
+  // vtkPVPluginTracker::LoadPluginConfigurationXMLFromString() to see the
+  // details about the configuration xml.
+  void LoadPluginConfigurationXMLFromString(const char* xmlcontents);
+
 //BTX
 protected:
   vtkSMPluginLoaderProxy();

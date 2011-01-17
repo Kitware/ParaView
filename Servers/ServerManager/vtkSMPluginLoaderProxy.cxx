@@ -41,6 +41,19 @@ bool vtkSMPluginLoaderProxy::LoadPlugin(const char* filename)
 }
 
 //----------------------------------------------------------------------------
+void vtkSMPluginLoaderProxy::LoadPluginConfigurationXMLFromString(
+  const char* xmlcontents)
+{
+  this->CreateVTKObjects();
+  vtkSMMessage message;
+  message << pvstream::InvokeRequest()
+          << "LoadPluginConfigurationXMLFromString"
+          << xmlcontents;
+  this->Invoke(&message);
+  this->UpdatePropertyInformation();
+}
+
+//----------------------------------------------------------------------------
 void vtkSMPluginLoaderProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);

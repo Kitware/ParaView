@@ -2018,7 +2018,10 @@
                        class="vtkPVPluginLoader"
                        processes="dataserver|renderserver" >
       <Documentation>
-        Use this proxy to load a plugin remotely.
+        Use this proxy to load a plugin remotely. This proxy has no properties
+        that users can set. Only information-properties are provided that can be
+        used to obtain various states. vtkSMPluginLoaderProxy has API that can
+        be used to load plugins, configuration xmls etc.
       </Documentation>
 
       <IntVectorProperty name="Loaded"

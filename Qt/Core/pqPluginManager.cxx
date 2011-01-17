@@ -131,8 +131,13 @@ void pqPluginManager::onServerConnected(pqServer* server)
     QString uri = server->getResource().schemeHostsPorts().toURI();
     QString key = QString("/PluginsList/%1").arg(uri);
     QString remote_plugin_config = settings->value(key).toString();
-    // TODO: now pass this xml to the vtkPVPluginTracker on the remote
+    // now pass this xml to the vtkPVPluginTracker on the remote
     // processes.
+    if (!remote_plugin_config.isEmpty())
+      {
+      server->session()->GetPluginManager()->LoadPluginConfigurationXMLFromString(
+        remote_plugin_config.toAscii().data(), true);
+      }
     }
 
   this->initialize(server->session()->GetPluginManager());

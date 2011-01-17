@@ -19,6 +19,7 @@
 #include "vtkProcessModule.h"
 #include "vtkPVOptions.h"
 #include "vtkPVPlugin.h"
+#include "vtkPVPluginTracker.h"
 #include "vtkPVPythonPluginInterface.h"
 #include "vtkPVServerManagerPluginInterface.h"
 
@@ -316,102 +317,12 @@ bool vtkPVPluginLoader::LoadPlugin(const char* file)
 }
 
 //-----------------------------------------------------------------------------
-#ifdef FIXME_COLLABORATION
-void vtkPVPluginLoader::Load(vtkPVPlugin* plugin)
+void vtkPVPluginLoader::LoadPluginConfigurationXMLFromString(const char*
+  xmlcontents)
 {
-  // This code should move somewhere else. I don't like the way static and
-  // dynamic loading of plugins differs and we are trying to consolidate that
-  // now.
-  if (!plugin)
-    {
-    vtkErrorMacro("Cannot load NULL plugin.");
-    this->PluginInfo->SetError("Cannot load NULL plugin");
-    return;
-    }
-
-  vtkPVPluginLoaderDebugMacro("Plugin instance located successfully. "
-    "Now loading components from the plugin instance based on the interfaces it "
-    "implements.");
-
-  // Populate some basic plugin information.
-  this->PluginInfo->SetPluginName(plugin->GetPluginName());
-  this->PluginInfo->SetPluginVersion(plugin->GetPluginVersionString());
-  this->PluginInfo->SetLoaded(1);
-
-  // plugin RequiredOnServer flag
-  bool serverRequired = plugin->GetRequiredOnServer();
-  bool clientRequired = plugin->GetRequiredOnClient();
-  this->PluginInfo->SetRequiredOnServer(serverRequired? 1 : 0);
-  this->PluginInfo->SetRequiredOnClient(clientRequired? 1 : 0);
-
-  // plugin required-plugins
-  this->PluginInfo->SetRequiredPlugins(plugin->GetRequiredPlugins());
-
-
-  vtkPVPluginLoaderDebugMacro(
-    "----------------------------------------------------------------\n"
-    "Plugin Information: \n"
-    "  Name        : " << this->PluginInfo->GetPluginName() << "\n"
-    "  Version     : " << this->PluginInfo->GetPluginVersion() << "\n"
-    "  ReqOnServer : " << this->PluginInfo->GetRequiredOnServer() << "\n"
-    "  ReqOnClient : " << this->PluginInfo->GetRequiredOnClient() << "\n"
-    "  ReqPlugins  : " << this->PluginInfo->GetRequiredPlugins());
-
-  // Now, if this is a server manager plugin, get the xmls.
-  vtkPVServerManagerPluginInterface* smplugin =
-    dynamic_cast<vtkPVServerManagerPluginInterface*>(plugin);
-  if (smplugin)
-    {
-    vtkstd::vector<vtkstd::string> xmls;
-    smplugin->GetXMLs(xmls);
-
-    this->ServerManagerXML->SetNumberOfTuples(static_cast<int>(xmls.size()));
-    for (int i=0; i<static_cast<int>(xmls.size()); i++)
-      {
-      this->ServerManagerXML->SetValue(i, xmls[i]);
-      }
-
-    if (smplugin->GetInitializeInterpreterCallback())
-      {
-      vtkClientServerInterpreterInitializer::GetInitializer()->RegisterCallback(
-        smplugin->GetInitializeInterpreterCallback());
-      }
-    vtkPVPluginLoaderDebugMacro(
-      "  ServerManager Plugin : Yes");
-    }
-  else
-    {
-    vtkPVPluginLoaderDebugMacro(
-      "  ServerManager Plugin : No");
-    }
-
-  // Now, if this is a python-module plugin, get the python source list.
-  vtkPVPythonPluginInterface *pyplugin =
-    dynamic_cast<vtkPVPythonPluginInterface*>(plugin);
-  if (pyplugin)
-    {
-    vtkstd::vector<vtkstd::string> names;
-    vtkstd::vector<vtkstd::string> sources;
-    vtkstd::vector<int> package_flags;
-    pyplugin->GetPythonSourceList(names, sources, package_flags);
-    this->PythonModuleNames->SetNumberOfTuples(static_cast<int>(names.size()));
-    this->PythonModuleSources->SetNumberOfTuples(static_cast<int>(sources.size()));
-    this->PythonPackageFlags->SetNumberOfTuples(static_cast<int>(package_flags.size()));
-    for (int cc=0; cc < static_cast<int>(names.size()); cc++)
-      {
-      this->PythonModuleNames->SetValue(cc, names[cc]);
-      this->PythonModuleSources->SetValue(cc, sources[cc]);
-      this->PythonPackageFlags->SetValue(cc, package_flags[cc]);
-      }
-    vtkPVPluginLoaderDebugMacro("  Python Plugin : Yes");
-    }
-  else
-    {
-    vtkPVPluginLoaderDebugMacro("  Python Plugin : No");
-    }
-  this->Modified();
+  vtkPVPluginTracker::GetInstance()->LoadPluginConfigurationXMLFromString(
+    xmlcontents);
 }
-#endif
 
 //-----------------------------------------------------------------------------
 void vtkPVPluginLoader::PrintSelf(ostream& os, vtkIndent indent)

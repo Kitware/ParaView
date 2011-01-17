@@ -17,11 +17,12 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVPluginLoader.h"
 #include "vtkPVPluginsInformation.h"
+#include "vtkPVPluginTracker.h"
 #include "vtkSMPluginLoaderProxy.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMSession.h"
-#include "vtkWeakPointer.h" // needed for vtkWeakPointer.
+#include "vtkWeakPointer.h"
 
 class vtkSMPluginManager::vtkInternals
 {
@@ -114,6 +115,39 @@ bool vtkSMPluginManager::LoadRemotePlugin(const char* filename)
     this->InvokeEvent(vtkSMPluginManager::PluginLoadedEvent);
     }
   return status;
+}
+
+//----------------------------------------------------------------------------
+void vtkSMPluginManager::LoadPluginConfigurationXMLFromString(
+  const char* xmlcontents, bool remote)
+{
+  if (remote)
+    {
+    vtkSMPluginLoaderProxy* proxy = vtkSMPluginLoaderProxy::SafeDownCast(
+      vtkSMProxyManager::GetProxyManager()->NewProxy("misc", "PluginLoader"));
+    proxy->UpdateVTKObjects();
+    proxy->LoadPluginConfigurationXMLFromString(xmlcontents);
+    proxy->Delete();
+
+    vtkPVPluginsInformation* temp = vtkPVPluginsInformation::New();
+    this->Internals->Session->GatherInformation(
+      vtkPVSession::DATA_SERVER_ROOT, temp, 0);
+    this->RemoteInformation->Update(temp);
+    temp->Delete();
+    }
+  else
+    {
+    vtkPVPluginTracker::GetInstance()->LoadPluginConfigurationXMLFromString(
+      xmlcontents);
+
+    vtkPVPluginsInformation* temp = vtkPVPluginsInformation::New();
+    this->Internals->Session->GatherInformation(
+      vtkPVSession::CLIENT, temp, 0);
+    this->LocalInformation->Update(temp);
+    temp->Delete();
+    }
+
+  this->InvokeEvent(vtkSMPluginManager::PluginLoadedEvent);
 }
 
 //----------------------------------------------------------------------------

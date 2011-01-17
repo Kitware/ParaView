@@ -56,6 +56,11 @@ public:
   bool LoadRemotePlugin(const char* filename);
   bool LoadLocalPlugin(const char* filename);
 
+  // Description:
+  // Loads the plugin configuration xml.
+  void LoadPluginConfigurationXMLFromString(const char* xmlcontents,
+    bool remote);
+
   enum
     {
     PluginLoadedEvent = 100000
