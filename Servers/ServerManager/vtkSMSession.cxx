@@ -14,6 +14,8 @@
 =========================================================================*/
 #include "vtkSMSession.h"
 
+#include "vtkCommand.h"
+#include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
 #include "vtkPVServerInformation.h"
@@ -48,6 +50,15 @@ vtkSMSession::vtkSMSession()
 
   this->LocalServerInformation = vtkPVServerInformation::New();
   this->LocalServerInformation->CopyFromObject(NULL);
+
+  // This ensure that whenever a message is received on  the parallel
+  // controller, this session is marked active. This is essential for
+  // satellites when running in parallel.
+  vtkMultiProcessController* controller = vtkMultiProcessController::GetGlobalController();
+  controller->AddObserver(vtkCommand::StartEvent,
+    this, &vtkSMSession::Activate);
+  controller->AddObserver(vtkCommand::EndEvent,
+    this, &vtkSMSession::DeActivate);
 }
 
 //----------------------------------------------------------------------------
