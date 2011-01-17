@@ -23,6 +23,7 @@
 #define __vtkSMUndoElement_h
 
 #include "vtkUndoElement.h"
+#include "vtkWeakPointer.h"
 
 class vtkSMSession;
 
@@ -33,14 +34,15 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Get/Set the Session.
-  vtkGetObjectMacro(Session, vtkSMSession);
+  virtual vtkSMSession* GetSession();
   virtual void SetSession(vtkSMSession*);
 
 protected:
   vtkSMUndoElement();
   ~vtkSMUndoElement();
 
-  vtkSMSession* Session;
+  // Identifies the session id to which this object is related.
+  vtkWeakPointer<vtkSMSession> Session;
 
 private:
   vtkSMUndoElement(const vtkSMUndoElement&); // Not implemented.

@@ -87,8 +87,6 @@ int main(int argc, char* argv[])
     proxy->Delete();
 
     proxy = pxm->NewProxy("sources", "SphereSource");
-    vtkSMPropertyHelper(proxy, "PhiResolution").Set(20);
-    vtkSMPropertyHelper(proxy, "ThetaResolution").Set(20);
     proxy->UpdateVTKObjects();
     sphereIds.push_back(proxy->GetGlobalID());
 

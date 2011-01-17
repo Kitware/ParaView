@@ -16,10 +16,9 @@
 
 #include "vtkObjectFactory.h"
 #include "vtkSMSession.h"
-#include "vtkSMProxyLocator.h"
+#include "vtkWeakPointer.h"
 
 
-vtkCxxSetObjectMacro(vtkSMUndoElement, Session, vtkSMSession);
 //-----------------------------------------------------------------------------
 vtkSMUndoElement::vtkSMUndoElement()
 {
@@ -38,3 +37,17 @@ void vtkSMUndoElement::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os, indent);
 }
 
+//----------------------------------------------------------------------------
+void vtkSMUndoElement::SetSession(vtkSMSession* session)
+{
+  if (this->Session != session)
+    {
+    this->Session = session;
+    this->Modified();
+    }
+}
+//----------------------------------------------------------------------------
+vtkSMSession* vtkSMUndoElement::GetSession()
+{
+  return this->Session.GetPointer();
+}

@@ -180,6 +180,7 @@ void vtkSMUndoStackBuilder::OnNewState( vtkSMSession* session,
         undoElement->SetCreateElement( true );
         undoElement->SetCreationState( newState );
         this->Add(undoElement);
+        undoElement->Delete();
         }
       else if(newState->global_id() == 1)
         {
@@ -192,6 +193,7 @@ void vtkSMUndoStackBuilder::OnNewState( vtkSMSession* session,
         undoElement->SetSession(session);
         undoElement->SetUndoRedoState( &origin, newState);
         this->Add(undoElement);
+        undoElement->Delete();
         }
       else
         {
@@ -208,6 +210,7 @@ void vtkSMUndoStackBuilder::OnNewState( vtkSMSession* session,
       undoElement->SetCreateElement( false );
       undoElement->SetCreationState( &oldState);
       this->Add(undoElement);
+      undoElement->Delete();
       }
     }
   else
@@ -219,6 +222,7 @@ void vtkSMUndoStackBuilder::OnNewState( vtkSMSession* session,
     undoElement->SetSession(session);
     undoElement->SetUndoRedoState( &oldState, newState);
     this->Add(undoElement);
+    undoElement->Delete();
     }
 }
 
