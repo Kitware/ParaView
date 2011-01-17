@@ -99,8 +99,8 @@ void vtkSpyPlotHistoryReader::PrintSelf(ostream& os, vtkIndent indent)
 //-----------------------------------------------------------------------------
 // Read the file to gather the number of timesteps
 int vtkSpyPlotHistoryReader::RequestInformation(vtkInformation *request,
-                                         vtkInformationVector **inputVector,
-                                         vtkInformationVector *outputVector)
+                               vtkInformationVector ** vtkNotUsed(inputVector),
+                               vtkInformationVector *outputVector)
 {
   vtkInformation *info=outputVector->GetInformationObject(0);
 
@@ -195,7 +195,7 @@ int vtkSpyPlotHistoryReader::RequestInformation(vtkInformation *request,
 
 //-------- ---------------------------------------------------------------------
 int vtkSpyPlotHistoryReader::RequestData(
-  vtkInformation *request,
+  vtkInformation * vtkNotUsed(request),
   vtkInformationVector **vtkNotUsed(inputVector),
   vtkInformationVector *outputVector)
 {
