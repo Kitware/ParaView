@@ -166,6 +166,55 @@
      </Hints>
    <!-- End ACosmoReader -->
    </SourceProxy>
+
+   <SourceProxy
+       name="StreamingNetCDFPOP"
+       class="vtkImageNetCDFPOPReader"
+       label="Image NetCDF POP reader">
+     <Documentation
+         short_help="streaming capable netcdf POP reader."
+         long_help="Read netcdf POP files for the multiresolution streaming view">
+     </Documentation>
+
+     <StringVectorProperty
+         name="FileName"
+         animateable="0"
+         command="SetFileName"
+         number_of_elements="1">
+       <FileListDomain name="files"/>
+       <Documentation>
+         This property specifies the file name to read.
+       </Documentation>
+     </StringVectorProperty>
+
+     <DoubleVectorProperty
+         name="Origin"
+         command="SetOrigin"
+         number_of_elements="3"
+         default_values="0.0 0.0 0.0" >
+       <DoubleRangeDomain name="range"/>
+       <Documentation>
+         The coordinate contained in this property specifies the position of the point with index (0,0,0).
+       </Documentation>
+     </DoubleVectorProperty>
+
+     <DoubleVectorProperty
+         name="Spacing"
+         command="SetSpacing"
+         number_of_elements="3"
+         default_values="1.0 1.0 1.0" >
+       <DoubleRangeDomain name="range"/>
+       <Documentation>
+         This property specifies the size of a voxel in each dimension.
+       </Documentation>
+     </DoubleVectorProperty>
+
+     <Hints>
+       <ReaderFactory extensions="pop.ncdf pop.nc"
+                      file_description="POP Ocean NetCDF (streaming image)" />
+     </Hints>
+   </SourceProxy>
+
   </ProxyGroup>
 
   <ProxyGroup

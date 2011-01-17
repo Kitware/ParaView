@@ -27,17 +27,9 @@
 #include "vtkPointData.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 
-#define DEBUGPRINT(arg)\
-  ;
-//arg;
-
-#define DEBUGPRINT_RESOLUTION(arg)\
-  ;
-//  arg;
-
-#define DEBUGPRINT_METAINFORMATION(arg)\
-  ;
-//  arg;
+#define DEBUGPRINT(arg) ;
+#define DEBUGPRINT_RESOLUTION(arg) ;
+#define DEBUGPRINT_METAINFORMATION(arg) ;
 
 vtkStandardNewMacro(vtkStreamedMandelbrot);
 
