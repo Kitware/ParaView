@@ -42,9 +42,7 @@ void vtkPVArrayCalculator::UpdateArrayAndVariableNames
    ( vtkDataObject * vtkNotUsed(theInputObj), vtkDataSetAttributes * inDataAttrs )
 { 
   static  char   stringSufix[3][3] = { "_X", "_Y", "_Z" };
-#ifndef NDEBUG
   unsigned long mtime = this->GetMTime();
-#endif
 
   // Look at the data-arrays available in the input and register them as
   // variables with the superclass.
@@ -100,10 +98,9 @@ void vtkPVArrayCalculator::UpdateArrayAndVariableNames
       }
     }
 
-#ifndef NDEBUG
   assert(this->GetMTime() == mtime &&
     "post: mtime cannot be changed in RequestData()");
-#endif
+  mtime; // added so compiler won't complain im release mode.
 }
 
 // ----------------------------------------------------------------------------
