@@ -266,7 +266,17 @@ public:
   // which can be accessed using GetLastSelection().
   // @CallOnAllProcessess
   void SelectCells(int region[4]);
+  void SelectCells(int region0, int region1, int region2, int region3)
+    {
+    int r[4] = {region0, region1, region2, region3};
+    this->SelectCells(r);
+    }
   void SelectPoints(int region[4]);
+  void SelectPoints(int region0, int region1, int region2, int region3)
+    {
+    int r[4] = {region0, region1, region2, region3};
+    this->SelectPoints(r);
+    }
   void Select(int field_association, int region[4]);
 
   // Description:
