@@ -747,7 +747,7 @@ void vtkEnzoReaderInternal::ReadBlockStructures()
       theStr = "";
       int    tmpInt;
       char   tmpChr;
-      while (  ( tmpChr = stream.get() )  !=  '['  );
+      while (  ( tmpChr = stream.get() )  !=  '['  ) {}
       while (  ( tmpChr = stream.get() )  !=  ']'  ) theStr += tmpChr;
       
       int    blkIdx = atoi( theStr.c_str() );

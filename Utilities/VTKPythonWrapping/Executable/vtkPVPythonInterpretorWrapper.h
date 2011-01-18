@@ -141,7 +141,8 @@ static PyTypeObject vtkPVPythonInterpretorWrapperType = {
     0, // PyObject *tp_subclasses;
     0, // PyObject *tp_weaklist;
 #if PYTHON_API_VERSION >= 1012
-    0  // tp_del
+    0, // tp_del
+    0  // tp_version_tag
 #endif
 };
 

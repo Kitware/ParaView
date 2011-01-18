@@ -65,6 +65,9 @@ using vtksys_ios::ostringstream;
 class vtkSortedTableStreamer::InternalsBase
 {
 public:
+  InternalsBase() {}
+  ~InternalsBase() {}
+
   virtual void SetSelectedComponent(int newValue) = 0;
   virtual void InvalidateCache() = 0;
   virtual int  Extract( vtkTable* input, vtkTable* output,
