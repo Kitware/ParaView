@@ -114,7 +114,18 @@ vtkSMProxyProperty::vtkSMProxyProperty()
 //---------------------------------------------------------------------------
 vtkSMProxyProperty::~vtkSMProxyProperty()
 {
-  delete this->PPInternals;
+  // Ensure that this happens before we delete this->PPInternals. This is needed
+  // because when items in this vector are being destroyed, they call
+  // vtkSMProxyProperty::RemoveProducer(). That function uses this->PPInternals
+  // to update producer counts.
+  this->PPInternals->Proxies.clear();
+
+  // We use this indirection to detect any other issues we may run into when
+  // destroying the vtkSMProxyPropertyInternals instance more
+  // cleanly (since we'll be accessing a NULL ptr).
+  vtkSMProxyPropertyInternals* temp = this->PPInternals;
+  this->PPInternals = NULL;
+  delete temp;
 }
 
 //---------------------------------------------------------------------------
