@@ -291,6 +291,9 @@ void vtkSMSessionClient::SetupDataServerRenderServerConnection()
   mpiMToN->UpdateVTKObjects();
   mpiMToN->InvokeCommand("Connect");
 
+  info->Delete();
+  info = NULL;
+
   vtkSMObject::GetProxyManager()->RegisterProxy("__internals__",
     "m2n_socket",
     mpiMToN);
