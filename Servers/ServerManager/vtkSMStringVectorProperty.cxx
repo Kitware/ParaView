@@ -280,6 +280,13 @@ int vtkSMStringVectorProperty::ReadXMLAttributes(vtkSMProxy* proxy,
       this->Internals->DefaultValues.push_back(tmp);
       }
     }
+  if (element->FindNestedElementByName("ArraySelectionInformationHelper"))
+    {
+    // since this information helper used to update the
+    // number-of-elements-per-command on the property everytime information was
+    // updated.
+    this->SetNumberOfElementsPerCommand(2);
+    }
   return 1;
 }
 
