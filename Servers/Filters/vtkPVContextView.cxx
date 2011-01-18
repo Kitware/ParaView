@@ -119,7 +119,8 @@ int ComputeMagnification(const int full_size[2], int window_size[2])
       static_cast<double>(full_size[0])/static_cast<double>(window_size[0])));
   magnification = (temp> magnification)? temp: magnification;
 
-  temp = ceil(full_size[1]/static_cast<double>(window_size[1]));
+  temp = static_cast<int>(ceil(
+    static_cast<double>(full_size[1])/static_cast<double>(window_size[1])));
   magnification = (temp > magnification)? temp : magnification;
   window_size[0] = full_size[0]/magnification;
   window_size[1] = full_size[1]/magnification;
