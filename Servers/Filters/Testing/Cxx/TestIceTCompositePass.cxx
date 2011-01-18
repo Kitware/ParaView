@@ -408,7 +408,7 @@ void MyProcess::Execute()
   this->CreatePipeline(renderer);
   this->SetupRenderPasses(renderer);
 
-  int retVal;
+  int retVal=vtkTesting::FAILED;
   if (myId == 0)
     {
     // root node
@@ -430,6 +430,7 @@ void MyProcess::Execute()
       syncRenderers2->SetRootProcessId(1);
 
       this->SocketController->ProcessRMIs();
+      retVal=vtkTesting::PASSED;
       }
     else
       {

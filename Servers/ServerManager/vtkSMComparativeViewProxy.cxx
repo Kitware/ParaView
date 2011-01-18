@@ -513,12 +513,11 @@ void vtkSMComparativeViewProxy::AddNewView()
     reprIter != this->Internal->RepresentationClones.end(); ++reprIter)
     {
     vtkSMProxy* repr = reprIter->first;
-
-#ifndef NDEBUG
     vtkSMProxy* clone =
       this->Internal->AddRepresentationClone(repr, newView);
+
     assert(clone != NULL);
-#endif
+    clone; // unused warning in release mode.
     }
 }
 

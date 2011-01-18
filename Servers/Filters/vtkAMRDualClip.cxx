@@ -1467,7 +1467,6 @@ vtkAMRDualClip::DoRequestData(vtkHierarchicalBoxDataSet* hbdsInput,
   vtkMultiPieceDataSet *mpds=vtkMultiPieceDataSet::New();
   mbdsOutput0->SetBlock(0,mpds);
 
-  //int myProcessId = this->Controller->GetLocalProcessId(); // Just for debugging.
   mpds->SetNumberOfPieces(0);
 
   if(this->Helper)
