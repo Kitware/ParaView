@@ -418,7 +418,7 @@ void MyProcess::Execute()
 
     if (this->ServerMode)
       {
-      tkSynchronizedRenderWindows* syncWindows2 =
+      vtkSynchronizedRenderWindows* syncWindows2 =
         vtkSynchronizedRenderWindows::New();
       syncWindows2->SetRenderWindow(renWin);
       syncWindows2->SetParallelController(this->SocketController);
