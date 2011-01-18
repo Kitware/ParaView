@@ -135,7 +135,6 @@
 #include "vtkPVRepresentedDataInformation.h"
 #include "vtkPVScalarBarActor.h"
 #include "vtkPVSelectionSource.h"
-#include "vtkPVServerFileListing.h"
 #include "vtkPVServerObject.h"
 #include "vtkPVServerSelectTimeSet.h"
 #include "vtkPVTextSource.h"
@@ -338,7 +337,6 @@ int main(int , char *[])
   PRINT_SELF(vtkPVRepresentedDataInformation);
   PRINT_SELF(vtkPVScalarBarActor);
   PRINT_SELF(vtkPVSelectionSource);
-  PRINT_SELF(vtkPVServerFileListing);
   PRINT_SELF(vtkPVServerObject);
   PRINT_SELF(vtkPVServerSelectTimeSet);
   PRINT_SELF(vtkPVTextSource);
