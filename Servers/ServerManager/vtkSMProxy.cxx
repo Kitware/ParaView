@@ -172,6 +172,8 @@ vtkObjectBase* vtkSMProxy::GetClientSideObject()
 {
   if (this->Session)
     {
+    this->CreateVTKObjects();
+
     vtkTypeUInt32 gid = this->GetGlobalID();
     vtkPMProxy* pmproxy =
       vtkPMProxy::SafeDownCast(this->Session->GetPMObject(gid));

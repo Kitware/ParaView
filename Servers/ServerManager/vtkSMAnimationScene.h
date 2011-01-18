@@ -17,15 +17,18 @@
 // .SECTION Description
 // vtkSMAnimationScene subclasses vtkPVAnimationScene to add awareness about
 // view proxies so that the scene can update view proxies using properties.
-
+// vtkSMAnimationScene forwards the vtkCommand::StartEvent and
+// vtkCommand::EndEvent from vtkCompositeAnimationPlayer to mark the start and
+// end of animation playback.
 #ifndef __vtkSMAnimationScene_h
 #define __vtkSMAnimationScene_h
 
 #include "vtkPVAnimationScene.h"
 
+class vtkCompositeAnimationPlayer;
+class vtkEventForwarderCommand;
 class vtkSMProxy;
 class vtkSMViewProxy;
-class vtkCompositeAnimationPlayer;
 
 class VTK_EXPORT vtkSMAnimationScene : public vtkPVAnimationScene
 {
@@ -111,6 +114,7 @@ protected:
   bool LockEndTime;
   vtkSMProxy* TimeKeeper;
   vtkCompositeAnimationPlayer* AnimationPlayer;
+  vtkEventForwarderCommand* Forwarder;
 
   friend class vtkSMAnimationSceneImageWriter;
   bool OverrideStillRender;

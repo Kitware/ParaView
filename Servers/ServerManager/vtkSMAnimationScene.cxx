@@ -14,13 +14,13 @@
 =========================================================================*/
 #include "vtkSMAnimationScene.h"
 
-#include "vtkCommand.h"
 #include "vtkCompositeAnimationPlayer.h"
+#include "vtkEventForwarderCommand.h"
 #include "vtkObjectFactory.h"
 #include "vtkSmartPointer.h"
+#include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMViewProxy.h"
-#include "vtkSMProperty.h"
 
 #include <vtkstd/vector>
 
@@ -75,6 +75,13 @@ vtkSMAnimationScene::vtkSMAnimationScene()
   // vtkAnimationPlayer::SetAnimationScene() is not reference counted.
   this->AnimationPlayer->SetAnimationScene(this);
   this->Internals = new vtkInternals();
+
+  this->Forwarder = vtkEventForwarderCommand::New();
+  this->Forwarder->SetTarget(this);
+  this->AnimationPlayer->AddObserver(
+    vtkCommand::StartEvent, this->Forwarder);
+  this->AnimationPlayer->AddObserver(
+    vtkCommand::EndEvent, this->Forwarder);
 }
 
 //----------------------------------------------------------------------------
@@ -82,8 +89,12 @@ vtkSMAnimationScene::~vtkSMAnimationScene()
 {
   this->SetTimeKeeper(NULL);
 
+  this->AnimationPlayer->RemoveObserver(this->Forwarder);
   this->AnimationPlayer->Delete();
   this->AnimationPlayer = NULL;
+
+  this->Forwarder->SetTarget(NULL);
+  this->Forwarder->Delete();
 
   delete this->Internals;
   this->Internals = NULL;

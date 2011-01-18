@@ -82,17 +82,19 @@ pqAnimationScene::pqAnimationScene(const QString& group, const QString& name,
     vtkSMProxy* proxy, pqServer* server, QObject* _parent/*=NULL*/)
 : pqProxy(group, name, proxy, server, _parent)
 {
+  vtkObject* animationScene =
+    vtkObject::SafeDownCast(proxy->GetClientSideObject());
+
   this->Internals = new pqAnimationScene::pqInternals();
   vtkEventQtSlotConnect* connector = this->getConnector();
 
   connector->Connect(proxy->GetProperty("Cues"),
     vtkCommand::ModifiedEvent, this, SLOT(onCuesChanged()));
-  connector->Connect(proxy,
-    vtkCommand::AnimationCueTickEvent, 
+  connector->Connect(animationScene, vtkCommand::AnimationCueTickEvent,
     this, SLOT(onTick(vtkObject*, unsigned long, void*, void*)));
-  connector->Connect(proxy, vtkCommand::StartEvent,
+  connector->Connect(animationScene, vtkCommand::StartEvent,
     this, SIGNAL(beginPlay()));
-  connector->Connect(proxy, vtkCommand::EndEvent,
+  connector->Connect(animationScene, vtkCommand::EndEvent,
     this, SIGNAL(endPlay()));
 
   connector->Connect(

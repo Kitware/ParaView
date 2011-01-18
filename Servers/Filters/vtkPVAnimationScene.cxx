@@ -28,6 +28,7 @@ vtkPVAnimationScene::vtkPVAnimationScene()
   this->AnimationCues = vtkCollection::New();
   this->AnimationCuesIterator = this->AnimationCues->NewIterator();
   this->SceneTime = 0;
+  this->InTick = false;
 }
 
 //----------------------------------------------------------------------------
@@ -108,6 +109,8 @@ void vtkPVAnimationScene::StartCueInternal()
 void vtkPVAnimationScene::TickInternal(
   double currenttime, double deltatime, double clocktime)
 {
+  bool previous = this->InTick;
+  this->InTick = true;
   this->SceneTime = currenttime;
 
   vtkCollectionIterator* iter = this->AnimationCuesIterator;
@@ -135,6 +138,7 @@ void vtkPVAnimationScene::TickInternal(
     }
 
   this->Superclass::TickInternal(currenttime, deltatime, clocktime);
+  this->InTick = previous;
 }
 
 //----------------------------------------------------------------------------

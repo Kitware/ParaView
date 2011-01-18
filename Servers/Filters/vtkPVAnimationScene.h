@@ -53,7 +53,12 @@ public:
   // Description:
   // Sets the current animation time.
   void SetSceneTime(double time)
-    { 
+    {
+    if (this->InTick)
+      {
+      // Since this method can be called during a Tick() event handler.
+      return;
+      }
     this->Initialize();
     this->Tick(time, 0, time); 
     }
@@ -80,7 +85,8 @@ protected:
   
   vtkCollection* AnimationCues;
   vtkCollectionIterator* AnimationCuesIterator;
- 
+
+  bool InTick;
   double SceneTime;
 private:
   vtkPVAnimationScene(const vtkPVAnimationScene&); // Not implemented.
