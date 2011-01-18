@@ -314,10 +314,8 @@ void vtkStreamingHarness::SetLockRefinement(int nv)
 void vtkStreamingHarness::RestartRefinement()
 {
   //cerr << "restart refinement" << endl;
-  this->PieceList1->Delete();
-  this->PieceList1 = NULL;
-  this->PieceList2->Delete();
-  this->PieceList2 = NULL;
+  this->SetPieceList1(NULL);
+  this->SetPieceList2(NULL);
   if (this->CacheFilter)
     {
     this->CacheFilter->EmptyCache();
