@@ -418,14 +418,13 @@ void MyProcess::Execute()
 
     if (this->ServerMode)
       {
-      syncWindows2 =
+      tkSynchronizedRenderWindows* syncWindows2 =
         vtkSynchronizedRenderWindows::New();
       syncWindows2->SetRenderWindow(renWin);
       syncWindows2->SetParallelController(this->SocketController);
       syncWindows2->SetIdentifier(2);
       syncWindows2->SetRootProcessId(1);
 
-      vtkSynchronizedRenderers* syncRenderers2 = vtkSynchronizedRenderers::New();
       syncRenderers2->SetRenderer(renderer);
       syncRenderers2->SetParallelController(this->SocketController);
       syncRenderers2->SetRootProcessId(1);
