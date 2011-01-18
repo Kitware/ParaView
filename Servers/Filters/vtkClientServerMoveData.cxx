@@ -136,7 +136,7 @@ int vtkClientServerMoveData::RequestData(vtkInformation*,
   if (this->ProcessType == AUTO)
     {
     vtkPVSession* session = vtkPVSession::SafeDownCast(
-      vtkProcessModule::GetProcessModule()->GetActiveSession());
+      vtkProcessModule::GetProcessModule()->GetSession());
     if (!session)
       {
       vtkErrorMacro("No active ParaView session");
