@@ -38,17 +38,17 @@
 #ifndef __vtkSMTimeKeeper_h
 #define __vtkSMTimeKeeper_h
 
-#include "vtkSMProxy.h"
+#include "vtkObject.h"
 
 class vtkSMProperty;
 class vtkSMSourceProxy;
 class vtkSMViewProxy;
 
-class VTK_EXPORT vtkSMTimeKeeper : public vtkSMProxy
+class VTK_EXPORT vtkSMTimeKeeper : public vtkObject
 {
 public:
   static vtkSMTimeKeeper* New();
-  vtkTypeMacro(vtkSMTimeKeeper, vtkSMProxy);
+  vtkTypeMacro(vtkSMTimeKeeper, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

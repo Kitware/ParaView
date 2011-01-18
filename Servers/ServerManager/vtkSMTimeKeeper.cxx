@@ -24,6 +24,8 @@
 #include "vtkSMViewProxy.h"
 
 #include <vtkstd/set>
+#include <vtkstd/map>
+#include <vtkstd/vector>
 
 class vtkSMTimeKeeper::vtkInternal
 {
@@ -33,6 +35,32 @@ public:
 
   typedef vtkstd::set<vtkSmartPointer<vtkSMSourceProxy> > SourcesType;
   SourcesType Sources;
+
+  typedef vtkstd::map<void*, unsigned long> ObserverIdsMap;
+  ObserverIdsMap ObserverIds;
+
+  ~vtkInternal()
+    {
+    this->ClearSourcesAndObservers();
+    }
+
+  void ClearSourcesAndObservers()
+    {
+    SourcesType::iterator srcIter;
+    for (srcIter = this->Sources.begin();
+      srcIter != this->Sources.end(); ++srcIter)
+      {
+      ObserverIdsMap::iterator iter = this->ObserverIds.find(
+        srcIter->GetPointer());
+      if (iter != this->ObserverIds.end())
+        {
+        srcIter->GetPointer()->RemoveObserver(iter->second);
+        this->ObserverIds.erase(iter);
+        }
+      }
+    this->Sources.clear();
+    this->ObserverIds.clear();
+    }
 };
 
 vtkStandardNewMacro(vtkSMTimeKeeper);
@@ -51,6 +79,7 @@ vtkSMTimeKeeper::vtkSMTimeKeeper()
 vtkSMTimeKeeper::~vtkSMTimeKeeper()
 {
   delete this->Internal;
+
   this->SetTimestepValuesProperty(0);
   this->SetTimeRangeProperty(0);
 }
@@ -98,15 +127,22 @@ void vtkSMTimeKeeper::AddTimeSource(vtkSMSourceProxy* src)
     return;
     }
 
-  src->AddObserver(vtkCommand::UpdateInformationEvent,
+  unsigned long id = src->AddObserver(vtkCommand::UpdateInformationEvent,
     this, &vtkSMTimeKeeper::UpdateTimeSteps);
   this->Internal->Sources.insert(src);
+  this->Internal->ObserverIds[src] = id;
   this->UpdateTimeSteps();
 }
 
 //----------------------------------------------------------------------------
 void vtkSMTimeKeeper::RemoveTimeSource(vtkSMSourceProxy* src)
 {
+  vtkInternal::ObserverIdsMap::iterator iter = this->Internal->ObserverIds.find(src);
+  if (iter != this->Internal->ObserverIds.end() && src)
+    {
+    src->RemoveObserver(iter->second);
+    this->Internal->ObserverIds.erase(iter);
+    }
   this->Internal->Sources.erase(src);
   this->UpdateTimeSteps();
 }
@@ -114,7 +150,7 @@ void vtkSMTimeKeeper::RemoveTimeSource(vtkSMSourceProxy* src)
 //----------------------------------------------------------------------------
 void vtkSMTimeKeeper::RemoveAllTimeSources()
 {
-  this->Internal->Sources.clear();
+  this->Internal->ClearSourcesAndObservers();
   this->UpdateTimeSteps();
 }
 
@@ -152,7 +188,7 @@ void vtkSMTimeKeeper::UpdateTimeSteps()
     iter != this->Internal->Sources.end(); ++iter)
     {
     vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
-      this->TimestepValuesProperty);
+      iter->GetPointer()->GetProperty("TimestepValues"));
     if (dvp)
       {
       unsigned int numElems = dvp->GetNumberOfElements();
@@ -165,7 +201,8 @@ void vtkSMTimeKeeper::UpdateTimeSteps()
         }
       }
 
-    dvp = vtkSMDoubleVectorProperty::SafeDownCast(this->TimeRangeProperty);
+    dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+      iter->GetPointer()->GetProperty("TimeRange"));
     if (dvp && dvp->GetNumberOfElements() > 0)
       {
       double cur_elem = dvp->GetElement(0);
@@ -178,16 +215,6 @@ void vtkSMTimeKeeper::UpdateTimeSteps()
       }
     }
 
-  double *new_values = new double[timesteps.size() + 1];
-  vtkstd::set<double>::iterator iter2;
-  unsigned int cc=0;
-  //cout << "------------" << endl;
-  for (iter2 = timesteps.begin(); iter2 != timesteps.end(); ++iter2, ++cc)
-    {
-    new_values[cc] = *iter2;
-    //cout << setprecision(20)<< *iter2 << endl;
-    }
-
   if (timerange[0] == VTK_DOUBLE_MAX && timerange[1] == VTK_DOUBLE_MIN)
     {
     timerange[0] = 0.0;
@@ -198,9 +225,20 @@ void vtkSMTimeKeeper::UpdateTimeSteps()
     this->TimeRangeProperty)->SetElements2(
     timerange[0], timerange[1]);
 
-  vtkSMDoubleVectorProperty::SafeDownCast(
-    this->TimestepValuesProperty)->SetElements(new_values, cc);
-  delete[] new_values;
+  vtkstd::vector<double> timesteps_vector;
+  timesteps_vector.insert(timesteps_vector.begin(),
+    timesteps.begin(), timesteps.end());
+  if (timesteps_vector.size() > 0)
+    {
+    vtkSMDoubleVectorProperty::SafeDownCast(
+      this->TimestepValuesProperty)->SetElements(
+      &timesteps_vector[0], static_cast<unsigned int>(timesteps_vector.size()));
+    }
+  else
+    {
+    vtkSMDoubleVectorProperty::SafeDownCast(
+      this->TimestepValuesProperty)->SetNumberOfElements(0);
+    }
 }
 
 //----------------------------------------------------------------------------
