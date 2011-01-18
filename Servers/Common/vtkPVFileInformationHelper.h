@@ -82,6 +82,15 @@ public:
   // Description:
   // Returns the platform specific path separator.
   vtkGetStringMacro(PathSeparator);
+
+  // Description:
+  // Returns if this->Path is a readable file.
+  bool GetActiveFileIsReadable();
+
+  // Description:
+  // Returns if this->Path is a directory.
+  bool GetActiveFileIsDirectory();
+
 protected:
   vtkPVFileInformationHelper();
   ~vtkPVFileInformationHelper();

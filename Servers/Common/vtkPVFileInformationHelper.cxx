@@ -16,6 +16,8 @@
 
 #include "vtkObjectFactory.h"
 
+#include <vtksys/SystemTools.hxx>
+
 vtkStandardNewMacro(vtkPVFileInformationHelper);
 //-----------------------------------------------------------------------------
 vtkPVFileInformationHelper::vtkPVFileInformationHelper()
@@ -40,6 +42,18 @@ vtkPVFileInformationHelper::~vtkPVFileInformationHelper()
   this->SetPath(0);
   this->SetPathSeparator(0);
   this->SetWorkingDirectory(0);
+}
+
+//-----------------------------------------------------------------------------
+bool vtkPVFileInformationHelper::GetActiveFileIsReadable()
+{
+  return vtksys::SystemTools::FileExists(this->Path);
+}
+
+//-----------------------------------------------------------------------------
+bool vtkPVFileInformationHelper::GetActiveFileIsDirectory()
+{
+  return vtksys::SystemTools::FileIsDirectory(this->Path);
 }
 
 //-----------------------------------------------------------------------------

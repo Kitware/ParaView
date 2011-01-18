@@ -186,7 +186,6 @@ SET(Filters_SRCS
   vtkPVRepresentedDataInformation.cxx
   vtkPVScalarBarActor.cxx
   vtkPVSelectionSource.cxx
-  vtkPVServerFileListing.cxx
   vtkPVServerObject.cxx
   vtkPVServerSelectTimeSet.cxx
   vtkPVSinusoidKeyFrame.cxx
