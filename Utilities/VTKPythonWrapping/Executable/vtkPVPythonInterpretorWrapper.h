@@ -30,7 +30,7 @@ struct vtkPVPythonInterpretorWrapper
   vtkPVPythonInterpretor* Interpretor;
   bool DumpToError;
 
-  // vtkPVPythonInterpretorWrapper() 
+  // vtkPVPythonInterpretorWrapper()
   //   {
   //   }
 
@@ -108,30 +108,30 @@ static PyTypeObject vtkPVPythonInterpretorWrapperType = {
     0,                         // tp_as_number
     0,                         // tp_as_sequence
     0,                         // tp_as_mapping
-    0,                         // tp_hash 
+    0,                         // tp_hash
     0,                         // tp_call
     0,                         // tp_str
     PyObject_GenericGetAttr,   // tp_getattro
     PyObject_GenericSetAttr,   // tp_setattro
     0,                         // tp_as_buffer
     Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE, // tp_flags
-    const_cast<char*>("vtkPVPythonInterpretorWrapper"),   //  tp_doc 
-    0,                         //  tp_traverse 
-    0,                         //  tp_clear 
-    0,                         //  tp_richcompare 
-    0,                         //  tp_weaklistoffset 
-    0,                         //  tp_iter 
-    0,                         //  tp_iternext 
-    vtkPVPythonInterpretorWrapperMethods, //  tp_methods 
-    vtkPVPythonInterpretorWrapperMembers, //  tp_members 
-    0,                         //  tp_getset 
-    0,                         //  tp_base 
-    0,                         //  tp_dict 
-    0,                         //  tp_descr_get 
-    0,                         //  tp_descr_set 
-    0,                         //  tp_dictoffset 
-    0,                         //  tp_init 
-    0,                         //  tp_alloc 
+    const_cast<char*>("vtkPVPythonInterpretorWrapper"),   //  tp_doc
+    0,                         //  tp_traverse
+    0,                         //  tp_clear
+    0,                         //  tp_richcompare
+    0,                         //  tp_weaklistoffset
+    0,                         //  tp_iter
+    0,                         //  tp_iternext
+    vtkPVPythonInterpretorWrapperMethods, //  tp_methods
+    vtkPVPythonInterpretorWrapperMembers, //  tp_members
+    0,                         //  tp_getset
+    0,                         //  tp_base
+    0,                         //  tp_dict
+    0,                         //  tp_descr_get
+    0,                         //  tp_descr_set
+    0,                         //  tp_dictoffset
+    0,                         //  tp_init
+    0,                         //  tp_alloc
     vtkPVPythonInterpretorWrapperNew,  //  tp_new
     0, // freefunc tp_free; /* Low-level free-memory routine */
     0, // inquiry tp_is_gc; /* For PyObject_IS_GC */
@@ -140,11 +140,11 @@ static PyTypeObject vtkPVPythonInterpretorWrapperType = {
     0, // PyObject *tp_cache;
     0, // PyObject *tp_subclasses;
     0, // PyObject *tp_weaklist;
-#if PYTHON_API_VERSION == 1012
-    0 // tp_del
-#elif PYTHON_API_VERSION >= 1013
+#if PY_VERSION_HEX >= 0x02060000 // tp_version_tag shows up in python 2.6
     0, // tp_del
     0  // tp_version_tag
+#elif PY_VERSION_HEX >= 0x02030000 // tp_del shows up in python 2.3
+    0  // tp_del
 #endif
 };
 
@@ -155,9 +155,9 @@ static PyObject* vtkWrite(PyObject* self, PyObject* args)
     return 0;
     }
 
-  vtkPVPythonInterpretorWrapper* wrapper = 
+  vtkPVPythonInterpretorWrapper* wrapper =
     reinterpret_cast<vtkPVPythonInterpretorWrapper*>(self);
-  
+
   char *string;
   // const_cast since older versions of python are not const correct.
   if (wrapper && PyArg_ParseTuple(args, const_cast<char*>("s"), &string))
@@ -175,7 +175,7 @@ static PyObject* vtkRead(PyObject* self, PyObject* args)
     return 0;
     }
 
-  vtkPVPythonInterpretorWrapper* wrapper = 
+  vtkPVPythonInterpretorWrapper* wrapper =
     reinterpret_cast<vtkPVPythonInterpretorWrapper*>(self);
 
   vtkStdString ret;
@@ -210,7 +210,7 @@ static vtkPVPythonInterpretorWrapper* vtkWrapInterpretor(vtkPVPythonInterpretor*
     return 0;
     }
 
-  vtkPVPythonInterpretorWrapper* wrapper = 
+  vtkPVPythonInterpretorWrapper* wrapper =
     PyObject_New(vtkPVPythonInterpretorWrapper, &vtkPVPythonInterpretorWrapperType);
   if (wrapper)
     {
