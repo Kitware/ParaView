@@ -27,6 +27,10 @@ public:
   {
     int PortNumber;
     vtkstd::string HostName;
+    NodeInformation()
+      {
+      this->PortNumber = -1;
+      }
   };
   vtkstd::vector<NodeInformation> ServerInformation;
 };
@@ -121,6 +125,16 @@ void vtkMPIMToNSocketConnectionPortInformation::AddInformation(vtkPVInformation*
     {
     vtkErrorMacro("Wrong type for AddInformation" << i);
     return;
+    }
+
+  for (size_t cc=0; cc < info->Internals->ServerInformation.size(); cc++)
+    {
+    if (info->Internals->ServerInformation[cc].PortNumber > 0)
+      {
+      this->SetPortNumber(
+        static_cast<unsigned int>(cc),
+        info->Internals->ServerInformation[cc].PortNumber);
+      }
     }
   this->SetPortNumber(info->ProcessNumber, info->PortNumber);
 }
