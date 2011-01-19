@@ -101,13 +101,11 @@ public:
   pqObjectBuilder* getObjectBuilder() const
     { return this->ObjectBuilder; }
 
-#ifdef FIXME_COLLABORATION
   /// Set/Get the application's central undo stack. By default no undo stack is
   /// provided. Applications must set on up as required.
   void setUndoStack(pqUndoStack* stack);
   pqUndoStack* getUndoStack() const
     { return this->UndoStack; }
-#endif
 
   /// Custom Applications may need use various "managers"
   /// All such manager can be registered with the pqApplicationCore

@@ -51,6 +51,8 @@ public:
   // Set the state of the UndoElement
   virtual void SetCreationState(const vtkSMMessage* createState);
 
+  virtual vtkTypeUInt32 GetGlobalId();
+
 protected:
   vtkSMProxyUndoElement();
   ~vtkSMProxyUndoElement();

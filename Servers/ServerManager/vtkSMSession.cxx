@@ -28,16 +28,66 @@
 #include "vtkSMSessionClient.h"
 #include "vtkSMSessionCore.h"
 #include "vtkSMUndoStackBuilder.h"
+#include "vtkSMProxyManager.h"
 #include "vtkWeakPointer.h"
 
 #include <vtksys/ios/sstream>
 #include <assert.h>
 
+//*****************************************************************************
+//                              Internal Class
+//*****************************************************************************
+class vtkSMSession::vtkInternals
+{
+public:
+  // Return previous message and replace it with the new one.
+  // If the previous message does not exist it has no global id
+  vtkSMMessage ReplaceState(vtkTypeUInt32 globalId, const vtkSMMessage* state)
+    {
+    vtkSMMessage result;
+
+    // Look if we have it
+    vtkstd::map<vtkTypeUInt32, vtkSMMessage>::iterator iter;
+    iter = this->StateMap.find(globalId);
+
+    // We do find a previous state
+    if(iter != this->StateMap.end())
+      {
+      result.CopyFrom(iter->second);
+      if(!state)
+        {
+        // It means the object should be deleted
+        this->StateMap.erase(iter);
+        }
+      }
+    if(state)
+      {
+      this->StateMap[globalId].CopyFrom(*state);
+      }
+    return result;
+    }
+
+  void FillWithLastState( vtkTypeUInt32 globalId, vtkSMMessage* stateToFill,
+                          bool keepProperties)
+    {
+    stateToFill->CopyFrom(this->StateMap[globalId]);
+    if(!keepProperties)
+      {
+      stateToFill->ClearExtension(ProxyState::property);
+      }
+    }
+
+private:
+  vtkstd::map<vtkTypeUInt32, vtkSMMessage> StateMap;
+};
+//*****************************************************************************
 vtkStandardNewMacro(vtkSMSession);
 vtkCxxSetObjectMacro(vtkSMSession, UndoStackBuilder, vtkSMUndoStackBuilder);
 //----------------------------------------------------------------------------
 vtkSMSession::vtkSMSession()
 {
+  this->Internals = new vtkInternals();
+  this->StateManagement = true; // Allow to store state in local cache for Uno/Redo
   this->Core = vtkSMSessionCore::New();
   this->PluginManager = vtkSMPluginManager::New();
   this->PluginManager->SetSession(this);
@@ -77,6 +127,8 @@ vtkSMSession::~vtkSMSession()
 
   this->LocalServerInformation->Delete();
   this->LocalServerInformation = 0;
+
+  delete this->Internals;
 }
 
 //----------------------------------------------------------------------------
@@ -108,25 +160,40 @@ void vtkSMSession::PushState(vtkSMMessage* msg)
   this->Activate();
 
   // Manage Undo/Redo if possible
-  if(this->UndoStackBuilder)
+  if(this->StateManagement)
     {
     vtkTypeUInt32 globalId = msg->global_id();
     vtkSMRemoteObject *remoteObj = this->GetRemoteObject(globalId);
 
     if(remoteObj)
       {
-      vtkSMMessage fullState;
-      fullState.CopyFrom(*remoteObj->GetFullState());
+      vtkSMMessage newState;
+      newState.CopyFrom(*remoteObj->GetFullState());
 
       // Need to provide id/location as the full state may not have them yet
-      fullState.set_global_id(globalId);
-      fullState.set_location(msg->location());
+      newState.set_global_id(globalId);
+      newState.set_location(msg->location());
 
-      this->UndoStackBuilder->OnNewState(this, globalId, &fullState);
-      }
-    else
-      {
-      cout << "Push a state that is not related to a proxy." << endl;
+      // Store state in cache
+      vtkSMMessage oldState = this->Internals->ReplaceState(globalId, &newState);
+
+      // Propagate to undo stack builder if possible
+      if(this->UndoStackBuilder)
+        {
+        if(oldState.has_global_id())
+          {
+          // Update
+          if(oldState.SerializeAsString() != newState.SerializeAsString())
+            {
+            this->UndoStackBuilder->OnUpdate(this, globalId, &oldState, &newState);
+            }
+          }
+        else
+          {
+          // FIXME Creation
+          // this->UndoStackBuilder->OnCreation(this, globalId, &newState);
+          }
+        }
       }
     }
 
@@ -167,9 +234,10 @@ void vtkSMSession::DeletePMObject(vtkSMMessage* msg)
   this->Activate();
 
   // Manage Undo/Redo if possible
-  if(this->UndoStackBuilder)
+  if(this->StateManagement)
     {
-    this->UndoStackBuilder->OnNewState(this, msg->global_id(), NULL);
+    // FIXME Store state in cache
+    // vtkSMMessage previousState = this->Internals->ReplaceState(msg->global_id(),NULL);
     }
 
   // This class does not handle remote sessions, so all messages are directly
@@ -358,4 +426,40 @@ vtkIdType vtkSMSession::ReverseConnectToRemote(
   session->RemoveObserver(id);
   session->Delete();
   return sid;
+}
+//----------------------------------------------------------------------------
+// Warning: It is at the responsability at the caller to delete the proxy
+//          once that one has been registered somewhere. The result can be NULL
+//          if the RemoteObject can be finf by GetRemoteObject
+vtkSMRemoteObject* vtkSMSession::ReNewRemoteObject( vtkTypeUInt32 globalId,
+                                                    bool withPreviousState )
+{
+  cout << "ReviveRemoteObject: " << globalId << endl;
+  vtkSMRemoteObject* remoteObject = this->GetRemoteObject(globalId);
+  if(this->StateManagement && !remoteObject)
+    {
+    vtkSMMessage proxyState;
+    this->Internals->FillWithLastState(globalId, &proxyState, withPreviousState);
+    vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+    remoteObject = pxm->NewProxy(&proxyState);
+    return remoteObject;
+    }
+  return NULL;
+}
+//----------------------------------------------------------------------------
+void vtkSMSession::ResetRemoteObject(vtkTypeUInt32 globalId)
+{
+  cout << "ResetRemoteObject: " << globalId << endl;
+  vtkSMRemoteObject* remoteObject = this->GetRemoteObject(globalId);
+  if(this->StateManagement && remoteObject)
+    {
+    vtkSMMessage proxyState;
+    this->Internals->FillWithLastState(globalId, &proxyState, true);
+    remoteObject->LoadState(&proxyState);
+    }
+  else
+    {
+    vtkWarningMacro("Try to reset a RemoteObject that does not exist. (id: "
+                    << globalId << ")");
+    }
 }

@@ -34,47 +34,11 @@
 #include <vtksys/RegularExpression.hxx>
 #include <vtkstd/map>
 
-
-class vtkSMUndoStackBuilder::vtkInternals
-{
-public:
-  // Return previous message and replace it with the new one.
-  // If the previous message does not exist it has no global id
-  vtkSMMessage ReplaceState(vtkTypeUInt32 globalId, const vtkSMMessage* state)
-    {
-    vtkSMMessage result;
-
-    // Look if we have it
-    vtkstd::map<vtkTypeUInt32, vtkSMMessage>::iterator iter;
-    iter = this->StateMap.find(globalId);
-
-    // We do find a previous state
-    if(iter != this->StateMap.end())
-      {
-      result.CopyFrom(iter->second);
-      if(!state)
-        {
-        // It means the object should be deleted
-        this->StateMap.erase(iter);
-        }
-      }
-    if(state)
-      {
-      this->StateMap[globalId].CopyFrom(*state);
-      }
-    return result;
-    }
-
-private:
-  vtkstd::map<vtkTypeUInt32, vtkSMMessage> StateMap;
-};
-//*****************************************************************************
 vtkStandardNewMacro(vtkSMUndoStackBuilder);
 vtkCxxSetObjectMacro(vtkSMUndoStackBuilder, UndoStack, vtkSMUndoStack);
 //-----------------------------------------------------------------------------
 vtkSMUndoStackBuilder::vtkSMUndoStackBuilder()
 {
-  this->Internals = new vtkInternals();
   this->UndoStack = 0;
   this->UndoSet = vtkUndoSet::New();
   this->Label = NULL;
@@ -92,7 +56,6 @@ vtkSMUndoStackBuilder::~vtkSMUndoStackBuilder()
     }
   this->SetLabel(NULL);
   this->SetUndoStack(0);
-  delete this->Internals;
 }
 //-----------------------------------------------------------------------------
 void vtkSMUndoStackBuilder::Begin(const char* label)
@@ -120,7 +83,12 @@ void vtkSMUndoStackBuilder::End()
 //-----------------------------------------------------------------------------
 void vtkSMUndoStackBuilder::PushToStack()
 {
-  cout << "Push stack " << this->UndoSet->GetNumberOfElements() << endl;
+  if(this->EnableMonitoring > 0)
+    {
+    return; // Only push the whole set when the first begin/end has been reached
+    }
+
+  cout << "====> Push stack " << this->UndoSet->GetNumberOfElements() << endl;
   if (this->UndoSet->GetNumberOfElements() > 0 && this->UndoStack)
     {
     this->UndoStack->Push( (this->Label? this->Label : "Changes"),
@@ -153,77 +121,72 @@ void vtkSMUndoStackBuilder::Add(vtkUndoElement* element)
   this->UndoSet->AddElement(element);
 }
 //-----------------------------------------------------------------------------
-void vtkSMUndoStackBuilder::OnNewState( vtkSMSession* session,
+void vtkSMUndoStackBuilder::OnCreation( vtkSMSession *session,
                                         vtkTypeUInt32 globalId,
-                                        const vtkSMMessage* newState)
+                                        const vtkSMMessage *creationState)
 {
   if (this->IgnoreAllChanges || !this->HandleChangeEvents() || !this->UndoStack)
     {
     return;
     }
 
-
-  vtkSMMessage oldState = this->Internals->ReplaceState(globalId, newState);
-
-  if(newState == NULL || !oldState.has_global_id())
+  // No creation event for special remote object (i.e.: PipelineState...)
+  if(globalId < 10)
     {
-    // Create / Delete
-    if(newState)
-      {
-      cout << "OnNewState CREATE " << globalId << endl;
-      // Create
-      // We only know how to deal with proxy
-      if( newState->HasExtension(ProxyState::xml_group) )
-        {
-        vtkSMProxyUndoElement* undoElement = vtkSMProxyUndoElement::New();
-        undoElement->SetSession(session);
-        undoElement->SetCreateElement( true );
-        undoElement->SetCreationState( newState );
-        this->Add(undoElement);
-        undoElement->Delete();
-        }
-      else if(newState->global_id() == 1)
-        {
-        // ServerManager state, just update, never create !!!
-        vtkSMMessage origin;
-        origin.CopyFrom(*newState);
-        origin.ClearExtension(ProxyManagerState::registered_proxy);
-        vtkSMRemoteObjectUpdateUndoElement* undoElement;
-        undoElement = vtkSMRemoteObjectUpdateUndoElement::New();
-        undoElement->SetSession(session);
-        undoElement->SetUndoRedoState( &origin, newState);
-        this->Add(undoElement);
-        undoElement->Delete();
-        }
-      else
-        {
-        vtkWarningMacro("Try to register Creation Undo event based on a non Proxy object.\n"
-                        << newState->DebugString());
-        }
-      }
-    else
-      {
-      // Delete
-      cout << "OnNewState DELETE " << globalId << endl;
-      vtkSMProxyUndoElement* undoElement = vtkSMProxyUndoElement::New();
-      undoElement->SetSession(session);
-      undoElement->SetCreateElement( false );
-      undoElement->SetCreationState( &oldState);
-      this->Add(undoElement);
-      undoElement->Delete();
-      }
+    this->OnUpdate(session, globalId, creationState, creationState);
     }
   else
     {
-    cout << "OnNewState UPDATE " << globalId << endl;
-    // Just update
-    vtkSMRemoteObjectUpdateUndoElement* undoElement;
-    undoElement = vtkSMRemoteObjectUpdateUndoElement::New();
-    undoElement->SetSession(session);
-    undoElement->SetUndoRedoState( &oldState, newState);
-    this->Add(undoElement);
-    undoElement->Delete();
+    if( creationState->HasExtension(ProxyState::xml_group) )
+      {
+      vtkSMProxyUndoElement* undoElement = vtkSMProxyUndoElement::New();
+      undoElement->SetSession(session);
+      undoElement->SetCreateElement( true );
+      undoElement->SetCreationState( creationState );
+      this->Add(undoElement);
+      undoElement->Delete();
+      }
+    else
+      {
+      vtkWarningMacro("Try to register Creation Undo event based on a non Proxy object.\n"
+                      << creationState->DebugString().c_str());
+      }
     }
+}
+//-----------------------------------------------------------------------------
+void vtkSMUndoStackBuilder::OnUpdate( vtkSMSession *session,
+                                      vtkTypeUInt32 globalId,
+                                      const vtkSMMessage *previousState,
+                                      const vtkSMMessage *newState)
+{
+  if (this->IgnoreAllChanges || !this->HandleChangeEvents() || !this->UndoStack)
+    {
+    return;
+    }
+
+  vtkSMRemoteObjectUpdateUndoElement* undoElement;
+  undoElement = vtkSMRemoteObjectUpdateUndoElement::New();
+  undoElement->SetSession(session);
+  undoElement->SetUndoRedoState( previousState, newState );
+  this->Add(undoElement);
+  undoElement->Delete();
+}
+//-----------------------------------------------------------------------------
+void vtkSMUndoStackBuilder::OnDeletion( vtkSMSession *session,
+                                        vtkTypeUInt32 globalId,
+                                        const vtkSMMessage *previousState)
+{
+  if (this->IgnoreAllChanges || !this->HandleChangeEvents() || !this->UndoStack)
+    {
+    return;
+    }
+
+  vtkSMProxyUndoElement* undoElement = vtkSMProxyUndoElement::New();
+  undoElement->SetSession(session);
+  undoElement->SetCreateElement( false );
+  undoElement->SetCreationState( previousState );
+  this->Add(undoElement);
+  undoElement->Delete();
 }
 
 //-----------------------------------------------------------------------------

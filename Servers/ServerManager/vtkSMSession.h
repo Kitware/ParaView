@@ -189,6 +189,39 @@ public:
     { return vtkSMSession::ReverseConnectToRemote(dsport, rsport, NULL); }
   static vtkIdType ReverseConnectToRemote(int dsport, int rsport, bool (*callback)());
 
+  // Description:
+  // Flag used to disable state caching needed for undo/redo. This overcome the
+  // presence of undo stack builder in the session.
+  vtkBooleanMacro(StateManagement, bool);
+  vtkSetMacro(StateManagement, bool);
+  vtkGetMacro(StateManagement, bool);
+
+  // Description:
+  // Re-New a remote object based on its ID and its previous state or just its
+  // previous definition. This means that it will create a new RemoteObject or
+  // return NULL if that one already exist.
+  //
+  // WARNING:
+  // - This only work if StateManagement is set to true.
+  // - It is at the responsability at the caller to delete the proxy
+  //   once that one has been registered somewhere.
+  // - Bringing back a proxy with its later state can be dangerous if
+  //   that one refere some other Proxy that may not be available yet.
+  //   For that reason, we allow to Reset that RemoteObject to that later
+  //   state later on with the ResetRemoteObject method.
+  virtual vtkSMRemoteObject* ReNewRemoteObject( vtkTypeUInt32 globalId,
+                                                bool withPreviousState);
+  // Description:
+  // Reset the values of the RemoteObject to its previously pushed state.
+  //
+  // WARNING:
+  // - This only work if StateManagement is set to true.
+  // - Bringing back a proxy with its later state can be dangerous if
+  //   that one refere some other Proxy that may not be available yet.
+  //   For that reason, we allow to Reset that RemoteObject to that later
+  //   state later on with the ResetRemoteObject method.
+  virtual void ResetRemoteObject(vtkTypeUInt32 globalId);
+
 //BTX
 protected:
   vtkSMSession();
@@ -198,12 +231,17 @@ protected:
   vtkSMUndoStackBuilder* UndoStackBuilder;
   vtkSMPluginManager* PluginManager;
 
+  bool StateManagement;
+
   // FIXME should be managed smartly between client and server.
   vtkTypeUInt32 LastGUID;
 
 private:
   vtkSMSession(const vtkSMSession&); // Not implemented
   void operator=(const vtkSMSession&); // Not implemented
+
+  class vtkInternals;
+  vtkInternals *Internals;
 
   vtkPVServerInformation* LocalServerInformation;
 //ETX

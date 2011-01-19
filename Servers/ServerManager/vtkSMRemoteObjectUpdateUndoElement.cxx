@@ -109,3 +109,8 @@ void vtkSMRemoteObjectUpdateUndoElement::SetUndoRedoState(
                    << "At least one of the provided states is NULL.");
     }
 }
+//-----------------------------------------------------------------------------
+vtkTypeUInt32 vtkSMRemoteObjectUpdateUndoElement::GetGlobalId()
+{
+  return this->BeforeState->global_id();
+}

@@ -85,18 +85,22 @@ public:
   /// Overridden to add observers to not record changes when the
   /// stack is being undone/redone.
   virtual void SetUndoStack(vtkSMUndoStack*);
+
+  /// Overridden to filter unwanted event and manage auto undoset creation
+  virtual void OnCreation(vtkSMSession *session, vtkTypeUInt32 globalId,
+                          const vtkSMMessage *creationState);
+  virtual void OnUpdate(vtkSMSession *session, vtkTypeUInt32 globalId,
+                        const vtkSMMessage *previousState,
+                        const vtkSMMessage *newState);
+  virtual void OnDeletion(vtkSMSession *session, vtkTypeUInt32 globalId,
+                          const vtkSMMessage *previousState);
+
 protected:
   pqUndoStackBuilder();
   ~pqUndoStackBuilder();
 
-  virtual void ExecuteEvent(vtkObject* caller, unsigned long eventid, 
-    void* data);
-
   bool IgnoreIsolatedChanges;
   bool UndoRedoing;
-
-  void OnStartEvent();
-  void OnEndEvent();
 
   // Added to ignore property changes we are told to ignore.
   virtual void OnPropertyModified(vtkSMProxy* proxy, 
@@ -110,9 +114,6 @@ protected:
 private:
   pqUndoStackBuilder(const pqUndoStackBuilder&); // Not implemented.
   void operator=(const pqUndoStackBuilder&); // Not implemented.
-
-  vtkCommand* StartObserver;
-  vtkCommand* EndObserver;
 };
 
 #endif

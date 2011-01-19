@@ -243,21 +243,42 @@ struct vtkSMProxyManagerInternals
     {
     // Fill equivalent temporary data structure
     vtkstd::set<vtkSMProxyManagerEntry> newStateContent;
+    vtkstd::vector<vtkTypeUInt32> proxyToReset;
     int max = newState->ExtensionSize(ProxyManagerState::registered_proxy);
     for(int cc=0; cc < max; cc++)
       {
       ProxyManagerState_ProxyRegistrationInfo reg =
           newState->GetExtension(ProxyManagerState::registered_proxy, cc);
       vtkSMProxy *proxy =
-          vtkSMProxy::SafeDownCast(this->ProxyManager->GetSession()->GetRemoteObject(reg.global_id()));
-      if(proxy)
+          vtkSMProxy::SafeDownCast(
+              this->ProxyManager->GetSession()->GetRemoteObject(reg.global_id()));
+
+      if(!proxy)
         {
-        newStateContent.insert(vtkSMProxyManagerEntry(reg.group().c_str(), reg.name().c_str(), proxy));
+        proxyToReset.push_back(reg.global_id());
+        vtkSMProxy *proxy =
+            vtkSMProxy::SafeDownCast(
+                this->ProxyManager->GetSession()->ReNewRemoteObject(reg.global_id(),false));
+        if(proxy)
+          {
+          newStateContent.insert(vtkSMProxyManagerEntry(reg.group().c_str(), reg.name().c_str(), proxy));
+          proxy->Delete();
+          }
+        else
+          {
+          cout << "Did not find proxy !!!! with id " << reg.global_id() << endl;
+          }
         }
       else
         {
-        cout << "Did not find proxy !!!! with id " << reg.global_id() << endl;
+        newStateContent.insert(vtkSMProxyManagerEntry(reg.group().c_str(), reg.name().c_str(), proxy));
         }
+      }
+
+    // Reset freshly created proxy
+    for(unsigned int cc=0; cc < proxyToReset.size(); cc++)
+      {
+      this->ProxyManager->GetSession()->ResetRemoteObject(proxyToReset[cc]);
       }
 
     // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

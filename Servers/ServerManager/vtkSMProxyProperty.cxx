@@ -24,6 +24,7 @@
 #include "vtkSMProxy.h"
 #include "vtkSMProxyLocator.h"
 #include "vtkSMProxyManager.h"
+#include "vtkSMSession.h"
 #include "vtkStdString.h"
 
 #include <vtkstd/algorithm>
@@ -365,17 +366,13 @@ void vtkSMProxyProperty::WriteTo(vtkSMMessage* message)
 //---------------------------------------------------------------------------
 void vtkSMProxyProperty::ReadFrom(const vtkSMMessage* message, int message_offset)
 {
-  abort();
-  (void)message;
-  (void)message_offset;
-#ifdef FIXME
   bool found = false;
   for(int i=0;i<message->ExtensionSize(ProxyState::property);++i)
     {
     const ProxyState_Property *prop = &message->GetExtension(ProxyState::property, i);
     if(strcmp(prop->name().c_str(), this->GetXMLName()) == 0)
       {
-      const Variant *value = &prop->value(0);
+      const Variant *value = &prop->value();
       int nbProxies = value->proxy_global_id_size();
       vtkstd::set<vtkTypeUInt32> newProxyIdList;
       vtkstd::set<vtkTypeUInt32>::const_iterator proxyIdIter;
@@ -387,9 +384,9 @@ void vtkSMProxyProperty::ReadFrom(const vtkSMMessage* message, int message_offse
         }
 
       // Deal with existing proxy
-      for(int i=0;i<this->GetNumberOfProxies();i++)
+      for(unsigned int i=0;i<this->GetNumberOfProxies();i++)
         {
-        vtkSMProxy2 *proxy = this->GetProxy(i);
+        vtkSMProxy *proxy = this->GetProxy(i);
         vtkTypeUInt32 id = proxy->GetGlobalID();
         if((proxyIdIter=newProxyIdList.find(id)) == newProxyIdList.end())
           {
@@ -399,7 +396,7 @@ void vtkSMProxyProperty::ReadFrom(const vtkSMMessage* message, int message_offse
         else
           {
           // Already there, no need to add it twice
-          newProxyIdList.erase(proxyIdIter, proxyIdIter);
+          newProxyIdList.erase(proxyIdIter);
           }
         }
 
@@ -409,12 +406,11 @@ void vtkSMProxyProperty::ReadFrom(const vtkSMMessage* message, int message_offse
           proxyIdIter++)
         {
         // Get the proxy from proxy manager
-        vtkSMProxy2* proxy = NULL; // FIXME with proxy manager
+        vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+        vtkSMProxy* proxy = vtkSMProxy::SafeDownCast(
+            pxm->GetSession()->GetRemoteObject(*proxyIdIter));
         this->AddProxy(proxy, false); // FIXME do we need to tag proxy as modified ?
         }
-
-      // Fix previous/current producer/consummer settings
-      this->UpdateInnerState();
 
       // Found the property, so exit the loop
       found = true;
@@ -426,7 +422,10 @@ void vtkSMProxyProperty::ReadFrom(const vtkSMMessage* message, int message_offse
     cout << "Not found " << this->GetXMLName() << endl;
     // FIXME do nothing or throw exception ==================================================================================
     }
-#endif
+  else
+    {
+    this->Modified();
+    }
 }
 
 //---------------------------------------------------------------------------

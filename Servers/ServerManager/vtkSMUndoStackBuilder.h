@@ -108,12 +108,21 @@ public:
 
 //BTX
 
-  // if newState is NULL it means that the object is supposed to be
-  // deleted otherwise just record the new state in the Undo/Redo stack
-  // if any
-  virtual void OnNewState( vtkSMSession* session,
+  // Record the creation of a Proxy
+  virtual void OnCreation( vtkSMSession* session,
                            vtkTypeUInt32 globalId,
-                           const vtkSMMessage* newState);
+                           const vtkSMMessage* creationState);
+
+  // Record an update of a RemoteObject
+  virtual void OnUpdate( vtkSMSession* session,
+                         vtkTypeUInt32 globalId,
+                         const vtkSMMessage* previousState,
+                         const vtkSMMessage* newState);
+
+  // Record the deletion of a Proxy
+  virtual void OnDeletion( vtkSMSession* session,
+                           vtkTypeUInt32 globalId,
+                           const vtkSMMessage* previousState);
 
 protected:
   vtkSMUndoStackBuilder();
@@ -135,16 +144,14 @@ protected:
 
   void InitializeUndoSet();
 
-private:
-  vtkSMUndoStackBuilder(const vtkSMUndoStackBuilder&); // Not implemented.
-  void operator=(const vtkSMUndoStackBuilder&); // Not implemented.
-
   // used to count Begin/End call to make sure they stay consistent
   // and make sure that a begin occurs before recording any event
   int EnableMonitoring;
   bool IgnoreAllChanges;
-  class vtkInternals;
-  vtkInternals *Internals;
+
+private:
+  vtkSMUndoStackBuilder(const vtkSMUndoStackBuilder&); // Not implemented.
+  void operator=(const vtkSMUndoStackBuilder&); // Not implemented.
 //ETX
 };
 

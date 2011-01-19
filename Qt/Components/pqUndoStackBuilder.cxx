@@ -39,6 +39,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProxyManager.h"
 #include "vtkSMUndoStack.h"
 #include "vtkUndoSet.h"
+#include "vtkSMSession.h"
+#include "vtkSMRemoteObject.h"
 
 #include <vtksys/ios/sstream>
 #include <vtksys/RegularExpression.hxx>
@@ -52,42 +54,12 @@ vtkStandardNewMacro(pqUndoStackBuilder);
 pqUndoStackBuilder::pqUndoStackBuilder()
 {
   this->IgnoreIsolatedChanges = false;
-
-  vtkMemberFunctionCommand<pqUndoStackBuilder>* observer = 
-    vtkMemberFunctionCommand<pqUndoStackBuilder>::New();
-  observer->SetCallback(*this, &pqUndoStackBuilder::OnStartEvent);
-  this->StartObserver = observer;
-
-  observer = vtkMemberFunctionCommand<pqUndoStackBuilder>::New();
-  observer->SetCallback(*this, &pqUndoStackBuilder::OnEndEvent);
-  this->EndObserver = observer;
-
   this->UndoRedoing = false;
 }
 
 //-----------------------------------------------------------------------------
 pqUndoStackBuilder::~pqUndoStackBuilder()
 {
-  if (this->UndoStack)
-    {
-    this->UndoStack->RemoveObserver(this->StartObserver);
-    this->UndoStack->RemoveObserver(this->EndObserver);
-    }
-
-  this->StartObserver->Delete();
-  this->EndObserver->Delete();
-}
-
-//-----------------------------------------------------------------------------
-void pqUndoStackBuilder::OnStartEvent()
-{
-  this->UndoRedoing = true;
-}
-
-//-----------------------------------------------------------------------------
-void pqUndoStackBuilder::OnEndEvent()
-{
-  this->UndoRedoing = false;
 }
 
 //-----------------------------------------------------------------------------
@@ -98,43 +70,134 @@ void pqUndoStackBuilder::SetUndoStack(vtkSMUndoStack* stack)
     return;
     }
 
-  if (this->UndoStack)
-    {
-    this->UndoStack->RemoveObserver(this->StartObserver);
-    this->UndoStack->RemoveObserver(this->EndObserver);
-    }
-
   this->Superclass::SetUndoStack(stack);
-
-  if (this->UndoStack)
-    {
-    this->UndoStack->AddObserver(vtkCommand::StartEvent, this->StartObserver);
-    this->UndoStack->AddObserver(vtkCommand::EndEvent, this->EndObserver);
-    }
 }
-
 //-----------------------------------------------------------------------------
-void pqUndoStackBuilder::ExecuteEvent(vtkObject* caller, unsigned long eventid, 
-  void* data)
+void pqUndoStackBuilder::OnCreation( vtkSMSession *session,
+                                     vtkTypeUInt32 globalId,
+                                     const vtkSMMessage *creationState)
 {
-#ifdef FIXME_COLLABORATION
-  if (this->GetIgnoreAllChanges() || this->HandleChangeEvents() || 
-    eventid != vtkCommand::PropertyModifiedEvent)
+  vtkSMRemoteObject* proxy = session->GetRemoteObject(globalId);
+
+  // FIXME make sure we don't escape too much (Utkarsh)
+  if( !proxy || (proxy && (
+      proxy->IsA("vtkSMViewProxy") ||
+      proxy->IsA("vtkSMCameraProxy") ||
+      proxy->IsA("vtkSMTimeKeeperProxy") ||
+      proxy->IsA("vtkSMAnimationScene") ||
+      proxy->IsA("vtkSMAnimationSceneProxy") ||
+      proxy->IsA("vtkSMNewWidgetRepresentationProxy") ||
+      proxy->IsA("vtkSMScalarBarWidgetRepresentationProxy"))))
     {
-    this->Superclass::ExecuteEvent(caller, eventid, data);
     return;
     }
 
-  // Property modification events are automatically added to stack
-  // under certain conditions even when the undo stack builder is not building an 
-  // active undo element.
-  if (!this->IgnoreIsolatedChanges && !this->UndoRedoing)
+  bool auto_element = !this->IgnoreAllChanges &&
+    !this->IgnoreIsolatedChanges && !this->UndoRedoing;
+
+  if (auto_element)
     {
-    vtkSMProxyManager::ModifiedPropertyInformation &info =*(reinterpret_cast<
-      vtkSMProxyManager::ModifiedPropertyInformation*>(data)); 
-    this->OnPropertyModified(info.Proxy, info.PropertyName);
+    vtksys_ios::ostringstream stream;
+    stream << "Changed '" << proxy->GetClassName() <<"'";
+    this->Begin(stream.str().c_str());
     }
-#endif
+
+  this->Superclass::OnCreation(session, globalId, creationState);
+
+ if (auto_element)
+    {
+    this->End();
+
+    if (this->UndoSet->GetNumberOfElements() > 0)
+      {
+      this->PushToStack();
+      }
+    }
+}
+//-----------------------------------------------------------------------------
+void pqUndoStackBuilder::OnDeletion( vtkSMSession *session,
+                                     vtkTypeUInt32 globalId,
+                                     const vtkSMMessage *previousState)
+{
+  vtkSMRemoteObject* proxy = session->GetRemoteObject(globalId);
+
+  // FIXME make sure we don't escape too much (Utkarsh)
+  if( !proxy || (proxy && (
+      //proxy->IsA("vtkSMViewProxy") ||
+      proxy->IsA("vtkSMCameraProxy") ||
+      proxy->IsA("vtkSMTimeKeeperProxy") ||
+      proxy->IsA("vtkSMAnimationScene") ||
+      proxy->IsA("vtkSMAnimationSceneProxy") ||
+      proxy->IsA("vtkSMNewWidgetRepresentationProxy") ||
+      proxy->IsA("vtkSMScalarBarWidgetRepresentationProxy"))))
+    {
+    return;
+    }
+
+  bool auto_element = !this->IgnoreAllChanges &&
+    !this->IgnoreIsolatedChanges && !this->UndoRedoing;
+
+  if (auto_element)
+    {
+    vtksys_ios::ostringstream stream;
+    stream << "Changed '" << proxy->GetClassName() <<"'";
+    this->Begin(stream.str().c_str());
+    }
+
+  this->Superclass::OnDeletion(session, globalId, previousState);
+
+ if (auto_element)
+    {
+    this->End();
+
+    if (this->UndoSet->GetNumberOfElements() > 0)
+      {
+      this->PushToStack();
+      }
+    }
+}
+//-----------------------------------------------------------------------------
+void pqUndoStackBuilder::OnUpdate( vtkSMSession *session,
+                                   vtkTypeUInt32 globalId,
+                                   const vtkSMMessage *oldState,
+                                   const vtkSMMessage *newState)
+{
+  vtkSMRemoteObject* proxy = session->GetRemoteObject(globalId);
+
+  // FIXME make sure we don't escape too much (Utkarsh)
+  if( !proxy || (proxy && (
+      //proxy->IsA("vtkSMViewProxy") ||
+      proxy->IsA("vtkSMCameraProxy") ||
+      proxy->IsA("vtkSMTimeKeeperProxy") ||
+      proxy->IsA("vtkSMAnimationScene") ||
+      proxy->IsA("vtkSMAnimationSceneProxy") ||
+      proxy->IsA("vtkSMNewWidgetRepresentationProxy") ||
+      proxy->IsA("vtkSMScalarBarWidgetRepresentationProxy"))))
+    {
+    return;
+    }
+
+  bool auto_element = !this->IgnoreAllChanges &&
+    !this->IgnoreIsolatedChanges && !this->UndoRedoing;
+
+  if (auto_element)
+    {
+    vtksys_ios::ostringstream stream;
+    stream << "Changed '" << proxy->GetClassName() <<"'";
+    this->Begin(stream.str().c_str());
+    }
+
+  this->Superclass::OnUpdate(session, globalId, oldState, newState);
+
+ if (auto_element)
+    {
+    this->End();
+
+    if (this->UndoSet->GetNumberOfElements() > 0)
+      {
+      this->PushToStack();
+      }
+    }
 }
 
 //-----------------------------------------------------------------------------

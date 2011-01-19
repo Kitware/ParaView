@@ -51,6 +51,8 @@ public:
   vtkSMMessage* BeforeState;
   vtkSMMessage* AfterState;
 
+  virtual vtkTypeUInt32 GetGlobalId();
+
 protected:
   vtkSMRemoteObjectUpdateUndoElement();
   ~vtkSMRemoteObjectUpdateUndoElement();

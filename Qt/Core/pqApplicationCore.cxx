@@ -72,9 +72,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSMAdaptor.h"
 #include "pqStandardServerManagerModelInterface.h"
 #include "pqStandardViewModules.h"
-#ifdef FIXME_COLLABORATION
 #include "pqUndoStack.h"
-#endif
 #include "pqXMLUtil.h"
 #include "vtkInitializationHelper.h"
 #include "vtkProcessModuleAutoMPI.h"
@@ -293,7 +291,6 @@ void pqApplicationCore::setLookupTableManager(pqLookupTableManager* mgr)
     }
 }
 
-#ifdef FIXME_COLLABORATION
 //-----------------------------------------------------------------------------
 void pqApplicationCore::setUndoStack(pqUndoStack* stack)
 {
@@ -307,7 +304,6 @@ void pqApplicationCore::setUndoStack(pqUndoStack* stack)
     emit this->undoStackChanged(stack);
     }
 }
-#endif
 
 //-----------------------------------------------------------------------------
 void pqApplicationCore::setDisplayPolicy(pqDisplayPolicy* policy)

@@ -114,3 +114,8 @@ int vtkSMProxyUndoElement::DeleteProxy()
 //    }
   return 1; // OK
 }
+//-----------------------------------------------------------------------------
+vtkTypeUInt32 vtkSMProxyUndoElement::GetGlobalId()
+{
+  return this->State->global_id();
+}

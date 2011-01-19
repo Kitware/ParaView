@@ -39,13 +39,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqActiveObjects.h"
 #include "pqServerManagerModel.h"
 
+#include "vtkSMProxyManager.h"
+#include "vtkSMSession.h"
+
 #include <QDebug>
 
 //-----------------------------------------------------------------------------
 pqUndoRedoBehavior::pqUndoRedoBehavior(QObject* parentObject)
   : Superclass(parentObject)
 {
-#ifdef FIXME_COLLABORATION
   pqApplicationCore* core = pqApplicationCore::instance();
   if (core->getUndoStack())
     {
@@ -59,7 +61,7 @@ pqUndoRedoBehavior::pqUndoRedoBehavior(QObject* parentObject)
   builder->Delete();
 
   // TODO: I don't know how to handle the registering of undo-elements.
-
+#ifdef FIXME_COLLABORATION
   pqSplitViewUndoElement* svu_elem = pqSplitViewUndoElement::New();
   stack->registerElementForLoader(svu_elem);
   svu_elem->Delete();
@@ -67,6 +69,7 @@ pqUndoRedoBehavior::pqUndoRedoBehavior(QObject* parentObject)
   pqCloseViewUndoElement* cvu_elem = pqCloseViewUndoElement::New();
   stack->registerElementForLoader(cvu_elem);
   cvu_elem->Delete();
+#endif
 
   QObject::connect(
     &pqActiveObjects::instance(), SIGNAL(serverChanged(pqServer*)),
@@ -86,15 +89,19 @@ pqUndoRedoBehavior::pqUndoRedoBehavior(QObject* parentObject)
     SIGNAL(finishedRemovingServer()),
     stack, SLOT(clear()));
 
-  // FIXME QObject::connect(
-  // FIXME   &this->Implementation->VCRController, SIGNAL(beginNonUndoableChanges()),
-  // FIXME   this->Implementation->UndoStack, SLOT(beginNonUndoableChanges()));
-  // FIXME QObject::connect(
-  // FIXME   &this->Implementation->VCRController, SIGNAL(endNonUndoableChanges()),
-  // FIXME   this->Implementation->UndoStack, SLOT(endNonUndoableChanges()));
+  // FIXME disable undo when VCR is used
+//  QObject::connect(
+//      &this->Implementation->VCRController, SIGNAL(beginNonUndoableChanges()),
+//      this->Implementation->UndoStack, SLOT(beginNonUndoableChanges()));
+//  QObject::connect(
+//      &this->Implementation->VCRController, SIGNAL(endNonUndoableChanges()),
+//      this->Implementation->UndoStack, SLOT(endNonUndoableChanges()));
 
   core->setUndoStack(stack);
-#endif
+
+  // FIXME COLLABORATION (Utkarsh): Where the binding should occur ???
+  vtkSMProxyManager::GetProxyManager()->GetSession()->SetUndoStackBuilder(builder);
+
 }
 
 
