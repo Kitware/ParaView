@@ -96,6 +96,7 @@ void vtkIterativeStreamer::PrepareFirstPass()
     }
 
   //first pass has to clear to start off
+  //ren->SetPreserveDepthBuffer(0);
   ren->EraseOn();
   rw->EraseOn();
   if (!rw->GetNeverRendered())
@@ -221,6 +222,7 @@ void vtkIterativeStreamer::EndRenderEvent()
   vtkRenderWindow *rw = this->GetRenderWindow();
   if (ren && rw)
     {
+    //ren->SetPreserveDepthBuffer(1);
     ren->EraseOff();
     rw->EraseOff();
     }

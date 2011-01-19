@@ -9,13 +9,17 @@ INCLUDE ( ${CMAKE_ROOT}/Modules/FindVTK.cmake )
 FIND_PACKAGE ( VTK REQUIRED )
 INCLUDE ( ${VTK_USE_FILE} )
 
-SET ( VTK_LINK_LIBRARIES vtkRendering vtkGraphics vtkFiltering vtkCommon)
+SET ( VTK_LINK_LIBRARIES
+  vtkRendering vtkGraphics vtkFiltering vtkCommon vtkIO vtkImaging vtkNetCDF)
+
+INCLUDE_DIRECTORIES(${VTKNETCDF_BINARY_DIR})
 
 SET(vtkStreaming_SOURCES
   vtkACosmoReader.cxx
   vtkAdaptiveOptions.cxx
   vtkGridSampler1.cxx
   vtkGridSampler2.cxx
+  vtkImageNetCDFPOPReader.cxx
   vtkIterativeStreamer.cxx
   vtkMetaInfoDatabase.cxx
   vtkMultiResolutionStreamer.cxx
@@ -52,6 +56,7 @@ IF (BUILD_AGAINST_PARAVIEW)
   SET(INST_SRCS)
   FOREACH(SRC
       vtkACosmoReader
+      vtkImageNetCDFPOPReader
       vtkIterativeStreamer
       vtkMultiResolutionStreamer
       vtkParallelStreamHelper

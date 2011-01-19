@@ -8,4 +8,10 @@
           extensions="cosmo"
           file_description="Cosmo (adaptive) Files" >
   </Reader>
+
+  <Reader name="StreamingNetCDFPOP"
+          extensions="pop.ncdf pop.nc"
+          file_description="POP Ocean NetCDF (streaming image)">
+  </Reader>
+
 </ParaViewReaders>

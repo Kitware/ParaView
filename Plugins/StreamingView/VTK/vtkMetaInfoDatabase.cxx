@@ -75,6 +75,12 @@ void vtkMetaInfoDatabase::PrintSelf(ostream& os, vtkIndent indent)
 void vtkMetaInfoDatabase::Insert(int p, int np, int ext[6], double range[2],
                                  double resolution)
 {
+  if (range[1] < range[0])
+    {
+    //we don't know yet
+    return;
+    }
+
   DEBUGPRINT_METAINFORMATION(
                              cerr << "Insert range of "
                              << range[0] << " .. " << range[1] << " for "
