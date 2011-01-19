@@ -149,6 +149,10 @@ pqStreamingControls::pqStreamingControls(QWidget* p)
   QObject::connect(this->Internals->restart_refinement, SIGNAL(pressed()),
                    this, SLOT(onRestartRefinement()));
 
+  //some enabled/disabled links
+  QObject::connect(this->Internals->progression_mode,
+                   SIGNAL(currentIndexChanged(int)),
+                   this, SLOT(onProgressionMode(int)));
 }
 
 //------------------------------------------------------------------------------
@@ -396,5 +400,23 @@ void pqStreamingControls::onRestartRefinement()
   if (rView && this->currentRep)
     {
     this->currentRep->InvokeCommand("RestartRefinement");
+    rView->render();
+    }
+}
+
+//------------------------------------------------------------------------------
+void pqStreamingControls::onProgressionMode(int state)
+{
+  if (state == 0)
+    {
+    //manual
+    this->Internals->refine->setEnabled(true);
+    this->Internals->coarsen->setEnabled(true);
+    }
+  else
+    {
+    //automatic
+    this->Internals->refine->setEnabled(false);
+    this->Internals->coarsen->setEnabled(false);
     }
 }

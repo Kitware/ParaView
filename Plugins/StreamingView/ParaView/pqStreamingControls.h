@@ -89,6 +89,7 @@ public slots:
   void onRefine();
   void onCoarsen();
   void onRestartRefinement();
+  void onProgressionMode(int);
 
 private slots:
 
