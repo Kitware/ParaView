@@ -24,7 +24,7 @@ ENDIF(VTK_WRAP_TCL)
 SET(PV_EXE_LIST
    pvserver pvrenderserver pvdataserver
    pvtest pvxmlstatetest pvstatetest pvInformationPropertyTest pvlocationtest
-   pvundotest pvhelpertest pvmergetest pvclientxmldefinitiontest
+   pvundotest pvundotest2 pvhelpertest pvmergetest pvclientxmldefinitiontest
    pvinvoketest)
 
 FOREACH(pvexe ${PV_EXE_LIST})
