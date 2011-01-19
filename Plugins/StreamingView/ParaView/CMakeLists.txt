@@ -34,6 +34,13 @@ IF(PARAVIEW_BUILD_QT_GUI)
     VIEW_XML_NAME IteratingView
     )
 
+  ADD_PARAVIEW_VIEW_OPTIONS(
+    VIEW1_OPTIONS_IFACE
+    VIEW1_OPTIONS_SRCS
+    VIEW_TYPE IteratingView
+    ACTIVE_VIEW_OPTIONS pqActiveRenderViewOptions
+  )
+
   ADD_PARAVIEW_VIEW_MODULE( VIEW2_IFACE VIEW2_IFACE_SRCS
     VIEW_TYPE PrioritizingView
     VIEW_NAME "Prioritizing View"
@@ -41,12 +48,26 @@ IF(PARAVIEW_BUILD_QT_GUI)
     VIEW_XML_NAME PrioritizingView
     )
 
+  ADD_PARAVIEW_VIEW_OPTIONS(
+    VIEW2_OPTIONS_IFACE
+    VIEW2_OPTIONS_SRCS
+    VIEW_TYPE PrioritizingView
+    ACTIVE_VIEW_OPTIONS pqActiveRenderViewOptions
+  )
+
   ADD_PARAVIEW_VIEW_MODULE( VIEW3_IFACE VIEW3_IFACE_SRCS
     VIEW_TYPE RefiningView
     VIEW_NAME "Refining View"
     VIEW_XML_GROUP views
     VIEW_XML_NAME RefiningView
     )
+
+  ADD_PARAVIEW_VIEW_OPTIONS(
+    VIEW3_OPTIONS_IFACE
+    VIEW3_OPTIONS_SRCS
+    VIEW_TYPE RefiningView
+    ACTIVE_VIEW_OPTIONS pqActiveRenderViewOptions
+  )
 
   # invoke macro that adds the refinement view control panel
   ADD_PARAVIEW_DOCK_WINDOW(
@@ -73,15 +94,21 @@ add_paraview_plugin(
     StreamingReaders.xml
   GUI_INTERFACES
     ${VIEW1_IFACE}
+    ${VIEW1_OPTIONS_IFACE}
     ${VIEW2_IFACE}
+    ${VIEW2_OPTIONS_IFACE}
     ${VIEW3_IFACE}
+    ${VIEW3_OPTIONS_IFACE}
     ${INSPECTOR_IFACE1}
   GUI_SOURCES
     ${MOC_SRCS}
     ${UI_BUILT_SOURCES}
     ${VIEW1_IFACE_SRCS}
+    ${VIEW1_OPTIONS_SRCS}
     ${VIEW2_IFACE_SRCS}
+    ${VIEW2_OPTIONS_SRCS}
     ${VIEW3_IFACE_SRCS}
+    ${VIEW3_OPTIONS_SRCS}
     ${INSPECTOR_IFACE1_SRCS}
     StreamingView.cxx
     IteratingView.cxx
