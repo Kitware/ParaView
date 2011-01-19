@@ -173,6 +173,10 @@ int vtkImageNetCDFPOPReader::RequestInformation(
 
   int ret =
     this->Superclass::RequestInformation(request, inputVector, outputVector);
+  if (!ret)
+    {
+    return ret;
+    }
 
   // get number of variables from file
   int numberOfVariables;
@@ -296,16 +300,15 @@ int vtkImageNetCDFPOPReader::RequestInformation(
     }
 
 
-  double *Origin;
-  Origin = outInfo->Get(vtkDataObject::ORIGIN());
+  outInfo->Get(vtkDataObject::ORIGIN(), this->Origin);
 
   double bounds[6];
-  bounds[0] = Origin[0] + sSpacing[0] * sWholeExtent[0];
-  bounds[1] = Origin[0] + sSpacing[0] * sWholeExtent[1];
-  bounds[2] = Origin[1] + sSpacing[1] * sWholeExtent[2];
-  bounds[3] = Origin[1] + sSpacing[1] * sWholeExtent[3];
-  bounds[4] = Origin[2] + sSpacing[2] * sWholeExtent[4];
-  bounds[5] = Origin[2] + sSpacing[2] * sWholeExtent[5];
+  bounds[0] = this->Origin[0] + sSpacing[0] * sWholeExtent[0];
+  bounds[1] = this->Origin[0] + sSpacing[0] * sWholeExtent[1];
+  bounds[2] = this->Origin[1] + sSpacing[1] * sWholeExtent[2];
+  bounds[3] = this->Origin[1] + sSpacing[1] * sWholeExtent[3];
+  bounds[4] = this->Origin[2] + sSpacing[2] * sWholeExtent[4];
+  bounds[5] = this->Origin[2] + sSpacing[2] * sWholeExtent[5];
   DEBUGPRINT_RESOLUTION
     (
      cerr << "RI SET BOUNDS ";
@@ -315,7 +318,7 @@ int vtkImageNetCDFPOPReader::RequestInformation(
   outInfo->Set(vtkStreamingDemandDrivenPipeline::WHOLE_BOUNDING_BOX(),
                bounds, 6);
 
-  return 1;
+  return ret;
 }
 
 //----------------------------------------------------------------------------
