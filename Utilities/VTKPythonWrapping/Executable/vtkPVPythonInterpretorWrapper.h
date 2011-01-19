@@ -140,7 +140,7 @@ static PyTypeObject vtkPVPythonInterpretorWrapperType = {
     0, // PyObject *tp_cache;
     0, // PyObject *tp_subclasses;
     0, // PyObject *tp_weaklist;
-#if PY_VERSION_HEX >= 0x02060000 // tp_version shows up in python 2.6
+#if PY_VERSION_HEX >= 0x02060000 // tp_version_tag shows up in python 2.6
     0, // tp_del
     0  // tp_version_tag
 #elif PY_VERSION_HEX >= 0x02030000 // tp_del shows up in python 2.3
