@@ -29,21 +29,21 @@ IF(PARAVIEW_BUILD_QT_GUI)
 
   ADD_PARAVIEW_VIEW_MODULE( VIEW1_IFACE VIEW1_IFACE_SRCS
     VIEW_TYPE IteratingView
-    VIEW_NAME IteratingView
+    VIEW_NAME "Iterating View"
     VIEW_XML_GROUP views
     VIEW_XML_NAME IteratingView
     )
 
   ADD_PARAVIEW_VIEW_MODULE( VIEW2_IFACE VIEW2_IFACE_SRCS
     VIEW_TYPE PrioritizingView
-    VIEW_NAME PrioritizingView
+    VIEW_NAME "Prioritizing View"
     VIEW_XML_GROUP views
     VIEW_XML_NAME PrioritizingView
     )
 
   ADD_PARAVIEW_VIEW_MODULE( VIEW3_IFACE VIEW3_IFACE_SRCS
     VIEW_TYPE RefiningView
-    VIEW_NAME RefiningView
+    VIEW_NAME "Refining View"
     VIEW_XML_GROUP views
     VIEW_XML_NAME RefiningView
     )
