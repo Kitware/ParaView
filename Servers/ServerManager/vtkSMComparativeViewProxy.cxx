@@ -238,7 +238,7 @@ vtkSMComparativeViewProxy::vtkSMComparativeViewProxy()
 
   this->Outdated = true;
 
-  vtkMemberFunctionCommand<vtkSMComparativeViewProxy>* fsO = 
+  vtkMemberFunctionCommand<vtkSMComparativeViewProxy>* fsO =
     vtkMemberFunctionCommand<vtkSMComparativeViewProxy>::New();
   fsO->SetCallback(*this, &vtkSMComparativeViewProxy::MarkOutdated);
   this->MarkOutdatedObserver = fsO;
@@ -517,7 +517,7 @@ void vtkSMComparativeViewProxy::AddNewView()
       this->Internal->AddRepresentationClone(repr, newView);
 
     assert(clone != NULL);
-    clone; // unused warning in release mode.
+    static_cast<void>(clone); // unused warning in release mode.
     }
 }
 
@@ -674,7 +674,7 @@ void vtkSMComparativeViewProxy::RemoveRepresentation(vtkSMProxy* repr)
 //----------------------------------------------------------------------------
 void vtkSMComparativeViewProxy::RemoveAllRepresentations()
 {
-  vtkInternal::MapOfReprClones::iterator iter = 
+  vtkInternal::MapOfReprClones::iterator iter =
     this->Internal->RepresentationClones.begin();
   while (iter != this->Internal->RepresentationClones.end())
     {
@@ -866,7 +866,7 @@ void vtkSMComparativeViewProxy::GetViews(vtkCollection* collection)
     }
 
   vtkInternal::VectorOfViews::iterator iter;
-  for (iter = this->Internal->Views.begin(); 
+  for (iter = this->Internal->Views.begin();
        iter != this->Internal->Views.end(); ++iter)
     {
     collection->AddItem(iter->GetPointer());
@@ -874,7 +874,7 @@ void vtkSMComparativeViewProxy::GetViews(vtkCollection* collection)
 }
 
 //----------------------------------------------------------------------------
-void vtkSMComparativeViewProxy::GetRepresentationsForView(vtkSMViewProxy* view, 
+void vtkSMComparativeViewProxy::GetRepresentationsForView(vtkSMViewProxy* view,
       vtkCollection *collection)
 {
   if (!collection)
@@ -942,7 +942,7 @@ void vtkSMComparativeViewProxy::GetRepresentations(int x, int y,
     vtkInternal::RepresentationData& data = reprIter->second;
     if (index == 0)
       {
-      collection->AddItem(reprIter->first);  
+      collection->AddItem(reprIter->first);
       }
     else
       {
@@ -955,7 +955,7 @@ void vtkSMComparativeViewProxy::GetRepresentations(int x, int y,
 void vtkSMComparativeViewProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  os << indent << "Dimensions: " << this->Dimensions[0] 
+  os << indent << "Dimensions: " << this->Dimensions[0]
     << ", " << this->Dimensions[1] << endl;
   os << indent << "Spacing: " << this->Spacing[0] << ", "
     << this->Spacing[1] << endl;
