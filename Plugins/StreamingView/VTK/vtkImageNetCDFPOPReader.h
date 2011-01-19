@@ -33,7 +33,7 @@
 class vtkDataArraySelection;
 class vtkCallbackCommand;
 
-class VTK_IO_EXPORT vtkImageNetCDFPOPReader : public vtkImageAlgorithm
+class VTK_EXPORT vtkImageNetCDFPOPReader : public vtkImageAlgorithm
 {
 public:
   static vtkImageNetCDFPOPReader *New();
