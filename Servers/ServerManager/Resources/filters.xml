@@ -9070,6 +9070,7 @@ This property controls how the filter works to generate tensor cell data. You ca
         <Property name="MaximumNumberOfPoints" proxy_name="Glyph1" exposed_name="Glyph Max. Points"/>
         <Property name="RandomMode" proxy_name="Glyph1" exposed_name="Glyph Random Mode"/>
         <Property name="SetScaleFactor" proxy_name="Glyph1" exposed_name="Glyph Scale Factor"/>
+        <Property name="Consistency" proxy_name="GenerateSurfaceNormals1" exposed_name="Consistency"/>
         <Property name="Input" proxy_name="ExtractSurface2" exposed_name="Input"/>
         <Property name="Invert" proxy_name="ArrowSource" exposed_name="InvertArrow"/>
       </ExposedProperties>
