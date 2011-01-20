@@ -33,6 +33,7 @@ vtkCxxSetObjectMacro(vtkStreamingHarness, CacheFilter, vtkPieceCacheFilter);
 //----------------------------------------------------------------------------
 vtkStreamingHarness::vtkStreamingHarness()
 {
+  this->Enabled = true;
   this->Pass = 0;
   this->Piece = 0;
   this->NumberOfPieces = 32;

@@ -100,6 +100,10 @@ void vtkPrioritizedStreamer::ResetEveryone()
     vtkStreamingHarness *harness = vtkStreamingHarness::SafeDownCast
       (iter->GetCurrentObject());
     iter->GoToNextItem();
+    if (!harness->GetEnabled())
+      {
+      continue;
+      }
 
     //make it start over
     harness->SetPass(0);
@@ -201,6 +205,10 @@ void vtkPrioritizedStreamer::AdvanceEveryone()
     vtkStreamingHarness *harness = vtkStreamingHarness::SafeDownCast
       (iter->GetCurrentObject());
     iter->GoToNextItem();
+    if (!harness->GetEnabled())
+      {
+      continue;
+      }
 
     //increment to the next pass
     int maxPass = harness->GetNumberOfPieces();
@@ -299,20 +307,24 @@ bool vtkPrioritizedStreamer::IsEveryoneDone()
   iter->InitTraversal();
   while(!iter->IsDoneWithTraversal())
     {
-    vtkStreamingHarness *next = vtkStreamingHarness::SafeDownCast
+    vtkStreamingHarness *harness = vtkStreamingHarness::SafeDownCast
       (iter->GetCurrentObject());
     iter->GoToNextItem();
+    if (!harness->GetEnabled())
+      {
+      continue;
+      }
 
     //check if anyone hasn't drawn the last necessary pass
-    int passNow = next->GetPass();
-    int maxPass = next->GetNumberOfPieces();
+    int passNow = harness->GetPass();
+    int maxPass = harness->GetNumberOfPieces();
     if (this->LastPass < maxPass)
       {
       maxPass = this->LastPass;
       }
     if (passNow <= maxPass-2)
       {
-      vtkPieceList *pl = next->GetPieceList1();
+      vtkPieceList *pl = harness->GetPieceList1();
       if (pl)
         {
         double priority = pl->GetPiece(passNow+1).GetPriority();
@@ -403,6 +415,10 @@ void vtkPrioritizedStreamer::SetNumberOfPasses(int nv)
       vtkStreamingHarness *harness = vtkStreamingHarness::SafeDownCast
         (iter->GetCurrentObject());
       iter->GoToNextItem();
+      if (!harness->GetEnabled())
+        {
+        continue;
+        }
       harness->SetNumberOfPieces(nv);
       }
     iter->Delete();

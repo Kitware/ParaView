@@ -179,3 +179,13 @@ void vtkPVStreamingRepresentation::MarkModified()
     this->Harness->Modified();
     }
 }
+
+//----------------------------------------------------------------------------
+void vtkPVStreamingRepresentation::SetVisibility(bool val)
+{
+  this->Superclass::SetVisibility(val);
+  if (this->Harness)
+    {
+    this->Harness->SetEnabled(val);
+    }
+}
