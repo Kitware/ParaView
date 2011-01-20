@@ -133,7 +133,7 @@ void pqPythonDialog::runScript()
     QString(tr("Python Script (*.py);;All files (*)")));
     
   dialog->setObjectName("PythonShellRunScriptDialog");
-  dialog->setFileMode(pqFileDialog::ExistingFiles);
+  dialog->setFileMode(pqFileDialog::ExistingFile);
   QObject::connect(
     dialog,
     SIGNAL(filesSelected(const QStringList&)), 
