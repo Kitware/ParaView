@@ -60,7 +60,7 @@ void pqMacroReaction::createMacro()
                            pqCoreUtilities::mainWidget(),
                            tr("Open Python File to create a Macro:"), QString(), tr("Python script (*.py);;All Files (*)"));
   fileDialog.setObjectName("FileOpenDialog");
-  fileDialog.setFileMode(pqFileDialog::ExistingFiles);
+  fileDialog.setFileMode(pqFileDialog::ExistingFile);
   if (fileDialog.exec() == QDialog::Accepted)
     {
     pythonManager->addMacro(fileDialog.getSelectedFiles()[0]);
