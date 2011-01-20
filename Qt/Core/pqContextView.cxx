@@ -117,7 +117,7 @@ pqContextView::pqContextView(
   this->Internal = new pqContextView::pqInternal();
   viewProxy->UpdateVTKObjects(); // this results in calling CreateVTKObjects().
   this->Command = command::New(*this);
-  viewProxy->GetClientSideView()->AddObserver(
+  vtkObject::SafeDownCast(viewProxy->GetClientSideObject())->AddObserver(
     vtkCommand::SelectionChangedEvent, this->Command);
 }
 

@@ -73,10 +73,8 @@ QStringList pqStandardViewModules::viewTypes() const
     pqXYChartView::XYChartViewType() <<
     pqXYBarChartView::XYBarChartViewType() <<
     pqComparativeRenderView::comparativeRenderViewType() <<
-#ifdef FIXME_COLLABORATION
     pqComparativeXYChartView::chartViewType() <<
     pqComparativeXYBarChartView::chartViewType() <<
-#endif
     pqParallelCoordinatesChartView::chartViewType();
 }
 
@@ -102,7 +100,6 @@ QString pqStandardViewModules::viewTypeName(const QString& type) const
     {
     return pqComparativeRenderView::comparativeRenderViewTypeName();
     }
-#ifdef FIXME_COLLABORATION
   else if (type == pqComparativeXYBarChartView::chartViewType())
     {
     return pqComparativeXYBarChartView::chartViewTypeName();
@@ -111,7 +108,6 @@ QString pqStandardViewModules::viewTypeName(const QString& type) const
     {
     return pqComparativeXYChartView::chartViewTypeName();
     }
-#endif
   else if (type == pqSpreadSheetView::spreadsheetViewType())
     {
     return pqSpreadSheetView::spreadsheetViewTypeName();
@@ -158,7 +154,6 @@ vtkSMProxy* pqStandardViewModules::createViewProxy(const QString& viewtype,
     {
     root_xmlname = "ComparativeRenderView";
     }
-#ifdef FIXME_COLLABORATION
   else if(viewtype == pqComparativeXYBarChartView::chartViewType())
     {
     root_xmlname = "ComparativeXYBarChartView";
@@ -167,7 +162,6 @@ vtkSMProxy* pqStandardViewModules::createViewProxy(const QString& viewtype,
     {
     root_xmlname = "ComparativeXYChartView";
     }
-#endif
   else if (viewtype == pqTwoDRenderView::twoDRenderViewType())
     {
     root_xmlname = "2DRenderView";
@@ -231,7 +225,6 @@ pqView* pqStandardViewModules::createView(const QString& viewtype,
     {
     return new pqRenderView(group, viewname, viewmodule, server, p);
     }
-#ifdef FIXME_COLLABORATION
   else if (viewtype == pqComparativeXYBarChartView::chartViewType()
     && viewmodule->IsA("vtkSMComparativeViewProxy"))
     {
@@ -246,7 +239,6 @@ pqView* pqStandardViewModules::createView(const QString& viewtype,
       group, viewname, vtkSMComparativeViewProxy::SafeDownCast(viewmodule),
       server, p);
     }
-#endif
   else if (viewmodule->IsA("vtkSMComparativeViewProxy"))
     {
     // Handle the other comparative render views.
