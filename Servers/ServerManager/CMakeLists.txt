@@ -47,6 +47,7 @@ SET (Kit_SRCS
   vtkPMVectorProperty.cxx
   vtkPMWriterProxy.cxx
   vtkPVKeyFrameAnimationCueForProxies.cxx
+  vtkPVComparativeView.cxx
 # --- SM Objects ---
   vtkSMAnimationScene.cxx
   vtkSMAnimationSceneImageWriter.cxx
@@ -57,6 +58,7 @@ SET (Kit_SRCS
   vtkSMCameraLink.cxx
   vtkSMCameraProxy.cxx
   vtkSMChartRepresentationProxy.cxx
+  vtkSMComparativeViewProxy.cxx
   vtkSMCompoundProxyDefinitionLoader.cxx
   vtkSMCompoundSourceProxy.cxx
   vtkSMCompoundSourceProxyDefinitionBuilder.cxx
@@ -195,7 +197,6 @@ SET(Kit_SRCS
 
   ## Comparative view +++++++++
   vtkSMComparativeAnimationCueProxy.cxx
-  vtkSMComparativeViewProxy.cxx
 
   ## Charts stuff +++++++++++++
   vtkSMContextArraysInformationHelper.cxx #---- SM Side only, not managed yet...

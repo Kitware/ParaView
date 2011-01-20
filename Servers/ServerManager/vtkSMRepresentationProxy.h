@@ -79,7 +79,7 @@ private:
   void ViewTimeChanged();
   friend class vtkSMViewProxy;
 
-  friend class vtkSMComparativeViewProxy;
+  friend class vtkPVComparativeView;
   void ClearMarkedModified() { this->MarkedModified = false; }
   bool MarkedModified;
 //ETX

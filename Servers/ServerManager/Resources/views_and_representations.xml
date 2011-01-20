@@ -4068,12 +4068,11 @@
 
   <ProxyGroup name="views">
     <!-- ================================================================== -->
-    <Proxy name="ComparativeViewBase" processes="client|renderserver|dataserver">
+    <Proxy name="ComparativeViewBase">
 
       <DoubleVectorProperty name="ViewTime"
         command="SetViewTime"
         number_of_elements="1"
-        update_self="1"
         default_values="none">
         <DoubleRangeDomain name="range"/>
         <Documentation>
@@ -4104,7 +4103,6 @@
       </IntVectorProperty>
 
       <IntVectorProperty name="ViewPosition"
-        update_self="1"
         command="SetViewPosition"
         number_of_elements="2"
         default_values="0 0">
@@ -4115,7 +4113,6 @@
 
       <IntVectorProperty name="ViewSize"
         command="SetViewSize"
-        update_self="1"
         number_of_elements="2"
         default_values="400 400" >
         <Documentation>
@@ -4125,8 +4122,6 @@
 
       <IntVectorProperty name="Dimensions"
         command="Build"
-        update_self="1"
-        immediate_update="1"
         number_of_elements="2"
         default_values="2 2">
         <IntRangeDomain name="range" min="1 1" max="10 10" />
@@ -4134,7 +4129,6 @@
 
       <IntVectorProperty name="OverlayAllComparisons"
         command="SetOverlayAllComparisons"
-        update_self="1"
         number_of_elements="1"
         default_values="0">
         <BooleanDomain name="bool" />
@@ -4142,7 +4136,6 @@
 
       <IntVectorProperty name="Spacing"
         command="SetSpacing"
-        update_self="1"
         number_of_elements="2"
         default_values="1 1">
         <IntRangeDomain name="range" min="0 0" max="10 10" />
@@ -4151,7 +4144,7 @@
       <ProxyProperty name="Representations"
         command="AddRepresentation"
         remove_command="RemoveRepresentation"
-        update_self="1"
+        argument_type="SMProxy"
         repeatable="1">
         <Documentation>
           Representations in this view.
@@ -4161,7 +4154,7 @@
       <ProxyProperty name="Cues"
         command="AddCue"
         remove_command="RemoveCue"
-        update_self="1">
+        argument_type="SMProxy">
         <Documentation>
           Animation cues for changing parameters.
         </Documentation>
@@ -4170,7 +4163,8 @@
 
     <!-- ================================================================== -->
     <ComparativeViewProxy name="ComparativeRenderView"
-      base_proxygroup="views" base_proxyname="ComparativeViewBase">
+      base_proxygroup="views" base_proxyname="ComparativeViewBase"
+      class="vtkPVComparativeView" >
       <Documentation>
         The is comparative view comprising of individual "RenderView" proxies
         for each panel in the comparative view grid.
@@ -4247,7 +4241,8 @@
 
     <!-- ================================================================== -->
     <ComparativeViewProxy name="ComparativeXYChartView"
-      base_proxygroup="views" base_proxyname="ComparativeViewBase">
+      base_proxygroup="views" base_proxyname="ComparativeViewBase"
+      class="vtkPVComparativeView" >
       <Documentation>
         The is comparative view comprising of individual "XYChartView" proxies
         for each panel in the comparative view grid.
@@ -4286,7 +4281,8 @@
 
     <!-- ================================================================== -->
     <ComparativeViewProxy name="ComparativeXYBarChartView"
-      base_proxygroup="views" base_proxyname="ComparativeViewBase">
+      base_proxygroup="views" base_proxyname="ComparativeViewBase"
+      class="vtkPVComparativeView" >
       <Documentation>
         The is comparative view comprising of individual "XYBarChartView" proxies
         for each panel in the comparative view grid.

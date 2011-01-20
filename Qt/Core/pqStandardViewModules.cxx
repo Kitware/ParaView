@@ -72,8 +72,8 @@ QStringList pqStandardViewModules::viewTypes() const
 //    pqScatterPlotView::scatterPlotViewType() <<
     pqXYChartView::XYChartViewType() <<
     pqXYBarChartView::XYBarChartViewType() <<
-#ifdef FIXME_COLLABORATION
     pqComparativeRenderView::comparativeRenderViewType() <<
+#ifdef FIXME_COLLABORATION
     pqComparativeXYChartView::chartViewType() <<
     pqComparativeXYBarChartView::chartViewType() <<
 #endif
@@ -98,11 +98,11 @@ QString pqStandardViewModules::viewTypeName(const QString& type) const
     {
     return pqTableView::tableTypeName();
     }
-#ifdef FIXME_COLLABORATION
   else if (type == pqComparativeRenderView::comparativeRenderViewType())
     {
     return pqComparativeRenderView::comparativeRenderViewTypeName();
     }
+#ifdef FIXME_COLLABORATION
   else if (type == pqComparativeXYBarChartView::chartViewType())
     {
     return pqComparativeXYBarChartView::chartViewTypeName();
@@ -154,11 +154,11 @@ vtkSMProxy* pqStandardViewModules::createViewProxy(const QString& viewtype,
     {
     root_xmlname = "RenderView";
     }
-#ifdef FIXME_COLLABORATION
   else if(viewtype == pqComparativeRenderView::comparativeRenderViewType())
     {
     root_xmlname = "ComparativeRenderView";
     }
+#ifdef FIXME_COLLABORATION
   else if(viewtype == pqComparativeXYBarChartView::chartViewType())
     {
     root_xmlname = "ComparativeXYBarChartView";
@@ -246,13 +246,13 @@ pqView* pqStandardViewModules::createView(const QString& viewtype,
       group, viewname, vtkSMComparativeViewProxy::SafeDownCast(viewmodule),
       server, p);
     }
+#endif
   else if (viewmodule->IsA("vtkSMComparativeViewProxy"))
     {
     // Handle the other comparative render views.
     return new pqComparativeRenderView(
       group, viewname, viewmodule, server, p);
     }
-#endif
 //  else if (viewmodule->IsA("vtkSMScatterPlotViewProxy"))
 //    {
 //    return new pqScatterPlotView(

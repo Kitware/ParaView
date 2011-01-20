@@ -16,14 +16,16 @@
 // film-strips.
 // .SECTION Description
 // vtkSMComparativeViewProxy is the view used to generate/view comparative
-// visualizations/film-strips.
-
+// visualizations/film-strips. vtkSMComparativeViewProxy works together with
+// vtkPVComparativeView -- the vtk-object for which this represents the proxy.
+// vtkPVComparativeView is a client-side VTK object which literally uses the
+// view and representation proxies to simulate the comparative view. Refer to
+// vtkPVComparativeView for details.
 #ifndef __vtkSMComparativeViewProxy_h
 #define __vtkSMComparativeViewProxy_h
 
 #include "vtkSMViewProxy.h"
 
-class vtkSMComparativeAnimationCueProxy;
 class vtkCollection;
 
 class VTK_EXPORT vtkSMComparativeViewProxy : public vtkSMViewProxy
@@ -32,37 +34,6 @@ public:
   static vtkSMComparativeViewProxy* New();
   vtkTypeMacro(vtkSMComparativeViewProxy, vtkSMViewProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
-
-  // Description:
-  // Builds the MxN views. This method simply creates the MxN internal view modules.
-  // It does not generate the visualization i.e. play the animation scene(s).
-  // This method does nothing unless the dimensions have changed, in which case
-  // it creates new internal view modules (or destroys extra ones). Note that
-  // the it's the responsibility of the application to lay the views out so that
-  // they form a MxN grid.
-  void Build(int dx, int dy);
-
-  // Description:
-  void SetOverlayAllComparisons(bool);
-  vtkGetMacro(OverlayAllComparisons, bool);
-
-  // Description:
-  // Returns the dimensions used by the most recent Build() request.
-  vtkGetVector2Macro(Dimensions, int);
-
-  // Description:
-  // Adds a representation proxy to this view.
-  virtual void AddRepresentation(vtkSMRepresentationProxy*);
-
-  // Description:
-  // Removes a representation proxy from this view.
-  virtual void RemoveRepresentation(vtkSMRepresentationProxy*);
-
-  // Description:
-  // Removes all added representations from this view.
-  // Simply calls RemoveRepresentation() on all added representations
-  // one by one.
-  virtual void RemoveAllRepresentations();
 
   // Description:
   // Updates the data pipelines for all visible representations.
@@ -94,46 +65,10 @@ public:
   vtkSMViewProxy* GetRootView();
 
   // Description:
-  // ViewSize, ViewPosition need to split up among all the component
-  // views correctly.
-  virtual void SetViewSize(int x, int y)
-    {
-    this->ViewSize[0] = x;
-    this->ViewSize[1] = y;
-    this->UpdateViewLayout();
-    }
-
-  // Description:
-  // ViewSize, ViewPosition need to split up among all the component
-  // views correctly.
-  virtual void SetViewPosition(int x, int y)
-    {
-    this->ViewPosition[0] = x;
-    this->ViewPosition[1] = y;
-    this->UpdateViewLayout();
-    }
-
-  // Description:
-  // Set spacing between views.
-  vtkSetVector2Macro(Spacing, int);
-  vtkGetVector2Macro(Spacing, int);
-
-  // Description:
-  // Add/Remove parameter cues.
-  void AddCue(vtkSMComparativeAnimationCueProxy*);
-  void RemoveCue(vtkSMComparativeAnimationCueProxy*);
-
-  // Description:
   // Dirty means this algorithm will execute during next update.
   // This all marks all consumers as dirty.
   virtual void MarkDirty(vtkSMProxy* modifiedProxy);
 
-  // Description:
-  // Get/Set the view time.
-  vtkSetMacro(ViewTime, double);
-  vtkGetMacro(ViewTime, double);
-
-  //BTX
 protected:
   vtkSMComparativeViewProxy();
   ~vtkSMComparativeViewProxy();
@@ -141,56 +76,9 @@ protected:
   // Description:
   virtual void CreateVTKObjects();
 
-  // Description:
-  // Creates and appends a new internal view.
-  // This not only creates a new view but also new copies of representations
-  // for all the representations in the view and adds them to the new view.
-  void AddNewView();
-
-  // Description:
-  // Removes an internal view and all the representations in that view.
-  void RemoveView(vtkSMViewProxy* remove);
-
-  // Description:
-  // Passes on the render request to the root view.
-  virtual void PostRender(bool interactive);
-
-  // Description:
-  // Update layout for internal views.
-  void UpdateViewLayout();
-
-  // Description:
-  // Update all representations belonging for the indicated position.
-  void UpdateAllRepresentations(int x, int y);
-
-  // Description:
-  // Marks the view dirty i.e. on next StillRender it needs to regenerate the
-  // comparative vis by replaying the animation(s).
-  void MarkOutdated()
-    { this->Outdated=true; }
-
-  void ClearDataCaches();
-
-  int Dimensions[2];
-  int ViewSize[2];
-  int ViewPosition[2];
-  int Spacing[2];
-  double ViewTime;
-
-  bool OverlayAllComparisons;
-
-  bool Outdated;
-
 private:
   vtkSMComparativeViewProxy(const vtkSMComparativeViewProxy&); // Not implemented
   void operator=(const vtkSMComparativeViewProxy&); // Not implemented
-
-  class vtkInternal;
-  vtkInternal* Internal;
-  vtkCommand* MarkOutdatedObserver;
-
-  //ETX
 };
 
 #endif
-
