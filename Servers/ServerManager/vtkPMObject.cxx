@@ -52,7 +52,7 @@ void vtkPMObject::Initialize(vtkSMSessionCore* session)
 }
 
 //----------------------------------------------------------------------------
-vtkPMObject* vtkPMObject::GetPMObject(vtkTypeUInt32 globalid)
+vtkPMObject* vtkPMObject::GetPMObject(vtkTypeUInt32 globalid) const
 {
   if (this->SessionCore)
     {

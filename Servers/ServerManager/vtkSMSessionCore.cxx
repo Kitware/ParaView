@@ -81,7 +81,11 @@ public:
     PMObjectMapType::iterator iter = this->PMObjectMap.find(globalUniqueId);
     if (iter != this->PMObjectMap.end())
       {
-      this->PMObjectMap.erase(iter);
+      if(iter->second)
+        {
+        iter->second->Delete();
+        }
+      // this->PMObjectMap.erase(iter); // Before weak pointer
       }
     }
   //---------------------------------------------------------------------------
@@ -143,7 +147,7 @@ public:
       }
     }
   //---------------------------------------------------------------------------
-  typedef vtkstd::map<vtkTypeUInt32, vtkSmartPointer<vtkPMObject> >
+  typedef vtkstd::map<vtkTypeUInt32, vtkWeakPointer<vtkPMObject> >
     PMObjectMapType;
   typedef vtkstd::map<vtkTypeUInt32, vtkWeakPointer<vtkSMRemoteObject> >
     RemoteObjectMapType;
@@ -292,8 +296,8 @@ void vtkSMSessionCore::PushStateInternal(vtkSMMessage* message)
       }
     // Create the corresponding PM object.
     vtkstd::string classname = message->GetExtension(DefinitionHeader::server_class);
-    vtkSmartPointer<vtkObject> object;
-    object.TakeReference(vtkInstantiator::CreateInstance(classname.c_str()));
+    vtkObject* object;
+    object = vtkInstantiator::CreateInstance(classname.c_str());
     if (!object)
       {
       vtkErrorMacro("Failed to instantiate " << classname.c_str());
@@ -308,7 +312,7 @@ void vtkSMSessionCore::PushStateInternal(vtkSMMessage* message)
       }
     obj->SetGlobalID(globalId);
     obj->Initialize(this);
-    this->Internals->PMObjectMap[globalId] = obj;
+    this->Internals->PMObjectMap[globalId] = obj; // WeakPointer map
 
     LOG (
       << "----------------------------------------------------------------\n"

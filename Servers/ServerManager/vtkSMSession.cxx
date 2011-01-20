@@ -67,14 +67,9 @@ public:
     return result;
     }
 
-  void FillWithLastState( vtkTypeUInt32 globalId, vtkSMMessage* stateToFill,
-                          bool keepProperties)
+  void FillWithLastState( vtkTypeUInt32 globalId, vtkSMMessage* stateToFill )
     {
     stateToFill->CopyFrom(this->StateMap[globalId]);
-    if(!keepProperties)
-      {
-      stateToFill->ClearExtension(ProxyState::property);
-      }
     }
 
 private:
@@ -430,36 +425,17 @@ vtkIdType vtkSMSession::ReverseConnectToRemote(
 //----------------------------------------------------------------------------
 // Warning: It is at the responsability at the caller to delete the proxy
 //          once that one has been registered somewhere. The result can be NULL
-//          if the RemoteObject can be finf by GetRemoteObject
-vtkSMRemoteObject* vtkSMSession::ReNewRemoteObject( vtkTypeUInt32 globalId,
-                                                    bool withPreviousState )
+//          if the RemoteObject can be find by GetRemoteObject
+vtkSMRemoteObject* vtkSMSession::ReNewRemoteObject( vtkTypeUInt32 globalId )
 {
-  cout << "ReviveRemoteObject: " << globalId << endl;
   vtkSMRemoteObject* remoteObject = this->GetRemoteObject(globalId);
   if(this->StateManagement && !remoteObject)
     {
     vtkSMMessage proxyState;
-    this->Internals->FillWithLastState(globalId, &proxyState, withPreviousState);
+    this->Internals->FillWithLastState(globalId, &proxyState);
     vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
     remoteObject = pxm->NewProxy(&proxyState);
     return remoteObject;
     }
   return NULL;
-}
-//----------------------------------------------------------------------------
-void vtkSMSession::ResetRemoteObject(vtkTypeUInt32 globalId)
-{
-  cout << "ResetRemoteObject: " << globalId << endl;
-  vtkSMRemoteObject* remoteObject = this->GetRemoteObject(globalId);
-  if(this->StateManagement && remoteObject)
-    {
-    vtkSMMessage proxyState;
-    this->Internals->FillWithLastState(globalId, &proxyState, true);
-    remoteObject->LoadState(&proxyState);
-    }
-  else
-    {
-    vtkWarningMacro("Try to reset a RemoteObject that does not exist. (id: "
-                    << globalId << ")");
-    }
 }

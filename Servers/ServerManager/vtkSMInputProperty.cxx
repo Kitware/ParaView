@@ -20,8 +20,16 @@
 #include "vtkSMMessage.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyLocator.h"
+#include "vtkSMProxyManager.h"
+#include "vtkSMSession.h"
 
+#include <vtkstd/algorithm>
+#include <vtkstd/map>
+#include <vtkstd/set>
 #include <vtkstd/vector>
+#include <vtkstd/iterator>
+
+#include <assert.h>
 
 vtkStandardNewMacro(vtkSMInputProperty);
 
@@ -64,8 +72,68 @@ void vtkSMInputProperty::WriteTo(vtkSMMessage* message)
 //---------------------------------------------------------------------------
 void vtkSMInputProperty::ReadFrom(const vtkSMMessage* message, int message_offset)
 {
-  (void) message;
-  (void) message_offset;
+  // FIXME this method is REALLY close to its superclass: Please keep them in sync
+  const ProxyState_Property *prop = &message->GetExtension(ProxyState::property, message_offset);
+  if(strcmp(prop->name().c_str(), this->GetXMLName()) == 0)
+    {
+    const Variant *value = &prop->value();
+    assert(value->proxy_global_id_size() == value->port_number_size());
+    int nbProxies = value->proxy_global_id_size();
+    vtkstd::set<vtkTypeUInt32> newProxyIdList;
+    vtkstd::set<vtkTypeUInt32>::const_iterator proxyIdIter;
+    vtkstd::map<vtkTypeUInt32,int> proxyIdPortMap;
+
+    // Fill indexed proxy id list
+    for(int i=0;i<nbProxies;i++)
+      {
+      proxyIdPortMap[value->proxy_global_id(i)] = value->port_number(i);
+      newProxyIdList.insert(value->proxy_global_id(i));
+      }
+
+    // Deal with existing proxy
+    for(unsigned int i=0;i<this->GetNumberOfProxies();i++)
+      {
+      vtkSMProxy *proxy = this->GetProxy(i);
+      vtkTypeUInt32 id = proxy->GetGlobalID();
+      if((proxyIdIter=newProxyIdList.find(id)) == newProxyIdList.end())
+        {
+        // Not find => Need to be removed
+        this->RemoveProxy(proxy, false); // FIXME do we need to tag proxy as modified ?
+        }
+      else
+        {
+        // Already there, no need to add it twice
+        newProxyIdList.erase(proxyIdIter);
+        }
+      }
+
+    // Managed real new proxy
+    for(proxyIdIter=newProxyIdList.begin();
+        proxyIdIter != newProxyIdList.end();
+        proxyIdIter++)
+      {
+      // Get the proxy from proxy manager
+      vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+      vtkSMProxy* proxy = vtkSMProxy::SafeDownCast(
+          pxm->GetSession()->GetRemoteObject(*proxyIdIter));
+      if(proxy)
+        {
+        this->AddInputConnection(proxy, proxyIdPortMap[*proxyIdIter],false); // FIXME do we need to tag proxy as modified ?
+        }
+      else
+        {
+        // Recreate the proxy as it used to be
+        proxy = vtkSMProxy::SafeDownCast(
+            pxm->GetSession()->ReNewRemoteObject(*proxyIdIter));
+        this->AddInputConnection(proxy, proxyIdPortMap[*proxyIdIter], true);
+        }
+      }
+    }
+  else
+    {
+    vtkWarningMacro("Invalid offset property");
+    }
+  this->Modified();
 }
 
 //---------------------------------------------------------------------------

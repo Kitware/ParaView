@@ -17,12 +17,14 @@
 #include "vtkClientServerStream.h"
 #include "vtkObjectFactory.h"
 #include "vtkPMProxy.h"
+#include "vtkPMObject.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSMMessage.h"
 #include "vtkSMRemoteObject.h"
 
 #include <assert.h>
 #include <vtkstd/set>
+#include <vtkSmartPointer.h>
 
 //****************************************************************************/
 //                    Internal Classes and typedefs
@@ -30,6 +32,11 @@
 class vtkPMProxyProperty::InternalCache
 {
 public:
+  InternalCache(vtkPMProxyProperty* parent)
+    {
+    this->Parent = parent;
+    }
+
   //--------------------------------------------------------------------------
   void SetVariant(const Variant *variant)
     {
@@ -37,6 +44,7 @@ public:
     for (int cc=0; cc < variant->proxy_global_id_size(); cc++)
       {
       this->VariantSet.insert( variant->proxy_global_id(cc) );
+      this->Dependancy.push_back(this->Parent->GetPMObject(variant->proxy_global_id(cc)));
       }
     }
 
@@ -78,20 +86,24 @@ public:
   //--------------------------------------------------------------------------
   void UpdateRegisteredProxy()
     {
+    this->Dependancy.erase(this->Dependancy.begin(), this->Dependancy.begin() += this->RegisteredProxy.size());
     this->RegisteredProxy = VariantSet;
     this->VariantSet.clear();
     }
+  //--------------------------------------------------------------------------
 
 private:
   vtkstd::set<vtkTypeUInt32> RegisteredProxy;
   vtkstd::set<vtkTypeUInt32> VariantSet;
+  vtkstd::vector<vtkSmartPointer<vtkPMObject> > Dependancy;
+  vtkPMProxyProperty* Parent;
 };
 //****************************************************************************/
 vtkStandardNewMacro(vtkPMProxyProperty);
 //----------------------------------------------------------------------------
 vtkPMProxyProperty::vtkPMProxyProperty()
 {
-  this->Cache = new InternalCache();
+  this->Cache = new InternalCache(this);
   this->CleanCommand = 0;
   this->RemoveCommand = 0;
   this->ArgumentType = VTK;

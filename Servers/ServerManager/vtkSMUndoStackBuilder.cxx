@@ -88,7 +88,6 @@ void vtkSMUndoStackBuilder::PushToStack()
     return; // Only push the whole set when the first begin/end has been reached
     }
 
-  cout << "====> Push stack " << this->UndoSet->GetNumberOfElements() << endl;
   if (this->UndoSet->GetNumberOfElements() > 0 && this->UndoStack)
     {
     this->UndoStack->Push( (this->Label? this->Label : "Changes"),

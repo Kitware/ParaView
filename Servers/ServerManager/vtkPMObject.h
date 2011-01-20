@@ -68,7 +68,7 @@ public:
 
   // Description:
   // Convenience method to obtain a vtkPMObject subclass given its global id.
-  vtkPMObject* GetPMObject(vtkTypeUInt32 globalid);
+  vtkPMObject* GetPMObject(vtkTypeUInt32 globalid) const;
 
   // Description:
   // Convenience method to obtain a vtkSMRemoteObject subclass given its

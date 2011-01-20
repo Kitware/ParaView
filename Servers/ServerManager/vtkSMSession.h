@@ -205,22 +205,7 @@ public:
   // - This only work if StateManagement is set to true.
   // - It is at the responsability at the caller to delete the proxy
   //   once that one has been registered somewhere.
-  // - Bringing back a proxy with its later state can be dangerous if
-  //   that one refere some other Proxy that may not be available yet.
-  //   For that reason, we allow to Reset that RemoteObject to that later
-  //   state later on with the ResetRemoteObject method.
-  virtual vtkSMRemoteObject* ReNewRemoteObject( vtkTypeUInt32 globalId,
-                                                bool withPreviousState);
-  // Description:
-  // Reset the values of the RemoteObject to its previously pushed state.
-  //
-  // WARNING:
-  // - This only work if StateManagement is set to true.
-  // - Bringing back a proxy with its later state can be dangerous if
-  //   that one refere some other Proxy that may not be available yet.
-  //   For that reason, we allow to Reset that RemoteObject to that later
-  //   state later on with the ResetRemoteObject method.
-  virtual void ResetRemoteObject(vtkTypeUInt32 globalId);
+  virtual vtkSMRemoteObject* ReNewRemoteObject( vtkTypeUInt32 globalId );
 
 //BTX
 protected:
