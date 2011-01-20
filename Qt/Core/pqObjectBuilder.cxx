@@ -117,13 +117,12 @@ pqPipelineSource* pqObjectBuilder::createSource(const QString& sm_group,
     source->setDefaultPropertyValues();
     source->setModifiedState(pqProxy::UNINITIALIZED);
 
-#ifdef FIXME_COLLABORATION
     pqProxyModifiedStateUndoElement* elem =
       pqProxyModifiedStateUndoElement::New();
+    elem->SetSession(server->session());
     elem->MadeUninitialized(source);
     ADD_UNDO_ELEM(elem);
     elem->Delete();
-#endif
     emit this->sourceCreated(source);
     emit this->proxyCreated(source);
     return source;
@@ -303,13 +302,12 @@ pqPipelineSource* pqObjectBuilder::createReader(const QString& sm_group,
   reader->setDefaultPropertyValues();
   reader->setModifiedState(pqProxy::UNINITIALIZED);
 
-#ifdef FIXME_COLLABORATION
   pqProxyModifiedStateUndoElement* elem =
     pqProxyModifiedStateUndoElement::New();
+  elem->SetSession(server->session());
   elem->MadeUninitialized(reader);
   ADD_UNDO_ELEM(elem);
   elem->Delete();
-#endif
 
   emit this->readerCreated(reader, files[0]);
   emit this->readerCreated(reader, files);

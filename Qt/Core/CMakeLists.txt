@@ -284,6 +284,8 @@ ADD_LIBRARY(pqCore
   pqPropertyManager.h
   pqProxy.cxx
   pqProxy.h
+  pqProxyModifiedStateUndoElement.cxx
+  pqProxyModifiedStateUndoElement.h
   pqQVTKWidget.cxx
   pqQVTKWidgetEventPlayer.cxx
   pqQVTKWidgetEventPlayer.h
@@ -386,8 +388,6 @@ ADD_LIBRARY(pqCore
 #  pqHelperProxyRegisterUndoElement.cxx
 #  pqHelperProxyRegisterUndoElement.h
 #
-#  pqProxyModifiedStateUndoElement.cxx
-#  pqProxyModifiedStateUndoElement.h
 #  pqProxyUnRegisterUndoElement.cxx
 #  pqProxyUnRegisterUndoElement.h
 ##  pqScatterPlotRepresentation.cxx

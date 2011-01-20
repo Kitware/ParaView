@@ -71,6 +71,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPropertyManager.h"
 #include "pqProxyModifiedStateUndoElement.h"
 #include "pqSelectThroughPanel.h"
+#include "pqServer.h"
 #include "pqServerManagerModel.h"
 #include "pqServerManagerObserver.h"
 #include "pqSettings.h"
@@ -523,13 +524,12 @@ void pqObjectInspectorWidget::accept()
     if (source)
       {
       this->show(source);
-#ifdef FIXME_COLLABORATION
       pqProxyModifiedStateUndoElement* elem =
         pqProxyModifiedStateUndoElement::New();
+      elem->SetSession(source->getServer()->session());
       elem->MadeUnmodified(source);
       ADD_UNDO_ELEM(elem);
       elem->Delete();
-#endif
       }
     }
 
