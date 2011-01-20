@@ -111,6 +111,11 @@ public:
   //restart at the lowest resolution.
   void RestartRefinement();
 
+  // Description:
+  //When an actor or representation containing this harness is not visible
+  //the driver checks this to ignore this harness entirely.
+  vtkSetMacro(Enabled, bool);
+  vtkGetMacro(Enabled, bool);
 protected:
   vtkStreamingHarness();
   ~vtkStreamingHarness();
@@ -142,6 +147,8 @@ protected:
   vtkPieceCacheFilter *CacheFilter;
 
   int LockRefinement;
+  bool Enabled;
+
 private:
   vtkStreamingHarness(const vtkStreamingHarness&);  // Not implemented.
   void operator=(const vtkStreamingHarness&);  // Not implemented.

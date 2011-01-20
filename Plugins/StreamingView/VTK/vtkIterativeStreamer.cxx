@@ -120,6 +120,10 @@ void vtkIterativeStreamer::PrepareFirstPass()
     vtkStreamingHarness *harness = vtkStreamingHarness::SafeDownCast
       (iter->GetCurrentObject());
     iter->GoToNextItem();
+    if (!harness->GetEnabled())
+      {
+      continue;
+      }
     harness->SetPiece(0);
     }
   iter->Delete();
@@ -142,6 +146,10 @@ void vtkIterativeStreamer::PrepareNextPass()
     vtkStreamingHarness *harness = vtkStreamingHarness::SafeDownCast
       (iter->GetCurrentObject());
     iter->GoToNextItem();
+    if (!harness->GetEnabled())
+      {
+      continue;
+      }
     int maxPiece = harness->GetNumberOfPieces();
     if (this->LastPass < maxPiece)
       {
@@ -212,6 +220,10 @@ bool vtkIterativeStreamer::IsEveryoneDone()
     vtkStreamingHarness *harness = vtkStreamingHarness::SafeDownCast
       (iter->GetCurrentObject());
     iter->GoToNextItem();
+    if (!harness->GetEnabled())
+      {
+      continue;
+      }
     int maxPiece = harness->GetNumberOfPieces();
     if (this->LastPass < maxPiece)
       {
@@ -297,6 +309,10 @@ void vtkIterativeStreamer::SetNumberOfPasses(int nv)
       vtkStreamingHarness *harness = vtkStreamingHarness::SafeDownCast
         (iter->GetCurrentObject());
       iter->GoToNextItem();
+      if (!harness->GetEnabled())
+        {
+        continue;
+        }
       harness->SetNumberOfPieces(nv);
       }
     iter->Delete();

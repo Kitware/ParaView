@@ -92,8 +92,13 @@ public:
   vtkGetObjectMacro(Harness, vtkStreamingHarness);
 
   // Description:
-  // Overridded to make sure that the upstream filters flow when we do
+  // Overridden to make sure that the upstream filters flow when we do
   void MarkModified();
+
+  // Desctiption:
+  // Overridden to take the streaming harness out of consideration when the rep is
+  // not shown.
+  virtual void SetVisibility(bool val);
 
 //BTX
 protected:

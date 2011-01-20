@@ -122,6 +122,10 @@ void vtkMultiResolutionStreamer::PrepareFirstPass()
     vtkStreamingHarness *harness = vtkStreamingHarness::SafeDownCast
       (iter->GetCurrentObject());
     iter->GoToNextItem();
+    if (!harness->GetEnabled())
+      {
+      continue;
+      }
 
     vtkPieceList *ToDo = harness->GetPieceList1();
     if (!ToDo)
@@ -584,6 +588,10 @@ void vtkMultiResolutionStreamer::ChooseNextPieces()
     vtkStreamingHarness *harness = vtkStreamingHarness::SafeDownCast
       (iter->GetCurrentObject());
     iter->GoToNextItem();
+    if (!harness->GetEnabled())
+      {
+      continue;
+      }
 
     vtkPieceList *ToDo = harness->GetPieceList1();
     vtkPieceList *NextFrame = harness->GetPieceList2();
@@ -690,6 +698,10 @@ bool vtkMultiResolutionStreamer::IsCompletelyDone()
     vtkStreamingHarness *harness = vtkStreamingHarness::SafeDownCast
       (iter->GetCurrentObject());
     iter->GoToNextItem();
+    if (!harness->GetEnabled())
+      {
+      continue;
+      }
 
     vtkPieceList *ToDo = harness->GetPieceList1();
     if (ToDo && ToDo->GetNumberNonZeroPriority() > 0)
@@ -726,6 +738,10 @@ bool vtkMultiResolutionStreamer::IsWendDone()
     vtkStreamingHarness *harness = vtkStreamingHarness::SafeDownCast
       (iter->GetCurrentObject());
     iter->GoToNextItem();
+    if (!harness->GetEnabled())
+      {
+      continue;
+      }
 
     //check if anyone hasn't reached the end of the visible domain
     vtkPieceList *ToDo = harness->GetPieceList1();
