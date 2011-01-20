@@ -92,7 +92,7 @@ public:
 
   // Description:
   // For internal use, window events call back here.
-  virtual void StartRenderEvent() = 0;
+  virtual void StartRenderEvent(bool forceRestart=false) = 0;
   virtual void EndRenderEvent() = 0;
 
 protected:

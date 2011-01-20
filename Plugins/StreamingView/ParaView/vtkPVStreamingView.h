@@ -116,6 +116,7 @@ protected:
   vtkStreamingDriver *StreamDriver;
 
   double RunningBounds[6];
+  bool LastRenderWasStill;
 
 private:
   vtkPVStreamingView(const vtkPVStreamingView&); // Not implemented

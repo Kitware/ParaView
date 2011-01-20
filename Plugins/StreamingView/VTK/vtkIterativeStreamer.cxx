@@ -161,16 +161,32 @@ void vtkIterativeStreamer::PrepareNextPass()
 }
 
 //----------------------------------------------------------------------------
-void vtkIterativeStreamer::StartRenderEvent()
+void vtkIterativeStreamer::StartRenderEvent(bool forceRestart)
 {
   DEBUGPRINT_PASSES(cerr << "SRE" << endl;);
-  bool firstPass = this->IsFirstPass();
+  bool firstPass = this->IsFirstPass() || forceRestart;
   if (this->GetParallelHelper())
     {
     this->GetParallelHelper()->Reduce(firstPass);
     }
   if (firstPass)
     {
+    //show whatever we partially drew before the camera moved
+    this->CopyBackBufferToFront();
+
+    //start off initial pass by clearing the screen
+    vtkRenderer *ren = this->GetRenderer();
+    vtkRenderWindow *rw = this->GetRenderWindow();
+    if (ren && rw)
+      {
+      ren->EraseOn();
+      rw->EraseOn();
+      if (!rw->GetNeverRendered())
+        {
+        rw->Frame();
+        }
+      }
+
     this->PrepareFirstPass();
     }
   else
@@ -220,25 +236,26 @@ void vtkIterativeStreamer::EndRenderEvent()
   //subsequent renders can not clear or they will erase what we just drew
   vtkRenderer *ren = this->GetRenderer();
   vtkRenderWindow *rw = this->GetRenderWindow();
-  if (ren && rw)
+  if (!ren || !rw)
     {
-    //ren->SetPreserveDepthBuffer(1);
-    ren->EraseOff();
-    rw->EraseOff();
+    return;
     }
 
-  bool everyoneDone = (this->IsEveryoneDone() || this->StopNow);
+  //don't clear the screen, keep adding to what we already drew
+  ren->EraseOff();
+  rw->EraseOff();
+
+  bool allDone = (this->IsEveryoneDone() || this->StopNow);
   if (this->GetParallelHelper())
     {
-    this->GetParallelHelper()->Reduce(everyoneDone);
+    this->GetParallelHelper()->Reduce(allDone);
     }
-  if (everyoneDone )
+  if (allDone)
     {
     DEBUGPRINT_PASSES(cerr << "ALLDONE SHOW" << endl;);
-
     this->StopNow = false;
+    //we just drew the last frame, everyone has to start over next time
     this->StartOver = true;
-
     //we also need to bring back buffer forward to show what we drew
     this->CopyBackBufferToFront();
     }
@@ -246,7 +263,7 @@ void vtkIterativeStreamer::EndRenderEvent()
     {
     if (this->DisplayFrequency == 1)
       {
-      DEBUGPRINT_PASSES(cerr << "ALLDONE SHOW ALL" << endl;);
+      DEBUGPRINT_PASSES(cerr << "SHOW ALL" << endl;);
       this->CopyBackBufferToFront();
       }
 

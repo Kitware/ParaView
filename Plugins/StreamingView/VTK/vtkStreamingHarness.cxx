@@ -172,10 +172,12 @@ int vtkStreamingHarness::RequestData
   vtkDataObject* input = inInfo->Get(vtkDataObject::DATA_OBJECT());
   vtkDataObject* output = outInfo->Get(vtkDataObject::DATA_OBJECT());
   output->ShallowCopy(input);
-  //cerr << "HARNESS(" << this <<") RD "
-  //     << this->Piece << "/"
-  //     << this->NumberOfPieces << "@"
-  //     << this->Resolution  << endl;
+/*
+    cerr << "HARNESS(" << this <<") RD "
+       << this->Piece << "/"
+       << this->NumberOfPieces << "@"
+       << this->Resolution  << endl;
+*/
   return 1;
 }
 

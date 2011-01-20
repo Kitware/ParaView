@@ -83,6 +83,7 @@ vtkPVStreamingView::vtkPVStreamingView()
   this->StreamDriver = NULL;
   this->IsDisplayDone = 1;
   vtkMath::UninitializeBounds(this->RunningBounds);
+  this->LastRenderWasStill = false;
 }
 
 //----------------------------------------------------------------------------
@@ -130,6 +131,9 @@ void vtkPVStreamingView::SetStreamDriver(vtkStreamingDriver *nd)
 //----------------------------------------------------------------------------
 void vtkPVStreamingView::Render(bool interactive, bool skip_rendering)
 {
+  bool changed = this->LastRenderWasStill != interactive;
+  this->LastRenderWasStill = interactive;
+
   //set flag that gui watches to schedule more renders,
   //assume we are done, and correct later if needed
   this->IsDisplayDone = 1;
@@ -141,7 +145,7 @@ void vtkPVStreamingView::Render(bool interactive, bool skip_rendering)
   if (this->StreamDriver)
     {
     //figure out what piece to show now
-    this->StreamDriver->StartRenderEvent();
+    this->StreamDriver->StartRenderEvent(changed);
 
     //be sure to update pipeline far enough to get it
     int num_reprs = this->GetNumberOfRepresentations();
