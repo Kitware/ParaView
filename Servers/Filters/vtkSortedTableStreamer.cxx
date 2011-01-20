@@ -66,7 +66,7 @@ class vtkSortedTableStreamer::InternalsBase
 {
 public:
   InternalsBase() {}
-  ~InternalsBase() {}
+  virtual ~InternalsBase() {}
 
   virtual void SetSelectedComponent(int newValue) = 0;
   virtual void InvalidateCache() = 0;
