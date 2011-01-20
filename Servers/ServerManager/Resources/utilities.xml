@@ -690,15 +690,51 @@
       <!-- End of AnimationCueBase -->
     </Proxy>
 
-    <!-- FIXME
-    <ComparativeAnimationCueProxy name="ComparativeAnimationCue" 
-      class="vtkAnimationCue"
-      base_proxygroup="animation" base_proxyname="AnimationCueBase">
+    <ComparativeAnimationCueProxy name="ComparativeAnimationCue"
+      class="vtkPVComparativeAnimationCue"
+      processes="client">
       <Documentation>
         Animation cue used by comparative views.
       </Documentation>
+
+      <IntVectorProperty name="AnimatedElement"
+        command="SetAnimatedElement"
+        number_of_elements="1"
+        default_values="0">
+      </IntVectorProperty>
+
+      <IntVectorProperty name="Enabled"
+        command="SetEnabled"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Enables this animation cue.
+        </Documentation>
+      </IntVectorProperty>
+
+      <ProxyProperty name="AnimatedProxy"
+        command="SetAnimatedProxy"
+        clean_command="RemoveAnimatedProxy"
+        argument_type="SMProxy">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+      </ProxyProperty>
+
+      <StringVectorProperty name="AnimatedPropertyName"
+        command="SetAnimatedPropertyName"
+        number_of_elements="1" >
+      </StringVectorProperty>
+
+      <StringVectorProperty name="AnimatedDomainName"
+        command="SetAnimatedDomainName"
+        number_of_elements="1">
+      </StringVectorProperty>
+
+      <!-- end of ComparativeAnimationCue -->
     </ComparativeAnimationCueProxy>
-    -->
 
     <Proxy name="KeyFrameAnimationCue"
       class="vtkPVKeyFrameAnimationCueForProxies"

@@ -19,11 +19,10 @@
 #include "vtkMemberFunctionCommand.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
+#include "vtkPVComparativeAnimationCue.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMCameraLink.h"
-#ifdef FIXME_COLLABORATION
 #include "vtkSMComparativeAnimationCueProxy.h"
-#endif
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMPropertyIterator.h"
 #include "vtkSMProxyLink.h"
@@ -175,11 +174,9 @@ public:
   typedef vtkstd::map<vtkSMRepresentationProxy*, RepresentationData> MapOfReprClones;
   MapOfReprClones RepresentationClones;
 
-#ifdef FIXME_COLLABORATION
   typedef vtkstd::vector<vtkSmartPointer<vtkSMComparativeAnimationCueProxy> >
     VectorOfCues;
   VectorOfCues Cues;
-#endif
 
   vtkSmartPointer<vtkSMProxyLink> ViewLink;
   vtkSmartPointer<vtkSMCameraLink> ViewCameraLink;
@@ -273,30 +270,26 @@ vtkPVComparativeView::~vtkPVComparativeView()
 //----------------------------------------------------------------------------
 void vtkPVComparativeView::AddCue(vtkSMComparativeAnimationCueProxy* cue)
 {
-#ifdef FIXME_COLLABORATION
   this->Internal->Cues.push_back(cue);
-  cue->AddObserver(vtkCommand::ModifiedEvent, this->MarkOutdatedObserver);
+  cue->GetCue()->AddObserver(vtkCommand::ModifiedEvent, this->MarkOutdatedObserver);
   this->MarkOutdated();
-#endif
 }
 
 //----------------------------------------------------------------------------
 void vtkPVComparativeView::RemoveCue(vtkSMComparativeAnimationCueProxy* cue)
 {
-#ifdef FIXME_COLLABORATION
   vtkInternal::VectorOfCues::iterator iter;
   for (iter = this->Internal->Cues.begin();
     iter != this->Internal->Cues.end(); ++iter)
     {
     if (iter->GetPointer() == cue)
       {
-      cue->RemoveObserver(this->MarkOutdatedObserver);
+      cue->GetCue()->RemoveObserver(this->MarkOutdatedObserver);
       this->Internal->Cues.erase(iter);
       this->MarkOutdated();
       break;
       }
     }
-#endif
 }
 
 //----------------------------------------------------------------------------
@@ -727,20 +720,18 @@ void vtkPVComparativeView::Update()
   // cout << "-------------" << endl;
 
   vtkSMComparativeAnimationCueProxy* timeCue = NULL;
-#ifdef FIXME_COLLABORATION
   // locate time cue.
   for (vtkInternal::VectorOfCues::iterator iter = this->Internal->Cues.begin();
     iter != this->Internal->Cues.end(); ++iter)
     {
     // for now, we are saying that the first cue that has no animatable  proxy
     // is for animating time.
-    if (iter->GetPointer()->GetAnimatedProxy() == NULL)
+    if (iter->GetPointer()->GetCue()->GetAnimatedProxy() == NULL)
       {
       timeCue = iter->GetPointer();
       break;
       }
     }
-#endif
 
   int index = 0;
   for (int y=0; y < this->Dimensions[1]; y++)
@@ -750,21 +741,18 @@ void vtkPVComparativeView::Update()
       int view_index = this->OverlayAllComparisons? 0 : index;
       vtkSMViewProxy* view = this->Internal->Views[view_index];
 
-#ifdef FIXME_COLLABORATION
       if (timeCue)
         {
-        double value = timeCue->GetValue(
+        double value = timeCue->GetCue()->GetValue(
           x, y, this->Dimensions[0], this->Dimensions[1]);
         vtkSMPropertyHelper(view,"ViewTime").Set(value);
         }
       else
-#endif
         {
         vtkSMPropertyHelper(view,"ViewTime").Set(this->ViewTime);
         }
       view->UpdateVTKObjects();
 
-#ifdef FIXME_COLLABORATION
       for (vtkInternal::VectorOfCues::iterator iter =
         this->Internal->Cues.begin();
         iter != this->Internal->Cues.end(); ++iter)
@@ -773,10 +761,9 @@ void vtkPVComparativeView::Update()
           {
           continue;
           }
-        iter->GetPointer()->UpdateAnimatedValue(
+        iter->GetPointer()->GetCue()->UpdateAnimatedValue(
           x, y, this->Dimensions[0], this->Dimensions[1]);
         }
-#endif
 
       // Make the view cache the current setup.
       this->UpdateAllRepresentations(x, y);

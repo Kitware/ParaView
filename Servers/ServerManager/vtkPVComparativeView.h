@@ -133,13 +133,10 @@ public:
   vtkSetVector2Macro(Spacing, int);
   vtkGetVector2Macro(Spacing, int);
 
-
-  //BTX
   // Description:
   // Add/Remove parameter cues.
   void AddCue(vtkSMComparativeAnimationCueProxy*);
   void RemoveCue(vtkSMComparativeAnimationCueProxy*);
-  //ETX
 
   // Description:
   // Get/Set the view time.

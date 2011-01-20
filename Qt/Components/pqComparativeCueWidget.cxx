@@ -36,9 +36,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqUndoStack.h"
 #include "vtkEventQtSlotConnect.h"
-#ifdef FIXME_COLLABORATION
+#include "vtkPVComparativeAnimationCue.h"
 #include "vtkSMComparativeAnimationCueProxy.h"
-#endif
 #include "vtkSMPropertyHelper.h"
 
 #include <vtkstd/vector>
@@ -103,7 +102,6 @@ pqComparativeCueWidget::~pqComparativeCueWidget()
 //-----------------------------------------------------------------------------
 void pqComparativeCueWidget::setCue(vtkSMProxy* _cue)
 {
-#ifdef FIXME_COLLABORATION
   if (this->Cue.GetPointer() == _cue)
     {
     return;
@@ -119,29 +117,23 @@ void pqComparativeCueWidget::setCue(vtkSMProxy* _cue)
     }
   this->updateGUI();
   this->setEnabled(this->Cue != NULL);
-#endif
 }
 
 //-----------------------------------------------------------------------------
 vtkSMComparativeAnimationCueProxy* pqComparativeCueWidget::cue() const
 {
-#ifdef FIXME_COLLABORATION
   return this->Cue;
-#endif
 }
 
 //-----------------------------------------------------------------------------
 bool pqComparativeCueWidget::acceptsMultipleValues() const
 {
-#ifdef FIXME_COLLABORATION
-  return (this->Cue && this->Cue->GetAnimatedElement() == -1);
-#endif
+  return (this->Cue && this->Cue->GetCue()->GetAnimatedElement() == -1);
 }
 
 //-----------------------------------------------------------------------------
 void pqComparativeCueWidget::updateGUI()
 {
-#ifdef FIXME_COLLABORATION
   pqLock lock(&this->InUpdateGUI, true);
 
   this->clear();
@@ -167,11 +159,12 @@ void pqComparativeCueWidget::updateGUI()
     }
   this->setHorizontalHeaderLabels(hlabels);
 
-  vtkSMComparativeAnimationCueProxy* acue = this->cue();
-  if (!acue)
+  vtkSMComparativeAnimationCueProxy* acueProxy = this->cue();
+  if (!acueProxy)
     {
     return;
     }
+  vtkPVComparativeAnimationCue* acue = acueProxy->GetCue();
 
   for (int colno=0; colno < cols; colno++)
     {
@@ -197,13 +190,11 @@ void pqComparativeCueWidget::updateGUI()
       this->setItem(rowno, colno, tableitem);
       }
     }
-#endif
 }
 
 //-----------------------------------------------------------------------------
 void pqComparativeCueWidget::onCellChanged(int rowno, int colno)
 {
-#ifdef FIXME_COLLABORATION
   if (this->InUpdateGUI)
     {
     return;
@@ -222,19 +213,18 @@ void pqComparativeCueWidget::onCellChanged(int rowno, int colno)
         *ptr = QVariant(part).toDouble();
         ptr++;
         }
-      this->cue()->UpdateValue(colno, rowno, newvalues,
+      this->cue()->GetCue()->UpdateValue(colno, rowno, newvalues,
         static_cast<unsigned int>(parts.size()));
       }
     }
   else
     {
     double item_data = QVariant(text).toDouble();
-    this->cue()->UpdateValue(colno, rowno, item_data);
+    this->cue()->GetCue()->UpdateValue(colno, rowno, item_data);
     }
   END_UNDO_SET();
 
   emit this->valuesChanged();
-#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -250,7 +240,6 @@ void pqComparativeCueWidget::mouseReleaseEvent(QMouseEvent* evt)
 //-----------------------------------------------------------------------------
 void pqComparativeCueWidget::editRange()
 {
-#ifdef FIXME_COLLABORATION
   QList<QTableWidgetSelectionRange> ranges = this->selectedRanges();
   if (ranges.size() != 1 ||
     (ranges[0].columnCount() <= 1 && 
@@ -296,18 +285,20 @@ void pqComparativeCueWidget::editRange()
 
   BEGIN_UNDO_SET("Update Parameter Values");
 
+  vtkPVComparativeAnimationCue* acue = this->cue()->GetCue();
+
   if (range.rowCount() == 1 &&
     range.columnCount() == this->size().width())
     {
     // user set an x-range.
-    this->cue()->UpdateXRange(range.topRow(), &minvalues[0], &maxvalues[0],
+    acue->UpdateXRange(range.topRow(), &minvalues[0], &maxvalues[0],
       numvalues);
     }
   else if (range.columnCount() == 1 &&
     range.rowCount() == this->size().height())
     {
     // user set a y-range.
-    this->cue()->UpdateYRange(range.leftColumn(), 
+    acue->UpdateYRange(range.leftColumn(),
       &minvalues[0], &maxvalues[0], numvalues);
     }
   else if (range.columnCount() == this->size().width() &&
@@ -318,20 +309,20 @@ void pqComparativeCueWidget::editRange()
       {
     case HORZ_FIRST:
       // user set a t-range.
-      this->cue()->UpdateWholeRange(&minvalues[0], &maxvalues[0], numvalues);
+      acue->UpdateWholeRange(&minvalues[0], &maxvalues[0], numvalues);
       break;
 
     case VERT_FIRST:
-      this->cue()->UpdateWholeRange(&minvalues[0], &maxvalues[0], numvalues,
+      acue->UpdateWholeRange(&minvalues[0], &maxvalues[0], numvalues,
         true);
       break;
 
     case HORZ_ONLY:
-      this->cue()->UpdateXRange(-1, &minvalues[0], &maxvalues[0], numvalues);
+      acue->UpdateXRange(-1, &minvalues[0], &maxvalues[0], numvalues);
       break;
 
     case VERT_ONLY:
-      this->cue()->UpdateYRange(-1, &minvalues[0], &maxvalues[0], numvalues);
+      acue->UpdateYRange(-1, &minvalues[0], &maxvalues[0], numvalues);
       break;
 
     default:
@@ -375,7 +366,7 @@ void pqComparativeCueWidget::editRange()
             }
           newvalues[cc] = minvalues[cc] + scale_factor * (maxvalues[cc] - minvalues[cc]);
           }
-        this->cue()->UpdateValue(xx, yy, &newvalues[0], numvalues);
+        acue->UpdateValue(xx, yy, &newvalues[0], numvalues);
         }
       }
     }
@@ -384,5 +375,4 @@ void pqComparativeCueWidget::editRange()
   emit this->valuesChanged();
 
   this->updateGUIOnIdle();
-#endif
 }

@@ -99,7 +99,8 @@ void vtkPVKeyFrameAnimationCueForProxies::SetAnimationValue(
 //----------------------------------------------------------------------------
 void vtkPVKeyFrameAnimationCueForProxies::EndUpdateAnimationValues()
 {
-  // FIXME: How can the keyframe tell the cue that the property needs to be
+  // FIXME_COLLABORATION:
+  // How can the keyframe tell the cue that the property needs to be
   // resized or not?
   //vtkSMVectorProperty * vp = vtkSMVectorProperty::SafeDownCast(property);
   //if(vp)

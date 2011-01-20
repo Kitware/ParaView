@@ -14,7 +14,8 @@
 =========================================================================*/
 // .NAME vtkPVKeyFrameAnimationCueForProxies
 // .SECTION Description
-//
+// vtkPVKeyFrameAnimationCueForProxies extends vtkPVKeyFrameAnimationCue to
+// update properties on proxies in SetAnimationValue().
 
 #ifndef __vtkPVKeyFrameAnimationCueForProxies_h
 #define __vtkPVKeyFrameAnimationCueForProxies_h
