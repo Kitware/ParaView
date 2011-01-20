@@ -93,8 +93,10 @@ public:
   ///   Typically used by "Save As..."
   /// ExistingFile: The name of a single existing file.
   ///   Typically used by "Open..."
+  ///   This mode allows the user to select a single file, or one time series group of files.
   /// ExistingFiles: The names of zero or more existing files.
   ///   Typically used by "Open..." when you want multiple file selection
+  ///   This mode allows the user to select multiples files, and multiple time series groups at the same time.
   /// Directory: The name of a directory.
   enum FileMode { AnyFile, ExistingFile, ExistingFiles, Directory };
 
