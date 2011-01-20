@@ -66,7 +66,7 @@ protected:
   vtkPrioritizedStreamer();
   ~vtkPrioritizedStreamer();
 
-  virtual void StartRenderEvent();
+  virtual void StartRenderEvent(bool forceRestar=false);
   virtual void EndRenderEvent();
 
   virtual void ResetEveryone();

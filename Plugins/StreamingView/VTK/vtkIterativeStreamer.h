@@ -54,7 +54,7 @@ protected:
 
   //Description:
   //Before each render, check and if needed do, initial pass setup
-  virtual void StartRenderEvent();
+  virtual void StartRenderEvent(bool forceRestart=false);
   //Description:
   //After each render advanced to next pass. If last pass do last pass work.
   virtual void EndRenderEvent();

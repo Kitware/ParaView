@@ -90,7 +90,7 @@ protected:
   vtkMultiResolutionStreamer();
   ~vtkMultiResolutionStreamer();
 
-  virtual void StartRenderEvent();
+  virtual void StartRenderEvent(bool forceRestart=false);
   virtual void EndRenderEvent();
 
   virtual bool IsWendDone();

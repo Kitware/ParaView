@@ -230,26 +230,22 @@ void vtkPrioritizedStreamer::AdvanceEveryone()
 }
 
 //----------------------------------------------------------------------------
-void vtkPrioritizedStreamer::StartRenderEvent()
+void vtkPrioritizedStreamer::StartRenderEvent(bool forceRestart)
 {
   DEBUGPRINT_PASSES
     (
      cerr << "SR " << this->Internal->DebugPass << endl;
      );
-
   vtkRenderer *ren = this->GetRenderer();
   vtkRenderWindow *rw = this->GetRenderWindow();
-  if (!ren || !rw)
-    {
-    return;
-    }
 
-  bool startOver = this->HasCameraMoved() || this->Internal->StartOver;
+  bool firstPass = this->HasCameraMoved() || this->Internal->StartOver ||
+    forceRestart;
   if (this->GetParallelHelper())
     {
-    this->GetParallelHelper()->Reduce(startOver);
+    this->GetParallelHelper()->Reduce(firstPass);
     }
-  if (startOver)
+  if (firstPass)
     {
     DEBUGPRINT_PASSES
       (
@@ -261,11 +257,14 @@ void vtkPrioritizedStreamer::StartRenderEvent()
     this->CopyBackBufferToFront();
 
     //start off initial pass by clearing the screen
-    ren->EraseOn();
-    rw->EraseOn();
-    if (!rw->GetNeverRendered())
+    if (ren && rw)
       {
-      rw->Frame();
+      ren->EraseOn();
+      rw->EraseOn();
+      if (!rw->GetNeverRendered())
+        {
+        rw->Frame();
+        }
       }
 
     //compute priority of subsequent passes
@@ -359,15 +358,10 @@ void vtkPrioritizedStreamer::EndRenderEvent()
     }
   if (allDone)
     {
+    DEBUGPRINT_PASSES(cerr << "ALLDONE SHOW" << endl;);
     this->Internal->StopNow = false;
-    DEBUGPRINT_PASSES
-      (
-       cerr << "ALL DONE" << endl;
-       );
-
     //we just drew the last frame, everyone has to start over next time
     this->Internal->StartOver = true;
-
     //bring back buffer forward to show what we drew
     this->CopyBackBufferToFront();
     }
@@ -375,10 +369,12 @@ void vtkPrioritizedStreamer::EndRenderEvent()
     {
     if (this->DisplayFrequency == 1)
       {
+      DEBUGPRINT_PASSES(cerr << "SHOW ALL" << endl;);
       this->CopyBackBufferToFront();
       }
 
     //we haven't finished yet so schedule the next pass
+    DEBUGPRINT_PASSES(cerr << "RENDER EVENTUALLY" << endl;);
     this->RenderEventually();
     }
 }

@@ -616,7 +616,7 @@ void vtkMultiResolutionStreamer::ChooseNextPieces()
 }
 
 //----------------------------------------------------------------------------
-void vtkMultiResolutionStreamer::StartRenderEvent()
+void vtkMultiResolutionStreamer::StartRenderEvent(bool forceRestart)
 {
   DEBUGPRINT_PASSES
     (
@@ -630,7 +630,8 @@ void vtkMultiResolutionStreamer::StartRenderEvent()
     return;
     }
 
-  this->Internal->CameraMoved = this->HasCameraMoved() || this->Internal->WendDone;
+  this->Internal->CameraMoved = this->HasCameraMoved() ||
+    this->Internal->WendDone || forceRestart;
   if (this->GetParallelHelper())
     {
     this->GetParallelHelper()->Reduce(this->Internal->CameraMoved);
