@@ -177,13 +177,9 @@ void pqFileChooserWidget::chooseFile()
     {
     dialog->setFileMode(pqFileDialog::Directory);
     }
-  else if (this->ForceSingleFile)
-    {
-    dialog->setFileMode(pqFileDialog::ExistingFile);
-    }
   else
     {
-    dialog->setFileMode(pqFileDialog::ExistingFiles);
+    dialog->setFileMode(pqFileDialog::ExistingFile);
     }
   if(QDialog::Accepted == dialog->exec())
     {
