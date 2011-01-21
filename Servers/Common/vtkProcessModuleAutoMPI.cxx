@@ -226,10 +226,16 @@ int vtkProcessModuleAutoMPIInternals::
     // Construct the Command line that will be executed
     vtksys_stl::vector<vtkstd::string> serverCommandStr;
     vtksys_stl::vector<const char*> serverCommand;
+
+#if defined(WIN32)
+    vtkstd::string serverExe =
+      vtkstd::string(this->ParaViewServer.c_str() + vtkstd::string(".exe")).c_str();
+#else
     const char* serverExe = this->ParaViewServer.c_str();
+#endif
 
     this->CreateCommandLine(serverCommandStr,
-                      serverExe,
+                      serverExe.c_str(),
                       this->MPIServerNumProcessFlag.c_str(),
                       port);
     vtkCopy(serverCommand, serverCommandStr);
