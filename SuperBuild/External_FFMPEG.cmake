@@ -7,7 +7,6 @@ set(ffmpeg_install "${CMAKE_CURRENT_BINARY_DIR}/FFMPEG-install")
 ExternalProject_Add(FFMPEG
   DOWNLOAD_DIR ${CMAKE_CURRENT_BINARY_DIR}
   SOURCE_DIR ${ffmpeg_source}
-  BINARY_DIR ${ffmpeg_binary}
   INSTALL_DIR ${ffmpeg_install}
   URL ${FFMPEG_URL}/${FFMPEG_GZ}
   URL_MD5 ${FFMPEG_MD5}

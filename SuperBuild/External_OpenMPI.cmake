@@ -28,7 +28,6 @@ else()
   ExternalProject_Add(OpenMPI
     DOWNLOAD_DIR ${CMAKE_CURRENT_BINARY_DIR}
     SOURCE_DIR ${OpenMPI_source}
-    BINARY_DIR ${OpenMPI_build}
     INSTALL_DIR ${OpenMPI_install}
     URL ${OPENMPI_URL}/${OPENMPI_GZ}
     URL_MD5 ${OPENMPI_MD5}
@@ -39,11 +38,10 @@ else()
 
 endif()
 
-set(OpenMPI_DIR "${OpenMPI_binary}" CACHE PATH "OpenMPI binary directory" FORCE)
 set(MPIEXEC ${OpenMPI_install}/bin/mpiexec${CMAKE_EXECUTABLE_SUFFIX})
 set(MPICC ${OpenMPI_install}/bin/mpicc${CMAKE_EXECUTABLE_SUFFIX})
 set(MPICXX ${OpenMPI_install}/bin/mpic++${CMAKE_EXECUTABLE_SUFFIX})
 set(MPI_INCLUDE_PATH ${OpenMPI_install}/include)
-set(MPI_LIBRARY ${OpenMPI_install}/lib/libmpi${CMAKE_LINK_LIBRARY_SUFFIX})
-set(MPI_EXTRA_LIBRARY ${OpenMPI_install}/lib/libmpi_cxx${CMAKE_LINK_LIBRARY_SUFFIX})
+set(MPI_LIBRARY ${OpenMPI_install}/lib/libmpi${_LINK_LIBRARY_SUFFIX})
+set(MPI_EXTRA_LIBRARY ${OpenMPI_install}/lib/libmpi_cxx${_LINK_LIBRARY_SUFFIX})
 mark_as_advanced(OpenMPI_DIR)
