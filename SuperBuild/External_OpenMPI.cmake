@@ -1,7 +1,7 @@
 
 # The OpenMPI external project for ParaView
 set(OpenMPI_source "${CMAKE_CURRENT_BINARY_DIR}/OpenMPI")
-set(OpenMPI_binary "${CMAKE_CURRENT_BINARY_DIR}/OpenMPI-build")
+set(OpenMPI_build "${CMAKE_CURRENT_BINARY_DIR}/OpenMPI-build")
 set(OpenMPI_install "${CMAKE_CURRENT_BINARY_DIR}/OpenMPI-install")
 
 # If Windows we use CMake otherwise ./configure
@@ -41,6 +41,8 @@ endif()
 
 set(OpenMPI_DIR "${OpenMPI_binary}" CACHE PATH "OpenMPI binary directory" FORCE)
 set(MPIEXEC ${OpenMPI_install}/bin/mpiexec${CMAKE_EXECUTABLE_SUFFIX})
+set(MPICC ${OpenMPI_install}/bin/mpicc${CMAKE_EXECUTABLE_SUFFIX})
+set(MPICXX ${OpenMPI_install}/bin/mpic++${CMAKE_EXECUTABLE_SUFFIX})
 set(MPI_INCLUDE_PATH ${OpenMPI_install}/include)
 set(MPI_LIBRARY ${OpenMPI_install}/lib/libmpi${CMAKE_LINK_LIBRARY_SUFFIX})
 set(MPI_EXTRA_LIBRARY ${OpenMPI_install}/lib/libmpi_cxx${CMAKE_LINK_LIBRARY_SUFFIX})
