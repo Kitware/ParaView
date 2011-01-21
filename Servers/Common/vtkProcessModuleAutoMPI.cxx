@@ -231,7 +231,7 @@ int vtkProcessModuleAutoMPIInternals::
     vtkstd::string serverExe =
       vtkstd::string(this->ParaViewServer.c_str() + vtkstd::string(".exe")).c_str();
 #else
-    const char* serverExe = this->ParaViewServer.c_str();
+    vtkstd::string serverExe = this->ParaViewServer;
 #endif
 
     this->CreateCommandLine(serverCommandStr,
