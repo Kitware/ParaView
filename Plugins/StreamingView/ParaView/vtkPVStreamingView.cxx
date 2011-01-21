@@ -145,7 +145,11 @@ void vtkPVStreamingView::Render(bool interactive, bool skip_rendering)
   if (this->StreamDriver)
     {
     //figure out what piece to show now
-    this->StreamDriver->StartRenderEvent(changed);
+    if (changed)
+      {
+      this->StreamDriver->RestartStreaming();
+      }
+    this->StreamDriver->StartRenderEvent();
 
     //be sure to update pipeline far enough to get it
     int num_reprs = this->GetNumberOfRepresentations();

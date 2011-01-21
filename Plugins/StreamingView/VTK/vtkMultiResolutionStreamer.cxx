@@ -95,6 +95,30 @@ void vtkMultiResolutionStreamer::AddHarnessInternal(vtkStreamingHarness *harness
 }
 
 //----------------------------------------------------------------------------
+bool vtkMultiResolutionStreamer::IsFirstPass()
+{
+  if (this->HasCameraMoved())
+    {
+    DEBUGPRINT_PASSES(cerr << "CAMMOVED" << endl;);
+    return true;
+    }
+
+  if (this->Internal->WendDone)
+    {
+    DEBUGPRINT_PASSES(cerr << "STARTOVER" << endl;);
+    return true;
+    }
+
+  vtkCollection *harnesses = this->GetHarnesses();
+  if (!harnesses)
+    {
+    return true;
+    }
+
+  return false;
+}
+
+//----------------------------------------------------------------------------
 void vtkMultiResolutionStreamer::PrepareFirstPass()
 {
   vtkCollection *harnesses = this->GetHarnesses();
@@ -624,7 +648,7 @@ void vtkMultiResolutionStreamer::PrepareNextPass()
 }
 
 //----------------------------------------------------------------------------
-void vtkMultiResolutionStreamer::StartRenderEvent(bool forceRestart)
+void vtkMultiResolutionStreamer::StartRenderEvent()
 {
   DEBUGPRINT_PASSES
     (
@@ -638,8 +662,7 @@ void vtkMultiResolutionStreamer::StartRenderEvent(bool forceRestart)
     return;
     }
 
-  this->Internal->CameraMoved = this->HasCameraMoved() ||
-    this->Internal->WendDone || forceRestart;
+  this->Internal->CameraMoved = this->IsFirstPass();
   if (this->GetParallelHelper())
     {
     this->GetParallelHelper()->Reduce(this->Internal->CameraMoved);
@@ -663,7 +686,7 @@ void vtkMultiResolutionStreamer::StartRenderEvent(bool forceRestart)
       rw->Frame();
       }
 
-    //compute priority of subsequent passes
+    //compute priority of subsequent set of passes
     //set pipeline to show the most important one this pass
     this->PrepareFirstPass();
     }
@@ -784,16 +807,10 @@ void vtkMultiResolutionStreamer::EndRenderEvent()
     }
   if (allDone)
     {
+    DEBUGPRINT_PASSES(cerr << "ALL DONE" << endl;);
     this->Internal->StopNow = false;
-
-    DEBUGPRINT_PASSES
-      (
-       cerr << "ALL DONE" << endl;
-       );
-
     //next pass should start with clear screen
     this->Internal->WendDone = true;
-
     //bring back buffer forward to show what we drew
     this->CopyBackBufferToFront();
     }
@@ -806,16 +823,12 @@ void vtkMultiResolutionStreamer::EndRenderEvent()
       }
     if (wendDone)
       {
-      DEBUGPRINT_PASSES
-        (
-         cerr << "WEND DONE" << endl;
-         );
-
+      DEBUGPRINT_PASSES(cerr << "WEND DONE" << endl;);
       //next pass should start with clear screen
       this->Internal->WendDone = true;
       }
 
-    if (this->DisplayFrequency == 1)
+    if (wendDone || this->DisplayFrequency==1)
       {
       this->CopyBackBufferToFront();
       }
@@ -823,6 +836,12 @@ void vtkMultiResolutionStreamer::EndRenderEvent()
     //there is more to draw, so keep going
     this->RenderEventually();
     }
+}
+
+//------------------------------------------------------------------------------
+void vtkMultiResolutionStreamer::RestartStreaming()
+{
+  this->Internal->WendDone = true;
 }
 
 //------------------------------------------------------------------------------

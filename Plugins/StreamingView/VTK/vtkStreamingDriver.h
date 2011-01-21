@@ -87,12 +87,16 @@ public:
   vtkGetMacro(CacheSize, int);
 
   //Description:
+  //A command to restart streaming on next render.
+  virtual void RestartStreaming() = 0;
+
+  //Description:
   //A command to halt streaming as soon as possible.
   virtual void StopStreaming() = 0;
 
   // Description:
   // For internal use, window events call back here.
-  virtual void StartRenderEvent(bool forceRestart=false) = 0;
+  virtual void StartRenderEvent() = 0;
   virtual void EndRenderEvent() = 0;
 
 protected:

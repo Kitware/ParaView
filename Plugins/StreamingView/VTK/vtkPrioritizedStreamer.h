@@ -25,13 +25,16 @@
 
 #include "vtkStreamingDriver.h"
 
-
 class VTK_EXPORT vtkPrioritizedStreamer : public vtkStreamingDriver
 {
 public:
   vtkTypeMacro(vtkPrioritizedStreamer,vtkStreamingDriver);
   void PrintSelf(ostream& os, vtkIndent indent);
   static vtkPrioritizedStreamer *New();
+
+  //Description:
+  //A command to restart streaming on next render.
+  void RestartStreaming();
 
   //Description:
   //A command to halt streaming as soon as possible.
@@ -66,23 +69,24 @@ protected:
   vtkPrioritizedStreamer();
   ~vtkPrioritizedStreamer();
 
-  virtual void StartRenderEvent(bool forceRestar=false);
+  virtual void StartRenderEvent();
   virtual void EndRenderEvent();
-
-  bool IsFirstPass();
-  bool IsEveryoneDone();
 
   // Description:
   // Overridden to set up initial number of passes.
   virtual void AddHarnessInternal(vtkStreamingHarness *);
 
-  virtual void PrepareFirstPass();
-  virtual void PrepareNextPass();
+  bool IsFirstPass();
+  bool IsEveryoneDone();
+
+  void PrepareFirstPass();
+  void PrepareNextPass();
 
   int NumberOfPasses;
   int LastPass;
   int PipelinePrioritization;
   int ViewPrioritization;
+
 private:
   vtkPrioritizedStreamer(const vtkPrioritizedStreamer&);  // Not implemented.
   void operator=(const vtkPrioritizedStreamer&);  // Not implemented.

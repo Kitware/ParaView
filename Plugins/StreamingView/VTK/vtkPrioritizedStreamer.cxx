@@ -263,7 +263,7 @@ void vtkPrioritizedStreamer::PrepareNextPass()
 }
 
 //----------------------------------------------------------------------------
-void vtkPrioritizedStreamer::StartRenderEvent(bool forceRestart)
+void vtkPrioritizedStreamer::StartRenderEvent()
 {
   DEBUGPRINT_PASSES
     (
@@ -272,7 +272,7 @@ void vtkPrioritizedStreamer::StartRenderEvent(bool forceRestart)
   vtkRenderer *ren = this->GetRenderer();
   vtkRenderWindow *rw = this->GetRenderWindow();
 
-  bool firstPass = this->IsFirstPass() || forceRestart;
+  bool firstPass = this->IsFirstPass();
   if (this->GetParallelHelper())
     {
     this->GetParallelHelper()->Reduce(firstPass);
@@ -413,6 +413,12 @@ void vtkPrioritizedStreamer::EndRenderEvent()
     DEBUGPRINT_PASSES(cerr << "RENDER EVENTUALLY" << endl;);
     this->RenderEventually();
     }
+}
+
+//------------------------------------------------------------------------------
+void vtkPrioritizedStreamer::RestartStreaming()
+{
+  this->Internal->StartOver = true;
 }
 
 //------------------------------------------------------------------------------

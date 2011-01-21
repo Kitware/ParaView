@@ -149,13 +149,13 @@ void vtkIterativeStreamer::PrepareNextPass()
 }
 
 //----------------------------------------------------------------------------
-void vtkIterativeStreamer::StartRenderEvent(bool forceRestart)
+void vtkIterativeStreamer::StartRenderEvent()
 {
   vtkRenderer *ren = this->GetRenderer();
   vtkRenderWindow *rw = this->GetRenderWindow();
 
   DEBUGPRINT_PASSES(cerr << "SRE" << endl;);
-  bool firstPass = this->IsFirstPass() || forceRestart;
+  bool firstPass = this->IsFirstPass();
   if (this->GetParallelHelper())
     {
     this->GetParallelHelper()->Reduce(firstPass);
@@ -247,7 +247,7 @@ void vtkIterativeStreamer::EndRenderEvent()
   ren->EraseOff();
   rw->EraseOff();
 
-  bool allDone = (this->IsEveryoneDone() || this->StopNow);
+  bool allDone = this->IsEveryoneDone() || this->StopNow;
   if (this->GetParallelHelper())
     {
     this->GetParallelHelper()->Reduce(allDone);
@@ -273,6 +273,12 @@ void vtkIterativeStreamer::EndRenderEvent()
     DEBUGPRINT_PASSES(cerr << "RENDER EVENTUALLY" << endl;);
     this->RenderEventually();
     }
+}
+
+//------------------------------------------------------------------------------
+void vtkIterativeStreamer::RestartStreaming()
+{
+  this->StartOver = true;
 }
 
 //------------------------------------------------------------------------------

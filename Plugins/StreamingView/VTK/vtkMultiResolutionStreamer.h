@@ -35,6 +35,10 @@ public:
   static vtkMultiResolutionStreamer *New();
 
   //Description:
+  //A command to restart streaming on next render.
+  void RestartStreaming();
+
+  //Description:
   //A command to halt streaming as soon as possible.
   void StopStreaming();
 
@@ -90,21 +94,22 @@ protected:
   vtkMultiResolutionStreamer();
   ~vtkMultiResolutionStreamer();
 
-  virtual void StartRenderEvent(bool forceRestart=false);
+  virtual void StartRenderEvent();
   virtual void EndRenderEvent();
-
-  virtual bool IsWendDone();
-  virtual bool IsCompletelyDone();
-
-  virtual void PrepareFirstPass();
-  virtual void PrepareNextPass();
-  virtual int Refine(vtkStreamingHarness *);
-  virtual int Coarsen(vtkStreamingHarness *);
-  virtual void Reap(vtkStreamingHarness *);
 
   // Description:
   // Overridden to set up initial number of passes.
   virtual void AddHarnessInternal(vtkStreamingHarness *);
+
+  bool IsFirstPass();
+  bool IsWendDone();
+  bool IsCompletelyDone();
+
+  void PrepareFirstPass();
+  void PrepareNextPass();
+  int Refine(vtkStreamingHarness *);
+  int Coarsen(vtkStreamingHarness *);
+  void Reap(vtkStreamingHarness *);
 
   enum {COARSEN, STAY, ADVANCE};
 

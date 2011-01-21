@@ -32,6 +32,10 @@ public:
   static vtkIterativeStreamer *New();
 
   //Description:
+  //A command to restart streaming on next render.
+  void RestartStreaming();
+
+  //Description:
   //A command to halt streaming as soon as possible.
   void StopStreaming();
 
@@ -54,7 +58,7 @@ protected:
 
   //Description:
   //Before each render, check and if needed do, initial pass setup
-  virtual void StartRenderEvent(bool forceRestart=false);
+  virtual void StartRenderEvent();
   //Description:
   //After each render advanced to next pass. If last pass do last pass work.
   virtual void EndRenderEvent();
@@ -73,6 +77,7 @@ protected:
   int NumberOfPasses;
   int LastPass;
   bool StopNow;
+
 private:
   vtkIterativeStreamer(const vtkIterativeStreamer&);  // Not implemented.
   void operator=(const vtkIterativeStreamer&);  // Not implemented.
