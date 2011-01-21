@@ -457,6 +457,15 @@ public:
   // The User MUST delete the provided proxy otherwise it will live forever
   virtual vtkSMProxy* NewProxy(const vtkSMMessage* msg);
 
+  // Description:
+  // Re-New a proxy based on its ID and its previous state.
+  // This means that it will create a new vtkSMProxy or will
+  // return NULL if that one already exist.
+  //
+  // WARNING:
+  // - It is at the responsability at the caller to delete the proxy.
+  virtual vtkSMProxy* ReNewProxy(vtkTypeUInt32 globalId);
+
 protected:
   vtkSMProxyManager();
   ~vtkSMProxyManager();

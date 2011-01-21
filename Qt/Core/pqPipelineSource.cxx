@@ -383,7 +383,6 @@ void pqPipelineSource::setDefaultPropertyValues()
 
   this->createAnimationHelpersIfNeeded();
 
-#ifdef FIXME_COLLABORATION
   // This is sort-of-a-hack to ensure that when this operation is undo, all the
   // helper proxies are discovered correctly. This needs to happen only after
   // all helper proxies have been created.
@@ -392,7 +391,6 @@ void pqPipelineSource::setDefaultPropertyValues()
   elem->RegisterHelperProxies(this);
   ADD_UNDO_ELEM(elem);
   elem->Delete();
-#endif
 }
 
 //-----------------------------------------------------------------------------

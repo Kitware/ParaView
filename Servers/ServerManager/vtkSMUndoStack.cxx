@@ -93,6 +93,13 @@ vtkSMUndoStack::~vtkSMUndoStack()
 //  this->Observer->Delete();
 }
 
+
+
+void vtkSMUndoStack::Push(const char* label, vtkUndoSet* changeSet)
+{
+  this->Superclass::Push(label, changeSet);
+}
+
 //-----------------------------------------------------------------------------
 //void vtkSMUndoStack::Push(const char* label, vtkUndoSet* set)
 //{
@@ -255,7 +262,10 @@ void vtkSMUndoStack::FillWithRemoteObjects( vtkUndoSet *undoSet,
     {
     vtkSMUndoElement* elem =
         vtkSMUndoElement::SafeDownCast(undoSet->GetElement(cc));
-    sessions.insert(elem->GetSession());
+    if(elem->GetSession())
+      {
+      sessions.insert(elem->GetSession());
+      }
     }
   vtkstd::set<vtkSmartPointer<vtkSMSession> >::iterator iter = sessions.begin();
   while(iter != sessions.end())

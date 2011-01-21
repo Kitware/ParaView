@@ -62,8 +62,12 @@ int vtkSMRemoteObjectUpdateUndoElement::UpdateState(const vtkSMMessage* state)
     // Creation or update
     vtkSMRemoteObject* remoteObj =
         this->Session->GetRemoteObject(state->global_id());
+
     if(remoteObj)
       {
+      // This prevent in-between object to be accenditaly removed
+      this->Session->GetAllRemoteObjects(this->UndoSetWorkingContext);
+
       // Update
       remoteObj->LoadState(state);
       return 1; // OK

@@ -45,7 +45,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyLocator.h"
+#include "vtkSMProxyManager.h"
 #include "vtkSMUtilities.h"
+#include "vtkSMSession.h"
 
 // Qt includes.
 #include <QAction>
@@ -69,9 +71,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // ParaView includes.
 #include "pqActiveObjects.h"
 #include "pqApplicationCore.h"
-#ifdef FIXME_COLLABORATION
 #include "pqCloseViewUndoElement.h"
-#endif
 #include "pqComparativeRenderView.h"
 #include "pqEventDispatcher.h"
 #include "pqImageUtil.h"
@@ -81,9 +81,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqInterfaceTracker.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
-#ifdef FIXME_COLLABORATION
 #include "pqSplitViewUndoElement.h"
-#endif
 #include "pqUndoStack.h"
 #include "pqViewFrameActionGroupInterface.h"
 #include "pqViewModuleInterface.h"
@@ -203,7 +201,7 @@ pqViewManager::pqViewManager(QWidget* _parent/*=null*/)
   core->registerManager("MULTIVIEW_MANAGER", this);
   QObject::connect(core,
     SIGNAL(stateLoaded(vtkPVXMLElement*, vtkSMProxyLocator*)),
-    this, SLOT(loadState(vtkPVXMLElement*, vtkSMProxyLocator*)));
+    this, SLOT(loadState(vtkPVXMLElement*)));
   QObject::connect(core,
     SIGNAL(stateSaved(vtkPVXMLElement*)),
     this, SLOT(saveState(vtkPVXMLElement*)));
@@ -412,15 +410,12 @@ void pqViewManager::onFrameRemovedInternal(pqMultiViewFrame* frame)
 void pqViewManager::onFrameRemoved(pqMultiViewFrame* frame)
 {
   this->onFrameRemovedInternal(frame);
-#ifdef FIXME_COLLABORATION
   if (this->Internal->CloseFrameUndoElement)
     {
     ADD_UNDO_ELEM(this->Internal->CloseFrameUndoElement);
     this->Internal->CloseFrameUndoElement = 0;
     END_UNDO_SET();
     }
-#endif
-
   // Now activate some frame, so that we have an active view.
   if (this->Internal->Frames.size() > 0)
     {
@@ -442,7 +437,6 @@ void pqViewManager::onPreFrameRemoved(pqMultiViewFrame* frame)
 {
   BEGIN_UNDO_SET("Close View");
 
-#ifdef FIXME_COLLABORATION
   vtkPVXMLElement* state = vtkPVXMLElement::New();
   this->saveState(state);
 
@@ -452,7 +446,6 @@ void pqViewManager::onPreFrameRemoved(pqMultiViewFrame* frame)
   this->Internal->CloseFrameUndoElement = elem;
   elem->Delete();
   state->Delete();
-#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -569,7 +562,6 @@ void pqViewManager::assignFrame(pqView* view)
     {
     // Create a new frame.
 
-#ifdef FIXME_COLLABORATION
     pqUndoStack* undoStack = pqApplicationCore::instance()->getUndoStack();
     if (undoStack && (undoStack->getInUndo() ||
       undoStack->getInRedo()))
@@ -580,7 +572,6 @@ void pqViewManager::assignFrame(pqView* view)
       this->Internal->PendingViews.push_back(view);
       return;
       }
-#endif
 
     // Locate frame to split.
     // If there is an active view, use it.
@@ -881,18 +872,17 @@ void pqViewManager::saveState(vtkPVXMLElement* root)
 }
 
 //-----------------------------------------------------------------------------
-bool pqViewManager::loadState(vtkPVXMLElement* rwRoot,
-  vtkSMProxyLocator* locator)
+void pqViewManager::loadState(vtkPVXMLElement* rwRoot)
 {
   if (!rwRoot || !rwRoot->GetName())
     {
     // qDebug() << "Argument must be <ViewManager /> element.";
-    return false;
+    return; // false;
     }
   if (strcmp(rwRoot->GetName(), "ViewManager") != 0)
     {
-    return this->loadState(rwRoot->FindNestedElementByName("ViewManager"),
-      locator);
+    this->loadState(rwRoot->FindNestedElementByName("ViewManager"));
+    return;
     }
 
   // When state is loaded by the server manager,
@@ -922,6 +912,7 @@ bool pqViewManager::loadState(vtkPVXMLElement* rwRoot,
   this->Internal->DontCreateDeleteViewsModules = false;
 
   this->Internal->Frames.clear();
+  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
   for(unsigned int cc=0; cc < rwRoot->GetNumberOfNestedElements(); cc++)
     {
     vtkPVXMLElement* elem = rwRoot->GetNestedElement(cc);
@@ -934,11 +925,19 @@ bool pqViewManager::loadState(vtkPVXMLElement* rwRoot,
       int id = 0;
       elem->GetScalarAttribute("view_module", &id);
       vtkSmartPointer<vtkSMProxy> viewModule;
-      viewModule = locator->LocateProxy(id);
+
+      viewModule =
+          vtkSMProxy::SafeDownCast(
+              pqActiveObjects::instance().activeServer()->session()->
+              GetRemoteObject(id));
+      if(!viewModule.GetPointer())
+        {
+        viewModule.TakeReference(pxm->ReNewProxy(id));
+        }
       if (!viewModule.GetPointer())
         {
         qCritical() << "Failed to locate view module mentioned in state!";
-        return false;
+        return; // false;
         }
 
       pqView* view = pqApplicationCore::instance()->getServerManagerModel()->
@@ -974,7 +973,7 @@ bool pqViewManager::loadState(vtkPVXMLElement* rwRoot,
       }
     }
 
-  return true;
+  //return true;
 }
 
 //-----------------------------------------------------------------------------
@@ -1095,12 +1094,10 @@ void pqViewManager::onSplittingView(const Index& index,
   Qt::Orientation orientation, float fraction, const Index& childIndex)
 {
   BEGIN_UNDO_SET("Split View");
-#ifdef FIXME_COLLABORATION
   pqSplitViewUndoElement* elem = pqSplitViewUndoElement::New();
   elem->SplitView(index, orientation, fraction, childIndex);
   ADD_UNDO_ELEM(elem);
   elem->Delete();
-#endif
 
   END_UNDO_SET();
 }

@@ -362,6 +362,14 @@ public:
   // unchanged.
   virtual int LoadXMLState(vtkPVXMLElement* element, vtkSMProxyLocator* locator);
 
+  // Description:
+  // Allow user to set the remote object to be discard for Undo/Redo
+  // action. By default, any remote object is Undoable.
+  // This override the RemoteObject ones to propagate the flag to the sub-proxy
+  virtual void PrototypeOn();
+  virtual void PrototypeOff();
+  virtual void SetPrototype(bool undo);
+
 //BTX
 
   // Description:

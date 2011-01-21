@@ -40,17 +40,22 @@ vtkStandardNewMacro(pqSplitViewUndoElement);
 //-----------------------------------------------------------------------------
 pqSplitViewUndoElement::pqSplitViewUndoElement()
 {
+  this->Index = NULL;
+  this->ChildIndex = NULL;
+  this->SetSession(NULL);
 }
 
 //-----------------------------------------------------------------------------
 pqSplitViewUndoElement::~pqSplitViewUndoElement()
 {
+  this->SetIndex(NULL);
+  this->SetChildIndex(NULL);
 }
 
 //-----------------------------------------------------------------------------
 int pqSplitViewUndoElement::Redo()
 {
-  if (!this->XMLElement)
+  if (!this->Index)
     {
     vtkErrorMacro("Invalid state.");
     return 0;
@@ -62,7 +67,7 @@ int pqSplitViewUndoElement::Redo()
 //-----------------------------------------------------------------------------
 int pqSplitViewUndoElement::Undo()
 {
-  if (!this->XMLElement)
+  if (!this->ChildIndex)
     {
     vtkErrorMacro("Invalid state.");
     return 0;
@@ -75,13 +80,7 @@ int pqSplitViewUndoElement::Undo()
 int pqSplitViewUndoElement::RedoInternal()
 {
   pqMultiView::Index index;
-  index.setFromString(this->XMLElement->GetAttribute("index"));
-
-  int orientation;
-  this->XMLElement->GetScalarAttribute("orientation", &orientation);
-
-  double percent;
-  this->XMLElement->GetScalarAttribute("percent", &percent);
+  index.setFromString(this->Index);
 
   pqMultiView* manager = qobject_cast<pqMultiView*>(
     pqApplicationCore::instance()->manager("MULTIVIEW_MANAGER"));
@@ -93,9 +92,9 @@ int pqSplitViewUndoElement::RedoInternal()
     }
 
   manager->splitWidget(
-    manager->widgetOfIndex(index), 
-    (orientation==0x01)? Qt::Horizontal : Qt::Vertical, 
-    (float)percent);
+      manager->widgetOfIndex(index),
+      (this->Orientation==0x01)? Qt::Horizontal : Qt::Vertical,
+      this->Percent);
   return 1;
 }
 
@@ -103,7 +102,7 @@ int pqSplitViewUndoElement::RedoInternal()
 int pqSplitViewUndoElement::UndoInternal()
 {
   pqMultiView::Index index;
-  index.setFromString(this->XMLElement->GetAttribute("child_index"));
+  index.setFromString(this->ChildIndex);
 
   pqMultiView* manager = qobject_cast<pqMultiView*>(
     pqApplicationCore::instance()->manager("MULTIVIEW_MANAGER"));
@@ -119,26 +118,14 @@ int pqSplitViewUndoElement::UndoInternal()
 }
 
 //-----------------------------------------------------------------------------
-bool pqSplitViewUndoElement::CanLoadState(vtkPVXMLElement* elem)
-{
-  return (elem && elem->GetName() && strcmp(elem->GetName(), "SplitView") == 0);
-}
-
-//-----------------------------------------------------------------------------
 void pqSplitViewUndoElement::SplitView(
   const pqMultiView::Index& index, Qt::Orientation orientation, float percent,
   const pqMultiView::Index& childIndex)
 {
-  vtkPVXMLElement* elem = vtkPVXMLElement::New();
-  elem->SetName("SplitView");
-
-  elem->AddAttribute("index", index.getString().toAscii().data());
-  elem->AddAttribute("child_index", childIndex.getString().toAscii().data());
-  elem->AddAttribute("orientation", orientation);
-  elem->AddAttribute("percent", static_cast<double>(percent));
-
-  this->SetXMLElement(elem);
-  elem->Delete();
+  this->SetIndex(index.getString().toAscii().data());
+  this->SetChildIndex(childIndex.getString().toAscii().data());
+  this->Orientation = orientation;
+  this->Percent = percent;
 }
 
 //-----------------------------------------------------------------------------

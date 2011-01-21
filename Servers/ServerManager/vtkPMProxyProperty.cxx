@@ -40,11 +40,16 @@ public:
   //--------------------------------------------------------------------------
   void SetVariant(const Variant *variant)
     {
+    this->NumberOfDependancyToDelete = this->Dependancy.size();
     this->VariantSet.clear();
     for (int cc=0; cc < variant->proxy_global_id_size(); cc++)
       {
       this->VariantSet.insert( variant->proxy_global_id(cc) );
-      this->Dependancy.push_back(this->Parent->GetPMObject(variant->proxy_global_id(cc)));
+      vtkPMObject* obj = this->Parent->GetPMObject(variant->proxy_global_id(cc));
+      if(obj)
+        {
+        this->Dependancy.push_back(obj);
+        }
       }
     }
 
@@ -86,17 +91,20 @@ public:
   //--------------------------------------------------------------------------
   void UpdateRegisteredProxy()
     {
-    this->Dependancy.erase(this->Dependancy.begin(), this->Dependancy.begin() += this->RegisteredProxy.size());
+    vtkstd::vector<vtkSmartPointer<vtkPMObject> >::iterator iterEnd = this->Dependancy.begin();
+    iterEnd += this->NumberOfDependancyToDelete;
+    this->Dependancy.erase(this->Dependancy.begin(), iterEnd);
+    this->NumberOfDependancyToDelete = 0;
     this->RegisteredProxy = VariantSet;
     this->VariantSet.clear();
     }
   //--------------------------------------------------------------------------
-
 private:
   vtkstd::set<vtkTypeUInt32> RegisteredProxy;
   vtkstd::set<vtkTypeUInt32> VariantSet;
   vtkstd::vector<vtkSmartPointer<vtkPMObject> > Dependancy;
   vtkPMProxyProperty* Parent;
+  int NumberOfDependancyToDelete;
 };
 //****************************************************************************/
 vtkStandardNewMacro(vtkPMProxyProperty);

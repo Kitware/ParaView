@@ -64,10 +64,6 @@ public:
   /// We make the pqProxy aware of its helper proxies.
   virtual int Redo();
 
-  // Description:
-  // Returns if this element can load the xml state for the given element.
-  virtual bool CanLoadState(vtkPVXMLElement*);
-
   /// Description:
   /// Creates the element to setup helper proxies for the proxy.
   void RegisterHelperProxies(pqProxy* proxy);
@@ -79,6 +75,9 @@ protected:
 private:
   pqHelperProxyRegisterUndoElement(const pqHelperProxyRegisterUndoElement&); // Not implemented.
   void operator=(const pqHelperProxyRegisterUndoElement&); // Not implemented.
+
+  struct vtkInternals;
+  vtkInternals* Internal;
 };
 
 #endif

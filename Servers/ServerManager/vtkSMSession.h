@@ -196,18 +196,17 @@ public:
   vtkSetMacro(StateManagement, bool);
   vtkGetMacro(StateManagement, bool);
 
+//BTX
+
   // Description:
-  // Re-New a remote object based on its ID and its previous state or just its
-  // previous definition. This means that it will create a new RemoteObject or
-  // return NULL if that one already exist.
+  // Copy the last state of the RemoteObject that use to have this globalId
+  // inside lastRemoteObjectState. If Not found the state won't be modified.
   //
   // WARNING:
   // - This only work if StateManagement is set to true.
-  // - It is at the responsability at the caller to delete the proxy
-  //   once that one has been registered somewhere.
-  virtual vtkSMRemoteObject* ReNewRemoteObject( vtkTypeUInt32 globalId );
+  virtual void GetRemoteObjectLastState( vtkTypeUInt32 globalId ,
+                                         vtkSMMessage* lastRemoteObjectState);
 
-//BTX
 protected:
   vtkSMSession();
   ~vtkSMSession();

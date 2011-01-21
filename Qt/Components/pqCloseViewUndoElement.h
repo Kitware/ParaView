@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMUndoElement.h"
 #include "pqComponentsExport.h"
 #include "pqMultiView.h"
+#include <vtkSmartPointer.h>
 
 
 /// pqCloseViewUndoElement is undo element used to undo the closing
@@ -60,10 +61,6 @@ public:
   virtual int Redo();
 
   // Description:
-  // Returns if this element can load the xml state for the given element.
-  virtual bool CanLoadState(vtkPVXMLElement*);
-
-  // Description:
   // Creates the undo element for the split operation.
   // \c invert flag inverts the operation of this undo element. When true,
   // Undo() does with Redo() would when invert=false, and vice-versa.
@@ -72,6 +69,10 @@ public:
 protected:
   pqCloseViewUndoElement();
   ~pqCloseViewUndoElement();
+
+  vtkSetStringMacro(Index);
+  char* Index;
+  vtkSmartPointer<vtkPVXMLElement> State;
 
 private:
   pqCloseViewUndoElement(const pqCloseViewUndoElement&); // Not implemented.

@@ -189,6 +189,13 @@ pqPipelineSource* pqObjectBuilder::createFilter(
   filter->setDefaultPropertyValues();
   filter->setModifiedState(pqProxy::UNINITIALIZED);
 
+  pqProxyModifiedStateUndoElement* elem =
+    pqProxyModifiedStateUndoElement::New();
+  elem->SetSession(server->session());
+  elem->MadeUninitialized(filter);
+  ADD_UNDO_ELEM(elem);
+  elem->Delete();
+
   emit this->filterCreated(filter);
   emit this->proxyCreated(filter);
   return filter;
@@ -748,6 +755,13 @@ vtkSMProxy* pqObjectBuilder::createProxyInternal(const QString& sm_group,
     qCritical() << "Failed to create proxy: " << sm_group << ", " << sm_name;
     return 0;
     }
+  else if (reg_group.contains("prototypes"))
+    {
+    // Mark as prototype to prevent them from behing saved in undo stack and
+    // managed through the state
+    proxy->SetPrototype(true);
+    }
+
 
   QString actual_regname = reg_name;
   if (reg_name.isEmpty())

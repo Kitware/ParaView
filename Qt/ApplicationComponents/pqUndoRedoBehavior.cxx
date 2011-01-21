@@ -32,8 +32,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqUndoRedoBehavior.h"
 
 #include "pqApplicationCore.h"
-#include "pqCloseViewUndoElement.h"
-#include "pqSplitViewUndoElement.h"
 #include "pqUndoStackBuilder.h"
 #include "pqUndoStack.h"
 #include "pqActiveObjects.h"
@@ -59,17 +57,6 @@ pqUndoRedoBehavior::pqUndoRedoBehavior(QObject* parentObject)
   pqUndoStackBuilder* builder = pqUndoStackBuilder::New();
   pqUndoStack* stack = new pqUndoStack(false, builder, this);
   builder->Delete();
-
-  // TODO: I don't know how to handle the registering of undo-elements.
-#ifdef FIXME_COLLABORATION
-  pqSplitViewUndoElement* svu_elem = pqSplitViewUndoElement::New();
-  stack->registerElementForLoader(svu_elem);
-  svu_elem->Delete();
-
-  pqCloseViewUndoElement* cvu_elem = pqCloseViewUndoElement::New();
-  stack->registerElementForLoader(cvu_elem);
-  cvu_elem->Delete();
-#endif
 
   QObject::connect(
     &pqActiveObjects::instance(), SIGNAL(serverChanged(pqServer*)),

@@ -207,7 +207,7 @@ void pqUndoStack::undo()
   vtkSMProxyManager::GetProxyManager()->UpdateRegisteredProxies("scalar_bars", 1);
   vtkSMProxyManager::GetProxyManager()->UpdateRegisteredProxies(1);
 
-  this->endNonUndoableChanges(); // FIXME used to be just after the undo
+  this->endNonUndoableChanges();
 
   pqApplicationCore::instance()->render();
 
@@ -227,7 +227,7 @@ void pqUndoStack::redo()
   vtkSMProxyManager::GetProxyManager()->UpdateRegisteredProxies("scalar_bars", 1);
   vtkSMProxyManager::GetProxyManager()->UpdateRegisteredProxies(1);
 
-  this->endNonUndoableChanges(); // FIXME used to be just after the redo
+  this->endNonUndoableChanges();
 
   pqApplicationCore::instance()->render();
 

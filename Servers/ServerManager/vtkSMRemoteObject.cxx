@@ -29,6 +29,7 @@ vtkSMRemoteObject::vtkSMRemoteObject()
   this->GlobalIDString = NULL;
   this->Location = 0;
   this->Session = NULL;
+  this->Prototype = false;
 }
 
 //----------------------------------------------------------------------------

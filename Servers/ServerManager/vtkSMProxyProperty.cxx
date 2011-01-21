@@ -390,7 +390,7 @@ void vtkSMProxyProperty::ReadFrom(const vtkSMMessage* message, int message_offse
       if((proxyIdIter=newProxyIdList.find(id)) == newProxyIdList.end())
         {
         // Not find => Need to be removed
-        this->RemoveProxy(proxy, false); // FIXME do we need to tag proxy as modified ?
+        this->RemoveProxy(proxy, true);
         }
       else
         {
@@ -410,14 +410,17 @@ void vtkSMProxyProperty::ReadFrom(const vtkSMMessage* message, int message_offse
           pxm->GetSession()->GetRemoteObject(*proxyIdIter));
       if(proxy)
         {
-        this->AddProxy(proxy, false); // FIXME do we need to tag proxy as modified ?
+        this->AddProxy(proxy, true);
         }
       else
         {
         // Recreate the proxy as it used to be
-        proxy = vtkSMProxy::SafeDownCast(
-            pxm->GetSession()->ReNewRemoteObject(*proxyIdIter));
-        this->AddProxy(proxy, true);
+        proxy = pxm->ReNewProxy(*proxyIdIter);
+        if(proxy)
+          {
+          this->AddProxy(proxy, true);
+          proxy->Delete();
+          }
         }
       }
     }
@@ -425,7 +428,6 @@ void vtkSMProxyProperty::ReadFrom(const vtkSMMessage* message, int message_offse
     {
     vtkWarningMacro("Invalid offset property");
     }
-  this->Modified();
 }
 
 //---------------------------------------------------------------------------

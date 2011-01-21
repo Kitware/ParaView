@@ -260,6 +260,7 @@ void vtkSMProxyManager::InstantiateGroupPrototypes(const char* groupName)
         {
         proxy->SetSession(NULL);
         proxy->SetLocation(0);
+        proxy->SetPrototype(true);
         this->RegisterProxy(newgroupname.str().c_str(), xml_name, proxy);
         proxy->FastDelete();
         }
@@ -467,6 +468,7 @@ vtkSMProxy* vtkSMProxyManager::GetPrototypeProxy(const char* groupname,
     }
   proxy->SetSession(NULL);
   proxy->SetLocation(0);
+  proxy->SetPrototype(true);
   // register the proxy as a prototype.
   this->RegisterProxy(protype_group.c_str(), name, proxy);
   proxy->Delete();
@@ -824,7 +826,7 @@ void vtkSMProxyManager::RegisterProxy(const char* groupname,
 
   // Update state
 
-  if(proxy->GetLocation() != 0) // Not a prototype !!!
+  if(proxy->GetLocation() != 0 && !proxy->IsPrototype()) // Not a prototype !!!
     {
     proxy->CreateVTKObjects(); // Make sure an ID has been assigned to it
 
@@ -1635,6 +1637,7 @@ vtkSMProxy* vtkSMProxyManager::NewProxy( const vtkSMMessage* msg)
   if( msg && msg->has_global_id() && msg->HasExtension(ProxyState::xml_group) &&
       msg->HasExtension(ProxyState::xml_name))
     {
+
     vtkSMProxy *proxy =
         this->NewProxy( msg->GetExtension(ProxyState::xml_group).c_str(),
                         msg->GetExtension(ProxyState::xml_name).c_str());
@@ -1677,4 +1680,19 @@ void vtkSMProxyManager::LoadXMLDefinitionFromServer()
   msg.set_location(vtkProcessModule::DATA_SERVER); // We want to request data server
   this->Session->PullState(&msg);
   this->ProxyDefinitionManager->LoadXMLDefinitionState(&msg);
+}
+//---------------------------------------------------------------------------
+vtkSMProxy* vtkSMProxyManager::ReNewProxy(vtkTypeUInt32 globalId)
+{
+  if(this->Session->GetRemoteObject(globalId))
+    {
+    return NULL; // The given proxy already exist, DO NOT create a new one
+    }
+  vtkSMMessage proxyState;
+  this->Session->GetRemoteObjectLastState(globalId, &proxyState);
+  if(proxyState.has_global_id())
+    {
+    return this->NewProxy( &proxyState );
+    }
+  return NULL;
 }

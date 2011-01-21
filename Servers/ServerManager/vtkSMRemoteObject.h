@@ -54,6 +54,13 @@ public:
   vtkTypeUInt32 GetGlobalID();
   const char* GetGlobalIDAsString();
 
+  // Description:
+  // Allow user to set the remote object to be discard for Undo/Redo
+  // action. By default, any remote object is Undoable.
+  vtkBooleanMacro(Prototype, bool);
+  bool IsPrototype() {return this->Prototype;}
+  vtkSetMacro(Prototype, bool);
+
 //BTX
 
   // Description:
@@ -112,6 +119,10 @@ protected:
 
   // Identifies the session id to which this object is related.
   vtkWeakPointer<vtkSMSession> Session;
+
+  // Allow remote object to be discard for any state management such as
+  // Undo/Redo, Register/UnRegister (in ProxyManager) and so on...
+  bool Prototype;
 
 private:
   vtkSMRemoteObject(const vtkSMRemoteObject&); // Not implemented

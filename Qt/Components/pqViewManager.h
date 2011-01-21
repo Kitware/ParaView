@@ -103,7 +103,7 @@ protected slots:
   void saveState(vtkPVXMLElement* root);
 
   /// Loads the state for the view window manager.
-  bool loadState(vtkPVXMLElement* rwRoot, vtkSMProxyLocator* loader);
+  virtual void loadState(vtkPVXMLElement* rwRoot);
 
   /// Called when server disconnects, we reset the view layout.
   void onServerDisconnect();
@@ -185,11 +185,6 @@ protected:
   // the view and the frame.
   void connect(pqMultiViewFrame* frame, pqView* view);
   void disconnect(pqMultiViewFrame* frame, pqView* view);
-
-  /// Hiding superclasses loadState. Don't use this API
-  /// since it is not aware of the loader which gives us 
-  /// the render modules to put in the window.
-  virtual void loadState(vtkPVXMLElement* /*root*/) { }
 
   /// Updates the context menu.
   void updateConversionActions(pqMultiViewFrame* frame);

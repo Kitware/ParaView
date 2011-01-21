@@ -85,7 +85,6 @@ public:
         {
         iter->second->Delete();
         }
-      // this->PMObjectMap.erase(iter); // Before weak pointer
       }
     }
   //---------------------------------------------------------------------------
@@ -105,7 +104,7 @@ public:
     PMObjectMapType::iterator iter = this->PMObjectMap.find(globalUniqueId);
     if (iter != this->PMObjectMap.end())
       {
-      return iter->second;
+      return iter->second.GetPointer();
       }
 
     return NULL; // Did not find it
@@ -116,7 +115,7 @@ public:
     RemoteObjectMapType::iterator iter = this->RemoteObjectMap.find(globalUniqueId);
     if (iter != this->RemoteObjectMap.end())
       {
-      return iter->second;
+      return iter->second.GetPointer();
       }
 
     return NULL; // Did not find it

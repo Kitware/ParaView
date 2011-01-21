@@ -41,37 +41,28 @@ vtkStandardNewMacro(pqCloseViewUndoElement);
 //----------------------------------------------------------------------------
 pqCloseViewUndoElement::pqCloseViewUndoElement()
 {
+  this->Index = NULL;
+  this->SetSession(NULL); // Maybe keep the one use to create the Element for state loading...
 }
 
 //----------------------------------------------------------------------------
 pqCloseViewUndoElement::~pqCloseViewUndoElement()
 {
-}
-
-//----------------------------------------------------------------------------
-bool pqCloseViewUndoElement::CanLoadState(vtkPVXMLElement* elem)
-{
-  return (elem && elem->GetName() && 
-    strcmp(elem->GetName(), "CloseView") == 0);
+  this->SetIndex(NULL);
 }
 
 //----------------------------------------------------------------------------
 void pqCloseViewUndoElement::CloseView(
   pqMultiView::Index frameIndex, vtkPVXMLElement* state)
 {
-  vtkPVXMLElement* elem = vtkPVXMLElement::New();
-  elem->SetName("CloseView");
-  elem->AddAttribute("index", frameIndex.getString().toAscii().data());
-  elem->AddNestedElement(state);
-  this->SetXMLElement(elem);
-  elem->Delete();
+  this->SetIndex(frameIndex.getString().toAscii().data());
+  this->State = state;
 }
 
 //----------------------------------------------------------------------------
 int pqCloseViewUndoElement::Undo()
 {
-  vtkPVXMLElement* state = this->XMLElement->GetNestedElement(0);
-  pqViewManager* manager = qobject_cast<pqViewManager*>(
+    pqViewManager* manager = qobject_cast<pqViewManager*>(
     pqApplicationCore::instance()->manager("MULTIVIEW_MANAGER"));
   if (!manager)
     {
@@ -79,7 +70,7 @@ int pqCloseViewUndoElement::Undo()
       << "MULTIVIEW_MANAGER must be registered with application core.");
     return 0;
     }
-  manager->loadState(state, this->GetProxyLocator());
+  manager->loadState(this->State); // FIXME maybe provide the session as locator
   return 1;
 }
 
@@ -87,7 +78,7 @@ int pqCloseViewUndoElement::Undo()
 int pqCloseViewUndoElement::Redo()
 {
   pqMultiView::Index index;
-  index.setFromString(this->XMLElement->GetAttribute("index"));
+  index.setFromString(this->Index);
 
   pqMultiView* manager = qobject_cast<pqMultiView*>(
     pqApplicationCore::instance()->manager("MULTIVIEW_MANAGER"));

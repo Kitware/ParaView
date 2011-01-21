@@ -254,17 +254,11 @@ struct vtkSMProxyManagerInternals
 
       if(!proxy)
         {
-        vtkSMProxy *proxy =
-            vtkSMProxy::SafeDownCast(
-                this->ProxyManager->GetSession()->ReNewRemoteObject(reg.global_id()));
+        vtkSMProxy *proxy = this->ProxyManager->ReNewProxy(reg.global_id());
         if(proxy)
           {
           newStateContent.insert(vtkSMProxyManagerEntry(reg.group().c_str(), reg.name().c_str(), proxy));
           proxy->Delete();
-          }
-        else
-          {
-          cout << "Did not find proxy !!!! with id " << reg.global_id() << endl;
           }
         }
       else

@@ -160,7 +160,7 @@ void vtkSMSession::PushState(vtkSMMessage* msg)
     vtkTypeUInt32 globalId = msg->global_id();
     vtkSMRemoteObject *remoteObj = this->GetRemoteObject(globalId);
 
-    if(remoteObj)
+    if(remoteObj && !remoteObj->IsPrototype())
       {
       vtkSMMessage newState;
       newState.CopyFrom(*remoteObj->GetFullState());
@@ -182,11 +182,6 @@ void vtkSMSession::PushState(vtkSMMessage* msg)
             {
             this->UndoStackBuilder->OnUpdate(this, globalId, &oldState, &newState);
             }
-          }
-        else
-          {
-          // FIXME Creation
-          // this->UndoStackBuilder->OnCreation(this, globalId, &newState);
           }
         }
       }
@@ -423,19 +418,11 @@ vtkIdType vtkSMSession::ReverseConnectToRemote(
   return sid;
 }
 //----------------------------------------------------------------------------
-// Warning: It is at the responsability at the caller to delete the proxy
-//          once that one has been registered somewhere. The result can be NULL
-//          if the RemoteObject can be find by GetRemoteObject
-vtkSMRemoteObject* vtkSMSession::ReNewRemoteObject( vtkTypeUInt32 globalId )
+void vtkSMSession::GetRemoteObjectLastState( vtkTypeUInt32 globalId ,
+                                             vtkSMMessage* lastRemoteObjectState)
 {
-  vtkSMRemoteObject* remoteObject = this->GetRemoteObject(globalId);
-  if(this->StateManagement && !remoteObject)
+  if(this->StateManagement)
     {
-    vtkSMMessage proxyState;
-    this->Internals->FillWithLastState(globalId, &proxyState);
-    vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
-    remoteObject = pxm->NewProxy(&proxyState);
-    return remoteObject;
+    this->Internals->FillWithLastState(globalId, lastRemoteObjectState);
     }
-  return NULL;
 }

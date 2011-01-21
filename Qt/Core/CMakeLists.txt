@@ -232,6 +232,8 @@ ADD_LIBRARY(pqCore
   pqFlatTreeViewEventTranslator.h
   pqFormBuilder.cxx
   pqFormBuilder.h
+  pqHelperProxyRegisterUndoElement.cxx
+  pqHelperProxyRegisterUndoElement.h
   pqHelperProxyStateLoader.cxx
   pqHelperProxyStateLoader.h
   pqHistogramTableModel.cxx
@@ -385,8 +387,6 @@ ADD_LIBRARY(pqCore
 
 #ADD_LIBRARY(pqCore_old
 #
-#  pqHelperProxyRegisterUndoElement.cxx
-#  pqHelperProxyRegisterUndoElement.h
 #
 #  pqProxyUnRegisterUndoElement.cxx
 #  pqProxyUnRegisterUndoElement.h

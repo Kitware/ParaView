@@ -374,8 +374,8 @@ ADD_LIBRARY(pqComponents
   pqChartValue.h
   pqClipPanel.cxx
   pqClipPanel.h
-#  pqCloseViewUndoElement.cxx
-#  pqCloseViewUndoElement.h
+  pqCloseViewUndoElement.cxx
+  pqCloseViewUndoElement.h
   pqColorMapModel.cxx
   pqColorMapModel.h
   pqColorPresetManager.cxx
@@ -600,8 +600,8 @@ ADD_LIBRARY(pqComponents
   pqSphereWidget.h
   pqSplineWidget.cxx
   pqSplineWidget.h
-#  pqSplitViewUndoElement.cxx
-#  pqSplitViewUndoElement.h
+  pqSplitViewUndoElement.cxx
+  pqSplitViewUndoElement.h
   pqSpreadSheetDisplayEditor.cxx
   pqSpreadSheetDisplayEditor.h
   pqSpreadSheetViewDecorator.cxx

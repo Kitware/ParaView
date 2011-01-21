@@ -1827,3 +1827,24 @@ void vtkSMProxy::LoadState(const vtkSMMessage* message)
     touchedProperties[i]->UpdateDependentDomains();
     }
 }
+//---------------------------------------------------------------------------
+void vtkSMProxy::PrototypeOn()
+{
+  this->SetPrototype(true);
+}
+
+//---------------------------------------------------------------------------
+void vtkSMProxy::PrototypeOff()
+{
+  this->SetPrototype(false);
+}
+
+//---------------------------------------------------------------------------
+void vtkSMProxy::SetPrototype(bool proto)
+{
+  this->Superclass::SetPrototype(proto);
+  for(unsigned int cc=0; cc < this->GetNumberOfSubProxies(); cc++)
+    {
+    this->GetSubProxy(cc)->SetPrototype(proto);
+    }
+}

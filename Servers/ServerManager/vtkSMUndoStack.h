@@ -50,10 +50,9 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // It is possible to push any instance of vtkUndoSet on to the server.
-  // Note however that once it is pushed on the server
-  // every connected client will be able to undo it (evetually atleast).
-//  void Push(const char* label, vtkUndoSet* set);
+  // Push an undo set on the Undo stack. This will clear
+  // any sets in the Redo stack.
+  virtual void Push(const char* label, vtkUndoSet* changeSet);
 
   // Description:
   // Performs an Undo using the set on the top of the undo stack. The set is poped from

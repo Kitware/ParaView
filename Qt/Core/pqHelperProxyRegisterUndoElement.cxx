@@ -31,43 +31,64 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "pqHelperProxyRegisterUndoElement.h"
 
+#include "vtkCollection.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMProxy.h"
+#include "vtkSMSession.h"
 #include "vtkSMProxyLocator.h"
+#include "vtkSMProxyManager.h"
 
 #include <QList>
 #include <QString>
+#include <vtkstd/vector>
 
 #include "pqApplicationCore.h"
 #include "pqProxy.h"
+#include "pqServer.h"
 #include "pqServerManagerModel.h"
 
+//*****************************************************************************
+//                  Internal class
+//*****************************************************************************
+struct HelperProxy
+{
+  HelperProxy(QString name, vtkTypeUInt32 id)
+    {
+    this->Name = name;
+    this->Id = id;
+    }
+
+  QString Name;
+  vtkTypeUInt32 Id;
+};
+//*****************************************************************************
+struct pqHelperProxyRegisterUndoElement::vtkInternals
+{
+  vtkTypeUInt32 ProxyGlobalID;
+  vtkstd::vector<HelperProxy> HelperList;
+};
+//*****************************************************************************
 vtkStandardNewMacro(pqHelperProxyRegisterUndoElement);
 //-----------------------------------------------------------------------------
 pqHelperProxyRegisterUndoElement::pqHelperProxyRegisterUndoElement()
 {
+  this->Internal = new vtkInternals();
 }
 
 //-----------------------------------------------------------------------------
 pqHelperProxyRegisterUndoElement::~pqHelperProxyRegisterUndoElement()
 {
-}
-
-//-----------------------------------------------------------------------------
-bool pqHelperProxyRegisterUndoElement::CanLoadState(vtkPVXMLElement* elem)
-{
-  return (elem && elem->GetName() && 
-    strcmp(elem->GetName(), "HelperProxyRegister") == 0);
+  delete this->Internal;
 }
 
 //-----------------------------------------------------------------------------
 void pqHelperProxyRegisterUndoElement::RegisterHelperProxies(pqProxy* proxy)
 {
-  vtkPVXMLElement* elem = vtkPVXMLElement::New();
-  elem->SetName("HelperProxyRegister");
-  elem->AddAttribute("id", proxy->getProxy()->GetSelfIDAsString());
+  this->Internal->ProxyGlobalID = proxy->getProxy()->GetGlobalID();
+  this->Internal->HelperList.clear();
+  this->SetSession(proxy->getServer()->session());
 
   QList<QString> keys = proxy->getHelperKeys();
   for (int cc=0; cc < keys.size(); cc++)
@@ -76,36 +97,23 @@ void pqHelperProxyRegisterUndoElement::RegisterHelperProxies(pqProxy* proxy)
     QList<vtkSMProxy*> helpers = proxy->getHelperProxies(key);
     foreach (vtkSMProxy* helper, helpers)
       {
-      vtkPVXMLElement* child = vtkPVXMLElement::New();
-      child->SetName("Item");
-      child->AddAttribute("id", helper->GetSelfIDAsString());
-      child->AddAttribute("name", key.toAscii().data());
-      elem->AddNestedElement(child);
-      child->Delete();
+      this->Internal->HelperList.push_back(HelperProxy(key, helper->GetGlobalID()));
       }
     }
-  this->SetXMLElement(elem);
-  elem->Delete();
 }
 
 //-----------------------------------------------------------------------------
 int pqHelperProxyRegisterUndoElement::Redo()
 {
-  vtkPVXMLElement* element = this->XMLElement;
-  
-  int id = 0;
-  element->GetScalarAttribute("id",&id);
-  if (!id)
+  if (!this->Session)
     {
-    vtkErrorMacro("Failed to locate proxy id.");
+    vtkErrorMacro("Undo element not properly set");
     return 0;
     }
 
-  vtkSmartPointer<vtkSMProxyLocator> locator = 
-   this->GetProxyLocator(); 
-
-  locator->SetConnectionID(this->GetConnectionID());
-  vtkSMProxy* proxy = locator->LocateProxy(id);
+  vtkSMProxy* proxy =
+      vtkSMProxy::SafeDownCast(
+          this->Session->GetRemoteObject(this->Internal->ProxyGlobalID));
 
   if (!proxy)
     {
@@ -123,29 +131,30 @@ int pqHelperProxyRegisterUndoElement::Redo()
     return 0;
     }
 
-  for (unsigned int cc=0; cc < element->GetNumberOfNestedElements(); cc++)
+  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+  for (unsigned int cc=0; cc < this->Internal->HelperList.size(); cc++)
     {
-    vtkPVXMLElement* child = element->GetNestedElement(cc);
-    if (!child->GetScalarAttribute("id", &id))
+    HelperProxy item = this->Internal->HelperList[cc];
+    vtkSMProxy* helper =
+        vtkSMProxy::SafeDownCast(
+            this->Session->GetRemoteObject(item.Id));
+
+    // As the helper was not found yet, just recreate it and keep a reference
+    // till the undo set complete. In that undo set that proxy should be register
+    // otherwise it will be automatically removed.
+    if(this->UndoSetWorkingContext && !helper)
       {
-      vtkErrorMacro("Missing id.");
-      continue;
+      helper = pxm->ReNewProxy(item.Id);
+      this->UndoSetWorkingContext->AddItem(helper);
+      helper->Delete();
       }
 
-    const char* name = child->GetAttribute("name");
-    if (!name)
-      {
-      vtkErrorMacro("Missing name.");
-      continue;
-      }
-
-    vtkSMProxy* helper = locator->LocateProxy(id);
     if (!helper)
       {
       vtkErrorMacro("Failed to locate the helper.");
       continue;
       }
-    pq_proxy->addHelperProxy(name, helper);
+    pq_proxy->addHelperProxy(item.Name, helper);
     }
   return 1;
 }
