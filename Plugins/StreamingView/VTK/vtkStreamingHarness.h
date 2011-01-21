@@ -29,6 +29,7 @@
 
 class vtkPieceList;
 class vtkPieceCacheFilter;
+class vtkGarbageCollector;
 
 class VTK_EXPORT vtkStreamingHarness : public vtkPassInputTypeAlgorithm
 {
@@ -149,6 +150,7 @@ protected:
   int LockRefinement;
   bool Enabled;
 
+  virtual void ReportReferences(vtkGarbageCollector*);
 private:
   vtkStreamingHarness(const vtkStreamingHarness&);  // Not implemented.
   void operator=(const vtkStreamingHarness&);  // Not implemented.

@@ -17,6 +17,7 @@
 
 #include "vtkDataObject.h"
 #include "vtkDataSetAttributes.h"
+#include "vtkGarbageCollector.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkObjectFactory.h"
@@ -52,6 +53,13 @@ vtkStreamingHarness::~vtkStreamingHarness()
   this->SetPieceList1(NULL);
   this->SetPieceList2(NULL);
   this->SetCacheFilter(NULL);
+}
+
+//-----------------------------------------------------------------------------
+void vtkStreamingHarness::ReportReferences(vtkGarbageCollector* collector)
+{
+  this->Superclass::ReportReferences(collector);
+  vtkGarbageCollectorReport(collector, this->CacheFilter, "CacheFilter");
 }
 
 //----------------------------------------------------------------------------
