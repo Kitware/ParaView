@@ -72,6 +72,14 @@ set(pv_tpl_c_flags ${CMAKE_C_FLAGS})
 set(pv_cxx_flags ${CMAKE_CXX_FLAGS})
 set(pv_c_flags ${CMAKE_C_FLAGS})
 
+if(WIN32)
+  set(_LINK_LIBRARY_SUFFIX .lib)
+elseif(APPLE)
+  set(_LINK_LIBRARY_SUFFIX .dylib)
+else()
+  set(_LINK_LIBRARY_SUFFIX .so)
+endif()
+
 # We aren't interested in seeing third party compiler warnings.
 set(pv_tpl_compiler_args ${pv_compiler_args})
 string(REPLACE "/W3" "/W0" pv_tpl_cxx_flags "${pv_tpl_cxx_flags}")
@@ -86,6 +94,8 @@ include(CheckFortran)
 # Establish Target Dependencies based on Selected Options
 #------------------------------------------------------------------------------
 
+include(PackageVersions)
+
 set(python_dependencies)
 set(CLAPACK_dependencies)
 set(NUMPY_dependencies)
@@ -93,10 +103,6 @@ set(Manta_dependencies)
 set(OpenMPI_dependencies)
 set(ParaView_dependencies)
 
-#-----------------------------------------------------------------------------
-#-----------------------------------------------------------------------------
-
-include(PackageVersions)
 
 set(MPI_ARGS)
 
@@ -128,7 +134,6 @@ if(NOT APPLE)
   include(External_NUMPY)
 else()
 
-  #find_package(LAPACK)
   find_package(PythonInterp)
   find_package(PythonLibs)
   find_package(MPI)
@@ -151,8 +156,8 @@ if(NOT WIN32)
   #include(External_Silo)
   #list(APPEND ParaView_dependencies Silo)
 
-  #include(External_FFMPEG)
-  #list(APPEND ParaView_dependencies FFMPEG)
+  include(External_FFMPEG)
+  list(APPEND ParaView_dependencies FFMPEG)
 endif()
 
 #------------------------------------------------------------------------------
@@ -187,6 +192,8 @@ ExternalProject_Add(${proj}
    ${MPI_ARGS}
    # Manta
    ${MANTA_ARGS}
+   # FFMPEG
+   ${FFMPEG_ARGS}
    # EyeDome
    -DPARAVIEW_BUILD_PLUGIN_EyeDome:BOOL=ON
    # VisIt

@@ -164,6 +164,7 @@ IF(PARAVIEW_USE_MPI)
 
   option(PARAVIEW_INSTALL_MPIEXEC "Include the MPI executable in an installation." OFF)
   mark_as_advanced(PARAVIEW_INSTALL_MPIEXEC)
+
   if(PARAVIEW_INSTALL_MPIEXEC)
     install(PROGRAMS ${MPIEXEC}
       DESTINATION ${PV_INSTALL_BIN_DIR}
