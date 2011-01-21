@@ -91,7 +91,6 @@ set(CLAPACK_dependencies)
 set(NUMPY_dependencies)
 set(Manta_dependencies)
 set(OpenMPI_dependencies)
-
 set(ParaView_dependencies)
 
 #-----------------------------------------------------------------------------
@@ -99,9 +98,18 @@ set(ParaView_dependencies)
 
 include(PackageVersions)
 
+set(MPI_ARGS)
+
 if(NOT APPLE)
   include(External_OpenMPI)
   list(APPEND ParaView_dependencies OpenMPI)
+
+  set(MPI_ARGS
+    -DPARAVIEW_USE_MPI:BOOL=ON
+    -DMPIEXEC:FILEPATH=${MPIEXEC}
+    -DMPI_INCLUDE_PATH:PATH=${MPI_INCLUDE_PATH}
+    -DMPI_LIBRARY:FILEPATH=${MPI_LIBRARY}
+    -DMPI_EXTRA_LIBRARY:FILEPATH=${MPI_EXTRA_LIBRARY})
 
   include(External_Python)
   list(APPEND ParaView_depenencies Python)
@@ -129,16 +137,15 @@ else()
 endif()
 
 
-
-
-
-
 include(External_Manta)
 set(MANTA_ARGS
  -DPARAVIEW_BUILD_PLUGIN_Manta:BOOL=ON
  -DMANTA_BUILD:PATH=${Manta_binary}
  -DMANTA_SOURCE:PATH=${Manta_source})
 list(APPEND ParaView_dependencies Manta)
+
+include(External_Boost)
+list(APPEND ParaView_dependencies Boost)
 
 if(NOT WIN32)
   #include(External_Silo)
@@ -166,22 +173,29 @@ ExternalProject_Add(${proj}
    -DCMAKE_CXX_FLAGS:STRING=${CMAKE_CXX_FLAGS}
    -DCMAKE_C_FLAGS:STRING=${CMAKE_C_FLAGS}
    -DCMAKE_BUILD_TYPE:STRING=${CMAKE_CFG_INTDIR}
+   # Boost
+   -DVTK_USE_BOOST:BOOL=ON
+   -DBoost_INCLUDE_DIR:PATH=${Boost_INCLUDE_DIR}
    # Python
    -DPARAVIEW_ENABLE_PYTHON:BOOL=ON
    -DPYTHON_EXECUTABLE:FILEPATH=${PYTHON_EXECUTABLE}
-   -DPYTHON_INCLUDE_DIR:PATH=${PYTHON_INCLUDE_DIR}
+   -DPYTHON_INCLUDE_DIR:PATH=${PYTHON_INCLUDE}
    -DPYTHON_LIBRARY:FILEPATH=${PYTHON_LIBRARY}
    # Qt
    -DQT_QMAKE_EXECUTABLE:PATH=${QT_QMAKE_EXECUTABLE}
    # MPI
-   -DPARAVIEW_USE_MPI:BOOL=ON
-   -DMPIEXEC:FILEPATH=${MPIEXEC}
-   -DMPI_INCLUDE_PATH:PATH=${MPI_INCLUDE_PATH}
-   -DMPI_LIBRARY:FILEPATH=${MPI_LIBRARY}
-   -DMPI_EXTRA_LIBRARY:FILEPATH=${MPI_EXTRA_LIBRARY}
+   ${MPI_ARGS}
    # Manta
    ${MANTA_ARGS}
    # EyeDome
    -DPARAVIEW_BUILD_PLUGIN_EyeDome:BOOL=ON
+   # VisIt
+   -DPARAVIEW_USE_VISITBRIDGE:BOOL=ON
+   #-DVISIT_BUILD_READER_CGNS:BOOL=ON
+   #-DCGNS_INCLUDE_DIR:PATH=
+   #-DCGNS_LIBRARY:FILEPATH=
+   #-DVISIT_BUILD_READER_Silo:BOOL=ON
+   #-DSILO_INCLUDE_DIR:PATH=
+   #-DSILO_LIBRARY:FILEPATH=
   INSTALL_COMMAND ""
   )
