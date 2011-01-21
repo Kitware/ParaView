@@ -399,6 +399,10 @@ void pqStreamingControls::onRestartRefinement()
   RefiningView* rView = qobject_cast<RefiningView*>(this->currentView);
   if (rView && this->currentRep)
     {
+    vtkSMStreamingViewProxy *svp =
+      vtkSMStreamingViewProxy::SafeDownCast(this->currentView->getProxy());
+    vtkSMProxy *driver = svp->GetDriver();
+    driver->InvokeCommand("RestartStreaming");
     this->currentRep->InvokeCommand("RestartRefinement");
     rView->render();
     }
@@ -418,5 +422,10 @@ void pqStreamingControls::onProgressionMode(int state)
     //automatic
     this->Internals->refine->setEnabled(false);
     this->Internals->coarsen->setEnabled(false);
+    RefiningView* rView = qobject_cast<RefiningView*>(this->currentView);
+    if (rView)
+      {
+      rView->render();
+      }
     }
 }

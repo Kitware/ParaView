@@ -84,7 +84,32 @@ void vtkPrioritizedStreamer::AddHarnessInternal(vtkStreamingHarness *harness)
 }
 
 //----------------------------------------------------------------------------
-void vtkPrioritizedStreamer::ResetEveryone()
+bool vtkPrioritizedStreamer::IsFirstPass()
+{
+  if (this->HasCameraMoved())
+    {
+    DEBUGPRINT_PASSES(cerr << "CAMMOVED" << endl;);
+    return true;
+    }
+
+  if (this->Internal->StartOver)
+    {
+    DEBUGPRINT_PASSES(cerr << "STARTOVER" << endl;);
+    return true;
+    }
+
+  vtkCollection *harnesses = this->GetHarnesses();
+  if (!harnesses)
+    {
+    return true;
+    }
+
+
+  return false;
+}
+
+//----------------------------------------------------------------------------
+void vtkPrioritizedStreamer::PrepareFirstPass()
 {
   vtkCollection *harnesses = this->GetHarnesses();
   if (!harnesses)
@@ -190,7 +215,7 @@ void vtkPrioritizedStreamer::ResetEveryone()
 }
 
 //----------------------------------------------------------------------------
-void vtkPrioritizedStreamer::AdvanceEveryone()
+void vtkPrioritizedStreamer::PrepareNextPass()
 {
   vtkCollection *harnesses = this->GetHarnesses();
   if (!harnesses)
@@ -238,7 +263,7 @@ void vtkPrioritizedStreamer::AdvanceEveryone()
 }
 
 //----------------------------------------------------------------------------
-void vtkPrioritizedStreamer::StartRenderEvent(bool forceRestart)
+void vtkPrioritizedStreamer::StartRenderEvent()
 {
   DEBUGPRINT_PASSES
     (
@@ -247,8 +272,7 @@ void vtkPrioritizedStreamer::StartRenderEvent(bool forceRestart)
   vtkRenderer *ren = this->GetRenderer();
   vtkRenderWindow *rw = this->GetRenderWindow();
 
-  bool firstPass = this->HasCameraMoved() || this->Internal->StartOver ||
-    forceRestart;
+  bool firstPass = this->IsFirstPass();
   if (this->GetParallelHelper())
     {
     this->GetParallelHelper()->Reduce(firstPass);
@@ -277,12 +301,12 @@ void vtkPrioritizedStreamer::StartRenderEvent(bool forceRestart)
 
     //compute priority of subsequent passes
     //set pipeline to show the most important one this pass
-    this->ResetEveryone();
+    this->PrepareFirstPass();
     }
   else
     {
     //subsequent passes pick next less important piece each pass
-    this->AdvanceEveryone();
+    this->PrepareNextPass();
     }
 
   //don't swap back to front automatically
@@ -389,6 +413,12 @@ void vtkPrioritizedStreamer::EndRenderEvent()
     DEBUGPRINT_PASSES(cerr << "RENDER EVENTUALLY" << endl;);
     this->RenderEventually();
     }
+}
+
+//------------------------------------------------------------------------------
+void vtkPrioritizedStreamer::RestartStreaming()
+{
+  this->Internal->StartOver = true;
 }
 
 //------------------------------------------------------------------------------

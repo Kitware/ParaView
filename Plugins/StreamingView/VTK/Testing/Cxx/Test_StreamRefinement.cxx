@@ -90,6 +90,7 @@ int main(int , char **)
   sd->SetRenderer(renderer);
   sd->AddHarness(harness);
   sd->SetProgressionMode(vtkMultiResolutionStreamer::AUTOMATIC);
+  sd->SetRefinementDepth(3);
 
   renWin->Render();
 

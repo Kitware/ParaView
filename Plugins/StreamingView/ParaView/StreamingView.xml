@@ -290,6 +290,10 @@
         processes="client|renderserver|dataserver">
 
       <Property
+          name="RestartStreaming"
+          command="RestartStreaming">
+      </Property>
+      <Property
           name="StopStreaming"
           command="StopStreaming">
       </Property>
@@ -336,6 +340,10 @@
         class="vtkPrioritizedStreamer"
         processes="client|renderserver|dataserver">
 
+      <Property
+          name="RestartStreaming"
+          command="RestartStreaming">
+      </Property>
       <Property
           name="StopStreaming"
           command="StopStreaming">
@@ -398,6 +406,10 @@
         class="vtkMultiResolutionStreamer"
         processes="client|renderserver|dataserver">
 
+      <Property
+          name="RestartStreaming"
+          command="RestartStreaming">
+      </Property>
       <Property
           name="StopStreaming"
           command="StopStreaming">
