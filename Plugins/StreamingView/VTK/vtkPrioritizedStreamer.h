@@ -69,13 +69,15 @@ protected:
   virtual void StartRenderEvent(bool forceRestar=false);
   virtual void EndRenderEvent();
 
-  virtual void ResetEveryone();
-  virtual void AdvanceEveryone();
-  virtual bool IsEveryoneDone();
+  bool IsFirstPass();
+  bool IsEveryoneDone();
 
   // Description:
   // Overridden to set up initial number of passes.
   virtual void AddHarnessInternal(vtkStreamingHarness *);
+
+  virtual void PrepareFirstPass();
+  virtual void PrepareNextPass();
 
   int NumberOfPasses;
   int LastPass;

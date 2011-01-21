@@ -64,9 +64,10 @@ protected:
   virtual void AddHarnessInternal(vtkStreamingHarness *);
 
   bool IsFirstPass();
+  bool IsEveryoneDone();
+
   void PrepareFirstPass();
   void PrepareNextPass();
-  bool IsEveryoneDone();
 
   bool StartOver;
   int NumberOfPasses;

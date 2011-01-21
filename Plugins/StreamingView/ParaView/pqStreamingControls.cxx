@@ -400,7 +400,7 @@ void pqStreamingControls::onRestartRefinement()
   if (rView && this->currentRep)
     {
     this->currentRep->InvokeCommand("RestartRefinement");
-    rView->render();
+//    rView->render();
     }
 }
 
@@ -418,5 +418,10 @@ void pqStreamingControls::onProgressionMode(int state)
     //automatic
     this->Internals->refine->setEnabled(false);
     this->Internals->coarsen->setEnabled(false);
+    RefiningView* rView = qobject_cast<RefiningView*>(this->currentView);
+    if (rView)
+      {
+      rView->render();
+      }
     }
 }

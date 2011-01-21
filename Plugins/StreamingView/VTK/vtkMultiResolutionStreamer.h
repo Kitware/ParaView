@@ -97,7 +97,7 @@ protected:
   virtual bool IsCompletelyDone();
 
   virtual void PrepareFirstPass();
-  virtual void ChooseNextPieces();
+  virtual void PrepareNextPass();
   virtual int Refine(vtkStreamingHarness *);
   virtual int Coarsen(vtkStreamingHarness *);
   virtual void Reap(vtkStreamingHarness *);

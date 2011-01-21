@@ -62,22 +62,21 @@ void vtkIterativeStreamer::AddHarnessInternal(vtkStreamingHarness *harness)
 //----------------------------------------------------------------------------
 bool vtkIterativeStreamer::IsFirstPass()
 {
+  if (this->HasCameraMoved())
+    {
+    DEBUGPRINT_PASSES(cerr << "CAMMOVED" << endl;);
+    return true;
+    }
+
   if (this->StartOver)
     {
     DEBUGPRINT_PASSES(cerr << "STARTOVER" << endl;);
-    this->StartOver = false;
     return true;
     }
 
   vtkCollection *harnesses = this->GetHarnesses();
   if (!harnesses)
     {
-    return true;
-    }
-
-  if (this->HasCameraMoved())
-    {
-    DEBUGPRINT_PASSES(cerr << "CAMMOVED" << endl;);
     return true;
     }
 
@@ -88,25 +87,6 @@ bool vtkIterativeStreamer::IsFirstPass()
 void vtkIterativeStreamer::PrepareFirstPass()
 {
   DEBUGPRINT_PASSES(cerr << "PFP" << endl;);
-  vtkRenderer *ren = this->GetRenderer();
-  vtkRenderWindow *rw = this->GetRenderWindow();
-  if (!ren || !rw)
-    {
-    return;
-    }
-
-  //first pass has to clear to start off
-  //ren->SetPreserveDepthBuffer(0);
-  ren->EraseOn();
-  rw->EraseOn();
-  if (!rw->GetNeverRendered())
-    {
-    rw->Frame();
-    }
-
-  //we manage back to front swapping
-  rw->SwapBuffersOff();
-
   vtkCollection *harnesses = this->GetHarnesses();
   if (!harnesses)
     {
@@ -157,7 +137,7 @@ void vtkIterativeStreamer::PrepareNextPass()
       }
     int pieceNow = harness->GetPiece();
     int pieceNext = pieceNow;
-    if (pieceNow+1 < maxPiece)
+    if (pieceNow < maxPiece)
       {
       pieceNext++;
       }
@@ -171,6 +151,9 @@ void vtkIterativeStreamer::PrepareNextPass()
 //----------------------------------------------------------------------------
 void vtkIterativeStreamer::StartRenderEvent(bool forceRestart)
 {
+  vtkRenderer *ren = this->GetRenderer();
+  vtkRenderWindow *rw = this->GetRenderWindow();
+
   DEBUGPRINT_PASSES(cerr << "SRE" << endl;);
   bool firstPass = this->IsFirstPass() || forceRestart;
   if (this->GetParallelHelper())
@@ -183,8 +166,6 @@ void vtkIterativeStreamer::StartRenderEvent(bool forceRestart)
     this->CopyBackBufferToFront();
 
     //start off initial pass by clearing the screen
-    vtkRenderer *ren = this->GetRenderer();
-    vtkRenderWindow *rw = this->GetRenderWindow();
     if (ren && rw)
       {
       ren->EraseOn();
@@ -201,6 +182,15 @@ void vtkIterativeStreamer::StartRenderEvent(bool forceRestart)
     {
     this->PrepareNextPass();
     }
+
+  //we manage back to front swapping
+  if (rw)
+    {
+    rw->SwapBuffersOff();
+    }
+
+  //assume that we are not done covering all the domains
+  this->StartOver = false;
 }
 
 //----------------------------------------------------------------------------
@@ -230,7 +220,7 @@ bool vtkIterativeStreamer::IsEveryoneDone()
       maxPiece = this->LastPass;
       }
     int pieceNow = harness->GetPiece();
-    if (pieceNow+1 < maxPiece)
+    if (pieceNow <= maxPiece-2)
       {
       everyone_done = false;
       break;

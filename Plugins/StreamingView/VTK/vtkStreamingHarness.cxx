@@ -323,4 +323,5 @@ void vtkStreamingHarness::RestartRefinement()
     {
     this->CacheFilter->EmptyCache();
     }
+  this->Modified();
 }

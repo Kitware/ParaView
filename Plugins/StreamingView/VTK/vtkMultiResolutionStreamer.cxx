@@ -573,7 +573,7 @@ void vtkMultiResolutionStreamer::Reap(vtkStreamingHarness *harness)
 }
 
 //----------------------------------------------------------------------------
-void vtkMultiResolutionStreamer::ChooseNextPieces()
+void vtkMultiResolutionStreamer::PrepareNextPass()
 {
   vtkCollection *harnesses = this->GetHarnesses();
   if (!harnesses)
@@ -670,7 +670,7 @@ void vtkMultiResolutionStreamer::StartRenderEvent(bool forceRestart)
   else
     {
     //ask everyone to choose the next piece to draw
-    this->ChooseNextPieces();
+    this->PrepareNextPass();
     }
 
   //don't swap back to front automatically
