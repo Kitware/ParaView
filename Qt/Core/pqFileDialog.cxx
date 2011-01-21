@@ -154,7 +154,7 @@ public:
     Completer(new QCompleter(&this->FileFilter, NULL)),
     Mode(ExistingFile),
     SupressOverwriteWarning(false),
-    FileNamesSeperator(" ; ")
+    FileNamesSeperator(";")
   {
   QObject::connect(p, SIGNAL(filesSelected(const QList<QStringList> &)),
     this->RecentModel, SLOT(setChosenFiles(const QList<QStringList> &)));
@@ -522,6 +522,8 @@ void pqFileDialog::setFileMode(pqFileDialog::FileMode mode)
       break;
     case ExistingFiles:
       selectionMode=QAbstractItemView::ExtendedSelection;
+      this->setWindowTitle(this->windowTitle() + "  (open multiple files with <ctrl> key.)");
+      this->setToolTip("open multiple files with <ctrl> key.");
       break;
     }
   this->Implementation->Ui.Files->setSelectionMode(selectionMode);
