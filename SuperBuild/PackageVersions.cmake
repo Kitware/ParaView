@@ -95,8 +95,8 @@ set(HDF5_MAJOR 1)
 set(HDF5_MINOR 8)
 set(HDF5_PATCH 5)
 set(HDF5_VERSION ${HDF5_MAJOR).${HDF5_MINOR}.${HDF5_PATCH})
-set(HDF5_URL)
-set(HDF5_GZ)
+set(HDF5_URL http://www.hdfgroup.org/ftp/HDF5/current/src)
+set(HDF5_GZ hdf5-${HDF5_VERSION}-patch1.tar.gz)
 set(HDF5_MD5)
 
 
