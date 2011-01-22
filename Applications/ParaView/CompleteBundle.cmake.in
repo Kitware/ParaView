@@ -73,7 +73,7 @@ endfunction(gp_item_default_embedded_path_override)
 #
 
 # Optional subdirectory inside the bundle where the app can be placed.
-set(ParaView_BUNDLE_LOCATION @ParaView_BUNDLE_LOCATION@)
+set(ParaView_BUNDLE_LOCATION "@ParaView_BUNDLE_LOCATION@")
 
 if(ParaView_BUNDLE_LOCATION)
   set(InstallPrefix "${CMAKE_INSTALL_PREFIX}/${ParaView_BUNDLE_LOCATION}")
