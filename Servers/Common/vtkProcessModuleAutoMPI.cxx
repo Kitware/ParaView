@@ -123,6 +123,12 @@ public:
   bool SetMPIRun(vtkstd::string mpiexec);
 };
 
+#ifdef WIN32
+#  define PARAVIEW_SERVER "pvserver.exe"
+#else
+#  define PARAVIEW_SERVER "pvserver"
+#endif
+
 //------------------------------------------------------------------------macro
 /*
  * The standard new macro
@@ -226,13 +232,12 @@ int vtkProcessModuleAutoMPIInternals::
     // Construct the Command line that will be executed
     vtksys_stl::vector<vtkstd::string> serverCommandStr;
     vtksys_stl::vector<const char*> serverCommand;
+    //vtkstd::string serverExe = this->ParaViewServer;
 
-#if defined(WIN32)
+    vtkPVOptions* options = vtkProcessModule::GetProcessModule()->GetOptions();
+    vtkstd::string app_dir = options->GetApplicationPath();
     vtkstd::string serverExe =
-      vtkstd::string(this->ParaViewServer.c_str() + vtkstd::string(".exe")).c_str();
-#else
-    vtkstd::string serverExe = this->ParaViewServer;
-#endif
+      vtksys::SystemTools::GetProgramPath(app_dir.c_str()) + "/" + PARAVIEW_SERVER;
 
     this->CreateCommandLine(serverCommandStr,
                       serverExe.c_str(),
@@ -263,8 +268,6 @@ int vtkProcessModuleAutoMPIInternals::
     }
   return 1;
 }
-
-#define PARAVIEW_SERVER "pvserver"
 
 //---------------------------------------------------------------------internal
 /*
