@@ -209,6 +209,12 @@ INSTALL(FILES "${EXECUTABLE_OUTPUT_PATH}/.plugins"
 # Call this last so the install script runs after the above targets are installed:
 #
 IF(APPLE)
+
+  SET (ParaView_BUNDLE_LOCATION "" CACHE FILEPATH
+  "Subdirectory in which to place ParaView app inside a bundle.")
+
+  MARK_AS_ADVANCED(ParaView_BUNDLE_LOCATION)
+
   SET(distributed_plugins ${PARAVIEW_PLUGINLIST})
   SET(PV_EXE_NAME "paraview")
   SET(OSX_MAKE_STANDALONE_BUNDLE_CMAKE_SCRIPT
