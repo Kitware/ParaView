@@ -62,7 +62,7 @@ set(FFMPEG_MD5)
 set(MANTA_REVISION 2478)
 set(MANTA_URL http://paraview.org/files/misc)
 set(MANTA_GZ manta-r${MANTA_REVISION}.tar.gz)
-set(MANTA_MD5)
+set(MANTA_MD5 1e0fa4dde2815a0977a93d09cce40d74)
 
 set(OPENMPI_MAJOR 1)
 set(OPENMPI_MINOR 4)
