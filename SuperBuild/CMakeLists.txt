@@ -115,7 +115,8 @@ if(NOT APPLE)
     -DMPIEXEC:FILEPATH=${MPIEXEC}
     -DMPI_INCLUDE_PATH:PATH=${MPI_INCLUDE_PATH}
     -DMPI_LIBRARY:FILEPATH=${MPI_LIBRARY}
-    -DMPI_EXTRA_LIBRARY:FILEPATH=${MPI_EXTRA_LIBRARY})
+    -DMPI_EXTRA_LIBRARY:FILEPATH=${MPI_EXTRA_LIBRARY}
+    -DPARAVIEW_INSTALL_MPIEXEC:BOOL=ON)
 
   include(External_Python)
   list(APPEND ParaView_depenencies Python)
@@ -151,6 +152,13 @@ list(APPEND ParaView_dependencies Manta)
 
 include(External_Boost)
 list(APPEND ParaView_dependencies Boost)
+
+include(External_zlib)
+list(APPEND ParaView_dependencies zlib)
+list(APPEND png_dependencies zlib)
+
+include(External_png)
+list(APPEND ParaView_dependencies png)
 
 if(NOT WIN32)
   #include(External_Silo)
