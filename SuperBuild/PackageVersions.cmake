@@ -80,8 +80,13 @@ set(QT_URL http://get.qt.nokia.com/qt/source)
 set(QT_GZ qt-everywhere-opensource-src-${QT_VERSION}.tar.gz)
 set(QT_MD5 6f88d96507c84e9fea5bf3a71ebeb6d7)
 
-
-set(CGNS_GZ http://sourceforge.net/projects/cgns/files/cgnslib_2.5/Release%204/cgnslib_2.5-4.tar.gz/download)
+set(CGNS_MAJOR 2)
+set(CGNS_MINOR 5)
+set(CGNS_PATCH 4)
+set(CGNS_VERSION ${CGNS_MAJOR}.${CGNS_MINOR}.${CGNS_PATCH})
+set(CGNS_URL http://sourceforge.net/projects/cgns/files/cgnslib_${CGNS_MAJOR}.${CGNS_MINOR}/Release%204)
+set(CGNS_GZ cgnslib_${CGNS_MAJOR}.${CGNS_MINOR}-${CGNS_PATCH}.tar.gz/download)
+set(CGNS_MD5)
 
 set(SILO_MAJOR 4)
 set(SILO_MINOR 8)
