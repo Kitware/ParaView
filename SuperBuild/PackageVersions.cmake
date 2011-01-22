@@ -99,4 +99,13 @@ set(HDF5_URL)
 set(HDF5_GZ)
 set(HDF5_MD5)
 
+
+set(ZLIB_MAJOR)
+set(ZLIB_MINOR)
+set(ZLIB_PATCH)
+set(ZLIB_VERSION ${ZLIB_MAJOR}.${ZLIB_MINOR}.${ZLIB_PATCH})
+set(ZLIB_URL)
+set(ZLIB_GZ)
+set(ZLIB_MD5)
+
 set(
