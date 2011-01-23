@@ -165,6 +165,13 @@ if(NOT WIN32)
   #list(APPEND ParaView_dependencies Silo)
 
   include(External_FFMPEG)
+  set(FFMPEG_ARGS
+    -DVTK_USE_FFMPEG_ENCODER:BOOL=ON
+    -DFFMPEG_INCLUDE_DIR:PATH=${FFMPEG_INCLUDE_DIR}
+    -DFFMPEG_avcodec_LIBRARY:FILEPATH=${FFMPEG_avcodec_LIBRARY}
+    -DFFMPEG_avformat_LIBRARY:FILEPATH=${FFMPEG_avformat_LIBRARY}
+    -DFFMPEG_avutil_LIBRARY:FILEPATH=${FFMPEG_avutil_LIBRARY}
+    -DFFMPEG_swscale_LIBRARY:FILEPATH=${FFMPEG_swscale_LIBRARY})
   list(APPEND ParaView_dependencies FFMPEG)
 endif()
 
