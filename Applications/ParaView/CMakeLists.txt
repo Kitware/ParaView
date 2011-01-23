@@ -210,7 +210,7 @@ INSTALL(FILES "${EXECUTABLE_OUTPUT_PATH}/.plugins"
 #
 IF(APPLE)
 
-  SET (ParaView_BUNDLE_LOCATION "" CACHE FILEPATH
+  SET (ParaView_BUNDLE_LOCATION "" CACHE STRING
   "Subdirectory in which to place ParaView app inside a bundle.")
 
   MARK_AS_ADVANCED(ParaView_BUNDLE_LOCATION)
