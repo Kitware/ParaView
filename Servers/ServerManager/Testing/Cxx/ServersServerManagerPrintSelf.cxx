@@ -95,7 +95,6 @@
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyIterator.h"
 #include "vtkSMPropertyLink.h"
-#include "vtkSMPropertyModificationUndoElement.h"
 #include "vtkSMProxyConfigurationReader.h"
 #include "vtkSMProxyConfigurationWriter.h"
 #include "vtkSMProxyDefinitionIterator.h"
@@ -106,12 +105,8 @@
 #include "vtkSMProxyListDomain.h"
 #include "vtkSMProxyLocator.h"
 #include "vtkSMProxyManager.h"
-#include "vtkSMProxyManagerReviver.h"
 #include "vtkSMProxyProperty.h"
-#include "vtkSMProxyRegisterUndoElement.h"
 #include "vtkSMProxySelectionModel.h"
-#include "vtkSMProxyStateChangedUndoElement.h"
-#include "vtkSMProxyUnRegisterUndoElement.h"
 #include "vtkSMPSWriterProxy.h"
 #include "vtkSMPVRepresentationProxy.h"
 #include "vtkSMPWriterProxy.h"
@@ -124,7 +119,6 @@
 #include "vtkSMScalarBarWidgetRepresentationProxy.h"
 #include "vtkSMSelectionHelper.h"
 #include "vtkSMServerFileListingProxy.h"
-#include "vtkSMServerProxyManagerReviver.h"
 #include "vtkSMServerSideAnimationPlayer.h"
 #include "vtkSMSILDomain.h"
 #include "vtkSMSILModel.h"
@@ -146,14 +140,12 @@
 #include "vtkSMUndoStackBuilder.h"
 #include "vtkSMUndoStack.h"
 #include "vtkSMUnstructuredGridVolumeRepresentationProxy.h"
-#include "vtkSMUpdateInformationUndoElement.h"
 #include "vtkSMUtilities.h"
 #include "vtkSMVectorProperty.h"
 #include "vtkSMViewProxy.h"
 #include "vtkSMWidgetRepresentationProxy.h"
 #include "vtkSMWriterFactory.h"
 #include "vtkSMWriterProxy.h"
-#include "vtkSMXMLParser.h"
 #include "vtkSMXMLPVAnimationWriterProxy.h"
 
 #define PRINT_SELF(classname)\
@@ -250,11 +242,9 @@ int main(int , char *[])
   PRINT_SELF(vtkSMProxyListDomain);
   PRINT_SELF(vtkSMProxyLocator);
   PRINT_SELF(vtkSMProxyManager);
-  PRINT_SELF(vtkSMProxyManagerReviver);
   PRINT_SELF(vtkSMProxyProperty);
   PRINT_SELF(vtkSMProxyRegisterUndoElement);
   PRINT_SELF(vtkSMProxySelectionModel);
-  PRINT_SELF(vtkSMProxyStateChangedUndoElement);
   PRINT_SELF(vtkSMProxyUnRegisterUndoElement);
   PRINT_SELF(vtkSMPSWriterProxy);
   PRINT_SELF(vtkSMPVRepresentationProxy);
@@ -268,7 +258,6 @@ int main(int , char *[])
   PRINT_SELF(vtkSMScalarBarWidgetRepresentationProxy);
   PRINT_SELF(vtkSMSelectionHelper);
   PRINT_SELF(vtkSMServerFileListingProxy);
-  PRINT_SELF(vtkSMServerProxyManagerReviver);
   PRINT_SELF(vtkSMServerSideAnimationPlayer);
   PRINT_SELF(vtkSMSILDomain);
   PRINT_SELF(vtkSMSILModel);
@@ -292,14 +281,12 @@ int main(int , char *[])
   PRINT_SELF(vtkSMUndoStackBuilder);
   PRINT_SELF(vtkSMUndoStack);
   PRINT_SELF(vtkSMUnstructuredGridVolumeRepresentationProxy);
-  PRINT_SELF(vtkSMUpdateInformationUndoElement);
   PRINT_SELF(vtkSMUtilities);
   PRINT_SELF(vtkSMVectorProperty);
   PRINT_SELF(vtkSMViewProxy);
   PRINT_SELF(vtkSMWidgetRepresentationProxy);
   PRINT_SELF(vtkSMWriterFactory);
   PRINT_SELF(vtkSMWriterProxy);
-  PRINT_SELF(vtkSMXMLParser);
   PRINT_SELF(vtkSMXMLPVAnimationWriterProxy);
   return 0;
 }

@@ -45,10 +45,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtksys/ios/sstream>
 #include <vtksys/RegularExpression.hxx>
 
-#ifdef FIXME_COLLABORATION
-#include "pqProxyUnRegisterUndoElement.h"
-#endif
-
 vtkStandardNewMacro(pqUndoStackBuilder);
 //-----------------------------------------------------------------------------
 pqUndoStackBuilder::pqUndoStackBuilder()

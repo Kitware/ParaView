@@ -387,9 +387,6 @@ ADD_LIBRARY(pqCore
 
 #ADD_LIBRARY(pqCore_old
 #
-#
-#  pqProxyUnRegisterUndoElement.cxx
-#  pqProxyUnRegisterUndoElement.h
 ##  pqScatterPlotRepresentation.cxx
 ##  pqScatterPlotRepresentation.h
 ##  pqScatterPlotView.cxx
