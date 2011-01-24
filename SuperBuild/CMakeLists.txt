@@ -85,8 +85,7 @@ if(APPLE)
   set(pv_apple_compiler_args
     -DCMAKE_OSX_ARCHITECTURES:STRING=${CMAKE_OSX_ARCHITECTURES}
     -DCMAKE_OSX_DEPLOYMENT_TARGET:STRING=${CMAKE_OSX_DEPLOYMENT_TARGET}
-    -DCMAKE_OSX_SYSROOT:PATH=${CMAKE_OSX_SYSROOT}
-    -DASDF:STRING=ASDF)
+    -DCMAKE_OSX_SYSROOT:PATH=${CMAKE_OSX_SYSROOT})
   list(APPEND pv_compiler_args ${pv_apple_compiler_args})
 
   if(NOT "${CMAKE_OSX_SYSROOT}" STREQUAL "")
@@ -145,12 +144,6 @@ if(NOT APPLE)
   include(External_Python)
   list(APPEND ParaView_depenencies Python)
 
-  if(APPLE AND "${CMAKE_OSX_DEPLOYMENT_TARGET}" STREQUAL "10.5")
-    set(PYTHON_EXECUTABLE "/System/Library/Frameworks/Python.framework/Versions/2.5/bin/python")
-    set(PYTHON_LIBRARY "/System/Library/Frameworks/Python.framework/Versions/2.5/Python")
-    set(PYTHON_INCLUDE_DIR "/System/Library/Frameworks/Python.framework/Versions/2.5/include/python2.5")
-  endif()
-
   set(NUMPY_dependencies python)
 
   if(CMAKE_Fortran_COMPILER)
@@ -168,6 +161,13 @@ else()
 
   find_package(PythonInterp)
   find_package(PythonLibs)
+
+  if(APPLE AND "${CMAKE_OSX_DEPLOYMENT_TARGET}" STREQUAL "10.5")
+    set(PYTHON_EXECUTABLE "/System/Library/Frameworks/Python.framework/Versions/2.5/bin/python" CACHE PATH "" FORCE)
+    set(PYTHON_LIBRARY "/System/Library/Frameworks/Python.framework/Versions/2.5/Python" CACHE PATH "" FORCE)
+    set(PYTHON_INCLUDE_DIR "/System/Library/Frameworks/Python.framework/Versions/2.5/include/python2.5" CACHE FILEPATH "" FORCE)
+  endif()
+
   find_package(MPI)
 
   include(External_NUMPY)
