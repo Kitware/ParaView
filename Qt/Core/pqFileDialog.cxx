@@ -398,7 +398,7 @@ pqFileDialog::pqFileDialog(
                    SLOT(onDoubleClickFile(const QModelIndex&)));
 
   QObject::connect(this->Implementation->Ui.FileName,
-                   SIGNAL(textEdited(const QString&)),
+                   SIGNAL(textChanged(const QString&)),
                    this,
                    SLOT(onTextEdited(const QString&)));
 
