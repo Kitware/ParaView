@@ -140,6 +140,7 @@ public:
   QStringList Filters;
   bool SupressOverwriteWarning;
   const QString FileNamesSeperator;
+  bool ShowMultipleFileHelp;
 
   // remember the last locations we browsed
   static QMap<QPointer<pqServer>, QString> ServerFilePaths;
@@ -154,6 +155,7 @@ public:
     Completer(new QCompleter(&this->FileFilter, NULL)),
     Mode(ExistingFile),
     SupressOverwriteWarning(false),
+    ShowMultipleFileHelp(false),
     FileNamesSeperator(";")
   {
   QObject::connect(p, SIGNAL(filesSelected(const QList<QStringList> &)),
@@ -396,7 +398,7 @@ pqFileDialog::pqFileDialog(
                    SLOT(onDoubleClickFile(const QModelIndex&)));
 
   QObject::connect(this->Implementation->Ui.FileName,
-                   SIGNAL(textChanged(const QString&)),
+                   SIGNAL(textEdited(const QString&)),
                    this,
                    SLOT(onTextEdited(const QString&)));
 
@@ -510,6 +512,9 @@ void pqFileDialog::onContextMenuRequested(const QPoint &menuPos)
 //-----------------------------------------------------------------------------
 void pqFileDialog::setFileMode(pqFileDialog::FileMode mode)
 {
+  //this code is only needed for the 3.10 release as
+  //after that the user should know that the dialog support multiple file open
+  bool setupMutlipleFileHelp = false;
   this->Implementation->Mode = mode;
   QAbstractItemView::SelectionMode selectionMode;
   switch(this->Implementation->Mode)
@@ -521,10 +526,16 @@ void pqFileDialog::setFileMode(pqFileDialog::FileMode mode)
       selectionMode=QAbstractItemView::SingleSelection;
       break;
     case ExistingFiles:
+      setupMutlipleFileHelp = (this->Implementation->ShowMultipleFileHelp != true);
       selectionMode=QAbstractItemView::ExtendedSelection;
-      this->setWindowTitle(this->windowTitle() + "  (open multiple files with <ctrl> key.)");
-      this->setToolTip("open multiple files with <ctrl> key.");
       break;
+    }
+  if (setupMutlipleFileHelp)
+    {
+    //only set the tooltip and window title the first time through
+    this->Implementation->ShowMultipleFileHelp = true;
+    this->setWindowTitle(this->windowTitle() + "  (open multiple files with <ctrl> key.)");
+    this->setToolTip("open multiple files with <ctrl> key.");
     }
   this->Implementation->Ui.Files->setSelectionMode(selectionMode);
   this->Implementation->Ui.Favorites->setSelectionMode(selectionMode);
