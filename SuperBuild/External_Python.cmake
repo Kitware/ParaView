@@ -12,6 +12,14 @@ if(WIN32)
   get_filename_component(python_base ${python_sln} PATH)
   get_filename_component(python_home ${python_base} PATH)
 
+  if("${CMAKE_SIZEOF_VOID_P}" EQUAL 8)
+    set(python_configuration "Release|x64")
+    set(PythonPCBuildDir ${CMAKE_BINARY_DIR}/python-build/PCbuild/amd64)
+  else()
+    set(python_configuration "Release|Win32")
+    set(PythonPCBuildDir ${CMAKE_BINARY_DIR}/python-build/PCbuild)
+  endif()
+
   ExternalProject_Add(${proj}
     URL ${PYTHON_URL}/${PYTHON_GZ}
     URL_MD5 ${PYTHON_MD5}
@@ -20,7 +28,7 @@ if(WIN32)
     PATCH_COMMAND ""
     CONFIGURE_COMMAND ""
     BUILD_IN_SOURCE ${python_BUILD_IN_SOURCE}
-    BUILD_COMMAND ${CMAKE_BUILD_TOOL} ${python_sln} /build Release /project select
+    BUILD_COMMAND ${CMAKE_BUILD_TOOL} ${python_sln} /build ${python_configuration} /project select
     INSTALL_COMMAND ""
     DEPENDS
       ${python_DEPENDENCIES}
@@ -29,7 +37,7 @@ if(WIN32)
   # Convenient helper macro
   macro(build_python_target target depend)
     ExternalProject_Add_Step(${proj} Build_${target}
-      COMMAND ${CMAKE_BUILD_TOOL} ${python_sln} /build Release /project ${target}
+      COMMAND ${CMAKE_BUILD_TOOL} ${python_sln} /build ${python_configuration} /project ${target}
       DEPENDEES ${depend}
       )
   endmacro(build_python_target)
@@ -51,26 +59,26 @@ if(WIN32)
   build_python_target(_multiprocessing Build_pythonw)
 
   ExternalProject_Add_Step(${proj} Build_python
-    COMMAND ${CMAKE_BUILD_TOOL} ${python_sln} /build Release /project python
+    COMMAND ${CMAKE_BUILD_TOOL} ${python_sln} /build ${python_configuration} /project python
     DEPENDEES Build__multiprocessing
     DEPENDERS install
     )
 
   ExternalProject_Add_Step(${proj} CopyPythonLib
-    COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/python-build/PCbuild/python${PYVER_SHORT}.lib ${CMAKE_BINARY_DIR}/python-build/Lib/python${PYVER_SHORT}.lib
+    COMMAND ${CMAKE_COMMAND} -E copy ${PythonPCBuildDir}/python${PYVER_SHORT}.lib ${CMAKE_BINARY_DIR}/python-build/Lib/python${PYVER_SHORT}.lib
     DEPENDEES install
     )
   ExternalProject_Add_Step(${proj} Copy_socketPyd
-    COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/python-build/PCbuild/_socket.pyd ${CMAKE_BINARY_DIR}/python-build/Lib/_socket.pyd
+    COMMAND ${CMAKE_COMMAND} -E copy ${PythonPCBuildDir}/_socket.pyd ${CMAKE_BINARY_DIR}/python-build/Lib/_socket.pyd
     DEPENDEES install
     )
   ExternalProject_Add_Step(${proj} Copy_ctypesPyd
-    COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/python-build/PCbuild/_ctypes.pyd ${CMAKE_BINARY_DIR}/python-build/Lib/_ctypes.pyd
+    COMMAND ${CMAKE_COMMAND} -E copy ${PythonPCBuildDir}/_ctypes.pyd ${CMAKE_BINARY_DIR}/python-build/Lib/_ctypes.pyd
     DEPENDEES install
     )
 
   ExternalProject_Add_Step(${proj} CopyPythonDll
-    COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/python-build/PCbuild/python${PYVER_SHORT}.dll ${CMAKE_BINARY_DIR}/python-build/bin/${CMAKE_CFG_INTDIR}/python${PYVER_SHORT}.dll
+    COMMAND ${CMAKE_COMMAND} -E copy ${PythonPCBuildDir}/python${PYVER_SHORT}.dll ${CMAKE_BINARY_DIR}/python-build/bin/${CMAKE_CFG_INTDIR}/python${PYVER_SHORT}.dll
     DEPENDEES install
     )
 
@@ -130,9 +138,9 @@ set(PYTHON_EXECUTABLE)
 set(PYTHON_SITE_PACKAGES ${CMAKE_BINARY_DIR}/python-build/lib/python${PYVER}/site-packages)
 
 if(WIN32)
-  set(PYTHON_INCLUDE_DIR ${CMAKE_BINARY_DIR}/Python-build/Include)
-  set(PYTHON_LIBRARY ${CMAKE_BINARY_DIR}/Python-build/PCbuild/python${PYVER_SHORT}.lib)
-  set(PYTHON_EXECUTABLE ${CMAKE_BINARY_DIR}/Python-build/PCbuild/python.exe)
+  set(PYTHON_INCLUDE_DIR ${python_build}/Include)
+  set(PYTHON_LIBRARY ${PythonPCBuildDir}/python${PYVER_SHORT}.lib)
+  set(PYTHON_EXECUTABLE ${PythonPCBuildDir}/python.exe)
 elseif(APPLE)
   set(PYTHON_INCLUDE_DIR ${CMAKE_BINARY_DIR}/python-build/include/python${PYVER})
   set(PYTHON_LIBRARY ${CMAKE_BINARY_DIR}/python-build/lib/libpython${PYVER}.dylib)
