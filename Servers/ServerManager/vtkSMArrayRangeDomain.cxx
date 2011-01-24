@@ -162,6 +162,7 @@ void vtkSMArrayRangeDomain::Update(const char* arrayName,
     return;
     }
 
+  bool valid = true;
   if ( iad->GetAttributeType() == vtkSMInputArrayDomain::ANY )
     {
     this->SetArrayRange(info->GetPointDataInformation(), arrayName);
@@ -172,11 +173,21 @@ void vtkSMArrayRangeDomain::Update(const char* arrayName,
     }
   else if ( iad->GetAttributeType() == vtkSMInputArrayDomain::POINT )
     {
-    this->SetArrayRange(info->GetPointDataInformation(), arrayName);
+    valid = this->SetArrayRange(info->GetPointDataInformation(), arrayName);
+    if (!valid)
+      {
+      this->SetArrayRangeForAutoConvertProperty(
+        info->GetCellDataInformation(),arrayName);
+      }
     }
   else if ( iad->GetAttributeType() == vtkSMInputArrayDomain::CELL )
     {
-    this->SetArrayRange(info->GetCellDataInformation(), arrayName);
+    valid = this->SetArrayRange(info->GetCellDataInformation(), arrayName);
+    if (!valid)
+      {
+      this->SetArrayRangeForAutoConvertProperty(
+        info->GetPointDataInformation(),arrayName);
+      }
     }
   else if ( iad->GetAttributeType() == vtkSMInputArrayDomain::VERTEX)
     {
@@ -193,14 +204,13 @@ void vtkSMArrayRangeDomain::Update(const char* arrayName,
 }
 
 //---------------------------------------------------------------------------
-void vtkSMArrayRangeDomain::SetArrayRange(
+bool vtkSMArrayRangeDomain::SetArrayRange(
   vtkPVDataSetAttributesInformation* info, const char* arrayName)
 {
   vtkPVArrayInformation* ai = info->GetArrayInformation(arrayName);
   if (!ai)
-    {
-    this->SetArrayRangeForAutoConvertProperty(info,arrayName);
-    return;
+    {    
+    return false;
     }
 
   int numArrComp = ai->GetNumberOfComponents();
@@ -218,10 +228,11 @@ void vtkSMArrayRangeDomain::SetArrayRange(
     this->AddMinimum(numArrComp, ai->GetComponentRange(-1)[0]);
     this->AddMaximum(numArrComp, ai->GetComponentRange(-1)[1]);
     }
+  return true;
 }
 
 //---------------------------------------------------------------------------
-void vtkSMArrayRangeDomain::SetArrayRangeForAutoConvertProperty(
+bool vtkSMArrayRangeDomain::SetArrayRangeForAutoConvertProperty(
   vtkPVDataSetAttributesInformation* info, const char* arrayName)
 {
   vtkStdString name =
@@ -229,20 +240,24 @@ void vtkSMArrayRangeDomain::SetArrayRangeForAutoConvertProperty(
   if ( name.length() == 0 )
     {
     //failed to extract the name from the mangled name
-    return;
+    return false;
+    }
+  if ( name == vtkStdString(arrayName) )
+    {
+    return this->SetArrayRange(info,arrayName);
     }
 
   vtkPVArrayInformation* ai = info->GetArrayInformation(name.c_str());
   if (!ai)
     {
-    return;
+    return false;
     }
   int numArrComp = ai->GetNumberOfComponents();
   int comp =
     vtkSMArrayListDomain::ComponentIndexFromMangledName(ai,arrayName);
   if ( comp == -1 )
     {
-    return;
+    return false;
     }
 
   // This creates numMinMax entries but leaves them unset (no min or max)
@@ -260,7 +275,7 @@ void vtkSMArrayRangeDomain::SetArrayRangeForAutoConvertProperty(
     this->AddMaximum(0, ai->GetComponentRange(-1)[1]);
     }
 
-  return;
+  return true;
 }
 
 //---------------------------------------------------------------------------

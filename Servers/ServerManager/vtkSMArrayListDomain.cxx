@@ -800,7 +800,7 @@ vtkStdString vtkSMArrayListDomain::ArrayNameFromMangledName(
   size_t pos = extractedName.rfind("_");
   if (pos == vtkStdString::npos)
     {
-    return vtkStdString("");
+    return extractedName;
     }
   return extractedName.substr(0,pos);
 }
