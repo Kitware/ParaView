@@ -110,6 +110,7 @@ protected:
   int Refine(vtkStreamingHarness *);
   int Coarsen(vtkStreamingHarness *);
   void Reap(vtkStreamingHarness *);
+  bool AnyToRefine(vtkStreamingHarness *);
 
   enum {COARSEN, STAY, ADVANCE};
 

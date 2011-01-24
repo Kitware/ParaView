@@ -89,11 +89,6 @@ public:
   vtkGetObjectMacro(PieceList2, vtkPieceList);
 
   //Description:
-  //A helper to help terminate refinement.
-  vtkSetMacro(NoneToRefine, bool);
-  vtkGetMacro(NoneToRefine, bool);
-
-  //Description:
   //Handle to immediately upstream cache filter.
   //This may or may not be present, but when so having the handle here simplifies
   //the driver's code to manage the cache.
@@ -103,7 +98,6 @@ public:
   //Description:
   //In multiresolution streaming, this prevents the associated object from
   //changing resolution level. Default is 0, off.
-  //vtkSetMacro(LockRefinement, int);
   void SetLockRefinement(int );
   vtkGetMacro(LockRefinement, int);
 
@@ -141,7 +135,6 @@ protected:
   int NumberOfPieces;
   double Resolution;
   bool ForOther;
-  bool NoneToRefine;
 
   vtkPieceList *PieceList1;
   vtkPieceList *PieceList2;

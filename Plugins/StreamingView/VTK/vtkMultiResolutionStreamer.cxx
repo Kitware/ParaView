@@ -37,23 +37,19 @@ public:
   Internals(vtkMultiResolutionStreamer *owner)
   {
     this->Owner = owner;
-    this->WendDone = true;
-    this->CameraMoved = true;
+    this->StartOver = true;
     this->StopNow = false;
     this->RefineNow = false;
     this->CoarsenNow = false;
-    this->DebugPass = 0;
   }
   ~Internals()
   {
   }
   vtkMultiResolutionStreamer *Owner;
-  bool WendDone;
-  bool CameraMoved;
+  bool StartOver;
   bool StopNow;
   bool RefineNow;
   bool CoarsenNow;
-  int DebugPass; //used solely for debug messages
 };
 
 //----------------------------------------------------------------------------
@@ -103,7 +99,7 @@ bool vtkMultiResolutionStreamer::IsFirstPass()
     return true;
     }
 
-  if (this->Internal->WendDone)
+  if (this->Internal->StartOver)
     {
     DEBUGPRINT_PASSES(cerr << "STARTOVER" << endl;);
     return true;
@@ -155,44 +151,46 @@ void vtkMultiResolutionStreamer::PrepareFirstPass()
     if (!ToDo)
       {
       //very first pass, start off with one piece at lowest res
-      vtkPieceList *pl = vtkPieceList::New();
       vtkPiece p;
       p.SetResolution(0.0);
       p.SetPiece(0);
       p.SetNumPieces(1);
-      pl->AddPiece(p);
+
+      //initialize the "this set of passes" and "next set passes" queues
+      vtkPieceList *pl = vtkPieceList::New(); //ToDo == "this set of passes"
       harness->SetPieceList1(pl);
       pl->Delete();
       ToDo = pl;
-
-      //and initialize an empty next frame queue
-      pl = vtkPieceList::New();
+      pl = vtkPieceList::New(); //NextFrame == "next set of passes"
+      pl->AddPiece(p);
       harness->SetPieceList2(pl);
       pl->Delete();
       }
 
+    //at this point TD is either empty or has only unimportant pieces in it
+    //and NF has all of the pieces we drew last time
+
     //combine empties that no longer matter
-    this->Reap(harness);
+    this->Reap(harness); //merges unimportant pieces left in TD
 
     if ((this->ProgressionMode == MANUAL && manualCommand == COARSEN))
       {
-      this->Coarsen(harness);
+      this->Coarsen(harness); //merges pieces in NF and empties NF onto TD
       }
-    harness->SetNoneToRefine(true);
-    //split and refine some of the pieces in nextframe
     if (this->ProgressionMode == AUTOMATIC ||
         (this->ProgressionMode == MANUAL && manualCommand == ADVANCE))
       {
-      int numRefined = this->Refine(harness);
-      if (numRefined > 0)
-        {
-        harness->SetNoneToRefine(false);
-        }
+      this->Refine(harness); //splits pieces in NF and empties NF onto TD
       }
     if (this->ProgressionMode != AUTOMATIC && manualCommand == STAY)
       {
+      //we weren't told to refine or coarsen anything
+      //simply dump NF onto TD to keep redrawing it
       ToDo->MergePieceList(harness->GetPieceList2());
       }
+
+    //at this point NF is empty and TD has all of the pieces we are going to
+    //draw in this set of passes
 
     //compute priorities for everything we are going to draw this wend
     for (int i = 0; i < ToDo->GetNumberOfPieces(); i++)
@@ -239,14 +237,6 @@ void vtkMultiResolutionStreamer::PrepareFirstPass()
          );
       piece.SetViewPriority(gPri);
 
-      if (this->Internal->CameraMoved)
-        {
-        //TODO: this whole forCamera and reapedflag business is a workaround
-        //for the way refining/reaping can by cyclic and not terminate.
-        //I would like to find a better termination condition and remove this.
-        piece.SetReapedFlag(false);
-        }
-
       ToDo->SetPiece(i, piece);
       }
 
@@ -290,9 +280,7 @@ int vtkMultiResolutionStreamer::Refine(vtkStreamingHarness *harness)
     vtkPiece piece = NextFrame->PopPiece();
     double res = piece.GetResolution();
     double priority = piece.GetPriority();
-    bool reaped = piece.GetReapedFlag();
-    if (!reaped &&
-        priority > 0.0 &&
+    if ((priority > 0.0) &&
         (res+res_delta <= maxRes))
       {
       numSplittable++;
@@ -539,7 +527,6 @@ void vtkMultiResolutionStreamer::Reap(vtkStreamingHarness *harness)
             }
           piece.SetResolution(res);
           piece.SetPipelinePriority(0.0);
-          piece.SetReapedFlag(true); //this avoids an infinite loop
           DEBUGPRINT_REFINE
             (
              cerr << "REAP "
@@ -652,43 +639,46 @@ void vtkMultiResolutionStreamer::StartRenderEvent()
 {
   DEBUGPRINT_PASSES
     (
-     cerr << "SR " << this->Internal->DebugPass << endl;
+     cerr << "SR " << endl;
      );
 
   vtkRenderer *ren = this->GetRenderer();
   vtkRenderWindow *rw = this->GetRenderWindow();
-  if (!ren || !rw)
-    {
-    return;
-    }
 
-  this->Internal->CameraMoved = this->IsFirstPass();
+  bool firstPass = this->IsFirstPass();
   if (this->GetParallelHelper())
     {
-    this->GetParallelHelper()->Reduce(this->Internal->CameraMoved);
+    this->GetParallelHelper()->Reduce(firstPass);
     }
-  if (this->Internal->CameraMoved)
+  if (firstPass)
     {
     DEBUGPRINT_PASSES
       (
        cerr << "RESTART" << endl;
-       this->Internal->DebugPass = 0;
        );
 
     //show whatever we partially drew before the camera moved
     this->CopyBackBufferToFront();
 
     //start off initial pass by clearing the screen
-    ren->EraseOn();
-    rw->EraseOn();
-    if (!rw->GetNeverRendered())
+    if (ren && rw)
       {
-      rw->Frame();
+      ren->EraseOn();
+      rw->EraseOn();
+      if (!rw->GetNeverRendered())
+        {
+        rw->Frame();
+        }
       }
 
     //compute priority of subsequent set of passes
     //set pipeline to show the most important one this pass
     this->PrepareFirstPass();
+
+    //above figures out what the subsequent set of passes should do,
+    //but doesn't actually update the pipeline to point to the first passes
+    //work. do that like so here.
+    this->PrepareNextPass();
     }
   else
     {
@@ -698,15 +688,53 @@ void vtkMultiResolutionStreamer::StartRenderEvent()
 
   //don't swap back to front automatically
   //only update the screen once the last piece is drawn
-  rw->SwapBuffersOff();
+  if (rw)
+    {
+    rw->SwapBuffersOff();
+    }
 
   //assume that we are not done covering all the domains
-  this->Internal->WendDone = false;
+  this->Internal->StartOver = false;
+}
+
+//----------------------------------------------------------------------------
+bool vtkMultiResolutionStreamer::AnyToRefine(vtkStreamingHarness *harness)
+{
+  if (harness->GetLockRefinement())
+    {
+    return false;
+    }
+
+  double res_delta = (1.0/this->RefinementDepth);
+  vtkPieceList *NextFrame = harness->GetPieceList2();
+  double maxRes = 1.0;
+  if (this->DepthLimit>0.0)
+    {
+    maxRes = res_delta*this->DepthLimit;
+    maxRes = (maxRes<1.0?maxRes:1.0);
+    }
+  for (int i = 0; i < NextFrame->GetNumberOfPieces(); i++)
+    {
+    vtkPiece piece = NextFrame->GetPiece(i);
+    double res = piece.GetResolution();
+    double priority = piece.GetPriority();
+    if ((priority > 0.0) &&
+        (res+res_delta <= maxRes))
+      {
+      return true;
+      }
+    }
+  return false;
 }
 
 //----------------------------------------------------------------------------
 bool vtkMultiResolutionStreamer::IsCompletelyDone()
 {
+  if (this->Internal->StopNow)
+    {
+    return true;
+    }
+
   vtkCollection *harnesses = this->GetHarnesses();
   if (!harnesses)
     {
@@ -726,6 +754,7 @@ bool vtkMultiResolutionStreamer::IsCompletelyDone()
       continue;
       }
 
+    //check if anyone hasn't reached the end of the visible domain
     vtkPieceList *ToDo = harness->GetPieceList1();
     if (ToDo && ToDo->GetNumberNonZeroPriority() > 0)
       {
@@ -733,10 +762,14 @@ bool vtkMultiResolutionStreamer::IsCompletelyDone()
       break;
       }
 
-    if (harness->GetNoneToRefine() == false)
+    //look for any in nextframe that could be refined
+    if (this->ProgressionMode == AUTOMATIC)
       {
-      everyone_completely_done = false;
-      break;
+      if (this->AnyToRefine(harness))
+        {
+        everyone_completely_done = false;
+        break;
+        }
       }
     }
   iter->Delete();
@@ -784,8 +817,7 @@ void vtkMultiResolutionStreamer::EndRenderEvent()
 {
   DEBUGPRINT_PASSES
     (
-     cerr << "ER " << this->Internal->DebugPass << endl;
-     this->Internal->DebugPass++;
+     cerr << "ER " << endl;
      );
 
   vtkRenderer *ren = this->GetRenderer();
@@ -800,7 +832,7 @@ void vtkMultiResolutionStreamer::EndRenderEvent()
   ren->EraseOff();
   rw->EraseOff();
 
-  bool allDone = this->IsCompletelyDone() || this->Internal->StopNow;
+  bool allDone = this->IsCompletelyDone();
   if (this->GetParallelHelper())
     {
     this->GetParallelHelper()->Reduce(allDone);
@@ -810,7 +842,7 @@ void vtkMultiResolutionStreamer::EndRenderEvent()
     DEBUGPRINT_PASSES(cerr << "ALL DONE" << endl;);
     this->Internal->StopNow = false;
     //next pass should start with clear screen
-    this->Internal->WendDone = true;
+    this->Internal->StartOver = true;
     //bring back buffer forward to show what we drew
     this->CopyBackBufferToFront();
     }
@@ -825,9 +857,8 @@ void vtkMultiResolutionStreamer::EndRenderEvent()
       {
       DEBUGPRINT_PASSES(cerr << "WEND DONE" << endl;);
       //next pass should start with clear screen
-      this->Internal->WendDone = true;
+      this->Internal->StartOver = true;
       }
-
     if (wendDone || this->DisplayFrequency==1)
       {
       this->CopyBackBufferToFront();
@@ -841,7 +872,7 @@ void vtkMultiResolutionStreamer::EndRenderEvent()
 //------------------------------------------------------------------------------
 void vtkMultiResolutionStreamer::RestartStreaming()
 {
-  this->Internal->WendDone = true;
+  this->Internal->StartOver = true;
 }
 
 //------------------------------------------------------------------------------
