@@ -3,11 +3,15 @@
 set(NUMPY_binary "${CMAKE_CURRENT_BINARY_DIR}/NUMPY/")
 
 if(APPLE)
+  set(NUMPY_PERFIX
+      "--home=${CMAKE_CURRENT_BINARY_DIR}/ParaView-build")
   set(NUMPY_INSTALL_PURELIB
       "--install-purelib=${CMAKE_CURRENT_BINARY_DIR}/ParaView-build/Utilities/VTKPythonWrapping/site-packages")
+  set(NUMPY_INSTALL_PLATLIB
+      "--install-platlib=${CMAKE_CURRENT_BINARY_DIR}/ParaView-build/Utilities/VTKPythonWrapping/site-packages")
   set(NUMPY_INSTALL_SCRIPTS
       "--install-scripts=${CMAKE_CURRENT_BINARY_DIR}/ParaView-build/bin")
-  set(NUMPY_PREFIX_ARGS "${NUMPY_INSTALL_PURELIB} ${NUMPY_INSTALL_SCRIPTS}")
+  set(NUMPY_PREFIX_ARGS "${NUMPY_PERFIX} ${NUMPY_INSTALL_PURELIB} ${NUMPY_INSTALL_PLATLIB} ${NUMPY_INSTALL_SCRIPTS}")
 endif()
 
 # to configure numpy we run a cmake -P script
