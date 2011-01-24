@@ -106,7 +106,6 @@ SET (Kit_SRCS
   vtkSMProxyManager.cxx
   vtkSMProxyProperty.cxx
   vtkSMProxySelectionModel.cxx
-  vtkSMProxyUndoElement.cxx
   vtkSMPSWriterProxy.cxx
   vtkSMPVRepresentationProxy.cxx
   vtkSMPWriterProxy.cxx

@@ -561,7 +561,7 @@ void vtkSMProxy::UpdateVTKObjects()
       vtkSMProperty* property = iter->second.Property;
       if (property && !property->GetInformationOnly())
         {
-        if (property->GetIsInternal() ||
+        if (property->GetIsInternal() || property->IsStateIgnored() ||
           strcmp(property->GetClassName(), "vtkSMProperty") == 0)
           {
           // Push only modified properties
@@ -708,7 +708,7 @@ void vtkSMProxy::CreateVTKObjects()
     vtkSMProperty* property = iter->second.Property;
     if (property && !property->GetInformationOnly())
       {
-      if (property->GetIsInternal() ||
+      if (property->GetIsInternal() || property->IsStateIgnored() ||
         strcmp(property->GetClassName(), "vtkSMProperty") == 0)
         {
         // No state for vtkSMProperty
@@ -1239,7 +1239,7 @@ vtkSMProperty* vtkSMProxy::NewProperty(const char* name,
     // Otherwise, properties like ForceUpdate get pushed and
     // cause problems.
     int is_internal;
-    if (property->GetIsInternal() ||
+    if (property->GetIsInternal() || property->IsStateIgnored() ||
       strcmp(property->GetClassName(), "vtkSMProperty") == 0)
       {
       this->DoNotModifyProperty = 1;

@@ -23,7 +23,6 @@
 #include "vtkSMProperty.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyManager.h"
-#include "vtkSMProxyUndoElement.h"
 #include "vtkSMRemoteObjectUpdateUndoElement.h"
 #include "vtkSMSession.h"
 #include "vtkSMUndoStack.h"
@@ -120,43 +119,10 @@ void vtkSMUndoStackBuilder::Add(vtkUndoElement* element)
   this->UndoSet->AddElement(element);
 }
 //-----------------------------------------------------------------------------
-void vtkSMUndoStackBuilder::OnCreation( vtkSMSession *session,
-                                        vtkTypeUInt32 globalId,
-                                        const vtkSMMessage *creationState)
-{
-  if (this->IgnoreAllChanges || !this->HandleChangeEvents() || !this->UndoStack)
-    {
-    return;
-    }
-
-  // No creation event for special remote object (i.e.: PipelineState...)
-  if(globalId < 10)
-    {
-    this->OnUpdate(session, globalId, creationState, creationState);
-    }
-  else
-    {
-    if( creationState->HasExtension(ProxyState::xml_group) )
-      {
-      vtkSMProxyUndoElement* undoElement = vtkSMProxyUndoElement::New();
-      undoElement->SetSession(session);
-      undoElement->SetCreateElement( true );
-      undoElement->SetCreationState( creationState );
-      this->Add(undoElement);
-      undoElement->Delete();
-      }
-    else
-      {
-      vtkWarningMacro("Try to register Creation Undo event based on a non Proxy object.\n"
-                      << creationState->DebugString().c_str());
-      }
-    }
-}
-//-----------------------------------------------------------------------------
-void vtkSMUndoStackBuilder::OnUpdate( vtkSMSession *session,
-                                      vtkTypeUInt32 globalId,
-                                      const vtkSMMessage *previousState,
-                                      const vtkSMMessage *newState)
+void vtkSMUndoStackBuilder::OnStateChange( vtkSMSession *session,
+                                           vtkTypeUInt32 globalId,
+                                           const vtkSMMessage *previousState,
+                                           const vtkSMMessage *newState)
 {
   if (this->IgnoreAllChanges || !this->HandleChangeEvents() || !this->UndoStack)
     {
@@ -167,23 +133,6 @@ void vtkSMUndoStackBuilder::OnUpdate( vtkSMSession *session,
   undoElement = vtkSMRemoteObjectUpdateUndoElement::New();
   undoElement->SetSession(session);
   undoElement->SetUndoRedoState( previousState, newState );
-  this->Add(undoElement);
-  undoElement->Delete();
-}
-//-----------------------------------------------------------------------------
-void vtkSMUndoStackBuilder::OnDeletion( vtkSMSession *session,
-                                        vtkTypeUInt32 globalId,
-                                        const vtkSMMessage *previousState)
-{
-  if (this->IgnoreAllChanges || !this->HandleChangeEvents() || !this->UndoStack)
-    {
-    return;
-    }
-
-  vtkSMProxyUndoElement* undoElement = vtkSMProxyUndoElement::New();
-  undoElement->SetSession(session);
-  undoElement->SetCreateElement( false );
-  undoElement->SetCreationState( previousState );
   this->Add(undoElement);
   undoElement->Delete();
 }

@@ -81,9 +81,5 @@ bool vtkPMTimeStepsProperty::Pull(vtkSMMessage* msgToFill)
       }
     return true;
     }
-  else
-    {
-    outInfo->PrintSelf(cout, vtkIndent(5));
-    }
   return false;
 }

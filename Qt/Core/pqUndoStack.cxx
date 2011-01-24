@@ -41,7 +41,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkUndoSet.h"
 #include "vtkSMUndoElement.h"
-#include "vtkSMProxyUndoElement.h"
 #include "vtkSMRemoteObjectUpdateUndoElement.h"
 
 

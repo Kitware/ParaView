@@ -108,21 +108,11 @@ public:
 
 //BTX
 
-  // Record the creation of a Proxy
-  virtual void OnCreation( vtkSMSession* session,
-                           vtkTypeUInt32 globalId,
-                           const vtkSMMessage* creationState);
-
-  // Record an update of a RemoteObject
-  virtual void OnUpdate( vtkSMSession* session,
-                         vtkTypeUInt32 globalId,
-                         const vtkSMMessage* previousState,
-                         const vtkSMMessage* newState);
-
-  // Record the deletion of a Proxy
-  virtual void OnDeletion( vtkSMSession* session,
-                           vtkTypeUInt32 globalId,
-                           const vtkSMMessage* previousState);
+  // Record a state change on a RemoteObject
+  virtual void OnStateChange( vtkSMSession* session,
+                              vtkTypeUInt32 globalId,
+                              const vtkSMMessage* previousState,
+                              const vtkSMMessage* newState);
 
 protected:
   vtkSMUndoStackBuilder();

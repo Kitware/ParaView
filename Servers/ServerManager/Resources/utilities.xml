@@ -852,6 +852,7 @@
         command="AddViewProxy"
         clean_command="RemoveAllViewProxies"
         repeat_command="1"
+        state_ignored="1"
         argument_type="SMProxy" >
         <ProxyGroupDomain name="groups">
           <Group name="views" />
@@ -2018,6 +2019,7 @@
         command="AddView"
         remove_command="RemoveView"
         argument_type="SMProxy"
+        state_ignored="1"
         repeatable="1">
         <Documentation>
           Views with their view time linked with this time keeper.

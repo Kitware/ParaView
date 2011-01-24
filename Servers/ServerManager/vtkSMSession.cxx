@@ -180,7 +180,8 @@ void vtkSMSession::PushState(vtkSMMessage* msg)
           // Update
           if(oldState.SerializeAsString() != newState.SerializeAsString())
             {
-            this->UndoStackBuilder->OnUpdate(this, globalId, &oldState, &newState);
+            this->UndoStackBuilder->OnStateChange( this, globalId,
+                                                   &oldState, &newState);
             }
           }
         }

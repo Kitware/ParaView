@@ -42,6 +42,7 @@ int vtkSMProperty::CheckDomains = 0;
 //---------------------------------------------------------------------------
 vtkSMProperty::vtkSMProperty()
 {
+  this->StateIgnored = false;
   this->Command = 0;
   this->ImmediateUpdate = 0;
   this->Animateable = 2; // By default Animateable in advanced mode only.
@@ -313,9 +314,20 @@ int vtkSMProperty::ReadXMLAttributes(vtkSMProxy* vtkNotUsed(proxy),
 
   int immediate_update;
   retVal = element->GetScalarAttribute("immediate_update", &immediate_update);
-  if(retVal) 
-    { 
-    this->SetImmediateUpdate(immediate_update); 
+  if(retVal)
+    {
+    this->SetImmediateUpdate(immediate_update);
+    }
+
+  int state_ignored;
+  retVal = element->GetScalarAttribute("state_ignored", &state_ignored);
+  if(retVal)
+    {
+    this->SetStateIgnored( state_ignored );
+    }
+  else
+    {
+    this->StateIgnoredOff(); // Default value
     }
 
   int update_self;

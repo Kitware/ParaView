@@ -366,7 +366,6 @@ void vtkSMSessionCore::PushState(vtkSMMessage* message)
 //----------------------------------------------------------------------------
 void vtkSMSessionCore::PushStateSatelliteCallback()
 {
-  cout << "PushStateSatelliteCallback" << endl;
   int byte_size = 0;
   this->ParallelController->Broadcast(&byte_size, 1, 0);
 
@@ -389,7 +388,6 @@ void vtkSMSessionCore::PushStateSatelliteCallback()
 void vtkSMSessionCore::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  this->Internals->PrintRemoteMap();
 }
 
 //----------------------------------------------------------------------------

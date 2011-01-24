@@ -174,7 +174,6 @@ const char* vtkSMRenderViewProxy::IsSelectVisibleCellsAvailable()
     return "Selection not supported due to insufficient color depth.";
     }
 
-  //cout << "yes" << endl;
   return NULL;
 }
 
@@ -490,8 +489,6 @@ void vtkSMRenderViewProxy::MarkDirty(vtkSMProxy* modifiedProxy)
   if (this->IsSelectionCached)
     {
     this->IsSelectionCached = false;
-    // cout << "InvalidateCachedSelection" << endl;
-
     vtkSMMessage message;
     message << pvstream::InvokeRequest() << "InvalidateCachedSelection";
     this->Invoke(&message);
@@ -566,7 +563,6 @@ namespace
   //-----------------------------------------------------------------------------
   static void vtkShrinkSelection(vtkSelection* sel)
     {
-    // sel->Print(cout);
     vtkstd::map<int, int> pixelCounts;
     unsigned int numNodes = sel->GetNumberOfNodes();
     int choosen = -1;

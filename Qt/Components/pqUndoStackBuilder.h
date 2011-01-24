@@ -87,13 +87,9 @@ public:
   virtual void SetUndoStack(vtkSMUndoStack*);
 
   /// Overridden to filter unwanted event and manage auto undoset creation
-  virtual void OnCreation(vtkSMSession *session, vtkTypeUInt32 globalId,
-                          const vtkSMMessage *creationState);
-  virtual void OnUpdate(vtkSMSession *session, vtkTypeUInt32 globalId,
-                        const vtkSMMessage *previousState,
-                        const vtkSMMessage *newState);
-  virtual void OnDeletion(vtkSMSession *session, vtkTypeUInt32 globalId,
-                          const vtkSMMessage *previousState);
+  virtual void OnStateChange(vtkSMSession *session, vtkTypeUInt32 globalId,
+                             const vtkSMMessage *previousState,
+                             const vtkSMMessage *newState);
 
 protected:
   pqUndoStackBuilder();

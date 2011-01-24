@@ -94,7 +94,7 @@ int vtkUndoSet::Redo()
     elem->SetUndoSetWorkingContext(this->TmpWorkingCollection);
     if (!elem->Redo())
       {
-      cout << "Failing !!! >>>" << endl;
+      vtkDebugMacro("Redo Action is failing. Start redoing the actions.");
       // redo failed, undo the half redone operations.
       for (int rr=cc-1; rr >=0; --rr)
         {
@@ -106,7 +106,6 @@ int vtkUndoSet::Redo()
         }
       // Release ref of tmp objects
       this->TmpWorkingCollection->RemoveAllItems();
-      cout << "<<<< Failing !!!" << endl;
       return 0;
       }
     elem->SetUndoSetWorkingContext(0); // Clear Working context
@@ -130,7 +129,7 @@ int vtkUndoSet::Undo()
     elem->SetUndoSetWorkingContext(this->TmpWorkingCollection);
     if (!elem->Undo())
       {
-      cout << "Failing !!! >>>" << endl;
+      vtkDebugMacro("Undo Action is failing. Start redoing the actions.");
       // undo failed, redo the half undone operations.
       for (int rr=0; rr <cc; ++rr)
         {
@@ -142,7 +141,6 @@ int vtkUndoSet::Undo()
         }
       // Release ref of tmp objects
       this->TmpWorkingCollection->RemoveAllItems();
-      cout << "<<<< Failing !!!" << endl;
       return 0;
       }
     elem->SetUndoSetWorkingContext(0); // Clear Working context

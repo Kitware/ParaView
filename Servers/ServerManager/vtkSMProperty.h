@@ -247,6 +247,10 @@ public:
   vtkSMProxy* GetParent()
     { return this->Proxy; }
 
+  // Flag used to ignore property when building Proxy state for Undo/Redo state.
+  // The default value is false.
+  virtual bool IsStateIgnored() { return this->StateIgnored; }
+
 //BTX
 protected:
   vtkSMProperty();
@@ -384,6 +388,12 @@ protected:
     }
 
   vtkSMProxy* Proxy;
+
+  // Flag used to ignore property when building Proxy state for Undo/Redo state.
+  // The default value is false.
+  bool StateIgnored;
+  vtkSetMacro(StateIgnored, bool);
+  vtkBooleanMacro(StateIgnored, bool);
 
 private:
   vtkSMProperty(const vtkSMProperty&); // Not implemented

@@ -866,10 +866,10 @@ void vtkSMProxyDefinitionManager::MergeProxyDefinition(vtkPVXMLElement* element,
       {
       if (!subProxySrc[name]->GetAttribute("override"))
         {
-        cout << "#####################################" << endl;
-        cout << "Find conflict between 2 SubProxy name. ("
-             << name.c_str() << ")" << endl;
-        cout << "#####################################" << endl;
+        vtkWarningMacro("#####################################" << endl
+                        << "Find conflict between 2 SubProxy name. ("
+                        << name.c_str() << ")" << endl
+                        << "#####################################" << endl);
         return;
         }
       else
@@ -891,10 +891,10 @@ void vtkSMProxyDefinitionManager::MergeProxyDefinition(vtkPVXMLElement* element,
       {
       if (!propertiesSrc[name]->GetAttribute("override") )
         {
-        cout << "#####################################" << endl;
-        cout << "Find conflict between 2 property name. ("
-            << name.c_str() << ")" << endl;
-        cout << "#####################################" << endl;
+        vtkWarningMacro("#####################################" << endl
+                        << "Find conflict between 2 property name. ("
+                        << name.c_str() << ")" << endl
+                        << "#####################################" << endl);
         return;
         }
       else

@@ -116,7 +116,6 @@ void vtkSMRepresentationProxy::MarkDirty(vtkSMProxy* modifiedProxy)
     {
     if (!this->MarkedModified)
       {
-      //cout << "MarkModified" << endl;
       this->MarkedModified = true;
       vtkSMMessage message;
       message << pvstream::InvokeRequest() << "MarkModified";
@@ -129,7 +128,6 @@ void vtkSMRepresentationProxy::MarkDirty(vtkSMProxy* modifiedProxy)
 //----------------------------------------------------------------------------
 void vtkSMRepresentationProxy::RepresentationUpdated()
 {
-  ///cout << "RepresentationUpdated" << endl;
   this->MarkedModified = false;
   this->PostUpdateData();
   // PostUpdateData will call InvalidateDataInformation() which will mark

@@ -64,10 +64,6 @@ void vtkSMIdTypeVectorProperty::WriteTo(vtkSMMessage* msg)
 //---------------------------------------------------------------------------
 void vtkSMIdTypeVectorProperty::ReadFrom(const vtkSMMessage* msg, int offset)
 {
-  //cout << ">>>>>>>>>>>>" << endl;
-  //msg->PrintDebugString();
-  //cout << "<<<<<<<<<<<<" << endl;
-
   assert(msg->ExtensionSize(ProxyState::property) > offset);
 
   const ProxyState_Property *prop = &msg->GetExtension(ProxyState::property,

@@ -73,15 +73,18 @@ void pqUndoStackBuilder::SetUndoStack(vtkSMUndoStack* stack)
   this->Superclass::SetUndoStack(stack);
 }
 //-----------------------------------------------------------------------------
-void pqUndoStackBuilder::OnCreation( vtkSMSession *session,
-                                     vtkTypeUInt32 globalId,
-                                     const vtkSMMessage *creationState)
+void pqUndoStackBuilder::OnStateChange( vtkSMSession *session,
+                                        vtkTypeUInt32 globalId,
+                                        const vtkSMMessage *oldState,
+                                        const vtkSMMessage *newState)
 {
   vtkSMRemoteObject* proxy = session->GetRemoteObject(globalId);
 
-  // FIXME make sure we don't escape too much (Utkarsh)
+  // FIXME COLLABORATION make sure we don't escape too much (Utkarsh)
+  // We filter proxy type that must not be involved in undo/redo state.
+  // The property themselves are already filtered based on a flag in the XML.
+  // XML Flag: state_ignored="1"
   if( !proxy || (proxy && (
-      proxy->IsA("vtkSMViewProxy") ||
       proxy->IsA("vtkSMCameraProxy") ||
       proxy->IsA("vtkSMTimeKeeperProxy") ||
       proxy->IsA("vtkSMAnimationScene") ||
@@ -102,92 +105,7 @@ void pqUndoStackBuilder::OnCreation( vtkSMSession *session,
     this->Begin(stream.str().c_str());
     }
 
-  this->Superclass::OnCreation(session, globalId, creationState);
-
- if (auto_element)
-    {
-    this->End();
-
-    if (this->UndoSet->GetNumberOfElements() > 0)
-      {
-      this->PushToStack();
-      }
-    }
-}
-//-----------------------------------------------------------------------------
-void pqUndoStackBuilder::OnDeletion( vtkSMSession *session,
-                                     vtkTypeUInt32 globalId,
-                                     const vtkSMMessage *previousState)
-{
-  vtkSMRemoteObject* proxy = session->GetRemoteObject(globalId);
-
-  // FIXME make sure we don't escape too much (Utkarsh)
-  if( !proxy || (proxy && (
-      //proxy->IsA("vtkSMViewProxy") ||
-      proxy->IsA("vtkSMCameraProxy") ||
-      proxy->IsA("vtkSMTimeKeeperProxy") ||
-      proxy->IsA("vtkSMAnimationScene") ||
-      proxy->IsA("vtkSMAnimationSceneProxy") ||
-      proxy->IsA("vtkSMNewWidgetRepresentationProxy") ||
-      proxy->IsA("vtkSMScalarBarWidgetRepresentationProxy"))))
-    {
-    return;
-    }
-
-  bool auto_element = !this->IgnoreAllChanges &&
-    !this->IgnoreIsolatedChanges && !this->UndoRedoing;
-
-  if (auto_element)
-    {
-    vtksys_ios::ostringstream stream;
-    stream << "Changed '" << proxy->GetClassName() <<"'";
-    this->Begin(stream.str().c_str());
-    }
-
-  this->Superclass::OnDeletion(session, globalId, previousState);
-
- if (auto_element)
-    {
-    this->End();
-
-    if (this->UndoSet->GetNumberOfElements() > 0)
-      {
-      this->PushToStack();
-      }
-    }
-}
-//-----------------------------------------------------------------------------
-void pqUndoStackBuilder::OnUpdate( vtkSMSession *session,
-                                   vtkTypeUInt32 globalId,
-                                   const vtkSMMessage *oldState,
-                                   const vtkSMMessage *newState)
-{
-  vtkSMRemoteObject* proxy = session->GetRemoteObject(globalId);
-
-  // FIXME make sure we don't escape too much (Utkarsh)
-  if( !proxy || (proxy && (
-      //proxy->IsA("vtkSMViewProxy") ||
-      proxy->IsA("vtkSMCameraProxy") ||
-      proxy->IsA("vtkSMTimeKeeperProxy") ||
-      proxy->IsA("vtkSMAnimationScene") ||
-      proxy->IsA("vtkSMAnimationSceneProxy") ||
-      proxy->IsA("vtkSMNewWidgetRepresentationProxy") ||
-      proxy->IsA("vtkSMScalarBarWidgetRepresentationProxy"))))
-    {
-    return;
-    }
-
-  bool auto_element = !this->IgnoreAllChanges &&
-    !this->IgnoreIsolatedChanges && !this->UndoRedoing;
-
-  if (auto_element)
-    {
-    vtksys_ios::ostringstream stream;
-    stream << "Changed '" << proxy->GetClassName() <<"'";
-    this->Begin(stream.str().c_str());
-    }
-
-  this->Superclass::OnUpdate(session, globalId, oldState, newState);
+  this->Superclass::OnStateChange(session, globalId, oldState, newState);
 
  if (auto_element)
     {
