@@ -101,8 +101,6 @@ else()
   list(APPEND pv_compiler_args -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE})
 endif()
 
-message("pv_compiler_args ${pv_compiler_args}")
-
 # We aren't interested in seeing third party compiler warnings.
 set(pv_tpl_compiler_args ${pv_compiler_args})
 string(REPLACE "/W3" "/W0" pv_tpl_cxx_flags "${pv_tpl_cxx_flags}")
@@ -224,6 +222,7 @@ if(ParaView_BUILD_DOCUMENTATION)
     -DBUILD_DOCUMENTATION:BOOL=ON
     -DPARAVIEW_GENERATE_PROXY_DOCUMENTATION:BOOL=ON
     -DGENERATE_FILTERS_DOCUMENTATION:BOOL=ON
+    -DDOCUMENTATION_HTML_HELP:BOOL=ON
   )
 endif()
 
