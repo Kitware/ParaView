@@ -51,8 +51,6 @@ protected:
   vtkSMChartRepresentationProxy();
   ~vtkSMChartRepresentationProxy();
 
-  virtual void CreateVTKObjects();
-
 private:
   vtkSMChartRepresentationProxy(const vtkSMChartRepresentationProxy&); // Not implemented
   void operator=(const vtkSMChartRepresentationProxy&); // Not implemented

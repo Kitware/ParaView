@@ -17,6 +17,7 @@
 #include "vtkContextNamedOptions.h"
 #include "vtkObjectFactory.h"
 #include "vtkSmartPointer.h"
+#include "vtkSMPropertyIterator.h"
 #include "vtkSMStringVectorProperty.h"
 #include "vtkStdString.h"
 #include "vtkStringList.h"
@@ -41,6 +42,20 @@ void vtkSMContextNamedOptionsProxy::UpdatePropertyInformationInternal(
 {
   vtkContextNamedOptions* options = vtkContextNamedOptions::SafeDownCast(
     this->GetClientSideObject());
+
+  if (prop == NULL)
+    {
+    // update property information for all info properties.
+    vtkSMPropertyIterator* iter = this->NewPropertyIterator();
+    for (iter->Begin(); !iter->IsAtEnd(); iter->Next())
+      {
+      if (iter->GetProperty() && iter->GetProperty()->GetInformationOnly())
+        {
+        this->UpdatePropertyInformationInternal(iter->GetProperty());
+        }
+      }
+    iter->Delete();
+    }
 
   vtkSMStringVectorProperty* svp = vtkSMStringVectorProperty::SafeDownCast(prop);
   if (!svp || !svp->GetInformationOnly() || !options)

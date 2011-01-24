@@ -22,6 +22,7 @@ SET (Kit_SRCS
   vtkInitializationHelper.cxx
 # --- PM Objects ---
   vtkPMArraySelectionProperty.cxx
+  vtkPMChartRepresentationProxy.cxx
   vtkPMCompoundSourceProxy.cxx
   vtkPMContextArraysProperty.cxx
   vtkPMDataArrayProperty.cxx

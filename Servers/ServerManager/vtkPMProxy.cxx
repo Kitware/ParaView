@@ -320,6 +320,10 @@ bool vtkPMProxy::CreateVTKObjects(vtkSMMessage* message)
     this->Internals->SubProxyHelpers[subproxyMsg.name()] = subproxy;
     }
 
+  // Allow subclasses to do some initialization if needed. Note this is called
+  // before properties are created.
+  this->OnCreateVTKObjects();
+
   // Process the XML and update properties etc.
   if (!this->ReadXMLAttributes(element))
     {
@@ -357,6 +361,11 @@ void vtkPMProxy::DeleteVTKObjects()
 
   this->VTKObject =  NULL;
   this->VTKObjectID = vtkClientServerID();
+}
+
+//----------------------------------------------------------------------------
+void vtkPMProxy::OnCreateVTKObjects()
+{
 }
 
 //----------------------------------------------------------------------------

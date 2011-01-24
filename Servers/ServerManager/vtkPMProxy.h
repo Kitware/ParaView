@@ -96,6 +96,12 @@ protected:
   virtual bool CreateVTKObjects(vtkSMMessage* message);
   void DeleteVTKObjects();
 
+  // Description;
+  // Called in CreateVTKObjects() after the vtk-object has been created and
+  // subproxy-information has been processed, but before the XML is parsed to
+  // generate properties and initialize their values.
+  virtual void OnCreateVTKObjects();
+
   // Description:
   // Parses the XML to create property/subproxy helpers.
   virtual bool ReadXMLAttributes(vtkPVXMLElement* element);

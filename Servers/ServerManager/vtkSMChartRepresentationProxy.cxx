@@ -16,15 +16,14 @@
 
 #include "vtkChartRepresentation.h"
 #include "vtkClientServerStream.h"
-#include "vtkContextNamedOptions.h"
 #include "vtkObjectFactory.h"
-#include "vtkProcessModule.h"
 #include "vtkSMPropertyHelper.h"
 
 vtkStandardNewMacro(vtkSMChartRepresentationProxy);
 //----------------------------------------------------------------------------
 vtkSMChartRepresentationProxy::vtkSMChartRepresentationProxy()
 {
+  this->SetKernelClassName("vtkPMChartRepresentationProxy");
 }
 
 //----------------------------------------------------------------------------
@@ -69,27 +68,3 @@ void vtkSMChartRepresentationProxy::AddInput(unsigned int inputPort,
     }
 }
 #endif
-
-//-----------------------------------------------------------------------------
-void vtkSMChartRepresentationProxy::CreateVTKObjects()
-{
-  if (this->ObjectsCreated)
-    {
-    return;
-    }
-  this->Superclass::CreateVTKObjects();
-  if (!this->ObjectsCreated)
-    {
-    return;
-    }
-
-  vtkSMProxy* optionsProxy = this->GetSubProxy("PlotOptions");
-  if (optionsProxy)
-    {
-    vtkContextNamedOptions* options = vtkContextNamedOptions::SafeDownCast(
-      optionsProxy->GetClientSideObject());
-    vtkChartRepresentation* repr = vtkChartRepresentation::SafeDownCast(
-      this->GetClientSideObject());
-    repr->SetOptions(options);
-    }
-}
