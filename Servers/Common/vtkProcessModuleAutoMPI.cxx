@@ -235,7 +235,8 @@ int vtkProcessModuleAutoMPIInternals::
     //vtkstd::string serverExe = this->ParaViewServer;
 
     vtkPVOptions* options = vtkProcessModule::GetProcessModule()->GetOptions();
-    vtkstd::string app_dir = options->GetApplicationPath();
+    vtkstd::string app_dir =
+      vtksys::SystemTools::GetProgramPath(options->GetApplicationPath());
 
     vtkstd::string serverExe = PARAVIEW_SERVER;
 
@@ -248,6 +249,7 @@ int vtkProcessModuleAutoMPIInternals::
     // Set the working directory as the location of pvserver. Some
     // mpi packages have issue with full paths containing spaces so
     // lets just invoke mpiexec  with no path to pvserver.
+    cerr << "Setting working directory to be " << app_dir.c_str() << endl;
     vtksysProcess_SetWorkingDirectory(server, app_dir.c_str());
 
     if(vtksysProcess_SetCommand(server, &serverCommand[0]))
