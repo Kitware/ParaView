@@ -115,6 +115,15 @@ IF (PARAVIEW_INSTALL_THIRD_PARTY_LIBRARIES AND NOT APPLE)
               COMPONENT Runtime)
     ENDIF(PARAVIEW_ENABLE_PYTHON)
   else(WIN32)
+    # Python Lib dir contains all of the native python modules
+    IF(PARAVIEW_ENABLE_PYTHON)
+      get_filename_component(PYTHON_LIBS_DIR "${PYTHON_LIBRARY}" PATH)
+      file(TO_CMAKE_PATH ${PYTHON_LIBS_DIR} PYTHON_LIBS_DIR)
+      INSTALL(DIRECTORY ${PYTHON_LIBS_DIR}
+              DESTINATION ${PV_INSTALL_BIN_DIR}
+              USE_SOURCE_PERMISSIONS
+              COMPONENT Runtime)
+    ENDIF(PARAVIEW_ENABLE_PYTHON)
     # Now install the plugins for sqldrivers. For use by the help system
     INSTALL(DIRECTORY ${QT_PLUGINS_DIR}/sqldrivers 
             DESTINATION ${PV_INSTALL_LIB_DIR}
