@@ -23,6 +23,7 @@ SET (Kit_SRCS
 # --- PM Objects ---
   vtkPMArraySelectionProperty.cxx
   vtkPMCompoundSourceProxy.cxx
+  vtkPMContextArraysProperty.cxx
   vtkPMDataArrayProperty.cxx
   vtkPMDoubleVectorProperty.cxx
   vtkPMFileSeriesReaderProxy.cxx
@@ -35,9 +36,9 @@ SET (Kit_SRCS
   vtkPMProxy.cxx
   vtkPMProxyProperty.cxx
   vtkPMPVRepresentationProxy.cxx
+  vtkPMScalarBarActorProxy.cxx
   vtkPMSelectionRepresentationProxy.cxx
   vtkPMSILProperty.cxx
-  vtkPMScalarBarActorProxy.cxx
   vtkPMSourceProxy.cxx
   vtkPMStringVectorProperty.cxx
   vtkPMTextSourceRepresentationProxy.cxx
@@ -46,9 +47,9 @@ SET (Kit_SRCS
   vtkPMUniformGridVolumeRepresentationProxy.cxx
   vtkPMVectorProperty.cxx
   vtkPMWriterProxy.cxx
-  vtkPVKeyFrameAnimationCueForProxies.cxx
-  vtkPVComparativeView.cxx
   vtkPVComparativeAnimationCue.cxx
+  vtkPVComparativeView.cxx
+  vtkPVKeyFrameAnimationCueForProxies.cxx
 # --- SM Objects ---
   vtkSMAnimationScene.cxx
   vtkSMAnimationSceneImageWriter.cxx
@@ -64,6 +65,7 @@ SET (Kit_SRCS
   vtkSMCompoundProxyDefinitionLoader.cxx
   vtkSMCompoundSourceProxy.cxx
   vtkSMCompoundSourceProxyDefinitionBuilder.cxx
+  vtkSMContextNamedOptionsProxy.cxx
   vtkSMContextViewProxy.cxx
   vtkSMCSVExporterProxy.cxx
   vtkSMDeserializer.cxx
@@ -199,8 +201,6 @@ SET(Kit_SRCS
   ## Comparative view +++++++++
 
   ## Charts stuff +++++++++++++
-  vtkSMContextArraysInformationHelper.cxx #---- SM Side only, not managed yet...
-  vtkSMContextNamedOptionsProxy.cxx #----------- Get stuff on local VTK object
 
   ## Reader/Writer factory +++++++++++
   vtkSMWriterProxy.cxx

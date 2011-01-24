@@ -3491,11 +3491,11 @@
       <StringVectorProperty name="SeriesNamesInfo"
         number_of_elements_per_command="1"
         element_types="2"
-        information_only="1">
+        information_only="1"
+        kernel_class="vtkPMContextArraysProperty" >
         <Documentation>
           Property providing list of available series that can be plotted.
         </Documentation>
-        <ContextArraysInformationHelper />
       </StringVectorProperty>
 
       <StringVectorProperty name="XArrayName"
