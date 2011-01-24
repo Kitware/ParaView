@@ -98,15 +98,6 @@ protected:
   bool IgnoreIsolatedChanges;
   bool UndoRedoing;
 
-  // Added to ignore property changes we are told to ignore.
-  virtual void OnPropertyModified(vtkSMProxy* proxy, 
-    const char* propname);
-
-  // Added to create pqProxyUnRegisterUndoElement which handles
-  // helper proxies as well.
-  virtual void OnUnRegisterProxy(const char* group, const char* name,
-    vtkSMProxy*);
-
 private:
   pqUndoStackBuilder(const pqUndoStackBuilder&); // Not implemented.
   void operator=(const pqUndoStackBuilder&); // Not implemented.
