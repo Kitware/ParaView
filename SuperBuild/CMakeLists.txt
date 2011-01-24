@@ -45,7 +45,7 @@ if(QT_FOUND)
   #  message(FATAL_ERROR "error: Slicer requires Qt >= ${minimum_required_qt_version} -- you cannot use Qt ${QT_VERSION_MAJOR}.${QT_VERSION_MINOR}.${QT_VERSION_PATCH}.")
   #ENDIF()
 else()
-  message(FATAL_ERROR "error: Qt4 was not found on your system. Please set QT_QMAKE_EXECUTABLE")
+  #message(FATAL_ERROR "error: Qt4 was not found on your system. Please set QT_QMAKE_EXECUTABLE")
 endif()
 
 # ----------------------------------------------------------------------------
@@ -72,12 +72,28 @@ set(pv_tpl_c_flags ${CMAKE_C_FLAGS})
 set(pv_cxx_flags ${CMAKE_CXX_FLAGS})
 set(pv_c_flags ${CMAKE_C_FLAGS})
 
-if(WIN32)
-  set(_LINK_LIBRARY_SUFFIX .lib)
-elseif(APPLE)
-  set(_LINK_LIBRARY_SUFFIX .dylib)
-else()
-  set(_LINK_LIBRARY_SUFFIX .so)
+# Important: change architecture *before* any enable_language() or project()
+# calls so that it's set properly to detect 64-bit-ness...
+#
+if(APPLE)
+  if(NOT CMAKE_OSX_DEPLOYMENT_TARGET OR "${CMAKE_OSX_DEPLOYMENT_TARGET}" STREQUAL "")
+    set(CMAKE_OSX_ARCHITECTURES "x86_64" CACHE STRING "force build for 64-bit Leopard" FORCE)
+    set(CMAKE_OSX_DEPLOYMENT_TARGET "10.5" CACHE STRING "force build for 64-bit Leopard" FORCE)
+    set(CMAKE_OSX_SYSROOT "/Developer/SDKs/MacOSX10.5.sdk" CACHE PATH "force build for 64-bit Leopard" FORCE)
+  endif()
+
+  set(pv_apple_compiler_args
+    -DCMAKE_OSX_ARCHITECTURES:STRING=${CMAKE_OSX_ARCHITECTURES}
+    -DCMAKE_OSX_DEPLOYMENT_TARGET:STRING=${CMAKE_OSX_DEPLOYMENT_TARGET}
+    -DCMAKE_OSX_SYSROOT:PATH=${CMAKE_OSX_SYSROOT}
+    -DASDF:STRING=ASDF)
+  list(APPEND pv_compiler_args ${pv_apple_compiler_args})
+
+  if(NOT "${CMAKE_OSX_SYSROOT}" STREQUAL "")
+    if(NOT EXISTS "${CMAKE_OSX_SYSROOT}")
+      message(FATAL_ERROR "error: CMAKE_OSX_SYSROOT='${CMAKE_OSX_SYSROOT}' does not exist")
+    endif()
+  endif()
 endif()
 
 # We aren't interested in seeing third party compiler warnings.
@@ -86,6 +102,14 @@ string(REPLACE "/W3" "/W0" pv_tpl_cxx_flags "${pv_tpl_cxx_flags}")
 string(REPLACE "/W4" "/W0" pv_tpl_cxx_flags "${pv_tpl_cxx_flags}")
 string(REPLACE "/W3" "/W0" pv_tpl_c_flags "${pv_tpl_c_flags}")
 string(REPLACE "/W4" "/W0" pv_tpl_c_flags "${pv_tpl_c_flags}")
+
+if(WIN32)
+  set(_LINK_LIBRARY_SUFFIX .lib)
+elseif(APPLE)
+  set(_LINK_LIBRARY_SUFFIX .dylib)
+else()
+  set(_LINK_LIBRARY_SUFFIX .so)
+endif()
 
 # Attempt to detect if we have a Fortran Compiler available.
 include(CheckFortran)
@@ -120,6 +144,13 @@ if(NOT APPLE)
 
   include(External_Python)
   list(APPEND ParaView_depenencies Python)
+
+  if(APPLE AND "${CMAKE_OSX_DEPLOYMENT_TARGET}" STREQUAL "10.5")
+    set(PYTHON_EXECUTABLE "/System/Library/Frameworks/Python.framework/Versions/2.5/bin/python")
+    set(PYTHON_LIBRARY "/System/Library/Frameworks/Python.framework/Versions/2.5/Python")
+    set(PYTHON_INCLUDE_DIR "/System/Library/Frameworks/Python.framework/Versions/2.5/include/python2.5")
+  endif()
+
   set(NUMPY_dependencies python)
 
   if(CMAKE_Fortran_COMPILER)
