@@ -3,6 +3,29 @@
 cmake_minimum_required(VERSION 2.8.3)
 #-----------------------------------------------------------------------------
 
+# Important: change architecture *before* any enable_language() or project()
+# calls so that it's set properly to detect 64-bit-ness...
+#
+if(APPLE)
+  if(NOT CMAKE_OSX_DEPLOYMENT_TARGET OR "${CMAKE_OSX_DEPLOYMENT_TARGET}" STREQUAL "")
+    set(CMAKE_OSX_ARCHITECTURES "x86_64" CACHE STRING "force build for 64-bit Leopard" FORCE)
+    set(CMAKE_OSX_DEPLOYMENT_TARGET "10.5" CACHE STRING "force build for 64-bit Leopard" FORCE)
+    set(CMAKE_OSX_SYSROOT "/Developer/SDKs/MacOSX10.5.sdk" CACHE PATH "force build for 64-bit Leopard" FORCE)
+  endif()
+
+  set(pv_apple_compiler_args
+    -DCMAKE_OSX_ARCHITECTURES:STRING=${CMAKE_OSX_ARCHITECTURES}
+    -DCMAKE_OSX_DEPLOYMENT_TARGET:STRING=${CMAKE_OSX_DEPLOYMENT_TARGET}
+    -DCMAKE_OSX_SYSROOT:PATH=${CMAKE_OSX_SYSROOT})
+  list(APPEND pv_compiler_args ${pv_apple_compiler_args})
+
+  if(NOT "${CMAKE_OSX_SYSROOT}" STREQUAL "")
+    if(NOT EXISTS "${CMAKE_OSX_SYSROOT}")
+      message(FATAL_ERROR "error: CMAKE_OSX_SYSROOT='${CMAKE_OSX_SYSROOT}' does not exist")
+    endif()
+  endif()
+endif()
+
 project(ParaViewSuperBuild)
 
 set(ParaViewSuperBuild_CMAKE_SOURCE_DIR ${ParaViewSuperBuild_SOURCE_DIR})
@@ -71,29 +94,6 @@ set(pv_tpl_cxx_flags ${CMAKE_CXX_FLAGS})
 set(pv_tpl_c_flags ${CMAKE_C_FLAGS})
 set(pv_cxx_flags ${CMAKE_CXX_FLAGS})
 set(pv_c_flags ${CMAKE_C_FLAGS})
-
-# Important: change architecture *before* any enable_language() or project()
-# calls so that it's set properly to detect 64-bit-ness...
-#
-if(APPLE)
-  if(NOT CMAKE_OSX_DEPLOYMENT_TARGET OR "${CMAKE_OSX_DEPLOYMENT_TARGET}" STREQUAL "")
-    set(CMAKE_OSX_ARCHITECTURES "x86_64" CACHE STRING "force build for 64-bit Leopard" FORCE)
-    set(CMAKE_OSX_DEPLOYMENT_TARGET "10.5" CACHE STRING "force build for 64-bit Leopard" FORCE)
-    set(CMAKE_OSX_SYSROOT "/Developer/SDKs/MacOSX10.5.sdk" CACHE PATH "force build for 64-bit Leopard" FORCE)
-  endif()
-
-  set(pv_apple_compiler_args
-    -DCMAKE_OSX_ARCHITECTURES:STRING=${CMAKE_OSX_ARCHITECTURES}
-    -DCMAKE_OSX_DEPLOYMENT_TARGET:STRING=${CMAKE_OSX_DEPLOYMENT_TARGET}
-    -DCMAKE_OSX_SYSROOT:PATH=${CMAKE_OSX_SYSROOT})
-  list(APPEND pv_compiler_args ${pv_apple_compiler_args})
-
-  if(NOT "${CMAKE_OSX_SYSROOT}" STREQUAL "")
-    if(NOT EXISTS "${CMAKE_OSX_SYSROOT}")
-      message(FATAL_ERROR "error: CMAKE_OSX_SYSROOT='${CMAKE_OSX_SYSROOT}' does not exist")
-    endif()
-  endif()
-endif()
 
 if(WIN32)
   list(APPEND pv_compiler_args -DCMAKE_BUILD_TYPE:STRING=${CMAKE_CFG_INTDIR})
