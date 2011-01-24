@@ -142,13 +142,16 @@ else()
   include(External_NUMPY)
 endif()
 
-
-include(External_Manta)
-set(MANTA_ARGS
- -DPARAVIEW_BUILD_PLUGIN_Manta:BOOL=ON
- -DMANTA_BUILD:PATH=${Manta_binary}
- -DMANTA_SOURCE:PATH=${Manta_source})
-list(APPEND ParaView_dependencies Manta)
+set(MANTA_ARGS)
+# Manta doesn't compile on Windows x64 currently
+if(NOT (WIN32 AND "${CMAKE_SIZEOF_VOID_P}" EQUAL 8))
+  include(External_Manta)
+  set(MANTA_ARGS
+    -DPARAVIEW_BUILD_PLUGIN_Manta:BOOL=ON
+    -DMANTA_BUILD:PATH=${Manta_binary}
+    -DMANTA_SOURCE:PATH=${Manta_source})
+  list(APPEND ParaView_dependencies Manta)
+endif()
 
 include(External_Boost)
 list(APPEND ParaView_dependencies Boost)
