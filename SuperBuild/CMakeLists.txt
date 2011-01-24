@@ -95,6 +95,14 @@ if(APPLE)
   endif()
 endif()
 
+if(WIN32)
+  list(APPEND pv_compiler_args -DCMAKE_BUILD_TYPE:STRING=${CMAKE_CFG_INTDIR})
+else()
+  list(APPEND pv_compiler_args -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE})
+endif()
+
+message("pv_compiler_args ${pv_compiler_args}")
+
 # We aren't interested in seeing third party compiler warnings.
 set(pv_tpl_compiler_args ${pv_compiler_args})
 string(REPLACE "/W3" "/W0" pv_tpl_cxx_flags "${pv_tpl_cxx_flags}")
@@ -194,7 +202,7 @@ list(APPEND png_dependencies zlib)
 include(External_png)
 list(APPEND ParaView_dependencies png)
 
-if(NOT WIN32)
+if(NOT WIN32 AND NOT APPLE)
   #include(External_Silo)
   #list(APPEND ParaView_dependencies Silo)
 
@@ -230,13 +238,11 @@ ExternalProject_Add(${proj}
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/..
   BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}/ParaView-build
   CMAKE_CACHE_ARGS
-    -DBUILD_SHARED_LIBS:BOOL=${BUILD_SHARED_LIBS}
+    ${pv_compiler_args}
+    -DBUILD_SHARED_LIBS:BOOL=ON
     -DBUILD_TESTING:BOOL=OFF
     -DPARAVIEW_DISABLE_VTK_TESTING:BOOL=ON
     -DPARAVIEW_TESTING_WITH_PYTHON:BOOL=OFF
-    -DCMAKE_CXX_FLAGS:STRING=${CMAKE_CXX_FLAGS}
-    -DCMAKE_C_FLAGS:STRING=${CMAKE_C_FLAGS}
-    -DCMAKE_BUILD_TYPE:STRING=${CMAKE_CFG_INTDIR}
     # Boost
     -DVTK_USE_BOOST:BOOL=ON
     -DBoost_INCLUDE_DIR:PATH=${Boost_INCLUDE_DIR}
