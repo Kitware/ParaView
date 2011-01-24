@@ -121,11 +121,6 @@ public:
     return Piece!=-1;
   }
 
-  // Description:
-  // A hack to help multires.
-  void SetReapedFlag(bool nv) { this->ReapedFlag = nv; }
-  bool GetReapedFlag() { return this->ReapedFlag; }
-
 protected:
 
   int Processor;
@@ -138,8 +133,6 @@ protected:
   double PipelinePriority;
   double ViewPriority;
   double CachedPriority;
-
-  bool ReapedFlag;
 
   friend class vtkPieceList;
 

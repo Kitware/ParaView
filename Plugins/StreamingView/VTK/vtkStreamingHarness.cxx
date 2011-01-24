@@ -42,7 +42,6 @@ vtkStreamingHarness::vtkStreamingHarness()
   this->ForOther = false;
   this->PieceList1 = NULL;
   this->PieceList2 = NULL;
-  this->NoneToRefine = false;
   this->CacheFilter = NULL;
   this->LockRefinement = 0;
 }
@@ -72,7 +71,6 @@ void vtkStreamingHarness::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "Resolution: " << this->Resolution << endl;
   os << indent << "PieceList1: " << this->PieceList1 << endl;
   os << indent << "PieceList2: " << this->PieceList2 << endl;
-  os << indent << "NoneToRefine: " << (this->NoneToRefine?"true":"false") << endl;
   os << indent << "CacheFilter: " << this->CacheFilter << endl;
 }
 
