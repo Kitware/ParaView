@@ -80,6 +80,10 @@ public:
      double &min, double &max, double &attribute_confidence);
 
   //Description:
+  //determines if the piece is in the piece cache filter's append slot
+  bool InAppend(int Pieces, int NumPieces, double Resolution);
+
+  //Description:
   //Handle to storage for the computed meta-data and priorities.
   //This may or may not be present but when they are, having the handle
   //here simplifies the driver's code to manage the information
@@ -111,6 +115,12 @@ public:
   //the driver checks this to ignore this harness entirely.
   vtkSetMacro(Enabled, bool);
   vtkGetMacro(Enabled, bool);
+
+  // Description:
+  // Tells this to ask the upstream PCF for the appended results.
+  vtkSetMacro(TryAppended, bool);
+  vtkGetMacro(TryAppended, bool);
+
 protected:
   vtkStreamingHarness();
   ~vtkStreamingHarness();
@@ -139,6 +149,7 @@ protected:
   vtkPieceList *PieceList1;
   vtkPieceList *PieceList2;
   vtkPieceCacheFilter *CacheFilter;
+  bool TryAppended;
 
   int LockRefinement;
   bool Enabled;

@@ -62,6 +62,7 @@ vtkMultiResolutionStreamer::vtkMultiResolutionStreamer()
   this->RefinementDepth = 5;
   this->DepthLimit = 10;
   this->MaxSplits = 8;
+  this->Interacting = false;
 }
 
 //----------------------------------------------------------------------------
@@ -170,6 +171,31 @@ void vtkMultiResolutionStreamer::PrepareFirstPass()
     //at this point TD is either empty or has only unimportant pieces in it
     //and NF has all of the pieces we drew last time
 
+    //don't ignore pieces that are unimportant just because they are in
+    //append slot
+    vtkPieceList *NextFrame = harness->GetPieceList2();
+    vtkPieceList *tmp = vtkPieceList::New();
+    while (ToDo->GetNumberOfPieces() != 0)
+      {
+      vtkPiece p = ToDo->PopPiece();
+      if (p.GetCachedPriority() == 0.0)
+        {
+        p.SetCachedPriority(1.0);
+        NextFrame->AddPiece(p);
+        }
+      else
+        {
+        tmp->AddPiece(p);
+        }
+      }
+    ToDo->MergePieceList(tmp);
+    tmp->Delete();
+    vtkPieceCacheFilter *pcf = harness->GetCacheFilter();
+    if (pcf)
+      {
+      pcf->ClearAppendTable();
+      }
+
     //combine empties that no longer matter
     this->Reap(harness); //merges unimportant pieces left in TD
 
@@ -177,12 +203,15 @@ void vtkMultiResolutionStreamer::PrepareFirstPass()
       {
       this->Coarsen(harness); //merges pieces in NF and empties NF onto TD
       }
-    if (this->ProgressionMode == AUTOMATIC ||
-        (this->ProgressionMode == MANUAL && manualCommand == ADVANCE))
+    if (!this->Interacting &&
+        (this->ProgressionMode == AUTOMATIC ||
+         (this->ProgressionMode == MANUAL && manualCommand == ADVANCE))
+        )
       {
       this->Refine(harness); //splits pieces in NF and empties NF onto TD
       }
-    if (this->ProgressionMode != AUTOMATIC && manualCommand == STAY)
+    if (this->Interacting ||
+        (this->ProgressionMode != AUTOMATIC && manualCommand == STAY))
       {
       //we weren't told to refine or coarsen anything
       //simply dump NF onto TD to keep redrawing it
@@ -237,11 +266,30 @@ void vtkMultiResolutionStreamer::PrepareFirstPass()
          );
       piece.SetViewPriority(gPri);
 
+      //check if piece will be rendered as part of append slot so that we don't
+      //rerender it
+      if (harness->InAppend(p,np,res))
+        {
+        piece.SetCachedPriority(0.0);
+        }
+      else
+        {
+        piece.SetCachedPriority(1.0);
+        }
+
       ToDo->SetPiece(i, piece);
       }
 
     //sort them
     ToDo->SortPriorities();
+
+    vtkPiece p = ToDo->GetPiece(0);
+    harness->SetPiece(p.GetPiece());
+    harness->SetNumberOfPieces(p.GetNumPieces());
+    harness->SetResolution(p.GetResolution());
+    harness->ComputePiecePriority(p.GetPiece(), p.GetNumPieces(),
+                                  p.GetResolution());
+    harness->SetTryAppended(true);
     }
 
   iter->Delete();
@@ -666,7 +714,7 @@ void vtkMultiResolutionStreamer::StartRenderEvent()
        );
 
     //show whatever we partially drew before the camera moved
-    this->CopyBackBufferToFront();
+    //this->CopyBackBufferToFront();
 
     //start off initial pass by clearing the screen
     if (ren && rw)
@@ -686,7 +734,7 @@ void vtkMultiResolutionStreamer::StartRenderEvent()
     //above figures out what the subsequent set of passes should do,
     //but doesn't actually update the pipeline to point to the first passes
     //work. do that like so here.
-    this->PrepareNextPass();
+    //this->PrepareNextPass();
     }
   else
     {

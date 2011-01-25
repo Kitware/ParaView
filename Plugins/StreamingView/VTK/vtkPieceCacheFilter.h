@@ -106,6 +106,9 @@ public:
   //Returns true if a given piece has been placed into the appended result
   //and was stored with at least the requested resolution.
   bool InAppend(int piece, int numpieces, double res);
+  //Description:
+  //Manually empty the append table, but not the cache itself
+  void ClearAppendTable();
 
 protected:
   vtkPieceCacheFilter();
@@ -122,8 +125,6 @@ protected:
   virtual int RequestData(vtkInformation *,
                           vtkInformationVector **,
                           vtkInformationVector *);
-
-  void ClearAppendTable();
 
 //BTX
   //The cache is a map of slots to datasets. The datasets are stored with their
