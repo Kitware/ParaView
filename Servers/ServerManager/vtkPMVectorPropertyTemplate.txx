@@ -300,7 +300,7 @@ bool vtkPMVectorPropertyTemplate<T, force_idtype>::Pull(vtkSMMessage* message)
   // Invoke property's method on the root node of the server
   vtkClientServerStream str;
   str << vtkClientServerStream::Invoke
-    << this->GetVTKObjectID() << this->GetCommand()
+    << this->GetVTKObject() << this->GetCommand()
     << vtkClientServerStream::End;
 
   this->ProcessMessage(str);
@@ -343,19 +343,19 @@ bool vtkPMVectorPropertyTemplate<T, force_idtype>::Push(T* values, int number_of
     }
 
   vtkClientServerStream stream;
-  vtkClientServerID objectId = this->GetVTKObjectID();
+  vtkObjectBase* object = this->GetVTKObject();
 
   if (this->CleanCommand)
     {
     stream << vtkClientServerStream::Invoke
-      << objectId << this->CleanCommand
+      << object << this->CleanCommand
       << vtkClientServerStream::End;
     }
 
   if (this->SetNumberCommand)
     {
     stream << vtkClientServerStream::Invoke
-         << objectId
+         << object
          << this->SetNumberCommand
          << number_of_elements / this->NumberOfElementsPerCommand
          << vtkClientServerStream::End;
@@ -363,7 +363,7 @@ bool vtkPMVectorPropertyTemplate<T, force_idtype>::Push(T* values, int number_of
 
   if (!this->Repeatable)
     {
-    stream << vtkClientServerStream::Invoke << objectId << this->Command;
+    stream << vtkClientServerStream::Invoke << object << this->Command;
     if (this->ArgumentIsArray)
       {
       stream << vtkClientServerStream::InsertArray(values, number_of_elements);
@@ -382,7 +382,7 @@ bool vtkPMVectorPropertyTemplate<T, force_idtype>::Push(T* values, int number_of
     int numCommands = number_of_elements / this->NumberOfElementsPerCommand;
     for(int i=0; i<numCommands; i++)
       {
-      stream << vtkClientServerStream::Invoke << objectId << this->Command;
+      stream << vtkClientServerStream::Invoke << object << this->Command;
       if (this->UseIndex)
         {
         stream << i;

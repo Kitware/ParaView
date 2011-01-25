@@ -45,8 +45,8 @@ bool vtkPMTextSourceRepresentationProxy::CreateVTKObjects(vtkSMMessage* message)
 
   vtkClientServerStream stream;
   stream << vtkClientServerStream::Invoke
-    << this->GetVTKObjectID() << "SetTextWidgetRepresentation"
-    << this->GetSubProxyHelper("TextWidgetRepresentation")->GetVTKObjectID()
+    << this->GetVTKObject() << "SetTextWidgetRepresentation"
+    << this->GetSubProxyHelper("TextWidgetRepresentation")->GetVTKObject()
     << vtkClientServerStream::End;
   this->Interpreter->ProcessStream(stream);
   return true;

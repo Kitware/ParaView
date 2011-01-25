@@ -192,14 +192,14 @@ bool vtkPMProxyProperty::Push(vtkSMMessage* message, int offset)
   vtkstd::vector<vtkTypeUInt32> proxy_ids;
 
   vtkClientServerStream stream;
-  vtkClientServerID objectId = this->GetVTKObjectID();
+  vtkObjectBase* object = this->GetVTKObject();
 
   // Deal with previous values to remove
   if (this->CleanCommand)
     {
     this->Cache->CleanCommand();
     stream << vtkClientServerStream::Invoke
-      << objectId
+      << object
       << this->CleanCommand
       << vtkClientServerStream::End;
     }
@@ -215,7 +215,7 @@ bool vtkPMProxyProperty::Push(vtkSMMessage* message, int offset)
       if(arg != NULL)
         {
         stream << vtkClientServerStream::Invoke
-               << objectId
+               << object
                << this->GetRemoveCommand()
                << arg
                << vtkClientServerStream::End;
@@ -237,7 +237,7 @@ bool vtkPMProxyProperty::Push(vtkSMMessage* message, int offset)
     if(arg != NULL || proxy_ids[cc] == 2)
       {
       stream << vtkClientServerStream::Invoke
-             << objectId
+             << object
              << this->GetCommand()
              << arg
              << vtkClientServerStream::End;
@@ -252,7 +252,7 @@ bool vtkPMProxyProperty::Push(vtkSMMessage* message, int offset)
   if (this->NullOnEmpty && this->CleanCommand == NULL && proxy_ids.size() == 0)
     {
     stream << vtkClientServerStream::Invoke
-      << objectId
+      << object
       << this->GetCommand()
       << vtkClientServerID(0)
       << vtkClientServerStream::End;

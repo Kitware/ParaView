@@ -60,12 +60,12 @@ bool vtkPMFileSeriesReaderProxy::CreateVTKObjects(vtkSMMessage* message)
 
   vtkClientServerStream stream;
   stream << vtkClientServerStream::Invoke
-         << this->GetVTKObjectID() << "SetReader" << reader
+         << this->GetVTKObject() << "SetReader" << reader
          << vtkClientServerStream::End;
   if (this->GetFileNameMethod())
     {
     stream << vtkClientServerStream::Invoke
-           << this->GetVTKObjectID()
+           << this->GetVTKObject()
            << "SetFileNameMethod"
            << this->GetFileNameMethod()
            << vtkClientServerStream::End;

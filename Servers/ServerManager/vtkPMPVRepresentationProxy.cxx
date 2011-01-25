@@ -137,7 +137,7 @@ void vtkPMPVRepresentationProxy::OnVTKObjectModified()
     {
     vtkClientServerStream stream;
     stream << vtkClientServerStream::Invoke
-      << iter->second.SubProxy->GetVTKObjectID()
+      << iter->second.SubProxy->GetVTKObject()
       << "SetRepresentation"
       << iter->second.SubText.c_str()
       << vtkClientServerStream::End;

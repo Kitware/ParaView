@@ -15,8 +15,7 @@
 #include "vtkPMCompoundSourceProxy.h"
 
 #include "vtkAlgorithm.h"
-#include "vtkClientServerInterpreter.h"
-#include "vtkClientServerStream.h"
+#include "vtkAlgorithmOutput.h"
 #include "vtkInformation.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
@@ -82,7 +81,7 @@ public:
 
   typedef vtkstd::vector<PortInfo> VectorOfPortInfo;
   VectorOfPortInfo ExposedPorts;
-  vtkstd::vector<vtkClientServerID> OutputPortIDs;
+  vtkstd::vector<vtkSmartPointer<vtkAlgorithmOutput> > OutputPorts;
   bool NeedOutputPortCreation;
 };
 //*****************************************************************************
@@ -100,19 +99,19 @@ vtkPMCompoundSourceProxy::~vtkPMCompoundSourceProxy()
 }
 
 //----------------------------------------------------------------------------
-vtkClientServerID vtkPMCompoundSourceProxy::GetOutputPortID(int port)
+vtkAlgorithmOutput* vtkPMCompoundSourceProxy::GetOutputPort(int port)
 {
   if(this->Internals->NeedOutputPortCreation)
     {
     this->CreateOutputPorts();
     }
 
-  if (static_cast<int>(this->Internals->OutputPortIDs.size()) > port)
+  if (static_cast<int>(this->Internals->OutputPorts.size()) > port)
     {
-    return this->Internals->OutputPortIDs[port];
+    return this->Internals->OutputPorts[port];
     }
 
-  return vtkClientServerID();
+  return NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -121,28 +120,23 @@ bool vtkPMCompoundSourceProxy::CreateOutputPorts()
   if(this->Internals->NeedOutputPortCreation)
     {
     int ports = this->Internals->GetNumberOfOutputPorts();
-    this->Internals->OutputPortIDs.resize(ports, vtkClientServerID(0));
+    this->Internals->OutputPorts.resize(ports);
 
-    vtkClientServerStream stream;
     for (int cc=0; cc < ports; cc++)
       {
-      vtkClientServerID portID = this->Interpreter->GetNextAvailableId();
-      this->Internals->OutputPortIDs[cc] = portID;
+      vtkPMSourceProxy* subProxy = vtkPMSourceProxy::SafeDownCast(
+        this->GetSubProxyHelper(
+          this->Internals->ExposedPorts[cc].ProxyName.c_str()));
+      if (!subProxy)
+        {
+        vtkErrorMacro("Failed to locate subproxy: " <<
+          this->Internals->ExposedPorts[cc].ProxyName.c_str());
+        return false;
+        }
 
-      vtkPMProxy* algo =
-          this->GetSubProxyHelper(
-              this->Internals->ExposedPorts[cc].ProxyName.c_str());
-
-      stream << vtkClientServerStream::Invoke
-             << algo->GetVTKObject()
-             << "GetOutputPort"
-             << this->Internals->ExposedPorts[cc].PortIndex
-             << vtkClientServerStream::End;
-      stream << vtkClientServerStream::Assign << portID
-             << vtkClientServerStream::LastResult
-             << vtkClientServerStream::End;
+      this->Internals->OutputPorts[cc] = subProxy->GetOutputPort(
+        this->Internals->ExposedPorts[cc].PortIndex);
       }
-    this->Interpreter->ProcessStream(stream);
     this->Internals->NeedOutputPortCreation = false;
     }
 

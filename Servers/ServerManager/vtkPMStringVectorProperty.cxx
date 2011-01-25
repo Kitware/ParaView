@@ -122,11 +122,11 @@ bool vtkPMStringVectorProperty::Push(const vtkstd::vector<vtkstd::string> &value
     }
 
   vtkClientServerStream stream;
-  vtkClientServerID objectId = this->GetVTKObjectID();
+  vtkObjectBase* object = this->GetVTKObject();
   if (this->CleanCommand)
     {
     stream << vtkClientServerStream::Invoke
-      << objectId << this->CleanCommand
+      << object << this->CleanCommand
       << vtkClientServerStream::End;
     }
 
@@ -137,7 +137,7 @@ bool vtkPMStringVectorProperty::Push(const vtkstd::vector<vtkstd::string> &value
 
   if (!this->Repeatable)
     {
-    stream << vtkClientServerStream::Invoke << objectId << this->Command;
+    stream << vtkClientServerStream::Invoke << object << this->Command;
     vtkstd::vector<vtkstd::string>::const_iterator iter;
     int i=0;
     for (iter = values.begin(); iter != values.end(); ++iter, ++i)
@@ -166,14 +166,14 @@ bool vtkPMStringVectorProperty::Push(const vtkstd::vector<vtkstd::string> &value
     if (this->SetNumberCommand)
       {
       stream << vtkClientServerStream::Invoke
-        << objectId
+        << object
         << this->SetNumberCommand
         << numCommands
         << vtkClientServerStream::End;
       }
     for (int i=0; i<numCommands; i++)
       {
-      stream << vtkClientServerStream::Invoke << objectId << this->Command;
+      stream << vtkClientServerStream::Invoke << object << this->Command;
       if (this->UseIndex)
         {
         stream << i;

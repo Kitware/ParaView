@@ -40,14 +40,14 @@ bool vtkPMScalarBarActorProxy::CreateVTKObjects(vtkSMMessage* message)
 
     // Label Text property
     stream << vtkClientServerStream::Invoke
-           << this->GetVTKObjectID()
+           << this->GetVTKObject()
            << "SetLabelTextProperty"
            << this->GetSubProxyHelper("LabelTextProperty")->GetVTKObject()
            << vtkClientServerStream::End;
 
     // Title text property
     stream << vtkClientServerStream::Invoke
-           << this->GetVTKObjectID()
+           << this->GetVTKObject()
            << "SetTitleTextProperty"
            << this->GetSubProxyHelper("TitleTextProperty")->GetVTKObject()
            << vtkClientServerStream::End;

@@ -22,7 +22,7 @@
 #define __vtkPMProxy_h
 
 #include "vtkPMObject.h"
-#include "vtkClientServerID.h"
+#include "vtkSmartPointer.h" // needed for vtkSmartPointer.
 
 class vtkSMProxyDefinitionManager;
 class vtkPVXMLElement;
@@ -49,12 +49,6 @@ public:
   virtual void Invoke(vtkSMMessage* msg);
 //ETX
 
-//BTX
-  // Description:
-  // Provides access to the id for the VTK object this proxy holds, if any;
-  // returns vtkClientServerID(0) otherwise.
-  vtkGetMacro(VTKObjectID, vtkClientServerID);
-
   // Description:
   // Returns access to the VTKObject pointer, if any.
   // Note this is a raw pointer to the local instance of the VTK object. Any
@@ -70,6 +64,7 @@ public:
   // Returns the VTKClassName.
   vtkGetStringMacro(VTKClassName);
 
+//BTX
 protected:
   vtkPMProxy();
   ~vtkPMProxy();
@@ -124,8 +119,7 @@ protected:
   char* PostPush;
   char* PostCreation;
 
-  vtkWeakPointer<vtkObjectBase> VTKObject;
-  vtkClientServerID VTKObjectID;
+  vtkSmartPointer<vtkObjectBase> VTKObject;
   bool ObjectsCreated;
 
 private:

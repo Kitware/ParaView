@@ -33,8 +33,8 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Returns the vtkClientServerID for an output port, if valid.
-  virtual vtkClientServerID GetOutputPortID(int port);
+  // Returns the vtkAlgorithmOutput for an output port, if valid.
+  virtual vtkAlgorithmOutput* GetOutputPort(int port);
 
 //BTX
 protected:

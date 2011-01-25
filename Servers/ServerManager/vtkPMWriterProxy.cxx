@@ -66,15 +66,16 @@ bool vtkPMWriterProxy::CreateVTKObjects(vtkSMMessage* message)
     return false;
     }
 
+  vtkObjectBase* object = this->GetVTKObject();
   vtkParallelSerialWriter* psw =
-    vtkParallelSerialWriter::SafeDownCast(this->GetVTKObject());
+    vtkParallelSerialWriter::SafeDownCast(object);
   if (psw)
     {
     psw->SetInterpreter(this->Interpreter);
     }
 
   vtkFileSeriesWriter* fsw =
-    vtkFileSeriesWriter::SafeDownCast(this->GetVTKObject());
+    vtkFileSeriesWriter::SafeDownCast(object);
   if (fsw)
     {
     fsw->SetInterpreter(this->Interpreter);
@@ -85,14 +86,14 @@ bool vtkPMWriterProxy::CreateVTKObjects(vtkSMMessage* message)
     {
     vtkClientServerStream stream;
     stream << vtkClientServerStream::Invoke
-      << this->GetVTKObjectID()
+      << object
       << "SetWriter"
-      << writerProxy->GetVTKObjectID()
+      << writerProxy->GetVTKObject()
       << vtkClientServerStream::End;
     if (this->FileNameMethod)
       {
       stream << vtkClientServerStream::Invoke
-        << this->GetVTKObjectID()
+        << object
         << "SetFileNameMethod"
         << this->FileNameMethod
         << vtkClientServerStream::End;
@@ -105,8 +106,8 @@ bool vtkPMWriterProxy::CreateVTKObjects(vtkSMMessage* message)
     {
     vtkClientServerStream stream;
     stream << vtkClientServerStream::Invoke
-      << this->GetVTKObjectID()
-      << "SetPreGatherHelper" << helper->GetVTKObjectID()
+      << object
+      << "SetPreGatherHelper" << helper->GetVTKObject()
       << vtkClientServerStream::End;
     this->Interpreter->ProcessStream(stream);
     }
@@ -116,8 +117,8 @@ bool vtkPMWriterProxy::CreateVTKObjects(vtkSMMessage* message)
     {
     vtkClientServerStream stream;
     stream << vtkClientServerStream::Invoke
-      << this->GetVTKObjectID()
-      << "SetPostGatherHelper" << helper->GetVTKObjectID()
+      << object
+      << "SetPostGatherHelper" << helper->GetVTKObject()
       << vtkClientServerStream::End;
     this->Interpreter->ProcessStream(stream);
     }
@@ -131,7 +132,7 @@ bool vtkPMWriterProxy::CreateVTKObjects(vtkSMMessage* message)
 
   vtkClientServerStream stream;
   stream << vtkClientServerStream::Invoke
-    << this->VTKObjectID
+    << object
     << "SetNumberOfPieces"
     << numProcs
     << vtkClientServerStream::End;
@@ -140,12 +141,12 @@ bool vtkPMWriterProxy::CreateVTKObjects(vtkSMMessage* message)
 
   // ALTERNATIVE: 1
   stream << vtkClientServerStream::Invoke
-    << this->VTKObjectID
+    << object
     << "SetStartPiece"
     << procId
     << vtkClientServerStream::End;
   stream << vtkClientServerStream::Invoke
-    << this->VTKObjectID
+    << object
     << "SetEndPiece"
     << procId
     << vtkClientServerStream::End;
@@ -154,7 +155,7 @@ bool vtkPMWriterProxy::CreateVTKObjects(vtkSMMessage* message)
 
   // ALTERNATIVE: 2
   stream << vtkClientServerStream::Invoke
-    << this->VTKObjectID
+    << object
     << "SetPiece"
     << procId
     << vtkClientServerStream::End;
@@ -165,7 +166,7 @@ bool vtkPMWriterProxy::CreateVTKObjects(vtkSMMessage* message)
   return true;
 }
 
-#ifdef FIXME
+#ifdef FIXME_COLLABORATION
 //----------------------------------------------------------------------------
 vtkClientServerID vtkPMWriterProxy::GetVTKObjectID(
   vtkPMProperty* property_helper)

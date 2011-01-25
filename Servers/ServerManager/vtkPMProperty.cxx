@@ -94,17 +94,6 @@ bool vtkPMProperty::ReadXMLAttributes(
 }
 
 //----------------------------------------------------------------------------
-vtkClientServerID vtkPMProperty::GetVTKObjectID()
-{
-  if (this->ProxyHelper)
-    {
-    return this->ProxyHelper->GetVTKObjectID();
-    }
-
-  return vtkClientServerID(0);
-}
-
-//----------------------------------------------------------------------------
 vtkPMObject* vtkPMProperty::GetPMObject(vtkTypeUInt32 globalid)
 {
   if (this->ProxyHelper)
@@ -129,8 +118,7 @@ vtkObjectBase* vtkPMProperty::GetVTKObject()
 {
   if (this->ProxyHelper)
     {
-    return this->ProxyHelper->GetInterpreter()->GetObjectFromID(
-        this->ProxyHelper->GetVTKObjectID());
+    return this->ProxyHelper->GetVTKObject();
     }
   return NULL;
 }
@@ -158,15 +146,14 @@ void vtkPMProperty::PrintSelf(ostream& os, vtkIndent indent)
 bool vtkPMProperty::Push(vtkSMMessage*, int)
 {
   if ( this->InformationOnly || !this->Command || this->UpdateSelf ||
-       this->GetVTKObjectID().IsNull() )
+       this->GetVTKObject() == NULL)
     {
     return true;
     }
 
   vtkClientServerStream stream;
-  vtkClientServerID objectId = this->GetVTKObjectID();
   stream << vtkClientServerStream::Invoke;
-  stream << objectId << this->Command;
+  stream << this->GetVTKObject() << this->Command;
   stream << vtkClientServerStream::End;
   return this->ProcessMessage(stream);
 }

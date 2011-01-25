@@ -14,6 +14,7 @@
 =========================================================================*/
 #include "vtkPMInputProperty.h"
 
+#include "vtkAlgorithmOutput.h"
 #include "vtkClientServerStream.h"
 #include "vtkObjectFactory.h"
 #include "vtkPMSourceProxy.h"
@@ -81,11 +82,11 @@ bool vtkPMInputProperty::Push(vtkSMMessage* message, int offset)
     }
 
   vtkClientServerStream stream;
-  vtkClientServerID objectId = this->GetVTKObjectID();
+  vtkObjectBase* object = this->GetVTKObject();
   if (this->CleanCommand)
     {
     stream << vtkClientServerStream::Invoke
-      << objectId
+      << object
       << this->CleanCommand
       << vtkClientServerStream::End;
     }
@@ -94,24 +95,28 @@ bool vtkPMInputProperty::Push(vtkSMMessage* message, int offset)
     {
     vtkPMSourceProxy* pmproxy = vtkPMSourceProxy::SafeDownCast(
       this->GetPMObject(proxy_ids[cc]));
-    stream << vtkClientServerStream::Invoke
-      << objectId
-      << this->GetCommand();
+    stream << vtkClientServerStream::Invoke << object << this->GetCommand();
     if (this->PortIndex > 0)
       {
       stream << this->PortIndex;
       }
-    stream
-      << (pmproxy? pmproxy->GetOutputPortID(output_ports[cc]) : vtkClientServerID(0))
-      << vtkClientServerStream::End;
+    if (pmproxy)
+      {
+      stream << pmproxy->GetOutputPort(output_ports[cc]);
+      }
+    else
+      {
+      stream << static_cast<vtkObjectBase*>(NULL);
+      }
+    stream << vtkClientServerStream::End;
     }
 
   if (this->NullOnEmpty && this->CleanCommand == NULL && proxy_ids.size() == 0)
     {
     stream << vtkClientServerStream::Invoke
-      << objectId
+      << object
       << this->GetCommand()
-      << vtkClientServerID(0)
+      << static_cast<vtkObjectBase*>(NULL)
       << vtkClientServerStream::End;
     }
 

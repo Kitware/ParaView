@@ -57,7 +57,7 @@ bool vtkPMDataArrayProperty::Pull(vtkSMMessage* msgToFill)
   // Invoke property's method on the root node of the server
   vtkClientServerStream str;
   str << vtkClientServerStream::Invoke
-    << this->GetVTKObjectID() << this->GetCommand()
+    << this->GetVTKObject() << this->GetCommand()
     << vtkClientServerStream::End;
 
   this->ProcessMessage(str);

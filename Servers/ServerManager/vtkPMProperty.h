@@ -80,10 +80,6 @@ protected:
   friend class vtkPMProxy;
 
   // Description:
-  // Convenience method to obtain interpreter id for the VTK Object.
-  vtkClientServerID GetVTKObjectID();
-
-  // Description:
   // Convenience method to obtain a vtkPMObject subclass given its global id.
   vtkPMObject* GetPMObject(vtkTypeUInt32 globalid);
 

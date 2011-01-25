@@ -63,8 +63,8 @@ bool vtkPMArraySelectionProperty::Pull(vtkSMMessage* msgToFill)
   result->set_type(Variant::STRING);
 
   // Get the ID for the reader.
-  vtkClientServerID readerID = this->GetVTKObjectID();
-  if(readerID.ID)
+  vtkObjectBase *reader = this->GetVTKObject();
+  if (reader != NULL)
     {
     vtksys_ios::ostringstream aname;
     aname << "GetNumberOf" << this->Command << "Arrays" << ends;
@@ -72,7 +72,7 @@ bool vtkPMArraySelectionProperty::Pull(vtkSMMessage* msgToFill)
     // Get the number of arrays.
     vtkClientServerStream stream;
     stream << vtkClientServerStream::Invoke
-        << readerID
+        << reader
         << aname.str().c_str()
         << vtkClientServerStream::End;
 
@@ -92,7 +92,7 @@ bool vtkPMArraySelectionProperty::Pull(vtkSMMessage* msgToFill)
 
       // Get the array name.
       stream << vtkClientServerStream::Invoke
-             << readerID
+             << reader
              << naname.str().c_str()
              << i
              << vtkClientServerStream::End;
@@ -119,7 +119,7 @@ bool vtkPMArraySelectionProperty::Pull(vtkSMMessage* msgToFill)
       saname << "Get" << this->Command << "ArrayStatus" << ends;
       // Get the array status.
       stream << vtkClientServerStream::Invoke
-             << readerID
+             << reader
              << saname.str().c_str()
              << name.c_str()
              << vtkClientServerStream::End;
@@ -142,9 +142,7 @@ bool vtkPMArraySelectionProperty::Pull(vtkSMMessage* msgToFill)
     }
   else
     {
-    vtkErrorMacro("GetArraySettings cannot get an ID from "
-                  << this->GetVTKObject()->GetClassName()
-                  << "(" << this->GetVTKObject() << ").");
+    vtkErrorMacro("GetArraySettings called on NULL vtkObject");
     }
   return true;
 }

@@ -47,7 +47,6 @@ vtkStandardNewMacro(vtkPMProxy);
 vtkPMProxy::vtkPMProxy()
 {
   this->Internals = new vtkInternals();
-  this->VTKObjectID = vtkClientServerID(0);
   this->VTKObject = NULL;
   this->ObjectsCreated = false;
 
@@ -104,7 +103,7 @@ void vtkPMProxy::Push(vtkSMMessage* message)
     {
     vtkClientServerStream stream;
     stream << vtkClientServerStream::Invoke
-           << this->GetVTKObjectID()
+           << this->GetVTKObject()
            << this->PostPush
            << vtkClientServerStream::End;
     this->Interpreter->ProcessStream(stream);
@@ -131,7 +130,7 @@ void vtkPMProxy::Invoke(vtkSMMessage* message)
   this->Interpreter->SetGlobalWarningDisplay( disableError ? 0 : 1);
 
   vtkClientServerStream stream;
-  stream << vtkClientServerStream::Invoke << this->GetVTKObjectID()
+  stream << vtkClientServerStream::Invoke << this->GetVTKObject()
          << command.c_str();
   for (int cc=0; cc < arguments->variant_size(); cc++)
     {
@@ -274,13 +273,7 @@ bool vtkPMProxy::CreateVTKObjects(vtkSMMessage* message)
   if (className && className[0])
     {
     this->SetVTKClassName(className);
-    this->VTKObjectID = this->Interpreter->GetNextAvailableId();
-    vtkClientServerStream stream;
-    stream << vtkClientServerStream::New
-           << className << this->VTKObjectID
-           << vtkClientServerStream::End;
-    this->Interpreter->ProcessStream(stream);
-    this->VTKObject = this->Interpreter->GetObjectFromID(this->VTKObjectID);
+    this->VTKObject.TakeReference(vtkInstantiator::CreateInstance(className));
     }
 
 #ifdef FIXME_COLLABORATION
@@ -338,7 +331,7 @@ bool vtkPMProxy::CreateVTKObjects(vtkSMMessage* message)
     {
     vtkClientServerStream stream;
     stream << vtkClientServerStream::Invoke
-           << this->GetVTKObjectID()
+           << this->GetVTKObject()
            << this->PostCreation
            << vtkClientServerStream::End;
     this->Interpreter->ProcessStream(stream);
@@ -350,17 +343,7 @@ bool vtkPMProxy::CreateVTKObjects(vtkSMMessage* message)
 //----------------------------------------------------------------------------
 void vtkPMProxy::DeleteVTKObjects()
 {
-  if (this->VTKObjectID.IsNull() == false && this->Interpreter)
-    {
-    vtkClientServerStream stream;
-    stream << vtkClientServerStream::Delete
-           << this->VTKObjectID
-           << vtkClientServerStream::End;
-    this->Interpreter->ProcessStream(stream);
-    }
-
   this->VTKObject =  NULL;
-  this->VTKObjectID = vtkClientServerID();
 }
 
 //----------------------------------------------------------------------------
@@ -371,11 +354,7 @@ void vtkPMProxy::OnCreateVTKObjects()
 //----------------------------------------------------------------------------
 vtkObjectBase* vtkPMProxy::GetVTKObject()
 {
-  if (this->VTKObjectID.IsNull() == false && this->Interpreter)
-    {
-    return this->Interpreter->GetObjectFromID(this->VTKObjectID);
-    }
-  return NULL;
+  return this->VTKObject.GetPointer();
 }
 
 //----------------------------------------------------------------------------

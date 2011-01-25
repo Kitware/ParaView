@@ -15,13 +15,15 @@
 #include "vtkPMSourceProxy.h"
 
 #include "vtkAlgorithm.h"
-#include "vtkClientServerInterpreter.h"
-#include "vtkClientServerStream.h"
+#include "vtkAlgorithmOutput.h"
 #include "vtkCommand.h"
 #include "vtkInformation.h"
+#include "vtkInstantiator.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVExtentTranslator.h"
+#include "vtkPVExtractPieces.h"
+#include "vtkPVPostFilter.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSMMessage.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
@@ -36,10 +38,11 @@
 class vtkPMSourceProxy::vtkInternals
 {
 public:
-  vtkstd::vector<vtkClientServerID> OutputPortIDs;
-  vtkstd::vector<vtkClientServerID> ExtractPiecesIDs;
-  vtkstd::vector<vtkClientServerID> PostFilterIDs;
+  vtkstd::vector<vtkSmartPointer<vtkAlgorithmOutput> > OutputPorts;
+  vtkstd::vector<vtkSmartPointer<vtkPVExtractPieces> > ExtractPieces;
+  vtkstd::vector<vtkSmartPointer<vtkPVPostFilter> > PostFilters;
 };
+
 //*****************************************************************************
 vtkStandardNewMacro(vtkPMSourceProxy);
 //----------------------------------------------------------------------------
@@ -47,52 +50,25 @@ vtkPMSourceProxy::vtkPMSourceProxy()
 {
   this->ExecutiveName = 0;
   this->SetExecutiveName("vtkPVCompositeDataPipeline");
-
   this->Internals = new vtkInternals();
 }
 
 //----------------------------------------------------------------------------
 vtkPMSourceProxy::~vtkPMSourceProxy()
 {
-  if (this->Interpreter)
-    {
-    vtkClientServerStream stream;
-    vtkstd::vector<vtkClientServerID>::iterator iter;
-    for (iter = this->Internals->ExtractPiecesIDs.begin();
-      iter != this->Internals->ExtractPiecesIDs.end(); ++iter)
-      {
-      if (!iter->IsNull())
-        {
-        stream << vtkClientServerStream::Delete << *iter
-          << vtkClientServerStream::End;
-        }
-      }
-    for (iter = this->Internals->PostFilterIDs.begin();
-      iter != this->Internals->PostFilterIDs.end(); ++iter)
-      {
-      if (!iter->IsNull())
-        {
-        stream << vtkClientServerStream::Delete << *iter
-          << vtkClientServerStream::End;
-        }
-      }
-
-    this->Interpreter->ProcessStream(stream);
-    }
-
   this->SetExecutiveName(0);
   delete this->Internals;
 }
 
 //----------------------------------------------------------------------------
-vtkClientServerID vtkPMSourceProxy::GetOutputPortID(int port)
+vtkAlgorithmOutput* vtkPMSourceProxy::GetOutputPort(int port)
 {
-  if (static_cast<int>(this->Internals->OutputPortIDs.size()) > port)
+  if (static_cast<int>(this->Internals->OutputPorts.size()) > port)
     {
-    return this->Internals->OutputPortIDs[port];
+    return this->Internals->OutputPorts[port];
     }
 
-  return vtkClientServerID();
+  return NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -108,44 +84,30 @@ bool vtkPMSourceProxy::CreateVTKObjects(vtkSMMessage* message)
     return false;
     }
 
-  vtkClientServerID sourceID = this->GetVTKObjectID();
-
-  if (sourceID.IsNull())
+  vtkAlgorithm* algorithm = vtkAlgorithm::SafeDownCast(this->GetVTKObject());
+  if (algorithm == NULL)
     {
     return true;
     }
 
-  vtkClientServerStream stream;
   if (this->ExecutiveName &&
     !this->GetVTKObject()->IsA("vtkPVDataRepresentation"))
     {
-    vtkClientServerID execId = this->Interpreter->GetNextAvailableId();
-    stream << vtkClientServerStream::New
-           << this->ExecutiveName
-           << execId
-           << vtkClientServerStream::End;
-    stream << vtkClientServerStream::Invoke
-           << sourceID
-           << "SetExecutive"
-           << execId
-           << vtkClientServerStream::End;
-    stream << vtkClientServerStream::Delete
-           << execId
-           << vtkClientServerStream::End;
+    vtkExecutive* executive = vtkExecutive::SafeDownCast(
+      vtkInstantiator::CreateInstance(this->ExecutiveName));
+    if (executive)
+      {
+      algorithm->SetExecutive(executive);
+      executive->FastDelete();
+      }
     }
 
   // Register observer to record the execution time for each algorithm in the
   // local timer-log.
-  vtkObject::SafeDownCast(this->GetVTKObject())->AddObserver(
+  algorithm->AddObserver(
     vtkCommand::StartEvent, this, &vtkPMSourceProxy::MarkStartEvent);
-  vtkObject::SafeDownCast(this->GetVTKObject())->AddObserver(
+  algorithm->AddObserver(
     vtkCommand::EndEvent, this, &vtkPMSourceProxy::MarkEndEvent);
-
-  if (!this->Interpreter->ProcessStream(stream))
-    {
-    return false;
-    }
-
   return this->CreateOutputPorts();
 }
 
@@ -159,9 +121,9 @@ bool vtkPMSourceProxy::CreateOutputPorts()
     }
 
   int ports = algo->GetNumberOfOutputPorts();
-  this->Internals->OutputPortIDs.resize(ports, vtkClientServerID(0));
-  this->Internals->ExtractPiecesIDs.resize(ports, vtkClientServerID(0));
-  this->Internals->PostFilterIDs.resize(ports, vtkClientServerID(0));
+  this->Internals->OutputPorts.resize(ports);
+  this->Internals->ExtractPieces.resize(ports);
+  this->Internals->PostFilters.resize(ports);
 
   for (int cc=0; cc < ports; cc++)
     {
@@ -176,20 +138,8 @@ bool vtkPMSourceProxy::CreateOutputPorts()
 //----------------------------------------------------------------------------
 bool vtkPMSourceProxy::InitializeOutputPort(vtkAlgorithm* algo, int port)
 {
-  // Assign an ID to this output port.
-  vtkClientServerID portID = this->Interpreter->GetNextAvailableId();
-  this->Internals->OutputPortIDs[port] = portID;
-
-  vtkClientServerStream stream;
-  stream << vtkClientServerStream::Invoke
-    << this->GetVTKObjectID()
-    << "GetOutputPort" << port
-    << vtkClientServerStream::End;
-  stream << vtkClientServerStream::Assign << portID
-    << vtkClientServerStream::LastResult
-    << vtkClientServerStream::End;
-  this->Interpreter->ProcessStream(stream);
-
+  // Save the output port in internal data-structure.
+  this->Internals->OutputPorts[port] = algo->GetOutputPort(port);
   this->CreateTranslatorIfNecessary(algo, port);
 
   int num_of_required_inputs = 0;
@@ -246,65 +196,29 @@ bool vtkPMSourceProxy::CreateTranslatorIfNecessary(vtkAlgorithm* algo, int port)
 //----------------------------------------------------------------------------
 void vtkPMSourceProxy::InsertExtractPiecesIfNecessary(vtkAlgorithm*, int port)
 {
-  vtkClientServerID portID = this->Internals->OutputPortIDs[port];
-  vtkClientServerID extractID = this->Interpreter->GetNextAvailableId();
 
-  this->Internals->ExtractPiecesIDs[port] = extractID;
+  vtkPVExtractPieces* extractPieces = vtkPVExtractPieces::New();
+  this->Internals->ExtractPieces[port] = extractPieces;
+  extractPieces->FastDelete();
 
-  vtkClientServerStream stream;
-  stream << vtkClientServerStream::New
-    << "vtkPVExtractPieces" << extractID
-    << vtkClientServerStream::End;
-  stream << vtkClientServerStream::Invoke
-    << extractID
-    << "SetInputConnection"
-    << portID
-    << vtkClientServerStream::End;
-  stream << vtkClientServerStream::Delete
-         << portID
-         << vtkClientServerStream::End
-         << vtkClientServerStream::Invoke
-         << extractID
-         << "GetOutputPort"
-         << 0
-         << vtkClientServerStream::End
-         << vtkClientServerStream::Assign
-         << portID
-         << vtkClientServerStream::LastResult
-         << vtkClientServerStream::End;
-  this->Interpreter->ProcessStream(stream);
+  extractPieces->SetInputConnection(this->Internals->OutputPorts[port]);
+
+  // update the OutputPorts so that the output port from vtkPVExtractPieces is
+  // now used as the output port from this proxy.
+  this->Internals->OutputPorts[port] = extractPieces->GetOutputPort(0);
 }
 
 //----------------------------------------------------------------------------
 void vtkPMSourceProxy::InsertPostFilterIfNecessary(vtkAlgorithm*, int port)
 {
-  vtkClientServerID portID = this->Internals->OutputPortIDs[port];
-  vtkClientServerID postFilterID = this->Interpreter->GetNextAvailableId();
+  vtkPVPostFilter* postFilter = vtkPVPostFilter::New();
+  this->Internals->PostFilters[port] = postFilter;
+  postFilter->FastDelete();
 
-  this->Internals->PostFilterIDs[port] = postFilterID;
+  postFilter->SetInputConnection(this->Internals->OutputPorts[port]);
 
-  vtkClientServerStream stream;
-  stream  << vtkClientServerStream::New
-          << "vtkPVPostFilter" << postFilterID
-          << vtkClientServerStream::End;
-  stream  << vtkClientServerStream::Invoke
-          << postFilterID << "SetInputConnection" << portID
-          << vtkClientServerStream::End;
-
-  // Now substitute portID to point to the post-filter.
-  stream << vtkClientServerStream::Delete
-         << portID
-         << vtkClientServerStream::End
-         << vtkClientServerStream::Invoke
-         << postFilterID
-         << "GetOutputPort"
-         << 0
-         << vtkClientServerStream::End
-         << vtkClientServerStream::Assign
-         << portID
-         << vtkClientServerStream::LastResult
-         << vtkClientServerStream::End;
-  this->Interpreter->ProcessStream(stream);
+  // Now substitute port to point to the post-filter.
+  this->Internals->OutputPorts[port] = postFilter->GetOutputPort(0);
 }
 
 //----------------------------------------------------------------------------
