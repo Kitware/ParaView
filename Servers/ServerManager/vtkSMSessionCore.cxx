@@ -74,6 +74,33 @@ namespace
 class vtkSMSessionCore::vtkInternals
 {
 public:
+  vtkInternals()
+    {
+    }
+  ~vtkInternals()
+    {
+    // Remove PMObject left in the right order...
+    PMObjectMapType::iterator iter;
+    int nbFound, nbDelete;
+    nbFound = nbDelete = 1;
+    while(nbFound > 0)
+      {
+      nbDelete = nbFound = 0;
+      for(iter = this->PMObjectMap.begin();iter != this->PMObjectMap.end(); iter++)
+        {
+        vtkPMObject* obj = iter->second;
+        if(obj)
+          {
+          nbFound++;
+          if(obj->GetReferenceCount() == 1)
+            {
+            nbDelete++;
+            obj->Delete();
+            }
+          }
+        }
+      }
+    }
   //---------------------------------------------------------------------------
   void Delete(vtkTypeUInt32 globalUniqueId)
     {

@@ -106,7 +106,7 @@ vtkStandardNewMacro(vtkSMProxyManager);
 vtkSMProxyManager::vtkSMProxyManager()
 {
   this->Session = NULL;
-  this->PipelineState = vtkSMPipelineState::New();
+  this->PipelineState = NULL;
   this->UpdateInputProxies = 0;
   this->Internals = new vtkSMProxyManagerInternals;
   this->Observer = vtkSMProxyManagerObserver::New();
@@ -154,7 +154,11 @@ vtkSMProxyManager::~vtkSMProxyManager()
   this->WriterFactory = 0;
 
   this->SetProxyDefinitionManager(NULL);
-  this->PipelineState->Delete();
+  if(this->PipelineState)
+    {
+    this->PipelineState->Delete();
+    this->PipelineState = NULL;
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -216,15 +220,17 @@ void vtkSMProxyManager::SetSession(vtkSMSession* session)
     this->UnRegisterAllLinks();
     this->UnRegisterProxies();
     this->SetProxyDefinitionManager(NULL);
+    this->PipelineState->Delete();
+    this->PipelineState = NULL;
     }
 
   this->Session = session;
 
-  // This will also register the RemoteObject to the Session
-  this->PipelineState->SetSession(this->Session);
-
   if (this->Session)
     {
+    // This will also register the RemoteObject to the Session
+    this->PipelineState = vtkSMPipelineState::New();
+    this->PipelineState->SetSession(this->Session);
     this->SetProxyDefinitionManager(session->GetProxyDefinitionManager());
     }
 }
