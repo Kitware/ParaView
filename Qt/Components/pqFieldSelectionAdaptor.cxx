@@ -217,12 +217,6 @@ void pqFieldSelectionAdaptor::internalDomainChanged()
     pqSMAdaptor::getFieldSelectionScalarDomainWithPartialArrays(this->Property);
   this->IsGettingAllDomains = false;
 
-  //Because of auto conversion we want the domain type association instead of the properties
-  //This makes sure we don't use a point property as an cell property, but instead
-  //convert it with vtkPVPostFilter.
-  //If this is removed the use case where you have point & cell properties with the same
-  //name fails. It will use the cell arrays on the point data, instead of grabbing the point array
-  int domain_association = ald->GetDomainAssociation();
   combo->blockSignals(true);
   combo->clear();
   int newIndex = -1;
@@ -232,6 +226,12 @@ void pqFieldSelectionAdaptor::internalDomainChanged()
     {
     QPixmap* pix = 0;
     int field_association = ald->GetFieldAssociation(array_idx);
+    //Because of auto conversion we want the domain type association instead of the properties
+    //This makes sure we don't use a point property as an cell property, but instead
+    //convert it with vtkPVPostFilter.
+    //If this is removed the use case where you have point & cell properties with the same
+    //name fails. It will use the cell arrays on the point data, instead of grabbing the point array
+    int domain_association = ald->GetDomainAssociation(array_idx);
     switch (field_association)
       {
     case vtkDataObject::FIELD_ASSOCIATION_CELLS:
