@@ -17,7 +17,6 @@ if(APPLE)
     -DCMAKE_OSX_ARCHITECTURES:STRING=${CMAKE_OSX_ARCHITECTURES}
     -DCMAKE_OSX_DEPLOYMENT_TARGET:STRING=${CMAKE_OSX_DEPLOYMENT_TARGET}
     -DCMAKE_OSX_SYSROOT:PATH=${CMAKE_OSX_SYSROOT})
-  list(APPEND pv_compiler_args ${pv_apple_compiler_args})
 
   if(NOT "${CMAKE_OSX_SYSROOT}" STREQUAL "")
     if(NOT EXISTS "${CMAKE_OSX_SYSROOT}")
@@ -99,6 +98,10 @@ if(WIN32)
   list(APPEND pv_compiler_args -DCMAKE_BUILD_TYPE:STRING=${CMAKE_CFG_INTDIR})
 else()
   list(APPEND pv_compiler_args -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE})
+endif()
+
+if(APPLE)
+  list(APPEND pv_compiler_args ${pv_apple_compiler_args})
 endif()
 
 # We aren't interested in seeing third party compiler warnings.
