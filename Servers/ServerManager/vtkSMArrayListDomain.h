@@ -104,6 +104,10 @@ public:
   int GetFieldAssociation(unsigned int idx);
 
   // Description:
+  // Get desired association of the current domain
+  int GetDomainAssociation();
+
+  // Description:
   // Return the attribute type. The values are listed in
   // vtkDataSetAttributes.h.
   vtkGetMacro(AttributeType, int);

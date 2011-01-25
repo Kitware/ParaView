@@ -76,7 +76,7 @@ public:
   // Description:
   // Set/get the attribute type. Valid values are: POINT, CELL, ANY.
   // Text representations are: point, cell, any.
-  void SetAttributeType(unsigned char type);
+  vtkSetMacro(AttributeType, unsigned char);
   vtkGetMacro(AttributeType, unsigned char);
   const char* GetAttributeTypeAsString();
   virtual void SetAttributeType(const char* type);

@@ -47,7 +47,7 @@ struct vtkSMArrayListDomainInternals
 {
   vtkstd::map<vtkStdString, int> PartialMap;
   vtkstd::vector<int> DataTypes;
-  vtkstd::vector<int> FieldAssociation;
+  vtkstd::vector<int> FieldAssociation;  
   vtkstd::vector<vtkSMArrayListDomainInformationKey> InformationKeys;
 };
 
@@ -75,6 +75,12 @@ int vtkSMArrayListDomain::IsArrayPartial(unsigned int idx)
 {
   const char* name = this->GetString(idx);
   return this->ALDInternals->PartialMap[name];
+}
+
+//---------------------------------------------------------------------------
+int vtkSMArrayListDomain::GetDomainAssociation( )
+{
+  return this->Association;
 }
 
 //---------------------------------------------------------------------------
@@ -207,14 +213,14 @@ unsigned int vtkSMArrayListDomain::AddArray(
         {
         first_index = newidx;
         }
-      this->ALDInternals->FieldAssociation[newidx] = association;
+      this->ALDInternals->FieldAssociation[newidx] = association;      
       }
     return first_index;
     }
   else
     {
     unsigned int newidx = this->AddString(arrayInfo->GetName());
-    this->ALDInternals->FieldAssociation[newidx] = association;
+    this->ALDInternals->FieldAssociation[newidx] = association;    
     return  newidx;
     }
 }
@@ -267,12 +273,22 @@ void vtkSMArrayListDomain::Update(vtkSMSourceProxy* sp,
   case vtkSMInputArrayDomain::POINT:
     this->AddArrays(sp, outputport, info->GetPointDataInformation(), iad,
       vtkDataObject:: FIELD_ASSOCIATION_POINTS);
+    if(vtkSMInputArrayDomain::GetAutomaticPropertyConversion())
+     {
+     this->AddArrays(sp, outputport, info->GetCellDataInformation(), iad,
+           vtkDataObject::FIELD_ASSOCIATION_CELLS);
+     }
     this->Association = vtkDataObject:: FIELD_ASSOCIATION_POINTS;
     break;
 
   case vtkSMInputArrayDomain::CELL:
     this->AddArrays(sp, outputport, info->GetCellDataInformation(), iad,
       vtkDataObject::FIELD_ASSOCIATION_CELLS);
+    if(vtkSMInputArrayDomain::GetAutomaticPropertyConversion())
+     {
+     this->AddArrays(sp, outputport, info->GetPointDataInformation(), iad,
+       vtkDataObject::FIELD_ASSOCIATION_POINTS);
+     }
     this->Association = vtkDataObject:: FIELD_ASSOCIATION_CELLS;
     break;
 
@@ -784,7 +800,7 @@ vtkStdString vtkSMArrayListDomain::ArrayNameFromMangledName(
   size_t pos = extractedName.rfind("_");
   if (pos == vtkStdString::npos)
     {
-    return vtkStdString("");
+    return extractedName;
     }
   return extractedName.substr(0,pos);
 }
