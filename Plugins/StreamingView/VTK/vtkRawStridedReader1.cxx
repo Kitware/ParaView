@@ -521,6 +521,8 @@ vtkRawStridedReader1::vtkRawStridedReader1()
   this->SI = 1;
   this->SJ = 1;
   this->SK = 1;
+
+  this->PostPreProcess = false;
 }
 
 //----------------------------------------------------------------------------
@@ -762,10 +764,10 @@ int vtkRawStridedReader1::RequestData(
     }
 
   char pfilename[256];
-  sprintf(pfilename, "%s.%d_%d_%d_%d_%d_%d_%d_%d_%f.block", this->Filename, uext[0], uext[1], uext[2], uext[3], uext[4], uext[5], P, NP, this->Resolution);
-  //cerr << pfilename <<"?" << endl;
+  sprintf(pfilename, "%s.%d_%d_%d_%d_%d_%d_%d_%d_%f.block", this->Filename,
+          uext[0], uext[1], uext[2], uext[3], uext[4], uext[5], P, NP,
+          this->Resolution);
   ifstream pfile(pfilename, ios::in|ios::binary);
-  //pfile.close();
   if(!pfile.is_open())
   {
     ifstream file(this->Filename, ios::in|ios::binary);
@@ -805,11 +807,14 @@ int vtkRawStridedReader1::RequestData(
       });
     file.close();
 
-    //cerr << "creating " << pfilename << " " << endl;
-    ofstream opfile(pfilename, ios::out|ios::binary);
-    unsigned int memsize = (uext[1]-uext[0]+1)*(uext[3]-uext[2]+1)*(uext[5]-uext[4]+1);
-    opfile.write((char*)myfloats, memsize*sizeof(float));
-    opfile.close();
+    if (this->PostPreProcess)
+      {
+      //cerr << "creating " << pfilename << " " << endl;
+      ofstream opfile(pfilename, ios::out|ios::binary);
+      unsigned int memsize = (uext[1]-uext[0]+1)*(uext[3]-uext[2]+1)*(uext[5]-uext[4]+1);
+      opfile.write((char*)myfloats, memsize*sizeof(float));
+      opfile.close();
+      }
   }
   else
   {

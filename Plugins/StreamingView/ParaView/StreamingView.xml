@@ -101,6 +101,17 @@
        </Documentation>
      </IntVectorProperty>
 
+     <IntVectorProperty
+         name="PostPreProcess"
+         command="SetPostPreProcess"
+         number_of_elements="1"
+         default_values="0">
+       <BooleanDomain name="bool" />
+       <Documentation>
+         When on, the reader saves auxiliary files for every chunk it reads from the file. Re-reader the data then is faster, but the cost is a large number of extra files on the file system.
+       </Documentation>
+     </IntVectorProperty>
+
      <Hints>
        <ReaderFactory extensions="sraw"
                       file_description="multiresolution raw format" />

@@ -58,6 +58,15 @@ public:
   vtkSetMacro(BlockReadSize, int);
   vtkGetMacro(BlockReadSize, int);
 
+  //Description:
+  //When on, the reader dumps the portions of the raw file it reads into
+  //auxiliary files when it first reads them. When that same file is re-read,
+  //the aux files are read in which is often much quicker than scanning through
+  //the original file to recreate the portion.
+  //The default is OFF
+  vtkSetMacro(PostPreProcess, bool);
+  vtkGetMacro(PostPreProcess, bool);
+
 protected:
   vtkRawStridedReader1();
   ~vtkRawStridedReader1();
@@ -119,6 +128,7 @@ protected:
   //Does resolution to stride mapping
   vtkGridSampler1 *GridSampler;
 
+  bool PostPreProcess;
 private:
   vtkRawStridedReader1(const vtkRawStridedReader1&);  // Not implemented.
   void operator=(const vtkRawStridedReader1&);  // Not implemented.
