@@ -94,9 +94,15 @@ endif (BUILD_TESTING)
 
 if (PARAVIEW_INSTALL_THIRD_PARTY_LIBRARIES AND NOT APPLE)
 
+  if(WIN32)
+   set(pv_runtime_dest ${PV_INSTALL_BIN_DIR})
+  else()
+   set(pv_runtime_dest ${PV_INSTALL_LIB_DIR})
+  endif()
+
   # Now install the plugins for sqldrivers. For use by the help system
   install(DIRECTORY ${QT_PLUGINS_DIR}/sqldrivers 
-          DESTINATION ${PV_INSTALL_BIN_DIR}
+          DESTINATION ${pv_runtime_dest}
           COMPONENT Runtime)
 
   if(PARAVIEW_ENABLE_PYTHON)
@@ -115,7 +121,7 @@ if (PARAVIEW_INSTALL_THIRD_PARTY_LIBRARIES AND NOT APPLE)
       
       file(TO_CMAKE_PATH ${PYTHON_LIBS_DIR} PYTHON_LIBS_DIR)
       install(DIRECTORY ${PYTHON_LIBS_DIR}
-              DESTINATION ${PV_INSTALL_BIN_DIR}
+              DESTINATION ${pv_runtime_dest}
               USE_SOURCE_PERMISSIONS
               COMPONENT Runtime)
     endif(PARAVIEW_INSTALL_PYTHON)
@@ -156,7 +162,7 @@ if (PARAVIEW_INSTALL_THIRD_PARTY_LIBRARIES AND NOT APPLE)
     if(PARAVIEW_INSTALL_MPIEXEC)
       GET_FILENAME_COMPONENT(mpi_bin_dir ${MPIEXEC} PATH)
       install(DIRECTORY ${mpi_bin_dir}/
-        DESTINATION ${PV_INSTALL_BIN_DIR}
+        DESTINATION ${pv_runtime_dest}
         COMPONENT Runtime)
     endif(PARAVIEW_INSTALL_MPIEXEC)
   endif(PARAVIEW_USE_MPI)
