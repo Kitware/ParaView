@@ -157,8 +157,8 @@ int vtkClientServerMoveData::RequestData(vtkInformation*,
 
   if (controller)
     {
-    bool is_server = this->ProcessType == SERVER;
-    bool is_client = this->ProcessType == CLIENT;
+    bool is_server = (processType == SERVER);
+    bool is_client = (processType == CLIENT);
     if (is_server)
       {
       vtkDebugMacro("Server Root: Send input data to client.");
@@ -202,20 +202,29 @@ int vtkClientServerMoveData::SendData(vtkDataObject* input,
   // This is a server root node.
   // If it is a selection, use the XML serializer.
   // Otherwise, use the communicator.
-  if (vtkSelection::SafeDownCast(input) != NULL)
+  if (this->OutputDataType == VTK_SELECTION)
     {
     // Convert to XML.
     vtkSelection* sel = vtkSelection::SafeDownCast(input);
-    vtksys_ios::ostringstream res;
-    vtkSelectionSerializer::PrintXML(res, vtkIndent(), 1, sel);
+    if (!sel)
+      {
+      int size=0;
+      return controller->Send(&size, 1, 1,
+        vtkClientServerMoveData::TRANSMIT_DATA_OBJECT);
+      }
+    else
+      {
+      vtksys_ios::ostringstream res;
+      vtkSelectionSerializer::PrintXML(res, vtkIndent(), 1, sel);
 
-    // Send the size of the string.
-    int size = static_cast<int>(res.str().size());
-    controller->Send(&size, 1, 1, 
-      vtkClientServerMoveData::TRANSMIT_DATA_OBJECT);
-    // Send the XML string.
-    return controller->Send(res.str().c_str(), size, 1, 
-      vtkClientServerMoveData::TRANSMIT_DATA_OBJECT);
+      // Send the size of the string.
+      int size = static_cast<int>(res.str().size());
+      controller->Send(&size, 1, 1,
+        vtkClientServerMoveData::TRANSMIT_DATA_OBJECT);
+      // Send the XML string.
+      return controller->Send(res.str().c_str(), size, 1,
+        vtkClientServerMoveData::TRANSMIT_DATA_OBJECT);
+      }
     }
 
   return controller->Send(input, 1,
@@ -232,6 +241,10 @@ vtkDataObject* vtkClientServerMoveData::ReceiveData(vtkMultiProcessController* c
     int size = 0;
     controller->Receive(&size, 1, 1,
       vtkClientServerMoveData::TRANSMIT_DATA_OBJECT);
+    if (size == 0)
+      {
+      return NULL;
+      }
     char* xml = new char[size+1];
     // Get the string itself.
     controller->Receive(xml, size, 1,
