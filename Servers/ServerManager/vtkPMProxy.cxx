@@ -283,7 +283,7 @@ bool vtkPMProxy::CreateVTKObjects(vtkSMMessage* message)
     this->VTKObject = this->Interpreter->GetObjectFromID(this->VTKObjectID);
     }
 
-#ifdef FIXME
+#ifdef FIXME_COLLABORATION
   // ensure that this is happening correctly in PMProxy
   if (this->VTKClassName && this->VTKClassName[0] != '\0')
     {

@@ -103,7 +103,7 @@ void pqHelperProxyRegisterUndoElement::RegisterHelperProxies(pqProxy* proxy)
 }
 
 //-----------------------------------------------------------------------------
-int pqHelperProxyRegisterUndoElement::Redo()
+int pqHelperProxyRegisterUndoElement::DoTheJob()
 {
   if (!this->Session)
     {

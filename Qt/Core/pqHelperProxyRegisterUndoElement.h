@@ -39,7 +39,8 @@ class pqProxy;
 
 /// This is a special undo element that gets added after a proxy 
 /// (referred to as "source" proxy) and all its
-/// helpers have been registered. 
+/// helpers have been registered.
+/// AND before it's proxy and all its helpers have been UNregistered.
 /// On undo, this element does nothing since the creation of 
 /// helper proxies will automatically be undone before the undo for creation 
 /// of the "source" proxy. However, on redo,
@@ -54,15 +55,18 @@ public:
   static pqHelperProxyRegisterUndoElement* New();
   vtkTypeMacro(pqHelperProxyRegisterUndoElement, vtkSMUndoElement);
   void PrintSelf(ostream& os, vtkIndent indent);
+  void SetOperationTypeToUndo() { this->ForUndo = true; }
+  void SetOperationTypeToRedo() { this->ForUndo = false; }
 
   /// Description:
   /// Undo the operation encapsulated by this element.
-  virtual int Undo() {return 1; }
+  /// We make the pqProxy aware of its helper proxies.
+  virtual int Undo() { return this->ForUndo ? this->DoTheJob() : 1; }
 
   /// Description:
   /// Redo the operation encaspsulated by this element.
   /// We make the pqProxy aware of its helper proxies.
-  virtual int Redo();
+  virtual int Redo() { return this->ForUndo ? 1 : this->DoTheJob(); }
 
   /// Description:
   /// Creates the element to setup helper proxies for the proxy.
@@ -71,6 +75,9 @@ public:
 protected:
   pqHelperProxyRegisterUndoElement();
   ~pqHelperProxyRegisterUndoElement();
+
+  virtual int DoTheJob();
+  bool ForUndo;
 
 private:
   pqHelperProxyRegisterUndoElement(const pqHelperProxyRegisterUndoElement&); // Not implemented.

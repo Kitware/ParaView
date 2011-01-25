@@ -383,11 +383,12 @@ void pqPipelineSource::setDefaultPropertyValues()
 
   this->createAnimationHelpersIfNeeded();
 
-  // This is sort-of-a-hack to ensure that when this operation is undo, all the
+  // This is sort-of-a-hack to ensure that when this operation is redo, all the
   // helper proxies are discovered correctly. This needs to happen only after
   // all helper proxies have been created.
   pqHelperProxyRegisterUndoElement* elem = 
     pqHelperProxyRegisterUndoElement::New();
+  elem->SetOperationTypeToRedo(); // Redo creation
   elem->RegisterHelperProxies(this);
   ADD_UNDO_ELEM(elem);
   elem->Delete();

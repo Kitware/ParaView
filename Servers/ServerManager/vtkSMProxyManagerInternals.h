@@ -153,13 +153,17 @@ struct vtkSMProxyManagerEntry
 
   bool operator==(const vtkSMProxyManagerEntry &other) const {
     return this->Group == other.Group && this->Name == other.Name
-        && this->Proxy == other.Proxy;
+        && this->Proxy->GetGlobalID() == other.Proxy->GetGlobalID();
   }
 
   bool operator<(const vtkSMProxyManagerEntry &other) const {
     if(this->Group < other.Group)
       {
       return true;
+      }
+    else if (this->Group == other.Group && this->Name == other.Name)
+      {
+      return this->Proxy->GetGlobalID() < other.Proxy->GetGlobalID();
       }
     else if (this->Group == other.Group)
       {
@@ -172,6 +176,10 @@ struct vtkSMProxyManagerEntry
     if(this->Group > other.Group)
       {
       return true;
+      }
+    else if (this->Group == other.Group && this->Name == other.Name)
+      {
+      return this->Proxy->GetGlobalID() > other.Proxy->GetGlobalID();
       }
     else if (this->Group == other.Group)
       {
@@ -293,7 +301,6 @@ struct vtkSMProxyManagerInternals
         }
       iter++;
       }
-
     }
 
   void RemoveTuples( const char* name,

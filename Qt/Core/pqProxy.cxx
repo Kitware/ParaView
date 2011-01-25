@@ -40,6 +40,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProxyIterator.h"
 #include "vtkSMProxyManager.h"
 
+#include "pqHelperProxyRegisterUndoElement.h"
+#include "pqUndoStack.h"
+
 #include <QMap>
 #include <QList>
 #include <QtDebug>
@@ -146,6 +149,16 @@ void pqProxy::updateHelperProxies() const
 //-----------------------------------------------------------------------------
 void pqProxy::clearHelperProxies()
 {
+  // This is sort-of-a-hack to ensure that when this operation (delete)
+  // is undo, all the helper proxies are discovered correctly. This needs to
+  // happen only when all helper proxies are still around.
+  pqHelperProxyRegisterUndoElement* elem =
+    pqHelperProxyRegisterUndoElement::New();
+  elem->SetOperationTypeToUndo(); // Undo deletion
+  elem->RegisterHelperProxies(this);
+  ADD_UNDO_ELEM(elem);
+  elem->Delete();
+
   vtkSMProxyManager* pxm = this->getProxy()->GetProxyManager();
   if (pxm)
     {
