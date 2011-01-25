@@ -92,7 +92,7 @@ if ( this->ALDInternals->DomainAssociation.find(idx) ==
   {
   return this->GetFieldAssociation(idx);
   }
-  return this->ALDInternals->DomainAssociation.at(idx);
+  return this->ALDInternals->DomainAssociation.find(idx)->second;
 }
 
 //---------------------------------------------------------------------------
