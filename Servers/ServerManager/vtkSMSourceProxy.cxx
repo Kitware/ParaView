@@ -223,6 +223,7 @@ int vtkSMSourceProxy::ReadXMLAttributes(vtkSMProxyManager* pm,
       }
     }
 
+  int port_count = 0;
   unsigned int numElems = element->GetNumberOfNestedElements();
   for (unsigned int cc=0; cc < numElems; cc++)
     {
@@ -231,11 +232,10 @@ int vtkSMSourceProxy::ReadXMLAttributes(vtkSMProxyManager* pm,
       strcmp(child->GetName(), "OutputPort")==0)
       {
       // Load output port configuration.
-      int index;
+      int index = 0;
       if (!child->GetScalarAttribute("index", &index))
         {
-        vtkErrorMacro("Missing OutputPort attribute 'index'.");
-        return 0;
+        index = port_count;
         }
       const char* portname= child->GetAttribute("name");
       if (!portname)
@@ -243,6 +243,7 @@ int vtkSMSourceProxy::ReadXMLAttributes(vtkSMProxyManager* pm,
         vtkErrorMacro("Missing OutputPort attribute 'name'.");
         return 0;
         }
+      port_count++;
       this->PInternals->EnsureOutputPortsSize(index+1); 
       this->PInternals->OutputPorts[index].Name = portname;
 

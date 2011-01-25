@@ -94,7 +94,7 @@ void vtkSMCompoundSourceProxy::PrintSelf(ostream& os, vtkIndent indent)
 void vtkSMCompoundSourceProxy::CreateOutputPorts()
 {
   if (this->Location == 0 ||
-      this->OutputPortsCreated && this->GetNumberOfOutputPorts())
+      (this->OutputPortsCreated && this->GetNumberOfOutputPorts() > 0))
     {
     return;
     }
@@ -175,10 +175,10 @@ void vtkSMCompoundSourceProxy::UpdateVTKObjects()
 int vtkSMCompoundSourceProxy::ReadXMLAttributes( vtkSMProxyManager* pm,
                                                  vtkPVXMLElement* element)
 {
-  // CAUTION: We changed the default ReadXMLAttributes by using a Locator...
-  //          We overide this method since compound proxy XML definition
-  //          is basically a XML state serialialization of a set of Proxies.
-  // this->Superclass::ReadXMLAttributes(pm, element);
+  if (!this->Superclass::ReadXMLAttributes(pm, element))
+    {
+    return 0;
+    }
 
   // Initialise the Proxy based on its definition state
   vtkSmartPointer<vtkSMCompoundProxyDefinitionLoader> deserializer;
@@ -285,7 +285,9 @@ int vtkSMCompoundSourceProxy::ReadXMLAttributes( vtkSMProxyManager* pm,
         }
       }
     }
+  return 1;
 }
+
 //----------------------------------------------------------------------------
 // vtkSMSourceProxy guarantees that the output port size is set up correctly
 // after CreateVTKObjects(). Hence, we ensure that it is set up correctly.
