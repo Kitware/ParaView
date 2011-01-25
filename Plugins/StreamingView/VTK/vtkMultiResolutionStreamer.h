@@ -89,6 +89,12 @@ public:
   // of all the harness shown within.
   void Coarsen();
 
+  // Description:
+  // Apps can call this during camera motion to prevent refinement
+  // during user interaction.
+  vtkSetMacro(Interacting, bool);
+  vtkGetMacro(Interacting, bool);
+
 //BTX
 protected:
   vtkMultiResolutionStreamer();
@@ -121,6 +127,7 @@ protected:
   int DepthLimit;
   int MaxSplits;
 
+  bool Interacting;
 private:
   vtkMultiResolutionStreamer
     (const vtkMultiResolutionStreamer&);  // Not implemented.

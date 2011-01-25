@@ -62,6 +62,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVStreamingView.h"
 
 #include "vtkMath.h"
+#include "vtkMultiResolutionStreamer.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVStreamingParallelHelper.h"
 #include "vtkPVStreamingRepresentation.h"
@@ -144,11 +145,28 @@ void vtkPVStreamingView::Render(bool interactive, bool skip_rendering)
 
   if (this->StreamDriver)
     {
-    //figure out what piece to show now
     if (changed)
       {
+      //prevent refinement while dragging mouse to make it more responsive
+      vtkMultiResolutionStreamer *msr = vtkMultiResolutionStreamer::SafeDownCast
+        (this->StreamDriver);
+      if (msr)
+        {
+        if (interactive)
+          {
+          msr->SetInteracting(true);
+          }
+        else
+          {
+          msr->SetInteracting(false);
+          }
+        }
+
+      //when mode changes, be sure not to skip anything
       this->StreamDriver->RestartStreaming();
       }
+
+    //figure out what piece to show now
     this->StreamDriver->StartRenderEvent();
 
     //be sure to update pipeline far enough to get it
