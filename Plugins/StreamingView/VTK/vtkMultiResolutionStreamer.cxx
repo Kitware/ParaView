@@ -315,6 +315,14 @@ int vtkMultiResolutionStreamer::Refine(vtkStreamingHarness *harness)
        << " -> ";
        );
 
+    //remove it from the cache filter
+    vtkPieceCacheFilter *pcf = harness->GetCacheFilter();
+    if (pcf)
+      {
+      int index = pcf->ComputeIndex(p,np);
+      pcf->DeletePiece(index);
+      }
+
     //compute next resolution to request for it
     double resolution = res + res_delta;
     if (resolution > 1.0)
