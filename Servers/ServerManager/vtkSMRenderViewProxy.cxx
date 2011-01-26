@@ -616,13 +616,9 @@ bool vtkSMRenderViewProxy::FetchLastSelection(
     {
     vtkSmartPointer<vtkPVLastSelectionInformation> info =
       vtkSmartPointer<vtkPVLastSelectionInformation>::New();
-#ifdef FIXME_COLLABORATION
-    // we have no API on vtkSMProxy to tell it to gather information from a
-    // specific server.
-    vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-    pm->GatherInformation(this->ConnectionID,
-      vtkProcessModule::DATA_SERVER, info, this->GetID());
-#endif
+
+    this->GetSession()->GatherInformation(
+      vtkPVSession::DATA_SERVER, info, this->GetGlobalID());
 
     vtkSelection* selection = info->GetSelection();
     if (!multiple_selections)
