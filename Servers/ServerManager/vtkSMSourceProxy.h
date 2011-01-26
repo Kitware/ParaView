@@ -191,8 +191,6 @@ protected:
   // Description:
   // Overwritten from superclass to invoke 
   virtual void PostUpdateData();
-  
-  int DoInsertExtractPieces;
 
 private:
   vtkSMSourceProxyInternals* PInternals;

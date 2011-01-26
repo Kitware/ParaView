@@ -95,8 +95,6 @@ vtkSMSourceProxy::vtkSMSourceProxy()
   this->ExecutiveName = 0;
   this->SetExecutiveName("vtkCompositeDataPipeline");
 
-  this->DoInsertExtractPieces = 1;
-
   this->NumberOfAlgorithmOutputPorts = VTK_UNSIGNED_INT_MAX;
   this->NumberOfAlgorithmRequiredInputPorts = VTK_UNSIGNED_INT_MAX;
   this->ProcessSupport = vtkSMSourceProxy::BOTH;
