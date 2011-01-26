@@ -323,7 +323,7 @@ void vtkSMProxyManager::AddElement(const char* groupName,
 
 //----------------------------------------------------------------------------
 vtkSMProxy* vtkSMProxyManager::NewProxy(
-  const char* groupName, const char* proxyName)
+  const char* groupName, const char* proxyName, const char* subProxyName)
 {
   if (!groupName || !proxyName)
     {
@@ -331,18 +331,21 @@ vtkSMProxy* vtkSMProxyManager::NewProxy(
     }
   // Find the XML element from which the proxy can be instantiated and
   // initialized
-  vtkPVXMLElement* element = this->GetProxyElement(groupName, proxyName);
+  vtkPVXMLElement* element = this->GetProxyElement( groupName, proxyName,
+                                                    subProxyName);
   if (element)
     {
-    return this->NewProxy(element, groupName, proxyName);
+    return this->NewProxy(element, groupName, proxyName, subProxyName);
     }
+
   return 0;
 }
 
 //---------------------------------------------------------------------------
 vtkSMProxy* vtkSMProxyManager::NewProxy(vtkPVXMLElement* pelement,
                                         const char* groupname,
-                                        const char* proxyname)
+                                        const char* proxyname,
+                                        const char* subProxyName)
 {
   vtkObject* object = 0;
   vtksys_ios::ostringstream cname;
@@ -352,10 +355,13 @@ vtkSMProxy* vtkSMProxyManager::NewProxy(vtkPVXMLElement* pelement,
   vtkSMProxy* proxy = vtkSMProxy::SafeDownCast(object);
   if (proxy)
     {
+    // XMLName/XMLGroup should be set before ReadXMLAttributes so sub proxy
+    // can be found based on their names when sent to the PM Side
+    proxy->SetXMLGroup(groupname);
+    proxy->SetXMLName(proxyname);
+    proxy->SetXMLSubProxyName(subProxyName);
     proxy->SetSession(this->GetSession());
     proxy->ReadXMLAttributes(this, pelement);
-    proxy->SetXMLName(proxyname);
-    proxy->SetXMLGroup(groupname);
     }
   else
     {
@@ -411,11 +417,14 @@ int vtkSMProxyManager::ProxyElementExists(const char* groupName,
 
 //---------------------------------------------------------------------------
 vtkPVXMLElement* vtkSMProxyManager::GetProxyElement(const char* groupName,
-                                                    const char* proxyName)
+                                                    const char* proxyName,
+                                                    const char* subProxyName)
 {
   assert(this->ProxyDefinitionManager != 0);
-  return this->ProxyDefinitionManager->GetCollapsedProxyDefinition(
-    groupName, proxyName, true);
+  return this->ProxyDefinitionManager->GetCollapsedProxyDefinition( groupName,
+                                                                    proxyName,
+                                                                    subProxyName,
+                                                                    true);
 }
 
 //---------------------------------------------------------------------------
@@ -459,7 +468,7 @@ vtkSMProxy* vtkSMProxyManager::GetPrototypeProxy(const char* groupname,
   // silently ask for the definition. If not found return NULL.
   vtkPVXMLElement* xmlElement =
     this->ProxyDefinitionManager->GetCollapsedProxyDefinition(
-      groupname, name, false);
+      groupname, name, NULL, false);
   if (xmlElement == NULL)
     {
     // No definition was located for the requested proxy.

@@ -776,14 +776,41 @@ void vtkSMProxyDefinitionManager::InvalidateCollapsedDefinition()
   this->InternalsFlatten->CoreDefinitions.clear();
 }
 //---------------------------------------------------------------------------
-vtkPVXMLElement* vtkSMProxyDefinitionManager::GetCollapsedProxyDefinition(const char* group, const char* name, bool throwError)
+vtkPVXMLElement* vtkSMProxyDefinitionManager::ExtractSubProxy(
+    vtkPVXMLElement* proxyDefinition, const char* subProxyName)
+{
+  if(!subProxyName)
+    {
+    return proxyDefinition;
+    }
+
+  // Extract just the sub-proxy in-line definition
+  for(unsigned int cc=0;cc<proxyDefinition->GetNumberOfNestedElements();cc++)
+    {
+    if(strcmp(proxyDefinition->GetNestedElement(cc)->GetName(), "SubProxy") == 0)
+      {
+      vtkPVXMLElement* subProxyDef =
+          proxyDefinition->GetNestedElement(cc)->FindNestedElementByName("Proxy");
+      if( subProxyDef && strcmp( subProxyDef->GetAttribute("name"), subProxyName) == 0)
+        {
+        return subProxyDef;
+        }
+      }
+    }
+
+  return NULL;
+}
+
+//---------------------------------------------------------------------------
+vtkPVXMLElement* vtkSMProxyDefinitionManager::GetCollapsedProxyDefinition(
+    const char* group, const char* name, const char* subProxyName, bool throwError)
 {
   // Look in the cache
   vtkPVXMLElement* flattenDefinition = this->InternalsFlatten->GetProxyElement(group,name);
   if (flattenDefinition)
     {
     // Found it, so return it...
-    return flattenDefinition;
+    return ExtractSubProxy(flattenDefinition, subProxyName);
     }
 
   // Not found in the cache, look if the definition exists
@@ -831,12 +858,12 @@ vtkPVXMLElement* vtkSMProxyDefinitionManager::GetCollapsedProxyDefinition(const 
       // Register it in the cache
       this->InternalsFlatten->CoreDefinitions[group][name] = newElement.GetPointer();
 
-      return newElement.GetPointer();
+      return ExtractSubProxy(newElement.GetPointer(), subProxyName);
       }
     }
 
   // Could be either the original definition or a NULL pointer if not found
-  return originalDefinition;
+  return ExtractSubProxy(originalDefinition, subProxyName);
 }
 //---------------------------------------------------------------------------
 void vtkSMProxyDefinitionManager::MergeProxyDefinition(vtkPVXMLElement* element,

@@ -252,17 +252,25 @@ bool vtkPMProxy::CreateVTKObjects(vtkSMMessage* message)
     !message->HasExtension(ProxyState::xml_name))
     {
     vtkErrorMacro("Incorrect message received. "
-      "Missing xml_group and xml_name information.");
-    message->PrintDebugString();
+                  << "Missing xml_group and xml_name information." << endl
+                  << message->DebugString().c_str() << endl);
     return false;
     }
 
   vtkSMProxyDefinitionManager* pdm = this->GetProxyDefinitionManager();
   vtkPVXMLElement* element = pdm->GetCollapsedProxyDefinition(
     message->GetExtension(ProxyState::xml_group).c_str(),
-    message->GetExtension(ProxyState::xml_name).c_str());
+    message->GetExtension(ProxyState::xml_name).c_str(),
+    (message->HasExtension(ProxyState::xml_sub_proxy_name) ?
+     message->GetExtension(ProxyState::xml_sub_proxy_name).c_str() :
+     NULL));
   if (!element)
     {
+    vtkErrorMacro("Definition not found for xml_group: "
+                  << message->GetExtension(ProxyState::xml_group).c_str()
+                  << " and xml_name: "
+                  << message->GetExtension(ProxyState::xml_name).c_str()
+                  << endl << message->DebugString().c_str() << endl );
     return false;
     }
 
@@ -306,11 +314,21 @@ bool vtkPMProxy::CreateVTKObjects(vtkSMMessage* message)
       this->GetPMObject(subproxyMsg.global_id()));
     if (subproxy == NULL)
       {
-      vtkErrorMacro("Failed to locate subproxy with global-id: " <<
-        subproxyMsg.global_id());
-      return false;
+      // This code has been commented to support ImplicitPlaneWidgetRepresentation
+      // which as a widget as SubProxy which stay on the client side.
+      // Therefore, when ParaView is running on Client/Server mode, that SubProxy
+      // does NOT exist on the Server side. This case should not fail the current
+      // proxy creation.
+
+      // vtkErrorMacro("Failed to locate subproxy with global-id: "
+      //                << subproxyMsg.global_id() << endl
+      //                << message->DebugString().c_str());
+      // return false;
       }
-    this->Internals->SubProxyHelpers[subproxyMsg.name()] = subproxy;
+    else
+      {
+      this->Internals->SubProxyHelpers[subproxyMsg.name()] = subproxy;
+      }
     }
 
   // Allow subclasses to do some initialization if needed. Note this is called

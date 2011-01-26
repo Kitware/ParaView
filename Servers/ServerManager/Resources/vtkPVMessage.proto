@@ -63,7 +63,7 @@ message DefinitionHeader
   }
 }
 
-// Extension ProxyState *********************************************** [20-23]
+// Extension ProxyState *********************************************** [20-24]
 
 message ProxyState
 {
@@ -80,10 +80,11 @@ message ProxyState
     }
 
   extend Message {
-    required string   xml_group = 20;
-    required string   xml_name  = 21;
-    repeated Property property  = 22;
-    repeated SubProxy subproxy  = 23;
+    required string   xml_group           = 20;
+    required string   xml_name            = 21;
+    optional string   xml_sub_proxy_name  = 22;
+    repeated Property property            = 23;
+    repeated SubProxy subproxy            = 24;
   }
 }
 

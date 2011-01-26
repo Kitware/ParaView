@@ -101,6 +101,7 @@ vtkSMProxy::vtkSMProxy()
   this->XMLGroup = 0;
   this->XMLName = 0;
   this->XMLLabel = 0;
+  this->XMLSubProxyName = 0;
   this->ObjectsCreated = 0;
 
   this->XMLElement = 0;
@@ -136,6 +137,7 @@ vtkSMProxy::~vtkSMProxy()
   this->SetXMLGroup(0);
   this->SetXMLName(0);
   this->SetXMLLabel(0);
+  this->SetXMLSubProxyName(0);
   this->SetXMLElement(0);
   if (this->SubProxyObserver)
     {
@@ -684,6 +686,10 @@ void vtkSMProxy::CreateVTKObjects()
   message.SetExtension(DefinitionHeader::server_class, this->GetKernelClassName());
   message.SetExtension(ProxyState::xml_group, this->GetXMLGroup());
   message.SetExtension(ProxyState::xml_name, this->GetXMLName());
+  if(this->XMLSubProxyName)
+    {
+    message.SetExtension(ProxyState::xml_sub_proxy_name, this->XMLSubProxyName);
+    }
 
   // Create sub-proxies first.
   vtkSMProxyInternals::ProxyMap::iterator it2 =
@@ -1296,17 +1302,14 @@ int vtkSMProxy::ReadXMLAttributes( vtkSMProxyManager* pm,
     this->SetKernelClassName(kernelClass);
     }
 
-  const char* xmlname = element->GetAttribute("name");
-  if(xmlname)
-    {
-    this->SetXMLName(xmlname);
-    this->SetXMLLabel(xmlname);
-    }
-
   const char* xmllabel = element->GetAttribute("label");
   if (xmllabel)
     {
     this->SetXMLLabel(xmllabel);
+    }
+  else
+    {
+    this->SetXMLLabel(this->GetXMLName());
     }
 
   const char* processes = element->GetAttribute("processes");
@@ -1406,12 +1409,14 @@ int vtkSMProxy::CreateSubProxiesAndProperties(vtkSMProxyManager* pm,
             }
           else
             {
-            subproxy = pm->NewProxy(subElement, "inline-proxy", name); // FIXME !!!!
+            gname = this->XMLGroup;
+            pname = this->XMLName;
+            subproxy = pm->NewProxy(subElement, gname, pname, name);
             }
           if (!subproxy)
             {
-            vtkErrorMacro("Failed to create subproxy: "
-              << (pname?pname:"(none"));
+            vtkErrorMacro( "Failed to create subproxy: "
+                           << (pname?pname:"(none"));
             return 0;
             }
           this->AddSubProxy(name, subproxy, override);

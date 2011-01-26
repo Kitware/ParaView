@@ -90,7 +90,8 @@ public:
   // The VTK wrappers handle New and Delete specially and may not allow
   // the deletion of object created through other methods. Use
   // UnRegister instead.
-  vtkSMProxy* NewProxy(const char* groupName, const char* proxyName);
+  vtkSMProxy* NewProxy(const char* groupName, const char* proxyName,
+                       const char* subProxyName = NULL);
 
   // Description:
   // Returns a vtkSMDocumentation object with the documentation
@@ -485,14 +486,15 @@ protected:
   // Description:
   // Given an XML element and group name create a proxy
   // and all of it's properties.
-  vtkSMProxy* NewProxy(vtkPVXMLElement* element,
-    const char* groupname, const char* proxyname);
+  vtkSMProxy* NewProxy(vtkPVXMLElement* element, const char* groupname,
+                       const char* proxyname, const char* subProxyName = NULL);
 
   // Description:
   // Given the proxy name and group name, returns the XML element for
   // the proxy.
-  vtkPVXMLElement* GetProxyElement(const char* groupName,
-    const char* proxyName);
+  vtkPVXMLElement* GetProxyElement( const char* groupName,
+                                    const char* proxyName,
+                                    const char* subProxyName = NULL);
 
   // Description:
   // Handles events.

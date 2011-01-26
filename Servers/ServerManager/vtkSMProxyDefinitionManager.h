@@ -58,10 +58,15 @@ public:
   // Returns the same thing as GetProxyDefinition in a flatten manner.
   // By flatten, we mean that the class hierarchy has been walked and merged
   // into a single vtkPVXMLElement definition.
-  vtkPVXMLElement* GetCollapsedProxyDefinition(const char* group, const char* name, bool throwError);
-  vtkPVXMLElement* GetCollapsedProxyDefinition(const char* group, const char* name)
+  vtkPVXMLElement* GetCollapsedProxyDefinition(const char* group,
+                                               const char* name,
+                                               const char* subProxyName,
+                                               bool throwError);
+  vtkPVXMLElement* GetCollapsedProxyDefinition(const char* group,
+                                               const char* name,
+                                               const char* subProxyName)
     {
-    return this->GetCollapsedProxyDefinition(group, name, true);
+    return this->GetCollapsedProxyDefinition(group, name, subProxyName, true);
     }
 
 
@@ -188,6 +193,12 @@ protected:
   // the proxy.
   vtkPVXMLElement* GetProxyElement(const char* groupName,
                                    const char* proxyName);
+
+  // Description:
+  // Convenient method used to extract sub-proxy definition inside a proxy
+  // definition. If (subProxyName == NULL) return proxyDefinition;
+  vtkPVXMLElement* ExtractSubProxy(vtkPVXMLElement* proxyDefinition,
+                                   const char* subProxyName);
 
 private:
   vtkSMProxyDefinitionManager(const vtkSMProxyDefinitionManager&); // Not implemented

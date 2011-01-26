@@ -443,6 +443,14 @@ protected:
   vtkSetStringMacro(XMLLabel);
 
   // Description:
+  // Assigned by the XML parser. It is used to figure out the origin
+  // of the definition of that proxy.
+  // By default, it stay NULL, only in-line subProxy do specify
+  // this field so when the definition is sent to the server, it can
+  // retreive the in-line definition of that proxy.
+  vtkSetStringMacro(XMLSubProxyName);
+
+  // Description:
   // Given a class name (by setting VTKClassName) and server ids (by
   // setting ServerIDs), this methods instantiates the objects on the
   // server(s)
@@ -592,6 +600,7 @@ protected:
   char* XMLGroup;
   char* XMLName;
   char* XMLLabel;
+  char* XMLSubProxyName;
   int ObjectsCreated;
   int DoNotUpdateImmediately;
   int DoNotModifyProperty;

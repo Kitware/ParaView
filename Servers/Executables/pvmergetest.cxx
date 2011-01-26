@@ -60,7 +60,8 @@ int main(int argc, char* argv[])
 
   vtkPVXMLElement* def = pxm->GetProxyDefinitionManager()->
                          GetCollapsedProxyDefinition( "representations",
-                                                      "GeometryRepresentation"); // GeometryRepresentation Glyph3DRepresentation
+                                                      "GeometryRepresentation",
+                                                      NULL); // GeometryRepresentation Glyph3DRepresentation
   def->PrintXML();
 
   cout << "Exiting..." << endl;
