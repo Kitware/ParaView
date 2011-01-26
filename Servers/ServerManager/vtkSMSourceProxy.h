@@ -122,6 +122,31 @@ public:
   }
   vtkPVDataInformation* GetDataInformation(unsigned int outputIdx);
 
+  // Description:
+  // Creates extract selection proxies for each output port if not already
+  // created.
+  void CreateSelectionProxies();
+
+  // Description:
+  // Set/Get the selection input. This is used to set the selection input to the
+  // extarction proxy for the output port identified by \c portIndex.
+  // If no extraction proxies are present, this method has no effect.
+  void SetSelectionInput(unsigned int portIndex, vtkSMSourceProxy* input,
+    unsigned int outputPort);
+
+  // Description:
+  // API to query selection input set using SetSelectionInput.
+  vtkSMSourceProxy* GetSelectionInput(unsigned int portIndex);
+  unsigned int GetSelectionInputPort(unsigned int portIndex);
+
+  // Description:
+  // Clean all selection inputs for the given port.
+  void CleanSelectionInputs(unsigned int portIndex);
+
+  // Description:
+  // Returns the source proxy which provides the selected data from the given
+  // output port.
+  vtkSMSourceProxy* GetSelectionOutput(unsigned int portIndex);
 
   // Description:
   // This returns information about whether the VTK algorithm supports
@@ -148,6 +173,10 @@ public:
     MULTIPLE_PROCESSES,
     BOTH
   };
+
+  // Description:
+  // Marks the selection proxies dirty as well as chain to superclass.
+  virtual void MarkDirty(vtkSMProxy* modifiedProxy);
 
 protected:
   vtkSMSourceProxy();
@@ -192,6 +221,7 @@ protected:
   // Overwritten from superclass to invoke 
   virtual void PostUpdateData();
 
+  bool SelectionProxiesCreated;
 private:
   vtkSMSourceProxyInternals* PInternals;
 
