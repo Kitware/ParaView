@@ -138,8 +138,7 @@ void vtkSMPointSpriteRepresentationProxy::InitializeSpriteTextures(
     {
     // create the texture proxy
     texture = pxm->NewProxy("textures", "SpriteTexture");
-    texture->SetConnectionID(repr->GetConnectionID());
-    texture->SetServers(vtkProcessModule::CLIENT
+    texture->SetLocation(vtkProcessModule::CLIENT
         | vtkProcessModule::RENDER_SERVER);
     pxm->RegisterProxy("textures", texName.c_str(), texture);
     texture->Delete();
@@ -186,8 +185,7 @@ void vtkSMPointSpriteRepresentationProxy::InitializeSpriteTextures(
     {
     // create the texture proxy
     texture = pxm->NewProxy("textures", "SpriteTexture");
-    texture->SetConnectionID(repr->GetConnectionID());
-    texture->SetServers(vtkProcessModule::CLIENT
+    texture->SetLocation(vtkProcessModule::CLIENT
         | vtkProcessModule::RENDER_SERVER);
     pxm->RegisterProxy("textures", texName.c_str(), texture);
 
