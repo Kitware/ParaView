@@ -81,5 +81,7 @@ bool vtkPMTimeStepsProperty::Pull(vtkSMMessage* msgToFill)
       }
     return true;
     }
-  return false;
+
+  // No value does not mean failure. So just return true
+  return true;
 }
