@@ -29,6 +29,7 @@
 #include "vtkSMInputProperty.h"
 #include "vtkSMMessage.h"
 #include "vtkSMPropertyIterator.h"
+#include "vtkSMProxyDefinitionManager.h"
 #include "vtkSMProxyLocator.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMSession.h"
@@ -1228,6 +1229,9 @@ vtkSMProperty* vtkSMProxy::NewProperty(const char* name,
     {
     return 0;
     }
+
+  // Patch XML to remove InformationHelper and set right kernel_class
+  vtkSMProxyDefinitionManager::PatchXMLProperty(propElement);
 
   vtkObject* object = 0;
   vtksys_ios::ostringstream cname;

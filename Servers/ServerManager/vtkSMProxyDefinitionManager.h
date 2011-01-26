@@ -39,6 +39,12 @@ class vtkSMProxyDefinitionIterator;
 class VTK_EXPORT vtkSMProxyDefinitionManager : public vtkSMObject
 {
 public:
+  // FIXME COLLABORATION : For now we dynamically convert InformationHelper
+  // into the correct kernel_class and attribute sets.
+  // THIS CODE MUST BE REMOVED once InformationHelper have been removed from
+  // legacy XML
+  static void PatchXMLProperty(vtkPVXMLElement* propElement);
+
   static vtkSMProxyDefinitionManager* New();
   vtkTypeMacro(vtkSMProxyDefinitionManager, vtkSMObject);
   void PrintSelf(ostream& os, vtkIndent indent);
