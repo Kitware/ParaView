@@ -253,16 +253,26 @@ void vtkPMSourceProxy::Invoke(vtkSMMessage* message)
     bool doTime = arguments->variant(2).integer(0) != 0;
     this->UpdatePipeline(port_index, time, doTime);
     message->Clear();
-    return;
     }
   else if (command == "UpdateInformation")
     {
     this->UpdateInformation();
     message->Clear();
-    return;
     }
-
-  return this->Superclass::Invoke(message);
+  else if (command == "SetupSelectionProxy")
+    {
+    assert(arguments->variant_size() == 2);
+    int index = arguments->variant(0).integer(0);
+    vtkTypeUInt32 guid = static_cast<vtkTypeUInt32>(
+      arguments->variant(1).integer(0));
+    this->SetupSelectionProxy(index,
+      vtkPMProxy::SafeDownCast(this->GetPMObject(guid)));
+    message->Clear();
+    }
+  else
+    {
+    return this->Superclass::Invoke(message);
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -295,6 +305,14 @@ void vtkPMSourceProxy::UpdatePipeline(int port, double time, bool doTime)
     sddp->SetUpdateTimeStep(port, time);
     }
   sddp->Update(port);
+}
+
+//----------------------------------------------------------------------------
+void vtkPMSourceProxy::SetupSelectionProxy(int port, vtkPMProxy* extractSelection)
+{
+  vtkAlgorithm* algo = vtkAlgorithm::SafeDownCast(
+    extractSelection->GetVTKObject());
+  algo->SetInputConnection(this->GetOutputPort(port));
 }
 
 //----------------------------------------------------------------------------

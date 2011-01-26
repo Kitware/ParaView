@@ -90,6 +90,10 @@ protected:
   virtual void UpdateInformation();
 
   // Description:
+  // setups extract selection proxies.
+  virtual void SetupSelectionProxy(int port, vtkPMProxy* extractSelection);
+
+  // Description:
   // Callbacks to add start/end events to the timer log.
   void MarkStartEvent();
   void MarkEndEvent();

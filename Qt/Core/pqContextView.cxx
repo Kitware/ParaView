@@ -456,10 +456,8 @@ void pqContextView::selectionChanged()
   selectionSource->UpdateVTKObjects();
 
   // Set the selection on the representation's source
-#ifdef FIXME_COLLABORATION
   repSource->CleanSelectionInputs(opPort->getPortNumber());
   repSource->SetSelectionInput(opPort->getPortNumber(), selectionSource, 0);
-#endif
   selectionSource->Delete();
 
   emit this->selected(opPort);

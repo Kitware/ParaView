@@ -844,7 +844,6 @@ void pqSignalAdaptorCompositeTreeWidget::updateSelectionCounts()
   
   // Iterate over the selection data information and then update the labels.
   vtkSMSourceProxy* sourceProxy = this->Internal->Domain->GetSource();
-#ifdef FIXME_COLLABORATION
   if (!sourceProxy ||
     !sourceProxy->GetSelectionOutput(this->Internal->Domain->GetSourcePort()))
     {
@@ -878,7 +877,6 @@ void pqSignalAdaptorCompositeTreeWidget::updateSelectionCounts()
       item->setToolTip(0, item->text(0));
       }
     }
-#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -890,7 +888,6 @@ void pqSignalAdaptorCompositeTreeWidget::setupSelectionUpdatedCallback(
   this->Internal->VTKConnectSelection->Disconnect();
   if (source)
     {
-#ifdef FIXME_COLLABORATION
     vtkSMSourceProxy* selProxy = source->GetSelectionOutput(port);
     if (selProxy)
       {
@@ -898,6 +895,5 @@ void pqSignalAdaptorCompositeTreeWidget::setupSelectionUpdatedCallback(
         selProxy, vtkCommand::UpdateDataEvent,
         this, SLOT(updateSelectionCounts()), 0, 0, Qt::QueuedConnection);
       }
-#endif
     }
 }

@@ -117,7 +117,6 @@ pqQueryDialog::pqQueryDialog(
   // Setup the spreadsheet view.
   this->Internals->spreadsheet->setModel(NULL);
 
-#ifdef FIXME_COLLABORATION
   // Link the selection color to the global selection color so that it will
   // affect all views, otherwise user may be get confused ;).
   vtkSMGlobalPropertiesManager* globalPropertiesManager =
@@ -131,7 +130,6 @@ pqQueryDialog::pqQueryDialog(
     "color", SIGNAL(colorChanged(const QVariant&)),
     globalPropertiesManager,
     globalPropertiesManager->GetProperty("SelectionColor"));
-#endif
 
   this->Internals->LabelColorAdaptor = new pqSignalAdaptorColor(
     this->Internals->labelColor, 

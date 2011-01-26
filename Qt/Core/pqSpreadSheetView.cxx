@@ -225,14 +225,12 @@ void pqSpreadSheetView::onCreateSelection(vtkSMSourceProxy* selSource)
     pqOutputPort* opport = repr->getOutputPortFromInput();
     vtkSMSourceProxy* input = vtkSMSourceProxy::SafeDownCast(
       opport->getSource()->getProxy());
-#ifdef FIXME_COLLABORATION
     input->CleanSelectionInputs(opport->getPortNumber());
     if (selSource)
       {
       input->SetSelectionInput(
         opport->getPortNumber(), selSource, 0);
       }
-#endif
     emit this->selected(opport);
     }
   else

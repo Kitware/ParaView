@@ -77,27 +77,23 @@ public:
 
   void clearSelection()
     {
-#ifdef FIXME_COLLABORATION
     if (this->SelectedPort)
       {
       vtkSMSourceProxy* src = vtkSMSourceProxy::SafeDownCast(
         this->SelectedPort->getSource()->getProxy());
       src->CleanSelectionInputs(this->SelectedPort->getPortNumber());
       }
-#endif
     this->SelectedPort = 0;
     }
 
   vtkSMProxy* getSelectionSourceProxy()
     {
-#ifdef FIXME_COLLABORATION
     if (this->SelectedPort)
       {
       vtkSMSourceProxy* src = vtkSMSourceProxy::SafeDownCast(
         this->SelectedPort->getSource()->getProxy());
       return src->GetSelectionInput(this->SelectedPort->getPortNumber());
       }
-#endif
     return 0;
     }
 

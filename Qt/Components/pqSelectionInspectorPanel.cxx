@@ -749,7 +749,6 @@ void pqSelectionInspectorPanel::updateDisplayStyleGUI()
     "value", SIGNAL(valueChanged(double)),
     reprProxy, reprProxy->GetProperty("SelectionOpacity"));
 
-#ifdef FIXME_COLLABORATION
   // setup for choosing color
   // Note: we are linking to the global property for selection color here, so
   // that all selection colors are affected instead of simply the current
@@ -760,7 +759,7 @@ void pqSelectionInspectorPanel::updateDisplayStyleGUI()
     this->Implementation->SelectionColorAdaptor,
     "color", SIGNAL(colorChanged(const QVariant&)),
     gpm, gpm->GetProperty("SelectionColor"));
-#endif
+
   // We also need to save the color change in the settings so that it's
   // preserved across sessions.
   QObject::connect(
@@ -1504,7 +1503,6 @@ void pqSelectionInspectorPanel::createNewSelectionSourceIfNeeded()
     if (strcmp(curSelSource->GetXMLName(), "FrustumSelectionSource") == 0 ||
       strcmp(curSelSource->GetXMLName(), "ThresholdSelectionSource") == 0)
       {
-#ifdef FIXME_COLLABORATION
       // We need to determine how many ids are present approximately.
       vtkSMSourceProxy* sourceProxy =
         vtkSMSourceProxy::SafeDownCast(port->getSource()->getProxy());
@@ -1527,7 +1525,6 @@ void pqSelectionInspectorPanel::createNewSelectionSourceIfNeeded()
           curSelSource = 0;
           }
         }
-#endif
       }
     }
 

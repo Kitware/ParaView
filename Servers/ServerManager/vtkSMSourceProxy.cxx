@@ -469,10 +469,9 @@ void vtkSMSourceProxy::CreateSelectionProxies()
     return;
     }
   this->CreateOutputPorts();
-#ifdef FIXME_COLLABORATION
 
   vtkClientServerStream stream;
-  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+  vtkSMProxyManager* pxm = this->GetProxyManager();
   unsigned int numOutputPorts = this->GetNumberOfOutputPorts();
   for (unsigned int cc=0; cc < numOutputPorts; cc++)
     {
@@ -481,35 +480,23 @@ void vtkSMSourceProxy::CreateSelectionProxies()
         pxm->NewProxy("filters", "PVExtractSelection")));
     if (esProxy)
       {
-      esProxy->SetServers(this->Servers);
-      esProxy->SetConnectionID(this->ConnectionID);
+      esProxy->SetLocation(this->Location);
+      // since we don't want the ExtractSelection proxy to further create
+      // extract selection proxies even by accident :).
       esProxy->SelectionProxiesCreated = true;
       esProxy->UpdateVTKObjects();
 
-      vtkSMOutputPort* port = this->GetOutputPort(cc);
       // We don't use input property since that leads to reference loop cycles
       // and I don't feel like doing the garbage collection thing right now.
-      stream << vtkClientServerStream::Invoke
-             << port->GetProducerID() /* we use a crooked means of getting at
-                                         the ID so that this code works for
-                                         vtkSMCompoundSourceProxy*/
-             << "GetOutputPort"
-             << port->GetPortIndex()
-             << vtkClientServerStream::End;
-      stream << vtkClientServerStream::Invoke
-             << esProxy->GetID()
-             << "SetInputConnection"
-             << vtkClientServerStream::LastResult
-             << vtkClientServerStream::End;
+      vtkSMMessage message;
+      message << pvstream::InvokeRequest()
+              << "SetupSelectionProxy" << static_cast<int>(cc)
+              << static_cast<int>(esProxy->GetGlobalID());
+      this->Invoke(&message);
       }
 
     this->PInternals->SelectionProxies.push_back(esProxy);
     }
-
-  vtkProcessModule::GetProcessModule()->SendStream(
-    this->ConnectionID, this->Servers, stream);
-#endif
-
   this->SelectionProxiesCreated = true;
 }
 
