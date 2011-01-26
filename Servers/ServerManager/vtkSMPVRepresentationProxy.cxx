@@ -14,31 +14,30 @@
 =========================================================================*/
 #include "vtkSMPVRepresentationProxy.h"
 
-#include "vtkClientServerStream.h"
-#include "vtkCollection.h"
 #include "vtkCommand.h"
 #include "vtkObjectFactory.h"
-#include "vtkProcessModule.h"
 #include "vtkPVXMLElement.h"
-#include "vtkSmartPointer.h"
-#include "vtkSMEnumerationDomain.h"
-#include "vtkSMIntVectorProperty.h"
+#include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
 
-#include <vtkstd/string>
-#include <vtkstd/map>
 #include <vtkstd/set>
+#include <vtkstd/string>
+
+class vtkSMPVRepresentationProxy::vtkStringSet :
+  public vtkstd::set<vtkstd::string> {};
 
 vtkStandardNewMacro(vtkSMPVRepresentationProxy);
 //----------------------------------------------------------------------------
 vtkSMPVRepresentationProxy::vtkSMPVRepresentationProxy()
 {
   this->SetKernelClassName("vtkPMPVRepresentationProxy");
+  this->RepresentationSubProxies = new vtkStringSet();
 }
 
 //----------------------------------------------------------------------------
 vtkSMPVRepresentationProxy::~vtkSMPVRepresentationProxy()
 {
+  delete this->RepresentationSubProxies;
 }
 
 //----------------------------------------------------------------------------
@@ -75,6 +74,75 @@ void vtkSMPVRepresentationProxy::OnPropertyUpdated(vtkObject*,
     {
     this->InvalidateDataInformation();
     }
+}
+
+//----------------------------------------------------------------------------
+void vtkSMPVRepresentationProxy::SetPropertyModifiedFlag(const char* name, int flag)
+{
+  vtkSMProxy* selectionRepr = this->GetSubProxy("SelectionRepresentation");
+  if (name && strcmp(name, "Input") == 0)
+    {
+    vtkSMPropertyHelper helper(this, name);
+    for (unsigned int cc=0; cc < helper.GetNumberOfElements(); cc++)
+      {
+      vtkSMSourceProxy* input = vtkSMSourceProxy::SafeDownCast(
+        helper.GetAsProxy(cc));
+      if (input && selectionRepr)
+        {
+        input->CreateSelectionProxies();
+        vtkSMSourceProxy* esProxy = input->GetSelectionOutput(
+          helper.GetOutputPort(cc));
+        if (!esProxy)
+          {
+          vtkErrorMacro("Input proxy does not support selection extraction.");
+          }
+        else
+          {
+          vtkSMPropertyHelper(selectionRepr, "Input").Set(esProxy);
+          selectionRepr->UpdateVTKObjects();
+          }
+        }
+      }
+
+    // Next we ensure that input is set on all input properties for the
+    // subproxies. This ensures that domains and such on subproxies can still
+    // function correctly.
+
+    // This piece of code is a disgrace :). We shouldn't have to do these kinds of
+    // hacks. It implies that something's awry with the way domains and
+    // updated/defined for sub-proxies.
+    for (vtkStringSet::iterator iter = this->RepresentationSubProxies->begin();
+      iter != this->RepresentationSubProxies->end(); ++iter)
+      {
+      vtkSMProxy* subProxy = this->GetSubProxy((*iter).c_str());
+      if (subProxy && subProxy->GetProperty("Input"))
+        {
+        subProxy->GetProperty("Input")->Copy(this->GetProperty("Input"));
+        subProxy->UpdateProperty("Input");
+        subProxy->GetProperty("Input")->UpdateDependentDomains();
+        }
+      }
+    }
+
+  this->Superclass::SetPropertyModifiedFlag(name, flag);
+}
+
+//----------------------------------------------------------------------------
+int vtkSMPVRepresentationProxy::ReadXMLAttributes(
+  vtkSMProxyManager* pm, vtkPVXMLElement* element)
+{
+  for (unsigned int cc=0; cc < element->GetNumberOfNestedElements(); ++cc)
+    {
+    if (element->GetName() &&
+      strcmp(element->GetName(), "RepresentationType") == 0 &&
+      element->GetAttribute("subproxy") != NULL)
+      {
+      this->RepresentationSubProxies->insert(
+        element->GetAttribute("subproxy"));
+      }
+    }
+
+  return this->Superclass::ReadXMLAttributes(pm, element);
 }
 
 //----------------------------------------------------------------------------

@@ -47,10 +47,22 @@ protected:
   // this->InvalidateDataInformation() is called.
   void OnPropertyUpdated(vtkObject*, unsigned long, void* calldata);
 
+  // Description:
+  // Overridden to ensure that whenever "Input" property changes, we update the
+  // "Input" properties for all internal representations (including setting up
+  // of the link to the extract-selection representation).
+  virtual void SetPropertyModifiedFlag(const char* name, int flag);
+
+  // Description:
+  // Overridden to process "RepresentationType" elements.
+  int ReadXMLAttributes(vtkSMProxyManager* pm, vtkPVXMLElement* element);
+
 private:
   vtkSMPVRepresentationProxy(const vtkSMPVRepresentationProxy&); // Not implemented
   void operator=(const vtkSMPVRepresentationProxy&); // Not implemented
 
+  class vtkStringSet;
+  vtkStringSet* RepresentationSubProxies;
 //ETX
 };
 

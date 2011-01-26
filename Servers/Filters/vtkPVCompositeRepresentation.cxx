@@ -131,7 +131,7 @@ void vtkPVCompositeRepresentation::RemoveInputConnection(int port, vtkAlgorithmO
 bool vtkPVCompositeRepresentation::AddToView(vtkView* view)
 {
   view->AddRepresentation(this->CubeAxesRepresentation);
-  //view->AddRepresentation(this->SelectionRepresentation);
+  view->AddRepresentation(this->SelectionRepresentation);
   return this->Superclass::AddToView(view);
 }
 
@@ -147,7 +147,7 @@ bool vtkPVCompositeRepresentation::RemoveFromView(vtkView* view)
 void vtkPVCompositeRepresentation::MarkModified()
 {
   this->CubeAxesRepresentation->MarkModified();
-  //this->SelectionRepresentation->MarkModified();
+  this->SelectionRepresentation->MarkModified();
   this->Superclass::MarkModified();
 }
 
