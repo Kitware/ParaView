@@ -749,14 +749,14 @@ void PrismDisplayProxyEditor::setupGUIConnections()
 //-----------------------------------------------------------------------------
 void PrismDisplayProxyEditor::updateEnableState()
 {
-  int reprType = this->Internal->Representation->getRepresentationType();
+  QString reprType = this->Internal->Representation->getRepresentationType();
 
   if (this->Internal->ColorBy->getCurrentText() == "Solid Color")
     {
     this->Internal->ColorInterpolateScalars->setEnabled(false);
-    if (reprType == vtkSMPVRepresentationProxy::WIREFRAME ||
-      reprType == vtkSMPVRepresentationProxy::POINTS ||
-      reprType == vtkSMPVRepresentationProxy::OUTLINE)
+    if (reprType == "Wireframe" ||
+        reprType == "Points" ||
+        reprType == "Outline")
       {
       this->Internal->ColorButtonStack->setCurrentWidget(
         this->Internal->AmbientColorPage);
@@ -783,12 +783,10 @@ void PrismDisplayProxyEditor::updateEnableState()
     }
 
 
-  this->Internal->EdgeStyleGroup->setEnabled(
-    reprType == vtkSMPVRepresentationProxy::SURFACE_WITH_EDGES);
+  this->Internal->EdgeStyleGroup->setEnabled(reprType == "Surface With Edges");
 
-  this->Internal->SliceGroup->setEnabled(
-    reprType == vtkSMPVRepresentationProxy::SLICE);
-  if (reprType == vtkSMPVRepresentationProxy::SLICE)
+  this->Internal->SliceGroup->setEnabled( reprType == "Slice" );
+  if ( reprType == "Slice" )
     {
     // every time the user switches to Slice mode we update the domain for the
     // slider since the domain depends on the input to the image mapper which
@@ -797,20 +795,20 @@ void PrismDisplayProxyEditor::updateEnableState()
     }
 
   this->Internal->compositeTree->setVisible(
-   this->Internal->CompositeTreeAdaptor &&
-   (reprType == vtkSMPVRepresentationProxy::VOLUME));
+      this->Internal->CompositeTreeAdaptor &&
+      (reprType == "Volume"));
 
   this->Internal->SelectedMapperIndex->setEnabled(
-    reprType == vtkSMPVRepresentationProxy::VOLUME
-    && this->Internal->Representation->getProxy()->GetProperty("SelectedMapperIndex"));
+      reprType == "Volume"
+      && this->Internal->Representation->getProxy()->GetProperty("SelectedMapperIndex"));
 
   vtkSMProperty *backfaceRepProperty = this->Internal->Representation
     ->getRepresentationProxy()->GetProperty("BackfaceRepresentation");
   if (   !backfaceRepProperty
-      || (   (reprType != vtkSMPVRepresentationProxy::POINTS)
-          && (reprType != vtkSMPVRepresentationProxy::WIREFRAME)
-          && (reprType != vtkSMPVRepresentationProxy::SURFACE)
-          && (reprType != vtkSMPVRepresentationProxy::SURFACE_WITH_EDGES) ) )
+      || (   (reprType != "Points")
+          && (reprType != "Wireframe")
+          && (reprType != "Surface")
+          && (reprType != "Surface With Edges") ) )
     {
     this->Internal->BackfaceStyleGroup->setEnabled(false);
     }
