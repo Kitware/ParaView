@@ -1857,3 +1857,17 @@ void vtkSMProxy::SetPrototype(bool proto)
     this->GetSubProxy(cc)->SetPrototype(proto);
     }
 }
+//---------------------------------------------------------------------------
+void vtkSMProxy::UpdateSelfAndAllInputs()
+{
+  vtkSMPropertyIterator* iter = this->NewPropertyIterator();
+
+  while (!iter->IsAtEnd())
+    {
+    iter->GetProperty()->UpdateAllInputs();
+    iter->Next();
+    }
+  iter->Delete();
+
+  this->UpdateVTKObjects();
+}

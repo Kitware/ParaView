@@ -370,6 +370,12 @@ public:
   virtual void PrototypeOff();
   virtual void SetPrototype(bool undo);
 
+  // Description:
+  // This method call UpdateVTKObjects on the current pipeline by starting at
+  // the sources. The sources are found by getting the Input of all the filter
+  // along the pipeline.
+  void UpdateSelfAndAllInputs();
+
 //BTX
 
   // Description:
