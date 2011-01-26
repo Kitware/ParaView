@@ -17,7 +17,6 @@ if(APPLE)
     -DCMAKE_OSX_ARCHITECTURES:STRING=${CMAKE_OSX_ARCHITECTURES}
     -DCMAKE_OSX_DEPLOYMENT_TARGET:STRING=${CMAKE_OSX_DEPLOYMENT_TARGET}
     -DCMAKE_OSX_SYSROOT:PATH=${CMAKE_OSX_SYSROOT})
-  list(APPEND pv_compiler_args ${pv_apple_compiler_args})
 
   if(NOT "${CMAKE_OSX_SYSROOT}" STREQUAL "")
     if(NOT EXISTS "${CMAKE_OSX_SYSROOT}")
@@ -101,6 +100,10 @@ else()
   list(APPEND pv_compiler_args -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE})
 endif()
 
+if(APPLE)
+  list(APPEND pv_compiler_args ${pv_apple_compiler_args})
+endif()
+
 # We aren't interested in seeing third party compiler warnings.
 set(pv_tpl_compiler_args ${pv_compiler_args})
 string(REPLACE "/W3" "/W0" pv_tpl_cxx_flags "${pv_tpl_cxx_flags}")
@@ -175,6 +178,13 @@ else()
   endif()
 
   find_package(MPI)
+  set(MPI_ARGS
+    -DPARAVIEW_USE_MPI:BOOL=ON
+    -DMPIEXEC:FILEPATH=${MPIEXEC}
+    -DMPI_INCLUDE_PATH:PATH=${MPI_INCLUDE_PATH}
+    -DMPI_LIBRARY:FILEPATH=${MPI_LIBRARY}
+    -DMPI_EXTRA_LIBRARY:FILEPATH=${MPI_EXTRA_LIBRARY}
+    -DPARAVIEW_INSTALL_MPIEXEC:BOOL=ON)
 
   include(External_NUMPY)
 endif()
