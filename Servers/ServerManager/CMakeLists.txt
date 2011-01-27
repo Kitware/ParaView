@@ -419,8 +419,6 @@ SET(GUI_CONFIG_FILES
   ParaViewWriters
 )
 
-IF (FIXME) #-------------------------------------------------------------- BEGIN
-
 IF(NOT CMAKE_CROSSCOMPILING)
   add_executable_with_forwarding(PV_EXE_SUFFIX
     vtkSMExtractDocumentation vtkSMExtractDocumentation.cxx)
@@ -456,8 +454,6 @@ ADD_CUSTOM_TARGET(HTMLDocumentation
 )
 SET (HTMLDocumentation_FILES ${HTML_RESULTS} CACHE INTERNAL
   "HTMLDocumentation files generated from ServerManager")
-
-ENDIF (FIXME) #------------------------------------------------------------- END
 
 SET(PARAVIEW_INCLUDE_MODULES_TO_SMAPPLICATION "")
 FOREACH(rf ${resourceFiles})
