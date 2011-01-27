@@ -238,7 +238,20 @@ int vtkProcessModuleAutoMPIInternals::
     vtkstd::string app_dir =
       vtksys::SystemTools::GetProgramPath(options->GetApplicationPath());
 
+#if defined(__APPLE__)
+    vtkstd::string serverExe =  app_dir.c_str() "../bin/" PARAVIEW_SERVER;
+#elif defined(WIN32)
     vtkstd::string serverExe = PARAVIEW_SERVER;
+
+    // Set the working directory as the location of pvserver. Some
+    // mpi packages have issue with full paths containing spaces so
+    // lets just invoke mpiexec  with no path to pvserver.
+    cerr << "Setting working directory to be " << app_dir.c_str() << endl;
+    vtksysProcess_SetWorkingDirectory(server, app_dir.c_str());
+#else
+    vtkstd::string serverExe = 
+      app_dir.c_str() + vtkstd::string("/") + vtkstd::string(PARAVIEW_SERVER);
+#endif
 
     this->CreateCommandLine(serverCommandStr,
                       serverExe.c_str(),
@@ -246,12 +259,7 @@ int vtkProcessModuleAutoMPIInternals::
                       port);
     vtkCopy(serverCommand, serverCommandStr);
 
-    // Set the working directory as the location of pvserver. Some
-    // mpi packages have issue with full paths containing spaces so
-    // lets just invoke mpiexec  with no path to pvserver.
-    cerr << "Setting working directory to be " << app_dir.c_str() << endl;
-    vtksysProcess_SetWorkingDirectory(server, app_dir.c_str());
-
+    
     if(vtksysProcess_SetCommand(server, &serverCommand[0]))
       {
       this->ReportCommand(&serverCommand[0], "SUCCESS:");
