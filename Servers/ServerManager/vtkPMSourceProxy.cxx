@@ -278,9 +278,23 @@ void vtkPMSourceProxy::Invoke(vtkSMMessage* message)
 //----------------------------------------------------------------------------
 void vtkPMSourceProxy::UpdateInformation()
 {
-  vtkAlgorithm* algo = vtkAlgorithm::SafeDownCast(this->GetVTKObject());
-  assert(algo);
-  algo->UpdateInformation();
+  if (this->GetVTKObject())
+    {
+    vtkAlgorithm* algo = vtkAlgorithm::SafeDownCast(this->GetVTKObject());
+    assert(algo);
+    algo->UpdateInformation();
+    }
+
+  // Call UpdateInformation() on all subproxies.
+  for (unsigned int cc=0; cc < this->GetNumberOfSubProxyHelpers(); cc++)
+    {
+    vtkPMSourceProxy* src = vtkPMSourceProxy::SafeDownCast(
+      this->GetSubProxyHelper(cc));
+    if (src)
+      {
+      src->UpdateInformation();
+      }
+    }
 }
 
 //----------------------------------------------------------------------------

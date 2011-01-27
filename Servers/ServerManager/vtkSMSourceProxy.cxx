@@ -187,13 +187,10 @@ void vtkSMSourceProxy::UpdatePipelineInformation()
     {
     vtkSMMessage message;
     message << pvstream::InvokeRequest() << "UpdateInformation";
+    // vtkPMSourceProxy ensures that it calls UpdateInformation() on each of the
+    // subproxies as well.
     this->Invoke(&message);
     }
-
-  // This is no longer applicable since subproxies don't exists on the
-  // client-side.
-  // This simply iterates over subproxies and calls UpdatePropertyInformation();
-  // this->Superclass::UpdatePipelineInformation();
 
   this->InvokeEvent(vtkCommand::UpdateInformationEvent);
   // this->MarkModified(this);  

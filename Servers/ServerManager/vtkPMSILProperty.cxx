@@ -89,7 +89,6 @@ bool vtkPMSILProperty::Pull(vtkSMMessage* msgToFill)
     vtkWarningMacro("Could not get the reader.");
     return false;
     }
-  reader->UpdateInformation();
   vtkInformation* info =
       reader->GetExecutive()->GetOutputInformation(this->OutputPort);
   if (!info || !info->Has(vtkDataObject::SIL()))

@@ -49,11 +49,6 @@ protected:
   // Create the output ports and add post filters for each output port.
   virtual bool CreateOutputPorts();
 
-  // Description:
-  // Triggers UpdateInformation(). Overridden to call UpdateInformation() on the
-  // internal "real" source proxies.
-  virtual void UpdateInformation();
-
 private:
   vtkPMCompoundSourceProxy(const vtkPMCompoundSourceProxy&); // Not implemented
   void operator=(const vtkPMCompoundSourceProxy&); // Not implemented

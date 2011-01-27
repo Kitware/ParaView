@@ -193,20 +193,6 @@ bool vtkPMCompoundSourceProxy::ReadXMLAttributes(vtkPVXMLElement* element)
 }
 
 //----------------------------------------------------------------------------
-void vtkPMCompoundSourceProxy::UpdateInformation()
-{
-  for (unsigned int cc=0; cc < this->GetNumberOfSubProxyHelpers(); cc++)
-    {
-    vtkPMSourceProxy* subproxy = vtkPMSourceProxy::SafeDownCast(
-      this->GetSubProxyHelper(cc));
-    if (subproxy)
-      {
-      subproxy->UpdateInformation();
-      }
-    }
-}
-
-//----------------------------------------------------------------------------
 void vtkPMCompoundSourceProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
