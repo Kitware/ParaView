@@ -24,6 +24,7 @@
 #include "vtkSMProxy.h"
 #include "vtkSMProxyLocator.h"
 #include "vtkSMProxyManager.h"
+#include "vtkSMStateLocator.h"
 #include "vtkSMSession.h"
 #include "vtkStdString.h"
 
@@ -364,11 +365,12 @@ void vtkSMProxyProperty::WriteTo(vtkSMMessage* message)
 }
 
 //---------------------------------------------------------------------------
-void vtkSMProxyProperty::ReadFrom(const vtkSMMessage* message, int message_offset)
+void vtkSMProxyProperty::ReadFrom(const vtkSMMessage* message, int msg_offset,
+                                  vtkSMStateLocator* locator)
 {
   // FIXME this method is REALLY close to its vtkSMInputProperty subClass
   // Please keep them in sync
-  const ProxyState_Property *prop = &message->GetExtension(ProxyState::property, message_offset);
+  const ProxyState_Property *prop = &message->GetExtension(ProxyState::property, msg_offset);
   if(strcmp(prop->name().c_str(), this->GetXMLName()) == 0)
     {
     const Variant *value = &prop->value();
@@ -415,7 +417,7 @@ void vtkSMProxyProperty::ReadFrom(const vtkSMMessage* message, int message_offse
       else
         {
         // Recreate the proxy as it used to be
-        proxy = pxm->ReNewProxy(*proxyIdIter);
+        proxy = pxm->ReNewProxy(*proxyIdIter, locator);
         if(proxy)
           {
           this->AddProxy(proxy, true);

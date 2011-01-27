@@ -75,6 +75,7 @@ SET (Kit_SRCS
   vtkSMDeserializer.cxx
   vtkSMDeserializer.cxx
   vtkSMDocumentation.cxx
+  vtkSMStateLocator.cxx
   vtkSMDomain.cxx
   vtkSMDomainIterator.cxx
   vtkSMDoubleVectorProperty.cxx
@@ -143,6 +144,7 @@ SET (Kit_SRCS
   vtkSMTimeKeeperProxy.cxx
   vtkSMTwoDRenderViewProxy.cxx
   vtkSMUndoElement.cxx
+  vtkSMUndoElementStateKeeper.cxx
   vtkSMUndoStackBuilder.cxx
   vtkSMUndoStack.cxx
   vtkSMUnstructuredGridVolumeRepresentationProxy.cxx

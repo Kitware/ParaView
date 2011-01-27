@@ -21,6 +21,7 @@
 #include "vtkPVXMLElement.h"
 #include "vtkSMMessage.h"
 #include "vtkSMVectorPropertyTemplate.h"
+#include "vtkSMStateLocator.h"
 
 vtkStandardNewMacro(vtkSMDoubleVectorProperty);
 
@@ -64,7 +65,8 @@ void vtkSMDoubleVectorProperty::WriteTo(vtkSMMessage* msg)
 }
 
 //---------------------------------------------------------------------------
-void vtkSMDoubleVectorProperty::ReadFrom(const vtkSMMessage* msg, int offset)
+void vtkSMDoubleVectorProperty::ReadFrom(const vtkSMMessage* msg, int offset,
+                                         vtkSMStateLocator* locator)
 {
   assert(msg->ExtensionSize(ProxyState::property) > offset);
 

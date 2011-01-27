@@ -26,6 +26,7 @@
 #include "vtkWeakPointer.h" // needed for vtkWeakPointer
 
 class vtkSMSession;
+class vtkSMStateLocator;
 
 class VTK_EXPORT vtkSMRemoteObject : public vtkSMObject
 {
@@ -55,6 +56,11 @@ public:
   const char* GetGlobalIDAsString();
 
   // Description:
+  // Allow the user to test if the RemoteObject has already a GlobalID without
+  // assigning a new one to it.
+  bool HasGlobalID();
+
+  // Description:
   // Allow user to set the remote object to be discard for Undo/Redo
   // action. By default, any remote object is Undoable.
   vtkBooleanMacro(Prototype, bool);
@@ -72,7 +78,7 @@ public:
 
   // Description:
   // This method is used to initialise the object to the given state
-  virtual void LoadState(const vtkSMMessage* msg) = 0;
+  virtual void LoadState(const vtkSMMessage* msg, vtkSMStateLocator* locator) = 0;
 
 protected:
   // Description:

@@ -19,6 +19,9 @@
 #include "vtkSMMessage.h"
 #include "vtkSMRemoteObject.h"
 #include "vtkSMSession.h"
+#include "vtkSMStateLocator.h"
+#include "vtkSMProxyManager.h"
+#include "vtkSMProxy.h"
 
 vtkStandardNewMacro(vtkSMRemoteObjectUpdateUndoElement);
 //-----------------------------------------------------------------------------
@@ -69,17 +72,16 @@ int vtkSMRemoteObjectUpdateUndoElement::UpdateState(const vtkSMMessage* state)
       this->Session->GetAllRemoteObjects(this->UndoSetWorkingContext);
 
       // Update
-      remoteObj->LoadState(state);
-      return 1; // OK
+      remoteObj->LoadState(state, this->Locator);
       }
-    else
+    else if(this->Locator)
       {
-      vtkWarningMacro(
-          "Unable to update RemoteObject state since no remote object with id "
-          << state->global_id() << " were found.");
+      // We are not allowed to re-new a proxy but we can overide the state that
+      // it should get if it is going to be recreated/reloaded by its parent proxy.
+      this->Locator->RegisterState(state);
       }
     }
-  return 0; // ERROR
+  return 1; // OK, we say that everything is fine.
 }
 
 //-----------------------------------------------------------------------------
@@ -103,4 +105,9 @@ void vtkSMRemoteObjectUpdateUndoElement::SetUndoRedoState(
 vtkTypeUInt32 vtkSMRemoteObjectUpdateUndoElement::GetGlobalId()
 {
   return this->BeforeState->global_id();
+}
+//-----------------------------------------------------------------------------
+void vtkSMRemoteObjectUpdateUndoElement::SetStateLocator(vtkSMStateLocator* locator)
+{
+  this->Locator = locator;
 }

@@ -35,11 +35,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkEventQtSlotConnect.h"
 #include "vtkSMGlobalPropertiesManager.h"
 #include "vtkSMProperty.h"
-#ifdef FIXME_COLLABORATION
-#include "vtkSMPropertyModificationUndoElement.h"
-#endif
 #include "vtkSMProxy.h"
 #include "vtkSMUndoElement.h"
+#include "vtkSMPropertyModificationUndoElement.h"
 
 #include <QtDebug>
 #include <QPointer>
@@ -87,7 +85,6 @@ pqScalarBarRepresentation::pqScalarBarRepresentation(const QString& group,
   // load default values.
   this->onLookupTableModified();
 
-#ifdef FIXME_COLLABORATION
   pqUndoStack* stack = pqApplicationCore::instance()->getUndoStack();
   if (stack)
     {
@@ -98,7 +95,6 @@ pqScalarBarRepresentation::pqScalarBarRepresentation(const QString& group,
     QObject::connect(this, SIGNAL(end()),
       stack, SLOT(endUndoSet()));
     }
-#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -219,7 +215,6 @@ void pqScalarBarRepresentation::setDefaultPropertyValues()
 {\
   vtkSMPropertyModificationUndoElement* elem =\
   vtkSMPropertyModificationUndoElement::New();\
-  elem->SetConnectionID(proxy->GetConnectionID());\
   elem->ModifiedProperty(proxy, name);\
   emit this->addToActiveUndoSet(elem);\
   elem->Delete();\
@@ -230,23 +225,19 @@ void pqScalarBarRepresentation::startInteraction()
 {
   emit this->begin("Move Color Legend");
 
-#ifdef FIXME_COLLABORATION
   vtkSMProxy* proxy = this->getProxy();
   PUSH_PROPERTY("Position");
   PUSH_PROPERTY("Position2");
   PUSH_PROPERTY("Orientation");
-#endif
 }
 
 //-----------------------------------------------------------------------------
 void pqScalarBarRepresentation::endInteraction()
 {
-#ifdef FIXME_COLLABORATION
   vtkSMProxy* proxy = this->getProxy();
   PUSH_PROPERTY("Position");
   PUSH_PROPERTY("Position2");
   PUSH_PROPERTY("Orientation");
-#endif
   emit this->end();
 }
 

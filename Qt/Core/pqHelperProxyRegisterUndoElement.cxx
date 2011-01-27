@@ -144,7 +144,7 @@ int pqHelperProxyRegisterUndoElement::DoTheJob()
     // otherwise it will be automatically removed.
     if(this->UndoSetWorkingContext && !helper)
       {
-      helper = pxm->ReNewProxy(item.Id);
+      helper = pxm->ReNewProxy(item.Id, proxy->GetSession()->GetStateLocator());
       this->UndoSetWorkingContext->AddItem(helper);
       helper->Delete();
       }

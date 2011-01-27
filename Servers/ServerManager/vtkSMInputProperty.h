@@ -33,6 +33,8 @@ struct vtkSMInputPropertyInternals;
 
 #include "vtkSMProxyProperty.h"
 
+class vtkSMStateLocator;
+
 class VTK_EXPORT vtkSMInputProperty : public vtkSMProxyProperty
 {
 public:
@@ -121,7 +123,8 @@ protected:
 
   // Description:
   // Let the property read and set its content from the stream
-  virtual void ReadFrom(const vtkSMMessage* msg, int message_offset);
+  virtual void ReadFrom(const vtkSMMessage* msg, int message_offset,
+                        vtkSMStateLocator* locator);
 
 
   virtual void RemoveAllProxies(int modify);

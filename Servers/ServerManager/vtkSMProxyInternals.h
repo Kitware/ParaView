@@ -53,7 +53,7 @@ struct vtkSMProxyInternals
   PropertyInfoMap Properties;
 
   // This vector keeps track of the order in which properties
-  // were added.
+  // were added for the Property iterator
   vtkstd::vector<vtkStdString> PropertyNamesInOrder;
 
   vtkstd::vector<int> ServerIDs;

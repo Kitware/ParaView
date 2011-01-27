@@ -114,6 +114,11 @@ public:
                               const vtkSMMessage* previousState,
                               const vtkSMMessage* newState);
 
+  // Record first state apparition for vtkSMStateLocator which has undoset context
+  virtual void OnNewState(vtkSMSession *session,
+                          vtkTypeUInt32 globalId,
+                          const vtkSMMessage *previousState);
+
 protected:
   vtkSMUndoStackBuilder();
   ~vtkSMUndoStackBuilder();

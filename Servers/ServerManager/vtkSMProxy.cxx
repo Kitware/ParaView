@@ -33,6 +33,7 @@
 #include "vtkSMProxyLocator.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMSession.h"
+#include "vtkSMStateLocator.h"
 
 #include <vtkstd/algorithm>
 #include <vtkstd/string>
@@ -316,6 +317,8 @@ void vtkSMProxy::AddProperty(const char* name, vtkSMProperty* prop)
 
   // BUG: Hmm, if this replaces an existing property, are we ending up with that
   // name being pushed in twice in the PropertyNamesInOrder list?
+  // => this vector is used by the OrderedProperty iterator which mean's
+  //    that the iterator will go several time on the same property.
 
   // Add the property name to the vector of property names.
   // This vector keeps track of the order in which properties
@@ -532,7 +535,7 @@ void vtkSMProxy::UpdatePropertyInformationInternal(
   this->PullState(&message);
 
   // Update internal values
-  this->LoadState(&message);
+  this->LoadState(&message, this->Session->GetStateLocator());
 }
 
 //---------------------------------------------------------------------------
@@ -1813,18 +1816,51 @@ const vtkSMMessage* vtkSMProxy::GetFullState()
   return this->State;
 }
 //---------------------------------------------------------------------------
-void vtkSMProxy::LoadState(const vtkSMMessage* message)
+void vtkSMProxy::LoadState(const vtkSMMessage* message, vtkSMStateLocator* locator)
 {
+  // Update globalId. This will fails if that one is already set with a different value
+  this->SetGlobalID(message->global_id());
+
+  // Manage its sub-proxy state
+  int nbSubProxy = message->ExtensionSize(ProxyState::subproxy);
+  for(int idx=0; idx < nbSubProxy; idx++)
+    {
+    const ProxyState_SubProxy *subProxyMsg =
+        &message->GetExtension(ProxyState::subproxy, idx);
+    vtkSMProxy* subProxy = this->GetSubProxy(subProxyMsg->name().c_str());
+
+    // Make sure the subproxy is not still around with its GlobalId if that
+    // subproxy is not already alive with a valid GlobalId
+    if(!(subProxy->HasGlobalID() || !this->Session->GetRemoteObject(subProxyMsg->global_id())))
+      {
+      cout << "SubProxy has no global ID but its old instance is still arround. " << subProxyMsg->global_id() << endl;
+      }
+    assert(subProxy->HasGlobalID() || !this->Session->GetRemoteObject(subProxyMsg->global_id()));
+
+    vtkSMMessage subProxyState;
+    if(locator && locator->FindState(subProxyMsg->global_id(), &subProxyState))
+      {
+      subProxy->LoadState(&subProxyState, locator);
+      }
+    else if(!subProxy->HasGlobalID())
+      {
+      vtkErrorMacro("### Warning !!! : set subproxy global ID without state. " << subProxyMsg->global_id());
+      subProxy->SetGlobalID(subProxyMsg->global_id());
+      }
+    }
+
+  // Manage properties
   vtkSMProxyInternals::PropertyInfoMap::iterator it;
   vtkstd::vector< vtkSmartPointer<vtkSMProperty> > touchedProperties;
   for (int i=0; i < message->ExtensionSize(ProxyState::property); ++i)
     {
-    const ProxyState_Property *prop_message = &message->GetExtension(ProxyState::property, i);
+    const ProxyState_Property *prop_message =
+        &message->GetExtension(ProxyState::property, i);
     const char* pname = prop_message->name().c_str();
     it = this->Internals->Properties.find(pname);
     if (it != this->Internals->Properties.end())
       {
-      it->second.Property->ReadFrom(message, i);
+      it->second.Property->ReadFrom(message, i, locator);
       touchedProperties.push_back(it->second.Property.GetPointer());
       }
     }

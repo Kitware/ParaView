@@ -19,6 +19,7 @@
 #include "vtkSMMessage.h"
 #include "vtkSMSession.h"
 #include "vtkSMProxyManager.h"
+#include "vtkSMStateLocator.h"
 
 #include <vtksys/SystemTools.hxx>
 #include <vtksys/ios/sstream>
@@ -42,9 +43,9 @@ const vtkSMMessage* vtkSMPipelineState::GetFullState()
   return vtkSMObject::GetProxyManager()->GetFullState();
 }
 //----------------------------------------------------------------------------
-void vtkSMPipelineState::LoadState(const vtkSMMessage* msg)
+void vtkSMPipelineState::LoadState(const vtkSMMessage* msg, vtkSMStateLocator* locator)
 {
-  vtkSMObject::GetProxyManager()->LoadState(msg);
+  vtkSMObject::GetProxyManager()->LoadState(msg, locator);
 }
 //----------------------------------------------------------------------------
 void vtkSMPipelineState::ValidateState()

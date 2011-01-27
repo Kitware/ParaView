@@ -387,7 +387,7 @@ public:
 
   // Description:
   // This method is used to initialise the object to the given state
-  virtual void LoadState(const vtkSMMessage* msg);
+  virtual void LoadState(const vtkSMMessage* msg, vtkSMStateLocator* locator);
 
 protected:
   vtkSMProxy();

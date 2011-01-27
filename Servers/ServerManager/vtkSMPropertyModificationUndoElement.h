@@ -24,7 +24,7 @@
 #define __vtkSMPropertyModificationUndoElement_h
 
 #include "vtkSMUndoElement.h"
-#include "vtkSMMessage.h"
+#include "vtkSMMessageMinimal.h"
 class vtkSMProxy;
 
 class VTK_EXPORT vtkSMPropertyModificationUndoElement : public vtkSMUndoElement
@@ -65,7 +65,7 @@ protected:
 
   vtkTypeUInt32 ProxyGlobalID;
   char* PropertyName;
-  vtkSMMessage PropertyState;
+  vtkSMMessage* PropertyState;
 
 private:
   vtkSMPropertyModificationUndoElement(const vtkSMPropertyModificationUndoElement&); // Not implemented.

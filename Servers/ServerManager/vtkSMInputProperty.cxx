@@ -22,6 +22,7 @@
 #include "vtkSMProxyLocator.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMSession.h"
+#include "vtkSMStateLocator.h"
 
 #include <vtkstd/algorithm>
 #include <vtkstd/map>
@@ -70,10 +71,11 @@ void vtkSMInputProperty::WriteTo(vtkSMMessage* message)
 }
 
 //---------------------------------------------------------------------------
-void vtkSMInputProperty::ReadFrom(const vtkSMMessage* message, int message_offset)
+void vtkSMInputProperty::ReadFrom(const vtkSMMessage* message, int msg_offset,
+                                  vtkSMStateLocator* locator)
 {
   // FIXME this method is REALLY close to its superclass: Please keep them in sync
-  const ProxyState_Property *prop = &message->GetExtension(ProxyState::property, message_offset);
+  const ProxyState_Property *prop = &message->GetExtension(ProxyState::property, msg_offset);
   if(strcmp(prop->name().c_str(), this->GetXMLName()) == 0)
     {
     const Variant *value = &prop->value();
@@ -120,16 +122,17 @@ void vtkSMInputProperty::ReadFrom(const vtkSMMessage* message, int message_offse
         {
         this->AddInputConnection(proxy, proxyIdPortMap[*proxyIdIter], true);
         }
-      else
-        {
-        // Recreate the proxy as it used to be
-        proxy = pxm->ReNewProxy(*proxyIdIter);
-        if(proxy)
-          {
-          this->AddInputConnection(proxy, proxyIdPortMap[*proxyIdIter], true);
-          proxy->Delete();
-          }
-        }
+// FIXME we should not renew an input
+//      else
+//        {
+//        // Recreate the proxy as it used to be
+//        proxy = pxm->ReNewProxy(*proxyIdIter, locator);
+//        if(proxy)
+//          {
+//          this->AddInputConnection(proxy, proxyIdPortMap[*proxyIdIter], true);
+//          proxy->Delete();
+//          }
+//        }
       }
     }
   else

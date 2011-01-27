@@ -30,6 +30,7 @@ class vtkSMProxyDefinitionManager;
 class vtkSMRemoteObject;
 class vtkSMSessionCore;
 class vtkSMUndoStackBuilder;
+class vtkSMStateLocator;
 
 class VTK_EXPORT vtkSMSession : public vtkPVSession
 {
@@ -203,16 +204,15 @@ public:
   vtkSetMacro(StateManagement, bool);
   vtkGetMacro(StateManagement, bool);
 
-//BTX
 
   // Description:
-  // Copy the last state of the RemoteObject that use to have this globalId
-  // inside lastRemoteObjectState. If Not found the state won't be modified.
-  //
-  // WARNING:
-  // - This only work if StateManagement is set to true.
-  virtual void GetRemoteObjectLastState( vtkTypeUInt32 globalId ,
-                                         vtkSMMessage* lastRemoteObjectState);
+  // Provide an access to the session state locator that can provide the last
+  // state of a given remote object that have been pushed.
+  // That locator will be filled by RemoteObject state only if
+  // StateManagement is set to true.
+  vtkGetObjectMacro(StateLocator, vtkSMStateLocator);
+
+//BTX
 
 protected:
   vtkSMSession();
@@ -221,7 +221,7 @@ protected:
   vtkSMSessionCore* Core;
   vtkSMUndoStackBuilder* UndoStackBuilder;
   vtkSMPluginManager* PluginManager;
-
+  vtkSMStateLocator* StateLocator;
   bool StateManagement;
 
   // FIXME should be managed smartly between client and server.

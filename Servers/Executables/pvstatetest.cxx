@@ -96,7 +96,7 @@ int main(int argc, char* argv[])
   editB.PrintDebugString();
 
   // Load previous state
-  proxy->LoadState(&origin);
+  proxy->LoadState(&origin, NULL);
   proxy->UpdateVTKObjects();
   editC = *proxy->GetFullState();
   cout << "====== Edition C (Load origin) ======" << endl;
@@ -112,7 +112,7 @@ int main(int argc, char* argv[])
     }
 
   // Load previous state
-  proxy->LoadState(&editA);
+  proxy->LoadState(&editA, NULL);
   proxy->UpdateVTKObjects();
   editC = *proxy->GetFullState();
   cout << "====== Edition C (Load editA) ======" << endl;
@@ -128,7 +128,7 @@ int main(int argc, char* argv[])
     }
 
   // Load previous state
-  proxy->LoadState(&editB);
+  proxy->LoadState(&editB, NULL);
   proxy->UpdateVTKObjects();
   editC = *proxy->GetFullState();
   cout << "====== Edition C (Load editB) ======" << endl;

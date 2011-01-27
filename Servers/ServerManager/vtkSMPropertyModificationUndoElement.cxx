@@ -19,6 +19,7 @@
 #include "vtkSMProperty.h"
 #include "vtkSMProxy.h"
 #include "vtkSMSession.h"
+#include "vtkSMMessage.h"
 
 vtkStandardNewMacro(vtkSMPropertyModificationUndoElement);
 //-----------------------------------------------------------------------------
@@ -27,12 +28,14 @@ vtkSMPropertyModificationUndoElement::vtkSMPropertyModificationUndoElement()
   this->SetMergeable(true);
   this->PropertyName = 0;
   this->ProxyGlobalID = 0;
+  this->PropertyState = new vtkSMMessage();
 }
 
 //-----------------------------------------------------------------------------
 vtkSMPropertyModificationUndoElement::~vtkSMPropertyModificationUndoElement()
 {
   this->SetPropertyName(0);
+  delete this->PropertyState;
 }
 
 //-----------------------------------------------------------------------------
@@ -66,7 +69,8 @@ int vtkSMPropertyModificationUndoElement::RevertToState()
                               proxy->GetProperty(this->PropertyName) : NULL );
   if (property)
     {
-    property->ReadFrom(&this->PropertyState, 0); // 0 because only one
+    // FIXME use the UndoSet locator...
+    property->ReadFrom(this->PropertyState, 0, proxy->GetSession()->GetStateLocator()); // 0 because only one
     proxy->UpdateProperty(this->PropertyName);
     }
   return 1;
@@ -88,8 +92,8 @@ void vtkSMPropertyModificationUndoElement::ModifiedProperty(vtkSMProxy* proxy,
   this->ProxyGlobalID = proxy->GetGlobalID();
   this->SetPropertyName(propertyname);
 
-  this->PropertyState.Clear();
-  property->WriteTo(&this->PropertyState);
+  this->PropertyState->Clear();
+  property->WriteTo(this->PropertyState);
 }
 
 //-----------------------------------------------------------------------------

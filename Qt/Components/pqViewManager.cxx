@@ -932,7 +932,8 @@ void pqViewManager::loadState(vtkPVXMLElement* rwRoot)
               GetRemoteObject(id));
       if(!viewModule.GetPointer())
         {
-        viewModule.TakeReference(pxm->ReNewProxy(id));
+        viewModule.TakeReference(
+            pxm->ReNewProxy(id, pxm->GetSession()->GetStateLocator()));
         }
       if (!viewModule.GetPointer())
         {

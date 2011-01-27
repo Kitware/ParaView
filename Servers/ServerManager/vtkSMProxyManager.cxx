@@ -34,6 +34,7 @@
 #include "vtkSMProxyProperty.h"
 #include "vtkSMReaderFactory.h"
 #include "vtkSMStateLoader.h"
+#include "vtkSMStateLocator.h"
 #include "vtkSMUndoStack.h"
 #include "vtkSMWriterFactory.h"
 #include "vtkStdString.h"
@@ -1620,7 +1621,7 @@ const vtkSMMessage* vtkSMProxyManager::GetFullState()
   return &this->Internals->State;
 }
 //---------------------------------------------------------------------------
-void vtkSMProxyManager::LoadState(const vtkSMMessage* msg)
+void vtkSMProxyManager::LoadState(const vtkSMMessage* msg, vtkSMStateLocator* locator)
 {
   // Need to compute differences and just call Register/UnRegister for those items
   vtkstd::set<vtkSMProxyManagerEntry> tuplesToUnregister;
@@ -1628,7 +1629,7 @@ void vtkSMProxyManager::LoadState(const vtkSMMessage* msg)
   vtkstd::set<vtkSMProxyManagerEntry>::iterator iter;
 
   // Fill delta sets
-  this->Internals->ComputeDelta(msg, tuplesToRegister, tuplesToUnregister);
+  this->Internals->ComputeDelta(msg, locator, tuplesToRegister, tuplesToUnregister);
 
   // Register new ones
   iter = tuplesToRegister.begin();
@@ -1647,44 +1648,19 @@ void vtkSMProxyManager::LoadState(const vtkSMMessage* msg)
     }
 }
 //---------------------------------------------------------------------------
-vtkSMProxy* vtkSMProxyManager::NewProxy( const vtkSMMessage* msg)
+vtkSMProxy* vtkSMProxyManager::NewProxy( const vtkSMMessage* msg,
+                                         vtkSMStateLocator* locator)
 {
   if( msg && msg->has_global_id() && msg->HasExtension(ProxyState::xml_group) &&
       msg->HasExtension(ProxyState::xml_name))
     {
-
     vtkSMProxy *proxy =
         this->NewProxy( msg->GetExtension(ProxyState::xml_group).c_str(),
                         msg->GetExtension(ProxyState::xml_name).c_str());
 
-    // Update proxy global-ids
-    proxy->SetGlobalID(msg->global_id());
-
-    // sub-proxy management
-    int nbSubProxy = msg->ExtensionSize(ProxyState::subproxy);
-    for(int idx=0; idx < nbSubProxy; idx++)
-      {
-      const ProxyState_SubProxy *subProxyMsg = &msg->GetExtension(ProxyState::subproxy, idx);
-      vtkSMProxy *subProxy =
-          vtkSMProxy::SafeDownCast(
-              this->GetSession()->GetRemoteObject(subProxyMsg->global_id()));
-      // If Sub-Proxy already exist just replace it
-      if(subProxy)
-        {
-        proxy->AddSubProxy(subProxyMsg->name().c_str(), subProxy);
-        }
-      else
-        {
-        // Otherwise just set its previous ID
-        vtkSMProxy *subProxy = proxy->GetSubProxy(subProxyMsg->name().c_str());
-        subProxy->SetGlobalID(subProxyMsg->global_id());
-        }
-      }
-
     // Then load the state for the current proxy
     // (This do not include the exposed properties)
-    proxy->LoadState(msg);
-
+    proxy->LoadState(msg, locator);
 
     // FIXME in collaboration mode we shouldn't push the state if it already come
     // from the server side
@@ -1713,17 +1689,17 @@ void vtkSMProxyManager::LoadXMLDefinitionFromServer()
   this->ProxyDefinitionManager->LoadXMLDefinitionState(&msg);
 }
 //---------------------------------------------------------------------------
-vtkSMProxy* vtkSMProxyManager::ReNewProxy(vtkTypeUInt32 globalId)
+vtkSMProxy* vtkSMProxyManager::ReNewProxy(vtkTypeUInt32 globalId,
+                                          vtkSMStateLocator* locator)
 {
   if(this->Session->GetRemoteObject(globalId))
     {
     return NULL; // The given proxy already exist, DO NOT create a new one
     }
   vtkSMMessage proxyState;
-  this->Session->GetRemoteObjectLastState(globalId, &proxyState);
-  if(proxyState.has_global_id())
+  if(locator && locator->FindState(globalId, &proxyState))
     {
-    return this->NewProxy( &proxyState );
+    return this->NewProxy( &proxyState, locator );
     }
   return NULL;
 }

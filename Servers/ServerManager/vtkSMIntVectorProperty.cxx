@@ -19,6 +19,7 @@
 #include "vtkPVXMLElement.h"
 #include "vtkSMMessage.h"
 #include "vtkSMVectorPropertyTemplate.h"
+#include "vtkSMStateLocator.h"
 
 vtkStandardNewMacro(vtkSMIntVectorProperty);
 
@@ -62,7 +63,8 @@ void vtkSMIntVectorProperty::WriteTo(vtkSMMessage* msg)
 }
 
 //---------------------------------------------------------------------------
-void vtkSMIntVectorProperty::ReadFrom(const vtkSMMessage* msg, int offset)
+void vtkSMIntVectorProperty::ReadFrom(const vtkSMMessage* msg, int offset,
+                                      vtkSMStateLocator* locator)
 {
   //cout << ">>>>>>>>>>>>" << endl;
   //msg->PrintDebugString();

@@ -246,6 +246,7 @@ struct vtkSMProxyManagerInternals
     }
 
   void ComputeDelta(const vtkSMMessage* newState,
+                    vtkSMStateLocator* locator,
                     vtkstd::set<vtkSMProxyManagerEntry> &toRegister,
                     vtkstd::set<vtkSMProxyManagerEntry> &toUnregister)
     {
@@ -262,7 +263,7 @@ struct vtkSMProxyManagerInternals
 
       if(!proxy)
         {
-        vtkSMProxy *proxy = this->ProxyManager->ReNewProxy(reg.global_id());
+        vtkSMProxy *proxy = this->ProxyManager->ReNewProxy(reg.global_id(), locator);
         if(proxy)
           {
           newStateContent.insert(vtkSMProxyManagerEntry(reg.group().c_str(), reg.name().c_str(), proxy));

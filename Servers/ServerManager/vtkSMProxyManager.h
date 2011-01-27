@@ -55,6 +55,7 @@ class vtkSMStateLoader;
 class vtkSMWriterFactory;
 class vtkStringList;
 class vtkSMPipelineState;
+class vtkSMStateLocator;
 
 //BTX
 struct vtkSMProxyManagerInternals;
@@ -448,7 +449,7 @@ public:
 
   // Description:
   // This method is used to initialise the ProxyManager to the given state
-  virtual void LoadState(const vtkSMMessage* msg);
+  virtual void LoadState(const vtkSMMessage* msg, vtkSMStateLocator* locator);
 
   // Description:
   // This metod allow the creation of a proxy based on its full state.
@@ -456,7 +457,8 @@ public:
   // where the message come from the server and the purpose is to create the SM
   // side when the PM side has already been created.
   // The User MUST delete the provided proxy otherwise it will live forever
-  virtual vtkSMProxy* NewProxy(const vtkSMMessage* msg);
+  virtual vtkSMProxy* NewProxy(const vtkSMMessage* msg,
+                               vtkSMStateLocator* locator);
 
   // Description:
   // Re-New a proxy based on its ID and its previous state.
@@ -465,7 +467,8 @@ public:
   //
   // WARNING:
   // - It is at the responsability at the caller to delete the proxy.
-  virtual vtkSMProxy* ReNewProxy(vtkTypeUInt32 globalId);
+  virtual vtkSMProxy* ReNewProxy(vtkTypeUInt32 globalId,
+                                 vtkSMStateLocator* locator);
 
 protected:
   vtkSMProxyManager();

@@ -72,6 +72,11 @@ void vtkSMRemoteObject::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "Session: " << this->Session << endl;
   os << indent << "GlobalID: " << this->GlobalID << endl;
 }
+//---------------------------------------------------------------------------
+bool vtkSMRemoteObject::HasGlobalID()
+{
+  return this->GlobalID != 0;
+}
 
 //---------------------------------------------------------------------------
 vtkTypeUInt32 vtkSMRemoteObject::GetGlobalID()
@@ -114,7 +119,9 @@ void vtkSMRemoteObject::SetGlobalID(vtkTypeUInt32 guid)
 
   if(this->GlobalID != 0)
     {
-    vtkErrorMacro("GlobalID must NOT be changed once it has been assigned");
+    vtkErrorMacro("GlobalID must NOT be changed once it has been assigned.\n"
+                  "Try to set " << guid << " to replace the current "
+                  << this->GlobalID << " value.");
     abort();
     }
 

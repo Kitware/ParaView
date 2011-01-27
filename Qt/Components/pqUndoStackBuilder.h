@@ -34,6 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkSMUndoStackBuilder.h"
 #include "pqComponentsExport.h"
+#include "vtkSMMessageMinimal.h"
 
 class vtkCommand;
 
@@ -91,9 +92,15 @@ public:
                              const vtkSMMessage *previousState,
                              const vtkSMMessage *newState);
 
+  /// Overridden to filter unwanted event and manage auto undoset creation
+  virtual void OnNewState(vtkSMSession *session, vtkTypeUInt32 globalId, const vtkSMMessage *creationState);
+
 protected:
   pqUndoStackBuilder();
   ~pqUndoStackBuilder();
+
+  /// Return false if this state should be escaped.
+  bool Filter(vtkSMSession* session, vtkTypeUInt32 globalId);
 
   bool IgnoreIsolatedChanges;
   bool UndoRedoing;

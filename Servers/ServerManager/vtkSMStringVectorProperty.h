@@ -29,6 +29,7 @@
 #include "vtkSMVectorProperty.h"
 
 class vtkStringList;
+class vtkSMStateLocator;
 
 class VTK_EXPORT vtkSMStringVectorProperty : public vtkSMVectorProperty
 {
@@ -133,7 +134,8 @@ protected:
 
   // Description:
   // Let the property read and set its content from the stream
-  virtual void ReadFrom(const vtkSMMessage*, int message_offset);
+  virtual void ReadFrom(const vtkSMMessage*, int message_offset,
+                        vtkSMStateLocator* locator);
 
   // Save concrete property values into the XML state property declaration
   virtual void SaveStateValues(vtkPVXMLElement* propElement);

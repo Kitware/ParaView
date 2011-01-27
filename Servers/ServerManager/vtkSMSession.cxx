@@ -27,6 +27,7 @@
 #include "vtkSMRemoteObject.h"
 #include "vtkSMSessionClient.h"
 #include "vtkSMSessionCore.h"
+#include "vtkSMStateLocator.h"
 #include "vtkSMUndoStackBuilder.h"
 #include "vtkSMProxyManager.h"
 #include "vtkWeakPointer.h"
@@ -34,54 +35,12 @@
 #include <vtksys/ios/sstream>
 #include <assert.h>
 
-//*****************************************************************************
-//                              Internal Class
-//*****************************************************************************
-class vtkSMSession::vtkInternals
-{
-public:
-  // Return previous message and replace it with the new one.
-  // If the previous message does not exist it has no global id
-  vtkSMMessage ReplaceState(vtkTypeUInt32 globalId, const vtkSMMessage* state)
-    {
-    vtkSMMessage result;
-
-    // Look if we have it
-    vtkstd::map<vtkTypeUInt32, vtkSMMessage>::iterator iter;
-    iter = this->StateMap.find(globalId);
-
-    // We do find a previous state
-    if(iter != this->StateMap.end())
-      {
-      result.CopyFrom(iter->second);
-      if(!state)
-        {
-        // It means the object should be deleted
-        this->StateMap.erase(iter);
-        }
-      }
-    if(state)
-      {
-      this->StateMap[globalId].CopyFrom(*state);
-      }
-    return result;
-    }
-
-  void FillWithLastState( vtkTypeUInt32 globalId, vtkSMMessage* stateToFill )
-    {
-    stateToFill->CopyFrom(this->StateMap[globalId]);
-    }
-
-private:
-  vtkstd::map<vtkTypeUInt32, vtkSMMessage> StateMap;
-};
-//*****************************************************************************
 vtkStandardNewMacro(vtkSMSession);
 vtkCxxSetObjectMacro(vtkSMSession, UndoStackBuilder, vtkSMUndoStackBuilder);
 //----------------------------------------------------------------------------
 vtkSMSession::vtkSMSession()
 {
-  this->Internals = new vtkInternals();
+  this->StateLocator = vtkSMStateLocator::New();
   this->StateManagement = true; // Allow to store state in local cache for Uno/Redo
   this->Core = vtkSMSessionCore::New();
   this->PluginManager = vtkSMPluginManager::New();
@@ -123,7 +82,7 @@ vtkSMSession::~vtkSMSession()
   this->LocalServerInformation->Delete();
   this->LocalServerInformation = 0;
 
-  delete this->Internals;
+  this->StateLocator->Delete();
 }
 
 //----------------------------------------------------------------------------
@@ -170,12 +129,23 @@ void vtkSMSession::PushState(vtkSMMessage* msg)
       newState.set_location(msg->location());
 
       // Store state in cache
-      vtkSMMessage oldState = this->Internals->ReplaceState(globalId, &newState);
+      vtkSMMessage oldState;
+      bool createAction = !this->StateLocator->FindState(globalId, &oldState);
+
+      // This is a filtering Hack, I don't like it. :-(
+      if(newState.GetExtension(ProxyState::xml_name) != "Camera")
+        {
+        this->StateLocator->RegisterState(&newState);
+        }
 
       // Propagate to undo stack builder if possible
       if(this->UndoStackBuilder)
         {
-        if(oldState.has_global_id())
+        if(createAction)
+          {
+          this->UndoStackBuilder->OnNewState(this, globalId, &newState);
+          }
+        else
           {
           // Update
           if(oldState.SerializeAsString() != newState.SerializeAsString())
@@ -427,13 +397,4 @@ vtkIdType vtkSMSession::ReverseConnectToRemote(
   session->RemoveObserver(id);
   session->Delete();
   return sid;
-}
-//----------------------------------------------------------------------------
-void vtkSMSession::GetRemoteObjectLastState( vtkTypeUInt32 globalId ,
-                                             vtkSMMessage* lastRemoteObjectState)
-{
-  if(this->StateManagement)
-    {
-    this->Internals->FillWithLastState(globalId, lastRemoteObjectState);
-    }
 }

@@ -68,11 +68,9 @@ void pqUndoStackBuilder::SetUndoStack(vtkSMUndoStack* stack)
 
   this->Superclass::SetUndoStack(stack);
 }
+
 //-----------------------------------------------------------------------------
-void pqUndoStackBuilder::OnStateChange( vtkSMSession *session,
-                                        vtkTypeUInt32 globalId,
-                                        const vtkSMMessage *oldState,
-                                        const vtkSMMessage *newState)
+bool pqUndoStackBuilder::Filter(vtkSMSession *session, vtkTypeUInt32 globalId)
 {
   vtkSMRemoteObject* proxy = session->GetRemoteObject(globalId);
 
@@ -88,6 +86,31 @@ void pqUndoStackBuilder::OnStateChange( vtkSMSession *session,
       proxy->IsA("vtkSMNewWidgetRepresentationProxy") ||
       proxy->IsA("vtkSMScalarBarWidgetRepresentationProxy"))))
     {
+    return true;
+    }
+  return false;
+}
+
+//-----------------------------------------------------------------------------
+void pqUndoStackBuilder::OnNewState(vtkSMSession *session,
+                                    vtkTypeUInt32 globalId,
+                                    const vtkSMMessage *state)
+{
+  if(this->Filter(session, globalId))
+    {
+    return;
+    }
+
+  this->Superclass::OnNewState(session, globalId, state);
+}
+//-----------------------------------------------------------------------------
+void pqUndoStackBuilder::OnStateChange( vtkSMSession *session,
+                                        vtkTypeUInt32 globalId,
+                                        const vtkSMMessage *oldState,
+                                        const vtkSMMessage *newState)
+{
+  if(this->Filter(session, globalId))
+    {
     return;
     }
 
@@ -96,6 +119,7 @@ void pqUndoStackBuilder::OnStateChange( vtkSMSession *session,
 
   if (auto_element)
     {
+    vtkSMRemoteObject* proxy = session->GetRemoteObject(globalId);
     vtksys_ios::ostringstream stream;
     stream << "Changed '" << proxy->GetClassName() <<"'";
     this->Begin(stream.str().c_str());

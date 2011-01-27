@@ -73,6 +73,7 @@ class vtkSMDomainIterator;
 class vtkSMInformationHelper;
 class vtkSMProxy;
 class vtkSMProxyLocator;
+class vtkSMStateLocator;
 //BTX
 struct vtkSMPropertyInternals;
 //ETX
@@ -270,7 +271,8 @@ protected:
 
   // Description:
   // Let the property read and set its content from the stream
-  virtual void ReadFrom(const vtkSMMessage*, int vtkNotUsed(message_offset)) {};
+  virtual void ReadFrom(const vtkSMMessage*, int vtkNotUsed(message_offset),
+                        vtkSMStateLocator* locator) {};
 
   // Description:
   // Set the appropriate ivars from the xml element. Should

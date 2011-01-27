@@ -21,6 +21,7 @@
 #include "vtkSMVectorPropertyTemplate.h"
 #include "vtkStdString.h"
 #include "vtkStringList.h"
+#include "vtkSMStateLocator.h"
 
 #include <vtksys/ios/sstream>
 
@@ -89,7 +90,8 @@ void vtkSMStringVectorProperty::WriteTo(vtkSMMessage* msg)
 }
 
 //---------------------------------------------------------------------------
-void vtkSMStringVectorProperty::ReadFrom(const vtkSMMessage* msg, int offset)
+void vtkSMStringVectorProperty::ReadFrom(const vtkSMMessage* msg, int offset,
+                                         vtkSMStateLocator* locator)
 {
   assert(msg->ExtensionSize(ProxyState::property) > offset);
 
