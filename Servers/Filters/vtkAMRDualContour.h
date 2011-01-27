@@ -39,6 +39,7 @@ class vtkDoubleArray;
 class vtkCellArray;
 class vtkCellData;
 class vtkIntArray;
+class vtkFloatArray;
 class vtkMultiProcessController;
 class vtkDataArraySelection;
 class vtkCallbackCommand;
@@ -89,7 +90,7 @@ public:
 
   // Description:
   // An option to turn off copying ghost values across process boundaries.
-  // If the ghost values are already correct, then the extra communication is 
+  // If the ghost values are already correct, then the extra communication is
   // not necessary.  If this assumption is wrong, this option will produce
   // cracks / seams.
   vtkSetMacro(SkipGhostCopy,int);
@@ -119,15 +120,17 @@ protected:
     vtkAMRDualGridHelperBlock* block);
 
   void ProcessBlock(vtkAMRDualGridHelperBlock* block, int blockId);
-  
+
+
   void ProcessDualCell(
     vtkAMRDualGridHelperBlock* block, int blockId,
-    int marchingCase,
     int x, int y, int z,
-    double values[8]);
+    vtkIdType cornerOffsets[8]);
 
   void AddCapPolygon(int ptCount, vtkIdType* pointIds, int blockId);
 
+  // This method is getting too many arguements!
+  // Capping was an after thought...
   void CapCell(
     int cellX, int cellY, int cellZ,  // block coordinates
     // Which cell faces need to be capped.
@@ -138,25 +141,43 @@ protected:
     vtkIdType edgePtIds[12],
     // Locations of 8 corners. (xyz4xyz4...) 4th value is not used.
     double cornerPoints[32],
+    // The id order is VTK from marching cube cases.  Different than axis orded "cornerPoints".
+    vtkIdType cornerOffsets[8],
     // For block id array (for debugging).  I should just make this an ivar.
-    int blockId);
+    int blockId,
+    // For passing attirbutes to output mesh
+    vtkDataSet* inData);
 
   // Stuff exclusively for debugging.
   vtkIntArray* BlockIdCellArray;
+  vtkFloatArray* TemperatureArray;
 
   // Ivars used to reduce method parrameters.
   vtkAMRDualGridHelper* Helper;
+  vtkPolyData* Mesh;
   vtkPoints* Points;
   vtkCellArray* Faces;
 
   vtkMultiProcessController *Controller;
 
   // I made these ivars to avoid allocating multiple times.
-  // The buffer is not used too many times, but .....
+  // The buffer is not used too many times, but ...
   int* MessageBuffer;
   int* MessageBufferLength;
 
   vtkAMRDualContourEdgeLocator* BlockLocator;
+
+  // Stuff for passing cell attributes to point attributes.
+  void InitializeCopyAttributes(
+    vtkHierarchicalBoxDataSet *hbdsInput,
+    vtkDataSet* mesh);
+  void InterpolateAttributes(
+    vtkDataSet* uGrid, vtkIdType offset0, vtkIdType offset1, double k,
+    vtkDataSet* mesh, vtkIdType outId);
+  void vtkAMRDualContour::CopyAttributes(
+    vtkDataSet* uGrid, vtkIdType inId,
+    vtkDataSet* mesh, vtkIdType outId);
+  void FinalizeCopyAttributes(vtkDataSet* mesh);
 
 private:
   vtkAMRDualContour(const vtkAMRDualContour&);  // Not implemented.

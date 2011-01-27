@@ -1228,7 +1228,7 @@ void vtkAMRDualGridHelper::QueueRegionRemoteCopy(
 }
 
 // Just a hack to test an assumption.
-// This can be removed once we determine hor the ghost values behave across
+// This can be removed once we determine how the ghost values behave across
 // level changes.
 static int vtkDualGridHelperCheckAssumption = 0;
 static int vtkDualGridHelperSkipGhostCopy = 0;
@@ -1264,6 +1264,8 @@ void vtkDualGridHelperCopyBlockToBlock(T* ptr, T* lowerPtr, int ext[6], int leve
         // Lets see if our assumption about ghost values is correct.
         if (vtkDualGridHelperCheckAssumption && vtkDualGridHelperSkipGhostCopy && *xPtr != val)
           {
+          // Sandia did get this message so I will default to have ghost copy on.
+          //  I did not document the assumption well enough.
           //vtkGenericWarningMacro("Ghost assumption incorrect.  Seams may result.");
           // Report issue once per execution.
           vtkDualGridHelperCheckAssumption = 0;
