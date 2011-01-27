@@ -314,18 +314,6 @@ void vtkSMAnimationScene::SetDuration(int val)
 }
 
 //----------------------------------------------------------------------------
-void vtkSMAnimationScene::AddTimeStep(double val)
-{
-  this->AnimationPlayer->AddTimeStep(val);
-}
-
-//----------------------------------------------------------------------------
-void vtkSMAnimationScene::RemoveAllTimeSteps()
-{
-  this->AnimationPlayer->RemoveAllTimeSteps();
-}
-
-//----------------------------------------------------------------------------
 void vtkSMAnimationScene::SetFramesPerTimestep(int val)
 {
   this->AnimationPlayer->SetFramesPerTimestep(val);

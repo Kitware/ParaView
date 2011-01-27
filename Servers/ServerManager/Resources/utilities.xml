@@ -842,7 +842,7 @@
     </Proxy>
 
     <!--Scene -->
-    <Proxy name="AnimationScene" class="vtkSMAnimationScene"
+    <AnimationSceneProxy name="AnimationScene" class="vtkSMAnimationScene"
       processes="client" >
       <Documentation>
         Proxy for animation scene.
@@ -1011,18 +1011,6 @@
         </Documentation>
       </IntVectorProperty>
 
-      <DoubleVectorProperty name="TimeSteps"
-        command="AddTimeStep"
-        repeat_command="1"
-        number_of_elements_per_command="1"
-        clean_command="RemoveAllTimeSteps">
-        <Documentation>
-          The discrete timesteps to play the animation in. Irrespective of order
-          of the time values in this property, the player always plays in the
-          animation in sorted order of the time step values.
-        </Documentation>
-      </DoubleVectorProperty>
-
       <IntVectorProperty name="FramesPerTimestep"
         command="SetFramesPerTimestep"
         number_of_elements="1"
@@ -1034,7 +1022,7 @@
       </IntVectorProperty>
 
       <!-- End of AnimationScene -->
-    </Proxy>
+    </AnimationSceneProxy>
 
   <!-- End of animation -->
   </ProxyGroup>

@@ -89,8 +89,6 @@ public:
   void SetPlayMode(int val);
   void SetNumberOfFrames(int val);
   void SetDuration(int val);
-  void AddTimeStep(double val);
-  void RemoveAllTimeSteps();
   void SetFramesPerTimestep(int val);
 
 //BTX

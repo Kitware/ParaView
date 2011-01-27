@@ -56,6 +56,7 @@ SET (Kit_SRCS
   vtkSMAnimationScene.cxx
   vtkSMAnimationSceneGeometryWriter.cxx
   vtkSMAnimationSceneImageWriter.cxx
+  vtkSMAnimationSceneProxy.cxx
   vtkSMAnimationSceneWriter.cxx
   vtkSMBoxRepresentationProxy.cxx
   vtkSMCameraConfigurationReader.cxx
