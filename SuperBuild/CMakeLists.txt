@@ -139,8 +139,14 @@ set(ParaView_dependencies)
 set(MPI_ARGS)
 
 if(NOT APPLE)
-  include(External_OpenMPI)
-  list(APPEND ParaView_dependencies OpenMPI)
+
+  if(WIN32)
+    include(External_OpenMPI)
+    list(APPEND ParaView_dependencies OpenMPI)
+  else()
+    include(External_MPICH2)
+    list(APPEND ParaView_dependencies MPICH2)
+  endif()
 
   set(MPI_ARGS
     -DPARAVIEW_USE_MPI:BOOL=ON
@@ -149,6 +155,13 @@ if(NOT APPLE)
     -DMPI_LIBRARY:FILEPATH=${MPI_LIBRARY}
     -DMPI_EXTRA_LIBRARY:FILEPATH=${MPI_EXTRA_LIBRARY}
     -DPARAVIEW_INSTALL_MPIEXEC:BOOL=ON)
+
+  if(NOT WIN32)
+    set(MPI_COMPILER_ARGS
+       -DCMAKE_C_COMPILER:FILEPTH=${MPI_C_COMPILER}
+       -DCMAKE_CXX_COMPILER:FILEPATH=${MPI_CXX_COMPILER})
+    list(APPEND MPI_ARGS ${MPI_COMPILER_ARGS})
+  endif()
 
   include(External_Python)
   list(APPEND ParaView_depenencies Python)

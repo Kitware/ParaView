@@ -163,6 +163,7 @@ if (PARAVIEW_INSTALL_THIRD_PARTY_LIBRARIES AND NOT APPLE)
       GET_FILENAME_COMPONENT(mpi_bin_dir ${MPIEXEC} PATH)
       install(DIRECTORY ${mpi_bin_dir}/
         DESTINATION ${pv_runtime_dest}
+        USE_SOURCE_PERMISSIONS
         COMPONENT Runtime)
     endif(PARAVIEW_INSTALL_MPIEXEC)
   endif(PARAVIEW_USE_MPI)

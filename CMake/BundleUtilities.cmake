@@ -717,18 +717,18 @@ function(verify_app app)
 
   get_bundle_and_executable("${app}" bundle executable valid)
 
-  message(STATUS "===========================================================================")
-  message(STATUS "Analyzing app='${app}'")
-  message(STATUS "bundle='${bundle}'")
-  message(STATUS "executable='${executable}'")
-  message(STATUS "valid='${valid}'")
+  message( "===========================================================================")
+  message( "Analyzing app='${app}'")
+  message( "bundle='${bundle}'")
+  message( "executable='${executable}'")
+  message( "valid='${valid}'")
 
   # Verify that the bundle does not have any "external" prerequisites:
   #
   verify_bundle_prerequisites("${bundle}" verified info)
-  message(STATUS "verified='${verified}'")
-  message(STATUS "info='${info}'")
-  message(STATUS "")
+  message( "verified='${verified}'")
+  message( "info='${info}'")
+  message( "")
 
   if(verified)
     # Verify that the bundle does not have any symlinks to external files:
