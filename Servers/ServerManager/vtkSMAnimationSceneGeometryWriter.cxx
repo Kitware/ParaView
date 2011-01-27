@@ -15,14 +15,13 @@
 #include "vtkSMAnimationSceneGeometryWriter.h"
 
 #include "vtkObjectFactory.h"
-#include "vtkProcessModule.h"
-#include "vtkSMDoubleVectorProperty.h"
+#include "vtkSMPropertyHelper.h"
+#include "vtkSMProxy.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMProxyProperty.h"
 #include "vtkSMRepresentationProxy.h"
-#include "vtkSMPropertyHelper.h"
 #include "vtkSMStringVectorProperty.h"
-#include "vtkSMXMLPVAnimationWriterProxy.h"
+#include "vtkSMPropertyHelper.h"
 
 vtkStandardNewMacro(vtkSMAnimationSceneGeometryWriter);
 vtkCxxSetObjectMacro(vtkSMAnimationSceneGeometryWriter, ViewModule, vtkSMProxy);
@@ -54,16 +53,10 @@ bool vtkSMAnimationSceneGeometryWriter::SaveInitialize()
     return false;
     }
 
-  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
-  this->GeometryWriter = vtkSMXMLPVAnimationWriterProxy::SafeDownCast(
-    pxm->NewProxy("writers","XMLPVAnimationWriter"));
-  this->GeometryWriter->SetConnectionID(this->ViewModule->GetConnectionID());
-  this->GeometryWriter->SetServers(vtkProcessModule::DATA_SERVER);
+  vtkSMProxyManager* pxm = this->GetProxyManager();
+  this->GeometryWriter = pxm->NewProxy("writers","XMLPVAnimationWriter");
 
-  vtkSMStringVectorProperty* svp = vtkSMStringVectorProperty::SafeDownCast(
-    this->GeometryWriter->GetProperty("FileName"));
-  svp->SetElement(0, this->FileName);
-  this->GeometryWriter->UpdateVTKObjects();
+  vtkSMPropertyHelper(this->GeometryWriter,"FileName").Set(this->FileName);
 
   vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
     this->ViewModule->GetProperty("Representations"));
@@ -90,15 +83,14 @@ bool vtkSMAnimationSceneGeometryWriter::SaveInitialize()
 //-----------------------------------------------------------------------------
 bool vtkSMAnimationSceneGeometryWriter::SaveFrame(double time)
 {
-  vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
-    this->GeometryWriter->GetProperty("WriteTime"));
-  dvp->SetElement(0, time);
+  vtkSMPropertyHelper(this->GeometryWriter, "WriteTime").Set(time);
   this->GeometryWriter->UpdateProperty("WriteTime", 1);
-
-  if (this->GeometryWriter->GetErrorCode())
+  this->GeometryWriter->UpdatePropertyInformation();
+  if (vtkSMPropertyHelper(this->GeometryWriter, "ErrorCode").GetAsInt())
     {
     return false;
     }
+
   return true;
 }
 

@@ -25,7 +25,6 @@
 #include "vtkSMAnimationSceneWriter.h"
 
 class vtkSMProxy;
-class vtkSMXMLPVAnimationWriterProxy;
 
 class VTK_EXPORT vtkSMAnimationSceneGeometryWriter : public vtkSMAnimationSceneWriter
 {
@@ -56,7 +55,7 @@ protected:
   // Called to finalize saving.
   virtual bool SaveFinalize();
 
-  vtkSMXMLPVAnimationWriterProxy* GeometryWriter;
+  vtkSMProxy* GeometryWriter;
   vtkSMProxy* ViewModule;
 private:
   vtkSMAnimationSceneGeometryWriter(const vtkSMAnimationSceneGeometryWriter&); // Not implemented.

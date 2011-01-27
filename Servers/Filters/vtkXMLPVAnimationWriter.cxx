@@ -19,6 +19,7 @@
 #include "vtkErrorCode.h"
 #include "vtkExecutive.h"
 #include "vtkInformation.h"
+#include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVDataRepresentation.h"
 #include "vtkSmartPointer.h"
@@ -72,6 +73,14 @@ vtkXMLPVAnimationWriter::vtkXMLPVAnimationWriter()
   this->FinishCalled = 0;
   this->FileNamesCreated = 0;
   this->NumberOfFileNamesCreated = 0;
+
+  vtkMultiProcessController* globalController =
+    vtkMultiProcessController::GetGlobalController();
+  if (globalController)
+    {
+    this->SetNumberOfPieces(globalController->GetNumberOfProcesses());
+    this->SetPiece(globalController->GetLocalProcessId());
+    }
 }
 
 //----------------------------------------------------------------------------

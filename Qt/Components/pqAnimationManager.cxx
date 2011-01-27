@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkProcessModule.h"
 #include "vtkPVServerInformation.h"
 #include "vtkRenderWindow.h"
+#include "vtkSMAnimationSceneGeometryWriter.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyManager.h"
@@ -44,7 +45,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #ifdef FIXME_COLLABORATION
 #include "vtkSMServerProxyManagerReviver.h"
-#include "vtkSMAnimationSceneGeometryWriter.h"
 #endif
 
 #include <QIntValidator>
@@ -726,7 +726,6 @@ bool pqAnimationManager::saveGeometry(const QString& filename,
     {
     return false;
     }
-#ifdef FIXME_COLLABORATION
   vtkSMProxy* sceneProxy = scene->getProxy();
   vtkSMAnimationSceneGeometryWriter* writer = vtkSMAnimationSceneGeometryWriter::New();
   writer->SetFileName(filename.toAscii().data());
@@ -735,8 +734,6 @@ bool pqAnimationManager::saveGeometry(const QString& filename,
   bool status = writer->Save();
   writer->Delete();
   return status;
-#endif
-  return false;
 }
 
 //-----------------------------------------------------------------------------

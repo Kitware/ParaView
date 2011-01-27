@@ -1033,7 +1033,7 @@
     </Proxy>
 
     <!-- ================================================================= -->
-    <XMLPVAnimationWriterProxy name="XMLPVAnimationWriter" class ="vtkXMLPVAnimationWriter">
+    <SourceProxy name="XMLPVAnimationWriter" class ="vtkXMLPVAnimationWriter">
       <Documentation>
         Internal writer proxy used when saving animation geometry to save all
         parts of the current source to the file with pieces spread across the
@@ -1044,7 +1044,7 @@
         name="Representations"
         command="AddRepresentation"
         clean_command="RemoveAllRepresentations"
-        immediate_update="0"
+        kernel_class="vtkPMXMLAnimationWriterRepresentationProperty"
         repeat_command="1">
         <Documentation>
           The input filter/source whose output dataset is to written to the
@@ -1057,37 +1057,35 @@
           Name of the file to write.
         </Documentation>
       </StringVectorProperty>
-      
-      <Property
-        name="Start"
-        command="Start"
-        update_self="1"
-        immediate_update="1">
+
+      <Property name="Start" command="Start">
+        <Documentation>Used to begin writing of the animation</Documentation>
       </Property>
-      
-      <DoubleVectorProperty 
-        name="WriteTime" 
-        command="WriteTime" 
+
+      <DoubleVectorProperty name="WriteTime"
+        command="WriteTime"
         number_of_elements="1"
-        update_self="1"
         default_values="0.0"
         is_internal="1">
         <DoubleRangeDomain name="range" min="0" />
+        <Documentation>Write each timestep in the animation</Documentation>
       </DoubleVectorProperty>
-      
-      <Property
-        name="Finish"
-        command="Finish"
-        update_self="1"
-        immediate_update="1">
+
+      <Property name="Finish" command="Finish">
+        <Documentation>Finish writing animation</Documentation>
       </Property>
+
+      <IntVectorProperty name="ErrorCode"
+        command="GetErrorCode"
+        information_only="1">
+      </IntVectorProperty>
 
       <Hints>
         <Property name="Input" show="0"/>
         <Property name="FileName" show="0"/>
       </Hints>
       <!-- End of XMLPVAnimationWriter -->
-    </XMLPVAnimationWriterProxy>
+    </SourceProxy>
 
     <!-- ================================================================= -->
     <PSWriterProxy name="CSVWriter" class="vtkParallelSerialWriter"

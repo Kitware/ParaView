@@ -48,11 +48,13 @@ SET (Kit_SRCS
   vtkPMUniformGridVolumeRepresentationProxy.cxx
   vtkPMVectorProperty.cxx
   vtkPMWriterProxy.cxx
+  vtkPMXMLAnimationWriterRepresentationProperty.cxx
   vtkPVComparativeAnimationCue.cxx
   vtkPVComparativeView.cxx
   vtkPVKeyFrameAnimationCueForProxies.cxx
 # --- SM Objects ---
   vtkSMAnimationScene.cxx
+  vtkSMAnimationSceneGeometryWriter.cxx
   vtkSMAnimationSceneImageWriter.cxx
   vtkSMAnimationSceneWriter.cxx
   vtkSMBoxRepresentationProxy.cxx
@@ -193,13 +195,11 @@ SET(Kit_SRCS
 #  vtkSMSelectionDeliveryRepresentationProxy.cxx
 
   ## Animation part +++++++++++
-  vtkSMAnimationSceneGeometryWriter.cxx
   vtkSMCameraManipulatorProxy.cxx
   vtkSMLinearAnimationCueManipulatorProxy.cxx
   vtkSMRepresentationAnimationHelperProxy.cxx
   vtkSMServerSideAnimationPlayer.cxx
   vtkSMTimeAnimationCueProxy.cxx
-  vtkSMXMLPVAnimationWriterProxy.cxx
 
   ## Comparative view +++++++++
 
