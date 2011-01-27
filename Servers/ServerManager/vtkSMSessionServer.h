@@ -101,6 +101,7 @@ public:
 
   void OnClientServerMessageRMI(void* message, int message_length);
   void OnCloseSessionRMI();
+  void SendLastResultToClient();
 
 protected:
   vtkSMSessionServer();

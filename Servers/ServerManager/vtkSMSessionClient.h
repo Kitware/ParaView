@@ -89,7 +89,7 @@ public:
   virtual void PushState(vtkSMMessage* msg);
   virtual void PullState(vtkSMMessage* message);
   virtual void Invoke(vtkSMMessage* msg);
-
+  virtual const vtkSMMessage* GetLastResult(vtkTypeUInt32 location);
 //ETX
 
   // Description:
@@ -125,10 +125,12 @@ public:
     PULL=3,
     GATHER_INFORMATION=4,
     REGISTER_MTON_SOCKET_CONNECTION=5,
+    LAST_RESULT=6,
     CLIENT_SERVER_MESSAGE_RMI=55625,
     CLOSE_SESSION=55626,
     REPLY_GATHER_INFORMATION_TAG=55627,
-    REPLY_PULL=55628
+    REPLY_PULL=55628,
+    REPLY_LAST_RESULT=55629,
     };
 
 protected:
@@ -147,6 +149,7 @@ protected:
   vtkPVServerInformation* DataServerInformation;
   vtkPVServerInformation* RenderServerInformation;
   vtkPVServerInformation* ServerInformation;
+  vtkSMMessage* ServerLastInvokeResult;
 
   vtkSetStringMacro(URI);
 

@@ -53,6 +53,7 @@ vtkSMSessionClient::vtkSMSessionClient()
   this->DataServerInformation = vtkPVServerInformation::New();
   this->RenderServerInformation = vtkPVServerInformation::New();
   this->ServerInformation = vtkPVServerInformation::New();
+  this->ServerLastInvokeResult = new vtkSMMessage();
 }
 
 //----------------------------------------------------------------------------
@@ -68,6 +69,9 @@ vtkSMSessionClient::~vtkSMSessionClient()
   this->RenderServerInformation->Delete();
   this->ServerInformation->Delete();
   this->SetURI(0);
+
+  delete this->ServerLastInvokeResult;
+  this->ServerLastInvokeResult = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -540,6 +544,64 @@ void vtkSMSessionClient::Invoke(vtkSMMessage* message)
     {
     this->Superclass::Invoke(message);
     }
+}
+
+//----------------------------------------------------------------------------
+const vtkSMMessage* vtkSMSessionClient::GetLastResult(vtkTypeUInt32 location)
+{
+  if (this->RenderServerController == NULL)
+    {
+    // re-route all render-server messages to data-server.
+    if (location & vtkProcessModule::RENDER_SERVER)
+      {
+      location |= vtkProcessModule::DATA_SERVER_ROOT;
+      location &= ~vtkProcessModule::RENDER_SERVER;
+      }
+    if (location & vtkProcessModule::RENDER_SERVER_ROOT)
+      {
+      location |= vtkProcessModule::DATA_SERVER_ROOT;
+      location &= ~vtkProcessModule::RENDER_SERVER_ROOT;
+      }
+    }
+
+  if (location & vtkPVSession::CLIENT)
+    {
+    return this->Superclass::GetLastResult(location);
+    }
+
+  vtkMultiProcessController* controller = NULL;
+  if ( (location & vtkPVSession::DATA_SERVER_ROOT) ||
+    (location & vtkPVSession::DATA_SERVER) )
+    {
+    controller = this->DataServerController;
+    }
+  else if ( (location  & vtkPVSession::RENDER_SERVER_ROOT) ||
+    (location & vtkPVSession::RENDER_SERVER) )
+    {
+    controller = this->RenderServerController;
+    }
+
+  if (controller)
+    {
+    this->ServerLastInvokeResult->Clear();
+
+    vtkMultiProcessStream stream;
+    stream << static_cast<int>(LAST_RESULT);
+    vtkstd::vector<unsigned char> raw_message;
+    stream.GetRawData(raw_message);
+    controller->TriggerRMIOnAllChildren(
+      &raw_message[0], static_cast<int>(raw_message.size()),
+      CLIENT_SERVER_MESSAGE_RMI);
+
+    // Get the reply
+    vtkMultiProcessStream replyStream;
+    controller->Receive(replyStream, 1, REPLY_LAST_RESULT);
+    vtkstd::string string;
+    replyStream >> string;
+    this->ServerLastInvokeResult->ParseFromString(string);
+    return this->ServerLastInvokeResult;
+    }
+  return this->Superclass::GetLastResult(location);
 }
 
 //----------------------------------------------------------------------------

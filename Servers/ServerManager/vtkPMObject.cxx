@@ -89,5 +89,7 @@ void vtkPMObject::Pull(vtkSMMessage* msg)
 //----------------------------------------------------------------------------
 void vtkPMObject::Invoke(vtkSMMessage* msg)
 {
-  // Nothing
+  msg->Clear();
+  // build an empty response message.
+  *msg << pvstream::InvokeResponse();
 }

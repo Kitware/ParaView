@@ -222,6 +222,8 @@ vtkSMSessionCore::vtkSMSessionCore()
     LOG("Log for " << options->GetArgv0() << " ("
       << this->ParallelController->GetLocalProcessId() << ")");
     }
+
+  this->LastInvokeResult = new vtkSMMessage();
 }
 
 //----------------------------------------------------------------------------
@@ -238,6 +240,8 @@ vtkSMSessionCore::~vtkSMSessionCore()
   delete this->Internals;
   this->ProxyDefinitionManager->Delete();
   this->ProxyDefinitionManager = NULL;
+  delete this->LastInvokeResult;
+  this->LastInvokeResult = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -518,10 +522,21 @@ void vtkSMSessionCore::InvokeInternal(vtkSMMessage* message)
     << "----------------------------------------------------------------\n"
     << message->DebugString().c_str());
 
+  this->LastInvokeResult->Clear();
+
   vtkPMObject* obj = this->Internals->GetPMObject(message->global_id());
   if (obj)
     {
     obj->Invoke(message);
+    if (message->HasExtension(paraview_protobuf::InvokeResponse::arguments) ||
+      message->HasExtension(paraview_protobuf::InvokeResponse::error))
+      {
+      // preserve the response.
+      this->LastInvokeResult->CopyFrom(*message);
+      message->Clear(); // this is unnecessary, but to avoid not detecting bugs
+      // when someone simply uses the invoke stream's value as the response in
+      // builtin mode, we clear it.
+      }
     }
   else
     {

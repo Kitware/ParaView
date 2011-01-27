@@ -352,6 +352,12 @@ void vtkSMSessionServer::OnClientServerMessageRMI(void* message, int message_len
       }
     break;
 
+  case vtkSMSessionClient::LAST_RESULT:
+      {
+      this->SendLastResultToClient();
+      }
+    break;
+
   case vtkSMSessionClient::GATHER_INFORMATION:
       {
       vtkstd::string classname;
@@ -374,6 +380,16 @@ void vtkSMSessionServer::OnClientServerMessageRMI(void* message, int message_len
       }
     break;
     }
+}
+
+//----------------------------------------------------------------------------
+void vtkSMSessionServer::SendLastResultToClient()
+{
+  const vtkSMMessage* result =
+    this->GetLastResult(vtkPVSession::CLIENT_AND_SERVERS);
+  vtkMultiProcessStream reply;
+  reply << result->SerializeAsString();
+  this->ClientController->Send(reply, 1, vtkSMSessionClient::REPLY_LAST_RESULT);
 }
 
 //----------------------------------------------------------------------------

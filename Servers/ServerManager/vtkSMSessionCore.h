@@ -60,6 +60,12 @@ public:
   virtual void Invoke(vtkSMMessage* message);
 
   // Description:
+  // Returns the return value for the most recent Invoke() call.
+  // When running in parallel, this only returns the result from the root node.
+  virtual const vtkSMMessage* GetLastResult()
+    { return this->LastInvokeResult; }
+
+  // Description:
   // Invoke a method remotely
   virtual void DeletePMObject(vtkSMMessage* message);
   //ETX
@@ -134,6 +140,11 @@ protected:
   vtkSMProxyDefinitionManager* ProxyDefinitionManager;
   vtkMultiProcessController* ParallelController;
   vtkClientServerInterpreter* Interpreter;
+
+  // Used to preserve the response from the most recent "Invoke" call until
+  // requested.
+  vtkSMMessage* LastInvokeResult;
+
 private:
   vtkSMSessionCore(const vtkSMSessionCore&); // Not implemented
   void operator=(const vtkSMSessionCore&);   // Not implemented

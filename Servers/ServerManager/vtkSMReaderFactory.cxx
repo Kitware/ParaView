@@ -651,9 +651,11 @@ bool vtkSMReaderFactory::CanReadFile(const char* filename, vtkSMProxy* proxy)
   msg << pvstream::InvokeRequestNoWarning() << "CanReadFile" << filename;
   session->Invoke(&msg);
 
-  if(!msg.GetExtension(InvokeResponse::error))
+  const vtkSMMessage* reply = session->GetLastResult(proxy->GetLocation());
+
+  if (!reply->GetExtension(InvokeResponse::error))
     {
-    canRead = msg.GetExtension(InvokeResponse::arguments).variant(0).integer(0);
+    canRead = reply->GetExtension(InvokeResponse::arguments).variant(0).integer(0);
     }
 
   return (canRead != 0);
