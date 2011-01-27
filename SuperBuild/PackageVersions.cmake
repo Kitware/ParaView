@@ -77,6 +77,14 @@ set(OPENMPI_URL http://www.open-mpi.org/software/ompi/v${OPENMPI_MAJOR}.${OPENMP
 set(OPENMPI_GZ openmpi-${OPENMPI_VERSION}.tar.gz)
 set(OPENMPI_MD5 e7148df2fe5de3e485838bfc94734d6f)
 
+set(MPICH2_MAJOR 1)
+set(MPICH2_MINOR 3)
+set(MPICH2_PATCH 1)
+set(MPICH2_VERSION ${MPICH2_MAJOR}.${MPICH2_MINOR}.${MPICH2_PATCH})
+set(MPICH2_URL http://www.mcs.anl.gov/research/projects/mpich2/downloads/tarballs/${MPICH2_VERSION})
+set(MPICH2_GZ mpich2-${MPICH2_VERSION}.tar.gz)
+set(MPICH2_MD5 eced41738eca4762b020e5521bb8c53d)
+
 set(QT_MAJOR 4)
 set(QT_MINOR 6)
 set(QT_PATCH 3)
