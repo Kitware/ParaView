@@ -54,9 +54,15 @@ namespace
     int argType = stream.GetArgumentType(0, 0);
 
     // If single value, all int types
-    if (argType == vtkClientServerStream::int32_value ||
+    if (
+      argType == vtkClientServerStream::int64_value ||
+      argType == vtkClientServerStream::uint64_value ||
+      argType == vtkClientServerStream::int32_value ||
       argType == vtkClientServerStream::int16_value ||
       argType == vtkClientServerStream::int8_value ||
+      argType == vtkClientServerStream::uint32_value ||
+      argType == vtkClientServerStream::uint16_value ||
+      argType == vtkClientServerStream::uint8_value ||
       argType == vtkClientServerStream::bool_value)
       {
       int ires;
@@ -70,7 +76,8 @@ namespace
       return true;
       }
     // if array, only 32 bit ints work
-    else if (argType == vtkClientServerStream::int32_array)
+    else if (argType == vtkClientServerStream::int32_array ||
+      argType == vtkClientServerStream::uint32_array)
       {
       vtkTypeUInt32 length;
       stream.GetArgumentLength(0, 0, &length);
@@ -83,6 +90,7 @@ namespace
         }
       return true;
       }
+
     return false;
     }
 
@@ -455,7 +463,9 @@ bool vtkPMVectorPropertyTemplate<T, force_idtype>::ReadXMLAttributes(
         return false;
         }
       }
-    return this->Push(&values[0], number_of_elements);
+    // don't push the values if the property in "internal".
+    return this->GetIsInternal() ? true :
+      this->Push(&values[0], number_of_elements);
     }
   return true;
 }
